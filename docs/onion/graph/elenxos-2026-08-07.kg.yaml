@@ -27,6 +27,7 @@ nodes:
       source: "docs/evolution/review/fix-radar-allowlist-denylist.md"
       locator: "elenxo-556+varredura-dos-predicados-de-status-no-kg-radar-e-irmaos"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ALLOWLIST_NO_RADAR_LATENTE
     node_type: evidence
@@ -42,6 +43,7 @@ nodes:
       source: "docs/evolution/review/fix-radar-allowlist-denylist.md"
       locator: "corpus-de-55-grafos-137-arestas-SUPERSEDES"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ALLOWLIST_NA_CATRACA_49_ATIVO
     node_type: evidence
@@ -57,6 +59,7 @@ nodes:
       source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
       locator: "reproducao-propria-trocar-um-no-PROD-para-drifted-sem-carimbar"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # SUCESSOR do no acima (2026-08-08). O rotulo antigo NAO foi reescrito: ele continua descrevendo o
   # fail-open como ele era, que e o unico jeito de a escada continuar legivel depois da correcao.
@@ -74,6 +77,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "mesma-mutacao-nos-dois-scripts-lado-a-lado-47-com-OBSOLETA-vs-48-limpo"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ALLOWLIST_NO_KG_VIEW
     node_type: evidence
@@ -99,6 +103,7 @@ nodes:
       source: "docs/evolution/review/fix-radar-allowlist-denylist.md"
       locator: "PR-556-mergeado-7742d8d"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── A TESE QUE OS TRES PRs CONFIRMARAM, CADA UM DE UM JEITO ─────────────────────────────────
   - id: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE
@@ -114,6 +119,7 @@ nodes:
       source: "docs/onion/graph/elenxos-2026-08-07.kg.yaml"
       locator: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A 25 \"id: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE\" docs/onion/graph/elenxos-2026-08-07.kg.yaml (nó + evidências filhas E_SITIO_HARD_SEM_COBERTURA, E_STEP_DE_CI_SEM_SELFTEST, E_BANCADA_QUE_NAO_SE_VERIFICAVA, e as arestas SUPPORTS); find . -iname \"*selftest-summary*\" -o -iname \"*collect-selftest*\" -o -iname \"*review-ledger*\" -o -iname \"*harness-inventory*\" -o -iname \"*testing-state*\"; grep -rn \"REGRA 80\\|REGRA 81\" docs/ ; sed -n '160,300p' docs/onion/graph/testes-evidencia-2026-09.kg.yaml"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SITIO_HARD_SEM_COBERTURA
     node_type: evidence
@@ -128,6 +134,7 @@ nodes:
       source: "commit 7742d8df (#556)"
       locator: "corpo (git show -s --format=%B 7742d8df) l.10 (\"alvo de REFUTES … único que REPROVA, exit 1\") e l.30-31 (\"o sítio que REPROVA não tinha nenhuma… 73 .kg.yaml × 6 modos: 0 diffs em 438 comparações\")"
       method: "leitura: corpo do commit do PR #556"
+      locality: "repo"
 
   - id: E_STEP_DE_CI_SEM_SELFTEST
     node_type: evidence
@@ -156,6 +163,7 @@ nodes:
       source: "commit ee8067af (#557)"
       locator: "corpo (git show -s --format=%B ee8067af) l.54-58: \"Três defeitos IDÊNTICOS… $( ) come a quebra de linha FINAL… diagnosticar custou 4 rodadas\" + cura _fixture_sane"
       method: "leitura: corpo do commit do PR #557"
+      locality: "repo"
 
   - id: D_GUARDA_DA_BANCADA_NOMEIA_A_CAUSA
     node_type: decision
@@ -171,6 +179,7 @@ nodes:
       source: "docs/evolution/review/feat-kg-seal-check.md"
       locator: "PR-557-mergeado-ee8067a+sabotagem-provada"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── A PREMISSA FALSA DA F4, E A SUPERACAO ──────────────────────────────────────────────────
   - id: C_F4_CAUSA_ERA_CREDENCIAL
@@ -214,6 +223,7 @@ nodes:
       source: "commit 422c61d3 (#558) + .github/workflows/onion-review.yml"
       locator: ".github/workflows/onion-review.yml l.573 e l.687 (bash .claude/utils/forge/post-review-comment.sh)"
       method: "leitura: commit #558 e o workflow vivo"
+      locality: "repo"
 
   - id: E_JSON_SCHEMA_NAO_PASSA
     node_type: evidence
@@ -229,6 +239,7 @@ nodes:
       source: "docs/evolution/review/fix-revisor-invisivel.md"
       locator: "parser-real-da-action-shell-quote+CLI-do-pin+probe-do-SDK"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_LACUNA_DA_SPEC_FECHA_NA_SPEC
     node_type: decision
@@ -243,6 +254,7 @@ nodes:
       source: "commit 422c61d3 (#558) + .claude/utils/forge/interface.md, adapters/github.md"
       locator: "interface.md l.94 (upsertBy); adapters/github.md l.224-241 (updateReviewComment)"
       method: "leitura: commit #558 e a spec do forge"
+      locality: "repo"
 
   - id: Q_SDAAL_EXECUTAVEL_ONDE_PARA
     node_type: question
@@ -288,6 +300,7 @@ nodes:
       source: "commit 422c61d3 (#558) + .github/workflows/onion-review.yml"
       locator: "git show --stat 422c61d3 (post-review-comment.sh +126, onion-review.yml); onion-review.yml l.573/687; backlog-real-2026-09.md l.41"
       method: "medição: git show --stat 422c61d3 + git grep post-review-comment.sh .github/workflows (revisão-total wf_2944480c)"
+      locality: "repo"
 
   - id: E_W8_LINT_VE_WORKFLOWS
     node_type: evidence
@@ -302,6 +315,7 @@ nodes:
       source: ".github/workflows"
       locator: "lint-artifacts.sh:1687-1698 — a REGRA 10 (anti-provider-direto) varre .github/workflows/*.yml como CONSUMIDOR, violacao HARD; bancada sdaal-workflows (a-b) prova a mordida; PR #758 (Onda 8, 2026-09-01)"
       method: "leitura: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_JSON_SCHEMA_NAO_PASSA

@@ -70,6 +70,7 @@ nodes:
       source: ".claude/rules/research-lens.md"
       locator: "A `research-lens` (.claude/rules/research-lens.md) manda: \"Corpus primeiro: bash .claude/validation/kg-corpus-grep.sh <tema> antes de qualquer busca externa\". Nao rodei — li o grafo da rodada 4 direto. O no que virou manchete desta rodada errou a VERSAO (2.1.268 em vez de 2.1.233), errou a MAGNITUDE (551 \"ocorrencias\" que eram `grep -rl | wc -l`, isto e ARQUIVOS, somando `.claude/worktrees/` de outros agentes, com `TaskList` casando `getTaskList` por substring; o real e 83/0/0/0) e chegou a CONCLUSAO OPOSTA a do corpus, que diz \"o FRAMEWORK Onion NAO depende disso\". A decisao que eu propus ao maestro — declarar a variavel no repo — e literalmente o que aquele no desaconselha: \"religar por reflexo pode PIORAR\"."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO
     node_type: evidence
@@ -104,6 +105,7 @@ nodes:
       source: ".claude/hooks"
       locator: "`claude auto-mode defaults` no binario 2.1.278 devolve JSON com 17 regras `allow`, 70 `soft_deny`, 1 `hard_deny` e um bloco `environment` (copia em data/automode-defaults-2.1.278.json). O subcomando expoe ainda `config` (config efetiva) e `critique` (feedback de IA sobre regras proprias). No repo, medido: 18 ENTRADAS de hook em .claude/settings.json / 15 SCRIPTS distintos (session-beacon-hook.sh aparece 3x) / 6 que vetam por `exit 2`. Os tres numeros descrevem populacoes diferentes e o grafo passa a dizer qual."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_RESPAWN_JA_EXISTIA_E_A_CASA_NAO_SABIA
     node_type: evidence
@@ -173,6 +175,7 @@ nodes:
       source: ".claude/skills/onion-orchestration/SKILL.md"
       locator: "CHANGELOG-LOCAL 2.1.265 (resume com run journal ausente passa a FALHAR explicito em vez de re-executar todos os agentes em silencio) e 2.1.271 (dynamic workflow que bate o limite de uso PAUSA e retoma, em vez de descartar os agentes afetados). Os dois aprovados pelo juiz com a fonte aberta."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_EXIT_2_INALTERADO_NA_JANELA
     node_type: evidence
@@ -190,6 +193,7 @@ nodes:
       source: "docs/onion/graph/onion-identity-2026-07.kg.yaml"
       locator: "Lacuna declarada pelo worker do eixo HOOKS, verbatim: \"Nao encontrei nenhuma entrada no delta 2.1.263->2.1.278 que mude o contrato de exit code de hooks (0/2/outro)\". Os 8 achados aprovados do eixo tocam tipo `prompt` de Stop hook, timeout de SessionEnd, PermissionRequest em --print e matcher de SubagentStop — nenhum toca o veto por exit 2."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_TIMEOUT_AUSENTE_EM_7_HOOKS_INCLUINDO_VETOS
     node_type: evidence
@@ -207,6 +211,7 @@ nodes:
       source: ".claude/settings.json"
       locator: "Medicao do JUIZ ao refutar um achado do scan: 11 de 18 ENTRADAS de hook em `.claude/settings.json` declaram `timeout`; 7 nao — session-degraded-notice, bash-empty-result-guard, pretooluse-protect-main, pretooluse-merge-gate, kg-read-leg, instructions-loaded-log, rule-title-in-prose. Contexto: a 2.1.268 corrigiu `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS` nao estender hooks sem `timeout` proprio."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CONTENCAO_DE_CUSTO_E_TEMA_DO_VENDOR_NA_JANELA
     node_type: evidence
@@ -224,6 +229,7 @@ nodes:
       source: "docs/knowledge-base/concepts/agent-orchestration.md"
       locator: "Tres mecanismos no delta, aprovados pelo juiz com uma correcao de versao: default de dynamic workflow menor (2.1.271, small em Pro; medium 15->10 agentes, ORIENTACAO e nao limite), prazo maximo em Monitor (2.1.271, max 10 min em runs -p de prompt unico) e chargeback com `multiplier` ate 10 em `modelPricing` (2.1.271)."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_MERCADO_E3_R5_SINAL_FRACO
     node_type: evidence
@@ -241,6 +247,7 @@ nodes:
       source: "docs/onion/radar-sources.yaml"
       locator: "Eixo mercado/capital: 3 achados aprovados e 1 dos 2 REPROVADOS da rodada inteira caiu aqui (bonus de credito de concorrente, fonte externa que o juiz abriu e nao sustentou). Nenhuma rodada de investimento, M&A ou down round no periodo."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_A_FABRICACAO_MUDOU_DE_PORTA_NAO_CAIU
     node_type: evidence
@@ -258,6 +265,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-21-r5/data/f1-scan-juizo.json"
       locator: "Descarte desta rodada: 2/41; rodada 4: 18/25. Mas a leitura simples NAO sobrevive a medicao: dos dois reprovados, APENAS UM era de fonte externa. O outro (EIXO 2, plugins) teve a citacao CONFERIDA E APROVADA no changelog local — o juiz o reprovou, verbatim, porque a consequencia carregava \"uma verificacao-ao-vivo FABRICADA\". E a passada adversarial achou MAIS DUAS fabricacoes da mesma especie que passaram pelo juiz (as contagens do no-manchete; a atribuicao de tipo ao Stop hook do repo)."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO
     node_type: decision

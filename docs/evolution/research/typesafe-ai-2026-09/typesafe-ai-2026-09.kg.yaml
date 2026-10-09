@@ -58,6 +58,7 @@ nodes:
       source: "https://typesafe.ai/manifesto"
       locator: "https://typesafe.ai/manifesto — lido 2026-09-21"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MACHINE_NATIVE_INTELLIGENCE
     node_type: evidence
@@ -75,6 +76,7 @@ nodes:
       source: "https://docs.typesafe.ai/introduction/machine-learning-primer"
       locator: "https://docs.typesafe.ai/introduction/machine-learning-primer — citacao literal do bloco destacado"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CAPITAL_40M_DCVC
     node_type: evidence
@@ -93,6 +95,7 @@ nodes:
       source: "https://typesafe.ai/team"
       locator: "imprensa concordante em >=4 veiculos (finsmes, theaiinsider, stackfutures, runtimewire) — NAO confirmado em fonte primaria do vendor; typesafe.ai/team diz apenas \"top-tier investors\" sem nomear"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ O MODELO ═══════════════════
 
@@ -112,6 +115,7 @@ nodes:
       source: "https://docs.typesafe.ai/concepts/system-one"
       locator: "https://docs.typesafe.ai/concepts/system-one — lido integral"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_RLCD_TERCEIRA_VIA_DE_POS_TREINO
     node_type: evidence
@@ -129,6 +133,7 @@ nodes:
       source: "https://docs.typesafe.ai/introduction/machine-learning-primer"
       locator: "https://docs.typesafe.ai/introduction/machine-learning-primer — as tres cartas RLHF/RLVR/RLCD"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CALIBRACAO_E_DE_GRUPO_NAO_DE_RESPOSTA
     node_type: evidence
@@ -146,6 +151,7 @@ nodes:
       source: "https://docs.typesafe.ai/concepts/system-one"
       locator: "https://docs.typesafe.ai/introduction/machine-learning-primer e https://docs.typesafe.ai/concepts/system-one — a ressalva aparece nas DUAS paginas"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TRES_PRIMITIVAS_TIPADAS
     node_type: evidence
@@ -163,6 +169,7 @@ nodes:
       source: "https://docs.typesafe.ai/api"
       locator: "https://docs.typesafe.ai/api e https://docs.typesafe.ai/primitives — request/response literais lidos"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CONFIDENCE_E_DERIVADO_DA_DISTRIBUICAO
     node_type: evidence
@@ -180,6 +187,7 @@ nodes:
       source: "https://docs.typesafe.ai/confidence"
       locator: "https://docs.typesafe.ai/confidence — lido integral, incl. o exemplo de limiar por risco"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ O QUE O PRODUTO DECLARA DE SI, COM AS RESSALVAS ═══════════════════
 
@@ -200,6 +208,7 @@ nodes:
       source: "https://docs.typesafe.ai/models"
       locator: "https://docs.typesafe.ai/models — tabela do jev-1.13.0"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_BENCH_AUTODECLARADO
     node_type: evidence
@@ -217,6 +226,7 @@ nodes:
       source: "https://typesafe.ai/"
       locator: "https://typesafe.ai/ (home) e o blog de lancamento — numeros LIDOS, nao reproduzidos; nenhuma chamada a API nesta rodada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LIMITES_DECLARADOS_PELO_VENDOR
     node_type: evidence
@@ -234,6 +244,7 @@ nodes:
       source: "https://docs.typesafe.ai/models"
       locator: "https://docs.typesafe.ai/models, /concepts/state, /primitives — ressalvas coletadas de 3 paginas"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_QUATRO_PADROES_ARQUITETURAIS
     node_type: evidence
@@ -251,6 +262,7 @@ nodes:
       source: "https://docs.typesafe.ai/patterns"
       locator: "https://docs.typesafe.ai/patterns — tabela dos 4 + as paginas de cada um"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AI_POWERED_SOFTWARE_CONTRA_AGENTES
     node_type: evidence
@@ -268,6 +280,7 @@ nodes:
       source: "https://docs.typesafe.ai/concepts/how-to-build-with-system-one"
       locator: "https://docs.typesafe.ai/concepts/how-to-build-with-system-one — as tres abas de arquitetura"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_JEV_NAO_SUBSTITUI_LLM_DE_AGENTE
     node_type: evidence
@@ -285,6 +298,7 @@ nodes:
       source: "https://docs.typesafe.ai/introduction/coding-agents"
       locator: "https://docs.typesafe.ai/introduction/coding-agents — pagina dedicada a desfazer exatamente esta confusao"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SKILL_E_PLUGIN_NO_MARKETPLACE_CLAUDE_CODE
     node_type: evidence
@@ -302,6 +316,7 @@ nodes:
       source: "https://docs.typesafe.ai/agent-skill"
       locator: "https://docs.typesafe.ai/agent-skill — comandos de instalacao literais"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ A RELACAO COM O ONION — ANALISE (claims minhas, nao do vendor) ═══════════════════
 
@@ -410,6 +425,7 @@ nodes:
       source: "docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md"
       locator: "25 julgamentos REAIS rodados nesta maquina: 5 nos do proprio corpus x 5 repeticoes independentes, um subagente read-only por julgamento, cada um recebendo SO o enunciado (sem ver o status: selado, para nao copiar gabarito)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_JEV_NAO_COBRE_A_PARTE_CARA
     node_type: claim
@@ -438,6 +454,7 @@ nodes:
       source: "https://docs.typesafe.ai/"
       locator: "inventario do que esta rodada NAO fez — ausencia medida, nao esquecida"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
 edges:
   - from: E_MANIFESTO_GARGALO_E_COMPONIBILIDADE

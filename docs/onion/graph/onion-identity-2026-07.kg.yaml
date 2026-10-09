@@ -111,6 +111,7 @@ nodes:
       source: "CLAUDE.md:identidade-canonica"
       locator: "filesystem do core 2026-08-04, INDEPENDENTE do texto do CLAUDE.md (senao seria circular): package.json AUSENTE (nao e npm), nenhum .cursor*/.antigravity*/.codex* na raiz (plataforma unica), docs/{business,technical,compliance}-context presentes (3 peer)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: C_RFC4_INTER_INSTANCE
     node_type: claim
     layer: audit
@@ -124,6 +125,7 @@ nodes:
       source: "82c85e3f:docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
       locator: "RFC-0004@82c85e3f l.2 (título) + l.18-23 (§1 Decisão: federar a COMUNICAÇÃO entre instâncias) + docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md l.141 (\"RFC-0004 = federação inter-instâncias (não trata do trio de branches interno)\")"
       method: "leitura: RFC-0004 no commit 82c85e3f + diagnóstico do plano §3"
+      locality: "repo"
   - id: C_RFC5_SCOPE_NOT_BRANCH
     node_type: claim
     layer: audit
@@ -137,6 +139,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
       locator: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_PARECER_2LINEAGE
     node_type: claim
     layer: audit
@@ -150,6 +153,7 @@ nodes:
       source: "docs/analysis/onion-parecer-rhilo-lineages-2026-07.md"
       locator: "docs/analysis/onion-parecer-rhilo-lineages-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_SIGNAL_DISJOINT
     node_type: claim
     layer: audit
@@ -173,6 +177,7 @@ nodes:
       source: "github.com/marciocar/metagamify"
       locator: "merge-base 62ef2c10 (origin/develop) f7e4b034 (origin/rhilo/main), pontas de 2026-07-11 = 05f96a05 (\"Merge pull request #75\", 2026-07-01 11:05 -0300); clone em /home/marcio/rhilo-metagamify"
       method: "leitura: merge-base dos commits 62ef2c10 e f7e4b034 do marciocar/metagamify = 05f96a05 (2026-07-01)"
+      locality: "web"
   - id: C_TOPO_MAIN_HAS_FW
     node_type: claim
     layer: audit
@@ -207,6 +212,7 @@ nodes:
       source: "docs/business-context/ docs/technical-context/"
       locator: "docs/business-context/ docs/technical-context/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_KG_MATURE
     node_type: claim
     layer: audit
@@ -221,6 +227,7 @@ nodes:
       source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
       locator: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_HEGEL_CRITERION
     node_type: claim
     layer: audit
@@ -281,6 +288,7 @@ nodes:
       source: "github.com/marciocar/metagamify"
       locator: "merge-base 62ef2c10 (origin/develop@2026-07-11) f7e4b034 (origin/rhilo/main@2026-07-11) = 05f96a05; log -1 05f96a05 = 2026-07-01 11:05 -0300; clone em /home/marcio/rhilo-metagamify"
       method: "leitura: merge-base dos commits 62ef2c10 e f7e4b034 do marciocar/metagamify = 05f96a05 (2026-07-01)"
+      locality: "web"
   - id: E_GIT_LSTREE_MAIN
     node_type: evidence
     layer: audit
@@ -294,6 +302,7 @@ nodes:
       source: "github.com/marciocar/metagamify"
       locator: "ls-tree -r --name-only bfb9bce2 -- .claude | wc -l = 239 (bfb9bce2 = origin/main do marciocar/metagamify, \"adoção do framework Onion\", 2026-06-26, a mesma ponta em 07-11); clone em /home/marcio/rhilo-metagamify"
       method: "leitura: árvore .claude do commit bfb9bce2 do marciocar/metagamify (239 arquivos)"
+      locality: "web"
   - id: E_CLAUDE_MD
     node_type: evidence
     layer: audit
@@ -308,6 +317,7 @@ nodes:
       source: "CLAUDE.md"
       locator: "CLAUDE.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: E_RFC5_TEXT
     node_type: evidence
     layer: audit
@@ -321,6 +331,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
       locator: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   # ==== camada F2 (pesquisa densa 2026-07-11, verificada adversarialmente) ====
   # -- evidencias PROD --
   - id: E_DOGFOOD_BUGS
@@ -338,6 +349,7 @@ nodes:
       source: "https://github.com/marciocar/onion-evolve/pull/126"
       locator: "gh pr view 126/89/128 (bugs achados por dogfood) + docs/knowledge-base/decisions/onion-adr-adopt-vendor-branch-merge-2026-07.md l.135-138 (verificação de campo: 392 arquivos, conflito isolado em 1 customizado, 7/7 asserts)"
       method: "leitura: corpos dos PRs #126/#89/#128 + ADR adopt-vendor-branch-merge §verificação de campo"
+      locality: "web"
   - id: E_MARKET_SCAN
     node_type: evidence
     layer: audit
@@ -351,6 +363,7 @@ nodes:
       source: "sessão de 2026-07-11 (commit 82c85e3f)"
       locator: "trace \"F2 Q3 (web)\"; números só no próprio nó; sessão de 2026-07-11 (commit 82c85e3f)"
       method: "testemunho: medição da sessão 2026-07-11 (pesquisa F2 Q3 na web), comando não registrado"
+      locality: "pessoa"
   - id: E_ORBIT
     node_type: evidence
     layer: audit
@@ -367,6 +380,7 @@ nodes:
       source: "9c180625:docs/evolution/federation/members.yaml"
       locator: "members.yaml@9c180625 (último antes de 2026-07-12) l.55-164: membros não-source = metagamify, pulse-mais, granaai, onion-mini; remotes l.59,96,117,164"
       method: "leitura: registro da federação fixado em 2026-07-10 (9c180625)"
+      locality: "repo"
   - id: E_SITE_LIVE
     node_type: evidence
     layer: audit
@@ -380,6 +394,7 @@ nodes:
       source: "82c85e3f:site/index.html"
       locator: "trace \"F2 Q1 (curl)\" da sessão de 2026-07-11 (commit 82c85e3f); corroboração parcial: 82c85e3f:site/index.html l.420,488-490 e l.379,391"
       method: "testemunho: medição da sessão 2026-07-11 (curl em onionevolve.com), comando completo e saída não registrados"
+      locality: "repo"
   # -- claims de valor/mercado --
   - id: C_DOGFOOD_VALUE
     node_type: claim
@@ -396,6 +411,7 @@ nodes:
       source: "https://github.com/marciocar/onion-evolve/pull/126"
       locator: "gh pr view 126 (§Validação \"Dogfood ponta a ponta... pegou um bug que o happy-path escondia: o CLAUDE.md mora fora dos roots\"), 89 (título \"Bug (achado pelo dogfooding)\"), 128 (\"Rodar o comando de verdade expôs 2 lacunas... o tipo de coisa que só o uso revela\") — todos MERGED"
       method: "leitura: corpos dos PRs #126, #89, #128 (gh pr view --repo marciocar/onion-evolve)"
+      locality: "web"
   - id: C_MARKET_COMMODITY
     node_type: claim
     layer: audit
@@ -411,6 +427,7 @@ nodes:
       source: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       locator: "spec-as-code SYNTHESIS l.33-34 (Spec Kit, BMAD) e l.120 (Spec Kit/Kiro/BMAD todos markdown) + verified_against do nó (WebSearch 2026-08-04, sessão do commit 28db0b0e)"
       method: "testemunho: re-scan WebSearch da sessão de 2026-08-04 (/meta:kg-freshness, commit 28db0b0e), resultados não persistidos"
+      locality: "repo"
   - id: C_ORBIT_CAVEAT
     node_type: claim
     layer: audit
@@ -426,6 +443,7 @@ nodes:
       source: "27ce2b4:docs/evolution/federation/members.yaml"
       locator: "members.yaml@27ce2b4 l.65-371 (8 kind: adopter; pulse-mais l.108-119 \"via consultoria de Marcio Carvalho\"; granaai l.131-140 \"acesso via token gh de marciocar\"; arandek l.335-352 local_path worktree na máquina do maestro)"
       method: "leitura: registro da federação no commit 27ce2b4 (2026-08-03)"
+      locality: "repo"
   - id: C_MARKET_PULL
     node_type: claim
     layer: audit
@@ -449,6 +467,7 @@ nodes:
       source: "docs/evolution/federation/CHANGELOG.md"
       locator: "CHANGELOG.md l.872-874 (F2.2 COMPLETO, 1o handshake com membro regulado granaai) + inbox/_processed/2026-07-10-rfc5-docs-only-adoption-ground-truth.md l.2-5 (sinal upstream 2026-07-10) + federation/outbox/granaai/_processed/2026-07-10-resposta-rfc5-ground-truth-absorvido.md l.3,6,12 (resposta downstream 2026-07-10, \"absorvida no mesmo dia\")"
       method: "leitura: CHANGELOG da federação + par sinal/resposta datados no mesmo dia"
+      locality: "repo"
   # -- claims de identidade --
   - id: C_FLOW_EVOLUTION
     node_type: claim
@@ -463,6 +482,7 @@ nodes:
       source: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md"
       locator: "plano l.228 (§8 F3, \"A identidade real = o loop de auto/co-evolução, não o pipeline product→pr do pitch\")"
       method: "testemunho: veredito F3 da sessão de 2026-07-11 sobre a pesquisa F2 (13 agentes, verificação adversarial), registrado no plano §8 e no commit 82c85e3f; saída bruta dos agentes não persistida"
+      locality: "repo"
   - id: C_IDENTITY_DRIFT
     node_type: claim
     layer: audit
@@ -476,6 +496,7 @@ nodes:
       source: "82c85e3f:docs/knowledge-base/meta/onion-framework-identity.md"
       locator: "82c85e3f:docs/knowledge-base/meta/onion-framework-identity.md l.105-109 (82 comandos/49 agentes/34 KBs) + l.280 (5 skills) x 82c85e3f:docs/onion/inventory.md l.11-14 (96/51/8/66) x 82c85e3f:site/index.html l.420,488-490"
       method: "leitura: KB, inventário e fonte do site fixados no commit de ingestão da F2 (82c85e3f, 2026-07-11)"
+      locality: "repo"
   - id: C_PUBLIC_AHEAD
     node_type: claim
     layer: audit
@@ -490,6 +511,7 @@ nodes:
       source: "82c85e3f:site/index.html"
       locator: "82c85e3f:site/index.html l.420,488-490 (96/51/8/66) e l.379,391 (loop) x 82c85e3f:docs/knowledge-base/meta/onion-framework-identity.md l.83-109 (82/49/5/34) x 82c85e3f:docs/onion/inventory.md l.11-14"
       method: "leitura: fonte do site, KB e inventário fixados no commit 82c85e3f (2026-07-11)"
+      locality: "repo"
   - id: C_PIPELINE_COMMODITY
     node_type: claim
     layer: audit
@@ -503,6 +525,7 @@ nodes:
       source: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md"
       locator: "plano l.251 (§8 \"Não investir no pipeline product→pr (33 cmds) como diferencial — é commodity + aspiracional\") + 82c85e3f:docs/onion/inventory.md l.21-22 (product 21 + engineer 12 = 33)"
       method: "testemunho: veredito F3 da sessão de 2026-07-11 (plano §8, commit 82c85e3f); o 33 é leitura do inventário no mesmo commit"
+      locality: "repo"
   # -- claims de ICP/metodo --
   - id: C_ICP_REGULATED
     node_type: claim
@@ -517,6 +540,7 @@ nodes:
       source: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       locator: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md l.191-194 (decisão do usuário via AskUserQuestion: \"ICP: orgs reguladas e multi-repo\", date 2026-06-17 l.3) + docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md l.231-232 e l.264-265 (zero adotante frio, zero cliente pagante)"
       method: "leitura: handoff da sessão de estratégia de 2026-06-17"
+      locality: "repo"
   - id: C_ICP_TENSION
     node_type: claim
     layer: audit
@@ -552,6 +576,7 @@ nodes:
       source: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md"
       locator: "plano l.235 (§8 \"O salto diferenciador (KG-sobre-negócio) é DESENHO, não uso vivo — continua não-executado\") + l.265 (lacunas)"
       method: "testemunho: veredito F3 da sessão de 2026-07-11 sobre a pesquisa F2, registrado no plano §8 (commit 82c85e3f)"
+      locality: "repo"
   - id: C_CATEGORY_UNNAMED
     node_type: claim
     layer: audit
@@ -565,6 +590,7 @@ nodes:
       source: "docs/analysis/onion-vision-concept-map-2026-06.md"
       locator: "concept-map l.29 + l.139 (\"Aberta: nomear a categoria do Onion (hoje: agent harness técnico / agentic SDLC funcional)\") + SYNTHESIS knowledge-centric l.18 e l.241"
       method: "leitura: mapa de conceitos 2026-06 (termos emprestados) + síntese knowledge-centric (combo sem nome)"
+      locality: "repo"
   - id: C_EDGE_HAGEL
     node_type: claim
     layer: audit
@@ -580,6 +606,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-02-sinal-sdaal-knowledge-graph.md"
       locator: "sinal l.3-8 (from: instância rhilo-metagamify, 2026-07-02, \"dogfoodado numa auditoria real de produção\") + l.39,67 (scripts/kg/radar.js) + l.73 (propõe /meta:kg ao core) + commit 70f9a26 (2026-07-04, #239: \"/meta:kg nasce do dogfood\", kg-radar.sh \"NÃO port do radar.js do rhilo\", \"prometido ao rhilo no D3\")"
       method: "leitura: sinal upstream do rhilo (2026-07-02) + corpo e kg-radar.sh l.16 do commit 70f9a26"
+      locality: "repo"
   # -- decisao de north-star + candidatos --
   - id: Q_NORTHSTAR
     node_type: question
@@ -639,6 +666,7 @@ nodes:
       source: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
       locator: "o proprio SYNTHESIS.md lido (311 linhas, 42 URLs unicas >= '26+ fontes', frase 'HYPE/discurso vs. IMPLEMENTADO/produto' literal) — evidencia sobre O ARTEFATO existir e conter isso, NAO checagem de mercado (essa e C_AXIS_HOT)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: C_AXIS_HOT
     node_type: claim
     layer: audit
@@ -654,6 +682,7 @@ nodes:
       source: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.20 (\"virou categoria quente em 2026\") + l.163-170 (§8, Company Brain = categoria #4 do YC RFS Summer 2026, Blomfield) + ressalva l.264-265"
       method: "leitura: síntese da pesquisa knowledge-centric 2026-07 (fontes secundárias datadas [31][32])"
+      locality: "repo"
   - id: C_PEER_UNIQUE
     node_type: claim
     layer: audit
@@ -670,6 +699,7 @@ nodes:
       source: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.158-161 (\"ninguém NO MATERIAL ENCONTRADO unifica...\") + l.215-218 (\"não encontrei ninguém... Todos os players são ancorados numa vertical e tratam as outras como fontes de contexto\") + l.269-270"
       method: "leitura: §7 e veredito (b) da síntese knowledge-centric 2026-07"
+      locality: "repo"
   - id: C_COMBO_UNOCCUPIED
     node_type: claim
     layer: audit
@@ -683,6 +713,7 @@ nodes:
       source: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.227-229 (\"cada propriedade isolada tem dono; a conjunção não tem\") + l.235-237 (\"Companhia existe por propriedade, não por combinação\")"
       method: "leitura: veredito (b) da síntese knowledge-centric 2026-07"
+      locality: "repo"
   - id: C_RECONCILE_VALUE
     node_type: claim
     layer: audit
@@ -699,6 +730,7 @@ nodes:
       source: "https://arxiv.org/abs/2510.08109"
       locator: "abstract arXiv:2510.08109 (\"VersionRAG achieves 90% accuracy, outperforming naive RAG (58%) and GraphRAG (64%)\"; \"where baselines fail (0-10%)\") + SYNTHESIS knowledge-centric l.115-119"
       method: "leitura: abstract do VersionRAG (lido via WebFetch em 2026-10-09) + síntese knowledge-centric"
+      locality: "web"
   - id: C_TOKI_TWIN
     node_type: claim
     layer: audit
@@ -712,6 +744,7 @@ nodes:
       source: "https://arxiv.org/abs/2606.06240"
       locator: "abstract arXiv:2606.06240 (submetido 2026-06-04: \"contradiction resolution is write-time concurrency control\"; \"provenance annotation that preserves the losing fact in an audit row\") + SYNTHESIS knowledge-centric l.98-104 e l.197-200 (\"maquinaria epistêmica gêmea do radar\")"
       method: "leitura: abstract do TOKI (WebFetch 2026-10-09) + síntese knowledge-centric"
+      locality: "web"
   - id: C_DEMAND_AXIS_NOT_ONION
     node_type: claim
     layer: audit
@@ -727,6 +760,7 @@ nodes:
       source: "27ce2b4:docs/evolution/federation/members.yaml"
       locator: "members.yaml@27ce2b4 l.65-371 (8 entradas kind: adopter; remotes marciocar/* exceto GranaAi/granaai e ArandekBR/arandek) + SYNTHESIS knowledge-centric l.167-170 e l.269-270"
       method: "leitura: registro da federação no commit 27ce2b4 (2026-08-03) + síntese knowledge-centric"
+      locality: "repo"
   - id: C_NAME_SLICES
     node_type: claim
     layer: audit
@@ -741,6 +775,7 @@ nodes:
       source: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.239-252 (§(c) \"O mercado ainda não nomeou o combo do Onion. Nomes existentes cobrem só fatias\": Company Brain, Active Ontology, DTO)"
       method: "leitura: §(c) da síntese knowledge-centric 2026-07"
+      locality: "repo"
   - id: C_NS2_PORTABLE
     node_type: claim
     layer: audit
@@ -791,6 +826,7 @@ nodes:
       source: "https://onionevolve.com"
       locator: "curl https://onionevolve.com em 2026-07-17 (trace) x c488a123:docs/onion/inventory.md l.11 (97) + log -S: 97 entra no inventário em 9df3a2dc (2026-07-15); corroboração c488a123:site/index.html l.488 (data-n=96) e corpo do commit c488a123 (\"o site exibe 96\")"
       method: "medição: curl https://onionevolve.com x docs/onion/inventory.md (sessão de 2026-07-17, commit c488a123); saída do curl não persistida"
+      locality: "web"
   - id: C_INTERNAL_AHEAD_0717
     node_type: claim
     layer: audit
@@ -806,6 +842,7 @@ nodes:
       source: "c488a123:docs/onion/inventory.md"
       locator: "c488a123:inventory.md l.11 (97) x c488a123:site/index.html l.488 (data-n=96) x c488a123:docs/knowledge-base/meta/onion-framework-identity.md l.122,137,274 (82) + corpo do commit c488a123"
       method: "leitura: inventário, site e KB fixados no commit da re-verificação de 2026-07-17"
+      locality: "repo"
   - id: E_LSTREE_MAIN_0717
     node_type: evidence
     layer: audit
@@ -824,6 +861,7 @@ nodes:
       source: "/home/marcio/onion-evolve"
       locator: "git ls-tree -r --name-only fb08cc6b -- .claude | wc -l = 399 no CORE (origin/main do onion-evolve em 2026-07-16 20:45 -0300) x git -C /home/marcio/rhilo-metagamify ls-tree ... bfb9bce2 = 239"
       method: "medição: git ls-tree -r --name-only <onion-evolve origin/main @2026-07-16..17> -- .claude | wc -l (reproduz o 399 no repo ERRADO)"
+      locality: "host"
   - id: C_VERTICALS_PARTIAL_0717
     node_type: claim
     layer: audit
@@ -838,6 +876,7 @@ nodes:
       source: "docs/business-context/ x docs/technical-context/"
       locator: "docs/business-context/ x docs/technical-context/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: Q_COLD_ADOPTER_0717
     node_type: question
     layer: audit
@@ -870,6 +909,7 @@ nodes:
       source: "https://github.com/marciocar/onion-architect"
       locator: "relato-do-maestro-2026-08-02"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_PORTE_PARA_O_CURSO
     node_type: evidence
@@ -886,6 +926,7 @@ nodes:
       source: "git:65289818"
       locator: "corpo do commit 65289818 (#514, 2026-08-02) §\"A HISTORIA\": \"o multi-IDE foi ATO DELIBERADO COM PROPOSITO DE NEGOCIO: para o Curso de Desenvolvimento com IA (spec-as-code) na PULSE MAIS... ALUNOS usaram o onion-portable como padrao — uso de campo real\""
       method: "testemunho: relato do maestro de 2026-08-02, registrado no corpo do commit 65289818"
+      locality: "repo"
 
   - id: E_FAMILIA_MULTIIDE_CONGELADA
     node_type: evidence
@@ -904,6 +945,7 @@ nodes:
       source: "git:65289818"
       locator: "corpo do commit 65289818 (#514, 2026-08-02): \"familia multi-IDE esta CONGELADA (confirmado pelo maestro)\" + \"os 7 repos publicos\"; createdAt re-medido em 2026-10-09 via gh repo list marciocar (imutável): 6 dos 7 depois de 2026-05-18"
       method: "testemunho: medição gh api da sessão de 2026-08-02 e confirmação do maestro, registradas no corpo do commit 65289818; createdAt re-medido em 2026-10-09"
+      locality: "repo"
 
   - id: D_CLAUDE_CODE_POR_CAPACIDADE
     node_type: decision
@@ -921,6 +963,7 @@ nodes:
       source: "git:65289818"
       locator: "corpo do commit 65289818 (#514, 2026-08-02): \"a decisao de 2026-05-18 foi TECNICA: parar de gastar energia em agnosticismo para poder usar recursos de fronteira (SendMessage entre agentes no modo Teams). Trade-off explicito...\" + 65289818:CLAUDE.md l.10-14"
       method: "testemunho: relato do maestro de 2026-08-02, registrado no corpo do commit 65289818 (sessão em 1a pessoa: \"O maestro contou a historia que faltava\")"
+      locality: "repo"
 
   - id: C_POSTURA_ACOPLAMENTO
     node_type: claim
@@ -937,6 +980,7 @@ nodes:
       source: "65289818:CLAUDE.md"
       locator: "corpo do commit 65289818 (#514, 2026-08-02) §\"O QUE MUDA\" item 2 + 65289818:CLAUDE.md l.15-18"
       method: "testemunho: formulação do maestro de 2026-08-02, citada no corpo do commit 65289818 e projetada no CLAUDE.md l.15-18"
+      locality: "repo"
 
   - id: C_CORE_NAO_E_FAMILIA
     node_type: claim
@@ -952,6 +996,7 @@ nodes:
       source: "65289818^:CLAUDE.md"
       locator: "65289818^:CLAUDE.md l.9 (\"não é distribuído publicamente\") + l.10 (\"Plataforma única: Claude Code\") + corpo do commit 65289818 (#514, 2026-08-02) §\"O QUE MUDA\" item 3"
       method: "leitura: CLAUDE.md no pai do PR #514 + corpo do commit da sessão de 2026-08-02 em 1a pessoa"
+      locality: "repo"
 
   - id: C_FATIAS_JA_TESTADAS
     node_type: claim
@@ -977,6 +1022,7 @@ nodes:
       source: "3e6a962d:docs/evolution/research/onion-market-kg-2026-08/onion-market-kg-2026-08.kg.yaml"
       locator: "3e6a962d:onion-market-kg-2026-08.kg.yaml l.152-160 (C_objecao_mattpocock_vence: \"enquanto a doutrina diz que e indivisivel\") + 3e6a962d:SYNTHESIS.md l.101-103 (agravante) + 65289818^:CLAUDE.md l.12 (\"não devem ser consolidados\") + corpo do commit 65289818"
       method: "leitura: versão do grafo e da síntese que carregava o erro (3e6a962d) + CLAUDE.md no pai do PR #514 + correção no corpo do 65289818"
+      locality: "repo"
 
   # ═══ RE-VERIFICACAO CONTRA O VIVO (/meta:kg-freshness, 2026-08-04) ═══
   # Fila do radar: 31 nos; medidos os 16 de maior atencao (15 fora do corte). 16 workers
@@ -1160,6 +1206,7 @@ nodes:
       source: "git:e054d69c"
       locator: "corpo do commit e054d69c (#554, 2026-08-06): \"NORTH-STAR: NS1 — KG / conhecimento\", \"Q_NORTHSTAR 10,0\", §\"POR QUE ISTO ORDENA\" e §\"AS DESCARTADAS NÃO SUMIRAM\""
       method: "testemunho: decisão do maestro de 2026-08-06 registrada no corpo do commit e054d69c"
+      locality: "repo"
 
   - id: D_ICP_EMPRESA_MAIS_N1
     node_type: decision
@@ -1177,6 +1224,7 @@ nodes:
       source: "git:e054d69c"
       locator: "corpo do commit e054d69c (#554, 2026-08-06: \"O maestro respondeu em 2026-08-06\"; ICP composto; consultoria não-excluída como restrição; 3 defeitos de core; hub aspiracional) + e054d69c:docs/evolution/federation/members.yaml l.65-67 (único role: hub = metagamify), l.352 (arandek NX+Bun+SST), l.186/267/317"
       method: "testemunho: decisão do maestro de 2026-08-06 registrada no corpo do commit e054d69c; evidência de campo por leitura do members.yaml no mesmo commit"
+      locality: "repo"
 
   - id: D_VALOR_ORQUESTRACAO_ANCORADA
     node_type: decision
@@ -1193,6 +1241,7 @@ nodes:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
       locator: "direcao-do-maestro-2026-08-06"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_ANCORA_SOLTA_79PCT
     node_type: claim
@@ -1218,6 +1267,7 @@ nodes:
       source: "93459973:docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       locator: "veredito l.5-7 (status ratificado, ratificado_em 2026-07-11, por maestro) + l.17-20 (\"não entortar doutrina… os eixos coexistem\"; liberado para resposta ao consumidor) + federation/outbox/metagamify/_processed/2026-07-11-veredito-metodologia-branches.md (entregue em 3004f156, 2026-07-11) + e5e81af2^:docs/onion/graph/onion-identity-2026-07.kg.yaml l.230 (D_NO_DISTORT status open)"
       method: "leitura: veredito ratificado (commit 93459973, 2026-07-11) + anúncio entregue na outbox + estado open do nó no pai da revisão-total e5e81af2"
+      locality: "repo"
 
   - id: E_CENSO0901_C_NS2_PORTABLE
     node_type: evidence
@@ -1232,6 +1282,7 @@ nodes:
       source: "docs/onion/graph/onion-identity-2026-07.kg.yaml"
       locator: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — grep -n \"C_NS2_PORTABLE\" -A20 docs/onion/graph/onion-identity-2026-07.kg.yaml (localizou o"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CENSO0901_C_COMPLIANCE_RARE
     node_type: evidence
@@ -1246,6 +1297,7 @@ nodes:
       source: "dd0f3ffb:docs/business-context/decisions.md"
       locator: "decisions.md@dd0f3ffb l.92 (D6 ratificado 2026-07-25), l.97 (\"MENSAGEM = P4 (regulado)\"), l.99 (\"único whitespace confirmado — compliance-peer\") + b57930a8:docs/business-context/02-product/strategy.md l.32-34 (§Diferenciais, item 1 \"3 dimensões peer (inc. compliance) — whitespace confirmado\")"
       method: "leitura: decisions.md e strategy.md fixados no último commit antes de 2026-09-02"
+      locality: "repo"
 
   - id: E_W9_TESTIMONY_MECANIZADO
     node_type: evidence
@@ -1262,6 +1314,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "bash .claude/validation/kg-radar.sh <este grafo> --freshness (ℹ 4 nó(s) TESTEMUNHO; 0 TESTIMONY-UNMARKED); --freshness-tsv | grep -c TESTIMONY$ = 4; bancada kg-freshness (c3) e census-extract (d)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_FAMILIA_TEM_DOIS_REGIMES_2026_09
     node_type: decision
@@ -1279,6 +1332,7 @@ nodes:
       source: "CLAUDE.md"
       locator: "decisao do maestro em 2026-09-16 ('linha viva'), com o porte medido no mesmo dia: 0 scripts de guarda antes, 4 guardas + bancada 11/11 + gate no CI depois"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_FAMILIA_TEM_TRES_REGIMES_2026_09
     node_type: decision
@@ -1297,6 +1351,7 @@ nodes:
       source: "CLAUDE.md · docs/evolution/federation/members.yaml"
       locator: "instrucao do maestro em 2026-09-23 ('faltou o onion-core na documentacao'), com a omissao MEDIDA: `grep -c onion-core CLAUDE.md` devolvia ZERO e este grafo tambem; o repo aparecia so nas projecoes GERADAS (members.yaml kind: door, graph.md, federation-map.md)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: D_FAMILIA_TEM_DOIS_REGIMES_2026_09

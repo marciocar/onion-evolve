@@ -28,6 +28,7 @@ nodes:
       source: ".claude/validation/injected-cut-check.sh"
       locator: "os tres sitios lidos e curados em 2026-10-03; passivo RE-MEDIDO depois das curas = ZERO diretivas injetadas com corte (dois `head -1` legitimos sobraram, que sao extracao de valor unico)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_SUBSTRATO_CHECK_DE_LINT_MOLDE_CONSUMED_MODE
     node_type: decision
@@ -43,6 +44,7 @@ nodes:
       source: ".claude/validation/consumed-mode-check.sh"
       locator: "guard-census.sh --markdown: consumed-mode-check.sh com 8 casos, o maior entre os checks; apos a forja o censo lista injected-cut-check.sh registrado em lint-artifacts.sh E lint-selftest.sh, e a massa foi de 210 para 211 familias"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_DOGFOOD_ACHOU_TRES_DEFEITOS_QUE_LEITURA_NAO_ACHA
     node_type: evidence
@@ -59,6 +61,7 @@ nodes:
       source: ".claude/validation/injected-cut-check.sh"
       locator: "--selftest 14/14 verde apos as curas (era 12/13 na 1a execucao, com o 13o reprovando pelo lado da ASSERCAO); producao rc=0 lendo 5 arquivos com diretiva"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_MUTANTE_QUE_NAO_MORDE_TEM_QUATRO_CAUSAS
     node_type: claim
@@ -74,6 +77,7 @@ nodes:
       source: ".claude/commands/common/prompts/guard-doctrine.md"
       locator: "⚠️ CORRIGIDO 2026-10-04 apos reprovacao: a 1a redacao dizia \"6 mutantes (M1-M6) ... 3 passadas ate os 6 morderem\" e isso DESCREVIA ALGO QUE NAO ACONTECEU — o Elenxo provou que eram 5/6, porque o M4 era NO-OP SEMANTICO (equivalencia medida em 17 casos + varredura do repo inteiro, rc e saida byte-a-byte identicos). A ironia e fechada: o M4 era instancia da QUARTA CAUSA que ESTE PROPRIO NO nomeia (mutante fraco), e eu diagnostiquei a causa errada, atribuindo-a ao bug de vacuidade. HOJE: 10 mutantes, 10 mordendo, com o harness provando a mutacao e o M4 atacando o MECANISMO (os dois filtros redundantes) em vez de um ponto"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_PROPRIO_CORTE_ME_CEGOU_NA_FORJA_CONTRA_CORTE
     node_type: evidence
@@ -89,6 +93,7 @@ nodes:
       source: ".claude/validation/guard-census.sh"
       locator: "GUARD_CENSUS_QUERY lido na l.33 e usado na l.94-96 do guard-census.sh; a 2a invocacao, com `sed -n` na secao certa, devolveu \"a classe parece NOVA\""
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_TETO_DECLARADO_O_QUE_A_GUARDA_NAO_VE
     node_type: evidence
@@ -105,6 +110,7 @@ nodes:
       source: ".claude/validation/injected-cut-check.sh"
       locator: "teto escrito no cabecalho do proprio check (linhas 20-33) e exercitado pelos casos (b) isencao, (c) fora-da-diretiva e (f) vacuidade"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_SEGUNDA_SUPERFICIE_INJETADA_FORA_DOS_DOIS_CAMINHOS
     node_type: question
@@ -120,6 +126,7 @@ nodes:
       source: ".claude/validation/injected-cut-check.sh"
       locator: "MEDICAO COMPLETA (2026-10-04, pelo Elenxo): `plugins/onion/skills/onion/SKILL.md:21` com diretiva viva e `| head -1`; `.claude/agents/**` com 60 arquivos fora do pathspec. A 1a redacao media apenas `.claude/rules/*.md` e CLAUDE.md — escopo menor que a afirmacao"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_ELENXO_REPROVOU_A_GUARDA_E_O_PIOR_ERA_FATAL
     node_type: evidence
@@ -136,6 +143,7 @@ nodes:
       source: "docs/evolution/review/fix-medidores-que-cortam-em-silencio.md"
       locator: "refutador opus/high em worktree isolada, mandato CACAR FALSO POSITIVO; 164k tokens, 60 chamadas, ~16 min; harness proprio com shim de git, 43 sondas; FP-1 reproduzido por mim ponta-a-ponta antes de aceitar, e re-verificado curado (guarda cala E lint 0 HARD com a documentacao presente); pos-cura: 18 casos, 10 mutantes mordendo, producao rc=0"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_DEFEITO_DATADO_TRES_SITIOS

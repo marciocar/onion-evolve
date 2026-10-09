@@ -26,6 +26,7 @@ nodes:
       source: ".claude/commands/meta/create-skill.md@fea684c3^ e .claude/validation/cited-directive-check.sh@fea684c3"
       locator: "create-skill.md l.86 (crase dupla) e l.219 (bloco cercado), antes da leva 1"
       method: "medição: guarda rodada contra worktree de origin/main em 2026-10-04 (2 HARD) e com a leva 1 aplicada (0 achados, 262 arquivos)"
+      locality: "repo"
 
   - id: D_SUBSTRATO_CHECK_DE_LINT_MOTOR_PYTHON
     node_type: decision
@@ -73,6 +74,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh@fea684c3 (run_cited_directive_selftests)"
       locator: "familia cited_directive, casos (a) a (f)"
       method: "medição: doze mutantes aplicados a guarda e a bancada, 12/12 reprovaram"
+      locality: "repo"
 
   - id: C_TETO_REGEX_TRANSCRITAS_DE_UMA_VERSAO
     node_type: claim
@@ -87,6 +89,7 @@ nodes:
       source: ".claude/validation/cited-directive-check.sh"
       locator: "cabecalho, secao TETO DECLARADO (1o item)"
       method: "leitura: cabecalho da guarda"
+      locality: "repo"
 
   - id: C_TETO_PROSA_NUA_E_AGENTES
     node_type: claim
@@ -101,6 +104,7 @@ nodes:
       source: ".claude/validation/cited-directive-check.sh"
       locator: "cabecalho, secao TETO DECLARADO (itens prosa nua e universo)"
       method: "leitura: cabecalho da guarda"
+      locality: "repo"
 
   - id: E_REEXTRACAO_2_1_295_SO_NOMES
     node_type: evidence

@@ -69,6 +69,7 @@ nodes:
       source: "https://github.com/karpathy/nanochat/blob/master/dev/LEADERBOARD.md"
       locator: "https://github.com/karpathy/nanochat README l.6 (\"only $48 (~2 hours of 8XH100 GPU node)\", \"closer to ~$15\" em spot) e l.24 (\"~$3/GPU/hr ... ~$24/hr\"); dev/LEADERBOARD.md ultima entrada 2026-03-14, 1.65 h, CORE 0.262634 (media de 5 runs); votos 3-0; RE-LIDO pela API do GitHub na escrita"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_AUTORESEARCH_DERIVED_FROM_NANOCHAT
     node_type: evidence
     plane: DEV
@@ -85,6 +86,7 @@ nodes:
       source: "https://github.com/karpathy/autoresearch"
       locator: "https://github.com/karpathy/autoresearch; votos 3-0; coerente com dev/LEADERBOARD.md (entradas de 2026-03-09 e 2026-03-14 creditam \"autoresearch round 2\")"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_AUTORESEARCH_AGENT_LOOP_TRAIN_PY
     node_type: evidence
     plane: DEV
@@ -101,6 +103,7 @@ nodes:
       source: "https://github.com/karpathy/autoresearch"
       locator: "https://github.com/karpathy/autoresearch; votos 3-0 na metade descritiva; a ligacao com a opcao B e INFERENCIA do pesquisador, nao esta na fonte (E_OBJECAO_AUTORESEARCH_PATTERN_ALREADY_OWNED)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_SLM_JUDGE_LITERATURE
     node_type: evidence
     plane: DEV
@@ -117,6 +120,7 @@ nodes:
       source: "https://arxiv.org/pdf/2411.15594"
       locator: "https://arxiv.org/pdf/2411.15594 (survey LLM-as-a-Judge); votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_IMBUE_NANOCHAT_STANDARD_BENCH
     node_type: evidence
     plane: DEV
@@ -134,6 +138,7 @@ nodes:
       source: "https://imbue.com/blog/2026-07-20-imbue-catalyst-nanochat"
       locator: "https://imbue.com/blog/2026-07-20-imbue-catalyst-nanochat; votos 3-0; fonte unica de fornecedor com interesse comercial (produto Catalyst, AGPL-3.0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_LEADERBOARD_MINTLIFY_JAN_FEB
     node_type: evidence
     plane: DEV
@@ -163,6 +168,7 @@ nodes:
       source: "https://github.com/tucan9389/nanochat-jax/discussions/1"
       locator: "https://github.com/tucan9389/nanochat-jax/discussions/1; votos 3-0; n=1 autodeclarado, sem replica independente"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_JAX_PORT_ITERATION_COST
     node_type: evidence
     plane: DEV
@@ -179,6 +185,7 @@ nodes:
       source: "https://github.com/tucan9389/nanochat-jax/discussions/1"
       locator: "https://github.com/tucan9389/nanochat-jax/discussions/1; votos 3-0; n=1 autodeclarado"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_UNDER_100_USD_SECONDARY
     node_type: evidence
     plane: DEV
@@ -196,6 +203,7 @@ nodes:
       source: "https://pythonlibraries.substack.com/p/replicate-gpt-2-for-73-600-cheaper"
       locator: "https://pythonlibraries.substack.com/p/replicate-gpt-2-for-73-600-cheaper; votos 3-0; redundante com o README primario (\"well below $100\")"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_JAN_2026_73_USD_CONVERSATIONAL
     node_type: evidence
     plane: DEV
@@ -225,6 +233,7 @@ nodes:
       source: "https://github.com/karpathy/nanochat"
       locator: "https://github.com/karpathy/nanochat; votos 3-0; RE-MEDIDO pela API do GitHub na escrita: stargazers_count 58422, forks_count 8191, license MIT; README l.82 (GPU unica \"8 times longer\") e l.112 (CPU \"You will not get strong results\")"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_CC_MANAGED_SETTINGS_MODEL_ROUTING
     node_type: evidence
     plane: DEV
@@ -241,6 +250,7 @@ nodes:
       source: "https://code.claude.com/docs/en/changelog"
       locator: "https://code.claude.com/docs/en/changelog; votos 2-1 (a divergencia ja sinalizava o objeto errado, E_OBJECAO_MANAGED_SETTINGS_WRONG_OBJECT)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_CC_MCP_HOOKS_NO_SLM_PATTERN
     node_type: evidence
     plane: DEV
@@ -257,6 +267,7 @@ nodes:
       source: "https://code.claude.com/docs/en/changelog"
       locator: "https://code.claude.com/docs/en/changelog; votos 3-0; Elenxo nao achou objecao material e confirmou coerencia com docs/knowledge-base/concepts/onion-engine-economy.md l.26 e l.63"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_AUTORESEARCH_VAL_BPB_5MIN
     node_type: evidence
     plane: DEV
@@ -273,6 +284,7 @@ nodes:
       source: "https://github.com/karpathy/autoresearch"
       locator: "https://github.com/karpathy/autoresearch; votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ───────────────── medicoes proprias na escrita ─────────────────
   - id: E_NANOCHAT_MASTER_NARROWED
@@ -292,6 +304,7 @@ nodes:
       source: "https://github.com/karpathy/nanochat/tree/master/scripts"
       locator: "gh api repos/karpathy/nanochat/contents/scripts -> base_eval, base_train, chat_cli, chat_eval, chat_rl, chat_sft, infer_bench, tok_eval, tok_train (SEM mid_train.py, SEM chat_web.py); contents/tasks -> arc, common, gsm8k, humaneval, mmlu, smoltalk (SEM customjson.py, my_identity.py); ultimo commit no master 2026-07-03T22:54:57Z; pushed_at 2026-09-07 (outra branch); ultima entrada do LEADERBOARD.md 2026-03-14. Medido por mim na escrita, confirmando o Elenxo."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_CORPUS_SCALE_MEASURED
     node_type: evidence
     plane: DEV
@@ -308,6 +321,7 @@ nodes:
       source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
       locator: "git ls-files *.kg.yaml (sem fixtures) = 129 grafos, 4.166.816 bytes (~1M tokens a ~4 B/token); git ls-files *.md *.yaml *.sh = 22.354.085 bytes (~5,5M tokens); LEADERBOARD.md: o GPT-2-capability e ~d26 treinado a --target-param-data-ratio 8; ordem de grandeza compute-optimal de um d20 = ~10^10 tokens (estimativa do Elenxo, coerente com a razao parametro:dado do proprio leaderboard). Medido por mim."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ───────────────── mercado e lacunas ─────────────────
   - id: E_MERCADO_NANOCHAT_2026_10
@@ -326,6 +340,7 @@ nodes:
       source: "https://imbue.com/blog/2026-07-20-imbue-catalyst-nanochat"
       locator: "sintetizador da rodada (sem rodada de investimento, M&A ou analista encontrados); API do GitHub (58.422 estrelas, 8.191 forks); imbue.com blog 2026-07-20 (Catalyst); nanochat-jax discussion 1 (US$2.500 de engenharia)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_LACUNAS_NANOCHAT_2026_10
     node_type: evidence
     plane: DEV
@@ -342,6 +357,7 @@ nodes:
       source: "docs/evolution/research/nanochat-onion-2026-10/data/wf_c8ba4e42-5e6.json · /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/subagents/workflows/wf_c8ba4e42-5e6/agent-a933a800bde71c94b.jsonl"
       locator: "result.decision.objections (33; survives True=20); result.refuted (11); result.notVerifiedByBudget (32); result.budgetDropped (17); result.unverified (0); grep -c 'id: E_OBJECAO' = 20; jsonl do write-kg, 2ª linha: objeções cortadas em 'Achado 13'"
       method: "medição: python3 json.load(data/wf_c8ba4e42-5e6.json) + len()/Counter nos campos de result e grep -c 'id: E_OBJECAO' no .kg.yaml; truncamento por leitura do arquivo agent-a933a800bde71c94b.jsonl no host"
+      locality: "host"
 
   # ═════════════ OPCOES (claims abertas) ═════════════
   - id: C_OPCAO_A_NO_TRAINING_LLM_AS_VM
@@ -422,6 +438,7 @@ nodes:
       source: "https://github.com/karpathy/nanochat/blob/master/dev/LEADERBOARD.md"
       locator: "Elenxo sobre Achado 1: README l.6/l.24/l.201 e LEADERBOARD.md (re-lidos por mim pela API do GitHub — conferem); ultimo commit no master 2026-07-03"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_AUTORESEARCH_PATTERN_ALREADY_OWNED
     node_type: evidence
     plane: DEV
@@ -436,6 +453,7 @@ nodes:
       source: "https://github.com/karpathy/autoresearch"
       locator: "Elenxo sobre Achado 3: o texto do autoresearch nao liga o padrao a bancada de dominio; S6_claim_no_doctrine (federation-research-2026-06-reconciled)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR
     node_type: evidence
     plane: DEV
@@ -450,6 +468,7 @@ nodes:
       source: "https://arxiv.org/pdf/2411.15594"
       locator: "Elenxo sobre Achado 4: tamanhos dos juizes citados (LLaMA-7B, Vicuna 7-13B) contra nanochat d20/d26 (~0.5-1.6B); arXiv 2411.15594"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_IMBUE_IS_PRETRAIN_BENCH
     node_type: evidence
     plane: DEV
@@ -464,6 +483,7 @@ nodes:
       source: "https://imbue.com/blog/2026-07-20-imbue-catalyst-nanochat"
       locator: "Elenxo sobre Achado 5: pagina da Imbue relida (1 H100, 5 min, 340 experimentos, Claude Code + Opus 4.8); tier 6, fornecedor com interesse comercial"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_MINTLIFY_MIRROR_STALE
     node_type: evidence
     plane: DEV
@@ -478,6 +498,7 @@ nodes:
       source: "https://github.com/karpathy/nanochat/blob/master/dev/LEADERBOARD.md"
       locator: "Elenxo sobre Achado 6: dev/LEADERBOARD.md primario (2.75 h em 2026-02-05; 2.50 h 03/03; 1.80 h 09/03; 1.65 h 14/03) — conferido por mim"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_JAX_PORT_N1_LOW_CEILING
     node_type: evidence
     plane: DEV
@@ -492,6 +513,7 @@ nodes:
       source: "https://github.com/tucan9389/nanochat-jax/discussions/1"
       locator: "Elenxo sobre Achado 7: discussion autodeclarada, tier 5, sem replica"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_ITERATION_COST_40X
     node_type: evidence
     plane: DEV
@@ -506,6 +528,7 @@ nodes:
       source: "https://github.com/tucan9389/nanochat-jax/discussions/1"
       locator: "Elenxo sobre Achado 8: US$2.500 de engenharia contra US$60,80 do run limpo (~40x); numero de PORTE, nao de fine-tune"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_SUBSTACK_REDUNDANT
     node_type: evidence
     plane: DEV
@@ -520,6 +543,7 @@ nodes:
       source: "https://pythonlibraries.substack.com/p/replicate-gpt-2-for-73-600-cheaper"
       locator: "Elenxo sobre Achado 9: o README primario ja da US$48 e \"well below $100\""
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_STARTUPHUB_WRONG_STAGE
     node_type: evidence
     plane: DEV
@@ -534,6 +558,7 @@ nodes:
       source: "https://www.startuphub.ai/news/figure-andrej-karpathy-nano-series-technical-contribution-2026-07-16"
       locator: "Elenxo sobre Achado 10: tier 4, estado de janeiro (3.04 h) superado por 1.65 h; CORE mede o modelo BASE"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_VPS_CANNOT_TRAIN
     node_type: evidence
     plane: DEV
@@ -548,6 +573,7 @@ nodes:
       source: "https://github.com/karpathy/nanochat"
       locator: "Elenxo sobre Achado 11: README l.112 (\"You will not get strong results\") e l.82 (\"8 times longer\") — conferidos por mim; a VPS KVM8 nao tem GPU"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_MANAGED_SETTINGS_WRONG_OBJECT
     node_type: evidence
     plane: DEV
@@ -562,6 +588,7 @@ nodes:
       source: "https://code.claude.com/docs/en/changelog"
       locator: "Elenxo sobre Achado 12: managed settings governam o modelo PRINCIPAL do harness; voto 2-1; S2_claim_rejection_precedent; C_OPCAO_B_PRIMITIVE_IN_HOUSE (jev-decision-round2-2026-10)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_VAL_BPB_NOT_DOMAIN_EVAL
     node_type: evidence
     plane: DEV
@@ -576,6 +603,7 @@ nodes:
       source: "https://github.com/karpathy/autoresearch"
       locator: "Elenxo sobre Achado 14: val_bpb e perda de modelagem de linguagem generica; o rotulo verdadeiro do dominio sao os nos JA SELADOS do KG"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_CHANGELOG_ABSENCE_UNMEASURED
     node_type: evidence
     plane: DEV
@@ -590,6 +618,7 @@ nodes:
       source: "https://code.claude.com/docs/en/changelog"
       locator: "Elenxo sobre o descarte \"changelog sem mencao a Nanochat/SLM\" (refutado por comodismo): faltou grep no changelog por nanochat|SLM|fine-tun antes de refutar"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_CATALYST_DOWNGRADE_NOT_REFUTE
     node_type: evidence
     plane: DEV
@@ -604,6 +633,7 @@ nodes:
       source: "https://imbue.com/blog/2026-07-20-imbue-catalyst-nanochat"
       locator: "Elenxo sobre o descarte \"Catalyst val_bpb 0.9361\" (refutado por comodismo): o 0.9361 CONSTA na pagina da Imbue; a baseline numerica do AutoResearch nao"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_LOW_QUALITY_PRIMARY_CORROBORATED
     node_type: evidence
     plane: DEV
@@ -618,6 +648,7 @@ nodes:
       source: "https://news.ycombinator.com/item?id=45569350"
       locator: "Elenxo sobre o descarte \"qualidade baixa e variavel\" (HN, tier 3, refutado por comodismo): corroborado por ChatCORE 0.3733 (nanochat-jax), README l.112 e l.201 (\"micro models\", \"strong baseline\")"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_DATA_SCALE_THREE_ORDERS
     node_type: evidence
     plane: DEV
@@ -632,6 +663,7 @@ nodes:
       source: "https://github.com/karpathy/nanochat"
       locator: "Elenxo sobre o descarte \"tokenizer/pretreino em dados proprios + SFT\" (tier 9, refutado por comodismo): tok_train/base_train/chat_sft existem; escala do corpus re-medida por mim em E_CORPUS_SCALE_MEASURED"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_SYNTHETIC_DATA_AXIS_UNREAD
     node_type: evidence
     plane: DEV
@@ -646,6 +678,7 @@ nodes:
       source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
       locator: "Elenxo sobre o corte por orcamento \"custo de dados sinteticos, trade-off identidade x utilidade, autoconsciencia honesta\": cortados sem leitura"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_OBJECAO_CORE_NOT_DOMAIN_GPU_CUT
     node_type: evidence
     plane: DEV
@@ -660,6 +693,7 @@ nodes:
       source: "https://github.com/karpathy/nanochat"
       locator: "Elenxo sobre o corte \"CORE != desempenho de dominio; exige GPU alugada\": README l.24 e l.112 (conferidos por mim); VPS KVM8 sem GPU"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_ARXIV_RL_JUDGE_UNREAD
     node_type: evidence
     plane: DEV
@@ -674,6 +708,7 @@ nodes:
       source: "https://arxiv.org/abs/2604.02621"
       locator: "Elenxo sobre o corte \"arXiv 2604.02621 (RL semi-supervisionado com LLM-judge)\": primario citado, NAO lido"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_OBJECAO_DOMAIN_FORKS_UNREAD
     node_type: evidence
     plane: DEV
@@ -688,6 +723,7 @@ nodes:
       source: "https://github.com/karpathy/nanochat/discussions"
       locator: "Elenxo sobre \"fontes nao lidas\": discussions/420 e /710, nanochat-jp (tohoku-nlp), autoautoresearch, arXiv 2603.25158, nanochat-mlx, precos de GPU — todos primarios citados, NAO lidos"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: Q_EVAL_DE_DOMINIO_DO_ONION
     node_type: question
@@ -713,6 +749,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612.jsonl · docs/evolution/research/nanochat-onion-2026-10/data/wf_c8ba4e42-5e6.json · 4d85438a (assunto do commit) · docs/evolution/research/nanochat-onion-2026-10/SYNTHESIS.md"
       locator: "transcript no host, mensagem do maestro 2026-10-05T18:19:47Z; journal args.question; assunto de 4d85438a ('a opção C se fortalece'); SYNTHESIS l.13 (A selada pelo maestro); D_QUATRO_PILARES l.334"
       method: "testemunho: leitura do arquivo 800cd025-….jsonl no host (mensagem do maestro, 2026-10-05) + pedido do estudo no journal versionado e assunto do commit 4d85438a da sessão"
+      locality: "host"
 
 
 edges:

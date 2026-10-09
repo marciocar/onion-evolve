@@ -26,6 +26,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md"
       locator: "sinal docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md, medido pelo hub no pin 547e2e3edf3b com lint-artifacts.sh"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1
     node_type: evidence
@@ -42,6 +43,7 @@ nodes:
       source: ".claude/utils/adopt/regen-ssot-projections.sh"
       locator: "sinal do hub (inventory.md dizia 109 comandos, filesystem 111; meta 42->43, docs 11->12; forge.md e build-project-manual.md entraram no proprio commit do update 3f84b84) + no core: adopt.md passo (8) chama regen-ssot-projections.sh, logo a regeneracao EXISTE e mesmo assim nao cobriu os dois arquivos"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_UPDATE_REMEDE_DEPOIS_DO_MERGE
     node_type: question
@@ -57,6 +59,7 @@ nodes:
       source: ".claude/commands/meta/adopt.md"
       locator: "PR fix/adopter-quick-cures: remeasure-hard.sh + adopt.md (--update cita HARD MEDIDO); bancada remeasure_hard (a)-(d), mutante (c) morde"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE
     node_type: question
@@ -72,6 +75,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "vendor-manifest.sh: _role_cut (l.142) so tem ramo para standalone (`*) : ;;` para o resto) e _emit_command_excludes retorna cedo quando o corte do papel e vazio; resolve-role-bundle.sh hub --tools lista 23 work_tools SEM forge; /home/marcio/gmill/.claude/commands/meta/ tem forge.md, evolve.md, create-*.md, co-announce.md, co-deliver.md, federation-publish.md"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_REGEN_POS_MERGE_MUDOU_O_INVENTARIO
     node_type: evidence
@@ -87,6 +91,7 @@ nodes:
       source: ".claude/utils/adopt/regen-ssot-projections.sh"
       locator: "update do gmill 547e2e3->ab08cde (branch chore/onion-update-ab08cde675fa, relatorio inbound/2026-10-05-update-ab08cde675fa.md): a regeneracao rodada DEPOIS do merge da onion/vendor levou o inventory.md de 111 para 113 comandos (meta 43->45); uma 2a regeneracao nao mudou nada; a oferta de CI rodada entre o merge e a regeneracao acusou o lint reprovando"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA
     node_type: question
@@ -102,6 +107,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-branch.sh + .claude/utils/adopt/durable-commit.sh"
       locator: "vendor-branch.sh:287-292; durable-commit.sh:116-121; commit 9d5eb535; PR #943 MERGED 2026-10-07"
       method: "leitura: código dos helpers + gh pr view 943"
+      locality: "repo"
 
   - id: Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN
     node_type: question
@@ -117,6 +123,7 @@ nodes:
       source: ".claude/hooks/pretooluse-protect-main.sh"
       locator: "payload PreToolUse com git push origin +master / -f origin master"
       method: "medição: hook alimentado com payload JSON (git push origin +master)"
+      locality: "repo"
 
 edges:
   - from: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1

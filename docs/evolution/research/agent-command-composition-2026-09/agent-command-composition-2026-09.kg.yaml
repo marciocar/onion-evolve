@@ -107,6 +107,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar/techniques/agent-skills"
       locator: "https://www.thoughtworks.com/radar/techniques/agent-skills — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CONDUCTOR_ORQUESTRACAO_DECLARADA_CUSTO_ZERO
     node_type: evidence
@@ -125,6 +126,7 @@ nodes:
       source: "https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/"
       locator: "https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MCP_GOVERNANCA_NEUTRA_PRECEDENTE
     node_type: evidence
@@ -164,6 +166,7 @@ nodes:
       source: "https://www.my2cents.ai/deep-dive/claude-code-workflows/"
       locator: "https://www.my2cents.ai/deep-dive/claude-code-workflows/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AGENTSKILLS_SPEC_ADOCAO_MULTIPLATAFORMA
     node_type: evidence
@@ -181,6 +184,7 @@ nodes:
       source: "https://strapi.io/blog/what-are-agent-skills-and-how-to-use-them"
       locator: "https://strapi.io/blog/what-are-agent-skills-and-how-to-use-them — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── MERCADO / CAPITAL (cláusula 4: invariante, não opção por tema) ───────────────────
   - id: E_MERCADO_AGENT_COMMAND_COMPOSITION_0928
@@ -199,6 +203,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_ba0cf8fd-e47.json"
       locator: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_ba0cf8fd-e47.json result.market, result.findings[0..4], result.refuted"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_ba0cf8fd-e47.json no host (result.market + findings)"
+      locality: "host"
 
   # ── LACUNAS (cláusula 8: lacuna vira nó) ─────────────────────────────────────────────
   - id: E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928
@@ -218,6 +223,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_ba0cf8fd-e47.json"
       locator: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_ba0cf8fd-e47.json result.stats, result.budgetDropped, result.notVerifiedByBudget, result.refuted ; 15824241 corpo"
       method: "testemunho: leitura do journal wf_ba0cf8fd-e47 no host 2026-09-28 (/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_ba0cf8fd-e47.json: result.stats, budgetDropped, notVerifiedByBudget, refuted)"
+      locality: "host"
 
   # ══════════════════════════════════════════════════════════════════════════════════════
   # RODADA DE PRIMÁRIAS — 2026-09-28 (mode: primaries · leitura + ancoragem verbatim)
@@ -248,6 +254,7 @@ nodes:
       source: "https://arxiv.org/abs/2604.11623v3"
       locator: "QUOTE verbatim: \"A context store is a backing system that persists context units: s=(σ,ι,ϕ) where σ is the store type (git repository, relational database, connector to external system, file system)... Stores are accessed exclusively through the Context Runtime Interface.\" — LOCATOR: arXiv:2604.11623v3, Seção 3.2 (Core Abstractions), Definição 3.3 (Context Store); paper.txt l.273-276 na cópia lida. DIVERGÊNCIA DECLARADA pelo próprio leitor: o número de página (p.6) NÃO é verificável na renderização HTML. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CXK_FRESHNESS_MANAGER_FOUR_STATES
     node_type: evidence
@@ -266,6 +273,7 @@ nodes:
       source: "https://arxiv.org/abs/2604.11623v3"
       locator: "QUOTE verbatim: \"Freshness Manager (continuous monitoring with four states: fresh, stale, expired, conflicted)\" — LOCATOR: arXiv:2604.11623v3, Seção 3.3 (arquitetura de sistema); paper.txt l.307 (\"Freshness Manager (continuous mon-\") e l.665 (\"Liveness Probe / Freshness Manager / Health monitoring with corrective action\"). DIVERGÊNCIA DECLARADA pelo próprio leitor: o Requisito 2.4 vive na Seção 2.3, não na 3.3; páginas (6-7) não verificáveis em HTML. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CXK_REQUIREMENT_2_4_TTL_MANDATE
     node_type: evidence
@@ -284,6 +292,7 @@ nodes:
       source: "https://arxiv.org/abs/2604.11623v3"
       locator: "QUOTE verbatim: \"Requirement 2.4 (Context Freshness (NIST: Measure 2.6 — data quality and relevance)). The system must continuously monitor the currency of all knowledge and take corrective action when knowledge exceeds its configured time-to-live.\" — LOCATOR: arXiv:2604.11623v3, Seção 2.3 (subseção da Seção 2, Requirements); paper.txt l.225. DIVERGÊNCIA DECLARADA: página 5 não verificável em HTML. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CXK_GATE_AT_REGISTRATION_NOT_AT_WRITE
     node_type: evidence
@@ -302,6 +311,7 @@ nodes:
       source: "https://arxiv.org/abs/2604.11623v3"
       locator: "QUOTE verbatim: \"This invariant is enforced at registration time: the Permission Engine rejects any agent profile that is not a strict subset, that includes operations outside the user's role, or that specifies a less restrictive tier than the user's.\" — LOCATOR: arXiv:2604.11623v3, Seção 3.4 (The Agent Permission Model), imediatamente após a Design Invariant 3.7 (Agent Permission Subset); paper.txt l.367-369. DIVERGÊNCIA DECLARADA: página 7 não verificável em HTML. MEDIÇÃO DE AUSÊNCIA no mesmo documento: \"write(\" ocorre UMA única vez no paper inteiro (l.286, assinatura de adapter \"write(conn, path, c) → Result\"), sem critério de aceitação, sem schema, sem validação descrita. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CXK_EVAL_FOUR_GOVERNANCE_BASELINES
     node_type: evidence
@@ -320,6 +330,7 @@ nodes:
       source: "https://arxiv.org/abs/2604.11623v3"
       locator: "QUOTE verbatim: \"B0: Ungoverned RAG 375 26.5% 80.9% 0/5 ... B3: Context Kubernetes 307 20.9% 64.0% 5/5\" — LOCATOR: arXiv:2604.11623v3, Tabela 6; paper.txt l.808-814. DIVERGÊNCIA DECLARADA pelo verificador: o claim citava \"Seção 8, Tabela 6\"; a Tabela 6 está na Seção 7.2 (Governance Impact Experiments), NÃO na Seção 8. Confirmados no texto/legenda: os quatro baselines (B0 Ungoverned RAG, B1 ACL-filtered RAG, B2 RBAC-aware RAG, B3 Context Kubernetes) e \"Four governance baselines compared (200 queries, synthetic data)\". ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CXK_SELF_DECLARED_LIMITATIONS
     node_type: evidence
@@ -338,6 +349,7 @@ nodes:
       source: "https://arxiv.org/abs/2604.11623v3"
       locator: "QUOTE verbatim: \"No production deployment. All experiments run against seed data in a local prototype... Organizational intelligence not implemented. Requirement R7 (Context Operators with pattern extraction, learning loops) is designed but not implemented in the prototype.\" — LOCATOR: arXiv:2604.11623v3, Seção 9.1 (Limitations); paper.txt l.1035-1040 e l.1055-1057. DIVERGÊNCIA DECLARADA: páginas 19-20 não verificáveis em HTML; entre as duas frases unidas pela elipse existe no original a frase intermediária \"Single-author evaluation. The gap analysis (Table 8) and the experiment design are by the author.\" — nada foi omitido de conteúdo (o claim a menciona em prosa), houve reordenação na citação. AUTORIA lida no próprio documento: Charafeddine Mouzouni, OPIT – Open Institute of Technology, and Cohorte AI, Paris, France (l.1-13), preprint arXiv v3 de 16 abr 2026. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CXK_ABSTRACT_GOVERNS_DELIVERY_NOT_DESTINATION
     node_type: evidence
@@ -356,6 +368,7 @@ nodes:
       source: "https://arxiv.org/abs/2604.11623v3"
       locator: "QUOTE verbatim: \"We formalize six core abstractions, a YAML-based declarative manifest for knowledge-architecture-as-code, a reconciliation loop, and a three-tier agent permission model where agent authority is always a strict subset of human authority.\" — LOCATOR: arxiv.org/abs/2604.11623v3, Abstract. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── (1) A ESPECIFICAÇÃO AGENT SKILLS LIDA NA FONTE PRIMÁRIA, AO VIVO ─────────────────
   - id: E_AGENTSKILLS_REQUIRED_FIELDS_NAME_DESCRIPTION
@@ -374,6 +387,7 @@ nodes:
       source: "https://agentskills.io/specification"
       locator: "QUOTE verbatim: \"The `SKILL.md` file must contain YAML frontmatter followed by Markdown content.\" e, na tabela de Frontmatter, \"| `name` | Yes | Max 64 characters. Lowercase letters, numbers, and hyphens only... | `description` | Yes | Max 1024 characters. Non-empty.\" — LOCATOR: agentskills.io/specification, seções \"SKILL.md format\" e \"Frontmatter\" (curl ao vivo, rc=200, 445 KB); license, compatibility, metadata e allowed-tools constam com Required=No. ancorada por DOIS leitores independentes e por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AGENTSKILLS_NO_ORCHESTRATION_SYNTAX
     node_type: evidence
@@ -391,6 +405,7 @@ nodes:
       source: "https://agentskills.io/specification"
       locator: "QUOTE verbatim: \"The Markdown body after the frontmatter contains the skill instructions. There are no format restrictions. Write whatever helps agents perform the task effectively.\" e \"Keep file references one level deep from SKILL.md. Avoid deeply nested reference chains.\" — LOCATOR: agentskills.io/specification, seção \"Body content\". MEDIÇÃO DE AUSÊNCIA no payload inteiro da página: \"orchestrat\" = 0 ocorrências. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AGENTSKILLS_INPUT_ONLY_NO_OUTPUT_DESTINATION
     node_type: evidence
@@ -408,6 +423,7 @@ nodes:
       source: "https://agentskills.io/specification"
       locator: "QUOTE verbatim: \"Agents load skills *progressively*, pulling in more detail only as a task calls for it.\" e \"A skill is a directory containing, at minimum, a `SKILL.md` file... Agents load skills through progressive disclosure, in three stages: Discovery... Activation... Execution\" — LOCATOR: agentskills.io/specification, seção \"Progressive disclosure\" (itens 1-3: Metadata ~100 tokens · Instructions <5000 tokens · Resources as needed) e agentskills.io, seções \"Directory structure\" e \"How do Agent Skills work?\". MEDIÇÃO DE AUSÊNCIA na mesma página: \"knowledge graph\" = 0 ocorrências; as três subseções opcionais são scripts/, references/ e assets/ — todas de ENTRADA. ancorada por DOIS leitores independentes e por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ANTHROPIC_DOCS_SKILLS_SINGLE_AGENT_SCOPE
     node_type: evidence
@@ -425,6 +441,7 @@ nodes:
       source: "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview"
       locator: "QUOTE verbatim: \"Every Skill requires a `SKILL.md` file with YAML frontmatter... **Required fields:** `name` and `description`\" — LOCATOR: platform.claude.com/docs/en/agents-and-tools/agent-skills/overview, seções \"Why use Skills\" e \"Skill structure\". ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── (2) A FORMA REAL DO CONDUCTOR — metade ancorada, metade pendente ─────────────────
   - id: E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME
@@ -444,6 +461,7 @@ nodes:
       source: "https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/"
       locator: "QUOTE verbatim: \"The orchestration layer consumes zero tokens. The structure is fixed at definition time—and that's the point.\" — LOCATOR: opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/ (confirmado por grep no HTML bruto). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── (3) A GOVERNANÇA DO MCP LIDA NAS DUAS FONTES INSTITUCIONAIS ──────────────────────
   - id: E_MCP_UNDER_LF_PROJECTS_NOT_NAMING_AAIF
@@ -462,6 +480,7 @@ nodes:
       source: "https://modelcontextprotocol.io/community/governance"
       locator: "QUOTE verbatim: \"Model Context Protocol has been established as **Model Context Protocol a Series of LF Projects, LLC**.\" — LOCATOR: modelcontextprotocol.io/community/governance, seção \"General Project Policies\". A mesma página descreve a governança técnica hierárquica (Lead Maintainers/BDFL, Core Maintainers, Maintainers) e SEPs para mudança de spec. MEDIÇÃO DE AUSÊNCIA declarada pelos leitores: a página NÃO cita \"Agentic AI Foundation\" pelo nome. ancorada por DOIS leitores independentes e por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AAIF_FORMED_2025_12_09_MCP_FOUNDING
     node_type: evidence
@@ -480,6 +499,7 @@ nodes:
       source: "https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation"
       locator: "QUOTE verbatim: \"The Linux Foundation announced the formation of the Agentic AI Foundation (AAIF) with founding contributions of leading technical projects including Anthropic's Model Context Protocol (MCP), Block's goose, and OpenAI's AGENTS.md.\" — LOCATOR: linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, press release de 9 dez 2025 (HTML bruto conferido via curl, não newsletter nem blog de terceiro). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AAIF_SCOPE_NEUTRAL_HOME_OPEN_GOVERNANCE
     node_type: evidence
@@ -498,6 +518,7 @@ nodes:
       source: "https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation"
       locator: "QUOTE verbatim: \"Bringing these projects together under the AAIF ensures they can grow with the transparency and stability that only open governance provides. The Linux Foundation is proud to serve as the neutral home\" — LOCATOR: linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, parágrafo de citação de apoio. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── CONTABILIDADE DESTA RODADA (cláusula 8: lacuna vira nó) ──────────────────────────
   - id: E_LACUNAS_PRIMARIES_0928
@@ -517,6 +538,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_91ae27d0-df6.json + a2734a63 (corpo) + docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml"
       locator: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_91ae27d0-df6.json result.stats/anchored/rejected ; agent-command-composition-2026-09.kg.yaml l.544 (Q_CONDUCTOR_VETO_ANCHORING_PENDING) ; a2734a63 corpo"
       method: "testemunho: leitura do journal wf_91ae27d0-df6 no host 2026-09-28 (result.stats/anchored/rejected) + leitura: verified_against de Q_CONDUCTOR_VETO_ANCHORING_PENDING (l.541) e corpo de a2734a63"
+      locality: "host"
 
   # ── PERGUNTAS QUE ESTA RODADA ABRE (esta sessão NUNCA sela) ──────────────────────────
   - id: Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART
@@ -533,6 +555,7 @@ nodes:
       source: "docs/evolution/review/chore-seal-composition-questions.md + 15824241 (corpo do commit)"
       locator: "chore-seal-composition-questions.md l.20, l.26 ; 15824241 corpo"
       method: "leitura: resíduo docs/evolution/review/chore-seal-composition-questions.md l.20/l.26 (selo do maestro por formulário) + corpo de 15824241 (medições na leitura integral de 88 KB)"
+      locality: "repo"
 
   - id: E_CONDUCTOR_SCHEMA_VALIDATION_ANCORADO
     node_type: evidence
@@ -550,6 +573,7 @@ nodes:
       source: "https://raw.githubusercontent.com/microsoft/conductor/main/docs/workflow-syntax.md"
       locator: "curl do arquivo bruto: http 200, 176.749 BYTES (o que o curl emite em size_download; 176.151 é a contagem de CARACTERES de `wc -m`, e atribuir esse número ao curl era troca de unidade — apontado pela passada adversarial) + extração VERBATIM confirmada por `grep -F` (1 ocorrência cada) + contagens de termo CASE-INSENSITIVE; docs/workflow-syntax.md do repositório oficial"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: Q_CONDUCTOR_VETO_ANCHORING_PENDING
     node_type: question

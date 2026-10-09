@@ -34,6 +34,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "medicao-direta-HEAD-2026-08-02"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_cerimonia_medida
     node_type: evidence
@@ -49,6 +50,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "5-lentes-adversariais-wf_0b0267b9-362"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_kg_e_arquivo_nao_motor
     node_type: evidence
@@ -64,6 +66,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "pista-dev-problema-wf_a489acb8-067"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_cmdb_e_o_mesmo_sintoma
     node_type: evidence
@@ -79,6 +82,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "pesquisa-externa-itsm-cmdb-aiops"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_categoria_kg_codebase
     node_type: evidence
@@ -94,6 +98,7 @@ nodes:
       source: "https://github.com/Graphify-Labs/graphify"
       locator: "gh-api-repos-2026-08-02"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: D_categoria_diferente_nao_concorrente
     node_type: decision
@@ -109,6 +114,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "correlacao-aristoteles-wf_eb01875e-962"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_extracted_inferred_transfere
     node_type: decision
@@ -135,6 +141,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "replay-corpus-7-casos-wf_eb01875e-962"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_plataforma_desqualifica
     node_type: evidence
@@ -150,6 +157,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "code.claude.com-docs-hooks"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: D_ratificado_e_refinado
     node_type: decision
@@ -165,6 +173,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "elenxo-w2-wf_eb01875e-962"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_dissent_corpus_e_cmdb
     node_type: claim
@@ -188,6 +197,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "corpus-9-casos-C7"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # PARCIALMENTE REFUTADO em 2026-08-02 por E_leitura_errada_consolidados: o AGRAVANTE deste no
   # ("plugins/ ja contradiz a doutrina") era LEITURA ERRADA de CLAUDE.md:12. A objecao em si segue
@@ -207,6 +217,7 @@ nodes:
       source: "https://github.com/mattpocock/skills"
       locator: "gh-api-e-leitura-do-HEAD"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: D_consumivel_em_fatias
     node_type: decision
@@ -231,6 +242,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "dois-runs-identicos-wf_7725217c-e1c-e-wf_9f6d7daf-8f7"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_busca_por_nome_acha_incumbente
     node_type: evidence
@@ -246,6 +258,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "furo-do-graphify"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── AS 3 SUBSTÂNCIAS REPROVADAS NO RE-LITÍGIO ──────────────────────────────────────────
   # Estes 3 nós foram ACRESCENTADOS em 2026-08-02 depois que o estudo de mecanização do Elenxo
@@ -302,6 +315,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "leitura-verbatim-de-CLAUDE.md-linha-12"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: A_RESEARCH_MARKET
     node_type: artifact
@@ -334,6 +348,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "wf_b516b6a2-b84"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_w2_tese_mae_refutada_na_junta
     node_type: claim
@@ -349,6 +364,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "contagem-direta-nos-53-grafos"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_w2_nao_derivar_nada_novo
     node_type: decision
@@ -364,6 +380,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "wf_b516b6a2-b84"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_w2_mecanizar_pode_ser_a_catedral
     node_type: claim
@@ -379,6 +396,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "taxa-de-defeito-medida"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_w2_plataforma_confirmada_por_junho
     node_type: evidence
@@ -394,6 +412,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_w2_porta_contra_experimento_n6
     node_type: evidence
@@ -409,6 +428,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "gh-api-repos-marciocar-2026-08-05"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_w2_moat_substancia_sim_palavra_nao
     node_type: claim
@@ -424,6 +444,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "contagem-supersedes-refutes-53-grafos"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_w2_dissent_paralisia_vestida_de_rigor
     node_type: claim
@@ -447,6 +468,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "filesystem-HEAD-fb4b672"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 
 
@@ -479,6 +501,7 @@ nodes:
       source: "https://trendshift.io/repositories/46562 + https://raw.githubusercontent.com/HarnessMD/munder-difflin/main/README.md"
       locator: "trendshift: array \"trendings\" (trend_date 2026-08-16..20; trending_language typescript = #6/#7 16/08, #1 18/08, #1 19/08, #2 20/08; null = #2 18/08, #3 19/08, #10 20/08); README l.10 (alt \"GitHub Trending: #1 Repository of the Day\")"
       method: "leitura: trendshift.io/repositories/46562 (curl com User-Agent de navegador, HTTP 200, 206 KB, 2026-10-09) e README raw l.10"
+      locality: "web"
 
   - id: C_MD_AUDITAVEL_DECLARADO_SEM_ARQUIVO
     node_type: claim
@@ -493,6 +516,7 @@ nodes:
       source: "github.com/HarnessMD/munder-difflin (ex chaitanyagiri/munder-difflin) package.json ; docs/evolution/review/research-adjacent-harness-munder-difflin.md achado 5"
       locator: "gh api repos/HarnessMD/munder-difflin/contents/package.json | grep -c noble|libsodium|tweetnacl"
       method: "medição: gh api contents/package.json + grep de libs de cripto"
+      locality: "web"
 
   - id: C_MD_LUDICIDADE_E_FUNCAO_SO_EM_UM_LUGAR
     node_type: claim
@@ -507,6 +531,7 @@ nodes:
       source: "github.com/HarnessMD/munder-difflin: HIVE.md, src/main/closingTime.ts, PR #365"
       locator: "PR #365 \"wall: 2 new Founding Supporter(s)\" (MERGED, autor app/github-actions); HIVE.md l.37"
       method: "leitura: arquivos e PR do repo externo via gh api"
+      locality: "web"
 
   - id: E_MD_DETERMINISMO_VALE_SO_PARA_O_ESQUELETO
     node_type: evidence
@@ -521,6 +546,7 @@ nodes:
       source: "github.com/HarnessMD/munder-difflin: HIVE.md, src/main/closingTime.ts, README.md ; docs/evolution/review/research-adjacent-harness-munder-difflin.md"
       locator: "HIVE.md l.36-37; closingTime.ts (0 anthropic/openai/fetch); README l.124 e l.152 (o GOD agent \"adjudicates\" e \"resolves routine ones itself, escalates critical\"); resíduo achado 4 l.26-27"
       method: "leitura: arquivos do repo externo via gh api + resíduo R56"
+      locality: "web"
 
   - id: D_MD_O_QUE_SERVE_E_O_QUE_NAO_SERVE
     node_type: decision

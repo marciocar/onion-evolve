@@ -31,6 +31,7 @@ nodes:
       source: "docs/evolution/inbox/"
       locator: "os dez lidos integralmente; afirmacoes centrais reproduzidas no core"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_A_PERNA_DE_LEITURA_TEM_PRECO
     node_type: evidence
@@ -46,6 +47,7 @@ nodes:
       source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md:287-297"
       locator: "grep por kg.yaml em .claude/hooks/ devolve VAZIO; drifted=0 em 3715 nos"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ONZE_PONTOS_ONDE_A_DOUTRINA_PROMETE_E_O_CODIGO_NAO_FAZ
     node_type: evidence
@@ -61,6 +63,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "tres achados reproduzidos por medicao direta no core"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_A_FILA_KG_INBOX_NAO_PASSA_NO_PROPRIO_GATE
     node_type: evidence
@@ -76,6 +79,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh (secao INTEGRIDADE)"
       locator: "fixture de proposta com UM no: kg-radar --integrity --schema devolve rc=1, no orfao"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_AUSENCIA_LIDA_COMO_RESULTADO_EM_TRES_SITIOS
     node_type: claim
@@ -91,6 +95,7 @@ nodes:
       source: ".claude/validation/inventory.sh:38"
       locator: "tres sitios medidos: inventory.sh:38, co-deliver.sh:101, verify-adopter-gate.sh:31"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SINAL_CURADO_SEM_AVISAR_QUEM_REPORTOU
     node_type: evidence
@@ -106,6 +111,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-08-27-adopt-greenfield-tres-defeitos.md"
       locator: "os tres defeitos do sinal de 2026-08-27 medidos como curados; o sinal seguia no inbox"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: I_LIGAR_A_PERNA_DE_LEITURA
     node_type: decision
@@ -238,6 +244,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "fixture reproduzida no core: PyYAML ve 2 nos, kg-radar anuncia 3 nos 2 arestas, ambos os gates rc=0"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_PARIDADE_DE_CENSO_VIRA_REGRA
     node_type: decision
@@ -262,6 +269,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "reproduzido antes (rc=1, no orfao) e depois (rc=0, MODO PROPOSTA anunciado); familia kg_proposal_mode 7/7; mutante da poda de comentario EXECUTADO e reprovado"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PARIDADE_DE_CENSO_E_REGRA_82
     node_type: evidence
@@ -277,6 +285,7 @@ nodes:
       source: ".claude/validation/kg-census-parity-check.sh"
       locator: "corpus do core: 128 grafos, 124 medidos, 0 HARD; fantasma forjado pego e NOMEADO; familia kg_census_parity 6/6; mutante da ancora fixa EXECUTADO e reprovado por 3 casos"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_A_PERNA_DE_LEITURA_TEM_PRECO

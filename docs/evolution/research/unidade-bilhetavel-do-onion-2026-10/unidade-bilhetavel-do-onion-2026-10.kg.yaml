@@ -75,6 +75,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh · .claude/hooks/"
       locator: "medicao nesta maquina em 2026-10-01 — `claude --version` = 2.1.286; o binario /home/marcio/.local/share/claude/versions/2.1.286 e ELF 64-bit e `grep -ao` nele devolve PreToolUse 243x, bypassPermissions 195x e billing 167x; `ls .claude/hooks/*.sh` = 15 hooks, dos quais 6 contem `exit 2`; `wc -l .claude/validation/lint-artifacts.sh` = 5282 com 203 chamadas `violation \"` e 13 arquivos de baseline-catraca"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CORPUS_AUSENCIA_DE_UNIDADE_BILHETAVEL
     node_type: evidence
@@ -93,6 +94,7 @@ nodes:
       source: "docs/onion/graph/ · docs/evolution/research/"
       locator: "bash .claude/validation/kg-corpus-grep.sh \"unidade bilhetavel\" → 109 grafos varridos, 0 nos; contagem por termo nos mesmos 109 grafos via `git ls-files \"*.kg.yaml\" | grep -v /fixtures/ | xargs grep -il <termo> | wc -l`: pricing 11, cobranca 6, monetiz 4, open-core 3, \"unidade bilhet\" 0"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ═══════════════════ O GATE COMO PRIMITIVO (eixo 2) ═══════════════════
 
@@ -112,6 +114,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "https://code.claude.com/docs/en/hooks — votos 3-0, fonte primaria da plataforma"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GOVERNANCA_EM_HOOK_JA_E_NATIVA_SYSTEMPROMPT
     node_type: evidence
@@ -130,6 +133,7 @@ nodes:
       source: "https://systemprompt.io/guides/enterprise-claude-code-managed-settings"
       locator: "https://systemprompt.io/guides/enterprise-claude-code-managed-settings — votos 3-0, mas source_kind vendor-on-competitor (clausula 7: sempre suspeito), sem numero de preco publicado"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ O CASO STYRA (eixo 5, anti-padrao) ═══════════════════
 
@@ -150,6 +154,7 @@ nodes:
       source: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371"
       locator: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371 (primaria, votos 2-1) cruzada com https://cloudnativenow.com/editorial-calendar/best-of-2025/apple-buys-styra-brains-opa-remains-open-2/ (agregador tier 5, votos 3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_STYRA_PRODUTO_COMERCIAL_VIROU_CNCF
     node_type: evidence
@@ -168,6 +173,7 @@ nodes:
       source: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371"
       locator: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371 — votos 3-0, fonte primaria dos proprios fundadores"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ PRECO POR DECISAO: O PISO DO MERCADO (eixo 1) ═══════════════════
 
@@ -188,6 +194,7 @@ nodes:
       source: "https://cloudburn.io/blog/amazon-bedrock-agentcore-pricing"
       locator: "https://cloudburn.io/blog/amazon-bedrock-agentcore-pricing — votos 3-0, mas e analista de terceiro que DERIVA o numero; a pagina de precos da propria AWS (tier 9) foi REFUTADA nesta mesma rodada e NAO aparece lida de nenhum lado"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AGENT_CUSTODY_COBRA_PELO_RECIBO
     node_type: evidence
@@ -206,6 +213,7 @@ nodes:
       source: "https://github.com/svayatta/agent-custody"
       locator: "https://github.com/svayatta/agent-custody — repo Apache-2.0 com 8 estrelas, criado em 2026-09-04; preco no proprio repo; a claim do conteudo do produto veio com votos 2-1"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ PROVA COMO PRODUTO: FUNDAMENTO SEM MERCADO (eixo 4) ═══════════════════
 
@@ -226,6 +234,7 @@ nodes:
       source: "https://arxiv.org/pdf/2608.00801"
       locator: "https://arxiv.org/pdf/2608.00801 — votos 3-0 nas duas claims (a tecnica e a declaracao de que a fonte nao responde aos seis eixos)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_VIZINHANCA_SEM_PRECO_PUBLICADO
     node_type: evidence
@@ -244,6 +253,7 @@ nodes:
       source: "https://github.com/vectimus/vectimus · https://github.com/marcofanti/sondera-coding-agent-hooks-java"
       locator: "https://github.com/vectimus/vectimus (votos 2-1) e https://github.com/marcofanti/sondera-coding-agent-hooks-java (votos 3-0) — em AMBOS o que se mediu foi o REPOSITORIO, nao o site, docs ou release notes do fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_FONTES_QUE_NAO_RESPONDEM_A_PERGUNTA
     node_type: evidence
@@ -262,6 +272,7 @@ nodes:
       source: "https://www.thoughtworks.com/en-th/radar · https://www.openappa.com/"
       locator: "https://www.thoughtworks.com/en-th/radar (votos 3-0) e https://www.openappa.com/ (votos 3-0) — ambas registradas como achado de AUSENCIA, nao de conteudo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ MERCADO E CAPITAL (eixo 6) ═══════════════════
 
@@ -282,6 +293,7 @@ nodes:
       source: "https://fortune.com/2026/05/28/geordie-security-governance-ai-agents/"
       locator: "tres rodadas confirmadas em fontes de tiers diferentes: https://barc.com/?p=155644 (tier 7, votos 3-0), https://fortune.com/2026/05/28/geordie-security-governance-ai-agents/ (tier 6, votos 3-0) e https://newmarketpitch.com/blogs/news/ai-governance-funding-news (tier 5, votos 3-0); os agregados da MESMA fonte (12 rodadas, US$186,8M, Gray Swan, Cinder) ficaram no lado REFUTADO"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ LACUNAS (clausula 8 — lacuna vira no) ═══════════════════
 
@@ -303,6 +315,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_8fc9168b-69a.json"
       locator: "journal wf_8fc9168b-69a.json: result.stats {sources 24, claims 90, verified 34, confirmed 17, refuted 17, unverified 0}; logs \"fetch 24 (31 cortadas por orçamento)\", \"Fontes 24 → claims 90 → verificando top 34 (56 fora do orçamento)\", \"Elenxo: 60 objeções, 52 sobreviventes\"; result.refuted (17)"
       method: "testemunho: leitura do journal wf_8fc9168b-69a no host 2026-10-01"
+      locality: "host"
 
   # ═══════════════════ AS OPCOES (uma claim por opcao, todas open) ═══════════════════
 
@@ -394,6 +407,7 @@ nodes:
       source: "/home/marcio/.local/share/claude/versions/2.1.286"
       locator: "achado 1 (exit 2 nativo, tier 9) lido contra a medicao local de 2026-10-01: o binario 2.1.286 traz 243 ocorrencias de PreToolUse e 195 de bypassPermissions — o Elenxo declarou 117, numero que NAO reproduz aqui"
       method: "testemunho: leitura do arquivo /home/marcio/.local/share/claude/versions/2.1.286 no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: E_OBJECAO_STYRA_E_DE_2025_E_INFERENCIA
     node_type: evidence
@@ -411,6 +425,7 @@ nodes:
       source: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371"
       locator: "achado 2 (valid_from 2025-08-20) contra a EXIGENCIA DE ATUALIDADE da propria rodada, e contra o achado 12 da MESMA rodada (acquihire sem aquisicao)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_QUEM_MONETIZA_E_O_CONTROL_PLANE
     node_type: evidence
@@ -428,6 +443,7 @@ nodes:
       source: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371"
       locator: "achado 3 (produtos comerciais da Styra para a CNCF) lido contra o achado 7 da MESMA rodada (AWS cobrando por decisao de Cedar) — os dois juntos derrubam a inferencia que a rodada tirou do primeiro"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_NEO_SEM_OBJETO_E_PERMALINK_CRU
     node_type: evidence
@@ -445,6 +461,7 @@ nodes:
       source: "https://barc.com/?p=155644"
       locator: "achado 4 inspecionado: a fonte e barc.com/?p=155644, permalink cru de WordPress sem slug, sem autor e sem data no URL, carregando tier 7 para uma afirmacao de US$100M que teria release primario de a16z e Bessemer"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_RADAR_MEDIDO_NO_CAMINHO_ERRADO
     node_type: evidence
@@ -462,6 +479,7 @@ nodes:
       source: "https://www.thoughtworks.com/en-th/radar"
       locator: "achado 5 lido contra o corpus de metodo da casa: thoughtworks.com/en-th/radar e a LANDING do Radar; o conteudo vive nos blips individuais e no PDF do volume, nenhum dos quais aparece lido na rodada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_GEORDIE_REFUTA_C_NA_FORMA_ONION
     node_type: evidence
@@ -479,6 +497,7 @@ nodes:
       source: "https://fortune.com/2026/05/28/geordie-security-governance-ai-agents/"
       locator: "achado 6 lido contra o item CORTADO POR ORCAMENTO na mesma rodada, que descreve o que a Geordie vende: discovery mais risk mapping mais remediacao por context engineering — packaging de plataforma, NAO gate deterministico por veredito"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_TIER_INVERTIDO_E_PISO_DE_COMMODITY
     node_type: evidence
@@ -496,6 +515,7 @@ nodes:
       source: "https://cloudburn.io/blog/amazon-bedrock-agentcore-pricing"
       locator: "comparacao direta das duas listas do repasse: a MESMA afirmacao de preco esta REFUTADA em tier 9 (aws.amazon.com/bedrock/agentcore/pricing) e CONFIRMADA em tier 6 (cloudburn.io); a pagina da propria AWS nao aparece lida em nenhum dos dois lados"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_SEM_PRICING_NAO_E_SEM_MONETIZACAO
     node_type: evidence
@@ -513,6 +533,7 @@ nodes:
       source: "https://github.com/vectimus/vectimus"
       locator: "achado 8 (votos 2-1) lido contra o padrao open-core documentado na propria rodada: o Semgrep e LGPL no GitHub e cobra US$35 por contributor/mes no SITE — e esse item caiu no lado refutado desta mesma rodada"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_ATESTACAO_AINDA_E_PAPER
     node_type: evidence
@@ -530,6 +551,7 @@ nodes:
       source: "https://arxiv.org/pdf/2608.00801"
       locator: "achado 9: prova de conceito academica com TPM EMULADO, sem produto e sem preco — a propria descricao do item"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_AUSENCIA_CONTADA_COMO_ACHADO
     node_type: evidence
@@ -547,6 +569,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_8fc9168b-69a.json"
       locator: "journal wf_8fc9168b-69a.json: result.decision.objections[9] (target \"Achado 10 — A fonte não responde às seis perguntas… (mesmo arXiv)\": \"Dois achados confirmados (9 e 10) extraídos da MESMA fonte... a rodada parece ter 17 achados e tem, na prática, ~11 com conteúdo\") + objections[4] (achado 5, Radar sem info), [7] (achado 8, Vectimus sem preço), [12] (achado 13, openappa sem evidência), [16] (achado 17, Sondera sem preço)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_8fc9168b-69a.json no host"
+      locality: "host"
 
 edges:
 

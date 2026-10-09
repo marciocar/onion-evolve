@@ -25,6 +25,7 @@ nodes:
       source: "400d780364147906f39a19eecffa43c9e4f85992:docs/onion/graph/fios-abertos.kg.yaml + 9aa881a9 (corpo do commit)"
       locator: "400d7803:fios-abertos.kg.yaml l.39 (TETO 19) ; contagem de nós ; 9aa881a9 corpo"
       method: "medição: git show 400d7803:docs/onion/graph/fios-abertos.kg.yaml | grep -c '^ - id:' = 19 + leitura l.39 \"TETO: 19 NÓS\"; recusa da catraca = corpo de 9aa881a9 (1ª pessoa)"
+      locality: "repo"
 
   - id: I_AGENTE_EXPO_RN
     node_type: decision
@@ -62,6 +63,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-09-10-doutrina-versus-codigo-no-motor-do-kg.md"
       locator: "medicao no kg-radar.sh em 2026-09-22: pagerank/amortecimento = 0 ocorrencias; ciclo|cycle = 0; condicao composta done+PROD = 0; SUPPORTS = 1 (so a string do enum); migalha aparece so em ⚠; validFrom/sourceTier = 11 (CURADO pelo #865); review_after = 12 (lido pela secao VALIDADE); corpus vivo: 4.021 status, 0 fora do enum, 0 drifted"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_LACO_DE_RECONCILIACAO_CONSTRUIDO_E_PARADO
     node_type: decision
@@ -76,6 +78,7 @@ nodes:
       source: "9aa881a92ba8 (corpus docs/**/*.kg.yaml) + .claude/validation/lib/status-factor.awk + docs/evolution/inbox/_processed/2026-09-10-doutrina-versus-codigo-no-motor-do-kg.md + docs/onion/graph/company-brain-market-2026-07.kg.yaml"
       locator: "git grep em 9aa881a9 ; status-factor.awk l.28 ; inbox 2026-09-10 l.28, l.39 ; company-brain-market-2026-07.kg.yaml l.160-169 ; e054d69c (2026-08-06)"
       method: "medição: git grep -h -E '^\\s*status:\\s*drifted' 9aa881a9 -- 'docs/*.kg.yaml' = 0 (de 4.024 linhas status em 101 grafos) + leitura: status-factor.awk l.28, inbox l.28/l.39, company-brain l.169"
+      locality: "repo"
 
   - id: D_O_RADAR_NUNCA_EMITIU_SUPERSEDES
     node_type: decision
@@ -90,6 +93,7 @@ nodes:
       source: "9aa881a92ba8:docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml + 9aa881a9:docs/evolution/research/claude-code-2.1-onion-2026-08/claude-code-2.1-onion-2026-08.kg.yaml + 9aa881a9:docs/onion/radar-baselines.yaml + 9aa881a9:.claude/commands/meta/radar.md"
       locator: "r5.kg.yaml (grep -c SUPERSEDES) ; claude-code-2.1-onion-2026-08.kg.yaml (35 nós, versões 2.1.211–2.1.233, --freshness) ; radar-baselines.yaml l.17 ; radar.md l.36-37"
       method: "medição: git show 9aa881a9:<r5>.kg.yaml | grep -c SUPERSEDES = 0 + kg-radar.sh <claude-code-2.1-onion@9aa881a9> --freshness = 0 STALE (34 com frescor declarado) + leitura: radar-baselines.yaml l.17 cc_version 2.1.278, radar.md l.36-37"
+      locality: "repo"
 
   - id: E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA
     node_type: evidence
@@ -110,6 +114,7 @@ nodes:
       source: "9aa881a9 (nó criado pela sessão 2026-09-22) + 0595c2d5 (corpo do commit) + 0595c2d5:.claude/validation/lint-selftest.sh"
       locator: "corpo de 0595c2d5 ('E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA → refutado'); lint-selftest.sh@0595c2d5 l.401, l.495"
       method: "testemunho: medição da sessão 2026-09-22 (bancada --affected-staged --jobs auto lida de arquivo truncado por | tail -14), comando de captura não registrado; a truncagem e a refutação estão em 1ª pessoa no corpo de 0595c2d5, e o código l.401/l.495 a confirma"
+      locality: "repo"
 
   - id: E_A_FAIXA_CARREGA_O_DETALHE_EU_E_QUE_TRUNQUEI
     node_type: evidence
@@ -124,6 +129,7 @@ nodes:
       source: "0595c2d5:.claude/validation/lint-selftest.sh + 0595c2d5 (corpo do commit)"
       locator: "0595c2d5:lint-selftest.sh l.401, l.495 ; 0595c2d5 corpo"
       method: "leitura: 0595c2d5:.claude/validation/lint-selftest.sh l.401 (pai replica a saída do filho) e l.495 (record_fail imprime nome E motivo); reprodução com mutante = testemunho da sessão 2026-09-23 (corpo 0595c2d5)"
+      locality: "repo"
 
   - id: D_PREDICADO_E_RADAR_SE_CONTRADIZEM_NO_REFUTES_DE_NO_JA_SELADO
     node_type: decision
@@ -138,6 +144,7 @@ nodes:
       source: "0595c2d5 (corpo do commit) + 0595c2d5:docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
       locator: "0595c2d5 corpo (\"E achei um buraco de doutrina conduzindo\"); KB l.202-204 (contradição REFUTES em nó open reprova)"
       method: "testemunho: medição da sessão 2026-09-23 (radar e kg-seal-exception.sh com status refuted×open), comando não registrado — origem: corpo do commit 0595c2d5 em 1ª pessoa"
+      locality: "repo"
 
   - id: E_A_KB_JA_FOI_CORRIGIDA_EM_09_18_SO_A_IMPLEMENTACAO_FALTA
     node_type: evidence
@@ -152,6 +159,7 @@ nodes:
       source: "0595c2d5:docs/knowledge-base/concepts/knowledge-graph-sdaal.md + 0595c2d5:.claude/validation/kg-radar.sh"
       locator: "KB l.202-218 ; kg-radar.sh l.27-29 ; 251adf6f (2026-09-18)"
       method: "leitura: 0595c2d5:knowledge-graph-sdaal.md l.202-218 + kg-radar.sh l.27-29; data da correção por git log -S\"CORRIGIDO em 2026-09-18\" = 251adf6f (2026-09-18)"
+      locality: "repo"
 
   - id: E_REGRA_85_E_INSATISFAZIVEL_ANTES_DO_MERGE
     node_type: evidence
@@ -167,6 +175,7 @@ nodes:
       source: "ops/testing/lint-summary.sh"
       locator: "artefato `lint-evidence-35929817914` BAIXADO do run do PR #869 e renderizado por ops/testing/lint-summary.sh: 3 HARD, e DOIS deles sao as linhas da REGRA 85 (onion-core 4>0, onion-standalone 412>408). Isto REFUTA a leitura que eu havia escrito horas antes a partir do run 35903248855 (0 HARD, zero ocorrencia de REGRA 85): aquele run e de 18:33 e PRECEDE o merge do #868, ou seja a porta ainda nao estava defasada quando ele rodou — eu li ausencia-de-defeito como ausencia-de-guarda"
       method: "leitura: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA
     node_type: decision
@@ -198,6 +207,7 @@ nodes:
       source: "3d8cb0b5 (corpo do commit) + cfcff558ccb3:.claude/validation/door-staleness-baseline.txt"
       locator: "3d8cb0b5 corpo; cfcff558:door-staleness-baseline.txt l.103, l.116, l.143, l.147"
       method: "leitura: corpo do commit 3d8cb0b5 (selo do maestro citado) + door-staleness-baseline.txt no pai cfcff558"
+      locality: "repo"
 
   - id: Q_QUEM_CARIMBA_O_PIN_DA_PORTA
     node_type: question

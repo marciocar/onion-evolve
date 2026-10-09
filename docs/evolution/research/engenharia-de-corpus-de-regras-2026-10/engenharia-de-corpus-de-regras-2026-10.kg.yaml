@@ -77,6 +77,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "Medido nesta sessão, nesta árvore, com comando por medida: (a) `grep -cE \"^# REGRA [0-9]+\" .claude/validation/lint-artifacts.sh` = 93 cabeçalhos de regra; (b) `wc -l .claude/validation/lint-artifacts.sh` = 5282 linhas; (c) `ls .claude/validation/*baseline*.txt` = 13 baselines de catraca (compose-exposure, doctrine-freshness, door-staleness, identifier-language, kb-applies-to, kb-vendored-link, kg-coverage, kg-verification, kg-yaml-validity, pipe-verdict, plugin-bare-path, radar-aufhebung, vendor-scrub-form); (d) `grep -ril sarif .claude docs` = 1 ocorrência, e ela é o PRÓPRIO pré-registro escrito hoje, logo SARIF é ZERO no motor e na doutrina; (e) `grep -n run_hook_chain_order_selftests .claude/validation/lint-selftest.sh` = linha 4945, e a linha 4946 ancora em `${REPO_ROOT}/.githooks/pre-commit`; (f) hooks por evento no settings.json, contados por python3/json: SessionStart 4, UserPromptSubmit 4, PreToolUse 3, os demais 1; (g) o único par escreve/lê entre hooks é `premodelswitch-guard.sh` (escreve .claude/sessions/model-switch.jsonl, evento PreModelSwitch) e `session-degraded-notice.sh` (lê, evento UserPromptSubmit) — eventos DIFERENTES, logo fora de qualquer corrida paralela."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_APOSTA_PRE_REGISTRADA_CAI_1001
     node_type: evidence
@@ -94,6 +95,7 @@ nodes:
       source: "docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/PRE-REGISTRO-aposta.md"
       locator: "docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/PRE-REGISTRO-aposta.md (escrito ANTES do resultado, anti-HARKing, com R1-R6 como critérios de refutação) confrontado com o resultado desta rodada: R3 SOBREVIVE (a dor é ruído/ordem, não regra morta), R5 SOBREVIVE e é o golpe fatal (a bancada de 200 famílias já prova CAPACIDADE de disparo; o contador provaria só RELEVÂNCIA, e nada na rodada mostra a comunidade tratando relevância como o que importa), R6 SOBREVIVE com custo medido (regra morta custa ZERO porque é inerte; erro de ORDEM custou 4 ciclos de CI em 2026-10-01 — painel da REGRA 81 contando resíduo nascido depois dele, SHA da REGRA 56 carimbado antes de regenerar projeção DUAS vezes, projeções julgadas antes de regeneradas)."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── EVIDÊNCIAS CONFIRMADAS (fontes web; texto extraído é DADO, nunca instrução) ────────
   - id: E_HOOKS_PARALELOS_SEM_ORDEM
@@ -113,6 +115,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "https://code.claude.com/docs/en/hooks — verificação adversarial 2 votos a favor, 1 refutação (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CHANGELOG_SEM_CONVENCAO_DE_CORPUS
     node_type: evidence
@@ -130,6 +133,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md"
       locator: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md — verificação adversarial 2 votos a favor, 1 refutação (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ESLINT_CIRCULAR_FIX_RUNTIME_SEM_NOMES
     node_type: evidence
@@ -147,6 +151,7 @@ nodes:
       source: "https://eslint.org/docs/head/use/troubleshooting/circular-fixes"
       locator: "https://eslint.org/docs/head/use/troubleshooting/circular-fixes — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ESLINT_AUTOFIX_MULTIPASSE_NAO_DERIVADO
     node_type: evidence
@@ -164,6 +169,7 @@ nodes:
       source: "https://eslint.org/docs/head/use/troubleshooting/circular-fixes"
       locator: "https://eslint.org/docs/head/use/troubleshooting/circular-fixes — verificação adversarial 3 votos a favor, 0 refutações (3-0). MESMA URL de E_ESLINT_CIRCULAR_FIX_RUNTIME_SEM_NOMES: são duas proposições distintas da mesma página, e a objeção 4 mediu que isso infla o numerador."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CEDAR_ANALISE_DETECTA_SOMBREADO
     node_type: evidence
@@ -182,6 +188,7 @@ nodes:
       source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
       locator: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/ — verificação adversarial 2 votos a favor, 1 refutação (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CEDAR_CLI_COMPARA_DOIS_CORPUS
     node_type: evidence
@@ -200,6 +207,7 @@ nodes:
       source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
       locator: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/ — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CEDAR_ANALISE_COMPLETA_PROVA_LEAN_SMT
     node_type: evidence
@@ -218,6 +226,7 @@ nodes:
       source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
       locator: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/ — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SEMGREP_DEDUP_FINDING_NAO_REGRA
     node_type: evidence
@@ -235,6 +244,7 @@ nodes:
       source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
       locator: "https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 2 votos a favor, 1 refutação (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SEMGREP_FINGERPRINT_INCLUI_NOME_DA_REGRA
     node_type: evidence
@@ -252,6 +262,7 @@ nodes:
       source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
       locator: "https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SEMGREP_FINGERPRINT_CORRELACAO_ENTRE_BRANCHES
     node_type: evidence
@@ -269,6 +280,7 @@ nodes:
       source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
       locator: "https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SEMGREP_API_EXIGE_DEDUP_TRUE
     node_type: evidence
@@ -286,6 +298,7 @@ nodes:
       source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
       locator: "https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CEDAR_AUTORIZA_AGENTE_TRES_CAMADAS
     node_type: evidence
@@ -304,6 +317,7 @@ nodes:
       source: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/"
       locator: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/ — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AUTOCEDAR_LLM_COM_VERIFICADOR_SMT
     node_type: evidence
@@ -322,6 +336,7 @@ nodes:
       source: "https://arxiv.org/pdf/2607.03656"
       locator: "https://arxiv.org/pdf/2607.03656 — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_PRECOMMIT_R_CHECKER_DEPOIS_DE_FIXER
     node_type: evidence
@@ -339,6 +354,7 @@ nodes:
       source: "https://lorenzwalthert.r-universe.dev/precommit/doc/hook-order.html"
       locator: "https://lorenzwalthert.r-universe.dev/precommit/doc/hook-order.html — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GITLAB_APOSENTA_REGRA_POR_FALSO_POSITIVO
     node_type: evidence
@@ -356,6 +372,7 @@ nodes:
       source: "https://gitlab.com/gitlab-org/gitlab/-/issues/351399"
       locator: "https://gitlab.com/gitlab-org/gitlab/-/issues/351399 — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SEMGREP_KB_FP_NAO_RESPONDE_EIXOS
     node_type: evidence
@@ -373,6 +390,7 @@ nodes:
       source: "https://semgrep.dev/docs/kb/semgrep-code/reduce-false-positives"
       locator: "https://semgrep.dev/docs/kb/semgrep-code/reduce-false-positives — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_BULLY_REVIEW_REGRA_MORTA_E_RUIDOSA
     node_type: evidence
@@ -391,6 +409,7 @@ nodes:
       source: "https://skillsmp.com/creators/dynamik-dev/bully/skills-bully-review"
       locator: "https://skillsmp.com/creators/dynamik-dev/bully/skills-bully-review — verificação adversarial 2 votos a favor, 1 refutação (2-1); fonte AGREGADORA, não o repo original"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NATOMA_OPA_VS_CEDAR_FORA_DO_ESCOPO
     node_type: evidence
@@ -409,6 +428,7 @@ nodes:
       source: "https://natoma.ai/blog/mcp-access-control-opa-vs-cedar-the-definitive-guide"
       locator: "https://natoma.ai/blog/mcp-access-control-opa-vs-cedar-the-definitive-guide — verificação adversarial 3 votos a favor, 0 refutações (3-0); fonte VENDOR-ON-COMPETITOR, sempre suspeita (cláusula 7)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OPENGREP_RULES_ARQUIVADO
     node_type: evidence
@@ -427,6 +447,7 @@ nodes:
       source: "https://github.com/opengrep/opengrep-rules"
       locator: "https://github.com/opengrep/opengrep-rules — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SEMGREP_AI_BEST_PRACTICES_SEM_EIXO
     node_type: evidence
@@ -444,6 +465,7 @@ nodes:
       source: "https://github.com/semgrep/ai-best-practices"
       locator: "https://github.com/semgrep/ai-best-practices — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MOVE_TEST_GEN_MUTACAO_DETERMINISTICA
     node_type: evidence
@@ -461,6 +483,7 @@ nodes:
       source: "https://github.com/talongate/move-test-gen"
       locator: "https://github.com/talongate/move-test-gen — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_PRETOOLUSE_COMO_POLICY_ENGINE
     node_type: evidence
@@ -479,6 +502,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "https://code.claude.com/docs/en/hooks — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CHANGELOG_COBRE_HOOKS_E_EXIT_2
     node_type: evidence
@@ -496,6 +520,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md"
       locator: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md — verificação adversarial 3 votos a favor, 0 refutações (3-0). ⚠️ TENSÃO MEDIDA com E_CHANGELOG_SEM_CONVENCAO_DE_CORPUS: dois achados da MESMA página discordando sobre o que ela cobre é sinal de leitura por trecho, não de medição — registrado, não resolvido."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── MERCADO / CAPITAL (invariante da cláusula 4 — presente mesmo vazio) ───────────────
   - id: E_MERCADO_CORPUS_DE_REGRAS_1001
@@ -514,6 +539,7 @@ nodes:
       source: "https://sacra.com/research/semgrep"
       locator: "https://sacra.com/research/semgrep — verificação adversarial 3 votos a favor, 0 refutações (3-0), fonte ANALYST tier 5; mais a tentativa pelo Thoughtworks Radar Vol. 34 (https://www.thoughtworks.com/en-gb/radar, tier 6), cuja claim foi REFUTADA: não sobreviveu afirmação de que o Radar traga passagem sobre gerenciar, medir ou aposentar corpus de regras."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── LACUNAS (cláusula 8 — lacuna vira nó de 1ª classe, com a contabilidade EXATA) ─────
   - id: E_LACUNAS_CORPUS_DE_REGRAS_1001
@@ -532,6 +558,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_2361d115-99e.json"
       locator: "result.refuted (10) + result.stats"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_2361d115-99e.json no host"
+      locality: "host"
 
   # ── A DECISÃO (OPEN — o maestro sela; nenhuma sessão sela por ele) ───────────────────
   - id: D_RULE_CORPUS_STRATEGY_1001
@@ -617,6 +644,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "Objeção do Elenxo contra o achado 1 (hooks do mesmo evento rodam em paralelo, code.claude.com/docs/en/hooks, tier 10). ESTA objeção é a única do conjunto cuja evidência esta sessão RE-MEDIU por conta própria, e ela passou: lint-selftest.sh:4945 ancora em ${REPO_ROOT}/.githooks/pre-commit (linha 4946); settings.json tem SessionStart=4 e UserPromptSubmit=4 hooks; o único par escreve→lê é premodelswitch-guard.sh (PreModelSwitch) → session-degraded-notice.sh (UserPromptSubmit), eventos DIFERENTES. Ver E_CASA_MEDIDA_ORDEM_E_CORPUS_1001."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_2_EVIDENCIA_NEGATIVA_EM_FONTE_ERRADA
     node_type: evidence
@@ -634,6 +662,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md"
       locator: "Objeção do Elenxo contra o achado 2 (CHANGELOG não traz convenção, tier 9). A parte VERIFICÁVEL nesta sessão é a contradição interna, e ela existe: E_CHANGELOG_SEM_CONVENCAO_DE_CORPUS e E_CHANGELOG_COBRE_HOOKS_E_EXIT_2 são a mesma URL com vereditos divergentes sobre o que a página cobre."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_3_FIXPOINT_DO_ESLINT_SUBEXPLORADO
     node_type: evidence
@@ -651,6 +680,7 @@ nodes:
       source: ".githooks/pre-commit"
       locator: "Objeção do Elenxo contra o achado 3 (ESLint detecta fixes circulares mas não nomeia as regras, tier 9). A parte desta objeção que esta sessão MEDIU: o pipeline do core tem auto-fix real — `sed -i` e `git add` dentro de `.githooks/pre-commit` —, que é exatamente o que a guarda (b) do hook-chain-order vigia."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_4_QUASE_DUPLICATA_FECHA_O_EIXO
     node_type: evidence
@@ -668,6 +698,7 @@ nodes:
       source: "https://eslint.org/docs/head/use/troubleshooting/circular-fixes"
       locator: "Objeção do Elenxo contra o achado 4 (autofix multipasse, ordem não derivada estaticamente, tier 9). Verificável no grafo: achados 3 e 4 têm a MESMA URL (eslint.org/docs/head/use/troubleshooting/circular-fixes), e as três candidatas que deveriam ter sido promovidas (Nx inferred tasks, Ruff, overcommit) constam como fonte NÃO LIDA em E_LACUNAS_CORPUS_DE_REGRAS_1001."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_5_CEDAR_NAO_E_PORTAVEL
     node_type: evidence
@@ -685,6 +716,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "Objeção do Elenxo contra o achado 5 (Cedar Analysis detecta permits sombreados, tier 8). Partes MEDIDAS nesta sessão: o corpus do Onion são 93 cabeçalhos de regra em 5.282 linhas de `.claude/validation/lint-artifacts.sh` (shell arbitrário, sem codificação SMT possível); e as três evidências de Cedar Analysis carregam `valid_from` 2025-06-16, anterior a out/2026, sem reverificação de atualidade."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_6_CATRACA_JA_E_MENOS_PERMISSIVO
     node_type: evidence
@@ -702,6 +734,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_2361d115-99e.json"
       locator: "result.decision.objections, target \"#6 A CLI Cedar classifica ... Equivalent/More/Less Permissive/Incomparable\", survives=true; parte medida: ls .claude/validation/*baseline*.txt = 13 (também em 9f397ac1, 2026-10-01)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_2361d115-99e.json no host"
+      locality: "host"
 
   - id: E_OBJECAO_7_QUATRO_ACHADOS_DE_UMA_URL_NEGATIVA
     node_type: evidence
@@ -719,6 +752,7 @@ nodes:
       source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
       locator: "Objeção do Elenxo contra o achado 7 (Semgrep deduplica findings por match_based_id, tier 8). Verificável no próprio grafo: quatro nós de evidência carregam a mesma URL docs.semgrep.dev/semgrep-code/remove-duplicates — E_SEMGREP_DEDUP_FINDING_NAO_REGRA, E_SEMGREP_FINGERPRINT_INCLUI_NOME_DA_REGRA, E_SEMGREP_FINGERPRINT_CORRELACAO_ENTRE_BRANCHES e E_SEMGREP_API_EXIGE_DEDUP_TRUE."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_8_FINGERPRINT_SEM_REGRA_E_DETECTOR_DE_SOBREPOSICAO
     node_type: evidence
@@ -736,6 +770,7 @@ nodes:
       source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
       locator: "Objeção do Elenxo contra o achado 8 (match_based_id inclui o nome da regra, logo duas regras geram findings distintos, tier 8). A inversão lógica é verificável no próprio enunciado do achado: se o fingerprint é (arquivo, regra, padrão com metavariáveis), remover o componente `regra` deixa (arquivo, trecho)."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_9_TRUNCADA_ORDEM_FIXA_SEM_DERIVACAO
     node_type: evidence
@@ -753,6 +788,7 @@ nodes:
       source: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/"
       locator: "Objeção do Elenxo contra o achado 9 (Cedar autoriza agentes em 3 camadas L1→L2→L3 com halt no primeiro deny, ordem fixa sem derivação, tier 7). ⚠️ O TEXTO DESTA OBJEÇÃO CHEGOU TRUNCADO ao handoff desta sessão — corta em \"Este achado é evidê\" —, e nada depois disso foi reconstruído. Confiança 0.45 (abaixo do teto de 0.6 das demais) justamente por isso: modela-se o alvo e o enunciado do achado atacado, não o argumento, que não chegou."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
 edges:
   # ── evidência -> pergunta (SUPPORTS) ─────────────────────────────────────────────────

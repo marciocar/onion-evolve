@@ -41,6 +41,7 @@ nodes:
       source: "https://code.claude.com/docs/en/plugins#submit-your-plugin-to-the-official-marketplace"
       locator: "https://code.claude.com/docs/en/plugins#submit-your-plugin-to-the-official-marketplace — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_GRANULARIDADE_VERTICAL_COESA
     node_type: evidence
     plane: DEV
@@ -58,6 +59,7 @@ nodes:
       source: "https://claude.com/docs/plugins/submit"
       locator: "https://claude.com/docs/plugins/submit — votos 2-1 (um voto adversarial contestou a forca do \"explicitamente\"; a claim sobreviveu rebaixada)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_CURADORIA_DUAS_CAMADAS
     node_type: evidence
     plane: DEV
@@ -75,6 +77,7 @@ nodes:
       source: "https://claude.com/docs/plugins/submit"
       locator: "https://claude.com/docs/plugins/submit — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_DIRETORIO_OFICIAL_AUTO_ADICIONADO
     node_type: evidence
     plane: DEV
@@ -92,6 +95,7 @@ nodes:
       source: "https://code.claude.com/docs/en/discover-plugins"
       locator: "https://code.claude.com/docs/en/discover-plugins — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_MARKETPLACE_COMUNITARIO_PIN_POR_SHA
     node_type: evidence
     plane: DEV
@@ -109,6 +113,7 @@ nodes:
       source: "https://code.claude.com/docs/en/discover-plugins"
       locator: "https://code.claude.com/docs/en/discover-plugins — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_POLITICA_DESCRICAO_PRECISA
     node_type: evidence
     plane: DEV
@@ -126,6 +131,7 @@ nodes:
       source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
       locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_POLITICA_TRES_EXEMPLOS_E_SUPORTE
     node_type: evidence
     plane: DEV
@@ -143,6 +149,7 @@ nodes:
       source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
       locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_REPO_PUBLICO_OBRIGATORIO
     node_type: evidence
     plane: DEV
@@ -160,6 +167,7 @@ nodes:
       source: "https://claude.com/docs/connectors/building/review-criteria"
       locator: "https://claude.com/docs/connectors/building/review-criteria — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_TOP_INSTALL_FRONTEND_DESIGN
     node_type: evidence
     plane: DEV
@@ -177,6 +185,7 @@ nodes:
       source: "https://claude.com/plugins"
       locator: "https://claude.com/plugins — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_TOP_INSTALL_SUPERPOWERS
     node_type: evidence
     plane: DEV
@@ -194,6 +203,7 @@ nodes:
       source: "https://claude.com/plugins"
       locator: "https://claude.com/plugins — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_CMD_NU_NAO_RESOLVE
     node_type: evidence
     plane: DEV
@@ -210,6 +220,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/issues/15882"
       locator: "https://github.com/anthropics/claude-code/issues/15882 — votos 2-1 (issue aberta por terceiro; o voto contrario notou que e relato de usuario, nao spec)"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_MIRROR_READONLY_NIGHTLY
     node_type: evidence
     plane: DEV
@@ -227,6 +238,7 @@ nodes:
       source: "https://github.com/anthropics/claude-plugins-community"
       locator: "https://github.com/anthropics/claude-plugins-community — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_SESSIONSTART_HOOKS_EMBARCADOS
     node_type: evidence
     plane: DEV
@@ -244,6 +256,7 @@ nodes:
       source: "https://developers.redhat.com/articles/2026/08/18/securing-claude-code-plug-ins-best-practices-repository-security"
       locator: "https://developers.redhat.com/articles/2026/08/18/securing-claude-code-plug-ins-best-practices-repository-security — votos 3-0; source_kind vendor-on-competitor (SEMPRE suspeito, clausula 7) — confianca rebaixada por isso, nao por dissenso"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_MCP_SERVER_REGISTRAVEL_POR_PLUGIN
     node_type: evidence
     plane: DEV
@@ -261,6 +274,7 @@ nodes:
       source: "https://developers.redhat.com/articles/2026/08/18/securing-claude-code-plug-ins-best-practices-repository-security"
       locator: "https://developers.redhat.com/articles/2026/08/18/securing-claude-code-plug-ins-best-practices-repository-security — votos 3-0; source_kind vendor-on-competitor (suspeito por doutrina)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_ONION_MEDIDO_LOCAL_0904
     node_type: evidence
     plane: DEV
@@ -278,6 +292,7 @@ nodes:
       source: "commit dcd1c3ee + docs/evolution/research/plugin-directory-landscape-2026-09/SYNTHESIS.md + commit 5f91e64b"
       locator: "corpo de dcd1c3ee (\"531 referências... 194/208/129... ZERO na forma /<plugin>:<cmd>\"); SYNTHESIS.md l.31 (531, ponteiros mortos) e l.39 (nenhum .mcp.json); 5f91e64b:.claude-plugin/marketplace.json (8 entradas); git ls-tree 5f91e64b sem .mcp.json"
       method: "leitura: corpo do commit dcd1c3ee (medição do plugin-namespace-check.sh, 2026-09-04) + SYNTHESIS da rodada + árvore de 5f91e64b"
+      locality: "repo"
   - id: E_MERCADO_PLUGIN_DIRECTORY_0904
     node_type: evidence
     plane: DEV
@@ -295,6 +310,7 @@ nodes:
       source: "https://claude.com/plugins"
       locator: "https://claude.com/plugins (primaria, tier 9, votos 3-0); eixo E4 rodado, nenhuma rodada/M&A/down round/nota de analista sobreviveu aos votos"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_LACUNAS_PLUGIN_DIRECTORY_0904
     node_type: evidence
     plane: DEV
@@ -311,6 +327,7 @@ nodes:
       source: "https://clau.de/plugin-directory-submission"
       locator: "contabilidade da propria rodada: 26 fontes, 30 claims, 15 sobreviventes, 11 quedas, 0 nao-verificadas por falha de acesso"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 edges:
   - from: E_NAMESPACE_SEMPRE_QUALIFICADO
     to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09

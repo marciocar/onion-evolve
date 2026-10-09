@@ -27,6 +27,7 @@ nodes:
       source: ".claude/hooks/lib/invocation-lines.sh"
       locator: "payload JSON sintetico contra pretooluse-merge-gate.sh e pretooluse-protect-main.sh do main (2786f56c): +main, \"main\", TZ=… bash -c, timeout, gh -R, /usr/bin/gh, eval, xargs, $(echo gh), & simples, if/then, heredoc SEM aspas com $(…), {gh,} — rc=0 nos dois; branch protection do host: 403"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ESTUDO_O_CORPUS_NUNCA_CONSIDEROU_TOKENIZADOR
     node_type: evidence
@@ -57,6 +58,7 @@ nodes:
       source: "commit 0766a4d7 (sessão session_01NSeoZ75idrWT2wShxLsVfA) ; .claude/hooks/lib/invocation-lines.sh l.22-23"
       locator: "verified_against do nó (parseCommand/tree-sitter, 145 strings reason: em torno de 'tree-sitter mis-parse') + cabeçalho da lib l.22-23"
       method: "testemunho: medição da sessão 2026-10-05 sobre o binário 2.1.289, comando não registrado"
+      locality: "repo"
 
   - id: E_ESTUDO_SO_O_SHLEX_EXISTE_EM_TODO_LUGAR
     node_type: evidence
@@ -96,6 +98,7 @@ nodes:
       source: "commit 0766a4d7 (sessão session_01NSeoZ75idrWT2wShxLsVfA) ; .claude/validation/lint-selftest.sh l.5787-5800"
       locator: "lint-selftest.sh l.5787 (5 FP da reexecução dos 12.268 comandos), l.5793 (cd /outro/repo, v3), l.5796 (IndexError de case em bash -c, v4)"
       method: "testemunho: medição da sessão 2026-10-05, comando não registrado (replay.py não preservado)"
+      locality: "repo"
 
   - id: C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE
     node_type: claim
@@ -111,6 +114,7 @@ nodes:
       source: ".claude/hooks/lib/invocation-lines.sh"
       locator: "cabecalho da lib (FRONTEIRA DECLARADA)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_TETO_SHLEX_NAO_E_PARSER_DE_BASH
     node_type: claim
@@ -125,6 +129,7 @@ nodes:
       source: "https://docs.python.org/3/library/shlex.html"
       locator: "§shlex — 'makes it easy to write lexical analyzers for simple syntaxes resembling that of the Unix shell'; punctuation_chars"
       method: "leitura: documentação oficial do shlex"
+      locality: "web"
 
   - id: C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2
     node_type: question
@@ -139,6 +144,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-10-05-r7/data/2.1.289.txt"
       locator: "l.2"
       method: "leitura: changelog 2.1.289 verbatim do radar E3 r7"
+      locality: "repo"
 
   - id: C_TETO_MUTANTES_QUE_AS_CAMADAS_ESCONDEM
     node_type: claim
@@ -153,6 +159,7 @@ nodes:
       source: "docs/evolution/review/fix-veto-normalize-by-tokens.md"
       locator: "nota (l.13-15) + §Os confirmed (l.40-41); .claude/hooks/lib/invocation-lines.sh l.1216 (ONION_INVOCATION_STRICT)"
       method: "juízes: Elenxo 2ª passada (resíduo R56 fix/veto-normalize-by-tokens)"
+      locality: "repo"
 
   - id: E_ELENXO_REPROVOU_A_1A_REESCRITA
     node_type: evidence
@@ -167,6 +174,7 @@ nodes:
       source: "docs/evolution/review/fix-veto-normalize-by-tokens.md"
       locator: "tabela §As três passadas, linha 1ª (l.28) + frontmatter verdict REPROVADO_E_CURADO"
       method: "juízes: Elenxo opus em worktree isolada, 1ª passada (resíduo R56)"
+      locality: "repo"
 
   - id: E_A_REEXECUCAO_MENTIA_POR_ESTADO
     node_type: evidence
@@ -181,6 +189,7 @@ nodes:
       source: "commit 0766a4d7 (sessão session_01NSeoZ75idrWT2wShxLsVfA) ; .claude/hooks/lib/invocation-lines.sh l.54-59 ; docs/evolution/review/fix-veto-normalize-by-tokens.md l.47"
       locator: "invocation-lines.sh l.54-59 (FP que somem com a branch neutra = estado do disco de hoje); resíduo l.47 (31 artefatos de estado, 4 FP antigos)"
       method: "testemunho: medição da sessão 2026-10-05, comando não registrado (replay.py/classify.py não preservados)"
+      locality: "repo"
 
   - id: E_ELENXO_2A_PASSADA_O_DIRETORIO_ERRADO
     node_type: evidence
@@ -196,6 +205,7 @@ nodes:
       source: ".claude/hooks/lib/invocation-lines.sh"
       locator: "Elenxo opus, 2a passada, em worktree isolada: a1-a4.py, wt.py, wt2.py e mrun.py contra sandboxes sb3 (raiz na feat), sbm (raiz na main, worktree fix/x), sbf (raiz na feat, main noutra worktree) e other_proj; 14.958 comandos do corpus reexecutados; latencia em 50 comandos reais (mediana 90 ms nova x 98 ms antiga)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ELENXO_3A_PASSADA_A_ISENCAO_E_A_FALHA_ABERTA
     node_type: evidence
@@ -211,6 +221,7 @@ nodes:
       source: ".claude/hooks/lib/invocation-lines.sh"
       locator: "Elenxo opus, 3a passada, worktree isolada, sandboxes R/R2/O/RB/N/NH/bare (e3/t1-t10.py, h.py), push REAL confirmando insteadOf/pushInsteadOf e remoto com barra; 15.031 comandos do corpus reexecutados em duas configuracoes (raiz na feat; worktree com raiz na main); latencia e contagem de chamadas git medidas"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_ELENXO_3A_PASSADA_A_ISENCAO_E_A_FALHA_ABERTA

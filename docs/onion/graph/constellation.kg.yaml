@@ -23,6 +23,7 @@ nodes:
       source: "docs/discussions/onion-pessoal-marcio/ (README.md, 01-verticais-peer.md, 02-reconciliacao.md)"
       locator: "01-verticais-peer.md:7 e 25-30; 02-reconciliacao.md:28-34"
       method: "leitura: arquivos da estrela no repo"
+      locality: "repo"
   - id: ENT_KB_CORE
     node_type: entity
     layer: audit
@@ -36,6 +37,7 @@ nodes:
       source: "docs/knowledge-base/concepts/transfer-heuristic-aristotle.md + commit 0dcacbb1"
       locator: "transfer-heuristic-aristotle.md l.5 'status: candidato'; 0dcacbb1 (2026-07-12 16:42Z, merge com pais 5fb21f5b e e0b2d6ad: 'merge: transfer-heuristic (Aristotle) KB — earned by use')"
       method: "leitura: frontmatter da KB + merge 0dcacbb1"
+      locality: "repo"
   - id: ENT_DIALOGIC_RESEARCH
     node_type: entity
     layer: audit
@@ -48,6 +50,7 @@ nodes:
       source: "docs/onion/graph/constellation-dialogic-layer-2026-07.kg.yaml + docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "constellation-dialogic-layer-2026-07.kg.yaml:306 (D_ARISTOTLE_HOME_IS_KB, trace para o .md de análise)"
       method: "leitura: grafo e relatório da pesquisa da camada dialógica"
+      locality: "repo"
 
   # ---- as premissas cruzadas ----
   - id: C_ARISTOTLE_STAR
@@ -62,6 +65,7 @@ nodes:
       source: "docs/discussions/onion-pessoal-marcio/01-verticais-peer.md"
       locator: "l.7 (lente \"Aristóteles (a régua) + Hegel (o motor)\") e l.23-32 (régua; Hegel motor, Aufhebung, \"recusa-se o telos\")"
       method: "leitura: estrela discuss/onion-pessoal-marcio"
+      locality: "repo"
   - id: C_ARISTOTLE_KB
     node_type: claim
     layer: audit
@@ -74,6 +78,7 @@ nodes:
       source: "docs/knowledge-base/concepts/transfer-heuristic-aristotle.md + .claude/commands/meta/adopt.md"
       locator: "KB l.17-19 (reconciliada com a estrela 2026-07-12); adopt.md l.26 (link para a régua de transferência = invocação por /meta:adopt); merge 0dcacbb1 (2026-07-12 16:42); drive-to-verify e700f471 (2026-07-19)"
       method: "leitura: KB viva + /meta:adopt + histórico git"
+      locality: "repo"
   - id: E_STAR_CAUGHT_ITSELF
     node_type: evidence
     layer: audit
@@ -86,6 +91,7 @@ nodes:
       source: "docs/discussions/onion-pessoal-marcio/02-reconciliacao.md"
       locator: "linhas 28-34 (belief base/Hansson; argumentação bipolar desde 2005 Cayrol-Lagasquerie-Schiex; \"A P1 marcou… como novo por otimismo\")"
       method: "leitura: estrela 02-reconciliacao"
+      locality: "repo"
   - id: C_RECONCILED_AGREE
     node_type: claim
     layer: audit
@@ -98,6 +104,7 @@ nodes:
       source: "docs/knowledge-base/concepts/transfer-heuristic-aristotle.md"
       locator: "linhas 17-19 e 76 (KB \"puxa da estrela\"; par régua/motor + a régua pegando a própria falsa distinção)"
       method: "leitura: KB reconciliada (commit 68c2e1fc \"reconcile Aristotle KB with the star\")"
+      locality: "repo"
 edges:
   - from: C_ARISTOTLE_STAR
     to: ENT_STAR_PESSOAL

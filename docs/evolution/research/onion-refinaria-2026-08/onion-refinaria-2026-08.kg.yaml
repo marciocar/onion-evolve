@@ -36,6 +36,7 @@ nodes:
       source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
       locator: "wf_083d49f2-3b2"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_o_terceiro_termo_e_o_motor
     node_type: claim
@@ -51,6 +52,7 @@ nodes:
       source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
       locator: "contagem-derivados-vs-bruto-53-grafos"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_m7_ninguem_cita_id_em_pr
     node_type: evidence
@@ -66,6 +68,7 @@ nodes:
       source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
       locator: "gh-pr-list-merged-antes-de-2026-08-02"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_triagem_virar_status_erraria_80pct
     node_type: evidence
@@ -81,6 +84,7 @@ nodes:
       source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
       locator: "wf_7541c420-c55"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_m1_avisa_nao_reprova
     node_type: decision
@@ -96,6 +100,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "kg-radar-integrity.sh-53-grafos-exit-0"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_m2_decisao_sem_ancora_70pct
     node_type: evidence
@@ -111,6 +116,7 @@ nodes:
       source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
       locator: "parser-python-sobre-git-ls-files-kg-yaml-sem-fixtures"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_m3_portabilidade_executada
     node_type: evidence
@@ -126,6 +132,7 @@ nodes:
       source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
       locator: "env -i PATH=/usr/bin:/bin HOME=/tmp/nohome bash <script>"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_lint_granularidade_por_secao
     node_type: question
@@ -151,6 +158,7 @@ nodes:
       source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
       locator: "taxa-de-defeito-9-numeros-em-meses"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_m5_state_construido_e_medido
     node_type: evidence
@@ -166,6 +174,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh --state"
       locator: "medicao-da-propria-construcao-3-grafos-ativos-e-mutation-test"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_state_e_aposta_com_falsificador
     node_type: claim
@@ -189,6 +198,7 @@ nodes:
       source: ".claude/validation/fixtures/kg-reconcile/state-below-radar.kg.yaml"
       locator: "lint-selftest-run-2026-08-06-caso-d-reprovou"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_lint_only_ja_existe_e_e_parcial
     node_type: evidence
@@ -221,6 +231,7 @@ nodes:
       source: ".githooks/pre-commit"
       locator: "cronometragem-do-run-completo-921s-contra-comentario-do-hook"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_m4_trace_resolve_refutou_a_spec
     node_type: evidence
@@ -236,6 +247,7 @@ nodes:
       source: ".claude/validation/kg-trace-resolve.sh"
       locator: "medicao-1659-traces-em-54-grafos-e-contagem-de-escopo-do-freshness-tsv"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_minha_guarda_deu_fail_open
     node_type: evidence
@@ -251,6 +263,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "incidente-reproduzido-e-mutation-test-que-o-mata"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_m4_falso_positivo_e_o_inimigo
     node_type: claim
@@ -265,6 +278,7 @@ nodes:
       source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md:189-203 @d1fb7552"
       method: "leitura: SYNTHESIS da refinaria §\"Todo filtro nasceu de um falso-positivo medido\""
+      locality: "repo"
 
 edges:
   - from: E_m4_trace_resolve_refutou_a_spec

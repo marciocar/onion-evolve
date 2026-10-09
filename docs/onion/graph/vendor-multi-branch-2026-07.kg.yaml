@@ -23,6 +23,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-27-develop-onion-update-base-cruzada.md"
       locator: "sinal-do-adotante-lido"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_cause_is_two_branches
     node_type: claim
@@ -63,6 +64,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-branch.sh"
       locator: "reproducao-tentativa-3"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_reproduction_3_tries
     node_type: evidence
@@ -79,6 +81,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "fixtures-executadas-contra-o-helper-real"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_content_test_discriminates
     node_type: evidence
@@ -95,6 +98,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-branch.sh"
       locator: "md5-das-trees-nas-duas-fixtures"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_structural_guard
     node_type: decision
@@ -111,6 +115,7 @@ nodes:
       source: "docs/analysis/onion-adr-vendor-multi-integration-branch-2026-07.md"
       locator: "selftest-g-e-g-mut-verdes"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_three_or_more_branches
     node_type: question
@@ -137,6 +142,7 @@ nodes:
       source: "docs/analysis/onion-adr-vendor-multi-integration-branch-2026-07.md"
       locator: "l.102 (\"Não reproduzimos os 110 arquivos do adotante — reproduzimos a classe\")"
       method: "leitura: ADR da base cruzada multi-branch"
+      locality: "repo"
 
   - id: C_warn_is_not_a_stop
     node_type: claim
@@ -153,6 +159,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-27-desfecho-receita-develop-warn-falso-positivo.md"
       locator: "desfecho-do-adotante-e-fixture-reproduzida"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_guard_already_covers
     node_type: evidence
@@ -169,6 +176,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-branch.sh"
       locator: "fixture-do-caso-do-adotante-executada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CENSO0901_Q_volume_not_reproduced
     node_type: evidence
@@ -183,6 +191,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-27-desfecho-receita-develop-warn-falso-positivo.md"
       locator: "l.6 (assunto: merge limpo, framework-only), l.30-40 (tabela: apps 0, produto 0, diferente dos 110 conflitos), l.60 (commits 030404a5 merge + d8434efc stamp)"
       method: "leitura: sinal de desfecho do adotante (2026-07-27)"
+      locality: "repo"
 
 edges:
   - from: E_reproduction_3_tries

@@ -28,6 +28,7 @@ nodes:
       source: ".claude/diary/2026-10-02-quatro-decisoes-seladas-e-tres-guardas-com-defeito-datado.md"
       locator: "forge-census.sh --tsv | grep -P \"\\tevolve\\t\" devolve \"2 evolve 0 0 0 1 0 0\"; a distribuicao por awk soma 59, que e o total do cabecalho — consistencia interna que prova que as contagens nao vieram de comando falho"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_MEDIDOR_QUE_CORTA_OU_ZERA_EM_SILENCIO
     node_type: claim
@@ -43,6 +44,7 @@ nodes:
       source: ".claude/validation/forge-census.sh"
       locator: "head -12 literal lido no forge-census.sh; invocacao do kg-corpus-grep com frase quotada devolvendo 0 sobre 120 grafos, e 294 nos com os mesmos termos separados"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_AS_DUAS_CURAS_COM_CONTRAPROVA
     node_type: evidence
@@ -59,6 +61,7 @@ nodes:
       source: ".claude/validation/kg-corpus-grep.sh"
       locator: "familia run_silent_measurer_selftests 4/4 verde; 4 mutantes MORDERAM (M1 sem a declaracao, M2 declaracao incondicional, M3 frase volta a 1 termo, M4 zero nu) e os dois artefatos voltaram byte-identicos por `cmp -s`"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_TERCEIRA_CAUSA_DE_MUTANTE_QUE_NAO_MORDE
     node_type: claim
@@ -74,6 +77,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "primeira rodada: 4x \"NAO MORDEU\" com os 4 ✗ visiveis na propria saida do diagnostico; apos ancorar no prefixo: 4x MORDEU"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_REPLACE_PRIMEIRO_ACERTOU_O_COMENTARIO
     node_type: evidence
@@ -89,6 +93,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "o diff do proprio harness mostrou o comentario corrompido (l.18) com a chamada do M1 inalterada; corrigidas as duas pontas, 4/4 morderam"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_O_EVOLVE_NAO_E_FRACO_E_SEM_GATILHO
     node_type: claim
@@ -104,6 +109,7 @@ nodes:
       source: "docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml"
       locator: "C_TESE_AUTO_EVOLUCAO e E_ELENXO_AUTO_EVOLUCAO lidos inteiros (impact 5 e 4, confirmed, verified_at 2026-08-31); o predicado _cites_doctrine do forge-census exige common/prompts/*-doctrine.md e o evolve cita apenas a KB"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_GATILHO_DO_EVOLVE_QUAL_E
     node_type: question
@@ -119,6 +125,7 @@ nodes:
       source: ".claude/commands/meta/evolve.md"
       locator: "REGRA 65 lida no lint-artifacts; o evolve.md nao cita census, rules/ nem familia de bancada (medido: 0 ocorrencias de cada). ADICIONADO em 2026-10-03 apos reprovacao: 65 dias calculados contra o mtime/nome do ultimo relatorio em docs/analysis/ (onion-evolution-2026-07-30.md); ZERO ocorrencias de cron|schedule|/loop|agend em evolve.md; DUAS entradas MOAT no automation-ladder-registry.txt, ambas de deploy"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_ELENXO_REPROVOU_O_PR_QUE_DENUNCIAVA_CORTE
     node_type: evidence
@@ -135,6 +142,7 @@ nodes:
       source: "docs/evolution/review/fix-medidores-que-cortam-em-silencio.md"
       locator: "refutador opus/high em worktree isolada, mandato REFUTAR, default REPROVADO; 184k tokens, 88 chamadas, ~17 min; rodou os artefatos, refez os 4 mutantes com harness PROPRIO (confirmando que mordem) e acrescentou 2 mutantes que eu nao tinha; os achados R2/R3/R8 foram RE-VERIFICADOS por mim na fonte antes de aceitar"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_GUARDA_DA_CLASSE_CORTE_NAO_DECLARADO
     node_type: decision
@@ -152,6 +160,7 @@ nodes:
       source: "commit a102675b (corpo) · .claude/validation/lint-artifacts.sh@a102675b"
       locator: "lint-artifacts.sh@a102675b:5396-5409 (REGRA 96, título, selo em 2026-10-04 após passivo medido em zero, helper injected-cut-check.sh) · a102675b corpo l.37 (mutantes eram 5/6, M4 NO-OP SEMÂNTICO) e l.49 (--selftest 18/18 · 10 mutantes, 10 mordendo) · injected-cut-2026-10.kg.yaml@a102675b:60"
       method: "leitura: corpo do commit a102675b, o lint no mesmo commit e o grafo da forja"
+      locality: "repo"
 
 edges:
   - from: C_MEDIDOR_QUE_CORTA_OU_ZERA_EM_SILENCIO

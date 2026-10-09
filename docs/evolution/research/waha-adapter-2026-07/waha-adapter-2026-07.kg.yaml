@@ -28,6 +28,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "webfetch-github-releases-e-waha.devlike.pro-docs"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_waha_plus_contradiction
     node_type: claim
@@ -43,6 +44,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "readme-do-repo-vs-changelog-2026.6.1"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_engine_weight_hypothesis
     node_type: claim
@@ -90,6 +92,7 @@ nodes:
       source: "docs/meta-specs/integrations.md"
       locator: "anti-padrao-3-env-switch-ficticio"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── O ACHADO CENTRAL ──
   - id: D_dogfood_before_sdaal
@@ -106,6 +109,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "teste-do-gatilho-1-real-mais-N-prometidos"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_retraction_criterion
     node_type: claim
@@ -161,6 +165,7 @@ nodes:
       source: "docs/analysis/onion-adr-sdaal-nested-two-level-2026-07.md"
       locator: "leitura-do-ADR-onion-adr-sdaal-nested-two-level-2026-07"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_naming_messaging_nested
     node_type: decision
@@ -176,6 +181,7 @@ nodes:
       source: "docs/analysis/onion-adr-sdaal-nested-two-level-2026-07.md"
       locator: "ADR-aninhado-mais-ratificacao-do-maestro"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_sender_is_consumer
     node_type: decision
@@ -191,6 +197,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "ratificacao-do-maestro"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── GATILHO PARCIAL 2026-07-31: dogfood LOCAL do WAHA (comportamento medido, não doc lida) ──
   - id: E_dogfood_local_waha
@@ -207,6 +214,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "docker-run-local-curl-contra-a-API-viva"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_engine_measured
     node_type: evidence
@@ -222,6 +230,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "docker-stats-dois-containers-sessao-iniciada"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_vps_access_blocked
     node_type: question
@@ -237,6 +246,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "ssh-permission-denied-2-chaves-3-usuarios"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── CORREÇÃO 2026-07-31 (2ª): a sessão RODA NA VPS — o "sem acesso" era erro meu ──
   - id: E_session_is_on_vps
@@ -253,6 +263,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "hostname-whoami-hostnamectl-systemctl"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_sender_absent_on_vps
     node_type: evidence
@@ -268,6 +279,7 @@ nodes:
       source: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       locator: "ls-home-onion-mais-find-whatsapp-web.js-na-vps"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_waha_deployed_prod
     node_type: evidence
@@ -283,6 +295,7 @@ nodes:
       source: "/home/marcio/onion-vps-waha/docker-compose.yml"
       locator: "docker-compose-up-mais-curl-na-vps"
       method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   # ── GATILHO FECHADO 2026-08-01: 1a mensagem REAL enviada ──
   - id: E_gatilho_fechado
@@ -299,6 +312,7 @@ nodes:
       source: "/home/marcio/onion-vps-waha/docker-compose.yml"
       locator: "post-api-sendText-contra-waha-vivo-na-vps"
       method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: C_pairing_needs_primary
     node_type: claim
@@ -314,6 +328,7 @@ nodes:
       source: "commit bdc06bd9"
       locator: "corpo do commit bdc06bd9 (2026-08-01 04:05), parágrafos \"ACHADO DE CAMPO\" e \"RECOMENDAÇÃO DE DESIGN\""
       method: "testemunho: dogfood de campo da sessão 2026-08-01 relatado em 1ª pessoa no corpo do commit bdc06bd9; comando não registrado"
+      locality: "repo"
 
   # ── ACHADO RAIZ 2026-08-01: ENDERECAMENTO LID (o mais valioso da rodada) ──
   - id: E_lid_addressing_root_cause
@@ -330,6 +345,7 @@ nodes:
       source: "commit 18ec63f2 + docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "corpo do commit 18ec63f2 (2026-08-01 04:35) parágrafo \"CAUSA RAIZ\"; SYNTHESIS.md l.70-81; onion-vps-waha@86662e0:README.md l.33-34"
       method: "testemunho: medição da sessão 2026-08-01 (3 envios controlados), comando não registrado; relatada em 1ª pessoa no commit 18ec63f2"
+      locality: "repo"
 
   - id: D_resolve_is_contract
     node_type: decision
@@ -345,6 +361,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "achado-LID-medido"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_engine_decision_reopened
     node_type: claim
@@ -371,6 +388,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "nenhum-dos-3-destinatarios-recebeu"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── PENDENCIAS FECHADAS 2026-08-01 ──
   - id: D_engine_noweb_confirmed
@@ -387,6 +405,7 @@ nodes:
       source: "commit f1ac4623 (corpo) · /home/marcio/onion-vps-waha@86662e0:docker-compose.yml"
       locator: "f1ac4623 corpo §PENDÊNCIA 1 (2026-08-01 05:10Z) · onion-vps-waha@86662e0:docker-compose.yml l.18 (WHATSAPP_DEFAULT_ENGINE: NOWEB) · README.md l.13"
       method: "leitura: corpo do commit f1ac4623 + compose do repo onion-vps-waha no commit 86662e0"
+      locality: "host"
 
   - id: E_ack_lifecycle_proven
     node_type: evidence
@@ -402,6 +421,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
       locator: "webhook-message.ack-capturado-em-container-na-rede-do-compose"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_webhook_event_scope_is_guardrail
     node_type: claim
@@ -417,6 +437,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-guardrails.md"
       locator: "erro-real-cometido-nesta-sessao"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_waha_current

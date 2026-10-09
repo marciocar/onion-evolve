@@ -20,6 +20,7 @@ nodes:
       source: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md"
       locator: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md l.9,l.21-22; PR #412 corpo §\"Família\"; .claude/diary/2026-08-03-o-revisor-verde-que-nunca-revisou.md l.19-30; docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md l.32"
       method: "derivado: síntese de 4 fontes lidas, uma por ocorrência da família"
+      locality: "repo"
   - id: E_ADOPT_SIGNAL
     node_type: evidence
     layer: audit
@@ -34,6 +35,7 @@ nodes:
       source: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md"
       locator: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_IDENTITY_DRIFT
     node_type: claim
     layer: audit
@@ -48,6 +50,7 @@ nodes:
       source: "docs/knowledge-base/meta/onion-framework-identity.md"
       locator: "docs/knowledge-base/meta/onion-framework-identity.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_SOFTPASS_GAP
     node_type: claim
     layer: audit
@@ -62,6 +65,7 @@ nodes:
       source: "https://github.com/marciocar/onion-evolve/actions/runs/29621079157"
       locator: "run 29621079157 (PR #413, 07-17) passos review/retry/soft-pass + comentário do bot no PR #413; runs 29644692142/29645267201 (pós-pin, retry e soft-pass skipped); ec165436 (#361) e 471aedcf (#363) corpos; PR #414 corpo ('mascarado pelo soft-pass'); diário revisor-verde l.27-30"
       method: "medição: gh run view 29621079157 --log (review e retry 'Process completed with exit code 1' em is_error; soft-pass rodou e comentou no PR) + gh run view 29644692142 --json jobs"
+      locality: "web"
   - id: C_EVOLVE_BACKLOG
     node_type: artifact
     layer: audit
@@ -76,6 +80,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-17.md"
       locator: "docs/analysis/onion-evolution-2026-07-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_D1_WEIGHT
     node_type: claim
     layer: audit
@@ -96,6 +101,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-17.md"
       locator: "docs/analysis/onion-evolution-2026-07-17.md l.4,l.25"
       method: "juízes: veredito do juiz adversarial opus do /meta:evolve 2026-07-17 (5 juízes, l.4), registrado no relatório"
+      locality: "repo"
   - id: C_ITEM6
     node_type: claim
     layer: audit
@@ -133,6 +139,7 @@ nodes:
       source: "https://github.com/marciocar/onion-evolve/pull/414"
       locator: "PR #414 corpo (§Experimento controlado, §Evidência); 33da605f corpo"
       method: "leitura: corpo do PR #414 e do commit 33da605f (07-18)"
+      locality: "web"
   - id: E_EXPERIMENT
     node_type: evidence
     layer: audit
@@ -148,6 +155,7 @@ nodes:
       source: "https://github.com/marciocar/onion-evolve/actions/runs/29644692142"
       locator: "runs 29624922938 (#414: 'Action skipped due to workflow validation'), 29644692142 (#415) e 29645267201 (#416): is_error true, num_turns 1, total_cost_usd 0; PRs #415/#416 com 0 reviews e 0 comments"
       method: "medição: gh run view 29624922938/29644692142/29645267201 --log + gh pr view 415/416 --json reviews,comments"
+      locality: "web"
   - id: C_ACTION_CAUSE
     node_type: claim
     layer: audit
@@ -162,6 +170,7 @@ nodes:
       source: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
       locator: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md l.36-38"
       method: "leitura: diário de 2026-08-03 (migalha type:error da sessão que fechou a causa)"
+      locality: "repo"
   - id: E_BOTH_PINS_FAIL
     node_type: evidence
     layer: audit
@@ -176,6 +185,7 @@ nodes:
       source: "https://github.com/marciocar/onion-evolve/pull/532"
       locator: "PR #532 corpo, tabela \"Onde estamos\", linha \"versão da action\"; PR #530 corpo, tabela dos 4 runs"
       method: "leitura: corpos dos PRs #532 e #530"
+      locality: "web"
   - id: E_401_IN_RUNNER
     node_type: evidence
     layer: audit
@@ -190,6 +200,7 @@ nodes:
       source: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
       locator: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md l.29-33; PR #533 corpo (tabela antes/depois)"
       method: "leitura: diário 2026-08-03 + PR #533 (medição de dentro do runner relatada pela sessão)"
+      locality: "repo"
   - id: C_CREDENTIAL_CAUSE
     node_type: claim
     layer: audit
@@ -204,6 +215,7 @@ nodes:
       source: "docs/analysis/onion-guardas-mapa-2026-08.md §3.3"
       locator: "docs/analysis/onion-guardas-mapa-2026-08.md §3.3"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: E_KEY_SWAP_CURED
     node_type: evidence
     layer: audit
@@ -218,6 +230,7 @@ nodes:
       source: "7a737711:.claude/validation/review-verdict.sh"
       locator: "commit 7a737711 (#534) corpo §1-2; PR #533 corpo (tabela antes/depois)"
       method: "leitura: corpo do commit #534 + PR #533"
+      locality: "repo"
   - id: C_MEASURE_RIGHT_INFER_WRONG
     node_type: claim
     layer: audit
@@ -232,6 +245,7 @@ nodes:
       source: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
       locator: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_TRANSITORY
     node_type: claim
     layer: audit
@@ -255,6 +269,7 @@ nodes:
       source: "33da605f:.github/workflows/onion-review.yml"
       locator: "33da605f diff (uses: anthropics/claude-code-action@e90deca4…, comentário PINADO v1.0.171); a0fe0208 (#530) corpo"
       method: "leitura: commit do pin (07-18) e commit que o trocou (#530, 08-03)"
+      locality: "repo"
   - id: C_GENERATOR_LOCAL
     node_type: claim
     layer: audit
@@ -270,6 +285,7 @@ nodes:
       source: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md"
       locator: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md l.17-19; 7de0056d:.claude/validation/kg-radar.sh l.106; 7de0056d:.claude/commands/meta/kg.md l.89"
       method: "leitura: backlog de triagem 07-18 + gramática do core no commit do nó"
+      locality: "repo"
   - id: E_FAILOPEN_FIELD
     node_type: evidence
     layer: audit
@@ -283,6 +299,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"
       locator: "docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md l.15-17"
       method: "leitura: sinal de campo do granaai (2026-07-17) arquivado em inbox/_processed"
+      locality: "repo"
   - id: D_LOCAL_VALIDATOR_DOCTRINE
     node_type: decision
     layer: audit
@@ -295,6 +312,7 @@ nodes:
       source: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md"
       locator: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md l.24-32; PR #416 corpo"
       method: "leitura: backlog de triagem 07-18 (item 1) + PR #416 (ack ao granaai)"
+      locality: "repo"
   - id: D_DRIVE_VERIFY
     node_type: decision
     layer: audit
@@ -308,6 +326,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
       locator: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 edges:
   - from: E_ADOPT_SIGNAL
     to: C_DECLARED_VERIFIED

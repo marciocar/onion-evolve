@@ -47,6 +47,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-10-05-r7/SYNTHESIS.md"
       locator: "l.22-25 (quatro furos; core não instala; specialist recomenda) + l.36-37 (juiz reprovou a 1ª redação)"
       method: "leitura: SYNTHESIS e data/2.1.289.txt (l.2, l.4, l.15, l.16) da rodada, conferidos contra o commit 2786f56c (settings.json, plugin onion-engineering) e o checkpoint 5035ca19"
+      locality: "repo"
 
   - id: E_PLUGIN_VALIDATE_FIX_NAO_TOCA_OS_PLUGINS
     node_type: evidence
@@ -63,6 +64,7 @@ nodes:
       source: "plugins/onion/.claude-plugin/plugin.json"
       locator: "ls plugins/*/.claude-plugin: capability.json plugin.json provenance.json, nenhum marketplace.json; o marketplace.json mora so na raiz; claude plugin validate plugins/onion --strict: Validation passed"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO
     node_type: question
@@ -87,6 +89,7 @@ nodes:
       source: ".claude/ no commit 2786f56c"
       locator: "git grep \"auth status\" 2786f56c -- .claude (+ data/2.1.289.txt l.5)"
       method: "medição: git grep -c \"auth status\" 2786f56c -- .claude → 10 ocorrências em 4 arquivos (invite-collaborator.sh, transfer-ownership.sh, forge/adapters/github.md, forge/detector.md), git grep \"claude auth status\" → 0"
+      locality: "repo"
 
   - id: E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE
     node_type: evidence
@@ -102,6 +105,7 @@ nodes:
       source: ".claude/hooks/pretooluse-merge-gate.sh"
       locator: "payload JSON sintetico contra .claude/hooks/pretooluse-merge-gate.sh e pretooluse-protect-main.sh, rc lido do hook: git push origin +main 0/0; git push origin \"main\" 0/0; TZ=\"$HOME\" bash -c \"gh pr merge 1\" 0/0; timeout 60 gh pr merge 1 0/0; gh -R o/r pr merge 1 0/0; controle git push origin main 2/0. Branch protection do host: 403 (plano sem o recurso) — o hook e a UNICA barreira"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH
     node_type: question
@@ -129,6 +133,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-10-05-r7/data/2.1.289.txt"
       locator: "l.8 (mods não carregavam na 1ª sessão após upgrade) + l.2 (deny/ask em parte aninhada sobre aprovação de mod, máquinas gerenciadas) + l.22"
       method: "leitura: bloco do CHANGELOG 2.1.289 versionado no diretório da rodada (conferido pelo juiz em 3 fontes, SYNTHESIS l.16-18)"
+      locality: "repo"
 
 edges:
   - from: E_DELTA_E_UMA_VERSAO_CONTIGUA

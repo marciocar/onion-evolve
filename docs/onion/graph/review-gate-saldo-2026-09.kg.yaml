@@ -27,6 +27,7 @@ nodes:
       source: "https://github.com/marciocar/onion-evolve/actions/runs/36782105288"
       locator: "artefato review-evidence-36782105288 (claude-execution-output.json) + log do passo de pré-voo; run anterior 36781367066"
       method: "medição: gh run download 36782105288 --repo marciocar/onion-evolve -n review-evidence-36782105288 + gh run view 36782105288 --log + gh api .../actions/runs (36781367066 success 21:44Z, 36782105288 failure 21:51Z)"
+      locality: "web"
 
   - id: C_PREVOO_MEDE_CREDENCIAL_NAO_SALDO
     node_type: claim
@@ -44,6 +45,7 @@ nodes:
       source: "https://github.com/marciocar/onion-evolve/actions/runs/36782105288"
       locator: "log do run 36782105288, job onion-review, passo 'Pré-voo — a credencial consegue RODAR o modelo do revisor?' (21:51:59Z: 'POST /v1/messages, modelo claude-sonnet-5, max_tokens=1: HTTP 200') + artefato review-evidence-36782105288 (revisor 21:53:11Z: is_error, 400, 'Credit balance is too low')"
       method: "medição: gh run view 36782105288 --repo marciocar/onion-evolve --log | grep pré-voo + gh run download 36782105288 -n review-evidence-36782105288"
+      locality: "web"
 
   - id: Q_REVISOR_SEM_SALDO_DERRUBA_TODO_PR
     node_type: question
@@ -61,6 +63,7 @@ nodes:
       source: "https://github.com/marciocar/onion-evolve/actions/runs/36782105288"
       locator: "log do run 36782105288, job onion-review-verdict (REVISOU: false, ACHADOS: -1) ; listagem de runs \"Onion Code Review\" desde 2026-09-30"
       method: "medição: gh run view 36782105288 --repo marciocar/onion-evolve --log | grep -E 'REVISOU|ACHADOS' + gh api 'repos/marciocar/onion-evolve/actions/runs?created=>2026-09-30' (conclusões do Onion Code Review)"
+      locality: "web"
 
   - id: D_SEM_CREDITO_POR_ORA
     node_type: decision
@@ -76,6 +79,7 @@ nodes:
       source: "90fb5006 (corpo do commit) + docs/evolution/review/docs-review-gate-sem-credito-por-decisao.md"
       locator: "90fb5006 corpo"
       method: "testemunho: selo do maestro em 2026-10-01, citação verbatim registrada no corpo do commit 90fb5006 da sessão"
+      locality: "repo"
 
 edges:
   - from: C_PREVOO_MEDE_CREDENCIAL_NAO_SALDO

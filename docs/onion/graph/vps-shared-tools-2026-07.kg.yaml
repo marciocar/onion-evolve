@@ -27,6 +27,7 @@ nodes:
       source: "docs/evolution/federation-roadmap-2026.md"
       locator: "m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── TOOL 1: AUTH/IDENTIDADE (maduro) ──
   - id: ENT_logto
@@ -43,6 +44,7 @@ nodes:
       source: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
       locator: "m2-bridge-logto-KG+flip-P7+m8-serial-2026-08-reverificado"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── TOOL 2: WHATSAPP ──
   - id: ENT_whatsapp
@@ -59,6 +61,7 @@ nodes:
       source: "docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
       locator: "ledger l.22 (ENT_whatsapp DRIFTED: WAHA vivo; whatsapp-sender inexistente) · corpo de 8b005f65 l.49-53 (sudo find no workspace do bridge: o diretório existe, o serviço não) · onion-vps-waha@3408d82 docker-compose.yml l.12 (image devlikeapro/waha:latest) e l.16 (127.0.0.1:3999:3000)"
       method: "testemunho: medição no host vivo srv1812846 em 2026-08-06/07 (ps, docker ps -a, systemctl, sudo find), registrada no ledger M8 e nos commits a8b6cfb7/8b005f65; 234M, mtime de .wwebjs_auth, \"running desde 2026-08-05\" e o 401 não têm comando versionado"
+      locality: "repo"
 
   - id: E_waha_public_route_caddy
     node_type: evidence
@@ -73,6 +76,7 @@ nodes:
       source: "docs/evolution/review/ops-waha-public-route.md"
       locator: "l.18 (Origem: ordem do maestro, integração Lovable) + §Prova l.46 (caddy validate, 401 sem chave/chave errada) + §Adendo l.54-62 (token ~/.config/hostinger informado pelo maestro, PUT overwrite:false verificado por releitura, cert LE válido até 2026-11-17, 401 JSON do WAHA); onion-vps-waha@c92ff68 README.md l.41-46"
       method: "leitura: resíduo R56 do PR #634 + commit 21e62755 + README do repo onion-vps-waha@c92ff68"
+      locality: "repo"
 
   - id: E_gmill_demo_route_caddy
     node_type: evidence
@@ -87,6 +91,7 @@ nodes:
       source: "docs/evolution/review/ops-gmill-demo-site.md"
       locator: "l.24 (Origem: ordem do maestro, sessão meugmill-vendas-6d) + §Achados l.39+ (1: Bearer→401, opção B cookie; 2: route load-bearing, mutante) + §\"Prova ao vivo (2026-10-08)\" l.67+ + §Pendente-com-dono l.80; ops/caddy/conf.d/gmill.caddy l.5-7, l.34-46"
       method: "leitura: resíduo R56 do branch ops/gmill-demo-site + vhost versionado (commit afca438e)"
+      locality: "repo"
 
   - id: E_librechat_install_started
     node_type: evidence
@@ -153,6 +158,7 @@ nodes:
       source: "docs/discussions/vps-shared-tools/SEED.md"
       locator: "SEED.md l.39 (direção do maestro: MANTER web.js + WAHA PADRÃO, dois adapters) · docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md l.27 (Evolution perde para WAHA/Baileys/wwebjs) · docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv l.22, l.25, l.27 · corpo de 8b005f65 l.49-53 (código em disco no workspace do bridge; o serviço não existe) · git ls-tree 8b005f65 .claude/utils/ (sem whatsapp) · vps-shared-tools-2026-07.kg.yaml D_f1_whatsapp_dogfood_first"
       method: "leitura: direção do maestro no SEED + SYNTHESIS whatsapp-api + ledger M8 versionado (2026-08-06) + corpo de 8b005f65 + git ls-tree 8b005f65"
+      locality: "repo"
 
   - id: D_email_plus_logto_connector
     node_type: decision
@@ -179,6 +185,7 @@ nodes:
       source: "docs/discussions/vps-shared-tools/SEED.md"
       locator: "direcao-do-maestro+estado-de-execucao-medido-2026-08-06+m8-serial-2026-08-reverificado"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── QUESTOES DE PESQUISA (research-first-over-priors) ──
   - id: Q_catalog_vs_platform
@@ -332,6 +339,7 @@ nodes:
       source: "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml"
       locator: "pesquisa-f1-web-verificada-mais-teste-do-gatilho+m8-serial-2026-08-reverificado"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # A DIVIDA que o Elenxo mandou tirar da prosa do commit e por no grafo — e' aqui que
   # catch-up/warm-up leem, nao na mensagem de commit.
@@ -376,6 +384,7 @@ nodes:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
       locator: "m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_escada_analise_presumida_cumprida
     node_type: claim
@@ -405,6 +414,7 @@ nodes:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
       locator: "m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── AUFHEBUNG RESTAURADA (2026-08-07) — a posicao que o M8 APAGOU em vez de rebaixar ──
   # O run de 2026-08-06 (#552) reescreveu o label de ENT_whatsapp com a verdade nova, em vez de
@@ -424,6 +434,7 @@ nodes:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
       locator: "m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CENSO0901_ENT_monitoring
     node_type: evidence
@@ -438,6 +449,7 @@ nodes:
       source: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
       locator: "meta.note l.8-12 (F2+F2-b, dois Elenxos, síntese REPROVADA pelo crítico, verificação independente) + l.207 (ANTI-CATÁLOGO: OTel/Prometheus/Grafana e Langfuse NÃO AGORA); docs/analysis/backlog-real-2026-09.md l.53"
       method: "leitura: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
+      locality: "repo"
 
   - id: E_CENSO0901_A_analysis_structure
     node_type: evidence
@@ -452,6 +464,7 @@ nodes:
       source: "docs/analysis/backlog-real-2026-09.md"
       locator: "l.77 (§3 PROPOSTAS DE SELO, linha A_analysis_structure; run_id wf_2944480c-98f no frontmatter); stack-harmonia-2026-08.kg.yaml l.16-24 (D_sintese_reprovada)"
       method: "leitura: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
+      locality: "repo"
 
   - id: E_CENSO0901_C_axis_tunneling
     node_type: evidence
@@ -466,6 +479,7 @@ nodes:
       source: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
       locator: "l.214-222 (C_tunneling_nome_errado: \"tunneling é o NOME ERRADO... INGRESSO AUTENTICADO... Caddy + Logto\") + l.207 (ANTI-CATÁLOGO); docs/analysis/backlog-real-2026-09.md l.62"
       method: "leitura: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
+      locality: "repo"
 
   - id: E_CENSO0901_Q_tunneling
     node_type: evidence
@@ -480,6 +494,7 @@ nodes:
       source: "docs/evolution/research/census-2026-09-01/data/rodada1.json"
       locator: "medidos[18] (node_id Q_tunneling, run_id wf_90dd73fe-cd2: verdict DRIFTED, claims 3/3, campo divergence = texto do label)"
       method: "leitura: docs/evolution/research/census-2026-09-01/data/rodada1.json medidos[18] (node_id Q_tunneling, verdict DRIFTED, claims 3/3, divergence = texto do label), run wf_90dd73fe-cd2"
+      locality: "repo"
 
 edges:
   # o LibreChat entra como CONSUMIDOR do catalogo (Logto/Caddy), sob o framing decidido

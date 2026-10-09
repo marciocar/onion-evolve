@@ -33,6 +33,7 @@ nodes:
       source: "docs/business-context/02-product/metrics.md"
       locator: "sete-de-oito-stale-falham-so-no-item-4-mas-so-um-dos-cinco-sitios-tem-ssot-gerada"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO
     node_type: evidence
@@ -48,6 +49,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "tres-formas-de-99-no-codebase-guide-e-nenhuma-casa-com-os-marcadores-canonicos-da-regra-16"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CITACAO_FABRICADA_COM_ANCORA_DE_LINHA
     node_type: evidence
@@ -63,6 +65,7 @@ nodes:
       source: "docs/technical-context/02-ai-context/codebase-guide.md"
       locator: "sed-4p-do-agente-devolve-102-e-o-doc-cita-99-entre-aspas-com-arquivo-linha"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_NOTA_DE_FRESCOR_BLINDA_O_NUMERO_ERRADO
     node_type: claim
@@ -78,6 +81,7 @@ nodes:
       source: "docs/technical-context/02-ai-context/codebase-guide.md"
       locator: "nota-re-testada-2026-08-05-a-nove-linhas-do-cabecalho-skills-10-quando-sao-11"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_COMMIT_DE_CORRECAO_AFIRMOU_FALSO
     node_type: evidence
@@ -93,6 +97,7 @@ nodes:
       source: "docs/technical-context/02-ai-context/codebase-guide.md"
       locator: "commit-48a39f0-diz-nao-toquei-no-que-ja-estava-certo-102-comandos-conferem-em-toda-ocorrencia"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ACUSADOR_ERROU_O_REFERENTE_E_O_JUIZ_DERRUBOU
     node_type: evidence
@@ -108,6 +113,7 @@ nodes:
       source: "docs/analysis/context-freshness-core-2026-08-12.md ; docs/business-context/03-market/competitive-landscape.md l.59 ; docs/business-context/decisions.md l.99"
       locator: "§Refutado pelo juiz l.53-57"
       method: "juízes: juiz opus da auditoria context-freshness registrado no relatorio"
+      locality: "repo"
 
   - id: Q_CONTAGEM_DE_ADOTANTES_STALE_EM_DOIS_DOCS_DE_BUSINESS
     node_type: question
@@ -123,6 +129,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml"
       locator: "grep-c-circunflexo-espaco-kind-adopter-em-members-yaml-devolve-8-contra-4-declarado-nos-dois-docs"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_ORCAMENTO_DE_CI_MEDIDO_CONTRA_ARTEFATO_41PCT_MENOR
     node_type: question
@@ -138,6 +145,7 @@ nodes:
       source: "docs/technical-context/04-workflow/contributing.md"
       locator: "wc-l-do-lint-3191-contra-2261-declarado-e-timeout-minutes-25-contra-15-declarado"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_FALHA_POR_VOCABULARIO_ATRAVESSA_GREP_E_JUIZ_LLM
     node_type: claim
@@ -152,6 +160,7 @@ nodes:
       source: "docs/analysis/context-freshness-core-2026-08-12.md"
       locator: "§Refutado pelo juiz (l.53-57), §Por que o lint nao pegava (l.73-77), §O que a revisao adversarial derrubou itens 1 e 4 (l.82-100)"
       method: "leitura: relatorio da auditoria context-freshness 2026-08-12"
+      locality: "repo"
 
   - id: A_RUN_DA_AUDITORIA_DE_CONTEXTO
     node_type: artifact
@@ -167,6 +176,7 @@ nodes:
       source: "docs/analysis/context-freshness-core-2026-08-12.md"
       locator: "19-workers-concluidos-zero-descartados-e-zero-com-checked-against-live-igual-nao-medi"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: I_REFRESH_APLICADO_E_A_GUARDA_CALOU
     node_type: decision
@@ -182,6 +192,7 @@ nodes:
       source: "docs/business-context/decisions.md"
       locator: "lint-de-8-para-4-SOFT-em-worktree-limpo-3-curadas-e-1-fora-de-escopo-da-catraca-na-branch"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: I_REGUA_CANONICA_DE_ADOTANTE_RATIFICADA
     node_type: decision
@@ -197,6 +208,7 @@ nodes:
       source: "docs/business-context/decisions.md"
       locator: "D8-em-decisions-md-mais-tres-docs-apontando-a-receita-em-vez-de-copiar-o-numero"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_VOICE_OF_CUSTOMER_P6_DRIFT_2026_08_23
     node_type: evidence
@@ -213,6 +225,7 @@ nodes:
       source: "docs/business-context/01-customer/voice-of-customer.md"
       locator: "re-run do /meta:context-freshness em 2026-08-23 (11 dias apos o run 08-12): o voice-of-customer.md afirmava 'Complexidade para leigo bloqueia P6 (Onion Pessoal) INTEIRAMENTE hoje', com carimbo Ultima Atualizacao 2026-07-13 — mas a realidade (memoria onion-pessoal-app-state) e app EM CONSTRUCAO ATIVA, F0 fechado no device. Instancia fresca da tese C_NOTA_DE_FRESCOR_BLINDA_O_NUMERO_ERRADO: a nota de frescor blindava um claim que envelheceu. CORRIGIDO no mesmo movimento (linha 19 + re-carimbo). Nota de calibragem: o run haiku de 08-23 over-flaggou #2 (rastreabilidade) em 12/13 business; o spot-check mostrou que a maioria TEM secao Fontes, falta ancoragem por-numero — consistente com o juiz opus de 08-12 que ja estreitara a tese para #4-por-numero, nao #2"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 edges:
   - from: I_REFRESH_APLICADO_E_A_GUARDA_CALOU
     to: C_CONTAGEM_A_MAO_DRIFTA_CONTRA_SSOT_GERADA

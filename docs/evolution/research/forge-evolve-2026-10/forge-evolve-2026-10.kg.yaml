@@ -26,6 +26,7 @@ nodes:
       source: ".claude/commands/meta/evolve.md"
       locator: "forge-census.sh --tsv antes (2 evolve 0 0 0 1 0 0) e depois (6 evolve 1 1 0 1 1 1); o salto de 3 para 5 ocorreu so apos `git add`, medido"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_O_RAIO_X_E_COMPOSICAO_DE_MEDIDORES
     node_type: decision
@@ -41,6 +42,7 @@ nodes:
       source: ".claude/validation/evolve-census.sh"
       locator: "tempo medido de cada medidor (forge 2s, guard 1s, dissect 1s); `time` do raio-X: 4,98s numa medicao minha, 6,0-9,35s nas do Elenxo sob carga — o numero honesto e a faixa; bancada run_evolve_census_selftests 6/6 com 6 mutantes mordendo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_A_SUPERFICIE_NASCEU_VIVA_NA_CARGA
     node_type: evidence
@@ -57,6 +59,7 @@ nodes:
       source: ".claude/commands/meta/evolve.md"
       locator: "/meta:evolve invocado pela Skill em 2026-10-04; a carga devolveu \"**Hoje:** 2026-10-04\" e o bloco \"# raio-X do framework\" com as 6 secoes"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_RUNCOMMAND_NUNCA_EXISTIU_E_SEGUE_NA_SUPERFICIE
     node_type: evidence
@@ -73,6 +76,7 @@ nodes:
       source: ".claude/commands/meta/evolve.md"
       locator: "texto do Passo 3 na superficie carregada; a nota de 2026-08-05 na propria superficie afirma o grep vazio por runCommand e SlashCommand"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL
     node_type: question
@@ -88,6 +92,7 @@ nodes:
       source: ".claude/skills/onion-orchestration/SKILL.md"
       locator: "forge-census --tsv marca a coluna workflow do evolve como 0; o Passo 3 do evolve.md autora o script inline; a skill onion-orchestration, passo 3, exige arquivo"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CHECKPOINT_DO_DRIVE_VIVE_EM_ARQUIVO_QUE_NAO_VIAJA
     node_type: evidence
@@ -104,6 +109,7 @@ nodes:
       source: ".claude/commands/meta/drive.md"
       locator: "git add de .claude/sessions/ recusado por .gitignore em 2026-10-04; contagem por find; o P0.5 do drive.md le o STATE.md por caminho"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_DOCUMENTACAO_INDISTINGUIVEL_DE_INVOCACAO_VIVA
     node_type: claim
@@ -119,6 +125,7 @@ nodes:
       source: ".claude/validation/injected-cut-check.sh"
       locator: "os tres casos medidos e curados em 2026-10-04 (PRs #909 e #910): FP-1 do Elenxo da REGRA 96, a nota da carga morta no forge-guard.md, e o par fantasma da REGRA 59"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA
     node_type: question
@@ -134,6 +141,7 @@ nodes:
       source: ".claude/commands/meta/evolve.md"
       locator: "raio-X rodado em 2026-10-04 (as quatro contagens citadas sao da saida dele); a REGRA 97 segue emitindo EVOLVE-VENCIDO e EVOLVE-DELTA"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_ELENXO_REPROVOU_O_RAIO_X_POR_NUMERO_FALSO
     node_type: evidence
@@ -150,6 +158,7 @@ nodes:
       source: ".claude/validation/evolve-census.sh"
       locator: "refutador opus/high em worktree isolada; 166k tokens, 72 chamadas, ~20 min; pos-cura reverificado por mim: 0 vencida, 4 carregaram, guard-census 8x=16, 9 mutantes"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: D_O_RAIO_X_E_COMPOSICAO_DE_MEDIDORES

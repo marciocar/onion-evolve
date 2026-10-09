@@ -40,6 +40,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-03/SYNTHESIS.md"
       locator: "CHANGELOG l.17; medicao frontmatter-only (awk entre os dois ---): commands 109 (96 sonnet/10 opus/3 haiku), skills 0, agents 51; juiz EMENDOU (meu grep contava exemplos no corpo: 111/1/163)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_F2_AUTO_MODE_MANTEM_SESSAO
     node_type: evidence
     plane: DEV
@@ -56,6 +57,7 @@ nodes:
       source: "docs/knowledge-base/concepts/agent-orchestration.md"
       locator: "CHANGELOG l.12 (eu citara l.10 = cache OAuth; juiz corrigiu)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_F3_PERMISSION_PROMPTS_NONE
     node_type: evidence
     plane: DEV
@@ -72,6 +74,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md"
       locator: "l.4 (\"Added --permission-prompts none for unattended headless hosts: anything that would prompt is denied automatically while the active permission mode (including auto mode) keeps deciding\") + SYNTHESIS.md l.21-25 (placar: F3 entre os 8 emendados) e l.45"
       method: "juízes: juiz adversarial opus/high (juiz-e3-0903) emendou F3; texto conferido no CHANGELOG verbatim em data/"
+      locality: "repo"
   - id: E_F4_CLAUDE_JSON_CONCORRENTE
     node_type: evidence
     plane: DEV
@@ -88,6 +91,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md"
       locator: "l.7 (\"Fixed concurrent sessions silently reverting each other's ~/.claude.json changes — workspace trust no longer resets and MCP/project state is no longer lost\") + SYNTHESIS.md l.21-25 (F4 emendado) + data/f1-findings-pre-juiz.md (F4: \"40 processos claude medidos em 09-02\")"
       method: "juízes: juiz adversarial opus/high (juiz-e3-0903) emendou F4 (número de 09-02 não re-medido); texto conferido no CHANGELOG verbatim"
+      locality: "repo"
   - id: E_F5_DENY_READ_COBERTURA_E_O_ALLOW_DO_ENV
     node_type: evidence
     plane: DEV
@@ -104,6 +108,7 @@ nodes:
       source: ".claude/settings.json"
       locator: "CHANGELOG l.9; grep -n deny .claude/settings.json .claude/settings.local.json = vazio; settings.json:12 \"Bash(grep * .env)\" esta em permissions.ALLOW (juiz REPROVOU minha leitura: li allow como deny)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
     # 2026-09-04 (rodada 3, l.42): a plataforma REVERTEU a cobertura de deny rules Read() em args do Bash — a metade
     # "cobertura e opcao a adotar" deste no esta superada (E_R3_F1_REVERT_DENY_READ_BASH em radar-E3-2026-09-04);
     # a metade do ALLOW Bash(grep * .env) segue viva. Superacao parcial: status fica confirmed.
@@ -123,6 +128,7 @@ nodes:
       source: ".claude/skills/onion-publish/SKILL.md"
       locator: "CHANGELOG l.6; .claude/skills/onion-publish/SKILL.md:9 (allowed-tools) e :55-56 (passo 5, --strict manual); lint-artifacts.sh:2284 delega validacao YAML ao plugin validate (juiz EMENDOU: nao e novo, ja e usado manualmente)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_F7_MANAGED_MCP_E_ALLOWLIST
     node_type: evidence
     plane: DEV
@@ -139,6 +145,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md"
       locator: "l.3 (managedMcpServers: HTTP/SSE para todos; entradas com comando são puladas) + l.37 (allowedMcpServers governa só servidores adicionados por usuário; usar deniedMcpServers) + SYNTHESIS.md l.21-25"
       method: "juízes: juiz adversarial opus/high corrigiu a linha citada (l.38→l.37) e emendou F7; texto conferido no CHANGELOG verbatim"
+      locality: "repo"
   - id: E_F8_STOP_HOOK_NAO_SE_APLICA
     node_type: evidence
     plane: DEV
@@ -155,6 +162,7 @@ nodes:
       source: ".claude/settings.json"
       locator: "CHANGELOG l.29 (eu citara l.30 = MCP no navegador); settings.json configura SessionStart/UserPromptSubmit/SessionEnd/PreCompact/PostToolUse/PreToolUse/PreModelSwitch/PostModelSwitch — SEM hook Stop (juiz REPROVOU)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_F9_WORKTREE_E_WORKFLOW
     node_type: evidence
     plane: DEV
@@ -171,6 +179,7 @@ nodes:
       source: ".claude/workflows/onion-research.js"
       locator: "CHANGELOG l.20, l.27, l.31, l.36 (eu citara l.21/l.32; juiz corrigiu); git worktree list (worktree viva em .claude/worktrees/); .claude/workflows/onion-research.js (36 KB)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_F10_GITLAB_NA_PLATAFORMA
     node_type: evidence
     plane: DEV
@@ -187,6 +196,7 @@ nodes:
       source: ".claude/utils/forge/adapters/github.md"
       locator: "CHANGELOG l.5 e l.35; .claude/utils/forge/adapters/ = github.md + none.md (github.md:9 declara-se o unico implementado; gitlab/bitbucket = costura em factory.md/detector.md)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_F11_MANAGED_SETTINGS_FAIL_LOUD
     node_type: evidence
     plane: DEV
@@ -203,6 +213,7 @@ nodes:
       source: ".claude/hooks/premodelswitch-guard.sh"
       locator: "CHANGELOG l.25 (eu citara l.24 = identidade do repo; juiz corrigiu); .claude/hooks/premodelswitch-guard.sh (baseline ilegivel = exit 2 nomeando o arquivo)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_OMISSOES_JUIZ_0903
     node_type: evidence
     plane: DEV
@@ -219,6 +230,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md"
       locator: "l.26, l.28, l.22, l.16, l.24, l.33, l.39, l.44 (2.1.258), l.13 — todas por grep -n; SYNTHESIS.md l.21-25 (placar: 8 omissões) e l.50"
       method: "juízes: juiz adversarial opus/high (juiz-e3-0903) apontou as 8 omissões, registradas no placar do SYNTHESIS; linhas conferidas no CHANGELOG verbatim"
+      locality: "repo"
   - id: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
     node_type: decision
     plane: PROD
@@ -233,6 +245,7 @@ nodes:
       source: "docs/onion/radar-baselines.yaml"
       locator: "familia model_ladder 7/7 (guarda: piso/picker veta, piso/fallback degraded, restored, fora veta; aviso; REGRA 70; REGRA 71; sonda) + lint real sem REGRA 70/71 + 109 comandos sem model: no frontmatter"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_LACUNAS_E3_0903
     node_type: evidence
     plane: DEV
@@ -249,6 +262,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-03/SYNTHESIS.md"
       locator: "l.54-60 (§\"Lacunas declaradas\", itens 1-5) + corpo do commit eaedbc83 (item 6: \"fallback nativo só por sobrecarga (529); por cota não existe (lacuna)\") + .claude/hooks/premodelswitch-guard.sh@eaedbc83 l.61-74 (piso só por fallback, source != picker)"
       method: "leitura: SYNTHESIS l.56-60 + commit eaedbc83 (corpo e premodelswitch-guard.sh l.61-74) + frontmatter dos comandos em 09564b8c; a cláusula da tentativa (0 eventos em .claude/sessions/model-switch.jsonl) é testemunho: medição da sessão 2026-09-03, comando não registrado"
+      locality: "repo"
   - id: E_FALLBACK_NATIVO_MEDIDO_0903
     node_type: evidence
     plane: PROD
@@ -265,6 +279,7 @@ nodes:
       source: "docs/onion/radar-baselines.yaml"
       locator: "binario 2.1.259 (strings): chave de settings fallbackModel (aceita LISTA — merge especial), flag --fallback-model, classe FallbackTriggeredError(originalModel, fallbackModel, reason=\"overloaded\") apos retries de 529, headers x-cc-fallback-from-model/-trigger/-category; NAO encontrado fallback por COTA do plano"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_ESCADA_DE_MODELOS_IMPLEMENTADA_0903
     node_type: evidence
     plane: PROD
@@ -281,6 +296,7 @@ nodes:
       source: ".claude/hooks/premodelswitch-guard.sh"
       locator: "familia model_ladder 7/7; 6 transicoes testadas a mao na guarda; lint real sem REGRA 70/71; 109 comandos sem model:"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_F1_MODEL_FRONTMATTER_VALE_INTERATIVO

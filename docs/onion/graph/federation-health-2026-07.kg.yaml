@@ -22,6 +22,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:10"
       locator: "docs/evolution/federation/members.yaml:10"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_GRANAAI_PIN_UNTRUSTED
     node_type: claim
     layer: audit
@@ -37,6 +38,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:126"
       locator: "pin"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_GRANAAI_PIN_REVERIFIED
     node_type: evidence
     layer: audit
@@ -52,6 +54,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:119"
       locator: "pin"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: C_ANNOUNCE_BACKLOG
     node_type: claim
     layer: audit
@@ -66,6 +69,7 @@ nodes:
       source: "docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutrina-granaai.md"
       locator: "docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutrina-granaai.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: E_ANNOUNCE_BACKLOG_RECONCILED
     node_type: evidence
     layer: audit
@@ -80,6 +84,7 @@ nodes:
       source: "docs/evolution/federation/outbox/metagamify/_processed"
       locator: "docs/evolution/federation/outbox/metagamify/_processed"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_METAGAMIFY_PROD_UNCOMMITTED
     node_type: claim
     layer: audit
@@ -95,6 +100,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:73"
       locator: "commit"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_METAGAMIFY_PIN_REVERIFIED
     node_type: evidence
     layer: audit
@@ -110,6 +116,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:61"
       locator: "pin"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: C_METAGAMIFY_VENDOR_VNEXTPIN
     node_type: claim
     layer: audit
@@ -125,6 +132,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:61"
       locator: "pin"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: C_GRANAAI_LINEAGES_UNKNOWN
     node_type: claim
     layer: audit
@@ -140,6 +148,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:131"
       locator: "censo lote 4: worker CONFIRMED e juiz opus/high APROVOU (run wf_da7d6a16-49e)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: C_PERSONALITY_SEEDS
     node_type: claim
     layer: audit
@@ -163,6 +172,7 @@ nodes:
       source: ".claude/identity/personality.md + git: d7807bf7"
       locator: "personality.md l.10 (\"74 migalhas\"); mensagem de d7807bf7 (\"All 27 [[slug]] anchors are real entries\"; \"6 of 7 adopters still seed-manual, 1 gated/n-a\"); d7807bf7:members.yaml l.36 (personality_summary do core EMERGENTE)"
       method: "leitura: artefato gerado + commit d7807bf7"
+      locality: "repo"
   - id: C_ADOPTER_PERSONALITY_SEEDS_PENDING
     node_type: claim
     layer: audit
@@ -178,6 +188,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:36"
       locator: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): As duas afirmacoes mecanicas do label seguem verdadeiras (mecanismo por-instancia via /meta:personality-sync + relay upstream; marcio-pessoal segue gated/n-a) mas o NUMER"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: C_FED_STRUCTURE_IS_TRIPLES
     node_type: claim
     layer: audit
@@ -192,6 +203,7 @@ nodes:
       source: ".claude/validation/graph.sh:76"
       locator: ".claude/validation/graph.sh:76"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: D_FED_KG_AS_AUDIT_OVERLAY
     node_type: decision
     trace: docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md
@@ -206,6 +218,7 @@ nodes:
       source: "docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md"
       locator: "docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_FED_RADAR_ABSENT
     node_type: claim
     layer: audit
@@ -219,6 +232,7 @@ nodes:
       source: "git: 1d9fd485 + ff6c22a6:.claude/validation/federation-radar.sh"
       locator: "ff6c22a6:.claude/validation/federation-radar.sh l.5-7 (\"Consolida os checks que hoje vivem espalhados (pin-integrity-check.sh, reconcile-inputs.sh, /meta:federation-*)\"); claim nasce em 1d9fd485 (2026-07-18 15:50) antes do radar (ff6c22a6, 19:22)"
       method: "leitura: histórico git e cabeçalho do radar no commit de criação"
+      locality: "repo"
   - id: E_FED_RADAR_BUILT
     node_type: evidence
     layer: audit
@@ -233,6 +247,7 @@ nodes:
       source: ".claude/validation/federation-radar.sh"
       locator: "bash .claude/validation/federation-radar.sh"
       method: "medição: bash .claude/validation/federation-radar.sh (re-executado 2026-10-09; o run de 07-24 não tem comando registrado)"
+      locality: "repo"
   - id: E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE
     node_type: evidence
     plane: DEV
@@ -247,6 +262,7 @@ nodes:
       source: "ops/materialize-door.sh"
       locator: "materializacao EXECUTADA 4x em destinos descartaveis a partir de HEAD (ops/materialize-door.sh --role standalone), cronometrada com /usr/bin/time em 3 amostras; lint-artifacts.sh rodado DENTRO do resultado; diff -ru <destino> /home/marcio/onion-standalone --exclude=.git | grep -c \"^[+-]\" para as linhas e diff -rq | grep -c . para os caminhos"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR
     node_type: evidence
@@ -262,6 +278,7 @@ nodes:
       source: ".claude/validation/door-staleness-baseline.txt"
       locator: "git log -p em .claude/validation/door-staleness-baseline.txt (todas as refs) + door-staleness-check.sh medindo contra merge-base; em `main` a serie do onion-standalone e 373 → 374 → 381 → 383 → 384 → 388 entre 2026-09-17 e 2026-09-18"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA
     node_type: question
@@ -287,6 +304,7 @@ nodes:
       source: "ops/materialize-door.sh"
       locator: "ops/materialize-door.sh:238 (redacao anterior) + vendor-manifest.sh --role standalone mostrando :(exclude).claude/utils/adopt/regen-ssot-projections.sh; materializacao executada antes e depois da cura, com o lint dentro do destino: 8 HARD antes, 4 depois"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: C_GRANAAI_PIN_UNTRUSTED

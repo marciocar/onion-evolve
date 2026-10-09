@@ -81,6 +81,7 @@ nodes:
       source: "docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml · docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml · .claude/validation/vps-exposure-check.sh"
       locator: "leitura do corpus em 2026-10-05: docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml (CL_net_exposure_incident, D_containment_docker_user), docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml (E_CLASSE_DE_EXPOSICAO_VIROU_REGRA_64), .claude/validation/vps-exposure-check.sh presente, ops/ com 20 entradas"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_DOUTRINA_PULL_NOT_PUSH_E_TRES_DIMENSOES
     node_type: evidence
@@ -98,6 +99,7 @@ nodes:
       source: "CLAUDE.md · docs/evolution/research/stack-harmonia-2026-08/ · docs/onion/graph/vps-shared-tools-2026-07.kg.yaml"
       locator: "CLAUDE.md (CORE diferente de FAMILIA; 3 dimensoes peer selada; design/ e categoria, nao 4a dimensao) + docs/evolution/research/stack-harmonia-2026-08 (D_regra_5_portoes, D_anti_catalogo) + docs/onion/graph/vps-shared-tools-2026-07 (D_framing_catalogo) — lidos no corpus desta rodada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ═══════════════════ CLAUDE CODE — HOOKS (tier 9) ═══════════════════
 
@@ -117,6 +119,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "https://code.claude.com/docs/en/hooks — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HOOK_EVENTOS_SEM_AGENDADOR
     node_type: evidence
@@ -134,6 +137,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "https://code.claude.com/docs/en/hooks — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HOOK_TIMEOUT_FALHA_ABERTO
     node_type: evidence
@@ -151,6 +155,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "https://code.claude.com/docs/en/hooks — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HOOK_TIMEOUT_PADRAO_600S
     node_type: evidence
@@ -168,6 +173,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "https://code.claude.com/docs/en/hooks — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ CENSO QUE SO REPORTA (tier 6-8) ═══════════════════
 
@@ -187,6 +193,7 @@ nodes:
       source: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html"
       locator: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 2-1"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CHECKRESTART_VIA_LSOF_SEM_ESTADO
     node_type: evidence
@@ -204,6 +211,7 @@ nodes:
       source: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html"
       locator: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CHECKRESTART_SENSIVEL_AO_KERNEL
     node_type: evidence
@@ -221,6 +229,7 @@ nodes:
       source: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html"
       locator: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 2-1"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LIVEPATCH_SUPRIME_REBOOT_REQUIRED
     node_type: evidence
@@ -239,6 +248,7 @@ nodes:
       source: "https://lists.snapcraft.io/archives/foundations-bugs/2025-June/539876.html"
       locator: "https://lists.snapcraft.io/archives/foundations-bugs/2025-June/539876.html — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LYNIS_AUDITORIA_SO_RELATO
     node_type: evidence
@@ -256,6 +266,7 @@ nodes:
       source: "https://manpages.org/lynis/8"
       locator: "https://manpages.org/lynis/8 — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ DOCKER x UFW (tier 3-5) ═══════════════════
 
@@ -275,6 +286,7 @@ nodes:
       source: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps"
       locator: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_DOCKER_USER_ROTEAR_PARA_UFW
     node_type: evidence
@@ -292,6 +304,7 @@ nodes:
       source: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps"
       locator: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_UFW_STATUS_SUBESTIMA_EXPOSICAO
     node_type: evidence
@@ -309,6 +322,7 @@ nodes:
       source: "https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown"
       locator: "https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown — votos 3-0; vendor-on-competitor, suspeito por clausula 7"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_DOCKER_USER_PONTO_OFICIAL
     node_type: evidence
@@ -326,6 +340,7 @@ nodes:
       source: "https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown"
       locator: "https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown — votos 3-0; vendor-on-competitor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_DOCKER_DNAT_PREROUTING
     node_type: evidence
@@ -343,6 +358,7 @@ nodes:
       source: "https://www.ssdnodes.com/learn/lang/pt/docker-ports-bypass-ufw"
       locator: "https://www.ssdnodes.com/learn/lang/pt/docker-ports-bypass-ufw — votos 3-0; vendor-on-competitor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_BIND_LOOPBACK_MITIGA
     node_type: evidence
@@ -360,6 +376,7 @@ nodes:
       source: "https://github.com/SDbyFrankChen/claude-code-server-security-audit"
       locator: "https://github.com/SDbyFrankChen/claude-code-server-security-audit — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ OPS AGENTICO (tier 4) ═══════════════════
 
@@ -380,6 +397,7 @@ nodes:
       source: "https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/"
       locator: "https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/ — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HEINZEL_MEMORIA_POR_SERVIDOR
     node_type: evidence
@@ -397,6 +415,7 @@ nodes:
       source: "https://github.com/wintermeyer/heinzel"
       locator: "https://github.com/wintermeyer/heinzel — votos 2-1"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ MERCADO E LACUNAS ═══════════════════
 
@@ -416,6 +435,7 @@ nodes:
       source: "https://www.qovery.com/blog/platform-engineering-vs-devops-50-engineers-build-or-buy"
       locator: "sintese do eixo mercado/capital da rodada de 2026-10-05; 3 claims de mercado (qovery.com, tier 3) refutadas no voto adversarial"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LACUNAS_INFRA_VPS_1005
     node_type: evidence
@@ -434,6 +454,7 @@ nodes:
       source: "docs/evolution/research/infra-vps-2026-10/data/wf_b5f60320-80d.json + docs/evolution/research/infra-vps-2026-10/SYNTHESIS.md"
       locator: "journal: result.stats {sources 15, claims 51, verified 25, confirmed 17, refuted 8, unverified 0}; len(budgetDropped)=33; len(notVerifiedByBudget)=26; refuted[0..7] (tiers 4,4,4,3,3,3,3,8); logs \"Elenxo: 41 objeções, 27 sobreviventes\"; grafo: 12 \"id: E_OBJECAO\"; SYNTHESIS.md l.50-55 (tabela) e l.57 (recomendação chegou truncada ao escritor)"
       method: "leitura: journal versionado data/wf_b5f60320-80d.json (git ls-files) + SYNTHESIS.md"
+      locality: "repo"
 
   # ═══════════════════ OPCOES ═══════════════════
 
@@ -514,6 +535,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "objecao do Elenxo ao achado 1 (https://code.claude.com/docs/en/hooks, tier 9) + postura de acoplamento do CLAUDE.md"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_CHECKRESTART_AUSENTE
     node_type: evidence
@@ -531,6 +553,7 @@ nodes:
       source: "/usr/sbin/needrestart"
       locator: "medido nesta VPS em 2026-10-05: which checkrestart vazio; /usr/sbin/needrestart existe"
       method: "testemunho: leitura do arquivo /usr/sbin/needrestart no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: E_OBJECAO_INSTRUMENTO_NAO_VERIFICADO
     node_type: evidence
@@ -548,6 +571,7 @@ nodes:
       source: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html"
       locator: "objecao do Elenxo ao achado 17 (checkrestart sensivel ao kernel, tier 8)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_LIVEPATCH_CRUZAR_SINAIS
     node_type: evidence
@@ -565,6 +589,7 @@ nodes:
       source: "/var/run/reboot-required.pkgs · /boot"
       locator: "medido nesta VPS em 2026-10-05: canonical-livepatch ausente; /var/run/reboot-required existe com .pkgs libc6, linux-image-6.8.0-142-generic, linux-base; uname -r 139"
       method: "testemunho: leitura do arquivo /var/run/reboot-required.pkgs no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: E_OBJECAO_LYNIS_NAO_REINVENTAR
     node_type: evidence
@@ -582,6 +607,7 @@ nodes:
       source: "https://manpages.org/lynis/8 · docs/evolution/research/stack-harmonia-2026-08/"
       locator: "objecao do Elenxo ao achado 5 (https://manpages.org/lynis/8, tier 6); which lynis vazio medido; D_regra_5_portoes e D_anti_catalogo em stack-harmonia-2026-08"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_DOCKER_UFW_JA_COBERTO
     node_type: evidence
@@ -599,6 +625,7 @@ nodes:
       source: ".claude/validation/vps-exposure-check.sh · docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml"
       locator: "objecao do Elenxo aos achados 6, 8, 9 e 11; .claude/validation/vps-exposure-check.sh; D_containment_docker_user; iptables -S DOCKER-USER sem root = Permission denied (you must be root), medido pelo Elenxo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_AFTER_RULES_E_MUDANCA
     node_type: evidence
@@ -616,6 +643,7 @@ nodes:
       source: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps"
       locator: "objecao do Elenxo ao achado 7 (virtua.cloud, tier 5); systemctl is-enabled onion-vps-docker-firewall = enabled, medido"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_HOMELAB_NAO_E_INDEPENDENTE
     node_type: evidence
@@ -633,6 +661,7 @@ nodes:
       source: "https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/"
       locator: "objecao do Elenxo ao achado 10 (mustafa.net, tier 4, blog de opiniao)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_HEINZEL_ANALOGIA_FROUXA
     node_type: evidence
@@ -650,6 +679,7 @@ nodes:
       source: "https://github.com/wintermeyer/heinzel"
       locator: "objecao do Elenxo ao achado 12 (https://github.com/wintermeyer/heinzel, tier 4, votos 2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_BIND_LOOPBACK_JA_E_REGRA
     node_type: evidence
@@ -667,6 +697,7 @@ nodes:
       source: ".claude/validation/vps-exposure-check.sh"
       locator: "objecao do Elenxo ao achado 13 (tier 3); REGRA 64 e vps-exposure-check.sh no core"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_SESSIONSTART_E_AUTOSTART
     node_type: evidence
@@ -684,6 +715,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "objecao do Elenxo ao achado 14 (https://code.claude.com/docs/en/hooks, tier 9) + MOAT W7 (/meta:radar maestro-invocado, nunca agendado) + padrao REGRA 65"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_TIMEOUT_FALHA_ABERTO
     node_type: evidence
@@ -701,6 +733,7 @@ nodes:
       source: "https://code.claude.com/docs/en/hooks"
       locator: "objecao do Elenxo aos achados 15 e 16 (https://code.claude.com/docs/en/hooks, tier 9); evidencia TRUNCADA no payload em Se houver qualquer integracao por"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA
     node_type: question
@@ -716,6 +749,7 @@ nodes:
       source: ".claude/validation/vps-exposure-check.sh"
       locator: "grep em .claude/validation/vps-exposure-check.sh: 3 linhas com /home/marcio/onion-vps-*/backups, /home/marcio/backups/*, /home/onion/.claude/backups; o arquivo existe em brain-granaai, gmill, sacola-de-ideias e na porta publica onion-core"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── evidencias sustentam a pergunta ──
 

@@ -17,6 +17,7 @@ nodes:
       source: ".claude/commands/meta/kg.md"
       locator: "modo-documentado-em-kg.md"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: C_p6_wrapper_fino
     node_type: claim
     plane: DEV
@@ -39,6 +40,7 @@ nodes:
       source: ".claude/commands/meta/kg.md"
       locator: "leitura-do-kg.md-e-pipeline"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_lacuna_pipeline
     node_type: evidence
     plane: PROD
@@ -53,6 +55,7 @@ nodes:
       source: ".claude/commands/product/consolidate-meetings.md"
       locator: "exploracao-pipeline-descoberta"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_radar_ja_diagnostica
     node_type: evidence
     plane: PROD
@@ -67,6 +70,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "kg-radar-domain-existe"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_dogfood_de_campo
     node_type: evidence
     plane: PROD
@@ -95,6 +99,7 @@ nodes:
       source: ".claude/commands/meta/kg.md"
       locator: "modo-nao-codigo"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: C_soberania_engajamento
     node_type: claim
     plane: DEV
@@ -107,6 +112,7 @@ nodes:
       source: ".claude/validation/projection-safety.sh"
       locator: ".claude/validation/projection-safety.sh"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: A_kg_md
     node_type: artifact
     plane: PROD
@@ -121,6 +127,7 @@ nodes:
       source: ".claude/commands/meta/kg.md"
       locator: "secao-diagnose-em-kg.md"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: Q_automacao_pipeline
     node_type: question
     plane: DEV
@@ -144,6 +151,7 @@ nodes:
       source: "d726efb2:.claude/commands/meta/kg.md"
       locator: "commit d726efb2 (#500, 2026-07-30): kg.md §\"Automação parcial\" (hoje l.442) + .claude/utils/diagnose/scaffold-diagnose-store.sh; e5e81af2^:docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml l.97 (status: open); Q nascido em 5a2e1c90 (#499, 2026-07-30)"
       method: "leitura: git (commits #499/#500 e estado do nó antes do censo)"
+      locality: "repo"
 
 edges:
   - from: E_map_e_software_diagnose_e_negocio

@@ -43,6 +43,7 @@ nodes:
       source: ".claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md"
       locator: ".claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: E_WIRE_IN_LIVE
     node_type: evidence
@@ -72,6 +73,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-guardrails.md"
       locator: "docs/knowledge-base/concepts/onion-guardrails.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: C_STRUCTURAL_OVER_GATED
     node_type: claim
@@ -86,6 +88,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-guardrails.md"
       locator: "docs/knowledge-base/concepts/onion-guardrails.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: C_SURFACE_REMAINS_GATED
     node_type: claim
@@ -101,6 +104,7 @@ nodes:
       source: "docs/discussions/guardrails-nemo-lens/promotion-plan.md:34"
       locator: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O no descreve o fio #4 (/meta:guardrails) como GATED — residuo aberto aguardando decisao do maestro. Mas o PROPRIO arquivo kg registra, 7 dias depois, que a decisao FOI tomada (D_N"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_INDEX_VS_DSL
     node_type: question
@@ -126,6 +130,7 @@ nodes:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "elenxo-3-steelman-6-refutacao-1-sintese"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_DSL_REFUTED
     node_type: evidence
@@ -141,6 +146,7 @@ nodes:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "run_id wf_15cebeba-773; §Veredito bullet DSL l.53-58"
       method: "juízes: Elenxo orquestrado (3 steelman + 6 refutação 2 lentes + síntese), veredito registrado"
+      locality: "repo"
 
   - id: E_HYBRID_REFUTED
     node_type: evidence
@@ -156,6 +162,7 @@ nodes:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "run_id wf_15cebeba-773; bullet Híbrido l.59"
       method: "juízes: Elenxo orquestrado, veredito registrado"
+      locality: "repo"
 
   - id: E_INDEX_LIVE_LENS
     node_type: evidence
@@ -171,6 +178,7 @@ nodes:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "run_id wf_15cebeba-773; bullet Índice l.65-69 + §A forma concreta item 1 l.79"
       method: "juízes: Elenxo orquestrado, veredito registrado"
+      locality: "repo"
 
   - id: Q_AUTHORING_TRIGGER
     node_type: question
@@ -196,6 +204,7 @@ nodes:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "ADENDO — Spike 2026-07-31 l.14-27"
       method: "leitura: adendo do veredito registra o resultado do spike (grep pelado vs lente em product/task.md e canal C2)"
+      locality: "repo"
 
   - id: D_NO_COMMAND
     node_type: decision
@@ -211,6 +220,7 @@ nodes:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "spike-behavior-over-declaration"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_REVERSE_JOIN_SCOPE
     node_type: question
@@ -247,6 +257,7 @@ nodes:
       source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
       locator: "substrato-verificado-projection-safety+hooks+guia-claude-code"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PRIMITIVE_EXISTS
     node_type: evidence
@@ -262,6 +273,7 @@ nodes:
       source: ".claude/validation/projection-safety.sh"
       locator: "projection-safety.sh-linha-74-run_audit-e-KG-relay-gustavo-P7"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_HOOK_SUBSTRATE
     node_type: evidence
@@ -277,6 +289,7 @@ nodes:
       source: ".claude/settings.json"
       locator: "guia-claude-code-hooks-oficial"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_WIRE_IN_DONE_PR452

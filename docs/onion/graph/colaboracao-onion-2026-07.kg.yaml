@@ -24,6 +24,7 @@ nodes:
       source: "git:5e511195 (PR #298) docs/evolution/inbox/2026-07-08-test-message.md"
       locator: "git show --stat 5e511195 (autor mauriciomatos, 2026-07-08, escreve em docs/evolution/inbox/)"
       method: "leitura: commit do core que refuta a exclusividade do relay"
+      locality: "repo"
   - id: EN_VISITANTE
     node_type: entity
     layer: domain
@@ -52,6 +53,7 @@ nodes:
       source: "docs/evolution/inbox"
       locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. cd /home/marcio/onion-evolve && ls -la docs/evolution/inbox/ docs/evolution/outbox/ docs/e => Claim 1 (repositório é meio de colaboração assíncrona): CONFIRMADO ao vivo. `docs/evolution/{inbox,outbox,inbo…"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: EN_VERTICAL
     node_type: entity
     layer: domain
@@ -66,6 +68,7 @@ nodes:
       source: ".claude/commands/meta/create-vertical.md"
       locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. cd /home/marcio/onion-evolve && test -f .claude/commands/meta/create-vertical.md && echo E => EXISTS. Linha 123: \"`.claude/skills/<slug>/SKILL.md` — hub-roteador homônimo (deriva da SSOT viva, nunca hardc…"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: ST_SINAL_INBOX
     node_type: state
     layer: domain
@@ -78,6 +81,7 @@ nodes:
       source: ".claude/commands/meta/co-relay.md"
       locator: "l.3/l.14 (o carteiro transporta o sinal para docs/evolution/inbox/ do core, sem commit; a triagem é da sessão do core)"
       method: "leitura: doutrina do carteiro upstream"
+      locality: "repo"
   - id: ST_SINAL_PROCESSED
     node_type: state
     layer: domain
@@ -90,6 +94,7 @@ nodes:
       source: ".claude/commands/meta/co-evolve.md"
       locator: "l.15 (\"só move mensagens para _processed/ quando você confirmar\") + ls docs/evolution/inbox/_processed (154 arquivos)"
       method: "leitura: comando co-evolve + diretório _processed"
+      locality: "repo"
   - id: EV_RELAY
     node_type: event
     layer: domain
@@ -104,6 +109,7 @@ nodes:
       source: ".claude/utils/co-evolution/co-relay.sh"
       locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. 1) grep -nE \"cp |git add|git commit|git push\" .claude/utils/co-evolution/co-relay.sh 2) ls => (1) linha 154: `cp \"$f\" \"${DEST_DIR}/${base}\"` — único transporte no script; ZERO ocorrências de git add/commi…"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: IN_I3
     node_type: invariant
     layer: domain
@@ -118,6 +124,7 @@ nodes:
       source: ".claude/commands/meta/co-relay.md"
       locator: "l.25 (\"A sessão do adotante nunca commita/pusha no repo alheio (I3 — um escritor por repo)\") + l.3 (ENTREGA-SEM-COMMIT)"
       method: "leitura: doutrina do carteiro upstream no core"
+      locality: "repo"
   - id: RU_RELAY_MAESTRO
     node_type: rule
     layer: domain
@@ -132,6 +139,7 @@ nodes:
       source: "docs/evolution/inbox (git log do core)"
       locator: "git log --all --format='%h %an' -- docs/evolution/inbox/ | grep -v \"Marcio Carvalho\""
       method: "medição: git log de autores em docs/evolution/inbox"
+      locality: "repo"
   - id: RU_BRANCH_TWO_TIER
     node_type: rule
     layer: domain
@@ -173,6 +181,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
       locator: "Sinal 1 (\"Um engajamento real de consultoria+treino foi entregue inteiro a partir de specs\") + frontmatter evidencia \"sessão 2026-07-15/16\""
       method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
+      locality: "repo"
   - id: E_DIARY_MIGALHAS
     node_type: evidence
     layer: audit
@@ -207,6 +216,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
       locator: "Sinal 1 (\"Tese confirmada: uma boa spec é um multiplicador de artefatos\")"
       method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
+      locality: "repo"
   - id: C_ASYNC_REPO
     node_type: claim
     layer: audit
@@ -336,6 +346,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
       locator: "Sinal 6 (\"Uma SSOT, duas projeções ... a interna (completa) e a client-safe (a interna despida)\")"
       method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
+      locality: "repo"
   - id: IN_CLIENT_SAFE
     node_type: invariant
     layer: domain
@@ -350,6 +361,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
       locator: "Sinal 6 l.65-67 ('Antes de qualquer artefato cruzar para o cliente ou para o core, roda-se um grep de termos sensíveis → tem que dar 0')"
       method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
+      locality: "repo"
   - id: EN_KG_CLIENTE
     node_type: entity
     layer: domain
@@ -364,6 +376,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
       locator: "Sinal 7, bullet \"KG do engajamento\" (\"Contém nós 🔒 confidenciais explicitamente marcados ... Fica no repo dev — nunca sai\")"
       method: "leitura: sinal upstream do adotante que originou o label (relay 2026-07-16)"
+      locality: "repo"
   - id: EN_KG_COLAB
     node_type: entity
     layer: domain
@@ -378,6 +391,7 @@ nodes:
       source: "docs/onion/graph/colaboracao-onion-2026-07.kg.yaml"
       locator: "bash .claude/validation/projection-safety.sh docs/onion/graph/colaboracao-onion-2026-07.kg.yaml (6 termos derivados do members.yaml; 1 arquivo; OK) + cabeçalho l.1 (META-ONION, não é dado de cliente)"
       method: "medição: bash .claude/validation/projection-safety.sh docs/onion/graph/colaboracao-onion-2026-07.kg.yaml"
+      locality: "repo"
   - id: EN_MARCA
     node_type: entity
     layer: domain
@@ -390,6 +404,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
       locator: "Sinal 8, bullet \"Vínculos assimétricos com a entidade entregadora\" (marca sob a qual o serviço é entregue)"
       method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
+      locality: "repo"
   - id: D_VISIBILIDADE
     node_type: decision
     layer: audit
@@ -418,6 +433,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
       locator: "Sinal 8, bullet \"Vínculos assimétricos com a entidade entregadora\""
       method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
+      locality: "repo"
   - id: Q_AUTORIZACAO_NAO_FORMALIZADA
     node_type: question
     layer: audit
@@ -442,6 +458,7 @@ nodes:
       source: "docs/evolution/inbox"
       locator: "git log do core: commit 5e511195 (PR #298, mesclado em main) de colaborador externo escrevendo direto em docs/evolution/inbox/ — selado pelo maestro 2026-08-30"
       method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_MEDIDO_EN_KG_CLIENTE_2026_09
     node_type: evidence
     plane: PROD
@@ -469,6 +486,7 @@ nodes:
       source: "docs/evolution/inbox"
       locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): REFUTED 2/2 — git log --all --format='%H %an' -- docs/evolution/inbox/ | grep -v \"Marcio Carvalho\". FLIP NAO E NOVO: executa o selo do maestro de 2026-08-31 (PR #724, C_MAESTRO_NAO_E_UNICO_RELAY, mesmo fato: commit 5e511195/PR #298 por terceiro na rota de relay)"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   # domain — papeis e canais

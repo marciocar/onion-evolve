@@ -59,6 +59,7 @@ nodes:
       source: "mensagem entre sessões do adotante dedicado ao KG-SSOT ao core"
       locator: "resposta à pergunta 1, em 2026-10-08"
       method: "leitura da resposta; opinião, não medição"
+      locality: "pessoa"
   - id: E_OPINIAO_CARIMBO_PELO_QUE_FOI_LIDO
     node_type: evidence
     layer: audit
@@ -74,6 +75,7 @@ nodes:
       source: "mensagem entre sessões do adotante dedicado ao KG-SSOT ao core"
       locator: "resposta à pergunta 2, em 2026-10-08"
       method: "leitura da resposta; opinião, não medição"
+      locality: "pessoa"
   - id: E_OPINIAO_RISCOS_QUE_FALTAVAM
     node_type: evidence
     layer: audit
@@ -89,6 +91,7 @@ nodes:
       source: "mensagem entre sessões do adotante dedicado ao KG-SSOT ao core"
       locator: "resposta à pergunta 3, em 2026-10-08"
       method: "leitura da resposta; opinião, não medição"
+      locality: "pessoa"
   - id: E_DOGFOOD_POR_COMANDO_REAL
     node_type: evidence
     layer: audit

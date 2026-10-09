@@ -75,6 +75,7 @@ nodes:
       source: "https://docs.divio.com/documentation-system/"
       locator: "https://docs.divio.com/documentation-system/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_DISCLOSURE_TETO_DUAS_CAMADAS
     node_type: evidence
@@ -92,6 +93,7 @@ nodes:
       source: "https://www.nngroup.com/articles/progressive-disclosure/"
       locator: "https://www.nngroup.com/articles/progressive-disclosure/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1), o consenso mais fragil da rodada"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_DIATAXIS_CANONICAL_SEPARACAO
     node_type: evidence
@@ -110,6 +112,7 @@ nodes:
       source: "https://ubuntu.com/blog/diataxis-a-new-foundation-for-canonical-documentation"
       locator: "https://ubuntu.com/blog/diataxis-a-new-foundation-for-canonical-documentation — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NAVEGACAO_EXPECTATIVAS_EXPLICITAS
     node_type: evidence
@@ -127,6 +130,7 @@ nodes:
       source: "https://www.nngroup.com/articles/progressive-disclosure/"
       locator: "https://www.nngroup.com/articles/progressive-disclosure/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0). MESMA URL de E_DISCLOSURE_TETO_DUAS_CAMADAS"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EIXO MERCADO/CAPITAL (invariante — cláusula 4) ───────────────────────────────────
   - id: E_MERCADO_DECK_PATTERNS_0924
@@ -145,6 +149,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_cd666d1e-81d.json"
       locator: "result.market"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_cd666d1e-81d.json no host"
+      locality: "host"
 
   # ── LACUNAS (cláusula 8: lacuna vira nó) ─────────────────────────────────────────────
   - id: E_LACUNAS_DECK_PATTERNS_0924
@@ -164,6 +169,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_cd666d1e-81d.json"
       locator: "result.stats {sources 18, claims 38, verified 28, confirmed 4, refuted 24, unverified 0}; len(budgetDropped)=17 (kubernetes.io ×2, stripe.com/docs); len(notVerifiedByBudget)=10; refuted[0,18,19] tier 9 code.claude.com; decision.objections[12] (Terraform/React/Docker nem tentados); logs \"35 URLs únicas → fetch 18 (17 cortadas)\" e \"Elenxo: 18 objeções, 14 sobreviventes\"; grafo: 6 \"id: E_OBJECAO\""
       method: "testemunho: leitura do journal /home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_cd666d1e-81d.json no host 2026-10-09"
+      locality: "host"
 
   # ── A DECISÃO (o maestro sela — esta sessão NUNCA sela) ──────────────────────────────
   - id: D_DECK_ARCO_PREMIUM_0924
@@ -280,6 +286,7 @@ nodes:
       source: "docs/knowledge-base/education/applications/educational-design-guidelines.md"
       locator: "Objecao do Elenxo (1 agente, sem votacao) cruzada com medicao propria nesta sessao: grep -n \"Diataxis\\|Zettelkasten\" docs/knowledge-base/education/applications/educational-design-guidelines.md devolve l.30 com o texto verbatim \"convergencia Zettelkasten (literature!=permanent notes) - Diataxis (reference!=how-to)\", na coluna \"vinculante\", com \"decisao do maestro 2026-07-05\"; e o proprio Scope registra 5 claims refutadas que atribuiam ordem ao Diataxis"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_2_DISCLOSURE_SEM_PONTE_E_TETO_JA_FEITO
     node_type: evidence
@@ -297,6 +304,7 @@ nodes:
       source: "docs/deck-iftl-rebased:docs/evolution/decks/iftl-frameworks-agentes-2026-08.html"
       locator: "git show <branch>:<deck> | grep -o \"short:1\" | wc -l ; grep -c \"^{act:\""
       method: "medição: grep short:1 e ^{act: no deck da branch docs/deck-iftl-rebased"
+      locality: "repo"
 
   - id: E_OBJECAO_3_QUATRO_ACHADOS_SAO_DUAS_FONTES
     node_type: evidence
@@ -314,6 +322,7 @@ nodes:
       source: "https://www.nngroup.com/articles/progressive-disclosure/"
       locator: "Objecao do Elenxo (1 agente, sem votacao) verificavel no proprio payload da rodada: achados 1 e 3 sao a doutrina Diataxis (docs.divio.com tier 8 e ubuntu.com tier 6); achados 2 e 4 citam a URL IDENTICA https://www.nngroup.com/articles/progressive-disclosure/. 4 claims, 2 URLs-fonte"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_4_NAVEGACAO_NAO_DISCRIMINA_E_JA_ENTREGUE
     node_type: evidence
@@ -331,6 +340,7 @@ nodes:
       source: "docs/deck-iftl-rebased:docs/evolution/decks/iftl-frameworks-agentes-2026-08.html"
       locator: "grep -oiE \"(navegar|mapa|Clique para saltar|caminho curto|essenciais)\""
       method: "medição: grep dos rótulos de navegação no deck da branch docs/deck-iftl-rebased"
+      locality: "repo"
 
   - id: E_OBJECAO_5_CORPUS_VAZIO_E_FALSO_NEGATIVO
     node_type: evidence
@@ -348,6 +358,7 @@ nodes:
       source: ".claude/skills/onion-onboarding/SKILL.md"
       locator: "Objecao do Elenxo (1 agente, sem votacao) cruzada com medicao propria nesta sessao — os 4 sitios existem e dizem o que ela afirma: ls docs/knowledge-base/education/theories/ = plea-rosario.md, srl-zimmerman.md; educational-design-guidelines.md l.3 \"Versao 1.3.0 | 2026-07-05\" e l.27 diretriz 2 com \"Fan et al. 2025, RCT peer-reviewed\" (srl-zimmerman.md l.53: BJET 56(2), DOI 10.1111/bjet.13544, N=117); onion-guided-lifecycle.md l.51-52 \"Orient -> Activate -> Reinforce\" e l.45 \"3 perguntas criticas + avancado adiado\"; .claude/skills/onion-onboarding/SKILL.md l.43-45 \"comece pelo papel DELE ... Nao despeje os 6 papeis de uma vez\""
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_6_DECK_DE_65_SLIDES_NAO_EXISTE
     node_type: evidence
@@ -365,6 +376,7 @@ nodes:
       source: "docs/deck-iftl-rebased:docs/evolution/decks/iftl-frameworks-agentes-2026-08.html"
       locator: "git branch -a --list \"*deck*\" ; git ls-tree -r --name-only main | grep -c evolution/decks/ ; grep -c \"^{act:\""
       method: "medição: branches *deck*, ls-tree de main e contagem de atos"
+      locality: "repo"
 
 edges:
   # ── evidência -> pergunta (SUPPORTS) ─────────────────────────────────────────────────

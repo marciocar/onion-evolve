@@ -38,6 +38,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/int-inventario.md"
       locator: "inventario read-only lens-internal: 10 clausulas x artefato:linha (radar.md:13/:47-50, radar-baselines.yaml:17/:22, lint-artifacts.sh:3602/:3630, kg.md:65-88, adopt.md:26-29, elenxo-doctrine.md:79, kg-born-marker.sh:175)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_TRES_GAPS_SAO_UMA_SUPERFICIE
     node_type: evidence
@@ -53,6 +54,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/int-inventario.md"
       locator: "lens-internal secao E + grep no contexto principal (grep -rn \"grafos anteriores|pesquisas anteriores|reusa\" .claude/commands .claude/skills .claude/agents = 0 etapas ler-antes-de-pesquisar; 27 grafos em docs/evolution/research/ nunca consultados por pesquisa nova)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SEM_DOUTRINA_DE_ESCOLHA_DE_FONTES
     node_type: evidence
@@ -68,6 +70,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/int-inventario.md"
       locator: "grep -rlniE \"tier(ing)? de fonte|hierarquia de fontes|credibilidade d[ae] fonte|fonte prim[aa]ria\" .claude docs/knowledge-base docs/meta-specs = so a worktree velha discuss+onion-pessoal-app; R15 = confianca no CONTEUDO, nao selecao; kg.md:116 = prosa sem campo; research-agent.md:256 = 1 linha"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── PLATAFORMA: Claude Code 2.1.258 ─────────────────────────────────────────────────────
   - id: E_DEEP_RESEARCH_EMBUTIDO_E_A_BASE
@@ -84,6 +87,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-neighbors-deep-research-deepdive.md"
       locator: "code.claude.com/docs/en/workflows (Bundled workflows) + script extraido do binario 2.1.258 (431 linhas: VOTES_PER_CLAIM=3, REFUTATIONS_REQUIRED=2, MAX_FETCH=15, MAX_VERIFY_CLAIMS=25; fases Scope -> Search -> URL-dedup -> Fetch+Extract -> Verify 3 votos -> Synthesize; sem model/effort por fase; claims nao-checaveis saem UNVERIFIED, nao refutadas)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PLATAFORMA_TEM_AS_PECAS_DA_LENTE_SEM_REDIGIR
     node_type: evidence
@@ -99,6 +103,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-claude-code-2.1.258.md"
       locator: "lens-claude-code (fontes primarias code.claude.com skills/memory/hooks/sub-agents/tools-reference/prompt-caching/changelog; 2.1.258 = ultima, 2026-09-01)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_LACUNAS_DA_PLATAFORMA_QUE_O_ONION_SUPRE
     node_type: evidence
@@ -114,6 +119,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-claude-code-2.1.258.md"
       locator: "lens-claude-code secao LACUNAS (docs primarias) + 5 NAO-VERIFICADOS declarados (teto 200 WebSearch/sessao; nome literal do env de concorrencia; parametrizacao de dominio do /deep-research; MCP oficial Perplexity/Brave; routine disparando workflow salvo)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── ESTADO DA ARTE ──────────────────────────────────────────────────────────────────────
   - id: E_LITERATURA_ENDOSSA_METADADO_EXPLICITO_MAIS_REGRA
@@ -130,6 +136,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-sota-deep-research-kg-temporal.md"
       locator: "arXiv 2501.13956 (Graphiti bi-temporal), 2605.06527 (STALE: melhor modelo 55,2%), 2606.01435 (\"Dont Ask the LLM to Track Freshness\": +10,8 pts separando extracao de politica; BM25+regra determinística bate KG temporal elaborado; limite p=0,45 em LongMemEval), 2606.26511/2606.06240 (supersessao deterministica), LazyGraphRAG (US$33k -> 0,1%), 2602.18940 (DREAM: Miragem da Sintese)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ESCALA_DE_AUTORIDADE_E_VERIFICACAO_MECANICA_DE_CITACAO
     node_type: evidence
@@ -145,6 +152,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-sota-deep-research-kg-temporal.md"
       locator: "DREAM arXiv 2602.18940 (Domain Authoritativeness 1-10 em 4 faixas), 2601.17109 (authority signals), 2607.04560 (credibilidade por artigo varia no tempo), WANDR research.perplexity.ai 2026-07-14 (re-busca a pagina citada; cobertura completa ~13% nos lideres), agregadores SEO (DA r=0,18)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_VIZINHO_DEEPDIVE_E_PADROES_A_ABSORVER
     node_type: evidence
@@ -160,6 +168,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-neighbors-deep-research-deepdive.md"
       locator: "github.com/Socialpranker/deepdive (MIT, 393 estrelas, criado 2026-05-21, push 2026-09-01) lido via WebFetch; GitHub Search created:>2026-01-01 sort=stars + HN Algolia (10 repos por trajetoria)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PERIODICIDADE_POR_TIPO_DE_CONHECIMENTO
     node_type: evidence
@@ -175,6 +184,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-sota-deep-research-kg-temporal.md"
       locator: "data/ext-sota-deep-research-kg-temporal.md:62-69 (§(iii) Periodicidade por tipo) + data/ext-market-capital.md:58-59 (§7 Fontes que valem rotina); espelho em SYNTHESIS.md:69-72"
       method: "leitura: relatórios das lentes lens-sota (iii) e lens-market §7 gravados em data/ da pesquisa 2026-09-02"
+      locality: "repo"
 
   # ── MERCADO / CAPITAL ──────────────────────────────────────────────────────────────────
   - id: E_INSTITUCIONAIS_CONVERGEM_PARA_A_TESE_DO_ONION
@@ -191,6 +201,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-market-capital.md"
       locator: "Thoughtworks Radar v34 (2026-04-15; context graph ASSESS; context engineering + curated shared instructions ADOPT; SDD ASSESS), Forrester Predictions 2026 (2025-10-28: governance-as-code em 80% dos times), Gartner Hype Cycle Agentic AI (2026-04-02 via terceiro — 403 no original), Stack Overflow 2025 (84% usam / ~30% confiam / 66% \"quase certo mas nao\"), YC W26 (41,5% agent infra)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CAPITAL_CONCENTRA_EM_VERIFICACAO_E_MEMORIA_TEMPORAL
     node_type: evidence
@@ -206,6 +217,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-market-capital.md"
       locator: "13 eventos datados (cursor.com/blog + cnbc 2026-06-16: SpaceX-Cursor US$60B; techcrunch 2026-05-27: Cognition US$1B a 26B; siliconangle 2026-03-12: Replit 400M a 9B; Langfuse->ClickHouse 01/2026; Braintrust 80M; Cognee 7,5M; Potpie 2,2M; Graphon 8,3M; AIUC-1 no STAR Registry cloudsecurityalliance.org 2026-06-30; Tavily->Nebius 400M; Exa 250M a 2,2B)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ANTHROPIC_AUTO_MODE_17PCT_FALSO_NEGATIVO
     node_type: evidence
@@ -221,6 +233,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-market-capital.md"
       locator: "anthropic.com/engineering/claude-code-auto-mode (2026-03-25): classificador em 2 estagios admite 17% de falso-negativo em acoes realmente perigosas; \"julgamento humano continua essencial\"; + \"Harness design for long-running application development\" (2026-03-24): \"todo componente do harness assume que o modelo nao sabe algo; essas suposicoes EXPIRAM\""
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CONTRA_SINAL_INSTRUCTION_BLOAT_EM_CAUTION
     node_type: evidence
@@ -236,6 +249,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-market-capital.md"
       locator: "thoughtworks.com/radar/techniques/agent-instruction-bloat (CAUTION, 04/2026) + progressive context disclosure (TRIAL) + medicao do core (CLAUDE.md: 52.655 linhas de markdown acoplado vs 26.596 de shell; SSOT claude-code-2.1-onion-2026-08)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── CLAIMS ──────────────────────────────────────────────────────────────────────────────
   - id: C_LENTE_E_SPEC_CARREGADA_NAO_COMANDO_NOVO
@@ -252,6 +266,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md"
       locator: "derivada de E_DIRETRIZ_70PCT_JA_MECANIZADA_NO_RADAR + E_PLATAFORMA_TEM_AS_PECAS_DA_LENTE_SEM_REDIGIR + E_CONTRA_SINAL_INSTRUCTION_BLOAT_EM_CAUTION; nao testada em dogfood (F1)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_ESCOLHA_DE_FONTES_E_DADO_MAIS_GUARDA
     node_type: claim
@@ -267,6 +282,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md"
       locator: "derivada de E_SEM_DOUTRINA_DE_ESCOLHA_DE_FONTES + E_ESCALA_DE_AUTORIDADE_E_VERIFICACAO_MECANICA_DE_CITACAO + E_PERIODICIDADE_POR_TIPO_DE_CONHECIMENTO; nao testada (F1/F2)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_BITEMPORAL_E_REVISITA_FECHAM_O_ENVELHECIMENTO
     node_type: claim
@@ -282,6 +298,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md"
       locator: "derivada de E_LITERATURA_ENDOSSA_METADADO_EXPLICITO_MAIS_REGRA + E_TRES_GAPS_SAO_UMA_SUPERFICIE + E_PERIODICIDADE_POR_TIPO_DE_CONHECIMENTO; nao testada (F1/F4)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_NAO_REINVENTAR_NAO_ABANDONAR_TEM_REGUA
     node_type: claim
@@ -297,6 +314,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md"
       locator: "SYNTHESIS.md §Não reinventar · não abandonar (o teste do capital), l.88-96; .claude/commands/meta/adopt.md:24-27 (régua igual→transfere/diferente→desenha); data/int-inventario.md:13 (item 6, PARCIAL)"
       method: "derivado: E_CAPITAL_CONCENTRA_EM_VERIFICACAO_E_MEMORIA_TEMPORAL + E_INSTITUCIONAIS_CONVERGEM_PARA_A_TESE_DO_ONION + régua do adopt.md + inventário interno"
+      locality: "repo"
 
   # ── DECISÕES (plano de execução — nascem open; o maestro sela) ─────────────────────────
   - id: D_F1_FUNDACAO_FRAGMENTO_CAMPOS_GUARDAS_CORPUS
@@ -313,6 +331,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md"
       locator: "selo do maestro (\"Vamos atacar D_F1..F4\"); DOGFOOD: kg-corpus-grep.sh PreModelSwitch → 8 nos (81 grafos via git ls-files; o glob antigo via 27), \"instruction bloat\" → 2 nos, corpus vazio → exit 2; bancada run_research_lens_selftests 8/8; lint no corpus real 0 HARD; radar exit 0 nos 4 grafos carimbados com review_after; entregue no PR feat/research-lens-f1"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_F2_MOTOR_WORKFLOW_ONION_RESEARCH_E_SKILL
     node_type: decision
@@ -328,6 +347,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md"
       locator: "DOGFOOD ao vivo: Workflow wf_9dad8645-eda sobre o NAO-VERIFICADO #1 (teto de WebSearch). Rodada 1 FALHOU ALTO (17 agentes, 1,08M tokens, 0 claims) por 3 defeitos de desenho (orcamento first-come, fetch sem prompt dirigido, sem retry raw) — corrigidos no script; rodada 2 retomada do cache (31 agentes acumulados, 1,33M) escreveu docs/evolution/research/websearch-cap-2026-09/ com radar exit 0, 3 achados (tier 3 nao promovido a high), mercado declarado sem sinal, review_after 30d. Custo/no ~220k (regressao vs 68-74k do censo, causa = rodada 1). A pergunta aberta certa foi deterministica: grep no binario 2.1.258 fechou 2 NAO-VERIFICADOS (default 200 + contador de sessao; MAX_CONCURRENT_SUBAGENTS=20). Bancada run_research_workflow_selftests 5/5. Skill onion-research fora do plugin onion (manifest enumera; decisao declarada)."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_F3_MODO_DECISAO_COM_ELENXO
     node_type: decision
@@ -343,6 +363,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md"
       locator: "DOGFOOD ao vivo: Workflow wf_ab17f8d6-773 em mode=decision sobre \"o que podar do CLAUDE.md\" (52 agentes, 3,4M tokens, 27 min): fase Elenxo derrubou os 2 achados web e reabriu 12 descartes por comodismo (inclusive a premissa da MINHA pergunta: skills nao sao sempre-carregadas, problema ~5x menor); 1a escrita do grafo saiu SEM no D_ (patch mirou ancora inexistente — o agente nunca recebeu o bloco) → contrato de decisao passou a ser EXIGIDO pelo schema (decisionNodeId/optionNodeIds/constrainsEdges>=1) + fail-loud; relancado do cache (99k) → poda-instruction-bloat-2026-09: 19 nos, 4 opcoes, 7 objecoes, 12 CONSTRAINS, 1 REFUTES, D_ open para o maestro, radar exit 0. Bancada run_research_workflow_selftests 7/7."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_F4_REVISITA_REGRA65_E_MODO_REVISIT
     node_type: decision
@@ -358,6 +379,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md"
       locator: "DOGFOOD ao vivo: --revisit em whatsapp-api-2026-07 (baseline 2026-07-17). Rodada 1 (cadencia do seletor = 90d): 0 nos vencidos, 76k, parou — correto. Rodada 2 (cadenceDays=30, override novo): 21 agentes, 1,37M, mas 4 refutacoes CAUSADAS pelo placeholder de citacao do modo revisita (o verificador leu a instrucao como citacao) — grafo revertido, cura: verificador RE-BUSCA a fonte e extrai a citacao atual; corpus automatico = o proprio grafo. Rodada 3 (relancada do cache, 1,32M): 1 reconfirmado, 5 SUPERSEDES com nos E_*_REVISITA_20260903, 5 antigos → superseded (2 ja refuted), review_after 2026-07-17 → 2026-10-03, radar exit 0 (61 nos). Dois TDZ (REVISIT/webText antes da declaracao) pegos por executar o corpo com stubs (caso (i) da bancada, 9/9); REGRA 69 (roster last_checked vs cadencia) com bancada (i) da familia research-lens 9/9."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_PODA_INSTRUCTION_BLOAT_MEDIDA
     node_type: decision
@@ -391,6 +413,7 @@ nodes:
       source: "docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md"
       locator: "listas NAO-VERIFICADO dos 3 workers externos (13 itens) + limites do metodo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_DIRETRIZ_70PCT_JA_MECANIZADA_NO_RADAR

@@ -48,6 +48,7 @@ nodes:
       source: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212"
       locator: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CAP_EXHAUSTED_MODEL_CONTINUES
     node_type: evidence
@@ -65,6 +66,7 @@ nodes:
       source: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212"
       locator: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_WEBFETCH_AUSENTE_NA_FONTE
     node_type: evidence
@@ -82,6 +84,7 @@ nodes:
       source: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212"
       locator: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MERCADO_SEM_SINAL_WEBSEARCH_CAP
     node_type: evidence
@@ -99,6 +102,7 @@ nodes:
       source: "docs/evolution/research/websearch-cap-2026-09/SYNTHESIS.md@725fff11 · .claude/workflows/onion-research.js@725fff11"
       locator: "SYNTHESIS.md §A resposta, parágrafo \"Mercado (invariante)\" + §Lacunas (\"Reddit inalcançável (já no corpus)\"); onion-research.js l.83 (eixo fixo mercado-capital)"
       method: "testemunho: resultado do fan-out do workflow wf_9dad8645-eda na sessão de 2026-09-02 (commit 725fff11), declarado na SYNTHESIS; journal ausente do host"
+      locality: "repo"
 
   - id: E_LACUNAS_DECLARADAS_WEBSEARCH_CAP_0902
     node_type: evidence
@@ -116,6 +120,7 @@ nodes:
       source: "docs/evolution/research/websearch-cap-2026-09/SYNTHESIS.md@725fff11 · docs/evolution/review/feat-research-lens-f2.md"
       locator: "SYNTHESIS.md frontmatter run_id wf_9dad8645-eda + tabela \"A resposta\" + §Lacunas declaradas; resíduo §Não mudou"
       method: "testemunho: contabilidade emitida pelo workflow /onion-research wf_9dad8645-eda na sessão de 2026-09-02 (commit 725fff11); journal ausente do host; cláusulas (a)-(d) e o caminho de cura conferidos por leitura"
+      locality: "repo"
 
   - id: E_BINARIO_2_1_258_TETO_200_E_CONTADOR_DE_SESSAO
     node_type: evidence

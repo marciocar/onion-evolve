@@ -26,6 +26,7 @@ nodes:
       source: "docs/technical-context/index.md"
       locator: "docs/technical-context/index.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: F_CHARTER
     node_type: artifact
@@ -41,6 +42,7 @@ nodes:
       source: "docs/technical-context/01-core/project-charter.md"
       locator: "docs/technical-context/01-core/project-charter.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: F_ADR
     node_type: artifact
@@ -56,6 +58,7 @@ nodes:
       source: "docs/technical-context/01-core/adr/index.md"
       locator: "docs/technical-context/01-core/adr/index.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: F_AIDEV
     node_type: artifact
@@ -71,6 +74,7 @@ nodes:
       source: "docs/technical-context/02-ai-context/ai-development-guide.md"
       locator: "docs/technical-context/02-ai-context/ai-development-guide.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: F_CODEBASE
     node_type: artifact
@@ -87,6 +91,7 @@ nodes:
       source: "docs/technical-context/02-ai-context/codebase-guide.md"
       locator: "refresh-do-artefato-em-2026-08-13-conferido-contra-inventory-md-e-ls-skills"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: F_BIZLOGIC
     node_type: artifact
@@ -102,6 +107,7 @@ nodes:
       source: "docs/technical-context/03-domain/business-logic.md"
       locator: "docs/technical-context/03-domain/business-logic.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: F_CONTRIB
     node_type: artifact
@@ -117,6 +123,7 @@ nodes:
       source: "docs/technical-context/04-workflow/contributing.md"
       locator: "docs/technical-context/04-workflow/contributing.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: F_CHALLENGES
     node_type: artifact
@@ -132,6 +139,7 @@ nodes:
       source: "docs/technical-context/04-workflow/architecture-challenges.md"
       locator: "docs/technical-context/04-workflow/architecture-challenges.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   # ---- CAMADAS (entity, layer: audit) ----
   - id: L1_CORE
@@ -148,6 +156,7 @@ nodes:
       source: "docs/technical-context/01-core/"
       locator: "docs/technical-context/01-core/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: L2_AICTX
     node_type: entity
@@ -163,6 +172,7 @@ nodes:
       source: "docs/technical-context/02-ai-context/"
       locator: "docs/technical-context/02-ai-context/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: L3_DOMAIN
     node_type: entity
@@ -178,6 +188,7 @@ nodes:
       source: "docs/technical-context/03-domain/"
       locator: "docs/technical-context/03-domain/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: L4_WORKFLOW
     node_type: entity
@@ -193,6 +204,7 @@ nodes:
       source: "docs/technical-context/04-workflow/"
       locator: "docs/technical-context/04-workflow/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   # ---- SUBSISTEMAS-ÂNCORA (entity, layer: domain) ----
   - id: SUB_SDAAL
@@ -209,6 +221,7 @@ nodes:
       source: "docs/meta-specs/integrations.md; .claude/utils/{task-manager,forge}/"
       locator: "docs/meta-specs/integrations.md; .claude/utils/{task-manager,forge}/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: SUB_KG
     node_type: entity
@@ -224,6 +237,7 @@ nodes:
       source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md; .claude/validation/kg-radar.sh"
       locator: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md; .claude/validation/kg-radar.sh"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: SUB_VALIDATION
     node_type: entity
@@ -239,6 +253,7 @@ nodes:
       source: ".claude/validation/; docs/onion/inventory.md; .claude/validation/lint-rules.md"
       locator: ".claude/validation/; docs/onion/inventory.md; .claude/validation/lint-rules.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: SUB_COEVO
     node_type: entity
@@ -254,6 +269,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-federation-and-adoption.md; .claude/utils/co-evolution/"
       locator: "docs/knowledge-base/concepts/onion-federation-and-adoption.md; .claude/utils/co-evolution/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: SUB_PHASED
     node_type: entity
@@ -269,6 +285,7 @@ nodes:
       source: ".claude/commands/engineer/plan.md"
       locator: "plan.md l.27 e l.36 (vocabulário [DONE]/[ACTIVE]/[TODO], invariante exatamente uma [ACTIVE]); l.21 (.claude/sessions/<feature-slug>); .gitignore l.4-8"
       method: "leitura: comando vivo /engineer:plan + .gitignore do core"
+      locality: "repo"
 
 edges:
   # index hub -> depende das 4 camadas que ele indexa

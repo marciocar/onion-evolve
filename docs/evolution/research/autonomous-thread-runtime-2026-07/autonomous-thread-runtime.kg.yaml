@@ -20,6 +20,7 @@ nodes:
       source: "https://www.mindstudio.ai/blog/progressive-autonomy-ai-agents-safe-deployment"
       locator: "https://www.mindstudio.ai/blog/progressive-autonomy-ai-agents-safe-deployment"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "web"
   - id: E_SRC_DETERMINISTIC
     node_type: evidence
     layer: audit
@@ -34,6 +35,7 @@ nodes:
       source: "https://medium.com/@mvtavares/ai-can-speed-up-code-review-but-merge-decisions-still-need-deterministic-guardrails"
       locator: "https://medium.com/@mvtavares/ai-can-speed-up-code-review-but-merge-decisions-still-need-deterministic-guardrails"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "web"
   - id: E_SRC_HITL
     node_type: evidence
     layer: audit
@@ -48,6 +50,7 @@ nodes:
       source: "https://ideaforgestudios.com/2026/07/17/human-in-the-loop-ai-agents-autonomy-playbook/"
       locator: "https://ideaforgestudios.com/2026/07/17/human-in-the-loop-ai-agents-autonomy-playbook/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "web"
   - id: C_GRADUATED_LADDER
     node_type: claim
     layer: audit
@@ -61,6 +64,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md · a275a6b4:docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
       locator: "SYNTHESIS l.25-26; ADR l.30-32"
       method: "leitura: mapeamento padrão-2026 → Onion na SYNTHESIS e no contexto do ADR"
+      locality: "repo"
   - id: C_DETERMINISTIC_MERGE
     node_type: claim
     layer: audit
@@ -74,6 +78,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       locator: "l.27-28 (bloco \"Transfere\")"
       method: "leitura: mapeamento padrão-2026 → Onion na SYNTHESIS da pesquisa"
+      locality: "repo"
   - id: E_FABLE_REVIEW
     node_type: evidence
     layer: audit
@@ -87,6 +92,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md · a275a6b4:docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
       locator: "SYNTHESIS l.35-39; ADR l.35; corpo do commit a275a6b4"
       method: "leitura: resultado da revisão adversarial fable registrado na SYNTHESIS e no ADR (a saída do revisor não foi versionada)"
+      locality: "repo"
   - id: C_CONTRACT_RAW
     node_type: claim
     layer: audit
@@ -100,6 +106,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       locator: "l.35-39 (os furos do contrato-rascunho)"
       method: "leitura: contrato cru reconstituído pela refutação registrada na SYNTHESIS (o rascunho em si não foi versionado)"
+      locality: "repo"
   - id: C_CONTRACT_FIXED
     node_type: claim
     layer: audit
@@ -113,6 +120,7 @@ nodes:
       source: "a275a6b4:docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md · docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       locator: "ADR l.48-57 (AUTOMATE GATED, 3 pré-condições, LLM veto-only), l.70-71 (worktree própria + session-beacon.sh check), l.74-79 (Guardas de PARADA); SYNTHESIS l.41-43"
       method: "leitura: ADR no commit de criação a275a6b4 + SYNTHESIS da pesquisa"
+      locality: "repo"
   - id: D_RUNTIME_CONTRACT
     node_type: decision
     layer: audit
@@ -128,6 +136,7 @@ nodes:
       source: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
       locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED — ver E_MEDIDO_D_RUNTIME_CONTRACT_2026_09 (SUPERSEDES); label de julho preservado como historia"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: C_W6_PERITEM
     node_type: claim
     layer: audit
@@ -141,6 +150,7 @@ nodes:
       source: "a275a6b4:docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
       locator: "l.9 (extends: \"W6 responder-gated → escada graduada\"), l.26-28 (W6: executar gateia), l.42 (propor ato-3), l.45-47 (merge humano revisado EM LOTE)"
       method: "leitura: ADR no commit de criação a275a6b4"
+      locality: "repo"
   - id: C_GATED
     node_type: claim
     layer: audit
@@ -163,6 +173,7 @@ nodes:
       source: "e86568cc:docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
       locator: "frontmatter l.5 no commit e86568cc (2026-09-01) ('status: accepted (degrau AUDIT) … Selado pelo maestro … Aceite QUALIFICADO … AUTOMATE segue GATED'); selo em 831332ab (2026-08-27); e86568cc:…autonomous-thread-runtime.kg.yaml l.84-94 (D_RUNTIME_CONTRACT status open, trace = o ADR)"
       method: "leitura: frontmatter do ADR e o nó D_RUNTIME_CONTRACT no commit e86568cc (2026-09-01); o journal wf_405c7716-7b3 não existe no host"
+      locality: "repo"
 
 edges:
   - from: E_SRC_GRADUATED

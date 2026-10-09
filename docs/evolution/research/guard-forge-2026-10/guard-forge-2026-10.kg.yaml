@@ -38,6 +38,7 @@ nodes:
       source: ".claude/hooks/background-state-needs-evidence.sh"
       locator: "background-state-needs-evidence.sh l.6-17 (cabeçalho POR QUÊ); corpo do commit 33027c3b ('A GUARDA NASCEU DE DEFEITO MEDIDO')"
       method: "testemunho: relato em 1ª pessoa da sessão de 2026-10-02 no corpo do commit 33027c3b e no cabeçalho do hook; o ps da medição não tem saída versionada"
+      locality: "repo"
 
   - id: E_ERA_A_UNICA_DAS_CINCO_SEM_MECANISMO
     node_type: evidence
@@ -52,6 +53,7 @@ nodes:
       source: ".claude/hooks/background-state-needs-evidence.sh"
       locator: "background-state-needs-evidence.sh l.18-21; corpo do commit 33027c3b ('Era a ÚNICA das cinco correções daquele turno sem mecanismo')"
       method: "testemunho: relato em 1ª pessoa da sessão de 2026-10-02 no corpo do commit 33027c3b e no cabeçalho do hook"
+      locality: "repo"
 
   - id: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
     node_type: decision
@@ -66,6 +68,7 @@ nodes:
       source: ".claude/commands/common/prompts/guard-doctrine.md"
       locator: "guard-doctrine.md l.18 (peça 2 = molde medido) e l.82 (molde mais exercitado: rule-title-in-prose.sh, hook Stop); .claude/hooks/rule-title-in-prose.sh l.10 (lê transcript, exit 2); corpo do commit 33027c3b ('14 guardas com --selftest')"
       method: "leitura: guard-doctrine.md + cabeçalho de rule-title-in-prose.sh + corpo do commit 33027c3b (2026-10-02) que forjou a guarda"
+      locality: "repo"
 
   - id: E_BANCADA_VERDE_COM_ARTEFATO_INUTIL
     node_type: evidence
@@ -80,6 +83,7 @@ nodes:
       source: "docs/evolution/review/feat-forge-guard-2026-10.md"
       locator: "feat-forge-guard-2026-10.md l.17-28 (achado + medição em produção) e l.30-39 (causa estrutural)"
       method: "juízes: achado F1/F2 do refutador opus/high do Elenxo em worktree isolada (resíduo verdict REPROVADO_E_CURADO, elenxo: sim, 11 achados provados por execução)"
+      locality: "repo"
 
   - id: E_A_GUARDA_VETAVA_A_REDACAO_CURADA
     node_type: evidence
@@ -95,6 +99,7 @@ nodes:
       source: "docs/evolution/review/feat-forge-guard-2026-10.md · .claude/hooks/background-state-needs-evidence.sh · .claude/commands/common/prompts/guard-doctrine.md"
       locator: "feat-forge-guard-2026-10.md l.51 (F4) · background-state-needs-evidence.sh l.68-80 (exoneração por SENTENÇA) e l.236-243 (o harvester só colhe texto de rows assistant) · guard-doctrine.md l.55-56"
       method: "juízes: achado F4 do refutador opus/high do Elenxo (resíduo REPROVADO_E_CURADO, elenxo: sim), cura registrada no hook"
+      locality: "repo"
 
   - id: E_SUPERFICIE_MORTA_NA_CARGA_PELO_PROPRIO_EXEMPLO
     node_type: evidence
@@ -109,6 +114,7 @@ nodes:
       source: "docs/evolution/review/feat-forge-guard-2026-10.md"
       locator: "feat-forge-guard-2026-10.md l.92-103 ('O que a INVOCAÇÃO revelou', item 1)"
       method: "testemunho: invocação real de /meta:forge-guard em 2026-10-02 relatada em 1ª pessoa no resíduo e no corpo do commit 33027c3b"
+      locality: "repo"
 
   - id: T_O_QUE_A_GUARDA_NAO_VE
     node_type: claim
@@ -123,6 +129,7 @@ nodes:
       source: ".claude/hooks/background-state-needs-evidence.sh"
       locator: "background-state-needs-evidence.sh l.28-38 (TETO DECLARADO); feat-forge-guard-2026-10.md l.78-82 (interação entre os dois vetos Stop NÃO VERIFICADA); guard-doctrine.md l.23 (peça 7)"
       method: "leitura: cabeçalho TETO DECLARADO do hook vivo + nota do resíduo da PR"
+      locality: "repo"
 
   - id: D_A_FORJA_E_REUSAVEL_PORQUE_O_PROCEDIMENTO_E_O_MAIS_REPETIDO
     node_type: decision

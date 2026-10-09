@@ -25,6 +25,7 @@ nodes:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## 2.1.290 a ## 2.1.295 (cópias em data/)"
       method: "leitura e contagem"
+      locality: "web"
   - id: E_HOOK_ONFAILURE_BLOCK
     node_type: evidence
     layer: audit
