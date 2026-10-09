@@ -22,6 +22,10 @@ nodes:
     verified_at: 2026-07-25
     label: "index.md — hub de navegação das 4 camadas (link + 1 linha por arquivo), gerado por M1b"
     trace: "docs/technical-context/index.md"
+    provenance:
+      source: "docs/technical-context/index.md"
+      locator: "docs/technical-context/index.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: F_CHARTER
     node_type: artifact
@@ -33,6 +37,10 @@ nodes:
     verified_at: 2026-07-25
     label: "project-charter.md — vision/success/scope/stakeholders/constraints do core; identidade canônica (framework template, não npm, não CLI)"
     trace: "docs/technical-context/01-core/project-charter.md"
+    provenance:
+      source: "docs/technical-context/01-core/project-charter.md"
+      locator: "docs/technical-context/01-core/project-charter.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: F_ADR
     node_type: artifact
@@ -44,6 +52,10 @@ nodes:
     verified_at: 2026-07-25
     label: "adr/index.md — índice dos ADRs reais (indexa 37; o disco tem 42 — a divergência é do índice, medida 2026-08-13) (docs/analysis/onion-adr-*.md) agrupados em 5 temas; não recria, só indexa"
     trace: "docs/technical-context/01-core/adr/index.md"
+    provenance:
+      source: "docs/technical-context/01-core/adr/index.md"
+      locator: "docs/technical-context/01-core/adr/index.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: F_AIDEV
     node_type: artifact
@@ -55,6 +67,10 @@ nodes:
     verified_at: 2026-07-25
     label: "ai-development-guide.md — idioma por camada, fronteiras §4.2/4.3, as **59 regras** do lint (53 HARD/11 SOFT, medido 2026-08-13), guardrails R15.2/R15.3b, gotchas"
     trace: "docs/technical-context/02-ai-context/ai-development-guide.md"
+    provenance:
+      source: "docs/technical-context/02-ai-context/ai-development-guide.md"
+      locator: "docs/technical-context/02-ai-context/ai-development-guide.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: F_CODEBASE
     node_type: artifact
@@ -82,6 +98,10 @@ nodes:
     verified_at: 2026-07-25
     label: "business-logic.md — o domínio do core: SDAAL, KG SDAAL, co-evolução/federação, workflows faseados"
     trace: "docs/technical-context/03-domain/business-logic.md"
+    provenance:
+      source: "docs/technical-context/03-domain/business-logic.md"
+      locator: "docs/technical-context/03-domain/business-logic.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: F_CONTRIB
     node_type: artifact
@@ -93,6 +113,10 @@ nodes:
     verified_at: 2026-07-25
     label: "contributing.md — GitFlow via /git:flow, ciclo plan→pr-update, review 2 camadas, testes, githook nativo, dogfood"
     trace: "docs/technical-context/04-workflow/contributing.md"
+    provenance:
+      source: "docs/technical-context/04-workflow/contributing.md"
+      locator: "docs/technical-context/04-workflow/contributing.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: F_CHALLENGES
     node_type: artifact
@@ -104,6 +128,10 @@ nodes:
     verified_at: 2026-07-25
     label: "architecture-challenges.md — retrato honesto: sinais do inbox sem mecanismo, federação formal 0 contratos vs co-evo ativa, gate SOFT persistente"
     trace: "docs/technical-context/04-workflow/architecture-challenges.md"
+    provenance:
+      source: "docs/technical-context/04-workflow/architecture-challenges.md"
+      locator: "docs/technical-context/04-workflow/architecture-challenges.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ---- CAMADAS (entity, layer: audit) ----
   - id: L1_CORE
@@ -116,6 +144,10 @@ nodes:
     verified_at: 2026-07-25
     label: "Camada 1 — Núcleo (01-core/): charter + índice de ADRs; escopo é o core, não um projeto-alvo"
     trace: "docs/technical-context/01-core/"
+    provenance:
+      source: "docs/technical-context/01-core/"
+      locator: "docs/technical-context/01-core/"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: L2_AICTX
     node_type: entity
@@ -127,6 +159,10 @@ nodes:
     verified_at: 2026-07-25
     label: "Camada 2 — AI-Context (02-ai-context/): guia de desenvolvimento p/ IA + guia de navegação do codebase"
     trace: "docs/technical-context/02-ai-context/"
+    provenance:
+      source: "docs/technical-context/02-ai-context/"
+      locator: "docs/technical-context/02-ai-context/"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: L3_DOMAIN
     node_type: entity
@@ -138,6 +174,10 @@ nodes:
     verified_at: 2026-07-25
     label: "Camada 3 — Domínio (03-domain/): business-logic; api-specification N/A (core não é app com API HTTP)"
     trace: "docs/technical-context/03-domain/"
+    provenance:
+      source: "docs/technical-context/03-domain/"
+      locator: "docs/technical-context/03-domain/"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: L4_WORKFLOW
     node_type: entity
@@ -149,6 +189,10 @@ nodes:
     verified_at: 2026-07-25
     label: "Camada 4 — Workflow (04-workflow/): contributing + architecture-challenges (o retrato honesto)"
     trace: "docs/technical-context/04-workflow/"
+    provenance:
+      source: "docs/technical-context/04-workflow/"
+      locator: "docs/technical-context/04-workflow/"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ---- SUBSISTEMAS-ÂNCORA (entity, layer: domain) ----
   - id: SUB_SDAAL
@@ -161,6 +205,10 @@ nodes:
     verified_at: 2026-07-25
     label: "SDAAL — abstração provider-agnóstica; instâncias reais task-manager (API-first) e forge (CLI-first); consumidor nunca chama provider direto"
     trace: "docs/meta-specs/integrations.md; .claude/utils/{task-manager,forge}/"
+    provenance:
+      source: "docs/meta-specs/integrations.md; .claude/utils/{task-manager,forge}/"
+      locator: "docs/meta-specs/integrations.md; .claude/utils/{task-manager,forge}/"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: SUB_KG
     node_type: entity
@@ -172,6 +220,10 @@ nodes:
     verified_at: 2026-07-25
     label: "KG SDAAL / kg-radar — 2 layers (audit epistêmica + domain SSOT durável); investigação nasce em .kg.yaml; radar determinístico soberano"
     trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md; .claude/validation/kg-radar.sh"
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md; .claude/validation/kg-radar.sh"
+      locator: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md; .claude/validation/kg-radar.sh"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: SUB_VALIDATION
     node_type: entity
@@ -183,6 +235,10 @@ nodes:
     verified_at: 2026-07-25
     label: "Validação — gate mecânico do dogfood: lint-artifacts.sh (**59 regras, 53 HARD/11 SOFT** — medido 2026-08-13; SSOT `.claude/validation/lint-rules.md`) + lint-selftest.sh + inventory.sh (SSOT gerada)"
     trace: ".claude/validation/; docs/onion/inventory.md; .claude/validation/lint-rules.md"
+    provenance:
+      source: ".claude/validation/; docs/onion/inventory.md; .claude/validation/lint-rules.md"
+      locator: ".claude/validation/; docs/onion/inventory.md; .claude/validation/lint-rules.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: SUB_COEVO
     node_type: entity
@@ -194,6 +250,10 @@ nodes:
     verified_at: 2026-07-25
     label: "Co-evolução/federação — tiers RFC-0003, invariante I3 (um escritor/repo, entrega-sem-commit), /meta:adopt never-clobber vendor-branch 3-way"
     trace: "docs/knowledge-base/concepts/onion-federation-and-adoption.md; .claude/utils/co-evolution/"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-federation-and-adoption.md; .claude/utils/co-evolution/"
+      locator: "docs/knowledge-base/concepts/onion-federation-and-adoption.md; .claude/utils/co-evolution/"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: SUB_PHASED
     node_type: entity

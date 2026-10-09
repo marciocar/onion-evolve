@@ -100,6 +100,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "FRONTEIRA HONESTA do mapa: LibreChat = face de CONSULTA/distribuicao/multiusuario (OIDC, ACL, RAG, artifacts); Claude Code/Bridge = face de EXECUCAO sobre o repo (filesystem, git, bash). Reimplementar bash/git via MCP para o LibreChat 'virar' Claude Code e NAO-VALE por construcao"
+    provenance:
+      source: "docs/evolution/research/librechat-2026-08/SYNTHESIS.md"
+      locator: "docs/evolution/research/librechat-2026-08/SYNTHESIS.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_TOP5_INTEGRACOES
     node_type: decision
     trace: docs/evolution/research/librechat-2026-08/SYNTHESIS.md
@@ -109,6 +113,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "Top-5 por valor: (1) skillSync.github->repo Onion [BAIXO] (2) agente Onion-KB com File Search das KBs [BAIXO/MEDIO] (3) MCP onion-kg read-only streamable-http [MEDIO, DESENHA] (4) Bridge-como-MCP = braco executor [MEDIO/ALTO] (5) 5-8 agentes-vitrine a mao [BAIXO] — NUNCA os 51 (sem import/export, Discussion #10019)"
+    provenance:
+      source: "docs/evolution/research/librechat-2026-08/SYNTHESIS.md"
+      locator: "docs/evolution/research/librechat-2026-08/SYNTHESIS.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_STACK_PADRAO_ONION_VPS
     node_type: decision
     trace: /home/marcio/onion-vps-librechat/docker-compose.yml

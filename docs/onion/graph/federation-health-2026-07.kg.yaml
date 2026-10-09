@@ -18,6 +18,10 @@ nodes:
     verified_at: 2026-07-18
     label: "onion-evolve (source/T0) — a fonte nao se carimba; sua versao E a HEAD do main"
     trace: "docs/evolution/federation/members.yaml:10"
+    provenance:
+      source: "docs/evolution/federation/members.yaml:10"
+      locator: "docs/evolution/federation/members.yaml:10"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_GRANAAI_PIN_UNTRUSTED
     node_type: claim
     layer: audit
@@ -58,6 +62,10 @@ nodes:
     verified_at: 2026-07-24
     label: "anuncios 07-18 (ingestor + write-kg) estao em STAGING p/ metagamify/pulse-mais/onion-mini — gerados, nao transportados (declarado != entregue)"
     trace: "docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutrina-granaai.md"
+    provenance:
+      source: "docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutrina-granaai.md"
+      locator: "docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutrina-granaai.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_ANNOUNCE_BACKLOG_RECONCILED
     node_type: evidence
     layer: audit
@@ -68,6 +76,10 @@ nodes:
     verified_at: 2026-07-24
     label: "reconciliado 2026-07-24: os 3 anuncios 07-18 estao TODOS em outbox/_processed dos 3 adotantes (transportados; o backlog era stale). E o Passo 2.1 (reconciliacao outbox×inbound, nascido do sinal multi-checkout 07-23) pegou um caso REAL: 5 anuncios metagamify (07-09/07-16) estavam transportados mas AUSENTES do inbound do checkout VPS — recuperados por re-entrega. Dogfood: o mecanismo de ontem achou a perda de hoje."
     trace: "docs/evolution/federation/outbox/metagamify/_processed"
+    provenance:
+      source: "docs/evolution/federation/outbox/metagamify/_processed"
+      locator: "docs/evolution/federation/outbox/metagamify/_processed"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_METAGAMIFY_PROD_UNCOMMITTED
     node_type: claim
     layer: audit
@@ -147,6 +159,10 @@ nodes:
     verified_at: 2026-07-24
     label: "F2 construida: /meta:personality-sync existe (RFC-0003 §2.4) e foi DOGFOODADO no core — .claude/identity/personality.md do onion-evolve gerado a partir de 74 migalhas do diario + git inicial + .onion-version, cada afirmacao ancorada ([[slug]]). O personality_summary do core deixou de ser seed manual. RESTA (por-instancia, gated na sessao de cada adotante): dos 7 adotantes, 6 seguem seed-manual datado + 1 (marcio-pessoal) gated/n-a — so viram emergentes quando cada um rodar o proprio sync."
     trace: ".claude/commands/meta/personality-sync.md"
+    provenance:
+      source: ".claude/commands/meta/personality-sync.md"
+      locator: ".claude/commands/meta/personality-sync.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_ADOPTER_PERSONALITY_SEEDS_PENDING
     node_type: claim
     layer: audit
@@ -172,6 +188,10 @@ nodes:
     verified_at: 2026-07-18
     label: "a ESTRUTURA da federacao (adopts/tier/trust/pin/lineage) ja e grafo: graph.sh --triples emite do members.yaml. A camada audit adiciona o eixo de VERIFICACAO, nao re-modela a estrutura"
     trace: ".claude/validation/graph.sh:76"
+    provenance:
+      source: ".claude/validation/graph.sh:76"
+      locator: ".claude/validation/graph.sh:76"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_FED_KG_AS_AUDIT_OVERLAY
     node_type: decision
     trace: docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md
@@ -182,6 +202,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-24
     label: "FINDING: a foto-da-federacao-KG e um overlay AUDIT de saude-de-verificacao + um radar de federacao (checks proprios) — NAO um domain-layer forcado (adopts/trust nao cabem nos 6 edge-types domain; nao inventar tipo antes da prova). IMPLEMENTADA: ADR + federation-radar.sh + este overlay .kg.yaml."
+    provenance:
+      source: "docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md"
+      locator: "docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_FED_RADAR_ABSENT
     node_type: claim
     layer: audit
@@ -201,6 +225,10 @@ nodes:
     verified_at: 2026-07-24
     label: "federation-radar.sh EXISTE e roda (exit 0, 2026-07-24), consolidando os 4 checks antes espalhados num veredito de ATENCAO: ① pin declarado!=verificado ② anuncio staging-nao-transportado ③ hub sem sub-adotado ④ linhagem sem pin. Construido conforme a decisao D_FED_KG_AS_AUDIT_OVERLAY (overlay KG + radar proprio, sem forcar domain-layer). O 'FALTA' era stale — o radar nasceu depois do baseline 07-18."
     trace: ".claude/validation/federation-radar.sh"
+    provenance:
+      source: ".claude/validation/federation-radar.sh"
+      locator: ".claude/validation/federation-radar.sh"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE
     node_type: evidence
     plane: DEV

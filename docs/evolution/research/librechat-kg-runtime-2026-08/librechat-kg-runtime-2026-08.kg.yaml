@@ -39,6 +39,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "READ-LEG (desenho): (a) as TOOLS MCP sao o read(KG) do agente — navegar/radar/consultar expostos pelo proprio MCP do dominio (a PoC ja tem; o onion-kg fara o mesmo p/ o core, F6.3); (b) as INSTRUCTIONS do agente carregam a disciplina read-first (consultar o grafo ANTES de responder estado, citar no/aresta, nunca inventar caminho de skill); (c) skill always-apply via skillSync e o transporte NATURAL da doutrina — o repo ja e fonte viva das skills"
+    provenance:
+      source: "docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md"
+      locator: "docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_WRITE_LEG_AS_PROPOSAL
     node_type: decision
     trace: docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md

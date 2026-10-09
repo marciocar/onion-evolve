@@ -225,6 +225,10 @@ nodes:
     status: confirmed
     label: "VEREDITO: #1 já servido (create-vertical existe — avisar o adotante + fechar F2 se pendente). Promover primeiro #2/#3/#5 (GAP + adotante topa tocar = prontidão máxima). #4 e #7 design de onboarding/gate. #6 wrapper fino sobre /meta:kg map. Quem decide números/ordem final = maestro"
     trace: "docs/evolution/inbox/_processed/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+      locator: "docs/evolution/inbox/_processed/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+      method: "derivado: trace do nó, sem registro de medição"
 edges:
   - from: E_create_vertical_existe
     to: C_p1_gerador_vertical

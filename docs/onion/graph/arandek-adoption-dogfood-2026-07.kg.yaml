@@ -14,6 +14,10 @@ nodes:
     status: confirmed
     label: "durable-commit quebra se o adotante ignora .claude/ INTEIRO no gitignore — git add respeita o ignore, superfície do framework + stamp nunca commitados"
     trace: ".claude/utils/adopt/durable-commit.sh (git add .claude)"
+    provenance:
+      source: ".claude/utils/adopt/durable-commit.sh (git add .claude)"
+      locator: ".claude/utils/adopt/durable-commit.sh (git add .claude)"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: C_V1
     node_type: claim
@@ -33,6 +37,10 @@ nodes:
     status: confirmed
     label: "regra de contagem (check_inventory_total_drift) não era adopter-aware — lia docs de PRODUTO do adotante como claim do inventário Onion"
     trace: ".claude/validation/lint-artifacts.sh inventory_scope_excluded"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh inventory_scope_excluded"
+      locator: ".claude/validation/lint-artifacts.sh inventory_scope_excluded"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: C_GAP1
     node_type: claim
@@ -52,6 +60,10 @@ nodes:
     verified_at: 2026-07-24
     label: "contagens stale na KB de identidade (97 comandos / 8 skills / 76 KBs) vs SSOT gerada (99/51/10/86) — KB violando a própria nota anti-redrift"
     trace: "docs/knowledge-base/meta/onion-framework-identity.md"
+    provenance:
+      source: "docs/knowledge-base/meta/onion-framework-identity.md"
+      locator: "docs/knowledge-base/meta/onion-framework-identity.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: C_D2
     node_type: claim
@@ -70,6 +82,10 @@ nodes:
     status: confirmed
     label: "o passo cp .env.example .env do relatório não funciona (adapter lê ambiente) e pode VIOLAR a convenção do alvo (arandek proíbe .env solto)"
     trace: ".claude/commands/meta/adopt.md Fase 4"
+    provenance:
+      source: ".claude/commands/meta/adopt.md Fase 4"
+      locator: ".claude/commands/meta/adopt.md Fase 4"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: C_D1
     node_type: claim
@@ -79,6 +95,10 @@ nodes:
     status: confirmed
     label: "mapa explícito de contexto era CÓDIGO MORTO — a adoção cria docs/*-context/, o layout padrão casava antes, e o adotante com SSOT próprio nunca conseguia declará-lo"
     trace: ".claude/skills/onion-engineering-context/SKILL.md:73"
+    provenance:
+      source: ".claude/skills/onion-engineering-context/SKILL.md:73"
+      locator: ".claude/skills/onion-engineering-context/SKILL.md:73"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: C_STALE
     node_type: claim
@@ -88,6 +108,10 @@ nodes:
     status: confirmed
     label: "teste adopted-role/link-guard reprovava — anterior à REGRA 45, assumia core-only pulado em silêncio; falha PRÉ-EXISTENTE (reproduz no main), não regressão"
     trace: ".claude/validation/lint-selftest.sh run_adopted_role_selftests"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh run_adopted_role_selftests"
+      locator: ".claude/validation/lint-selftest.sh run_adopted_role_selftests"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_GAP2_ZERO
     node_type: evidence
@@ -117,6 +141,10 @@ nodes:
     status: confirmed
     label: "leitura direta: check_plugins_sync (linha 438) e check_role_bundle_sync (linha 542) já retornam 0 para role adopted — adotante NÃO vendoriza plugins por design"
     trace: ".claude/validation/lint-artifacts.sh:438,542"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh:438,542"
+      locator: ".claude/validation/lint-artifacts.sh:438,542"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_V1_COMMITS
     node_type: evidence
@@ -137,6 +165,10 @@ nodes:
     verified_at: 2026-07-24
     label: "docs/onion/inventory.md (SSOT gerada do filesystem no pin 5e3ee) = 99/51/10/86; a KB afirmava 97/8/76"
     trace: "docs/onion/inventory.md"
+    provenance:
+      source: "docs/onion/inventory.md"
+      locator: "docs/onion/inventory.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_D2_SRC
     node_type: evidence
@@ -146,6 +178,10 @@ nodes:
     status: confirmed
     label: "settings.json:26 usa 'test -f .env && grep .env'; detector.md:46 usa process.env.TASK_MANAGER_PROVIDER — nada carrega o .env para o ambiente"
     trace: ".claude/settings.json:26; detector.md:46"
+    provenance:
+      source: ".claude/settings.json:26; detector.md:46"
+      locator: ".claude/settings.json:26; detector.md:46"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_D1_L73
     node_type: evidence
@@ -155,6 +191,10 @@ nodes:
     status: confirmed
     label: "SKILL.md:73 crava 'docs/technical-context/ completo supera o mapa explícito'; a Fase 3 do adopt.md CRIA os 3 *-context/ → item 1 sempre casa antes"
     trace: ".claude/skills/onion-engineering-context/SKILL.md:73; adopt.md Fase 3"
+    provenance:
+      source: ".claude/skills/onion-engineering-context/SKILL.md:73; adopt.md Fase 3"
+      locator: ".claude/skills/onion-engineering-context/SKILL.md:73; adopt.md Fase 3"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_STALE_R45
     node_type: evidence
@@ -174,6 +214,10 @@ nodes:
     verified_at: 2026-07-24
     label: "selftest completo do core: 465 passaram, 0 falharam (inclui os novos scope-gitignore/inventory-adopter-scope/task-manager-hook)"
     trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: ".claude/validation/lint-selftest.sh"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_CI
     node_type: evidence

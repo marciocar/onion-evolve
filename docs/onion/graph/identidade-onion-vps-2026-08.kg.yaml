@@ -286,6 +286,10 @@ nodes:
     confidence: 0.9
     label: "CORRECAO DE ENQUADRAMENTO FEITA PELO MAESTRO, e ela muda a conclusao. Eu havia tratado o Sourcegraph como analogia distante ('grafo de codigo vs grafo de conhecimento, outra coisa'). O maestro corrigiu: o Onion tambem ORIENTA DESENVOLVIMENTO — tem technical-context, C4, `/engineer/*`, revisao diff-scoped — logo ferramenta de inteligencia de codigo e PEER, nao metafora. Sob esse eixo: a busca por grep/read do Onion NAO E ATRASO, e a escolha que o mercado convergiu. Em maio/2025 a Anthropic REMOVEU o RAG vetorial do Claude Code (embeddings, DB vetorial, chunking) por busca agentica pura — 'outperformed everything, by a lot'; Cursor contratou os engenheiros da decisao; Windsurf, Cline, Devin e o PROPRIO Amp do Sourcegraph tambem abandonaram vetores. LICAO CARA DO SOURCEGRAPH: nao construir indexador proprio — cada indexador SCIP e um projeto de tooling de compilador a parte, e o `search-based` sobreviveu ao `precise` justamente por ser COBERTURA UNIVERSAL COM CUSTO ZERO DE MANUTENCAO."
     trace: "https://sourcegraph.com/blog/context-engineering"
+    provenance:
+      source: "https://sourcegraph.com/blog/context-engineering"
+      locator: "https://sourcegraph.com/blog/context-engineering"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: Q_LACUNA_DECISAO_MAIS_CODIGO
     node_type: question

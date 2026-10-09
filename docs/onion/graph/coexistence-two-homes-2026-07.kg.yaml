@@ -43,6 +43,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: "origin (GitHub) = fonte unica; Avell e VPS sao clones; git e o elo (o link entre as duas casas)"
+    provenance:
+      source: ".claude/diary/2026-07-16-two-homes-origin-and-coexistence.md"
+      locator: ".claude/diary/2026-07-16-two-homes-origin-and-coexistence.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_VPS_PRIMARY
     node_type: decision
     trace: .claude/diary/2026-07-16-two-homes-origin-and-coexistence.md
@@ -52,6 +56,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: "papeis assimetricos (escolha do maestro): VPS primaria always-on + Avell workstation movel"
+    provenance:
+      source: ".claude/diary/2026-07-16-two-homes-origin-and-coexistence.md"
+      locator: ".claude/diary/2026-07-16-two-homes-origin-and-coexistence.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: Q_MEMORY_COEXIST
     node_type: question
     layer: audit
@@ -93,6 +101,10 @@ nodes:
     status: confirmed
     label: "lente Hegel: KG vale quando o conhecimento deixa de ser monotonico; 20 memorias estaveis ABAIXO do limiar (memoria-KG = over-engineering); o DESIGN da coexistencia ACIMA (este KG vale a pena)"
     trace: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md"
+    provenance:
+      source: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md"
+      locator: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_MEMORY_VERDICT
     node_type: decision
     layer: audit

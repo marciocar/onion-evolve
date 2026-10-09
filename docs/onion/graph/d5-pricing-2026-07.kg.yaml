@@ -180,6 +180,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "Diretriz D5 (rege todos os degraus): ticket PREMIUM ($129+) > pipoca ($5-10) p/ maestro solo; vender SELO/curadoria/serviço, não o texto; preço-por-outcome SÓ depois de instrumentar (metrics.md). Nenhum degrau vira faixa-volume/pipoca"
+    provenance:
+      source: "docs/business-context/decisions.md"
+      locator: "docs/business-context/decisions.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_maestro_d5_ratify_20260729
     node_type: evidence
@@ -191,6 +195,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-29
     label: "Maestro ratificou 2026-07-29 (parcial): degrau 1 treino = TESTAR 2-3 pontos ($1.8-3k/dia) antes de fixar (preço-por-descoberta); degrau 2 cert = só inicial ~$1.250, renovação gated no diretório público; degraus 3-4 seguem sob-consulta/gated (D6/D2); INSTRUMENTAÇÃO autorizada (scanner STATE.md + JSONL context-freshness). Aplicado em decisions.md"
+    provenance:
+      source: "docs/business-context/decisions.md"
+      locator: "docs/business-context/decisions.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
 edges:
   # ratificação parcial do maestro (2026-07-29) SUPPORTS a decisão central D5

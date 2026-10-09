@@ -242,7 +242,6 @@
       "form.required.node.provenance"
     ],
     "docs/onion/graph/doctrine-behavior-over-declaration-2026-07.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.meta.title"
     ],
     "docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml": [
@@ -294,9 +293,6 @@
     "docs/onion/graph/inference-contract-audit-2026-07.kg.yaml": [
       "form.required.node.provenance",
       "form.unknown-key.meta.title"
-    ],
-    "docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml": [
-      "form.required.node.provenance"
     ],
     "docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml": [
       "form.required.node.provenance"

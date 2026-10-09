@@ -129,6 +129,10 @@ nodes:
     status: confirmed
     label: "RFC-0005 rejeita branch-como-escopo; branch permanece no eixo versao"
     trace: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+    provenance:
+      source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+      locator: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_PARECER_2LINEAGE
     node_type: claim
     layer: audit
@@ -138,6 +142,10 @@ nodes:
     status: confirmed
     label: "parecer 03/07 propos 2 linhagens framework-develop x production-rhilomain; main-produto fora do mapa"
     trace: "docs/analysis/onion-parecer-rhilo-lineages-2026-07.md"
+    provenance:
+      source: "docs/analysis/onion-parecer-rhilo-lineages-2026-07.md"
+      locator: "docs/analysis/onion-parecer-rhilo-lineages-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_SIGNAL_DISJOINT
     node_type: claim
     layer: audit
@@ -187,6 +195,10 @@ nodes:
     status: superseded
     label: "business-context e technical-context vazios (so README) - greenfield"
     trace: "docs/business-context/ docs/technical-context/"
+    provenance:
+      source: "docs/business-context/ docs/technical-context/"
+      locator: "docs/business-context/ docs/technical-context/"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_KG_MATURE
     node_type: claim
     layer: audit
@@ -197,6 +209,10 @@ nodes:
     label: "KG SDAAL (meta:kg + kg-radar.sh) ja dogfoodado em producao; e a tecnica de reconciliacao"
     trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
     verified_at: 2026-07-17
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      locator: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_HEGEL_CRITERION
     node_type: claim
     layer: audit
@@ -272,6 +288,10 @@ nodes:
     label: "CLAUDE.md declara a identidade canonica (2026-05-18)"
     trace: "CLAUDE.md"
     verified_at: 2026-07-17
+    provenance:
+      source: "CLAUDE.md"
+      locator: "CLAUDE.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_RFC5_TEXT
     node_type: evidence
     layer: audit
@@ -281,6 +301,10 @@ nodes:
     status: confirmed
     label: "RFC-0005: branch-para-escopo rejeitado; versao x escopo sao eixos separados"
     trace: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+    provenance:
+      source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+      locator: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:22"
+      method: "derivado: trace do nó, sem registro de medição"
   # ==== camada F2 (pesquisa densa 2026-07-11, verificada adversarialmente) ====
   # -- evidencias PROD --
   - id: E_DOGFOOD_BUGS
@@ -684,6 +708,10 @@ nodes:
     label: "business-context deixou de ser vazio (11 arquivos desde 13/07); technical-context segue so README — greenfield parcial, nao total"
     trace: "docs/business-context/ x docs/technical-context/"
     verified_at: 2026-07-17
+    provenance:
+      source: "docs/business-context/ x docs/technical-context/"
+      locator: "docs/business-context/ x docs/technical-context/"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: Q_COLD_ADOPTER_0717
     node_type: question
     layer: audit

@@ -16,6 +16,10 @@ nodes:
     verified_at: 2026-07-18
     label: "granaai tem can_correct_to onion-evolve (elevado por rigor comprovado) — autoriza a absorcao da correcao dele"
     trace: "docs/evolution/federation/members.yaml:154"
+    provenance:
+      source: "docs/evolution/federation/members.yaml:154"
+      locator: "docs/evolution/federation/members.yaml:154"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_S1
     node_type: evidence
     layer: audit
@@ -26,6 +30,10 @@ nodes:
     verified_at: 2026-07-18
     label: "granaai: .kg.yaml de 107 nos selou verde na integridade com TRACES_TO 0/10 — breadcrumbs orfaos"
     trace: "granaai:docs/evolution/inbox/_processed/2026-07-17-redogfood-kg-sdaal-validation-gaps.md"
+    provenance:
+      source: "granaai:docs/evolution/inbox/_processed/2026-07-17-redogfood-kg-sdaal-validation-gaps.md"
+      locator: "granaai:docs/evolution/inbox/_processed/2026-07-17-redogfood-kg-sdaal-validation-gaps.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_S3
     node_type: evidence
     layer: audit
@@ -36,6 +44,10 @@ nodes:
     verified_at: 2026-07-18
     label: "granaai: o fix do radar soberano nao alcancou o kg-validate-v2.py local (gramatica divergente) — falso-verde voltou pela porta do validador duplicado"
     trace: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"
+    provenance:
+      source: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"
+      locator: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_S2
     node_type: evidence
     layer: audit
@@ -46,6 +58,10 @@ nodes:
     verified_at: 2026-07-18
     label: "granaai: radar dava verde (exit 0) em grafo com 0 nos parseados — nao ha contradicao em conjunto vazio"
     trace: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md"
+    provenance:
+      source: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md"
+      locator: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_S4
     node_type: evidence
     layer: audit
@@ -56,6 +72,10 @@ nodes:
     verified_at: 2026-07-18
     label: "granaai: canonicalizou monorepo NX (45 apps, 453 libs) em .kg.yaml valido via 5 scanners paralelos"
     trace: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-discovery-granaai-canonical-monorepo.md"
+    provenance:
+      source: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-discovery-granaai-canonical-monorepo.md"
+      locator: "granaai:docs/evolution/inbox/_processed/2026-07-17-kg-discovery-granaai-canonical-monorepo.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_S1
     node_type: claim
     layer: audit
@@ -113,6 +133,10 @@ nodes:
     verified_at: 2026-07-18
     label: "ABSORVER: S1 e S3a viram nota de doutrina no KB canonico (credito granaai, arquivo:linha) — o core passa a carregar a doutrina"
     trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      locator: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_BACKLOG
     node_type: decision
     layer: audit
@@ -123,6 +147,10 @@ nodes:
     verified_at: 2026-07-18
     label: "BACKLOG: S3b (--update regenera inventory) e S4 (map projeto) sao feature/fix, nao doutrina — entram no ciclo de engenharia"
     trace: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md"
+    provenance:
+      source: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md"
+      locator: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_S2_ABSORBED
     node_type: decision
     layer: audit
@@ -133,6 +161,10 @@ nodes:
     verified_at: 2026-07-17
     label: "JA ABSORVIDO: fail-open consertado — radar reprova grafo ilegivel (0 nos = exit 1 antes de opinar); LISTA eh a gramatica canonica"
     trace: ".claude/validation/kg-radar.sh:120"
+    provenance:
+      source: ".claude/validation/kg-radar.sh:120"
+      locator: ".claude/validation/kg-radar.sh:120"
+      method: "derivado: trace do nó, sem registro de medição"
 edges:
   - from: E_S1
     to: C_S1

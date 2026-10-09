@@ -25,6 +25,10 @@ nodes:
     verified_at: 2026-07-18
     label: "diary/export-sharable/co-relay/a2a-live construidos; personality-sync F2, synthesize-collective F4, SUPERSEDES RFC-0005 F3 todos gated; agregador-que-ingere-com-politica nomeado sem comando"
     trace: "docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md"
+    provenance:
+      source: "docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md"
+      locator: "docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_FIELD_SEAM
     node_type: claim
     layer: audit
@@ -44,6 +48,10 @@ nodes:
     verified_at: 2026-07-18
     label: "deep-research (skill do harness) despeja em /tmp efemero e nao persiste no KG-SSOT — write(KG) depende de lembrar (semente + desbloqueio do onion-pessoal)"
     trace: "docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md"
+      locator: "docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_GRANAAI_DOCTRINE
     node_type: evidence
     layer: audit
@@ -54,6 +62,10 @@ nodes:
     verified_at: 2026-07-18
     label: "granaai entregou 4 sinais de doutrina ao core: integridade-nao-eh-rastreabilidade (TRACES_TO), fail-open do radar, validador-local-delega-radar, formalizar /meta:kg map"
     trace: "/home/marcio/granaai/docs/evolution/inbox/_processed/"
+    provenance:
+      source: "/home/marcio/granaai/docs/evolution/inbox/_processed/"
+      locator: "/home/marcio/granaai/docs/evolution/inbox/_processed/"
+      method: "testemunho: leitura do arquivo /home/marcio/granaai/docs/evolution/inbox/_processed/ no host; trace do nó, sem registro de medição"
   - id: E_PESSOAL_LIFEKG
     node_type: evidence
     layer: audit
@@ -64,6 +76,10 @@ nodes:
     verified_at: 2026-07-18
     label: "onion-pessoal adota o METODO (nao vendoriza .claude): a raiz E o KG (marcio-*-f0.kg.yaml) com planes DEV/PROD, SUPERSEDES/Aufhebung e exit 1 honesto (contradicao viva)"
     trace: "docs/evolution/federation/members.yaml:185"
+    provenance:
+      source: "docs/evolution/federation/members.yaml:185"
+      locator: "docs/evolution/federation/members.yaml:185"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_FASE1_WRITEKG
     node_type: decision
     layer: audit
@@ -74,6 +90,10 @@ nodes:
     verified_at: 2026-07-18
     label: "Fase 1: write(KG) vira passo de fechamento da orquestracao (passo 7 da skill + Passo 4.5 do comando) — bookend simetrico do read(KG), mecanismo nao conselho"
     trace: ".claude/skills/onion-orchestration/SKILL.md"
+    provenance:
+      source: ".claude/skills/onion-orchestration/SKILL.md"
+      locator: ".claude/skills/onion-orchestration/SKILL.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_FED_AS_KG
     node_type: claim
     layer: audit

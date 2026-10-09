@@ -106,6 +106,10 @@ nodes:
     verified_at: 2026-07-18
     label: "DOUTRINA (KB onion-perception-instruments): instrumentos = pernas read+verify; breadcrumbs = perna write. 3 generos por objeto + 4 papeis + 3 fontes + veredito/frescor transversais + unidade=check"
     trace: "docs/knowledge-base/concepts/onion-perception-instruments.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
+      locator: "docs/knowledge-base/concepts/onion-perception-instruments.md"
+      method: "derivado: trace do nó, sem registro de medição"
 edges:
   - from: E_FABLE_REVIEW
     to: C_4_ROLES

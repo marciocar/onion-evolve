@@ -26,6 +26,10 @@ nodes:
     verified_at: 2026-07-17
     label: "adopt --update clobra adotante stale-stampado (3 bugs: pin-canario, fallback HEAD, stamp branch errada) — triado #410"
     trace: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md"
+    provenance:
+      source: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md"
+      locator: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_IDENTITY_DRIFT
     node_type: claim
     layer: audit
@@ -36,6 +40,10 @@ nodes:
     verified_at: 2026-07-18
     label: "KB de identidade citava contagens driftadas da SSOT gerada (5 skills vs 8, 82/87 vs 97, 8 vs 10 dims) — resync #412 preservando narrativas historicas"
     trace: "docs/knowledge-base/meta/onion-framework-identity.md"
+    provenance:
+      source: "docs/knowledge-base/meta/onion-framework-identity.md"
+      locator: "docs/knowledge-base/meta/onion-framework-identity.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_SOFTPASS_GAP
     node_type: claim
     layer: audit
@@ -55,6 +63,10 @@ nodes:
     verified_at: 2026-07-18
     label: "evolve audit 10-D (13 agentes): 6 achados sobreviveram, 2 refutados pelo juiz opus — executados em #411/#412/#413"
     trace: "docs/analysis/onion-evolution-2026-07-17.md"
+    provenance:
+      source: "docs/analysis/onion-evolution-2026-07-17.md"
+      locator: "docs/analysis/onion-evolution-2026-07-17.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_D1_WEIGHT
     node_type: claim
     layer: audit
@@ -154,6 +166,10 @@ nodes:
     verified_at: 2026-08-03
     label: "CAUSA-RAIZ: o secret ANTHROPIC_API_KEY nao autenticava. A action NAO REPASSA o 401 — pendura ~180s e devolve is_error sem mensagem, entregando erro de auth vestido de timeout"
     trace: "docs/analysis/onion-guardas-mapa-2026-08.md §3.3"
+    provenance:
+      source: "docs/analysis/onion-guardas-mapa-2026-08.md §3.3"
+      locator: "docs/analysis/onion-guardas-mapa-2026-08.md §3.3"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_KEY_SWAP_CURED
     node_type: evidence
     layer: audit
@@ -174,6 +190,10 @@ nodes:
     verified_at: 2026-08-03
     label: "MEDIR CERTO E INFERIR ERRADO e modo de falha distinto de medir errado, e mais perigoso: TRES rodadas descartaram credencial por '401 e instantaneo, isto pendura 180s' — premissas verdadeiras, terceira premissa (a action repassaria o 401) NUNCA testada"
     trace: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
+    provenance:
+      source: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
+      locator: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_TRANSITORY
     node_type: claim
     layer: audit
@@ -228,6 +248,10 @@ nodes:
     status: confirmed
     label: "METODO: veredito de revisor/juiz/sinal e HIPOTESE — verificar com evidencia de 1a mao antes de agir. Produziu as 4 refutacoes desta sessao (D1, item6, modelo, generator-local)"
     trace: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
+      locator: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
+      method: "derivado: trace do nó, sem registro de medição"
 edges:
   - from: E_ADOPT_SIGNAL
     to: C_DECLARED_VERIFIED

@@ -83,6 +83,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "CRIAR um repo framework-bearing p/ cliente (greenfield) — source instala o framework num alvo vazio → standalone/hub em potencial"
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: ".claude/commands/meta/adopt.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: TX_adopt
     node_type: decision
     trace: .claude/commands/meta/adopt.md
@@ -92,6 +96,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "ADOTAR um projeto no Onion — source OU hub instala a superficie vendorizada num alvo → consumer (cp+config+stamp, never-clobber, faseado)"
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: ".claude/commands/meta/adopt.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: TX_promote_hub
     node_type: decision
     trace: .claude/commands/meta/adopt.md
@@ -101,6 +109,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "PROMOVER a hub (/meta:adopt --promote-hub) — re-carimba adopted→hub, deliberado; abre a Camada 2 (a empresa passa a adotar os proprios projetos). FED-3-1 preservado"
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: ".claude/commands/meta/adopt.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: TX_update
     node_type: decision
     trace: .claude/commands/meta/adopt.md
@@ -110,6 +122,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "ATUALIZAR um repo adotado (/meta:adopt --update) — traz o delta do framework via merge de vendor-branch + re-config + re-stamp; idempotente"
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: ".claude/commands/meta/adopt.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: TX_invite
     node_type: decision
     trace: .claude/utils/adopt/invite-collaborator.sh
@@ -119,6 +135,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "CONVIDAR colaborador (invite-collaborator.sh) — dono adiciona o cliente ao repo (permissao write); dry-run-first, o convidado precisa aceitar"
+    provenance:
+      source: ".claude/utils/adopt/invite-collaborator.sh"
+      locator: ".claude/utils/adopt/invite-collaborator.sh"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: TX_transfer
     node_type: decision
     trace: .claude/utils/adopt/transfer-ownership.sh
@@ -128,6 +148,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "TRANSFERIR posse (transfer-ownership.sh) — passa o repo ao cliente; posse singular (ex-dono vira colaborador via convite), URL redireciona, destino aceita"
+    provenance:
+      source: ".claude/utils/adopt/transfer-ownership.sh"
+      locator: ".claude/utils/adopt/transfer-ownership.sh"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: TX_decouple
     node_type: decision
     trace: .claude/utils/adopt/decouple-source.sh
@@ -137,6 +161,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "DESACOPLAR (decouple-source.sh) — um adotado/hub vira fonte-soberana propria (role: source + decoupled_from, own T0, autora o proprio framework, corta o --update do core)"
+    provenance:
+      source: ".claude/utils/adopt/decouple-source.sh"
+      locator: ".claude/utils/adopt/decouple-source.sh"
+      method: "derivado: trace do nó, sem registro de medição"
 
 edges:
   # source e a origem: cria, adota, atualiza; o distilled deriva dele

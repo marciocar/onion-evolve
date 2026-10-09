@@ -59,6 +59,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "messaging-framework.md DEFINITIVO p/ mini/standalone/hub (deixa de ser stub); linha leiga P6 segue bloqueada (D3)"
+    provenance:
+      source: "docs/business-context/04-operations/messaging-framework.md"
+      locator: "docs/business-context/04-operations/messaging-framework.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_DOOR_TWEAKS
     node_type: decision
     layer: audit
