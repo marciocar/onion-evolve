@@ -498,6 +498,14 @@
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2 — PROVA NOVA no P0.6: a semântica de cgroup_parent DEPENDE do cgroup driver do docker. MEDIDO hoje: driver = systemd (h |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
+## contrato-kg-absorcao-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 16.2 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
+| 7.2 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
+| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
+
 ## m3-federation-admin-2026-07 — 11 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -534,14 +542,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 15.0 | `Q_REVISOR_SEM_SALDO_DERRUBA_TODO_PR` | review-gate-saldo-2026-09 | enquanto a conta de API do CI estiver sem saldo, TODO PR deste repo mergeia por dispensa em vez de aprovacao — o gate semantico  |
-
-## contrato-kg-absorcao-2026-10 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 14.4 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
-| 7.2 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
-| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
 ## radar-E3-2026-10-03-r6 — 5 item(ns)
 
