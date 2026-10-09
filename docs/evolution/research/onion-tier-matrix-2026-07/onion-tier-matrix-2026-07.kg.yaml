@@ -20,6 +20,7 @@ nodes:
       source: ".claude/utils/marketplace/roles.yaml@9ed41811"
       locator: "l.20-21 (hub base/optional) × l.24-25 (standalone base/optional)"
       method: "leitura: git show 9ed41811:.claude/utils/marketplace/roles.yaml"
+      locality: "repo"
   - id: E_DEADREF
     node_type: evidence
     layer: audit
@@ -33,6 +34,7 @@ nodes:
       source: ".claude/commands/engineer/work.md@9ed41811 + .claude/utils/marketplace/verticals/onion-engineering.manifest.sh@9ed41811"
       locator: "work.md l.24 (passo 0 roda bash .claude/validation/kg-radar.sh) + manifest l.31 VALIDATION=()"
       method: "leitura: git show 9ed41811 dos dois arquivos"
+      locality: "repo"
   - id: E_ANTHROPIC_JOINT
     node_type: evidence
     layer: audit
@@ -46,6 +48,7 @@ nodes:
       source: "https://support.claude.com/en/articles/13837433 + https://support.claude.com/en/articles/12512176"
       locator: "13837433 \"Manage plugins for your organization\": \"Plugin marketplaces let Team and Enterprise plan owners distribute curated plugins\" + acesso por grupo; 12512176: \"Skills are available for users on Free, Pro, Max, Team, and Enterprise plans\""
       method: "leitura: artigos de suporte da Anthropic (lidos 2026-10-09)"
+      locality: "web"
   - id: E_LAND_EXPAND
     node_type: evidence
     layer: audit
@@ -69,6 +72,7 @@ nodes:
       source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
       locator: "§Veredito central l.21-34 (motor roles.yaml:20-25 + doutrina D4 + mercado Anthropic/Datadog)"
       method: "derivado: síntese da pesquisa wf_ab57a814-c16 a partir de E_BASE_IDENTICAL, E_ANTHROPIC_JOINT e E_LAND_EXPAND"
+      locality: "repo"
   - id: C_MATRIX_GAP
     node_type: claim
     layer: audit
@@ -95,6 +99,7 @@ nodes:
       source: "docs/knowledge-base/concepts/public-door-vs-private-core.md@9ed41811 + docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md@9ed41811"
       locator: "KB l.91-92 (\"Os .kg.yaml do core ... são privados e não viajam ... Um door que investigue gera os seus .kg.yaml locais\"); SYNTHESIS l.75-77 (viaja o script, nunca o dado) e l.92-93 (kg.md:60-61 escopado à Federação)"
       method: "leitura: KB de porta pública × core privado e síntese no commit da pesquisa"
+      locality: "repo"
   - id: C_STD_MOAT_NOT_REVENUE
     node_type: claim
     layer: audit
@@ -108,6 +113,7 @@ nodes:
       source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
       locator: "§Recorte do funil l.61 (\"É MOAT/advocacy, não funil de receita (D5: solo não sustenta volume)\")"
       method: "derivado: síntese da pesquisa wf_ab57a814-c16 (frente business/funil)"
+      locality: "repo"
   # --- decisões ---
   - id: D_ADOPT_REFRAME
     node_type: decision
@@ -124,6 +130,7 @@ nodes:
       source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: D_KGRADAR_FIX_NONGATED
     node_type: decision
     layer: audit
@@ -177,6 +184,7 @@ nodes:
       source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
       locator: "§\"Mas: a matriz está estruturalmente incompleta\" l.44 (\"Contagem: são 16 work-tools (não ~17). Reconciliar.\")"
       method: "leitura: síntese da pesquisa wf_ab57a814-c16"
+      locality: "repo"
 edges:
   - from: E_BASE_IDENTICAL
     to: C_REFRAME_SUSTAINED

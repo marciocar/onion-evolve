@@ -36,6 +36,7 @@ nodes:
       source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md:431"
       locator: "repo-HEAD-5c6e2cf"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_write_leg_only
     node_type: evidence
@@ -51,6 +52,7 @@ nodes:
       source: "0e520d51:.claude/validation/lint-artifacts.sh"
       locator: "0e520d51 (main antes do PR #510, 2026-08-01 21:09 -0300): .claude/validation/lint-artifacts.sh cabecalhos REGRA 26/29/31/32/41/42/43/47; .claude/hooks/ (5 scripts); CLAUDE.md; docs/knowledge-base/concepts/knowledge-graph-sdaal.md l.441-449"
       method: "leitura: arvore de 0e520d51 (HEAD 5c6e2cf citado na SYNTHESIS nao existe mais no repo)"
+      locality: "repo"
 
   - id: E_cost_is_not_the_barrier
     node_type: evidence
@@ -66,6 +68,7 @@ nodes:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
       locator: "medicao-direta-VPS"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_timing_hypothesis
     node_type: claim
@@ -89,6 +92,7 @@ nodes:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
       locator: "_processed/2026-07-16-ssot-como-runtime-para-adr.md"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_glob_blind_36pct
     node_type: evidence
@@ -104,6 +108,7 @@ nodes:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
       locator: "execucao-verbatim-do-glob-no-HEAD"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_replay_scoreboard
     node_type: evidence
@@ -119,6 +124,7 @@ nodes:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
       locator: "elenxo-14-workers-wf_38afb1f2-ee7"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_claude_md_has_control
     node_type: evidence
@@ -134,6 +140,7 @@ nodes:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
       locator: "CLAUDE.md-git-blame"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ammunition_not_trigger
     node_type: evidence
@@ -149,6 +156,7 @@ nodes:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
       locator: "replay-corpus-9-casos"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_residue_is_the_property
     node_type: claim
@@ -173,6 +181,7 @@ nodes:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
       locator: "elenxo-wf_38afb1f2-ee7"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_fix_glob_not_a_cure
     node_type: decision

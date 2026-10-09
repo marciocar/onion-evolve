@@ -65,6 +65,7 @@ nodes:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "QUOTE: 'On another of your machines | Through Anthropic servers, arriving over that machine's [Remote Control](/docs/en/remote-control) connection' — locator: Message sessions on other machines, tabela de transporte — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_XSESSION_REACH_OWN_SESSIONS_ONLY
     node_type: evidence
@@ -82,6 +83,7 @@ nodes:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "QUOTE: 'Your Remote Control sessions on other machines**: shown while this session is connected to [Remote Control](/docs/en/remote-control), and labeled `Remote Control`.' — locator: See which sessions Claude can reach, lista de linhas — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_XSESSION_NO_RC_MEANS_NO_REPLY_ADDRESS
     node_type: evidence
@@ -99,6 +101,7 @@ nodes:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "QUOTE: 'If this session isn't connected to Remote Control when Claude sends to a session beyond this machine, the message still goes through, but without a [reply address](#what-a-message-looks-like), so the receiving Claude can't answer it.' — locator: Message sessions on other machines, parágrafo após a lista de condições — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_XSESSION_DEFAULT_HOLDS_WHEN_RECEIVER_BYPASSES
     node_type: evidence
@@ -116,6 +119,7 @@ nodes:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "QUOTE: 'The receiving session bypasses permission prompts**: Claude Code holds each message for your approval. It delivers one only when the sending session identifies itself as also bypassing.' — locator: Control inbound messages, lista do default; Non-interactive sessions — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_XSESSION_ISOLATE_PEER_MACHINES_OUTBOUND_GATE
     node_type: evidence
@@ -133,6 +137,7 @@ nodes:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "QUOTE: 'Claude Code asks for your approval before Claude's message to a session beyond this machine leaves, even in `bypassPermissions` mode, which skips ordinary permission prompts.' — locator: Require approval for cross-machine messages — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── CLAUDE CODE · Remote Control ──────────────────────────────────────────────────────────
   - id: E_CC_RC_REQUIRES_CLAUDEAI_SUBSCRIPTION
@@ -151,6 +156,7 @@ nodes:
       source: "https://code.claude.com/docs/en/remote-control"
       locator: "QUOTE: 'available on Pro, Max, Team, and Enterprise plans. API keys are not supported. On Team and Enterprise, an Owner must first enable the Remote Control toggle in' — locator: Requirements, bullet Subscription (l.28); login claude.ai no bullet Authentication (l.29) e Troubleshooting (l.457) — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_RC_AUTOCONNECT_OWN_ACCOUNT_ONLY
     node_type: evidence
@@ -168,6 +174,7 @@ nodes:
       source: "https://code.claude.com/docs/en/remote-control"
       locator: "QUOTE: 'Auto-connect signs in with your own claude.ai account, so a session it starts appears only in your own account's Claude apps and grants no one else access.' — locator: Enable Remote Control for all sessions (l.199) — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_RC_TRUSTED_DEVICES_BINDING
     node_type: evidence
@@ -185,6 +192,7 @@ nodes:
       source: "https://code.claude.com/docs/en/remote-control"
       locator: "QUOTE: 'It ties Remote Control access to a known device and a recent authentication, not just a signed-in account.' — locator: Trusted Devices (l.237) — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_RC_OUTBOUND_HTTPS_TRANSCRIPT_STORED
     node_type: evidence
@@ -202,6 +210,7 @@ nodes:
       source: "https://code.claude.com/docs/en/remote-control"
       locator: "QUOTE: 'Your local Claude Code session makes outbound HTTPS requests only and never opens inbound ports on your machine.' — locator: Connection and security, parágrafo 1 (l.221); armazenamento da transcrição no parágrafo 3 (l.225) — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_RC_UNAVAILABLE_UNDER_ZDR_HIPAA
     node_type: evidence
@@ -219,6 +228,7 @@ nodes:
       source: "https://code.claude.com/docs/en/remote-control"
       locator: "QUOTE: 'Organizations with Zero Data Retention enabled, or with the HIPAA configuration applied, can't enable Remote Control.' — locator: Connection and security, último parágrafo (l.227) — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── CLAUDE CODE · Channels ────────────────────────────────────────────────────────────────
   - id: E_CC_CHANNELS_RESEARCH_PREVIEW
@@ -237,6 +247,7 @@ nodes:
       source: "https://code.claude.com/docs/en/channels"
       locator: "QUOTE: 'Channels are a research preview feature. Availability is rolling out gradually, and the `--channels` flag syntax and protocol contract may change based on feedback.' — locator: channels, seção Research preview, par. 1 — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_CHANNELS_DEV_FLAG_INTERACTIVE_ONLY
     node_type: evidence
@@ -254,6 +265,7 @@ nodes:
       source: "https://code.claude.com/docs/en/channels-reference"
       locator: "QUOTE: 'If you pass it in non-interactive mode with `-p` or through the Agent SDK, Claude Code ignores the flag and the channel doesn't register.' — locator: channels-reference, seção Test during the research preview, par. 2 — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_CHANNELS_ENABLED_MASTER_SWITCH
     node_type: evidence
@@ -271,6 +283,7 @@ nodes:
       source: "https://code.claude.com/docs/en/channels"
       locator: "QUOTE: 'Master switch. Must be `true` for any channel to deliver messages. Blocks all channels including the development flag when off.' — locator: channels, seção Enterprise controls, tabela, linha channelsEnabled — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_CHANNELS_SENDER_ALLOWLIST_GOVERNS_RELAY
     node_type: evidence
@@ -288,6 +301,7 @@ nodes:
       source: "https://code.claude.com/docs/en/channels"
       locator: "QUOTE: 'Anyone who can reply through the channel can approve or deny tool use in your session, so only allowlist senders you trust with that authority.' — locator: channels, seção Security, último par. — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_CHANNELS_RELAY_ONLY_WITH_AUTHENTICATED_SENDER
     node_type: evidence
@@ -305,6 +319,7 @@ nodes:
       source: "https://code.claude.com/docs/en/channels-reference"
       locator: "QUOTE: 'Only declare the capability if your channel [authenticates the sender](#gate-inbound-messages), because anyone who can reply through your channel can approve or deny tool use in your session.' — locator: channels-reference, seção Relay permission prompts > Add relay to a chat bridge, par. após a lista de 3 componentes — ancorada por verificador independente (wf_da77c143-24c)"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── CLAUDE CODE · Agent Teams ─────────────────────────────────────────────────────────────
   - id: E_CC_AGENT_TEAMS_SESSION_SCOPED
@@ -323,6 +338,7 @@ nodes:
       source: "https://code.claude.com/docs/en/agent-teams"
       locator: "QUOTE: '**One team per session**: a session has exactly one team, scoped to that session. You can't create additional named teams or share a team across sessions.' — locator: agent-teams, Limitations — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_AGENT_TEAMS_EXPERIMENTAL_INTERACTIVE
     node_type: evidence
@@ -340,6 +356,7 @@ nodes:
       source: "https://code.claude.com/docs/en/agent-teams"
       locator: "QUOTE: 'Agent teams are experimental and disabled by default. Enable them by setting `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in your [settings.json](/docs/en/settings) or environment.' — locator: agent-teams, Warning no topo; seção Enable agent teams — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── CLAUDE CODE · plugin oficial de canal (Discord) ───────────────────────────────────────
   - id: E_CC_DISCORD_PLUGIN_DROPS_BOT_AUTHORS
@@ -358,6 +375,7 @@ nodes:
       source: "https://github.com/anthropics/claude-plugins-official/blob/main/external_plugins/discord/server.ts"
       locator: "QUOTE (prefixo verbatim): 'client.on('messageCreate', msg => { if (msg.author.bot) return handleInbound(msg) [...]' — locator: external_plugins/discord/server.ts l.805-808; única ocorrência de author.bot (grep) em l.806 — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── SLACK ─────────────────────────────────────────────────────────────────────────────────
   - id: E_SLACK_MCP_READ_AND_SEND
@@ -376,6 +394,7 @@ nodes:
       source: "https://docs.slack.dev/ai/slack-mcp-server/"
       locator: "QUOTE: 'The MCP server can retrieve and send messages throughout a Slack workspace:' — locator: slack-mcp-server, seção Retrieving and sending messages — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SLACK_MCP_SEND_ANY_READ_FULL_HISTORY
     node_type: evidence
@@ -393,6 +412,7 @@ nodes:
       source: "https://docs.slack.dev/ai/slack-mcp-server/"
       locator: "QUOTE: 'Read channels — grab the complete message history of channels.' — locator: slack-mcp-server, Retrieving and sending messages — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SLACK_MCP_MARKETPLACE_OR_INTERNAL_ONLY
     node_type: evidence
@@ -410,6 +430,7 @@ nodes:
       source: "https://docs.slack.dev/ai/slack-mcp-server/"
       locator: "QUOTE: 'Only apps published in the Slack Marketplace and internal apps can use MCP at this time;' — locator: slack-mcp-server, Security concerns — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SLACK_MCP_ADMIN_APPROVAL
     node_type: evidence
@@ -427,6 +448,7 @@ nodes:
       source: "https://docs.slack.dev/ai/slack-mcp-server/"
       locator: "QUOTE: 'Workspace admins can approve and manage all MCP client integrations, keeping your Slack data safe.' — locator: slack-mcp-server, overview e App Identity — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SLACK_BOT_MESSAGE_EVENT_IDENTIFIES_BOT
     node_type: evidence
@@ -444,6 +466,7 @@ nodes:
       source: "https://docs.slack.dev/reference/events/message/bot_message/"
       locator: "QUOTE: 'you can detect if a message was sent by a bot by the presence of the bot_id and bot_profile fields in the event payload.' — locator: reference/events/message/bot_message, Bot identification — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── MICROSOFT TEAMS · Work IQ MCP ─────────────────────────────────────────────────────────
   - id: E_TEAMS_WORKIQ_TEN_TOOLS_NO_PUSH
@@ -462,6 +485,7 @@ nodes:
       source: "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/work-iq/mcp/overview"
       locator: "QUOTE: 'fetch /me/chats/{id}/messages → read Teams chat messages' — locator: Work IQ MCP overview, seção How tools work — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TEAMS_WORKIQ_GA_STATUS_UNANCHORED
     node_type: evidence
@@ -479,6 +503,7 @@ nodes:
       source: "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/work-iq/mcp/overview"
       locator: "QUOTE: 'New workloads, backends, and data sources add **paths**, not tools. The tool surface stays fixed at 10.' — locator: Work IQ MCP overview, seção How tools work — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TEAMS_WORKIQ_LICENSING_USAGE_BASED
     node_type: evidence
@@ -496,6 +521,7 @@ nodes:
       source: "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/work-iq/enable-work-iq"
       locator: "QUOTE: 'A usage-based billing plan set up in Copilot Studio with an Azure subscription and resource group assigned.' — locator: Enable your tenant for Work IQ, seção Prerequisites — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TEAMS_WORKIQ_BILLING_NO_COPILOT_LICENSE_MARK
     node_type: evidence
@@ -513,6 +539,7 @@ nodes:
       source: "https://learn.microsoft.com/en-us/microsoft-365/copilot/usage-based-billing-overview-copilot-credits"
       locator: "QUOTE: 'Work IQ API for custom apps and agents' — locator: Usage-Based Billing for Copilot Credits, lista Services managed by usage-based billing — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TEAMS_WORKIQ_ASK_DELEGATED_HUMAN_IDENTITY
     node_type: evidence
@@ -530,6 +557,7 @@ nodes:
       source: "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/work-iq/permissions"
       locator: "QUOTE: 'Allows the app to ask Work IQ agents questions and receive responses on behalf of the signed-in user.' — locator: Work IQ API permissions reference, seção WorkIQAgent.Ask — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TEAMS_AGENTS_RECEIVE_ONLY_WHEN_MENTIONED
     node_type: evidence
@@ -547,6 +575,7 @@ nodes:
       source: "https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/conversations/channel-and-group-conversations"
       locator: "QUOTE: 'By default, agents in group chats and channels only receive messages when they're directly @mentioned. They don't receive other messages sent to the conversation.' — locator: Channel and Group Conversation Chat for Agents - Teams, parágrafo 2 — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── A2A ───────────────────────────────────────────────────────────────────────────────────
   - id: E_A2A_V1_STABLE_SIGNED_CARDS
@@ -566,6 +595,7 @@ nodes:
       source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
       locator: "QUOTE: 'A2A's momentum accelerated with the release of version 1.0, its first stable specification.' — locator: LF press release, 2026-04-09 — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_A2A_ADOPTION_150_ORGS_CLOUD
     node_type: evidence
@@ -584,6 +614,7 @@ nodes:
       source: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
       locator: "QUOTE: 'Cloud providers have reinforced that momentum by embedding A2A directly into their platforms.' — locator: LF press release, 2026-04-09 — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_A2A_CARD_SIGNING_IS_OPTIONAL
     node_type: evidence
@@ -601,6 +632,7 @@ nodes:
       source: "https://a2a-protocol.org/latest/specification/"
       locator: "QUOTE: 'Agent Cards MAY be digitally signed using JSON Web Signature (JWS)' — locator: A2A spec §8.4 Agent Card Signing — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_A2A_REVOKED_KEYS_AND_JCS
     node_type: evidence
@@ -618,6 +650,7 @@ nodes:
       source: "https://a2a-protocol.org/latest/specification/"
       locator: "QUOTE: 'Expired or revoked keys MUST NOT be used for verification' — locator: A2A spec §8.4 Agent Card Signing (§8.4.1 e §8.4.3) — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_A2A_INPUT_VALIDATION_NO_UNTRUSTED_AGENT_CONTENT
     node_type: evidence
@@ -635,6 +668,7 @@ nodes:
       source: "https://a2a-protocol.org/latest/specification/"
       locator: "QUOTE: 'Agents MUST validate all input parameters before processing' — locator: A2A spec §13.4 Security Considerations, Input Validation — ancorada por verificador independente (wf_da77c143-24c)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ───────────────────
   - id: E_ELENXO_CC_VERSION_NOT_ANCHORED
@@ -653,6 +687,7 @@ nodes:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "`claude --version` nesta máquina = '2.1.293 (Claude Code)' (re-medido pelo escritor em 2026-10-07); nenhuma das claims cc-* ancora a versão da página citada (docs vivas, sem data no locator)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ELENXO_MEMBERS_YAML_HAS_NO_PLATFORM_IDENTITY
     node_type: evidence
@@ -670,6 +705,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml"
       locator: "docs/evolution/federation/members.yaml: granaai (l.140-182) traz só remote/local_path e keys: [granaai-1] (JWKS do A2A); gmill (membro hub-operacoes-enterprise, l.298-304) sem campo keys algum; grep -ciE slack|teams|claude_account no arquivo = 0 (re-medido pelo escritor em 2026-10-07)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ELENXO_CROSS_ACCOUNT_UNDOCUMENTED_INFERRED
     node_type: evidence
@@ -687,6 +723,7 @@ nodes:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "Elenxo do run wf_da77c143-24c sobre as claims 1 e 2 de cross-session: 'On another of YOUR machines' prova transporte de UMA conta; o listing só mostra sessões do próprio usuário; nenhuma frase nega expressamente mensagens entre contas"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CC_CLOUD_SESSION_CANNOT_REPLY_TOOL_DESCRIPTION
     node_type: evidence
@@ -721,6 +758,7 @@ nodes:
       source: "https://code.claude.com/docs/en/cross-session-messaging"
       locator: "Elenxo do run wf_da77c143-24c sobre a claim 4 de cross-session + a claim parceira sobre crossSessionInbound REJEITADA na ancoragem (hold explícito não abre diálogo; refuse descarta sem humano)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY
     node_type: evidence
@@ -738,6 +776,7 @@ nodes:
       source: "https://code.claude.com/docs/en/channels-reference"
       locator: "Elenxo do run wf_da77c143-24c sobre as claims 14 e 15 de channels: quem está na allowlist APROVA uso de ferramentas; a allowlist é por ID de plataforma"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ELENXO_CHANNELS_TOGGLE_UNMEASURED_PER_ADOPTER
     node_type: evidence
@@ -755,6 +794,7 @@ nodes:
       source: "https://code.claude.com/docs/en/channels"
       locator: "Elenxo do run wf_da77c143-24c sobre a claim 13 de channels: o mecanismo está provado, mas a rodada não mediu plano claude.ai nem estado dos toggles (channelsEnabled, Remote Control) nas orgs da granaai e da gmill"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   # ── SÍNTESE (open — não selada; quem decide é o maestro) ──────────────────────────────────
   - id: C_LIVE_CLASS_DESIGN_CONSTRAINTS
@@ -783,6 +823,7 @@ nodes:
       source: "docs/evolution/research/canal-vivo-sessoes-2026-10/SYNTHESIS.md"
       locator: "retorno do run wf_da77c143-24c (modo primaries): 8 fontes nomeadas (cc-cross-session, cc-remote-control, cc-channels, cc-agent-teams-claude-tag, cc-plugins-official-discord, slack-mcp-events, teams-workiq-mcp, a2a-spec-lf), 8 lidas, 0 inalcançáveis; 45 claims à ancoragem, 34 ANCORADAS, 11 REJEITADAS (11 exageradas, 0 não-encontradas)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ELENXO_CLAUDE_TAG_ONLY_BETA_ANCHORED
     node_type: evidence
@@ -799,6 +840,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[19] (objeção 20, target \"Metade Claude Tag da lacuna cc-agent-teams-claude-tag\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 20)"
+      locality: "host"
   - id: E_ELENXO_DISCORD_LINE_UNPINNED
     node_type: evidence
     plane: DEV
@@ -814,6 +856,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[20] (objeção 21, target \"18 [cc-plugins-official-discord] o plugin Discord descarta mensagem de bot\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 21)"
+      locality: "host"
   - id: E_ELENXO_SLACK_OFFICIAL_MCP_PLUGIN_EXISTS
     node_type: evidence
     plane: DEV
@@ -829,6 +872,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[21] (objeção 22, target \"Rejeição da claim do marketplace (Slack)\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 22)"
+      locality: "host"
   - id: E_ELENXO_SLACK_PUSH_UNANCHORED
     node_type: evidence
     plane: DEV
@@ -844,6 +888,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[23] (objeção 24, target \"20 [slack-mcp-events] lê o histórico completo\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 24)"
+      locality: "host"
   - id: E_ELENXO_SLACK_APP_CLASS_UNMEASURED
     node_type: evidence
     plane: DEV
@@ -859,6 +904,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[24] (objeção 25, target \"21 [slack-mcp-events] só apps do Marketplace ou internos usam MCP\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 25)"
+      locality: "host"
   - id: E_ELENXO_SLACK_BOT_TO_APP_OPEN
     node_type: evidence
     plane: DEV
@@ -874,6 +920,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[26] (objeção 27, target \"23 [slack-mcp-events] bot_message\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 27)"
+      locality: "host"
   - id: E_ELENXO_WORKIQ_NO_PUSH_BY_SILENCE
     node_type: evidence
     plane: DEV
@@ -889,6 +936,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[27] (objeção 28, target \"24 [teams-workiq-mcp] 10 tools, sem subscrição/push\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 28)"
+      locality: "host"
   - id: E_ELENXO_WORKIQ_LICENSE_BY_SILENCE
     node_type: evidence
     plane: DEV
@@ -904,6 +952,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[29] (objeção 30, target \"26 [teams-workiq-mcp] sem exigência de licença M365 Copilot\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 30)"
+      locality: "host"
   - id: E_ELENXO_WORKIQ_BILLING_BY_ABSENCE
     node_type: evidence
     plane: DEV
@@ -919,6 +968,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[30] (objeção 31, target \"27 [teams-workiq-mcp] billing sem a marca 'Copilot license required'\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 31)"
+      locality: "host"
   - id: E_ELENXO_WORKIQ_ONE_PERMISSION_GENERALIZED
     node_type: evidence
     plane: DEV
@@ -934,6 +984,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[31] (objeção 32, target \"28 [teams-workiq-mcp] WorkIQAgent.Ask delegada\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 32)"
+      locality: "host"
   - id: E_ELENXO_TEAMS_BOT_TO_BOT_OPEN
     node_type: evidence
     plane: DEV
@@ -949,6 +1000,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[32] (objeção 33, target \"29 [teams-workiq-mcp] agente em canal só recebe @menção salvo RSC\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 33)"
+      locality: "host"
   - id: E_ELENXO_A2A_ADOPTION_SELF_DECLARED
     node_type: evidence
     plane: DEV
@@ -964,6 +1016,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[34] (objeção 35, target \"31 [a2a-spec-lf] 150+ organizações\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 35)"
+      locality: "host"
   - id: E_ELENXO_A2A_UNTRUSTED_SCAN_PARTIAL
     node_type: evidence
     plane: DEV
@@ -979,6 +1032,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
       locator: "result.elenxo.objections[37] (objeção 38, target \"34 [a2a-spec-lf] sem orientação dedicada a conteúdo de outro agente\", survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 38)"
+      locality: "host"
 edges:
   # ── evidências informam a pergunta ──
   - from: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC

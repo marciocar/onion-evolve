@@ -85,6 +85,7 @@ nodes:
       source: "docs/onion/graph/ · docs/evolution/research/"
       locator: "medido nesta maquina em 2026-10-01: `find docs -name \"*.kg.yaml\" -not -path \"*/worktrees/*\" | wc -l` = 114 arquivos; soma de bytes pelo mesmo find com -printf %s = 3.830.401; divisao por 350 bytes por credito (regra publicada do Zep) = 10.944 creditos para reingerir TODO o conhecimento do Onion uma vez"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_MEDIDO_FEDERACAO_22_MEMBROS_1001
     node_type: evidence
@@ -103,6 +104,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml"
       locator: "medido nesta maquina em 2026-10-01: `grep -c \"^\\s*-\\s*id:\" docs/evolution/federation/members.yaml` = 22, rc=0, arquivo de 64.096 bytes com data de 2026-09-30"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CORPUS_PREVIO_COMPANY_BRAIN_JA_EXISTE
     node_type: evidence
@@ -121,6 +123,7 @@ nodes:
       source: "docs/onion/graph/company-brain-market-2026-07.kg.yaml · docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml"
       locator: "bash .claude/validation/kg-corpus-grep.sh \"company brain\" em 2026-10-01 → acertos em 8 grafos, com o grafo DEDICADO docs/onion/graph/company-brain-market-2026-07.kg.yaml (30 nos, baseline 2026-07-25, nos de censo de 2026-09-01)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ═══════════════════ EIXO 1 — COMPANY BRAIN COM PRECO PUBLICADO ═══════════════════
 
@@ -141,6 +144,7 @@ nodes:
       source: "https://dust.tt/pricing"
       locator: "https://dust.tt/pricing — votos 3-0, pagina de preco do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_DUST_PAGINA_SEM_GRAFO_NEM_PROVENIENCIA
     node_type: evidence
@@ -159,6 +163,7 @@ nodes:
       source: "https://dust.tt/pricing"
       locator: "https://dust.tt/pricing — votos 2-1, leitura de ausencia na pagina de preco"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ONYX_VINTE_DOLARES_POR_ASSENTO
     node_type: evidence
@@ -177,6 +182,7 @@ nodes:
       source: "https://www.onyx.app/pricing"
       locator: "https://www.onyx.app/pricing — votos 3-0, pagina de preco do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ZEP_GRAFO_TEMPORAL_COBRA_POR_CONSUMO
     node_type: evidence
@@ -194,6 +200,7 @@ nodes:
       source: "https://www.getzep.com/pricing"
       locator: "https://www.getzep.com/pricing — votos 2-1, pagina de preco do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ZEP_SO_A_ESCRITA_E_BILHETADA
     node_type: evidence
@@ -211,6 +218,7 @@ nodes:
       source: "https://www.getzep.com/pricing"
       locator: "https://www.getzep.com/pricing — votos 3-0, pagina de preco do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GLEAN_NAO_PUBLICA_PRECO
     node_type: evidence
@@ -228,6 +236,7 @@ nodes:
       source: "https://glean.com"
       locator: "https://glean.com — votos 2-1, homepage do fornecedor; leitura de ausencia, tier rebaixado a 5 porque homepage nao e pagina de preco"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GURU_NAO_PUBLICA_PRECO
     node_type: evidence
@@ -246,6 +255,7 @@ nodes:
       source: "https://www.getguru.com/pricing"
       locator: "https://www.getguru.com/pricing — votos 3-0, pagina de preco do proprio fornecedor; leitura de ausencia na pagina DEDICADA a preco"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GURU_PACOTE_INCLUI_CONDUCAO_HUMANA
     node_type: evidence
@@ -264,6 +274,7 @@ nodes:
       source: "https://www.getguru.com/pricing"
       locator: "https://www.getguru.com/pricing — votos 3-0, pagina de preco do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GURU_PROVENIENCIA_SEM_PRECO_PROPRIO
     node_type: evidence
@@ -282,6 +293,7 @@ nodes:
       source: "https://www.getguru.com/pricing"
       locator: "https://www.getguru.com/pricing — votos 3-0, pagina de preco do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ EIXO 2 — METODO COMO PRODUTO RECORRENTE ═══════════════════
 
@@ -302,6 +314,7 @@ nodes:
       source: "https://humanitec.com/pricing"
       locator: "https://humanitec.com/pricing — votos 3-0, pagina de preco do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_PORT_COBRA_POR_ASSENTO
     node_type: evidence
@@ -320,6 +333,7 @@ nodes:
       source: "https://www.port.io/pricing"
       locator: "https://www.port.io/pricing — votos 3-0, pagina de preco do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ROADIE_POR_DEV_CONTRIBUINTE
     node_type: evidence
@@ -350,6 +364,7 @@ nodes:
       source: "https://keygen.sh/pricing/"
       locator: "https://keygen.sh/pricing/ — votos 3-0, pagina de preco do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ EIXO 3 — O CEMITERIO (um unico no confirmado) ═══════════════════
 
@@ -370,6 +385,7 @@ nodes:
       source: "https://en.wikipedia.org/wiki/Pivotal_Software"
       locator: "https://en.wikipedia.org/wiki/Pivotal_Software — votos 2-1, agregador; tier 5 e confianca 0,6 porque e enciclopedia e nao fonte primaria da operacao"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ EIXO 4 — O RECEPTOR HOSPEDADO MINIMO ═══════════════════
 
@@ -389,6 +405,7 @@ nodes:
       source: "https://polar.sh/docs/features/benefits/license-keys"
       locator: "https://polar.sh/docs/features/benefits/license-keys — votos 3-0, documentacao do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_POLAR_ENDPOINT_DE_VALIDACAO_COMPRAVEL
     node_type: evidence
@@ -406,6 +423,7 @@ nodes:
       source: "https://polar.sh/docs/features/benefits/license-keys"
       locator: "https://polar.sh/docs/features/benefits/license-keys — votos 3-0, documentacao do proprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ EIXO 5 — PROVENIENCIA: A TECNICA JA FOI NOMEADA POR ANALISTA ═══════════
 
@@ -426,6 +444,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar/techniques"
       locator: "https://www.thoughtworks.com/radar/techniques — votos 3-0, Technology Radar Vol 34 de abril de 2026, fonte de analista"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TW_RADAR_CONTEXT_GRAPH_E_BITEMPORAL
     node_type: evidence
@@ -444,6 +463,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar/techniques"
       locator: "https://www.thoughtworks.com/radar/techniques — votos 3-0, Technology Radar Vol 34 de abril de 2026, fonte de analista"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TW_RADAR_NAO_RESPONDE_EIXOS_COMERCIAIS
     node_type: evidence
@@ -462,6 +482,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar"
       locator: "https://www.thoughtworks.com/radar — votos 3-0, leitura de ausencia na fonte de analista"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_COMPANY_BRAIN_OSS_SEM_RECEITA
     node_type: evidence
@@ -480,6 +501,7 @@ nodes:
       source: "https://github.com/caelstewart/company-brain"
       locator: "https://github.com/caelstewart/company-brain — votos 3-0, repositorio publico; tier 4 por ser projeto de engenheiro sem tracao declarada"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CHANGELOG_DO_CLAUDE_CODE_SEM_MENCAO
     node_type: evidence
@@ -497,6 +519,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md"
       locator: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md — votos 3-0, fonte primaria da plataforma, versoes 2.1.281 a 2.1.286"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ EIXO 7 — MERCADO E CAPITAL ═══════════════════
 
@@ -517,6 +540,7 @@ nodes:
       source: "https://techcrunch.com/2026/05/28/gleans-top-line-crosses-300m-as-ai-budget-cutting-becomes-its-major-selling-point/"
       locator: "https://techcrunch.com/2026/05/28/gleans-top-line-crosses-300m-as-ai-budget-cutting-becomes-its-major-selling-point/ e https://theaieconomy.substack.com/p/glean-300m-arr-enterprise-ai-pilot-to-production — votos 2-1 em cada, DUAS fontes independentes para o MESMO fato, ambas tier 5"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ARR_DE_GLEAN_E_METRICA_QUESTIONAVEL
     node_type: evidence
@@ -535,6 +559,7 @@ nodes:
       source: "https://theaieconomy.substack.com/p/glean-300m-arr-enterprise-ai-pilot-to-production"
       locator: "https://theaieconomy.substack.com/p/glean-300m-arr-enterprise-ai-pilot-to-production — votos 2-1, analise citando o TechCrunch"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MERCADO_COMPANY_BRAIN_E_METODO_1001
     node_type: evidence
@@ -553,6 +578,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_192911fe-13d.json"
       locator: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_192911fe-13d.json → result.market"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_192911fe-13d.json no host (result.market do run de 2026-10-01)"
+      locality: "host"
 
   # ═══════════════════ LACUNAS (contabilidade exata, numero nunca menor que o real) ═══════════
 
@@ -574,6 +600,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_192911fe-13d.json"
       locator: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_192911fe-13d.json → result.stats, result.refuted (12), result.notVerifiedByBudget (67), result.budgetDropped (7), result.decision.objections (59, 51 survives)"
       method: "testemunho: leitura do journal wf_192911fe-13d no host 2026-10-01 (kgPath = este grafo)"
+      locality: "host"
 
   # ═══════════════════ AS OPCOES (uma claim por opcao, todas open) ═══════════════════
 
@@ -647,6 +674,7 @@ nodes:
       source: "https://dust.tt/pricing"
       locator: "objecao 1 do Elenxo contra o achado Dust (preco por assento com creditos, tier 9, https://dust.tt/pricing); objecao de RELEVANCIA e nao de veracidade"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_AUSENCIA_E_FALTA_DE_SALIENCIA
     node_type: evidence
@@ -664,6 +692,7 @@ nodes:
       source: "https://dust.tt/pricing"
       locator: "objecao 2 do Elenxo contra o achado de ausencia de grafo e proveniencia na pagina de preco do Dust (tier 9, https://dust.tt/pricing)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_VOLUME_CURADO_NAO_ALCANCA_O_PISO
     node_type: evidence
@@ -681,6 +710,7 @@ nodes:
       source: "https://www.getzep.com/pricing"
       locator: "objecao 3 do Elenxo contra o achado Zep (credito por episodio, tier 9), MEDIDA CONTRA O VIVO nesta sessao: find docs -name \"*.kg.yaml\" -not -path \"*/worktrees/*\" devolve 114 arquivos e 3.830.401 bytes, que a 350 bytes por credito da 10.944 creditos contra os 10.000 do plano FREE"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_MERCADO_COBRA_ESCRITA_ONION_LE
     node_type: evidence
@@ -698,6 +728,7 @@ nodes:
       source: "https://www.getzep.com/pricing"
       locator: "objecao 4 do Elenxo contra o achado Zep de que recuperacao, armazenamento e grafo saem a 0 creditos e so a escrita e bilhetada (tier 9, https://www.getzep.com/pricing)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_CHANGELOG_E_INSTRUMENTO_ERRADO
     node_type: evidence
@@ -715,6 +746,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md"
       locator: "objecao 5 do Elenxo contra o achado de ausencia no CHANGELOG do Claude Code 2.1.281-286 (tier 9, votos 3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_ONYX_FIXA_O_TETO_SEM_RECEPTOR
     node_type: evidence
@@ -732,6 +764,7 @@ nodes:
       source: "https://www.onyx.app/pricing"
       locator: "objecao 6 do Elenxo contra o achado Onyx de US$20 por usuario por mes no anual (tier 9, https://www.onyx.app/pricing)"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_NINGUEM_PAGA_POR_REPO_ONBOARDED
     node_type: evidence
@@ -749,6 +782,7 @@ nodes:
       source: "https://humanitec.com/pricing"
       locator: "objecao 7 do Elenxo contra o achado Humanitec (pacote de tier, tier 9), cruzada com a medicao local de 2026-10-01: docs/evolution/federation/members.yaml tem 22 entradas"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_METODO_E_GRATIS_PAGO_E_GOVERNANCA
     node_type: evidence
@@ -766,6 +800,7 @@ nodes:
       source: "https://www.port.io/pricing"
       locator: "objecao 8 do Elenxo contra o achado Port de preco por assento (tier 8), juntado ao item que a rodada DESCARTOU: catalogo, Context Lake, Scorecards, Actions e AI Agents em TODOS os planos inclusive Free, pago adiciona SSO, SCIM, permissoes, workspaces, Private Link e SLA"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_ALU_MEDE_HONESTIDADE_NAO_USO
     node_type: evidence
@@ -783,6 +818,7 @@ nodes:
       source: "https://keygen.sh/pricing/"
       locator: "objecao 9 do Elenxo contra o achado Keygen de cobranca por active licensed users (tier 8, https://keygen.sh/pricing/)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_GURU_E_O_VEREDITO_E_D_MORRE
     node_type: evidence
@@ -800,6 +836,7 @@ nodes:
       source: "https://www.getguru.com/pricing"
       locator: "objecao 10 do Elenxo contra o achado Guru de nao publicar preco (tier 8); o repasse desta objecao chegou TRUNCADO, cortando em \"Pivotal Labs foi absorvida e renomeada VMware Tanzu Labs em jan/2021 (acha\" — modelada pelo que dela se le"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══ RECONCILIACAO DA PILHA `refuted` (lida DEPOIS do run, 2026-10-01) ═══
   # Por que existe: a rodada entregou 12 claims refutadas e a sintese ia projetar so o lado
@@ -823,6 +860,7 @@ nodes:
       source: "https://roadie.io/pricing/"
       locator: "https://roadie.io/pricing/ relida ao vivo em 2026-10-01 por tres refutadores independentes (curl, 161.818 bytes); a string \"Existing subscribers only\" aparece 2x no HTML, uma em cada plano por-dev, conferida por grep"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ONYX_ENTREGA_GRAFO_1001
     node_type: evidence
@@ -840,6 +878,7 @@ nodes:
       source: "https://docs.onyx.app/"
       locator: "https://docs.onyx.app/ (doc primaria do fornecedor, fetch 2026-10-01) + https://api.github.com/repos/onyx-dot-app/onyx/contents/backend/onyx/kg (codigo-fonte primario); tres refutadores independentes chegaram a mesma contra-evidencia"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_PIVOTAL_DATA_SEC_1001
     node_type: evidence
@@ -857,6 +896,7 @@ nodes:
       source: "https://www.sec.gov/Archives/edgar/data/1574135/000095017213000044/xslFormDX01/primary_doc.xml"
       locator: "S-1 da propria Pivotal Software (SEC, 2018-03-23) e Form D (CIK 0001574135, arquivado 2013-04-15): \"We were incorporated in the State of Delaware on April 1, 2013 under the name GoPivotal, Inc.\"; Form D declara ano 2013 e primeira venda 2013-04-01"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
 
   - id: AR_SYNTHESIS_COMPANY_BRAIN_1001
@@ -873,6 +913,7 @@ nodes:
       source: "docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/SYNTHESIS.md"
       locator: "arquivo conferido no disco; o frontmatter carrega o contrato de custo (run_id wf_192911fe-13d, 9.987.160 tokens, 148 agentes, 97 min) e aponta kg: para este grafo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 
 edges:

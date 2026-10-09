@@ -26,6 +26,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "mesma-mutacao-rodada-no-script-ANTIGO-e-no-NOVO-lado-a-lado"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CUSTO_ZERO_PROVA_QUE_E_CURA_E_NAO_APERTO
     node_type: evidence
@@ -41,6 +42,7 @@ nodes:
       source: "docs/evolution/review/fix-catraca-regra49.md"
       locator: "l.101-103 (\"A outra medição central resistiu\")"
       method: "juízes: Elenxo wf_fa9e6ad4-4b7 (4 refutadores por lente + juiz opus/high) conferiu no corpus 43 confirmed + 5 open, drifted/unverifiable/done sem carimbo = 0, gate 48 antes e depois — registrado no resíduo REGRA 56 do PR #559"
+      locality: "repo"
 
   # ── A FORMA DA CURA ─────────────────────────────────────────────────────────────────────────
   - id: C_SAIR_DO_ESCOPO_E_ENCOLHER_O_BASELINE
@@ -57,6 +59,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "quatro-rotas-de-fuga-exercitadas-uma-a-uma-no-corpus-real"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_DENYLIST_EM_SITIO_UNICO
     node_type: decision
@@ -72,6 +75,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "selftest-h-cinco-status-vivos-dentro-do-escopo"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_CINCO_SAIDAS_CLASSIFICADAS_CONTRA_O_VIVO
     node_type: decision
@@ -87,6 +91,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "selftests-i-a-n-uma-saida-por-caso"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ⚠️ SUPERSEDIDO pelo Elenxo (E_MEDICAO_NAO_OBSERVADA_ERA_MINHA). O rótulo abaixo NÃO foi reescrito:
   # ele continua afirmando o que eu afirmei, que é o único jeito de a escada ficar legível.
@@ -104,6 +109,7 @@ nodes:
       source: "docs/onion/graph/elenxos-2026-08-07.kg.yaml"
       locator: "os-3-nos-refuted-superseded-sem-carimbo-do-corpus-real"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_GUARDA_QUE_PUNE_CONFORMIDADE_E_PIOR_QUE_NENHUMA
     node_type: claim
@@ -119,6 +125,7 @@ nodes:
       source: "docs/evolution/review/feat-kg-seal-check.md"
       locator: "reincidencia-em-dois-dias-REGRA-57-e-REGRA-49"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── O ACHADO QUE VEIO DE FORA: O TESTE DO TESTE ─────────────────────────────────────────────
   - id: E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA
@@ -135,6 +142,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "sabotagem-deliberada-da-fixture-8-de-9-casos-morreram-1-sobreviveu"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA
     node_type: claim
@@ -150,6 +158,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "8-casos-que-afirmam-PRESENCA-morreram-1-que-afirma-ausencia-sobreviveu"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_PROVA_MUTACAO_COBRA_AS_TRES_CONDICOES
     node_type: decision
@@ -165,6 +174,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "helper-unico-usado-por-3-mutation-tests-acusando-FIXTURE-MORTA-por-nome"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── O ACHADO QUE VEIO DA HIGIENE (F5) ───────────────────────────────────────────────────────
   # ⚠️ REFUTADO no mesmo dia, por E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO. O rótulo NÃO foi
@@ -183,6 +193,7 @@ nodes:
       source: "docs/evolution/review/fix-catraca-regra49.md"
       locator: "l.186-200 (§\"Correção de um relato meu: o defeito de família do GIT_DIR não existe\")"
       method: "leitura: resíduo REGRA 56 do PR #559 registra o diagnóstico de sessão e sua refutação; corpo do commit 17e786a0 idem"
+      locality: "repo"
 
   - id: Q_QUANTOS_DOS_35_SITIOS_SAO_ALCANCAVEIS
     node_type: question
@@ -207,6 +218,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "lint-do-main-rodado-com-e-sem-GIT_DIR-em-sandbox-git-0-e-0-violacoes"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_MEDIR_NO_CHECKOUT_VELHO_E_MEDIR_O_PASSADO
     node_type: claim
@@ -222,6 +234,7 @@ nodes:
       source: "docs/evolution/review/fix-catraca-regra49.md"
       locator: "um-defeito-de-familia-inventado-e-um-PR-que-teria-sido-desperdicio"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_BRANCH_MAESTRO_ASIDE_ERA_MORTA_DE_FATO
     node_type: evidence
@@ -237,6 +250,7 @@ nodes:
       source: "commit f33afad (branch feat/maestro-aside, apagada)"
       locator: "git cherry 17e786a0^1 f33afad; git diff --shortstat f33afad 17e786a0^1; docs/onion/inventory.md l.14 nos dois commits"
       method: "medição: git cherry 17e786a0^1 f33afad → 2 commits \"-\"; git diff --shortstat f33afad 17e786a0^1 → 8683 insertions; git show <sha>:docs/onion/inventory.md l.14 → KB 88 (f33afad) vs 90 (main de 2026-08-08)"
+      locality: "repo"
 
   - id: C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA
     node_type: claim
@@ -264,6 +278,7 @@ nodes:
       source: "docs/evolution/review/fix-catraca-regra49.md"
       locator: "tres-bypass-reproduzidos-pelo-juiz-e-refeitos-por-mim-em-sandbox"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_ALIBI_POR_PROXIMIDADE_NAO_E_RECONCILIACAO
     node_type: claim
@@ -279,6 +294,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "predicado-reescrito-e-6-mutacoes-que-sobreviviam-passando-a-acusar"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_MEDICAO_NAO_OBSERVADA_ERA_MINHA
     node_type: evidence
@@ -294,6 +310,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "falsificacao-em-um-comando-pelo-juiz-48-SOFT-PASSIVO-zero-HARD"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_MEMOIZACAO_MORTA_EM_SUBSHELL
     node_type: evidence
@@ -309,6 +326,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "cronometragem-no-estado-alvo-com-os-48-carimbados-saida-byte-identica"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_BANCADA_MORREU_CALADA_POR_SET_E
     node_type: evidence
@@ -324,6 +342,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "bancada-solo-abortando-duas-vezes-no-mesmo-caso-com-rc-1-e-zero-falhas"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_TRAP_QUE_GRITA_QUANDO_A_SUITE_MORRE
     node_type: decision
@@ -339,6 +358,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "trap-provado-nos-dois-sentidos-grita-ao-abortar-cala-ao-chegar-ao-fim"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA
     node_type: claim
@@ -365,6 +385,7 @@ nodes:
       source: "docs/evolution/review/fix-catraca-regra49.md"
       locator: "l.230-233 (dívida declarada: as cinco classes sem cobertura de campo)"
       method: "leitura: resíduo REGRA 56 do PR #559 (2026-08-08) e o \"NÃO-VERIFICADO, declarado\" do corpo do commit 17e786a0"
+      locality: "repo"
 
   - id: Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE
     node_type: question
@@ -380,6 +401,7 @@ nodes:
       source: ".claude/validation/kg-radar-integrity.sh"
       locator: "git-mv-de-um-arquivo-tirando-5-entradas-de-uma-vez-com-exit-0"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_UPDATE_FILTER_REMOVIDO_COLLISION
     node_type: evidence
@@ -395,6 +417,7 @@ nodes:
       source: "commit d7eae7d1"
       locator: "corpo do commit d7eae7d1 (2026-08-24) + docs/evolution/review/docs-materialize-update-removido-bug.md l.17-19"
       method: "leitura: corpo do commit que materializou o bug grafo-primeiro, medido pelo fork contra o clone da granaai; mecanismo re-lido no R0 kg-freshness 2026-09-09 (comandos no verified_against)"
+      locality: "repo"
   - id: D_CURE_AMEND_FILTERED_BASELINE_INTO_MERGE
     node_type: decision
     layer: audit
@@ -419,6 +442,7 @@ nodes:
       source: "docs/evolution/review/fix-adopt-emit-missing-baselines.md"
       locator: "l.16-35 (fecha D_ADOPT_MUST_EMIT_MISSING_BASELINES; veredito l.33-35)"
       method: "leitura: resíduo REGRA 56 do PR do commit cfd56a4b (2026-08-26) + corpo de a787ab4f (cura da contaminação)"
+      locality: "repo"
   - id: C_REGULATED_ADOPTER_IS_THE_ORACLE
     node_type: claim
     layer: audit
@@ -433,6 +457,7 @@ nodes:
       source: "commit d7eae7d1"
       locator: "corpo do commit d7eae7d1 (2026-08-24) + docs/evolution/review/docs-materialize-update-removido-bug.md l.17-19"
       method: "leitura: corpo do commit que materializou o bug (d7eae7d1) e o resíduo REGRA 56 do mesmo PR"
+      locality: "repo"
   - id: D_CURE_PRESERVE_ADOPTER_BASELINE
     node_type: decision
     layer: audit
@@ -459,6 +484,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "bancada run_vendor_baseline_removido_selftests (3 casos: A/GREEN baseline rastreado, B/GREEN vendor sem baseline=granaai, RED/MUT que remove o bloco entre marcadores e contamina os DOIS) + reproducoes isoladas dos dois estados + dogfood REAL num clone descartavel da granaai (nunca o repo real): update com o helper curado → vendor 0 chaves estrangeiras, develop sem baseline do core; update ANTIGO (fork, medido antes) → 47 REMOVIDO + vendor contaminado. A revisao adversarial (branch-code-reviewer) refutou minha 1a cura (checkout so cobria o estado A; no-op na granaai) — verificado e ESTENDIDO."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_GRANAAI_NOBASELINE_PREEXISTING
     node_type: evidence
     layer: audit
@@ -474,6 +500,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "clone da granaai, develop PRE-update (aa7732e6, sem meu update): a catraca ja emite [kg-verificacao/NO-BASELINE] baseline AUSENTE, rc=1. Nenhuma branch da granaai (develop/vendor/main/feat/*) rastreia kg-verification-baseline.txt. Logo o NO-BASELINE independe do --update — e estado PRE-catraca do adotante."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: D_ADOPT_MUST_EMIT_MISSING_BASELINES
     node_type: decision
     layer: audit
@@ -489,6 +516,7 @@ nodes:
       source: ".claude/utils/adopt/regen-baselines.sh"
       locator: "implementado: regen-baselines.sh ganhou --ensure-from <SOURCE> (semeia stub p/ cada baseline que o core define mas o alvo NAO tem; o loop --auto emite do CORPUS DO ADOTANTE). adopt.md passa --ensure-from no update. Provado por reproducao (adotante pre-catraca: catraca rc 1→0) + DOGFOOD REAL num clone da granaai (update+ensure-from → kg-verification-coverage rc=0, HARD:0, NO-BASELINE resolvido, baseline emitido do corpus dela com 0 chaves). Selftest run_regen_ensure_from_selftests 2/2 (a: cura; b/MUT: sem a flag o NO-BASELINE persiste = load-bearing)."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: D_SCRUB_FROZEN_POISON_IN_VENDORS
     node_type: decision
     layer: audit
@@ -514,6 +542,7 @@ nodes:
       source: "docs/evolution/review/feat-kg-first-real-dogfood.md"
       locator: "l.24 (47→46), l.30-31 (L434/L454/L435/L358), l.33 (coverage rc=0), l.39-40 (PARCIAL: 1 de 5 caminhos)"
       method: "leitura: resíduo REGRA 56 do PR do commit 88099af3 (2026-08-27)"
+      locality: "repo"
   - id: E_CINCO_CLASSES_ESTADO_MEDIDO
     node_type: evidence
     plane: PROD
@@ -528,6 +557,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "kg-verification-coverage.sh --format tsv rodado no corpus real: 46 PASSIVO, ZERO das outras 4 classes (corpus limpo)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_CENSO0901_C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_
     node_type: evidence
     plane: PROD
@@ -541,6 +571,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — git log --oneline -- .claude/validation/kg-verification-coverage.sh (histórico completo do"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CENSO0901_Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_
     node_type: evidence
@@ -555,6 +586,7 @@ nodes:
       source: ".claude/validation/kg-verification-baseline.txt"
       locator: "/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 4/4 — git log --oneline -- .claude/validation/kg-verification-baseline.txt (achei 88099af3 e e86"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_A_DISCIPLINA_VIROU_MECANISMO_DE_PAINEL
     node_type: evidence
@@ -570,6 +602,7 @@ nodes:
       source: "docs/onion/testing-validation-system.md"
       locator: "grep do texto `comando que a produziu` em testing-validation-system.md:499-501 e framework-testes.md:633-637, medido 2026-09-09"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_A_CURA_DO_GIT_DIR_VIVE_MAS_O_LINT_DO_MAIN_NAO_ESTA_LIMPO
     node_type: evidence
@@ -585,6 +618,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh (_gen_into)"
       locator: "lint-artifacts.sh rodado com e sem GIT_DIR, diff das violacoes VAZIO; contagem do main hoje, medido 2026-09-09"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   # o defeito e a forma da cura

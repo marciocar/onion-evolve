@@ -42,6 +42,7 @@ nodes:
       source: ".claude/settings.json"
       locator: ".claude/settings.json (PreToolUse: 1 hook antes do PR); gates-mech: 8 hooks lidos por inteiro — 5 nunca usam exit 2 por desenho; .claude/utils/federation-transport/inbox-pull.sh:45 (sha256, SessionStart)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_HOST_SEM_PROTECAO_CI_E_AVISO
     node_type: evidence
@@ -57,6 +58,7 @@ nodes:
       source: ".github/workflows/onion-review.yml"
       locator: ".github/workflows/onion-review.yml:493 (\"nenhum check e obrigatorio. Vermelho aqui INFORMA; merge segue possivel\"); gh api repos/.../branches/main/protection = 403 (medido nesta sessao); ops/pr-merge-verified.sh l.1-119"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE
     node_type: evidence
@@ -72,6 +74,7 @@ nodes:
       source: ".claude/validation/review-artifact-check.sh"
       locator: ".claude/validation/review-artifact-check.sh:205-211 (case '|*[!0-9]* → so exige NUMERO), l.190-198 (reviewed_diff_sha256 recalculado pelo script = unico campo com verificacao cruzada), l.14-18 (cabecalho admite \"NAO julga a qualidade da revisao\")"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_KG_SEAL_NAO_SABE_QUEM_SELOU
     node_type: evidence
@@ -87,6 +90,7 @@ nodes:
       source: ".claude/validation/kg-seal-check.sh"
       locator: "grep -n \"sealed_by|approved_by|git log|author\" .claude/validation/kg-seal-check.sh = 0 hits (medido); bloco de julgamento l.118-222 opera so sobre verified_at/status/arestas/confidence"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CATRACAS_SAO_ATESTACAO_AUTODECLARADA
     node_type: evidence
@@ -102,6 +106,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "gates-ci: 58 REGRAs [HARD] levantadas em lint-artifacts.sh; REGRA 49 (l.~2561) \"LIMITE HONESTO (igual a 42): nao checa se o carimbo e VERDADE, so que existe\"; kg-backlog-check.sh:60-61,75 (DONE-NU: val() so normaliza formato); kg-backlog-check.sh:70-71 (TETO editavel no mesmo commit)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_POSTTOOLUSE_E_SINAL_POS_FATO
     node_type: evidence
@@ -117,6 +122,7 @@ nodes:
       source: ".claude/hooks/bash-empty-result-guard.sh"
       locator: ".claude/hooks/bash-empty-result-guard.sh l.24-27 (\"nao bloqueia nem desfaz\"), l.36-37 (sem jq a guarda inteira se cala), 8 detectores (l.151/159/165/255/257/270/296/299/341); disparou 3x nesta propria sessao sobre probes"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ASIDE_ROUTER_GATE_E_PROMPT
     node_type: evidence
@@ -132,6 +138,7 @@ nodes:
       source: ".claude/validation/aside-router.sh"
       locator: ".claude/validation/aside-router.sh:26 GATE=\"PROPONHA e aguarde a confirmacao do maestro (Ato 3/W6) ANTES de executar.\" — string injetada no prompt; aside-router-hook.sh l.8-9 \"NUNCA bloqueia (sem exit 2)\""
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PROSA_29_GATES_1_COBERTO
     node_type: evidence
@@ -147,6 +154,7 @@ nodes:
       source: "docs/analysis/onion-gates-textuais-2026-09.md"
       locator: "5cf7dc39:docs/analysis/onion-gates-textuais-2026-09.md l.79-92 (§1.5)"
       method: "leitura: análise dos gates textuais (projeção do grafo; linhas re-lidas no contexto principal) no commit 5cf7dc39"
+      locality: "repo"
 
   - id: E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA
     node_type: evidence
@@ -162,6 +170,7 @@ nodes:
       source: "ops/pr-merge-verified.sh"
       locator: "gates-mech: 7 scripts de ops/*.sh lidos por inteiro (deploy-site, install-caddy-config, update-bridge, bridge-backup, gpg-protect-key, verify-adopter-gate, pr-merge-verified) — todos com die()/exit 1-2 internos; nenhum hook forca a invocacao; comandos crus (rsync, systemctl, sudo cp, gpg) passam livres"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_UTILS_GUARDAS_SEM_HOOK
     node_type: evidence
@@ -177,6 +186,7 @@ nodes:
       source: "docs/analysis/onion-gates-textuais-2026-09.md"
       locator: "5cf7dc39:docs/analysis/onion-gates-textuais-2026-09.md l.72-77 (§1.4); 5cf7dc39:.claude/utils/guardrails/onion-untrusted-wrap.sh l.4"
       method: "leitura: análise dos gates textuais §1.4 + cabeçalho do wrap no mesmo commit"
+      locality: "repo"
 
   - id: E_PRECOMMIT_CONDICIONAL_A_CONFIG_LOCAL
     node_type: evidence
@@ -192,6 +202,7 @@ nodes:
       source: ".githooks/pre-commit"
       locator: "git config core.hooksPath = /home/marcio/onion-evolve/.githooks (medido nesta sessao); .git/hooks/pre-commit inexistente (so .sample); .githooks/pre-commit:30-36 (main/develop), :122-127 (HARD), :142-149 (selftest das guardas se toca validation/)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── Evidencia: buracos achados por BANCADA (nao por leitura) ─────────────────────────
   - id: E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE
@@ -208,6 +219,7 @@ nodes:
       source: ".claude/hooks/pretooluse-protect-main.sh"
       locator: "bancada run_pretooluse_veto_selftests (nova nesta rodada): `git push -f origin HEAD:main` contra protect-main v1 → rc=0; regex v1 exigia ESPACO antes de main; corrigida para ([[:space:]]|:)(refs/heads/)?main; caso \"protect-main: -f HEAD:main → VETO\" verde"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_BURACO_INVOLUCROS_NOS_DOIS_VETOS
     node_type: evidence
@@ -223,6 +235,7 @@ nodes:
       source: ".claude/hooks/lib/invocation-lines.sh"
       locator: "probes no contexto principal (2026-09-02): command git push -f origin main · \\git push · env git push · exec gh pr merge · bash -c \"git push -f origin main\" · git -C . push --force origin HEAD:main · sudo -u x git push origin main · out=$(gh pr merge 1) → TODOS rc=0 nos dois hooks antes da lib; apontado por gates-mech (3 formas), ampliado pela bancada (sudo -u, $( ))"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── Evidencia: CURAS executadas nesta rodada (mecanismo + bancada) ───────────────────
   - id: E_CURA_MERGE_GATE_2O_VETO
@@ -239,6 +252,7 @@ nodes:
       source: ".claude/hooks/pretooluse-merge-gate.sh"
       locator: ".claude/hooks/pretooluse-merge-gate.sh registrado em settings.json (PreToolUse Bash, 2o da lista); veto AO VIVO nesta sessao: `gh pr merge 0` → \"GUARDA-PRETOOLUSE: gh pr merge direto negado\" (hook captado sem reiniciar a sessao); bancada 32/32"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CURA_LIB_INVOCACAO_PARTILHADA
     node_type: evidence
@@ -254,6 +268,7 @@ nodes:
       source: ".claude/hooks/lib/invocation-lines.sh"
       locator: ".claude/hooks/lib/invocation-lines.sh (onion_invocation_lines: heredoc fora · split por && || ; | $( ` <( >( · desembrulha 1 nivel de sh -c · tira \\ command exec env nohup time sudo builtin VAR=val · colapsa git -C/-c) sourced pelos 2 hooks; bancada 32/32 incl. 11 casos de involucro; falso-positivo de heredoc/echo/prosa continua passando"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CURA_BANCADA_DOS_VETOS
     node_type: evidence
@@ -269,6 +284,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_pretooluse_veto_selftests em lint-selftest.sh (sandbox git com ops/pr-merge-verified.sh; _pv/_case; 32 casos: 11 protect-main + 21 merge-gate); 32/32 no runner isolado com set -euo pipefail ([[bancada-espelha-o-runner]]) — a bancada completa estourou 10 min na VPS carregada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── Claims ─────────────────────────────────────────────────────────────────────────
   - id: C_CONTAGEM_POS_RODADA
@@ -285,6 +301,7 @@ nodes:
       source: "docs/analysis/onion-gates-textuais-2026-09.md"
       locator: "5cf7dc39:docs/analysis/onion-gates-textuais-2026-09.md l.96-104 (§2); l.43 (inbox-pull sha256); l.65-68 (REGRAs 29/42/49/56/57/58)"
       method: "leitura: análise dos gates textuais no commit 5cf7dc39 (tabela antes→depois + inventário §1)"
+      locality: "repo"
 
   - id: C_ATESTACAO_NAO_TEM_CURA_DETERMINISTICA
     node_type: claim
@@ -300,6 +317,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml"
       locator: "E_REGRA56 + E_KG_SEAL + E_CATRACAS; alternativas consideradas e descartadas: sealed_by por autor git (mesmo autor — o maestro opera pela sessao), assinatura GPG por campo (catedral sem gatilho), exigir findings_real>0 (pune revisao limpa real)"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA
     node_type: claim
@@ -315,6 +333,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "3 buracos achados so por bancada (HEAD:main, sudo -u x, $( )) contra 3 apontados por leitura (command/\\/bash -c, gates-mech) — mesma rodada, mesmos hooks"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── Abertos com gatilho nomeado ───────────────────────────────────────────────────
   - id: D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO
@@ -367,6 +386,7 @@ nodes:
       source: ".claude/validation/review-artifact-check.sh"
       locator: "leitura de .claude/validation/review-artifact-check.sh (VERDICT_ENUM) contra o label do no, medido 2026-09-09"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_VETO_UNICO_ANTES_DA_RODADA

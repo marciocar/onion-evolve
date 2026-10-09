@@ -22,6 +22,7 @@ nodes:
       source: ".claude/validation/evolve-staleness-check.sh"
       locator: "último relatório medido por `ls -t docs/analysis | grep evolution`; 66 dias calculados de 2026-07-30 a 2026-10-04; ausência de gatilho confirmada por grep de census/rules/bancada em evolve.md = 0 ocorrências de cada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO
     node_type: decision
@@ -37,6 +38,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "censo de guardas: classe NOVA (\"nenhum arquivo de guarda menciona o termo\"); molde da REGRA 65 lido em lint-artifacts.sh l.4718 (portabilidade de data GNU/BSD/awk copiada); registro confirmado nos DOIS lugares pelo censo"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_GATILHO_DISPAROU_NO_DIA_EM_QUE_NASCEU
     node_type: evidence
@@ -53,6 +55,7 @@ nodes:
       source: "docs/analysis"
       locator: "bash .claude/validation/evolve-staleness-check.sh . devolve rc=1 com as duas linhas; 291 contado por git log --since=2026-07-30T00:00:00 (o 289 que eu publiquei vinha da data NUA, que e cega ao dia) --name-only nos cinco caminhos, filtrado por .md/.sh e `sort -u`"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_DOIS_CASOS_NASCERAM_DE_MUTANTE
     node_type: evidence
@@ -68,6 +71,7 @@ nodes:
       source: ".claude/validation/evolve-staleness-check.sh"
       locator: "⚠️ CORRIGIDO 2026-10-04 apos reprovacao: eu declarei 6/6 e o Elenxo provou 5/6 — o M6 SOBREVIVIA, porque o caso (g) usava o caminho CANONICO do repo em vez de `$0`, logo exercitava o artefato instalado e nao o que estava em teste. Hoje, pos-cura: 11 casos, 10 mutantes, 10 mordendo, com `$0` resolvido em ABSOLUTO antes de qualquer `cd`"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_RELOGIO_NAO_E_VEDADO_AO_EVOLVE_E_A_GUARDA_NAO_DECIDE_ISSO
     node_type: claim
@@ -83,6 +87,7 @@ nodes:
       source: "33039e0d1f27:.claude/commands/meta/evolve.md + 33039e0d:.claude/validation/automation-ladder-registry.txt + 34a02a34 + 33039e0d:docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
       locator: "evolve.md@33039e0d (grep) ; automation-ladder-registry.txt l.37-38 ; 34a02a34 (nó com 'isso e MOAT W7') ; f2-confronto.json l.422"
       method: "medição: git show 33039e0d:.claude/commands/meta/evolve.md | grep -ciE 'cron|schedule|/loop|agend' = 0 + leitura: registry l.37-38, f2-confronto.json l.422, commit 34a02a34"
+      locality: "repo"
 
   - id: E_TETO_DECLARADO_DO_GATILHO
     node_type: evidence
@@ -99,6 +104,7 @@ nodes:
       source: ".claude/validation/evolve-staleness-check.sh"
       locator: "teto escrito no cabecalho do check (l.28-41) e exercitado pelos casos (c) nunca-rodou, (d) opt-in, (e) data ilegivel e (g) git inalcancavel"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO
     node_type: question
@@ -114,6 +120,7 @@ nodes:
       source: ".claude/commands/meta/evolve.md"
       locator: "forge-census --tsv: evolve em 2/7; a perna (1) casa o glob onion-evolution-*.md, conferido no sandbox do caso (e) para nome que nao casa a regex"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_ELENXO_REPROVOU_O_GATILHO_E_A_TESE_CAIU
     node_type: evidence
@@ -130,6 +137,7 @@ nodes:
       source: ".claude/validation/evolve-staleness-check.sh"
       locator: "refutador opus/high em worktree isolada, mandato CACAR FALSO POSITIVO; 174k tokens, 59 chamadas, ~15 min; pos-cura: --selftest 11/11, bancada 5/5, 10 mutantes mordendo, 3 estados do repo verificados a mao"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_O_EVOLVE_ERA_O_UNICO_ORGAO_SEM_GATILHO

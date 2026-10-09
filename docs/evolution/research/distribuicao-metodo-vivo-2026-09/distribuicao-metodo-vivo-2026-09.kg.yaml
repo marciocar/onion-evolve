@@ -67,6 +67,7 @@ nodes:
       source: "https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template"
       locator: "docs.github.com — Creating a repository from a template, secao comparativa fork vs. template, bloco Commit History; QUOTE verbatim: \"A new fork includes the entire commit history of the parent repository, while a repository created from a template starts with a single commit.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_TEMPLATE_SEM_PR_DE_VOLTA_HISTORIAS_NAO_RELACIONADAS
     node_type: evidence
     plane: DEV
@@ -83,6 +84,7 @@ nodes:
       source: "https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template"
       locator: "docs.github.com — Creating a repository from a template, nota sobre branches criadas a partir de template; QUOTE verbatim: \"Branches created from a template have unrelated histories, which means you cannot create pull requests or merge between the branches.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_FORK_MANTEM_CONEXAO_COM_UPSTREAM
     node_type: evidence
     plane: DEV
@@ -99,6 +101,7 @@ nodes:
       source: "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks"
       locator: "docs.github.com — About forks, primeiro paragrafo da secao introdutoria logo apos a definicao de fork; QUOTE verbatim: \"A fork has its own settings and permissions but stays connected to the upstream repository.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_POLYFORM_INTERNAL_USE_USO_INTERNO_SEM_DISTRIBUIR
     node_type: evidence
     plane: DEV
@@ -115,6 +118,7 @@ nodes:
       source: "https://polyformproject.org/licenses/internal-use/1.0.0"
       locator: "PolyForm Internal Use License 1.0.0 — polyformproject.org/licenses/internal-use/1.0.0; QUOTE verbatim: \"you may not distribute the software\" + \"Use of the software for the internal business operations of you and your company is use for a permitted purpose.\" + \"These terms do not allow you to sublicense or transfer any of your licenses to anyone else\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_POLYFORM_NONCOMMERCIAL_NAO_SERVE_A_CLIENTE_COMERCIAL
     node_type: evidence
     plane: DEV
@@ -131,6 +135,7 @@ nodes:
       source: "https://polyformproject.org/licenses/noncommercial/1.0.0"
       locator: "PolyForm Noncommercial License 1.0.0 — polyformproject.org/licenses/noncommercial/1.0.0; QUOTE verbatim: \"Any noncommercial purpose is a permitted purpose, including personal use for research, experiment, and testing for the benefit of public knowledge, personal study, private entertainment, hobby projects, amateur pursuits, or religious observance, without any anticipated commercial application.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_BSL_E_ESQUELETO_COM_CHANGE_DATE
     node_type: evidence
     plane: DEV
@@ -147,6 +152,7 @@ nodes:
       source: "https://mariadb.com/bsl11"
       locator: "Business Source License 1.1 — mariadb.com/bsl11, clausula de grant + Change Date; QUOTE verbatim: \"The Licensor hereby grants you the right to copy, modify, create derivative works, redistribute, and make non-production use of the Licensed Work.\" e \"Effective on the Change Date, or the fourth anniversary of the first publicly available distribution of a specific version of the Licensed Work under this License, whichever comes first, the Licensor hereby grants you rights under the terms of the Change License\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_ELASTIC_V2_VETA_SAAS_NAO_USO_INTERNO
     node_type: evidence
     plane: DEV
@@ -163,6 +169,7 @@ nodes:
       source: "https://www.elastic.co/licensing/elastic-license"
       locator: "Elastic License 2.0, secao Limitations — elastic.co/licensing/elastic-license; QUOTE verbatim: \"You may not provide the software to third parties as a hosted or managed service, where the service provides users with access to any substantial set of the features or functionality of the software.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_APACHE_AVISO_PROEMINENTE_EM_ARQUIVO_MODIFICADO
     node_type: evidence
     plane: DEV
@@ -179,6 +186,7 @@ nodes:
       source: "https://www.apache.org/licenses/LICENSE-2.0"
       locator: "Apache License 2.0, Secao 4, alinea (b); QUOTE verbatim: \"You must cause any modified files to carry prominent notices stating that You changed the files\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_LICENCA_NAO_CONCEDE_MARCA
     node_type: evidence
     plane: DEV
@@ -195,6 +203,7 @@ nodes:
       source: "https://www.apache.org/licenses/LICENSE-2.0"
       locator: "Apache License 2.0, Secao 6, Trademarks; QUOTE verbatim: \"This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work and reproducing the content of the NOTICE file\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_ASF_DERIVADO_SOB_MARCA_PROPRIA_SEM_CONFUSAO
     node_type: evidence
     plane: DEV
@@ -211,6 +220,7 @@ nodes:
       source: "https://www.apache.org/foundation/marks/"
       locator: "Apache Software Foundation, Apache Trademark Policy (apache.org/foundation/marks/), secao sobre derivative works; QUOTE verbatim: \"you may not apply trademarks to your derivative works of _ProjectName_ software that are confusingly similar to \"_ProjectName_\" or \"Apache _ProjectName_\"\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_GITLAB_HANDBOOK_FIRST_PUBLICO_POR_POLITICA
     node_type: evidence
     plane: DEV
@@ -227,6 +237,7 @@ nodes:
       source: "https://handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/"
       locator: "handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/ — abertura do corpo do artigo, logo apos o titulo The importance of a handbook-first approach to communication; QUOTE verbatim: \"GitLab is intentional about documenting in a manner that creates a single source of truth. It operates handbook-first, and in valuing transparency, makes its handbook publicly accessible to all.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_HANDBOOK_PUBLICO_CRIA_ACCOUNTABILITY
     node_type: evidence
     plane: DEV
@@ -243,6 +254,7 @@ nodes:
       source: "https://handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/"
       locator: "handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/ — secao Make handbook-first a value, frase seguinte a citacao anterior; QUOTE verbatim: \"Public handbooks lead to accountability. It is easier to let an internal wiki rot than it is a handbook which is open to the world.\" — ancorada por verificador independente (a forma original usa a contracao)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_THOUGHTBOT_PLAYBOOK_CC_BY_NC
     node_type: evidence
     plane: DEV
@@ -259,6 +271,7 @@ nodes:
       source: "https://thoughtbot.com/playbook"
       locator: "thoughtbot.com/playbook — rodape, logo antes da linha de copyright; QUOTE verbatim: \"The playbook is free and licensed as Creative Commons Attribution-NonCommercial so you may learn from, or use, our tactics in your own company.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_COPIER_CONFLITO_INLINE_NUNCA_EM_SILENCIO
     node_type: evidence
     plane: DEV
@@ -275,6 +288,7 @@ nodes:
       source: "https://copier.readthedocs.io/en/stable/updating/"
       locator: "copier.readthedocs.io/en/stable/updating/ — opcao --conflict inline (default); QUOTE verbatim: \"Updates the file with conflict markers. This is quite similar to the conflict markers created when a git merge command encounters a conflict.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_COPIER_MODO_REJ_ISOLA_O_DIFF
     node_type: evidence
     plane: DEV
@@ -291,6 +305,7 @@ nodes:
       source: "https://copier.readthedocs.io/en/stable/updating/"
       locator: "copier.readthedocs.io/en/stable/updating/ — opcao --conflict rej; QUOTE verbatim: \"Creates a separate .rej file for each file with conflicts. These files contain the unresolved diffs.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_COPIER_ANSWERS_NAO_SE_EDITA_A_MAO
     node_type: evidence
     plane: DEV
@@ -307,6 +322,7 @@ nodes:
       source: "https://copier.readthedocs.io/en/stable/updating/"
       locator: "copier.readthedocs.io/en/stable/updating/ — secao Never change the answers file manually, bloco Important; QUOTE verbatim: \"This will trick Copier, making it believe that those modified answers produced the current subproject, while it was produced by a different answers set.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_CRUFT_UPDATE_E_PORTAO_DE_REVISAO
     node_type: evidence
     plane: DEV
@@ -323,6 +339,7 @@ nodes:
       source: "https://cruft.github.io/cruft/"
       locator: "cruft.github.io/cruft/ — secao Updating a Project; QUOTE verbatim: \"To update an existing project, that was created using cruft, run cruft update in the root of the project. If there are any updates, cruft will have you review them before applying.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_PLUGIN_SO_LEVA_README_NA_RAIZ
     node_type: evidence
     plane: DEV
@@ -339,6 +356,7 @@ nodes:
       source: "https://code.claude.com/docs/en/plugins"
       locator: "code.claude.com/docs/en/plugins, secao Share your plugins; QUOTE verbatim: \"Add documentation: Include a README.md with installation and usage instructions\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_MARKETPLACE_PROPRIO_SEM_EXIGENCIA_DE_PUBLICO
     node_type: evidence
     plane: DEV
@@ -355,6 +373,7 @@ nodes:
       source: "https://code.claude.com/docs/en/plugin-marketplaces"
       locator: "code.claude.com/docs/en/plugin-marketplaces — o heading real e Private repositories (NAO existe heading chamado Public vs. Private Repository Requirements nesta pagina); QUOTE verbatim: \"Claude Code supports installing plugins from private repositories.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_PLUGIN_INTERNO_VIA_MARKETPLACE_PRIVADO
     node_type: evidence
     plane: DEV
@@ -371,6 +390,7 @@ nodes:
       source: "https://code.claude.com/docs/en/plugins"
       locator: "code.claude.com/docs/en/plugins, secao Share your plugins; QUOTE verbatim: \"To keep a plugin internal to your team, host the marketplace in a private repository.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_ORG_SETTINGS_EXIGE_PUBLICO_FORA_DO_OWNER
     node_type: evidence
     plane: DEV
@@ -387,6 +407,7 @@ nodes:
       source: "https://code.claude.com/docs/en/plugin-marketplaces"
       locator: "code.claude.com/docs/en/plugin-marketplaces — heading real Distribute through organization settings (nao Public vs. Private Repository Requirements, nome inexistente no documento); QUOTE verbatim: \"github.com repositories under a different owner and repositories on other hosts, such as GitLab or Bitbucket, must be public.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_GITLAB_CORTE_POR_PERSONA_DE_COMPRADOR
     node_type: evidence
     plane: DEV
@@ -403,6 +424,7 @@ nodes:
       source: "https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md"
       locator: "GitLab stewardship.md, secao What Features Are Paid-Only, linhas 41-42; QUOTE verbatim: \"To determine what is open source and what not we ask ourselves: **Who cares the most about the feature**. If the likely buyer is an individual contributor the feature will be open source, otherwise it will be source-available (proprietary).\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_CORTE_E_RELATIVO_NAO_EXCLUSIVO
     node_type: evidence
     plane: DEV
@@ -419,6 +441,7 @@ nodes:
       source: "https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md"
       locator: "GitLab stewardship.md, secao What Features Are Paid-Only, linhas 44-48; QUOTE verbatim: \"There aren not any features that are only useful to managers, directors, and executives. So for every source-available feature there will be an individual contributor who cares about it.\" (a forma original usa a contracao) + \"The more of GitLab that you use the more likely it is that you benefit from a higher tier.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_PISO_ABERTO_SEM_LIMITE_ARTIFICIAL
     node_type: evidence
     plane: DEV
@@ -435,6 +458,7 @@ nodes:
       source: "https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md"
       locator: "GitLab stewardship.md, secao Promises, itens 4-5, linhas 23-24; QUOTE verbatim: \"The open source codebase will have all the features that are essential to running a large forge with public and private repositories.\" + \"The open source codebase will not contain any artificial limits (repositories, users, size, performance, requiring a trademarked header, etc.).\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_PROMESSA_NAO_COBRE_O_SAAS_DO_PROPRIO_VENDOR
     node_type: evidence
     plane: DEV
@@ -451,6 +475,7 @@ nodes:
       source: "https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md"
       locator: "GitLab stewardship.md, secao Software as a Service, linhas 35-36; QUOTE verbatim: \"Our stewardship promise applies only to the GitLab open source codebase, not to GitLab, Inc services such as GitLab Software as a Service (SaaS). For GitLab SaaS, we may add limits around usage (e.g., storage, compute, traffic) or proxies for usage (e.g., number of users in a group) as we seek to optimize costs and revenues.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_SEPARACAO_FISICA_DIRETORIO_E_MIRROR
     node_type: evidence
     plane: DEV
@@ -467,6 +492,7 @@ nodes:
       source: "https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md"
       locator: "GitLab stewardship.md, secao Promises, 12o e ultimo bullet, linha 31; QUOTE verbatim: \"This will be implemented with a separate directory for EE code and a Git repo downstream that is open source only.\" — ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_BIOGRAFIA_VIVE_DENTRO_DO_CLAUDE_QUE_O_ADOPT_VENDORIZA
     node_type: evidence
     plane: DEV
@@ -483,6 +509,7 @@ nodes:
       source: ".claude/diary/ · .claude/commands/meta/adopt.md · docs/evolution/federation/members.yaml · docs/analysis/arandek-repo-exposure-2026-08.md"
       locator: "medicao local em /home/marcio/onion-evolve nesta rodada: ls .claude/diary | wc -l = 127 arquivos (o primeiro e 2026-07-01-audit-dogfood-finds-code-bugs.md); grep -c exclude .claude/commands/meta/adopt.md = 0; docs/evolution/federation/members.yaml e docs/analysis/arandek-repo-exposure-2026-08.md presentes no working tree. CORRECAO de rota feita nesta medicao: o Elenxo citou docs/diary, que NAO EXISTE — o diario vive em .claude/diary, ou seja, DENTRO do diretorio que o /meta:adopt vendoriza"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_LICENCA_ATUAL_E_MIT_JA_CONCEDIDA
     node_type: evidence
     plane: DEV
@@ -499,6 +526,7 @@ nodes:
       source: "LICENSE · plugins/onion/LICENSE · plugins/onion-product/LICENSE · plugins/onion-engineering/LICENSE · plugins/onion-compliance/LICENSE · plugins/onion-design/LICENSE"
       locator: "medicao local nesta rodada: head -3 LICENSE = \"MIT License / Copyright (c) 2026 Marcio Carvalho\"; ls plugins/*/LICENSE = 5 arquivos (onion, onion-product, onion-engineering, onion-compliance, onion-design), todos comecando com \"MIT License\" e ja publicados (memoria onion-plugin-marketplace-publication-state, PR 791)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_MASSA_138K_DISTRIBUIVEL_VS_151K_BIOGRAFIA
     node_type: evidence
     plane: DEV
@@ -531,6 +559,7 @@ nodes:
       source: "docs/evolution/research/distribuicao-metodo-vivo-2026-09/"
       locator: "contabilidade da propria rodada: 15 documentos primarios lidos inteiros em 7 lacunas nomeadas, 33 claims submetidas a ancoragem independente, 26 ANCORADAS, 7 EXAGERADAS, 0 NAO-ENCONTRADAS, 0 fonte inalcancavel"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
     node_type: question
     plane: DEV
@@ -588,6 +617,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "procedimento de copia do adopt.md rodado VERBATIM num diretorio vazio: 680 arquivos chegaram; diario, sessions, beacons, identity, scratchpad, worktrees, settings.local.json, docs/{evolution,analysis,discussions,materials,applying,onion} e backlog.md NAO chegaram. Confirmado em 6 adotantes reais: zero tem .claude/diary ou members.yaml"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_QUATRO_COPIAS_DA_MESMA_LISTA_DUAS_DRIFTADAS
     node_type: evidence
@@ -605,6 +635,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "adopt.md copiava 11 pathspecs; o `roots=` da REGRA 36 varria 9 e o `VENDORED_ROOTS` da REGRA 45 varria 9 — `.claude/rules` e `.claude/workflows` viajavam SEM ser varridos por nome comercial de cliente nem por link core-privado"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_BASELINES_SAO_INDICE_DO_REPO_PRIVADO_E_JA_CHEGARAM
     node_type: evidence
@@ -622,6 +653,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "medido nos repos entregues: sacola-de-ideias 24 linhas, jogo-da-vida 24, venda-direta-pdi 24, portal-gamificacao 24, onion-adopt-granaa-ai 25 — todas citando docs/discussions, docs/analysis ou docs/materials do core; onion-standalone: 0 (nao passou pelo caminho padrao)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ROLES_YAML_E_OUTRA_GRANULARIDADE
     node_type: evidence
@@ -639,6 +671,7 @@ nodes:
       source: ".claude/utils/marketplace/roles.yaml"
       locator: "resolve-role-bundle.sh resolve VERTICAIS (plugins) e WORK_TOOLS (comandos) a partir de roles.yaml; o corte do onion-standalone (274 arquivos a menos, zero a mais, meta-fabrica fora) e corte de PATHSPEC. Sao SSOTs de coisas diferentes; nenhuma invocacao de resolve-role-bundle.sh existe no adopt.md"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ══ AS QUATRO DECISOES DO MAESTRO (2026-09-14) ══════════════════════════════════════════════
   - id: D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT
@@ -657,6 +690,7 @@ nodes:
       source: "commit a74ff166 · docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md"
       locator: "a74ff166 corpo (\"veículo — onion-standalone público MAIS /meta:adopt no repo do cliente\") · SYNTHESIS.md:170 (selo Veículo, ressalva e reenquadramento) e 246 (backlog 1: levar o standalone ao core completo)"
       method: "leitura: corpo do commit a74ff166 e SYNTHESIS.md versionada"
+      locality: "repo"
 
   - id: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
     node_type: decision
@@ -674,6 +708,7 @@ nodes:
       source: "commit a74ff166 · docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md"
       locator: "a74ff166 corpo (\"corte — viaja tudo, inclusive a meta-fábrica\") · SYNTHESIS.md:171 (selo Corte: 9 de 11, 3 de 7) e :147-157 (--role idênticas, ROLE nunca mais lido, 63 arquivos + 43 comandos)"
       method: "leitura: corpo do commit a74ff166 e SYNTHESIS.md versionada"
+      locality: "repo"
 
   - id: D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC
     node_type: decision
@@ -714,6 +749,7 @@ nodes:
       source: "https://www.gov.br/inpi/pt-br/servicos/marcas/custos-e-pagamento"
       locator: "Tabela de Retribuicoes do INPI (PDF oficial, Portaria GM/MDIC 110/2025), codigo 389 \"Pedido de registro de marca (com especificacao pre-aprovada) - valor por classe\" R$ 880,00 / 440,00 com desconto; codigos 372/373 \"Primeiro decenio de vigencia... e expedicao de certificado\" R$ 0,00; codigo 374 prorrogacao R$ 1.000,00 / 500,00. Classes NCL 13a ed.: 42 cobre \"projeto e desenvolvimento de hardware e de software de computador\", \"consultoria tecnologica\" e \"software enquanto servico (SaaS)\"; 41 cobre \"provimento de treinamento\"; 9 so se houver software distribuido como copia"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MARCA_ONION_FORTE_NA_LEI_FRACA_NO_CAMPO
     node_type: evidence
@@ -731,6 +767,7 @@ nodes:
       source: "https://www.rfc-editor.org/rfc/rfc7686.txt"
       locator: "LPI art. 124 VI barra o que e generico/descritivo EM RELACAO ao produto — \"onion\" nao descreve software, logo e marca ARBITRARIA (a categoria mais forte). Contra: RFC 7686 (out/2015) registra \".onion\" como Special-Use Domain Name na IANA; Tor Project usa \"onion services\"; Jeffrey Palermo publicou \"Onion Architecture\" em 29/07/2008 e o padrao tem 18 anos de uso corrente; pacote npm `onion` existe desde 11/06/2011"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MARCA_SEM_REGISTRO_SO_PRECEDENCIA_E_CONCORRENCIA_DESLEAL
     node_type: evidence
@@ -748,6 +785,7 @@ nodes:
       source: "https://www.gov.br/inpi/pt-br/servicos/marcas/arquivos/legislacao/lpitradpmsrevpms.pdf"
       locator: "LPI art. 129 caput: \"A propriedade da marca adquire-se pelo registro validamente expedido... sendo assegurado ao titular seu uso exclusivo em todo o territorio nacional\"; art. 129 §1o da a quem usa de boa-fe ha 6 meses o \"direito de precedencia AO REGISTRO\"; arts. 195 III/IV/V (concorrencia desleal) e 209 (perdas e danos) — tradução oficial da LPI hospedada pelo proprio INPI, porque o Planalto caiu (ECONNRESET x5)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MARCA_CLAUSULA_DE_RENAME_SO_TEM_DENTES_COM_REGISTRO
     node_type: evidence
@@ -765,6 +803,7 @@ nodes:
       source: "https://www.apache.org/foundation/marks/faq/"
       locator: "ASF FAQ: \"If you distribute modified versions of Apache Software you must do so under a new name\"; ASF policy: \"you may not apply trademarks to your derivative works... that are confusingly similar\"; Linux Foundation: \"A copyright license, even an open source copyright license, does not include an implied right or license to use a trademark\". Caso concreto medido: AWS anuncia o fork OpenSearch em 12/04/2021 (\"we will rename our existing Amazon Elasticsearch Service\") e a Elastic declara em 16/02/2022 que \"resolved the trademark infringement lawsuit\""
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MARCA_LACUNAS_DA_RODADA_0914
     node_type: evidence
@@ -804,6 +843,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "selado pelo maestro 2026-09-14: limpar no proximo /meta:adopt --update de cada adotante, um repo por vez, com o gate de la — em vez de cinco PRs hoje"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── SCRUB POR FORMA: o vazamento que a REGRA 36 nao via, achado ao medir antes de publicar (2026-09-14) ──
   - id: E_VAZAMENTO_REAL_DE_CLIENTE_NA_SUPERFICIE_QUE_VIAJA
@@ -822,6 +862,7 @@ nodes:
       source: ".claude/validation/vendor-scrub-form-check.sh"
       locator: "medicao no proprio repo: nome comercial de um cliente real de PoC encontrado em DOIS arquivos dentro da superficie vendorizada (.claude/commands/meta/adopt.md e .claude/utils/adopt/regen-baselines.sh), ambos emitidos pelo transporte do /meta:adopt"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_SCRUB_POR_FORMA_CURADO_ANTES_DE_PUBLICAR
     node_type: decision
@@ -837,6 +878,7 @@ nodes:
       source: "commit a74ff166 · .claude/validation/vendor-scrub-form-check.sh@a74ff166 · .claude/validation/lint-selftest.sh@a74ff166 · .claude/validation/lint-artifacts.sh@a74ff166"
       locator: "a74ff166 corpo (scrub — curar ANTES, forma, teto) · vendor-scrub-form-check.sh@a74ff166:7-27 (ampersand 2+ chars, âncora, catraca, REGRAS 45/49, teto) · lint-selftest.sh@a74ff166:4232-4279 (run_vendor_scrub_form_selftests, casos a-f, mutante e) · lint-artifacts.sh@a74ff166:3276-3286 (ligado na REGRA 36)"
       method: "leitura: commit a74ff166 e os arquivos que ele cria"
+      locality: "repo"
 
   - id: E_MARCA_BUSCA_INPI_EXECUTADA_0915
     node_type: evidence
@@ -854,6 +896,7 @@ nodes:
       source: "https://busca.inpi.gov.br/pePI"
       locator: "busca do maestro em busca.inpi.gov.br/pePI em 2026-09-15 as 11:19 (base atualizada ate 15/09/2026): termo `onion` devolveu 9 processos; termo `onion evolve` devolveu ZERO"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: A_MARCA_LER_ESPECIFICACAO_DO_933007990
     node_type: decision
@@ -895,6 +938,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "vendor-manifest.sh --emit-scrub-roots listava 11 raizes e nenhuma era plugins/; e grep do prefixo da familia do vertical pessoal achou 6 citacoes, duas ja dentro do plugin publico montado"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO
     node_type: decision

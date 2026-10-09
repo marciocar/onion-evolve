@@ -66,6 +66,7 @@ nodes:
       source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
       locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_POLITICA_PRIVACIDADE_E_DOC_SEM_LOCALE
     node_type: evidence
@@ -84,6 +85,7 @@ nodes:
       source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
       locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_POLITICA_TRES_EXEMPLOS_SEM_IDIOMA
     node_type: evidence
@@ -101,6 +103,7 @@ nodes:
       source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
       locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TRADUCAO_MANUAL_PARA_MEDIANA_ZERO
     node_type: evidence
@@ -119,6 +122,7 @@ nodes:
       source: "https://arxiv.org/html/2508.02497v1"
       locator: "https://arxiv.org/html/2508.02497v1 — verificacao adversarial 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MIRROR_COMUNITARIO_SEM_POLITICA_DE_IDIOMA
     node_type: evidence
@@ -137,6 +141,7 @@ nodes:
       source: "https://github.com/anthropics/claude-plugins-community"
       locator: "https://github.com/anthropics/claude-plugins-community — verificacao adversarial 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ANTHROPIC_RECOMENDA_IDIOMA_EXPLICITO
     node_type: evidence
@@ -155,6 +160,7 @@ nodes:
       source: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support"
       locator: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support — verificacao adversarial 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_JETBRAINS_DECLARADO_IRRELEVANTE
     node_type: evidence
@@ -172,6 +178,7 @@ nodes:
       source: "https://plugins.jetbrains.com/docs/intellij/providing-translations.html"
       locator: "https://plugins.jetbrains.com/docs/intellij/providing-translations.html — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── MEDIÇÃO LOCAL DESTA RODADA (dogfood tier 10 no proprio repo) ─────────────────────────
   - id: E_MEDIDO_LOCAL_SUPERFICIE_GERADA_VEM_DO_CORPO_0904
@@ -191,6 +198,7 @@ nodes:
       source: ".claude/utils/marketplace/plugin-readme.sh; .claude/utils/marketplace/generate-marketplace.sh; plugins/*/.claude-plugin/plugin.json"
       locator: "medicao no repo em 2026-09-04 (Claude Code 2.1.260): `ls plugins/` = 8; as 8 `description` de plugins/*/.claude-plugin/plugin.json estao em pt-BR e sao ESCRITAS A MAO; `generate-marketplace.sh` so as COPIA (`desc=\"$(field \"${pj}\" description)\"`); `plugin-readme.sh` tem 24 blocos `out.append` de prosa pt-BR hardcoded e monta as tabelas \"O que faz\" / \"Especialidade\" / \"Quando ativa\" a partir do `description:` de frontmatter; populacao-fonte em .claude/ = 112 comandos + 51 agentes + 13 skills = 176 descricoes e 29 `argument-hint`; populacao EMBARCADA em plugins/ = 76 + 46 + 12 = 134 descricoes e 13 `argument-hint`"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_MEDIDO_LOCAL_ZERO_EXEMPLOS_DE_PROMPT_0904
     node_type: evidence
@@ -209,6 +217,7 @@ nodes:
       source: "plugins/*/README.md; .claude/utils/marketplace/plugin-readme.sh"
       locator: "medicao no repo em 2026-09-04: `grep -rc \"Exemplo\" plugins/*/README.md` devolve 0 nos 8 READMEs; os headings gerados sao Instalar / O que traz / Comandos / Agentes / Skills / Hooks / Requisitos / Proveniencia / Comandos do core citados / Licenca — nenhuma secao de exemplos de prompt"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── EIXO MERCADO/CAPITAL (invariante — clausula 4) ───────────────────────────────────────
   - id: E_MERCADO_SEM_SINAL_DE_CAPITAL_EM_I18N_DE_CATALOGO
@@ -228,6 +237,7 @@ nodes:
       source: "docs/evolution/research/plugin-language-policy-2026-09/SYNTHESIS.md · docs/evolution/research/plugin-directory-landscape-2026-09/SYNTHESIS.md · docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml"
       locator: "R2 SYNTHESIS l.48-50; R1 SYNTHESIS l.33 e l.43; R1 kg l.72; nó E_MIRROR_COMUNITARIO_SEM_POLITICA_DE_IDIOMA do grafo R2 (l.134)"
       method: "leitura: eixo de mercado das SYNTHESIS R1/R2 e nós dos dois grafos"
+      locality: "repo"
 
   # ── LACUNAS DE 1a CLASSE (regua de saida, item 2) ────────────────────────────────────────
   - id: E_LACUNAS_DECLARADAS_PLUGIN_LANGUAGE_0904
@@ -247,6 +257,7 @@ nodes:
       source: "docs/evolution/research/plugin-language-policy-2026-09/SYNTHESIS.md · docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml"
       locator: "SYNTHESIS l.24 (15 fontes · 33 claims · 25 verificadas, 7/18), l.29, l.42-43 (venue e dogfood não feitos), l.55 (8 claims, 34 fontes fora do orçamento); grafo: 7 evidências externas confirmadas, 3 com trace support.claude.com/13145358"
       method: "leitura: SYNTHESIS.md (projeção do run wf_bde10f3f-28c; journal ausente no host, find /home/marcio vazio) + contagem dos nós confirmados do grafo"
+      locality: "repo"
 
   # ── AS OPÇÕES (uma claim por opção, todas open) ──────────────────────────────────────────
   - id: C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR
@@ -301,6 +312,7 @@ nodes:
       source: "50f94101 (corpo do commit) · docs/evolution/research/plugin-language-policy-2026-09/SYNTHESIS.md"
       locator: "corpo de 50f94101 l.3-6 (\"sela (i′) e (c), segue\"); SYNTHESIS l.35-46 (veredito do Elenxo, (i′) e 6 CONSTRAINS)"
       method: "testemunho: selo do maestro de 2026-09-04 citado no corpo do commit 50f94101; conteúdo da política por leitura da SYNTHESIS l.35-46"
+      locality: "repo"
 
   # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ───────────────────
   - id: E_OBJECAO_SILENCIO_CORTA_PARA_OS_DOIS_LADOS
@@ -319,6 +331,7 @@ nodes:
       source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
       locator: "a propria E_POLITICA_SEM_REQUISITO_DE_IDIOMA (tier 9) lida com rigor logico, cruzada com plugin-directory-landscape-2026-09/E_CURADORIA_DUAS_CAMADAS (revisao automatica a cada push + selo Anthropic Verified) e com E_LACUNAS_PLUGIN_DIRECTORY_0904 (\"i18n NAO respondido\")"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_TRES_ACHADOS_SAO_UMA_SO_PAGINA
     node_type: evidence
@@ -336,6 +349,7 @@ nodes:
       source: "docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml · docs/evolution/research/plugin-language-policy-2026-09/SYNTHESIS.md"
       locator: "grafo l.59-99 (E_POLITICA_SEM_REQUISITO_DE_IDIOMA, E_POLITICA_PRIVACIDADE_E_DOC_SEM_LOCALE, E_POLITICA_TRES_EXEMPLOS_SEM_IDIOMA, trace 13145358); SYNTHESIS l.24 e l.29"
       method: "derivado: contagem de URLs distintas entre os 7 nós CONFIRMADA do próprio grafo + leitura da SYNTHESIS"
+      locality: "repo"
 
   - id: E_OBJECAO_PAPER_SO_TRANSFERE_PARA_A_PARTE_MANUAL
     node_type: evidence
@@ -353,6 +367,7 @@ nodes:
       source: "https://arxiv.org/html/2508.02497v1"
       locator: "https://arxiv.org/html/2508.02497v1 (regime medido: traducao MANTIDA A MAO) cruzado com a medicao local — READMEs de plugin e do marketplace sao GERADOS por .claude/utils/marketplace/plugin-readme.sh e marketplace-readme.sh e travados byte-a-byte pela REGRA 19 [HARD] em .claude/validation/lint-artifacts.sh:1161"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_MIRROR_NAO_FOI_MEDIDO
     node_type: evidence
@@ -370,6 +385,7 @@ nodes:
       source: "https://github.com/anthropics/claude-plugins-community"
       locator: "https://github.com/anthropics/claude-plugins-community — o que foi lido foi o README do mirror; o template de PR, o bot de revisao e a listagem viva com contador de instalacoes nao foram inspecionados, e a propria rodada registra em \"descartados\" que o fetch nao encontrou exemplos de plugins nao-anglofonos"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_JETBRAINS_TEM_LOCALE_EXPLICITO
     node_type: evidence
@@ -387,6 +403,7 @@ nodes:
       source: "https://plugins.jetbrains.com/docs/intellij/providing-translations.html"
       locator: "material do JetBrains SDK citado pelo Elenxo e cortado por orcamento na rodada: language packs com atributo de locale explicito (locale=\"zh-CN\" no plugin.xml) e bundled translations por diretorio (/localization/$LANGUAGE_CODE$/) — nao re-buscado nesta rodada, por isso confianca 0.6"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_IDIOMA_EXIGE_INSTRUCAO_EXPLICITA
     node_type: evidence
@@ -404,6 +421,7 @@ nodes:
       source: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support"
       locator: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support (tier 10, 3-0) somado ao tier 6 descartado de que prompt em ingles produz resposta ~52% mais longa (https://arxiv.org/html/2608.26186)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS
     node_type: evidence
@@ -422,6 +440,7 @@ nodes:
       source: "plugins/*/README.md; https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
       locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy (>= 3 exemplos de prompt exigidos) cruzado com a medicao local de 2026-09-04: `grep -rc \"Exemplo\" plugins/*/README.md` = 0 nos oito READMEs; nenhum heading de exemplos entre os 10 gerados"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_DOGFOOD_DE_IDIOMA_NAO_FOI_FEITO
     node_type: evidence
@@ -439,6 +458,7 @@ nodes:
       source: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support"
       locator: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support (tier 10) — claim descartada pela rodada apesar de responder LITERALMENTE a uma das perguntas do escopo; nenhuma invocacao de comando de corpo pt-BR em sessao EN foi executada nesta rodada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_PENALIDADE_DE_DESCOBERTA_DESCARTADA
     node_type: evidence
@@ -456,6 +476,7 @@ nodes:
       source: "https://arxiv.org/html/2602.19446"
       locator: "https://arxiv.org/html/2602.19446 (tier 7) — claim descartada pela rodada sem contra-evidencia nomeada: repos dominados por ingles com mediana de 36 estrelas contra 12 (mistos) e 2 (nao-ingles)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
 
   # ── CENSO DO VENUE (CONSTRAIN 2 cumprida — medido por gh api em 2026-09-04) ─────────────

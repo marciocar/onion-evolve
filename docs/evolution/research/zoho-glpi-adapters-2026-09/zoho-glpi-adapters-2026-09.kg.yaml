@@ -70,6 +70,7 @@ nodes:
       source: "https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2"
       locator: "https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2 — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ZOHO_SEM_ENDPOINT_TRANSICAO
     node_type: evidence
@@ -87,6 +88,7 @@ nodes:
       source: "https://www.zoho.com/projects/help/rest-api/tasks-api.html"
       locator: "https://www.zoho.com/projects/help/rest-api/tasks-api.html — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GLPI_CLOUD_SAAS_OVH_EUROPA
     node_type: evidence
@@ -105,6 +107,7 @@ nodes:
       source: "https://www.glpi-project.org/en/glpi-network-cloud/"
       locator: "https://www.glpi-project.org/en/glpi-network-cloud/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1); pagina de VENDAS do fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GLPI_EXPORT_DOC_DESACONSELHA_PHPMYADMIN
     node_type: evidence
@@ -122,6 +125,7 @@ nodes:
       source: "https://help.glpi-project.org/tutorials/my-instance/export_database"
       locator: "https://help.glpi-project.org/tutorials/my-instance/export_database — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0); citacao verbatim confirmada na pagina"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GLPI_DOCKER_PAGINA_SILENTE
     node_type: evidence
@@ -139,6 +143,7 @@ nodes:
       source: "https://www.glpi-project.org/en/run-glpi-with-docker/"
       locator: "https://www.glpi-project.org/en/run-glpi-with-docker/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0); achado NEGATIVO (ausencia de informacao na fonte)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── MEDIÇÃO PRÓPRIA (a casa, não a web) ──────────────────────────────────────────────
   - id: E_FORGE_PRECEDENTE_MEDIDO_16_METODOS
@@ -157,6 +162,7 @@ nodes:
       source: ".claude/utils/forge/interface.md"
       locator: "medicao nesta sessao: grep dos metodos em .claude/utils/forge/interface.md devolve EXATAMENTE 16 — createPR, updatePR, getPR, getPRStatus, listPRs, mergePR, addReviewComment, getReviewComments, updateReviewComment, requestReviewers, getCIStatus, getCheckRuns, createRelease, getRelease, validateRepo, getProviderFromRemote; e `NoForgeAdapter` existe em .claude/utils/forge/adapters/none.md (tambem citado em README.md e factory.md). Comparacao: .claude/utils/task-manager/ tem interface propria de 14 metodos e 5 adapters (jira 887 linhas, clickup 796, linear 785, asana 546, none 46)."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── EIXO MERCADO (invariante, mesmo vazio) ───────────────────────────────────────────
   - id: E_MERCADO_ZOHO_GLPI_0923
@@ -175,6 +181,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_fea4633d-17c.json"
       locator: "result.market"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_fea4633d-17c.json no host (campo result.market do run wf_fea4633d-17c)"
+      locality: "host"
 
   # ── LACUNAS DECLARADAS (contagem EXATA, nunca menor que a real) ───────────────────────
   - id: E_LACUNAS_DECLARADAS_ZOHO_GLPI_0923
@@ -194,6 +201,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_fea4633d-17c.json"
       locator: "result.stats (sources 18, claims 25, confirmed 5, refuted 20, unverified 0) · result.decision.objections (25: finding/true 5, discarded-by-comodismo/true 14, discarded-by-evidence/false 6) · result.budgetDropped (16: high 6, medium 7, low 3)"
       method: "testemunho: leitura do journal /home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_fea4633d-17c.json no host 2026-10-09"
+      locality: "host"
 
   # ── A DECISÃO (OPEN — quem sela é o maestro) ──────────────────────────────────────────
   - id: D_ZOHO_GLPI_ADAPTERS_0923
@@ -289,6 +297,7 @@ nodes:
       source: "https://forum.glpi-project.org/viewtopic.php?id=294972"
       locator: "https://forum.glpi-project.org/viewtopic.php?id=294972 — fonte que a rodada listou como NAO LIDA e que o Elenxo leu, com trechos verbatim; cruzada com a propria pagina v2 do GLPI e com github.com/glpi-project/glpi/releases. Afirmacao de UM agente, sem votacao adversarial."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_2_ZOHO_V3_CORTE_DEZ_2025
     node_type: evidence
@@ -307,6 +316,7 @@ nodes:
       source: "https://www.zoho.com/projects/help/rest-api/tasks-api.html"
       locator: "https://www.zoho.com/projects/help/rest-api/tasks-api.html (lida pelo Elenxo: expoe v2 e v3 na MESMA pagina) + https://ascentbusiness.co.uk/zoho-projects-api-deadline-migrate-to-v3-by-31-december-2025/ (consultoria/parceiro, tier 4). A primaria projects.zoho.com/api-docs e PRIMARIO CITADO, NAO LIDO. Afirmacao de UM agente, sem votacao."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_3_INSTANCIA_REAL_NUNCA_MEDIDA
     node_type: evidence
@@ -324,6 +334,7 @@ nodes:
       source: "https://www.glpi-project.org/en/glpi-network-cloud/"
       locator: "https://www.glpi-project.org/en/glpi-network-cloud/ (tier 7, pagina de vendas) confrontada com: a fala do maestro (\"hoje buscamos as atividades la via API\", sem dizer a hospedagem) e com https://help.glpi-project.org/tutorials/my-instance/export_database, lida pelo Elenxo, que instrui \"Once connected in CLI on your server hosting your database\" e nao tem uma linha sobre cloud->self-hosted. Afirmacao de UM agente, sem votacao."
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_4_EXPORT_DOCUMENTADO_INVERTE_A_ORDEM
     node_type: evidence
@@ -341,6 +352,7 @@ nodes:
       source: "https://help.glpi-project.org/tutorials/my-instance/export_database"
       locator: "https://help.glpi-project.org/tutorials/my-instance/export_database — citacao verbatim tier 9 confirmada (\"Once connected in CLI on your server hosting your database\", mysqldump/tar, alternativa HeidiSQL exigindo conectividade direta ao banco), lida pelo Elenxo, e AUSENCIA verificada de procedimento cloud->self-hosted na pagina. Afirmacao de UM agente, sem votacao."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_5_ACHADO_VAZIO_COM_DEZ_NAO_LIDAS
     node_type: evidence
@@ -358,6 +370,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_fea4633d-17c.json"
       locator: "result.decision.objections[4] (target \"Achado 5 — a página Docker do GLPI...\", kind=finding, survives=true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_fea4633d-17c.json no host (veredito do Elenxo, objeção ao achado 5)"
+      locality: "host"
 
   - id: E_OBJECAO_6_BASTA_TROCAR_BASE_URL_DESCARTADO
     node_type: evidence
@@ -375,6 +388,7 @@ nodes:
       source: "https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2"
       locator: "a claim REFUTADA \"a API v2 autentica por OAuth2 Password Grant e nao distingue cloud vs self-hosted, logo basta trocar a base URL\" (https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2, tier 9) reaberta pelo Elenxo sob a clausula 6 (descartado por evidencia ou por comodismo?) — veredito: por comodismo. ⚠️ O texto desta objecao chegou TRUNCADO ao handoff desta sessao; modelados os 3 sub-pontos legiveis. Afirmacao de UM agente, sem votacao."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
 edges:
   # ── evidência -> pergunta (SUPPORTS) ─────────────────────────────────────────────────

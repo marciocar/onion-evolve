@@ -18,6 +18,7 @@ nodes:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
       locator: "execucao-direta-9-agents-seriais-com-usage-por-item"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_FALLBACK_SERIAL_RODA
     node_type: evidence
@@ -35,6 +36,7 @@ nodes:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md · docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
       locator: "SYNTHESIS.md l.38-40 (Passos 2, 3 e 4 em 9 de 9, zero SKIP), l.42-50 (Passo 0 e Passo 1 não executaram), l.56-64 (teste forçado; provado o caminho de código, não o gatilho) · ledger-por-item.tsv (9 itens com veredito)"
       method: "leitura: síntese do M8 revisada em a8b6cfb7 (revisão adversarial do PR #548) + ledger-por-item.tsv"
+      locality: "repo"
 
   - id: E_DELTA_ENTRE_ITEM2_E_ITEM3
     node_type: evidence
@@ -51,6 +53,7 @@ nodes:
       source: "docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
       locator: "usage-por-item-do-runtime-ver-ledger-por-item.tsv"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_SERIAL_ACUMULA_CONTEXTO
     node_type: claim
@@ -76,6 +79,7 @@ nodes:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md · docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
       locator: "SYNTHESIS.md l.31-33 (citação do W3 não verificável) e l.102-119 (§A estimativa errou por 2,3×; 1,4M é PISO) · ledger-por-item.tsv (soma da col.3 = 697.710)"
       method: "leitura: síntese do M8 revisada em a8b6cfb7 + ledger versionado (soma conferida por awk)"
+      locality: "repo"
 
   - id: C_DRIFT_44_PCT_NA_VPS
     node_type: claim
@@ -92,6 +96,7 @@ nodes:
       source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md · docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv · commit 8b005f65 (corpo)"
       locator: "SYNTHESIS.md l.121-143 (§44% de drift) · ledger-por-item.tsv (9 linhas, 4 DRIFTED) · 8b005f65 corpo §\"CORRIGIDA UMA FALSIDADE FACTUAL\" (sudo find .../onion-bridge/workspaces -name whatsapp-sender devolve o caminho)"
       method: "leitura: síntese e ledger versionados do M8 + correção registrada no corpo do commit 8b005f65 (2026-08-07)"
+      locality: "repo"
 
   - id: C_CONTRATO_M6_NAO_COBRE_SERIAL
     node_type: claim

@@ -79,6 +79,7 @@ nodes:
       source: "https://www.w3.org/TR/rdf11-datasets/"
       locator: "https://www.w3.org/TR/rdf11-datasets/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SPARQL_SERVICE_FEDERADO
     node_type: evidence
@@ -97,6 +98,7 @@ nodes:
       source: "https://www.w3.org/TR/sparql11-federated-query/"
       locator: "https://www.w3.org/TR/sparql11-federated-query/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NEO4J_COMPOSITE_QUERY_N_GRAFOS
     node_type: evidence
@@ -115,6 +117,7 @@ nodes:
       source: "https://neo4j.com/docs/operations-manual/current/fabric/"
       locator: "https://neo4j.com/docs/operations-manual/current/fabric/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NEO4J_ARESTA_NAO_ATRAVESSA_PROXY_NODE
     node_type: evidence
@@ -133,6 +136,7 @@ nodes:
       source: "https://neo4j.com/docs/operations-manual/current/fabric/"
       locator: "https://neo4j.com/docs/operations-manual/current/fabric/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_FREEMAN_CENTRALIZATION_NORMALIZADA
     node_type: evidence
@@ -150,6 +154,7 @@ nodes:
       source: "https://en.wikipedia.org/wiki/Centrality"
       locator: "https://en.wikipedia.org/wiki/Centrality — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CLOSENESS_NORMALIZA_POR_TAMANHO
     node_type: evidence
@@ -167,6 +172,7 @@ nodes:
       source: "https://en.wikipedia.org/wiki/Centrality"
       locator: "https://en.wikipedia.org/wiki/Centrality — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NAMED_GRAPHS_URI_PROVENIENCIA
     node_type: evidence
@@ -184,6 +190,7 @@ nodes:
       source: "https://en.wikipedia.org/wiki/Named_graph"
       locator: "https://en.wikipedia.org/wiki/Named_graph — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBSIDIAN_LINK_QUALIFICADO_NAMESPACE
     node_type: evidence
@@ -202,6 +209,7 @@ nodes:
       source: "https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian"
       locator: "https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MULTIVAULT_MCP_SEM_VIEW_AGREGADA
     node_type: evidence
@@ -220,6 +228,7 @@ nodes:
       source: "https://github.com/bepitulaz/obsidian-multivault-mcp"
       locator: "https://github.com/bepitulaz/obsidian-multivault-mcp — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_W3C_MERGE_E_ESCOLHA_EXPLICITA
     node_type: evidence
@@ -237,6 +246,7 @@ nodes:
       source: "https://www.w3.org/TR/rdf11-datasets/"
       locator: "https://www.w3.org/TR/rdf11-datasets/ secao 3.2 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EIXO MERCADO/CAPITAL (invariante — cláusula 4) ───────────────────────────────────
   - id: E_MERCADO_KG_MULTI_GRAPH_0904
@@ -255,6 +265,7 @@ nodes:
       source: "https://neo4j.com/docs/operations-manual/current/fabric/"
       locator: "busca do eixo mercado/capital nesta rodada — nenhuma rodada de investimento, M&A ou nota de analista colhida sobre \"visao agregada de N grafos de conhecimento peer\" (KG pessoal ou organizacional); unico sinal adjacente e de FORNECEDOR: https://neo4j.com/docs/operations-manual/current/fabric/"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── LACUNAS DECLARADAS (cláusula 8: lacuna vira nó) ──────────────────────────────────
   - id: E_LACUNAS_KG_MULTI_GRAPH_0904
@@ -273,6 +284,7 @@ nodes:
       source: "docs/evolution/research/kg-multi-graph-view-2026-09/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.24 (10 confirmadas, 15 refutadas), l.49 (C5 lacunas), l.57 (NÃO-VERIFICADOS); corpo do commit a71023c6"
       method: "testemunho: contabilidade da rodada /onion-research wf_bb97173d-425 (2026-09-04, commit a71023c6); journal do run ausente no host, detalhamento por tier só no próprio nó"
+      locality: "repo"
 
   # ── A DECISÃO (OPEN — o maestro sela; nenhuma sessão converte recomendação em veredito) ─
   - id: D_KG_MULTI_GRAPH_VIEW_0904
@@ -376,6 +388,7 @@ nodes:
       source: ".claude/validation/kg-trace-resolve.sh"
       locator: "E_W3C_SEM_SEMANTICA_UNICA_DATASETS (https://www.w3.org/TR/rdf11-datasets/) cruzada com E_W3C_MERGE_E_ESCOLHA_EXPLICITA (mesma fonte, secao 3.2) e com a medicao local: grep -c \"system(|getline <|getline<\" .claude/validation/kg-radar.sh -> 0 (executado 2026-09-04); kg-trace-resolve.sh l.19-23"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_2_SERVICE_PRESSUPOE_ENDPOINT_VIVO
     node_type: evidence
@@ -393,6 +406,7 @@ nodes:
       source: "docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml"
       locator: "cabeçalho do grafo l.36-39 (E_OBJECAO_2 e Q_BACKLOG_FEDERADO); docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml l.281-288 (Q_BACKLOG_FEDERADO open, gatilho literal); SYNTHESIS.md l.29, l.34-36"
       method: "juízes: objeção sobrevivente do Elenxo da rodada wf_bb97173d-425 (cabeçalho declara 10 objeções sobreviventes; veredito do Elenxo no SYNTHESIS l.34-36); premissa gated por leitura do nó Q_BACKLOG_FEDERADO"
+      locality: "repo"
 
   - id: E_OBJECAO_3_COMPOSITE_E_ADMIN_PLATFORM_E_SILENTE_SOBRE_METRICA
     node_type: evidence
@@ -410,6 +424,7 @@ nodes:
       source: "docs/evolution/research/stack-harmonia-2026-08"
       locator: "E_NEO4J_COMPOSITE_QUERY_N_GRAFOS (https://neo4j.com/docs/operations-manual/current/fabric/ — vendor doc tier 8, edicao Enterprise) cruzada com o corpus: stack-harmonia-2026-08/D_anti_catalogo (confirmed 2026-08-01, \"nao construir admin platform/painel agregado\")"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_4_PROXY_NODE_SEM_INTEGRIDADE_REFERENCIAL
     node_type: evidence
@@ -427,6 +442,7 @@ nodes:
       source: ".claude/validation/kg-trace-resolve.sh"
       locator: "E_NEO4J_ARESTA_NAO_ATRAVESSA_PROXY_NODE (https://neo4j.com/docs/operations-manual/current/fabric/) cruzada com medicao local: kg-trace-resolve.sh l.10-12 registra \"54 grafos, 1.659 nos com trace: -> 13 ponteiros mortos (7 por arquivo movido para _processed/, 4 por prefixo perdido, 2 por reorganizacao)\"; e grep -n orfao .claude/validation/kg-radar.sh -> l.744 `if (deg[id] == 0) print \"✗ no orfao (grau 0)\"` — unico guard de orfao do motor, INTRA-arquivo"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_5_ATENCAO_COM_GRAU_BRUTO_NAO_E_COMPARAVEL
     node_type: evidence
@@ -444,6 +460,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "E_FREEMAN_CENTRALIZATION_NORMALIZADA + E_CLOSENESS_NORMALIZA_POR_TAMANHO (https://en.wikipedia.org/wiki/Centrality) cruzadas com medicao local: .claude/validation/kg-radar.sh l.354/407/446/457/487 -> att[id] = impact[id] * conf[id] * sf * (1 + deg[id]) com deg incrementado cru em l.303/316, ZERO normalizacao por tamanho; dispersao do corpus medida hoje: docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml = 882 nos / 1.087 arestas contra grafos de ~10 nos"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_6_DEFEITO_JA_VIVO_NO_BACKLOG_MD
     node_type: evidence
@@ -461,6 +478,7 @@ nodes:
       source: "docs/backlog.md"
       locator: "medicao local 2026-09-04: docs/backlog.md l.8 \"122 itens abertos em 36 grafo(s) com aberto (de 58 no escopo) · 36 grupo(s)\"; .claude/validation/kg-backlog-project.sh l.175-179 comentario \"grupos ordenados por MAIOR atencao do grupo\" + `sort -t$\\t -k1,1nr`; ordem renderizada hoje coloca plugin-mcp-posture-2026-09 acima de m3-federation-admin-2026-07"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_7_NAMED_GRAPH_SO_RATIFICA_STATUS_QUO
     node_type: evidence
@@ -478,6 +496,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "E_NAMED_GRAPHS_URI_PROVENIENCIA (https://en.wikipedia.org/wiki/Named_graph, tier 6) cruzada com medicao local: .claude/validation/kg-radar.sh l.390 — \"a fila do corpus e o laco de quem chama — por isso a 1a coluna e o ARQUIVO, sem a qual o id sozinho nao localiza nada num corpus\"; git ls-files \"*.kg.yaml\" | grep -v /fixtures/ | wc -l -> 88 grafos"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_8_SINTAXE_SEM_RESOLVER_NAO_GARANTE
     node_type: evidence
@@ -495,6 +514,7 @@ nodes:
       source: "https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian"
       locator: "E_OBSIDIAN_LINK_QUALIFICADO_NAMESPACE (https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian, tier 5, plugin de terceiro em repo pessoal) cruzada com kg-trace-resolve.sh l.10-12 (13 ponteiros mortos medidos em 1.659 `trace:`)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_9_AUSENCIA_EM_UMA_IMPLEMENTACAO_NAO_E_ANTIPADRAO
     node_type: evidence
@@ -512,6 +532,7 @@ nodes:
       source: "https://github.com/bepitulaz/obsidian-multivault-mcp"
       locator: "E_MULTIVAULT_MCP_SEM_VIEW_AGREGADA (https://github.com/bepitulaz/obsidian-multivault-mcp, tier 5, voto 2-1); ⚠️ o texto integral desta objecao chegou TRUNCADO no handoff do Elenxo (\"kind\":\"fi...) — o que segue e derivado do proprio achado 9 e do seu tier/votos, sem completar por adivinhacao"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_10_W3C_MERGE_LEGITIMA_FUNDIR
     node_type: evidence
@@ -529,6 +550,7 @@ nodes:
       source: "https://www.w3.org/TR/rdf11-datasets/"
       locator: "E_W3C_MERGE_E_ESCOLHA_EXPLICITA (https://www.w3.org/TR/rdf11-datasets/ secao 3.2, tier 10, 3-0) — a evidencia de maior autoridade da rodada, lida contra a tentacao de usar o achado 1 para reprovar O1"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
 edges:
   # ── evidência web -> pergunta ────────────────────────────────────────────────────────

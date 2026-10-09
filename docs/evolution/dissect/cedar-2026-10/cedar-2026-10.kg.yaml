@@ -48,6 +48,7 @@ nodes:
       source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
       locator: "nivel PAGO pelo corpus: engenharia-de-corpus-de-regras-2026-10 traz o repo cedar-policy/cedar-spec sob Apache 2.0, mantido pela AWS, com Cedar Analysis anunciado no blog de open source do fornecedor"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_N1_CAPACIDADE
     node_type: evidence
@@ -66,6 +67,7 @@ nodes:
       source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
       locator: "nivel PAGO pelo corpus (tier 8, votos 2-1): o Cedar Analysis detecta por analise estatica permits sombreados, condicoes impossiveis, forbid que anula permits e negacao total de acoes; ha CLI que COMPARA dois corpus de politicas"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_N2_MECANISMO
     node_type: evidence
@@ -84,6 +86,7 @@ nodes:
       source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
       locator: "nivel PAGO pelo corpus (tier 8, votos 3-0): a analise e correta e completa, com prova formalizada em Lean, usando SMT solver (CVC5) sobre formulas que representam TODAS as requisicoes possiveis"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_N2_LACUNA_EXECUCAO
     node_type: evidence
@@ -112,6 +115,7 @@ nodes:
       source: "docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml"
       locator: "regua de transferencia aplicada contra E_N2_MECANISMO, com a objecao do refutador do grafo irmao (E_OBJECAO_5_CEDAR_NAO_E_PORTAVEL) sobrevivendo"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_N3_O_QUE_TRANSFERE
     node_type: evidence
@@ -130,6 +134,7 @@ nodes:
       source: "https://arxiv.org/pdf/2607.03656"
       locator: "nivel PAGO pelo corpus (tier 7, votos 3-0): AutoCedar (arXiv 2607.03656, jul/2026) usa laco agentico de LLM com verificador formal SMT como GATE para autoria de politica — a politica gerada e verificada antes de ser aceita"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_N3_ORDEM_NINGUEM_DERIVA
     node_type: evidence
@@ -148,6 +153,7 @@ nodes:
       source: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/"
       locator: "nivel PAGO pelo corpus (tier 7, votos 3-0): o Cedar autorizando agentes em cadeia multi-agente avalia em 3 camadas L1 a L3 com halt no primeiro deny, e a ordem e FIXA POR CAMADA, sem derivacao de dependencia entre politicas"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CORPUS_PAGOU_N0_A_N2
     node_type: evidence
@@ -166,6 +172,7 @@ nodes:
       source: ".claude/validation/dissect-census.sh"
       locator: "30eecf28^ (arvore anterior a 1a dissecacao); .claude/validation/dissect-census.sh l.23, l.117 em 30eecf28; corpo de 30eecf28"
       method: "medição: bash .claude/validation/dissect-census.sh (registrado no verified_against; re-executado 2026-10-09 devolve \"cedar | N3 | parquear | 2026-10-01 | 2026-10-31\"); estado do dia 1 por leitura de 30eecf28^ (148 .kg.yaml rastreados, zero \"dissect_tool:\")"
+      locality: "repo"
 
   - id: D_CEDAR_1001
     node_type: decision

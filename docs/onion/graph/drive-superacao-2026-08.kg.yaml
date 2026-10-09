@@ -31,6 +31,7 @@ nodes:
       source: ".claude/commands/meta/drive.md"
       locator: ".claude/commands/meta/drive.md + .claude/validation/kg-drive-project.sh no main (PR #692) + run_drive_selftests 4/4"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_DRIVE_CONDUZIU_FIO_REAL
     node_type: evidence
     label: "Prova por comportamento: o 1o /meta:drive (catraca --max-nodes 1) conduziu um fio REAL end-to-end. P0 legivel; P1 censo pegou Q_PRIMEIRO_DOGFOOD (research, atencao 15) — o MESMO fio que o /meta:realign flagara; P3 classificou research e AVANCOU (mediu o estado das 5 classes da catraca: 46 PASSIVO, demais so em evento transitorio); selou AUTO (append E_CINCO_CLASSES_ESTADO_MEDIDO SUPPORTS a Q); P5 checkpoint radar exit 0 + realign ALINHADO; re-censo confirmou a Q avancada mas ainda open (research refina, nao fecha). Nenhum merge (degrau AUDIT respeitado)"
@@ -45,6 +46,7 @@ nodes:
       source: "docs/onion/graph/catraca-regra49-2026-08.kg.yaml"
       locator: "execucao do laco na catraca-regra49-2026-08.kg.yaml: radar --integrity --schema rc=0, realign --check ALINHADO"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 edges:
   - from: D_DRIVE_MECANIZA_O_RUNTIME
     edge_type: SUPERSEDES

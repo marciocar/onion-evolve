@@ -18,6 +18,7 @@ nodes:
       source: ".claude/utils/adopt/durable-commit.sh (git add .claude)"
       locator: ".claude/utils/adopt/durable-commit.sh (git add .claude)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: C_V1
     node_type: claim
@@ -46,6 +47,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh inventory_scope_excluded"
       locator: ".claude/validation/lint-artifacts.sh inventory_scope_excluded"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: C_GAP1
     node_type: claim
@@ -69,6 +71,7 @@ nodes:
       source: "docs/knowledge-base/meta/onion-framework-identity.md"
       locator: "docs/knowledge-base/meta/onion-framework-identity.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: C_D2
     node_type: claim
@@ -82,6 +85,7 @@ nodes:
       source: ".claude/settings.json@d6aba0e^1 l.26 ; .claude/utils/task-manager/detector.md l.46 ; docs/evolution/inbox/_processed/2026-07-24-sinal-adocao-arandek.md §D2"
       locator: "settings.json:26 (antes do merge) vs detector.md:46"
       method: "leitura: as duas linhas citadas no trace + sinal do adotante"
+      locality: "repo"
 
   - id: C_D3
     node_type: claim
@@ -95,6 +99,7 @@ nodes:
       source: ".claude/commands/meta/adopt.md Fase 4"
       locator: ".claude/commands/meta/adopt.md Fase 4"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: C_D1
     node_type: claim
@@ -108,6 +113,7 @@ nodes:
       source: ".claude/skills/onion-engineering-context/SKILL.md:73"
       locator: ".claude/skills/onion-engineering-context/SKILL.md:73"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: C_STALE
     node_type: claim
@@ -162,6 +168,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh:438,542"
       locator: ".claude/validation/lint-artifacts.sh:438,542"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: E_V1_COMMITS
     node_type: evidence
@@ -190,6 +197,7 @@ nodes:
       source: "docs/onion/inventory.md"
       locator: "docs/onion/inventory.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: E_D2_SRC
     node_type: evidence
@@ -400,6 +408,7 @@ nodes:
       source: "docs/analysis/onion-adopt-update-pin-staleness-2026-07.md"
       locator: "stamps-e-frontmatter-do-adotante-comparados"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PIN_STALE_IN_SIGNAL
     node_type: evidence
@@ -416,6 +425,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-27-correcao-pin-declarado-no-sinal-anterior.md"
       locator: "frontmatter-do-sinal-vs-onion-version"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_GREP_OLD_PIN
     node_type: decision
@@ -469,6 +479,7 @@ nodes:
       source: ".claude/utils/adopt/write-stamp.sh"
       locator: "grep -rl <8hex do pin anterior> em /home/marcio/{aura,gustavo-pulga,mvp-venda-direta-pdi,<adotante-a>,onion-arthur,onion-pedro,onion-standalone,poc-venda-direta-pdi,pulse-mais,rhilo-metagamify} (pins anteriores lidos do git log do .onion-version)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_GAP2_ZERO

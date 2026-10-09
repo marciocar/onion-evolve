@@ -39,6 +39,7 @@ nodes:
       source: "docs/knowledge-base/concepts/agent-orchestration.md"
       locator: "CHANGELOG 2.1.257 l.10 + l.99; juiz EMENDOU (omitia l.99)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_F2_SUBAGENT_MODEL_FORCE
     node_type: evidence
@@ -54,6 +55,7 @@ nodes:
       source: ".claude/skills/onion-orchestration/SKILL.md"
       locator: "CHANGELOG l.13; grep -c ^model: .claude/agents = 51/60; onion-orchestration/SKILL.md:123,144,171; grep SUBAGENT_MODEL_FORCE na maquinaria = 0"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_TIERING_CHECA_ENV_FORCE
     node_type: decision
@@ -80,6 +82,7 @@ nodes:
       source: "CLAUDE.md"
       locator: "CHANGELOG l.98; grep -l bypassPermissions em 26 settings*.json (/home/marcio/*/.claude + core) rc=1 (ausencia); onion-bridge src/workspace.ts:105 + config.ts:28; juiz EMENDOU 2 numeros"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_F4_BLOCK_READS_FORA_WORKDIR
     node_type: evidence
@@ -95,6 +98,7 @@ nodes:
       source: ".claude/commands/meta/kg-freshness.md"
       locator: "CHANGELOG l.16; kg-freshness.md:120-126 (\"Bloqueio de acesso so vale TENTADO\", cita /home/onion/onion-bridge/src/)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_KG_FRESHNESS_DISTINGUE_BLOQUEIO_DE_HARNESS
     node_type: decision
@@ -121,6 +125,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md · docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md · commit 8320b1c3"
       locator: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md tabela Vereditos, linha F5 (EMENDADO, medição fail-open: .claude/plugins não existe; plugins/ = 0 symlinks) · docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md:46,47,54 (= CHANGELOG oficial l.53/54/61) · data/f1-findings-pre-juiz.md:9 (rascunho antes do juiz)"
       method: "juízes: veredito EMENDADO do juiz-e3 (opus/high, mandato REFUTAR) registrado na tabela de vereditos do SYNTHESIS.md"
+      locality: "repo"
 
   - id: E_F6_DETACHED_MORRE_NO_STOP
     node_type: evidence
@@ -136,6 +141,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "CHANGELOG l.69; grep -n setsid .claude/validation/lint-selftest.sh = so o decoy (l.9536-9537), morto por kill explicito (l.9555)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_F7_EXIT2_INTACTO
     node_type: evidence
@@ -151,6 +157,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md · docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md"
       locator: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md tabela Vereditos, linha F7 (EMENDADO, non-sequitur 'reforçada por F5a' removido) · docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md:47 e :79 (únicas linhas com 'hook') · data/f1-findings-pre-juiz.md:11"
       method: "juízes: veredito EMENDADO do juiz-e3 (opus/high) registrado na tabela de vereditos do SYNTHESIS.md"
+      locality: "repo"
 
   - id: E_F8_WORKTREE_ISOLADO_VIABILIZOU
     node_type: evidence
@@ -166,6 +173,7 @@ nodes:
       source: ".claude/commands/meta/orchestrate.md"
       locator: "CHANGELOG l.63 + l.72; git worktree list = 1 worktree linkado ativo (.claude/worktrees/discuss+onion-pessoal-app); grep -c \"<<\" lint-selftest.sh = 82 linhas com heredoc; isolation: \"worktree\" so em comentario (orchestrate.md:174) — 0 usos reais"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_F9_WORKER_CORTADO_CONTINUA
     node_type: evidence
@@ -181,6 +189,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md · docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md"
       locator: "docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md:42 (subagente cortado mid-stream continua) e :55 (transcript > 5 MB 'No transcript found') · docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md tabela Vereditos linha F9 ('omissão do juiz') e Lacunas item 3"
       method: "leitura: cópia versionada da entrada 2.1.257 do CHANGELOG e a tabela de vereditos"
+      locality: "repo"
 
   - id: E_F10_SETTINGS_POS_STARTUP_VALEM
     node_type: evidence
@@ -196,6 +205,7 @@ nodes:
       source: ".claude/commands/meta/adopt.md"
       locator: "CHANGELOG l.18; onion-bridge src/workspace.ts:44-47,105 (GUEST_SETTINGS escrito em runtime, settingSources:[project]); adopt.md:175-184 (instala/mescla .claude/settings.json no alvo)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_F11_CONTAINMENT_ESCAPE_CONVERGE_COM_SSRF
     node_type: evidence
@@ -211,6 +221,7 @@ nodes:
       source: ".claude/utils/federation-transport/a2a-ssrf-check.sh"
       locator: "CHANGELOG l.12; a2a-ssrf-check.sh:69 nega 169.254.* (link-local-metadata); grep curl/wget/getent/dig no helper = 0 (rc=1); _ssrf em lint-selftest.sh:4223 so passa string"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_LACUNAS_DECLARADAS_E3_0902
     node_type: evidence
@@ -226,6 +237,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md"
       locator: "juiz-e3, secao LACUNAS DECLARADAS — itens 1-2 na 1a entrega; itens 3-7 na 2a entrega (01:12Z, apos 2 truncamentos), que CONFIRMOU independentemente os itens 3-4 que eu declarara por conta propria (molde E_REDDIT_INALCANCAVEL)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_FABLE_5_1_CONFIRMADO_NA_CONTA
     node_type: evidence
@@ -242,6 +254,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md"
       locator: "RELATO do maestro (2026-09-02, respondendo ao item \"confirmar cota do Fable 5.1 nesta conta\" do relatorio do W9): \"confirmado, saiu a versão 5.1 do fable\" — testemunho, nao medicao (por isso evidence_class: testimony e plane: DEV). Corroboracao observada: esta sessao roda como claude-fable-5-1 (identidade de modelo reportada pelo harness da sessao 72998cdc)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PROBE_ALIAS_FABLE_MEDIDO_0902
     node_type: evidence
@@ -257,6 +270,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-fable-alias.md"
       locator: "Agent({model:\"fable\"}) + grep \"model\":\"...\" no transcript do subagente = 1x \"claude-fable-5-1\" (campo da RESPOSTA da API, nao declaracao do modelo); Claude Code 2.1.257; sessao sem gateway"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_REGRA65_CEGA_AO_PROCESSO_0902
     node_type: evidence
@@ -272,6 +286,7 @@ nodes:
       source: "commit aabfa699 (corpo) · docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md · .claude/validation/lint-artifacts.sh@aabfa699^"
       locator: "aabfa699 corpo ('rodou 2.1.247 por 6 dias com o disco em 2.1.258... REGRA 65 dizia instalado=2.1.258. Fable 5.1 ficou invisível') · probe-premodelswitch.md:12 (binário deletado, picker 'Update to 2.1.255+', eventos nasceram em 2.1.251, 4 PIDs < 2.1.255, 1ª tentativa não disparou) · lint-artifacts.sh@aabfa699^:3617-3619 (installed_cc via `claude --version`)"
       method: "leitura: corpo do commit aabfa699, sonda versionada e o lint anterior à cura"
+      locality: "repo"
 
   - id: D_REGRA65_MEDE_O_PROCESSO
     node_type: decision
@@ -287,6 +302,7 @@ nodes:
       source: ".claude/hooks/session-version-drift.sh"
       locator: "hook session-version-drift.sh no UserPromptSubmit: drift simulado (ONION_CC_EXECPATH=…/2.1.247) emitiu o aviso com as 2 versoes, 2a vez calou (rate-limit), sem drift calou; bancada run_version_drift_selftests 5/5 com claude sintetico (symlink → versions/X) + radar-staleness (f)/(g) 2/2; lint REGRA 65 prefere CLAUDE_CODE_EXECPATH e emite SOFT proprio processo != disco. O 1o commit foi REPROVADO pelo pre-commit: o CLAUDE_CODE_EXECPATH da sessao VAZAVA para dentro do fixture (f) e o caso mudava de resultado entre CI e pre-commit — cura: override ONION_CC_EXECPATH vale quando DEFINIDO (mesmo vazio), a bancada isola"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_F1_FABLE_5_1_DEFAULT

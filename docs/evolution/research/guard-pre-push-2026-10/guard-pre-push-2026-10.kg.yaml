@@ -24,6 +24,7 @@ nodes:
       source: "ops/pr-finalize.sh"
       locator: "CI dos PRs #923 (run 37335747234) e #925 (run 37337285721): REGRA 81 (Painel de estado é GERADO dos produtores, nunca redigido) — testing-state.md defasado; #924 enviado com \"Violações HARD : 2\" porque o encadeamento `lint | grep \"Violações HARD\" && push` lia a PRESENÇA da linha"
       method: "derivado na migração ao contrato v3 (trace do nó); não reverificado na migração"
+      locality: "repo"
 
   - id: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
     node_type: decision
@@ -50,6 +51,7 @@ nodes:
       source: "ops/pr-finalize.sh"
       locator: "pf-924.log (1a versao: commit de projecoes recusado pela REGRA 56 depois do --rebase); 1o teste negativo recusou pelo motivo ERRADO (regex de isencao nao conhecia \"fora de escopo\"); a familia de bancada abortou a suite por o=\"$(...)\"; rc=$? sob set -e"
       method: "derivado na migração ao contrato v3 (trace do nó); não reverificado na migração"
+      locality: "repo"
 
   - id: C_TETO_O_QUE_O_PRE_PUSH_NAO_PEGA
     node_type: claim
@@ -65,6 +67,7 @@ nodes:
       source: ".githooks/pre-push"
       locator: "cabecalho de .githooks/pre-push (FRONTEIRA DECLARADA)"
       method: "derivado na migração ao contrato v3 (trace do nó); não reverificado na migração"
+      locality: "repo"
 
   - id: E_ELENXO_REPROVOU_O_MOTOR_QUE_LAVAVA_RESIDUO
     node_type: evidence
@@ -80,6 +83,7 @@ nodes:
       source: "ops/pr-finalize.sh"
       locator: "Elenxo opus em worktree isolada, sandbox git real sobre o commit 376e04c2 (scratchpad/elx-pf: t-gh.sh, t-lease.sh, t-rebase.sh, t-mutant.sh, clone/ com o commit 370ecab6 do resíduo lavado); B1 re-provado pela bancada nova: a versao defeituosa sai rc=0 com o codigo mudado, a curada recusa"
       method: "derivado na migração ao contrato v3 (trace do nó); não reverificado na migração"
+      locality: "repo"
 
   - id: E_ELENXO_2_REABRIU_B1_PELA_FORMA_DO_HASH
     node_type: evidence
@@ -95,6 +99,7 @@ nodes:
       source: "ops/pr-finalize.sh"
       locator: "Elenxo 2 (opus, worktree isolada, sandboxes git reais sobre 4a357b01): hash entre aspas e com espaco no fim lavados com rc=0; 4 de 372 residuos do acervo usam aspas; 19 mutantes rodados, 11 sobreviventes; cura medida: familia pre_push 32/32 e 23 de 24 mutantes mordem (o 24o, rcode vazio, e redundante por construcao: o hash de codigo e validado em 64 hex)"
       method: "derivado na migração ao contrato v3 (trace do nó); não reverificado na migração"
+      locality: "repo"
 
   - id: Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO
     node_type: question

@@ -31,6 +31,7 @@ nodes:
       source: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
       locator: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:9-16 (§'A máxima (cunhagem do maestro, 2026-07-24)')"
       method: "leitura: KB versionada que registra a máxima com autoria e data"
+      locality: "repo"
 
   # ── A escada de refutacoes (cada claim 'esta pronto' cai) ──────────────────
   - id: C1_HAVE_GRADUATED
@@ -71,6 +72,7 @@ nodes:
       source: "commit 07397d96 (corpo) · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
       locator: "07397d96 corpo ('Finding (3 explorers): the doctrine is ~75% ALREADY in the core, scattered across 6 docs') · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:3-4 e :85-91 (Referências: as peças que a escada unifica)"
       method: "leitura: corpo do commit 07397d96 e a lista de peças da KB"
+      locality: "repo"
 
   - id: E_MECHANISM_ORPHAN
     node_type: evidence
@@ -99,6 +101,7 @@ nodes:
       source: ".claude/validation/guardrails/onion-effect-gate.sh@6a6ac459 · .claude/commands/common/prompts/untrusted-content-provenance.md@6a6ac459 · .claude/validation/lint-selftest.sh@6a6ac459"
       locator: "untrusted-content-provenance.md@6a6ac459:32 (invoca onion-effect-gate.sh) · adopt.md e reverse-consolidate.md@6a6ac459 (citam untrusted-content-provenance) · lint-selftest.sh@6a6ac459:4758-4768"
       method: "leitura: arquivos do core no commit 6a6ac459 (2026-07-24); identidade com o protótipo conferida por diff no host"
+      locality: "repo"
 
   - id: E_ACTION_NOT_PROVEN
     node_type: evidence
@@ -112,6 +115,7 @@ nodes:
       source: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md@07397d96 · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
       locator: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md@07397d96:5 (status) e :48 (AUTOMATE gated) · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:82-83 ('hoje é juízo humano')"
       method: "leitura: ADR e KB no commit 07397d96"
+      locality: "repo"
 
   - id: E_RUNGS_MISSING
     node_type: evidence
@@ -126,6 +130,7 @@ nodes:
       source: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
       locator: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:76-83 (§'As três lacunas genuinamente novas')"
       method: "leitura: KB no commit 07397d96"
+      locality: "repo"
 
   # ── A tese-nucleo: a superacao ─────────────────────────────────────────────
   - id: D_OVERCOMING
@@ -139,6 +144,7 @@ nodes:
       source: "commit 07397d96 (corpo) · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
       locator: "07397d96 corpo (bullets KB/MECHANISM e 'eventually AUTOMATE (earned, never decreed)') · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:3-7 (cita, não recopia), :31-37 (escada HUMANO→MONITORADO→DINÂMICO→AUTO + MOAT), :68-74 (gate de integridade)"
       method: "leitura: corpo do commit 07397d96 e a KB que ele cria"
+      locality: "repo"
 
   - id: D_MECHANISM_OR_PROSE
     node_type: decision
@@ -152,6 +158,7 @@ nodes:
       source: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96 · .claude/diary/2026-07-21-mechanism-beats-prose.md"
       locator: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:68-74 (§'O mecanismo (senão é prosa)') · mechanism-beats-prose.md:10 (next_recommended: 'meia-vida curta')"
       method: "leitura: KB no commit 07397d96 e a migalha citada no trace"
+      locality: "repo"
 
   # ── Os 3 degraus faltantes como perguntas abertas (Ondas 2-4) ──────────────
   - id: Q_MONITORED_RUNG

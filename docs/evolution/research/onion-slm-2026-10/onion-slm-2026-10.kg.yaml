@@ -87,6 +87,7 @@ nodes:
       source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml"
       locator: "baa56596:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.395-403 (D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10: status done, verified_against SELADO PELO MAESTRO, label)"
       method: "leitura: nó-alvo no grafo nanochat, hoje em main (o verified_against apontava a branch, que entrou em main)"
+      locality: "repo"
 
   - id: X_REF_NANOCHAT_OPTION_C
     node_type: entity
@@ -102,6 +103,7 @@ nodes:
       source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml"
       locator: "baa56596:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.363-371 (C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL)"
       method: "leitura: nó-alvo no grafo nanochat em main"
+      locality: "repo"
 
   - id: X_REF_NANOCHAT_Q_EVAL
     node_type: entity
@@ -117,6 +119,7 @@ nodes:
       source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml"
       locator: "baa56596:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.688-696 (Q_EVAL_DE_DOMINIO_DO_ONION)"
       method: "leitura: nó-alvo no grafo nanochat em main"
+      locality: "repo"
 
   - id: X_REF_NANOCHAT_OBJ_CORRELATED_ERROR
     node_type: entity
@@ -132,6 +135,7 @@ nodes:
       source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml"
       locator: "baa56596:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.435-443 (E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR)"
       method: "leitura: nó-alvo no grafo nanochat em main"
+      locality: "repo"
 
   - id: X_REF_DEID_NONE_FAILSAFE
     node_type: entity
@@ -147,6 +151,7 @@ nodes:
       source: "docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml#IN_NONE_FAILSAFE"
       locator: "docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml l.140-147 — IN_NONE_FAILSAFE, invariant, status: confirmed"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── EVIDENCIAS ANCORADAS · especialistas prontos: GLiNER2.5 ─────────────────────────────
   - id: E_GLINER25_SIZES_APACHE
@@ -165,6 +170,7 @@ nodes:
       source: "https://fastino.ai/models/gliner2-5"
       locator: "QUOTE verbatim: \"0.3B (multi), 0.2B (base), 74M (small)\" — LOCATOR: fastino.ai/models/gliner2-5, tabela de comparacao, linha MODEL SIZE (PARAMETERS); linha OPEN-SOURCE LICENSE; README, tabela GLiNER2.5 (boundary) e badge/rodape de licenca. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GLINER25_CPU_FIRST_DECLARED
     node_type: evidence
@@ -182,6 +188,7 @@ nodes:
       source: "https://github.com/fastino-ai/GLiNER2"
       locator: "QUOTE verbatim: \"CPU first: fast local inference on standard hardware — no GPU required\" — LOCATOR: github.com/fastino-ai/GLiNER2, README, secao Why GLiNER2? (linha 26). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── GLiNER2-PII ──────────────────────────────────────────────────────────────────────────
   - id: E_GLINER2PII_NO_CPF_CNPJ_LABEL
@@ -200,6 +207,7 @@ nodes:
       source: "https://arxiv.org/abs/2605.09973v1"
       locator: "QUOTE verbatim: \"Government / tax identifiers government_id, national_id_number, passport_number, drivers_license_number, license_number, tax_id, tax_number\" — LOCATOR: arXiv 2605.09973v1, Table 1 (linha Government / tax identifiers). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GLINER2PII_PORTUGUESE_SYNTHETIC_CORPUS
     node_type: evidence
@@ -217,6 +225,7 @@ nodes:
       source: "https://arxiv.org/abs/2605.09973v1"
       locator: "QUOTE verbatim: \"files, in English, French, Spanish, German, Italian, Portuguese, and Dutch, with occasional mixed-language passages.\" — LOCATOR: arXiv 2605.09973v1, Secao 3 (fim da descricao do corpus); Secao 6 Discussion and Limitations. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GLINER2PII_EVAL_SPY_ONLY
     node_type: evidence
@@ -234,6 +243,7 @@ nodes:
       source: "https://arxiv.org/abs/2605.09973v1"
       locator: "QUOTE verbatim: \"The evaluation covers only legal and medical documents, and the training data are entirely synthetic and have not been validated by human annotators.\" — LOCATOR: arXiv 2605.09973v1, Secao 6 (Discussion and Limitations); Secao 4 (Benchmark). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── OpenAI Privacy Filter ────────────────────────────────────────────────────────────────
   - id: E_OPF_SIZE_LICENSE_LOCAL
@@ -357,6 +367,7 @@ nodes:
       source: "https://github.com/numindai/nuextract"
       locator: "QUOTE verbatim: \"GitHub Repository](https://github.com/numindai/nuextract) — inference & fine-tuning scripts\" — LOCATOR: blog NuMind, links rapidos (Quick Links / Availability). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NUEXTRACT3_TYPED_TEMPLATES
     node_type: evidence
@@ -392,6 +403,7 @@ nodes:
       source: "https://artificialanalysis.ai/articles/qwen3-5-small-models"
       locator: "QUOTE verbatim: \"Qwen3.5 9B (32) scores roughly double the next closest models under 10B.\" — LOCATOR: artificialanalysis.ai/articles/qwen3-5-small-models, secao de comparacao. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_QWEN38_27B_DENSE_COMPACT
     node_type: evidence
@@ -409,6 +421,7 @@ nodes:
       source: "https://huggingface.co/Qwen/Qwen3.8-27B"
       locator: "QUOTE verbatim: \"Qwen3.8-27B brings these advances to a compact, deployment-friendly dense model: a native vision-language model that understands images and videos\" — LOCATOR: huggingface.co/Qwen/Qwen3.8-27B, model card, introducao. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_QWEN38_NO_SMALL_VARIANT_AGGREGATOR
     node_type: evidence
@@ -426,6 +439,7 @@ nodes:
       source: "codersera.com (artigo sobre o lineup Qwen 3.8)"
       locator: "QUOTE verbatim: \"There is no Qwen 3.8 at 0.8B, 3B, 9B, 14B, 35B, 70B or 122B.\" — LOCATOR: codersera.com, secao Why do searches for Qwen 3.8 35B-A3B, 14B and 122B come up empty?. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_QWEN36_35B_A3B_OPEN_AGGREGATOR
     node_type: evidence
@@ -443,6 +457,7 @@ nodes:
       source: "codersera.com (artigo sobre o lineup Qwen 3.8)"
       locator: "QUOTE verbatim: \"Qwen3.6-35B-A3B is real: 35B total, 3B activated, Apache 2.0, April 2026.\" — LOCATOR: codersera.com, secao Why do searches for Qwen 3.8 35B-A3B ... come up empty?. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   # ── Bases: Gemma 4 ──────────────────────────────────────────────────────────────────────
   - id: E_GEMMA4_APACHE2_STANDARD
@@ -478,6 +493,7 @@ nodes:
       source: "https://huggingface.co/blog/gemma4"
       locator: "QUOTE verbatim: \"2.3B effective, 5.1B with embeddings\" — LOCATOR: Hugging Face blog gemma4, tabela de modelos. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GEMMA4_12B_UNIFIED_0603
     node_type: evidence
@@ -496,6 +512,7 @@ nodes:
       source: "https://ai.google.dev/gemma/docs/releases"
       locator: "QUOTE verbatim: \"Release of Gemma 4 12B Unified.\" — LOCATOR: ai.google.dev/gemma/docs/releases, entrada de 3 de junho de 2026. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GEMMA4_MTP_RELEASE_0416
     node_type: evidence
@@ -514,6 +531,7 @@ nodes:
       source: "https://ai.google.dev/gemma/docs/releases"
       locator: "QUOTE verbatim: \"Release of Gemma 4 - MTP for E2B, E4B, 31B, and 26B A4B.\" — LOCATOR: ai.google.dev/gemma/docs/releases, entrada de 16 de abril de 2026. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── Bases: ZAYA1 ────────────────────────────────────────────────────────────────────────
   - id: E_ZAYA1_8B_MOE_760M_ACTIVE
@@ -532,6 +550,7 @@ nodes:
       source: "https://huggingface.co/Zyphra/ZAYA1-8B"
       locator: "QUOTE verbatim: \"a small mixture of experts language model with 760M active parameters and 8.4B total parameters trained end-to-end by Zyphra.\" — LOCATOR: Model card HF Zyphra/ZAYA1-8B, abertura. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ZAYA1_MATH_CODE_POSITIONING
     node_type: evidence
@@ -549,6 +568,7 @@ nodes:
       source: "https://huggingface.co/Zyphra/ZAYA1-8B"
       locator: "QUOTE verbatim: \"excels at detailed long-form reasoning especially for mathematical and coding task\" — LOCATOR: Model card HF Zyphra/ZAYA1-8B, descricao de capacidade. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── Embedders ───────────────────────────────────────────────────────────────────────────
   - id: E_EMBEDDINGGEMMA_308M_MTEB
@@ -568,6 +588,7 @@ nodes:
       source: "https://huggingface.co/blog/embeddinggemma"
       locator: "QUOTE verbatim: \"the highest-ranking text-only multilingual embedding model under 500M on the Massive Text Embedding Benchmark (MTEB)\" — LOCATOR: HF blog embeddinggemma, introducao. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_QWEN3_EMBEDDING_8B_MTEB_7058
     node_type: evidence
@@ -621,6 +642,7 @@ nodes:
       source: "https://thinkingmachines.ai/blog/on-policy-distillation/"
       locator: "QUOTE verbatim: \"reaching a higher score of 74.4 on AIME'24 at one-tenth the cost of RL with on-policy distillation\" — LOCATOR: blog Thinking Machines (on-policy distillation), Distillation for reasoning, legenda From Qwen3 Technical Report, Table 21. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TINKER_GA_1212
     node_type: evidence
@@ -639,6 +661,7 @@ nodes:
       source: "https://thinkingmachines.ai/news/tinker-general-availability"
       locator: "QUOTE verbatim: \"Everybody can use Tinker now. The waitlist is over\" — LOCATOR: thinkingmachines.ai/news/tinker-general-availability, Dec 12, 2025, secao General availability. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TINKER_DISTILLATION_RECIPE_767
     node_type: evidence
@@ -692,6 +715,7 @@ nodes:
       source: "https://github.com/huggingface/trl/releases/tag/v0.26.0"
       locator: "QUOTE verbatim: \"Move GKDTrainer to experimental module by @behroozazarkhalili in https://github.com/huggingface/trl/pull/4474\" — LOCATOR: huggingface/trl release v0.26.0, secao Experimental. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TRL_V029_SHIMS_REMOVED
     node_type: evidence
@@ -710,6 +734,7 @@ nodes:
       source: "https://github.com/huggingface/trl/releases/tag/v0.29.0"
       locator: "QUOTE verbatim: \"Remove deprecated ORPO after moved to experimental by @albertvillanova in https://github.com/huggingface/trl/pull/5050\" — LOCATOR: huggingface/trl release v0.29.0, secao Deprecations. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_UNSLOTH_GKD_CHUNKED_JSD
     node_type: evidence
@@ -728,6 +753,7 @@ nodes:
       source: "https://github.com/unslothai/unsloth/pull/12136"
       locator: "QUOTE verbatim: \"Neither the student nor the teacher materialises its `(batch, seq, vocab)` logits any more.\" — LOCATOR: unslothai/unsloth PR #12136, descricao; arquivos unsloth/models/rl_replacements.py e rl.py. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── LoRA Land: quando SLM ajustado vence fronteira ──────────────────────────────────────
   - id: E_LORALAND_310_MODELS_AVERAGES
@@ -746,6 +772,7 @@ nodes:
       source: "https://arxiv.org/abs/2405.00732"
       locator: "QUOTE verbatim: \"across 10 base models and 31 tasks for a total of 310 models. We find that 4-bit LoRA fine-tuned models outperform base models by 34 points and GPT-4 by 10 points on average.\" — LOCATOR: LoRA Land, Abstract; Tabela 2; Secao 6 (LoRA Land). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LORALAND_224_OF_310_BEAT_GPT4
     node_type: evidence
@@ -763,6 +790,7 @@ nodes:
       source: "https://arxiv.org/abs/2405.00732"
       locator: "QUOTE verbatim: \"After fine-tuning, 301/310 models surpass their base model counterpart14 , while 224/310 fine-tuned LLMs surpass the benchmark set by GPT-4 (Table 4).\" — LOCATOR: LoRA Land, Secao 4 Results (p.9), Tabelas 3 e 4. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LORALAND_CODE_LOSSES
     node_type: evidence
@@ -780,6 +808,7 @@ nodes:
       source: "https://arxiv.org/abs/2405.00732"
       locator: "QUOTE verbatim: \"magicoder humaneval 0.201 0.433 0.829 0.232 -0.396\" — LOCATOR: LoRA Land, Secao 4, Tabela 3 (PDF p.10; o claim dizia p.8-9); Apendice C (Mistral-7b). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LORALAND_NER_LEGAL_WIKISQL
     node_type: evidence
@@ -797,6 +826,7 @@ nodes:
       source: "https://arxiv.org/abs/2405.00732"
       locator: "QUOTE verbatim: \"wikisql rouge 0.301 0.898 0.909 0.597 -0.011\" — LOCATOR: LoRA Land, Secao 4, Tabela 3; Apendice C (colunas mistral-7b e zephyr-7b-beta); Tabela 1; Secao 3.5. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LORALAND_DECLARED_LIMITATIONS
     node_type: evidence
@@ -814,6 +844,7 @@ nodes:
       source: "https://arxiv.org/abs/2405.00732"
       locator: "QUOTE verbatim: \"Our evaluations are limited to the first 1000 examples of datasets with larger evaluation splits to manage costs while maintaining rigor. This may introduce selection bias\" — LOCATOR: LoRA Land, Secao 7 Limitations (p.18); tambem Secao 3.5. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── KaLLM 2026: avaliacao de extracao de KG ─────────────────────────────────────────────
   - id: E_KALLM_F1_UNDERESTIMATES
@@ -900,6 +931,7 @@ nodes:
       source: "https://github.com/SukSev/kg_benchmarking"
       locator: "QUOTE verbatim: \"The repository is publicly accessible via GitHub: https: //github.com/SukSev/kg_benchmarking\" — LOCATOR: KaLLM 2026, Secao 7 (Availability / Reproducibility). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── NVIDIA: SLM em subtarefas agenticas ─────────────────────────────────────────────────
   - id: E_NVIDIA_LLM_SLM_ALGORITHM_ONE_WAY
@@ -918,6 +950,7 @@ nodes:
       source: "https://arxiv.org/abs/2506.02153"
       locator: "QUOTE verbatim: \"In the following steps, we outline an algorithm that describes one possible way to carry out the change of the underlying model painlessly.\" — LOCATOR: NVIDIA, Small Language Models are the Future of Agentic AI, Secao 6, paragrafo introdutorio. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NVIDIA_S1_INSTRUMENT_CALLS
     node_type: evidence
@@ -935,6 +968,7 @@ nodes:
       source: "https://arxiv.org/abs/2506.02153"
       locator: "QUOTE verbatim: \"The initial step involves deploying instrumentation to log all non-HCI agent calls, capturing input prompts, output responses, contents of individual tool calls, and optionally latency metrics\" — LOCATOR: NVIDIA, Secao 6, passo S1. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NVIDIA_S2_10K_100K_EXAMPLES
     node_type: evidence
@@ -952,6 +986,7 @@ nodes:
       source: "https://arxiv.org/abs/2506.02153"
       locator: "QUOTE verbatim: \"(10k-100k examples being sufficient for fine-tuning of small models as a rule of thumb [5, 22]), it is necessary to remove any PII, PHI, or any other application-specific sensitive data\" — LOCATOR: NVIDIA, Secao 6, passo S2. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NVIDIA_NARROW_SUBSET_HETEROGENEOUS
     node_type: evidence
@@ -969,6 +1004,7 @@ nodes:
       source: "https://arxiv.org/abs/2506.02153"
       locator: "QUOTE verbatim: \"Thus, we argue that a SLM appropriately fine-tuned for the selected prompts would suffice while having the above-mentioned benefits of increased efficiency and greater flexibility.\" — LOCATOR: NVIDIA, Secao 3.4 (A4); abstract. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NVIDIA_POSITION_PAPER_LIMITS
     node_type: evidence
@@ -986,6 +1022,7 @@ nodes:
       source: "https://arxiv.org/abs/2506.02153"
       locator: "QUOTE verbatim: \"We acknowledge that alternative view AV2 is a valid view, with the exact economical considerations being highly case-specific. We believe that the jury is still out on alternative view AV2\" — LOCATOR: NVIDIA, Secao 4.2 (Acknowledgment); Apendice B. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── Rotulo por corrupcao de grafo ───────────────────────────────────────────────────────
   - id: E_TRANSE_SINGLE_CORRUPTED_NEGATIVE
@@ -1056,6 +1093,7 @@ nodes:
       source: "hamel.dev — notas do workshop 1 (fine-tuning)"
       locator: "QUOTE verbatim: \"If your prompt is ballooning in an attempt to capture a growing list of rules or conditions...fine-tuning should be useful.\" — LOCATOR: workshop_1, secao When Should You Fine Tune?. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HAMEL_DONT_START_WITH_FINETUNE
     node_type: evidence
@@ -1073,6 +1111,7 @@ nodes:
       source: "hamel.dev — notas do workshop 1 (fine-tuning)"
       locator: "QUOTE verbatim: \"don't start with fine tuning. You can do a lot with prompt engineering. That is much quicker to iterate with.\" — LOCATOR: workshop_1, secao Philosophy of AI projects (o locator do claim, anti-casos, estava errado). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HAMEL_ANTICASES_CHANGING_REQUIREMENTS
     node_type: evidence
@@ -1090,6 +1129,7 @@ nodes:
       source: "hamel.dev — notas do workshop 1 (fine-tuning)"
       locator: "QUOTE verbatim: \"requirements change often (requiring re-training)\" — LOCATOR: workshop_1, secao When Shouldn't You Fine Tune? (nao Inappropriate Task Scope). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HAMEL_HONEYCOMB_QUALITATIVE
     node_type: evidence
@@ -1107,6 +1147,7 @@ nodes:
       source: "hamel.dev — notas do workshop 1 (fine-tuning)"
       locator: "QUOTE verbatim: \"faster, more compliant from a data privacy perspective and was higher quality versus gpt 3.5.\" — LOCATOR: workshop_1, secao Case Study: Honeycomb - NL to Query. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   # ── Mercado / capital ───────────────────────────────────────────────────────────────────
   - id: E_LIQUID_SERIES_A_250M
@@ -1126,6 +1167,7 @@ nodes:
       source: "https://www.liquid.ai/blog/we-raised-250m-to-scale-capable-and-efficient-general-purpose-ai"
       locator: "QUOTE verbatim: \"In the next phase, we will use our Series A funding to scale our compute infrastructure, expedite our product readiness on the edge and on-premise, e.g. LFM inference and fine-tuning stacks\" — LOCATOR: liquid.ai/blog/we-raised-250m-to-scale-capable-and-efficient-general-purpose-ai, paragrafo da proxima fase. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TML_NVIDIA_INVESTMENT
     node_type: evidence
@@ -1144,6 +1186,7 @@ nodes:
       source: "https://thinkingmachines.ai/news/nvidia-partnership"
       locator: "QUOTE verbatim: \"NVIDIA has also made a significant investment in Thinking Machines Lab to support the company's long-term growth.\" — LOCATOR: thinkingmachines.ai/news/nvidia-partnership, paragrafo de abertura (Mar 10, 2026). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_FASTINO_SEED_175M_KHOSLA
     node_type: evidence
@@ -1162,6 +1205,7 @@ nodes:
       source: "https://techcrunch.com/2025/05/07/fastino-trains-ai-models-on-cheap-gaming-gpus-and-just-raised-17-5m-led-by-khosla"
       locator: "QUOTE verbatim: \"Fastino has secured $17.5 million in seed funding led by Khosla Ventures\" — LOCATOR: techcrunch.com/2025/05/07/fastino-trains-ai-models-on-cheap-gaming-gpus-and-just-raised-17-5m-led-by-khosla, lead. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── CONTABILIDADE DA RODADA ─────────────────────────────────────────────────────────────
   - id: E_LACUNAS_ONION_SLM_PRIMARIES_1005

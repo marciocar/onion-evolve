@@ -26,6 +26,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md"
       locator: "rfc-0005-scope-inheritance-polymorphism.md:3,13 (status accepted) + :19-22 (§1 Decisão: mecanismo HÍBRIDO de três planos) + :26-30 (§2 tabela dos 3 planos)"
       method: "leitura: RFC-0005 com status accepted (2026-07-09), decisão fundamentada na pesquisa scope-inheritance-2026 (commit a971f2f4, PR #308)"
+      locality: "repo"
   - id: D_BRANCHES_REJECTED
     node_type: decision
     plane: DEV
@@ -38,6 +39,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md"
       locator: "rfc-0005-scope-inheritance-polymorphism.md:3,13 (status accepted) + :21 (§1 'Branch-para-escopo é rejeitado') + :38-46 (§3 antipadrão GitOps; branch não COMPÕE)"
       method: "leitura: RFC-0005 com status accepted (2026-07-09), decisão fundamentada na pesquisa scope-inheritance-2026 (commit a971f2f4, PR #308)"
+      locality: "repo"
   - id: D_CASCADE_SPINE
     node_type: decision
     plane: DEV
@@ -50,6 +52,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md"
       locator: "rfc-0005-scope-inheritance-polymorphism.md:3,13 (status accepted) + :28 (§2 plano Cognitivo: Cascata-NATIVA, managed>user>project>local + walk-up) + :36 (ranking: cascata-nativa primeiro)"
       method: "leitura: RFC-0005 com status accepted (2026-07-09), decisão fundamentada na pesquisa scope-inheritance-2026 (commit a971f2f4, PR #308)"
+      locality: "repo"
   - id: D_MERGE_NLAYERS
     node_type: decision
     plane: DEV
@@ -62,6 +65,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md"
       locator: "rfc-0005-scope-inheritance-polymorphism.md:3,13 (status accepted) + :29 (§2 plano Configuração: Merge-N-camadas, generalizar vendor-branch 2→N, strategic-merge) + :32-33 (overlays como modelo de qualidade do merge)"
       method: "leitura: RFC-0005 com status accepted (2026-07-09), decisão fundamentada na pesquisa scope-inheritance-2026 (commit a971f2f4, PR #308)"
+      locality: "repo"
   - id: D_SUPERSEDES_GATED
     node_type: decision
     plane: DEV
@@ -84,6 +88,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:327 (§Verificação adversarial, linha H1-01)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H1_02
     node_type: claim
     plane: DEV
@@ -98,6 +103,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:328 (§Verificação adversarial, linha H1-02)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H1_03
     node_type: claim
     plane: DEV
@@ -112,6 +118,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:329 (§Verificação adversarial, linha H1-03)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H1_04
     node_type: claim
     plane: DEV
@@ -126,6 +133,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:330 (§Verificação adversarial, linha H1-04)"
       method: "juízes: verificador adversarial do stream H1 registrou veredito confirmed com ressalva de atribuição (a primária re-buscada inlinePatch.md é magra; o type-aware repousa na secundária fabianlee + doc K8s SMP)"
+      locality: "repo"
   - id: C_H1_05
     node_type: claim
     plane: DEV
@@ -140,6 +148,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:331 (§Verificação adversarial, linha H1-05)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H1_06
     node_type: claim
     plane: DEV
@@ -154,6 +163,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:332 (§Verificação adversarial, linha H1-06)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H1_07
     node_type: claim
     plane: DEV
@@ -168,6 +178,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:333 (§Verificação adversarial, linha H1-07)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H1_08
     node_type: claim
     plane: DEV
@@ -182,6 +193,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:334 (§Verificação adversarial, linha H1-08)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H1_09
     node_type: claim
     plane: DEV
@@ -196,6 +208,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:335 (§Verificação adversarial, linha H1-09)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H1_10
     node_type: claim
     plane: DEV
@@ -210,6 +223,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:336 (§Verificação adversarial, linha H1-10)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H1_11
     node_type: claim
     plane: DEV
@@ -224,6 +238,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:337 (§Verificação adversarial, linha H1-11)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H1_12
     node_type: claim
     plane: DEV
@@ -238,6 +253,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "H1-config-cascade-override.md:338 (§Verificação adversarial, linha H1-12)"
       method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H2_01
     node_type: claim
     plane: DEV
@@ -252,6 +268,7 @@ nodes:
       source: "code.claude.com/docs/en/settings"
       locator: "research-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_H2_02
     node_type: claim
     plane: DEV
@@ -266,6 +283,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "H2-claude-code-native-layers.md:341 (§Verificação adversarial, linha H2-02)"
       method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H2_04
     node_type: claim
     plane: DEV
@@ -280,6 +298,7 @@ nodes:
       source: "code.claude.com/docs/en/memory"
       locator: "research-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_H2_05
     node_type: claim
     plane: DEV
@@ -294,6 +313,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "H2-claude-code-native-layers.md:344 (§Verificação adversarial, linha H2-05)"
       method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H2_06
     node_type: claim
     plane: DEV
@@ -308,6 +328,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "H2-claude-code-native-layers.md:345 (§Verificação adversarial, linha H2-06)"
       method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H2_07
     node_type: claim
     plane: DEV
@@ -322,6 +343,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "H2-claude-code-native-layers.md:346 (§Verificação adversarial, linha H2-07)"
       method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H2_08
     node_type: claim
     plane: DEV
@@ -336,6 +358,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "H2-claude-code-native-layers.md:347 (§Verificação adversarial, linha H2-08)"
       method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H2_09
     node_type: claim
     plane: DEV
@@ -350,6 +373,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "H2-claude-code-native-layers.md:348 (§Verificação adversarial, linha H2-09)"
       method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H2_10
     node_type: claim
     plane: DEV
@@ -364,6 +388,7 @@ nodes:
       source: "support.claude.com/.../13837433"
       locator: "research-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_H2_11
     node_type: claim
     plane: DEV
@@ -378,6 +403,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "H2-claude-code-native-layers.md:350 (§Verificação adversarial, linha H2-11)"
       method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H2_12
     node_type: claim
     plane: DEV
@@ -392,6 +418,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "H2-claude-code-native-layers.md:351 (§Verificação adversarial, linha H2-12)"
       method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H2_13
     node_type: claim
     plane: DEV
@@ -420,6 +447,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:289 (§Verificação adversarial, linha H3-01)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_02
     node_type: claim
     plane: DEV
@@ -434,6 +462,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:290 (§Verificação adversarial, linha H3-02)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_03
     node_type: claim
     plane: DEV
@@ -448,6 +477,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:291 (§Verificação adversarial, linha H3-03)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_04
     node_type: claim
     plane: DEV
@@ -462,6 +492,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:292 (§Verificação adversarial, linha H3-04)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_05
     node_type: claim
     plane: DEV
@@ -476,6 +507,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:293 (§Verificação adversarial, linha H3-05)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_06
     node_type: claim
     plane: DEV
@@ -490,6 +522,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:294 (§Verificação adversarial, linha H3-06)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_07
     node_type: claim
     plane: DEV
@@ -504,6 +537,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:295 (§Verificação adversarial, linha H3-07)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_08
     node_type: claim
     plane: DEV
@@ -518,6 +552,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:296 (§Verificação adversarial, linha H3-08)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_09
     node_type: claim
     plane: DEV
@@ -532,6 +567,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:297 (§Verificação adversarial, linha H3-09)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_10
     node_type: claim
     plane: DEV
@@ -546,6 +582,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:298 (§Verificação adversarial, linha H3-10)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_12
     node_type: claim
     plane: DEV
@@ -560,6 +597,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:300 (§Verificação adversarial, linha H3-12)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H3_13
     node_type: claim
     plane: DEV
@@ -574,6 +612,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "H3-monorepo-team-person-versioning.md:301 (§Verificação adversarial, linha H3-13)"
       method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H4_F1
     node_type: claim
     plane: DEV
@@ -588,6 +627,7 @@ nodes:
       source: "code.claude.com/docs/en/memory"
       locator: "research-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_H4_F2
     node_type: claim
     plane: DEV
@@ -612,6 +652,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "H4-ai-mediated-inheritance.md:355 (§Verificação adversarial, linha H4·F3)"
       method: "juízes: verificador adversarial do stream H4 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H4_F4
     node_type: claim
     plane: DEV
@@ -626,6 +667,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "H4-ai-mediated-inheritance.md:356 (§Verificação adversarial, linha H4·F4)"
       method: "juízes: verificador adversarial do stream H4 registrou veredito confirmed por múltiplas fontes 2026 (Anthropic, BISI, Forbes); o fetch da URL primária citada devolveu outro conteúdo (ressalva de URL na nota)"
+      locality: "repo"
   - id: C_H4_F5
     node_type: claim
     plane: DEV
@@ -640,6 +682,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "H4-ai-mediated-inheritance.md:357 (§Verificação adversarial, linha H4·F5)"
       method: "juízes: verificador adversarial do stream H4 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H4_F6
     node_type: claim
     plane: DEV
@@ -654,6 +697,7 @@ nodes:
       source: "code.claude.com/docs/en/sub-agents"
       locator: "research-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_H4_F7
     node_type: claim
     plane: DEV
@@ -668,6 +712,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "H4-ai-mediated-inheritance.md:359 (§Verificação adversarial, linha H4·F7)"
       method: "juízes: verificador adversarial do stream H4 re-buscou a fonte primária e registrou veredito confirmed"
+      locality: "repo"
   - id: C_H4_F8
     node_type: claim
     plane: DEV
@@ -692,6 +737,7 @@ nodes:
       source: "support.claude.com/.../manage-plugins"
       locator: "research-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_H4_F10
     node_type: claim
     plane: DEV
@@ -726,6 +772,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "H4-ai-mediated-inheritance.md:354 (§Verificação adversarial, linha H4·F2)"
       method: "juízes: verificador adversarial do stream H4 re-buscou a primária e marcou declarado≠verificado (a cifra ~63% não aparece no abstract do arXiv:2404.13208) na nota da linha H4·F2"
+      locality: "repo"
   - id: E_F8_CORR
     node_type: evidence
     plane: DEV
@@ -740,6 +787,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "H4-ai-mediated-inheritance.md:360 (§Verificação adversarial, linha H4·F8)"
       method: "juízes: verificador adversarial do stream H4 re-buscou a primária e marcou declarado≠verificado (a citação 'keep hierarchies shallow' é de blog secundário, não da página K8s) na nota da linha H4·F8"
+      locality: "repo"
   - id: E_F10_CORR
     node_type: evidence
     plane: DEV
@@ -754,6 +802,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "H4-ai-mediated-inheritance.md:362 (§Verificação adversarial, linha H4·F10)"
       method: "juízes: verificador adversarial do stream H4 re-buscou a primária e marcou ESTATÍSTICA ERRADA (10.000 = limite do $in de metadata, não teto de namespaces) na nota da linha H4·F10"
+      locality: "repo"
 edges:
   - from: C_H1_01
     to: A_RESEARCH_SCOPE

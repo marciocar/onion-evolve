@@ -25,6 +25,7 @@ nodes:
       source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
       locator: "yaml.safe_load sobre os 138 .kg.yaml do core (fora fixtures e materials): 12 ids SYNTHESIS.md_* (29 ocorrencias) num grafo; 6 valid_from inteiros em 4 grafos; 6 grafos sem schema_version, 9 sem meta.id, 7 com schema_version inteiro. Depois da cura: 0 em todas as contagens."
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ORIGEM_DOS_IDS_FOI_MODELAGEM_A_MAO
     node_type: evidence
@@ -40,6 +41,7 @@ nodes:
       source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
       locator: "git log -S SYNTHESIS.md_ no grafo: nasceu em e0bf994a (2026-07-21), commit que so toca o grafo e o baseline de cobertura; nenhum script gerador no repo produz o prefixo"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY
     node_type: decision
@@ -77,6 +79,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "kg-radar-integrity.sh --format tsv no core: 10 SOFT falsos (35 nos com valid_from entre aspas simples); 0 depois de ler a forma crua"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_TETO_DATAS_ISO_SEM_ASPAS
     node_type: claim

@@ -21,6 +21,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       locator: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G1_AUTH_REQUIRED_OOB
     node_type: claim
     layer: audit
@@ -34,6 +35,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       locator: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G1_TRANSPORT_ONLY_AUTH
     node_type: claim
     layer: audit
@@ -47,6 +49,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       locator: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G1_OAUTH21_PKCE
     node_type: claim
     layer: audit
@@ -60,6 +63,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       locator: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G1_RECEIVER_JWS_ANTIREPLAY
     node_type: claim
     layer: audit
@@ -73,6 +77,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       locator: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G1_ANTI_SSRF
     node_type: claim
     layer: audit
@@ -86,6 +91,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       locator: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G1_RECEIVER_DEFENSE_DEPTH
     node_type: claim
     layer: audit
@@ -99,6 +105,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       locator: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G1_DURABLE_PAUSE_SIGNAL
     node_type: claim
     layer: audit
@@ -112,6 +119,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       locator: "docs/evolution/research/federation-2026/G1-a2a-gated-handshake-regulated.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G1_AIP_PREPRINT_LOW_AUTHORITY
     node_type: claim
     layer: audit
@@ -161,6 +169,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f1"
       locator: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f1"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G2_GOVERNANCA_NAMESPACE
     node_type: claim
     layer: audit
@@ -174,6 +183,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f2"
       locator: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f2"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G2_CONFIANCA_NAO_RESOLVIDA
     node_type: claim
     layer: audit
@@ -187,6 +197,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f3"
       locator: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f3"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G2_DOCKER_MCP_CATALOG
     node_type: claim
     layer: audit
@@ -200,6 +211,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f4"
       locator: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f4"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G2_BACKSTAGE_CITATION_FIX
     node_type: claim
     layer: audit
@@ -213,6 +225,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f5"
       locator: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f5"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G2_A2A_REGISTRY_ABERTO
     node_type: claim
     layer: audit
@@ -226,6 +239,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f6"
       locator: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f6"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G2_PROVENANCE_COMMIT_PADRAO
     node_type: claim
     layer: audit
@@ -239,6 +253,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f7"
       locator: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f7"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G2_CLAUDE_PLUGINS_ANALOGO
     node_type: claim
     layer: audit
@@ -252,6 +267,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f8"
       locator: "docs/evolution/research/federation-2026/G2-governed-capability-registry.md#f8"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G2_DECISAO_MANTER_GATED
     node_type: decision
     layer: audit
@@ -292,6 +308,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       locator: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G3_TRUST_THRESHOLD_REMOVAL
     node_type: claim
     layer: audit
@@ -305,6 +322,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       locator: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G3_REPUTATION_DECENTRALIZED_GOSSIP
     node_type: claim
     layer: audit
@@ -318,6 +336,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       locator: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G3_REPUTATION_MATURITY_SIM_ONLY
     node_type: claim
     layer: audit
@@ -331,6 +350,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       locator: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G3_CRDT_REMOVES_SPOF_BUT_CAP_PRICED
     node_type: claim
     layer: audit
@@ -344,6 +364,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       locator: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G3_SPLIT_BY_CAP_NOT_SCALE
     node_type: claim
     layer: audit
@@ -357,6 +378,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       locator: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G3_GIT_ASYNC_IS_OPTIMISTIC_REPLICATION
     node_type: claim
     layer: audit
@@ -370,6 +392,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       locator: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G3_CRDT_VALUE_IDLE_SINGLE_WRITER
     node_type: claim
     layer: audit
@@ -383,6 +406,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       locator: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G3_HUB_SPOKE_OPTIMAL_SMALL_SCALE
     node_type: claim
     layer: audit
@@ -396,6 +420,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       locator: "docs/evolution/research/federation-2026/G3-reputation-and-ssot-vs-mesh.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G3_DECISION_SINGLE_SOURCE_IDENTITY_MESH_COMMS
     node_type: decision
     layer: audit
@@ -436,6 +461,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       locator: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G4_AAIF_A2A_COMPLEMENTARY
     node_type: claim
     layer: audit
@@ -449,6 +475,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       locator: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G4_ARXIV_AIP
     node_type: evidence
     layer: audit
@@ -462,6 +489,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       locator: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G4_ARXIV_OVERLAYING_GOV
     node_type: evidence
     layer: audit
@@ -475,6 +503,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       locator: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G4_ARXIV_ANUMATI
     node_type: evidence
     layer: audit
@@ -488,6 +517,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       locator: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G4_DELEGATION_GATE_DECISION
     node_type: decision
     layer: audit
@@ -501,6 +531,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       locator: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G4_MCP_TOOLPOISONING_STAT_REFUTED
     node_type: claim
     layer: audit
@@ -523,6 +554,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       locator: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G4_BACKSTAGE_COST
     node_type: claim
     layer: audit
@@ -536,6 +568,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       locator: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G4_BACKSTAGE_DECISION
     node_type: decision
     layer: audit
@@ -549,6 +582,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       locator: "docs/evolution/research/federation-2026/G4-re-verify-downgraded.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: G4_MONOREPO_STAT_REFUTED
     node_type: claim
     layer: audit
@@ -580,6 +614,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       locator: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S1_SSE_WEBHOOK_PAIR
     node_type: claim
     layer: audit
@@ -602,6 +637,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       locator: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S1_AUTH_RECEIVER_SIDE
     node_type: claim
     layer: audit
@@ -615,6 +651,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       locator: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S1_POLICY_AS_DATA
     node_type: claim
     layer: audit
@@ -628,6 +665,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       locator: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S1_AGENT_SDK_HEADLESS
     node_type: claim
     layer: audit
@@ -641,6 +679,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       locator: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S1_DURABLE_EXECUTION
     node_type: claim
     layer: audit
@@ -654,6 +693,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       locator: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S1_MCP_A2A_LAYERS
     node_type: claim
     layer: audit
@@ -667,6 +707,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       locator: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S1_AAIF_GOVERNS_BOTH
     node_type: claim
     layer: audit
@@ -698,6 +739,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       locator: "docs/evolution/research/federation-2026/S1-a2a-live-interop.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
     node_type: decision
     layer: audit
@@ -738,6 +780,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
       locator: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S2_ATTRIBUTE_TARGETING
     node_type: claim
     layer: audit
@@ -751,6 +794,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
       locator: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S2_PULL_PLUS_WEBHOOK
     node_type: claim
     layer: audit
@@ -764,6 +808,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
       locator: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S2_HUBSPOKE_CONTROL_PLANE
     node_type: claim
     layer: audit
@@ -777,6 +822,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
       locator: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S2_SSOT_VS_MESH
     node_type: claim
     layer: audit
@@ -817,6 +863,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
       locator: "docs/evolution/research/federation-2026/S2-sync-federation-models.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S2_DECISION_GRAPH_INGEST_MEMBERS
     node_type: decision
     layer: audit
@@ -866,6 +913,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
       locator: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S3_MEMBERS_YAML_IS_GRAPH
     node_type: claim
     layer: audit
@@ -879,6 +927,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
       locator: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S3_CHANGELOG_EVENT_LOG
     node_type: claim
     layer: audit
@@ -901,6 +950,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
       locator: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S3_STATIC_SITE_NO_BACKEND
     node_type: claim
     layer: audit
@@ -959,6 +1009,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
       locator: "docs/evolution/research/federation-2026/S3-observability-console-map.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S3_EV_GRAPH_INGEST_GAP
     node_type: evidence
     layer: audit
@@ -981,6 +1032,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f1"
       locator: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f1"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S4_MULTI_AGENT_CONTEXT_FAILURE
     node_type: claim
     layer: audit
@@ -994,6 +1046,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f2"
       locator: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f2"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S4_REPUTATION_GOSSIP
     node_type: claim
     layer: audit
@@ -1007,6 +1060,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f3"
       locator: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f3"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S4_A2A_INTEROP
     node_type: claim
     layer: audit
@@ -1020,6 +1074,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f5"
       locator: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f5"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S4_MCP_SUPPLY_CHAIN_RISK
     node_type: claim
     layer: audit
@@ -1033,6 +1088,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f6"
       locator: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f6"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S4_COPILOT_ORG_INSTRUCTIONS
     node_type: claim
     layer: audit
@@ -1064,6 +1120,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f10"
       locator: "docs/evolution/research/federation-2026/S4-competitors-academia-governance.md#f10"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S4_DEC_TRANSPORT_SDAAL
     node_type: decision
     layer: audit
@@ -1113,6 +1170,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       locator: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: GAPS_AUTH_REQUIRED_OOB
     node_type: claim
     layer: audit
@@ -1126,6 +1184,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       locator: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: GAPS_PIN_INTEGRITY_A2A
     node_type: claim
     layer: audit
@@ -1139,6 +1198,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       locator: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: GAPS_A2A_NO_PROMPT_INJECTION
     node_type: claim
     layer: audit
@@ -1152,6 +1212,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       locator: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: GAPS_DECISION_A2A_LIVE_SIGNALS_ONLY
     node_type: decision
     layer: audit
@@ -1174,6 +1235,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       locator: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: GAPS_REGISTRY_TRUST_UNSOLVED
     node_type: claim
     layer: audit
@@ -1187,6 +1249,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       locator: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: GAPS_DECISION_KEEP_GATED_CURATION
     node_type: decision
     layer: audit
@@ -1200,6 +1263,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       locator: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: GAPS_REPUTATION_SIMULATION_EVIDENCE
     node_type: claim
     layer: audit
@@ -1231,6 +1295,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       locator: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: GAPS_DECISION_SINGLE_SOURCE_MESH
     node_type: decision
     layer: audit
@@ -1244,6 +1309,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       locator: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: GAPS_MCP_TOOLPOISON_STATS
     node_type: evidence
     layer: audit
@@ -1257,6 +1323,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       locator: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SYNTHESIS_REUSE_NOT_INVENTION
     node_type: claim
     layer: audit
@@ -1270,6 +1337,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/federation-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SYNTHESIS_GOVERNANCE_AHEAD_OBS_BEHIND
     node_type: claim
     layer: audit
@@ -1283,6 +1351,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/federation-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SYNTHESIS_VPS_SUFFICES
     node_type: claim
     layer: audit
@@ -1296,6 +1365,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/federation-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SYNTHESIS_SINGLE_SOURCE_MESH
     node_type: decision
     layer: audit
@@ -1354,6 +1424,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/federation-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SYNTHESIS_BACKSTAGE_COST_REJECTED
     node_type: evidence
     layer: audit
@@ -1367,6 +1438,7 @@ nodes:
       source: "docs/evolution/research/federation-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/federation-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SYNTHESIS_TOOL_POISONING_STAT_DOWNGRADED
     node_type: claim
     layer: audit
@@ -1399,6 +1471,7 @@ nodes:
       source: ".claude/utils/federation-transport/README.md; .claude/utils/federation-transport/factory.md; .claude/utils/federation-transport/adapters/{git-async,local,a2a-live}.md; .claude/utils/federation-transport/detect-transport.sh"
       locator: ".claude/utils/federation-transport/README.md; .claude/utils/federation-transport/factory.md; .claude/utils/federation-transport/adapters/{git-async,local,a2a-live}.md; .claude/utils/federation-transport/detect-transport.sh"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC_SELECTOR_TARGETING_BUILT
     node_type: evidence
     layer: audit
@@ -1413,6 +1486,7 @@ nodes:
       source: ".claude/utils/co-evolution/resolve-target.sh"
       locator: ".claude/utils/co-evolution/resolve-target.sh"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC_GRAPH_INGESTS_MEMBERS
     node_type: evidence
     layer: audit
@@ -1427,6 +1501,7 @@ nodes:
       source: ".claude/validation/graph.sh (linhas 18, 57-92, 158, 226-228); docs/onion/federation-map.md"
       locator: ".claude/validation/graph.sh (linhas 18, 57-92, 158, 226-228); docs/onion/federation-map.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC_CONSOLE_SELF_CONTAINED
     node_type: evidence
     layer: audit
@@ -1469,6 +1544,7 @@ nodes:
       source: ".claude/utils/federation-transport/a2a-verify.sh; .claude/utils/federation-transport/a2a-ssrf-check.sh; .claude/utils/federation-transport/jwks/{metagamify-1,granaai-1}.pem; .claude/utils/federation-transport/adapters/a2a-live.md"
       locator: ".claude/utils/federation-transport/a2a-verify.sh; .claude/utils/federation-transport/a2a-ssrf-check.sh; .claude/utils/federation-transport/jwks/{metagamify-1,granaai-1}.pem; .claude/utils/federation-transport/adapters/a2a-live.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC_A2A_ENDPOINT_STATUS_FOUNDATION
     node_type: evidence
     layer: audit
@@ -1483,6 +1559,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml (bloco a2a: do onion-evolve, status: foundation); .claude/utils/federation-transport/README.md (tabela de adapters); .claude/utils/federation-transport/adapters/a2a-live.md (linha 41)"
       locator: "docs/evolution/federation/members.yaml (bloco a2a: do onion-evolve, status: foundation); .claude/utils/federation-transport/README.md (tabela de adapters); .claude/utils/federation-transport/adapters/a2a-live.md (linha 41)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC_SIGNALS_ONLY_RATIFIED
     node_type: evidence
     layer: audit
@@ -1497,6 +1574,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md §4-§6; .claude/utils/federation-transport/factory.md (a2a-live nunca auto)"
       locator: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md §4-§6; .claude/utils/federation-transport/factory.md (a2a-live nunca auto)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC_MEMBERS_YAML_CURATED_REGISTRY
     node_type: evidence
     layer: audit
@@ -1511,6 +1589,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml; .claude/validation/pin-integrity-check.sh; .claude/validation/a2a-agent-card.sh; .claude/validation/lint-artifacts.sh (REGRA 25, linha 648)"
       locator: "docs/evolution/federation/members.yaml; .claude/validation/pin-integrity-check.sh; .claude/validation/a2a-agent-card.sh; .claude/validation/lint-artifacts.sh (REGRA 25, linha 648)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC_NO_REVERSE_DNS_NAMESPACE
     node_type: evidence
     layer: audit
@@ -1525,6 +1604,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml@4e54b052"
       locator: "members.yaml@4e54b052 (linhas '  - id:'; pins l.61-73, l.98, l.119); grafo@4e54b052 l.207 (a 'ação barata' de junho); a2a-agent-card.sh (Agent Card em well-known)"
       method: "leitura: members.yaml e o nó de junho l.207 lidos no commit 4e54b052"
+      locality: "repo"
   - id: REC_STAGING_ROT_AND_MISSING_MAILBOX
     node_type: evidence
     layer: audit
@@ -1567,6 +1647,7 @@ nodes:
       source: ".claude/validation/federation-status-scan.sh@4e54b052"
       locator: "federation-status-scan.sh@4e54b052 l.3-19, l.62-73; federation-radar.sh@4e54b052 l.3-14"
       method: "leitura: os dois scripts lidos no commit 4e54b052 (2026-07-21)"
+      locality: "repo"
   - id: REC_GIT_ASYNC_STILL_DEFAULT
     node_type: evidence
     layer: audit
@@ -1596,6 +1677,7 @@ nodes:
       source: "docs/evolution/trust-log.md@4e54b052"
       locator: "trust-log.md@4e54b052 l.7-9 (as 3 entradas, '2026-07-01 13:36'); corpo do commit 4e54b052 l.26-28 ('has not been written since 2026-07-01')"
       method: "leitura: trust-log.md no commit 4e54b052 + corpo do próprio commit que criou o nó"
+      locality: "repo"
   - id: REC_FABRICATED_CITATIONS_INSTITUTIONALIZED
     node_type: evidence
     layer: audit
@@ -1624,6 +1706,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml (granaai a2a: PREPARADO, não ativado); docs/evolution/federation/CHANGELOG.md (última entrada a2a: 2026-07-10 linha 342)"
       locator: "docs/evolution/federation/members.yaml (granaai a2a: PREPARADO, não ativado); docs/evolution/federation/CHANGELOG.md (última entrada a2a: 2026-07-10 linha 342)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_1_a2a_adr_ssot
     node_type: decision
     layer: audit
@@ -1637,6 +1720,7 @@ nodes:
       source: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#1-o-eixo-já-está-adjudicado-ssot"
       locator: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#1-o-eixo-já-está-adjudicado-ssot"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_1_external_signal
     node_type: evidence
     layer: audit
@@ -1659,6 +1743,7 @@ nodes:
       source: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#2-reconciliação-o-que-a-conversa-externa-acertou--e-o-que-perdeu"
       locator: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#2-reconciliação-o-que-a-conversa-externa-acertou--e-o-que-perdeu"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_1_claim_runtime_forbidden
     node_type: claim
     layer: audit
@@ -1672,6 +1757,7 @@ nodes:
       source: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#1-o-eixo-já-está-adjudicado-ssot"
       locator: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#1-o-eixo-já-está-adjudicado-ssot"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_1_claim_format_deferred
     node_type: claim
     layer: audit
@@ -1694,6 +1780,7 @@ nodes:
       source: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#3-desambiguação-crítica-corrige-leitura-comum"
       locator: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#3-desambiguação-crítica-corrige-leitura-comum"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_1_evidence_single_consumer
     node_type: evidence
     layer: audit
@@ -1725,6 +1812,7 @@ nodes:
       source: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#5-síntese--fechamento-do-radar-de-orquestração-3-eixos-percorridos"
       locator: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#5-síntese--fechamento-do-radar-de-orquestração-3-eixos-percorridos"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_1_decision_radar_closed
     node_type: decision
     layer: audit
@@ -1753,6 +1841,7 @@ nodes:
       source: "docs/analysis/onion-federation-audit-2026-07-01.md#0-sumário"
       locator: "docs/analysis/onion-federation-audit-2026-07-01.md:18-21"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: B2_2_evidence_dogfood_scripts
     node_type: evidence
     layer: audit
@@ -1766,6 +1855,7 @@ nodes:
       source: "docs/analysis/onion-federation-audit-2026-07-01.md#0-sumário"
       locator: "docs/analysis/onion-federation-audit-2026-07-01.md#0-sumário"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_2_claim_trust_topology_bug
     node_type: claim
     layer: audit
@@ -1779,6 +1869,7 @@ nodes:
       source: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 1"
       locator: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 1"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_2_decision_fix_trust_regex
     node_type: decision
     layer: audit
@@ -1801,6 +1892,7 @@ nodes:
       source: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 2"
       locator: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 2"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_2_decision_fix_onion_version_role
     node_type: decision
     layer: audit
@@ -1823,6 +1915,7 @@ nodes:
       source: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 3"
       locator: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 3"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_2_claim_pin_drift
     node_type: claim
     layer: audit
@@ -1836,6 +1929,7 @@ nodes:
       source: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 4"
       locator: "docs/analysis/onion-federation-audit-2026-07-01.md#1-backlog-priorizado item 4"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_2_question_adopted_at_semantics
     node_type: question
     layer: audit
@@ -1858,6 +1952,7 @@ nodes:
       source: "docs/analysis/onion-federation-audit-2026-07-01.md#3-alertas-transversais item 1"
       locator: "docs/analysis/onion-federation-audit-2026-07-01.md#3-alertas-transversais item 1"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_2_claim_manual_sync_fails_silently
     node_type: claim
     layer: audit
@@ -1871,6 +1966,7 @@ nodes:
       source: "docs/analysis/onion-federation-audit-2026-07-01.md#3-alertas-transversais item 2"
       locator: "docs/analysis/onion-federation-audit-2026-07-01.md#3-alertas-transversais item 2"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_2_claim_machinery_ahead_of_gate
     node_type: claim
     layer: audit
@@ -1915,6 +2011,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-v2-2026-06.md#L16 (§1)"
       locator: "docs/analysis/onion-federation-design-v2-2026-06.md#L16 (§1)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_4_sa1_metaspec_violation
     node_type: claim
     layer: audit
@@ -1928,6 +2025,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-v2-2026-06.md#L17 (§1)"
       locator: "docs/analysis/onion-federation-design-v2-2026-06.md#L17 (§1)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_4_pivot_hub_to_peer
     node_type: decision
     layer: audit
@@ -1941,6 +2039,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-v2-2026-06.md#L5,L19 (§1)"
       locator: "docs/analysis/onion-federation-design-v2-2026-06.md#L5,L19 (§1)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_4_identity_guardrail
     node_type: decision
     layer: audit
@@ -1954,6 +2053,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-v2-2026-06.md#L36-L46 (§2)"
       locator: "docs/analysis/onion-federation-design-v2-2026-06.md#L36-L46 (§2)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_4_ledger_git_spine
     node_type: decision
     layer: audit
@@ -1967,6 +2067,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-v2-2026-06.md#L57-L76 (§3)"
       locator: "docs/analysis/onion-federation-design-v2-2026-06.md#L57-L76 (§3)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_4_safety_layers_relocated
     node_type: claim
     layer: audit
@@ -1980,6 +2081,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-v2-2026-06.md#L96-L104 (§5)"
       locator: "docs/analysis/onion-federation-design-v2-2026-06.md#L96-L104 (§5)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_4_contract_tests_required
     node_type: decision
     layer: audit
@@ -2038,6 +2140,7 @@ nodes:
       source: "docs/analysis/onion-federation-review-2026-06.md:14-27"
       locator: "docs/analysis/onion-federation-review-2026-06.md:14-27"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_5_decision_no_a2a
     node_type: decision
     layer: audit
@@ -2051,6 +2154,7 @@ nodes:
       source: "docs/analysis/onion-federation-review-2026-06.md:25"
       locator: "docs/analysis/onion-federation-review-2026-06.md:25"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_5_artifact_federation_commands
     node_type: artifact
     layer: audit
@@ -2073,6 +2177,7 @@ nodes:
       source: "docs/analysis/onion-federation-review-2026-06.md:47-60"
       locator: "docs/analysis/onion-federation-review-2026-06.md:47-60"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_5_claim_verdict_defensible
     node_type: claim
     layer: audit
@@ -2086,6 +2191,7 @@ nodes:
       source: "docs/analysis/onion-federation-review-2026-06.md:77-83"
       locator: "docs/analysis/onion-federation-review-2026-06.md:77-83"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_5_question_format_interop
     node_type: question
     layer: audit
@@ -2108,6 +2214,7 @@ nodes:
       source: "docs/analysis/onion-federation-review-2026-06.md:64,113"
       locator: "docs/analysis/onion-federation-review-2026-06.md:64,113"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_5_claim_naming_gap
     node_type: claim
     layer: audit
@@ -2172,6 +2279,7 @@ nodes:
       source: ".claude/validation/trust-topology-check.sh (id_in_list, linhas 88-105)"
       locator: ".claude/validation/trust-topology-check.sh (id_in_list, linhas 88-105)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC2_ONION_VERSION_ROLE_DERIVED
     node_type: evidence
     layer: audit
@@ -2186,6 +2294,7 @@ nodes:
       source: ".claude/validation/onion-version.sh (linhas 42-49, 56-64)"
       locator: ".claude/validation/onion-version.sh (linhas 42-49, 56-64)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC2_KB_SCHEMA_V2_HELD
     node_type: evidence
     layer: audit
@@ -2200,6 +2309,7 @@ nodes:
       source: "docs/knowledge-base/concepts/multi-repo-federation.md (linha 95: version: 2)"
       locator: "docs/knowledge-base/concepts/multi-repo-federation.md (linha 95: version: 2)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC2_ROLE_NAMESPACES_NAMED_NOT_COLLAPSED
     node_type: evidence
     layer: audit
@@ -2228,6 +2338,7 @@ nodes:
       source: "docs/evolution/federation/@e0bf994a"
       locator: "git ls-tree -r e0bf994a (contracts só em .claude/validation/fixtures/contracts/); CHANGELOG.md@e0bf994a; .claude/commands/meta/federation-{check,publish,register,rollback,status}.md@e0bf994a; federation-register.md criado em 14ecfeb7 (2026-06-14), federation-status-scan.sh em 768bb1bf (2026-06-15)"
       method: "medição: git ls-tree -r --name-only e0bf994a | grep -i contract; git show e0bf994a:docs/evolution/federation/CHANGELOG.md | grep -c -i -E 'rollback|federation-check' (=0)"
+      locality: "repo"
   - id: REC2_LEDGER_TRAFFIC_IS_DOCBRIDGE
     node_type: evidence
     layer: audit
@@ -2242,6 +2353,7 @@ nodes:
       source: "docs/evolution/federation/CHANGELOG.md@e0bf994a"
       locator: "CHANGELOG.md@e0bf994a (cabeçalhos '## '); docs/evolution/federation/outbox/@e0bf994a (8 dirs); docs/evolution/federation/@e0bf994a (sem contracts/)"
       method: "medição: git show e0bf994a:docs/evolution/federation/CHANGELOG.md | grep -c '^## ' (=53) e git ls-tree --name-only e0bf994a docs/evolution/federation/outbox/"
+      locality: "repo"
   - id: REC2_A2A_FORMAT_BUILT_WITHOUT_TRIGGER
     node_type: evidence
     layer: audit
@@ -2256,6 +2368,7 @@ nodes:
       source: "docs/analysis/onion-federation-adr-a2a-format-interop-2026-06.md@e0bf994a"
       locator: "ADR@e0bf994a l.3 (date 2026-06-15), l.153-161 (§Gatilho); adapters/a2a-live.md@e0bf994a l.5 ('6 camadas'); a2a-verify.sh@e0bf994a l.15-22 (camadas 0-6); a2a-agent-card.sh@e0bf994a l.3-8; jwks/README.md@e0bf994a l.1; lint-artifacts.sh@e0bf994a l.648 (REGRA 25); agent-card.json criado em a359f3ed (2026-07-09)"
       method: "leitura: ADR, a2a-live.md, gerador, verificador, JWKS e lint lidos no commit e0bf994a (2026-07-21)"
+      locality: "repo"
   - id: REC2_TRUST_MACHINERY_IDLE
     node_type: evidence
     layer: audit
@@ -2271,6 +2384,7 @@ nodes:
       source: "docs/evolution/trust-log.md@e0bf994a + docs/evolution/federation/CHANGELOG.md@e0bf994a + .claude/utils/federation-transport/a2a-verify.sh@e0bf994a"
       locator: "trust-log.md@e0bf994a l.7-9 (3 tentativas, '2026-07-01 13:36'); CHANGELOG.md@e0bf994a l.342-346 (handshake a2a-live 07-10, 7 camadas); a2a-verify.sh@e0bf994a l.17, l.89-93 (camada 1 compõe trust-topology-check); corpo de 21842a51 l.36, l.47"
       method: "leitura: trust-log, CHANGELOG e a2a-verify no commit e0bf994a + corpo do commit 21842a51"
+      locality: "repo"
   - id: REC2_DIARY_GATE_MET
     node_type: evidence
     layer: audit
@@ -2285,6 +2399,7 @@ nodes:
       source: ".claude/diary/ (63 arquivos .md); .claude/validation/diary-index.sh"
       locator: ".claude/diary/ (63 arquivos .md); .claude/validation/diary-index.sh"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: REC2_NAMING_NEVER_LEAKED
     node_type: evidence
     layer: audit
@@ -2299,6 +2414,7 @@ nodes:
       source: "docs/materials/@e0bf994a"
       locator: "docs/materials/case-studies.md@e0bf994a l.22, l.29; landing-page.md l.64; manual-toc.md l.103; docs/analysis/onion-federation-review-2026-06.md@e0bf994a l.87 (a recomendação de rename)"
       method: "medição: git grep -n -i 'federa' e0bf994a -- 'docs/materials/*.md' + git grep -l -i 'federação de agentes' e0bf994a (comando do trace, re-rodado no commit da data)"
+      locality: "repo"
   - id: REC2_HUB_VS_PEER_REFERENTS
     node_type: claim
     layer: audit
@@ -2312,6 +2428,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-v2-2026-06.md@e0bf994a"
       locator: "design-v2 l.13, l.16, l.26 (hub v1 = 1 sessão opera N dirs alheios, SA-3); members.yaml@e0bf994a l.3 ('Fonte canônica: o core'), l.12, l.57 (metagamify role: hub); federation-transport/README.md@e0bf994a l.55-60 (I3 um escritor por repo); grafo@e0bf994a l.297 (nó 'hub-and-spoke é o ótimo operacional')"
       method: "derivado: reconciliação construída a partir de design-v2, members.yaml, README do transporte e do nó irmão l.297, lidos em e0bf994a"
+      locality: "repo"
   - id: REC2_Q_FORMAL_FEDERATION_DEAD_OR_DORMANT
     node_type: question
     layer: audit
@@ -2335,6 +2452,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-review-2026-06.md"
       locator: "docs/analysis/onion-federation-design-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_3_sa1_metaspec_violation
     node_type: claim
     layer: audit
@@ -2348,6 +2466,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-review-2026-06.md"
       locator: "docs/analysis/onion-federation-design-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_3_sa2_safety_machine_gap
     node_type: claim
     layer: audit
@@ -2361,6 +2480,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-review-2026-06.md"
       locator: "docs/analysis/onion-federation-design-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_3_sa3_crossdir_spike_late
     node_type: claim
     layer: audit
@@ -2374,6 +2494,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-review-2026-06.md"
       locator: "docs/analysis/onion-federation-design-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_3_decision_encaixe_canonico
     node_type: decision
     layer: audit
@@ -2405,6 +2526,7 @@ nodes:
       source: "docs/analysis/onion-federation-design-review-2026-06.md"
       locator: "docs/analysis/onion-federation-design-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B2_3_orchestration_method
     node_type: evidence
     layer: audit
@@ -2517,6 +2639,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
       locator: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S2_claim_onion_mini_response
     node_type: claim
     layer: audit
@@ -2530,6 +2653,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
       locator: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S2_question_federation_vs_orchestration
     node_type: question
     layer: audit
@@ -2561,6 +2685,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
       locator: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S2_claim_bifurcado_category
     node_type: claim
     layer: audit
@@ -2574,6 +2699,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
       locator: "docs/analysis/onion-research-seed-federated-slm-orchestration-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S2_decision_deep_research_trigger
     node_type: decision
     layer: audit
@@ -2668,6 +2794,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-ide-integration-revisit-2026-07.md"
       locator: "docs/analysis/onion-research-seed-ide-integration-revisit-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S4_q_multi_ide_revisit
     node_type: question
     layer: audit
@@ -2744,6 +2871,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
       locator: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S5_claim_pieces_kg_missing
     node_type: claim
     layer: audit
@@ -2757,6 +2885,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
       locator: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S5_claim_anti_cathedral_alert
     node_type: claim
     layer: audit
@@ -2770,6 +2899,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
       locator: "docs/analysis/onion-research-seed-lego-composition-kg-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S5_decision_dogfood_kg_sdaal
     node_type: decision
     layer: audit
@@ -2810,6 +2940,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-model-lifecycle-caretaking-2026-07.md"
       locator: "docs/analysis/onion-research-seed-model-lifecycle-caretaking-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S6_claim_provider_diff
     node_type: claim
     layer: audit
@@ -2895,6 +3026,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md"
       locator: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S7_claim_metaphor_fragile
     node_type: claim
     layer: audit
@@ -2953,6 +3085,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
       locator: "docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S8_ClaimReadingA
     node_type: claim
     layer: audit
@@ -3092,6 +3225,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
       locator: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S10_evidence_two_instances
     node_type: evidence
     layer: audit
@@ -3105,6 +3239,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
       locator: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S10_claim_gap_was_index
     node_type: claim
     layer: audit
@@ -3118,6 +3253,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
       locator: "docs/analysis/onion-research-seed-seed-organization-meta-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S10_decision_index_table
     node_type: decision
     layer: audit
@@ -3176,6 +3312,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
       locator: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S11_claim_slm_grounding
     node_type: claim
     layer: audit
@@ -3189,6 +3326,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
       locator: "docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: S11_q_fontes_primarias
     node_type: question
     layer: audit
@@ -3374,6 +3512,7 @@ nodes:
       source: "docs/analysis/README.md:9-31"
       locator: "docs/analysis/README.md:9-31"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_evid_education_vertical_kb
     node_type: evidence
     layer: audit
@@ -3388,6 +3527,7 @@ nodes:
       source: "docs/knowledge-base/education/theories/plea-rosario.md · docs/knowledge-base/education/theories/srl-zimmerman.md · docs/knowledge-base/education/applications/onion-srl-bridges.md:24-30 · docs/analysis/onion-adr-education-vertical-2026-07.md"
       locator: "docs/knowledge-base/education/theories/plea-rosario.md · docs/knowledge-base/education/theories/srl-zimmerman.md · docs/knowledge-base/education/applications/onion-srl-bridges.md:24-30 · docs/analysis/onion-adr-education-vertical-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_evid_hegel_catalog_layer1
     node_type: evidence
     layer: audit
@@ -3402,6 +3542,7 @@ nodes:
       source: "docs/discussions/onion-pessoal-marcio/proto/theories/hegel-dialectics.md:1-50"
       locator: "docs/discussions/onion-pessoal-marcio/proto/theories/hegel-dialectics.md:1-50"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_evid_hegel_diary_grenze
     node_type: evidence
     layer: audit
@@ -3416,6 +3557,7 @@ nodes:
       source: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md:17-40"
       locator: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md:17-40"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_claim_hegel_system_kb_missing
     node_type: claim
     layer: audit
@@ -3439,6 +3581,7 @@ nodes:
       source: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md:1-35 · docs/onion/graph/onion-identity-2026-07.kg.yaml:1-25,167-187,423"
       locator: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md:1-35 · docs/onion/graph/onion-identity-2026-07.kg.yaml:1-25,167-187,423"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_claim_pieces_kg_still_missing
     node_type: claim
     layer: audit
@@ -3452,6 +3595,7 @@ nodes:
       source: "docs/onion/graph/ (10 .kg.yaml inspecionados) · .claude/commands/meta/graph.md"
       locator: "docs/onion/graph/ (10 .kg.yaml inspecionados) · .claude/commands/meta/graph.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_evid_provenance_coverage_gate
     node_type: evidence
     layer: audit
@@ -3466,6 +3610,7 @@ nodes:
       source: ".claude/validation/kg-provenance-coverage.sh:1-40 · .claude/validation/lint-artifacts.sh:1456-1482 · .claude/validation/kg-coverage-baseline.txt"
       locator: ".claude/validation/kg-provenance-coverage.sh:1-40 · .claude/validation/lint-artifacts.sh:1456-1482 · .claude/validation/kg-coverage-baseline.txt"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_evid_parecer_bifurcado
     node_type: evidence
     layer: audit
@@ -3480,6 +3625,7 @@ nodes:
       source: "docs/analysis/onion-parecer-rejection-vs-spinoff-signal-2026-07.md:12,39,44,48,142-145"
       locator: "docs/analysis/onion-parecer-rejection-vs-spinoff-signal-2026-07.md:12,39,44,48,142-145"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_evid_family_topology_adr
     node_type: evidence
     layer: audit
@@ -3494,6 +3640,7 @@ nodes:
       source: "docs/analysis/onion-adr-family-repo-topology-2026-07.md:1-60"
       locator: "docs/analysis/onion-adr-family-repo-topology-2026-07.md:1-60"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_claim_family_unregistered_still
     node_type: claim
     layer: audit
@@ -3507,6 +3654,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:190-203"
       locator: "docs/evolution/federation/members.yaml:190-203"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_evid_local_slm_adapter_doc
     node_type: evidence
     layer: audit
@@ -3521,6 +3669,7 @@ nodes:
       source: ".claude/utils/de-identification/adapters/local-slm.md · docs/sdaal/sdaal.md:320"
       locator: ".claude/utils/de-identification/adapters/local-slm.md · docs/sdaal/sdaal.md:320"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_claim_radar_channel_absent
     node_type: claim
     layer: audit
@@ -3534,6 +3683,7 @@ nodes:
       source: "docs/knowledge-base/agentic-patterns/field-observations/ · docs/evolution/inbox/ · docs/analysis/onion-orchestration-external-radar-2026-06.md"
       locator: "docs/knowledge-base/agentic-patterns/field-observations/ · docs/evolution/inbox/ · docs/analysis/onion-orchestration-external-radar-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_claim_srl_pair_not_duplicate
     node_type: claim
     layer: audit
@@ -3547,6 +3697,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-srl-plea-2026-07.md · docs/analysis/onion-research-srl-plea-2026-07.md"
       locator: "docs/analysis/onion-research-seed-srl-plea-2026-07.md · docs/analysis/onion-research-srl-plea-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_claim_bifurcado_cluster
     node_type: claim
     layer: audit
@@ -3560,6 +3711,7 @@ nodes:
       source: "docs/analysis/README.md:22-31 · docs/analysis/onion-parecer-rejection-vs-spinoff-signal-2026-07.md:39"
       locator: "docs/analysis/README.md:22-31 · docs/analysis/onion-parecer-rejection-vs-spinoff-signal-2026-07.md:39"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_claim_onion_as_model_pair_complementary
     node_type: claim
     layer: audit
@@ -3573,6 +3725,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md · docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
       locator: "docs/analysis/onion-research-seed-onion-as-model-2026-07.md · docs/analysis/onion-research-seed-onion-as-model-lens-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY_claim_sources_question_duplicated
     node_type: claim
     layer: audit
@@ -3586,6 +3739,7 @@ nodes:
       source: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md:37 · docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
       locator: "docs/analysis/onion-research-seed-research-radar-channel-2026-07.md:37 · docs/analysis/onion-research-seed-smolagents-and-emerging-patterns-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_1_claim_branches_antipadrao
     node_type: claim
     layer: audit
@@ -3599,6 +3753,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_1_claim_cascata_nativa_claude_code
     node_type: claim
     layer: audit
@@ -3612,6 +3767,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_1_claim_subrepo_scoping_resolvido
     node_type: claim
     layer: audit
@@ -3634,6 +3790,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_1_claim_components_vs_overlay
     node_type: claim
     layer: audit
@@ -3647,6 +3804,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_1_claim_tsconfig_array_footgun
     node_type: claim
     layer: audit
@@ -3660,6 +3818,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_1_claim_policy_precisa_reconciliacao
     node_type: claim
     layer: audit
@@ -3673,6 +3832,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_1_decision_mecanismo_hibrido
     node_type: decision
     layer: audit
@@ -3704,6 +3864,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_1_artifact_tabela_regulated_member
     node_type: artifact
     layer: audit
@@ -3735,6 +3896,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_2_settings_json_no_tree_inheritance
     node_type: claim
     layer: audit
@@ -3784,6 +3946,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_2_server_managed_no_per_group
     node_type: claim
     layer: audit
@@ -3797,6 +3960,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_2_import_transclusion_mechanism
     node_type: claim
     layer: audit
@@ -3810,6 +3974,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_2_regulated_member_mapping_applied
     node_type: artifact
     layer: audit
@@ -3841,6 +4006,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_3_cascade_mercado
     node_type: claim
     layer: audit
@@ -3854,6 +4020,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_3_branch_rejected
     node_type: decision
     layer: audit
@@ -3867,6 +4034,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_3_team_gap
     node_type: claim
     layer: audit
@@ -3898,6 +4066,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_3_claude_settings_cascade
     node_type: evidence
     layer: audit
@@ -3912,6 +4081,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_3_mise_walkup
     node_type: evidence
     layer: audit
@@ -3926,6 +4096,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_3_regulated_member_topology
     node_type: decision
     layer: audit
@@ -3967,6 +4138,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_4_cascata_nativa
     node_type: evidence
     layer: audit
@@ -3980,6 +4152,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_4_subagentes_precedencia
     node_type: evidence
     layer: audit
@@ -3993,6 +4166,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_4_plugin_marketplace
     node_type: evidence
     layer: audit
@@ -4006,6 +4180,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_4_kustomize_overlay
     node_type: claim
     layer: audit
@@ -4019,6 +4194,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_4_supersedes_bitemporal
     node_type: claim
     layer: audit
@@ -4032,6 +4208,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_4_polimorfismo_sdaal
     node_type: claim
     layer: audit
@@ -4045,6 +4222,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_4_constituicao_reason_based
     node_type: evidence
     layer: audit
@@ -4058,6 +4236,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_4_branches_rejeitados
     node_type: claim
     layer: audit
@@ -4071,6 +4250,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_4_veredito_hibrido
     node_type: decision
     layer: audit
@@ -4102,6 +4282,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       locator: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_4_gap_engenharia
     node_type: question
     layer: audit
@@ -4187,6 +4368,7 @@ nodes:
       source: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_5_claim_refutacao_grounding
     node_type: claim
     layer: audit
@@ -4227,6 +4409,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       locator: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_6_empirical_support
     node_type: evidence
     layer: audit
@@ -4240,6 +4423,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       locator: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_6_judge_panel_maps
     node_type: claim
     layer: audit
@@ -4253,6 +4437,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       locator: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_6_diversity_correctness
     node_type: claim
     layer: audit
@@ -4266,6 +4451,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       locator: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_6_orchestrate_gate
     node_type: claim
     layer: audit
@@ -4279,6 +4465,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       locator: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_6_mixing_depth_cap
     node_type: claim
     layer: audit
@@ -4310,6 +4497,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       locator: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_6_adopt_qualitative
     node_type: decision
     layer: audit
@@ -4332,6 +4520,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       locator: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_6_calibration_trigger
     node_type: question
     layer: audit
@@ -4354,6 +4543,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       locator: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_7_claim_gen3_no_grand_ontology
     node_type: claim
     layer: audit
@@ -4367,6 +4557,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       locator: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_7_evidence_arxiv_web_of_agents
     node_type: evidence
     layer: audit
@@ -4380,6 +4571,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       locator: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_7_claim_boundary_evolution_fleet_fog
     node_type: claim
     layer: audit
@@ -4393,6 +4585,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       locator: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_7_decision_retire_fleet_terms
     node_type: decision
     layer: audit
@@ -4407,6 +4600,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       locator: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_7_decision_disambiguate_boundary_tbox_abox
     node_type: decision
     layer: audit
@@ -4421,6 +4615,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       locator: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_7_decision_reject_external_ontology_store
     node_type: decision
     layer: audit
@@ -4435,6 +4630,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       locator: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_7_question_topology_adr_debt_f3
     node_type: question
     layer: audit
@@ -4458,6 +4654,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       locator: "docs/analysis/onion-orchestration-ontology-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_8_adr_topologia
     node_type: entity
     layer: audit
@@ -4481,6 +4678,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       locator: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_8_zero_blocker
     node_type: evidence
     layer: audit
@@ -4495,6 +4693,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       locator: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_8_wm_fortalece
     node_type: claim
     layer: audit
@@ -4509,6 +4708,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       locator: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_8_ca_confunde_estrutural_comportamental
     node_type: claim
     layer: audit
@@ -4523,6 +4723,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       locator: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_8_nomenclatura_sumarizador
     node_type: claim
     layer: audit
@@ -4546,6 +4747,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       locator: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_8_kb_doutrina_ausente
     node_type: claim
     layer: audit
@@ -4560,6 +4762,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       locator: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_8_decisao_fixes_camada12
     node_type: decision
     layer: audit
@@ -4574,6 +4777,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       locator: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_8_decisao_diferir_promocao
     node_type: decision
     layer: audit
@@ -4614,6 +4818,7 @@ nodes:
       source: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       locator: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_9_claim_negotiation_gap
     node_type: claim
     layer: audit
@@ -4627,6 +4832,7 @@ nodes:
       source: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       locator: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_9_claim_blocker_portability
     node_type: claim
     layer: audit
@@ -4640,6 +4846,7 @@ nodes:
       source: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       locator: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_9_claim_blocker_auditability
     node_type: claim
     layer: audit
@@ -4653,6 +4860,7 @@ nodes:
       source: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       locator: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_9_evidence_smoketest
     node_type: evidence
     layer: audit
@@ -4667,6 +4875,7 @@ nodes:
       source: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       locator: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_9_evidence_tasklist_demo
     node_type: evidence
     layer: audit
@@ -4681,6 +4890,7 @@ nodes:
       source: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       locator: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_9_decision_optin
     node_type: decision
     layer: audit
@@ -4703,6 +4913,7 @@ nodes:
       source: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       locator: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_9_artifact_kb_boundary
     node_type: artifact
     layer: audit
@@ -4717,6 +4928,7 @@ nodes:
       source: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       locator: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_9_question_capability_detection
     node_type: question
     layer: audit
@@ -4748,6 +4960,7 @@ nodes:
       source: "docs/analysis/onion-distribution-strategy-2026-06.md"
       locator: "docs/analysis/onion-distribution-strategy-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_10_ecosystem_native_plugins
     node_type: claim
     layer: audit
@@ -4761,6 +4974,7 @@ nodes:
       source: "docs/analysis/onion-distribution-strategy-2026-06.md"
       locator: "docs/analysis/onion-distribution-strategy-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_10_skillmd_open_standard
     node_type: claim
     layer: audit
@@ -4774,6 +4988,7 @@ nodes:
       source: "docs/analysis/onion-distribution-strategy-2026-06.md"
       locator: "docs/analysis/onion-distribution-strategy-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_10_layer_taxonomy
     node_type: decision
     layer: audit
@@ -4787,6 +5002,7 @@ nodes:
       source: "docs/analysis/onion-distribution-strategy-2026-06.md"
       locator: "docs/analysis/onion-distribution-strategy-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_10_verdict_hybrid
     node_type: decision
     layer: audit
@@ -4809,6 +5025,7 @@ nodes:
       source: "docs/analysis/onion-distribution-strategy-2026-06.md"
       locator: "docs/analysis/onion-distribution-strategy-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_10_provenance_gap
     node_type: claim
     layer: audit
@@ -4822,6 +5039,7 @@ nodes:
       source: "docs/analysis/onion-distribution-strategy-2026-06.md"
       locator: "docs/analysis/onion-distribution-strategy-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_10_commercial_sharpening
     node_type: decision
     layer: audit
@@ -4854,6 +5072,7 @@ nodes:
       source: "docs/analysis/onion-distribution-strategy-2026-06.md"
       locator: "docs/analysis/onion-distribution-strategy-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_10_exchange_unit_adr
     node_type: artifact
     layer: audit
@@ -4868,6 +5087,7 @@ nodes:
       source: "docs/analysis/onion-distribution-strategy-2026-06.md"
       locator: "docs/analysis/onion-distribution-strategy-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_10_design_plugin_prototype
     node_type: artifact
     layer: audit
@@ -4882,6 +5102,7 @@ nodes:
       source: "docs/analysis/onion-distribution-strategy-2026-06.md"
       locator: "docs/analysis/onion-distribution-strategy-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_11_claim_ns1_kg_candidate
     node_type: claim
     layer: audit
@@ -4913,6 +5134,7 @@ nodes:
       source: "docs/analysis/onion-decision-north-star-2026-07.md"
       locator: "docs/analysis/onion-decision-north-star-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_11_claim_ns3_hedge_caixa
     node_type: claim
     layer: audit
@@ -4963,6 +5185,7 @@ nodes:
       source: "docs/analysis/onion-decision-north-star-2026-07.md"
       locator: "docs/analysis/onion-decision-north-star-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_11_decision_maestro_final_weight
     node_type: decision
     layer: audit
@@ -4986,6 +5209,7 @@ nodes:
       source: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       locator: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_12_decision_integration_branch
     node_type: decision
     layer: audit
@@ -5000,6 +5224,7 @@ nodes:
       source: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       locator: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_12_decision_wontdo_schema_lint
     node_type: decision
     layer: audit
@@ -5013,6 +5238,7 @@ nodes:
       source: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       locator: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_12_question_reopen_lint
     node_type: question
     layer: audit
@@ -5036,6 +5262,7 @@ nodes:
       source: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       locator: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_12_decision_snapshot_retention
     node_type: decision
     layer: audit
@@ -5050,6 +5277,7 @@ nodes:
       source: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       locator: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_12_decision_co_announce
     node_type: decision
     layer: audit
@@ -5064,6 +5292,7 @@ nodes:
       source: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       locator: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_12_evidence_dogfood_alvo_parsing
     node_type: evidence
     layer: audit
@@ -5078,6 +5307,7 @@ nodes:
       source: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       locator: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_12_decision_prettierignore
     node_type: decision
     layer: audit
@@ -5092,6 +5322,7 @@ nodes:
       source: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       locator: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B4_12_claim_no_e2e_test
     node_type: claim
     layer: audit
@@ -5129,6 +5360,7 @@ nodes:
       source: ".claude/utils/scope/compose-settings.sh@6ee5a7fa"
       locator: "compose-settings.sh@6ee5a7fa l.3-13 (N camadas, merge type-aware); resolve-scope-layers.sh@6ee5a7fa l.3-8 (empresa→time→pessoa); commits d20918a4 (#309), 6db26f49 (#314), 2dab19b2 (#320)"
       method: "leitura: dois scripts no commit 6ee5a7fa + mensagens dos commits d20918a4, 6db26f49, 2dab19b2"
+      locality: "repo"
   - id: SY4_prod_show_scope_provenancia
     node_type: evidence
     layer: audit
@@ -5143,6 +5375,7 @@ nodes:
       source: ".claude/utils/scope/resolve-scope-layers.sh:11-18,60-61 (--show-scope/--provenance, --json, role/form do .onion-version) · docs/evolution/scope-convention-2026.md:44-58 (invariante strip(provtree)==compose, exit 4)"
       locator: ".claude/utils/scope/resolve-scope-layers.sh:11-18,60-61 (--show-scope/--provenance, --json, role/form do .onion-version) · docs/evolution/scope-convention-2026.md:44-58 (invariante strip(provtree)==compose, exit 4)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY4_prod_scope_convention
     node_type: evidence
     layer: audit
@@ -5185,6 +5418,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-topology-adr-2026-06-21.md:1-25 (title sem RASCUNHO, type: adr, status: accepted, filename sem -draft-)"
       locator: "docs/analysis/onion-orchestration-topology-adr-2026-06-21.md:1-25 (title sem RASCUNHO, type: adr, status: accepted, filename sem -draft-)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY4_prod_ca_estrutural_vs_comportamental
     node_type: evidence
     layer: audit
@@ -5213,6 +5447,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-relation-vocabulary.md@6ee5a7fa"
       locator: "onion-relation-vocabulary.md@6ee5a7fa l.96 ('| nó sumarizador | aggregator / sub-synthesizer |'); agent-orchestration.md@6ee5a7fa l.507 ('Locus ≠ forma'); topology-review-2026-06-22.md@6ee5a7fa l.53 (Tema C ⏳ DIFERIDO À PROMOÇÃO)"
       method: "leitura: KBs e review lidos no commit 6ee5a7fa"
+      locality: "repo"
   - id: SY4_prod_orchestrates_workers
     node_type: evidence
     layer: audit
@@ -5264,6 +5499,7 @@ nodes:
       source: ".claude-plugin/marketplace.json:1-20 · plugins/{onion-compliance,onion-design,onion-docs,onion-engineering,onion-product,onion-testing,onion-work-tools}/.claude-plugin · .claude/utils/marketplace/{assemble-plugin.sh,generate-marketplace.sh,resolve-role-bundle.sh,roles.yaml}"
       locator: ".claude-plugin/marketplace.json:1-20 · plugins/{onion-compliance,onion-design,onion-docs,onion-engineering,onion-product,onion-testing,onion-work-tools}/.claude-plugin · .claude/utils/marketplace/{assemble-plugin.sh,generate-marketplace.sh,resolve-role-bundle.sh,roles.yaml}"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY4_prod_co_announce_docbridge
     node_type: evidence
     layer: audit
@@ -5334,6 +5570,7 @@ nodes:
       source: ".claude/skills/onion-patterns/SKILL.md:174-178,247 (§Playbooks recognition-primed, doutrina RFC-0002, resíduo vira playbook novo) · docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md"
       locator: ".claude/skills/onion-patterns/SKILL.md:174-178,247 (§Playbooks recognition-primed, doutrina RFC-0002, resíduo vira playbook novo) · docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY4_open_pessoa_versionavel
     node_type: question
     layer: audit
@@ -5411,6 +5648,7 @@ nodes:
       source: "docs/analysis/onion-orchestration-topology-adr-2026-06-21.md@6ee5a7fa"
       locator: "topology-adr l.130-136 (b·m ≤ W no agente sintetizador/nó sumarizador); math-phase-transition-2026-06.md@6ee5a7fa l.42, l.64 (b·m≤W, aponta o ADR); topology-review-2026-06-22.md@6ee5a7fa l.50, l.53, l.75 ('reancorado em primeiros princípios')"
       method: "derivado: sobreposição apurada pela leitura dos três documentos no commit 6ee5a7fa"
+      locality: "repo"
   - id: SY4_dup_ontology_f3_e_review_metadados
     node_type: claim
     layer: audit
@@ -5437,6 +5675,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-relation-vocabulary.md:54,69 (fronteira evolução×orquestração) vs docs/analysis/onion-orchestration-topology-adr-2026-06-21.md (locus×forma)"
       locator: "docs/knowledge-base/concepts/onion-relation-vocabulary.md:54,69 (fronteira evolução×orquestração) vs docs/analysis/onion-orchestration-topology-adr-2026-06-21.md (locus×forma)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY4_claim_duas_proveniencias_distintas
     node_type: claim
     layer: audit
@@ -5450,6 +5689,7 @@ nodes:
       source: ".claude/utils/scope/resolve-scope-layers.sh@6ee5a7fa"
       locator: "resolve-scope-layers.sh@6ee5a7fa l.5, l.12-16 (--show-scope/--provenance por chave, RFC-0005); .claude/validation/kg-provenance-coverage.sh@6ee5a7fa l.3-16 ('este RELATÓRIO existe no grafo?'); kg-coverage-baseline.txt"
       method: "derivado: distinção construída da leitura dos dois scripts no commit 6ee5a7fa"
+      locality: "repo"
   - id: B5_1_mcp_first_leak
     node_type: claim
     layer: audit
@@ -5463,6 +5703,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-15.md"
       locator: "docs/analysis/onion-evolution-2026-06-15.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_1_mcp_sweep_decision
     node_type: decision
     layer: audit
@@ -5485,6 +5726,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-15.md"
       locator: "docs/analysis/onion-evolution-2026-06-15.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_1_inventory_command_decision
     node_type: decision
     layer: audit
@@ -5507,6 +5749,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-15.md"
       locator: "docs/analysis/onion-evolution-2026-06-15.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_1_kb_freshness_command_decision
     node_type: decision
     layer: audit
@@ -5529,6 +5772,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-15.md"
       locator: "docs/analysis/onion-evolution-2026-06-15.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_1_broken_links_security_master
     node_type: evidence
     layer: audit
@@ -5542,6 +5786,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-15.md"
       locator: "docs/analysis/onion-evolution-2026-06-15.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_1_fix_phantom_links_decision
     node_type: decision
     layer: audit
@@ -5564,6 +5809,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-15.md"
       locator: "docs/analysis/onion-evolution-2026-06-15.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_1_refuted_findings
     node_type: claim
     layer: audit
@@ -5577,6 +5823,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-15.md"
       locator: "docs/analysis/onion-evolution-2026-06-15.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_1_a2a_export_gated
     node_type: decision
     layer: audit
@@ -5608,6 +5855,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-16.md"
       locator: "docs/analysis/onion-evolution-2026-06-16.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_2_phantom_categories
     node_type: claim
     layer: audit
@@ -5621,6 +5869,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-16.md"
       locator: "docs/analysis/onion-evolution-2026-06-16.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_2_threshold_ambiguity
     node_type: claim
     layer: audit
@@ -5634,6 +5883,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-16.md"
       locator: "docs/analysis/onion-evolution-2026-06-16.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_2_federation_v1_dead_links
     node_type: claim
     layer: audit
@@ -5647,6 +5897,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-16.md"
       locator: "docs/analysis/onion-evolution-2026-06-16.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_2_zero_phase_merge_vetoes
     node_type: decision
     layer: audit
@@ -5660,6 +5911,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-16.md"
       locator: "docs/analysis/onion-evolution-2026-06-16.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_2_adversarial_judge_refutation
     node_type: evidence
     layer: audit
@@ -5673,6 +5925,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-16.md"
       locator: "docs/analysis/onion-evolution-2026-06-16.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_2_decision_delink_not_repoint
     node_type: decision
     layer: audit
@@ -5686,6 +5939,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-16.md"
       locator: "docs/analysis/onion-evolution-2026-06-16.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_2_decision_retain_2026_06_15
     node_type: decision
     layer: audit
@@ -5699,6 +5953,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-16.md"
       locator: "docs/analysis/onion-evolution-2026-06-16.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_2_executed_same_day
     node_type: evidence
     layer: audit
@@ -5739,6 +5994,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-17.md"
       locator: "docs/analysis/onion-evolution-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_3_alert_b_mcp_leak
     node_type: claim
     layer: audit
@@ -5752,6 +6008,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-17.md"
       locator: "docs/analysis/onion-evolution-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_3_lint_rule9_gap
     node_type: claim
     layer: audit
@@ -5765,6 +6022,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-17.md"
       locator: "docs/analysis/onion-evolution-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_3_decision_root_fix_order
     node_type: decision
     layer: audit
@@ -5778,6 +6036,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-17.md"
       locator: "docs/analysis/onion-evolution-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_3_decision_fix_both_creators
     node_type: decision
     layer: audit
@@ -5791,6 +6050,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-17.md"
       locator: "docs/analysis/onion-evolution-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_3_decision_preserve_historical
     node_type: decision
     layer: audit
@@ -5804,6 +6064,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-17.md"
       locator: "docs/analysis/onion-evolution-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_3_judge_cull_evidence
     node_type: evidence
     layer: audit
@@ -5817,6 +6078,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-17.md"
       locator: "docs/analysis/onion-evolution-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_3_backlog_prioritized
     node_type: artifact
     layer: audit
@@ -5839,6 +6101,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-08.md"
       locator: "docs/analysis/onion-evolution-2026-07-08.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_4_finding1_copy_manual_commit
     node_type: claim
     layer: audit
@@ -5852,6 +6115,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-08.md"
       locator: "docs/analysis/onion-evolution-2026-07-08.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_4_finding2_merge_future
     node_type: claim
     layer: audit
@@ -5865,6 +6129,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-08.md"
       locator: "docs/analysis/onion-evolution-2026-07-08.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_4_finding3_version_revert
     node_type: claim
     layer: audit
@@ -5878,6 +6143,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-08.md"
       locator: "docs/analysis/onion-evolution-2026-07-08.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_4_finding4_report_offer_commit
     node_type: claim
     layer: audit
@@ -5891,6 +6157,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-08.md"
       locator: "docs/analysis/onion-evolution-2026-07-08.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_4_systemic_cause
     node_type: claim
     layer: audit
@@ -5913,6 +6180,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-08.md"
       locator: "docs/analysis/onion-evolution-2026-07-08.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_4_decision_autocommit
     node_type: decision
     layer: audit
@@ -5944,6 +6212,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-08.md"
       locator: "docs/analysis/onion-evolution-2026-07-08.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_4_ssot_context_pilot
     node_type: claim
     layer: audit
@@ -5957,6 +6226,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-08.md"
       locator: "docs/analysis/onion-evolution-2026-07-08.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_5_meta_strategize_capability
     node_type: entity
     layer: audit
@@ -6015,6 +6285,7 @@ nodes:
       source: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
       locator: "docs/analysis/onion-strategy-layer-blindspots-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_5_precisao_match_question
     node_type: question
     layer: audit
@@ -6064,6 +6335,7 @@ nodes:
       source: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
       locator: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_6_reconhecedor_leve
     node_type: entity
     layer: audit
@@ -6140,6 +6412,7 @@ nodes:
       source: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
       locator: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_6_skill_onion_patterns
     node_type: entity
     layer: audit
@@ -6153,6 +6426,7 @@ nodes:
       source: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
       locator: "docs/analysis/onion-strategy-layer-capability-draft-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_6_gate_dependencia_doc1
     node_type: decision
     layer: audit
@@ -6175,6 +6449,7 @@ nodes:
       source: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
       locator: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_7_catalog_first_reframe
     node_type: claim
     layer: audit
@@ -6188,6 +6463,7 @@ nodes:
       source: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
       locator: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_7_gap_diagnosis
     node_type: evidence
     layer: audit
@@ -6201,6 +6477,7 @@ nodes:
       source: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
       locator: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_7_sdaal_precedent
     node_type: evidence
     layer: audit
@@ -6214,6 +6491,7 @@ nodes:
       source: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
       locator: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_7_overlap_doubt
     node_type: claim
     layer: audit
@@ -6236,6 +6514,7 @@ nodes:
       source: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
       locator: "docs/analysis/onion-strategy-layer-handoff-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_7_timing_question
     node_type: question
     layer: audit
@@ -6294,6 +6573,7 @@ nodes:
       source: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
       locator: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_8_decision_5_skills_reclass
     node_type: decision
     layer: audit
@@ -6307,6 +6587,7 @@ nodes:
       source: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
       locator: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_8_patch1_runflow_dev
     node_type: decision
     layer: audit
@@ -6366,6 +6647,7 @@ nodes:
       source: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       locator: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_9_install_any_plan
     node_type: decision
     layer: audit
@@ -6380,6 +6662,7 @@ nodes:
       source: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       locator: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_9_plugin_root_caveat
     node_type: evidence
     layer: audit
@@ -6394,6 +6677,7 @@ nodes:
       source: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       locator: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_9_role_scoping_gated
     node_type: claim
     layer: audit
@@ -6408,6 +6692,7 @@ nodes:
       source: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       locator: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_9_roles_yaml_resolver
     node_type: artifact
     layer: audit
@@ -6422,6 +6707,7 @@ nodes:
       source: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       locator: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_9_meta_factory_never_plugin
     node_type: decision
     layer: audit
@@ -6436,6 +6722,7 @@ nodes:
       source: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       locator: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_9_fallback_vendoring
     node_type: decision
     layer: audit
@@ -6450,6 +6737,7 @@ nodes:
       source: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       locator: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_9_regulated_prefers_vendoring
     node_type: claim
     layer: audit
@@ -6464,6 +6752,7 @@ nodes:
       source: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       locator: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_9_verification_checklist
     node_type: artifact
     layer: audit
@@ -6478,6 +6767,7 @@ nodes:
       source: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       locator: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_10_ambiente_goalflow
     node_type: entity
     layer: audit
@@ -6536,6 +6826,7 @@ nodes:
       source: "docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md"
       locator: "docs/analysis/onion-plugin-smoke-test-goalflow-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_10_regra_crash_vira_sinal
     node_type: claim
     layer: audit
@@ -6568,6 +6859,7 @@ nodes:
       source: "docs/analysis/onion-door-birth-findings-2026-07.md"
       locator: "docs/analysis/onion-door-birth-findings-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_11_adopt_role_scoped_composicao
     node_type: claim
     layer: audit
@@ -6581,6 +6873,7 @@ nodes:
       source: "docs/analysis/onion-door-birth-findings-2026-07.md"
       locator: "docs/analysis/onion-door-birth-findings-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_11_door_vendored_nao_marketplace
     node_type: claim
     layer: audit
@@ -6594,6 +6887,7 @@ nodes:
       source: "docs/analysis/onion-door-birth-findings-2026-07.md"
       locator: "docs/analysis/onion-door-birth-findings-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_11_doutrina_circulation_safe
     node_type: decision
     layer: audit
@@ -6607,6 +6901,7 @@ nodes:
       source: "docs/analysis/onion-door-birth-findings-2026-07.md"
       locator: "docs/analysis/onion-door-birth-findings-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_11_g1_link_guard_fix
     node_type: artifact
     layer: audit
@@ -6621,6 +6916,7 @@ nodes:
       source: "docs/analysis/onion-door-birth-findings-2026-07.md"
       locator: "docs/analysis/onion-door-birth-findings-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_11_g2_tier_kb_nao_circulante
     node_type: question
     layer: audit
@@ -6670,6 +6966,7 @@ nodes:
       source: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
       locator: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_12_modo_falha
     node_type: claim
     layer: audit
@@ -6683,6 +6980,7 @@ nodes:
       source: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
       locator: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_12_payload_evidencia
     node_type: evidence
     layer: audit
@@ -6696,6 +6994,7 @@ nodes:
       source: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
       locator: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_12_wiring_evidencia
     node_type: evidence
     layer: audit
@@ -6709,6 +7008,7 @@ nodes:
       source: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
       locator: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_12_governanca_transfere
     node_type: claim
     layer: audit
@@ -6722,6 +7022,7 @@ nodes:
       source: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
       locator: "docs/analysis/onion-f1-spike-adopt-domain-profile-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_12_decisao_profile
     node_type: decision
     layer: audit
@@ -6772,6 +7073,7 @@ nodes:
       source: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       locator: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_13_rhilo_main_dupla_carga
     node_type: claim
     layer: audit
@@ -6786,6 +7088,7 @@ nodes:
       source: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       locator: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_13_veredito_develop_coexiste
     node_type: decision
     layer: audit
@@ -6799,6 +7102,7 @@ nodes:
       source: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       locator: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_13_veredito_politica_merge_invertida
     node_type: decision
     layer: audit
@@ -6812,6 +7116,7 @@ nodes:
       source: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       locator: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_13_lineage_product_main_nova
     node_type: decision
     layer: audit
@@ -6825,6 +7130,7 @@ nodes:
       source: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       locator: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_13_veredito_cliente_escopo_vs_versao
     node_type: decision
     layer: audit
@@ -6838,6 +7144,7 @@ nodes:
       source: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       locator: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_13_branch_roles_sdaal
     node_type: entity
     layer: audit
@@ -6860,6 +7167,7 @@ nodes:
       source: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       locator: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_13_gate_extracao_escopo_rhilo
     node_type: question
     layer: audit
@@ -6882,6 +7190,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_14_evidence_deterministic_merge
     node_type: evidence
     layer: audit
@@ -6895,6 +7204,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_14_evidence_hitl_risk_split
     node_type: evidence
     layer: audit
@@ -6908,6 +7218,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_14_claim_transfer_onion
     node_type: claim
     layer: audit
@@ -6921,6 +7232,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_14_claim_onion_stricter
     node_type: claim
     layer: audit
@@ -6934,6 +7246,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_14_decision_draft_contract
     node_type: decision
     layer: audit
@@ -6956,6 +7269,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_14_decision_automate_gated
     node_type: decision
     layer: audit
@@ -6969,6 +7283,7 @@ nodes:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_14_artifact_adr_thread_runtime
     node_type: artifact
     layer: audit
@@ -7010,6 +7325,7 @@ nodes:
       source: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_15_kg_engine
     node_type: entity
     layer: audit
@@ -7024,6 +7340,7 @@ nodes:
       source: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_15_federation_edge_gap
     node_type: claim
     layer: audit
@@ -7046,6 +7363,7 @@ nodes:
       source: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_15_regulated_member_signals
     node_type: evidence
     layer: audit
@@ -7060,6 +7378,7 @@ nodes:
       source: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_15_onion_pessoal_method
     node_type: evidence
     layer: audit
@@ -7074,6 +7393,7 @@ nodes:
       source: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_15_four_phase_plan
     node_type: decision
     layer: audit
@@ -7114,6 +7434,7 @@ nodes:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_16_claim_evidencia_anthropic_2026
     node_type: claim
     layer: audit
@@ -7127,6 +7448,7 @@ nodes:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_16_decisao_casa_de_marca
     node_type: decision
     layer: audit
@@ -7140,6 +7462,7 @@ nodes:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_16_claim_prova_universalidade
     node_type: claim
     layer: audit
@@ -7153,6 +7476,7 @@ nodes:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_16_decisao_fronteira_comercial_voz
     node_type: decision
     layer: audit
@@ -7166,6 +7490,7 @@ nodes:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_16_decisao_frame_competitivo
     node_type: decision
     layer: audit
@@ -7179,6 +7504,7 @@ nodes:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_16_artifact_messaging_framework
     node_type: artifact
     layer: audit
@@ -7210,6 +7536,7 @@ nodes:
       source: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_17_gap_discurso_pratica
     node_type: claim
     layer: audit
@@ -7223,6 +7550,7 @@ nodes:
       source: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_17_tessl_unico_as_source
     node_type: evidence
     layer: audit
@@ -7236,6 +7564,7 @@ nodes:
       source: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_17_agentspec_modelspec_runtime
     node_type: evidence
     layer: audit
@@ -7249,6 +7578,7 @@ nodes:
       source: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_17_grove_spec_unidade_fundamental
     node_type: claim
     layer: audit
@@ -7298,6 +7628,7 @@ nodes:
       source: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B5_17_veredito_trajetoria_campo
     node_type: decision
     layer: audit
@@ -7311,6 +7642,7 @@ nodes:
       source: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       locator: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_mcp_first_leak_closed
     node_type: claim
     layer: audit
@@ -7325,6 +7657,7 @@ nodes:
       source: ".claude/agents/meta/agent-creator-specialist.md:183,239,242,249 · .claude/commands/common/templates/agent-template.md:144,178,181,312"
       locator: ".claude/agents/meta/agent-creator-specialist.md:183,239,242,249 · .claude/commands/common/templates/agent-template.md:144,178,181,312"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_count_drift_ssot_closed
     node_type: claim
     layer: audit
@@ -7340,6 +7673,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh@123749e2"
       locator: "docs/onion/inventory.md@123749e2 l.1; lint-artifacts.sh@123749e2 l.383-386 (REGRA 8), l.1018-1033 (REGRA 16, incl. ISENTA docs/materials/), l.1293-1294"
       method: "leitura: inventory.md e lint-artifacts.sh no commit 123749e2"
+      locality: "repo"
   - id: SY5_index_residual_drift
     node_type: claim
     layer: audit
@@ -7363,6 +7697,7 @@ nodes:
       source: ".claude/commands/meta/kb-freshness.md@123749e2"
       locator: ".claude/commands/meta/{kb-freshness,context-freshness}.md@123749e2; plugins/onion-work-tools/commands/{kb-freshness,context-freshness}.md@123749e2; lint-artifacts.sh@123749e2 l.994 (REGRA 15); docs/analysis/onion-adr-kg-freshness-gate-2026-07.md@123749e2"
       method: "leitura: git ls-tree -r --name-only 123749e2 | grep freshness + lint-artifacts.sh l.994 no commit 123749e2"
+      locality: "repo"
   - id: SY5_evolve_diaries_redecide
     node_type: claim
     layer: audit
@@ -7378,6 +7713,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-06-16.md@123749e2"
       locator: "onion-evolution-2026-06-15.md@123749e2 l.36, l.56, l.67; -06-16.md l.36-37, l.83, l.86, l.92, l.139; -06-17.md l.61, l.69-70, l.76"
       method: "leitura: os três diários lidos no commit 123749e2"
+      locality: "repo"
   - id: SY5_prose_backlog_antipattern
     node_type: claim
     layer: audit
@@ -7392,6 +7728,7 @@ nodes:
       source: "commit 123749e2 (corpo) + .claude/validation/lint-artifacts.sh@123749e2"
       locator: "corpo do commit 123749e2 l.22-27; lint-artifacts.sh@123749e2 l.383 (REGRA 8), l.1018 (REGRA 16); docs/analysis/onion-evolution-2026-06-16.md@123749e2 l.92 (achado repetido)"
       method: "leitura: corpo do commit 123749e2 + lint e diário 06-16 no mesmo commit"
+      locality: "repo"
   - id: SY5_phase_merge_invariant_held
     node_type: claim
     layer: audit
@@ -7406,6 +7743,7 @@ nodes:
       source: "plugins/onion-engineering/commands/ (plan,start,work,pre-pr,pr,pr-update) · plugins/onion-product/commands/ (collect,refine,spec,feature)"
       locator: "plugins/onion-engineering/commands/ (plan,start,work,pre-pr,pr,pr-update) · plugins/onion-product/commands/ (collect,refine,spec,feature)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_strategy_trio_is_one_package
     node_type: claim
     layer: audit
@@ -7420,6 +7758,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md@123749e2"
       locator: "rfc-0002 l.5 ('re: ...onion-strategy-layer-handoff-2026-06-17.md (+ 4 docs irmãos)'); onion-strategy-layer-capability-draft-2026-06-17.md l.19 ('Doc 2 de 4 do handoff de 2026-06-17 15:18'); -handoff-2026-06-17.md l.22 ('Doc 3 de 4'); -blindspots-2026-06-17.md l.17 ('Doc 4 de 4'); -adr-draft-2026-06-17.md l.20 ('Doc 1 de 4')"
       method: "leitura: RFC-0002 e os quatro docs strategy-layer no commit 123749e2"
+      locality: "repo"
   - id: SY5_rfc0002_judged_trio
     node_type: claim
     layer: audit
@@ -7434,6 +7773,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md §2,§3"
       locator: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md §2,§3"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_playbooks_materialization_open
     node_type: claim
     layer: audit
@@ -7457,6 +7797,7 @@ nodes:
       source: ".claude/utils/adopt/durable-commit.sh:15,19,55"
       locator: ".claude/utils/adopt/durable-commit.sh:15,19,55"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_vendor_branch_closed
     node_type: claim
     layer: audit
@@ -7485,6 +7826,7 @@ nodes:
       source: ".claude-plugin/marketplace.json · plugins/ (7 dirs)"
       locator: ".claude-plugin/marketplace.json · plugins/ (7 dirs)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_meta_factory_doctrine_held
     node_type: claim
     layer: audit
@@ -7499,6 +7841,7 @@ nodes:
       source: "plugins/onion-work-tools/commands/@123749e2"
       locator: "git ls-tree --name-only 123749e2 plugins/onion-work-tools/commands/ (14 arquivos); docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md@123749e2 l.28 (D4 meta-fábrica = create-*/adopt/federation-*/evolve/graph/inventory)"
       method: "medição: git ls-tree --name-only 123749e2 plugins/onion-work-tools/commands/ (14 entradas)"
+      locality: "repo"
   - id: SY5_onion_meta_question_dissolved
     node_type: claim
     layer: audit
@@ -7513,6 +7856,7 @@ nodes:
       source: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md@123749e2"
       locator: "patch-draft l.82-83 ('#4 onion-meta — os 30 comandos meta/ ... Tensiona a doutrina → RFC'); plugins/onion-work-tools/.claude-plugin/plugin.json@123749e2 (description 'nao meta-fabrica'); docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md@123749e2 l.28"
       method: "leitura: patch-draft, plugin.json e SYNTHESIS da tier-matrix no commit 123749e2"
+      locality: "repo"
   - id: SY5_orchestration_skill_shipped_elsewhere
     node_type: claim
     layer: audit
@@ -7527,6 +7871,7 @@ nodes:
       source: "plugins/@123749e2"
       locator: "plugins/onion-work-tools/skills/onion-orchestration/SKILL.md@123749e2; git ls-tree 123749e2 plugins/onion-design/ (sem skills/); plugins/onion-design/commands/generate.md@123749e2 l.50; docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md@123749e2 l.44 (Patch #2 → onion-design)"
       method: "leitura: árvore de plugins/, generate.md e patch-draft no commit 123749e2"
+      locality: "repo"
   - id: SY5_runflow_patch_open
     node_type: claim
     layer: audit
@@ -7550,6 +7895,7 @@ nodes:
       source: "plugins/@123749e2"
       locator: "git ls-tree -r 123749e2 plugins (warm-up só em plugins/onion-engineering/commands/ e plugins/onion-product/commands/); .claude/commands/catch-up.md@123749e2; docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md@123749e2 l.80-81 (gap do /catch-up)"
       method: "medição: git ls-tree -r --name-only 123749e2 plugins | grep -i -E 'catch-up|warm-up' (equivalente ao find do trace, no commit da data)"
+      locality: "repo"
   - id: SY5_smoke_test_never_run
     node_type: claim
     layer: audit
@@ -7600,6 +7946,7 @@ nodes:
       source: ".claude/validation/resolve-production-branch.sh@123749e2"
       locator: "resolve-production-branch.sh@123749e2 l.3-18"
       method: "leitura: cabeçalho do script no commit 123749e2"
+      locality: "repo"
   - id: SY5_branch_roles_adr_still_proposed
     node_type: claim
     layer: audit
@@ -7632,6 +7979,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:73-75"
       locator: "docs/evolution/federation/members.yaml:73-75"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_autonomy_adr_gated_beacon_real
     node_type: claim
     layer: audit
@@ -7646,6 +7994,7 @@ nodes:
       source: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md@123749e2"
       locator: "adr l.5 ('status: proposed — GATED'), l.70, l.85 (beacon-check); .claude/validation/session-beacon.sh@123749e2 l.1-11; docs/evolution/research/autonomous-thread-runtime-2026-07/autonomous-thread-runtime.kg.yaml@123749e2"
       method: "leitura: ADR, script e grafo lidos no commit 123749e2"
+      locality: "repo"
   - id: SY5_ingestor_doctrine_accepted_code_absent
     node_type: claim
     layer: audit
@@ -7661,6 +8010,7 @@ nodes:
       source: "docs/analysis/onion-adr-doctrine-ingestor-2026-07.md@123749e2"
       locator: "adr l.2 (título), l.5 (status accepted, 1º dogfood granaai), l.36-38 (can_correct_to); git grep -l -i ingestor 123749e2 -- .claude/ (3 diários + diary/index.md + utils/design-source/README.md l.6, l.9, l.11)"
       method: "leitura: ADR no commit 123749e2 + git grep -l -i ingestor 123749e2 -- .claude/"
+      locality: "repo"
   - id: SY5_federation_kg_ontology_answered
     node_type: claim
     layer: audit
@@ -7675,6 +8025,7 @@ nodes:
       source: "docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md"
       locator: "docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_brand_voice_shipped
     node_type: claim
     layer: audit
@@ -7689,6 +8040,7 @@ nodes:
       source: "docs/business-context/04-operations/messaging-framework.md:1-40"
       locator: "docs/business-context/04-operations/messaging-framework.md:1-40"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_p6_still_blocked
     node_type: claim
     layer: audit
@@ -7703,6 +8055,7 @@ nodes:
       source: "docs/business-context/04-operations/messaging-framework.md:6-8"
       locator: "docs/business-context/04-operations/messaging-framework.md:6-8"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_spec_as_run_not_absorbed
     node_type: claim
     layer: audit
@@ -7735,6 +8088,7 @@ nodes:
       source: ".claude/validation/a2a-agent-card.sh · .claude/validation/lint-artifacts.sh:649 · docs/evolution/federation/members.yaml:83-86 · docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
       locator: ".claude/validation/a2a-agent-card.sh · .claude/validation/lint-artifacts.sh:649 · docs/evolution/federation/members.yaml:83-86 · docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY5_verdict_leva5
     node_type: claim
     layer: audit
@@ -7763,6 +8117,7 @@ nodes:
       source: "docs/analysis/onion-review-2026-05.md"
       locator: "docs/analysis/onion-review-2026-05.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_1_tres_dimensoes_peer
     node_type: decision
     layer: audit
@@ -7777,6 +8132,7 @@ nodes:
       source: "docs/analysis/onion-review-2026-05.md"
       locator: "docs/analysis/onion-review-2026-05.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_1_workflows_faseados_preservar
     node_type: decision
     layer: audit
@@ -7791,6 +8147,7 @@ nodes:
       source: "docs/analysis/onion-review-2026-05.md"
       locator: "docs/analysis/onion-review-2026-05.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_1_abandono_onion_v4
     node_type: decision
     layer: audit
@@ -7805,6 +8162,7 @@ nodes:
       source: "docs/analysis/onion-review-2026-05.md"
       locator: "docs/analysis/onion-review-2026-05.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_1_metaspecs_ausentes
     node_type: claim
     layer: audit
@@ -7819,6 +8177,7 @@ nodes:
       source: "docs/analysis/onion-review-2026-05.md"
       locator: "docs/analysis/onion-review-2026-05.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_1_kbs_historicas_sem_marcacao
     node_type: claim
     layer: audit
@@ -7833,6 +8192,7 @@ nodes:
       source: "docs/analysis/onion-review-2026-05.md"
       locator: "docs/analysis/onion-review-2026-05.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_1_task_manager_mais_maduro
     node_type: claim
     layer: audit
@@ -7847,6 +8207,7 @@ nodes:
       source: "docs/analysis/onion-review-2026-05.md"
       locator: "docs/analysis/onion-review-2026-05.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_1_plano_priorizado_p0_p3
     node_type: decision
     layer: audit
@@ -7861,6 +8222,7 @@ nodes:
       source: "docs/analysis/onion-review-2026-05.md"
       locator: "docs/analysis/onion-review-2026-05.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_1_piloto_p3_pendente
     node_type: question
     layer: audit
@@ -7875,6 +8237,7 @@ nodes:
       source: "docs/analysis/onion-review-2026-05.md"
       locator: "docs/analysis/onion-review-2026-05.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_2_standalone_instance
     node_type: entity
     layer: audit
@@ -7888,6 +8251,7 @@ nodes:
       source: "docs/analysis/onion-vision-concept-map-2026-06.md"
       locator: "docs/analysis/onion-vision-concept-map-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_2_federacao_peer
     node_type: entity
     layer: audit
@@ -7901,6 +8265,7 @@ nodes:
       source: "docs/analysis/onion-vision-concept-map-2026-06.md"
       locator: "docs/analysis/onion-vision-concept-map-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_2_cerebro_central
     node_type: entity
     layer: audit
@@ -7932,6 +8297,7 @@ nodes:
       source: "docs/analysis/onion-vision-concept-map-2026-06.md"
       locator: "docs/analysis/onion-vision-concept-map-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_2_comercializacao_bsl
     node_type: decision
     layer: audit
@@ -7999,6 +8365,7 @@ nodes:
       source: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       locator: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_3_decision_familia_portas
     node_type: decision
     layer: audit
@@ -8012,6 +8379,7 @@ nodes:
       source: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       locator: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_3_decision_licenciamento_faseado
     node_type: decision
     layer: audit
@@ -8034,6 +8402,7 @@ nodes:
       source: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       locator: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_3_claim_sdaal_vale_a_pena
     node_type: claim
     layer: audit
@@ -8066,6 +8435,7 @@ nodes:
       source: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       locator: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_3_claim_sdaal_teto_largura
     node_type: claim
     layer: audit
@@ -8079,6 +8449,7 @@ nodes:
       source: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       locator: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_3_decision_harness_golden_payload
     node_type: decision
     layer: audit
@@ -8102,6 +8473,7 @@ nodes:
       source: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       locator: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_3_question_coordenacao_overlap
     node_type: question
     layer: audit
@@ -8124,6 +8496,7 @@ nodes:
       source: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       locator: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_4_tese_consistente
     node_type: evidence
     layer: audit
@@ -8137,6 +8510,7 @@ nodes:
       source: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       locator: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_4_ssot_gerada_integra
     node_type: evidence
     layer: audit
@@ -8150,6 +8524,7 @@ nodes:
       source: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       locator: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_4_zero_store_externo
     node_type: evidence
     layer: audit
@@ -8163,6 +8538,7 @@ nodes:
       source: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       locator: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_4_sdaal_invariantes
     node_type: evidence
     layer: audit
@@ -8176,6 +8552,7 @@ nodes:
       source: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       locator: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_4_migracao_orquestracao_limpa
     node_type: evidence
     layer: audit
@@ -8189,6 +8566,7 @@ nodes:
       source: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       locator: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_4_contradicao_limite_tamanho
     node_type: claim
     layer: audit
@@ -8256,6 +8634,7 @@ nodes:
       source: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       locator: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_d1_definicoes_conflitantes
     node_type: claim
     layer: audit
@@ -8269,6 +8648,7 @@ nodes:
       source: "docs/analysis/onion-sessions-review-2026-06.md"
       locator: "docs/analysis/onion-sessions-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_d2_versionamento_contradiz
     node_type: claim
     layer: audit
@@ -8282,6 +8662,7 @@ nodes:
       source: "docs/analysis/onion-sessions-review-2026-06.md"
       locator: "docs/analysis/onion-sessions-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_d3_templates_orfaos
     node_type: claim
     layer: audit
@@ -8295,6 +8676,7 @@ nodes:
       source: "docs/analysis/onion-sessions-review-2026-06.md"
       locator: "docs/analysis/onion-sessions-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_d4_colisao_nomes
     node_type: claim
     layer: audit
@@ -8308,6 +8690,7 @@ nodes:
       source: "docs/analysis/onion-sessions-review-2026-06.md"
       locator: "docs/analysis/onion-sessions-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_d5_protocolo_ler_tudo
     node_type: claim
     layer: audit
@@ -8321,6 +8704,7 @@ nodes:
       source: "docs/analysis/onion-sessions-review-2026-06.md"
       locator: "docs/analysis/onion-sessions-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_d6_badges_nao_deterministicos
     node_type: claim
     layer: audit
@@ -8334,6 +8718,7 @@ nodes:
       source: "docs/analysis/onion-sessions-review-2026-06.md"
       locator: "docs/analysis/onion-sessions-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_dec_contrato_unificado
     node_type: decision
     layer: audit
@@ -8347,6 +8732,7 @@ nodes:
       source: "docs/analysis/onion-sessions-review-2026-06.md"
       locator: "docs/analysis/onion-sessions-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_dec_terminologia_worklog_transcript
     node_type: decision
     layer: audit
@@ -8360,6 +8746,7 @@ nodes:
       source: "docs/analysis/onion-sessions-review-2026-06.md"
       locator: "docs/analysis/onion-sessions-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_dec_vocabulario_ascii
     node_type: decision
     layer: audit
@@ -8373,6 +8760,7 @@ nodes:
       source: "docs/analysis/onion-sessions-review-2026-06.md"
       locator: "docs/analysis/onion-sessions-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_dec_versionamento_por_projeto
     node_type: decision
     layer: audit
@@ -8386,6 +8774,7 @@ nodes:
       source: "docs/analysis/onion-sessions-review-2026-06.md"
       locator: "docs/analysis/onion-sessions-review-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_5_plan_refactor_sessions
     node_type: artifact
     layer: audit
@@ -8408,6 +8797,7 @@ nodes:
       source: "docs/analysis/onion-vv-baseline-2026-06.md"
       locator: "docs/analysis/onion-vv-baseline-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_6_oversized_agents
     node_type: claim
     layer: audit
@@ -8421,6 +8811,7 @@ nodes:
       source: "docs/analysis/onion-vv-baseline-2026-06.md"
       locator: "docs/analysis/onion-vv-baseline-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_6_oversized_commands
     node_type: claim
     layer: audit
@@ -8434,6 +8825,7 @@ nodes:
       source: "docs/analysis/onion-vv-baseline-2026-06.md"
       locator: "docs/analysis/onion-vv-baseline-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_6_platform_gaps
     node_type: claim
     layer: audit
@@ -8447,6 +8839,7 @@ nodes:
       source: "docs/analysis/onion-vv-baseline-2026-06.md"
       locator: "docs/analysis/onion-vv-baseline-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_6_missing_frontmatter
     node_type: claim
     layer: audit
@@ -8460,6 +8853,7 @@ nodes:
       source: "docs/analysis/onion-vv-baseline-2026-06.md"
       locator: "docs/analysis/onion-vv-baseline-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_6_broken_symlinks
     node_type: claim
     layer: audit
@@ -8473,6 +8867,7 @@ nodes:
       source: "docs/analysis/onion-vv-baseline-2026-06.md"
       locator: "docs/analysis/onion-vv-baseline-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_6_remove_symlinks_decision
     node_type: decision
     layer: audit
@@ -8513,6 +8908,7 @@ nodes:
       source: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       locator: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_7_gap_classificador_ausente
     node_type: claim
     layer: audit
@@ -8526,6 +8922,7 @@ nodes:
       source: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       locator: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_7_sintoma_cross_links_assimetricos
     node_type: claim
     layer: audit
@@ -8539,6 +8936,7 @@ nodes:
       source: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       locator: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_7_sintoma_inventory_nao_re_roda
     node_type: claim
     layer: audit
@@ -8552,6 +8950,7 @@ nodes:
       source: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       locator: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_7_entity_regua_p0_p3
     node_type: entity
     layer: audit
@@ -8565,6 +8964,7 @@ nodes:
       source: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       locator: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_7_outlier_a_create_agent_express
     node_type: claim
     layer: audit
@@ -8614,6 +9014,7 @@ nodes:
       source: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       locator: "docs/analysis/onion-toolbox-s1-scoping-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_7_proximo_passo_adr_ciclo_vida
     node_type: question
     layer: audit
@@ -8636,6 +9037,7 @@ nodes:
       source: "docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md"
       locator: "docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_8_ledger_isomorphism
     node_type: claim
     layer: audit
@@ -8649,6 +9051,7 @@ nodes:
       source: "docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md"
       locator: "docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_8_solo_mature
     node_type: claim
     layer: audit
@@ -8662,6 +9065,7 @@ nodes:
       source: "docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md"
       locator: "docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_8_team_gap
     node_type: claim
     layer: audit
@@ -8675,6 +9079,7 @@ nodes:
       source: "docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md"
       locator: "docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_8_federation_mature
     node_type: claim
     layer: audit
@@ -8688,6 +9093,7 @@ nodes:
       source: "docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md"
       locator: "docs/analysis/onion-research-harness-ledger-3-modes-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_8_decision_document_model
     node_type: decision
     layer: audit
@@ -8746,6 +9152,7 @@ nodes:
       source: "docs/analysis/onion-research-how-we-work-2026-06.md"
       locator: "docs/analysis/onion-research-how-we-work-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_9_entity_three_layers
     node_type: entity
     layer: audit
@@ -8759,6 +9166,7 @@ nodes:
       source: "docs/analysis/onion-research-how-we-work-2026-06.md"
       locator: "docs/analysis/onion-research-how-we-work-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_9_decision_kb_recommended
     node_type: decision
     layer: audit
@@ -8799,6 +9207,7 @@ nodes:
       source: "docs/analysis/onion-research-how-we-work-2026-06.md"
       locator: "docs/analysis/onion-research-how-we-work-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_9_question_topic2_link
     node_type: question
     layer: audit
@@ -8821,6 +9230,7 @@ nodes:
       source: "docs/analysis/onion-research-self-describing-components-2026-06.md"
       locator: "docs/analysis/onion-research-self-describing-components-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_10_capability_contract
     node_type: entity
     layer: audit
@@ -8852,6 +9262,7 @@ nodes:
       source: "docs/analysis/onion-research-self-describing-components-2026-06.md"
       locator: "docs/analysis/onion-research-self-describing-components-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_10_decisao_descentralizado
     node_type: decision
     layer: audit
@@ -8865,6 +9276,7 @@ nodes:
       source: "docs/analysis/onion-research-self-describing-components-2026-06.md"
       locator: "docs/analysis/onion-research-self-describing-components-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_10_gap_injecao_condicional
     node_type: question
     layer: audit
@@ -8914,6 +9326,7 @@ nodes:
       source: "docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md"
       locator: "docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_11_claim_conflito_nao_resolvido_estado_arte
     node_type: claim
     layer: audit
@@ -8927,6 +9340,7 @@ nodes:
       source: "docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md"
       locator: "docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_11_claim_arestas_binarias_grosseiras
     node_type: claim
     layer: audit
@@ -8940,6 +9354,7 @@ nodes:
       source: "docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md"
       locator: "docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_11_claim_armazenamento_executavel_sem_prova
     node_type: claim
     layer: audit
@@ -8962,6 +9377,7 @@ nodes:
       source: "docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md"
       locator: "docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_11_decision_veredito_3_capacidades
     node_type: decision
     layer: audit
@@ -8975,6 +9391,7 @@ nodes:
       source: "docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md"
       locator: "docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_11_decision_enabler_migalha_condicionada
     node_type: decision
     layer: audit
@@ -9024,6 +9441,7 @@ nodes:
       source: "docs/analysis/onion-work-models-research-2026-07.md"
       locator: "docs/analysis/onion-work-models-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_12_gate_git_nativo_transplantavel
     node_type: claim
     layer: audit
@@ -9037,6 +9455,7 @@ nodes:
       source: "docs/analysis/onion-work-models-research-2026-07.md"
       locator: "docs/analysis/onion-work-models-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_12_trigger_lazy_por_sessao_substitui_cron
     node_type: claim
     layer: audit
@@ -9050,6 +9469,7 @@ nodes:
       source: "docs/analysis/onion-work-models-research-2026-07.md"
       locator: "docs/analysis/onion-work-models-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_12_arquivos_versionados_vencem_rag
     node_type: claim
     layer: audit
@@ -9063,6 +9483,7 @@ nodes:
       source: "docs/analysis/onion-work-models-research-2026-07.md"
       locator: "docs/analysis/onion-work-models-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_12_limite_absorcao_breadcrumbs
     node_type: claim
     layer: audit
@@ -9076,6 +9497,7 @@ nodes:
       source: "docs/analysis/onion-work-models-research-2026-07.md"
       locator: "docs/analysis/onion-work-models-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_12_risco_reflexao_falsa_persistida
     node_type: claim
     layer: audit
@@ -9089,6 +9511,7 @@ nodes:
       source: "docs/analysis/onion-work-models-research-2026-07.md"
       locator: "docs/analysis/onion-work-models-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_12_squad_dropbox_referencia
     node_type: evidence
     layer: audit
@@ -9102,6 +9525,7 @@ nodes:
       source: "docs/analysis/onion-work-models-research-2026-07.md"
       locator: "docs/analysis/onion-work-models-research-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_12_decisao_migalha_vencida_retestar
     node_type: decision
     layer: audit
@@ -9142,6 +9566,7 @@ nodes:
       source: "docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md"
       locator: "docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_13_dev_branch_no_onion
     node_type: claim
     layer: audit
@@ -9155,6 +9580,7 @@ nodes:
       source: "docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md"
       locator: "docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_13_integration_branch_conflict
     node_type: claim
     layer: audit
@@ -9177,6 +9603,7 @@ nodes:
       source: "docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md"
       locator: "docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_13_decision_where_onion_lives
     node_type: question
     layer: audit
@@ -9235,6 +9662,7 @@ nodes:
       source: "docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md"
       locator: "docs/analysis/onion-arandek-reactivation-handoff-2026-06-19.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_14_whatsapp_sender_tool
     node_type: entity
     layer: audit
@@ -9249,6 +9677,7 @@ nodes:
       source: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       locator: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_14_core_identity_violation
     node_type: claim
     layer: audit
@@ -9262,6 +9691,7 @@ nodes:
       source: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       locator: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_14_decision_opcao_a
     node_type: decision
     layer: audit
@@ -9276,6 +9706,7 @@ nodes:
       source: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       locator: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_14_opcao_b_refutada
     node_type: claim
     layer: audit
@@ -9317,6 +9748,7 @@ nodes:
       source: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       locator: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_14_meia_instancia_pattern
     node_type: claim
     layer: audit
@@ -9330,6 +9762,7 @@ nodes:
       source: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       locator: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_14_rota_volta_mobile
     node_type: question
     layer: audit
@@ -9361,6 +9794,7 @@ nodes:
       source: "docs/analysis/onion-product-material-raw-2026-06.md"
       locator: "docs/analysis/onion-product-material-raw-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_15_abandoned_directions
     node_type: decision
     layer: audit
@@ -9374,6 +9808,7 @@ nodes:
       source: "docs/analysis/onion-product-material-raw-2026-06.md"
       locator: "docs/analysis/onion-product-material-raw-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_15_sdaal_pattern
     node_type: entity
     layer: audit
@@ -9387,6 +9822,7 @@ nodes:
       source: "docs/analysis/onion-product-material-raw-2026-06.md"
       locator: "docs/analysis/onion-product-material-raw-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_15_federation_case
     node_type: claim
     layer: audit
@@ -9401,6 +9837,7 @@ nodes:
       source: "docs/analysis/onion-product-material-raw-2026-06.md"
       locator: "docs/analysis/onion-product-material-raw-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_15_evolve_case
     node_type: claim
     layer: audit
@@ -9415,6 +9852,7 @@ nodes:
       source: "docs/analysis/onion-product-material-raw-2026-06.md"
       locator: "docs/analysis/onion-product-material-raw-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_15_agent_teams_decision
     node_type: decision
     layer: audit
@@ -9428,6 +9866,7 @@ nodes:
       source: "docs/analysis/onion-product-material-raw-2026-06.md"
       locator: "docs/analysis/onion-product-material-raw-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_15_fix_propagator
     node_type: claim
     layer: audit
@@ -9442,6 +9881,7 @@ nodes:
       source: "docs/analysis/onion-product-material-raw-2026-06.md"
       locator: "docs/analysis/onion-product-material-raw-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_15_allowed_tools_policy
     node_type: claim
     layer: audit
@@ -9456,6 +9896,7 @@ nodes:
       source: "docs/analysis/onion-product-material-raw-2026-06.md"
       locator: "docs/analysis/onion-product-material-raw-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_15_differentiation_claim
     node_type: claim
     layer: audit
@@ -9469,6 +9910,7 @@ nodes:
       source: "docs/analysis/onion-product-material-raw-2026-06.md"
       locator: "docs/analysis/onion-product-material-raw-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_15_target_audience
     node_type: entity
     layer: audit
@@ -9482,6 +9924,7 @@ nodes:
       source: "docs/analysis/onion-product-material-raw-2026-06.md"
       locator: "docs/analysis/onion-product-material-raw-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_16_opus48_vs_gpt55
     node_type: entity
     layer: audit
@@ -9495,6 +9938,7 @@ nodes:
       source: "docs/analysis/panorama-ia-generativa-2026-06.md"
       locator: "docs/analysis/panorama-ia-generativa-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_16_mcp_padrao_de_fato
     node_type: claim
     layer: audit
@@ -9508,6 +9952,7 @@ nodes:
       source: "docs/analysis/panorama-ia-generativa-2026-06.md"
       locator: "docs/analysis/panorama-ia-generativa-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_16_fim_modelo_heroi
     node_type: claim
     layer: audit
@@ -9521,6 +9966,7 @@ nodes:
       source: "docs/analysis/panorama-ia-generativa-2026-06.md"
       locator: "docs/analysis/panorama-ia-generativa-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_16_slm_mais_barato_llm
     node_type: claim
     layer: audit
@@ -9534,6 +9980,7 @@ nodes:
       source: "docs/analysis/panorama-ia-generativa-2026-06.md"
       locator: "docs/analysis/panorama-ia-generativa-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_16_modelos_chineses_custo_beneficio
     node_type: claim
     layer: audit
@@ -9547,6 +9994,7 @@ nodes:
       source: "docs/analysis/panorama-ia-generativa-2026-06.md"
       locator: "docs/analysis/panorama-ia-generativa-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: B6_16_ap2_vulneravel_prompt_injection
     node_type: evidence
     layer: audit
@@ -9588,6 +10036,7 @@ nodes:
       source: "docs/meta-specs/{agents,architecture,code-standards,commands,integrations,index}.md"
       locator: "docs/meta-specs/{agents,architecture,code-standards,commands,integrations,index}.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_proibicoes_arch7
     node_type: claim
     layer: audit
@@ -9602,6 +10051,7 @@ nodes:
       source: "docs/meta-specs/architecture.md:232-233,310-314"
       locator: "docs/meta-specs/architecture.md:232-233,310-314"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_kbfreshness_gate3
     node_type: claim
     layer: audit
@@ -9616,6 +10066,7 @@ nodes:
       source: ".claude/commands/meta/kb-freshness.md:70,82,224 · .claude/commands/meta/evolve.md:74 (D6 resíduo .onion/CLI/npm/multi-IDE)"
       locator: ".claude/commands/meta/kb-freshness.md:70,82,224 · .claude/commands/meta/evolve.md:74 (D6 resíduo .onion/CLI/npm/multi-IDE)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_identity_kb
     node_type: claim
     layer: audit
@@ -9630,6 +10081,7 @@ nodes:
       source: "docs/knowledge-base/meta/onion-framework-identity.md:38,44,305"
       locator: "docs/knowledge-base/meta/onion-framework-identity.md:38,44,305"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_none_adapter
     node_type: claim
     layer: audit
@@ -9644,6 +10096,7 @@ nodes:
       source: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md@e94fd6f1"
       locator: "sdaal-fidelity-audit@e94fd6f1 l.40 ('As 3 abstrações agora simétricas'); git ls-tree -r e94fd6f1 .claude/utils/ (adapters/none.md em task-manager, forge, de-identification); onion-repositioning-sdaal-session-2026-06-17.md@e94fd6f1 l.113-118"
       method: "leitura: auditoria SDAAL, árvore .claude/utils/ e doc de reposicionamento no commit e94fd6f1"
+      locality: "repo"
   - id: SY6_ev_lint_regra5_por_tipo
     node_type: claim
     layer: audit
@@ -9658,6 +10111,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh:259-311"
       locator: ".claude/validation/lint-artifacts.sh:259-311"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_regua_p0p3_skill
     node_type: claim
     layer: audit
@@ -9672,6 +10126,7 @@ nodes:
       source: ".claude/skills/onion/SKILL.md:109-112"
       locator: ".claude/skills/onion/SKILL.md:109-112"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_inventory_sync_prompt
     node_type: claim
     layer: audit
@@ -9686,6 +10141,7 @@ nodes:
       source: ".claude/commands/common/prompts/inventory-sync-after-create.md"
       locator: ".claude/commands/common/prompts/inventory-sync-after-create.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_adr_toolbox
     node_type: claim
     layer: audit
@@ -9700,6 +10156,7 @@ nodes:
       source: "docs/analysis/onion-adr-toolbox-lifecycle-2026-06.md"
       locator: "docs/analysis/onion-adr-toolbox-lifecycle-2026-06.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_outlier_a_corrigido
     node_type: claim
     layer: audit
@@ -9714,6 +10171,7 @@ nodes:
       source: ".claude/commands/meta/create-agent-express.md:70-71"
       locator: ".claude/commands/meta/create-agent-express.md:70-71"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_outlier_b_movido
     node_type: claim
     layer: audit
@@ -9728,6 +10186,7 @@ nodes:
       source: ".claude/commands/product/create-task-structure.md (ausente em .claude/commands/meta/)"
       locator: ".claude/commands/product/create-task-structure.md (ausente em .claude/commands/meta/)"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_worklog_contrato
     node_type: claim
     layer: audit
@@ -9742,6 +10201,7 @@ nodes:
       source: "docs/knowledge-base/concepts/worklog-protocol.md §2-§3 · docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento · .claude/hooks/worklog-capture-session.sh"
       locator: "docs/knowledge-base/concepts/worklog-protocol.md §2-§3 · docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento · .claude/hooks/worklog-capture-session.sh"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_state_md_ponteiro
     node_type: claim
     layer: audit
@@ -9756,6 +10216,7 @@ nodes:
       source: ".claude/commands/@e94fd6f1"
       locator: "git grep -l STATE.md e94fd6f1 -- .claude/commands/ (13 arquivos); engineer/work.md@e94fd6f1 l.25; docs/analysis/onion-sessions-review-2026-06.md@e94fd6f1 l.44 (o protocolo antigo 'Ler todos os arquivos markdown na pasta'), l.62 (STATE.md Tier-0)"
       method: "medição: git grep -l STATE.md e94fd6f1 -- .claude/commands/ | wc -l (=13, comando do trace no commit da data)"
+      locality: "repo"
   - id: SY6_ev_symlinks_removidos
     node_type: claim
     layer: audit
@@ -9770,6 +10231,7 @@ nodes:
       source: ".claude/@e94fd6f1"
       locator: "git ls-tree -r e94fd6f1 .claude (0 entradas modo 120000); .claude/commands/product/ sem help.md; docs/analysis/onion-vv-baseline-2026-06.md@e94fd6f1 l.92-98 (os 2 symlinks para .onion/contexts/)"
       method: "medição: git ls-tree -r e94fd6f1 .claude | grep -c '^120000' (=0) e git ls-tree -r --name-only e94fd6f1 .claude/commands/product/ | grep -c help (=0)"
+      locality: "repo"
   - id: SY6_ev_allowed_tools_universal
     node_type: claim
     layer: audit
@@ -9784,6 +10246,7 @@ nodes:
       source: ".claude/commands/@e94fd6f1"
       locator: "git grep -l allowed-tools e94fd6f1 -- .claude/commands/ (98); docs/onion/inventory.md@e94fd6f1 l.11 ('Comandos invocáveis | 98'); docs/analysis/onion-vv-baseline-2026-06.md@e94fd6f1 l.66 ('allowed-tools em comandos | ⚠️ 1/93'); docs/knowledge-base/meta/onion-framework-identity.md@e94fd6f1 l.261 (capability surface)"
       method: "medição: git grep -l allowed-tools e94fd6f1 -- .claude/commands/ | wc -l (=98, comando do trace no commit da data)"
+      locality: "repo"
   - id: SY6_ev_settings_presentes
     node_type: claim
     layer: audit
@@ -9798,6 +10261,7 @@ nodes:
       source: "/home/marcio/onion-evolve/.claude/settings.local.json + .claude/settings.json@e94fd6f1"
       locator: ".claude/settings.json@e94fd6f1; .gitignore@e94fd6f1 l.46 (.claude/settings.local.json ignorado); git ls-tree -r e94fd6f1 | grep -i execution (vazio); docs/analysis/onion-sessions-review-2026-06.md@e94fd6f1 l.38 (os templates órfãos)"
       method: "testemunho: medição da sessão 2026-07-21 (commit e94fd6f1), comando não registrado, para .claude/settings.local.json (gitignored, .gitignore@e94fd6f1 l.46); settings.json e ausência dos templates por leitura de e94fd6f1"
+      locality: "host"
   - id: SY6_ev_mcp_json_ausente
     node_type: claim
     layer: audit
@@ -9821,6 +10285,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-working-method.md §0-§6"
       locator: "docs/knowledge-base/concepts/onion-working-method.md §0-§6"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_team_gated_preservado
     node_type: claim
     layer: audit
@@ -9835,6 +10300,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-working-method.md:96"
       locator: "docs/knowledge-base/concepts/onion-working-method.md:96"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_diary_conflict_class
     node_type: claim
     layer: audit
@@ -9849,6 +10315,7 @@ nodes:
       source: ".claude/commands/meta/diary.md:78-105,230-261"
       locator: ".claude/commands/meta/diary.md:78-105,230-261"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_retestar_nunca_recarimbar
     node_type: claim
     layer: audit
@@ -9863,6 +10330,7 @@ nodes:
       source: ".claude/commands/meta/diary.md:234-250"
       locator: ".claude/commands/meta/diary.md:234-250"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_capability_contract_lint
     node_type: claim
     layer: audit
@@ -9877,6 +10345,7 @@ nodes:
       source: "docs/analysis/onion-adr-capability-contract-2026-06.md · .claude/validation/lint-artifacts.sh:57-58,458-466,1589"
       locator: "docs/analysis/onion-adr-capability-contract-2026-06.md · .claude/validation/lint-artifacts.sh:57-58,458-466,1589"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_drift_guard_r19
     node_type: claim
     layer: audit
@@ -9891,6 +10360,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh:412-424"
       locator: ".claude/validation/lint-artifacts.sh:412-424"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_golden_payload_ausente
     node_type: claim
     layer: audit
@@ -9914,6 +10384,7 @@ nodes:
       source: "LICENSE:1 'MIT License'"
       locator: "LICENSE:1 'MIT License'"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_presskit_coerente
     node_type: claim
     layer: audit
@@ -9928,6 +10399,7 @@ nodes:
       source: "docs/materials/press-kit.md:69"
       locator: "docs/materials/press-kit.md:69"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_porta_publica
     node_type: claim
     layer: audit
@@ -9942,6 +10414,7 @@ nodes:
       source: "docs/knowledge-base/concepts/public-door-vs-private-core.md · docs/analysis/onion-adr-family-repo-topology-2026-07.md · docs/analysis/onion-adr-claude-door-topology-2026-07.md · docs/evolution/federation/members.yaml:190-218"
       locator: "docs/knowledge-base/concepts/public-door-vs-private-core.md · docs/analysis/onion-adr-family-repo-topology-2026-07.md · docs/analysis/onion-adr-claude-door-topology-2026-07.md · docs/evolution/federation/members.yaml:190-218"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_adr_reposicionamento_inexistente
     node_type: claim
     layer: audit
@@ -9965,6 +10438,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml:10-218 · .claude/validation/pin-integrity-check.sh"
       locator: "docs/evolution/federation/members.yaml:10-218 · .claude/validation/pin-integrity-check.sh"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_federation_transport_sdaal
     node_type: claim
     layer: audit
@@ -9979,6 +10453,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md §1-§3 · .claude/utils/federation-transport/"
       locator: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md §1-§3 · .claude/utils/federation-transport/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_arandek_nunca_graduou
     node_type: claim
     layer: audit
@@ -10002,6 +10477,7 @@ nodes:
       source: ".claude/commands/meta/adopt.md:10,163-165 · .claude/validation/resolve-integration-branch.sh · .claude/validation/resolve-production-branch.sh"
       locator: ".claude/commands/meta/adopt.md:10,163-165 · .claude/validation/resolve-integration-branch.sh · .claude/validation/resolve-production-branch.sh"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_whatsapp_extraido
     node_type: claim
     layer: audit
@@ -10031,6 +10507,7 @@ nodes:
       source: "docs/analysis/onion-adr-slm-as-tool-de-identification-2026-06.md · .claude/utils/de-identification/"
       locator: "docs/analysis/onion-adr-slm-as-tool-de-identification-2026-06.md · .claude/utils/de-identification/"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_ev_evolve_tiering
     node_type: claim
     layer: audit
@@ -10046,6 +10523,7 @@ nodes:
       source: ".claude/commands/meta/evolve.md@e94fd6f1"
       locator: "evolve.md@e94fd6f1 l.64-65 (D4, D5, D9, D10 são composição — delegam a comandos/rotina), l.67-78 (tabela Dimensão × Tier)"
       method: "leitura: tabela de dimensões do /meta:evolve no commit e94fd6f1"
+      locality: "repo"
   - id: SY6_ev_kg_virou_guarda
     node_type: claim
     layer: audit
@@ -10060,6 +10538,7 @@ nodes:
       source: ".claude/commands/meta/kg.md · .claude/validation/kg-radar.sh · .claude/validation/kg-provenance-coverage.sh · .claude/validation/lint-artifacts.sh:61-63"
       locator: ".claude/commands/meta/kg.md · .claude/validation/kg-radar.sh · .claude/validation/kg-provenance-coverage.sh · .claude/validation/lint-artifacts.sh:61-63"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: SY6_open_injecao_condicional
     node_type: claim
     layer: audit
@@ -10154,6 +10633,7 @@ nodes:
       source: "docs/evolution/review/feat-pilot-sealing-batch.md@d761c963"
       locator: "resíduo feat-pilot-sealing-batch.md@d761c963 l.26 e l.43-44; lint-artifacts.sh@d761c963 l.1479-1497 (REGRA 28, AMPUTAÇÃO 2026-08) e l.1509 ('DUAS classes'); lint-artifacts.sh@4e54b052 l.689 ('TRÊS classes'); commits 83a7830d e 419a3907 (4+7=11); commit 757a6676 (2026-08-18) + docs/evolution/federation/outbox/marcio-pessoal/_processed/2026-08-18-elenxo-doctrine-vendorizada.md@d761c963"
       method: "leitura: resíduo de selagem, lint em d761c963 e 4e54b052, commits 83a7830d/419a3907/757a6676 do core"
+      locality: "repo"
 
 edges:
   - from: G1_INTERRUPT_STATES

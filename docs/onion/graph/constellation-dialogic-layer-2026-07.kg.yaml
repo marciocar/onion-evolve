@@ -28,6 +28,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.43, 50-52"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.43, 50-52"
+      locality: "repo"
   - id: C_TWO_QUANTITATIVES
     node_type: claim
     layer: audit
@@ -40,6 +41,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.67-72"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.67-72"
+      locality: "repo"
   - id: C_QUAL_TO_QUANT
     node_type: claim
     layer: audit
@@ -52,6 +54,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.59-67"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.59-67"
+      locality: "repo"
   - id: C_ARISTOTLE_NO_HOME
     node_type: claim
     layer: audit
@@ -64,6 +67,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.90-99 ; medição: git grep -il aristo 9dd375f6 = 0"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.90-99 + medição: git grep -il aristo 9dd375f6 = 0"
+      locality: "repo"
 
   # ---- evidencia (verificada) ----
   - id: E_INTERFACE_FOLD
@@ -78,6 +82,7 @@ nodes:
       source: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "interface-state-of-art.kg.yaml l.227-251, l.384-393 ; 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.112-120"
       method: "leitura: interface-state-of-art.kg.yaml l.227-251 (nós REF_* do refutador) e l.384-393 (3 REFUTES) + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.112-120"
+      locality: "repo"
   - id: E_EXPLORE_ARISTOTLE
     node_type: evidence
     layer: audit
@@ -91,6 +96,7 @@ nodes:
       source: "9dd375f6c8c03a7f830331f45b5a7a0d4e6a04bb + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "git grep -il aristo 9dd375f6 (pai de 5265aced) ; 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.96-97"
       method: "medição: git grep -il aristo 9dd375f6c8c0 (e aristó) = 0 arquivos + leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.96-97"
+      locality: "repo"
 
   # ---- decidido (decisions) ----
   - id: D_STORE_GATED
@@ -117,6 +123,7 @@ nodes:
       source: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: D_ARISTOTLE_HOME_CANDIDATE
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -180,6 +187,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.159-161"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.159-161"
+      locality: "repo"
   - id: C_PREVIA_CONTAINS_RADAR
     node_type: claim
     layer: audit
@@ -192,6 +200,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.160"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.160"
+      locality: "repo"
   - id: C_RITUAL_IS_NEW
     node_type: claim
     layer: audit
@@ -204,6 +213,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.161"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.161"
+      locality: "repo"
   - id: C_DIALOGIC_DECOMPOSED
     node_type: claim
     layer: audit
@@ -216,6 +226,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.151-165"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.151-165"
+      locality: "repo"
   - id: D_DIALOGIC_ORTHOGONAL
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -229,6 +240,7 @@ nodes:
       source: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   # ---- RESOLUCAO de Q_AUTOREG_RHYTHM (dissolve a premissa: gatilho, nao ritmo) ----
   - id: C_RHYTHM_IS_EVENT_NOT_CLOCK
@@ -243,6 +255,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.169-180"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.169-180"
+      locality: "repo"
   - id: C_ANTITHEATER_DOGFOOD_GATED
     node_type: claim
     layer: audit
@@ -255,6 +268,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.182-184"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.182-184"
+      locality: "repo"
   - id: C_PIGGYBACK_EXISTING_EVENTS
     node_type: claim
     layer: audit
@@ -268,6 +282,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.184-186"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.184-186"
+      locality: "repo"
   - id: D_AUTOREG_EVENT_TRIGGERED
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -281,6 +296,7 @@ nodes:
       source: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   # ---- RESOLUCAO de Q_PREVIA_SCHEMA (projecao por-papel; o .kg.yaml e a face publica) ----
   - id: C_PREVIA_IS_ROLE_PROJECTION
@@ -295,6 +311,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.190-200"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.190-200"
+      locality: "repo"
   - id: C_KG_IS_PUBLIC_FACE
     node_type: claim
     layer: audit
@@ -307,6 +324,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.202-208"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.202-208"
+      locality: "repo"
   - id: C_PREVIA_IS_DETERMINISTIC
     node_type: claim
     layer: audit
@@ -319,6 +337,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.142-143, 206-209"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.142-143, 206-209"
+      locality: "repo"
   - id: D_PREVIA_SCHEMA_DEFINED
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -332,6 +351,7 @@ nodes:
       source: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: D_ISOLATION_EXTENSION_GATED
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -357,6 +377,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.218-221"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.218-221"
+      locality: "repo"
   - id: C_ARISTOTLE_PARITY
     node_type: claim
     layer: audit
@@ -369,6 +390,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.90-99, 223-224"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.90-99, 223-224"
+      locality: "repo"
   - id: C_ARISTOTLE_IS_DISCIPLINE
     node_type: claim
     layer: audit
@@ -381,6 +403,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.84-86, 226-229"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.84-86, 226-229"
+      locality: "repo"
   - id: D_ARISTOTLE_HOME_IS_KB
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -406,6 +429,7 @@ nodes:
       source: ".claude/commands/meta/diary.md + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: ".claude/commands/meta/diary.md l.7 ; 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.180-183"
       method: "leitura: .claude/commands/meta/diary.md l.7 + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.180-183"
+      locality: "repo"
   - id: ENT_INTERFACE_STAR
     node_type: entity
     layer: audit
@@ -418,6 +442,7 @@ nodes:
       source: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "interface-state-of-art.kg.yaml l.1, l.384-393 ; 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.112-117"
       method: "leitura: docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml l.1 e l.384-393 + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.112-117"
+      locality: "repo"
   - id: ENT_CONSTELLATION_ADR
     node_type: entity
     layer: audit
@@ -430,6 +455,7 @@ nodes:
       source: "docs/knowledge-base/decisions/onion-adr-constellation-operating-model-2026-07.md + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "onion-adr-constellation-operating-model-2026-07.md l.19-20, l.34 ; 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.22-24"
       method: "leitura: ADR da Constelação l.19-20 e l.34 + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.22-24"
+      locality: "repo"
   - id: ENT_KG_SDAAL
     node_type: entity
     layer: audit
@@ -442,6 +468,7 @@ nodes:
       source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
       locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.59-62, 74-75"
       method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.59-62, 74-75"
+      locality: "repo"
 
   # ---- 3o face: o boletim core->estrela (padrao candidato, emergiu 1x) ----
   - id: C_BOLETIM_INFORM

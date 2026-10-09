@@ -47,6 +47,7 @@ nodes:
       source: ".claude/commands/meta/kg-freshness.md (bloco KgReverifySchema, chave allOf)"
       locator: "8 de 8 workers, run wf_6aa135ec-1e2 (o run wf_3790d38b-6a8 citado na 1a versao estava ERRADO: la o erro foi outro, e a revisao pegou)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_GUARDA_ESTRUTURAL_APROVA_O_INUTILIZAVEL
     node_type: evidence
@@ -62,6 +63,7 @@ nodes:
       source: ".claude/validation/kg-reverify-schema-check.sh:20-24"
       locator: "execução direta do script, rc=0"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_A_GUARDA_BLOQUEIA_A_PROPRIA_CURA
     node_type: claim
@@ -77,6 +79,7 @@ nodes:
       source: ".claude/validation/kg-reverify-schema-check.sh (check GUARDA-AUSENTE) · .githooks/pre-commit:104"
       locator: "sandbox com a cura aplicada; rc=1, violação nomeada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_GUARDAS_MIGRAM_PARA_O_FANIN
     node_type: decision
@@ -102,6 +105,7 @@ nodes:
       source: ".claude/skills/onion-orchestration/SKILL.md:165,174,178"
       locator: "ReferenceError no run wf_5261e050-96d"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PARALLEL_EXEMPLOS_CANONICOS_QUEBRADOS
     node_type: evidence
@@ -117,6 +121,7 @@ nodes:
       source: ".claude/skills/onion-orchestration/SKILL.md (blocos javascript)"
       locator: "TypeError no run wf_3790d38b-6a8"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ═══════════════ O que a medição do grafo M2 revelou ═══════════════
   - id: E_ZERO_DE_OITO_SOBREVIVE
@@ -133,6 +138,7 @@ nodes:
       source: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
       locator: "runs wf_86d657c4-3d9 (8 workers) + wf_cac2ae81-4a2 (4 juízes opus/high)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_WORKERS_ENCOLHEM_O_DENOMINADOR
     node_type: claim
@@ -148,6 +154,7 @@ nodes:
       source: "run wf_cac2ae81-4a2"
       locator: "4 juízes opus/high, contagem independente contra o label integral"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: C_TAMANHO_DO_NO_PREVE_VERIFICABILIDADE
     node_type: question
@@ -163,6 +170,7 @@ nodes:
       source: "run wf_86d657c4-3d9"
       locator: "campo coverage, primeira execução da história"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: C_READONLY_CONFUNDE_POST_COM_MUTACAO
     node_type: claim
@@ -178,6 +186,7 @@ nodes:
       source: ".claude/commands/meta/kg-freshness.md Passo 3, cláusula READ-ONLY"
       locator: "2 dos 4 nos parciais, `blocked_by` verbatim (a 1a versao dizia 3, corrigido pela revisao)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_TABELA_DE_SELAGEM_SEM_CELULA_PARA_DRIFT_PARCIAL
     node_type: claim
@@ -193,6 +202,7 @@ nodes:
       source: ".claude/commands/meta/kg-freshness.md Passo 4, tabela de selagem"
       locator: "E_p7_flip_live, medição executada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ═══════════════ O achado operacional: dois SSOTs, e o projetor escolhe pela CWD ═══════════════
   - id: E_ESPELHO_CADUCO_DO_SSOT_DA_FEDERACAO
@@ -209,6 +219,7 @@ nodes:
       source: "ec4c8442 (corpo do commit) + ec4c8442:docs/evolution/federation/members.yaml"
       locator: "corpo de ec4c8442 l.20 ('existem DOIS members.yaml nesta máquina (9 e 8 adotantes)'); git show ec4c8442:docs/evolution/federation/members.yaml | md5sum = a31526aa; último commit do arquivo 31f9d697 (2026-08-17)"
       method: "testemunho: medição da sessão 2026-08-29 (md5sum + PyYAML nos dois caminhos) relatada em 1ª pessoa no corpo de ec4c8442 (Claude-Session); a metade versionada conferida por leitura (md5 a31526aa, 9 adopters incl. poc-venda-direta-pdi); /home/onion sem permissão hoje"
+      locality: "repo"
 
   - id: C_PROJETOR_DE_IDENTIDADE_SEM_ANCORA
     node_type: claim
@@ -224,6 +235,7 @@ nodes:
       source: "ops/bridge-auth/logto-provision.sh:257,330,484"
       locator: "grep por BASH_SOURCE/SCRIPT_DIR/cd no script: ZERO"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ═══════════════ Drift medido no grafo M2 (para o maestro selar, NÃO carimbado) ═══════════════
   - id: E_ADMIN_STATS_NAO_EXISTE_MAIS
@@ -240,6 +252,7 @@ nodes:
       source: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml (E_p7_flip_live, E_p9_complete)"
       locator: "404 no vivo + grep no src, por dois workers independentes"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CONSOLE_LIGADO_DESDE_08_10
     node_type: evidence
@@ -255,6 +268,7 @@ nodes:
       source: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml (C_console_not_the_path, reverify_note)"
       locator: "console.sh status → LIGADO; /etc/caddy/conf.d/logto-console.caddy sem .disabled"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ═══════════════ Perguntas abertas, com gatilho nomeado ═══════════════
   - id: Q_REVERIFY_NOTE_E_PROSA_GRAMPEADA
@@ -290,6 +304,7 @@ nodes:
       source: ".claude/commands/meta/kg-freshness.md (bloco KgReverifySchema)"
       locator: "sonda wf_742e3a39-e7f (API) + sandbox da guarda (rc=0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SO_A_GUARDA_1_DISPAROU
     node_type: evidence
@@ -320,6 +335,7 @@ nodes:
       source: "wf_cac2ae81-4a2 (juízo dos workers) · wf_56959265-e4e (juízo deste grafo)"
       locator: "4 juízes opus/high, 3 de 4 contagens julgadas desonestas"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: C_SKILL_DE_ORQUESTRACAO_E_COPY_PASTE_MORTO
     node_type: claim
@@ -360,6 +376,7 @@ nodes:
       source: "runs wf_26433f93-c5d"
       locator: "run wf_26433f93-c5d: 3 lentes cegas + steelman + refutador opus/high"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: E_EQUIVALENCIA_POR_TABELA_VERDADE
     node_type: evidence
@@ -375,6 +392,7 @@ nodes:
       source: "sessao 2026-08-29, tabela-verdade reproduzivel"
       locator: "jsonschema 4.26, tabela-verdade de 15 casos (12 combinatorios + 3 omissoes de chave)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "pessoa"
 
   - id: E_SCHEMA_CURADO_E_CATRACA_NO_REPO
     node_type: evidence
@@ -390,6 +408,7 @@ nodes:
       source: ".claude/commands/meta/kg-freshness.md · .claude/validation/kg-reverify-schema-check.sh"
       locator: "kg-reverify-schema-check.sh --selftest 7/7 + mutante de producao acusado + schema real rc=0"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_JUIZ_SEM_PADRAO_OURO
     node_type: claim
@@ -405,6 +424,7 @@ nodes:
       source: "runs wf_cac2ae81-4a2 · wf_56959265-e4e · wf_d68dc607-bce"
       locator: "argumento do refutador conferido contra os runs: 4/4 reprovacoes sem contagem independente"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: C_JUIZ_E_CENSO_SAO_UMA_DECISAO
     node_type: claim
@@ -420,6 +440,7 @@ nodes:
       source: "docs/evolution/review/fix-kg-freshness-schema-cure.md · e5a26a3c (corpo do commit) · 7bba14f3:docs/onion/graph/fios-abertos.kg.yaml (nó do custo unitário)"
       locator: "resíduo l.5 (Elenxo wf_26433f93-c5d) e l.27-29 (steelman); corpo de e5a26a3c ('Nenhuma duplicata do censo fecha antes de B'); diff de 7bba14f3 (+label 'O PRECO DE RE-VERIFICAR UM NO': 68.585 por nó, 8 nós de um único grafo m2-bridge-logto, multiplicar = EXTRAPOLACAO)"
       method: "juízes: steelman do Elenxo wf_26433f93-c5d (3 lentes cegas + steelman opus/high + refutador default REPROVADO) registrado no resíduo R56; journal ausente no host; custo unitário por leitura de 7bba14f3"
+      locality: "repo"
 
   - id: D_JUIZ_CALIBRACAO_GATED
     node_type: decision
@@ -447,6 +468,7 @@ nodes:
       source: "docs/evolution/review/feat-kg-freshness-calibration-pilot.md · docs/evolution/research/kg-freshness-dogfood-2026-08/calibration-gold-standard-2026-08-29.md"
       locator: "resíduo l.22-41 (tabela e números); ouro: 8 seções \"OURO:\" (l.5-62), sha256 c975fce64fca59396887a5f07443e7fa28069f0e2c6d9f24269f412575b4d240"
       method: "leitura: tabela de calibração do resíduo R56 + padrão-ouro versionado (sha256 conferido em 2026-10-09)"
+      locality: "repo"
 
   - id: E_BARRAGEM_DO_SCHEMA_MEDIDA_EM_PRODUCAO
     node_type: evidence
@@ -462,6 +484,7 @@ nodes:
       source: ".claude/commands/meta/kg-freshness.md (comentario do blocked_by)"
       locator: "transcript do worker REC2 no run wf_86dccc06-a90: 5 tentativas, 5 rejeicoes"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ACHADOS_DE_CONTEUDO_DO_PILOTO
     node_type: evidence
@@ -477,6 +500,7 @@ nodes:
       source: "runs wf_86dccc06-a90 · wf_832e0a15-0bf"
       locator: "vereditos finais do run wf_86dccc06-a90; propostas NAO carimbadas nos grafos-alvo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: D_B_JUIZ_FIXO_VEREDITO_PROPOSTA
     node_type: decision

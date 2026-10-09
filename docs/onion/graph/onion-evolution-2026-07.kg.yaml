@@ -155,6 +155,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-04.md"
       locator: "§1 backlog item 15, l.34"
       method: "leitura: relatório versionado da auditoria /meta:evolve wf_01b63531-114 (commit 70f9a26c, 2026-07-04)"
+      locality: "repo"
   - id: C_D4_9
     node_type: claim
     plane: DEV
@@ -167,6 +168,7 @@ nodes:
       source: "docs/knowledge-base/platforms/runflow.md:1"
       locator: "docs/knowledge-base/platforms/runflow.md:1"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   # ── Claims refutados (7) — preservados; REFUTES explicito, nunca delete ──
   - id: C_D1_2
@@ -239,6 +241,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-04.md:1"
       locator: "docs/analysis/onion-evolution-2026-07-04.md:1"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: E_J_D1_2
     node_type: evidence
     plane: DEV
@@ -251,6 +254,7 @@ nodes:
       source: ".claude/commands/meta/create-agent.md:207"
       locator: ".claude/commands/meta/create-agent.md:207"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: E_J_D3_6
     node_type: evidence
     plane: DEV
@@ -263,6 +267,7 @@ nodes:
       source: ".claude/commands/product/task.md:47"
       locator: ".claude/commands/product/task.md:47"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: E_J_D3_7
     node_type: evidence
     plane: DEV
@@ -275,6 +280,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-04.md"
       locator: "§2 tabela de refutados, l.47 (D3-7)"
       method: "juízes: refutação do juiz adversarial opus no run wf_01b63531-114, registrada no relatório versionado"
+      locality: "repo"
   - id: E_J_FENCES
     node_type: evidence
     plane: DEV
@@ -287,6 +293,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-04.md"
       locator: "§2 tabela de refutados, l.48-49 (D7-13, D7-16) + lição l.59-60"
       method: "juízes: refutação do juiz adversarial opus no run wf_01b63531-114, registrada no relatório versionado"
+      locality: "repo"
   - id: E_J_D7_18
     node_type: evidence
     plane: DEV
@@ -299,6 +306,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-04.md"
       locator: "§2 tabela de refutados, l.50 (D7-18)"
       method: "juízes: refutação do juiz adversarial opus no run wf_01b63531-114, registrada no relatório versionado"
+      locality: "repo"
   - id: E_J_D7_19
     node_type: evidence
     plane: DEV
@@ -311,6 +319,7 @@ nodes:
       source: ".claude/utils/task-manager/factory.md:1"
       locator: ".claude/utils/task-manager/factory.md:1"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   # ── Questões abertas e decisões que o grafo produz ─────────────────────
   - id: Q_LINT_LINKS
@@ -367,6 +376,7 @@ nodes:
       source: ".claude/commands/meta/adopt.md:123"
       locator: ".claude/commands/meta/adopt.md:123"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_D5_10B
     node_type: claim
     plane: DEV
@@ -387,6 +397,7 @@ nodes:
       source: "docs/knowledge-base/tools/postgresql.md:1"
       locator: "docs/knowledge-base/tools/postgresql.md:1"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: E_TUNE_PAIRS
     node_type: evidence
     plane: DEV
@@ -399,6 +410,7 @@ nodes:
       source: ".claude/commands/meta/create-command.md:78"
       locator: ".claude/commands/meta/create-command.md:78"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: E_LS_UNUSED
     node_type: evidence
     plane: DEV
@@ -411,6 +423,7 @@ nodes:
       source: ".claude/commands/meta/adopt.md:9"
       locator: ".claude/commands/meta/adopt.md:9"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: D_QUICKWINS
     node_type: decision
     plane: DEV

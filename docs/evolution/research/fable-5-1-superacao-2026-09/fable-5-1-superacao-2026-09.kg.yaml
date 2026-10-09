@@ -40,6 +40,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md"
       locator: "System Card Fable 5.1/Mythos 5.1 (PDF oficial, 212pp) lido por pdftotext no contexto principal: syscard.txt l.90-92, l.3479-3496 (data/ext-syscard-primario.md S1)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SYSCARD_HONESTIDADE_EMENDADA
     node_type: evidence
@@ -55,6 +56,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md"
       locator: "syscard.txt l.103-107 (MASK, abstencao), l.3996-4000 (§6.4.4), l.3334-3339 (S2) — leitura primaria; emenda a data/ext-oficial.md que citava paráfrase de terceiros"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SYSCARD_S3_MULTIAGENT_LATENCIA
     node_type: evidence
@@ -70,6 +72,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md"
       locator: "syscard.txt §8.13 ProgramBench l.5945-5965; corroborado por data/ext-comunidade.md §2 (nenhum relato de abandono de fan-out pelo 1M; padrao publicado = orquestrador fable + executores baratos)"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SYSCARD_S7_S8_MONITOR_GRADER
     node_type: evidence
@@ -85,6 +88,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md"
       locator: "syscard.txt l.3369-3380"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CC_FORCE_ENV_E_HOOK_MODELSWITCH
     node_type: evidence
@@ -100,6 +104,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-claude-code.md"
       locator: "CHANGELOG oficial 2.1.251/2.1.257 + docs code.claude.com/hooks e model-config (data/ext-claude-code.md); env force medida =0 nesta VPS (data/int-maquinaria.md §B.3); claude --version 2.1.257"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_COMUNIDADE_CUSTO_CONTRADITORIO
     node_type: evidence
@@ -115,6 +120,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-comunidade.md"
       locator: "data/ext-comunidade.md §1.3 (Every.to vs HN eis/george_max vs issue #91289), §4 (issues 2026-09-01/02), claudefa.st breaking changes"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PROBE_ALIAS_FABLE_5_1
     node_type: evidence
@@ -130,6 +136,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml#E_LACUNAS_DECLARADAS_E3_0902"
       locator: "Agent({model:\"fable\"}) + grep -o \"model\":\"[^\"]*\" no transcript do subagente: 1 \"model\":\"claude-fable-5-1\" (campo da RESPOSTA da API, nao declaracao do modelo). Claude Code 2.1.257, sessao sem gateway (data/probe-fable-alias.md)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── Evidencia INTERNA ───────────────────────────────────────────────────────────────
   - id: E_INT_CENSO_TIERING_51_AGENTES
@@ -146,6 +153,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md"
       locator: "grep de frontmatter model: nos 51 agentes + awk de frontmatter nos comandos, re-medidos pelo juiz (data/int-maquinaria.md §A e §Emendas; a 1a contagem \"47 sonnet\" do contexto principal estava errada por contar exemplos no corpo de agent-creator-specialist — corrigida pelo worker)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_INT_HARDCODED_E_SEM_GUARDA
     node_type: evidence
@@ -161,6 +169,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md"
       locator: "data/int-maquinaria.md §B.1, §B.2, §B.3, §D; grep -rn effort .claude/validation/ = rc 1 (zero); allowlist sem fable conferida em onion-patterns/SKILL.md:98 e onion-validation/SKILL.md:19 pelo contexto principal"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_INT_25_ESTRATEGIAS_15_CASOS
     node_type: evidence
@@ -176,6 +185,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/int-estrategias.md"
       locator: "data/int-estrategias.md (worker opus, read-only, toda linha com arquivo:linha); casos historicos citados de lint-artifacts.sh:616-620, kg-freshness.md, behavior-over-declaration.md, kg-freshness-dogfood-2026-08.kg.yaml"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── Claims ──────────────────────────────────────────────────────────────────────────
   - id: C_EXIT2_REFORCA_NAO_SUPERA
@@ -192,6 +202,7 @@ nodes:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
       locator: "E_SYSCARD_S1 (fonte primaria) + E_INT_25_ESTRATEGIAS (auto-revisao 0/6) + E3 F7 (exit 2 intacto em 2.1.257)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_TIERING_COMPRA_ECONOMIA_ORQUESTRACAO_COMPRA_TETO
     node_type: claim
@@ -207,6 +218,7 @@ nodes:
       source: "docs/knowledge-base/concepts/agent-orchestration.md"
       locator: "E_SYSCARD_S3 + E_COMUNIDADE_CUSTO + kg-freshness-dogfood-2026-08.kg.yaml:328 (tiering do juiz e escopo do censo sao a MESMA decisao)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_LEITURA_KG_UNICA_PERNA_MODELO_DEPENDENTE
     node_type: claim
@@ -243,6 +255,7 @@ nodes:
       source: "docs/analysis/onion-guardas-mapa-2026-08.md"
       locator: "SELADA pelo maestro em texto proprio (2026-09-02: \"sela e executa a D_AUDITAR_GATES_TEXTUAIS\"); execucao = docs/analysis/onion-gates-textuais-2026-09.md + grafo audit-textual-gates-2026-09"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_HOOK_PREMODELSWITCH_GUARDA
     node_type: decision
@@ -346,6 +359,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/SYNTHESIS.md"
       locator: "secoes \"Lacunas\" dos 7 arquivos de data/ + omissoes apontadas por juiz-fable51 (transcript grep, syscard l.86-88)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── Elenxo: objecoes sobreviventes do juiz-fable51 (fable/high, mandato REFUTAR) ────
   - id: E_JUIZ_SYSCARD_L86_AUTORIZACAO
@@ -362,6 +376,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-oficial.md"
       locator: "syscard.txt l.86-88 (leitura primaria pelo juiz; omitida pelos 3 workers externos)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_JUIZ_3_GATES_TEXTUAIS
     node_type: evidence
@@ -377,6 +392,7 @@ nodes:
       source: ".claude/validation/kg-seal-check.sh"
       locator: "grep \"gh pr merge\" .claude = 18 ocorrencias, 0 gate de autorizacao; kg-seal-check.sh:61,105,109,163-164,209 (so verified_at, sem sealed_by/approved_by); aside-router.sh:26 GATE= string; pre-commit escape --no-verify; hooks exit 2 = 2 (protect-main, bash-empty-result-guard)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_RODADA_100_LEITURA_0_COMPORTAMENTO
     node_type: claim
@@ -392,6 +408,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/int-estrategias.md"
       locator: "juiz-fable51: 7 arquivos de data/ sao grep/leitura; unico experimento executado = 1 chamada de Agent (probe do alias); 0 turnos de Workflow, 0 hooks disparados, 0 runs de kg-freshness com 5.1"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_JUIZ_ITENS_REPROVADOS_E_CONTRADICAO
     node_type: evidence
@@ -433,6 +450,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-workflow-alias.md"
       locator: "Workflow run wf_5f0d93a6-28b (opt-in do maestro em texto proprio): agent {model:fable} → transcript \"model\":\"claude-fable-5-1\" (1x); controle {model:opus} → \"claude-opus-5\" (2x); campo da RESPOSTA da API, casado ao alias pelo meta.json; Claude Code 2.1.257, sem gateway; 94k tokens, 7,8s"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PREMODELSWITCH_DISPARO_MEDIDO_0902
     node_type: evidence
@@ -448,6 +466,7 @@ nodes:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md"
       locator: "log da sonda .model-switch.log — 2 linhas (PreModelSwitch + PostModelSwitch) na sessao a331b306, binario 2.1.258, troca claude-opus-5[1m] -> claude-fable-5-1 via picker"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_GUARDA_PREMODELSWITCH_APLICADA_0902
     node_type: evidence
@@ -463,6 +482,7 @@ nodes:
       source: ".claude/hooks/premodelswitch-guard.sh"
       locator: "bancada run_premodelswitch_guard_selftests 11/11 + radar-staleness (h)/(i) 2/2 no runner; lint --only radar-baselines.yaml sem HARD com session_models presente; hook piped com payload real do E_PREMODELSWITCH_DISPARO_MEDIDO_0902 (fable-5-1 rc=0, fable-5-1[1m] rc=0, sonnet-5 rc=2)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_SYSCARD_S1_FABRICA_APROVACAO

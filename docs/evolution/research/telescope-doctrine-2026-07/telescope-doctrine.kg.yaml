@@ -19,6 +19,7 @@ nodes:
       source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.24-27"
       method: "leitura: SYNTHESIS.md registra a lente Transformer-absorção da orquestração wf_35e1e7a2"
+      locality: "repo"
   - id: E_LENS_MARKET
     node_type: evidence
     layer: audit
@@ -32,6 +33,7 @@ nodes:
       source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.30-31; ADR l.63-64"
       method: "leitura: SYNTHESIS.md registra a lente mercado/prior-art da orquestração wf_35e1e7a2"
+      locality: "repo"
   - id: E_LENS_RISK
     node_type: evidence
     layer: audit
@@ -45,6 +47,7 @@ nodes:
       source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.19 e l.42 (inv.8)"
       method: "leitura: SYNTHESIS.md registra a lente risco-adversarial (daemon-vigia) e o invariante on-demand"
+      locality: "repo"
   - id: C_NAME_TELESCOPE
     node_type: claim
     layer: audit
@@ -58,6 +61,7 @@ nodes:
       source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.15-17; ADR l.30-34"
       method: "leitura: SYNTHESIS.md registra o nome telescópio e o par por oposição com o farol"
+      locality: "repo"
   - id: C_ACT_VISLUMBRE
     node_type: claim
     layer: audit
@@ -71,6 +75,7 @@ nodes:
       source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.18-20 (vislumbre = unidade do ato); ADR l.35-36"
       method: "leitura: SYNTHESIS.md da orquestração wf_35e1e7a2 registra vislumbre como unidade do ato"
+      locality: "repo"
   - id: C_PEEK_RAW
     node_type: claim
     layer: audit
@@ -94,6 +99,7 @@ nodes:
       source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_INV9_RAW
     node_type: claim
     layer: audit
@@ -116,6 +122,7 @@ nodes:
       source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.50 (FURO A)"
       method: "juízes: furo A achado pela verificação adversarial opus da orquestração wf_35e1e7a2"
+      locality: "repo"
   - id: E_FURO_B
     node_type: evidence
     layer: audit
@@ -129,6 +136,7 @@ nodes:
       source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.51 (FURO B)"
       method: "juízes: furo B achado pela verificação adversarial opus da orquestração wf_35e1e7a2"
+      locality: "repo"
   - id: C_FURO_C
     node_type: claim
     layer: audit
@@ -142,6 +150,7 @@ nodes:
       source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.52 (FURO C)"
       method: "juízes: furo C achado pela verificação adversarial opus da orquestração wf_35e1e7a2, registrado no SYNTHESIS"
+      locality: "repo"
   - id: C_INV9_FIXED
     node_type: claim
     layer: audit
@@ -155,6 +164,7 @@ nodes:
       source: "docs/analysis/onion-adr-telescope-session-observation-2026-07.md"
       locator: "ADR l.54-60 (invariante 9 corrigido); SYNTHESIS.md l.43, l.50-51"
       method: "juízes: correção do invariante 9 pelos furos A/B da verificação adversarial wf_35e1e7a2, registrada no ADR e no SYNTHESIS"
+      locality: "repo"
   - id: D_VALIDATION_PATTERN
     node_type: decision
     layer: audit
@@ -169,6 +179,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
       locator: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: C_GATED
     node_type: claim
     layer: audit

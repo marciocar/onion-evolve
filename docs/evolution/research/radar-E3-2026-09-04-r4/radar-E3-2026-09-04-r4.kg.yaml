@@ -40,6 +40,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261"
       locator: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261 — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_R4_F2_PLUGIN_POR_COMMAND_SOURCE_E_BLOQUEIO_GERENCIADO
     node_type: evidence
     plane: DEV
@@ -56,6 +57,7 @@ nodes:
       source: "https://code.claude.com/docs/en/plugin-marketplaces"
       locator: "https://code.claude.com/docs/en/plugin-marketplaces — votos 3-0; a propria pagina NAO documenta delta 260→261 (e referencia arquitetural estavel)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_R4_F3_REGRA_DE_CAMINHO_SO_VALE_PARA_EDIT_E_READ
     node_type: evidence
     plane: DEV
@@ -73,6 +75,7 @@ nodes:
       source: "https://code.claude.com/docs/en/permissions"
       locator: "https://code.claude.com/docs/en/permissions — votos 3-0; requer v2.1.210+"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_R4_F4_REVERT_DE_260_CORROBORADO_POR_AGREGADOR
     node_type: evidence
     plane: DEV
@@ -90,6 +93,7 @@ nodes:
       source: "https://ccleaks.com/news/claude-code-2-1-260-sep-2026"
       locator: "https://ccleaks.com/news/claude-code-2-1-260-sep-2026 — votos 3-0; tier 2 (agregador) trava a confianca em 0.6 pela clausula 7 da doutrina de pesquisa"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_R4_F5_RESUME_COM_SESSION_ID_MALFORMADO_REINICIA_FRESCO
     node_type: evidence
     plane: DEV
@@ -107,6 +111,7 @@ nodes:
       source: "https://code.claude.com/docs/en/changelog"
       locator: "https://code.claude.com/docs/en/changelog — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_R4_F6_SKILL_DOCTOR_MEDE_SKILL_SEM_USO_E_CUSTO
     node_type: evidence
     plane: DEV
@@ -124,6 +129,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261"
       locator: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261 — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_R4_F7_URL_DE_RENDERIZADOR_PUBLICO_E_UPLOAD
     node_type: evidence
     plane: DEV
@@ -141,6 +147,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261"
       locator: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261 — votos 3-0"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_MERCADO_E3_R4_SEM_SINAL
     node_type: evidence
     plane: DEV
@@ -157,6 +164,7 @@ nodes:
       source: ".claude/commands/common/prompts/research-doctrine.md"
       locator: "as 27 fontes desta rodada, todas primarias de produto (GitHub compare, code.claude.com changelog/permissions/plugin-marketplaces) + 1 agregador tier 2; nenhuma do eixo mercado/capital/analistas"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_LACUNAS_E3_R4_0904
     node_type: evidence
     plane: DEV
@@ -173,6 +181,7 @@ nodes:
       source: "docs/onion/radar-baselines.yaml"
       locator: "`claude --version` (disco 2.1.261) x versao do processo desta sessao (2.1.260); contabilidade da rodada: 27 fontes, 18 claims, 7 confirmadas"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 edges:
   - from: E_R4_F1_SAIDA_DE_HOOK_PERDIDA_NO_RESUME_CURADA
     to: Q_E3_DELTA_2_1_261

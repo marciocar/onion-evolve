@@ -18,6 +18,7 @@ nodes:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       locator: "l.19-21 (§Decisão central: \"0–20%\", \"40% menos erro / 55% mais rápido\", Anthropic 2026)"
       method: "leitura: SYNTHESIS.md da rodada wf_09aabf00-bfe"
+      locality: "repo"
   - id: E_README_GOLD
     node_type: evidence
     layer: audit
@@ -44,6 +45,7 @@ nodes:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       locator: "l.19-21 (§Decisão central)"
       method: "leitura: SYNTHESIS.md da rodada wf_09aabf00-bfe"
+      locality: "repo"
   - id: C_BRAND_ARCH
     node_type: claim
     layer: audit
@@ -57,6 +59,7 @@ nodes:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       locator: "l.24-25 (§Pilares, bullet Arquitetura: Casa de Marca, plataforma=metadado nunca H1, universalidade como FATO)"
       method: "leitura: SYNTHESIS.md da rodada wf_09aabf00-bfe"
+      locality: "repo"
   - id: C_COMMERCIAL_BOUNDARY
     node_type: claim
     layer: audit
@@ -70,6 +73,7 @@ nodes:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
       locator: "l.26-27 (§Pilares, bullet Fronteira comercial na voz)"
       method: "leitura: SYNTHESIS.md da rodada wf_09aabf00-bfe"
+      locality: "repo"
   - id: D_MESSAGING_DEFINITIVE
     node_type: decision
     trace: docs/business-context/04-operations/messaging-framework.md
@@ -83,6 +87,7 @@ nodes:
       source: "docs/business-context/04-operations/messaging-framework.md"
       locator: "docs/business-context/04-operations/messaging-framework.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: D_DOOR_TWEAKS
     node_type: decision
     layer: audit

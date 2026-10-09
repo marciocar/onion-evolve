@@ -29,6 +29,7 @@ nodes:
       source: ".claude/commands/meta/create-skill.md"
       locator: "simulador das regex do harness 2.1.289 (pTe/uDn/cDn) sobre create-skill.md e agent-skills-specialist.md: 6 diretivas vivas ANTES, 0 DEPOIS"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_LEVA1_LINK_DA_DOUTRINA_DE_CLIENTE
     node_type: evidence
@@ -44,6 +45,7 @@ nodes:
       source: ".claude/commands/common/prompts/client-material-doctrine.md"
       locator: "ls do alvo resolvido a partir de .claude/commands/common/prompts/ com quatro niveis; demais links relativos do arquivo varridos, zero mortos"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_LEVA1_SKILL_E_NAO_MEDIVEL
     node_type: evidence
@@ -59,6 +61,7 @@ nodes:
       source: ".claude/validation/instructions-loaded-census.sh"
       locator: "log local de carga com 141 linhas e ZERO de skill; familias instructions_loaded (c,e) e evolve_census (j) verdes; tres mutantes morderam (skill volta a NUNCA; rule vira NAO-MEDIVEL; evolve-census trata NAO-MEDIVEL como alvo)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_LEVA1_PREMISSA_DO_D9_CORRIGIDA
     node_type: evidence
@@ -74,6 +77,7 @@ nodes:
       source: ".claude/commands/meta/evolve.md"
       locator: "git ls-files docs/business-context (15) e docs/technical-context (9)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_LEVA2_CURAS_M_RESTANTES
     node_type: question
@@ -99,6 +103,7 @@ nodes:
       source: ".claude/workflows/evolve.js"
       locator: "forge-census.sh: evolve 6/7 -> 7/7; familia evolve_workflow (a-g) verde com agent() simulado que imita o runtime (stage que lanca vira null); seis mutantes morderam, inclusive os dois com que o Elenxo provou a 1a bancada decorativa (survived=all; correlacao por indice)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_LEVA2_CHECKPOINT_DO_DRIVE_NO_GRAFO
     node_type: evidence
     plane: DEV
@@ -113,6 +118,7 @@ nodes:
       source: ".claude/validation/kg-drive-project.sh"
       locator: "familias drive e seal_exception verdes (33 casos); 5 mutantes pos-Elenxo morderam (leitura por texto; pending ignorado; close-lot nao grava; (4) sempre OK; (4) por substring) e, antes, 4 mutantes morderam (pending ignorado; comentario passa a contar; valor desconhecido aceito; pendente sai 0) — o do comentario so mordeu depois de a fixture trazer o valor OPOSTO no comentario"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_CYCLE_COMPLETION_MEDE_RECENCIA_PELO_STATE
     node_type: question

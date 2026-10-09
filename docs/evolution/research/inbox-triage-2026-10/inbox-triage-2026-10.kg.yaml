@@ -36,6 +36,7 @@ nodes:
       source: "docs/evolution/review/chore-inbox-triage-2026-10.md"
       locator: "passada adversarial em worktree isolada sobre o commit 63c25c3b; 5 achados reais, 5 provados; os 4 pedidos conferidos no codigo (grep por knowledge-base/index em .claude/utils/adopt = ZERO; adopt.md:685 declara o gate)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
     node_type: question
@@ -51,6 +52,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md"
       locator: "sinal lido integralmente em 2026-10-02; medido no core: zero tratamento de knowledge-base/index.md em .claude/utils/adopt/ e adopt.md"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU
     node_type: decision
@@ -96,6 +98,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-10-02-promocao-a-hub.md"
       locator: "door-role-parity-check.sh rodado em 2026-10-02: rc=0 com saida vazia; o PREDICADO filtra kind==door na l.87 (a l.42 e o comentario que declara a fronteira, nao codigo); members.yaml tinha role standalone enquanto o carimbo do adotante dizia hub"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_UPDATE_3WAY_PRESERVA_O_INDEX_DA_KB
     node_type: evidence
@@ -110,6 +113,7 @@ nodes:
       source: "docs/knowledge-base/index.md"
       locator: "medido PELO HUB (sinal de 2026-10-04): md5 do docs/knowledge-base/index.md antes = depois do update para 3a3c7cf280ac pelo merge de onion/vendor; nao re-medido no core"
       method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE

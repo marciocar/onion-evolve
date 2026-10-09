@@ -41,6 +41,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/issues/34556"
       locator: "issue #34556, corpo §'3-Tier Memory Architecture' (L1 MEMORY.md, L2 topic files, L3 vault)"
       method: "leitura: issue #34556 via gh api (2026-10-09)"
+      locality: "web"
 
   - id: E_DOR_DOMINANTE_E_CONTEXTO_E_CUSTO
     node_type: evidence
@@ -70,6 +71,7 @@ nodes:
       source: "sessão do core 2026-08-16 (frente de pesquisa externa do run claude-code-2.1) — corpo do commit 6850818d (\"duas frentes de pesquisa externa\")"
       locator: "filtros registrados no verified_against (created:>2026-05-01, sort:stars); repos sem owner nem termos de busca"
       method: "testemunho: medição da sessão 2026-08-16, comando não registrado"
+      locality: "pessoa"
 
   - id: E_CONCORRENTE_DE_POSICAO_COMPANY_BRAIN
     node_type: evidence
@@ -84,6 +86,7 @@ nodes:
       source: "https://news.ycombinator.com/item?id=48387095"
       locator: "título da Launch HN (2026-06-03, 79 pontos, 78 comentários): \"Launch HN: Hyper (YC P26) – Company brain to power agentic development\""
       method: "leitura: thread HN via API Algolia (2026-10-09)"
+      locality: "web"
 
   - id: E_FRAGILIDADE_HERDADA_DA_PLATAFORMA
     node_type: evidence
@@ -98,6 +101,7 @@ nodes:
       source: "https://github.com/anthropics/claude-code/issues/87145 · /87146 · /54394"
       locator: "issues #87145, #87146, #54394"
       method: "leitura: issues via gh api (2026-10-09)"
+      locality: "host"
 
   - id: Q_ONDE_MORA_A_SUPERACAO
     node_type: question
@@ -188,6 +192,7 @@ nodes:
       source: "docs/evolution/review/docs-claude-code-2-1-audit.md"
       locator: "frontmatter (REVISOR_ADVERSARIAL elenxo-superacao, 47 scripts e 63 grafos) + achados 1, 2 e 5; .claude/validation/lint-artifacts.sh@6850818d:831"
       method: "juízes: passada adversarial Elenxo registrada no resíduo R56 do PR #616"
+      locality: "repo"
 
   - id: E_A_CASA_JA_TINHA_REFUTADO_A_PERNA_DA_LEITURA
     node_type: evidence
@@ -202,6 +207,7 @@ nodes:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md (PR #510, commit 3e6a962d)"
       locator: "frontmatter l.6-7 (Elenxo 14 workers, run wf_38afb1f2-ee7) · §Veredito l.17-32 (1/9·1/9·0/9, gate social) · l.40-42 (C4–C6 falhou 3×) · l.48-49 (0 de 9 consultou e não achou; sete não consultou)"
       method: "leitura: SYNTHESIS do Elenxo de 2026-08-02"
+      locality: "repo"
 
   - id: E_ACOPLAMENTO_DECLARADO_E_NAO_EXERCIDO
     node_type: evidence
@@ -216,6 +222,7 @@ nodes:
       source: ".claude/ no commit 6850818d (2026-08-16)"
       locator: "grep -rn SendMessage .claude --include=*.md --include=*.sh --include=*.json"
       method: "medição: grep -rn SendMessage .claude (comando registrado no label)"
+      locality: "repo"
 
   - id: D_SUPERACAO_REESCRITA_REINCIDENCIA
     node_type: decision
@@ -271,6 +278,7 @@ nodes:
       source: "docs/analysis/onion-adr-superacao-reincidencia-2026-08.md"
       locator: "cabeçalho (Status: ACEITA, ratificada pelo maestro 2026-08-16) + §Consequências linhas 72-81"
       method: "leitura: ADR ratificada"
+      locality: "repo"
 
   - id: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
     node_type: evidence
@@ -299,6 +307,7 @@ nodes:
       source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
       locator: "linha 122 (gatilho de reabertura: 'fiado à mão, fresco e descartável, 2–3× em sessão real, registrando se o veredito injetado mudou a resposta')"
       method: "leitura: gatilho declarado no SYNTHESIS de 2026-08-02 + docs/analysis/onion-adr-superacao-reincidencia-2026-08.md:70"
+      locality: "repo"
 
   - id: E_A_LISTA_DO_QUE_PARAR_ENCOLHEU_AO_SER_MEDIDA
     node_type: evidence
@@ -313,6 +322,7 @@ nodes:
       source: "docs/analysis/onion-adr-superacao-reincidencia-2026-08.md"
       locator: "§Consequências linhas 72-81"
       method: "leitura: ADR ratificada 2026-08-16 (commit db2f21bf)"
+      locality: "repo"
 
   - id: E_DOGFOOD_DA_PERNA_DE_LEITURA_3_DE_3_NAO_MUDOU
     node_type: evidence
@@ -403,6 +413,7 @@ nodes:
       source: ".github/workflows/onion-selftest.yml@61a950ee"
       locator: "linhas 3-34 (cabeçalho + on: pull_request.paths + schedule cron '17 4 * * *')"
       method: "leitura: workflow criado no commit 61a950ee (2026-08-17)"
+      locality: "repo"
 
   - id: E_MEDICAO_DOS_REMOTOS_PERDEU_VALOR_DE_DECISAO
     node_type: evidence
@@ -417,6 +428,7 @@ nodes:
       source: ".claude/commands/meta/adopt.md@61a950ee"
       locator: "§'Atualizar um repo adotado (--update)' l.605 → 'Re-aplicar a configuração install-only' l.653"
       method: "leitura: adopt.md no commit que registrou o nó"
+      locality: "repo"
 
 
   - id: E_O_GATE_DO_ADOTANTE_NASCE_REPROVADO_POR_PASSIVO_ALHEIO
@@ -432,6 +444,7 @@ nodes:
       source: "docs/evolution/review/fix-adopt-regen-all-baselines.md (PR #628) + .claude/utils/adopt/regen-baselines.sh"
       locator: "resíduo §'Origem: dogfood de campo' e §Achado 1; regen-baselines.sh:6-13 ('47 chaves de grafos do core… 47 violações HARD')"
       method: "leitura: resíduo R56 do PR #628 e cabeçalho do helper que curou"
+      locality: "repo"
 
   - id: E_A_GUARDA_DE_PROJECAO_CONFIAVA_NA_METADE_SEGURA
     node_type: evidence
@@ -446,6 +459,7 @@ nodes:
       source: ".claude/validation/projection-safety.sh + docs/evolution/review/fix-adopt-regen-all-baselines.md"
       locator: "projection-safety.sh l.371-378 (pressuposto falho, nome NDA no console com guarda verde) · resíduo §Achado 2 l.37-46 (federation-map.md nunca auditado)"
       method: "leitura: cabeçalho da guarda que curou + resíduo R56 do PR #628"
+      locality: "repo"
 
   - id: D_INVARIANTE_PROJETADO_IGUAL_AO_SLUG_COM_ISENCAO_NO_DADO
     node_type: decision
@@ -460,6 +474,7 @@ nodes:
       source: ".claude/validation/projection-safety.sh + docs/evolution/federation/members.yaml"
       locator: "projection-safety.sh:370-401 (bloco P6) · members.yaml:505 (projection_name_exempt: true)"
       method: "leitura: código da guarda P6 e dado de isenção"
+      locality: "repo"
 
   - id: D_REGENERAR_BASELINE_POR_DESCOBERTA_NAO_POR_LISTA
     node_type: decision
@@ -474,6 +489,7 @@ nodes:
       source: ".claude/utils/adopt/regen-baselines.sh (commit 31f9d697)"
       locator: "linhas 20-25 (varre *-baseline.txt; sai 3), 78-89 (NUNCA no core; papel via onion-version.sh), :133 'exit 3' em 31f9d697"
       method: "leitura: código do helper + resíduo docs/evolution/review/fix-adopt-regen-all-baselines.md (PR #628)"
+      locality: "repo"
 
 edges:
   - from: E_COMUNIDADE_MEMORIA_3_CAMADAS

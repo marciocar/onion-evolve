@@ -34,6 +34,7 @@ nodes:
       source: "commit 198393e4 (árvore) · docs/evolution/review/feat-kbs-zoho-glpi-regra93.md"
       locator: "ls-tree 198393e4 .claude/commands/product (22 arquivos) e engineer (13) · git grep 'sessions/<slug>' e 'sessions/<feature-slug>' em 198393e4"
       method: "testemunho: medição da sessão 2026-09-30 (commit 198393e4), comando não registrado"
+      locality: "repo"
   - id: E_DIA_INTEIRO_FORA_DO_PROVIDER
     node_type: evidence
     layer: audit
@@ -50,6 +51,7 @@ nodes:
       source: "commit 198393e4 (corpo) · docs/onion/graph/rito-task-manager-2026-09.kg.yaml (cabeçalho)"
       locator: "198393e4 corpo (REGRA 93, 3 KBs do hub absorvidas, hub registrado no members.yaml) · .claude/commands/engineer/start.md (session nasce por invocação)"
       method: "testemunho: medição da sessão 2026-09-30 (commit 198393e4), comando não registrado"
+      locality: "repo"
   - id: E_WORKLOG_E_MECANISMO_MORTO
     node_type: evidence
     layer: audit
@@ -66,6 +68,7 @@ nodes:
       source: "/home/marcio/onion-evolve/.claude/sessions/*/STATE.md (host) · .claude/hooks/worklog-capture-session.sh@198393e4 · .claude/hooks/worklog-precompact-breadcrumb.sh@198393e4 · commit 3e6a962d"
       locator: "12 STATE.md com mtime ≤ 2026-09-30 · capture-session@198393e4:28-29 · precompact@198393e4:11-12 · 3e6a962d diff do hook (l.455 'NO-OP em 56 de 58 branches reais (96%)')"
       method: "testemunho: leitura dos 12 STATE.md no host + leitura dos hooks no commit 198393e4 e do commit 3e6a962d"
+      locality: "host"
   - id: E_ESQUEMA_DIVERGIU_DA_PRATICA
     node_type: evidence
     layer: audit
@@ -82,6 +85,7 @@ nodes:
       source: "/home/marcio/onion-evolve/.claude/sessions/*/STATE.md (host) · docs/knowledge-base/concepts/worklog-protocol.md@198393e4"
       locator: "STATE.md dos 12 diretórios com mtime ≤ 2026-09-30 · worklog-protocol.md@198393e4:62,65,68,88 (Objective/Constraints/Map/resume_command)"
       method: "testemunho: leitura dos 12 arquivos .claude/sessions/*/STATE.md no host (fora do git) + leitura do esquema em worklog-protocol.md@198393e4"
+      locality: "host"
   - id: C_PRECEDENTE_DERIVAR_DA_BRANCH_FUNCIONA
     node_type: claim
     layer: audit
@@ -96,6 +100,7 @@ nodes:
       source: ".claude/validation/review-artifact-check.sh@198393e4 · .claude/validation/lint-artifacts.sh@198393e4 · .claude/hooks/worklog-capture-session.sh@198393e4 · .claude/hooks/worklog-precompact-breadcrumb.sh@198393e4"
       locator: "review-artifact-check.sh@198393e4:165 (REGRA 56: SLUG=tr / -, desde cd0f847b 2026-08-06) · lint-artifacts.sh@198393e4:1527 (REGRA 63) e :2387 (REGRA 87) · worklog-capture-session.sh@198393e4:28-29 · worklog-precompact-breadcrumb.sh@198393e4:11-12 (slug=\"${branch#*/}\")"
       method: "leitura: código das duas derivações no commit 198393e4 (o dia do nó)"
+      locality: "repo"
   - id: E_LEVA_NAO_SERVE_COMO_UNIDADE
     node_type: evidence
     layer: audit
@@ -128,6 +133,7 @@ nodes:
       source: "docs/backlog.md"
       locator: "docs/backlog.md e PROJECAO GERADA (kg-backlog-project.sh) dos nos status:open, ordenados por atencao, com 'nao editar a mao: feche o item no grafo e ele sai daqui' escrito no topo. O NUMERO nao entra neste no de proposito: a 1a versao cravou '229 em 51' e a projecao do MESMO commit ja dizia 230 em 52 — o no invalidava o proprio numero ao nascer, pela 4a vez nesta classe. O FATO e que o backlog e projecao do grafo; a populacao vive na projecao, que se regenera."
       method: "derivado: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── AS DUAS DECISÕES SELADAS ────────────────────────────────────────────────────────────────
   - id: D_SLUG_DA_SESSION_E_A_BRANCH
@@ -144,6 +150,7 @@ nodes:
       source: "commit 198393e4 · docs/evolution/review/feat-kbs-zoho-glpi-regra93.md · .claude/sessions/ (host)"
       locator: "feat-kbs-zoho-glpi-regra93.md §'O que este PR toca no grafo' (Frente 2 não entrou) · ls /home/marcio/onion-evolve/.claude/sessions"
       method: "testemunho: selo do maestro registrado no nó em 2026-09-30 (commit 198393e4); contagem das sessions lida no host"
+      locality: "repo"
   - id: D_UMA_TASK_POR_FIO
     node_type: decision
     layer: audit
@@ -159,6 +166,7 @@ nodes:
       source: "docs/backlog.md · .claude/validation/kg-backlog-project.sh"
       locator: "SELADO pelo maestro em 2026-09-30, REVISANDO o selo da mesma tarde ('uma task por leva'). A revisao veio de ele pedir que eu repensasse e EU MEDIR que o backlog do core ja e projecao do grafo."
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: D_MAPA_NO_MAP_CANONICO
     node_type: decision
     layer: audit
@@ -173,6 +181,7 @@ nodes:
       source: "commit 198393e4 (corpo: rito-task-manager-2026-09.kg.yaml nasce com os nós selados) · docs/knowledge-base/concepts/worklog-protocol.md@198393e4 · .claude/validation/kg-backlog-project.sh@198393e4"
       locator: "worklog-protocol.md@198393e4:68,72 (`## Map` e `- task-manager → main: <id> · provider:`) · kg-backlog-project.sh@198393e4:178-182"
       method: "testemunho: selo do maestro registrado no nó em 2026-09-30 (commit 198393e4); slot e molde conferidos por leitura"
+      locality: "repo"
 
   # ── O QUE FICA ABERTO ───────────────────────────────────────────────────────────────────────
   - id: Q_COMPROMISSO_ESPERA_COLHEITA
@@ -215,6 +224,7 @@ nodes:
       source: "commit fbf9ac12 (corpo) · commit 265f6a89 (diff de .claude/utils/task-manager/adapters/zoho.md)"
       locator: "fbf9ac12 corpo §'O erro ensina mais que o endpoint' · 265f6a89 corpo l.7-9 ('createSubtask NÃO FUNCIONA por caminho nenhum') · zoho.md@265f6a89:38 (vínculo é objeto aninhado)"
       method: "leitura: corpos dos commits 265f6a89 e fbf9ac12 e o adapter zoho.md em 265f6a89"
+      locality: "repo"
 
   - id: Q_GMILL_MAIN_DIVERGIU
     node_type: question
@@ -247,6 +257,7 @@ nodes:
       source: "commit c383df21 (corpo) · /home/marcio/gmill@148a87e:docs/knowledge-base/platforms/zoho-projects-api.md · docs/knowledge-base/platforms/zoho-projects-api.md@198393e4"
       locator: "c383df21 corpo §D_NAO_SOBRESCREVER_KB_DE_ADOTANTE · gmill@148a87e zoho-projects-api.md:16,18,232,304 (v1.2, /api/v3.1/, global-statuses, custom_fields.READ) · core@198393e4 zoho-projects-api.md:26 (v1.1)"
       method: "leitura: corpo do commit c383df21 + KB do adotante no commit gmill@148a87e contra a KB do core em 198393e4"
+      locality: "host"
 
   # ── SELOS DO MAESTRO EM 2026-10-01 (pesquisa de motores e corpus de regras) ─────────────────
   - id: D_NAO_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO
@@ -262,6 +273,7 @@ nodes:
       source: "docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md"
       locator: "docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md:14-17 (§'A resposta primeiro')"
       method: "leitura: síntese versionada da rodada motores-de-regras-deterministicos-2026-10 (run wf_fcfb94bc-f30)"
+      locality: "repo"
 
   - id: D_CAPACIDADES_ANALISADAS_ANTES_DE_ABSORVER
     node_type: decision
@@ -278,6 +290,7 @@ nodes:
       source: "docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md"
       locator: "selado pelo maestro: 'nenhuma agora, PRIMEIRO tem que analisar a proposta de cada uma e suas consequencias e o que pode quebrar para ter um plano de implementacao sem falhas'. Plano escrito em docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_LADO_CLASSICO_DO_ZEN_NAO_MEDIDO
     node_type: question
@@ -293,6 +306,7 @@ nodes:
       source: "docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md"
       locator: "docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md:42-45 (§'NÃO-VERIFICADOS, e esta lacuna importa')"
       method: "leitura: síntese versionada da rodada motores-de-regras-deterministicos-2026-10"
+      locality: "repo"
 
   - id: E_O_LINT_SO_LE_E_O_HOOK_ESCREVE
     node_type: evidence
@@ -309,6 +323,7 @@ nodes:
       source: "docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md · commit 0f8a2d41"
       locator: "onion-absorcao-capacidades-de-motor-2026-10.md:14-20 (tabela leitor/escritor e 'reduz o escopo das três propostas') e :24-25 (check_scan_sanity primeira por desenho)"
       method: "leitura: análise versionada no commit 0f8a2d41 (2026-10-01)"
+      locality: "repo"
 
   - id: Q_CLAUSULA_11_ONDA_DERIVADA
     node_type: question

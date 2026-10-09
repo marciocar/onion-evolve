@@ -17,6 +17,7 @@ nodes:
       source: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
       locator: "helper-testado-7-selftests-verdes"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: C_pausa_e_o_valor
     node_type: claim
     plane: DEV
@@ -29,6 +30,7 @@ nodes:
       source: ".claude/commands/meta/kg.md"
       locator: ".claude/commands/meta/kg.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: D_linha_vermelha
     node_type: decision
     plane: PROD
@@ -43,6 +45,7 @@ nodes:
       source: ".claude/commands/meta/kg.md@88099af3"
       locator: "l.453-456 (\"🚩 A linha vermelha: a automação substitui só o fan-out mecânico (scaffold, extract/consolidate, geração de candidatos, gate-do-radar). Nunca o selo humano na PAUSA. Não existe --auto de diagnóstico de propósito — ao contrário do transform\"); no HEAD atual l.463"
       method: "leitura: kg.md no commit da re-verificação (88099af3, 2026-08-27)"
+      locality: "repo"
   - id: E_gap_scaffold
     node_type: evidence
     plane: PROD
@@ -57,6 +60,7 @@ nodes:
       source: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
       locator: "exploracao-nenhum-scaffold-de-kg-nem-state"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_reusa_state_pointer
     node_type: evidence
     plane: PROD
@@ -71,6 +75,7 @@ nodes:
       source: ".claude/commands/meta/kg.md@d726efb2"
       locator: "l.400 (store \"commitado por lote + um STATE.md com ponteiro NEXT retomável\") + l.433 e l.444 (scaffold cria STATE.md com NEXT; \"Retoma frio pelo NEXT-pointer\"); docs/knowledge-base/concepts/worklog-protocol.md l.52-54 e l.75 (§3 STATE.md, ## NEXT); .claude/commands/meta/adopt.md l.463-464 (adopt usa STATE.md/NEXT); corpo do commit d726efb2"
       method: "leitura: kg.md no commit da entrega + worklog-protocol + adopt.md"
+      locality: "repo"
   - id: E_skeleton_vazio_reprova
     node_type: evidence
     plane: PROD
@@ -85,6 +90,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "radar-legibilidade-medida"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: C_precedente_interactive
     node_type: claim
     plane: DEV
@@ -97,6 +103,7 @@ nodes:
       source: ".claude/commands/product/transform-consolidated.md"
       locator: ".claude/commands/product/transform-consolidated.md l.76-86 + .claude/skills/onion-wizard/SKILL.md l.44-45 + .claude/commands/meta/kg.md@88099af3 l.436 (HEAD l.446-447)"
       method: "leitura: comando transform-consolidated + skill onion-wizard"
+      locality: "repo"
   - id: Q_orquestrador_gated
     node_type: question
     plane: DEV
@@ -121,6 +128,7 @@ nodes:
       source: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
       locator: "7-selftests-verdes"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 edges:
   - from: C_pausa_e_o_valor
     to: D_linha_vermelha

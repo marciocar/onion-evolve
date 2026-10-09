@@ -55,6 +55,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh em 2026-09-30"
       locator: "as REGRAS que liam members.yaml naquele dia: 24, 28, 30, 37, 38 e 85"
       method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
+      locality: "repo"
 
   # ---- o que a passada adversarial derrubou ----
   - id: C_MATERIALIZADOR_LE_O_REGISTRO
@@ -71,6 +72,7 @@ nodes:
       source: "ops/materialize-door.sh em 2026-09-30"
       locator: "grep -n members.yaml no script; ROLE como argumento com default hub (l.34 e l.37 daquela versão)"
       method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
+      locality: "repo"
 
   - id: E_LINT_NAO_FICA_NO_CAMINHO
     node_type: evidence
@@ -103,6 +105,7 @@ nodes:
       source: "docs/evolution/federation/members.yaml do core em 2026-09-30"
       locator: "members.yaml:73 (hub como central que pode ter sub-adotados) e a contagem de parent: metagamify"
       method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
+      locality: "repo"
 
   # ---- as duas guardas ----
   - id: D_GUARDA_EM_DUAS_LINHAS
@@ -149,6 +152,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-manifest.sh e .claude/validation/lint-selftest.sh (família role_cut) na branch fix/role-cut-command-companions"
       locator: "_emit_companion_excludes e _is_anchor no manifesto; casos (m), (m-hub) e (m-MUT) na bancada"
       method: "medição: materialize-door standalone e hub em diretório temporário antes e depois da cura, com diff das listas, lint da porta e bancada com mutante em 2026-10-09"
+      locality: "repo"
 
   - id: Q_ROLE_DUPLA_LEITURA
     node_type: question
@@ -179,6 +183,7 @@ nodes:
       source: "docs/evolution/review/docs-cure-named-private-pointers.md e docs/evolution/federation/members.yaml em origin/main d9852a9e"
       locator: "resíduo: seção 'O que mudou o dia' (onion-evolve PÚBLICO, core fechado, porta onion-core decidida); members.yaml: entrada id onion-core, comentário do remote e bloco da história reescrita"
       method: "leitura: os dois arquivos lidos em 2026-10-09; a publicidade do repo em 17/09 é o que o resíduo registra, não remedida no forge nesta passada"
+      locality: "repo"
 
   - id: D_MATRIZ_DE_PORTAS_2026_10
     node_type: decision
@@ -215,6 +220,7 @@ nodes:
       source: ".claude/validation/members-validate.sh em origin/main d9852a9e"
       locator: "ROLES = {source, hub, standalone, consumer} e VENDOR = {adopter, door} no bloco python; saída sobre /tmp com onion-mini mutado"
       method: "medição: members-validate.sh rodado sobre cópia mutada do members.yaml em 2026-10-09, rc 1"
+      locality: "repo"
 
   - id: Q_REGISTRAR_ONION_PLUGINS_NO_MEMBERS
     node_type: question

@@ -22,6 +22,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§2 Agente l.72-76"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_player_glean
     node_type: entity
     layer: audit
@@ -35,6 +36,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§2 Empresa l.84-87"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_player_clickup_brain2
     node_type: entity
     layer: audit
@@ -49,6 +51,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§2 Empresa l.88-90"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_player_ms_recall
     node_type: entity
     layer: audit
@@ -63,6 +66,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§2 Empresa l.91-93"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_player_limitless_meta
     node_type: entity
     layer: audit
@@ -76,6 +80,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§2 Pessoal l.96-99"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_player_pkm_frag
     node_type: entity
     layer: audit
@@ -89,6 +94,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§2 Pessoal l.100-101"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
 
   # ---- EVIDÊNCIA DE MERCADO/TREND (evidence) ----
   - id: E_bottleneck_context
@@ -104,6 +110,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§1 l.38-46"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_brain_stack_3seg
     node_type: evidence
     layer: audit
@@ -117,6 +124,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§1 tabela l.29-36 + §2 l.68-69"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_consolidation_is_the_line
     node_type: evidence
     layer: audit
@@ -130,6 +138,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§1 l.52-55 + l.19-20"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_market_memory_cagr
     node_type: evidence
     layer: audit
@@ -143,6 +152,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§3 tabela l.121-126"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_context_drift_failures
     node_type: evidence
     layer: audit
@@ -156,6 +166,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§3 Sinais macro l.136-138 + Dor quantificada l.142"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_knowledge_loss_cost
     node_type: evidence
     layer: audit
@@ -169,6 +180,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§3 Dor quantificada l.140-144"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_gartner_shakeup
     node_type: evidence
     layer: audit
@@ -182,6 +194,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§3 Sinais macro l.129-133"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   # REFUTADO em 2026-08-02 por E_yc_rfs_company_brain (fonte primária: o RFS Summer 2026 da YC).
   # status confirmed -> refuted é OBRIGATÓRIO junto com a aresta: nó que recebe REFUTES e segue
   # confirmed é contradição estrutural e o kg-radar reprova (exit 1). A honestidade de 07-25 estava
@@ -199,6 +212,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§3 Honestidade l.146-148"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
   - id: E_yc_rfs_company_brain
     node_type: evidence
     layer: audit
@@ -214,6 +228,7 @@ nodes:
       source: "https://www.ycombinator.com/rfs"
       locator: "ycombinator.com-rfs-summer-2026"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: C_three_verbs_selfcheck
     node_type: claim
@@ -230,6 +245,7 @@ nodes:
       source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
       locator: "medicao-interna-HEAD-2026-08-02"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_whitespace_no_unified
     node_type: evidence
@@ -244,6 +260,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§2 Whitespace confirmado l.103-112"
       method: "leitura: doc-irmão versionado da pesquisa de 2026-07-25 (commit b37e7b64, fan-out de 4 research com verificação externa), que transcreve a evidência com a mesma redação"
+      locality: "repo"
 
   # ---- EVIDÊNCIA INTERNA (evidence, trace) — o que o Onion TEM ----
   - id: E_onion_kg_dogfood
@@ -260,6 +277,7 @@ nodes:
       source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
       locator: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: E_onion_n1_device
     node_type: evidence
     trace: user memory onion-pessoal-app-state
@@ -288,6 +306,7 @@ nodes:
       source: "docs/knowledge-base/concepts/inference-mitigation.md"
       locator: "docs/knowledge-base/concepts/inference-mitigation.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: E_onion_l1l6_gated
     node_type: evidence
     trace: docs/business-context/decisions.md
@@ -301,6 +320,7 @@ nodes:
       source: "docs/business-context/decisions.md"
       locator: "docs/business-context/decisions.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   # ---- CLAIMS / TESES DE DIFERENCIAL (claim) ----
   - id: C_diff_git_vs_llm
@@ -315,6 +335,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "l.17-21 (leitura em uma frase) + §5 jogada #2 l.203-206"
       method: "leitura: tese formulada na síntese versionada da pesquisa (commit b37e7b64, 2026-07-25)"
+      locality: "repo"
   - id: C_diff_triad
     node_type: claim
     layer: audit
@@ -327,6 +348,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§6 Como IR ALÉM l.219-238"
       method: "leitura: tese formulada na síntese versionada da pesquisa (commit b37e7b64, 2026-07-25)"
+      locality: "repo"
   - id: C_diff_ir_alem_gated
     node_type: claim
     layer: audit
@@ -339,6 +361,7 @@ nodes:
       source: "docs/analysis/company-brain-market-2026-07.md"
       locator: "§6 Ressalva doutrinária l.240-242 + §5 jogada #3 l.207-209"
       method: "leitura: ressalva formulada na síntese versionada da pesquisa (commit b37e7b64, 2026-07-25)"
+      locality: "repo"
 
   # ---- DECISÕES (decision) — mais-próximo / mais-valor + amarras ----
   - id: D_mais_proximo
@@ -377,6 +400,7 @@ nodes:
       source: "docs/business-context/decisions.md"
       locator: "docs/business-context/decisions.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   # ---- QUESTÕES (question) ----
   - id: Q_ntenant_proof
@@ -413,6 +437,7 @@ nodes:
       source: "docs/analysis/backlog-real-2026-09.md (e5e81af2) + commit fae0b529"
       locator: "backlog-real-2026-09.md l.71 (veredito truncado) + fae0b529 corpo e diff de site/src/pages/index.astro (description l.46, badge l.70, hero-note l.82 do diff)"
       method: "testemunho: veredito DRIFTED da revisão-total wf_2944480c-98f (2026-09-01), journal ausente do host; texto registrado só truncado na listagem versionada; o fato-âncora (commit fae0b529 de 2026-08-26) é conferível"
+      locality: "repo"
 
   - id: E_CENSO0901_Q_p4_instrument
     node_type: evidence

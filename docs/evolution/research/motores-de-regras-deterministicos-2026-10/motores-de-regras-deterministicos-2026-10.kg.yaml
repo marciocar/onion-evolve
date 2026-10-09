@@ -65,6 +65,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh · .claude/validation/lint-selftest.sh"
       locator: "medicao no repo em 2026-10-01: `wc -l .claude/validation/lint-artifacts.sh` = 5282 · `grep -c 'violation \"' lint-artifacts.sh` = 203 · maior numero de regra no lint = REGRA 93, com 92 tokens `REGRA N` distintos · `ls .claude/validation/ | grep -i baseline` = 13 arquivos *-baseline.txt · `wc -l .claude/validation/lint-selftest.sh` = 20619 · `command -v` devolve AUSENTE para cedar, opa, java, cargo, mvn e drools, e presente so para jq, python3 e node"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CORPUS_AUSENCIA_DE_MOTOR_DE_REGRAS
     node_type: evidence
@@ -83,6 +84,7 @@ nodes:
       source: "docs/onion/graph/ · docs/evolution/research/audit-textual-gates-2026-09/"
       locator: "bash .claude/validation/kg-corpus-grep.sh sobre motor de regras / decision engine / DMN / Rego / Cedar / OPA / Drools / ZEN Engine → 109 grafos varridos, 0 no sobre o tema; os 3.276 nos devolvidos casaram por colisao de termo generico (decision, engine)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ═══════════════════ CEDAR: VERIFICACAO FORMAL E O METODO (VGD) ═══════════════════
 
@@ -103,6 +105,7 @@ nodes:
       source: "https://arxiv.org/pdf/2407.01688"
       locator: "https://arxiv.org/pdf/2407.01688 (3-0) + https://arxiv.org/html/2407.01688v1 (3-0) + https://arxiv.org/pdf/2403.04651 (3-0) — TRES recortes de DOIS papers; a confianca NAO foi somada por repeticao"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CEDAR_COMPILADOR_SIMBOLICO_SMT
     node_type: evidence
@@ -121,6 +124,7 @@ nodes:
       source: "https://arxiv.org/pdf/2403.04651"
       locator: "https://arxiv.org/pdf/2407.01688 (3-0) + https://arxiv.org/html/2407.01688v1 (3-0) + https://arxiv.org/pdf/2403.04651 (3-0) — mesmos dois papers"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CEDAR_VGD_ACHOU_25_BUGS
     node_type: evidence
@@ -139,6 +143,7 @@ nodes:
       source: "https://arxiv.org/pdf/2407.01688"
       locator: "https://arxiv.org/pdf/2407.01688 — votacao adversarial 2-1 (maioria apertada)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SYMCERT_VERIFICA_AS_ANALISES_SMT
     node_type: evidence
@@ -157,6 +162,7 @@ nodes:
       source: "https://www.amazon.science/publications/symcert-verifying-smt-based-policy-analyses"
       locator: "https://www.amazon.science/publications/symcert-verifying-smt-based-policy-analyses — DOIS recortes da MESMA pagina, ambos 3-0; a pagina e landing de publicacao da Amazon (o vendedor da tecnologia), tier 8 por dominio e nao por independencia"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CEDAR_CNCF_SANDBOX_2026_01
     node_type: evidence
@@ -175,6 +181,7 @@ nodes:
       source: "https://infoq.com/news/2026/01/cedar-joins-cncf-sandbox/"
       locator: "https://infoq.com/news/2026/01/cedar-joins-cncf-sandbox/ — 2-1 na claim de ingresso no CNCF, 3-0 na claim de verificacao formal"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ MOTOR + IA: O PADRAO LLM PROPOE, MOTOR DECIDE ═══════════════════
 
@@ -195,6 +202,7 @@ nodes:
       source: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/"
       locator: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/ (3-0) + o mesmo post no mirror https://noise.getoto.net/2026/07/06/... (2-1) — primario E mirror foram contados como duas fontes na rodada; aqui sao UMA"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AUTOFORMALIZACAO_GERADOR_CRITICO_CEDAR
     node_type: evidence
@@ -213,6 +221,7 @@ nodes:
       source: "https://arxiv.org/pdf/2606.26649"
       locator: "https://arxiv.org/pdf/2606.26649 (3-0, duas claims) + https://icml.cc/virtual/2026/67916 (3-0) + https://www.emergentmind.com/papers/2606.26649 (3-0, duas claims) — CINCO recortes do MESMO paper em tres hosts; confianca travada em 0.7 pela concentracao e pelo tier do agregador"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AGENTCORE_ESCOLHEU_CEDAR_NEUROSIMBOLICO
     node_type: evidence
@@ -231,6 +240,7 @@ nodes:
       source: "https://noise.getoto.net/2026/05/20/why-policy-in-amazon-bedrock-agentcore-chose-cedar-for-securing-agentic-workflows/"
       locator: "https://noise.getoto.net/2026/05/20/why-policy-in-amazon-bedrock-agentcore-chose-cedar-for-securing-agentic-workflows/ — TRES recortes do MESMO post, no MESMO mirror (3-0, 2-1, 3-0); source_kind vendor-on-competitor, que a clausula 7 manda tratar como SEMPRE suspeito"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HOOKS_DE_AGENTE_COM_POLICY_ENGINE
     node_type: evidence
@@ -249,6 +259,7 @@ nodes:
       source: "https://blog.sondera.ai/p/hooking-coding-agents-with-the-cedar"
       locator: "https://chatforest.com/reviews/authorization-policy-engine-mcp-servers/ (agregador, 3-0) + https://blog.sondera.ai/p/hooking-coding-agents-with-the-cedar (blog de engenheiro, 3-0) + https://github.com/vectimus/vectimus (repo, 2-1); confianca travada em 0.5 pela clausula 7 — tier <= 5 com agregador e blog pessoal, sem fonte primaria de fornecedor"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ O LADO NAO-CEDAR QUE A RODADA ALCANCOU (2 fontes) ═══════════════════
 
@@ -269,6 +280,7 @@ nodes:
       source: "https://www.youngju.dev/blog/2026-07-17-opa-post-styra-apple-acquihire-reality.en"
       locator: "https://www.youngju.dev/blog/2026-07-17-opa-post-styra-apple-acquihire-reality.en — blog de engenheiro, 3-0; tier 5, e a UNICA fonte da rodada sobre OPA/Rego"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GORULES_BRE_VERSUS_BRMS_SEM_DATA
     node_type: evidence
@@ -286,6 +298,7 @@ nodes:
       source: "https://docs.gorules.io/developers/overview/bre-vs-brms.md"
       locator: "https://docs.gorules.io/developers/overview/bre-vs-brms.md — DOIS recortes da mesma pagina de documentacao do fornecedor, 3-0 cada; SEM DATA na pagina, logo sem valid_from"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ EIXO MERCADO / CAPITAL (invariante, clausula 4) ═══════════════════
 
@@ -307,6 +320,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json"
       locator: "journal wf_fcfb94bc-f30.json: result.market; result.budgetDropped (securityweek \"Cerbos raises $7.5 million\"); result.notVerifiedByBudget (Kognitos: Prosperity7/Khosla/Wipro Ventures; \"dois relatórios Gartner de 2026\")"
       method: "testemunho: leitura do journal wf_fcfb94bc-f30 no host 2026-10-01"
+      locality: "host"
 
   # ═══════════════════ LACUNAS DE 1a CLASSE (clausula 8 e regua de saida 2) ═══════════════════
 
@@ -327,6 +341,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json"
       locator: "journal wf_fcfb94bc-f30.json: result.stats {sources 22, claims 93, verified 32, confirmed 28, refuted 4, unverified 0}; logs \"fetch 22 (23 cortadas por orçamento)\", \"Elenxo: 56 objeções, 50 sobreviventes\"; result.refuted (4 itens)"
       method: "testemunho: leitura do journal wf_fcfb94bc-f30 no host 2026-10-01"
+      locality: "host"
 
   # ═══════════════════ AS OPCOES (claim por opcao, todas OPEN — o maestro sela) ═══════════════════
 
@@ -407,6 +422,7 @@ nodes:
       source: "https://www.amazon.science/publications/symcert-verifying-smt-based-policy-analyses"
       locator: "a propria frase citada no achado 1, da landing de publicacao da Amazon: erros de codificacao nas analises SMT do Cedar podem comprometer a corretude silenciosamente e escapam de testes"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_TRES_NIVEIS_DE_CONFIANCA_E_BINARIO_AUSENTE
     node_type: evidence
@@ -424,6 +440,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "achado 2 lido contra a medicao local de 2026-10-01: `command -v cedar` devolve NADA nesta maquina, assim como opa, java, cargo, mvn e drools; so jq, python3 e node existem"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_VGD_PRESCREVE_ORACULO_NAO_MIGRACAO
     node_type: evidence
@@ -441,6 +458,7 @@ nodes:
       source: "https://arxiv.org/pdf/2407.01688"
       locator: "achado 3 lido contra a medicao local: lint-selftest.sh tem 20.619 linhas e .claude/validation/ tem 13 arquivos *-baseline.txt de catraca — o Onion ja tem metade do teste diferencial que o VGD prescreve"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_25_BUGS_MEDEM_DEFEITO_DO_MOTOR
     node_type: evidence
@@ -458,6 +476,7 @@ nodes:
       source: "https://arxiv.org/pdf/2407.01688"
       locator: "achado 4 (votacao 2-1) lido contra a medicao local: `grep -c 'violation \"' lint-artifacts.sh` = 203 — o gate do Onion e legivel por grep, um motor declarativo de terceiro nao e legivel assim"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_EQUIVALENCIA_NAO_E_CONFLITO_DE_LINT
     node_type: evidence
@@ -475,6 +494,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "achado 5 lido contra o que o gate FAZ: 306 das 5.282 linhas de lint-artifacts.sh invocam grep/sed/awk/find/python sobre o filesystem e o git; nenhuma fonte da rodada mostra lint de artefato expresso em Cedar"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_ZERO_DADO_DE_ATUALIDADE_2026
     node_type: evidence
@@ -492,6 +512,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json"
       locator: "journal wf_fcfb94bc-f30.json: result.decision.objections[5] (target \"Achado 6 — Cedar... paper de março de 2024\", survives true) + result.refuted[2] (v0.6.0 0-3)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json no host"
+      locality: "host"
 
   - id: E_OBJECAO_75MS_NAO_MEDE_HOOK
     node_type: evidence
@@ -509,6 +530,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json"
       locator: "journal wf_fcfb94bc-f30.json: result.decision.objections[6] (target \"Achado 7 — ... ~75 ms\", survives true)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json no host"
+      locality: "host"
 
   - id: E_OBJECAO_DRIFT_DO_ONION_E_DOCSTRING_VS_CORPO
     node_type: evidence
@@ -526,6 +548,7 @@ nodes:
       source: ".claude/validation/rules-registry.sh"
       locator: "achado 8 contra o mecanismo que JA existe: rules-registry.sh deriva a severidade de violation \"HARD\"/\"SOFT\" NO CORPO da guarda (nao do comentario) e reprova em 6 catracas de clareza; a falha medida da REGRA 85 (saiu HARD onde e HARD+SOFT, com a projecao byte-a-byte APROVANDO) esta no proprio registro"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_ACHADO_9_E_DUPLICATA_DO_3
     node_type: evidence
@@ -543,6 +566,7 @@ nodes:
       source: "https://arxiv.org/html/2407.01688v1"
       locator: "achado 9 confrontado com o achado 3: mesma publicacao (arXiv 2407.01688), mesmo conteudo (modelos Lean com propriedades provadas — forbid trumps permit, default deny, soundness — mais DRT), lido em host diferente (html em vez de pdf)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_28_ACHADOS_SAO_8_ARTEFATOS
     node_type: evidence
@@ -560,6 +584,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json"
       locator: "journal wf_fcfb94bc-f30.json: result.decision.recommendation §\"Por que D antes de tudo\" (\"Dos 28 achados, 26 são Cedar, 1 é FAQ de fornecedor sem data e 1 é um blog pessoal sobre o OPA; e esses 28 colapsam em ~8 artefatos distintos\") + objections[8], [49] (ZEN sem medição) e [55] (faixa contrarian com zero fontes)"
       method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json no host"
+      locality: "host"
 
 edges:
   # ── evidências sustentam a pergunta (15) ──

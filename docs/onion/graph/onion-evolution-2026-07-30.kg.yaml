@@ -27,6 +27,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "fan-out-6-dims-mais-verificacao"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   # ── SOBREVIVENTES (recommended) ──
   - id: C_d6_sysdoc_mcp
     node_type: claim
@@ -118,6 +119,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-30.md"
       locator: "linhas 12-14 (run wf_7a6ca1e6-064; 13 → 5 refutados = 3 juiz adversarial + 2 verificação principal) e :46 (D8: 2 achados brutos refutados na verificação)"
       method: "leitura: relatório da auditoria /meta:evolve 2026-07-30"
+      locality: "repo"
   - id: E_juiz_refutou_3
     node_type: evidence
     plane: PROD
@@ -132,6 +134,7 @@ nodes:
       source: "wf_7a6ca1e6-064 journal"
       locator: "verdicts-do-workflow"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
   - id: A_relatorio_evolve
     node_type: artifact
     plane: PROD
@@ -146,6 +149,7 @@ nodes:
       source: "docs/analysis/onion-evolution-2026-07-30.md"
       locator: "relatorio-escrito"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_no_absolute_link_convention
     node_type: evidence
     plane: DEV
@@ -160,6 +164,7 @@ nodes:
       source: "docs/meta-specs/code-standards.md"
       locator: "censo lote 7 (run wf_05b33768-48c) + selo do maestro 2026-08-30: code-standards.md par.2.5 linha 91 + varredura dos 55 arquivos de .claude/commands/"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CENSO0901_C_d3_comment_dup
     node_type: evidence
@@ -174,6 +179,7 @@ nodes:
       source: "docs/evolution/research/census-2026-09-01/data/rodada1.json (commit 9c2fa06b)"
       locator: "sed -n '190,270p' .claude/commands/product/task.md · sed -n '195,300p' .claude/commands/product/feature.md"
       method: "medição: sed -n dos blocos de template em task.md e feature.md (/meta:census 2026-09-01)"
+      locality: "repo"
 
   - id: E_REFUTA_C_d3_comment_dup
     node_type: evidence
@@ -188,6 +194,7 @@ nodes:
       source: ".claude/commands/product/task.md"
       locator: "revisao-total (wf_2944480c-98f): REFUTED 1/1 — grep -n \"clickup-patterns\\|Unicode\\|━━━\" .claude/commands/product/task.md .claude/commands/product/feature.md;. Selo do maestro: ordem vai-na-ordem 2026-09-01 (etapa 1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: D_veredito_saudavel

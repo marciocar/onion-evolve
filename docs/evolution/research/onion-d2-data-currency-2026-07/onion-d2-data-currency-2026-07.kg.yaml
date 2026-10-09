@@ -18,6 +18,7 @@ nodes:
       source: "docs/discussions/onion-pessoal-marcio/05-mitigacao-inferencia.md"
       locator: "docs/discussions/onion-pessoal-marcio/05-mitigacao-inferencia.md:26-29, :68-69, :81 @754497e4"
       method: "leitura: discussão P5 (mitigação de inferência) do onion-pessoal"
+      locality: "repo"
   - id: E_RFC4_SINGLE_SOURCE
     node_type: evidence
     layer: audit
@@ -31,6 +32,7 @@ nodes:
       source: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
       locator: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md:20 e :37-38 @7aa81347; docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:41"
       method: "leitura: RFC-0004 §1-2"
+      locality: "repo"
   - id: E_FAILSAFE_RATIFIED
     node_type: evidence
     layer: audit
@@ -44,6 +46,7 @@ nodes:
       source: "docs/discussions/onion-pessoal-marcio/04-privacidade-soberania.md"
       locator: "docs/discussions/onion-pessoal-marcio/04-privacidade-soberania.md:25, :35, :40-41 @470d1350; docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:23 @9d6fac2c (JÁ ratificada)"
       method: "leitura: discussão P4 (privacidade/soberania) do onion-pessoal"
+      locality: "repo"
   - id: E_EU_AI_ACT
     node_type: evidence
     layer: audit
@@ -58,6 +61,7 @@ nodes:
       source: "https://www.techtimes.com/articles/320024/20260709/gdpr-applies-ai-training-data-eu-ends-web-scraping-free-pass-every-lab.htm"
       locator: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:54 @9d6fac2c; techtimes (publicado 2026-07-09)"
       method: "leitura: artigo techtimes citado no SYNTHESIS l.54"
+      locality: "web"
   - id: E_SSOT_PROTOTIPO
     node_type: evidence
     layer: audit
@@ -71,6 +75,7 @@ nodes:
       source: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:24 @9d6fac2c; docs/discussions/onion-pessoal-marcio/05-mitigacao-inferencia.md:122-123 @754497e4"
       method: "leitura: SYNTHESIS D2 l.24 + item 6 da P5"
+      locality: "repo"
   - id: C_A_ELIMINADA
     node_type: claim
     layer: audit
@@ -84,6 +89,7 @@ nodes:
       source: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:23 e :29-30 @9d6fac2c"
       method: "leitura: SYNTHESIS da pesquisa D2 (wf_b533468d-41c)"
+      locality: "repo"
   - id: C_CARD_FUNDE_DUAS
     node_type: claim
     layer: audit
@@ -97,6 +103,7 @@ nodes:
       source: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:19-26 @9d6fac2c"
       method: "leitura: SYNTHESIS da pesquisa D2"
+      locality: "repo"
   - id: C_P5_ESCOPO_N1
     node_type: claim
     layer: audit

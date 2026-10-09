@@ -62,6 +62,7 @@ nodes:
       source: "https://jevtypesafeai.com/"
       locator: "citacao verbatim \"The AI model that returns typed decisions, not text.\" — Home, hero (h1; a quebra de linha fica entre \"returns\" e \"typed decisions\"); ancorada por verificador independente. CORROBORADA FORA do site lido pelo proprio fabricante (ver E_VENDOR_SYSTEM_ONE_CATEGORY), por isso a objecao do Elenxo caiu."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_JEV_LATENCY_AND_THREE_FORMATS
     node_type: evidence
     plane: DEV
@@ -78,6 +79,7 @@ nodes:
       source: "https://jevtypesafeai.com/"
       locator: "citacao verbatim \"Jev = fast, typed decisions for AI agents and software — choice, score, or yes/no probability, in 70–500ms.\" — Home, linha logo abaixo do hero; ancorada por verificador independente. Latencia CORROBORADA por terceiro independente (eesel.ai, 2026-09-21: \"70ms to 500ms\" end-to-end e \"40x to 200x faster\")."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_ZERO_HALLUCINATION_SLOGAN
     node_type: evidence
     plane: DEV
@@ -106,6 +108,7 @@ nodes:
       source: "https://jevtypesafeai.com/"
       locator: "citacao verbatim \"Pick one of up to 255 labelled options\" — Home, secao \"The three primitives\" (choice, score, noul); ancorada por verificador independente. Taxonomia CORROBORADA por eesel.ai (\"three primitives: Noul (probability), Choice (select from list), and Score (numeric rating)\")."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_PRICE_ON_RESELLER_SITE
     node_type: evidence
     plane: DEV
@@ -134,6 +137,7 @@ nodes:
       source: "https://jevtypesafeai.com/"
       locator: "citacao verbatim \"No — Jev is a hosted model from TypeSafe AI, called over an API.\" — Home, FAQ \"Is Jev open source?\" (secao Getting started); ancorada por verificador independente. Sustentado por fonte do fabricante (console de sign-in, zero mencao a pesos abertos) e por eesel.ai (\"hosted/closed\", acesso via Cloudflare Workers AI e lista de early-access)."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ───────────────── jev-docs ─────────────────
   - id: E_DECIDE_API_SHAPE
@@ -152,6 +156,7 @@ nodes:
       source: "https://jevtypesafeai.com/docs"
       locator: "citacao verbatim \"One call: a state plus typed questions, calibrated answers back.\" — /docs, \"Core API — /v1/decide\"; ancorada por verificador independente. CORROBORADA por eesel.ai, que descreve multiplas perguntas avaliadas contra o mesmo state \"in a single parallel pass\"."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_TYPE_FIXED_BY_REQUEST_NO_PARSING
     node_type: evidence
     plane: DEV
@@ -168,6 +173,7 @@ nodes:
       source: "https://jevtypesafeai.com/docs"
       locator: "citacao verbatim \"Because every answer's type is fixed by your request, you branch on it in plain code — no parsing, no regex.\" — /docs, \"Response\"; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia, ver E_SOURCE_TIER_INFLATED). CORROBORADA por eesel.ai: \"cannot make a type error and cannot return an option that was not in your list\"."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_LIMITS_AND_PIN_MODEL_VERSION
     node_type: evidence
     plane: DEV
@@ -184,6 +190,7 @@ nodes:
       source: "https://jevtypesafeai.com/docs"
       locator: "citacao verbatim \"Pin a model version in production so thresholds don't shift.\" — /docs, \"Best practice\"; ancorada por verificador independente. Limites declarados na mesma secao: 64k tokens de state+perguntas, 32k para state+maior pergunta, ate 255 opcoes em choice, 2-10 niveis em score."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ───────────────── jev-get ─────────────────
   - id: E_FREE_PLAYGROUND_NO_SIGNUP
@@ -202,6 +209,7 @@ nodes:
       source: "https://jevtypesafeai.com/get-jev"
       locator: "citacao verbatim \"Run real Jev calls in your browser, no key and no signup.\" — /get-jev, item 1 \"Try it now — free playground\"; ancorada por verificador independente."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_DISTRIBUTION_GATEWAYS
     node_type: evidence
     plane: DEV
@@ -230,6 +238,7 @@ nodes:
       source: "https://jevtypesafeai.com/get-jev"
       locator: "citacao verbatim \"Jev is developed by TypeSafe AI. This platform is independently operated by CODEFASHION TECH LTD and is not affiliated with or endorsed by TypeSafe AI.\" — /get-jev, aviso ao fim do corpo da pagina, repetido no rodape (\"© 2026 CODEFASHION TECH LTD.\", \"Not affiliated with or endorsed by TypeSafe AI.\"); ancorada por verificador independente."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ───────────────── jev-agent-skill ─────────────────
   - id: E_SKILL_TEACHES_FUZZY_IF
@@ -248,6 +257,7 @@ nodes:
       source: "https://jevtypesafeai.com/agent-skill"
       locator: "citacao verbatim \"Give any AI coding agent a fast, typed \"fuzzy if\": one skill teaches it to call the Jev Decision API for routing, guardrails, scoring and gating\" — /agent-skill, subtitulo de abertura sob \"Add the Jev skill to your agent\"; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia)."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_SKILL_INSTALL_PROMPT_AND_CURL
     node_type: evidence
     plane: DEV
@@ -264,6 +274,7 @@ nodes:
       source: "https://jevtypesafeai.com/agent-skill"
       locator: "citacao verbatim \"curl -o ~/.claude/skills/jev/SKILL.md --create-dirs https://jevtypesafeai.com/skill/SKILL.md\" — /agent-skill, \"Copy to your agent\" (\"Any agent — paste this prompt\" e \"Any agent — install the file manually\"); ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia)."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_SKILL_TEACHES_API_CONTRACT
     node_type: evidence
     plane: DEV
@@ -280,6 +291,7 @@ nodes:
       source: "https://jevtypesafeai.com/agent-skill"
       locator: "citacao verbatim \"The exact request / response shape, so the agent branches on typed values with no parsing\" — /agent-skill, \"What the skill teaches your agent\", itens 1 e 3; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia)."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_SKILL_TEACHES_WHEN_AND_COST
     node_type: evidence
     plane: DEV
@@ -296,6 +308,7 @@ nodes:
       source: "https://jevtypesafeai.com/agent-skill"
       locator: "citacao verbatim \"When to call Jev instead of another LLM — routing, tool-call guardrails, context compaction, classification\" — /agent-skill, \"What the skill teaches your agent\", itens 2 e 4; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia)."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ───────────────── jev-integrations ─────────────────
   - id: E_TYPESCRIPT_SDK
@@ -314,6 +327,7 @@ nodes:
       source: "https://jevtypesafeai.com/integrations"
       locator: "citacao verbatim \"Call Jev from TypeScript/Node: install the SDK, set your key, and get a typed, calibrated choice / score / noul with a 30-line working example.\" — /integrations, card \"SDK / TypeScript\"; ancorada por verificador independente."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ───────────────── jev-tools ─────────────────
   - id: E_TOOLS_AGENTS_DEV_DEMOS
@@ -332,6 +346,7 @@ nodes:
       source: "https://jevtypesafeai.com/tools"
       locator: "citacao verbatim \"Paste an agent's shell commands — Jev gates each one ALLOW / CONFIRM / BLOCK with a risk score.\" — /tools l.42-153, Featured demos; ancorada por verificador independente."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_ROUTERS_SKILL_AND_MODEL
     node_type: evidence
     plane: DEV
@@ -348,6 +363,7 @@ nodes:
       source: "https://jevtypesafeai.com/tools"
       locator: "citacao verbatim \"Route each task to the one tool an agent should call — web search, code, DB, email — with confidence.\" — /tools l.97-100 (Skill Router) e l.150-153 (Model Router); ancorada por verificador independente."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_PR_JUDGE_VERDICT
     node_type: evidence
     plane: DEV
@@ -364,6 +380,7 @@ nodes:
       source: "https://jevtypesafeai.com/tools"
       locator: "citacao verbatim \"Paste a GitHub PR — Jev returns SAFE / REVIEW / BLOCK with structured checks, in one call.\" — /tools l.188-191, PR Judge; ancorada por verificador independente."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_TOOLS_TAXONOMY_AND_BATCH
     node_type: evidence
     plane: DEV
@@ -380,6 +397,7 @@ nodes:
       source: "https://jevtypesafeai.com/tools"
       locator: "citacao verbatim \"Upload a CSV or paste rows, ask 1–8 questions, and get a typed answer for every row — filter, sort, export.\" — /tools l.269-308; ancorada por verificador independente."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ───────────────── Evidencia trazida pelo ELENXO (fontes que a rodada NAO abriu) ─────────────────
   - id: E_VENDOR_SYSTEM_ONE_CATEGORY
@@ -398,6 +416,7 @@ nodes:
       source: "https://typesafe.ai/"
       locator: "typesafe.ai (fonte do FABRICANTE, lida no Elenxo desta rodada): \"Jev is TypeSafe's first public System One Model, optimized for automation. Send Jev structured questions and get typed decisions with probabilities and confidence that your software can act on\" e \"System One Models are a new class of AI model built for decisions inside software\"."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_VENDOR_CONFIDENCE_ESCALATES
     node_type: evidence
     plane: DEV
@@ -414,6 +433,7 @@ nodes:
       source: "https://typesafe.ai/"
       locator: "typesafe.ai (fabricante): \"Every Jev decision comes with a confidence estimate, so your software can act when confidence is high and escalate when it is not.\""
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_TYPED_WRONG_ANSWER_POSSIBLE
     node_type: evidence
     plane: DEV
@@ -430,6 +450,7 @@ nodes:
       source: "https://www.eesel.ai/"
       locator: "eesel.ai (cobertura independente, 2026-09-21): \"a confidently wrong typed answer is still possible\"; o teto da garantia e \"cannot produce a type error\" / \"cannot make a type error and cannot return an option that was not in your list\"."
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_VENDOR_PRICE_42_PER_BILLION
     node_type: evidence
     plane: DEV
@@ -446,6 +467,7 @@ nodes:
       source: "https://typesafe.ai/"
       locator: "typesafe.ai (fabricante): \"$42 Per Billion input tokens\" = US$ 0,042 por milhao; CORROBORADO por eesel.ai: \"$0.042 / MTok\" e \"238x lower than Claude Fable 5.1\"."
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_NOUL_IS_BARE_NUMBER
     node_type: evidence
     plane: DEV
@@ -462,6 +484,7 @@ nodes:
       source: "https://jevtypesafeai.com/docs"
       locator: "medicao do verificador independente sobre /docs ao rejeitar a claim \"os tres tipos devolvem probabilidades e confianca calibradas\": so choice e score devolvem `confidence` e `probabilities`; o noul devolve UM numero nu — exemplo da propria doc: {\"type\":\"noul\",\"noul\":0.94}. A doc nao cita metodologia de calibracao nem garantia alguma; \"calibrated\" aparece so como adjetivo."
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_CONTEXT_WINDOW_CONFLICT
     node_type: evidence
     plane: DEV
@@ -478,6 +501,7 @@ nodes:
       source: "https://www.eesel.ai/"
       locator: "conflito MEDIDO entre fontes: /docs (revendedor) declara 64k tokens para state+perguntas e 32k para state+maior pergunta; eesel.ai (independente) reporta \"32,000 tokens\" como a JANELA de jev-1.13.0. Nenhuma fonte reconcilia os dois numeros."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_ACCESS_REGIME_WAITLIST_VS_OPEN
     node_type: evidence
     plane: DEV
@@ -494,6 +518,7 @@ nodes:
       source: "https://www.eesel.ai/"
       locator: "eesel.ai (independente): acesso ao JEV via \"Cloudflare Workers AI\" e por \"early-access waitlist\"; typesafe.ai expoe console de sign-in. O site do revendedor, por contraste, anuncia \"live — try it free, no signup\"."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_OPENROUTER_SLUG_NOT_CONFIRMED
     node_type: evidence
     plane: DEV
@@ -522,6 +547,7 @@ nodes:
       source: "https://typesafe.ai/"
       locator: "auditoria da propria rodada: as 6 URLs do mandato (/, /get-jev, /docs, /agent-skill, /integrations, /tools) pertencem TODAS ao dominio jevtypesafeai.com, que declara nao ter afiliacao com a TypeSafe AI. typesafe.ai e console.typesafe.ai nao foram abertos na fase de leitura; abri-los no Elenxo custou 2 chamadas e devolveu categoria, mecanismo e preco real."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: E_SOURCE_TIER_INFLATED
     node_type: evidence
     plane: DEV
@@ -538,6 +564,7 @@ nodes:
       source: "https://jevtypesafeai.com/get-jev"
       locator: "auditoria dos tiers declarados: o leitor declarou tier 9 para 5 claims (/docs Response e as 4 de /agent-skill) e tier 6 para 9 claims, todas do MESMO dominio de terceiro nao afiliado. Pela clausula 7, fonte que fala de produto alheio sem afiliacao nao recebe tier de fonte definitiva. Rebaixadas a 6 (as de tier 9) e 5 (as sem tier declarado, onde o conteudo e numero de marketing)."
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   # ───────────────── Claims (o que a rodada estabelece, sem selar) ─────────────────
   - id: C_JEV_CATEGORY_IS_SYSTEM_ONE
@@ -594,6 +621,7 @@ nodes:
       source: "https://jevtypesafeai.com/"
       locator: "contabilidade fechada da rodada de primarias de 2026-10-01, conferida contra o retorno do verificador de ancoragem e contra o Elenxo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   # ───────────────── Fios abertos (proposta; esta rodada NAO sela) ─────────────────
   - id: Q_JEV_ARCHITECTURE_UNKNOWN

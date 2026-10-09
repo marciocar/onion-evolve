@@ -29,6 +29,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "patch-a-b-medido-only-cai-de-16-2s-para-5-3s-com-diff-de-veredito-vazio-em-dois-cenarios"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_QUATRO_LENTES_CONVERGIRAM_SEM_SE_VER
     node_type: evidence
@@ -44,6 +45,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "as-4-lentes-independentes-nomearam-check-plugins-sync-como-vilao-dominante"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_CAPABILITY_NAO_PODE_LEVAR_BLANKET_SKIP
     node_type: claim
@@ -59,6 +61,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "fixture-bad-overclaim-injetada-com-blanket-skip-fica-cega-e-com-scope-filter-sem-normalizar-vdir-tambem"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SHA1SUM_POR_NO_2486_SPAWNS
     node_type: evidence
@@ -74,6 +77,7 @@ nodes:
       source: ".claude/validation/kg-verification-coverage.sh"
       locator: "re-medido-no-caminho-do-lint-format-tsv-0-95s-e-47-spawns-o-caminho-caro-so-dispara-com-orfas"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_REGRESSAO_16S_86S_E_CONCENTRADA_NAO_LINEAR
     node_type: evidence
@@ -89,6 +93,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh"
       locator: "guardas-27-para-59-2-19x-linhas-2-51x-tempo-5-37x-concentrado-em-3-guardas-novas"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO
     node_type: question
@@ -104,6 +109,7 @@ nodes:
       source: ".claude/validation/consumed-mode-check.sh"
       locator: "tripla-regua-2026-08-13-consumed-mode-oficial-33-pares-0-sem-teste-e-o-unico-orfao-real-foi-ligado"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PISO_IRREDUTIVEL_DA_REFINARIA_SUPERADO
     node_type: evidence
@@ -119,6 +125,7 @@ nodes:
       source: "docs/analysis/elenxo-mecanismos-lint-2026-08-13.md"
       locator: "docs/analysis/elenxo-mecanismos-lint-2026-08-13.md l.95,l.105-107; 0e087e04 diff de docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml (E_lint_only_ja_existe_e_e_parcial)"
       method: "leitura: análise do Elenxo 2026-08-13 + diff do nó da refinaria no commit #588"
+      locality: "repo"
 
   - id: I_P4_HIGIENE_DE_VERDADE_DECLARADA_FECHADA
     node_type: decision
@@ -134,6 +141,7 @@ nodes:
       source: "55061ca6:.githooks/pre-commit"
       locator: "55061ca6 diff .githooks/pre-commit e .claude/validation/consumed-mode-check.sh; docs/analysis/elenxo-mecanismos-lint-2026-08-13.md l.118-121; 0e087e04:docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml l.81"
       method: "leitura: diffs do commit #589 + análise; registro da lente no grafo em 0e087e04"
+      locality: "repo"
 
   - id: Q_GATILHO_DO_WIREIN_NAO_CASA_COM_O_SUT
     node_type: question
@@ -149,6 +157,7 @@ nodes:
       source: "docs/evolution/review/perf-lint-backlog-p3-p5.md"
       locator: "docs/evolution/review/perf-lint-backlog-p3-p5.md l.32,l.51-55; c77cfd25 diff .githooks/pre-commit (bloco GATILHO DIRETO DO SUT); docs/evolution/review/perf-hook-autofix-fechamentos.md l.51"
       method: "leitura: resíduos dos PRs #589 e #590 + diff do pre-commit"
+      locality: "repo"
 
   - id: I_P3_KG_VIEW_TRIPLO_PARSE_CURADO
     node_type: decision
@@ -163,6 +172,7 @@ nodes:
       source: "docs/evolution/review/perf-lint-backlog-p3-p5.md"
       locator: "docs/evolution/review/perf-lint-backlog-p3-p5.md l.35-36,l.39-46; docs/analysis/elenxo-mecanismos-lint-2026-08-13.md l.111-116; 55061ca6 diff .claude/validation/kg-view.sh; .claude/validation/lib/status-factor.awk l.35"
       method: "leitura: resíduo do PR #589 (revisor reproduziu os números) + análise + diff do kg-view.sh"
+      locality: "repo"
 
   - id: Q_R19_AUTOFIX_COM_RASTRO_CANDIDATO
     node_type: question
@@ -178,6 +188,7 @@ nodes:
       source: "docs/evolution/review/perf-hook-autofix-fechamentos.md + c77cfd25:.githooks/pre-commit + 55061ca6 (corpo do commit)"
       locator: "perf-hook-autofix-fechamentos.md l.19-33,l.45-52; c77cfd25 diff .githooks/pre-commit l.21-27 (bloco 'AUTO-REGENERAÇÃO DE PLUGINS COM RASTRO … opção b do maestro … R19 segue intacta … HARD no CI'); 55061ca6 corpo l.68-73"
       method: "leitura: resíduo do PR #590 + diff do pre-commit em c77cfd25 + corpo do commit #589"
+      locality: "repo"
 
   - id: I_ASSEMBLE_FALHO_VIRA_VIOLATION
     node_type: decision
@@ -193,6 +204,7 @@ nodes:
       source: "c77cfd25:.claude/validation/lint-artifacts.sh"
       locator: "c77cfd25 diff lint-artifacts.sh @@ -1042 (check_plugins_sync); docs/evolution/review/docs-elenxo-mecanismos-lint.md l.41-42; docs/evolution/review/perf-hook-autofix-fechamentos.md l.52"
       method: "leitura: diff do commit #590 + resíduos dos PRs #588 e #590"
+      locality: "repo"
 
   - id: Q_PARECER_SOBRE_DIFF_INVERTIDO
     node_type: question
@@ -207,6 +219,7 @@ nodes:
       source: "docs/evolution/review/docs-kg-parecer-diff-invertido.md + docs/evolution/review/fix-review-dirty-tree-guard.md + docs/evolution/review/docs-kg-prova-viva-dirty-tree.md"
       locator: "docs-kg-parecer-diff-invertido.md l.27-34,l.42-49; fix-review-dirty-tree-guard.md l.27-32,l.49-53; docs-kg-prova-viva-dirty-tree.md l.24-27; gh run view 31732737397/31735494448/31749652342/31749555842"
       method: "leitura: resíduos dos PRs #591, #592 e #594 + metadados dos runs (gh run view)"
+      locality: "repo"
 
   - id: Q_MUDEZ_DA_GUARDA_NAO_SE_IDENTIFICA
     node_type: question
@@ -222,6 +235,7 @@ nodes:
       source: ".github/workflows/onion-review.yml"
       locator: "8o-elenxo-no-caminho-benigno-a-guarda-nao-emite-nada-e-log-sem-guarda-e-indistinguivel-de-guarda-muda"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: A_RUN_DO_ELENXO_DE_MECANISMOS
     node_type: artifact
@@ -237,6 +251,7 @@ nodes:
       source: "docs/analysis/elenxo-mecanismos-lint-2026-08-13.md"
       locator: "workflow-de-4-agentes-com-241-tool-calls-e-os-4-schemas-validados"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: I_P3_KG_VIEW_TRIPLO_PARSE_CURADO

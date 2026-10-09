@@ -63,6 +63,7 @@ nodes:
       source: "https://claude.com/docs/connectors/building/review-criteria"
       locator: "https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TOOL_ANNOTATIONS_OBRIGATORIAS
     node_type: evidence
@@ -81,6 +82,7 @@ nodes:
       source: "https://claude.com/docs/connectors/building/review-criteria"
       locator: "https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_PLUGIN_EMBARCA_MCP_VIA_PLUGIN_ROOT
     node_type: evidence
@@ -99,6 +101,7 @@ nodes:
       source: "https://code.claude.com/docs/en/plugins-reference"
       locator: "https://code.claude.com/docs/en/plugins-reference — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TOOLS_NAMESPACED_POR_PLUGIN
     node_type: evidence
@@ -117,6 +120,7 @@ nodes:
       source: "https://code.claude.com/docs/en/plugins-reference"
       locator: "https://code.claude.com/docs/en/plugins-reference — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MCP_REMOTO_EXIGE_OAUTH_CA
     node_type: evidence
@@ -135,6 +139,7 @@ nodes:
       source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
       locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_POLITICA_REMOTO_VS_LOCAL
     node_type: evidence
@@ -152,6 +157,7 @@ nodes:
       source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
       locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_PLUGIN_JSON_CAMPO_MCPSERVERS
     node_type: evidence
@@ -170,6 +176,7 @@ nodes:
       source: "https://code.claude.com/docs/en/plugin-marketplaces"
       locator: "https://code.claude.com/docs/en/plugin-marketplaces — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MARKETPLACE_JSON_MCPSERVERS
     node_type: evidence
@@ -187,6 +194,7 @@ nodes:
       source: "https://code.claude.com/docs/en/plugin-marketplaces"
       locator: "https://code.claude.com/docs/en/plugin-marketplaces — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MCP_JSON_OPCIONAL_NO_OFICIAL
     node_type: evidence
@@ -205,6 +213,7 @@ nodes:
       source: "https://github.com/anthropics/claude-plugins-official"
       locator: "https://github.com/anthropics/claude-plugins-official — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_POSTMARK_MCP_MALICIOSO
     node_type: evidence
@@ -223,6 +232,7 @@ nodes:
       source: "https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/"
       locator: "https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MCP_ALTO_TRUST_AMPLA_PERMISSAO
     node_type: evidence
@@ -240,6 +250,7 @@ nodes:
       source: "https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/"
       locator: "https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_KG_MCP_TERCEIRO_MULTI_HOST_STDIO
     node_type: evidence
@@ -258,6 +269,7 @@ nodes:
       source: "https://github.com/hilyfux/knowledge-graph"
       locator: "https://github.com/hilyfux/knowledge-graph — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_MCP_DEVE_CHAMAR_API_PRIMEIRA_PARTE
     node_type: evidence
@@ -276,6 +288,7 @@ nodes:
       source: "https://claude.com/docs/connectors/building/review-criteria"
       locator: "https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_PLUGIN_EXIGE_REPO_PUBLICO
     node_type: evidence
@@ -294,6 +307,7 @@ nodes:
       source: "https://claude.com/docs/connectors/building/review-criteria"
       locator: "https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_EXIGE_DOC_PUBLICA_E_CREDENCIAIS_TESTE
     node_type: evidence
@@ -312,6 +326,7 @@ nodes:
       source: "https://claude.com/docs/connectors/building/review-criteria"
       locator: "https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EIXO MERCADO/CAPITAL (invariante, clausula 4) ────────────────────────────────────
   - id: E_MERCADO_PLUGIN_MCP_0904
@@ -330,6 +345,7 @@ nodes:
       source: "docs/evolution/research/plugin-mcp-posture-2026-09/SYNTHESIS.md + docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml"
       locator: "SYNTHESIS.md l.56 (Mercado); plugin-directory-landscape-2026-09.kg.yaml E_MERCADO_PLUGIN_DIRECTORY_0904 label l.287; o \"Trial\" do Thoughtworks só em E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904 item (1), label l.341"
       method: "leitura: SYNTHESIS.md da rodada (seção Mercado) + nó E_MERCADO_PLUGIN_DIRECTORY_0904 do corpus R1"
+      locality: "repo"
 
   # ── LACUNAS DECLARADAS (regra de saida #2) ───────────────────────────────────────────
   - id: E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904
@@ -348,6 +364,7 @@ nodes:
       source: "docs/evolution/research/plugin-mcp-posture-2026-09/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.56 (analistas e Stytch refutados) e l.60 (refutados 10; fora do orçamento 18 claims e 36 fontes); docs/evolution/review/research-plugin-decisions-2026-09.md l.5 (wf_9ad3aba7-b48: 15/10)"
       method: "testemunho: contabilidade da sessão session_01J14a87JnNoQou9hyFjASgN sobre o run wf_9ad3aba7-b48 (commit 1e346a5c, 2026-09-04); journal ausente do host; lista item a item só no grafo"
+      locality: "repo"
 
   # ── A DECISÃO (o maestro sela — esta sessão NUNCA sela) ──────────────────────────────
   - id: D_PLUGIN_MCP_POSTURE_0904
@@ -364,6 +381,7 @@ nodes:
       source: "commit 50f94101 + docs/evolution/review/docs-seal-plugin-decisions-2026-09.md"
       locator: "corpo do commit 50f94101 (citação do maestro \"sela (i′) e (c), segue\", 2026-09-04); resíduo docs-seal-plugin-decisions-2026-09.md achado 1; SYNTHESIS.md l.33-52 (veredito do Elenxo)"
       method: "testemunho: selo do maestro 2026-09-04 registrado no corpo do commit 50f94101 e no resíduo docs/evolution/review/docs-seal-plugin-decisions-2026-09.md"
+      locality: "repo"
 
   # ── AS OPÇÕES (uma claim por opção; quem sela é o maestro) ───────────────────────────
   - id: C_OPCAO_A_CONECTOR_REMOTO_PUBLICO
@@ -419,6 +437,7 @@ nodes:
       source: "ops/mcp-onion-exec/server.py"
       locator: "E_ANTHROPIC_READ_WRITE_SEPARADOS (https://claude.com/docs/connectors/building/review-criteria) cruzada com medicao no repo: ops/mcp-onion-exec/server.py — dict TOOLS l.92-95 com run_lint, run_inventory, kg_freshness (leitura) e propose_kg_write (escrita, `open(fpath, \"w\")` em docs/evolution/kg-inbox/) NO MESMO SERVIDOR"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER
     node_type: evidence
@@ -436,6 +455,7 @@ nodes:
       source: "ops/mcp-onion-kg/server.py"
       locator: "grep -c \"readOnlyHint|destructiveHint|annotations\" em ops/mcp-onion-kg/server.py, ops/mcp-onion-exec/server.py, ops/mcp-onion-framework/server.py -> 0, 0, 0 (executado 2026-09-04); a unica string \"title\" e a de serverInfo, nao por-tool"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA
     node_type: evidence
@@ -453,6 +473,7 @@ nodes:
       source: "ops/mcp-onion-kg/server.py"
       locator: "ops/mcp-onion-kg/server.py l.21 `REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))` e todo `_run` com cwd=REPO; caminhos hardcoded do CORE (docs/knowledge-base/, .claude/validation/kg-radar.sh, .claude/diary/index.md, docs/onion/inventory.md) contra o layout medido do plugin materializado: plugins/onion/kb (4 arquivos) e plugins/onion/validation/kg-radar.sh"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA
     node_type: evidence
@@ -470,6 +491,7 @@ nodes:
       source: "ops/mcp-onion-kg/server.py"
       locator: "ops/mcp-onion-kg/server.py l.85 declara \"Busca um termo nas 91 KBs (docs/knowledge-base)\" contra `find docs/knowledge-base -name \"*.md\" | wc -l` = 94 (executado 2026-09-04)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_5_TOPOLOGIA_PRIVADA_BLOQUEIA_A
     node_type: evidence
@@ -487,6 +509,7 @@ nodes:
       source: "https://claude.com/docs/connectors/building/review-criteria"
       locator: "E_PLUGIN_EXIGE_REPO_PUBLICO (review-criteria, tier 10, 3-0) cruzada com a topologia real: onion-claude equivale a onion-evolve e e PRIVATE (migalha family-repo-topology-door-core-collapse); as tools da triade servem docs/knowledge-base/, .claude/diary/ e os .kg.yaml, que so existem no repo privado"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_6_COMPARATIVO_USADO_COMO_LUZ_VERDE
     node_type: evidence
@@ -504,6 +527,7 @@ nodes:
       source: "docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml"
       locator: "nó E_POLITICA_REMOTO_VS_LOCAL (label l.149) e nó E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904 item (3) (label l.341)"
       method: "derivado: confronto do nó E_POLITICA_REMOTO_VS_LOCAL com o item (3) do nó E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904, no mesmo grafo"
+      locality: "repo"
 
   - id: E_OBJECAO_7_SINTAXE_TRES_VEZES_ADOCAO_NENHUMA
     node_type: evidence
@@ -521,6 +545,7 @@ nodes:
       source: "commit 1e346a5c (árvore do core) + docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml"
       locator: "git ls-tree -r --name-only 1e346a5c | grep -c '\\.mcp\\.json$' → 0; git show 1e346a5c:.claude-plugin/marketplace.json (8 plugins, grep -c mcpServers → 0); nós E_PLUGIN_JSON_CAMPO_MCPSERVERS (l.163), E_MARKETPLACE_JSON_MCPSERVERS (l.181), E_PLUGIN_EMBARCA_MCP_VIA_PLUGIN_ROOT (verified_against code.claude.com/docs/en/plugins-reference)"
       method: "medição: git ls-tree -r --name-only 1e346a5c | grep -c '\\.mcp\\.json$' (0) e git show 1e346a5c:.claude-plugin/marketplace.json | grep -c mcpServers (0, 8 plugins) — o comando do verified_against refeito no commit da rodada"
+      locality: "repo"
 
   - id: E_OBJECAO_8_DUPLICATA_INFLA_CONTAGEM
     node_type: evidence
@@ -538,6 +563,7 @@ nodes:
       source: "docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml"
       locator: "nós E_PLUGIN_JSON_CAMPO_MCPSERVERS (verified_against l.163) e E_MARKETPLACE_JSON_MCPSERVERS (impact l.178, verified_against l.181, label l.184)"
       method: "derivado: comparação dos dois nós de evidência do mesmo grafo (URL, votos, impact e label)"
+      locality: "repo"
 
 
   # ── GATILHOS (i) e (ii) da reabertura de (b) — MEDIDOS em 2026-09-04 ────────────────────
@@ -558,6 +584,7 @@ nodes:
       source: "docs/evolution/research/plugin-mcp-posture-2026-09/data/venue-official-probe-2026-09-04.json"
       locator: "data/venue-official-probe-2026-09-04.json (291 registros; campos has_mcp_json, pj_mcpServers, has_hooks_json, pj_keys) + anthropics/claude-plugins-official@7fbbff80:.claude-plugin/marketplace.json"
       method: "leitura: data/venue-official-probe-2026-09-04.json versionado no commit fa2f7c23 (gerado por data/crawl.py), conferido contra o marketplace.json oficial @7fbbff80"
+      locality: "repo"
 
   - id: E_REGIME_MCP_EMBUTIDO_E_DO_DIRETORIO_DE_PLUGINS
     node_type: evidence
@@ -576,6 +603,7 @@ nodes:
       source: "https://claude.com/docs/plugins/submit"
       locator: "WebFetch claude.com/docs/plugins/submit (\"separate and complementary directory from the Connectors Directory\"; \"a plugin can include any MCP of any kind in its .mcp.json\"; \"basic automated review\"), connectors/building/submission (\"The portal accepts remote MCP servers only. Local servers are distributed as desktop extensions or plugins\"), review-criteria (escopo = servidores NO Connector Directory), Software Directory Policy §3.F e §5"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
 edges:
   # ── evidência web -> pergunta ────────────────────────────────────────────────────────

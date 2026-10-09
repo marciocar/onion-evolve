@@ -24,6 +24,7 @@ nodes:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
       locator: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
 
   - id: E_L1
     node_type: evidence

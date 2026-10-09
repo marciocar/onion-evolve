@@ -38,6 +38,7 @@ nodes:
       source: "docs/evolution/research/backlog-grafo-2026-08/SYNTHESIS.md"
       locator: "l.246-252 (\"A objeção que sobrevive\": W1 proibida de pressupor a fronteira; verbos vedados/permitidos; \"owner: cai do lado vedado\")"
       method: "leitura: plano versionado da onda (SYNTHESIS.md, commit e9423265) + corpo do PR #704 para a consequência exercida"
+      locality: "repo"
 
   # ── as medicoes da F1 (feitas no planejamento, agora tipadas) ────────────
   - id: E_61PCT_DO_BACKLOG_PASSOU_DE_UM_MES
@@ -53,6 +54,7 @@ nodes:
       source: "docs/evolution/research/backlog-grafo-2026-08/SYNTHESIS.md"
       locator: "l.96-100 (comando git log -S) + l.149-159 (distribuição 0/113/67/6, média 31, 186/186)"
       method: "leitura: medição registrada no plano versionado (SYNTHESIS.md §D, e9423265, 2026-08-28); a re-derivação sobre 190 itens dá 120/60/10, média 31,1 — coerente, não idêntica"
+      locality: "repo"
 
   - id: E_TOPO_NASCEU_NUMA_RAJADA_E_NAO_SE_MOVEU
     node_type: evidence
@@ -68,6 +70,7 @@ nodes:
       source: "docs/backlog.md@84c659e9 (= c5bf7fd4^, projeção de 2026-08-28) + docs/evolution/research/backlog-grafo-2026-08/SYNTHESIS.md"
       locator: "backlog.md: 190 linhas ordenadas por Atenção, top 15 = D_gate_oidc_dual 119.0 … Q_GUARDAS_COERENTES 21.6 + dois dos quatro empatados em 20.0; SYNTHESIS l.129-145 (a tabela lista os mesmos itens e \"mais 4 decisions\": D_mais_valor, D_fix_ancestor_floor, D_resource_plan_b, D_logto_same_protection_tier)"
       method: "medição: (juiz, 2026-10-09) git show 84c659e9:docs/backlog.md | ordenar por Atenção | head -15; para cada id: git log --format=\"%h %ad\" -S\"  - id: <ID>\" 84c659e9 -- <grafo> | tail -1"
+      locality: "repo"
 
   - id: C_O_DRIVER_CONDUZ_O_GRAFO_VAZIO
     node_type: claim
@@ -82,6 +85,7 @@ nodes:
       source: "docs/backlog.md"
       locator: "kg-drive-project.sh:30 e kg-realign-project.sh:29 fixam fios-abertos; medido: fios-abertos = 0 abertos (20/20 teto) enquanto docs/backlog.md = 190"
       method: "leitura: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
     node_type: question
@@ -101,6 +105,7 @@ nodes:
       source: "docs/evolution/review/drive-backlog-graph-p3-batch1.md"
       locator: "§Achados item 2 (l.27-31: \"trabalhado por outro caminho\"; 6 dias; 7 de 8 commits; 24 de 37 antes) + SYNTHESIS.md l.198-200 (o dissenso registrado)"
       method: "leitura: resíduo R56 da passada P3 do /meta:drive (2026-08-28) + corpo do commit 4d190912 + plano versionado"
+      locality: "repo"
 
   - id: E_45PCT_SAO_PERGUNTA_PARADA_SOB_CONTROLE
     node_type: evidence
@@ -115,6 +120,7 @@ nodes:
       source: "docs/evolution/research/backlog-grafo-2026-08/SYNTHESIS.md"
       locator: "l.112-127 (§C: tabela 183 open/2 drifted/1 unverifiable; 83 question 45%/54 claim/35 decision; \"tabela projetada tem só quatro colunas\")"
       method: "leitura: medição registrada no plano versionado (SYNTHESIS.md §C, e9423265, 2026-08-28); reprodução do juiz sobre docs/backlog.md@84c659e9 dá escopo 190 (187 open, 86 question) — coerente, não idêntica"
+      locality: "repo"
 
   - id: E_DOIS_DRIFTED_NAO_RECONCILIADOS
     node_type: evidence
@@ -129,6 +135,7 @@ nodes:
       source: "docs/onion/graph/m3-federation-admin-2026-07.kg.yaml@c5bf7fd4"
       locator: "m3 l.62-70 (C_command_side_gap status drifted, verified_at 2026-08-27, \"medido no drive 2026-08-27\"); m2-bridge-logto-2026-07.kg.yaml@c5bf7fd4 l.1398-1406 (E_floors_effective_measured_20260729 status drifted); .claude/validation/lib/status-factor.awk@c5bf7fd4 l.28"
       method: "leitura: git show c5bf7fd4 dos dois grafos e do status-factor.awk"
+      locality: "repo"
 
   # ── o teto como pre-condicao mecanica ────────────────────────────────────
   - id: C_TETO_CHEIO_E_PRE_CONDICAO_NAO_BOA_PRATICA
@@ -144,6 +151,7 @@ nodes:
       source: "docs/onion/graph/fios-abertos.kg.yaml"
       locator: "kg-backlog-check.sh docs/onion/graph/fios-abertos.kg.yaml => OK 20/20 nos"
       method: "derivado: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── a perna externa, com o limite medido ─────────────────────────────────
   - id: E_REDDIT_INACESSIVEL_DESTE_HARNESS
@@ -159,6 +167,7 @@ nodes:
       source: "docs/evolution/research/backlog-grafo-2026-08/SYNTHESIS.md"
       locator: "l.68-80 (§\"Fontes externas — acesso VERIFICADO\": Reddit ❌ www e old \"unable to fetch\"; \"Decisão do maestro: substituir o eixo Reddit\")"
       method: "testemunho: medição da sessão 2026-08-28 (WebFetch em www.reddit.com e old.reddit.com; WebSearch site:reddit.com), comando não reproduzível registrado; resultado e decisão do maestro registrados pela própria sessão no plano versionado (SYNTHESIS.md) e no commit c5bf7fd4"
+      locality: "repo"
 
   - id: E_PRIOR_ART_EXTERNO_BATE_NA_LACUNA_DE_ORDEM
     node_type: evidence
@@ -185,6 +194,7 @@ nodes:
       source: "docs/evolution/review/feat-backlog-projection-ratchet.md + docs/evolution/research/backlog-grafo-2026-08/SYNTHESIS.md"
       locator: "resíduo l.35-37 (Crítico 1), l.51 (Crítico 2), l.82-87 (bancada 8/8, 5 mutantes, CI); PR #704 corpo §\"O que NÃO foi construído\"; SYNTHESIS.md l.340-348 (\"Antes da Onda 1 — o trabalho de mecanismo que já tem gatilho (não depende da pesquisa)\")"
       method: "leitura: resíduo R56 do PR #704 + corpo do PR #704 (gh pr view 704, MERGED, mergeCommit 84c659e9) + plano versionado (SYNTHESIS.md, e9423265)"
+      locality: "repo"
 
   - id: C_O_PROGRAMA_SO_EXISTIA_FORA_DA_SSOT
     node_type: claim
@@ -199,6 +209,7 @@ nodes:
       source: "docs/onion/graph"
       locator: "grep pelos ids nomeados no plano em docs/onion/graph e docs/evolution/research => ZERO ocorrencias; o plano aprovado (33KB) esta fora do repositorio (git: \"outside repository\")"
       method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_A_FILA_E_PARCIALMENTE_CONDUZIDA
     node_type: evidence
@@ -213,6 +224,7 @@ nodes:
       source: "docs/backlog.md"
       locator: "git log --all --grep=<id> para os 190 ids extraidos de docs/backlog.md => 37 com commit; grep GRAPH= em kg-drive-project.sh:30,34 e kg-realign-project.sh:30,34; .claude/sessions/drive-m3-federation-2026-08-27 conduziu grafo nao-default"
       method: "leitura: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_TRABALHO_PRECEDE_A_PROJECAO
     node_type: evidence
@@ -227,6 +239,7 @@ nodes:
       source: "docs/backlog.md"
       locator: "git log --follow -- docs/backlog.md => 8 commits, 7 da construcao (22-28/08); para os 190 ids, primeira citacao em commit ANTES de 2026-08-22 = 24, DEPOIS = 13"
       method: "leitura: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_KARMA2502_CITACAO_MAB_E_FALSA
     node_type: evidence
@@ -242,6 +255,7 @@ nodes:
       source: "https://arxiv.org/html/2502.06472v1 + https://arxiv.org/html/2502.06472v2"
       locator: "v1 §3.2 (\"Central Controller Agent (CCA)... LLM-based utility scoring and multi-armed bandit-inspired exploration\") e §3.3 eq.(2)-(3); v2 §3.2 (\"under the orchestration of a Central Controller\") e Evaluator eq.(12)-(15); abs/2502.06472 (v1 2025-02-10, v2 2026-01-11)"
       method: "leitura: arxiv HTML das duas versões + histórico de versões em /abs (lido pelo juiz 2026-10-09)"
+      locality: "web"
 
   - id: E_SGH2604_ESCOPO_EXCLUI_GRAFO_EPISTEMICO
     node_type: evidence
@@ -257,6 +271,7 @@ nodes:
       source: "https://arxiv.org/html/2604.11378v1"
       locator: "abstract (\"This is a position paper and design proposal... not a production implementation or empirical results\"); §4.1 (\"verifiable engineering tasks —tasks whose dependency structure can be articulated before execution begins\"); §9.7 (exploratory tasks); tabela vs LangGraph (\"Routing policy: Deterministic topology-based\")"
       method: "leitura: arxiv abs+html da v1 (única versão, 13/abr/2026; lido pelo juiz 2026-10-09)"
+      locality: "web"
 
   - id: E_GRADE2606_DIAGNOSTICO_NAO_REORDENA
     node_type: evidence
@@ -271,6 +286,7 @@ nodes:
       source: "https://arxiv.org/html/2606.22741v1"
       locator: "§4 (seis corpora observados: tau-bench, tau2-bench, SWE-agent, SWE-Gym, OpenHands, AgentRewardBench); §6 (Who&When, 126 failed runs, localização de falha); Appx F (FLORA-Bench ~6×10^5 pares)"
       method: "leitura: re-busca da v1 (22/jun/2026, a vigente em 2026-08-28; v2 é de 12/set) no arxiv HTML"
+      locality: "web"
 
   - id: E_GRADE2606_HUB_CONCENTRACAO_SUPERA_GRAU_BRUTO
     node_type: evidence
@@ -319,6 +335,7 @@ nodes:
       source: "docs/knowledge-base/concepts/onion-abstraction-doctrine.md"
       locator: "l.57 (\"O 2º provider real é o gatilho da graduação a SDAAL\") + l.63 (Anti-simetria); SYNTHESIS.md l.283; m3-federation-admin-2026-07.kg.yaml l.260-261"
       method: "leitura: doutrina de abstração (gatilho 2º provider real) + plano versionado da onda + nó refutado do m3"
+      locality: "repo"
 
   - id: Q_O_QUE_VIAJA_DO_BACKLOG
     node_type: question
@@ -352,6 +369,7 @@ nodes:
       source: "docs/evolution/research/backlog-grafo-2026-08/SYNTHESIS.md"
       locator: "l.289 (Onda 3: \"D_AGREGACAO_CROSS_REPO_E_MOAT — MOAT permanente\") + corpo do commit e9423265"
       method: "leitura: SYNTHESIS.md l.289 e corpo do commit e9423265 (l.26-28)"
+      locality: "repo"
 
   - id: E_PRIOR_ART_AUDITADO_POR_LEITURA
     node_type: evidence
@@ -367,6 +385,7 @@ nodes:
       source: "https://arxiv.org/html/2502.06472v1 + https://arxiv.org/html/2604.11378v1 + https://arxiv.org/html/2606.22741v1 + https://arxiv.org/abs/2511.18194"
       locator: "KARMA v1 §3.2-3.3 (CCA + bandit) vs v2; SGH v1 §4.1 e §9.7 (\"ill-suited for tasks whose dependency structure cannot be articulated before execution begins\"); GRADE v1 §2 e §6; Agent-as-a-Graph abstract (tool/agent retrieval)"
       method: "leitura: arxiv (abs/html) dos 4 papers, incluindo o histórico de versões do KARMA (juiz 2026-10-09)"
+      locality: "web"
 
 edges:
   - from: E_61PCT_DO_BACKLOG_PASSOU_DE_UM_MES

@@ -32,6 +32,7 @@ nodes:
       source: "docs/onion/testing-validation-system.md; docs/onion/maintenance-checklist.md"
       locator: "commit 346673a7; grep dos números; bash consumed-mode-check.sh → 40 pares · 0 sem teste"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_BANCADA_NAO_CONTAVA_PARA_NINGUEM
     node_type: evidence
@@ -47,6 +48,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "commit 7d104066; bancada 1127/1127 STRICT --jobs auto em 685s, TSV de 164 linhas"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
     node_type: evidence
@@ -62,6 +64,7 @@ nodes:
       source: ".github/workflows/onion-selftest.yml; .githooks/pre-commit"
       locator: "medido: 1127 casos · 155 famílias · 78 regras; comentários dizem 689, 980, ~850 e 18"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: I_HARNESS_INVENTORY
     node_type: decision
@@ -131,6 +134,7 @@ nodes:
       source: ".claude/validation/review-ledger.sh"
       locator: "bash .claude/validation/review-ledger.sh sobre docs/evolution/review (262 residuos)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_LEDGER_TINHA_O_DEFEITO_QUE_CACA
     node_type: evidence
@@ -170,6 +174,7 @@ nodes:
       source: ".claude/validation/review-artifact-check.sh (VERDICT_ENUM)"
       locator: "selo do maestro em 2026-09-08 + bancada review_artifact 17/17 com prova de mutacao"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_A_CAUDA_ERAM_TRES_CAMPOS
     node_type: evidence
@@ -185,6 +190,7 @@ nodes:
       source: "docs/evolution/review/*.md"
       locator: "agrupamento das 72 formas por primeiro token sobre docs/evolution/review"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SSOT_DO_HARNESS_COM_CATRACA
     node_type: evidence
@@ -200,6 +206,7 @@ nodes:
       source: ".claude/validation/harness-inventory.sh"
       locator: "lint-artifacts.sh 0 HARD + dogfood: editar o .md a mao reprova REGRA 80"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_EXISTE_NAO_E_RODOU
     node_type: claim
@@ -215,6 +222,7 @@ nodes:
       source: "git: 67cafc2b:docs/onion/testing-inventory.md"
       locator: "67cafc2b:docs/onion/testing-inventory.md l.15 (913 sítios + comando grep -cE record_*), l.32 (⊘ NÃO MEDIDO), l.36 (distinção existe×rodou); diff do mesmo commit registra a bancada do dia com 1135 asserções executadas"
       method: "medição: grep -cE '^\\s*(record_pass|record_fail|record_skip) ' .claude/validation/lint-selftest.sh"
+      locality: "repo"
 
   - id: E_A_MAQUINARIA_REPROVOU_A_PROPRIA_CURA
     node_type: evidence
@@ -230,6 +238,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh (run_harness_inventory_selftests)"
       locator: "lint-artifacts.sh sobre o proprio commit em construcao"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_UNTRACKED_TORNA_A_PROJECAO_INSTAVEL
     node_type: claim
@@ -245,6 +254,7 @@ nodes:
       source: ".claude/validation/kg-backlog-project.sh + .claude/validation/harness-inventory.sh"
       locator: "duas ocorrencias medidas em 2026-09-08, ambas barradas pelo gate antes de qualquer dano"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_FIXTURE_NA_ARVORE_VIVA_E_DISPUTAVEL
     node_type: evidence
@@ -260,6 +270,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh (run_moat_boundary_selftests)"
       locator: "moat_boundary 3/3 apos a cura; antes, (a) e (c) alternavam falha sem padrao"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_FIXTURE_NA_ARVORE_VIVA_CORRE_COM_AS_FAIXAS
     node_type: evidence
@@ -275,6 +286,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh:1121"
       locator: "as 3 falhas passam ISOLADAS (14/14) e so aparecem sob --jobs auto"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SERIE_DA_BANCADA_EXISTE
     node_type: evidence
@@ -290,6 +302,7 @@ nodes:
       source: "ops/testing/collect-selftest.sh + docs/onion/metrics/selftest-runs.jsonl"
       locator: "primeiro envelope real, LIDO do ledger commitado: 1164 pass / 0 fail / 160 familias em 167 linhas / 750s, sha 01d1df49, dirty=true"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_O_CAMPO_QUE_NAO_CONTAVA_O_QUE_O_NOME_DIZ
     node_type: evidence
@@ -305,6 +318,7 @@ nodes:
       source: "ops/testing/collect-selftest.sh (familias x linhas_relatorio)"
       locator: "165 linhas de relatorio para 158 familias; os 8 shards de `fixtures` somam 12x6+11x2 = 94, exatamente as 94 fixtures do manifesto"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_IDEMPOTENCIA_CHECAVA_FORMATO_QUE_NINGUEM_ESCREVIA
     node_type: claim
@@ -320,6 +334,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh (selftest-series caso (b))"
       locator: "primeira invocacao do coletor gravou o MESMO envelope 2x"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_EVIDENCIA_DE_TERMINAL_NO_CI_LIGADA
     node_type: evidence
@@ -335,6 +350,7 @@ nodes:
       source: ".github/workflows/onion-selftest.yml + ops/testing/selftest-summary.sh"
       locator: "bash .claude/validation/lint-selftest.sh --families ci_evidence (hoje 11 passaram, 0 falharam) + onion-selftest.yml l.152-166 (if: always() + selftest-summary.sh + upload-artifact@v4)"
       method: "medição: bash .claude/validation/lint-selftest.sh --families ci_evidence"
+      locality: "repo"
 
   - id: E_O_SUMARIO_REPORTA_NAO_JULGA
     node_type: claim
@@ -350,6 +366,7 @@ nodes:
       source: "ops/testing/selftest-summary.sh"
       locator: "caso (f) da familia ci_evidence: sumario com falhas ainda sai 0"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_PAINEL_GERADO_COM_CINCO_DEFESAS
     node_type: evidence
@@ -365,6 +382,7 @@ nodes:
       source: ".claude/validation/testing-state.sh + docs/onion/testing-state.md"
       locator: "familia testing_state 6/6 + dogfood: editar o .md a mao reprova REGRA 81"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ARTEFATO_CATRACADO_NAO_IMPRIME_HOJE
     node_type: claim
@@ -380,6 +398,7 @@ nodes:
       source: ".claude/validation/testing-state.sh"
       locator: "caso (c) da familia testing_state trava a decisao"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_DOC_AFIRMA_ESTADO_QUE_O_VIVO_DESMENTE
     node_type: claim
@@ -395,6 +414,7 @@ nodes:
       source: "git: abbc2d0c + be29ab00"
       locator: "abbc2d0c: testing-validation-system.md (painel Coverage 85%/Mutation 74% sem produtor, apagado) e maintenance-checklist.md l.438-441 (REGRA 59 ligada, 40 pares, 0 sem teste); be29ab00: catraca-regra49-2026-08.kg.yaml l.551 (verified_against \"0 e 0\" vs lint 2 HARD + 24 SOFT) e R0 de audit-textual-gates-2026-09 (trace l.205-211, script 211→254 linhas; be29ab00:review-artifact-check.sh = 254)"
       method: "leitura: commits da cura (abbc2d0c) e das re-medições R0 de 2026-09-09 (be29ab00)"
+      locality: "repo"
 
   - id: E_O_SCHEMA_DO_KG_FRESHNESS_NAO_RODA
     node_type: evidence
@@ -410,6 +430,7 @@ nodes:
       source: ".claude/commands/meta/kg-freshness.md"
       locator: "os 16 workers da 1a tentativa de R0 morreram todos com API Error 400"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_AS_GUARDAS_DO_FANIN_SAO_LOAD_BEARING
     node_type: evidence
@@ -425,6 +446,7 @@ nodes:
       source: "/tmp/claude-1000/r0/final.json"
       locator: "R0 run wf_5b2f274e-83d: 16 workers, 5 rebaixamentos no fan-in"
       method: "testemunho: leitura do arquivo /tmp/claude-1000/r0/final.json no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: Q_BLOCKED_BY_ESTA_SOBRECARREGADO
     node_type: question
@@ -449,6 +471,7 @@ nodes:
       source: "docs/evolution/review/feat-testing-visibility-onda0.md"
       locator: "run wf_7cd5ae40-511: 6 dimensoes com mandato de refutar, 20 agentes, 1,87M tokens, 14 achados / 14 REAIS"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: I_CURAR_O_RESIDUO_DO_ELENXO
     node_type: decision
@@ -492,6 +515,7 @@ nodes:
       source: ".claude/validation/harness-inventory.sh"
       locator: "Medido em 2026-09-27 contra o `harness-inventory.sh` de origin/main, em tres sandboxes construidos com `git archive HEAD` (copia FIEL da arvore rastreada). (1) SEM .git: rc=0, a tabela sai com CINCO contadores zerados, e o stderr traz a mensagem `sem indice git ... Recusa.` CINCO VEZES — contadas com grep -c. (2) Com git e tudo UNTRACKED (o cenario do adotante greenfield): mesmo resultado, rc=0. (3) No repo real: 80 scripts, 16 hooks, correto. Depois da cura: (1) rc=2 recusando ANTES de contar; (2) rc=2 nomeando `CONTRADICAO ... 75 arquivo(s) em disco ... contagem RASTREADA = 0`; (3) inalterado. Mutante que devolve o `_die` para dentro do `_tracked` e remove a assertiva: os dois casos de bancada REPROVAM, com rc=0 e a mensagem Recusa impressa."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_A_GUARDA_GRITAVA_CINCO_VEZES_E_NAO_PARAVA

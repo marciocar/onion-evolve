@@ -26,6 +26,7 @@ nodes:
       source: "db8d9844:docs/onion/identidade-onion-vps.md"
       locator: "db8d9844:docs/onion/identidade-onion-vps.md l.10-26; 4b3c70fb (corpo + diff de ops/bridge-auth/logto-provision.sh)"
       method: "leitura: prosa da doutrina commitada em db8d9844 (l.10-26) + corpo de 4b3c70fb"
+      locality: "repo"
 
   - id: C_TRES_MODELOS_DE_CONFIANCA
     node_type: claim
@@ -40,6 +41,7 @@ nodes:
       source: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
       locator: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md l.55-65; db8d9844:docs/onion/identidade-onion-vps.md l.56-70; corpo de 50516e84 item 2"
       method: "testemunho: medicao da sessao 2026-08-10 (prosa db8d9844 l.56-70: conexoes na 3011 = 0, authorize 400 no upgrade) re-verificada pelo run kg-freshness wf_7804d86f-3a7 em 2026-08-12, com a perna do bridge fechada a mao por leitura de identity.ts:34/45/126/129/133 (sem acesso hoje a /home/onion sem sudo); comandos dos workers nao registrados (journal ausente no host)"
+      locality: "repo"
 
   - id: C_REDE_ISOLADA_POR_CONSTRUCAO
     node_type: claim
@@ -54,6 +56,7 @@ nodes:
       source: ".claude/validation/vps-exposure-check.sh"
       locator: ".claude/validation/vps-exposure-check.sh l.9-16 (nasceu em db8d9844); db8d9844:docs/onion/identidade-onion-vps.md l.52-54 e l.124-129"
       method: "leitura: comando de refutacao registrado em vps-exposure-check.sh l.10-11 (docker exec onion-vps-waha curl http://172.17.0.1:3022/ -> 302) + prosa db8d9844 com a afirmacao original"
+      locality: "repo"
 
   # ── O QUE O MERCADO DIZ, E O QUE ISSO MUDA ──────────────────────────────────
   - id: E_RECUPERACAO_E_O_ELO_FRACO
@@ -70,6 +73,7 @@ nodes:
       source: "https://fidoalliance.org/fido-alliance-reports-accelerating-global-passkey-adoption-on-world-passkey-day-2026/"
       locator: "fido-2026-5bi-passkeys-75pct-ativaram-49pct-usam-owasp-e-nist-800-63-4"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ORG_LOGICA_NAO_E_FRONTEIRA
     node_type: evidence
@@ -85,6 +89,7 @@ nodes:
       source: "https://www.sentinelone.com/vulnerability-database/cve-2026-43912/"
       locator: "CVE-2026-43912-cvss-8.7-corrigido-em-1.35.5-rodamos-1.37.1"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CVE_LOGTO_NAO_TEM_PORTA_AQUI
     node_type: evidence
@@ -100,6 +105,7 @@ nodes:
       source: "https://kb.cert.org/vuls/id/492466"
       locator: "zero-conectores-sociais-zero-sso-empresarial-so-smtp"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   # ── AS TRES CORRECOES DE AFIRMACOES MINHAS ──────────────────────────────────
   - id: I_EU_DECLAREI_SSO_PROVADO_SEM_PROVAR
@@ -126,6 +132,7 @@ nodes:
       source: "db8d9844:docs/onion/identidade-onion-vps.md"
       locator: "db8d9844:docs/onion/identidade-onion-vps.md l.80, l.85-87, l.189-192; docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.40-41"
       method: "leitura: prosa db8d9844 + resíduo do #578 l.40-41"
+      locality: "repo"
 
   - id: I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE
     node_type: decision
@@ -141,6 +148,7 @@ nodes:
       source: "/home/marcio/onion-vps-logto@cc15d9b"
       locator: "cc15d9b (corpo) no clone /home/marcio/onion-vps-logto; .claude/hooks/bash-empty-result-guard.sh l.151"
       method: "leitura: commit cc15d9b do repo onion-vps-logto (2026-08-10) + hook do core l.151 (classe EXIT-CODE-DE-PIPE)"
+      locality: "host"
 
   # ── O QUE O ELENXO ACHOU E NINGUEM TINHA VISTO ──────────────────────────────
   - id: I_SEGUNDO_IDP_COM_CONSOLE_DESTRANCADO
@@ -157,6 +165,7 @@ nodes:
       source: "/home/marcio/onion-adopt-arandek-local@01ee76f"
       locator: "corpo de 01ee76f + README.md no clone /home/marcio/onion-adopt-arandek-local; docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.43, l.105-107; /home/marcio/onion-adopt-arandek/docker-compose.yml l.268 (logto:1.36.0)"
       method: "testemunho: medição da sessão 2026-08-11 registrada em 1ª pessoa em 01ee76f (onion-adopt-arandek-local) e no resíduo do #578; a saída SQL e a contagem de containers sem comando registrado"
+      locality: "host"
 
   - id: I_A1_A_MEDICAO_CAIU_A_CONCLUSAO_SOBREVIVEU
     node_type: decision
@@ -182,6 +191,7 @@ nodes:
       source: "037d4d3c"
       locator: "corpo de 037d4d3c (2 partes: fechamento + passada adversarial); docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.67-68, l.108-110; corpo de 0bb76d76"
       method: "leitura: corpos de 037d4d3c e 0bb76d76 + resíduo REGRA 56 do #578"
+      locality: "repo"
 
   - id: E_MEMORIA_DE_AGENTE_E_COMMODITY_PELO_DINHEIRO
     node_type: evidence
@@ -207,6 +217,7 @@ nodes:
       source: "https://decrypt.co/365897"
       locator: "decrypt.co/365897 (Jason Nelson, 28/04/2026), parágrafos 2-3 e 6-7"
       method: "leitura: reportagem do Decrypt sobre o incidente PocketOS/Railway"
+      locality: "web"
 
   # ── O QUE FALTA, MEDIDO ─────────────────────────────────────────────────────
   - id: Q_ISOLAMENTO_DO_BRIDGE_CHAVEIA_NO_TOKEN
@@ -223,6 +234,7 @@ nodes:
       source: "/home/marcio/onion-bridge-dev@e09d4c7"
       locator: "e09d4c7 e 8943e25 no clone /home/marcio/onion-bridge-dev (marciocar/onion-bridge); corpo do PR #2 de marciocar/onion-bridge (bancada Hono, 4ª req → 429); 037d4d3c (sha256 do sub); db8d9844:docs/onion/identidade-onion-vps.md l.135-146"
       method: "leitura: commits e09d4c7 (2026-08-11) e 8943e25 (2026-08-13) do onion-bridge + corpo de 037d4d3c + prosa db8d9844"
+      locality: "host"
 
   - id: Q_RECUPERACAO_NAO_EXISTE_ONDE_MAIS_DOI
     node_type: question
@@ -238,6 +250,7 @@ nodes:
       source: "db8d9844:docs/onion/identidade-onion-vps.md"
       locator: "db8d9844:docs/onion/identidade-onion-vps.md l.89-103; db8d9844:ops/bridge-auth/logto-provision.sh l.390-410 (host/porta/remetente/5 templates); corpo de f5d50f4b (SPF e Return-Path)"
       method: "leitura: prosa e logto-provision.sh em db8d9844 + corpo de f5d50f4b"
+      locality: "repo"
 
   - id: Q_MFA_EM_ZERO_MAS_QUANTIFICAR_ANTES
     node_type: question
@@ -253,6 +266,7 @@ nodes:
       source: "0bb76d76"
       locator: "corpo de 0bb76d76 item 2 + passada adversarial; db8d9844:docs/onion/identidade-onion-vps.md l.105-120"
       method: "leitura: corpo de 0bb76d76 + prosa db8d9844 l.105-120"
+      locality: "repo"
 
   - id: Q_METADE_DO_BRIDGE_FORA_DO_REPO
     node_type: question
@@ -267,6 +281,7 @@ nodes:
       source: "0bb76d76"
       locator: "corpo de 0bb76d76 item 1 + passada adversarial; 4584d4c9:ops/bridge-auth/README.md l.4-7 (bridge-src eliminada, derivou nas DUAS direções, identity.ts mais novo que produção); docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.42"
       method: "leitura: corpos de 0bb76d76 e 4584d4c9 + residuo do #578 l.42"
+      locality: "repo"
 
   - id: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     node_type: question
@@ -282,6 +297,7 @@ nodes:
       source: "dd0f3ffb"
       locator: "corpo de dd0f3ffb (bloco GPG, 2026-08-13); /home/marcio/onion-vps-vaultwarden 31cd4f9:backup-offsite.sh l.5-8"
       method: "leitura: corpo de dd0f3ffb + backup-offsite.sh no clone onion-vps-vaultwarden em 31cd4f9"
+      locality: "repo"
 
   - id: Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS
     node_type: question
@@ -296,6 +312,7 @@ nodes:
       source: "dd0f3ffb"
       locator: "corpo de dd0f3ffb (\"GPG — FECHADO PELO GATILHO QUE ELE MESMO DECLARAVA\"); corpo de 7d3c05a0"
       method: "testemunho: declaração do maestro em 2026-08-13 (\"gpg já foi\") registrada pela sessão em dd0f3ffb; shred do .asc e privada no chaveiro relatados pela sessão em 7d3c05a0"
+      locality: "repo"
 
   - id: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
     node_type: question
@@ -311,6 +328,7 @@ nodes:
       source: "docs/analysis/arandek-repo-exposure-2026-08.md"
       locator: "grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
     node_type: question
@@ -326,6 +344,7 @@ nodes:
       source: "b0cfa8f9"
       locator: "b0cfa8f9 (corpo, 2026-08-11); .claude/validation/vps-exposure-check.sh l.9-16 e l.81; docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.76-86"
       method: "leitura: corpo de b0cfa8f9 + header da guarda + residuo do #578"
+      locality: "repo"
 
   # ── A COSTURA COM O ONION COMO FRAMEWORK DE DESENVOLVIMENTO ─────────────────
   - id: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
@@ -340,6 +359,7 @@ nodes:
       source: "https://sourcegraph.com/blog/context-engineering"
       locator: "https://sourcegraph.com/blog/context-engineering"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "web"
 
   - id: Q_LACUNA_DECISAO_MAIS_CODIGO
     node_type: question
@@ -365,6 +385,7 @@ nodes:
       source: "3af49bb1"
       locator: "corpo de 3af49bb1 (PR #580, 2026-08-11); docs/evolution/review/fix-chronic-nodes-remodel.md l.5 (pass rc=2); /home/marcio/onion-vps-logto 2a4d992/4e99f87/dd1ba80"
       method: "leitura: corpo de 3af49bb1 + commits do onion-vps-logto de 2026-08-11"
+      locality: "repo"
 
   # ── O QUE A RE-VERIFICACAO DE 2026-08-12 ACHOU (run wf_7804d86f-3a7) ─────────
   - id: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
@@ -381,6 +402,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "cinco-nos-com-duas-linhas-verified-at-e-o-tsv-do-radar-devolvendo-a-ultima"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
     node_type: evidence
@@ -396,6 +418,7 @@ nodes:
       source: "/home/onion/onion-bridge/src/identity.ts"
       locator: "sudo-ls-lendo-o-diretorio-que-o-worker-declarou-permission-denied"
       method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/identity.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: C_NO_COMPOSTO_RECEBE_VEREDITO_ATOMICO
     node_type: claim
@@ -410,6 +433,7 @@ nodes:
       source: "50516e84:.claude/commands/meta/kg-freshness.md"
       locator: "50516e84:.claude/commands/meta/kg-freshness.md l.149-212; corpo do commit 50516e84 (PR #584)"
       method: "leitura: schema KgReverifySchema e nota do fan-in em 50516e84 + corpo do commit (Elenxo item 5)"
+      locality: "repo"
 
   - id: A_SINTESE_DO_RUN_DE_REVERIFICACAO
     node_type: artifact
@@ -425,6 +449,7 @@ nodes:
       source: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
       locator: "arquivo-versionado-com-frontmatter-run-id-tokens-agents-duration"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_CARIMBO_A_MAO_INSERE_EM_VEZ_DE_SUBSTITUIR
     node_type: claim
@@ -440,6 +465,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "sete-instancias-em-tres-grafos-achadas-so-depois-que-a-guarda-existiu"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA
     node_type: evidence
@@ -456,6 +482,7 @@ nodes:
       source: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
       locator: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md l.69-74; /home/marcio/onion-vps-vaultwarden 31cd4f9:backup-offsite.sh l.1-8"
       method: "leitura: relatório do run kg-freshness de 2026-08-12 (achado 3) + backup-offsite.sh no clone em 31cd4f9"
+      locality: "repo"
 
   - id: Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO
     node_type: question
@@ -471,6 +498,7 @@ nodes:
       source: "d761c963"
       locator: "corpo de d761c963 (selos AskUserQuestion 2026-08-30, SUPERSEDES no Q_BACKUP)"
       method: "leitura: corpo de d761c963"
+      locality: "repo"
 
   - id: E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO
     node_type: evidence
@@ -486,6 +514,7 @@ nodes:
       source: "docs/analysis/granaai-compose-exposure-2026-08.md"
       locator: "docs/analysis/granaai-compose-exposure-2026-08.md l.1-25; 91daebce (corpo, censo lote 5)"
       method: "leitura: doc de analise versionado (medicao do censo de 2026-08-30, run wf_2349bf29-ea0) + corpo de 91daebce"
+      locality: "repo"
 
   - id: Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO
     node_type: question
@@ -501,6 +530,7 @@ nodes:
       source: "dd89ddd4"
       locator: "corpo de dd89ddd4 (2026-08-30) + docs/evolution/review/fix-offsite-destination-truth.md (dd89ddd4, itens 1-3 e §O que mudou no grafo: chaves R2 já no pass); corpo de 3eaecc6d; docs/evolution/review/chore-seal-queue-maestro.md l.42-49"
       method: "leitura: corpos de dd89ddd4 e 3eaecc6d + residuo REGRA 56 da fila de selos"
+      locality: "repo"
 
   - id: Q_MAIS_UM_IMUTAVEL_GATED
     node_type: question
@@ -516,6 +546,7 @@ nodes:
       source: "3eaecc6d"
       locator: "corpo de 3eaecc6d; docs/evolution/review/feat-offsite-proven.md l.27-31; /home/marcio/onion-vps-vaultwarden 31cd4f9:backup-offsite.sh l.25-26, l.45-48"
       method: "leitura: corpo de 3eaecc6d (decisao com o maestro 2026-08-31) + cabecalho de backup-offsite.sh no clone com sha"
+      locality: "repo"
 
   - id: E_CLASSE_DE_EXPOSICAO_VIROU_REGRA_64
     node_type: evidence
@@ -531,6 +562,7 @@ nodes:
       source: ".claude/validation/lint-artifacts.sh (REGRA 64) · docs/analysis/granaai-compose-exposure-2026-08.md · docs/analysis/arandek-compose-fallbacks-message-2026-08.md"
       locator: "dogfood 4/4 acusacoes no compose ruim + 0 no curado; bancada 3/3 (acusa, cura passa, untracked fora); registry regenerado com a 64 classificada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CENSO0901_Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_D
     node_type: evidence
@@ -545,6 +577,7 @@ nodes:
       source: "f1cb21c9:.claude/validation/lint-artifacts.sh"
       locator: "f1cb21c9:.claude/validation/lint-artifacts.sh l.3476 (REGRA 64 [HARD]); corpo de 91daebce (gatilho disparou, 2026-08-30); corpo de b0cfa8f9 (GATED no segundo adotante)"
       method: "leitura: commits b0cfa8f9, 91daebce e f1cb21c9 (REGRA 64 HARD em 2026-08-31)"
+      locality: "repo"
 
   - id: Q_SENHA_CHAVE_ESTADO_2026_09
     node_type: question
@@ -560,6 +593,7 @@ nodes:
       source: "docs/evolution/review/fix-chronic-nodes-remodel.md"
       locator: "docs/evolution/review/fix-chronic-nodes-remodel.md l.5, l.16-17 (5adb88b0); /home/marcio/onion-vps-logto dd1ba80:backup.sh l.29-33, l.82; /home/marcio/.gnupg/gpg-agent.conf l.2"
       method: "testemunho: remodelagem manual da sessão de 2026-09-01 registrada no resíduo (pass rc=2, chmod 600, 3 up.sh) + leitura do arquivo /home/marcio/.gnupg/gpg-agent.conf no host (default-cache-ttl 28800)"
+      locality: "repo"
 
   - id: E_REFUTA_Q_LACUNA_DECISAO_MAIS_CODIGO
     node_type: evidence
@@ -575,6 +609,7 @@ nodes:
       source: "https://api.github.com/repos/ruevu/cortex"
       locator: "https://api.github.com/repos/ruevu/cortex (created_at 2026-04-11; README l.261/267 supersede/SUPERSEDES); github.com/Graphify-Labs/graphify (created_at 2026-04-03); github.com/sverklo/sverklo README l.127 (conflicts sem auto-resolução); docs/evolution/review/fix-chronic-nodes-remodel.md l.5, l.18-19"
       method: "leitura: datas de criacao imutaveis via GitHub API + residuo REGRA 56 da etapa 4 (worker opus com WebSearch real, 5 contraexemplos)"
+      locality: "web"
 
   - id: Q_REFUTES_EDGE_SEM_PAR
     node_type: question

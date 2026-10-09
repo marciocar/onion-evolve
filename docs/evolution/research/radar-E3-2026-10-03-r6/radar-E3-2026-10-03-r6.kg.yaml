@@ -79,6 +79,7 @@ nodes:
       source: "docs/onion/radar-baselines.yaml"
       locator: "data/2.1.280.txt e data/2.1.284.txt (verbatim); grep em docs/onion/radar-baselines.yaml l.49-52 e grep -rl opus-5-5 = 0 sitios"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: D_SESSION_MODELS_PRECISA_DO_OPUS_5_5
     node_type: decision
@@ -94,6 +95,7 @@ nodes:
       source: "docs/onion/radar-baselines.yaml"
       locator: "E_OPUS_5_5_E_O_NOVO_DEFAULT_E_A_CASA_O_VETA; o eixo E6 tem last_run proprio e nao foi rodado nesta leva. REFORCO COLHIDO NA CONFERENCIA DE ATRIBUICAO (data/2.1.280.txt l.80, verbatim): \"Changed an effort level saved before /effort became per-model to no longer apply to newly released models such as Opus 5.5; they start at their default until you pick a level\" — logo a ESCADA da casa (model+effort por fase) nao herda effort em modelo novo, o que torna a (b) \"re-medir a escada inteira\" mais forte do que parecia: nao e so o nome do modelo que muda, e o effort efetivo. Conferido tambem que o `Added` do opus-5-5 mora na 2.1.280 l.2 e que as mencoes na 2.1.287/288 sao `Fixed`/`Changed` — a checagem que a 1a passada nao fez."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_DOCTOR_PROMPT_AUDIT_MEDE_A_METADE_QUE_NINGUEM_MEDE
     node_type: evidence
@@ -110,6 +112,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-10-03-r6/data/2.1.283.txt"
       locator: "verbatim em data/2.1.283.txt; a tese do fosso esta em CLAUDE.md (26.596 shell x 52.655 markdown)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_MOD_YOU_SHOULD_KNOW_E_UM_ELENXO_FRACO
     node_type: question
@@ -138,6 +141,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-10-03-r6/data/2.1.288.txt"
       locator: "l.58 'Fixed PreToolUse and PermissionRequest hooks being skipped when matching them failed… the call is now blocked'"
       method: "leitura: changelog 2.1.288 verbatim em data/"
+      locality: "repo"
 
   - id: Q_SKILL_VERIFY_E_ABSORCAO_SEM_TROCAR_MECANISMO
     node_type: question
@@ -166,6 +170,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-10-03-r6/data/"
       locator: "verbatim em data/2.1.281.txt, data/2.1.282.txt e data/2.1.283.txt"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_FLUXO_NAO_CHECA_CONTIGUIDADE_DE_VERSAO
     node_type: question
@@ -181,6 +186,7 @@ nodes:
       source: "docs/onion/radar-baselines.yaml"
       locator: "grep por contiguidade em .claude/validation/*.sh devolve so casos de shard de bancada; a baseline do E3 guarda cc_version desde a rodada 5"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA
     node_type: question
@@ -207,6 +213,7 @@ nodes:
       source: ".claude/commands/meta/radar.md"
       locator: "etapa 5 de radar.md cobre apenas veredito que derruba decisao selada; os tres achados de capacidade desta rodada nao tem destino no fluxo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_WEBFETCH_RESUME_E_INVENTA_ATRIBUICAO
     node_type: evidence
@@ -223,6 +230,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-10-03-r6/data/"
       locator: "duas chamadas de WebFetch contra a mesma URL, com atribuicoes divergentes entre si e divergentes da extracao por ancora; os 9 blocos crus estao em data/"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CORPUS_VIROU_INSTRUMENTO_DE_ISENCAO
     node_type: evidence
@@ -239,6 +247,7 @@ nodes:
       source: ".claude/validation/kg-corpus-grep.sh"
       locator: "kg-corpus-grep.sh rodado depois da cura imprime imp= e conf=; os tres nos foram lidos e seus campos conferidos um a um"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_JUIZ_REPROVOU_CINCO_DE_SEIS
     node_type: evidence
@@ -254,6 +263,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-10-03-r6/SYNTHESIS.md"
       locator: "l.76 'Placar do juiz: 1 aprovado · 5 reprovados · 1 lacuna genuína' + l.9 tokens: 122349"
       method: "juízes: juiz opus/high em worktree isolada (placar registrado na SYNTHESIS)"
+      locality: "repo"
 
   - id: E_A_GUARDA_VETOU_O_PROPRIO_MAESTRO
     node_type: evidence
@@ -271,6 +281,7 @@ nodes:
       source: "/home/marcio/onion-evolve/.claude/sessions/model-switch.jsonl (host) + /tmp/claude-1000/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/scratchpad/sw.jsonl (host) + commit 08f67521 + commit 4ead57a1 / PR #907"
       locator: "model-switch.jsonl l.34 (2026-10-03T23:08:12Z, PreModelSwitch opus-5→opus-5-5, picker, block; único veto de 10-03); sw.jsonl l.1-3 (23:09:38Z: allow restored; block haiku-3; block sonnet-5 degraded); 08f67521^:.claude/hooks/premodelswitch-guard.sh l.79 e radar-baselines.yaml l.51-53; 4ead57a1 (autor 2026-10-03T14:02:43Z) já contém E_OPUS_5_5 l.62"
       method: "testemunho: leitura de .claude/sessions/model-switch.jsonl e scratchpad/sw.jsonl no host 2026-10-09 (não versionados), mais leitura dos commits 08f67521 e 4ead57a1"
+      locality: "host"
 
 edges:
   - from: E_ESCOPO_REAL_NOVE_VERSOES

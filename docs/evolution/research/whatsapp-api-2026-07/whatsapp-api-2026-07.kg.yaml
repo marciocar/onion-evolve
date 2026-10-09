@@ -54,6 +54,7 @@ nodes:
       source: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md:3, :7, :27 @a6d2524f"
       method: "leitura: SYNTHESIS da pesquisa WhatsApp (§Veredito)"
+      locality: "repo"
   - id: D_FINTECH_OFICIAL
     node_type: decision
     plane: DEV
@@ -66,6 +67,7 @@ nodes:
       source: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md:3-5 @a6d2524f"
       method: "leitura: SYNTHESIS da pesquisa WhatsApp (cenário A)"
+      locality: "repo"
   - id: D_DOGFOOD_WAHA
     node_type: decision
     plane: DEV
@@ -79,6 +81,7 @@ nodes:
       source: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md:8, :10, :27, :31 @a6d2524f"
       method: "leitura: SYNTHESIS da pesquisa WhatsApp (veredito cenário B)"
+      locality: "repo"
   - id: C_S1_F1
     node_type: claim
     plane: DEV
@@ -93,6 +96,7 @@ nodes:
       source: "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S1_F10
     node_type: claim
     plane: DEV
@@ -117,6 +121,7 @@ nodes:
       source: "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S1_F3
     node_type: claim
     plane: DEV
@@ -141,6 +146,7 @@ nodes:
       source: "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S1_F5
     node_type: claim
     plane: DEV
@@ -155,6 +161,7 @@ nodes:
       source: "https://developers.facebook.com/documentation/business-messaging/whatsapp/messaging-limits"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S1_F6
     node_type: claim
     plane: DEV
@@ -199,6 +206,7 @@ nodes:
       source: "https://business.whatsapp.com/policy"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S2_F1
     node_type: claim
     plane: DEV
@@ -225,6 +233,7 @@ nodes:
       source: "https://www.interakt.shop/pt/blog/the-guide-to-migrate-whatsapp-business-api-number-from-one-provider-to-another/"
       locator: "revisita-2026-09-03: voto adversarial 3-0 SUSTENTOU a claim contra https://www.interakt.shop/pt/blog/the-guide-to-migrate-whatsapp-business-api-number-from-one-provider-to-another/ (tier 4, blog de vendor sobre migração) — único nó de julho a sobreviver à revisita"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: C_S2_F11
     node_type: claim
     plane: DEV
@@ -259,6 +268,7 @@ nodes:
       source: "https://www.infobip.com/docs/whatsapp"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S2_F3
     node_type: claim
     plane: DEV
@@ -353,6 +363,7 @@ nodes:
       source: "https://docs.evolutionfoundation.com.br/licensing/faq"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S3_F3
     node_type: claim
     plane: DEV
@@ -367,6 +378,7 @@ nodes:
       source: "https://github.com/WhiskeySockets/Baileys"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S3_F4
     node_type: claim
     plane: DEV
@@ -391,6 +403,7 @@ nodes:
       source: "https://github.com/wppconnect-team/wppconnect"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S3_F6
     node_type: claim
     plane: DEV
@@ -405,6 +418,7 @@ nodes:
       source: "https://github.com/pedroslopez/whatsapp-web.js"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S3_F7
     node_type: claim
     plane: DEV
@@ -419,6 +433,7 @@ nodes:
       source: "https://github.com/orkestral/venom/commits/master"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S3_F8
     node_type: claim
     plane: DEV
@@ -433,6 +448,7 @@ nodes:
       source: "https://github.com/WhiskeySockets/Baileys"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S4_F1
     node_type: claim
     plane: DEV
@@ -447,6 +463,7 @@ nodes:
       source: "https://www.whatsapp.com/legal/business-terms"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S4_F10
     node_type: claim
     plane: DEV
@@ -461,6 +478,7 @@ nodes:
       source: "https://techcrunch.com/2026/01/13/brazil-orders-meta-to-suspend-policy-banning-third-party-ai-chatbots-from-whatsapp/"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S4_F2
     node_type: claim
     plane: DEV
@@ -475,6 +493,7 @@ nodes:
       source: "https://www.whatsapp.com/legal/terms-of-service"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S4_F3
     node_type: claim
     plane: DEV
@@ -503,6 +522,7 @@ nodes:
       source: "https://github.com/WhiskeySockets/Baileys/issues/1869"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S4_F5
     node_type: claim
     plane: DEV
@@ -567,6 +587,7 @@ nodes:
       source: "https://github.com/WhiskeySockets/Baileys"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S5_F2
     node_type: claim
     plane: DEV
@@ -581,6 +602,7 @@ nodes:
       source: "https://github.com/EvolutionAPI/evolution-api"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S5_F3
     node_type: claim
     plane: DEV
@@ -595,6 +617,7 @@ nodes:
       source: "https://github.com/wwebjs/whatsapp-web.js/issues"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S5_F4
     node_type: claim
     plane: DEV
@@ -609,6 +632,7 @@ nodes:
       source: "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S5_F5
     node_type: claim
     plane: DEV
@@ -633,6 +657,7 @@ nodes:
       source: "https://github.com/wwebjs/whatsapp-web.js/issues"
       locator: "market-2026-07"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
   - id: C_S5_F7
     node_type: claim
     plane: DEV
@@ -690,6 +715,7 @@ nodes:
       source: "https://blueticks.co/blog/whatsapp-business-pricing-change-2026-per-message"
       locator: "voto adversarial 2026-09-03 sobre https://blueticks.co/blog/whatsapp-business-pricing-change-2026-per-message — REPROVADO: blog agregador sem confirmação na página primária de pricing da Meta"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_QUALITY_RATING_REVISITA_20260903
     node_type: evidence
     plane: DEV
@@ -706,6 +732,7 @@ nodes:
       source: "https://getkanal.com/blog/whatsapp-business-quality-rating-explained"
       locator: "voto adversarial 2026-09-03 sobre https://getkanal.com/blog/whatsapp-business-quality-rating-explained — REPROVADO: mecânica do quality rating descrita só por blog de vendor, sem doc primária da Meta"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_TEMPLATE_RULES_REVISITA_20260903
     node_type: evidence
     plane: DEV
@@ -722,6 +749,7 @@ nodes:
       source: "https://chatmaxima.com/blog/whatsapp-business-api-pricing-2026-complete-guide/"
       locator: "voto adversarial 2026-09-03 sobre https://chatmaxima.com/blog/whatsapp-business-api-pricing-2026-complete-guide/ — REPROVADO de novo: limite de 550 caracteres e máximo de 10 emojis não aparecem em fonte primária"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_BSP_BRAZIL_PLAYERS_REVISITA_20260903
     node_type: evidence
     plane: DEV
@@ -738,6 +766,7 @@ nodes:
       source: "https://www.messagecentral.com/blog/best-whatsapp-business-api-providers-brazil"
       locator: "voto adversarial 2026-09-03 sobre https://www.messagecentral.com/blog/best-whatsapp-business-api-providers-brazil — REPROVADO: listicle de vendor sobre concorrentes (vendor-on-competitor, sempre suspeito pela cláusula 7)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_360DIALOG_MARKUP_REVISITA_20260903
     node_type: evidence
     plane: DEV
@@ -754,6 +783,7 @@ nodes:
       source: "https://setsmart.io/blog/whatsapp-business-api-pricing"
       locator: "voto adversarial 2026-09-03 sobre https://setsmart.io/blog/whatsapp-business-api-pricing — REPROVADO de novo: markup atribuído à 360dialog não confere com nenhuma página do próprio fornecedor"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
   - id: E_MERCADO_WHATSAPP_REVISITA_20260903
     node_type: evidence
     plane: DEV
@@ -769,6 +799,7 @@ nodes:
       source: "docs/evolution/review/feat-research-lens-f4.md"
       locator: "docs/evolution/review/feat-research-lens-f4.md:5; corpo de 79a8a878; whatsapp-api-2026-07.kg.yaml:195,255"
       method: "testemunho: eixo mercado do run wf_9487391f da sessão 2026-09-03 (Claude-Session session_01J14a87…), journal não preservado no host"
+      locality: "repo"
   - id: E_LACUNAS_WHATSAPP_REVISITA_20260903
     node_type: evidence
     plane: DEV
@@ -785,6 +816,7 @@ nodes:
       source: "79a8a878:docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md · docs/evolution/review/feat-research-lens-f4.md"
       locator: "SYNTHESIS@79a8a878 l.44-53 (§Revisita 2026-09-03); resíduo l.5 (wf_9487391f 1,32M: 1 reconfirmado, 5 SUPERSEDES)"
       method: "leitura: apêndice datado da revisita no SYNTHESIS (commit 79a8a878) e resíduo R56 do PR"
+      locality: "repo"
 
 edges:
   - from: C_S1_F1

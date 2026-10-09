@@ -21,6 +21,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "medido 2026-09-07: `kg-radar.sh <g> --integrity --schema` imprimia SO o cabecalho INTEGRIDADE; `--schema` sozinho imprime o dele. Causa: MODE=${2:---all} le so o $2. Sitios com a forma de dois modos, medidos por tipo: 22 ocorrencias em 6 arquivos .sh (executavel, incluindo os dois gates de passo zero e o predicado de selo) + 67 em 52 .md (prosa) + 6 outros. Rodando --schema sozinho: 0 reprovam entre os 92 grafos versionados nao-fixture (o corpus tem 125 no total; as 2 fixtures que reprovam existem para isso)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_LISTA_DE_VERSOES_MENTE_SOBRE_MATURIDADE
     node_type: evidence
@@ -36,6 +37,7 @@ nodes:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
       locator: "medido na fonte em 2026-09-07: `npm view @base-ui-components/react versions` termina em 1.0.0-rc.0 (parece imaturo); `npm view @base-ui-components/react deprecated` devolve 'Package was renamed to @base-ui/react'; `npm view @base-ui/react version` devolve 1.8.0 estavel"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO
     node_type: claim
@@ -51,6 +53,7 @@ nodes:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
       locator: "os dois sinais desta rodada, medidos no core: o radar rodava um modo e devolvia exit 0 como se fossem dois; e `npm view versions` descreve fielmente o historico de um nome abandonado e por isso engana sobre maturidade. Em ambos o artefato responde a verdade a uma pergunta que nao era a que importava"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_CENSO_EM_VOO_LE_NOME_DE_BRANCH
     node_type: evidence
@@ -66,6 +69,7 @@ nodes:
       source: ".claude/commands/meta/drive.md"
       locator: "medido 2026-09-07: o censo do grafo do plano em origin/main devolve pronto=12 bloqueado=13 sobre 39 nos, com 12 fechados — entre eles D_PR01_STRICT_LIMPO (PR #815 mergeado). A afirmacao contraria ('o plano ainda nao comecou') foi produzida lendo `git worktree list` e vendo a branch `fix/merge-verified-false-negative`, que nao e no do plano"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_RADAR_IGNORAVA_O_SEGUNDO_MODO

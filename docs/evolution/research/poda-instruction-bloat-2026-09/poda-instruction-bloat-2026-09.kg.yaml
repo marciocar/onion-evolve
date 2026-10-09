@@ -57,6 +57,7 @@ nodes:
       source: "https://www.alphaxiv.org/abs/2608.11095"
       locator: "https://www.alphaxiv.org/abs/2608.11095 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_RADAR_V34_BLOAT_CAUTION_SKILLS_TRIAL
     node_type: evidence
@@ -75,6 +76,7 @@ nodes:
       source: "https://www.thoughtworks.com/en-br/radar/techniques/agent-skills"
       locator: "https://www.thoughtworks.com/en-br/radar/techniques/agent-skills — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EVIDÊNCIA LOCAL tier 10 (o artefato instalado e o proprio repo) ──────────────────────
   - id: E_MEDIDO_LOCAL_TIER10_NO_PROPRIO_REPO
@@ -94,6 +96,7 @@ nodes:
       source: "CLAUDE.md · .claude/skills/*/SKILL.md · /home/marcio/.local/share/claude/versions/2.1.259"
       locator: "medicao propria, 4 comandos no repo e no binario instalado: (1) `git log --follow --numstat -- CLAUDE.md` = 59 commits, adds=323, dels=77, maior remocao unica de toda a historia = 5 linhas; (2) `wc -lc CLAUDE.md` = 246 linhas / 17.041 bytes (~5k tokens = ~0,5% de uma janela de 1M); (3) `grep -n \"^paths:\" .claude/skills/*/SKILL.md` = onion-patterns [\".claude/**\",\"docs/onion/**\"] e onion-validation [\".claude/**\"] JA declaram escopo por path; (4) `grep -ao InstructionsLoaded <binario 2.1.259>` = 21 ocorrencias, incluindo executeInstructionsLoadedHooks / hasInstructionsLoadedHook e a lista de eventos de hook — o hook EXISTE no artefato instalado."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "host"
 
   # ── A PREMISSA DO CORPUS QUE ESTA RODADA DERRUBA ────────────────────────────────────────
   - id: C_PREMISSA_SKILLS_SEMPRE_CARREGADAS
@@ -123,6 +126,7 @@ nodes:
       source: "https://www.thoughtworks.com/en-br/radar/techniques/agent-skills"
       locator: "varredura do eixo mercado/capital sobre as 12 claims da rodada: nenhuma rodada de investimento, M&A, valuation ou down round nomeado sobreviveu aos votos; o unico sinal de mercado e o analista (Thoughtworks Radar v34, abr/2026)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   # ── LACUNAS DECLARADAS (clausula 6 + regua de saida #2) ──────────────────────────────────
   - id: E_LACUNAS_DECLARADAS_PODA_0903
@@ -204,6 +208,7 @@ nodes:
       source: "https://www.alphaxiv.org/abs/2608.11095"
       locator: "a propria triagem da rodada: quatro claims saem do mesmo preprint (alphaXiv 2608.11095) e receberam vereditos opostos — a manchete do log-hazard -0.032 CONFIRMADA, e as tres irmas REFUTADAS (O(1) para adicionar vs O(2^|D|) para deletar; \"poda estruturada eliminou 99,3%\"; \"refactor nao-estruturado retoma +4,1% a +4,9%\"). Teste local que ninguem rodou e custa 1 comando: `git log --follow --numstat -- CLAUDE.md` = 59 commits, adds=323, dels=77, maior remocao unica = 5 linhas."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_PREMISSA_SUPERESTIMADA_CINCO_VEZES
     node_type: evidence
@@ -221,6 +226,7 @@ nodes:
       source: "https://www.thoughtworks.com/en-br/radar/techniques/agent-skills"
       locator: "tres furos medidos: (a) mistura de aneis — Agent Skills esta em TRIAL, nao e avaliacao CAUTION, e a correcao foi cortada por orcamento nesta mesma rodada; (b) `wc -c CLAUDE.md` = 17.041 bytes (~5k tokens) contra janela de 1M = ~0,5%, logo \"esgotamento da janela de contexto\" nao e o constrangimento vivo; (c) a listagem de skills desta propria sessao mostra apenas as `description` no contexto, e `grep -n \"^paths:\" .claude/skills/*/SKILL.md` devolve onion-patterns e onion-validation ja escopadas."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_SKILLS_JA_SAO_SOB_DEMANDA
     node_type: evidence
@@ -239,6 +245,7 @@ nodes:
       source: "docs/knowledge-base/tools/agent-skills.md"
       locator: "artefato instalado, 1 comando, sem web: binario /home/marcio/.local/share/claude/versions/2.1.259 + a listagem de skills do proprio prompt desta sessao (so descriptions no contexto; o corpo de onion-orchestration, 296 linhas, so entra via ferramenta Skill) + docs/knowledge-base/tools/agent-skills.md:131 documentando `paths` para skill"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO
     node_type: evidence
@@ -257,6 +264,7 @@ nodes:
       source: "https://arxiv.org/pdf/2507.11538"
       locator: "https://arxiv.org/pdf/2507.11538 (tier 8) — \"o padrao de degradacao por densidade correlaciona com tamanho do modelo e capacidade de raciocinio, ou seja, o efeito NAO e uniforme\" — cruzado com a doutrina de tiering do repo (memoria efficiency-over-economy: model+effort por fase; opus-5[1m] no maestro, modelos menores em subagentes)"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_CUSTO_ASSIMETRICO_ADICIONAR_VS_DELETAR
     node_type: evidence
@@ -275,6 +283,7 @@ nodes:
       source: "https://www.alphaxiv.org/abs/2608.11095"
       locator: "https://www.alphaxiv.org/abs/2608.11095 (tier 7) — \"adicionar instrucoes custa O(1), deletar com seguranca custa O(2^|D|)\" — o MESMO preprint cuja manchete a rodada MANTEVE; corroborado localmente por adds=323 / dels=77 em 59 commits e maior remocao unica = 5 linhas"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_REGISTRAR_O_PORQUE_DE_CADA_INSTRUCAO
     node_type: evidence
@@ -293,6 +302,7 @@ nodes:
       source: "https://www.alphaxiv.org/abs/2608.11095"
       locator: "https://www.alphaxiv.org/abs/2608.11095 (tier 7) — \"medir primeiro (telemetria de quais instrucoes influenciam decisoes) + comentarios registrando por que cada instrucao foi criada + poda estruturada eliminou 99,3% das instrucoes excedentes, mas so quando estruturada\" — terceira claim do mesmo preprint, refutada enquanto a manchete ficou de pe"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_LOST_IN_THE_MIDDLE_E_O_MECANISMO_CAUSAL
     node_type: evidence
@@ -311,6 +321,7 @@ nodes:
       source: "docs/evolution/research/kg-read-leg-2026-08/"
       locator: "https://www.thoughtworks.com/radar/techniques/agent-instruction-bloat (tier 6) — \"instrucoes longas e conflitantes fazem o modelo atender menos ao conteudo enterrado no meio de contextos longos\" — corroborado ao vivo pelo corpus: kg-read-leg-2026-08/E_claude_md_has_control (a secao entrou no CLAUDE.md em 2026-06-22 e o caso C1 falhou ~6 semanas depois SOB ELA CARREGADA, com o agente arbitrando entre imperativos concorrentes) e o placar kg-read-leg-2026-08/E_replay_scoreboard (cura A = 1/9)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903
     node_type: evidence
     plane: PROD
@@ -327,6 +338,7 @@ nodes:
       source: "docs/analysis/poda-instrucoes-protocolo-2026-09.md"
       locator: "binario instalado 2.1.259 (~/.local/share/claude/versions/2.1.259, strings): schema Toe = base + file_path + memory_type in [User,Project,Local,Managed] + load_reason in Eoe=[session_start,nested_traversal,path_glob_match,include,compact] + globs? + trigger_file_path? + parent_file_path?; 15 ocorrencias"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   # ── evidências sustentam a pergunta ──

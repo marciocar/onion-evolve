@@ -27,6 +27,7 @@ nodes:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "critico-adversarial-mais-re-medicao-independente"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_tres_erros_medidos
     node_type: evidence
@@ -57,6 +58,7 @@ nodes:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "critico-mais-verificacao"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── O QUE SOBREVIVE (acionavel) ──
   - id: C_waha_orfao_desligar
@@ -73,6 +75,7 @@ nodes:
       source: "/home/marcio/onion-vps-waha/docker-compose.yml"
       locator: "docker-ps-mais-grep-no-src-do-bridge"
       method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: C_producao_nao_e_o_repo
     node_type: claim
@@ -88,6 +91,7 @@ nodes:
       source: "/home/onion/onion-bridge"
       locator: "rev-list-HEAD..origin-main-no-checkout-de-producao-do-bridge-0-a-frente-0-atras"
       method: "testemunho: leitura do arquivo /home/onion/onion-bridge no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: C_bypass_permissions_exposto
     node_type: claim
@@ -103,6 +107,7 @@ nodes:
       source: "/home/onion/onion-bridge/.env"
       locator: "env-de-producao-do-bridge"
       method: "testemunho: leitura do arquivo /home/onion/onion-bridge/.env no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: C_medir_firewall_antes
     node_type: claim
@@ -118,6 +123,7 @@ nodes:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "critica-ao-rotulo-gatilho-disparado"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_ntfy_default_publico
     node_type: claim
@@ -133,6 +139,7 @@ nodes:
       source: ".claude/utils/co-evolution/mail-receiver.sh"
       locator: "leitura-do-mail-receiver.sh"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_downstream_parado_nao_partido
     node_type: evidence
@@ -148,6 +155,7 @@ nodes:
       source: "docs/evolution/federation/outbox/"
       locator: "find-nos-8-outboxes"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── A REGRA QUE SOBREVIVE (do F2-b) ──
   - id: D_regra_5_portoes
@@ -164,6 +172,7 @@ nodes:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "F2b-veredito-3-dimensoes-web-verificadas"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_assimetria_do_custo
     node_type: claim
@@ -179,6 +188,7 @@ nodes:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "F2b-custo-total-e-contrafactual"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_dissent_seguranca_isolamento
     node_type: claim
@@ -194,6 +204,7 @@ nodes:
       source: "/home/onion/onion-bridge/src/server.ts"
       locator: "leitura-do-server.ts-do-bridge"
       method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/server.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   # ── ANTI-CATALOGO (sobreviveu inteiro) ──
   - id: D_anti_catalogo
@@ -210,6 +221,7 @@ nodes:
       source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
       locator: "§O anti-catálogo (l.46-53)"
       method: "leitura: SYNTHESIS.md da rodada stack-harmonia"
+      locality: "repo"
 
   - id: C_tunneling_nome_errado
     node_type: claim
@@ -225,6 +237,7 @@ nodes:
       source: "/etc/caddy/Caddyfile"
       locator: "F2b-pesquisa-tunneling"
       method: "testemunho: leitura do arquivo /etc/caddy/Caddyfile no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: Q_publicar_ou_nao
     node_type: question
@@ -249,6 +262,7 @@ nodes:
       source: "docs/analysis/onion-adr-hosted-service-identity-2026-08.md"
       locator: "adr-ratificado-pelo-maestro-2026-08-01"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ── RECONCILIAÇÃO de 2026-08-08 — e estes nós vivem AQUI de propósito ──────────────────────────
   # O radar só enxerga arestas DENTRO de um arquivo. Escrevi a refutação e a política num grafo de
@@ -269,6 +283,7 @@ nodes:
       source: "/home/onion/onion-bridge"
       locator: "rev-list-nos-dois-sentidos-no-checkout-de-producao-mais-status-porcelain-limpo"
       method: "testemunho: leitura do arquivo /home/onion/onion-bridge no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
 
   - id: PO_ferramenta_da_vps_nao_se_encerra
     node_type: policy
@@ -284,6 +299,7 @@ nodes:
       source: "docs/onion/graph/fios-abertos.kg.yaml"
       locator: "diretriz-do-maestro-2026-08-08-dada-depois-de-eu-propor-desligar-o-waha"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 edges:
   - from: E_tres_erros_medidos

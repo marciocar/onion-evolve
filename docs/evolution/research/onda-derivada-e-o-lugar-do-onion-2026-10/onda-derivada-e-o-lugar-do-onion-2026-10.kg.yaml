@@ -142,6 +142,7 @@ nodes:
       source: ".claude-plugin/marketplace.json"
       locator: "medição nesta máquina em 2026-10-01, na raiz do repo: `ls plugins/` devolve 5 diretórios (onion, onion-compliance, onion-design, onion-engineering, onion-product); `python3 -c json.load` sobre `.claude-plugin/marketplace.json` devolve `len(plugins) == 5`. O `grep -c '\"name\"'` no mesmo arquivo devolve 12 — e é ESSE o número que circulava: 12 é a contagem de chaves `name` incluindo `owner` e `metadata` aninhados, não de entradas de plugin."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_MEDIDO_BLOAT_DO_PROPRIO_CORE_1001
     node_type: evidence
@@ -160,6 +161,7 @@ nodes:
       source: "commit 44ceba79 (pai do 30eecf28, árvore medida) · commit 30eecf28"
       locator: "git ls-tree -r 44ceba79 .claude/ — .md fora de fixtures: 408 arquivos, 71.675 linhas; .sh: 48.757 (sem fixtures) / 48.950 (todos)"
       method: "testemunho: medição da sessão 2026-10-01 (commit 30eecf28), comando parcialmente registrado ('git ls-files, fixtures excluídos'); aviso de teto do MEMORY.md é evento da sessão"
+      locality: "repo"
 
   - id: E_CORPUS_O_QUE_AS_RODADAS_DE_HOJE_JA_MEDIRAM
     node_type: evidence
@@ -178,6 +180,7 @@ nodes:
       source: "docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml"
       locator: "corpus das rodadas irmãs do mesmo dia (unidade-bilhetavel-do-onion-2026-10 e motores-de-regras-deterministicos-2026-10), injetado nesta rodada pela cláusula 0 e NÃO repago aqui"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   # ═══════════════════ EVIDÊNCIAS CONFIRMADAS (15 nós / 19 claims) ═══════════════════
 
@@ -198,6 +201,7 @@ nodes:
       source: "https://code.claude.com/docs/en/changelog"
       locator: "https://code.claude.com/docs/en/changelog — votos 2-1 (não unânime); duas entradas em CINCO dias de calendário na MESMA linha de release: 2.1.281 em 2026-09-23 (assume_role em upstreams Bedrock) e 2.1.284 em 2026-09-28 (limite de gasto em dólares visível em /usage)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_RADAR_SENSORES_DETERMINISTICOS_EM_TRIAL
     node_type: evidence
@@ -216,6 +220,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents"
       locator: "https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents e https://www.thoughtworks.com/radar — votos 3-0 em ambas as entregas. FUSÃO DECLARADA: a rodada entregou este fato DUAS VEZES (um achado da página do Radar, outro da página da técnica) e a objeção F4 denunciou a dupla contagem; os dois viraram UM nó, e o peso da posição DURANTE cai na mesma medida."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_RADAR_PLUGIN_E_SKILLS_EM_TRIAL
     node_type: evidence
@@ -234,6 +239,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar"
       locator: "https://www.thoughtworks.com/radar — votos 3-0; o próprio achado admite ZERO dado de monetização, taxa ou receita"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_REVISAO_HUMANA_E_O_GARGALO_DECLARADO
     node_type: evidence
@@ -252,6 +258,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents"
       locator: "https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents — votos 3-0; a frase citada diz que AGENTES precisam de loops de feedback diretamente acessíveis, e NÃO que humanos pagam para reduzir carga de revisão"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_INSTRUCTION_BLOAT_EM_CAUTION
     node_type: evidence
@@ -270,6 +277,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar/techniques/agent-instruction-bloat"
       locator: "https://www.thoughtworks.com/radar/techniques/agent-instruction-bloat — votos 3-0. ⚠️ A SEGUNDA claim desta mesma URL (a que concluía \"logo o gate determinístico vale mais que prosa que aconselha, como no Onion\") foi REFUTADA por fonte fraca na própria rodada: a inferência pró-Onion caiu, o fato ficou."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_STAGE_PRECO_POR_ASSENTO_E_FORMULACAO
     node_type: evidence
@@ -288,6 +296,7 @@ nodes:
       source: "https://stagereview.app/"
       locator: "https://stagereview.app/ — votos 3-0 no preço, 2-1 na formulação do gargalo. FUSÃO DECLARADA: duas claims da mesma página (o preço e a formulação) viraram UM nó. A linha que dizia \"~57 mil PRs revisados, sem receita nem clientes\" foi CORTADA POR ORÇAMENTO nesta rodada — ou seja, o dado que separaria preço de tabela de receita real não foi pago."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_CANAL_OFICIAL_SEM_TRILHO_DE_COBRANCA
     node_type: evidence
@@ -305,6 +314,7 @@ nodes:
       source: "https://github.com/anthropics/claude-plugins-community"
       locator: "https://github.com/anthropics/claude-plugins-community — votos 3-0; declaração de AUSÊNCIA verificada na página (nenhum mecanismo de cobrança, preço, taxa, canal de pagamento, receita ou adoção por plugin)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_TRACE_OCUPA_POS_SEM_PRECO
     node_type: evidence
@@ -322,6 +332,7 @@ nodes:
       source: "https://github.com/agentrust-io/trace-spec"
       locator: "https://github.com/agentrust-io/trace-spec — votos 2-1 em ambas as claims. FUSÃO DECLARADA: a ocupação da posição e o limite técnico vieram como dois achados da mesma fonte e viraram UM nó."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AGENT_SIGN_PROVENIENCIA_GRATIS_SIGSTORE
     node_type: evidence
@@ -339,6 +350,7 @@ nodes:
       source: "https://github.com/nolabs-ai/agent-sign"
       locator: "https://github.com/nolabs-ai/agent-sign — votos 2-1 em ambas as claims, fundidas num nó: a GitHub Action e o formato do bundle são a mesma observação"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_WATCHFLOW_GATE_NO_MERGE_OSS
     node_type: evidence
@@ -356,6 +368,7 @@ nodes:
       source: "https://github.com/warestack/watchflow"
       locator: "https://github.com/warestack/watchflow — votos 3-0 na posição. ⚠️ A claim IRMÃ, sobre o modelo de receita (open-core MIT com upsell enterprise via Warestack, 87 stars e 26 forks, sem receita nem clientes), caiu no lado REFUTADO por fonte fraca na mesma rodada."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AGENTPLANE_DURANTE_E_POS_SEM_RECEITA
     node_type: evidence
@@ -374,6 +387,7 @@ nodes:
       source: "https://github.com/agentplane/agentplane"
       locator: "https://github.com/agentplane/agentplane — votos 3-0; a URL agentplane/agentplane dá 404 e o projeto vive hoje em basilisk-labs/agentplane. ⚠️ A claim irmã (ausência de monetização, MIT, sem preço na página) caiu no lado REFUTADO por fonte fraca."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_PLUGIN_SEM_METRICA_DE_MONETIZACAO
     node_type: evidence
@@ -391,6 +405,7 @@ nodes:
       source: "https://github.com/wshobson/agents"
       locator: "https://github.com/wshobson/agents — votos 3-0; declaração de AUSÊNCIA (nenhuma métrica de instalação, receita, preço ou taxa divulgada)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_BERNSTEIN_GOVERNANCA_OSS_SEM_RECEITA
     node_type: evidence
@@ -408,6 +423,7 @@ nodes:
       source: "https://github.com/sipyourdrink-ltd/bernstein"
       locator: "https://github.com/sipyourdrink-ltd/bernstein — votos 3-0. ⚠️ A claim irmã, que descrevia a MAQUINARIA (replay journal, log encadeado por HMAC, recibos Ed25519 — o análogo mais próximo do ativo do Onion), caiu no lado REFUTADO por fonte fraca: ficou a ausência de receita e perdeu-se a descrição técnica do par."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HALOFY_OCUPA_POSICAO_META
     node_type: evidence
@@ -425,6 +441,7 @@ nodes:
       source: "https://github.com/halofyai/halofy"
       locator: "https://github.com/halofyai/halofy — votos 2-1; ⚠️ source_kind vendor-on-competitor, SEMPRE SUSPEITO pela cláusula 7: é o próprio projeto descrevendo a categoria que ele quer ocupar. A claim irmã (dual-track AGPL-3.0 com serviço gerenciado pago) caiu no lado REFUTADO."
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_AGENSI_TAXA_DE_CANAL_30_PORCENTO
     node_type: evidence
@@ -442,6 +459,7 @@ nodes:
       source: "https://agensi.io"
       locator: "https://agensi.io — votos 2-1. ⚠️ A claim irmã, com os números de catálogo (7.500+ skills, 550+ criadores, 7.500+ usuários, distribuição em Claude Code/Cursor/Codex/Copilot e endpoint MCP), caiu no lado REFUTADO por fonte fraca — então a taxa sobrevive SEM o volume que diria se ela move dinheiro."
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ MERCADO / CAPITAL (eixo invariante) ═══════════════════
 
@@ -462,6 +480,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar"
       locator: "síntese do eixo mercado/capital desta rodada contra o corpus das rodadas irmãs do mesmo dia; sem rodada de investimento NOVA encontrada nesta passada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   # ═══════════════════ LACUNAS (cláusula 8: lacuna vira nó, e não arredonda) ═══════════════════
 
@@ -579,6 +598,7 @@ nodes:
       source: "https://code.claude.com/docs/en/changelog"
       locator: "achado F1 (changelog 2.1.284 de 2026-09-28 e 2.1.281 de 2026-09-23, tier 9) relido como SÉRIE e não como ponto: duas absorções em cinco dias de calendário na mesma linha de release"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_F2_TRIAL_SEM_FORNECEDOR_E_NEGATIVO
     node_type: evidence
@@ -596,6 +616,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar"
       locator: "achado F2 (Radar Vol 34, Trial, tier 8) contra a natureza do anel Trial num radar de TÉCNICA, e contra a confirmação já medida no corpus (Vectimus Apache-2.0 grátis, Sondera sem preço publicado)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_F3_CANAL_NAO_E_TRILHO
     node_type: evidence
@@ -613,6 +634,7 @@ nodes:
       source: ".claude-plugin/marketplace.json"
       locator: "achado F3 (plugin marketplace e Agent Skills em Trial, tier 8, com zero dado de monetização) contra a medição local de 2026-10-01: `plugins/` com 5 plugins materializados e `plugins[]` do marketplace.json com 5 entradas, e zero pagamento registrado"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_OBJECAO_F4_DUPLA_CONTAGEM_DOS_SENSORES
     node_type: evidence
@@ -630,6 +652,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents"
       locator: "achados F2 e F4 comparados: a MESMA URL do Radar e o MESMO anel (Trial) entregues como dois achados independentes — e a fusão foi APLICADA nesta sessão (E_RADAR_SENSORES_DETERMINISTICOS_EM_TRIAL é um nó, não dois)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_F5_GARGALO_REAL_PECA_ERRADA
     node_type: evidence
@@ -647,6 +670,7 @@ nodes:
       source: "https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents"
       locator: "achado F5 (carga de revisão humana, tier 7) lido literalmente contra o achado F7/F8 da MESMA rodada (Stage): o único fornecedor pago medido no gargalo vende COMPREENSÃO de PR, superfície que o core não tem"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_F6_BLOAT_E_AUTO_INCRIMINACAO
     node_type: evidence
@@ -664,6 +688,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcacd012-07e.json (host) · commit 44ceba79 (árvore)"
       locator: "result.decision.objections, entrada target 'F6 — Agent instruction bloat em Caution (Radar Vol 34)' · ls-tree 44ceba79 .claude/ (408 .md, 71.675 linhas)"
       method: "testemunho: leitura do arquivo wf_fcacd012-07e.json no host (objeção F6 do refutador) + medição local da sessão 2026-10-01"
+      locality: "host"
 
   - id: E_OBJECAO_F7_PRECO_DE_TABELA_NAO_E_RECEITA
     node_type: evidence
@@ -681,6 +706,7 @@ nodes:
       source: "https://stagereview.app/"
       locator: "achado F7 (Stage US$30/usuário/mês, tier 6) contra a própria contabilidade da rodada: a linha dos ~57 mil PRs revisados, sem receita nem clientes, foi CORTADA POR ORÇAMENTO — e é exatamente o dado que separaria preço de tabela de receita"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_F8_NARRATIVA_E_O_INVERSO_DO_ATIVO
     node_type: evidence
@@ -698,6 +724,7 @@ nodes:
       source: "https://stagereview.app/"
       locator: "achado F8 (Stage estrutura o PR em capítulos temáticos, tier 6) comparado ao ativo declarado do Onion (reprovação determinística sem LLM, 5.282 linhas de shell com severidade derivada do corpo da guarda)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_F9_NEGATIVO_DECISIVO_REBAIXADO
     node_type: evidence
@@ -715,6 +742,7 @@ nodes:
       source: "https://github.com/anthropics/claude-plugins-community"
       locator: "achado F9 (canal oficial sem cobrança, preço, taxa ou canal de pagamento, tier 6) contra o lugar que a síntese lhe deu: nota de rodapé ao lado da taxa de 30% de um marketplace de TERCEIRO (Agensi, tier 4, sem volume de vendas)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_F10_SPEC_SEM_COMPRADOR_COMMODITIZA
     node_type: evidence
@@ -732,6 +760,7 @@ nodes:
       source: "https://github.com/agentrust-io/trace-spec"
       locator: "achado F10 (TRACE ocupa a posição PÓS, tier 6) contra o precedente do MESMO lote: agent-sign entrega atestação Sigstore/in-toto de graça, isto é, proveniência como infraestrutura gratuita — o padrão que a objeção prevê"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_OBJECAO_F11_TRUNCADA_NO_REPASSE
     node_type: evidence
@@ -750,6 +779,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcacd012-07e.json (host)"
       locator: "result.decision.objections, entrada target 'F11 — TRACE prova autoria/integridade mas não o com base em quê' (kind finding, survives true)"
       method: "testemunho: leitura do journal /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcacd012-07e.json no host em 2026-10-09"
+      locality: "host"
 
   - id: E_OBJECAO_G_QUATRO_FONTES_SEM_LEITURA
     node_type: evidence
@@ -767,6 +797,7 @@ nodes:
       source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcacd012-07e.json (host)"
       locator: "result.decision.recommendation (opção G: 'quatro fontes que decidem ficaram sem leitura... Brain0... cortado por orçamento CINCO vezes') · result.budgetDropped (permit.io/mcp-gateway, toolbooth/toolbooth, github.blog 2026-07-29 default-model-enablement)"
       method: "testemunho: leitura do arquivo wf_fcacd012-07e.json no host (recomendação do refutador)"
+      locality: "host"
 
   - id: AR_SYNTHESIS_ONDA_DERIVADA_1001
     node_type: artifact
@@ -782,6 +813,7 @@ nodes:
       source: "docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/SYNTHESIS.md"
       locator: "arquivo conferido no disco; frontmatter com o contrato de custo (run_id wf_fcacd012-07e, 10.173.983 tokens, 148 agentes, 99 min) apontando kg: para este grafo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 
 edges:

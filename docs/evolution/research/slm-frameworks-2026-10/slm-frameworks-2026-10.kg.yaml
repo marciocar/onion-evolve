@@ -81,6 +81,7 @@ nodes:
       source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10"
       locator: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.335-338 nesta worktree (branch research/onion-slm-roadmap-2026-10) — D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, node_type decision, status: done"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: X_REF_NANOCHAT_Q_EVAL
     node_type: entity
@@ -96,6 +97,7 @@ nodes:
       source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#Q_EVAL_DE_DOMINIO_DO_ONION"
       locator: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.548-553 nesta worktree — Q_EVAL_DE_DOMINIO_DO_ONION, node_type question, status: open"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: X_REF_SLM_Q_OPTION_C
     node_type: entity
@@ -111,6 +113,7 @@ nodes:
       source: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF"
       locator: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.997-1003 nesta worktree — Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF, node_type question, status: open"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: X_REF_SLM_EVAL_DESIGN
     node_type: entity
@@ -126,6 +129,7 @@ nodes:
       source: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS"
       locator: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.980-986 nesta worktree — C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS, node_type claim, status: open"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: X_REF_SLM_FINETUNE_NARROW
     node_type: entity
@@ -141,6 +145,7 @@ nodes:
       source: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT"
       locator: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.964-970 nesta worktree — C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT, node_type claim, status: open"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: X_REF_SLM_SMOL_OMITTED
     node_type: entity
@@ -156,6 +161,7 @@ nodes:
       source: "docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md l.109-110 nesta worktree: \"Smol Training Playbook: OMITIDO — o leitor não produziu claim nem marcou inalcançável. É objeção sobrevivente por omissão (cláusula 6).\" (o E_LACUNAS daquele grafo NÃO o menciona; está na síntese e no run-wf_78edad4f-896.json l.1270)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   # ── EVIDÊNCIAS ANCORADAS · Smol Training Playbook (Hugging Face) ─────────────────────────
   - id: E_SMOL_DECIDE_WHETHER_TO_TRAIN
@@ -174,6 +180,7 @@ nodes:
       source: "https://huggingfacetb-smol-training-playbook.hf.space/"
       locator: "QUOTE verbatim: \"many failed training projects didn't fail because of bad hyperparameters or buggy code; they failed because someone decided to train a model they didn't need.\" — LOCATOR: Smol Training Playbook, seção Why: The Question Nobody Wants to Answer. Tier 7 propagado (o leitor declarou 7 para outras claims da mesma fonte). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SMOL_BUILD_ON_SOTA_FIRST
     node_type: evidence
@@ -191,6 +198,7 @@ nodes:
       source: "https://huggingfacetb-smol-training-playbook.hf.space/"
       locator: "QUOTE verbatim: \"Spend a few days building on top of Qwen3, Gemma 3, or another current state-of-the-art (SOTA) model. Can you reach your performance goals through prompting, tool use, or post-training?\" — LOCATOR: Smol Training Playbook, seção Production: Why Can't You Use an Existing Model? Tier 7 propagado. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SMOL_ONE_VARIABLE_PER_ABLATION
     node_type: evidence
@@ -208,6 +216,7 @@ nodes:
       source: "https://huggingfacetb-smol-training-playbook.hf.space/"
       locator: "QUOTE verbatim: \"Change one thing at a time. Keep everything else identical between experiments.\" — LOCATOR: Smol Training Playbook, Rules of Engagement (ablações). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SMOL_ABLATION_COST_GPU_HOURS
     node_type: evidence
@@ -225,6 +234,7 @@ nodes:
       source: "https://huggingfacetb-smol-training-playbook.hf.space/"
       locator: "QUOTE verbatim: \"Ablations and debugging consumed a total of 161,280 GPU hours, more than half the cost of our main training run (276,480 GPU hours).\" — LOCATOR: Smol Training Playbook, Estimating Ablation Cost. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_SMOL_ABLATION_REDUCED_SCALE
     node_type: evidence
@@ -242,6 +252,7 @@ nodes:
       source: "https://huggingfacetb-smol-training-playbook.hf.space/"
       locator: "QUOTE verbatim: \"We train for 45B tokens to ensure we get stable signal, though ~35B is Chinchilla-optimal for this model size.\" — LOCATOR: Smol Training Playbook, Ablation Setup. Tier 7 propagado. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EVIDÊNCIAS ANCORADAS · HF Evaluation Guidebook ──────────────────────────────────────
   - id: E_GUIDEBOOK_INSPECT_50_SAMPLES
@@ -260,6 +271,7 @@ nodes:
       source: "https://github.com/huggingface/evaluation-guidebook"
       locator: "QUOTE verbatim: \"Take 50 random samples and manually inspect them:\" — LOCATOR: evaluation-guidebook, designing-your-automatic-evaluation.md, Choosing a dataset > Selecting an existing dataset > #### Samples (linhas 23-32). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GUIDEBOOK_EVAL_BOUND_BY_DATASET
     node_type: evidence
@@ -277,6 +289,7 @@ nodes:
       source: "https://github.com/huggingface/evaluation-guidebook"
       locator: "QUOTE verbatim: \"**your evaluation result will only be as good as your evaluation dataset**.\" — LOCATOR: evaluation-guidebook, designing-your-automatic-evaluation.md, Choosing a dataset, parágrafo de abertura (linha 4); preferência por especialistas na linha 9. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GUIDEBOOK_ASSUME_CONTAMINATION
     node_type: evidence
@@ -294,6 +307,7 @@ nodes:
       source: "https://github.com/huggingface/evaluation-guidebook"
       locator: "QUOTE verbatim: \"you should assume that a dataset publicly available on the internet is or will be contaminated.\" — LOCATOR: evaluation-guidebook, automated-benchmarks/tips-and-tricks.md, Managing contamination (linhas 4-9, 11). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EVIDÊNCIAS ANCORADAS · lighteval (Hugging Face) ─────────────────────────────────────
   - id: E_LIGHTEVAL_MULTI_BACKEND
@@ -312,6 +326,7 @@ nodes:
       source: "https://huggingface.co/docs/lighteval"
       locator: "QUOTE verbatim: \"`transformers`: Evaluate models on CPU or one or more GPUs using [🤗 Accelerate](https://github.com/huggingface/transformers)\" — LOCATOR: docs/lighteval, Key Features > Multi-Backend Support. Tier 9 propagado (declarado para outras claims da mesma doc). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LIGHTEVAL_SAMPLE_BY_SAMPLE
     node_type: evidence
@@ -329,6 +344,7 @@ nodes:
       source: "https://huggingface.co/docs/lighteval"
       locator: "QUOTE verbatim: \"saving and exploring detailed, sample-by-sample results to debug and see how your models stack up.\" — LOCATOR: docs/lighteval, parágrafo de abertura. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LIGHTEVAL_CUSTOM_TASK_PROMPT_FN
     node_type: evidence
@@ -346,6 +362,7 @@ nodes:
       source: "https://huggingface.co/docs/lighteval/adding-a-custom-task"
       locator: "QUOTE verbatim: \"You need to define a prompt function that will convert a line from your dataset to a document to be used for evaluation.\" — LOCATOR: docs/lighteval/adding-a-custom-task, Step 2: Define the Prompt Function. Tier 9 propagado. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LIGHTEVAL_TASK_CONFIG_LOCAL_RUN
     node_type: evidence
@@ -363,6 +380,7 @@ nodes:
       source: "https://huggingface.co/docs/lighteval/adding-a-custom-task"
       locator: "QUOTE verbatim: \"lighteval accelerate \\ \"model_name=openai-community/gpt2\" \\ \"myothertask|3\" \\ --custom-tasks community_tasks/my_custom_task.py\" — LOCATOR: docs/lighteval/adding-a-custom-task, Running Your Custom Task > Example Usage. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LIGHTEVAL_F1_WORD_OVERLAP
     node_type: evidence
@@ -380,6 +398,7 @@ nodes:
       source: "https://huggingface.co/docs/lighteval/metric-list"
       locator: "QUOTE verbatim: \"`f1_score`: Average F1 score in terms of word overlap between the model output and gold (normalisation optional).\" — LOCATOR: docs/lighteval/metric-list, Automatic metrics for generative tasks > Base. Tier 9 propagado. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_LIGHTEVAL_CUSTOM_SAMPLE_METRIC
     node_type: evidence
@@ -397,6 +416,7 @@ nodes:
       source: "https://huggingface.co/docs/lighteval/adding-a-custom-task"
       locator: "QUOTE verbatim: \"sample_level_fn=lambda x: x, # How to compute score for one sample corpus_level_fn=np.mean, # How to aggregate the sample metrics\" — LOCATOR: docs/lighteval/adding-a-custom-task, Step 3: Creating Custom Metrics (SampleLevelMetric). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EVIDÊNCIAS ANCORADAS · HF LLM Course, capítulo 11 (fine-tuning) ──────────────────────
   - id: E_HFCOURSE_SFT_AFTER_PROMPTING
@@ -415,6 +435,7 @@ nodes:
       source: "https://huggingface.co/learn/llm-course/chapter11/3"
       locator: "QUOTE verbatim: \"Need additional performance beyond what prompting can achieve\" — LOCATOR: huggingface.co/learn/llm-course chapter11/3, When to Use SFT. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HFCOURSE_COST_CONDITION
     node_type: evidence
@@ -432,6 +453,7 @@ nodes:
       source: "https://huggingface.co/learn/llm-course/chapter11/3"
       locator: "QUOTE verbatim: \"the cost of using a large general-purpose model outweighs the cost of fine-tuning a smaller model\" — LOCATOR: chapter11/3, When to Use SFT. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HFCOURSE_SFT_INPUT_OUTPUT_PAIRS
     node_type: evidence
@@ -449,6 +471,7 @@ nodes:
       source: "https://huggingface.co/learn/llm-course/chapter11/3"
       locator: "QUOTE verbatim: \"a task-specific dataset structured with input-output pairs. Each pair should consist of: An input prompt, The expected model response\" — LOCATOR: chapter11/3, seção Dataset Preparation (não \"Dataset Requirements\"). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HFCOURSE_LORA_SMALL_RANK
     node_type: evidence
@@ -466,6 +489,7 @@ nodes:
       source: "https://huggingface.co/learn/llm-course/chapter11/4"
       locator: "QUOTE verbatim: \"start with small rank values (4-8) for LoRA and monitor training loss. Use validation sets to prevent overfitting and compare results with full fine-tuning baselines when possible.\" — LOCATOR: chapter11/4, bloco de boas práticas do LoRA. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HFCOURSE_PROGRESSIVE_EVAL
     node_type: evidence
@@ -483,6 +507,7 @@ nodes:
       source: "https://huggingface.co/learn/llm-course/chapter11/5"
       locator: "QUOTE verbatim: \"Develop custom evaluation datasets that reflect your actual use case\" — LOCATOR: chapter11/5, Custom Evaluation (passo 3 de 4); caveat na seção de benchmarks. Tier 7 propagado. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EVIDÊNCIAS ANCORADAS · Hamel Husain (evals) ─────────────────────────────────────────
   - id: E_HAMEL_THREE_LEVELS
@@ -500,6 +525,7 @@ nodes:
       source: "https://hamel.dev/blog/posts/evals/"
       locator: "QUOTE verbatim: \"Unit tests for LLMs are assertions (like you would write in pytest).\" — LOCATOR: hamel.dev/blog/posts/evals/, Level 1: Unit Tests. Tier NÃO declarado pelo leitor (campo ausente). ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HAMEL_ERROR_ANALYSIS_FIRST
     node_type: evidence
@@ -516,6 +542,7 @@ nodes:
       source: "https://hamel.dev/blog/posts/evals-faq/"
       locator: "QUOTE verbatim: \"Error analysis is the most important activity in evals. Error analysis helps you decide what evals to write in the first place.\" — LOCATOR: hamel.dev/blog/posts/evals-faq/, Q: Why is \"error analysis\" so important in AI evals, and how is it performed? Tier NÃO declarado pelo leitor. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_HAMEL_FINETUNE_IS_DATA
     node_type: evidence
@@ -532,6 +559,7 @@ nodes:
       source: "https://hamel.dev/blog/posts/evals/"
       locator: "QUOTE verbatim: \"99% of the labor involved with fine-tuning is assembling high-quality data that covers your AI product's surface area.\" — LOCATOR: hamel.dev/blog/posts/evals/, Eval Systems Unlock Superpowers For Free > Fine-Tuning. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EVIDÊNCIAS ANCORADAS · Eugene Yan (evals e LLM-evaluators) ───────────────────────────
   - id: E_YAN_EXTRACTION_METRICS
@@ -550,6 +578,7 @@ nodes:
       source: "https://eugeneyan.com/writing/evals/"
       locator: "QUOTE verbatim: \"Recall, precision, ROC-AUC, PR-AUC, separation of distributions\" — LOCATOR: eugeneyan.com/writing/evals, seção Classification/Extraction. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_YAN_SIMILARITY_METRICS_FAIL
     node_type: evidence
@@ -567,6 +596,7 @@ nodes:
       source: "https://eugeneyan.com/writing/evals/"
       locator: "QUOTE verbatim: \"The similarity distributions of positive and negative instances are too close...not discriminative enough to cut a threshold.\" — LOCATOR: eugeneyan.com/writing/evals, seção Metrics That Don't Work. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_YAN_SUMMARIZATION_NLI_1000
     node_type: evidence
@@ -584,6 +614,7 @@ nodes:
       source: "https://eugeneyan.com/writing/evals/"
       locator: "QUOTE verbatim: \"With a thousand samples or more, it becomes a solid factual consistency eval and may be good enough as a hallucination guardrail.\" — LOCATOR: eugeneyan.com/writing/evals, seção Summarization. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_YAN_LLM_EVALUATOR_CALIBRATION
     node_type: evidence
@@ -601,6 +632,7 @@ nodes:
       source: "https://eugeneyan.com/writing/llm-evaluators/"
       locator: "QUOTE verbatim: \"Most folks have human annotators as the baseline. Here, we aim for the LLM-human correlation to match human-human correlation.\" — LOCATOR: eugeneyan.com/writing/llm-evaluators, seção Human Annotation. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EVIDÊNCIAS ANCORADAS · Google, Rules of Machine Learning ─────────────────────────────
   - id: E_GOOGLE_R1_NO_ML_WITHOUT_DATA
@@ -619,6 +651,7 @@ nodes:
       source: "https://developers.google.com/machine-learning/guides/rules-of-ml"
       locator: "QUOTE verbatim: \"If machine learning is not absolutely required for your product, don't use it until you have data.\" — LOCATOR: developers.google.com/machine-learning/guides/rules-of-ml, Rule #1: Don't be afraid to launch a product without machine learning. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GOOGLE_R2_METRICS_FIRST
     node_type: evidence
@@ -636,6 +669,7 @@ nodes:
       source: "https://developers.google.com/machine-learning/guides/rules-of-ml"
       locator: "QUOTE verbatim: \"Before formalizing what your machine learning system will do, track as much as possible in your current system.\" — LOCATOR: rules-of-ml, Rule #2: First, design and implement metrics. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GOOGLE_R5_TEST_INFRA_INDEPENDENTLY
     node_type: evidence
@@ -653,6 +687,7 @@ nodes:
       source: "https://developers.google.com/machine-learning/guides/rules-of-ml"
       locator: "QUOTE verbatim: \"Make sure that the infrastructure is testable, and that the learning parts of the system are encapsulated so that you can test everything around it.\" — LOCATOR: rules-of-ml, Rule #5: Test the infrastructure independently from the machine learning. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_GOOGLE_PHASE2_GATE_E2E
     node_type: evidence
@@ -670,6 +705,7 @@ nodes:
       source: "https://developers.google.com/machine-learning/guides/rules-of-ml"
       locator: "QUOTE verbatim: \"After you have a working end to end system with unit and system tests instrumented, Phase II begins.\" — LOCATOR: rules-of-ml, ML Phase II: Feature Engineering, introdução. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EVIDÊNCIAS ANCORADAS · Anthropic, Define success criteria ───────────────────────────
   - id: E_ANTHROPIC_SUCCESS_CRITERIA_FIRST
@@ -687,6 +723,7 @@ nodes:
       source: "https://platform.claude.com/docs/en/test-and-evaluate/define-success"
       locator: "QUOTE verbatim: \"Building a successful LLM-based application starts with clearly defining your success criteria and then designing evaluations to measure performance against them.\" — LOCATOR: platform.claude.com/docs/en/test-and-evaluate/define-success, Define Success Criteria, abertura (parágrafo 1). Tier NÃO declarado pelo leitor. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_ANTHROPIC_ACHIEVABLE_TARGETS
     node_type: evidence
@@ -703,6 +740,7 @@ nodes:
       source: "https://platform.claude.com/docs/en/test-and-evaluate/define-success"
       locator: "QUOTE verbatim: \"Base your targets on industry benchmarks, prior experiments, AI research, or expert knowledge. Your success metrics should not be unrealistic to current frontier model capabilities.\" — LOCATOR: define-success, Define Your Success Criteria > Achievable. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── EVIDÊNCIAS ANCORADAS · NVIDIA, conversão LLM → SLM em agentes (arXiv 2506.02153) ─────
   - id: E_NVIDIA_S1_INSTRUMENT
@@ -720,6 +758,7 @@ nodes:
       source: "https://arxiv.org/abs/2506.02153"
       locator: "QUOTE verbatim: \"deploying instrumentation to log all non-HCI agent calls, capturing input prompts, output responses, contents of individual tool calls, and optionally latency metrics for a later targeted optimization.\" — LOCATOR: arXiv 2506.02153, Seção 6, passo S1. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NVIDIA_S2_CURATE_10K_100K
     node_type: evidence
@@ -736,6 +775,7 @@ nodes:
       source: "https://arxiv.org/abs/2506.02153"
       locator: "QUOTE verbatim: \"Once a satisfactory amount of data has been collected (10k-100k examples being sufficient for fine-tuning of small models as a rule of thumb [5, 22]), it is necessary to remove any PII, PHI\" — LOCATOR: arXiv 2506.02153, Seção 6, passo S2. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NVIDIA_S3_CLUSTER_TASKS
     node_type: evidence
@@ -752,6 +792,7 @@ nodes:
       source: "https://arxiv.org/abs/2506.02153"
       locator: "QUOTE verbatim: \"Employ unsupervised clustering techniques on the collected prompts and agent actions to identify recurring patterns of requests or internal agent operations [35, 42, 21]. These clusters help define candidate tasks\" — LOCATOR: arXiv 2506.02153, Seção 6, passo S3. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NVIDIA_S4_SELECT_SLM
     node_type: evidence
@@ -768,6 +809,7 @@ nodes:
       source: "https://arxiv.org/abs/2506.02153"
       locator: "QUOTE verbatim: \"Criteria for selection include the SLM’s inherent capabilities (e.g., instruction following, reasoning, context window size), its performance on relevant benchmarks for the task type, its licensing, and its deployment footprint\" — LOCATOR: arXiv 2506.02153, Seção 6, passo S4. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   - id: E_NVIDIA_S5_FINETUNE_PEFT
     node_type: evidence
@@ -784,6 +826,7 @@ nodes:
       source: "https://arxiv.org/abs/2506.02153"
       locator: "QUOTE verbatim: \"fine-tune the chosen SLMs on these specialized datasets. PEFT techniques such as LoRA [34] or QLoRA [20] can be leveraged to reduce computational costs and memory requirements\" — LOCATOR: arXiv 2506.02153, Seção 6, passo S5. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "web"
 
   # ── CONTABILIDADE DA RODADA ─────────────────────────────────────────────────────────────
   - id: E_LACUNAS_SLM_FRAMEWORKS_PRIMARIES_1005

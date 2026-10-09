@@ -29,6 +29,7 @@ nodes:
       source: "ops/pr-finalize.sh"
       locator: "gh run list do linter por branch (#932-#936 e #923-#927)"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO
     node_type: evidence
     layer: audit
@@ -44,6 +45,7 @@ nodes:
       source: ".claude/hooks/bash-empty-result-guard.sh"
       locator: "aviso PR-SEM-PASSADA-ADVERSARIAL nos PRs #932-#939, todos com resíduo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_MAPA_SEM_MERGE_ONION_HOOKS
     node_type: evidence
     layer: audit
@@ -59,6 +61,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "lint-selftest.sh --affected .claude/utils/adopt/merge-onion-hooks.sh --dry-run"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_DOIS_LEITORES_DIVERGIAM
     node_type: evidence
     layer: audit
@@ -74,6 +77,7 @@ nodes:
       source: ".claude/validation/kg-radar.sh"
       locator: "kg-radar.sh exit 0 e kg-drive-project.sh exit 2 na semente com dois documentos (curado no PR #938)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_NARRATIVA_NO_ROTULO_VAZA_GABARITO
     node_type: evidence
     layer: audit
@@ -89,6 +93,7 @@ nodes:
       source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
       locator: "eval da Porta 0 do onion-slm: 14 casos com REFUTA no rótulo, mais superou/substitui/ALEGAVA"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_RADAR_CEGO_A_TIPO_TROCADO
     node_type: evidence
     layer: audit
@@ -104,6 +109,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-10-06-radar-cego-mu07-mu18.md"
       locator: "fumaça da Porta 0 do onion-slm: MU-07 20/20 passaram no radar; Claude zero-shot pegou 17/20"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_CANAL_VIVO_ENTRE_SESSOES_USADO
     node_type: evidence
     layer: audit
@@ -119,6 +125,7 @@ nodes:
       source: ".claude/commands/meta/co-evolve.md"
       locator: "trocas SendMessage core↔onion-slm em 2026-10-06; uma mensagem não chegou; escrita em db de página alheia"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_MERGE_GATE_INERTE_NO_ADOTANTE
     node_type: evidence
     layer: audit
@@ -134,6 +141,7 @@ nodes:
       source: ".claude/hooks/pretooluse-merge-gate.sh"
       locator: "adoção do onion-kg-ssot: pretooluse-merge-gate.sh sai 0 sem ops/ no repo"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_SKILL_CORE_ONLY_VIAJOU
     node_type: evidence
     layer: audit
@@ -244,6 +252,7 @@ nodes:
       source: ".claude/validation/door-role-parity-check.sh"
       locator: "PR #949: Elenxo REPROVOU o vocabulário único (carimbo standalone liga o modo porta: 0→16 e 0→14 HARD medidos em clones); maestro selou o desenho do Elenxo com hub→hub; bancada door_role_parity (g2)-(g5) + fixture, 3 mutantes"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: Q_VETO_PRETOOLUSE_NO_PR_CREATE
     node_type: question
     layer: audit
@@ -279,6 +288,7 @@ nodes:
       source: ".claude/validation/lint-selftest.sh"
       locator: "lint-selftest.sh --affected <arquivo> --dry-run em origin/main 33d4067a: lint-selftest.sh → TODAS (failsafe); docs/README.md → 14; kg-grammar.md → 14; pr-merge-verified.sh → 16; as 14 de docs/README.md estão nas três seleções"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: Q_PRECOMMIT_SELECAO_POR_CASO
     node_type: question
     layer: audit
@@ -303,6 +313,7 @@ nodes:
       source: "ops/pr-finalize.sh"
       locator: "fechamento do #955 (3 rodadas do ops/pr-finalize.sh --push) e as rodadas do #949-#954 no mesmo dia"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_TM_PERCENTUAL_IGNORA_STORY_POINTS
     node_type: evidence
     layer: audit
@@ -318,6 +329,7 @@ nodes:
       source: ".claude/utils/task-manager/adapters/zoho.md"
       locator: "zoho.md:311 (% proporcional à contagem de fases do plan.md, pós-#956); grep story.point em .claude/utils/task-manager/ só acha clickup.md; nenhum % de task-mãe calculado"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: Q_TASK_MANAGER_SDAAL_COMPLETO
     node_type: question
     layer: audit
@@ -343,6 +355,7 @@ nodes:
       source: "ops/pr-finalize.sh"
       locator: "leva de 2026-10-07/08 com até 6 PRs abertos: #956, #957 (2x), #959 e #960 entraram em CONFLICTING após merges vizinhos; os conflitos relatados nos rebases foram em testing-state.md, testing-inventory.md, backlog.md, kg-read-index.tsv e plugins/ regenerados; conflito de código só 1 (onion-research.js, #957 x #959). PR em CONFLICTING não dispara CI"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: Q_MERGE_DRIVER_PARA_PROJECAO_GERADA
     node_type: question
     layer: audit
@@ -368,6 +381,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-10-08-onion-brain-mcp.md"
       locator: "§O que aconteceu no campo + §O pedido"
       method: "leitura: sinal do adotante brain-granaai"
+      locality: "repo"
   - id: Q_ONION_BRAIN_MCP
     node_type: question
     layer: audit

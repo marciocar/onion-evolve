@@ -48,6 +48,7 @@ nodes:
       source: "docs/evolution/review/feat-forge-pecas-2-3-7.md · .claude/commands/common/prompts/forge-doctrine.md · 72b6ac60 (corpo do commit) · docs/evolution/review/fix-causa-real-do-ci-e-peca-3.md"
       locator: "feat-forge-pecas-2-3-7.md l.20 (\"selada 2026-09-28, escopo 2+3+7, core-only\"), l.71-73 (57 candidatos, peça 2 em 4, peça 5 em 17); forge-doctrine.md l.80-84 (face que viaja gated); corpo de 72b6ac60 (\"o escopo que o maestro selou\"; a guarda já cobria \"HARD, desde agosto\"); fix-causa-real-do-ci-e-peca-3.md l.69 (peça 3 re-medida em 3)"
       method: "testemunho: selo do maestro de 2026-09-28 registrado no resíduo feat-forge-pecas-2-3-7.md l.20 e no corpo de 72b6ac60; números por leitura do resíduo l.71-73"
+      locality: "repo"
 
   - id: C_DESTINO_SEM_DONO
     node_type: claim
@@ -78,6 +79,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md"
       locator: "sinal de campo primário docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md (nomeia os 3 run ids wwujc53hz, wte2k70qw, wzxz11dvf) + git log -S \"write(KG)\" em .claude/skills/onion-orchestration/SKILL.md, que datou a convenção em 6456e06a (2026-07-18) + memória datada de 2026-07-23 sobre as 8 passadas de Elenxo"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: C_FACE_QUE_VIAJA_TEM_MOTOR_CORTADO
     node_type: claim
@@ -93,6 +95,7 @@ nodes:
       source: ".claude/utils/adopt/vendor-manifest.sh · plugins/onion/skills/onion-wizard/SKILL.md"
       locator: "lint-artifacts.sh de 2026-09-28 (3 SOFT de plugin-bare-path/ALLOWED-TOOLS + 1 PASSIVO, todos SOFT) + leitura de .claude/utils/adopt/vendor-manifest.sh (_base inclui .claude/utils; _role_cut corta utils/wizard/ SÓ em standalone) + ausência de plugins/onion/utils/wizard/"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_SETE_PECAS_SAO_UMA_INSTANCIA
     node_type: evidence
@@ -108,6 +111,7 @@ nodes:
       source: "a2734a63 (árvore git) · a2734a63:.claude/validation/lint-selftest.sh · docs/evolution/review/feat-forge-pecas-2-3-7.md"
       locator: "git ls-tree a2734a63 dos 4 caminhos; lint-selftest.sh l.4908 (run_research_workflow_selftests) e l.5012 (run_research_lens_selftests); resíduo l.71-73"
       method: "leitura: árvore e bancada no commit do nó + censo por máquina no resíduo da forja"
+      locality: "repo"
 
   - id: O_N1_NAO_E_PADRAO
     node_type: claim

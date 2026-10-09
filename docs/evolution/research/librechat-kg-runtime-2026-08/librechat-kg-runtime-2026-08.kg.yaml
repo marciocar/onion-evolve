@@ -51,6 +51,7 @@ nodes:
       source: "docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md"
       locator: "docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md"
       method: "derivado: trace do nó, sem registro de medição"
+      locality: "repo"
   - id: D_WRITE_LEG_AS_PROPOSAL
     node_type: decision
     trace: docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md
@@ -66,6 +67,7 @@ nodes:
       source: "docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md"
       locator: "CONSTRUIDO: propose_kg_write (onion-exec, Camada 1) grava na fila docs/evolution/kg-inbox/ e NUNCA no grafo vivo — testado: proposta caiu na fila, grafo vivo intacto. A fila tem _sealed/_rejected (Aufhebung). Bridge-como-MCP Camada 1 no ar: 4 tools; Camada 2 (prompt livre) gated por ACL. Log LibreChat: 3 servers 19 tools"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: Q_ONION_KG_MCP_NEXT
     node_type: question
     trace: /home/marcio/onion-evolve/ops/mcp-onion-kg/server.py
@@ -81,6 +83,7 @@ nodes:
       source: "/home/marcio/onion-evolve/ops/mcp-onion-kg/server.py"
       locator: "CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
       method: "testemunho: leitura do arquivo /home/marcio/onion-evolve/ops/mcp-onion-kg/server.py no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "host"
   - id: E_AGENTE_VITRINE_ONION
     node_type: evidence
     layer: audit
@@ -95,6 +98,7 @@ nodes:
       source: "sessão do core 2026-08-21 (LibreChat na VPS), registrada no commit c3fd467a (2026-08-21 18:13)"
       locator: "agent_onion_702171 criado com 15 tools dos 3 MCPs + ACL, read-first, sonnet-5; 793 embeddings re-apontados"
       method: "testemunho: medição da sessão 2026-08-21, comando não registrado"
+      locality: "pessoa"
 
   - id: D_TRIADE_MCP_POR_EIXO
     node_type: decision
@@ -111,6 +115,7 @@ nodes:
       source: "commit 5f610327 (#645, 2026-08-20) + ops/mcp-onion-framework/server.py, ops/mcp-onion-kg/, ops/mcp-onion-exec/"
       locator: "corpo do commit 5f610327, 3o item feat(mcp): onion-framework (\"eu fragmentara por RISCO só; faltava o eixo IDENTIDADE... 3ª natureza, não fusão (colapsar read+exec baixa a segurança ao mais perigoso)... Log: 4 servers 24 tools\")"
       method: "leitura: corpo do commit #645 + servidores versionados em ops/"
+      locality: "repo"
 
   - id: E_SERVER_LEGS_PROVEN
     node_type: evidence
@@ -141,6 +146,7 @@ nodes:
       source: "docs/evolution/research/librechat-kg-runtime-2026-08/DOGFOOD-PROTOCOL.md"
       locator: "protocolo versionado em DOGFOOD-PROTOCOL.md: Parte A (pernas de servidor) pre-rodada por mim com evidencia real; Parte B (comportamento-do-chat: deferencia-ao-grafo, alucinacao, write-nao-vai-para-memory, disciplina write-leg do Elenxo) entregue ao maestro p/ rodar na UI. Escopo honesto declarado: Runtime=comportamento, Dogfood=metodo, Elenxo=parcial (so write-leg), SDAAL=conhecimento"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: Q_SEALING_NO_MECHANISM
     node_type: question
     trace: docs/evolution/kg-inbox/README.md
@@ -156,6 +162,7 @@ nodes:
       source: "docs/evolution/kg-inbox/README.md"
       locator: "verificado contra o vivo: grep por kg-inbox|proposal.kg.yaml|_sealed|_rejected em .claude/commands/ e .claude/validation/ = VAZIO (nenhum /meta:* nem guarda processa a fila); e ls docs/evolution/kg-inbox/*.proposal.kg.yaml = 2 propostas pendentes (gap-web-search, grana-ai-mapeamento). A selagem e ato manual de sessao do core (README da fila)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: Q_MAP_LEG_GATED
     node_type: question
     layer: audit
@@ -195,6 +202,7 @@ nodes:
       source: ".claude/commands/meta/kg-inbox.md"
       locator: "CONSTRUIDO E DOGFOODADO: comando /meta:kg-inbox (.claude/commands/meta/kg-inbox.md) processa a fila — lista, radar advisory, triagem (fronteira I3 primeiro), sela (integra no grafo vivo + git mv _sealed) ou rejeita (git mv _rejected + motivo). Rodado nas 2 propostas paradas: gap-web-search SELADA neste grafo; grana-ai-mapeamento REJEITADA (contexto de negocio da Grana nao mora no core, I3). Fila 2->0"
       method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: Q_WEB_SEARCH_GAP
     node_type: question
     layer: audit
@@ -219,6 +227,7 @@ nodes:
       source: "docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml"
       locator: "l.16-22 (nó E_NO_WEB_TOOL da proposta; origem onion-chat-conversa-usuario-2026-08-20, l.3) + cabeçalho de selagem l.1"
       method: "leitura: proposta selada da fila kg-inbox"
+      locality: "repo"
   - id: D_ROUTE_TO_BRIDGE
     node_type: decision
     trace: docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml
@@ -257,6 +266,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-09-04-kg-inbox-recusa-adotante.md"
       locator: "medido no core: .claude/commands/meta/kg-inbox.md Passos 1/3/4/5 roteados por papel (guarda (e) da familia upstream_portal_fixes varre os quatro, 8 mutantes provados — inclusive o cenario em que o Passo 1 roteia e o Passo 3 recusa, que a 1a versao da guarda deixava passar); .claude/utils/adopt/starter-kg-inbox.sh cria a fila (guarda (d) EXECUTA o bloco do starter, 3 mutantes); as 2 propostas reais do corpus nao trazem meta.target, logo a invariante da fronteira foi reancorada no ATO (caminho do alvo no git ls-files), nao no campo"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
   - id: Q_KG_INBOX_FORA_DO_PLUGIN
     node_type: question
@@ -273,6 +283,7 @@ nodes:
       source: "plugins/onion/commands/"
       locator: "medido 2026-09-05: ls plugins/onion/commands/ = 20 arquivos, kg.md e kg-freshness.md presentes, kg-inbox.md AUSENTE; grep kg-inbox nos *.manifest.sh do marketplace = 0 hits"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_KG_INBOX_FORA_POR_MEDICAO_NAO_POR_ESQUECIMENTO
     node_type: evidence
@@ -288,6 +299,7 @@ nodes:
       source: ".claude/commands/meta/kg-inbox.md"
       locator: "medido 2026-09-06: `sed -n 8p .claude/commands/meta/kg-inbox.md` mostra `Bash(bash .claude/utils/adopt/starter-kg-inbox.sh*)` no allowed-tools; `wc -l` do starter = 39; o Passo 2 do mesmo comando (l.64-69) afirma que a proposta nasce a mao num adotante; a REGRA 61 vive em lint-artifacts.sh:1372 e a classe ALLOWED-TOOLS da REGRA 74 e a que o lint ja acusa em 3 artefatos do bundle atual"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
 
   - id: E_ARGUMENTO_CORRIGIDO_ANTES_DO_MERGE
     node_type: evidence
@@ -303,6 +315,7 @@ nodes:
       source: "docs/evolution/review/feat-plugin-completo-drive.md"
       locator: "a correcao foi aplicada no mesmo PR, antes do merge; o gate mecanico (lint 0 HARD) estava verde sobre a versao errada, e o achado veio da passada adversarial da REGRA 56"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
 
 
 edges:

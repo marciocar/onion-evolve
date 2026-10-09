@@ -38,6 +38,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml"
       locator: "CHANGELOG 2.1.260 l.42; juiz EMENDOU: supera SO a metade \"cobertura por deny rule e opcao a adotar\" do E_F5 da rodada 2; o ALLOW Bash(grep * .env) em settings.json:12 segue vivo (4 camadas de settings: zero deny, zero ask)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA
     node_type: evidence
     plane: DEV
@@ -54,6 +55,7 @@ nodes:
       source: ".claude/hooks/premodelswitch-guard.sh"
       locator: "CHANGELOG l.20, l.21; juiz EMENDOU: l.20 e falha de carga de hook de PLUGIN — a guarda do core e hook de settings.json (PreModelSwitch entre 9 eventos/15 hooks), nao de plugin"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_R3_F3_PICKER_MOSTRA_FABLE
     node_type: evidence
     plane: DEV
@@ -70,6 +72,7 @@ nodes:
       source: "docs/onion/radar-baselines.yaml"
       locator: "CHANGELOG l.18; juiz EMENDOU: source=picker JA foi medido em 2026-09-02 18:28Z (unico registro de model-switch.jsonl, decision=block); ladder=restored so sai vindo de degrau abaixo — Fable→Fable da `same`"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_R3_F4_AGENTES_FABLE_1M
     node_type: evidence
     plane: DEV
@@ -86,6 +89,7 @@ nodes:
       source: "docs/knowledge-base/concepts/agent-orchestration.md"
       locator: "CHANGELOG l.17; juiz APROVOU e re-mediu: frontmatter entre os dois --- = 43 sonnet + 8 opus + 0 fable = 51 agentes (9 arquivos sem model: sao READMEs); grep fable em .claude/agents = 0; pin ANTHROPIC_DEFAULT_FABLE_MODEL ausente"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_R3_F5_CACHE_FABLE
     node_type: evidence
     plane: DEV
@@ -102,6 +106,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-04/SYNTHESIS.md"
       locator: "CHANGELOG l.19, l.51, l.4; juiz APROVOU"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_R3_F6_AUTOCOMPACT_1M
     node_type: evidence
     plane: DEV
@@ -118,6 +123,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
       locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.49; docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md l.15"
       method: "leitura: changelog verbatim l.49"
+      locality: "repo"
   - id: E_R3_F7_WORKFLOW_SCHEMA_E_STALL
     node_type: evidence
     plane: DEV
@@ -134,6 +140,7 @@ nodes:
       source: ".claude/workflows/onion-research.js"
       locator: "CHANGELOG l.43, l.34; juiz EMENDOU substancialmente: allOf = 0 ocorrencias em onion-research.js; KG_SCHEMA_DECISION e spread + properties estreitadas, todo required existe em properties — nenhum schema do workflow e insatisfazivel"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_R3_F8_PLATAFORMA_SUBAGENTES_E_BACKGROUND
     node_type: evidence
     plane: DEV
@@ -150,6 +157,7 @@ nodes:
       source: "docs/knowledge-base/concepts/agent-orchestration.md"
       locator: "CHANGELOG l.29, l.31, l.61; juiz REPROVOU a ancora local (o bg-spare e desta sessao, 04-09, e /exit soltando so a visao do cliente e a semantica correta de job destacado — nao a duplicacao de l.31) e reduziu l.61 a nota (o teto de 1 h valia so para comandos de background de SUBAGENTES; a bancada roda do pre-commit e da sessao principal)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locality: "repo"
   - id: E_R3_F10_RELOAD_PLUGINS_HEADLESS
     node_type: evidence
     plane: DEV
@@ -166,6 +174,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
       locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.5, l.35; 980bdbe3 (versao derivada); bee1122b (hooks exigem reiniciar, 2026-09-02); docs/evolution/research/radar-E3-2026-09-04/SYNTHESIS.md l.18, l.31"
       method: "leitura: changelog verbatim l.5/l.35 + commits 980bdbe3 e bee1122b; emenda do juiz registrada em SYNTHESIS l.18/l.31"
+      locality: "repo"
   - id: E_R3_F11_REGRAS_DE_PERMISSAO
     node_type: evidence
     plane: DEV
@@ -182,6 +191,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
       locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.9, l.10, l.11, l.54; 1ab1429e:.claude/settings.json; docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md l.25; SYNTHESIS.md l.18"
       method: "leitura: changelog verbatim + camadas de settings (1ab1429e:.claude/settings.json allow=13; host /home/marcio/onion-evolve/.claude/settings.local.json 97, ~/.claude/settings.json.bak-2026-09-04 3, ~/.claude/settings.local.json 24; zero deny/ask) + F11 do rascunho; juiz APROVOU (SYNTHESIS l.18)"
+      locality: "repo"
   - id: E_R3_F12_GITLAB_SUBGRUPOS_TAMBEM_NO_FORGE_DO_CORE
     node_type: evidence
     plane: PROD
@@ -198,6 +208,7 @@ nodes:
       source: ".claude/utils/forge/detector.md"
       locator: "CHANGELOG l.39, l.40; juiz EMENDOU com medicao: a regex do parseRepoIdentity do spec do forge (detector.md) devolve owner=subgroup para gitlab.com/group/subgroup/project.git e owner=sub2 para group/sub1/sub2/project.git — o namespace e descartado; costura confere (detector.md:133, factory.md:75 case gitlab, sem adapter)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locality: "repo"
   - id: E_R3_F13_BASH_MODE_FORA_DO_SANDBOX
     node_type: evidence
     plane: DEV
@@ -214,6 +225,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
       locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.59; 1ab1429e:.claude/settings.json; docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md l.29"
       method: "leitura: changelog verbatim l.59 + ausencia da chave sandbox nas 4 camadas de settings (1ab1429e:.claude/settings.json e as 3 do host)"
+      locality: "repo"
   - id: E_R3_OMISSOES_JUIZ_0904
     node_type: evidence
     plane: DEV
@@ -230,6 +242,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
       locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.4, l.8, l.13, l.16, l.22, l.28, l.44, l.46, l.55, l.60; docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md; SYNTHESIS.md l.18, l.33-34"
       method: "leitura: changelog verbatim nas 10 linhas citadas + rascunho pre-juiz (confere a omissao) + placar do juiz em SYNTHESIS l.18 (\"8 omissoes\") e l.33-34"
+      locality: "repo"
   - id: E_LACUNAS_E3_0904
     node_type: evidence
     plane: DEV
@@ -247,6 +260,7 @@ nodes:
       source: "docs/evolution/research/radar-E3-2026-09-04/SYNTHESIS.md"
       locator: "SYNTHESIS.md l.36-37; corpo de 1ab1429e ('Nada de 2.1.260 foi observado — lacunas declaradas', 2026-09-04 00:58Z); host /home/marcio/onion-evolve/.claude/sessions/model-switch.jsonl l.1 (09-02, sem campo ladder; l.2 é 09-04T17:27, posterior ao commit)"
       method: "testemunho: lacunas declaradas pela sessão 2026-09-04 no corpo de 1ab1429e e SYNTHESIS l.37; cláusula do ladder por leitura de .claude/sessions/model-switch.jsonl no host"
+      locality: "repo"
 edges:
   - from: E_R3_F1_REVERT_DENY_READ_BASH
     to: Q_E3_DELTA_2_1_260

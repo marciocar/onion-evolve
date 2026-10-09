@@ -25,6 +25,7 @@ nodes:
       source: ".claude/hooks/pretooluse-env-guard.sh na main 2beae385"
       locator: "as 7 formas reproduzidas no harness do SAC-68 (6 vetos com a mensagem literal de cada um)"
       method: "medição: o hook rodado com o JSON do PreToolUse no stdin"
+      locality: "repo"
   - id: Q_ENV_GUARD_SEM_FALSO_POSITIVO
     node_type: question
     layer: audit
