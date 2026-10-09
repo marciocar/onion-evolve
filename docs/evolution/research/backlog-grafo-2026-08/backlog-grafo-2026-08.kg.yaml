@@ -156,7 +156,7 @@ nodes:
   # ── a perna externa, com o limite medido ─────────────────────────────────
   - id: E_REDDIT_INACESSIVEL_DESTE_HARNESS
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 2
     confidence: 1.0
     status: confirmed

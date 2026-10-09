@@ -21,9 +21,10 @@ nodes:
     verified_against: "transcript da PoC: agente sem tools de grafo tentou read_file('skills/kg-ssot/SKILL.md'), recebeu erro, e concluiu 'nao existe kg-ssot' — capacidade tratada como ausente; agravado por config quebrada (tools renomeadas sem alias). O maestro nomeou a tese: 'nao adianta levar o assistente sem levar o KG-SSOT-first e o runtime SDAAL'"
     label: "PROVA DE CAMPO da F4b: agente LibreChat sem a perna KG nao degrada gracioso — ALUCINA o caminho e nega a capacidade. A doutrina precisa viajar COM o agente, nao ficar implicita"
     provenance:
-      source: "/home/marcio/poc-venda-direta-pdi@e9fe9a4 (marciocar/poc-venda-direta-pdi) docs/onion/graph/phase2-plan.kg.yaml + corpo do commit e9fe9a4; tese do maestro em docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md@c44687b0"
+      source: "poc-venda-direta-pdi@e9fe9a49:docs/onion/graph/phase2-plan.kg.yaml + corpo do commit e9fe9a49; tese do maestro em docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md@c44687b0"
       locator: "phase2-plan.kg.yaml nó LICAO_RENOMEAR_QUEBRA_AGENTE (l.743-751: \"o modelo, sem a ferramenta, alucina alternativas (vou ler skills/kg-ssot/SKILL.md) e conclui que a capacidade não existe — parece falta de projeto, é config quebrada\"); corpo de e9fe9a4 (2026-08-20 20:47, \"o modelo então alucinou alternativas e concluiu que a capacidade não existia\"); SYNTHESIS.md l.11-14 (citação do maestro)"
       method: "leitura: nó do incidente e commit no repo da PoC + síntese do core"
+      locality: "repo"
   - id: E_POC_MCP_HAS_KG_RUNTIME
     node_type: evidence
     layer: audit
@@ -35,9 +36,10 @@ nodes:
     verified_against: "sessao da PoC: ingerir_documento_colado -> dossie segmentado -> GRAFO do caso -> radar rc=0; h1..h5+navegar_caso operam sobre o grafo. O padrao ja existe do lado do MCP"
     label: "O MCP da PoC JA CARREGA o runtime KG do lado do servidor (texto->grafo->radar como pipeline de ingestao) — o que falta e o LADO DO AGENTE: saber que o grafo e a fonte e usa-lo primeiro"
     provenance:
-      source: "/home/marcio/poc-venda-direta-pdi@e9fe9a4 (marciocar/poc-venda-direta-pdi) scripts/f2/case_ingest.py + scripts/f2/mcp_server.py"
+      source: "poc-venda-direta-pdi@e9fe9a49:scripts/f2/case_ingest.py + scripts/f2/mcp_server.py"
       locator: "case_ingest.py l.85-111 (ingere_texto: \"texto → dossiê → grafo do caso → radar\", subprocess kg-radar.sh l.101); mcp_server.py l.129-133 (ingerir_documento_colado), l.142-177 (h1..h5 + navegar_caso)"
       method: "leitura: código do MCP da PoC no commit de 2026-08-20"
+      locality: "repo"
   - id: D_READ_LEG_DESIGN
     node_type: decision
     trace: docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md
@@ -72,7 +74,7 @@ nodes:
     node_type: question
     trace: /home/marcio/onion-evolve/ops/mcp-onion-kg/server.py
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.9
     status: done
@@ -80,14 +82,14 @@ nodes:
     verified_against: "CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
     label: "RESOLVIDA — o MCP onion-kg esta VIVO: os agentes do core tem a mesma perna read(KG) que a PoC; o write segue proposta-que-o-core-sela (fila kg-inbox CONSTRUIDA e recebendo — ver E_SERVER_LEGS_PROVEN; a SELAGEM e que segue manual — ver Q_SEALING_NO_MECHANISM)"
     provenance:
-      source: "/home/marcio/onion-evolve/ops/mcp-onion-kg/server.py"
-      locator: "CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-evolve/ops/mcp-onion-kg/server.py no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "serviço systemd onion-vps-mcp-kg relatado vivo pela sessão (host)"
+      locator: "onion-evolve@8ade5598:ops/mcp-onion-kg/server.py ; CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
+      method: "testemunho: serviço onion-vps-mcp-kg relatado vivo pela sessão no host 2026-08-20; código em onion-evolve@8ade5598"
       locality: "host"
   - id: E_AGENTE_VITRINE_ONION
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.9
     status: confirmed

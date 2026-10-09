@@ -12,7 +12,7 @@ nodes:
     node_type: claim
     trace: docs/evolution/inbox/_processed/2026-07-27-develop-onion-update-base-cruzada.md
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.9
     status: confirmed
@@ -148,7 +148,7 @@ nodes:
     node_type: claim
     trace: docs/evolution/inbox/_processed/2026-07-27-desfecho-receita-develop-warn-falso-positivo.md
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed

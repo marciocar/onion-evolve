@@ -31,9 +31,10 @@ nodes:
     narrative: "label anterior: o ignore cego de .claude/ JÁ custara 242 arquivos (71 skills, 39 comandos) ao arandek em mai/2026 — custo real é o trabalho do adotante perdido em silêncio, não só o stamp Onion"
     trace: "arandek commits 1aa794f9 / 88d93f26"
     provenance:
-      source: "arandek@88d93f26 ; arandek@1aa794f9 (clone /home/marcio/arandek)"
+      source: "arandek@88d93f26 ; arandek@1aa794f9"
       locator: "git ls-tree -r 88d93f26^ -- .claude (242 arquivos; 39 em .claude/commands; 70 .claude/skills/*/SKILL.md); corpo de 88d93f26 ('242 arquivos sob .claude/ removidos do index ... Arquivos permanecem no working tree') e de 1aa794f9"
       method: "leitura: história git do adotante arandek (commits 88d93f26 e 1aa794f9)"
+      locality: "repo"
 
   - id: C_GAP3
     node_type: claim
@@ -138,9 +139,10 @@ nodes:
     label: "verificado no arandek: .gitignore ignorava .claude/ (linhas 106+117); o durable-commit stajou 0 arquivos .claude/ (só docs/)"
     trace: "git ls-files .claude no onion-adopt-arandek pós 1º commit"
     provenance:
-      source: "arandek HEAD:.gitignore ; clone /home/marcio/onion-adopt-arandek commit 611329a1"
+      source: "arandek@611329a1:.gitignore ; arandek@611329a1 (1º commit durável)"
       locator: ".gitignore l.106 e l.117 (\".claude/\"); 611329a1 \"chore(onion): adopt to pin 5e3ea5ee46ac\" (2026-07-24) — git diff-tree: 0 arquivos .claude/, 101 em docs/"
-      method: "leitura: .gitignore do adotante + diff-tree do 1º commit durável no clone do adotante"
+      method: "leitura: .gitignore do adotante em arandek@611329a1 (l.106 e l.117 = \".claude/\", conferido pelo juiz com git show) + diff-tree do 1º commit durável"
+      locality: "repo"
 
   - id: E_GAP3_FP
     node_type: evidence
@@ -240,7 +242,7 @@ nodes:
 
   - id: E_SELFTEST
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.95
     status: confirmed
@@ -397,7 +399,7 @@ nodes:
     node_type: claim
     trace: docs/analysis/onion-adopt-update-pin-staleness-2026-07.md
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.9
     status: confirmed
@@ -460,9 +462,10 @@ nodes:
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — 1) git -C onion-evolve merge-base --is-ancestor d6aba0e 65d8a7501a03 (confirma que o pin d'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó estava formulado como pergunta em aberto sobre um evento futuro ("quando... rodar"); o evento não só ocorreu como foi superado por múltiplos ciclos adicionais de update no adotante. A pergunta não tem mais objeto: já foi respondida pelo próprio comportamento do adotante, e a segunda cláusula (s'
     provenance:
-      source: "onion-evolve (git) ; clone /home/marcio/onion-adopt-arandek (ArandekBR/arandek) ; docs/analysis/backlog-real-2026-09.md l.79"
+      source: "onion-evolve@5c40b1cc (merge-base d6aba0e → 65d8a7501a03) ; arandek@cd682ac4 (ArandekBR/arandek, último commit em .claude/.onion-version até 2026-09-01) ; docs/analysis/backlog-real-2026-09.md l.79"
       locator: "git merge-base --is-ancestor d6aba0e 65d8a7501a03 (rc=0); no adotante, git log --all -- .claude/.onion-version: fbde45ad 07-25 (pin 65d8a750), 68f5cd8c 07-30, e05fd15a/908e8376/cd682ac4 08-31"
-      method: "medição: git merge-base --is-ancestor d6aba0e 65d8a7501a03 + git log --all -- .claude/.onion-version no clone do adotante"
+      method: "medição: git merge-base --is-ancestor d6aba0e 65d8a7501a03 → rc=0 e git log --all -- .claude/.onion-version no adotante → fbde45ad, 68f5cd8c, e05fd15a, 908e8376, cd682ac4 (reproduzidos pelo juiz em 2026-10-09)"
+      locality: "repo"
 
   - id: E_W9_PIN_GREP_MEDIDO
     node_type: evidence

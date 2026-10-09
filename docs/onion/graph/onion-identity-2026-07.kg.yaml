@@ -353,7 +353,7 @@ nodes:
   - id: E_MARKET_SCAN
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.9
     status: confirmed
@@ -384,7 +384,7 @@ nodes:
   - id: E_SITE_LIVE
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 1.0
     status: superseded
@@ -858,10 +858,10 @@ nodes:
     trace: "git ls-tree -r --name-only origin/main -- .claude"
     verified_at: 2026-07-17
     provenance:
-      source: "/home/marcio/onion-evolve"
-      locator: "git ls-tree -r --name-only fb08cc6b -- .claude | wc -l = 399 no CORE (origin/main do onion-evolve em 2026-07-16 20:45 -0300) x git -C /home/marcio/rhilo-metagamify ls-tree ... bfb9bce2 = 239"
-      method: "medição: git ls-tree -r --name-only <onion-evolve origin/main @2026-07-16..17> -- .claude | wc -l (reproduz o 399 no repo ERRADO)"
-      locality: "host"
+      source: "onion-evolve@fb08cc6b:.claude + metagamify@bfb9bce2:.claude"
+      locator: "git ls-tree -r --name-only fb08cc6b -- .claude | wc -l = 399 no CORE (origin/main do onion-evolve em 2026-07-16 20:45 -0300) x git -C metagamify ls-tree ... bfb9bce2 = 239"
+      method: "medição: git ls-tree -r --name-only fb08cc6b -- .claude | wc -l = 399 (core) × git ls-tree -r --name-only bfb9bce2 -- .claude | wc -l = 239 (metagamify)"
+      locality: "repo"
   - id: C_VERTICALS_PARTIAL_0717
     node_type: claim
     layer: audit
@@ -931,7 +931,7 @@ nodes:
   - id: E_FAMILIA_MULTIIDE_CONGELADA
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -972,14 +972,14 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-02
+    verified_at: "2026-10-09"
     verified_against: formulacao-do-maestro-2026-08-02
     label: "postura de acoplamento (formulação do maestro, 2026-08-02): acoplado ao Claude Code para tirar vantagem da estrutura e maquinaria, mas mantendo independência quando for mais vantajoso e o acoplamento não for necessidade; é o teste de toda adoção de substrato"
     narrative: "label anterior: A POSTURA DE ACOPLAMENTO (formulacao do maestro, criterio de decisao e NAO documentacao): 'o Onion esta ACOPLADO ao Claude Code para tirar vantagem de sua ESTRUTURA E MAQUINARIA, mas buscando manter INDEPENDENCIA sempre que isso for MAIS VANTAJOSO e o acoplamento NAO FOR NECESSIDADE'. E o teste que decide toda adocao de substrato: acoplar so quando a capacidade que se ganha nao existe fora — nunca por conveniencia nem por simetria. Governa decisoes ja tomadas hoje (.claude/rules/, tipos de hook, o slice de rules) e as futuras"
     provenance:
-      source: "65289818:CLAUDE.md"
-      locator: "corpo do commit 65289818 (#514, 2026-08-02) §\"O QUE MUDA\" item 2 + 65289818:CLAUDE.md l.15-18"
-      method: "testemunho: formulação do maestro de 2026-08-02, citada no corpo do commit 65289818 e projetada no CLAUDE.md l.15-18"
+      source: "CLAUDE.md"
+      locator: "l.24-27 (\"acoplado ao Claude Code para tirar vantagem da sua estrutura e maquinaria, mas mantendo independência sempre que isso for mais vantajoso e o acoplamento não for necessidade\")"
+      method: "medição: grep -n \"mantendo independência sempre que\" CLAUDE.md em origin/main cffe09fe → l.25"
       locality: "repo"
 
   - id: C_CORE_NAO_E_FAMILIA
@@ -1042,9 +1042,10 @@ nodes:
     verified_at: 2026-08-04
     verified_against: "marciocar/metagamify @ 2026-08-04, medido no clone local com ls-remote (estado remoto vivo, sem fetch)"
     provenance:
-      source: "git ls-remote --heads + git ls-tree -r --name-only origin/main -- .claude, em /home/marcio/rhilo-metagamify (origin = github.com/marciocar/metagamify)"
+      source: "metagamify@bfb9bce2:.claude (origin/main em 2026-08-04) + git ls-remote --heads no adotante metagamify (github.com/marciocar/metagamify)"
       locator: "marciocar/metagamify @ 2026-08-04, medido no clone local com ls-remote (estado remoto vivo, sem fetch)"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "medição: git ls-tree -r --name-only bfb9bce2 -- .claude | wc -l = 239 (reproduzido pelo juiz em 2026-10-09); o ls-remote das outras cabeças (develop f016e3d3 existe no remoto) é estado daquele instante e não se reproduz"
+      locality: "repo"
 
   - id: C_MEDICAO_NO_REPO_ERRADO_0804
     node_type: claim

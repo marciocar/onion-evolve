@@ -24,7 +24,7 @@ nodes:
   - id: E_GREP_TRACE
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed

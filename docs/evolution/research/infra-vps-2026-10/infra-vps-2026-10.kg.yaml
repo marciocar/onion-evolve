@@ -48,7 +48,7 @@ nodes:
 
   - id: E_MEDIDO_ESTADO_VIVO_1005
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.9
@@ -60,9 +60,10 @@ nodes:
     label: 'O ESTADO VIVO e a razao da pergunta: reboot pendente desde 2026-09-24 (libc6 e kernel 6.8.0-142 em disco, rodando 139), 31 containers, docker e a contencao onion-vps-docker-firewall habilitados, e uma recorrencia de infra resolvida A MAO com N muito maior que 1 (16 mosh-server orfaos de 11h a 11 dias encerrados manualmente). Recorrencia resolvida a mao pede MECANISMO (fix-must-become-mechanism). A contagem kernel 146 disponivel nao foi reproduzida — so o 142 aparece instalado.'
     trace: '/var/run/reboot-required.pkgs · /boot · systemctl · docker ps'
     provenance:
-      source: "/var/run/reboot-required.pkgs · /boot · systemctl · docker ps"
+      source: "estado do host da VPS: pacotes de reboot pendente, kernels em boot, systemctl e docker ps (host)"
       locator: "re-medido nesta sessao em 2026-10-05: uname -r = 6.8.0-139-generic; /boot tem vmlinuz-6.8.0-139 e vmlinuz-6.8.0-142; /var/run/reboot-required existe desde 2026-09-24 com .pkgs = libc6, linux-image-6.8.0-142-generic, linux-base; systemctl is-enabled docker e onion-vps-docker-firewall = enabled; docker ps = 31 containers. NAO re-medidos aqui (vindos do worker de escopo): 45 pacotes atualizaveis, 31 unless-stopped, 16 mosh-server orfaos encerrados a mao, release 26.04.1 disponivel; kernel 146 disponivel NAO reproduzido"
-      method: "testemunho: leitura do arquivo /var/run/reboot-required.pkgs no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura de reboot-required.pkgs, kernels instalados, systemctl e docker ps no host 2026-10-05"
+      locality: "host"
 
   - id: E_CORPUS_INFRA_JA_COBRE_EXPOSICAO
     node_type: evidence
@@ -550,9 +551,9 @@ nodes:
     label: 'OBJECAO (Elenxo, 1 agente) aos achados 2 e 3: checkrestart NAO esta instalado aqui; needrestart esta (padrao do Ubuntu). O modelo relatar-sem-agir vale, mas o instrumento citado e ausente — evidencia emprestada. O censo chama needrestart -b (batch, parseavel).'
     trace: '/usr/sbin/needrestart'
     provenance:
-      source: "/usr/sbin/needrestart"
+      source: "needrestart instalado e checkrestart ausente no sistema (host)"
       locator: "medido nesta VPS em 2026-10-05: which checkrestart vazio; /usr/sbin/needrestart existe"
-      method: "testemunho: leitura do arquivo /usr/sbin/needrestart no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: which checkrestart e presença do needrestart no host 2026-10-05"
       locality: "host"
 
   - id: E_OBJECAO_INSTRUMENTO_NAO_VERIFICADO
@@ -586,9 +587,9 @@ nodes:
     label: 'OBJECAO (Elenxo, 1 agente) ao achado 4: Livepatch nao se aplica a este host (ausente, e o reboot-required existe). A licao geral sobrevive: o censo cruza uname -r (139) com /boot/vmlinuz-* (142) e marca qual sinal sustentou o veredito. Premissa a corrigir: kernel 146 disponivel nao foi reproduzido.'
     trace: '/var/run/reboot-required.pkgs · /boot'
     provenance:
-      source: "/var/run/reboot-required.pkgs · /boot"
+      source: "reboot-required.pkgs e kernels em boot do host (host)"
       locator: "medido nesta VPS em 2026-10-05: canonical-livepatch ausente; /var/run/reboot-required existe com .pkgs libc6, linux-image-6.8.0-142-generic, linux-base; uname -r 139"
-      method: "testemunho: leitura do arquivo /var/run/reboot-required.pkgs no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura de reboot-required.pkgs e dos kernels instalados no host 2026-10-05"
       locality: "host"
 
   - id: E_OBJECAO_LYNIS_NAO_REINVENTAR

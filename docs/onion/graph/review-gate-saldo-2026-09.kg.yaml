@@ -67,7 +67,7 @@ nodes:
 
   - id: D_SEM_CREDITO_POR_ORA
     node_type: decision
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed

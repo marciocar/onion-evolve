@@ -60,7 +60,7 @@ nodes:
 
   - id: E_FRAGMENTACAO_NAO_ABSORCAO
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.75
@@ -133,9 +133,10 @@ nodes:
     verified_against: dogfood-headless-sessao-nova-2.1.233-opus-5-respondeu-TASK_TOOLS_AUSENTES
     label: "BREAKING medido, não lido: a 2.1.233 desliga Task/todo tools por padrão em Opus 4.8+ (`CLAUDE_CODE_ENABLE_TODO_TOOLS=1` religa). Verificado por DOGFOOD — sessão headless nova, versão nova, `--model claude-opus-5`, instruída a chamar TaskList: respondeu `TASK_TOOLS_AUSENTES`. Duas leituras que só a medição separa: (a) o FRAMEWORK Onion NÃO depende disso — grep em .claude/{commands,agents,skills} devolve ZERO instruções de TaskCreate/TaskUpdate/TaskList; a dependência era do fluxo do orquestrador, não dos artefatos; (b) a desativação é DELIBERADA da Anthropic nos modelos novos, provavelmente porque Opus 4.8+/5 planejam nativamente sem o andaime — logo religar por reflexo pode PIORAR, e a decisão de religar é do maestro, não minha. O risco real que fica: o maestro trocou o default para Opus 5 hoje; sessões novas perdem o rastreio de tarefas sem avisar."
     provenance:
-      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md)"
+      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md)"
       locator: "## 2.1.233: 'Todo/task-tracking tools… are no longer available on Opus 4.8, Sonnet 5, Fable 5, Mythos 5, and newer models; set CLAUDE_CODE_ENABLE_TODO_TOOLS=1' (cópia local l.3195)"
       method: "leitura: CHANGELOG 2.1.233 (o dogfood headless TASK_TOOLS_AUSENTES fica como testemunho sem comando registrado)"
+      locality: "web"
 
   - id: E_CONTRATO_DE_HOOKS_EXPLODIU
     node_type: evidence
@@ -147,9 +148,10 @@ nodes:
     verified_against: docs-primarias-MAIS-verificacao-no-binario-2.1.233-instalado-com-controle
     label: "A superfície de hooks — onde vive TODA a maquinaria determinística do Onion — multiplicou. Eventos hoje: PreToolUse, PermissionRequest, PermissionDenied, PostToolUse, PostToolUseFailure, PostToolBatch, UserPromptSubmit, UserPromptExpansion, Stop, StopFailure, SessionStart, SessionEnd, Setup, PreCompact, PostCompact, SubagentStart, SubagentStop, TaskCreated, TaskCompleted, TeammateIdle, WorktreeCreate, WorktreeRemove, Notification, ConfigChange, InstructionsLoaded, CwdChanged, DirectoryAdded, FileChanged, MessageDisplay, Elicitation, ElicitationResult (~30, contra os ~8 clássicos). E os HANDLERS deixaram de ser só `command`: agora há `http`, `mcp_tool`, `prompt` e `agent` — ou seja, uma guarda pode ser um PROMPT ou um SUBAGENTE, não só um script. Timeouts e exit codes documentados (2 bloqueia; e desde 2.1.214 exit 2 com JSON inválido BLOQUEIA corretamente — antes não bloqueava, o que valida a guarda anti-fail-open do Onion). É a maior oportunidade técnica do levantamento para quem, como o Onion, faz da guarda o produto. CONFIRMADO LOCALMENTE, não só em doc: grep no ELF instalado (2.1.233) acha PermissionDenied(46), TeammateIdle(23), InstructionsLoaded(20), FileChanged(31), DirectoryAdded(28), PostToolUseFailure(30), hookSpecificOutput(35) — com CONTROLE (PreToolUse 93, SessionStart 79) provando que o método enxerga. Ou seja: está disponível NESTA máquina, hoje, não é roadmap."
     provenance:
-      source: "docs/evolution/review/docs-claude-code-2-1-audit.md + CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md)"
+      source: "docs/evolution/review/docs-claude-code-2-1-audit.md + CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md)"
       locator: "resíduo PR #616 §'Verificação cruzada' (revisor re-mediu os eventos no binário 2.1.233) · CHANGELOG ## 2.1.214 'Fixed hooks with exit code 2 not blocking… when stdout JSON fails schema validation'"
       method: "juízes: re-medição independente do revisor adversarial registrada no resíduo R56 do PR #616"
+      locality: "repo"
 
   - id: E_PLATAFORMA_ABSORVEU_DISTRIBUICAO_E_ISOLAMENTO
     node_type: evidence
@@ -161,9 +163,10 @@ nodes:
     verified_against: changelog-2.1.219-a-2.1.233-fonte-primaria
     label: "A plataforma passou a fazer sozinha coisas que um framework faria: plugin source `archive` (zip por HTTPS com pin SHA-256 — distribuição sem git/npm), `claude self-hosted-runner` (rodar sessões na própria infra), marketplaces com allowlist/blocklist e wildcard, sandbox com CREDENTIAL MASKING ciente de JWT e re-assinatura AWS SigV4, isolamento de worktree corrigido (sessões isoladas conseguiam rodar git destrutivo no checkout principal — fix de segurança), `--max-budget-usd` cortando subagente de background, nesting de subagentes 1→3 e cap de concorrência 20. Consequência para o Onion: a régua da postura de acoplamento (2026-05-18: 'acople só quando a capacidade não existe fora') tem itens novos para reavaliar — parte do que o Onion carrega em `adopt/vendor` pode virar `archive` com pin, e parte do que ele guarda com disciplina pode virar sandbox nativo."
     provenance:
-      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md)"
+      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md)"
       locator: "## 2.1.224 (archive com SHA-256, self-hosted-runner, credential masking jwt/sigv4) · ## 2.1.222 (worktree isolation destructive git) · ## 2.1.219 (nesting depth 3) · ## 2.1.217 (cap 20 concorrentes, --max-budget-usd em background)"
       method: "leitura: CHANGELOG 2.1.217–2.1.224"
+      locality: "web"
 
   - id: E_ASSIMETRIA_DE_PERMISSAO_DIR
     node_type: evidence
@@ -175,9 +178,10 @@ nodes:
     verified_against: changelog-2.1.211-e-2.1.214-mais-varredura-do-settings-do-core
     label: "Semântica de padrão mudou por baixo de configuração existente: `dir/**` de segmento único em REGRA DE PERMISSÃO e em `if:` de HOOK deixou de auto-aprovar em qualquer profundidade e passou a valer só `<cwd>/dir` (2.1.211/2.1.214) — mas as regras `deny`/`ask` MANTIVERAM o casamento em qualquer profundidade. Assimetria viva: o mesmo padrão significa coisas diferentes conforme o lado. Varredura no core: o `settings.local.json` usa caminhos ABSOLUTOS multi-segmento (`Read(//home/marcio/**)`), que não caem na mudança — o core passou ileso POR ACIDENTE de estilo, não por desenho. Registrado porque adotante com `Edit(src/**)` relativo teve o efeito da regra alterado sem tocar em nada."
     provenance:
-      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md)"
+      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md)"
       locator: "## 2.1.214: 'Fixed single-segment dir/** allow rules like Edit(src/**)… only <cwd>/dir' e 'Changed single-segment dir/** hook if: conditions… deny/ask permission rules keep their any-depth match' (cópia local l.3604 e l.3647)"
       method: "leitura: CHANGELOG 2.1.214"
+      locality: "web"
 
   - id: E_ELENXO_DERRUBOU_METADE_DA_TESE
     node_type: evidence
@@ -282,7 +286,7 @@ nodes:
 
   - id: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.9
@@ -326,7 +330,7 @@ nodes:
 
   - id: E_DOGFOOD_DA_PERNA_DE_LEITURA_3_DE_3_NAO_MUDOU
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.8
@@ -340,7 +344,7 @@ nodes:
 
   - id: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.9
@@ -348,9 +352,10 @@ nodes:
     verified_against: 11-repos-de-adotante-medidos-no-disco-com-ausencia-distinguida-de-vazio
     label: "A medição que o Elenxo declarou como a mais importante (se o corpus não transfere, o fosso é biografia deste repo e não produto) FOI FEITA — 11 dos 12 membros da federação medidos no disco. Resultado em três camadas. (1) A MAQUINARIA TRANSFERE: 9 de 11 têm `.claude/validation/` com 13–40 scripts; `kg-radar.sh`, `diary-index.sh` e o comando `/meta:diary` estão em TODOS os adotantes verificados. (2) A PRÁTICA QUASE NÃO TRANSFERE: grafo autoral em 3 de 7 (gustavo-pulga 2, arandek 3, onion-dist 1); diário em 1 de 7 (gustavo-pulga, 9 entradas); e — o número que decide — CI rodando a maquinaria em 1 de 7 (só o onion-standalone; 5 nunca tiveram `.github/workflows`, e o metagamify tem workflow que não cita o Onion). Guarda que existe como arquivo e não roda em CI é guarda inalcançável: a mesma classe que o core já registrou em 2026-08-02. (3) A INVERSÃO QUE A MEDIÇÃO REVELOU, e que salva os adotantes da acusação: `docs/evolution/review/` está AUSENTE nos 11, mas `review-artifact-check.sh` NUNCA FOI VENDORIZADO para nenhum deles — o zero de resíduos R56 não é prática que não pegou, é CAPACIDADE QUE NUNCA ENVIAMOS. A medição sugerida pelo revisor ('contar .kg.yaml e docs/evolution/review/ nos adotantes') teria produzido exatamente a conclusão errada, culpando o adotante por uma ausência do core. VEREDITO HONESTO: o corpus NÃO transfere hoje — mas a causa se reparte entre não-uso (grafo/diário, enviados e pouco usados) e não-envio (R56, jamais embarcado), e só a segunda é acionável por nós agora."
     provenance:
-      source: "sessão 2026-08-16 (agente do core) — commit 614e35b6 + leitura dos repos de adotante no host /home/marcio/<repo>"
+      source: "sessão 2026-08-16 (agente do core) — commit 614e35b6 + leitura dos repos de adotante no host"
       locator: "11 de 12 membros medidos no disco: validation/ em 9/11, grafo autoral 3/7, diário 1/7, CI 1/7, review-artifact-check.sh nunca vendorizado"
-      method: "testemunho: leitura dos repos de adotante no host (medição da sessão 2026-08-16, comando não registrado)"
+      method: "testemunho: leitura dos repos de adotante no host 2026-08-16 (comando não registrado)"
+      locality: "host"
 
   - id: Q_O_QUE_FAZER_COM_A_NAO_TRANSFERENCIA
     node_type: question

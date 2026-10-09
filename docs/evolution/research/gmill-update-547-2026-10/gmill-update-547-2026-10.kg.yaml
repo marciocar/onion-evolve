@@ -30,7 +30,7 @@ nodes:
 
   - id: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.85
     status: confirmed

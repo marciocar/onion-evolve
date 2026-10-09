@@ -443,9 +443,9 @@ nodes:
     trace: '/tmp/claude-1000/r0/final.json'
     label: "MEDIDO, nao suposto: dos 16 nos do R0, os workers declararam 9 CONFIRMED / 6 DRIFTED / 1 UNVERIFIABLE; apos o fan-in vale 6 / 4 / 6. CINCO rebaixamentos, um TERCO da amostra. Quatro por G1 (veredito positivo COM `blocked_by` preenchido — dizer `nao consegui medir isto` e `esta confirmado` na mesma respiracao) e um por G2: `E_MEDICAO_NAO_OBSERVADA_ERA_MINHA` declarou CONFIRMED tendo medido 5 de 6 afirmacoes, que e LITERALMENTE o defeito de 2026-08-12 que criou a guarda, reproduzido. Sem o fan-in, 5 nos receberiam carimbo indevido. E a prova pratica de que CONFIRMED e o desfecho para onde um worker escorrega: e o unico que nao pede justificativa."
     provenance:
-      source: "/tmp/claude-1000/r0/final.json"
+      source: "final.json do run R0 wf_5b2f274e-83d no scratch do harness (host)"
       locator: "R0 run wf_5b2f274e-83d: 16 workers, 5 rebaixamentos no fan-in"
-      method: "testemunho: leitura do arquivo /tmp/claude-1000/r0/final.json no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do final.json do run wf_5b2f274e-83d no host 2026-09-09"
       locality: "host"
 
   - id: Q_BLOCKED_BY_ESTA_SOBRECARREGADO

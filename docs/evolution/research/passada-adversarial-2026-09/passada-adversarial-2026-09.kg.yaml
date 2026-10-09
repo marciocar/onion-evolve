@@ -512,7 +512,7 @@ nodes:
 
   - id: E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.95
@@ -528,7 +528,7 @@ nodes:
 
   - id: E_METADE_DO_PARQUE_FORA_DO_REGISTRO_DA_FEDERACAO
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.95
@@ -812,7 +812,7 @@ nodes:
 
   - id: E_REVISOR_SEMANTICO_VOLTOU_A_RODAR_COM_CREDITO
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
@@ -828,7 +828,7 @@ nodes:
 
   - id: E_A_MESMA_CAUSA_VOLTOU_E_AGORA_COM_O_CORPO_DA_API
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed

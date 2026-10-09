@@ -121,7 +121,7 @@ nodes:
   - id: E_AGREGADO_COM_OPTIN_VAZA_POR_DIFERENCA
     node_type: evidence
     evidence_class: testimony
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.8

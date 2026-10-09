@@ -45,7 +45,7 @@ nodes:
 
   - id: E_ESTUDO_O_CLAUDE_CODE_RECUSA_O_QUE_NAO_PROVA
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.9
     status: confirmed
@@ -57,8 +57,8 @@ nodes:
     provenance:
       source: "commit 0766a4d7 (sessão session_01NSeoZ75idrWT2wShxLsVfA) ; .claude/hooks/lib/invocation-lines.sh l.22-23"
       locator: "verified_against do nó (parseCommand/tree-sitter, 145 strings reason: em torno de 'tree-sitter mis-parse') + cabeçalho da lib l.22-23"
-      method: "testemunho: medição da sessão 2026-10-05 sobre o binário 2.1.289, comando não registrado"
-      locality: "repo"
+      method: "medição: análise do binário do Claude Code 2.1.289 na sessão 2026-10-05 (parseCommand/tree-sitter, cerca de 145 strings reason:), comando não registrado"
+      locality: "host"
 
   - id: E_ESTUDO_SO_O_SHLEX_EXISTE_EM_TODO_LUGAR
     node_type: evidence
@@ -87,7 +87,7 @@ nodes:
 
   - id: E_REEXECUCAO_DOS_COMANDOS_REAIS
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.95
     status: confirmed

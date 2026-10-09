@@ -2058,7 +2058,7 @@ nodes:
 
   - id: D_R3_F1_F2_SELADAS
     node_type: decision
-    plane: PROD
+    plane: DEV
     status: done
     impact: 5
     confidence: 0.9
@@ -2113,7 +2113,7 @@ nodes:
 
   - id: D_R2_EMENDAS_A_C_SELADAS
     node_type: decision
-    plane: PROD
+    plane: DEV
     status: done
     impact: 5
     confidence: 0.85

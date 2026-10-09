@@ -292,9 +292,9 @@ nodes:
     label: "WAHA DEPLOYADO NA VPS (o gatilho, metade infra): /home/marcio/onion-vps-waha/docker-compose.yml no padrao da casa (stacks em /home/marcio/<projeto>). container onion-waha, restart unless-stopped, bind 127.0.0.1:3999 (SEM superficie publica — o consumidor roda no mesmo host), engine NOWEB (decidido POR MEDICAO), volume ./sessions persistente, segredos gerados por openssl em .env com umask 077 + .gitignore. PROVAS: 401 sem X-Api-Key / 200 com; POST /api/sessions -> SCAN_QR_CODE; GET /auth/qr -> 200 png 5379 bytes; RAM em producao 412.9 MiB. FALTA SO o ato fisico do maestro: escanear o QR (parear o numero)"
     trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
     provenance:
-      source: "/home/marcio/onion-vps-waha/docker-compose.yml"
+      source: "container onion-vps-waha e seu docker-compose.yml no host (host)"
       locator: "docker-compose-up-mais-curl-na-vps"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do docker-compose.yml do onion-vps-waha e medição do container no host 2026-07-31"
       locality: "host"
 
   # ── GATILHO FECHADO 2026-08-01: 1a mensagem REAL enviada ──
@@ -309,14 +309,14 @@ nodes:
     label: "GATILHO FECHADO: sessao PAREADA (status WORKING, me.pushName 'Marcio Carvalho') via PAIRING CODE (nao QR) e 1a MENSAGEM REAL ENVIADA por POST /api/sendText. Resposta observada: {key:{remoteJid,fromMe:true,id:'3EB0F3FD25A3BD038FC7EE'}, messageTimestamp, status:'PENDING'}. DECIDE 2 pontos do contrato que estavam no papel: (1) o WAHA DEVOLVE key.id real -> MessageReceipt.id e preenchivel neste provider (a nullabilidade existe pelo OUTRO provider, nao por este); (2) status PENDING prova CICLO DE VIDA de entrega (webhook message.ack) -> os estados queued/sent do MessageReceipt tem lastro, nao sao invencao. OBSERVACAO A VERIFICAR: me.id voltou '555197702725@c.us' (sem o 9), mas o envio para '5551997702725@c.us' funcionou — normalizacao de numero BR e assimetrica e o adapter precisa tratar"
     trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
     provenance:
-      source: "/home/marcio/onion-vps-waha/docker-compose.yml"
+      source: "container onion-vps-waha e seu docker-compose.yml no host (host)"
       locator: "post-api-sendText-contra-waha-vivo-na-vps"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do docker-compose.yml do onion-vps-waha e medição do container no host 2026-08-01"
       locality: "host"
 
   - id: C_pairing_needs_primary
     node_type: claim
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 0.9
@@ -333,7 +333,7 @@ nodes:
   # ── ACHADO RAIZ 2026-08-01: ENDERECAMENTO LID (o mais valioso da rodada) ──
   - id: E_lid_addressing_root_cause
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 1.0
@@ -402,10 +402,10 @@ nodes:
     label: "PENDENCIA 1 FECHADA — ENGINE DEFAULT = NOWEB. Re-teste com endereçamento LID correto: NOWEB enviou e a mensagem CHEGOU (confirmado pelo destinatario humano), com ZERO erros de USync nos logs (antes falhava sempre). Portanto o engine NUNCA foi a causa — era enderecamento. NOWEB e o default por medicao (412.9 MiB vs 638.8 do WEBJS, ~35% mais leve) SEM perda de funcionalidade. O valor real do WEBJS foi DIAGNOSTICO: mensagem de erro legivel ('No LID for user') vs o WARN silencioso do NOWEB ('USync yielded no results') — registrar como nota de troubleshooting, nao como default"
     trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
     provenance:
-      source: "commit f1ac4623 (corpo) · /home/marcio/onion-vps-waha@86662e0:docker-compose.yml"
-      locator: "f1ac4623 corpo §PENDÊNCIA 1 (2026-08-01 05:10Z) · onion-vps-waha@86662e0:docker-compose.yml l.18 (WHATSAPP_DEFAULT_ENGINE: NOWEB) · README.md l.13"
-      method: "leitura: corpo do commit f1ac4623 + compose do repo onion-vps-waha no commit 86662e0"
-      locality: "host"
+      source: "onion-evolve@f1ac4623 (corpo)"
+      locator: "f1ac4623 corpo §PENDÊNCIA 1 (2026-08-01 05:10Z) ; compose versionado depois em onion-waha@86662e01:docker-compose.yml l.18 (WHATSAPP_DEFAULT_ENGINE: NOWEB) e README.md l.13 — 1º e único commit do remoto, 2026-08-02T23:22Z"
+      method: "leitura: corpo do commit f1ac4623 do core; o compose de 2026-08-01 só existia no host e foi versionado um dia depois em onion-waha@86662e01"
+      locality: "repo"
 
   - id: E_ack_lifecycle_proven
     node_type: evidence

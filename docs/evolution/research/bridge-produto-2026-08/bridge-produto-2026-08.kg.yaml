@@ -43,9 +43,9 @@ nodes:
     label: "O PROGRAMA (aprovado 2026-08-14): 6 fases, 25 PRs pequenos com Elenxo cada, deploy sempre via ops/update-bridge.sh. DECISÕES SELADAS DO MAESTRO: (1) F0 fiação ∥ F1 pesquisa — religar o existente é invariante sob qualquer posicionamento; (2) thread store SERVER-SIDE (multi-device, pré-requisito de share, substrato do Brain futuro); (3) pesquisa COMPLETA ~15 lentes em 5 eixos; (4) admin novo via Logto Management API (M2M só no backend) + meter reader — convites mortos não ressuscitam. REFORÇO (aparte 2026-08-14): 'tudo deve começar com as versões mais modernas' → PR-00 moderniza deps ANTES da fiação (assistant-ui 0.15+ mata o pin 0.14.7 na direção certa; fia-se UMA vez, contra a API nova) — revoga a estratégia congelar-0.14. PRESERVAR: oidc.ts, sse.ts, meter.ts, telemetry/ SDAAL, tema 3 camadas, pickers / e @ (o diferencial: 102 comandos/51 agentes), convert-message.ts. ANTI-SALADA: nenhuma superfície nova antes do corte DO/DEFER/DROP do G1, cada item com aresta para evidência."
     trace: "/home/marcio/.claude/plans/enumerated-squishing-adleman.md"
     provenance:
-      source: "/home/marcio/.claude/plans/enumerated-squishing-adleman.md"
+      source: "plano enumerated-squishing-adleman.md do harness (host)"
       locator: "plano-aprovado-pelo-maestro-com-4-decisoes-seladas-e-reforco-de-versoes-latest"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/plans/enumerated-squishing-adleman.md no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do plano enumerated-squishing-adleman.md do harness no host 2026-08-14; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "host"
 
   - id: F0_ALICERCE_FIACAO
@@ -59,9 +59,9 @@ nodes:
     label: "F0 ALICERCE (sem. 1-2, começa já): PR-00 modernização de deps para latest (reforço do maestro) · PR-01 poda (333 linhas mortas + AdminPanel de convites + public/) · PR-02 controle (onCancel/onReload/onEdit — parar/regenerar/editar/branching vivos) · PR-03 SSE completo (thinking→reasoning, tool_result→UI, onAddToolResult) · PR-04 telemetria correta (modelUsage c/ cache-write, paridade ≤1% com o meter) · PR-05 persistência mínima (resume + histórico sobrevivem a F5) · PR-06 ErrorBoundary + safe-area bottom · PR-06b bancada (eslint+vitest+bench.sh — substituto do CI ausente) · PR-03b APROVAÇÃO GRANULAR DE TOOL (adicionado no G1 pelo maestro: canal canUseTool→SSE→decisão no chip + allowlist por ferramenta — a reação mista ao anúncio do Auto Mode (07/08) + triangulação C3 mostram que aprovação binária corrói confiança). GATE G0: 9/9 dones MEDIDOS + deploy + smoke. ✅ G0 FECHADO 2026-08-14: os 9 PRs mergeados (bridge #5-#10) com Elenxos 9º-12º no caminho (12º achou BLOQUEADOR: resume atravessava identidades — curado com session-owners + 403 + logout limpando persistência); deploy em produção pelo ops/update-bridge.sh (o 1º uso do ramo cheio desenterrou a retenção do backup morta desde 08-11 — core #596 — e um npm ci transiente que o fail-closed segurou com serviço parado de propósito; triagem humana completou e o NOOP do mecanismo confirmou o estado final); provas: health ok+pwa:true local+público, boot da invocação nova com auth enforce/JWKS OK/a2a 3, bench rc=0 (12 parque + 16 vitest + orçamento 885KB<940KB), estabilidade 10min."
     trace: "/home/onion/onion-bridge/web/src/runtime/onion-runtime.ts"
     provenance:
-      source: "/home/onion/onion-bridge/web/src/runtime/onion-runtime.ts"
-      locator: "deploy-em-producao-health-ok-pwa-true-invocacao-nova-auth-enforce-noop-do-mecanismo-e-estabilidade"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/web/src/runtime/onion-runtime.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "deploy da fase F0 medido em produção: health ok, PWA, invocação nova, enforce no-op (host)"
+      locator: "onion-bridge@28f3ad96:web/src/runtime/onion-runtime.ts ; deploy-em-producao-health-ok-pwa-true-invocacao-nova-auth-enforce-noop-do-mecanismo-e-estabilidade"
+      method: "testemunho: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@28f3ad96:web/src/runtime/onion-runtime.ts"
       locality: "host"
 
   - id: F1_FAROL_PESQUISA
@@ -86,9 +86,9 @@ nodes:
     label: "F2 ESPINHA (pós-G0, NÃO espera G1 — multi-conversa é table-stake unânime): PR-07 thread store SERVER-SIDE (CRUD por identidade/org, decisão selada do maestro; IDs estáveis + metadados extensíveis = porta do Brain) · PR-08 ExternalStoreThreadListAdapter + lista/título/arquivar · PR-09 rotas (/chat/:threadId, /admin — fim do useState-navegação; refresh restaura estado exato) · PR-10 busca · PR-11 code-splitting (chunk inicial <300KB dos 828KB). ✅ F2 FECHADA 2026-08-14 (bridge a4d562f+5c67928+cd44569): thread-store server-side com dono mecânico, painel+busca+deep-link /t/<id> (History API, zero dep), save no fim do turno. 13º ELENXO derrubou a v1 INTEIRA: a F2 nunca tinha salvado NADA (cleanup de effect zerava o ref antes da leitura — só execução revelava; a classe ref-como-canal do 12º reincidindo) + DoS por bytes (tetos contavam itens: 100MB/conversa, write síncrono travava o event loop) + 9 SEV-2/3 — todos curados com bancada de 6 cenários rodando o código REAL (6/6 falham no antigo). PR-11 RE-ANCORADO (o <300KB raw era irreal com assistant-ui na view única): orçamento vira GZIP ≤260KiB no bench, medido 253KiB — splitting real chega com F3 (shiki/painéis lazy). DECISÃO ABERTA AO MAESTRO: last-write-wins entre aparelhos (cura desenhada: concorrência otimista PUT+updatedAt→409; muda protocolo cliente). E o deploy desenterrou o 14º achado da linha: o guard [ -d ] do update-bridge SEM sudo mentia DIR-AUSENTE (marcio não atravessa /home/onion) — a mesma classe já escrita no bridge-backup.sh; curado neste PR."
     trace: "/home/onion/onion-bridge/web/src/App.tsx"
     provenance:
-      source: "/home/onion/onion-bridge/web/src/App.tsx"
-      locator: "deploy-em-producao-threads-401-sem-token-spa-fallback-servindo-index-bench-22-testes-gzip-253kib"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/web/src/App.tsx no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "deploy da fase F2 medido em produção: /threads 401 sem token, SPA fallback servindo index, bancada 22 testes (host)"
+      locator: "onion-bridge@c2b4e9db:web/src/App.tsx ; deploy-em-producao-threads-401-sem-token-spa-fallback-servindo-index-bench-22-testes-gzip-253kib"
+      method: "testemunho: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@c2b4e9db:web/src/App.tsx"
       locality: "host"
 
   - id: F3_ROSTO_REDESIGN
@@ -102,9 +102,9 @@ nodes:
     label: "F3 ROSTO (pós-G1): /design:generate (candidatas ancoradas cream #FAF7F2/orange #C2410C + gate WCAG determinístico) → @design-system-specialist (tokens DTCG→Tailwind) sobre o tema 3 camadas existente. PR-12 tokens + DARK LIGADO (já desenhado nos semânticos, toggle + prefers-color-scheme, WCAG AA nas duas) · PR-13 shiki lazy · PR-14 anexos PDF/text (backend JÁ aceita) · PR-15 blocos inline no fio (escopo mínimo do corte G1 — a tendência pós-Canvas) · PR-16 i18n pt-BR primeiro · PR-17 composer novo preservando pickers + sugestões anti-blank-page. GATE G3: WCAG AA claro+escuro, Lighthouse mobile ≥90, demo aprovada. ✅ F3 FECHADA 2026-08-14 (bridge 6510d84/4f7bf7c/0ec9aa9/73a69d2/bd4b3a9/1d45531): dark ligado (WCAG MEDIDO — pegou #7A726A herdado da landing reprovando AA e, no 14º Elenxo, a conversa CREME no tema escuro: o .dark só reapontava primitivos e o registry usa aliases shadcn — coluna completa, pares 6,3-16,6:1); shiki lazy dual-theme (com debounce por token: 7.365ms→122ms num bloco de 19KB em stream); anexos texto/md/código+PDF (o 14º provou o PR-14a DECORATIVO — external-store não funde attachments; curado com testes) + tetos 25MB /chat e 1MB texto; pt-BR 34/34; sugestões anti-blank-page pelo canal nativo. Ajustes de alinhamento declarados: SEM /design:generate (identidade já existia); PR-15 fundido no 13; Lighthouse = TETO (sem Chrome na VPS; substituto: gzip inicial 260KiB medido + WCAG por cálculo). 14º Elenxo: 11 achados/10 curados/16 testes-que-mordem. Escolhas registradas: bordas dark 1,35:1 (convenção shadcn; focus 6,7:1) · splash PWA creme (manifest estático)."
     trace: "/home/onion/onion-bridge/web/src/theme/onion.css"
     provenance:
-      source: "/home/onion/onion-bridge/web/src/theme/onion.css"
-      locator: "deploy-pelo-mecanismo-ramo-cheio-limpo-bridge-1d45531-health-ok-38-testes-gzip-no-orcamento"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/web/src/theme/onion.css no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "deploy da fase F3 pelo mecanismo, medido em produção: bridge 1d45531 health ok, 38 testes, gzip no orçamento (host)"
+      locator: "onion-bridge@1d45531a:web/src/theme/onion.css ; deploy-pelo-mecanismo-ramo-cheio-limpo-bridge-1d45531-health-ok-38-testes-gzip-no-orcamento"
+      method: "testemunho: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@1d45531a:web/src/theme/onion.css"
       locality: "host"
 
   - id: F4_GOVERNO_ADMIN
@@ -118,9 +118,9 @@ nodes:
     label: "F4 GOVERNO (pós-G1, ∥ F3): admin passa a administrar o que EXISTE. PR-18 meter reader (agregação org/sub/payer/model/cache × período — o ledger já grava com rigor de ADR e nada lê) · PR-19 usage dashboard (custo CERTO com cache-write) · PR-20 identidades/orgs/convites via Logto Management API (token M2M SÓ no backend Hono; front nunca fala com Logto admin) · PR-21 cotas + rate-limit como UX (orçamento no composer; 429 com retry-after legível, nunca modal genérico). GATE G4: convite→cadastro→1ª conversa→custo no dashboard em <5min, MEDIDO. ✅ F4 FECHADA 2026-08-14 (bridge 84402c0/e79d263/42a22b1/5bccdd6/bd82daa): meter-reader (o ledger parou de morrer em disco) + dashboard /admin no tema + quotas com 429 legível + identidades via Logto Management API fail-soft (M2M m-default extraído pela rota do provisionador, no .env). 15º ELENXO salvou a fase de ser fachada: a pilha MEDIA E MOSTRAVA MAS GOVERNAVA NADA — invite SEM GUARD (anônimo criava usuário no tenant; 201 medido) e a COTA ERA CÓDIGO MORTO (middleware após o handler) — as MESMAS classes já fechadas (use-sem-subpath do 11º, ordem-de-registro) reincidindo; +9 curas (DoS 79x na janela, PATCH gravando diferente do que respondia, convite-que-nunca-loga em tenant username-only agora avisado pelo IdP, token M2M sobrevivendo à revogação, __proto__, cortes silenciosos). PROVA VIVA pós-deploy: invite anônimo 401, usage 401 sem token, SPA /admin 200. FIOS ABERTOS COM GATILHO: S12 corrida do enforcement (ledger grava no FIM do turno — 20 checagens concorrentes passam; rate-limit contém a 20/min; cura = reserva-de-gasto-em-voo, decisão de desenho) · cota SEM SUPERFÍCIE de edição (só curl — UI de quota no admin) · G4 prova humana <5min pendente do maestro (convite pelo dashboard→login→chat→custo; convite útil exige e-mail como identificador no tenant OU criar com username)."
     trace: "/home/onion/onion-bridge/src/meter.ts"
     provenance:
-      source: "/home/onion/onion-bridge/src/meter.ts"
-      locator: "deploy-limpo-3a-vez-invite-anonimo-401-em-producao-usage-guards-ok-spa-admin-200-m2m-no-env"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/meter.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "deploy da fase F4 medido em produção: convite anônimo 401, guards de usage, SPA admin 200, M2M sem .env (host)"
+      locator: "onion-bridge@43afd2bd:src/meter.ts ; deploy-limpo-3a-vez-invite-anonimo-401-em-producao-usage-guards-ok-spa-admin-200-m2m-no-env"
+      method: "testemunho: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@43afd2bd:src/meter.ts"
       locality: "host"
 
   - id: F5_PRACA_DIVULGACAO
@@ -134,9 +134,9 @@ nodes:
     label: "F5 PRAÇA (pós-G3): PR-22 PWA real (runtimeCaching, offline shell, install prompt) · PR-23 share read-only com escopo de org · PR-24 onboarding (tour dos pickers — o diferencial apresentado no 1º uso). ✅ F5 FECHADA NO CÓDIGO E EM PRODUÇÃO 2026-08-14 (bridge f61ea31/b6b2ce4/57a1545/28f3ad9): PWA instalável (beforeinstallprompt + CacheFirst nos chunks lazy; iOS = teto declarado) · share por link NÃO-LISTADO e revogável (v1 TEXTO declarado: tool-calls/reasoning/synthetic fora POR DESENHO; escopo de org = DEFER com gatilho '1ª org povoada') · tour de 3 cartões pós-login. 16º ELENXO (11 achados, todos endereçados; 2 hipóteses do briefing REFUTADAS com evidência — o guard do subpath e o denylist do SW estavam certos): o CRÍTICO era o índice global shares.json com ler→mutar→escrever fail-open — UMA leitura falha SUBSTITUÍA os links de todos os usuários (medido); e as TRÊS classes do achado eram reincidências de curas que já existiam NO MESMO ARQUIVO (tmp+rename comentado 120 linhas acima; balde de I/O síncrono comentado 50 linhas acima; __proto__ do 13º) — a cura ficou no caso, não no mecanismo. Desta vez virou mecanismo: share-selftest.mts (16 asserts) na bancada. PROVAS VIVAS pós-deploy: /shared 404+noindex+no-store, share anônimo 401, /s/* noindex, 31º hit 429. Ajuste declarado: 'escopo de org' do plano virou v1 sem org (não há orgs povoadas — mesma régua do DEFER)."
     trace: "/home/onion/onion-bridge/web/vite.config.ts"
     provenance:
-      source: "/home/onion/onion-bridge/web/vite.config.ts"
-      locator: "deploy-28f3ad96-provas-vivas-shared-404-noindex-nostore-share-anonimo-401-s-noindex-hit31-429-selftest-16-16-bench-verde"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/web/vite.config.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "deploy 28f3ad96 da fase F5 com provas vivas em produção: shared 404 noindex/nostore, share anônimo 401, hit31 429 (host)"
+      locator: "onion-bridge@28f3ad96:web/vite.config.ts ; deploy-28f3ad96-provas-vivas-shared-404-noindex-nostore-share-anonimo-401-s-noindex-hit31-429-selftest-16-16-bench-verde"
+      method: "testemunho: medição de comportamento do deploy no host 2026-08-14, comando não registrado; código da fase em onion-bridge@28f3ad96:web/vite.config.ts"
       locality: "host"
 
   - id: E_DEMO_CAMPO_2026_08_14
@@ -150,9 +150,9 @@ nodes:
     label: "DEMO DE CAMPO do maestro (desktop+mobile, com a Nicole como 2ª usuária real) — achou o que 16 Elenxos de código não viram, porque a classe era OUTRA: a superfície MENTIA ao usuário. 8 achados: agente respondia em INGLÊS (preset claude_code só entrava com append — sem ele o CLAUDE.md do core nem carregava) · /onion no picker listava design:generate (matcher casa na DESCRIÇÃO) · rótulos COMANDOS/AGENTES flutuando vazios no mobile · catálogo em cache eterno · 'Identidade ativa' sem NOME (anonimato p/ o próprio dono) · 📊 para todo mundo rendia cards de erro confusos a não-admin · 'Identidade criada.' lia-se como convite ENVIADO (nenhum e-mail sai — Nicole só recebeu o código de login) · JSON cru dos args de tool ilegível. TODOS CURADOS no PR-25 (bridge 29b946d, deploy vivo) + 1 bônus da bancada: cache mtime com cegueira de mesmo-ms → chave mtime+size. LIÇÃO DA LINHA: Elenxo adversarial vê CÓDIGO; só uso real vê a MENTIRA DE SUPERFÍCIE — G5 dogfood é gate, não cerimônia."
     trace: "/home/onion/onion-bridge/web/src/App.tsx"
     provenance:
-      source: "/home/onion/onion-bridge/web/src/App.tsx"
+      source: "demo do maestro em desktop e mobile com screenshots (relato) (host)"
       locator: "demo-real-do-maestro-desktop-e-mobile-8-achados-com-screenshot-curas-em-29b946da"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/web/src/App.tsx no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: medição de comportamento no host 2026-08-14"
       locality: "host"
 
   - id: E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO
@@ -166,9 +166,9 @@ nodes:
     label: "F-ID.P0 SONDA (2026-08-15, medida — não inferida): um convidado, no fluxo REAL do bridge (query do Agent SDK, cwd=workspace, permissionMode=bypassPermissions, Read auto-aprovado ANTES do chip), pediu em pt-BR /home/onion/onion-bridge/.env e o agente respondeu '14' — leu o arquivo INTEIRO. Só contas de teste existiam (maestro: nada vazou a terceiros), mas o furo foi fechado antes de convidado real. CONTENÇÃO (bridge 43c2c9c, deploy vivo; cada cura provada por re-sonda comportamental): permissionMode por chamador (admin=bypass, convidado='default' — NÃO 'dontAsk', que bloqueava o core via symlink) · deny CIRÚRGICA na camada settings SÓ p/ não-admin (deny vence bypass, medido) negando .env+data/+home-do-onion+/proc/** mas preservando a LEITURA do core · settingSources:[] p/ não-admin (o settings do core trazia hooks que escrevem no core + allow Bash(grep * .env)) · env FILTRADO (LOGTO_M2M_SECRET/INVITE_TOKENS saíam no ambiente do agente) · GIT_CEILING nos dois dirs (workspaces+core, fechando o escape pelo symlink docs). Provas finais: ENV_BLOQUEADO · core legível ('Sistema') · /proc BLOQUEADO · data/ BLOQUEADO · git-docs 'not a git repository'. + bridge:write REMOVIDO do papel bridge-user no Logto (204) — sem write, sem Bash, fecha o vetor `sh -c cat` (vocabulário infinito, cura-por-lista nula). RESÍDUO (Elenxo P0): sandbox/bwrap é a cura estrutural do Bash mas bwrap NÃO está instalado e liga FAIL-OPEN em silêncio — P0-7 exige instalar+medir antes."
     trace: "/home/onion/onion-bridge/src/chat.ts"
     provenance:
-      source: "/home/onion/onion-bridge/src/chat.ts"
-      locator: "sonda-agente-real-cwd-workspace-bypass-respondeu-14-linhas-do-.env-e-16-re-sondas-das-curas"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/chat.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "sonda com agente real contra o bridge em produção (host)"
+      locator: "onion-bridge@a7184ef1:src/chat.ts (último commit do arquivo até 2026-08-15; não há registro de a sonda ter rodado antes ou depois dele) ; sonda-agente-real-cwd-workspace-bypass-respondeu-14-linhas-do-.env-e-16-re-sondas-das-curas"
+      method: "testemunho: medição de comportamento no host 2026-08-15"
       locality: "host"
 
   - id: F_ID_1_ADOCAO_LIMPA
@@ -182,9 +182,9 @@ nodes:
     label: "F-ID.1 ADOÇÃO LIMPA (bridge 2e10b497, deploy vivo): o workspace deixou de ser symlink→core e virou REPO GIT PRÓPRIO com o Onion VENDORIZADO (git archive da árvore tracked: agents/commands/skills/utils + docs/{meta-specs,knowledge-base,sdaal}; hooks e validation FORA de propósito). settings.json escrito pelo bridge (sem hooks). Objetivo PROVADO por dogfood: /catch-up no workspace responde 'LIMPO: só o meu espaço' (fim do vazamento que a 3ª entrada expôs). ELENXO F-ID.1 (agente dedicado, 9 achados MEDIDOS rodando o SDK) — DOIS eram meus: (1) 'curei' uma RACE QUE NÃO EXISTE (bootstrap é single-tick) e minha cura tmp+rename criava WEDGE PERMANENTE → revertida; o problema real era o CONGELAMENTO de ~500ms (bootstrap síncrono trava todo SSE) → agora ASSÍNCRONO + lock inflight; (2) CROSS-WORKSPACE CRÍTICO que EU ABRI no P0-5 (mover p/ /var/lib tirou os workspaces da deny; convidado lia o vizinho por path absoluto) → cura no canUseTool (Read/Grep/Glob de path absoluto fora do cwd negado direto; próprio auto-aprovado). +item 2: settingSources:[] dava ZERO comandos do Onion (o /catch-up 'provado' era o modelo lendo o .md como PROSA) → ['project'] (50+ comandos vivos, seguro porque convidado read-only não adultera o settings). +PAT do maestro via credential.helper=store no gitconfig (GIT_CONFIG_GLOBAL=/dev/null). Provas: comandos onion vivos, próprio legível, VIZINHO_BLOQUEADO, vendor-manifest 5/5. LIÇÃO: dogfood raso (o modelo IMPROVISA lendo prosa) mente 'funcionou' — o gate real é o system/init do SDK, não a resposta parecer certa. RESÍDUO: convidado sem Bash não roda comandos que precisam de git (sandbox deferido, P0-7); ~14M vendor/usuário sem coletor por idade."
     trace: "/home/onion/onion-bridge/src/workspace.ts"
     provenance:
-      source: "/home/onion/onion-bridge/src/workspace.ts"
-      locator: "deploy-2e10b497-dogfood-catch-up-LIMPO-comandos-onion-50-vivos-cross-workspace-VIZINHO_BLOQUEADO-vendor-manifest-5-5"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/workspace.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "deploy 2e10b497 da F-ID.1 medido em produção: catch-up limpo, 50 comandos vivos, vizinho bloqueado cross-workspace (host)"
+      locator: "onion-bridge@2e10b497:src/workspace.ts ; deploy-2e10b497-dogfood-catch-up-LIMPO-comandos-onion-50-vivos-cross-workspace-VIZINHO_BLOQUEADO-vendor-manifest-5-5"
+      method: "testemunho: medição de comportamento do deploy no host 2026-08-15, comando não registrado; código da fase em onion-bridge@2e10b497:src/workspace.ts"
       locality: "host"
 
   - id: F_ID_2_CONTEXTOS_ORG
@@ -198,9 +198,9 @@ nodes:
     label: "F-ID.2 CONTEXTOS ORG (bridge 83033b25, deploy vivo): o contexto virou par (kind,id) — pessoal (Second Brain) ou org (Company Brain) — atravessando workspace, thread-store e medidor. Org piloto Grana.AI criada+povoada (marcio@grana.ai admin). DUAL-TOKEN (Authorization=recurso + X-Onion-Org-Token=org, audience urn:logto:organization): resolveCtx fail-closed. WORKSPACE DE ORG = repo bare + checkout por membro (decisão selada): origem soberana data/orgs/<id>/repo.git, pull início / commit+push fim, git log audita quem escreveu. Thread-store de org em data/threads/org/<id>. Meter com org (campo já existia). GET /me/contexts (filtra federação por customData.bridge — tenant COMPARTILHADO com onion-dist/arandek). ELENXO F-ID.2 (14 achados MEDIDOS): DUAL-TOKEN RESISTIU A 7 ATAQUES (assinatura/aud/sub-roubado/expirado/alg:none — todos fail-closed) e store-key traversal fechado pelo h16. Curados: CRÍTICO conflito de org ENVENENAVA a origem (commit em rebase conflitado tem exit 0 e empurrava marcadores <<<<<<< para o Company Brain de TODA a org + wedgeava o membro — provado; curado com cleanGitState+recusa-UU+abort) · CRÍTICO guardCwdRead usava path.resolve derrotado por symlink→workspace de outro membro (provado: resolve passa, realpath nega) + deny orgs/** · ALTO resolveCtx aceitava org de federação (gate customData.bridge) · ALTO offboarding não alcançava org (varre por hash) · ALTO escrita na org sem autorização (gate callerCanWrite) · ALTO 2 turnos concorrentes=500 (lock inflight) · +MÉDIOS (bare revalidado, share keyOf, seed try/finally) +BAIXOS (storeKey injetiva, wsSlug delega). DECLARADOS: cota de org na conta pessoal (UX), revogação só no expiry (TTL). RESÍDUO: spike do org token HUMANO real pendente de login do marcio@grana.ai + switcher no front (F-ID.3) + ctx no session-owners."
     trace: "/home/onion/onion-bridge/src/context.ts"
     provenance:
-      source: "/home/onion/onion-bridge/src/context.ts"
-      locator: "deploy-83033b25-org-granaai-povoada-dual-token-7-ataques-fail-closed-conflito-sem-marcadores-realpath-nega-symlink"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/context.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "deploy 83033b25 da F-ID.2 medido em produção: org povoada, dual-token, 7 ataques fail-closed, realpath nega symlink (host)"
+      locator: "onion-bridge@83033b25:src/context.ts ; deploy-83033b25-org-granaai-povoada-dual-token-7-ataques-fail-closed-conflito-sem-marcadores-realpath-nega-symlink"
+      method: "testemunho: medição de comportamento do deploy no host 2026-08-15, comando não registrado; código da fase em onion-bridge@83033b25:src/context.ts"
       locality: "host"
 
   - id: F_ID_3_SUPERFICIE
@@ -215,10 +215,10 @@ nodes:
     narrative: "label anterior: F-ID.3 SUPERFÍCIE (parcial em produção): F-ID.3a (bridge 3720e47) — dual-token de PONTA A PONTA: getOrganizationToken (refresh grant + organization_id; login pede urn:logto:scope:organizations) + activeCtx (orgHeader síncrono anexa X-Onion-Org-Token a /chat e /threads) + ContextSwitcher no header (👤 Pessoal / 🏢 org de /me/contexts; troca ativa o contexto e recarrega). Fecha o resíduo do org token (basta marcio@grana.ai logar+trocar). F-ID.3c (bridge d4bb1a5) — gestão da org SÓ para admin DA ORG (orgAdminGuard consulta isOrgAdmin no Logto, não confia no token; authGuard→withCtx→orgAdminGuard): GET /o/:id/members, POST /o/:id/invite (convite NATIVO do Logto POST /organization-invitations, E-MAIL REAL via Postmark, template OrganizationInvitation, 14d, member|admin — fecha o 'convite que não convida' da demo 08-14), DELETE membro. Front OrgMembers.tsx lazy, botão 👥 no contexto de org. Provado contra Grana.AI (membros, admin=true, convite valida) + 401 sem token em produção. Elenxo F-ID.3 em curso. RESTA na F-ID.3: Home de contextos + perfil /me (F-ID.3b) — nó segue OPEN até essas telas + o Elenxo. Depois F-ID.4 (MGM)."
     trace: "/home/onion/onion-bridge/web/src/context/activeCtx.ts"
     provenance:
-      source: "01ddba9c (corpo, core) + /home/marcio/onion-bridge-dev 3720e47, 7aa03ae, d4bb1a5, 82a81ea, 22a383e"
-      locator: "git show -s 01ddba9c (\"F_ID_3_SUPERFICIE → done (ALTOs curados + teste de navegador...)\"); corpos de 3720e47 (3a), 7aa03ae (3b), d4bb1a5 (3c), 82a81ea (2 críticos), 22a383e (ALTOs) em /home/marcio/onion-bridge-dev"
-      method: "leitura: corpos de 3720e47/7aa03ae/d4bb1a5/82a81ea/22a383e em /home/marcio/onion-bridge-dev + corpo de 01ddba9c (transição a done)"
-      locality: "host"
+      source: "01ddba9c (corpo, core) + onion-bridge@3720e476, 7aa03ae, d4bb1a5, 82a81ea, 22a383e"
+      locator: "git show -s 01ddba9c (\"F_ID_3_SUPERFICIE → done (ALTOs curados + teste de navegador...)\"); corpos de 3720e47 (3a), 7aa03ae (3b), d4bb1a5 (3c), 82a81ea (2 críticos), 22a383e (ALTOs) em onion-bridge"
+      method: "leitura: corpos de 3720e47/7aa03ae/d4bb1a5/82a81ea/22a383e em onion-bridge + corpo de 01ddba9c (transição a done)"
+      locality: "repo"
 
   - id: F_ID_4_MGM
     node_type: entity
@@ -232,9 +232,10 @@ nodes:
     narrative: "label anterior: F-ID.4 MEMBER-GET-MEMBER (bridge 600cd9b, deploy vivo — ÚLTIMA peça da fase Identidade): decisão selada do maestro (pedido com aprovação). referrals.ts store atômico (tmp+rename, cache mtime+size, Object.create(null)): addReferral (valida e-mail, idempotente por e-mail pendente), listReferrals, decideReferral. Rotas: POST /me/referrals (qualquer usuário, rate-limit 20/min), GET/POST /admin/referrals* (adminGuard; aprovar dispara inviteUser). Front: campo 'Indicar alguém' no perfil /me + seção 'Indicações pendentes' no dashboard admin (✅/✖️). ⚠️ NÃO REVISADO POR ELENXO ainda (typecheck+bench+teste-navegador só). ⚠️ convite (org+pessoal) INERTE p/ quem não tem conta (cadastro fechado + sem tela de aceite; mensagem honesta) — tela de aceite é próximo. FASE F-ID COMPLETA: P0+F-ID.1+F-ID.2+F-ID.3(+ALTOs)+F-ID.4 em produção. TESTE DE NAVEGADOR do maestro achou 6 bugs de superfície (comando/contexto/header/marca/nome/prompt-imagem) que sonda/curl não pegam — todos curados; META-LIÇÃO reforçada."
     trace: "/home/onion/onion-bridge/src/referrals.ts"
     provenance:
-      source: "/home/marcio/onion-bridge-dev 600cd9b e c91374d (corpos)"
+      source: "onion-bridge@600cd9b3 + onion-bridge@c91374da (corpos)"
       locator: "corpo de 600cd9b (store tmp+rename, POST /me/referrals, \"Indicações pendentes\"); corpo de c91374d (Elenxo F-ID.4, 13 achados, \"o tenant AGORA aceita e-mail como login\"); git show -s 01ddba9c"
-      method: "leitura: corpos de 600cd9b e c91374d em /home/marcio/onion-bridge-dev"
+      method: "leitura: corpos de 600cd9b3 e c91374da no remoto marciocar/onion-bridge"
+      locality: "repo"
 
   - id: Q_GESTAO_USUARIOS_E_WORKSPACES
     node_type: question
@@ -257,9 +258,9 @@ nodes:
     label: "FURO DE SEGURANÇA achado pela 2ª entrada da Nicole (demo de campo): o papel bridge-user — atribuído a TODO convidado pelo invite — carregava bridge:admin E bridge:write no Logto. Todo convidado era ADMIN (via identidades, convidava, suspendia, APAGAVA usuários, editava quotas — a tela /admin da Nicole provou). Os guards do servidor sempre estiveram corretos; o erro era de PROVISIONAMENTO de papel, invisível a Elenxo de código — behavior-over-declaration na camada IdP. CURADO NA FONTE 2026-08-14: bridge:admin removido do bridge-user (DELETE 204), papel bridge-admin criado (201) e atribuído SÓ ao marciocar; prova: scopes finais bridge-user=[invoke,write], marciocar=[bridge-user,bridge-admin]. Resíduo: tokens JWT emitidos antes da cura valem até expirar (≤1h) — sem revogação stateless. FIO ABERTO: bridge:write continua em TODO convidado (o agente executa/escreve no cwd COMPARTILHADO) — decisão do maestro na Q_GESTAO_USUARIOS_E_WORKSPACES. + PWA: 'nada mudou' era SW novo esperando reload manual (controllerchange→reload, PR-26) e o merge do PR-26 saiu com bancada VERMELHA (cadeia sem abort em rc≠0 — reincidência declarada; curado no PR-27 com split real: admin+página pública fora da carga inicial)."
     trace: "/home/onion/onion-bridge/web/src/main.tsx"
     provenance:
-      source: "/home/onion/onion-bridge/web/src/main.tsx"
+      source: "Management API do Logto da VPS (DELETE 204, role criada 201) (host)"
       locator: "management-api-delete-204-role-bridge-admin-criada-201-scopes-finais-listados"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/web/src/main.tsx no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: medição de comportamento no host 2026-08-14"
       locality: "host"
 
   - id: Q_G5_DOGFOOD_GO_LIVE
@@ -519,7 +520,7 @@ nodes:
 
   - id: Q_G3_DEMO_DO_MAESTRO
     node_type: question
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-16
     verified_against: roteiro-conferido-item-a-item-contra-evidencia-6-de-8-com-rastro
     status: done
@@ -542,9 +543,10 @@ nodes:
     label: "F-ID: contêiner Pessoal (Second Brain) × Organização (Company Brain), substrato do F6. Nasceu do furo exposto pela 3ª entrada (marcio@grana.ai, via /catch-up). Entregue fim-a-fim em produção: P0 + adoção limpa + dual-token + superfície/org + member-get-member (bridge c91374d)."
     narrative: "label anterior: F-ID (Identidade e Contextos) — o CONTÊINER Pessoal (Second Brain) × Organização (Company Brain) na camada de conta/workspace/superfície. NÃO é o F6/Brain; é onde ele vai morar. Nasceu do 3º uso real: marcio@grana.ai rodou /catch-up e viu os PRs do Onion Bridge (não-dev enxergando o contexto de dev do produto). Entregue fim-a-fim em produção: P0 contenção + F-ID.1 adoção limpa + F-ID.2 dual-token + F-ID.3 superfície/org + F-ID.4 member-get-member. Deploy vivo (bridge c91374d, /health ok, /me/referrals 401 sem token)."
     provenance:
-      source: "e103c346 (corpo, core) + /home/marcio/onion-bridge-dev 98ab1af e 869af3c (corpos)"
-      locator: "git show -s e103c346 (corpo l.3-6); /home/marcio/onion-bridge-dev 98ab1af corpo (\"Company Brain (org) e Second Brain (pessoal)\"; \"substrato do F6\"); 869af3c corpo (\"o furo que a 3ª entrada, marcio@grana.ai, expôs\"); docs/evolution/review/docs-kg-fase-f-id-fechada.md:23"
-      method: "leitura: corpo de e103c346 + corpos de 98ab1af e 869af3c em /home/marcio/onion-bridge-dev + resíduo PR #609 (docs-kg-fase-f-id-fechada.md:23)"
+      source: "e103c346 (corpo, core) + onion-bridge@98ab1af9 e 869af3c (corpos)"
+      locator: "git show -s e103c346 (corpo l.3-6); onion-bridge 98ab1af corpo (\"Company Brain (org) e Second Brain (pessoal)\"; \"substrato do F6\"); 869af3c corpo (\"o furo que a 3ª entrada, marcio@grana.ai, expôs\"); docs/evolution/review/docs-kg-fase-f-id-fechada.md:23"
+      method: "leitura: corpo de e103c346 + corpos de 98ab1af e 869af3c em onion-bridge + resíduo PR #609 (docs-kg-fase-f-id-fechada.md:23)"
+      locality: "repo"
 
   - id: F_ID_2_DUAL_TOKEN_CONTEXTO
     node_type: decision
@@ -556,10 +558,10 @@ nodes:
     confidence: 0.9
     label: "F-ID.2 — contêiner de contexto (kind,id): p:<sub> | o:<orgId>. Dual-token: Authorization (recurso, aud=bridge) + X-Onion-Org-Token (aud=urn:logto:organization). resolveCtx faz isBridgeOrg+isMember em Promise.all, fail-closed (inválido/outra-identidade/org-não-bridge/não-membro → 403); nunca aceita org token sozinho (mantém binding anti-replay). storeKey de org hasheado por injetividade; workspace de org = repo bare + checkout por membro. Org Grana.AI id=9mt40fgqoudb (customData.bridge=true, filtra da federação)."
     provenance:
-      source: "/home/marcio/onion-bridge-dev c91374d:src/context.ts"
+      source: "onion-bridge@c91374da:src/context.ts"
       locator: "c91374d:src/context.ts:1-10 (par p:/o:, dual-token, anti-replay), :41 (storeKey h16), :44-80 (resolveCtx Promise.all, fail-closed → 403 em server.ts:236); corpo de 98ab1af e 83033b2; docs/onion/federation-orgs.json:2; corpo de 368e7a7"
-      method: "leitura: c91374d:src/context.ts e server.ts em /home/marcio/onion-bridge-dev + docs/onion/federation-orgs.json:2"
-      locality: "host"
+      method: "leitura: c91374d:src/context.ts e server.ts em onion-bridge + docs/onion/federation-orgs.json:2"
+      locality: "repo"
 
   - id: F_ID_4_MGM_REFERRALS
     node_type: decision
@@ -572,10 +574,10 @@ nodes:
     label: "F-ID.4 member-get-member: POST /me/referrals cria pedido pendente; o admin decide em 'Indicações pendentes' do dashboard e, aprovado, sai o convite. Elenxo: 13 achados (approve só carimba se o convite deu certo, navigator.locks, bodySizeGuard); autorização resistiu a 10 ataques."
     narrative: "label anterior: F-ID.4 — member-get-member: POST /me/referrals cria pedido pendente → admin aprova em Membros → convite Logto dispara. Store atômico (tmp+rename), teto 20 pendentes/user, poda decididos >90d, id opaco, idempotente. Revisado pelo Elenxo (13 achados, todos curados): approve-carimba-só-se-convite-deu-certo, mutex de token cross-aba (navigator.locks), bodySizeGuard, /usage/me-em-org=meu-consumo. Autorização RESISTIU (10 ataques de path). DECLARADOS não-feitos: cota de ORG própria (feature nova), byName mostra sub (UX), baldes rate-limit combinados (aceitável)."
     provenance:
-      source: "/home/marcio/onion-bridge-dev c91374d:web/src/admin/UsageDashboard.tsx"
+      source: "onion-bridge@c91374da:web/src/admin/UsageDashboard.tsx"
       locator: "c91374d:web/src/admin/UsageDashboard.tsx:136-141 (\"Indicações pendentes\"); c91374d:web/src/org/OrgMembers.tsx:54; corpos de 600cd9b e c91374d"
-      method: "leitura: corpos de 600cd9b e c91374d + UsageDashboard.tsx/OrgMembers.tsx @c91374d em /home/marcio/onion-bridge-dev"
-      locality: "host"
+      method: "leitura: corpos de 600cd9b e c91374d + UsageDashboard.tsx/OrgMembers.tsx @c91374d em onion-bridge"
+      locality: "repo"
 
   - id: E_CONVITE_FUNCIONA_EMAIL_LOGIN
     node_type: evidence
@@ -587,14 +589,14 @@ nodes:
     confidence: 0.85
     label: "DESCOBERTA do Elenxo F-ID.4: o tenant Logto AGORA aceita e-mail como identificador de login (a medição 08-14 'só username' ficou stale). Logo o CONVITE FUNCIONA — o convidado entra por e-mail+código de verificação; a mensagem 'em construção' era falsa e foi corrigida. Convite de ORG envia e-mail real (organization-invitations/Postmark); convite PESSOAL (member-get-member) cria o usuário mas NÃO envia e-mail automático (o admin avisa; a pessoa entra por e-mail+código). REFUTA a premissa 'tela de aceite necessária'."
     provenance:
-      source: "/home/marcio/onion-bridge-dev 0914ff6:ops/logto-sign-in-exp.baseline.json"
+      source: "onion-bridge@0914ff6b:ops/logto-sign-in-exp.baseline.json"
       locator: "ops/logto-sign-in-exp.baseline.json:30-32 @0914ff6 (identifier email, verificationCode true); corpo de c91374d; corpo de d4bb1a5; c91374d:web/src/admin/UsageDashboard.tsx:112-114"
-      method: "leitura: baseline do sign-in-exp versionado em 0914ff6 + corpos de c91374d e d4bb1a5 + UsageDashboard.tsx@c91374d (onion-bridge-dev)"
-      locality: "host"
+      method: "leitura: baseline do sign-in-exp versionado em 0914ff6 + corpos de c91374d e d4bb1a5 + UsageDashboard.tsx@c91374d (onion-bridge)"
+      locality: "repo"
 
   - id: Q_G_ID_PROVA_HUMANA
     node_type: question
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-16
     verified_against: rastros-medidos-no-tenant-e-no-ledger-apos-a-prova-do-maestro
     status: done
@@ -617,14 +619,14 @@ nodes:
     confidence: 0.9
     label: "Rodada convite/cadastro/nome/perfil (pós-F-ID, pedido do maestro 08-15) — TUDO em produção (bridge 9ba71af0): F0 baseline sign-in-exp (contradição 08-14×08-15 resolvida: as duas medições eram certas nos seus tempos; tenant aceita e-mail+código) · F1 nome no lugar do sub (displayName canônico name??username??email, bySub do dashboard traduzido, byName resolvido no Logto) · F2a convite pessoal idempotente (alreadyExisted, sem 502) · F2b reenvio de convite de org NATIVO (resend/revogar/recriar; MEDIDO: Expired é estado FINAL — revoke dá 422, recriar = DELETE+invite; e a cura do 204-que-virava-falha em mapi: removeOrgMember/deleteUser eram bugs latentes) · F3 signUp username+senha (PATCH aditivo, MissingProfile, campo único por decisão) · F4 PATs (exchange RFC 8693 server-side; 3 sondas até a chave allowTokenExchange; scope vazio ≠ todos — herança por FILTRAGEM; prova viva 4/4: 200 sub-correto/403 anti-fabricação/401 lixo/401 revogado) · F5 segurança no perfil (Account API direto do navegador, CORS medido, verificação reforçada, MFA NoPrompt opt-in, /me/access). Decisões seladas: PAT (não app M2M) · reenvio nos 2 fluxos · senha campo único · 2FA opcional via perfil · aplicar direto + CHANGELOG."
     provenance:
-      source: "/home/marcio/onion-bridge-dev (commits 0914ff6..9ba71af)"
+      source: "onion-bridge@0914ff6b..9ba71af0 (corpos)"
       locator: "corpos de 0914ff6 (F0), 2b04160 (F1), 61ef56e (F2a), 787e610+e1605e9 (F2b), 278d9bc (F3), 01cd4bf+d9699f0 (F4), 9ba71af (F5); docs/evolution/review/docs-round-invite-profile-announce.md:25; docs/evolution/federation/CHANGELOG.md:336-350"
-      method: "leitura: commits 0914ff6..9ba71af em /home/marcio/onion-bridge-dev + resíduo PR #610 (provas vivas) + CHANGELOG da federação (anúncio \"aplicar direto, registrar depois\")"
-      locality: "host"
+      method: "leitura: commits 0914ff6..9ba71af em onion-bridge + resíduo PR #610 (provas vivas) + CHANGELOG da federação (anúncio \"aplicar direto, registrar depois\")"
+      locality: "repo"
 
   - id: Q_ROUND_HUMAN_PROOF
     node_type: question
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-16
     verified_against: 5-de-5-o-ultimo-item-fechado-por-acao-humana-na-tela-revoked-medido-mais-email-atestado
     status: done
@@ -658,10 +660,10 @@ nodes:
     label: "Elenxo da rodada: 16 achados, 8 refutados contra o swagger vivo do tenant; curados no bridge (a7184ef, 7ff20f7, 867f95d): o PAT do admin herdava bridge:admin (cura: fora do exchange, callerIsAdmin(pat)=false, 90d), ALTOs 2-3, IDOR de convite; nasce pat-selftest. Provas vivas 5/5."
     narrative: "label anterior: Elenxo adversarial da rodada (16 achados; 8 REFUTADOS com medição contra o swagger vivo do tenant) — todos curados no bridge 867f95de. CRÍTICO do lote: ALTO 1 o PAT do admin herdava bridge:admin e rodava o /chat em bypassPermissions SEM deny (Read do .env/.ssh/data, Bash com env do serviço) — uma credencial de longa vida = acesso privilegiado ao host; cura na raiz: bridge:admin FORA do exchange (PAT nunca vira admin) + callerIsAdmin(pat)=false + validade 90d. ALTO 2 pat_ anônimo amplificava contra o IdP antes do rate-limit → looksLikePat pré-rede + balde por IP + evicção-por-expiração. ALTO 3 2FA meio-ativado. MÉDIO 4 IDOR de convite (invGuard). Nasceu a bancada que faltava (pat-selftest). Provas vivas 5/5: PAT do admin sai só bridge:invoke, 403 reconhecimento, 200 uso legítimo, 401 pat_ malformado sem tocar IdP. META-LIÇÃO: dogfood-raso mente — sonda/curl passaram; o Elenxo achou o que elas não veem."
     provenance:
-      source: "/home/marcio/onion-bridge-dev (commits a7184ef, 7ff20f7, 867f95d)"
+      source: "onion-bridge@a7184ef1, 7ff20f7, 867f95d (corpos)"
       locator: "corpos de a7184ef (ALTO 1/2, BAIXO 11/12), 7ff20f7 (MÉDIO 4-7), 867f95d (ALTO 3, pat-selftest); docs/evolution/review/docs-round-elenxo-cured.md:19-23"
-      method: "leitura: commits a7184ef/7ff20f7/867f95d em /home/marcio/onion-bridge-dev + resíduo PR #611 (docs-round-elenxo-cured.md:19-23)"
-      locality: "host"
+      method: "leitura: commits a7184ef/7ff20f7/867f95d em onion-bridge + resíduo PR #611 (docs-round-elenxo-cured.md:19-23)"
+      locality: "repo"
 
 edges:
   - from: E_ELENXO_ROUND_CURADO

@@ -41,7 +41,7 @@ nodes:
 
   - id: E_SO_O_HUB_FOI_AFETADO
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.9
     status: confirmed

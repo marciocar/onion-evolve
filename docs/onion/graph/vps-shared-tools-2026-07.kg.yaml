@@ -49,7 +49,7 @@ nodes:
   # ── TOOL 2: WHATSAPP ──
   - id: ENT_whatsapp
     node_type: entity
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 0.9

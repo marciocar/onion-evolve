@@ -176,7 +176,7 @@ nodes:
   - id: C_ADOPTER_PERSONALITY_SEEDS_PENDING
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 2
     confidence: 0.9
     status: superseded

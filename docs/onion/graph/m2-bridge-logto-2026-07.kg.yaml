@@ -450,7 +450,7 @@ nodes:
     node_type: claim
     trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.95
     status: confirmed
@@ -637,7 +637,7 @@ nodes:
   - id: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
     node_type: question
     layer: audit
-    plane: PROD
+    plane: DEV
     verified_at: 2026-09-02
     verified_against: 'CURA DEPLOYADA 2026-09-02 (E_W9_BRIDGE_DEPLOY_0902: jwksAttemptedAt em /home/onion/onion-bridge/src/identity.ts, 4 ocorrencias); segue open porque o criterio de fechamento e MEDICAO no vivo — 1 fetch por janela de 60s durante queda real do IdP — e nao se simula queda do Logto em producao. GATILHO: 1a queda real do IdP (journal do onion-vps-bridge)'
     status: open
@@ -646,15 +646,15 @@ nodes:
     label: "PRE-EXISTENTE, mas o P11 ELEVOU O RAIO — e essa mudanca de risco precisa morar aqui: antes, numa queda do Logto, o caminho legado ainda autenticava (degradado); agora NINGUEM autentica (queda total) E cada request re-busca o JWKS (medido pelo 6o Elenxo com IdP num buraco negro: 3 reqs seguidas, 5s cada, um fetch novo por request — retry storm contra a dependencia que ja esta caindo). O piso de 60s (identity.ts:41) so guarda o ramo force=true; o ramo normal so retorna cedo com cache POPULADO e fresco, e jwksFetchedAt so atualiza no sucesso. CURA DESENHADA pelo Elenxo (jwksAttemptedAt marcando a TENTATIVA + timeout de 5s no fetch + jwksSelfCheck reportando ok=cache.size>0). GATILHO: PR proprio no bridge; e o /health mentindo ok:true durante queda do IdP entra na mesma cura."
     trace: "/home/onion/onion-bridge/src/identity.ts"
     provenance:
-      source: "/home/onion/onion-bridge/src/identity.ts"
-      locator: "CURA DEPLOYADA 2026-09-02 (E_W9_BRIDGE_DEPLOY_0902: jwksAttemptedAt em /home/onion/onion-bridge/src/identity.ts, 4 ocorrencias); segue open porque o criterio de fechamento e MEDICAO no vivo — 1 fetch por janela de 60s durante queda real do IdP — e nao se simula queda do Logto em producao. GATILHO: 1a queda real do IdP (journal do onion-vps-bridge)"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/identity.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "host"
+      source: "onion-bridge@a99994aa:src/identity.ts"
+      locator: "CURA DEPLOYADA 2026-09-02 (E_W9_BRIDGE_DEPLOY_0902: jwksAttemptedAt em onion-bridge (produção)/src/identity.ts, 4 ocorrencias); segue open porque o criterio de fechamento e MEDICAO no vivo — 1 fetch por janela de 60s durante queda real do IdP — e nao se simula queda do Logto em producao. GATILHO: 1a queda real do IdP (journal do onion-vps-bridge)"
+      method: "leitura: src/identity.ts em onion-bridge@a99994aa (remoto marciocar/onion-bridge; arquivo na data 2026-09-02)"
+      locality: "repo"
 
   - id: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
     node_type: question
     layer: audit
-    plane: PROD
+    plane: DEV
     verified_at: 2026-09-02
     verified_against: 'FECHADA por deploy (ver E_W9_BRIDGE_DEPLOY_0902): sudo -n grep spawnSync /home/onion/onion-bridge/src/a2a.ts = so o comentario da l.88; spawn( presente; bench pre-merge 4820ms->1,1ms; medicao em PROD sob request a2a real = proximo uso real'
     status: done
@@ -663,10 +663,10 @@ nodes:
     label: "PRE-EXISTENTE, achado pelo 6o Elenxo ao procurar 'outra rota cara fora do rate-limit': POST /a2a faz spawnSync do gate do core (a2a.ts:50, timeout 15s) — e spawnSync BLOQUEIA o event loop do Node inteiro. Medido com gate falso dormindo 5s: /health foi de 9,6ms a 3,99s durante UM unico request a2a; todos os streams SSE de /chat congelam junto. Um remetente a2a (autenticado por token de pool, nao identidade) pode negar servico ao bridge inteiro dentro do timeout. CURA: spawn assincrono (execFile+promise) + rate-limit proprio no /a2a. GATILHO: PR proprio no bridge, junto ou apos o do JWKS."
     trace: "/home/onion/onion-bridge/src/a2a.ts"
     provenance:
-      source: "/home/onion/onion-bridge/src/a2a.ts"
-      locator: "FECHADA por deploy (ver E_W9_BRIDGE_DEPLOY_0902): sudo -n grep spawnSync /home/onion/onion-bridge/src/a2a.ts = so o comentario da l.88; spawn( presente; bench pre-merge 4820ms->1,1ms; medicao em PROD sob request a2a real = proximo uso real"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/a2a.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "host"
+      source: "onion-bridge@9d33d7eb:src/a2a.ts"
+      locator: "FECHADA por deploy (ver E_W9_BRIDGE_DEPLOY_0902): sudo -n grep spawnSync onion-bridge (produção)/src/a2a.ts = so o comentario da l.88; spawn( presente; bench pre-merge 4820ms->1,1ms; medicao em PROD sob request a2a real = proximo uso real"
+      method: "leitura: src/a2a.ts em onion-bridge@9d33d7eb (remoto marciocar/onion-bridge; arquivo na data 2026-09-02)"
+      locality: "repo"
 
   # ---- F4 (preservado): ACOPLAMENTO BRIDGE->LOGTO ----
   - id: C_logto_now_critical
@@ -887,7 +887,7 @@ nodes:
     node_type: evidence
     trace: /etc/systemd/system/system.slice.d/10-memory-protection.conf
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
@@ -895,16 +895,16 @@ nodes:
     verified_against: host-vps-medido
     label: "FIX A APLICADO 2026-07-26 (sessão do core, permissão explícita do maestro; hardening NAO-AUTH, sem risco de lockout). Drop-in system.slice.d/10-memory-protection.conf com MemoryMin=384M/MemoryLow=768M + daemon-reload. VERIFICADO NO EFETIVO lendo o cgroup: system.slice/memory.min 0 -> 402653184 e memory.low 0 -> 805306368; caddy (67108864) e onion-bridge (268435456) agora tem ancestral que concede protecao. Reverter: rm o arquivo + daemon-reload. A CLASSE do problema (varredura dos demais floors) segue aberta em Q_floors_effective"
     provenance:
-      source: "/etc/systemd/system/system.slice.d/10-memory-protection.conf"
+      source: "drop-in 10-memory-protection.conf do system.slice no systemd do host (host)"
       locator: "host-vps-medido"
-      method: "testemunho: leitura do arquivo /etc/systemd/system/system.slice.d/10-memory-protection.conf no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do drop-in 10-memory-protection.conf no host 2026-07-26"
       locality: "host"
 
   - id: E_bridge_source_read
     node_type: evidence
     trace: /home/onion/onion-bridge/src/server.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -912,9 +912,9 @@ nodes:
     verified_against: host-vps-medido
     label: "BRIDGE LIDO 2026-07-26 (sudo neste host; a sessao NAO havia tentado). REFINA C_identity_hole: nao ha ausencia de gate — TODA rota sensivel ja exige Bearer (/chat e /commands via authGuard; /a2a via a2aGuard com pool INVITE_TOKENS_A2A dedicado que REJEITA courtesy/byok; /admin/* via adminGuard) e o serveStatic catch-all e o ULTIMO registrado (ordem correta). Abertas por design: /health e /.well-known/agent-card.json. NAO EXISTE /invoke (o spec inventou). /chat ja tem rate-limit. Env vem de process.loadEnvFile() lendo /home/onion/onion-bridge/.env (NAO EnvironmentFile do systemd). SSE ja usa fetch+ReadableStream (NAO EventSource) — Authorization ja trafega. Logo o alvo real e IDENTIDADE (AUTH_TOKEN e segredo compartilhado; INVITE_TOKENS_* sao convites, nao usuarios), e o risco nomeavel e PERMISSION_MODE=bypassPermissions (config.ts:26): quem porta token executa irrestrito e nao se sabe QUEM"
     provenance:
-      source: "/home/onion/onion-bridge/src/server.ts"
+      source: "src/server.ts do checkout de produção do onion-bridge (host)"
       locator: "host-vps-medido"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/server.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-26"
       locality: "host"
 
   # ---- P0 PRE-FLIGHT EXECUTADO 2026-07-26 (read-only). Tres achados; dois REFUTAM premissa. ----
@@ -923,7 +923,7 @@ nodes:
     node_type: evidence
     trace: /home/marcio/onion-vps-logto/docker-compose.yml
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: superseded
@@ -931,16 +931,16 @@ nodes:
     verified_against: logto-db-consultada-read-only
     label: "PERGUNTA 4 RESPONDIDA — e a resposta e NAO. Consulta read-only ao postgres do Logto (docker exec, psql -U logto): a tabela users tem UM registro e ele vive no tenant ADMIN (o login do console), nao no tenant DEFAULT. O tenant default tem ZERO usuarios e ZERO applications (a tabela applications so traz os built-in do Logto, todos no tenant admin) e a tabela resources so traz os built-in (*.logto.app/api, logto.io/api) — nenhum API Resource do bridge existe ainda. sign_up esta ABERTO nos dois tenants (username+password, verify:false). CONSEQUENCIA DIRETA: o P3.4 (desligar sign-up ANTES do login humano do P4.2) FECHARIA o caminho do maestro exatamente como o spec temia. Criar o usuario no tenant DEFAULT vira PRE-REQUISITO explicito do flip, antes do P3.4"
     provenance:
-      source: "/home/marcio/onion-vps-logto/docker-compose.yml"
+      source: "postgres do Logto da VPS consultado read-only (docker exec psql, host)"
       locator: "logto-db-consultada-read-only"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-logto/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: consulta read-only ao banco do Logto no host 2026-07-26"
       locality: "host"
 
   - id: C_permission_mode_fail_open
     node_type: claim
     trace: /home/onion/onion-bridge/src/config.ts:26
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: refuted
@@ -948,16 +948,16 @@ nodes:
     verified_against: bridge-config-lido-e-env-medido
     label: "[CORRIGIDO 2026-07-27 — ver E_p5_identity_live] PERMISSION_MODE era FAIL-OPEN no artefato mais perigoso do sistema. config.ts:26 le `(process.env.PERMISSION_MODE ?? \"bypassPermissions\")` — o DEFAULT, na AUSENCIA da variavel, e o modo irrestrito. Medido no .env vivo: PERMISSION_MODE=bypassPermissions (declarado E efetivo). Se a variavel sumir num update do .env, o bridge NAO degrada para seguro: ele permanece irrestrito, em silencio. E a MESMA regressao silenciosa que o proprio spec combate no BRIDGE_AUTH_MODE (§3.5: 'o estado seguro e o estado SEM configuracao'), aqui invertida e JA VIVA. Fix candidato: inverter o default para o modo restrito e exigir opt-in explicito para bypassPermissions"
     provenance:
-      source: "/home/onion/onion-bridge/src/config.ts:26"
+      source: "src/config.ts:26 do checkout de produção do onion-bridge (host)"
       locator: "bridge-config-lido-e-env-medido"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/config.ts:26 no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-26"
       locality: "host"
 
   - id: C_a2a_pool_empty_admin_bypasses
     node_type: claim
     trace: /home/onion/onion-bridge/src/server.ts:38
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
@@ -965,16 +965,16 @@ nodes:
     verified_against: bridge-source-e-env-medidos
     label: "O 'pool dedicado' do /a2a nao isola nada — DOIS motivos medidos. (1) a2aGuard (server.ts:38) aceita `bearer === config.authToken` ANTES de consultar a2aTokens: o segredo de admin abre o /a2a por cima do pool. (2) o .env vivo NAO define INVITE_TOKENS_A2A (chaves presentes: AUTH_TOKEN, ONION_CWD, PORT, PERMISSION_MODE, ANTHROPIC_API_KEY, INVITE_TOKENS_COURTESY, INVITE_TOKENS_BYOK), logo config.a2aTokens e um Set VAZIO. Somando: hoje o UNICO caminho para o /a2a e o AUTH_TOKEN de admin. PRECISAO: isso NAO refuta o E_bridge_source_read — a clausula dele ('pool dedicado que REJEITA courtesy/byok') e literalmente verdadeira, courtesy/byok de fato nao estao em a2aTokens. O que cai e a ISOLACAO IMPLICADA, e com ela a conclusao em prosa da §0.2 do spec ('/a2a tem guard proprio e pool dedicado — nao e buraco'). Reabre o P0.2c (cobertura dupla vs excecao documentada): a excecao se apoiava num isolamento que nao existe. Efeito colateral a verificar: se ha remetentes a2a ativos, eles so podem estar usando o token de admin, ou o canal esta morto"
     provenance:
-      source: "/home/onion/onion-bridge/src/server.ts:38"
+      source: "src/server.ts:38 do checkout de produção do onion-bridge (host)"
       locator: "bridge-source-e-env-medidos"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/server.ts:38 no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-26"
       locality: "host"
 
   - id: C_console_not_the_path
     node_type: claim
     trace: /etc/caddy/conf.d/logto-console.caddy.disabled
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.8
     status: confirmed
@@ -983,9 +983,9 @@ nodes:
     verified_against: caddy-conf-e-logto-db-medidos
     label: "O CONSOLE NAO ESTA NO CAMINHO CRITICO — o objetivo e PROVISIONAR o tenant, nao entrar numa tela. Medido: o vhost console.onionevolve.com existe PRONTO e DESLIGADO (conf.d/logto-console.caddy.disabled; o Caddyfile importa *.caddy, e .disabled nunca carrega — dai o TLS falhar), o console vive so em 127.0.0.1:3012 (HTTP 302), e auth.onionevolve.com e o ISSUER OIDC (porta 3011) — bater nele no browser da /unknown-session. As duas saidas obvias sao ruins: expor o console publica o painel do provedor de identidade que esta virando caminho critico (e o sign_up esta ABERTO nos dois tenants); tunel SSH e inviavel do celular, que e como o maestro opera. A saida BOA dissolve o problema: o app M2M 'm-default' ja existe COM secret e ha o papel machine:mapi:default — da para provisionar headless pela Management API. Melhor que clicar: reproduzivel, auditavel, versionado, sem exposicao nova. E e o MESMO caminho que o P1-P3 precisa (API Resource + app M2M + app SPA/PKCE + role)"
     provenance:
-      source: "/etc/caddy/conf.d/logto-console.caddy.disabled"
+      source: "vhost logto-console.caddy.disabled no conf.d do Caddy do host (host)"
       locator: "caddy-conf-e-logto-db-medidos"
-      method: "testemunho: leitura do arquivo /etc/caddy/conf.d/logto-console.caddy.disabled no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura de logto-console.caddy.disabled no host 2026-07-26"
       locality: "host"
 
   - id: E_p1p3_provisioned
@@ -1010,7 +1010,7 @@ nodes:
     node_type: evidence
     trace: /home/onion/onion-bridge
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.75
     status: confirmed
@@ -1019,16 +1019,16 @@ nodes:
     verified_against: token-emitido-e-decodificado
     label: "[⚠ 2026-08-23 superficie parcialmente obsoleta — ver reverify_note] P4.1 PROVADO — PLANO A. Token client_credentials do app onion-bridge-service com resource=https://bridge.onionevolve.com decodificado (node, base64url nativo): aud=https://bridge.onionevolve.com · scope=bridge:invoke · iss=https://auth.onionevolve.com/oidc · header alg=ES384 typ=at+jwt. O Logto 1.41.0 self-hosted HONRA Resource Indicators (RFC 8707) e emite audiencia vinculada. A escada B1->B2->B3 do §3.6 NAO sera necessaria e o aud-binding do §3.3 se sustenta. ALG A PINAR: ES384 (nao RS256). Prova colateral de que o binding e REAL, e nao decorativo: durante o bootstrap, apresentar um token com aud=https://default.logto.app/api ao endpoint do tenant admin devolveu ERR_JWT_CLAIM_VALIDATION_FAILED/aud — o gate rejeitou o uso errado antes de qualquer codigo nosso"
     provenance:
-      source: "/home/onion/onion-bridge"
+      source: "token client_credentials do app onion-bridge-service emitido pelo Logto da VPS e decodificado (host)"
       locator: "token-emitido-e-decodificado"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: emissão e decodificação de token no host 2026-07-26"
       locality: "host"
 
   - id: E_p5_identity_live
     node_type: evidence
     trace: /home/onion/onion-bridge/src/identity.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.75
     status: confirmed
@@ -1037,16 +1037,16 @@ nodes:
     verified_against: bridge-reiniciado-e-7-provas-executadas
     label: "[⚠ 2026-08-23 superficie parcialmente obsoleta — ver reverify_note] P5 VIVO 2026-07-27. src/identity.ts instalado no bridge (copia REVISAVEL no repo — codigo de seguranca que so existe no host e codigo que ninguem revisa). authGuard tenta OIDC PRIMEIRO; o legado so e alcancavel sob BRIDGE_AUTH_MODE=dual-legacy. Sem `jose`: o bridge e producao SEM repo git e o alg e PINADO (ES384), o que fecha a confusao de algoritmo — em troca, cada caso negativo foi PROVADO contra o issuer vivo. Verificacao ES384 = ECDSA P-384 + SHA-384 com assinatura IEEE-P1363 (nao DER). Fail-closed em toda excecao (JWKS fora do ar nao vira 'pode entrar'). JWKS com cache 1h + piso de re-fetch 60s (kid desconhecido pode ser rotacao, mas re-buscar por request faria de um token forjado um amplificador de DoS). Assert de boot: 'JWKS OK (1 chave ES384) | auth: dual-legacy'. PROVAS 7/7 contra app.onionevolve.com/commands: OIDC valido 200 · legado 200 (janela) · sem token 401 · aud de OUTRO recurso 401 · sem scope bridge:invoke 401 · assinatura adulterada 401 · lixo 401. BONUS: C_permission_mode_fail_open CORRIGIDO — o default do PERMISSION_MODE deixou de ser bypassPermissions"
     provenance:
-      source: "/home/onion/onion-bridge/src/identity.ts"
+      source: "src/identity.ts do bridge reiniciado em produção (7 provas) (host)"
       locator: "bridge-reiniciado-e-7-provas-executadas"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/identity.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: C_pwa_has_no_pkce
     node_type: claim
     trace: /home/onion/onion-bridge/web/src/App.tsx:21
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: refuted
@@ -1055,9 +1055,9 @@ nodes:
     superseded_note: "fechado pelo P6 — ver E_p6_pkce_live"
     label: "O FLIP ESTA BLOQUEADO, e nao pelo que o spec supunha. A PWA NAO TEM UMA LINHA DE OIDC/PKCE: grep por code_verifier|pkce|oidc|authorize|logto em web/src e public devolve ZERO; ela obtem o token de getToken() (convite colado pelo usuario). Logo, flipar agora (remover BRIDGE_AUTH_MODE) trancaria o caminho HUMANO inteiro — o lockout que o spec teme, pela porta que o spec nao olhou. O P6 nao e formalidade ('os dois chamadores mandam Bearer'): para a PWA e implementar Authorization Code + PKCE de verdade (redirect ao authorize com code_challenge, rota /callback ja registrada como redirect URI do app SPA, troca do code com code_verifier, storage, refresh). CONSEQUENCIA DE ESCOPO: o item 1 fica num plato seguro (mecanismo pronto e provado, rollback de uma linha) e o P6 merece passada propria"
     provenance:
-      source: "/home/onion/onion-bridge/web/src/App.tsx:21"
+      source: "web/src/App.tsx:21 do checkout de produção (grep sem OIDC/PKCE) (host)"
       locator: "grep-no-fonte-da-pwa"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/web/src/App.tsx:21 no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: C_scaffold_removed_proof_was_invalid
@@ -1081,7 +1081,7 @@ nodes:
     node_type: evidence
     trace: /home/onion/onion-bridge/src/web-oidc.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.75
     status: confirmed
@@ -1090,9 +1090,9 @@ nodes:
     verified_against: bundle-servido-e-authorize-medidos
     label: "P6 VIVO 2026-07-27 — a PWA agora faz Authorization Code + PKCE. TRES escolhas de desenho: (1) client PUBLICO, zero segredo no device; (2) redirect na RAIZ e nao /callback, porque o bridge serve a PWA com catch-all estatico SEM fallback de SPA — /callback daria 404 e exigiria mudar o roteamento do servidor; na raiz o ?code= chega e o app limpa a URL com replaceState: ZERO mudanca no servidor; (3) getToken() continua SINCRONO — e a costura unica por onde todo o app ja passava, entao o login entra por ali e nada mais muda. BURACO DO P3 FECHADO no caminho: todas as roles eram MachineToMachine e o usuario NAO TINHA ROLE — o token humano sairia sem bridge:invoke e o gate recusaria: login funcionaria e acesso nao, o pior desfecho (parece configurado, nao e). Criada role bridge-user (type User) com o scope, atribuida. PROVAS: 6/6 marcas de PKCE no bundle SERVIDO (nao no build), authorize com os parametros reais devolve 303 -> /sign-in?app_id=<spa>, banco confirma marcio->bridge-user->bridge:invoke, redirect URIs raiz+/callback, refresh token 14d. Regressao: OIDC 200 · convite legado 200 (janela) · sem token 401 · PWA 200. FRONTEIRA: o login humano completo (senha + troca do code) NAO foi executado — exige browser; e o passo do maestro"
     provenance:
-      source: "/home/onion/onion-bridge/src/web-oidc.ts"
+      source: "src/web-oidc.ts do checkout de produção (bundle servido e authorize medidos) (host)"
       locator: "bundle-servido-e-authorize-medidos"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/web-oidc.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   # ---- P7 O FLIP EXECUTADO 2026-07-27 (carta branca do maestro) ----
@@ -1100,7 +1100,7 @@ nodes:
     node_type: evidence
     trace: /home/onion/onion-bridge/.env
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.8
     status: confirmed
@@ -1109,16 +1109,16 @@ nodes:
     verified_against: bridge-reiniciado-e-gates-medidos-pos-flip
     label: "[⚠ 2026-08-23 superficie parcialmente obsoleta — ver reverify_note] P7 O FLIP EXECUTADO 2026-07-27 (carta branca do maestro). Removida a linha BRIDGE_AUTH_MODE=dual-legacy do .env (backup .env.bak-pre-flip-20260727-152720; rollback = re-adicionar + restart, segundos) e systemctl restart onion-bridge. Boot mede 'JWKS OK (1 chave ES384) | auth: ENFORCE' e o AVISO dual-legacy SUMIU. PROVAS em localhost:8787 (probe barato /commands, que NAO dispara o Agent SDK): sem token 401 · AUTH_TOKEN legado 401 (era 200 na baseline pre-flip) · convite courtesy 401 (era 200) · POST /chat com AUTH_TOKEN 401 (barrado no gate, agente nao roda). CONTROLES intactos: /health 200 · PWA raiz 200 · /admin/tokens com AUTH_TOKEN 200 (adminGuard nao olha authMode) · /a2a com token a2a 403 (handler, nao 401 — gate vivo). ESCOPO: so P7 por decisao do maestro; convites courtesy/byok podem ser cortados (sem usuario dependente). PROVA POSITIVA FECHADA 2026-07-27: login humano OIDC na PWA -> /chat EXECUTOU o Agent SDK (custo/tokens medidos na propria UI) e /commands 200 (menu de comandos carregou). PRE-REQUISITO DESCOBERTO NO CAMINHO: o maestro criou a conta 'marciocar' por SIGN-UP (o sign-up do Logto esta ABERTO — P3.4 nunca executado) e ela nasceu SEM role; a camada 2 do RBAC (D_rbac_two_layers) SEGUROU — token sem scope bridge:invoke -> 401 — e o acesso so liberou apos atribuir a role bridge-user a marciocar (INSERT em users_roles no DB do Logto + re-login). /admin/stats segue 401 sob OIDC: ESPERADO, confirma C_p9_blocked_no_admin_oidc (adminGuard so AUTH_TOKEN, Identity OIDC sem conceito de admin). GAP ABERTO: sign-up do tenant default ABERTO (fechar = P3.4)."
     provenance:
-      source: "/home/onion/onion-bridge/.env"
+      source: ".env de produção do onion-bridge (host, não versionado)"
       locator: "bridge-reiniciado-e-gates-medidos-pos-flip"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/.env no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do .env de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: C_p9_blocked_no_admin_oidc
     node_type: claim
     trace: /home/onion/onion-bridge/src/server.ts:27
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: superseded
@@ -1126,14 +1126,14 @@ nodes:
     verified_against: bridge-source-lido-pos-flip
     label: "P9 NAO pode seguir 'na mesma janela do P8' como manda D_retire_legacy_immediately — ACHADO do flip (dogfood). Medido no server.ts: adminGuard (~linha 27) aceita APENAS config.authToken; a2aGuard (~linha 38) aceita config.authToken OU a2aTokens; NENHUM dos dois olha o authMode nem chama verifyAccessToken. E o Identity OIDC (identity.ts) so tem subject/scopes/isMachine — SEM conceito de admin. Logo apagar o AUTH_TOKEN (P9) mataria o /admin/* inteiro (401 sempre, sem reposicao) e o caminho admin do /a2a. A doutrina 'aposentar imediatamente' assumia legado==execucao; mas o AUTH_TOKEN tambem carrega admin/a2a, superficies que o OIDC ainda nao cobre. PRE-REQUISITO do P9: um caminho admin via OIDC (scope/sub -> admin) — trabalho NAO feito, decidido GATED com o maestro em 2026-07-27."
     provenance:
-      source: "/home/onion/onion-bridge/src/server.ts:27"
+      source: "src/server.ts:27 do checkout de produção pós-flip (host)"
       locator: "bridge-source-lido-pos-flip"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/server.ts:27 no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
   - id: C_p9_prereq_done_admin_oidc
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
@@ -1142,16 +1142,16 @@ nodes:
     trace: /home/onion/onion-bridge/src/server.ts:225
     label: "SUPERA C_p9: o pre-requisito que C_p9 dizia NAO-feito (caminho admin via OIDC, scope/sub->admin) ESTA FEITO. Medido 2026-08-27 no server.ts vivo: adminGuard (L225) NAO usa mais config.authToken — chama verifyAccessToken(bearer,'bridge:admin'), OIDC com escopo dedicado; a2aGuard (L37) aceita SO config.a2aTokens, o bypass do segredo de admin foi removido (comentario no codigo: 'P9 — o bypass do segredo de admin SAIU'). Logo P9 (aposentar o AUTH_TOKEN legado) deixou de estar bloqueado — o bridge avancou desde 2026-07-27. C_p9 nao errou (estava certo quando escrito); a realidade andou (DRIFTED). Achado do /meta:drive medindo o vivo."
     provenance:
-      source: "/home/onion/onion-bridge/src/server.ts:225"
+      source: "onion-bridge@7e736ba2:src/server.ts"
       locator: "server.ts vivo lido via sudo (1o /meta:drive na onda m2-bridge): adminGuard L225 chama verifyAccessToken(bearer,'bridge:admin') — OIDC com escopo admin; a2aGuard L37 so config.a2aTokens.has(bearer), bypass do admin REMOVIDO"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/server.ts:225 no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "host"
+      method: "leitura: src/server.ts em onion-bridge@7e736ba2 (remoto marciocar/onion-bridge; arquivo na data 2026-08-27)"
+      locality: "repo"
 
   - id: C_flip_was_partial
     node_type: claim
     trace: /home/onion/onion-bridge/src/server.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: superseded
@@ -1159,16 +1159,16 @@ nodes:
     verified_against: rotas-medidas-uma-a-uma-apos-o-flip
     label: "O FLIP (P7) FOI PARCIAL, e a medicao mostrou o estado INVERTIDO. O flip fechou o authGuard (/chat, /commands => 401 no legado), mas adminGuard e a2aGuard eram guards SEPARADOS que comparavam direto com config.authToken e nunca souberam de identidade. Medido logo apos o flip: /admin/stats devolvia 200 COM O SEGREDO LEGADO — incluindo POST /admin/tokens, que CUNHA convites — enquanto o token OIDC do humano era RECUSADO ali. O velho entrava e o novo nao. /a2a idem (400 = passou o guard). Licao: 'o flip' nao e um ato, e uma propriedade de CADA superficie guardada; declarar o segredo morto sem medir rota a rota e declarado != verificado aplicado a si mesmo"
     provenance:
-      source: "/home/onion/onion-bridge/src/server.ts"
+      source: "rotas do bridge em produção medidas uma a uma pós-flip (host)"
       locator: "rotas-medidas-uma-a-uma-apos-o-flip"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/server.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: E_p9_complete
     node_type: evidence
     trace: /home/onion/onion-bridge/src/identity.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.9
     status: confirmed
@@ -1177,16 +1177,16 @@ nodes:
     verified_against: rotas-medidas-apos-restart-e-remocao
     label: "P9 COMPLETO 2026-07-27. (1) scope bridge:admin criado e concedido SO a role humana — o app de servico NAO recebe (M2M nao cunha convite; conceder por conveniencia e como menor privilegio morre). (2) adminGuard passou a exigir identidade com bridge:admin; verifyAccessToken ganhou parametro `required` para exigir outro scope sem duplicar a verificacao de assinatura/audiencia — um caminho de validacao, dois niveis de acesso. (3) a2aGuard perdeu o bypass do segredo de admin: so o pool dedicado entra (zero trafego em 30 dias, fechar nao interrompeu ninguem). (4) AUTH_TOKEN REMOVIDO do .env. PROVAS apos restart: segredo aposentado => 401 em /commands, /admin/stats E /a2a (era 200 no admin); identidade de SERVICO => 200 em /commands e 401 em /admin (menor privilegio visivel); pool a2a => 400 (passa o guard, falha no payload); PWA e /health => 200. FRONTEIRA: o caminho ADMIN pelo token HUMANO nao foi provado por esta sessao — exige browser e a role e do maestro; recusei conceder bridge:admin ao servico 'para testar'"
     provenance:
-      source: "/home/onion/onion-bridge/src/identity.ts"
+      source: "rotas do bridge em produção após restart (src/identity.ts) (host)"
       locator: "rotas-medidas-apos-restart-e-remocao"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/identity.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: E_p9_human_admin_proven
     node_type: evidence
     trace: /home/onion/onion-bridge/src/web-oidc.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -1194,16 +1194,16 @@ nodes:
     verified_against: pwa-do-maestro-e-token-de-servico-medidos
     label: "A FRONTEIRA DECLARADA FOI FECHADA — e o defeito era meu, na costura. O guard de admin estava CERTO desde o restart (a PWA recebeu literalmente 'nao autorizado — acesso admin requer identidade com bridge:admin'), mas o token do maestro nao carregava o scope por DUAS causas somadas: (a) a PWA pedia so `bridge:invoke` — scope OAuth e REQUISITADO, nao concedido automaticamente, entao a role ter o scope NAO BASTA se o cliente nao o pede; (b) o login era de 18:02 e o scope nasceu 23:23, logo o token era anterior a existencia dele. Consertado: SCOPES da PWA passou a pedir bridge:admin para TODOS. PROVA DE QUE ISSO E SEGURO, medida e nao afirmada: o app de SERVICO pediu `bridge:invoke bridge:admin` e o Logto emitiu token com scope=`bridge:invoke` APENAS — pedir nao e receber, a autorizacao mora no servidor. /admin/stats devolve 401 ao servico mesmo tendo pedido. Maestro confirmou a engrenagem visivel na PWA apos re-login"
     provenance:
-      source: "/home/onion/onion-bridge/src/web-oidc.ts"
+      source: "PWA do maestro e token de serviço medidos contra o bridge em produção (host)"
       locator: "pwa-do-maestro-e-token-de-servico-medidos"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/web-oidc.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-27"
       locality: "host"
 
   - id: C_identity_bought_who_not_what
     node_type: claim
     trace: /home/onion/onion-bridge/src/chat.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: superseded
@@ -1211,16 +1211,16 @@ nodes:
     verified_against: env-e-toolset-do-sdk-medidos
     label: "P0-P9 fecharam QUEM entra e NAO tocaram O QUE se pode fazer. PERMISSION_MODE=bypassPermissions seguia vivo e `bridge:invoke` era tudo-ou-nada: toda identidade autenticada executava irrestrito. Sem diferenciar capacidade, o flip so trocou 'quem tem o segredo faz tudo' por 'quem tem identidade faz tudo' — melhor (revogavel, nominal, auditavel) mas nao MENOS PODER"
     provenance:
-      source: "/home/onion/onion-bridge/src/chat.ts"
+      source: "env e toolset do SDK no bridge em produção (src/chat.ts) (host)"
       locator: "env-e-toolset-do-sdk-medidos"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/chat.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
       locality: "host"
 
   - id: C_allowedtools_does_not_restrict
     node_type: claim
     trace: /home/onion/onion-bridge/src/chat.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -1228,10 +1228,10 @@ nodes:
     verified_against: tipos-do-pacote-instalado-v0.3.195
     label: "CORRECAO DE PREMISSA, apanhada ANTES de virar codigo: eu ia usar `allowedTools` como allowlist. A doc do @anthropic-ai/claude-agent-sdk v0.3.195 instalado diz o oposto — allowedTools 'auto-allows without prompting', e 'to restrict which tools are available, use the `tools` option instead'. Escrito de memoria, teria entregue uma restricao que NAO RESTRINGE: falso-verde por construcao, na propria guarda de capacidade. Quem limita e `tools` (com [] desligando tudo) e `disallowedTools` (remove do contexto). A skill que carreguei tambem era a errada — cobre a Claude API, nao o Agent SDK; a fonte que valeu foi o pacote em disco"
     provenance:
-      source: "/home/onion/onion-bridge/src/chat.ts"
+      source: "npm @anthropic-ai/claude-agent-sdk@0.3.195 (tipos do pacote, sdk.d.ts)"
       locator: "tipos-do-pacote-instalado-v0.3.195"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/chat.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "host"
+      method: "leitura: tipos do @anthropic-ai/claude-agent-sdk 0.3.195 (o mesmo instalado no bridge em 2026-07-28; upgrade a 0.3.220 em 5c6e2cfb)"
+      locality: "web"
 
   - id: D_capability_by_scope
     node_type: decision
@@ -1254,7 +1254,7 @@ nodes:
     node_type: evidence
     trace: /home/onion/onion-bridge/src/chat.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -1262,15 +1262,15 @@ nodes:
     verified_against: canario-de-escrita-e-enumeracao-no-ar
     label: "PROVA COMPORTAMENTAL, nao declaracao: o app de servico (scope=bridge:invoke apenas) recebeu 'crie o arquivo X, use qualquer meio disponivel' e o arquivo NAO existe depois (denominador explicito: o prompt pedia a escrita, a resposta veio com 14294 bytes, nao foi turno vazio). Enumeracao concorda: Glob/Grep/Read/WebFetch/WebSearch, sem Bash/Write/Edit. A 1a medicao foi DESCARTADA por ambigua — o marcador 'SEM_BASH' convivia com 'onion' na saida, e `id -un` no bridge devolve exatamente 'onion'"
     provenance:
-      source: "/home/onion/onion-bridge/src/chat.ts"
+      source: "canário de escrita contra o bridge em produção (src/chat.ts) (host)"
       locator: "canario-de-escrita-e-enumeracao-no-ar"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/chat.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
       locality: "host"
 
   - id: Q_p10_mutation_not_run
     node_type: question
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.7
     status: superseded
@@ -1379,7 +1379,7 @@ nodes:
   - id: Q_signup_close_not_via_api
     node_type: question
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.8
     status: open
@@ -1447,7 +1447,7 @@ nodes:
   - id: Q_orgs_are_empty_scaffolding
     node_type: question
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.9
     status: superseded
@@ -1494,7 +1494,7 @@ nodes:
     node_type: evidence
     trace: ops/bridge-auth/logto-provision.sh
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: superseded
@@ -1510,7 +1510,7 @@ nodes:
   - id: Q_seven_orgs_still_empty
     node_type: question
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.9
     status: superseded
@@ -1596,7 +1596,7 @@ nodes:
     node_type: claim
     trace: ops/bridge-auth/logto-provision.sh
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 1.0
     status: confirmed
@@ -1680,7 +1680,7 @@ nodes:
     node_type: claim
     trace: docs/analysis/onion-adr-federation-transport-pull-2026-07.md
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.3
     status: superseded
@@ -1709,7 +1709,7 @@ nodes:
     node_type: evidence
     trace: docs/evolution/federation/outbox/
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
@@ -1726,7 +1726,7 @@ nodes:
     node_type: decision
     trace: /home/onion/onion-bridge/src/federation.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -1734,16 +1734,16 @@ nodes:
     verified_against: clone-vazio-puxou-12-e-idempotencia-medida
     label: "DECISAO QUE A MEDICAO FORCOU: as outboxes do core estao VAZIAS (tudo em _processed/, porque a entrega marca como transportado). Servir uma FILA daria sempre zero. Serve-se entao O HISTORICO — tudo que ja foi anunciado aquele membro, com sha256 — e o adotante baixa o que lhe falta. Sem estado de fila, idempotente, e AUTO-CURATIVO: clone vazio puxou os 12 e a 2a rodada baixou 0. Integridade nao e opcional: conteudo que nao bate com o manifesto e DESCARTADO no cliente"
     provenance:
-      source: "/home/onion/onion-bridge/src/federation.ts"
+      source: "src/federation.ts do checkout de produção (clone vazio puxou 12) (host)"
       locator: "clone-vazio-puxou-12-e-idempotencia-medida"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/federation.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
       locality: "host"
 
   - id: E_pull_endpoint_works
     node_type: evidence
     trace: /home/onion/onion-bridge/src/federation.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -1751,16 +1751,16 @@ nodes:
     verified_against: "reverificado 2026-08-23: 5 mecanicas reproduzidas ao vivo (401 sem token, 401 M2M nao-org, 200 sha-correto, 403 nomeando conflito). Nota: clone servido 1 anuncio atrasado vs outbox (drift de sync, nao do endpoint)"
     label: "PULL DOWNSTREAM VIVO em GET /federation/inbox/:member. Medido: token de org do pulse-mais puxa os 12 proprios com sha; pedir o inbox de OUTRO membro devolve 403 nomeando o conflito ('identidade pertence a pulse-mais, pediu granaai'); sem token 401; token do bridge-service (nao-org) 401. Os 12 baixados sao BYTE-IDENTICOS ao que o core anunciou. O adotante real nao foi tocado — a prova de clone-novo rodou em diretorio temporario"
     provenance:
-      source: "/home/onion/onion-bridge/src/federation.ts"
-      locator: "reverificado 2026-08-23: 5 mecanicas reproduzidas ao vivo (401 sem token, 401 M2M nao-org, 200 sha-correto, 403 nomeando conflito). Nota: clone servido 1 anuncio atrasado vs outbox (drift de sync, nao do endpoint)"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/federation.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "GET /federation/inbox/:member contra o bridge em produção (5 mecânicas ao vivo) (host)"
+      locator: "onion-bridge@38702f00:src/federation.ts (último commit do arquivo até 2026-08-23) ; reverificado 2026-08-23: 5 mecanicas reproduzidas ao vivo (401 sem token, 401 M2M nao-org, 200 sha-correto, 403 nomeando conflito). Nota: clone servido 1 anuncio atrasado vs outbox (drift de sync, nao do endpoint)"
+      method: "testemunho: medição de comportamento no host 2026-08-23"
       locality: "host"
 
   - id: C_org_token_has_no_org_claim
     node_type: claim
     trace: /home/onion/onion-bridge/src/identity.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
@@ -1768,16 +1768,16 @@ nodes:
     verified_against: token-decodificado
     label: "MEDIDO, contra o que eu ia supor: o token de organizacao do Logto NAO traz claim de organizacao. A org vive so na AUDIENCE, como `urn:logto:organization:<id>` — e so o ID, nunca o nome. Consequencia de desenho: o bridge precisa de um mapa id->membro, e dar-lhe credencial da Management API para consultar seria conceder o universo por conveniencia. Solucao: mapa DERIVADO regeneravel (--write-org-map), fail-closed em id desconhecido. Nao fere o D5 da projecao: o SSOT segue decidindo QUAIS orgs existem; o id e so a alca que o Logto atribuiu"
     provenance:
-      source: "/home/onion/onion-bridge/src/identity.ts"
+      source: "token de organização do Logto decodificado (src/identity.ts em produção) (host)"
       locator: "token-decodificado"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/identity.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
       locality: "host"
 
   - id: C_p10_broke_scope_default
     node_type: claim
     trace: /home/onion/onion-bridge/src/identity.ts
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 1.0
     status: confirmed
@@ -1785,9 +1785,9 @@ nodes:
     verified_against: quatro-casos-falhando-identicamente
     label: "REGRESSAO MINHA, de duas horas antes, apanhada por medicao: no P10 escrevi `required ?? REQUIRED_SCOPE`, entao passar `undefined` NAO desliga a checagem de scope — cai em bridge:invoke. O token de organizacao vem com scope VAZIO, logo era recusado, e os quatro casos de teste falhavam identicamente (o que denunciou a causa comum). Corrigido com sentinela explicita: `required === \"\"` desliga de fato; undefined mantem o default historico"
     provenance:
-      source: "/home/onion/onion-bridge/src/identity.ts"
+      source: "src/identity.ts do checkout de produção (4 casos falhando igual) (host)"
       locator: "quatro-casos-falhando-identicamente"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/identity.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura/medição no checkout de produção do onion-bridge no host 2026-07-28"
       locality: "host"
 
 
@@ -1881,7 +1881,7 @@ nodes:
     node_type: evidence
     trace: /etc/systemd/system/system.slice.d/10-memory-protection.conf
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
@@ -1889,9 +1889,9 @@ nodes:
     verified_against: host-vps-medido
     label: "RE-VERIFY (kg-freshness 2026-07-29, medido read-only): o fix do teto de ancestral SEGUE EFETIVO. cat /sys/fs/cgroup/system.slice/memory.min => 402653184 (384M); caddy.service=67108864 (64M); onion-bridge.service=268435456 (256M); drop-in 10-memory-protection.conf presente. Com memory_recursiveprot a protecao do ancestral desce as folhas — os floors de caddy/bridge estao EFETIVOS, confirmando a supersessao de C_ancestor_cap_zeroes_floors. RESSALVA: mede o caso caddy/bridge, NAO a classe host-wide de Q_floors_effective (varredura dos demais floors segue gated)"
     provenance:
-      source: "/etc/systemd/system/system.slice.d/10-memory-protection.conf"
-      locator: "host-vps-medido"
-      method: "testemunho: leitura do arquivo /etc/systemd/system/system.slice.d/10-memory-protection.conf no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "memory.min dos cgroups do system.slice medido no host (host)"
+      locator: "drop-in 10-memory-protection.conf ; host-vps-medido"
+      method: "testemunho: leitura de memory.min nos cgroups do host 2026-07-29"
       locality: "host"
 
   - id: E_logto_now_critical_2026_08
@@ -1912,7 +1912,7 @@ nodes:
   - id: E_bridge_write_grant_absent_2026_08
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.9
     status: superseded
@@ -1928,7 +1928,7 @@ nodes:
   - id: E_logto_tenant_provisioned_2026_08
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.95
     status: confirmed
@@ -1937,9 +1937,9 @@ nodes:
     trace: /home/marcio/onion-vps-logto/docker-compose.yml
     label: "O tenant default NAO esta mais vazio: 3 users, 9 apps, resource do bridge existe, sign-up FECHADO. O pre-requisito que E_p0 descrevia (criar user antes do flip) foi cumprido E o P3.4 (desligar sign-up) tambem ja foi aplicado, na ordem recomendada. O snapshot de 07-26 foi ultrapassado pela linha do tempo"
     provenance:
-      source: "/home/marcio/onion-vps-logto/docker-compose.yml"
+      source: "postgres do Logto da VPS consultado read-only (docker exec psql, host)"
       locator: "medido ao vivo 2026-08-23 (docker exec psql): tenant default tem 3 users (nicole, marciog, marciocar), 9 applications (incl. onion-bridge-service/onion-bridge-pwa), o API Resource 'Onion Bridge' (https://bridge.onionevolve.com) existe, e sign_in_mode=SignIn nos dois tenants (registro fechado)"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-logto/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: consulta read-only ao banco do Logto no host 2026-08-23"
       locality: "host"
   - id: E_floors_now_effective_2026_08
     node_type: evidence
@@ -1976,7 +1976,7 @@ nodes:
   - id: E_bridge_write_regranted_2026_08
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.95
     status: confirmed
@@ -1992,7 +1992,7 @@ nodes:
   - id: E_d5_granaai_acolhida_2026_08
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.95
     status: confirmed
@@ -2008,7 +2008,7 @@ nodes:
   - id: E_default_deny_never_existed
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.95
@@ -2017,10 +2017,10 @@ nodes:
     label: "REFUTA [D_default_deny_routes]: o default-deny por middleware global + allowlist ancorada NUNCA foi implementado — nem em producao nem em NENHUM ponto do historico git. O codigo sempre praticou o modelo INVERSO que o proprio label nomeia como perigoso: lista fixa de rotas PROTEGIDAS (authGuard/a2aGuard rota-a-rota), com todo o resto aberto por default (incluindo o catch-all estatico). A decisao foi escrita como se descrevesse o sistema, e o sistema nunca a conheceu. A superficie de risco que ela mitigaria segue mapeada por Q_route_inventory (vivo). Selado REFUTED pelo maestro em 2026-08-30."
     trace: "/home/onion/onion-bridge/src/server.ts (historico completo)"
     provenance:
-      source: "/home/onion/onion-bridge/src/server.ts (historico completo)"
+      source: "onion-bridge@7e736ba2:src/server.ts"
       locator: "censo lote 1 (run wf_87c4a44e-0ff) + selo do maestro 2026-08-30: leitura do src vivo e do historico git completo do server.ts"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/server.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "host"
+      method: "leitura: src/server.ts em onion-bridge@7e736ba2 (remoto marciocar/onion-bridge; arquivo na data 2026-08-30)"
+      locality: "repo"
 
   - id: E_CENSO0901_D_resource_plan_b
     node_type: evidence

@@ -837,9 +837,9 @@ nodes:
     source_kind: analysis
     label: "As TRÊS claims sobre Claude Tag foram REJEITADAS por exagero. 'Não alcança sessão local' é inferência ('a página não trata de sessões Claude Code locais'). Ficou ancorado só o seguinte: beta público, Team/Enterprise, sandbox efêmero, pareamento 1 workspace Slack ↔ 1 org Claude, e por padrão 'anyone in the paired Slack workspace can tag @Claude'. A pergunta da lacuna segue sem resposta."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[19] (objeção 20, target \"Metade Claude Tag da lacuna cc-agent-teams-claude-tag\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 20)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 20)"
       locality: "host"
   - id: E_ELENXO_DISCORD_LINE_UNPINNED
     node_type: evidence
@@ -853,9 +853,9 @@ nodes:
     source_kind: analysis
     label: "O código citado (server.ts l.806, `if (msg.author.bot) return`) prova o comportamento do Discord. Só que o locator tem linha sem commit SHA, e código sem pin é declaração mutável (behavior-over-declaration). Além disso, Discord não está entre os transportes candidatos (slack/teams). A generalização 'duas sessões não se ouvem' vale para Discord. Para Telegram, a claim foi REJEITADA e mostra que lá não há filtro de bot no chat privado."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[20] (objeção 21, target \"18 [cc-plugins-official-discord] o plugin Discord descarta mensagem de bot\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 21)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 21)"
       locality: "host"
   - id: E_ELENXO_SLACK_OFFICIAL_MCP_PLUGIN_EXISTS
     node_type: evidence
@@ -869,9 +869,9 @@ nodes:
     source_kind: analysis
     label: "O verificador achou no marketplace.json oficial uma entrada `slack` (github.com/slackapi/slack-mcp-plugin, 'Search messages, access channels, read threads'). Isso REFUTA a frase da rodada prévia 'sem plugin oficial Slack' tomada no sentido amplo: há plugin oficial de MCP Slack, só não há plugin de CANAL (push). O grafo precisa separar plugin-MCP de plugin-canal."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[21] (objeção 22, target \"Rejeição da claim do marketplace (Slack)\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 22)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 22)"
       locality: "host"
   - id: E_ELENXO_SLACK_PUSH_UNANCHORED
     node_type: evidence
@@ -885,9 +885,9 @@ nodes:
     source_kind: analysis
     label: "Prova leitura sob demanda. A claim de 'sem push' foi REJEITADA ('modelo pull é inferência'). Então a pergunta que importa ao desenho live, se o Slack MCP acorda uma sessão quando chega mensagem, continua sem âncora."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[23] (objeção 24, target \"20 [slack-mcp-events] lê o histórico completo\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 24)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 24)"
       locality: "host"
   - id: E_ELENXO_SLACK_APP_CLASS_UNMEASURED
     node_type: evidence
@@ -901,9 +901,9 @@ nodes:
     source_kind: analysis
     label: "A frase diz 'at this time' (temporal), e a claim não ancora se o cliente Claude Code/plugin slackapi conta como 'Marketplace app' ou 'internal app' no workspace da granaai. A restrição está provada; a aplicabilidade ao transporte, não."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[24] (objeção 25, target \"21 [slack-mcp-events] só apps do Marketplace ou internos usam MCP\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 25)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 25)"
       locality: "host"
   - id: E_ELENXO_SLACK_BOT_TO_APP_OPEN
     node_type: evidence
@@ -917,9 +917,9 @@ nodes:
     source_kind: analysis
     label: "A própria claim declara a lacuna aberta. Não se sabe se o app de uma sessão recebe o bot_message do app da outra sessão, que é exatamente a condição para duas sessões se ouvirem por Slack."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[26] (objeção 27, target \"23 [slack-mcp-events] bot_message\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 27)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 27)"
       locality: "host"
   - id: E_ELENXO_WORKIQ_NO_PUSH_BY_SILENCE
     node_type: evidence
@@ -933,9 +933,9 @@ nodes:
     source_kind: analysis
     label: "A citação mostra só `fetch /me/chats/{id}/messages`. 'Sem tool de subscrição/webhook/push' sai por silêncio, e a claim 25 diz que novas capacidades entram como PATHS, não tools. Uma subscrição Graph poderia ser um path e não aparecer como tool. A ausência de push não está provada."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[27] (objeção 28, target \"24 [teams-workiq-mcp] 10 tools, sem subscrição/push\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 28)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 28)"
       locality: "host"
   - id: E_ELENXO_WORKIQ_LICENSE_BY_SILENCE
     node_type: evidence
@@ -949,9 +949,9 @@ nodes:
     source_kind: analysis
     label: "Sai do silêncio da página de habilitação, e silêncio não é dispensa. Serve para DERRUBAR a afirmação da rodada prévia ('Work IQ exige licença M365 Copilot'), que fica sem âncora, mas não prova o contrário. O licenciamento da gmill segue indefinido."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[29] (objeção 30, target \"26 [teams-workiq-mcp] sem exigência de licença M365 Copilot\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 30)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 30)"
       locality: "host"
   - id: E_ELENXO_WORKIQ_BILLING_BY_ABSENCE
     node_type: evidence
@@ -965,9 +965,9 @@ nodes:
     source_kind: analysis
     label: "É o mesmo vício da 26: inferência por ausência de marcador numa lista. Reforça a dúvida, não a resolve."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[30] (objeção 31, target \"27 [teams-workiq-mcp] billing sem a marca 'Copilot license required'\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 31)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 31)"
       locality: "host"
   - id: E_ELENXO_WORKIQ_ONE_PERMISSION_GENERALIZED
     node_type: evidence
@@ -981,9 +981,9 @@ nodes:
     source_kind: analysis
     label: "A citação prova que ESSA permissão é delegada 'on behalf of the signed-in user'. 'Logo não bot-a-bot' generaliza a partir de uma única permissão, e outras (app-only) não foram lidas."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[31] (objeção 32, target \"28 [teams-workiq-mcp] WorkIQAgent.Ask delegada\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 32)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 32)"
       locality: "host"
   - id: E_ELENXO_TEAMS_BOT_TO_BOT_OPEN
     node_type: evidence
@@ -997,9 +997,9 @@ nodes:
     source_kind: analysis
     label: "A própria claim admite que 'a doc não menciona mensagens vindas de outros bots'. A lacuna 'bot do Teams recebendo mensagem de outro bot' segue aberta."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[32] (objeção 33, target \"29 [teams-workiq-mcp] agente em canal só recebe @menção salvo RSC\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 33)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 33)"
       locality: "host"
   - id: E_ELENXO_A2A_ADOPTION_SELF_DECLARED
     node_type: evidence
@@ -1013,9 +1013,9 @@ nodes:
     source_kind: analysis
     label: "A fonte é um comunicado de imprensa da própria fundação, ou seja, autodeclaração interessada (follow-the-money). Não há medição independente de adoção. E a citação nem traz o número 150: fala só de 'cloud providers ... embedding'."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[34] (objeção 35, target \"31 [a2a-spec-lf] 150+ organizações\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 35)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 35)"
       locality: "host"
   - id: E_ELENXO_A2A_UNTRUSTED_SCAN_PARTIAL
     node_type: evidence
@@ -1029,9 +1029,9 @@ nodes:
     source_kind: analysis
     label: "A própria claim delimita 'a seção de segurança lida', então a afirmação de ausência cobre uma leitura parcial. Falta varrer a spec inteira por 'untrusted|prompt injection|instructions'. E o corpus já registra E_UTILS_GUARDAS_SEM_HOOK: a2a-verify/a2a-ssrf-check existem, mas sem hook. A 'espinha' A2A depende de uma guarda que é utilitário, não veto."
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json"
+      source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[37] (objeção 38, target \"34 [a2a-spec-lf] sem orientação dedicada a conteúdo de outro agente\", survives=true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/9959505d-bd70-44dc-bd7b-df45e9945f05/workflows/wf_da77c143-24c.json no host (veredito do Elenxo do run wf_da77c143-24c, objeção 38)"
+      method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 38)"
       locality: "host"
 edges:
   # ── evidências informam a pergunta ──

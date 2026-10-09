@@ -34,9 +34,9 @@ nodes:
     verified_against: "docs/features/skills + changelog v0.8.6 + PR #13293 (skillSync.github, config 1.3.13): SKILL.md com name/description/allowed-tools/always-apply; sync por owner/repo/paths/interval"
     label: "O ACHADO QUE MUDA O DESENHO: LibreChat adotou Agent Skills no MESMO formato SKILL.md do Claude Code + GitHub Skill Sync — o repo Onion pode ser LIDO como fonte viva de skills, sem porte"
     provenance:
-      source: "https://www.librechat.ai/docs/features/skills + /home/marcio/onion-vps-librechat @8f4e83c:README.md"
+      source: "https://www.librechat.ai/docs/features/skills + onion-vps-librechat@8f4e83c:README.md (repo local sem remoto alcançável, host)"
       locator: "docs/features/skills (SKILL.md, frontmatter, skillSync.github) ; 8f4e83c:README.md l.13, l.67-71"
-      method: "leitura: doc oficial features/skills (2026-10-09) + README.md do commit 8f4e83c do repo /home/marcio/onion-vps-librechat"
+      method: "testemunho: leitura da doc oficial features/skills (2026-10-09) + README.md do commit 8f4e83c do repo onion-vps-librechat (local, sem remoto alcançável) no host 2026-08-20"
       locality: "host"
   - id: E_OIDC_GENERICO_SEM_GUIA_LOGTO
     node_type: evidence
@@ -50,9 +50,9 @@ nodes:
     label: "OIDC genérico é 1ª classe (OPENID_* completo, role sync, PKCE), mas a doc oficial NÃO tem guia Logto (índice OIDC: Auth0/Cognito/Entra/Keycloak, Authelia/Authentik) — sem referência pronta; riscos do precedente Vaultwarden: ES384, /oidc no issuer, sem offline_access"
     narrative: "label anterior: OIDC generico e 1a classe (OPENID_* completo, role sync, PKCE) mas NAO existe guia Logto no mundo — a instalacao da casa e pioneira; riscos herdados do precedente Vaultwarden: ES384, /oidc no issuer, sem offline_access"
     provenance:
-      source: "https://raw.githubusercontent.com/danny-avila/LibreChat/v0.8.7/.env.example + https://www.librechat.ai/docs/configuration/authentication/OAuth2-OIDC + /home/marcio/onion-vps-librechat @c943a9b:README.md"
+      source: "https://raw.githubusercontent.com/danny-avila/LibreChat/v0.8.7/.env.example + https://www.librechat.ai/docs/configuration/authentication/OAuth2-OIDC + onion-vps-librechat@c943a9b:README.md (repo local sem remoto alcançável, host)"
       locator: "env.example@v0.8.7 l.636-647 (OPENID_*ROLE*, OPENID_ROLE_SYNC_*), l.673-675 (OPENID_USE_PKCE); índice OAuth2-OIDC (Auth0/Cognito/Entra/Keycloak/Authelia/Authentik, sem 'logto'); c943a9b:README.md l.23 (issuer /oidc sufixo, scopes SEM offline_access) + 7338dcb:docker-compose.yml l.58 ('armadilha nº2 do precedente'); vaultwarden-logto-2026-08.kg.yaml l.47-62 (ES384)"
-      method: "leitura: env.example da tag v0.8.7 + índice OIDC da doc oficial (2026-10-09) + README c943a9b/compose 7338dcb do repo onion-vps-librechat + vaultwarden-logto-2026-08.kg.yaml (precedente ES384)"
+      method: "testemunho: leitura do env.example da tag v0.8.7 + índice OIDC da doc oficial (2026-10-09) + README c943a9b/compose 7338dcb do repo onion-vps-librechat + vaultwarden-logto-2026-08.kg.yaml (precedente ES384)"
       locality: "host"
   - id: E_PLUGINS_DEPRECADOS_AGENTS_MCP
     node_type: evidence
@@ -97,9 +97,10 @@ nodes:
     verified_against: "Issue #12538 (meili indexa VAZIO em silencio, primary key ambigua) · Discussion #12884 (1o-usuario-admin NAO funciona com OIDC) · #10684 (latest quebra upgrade) · .env.example (Mongo sem auth por default)"
     label: "As 4 pegadinhas que o plano da casa ja neutraliza: pins em vez de latest; janela de admin LOCAL; verificacao de busca POR COMPORTAMENTO (nao pelo log de sync); Mongo sem-ports em rede isolada com limite declarado"
     provenance:
-      source: "/home/marcio/onion-vps-librechat @7338dcb:docker-compose.yml + up.sh + librechat.yaml"
+      source: "onion-vps-librechat@7338dcb:docker-compose.yml + up.sh + librechat.yaml (repo local sem remoto alcançável, host)"
       locator: "7338dcb:docker-compose.yml l.3-4, l.83-87, l.101-102 ; 7338dcb:up.sh l.22 ; 7338dcb:librechat.yaml l.7"
-      method: "leitura: commit 7338dcb do repo /home/marcio/onion-vps-librechat (compose, up.sh, librechat.yaml)"
+      method: "testemunho: leitura do commit 7338dcb do repo onion-vps-librechat (local, sem remoto alcançável) no host 2026-08-20 (compose, up.sh, librechat.yaml)"
+      locality: "host"
   - id: E_HEADROOM_SWAP_100
     node_type: evidence
     layer: audit
@@ -112,9 +113,9 @@ nodes:
     label: "O headroom de RAM da VPS é apertado (o swap desta VPS já esteve 100%): o stack entra com mem_limit em TUDO (api 1g, mongo/meili/vectordb 512m, rag 1g)"
     narrative: "label anterior: O headroom REAL de RAM e apertado (swap 100%): o stack entra com mem_limit em TUDO (api 1g, mongo/meili/vectordb 512m, rag 1g) e a higiene de sessoes orfas e decisao do maestro, nao minha"
     provenance:
-      source: "/home/marcio/onion-vps-librechat @7338dcb:docker-compose.yml"
+      source: "onion-vps-librechat@7338dcb:docker-compose.yml (repo local sem remoto alcançável, host)"
       locator: "7338dcb:docker-compose.yml l.6 ('mem_limit em tudo (o swap desta VPS já esteve 100%)'), l.16, l.82, l.100, l.119, l.137; corpo de 7338dcb (mesma frase)"
-      method: "leitura: commit 7338dcb do repo /home/marcio/onion-vps-librechat (docker-compose.yml + corpo)"
+      method: "testemunho: leitura do commit 7338dcb do repo onion-vps-librechat (local, sem remoto alcançável) no host 2026-08-20 (docker-compose.yml + corpo)"
       locality: "host"
 
   - id: E_SKILLSYNC_DORMANT_V087
@@ -128,9 +129,9 @@ nodes:
     verified_against: "lido no CODIGO da imagem v0.8.7 em producao: /app/api/server/services/Skills/sync.js exporta initializeGitHubSkillSync e grep na imagem inteira mostra ZERO callers fora do teste; corroborado pelo comportamento (boot aceita o schema, colecoes skillsync* existem com 0 docs, PAT valido com ZERO trafego, zero logs do servico). PR #13293 mergeou 2026-06-11, ANTES do corte do v0.8.7 (06-24) — codigo embarcou, wiring nao"
     label: "CORRECAO DA PESQUISA em 2 rodadas de dogfood: (1) DORMANT no v0.8.7 — zero callers; (2) upgrade REAL p/ v0.8.8-rc1 mediu que a hipotese liga-sozinho-no-upgrade era FALSA: nem no rc1 ha caller de boot — o desenho pos-ClickHouse gere o sync pelo ADMIN PANEL (skillsynccredentials por tenant; request-scoped recusa config==server, lido no codigo do rc1). Painel subiu (pin 1.0.0, loopback 3027) e FECHOU O CICLO em 2026-08-20: enabled ligado no painel (o gate final — github.enabled default off) + POST /api/admin/skills/sync/run = 11/11 skills sincronizadas; cron diario skill-sync-run.sh como mecanismo de fonte-viva. Correcao em 3 rodadas, todas aresta"
     provenance:
-      source: "/home/marcio/onion-vps-librechat @58955ae, @bd5252a, @8f4e83c (README.md, skill-sync-run.sh)"
+      source: "onion-vps-librechat@58955ae, @bd5252a, @8f4e83c (README.md, skill-sync-run.sh) (repo local sem remoto alcançável, host)"
       locator: "58955ae (corpo); bd5252a (corpo); 8f4e83c (corpo) + 8f4e83c:README.md l.67-71, l.101-104"
-      method: "leitura: commits 58955ae/bd5252a/8f4e83c do repo /home/marcio/onion-vps-librechat (corpo + README.md)"
+      method: "testemunho: leitura dos commits 58955ae/bd5252a/8f4e83c do repo onion-vps-librechat (local, sem remoto alcançável) no host 2026-08-20 (corpo + README.md)"
       locality: "host"
 
   # ---- o mapa (decisoes de integracao, lente Aristoteles) ----
@@ -175,9 +176,10 @@ nodes:
     label: "DECISÕES DO MAESTRO SELADAS (plano 2026-08-20): chat.onionevolve.com · SSO Logto (Onion ID), com admin LOCAL e login local ativo (OIDC liga só se o segredo existir) · só Anthropic na v1 · escopo completo com RAG (5 containers pinados) — stack construído no padrão da casa"
     narrative: "label anterior: DECISOES DO MAESTRO SELADAS: chat.onionevolve.com · SSO Logto obrigatorio (janela do 1o admin local) · so Anthropic server-key · escopo COMPLETO (5 containers com RAG) — e o stack ja esta construido no padrao da casa"
     provenance:
-      source: "/home/marcio/onion-vps-librechat @c943a9b:README.md + @7338dcb (docker-compose.yml, librechat.yaml, up.sh)"
+      source: "onion-vps-librechat@c943a9b:README.md + @7338dcb (docker-compose.yml, librechat.yaml, up.sh) (repo local sem remoto alcançável, host)"
       locator: "c943a9b:README.md l.10-13 ('Plano aprovado pelo maestro (2026-08-20)… SSO Logto (Onion ID), só Anthropic na v1… escopo completo com RAG. Decisões seladas'), l.17-25; 7338dcb:docker-compose.yml l.33-38 (ALLOW_EMAIL_LOGIN true para sempre), l.44-46, l.53-56 (OIDC vazio = login local segue); 7338dcb:up.sh l.17-22"
-      method: "leitura: commits c943a9b e 7338dcb do repo /home/marcio/onion-vps-librechat (README, compose, up.sh)"
+      method: "testemunho: leitura dos commits c943a9b e 7338dcb do repo onion-vps-librechat (local, sem remoto alcançável) no host 2026-08-20 (README, compose, up.sh)"
+      locality: "host"
 
   # ---- a fronteira aberta (a etapa do maestro) ----
   - id: Q_KG_RUNTIME_NO_LIBRECHAT
@@ -207,9 +209,10 @@ nodes:
     label: "FECHADO COMPLETO (2026-08-20): via RAG provada de ponta a ponta — agente Onion-KB com 793 embeddings (pgvector 0→793) e resposta citando arquivo-fonte via Agents API. A integração #2 do top-5 está ENTREGUE; a #1 (skillSync) ficou viva no mesmo dia pelo Admin Panel (11/11)"
     narrative: "label anterior: FECHADO COMPLETO (2026-08-20): chave inserida E a via RAG provada de ponta a ponta — agente Onion-KB (F6.2) com 793 embeddings e resposta citando arquivo-fonte via Agents API. A integracao #2 do top-5 esta ENTREGUE; a #1 (skillSync) fiada e dormant ate v0.8.8"
     provenance:
-      source: "/home/marcio/onion-vps-librechat @1c681b9 (README.md) + @8f4e83c + docs/evolution/research/librechat-2026-08/SYNTHESIS.md"
+      source: "onion-vps-librechat@1c681b9 (README.md) + @8f4e83c + docs/evolution/research/librechat-2026-08/SYNTHESIS.md (repo local sem remoto alcançável, host)"
       locator: "1c681b9 corpo + diff README ('Agente Onion-KB ✅ FEITO', 'Via RAG PROVADA 2026-08-20 … 0→793 embeddings … citação do arquivo-fonte'); 8f4e83c corpo (syncedSkillCount:11); SYNTHESIS.md l.57 (Top-5: skillSync → agente Onion-KB)"
-      method: "leitura: commits 1c681b9 e 8f4e83c do repo /home/marcio/onion-vps-librechat + SYNTHESIS.md l.57"
+      method: "testemunho: leitura dos commits 1c681b9 e 8f4e83c do repo onion-vps-librechat (local, sem remoto alcançável) no host 2026-08-20 + SYNTHESIS.md l.57"
+      locality: "host"
 
 edges:
   - from: E_SKILLS_FORMATO_IDENTICO

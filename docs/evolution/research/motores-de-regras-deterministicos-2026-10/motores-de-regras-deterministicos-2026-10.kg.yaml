@@ -317,7 +317,7 @@ nodes:
     narrative: "label anterior: EIXO MERCADO — o que apareceu e o que explicitamente NAO apareceu. APARECEU, em tres formas e todas sem numero: (1) M&A DE TALENTO — a Apple fez acquihire dos fundadores e da equipe da Styra, mantenedora do OPA, com licenca Apache-2.0 e governanca CNCF intactas: o motor sobrevive ao time, que e precisamente o argumento de durabilidade de padrao aberto sobre fornecedor. (2) MOVIMENTO DE FUNDACAO — a AWS doou o Cedar ao CNCF Sandbox (jan/2026): hyperscaler trocando controle por adocao, sinal de que a aposta e no PADRAO e nao na venda da linguagem. (3) CAPITAL DO INCUMBENTE EM FORMA DE PRODUTO, o sinal mais pesado — a AWS colocou Cedar DENTRO do Bedrock AgentCore como camada de politica de workflow agentico, o que diz onde o dinheiro espera a dor: autorizacao de AGENTE, nao lint de artefato. NAO APARECEU: nenhuma rodada de venture, nenhum valuation, nenhum down round, nenhum quadrante de analista, nenhum dado de receita ou adocao paga de NENHUM motor (incluindo GoRules/ZEN, Drools/Red Hat, Camunda e Cerbos, que tem empresa por tras). Declarado como ausencia medida, nao como sinal fraco."
     trace: 'docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml'
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json"
+      source: "journal wf_fcfb94bc-f30 (host)"
       locator: "journal wf_fcfb94bc-f30.json: result.market; result.budgetDropped (securityweek \"Cerbos raises $7.5 million\"); result.notVerifiedByBudget (Kognitos: Prosperity7/Khosla/Wipro Ventures; \"dois relatórios Gartner de 2026\")"
       method: "testemunho: leitura do journal wf_fcfb94bc-f30 no host 2026-10-01"
       locality: "host"
@@ -338,7 +338,7 @@ nodes:
     narrative: "label anterior: NAO-VERIFICADOS DE 1a CLASSE — custo: 23 fontes, 61 claims. (a) OBJECOES: 10 sobreviventes, 10 MODELADAS, 0 nao modeladas (9 achados numerados do Elenxo mais a objecao estrutural embutida na recomendacao, sobre monocultura de fonte). O teto de 32 nos NAO impediu modelar nenhuma. (b) REFUTADAS POR FONTE FRACA, 4, nominalmente: cobertura das politicas autoformalizadas no MedAgentBench (pagina do ICML sem numeros); Vectimus vetando por exit 2 na camada de tool-calling do Claude Code (nao comprovado no repo); Cedar v0.6.0 em 2026-08-24 (a UNICA alegacao de release de 2026 da rodada inteira); e a alegacao do Sondera de que o Rego nao oferece a analise de subconjunto contraditorio/vazio/sombreado que o Cedar oferece — vendor-on-competitor sobre o concorrente principal, derrubada por tier. (c) NAO-VERIFICADAS POR FALHA DE ACESSO: ZERO. Nenhuma fonte deu 403 nem truncou. O gargalo desta rodada foi ESCOLHA DE EIXO, nao acesso. (d) NAO MEDIDO, e era UM COMANDO: `gh api repos/cedar-policy/cedar/releases` e o equivalente para open-policy-agent/opa, kiegroup/drools, camunda, gorules/zen-engine, cerbos/cerbos, osohq/oso e casbin/casbin — velocidade de release e sinal de vida real sao pedido EXPLICITO da pergunta 1 e a rodada nao tem UM dado verificado de release, commit ou versao corrente de NENHUM motor. (e) CORTADO POR ORCAMENTO, e aqui esta o pior: o item do paper do Cedar que diz que os autores REJEITARAM gerar C a partir de Lean e escolheram Rust idiomatico mais um modelo Lean cerca de 10x menor — isto e, a evidencia CONTRARIA a migracao foi exatamente a que nao entrou. (f) FAIXAS INTEIRAS NAO LIDAS: Drools, Camunda/DMN (e se DMN e padrao ISO/OMG, que a pergunta 1 pede nominalmente), OpenL Tablets, json-rules-engine, Easy Rules, NRules, Clara Rules, GoRules BRMS e o proprio ZEN Engine — o PONTO DE PARTIDA da pergunta, com ZERO evidencia; mais Cerbos, Oso e Casbin; mais o eixo Rego/Datalog e o revival de logica declarativa; mais computacao incremental (Differential Datalog); mais DSL tipada compilada, teste diferencial de regras como disciplina e analise de cobertura/conflito fora do Cedar; mais a faixa CONTRARIAN (quem argumenta que motor declarativo PIORA). (g) CONCENTRACAO DE FONTE: 26 das 28 claims externas sao sobre Cedar; dedup aplicado de proposito, com 29 claims viradas em 12 nos de evidencia."
     trace: 'docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml'
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json"
+      source: "journal wf_fcfb94bc-f30 (host)"
       locator: "journal wf_fcfb94bc-f30.json: result.stats {sources 22, claims 93, verified 32, confirmed 28, refuted 4, unverified 0}; logs \"fetch 22 (23 cortadas por orçamento)\", \"Elenxo: 56 objeções, 50 sobreviventes\"; result.refuted (4 itens)"
       method: "testemunho: leitura do journal wf_fcfb94bc-f30 no host 2026-10-01"
       locality: "host"
@@ -509,9 +509,9 @@ nodes:
     label: 'OBJECAO 6 (Elenxo, 1 agente sem votacao) — a propria fonte central e de marco de 2024 e o sumarizador declarou que pode estar superada em 2026. Pior: a UNICA alegacao de release ou atividade de 2026 da rodada inteira (v0.6.0 em 2026-08-24) foi REFUTADA. Logo, contra a exigencia EXPLICITA de atualidade de outubro de 2026, a rodada nao tem UM dado verificado de velocidade de release, commit ou versao corrente de NENHUM motor — e a medicao custava um comando (`gh api repos/cedar-policy/cedar/releases`), que ninguem rodou. Esta objecao e a que sustenta reabrir antes de selar.'
     trace: 'docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml'
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json"
+      source: "journal wf_fcfb94bc-f30 (host)"
       locator: "journal wf_fcfb94bc-f30.json: result.decision.objections[5] (target \"Achado 6 — Cedar... paper de março de 2024\", survives true) + result.refuted[2] (v0.6.0 0-3)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json no host"
+      method: "testemunho: leitura do journal wf_fcfb94bc-f30 no host 2026-10-01"
       locality: "host"
 
   - id: E_OBJECAO_75MS_NAO_MEDE_HOOK
@@ -527,9 +527,9 @@ nodes:
     label: 'OBJECAO 7 (Elenxo, 1 agente sem votacao) — os 75 ms sao para UM conjunto de politicas num cenario de paper de 2024, nao para 93 regras sobre milhares de arquivos dentro de um hook de pre-commit. O orcamento real do Onion esta medido e e apertado: o lint caiu de cerca de 28s para 16s com um pre-filtro, e a bancada so fecha em cerca de 8 min em faixas paralelas. Nenhuma fonte da rodada mede SMT dentro de git hook, entao a alegacao de viabilidade de desempenho para ESTE uso e NAO-VERIFICADA — e o achado foi usado como se fosse verificada.'
     trace: 'docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml'
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json"
+      source: "journal wf_fcfb94bc-f30 (host)"
       locator: "journal wf_fcfb94bc-f30.json: result.decision.objections[6] (target \"Achado 7 — ... ~75 ms\", survives true)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json no host"
+      method: "testemunho: leitura do journal wf_fcfb94bc-f30 no host 2026-10-01"
       locality: "host"
 
   - id: E_OBJECAO_DRIFT_DO_ONION_E_DOCSTRING_VS_CORPO
@@ -581,9 +581,9 @@ nodes:
     label: 'OBJECAO 10, ESTRUTURAL (Elenxo, 1 agente sem votacao) — MONOCULTURA DE FONTE: 26 dos 28 achados externos falam de UM motor (Cedar), 1 e FAQ de fornecedor sem data e 1 e blog pessoal sobre OPA, e os 28 colapsam em cerca de 8 artefatos distintos. O ZEN Engine, que e o PONTO DE PARTIDA da pergunta, tem ZERO evidencia; Drools, Camunda/DMN, OpenL, Easy Rules, Cerbos, Oso, Casbin e o eixo Rego/Datalog nao foram lidos. Isto LIMITA todas as opcoes, inclusive A e E, porque a comparacao que escolheria entre motores nunca foi feita — e e o fundamento de reabrir (D) antes de selar qualquer coisa.'
     trace: 'docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml'
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json"
+      source: "journal wf_fcfb94bc-f30 (host)"
       locator: "journal wf_fcfb94bc-f30.json: result.decision.recommendation §\"Por que D antes de tudo\" (\"Dos 28 achados, 26 são Cedar, 1 é FAQ de fornecedor sem data e 1 é um blog pessoal sobre o OPA; e esses 28 colapsam em ~8 artefatos distintos\") + objections[8], [49] (ZEN sem medição) e [55] (faixa contrarian com zero fontes)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcfb94bc-f30.json no host"
+      method: "testemunho: leitura do journal wf_fcfb94bc-f30 no host 2026-10-01"
       locality: "host"
 
 edges:

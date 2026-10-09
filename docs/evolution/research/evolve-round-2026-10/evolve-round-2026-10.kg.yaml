@@ -137,14 +137,14 @@ nodes:
     trace: '.claude/validation/consumed-mode-check.sh'
     verified_against: 'MAQ-0, MAQ-5 e MAQ-7 da rodada, mais os tres casos curados em 2026-10-04 (PRs #909, #910 e #911)'
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json"
-      locator: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json → findings MAQ-0, MAQ-5, MAQ-7; corpo de d688f71d; corpos de a102675b, 33039e0d, 9c17b4da"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json no host (run wf_9cba4ab5 de 2026-10-04) + corpos de d688f71d/a102675b/33039e0d/9c17b4da"
+      source: "journal wf_9cba4ab5-0ac (host)"
+      locator: "journal wf_9cba4ab5-0ac (host) → findings MAQ-0, MAQ-5, MAQ-7; corpo de d688f71d; corpos de a102675b, 33039e0d, 9c17b4da"
+      method: "testemunho: leitura do journal wf_9cba4ab5-0ac no host (run wf_9cba4ab5 de 2026-10-04) + corpos de d688f71d/a102675b/33039e0d/9c17b4da"
       locality: "host"
 
   - id: C_LENTES_CASAM_O_ARTEFATO_NAO_A_INVOCACAO
     node_type: claim
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.8
     status: confirmed
@@ -153,9 +153,9 @@ nodes:
     trace: '.claude/rules/dissect-lens.md'
     verified_against: 'git log --diff-filter=A das duas lentes vs o ultimo timestamp do instructions-loaded.jsonl; find docs/evolution/dissect'
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json"
-      locator: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json → findings, id MAQ-6 (dimension MAQ)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json no host (achado MAQ-6 do run wf_9cba4ab5, 2026-10-04)"
+      source: "journal wf_9cba4ab5-0ac (host)"
+      locator: "journal wf_9cba4ab5-0ac (host) → findings, id MAQ-6 (dimension MAQ)"
+      method: "testemunho: leitura do journal wf_9cba4ab5-0ac no host (achado MAQ-6 do run wf_9cba4ab5, 2026-10-04)"
       locality: "host"
 
   - id: C_PESO_ADOPT_E_KG
