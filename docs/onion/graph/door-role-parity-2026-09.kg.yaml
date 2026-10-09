@@ -22,6 +22,10 @@ nodes:
     source_tier: 10
     label: "a porta PÚBLICA onion-core foi materializada com --role standalone e perdeu 85 arquivos de meta-fábrica"
     trace: ".claude/validation/door-role-parity-check.sh · ops/materialize-door.sh"
+    provenance:
+      source: "árvore da porta onion-core antes da restauração no commit 4eb55ac"
+      locator: "os 85 arquivos de meta-fábrica ausentes (adopt, create-*, federation-*, marketplace/, wizard/, skills/onion-publish/)"
+      method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
 
   - id: C_DUAS_FONTES_SEM_COBRANCA
     node_type: claim
@@ -33,6 +37,10 @@ nodes:
     verified_at: 2026-09-30
     verified_against: "medido: nenhuma REGRA do lint comparava o role: do members.yaml com o role: do carimbo da porta; as regras que tocam members.yaml eram 24/28/30/37/38/85"
     label: "o papel da porta tinha DUAS fontes (registro anotado à mão + carimbo da materialização) e nada cobrava que concordassem"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh em 2026-09-30"
+      locator: "as REGRAS que liam members.yaml naquele dia: 24, 28, 30, 37, 38 e 85"
+      method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
 
   # ---- o que a passada adversarial derrubou ----
   - id: C_MATERIALIZADOR_LE_O_REGISTRO
@@ -45,6 +53,10 @@ nodes:
     verified_at: 2026-09-30
     verified_against: "grep -n members.yaml ops/materialize-door.sh devolve só uma nota de prosa sobre o pin; ROLE é argumento com default hub (l.34, l.37)"
     label: "REFUTADA: 'quem materializa lê o registro, e o corte de papel vem dele' — o script nunca lê o members.yaml; quem leu a anotação foi um humano"
+    provenance:
+      source: "ops/materialize-door.sh em 2026-09-30"
+      locator: "grep -n members.yaml no script; ROLE como argumento com default hub (l.34 e l.37 daquela versão)"
+      method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
 
   - id: E_LINT_NAO_FICA_NO_CAMINHO
     node_type: evidence
@@ -58,6 +70,10 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "lint de PR no core não fica entre o operador e um comando de shell — a 1ª linha de defesa tem de morar no próprio materializador"
+    provenance:
+      source: "ops/materialize-door.sh e o relato do incidente de 2026-09-30"
+      locator: "o caminho do dano: um operador rodando o script com --role standalone num clone, sem PR no meio"
+      method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
 
   - id: C_TIER_HUB_E_CAPACIDADE
     node_type: claim
@@ -69,6 +85,10 @@ nodes:
     verified_at: 2026-09-30
     verified_against: "members.yaml:73 anota hub como 'central; PODE ter sub-adotados'; medido: parent: metagamify → 0 sub-adotados, e metagamify é hub"
     label: "o vocabulário de tier é de CAPACIDADE, não de uso — logo onion-core carimbada hub não é tier falso, e a objeção de que role: colide com tier nas portas cai"
+    provenance:
+      source: "docs/evolution/federation/members.yaml do core em 2026-09-30"
+      locator: "members.yaml:73 (hub como central que pode ter sub-adotados) e a contagem de parent: metagamify"
+      method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
 
   # ---- as duas guardas ----
   - id: D_GUARDA_EM_DUAS_LINHAS
@@ -82,6 +102,10 @@ nodes:
     verified_against: "as duas implantadas e exercitadas: 11 casos em run_door_role_parity_selftests + 4 em run_door_role_change_refusal_selftests, todos verdes; mutante -d→-f morto pelo caso (k)"
     label: "a cura é em DUAS linhas: recusa dentro de ops/materialize-door.sh (--role que contradiz o carimbo aborta, rc=2, escape --force-role-change) + REGRA 92 no lint cobrando a paridade registro×carimbo"
     trace: ".claude/validation/door-role-parity-check.sh · ops/materialize-door.sh · .claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh, famílias door_role_parity e door_role_change_refusal"
+      locator: "run_door_role_parity_selftests e run_door_role_change_refusal_selftests"
+      method: "medição: as duas famílias rodadas com LC_ALL=C em 2026-10-09, 19 casos e 0 falhas"
 
   - id: Q_PREDICADO_SUCESSOR
     node_type: question
@@ -91,6 +115,26 @@ nodes:
     confidence: 0.6
     status: open
     label: "a paridade é cega a 'ambas as fontes erradas do mesmo modo'; o sucessor mede o CONTEÚDO da porta contra o corte (vendor-manifest.sh --role) — GATILHO: uma porta aparecer mutilada com a paridade verde"
+
+  # ---- 2026-10-09: o corte deixava viajar as peças do comando cortado ----
+  - id: E_CORTE_DERIVA_COMPANHEIROS_DO_COMANDO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-09"
+    verified_against: "ops/materialize-door.sh --role standalone: 691 arquivos com origin/main 98cc49e2 e 677 com a cura, 14 a menos e nenhum a mais; --role hub com a mesma lista de 782 nos dois; lint da porta standalone rc 0 com 0 HARD; família role_cut 34/34 com LC_ALL=C e mutante sem a derivação reprovando o caso (m)"
+    source_kind: repo
+    source_tier: 10
+    label: "o corte por papel tirava o comando de meta/ e deixava viajar doutrina, lente, censo e workflow que só ele usa; agora deriva essas peças por citação, e a porta standalone perde 14 arquivos órfãos sem que o hub mude"
+    narrative: "Os 14 que saem são as peças de /meta:evolve, /meta:forge-guard, /meta:dissect, /meta:cc-update e /meta:forge. Duas lentes apontavam para o comando ausente. A client-material-doctrine fica, porque o /docs:build-project-manual, que o standalone recebe, a cita. O primeiro commit da cura cortava só 11: o comentário do próprio vendor-manifest.sh citava três peças com extensão e as mantinha vivas, e a planta deixou de contar como âncora."
+    trace: ".claude/utils/adopt/vendor-manifest.sh · .claude/validation/lint-selftest.sh · ops/materialize-door.sh"
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh e .claude/validation/lint-selftest.sh (família role_cut) na branch fix/role-cut-command-companions"
+      locator: "_emit_companion_excludes e _is_anchor no manifesto; casos (m), (m-hub) e (m-MUT) na bancada"
+      method: "medição: materialize-door standalone e hub em diretório temporário antes e depois da cura, com diff das listas, lint da porta e bancada com mutante em 2026-10-09"
 
   - id: Q_ROLE_DUPLA_LEITURA
     node_type: question
@@ -128,3 +172,7 @@ edges:
   - from: Q_ROLE_DUPLA_LEITURA
     to: C_TIER_HUB_E_CAPACIDADE
     edge_type: DEPENDS_ON
+  # o conteúdo da porta divergiu do corte pretendido com a paridade verde: só a materialização mostrou
+  - from: E_CORTE_DERIVA_COMPANHEIROS_DO_COMANDO
+    to: Q_PREDICADO_SUCESSOR
+    edge_type: SUPPORTS
