@@ -59,10 +59,10 @@ Contagem por categoria (SSOT [`docs/onion/inventory.md`](../../onion/inventory.m
 
 | Categoria | Path | Comandos |
 |-----------|------|---------:|
-| `meta/` | `.claude/commands/meta/` | 35 |
+| `meta/` | `.claude/commands/meta/` | 46 |
 | `product/` | `.claude/commands/product/` | 21 |
 | `engineer/` | `.claude/commands/engineer/` | 12 |
-| `docs/` | `.claude/commands/docs/` | 11 |
+| `docs/` | `.claude/commands/docs/` | 12 |
 | `validate/` | `.claude/commands/validate/` (inclui subpastas `collab/`, `qa-points/`, `test-strategy/`) | 6 |
 | `git/` | `.claude/commands/git/` | 6 |
 | `test/` | `.claude/commands/test/` | 3 |
@@ -70,7 +70,7 @@ Contagem por categoria (SSOT [`docs/onion/inventory.md`](../../onion/inventory.m
 | `quick/` | `.claude/commands/quick/` | 1 |
 | `development/` | `.claude/commands/development/` | 1 |
 | _root_ | `onion.md`, `warm-up.md`, `catch-up.md` | 3 |
-| **Total** | | **113** |
+| **Total** | | **114** |
 
 `.claude/commands/common/` **não conta** como categoria — guarda fragmentos
 compartilhados (`common/templates/`, `common/prompts/`) reusados via referência

@@ -9587,10 +9587,13 @@ run_role_promotion_selftests() {
   #     outra sintaxe — passava VERDE; e a perna `--framework "$(... onion-version.sh ...)"`, que
   #     estava VIVA e carimbava o NOME DO REPO DO ALVO sobre `onion-evolve`, nunca foi vista. Cobrar forma nao
   #     cobre comportamento: agora o teste e sobre o CONJUNTO de flags de identidade no bloco.
-  if [ -f "${ad}" ]; then
+  # ⚠️ Desde a F1 das portas (2026-10-09) o --promote-hub é SCRIPT (`promote-hub.sh`), não snippet no
+  #    adopt.md — a lógica da branch dedicada não cabia em prosa sem bancada. O bloco medido mudou de casa.
+  local ph="${REPO_ROOT}/.claude/utils/adopt/promote-hub.sh"
+  if [ -f "${ph}" ]; then
     local blk_ph flags_bad=""
     # o bloco do --promote-hub: da linha do write-stamp.sh ate a linha do `git add -f` seguinte
-    blk_ph="$(awk '/write-stamp\.sh" "\$REPO"/{f=1} f{print} f && /git -C "\$REPO" add -f/{exit}' "${ad}")"
+    blk_ph="$(awk '/write-stamp\.sh" "\$\{WORK\}"/{f=1} f{print} f && /git -C "\$\{WORK\}" add -f/{exit}' "${ph}")"
     if [ -z "${blk_ph}" ]; then
       record_fail "role-promotion: (a) bloco do --promote-hub nao localizado" "a ancora mudou — o caso ficou cego, conserte o caso antes de confiar nele"
     else
@@ -9604,7 +9607,7 @@ run_role_promotion_selftests() {
           "flag(s) de identidade no bloco do --promote-hub:${flags_bad} — promover papel nao muda versao nem framework, e tudo derivado de \$REPO e do ADOTANTE"
       fi
     fi
-  else record_skip "role-promotion: (a) adopt.md ausente (adotante) → pulado"; fi
+  else record_skip "role-promotion: (a) promote-hub.sh ausente (papel sem adoção) → pulado"; fi
 
   # (a2) FLAG PRESENTE E VAZIA E ERRO, nao heranca silenciosa (F2 do Elenxo). Em origin/main isso
   #      era rc=2; a 1a cura do fallback transformou em rc=0 com `updated_at` de HOJE e pin VELHO —
@@ -16890,6 +16893,27 @@ run_adopt_robust_selftests() {
     else record_fail "adopt-robust: (c4)" "rc=${_rc} main andou? $([ "$(git -C "${ta}" rev-parse main)" = "${_m0}" ] && echo não || echo SIM) · ${_out:0:250}"; fi
   fi
   unset -f _ar_repo
+
+  # (c6) --promote-hub (promote-hub.sh): com farol vivo, o carimbo de hub cai em chore/onion-promote-hub
+  #      numa worktree irmã; a integração não anda; sem stamp (a fonte) recusa. MUTANTE: `WORK="${REPO}"`
+  #      no lugar do dedicated-branch faz o commit cair na main.
+  local t6="${d}/t6" ph="${ad}/promote-hub.sh"
+  rm -rf "${t6}"; mkdir -p "${t6}/.claude"; git -C "${t6}" init -q -b main
+  printf 'framework: onion-evolve\nsource_commit: abc123def456\nsource_commit_date: 2026-10-01\nrole: adopted\nadopted_at: 2026-10-01\n' > "${t6}/.claude/.onion-version"
+  git -C "${t6}" add -f -A; git -C "${t6}" commit -qm adopt
+  local _m6; _m6="$(git -C "${t6}" rev-parse main)"
+  [ -f "${sb}" ] && bash "${sb}" up "${t6}" sessao-do-hub-selftest >/dev/null 2>&1
+  local _r6=0 _r6s=0 _wt6="${d}/t6-chore-onion-promote-hub"
+  bash "${ph}" "${t6}" >/dev/null 2>&1 || _r6=$?
+  mkdir -p "${d}/t6src"; git -C "${d}/t6src" init -q
+  bash "${ph}" "${d}/t6src" >/dev/null 2>&1 || _r6s=$?
+  if [ "${_r6}" -eq 0 ] && [ "$(git -C "${t6}" rev-parse main)" = "${_m6}" ] \
+     && git -C "${t6}" show chore/onion-promote-hub:.claude/.onion-version 2>/dev/null | grep -qx 'role: hub' \
+     && git -C "${t6}" show chore/onion-promote-hub:.claude/.onion-version 2>/dev/null | grep -qx 'source_commit: abc123def456' \
+     && [ "${_r6s}" -eq 1 ]; then
+    record_pass "adopt-robust: (c6) --promote-hub carimba hub em chore/onion-promote-hub (pin herdado), a main não anda; a fonte recusa"
+  else record_fail "adopt-robust: (c6)" "rc=${_r6} main andou? $([ "$(git -C "${t6}" rev-parse main)" = "${_m6}" ] && echo não || echo SIM) · fonte rc=${_r6s} (esp. 1)"; fi
+  [ -d "${_wt6}" ] && { git -C "${t6}" worktree remove --force "${_wt6}" >/dev/null 2>&1 || true; }
 
   # (c5) durable-commit: ONION_DURABLE_VERIFY=1 RODA o gate do alvo; o default (adoção) segue pulando.
   #      MUTANTE: tirar a linha que esvazia `_nv` ⇒ o hook não roda sob VERIFY=1.
