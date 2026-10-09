@@ -16900,7 +16900,7 @@ run_adopt_robust_selftests() {
       local _i4=""
       [ "${_rc}" -eq 0 ] || _i4="${_i4} rc=${_rc}"
       [ "$(git -C "${ta}" rev-parse main)" = "${_m0}" ] || _i4="${_i4} main-andou"
-      git -C "${ta}" show "chore/onion-update-${_pin}:docs/meta-specs/spec.md" 2>/dev/null | grep -q 'v2' || _i4="${_i4} v2-fora-da-branch"
+      grep -q 'v2' <<< "$(git -C "${ta}" show "chore/onion-update-${_pin}:docs/meta-specs/spec.md" 2>/dev/null)" || _i4="${_i4} v2-fora-da-branch"
       if [ "${_mode}" = farol-vivo ]; then
         [ -n "${_wk}" ] && [ "${_wk}" != "${ta}" ] || _i4="${_i4} sem-worktree-irmã"
         [ "$(git -C "${ta}" rev-parse --abbrev-ref HEAD)" = main ] || _i4="${_i4} checkout-alheio-trocou"
@@ -16933,8 +16933,8 @@ run_adopt_robust_selftests() {
   mkdir -p "${d}/t6src"; git -C "${d}/t6src" init -q
   bash "${ph}" "${d}/t6src" >/dev/null 2>&1 || _r6s=$?
   if [ "${_r6}" -eq 0 ] && [ "$(git -C "${t6}" rev-parse main)" = "${_m6}" ] \
-     && git -C "${t6}" show chore/onion-promote-hub:.claude/.onion-version 2>/dev/null | grep -qx 'role: hub' \
-     && git -C "${t6}" show chore/onion-promote-hub:.claude/.onion-version 2>/dev/null | grep -qx 'source_commit: abc123def456' \
+     && grep -qx 'role: hub' <<< "$(git -C "${t6}" show chore/onion-promote-hub:.claude/.onion-version 2>/dev/null)" \
+     && grep -qx 'source_commit: abc123def456' <<< "$(git -C "${t6}" show chore/onion-promote-hub:.claude/.onion-version 2>/dev/null)" \
      && [ "${_r6s}" -eq 1 ]; then
     record_pass "adopt-robust: (c6) --promote-hub carimba hub em chore/onion-promote-hub (pin herdado), a main não anda; a fonte recusa"
   else record_fail "adopt-robust: (c6)" "rc=${_r6} main andou? $([ "$(git -C "${t6}" rev-parse main)" = "${_m6}" ] && echo não || echo SIM) · fonte rc=${_r6s} (esp. 1)"; fi
@@ -16953,7 +16953,7 @@ run_adopt_robust_selftests() {
   printf 'z\n' > "${t5}/.claude/c.md"; local _rc_refuse=0
   HOOK_RC=1 ONION_DURABLE_VERIFY=1 bash "${ad}/durable-commit.sh" "${t5}" update abc chore/onion-update-abc >/dev/null 2>&1 || _rc_refuse=$?
   if [ "${_h_default}" = 0 ] && [ "${_h_verify}" = 1 ] && [ "${_rc_refuse}" -eq 1 ] \
-     && git -C "${t5}" diff --cached --name-only | grep -q 'c.md'; then
+     && grep -q 'c.md' <<< "$(git -C "${t5}" diff --cached --name-only)"; then
     record_pass "adopt-robust: (c5) VERIFY=1 roda o gate do alvo (e a recusa dele é rc=1 com a mudança à vista); default segue --no-verify"
   else record_fail "adopt-robust: (c5)" "hook default=${_h_default} (esperado 0) · verify=${_h_verify} (esperado 1) · recusa rc=${_rc_refuse} (esperado 1)"; fi
 

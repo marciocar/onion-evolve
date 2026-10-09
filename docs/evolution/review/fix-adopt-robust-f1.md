@@ -3,8 +3,7 @@ title: "Revisão — F1 das portas: adoção robusta (SAC-89, absorve SAC-87)"
 date: 2026-10-09
 branch: fix/adopt-robust-f1
 reviewer: "passada adversarial por subagente independente (só leitura, reprodução em /tmp) sobre o diff inteiro; bancada adopt_robust + door/door_seal_pin/role_cut/role_promotion sob LC_ALL=C com um mutante por caso; dogfood dos blocos do próprio adopt.md num sandbox"
-reviewed_diff_sha256: cc46f0e8c58d747f476b27ec192b76b9a79f611a4c51ea4f25c0eb30de2d0a20
-reviewed_code_sha256: f425390d80bb73cdf2fb56a33318bea1c14f4e83114cba49d71631ff159aed52
+reviewed_diff_sha256: pendente
 findings_total: 8
 findings_real: 5
 verdict: REPROVADO_E_CURADO
@@ -47,3 +46,10 @@ O dogfood achou três coisas que a bancada não via, todas curadas no 2º commit
 
 - O bundle `adopted` nasce com 1 HARD e o standalone com 2. A cura é a F2 (manifestos por porta).
 - `Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA` (open, no grafo).
+
+## Depois da revisão (re-revisado por mim, mudança mecânica)
+
+O CI (selftest shard 4) reprovou a guarda `shell_pipefail_robustness`: 5 sítios novos de `<produtor> | grep -q`
+(1 no `dedicated-branch.sh`, 4 na família `adopt_robust`) — a classe EPIPE sob pipefail. Curados para
+here-string, sem mudar o que cada caso julga; `shell_pipefail_robustness` e `adopt_robust` verdes sob LC_ALL=C.
+
