@@ -21180,6 +21180,33 @@ STUB
      && grep -qF "onion_version: ${PIN_OLD}   # comentario antigo do alvo" "${REG}"; then
     record_pass "registry-pins: (e) leitura de clone acusa a divergência, mas o --seal só carimba o remoto"
   else record_fail "registry-pins: (e) carimbou leitura de clone" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
+
+  # (f) carimbo de OUTRA adoção no mesmo remoto (o caso granaai × brain-granaai da passada real):
+  #     registro `standalone`, carimbo `role: hub` ⇒ acusa papel e o --seal NÃO carimba.
+  #     MUTANTE: tirar o `case` de papel reprova este caso.
+  rm -rf "${clone}"; rm -f "${stamps}"/*; _rp_stamp vizinho "${PIN_OLD}"
+  printf 'source_commit: %s\nrole: hub\n' "${PIN_NEW}" > "${stamps}/dono_alvo_main"
+  _rp_reg "${PIN_OLD}" "${PIN_OLD}" "github.com/dono/alvo"
+  sed -i '/^  - id: alvo$/a\    role: standalone' "${REG}"
+  _rp --seal
+  if [ "${_r}" -eq 1 ] && grep -E '^alvo ' <<< "${_o}" | grep -q 'papel: registro standalone × carimbo hub' \
+     && grep -qF "onion_version: ${PIN_OLD}   # comentario antigo do alvo" "${REG}"; then
+    record_pass "registry-pins: (f) carimbo de outra adoção (papel incompatível) ⇒ acusa e NÃO carimba"
+  else record_fail "registry-pins: (f) carimbou carimbo de outra adoção" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
+
+  # (g) membro COM remoto, remoto FALHA, clone parado bate com o registro ⇒ ILEGÍVEL (rc=3), nunca ok.
+  #     MUTANTE: tirar o ramo remote_failed reprova este caso (sai ok, rc=0).
+  local origin_repo="${d}/origin-alvo"
+  mkdir -p "${origin_repo}/.claude"; git -C "${origin_repo}" init -q -b main
+  printf 'source_commit: %s\nrole: adopted\n' "${PIN_OLD}" > "${origin_repo}/.claude/.onion-version"
+  git -C "${origin_repo}" add -A >/dev/null 2>&1; git -C "${origin_repo}" -c user.email=t@t -c user.name=t commit -q -m stamp
+  git clone -q "${origin_repo}" "${clone}" 2>/dev/null
+  rm -f "${stamps}/dono_alvo_main"
+  _rp_reg "${PIN_OLD}" "${PIN_OLD}" "github.com/dono/alvo"
+  _rp --check
+  if [ "${_r}" -eq 3 ] && grep -E '^alvo ' <<< "${_o}" | grep -q 'ILEGÍVEL' && ! grep -E '^alvo ' <<< "${_o}" | grep -qE ' ok$'; then
+    record_pass "registry-pins: (g) remoto falhou e só o clone confirma ⇒ ILEGÍVEL rc=3 (clone parado não vira 'em dia')"
+  else record_fail "registry-pins: (g) clone parado virou ok" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
   unset -f _rp _rp_reg _rp_stamp
 }
 

@@ -70,7 +70,7 @@ for m in doc.get('members') or []:
     mid = str(m.get('id') or '').strip()
     if only and mid != only: continue
     f = lambda k: ' '.join(str(m.get(k) or '').split())
-    print('\x1f'.join([mid, f('kind'), f('remote'), f('local_path'), f('onion_version'), f('integration_branch')]))
+    print('\x1f'.join([mid, f('kind'), f('remote'), f('local_path'), f('onion_version'), f('integration_branch'), f('role')]))
 PY
 )" || { echo "ERRO: não parseei ${MEMBERS} (YAML inválido é cobrança do members-validate.sh)." >&2; exit 2; }
 [ -n "${ROWS}" ] || { echo "ERRO: nenhum membro${ONLY:+ com id '${ONLY}'} em ${MEMBERS}." >&2; exit 2; }
@@ -97,7 +97,7 @@ TODAY="$(date +%F)"
 n_ok=0; n_div=0; n_ill=0; n_sealed=0; n_out=0
 SEAL_LIST=""
 printf '%-26s %-14s %-14s %-24s %-30s %s\n' "membro" "registro" "vivo" "fonte" "branch" "ação"
-while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch; do
+while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole; do
   [ -n "${mid}" ] || continue
   if [ "${kind}" != "adopter" ]; then
     printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin:-—}" "—" "—" "—" "fora (kind ${kind:-?}$([ "${kind}" = door ] && echo ' → ops/door-seal-pin.sh'))"
@@ -134,10 +134,10 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch; do
   fi
 
   # ── o carimbo VIVO: remoto primeiro, clone depois ───────────────────────────────────────
-  live=""; src=""; why=""
+  live=""; src=""; why=""; _st=""; remote_failed=0
   if [ -n "${orep}" ] && [ -n "${branch}" ] && [ "${NOREMOTE}" -eq 0 ]; then
     _st="$(gh api "repos/${orep}/contents/.claude/.onion-version?ref=${branch}" --jq '.content' 2>/dev/null | base64 -d 2>/dev/null || true)"
-    if [ -n "${_st}" ]; then live="$(printf '%s\n' "${_st}" | _stamp_pin)"; src="remoto"; else why="remoto ilegível (${orep}@${branch})"; fi
+    if [ -n "${_st}" ]; then live="$(printf '%s\n' "${_st}" | _stamp_pin)"; src="remoto"; else why="remoto ilegível (${orep}@${branch})"; remote_failed=1; fi
   elif [ -z "${orep}" ]; then why="sem remoto no registro nem no clone"
   elif [ "${NOREMOTE}" -eq 1 ]; then why="--no-remote"
   else why="branch de integração não resolvida"; fi
@@ -146,7 +146,8 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch; do
     if git -C "${clone}" rev-parse --verify --quiet "refs/remotes/origin/${branch}" >/dev/null; then _ref="origin/${branch}"; src="clone(origin/${branch})"
     elif ! git -C "${clone}" remote | grep -q .; then _ref="${branch}"; src="clone-local(sem remoto)"; fi
     if [ -n "${_ref}" ]; then
-      live="$(git -C "${clone}" show "${_ref}:.claude/.onion-version" 2>/dev/null | _stamp_pin)"
+      _st="$(git -C "${clone}" show "${_ref}:.claude/.onion-version" 2>/dev/null || true)"
+      live="$(printf '%s\n' "${_st}" | _stamp_pin)"
       [ -n "${live}" ] || { src=""; why="${why:+${why}; }carimbo ausente em ${_ref}"; }
     else why="${why:+${why}; }clone sem origin/${branch}"; fi
   elif [ -z "${live}" ] && [ -z "${clone}" ]; then
@@ -159,6 +160,24 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch; do
     n_ill=$((n_ill + 1)); continue
   fi
   live12="${live:0:12}"
+  # PAPEL do carimbo lido × tier do registro, pelo MESMO mapa da REGRA 92 (hub→hub;
+  # standalone|consumer→adopted). Achado da passada adversarial da F1.5: granaai e brain-granaai
+  # apontam o MESMO remoto, e o carimbo da develop (role hub, adopted_at 2026-10-01) é a adoção do
+  # brain — a 1ª versão carimbou esse pin no granaai (standalone). Carimbo de outra adoção não é pin
+  # deste membro: acusa e não carimba, nem quando o pin bate.
+  stamp_role="$(printf '%s\n' "${_st}" | awk '/^role:/{sub(/^role:[[:space:]]*/,""); sub(/[[:space:]]*#.*$/,""); gsub(/[[:space:]"\047]/,""); print; exit}')"
+  if [ -n "${stamp_role}" ] && [ -n "${regrole}" ]; then
+    case "${regrole}:${stamp_role}" in hub:hub|standalone:adopted|consumer:adopted) ;; *)
+      printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin:-—}" "${live12}" "${src}" "${branch} ${bsrc}" "DIVERGE (papel: registro ${regrole} × carimbo ${stamp_role} — carimbo de OUTRA adoção?)"
+      n_div=$((n_div + 1)); continue ;;
+    esac
+  fi
+  # Membro COM remoto cujo remoto falhou: o acerto lido do clone (sem fetch) pode ser clone parado
+  # batendo com registro parado. Não é "em dia" — é ilegível com uma pista (achado da passada).
+  if [ "${remote_failed}" -eq 1 ] && [ "${src}" != "remoto" ]; then
+    printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin:-—}" "${live12}" "${src}" "${branch} ${bsrc}" "ILEGÍVEL: ${why}; o clone diz ${live12}, sem fetch"
+    n_ill=$((n_ill + 1)); continue
+  fi
   if _same_pin "${regpin}" "${live}"; then
     printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin}" "${live12}" "${src}" "${branch} ${bsrc}" "ok"
     n_ok=$((n_ok + 1)); continue
@@ -196,7 +215,13 @@ if [ "${MODE}" = "seal" ] && [ -n "${SEAL_LIST}" ]; then
         print ind "onion_version: " pin "   # " note; done=1; next }
       { print }' "${MEMBERS}" > "${TMP}"
     _b="$(wc -l < "${MEMBERS}")"; _a="$(wc -l < "${TMP}")"
-    if [ "${_b}" -ne "${_a}" ] || ! grep -qE "^[[:space:]]*onion_version: ${spin} " "${TMP}"; then
+    # Confere DENTRO do bloco do membro (o vizinho pode ter o mesmo pin) e que só UMA linha mudou.
+    _got="$(awk -v want="${sid}" '
+      function clean(s) { sub(/^[^:]*:[[:space:]]*/,"",s); sub(/[[:space:]]*#.*$/,"",s); gsub(/[[:space:]]+$/,"",s); gsub(/"/,"",s); gsub(/\047/,"",s); return s }
+      /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ { cur=(clean($0)==want) }
+      cur && /^[[:space:]]*onion_version:[[:space:]]*/ { print clean($0); exit }' "${TMP}")"
+    _nchg="$(diff "${MEMBERS}" "${TMP}" | grep -c '^>' || true)"
+    if [ "${_b}" -ne "${_a}" ] || [ "${_got}" != "${spin}" ] || [ "${_nchg}" -ne 1 ]; then
       echo "ERRO: o carimbo de '${sid}' não saiu como uma linha só (${_b} → ${_a} linhas) — registro NÃO gravado." >&2; exit 1
     fi
     cat "${TMP}" > "${MEMBERS}"
