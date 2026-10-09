@@ -3,7 +3,7 @@
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
   x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote F1.5 das portas (SAC-90), PR para merge humano. Escritos: E_REGISTRO_HONESTO_F15 (SUPPORTS a matriz, SUPERSEDES E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS), E_HISTORICO_DO_REGISTRO_DAS_PORTAS e E_HISTORICO_DO_REGISTRO_DOS_ADOTANTES (a biografia que saiu do members.yaml), Q_REGISTRAR_ONION_PLUGINS_NO_MEMBERS flip para done, Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO aberto (decisão do maestro). Selo da F1 (SAC-89, mergeada) feito antes deste fechamento. Resíduo declarado: granaai segue divergente no --check (carimbo da develop é do brain); onion-core segue role hub até a F2/F3; onion-mini sem carimbo até a F5"
+  x_drive_checkpoint_note: "lote do selo granaai (2026-10-09, no PR da onda O4): Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO flip para done; granaai vira linhagem histórica (superseded_by: brain-granaai) no members.yaml; registry-pins pula superseded_by (caso h) e members-validate cobra o alvo (2 fixtures); termos da REGRA 36 inalterados; 4 nós deste grafo PROD→DEV pela onda O4; PR para merge humano"
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
@@ -26,7 +26,7 @@ nodes:
   - id: E_DANO_85_ARQUIVOS
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -44,7 +44,7 @@ nodes:
   - id: C_DUAS_FONTES_SEM_COBRANCA
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.95
     status: confirmed
@@ -65,19 +65,19 @@ nodes:
     impact: 4
     confidence: 0.9
     status: refuted
-    verified_at: 2026-09-30
+    verified_at: "2026-10-09"
     verified_against: "grep -n members.yaml ops/materialize-door.sh devolve só uma nota de prosa sobre o pin; ROLE é argumento com default hub (l.34, l.37)"
     label: "REFUTADA: 'quem materializa lê o registro, e o corte de papel vem dele' — o script nunca lê o members.yaml; quem leu a anotação foi um humano"
     provenance:
-      source: "ops/materialize-door.sh em 2026-09-30"
-      locator: "grep -n members.yaml no script; ROLE como argumento com default hub (l.34 e l.37 daquela versão)"
-      method: "testemunho: sessão de 2026-09-30 que forjou as guardas, registrado em verified_against; não remedido nesta passada"
+      source: "ops/materialize-door.sh"
+      locator: "grep -niE \"members|federation/\" → só l.10/l.50 (comentário), l.67/l.71 (echo de aviso) e l.434 (heredoc de instrução); nenhuma leitura do arquivo"
+      method: "medição: grep -niE \"members|federation/\" ops/materialize-door.sh em origin/main cffe09fe (último commit do script 020661ca, 2026-10-09)"
       locality: "repo"
 
   - id: E_LINT_NAO_FICA_NO_CAMINHO
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -94,7 +94,7 @@ nodes:
   - id: C_TIER_HUB_E_CAPACIDADE
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.9
     status: confirmed
@@ -333,12 +333,17 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.9
-    status: open
+    status: done
     verified_at: "2026-10-09"
-    verified_against: "ops/registry-pins.sh --check: granaai (registro standalone, develop) lê no remoto GranaAi/granaai um carimbo role hub, adopted_at 2026-10-01, source_commit 6f3ab3a3905c — o mesmo do brain-granaai em onion/develop"
+    verified_against: "ops/registry-pins.sh --check depois do selo: granaai sai como 'fora (linhagem histórica → brain-granaai)', 19 em dia, 0 divergentes, rc 0; members-validate.sh rc 0; projection-safety e vendor-scrub-form-check com saída idêntica antes e depois, e os ids que a REGRA 36 deriva do registro com o mesmo sha256"
     label: "granaai e brain-granaai apontam o mesmo remoto, e a develop dele já carrega o carimbo do brain: são um membro só, ou o granaai integra em outra branch? — GATILHO: decisão do maestro; até lá o --check acusa e o --seal recusa"
-    narrative: "Achado da passada adversarial da F1.5. O clone local da granaai está num checkout sem .onion-version, e por isso a REGRA 92 também acusa adotante/CARIMBO-AUSENTE nele. Respostas possíveis: fundir as duas entradas, registrar a branch real de integração do granaai, ou declarar o granaai como linhagem antiga."
+    narrative: "Achado da passada adversarial da F1.5. O clone local da granaai está num checkout sem .onion-version, e por isso a REGRA 92 também acusa adotante/CARIMBO-AUSENTE nele. Respostas possíveis: fundir as duas entradas, registrar a branch real de integração do granaai, ou declarar o granaai como linhagem antiga. FECHADO em 2026-10-09 pelo selo do maestro: granaai é LINHAGEM ANTIGA, porque a adoção standalone de julho foi superada pela adoção hub do brain-granaai no mesmo remoto. Forma escolhida: a entrada fica no members.yaml com superseded_by: brain-granaai, em vez de sair da lista, porque o id e o name dela são lidos pela REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente), pelo projection-safety e pelo vendor-scrub, e a chave a2a granaai-1 e o trust são lidos pelo a2a-verify e pelo trust-topology-check. Só o ops/registry-pins.sh muda de comportamento (o membro sai do escopo, caso (h) da bancada); o members-validate.sh cobra que o superseded_by aponte um membro que existe e não é histórico (fixtures members-good-superseded e members-bad-superseded-unknown). O resíduo da REGRA 92 sobre o clone local segue como estava."
     trace: "docs/evolution/federation/members.yaml · ops/registry-pins.sh"
+    provenance:
+      source: "docs/evolution/federation/members.yaml, ops/registry-pins.sh e .claude/validation/members-validate.sh na branch feat/provenance-wave-o4"
+      locator: "entrada granaai (superseded_by: brain-granaai); ramo superseded_by do registry-pins; checagem de superseded_by do members-validate; casos registry-pins (h) e fixtures members-*-superseded*"
+      method: "medição: ops/registry-pins.sh --check, members-validate.sh, projection-safety.sh e vendor-scrub-form-check.sh antes e depois em 2026-10-09"
+      locality: "repo"
 
 edges:
   # o dano é a evidência de que a lacuna existia

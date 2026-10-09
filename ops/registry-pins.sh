@@ -29,7 +29,8 @@
 #
 # ══ O QUE ELE NÃO FAZ ════════════════════════════════════════════════════════════════════════
 # Não lê `lineages:` (pins por linhagem seguem manuais e comentados no registro), não toca porta
-# (`kind: door` é do door-seal-pin.sh) nem membro que não vendoriza (`onion_version: n/a`).
+# (`kind: door` é do door-seal-pin.sh) nem membro que não vendoriza (`onion_version: n/a`), nem
+# linhagem histórica (`superseded_by: <id>`, adoção superada por outro membro no mesmo remoto).
 # É `ops/` e não REGRA do lint pelo mesmo motivo do door-seal-pin.sh: precisa de rede e de clones
 # que o CI não tem, e guarda que só passa na máquina de uma pessoa é armadilha.
 set -uo pipefail
@@ -70,7 +71,7 @@ for m in doc.get('members') or []:
     mid = str(m.get('id') or '').strip()
     if only and mid != only: continue
     f = lambda k: ' '.join(str(m.get(k) or '').split())
-    print('\x1f'.join([mid, f('kind'), f('remote'), f('local_path'), f('onion_version'), f('integration_branch'), f('role')]))
+    print('\x1f'.join([mid, f('kind'), f('remote'), f('local_path'), f('onion_version'), f('integration_branch'), f('role'), f('superseded_by')]))
 PY
 )" || { echo "ERRO: não parseei ${MEMBERS} (YAML inválido é cobrança do members-validate.sh)." >&2; exit 2; }
 [ -n "${ROWS}" ] || { echo "ERRO: nenhum membro${ONLY:+ com id '${ONLY}'} em ${MEMBERS}." >&2; exit 2; }
@@ -97,8 +98,16 @@ TODAY="$(date +%F)"
 n_ok=0; n_div=0; n_ill=0; n_sealed=0; n_out=0
 SEAL_LIST=""
 printf '%-26s %-14s %-14s %-24s %-30s %s\n' "membro" "registro" "vivo" "fonte" "branch" "ação"
-while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole; do
+while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole superby; do
   [ -n "${mid}" ] || continue
+  # LINHAGEM HISTÓRICA (selo do maestro, 2026-10-09, Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO): membro com
+  # `superseded_by: <id>` é uma adoção SUPERADA por outra no mesmo remoto. O carimbo vivo de lá é o do
+  # sucessor, e conferi-lo contra o pin antigo acusaria DIVERGE para sempre. A entrada fica no registro
+  # (termos da REGRA 36, chaves a2a e trust seguem lidos por quem lê), mas sai do escopo deste script.
+  if [ -n "${superby}" ]; then
+    printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin:-—}" "—" "—" "—" "fora (linhagem histórica → ${superby})"
+    n_out=$((n_out + 1)); continue
+  fi
   if [ "${kind}" != "adopter" ]; then
     printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin:-—}" "—" "—" "—" "fora (kind ${kind:-?}$([ "${kind}" = door ] && echo ' → ops/door-seal-pin.sh'))"
     n_out=$((n_out + 1)); continue

@@ -40,6 +40,8 @@ members	members/members-bad-stamp-role.yaml	-	fail
 members	members/members-good-door-roles.yaml	-	pass	
 members	members/members-bad-mini-adopter.yaml	-	fail	
 members	members/members-bad-plugins-na.yaml	-	fail	
+members	members/members-good-superseded.yaml	-	pass	
+members	members/members-bad-superseded-unknown.yaml	-	fail	
 merge	adopt-settings-merge/target-empty.json	-	-
 merge	adopt-settings-merge/target-with-own.json	-	-
 merge	adopt-settings-merge/target-with-own-attribution.json	-	-

@@ -143,7 +143,11 @@ members:
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — não citar em superfície pública
     local_path: "/home/marcio/granaai"   # re-clonado 2026-07-08 no novo lar (KVM 8); acesso via token gh de marciocar (org GranaAi privada)
-    onion_version: 6cc162f32d1c   # NÃO carimbado: a develop do remoto traz o carimbo do brain-granaai (role hub, adopted_at 2026-10-01), não o deste membro — ver E_REGISTRO_HONESTO_F15
+    onion_version: 6cc162f32d1c   # pin da adoção standalone de julho, congelado: a develop do remoto traz o carimbo do brain-granaai (role hub, adopted_at 2026-10-01) — ver E_REGISTRO_HONESTO_F15
+    superseded_by: brain-granaai  # LINHAGEM HISTÓRICA (selo do maestro, 2026-10-09, Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO): a adoção
+                                  # standalone de julho foi superada pela adoção hub do brain-granaai, no mesmo remoto. A entrada
+                                  # FICA (termos da REGRA 36, chave a2a granaai-1 e trust seguem lidos); só o ops/registry-pins.sh
+                                  # deixa de conferir o pin, porque o carimbo vivo daquele remoto é o do sucessor.
     lineages:                     # ≥3 adoções distintas (sinal 2026-07-10-granaai-multi-lineage; padrão metagamify/D2)
       mauricio:                   # máquina do Mauricio Matos — a linhagem da adoção registrada (2026-07-01);
                                   # reconciliação #1094/#1096 revisada por ele. Pin não-verificável deste host.
