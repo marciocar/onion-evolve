@@ -688,9 +688,9 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.2 | `Q_PREDICADO_SUCESSOR` | door-role-parity-2026-09 | a paridade é cega a 'ambas as fontes erradas do mesmo modo'; o sucessor mede o CONTEÚDO da porta contra o corte (vendor-manifest |
-| 6.4 | `Q_REGISTRAR_ONION_PLUGINS_NO_MEMBERS` | door-role-parity-2026-09 | onion-plugins é repo público com prefixo onion- e segue FORA do members.yaml, o ponto cego da REGRA 36 — GATILHO: registrar co |
 | 6.3 | `Q_ROLE_DUPLA_LEITURA` | door-role-parity-2026-09 | o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade |
 | 5.4 | `Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA` | door-role-parity-2026-09 | o commit durável da adoção deixa .gitignore e .env.example fora: a proteção de segredo que a adoção escreve no .gitignore n |
+| 5.4 | `Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO` | door-role-parity-2026-09 | granaai e brain-granaai apontam o mesmo remoto, e a develop dele já carrega o carimbo do brain: são um membro só, ou o granaai  |
 
 ## forge-cc-update-2026-10 — 2 item(ns)
 

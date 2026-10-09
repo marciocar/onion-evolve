@@ -10,12 +10,13 @@ flowchart TD
   pulse_mais["pulse-mais<br/>standalone · greenfield"]:::standalone
   granaai["granaai<br/>standalone · regulated"]:::standalone
   gustavo_pulga["gustavo-pulga<br/>standalone · greenfield"]:::standalone
-  onion_mini["onion-mini<br/>standalone · distilled"]:::standalone
+  onion_mini["onion-mini<br/>mini · distilled"]:::mini
   onion_standalone["onion-standalone<br/>standalone · greenfield"]:::standalone
   hub_operacoes_enterprise["hub-operacoes-enterprise<br/>hub · greenfield"]:::hub
   brain_granaai["brain-granaai<br/>hub · brownfield"]:::hub
   vendas_pdi_enterprise["vendas-pdi-enterprise<br/>standalone · greenfield"]:::standalone
   onion_core["onion-core<br/>hub · greenfield"]:::hub
+  onion_plugins["onion-plugins<br/>plugins · greenfield"]:::plugins
   onion_codex["onion-codex<br/>standalone · distilled"]:::standalone
   marcio_pessoal["marcio-pessoal<br/>standalone · regulated"]:::standalone
   onion_pedro["onion-pedro<br/>standalone · greenfield"]:::standalone
@@ -43,6 +44,7 @@ flowchart TD
   brain_granaai -.->|can-correct| onion_evolve
   vendas_pdi_enterprise -->|adopts| onion_evolve
   onion_core -->|adopts| onion_evolve
+  onion_plugins -->|adopts| onion_evolve
   onion_codex -->|adopts| onion_evolve
   marcio_pessoal -->|adopts| onion_evolve
   onion_pedro -->|adopts| onion_evolve
@@ -71,13 +73,14 @@ flowchart TD
 | metagamify | standalone | legacy | gamification, nx-monorepo, asana-integration, metagamification | `21213cc6c3d6` |
 | pulse-mais | standalone | greenfield | education, srl-plea, learning-materials | `c711baa17617` |
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `6cc162f32d1c` |
-| gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `c9eb2c40bc3b` |
-| onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
+| gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `7fd9392cd43b` |
+| onion-mini | mini | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
 | onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `947e69ce069d` |
-| hub-operacoes-enterprise | hub | greenfield | hub, task-manager-integration, itsm | `cff9214c3b9a` |
+| hub-operacoes-enterprise | hub | greenfield | hub, task-manager-integration, itsm | `8278fee79d1c` |
 | brain-granaai | hub | brownfield | company-brain, clickup, pesquisa-primaria | `6f3ab3a3905c` |
-| vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `24118c5d7a97` |
+| vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `4299290b73d4` |
 | onion-core | hub | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `947e69ce069d` |
+| onion-plugins | plugins | greenfield | plugin-marketplace, public-distribution, claude-code | `947e69ce069d` |
 | onion-codex | standalone | distilled | substrate-port, openai-codex, portability-proof, deterministic-guards | `n/a` |
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |
@@ -89,7 +92,7 @@ flowchart TD
 | hub-formacao-enterprise | hub | greenfield | hub-de-adocao, formacao-hands-on, company-brain, spec-as-code | `f32e2f931c73` |
 | sacola-de-ideias | standalone | greenfield | astro-site, institutional, greenfield-dogfood | `8e2517724c0a` |
 | portal-gamificacao | standalone | greenfield | gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers | `2e3f3a6f88ce` |
-| jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `2e3f3a6f88ce` |
+| jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `df031ef53683` |
 | onion-slm | standalone | greenfield | slm, eval-de-dominio, roteiro-gradual | `9e75a73d0401` |
 | onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `7818b8a25ae6` |
-| onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `fe8359e38b43` |
+| onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `0d293c077a28` |
