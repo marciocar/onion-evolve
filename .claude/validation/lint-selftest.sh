@@ -23643,6 +23643,71 @@ run_kg_migrate_v3_selftests() {
      && PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --routing "${t2}" "${go}" >/dev/null 2>&1; then
     record_pass "kg-migrate-v3: (i) onda O2: A2 com trace e sem verified_against ganha o trace como locator e 'derivado: trace do nó, sem registro de medição'; circular, sumido, registro de comando e citação sem localizador ficam intocados; host vira testemunho; R intocado; 2ª passada no-op"
   else record_fail "kg-migrate-v3: (i)" "onda O2 inventou locator, recusou o válido ou não é idempotente: rc=${rc} ${out} ${y}"; fi
+  # (j) onda O3 (--apply-judged): aplica a planilha JULGADA. Só APROVADO/CORRIGIDO; REPROVADO e proposta de
+  #     selo do maestro (dev-dúvida) ficam intocados. corrigir/testemunho escreve OU SUBSTITUI no lugar o bloco
+  #     provenance (nunca duplica a chave: o PyYAML aceita chave duplicada calado); rebaixar só vira confirmed;
+  #     dev-óbvio troca PROD→DEV; method fora das classes é recusado; 2ª passada no-op; nó fora da planilha
+  #     intocado byte a byte. O risco vigiado: aplicar o que o juiz reprovou, ou empilhar provenance.
+  local gj="${d}/docs/x/j.kg.yaml" cj="${d}/juiz.csv"
+  {
+    printf 'meta:\n  id: j\n  schema_version: "1"\n  baseline: 2026-10-09\nnodes:\n'
+    printf '  - id: Q_J\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    label: "pergunta"\n'
+    printf '  - id: E_J_CORR\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "corrigir"\n'
+    printf '  - id: E_J_SUBST\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "substituir"\n    provenance:\n      source: "ops/velho.sh"\n      locator: "ops/velho.sh"\n      method: "derivado: trace do nó, sem registro de medição"\n    verified_at: "2026-10-01"\n'
+    printf '  - id: E_J_TEST\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "testemunho"\n'
+    printf "  - id: E_J_REB\n    node_type: evidence\n    plane: DEV\n    status: 'confirmed'   # c\n    impact: 2\n    confidence: 0.8\n    label: \"rebaixar\"\n"
+    printf '  - id: E_J_REB_OPEN\n    node_type: evidence\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.8\n    label: "rebaixar sobre open"\n'
+    printf '  - id: D_J_DEV\n    node_type: decision\n    plane: PROD\n    status: done\n    impact: 2\n    confidence: 0.8\n    label: "dev-óbvio"\n'
+    printf '  - id: E_J_DEV_CONF\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "dev-óbvio confirmed"\n'
+    printf '  - id: E_J_REPROV\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "reprovado"\n'
+    printf '  - id: Q_J_DUV\n    node_type: question\n    plane: PROD\n    status: open\n    impact: 2\n    confidence: 0.8\n    label: "dev-dúvida"\n'
+    printf '  - id: E_J_BADM\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "method ruim"\n'
+    printf '  - id: E_J_FORA\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "fora da planilha"\n'
+    printf 'edges:\n  - from: E_J_CORR\n    to: Q_J\n    edge_type: SUPPORTS\n'
+  } > "${gj}"
+  {
+    printf 'id,grafo,proposta_original,veredito,proposta_final,source_final,locator_final,method_final,motivo,confianca\n'
+    printf 'E_J_CORR,docs/x/j.kg.yaml,corrigir,APROVADO,corrigir,ops/a.sh,"ops/a.sh l.3, ""x""",leitura: ops/a.sh,ok,0.9\n'
+    printf 'E_J_SUBST,docs/x/j.kg.yaml,corrigir,CORRIGIDO,corrigir,ops/novo.sh,ops/novo.sh l.9,medição: bash ops/novo.sh,ok,0.9\n'
+    printf 'E_J_TEST,docs/x/j.kg.yaml,testemunho,APROVADO,testemunho,sessão 2026-10-09,commit abc,testemunho: medição da sessão,ok,0.8\n'
+    printf 'E_J_REB,docs/x/j.kg.yaml,corrigir,CORRIGIDO,rebaixar,,,,sem fonte,0.9\n'
+    printf 'E_J_REB_OPEN,docs/x/j.kg.yaml,rebaixar,APROVADO,rebaixar,,,,x,0.9\n'
+    printf 'D_J_DEV,docs/x/j.kg.yaml,dev-óbvio,APROVADO,dev-óbvio,,,,plano,0.9\n'
+    printf 'E_J_DEV_CONF,docs/x/j.kg.yaml,dev-óbvio,APROVADO,dev-óbvio,ops/b.sh,ops/b.sh l.1,leitura: ops/b.sh,plano,0.9\n'
+    printf 'E_J_REPROV,docs/x/j.kg.yaml,corrigir,REPROVADO,corrigir,ops/c.sh,ops/c.sh,leitura: ops/c.sh,não sustenta,0.9\n'
+    printf 'Q_J_DUV,docs/x/j.kg.yaml,dev-óbvio,CORRIGIDO,dev-dúvida,,,,dúvida,0.5\n'
+    printf 'E_J_BADM,docs/x/j.kg.yaml,corrigir,APROVADO,corrigir,ops/d.sh,ops/d.sh,sustenta: ops/d.sh,ok,0.9\n'
+    printf 'E_J_SUMIU,docs/x/j.kg.yaml,corrigir,APROVADO,corrigir,ops/e.sh,ops/e.sh,leitura: ops/e.sh,ok,0.9\n'
+  } > "${cj}"
+  local fora1 fora2
+  fora1="$(sed -n '/id: E_J_FORA/,/label:/p' "${gj}" | sha256sum)"
+  if out="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --apply-judged "${cj}" "${gj}" 2>&1)"; then rc=0; else rc=$?; fi
+  y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${gj}" 2>&1)" || true
+  fora2="$(sed -n '/id: E_J_FORA/,/label:/p' "${gj}" | sha256sum)"
+  if [ "${rc}" -eq 0 ] \
+     && python3 -I -B -c '
+import json,sys
+g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}
+assert n["E_J_CORR"]["provenance"]=={"source":"ops/a.sh","locator":"ops/a.sh l.3, \"x\"","method":"leitura: ops/a.sh"}, n["E_J_CORR"]
+assert n["E_J_SUBST"]["provenance"]=={"source":"ops/novo.sh","locator":"ops/novo.sh l.9","method":"medição: bash ops/novo.sh"}, n["E_J_SUBST"]
+assert n["E_J_SUBST"]["verified_at"]=="2026-10-01"
+assert n["E_J_TEST"]["provenance"]["method"]=="testemunho: medição da sessão"
+assert n["E_J_REB"]["status"]=="unverifiable" and "provenance" not in n["E_J_REB"]
+assert n["E_J_REB_OPEN"]["status"]=="open"
+assert n["D_J_DEV"]["plane"]=="DEV" and n["D_J_DEV"]["status"]=="done" and "provenance" not in n["D_J_DEV"]
+assert n["E_J_DEV_CONF"]["plane"]=="DEV" and n["E_J_DEV_CONF"]["provenance"]["source"]=="ops/b.sh"
+assert n["E_J_REPROV"]["plane"]=="PROD" and "provenance" not in n["E_J_REPROV"]
+assert n["Q_J_DUV"]["plane"]=="PROD"
+assert "provenance" not in n["E_J_BADM"] and "provenance" not in n["E_J_FORA"]
+' "${y}" 2>/dev/null \
+     && [ "$(sed -n '/id: E_J_SUBST/,/id: E_J_TEST/p' "${gj}" | grep -c '^    provenance:')" -eq 1 ] \
+     && grep -q "^    status: 'unverifiable'   # c$" "${gj}" && [ "${fora1}" = "${fora2}" ] \
+     && grep -q 'REPROVADO pelo juiz.*E_J_REPROV (REPROVADO)' <<< "${out}" && grep -q 'SELO DO MAESTRO.*Q_J_DUV (dev-dúvida)' <<< "${out}" \
+     && grep -q 'RECUSADO.*E_J_BADM (method fora' <<< "${out}" && grep -q 'RECUSADO.*E_J_REB_OPEN (rebaixar sobre status open)' <<< "${out}" \
+     && grep -q 'AUSENTE DO GRAFO: E_J_SUMIU' <<< "${out}" \
+     && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --apply-judged "${cj}" "${gj}" >/dev/null 2>&1; then
+    record_pass "kg-migrate-v3: (j) onda O3 --apply-judged: corrigir/testemunho escrevem ou SUBSTITUEM no lugar a provenance (uma chave só); rebaixar vira só confirmed; dev-óbvio PROD→DEV; REPROVADO, dev-dúvida, method fora das classes e nó fora da planilha intocados e reportados; 2ª passada no-op"
+  else record_fail "kg-migrate-v3: (j)" "onda O3 aplicou o reprovado, empilhou provenance, ou não é idempotente: rc=${rc} ${out} ${y}"; fi
   rm -rf "${d}"
 }
 _family run_kg_migrate_v3_selftests
