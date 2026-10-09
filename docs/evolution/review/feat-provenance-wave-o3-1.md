@@ -4,8 +4,8 @@ date: 2026-10-09
 branch: feat/provenance-wave-o3-1
 reviewer: "passada adversarial com mandato de achar linha REPROVADA aplicada, provenance empilhada ou divergente da planilha, flip fora do selo: conferência mecânica das 276 linhas contra o arquivo final, amostra de 10 aplicados (semente 20261009) com o nó aberto, idempotência, e bancada kg_migrate_v3 11/11 com LC_ALL=C e 6 mutantes do caso (j)"
 reviewed_diff_sha256: pendente
-findings_total: 3
-findings_real: 1
+findings_total: 4
+findings_real: 2
 verdict: CORRIGIDO
 tokens: 0
 duration_min: 90
@@ -46,6 +46,11 @@ aplicação cobriu os 37 grafos da planilha. O selo do maestro de 2026-10-09 cob
    4 selada diz que fonte no host vira testemunho, mas que fonte com commit noutro repo vira `leitura`. A
    fonte cita o commit e9fe9a4 do repo `marciocar/poc-venda-direta-pdi`, então `leitura` está conforme.
    As outras 5 fontes de host são `testemunho`.
+
+4. **REAL, curado: os dois resumos novos nasciam fora do grafo.** O `pr-finalize --check` acusou 2 HARD
+   da REGRA 29 (Gate de PROVENIÊNCIA INVERTIDO, com catraca). Nenhum `.kg.yaml` citava
+   `o3-wave1-resumo.md` e `o3-wave1-juiz-resumo.md`. **Cura:** os dois entraram no `trace` de
+   `E_ONDA_O3_1_APLICADA`, ao lado da planilha. Com isso, o `--check` deu 0 HARD.
 
 ## Amostra (10 aplicados, semente 20261009, conferidos no arquivo final)
 
