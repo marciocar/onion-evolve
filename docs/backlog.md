@@ -306,6 +306,14 @@
 | 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
 | 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
 
+## contrato-kg-absorcao-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 28.8 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
+| 9.6 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
+| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
+
 ## slm-capitalizacao-2026-10 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -318,14 +326,6 @@
 | 16.8 | `C_OPEN_SHOWCASE_PRIVATE_HOLDOUT` | slm-capitalizacao-2026-10 | LEITURA (forma do bench): a tensao aberto x prova (Scale: privado preserva valor probatorio) sugere o desenho HIBRIDO — fatia ab |
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
-
-## contrato-kg-absorcao-2026-10 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 27.0 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
-| 9.6 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
-| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
 ## meta-research-lens-2026-09 — 3 item(ns)
 
