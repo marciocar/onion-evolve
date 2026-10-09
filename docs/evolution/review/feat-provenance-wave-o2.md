@@ -3,7 +3,8 @@ title: "Revisão — onda O2 da migração de provenance (SAC-73): o trace como 
 date: 2026-10-09
 branch: feat/provenance-wave-o2
 reviewer: "passada adversarial com mandato de achar provenance INVENTADA ou trace que não sustenta o label: varredura mecânica dos 624 candidatos (suporte por termo, forma do trace), amostra de 20 escritos com o arquivo aberto, e bancada kg_migrate_v3 10/10 com LC_ALL=C e 8 mutantes do caso (i)"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4f07dbee74623967be3392e1657f0118c88cbefd6aa0447b6ce36255ff19c55e
+reviewed_code_sha256: d09493aadaad1dc4fe850ffd9dd015929ae3926d207e137f344b2a3a9f8e546c
 findings_total: 4
 findings_real: 3
 verdict: REPROVADO_E_CURADO
