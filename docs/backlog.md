@@ -670,6 +670,13 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
+## door-role-parity-2026-09 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.2 | `Q_PREDICADO_SUCESSOR` | door-role-parity-2026-09 | a paridade é cega a 'ambas as fontes erradas do mesmo modo'; o sucessor mede o CONTEÚDO da porta contra o corte (vendor-manifest |
+| 4.2 | `Q_ROLE_DUPLA_LEITURA` | door-role-parity-2026-09 | o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade |
+
 ## forge-cc-update-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -750,13 +757,6 @@
 |--:|---|---|---|
 | 5.1 | `C_TETO_PERFIL_YAML_E_DO_CONTRATO` | kg-id-valid-from-2026-10 | TETO: politica de extensoes e MUST x SHOULD de verified_at em PROD ficaram FORA de proposito — decisao do contrato formal do .kg |
 | 3.2 | `C_TETO_DATAS_ISO_SEM_ASPAS` | kg-id-valid-from-2026-10 | TETO: valid_from: 2026-10-01 sem aspas e lido como DATA (timestamp YAML 1.1) por um leitor tipado, nao como string — 88 ocorrenc |
-
-## door-role-parity-2026-09 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.8 | `Q_PREDICADO_SUCESSOR` | door-role-parity-2026-09 | a paridade é cega a 'ambas as fontes erradas do mesmo modo'; o sucessor mede o CONTEÚDO da porta contra o corte (vendor-manifest |
-| 4.2 | `Q_ROLE_DUPLA_LEITURA` | door-role-parity-2026-09 | o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade |
 
 ## evolve-cures-2026-10 — 1 item(ns)
 
