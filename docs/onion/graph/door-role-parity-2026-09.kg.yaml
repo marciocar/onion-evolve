@@ -2,11 +2,19 @@
 # Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
+  x_drive_checkpoint: pending
+  x_drive_checkpoint_note: "lote F0 das portas (SAC-88), PR para merge humano. Escritos: D_MATRIZ_DE_PORTAS_2026_10, E_ONION_CORE_NASCEU_PUBLICO_2026_09_17, E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS. FLIPS PROPOSTOS AO MAESTRO (nós selados, não flipados): D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA done→superseded e D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT done→superseded (distribuicao-metodo-vivo-2026-09); D_ADOPT_REFRAME confirmed→superseded só se o maestro julgar que a parte do corte domina o nó (onion-tier-matrix-2026-07); e Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN open→done, respondida pela matriz"
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
   baseline: 2026-09-30
   review_after: 2026-12-29
+  # Aufhebung cross-file de D_MATRIZ_DE_PORTAS_2026_10 (o motor de arestas é intra-arquivo); de
+  # D_ADOPT_REFRAME cai só a parte do corte. Os flips desses nós selados são do maestro.
+  x_supersedes_external:
+    - docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
+    - docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT
+    - docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml#D_ADOPT_REFRAME
 nodes:
   # ---- o dano ----
   - id: E_DANO_85_ARQUIVOS
@@ -145,6 +153,62 @@ nodes:
     status: open
     label: "o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade, mas o nome único para dois usos segue sendo dívida — GATILHO: um terceiro consumidor do campo discordar dos dois"
 
+  # ---- 2026-10-09: a matriz das portas (F0 do plano das portas, SAC-88) ----
+  - id: E_ONION_CORE_NASCEU_PUBLICO_2026_09_17
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    valid_from: "2026-09-17"
+    verified_at: "2026-10-09"
+    verified_against: "lidos o resíduo R56 de docs/cure-named-private-pointers (date 2026-09-17, verdict CORRIGIDO) e a entrada onion-core do members.yaml (remote PÚBLICO desde 2026-09-17, kind door, história reescrita no mesmo dia)"
+    source_kind: repo
+    source_tier: 10
+    label: "em 2026-09-17 o onion-evolve foi medido PÚBLICO contra a doutrina que o declarava privado; o maestro fechou o core no mesmo movimento e decidiu a porta onion-core, que nasceu pública naquele dia"
+    narrative: "É o fato que o corpus nunca registrou como nó: a porta onion-core não foi planejada, nasceu de uma medição que mudou o dia. O resíduo conta que cinco lugares da doutrina (public-face.sh, plugin-readme.sh, REGRA 35, REGRA 79 e a skill de co-evolução) declaravam o core privado, e o forge dizia o contrário. A primeira materialização foi barrada pelo próprio script (18 ponteiros a documento privado nomeado, um com nome de cliente no arquivo, e baselines que expunham a topologia dos grafos pessoais). O registro guarda o resto: a história da porta foi reescrita com force-push no mesmo dia por vazamento medido num baseline populado. O papel escolhido naquele dia foi hub; a matriz de 2026-10-09 o troca por source."
+    trace: "docs/evolution/review/docs-cure-named-private-pointers.md · docs/evolution/federation/members.yaml"
+    provenance:
+      source: "docs/evolution/review/docs-cure-named-private-pointers.md e docs/evolution/federation/members.yaml em origin/main d9852a9e"
+      locator: "resíduo: seção 'O que mudou o dia' (onion-evolve PÚBLICO, core fechado, porta onion-core decidida); members.yaml: entrada id onion-core, comentário do remote e bloco da história reescrita"
+      method: "leitura: os dois arquivos lidos em 2026-10-09; a publicidade do repo em 17/09 é o que o resíduo registra, não remedida no forge nesta passada"
+
+  - id: D_MATRIZ_DE_PORTAS_2026_10
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-09"
+    verified_against: "decisão do maestro na sessão de 2026-10-09, respondida por AskUserQuestion e registrada na tabela de decisões do plano das portas (SAC-88)"
+    label: "matriz das portas: onion-core = source sem biografia com toda a maquinaria; standalone = core menos adoção e federação, com meta-fábrica; plugins = o standalone empacotado; mini = allowlist didática; plugins/ sai do core; publicar é sob demanda e nunca trava o desenvolvimento"
+    narrative: "A tabela, porta por porta. ONION-CORE: o source publicado e versionado, sem dados particulares, o core das empresas; leva toda a maquinaria, inclusive meta-fábrica, adoção e federação; o carimbo passa a role: source (kind: door), não hub. ONION-STANDALONE: uso direto num projeto individual; é o core menos adoção e federação (saem adopt, federation-*, co-relay, co-evolve, co-deliver, co-announce, o hook de inbox, onion-publish e as transições de adoção no wizard) e LEVA a meta-fábrica. ONION-PLUGINS: a mesma superfície do standalone, empacotada em plugins; a meta-fábrica é liberada, o que responde Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN e pede revisão da REGRA 61. ONION-MINI: porta didática para iniciantes, gerada do core por ALLOWLIST (por volta de 15 comandos do ciclo produto e desenvolvimento, sem KG, meta e compliance); o GPT atual segue como artefato à parte. PLUGINS/ NO CORE: sai; as REGRAS 19 e 72 a 79 passam a rodar só na publicação. PUBLICAÇÃO: sob demanda, por comando, e nenhuma porta defasada trava PR comum. A Aufhebung atravessa arquivos (o motor de arestas é intra-arquivo) e está declarada em meta.x_supersedes_external: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA cai porque adoção e federação deixam de viajar para o standalone, embora a meta-fábrica siga viajando; D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT cai porque a vitrine com adoção passa a ser o onion-core; de D_ADOPT_REFRAME cai só a parte do corte (meta-fábrica core-only), e std = hub em trabalho sobrevive. Os flips desses nós selados são do maestro e estão propostos na nota do lote."
+    provenance:
+      source: "plano das portas, arquivo local da sessão fora do repo (~/.claude/plans/twinkly-sniffing-neumann.md), e a issue Linear SAC-88"
+      locator: "seção 'Decisões do maestro (2026-10-09)', tabela Porta × O que é × Superfície"
+      method: "testemunho: decisão do maestro na sessão de 2026-10-09 (AskUserQuestion)"
+
+  - id: E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-10-09"
+    verified_against: "members-validate.sh sobre uma cópia do members.yaml com onion-mini em role: mini e kind: door: rc 1, 'role inválido (mini); esperado consumer, hub, source, standalone' e 'kind door vendoriza, onion_version não pode ser n/a'"
+    source_kind: repo
+    source_tier: 10
+    label: "o registro ainda não sabe escrever a matriz: members-validate.sh (REGRA 66, HARD no lint) aceita só source, hub, standalone e consumer em role:, e kind: door exige pin real; mini e plugins ficam para a ampliação do schema na F2"
+    narrative: "Medido na F0 antes de editar o members.yaml vivo, porque a REGRA 66 roda o validador sobre ele em todo lint. Há um segundo bloqueio para o onion-plugins como kind: door: o clone em /home/marcio/onion-plugins não tem .claude/.onion-version (o pin vive em provenance.json por plugin), e a REGRA 92 acusaria CARIMBO-AUSENTE. Por isso a F0 registra a decisão e não toca nos papéis do registro."
+    trace: ".claude/validation/members-validate.sh · .claude/validation/door-role-parity-check.sh"
+    provenance:
+      source: ".claude/validation/members-validate.sh em origin/main d9852a9e"
+      locator: "ROLES = {source, hub, standalone, consumer} e VENDOR = {adopter, door} no bloco python; saída sobre /tmp com onion-mini mutado"
+      method: "medição: members-validate.sh rodado sobre cópia mutada do members.yaml em 2026-10-09, rc 1"
+
 edges:
   # o dano é a evidência de que a lacuna existia
   - from: E_DANO_85_ARQUIVOS
@@ -176,3 +240,15 @@ edges:
   - from: E_CORTE_DERIVA_COMPANHEIROS_DO_COMANDO
     to: Q_PREDICADO_SUCESSOR
     edge_type: SUPPORTS
+  # a porta onion-core nasceu de uma medição; a matriz formaliza o papel que ela já cumpria
+  - from: E_ONION_CORE_NASCEU_PUBLICO_2026_09_17
+    to: D_MATRIZ_DE_PORTAS_2026_10
+    edge_type: SUPPORTS
+  # o schema do registro limita a escrita da matriz até a F2, sem derrubá-la
+  - from: E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS
+    to: D_MATRIZ_DE_PORTAS_2026_10
+    edge_type: CONSTRAINS
+  # a dívida do nome único cresce com dois papéis novos: é ela que a F2 paga
+  - from: Q_ROLE_DUPLA_LEITURA
+    to: D_MATRIZ_DE_PORTAS_2026_10
+    edge_type: CONSTRAINS

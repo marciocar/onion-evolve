@@ -219,6 +219,9 @@ members:
 
   - id: onion-mini
     name: onion-mini (Onion Mini — a versão mini e portátil, ex-onion-portable)
+    # MATRIZ DAS PORTAS (2026-10-09, D_MATRIZ_DE_PORTAS_2026_10): vira porta didática, role: mini e
+    #   kind: door, gerada do core por allowlist na F5 (SAC-94). O schema ainda recusa os dois valores
+    #   (members-validate.sh, medido): a ampliação é da F2, e até lá a entrada segue como está.
     role: standalone            # DESTILAÇÃO CURADA, não adoção (não vendoriza .claude/) — role
     kind: distillation  # reescrita curada da doutrina; onion_version: n/a — NAO vendoriza
                                 # 'distilled' formal é costura gated (2ª destilação; ADR mini-distillation D2)
@@ -405,6 +408,9 @@ members:
 
   - id: onion-core
     name: onion-core (porta pública do core — maquinaria completa, papel hub, sem biografia)
+    # MATRIZ DAS PORTAS (2026-10-09, D_MATRIZ_DE_PORTAS_2026_10): o papel vira `source` na F2, junto
+    #   com o carimbo novo. Trocar só aqui antes disso faria a REGRA 92 (Papel da porta no registro
+    #   concorda com o CARIMBO dela) reprovar.
     role: hub                   # CORRIGIDO 2026-09-30: dizia `standalone` e o CARIMBO da porta diz `hub`
                                 #   — 11 materializações seguidas (22/09→27/09) carimbaram hub, e o CLAUDE.md
                                 #   declara esta porta como "mesma plataforma, mesma MAQUINARIA, sem biografia".

@@ -28,8 +28,8 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
 - **CORE ≠ FAMÍLIA** — estas linhas descrevem **este repo** (o core). Existe uma **família
   multi-IDE pública**, e ela tem **três regimes**, não um:
   - **CONGELADOS** (`onion`, `onion-cursor`, `onion-antigravity`, `onion-copilot`,
-    `onion-architect`, `onion-mini`, `onion-standalone`): material de curso e prova de
-    portabilidade, **não** linha de manutenção ativa.
+    `onion-architect`): material de curso e prova de portabilidade, **não** linha de manutenção
+    ativa.
   - **LINHA VIVA** (`onion-codex`, decisão do maestro em **2026-09-16**): mantido, com gate
     determinístico próprio (`.codex/validation/` + `Onion Validate (Codex)` no CI).
   - **PORTA** (`onion-core`, pública desde **2026-09-17**): a **face pública do core** — mesma
@@ -38,6 +38,24 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
     (18 vezes até 2026-09-23) e cobrada pela REGRA 85 (Porta pública espelha o core, com catraca).
     Por ser projeção, **a história dela não tem valor autoral** — já foi reescrita com force-push
     uma vez, por vazamento medido de caminhos core-privados num baseline que viajou populado.
+
+    **Desde 2026-10-09 o regime PORTA tem quatro portas**, todas projeção do core, publicadas
+    **sob demanda** (por comando, sem nunca travar o desenvolvimento):
+    - **`onion-core`** — o source publicado, sem biografia: toda a maquinaria, inclusive
+      meta-fábrica, adoção e federação. É o core das empresas (carimbo `source` a partir da F2);
+    - **`onion-standalone`** — uso direto num projeto individual: o core **menos** adoção e
+      federação, **com** a meta-fábrica;
+    - **`onion-plugins`** — a superfície do standalone empacotada como plugins do marketplace;
+    - **`onion-mini`** — porta didática para iniciantes, gerada do core por allowlist (o ciclo de
+      produto e desenvolvimento, sem KG, meta e compliance).
+
+    Decisão do maestro de 2026-10-09 (plano das portas, SAC-88), registrada no nó
+    `D_MATRIZ_DE_PORTAS_2026_10` de `docs/onion/graph/door-role-parity-2026-09.kg.yaml`. Ela tira
+    o standalone e o mini dos congelados e supera o corte de 2026-09-14 (tudo viajava para o
+    standalone, adoção inclusa). O que já existe hoje: o `onion-core` e o `onion-standalone` saem
+    por `ops/materialize-door.sh`, e o `onion-plugins` pela skill `onion-publish`. O resto é das
+    fases seguintes: o corte por porta é a F2, o comando único `/meta:publish` é a F3 e o mini
+    gerado é a F5.
 
   > ⚠️ **`onion-core` faltava nesta lista até 2026-09-23**, e a causa é de datas: a decisão dos dois
   > regimes foi selada em **16/09** e a porta nasceu pública em **17/09** — um dia depois, sem
