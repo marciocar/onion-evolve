@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# kg-contract-check.sh — julga UM ou mais .kg.yaml contra o contrato vendorizado (hoje v4.1), ANTES do commit.
+# kg-contract-check.sh — julga UM ou mais .kg.yaml contra o contrato vendorizado (hoje v4.2), ANTES do commit.
 #
 # Por que existe (2026-10-08, SAC-71): desde que o gate do contrato entrou no CI (vendor/kg-ssot,
 # kg_gate.py), todo grafo NOVO tem de nascer limpo no SHOULD — e o gate só enxerga arquivo rastreado
@@ -46,6 +46,8 @@ HINT = {
     "integrity.untraced-decision": "decision sem origem: dê a ela trace: \"<run, pergunta ou fonte>\", provenance ou uma aresta TRACES_TO",
     "integrity.testimony-in-prod": "nó PROD apoiado em testemunho: rebaixe para DEV ou meça e troque o method para medição/leitura",
     "integrity.verified-before-fact": "verified_at anterior ao valid_from: não se verifica um fato antes de ele valer; corrija uma das datas",
+    # aviso do v4.2 (2026-10-09, SAC-97): locality é opcional, mas quando vem tem de estar no vocabulário
+    "form.enum.node.provenance.locality": "provenance.locality fora do vocabulário: use repo, web, host ou pessoa (ou tire a chave; kg-migrate-v3.py --locality a deriva do source)",
 }
 rc = 0
 for f in files:
