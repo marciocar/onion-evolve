@@ -71,32 +71,10 @@ adotando `projeto-a`, `projeto-b`) precisa da **autoridade de adoção local**. 
 **deliberada** (`std/adopted → hub`, o passo que a tier-matrix já previu):
 
 ```bash
-# Roda no REPO ATUAL (sem alvo). Idempotente. NÃO copia nada — só re-carimba o papel + commita.
-REPO="$(git rev-parse --show-toplevel)"
-ROLE_NOW="$(bash "$REPO/.claude/validation/onion-version.sh" | awk '/^role:/{print $2}')"
-case "$ROLE_NOW" in
-  source) echo "Abortar: o core (role: source) não se promove — já é autoridade máxima."; exit 1 ;;
-  hub)    echo "No-op: já é hub."; exit 0 ;;
-  adopted|"") : ;;  # o caso a promover
-esac
-# BRANCH DEDICADA, nunca a integração (F1 das portas, 2026-10-09): até aqui o commit caía na branch
-# que estivesse em HEAD — em geral a própria integração, sem PR. O papel novo chega por PR, como
-# qualquer mudança. Com farol vivo (esta sessão conta) a branch nasce numa worktree irmã.
-INTEG="$(bash "$REPO/.claude/validation/resolve-integration-branch.sh" "$REPO")"
-WORK="$(bash "$REPO/.claude/utils/adopt/dedicated-branch.sh" "$REPO" chore/onion-promote-hub "$INTEG")" || exit 1
-# Re-carimba role: hub PRESERVANDO adopted_from/adopted_at/mode (write-stamp lê o stamp antigo).
-# SEM --framework/--commit/--commit-date de PROPÓSITO: identidade derivada de "$REPO" é do ALVO, não
-# do core — `--framework` carimbava o nome do repo do alvo e `--commit` um SHA fora da história do
-# core. Promover papel não muda versão: o write-stamp herda os três do stamp. Razão inteira lá.
-bash "$REPO/.claude/utils/adopt/write-stamp.sh" "$WORK" --role hub
-# REGRA 40: o stamp DEVE estar trackeado — commitar (force-add: é gitignored na herança da fonte).
-# SEM --no-verify: o gate do repo roda neste commit (é a única checagem local antes do PR).
-git -C "$WORK" add -f .claude/.onion-version
-git -C "$WORK" diff --cached --quiet \
-  || git -C "$WORK" commit -q -m "chore(onion): promove a hub (role: hub) — autoridade de adoção local dos próprios projetos" \
-  || exit 1   # retomada: branch já carimbada → nada a commitar, segue para o PR
-echo "✅ Carimbo de HUB commitado em chore/onion-promote-hub ($WORK). Push + PR para $INTEG (merge commit);"
-echo "   depois do merge este repo pode: /meta:adopt <projeto> (adotar) e /meta:adopt --update <projeto>."
+# Roda no REPO ATUAL (sem alvo). Idempotente. Só re-carimba `role: hub` e commita — numa BRANCH
+# DEDICADA (`chore/onion-promote-hub`; worktree irmã se houver farol vivo), COM o gate do repo, para
+# chegar à integração por PR. A lógica (e o porquê) vive no helper, coberto pela bancada.
+bash "$(git rev-parse --show-toplevel)/.claude/utils/adopt/promote-hub.sh"
 ```
 
 **O que o hub GANHA (Camada 2):** adotar e atualizar os **próprios** projetos (`adopt` / `--update` local).
@@ -116,12 +94,9 @@ SOURCE_ROOT="$(git rev-parse --show-toplevel)"
 DEST="<INSTALL_DIR — ver Fase 2>"
 ROLE="<ROLE do STATE.md (adoção, PASSO 0) | TARGET_ROLE (--update)>"   # adopted | hub | standalone
 
-# (a) MANIFESTO — a lista não mora aqui (SSOT: `vendor-manifest.sh`) e o rc dela é LIDO por um helper:
-#     pathspec AUSENTE é TODOS para o git, não NENHUM — medido 2026-09-15, um manifesto falhando fez
-#     `git archive HEAD --` copiar 2222 arquivos (353 de biografia) com rc=0.
-#     ⚠️ NUNCA `mapfile -t manifest < <(…) || ABORTADO`: o `||` lê o rc do MAPFILE (sempre 0), e foi
-#     assim que este sítio ficou até 2026-10-09 — o ABORTADO nunca disparou. A função captura em
-#     variável (rc do produtor), converte, e recusa o vazio. O PAPEL vem explícito, nunca do ambiente.
+# (a) MANIFESTO (SSOT: `vendor-manifest.sh`) pela função que LÊ o rc do produtor e recusa o vazio —
+#     pathspec ausente é TODOS para o git (2222 arquivos copiados com rc=0, 2026-09-15). NUNCA
+#     `mapfile … < <(…) || ABORTADO`: o `||` lê o rc do mapfile (razão em load-manifest.sh).
 source "$SOURCE_ROOT/.claude/utils/adopt/load-manifest.sh"
 onion_load_manifest "$SOURCE_ROOT" "$ROLE" || exit 1
 
@@ -368,8 +343,8 @@ if [ -f "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" ] \
   bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$DEST" --ensure-from "$SOURCE_ROOT"; RB_RC=$?
   # rc=3 (baseline não resolvido) AVISA; rc=2 (uso/papel) ABORTA — engolir o 2 com `|| true`, como
   # as duas pontas faziam, faz o alvo herdar o passivo do core em silêncio (114 chaves medidas).
-  [ "$RB_RC" = 3 ] && echo "⚠️  regen-baselines: baseline(s) não resolvido(s) — confira antes do PR." >&2
-  [ "$RB_RC" = 2 ] && { echo "ABORTADO: regen-baselines recusou (rc=2) — o alvo herdaria o baseline do CORE." >&2; exit 1; }
+  [ "$RB_RC" = 3 ] && echo "⚠️  regen-baselines: baseline(s) não resolvido(s) — confira antes do PR." >&2   # (`if` abaixo, não `&&`: o `&&` falso como ÚLTIMA linha fazia o bloco sair rc=1 no SUCESSO — medido no dogfood da F1)
+  if [ "$RB_RC" = 2 ]; then echo "ABORTADO: regen-baselines recusou (rc=2) — o alvo herdaria o baseline do CORE." >&2; exit 1; fi
 fi
 ```
 
@@ -505,17 +480,13 @@ if [ -z "$IN_PLACE" ] && [ ! -d "$TARGET/.git" ]; then git -C "$TARGET" init -q;
 #     principal). Carimbar `develop` por default seria errado num greenfield sem branch develop (o campo
 #     presente vence a cadeia → base apontaria p/ branch inexistente). Só vira SSOT versionado (Fase 5)
 #     quando é escolha explícita; o git config local é setado no Procedimento pós-cópia (conveniência).
-# 0f. PAPEL DO ALVO (--role adopted|hub|standalone; default adopted). Ele CORTA o transporte (Fase 2) e
-#     entra no carimbo (Fase 5). Até 2026-10-09 o flag era parseado aqui e NUNCA MAIS LIDO: a Fase 2
-#     lia `${ONION_ROLE:-adopted}` (env que ninguém atribuía na adoção) e a Fase 5 não passava --role —
-#     `/meta:adopt X --role standalone` saía `role: adopted`, com a meta-fábrica inteira. Papel inválido
-#     aborta AQUI, antes de tocar o alvo (o write-stamp recusaria só na Fase 5, depois da cópia).
+# 0f. PAPEL (--role adopted|hub|standalone): CORTA o transporte (Fase 2) e entra no carimbo (Fase 5).
+#     Até 2026-10-09 era parseado e nunca lido (`--role standalone` saía `adopted`). Inválido aborta AQUI.
 ROLE="${ROLE:-adopted}"   # ROLE = o valor de --role (o orquestrador o substitui); omitido → adopted
 case "$ROLE" in adopted|hub|standalone) : ;; *) echo "Abortar: --role '$ROLE' inválido (adopted|hub|standalone)."; exit 1 ;; esac
 ```
 
-- Persistir `TARGET`, `MODE`, `ROLE`, `INTEGRATION_BRANCH`, `SRC_*` no `STATE.md`. `NEXT: Fase 1`.
-  O `ROLE` é o que as Fases 2 e 5 leem — sem ele no `STATE.md` o shell novo de cada fase o perde.
+- Persistir `SOURCE_ROOT`, `TARGET`, `MODE`, `ROLE`, `INTEGRATION_BRANCH`, `SRC_*` no `STATE.md` (as Fases 2 e 5 os leem). `NEXT: Fase 1`.
 
 ### Fase 1 — Engenharia reversa (se houver código)
 
@@ -538,8 +509,7 @@ else
   git -C "$TARGET" checkout -b onion/adopt 2>/dev/null || git -C "$TARGET" checkout onion/adopt
   INSTALL_DIR="$TARGET"
 fi
-# 2b. Rodar o «Procedimento de cópia segura» com DEST="$INSTALL_DIR" e ROLE="<ROLE do STATE.md>" — o papel
-#     escolhe o CORTE do manifesto (standalone não leva adoção nem federação). Sem ROLE a função recusa.
+# 2b. Rodar o «Procedimento de cópia segura» com DEST="$INSTALL_DIR" e ROLE="<ROLE do STATE.md>" (o corte).
 
 # 2c. AVISO de hook de commit (legacy): a worktree nova NÃO tem node_modules. Se o alvo usa HUSKY
 #     (que invoca binário de node_modules: husky+lint-staged → prettier/eslint), o 1º commit da adoção
@@ -616,10 +586,8 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/write-stamp.sh" "$INSTALL_DIR" \
   --adopted-from "$(git -C "$SOURCE_ROOT" remote get-url origin 2>/dev/null || echo "$SOURCE_ROOT")" \
   --role "${ROLE:?ROLE do STATE.md (PASSO 0f) ausente}" \
   --mode "${MODE}" ${INTEGRATION_BRANCH:+--integration-branch "${INTEGRATION_BRANCH}"}
-# integration_branch: só entra se foi escolha explícita (--integration-branch); sem escolha o helper omite —
-# o resolve-integration-branch.sh detecta a cada PR (develop-se-existe-senão a branch principal).
-# --role: o MESMO papel que cortou o transporte na Fase 2. Carimbo e corte divergentes fariam o próximo
-# --update (que lê o papel do carimbo) republicar o que a adoção cortou.
+# integration_branch: só se foi escolha explícita; sem ela o resolve-integration-branch.sh detecta a cada PR.
+# --role: o MESMO papel que cortou a Fase 2 — o --update lê o papel do carimbo para cortar igual.
 ```
 
 # (8c) SEMENTE DO KG — o primeiro `.kg.yaml` do adotante (achado de campo, 2026-08-17).
@@ -647,7 +615,7 @@ fi
 if [ -f "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" ]; then
   bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$INSTALL_DIR" --ensure-from "$SOURCE_ROOT"; RB_RC=$?
   [ "$RB_RC" = 3 ] && echo "⚠️  regen-baselines: baseline(s) não resolvido(s) — confira antes do PR." >&2
-  [ "$RB_RC" = 2 ] && { echo "ABORTADO: regen-baselines recusou (rc=2) — o alvo herdaria o baseline do CORE." >&2; exit 1; }
+  if [ "$RB_RC" = 2 ]; then echo "ABORTADO: regen-baselines recusou (rc=2) — o alvo herdaria o baseline do CORE." >&2; exit 1; fi
 fi
 
 - **Commit durável (obrigatório):** aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
@@ -755,10 +723,8 @@ fi
 # (`onion-version.sh` hardcoda `role: source` por ser a identidade da FONTE — não serve aqui).
 TARGET_ROLE="$(awk '/^role:/{print $2; exit}' "$TARGET/.claude/.onion-version")"
 [ -n "$TARGET_ROLE" ] || TARGET_ROLE=adopted   # stamp sem campo role → adotado por definição
-# ⚠️ O EXPORT é o que faz o papel chegar ao `vendor-branch.sh`, que é quem COPIA no --update. Sem ele
-# o TARGET_ROLE alimentava só o `diff --stat` abaixo e a atualização rodava cega (medido 2026-09-15:
-# `ONION_ROLE` era lido por dois arquivos e atribuído por NENHUM — 106 arquivos da meta-fábrica caíam
-# num alvo `role: standalone` com a bancada verde).
+# ⚠️ O EXPORT faz o papel chegar ao `vendor-branch.sh` (quem COPIA no --update); sem ele, 106 arquivos da
+# meta-fábrica caíam num alvo `role: standalone` com a bancada verde (medido 2026-09-15).
 export ONION_ROLE="$TARGET_ROLE"
 # Mesma função da cópia segura (o `mapfile … < <(…) || ABORTADO` daqui engolia o rc — ver load-manifest.sh).
 source "$SOURCE_ROOT/.claude/utils/adopt/load-manifest.sh"
@@ -768,12 +734,10 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
 [ -n "$PIN_OK" ] && git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
 ```
 
-- **Branch dedicada, nunca a integração** (F1 das portas, SAC-89, 2026-10-09). Medido no `--update` do
-  brain-granaai: este passo mandava mergear e commitar NA integração, com `--no-verify` — o framework
-  novo entrava na branch de integração do adotante sem PR e sem o gate dele. Agora tudo do update
-  (merge da vendor, config, re-carimbo, relatório) cai em `chore/onion-update-<pin>`, e chega à
-  integração por PR com merge commit. **Com farol vivo no alvo** (outra sessão trabalhando lá —
-  `session-beacon.sh check`), a branch nasce numa **worktree irmã** e o checkout do alvo fica intocado:
+- **Branch dedicada, nunca a integração** (F1 das portas, 2026-10-09 — medido num `--update` de hub: o
+  merge e o commit caíam NA integração, com `--no-verify`, sem PR). Tudo do update cai em
+  `chore/onion-update-<pin>` e chega à integração por PR; **com farol vivo no alvo** (outra sessão lá),
+  numa **worktree irmã**, e o checkout do alvo fica intocado (razão em `dedicated-branch.sh`):
   ```bash
   INTEGRATION_BRANCH="$(bash "$SOURCE_ROOT/.claude/validation/resolve-integration-branch.sh" "$TARGET")"
   UPDATE_BR="chore/onion-update-$NOW"
@@ -782,8 +746,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   ```
 - **Aplicar o framework via MERGE de vendor-branch** (Achado #2 — substitui o copy-over), **na branch dedicada**:
   `bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-branch.sh" update "$WORK" "$SOURCE_ROOT" "$NOW" "$UPDATE_BR"`.
-  O 4º argumento é a branch onde o merge cai — o helper sempre aceitou qualquer branch ali; a
-  integração era só o que a prosa passava. O helper aplica o framework novo no
+  (o 4º argumento é a branch onde o merge cai). O helper aplica o framework novo no
   `onion/vendor` (fonte-de-merge, base comum) e faz `git merge` na branch dedicada → a customização local vira
   **conflito git real** (never-clobber estrutural), não diff clobável. **Exit 10 = CONFLITO** → o maestro
   resolve (`git mergetool`/marcadores + `git commit`) **antes** de seguir; **exit 0** = framework atualizado
@@ -794,13 +757,9 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   `settings.json` próprio recebe os *scripts* dos hooks (no manifesto acima) mas **não** o registro → o
   "you have mail" não dispara. O Procedimento faz o merge idempotente do `settings.json` + garante o
   starter `docs/evolution/`. (Fecha `docs/evolution/inbox/2026-06-18-adopt-update-skips-phase3-steps.md`.)
-  **O helper filtra em vez de re-emitir aqui, e ele decide isso sozinho** (`--auto`). A razão é a catraca: no update o alvo **já tem história**, então
-  re-emitir o baseline re-toleraria toda a dívida acumulada desde a última atualização — a guarda ficaria
-  verde sobre crescimento real. Com `--filter` cai só a chave **estrangeira** (arquivo inexistente no
-  alvo = passivo que veio na cópia do core) e a dívida **local** segue cobrada. Medido em 2026-08-17: 4
-  dos 8 adotantes locais **não têm** `kg-verification-baseline.txt` e a guarda emite `HARD NO-BASELINE`
-  (fail-closed) — no próximo update eles receberiam o lint novo **e** o baseline do core, que é
-  exatamente o defeito de 47 HARD que esta rodada curou.
+  **O `regen-baselines` filtra em vez de re-emitir aqui, e decide sozinho** (`--auto`): no update o alvo já
+  tem história, e re-emitir re-toleraria a dívida acumulada; `--filter` tira só a chave **estrangeira**
+  (passivo do core) e a dívida **local** segue cobrada (o defeito de 47 HARD medido em 2026-08-17).
 - **Re-carimbar** com a identidade NOVA da fonte (re-derivar — não há PASSO 0 aqui). **Sempre via
   helper determinístico** — a semântica (preserve + updated_at) vive no script, não em quem o chama:
   ```bash
@@ -809,12 +768,8 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   bash "$SOURCE_ROOT/.claude/utils/adopt/write-stamp.sh" "$WORK" \
     --framework "${SRC_FRAMEWORK}" --commit "${SRC_COMMIT}" --commit-date "${SRC_COMMIT_DATE}" \
     --members "$SOURCE_ROOT/docs/evolution/federation/members.yaml" --member-id "<id-no-members-se-registrado>"
-  # O helper, no caminho de UPDATE (stamp existente): PRESERVA adopted_from/mode/integration_branch e
-  # adopted_at do stamp antigo (⚠️ adopted_at NUNCA re-carimba — semântica única, audit 2026-07-01 #5);
-  # atualiza source_commit/date; escreve updated_at=hoje. adopted_at perdido (re-carimbo pré-fix) →
-  # restaurado do members.yaml (--members/--member-id); irrecuperável → omitido com AVISO, nunca inventado.
-  # integration_branch ausente no antigo → ausência preservada (resolução detecta a cada PR; o passo (3)
-  # do Procedimento ainda seta o git config local a partir do valor resolvido).
+  # No UPDATE o helper PRESERVA adopted_from/mode/integration_branch/adopted_at (adopted_at NUNCA re-carimba),
+  # atualiza source_commit/date e escreve updated_at; adopted_at perdido → members.yaml, ou omitido com AVISO.
   ```
 - **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima,
   já commitado na branch dedicada); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o
@@ -822,11 +777,11 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `BR=$UPDATE_BR`) **com `ONION_DURABLE_VERIFY=1`**: o alvo já tem
   o gate do Onion, e pular o hook aqui era pular a única checagem local antes do PR. Se o gate recusar
   (rc=1, saída dele impressa), a mudança fica aplicada e não commitada na branch dedicada — cure e
-  re-rode. Em caso de conflito de merge (exit 10 acima), este passo roda **após** o maestro resolver e commitar o merge.
-- **Integrar por PR:** `git -C "$WORK" push -u origin "$UPDATE_BR"` e PR para `$INTEGRATION_BRANCH` com
-  **merge commit** (`pr-merge-verified.sh --merge-commit --assert-ancestor onion/vendor` onde houver; nunca
-  rebase/squash — linearizar tira a `onion/vendor` da ancestralidade e o próximo update conflita em falso).
-  Com worktree irmã, remova-a depois do merge: `git -C "$TARGET" worktree remove "$WORK"`.
+  re-rode. ⚠️ O bundle `adopted` já NASCE com 1 HARD (`rules/dissect-lens.md`, `papel/SEM-OBJETO`;
+  medido no dogfood da F1, cura na F2): recusa só por HARD pré-existente (compare `remeasure-hard.sh`
+  na integração e no `$WORK`) admite `--no-verify` **declarado no corpo do PR** — calado, nunca. Em caso de conflito de merge (exit 10 acima), este passo roda **após** o maestro resolver e commitar o merge.
+- **Integrar por PR:** push de `$UPDATE_BR` e PR para `$INTEGRATION_BRANCH` com **merge commit** (nunca
+  rebase/squash: tira a `onion/vendor` da ancestralidade); com worktree irmã, `git -C "$TARGET" worktree remove "$WORK"` depois.
 - **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
   (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`). Reusa o `diff --stat` já computado
   acima. **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode

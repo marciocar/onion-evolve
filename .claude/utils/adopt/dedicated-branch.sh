@@ -10,7 +10,7 @@
 # rc  : 0 pronto · 2 precondição (não-repo, base inexistente, árvore suja, branch presa noutra worktree)
 #
 # ══ POR QUE EXISTE (F1 das portas, SAC-89, 2026-10-09) ════════════════════════════════════════════
-# Medido no --update do brain-granaai: o adopt.md mandava `BR=$INTEGRATION_BRANCH`, o vendor-branch
+# Medido no --update de um hub adotante (2026-10): o adopt.md mandava `BR=$INTEGRATION_BRANCH`, o vendor-branch
 # fazia checkout E merge na integração, e o durable-commit fechava com `--no-verify`. Três escolhas que
 # somadas punham o framework novo na branch de integração do adotante SEM passar por PR nem pelo gate
 # dele — o oposto do que o Onion cobra de qualquer outra mudança. A branch dedicada devolve o update

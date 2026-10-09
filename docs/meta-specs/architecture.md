@@ -272,6 +272,12 @@ mode: greenfield | legacy | regulated
 integration_branch: <branch>   # OPCIONAL — presente só quando escolhido via --integration-branch
 ```
 
+Nas **portas** (`ops/materialize-door.sh`) o escritor é o **mesmo** `write-stamp.sh`, com `--kind door`:
+saem `framework`/`source_commit`/`source_commit_date`/`role`/`adopted_from` e, no lugar de
+`adopted_at`/`updated_at`, `kind: door` + `materialized_at: <YYYY-MM-DD>` — a porta é projeção regenerada
+inteira, então nada se herda do carimbo anterior e o `role` é obrigatório. Até 2026-10-09 a porta tinha
+um dialeto próprio (`onion_version`), que o `door-seal-pin.sh` ainda lê como fallback.
+
 O campo **`integration_branch`** (opcional) é o **SSOT versionado** da branch de integração — a que os PRs
 de evolução Onion miram (ex. `<projeto>-evolve`, separada da branch de produto). É **carimbado só quando
 escolha explícita** (`/meta:adopt --integration-branch <nome>`); **ausente** é o caso normal. A base do PR

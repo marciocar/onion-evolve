@@ -2,7 +2,8 @@
 # Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
-  x_drive_checkpoint: sealed
+  x_drive_checkpoint: pending
+  x_drive_checkpoint_note: "lote F1 das portas (SAC-89, absorve SAC-87), PR para merge humano. Escritos: E_ADOCAO_ROBUSTA_F1 (SUPPORTS a matriz) e Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA (open, CONSTRAINS a evidência). Selo da F0 no mesmo PR: CONSTRAINS sem flip (x_constrained_by nos 6 alvos), D_FAMILIA_TEM_DOIS_REGIMES_2026_09 superseded. Resíduo declarado ao maestro: o bundle adopted nasce com 1 HARD (dissect-lens SEM-OBJETO) que, com ONION_DURABLE_VERIFY=1, recusa o commit final do --update e do --promote-hub até a F2"
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
@@ -225,6 +226,39 @@ nodes:
     label: "onion-plugins é repo público com prefixo onion- e segue FORA do members.yaml, o ponto cego da REGRA 36 — GATILHO: registrar como kind door, role plugins, no mesmo PR que ampliar o schema do registro (F1.5 ou F2 do plano das portas)"
     narrative: "O pin a registrar é o ref do provenance.json publicado (947e69ce069d em 2026-10-09). Dois bloqueios medidos hoje: o members-validate.sh recusa role plugins, e o clone não tem .claude/.onion-version, o que faria a REGRA 92 acusar CARIMBO-AUSENTE. A cura do segundo é decidir onde mora o carimbo de uma porta que é marketplace, não árvore .claude/."
 
+  - id: E_ADOCAO_ROBUSTA_F1
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    valid_from: "2026-10-09"
+    verified_at: "2026-10-09"
+    verified_against: "família de bancada adopt_robust (15 casos) + door (f2) + door_seal_pin (l)(m) + role_cut (i) + role_promotion (a) sob LC_ALL=C, cada caso com mutante que reprova; dogfood dos blocos do próprio adopt.md num sandbox (adoção --role standalone, --update e --promote-hub com farol vivo)"
+    source_kind: repo
+    source_tier: 10
+    label: "F1 das portas: a adoção ficou robusta — manifesto que falha aborta, o --role percorre até o carimbo, --update e --promote-hub vão a branch dedicada, offer-onion-ci aceita worktree e a porta tem um escritor de carimbo só"
+    narrative: "Os cinco defeitos medidos no plano, um por um. (1) O mapfile < <(resolve-manifest) || ABORTADO nunca abortava: o || lia o rc do mapfile; mutante devolvendo o padrão velho faz o bloco do adopt.md chegar à extração com N=0 e rc=0. A cura é a função onion_load_manifest (load-manifest.sh), nos dois sítios. E o caso role-cut (i) aprovava o padrão quebrado por STRING; foi reescrito. (2) O --role da adoção nova era decorativo; dogfood: --role standalone sai com stamp standalone e 684 arquivos contra 791 do adopted (adopt, federation-member, marketplace e create-agent ausentes). (3) --update e --promote-hub vão a chore/onion-update-<pin> e chore/onion-promote-hub pelo dedicated-branch.sh, em worktree irmã com farol vivo; dogfood: a main não andou e o checkout da outra sessão seguiu em main. O durable-commit ganhou ONION_DURABLE_VERIFY=1 e o --promote-hub virou script (promote-hub.sh). (4) offer-onion-ci aceita worktree e exige a raiz. (5) materialize-door chama write-stamp --kind door; door-seal-pin lê source_commit com fallback ao onion_version das portas já publicadas. RESÍDUOS MEDIDOS, não curados aqui: o bundle adopted de origin/main nasce com 1 HARD (rules/dissect-lens.md, papel/SEM-OBJETO) e o standalone com 2 — com VERIFY=1 esse HARD pré-existente RECUSA o commit final do --update e do --promote-hub (medido no dogfood); a prosa admite --no-verify declarado no PR até a F2 curar o corte. E Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA."
+    trace: ".claude/utils/adopt/load-manifest.sh · .claude/utils/adopt/dedicated-branch.sh · .claude/utils/adopt/promote-hub.sh · .claude/commands/meta/adopt.md · ops/materialize-door.sh"
+    provenance:
+      source: "branch fix/adopt-robust-f1 (PR da F1, SAC-89): .claude/validation/lint-selftest.sh run_adopt_robust_selftests e as famílias door, door_seal_pin, role_cut, role_promotion"
+      locator: "casos adopt-robust (a1)(a2)(b1)(b2)(b3)(c1)-(c6)(d1)(e1), door (f2), door-seal-pin (l)(m), role-cut (i), role-promotion (a); resíduo R56 docs/evolution/review/fix-adopt-robust-f1.md"
+      method: "medição: bancada sob LC_ALL=C com um mutante por caso (cada um reprova) e dogfood executando os blocos do próprio adopt.md num sandbox em /tmp"
+
+  - id: Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    verified_at: "2026-10-09"
+    verified_against: "dogfood da F1: depois do commit durável da adoção, git status no sandbox mostrou .gitignore e .env.example como untracked (adoção standalone e adopted)"
+    label: "o commit durável da adoção deixa .gitignore e .env.example fora: a proteção de segredo que a adoção escreve no .gitignore não vira objeto git"
+    narrative: "Medido no dogfood da F1, não curado nela por escopo. ONION_PATHS do durable-commit.sh não inclui .gitignore nem .env.example, e os dois saem untracked. O .gitignore é onde o ensure-secret-gitignore.sh põe a proteção do .env; enquanto não for commitado, um git clean ou um clone novo a perde. A cura não é só acrescentar o caminho: o .gitignore é do adotante, e stajar o arquivo inteiro levaria junto edições dele não commitadas. Pede staging das linhas que o Onion escreveu, ou commit só quando o arquivo nasceu na adoção."
+    trace: ".claude/utils/adopt/durable-commit.sh · .claude/utils/adopt/ensure-secret-gitignore.sh"
+
 edges:
   # o dano é a evidência de que a lacuna existia
   - from: E_DANO_85_ARQUIVOS
@@ -271,3 +305,10 @@ edges:
   - from: Q_REGISTRAR_ONION_PLUGINS_NO_MEMBERS
     to: E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS
     edge_type: DEPENDS_ON
+  # a F1 entrega a parte da matriz que é adoção (papel percorre, carimbo único da porta)
+  - from: E_ADOCAO_ROBUSTA_F1
+    to: D_MATRIZ_DE_PORTAS_2026_10
+    edge_type: SUPPORTS
+  - from: Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA
+    to: E_ADOCAO_ROBUSTA_F1
+    edge_type: CONSTRAINS
