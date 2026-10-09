@@ -54,6 +54,10 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
     nó numa linha por regra e aplica dev-historia (PROD→DEV), manter-prod-medido (provenance medida + verified_at
     do --verified-at), reescrever-source e corrigir-method-locality (provenance com a locality do juiz; `(inalterado)`
     mantém o valor atual; caminho absoluto de arquivo na source final é recusado). Ver apply_judged_o4.
+  · ONDA O5 (2026-10-09, SAC-73): o5-juiz.csv, mesmo formato da O4 com campo `*_final` VAZIO = inalterado, aplica
+    reescrever-locator-method, manter-prod-binario (fica PROD), manter-dev-binario (fica DEV, plano nunca muda) e
+    dev-sem-versao (PROD→DEV); caminho de máquina (absoluto ou ~/) que sobre em source, locator OU method finais
+    recusa a linha inteira. Ver _o5_row.
   · COM --locality (contrato v4.2, 2026-10-09, SAC-97): só ACRESCENTA `provenance.locality` (repo|web|host|
     pessoa) às provenances em bloco que ainda não a têm, quando o `source` a determina pela regra de locality_of
     (ver o bloco "provenance.locality" abaixo); sem certeza, o nó fica sem a chave e sai na contagem. Prova, por
@@ -454,10 +458,11 @@ def _set_field(block, key, old, new):
     return block, False, None
 
 
-def _put_provenance(block, src, loc, method, lroot=None, locality=None):
+def _put_provenance(block, src, loc, method, lroot=None, locality=None, derive=True):
     """Escreve o bloco provenance (ou substitui o existente, no mesmo lugar), com a locality quando o source a
-    determina (contrato v4.2) ou, na O4, a que o juiz escreveu (`locality`). (bloco, mudou?)."""
-    loc_val = locality or locality_of(src, lroot)
+    determina (contrato v4.2) ou, na O4, a que o juiz escreveu (`locality`). derive=False (O5): sem locality do juiz
+    e sem locality atual, o nó continua sem a chave (campo vazio = inalterado). (bloco, mudou?)."""
+    loc_val = locality or (locality_of(src, lroot) if derive else None)
     new = ["    provenance:", "      source: " + q(src), "      locator: " + q(loc), "      method: " + q(method)] \
         + (["      locality: " + q(loc_val)] if loc_val else [])
     want = {"source": src, "locator": loc, "method": method}
@@ -634,8 +639,16 @@ def apply_judged(text, judged, promote=False, wave="", lroot=None):
 #   fluxo, dev-historia/manter sobre plane que não é PROD, manter sem --verified-at.
 O4_ACTIONS = ("dev-historia", "manter-prod-medido", "reescrever-source", "corrigir-method-locality")
 O4_KEEP = re.compile(r'^\(inalterad[oa]\)$')
+# ── onda O5 (2026-10-09, SAC-73): o5-juiz.csv, mesmo formato da O4, mas campo `*_final` VAZIO = inalterado ──────
+#   reescrever-locator-method → troca source/locator/method/locality pelos *_final (vazio mantém o atual);
+#   manter-prod-binario       → fica em PROD (plane tem de ser PROD) com a provenance dos *_final;
+#   manter-dev-binario        → fica em DEV (plane tem de ser DEV, nunca muda) com a provenance dos *_final;
+#   dev-sem-versao            → PROD→DEV (ou já DEV) com a provenance dos *_final.
+#   Recusa atômica por linha, além das da O4: CAMINHO DE MÁQUINA (absoluto de sistema ou ~/) que sobre em source,
+#   locator OU method finais (inclusive no valor mantido), e plano incompatível com a ação.
+O5_ACTIONS = ("reescrever-locator-method", "manter-prod-binario", "manter-dev-binario", "dev-sem-versao")
 # caminho de arquivo do host (não rota HTTP como /threads): raiz de sistema ou ~/
-ABS_FS_RE = re.compile(r'(?:^|[\s"\'(=,;\[])(?:~/|/(?:home|etc|var|usr|tmp|opt|root|srv|boot|run|proc|sys|mnt|lib|bin|sbin|dev|snap|media)(?:/|\b))')
+ABS_FS_RE = re.compile(r'(?:^|[\s"\'(=,;\[`:])(?:~/|/(?:home|etc|var|usr|tmp|opt|root|srv|boot|run|proc|sys|mnt|lib|bin|sbin|dev|snap|media)(?:/|\b))')
 
 
 def _get_provenance(block):
@@ -667,9 +680,54 @@ def _put_scalar(block, key, value):
     return block[:n] + [f"    {key}: " + q(value) + tail] + block[n + 1:], True
 
 
+def _o5_row(block, r):
+    """Aplica UMA linha da O5 ao bloco (campo vazio = inalterado). (bloco, chave do relatório ou None, recusa ou None)."""
+    act = r["proposta_final"].strip()
+    cur = _get_provenance(block)
+    if cur is False:
+        return block, False, "provenance em forma de fluxo"
+    cur = cur or {}
+    fin = {}
+    for k in ("source", "locator", "method", "locality"):
+        v = (r.get(k + "_final") or "").strip()
+        fin[k] = v if v else cur.get(k)
+    src, loc, method, locality = fin["source"], fin["locator"], fin["method"], fin["locality"]
+    if not all(isinstance(x, str) and x for x in (src, loc, method)):
+        return block, False, "source/locator/method vazio (nem final nem atual)"
+    if not re.match(r'^(' + "|".join(METHOD_CLASSES) + r'): \S', method):
+        return block, False, "method fora das classes do contrato"
+    if locality is not None and locality not in LOCALITIES:
+        return block, False, f"locality fora do contrato ({locality or 'vazia'})"
+    for k, v in (("source", src), ("locator", loc), ("method", method)):
+        if ABS_FS_RE.search(v):
+            return block, False, f"caminho de máquina no {k} final"
+    _, plane = _get_scalar(block, "plane")
+    key = None
+    if act == "manter-prod-binario" and plane != "PROD":
+        return block, False, f"manter-prod-binario sobre plane {plane}"
+    if act == "manter-dev-binario" and plane != "DEV":
+        return block, False, f"manter-dev-binario sobre plane {plane}"
+    if act == "dev-sem-versao":
+        if plane == "PROD":
+            block, changed, _ = _set_field(block, "plane", "PROD", "DEV")
+            if not changed:
+                return block, False, "dev-sem-versao: plane PROD que não sei editar por linha"
+            key = "plane"
+        elif plane != "DEV":
+            return block, False, f"dev-sem-versao sobre plane {plane}"
+    block, c = _put_provenance(block, src, loc, method, locality=locality, derive=False)
+    if c is None:
+        return block, False, "provenance em forma de fluxo"
+    if c and key is None:
+        key = "prov"
+    return block, key, None
+
+
 def _o4_row(block, r, verified_at):
     """Aplica UMA linha da O4 ao bloco. (bloco, chave do relatório ou None, motivo da recusa ou None)."""
     act = r["proposta_final"].strip()
+    if act in O5_ACTIONS:
+        return _o5_row(block, r)
     if act == "dev-historia":
         block, changed, cur = _set_field(block, "plane", "PROD", "DEV")
         if changed:
@@ -742,7 +800,7 @@ def apply_judged_o4(text, judged, verified_at=None):
             tag = f"{nid} [regra {r['regra']}]"
             if verdict not in JUDGED_OK:
                 rep["rejected"].append(f"{tag} ({verdict})"); continue
-            if act not in O4_ACTIONS:
+            if act not in O4_ACTIONS + O5_ACTIONS:
                 rep["sealed"].append(f"{tag} ({act})"); continue
             before = list(block)
             block, key, refused = _o4_row(block, r, verified_at)
@@ -989,9 +1047,9 @@ def main_judged_o4(files, judged, check, verified_at=None):
         verb = ("PENDENTE" if check else "aplicado") if changed else "nada a aplicar"
         print(f"{f}: {verb} · nós julgados {len(rows)} · PROD→DEV {len(rep['plane'])} · provenance escrita {len(rep['prov'])}"
               f" · só verified_at {len(rep['verified'])} · já aplicado {len(rep['same'])} · REPROVADO (intocado) {len(rep['rejected'])}"
-              f" · fora das ações O4 (intocado) {len(rep['sealed'])} · recusado {len(rep['refused'])} · ausente do grafo {len(rep['missing'])}")
+              f" · fora das ações O4/O5 (intocado) {len(rep['sealed'])} · recusado {len(rep['refused'])} · ausente do grafo {len(rep['missing'])}")
         for k, title in (("plane", "PROD→DEV"), ("prov", "provenance escrita"), ("verified", "verified_at atualizado"),
-                         ("rejected", "REPROVADO pelo juiz (intocado)"), ("sealed", "FORA DAS AÇÕES O4 (intocado)"),
+                         ("rejected", "REPROVADO pelo juiz (intocado)"), ("sealed", "FORA DAS AÇÕES O4/O5 (intocado)"),
                          ("refused", "RECUSADO (intocado)"), ("missing", "AUSENTE DO GRAFO")):
             if rep[k]:
                 print(f"  {title}: " + ", ".join(rep[k]))

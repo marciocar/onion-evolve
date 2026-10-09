@@ -24483,6 +24483,67 @@ assert all(x["verified_at"]=="2026-09-01" for x in n.values() if "verified_at" i
      && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --apply-judged "${cn}" "${gn}" >/dev/null 2>&1; then
     record_pass "kg-migrate-v3: (n) onda O4 reescrever-source/corrigir-method-locality: locality do juiz (não a deduzida), (inalterado) copia o atual, nó em duas regras recebe as duas, caminho absoluto na source final recusa a linha (rota HTTP não), locality fora do contrato e (inalterado) sem provenance recusados; 2ª passada no-op"
   else record_fail "kg-migrate-v3: (n)" "onda O4 ignorou a locality do juiz, deixou caminho absoluto ou não é idempotente: rc=${rc} ${out} ${y}"; fi
+  # (o) onda O5 (SAC-73, 2026-10-09), o5-juiz.csv: campo `*_final` VAZIO = inalterado. reescrever-locator-method
+  #     troca só o que a linha traz; manter-prod-binario fica em PROD com `locality: web`; manter-dev-binario fica em
+  #     DEV e NUNCA muda o plano (sobre PROD é recusado, nó intocado); dev-sem-versao leva PROD→DEV com a provenance;
+  #     caminho de máquina que SOBRE em source, locator ou method finais (inclusive `~/` e o valor mantido) recusa a
+  #     linha inteira; REPROVADO e ao-maestro-P4 ficam intocados; 2ª passada no-op. Mutantes que este caso reprova:
+  #     manter-dev-binario sem a checagem de plano, locality do juiz ignorada (web não aplicado) e a guarda de
+  #     caminho de máquina só na source.
+  local go="${d}/docs/x/o.kg.yaml" co="${d}/o5-o.csv"
+  {
+    printf 'meta:\n  id: o\n  schema_version: "1"\n  baseline: "2026-10-09"\nnodes:\n'
+    _kmv_o5() { printf '  - id: %s\n    node_type: evidence\n    plane: %s\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_at: "2026-09-01"\n    verified_against: "x"\n    label: "%s"\n    provenance:\n      source: "binário do Claude Code 2.1.258 (host)"\n      locator: "%s"\n      method: "%s"\n      locality: "host"\n' "$1" "$2" "$1" "$3" "$4"; }
+    _kmv_o5 E_O_REESC DEV "grep em /home/x/repo l.3" "leitura: README"
+    _kmv_o5 E_O_PRODBIN PROD "re.finditer em /tmp/bin" "derivado: x"
+    _kmv_o5 E_O_DEVBIN DEV "offset 12" "derivado: x"
+    _kmv_o5 E_O_DEVBIN_PROD PROD "offset 13" "derivado: x"
+    _kmv_o5 E_O_SEMVER PROD "offset 14" "derivado: x"
+    _kmv_o5 E_O_TIL DEV "grep em /home/x/repo l.4" "leitura: README"
+    _kmv_o5 E_O_SOBRA DEV "grep em /home/x/repo l.5" "leitura: README de /home/x/repo"
+    _kmv_o5 E_O_REPROV DEV "receita env -i HOME=/home/x" "leitura: x"
+    _kmv_o5 E_O_P4 DEV "citação de ~/.claude.json" "leitura: x"
+    _kmv_o5 E_O_HIST PROD "offset 15" "testemunho: sessão"
+  } > "${go}"
+  {
+    printf 'id,grafo,regra,proposta_original,veredito,proposta_final,source_final,locator_final,method_final,locality_final,motivo,confianca\n'
+    printf 'E_O_REESC,docs/x/o.kg.yaml,1,reescrever-locator-method,APROVADO,reescrever-locator-method,,grep em <clone do repo> l.3,,,abs,0.9\n'
+    printf 'E_O_PRODBIN,docs/x/o.kg.yaml,2,manter-prod-binario,APROVADO,manter-prod-binario,binário do Claude Code 2.1.258,re.finditer sobre os bytes,medição: re.finditer sobre o binário 2.1.258,web,bin,0.9\n'
+    printf 'E_O_DEVBIN,docs/x/o.kg.yaml,2,manter-prod-binario,CORRIGIDO,manter-dev-binario,binário do Claude Code 2.1.259,,,web,D1,0.8\n'
+    printf 'E_O_DEVBIN_PROD,docs/x/o.kg.yaml,2,manter-prod-binario,CORRIGIDO,manter-dev-binario,binário do Claude Code 2.1.259,,,web,D1,0.8\n'
+    printf 'E_O_SEMVER,docs/x/o.kg.yaml,2,dev-sem-versao,APROVADO,dev-sem-versao,binário do Claude Code 2.1.286,,,web,sem comando,0.8\n'
+    printf 'E_O_TIL,docs/x/o.kg.yaml,1,reescrever-locator-method,APROVADO,reescrever-locator-method,,grep em ~/repo l.4,,,abs,0.9\n'
+    printf 'E_O_SOBRA,docs/x/o.kg.yaml,1,reescrever-locator-method,APROVADO,reescrever-locator-method,,grep em <clone> l.5,,,abs,0.9\n'
+    printf 'E_O_REPROV,docs/x/o.kg.yaml,1,reescrever-locator-method,REPROVADO,ao-maestro-P4,,env -i,,,receita,0.9\n'
+    printf 'E_O_P4,docs/x/o.kg.yaml,1,excluir,CORRIGIDO,ao-maestro-P4,,,,,citação,0.9\n'
+    printf 'E_O_HIST,docs/x/o.kg.yaml,3,dev-historia,APROVADO,dev-historia,,,,,cascata,0.9\n'
+  } > "${co}"
+  local o_before; o_before="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${go}" 2>&1)" || true
+  if out="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --apply-judged "${co}" "${go}" 2>&1)"; then rc=0; else rc=$?; fi
+  y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${go}" 2>&1)" || true
+  if [ "${rc}" -eq 0 ] \
+     && python3 -I -B -c '
+import json,sys
+o={x["id"]:x for x in json.loads(sys.argv[2])["nodes"]}
+n={x["id"]:x for x in json.loads(sys.argv[1])["nodes"]}
+src="binário do Claude Code 2.1.258 (host)"
+assert n["E_O_REESC"]["provenance"]=={"source":src,"locator":"grep em <clone do repo> l.3","method":"leitura: README","locality":"host"}, n["E_O_REESC"]
+assert n["E_O_PRODBIN"]["plane"]=="PROD" and n["E_O_PRODBIN"]["provenance"]=={"source":"binário do Claude Code 2.1.258","locator":"re.finditer sobre os bytes","method":"medição: re.finditer sobre o binário 2.1.258","locality":"web"}
+assert n["E_O_DEVBIN"]["plane"]=="DEV" and n["E_O_DEVBIN"]["provenance"]=={"source":"binário do Claude Code 2.1.259","locator":"offset 12","method":"derivado: x","locality":"web"}
+assert n["E_O_SEMVER"]["plane"]=="DEV" and n["E_O_SEMVER"]["provenance"]["source"]=="binário do Claude Code 2.1.286" and n["E_O_SEMVER"]["provenance"]["locality"]=="web"
+assert n["E_O_HIST"]["plane"]=="DEV" and n["E_O_HIST"]["provenance"]==o["E_O_HIST"]["provenance"]
+for k in ("E_O_DEVBIN_PROD","E_O_TIL","E_O_SOBRA","E_O_REPROV","E_O_P4"):
+    assert n[k]==o[k], k
+assert all(n[k]["status"]=="confirmed" for k in n)
+' "${y}" "${o_before}" 2>/dev/null \
+     && grep -q 'E_O_DEVBIN_PROD \[regra 2\] (manter-dev-binario sobre plane PROD)' <<< "${out}" \
+     && grep -q 'E_O_TIL \[regra 1\] (caminho de máquina no locator final)' <<< "${out}" \
+     && grep -q 'E_O_SOBRA \[regra 1\] (caminho de máquina no method final)' <<< "${out}" \
+     && grep -q 'E_O_REPROV \[regra 1\] (REPROVADO)' <<< "${out}" \
+     && grep -q 'E_O_P4 \[regra 1\] (ao-maestro-P4)' <<< "${out}" \
+     && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --apply-judged "${co}" "${go}" >/dev/null 2>&1; then
+    record_pass "kg-migrate-v3: (o) onda O5: campo vazio mantém o atual; manter-prod-binario fica em PROD e manter-dev-binario fica em DEV, ambos com locality web; manter-dev-binario sobre PROD recusado sem mudar o plano; dev-sem-versao PROD→DEV; caminho de máquina (~/ inclusive, e no valor mantido) recusa a linha; REPROVADO e ao-maestro-P4 intocados; 2ª passada no-op"
+  else record_fail "kg-migrate-v3: (o)" "onda O5 mudou o plano do manter-dev-binario, ignorou a locality web ou deixou caminho de máquina: rc=${rc} ${out} ${y}"; fi
   # (l) --locality (contrato v4.2, 2026-10-09, SAC-97): num repo git de verdade (a regra de `repo` confere a raiz
   #     e o sha com o git), cada classe sai do source; o sha que o git não conhece, a citação bibliográfica e a
   #     fonte já com locality ficam como estão; fonte mista vale a MENOS reverificável (repo + host → host); o YAML
