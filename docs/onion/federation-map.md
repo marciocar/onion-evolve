@@ -73,11 +73,11 @@ flowchart TD
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `6cc162f32d1c` |
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `c9eb2c40bc3b` |
 | onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
-| onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `685140eadd7d` |
+| onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `947e69ce069d` |
 | hub-operacoes-enterprise | hub | greenfield | hub, task-manager-integration, itsm | `cff9214c3b9a` |
 | brain-granaai | hub | brownfield | company-brain, clickup, pesquisa-primaria | `663fdbc5bdcc` |
 | vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `24118c5d7a97` |
-| onion-core | hub | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `8278fee79d1c` |
+| onion-core | hub | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `947e69ce069d` |
 | onion-codex | standalone | distilled | substrate-port, openai-codex, portability-proof, deterministic-guards | `n/a` |
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |
