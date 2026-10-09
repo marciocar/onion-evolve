@@ -27,6 +27,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "instancia unica: observado = beneficiario = proponente = aprovador = o maestro"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-01-telemetria-util-e-etica.md"
+      locator: "NOTE-01 l.28-31; NOTE-02 l.27-32; NOTE-00 l.36-37"
+      method: "leitura: notas irmãs da discussão"
   - id: C_COLLAPSE_DISSOLVES
     node_type: claim
     layer: audit
@@ -35,6 +39,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "o colapso DISSOLVE o risco de vigilancia (observado=beneficiario) -> intake seguro (N01)"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-01-telemetria-util-e-etica.md"
+      locator: "NOTE-01 l.26-37; NOTE-00 l.36-37"
+      method: "leitura: NOTE-01 (bossware) + síntese NOTE-00 achado 1"
   - id: C_COLLAPSE_CREATES
     node_type: claim
     layer: audit
@@ -43,6 +51,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "o MESMO colapso CRIA apofenia institucionalizada (propoe=aprova) -> exige refutador (N02)"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-02-reconhecimento-de-padroes.md"
+      locator: "NOTE-02 l.27-33 e l.83; NOTE-00 l.36-38"
+      method: "leitura: NOTE-02 + síntese NOTE-00 achado 1"
 
   # ---- a premissa compartilhada (o no-chave do radar cross-study) ----
   - id: C_TELEMETRY_VIABLE
@@ -69,6 +81,10 @@ nodes:
     confidence: 0.7
     status: confirmed
     label: "os sinais uteis sao de atrito/retrabalho (tool_decision reject, blocked_on_user, loops), nao de produtividade"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-00-sintese.md"
+      locator: "NOTE-00 l.39-41; NOTE-01 l.21 e l.69-70"
+      method: "leitura: síntese NOTE-00 achado 2 + NOTE-01"
 
   # ---- gate como superficie central ----
   - id: C_FATIGUE_IS_SECURITY
@@ -79,6 +95,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "fadiga de aprovacao e falha de SEGURANCA, nao de UX (rubber-stamping = supervisao performatica)"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-03-formas-de-comunicacao.md"
+      locator: "NOTE-03 l.64-70; NOTE-00 l.44-45"
+      method: "leitura: NOTE-03 seção Gates visuais"
   - id: C_GRAPH_CEILING
     node_type: claim
     layer: audit
@@ -87,6 +107,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "grafo node-link tem teto ~50 nos -> kg-console e modo de inspecao, nao workspace continuo"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-03-formas-de-comunicacao.md"
+      locator: "NOTE-03 l.58-62 (fonte citada l.116: kobourov NL-AM-TVCG18 / arXiv:2008.07944); NOTE-00 l.46"
+      method: "leitura: NOTE-03 bullet Grafo projetado"
 
   # ---- evidencia do dogfood real (N05) ----
   - id: E_DOGFOOD_STRUCTURE
@@ -97,6 +121,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "N05: telemetria real capturada — estrutura (tokens/tool_decision/spans) sim, conteudo fora por construcao, custo ~0"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-05-dogfood-telemetria.md"
+      locator: "NOTE-05 §Setup l.17-24 e §O que funcionou l.26-37"
+      method: "leitura: NOTE-05 registra setup reproduzível e captura (claude -p com CLAUDE_CODE_ENABLE_TELEMETRY=1 + sink OTLP)"
   - id: E_NOISY_SUBSTRATE
     node_type: evidence
     layer: audit
@@ -105,6 +133,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "N05: stream entrelacado com telemetria do app (prisma/bullmq/eventloop) — filtro de prefixo e passo-0"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-05-dogfood-telemetria.md"
+      locator: "NOTE-05 Achado B l.47-52"
+      method: "leitura: NOTE-05 Achado B"
   - id: E_INTERACTIVE_ONLY
     node_type: evidence
     layer: audit
@@ -113,6 +145,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "N05: blocked_on_user flatlina em headless — fadiga de gate so e mensuravel com humano no loop (interativo)"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-05-dogfood-telemetria.md"
+      locator: "NOTE-05 Achado A l.41-45"
+      method: "leitura: NOTE-05 Achado A"
   - id: E_AUTOMODE_GATE
     node_type: evidence
     layer: audit
@@ -121,6 +157,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "N05: o gate de auto-mode barrou bypassPermissions no meio do experimento — exemplo vivo da tese"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-05-dogfood-telemetria.md"
+      locator: "NOTE-05 §O bônus meta l.62-68"
+      method: "leitura: NOTE-05 registra o dogfood de 2026-07-12"
 
   # ---- a fronteira honesta ----
   - id: Q_PATTERN_UNPROVEN
@@ -219,6 +259,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "estudo camadas de liberacao (authorization-layers) — a espinha intake x execucao, ja no core"
+    provenance:
+      source: "docs/knowledge-base/concepts/authorization-layers-intake-vs-execution.md"
+      locator: "frontmatter l.1-6 + tabela de metadados l.17 (Versão 1.0.0); citada em NOTE-04 l.9, l.15, l.72"
+      method: "leitura: KB do estudo no core"
   - id: ENT_BEHAVIOR_STAR
     node_type: entity
     layer: audit
@@ -245,6 +289,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "N≥3 prova o LOOP observa recorrencia (leg-1); validar os invariantes exige INTERVIR+re-medir (leg-2, estudo maior) — nao confundir; leg-1 OK nao promove os R_*"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-06-preregistro-n3.md"
+      locator: "NOTE-06 §1 l.24-28 e l.62, l.86-87"
+      method: "leitura: pré-registro NOTE-06 §1"
   - id: E_PREREGISTRO
     node_type: evidence
     layer: audit
@@ -253,6 +301,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "pré-registro N≥3 declarado (NOTE-06): sinais fixados, descoberta!=confirmacao (N>=4), filtro-de-prefixo passo-0, vies intra-orbita declarado — anti-HARKing"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-06-preregistro-n3.md"
+      locator: "NOTE-06 l.12-15, §2 l.30-47, §5 l.70-76"
+      method: "leitura: o próprio pré-registro NOTE-06"
 edges:
   # a tese e seus apoios
   - from: E_AUTOMODE_GATE

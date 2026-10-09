@@ -171,6 +171,10 @@ nodes:
     verified_against: 'lens-sota (iii) com justificativas datadas (Brave free tier fev/2026; Deep Research o3->GPT-5.2 fev/2026; Tavily fev/2026 + Exa mai/2026; WANDR jul + DREAM fev; bi-temporal Zep jan/2025 canonico) + lens-market secao 7 (Radar abril/novembro; Forrester outubro; SO Survey anual)'
     label: 'PROPOSTA MEDIDA: revisita por tipo — versao de ferramenta/preco de API 30d; lineup de modelos 45d (= REGRA 65 hoje); mercado/capital 90d; benchmark/empirico 120d; doutrina/padrao arquitetural 12m ou gatilho nomeado. Roster de fontes por cadencia: SEMANAL anthropic.com/engineering + changelog (gatilho de re-medicao), cursor.com/blog, TechCrunch/CNBC por M&A, HN Algolia por trajetoria; MENSAL State of AI newsletter, a16z, YC RFS; TRIMESTRAL Thoughtworks Radar (maior densidade por palavra), Menlo, Gartner Hype Cycles, batch YC; ANUAL SO Survey, State of AI Report, Forrester (outubro).'
     trace: 'docs/evolution/research/meta-research-lens-2026-09/data/ext-market-capital.md'
+    provenance:
+      source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-sota-deep-research-kg-temporal.md"
+      locator: "data/ext-sota-deep-research-kg-temporal.md:62-69 (§(iii) Periodicidade por tipo) + data/ext-market-capital.md:58-59 (§7 Fontes que valem rotina); espelho em SYNTHESIS.md:69-72"
+      method: "leitura: relatórios das lentes lens-sota (iii) e lens-market §7 gravados em data/ da pesquisa 2026-09-02"
 
   # ── MERCADO / CAPITAL ──────────────────────────────────────────────────────────────────
   - id: E_INSTITUCIONAIS_CONVERGEM_PARA_A_TESE_DO_ONION
@@ -289,6 +293,10 @@ nodes:
     verified_against: 'derivada de E_CAPITAL_CONCENTRA_EM_VERIFICACAO_E_MEMORIA_TEMPORAL + E_INSTITUCIONAIS_CONVERGEM_PARA_A_TESE_DO_ONION + adopt.md:26-29 + elenxo-doctrine.md:79'
     label: 'TESE: a clausula "nao inventar a roda, mas nao abandonar ideias por comodismo/hype" ja tem regua na casa (igual->transfere / diferente->desenha, presa ao /meta:adopt) e ganha o eixo de capital como teste: VIROU FEATURE DE OUTRO -> integrar (observabilidade, orquestracao, sandbox, scaffolding de spec, certificacao); ESCASSO -> construir (verificacao, memoria temporal, governanca auditavel). Toda ideia descartada responde "por evidencia ou por comodismo?" e a resposta vira no CONSTRAINS/REFUTES — o Elenxo ja refuta o que EU afirmo; falta refutar o que EU descarto.'
     trace: 'docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md"
+      locator: "SYNTHESIS.md §Não reinventar · não abandonar (o teste do capital), l.88-96; .claude/commands/meta/adopt.md:24-27 (régua igual→transfere/diferente→desenha); data/int-inventario.md:13 (item 6, PARCIAL)"
+      method: "derivado: E_CAPITAL_CONCENTRA_EM_VERIFICACAO_E_MEMORIA_TEMPORAL + E_INSTITUCIONAIS_CONVERGEM_PARA_A_TESE_DO_ONION + régua do adopt.md + inventário interno"
 
   # ── DECISÕES (plano de execução — nascem open; o maestro sela) ─────────────────────────
   - id: D_F1_FUNDACAO_FRAGMENTO_CAMPOS_GUARDAS_CORPUS

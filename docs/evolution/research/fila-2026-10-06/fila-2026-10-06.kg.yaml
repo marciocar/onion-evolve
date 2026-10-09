@@ -364,6 +364,10 @@ nodes:
     verified_at: 2026-10-08
     verified_against: "sinal 2026-10-08-onion-brain-mcp do brain-granaai: artefato do claude.ai com chat (sample) não executa o radar; MCP host: só serve ao dono da máquina; o business-context (~570 KB) não cabe num prompt"
     label: "um hub precisa que o time não técnico consulte o Company Brain com o veredito do Onion fora do Claude Code, e hoje o paliativo é um segundo leitor do corpus em JS"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-08-onion-brain-mcp.md"
+      locator: "§O que aconteceu no campo + §O pedido"
+      method: "leitura: sinal do adotante brain-granaai"
   - id: Q_ONION_BRAIN_MCP
     node_type: question
     layer: audit

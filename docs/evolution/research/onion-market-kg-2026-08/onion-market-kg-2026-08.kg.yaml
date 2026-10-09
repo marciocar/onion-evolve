@@ -460,13 +460,17 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'gh search repos + API do GitHub em 2026-08-28: chaitanyagiri/munder-difflin, 5219 estrelas, 629 forks, 185 PRs fechados, criado 2026-05-31; trendshift.io (fonte terceira) para o historico de ranking'
     label: 'HARNESS ADJACENTE REAL, medido na API e no codigo — nao na landing page. Electron+React que EMPACOTA CLIs de agente (cada clone e um pty rodando o CLI que voce ja paga; nao reimplementa agente nenhum). Comunicacao entre clones e ARQUIVO LOCAL: outbox -> rename atomico -> inbox, tudo num repo git local. 12 providers CONTADOS em src/shared/agentProvider.ts — o numero bate. Comunidade real: PRs de externos identificaveis, nao repo de vitrine. 3 meses de idade para 5.2k estrelas'
+    provenance:
+      source: "docs/evolution/review/research-adjacent-harness-munder-difflin.md ; src/shared/agentProvider.ts (HarnessMD/munder-difflin)"
+      locator: "resíduo l.21-22 (achado 1: 5.219★/629 forks/185 PRs/criado 31/05/2026, PRs de externos) + l.25 (achado 3: 12 providers); agentProvider.ts l.24-37"
+      method: "leitura: resíduo R56 (medição de 2026-08-28 registrada) + código externo via gh api"
 
   - id: E_MD_PICO_APRESENTADO_COMO_REGUA
     node_type: evidence
     plane: PROD
     impact: 3
     confidence: 0.95
-    status: confirmed
+    status: unverifiable
     verified_at: 2026-08-28
     verified_against: 'trendshift.io: #1 em 18/08/2026; em 25/08 ja era #8 de JavaScript e #18 na semana 34'
     label: 'BARULHO NOMEADO: o badge "GitHub Trending #1 Repository of the Day" e um PICO DE UM DIA (18/08) exibido sem data. Uma semana depois ja era #8/#18. Hype nao e retencao — e apresentar o melhor dia como se fosse a regua permanente e a forma mais barata de inflar tracao. Vale como contra-exemplo para a nossa propria comunicacao: numero de vitrine sem carimbo de data envelhece mentindo'
@@ -480,6 +484,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'varredura de 55 arquivos de src/main + 33 de src/shared: package.json SEM nenhuma lib de cripto (nem tweetnacl/libsodium/@noble); nenhum relay.ts/sync.ts/network.ts/e2e.ts; integrationBroker.ts so usa randomBytes/timingSafeEqual'
     label: 'O ACHADO MAIS UTIL PARA NOS, e ele e de METODO: a landing declara criptografia clone-a-clone "X25519/AES-256-GCM, publicamente auditavel no GitHub" — e a implementacao NAO FOI ENCONTRADA no repo MIT. Isto NAO prova ausencia (node:crypto nativo faz X25519 sem dependencia, e o recurso e do tier PAGO, cujo relay plausivelmente vive no SaaS fechado). O que cai e a palavra AUDITAVEL: se o codigo que sustenta a claim nao esta na superficie publica, "publicamente auditavel" nao se sustenta. Segue OPEN: nao afirmamos ausencia, afirmamos NAO-VERIFICADO. GATILHO para fechar: alguem apontar o arquivo, ou o proprio projeto declarar que o relay e fechado'
+    provenance:
+      source: "github.com/HarnessMD/munder-difflin (ex chaitanyagiri/munder-difflin) package.json ; docs/evolution/review/research-adjacent-harness-munder-difflin.md achado 5"
+      locator: "gh api repos/HarnessMD/munder-difflin/contents/package.json | grep -c noble|libsodium|tweetnacl"
+      method: "medição: gh api contents/package.json + grep de libs de cripto"
 
   - id: C_MD_LUDICIDADE_E_FUNCAO_SO_EM_UM_LUGAR
     node_type: claim
@@ -490,6 +498,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'leitura de HIVE.md + closingTime.ts (roteamento e shutdown sao orquestracao de arquivo, sem chamada de modelo) + PR automatizado #365 "wall: 2 new Founding Supporter(s)" no repo'
     label: 'SEPARADA A LUDICIDADE ENTRE ENFEITE E FUNCAO. Enfeite: o chao de escritorio em Pixi.js e skin sobre um dashboard — a funcao real embutida e observability (quem esta ocioso/trabalhando/esperando aprovacao), que uma tabela entregaria igual. FUNCAO de verdade: (a) nomear o orquestrador ("Michael") da ponto unico de escalonamento, reduzindo carga cognitiva; (b) a "Founders Wall" (US$20 unico) NAO e badge — e LEDGER PUBLICO commitado no git, alimentado por PR automatizado: prova social que qualquer um AUDITA no historico, em vez de numero declarado. ATRAPALHA: "clone" promete fidelidade que um wrapper de LLM nao tem — e a propria engenharia deles contradiz, exigindo escalonamento humano para gasto e destrutivo'
+    provenance:
+      source: "github.com/HarnessMD/munder-difflin: HIVE.md, src/main/closingTime.ts, PR #365"
+      locator: "PR #365 \"wall: 2 new Founding Supporter(s)\" (MERGED, autor app/github-actions); HIVE.md l.37"
+      method: "leitura: arquivos e PR do repo externo via gh api"
 
   - id: E_MD_DETERMINISMO_VALE_SO_PARA_O_ESQUELETO
     node_type: evidence
@@ -500,6 +512,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'HIVE.md ("Everything the hive knows is files in one local git repo") + closingTime.ts sem chamada de API; e o GOD orchestrator e um processo Claude Code comum'
     label: 'A CLAIM "deterministico e sem tokens" e VERDADE PELA METADE, e a metade que falta e a que custa. Roteamento de mensagem e animacao sao mesmo deterministicos e gratuitos. Mas o JULGAMENTO do orquestrador (decidir rotina vs escalar) e uma sessao de LLM cobrada como qualquer outra. A comunicacao deles nao separa as duas coisas — e essa e a licao direta para a NOSSA doc: dizer explicitamente ONDE o token e gasto, em vez de deixar o leitor inferir do adjetivo'
+    provenance:
+      source: "github.com/HarnessMD/munder-difflin: HIVE.md, src/main/closingTime.ts, README.md ; docs/evolution/review/research-adjacent-harness-munder-difflin.md"
+      locator: "HIVE.md l.36-37; closingTime.ts (0 anthropic/openai/fetch); README l.124 e l.152 (o GOD agent \"adjudicates\" e \"resolves routine ones itself, escalates critical\"); resíduo achado 4 l.26-27"
+      method: "leitura: arquivos do repo externo via gh api + resíduo R56"
 
   - id: D_MD_O_QUE_SERVE_E_O_QUE_NAO_SERVE
     node_type: decision
@@ -511,6 +527,10 @@ nodes:
     trace: "docs/evolution/research/onion-market-kg-2026-08/onion-market-kg-2026-08.kg.yaml"
     verified_against: 'mapeamento completo de 2026-08-28 (codigo + API + landing), com fato/barulho/nao-verificavel separados por item'
     label: 'O QUE VIRA EXEMPLO NUMA APRESENTACAO DO ONION: (1) ledger publico como prova social AUDITAVEL — ecoa behavior-over-declaration vindo de fora; (2) blog tecnico de 30+ posts sobre bugs reais = dogfood publicado virando canal de aquisicao; (3) linha comercial limpa por ESCOPO (uma maquina gratis para sempre; time distribuido e o produto pago); (4) o contra-exemplo mais forte: declarar "auditavel"/"deterministico" sem apontar o arquivo. O QUE NAO VIRA, porque a comparacao seria DESONESTA: eles sao multi-provider POR DESENHO (12 CLIs, nunca se acoplar) e nos apostamos no ACOPLAMENTO SELETIVO pelo exit 2 de hook — teses OPOSTAS e ambas defensaveis, competir em "quem tem mais providers" e comparar eixos diferentes; e o escopo (eles fazem execucao tecnica, nos cobrimos tres dimensoes peer) e categoria distinta, nao vitoria'
+    provenance:
+      source: "docs/evolution/review/research-adjacent-harness-munder-difflin.md ; src/shared/agentProvider.ts (HarnessMD/munder-difflin)"
+      locator: "resíduo l.37-39 (§Disciplinas: \"Nada de vitória competitiva ... multi-provider por desenho, nós apostamos no acoplamento seletivo\"); agentProvider.ts l.24-37 (12 providers + custom)"
+      method: "leitura: resíduo R56 do mapeamento + código externo via gh api"
 
 edges:
   - from: C_tese_texto_vs_script

@@ -133,6 +133,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: fixture-vs-repo-do-adotante
     label: "Reproduzimos a CLASSE (conflito contabil em codigo de aplicacao por vendor branch-especifico), NAO os 110 arquivos. O volume depende da divergencia real do repo do adotante e nao foi medido la. Nao afirmar igualdade"
+    provenance:
+      source: "docs/analysis/onion-adr-vendor-multi-integration-branch-2026-07.md"
+      locator: "l.102 (\"Não reproduzimos os 110 arquivos do adotante — reproduzimos a classe\")"
+      method: "leitura: ADR da base cruzada multi-branch"
 
   - id: C_warn_is_not_a_stop
     node_type: claim
@@ -175,6 +179,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — Lido o nó inteiro (label/trace) + o edge DEPENDS_ON→C_field_report. CONTADAS as claims do '
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A pergunta "o volume real (110 arquivos) foi medido no repo do adotante?" foi respondida — com "não foi, e não precisou ser". No mesmo dia (2026-07-27), o próprio update na branch develop do <hub-t1> (o cenário exato do incidente) completou com 0 arquivos de app tocados (commit d8434efc), e a mensag'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-27-desfecho-receita-develop-warn-falso-positivo.md"
+      locator: "l.6 (assunto: merge limpo, framework-only), l.30-40 (tabela: apps 0, produto 0, diferente dos 110 conflitos), l.60 (commits 030404a5 merge + d8434efc stamp)"
+      method: "leitura: sinal de desfecho do adotante (2026-07-27)"
 
 edges:
   - from: E_reproduction_3_tries

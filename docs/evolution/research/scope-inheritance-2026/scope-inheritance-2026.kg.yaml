@@ -22,6 +22,10 @@ nodes:
     status: confirmed
     label: "Veredito: mecanismo HÍBRIDO 3-plano (cascata cognitiva + merge N-camadas + SUPERSEDES conhecimento)"
     trace: "SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md"
+      locator: "rfc-0005-scope-inheritance-polymorphism.md:3,13 (status accepted) + :19-22 (§1 Decisão: mecanismo HÍBRIDO de três planos) + :26-30 (§2 tabela dos 3 planos)"
+      method: "leitura: RFC-0005 com status accepted (2026-07-09), decisão fundamentada na pesquisa scope-inheritance-2026 (commit a971f2f4, PR #308)"
   - id: D_BRANCHES_REJECTED
     node_type: decision
     plane: DEV
@@ -30,6 +34,10 @@ nodes:
     status: confirmed
     label: "Branches REJEITADAS como mecanismo de herança de escopo (antipadrão GitOps; herança precisa COMPOR)"
     trace: "SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md"
+      locator: "rfc-0005-scope-inheritance-polymorphism.md:3,13 (status accepted) + :21 (§1 'Branch-para-escopo é rejeitado') + :38-46 (§3 antipadrão GitOps; branch não COMPÕE)"
+      method: "leitura: RFC-0005 com status accepted (2026-07-09), decisão fundamentada na pesquisa scope-inheritance-2026 (commit a971f2f4, PR #308)"
   - id: D_CASCADE_SPINE
     node_type: decision
     plane: DEV
@@ -38,6 +46,10 @@ nodes:
     status: confirmed
     label: "Cascata-nativa do Claude Code = ESPINHA (managed>user>project>local + CLAUDE.md hierárquico)"
     trace: "SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md"
+      locator: "rfc-0005-scope-inheritance-polymorphism.md:3,13 (status accepted) + :28 (§2 plano Cognitivo: Cascata-NATIVA, managed>user>project>local + walk-up) + :36 (ranking: cascata-nativa primeiro)"
+      method: "leitura: RFC-0005 com status accepted (2026-07-09), decisão fundamentada na pesquisa scope-inheritance-2026 (commit a971f2f4, PR #308)"
   - id: D_MERGE_NLAYERS
     node_type: decision
     plane: DEV
@@ -46,6 +58,10 @@ nodes:
     status: confirmed
     label: "Merge N-camadas (overlay estilo Kustomize) p/ override estrutural — generaliza o vendor-branch"
     trace: "SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md"
+      locator: "rfc-0005-scope-inheritance-polymorphism.md:3,13 (status accepted) + :29 (§2 plano Configuração: Merge-N-camadas, generalizar vendor-branch 2→N, strategic-merge) + :32-33 (overlays como modelo de qualidade do merge)"
+      method: "leitura: RFC-0005 com status accepted (2026-07-09), decisão fundamentada na pesquisa scope-inheritance-2026 (commit a971f2f4, PR #308)"
   - id: D_SUPERSEDES_GATED
     node_type: decision
     plane: DEV
@@ -64,6 +80,10 @@ nodes:
     verified_at: 2026-07-17
     label: "git-scm/docs/git-config confirma literalmente os 5 escopos (system→global→local→worktree→command), '…"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:327 (§Verificação adversarial, linha H1-01)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H1_02
     node_type: claim
     plane: DEV
@@ -74,6 +94,10 @@ nodes:
     verified_at: 2026-07-17
     label: "code.claude.com/docs/en/settings confirma a precedência managed>CLI>local>project>user e 'Managed (h…"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:328 (§Verificação adversarial, linha H1-02)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H1_03
     node_type: claim
     plane: DEV
@@ -84,6 +108,10 @@ nodes:
     verified_at: 2026-07-17
     label: "code.claude.com/docs/en/memory + /large-codebases confirmam upward-traversal com concatenação ('All …"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:329 (§Verificação adversarial, linha H1-03)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H1_04
     node_type: claim
     plane: DEV
@@ -94,6 +122,10 @@ nodes:
     verified_at: 2026-07-17
     label: "O comportamento type-aware do strategic-merge (escalares substituem, mapas mergeiam, listas por merg…"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:330 (§Verificação adversarial, linha H1-04)"
+      method: "juízes: verificador adversarial do stream H1 registrou veredito confirmed com ressalva de atribuição (a primária re-buscada inlinePatch.md é magra; o type-aware repousa na secundária fabianlee + doc K8s SMP)"
   - id: C_H1_05
     node_type: claim
     plane: DEV
@@ -104,6 +136,10 @@ nodes:
     verified_at: 2026-07-17
     label: "components.md confirma components como blocos opt-in composáveis ('Each opt-in feature gets packaged…"
     trace: "roles.yaml"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:331 (§Verificação adversarial, linha H1-05)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H1_06
     node_type: claim
     plane: DEV
@@ -114,6 +150,10 @@ nodes:
     verified_at: 2026-07-17
     label: "octopus.com sustenta o antipadrão com as três razões: merge propaga mudança indesejada entre ambient…"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:332 (§Verificação adversarial, linha H1-06)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H1_07
     node_type: claim
     plane: DEV
@@ -124,6 +164,10 @@ nodes:
     verified_at: 2026-07-17
     label: "typescriptlang.org/tsconfig/extends confirma que // são overwrite (citação literal) e  mergeia por c…"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:333 (§Verificação adversarial, linha H1-07)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H1_08
     node_type: claim
     plane: DEV
@@ -134,6 +178,10 @@ nodes:
     verified_at: 2026-07-17
     label: "eslint.org/blog confirma o abandono da cascata por diretório em favor do array ordenado ('The only r…"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:334 (§Verificação adversarial, linha H1-08)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H1_09
     node_type: claim
     plane: DEV
@@ -144,6 +192,10 @@ nodes:
     verified_at: 2026-07-17
     label: "helm.sh confirma 'A parent chart can override values for subcharts' (push-down) e globals propagando…"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:335 (§Verificação adversarial, linha H1-09)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H1_10
     node_type: claim
     plane: DEV
@@ -154,6 +206,10 @@ nodes:
     verified_at: 2026-07-17
     label: "spec.editorconfig.org confirma busca upward parando em  ou raiz do FS, 'closer file are read last → …"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:336 (§Verificação adversarial, linha H1-10)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H1_11
     node_type: claim
     plane: DEV
@@ -164,6 +220,10 @@ nodes:
     verified_at: 2026-07-17
     label: "cosmiconfig README confirma literalmente 'Stops at the first configuration found, instead of finding…"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:337 (§Verificação adversarial, linha H1-11)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H1_12
     node_type: claim
     plane: DEV
@@ -174,6 +234,10 @@ nodes:
     verified_at: 2026-07-17
     label: "openpolicyagent.org/docs/management-bundles confirma  como namespace de ownership por prefixo de pat…"
     trace: "ver H1"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md"
+      locator: "H1-config-cascade-override.md:338 (§Verificação adversarial, linha H1-12)"
+      method: "juízes: verificador adversarial do stream H1 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H2_01
     node_type: claim
     plane: DEV
@@ -198,6 +262,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Verbatim: 'Later files override earlier ones for scalar values, arrays are concatenated and de-dupli…"
     trace: "ver H2"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+      locator: "H2-claude-code-native-layers.md:341 (§Verificação adversarial, linha H2-02)"
+      method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H2_04
     node_type: claim
     plane: DEV
@@ -222,6 +290,10 @@ nodes:
     verified_at: 2026-07-17
     label: "verbatim: 'Claude Code loads every CLAUDE.md file from your working directory and every parent direc…"
     trace: "ver H2"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+      locator: "H2-claude-code-native-layers.md:344 (§Verificação adversarial, linha H2-05)"
+      method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H2_06
     node_type: claim
     plane: DEV
@@ -232,6 +304,10 @@ nodes:
     verified_at: 2026-07-17
     label: "verbatim: 'maximum depth of four hops', 'Relative paths resolve relative to the file containing the …"
     trace: "ver H2"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+      locator: "H2-claude-code-native-layers.md:345 (§Verificação adversarial, linha H2-06)"
+      method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H2_07
     node_type: claim
     plane: DEV
@@ -242,6 +318,10 @@ nodes:
     verified_at: 2026-07-17
     label: "verbatim: 'Project settings in .claude/settings.json load only from your starting directory and are …"
     trace: "ver H2"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+      locator: "H2-claude-code-native-layers.md:346 (§Verificação adversarial, linha H2-07)"
+      method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H2_08
     node_type: claim
     plane: DEV
@@ -252,6 +332,10 @@ nodes:
     verified_at: 2026-07-17
     label: "verbatim: ordem de prioridade 1 Managed → 2  CLI (sessão) → 3  (projeto) → 4  (user) → 5 Plugin; 'Pr…"
     trace: "ver H2"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+      locator: "H2-claude-code-native-layers.md:347 (§Verificação adversarial, linha H2-08)"
+      method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H2_09
     node_type: claim
     plane: DEV
@@ -262,6 +346,10 @@ nodes:
     verified_at: 2026-07-17
     label: "verbatim:  glob frontmatter; 'User-level rules are loaded before project rules, giving project rules…"
     trace: "ver H2"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+      locator: "H2-claude-code-native-layers.md:348 (§Verificação adversarial, linha H2-09)"
+      method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H2_10
     node_type: claim
     plane: DEV
@@ -286,6 +374,10 @@ nodes:
     verified_at: 2026-07-17
     label: "verbatim confirma o all-or-nothing: 'if server-managed settings deliver any keys at all, other endpo…"
     trace: "ver H2"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+      locator: "H2-claude-code-native-layers.md:350 (§Verificação adversarial, linha H2-11)"
+      method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H2_12
     node_type: claim
     plane: DEV
@@ -296,6 +388,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Issue  acessível e vigente: plugins de org managed settings ( + ) 'do not auto-install in the CLI.."
     trace: "ver H2"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H2-claude-code-native-layers.md"
+      locator: "H2-claude-code-native-layers.md:351 (§Verificação adversarial, linha H2-12)"
+      method: "juízes: verificador adversarial do stream H2 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H2_13
     node_type: claim
     plane: DEV
@@ -320,6 +416,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Fonte oficial nx confirma a cascata 'inferred tasks < targetDefaults (nx.json) < project-level (proj…"
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:289 (§Verificação adversarial, linha H3-01)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_02
     node_type: claim
     plane: DEV
@@ -330,6 +430,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Discussion #33761 existe e é feature request aberta (post 2025-12-08, apoio 2026-03-09, sem implemen…"
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:290 (§Verificação adversarial, linha H3-02)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_03
     node_type: claim
     plane: DEV
@@ -340,6 +444,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Doc oficial confirma tags () +  +  que falham no lint com mensagem 'A project tagged with 'scope:adm…"
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:291 (§Verificação adversarial, linha H3-03)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_04
     node_type: claim
     plane: DEV
@@ -350,6 +458,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Doc oficial: 'The  plugin lets you define code ownership based on projects.."
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:292 (§Verificação adversarial, linha H3-04)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_05
     node_type: claim
     plane: DEV
@@ -360,6 +472,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Doc mise confirma recursão para cima ('These files recurse upwards.."
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:293 (§Verificação adversarial, linha H3-05)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_06
     node_type: claim
     plane: DEV
@@ -370,6 +486,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Fonte jdsalaro sustenta includeIf  por sub-árvore + last-wins ('the former's user section will be ov…"
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:294 (§Verificação adversarial, linha H3-06)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_07
     node_type: claim
     plane: DEV
@@ -380,6 +500,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Doc chezmoi confirma source-dir comum + templates que consomem dados locais + precedência  (built-in…"
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:295 (§Verificação adversarial, linha H3-07)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_08
     node_type: claim
     plane: DEV
@@ -390,6 +514,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Fonte confirma symlink farm/overlay reversível ('Unstow and restore original state') e o limite verb…"
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:296 (§Verificação adversarial, linha H3-08)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_09
     node_type: claim
     plane: DEV
@@ -400,6 +528,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Doc Renovate confirma  array ordenado + presets aninháveis + auto-extend de  do user/group/org pai (…"
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:297 (§Verificação adversarial, linha H3-09)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_10
     node_type: claim
     plane: DEV
@@ -410,6 +542,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Doc oficial confirma cascata managed > cli > local > project > user, locais de  (/etc/claude-code/, …"
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:298 (§Verificação adversarial, linha H3-10)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_12
     node_type: claim
     plane: DEV
@@ -420,6 +556,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Artigo de suporte confirma override de preferência de install por grupo ('override a plugin's organi…"
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:300 (§Verificação adversarial, linha H3-12)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H3_13
     node_type: claim
     plane: DEV
@@ -430,6 +570,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Changelog GitHub confirma required-reviewer rule GA em 2026-02-17, que 'augments CODEOWNERS files bu…"
     trace: "ver H3"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
+      locator: "H3-monorepo-team-person-versioning.md:301 (§Verificação adversarial, linha H3-13)"
+      method: "juízes: verificador adversarial do stream H3 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H4_F1
     node_type: claim
     plane: DEV
@@ -464,6 +608,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Verbatim no Model Spec (): cadeia Root>System>Developer>User>Guideline; 'Unlike user defaults that c…"
     trace: "ver H4"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+      locator: "H4-ai-mediated-inheritance.md:355 (§Verificação adversarial, linha H4·F3)"
+      method: "juízes: verificador adversarial do stream H4 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H4_F4
     node_type: claim
     plane: DEV
@@ -474,6 +622,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Claim e priority-hierarchy sustentados por múltiplas fontes 2026 (Anthropic, BISI, Forbes 22/jan/202…"
     trace: "ver H4"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+      locator: "H4-ai-mediated-inheritance.md:356 (§Verificação adversarial, linha H4·F4)"
+      method: "juízes: verificador adversarial do stream H4 registrou veredito confirmed por múltiplas fontes 2026 (Anthropic, BISI, Forbes); o fetch da URL primária citada devolveu outro conteúdo (ressalva de URL na nota)"
   - id: C_H4_F5
     node_type: claim
     plane: DEV
@@ -484,6 +636,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Verbatim na primária (Graphiti, getzep): 'Each fact … has a validity window: when it became true, an…"
     trace: "ver H4"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+      locator: "H4-ai-mediated-inheritance.md:357 (§Verificação adversarial, linha H4·F5)"
+      method: "juízes: verificador adversarial do stream H4 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H4_F6
     node_type: claim
     plane: DEV
@@ -508,6 +664,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Primária (spec MCP 2025-11-25) confirma as primitivas: Resources = 'Context and data, for the user o…"
     trace: "ver H4"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+      locator: "H4-ai-mediated-inheritance.md:359 (§Verificação adversarial, linha H4·F7)"
+      method: "juízes: verificador adversarial do stream H4 re-buscou a fonte primária e registrou veredito confirmed"
   - id: C_H4_F8
     node_type: claim
     plane: DEV
@@ -562,6 +722,10 @@ nodes:
     verified_at: 2026-07-17
     label: "a cifra ~63% NÃO aparece no abstract público do paper (arXiv:2404.13208) — mecanismo confirmado, número não-verificável"
     trace: "H4 §Verificação adversarial"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+      locator: "H4-ai-mediated-inheritance.md:354 (§Verificação adversarial, linha H4·F2)"
+      method: "juízes: verificador adversarial do stream H4 re-buscou a primária e marcou declarado≠verificado (a cifra ~63% não aparece no abstract do arXiv:2404.13208) na nota da linha H4·F2"
   - id: E_F8_CORR
     node_type: evidence
     plane: DEV
@@ -572,6 +736,10 @@ nodes:
     verified_at: 2026-07-17
     label: "a citação 'keep hierarchies shallow' é de BLOG secundário, não da página K8s oficial atribuída — base/overlay confirmado, atribuição errada"
     trace: "H4 §Verificação adversarial"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+      locator: "H4-ai-mediated-inheritance.md:360 (§Verificação adversarial, linha H4·F8)"
+      method: "juízes: verificador adversarial do stream H4 re-buscou a primária e marcou declarado≠verificado (a citação 'keep hierarchies shallow' é de blog secundário, não da página K8s) na nota da linha H4·F8"
   - id: E_F10_CORR
     node_type: evidence
     plane: DEV
@@ -582,6 +750,10 @@ nodes:
     verified_at: 2026-07-17
     label: "10.000 é o limite de valores do operador metadata $in, NÃO teto de namespaces/índice (doc atual: 'million-scale namespaces') — ESTATÍSTICA ERRADA"
     trace: "H4 §Verificação adversarial"
+    provenance:
+      source: "docs/evolution/research/scope-inheritance-2026/H4-ai-mediated-inheritance.md"
+      locator: "H4-ai-mediated-inheritance.md:362 (§Verificação adversarial, linha H4·F10)"
+      method: "juízes: verificador adversarial do stream H4 re-buscou a primária e marcou ESTATÍSTICA ERRADA (10.000 = limite do $in de metadata, não teto de namespaces) na nota da linha H4·F10"
 edges:
   - from: C_H1_01
     to: A_RESEARCH_SCOPE

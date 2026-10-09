@@ -211,6 +211,10 @@ nodes:
     verified_against: '913 sitios estaticos de record_* contra 1135 assercoes executadas na mesma arvore'
     trace: 'docs/onion/testing-inventory.md'
     label: "A DISTINCAO QUE O PAINEL VAI HERDAR: o que EXISTE e o que RODOU sao duas fontes, nao uma. Ha 913 sitios estaticos de `record_pass|record_fail|record_skip` contra 1135 assercoes efetivamente executadas — a diferenca sao sitios dentro de laco, que disparam N vezes. Publicar o estatico como `tamanho da bancada` trocaria uma defasagem por um ERRO DE CATEGORIA. Por isso a SSOT conta so o que existe e imprime `⊘ NAO MEDIDO` para o que rodou, ate a serie historica existir. E o terceiro desfecho da onda, aplicado ao proprio inventario."
+    provenance:
+      source: "git: 67cafc2b:docs/onion/testing-inventory.md"
+      locator: "67cafc2b:docs/onion/testing-inventory.md l.15 (913 sítios + comando grep -cE record_*), l.32 (⊘ NÃO MEDIDO), l.36 (distinção existe×rodou); diff do mesmo commit registra a bancada do dia com 1135 asserções executadas"
+      method: "medição: grep -cE '^\\s*(record_pass|record_fail|record_skip) ' .claude/validation/lint-selftest.sh"
 
   - id: E_A_MAQUINARIA_REPROVOU_A_PROPRIA_CURA
     node_type: evidence
@@ -327,6 +331,10 @@ nodes:
     verified_against: 'familia ci_evidence 9/9, incluindo o caso que assere que o WORKFLOW invoca o gerador'
     trace: 'ops/testing/selftest-summary.sh + .github/workflows/onion-selftest.yml'
     label: "ONDA 0.4 ENTREGUE — a saida da bancada e do lint viram ARTEFATO (`upload-artifact`, 30 dias) e SUMARIO (`$GITHUB_STEP_SUMMARY`) nos dois workflows de teste, com `if: always()` — a evidencia que importa e a do job que FALHOU; sem `always` o CI so guarda prova de sucesso. O gerador virou SCRIPT (`selftest-summary.sh`) e nao shell dentro do YAML, porque shell embutido em workflow e a UNICA peca do gate que nenhuma guarda exercita: nao roda local, nao entra na bancada, e so se descobre quebrada no dia em que alguem precisa dela. Como script, ganhou familia e a REGRA 59 (Modo que a producao consome e exercitado pela bancada) passa a vigiar a flag do wire-in."
+    provenance:
+      source: ".github/workflows/onion-selftest.yml + ops/testing/selftest-summary.sh"
+      locator: "bash .claude/validation/lint-selftest.sh --families ci_evidence (hoje 11 passaram, 0 falharam) + onion-selftest.yml l.152-166 (if: always() + selftest-summary.sh + upload-artifact@v4)"
+      method: "medição: bash .claude/validation/lint-selftest.sh --families ci_evidence"
 
   - id: E_O_SUMARIO_REPORTA_NAO_JULGA
     node_type: claim
@@ -383,6 +391,10 @@ nodes:
     verified_against: 'quatro instancias medidas: painel inventado, maintenance-checklist, verified_against de dois nos de agosto'
     trace: 'docs/onion/graph/testes-evidencia-2026-09.kg.yaml'
     label: "CLASSE, com QUATRO instancias medidas e nenhuma inventada. (1) `testing-validation-system.md` publicava `Coverage: 85% · Mutation: 74%` sem produtor — metas redesenhadas como medicao. (2) `maintenance-checklist.md` dizia a REGRA 59 (Modo que a producao consome e exercitado pela bancada) DESLIGADA; esta ligada, HARD, 40 pares, 0 sem teste — e enganou uma exploracao desta casa ANTES de enganar qualquer humano. (3) o `verified_against` de `E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO` cita `0 e 0 violacoes`; o lint do main hoje sai com 2 HARD + 24 SOFT por razoes alheias ao que o no prova — quem lesse sem re-medir concluiria `o lint esta limpo`. (4) o `trace` de `E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE` cita l.205-211 de um script que cresceu para 254 linhas. O PADRAO: nenhuma das quatro e mentira; TODAS foram verdade quando escritas. Defasagem engana por mais tempo que ficcao, porque um dia foi verdade e ninguem tem motivo para desconfiar. A cura nao e escrever melhor — e o carimbo VENCER (REGRA 67) e a re-medicao ser barata."
+    provenance:
+      source: "git: abbc2d0c + be29ab00"
+      locator: "abbc2d0c: testing-validation-system.md (painel Coverage 85%/Mutation 74% sem produtor, apagado) e maintenance-checklist.md l.438-441 (REGRA 59 ligada, 40 pares, 0 sem teste); be29ab00: catraca-regra49-2026-08.kg.yaml l.551 (verified_against \"0 e 0\" vs lint 2 HARD + 24 SOFT) e R0 de audit-textual-gates-2026-09 (trace l.205-211, script 211→254 linhas; be29ab00:review-artifact-check.sh = 254)"
+      method: "leitura: commits da cura (abbc2d0c) e das re-medições R0 de 2026-09-09 (be29ab00)"
 
   - id: E_O_SCHEMA_DO_KG_FRESHNESS_NAO_RODA
     node_type: evidence

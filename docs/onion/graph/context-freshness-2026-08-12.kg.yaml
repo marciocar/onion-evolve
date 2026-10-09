@@ -104,6 +104,10 @@ nodes:
     confidence: 1.0
     label: "O JUIZ ADVERSARIAL PAGOU O PROPRIO CUSTO derrubando UM dos oito STALE. O worker acusou `competitive-landscape.md` de tratar a decisao D6 como 'hipotese a validar' quando D6 fora ratificada em 2026-07-25. MEDIDO pelo juiz: o 'hipotese a validar' da linha 59 qualifica o WHITESPACE DE MERCADO (lacuna nao confirmada por fonte externa), NAO a decisao — o arquivo apenas CITA D6 como cross-reference. E o proprio card ratificado de D6 fecha com 'Falta (nao bloqueia): 1-2 entrevistas P4', ou seja, a validacao de campo que o arquivo pede SEGUE PENDENTE por admissao da propria decisao. ⚠️ A LICAO DE METODO: o acusador casou a PALAVRA ('hipotese', 'validar') com o REFERENTE ERRADO. E o mesmo eixo de [[guarda-por-lista-falha-pelo-vocabulario]], agora num juiz-LLM em vez de num grep — o vocabulario engana quem procura por forma sem ancorar no sujeito da frase."
     trace: "docs/business-context/03-market/competitive-landscape.md"
+    provenance:
+      source: "docs/analysis/context-freshness-core-2026-08-12.md ; docs/business-context/03-market/competitive-landscape.md l.59 ; docs/business-context/decisions.md l.99"
+      locator: "§Refutado pelo juiz l.53-57"
+      method: "juízes: juiz opus da auditoria context-freshness registrado no relatorio"
 
   - id: Q_CONTAGEM_DE_ADOTANTES_STALE_EM_DOIS_DOCS_DE_BUSINESS
     node_type: question
@@ -144,6 +148,10 @@ nodes:
     impact: 4
     confidence: 0.9
     label: "CLAIM QUE NASCEU DE UMA ARESTA-ALIBI DESFEITA, e o nascimento e o ponto. A 1a versao ligava [E_ACUSADOR_ERROU_O_REFERENTE] a [E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO] com `SUPPORTS` — mas um juiz derrubando uma acusacao sobre D6 NAO eleva em nada a credencia de que um regex e cego a tres formas de '99'. Sao proposicoes independentes; o elo real era ANALOGIA DE MODO DE FALHA, e analogia nao e suporte evidencial. A aresta existia para o no nao ficar orfao (grau 0 reprova) — alibi por proximidade, SEGUNDA vez que o autor comete isso em um dia (a 1a foi em identidade-onion-vps, tambem pega pelo Elenxo). A cura nao e apagar a aresta: e NOMEAR a tese que a analogia de fato sustenta. ⚠️ A TESE: casar a PALAVRA sem ancorar no SUJEITO da frase falha igual em `grep`, em juiz-LLM e em humano. QUATRO instancias medidas no mesmo dia: (1) a REGRA 16 nao via '99' em tres formas porque o feeder exigia uma ordem de palavras; (2) um worker acusou `competitive-landscape.md` casando 'hipotese a validar' com a decisao D6 quando qualificava o whitespace de mercado; (3) o AUTOR deste grafo acusou `business-logic.md` de dizer '11 membros' casando o numeral com `11 skills`/`11 arquivos` — o doc diz 8, o valor certo; (4) ao ESCREVER este no, o autor tentou ancora-lo em `A_SINTESE_DO_RUN_DE_REVERIFICACAO`, id que pertence a OUTRO grafo, por lembrar a forma e nao o referente. A quarta aconteceu dentro da cura da terceira. O substrato muda (regex, LLM, humano); o defeito nao."
+    provenance:
+      source: "docs/analysis/context-freshness-core-2026-08-12.md"
+      locator: "§Refutado pelo juiz (l.53-57), §Por que o lint nao pegava (l.73-77), §O que a revisao adversarial derrubou itens 1 e 4 (l.82-100)"
+      method: "leitura: relatorio da auditoria context-freshness 2026-08-12"
 
   - id: A_RUN_DA_AUDITORIA_DE_CONTEXTO
     node_type: artifact

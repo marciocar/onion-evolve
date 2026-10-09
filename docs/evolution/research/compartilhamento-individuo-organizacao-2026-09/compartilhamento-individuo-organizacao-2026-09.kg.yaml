@@ -207,6 +207,10 @@ nodes:
     source_kind: internal-audit
     label: 'LACUNAS (corrigido 2026-09-13 pela passada adversarial: a 1a redacao dizia 41 fontes e 3 descartes reabertos — 41 sao as URLs CORTADAS, e os reabertos sao 33). 15 fontes lidas de 56; 13 claims cortadas por orcamento; 0 nao-verificadas por 403/truncagem. TETO: das 40 objecoes sobreviventes do Elenxo so 10 viraram no; as 30 restantes estao NOMEADAS em data/wf_88199ba9-b9a-return.json (decision.objections) e nao foram julgadas aqui. REFUTADAS POR FONTE FRACA OU TRIAGEM (19), entre elas: Viva piso de grupo 5 e privacidade diferencial em organization insights (learn.microsoft.com, tier 6 — o Elenxo as RE-CONFIRMA por outro caminho, o changelog do Copilot Dashboard); peer group de 20+ empresas e pressao de gestor para ativar rastreamento (winbuzzer, tier 5); Glean com limiar tipo k-anonimato (tier 5); Meta capturando mouse/keystrokes (HN, tier 2); criterio de 4 elementos e limites temporais (JCMC, tier 8); legitimo interesse como base preferencial por dupla vulnerabilidade (IDPL, tier 8). DESCARTE LEGITIMO ACEITO PELO ELENXO (1): violacao de Contextual Integrity ocorre por function creep — em Nissenbaum (2010) a violacao e QUALQUER mudanca nos parametros do fluxo, function creep e so um caso. DESCARTES REABERTOS POR COMODISMO: 33; viraram no so 3 (divergencia art. 88 PT x DE, teste Barbulescu, lacuna doutrinaria UE). As objecoes do Elenxo sao afirmacao de UM agente, sem votacao, e citam primarios (EUR-Lex, EDPB, changelog da Microsoft) que NAO foram lidos na rodada. EIXOS SEM FONTE LIDA: LGPD/ANPD/TST, autodeterminacao (Deci & Ryan), privacidade diferencial e ataques de diferenca em grupos pequenos, Second Brain/PKM, Notion.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/data/wf_88199ba9-b9a-return.json"
+      locator: "stats (sources 15, claims 38, verified 25, confirmed 6, refuted 19) + budgetDropped (41) + notVerifiedByBudget (13) + decision.objections (47, survives=true 40)"
+      method: "leitura: retorno versionado do run wf_88199ba9-b9a, contagens refeitas"
 
   # ── AS OPÇÕES (uma claim por opção, todas open) ──────────────────────────────────────────
   - id: C_OPCAO_A_BIDIRECTIONAL_INSEPARABLE_SHARING
@@ -235,6 +239,10 @@ nodes:
     confidence: 0.6
     label: 'OPCAO C — A restringida: fluxo por proposito com assimetria de padrao (organizacao->individuo aberto SO para o dado da propria pessoa e as decisoes que a afetam — agregado de terceiros mostrado ao time cai no falseamento de D_JOGO_DA_VIDA_E_BANCO_DE_PROVAS; individuo->organizacao so PREDICADO), sob o criterio Barbulescu (notificacao previa, grau de intrusao, razao legitima, meio menos intrusivo, consequencias, salvaguardas — Grande Camara 2017, §121) + defesa matematica contra diferenca (piso de grupo NAO basta; budget de consultas/composicao). A favor: preserva a tese de A, transpoe ao eixo empregador as politicas que o corpus ja tem para pessoa x federacao (PO_DISCLOSURE_VC, PO_BUDGET, PO_L3_FILTRO) e e a unica com mecanismo verificavel. Contra: C-65/23 e consentimento vieram de fonte tier 6 e extrapolados; finalidade nao e lista fechada; fragmentacao nacional (C-34/21) impede um criterio unico; nada lido sobre LGPD/TST nem sobre o ataque tracker. Restringida por E_OBJECTION_C65_23_EXTRAPOLATED, E_OBJECTION_CONSENT_NOT_REJECTED_BUT_UNLIKELY, E_OBJECTION_BELGIAN_CLOSED_LIST_NOT_GENERAL, E_OBJECTION_MANDATORY_AXES_UNCOVERED, E_OBJECTION_ART88_NATIONAL_FRAGMENTATION e E_OBJECTION_NO_UNIFORM_EU_THRESHOLD.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/data/wf_88199ba9-b9a-return.json"
+      locator: "decision.options[2] + decision.recommendation"
+      method: "leitura: retorno versionado do run wf_88199ba9-b9a"
 
   - id: C_OPCAO_D_GATED_COMPLEMENTARY_ROUND
     node_type: claim
@@ -244,11 +252,15 @@ nodes:
     confidence: 0.65
     label: 'EXECUTADA em 2026-09-13 (13 primarias nomeadas, 62 claims ancoradas, 14 rejeitadas na ancoragem) — o `nao selar agora` abaixo JA FOI cumprido como condicao do selo; o que resta dela esta em E_R2_LACUNAS_RODADA_COMPLEMENTAR_0913 (14 lacunas ainda abertas). Enquadramento original: OPCAO D — GATED: nao selar agora; rodada complementar para LGPD (arts. 7, 8 §3, 10; legitimo interesse) + ANPD + TST (monitoramento de e-mail corporativo), autodeterminacao (Deci & Ryan aplicada a monitoramento) e as fontes de privacidade em grupos pequenos nao lidas (Denning 1979 tracker, Dinur & Nissim 2003, privacidade diferencial em times pequenos), mais o primario do Viva (Tech Community) e C-34/21. A favor: a pergunta central esta SEM evidencia direta e o eixo BR, que e o do adotante, tem zero fonte. Contra: adiar nao protege ninguem enquanto o adotante opera; por isso D e CONDICAO DE SELO de C, nao alternativa a ela. Sustentada por E_LACUNAS_COMPARTILHAMENTO_0913.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/data/wf_88199ba9-b9a-return.json ; docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/data/wf_1865aba9-e20-return.json"
+      locator: "decision.options[3] (run 1) + sources=13, anchoredCount=62, rejectedCount=14 (run 2)"
+      method: "leitura: retornos versionados dos runs wf_88199ba9-b9a e wf_1865aba9-e20"
 
   # ── A DECISÃO (open — quem sela é o maestro) ─────────────────────────────────────────────
   - id: D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION
     node_type: decision
-    plane: PROD
+    plane: DEV
     status: done
     impact: 5
     confidence: 0.7
@@ -1539,6 +1551,10 @@ nodes:
     source_kind: internal-audit
     label: 'CORRIGIDO 2026-09-13 pelo confronto com o retorno do run: a 1a redacao dizia `18+ objecoes julgadas, TODAS sobreviventes` — foram 95, com 78 sobreviventes, e o Elenxo deixou 14 LACUNAS ABERTAS. As tres maiores, contra o que o selo pediu: (i) Deci & Ryan (eixo 4) NAO foi lido — entrou meta-analise de monitoramento eletronico como PROXY, e 3 das 6 claims dela cairam na ancoragem; (ii) o texto da LGPD teve 5 de 6 claims REPROVADAS (quote nao-verbatim, verbo trocado, inferencia inexistente no art. 11) — o eixo legal BR se sustenta pelo GUIA da ANPD, nao pela lei lida; (iii) o TST entrou por NOTICIA do proprio tribunal, nao por acordao/ementa. Acordo coletivo BR (CLT art. 611-A) como analogo do art. 88: ZERO fonte. CONTABILIDADE DA RODADA 2 (a rodada complementar da opcao D, executada em 2026-09-13). LIDAS (13): LGPD, Guia do legitimo interesse da ANPD, noticias do TST sobre 2 acordaos (e-mail corporativo e cameras), EDPB Guidelines 05/2020, TEDH Barbulescu + Lopez Ribalda II, CJEU C-65/23 (EUR-Lex), CJEU C-34/21, Denning et al. 1979 (tracker), Dinur & Nissim 2003, paper de k-anonimato + IAPP, doc do Viva/Copilot Dashboard (learn.microsoft.com), meta-analise EPM, press release do Glean, blog do Productivity Score, 2 processos (Netradyne/BIPA e Samsara). INALCANCAVEIS: NENHUMA. ANCORADAS: 62 (viraram no). REJEITADAS NA ANCORAGEM: 14 — 13 EXAGERADAS (5 do leitor da LGPD: taxatividade das hipoteses do art. 7, situacoes-modelo do legitimo interesse, escopo estrito, RIPD exigivel, consentimento destacado para sensiveis; 1 do TST sobre senha pessoal e sigilo de correspondencia; 1 do EDPB sobre atribuicao ao WP29 Opinion 2/2017 nota 20; 2 de Barbulescu — fator (iii) fluxo x conteudo e o §122 do recurso judicial independente; 1 do tracker sobre independer de decomposicao; 3 da meta-analise EPM — estresse estrutural, ausencia de ganho de desempenho e invasividade como moderador) e 1 NAO-ENCONTRADA (clausulas sindicais restringindo IA: Culinary Workers e ILA). LACUNAS QUE CONTINUAM ABERTAS (do gapsOpen do Elenxo): (1) o eixo ESTATUTARIO BR segue sem citacao conferivel — quem o carrega e o guia da ANPD, nao a lei; (2) nenhuma fonte entrega um LIMIAR operacional que separe agregado-com-piso de agregado-sem-piso: ANPD da procedimento, TST da "nucleo essencial", TEDH da fatores, CJEU diz que o limiar nao esta harmonizado; (3) os acordaos do TST foram lidos por NOTICIA institucional, nao por ementa/acordao, e um deles e pre-LGPD; (4) as quotes verbatim de EDPB, Barbulescu/Lopez Ribalda, dispositivo de C-65/23, tracker, Dinur-Nissim, Viva e EPM NAO chegaram ao dossie — a leitura foi ancorada, a citacao nao; (5) Contextual Integrity (Nissenbaum) continua so em descartes; (6) Second Brain/PKM e Notion seguem sem fonte lida, em 2 rodadas; (7) os 2 processos vieram de agregador/imprensa setorial, sem docket; (8) as 30 objecoes do Elenxo da rodada 1 nomeadas em data/wf_88199ba9-b9a-return.json seguem sem julgamento.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/data/wf_1865aba9-e20-return.json"
+      locator: "sources 13, unreachable 0, anchoredCount 62, rejectedCount 14 (13 EXAGERADA + 1 NAO-ENCONTRADA), elenxo.objections 95 (78 survives), gapsClosed 11, gapsOpen 14"
+      method: "leitura: retorno versionado do run wf_1865aba9-e20, contagens refeitas"
 
   # ── O QUE ESTA RODADA PROPÕE AO SELO (proposta, não reabertura) ─────────────────────────
   - id: Q_R2_REVISAO_DO_SELO_C
@@ -1567,7 +1583,7 @@ nodes:
   - id: E_R3_TST_EMAIL_PESSOAL_VS_CORPORATIVO
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: unverifiable
     impact: 3
     confidence: 0.4
     verified_at: 2026-09-13
@@ -1580,7 +1596,7 @@ nodes:
   - id: E_R3_TST_CIENCIA_PREVIA_AFASTA_EXPECTATIVA
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: unverifiable
     impact: 4
     confidence: 0.4
     verified_at: 2026-09-13
@@ -1593,7 +1609,7 @@ nodes:
   - id: E_R3_TST_PROPORCIONALIDADE_PARCIMONIA_NA_ILICITUDE
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: unverifiable
     impact: 3
     confidence: 0.4
     verified_at: 2026-09-13
@@ -1606,7 +1622,7 @@ nodes:
   - id: E_R3_TST_MONITORAR_FORMA_E_CONTEUDO_EMAIL_CORPORATIVO
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: unverifiable
     impact: 5
     confidence: 0.4
     verified_at: 2026-09-13
@@ -1962,6 +1978,10 @@ nodes:
     source_kind: internal-audit
     label: 'DEFEITO DE GATE MEDIDO NA PROPRIA RODADA, e CURADO NO MOTOR: 13 das 22 claims que a ancoragem devolveu como ANCORADA chegaram com `quote` VAZIA e `locator` `—`. O write(KG) as escreveu com ressalva no rotulo e tier rebaixado (5 a 7 em vez de 9-10), mas o pipeline as CONTOU como ancoradas — e o Elenxo cravou: `enquanto o gate aceitar campo vazio, contar claims ancoradas nao mede nada`. Cura no `.claude/workflows/onion-research.js` (nao no prompt): (a) o schema do leitor passa a exigir `quote` com pelo menos 30 caracteres e `locator` com pelo menos 2; (b) o ancorador devolve a citacao que ELE conferiu, com precedencia sobre a do leitor; (c) o casamento leitor-ancorador deixa de exigir texto identico (era ai que a citacao se perdia); (d) FAIL-CLOSED no motor: veredito ANCORADA sem citacao e REBAIXADO para AFIRMADA-SEM-CITACAO e vai para a coluna das rejeitadas. Bancada: casos (n) e (n2) da familia research_workflow, com mutante provado no arquivo vivo. ALEM DISSO, uma conclusao desta rodada foi REFUTADA por medicao direta nesta sessao: o alvo (d) concluiu `nao ha analogo do art. 88 porque a lista do art. 611-A e fechada`, e o caput diz `entre outros` — ver E_R3_CLT_611A_ENTRE_OUTROS_MEDIDO. CONTABILIDADE DA RODADA 3 (primarias nomeadas, 2026-09-13) — a rodada dirigida pelas lacunas ja nomeadas em E_R2_LACUNAS_RODADA_COMPLEMENTAR_0913; NADA aqui reabre o selo de D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION. ALVOS LIDOS (6): tst-acordaos, anpd-decisao-monitoramento, lgpd-texto-legal, deci-ryan-primario (com a meta-analise EPM de Ravid et al. 2023 no mesmo alvo), viva-bin-unitario-e-epsilon, acordo-coletivo-br. FONTES DECLARADAS INALCANCAVEIS PELO RUN: NENHUMA — mas a rodada REGISTRA 4 falhas de acesso ao INTEIRO TEOR dentro do alvo tst-acordaos, cada uma com causa distinta e reproduzida pelo verificador: jusbrasil.com.br devolveu HTTP 403 (bloqueio), o PDF da migalhas chegou como binario ilegivel, o backend de jurisprudencia do TST recusou conexao (ECONNREFUSED) e a busca por boletins do TRT12 nao localizou o caso citado nominalmente. ANCORADAS: 22 (viraram no). REJEITADAS NA ANCORAGEM: 8, TODAS COMO EXAGERADAS — (1) tst-acordaos: o alvo RR-21162-51.2015.5.04.0014 (cameras) nao foi lido em inteiro teor e a pagina https://www.tst.jus.br/en/-/... esta INTEGRALMENTE EM PORTUGUES apesar do sufixo /en/, logo a frase em ingles atribuida a ela nao existe (a parte de INACESSIBILIDADE do claim foi, essa sim, reproduzida e sobrevive — virou o registro de falhas acima); (2) anpd CLAIM 1: "nenhum processo sancionador concluido trata de monitoramento" — a lista oficial confere quase item a item, mas a pagina NAO descreve o assunto de cada processo, entao o "nenhum" e inferencia do verificador sobre nomes, nao leitura; (3) anpd CLAIM 3: o Guia Orientativo como unico documento que menciona monitoramento de funcionarios — o verificador LEU o PDF oficial (53 paginas) e CONFIRMOU a substancia (Exemplo 7, p. 24), mas a claim foi marcada exagerada pelo escopo "unico documento"; (4) e (5) deci-ryan: "definicao formal de necessidade basica" (p. 74, col. 2) e "falha de EMPREGADORES/organizacoes contribui para alienacao" (p. 74, col. 1) — AS DUAS QUOTES SAO VERBATIM E ESTAO ONDE INDICADO, e o texto de fato nomeia "employees" e "organizations"; o que caiu foi a CLAUSULA FINAL de cada uma ("base teorica para prever dano do monitoramento", "ponte primaria entre SDT e ambientes de trabalho monitorados"), que e inferencia do leitor — o artigo de 2000 nao menciona monitoramento em ponto algum; (6) a Tabela 6 da meta-analise EPM: os dois trechos conferem exatamente (Invasiveness->Stress/strain K=10, N=3260, rho=.20, IC95%[.10,.29], p.23; Transparency->Broad attitudes K=14, N=3696, rho=.25, IC95%[.11,.39], p.24), mas a PROSA fundiu "privacy invasion" e "CWBs" como se fossem a mesma linha rotulada rho=.22 — na tabela sao DUAS linhas distintas sob Invasiveness; (7) e (8) acordo-coletivo-br: as duas citacoes do acordao de cameras (RR-21162-51.2015.5.04.0014, PDF oficial de 34 paginas, LIDO INTEIRO pelo verificador) NAO sao verbatim — comprimem e reescrevem as frases reais (omissoes de "dos empregados", "pelo empregador", troca de "partes intimas" por "a intimidade", supressao de "nao configura ato ilicito,", e uniao por "desde que" de duas frases separadas por ponto final em fls.19); a SUBSTANCIA foi confirmada pelo verificador — o acordao funda a licitude SO no art. 2o da CLT e na ponderacao constitucional, SEM QUALQUER MENCAO a acordo/convencao coletiva como base legitimadora, o que e o achado negativo que o eixo (d) pedia. LACUNAS QUE CONTINUAM ABERTAS: (1) o TST segue SEM ACORDAO LOCALIZADO no eixo e-mail corporativo — as 4 claims ancoradas chegaram sem quote e sem locator, entao a lacuna (3) da rodada 2 NAO foi fechada, apenas deslocada; (2) NENHUMA fonte, em TRES rodadas, entrega um LIMIAR operacional que separe agregado-com-piso de agregado-sem-piso — e a rodada 3 mostrou por que a pergunta estava mal posta: no produto de referencia o piso nem se aplica ao bin (E_R3_VIVA_PISO_APLICA_AO_FILTRO_NAO_AO_BIN); (3) art. 5o, II da LGPD (rol taxativo de dado sensivel) e os paragrafos do art. 20 NAO foram lidos — a ponte histograma->dado sensivel e a controversia da revisao por pessoa natural seguem sem ancora; (4) a ponte SDT->monitoramento continua sendo INFERENCIA: o primario de Deci & Ryan foi finalmente lido e ancorado, e ele nao fala de monitoramento; (5) os COEFICIENTES da Tabela 6 do EPM seguem nao ancorados em prosa correta (os numeros existem e conferem; a claim que os descrevia, nao); (6) as quotes verbatim de Viva e CLT NAO chegaram ao dossie — a leitura foi ancorada, a citacao nao, MESMA familia da lacuna (4) da rodada 2; (7) Contextual Integrity (Nissenbaum), Second Brain/PKM e Notion seguem sem fonte lida, agora em TRES rodadas; (8) as 30 objecoes do Elenxo da rodada 1 (data/wf_88199ba9-b9a-return.json) seguem sem julgamento. NOTA DE RECONCILIACAO: E_R2_LACUNAS_RODADA_COMPLEMENTAR_0913 NAO foi superseded de proposito — ele e o registro FIEL da rodada 2 e continua correto sobre ela; o que mudou foi o estado das lacunas, e isso se le aqui.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/data/wf_44d33784-fe6-return.json ; .claude/workflows/onion-research.js"
+      locator: "anchored (22, 13 com quote vazia), rejected (8 EXAGERADA), stats.sources 6; onion-research.js l.174 (quote minLength 30, locator minLength 2) e l.253 (AFIRMADA-SEM-CITACAO)"
+      method: "leitura: retorno versionado do run de primarias + motor curado"
 
   # ── O QUE ESTA RODADA PROPÕE (propõe, NÃO sela — o selo é do maestro) ───────────────────
   - id: E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR
@@ -2078,6 +2098,10 @@ nodes:
     verified_against: 'passada adversarial de 2026-09-19 sobre o raciocinio da proposta; QUATRO citacoes decisivas re-conferidas a mao pelo condutor, por grep no corpus, antes de aceitar o veredito'
     label: 'A PROPOSTA CAIU CONTRA O PROPRIO CORPUS — e os nos que a derrubam ja estavam no grafo que eu editava. (A1, FATAL) A camada 3 (raio expansivel so pelo individuo) e TEXTUALMENTE proibida por E_R2_EDPB_EXCECAO_SEM_CONSEQUENCIA_ADVERSA, `confirmed`, tier 9, MESMO ARQUIVO: "C NAO deve desenhar nada que dependa de opt-in do empregado COMO SALVAGUARDA. LIMITA C." Opt-in dentro de relacao assimetrica nao e salvaguarda; o Elenxo da rodada 1 ja havia absorvido que "o pedido do superior JA e coercao contextual". (A7) A proposta REINTRODUZ desenho ja REFUTADO: E_AGREGADO_COM_OPTIN_VAZA_POR_DIFERENCA diz que "agregado com consentimento parcial vaza o individuo POR DIFERENCA em times de 3 a 5" — e reconhecimento com raio parcial somado a `karma_total` integro e exatamente isso: `karma_total - soma(visiveis)` denuncia quem manteve o raio estreito. O `Q_FRONTEIRA` CITA esse no; a proposta nao. (A3) A tese central e PARCIAL, e o contraexemplo esta DENTRO do no que ela cita: "A cinco, com participacao completa, o contador satura os elegiveis e o Karma individual de TODOS se reconstroi" — ali o exposto nao e o ajudante, sao todos, e o predicado revelado ("fulano ajudou zero vezes") e telemetria de produtividade, o LIMITE DURO BR ja selado. E no ataque 2 o exposto nominal e O PEDINTE, que a proposta deixa sem controle nenhum. (A4) A rejeicao da opcao 3 do adotante e indevida E a camada 1 E a opcao 3: ele propos mostrar "alguem se ofereceu" em vez de "1"; a camada 1 e `alguem ja se ofereceu` — a MESMA string. Rejeitei por nome e adotei o ramo. A F2 barra INVOCAR "privacidade diferencial" sem epsilon; faixa deterministica nao e ruido probabilistico, e a propria proposta admite isso ao escrever "nao e ruido". (A5) A camada 4 nao fecha o que o documento afirma fechar: duas leituras sao uso NORMAL do produto, e budget sem epsilon limita TAXA, nao informacao liberada — o mesmo vicio que a F2 barra, aplicado a propria proposta. O QUE SOBREVIVEU: a distincao "o contador nunca foi o reconhecimento; ele acontece na aceitacao" continua correta e sustentada pela descricao do adotante; e a disciplina de estado do no (nasceu open, declarou-se proposta, preservou a objecao) nao teve verificacao fabricada.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/review/docs-frontier-recognition-radius-proposal.md"
+      locator: "frontmatter (verdict REPROVADO_E_CURADO, elenxo: sim) + §Os dois achados fatais l.26-41 + §Os outros que sobreviveram l.42-54 + §O que o refutador atacou e NÃO derrubou l.55-62"
+      method: "juízes: passada adversarial (Elenxo) de 2026-09-19 registrada no resíduo R56, com as 4 citações re-conferidas no grafo (l.687, l.176)"
 
   - id: D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR
     node_type: decision

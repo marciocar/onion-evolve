@@ -49,6 +49,10 @@ nodes:
     verified_against: 'Duas linhas do MESMO changelog local, e a segunda e a que importa: l.646 (2.1.268) "Changed the task-tracking tools ... to be offered only on Claude 3.x, Opus 4.0-4.7, Sonnet 4.0-4.6, Haiku 4.5" e l.1645 (2.1.233) "Todo/task-tracking tools ... are no longer available on Opus 4.8, Sonnet 5, Fable 5, Mythos 5, and newer models; set CLAUDE_CODE_ENABLE_TODO_TOOLS=1". Contagem REAL no repo, excluindo `.claude/worktrees/` (copias transitorias de outros agentes) e com palavra inteira: TodoWrite 83 ocorrencias em 56 arquivos; TaskCreate, TaskUpdate e TaskList ZERO. Medicao de comportamento pelo refutador, em worktree isolada: com `CLAUDE_CODE_ENABLE_TODO_TOOLS=0` e `--model opus`, `TodoWrite` some da lista, e um agente que o declara em `tools:` (`@mermaid-specialist`) RODA SEM ERRO (36.654 tokens, 8,9s).'
     trace: '.claude/settings.json'
     label: 'O DELTA AQUI E A FORMA DO GATE, NAO O DESLIGAMENTO — e a versao anterior deste no afirmava o contrário, com numeros inventados. O desligamento das task tools para o lineup desta casa e de 2.1.233, TRINTA E CINCO versoes antes desta janela, e o corpus ja o media por DOGFOOD em 2026-08-16 (`claude-code-2.1-onion-2026-08`, sessao headless com opus-5 respondendo `TASK_TOOLS_AUSENTES`). A 2.1.268 so trocou "off acima de 4.8" por uma allowlist fechada por faixa. CONSEQUENCIA REAL: pequena. O framework nao depende dessas ferramentas — `TaskCreate`/`TaskUpdate`/`TaskList` dao ZERO em `.claude/`, e `TodoWrite` aparece em 83 ocorrencias que sao sobretudo campo `tools:` de agente. Com a variavel desligada a ferramenta some e o artefato NAO quebra: medido. O que fica, e nao e nada: o escape vive no `~/.claude/settings.json` PESSOAL do maestro, entao o comportamento desta maquina difere do de um adotante — diferenca real, consequencia pequena.'
+    provenance:
+      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md)"
+      locator: "## 2.1.268 'Changed the task-tracking tools… offered only on Claude 3.x, Opus 4.0–4.7…' · ## 2.1.233 'no longer available on Opus 4.8, Sonnet 5…'"
+      method: "leitura: CHANGELOG 2.1.268 e 2.1.233"
 
   - id: E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO
     node_type: evidence
@@ -79,6 +83,10 @@ nodes:
     verified_against: 'PROVENIENCIA: `/ultrareview` em 2.1.111 (l.4082), subcomando em l.3853 — FORA da janela. `claude ultrareview --help` no binario 2.1.278, verbatim: "Run a cloud-hosted multi-agent code review of the current branch (or a PR number / base branch) and print the findings", com `--json`, `--post` (posta no PR) e `--no-post` (default). Saida completa em data/claude-help-2.1.278.txt.'
     trace: 'ops/review-gate-health.sh'
     label: 'A CAPACIDADE NAO E NOVA, E ISSO DESARMA A NARRATIVA DE COLISAO: `/ultrareview` nasceu na 2.1.111 (changelog l.4082) e o subcomando `claude ultrareview` na l.3853, ambos ANTES da baseline r4. No delta ha so polimento. Logo nao houve movimento do vendor contra o gate desta casa — houve coincidencia de calendario: o gate que torna o parecer do `onion-review` BLOQUEANTE foi mergeado em 2026-09-21 (PR #857) no mesmo dia em que EU descobri o subcomando, que ja estava la havia versoes. `claude ultrareview` faz review multi-agente HOSPEDADO da branch ou de um PR e sabe postar o resultado. A pergunta de adequacao nao e "qual e melhor" — e QUAL DIMENSAO CADA UM COBRE: o `onion-review` revisa contra a CONSTITUICAO deste repo (meta-specs, REGRAS numeradas, doutrina), que nenhum revisor generico conhece; o `ultrareview` traz paralelismo e custo que nao saem do bolso do CI daqui. NAO DECIDO ISSO: fica como decisao aberta para o maestro, com o dado na mao.'
+    provenance:
+      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md) + docs/evolution/research/radar-E3-2026-09-21-r5/data/claude-help-2.1.278.txt"
+      locator: "## 2.1.111 'Added /ultrareview for running comprehensive code review in the cloud…'; entrada 'Added claude ultrareview [target] subcommand' (anterior a 2.1.144); claude-help-2.1.278.txt:297"
+      method: "leitura: CHANGELOG + --help gravado"
 
   - id: E_AUTO_MODE_E_UMA_CAMADA_DE_PERMISSAO_QUE_O_ONION_NAO_USA
     node_type: evidence
@@ -122,6 +130,10 @@ nodes:
     verified_against: 'CHANGELOG-LOCAL 2.1.265 (aprovado pelo juiz com a fonte aberta). O repo publica 5 plugins na mesma arvore: plugins/onion, onion-engineering, onion-product, onion-compliance, onion-design.'
     trace: 'plugins'
     label: '`--plugin-dir` passou a aceitar uma PASTA COM VARIOS PLUGINS (cada subpasta com seu manifesto), que e exatamente a topologia que o `onion-plugins` ja publica. Ganho concreto e pequeno: testar os 5 plugins de uma vez, sem apontar um a um. Nao muda desenho — reduz atrito de dogfood.'
+    provenance:
+      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md) + plugins/ do repo"
+      locator: "## 2.1.265: 'Added support for pointing --plugin-dir at a folder of plugins: each child folder with a manifest loads'; git ls-files plugins → onion, onion-compliance, onion-design, onion-engineering, onion-product"
+      method: "leitura: CHANGELOG 2.1.265 + árvore plugins/"
 
   - id: E_PLUGIN_EVAL_E_CANDIDATO_A_GATE_DE_PUBLICACAO
     node_type: evidence
@@ -135,6 +147,10 @@ nodes:
     verified_against: 'CHANGELOG-LOCAL 2.1.269 (aprovado pelo juiz). O `claude --help` de 2.1.278 lista `plugin` como subcomando.'
     trace: 'plugins'
     label: '`claude plugin eval` traz suite de avaliacao de plugin com resultado PONTUADO e REPRODUZIVEL. Esta casa publica 5 plugins num marketplace publico e hoje o gate de publicacao e o lint + a bancada do CORE — nada mede o plugin COMO PLUGIN, do lado de quem instala. Candidato a gate pre-publish. GATILHO NOMEADO (nao pre-cozinhar): a proxima publicacao no marketplace; ali se roda `plugin eval` antes e se decide pela medicao, nao por esta nota.'
+    provenance:
+      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md) + docs/evolution/research/radar-E3-2026-09-21-r5/data/claude-help-2.1.278.txt"
+      locator: "## 2.1.269: 'Added claude plugin eval: run a plugin's eval suite… scored, reproducible results'; claude-help-2.1.278.txt:283 'plugin|plugins'"
+      method: "leitura: CHANGELOG 2.1.269 + saída do --help gravada"
 
   - id: E_WORKFLOW_GANHOU_RETOMADA_E_FALHA_EXPLICITA
     node_type: evidence

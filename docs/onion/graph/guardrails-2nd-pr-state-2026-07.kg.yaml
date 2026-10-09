@@ -136,6 +136,10 @@ nodes:
     verified_against: refutacao-adversarial-2-lentes-opus
     label: "DSL REFUTADA nas 2 lentes: inverte estrutural>gated (move logica de decisao do gate — verbos hardcoded no .sh selftestado — p/ dado de config fora da superficie testada); so sobrevive com condicoes que NAO valem hoje (effect-gate em quarentena nao-wired; N=0 demanda de campo; sua evidencia-ancora descreve ERRADO o artefato vivo — e whitelist INTAKE/EXECUTION deny-by-default JA em bash). Deferida, nao proposicao viva"
     trace: "docs/knowledge-base/concepts/onion-guardrails.md"
+    provenance:
+      source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+      locator: "run_id wf_15cebeba-773; §Veredito bullet DSL l.53-58"
+      method: "juízes: Elenxo orquestrado (3 steelman + 6 refutação 2 lentes + síntese), veredito registrado"
 
   - id: E_HYBRID_REFUTED
     node_type: evidence
@@ -147,6 +151,10 @@ nodes:
     verified_against: refutacao-adversarial-doutrina-conf-alta
     label: "HIBRIDO REFUTADO conf ALTA (doutrina): a Fase B (compilador) repousa em transferencia FALSA — a catraca REGRA 42 NAO e 'declaracao compila p/ gate', e dado TIPADO consumido por runner FIXO escrito a mao (zero codegen). Fase B so sobrevive colapsando ate deixar de ser DSL/compilador — e ai DISSOLVE no indice. Seu custo confessa: compilador exige disciplina de revisor a cada PR (o anti-padrao que a discussao mata)"
     trace: "docs/discussions/guardrails-nemo-lens/promotion-plan.md"
+    provenance:
+      source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+      locator: "run_id wf_15cebeba-773; bullet Híbrido l.59"
+      method: "juízes: Elenxo orquestrado, veredito registrado"
 
   - id: E_INDEX_LIVE_LENS
     node_type: evidence
@@ -158,6 +166,10 @@ nodes:
     verified_against: lint-artifacts-em-REGRA-48-vs-taxonomia-148-vetos-14-cat
     label: "INDICE tambem refutado (espelho-de-snapshot cai): a taxonomy-onion-r.md e snapshot 2026-07-12 de 148 vetos/14 categorias, mas o lint JA esta em REGRA 48 (~20 regras nasceram depois, sem categorizar) — o snapshot JA DRIFTOU. MAS as condicoes de sobrevivencia CONVERGEM e ELEVAM: espelho->lente-viva (grep ao vivo). DSL e hibrido tambem terminam em 'indice agora + autoria deferida'"
     trace: ".claude/validation/lint-rules.md"
+    provenance:
+      source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+      locator: "run_id wf_15cebeba-773; bullet Índice l.65-69 + §A forma concreta item 1 l.79"
+      method: "juízes: Elenxo orquestrado, veredito registrado"
 
   - id: Q_AUTHORING_TRIGGER
     node_type: question
@@ -179,6 +191,10 @@ nodes:
     verified_against: spike-grep-vivo-vs-lente-em-task.md-e-canal-C2
     label: "SPIKE refuta o 'construir': (1) FORWARD categoria->vetos = grep que o maestro JA tem; lente-viva so sobrepoe o lint. (2) CANAL-RESOLUCAO carrega peso MAS a resposta JA vive na KB §4.1/4.2 (tabela curada) — nao precisa de comando. (3) JOIN-REVERSO (arquivo->categorias que governam) responde pergunta real que grep e --only NAO respondem, MAS nao ha escopo machine-readable por guarda (vive espalhado em _find roots/case-globs) -> hand-curar tabela DRIFTA (a ironia que mata a doutrina) ou instrumentar 48 guardas (churn, decisao maior). Nenhuma das 3 pecas ganha um comando /meta: hoje"
     trace: ".claude/validation/lint-artifacts.sh"
+    provenance:
+      source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+      locator: "ADENDO — Spike 2026-07-31 l.14-27"
+      method: "leitura: adendo do veredito registra o resultado do spike (grep pelado vs lente em product/task.md e canal C2)"
 
   - id: D_NO_COMMAND
     node_type: decision

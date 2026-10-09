@@ -128,7 +128,7 @@ nodes:
   - id: E_LACUNAS_DECLARADAS_PODA_0903
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: unverifiable
     impact: 3
     confidence: 0.9
     verified_at: 2026-09-03
