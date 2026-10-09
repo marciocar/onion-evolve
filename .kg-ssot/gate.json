@@ -1,6 +1,6 @@
 {
   "contract": "kg-contract-v4.schema.json",
-  "contract_sha256": "dcc872a35afecf8751ab2b7f740a5c55516c51ad4a4e54206ba612e14c0a16d5",
+  "contract_sha256": "b00c74ae1390edbacb87b34dc4c3f5f6bd8cebaa620fd9e7a86a7e9d2ff616d8",
   "graphs": 138,
   "failing": {
     "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml": [
@@ -72,14 +72,15 @@
     ]
   },
   "debt": {
-    "form.pattern.node.provenance.method": 6,
-    "form.range.node.label": 111,
-    "form.required.node.verified_against": 16,
-    "form.required.node.verified_at": 6,
-    "integrity.testimony-in-prod": 36,
-    "integrity.untraced-decision": 14,
+    "form.pattern.node.provenance.method": 39,
+    "form.range.node.label": 2224,
+    "form.required.node.verified_against": 141,
+    "form.required.node.verified_at": 17,
+    "integrity.testimony-in-prod": 121,
+    "integrity.untraced-decision": 36,
     "yaml.unquoted-date": 129
   },
+  "granularity": "node",
   "accepted_regressions": [
     {
       "date": "2026-10-08",

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://onion-kg-ssot/spec/kg-contract-v4.should.schema.json",
   "title": "kg.yaml — contrato v4, nível SHOULD",
-  "description": "O contrato v4 do .kg.yaml, nível SHOULD (alerta, não reprova), o vigente desde a rampa EPIC_9_CONTRACT_V4_RAMP. É o SHOULD v3 menos o que o v4 promoveu a MUST: a chave desconhecida sem x_ no topo, no meta, no nó e na aresta (Q_UNKNOWN_KEY_RAMP) e o nó confirmed ou PROD sem provenance (Q_CONTRACT_STRUCTURED_PROVENANCE). Segue alertando: nome de chave que não é slug ([A-Za-z_][A-Za-z0-9_-]*), como form.pattern.<escopo>.key, que sem x_ também reprova no MUST; nó PROD sem verified_at (Q_CONTRACT_CONFORMANCE_LEVELS); label do nó acima de 280 caracteres, form.range.node.label, porque a narrativa vai para narrative (Q_CONTRACT_FACT_NARRATIVE); a chave desconhecida dentro de provenance, fechada em source, locator, method e x_; e o grafo sem nós (nodes: []), como form.range.top.nodes (Q_CONTRACT_EMPTY_GRAPH): é válido, como o primeiro uso de um app, mas o aviso pega o parse que falhou em silêncio. No v4, provenance.method alerta (form.pattern.node.provenance.method) quando não segue a forma canônica '<classe>: <detalhe>', com a classe em medição, leitura, juízes, derivado, testemunho (Q_CONTRACT_METHOD_VOCABULARY); reprova no v5. Medição feita por terceiro e lida pelo autor do grafo é testemunho. No v4.1 (Q_RADAR_WARNINGS_WITHOUT_CASES) entram quatro avisos que o próprio arquivo decide. O schema acusa a claim com verified_at e sem verified_against (form.required.node.verified_against): carimbo sem alvo não distingue verificado de declarado. Só a claim, como o UNANCHORED do radar: evidence é a própria âncora, artifact nomeia o alvo, question não afirma e a origem da decision é cobrada por integrity.untraced-decision. O leitor acusa três avisos que cruzam campos ou arestas, por isso não cabem no schema: integrity.testimony-in-prod (nó PROD cuja base é testemunho), integrity.verified-before-fact (verified_at anterior a valid_from) e integrity.untraced-decision (decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela).",
+  "description": "O contrato v4 do .kg.yaml, nível SHOULD (alerta, não reprova), o vigente desde a rampa EPIC_9_CONTRACT_V4_RAMP. É o SHOULD v3 menos o que o v4 promoveu a MUST: a chave desconhecida sem x_ no topo, no meta, no nó e na aresta (Q_UNKNOWN_KEY_RAMP) e o nó confirmed ou PROD sem provenance (Q_CONTRACT_STRUCTURED_PROVENANCE). Segue alertando: nome de chave que não é slug ([A-Za-z_][A-Za-z0-9_-]*), como form.pattern.<escopo>.key, que sem x_ também reprova no MUST; nó PROD sem verified_at (Q_CONTRACT_CONFORMANCE_LEVELS); label do nó acima de 280 caracteres, form.range.node.label, porque a narrativa vai para narrative (Q_CONTRACT_FACT_NARRATIVE); a chave desconhecida dentro de provenance, fechada em source, locator, method e x_; e o grafo sem nós (nodes: []), como form.range.top.nodes (Q_CONTRACT_EMPTY_GRAPH): é válido, como o primeiro uso de um app, mas o aviso pega o parse que falhou em silêncio. No v4, provenance.method alerta (form.pattern.node.provenance.method) quando não segue a forma canônica '<classe>: <detalhe>', com a classe em medição, leitura, juízes, derivado, testemunho (Q_CONTRACT_METHOD_VOCABULARY); reprova no v5. Medição feita por terceiro e lida pelo autor do grafo é testemunho. No v4.1 (Q_RADAR_WARNINGS_WITHOUT_CASES) entram quatro avisos que o próprio arquivo decide. O schema acusa a claim com verified_at e sem verified_against (form.required.node.verified_against): carimbo sem alvo não distingue verificado de declarado. Só a claim, como o UNANCHORED do radar: evidence é a própria âncora, artifact nomeia o alvo, question não afirma e a origem da decision é cobrada por integrity.untraced-decision. O leitor acusa três avisos que cruzam campos ou arestas, por isso não cabem no schema: integrity.testimony-in-prod (nó PROD cuja base é testemunho), integrity.verified-before-fact (verified_at anterior a valid_from) e integrity.untraced-decision (decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela). No v4.2 entra provenance.locality, opcional, com o enum repo (arquivo versionado no próprio repo), web (endereço público), host (só existe numa máquina: journal local, caminho fora do repo) ou pessoa (relato de alguém): o valor fora do enum alerta como form.enum.node.provenance.locality. Serve para medir o que é reverificável por terceiros e para barrar host na publicação.",
   "type": "object",
   "propertyNames": {
     "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
@@ -35,6 +35,7 @@
                   "anyOf": [
                     {
                       "enum": [
+                        "locality",
                         "locator",
                         "method",
                         "source"
@@ -50,6 +51,14 @@
             "properties": {
               "method": {
                 "pattern": "^(?:medição|leitura|juízes|derivado|testemunho): [^ \t\n\r]"
+              },
+              "locality": {
+                "enum": [
+                  "host",
+                  "pessoa",
+                  "repo",
+                  "web"
+                ]
               }
             }
           }

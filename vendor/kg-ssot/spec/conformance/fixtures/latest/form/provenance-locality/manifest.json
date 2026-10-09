@@ -1,0 +1,49 @@
+{
+  "description": "provenance.locality (v4.2, pedido do core em 2026-10-09, selado pelo maestro): opcional, enum repo, web, host ou pessoa, validado só no SHOULD. Mede o que é reverificável por terceiros e permite barrar host na publicação.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-locality-repo.kg.yaml",
+      "description": "provenance.locality: repo, um valor do enum",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-locality-web.kg.yaml",
+      "description": "provenance.locality: web, um valor do enum",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-locality-host.kg.yaml",
+      "description": "provenance.locality: host, um valor do enum",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-locality-pessoa.kg.yaml",
+      "description": "provenance.locality: pessoa, um valor do enum",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-locality-unknown.kg.yaml",
+      "description": "provenance.locality: servidor, valor fora do enum: alerta, não reprova",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.provenance.locality"
+      ]
+    },
+    {
+      "file": "warn-locality-uppercase.kg.yaml",
+      "description": "provenance.locality: Host, o enum distingue maiúscula: Host alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.enum.node.provenance.locality"
+      ]
+    }
+  ]
+}

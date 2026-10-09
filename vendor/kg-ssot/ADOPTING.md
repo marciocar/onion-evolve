@@ -34,14 +34,14 @@ O adotante usa só `update` e `check`.
 A primeira vez, a partir de um clone deste repo:
 
 ```bash
-python3 -I -B tools/kg_vendor.py update --tag contract-v4.1.0 --dest <adotante>/vendor/kg-ssot
+python3 -I -B tools/kg_vendor.py update --tag contract-v4.2.0 --dest <adotante>/vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.1.0 --source <caminho ou URL deste repo>
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.2.0 --source <caminho ou URL deste repo>
 ```
 
 - **Leitura:** o vendor lê a tag com `git archive`, nunca a árvore de trabalho. Os nomes são literais: um `*`
@@ -53,6 +53,13 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.1.0 --s
   - um diretório sem carimbo, porque nunca apaga um diretório alheio;
   - um vendor que diverge do carimbo, a menos que venha `--force`. Isso evita que uma edição local suma em
     silêncio.
+- **Perfil mínimo:** quem só roda o gate e o check pode trazer o perfil `gate` com `--profile gate`. São 10 arquivos:
+  o contrato (MUST e SHOULD), o `release.json`, o leitor, o gate, o vendor, o `requirements.txt`, este guia, a
+  `LICENSE` e o `NOTICE`. A suíte de conformidade fica de fora, e por isso o `kg_conformance.py` e o
+  `spec/conformance/README.md` que este guia cita não vêm. O carimbo registra o perfil, o `check` confere só o que ele
+  trouxe, e o update seguinte **herda** o perfil do carimbo (`--profile full` volta à release inteira).
+  Quem está numa tag anterior à `contract-v4.1.1` migra em dois passos, porque o vendor antigo não conhece
+  `--profile`: primeiro o update normal para a 4.1.1, depois o update com `--profile gate`.
 - **Carimbo:** `vendor/kg-ssot/.kg-ssot-version` guarda a tag, o commit e o sha256 de cada arquivo.
 - **Commit:** o vendor não commita. Num PR próprio, o adotante commita o diretório inteiro com o carimbo.
 
@@ -96,6 +103,18 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/meu-grafo.kg.yaml
 #   MUST   form.required.node.provenance ×33 · yaml.forbidden-key-on ×7
 #   SHOULD form.required.node.verified_at ×33
 ```
+
+Para saber **em qual nó ou aresta** cada código sai, acrescente `--where`. A saída padrão não muda; cada ocorrência
+ganha uma linha com o lugar:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where docs/meu-grafo.kg.yaml
+#     MUST   form.required.node.provenance  nó C_MODEL_EXPLAINABLE
+#     MUST   yaml.forbidden-key-on  aresta #6 (C_X -> Q_A)
+#     SHOULD integrity.testimony-in-prod  nó C_BIAS_AUDIT_QUARTERLY
+```
+
+O que não tem lugar mais fino sai como `arquivo`: o erro de parse, o `.nan`/`.inf` e a data sem aspas.
 
 rc 0 todo arquivo passa no MUST, 1 algum reprova, 2 entrada quebrada.
 
@@ -159,6 +178,14 @@ recalcula o carimbo. Isso o review do PR do adotante pega, porque o diff do cari
 No MUST, a comparação é por grafo: consertar um grafo não compensa quebrar outro. A dívida SHOULD é por código,
 um total de grafos. Tirar um aviso de um grafo e pôr o mesmo em outro empata.
 
+**Dívida por nó.** Por grafo, uma melhora espalhada aparece como piora: consertar 3 ocorrências num grafo e criar 1
+em outro conta como +1 grafo. Desde a `contract-v4.2.0`, `kg_gate.py --update --granularity node` passa a contar e
+travar a dívida SHOULD por ocorrência, somada em todos os grafos. A base guarda a granularidade, e o gate a usa sem
+precisar da opção outra vez; `--granularity graph` volta ao padrão. Trocar não é piora: na passada que troca, a
+dívida é comparada na granularidade da base, e o `--update` só pede motivo se ela piorou de verdade. O MUST segue por
+grafo nas duas granularidades. Ocorrência é por nó ou aresta na maioria dos códigos; os que valem para o arquivo
+inteiro (`yaml.unquoted-date`, `form.range.top.nodes`) contam 1 por grafo.
+
 Um ganho passa e pede para travar: o grafo saiu de `failing` porque foi consertado, ou a dívida caiu. Um grafo
 apagado não conta como conserto: o gate diz que ele saiu do corpus, e diz quando o corpus encolhe, para o PR
 mostrar a remoção. Para
@@ -174,7 +201,8 @@ Sobre `--update`:
 - no `kg_gate.py`:
   - `--repo` não é um repo git;
   - a base está ausente (sem `--update`), ilegível ou fora do formato. O formato é `contract` como texto,
-    `failing` como caminho → [códigos], `debt` como código → inteiro ≥ 0 e `accepted_regressions` como lista;
+    `failing` como caminho → [códigos], `debt` como código → inteiro ≥ 0, `accepted_regressions` como lista e,
+    opcional, `granularity` como `graph` ou `node`;
   - um `.kg.yaml` não pôde ser lido.
 - no `kg_vendor.py`:
   - o `--source` não é repo git, a tag não existe, ou o `spec/release.json` dela está ausente, ilegível ou
@@ -194,7 +222,7 @@ O PR que muda a tag faz três coisas:
 Aviso novo no SHOULD sobe a dívida por desenho. As rampas do contrato (SHOULD hoje, MUST depois) chegam assim,
 como compromisso medido.
 
-Da `contract-v4.0.x` para a `contract-v4.1.0`, nenhum veredito muda: entram quatro avisos SHOULD (carimbo sem alvo,
+Da `contract-v4.0.x` para a `contract-v4.1.x`, nenhum veredito muda: entram quatro avisos SHOULD (carimbo sem alvo,
 testemunho em PROD, verificação antes do fato e decisão sem origem; a tabela está em `spec/conformance/README.md`).
 Se a dívida SHOULD subir (por desenho, quando o corpus tem o que os avisos novos acusam), o `--update` desse PR vai com
 `--accept-regression "<motivo>"`; se não subir, o `--update` grava a identidade nova sem motivo.
@@ -221,7 +249,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance` (no primeiro adotante, seis deles emitiam `method` livre).
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.1.0 --source <caminho ou URL deste repo>`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.2.0 --source <caminho ou URL deste repo>`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
@@ -229,6 +257,14 @@ O caminho, num PR só:
    `failing`, como **dívida herdada**. Sem o motivo, o `--update` recusa, porque grafo que passava e falha é
    piora. Daí em diante vale a catraca: grafo novo tem de passar no v4, grafo de `failing` não ganha código MUST
    novo, e a dívida só encolhe, com `--update` a cada conserto.
+
+**Onde a fonte mora** (`provenance.locality`, opcional, desde a `contract-v4.2.0`): `repo` (arquivo versionado no
+próprio repo), `web` (endereço público), `host` (só existe numa máquina: um journal local, um caminho fora do repo) ou
+`pessoa` (o relato de alguém). Fora desses valores, alerta como `form.enum.node.provenance.locality`. Serve para medir
+o que um terceiro consegue reverificar e para barrar `host` quando o grafo vai a público.
+
+**Label corrigido.** Quando uma revisão troca o label de um nó, o label anterior vai para a `narrative`, começando
+por `label anterior: …`. O git guarda o resto do histórico; o contrato não tem campo próprio para isso.
 
 O que fazer com um nó `confirmed` ou PROD **sem fonte recuperável**:
 - **o padrão é rebaixar** o `status` para `unverifiable`, que não exige `provenance`: o que não se rastreia não

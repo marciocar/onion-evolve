@@ -4,12 +4,17 @@
 Mede os .kg.yaml rastreados por git no repo (árvore de trabalho; fora */fixtures/* e docs/materials/*, como no
 spike, ou o que --exclude disser) contra o MUST e o SHOULD do contrato vigente, e compara com a linha de base:
   failing — grafo → códigos MUST que ele carrega hoje (a dívida herdada, nomeada por caminho);
-  debt    — código SHOULD → quantos grafos o carregam.
+  debt    — código SHOULD → quantos grafos o carregam (granularity graph, o padrão) ou quantas ocorrências, somadas
+            em todos os grafos (granularity node). A base guarda a granularidade; --granularity a troca num --update.
 
 Reprova (rc 1): grafo fora de failing que falha no MUST (grafo NOVO inclusive); grafo de failing com código MUST
 que não tinha; dívida de um código que sobe ou código de dívida novo; contrato diferente do da base (nome do
 schema MUST ou sha256 dos schemas). Consertar um grafo não compensa quebrar outro no MUST: a comparação é por
-grafo. A dívida SHOULD é por código (total de grafos): tirar um aviso de A e pôr o mesmo em B empata.
+grafo. A dívida SHOULD é por código: por grafo, tirar um aviso de A e pôr o mesmo em B empata; por nó, consertar três
+ocorrências num grafo e criar uma noutro é ganho (o pedido do core: por grafo, uma melhora líquida espalhada aparecia
+como piora). Trocar a granularidade não é piora: na passada que troca, a dívida é comparada na granularidade da base, e
+só uma piora de verdade pede --accept-regression. Ocorrência é por nó ou aresta na maioria dos códigos; os que são do
+arquivo inteiro (yaml.unquoted-date, form.range.top.nodes) contam 1 por grafo.
 Ganho (grafo que sai de failing, código que some, dívida que cai): passa, com aviso "trave com --update".
 
 Depois da comparação, o detalhe da medição (os mesmos códigos de kg_validate.py, sem mudar o rc):
@@ -23,7 +28,7 @@ motivo fica na base. rc 2: entrada quebrada (não é repo git, base ilegível, f
 
 Uso:
   kg_gate.py [--repo DIR] [--baseline ARQ] [--exclude GLOB ...] [--no-default-excludes]
-             [--update [--accept-regression MOTIVO]]
+             [--update [--accept-regression MOTIVO] [--granularity graph|node]]
 """
 import argparse
 import collections
@@ -58,8 +63,11 @@ def measure_texts(items):
     É a mesma lógica que a catraca daqui (kg_ratchet.core_numbers) usa para medir o core por fora.
     """
     must, should = validators()
-    return {name: {"must": kg_validate.codes(text, must), "should": kg_validate.warnings(text, must, should)}
-            for name, text in items}
+    out = {}
+    for name, text in items:
+        counts = kg_validate.warning_counts(text, must, should)
+        out[name] = {"must": kg_validate.codes(text, must), "should": sorted(counts), "should_counts": dict(counts)}
+    return out
 
 
 def selected(name, exclude):
@@ -87,16 +95,28 @@ def contract_identity():
     return kg_validate.CONTRACT_MUST.name, digest.hexdigest()
 
 
-def numbers(measured):
+GRANULARITIES = ("graph", "node")
+
+
+def numbers(measured, granularity="graph"):
     failing = {n: r["must"] for n, r in sorted(measured.items()) if r["must"]}
-    debt = collections.Counter(c for r in measured.values() for c in set(r["should"]))
+    if granularity == "node":
+        debt = collections.Counter()
+        for r in measured.values():
+            debt.update(r.get("should_counts") or {c: 1 for c in r["should"]})
+    else:
+        debt = collections.Counter(c for r in measured.values() for c in set(r["should"]))
     name, digest = contract_identity()
-    return {"contract": name, "contract_sha256": digest, "graphs": len(measured), "failing": failing,
-            "debt": dict(sorted(debt.items()))}
+    out = {"contract": name, "contract_sha256": digest, "graphs": len(measured), "failing": failing,
+           "debt": dict(sorted(debt.items()))}
+    if granularity != "graph":
+        out["granularity"] = granularity
+    return out
 
 
-def compare(base, now, present=None):
-    """(rc, linhas, piorou), por grafo em failing e por código em debt. present: os grafos medidos agora."""
+def compare(base, now, present=None, debt_now=None):
+    """(rc, linhas, piorou), por grafo em failing e por código em debt. present: os grafos medidos agora. debt_now: a
+    dívida de agora medida na granularidade da BASE, para a passada que troca a granularidade comparar maçã com maçã."""
     rc, lines, worse_any = 0, [], False
 
     def worse(msg):
@@ -122,6 +142,13 @@ def compare(base, now, present=None):
             lines.append(f"↑ melhorou {name}: " + (f"saiu {', '.join(sorted(want - got))}" if got else "passa no MUST")
                          + " (trave o ganho: kg_gate.py --update)")
     want_d, got_d = base.get("debt", {}), now["debt"]
+    g_base, g_now = base.get("granularity", "graph"), now.get("granularity", "graph")
+    if g_base != g_now:
+        if debt_now is None:
+            raise ValueError("granularidade trocada sem a dívida medida na granularidade da base")
+        got_d = debt_now  # compara na unidade da base: trocar não é piora, mas a piora que vier junto aparece
+        lines.append(f"· granularidade da dívida trocada: base por {g_base}, nova por {g_now} — a dívida é comparada por"
+                     f" {g_base}, e a base nova é gravada por {g_now}")
     for code in sorted(set(want_d) | set(got_d)):
         want, got = want_d.get(code, 0), got_d.get(code, 0)
         if got > want:
@@ -152,8 +179,9 @@ def detail(base, now):
         else:
             kind = "herdado"
         lines.append(f"  MUST   {name} ({kind}): {' · '.join(got)}")
+    one, many = ("ocorrência", "ocorrências") if now.get("granularity") == "node" else ("grafo", "grafos")
     for code, count in now["debt"].items():
-        lines.append(f"  SHOULD {code}: {count} grafo{'s' if count != 1 else ''}")
+        lines.append(f"  SHOULD {code}: {count} {one if count == 1 else many}")
     return lines
 
 
@@ -169,10 +197,11 @@ def read_base(path):
           and isinstance(base.get("failing"), dict) and all(strings(v) for v in base["failing"].values())
           and isinstance(base.get("debt"), dict)
           and all(type(v) is int and v >= 0 for v in base["debt"].values())
-          and isinstance(base.get("accepted_regressions", []), list))
+          and isinstance(base.get("accepted_regressions", []), list)
+          and base.get("granularity", "graph") in GRANULARITIES)
     if not ok:
         raise Broken(f"linha de base fora do formato ({path}): contract texto, failing caminho → [códigos],"
-                     " debt código → inteiro ≥ 0, accepted_regressions lista")
+                     " debt código → inteiro ≥ 0, accepted_regressions lista, granularity graph ou node")
     return base
 
 
@@ -187,22 +216,30 @@ def main(argv=None):
                     help="não aplica os defaults (cuidado: as fixtures do vendor entram no corpus)")
     ap.add_argument("--update", action="store_true", help="grava a linha de base (mostra a comparação antes)")
     ap.add_argument("--accept-regression", metavar="MOTIVO", help="com --update: aceita uma piora, com o motivo na base")
+    ap.add_argument("--granularity", choices=GRANULARITIES,
+                    help="com --update: troca a granularidade da dívida SHOULD (graph, o padrão, ou node); sem ela, vale"
+                         " a da base")
     args = ap.parse_args(argv)
+    if args.granularity and not args.update:
+        print("GATE QUEBRADO  --granularity só vale com --update (a base lembra a granularidade)")
+        return 2
     path = pathlib.Path(args.baseline) if args.baseline else pathlib.Path(args.repo) / DEFAULT_BASELINE
     try:
         measured = measure_texts(corpus(args.repo, (() if args.no_default_excludes else DEFAULT_EXCLUDE)
                                         + tuple(args.exclude)))
-        now = numbers(measured)
         if path.is_file():
             base = read_base(path)
         elif args.update:
             base = None
         else:
             raise Broken(f"linha de base ausente ({path}): grave a primeira com --update")
+        g_base = (base or {}).get("granularity", "graph")
+        now = numbers(measured, args.granularity or g_base)
+        debt_now = numbers(measured, g_base)["debt"] if base is not None and args.granularity not in (None, g_base) else None
     except (Broken, OSError, ValueError) as exc:
         print(f"GATE QUEBRADO  {exc}")
         return 2
-    rc, lines, worse = compare(base, now, set(measured)) if base is not None else (0, [], False)
+    rc, lines, worse = compare(base, now, set(measured), debt_now) if base is not None else (0, [], False)
     print("\n".join(lines + detail(base, now)))
     if not args.update:
         return rc

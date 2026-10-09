@@ -130,12 +130,15 @@ jobs:
 
       - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
         # O radar (kg-radar.sh) é o leitor de semântica e integridade; a FORMA do .kg.yaml é julgada pelo
-        # contrato v4.1 vendorizado por pin (tag contract-v4.1.0 do adotante dedicado ao KG-SSOT; o v4.1 só
-        # acrescenta 4 avisos SHOULD ao v4.0, adotado em 2026-10-09 com a dívida nova na base). Medido em
+        # contrato v4.2 vendorizado por pin (tag contract-v4.2.0 do adotante dedicado ao KG-SSOT; o v4.1 trouxe
+        # 4 avisos SHOULD ao v4.0, e o v4.2 traz a dívida POR NÓ e o `provenance.locality` opcional, sem mudar
+        # nenhum veredito MUST; adotado em 2026-10-09, SAC-97). Medido em
         # 2026-10-08: o radar sozinho aceitava 55 casos da suíte que o contrato reprova. O vendor não se
         # edita aqui (o check reprova qualquer byte alterado); mudança no contrato volta como sinal.
-        # Catraca POR GRAFO contra .kg-ssot/gate.json: grafo novo ou que passou a falhar no MUST reprova,
-        # e a dívida SHOULD só pode descer. rc 2 = entrada quebrada, nunca verde.
+        # Catraca contra .kg-ssot/gate.json: no MUST, POR GRAFO (grafo novo ou que passou a falhar reprova);
+        # a dívida SHOULD só pode descer e, desde o v4.2, é contada POR OCORRÊNCIA (código × nó). A base
+        # GUARDA a granularidade ("granularity": "node"), por isso este passo NÃO passa --granularity: o
+        # gate lê a da base. rc 2 = entrada quebrada, nunca verde.
         run: |
           python3 -m pip install --quiet -r vendor/kg-ssot/tools/requirements.txt
           python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
@@ -143,7 +146,7 @@ jobs:
           # posição do dono do contrato): propostas arquivadas do kg-inbox são história, e os grafos proto
           # do Onion pessoal não são grafo do produto. O demo fictício foi para fixtures/ (default).
           # ⚠️ A base (.kg-ssot/gate.json) tem de ser gravada com os MESMOS --exclude:
-          #    python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update <os --exclude abaixo>
+          #    python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update <os --exclude abaixo>  (a granularidade vem da base)
           python3 -I vendor/kg-ssot/tools/kg_gate.py \
             --exclude 'docs/evolution/kg-inbox/_rejected/*' \
             --exclude 'docs/evolution/kg-inbox/_sealed/*' \
