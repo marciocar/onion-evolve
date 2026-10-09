@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**404 itens abertos** em 87 grafo(s) com aberto (de 113 no escopo) · 88 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**406 itens abertos** em 87 grafo(s) com aberto (de 113 no escopo) · 88 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -553,13 +553,14 @@
 | 5.1 | `Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA` | radar-E3-2026-10-03-r6 | BURACO DE FLUXO 2 (de 3), apontado pelo maestro: "visao da comunidade sobre a versao" NAO entra na rodada E3 por construcao. Medid |
 | 5.1 | `Q_SKILL_VERIFY_E_ABSORCAO_SEM_TROCAR_MECANISMO` | radar-E3-2026-10-03-r6 | A 2.1.286 (30/09) — e NAO a 2.1.287 como a 1a passada afirmou, e a versao errada era de DENTRO da janela que eu declarei selada  |
 
-## identidade-onion-vps-2026-08 — 5 item(ns)
+## identidade-onion-vps-2026-08 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 14.2 | `E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO` | identidade-onion-vps-2026-08 | O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotan |
 | 12.0 | `Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO` | identidade-onion-vps-2026-08 | ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. Medido em `/home/marcio/onion-adopt-arandek/dock |
 | 6.4 | `Q_REFUTES_EDGE_SEM_PAR` | identidade-onion-vps-2026-08 | A lacuna REAL que restou do Q_LACUNA refutado: a aresta REFUTES tipada (refutacao como cidada de 1a classe do grafo, com reconcili |
+| 5.6 | `Q_LOGTO_QUANDO_FECHAR_O_CADASTRO` | identidade-onion-vps-2026-08 | quando fechar de novo o cadastro do Logto (signInMode: SignIn) — GATILHO: o propósito do cadastro aberto acabar, surgir conta q |
 | 5.4 | `Q_SENHA_CHAVE_ESTADO_2026_09` | identidade-onion-vps-2026-08 | ESTADO ATUAL da chave GPG com passphrase (substitui o no de 08-12 que misturava >=9 afirmacoes): a protecao FICA (decisao do maest |
 | 4.8 | `Q_MAIS_UM_IMUTAVEL_GATED` | identidade-onion-vps-2026-08 | O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda d |
 
@@ -670,12 +671,13 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## door-role-parity-2026-09 — 2 item(ns)
+## door-role-parity-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.2 | `Q_PREDICADO_SUCESSOR` | door-role-parity-2026-09 | a paridade é cega a 'ambas as fontes erradas do mesmo modo'; o sucessor mede o CONTEÚDO da porta contra o corte (vendor-manifest |
-| 4.2 | `Q_ROLE_DUPLA_LEITURA` | door-role-parity-2026-09 | o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade |
+| 6.4 | `Q_REGISTRAR_ONION_PLUGINS_NO_MEMBERS` | door-role-parity-2026-09 | onion-plugins é repo público com prefixo onion- e segue FORA do members.yaml, o ponto cego da REGRA 36 — GATILHO: registrar co |
+| 6.3 | `Q_ROLE_DUPLA_LEITURA` | door-role-parity-2026-09 | o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade |
 
 ## forge-cc-update-2026-10 — 2 item(ns)
 

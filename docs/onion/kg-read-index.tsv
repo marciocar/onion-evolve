@@ -2127,6 +2127,7 @@ docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml	D_SELO_DO_MAESTRO_REVE
 docs/onion/graph/pr-decision-history-2026-08.kg.yaml	E_PR_DECISION_LOG	docs/onion/graph/pr-decision-history-2026-08.kg.yaml
 docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml	C_p6_wrapper_fino	docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml
 docs/onion/graph/testes-evidencia-2026-09.kg.yaml	E_DOC_AFIRMA_ESTADO_QUE_O_VIVO_DESMENTE	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
+docs/onion/identidade-onion-vps.md	E_LOGTO_CADASTRO_ABERTO_INTENCIONAL_2026_10_09	docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml
 docs/onion/inventory.md	C_D8_22	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/onion/inventory.md	E_BRANCH_MAESTRO_ASIDE_ERA_MORTA_DE_FATO	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/onion/inventory.md	E_C1_SSOT	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
