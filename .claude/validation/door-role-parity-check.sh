@@ -160,6 +160,9 @@ while IFS=$'\x1f' read -r mid role path kind; do
   #     (SAC-94). Hoje o clone é a destilação antiga, sem carimbo. A guarda DECLARA não-medido, como
   #     no CI; depois da F5 o carimbo existe e cai na comparação normal abaixo.
   #   Se uma dessas portas tiver `.onion-version`, NENHUM ramo especial vale: compara como as outras.
+  #   TETO DECLARADO: para `plugins` esta guarda mede só a PRESENÇA da proveniência (a forma), não
+  #   compara o `ref` com o `onion_version` do registro — isso é pin, e o pin é da REGRA 85 e do
+  #   `/meta:publish` (F3). Papel e pin são perguntas diferentes; misturá-las aqui criaria um 2º dono.
   if [ ! -f "${path}/.claude/.onion-version" ]; then
     if [ "${role}" = "plugins" ]; then
       if compgen -G "${path}/plugins/*/.claude-plugin/provenance.json" >/dev/null; then continue; fi
