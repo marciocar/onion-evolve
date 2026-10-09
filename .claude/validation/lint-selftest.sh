@@ -9344,6 +9344,9 @@ run_cited_directive_selftests() {
   #     Claude Code — duas atualizações em dois dias pintaram de vermelho PRs sem relação com a guarda, e a
   #     re-extração era à mão. Agora os identificadores entram como curinga (`⟨F⟩`, consistente dentro do
   #     trecho) e só a ESTRUTURA é comparada: renomear não é deriva; mudar o comportamento é.
+  #     AS LOCAIS DO LAÇO TAMBÉM (2026-10-09, SAC-84): a 2.1.295 trocou `for(let g…let h=` por
+  #     `for(let h…let y=` sem mudar uma vírgula do comportamento, e o (f) reprovou DERIVA porque o
+  #     molde fixava `g`/`h` — o curinga tinha parado nos nomes de função. `⟨G⟩`/`⟨H⟩` fecham isso.
   local _bin _miss; _bin="$(readlink -f "$(command -v claude 2>/dev/null)" 2>/dev/null || true)"
   _cd_struct() {  # <arquivo> → imprime os trechos AUSENTES (vazio = os 3 presentes)
     python3 - "$1" <<'CDPY'
@@ -9351,7 +9354,7 @@ import re, sys
 data = open(sys.argv[1], 'rb').read().decode('latin-1')
 T = [r'function ⟨F⟩(e){return e.replace(/`[^`\n]+`/g,(n,r)=>{let s=e[r-1];return s==="!"||s==="`"?n:"`"+',
      r'⟨B⟩=/```!\s*\n?([\s\S]*?)\n?```/g,⟨I⟩=/(?<=^|\s)!`([^`]+)`/gm',
-     r'let n=e.matchAll(⟨B⟩),r=e.includes("!`")?⟨F⟩(e).matchAll(⟨I⟩):[],s=[];for(let g of[...n,...r]){let h=⟨T⟩(g[1]??"");if(h)s.push({raw:g[0],command:h,at:g.index})}return s']
+     r'let n=e.matchAll(⟨B⟩),r=e.includes("!`")?⟨F⟩(e).matchAll(⟨I⟩):[],s=[];for(let ⟨G⟩ of[...n,...r]){let ⟨H⟩=⟨T⟩(⟨G⟩[1]??"");if(⟨H⟩)s.push({raw:⟨G⟩[0],command:⟨H⟩,at:⟨G⟩.index})}return s']
 for t in T:
     rx, seen = '', set()
     for part in re.split(r'(⟨[A-Z]⟩)', t):
@@ -24360,6 +24363,14 @@ run_cc_delta_census_selftests() {
   if [ "${rc}" -eq 0 ] && grep -q "^hooks$(printf '\t')2$(printf '\t')sem_onFailure$(printf '\t')1\$" <<< "${out}"; then
     record_pass "cc-delta-census: (d) inventário acusa o hook sem onFailure (1 de 2)"
   else record_fail "cc-delta-census: (d)" "rc=${rc} $(_emit "${out}" | grep '^hooks' | tr '\t' ' ')"; fi
+  # (h) guarda de DERIVA DE BINÁRIO listada (SAC-84, 2026-10-09): só a família que lê o claude instalado.
+  #     O fixture escreve `command -v %s` + claude para esta própria família não se auto-acusar no repo real.
+  mkdir -p "${sb}/r/.claude/validation"
+  printf 'run_le_binario_selftests() {\n  _b="$(command -v %s)"\n}\nrun_so_copia_selftests() {\n  :\n}\n' claude > "${sb}/r/.claude/validation/lint-selftest.sh"
+  if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= bash "${sut}" "${sb}/r" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ "$(grep '^guarda_binario' <<< "${out}" | tr '\t' ' ')" = "guarda_binario le_binario" ]; then
+    record_pass "cc-delta-census: (h) lista a guarda de deriva de binário (e só ela) para a rodada rodar"
+  else record_fail "cc-delta-census: (h)" "rc=${rc} [$(grep '^guarda_binario' <<< "${out}" | tr '\t\n' ' ')]"; fi
   # (f) o diretório da próxima rodada sai do `kg:` do eixo E3 (r7 → r8), não da memória de quem conduz
   if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= CC_DELTA_TODAY=2026-10-08 bash "${sut}" "${sb}/r" --tsv 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -q "^proxima_rodada$(printf '\t')docs/evolution/research/radar-E3-2026-10-08-r8/\$" <<< "${out}"; then

@@ -22,6 +22,10 @@ nodes:
     verified_against: 'cited-directive-check.sh contra um worktree de origin/main: 2 achados HARD em create-skill.md l.86 (crase dupla) e l.219 (bloco cercado); 0 achados com a leva 1 aplicada (262 arquivos lidos)'
     trace: '.claude/commands/meta/create-skill.md'
     label: 'O DEFEITO, DATADO (peca 1 da guarda): em 2026-10-04 o /meta:create-skill executava git diff e git diff HEAD a cada invocacao — dois exemplos de documentacao que o autor escreveu como CITACAO (crase dupla; bloco cercado) e que o harness 2.1.289 le como diretiva de injecao viva. Segunda instancia no mesmo dia: o /meta:forge-guard nasceu morto na carga pelo mesmo mecanismo. A guarda, rodada contra main, acusa exatamente os dois sitios do dano e cala depois da cura.'
+    provenance:
+      source: ".claude/commands/meta/create-skill.md@fea684c3^ e .claude/validation/cited-directive-check.sh@fea684c3"
+      locator: "create-skill.md l.86 (crase dupla) e l.219 (bloco cercado), antes da leva 1"
+      method: "medição: guarda rodada contra worktree de origin/main em 2026-10-04 (2 HARD) e com a leva 1 aplicada (0 achados, 262 arquivos)"
 
   - id: D_SUBSTRATO_CHECK_DE_LINT_MOTOR_PYTHON
     node_type: decision
@@ -65,6 +69,10 @@ nodes:
     verified_against: 'doze mutantes contra a familia cited_directive, 12/12 mordem: sem mascara (M4), sem lookbehind (M6), bloco em prosa (M5), bloco em cerca (M9), cerca-bang nao alterna (fp1), cerca fecha por qualquer cerca, so crase sem recuo, crase dupla em qualquer ponto, sem blockquote, sem comentario HTML, motor morto calado, dispatcher desligado'
     trace: '.claude/validation/lint-selftest.sh'
     label: 'MUTANTES DEPOIS DAS CURAS: doze, incluindo os quatro do Elenxo que sobreviviam (M4, M5, M6, M9) e o dispatcher desligado. Dois deles (M4, M6) so morderam quando a paridade passou a olhar a GUARDA alem do binario; e o da cerca so mordeu quando o caso fp5 voltou a forma exata do achado (cerca interna nua). Tres casos decorativos achados pelo proprio mutante, de novo.'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh@fea684c3 (run_cited_directive_selftests)"
+      locator: "familia cited_directive, casos (a) a (f)"
+      method: "medição: doze mutantes aplicados a guarda e a bancada, 12/12 reprovaram"
 
   - id: C_TETO_REGEX_TRANSCRITAS_DE_UMA_VERSAO
     node_type: claim
@@ -75,6 +83,10 @@ nodes:
     trace: '.claude/validation/cited-directive-check.sh'
     verified_against: 'cabecalho do script, secao TETO'
     label: 'TETO 1: as regex sao TRANSCRITAS do binario 2.1.289. Um Claude Code novo pode mudar o parser e a guarda nao percebe — ela simularia uma leitura que o harness ja nao faz. Quem acusa a versao nova e a REGRA 65 (radar E3); re-medir estas regex e parte da rodada do E3.'
+    provenance:
+      source: ".claude/validation/cited-directive-check.sh"
+      locator: "cabecalho, secao TETO DECLARADO (1o item)"
+      method: "leitura: cabecalho da guarda"
 
   - id: C_TETO_PROSA_NUA_E_AGENTES
     node_type: claim
@@ -85,8 +97,39 @@ nodes:
     trace: '.claude/validation/cited-directive-check.sh'
     verified_against: 'cabecalho do script, secao TETO'
     label: 'TETO 2: diretiva viva numa linha de prosa comum e tratada como INTENCIONAL (e a forma das diretivas de verdade, e intencao nao se mede) — um exemplo escrito em prosa nua passa. E o universo nao inclui .claude/agents, e isso e CERTO e medido: o Elenxo da leva 1 achou no binario que o harness nao injeta em corpo de agente. Os 4 sitios do agent-skills-specialist foram cura preventiva.'
+    provenance:
+      source: ".claude/validation/cited-directive-check.sh"
+      locator: "cabecalho, secao TETO DECLARADO (itens prosa nua e universo)"
+      method: "leitura: cabecalho da guarda"
+
+  - id: E_REEXTRACAO_2_1_295_SO_NOMES
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-10-09"
+    valid_from: "2026-10-09"
+    verified_against: "binario 2.1.295 (~/.local/share/claude/versions/2.1.295) lido por bytes; copia 2.1.290 de HEAD normalizada por renomeacao e comparada a copia 2.1.295: IDENTICAS; 2.1.293 e 2.1.294 com a forma da 2.1.290; corpus --tsv rc 0 e vazio com as duas copias"
+    trace: ".claude/validation/cited-directive-check.sh"
+    label: "Na 2.1.295 o parser de diretivas so mudou NOMES, inclusive as locais do laco (g/h viraram h/y). A bancada (f) reprovou DERIVA porque o molde fixava g/h; o comportamento e o mesmo e o corpus nao ganhou nem perdeu acusacao."
+    narrative: >
+      SAC-84 (2026-10-09). Antes (2.1.290): function D3n(e){let n=e.matchAll(lUn),r=e.includes("!`")?PCe(e).matchAll(dUn):[],s=[];for(let g of[...n,...r]){let h=aFr(g[1]??"");if(h)s.push({raw:g[0],command:h,at:g.index})}return s}.
+      Depois (2.1.295): function Ltr(e){let n=e.matchAll(Dqn),r=e.includes("!`")?UPe(e).matchAll(Lqn):[],s=[];for(let h of[...n,...r]){let y=o5r(h[1]??"");if(y)s.push({raw:h[0],command:y,at:h.index})}return s}.
+      Mascara e as duas regex: byte a byte iguais. O curinga estrutural de 2026-10-06 tinha parado nos nomes de
+      funcao; a cura estendeu a ⟨G⟩/⟨H⟩. Mutantes: copia 2.1.290 de volta passa (renomear nao e deriva, por
+      desenho); tirar a mascara da copia reprova (f) em guarda:; o molde antigo reprova (f) em guarda: e binario:.
+      Licao mecanizada no cc-delta-census.sh: o relatorio lista as guardas de deriva de binario (familias que
+      leem `command -v claude`, hoje so cited_directive), caso (h) na bancada, porque o CI nao tem o binario.
+    provenance:
+      source: "/home/marcio/.local/share/claude/versions/2.1.295 e git show HEAD:.claude/validation/cited-directive-check.sh"
+      locator: "offset 215300431 do binario (funcao UPe ate Ltr); bloco verbatim do _engine da guarda"
+      method: "medição: extracao por python lendo bytes, comparacao normalizada por renomeacao, bancada --families cited_directive e tres mutantes"
 
 edges:
+  - from: E_REEXTRACAO_2_1_295_SO_NOMES
+    to: D_MOTOR_E_COPIA_LITERAL_DO_BINARIO
+    edge_type: SUPPORTS
   - from: E_DEFEITO_CITACAO_EXECUTADA
     to: D_SUBSTRATO_CHECK_DE_LINT_MOTOR_PYTHON
     edge_type: SUPPORTS
