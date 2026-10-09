@@ -2,7 +2,7 @@
 title: 'Resíduo — gmill.onionevolve.com: o 1º vhost de conf.d versionado, com segredo fora do git'
 date: 2026-10-08
 branch: ops/gmill-demo-site
-reviewed_diff_sha256: 2fe2068d2b572a571eaad09081ee4d027dd9dac1470c750f26e2ecd23918f60c
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 8066dc592f5ea5e75aa971c08b8aa39326df268dfd9596db5cf10051daed7953
 findings_total: 7
 findings_real: 6
@@ -98,3 +98,5 @@ segredos rotacionados, que nunca apareceram em saída nenhuma.
   - **Lição:** prova com credencial imprime só `http_code`, nunca `url_effective` nem `redirect_url`.
 
 - **Demo sem dados.** O Basic do vhost seguia ao upstream, e o IdP de teste o lia no `/default/token` como autenticação do cliente OAuth (`client_secret_basic`, client `gmill` desconhecido). Por isso o token saía como `vendedor-01/filial-01`, perfil sem dados. A cura é `header_up -Authorization` só na rota do Basic, já que a rota do cookie mantém o Bearer. Medido: `/api/v1/me` passou de `vendedor-01` a `demo-admin / DEMO-ES`.
+
+- **header_down removido.** A meugmill-vendas mergeou `absolute_redirect off` no nginx da web (PR #16 deles, 83d84a7). Conferido no upstream: `Location: /demo/index.html`. Via Caddy, com credencial: 302 para `/demo/index.html`. O `header_up -Authorization` fica, porque é a fronteira do Basic.
