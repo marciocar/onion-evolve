@@ -50,6 +50,10 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
     nada da linha é aplicado): method fora das classes do contrato, source/locator vazios, label_final vazio ou
     acima de 280, refutar sobre status que não é confirmed, nó ausente do grafo, rebaixar sobre status que não é
     confirmed. Edição por linha; a 2ª aplicação é no-op. Datas não são citadas neste modo.
+  · ONDA O4 (2026-10-09, SAC-73): a planilha com as colunas `regra` e `locality_final` (o4-juiz.csv) aceita o mesmo
+    nó numa linha por regra e aplica dev-historia (PROD→DEV), manter-prod-medido (provenance medida + verified_at
+    do --verified-at), reescrever-source e corrigir-method-locality (provenance com a locality do juiz; `(inalterado)`
+    mantém o valor atual; caminho absoluto de arquivo na source final é recusado). Ver apply_judged_o4.
   · COM --locality (contrato v4.2, 2026-10-09, SAC-97): só ACRESCENTA `provenance.locality` (repo|web|host|
     pessoa) às provenances em bloco que ainda não a têm, quando o `source` a determina pela regra de locality_of
     (ver o bloco "provenance.locality" abaixo); sem certeza, o nó fica sem a chave e sai na contagem. Prova, por
@@ -61,7 +65,7 @@ O que ela NÃO faz (é decisão humana ou do contrato, nunca da ferramenta):
     (a gramática diz: sem fonte verificável, o nó não é confirmed — rebaixar é decisão de quem conhece o nó);
   · label acima de 280 NÃO é cortado: separar fato e narrativa é semântico; sai no relatório.
 
-Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv> [--promote-unverifiable] | --locality] <arquivo.kg.yaml>...
+Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv> [--promote-unverifiable] [--verified-at AAAA-MM-DD] | --locality] <arquivo.kg.yaml>...
 rc:    0 = nada pendente (ou aplicado) · 1 = --check e há mudança pendente · 2 = entrada quebrada
        (arquivo ausente, routing ilegível ou sem as colunas, YAML inválido antes ou DEPOIS da edição — a edição
        nunca grava YAML inválido).
@@ -419,11 +423,17 @@ def load_judged(path):
     if not rows or any(c not in rows[0] for c in JUDGED_COLS):
         raise BrokenInput(f"planilha julgada sem as colunas {', '.join(JUDGED_COLS)} ({path})")
     out = {}
+    by_rule = "regra" in rows[0]  # formato O4: o mesmo nó pode vir numa linha por regra
     for r in rows:
         k = (r["grafo"], r["id"])
-        if k in out:
+        if by_rule:
+            if any(x["regra"] == r["regra"] for x in out.get(k, [])):
+                raise BrokenInput(f"planilha julgada com id duplicado na mesma regra ({path}): {k[1]} em {k[0]} (regra {r['regra']})")
+            out.setdefault(k, []).append(r)
+        elif k in out:
             raise BrokenInput(f"planilha julgada com id duplicado ({path}): {k[1]} em {k[0]}")
-        out[k] = r
+        else:
+            out[k] = r
     return out
 
 
@@ -444,14 +454,15 @@ def _set_field(block, key, old, new):
     return block, False, None
 
 
-def _put_provenance(block, src, loc, method, lroot=None):
+def _put_provenance(block, src, loc, method, lroot=None, locality=None):
     """Escreve o bloco provenance (ou substitui o existente, no mesmo lugar), com a locality quando o source a
-    determina (contrato v4.2). (bloco, mudou?)."""
+    determina (contrato v4.2) ou, na O4, a que o juiz escreveu (`locality`). (bloco, mudou?)."""
+    loc_val = locality or locality_of(src, lroot)
     new = ["    provenance:", "      source: " + q(src), "      locator: " + q(loc), "      method: " + q(method)] \
-        + _loc_line(src, lroot)
+        + (["      locality: " + q(loc_val)] if loc_val else [])
     want = {"source": src, "locator": loc, "method": method}
-    if locality_of(src, lroot):
-        want["locality"] = locality_of(src, lroot)
+    if loc_val:
+        want["locality"] = loc_val
     for n, b in enumerate(block[1:], 1):
         if re.match(r'^    provenance:[ \t]*(#.*)?$', b):
             e = n + 1
@@ -612,6 +623,143 @@ def apply_judged(text, judged, promote=False, wave="", lroot=None):
     return "\n".join(out), rep
 
 
+# ── onda O4 (2026-10-09, SAC-73): a planilha julgada traz `regra` e `locality_final` ──────────────────────
+#   dev-historia             → `plane: PROD` vira `DEV` (testemunho datado sem conferência); status intocado;
+#   manter-prod-medido       → fica em PROD: provenance com os *_final (method `medição: …`) e `verified_at`
+#                              passa à data do --verified-at (condição do juiz: medição de hoje);
+#   reescrever-source        → troca source/locator/method/locality pelos *_final; `(inalterado)` mantém o atual;
+#   corrigir-method-locality → idem (a regra 3 selada: binário de versão fixa é `medição` com `host`).
+#   Recusa atômica por linha: method fora das classes, locality fora de repo|web|host|pessoa, campo vazio,
+#   `(inalterado)` sem provenance de onde copiar, CAMINHO ABSOLUTO DE ARQUIVO na source final, provenance em
+#   fluxo, dev-historia/manter sobre plane que não é PROD, manter sem --verified-at.
+O4_ACTIONS = ("dev-historia", "manter-prod-medido", "reescrever-source", "corrigir-method-locality")
+O4_KEEP = re.compile(r'^\(inalterad[oa]\)$')
+# caminho de arquivo do host (não rota HTTP como /threads): raiz de sistema ou ~/
+ABS_FS_RE = re.compile(r'(?:^|[\s"\'(=,;\[])(?:~/|/(?:home|etc|var|usr|tmp|opt|root|srv|boot|run|proc|sys|mnt|lib|bin|sbin|dev|snap|media)(?:/|\b))')
+
+
+def _get_provenance(block):
+    """O dict da provenance em bloco, None se ausente, False se em fluxo ou ilegível."""
+    for n, b in enumerate(block[1:], 1):
+        if re.match(r'^    provenance:[ \t]*(#.*)?$', b):
+            e = n + 1
+            while e < len(block) and (block[e].startswith("      ") or not block[e].strip()):
+                e += 1
+            try:
+                cur = yaml.safe_load("\n".join(x[4:] for x in block[n:e]))["provenance"]
+            except Exception:
+                return False
+            return cur if isinstance(cur, dict) else False
+        if re.match(r'^    provenance:', b):
+            return False
+    return None
+
+
+def _put_scalar(block, key, value):
+    """`    <key>: "<value>"` no lugar (comentário preservado) ou acrescentada ao fim do bloco. (bloco, mudou?)."""
+    n, cur = _get_scalar(block, key)
+    if n is None:
+        return block + [f"    {key}: " + q(value)], True
+    if cur == value:
+        return block, False
+    m = re.match(r'^    [A-Za-z_][A-Za-z0-9_]*:[ \t]*(?:"[^"]*"|\'[^\']*\'|[^#]*?)([ \t]*#.*)?$', block[n])
+    tail = (m.group(1) or "") if m else ""
+    return block[:n] + [f"    {key}: " + q(value) + tail] + block[n + 1:], True
+
+
+def _o4_row(block, r, verified_at):
+    """Aplica UMA linha da O4 ao bloco. (bloco, chave do relatório ou None, motivo da recusa ou None)."""
+    act = r["proposta_final"].strip()
+    if act == "dev-historia":
+        block, changed, cur = _set_field(block, "plane", "PROD", "DEV")
+        if changed:
+            return block, "plane", None
+        return block, (None if cur == "DEV" else False), (None if cur == "DEV" else f"dev-historia sobre plane {cur}")
+    src, loc, method = r["source_final"].strip(), r["locator_final"].strip(), r["method_final"].strip()
+    locality = (r.get("locality_final") or "").strip()
+    cur = _get_provenance(block)
+    if cur is False:
+        return block, False, "provenance em forma de fluxo"
+    if O4_KEEP.match(src) or O4_KEEP.match(loc) or O4_KEEP.match(method):
+        if not cur:
+            return block, False, "(inalterado) sem provenance de onde copiar"
+        src = cur.get("source", "") if O4_KEEP.match(src) else src
+        loc = cur.get("locator", "") if O4_KEEP.match(loc) else loc
+        method = cur.get("method", "") if O4_KEEP.match(method) else method
+    if not (isinstance(src, str) and src and isinstance(loc, str) and loc and isinstance(method, str) and method):
+        return block, False, "source/locator/method vazio"
+    if not re.match(r'^(' + "|".join(METHOD_CLASSES) + r'): \S', method):
+        return block, False, "method fora das classes do contrato"
+    if locality not in LOCALITIES:
+        return block, False, f"locality fora do contrato ({locality or 'vazia'})"
+    if ABS_FS_RE.search(src):
+        return block, False, "caminho absoluto na source final"
+    if act == "manter-prod-medido":
+        _, plane = _get_scalar(block, "plane")
+        if plane != "PROD":
+            return block, False, f"manter-prod-medido sobre plane {plane}"
+        if not method.startswith("medição: "):
+            return block, False, "manter-prod-medido sem method medição"
+        if not verified_at:
+            return block, False, "manter-prod-medido sem --verified-at"
+    block, c = _put_provenance(block, src, loc, method, locality=locality)
+    if c is None:
+        return block, False, "provenance em forma de fluxo"
+    key = "prov" if c else None
+    if act == "manter-prod-medido":
+        block, c2 = _put_scalar(block, "verified_at", verified_at)
+        if c2:
+            key = key or "verified"
+    return block, key, None
+
+
+def apply_judged_o4(text, judged, verified_at=None):
+    """judged={id: [linhas, uma por regra]}: aplica só APROVADO/CORRIGIDO das ações O4, linha a linha (recusa atômica
+    por linha: o que a linha mudou volta). Devolve (texto, relatório)."""
+    lines = text.split("\n")
+    rep = {"plane": [], "prov": [], "verified": [], "same": [], "rejected": [], "sealed": [], "refused": [], "missing": []}
+    seen, out, in_nodes, i = set(), [], False, 0
+    while i < len(lines):
+        ln = lines[i]
+        if re.match(r'^nodes:\s*(#.*)?$', ln):
+            in_nodes = True
+        elif re.match(r'^[A-Za-z_]', ln):
+            in_nodes = False
+        m = NODE_RE.match(ln) if in_nodes else None
+        if not m or m.group(1) not in judged:
+            out.append(ln); i += 1; continue
+        nid, j = m.group(1), i + 1
+        seen.add(nid)
+        while j < len(lines) and (lines[j].startswith("    ") or not lines[j].strip() or lines[j].lstrip().startswith("#")) \
+                and not NODE_RE.match(lines[j]):
+            j += 1
+        end = j
+        while end > i + 1 and (not lines[end - 1].strip() or lines[end - 1].lstrip().startswith("#")):
+            end -= 1
+        block = lines[i:end]
+        for r in sorted(judged[nid], key=lambda x: x["regra"]):
+            act, verdict = r["proposta_final"].strip(), r["veredito"].strip()
+            tag = f"{nid} [regra {r['regra']}]"
+            if verdict not in JUDGED_OK:
+                rep["rejected"].append(f"{tag} ({verdict})"); continue
+            if act not in O4_ACTIONS:
+                rep["sealed"].append(f"{tag} ({act})"); continue
+            before = list(block)
+            block, key, refused = _o4_row(block, r, verified_at)
+            if refused is not None:
+                block = before  # recusa atômica: nada da linha é aplicado
+                rep["refused"].append(f"{tag} ({refused})")
+            elif key:
+                rep[key].append(tag)
+            else:
+                rep["same"].append(tag)
+        out.extend(block)
+        out.extend(lines[end:j])
+        i = j
+    rep["missing"] = sorted(set(judged) - seen)
+    return "\n".join(out), rep
+
+
 def refuted_dependents(text, ids):
     """Para cada nó refutado agora: quem ainda se apoia nele (SUPPORTS saindo dele, DEPENDS_ON entrando nele) e
     quem ele REFUTA. É o relatório da reconciliação: a gramática cobra o status do alvo de REFUTES
@@ -695,6 +843,15 @@ def main(argv):
         argv = argv[:k] + argv[k + 2:]
         promote = "--promote-unverifiable" in argv
         argv = [a for a in argv if a != "--promote-unverifiable"]
+        vat = None
+        if "--verified-at" in argv:
+            k = argv.index("--verified-at")
+            if k + 1 >= len(argv) or not re.match(r'^\d{4}-\d{2}-\d{2}$', argv[k + 1]):
+                print("kg-migrate-v3: --verified-at pede uma data AAAA-MM-DD", file=sys.stderr); return 2
+            vat = argv[k + 1]
+            argv = argv[:k] + argv[k + 2:]
+        if judged and isinstance(next(iter(judged.values())), list):
+            return main_judged_o4(argv, judged, check, vat)
         return main_judged(argv, judged, check, promote, wave)
     routing = None
     if "--routing" in argv:
@@ -801,6 +958,50 @@ def main_judged(files, judged, check, promote=False, wave=""):
             pending = True
             if not check:
                 open(f, "w", encoding="utf-8").write(new)
+    return 1 if (check and pending) else 0
+
+
+def main_judged_o4(files, judged, check, verified_at=None):
+    """O laço do --apply-judged no formato O4: um grafo por vez, YAML conferido antes e depois, e a prova de que
+    só os nós da planilha mudaram (senão rc 2, nada gravado)."""
+    if not files:
+        print(__doc__.strip().split("\n\n")[-1], file=sys.stderr); return 2
+    pending, tot = False, {k: 0 for k in ("plane", "prov", "verified", "same", "rejected", "sealed", "refused", "missing")}
+    for f in files:
+        try:
+            text = open(f, encoding="utf-8").read()
+            before = yaml.safe_load(text)
+        except FileNotFoundError:
+            print(f"kg-migrate-v3: {f} não existe", file=sys.stderr); return 2
+        except yaml.YAMLError as e:
+            print(f"kg-migrate-v3: {f} não é YAML válido antes da migração ({e.__class__.__name__}) — não toco", file=sys.stderr); return 2
+        _, rows = routes_for(judged, f)
+        new, rep = apply_judged_o4(text, rows, verified_at)
+        try:
+            after = yaml.safe_load(new)
+        except yaml.YAMLError as e:
+            print(f"kg-migrate-v3: a aplicação em {f} daria YAML inválido ({e.__class__.__name__}) — nada gravado", file=sys.stderr); return 2
+        strip = lambda g: {k: v for k, v in (g or {}).items() if k != "nodes"}
+        others = lambda g: [n for n in (g or {}).get("nodes") or [] if not (isinstance(n, dict) and n.get("id") in rows)]
+        if strip(after) != strip(before) or others(after) != others(before):
+            print(f"kg-migrate-v3: a aplicação em {f} mudaria nó fora da planilha — nada gravado", file=sys.stderr); return 2
+        changed = new != text
+        verb = ("PENDENTE" if check else "aplicado") if changed else "nada a aplicar"
+        print(f"{f}: {verb} · nós julgados {len(rows)} · PROD→DEV {len(rep['plane'])} · provenance escrita {len(rep['prov'])}"
+              f" · só verified_at {len(rep['verified'])} · já aplicado {len(rep['same'])} · REPROVADO (intocado) {len(rep['rejected'])}"
+              f" · fora das ações O4 (intocado) {len(rep['sealed'])} · recusado {len(rep['refused'])} · ausente do grafo {len(rep['missing'])}")
+        for k, title in (("plane", "PROD→DEV"), ("prov", "provenance escrita"), ("verified", "verified_at atualizado"),
+                         ("rejected", "REPROVADO pelo juiz (intocado)"), ("sealed", "FORA DAS AÇÕES O4 (intocado)"),
+                         ("refused", "RECUSADO (intocado)"), ("missing", "AUSENTE DO GRAFO")):
+            if rep[k]:
+                print(f"  {title}: " + ", ".join(rep[k]))
+        for k in tot:
+            tot[k] += len(rep[k])
+        if changed:
+            pending = True
+            if not check:
+                open(f, "w", encoding="utf-8").write(new)
+    print("TOTAL · " + " · ".join(f"{k} {v}" for k, v in tot.items()))
     return 1 if (check and pending) else 0
 
 
