@@ -3,7 +3,7 @@ title: 'Resíduo — F1.5 das portas: o registro diz a verdade medida, e um cari
 date: 2026-10-09
 branch: chore/registry-honest-f15
 reviewer: "revisor adversarial (Elenxo, subagente general-purpose, só leitura) sobre 1813fcb6; curas no commit seguinte com bancada registry_pins 7/7 e door_role_parity verdes, um mutante por caso"
-reviewed_diff_sha256: 03ec54761689c57522ffc89b4818d90bf924eeeabe14ef6859eb4fa68972c3a3
+reviewed_diff_sha256: eb07c66a5266a8b1c74682f12c9d17fe93cca8bd80fd641cc359472d12ffa27a
 reviewed_code_sha256: 191dc2a8e6c767f93c1de3565aa51ee32d0ad88969abf5f3445f77b44c144d58
 findings_total: 6
 findings_real: 6
