@@ -2,7 +2,7 @@
 title: 'Resíduo — o corte por papel leva junto os companheiros do comando cortado'
 date: 2026-10-09
 branch: fix/role-cut-command-companions
-reviewed_diff_sha256: acf142bbcd172e4825bdfd48a17b3afc8dab9fea989371da93b8682cb3c5e8c5
+reviewed_diff_sha256: 9f28594d04b6665e24787fd3c7d0dd396afdec7a2653128fa8ad59d241f9ff2f
 reviewed_code_sha256: f91e70c7e88618f0469c0de86e8d9484c3f8bcc78725a6e241c7d6ac8e280ce2
 findings_total: 4
 findings_real: 4
