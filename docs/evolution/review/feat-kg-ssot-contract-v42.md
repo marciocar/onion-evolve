@@ -2,8 +2,8 @@
 title: 'Resíduo — adoção do contrato KG-SSOT v4.2 (SAC-97)'
 date: 2026-10-09
 branch: feat/kg-ssot-contract-v42
-reviewed_diff_sha256: d807ac6f7a4f8cf69a3f6913a111461eca41846bac0d0ca729cffaf31d3b5b3f
-reviewed_code_sha256: 1ad5c6343e9dbd47c42fe1ef47c54ce7782e2b8ecf81692aac981f05924451c9
+reviewed_diff_sha256: 22fb7acd45142013f0c45ab5a1d40a341084c5f4851a112ec0c431b9ea66e6ca
+reviewed_code_sha256: be8678da7c5184b68c9dea4d9de97140bafe09b0b3c023bf58c54dc7610ccd36
 findings_total: 3
 findings_real: 3
 findings_fixed: 2
@@ -115,9 +115,27 @@ e `census_seal`, `seed_adoption_graph` e `cc_delta_census` 23/23 juntas.
 # KG
 
 O nó `E_CONTRATO_V42_ADOTADO` foi criado em `contrato-kg-absorcao-2026-10`. Ele `SUPPORTS`
-`D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO` e `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3`. O teto sobe de 20 para 21, com a
-justificativa no meta. O lote 6 foi selado com `--seal`, e o lote 7 foi aberto com `--close-lot`, pendente do
-selo do maestro.
+`D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO` e `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3`.
+
+**Rebase sobre o #996 (radar, SAC-96, 858d7ca0).** O #996 entrou na main durante o CI deste PR e deixou o #997
+em CONFLICTING. O conflito ficou em três lugares:
+- **Grafo do contrato.** Mantive a versão da main e reaplicai o meu nó por cima. Os dois nós ficam:
+  `E_RADAR_ALINHADO_AO_CONTRATO_TESTEMUNHO_E_DECISAO` e `E_CONTRATO_V42_ADOTADO`. O teto sobe de 21 para 22, com
+  justificativa. O lote 7, do radar, foi selado com `--seal`, e este passou a ser o lote 8, aberto com
+  `--close-lot` e pendente do selo do maestro.
+- **Plugin `onion`.** Remontado das fontes mescladas (REGRA 19).
+- **Projeções.** Regeneradas pelo `pr-finalize`.
+
+Os assuntos dos commits ainda dizem "lote 7", porque foram escritos antes do rebase. Vale o que o grafo diz:
+lote 8.
+
+Depois do rebase, conferi de novo:
+- `--locality --check` dá rc 0 nos 138 grafos;
+- o diff contra a main tem 3519 linhas `locality`: as 3517 de antes, mais o nó novo do radar e o meu, que
+  também ganharam a chave;
+- o gate sai rc 0, com a mesma dívida;
+- o `kg-radar --integrity` novo, que lê a provenance por posição, sai exit 0 nos 138 grafos;
+- a bancada sai 78/78, incluindo a família `kg_radar_contract` do #996 e a `shell_pipefail_robustness`.
 
 # Os `confirmed` dos grafos editados
 

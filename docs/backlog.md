@@ -327,6 +327,14 @@
 | 14.0 | `D_PODA_INSTRUCTION_BLOAT_MEDIDA` | meta-research-lens-2026-09 | DECISAO PROPOSTA (fio proprio, GATED): medir o que do CLAUDE.md/skills/rules carrega SEMPRE vs sob demanda (InstructionsLoaded hoo |
 | 6.3 | `D_BUSCA_COMO_SDAAL_GATED` | meta-research-lens-2026-09 | DECISAO PROPOSTA (GATED): adapter de busca em .claude/utils/search/ (irmao do task-manager: WebSearch nativo default; MCP Exa/Tavi |
 
+## contrato-kg-absorcao-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 25.2 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
+| 9.6 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
+| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
+
 ## typesafe-ai-2026-09 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -378,14 +386,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
-
-## contrato-kg-absorcao-2026-10 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 23.4 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
-| 9.6 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
-| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
 ## guardas-revisao-2026-08 — 4 item(ns)
 
