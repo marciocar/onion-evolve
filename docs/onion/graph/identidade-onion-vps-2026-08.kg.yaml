@@ -521,14 +521,13 @@ nodes:
   - id: E_LOGTO_CADASTRO_ABERTO_INTENCIONAL_2026_10_09
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
+    evidence_class: testimony
     impact: 4
     confidence: 0.85
     status: confirmed
     verified_at: "2026-10-09"
-    verified_against: "estado do sign-in experience medido na sessão do maestro de 2026-10-09: signInMode SignInAndRegister, signUp por username e password, verify false; decisão do maestro de manter o cadastro aberto, no mesmo dia"
-    source_kind: repo
-    source_tier: 8
+    verified_against: "relato da sessão do maestro de 2026-10-09: signInMode SignInAndRegister, signUp por username e password, verify false, e a decisão de manter o cadastro aberto; não remedido por este agente"
     label: "o cadastro público do Logto (tenant default) está ABERTO e é intencional desde 2026-10-09: signInMode SignInAndRegister, signUp por username e senha, sem verificação; o 'fechado' de 08-10 (I_A1) deixou de descrever o vivo"
     narrative: "Não é regressão: o maestro decidiu abrir. O que muda para a doutrina é que a resposta 'um usuário novo se cadastra sozinho?' passou de NÃO para SIM no Logto, e quem lê o I_A1_A_MEDICAO_CAIU_A_CONCLUSAO_SOBREVIVEU como estado atual erra. Sem verificação de e-mail, a conta nasce sem prova de posse de nada. A tese do grafo (C_IDP_AUTENTICA_NAO_DECIFRA) limita o raio no cofre, mas cada serviço que confia em QUALQUER identidade do tenant default herda o cadastro aberto, e é isso que o gatilho de revisita vigia. Não remedido por este agente: o estado vem da medição da sessão do maestro."
     trace: "docs/onion/identidade-onion-vps.md"
@@ -662,10 +661,11 @@ edges:
   - from: Q_REFUTES_EDGE_SEM_PAR
     to: E_REFUTA_Q_LACUNA_DECISAO_MAIS_CODIGO
     edge_type: TRACES_TO
-  # 2026-10-09: o cadastro foi aberto por decisão; o "fechado" de 08-10 deixa de ser o estado vivo
+  # 2026-10-09: o cadastro foi aberto por decisão. O I_A1 segue valendo sobre ONDE fica o portão
+  # (403 em /identification); o que ele deixa de ser é a descrição do estado vivo — limita, não derruba
   - from: E_LOGTO_CADASTRO_ABERTO_INTENCIONAL_2026_10_09
     to: I_A1_A_MEDICAO_CAIU_A_CONCLUSAO_SOBREVIVEU
-    edge_type: SUPERSEDES
+    edge_type: CONSTRAINS
   - from: Q_LOGTO_QUANDO_FECHAR_O_CADASTRO
     to: E_LOGTO_CADASTRO_ABERTO_INTENCIONAL_2026_10_09
     edge_type: DEPENDS_ON

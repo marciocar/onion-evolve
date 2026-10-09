@@ -3,18 +3,23 @@
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
   x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote F0 das portas (SAC-88), PR para merge humano. Escritos: D_MATRIZ_DE_PORTAS_2026_10, E_ONION_CORE_NASCEU_PUBLICO_2026_09_17, E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS. FLIPS PROPOSTOS AO MAESTRO (nós selados, não flipados): D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA done→superseded e D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT done→superseded (distribuicao-metodo-vivo-2026-09); D_ADOPT_REFRAME confirmed→superseded só se o maestro julgar que a parte do corte domina o nó (onion-tier-matrix-2026-07); e Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN open→done, respondida pela matriz"
+  x_drive_checkpoint_note: "lote F0 das portas (SAC-88), PR para merge humano. Escritos: D_MATRIZ_DE_PORTAS_2026_10, E_ONION_CORE_NASCEU_PUBLICO_2026_09_17, E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS, Q_REGISTRAR_ONION_PLUGINS_NO_MEMBERS. FLIPS PROPOSTOS AO MAESTRO (nós selados, não flipados; toda superação é PARCIAL, ver a narrative da matriz): D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA e D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT done→superseded; D_ADOPT_REFRAME confirmed→superseded se a parte do corte dominar o nó; D_FAMILIA_TEM_DOIS_REGIMES_2026_09, D_FAMILIA_TEM_TRES_REGIMES_2026_09 e E_FAMILIA_MULTIIDE_CONGELADA →superseded; D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA →superseded só quando a F3 tornar o workflow informativo; Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN open→done"
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
   baseline: 2026-09-30
   review_after: 2026-12-29
-  # Aufhebung cross-file de D_MATRIZ_DE_PORTAS_2026_10 (o motor de arestas é intra-arquivo); de
-  # D_ADOPT_REFRAME cai só a parte do corte. Os flips desses nós selados são do maestro.
+  # Aufhebung cross-file de D_MATRIZ_DE_PORTAS_2026_10 (o motor de arestas é intra-arquivo). Todas são
+  # PARCIAIS: o que cai e o que sobrevive de cada uma está na narrative do nó. Os flips desses nós
+  # selados são do maestro.
   x_supersedes_external:
     - docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
     - docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT
     - docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml#D_ADOPT_REFRAME
+    - docs/onion/graph/onion-identity-2026-07.kg.yaml#D_FAMILIA_TEM_DOIS_REGIMES_2026_09
+    - docs/onion/graph/onion-identity-2026-07.kg.yaml#D_FAMILIA_TEM_TRES_REGIMES_2026_09
+    - docs/onion/graph/onion-identity-2026-07.kg.yaml#E_FAMILIA_MULTIIDE_CONGELADA
+    - docs/evolution/research/triagem-inbox-2026-09/triagem-inbox-2026-09.kg.yaml#D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA
 nodes:
   # ---- o dano ----
   - id: E_DANO_85_ARQUIVOS
@@ -178,15 +183,16 @@ nodes:
     node_type: decision
     layer: audit
     plane: DEV
+    evidence_class: testimony
     impact: 5
     confidence: 0.9
     status: confirmed
     verified_at: "2026-10-09"
     verified_against: "decisão do maestro na sessão de 2026-10-09, respondida por AskUserQuestion e registrada na tabela de decisões do plano das portas (SAC-88)"
     label: "matriz das portas: onion-core = source sem biografia com toda a maquinaria; standalone = core menos adoção e federação, com meta-fábrica; plugins = o standalone empacotado; mini = allowlist didática; plugins/ sai do core; publicar é sob demanda e nunca trava o desenvolvimento"
-    narrative: "A tabela, porta por porta. ONION-CORE: o source publicado e versionado, sem dados particulares, o core das empresas; leva toda a maquinaria, inclusive meta-fábrica, adoção e federação; o carimbo passa a role: source (kind: door), não hub. ONION-STANDALONE: uso direto num projeto individual; é o core menos adoção e federação (saem adopt, federation-*, co-relay, co-evolve, co-deliver, co-announce, o hook de inbox, onion-publish e as transições de adoção no wizard) e LEVA a meta-fábrica. ONION-PLUGINS: a mesma superfície do standalone, empacotada em plugins; a meta-fábrica é liberada, o que responde Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN e pede revisão da REGRA 61. ONION-MINI: porta didática para iniciantes, gerada do core por ALLOWLIST (por volta de 15 comandos do ciclo produto e desenvolvimento, sem KG, meta e compliance); o GPT atual segue como artefato à parte. PLUGINS/ NO CORE: sai; as REGRAS 19 e 72 a 79 passam a rodar só na publicação. PUBLICAÇÃO: sob demanda, por comando, e nenhuma porta defasada trava PR comum. A Aufhebung atravessa arquivos (o motor de arestas é intra-arquivo) e está declarada em meta.x_supersedes_external: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA cai porque adoção e federação deixam de viajar para o standalone, embora a meta-fábrica siga viajando; D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT cai porque a vitrine com adoção passa a ser o onion-core; de D_ADOPT_REFRAME cai só a parte do corte (meta-fábrica core-only), e std = hub em trabalho sobrevive. Os flips desses nós selados são do maestro e estão propostos na nota do lote."
+    narrative: "A tabela, porta por porta. ONION-CORE: o source publicado e versionado, sem dados particulares, o core das empresas; leva toda a maquinaria, inclusive meta-fábrica, adoção e federação; o carimbo passa a role: source (kind: door), não hub. ONION-STANDALONE: uso direto num projeto individual; é o core menos adoção e federação (saem adopt, federation-*, co-relay, co-evolve, co-deliver, co-announce, o hook de inbox, onion-publish e as transições de adoção no wizard) e LEVA a meta-fábrica. ONION-PLUGINS: a mesma superfície do standalone, empacotada em plugins; a meta-fábrica é liberada, o que responde Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN e pede revisão da REGRA 61. ONION-MINI: porta didática para iniciantes, gerada do core por ALLOWLIST (por volta de 15 comandos do ciclo produto e desenvolvimento, sem KG, meta e compliance); o GPT atual segue como artefato à parte. PLUGINS/ NO CORE: sai; as REGRAS 19 e 72 a 79 passam a rodar só na publicação. PUBLICAÇÃO: sob demanda, por comando, e nenhuma porta defasada trava PR comum. A Aufhebung atravessa arquivos (o motor de arestas é intra-arquivo), está declarada em meta.x_supersedes_external e é PARCIAL em todos os alvos. D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA: cai 'adoção e federação viajam para o standalone'; sobrevive 'tudo viaja' para o onion-core e 'a meta-fábrica viaja' para standalone e plugins. D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT: cai o standalone como vitrine com adoção (a vitrine com adoção passa a ser o onion-core); sobrevive o reenquadramento de que o cliente não forka e recebe o framework pelo /meta:adopt com onion/vendor. D_ADOPT_REFRAME: cai 'meta-fábrica core-only'; sobrevive std = hub em trabalho. D_FAMILIA_TEM_DOIS_REGIMES_2026_09, D_FAMILIA_TEM_TRES_REGIMES_2026_09 e E_FAMILIA_MULTIIDE_CONGELADA (onion-identity-2026-07): cai o mini e o standalone como congelados e o onion-core como porta única; sobrevivem os regimes congelado e linha viva. D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA (triagem-inbox-2026-09): cai a cobrança bloqueante da defasagem na main, mas só quando a F3 tornar o workflow informativo; até lá ela segue no vivo. Os flips desses nós selados são do maestro e estão propostos na nota do lote."
     provenance:
-      source: "plano das portas, arquivo local da sessão fora do repo (~/.claude/plans/twinkly-sniffing-neumann.md), e a issue Linear SAC-88"
+      source: "issue Linear SAC-88 (projeto 'Onion — core: próximas levas') e o plano das portas que ela referencia, arquivo local da sessão fora do repo"
       locator: "seção 'Decisões do maestro (2026-10-09)', tabela Porta × O que é × Superfície"
       method: "testemunho: decisão do maestro na sessão de 2026-10-09 (AskUserQuestion)"
 
@@ -208,6 +214,16 @@ nodes:
       source: ".claude/validation/members-validate.sh em origin/main d9852a9e"
       locator: "ROLES = {source, hub, standalone, consumer} e VENDOR = {adopter, door} no bloco python; saída sobre /tmp com onion-mini mutado"
       method: "medição: members-validate.sh rodado sobre cópia mutada do members.yaml em 2026-10-09, rc 1"
+
+  - id: Q_REGISTRAR_ONION_PLUGINS_NO_MEMBERS
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: "onion-plugins é repo público com prefixo onion- e segue FORA do members.yaml, o ponto cego da REGRA 36 — GATILHO: registrar como kind door, role plugins, no mesmo PR que ampliar o schema do registro (F1.5 ou F2 do plano das portas)"
+    narrative: "O pin a registrar é o ref do provenance.json publicado (947e69ce069d em 2026-10-09). Dois bloqueios medidos hoje: o members-validate.sh recusa role plugins, e o clone não tem .claude/.onion-version, o que faria a REGRA 92 acusar CARIMBO-AUSENTE. A cura do segundo é decidir onde mora o carimbo de uma porta que é marketplace, não árvore .claude/."
 
 edges:
   # o dano é a evidência de que a lacuna existia
@@ -252,3 +268,6 @@ edges:
   - from: Q_ROLE_DUPLA_LEITURA
     to: D_MATRIZ_DE_PORTAS_2026_10
     edge_type: CONSTRAINS
+  - from: Q_REGISTRAR_ONION_PLUGINS_NO_MEMBERS
+    to: E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS
+    edge_type: DEPENDS_ON

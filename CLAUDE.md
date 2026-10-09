@@ -39,8 +39,10 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
     Por ser projeção, **a história dela não tem valor autoral** — já foi reescrita com force-push
     uma vez, por vazamento medido de caminhos core-privados num baseline que viajou populado.
 
-    **Desde 2026-10-09 o regime PORTA tem quatro portas**, todas projeção do core, publicadas
-    **sob demanda** (por comando, sem nunca travar o desenvolvimento):
+    **Desde 2026-10-09 o regime PORTA tem quatro portas**, todas projeção do core. O destino é
+    publicá-las **sob demanda**, por comando, sem nunca travar o desenvolvimento. Isso ainda não vale:
+    até a F3, a REGRA 85 e o workflow `onion-door-staleness` seguem cobrando a defasagem do
+    `onion-core` depois de cada merge.
     - **`onion-core`** — o source publicado, sem biografia: toda a maquinaria, inclusive
       meta-fábrica, adoção e federação. É o core das empresas (carimbo `source` a partir da F2);
     - **`onion-standalone`** — uso direto num projeto individual: o core **menos** adoção e

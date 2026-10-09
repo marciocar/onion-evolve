@@ -77,7 +77,7 @@ não há lugar único onde auditar acesso. A política de acesso vive **N vezes*
 
 | superfície | resposta |
 |---|---|
-| **Logto** | **Sim, e de propósito, desde 2026-10-09.** Por decisão do maestro, o tenant `default` está com `signInMode: SignInAndRegister`, `signUp` por `username` + `password` e `verify: false`, como medido na sessão daquele dia. Até então a resposta era **não** (`signInMode: SignIn`, com o portão em `POST /api/experience/identification` respondendo `403`). **Revisita** (`Q_LOGTO_QUANDO_FECHAR_O_CADASTRO`): fechar de novo quando o propósito do cadastro aberto acabar, quando surgir conta que ninguém reconhece, quando for ligado login social ou quando algum serviço passar a autorizar qualquer identidade do tenant |
+| **Logto** | **Sim, e de propósito, desde 2026-10-09.** Por decisão do maestro, o tenant `default` está com `signInMode: SignInAndRegister`, `signUp` por `username` + `password` e `verify: false`, segundo a medição da sessão do maestro daquele dia (relato, não remedido por quem escreveu esta linha). Até então a resposta era **não** (`signInMode: SignIn`, com o portão em `POST /api/experience/identification` respondendo `403`). **Revisita** (`Q_LOGTO_QUANDO_FECHAR_O_CADASTRO`): fechar de novo quando o propósito do cadastro aberto acabar, quando surgir conta que ninguém reconhece, quando for ligado login social ou quando algum serviço passar a autorizar qualquer identidade do tenant |
 | **Vaultwarden** | **Não.** `SIGNUPS_ALLOWED=false`, registro responde `400` |
 | **bridge** | **Não.** Sem rota de signup; emissão é `POST /admin/tokens`, atrás do escopo `bridge:admin` |
 | **WAHA** | **Não tem noção de usuário** — um par de credenciais global |
