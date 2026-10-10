@@ -142,8 +142,9 @@ fi
 # projeto adotado. Um adotado `source` se declararia o core (o PASSO 0 do adopt passaria); um adotado
 # `mini` ou `plugins` não tem transporte que o produza. Recusar fora da porta é o mesmo critério do
 # members-validate.sh (mini/plugins só com kind door).
-case "${ROLE}" in
-  adopted|hub|standalone) : ;;
+# (a 1a alternação fica na MESMA linha do `case`: a bancada role_vocabulary deriva dela os papéis de
+# ADOÇÃO que todo predicado de "repo derivado" tem de conhecer; os de porta são cobertos por `kind: door`)
+case "${ROLE}" in adopted|hub|standalone) : ;;
   source|plugins|mini)
     [ "${KIND}" = door ] || { echo "ERRO: --role '${ROLE}' é papel de PORTA — só com --kind door (projeto adotado usa adopted, hub ou standalone)" >&2; exit 2; } ;;
   *) echo "ERRO: --role deve ser 'adopted', 'hub' ou 'standalone' (ou, com --kind door, 'source', 'plugins' ou 'mini'; veio '${ROLE}')" >&2; exit 2 ;;
