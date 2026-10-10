@@ -38,18 +38,23 @@ introspecção e **zero percepção externa recorrente** (S9 parada desde 07-06)
   **três** desfechos, não um. Cobrado pela **REGRA 89 (Rodada de radar selada reconcilia o corpus
   que superou (Aufhebung), com catraca)**:
   1. `SUPERSEDES` no próprio grafo, quando o nó derrubado vive nele;
-  2. `meta.x_supersedes_external: <grafo>#<nó>`, quando ele vive na rodada ANTERIOR — e este caso é
-     a regra, não a exceção. ⚠️ **A aresta do motor é INTRA-ARQUIVO** (`kg-radar.sh` recebe um
-     arquivo por invocação): obedecer ao "grafo próprio por rodada" torna `SUPERSEDES` sobre a
-     baseline anterior *inalcançável*. Esta linha mandou o impossível por semanas, e a guarda
-     nasceu quase punindo quem a obedecia;
+  2. `external_edges` no topo do grafo, quando o nó derrubado vive na rodada ANTERIOR — e este caso é
+     a regra, não a exceção. Um item por nó derrubado, sem `from` (quem supera é a rodada inteira):
+     ```yaml
+     external_edges:
+       - to: "docs/evolution/research/radar-E3-<data>-rN/radar-E3-<data>-rN.kg.yaml#<NÓ>"
+         edge_type: SUPERSEDES
+     ```
+     É a forma do contrato v4.3 (2026-10-10, SAC-98), e o gate do CI **confere que o alvo existe**
+     (`integrity.dangling-external`, contra todos os `.kg.yaml` rastreados): alvo inventado reprova.
+     Até a v4.2 a aresta do motor era INTRA-ARQUIVO, e a forma era a chave própria
+     `meta.x_supersedes_external`, que **não conta mais** na REGRA 89 (não se conferia o alvo);
+     o corpus foi migrado por `kg-migrate-v3.py --external-edges`;
   3. `meta.x_supersedes_none: <razão>`, quando a rodada genuinamente não derrubou nada — desfecho de
      1ª classe. **Forçar `SUPERSEDES` inventado é pior que a dívida**, e a razão tem de dizer
-     contra QUAL baseline se mediu (a do eixo, não um corpus qualquer).
-  Os dois `meta.*` exigem **valor**: campo vazio não conta.
-  ⚠️ **Escreva com o prefixo `x_`** (`x_supersedes_external`, `x_supersedes_none`): o contrato v3 do
-  `.kg.yaml` só reconhece extensão com `x_`, e o gate do CI reprova rodada nova que traga a chave sem ele
-  (medido em 2026-10-08). A REGRA 89 aceita as duas formas; as rodadas antigas seguem válidas.
+     contra QUAL baseline se mediu (a do eixo, não um corpus qualquer). Exige **valor**: campo vazio
+     não conta. ⚠️ **Escreva com o prefixo `x_`**: o contrato só reconhece extensão com `x_`, e o
+     gate do CI reprova rodada nova que traga a chave sem ele (medido em 2026-10-08).
 - **Lacuna declarada é desfecho de 1ª classe** (molde `E_REDDIT_INALCANCAVEL`): fonte
   inalcançável vira `lacunas_declaradas`, nunca finding.
 
