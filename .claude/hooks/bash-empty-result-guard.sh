@@ -413,7 +413,7 @@ _residuo_commitado() {  # $1=dir $2=branch — o resíduo da REGRA 56 está na b
   [ -n "$2" ] || return 1
   git -C "$1" cat-file -e "$2:docs/evolution/review/$(printf '%s' "$2" | tr / -).md" 2>/dev/null; }
 _repo_derivado() {  # o MESMO predicado da REGRA 56 (review-artifact-check.sh): fora de escopo ali
-  grep -qE '^(role:[[:space:]]*(adopted|hub|standalone)|decoupled_from:)' "$1/.claude/.onion-version" 2>/dev/null; }
+  grep -qE '^(role:[[:space:]]*(adopted|hub|standalone)|decoupled_from:|kind:[[:space:]]*door)' "$1/.claude/.onion-version" 2>/dev/null; }
 
 if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:space:]]+pr[[:space:]]+create([[:space:]]|$)'; then
     _prd="$(_pr_dir)"; _prb="$(_pr_branch "${_prd}")"

@@ -1811,8 +1811,21 @@ for t, names in sorted(owner.items()):
     if len(names) > 1:
         print("DUPSET\t%s\t%s" % (t, ",".join(names)))
 mdir = os.path.join(root, ".claude", "commands", "meta")
-if sets and os.path.isdir(mdir):
-    for f in sorted(os.listdir(mdir)):
+# A partição julga o que é RASTREADO (o que o transporte pode levar): a bancada planta sondas não
+# rastreadas em commands/meta/ para testar OUTRAS regras, e contá-las reprovava 3 casos alheios (medido
+# no 1º gate). Fora de um repo git, o diretório inteiro.
+import subprocess
+names = None
+try:
+    out = subprocess.run(["git", "-C", root, "ls-files", "-z", "--", ".claude/commands/meta"],
+                         capture_output=True, check=True).stdout.decode("utf-8", "replace")
+    names = sorted(os.path.basename(p) for p in out.split("\0") if p)
+except Exception:
+    names = None
+if names is None and os.path.isdir(mdir):
+    names = sorted(os.listdir(mdir))
+if sets and names:
+    for f in names:
         if f.endswith(".md") and f != "README.md" and f[:-3] not in owner:
             print("UNSET\t%s\t" % f[:-3])
 PY
