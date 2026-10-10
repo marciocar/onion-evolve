@@ -17086,7 +17086,12 @@ run_role_cut_selftests() {
         #     cc-update, create-*) SAIU das exceções — o standalone passou a recebê-la, então comando
         #     de fábrica que uma guarda manda rodar TEM de viajar como qualquer outro. Ficam só
         #     adoção e federação, que a matriz tira do standalone.
-        adopt|federation-*|co-announce|co-deliver|co-evolve|co-relay|personality-sync) continue ;;  # adoção/federação/pendente
+        # `publish` entrou em 2026-10-10 (F3 das portas, CI do PR #1008): está no conjunto `adoption`, e
+        #     quem o cita é a mensagem da REGRA 85 (Porta pública espelha o core, com catraca), que só
+        #     dispara onde há `docs/evolution/federation/members.yaml` — no papel não-source ela é
+        #     [papel/SEM-OBJETO] (`_without_object_for_role` em lint-artifacts.sh). Logo o alvo que não
+        #     recebe o comando também nunca colhe a violação que o cita. Publicar portas é ato da fonte.
+        adopt|federation-*|co-announce|co-deliver|co-evolve|co-relay|personality-sync|publish) continue ;;  # adoção/federação/pendente
         nao|federation-) continue ;;                                            # falsos positivos do grep
       esac
       [ -f "${REPO_ROOT}/.claude/commands/meta/${_c}.md" ] || continue          # comando que não existe
