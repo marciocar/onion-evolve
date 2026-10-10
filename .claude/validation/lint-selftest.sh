@@ -13590,7 +13590,12 @@ PY
   mkdir -p "${sb}/ops"; : > "${sb}/ops/materialize-door.sh"
   _p2b="$(LC_ALL=C bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
   mkdir -p "${sb}/ops/door-templates/mini"
-  cp "${REPO_ROOT}"/ops/door-templates/mini/*.door.md "${sb}/ops/door-templates/mini/" 2>/dev/null || true
+  # toda fonte que o roles.yaml declara (os templates do mini e as KBs do contrato de sessão)
+  local _ovs
+  while IFS=$'\t' read -r _ _ovs; do
+    [ -n "${_ovs}" ] || continue
+    mkdir -p "$(dirname "${sb}/${_ovs}")"; cp "${REPO_ROOT}/${_ovs}" "${sb}/${_ovs}" 2>/dev/null || true
+  done <<< "$(bash "${REPO_ROOT}/.claude/utils/marketplace/resolve-role-bundle.sh" mini --overlays 2>/dev/null)"
   _p2c="$(LC_ALL=C bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
   if ! grep -q 'o overlay do papel' <<< "${_p2a}" && grep -q "o overlay do papel 'mini' aponta a fonte 'ops/door-templates/mini/README.door.md'" <<< "${_p2b}" \
      && ! grep -q 'o overlay do papel' <<< "${_p2c}"; then
