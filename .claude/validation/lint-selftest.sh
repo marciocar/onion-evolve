@@ -24138,6 +24138,16 @@ run_kg_contract_check_selftests() {
      && [ "${rcb}" -eq 0 ]; then
     record_pass "kg-contract-check: (i) external_edges com alvo inexistente → rc 1 no MUST com a cura; alvo existente → rc 0"
   else record_fail "kg-contract-check: (i)" "esperava rc 1 dangling-external e rc 0 no válido: rc=${rc} rcb=${rcb} ${out} ${outb}"; fi
+  # (i2) kit v4.3.2 (2026-10-10): o índice só lê os grafos citados, e o alvo sai do DOCUMENTO PARSEADO. Alvo
+  #      válido escrito com escape YAML (\x2F) tem de passar; chave entre aspas com id inexistente tem de
+  #      reprovar. Mutante: derivar o alvo pelo regex de linha do kit (external_targets) reprova os dois.
+  sed -e 's|"g/limpo.kg.yaml#Q_A"|"g\\x2Flimpo.kg.yaml#Q_A"|' "${sb}/g/extok.kg.yaml" > "${sb}/g/extesc.kg.yaml"
+  sed -e 's/^external_edges:/"external_edges":/' "${sb}/g/extruim.kg.yaml" > "${sb}/g/extqkey.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/extesc.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if outb="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/extqkey.kg.yaml 2>&1)"; then rcb=0; else rcb=$?; fi
+  if [ "${rc}" -eq 0 ] && [ "${rcb}" -eq 1 ] && LC_ALL=C grep -q 'MUST   integrity.dangling-external' <<< "${outb}"; then
+    record_pass "kg-contract-check: (i2) alvo com escape YAML → rc 0; chave entre aspas com id inexistente → rc 1 dangling-external"
+  else record_fail "kg-contract-check: (i2)" "esperava rc 0 no escapado e rc 1 na chave entre aspas: rc=${rc} rcb=${rcb} ${out} ${outb}"; fi
   # (j) REGRA 99 (SAC-103, 2026-10-10): caminho de máquina pela CLASSE (machine_path.py). Grafo NOVO com o
   #     `cd /outro/repo` que as ondas O4–O7 deixaram num label → rc 1 nomeando MACHINE-PATH; RASTREADO com o
   #     caminho herdado e edição sem relação → rc 0 (a dívida herdada é da catraca do lint); RASTREADO que ganha
