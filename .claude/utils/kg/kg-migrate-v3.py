@@ -61,6 +61,12 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
   · ONDA O6 (2026-10-10, SAC-73): o6-juiz.csv com `campo` + `valor_final` aplica verified_against, trace (troca ou
     remoção com a linha na narrative), o marcador P4 `x_path_is_content` (string), binário DEV/PROD, locality/source/
     method e o reconciliar (nó novo de --new-nodes + SUPERSEDES). `--hold <id>[:<regra>]` = item ao maestro. Ver o6_ops.
+  · ONDA O7 (2026-10-10, SAC-73): o7-juiz.csv tem `campo` + `valor_final` mas NÃO tem `regra` (o mesmo nó vem numa
+    linha por campo). `proposta_final: reescrever` deriva a ação do `campo` (label → reescrever-label; narrative →
+    reescrever-narrative; reverify_note → reescrever-reverify-note; provenance.locator → reescrever-locator; e os
+    da O6). reescrever-label troca o label (≤280) e ACRESCENTA à narrative o "label anterior: …" da planilha (sem
+    ele, recusa). A guarda de caminho de máquina passa a ver a barra dupla (`//home/…`, sintaxe de permissão do
+    Claude Code) e `~<conta>/`. Ver o7_normalize.
   · COM --locality (contrato v4.2, 2026-10-09, SAC-97): só ACRESCENTA `provenance.locality` (repo|web|host|
     pessoa) às provenances em bloco que ainda não a têm, quando o `source` a determina pela regra de locality_of
     (ver o bloco "provenance.locality" abaixo); sem certeza, o nó fica sem a chave e sai na contagem. Prova, por
@@ -420,6 +426,28 @@ JUDGED_OK = ("APROVADO", "CORRIGIDO")
 PROV_ACTIONS = ("corrigir", "testemunho")
 
 
+O7_COLS = ("id", "grafo", "campo", "veredito", "proposta_final", "valor_final")
+# `reescrever` + campo → ação; a ordem (_ord) aplica a substituição inteira da narrative ANTES do label que lhe
+# acrescenta o "label anterior" (o mesmo nó pode vir com as duas linhas: E_GROUNDING na O7)
+O7_BY_FIELD = {"label": "reescrever-label", "narrative": "reescrever-narrative", "reverify_note": "reescrever-reverify-note",
+               "verified_against": "reescrever-va", "trace": "reescrever-trace", "provenance.locator": "reescrever-locator",
+               "provenance.method": "reescrever-method", "provenance.source": "reescrever-source"}
+
+
+def o7_normalize(r):
+    """A linha O7 no formato que o laço da O6 consome: `regra` = o campo, `locality_final` vazio e a ação derivada
+    do campo quando a proposta é o verbo genérico `reescrever` (a ação explícita, ex. reescrever-label, também vale)."""
+    r = dict(r)
+    campo = r["campo"].strip()
+    first = campo.split(";")[0].strip()
+    if r["proposta_final"].strip() == "reescrever":
+        r["proposta_final"] = O7_BY_FIELD.get(first, "reescrever")  # campo sem ação conhecida: fica fora das ações
+    r["regra"] = campo
+    r.setdefault("locality_final", "")
+    r["_ord"] = 0 if r["proposta_final"] == "reescrever-narrative" else 1
+    return r
+
+
 def load_judged(path):
     """{(grafo, id): linha} da planilha julgada. Coluna ausente, arquivo ilegível ou id duplicado → BrokenInput."""
     import csv
@@ -427,9 +455,12 @@ def load_judged(path):
         rows = list(csv.DictReader(open(path, encoding="utf-8", newline="")))
     except OSError as e:
         raise BrokenInput(f"planilha julgada ilegível ({path}): {e.__class__.__name__}")
-    cols = O6_COLS if rows and "campo" in rows[0] else JUDGED_COLS  # O6: campo + valor_final no lugar dos *_final
+    o7 = bool(rows) and "campo" in rows[0] and "regra" not in rows[0]  # O7: uma linha por campo, sem `regra`
+    cols = O7_COLS if o7 else (O6_COLS if rows and "campo" in rows[0] else JUDGED_COLS)  # O6: campo + valor_final
     if not rows or any(c not in rows[0] for c in cols):
         raise BrokenInput(f"planilha julgada sem as colunas {', '.join(cols)} ({path})")
+    if o7:
+        rows = [o7_normalize(r) for r in rows]
     out = {}
     by_rule = "regra" in rows[0]  # formato O4: o mesmo nó pode vir numa linha por regra
     for r in rows:
@@ -651,8 +682,18 @@ O4_KEEP = re.compile(r'^\(inalterad[oa]\)$')
 #   Recusa atômica por linha, além das da O4: CAMINHO DE MÁQUINA (absoluto de sistema ou ~/) que sobre em source,
 #   locator OU method finais (inclusive no valor mantido), e plano incompatível com a ação.
 O5_ACTIONS = ("reescrever-locator-method", "manter-prod-binario", "manter-dev-binario", "dev-sem-versao")
-# caminho de arquivo do host (não rota HTTP como /threads): raiz de sistema ou ~/
-ABS_FS_RE = re.compile(r'(?:^|[\s"\'(=,;\[`:])(?:~/|/(?:home|etc|var|usr|tmp|opt|root|srv|boot|run|proc|sys|mnt|lib|bin|sbin|dev|snap|media)(?:/|\b))')
+# caminho de arquivo do host (não rota HTTP como /threads): raiz de sistema ou ~/. Desde a O7 (achado J-O7-1 do
+# juiz, item A7 selado): também a BARRA DUPLA (`Read(//home/…)`, a sintaxe de permissão do Claude Code; exige a barra
+# depois do diretório e não casa depois de `:`, para `https://dev.to` não virar caminho) e `~<conta>/` seguido de
+# letra (`~onion/whatsapp-sender`; `~abril/2026`, que é aproximação de data, fica de fora).
+# Selo A4 do maestro (2026-10-10): /dev/null, /dev/stdin, /dev/stdout e /dev/stderr são parte do comando, iguais em
+# qualquer Linux — não são caminho desta máquina, ficam literais e a guarda os isenta. Selo A6: caminho RELATIVO do
+# repo (docs/discussions/onion-pessoal-marcio/…) é legítimo; a guarda nunca o olhou (só raiz de sistema e ~).
+_DEV_STD = r'(?!dev/(?:null|stdin|stdout|stderr)(?![\w/.-]))'
+_SYS_DIRS = _DEV_STD + r'(?:home|etc|var|usr|tmp|opt|root|srv|boot|run|proc|sys|mnt|lib|bin|sbin|dev|snap|media)'
+ABS_FS_RE = re.compile(r'(?:^|[\s"\'(=,;\[`:])(?:~/|/' + _SYS_DIRS + r'(?:/|\b))'
+                       r'|(?:^|[\s"\'(=,;\[`])//' + _SYS_DIRS + r'/'
+                       r'|(?:^|[\s"\'(=,;\[`:])~[a-z_][a-z0-9_-]*/(?=[A-Za-z._])')
 
 
 def _get_provenance(block):
@@ -849,12 +890,15 @@ def apply_judged_o4(text, judged, verified_at=None):
 O6_COLS = ("id", "grafo", "regra", "veredito", "proposta_final", "campo", "valor_final", "locality_final")
 O6_ACTIONS = ("dev-sem-comando", "binario-dev", "binario-prod", "marcar-path-conteudo", "reescrever-va",
               "reescrever-trace", "remover-trace-narrative", "reconciliar", "add-locality", "reescrever-source",
-              "reescrever-method")
+              "reescrever-method", "reescrever-label", "reescrever-narrative", "reescrever-reverify-note",
+              "reescrever-locator")
 P4_MARKS = ("citação", "vetor", "receita")
 _O6_KEY = re.compile(r'(?:^|\s·\s)(remover trace(?=\s·\s|$)|(?:plane|method|locality|source|locator|trace|x_path_is_content|'
                      r'narrative)(?: \([^)]*\))?:\s)')
 _O6_SUB = re.compile(r'^troca "(.*)" por "(.*)"$', re.S)
 _TRACE_PREV = "trace anterior: "
+_O7_LABEL = re.compile(r'^label: "(.*?)"(?: · narrative \((?:acrescentar|nova linha)\): "(.*)")?$', re.S)
+_LABEL_PREV = "label anterior: "
 _TRACE_PREV_HOST = "trace anterior (só no host): "
 
 
@@ -883,6 +927,18 @@ def o6_ops(r):
     fields = {c.strip() for c in campo.split(";") if c.strip()}
     if r["proposta_final"].strip() in ("dev-sem-comando", "reconciliar"):
         return [], None
+    if r["proposta_final"].strip() == "reescrever-label":
+        # O7: `label: "<novo>" · narrative (acrescentar): "<label anterior: …>"` (a narrative é opcional na forma, mas
+        # sem ela a linha é recusada adiante: o label antigo não pode sumir)
+        m = _O7_LABEL.match(val)
+        if not m:
+            return None, "valor_final fora da forma `label: \"…\" · narrative (acrescentar): \"…\"`"
+        if fields - {"label", "narrative"} or "label" not in fields:
+            return None, f"chave fora do campo declarado ({campo})"
+        return [("label", m.group(1))] + ([("narr", m.group(2))] if m.group(2) is not None else []), None
+    if len(fields) == 1 and fields & {"narrative", "reverify_note"} and r["proposta_final"].strip() in (
+            "reescrever-narrative", "reescrever-reverify-note"):
+        return [("top", next(iter(fields)), val)], None  # O7: substitui o campo inteiro (texto livre, sem forma de chave)
     if len(fields) == 1 and not _O6_KEY.match(val):
         f = next(iter(fields))
         if f in ("verified_against", "trace"):
@@ -993,7 +1049,9 @@ def _o6_row(block, r, new_nodes):
         return block, False, f"binario-prod sobre plane {plane}", None
     want = {"binario-dev": {"top", "prov"}, "binario-prod": {"prov"}, "marcar-path-conteudo": {"mark", "narr"},
             "reescrever-va": {"top"}, "reescrever-trace": {"top", "narr"}, "remover-trace-narrative": {"del", "narr"},
-            "add-locality": {"prov"}, "reescrever-source": {"prov", "sub"}, "reescrever-method": {"prov"}}[act]
+            "add-locality": {"prov"}, "reescrever-source": {"prov", "sub"}, "reescrever-method": {"prov"},
+            "reescrever-label": {"label", "narr"}, "reescrever-narrative": {"top"}, "reescrever-reverify-note": {"top"},
+            "reescrever-locator": {"prov", "sub"}}[act]
     if {o[0] for o in ops} - want:
         return block, False, f"{act} com operação fora da ação ({', '.join(sorted({o[0] for o in ops} - want))})", None
     if act == "marcar-path-conteudo" and not any(o[0] == "mark" for o in ops):
@@ -1002,10 +1060,25 @@ def _o6_row(block, r, new_nodes):
         return block, False, "remover-trace-narrative sem `remover trace` e a linha da narrative", None
     if act == "binario-dev" and ("top", "plane", "DEV") not in ops:
         return block, False, "binario-dev sem plane: DEV", None
+    if act == "reescrever-label":
+        new_label = next(o[1] for o in ops if o[0] == "label")
+        narr = [o[1] for o in ops if o[0] == "narr"]
+        if not new_label.strip():
+            return block, False, "label final vazio", None
+        if len(new_label) > LABEL_MAX:
+            return block, False, f"label final com {len(new_label)} caracteres > {LABEL_MAX}", None
+        if _machine(new_label):
+            return block, False, f"{_machine(new_label)} no label final", None
+        _, cur_label = _get_scalar(block, "label")
+        if cur_label != new_label and not (narr and narr[0].startswith(_LABEL_PREV)):
+            # o label antigo não se apaga: vai à narrative como "label anterior: …", já descrito pela planilha
+            return block, False, "reescrever-label sem o \"label anterior: …\" na narrative", None
     changed = False
     prov_touched = False
     for o in ops:
-        if o[0] == "top":
+        if o[0] == "label":
+            block, c = _put_top(block, "label", o[1]); changed |= c
+        elif o[0] == "top":
             if o[1] == "plane" and o[2] not in ("DEV", "PROD"):
                 return block, False, f"plane fora do vocabulário ({o[2]})", None
             if o[1] != "plane" and _machine(o[2]):
@@ -1046,7 +1119,8 @@ def _o6_row(block, r, new_nodes):
             elif o[3] not in curv:
                 return block, False, f"troca no {o[1]}: o trecho de origem não está no valor atual", None
             prov_touched = True
-    if act in ("binario-dev", "binario-prod", "add-locality", "reescrever-source", "reescrever-method") and loc_final:
+    if act in ("binario-dev", "binario-prod", "add-locality", "reescrever-source", "reescrever-method",
+               "reescrever-locator") and loc_final:
         prov["locality"] = loc_final; prov_touched = True
     if prov_touched:
         src, loc, method, locality = (prov.get(k) for k in ("source", "locator", "method", "locality"))
@@ -1155,7 +1229,8 @@ def apply_judged_o6(text, judged, new_nodes=None, hold=()):
         while end > i + 1 and (not lines[end - 1].strip() or lines[end - 1].lstrip().startswith("#")):
             end -= 1
         block = lines[i:end]
-        for r in sorted(judged[nid], key=lambda x: x["regra"]):
+        start, applied = list(block), []
+        for r in sorted(judged[nid], key=lambda x: (x.get("_ord", 1), x["regra"])):
             act, verdict = r["proposta_final"].strip(), r["veredito"].strip()
             tag = f"{nid} [regra {r['regra']}]"
             if verdict not in JUDGED_OK:
@@ -1174,10 +1249,16 @@ def apply_judged_o6(text, judged, new_nodes=None, hold=()):
                 inserts.append((nid, new, new_nodes[new]["lines"]))
             if key:
                 rep["reconciliar" if key == "reconcile" else key].append(tag)
+                applied.append(("reconciliar" if key == "reconcile" else key, tag))
             elif new and not re.search(r'^  - id:[ \t]*' + re.escape(new) + r'[ \t]*$', text, re.M):
                 rep["reconciliar"].append(tag)
             else:
                 rep["same"].append(tag)
+        if block == start and all(k != "reconciliar" for k, _ in applied):
+            # O7: a substituição da narrative e o acréscimo do label anterior se compensam na 2ª passada — o nó
+            # que termina igual ao que era não foi "aplicado"
+            for k, tag in applied:
+                rep[k].remove(tag); rep["same"].append(tag)
         out.extend(block)
         out.extend(lines[end:j])
         i = j
