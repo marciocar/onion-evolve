@@ -38,8 +38,9 @@ sessão. Diga isso: *"quanto mais você me usa, mais eu sou seu — leio seu gra
 
 ## Orient — "onde você está e o que é possível" (não pergunta ainda)
 
-1. **Papel deste repo:** `bash .claude/validation/onion-version.sh | grep '^role:'` (`source`/`hub`/`adopted`;
-   sem stamp = source).
+1. **Papel deste repo:** `bash .claude/validation/onion-version.sh | grep '^role:'` (`source`/`hub`/`adopted`,
+   ou papel de porta `standalone`/`plugins`/`mini`; sem stamp = source). Nos papéis de porta não há adoção
+   nem federação: a projeção default já omite essas transições, e o onboarding não as ensina como passo.
 2. **A família (projeção `--roles`):** apresente o mapa, mas **progressivo** — comece pelo papel DELE ("você é
    um `hub` — a empresa que controla os próprios projetos"), depois a cadeia `source → hub → consumer` e só
    então os demais se perguntarem. Não despeje os 6 papéis de uma vez.

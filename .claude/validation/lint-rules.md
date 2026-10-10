@@ -183,7 +183,7 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 | 35 | Site público não linka deep-link do repo PRIVADO (404 garantido) | HARD | site público linkando deep-link de repo privado — 404 garantido |
 | 36 | Superfície VENDORIZADA sem nome comercial de cliente | HARD | nome comercial de cliente vazando em superfície vendorizada |
 | 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT | link vivo em superfície vendorizada para caminho core-privado — morto no adotante |
-| 61 | Fronteira de MOAT: manifesto de plugin publicável não vaza meta-fábrica nem grafo privado | HARD | publicar a AUTO-REPLICAÇÃO (create-*/adopt/marketplace/decouple) ou o SSOT PRIVADO do core |
+| 61 | Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado | HARD | publicar a ADOÇÃO e a FEDERAÇÃO (adopt/federation-*/co-*/marketplace/decouple) ou o SSOT PRIVADO |
 | 64 | Compose sem bind local ou com segredo em fallback literal | HARD + SOFT | porta publicada em todas as interfaces (o Docker ignora o firewall do HOST — ufw/iptables |
 | 79 | Artefato de plugin não publica o repo-fonte PRIVADO como endereço | HARD | plugin/marketplace publicando a URL do source privado — 404 no instalador |
 

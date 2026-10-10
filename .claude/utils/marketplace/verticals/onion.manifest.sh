@@ -1,6 +1,6 @@
 # onion — o NÚCLEO do Sistema Onion como plugin: orquestrador mestre, runtime de knowledge graph
 # (kg + radar soberano + freshness), sessões, diário, orquestração, condução (wizard/onboarding/retro),
-# validação de meta-specs, co-evolução upstream e os adapters SDAAL (task-manager, forge).
+# validação de meta-specs e os adapters SDAAL (task-manager, forge).
 # 2026-09-04 (F2 da revisão para o diretório oficial): ABSORVEU onion-work-tools — a pesquisa R1 mostrou que o
 # canal premia bundle vertical coeso, e work-tools era um saco de ferramentas que duplicava skill/motor/KB do núcleo.
 # 2026-09-06: ABSORVEU a CONDUÇÃO DE PLANO-GRAFO (/meta:drive + /meta:realign + os dois motores + o predicado
@@ -14,13 +14,16 @@
 # ficaria NU no plugin e cai na classe ALLOWED-TOOLS da REGRA 74 — permissão que não casa no consumidor,
 # comando NASCIDO MORTO. Some-se a isso a pergunta de desenho que o fio já nomeia (onde o INSTALADOR
 # guarda fila e grafo). Ver Q_KG_INBOX_FORA_DO_PLUGIN em docs/evolution/research/librechat-kg-runtime-2026-08/.
-# REGRA 61: manifesto publicável NUNCA lista meta-fábrica (create-*/adopt/marketplace/decouple/evolve/absorb-skill/
-# federation-*) nem docs/onion/graph/*. co-evolve/co-relay (upstream) são permitidos por desenho.
+# REGRA 61: manifesto publicável NUNCA lista adoção nem federação (adopt/federation-*/co-*/marketplace/decouple)
+# nem docs/onion/graph/*. ⚠️ 2026-10-10 (F2 das portas, D_MATRIZ_DE_PORTAS_2026_10): plugins = a superfície do
+# standalone. /meta:co-evolve e /meta:co-relay SAÍRAM deste núcleo (eram "upstream permitido por desenho"; a
+# matriz os nomeia entre o que o standalone não leva), junto com a capacidade co-evolution-upstream. A
+# meta-fábrica (create-*/evolve/forge...) deixou de ser moat e PODE entrar; empacotá-la é da F4 (SAC-93).
 
 PLUGIN_NAME="onion"
 PLUGIN_VERSION="0.1.0"
-PLUGIN_DESC="Núcleo operacional do Sistema Onion: o orquestrador mestre (skill onion), runtime de knowledge graph (kg + radar soberano + kg-freshness), sessões e diário, orquestração de subagentes, condução (wizard/onboarding/retro), validação de meta-specs, co-evolução upstream e os adapters SDAAL de task-manager e forge."
-KEYWORDS=(onion orchestration knowledge-graph sdaal dogfood elenxo runtime diary metaspec co-evolution)
+PLUGIN_DESC="Núcleo operacional do Sistema Onion: o orquestrador mestre (skill onion), runtime de knowledge graph (kg + radar soberano + kg-freshness), sessões e diário, orquestração de subagentes, condução (wizard/onboarding/retro), validação de meta-specs e os adapters SDAAL de task-manager e forge."
+KEYWORDS=(onion orchestration knowledge-graph sdaal dogfood elenxo runtime diary metaspec)
 
 # Ordem: o absorvido PRIMEIRO, o dono DEPOIS — na colisão de basename (README.md/help.md) o assembler deixa o último vencer.
 COMMANDS=(
@@ -36,8 +39,6 @@ COMMANDS=(
   ".claude/commands/meta/constellation.md"
   ".claude/commands/meta/setup-integration.md"
   ".claude/commands/meta/setup-code-review.md"
-  ".claude/commands/meta/co-evolve.md"
-  ".claude/commands/meta/co-relay.md"
   ".claude/commands/meta/backlog.md"
   ".claude/commands/meta/drive.md"
   ".claude/commands/meta/realign.md"
@@ -146,7 +147,6 @@ PROVIDES=(
   "metaspec-validation"
   "freshness-audits"
   "constellation-map"
-  "co-evolution-upstream"
   "plan-graph-drive"
   "plan-graph-realign"
   "guided-conduction"

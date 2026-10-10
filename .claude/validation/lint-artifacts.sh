@@ -1739,25 +1739,51 @@ PY
   #   (1) todo `work_tools:` de papel referencia um set válido (ou none/tbd);
   #   (2) todo tool nomeado em work_tool_sets resolve a um comando real .claude/commands/meta/<tool>.md;
   #   (3) o conjunto `full` está coberto pelo manifesto onion — o núcleo absorveu onion-work-tools em 2026-09-04 (roles.yaml <-> manifesto).
+  #   (4) PARTIÇÃO (2026-10-10, F2 das portas): todo comando de commands/meta/ (menos o README) mora em
+  #       EXATAMENTE um conjunto. Os conjuntos são à mão (meta_factory, federation, adoption...) e o corte
+  #       por papel os CONSOME; sem esta cobrança, comando novo não classificado viajaria ou sumiria por
+  #       default, e em silêncio — a lição "lista escrita à mão envelhece pelo que se acrescenta depois".
+  #   (5) a ALLOWLIST de papel (o mini) nomeia caminhos que existem: allowlist com caminho morto encolhe a
+  #       porta sem ninguém notar (o vendor-manifest só AVISA, porque a decisão é de quem escreveu a lista).
   local wt_out kind a b
-  wt_out="$(python3 - "${roles}" <<'PY'
-import sys, yaml
+  wt_out="$(python3 - "${roles}" "${REPO_ROOT}" <<'PY'
+import sys, yaml, os
 d = yaml.safe_load(open(sys.argv[1])) or {}
+root = sys.argv[2]
 sets = d.get("work_tool_sets") or {}
 valid = set(sets.keys()) | {"none", "tbd"}
 for role, spec in (d.get("roles") or {}).items():
     wt = (spec or {}).get("work_tools")
-    if wt is not None and wt not in valid:
-        print("BADSET\t%s\t%s" % (role, wt))
+    for w in (wt if isinstance(wt, list) else [wt]):
+        if w is not None and w not in valid:
+            print("BADSET\t%s\t%s" % (role, w))
+    al = (spec or {}).get("allowlist") or {}
+    for key in ("commands", "agents", "skills", "support"):
+        for x in (al.get(key) or []):
+            if not os.path.exists(os.path.join(root, ".claude", x)):
+                print("ALLOWDEAD\t%s\t%s" % (role, x))
+owner = {}
 for name, lst in sets.items():
     for t in (lst or []):
         print("TOOL\t%s\t" % t)
+        owner.setdefault(t, []).append(name)
+for t, names in sorted(owner.items()):
+    if len(names) > 1:
+        print("DUPSET\t%s\t%s" % (t, ",".join(names)))
+mdir = os.path.join(root, ".claude", "commands", "meta")
+if sets and os.path.isdir(mdir):
+    for f in sorted(os.listdir(mdir)):
+        if f.endswith(".md") and f != "README.md" and f[:-3] not in owner:
+            print("UNSET\t%s\t" % f[:-3])
 PY
 )"
   while IFS=$'\t' read -r kind a b; do
     case "${kind}" in
       BADSET) violation "HARD" "utils/marketplace/roles.yaml" "papel '${a}' referencia work_tools set '${b}' inexistente em work_tool_sets" ;;
       TOOL) [ -f "${REPO_ROOT}/.claude/commands/meta/${a}.md" ] || violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' sem comando em .claude/commands/meta/${a}.md — crie com /meta:create-command ${a} (ou corrija o nome em work_tool_sets se foi digitado errado)" ;;
+      DUPSET) violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' está em MAIS DE UM conjunto (${b}) — os conjuntos particionam commands/meta/: deixe o comando em um só" ;;
+      UNSET) violation "HARD" "utils/marketplace/roles.yaml" "comando /meta:${a} não está em NENHUM work_tool_set — classifique-o (full, meta_factory, federation, adoption ou pending) em roles.yaml; sem classificação o corte por papel decide por default, em silêncio" ;;
+      ALLOWDEAD) violation "HARD" "utils/marketplace/roles.yaml" "a allowlist do papel '${a}' nomeia '.claude/${b}', que não existe — corrija o caminho ou tire-o da lista" ;;
     esac
   done <<< "${wt_out}"
   local wtman="${vdir}/onion.manifest.sh" ft   # 2026-09-04: onion absorveu onion-work-tools (F2)
@@ -1769,9 +1795,11 @@ PY
 }
 
 # ===========================================================================
-# REGRA 61 — Fronteira de MOAT: manifesto de plugin publicável não vaza meta-fábrica nem grafo privado [HARD]
-# previne: publicar a AUTO-REPLICAÇÃO (create-*/adopt/marketplace/decouple) ou o SSOT PRIVADO do core
-#           (docs/onion/graph/*) num plugin distribuível. A doutrina L1-distribui/L2-L3-moat vira
+# REGRA 61 — Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado [HARD]
+# previne: publicar a ADOÇÃO e a FEDERAÇÃO (adopt/federation-*/co-*/marketplace/decouple) ou o SSOT PRIVADO
+#           do core (docs/onion/graph/*) num plugin distribuível. Até 2026-10-10 a regra também barrava a
+#           meta-fábrica (create-*/evolve/absorb-skill); a matriz das portas (D_MATRIZ_DE_PORTAS_2026_10,
+#           decisão do maestro de 2026-10-09) a libera para standalone e plugins. A doutrina L1-distribui/L2-L3-moat vira
 #           MECANISMO: vazar o moat é erro de lint, não questão de lembrar. Checa as FONTES DECLARADAS
 #           (arrays do manifesto), não a prosa — sourcia o manifesto (como o assemble-plugin.sh faz),
 #           então comentário/descrição que MENCIONE a meta-fábrica não dispara; só a lista real de fontes.
@@ -1781,12 +1809,20 @@ check_moat_boundary() {
   [ "${IS_DERIVED}" -eq 1 ] && return 0
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals" root="${REPO_ROOT}" m src entry files ef bn bad abs
   [ -d "${vdir}" ] || return 0
-  # DENYLIST por BASENAME de meta-fábrica/federação-downstream (comandos achatam no plugin → basename é
-  # o que resta) + por PATH (utils/adopt|marketplace|federation, e QUALQUER *.kg.yaml — o SSOT é do
-  # adotante). co-evolve/co-relay (UPSTREAM) são permitidos por desenho; co-announce/co-deliver (DOWNSTREAM)
-  # e federation-* (ledger L3) não. absorb-skill e evolve são fábrica.
-  local moat_base='^(create-(abstraction|agent|agent-express|command|knowledge-base|skill|vertical)|absorb-skill|adopt|evolve|federation-.*|co-announce|co-deliver|decouple-source|assemble-plugin|generate-marketplace)\.(md|sh)$'
-  local moat_path='(/utils/adopt/|/utils/marketplace/|/utils/federation/|\.kg\.yaml$)'
+  # DENYLIST por BASENAME de ADOÇÃO e FEDERAÇÃO (comandos achatam no plugin → basename é o que resta) +
+  # por PATH (utils/adopt|marketplace|federation|federation-transport|co-evolution, a skill onion-publish
+  # e QUALQUER *.kg.yaml — o SSOT é do adotante).
+  # ⚠️ A FRONTEIRA MUDOU EM 2026-10-10 (F2 das portas, SAC-91), por decisão do maestro registrada em
+  # D_MATRIZ_DE_PORTAS_2026_10: "plugins = a mesma superfície do standalone", e o standalone LEVA a
+  # meta-fábrica. Até a F2 esta regra barrava create-*, absorb-skill e evolve como moat; agora eles
+  # PODEM entrar num manifesto publicável (o empacotamento é da F4, SAC-93), e o que a regra protege é
+  # o que a matriz tira do standalone: adoção (adopt, federation-*, onion-publish, decouple, o motor do
+  # marketplace) e federação. Por isso co-evolve e co-relay, que eram "upstream permitido por desenho",
+  # passaram a ser barrados: a matriz os nomeia entre o que sai. personality-sync entra pela mesma razão
+  # do roles.yaml (conjunto `pending`): a matriz não o classificou, e o lado seguro é não publicá-lo.
+  # O grafo (*.kg.yaml) segue moat em todo papel: é o SSOT privado, não fábrica.
+  local moat_base='^(adopt|federation-.*|co-(announce|deliver|evolve|relay)|co-evolution-inbox-check|personality-sync|decouple-source|assemble-plugin|generate-marketplace|materialize-marketplace-repo)\.(md|sh)$'
+  local moat_path='(/utils/adopt/|/utils/marketplace/|/utils/federation/|/utils/federation-transport/|/utils/co-evolution/|/skills/onion-publish/|\.kg\.yaml$)'
   for m in "${vdir}"/*.manifest.sh; do
     [ -f "${m}" ] || continue
     src="$( set +u; . "${m}" >/dev/null 2>&1; printf '%s\n' \

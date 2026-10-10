@@ -18,7 +18,7 @@ proposta ao grafo vivo, ou a recusa. Sem ele a fila acumula sem controle (o gati
 2 propostas paradas, medido 2026-08-21).
 
 > **O que este comando NÃO é.** Não é `propose_kg_write` (o *produtor* da proposta). Não é
-> `/onion:co-evolve` (fila de mensagens entre repos). É o **consumidor** da fila `kg-inbox` **deste**
+> `meta:co-evolve` (fila de mensagens entre repos). É o **consumidor** da fila `kg-inbox` **deste**
 > repo — o ato de selar, exercido por quem é dono do grafo. (O README da fila é local a cada repo e
 > `docs/evolution/` **não** viaja na adoção: no adotante vale o README que o starter do `meta:adopt`
 > escreve, não este.)
@@ -88,7 +88,7 @@ Para cada proposta:
    | `role:` | mora aqui (candidato a SELAR) | não mora aqui (**REJEITAR** + registrar o gap) |
    |---|---|---|
    | `source` (core) | o **próprio framework**: capacidade, gap, doutrina, decisão de arquitetura | contexto de **negócio de adotante/tenant** (produto, mercado, cliente) — mora no repo dele |
-   | `adopted` \| `hub` | o **domínio deste repo**: produto, negócio, cliente, decisão de arquitetura DAQUI | doutrina do **framework** (isso é sinal upstream: vai por `/onion:co-relay` ao core, não por selagem aqui) · conhecimento de um **terceiro** repo |
+   | `adopted` \| `hub` | o **domínio deste repo**: produto, negócio, cliente, decisão de arquitetura DAQUI | doutrina do **framework** (isso é sinal upstream: vai por `meta:co-relay` ao core, não por selagem aqui) · conhecimento de um **terceiro** repo |
 
    Note a simetria, e que ela não é cosmética: o que o core rejeita por fronteira é exatamente o que
    um adotante SELA, e vice-versa. Até 2026-09-05 esta seção perguntava apenas pelo core — então

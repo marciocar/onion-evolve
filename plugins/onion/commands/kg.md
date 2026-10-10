@@ -16,7 +16,7 @@ argument-hint: "[<arquivo.kg.yaml> | novo <slug> | map <área> | diagnose <slug>
 related_commands:
   - meta:evolve
   - /onion:graph
-  - /onion:co-evolve
+  - meta:co-evolve
 related_agents:
   - research-agent
   - onion
