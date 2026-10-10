@@ -1,6 +1,6 @@
 ---
-reviewed_diff_sha256: 6217ef9ee6bc91ee7df3a96b258c2842f59a5a28cba4ca6ce49093655657da05
-reviewed_code_sha256: 83707c9bef8a6278ce6e71a34d1488b101d610ca3f62d5247799b10d2bffa907
+reviewed_diff_sha256: 618b70ecc025d4f0243ca75f3f1b8f7af0f10430a8924210388246f3fa630b20
+reviewed_code_sha256: ce1242b3a22fb065e95cf3c85f9655ea67ad82d86a78fa0b93720b1f23d53ee6
 findings_total: 11
 findings_real: 6
 tokens: 106308
@@ -13,7 +13,9 @@ nota: >
   do corpus; uma classe de falso positivo medida na prosa do repo; quatro falsos negativos baratos.
   Cinco curados no mesmo laço, e a cura do segmento único expôs um sexto (no corpus), também curado.
   As outras classes são de frase sintética, sem ocorrência no repo, e ficaram declaradas como teto.
-  APROVADO é o estado depois das curas.
+  APROVADO é o estado depois das curas. Depois do 1º push, o CI (kg-fixture-paths (c)) acusou uma
+  string de TESTE no selftest que imitava o grep-próprio de fixture; trocada por outro glob relativo
+  (só o caso cala: glob relativo mudou; revisto por mim, sem efeito na classe).
 ---
 
 # Resíduo — `feat/guard-machine-path`
