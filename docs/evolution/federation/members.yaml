@@ -760,7 +760,7 @@ members:
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-kg-ssot (privado)
     local_path: /home/marcio/onion-kg-ssot
-    onion_version: 0d293c077a28   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-09)
+    onion_version: 54ef8ebdf150   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-10)
     adopted_at: 2026-10-06
     mode: greenfield
     personality_summary: "O grafo de conhecimento verificável como PRODUTO INDEPENDENTE: adota e usa o Onion, e o Onion adota e usa o KG-SSOT (dogfood nos dois sentidos). Tem contextos próprios, feitos de pesquisa profunda e de mercado ali dentro, e lê o core só para entender o encaixe. Primeiro marco: o contrato formal do .kg.yaml (JSON Schema + suíte de conformidade) que o core passará a consumir."

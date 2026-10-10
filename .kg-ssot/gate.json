@@ -1,7 +1,7 @@
 {
   "contract": "kg-contract-v4.schema.json",
   "contract_sha256": "5d3fec7b48f5ad2af1ce80d8193c50032cdbc7aa14827ce04e4c165de10082e5",
-  "graphs": 138,
+  "graphs": 139,
   "failing": {
     "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml": [
       "form.unknown-key.meta.label",
@@ -72,7 +72,6 @@
     ]
   },
   "debt": {
-    "form.pattern.node.provenance.method": 34,
     "form.range.node.label": 2162,
     "form.required.node.verified_against": 141,
     "form.required.node.verified_at": 15,
