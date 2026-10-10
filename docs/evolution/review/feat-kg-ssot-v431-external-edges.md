@@ -3,9 +3,9 @@ title: 'Resíduo — adoção do kit KG-SSOT kg-ssot-v4.3.1 e migração para ex
 date: 2026-10-10
 branch: feat/kg-ssot-v431-external-edges
 reviewed_diff_sha256: pendente
-findings_total: 4
-findings_real: 4
-findings_fixed: 3
+findings_total: 5
+findings_real: 5
+findings_fixed: 4
 tokens: 0
 duration_min: 110
 verdict: CORRIGIDO
@@ -84,6 +84,7 @@ Dois comentários e uma narrative descreviam a chave velha como lugar da aresta,
   Contra os casos do vendor, o radar concorda com o contrato em `integrity/external-local` (os dois) e aprova os
   três válidos de `form/external-edges`. Os inválidos de forma são do contrato. O `--integrity` sai exit 0 nos 9
   grafos migrados e no grafo do contrato.
+- **kg-view (a lente):** soma a ponta local no grau, em paridade com o motor (achado 5).
 - **kg-contract-check:** monta o mesmo índice quando o grafo usa a chave e dá a cura dos dois códigos MUST novos
   (achado 3).
 - **kg-drive e kg-seal-exception:** só leem `x_drive_checkpoint`, que é declaração e fica `x_`. O `_ckpt` reescreve
@@ -114,6 +115,13 @@ Dois comentários e uma narrative descreviam a chave velha como lugar da aresta,
 3. **Real, curado: o kg-contract-check aprovava ponta externa inexistente.** Sem o índice, o leitor de referência
    confere só a forma e a ponta local. Medido com o mutante: `extruim.kg.yaml` saía "conforme". Cura: o índice se
    monta quando o grafo usa a chave. O caso (i) reprova o mutante.
+5. **Real, curado: a lente divergia do motor no grau (REGRA 31 (Lente do grafo: DERIVADA e em paridade com o
+   motor)).** O 1º `pr-finalize --check` reprovou 4 grafos migrados com 6 HARD. Quando o kg-radar passou a contar
+   a ponta local, o `kg-view.sh` não acompanhou, e a atenção de 6 nós divergia, por exemplo
+   `D_ADOPT_REFRAME` 23,75 no motor e 19,00 na lente. O mesmo `--check` acusou a REGRA 19 (Plugins de vertical
+   (plugins/*) sincronizados com as fontes) no `onion-engineering`, que também leva o kg-radar. Cura: a lente lê a
+   seção, e os dois plugins foram remontados. O caso (n) traz o mutante que quebra a paridade. Depois da cura, o
+   `--check` dá 0 HARD.
 4. **Real, NÃO curado (decisão do maestro): sobreposição em `door-role-parity`.** A migração é 1:1. A Aufhebung
    do grafo virou SUPERSEDES do grafo inteiro sobre 7 alvos, e 6 desses alvos também recebem CONSTRAINS da
    `D_MATRIZ_DE_PORTAS_2026_10`, que o maestro selou em 2026-10-09 como "CONSTRAINS, sem flip". As duas chaves já
@@ -131,6 +139,7 @@ Dois comentários e uma narrative descreviam a chave velha como lugar da aresta,
 | cc-delta-census volta a ensinar `x_supersedes_external` | `cc-delta-census (i)` |
 | kg-radar não conta a ponta local como ligação | `kg-radar-contract (l)`, dentro da família |
 | kg-radar sem a seção `external_edges` | `kg-radar-contract (m)`, dentro da família |
+| kg-view sem somar a ponta local no grau | `kg-radar-contract (n)`, dentro da família |
 | kg-migrate-v3 sem a conferência do alvo | `kg-migrate-v3 (x)` |
 | kg-migrate-v3 com from/to do CONSTRAINS invertidos | `kg-migrate-v3 (x)` |
 
