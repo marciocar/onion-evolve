@@ -2609,7 +2609,7 @@ check_kg_read_index_sync() {
 
 
 # ===========================================================================
-# REGRA 85 — Porta pública espelha o core, com catraca [HARD]
+# REGRA 85 — Porta pública espelha o core, com catraca [SOFT]
 # previne: a porta MENTIR sobre o que o core é, por falta de re-materialização
 #   O `materialize-door.sh` resolve o COMO se publica. O QUANDO era uma frase —
 #   "toda leva mergeada em main que toque a superfície que viaja" — e frase não
@@ -2649,12 +2649,19 @@ check_door_staleness() {
       # — o único instante em que re-materializar é possível — e falha lá, alto, com a porta nomeada.
       # SEM-BASELINE e PIN-DESCONHECIDO seguem HARD: não são questão de momento, são registro quebrado.
       *ANDOU-PARA-TRAS*)
-        violation "SOFT" "docs/evolution/federation/members.yaml" "REGRA 85 (Porta pública espelha o core, com catraca): [porta/DEFASADA-COBRADA-POS-MERGE] ${line} — re-materialize (bash ops/materialize-door.sh <clone>), publique e avance o pin. NÃO bloqueia este PR de propósito: a cura só existe depois do merge, e a cobrança bloqueante mora no workflow \`onion-door-staleness\` (push para main). Porta defasada MENTE sobre o core — mas o PR não é o lugar de consertar."
+        violation "SOFT" "docs/evolution/federation/members.yaml" "REGRA 85 (Porta pública espelha o core, com catraca): [porta/DEFASADA-COBRADA-POS-MERGE] ${line} — medida pelo CACHE do registro; a defasagem real, lida do remoto: bash ops/publish-door.sh --status. A cura é /meta:publish <porta>, sob demanda. NÃO bloqueia este PR nem a main: o workflow \`onion-door-staleness\` é relatório desde a F3 das portas."
         ;;
+      # ⚠️ INFORMATIVA POR INTEIRO DESDE A F3 DAS PORTAS (2026-10-10, SAC-92, D_MATRIZ_DE_PORTAS_2026_10:
+      # "publicar é sob demanda e nunca trava o desenvolvimento"). SEM-BASELINE e PIN-DESCONHECIDO eram
+      # HARD por serem "registro quebrado, não questão de momento" — e o argumento valia enquanto o pin do
+      # registro era a verdade sobre a porta. Com o /meta:publish o selo é o CARIMBO da porta, lido do
+      # remoto (`ops/publish-door.sh --status`), e o `onion_version` do members.yaml virou CACHE: ninguém
+      # mais o avança por PR. Cobrar HARD sobre um cache faria todo PR comum depender de manter um campo
+      # que não é mais a fonte — o deadlock que a matriz decidiu desfazer. O sinal FICA, rotulado.
       *SEM-BASELINE*|*PIN-DESCONHECIDO*)
-        violation "HARD" "docs/evolution/federation/members.yaml" "REGRA 85 (Porta pública espelha o core, com catraca): ${line} — isto NÃO é questão de momento: é registro quebrado (pin que não existe na história, ou porta sem teto declarado). Corrija no members.yaml / door-staleness-baseline.txt antes do merge."
+        violation "SOFT" "docs/evolution/federation/members.yaml" "REGRA 85 (Porta pública espelha o core, com catraca): [registro/CACHE-QUEBRADO] ${line} — o pin do registro é cache desde a F3; o fato é o carimbo publicado: bash ops/publish-door.sh --status. Informativo, não bloqueia."
         ;;
-      ERRO*) violation "HARD" ".claude/validation/door-staleness-check.sh" "REGRA 85 (Porta pública espelha o core, com catraca): a guarda não pôde julgar — ${line}" ;;
+      ERRO*) violation "SOFT" ".claude/validation/door-staleness-check.sh" "REGRA 85 (Porta pública espelha o core, com catraca): [porta/NAO-MEDIDO] a guarda não pôde julgar — ${line}. Isto NÃO é 'portas em dia'; a medida que vale é bash ops/publish-door.sh --status." ;;
     esac
   done <<< "${out}"
 }

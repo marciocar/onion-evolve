@@ -2,7 +2,7 @@
 # =============================================================================
 # ensure-secret-gitignore.sh — garante que o adotante NÃO versione segredos locais
 #
-# POR QUÊ : a adoção do onion-curation e do onion-kg-ssot (2026-10-06) mediu que o /meta:adopt não
+# POR QUÊ : a adoção de dois adotantes (2026-10-06) mediu que o /meta:adopt não
 #           gerava `.gitignore` de segredos — nada impedia commitar um `.env` no adotante. As duas
 #           sessões curaram à mão, no próprio repo. Cura de classe: o adopt garante o bloco.
 #

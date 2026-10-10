@@ -2,8 +2,7 @@
 # Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
-  x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote da F2 das portas (SAC-91, 2026-10-10): E_MANIFESTOS_POR_PAPEL_F2 nasce confirmed (DEV) apoiando D_MATRIZ_DE_PORTAS_2026_10; Q_STANDALONE_DE_ADOCAO_SEGUE_A_PORTA e Q_PERSONALITY_SYNC_SEM_CONJUNTO nascem open para o maestro; nenhum flip auto-selado; PR para merge humano"
+  x_drive_checkpoint: sealed
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30

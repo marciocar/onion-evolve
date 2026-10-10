@@ -17,8 +17,8 @@ on:
       # o próprio CI: sem este path, um PR que mexe no workflow não dispara o lint —
       # ponto cego medido no core (#509), um nível acima do código.
       - '.github/workflows/**'
-      # e o gate local: um PR que mexe só no pre-commit também tem de rodar o lint (achado na adoção do
-      # onion-curation, 2026-10-06 — o template não disparava em .githooks/**)
+      # e o gate local: um PR que mexe só no pre-commit também tem de rodar o lint (achado na adoção de
+      # um adotante, 2026-10-06 — o template não disparava em .githooks/**)
       - '.githooks/**'
 
 permissions:

@@ -39,7 +39,7 @@ Não há métricas de produto (não é um app com usuários finais) — o crité
 
 | Área | Descrição | Fonte |
 |---|---|---|
-| Comandos invocáveis | 114 comandos em 10 categorias (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `design`, `development`, `quick`) + `onion.md`, `warm-up.md`, `catch-up.md` no root | `docs/onion/inventory.md:8-9,15-29` (SSOT gerada) |
+| Comandos invocáveis | 115 comandos em 10 categorias (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `design`, `development`, `quick`) + `onion.md`, `warm-up.md`, `catch-up.md` no root | `docs/onion/inventory.md:8-9,15-29` (SSOT gerada) |
 | Agentes especializados | 51 agentes em 9 categorias (`compliance`, `deployment`, `development`, `git`, `meta`, `product`, `research`, `review`, `testing`) | `docs/onion/inventory.md:9,33-45` |
 | Skills | 13 skills em `.claude/skills/` (`onion` orquestrador; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration`; entre outras) | `docs/onion/inventory.md:10`; `CLAUDE.md:13` |
 | Knowledge Bases | 111 KBs em `docs/knowledge-base/` (contagem inclui READMEs de (sub)categoria, exclui `index.md`) | `docs/onion/inventory.md:11` |

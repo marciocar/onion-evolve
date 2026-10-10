@@ -113,7 +113,7 @@ case "${OP}" in
   *)      _subj="${OP} no pin ${PIN}" ;;
 esac
 [ -n "${SUBJECT:-}" ] && _subj="${SUBJECT}"
-# ASSINATURA (2026-10-06, medido nas adoções do onion-curation e do onion-kg-ssot): o commit de adoção saía
+# ASSINATURA (2026-10-06, medido nas adoções de dois adotantes): o commit de adoção saía
 # SEM a assinatura, e as duas sessões fizeram amend à mão. Vale a do PRÓPRIO adotante (`attribution.commit` do
 # settings.json DELE, que o merge never-clobber preserva — PR #936); sem ela, o commit sai sem assinatura.
 _sig=""

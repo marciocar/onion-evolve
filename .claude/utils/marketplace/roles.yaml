@@ -112,6 +112,7 @@ work_tool_sets:
     - federation-register
     - federation-rollback
     - federation-status
+    - publish                # /meta:publish (F3 das portas, SAC-92): publicar portas é ato da FONTE, par da skill onion-publish
   # PENDING — comando que a matriz NÃO classificou. Fica com source e hub (o status quo dele) e NÃO viaja
   # para standalone/plugins até o maestro decidir. personality-sync escreve a linha personality_summary do
   # members.yaml (registro da federação) e tem tag `federation`, mas não está na lista da matriz.

@@ -21,16 +21,46 @@
 # com teto BAIXO, porque não tem passivo a carregar.
 #
 # Uso : door-staleness-check.sh [<repo>] [--emit-baseline]
+#       door-staleness-check.sh <repo> --count <pin> [--tip <ref>]
 # Saída: uma linha por porta. rc=1 se alguma passou do tolerado.
+#        `--count` imprime SÓ o número de commits da superfície que viaja entre <pin> e a ponta
+#        (default: a mesma ponta da catraca). É a medida que o `ops/publish-door.sh --status` usa com
+#        o pin LIDO DO REMOTO da porta (F3 das portas, SAC-92): um cálculo, dois leitores — o pin do
+#        registro é cache, o do carimbo publicado é o fato. rc=3 se o pin não é commit deste repo.
 # =============================================================================
 set -uo pipefail
 REPO="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
-[ "${REPO}" = "--emit-baseline" ] && REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-EMIT=0; for a in "$@"; do [ "$a" = "--emit-baseline" ] && EMIT=1; done
+case "${REPO}" in --*) REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)" ;; esac
+EMIT=0; COUNT_PIN=""; COUNT_TIP=""
+_prev=""
+for a in "$@"; do
+  case "${_prev}" in --count) COUNT_PIN="$a" ;; --tip) COUNT_TIP="$a" ;; esac
+  [ "$a" = "--emit-baseline" ] && EMIT=1
+  _prev="$a"
+done
+[ "${_prev}" = "--count" ] && { echo "ERRO door-staleness: --count exige um pin." >&2; exit 3; }
 
 MEMBERS="${REPO}/docs/evolution/federation/members.yaml"
 BASELINE="${REPO}/.claude/validation/door-staleness-baseline.txt"
 VM="${REPO}/.claude/utils/adopt/vendor-manifest.sh"
+
+# ── MODO --count: a medida, sem o registro ───────────────────────────────────────────────
+# Não lê o members.yaml de propósito: quem chama traz o pin (lido do carimbo publicado da porta).
+# O recorte (raízes que viajam, exclusão do livro-caixa) é o MESMO da catraca abaixo — por isso mora
+# aqui, e não copiado no publish-door.sh.
+if [ -n "${COUNT_PIN}" ]; then
+  [ -f "${VM}" ] || { echo "ERRO door-staleness: vendor-manifest.sh ausente — sem a SSOT do transporte não se sabe QUAL superfície conta." >&2; exit 3; }
+  git -C "${REPO}" rev-parse --verify --quiet "${COUNT_PIN}^{commit}" >/dev/null \
+    || { echo "ERRO door-staleness: o pin '${COUNT_PIN}' não é commit deste repo." >&2; exit 3; }
+  _tip="${COUNT_TIP:-HEAD}"
+  git -C "${REPO}" rev-parse --verify --quiet "${_tip}^{commit}" >/dev/null \
+    || { echo "ERRO door-staleness: a ponta '${_tip}' não resolve." >&2; exit 3; }
+  _croots=(); while IFS= read -r _r; do [ -n "${_r}" ] && _croots+=("${_r}"); done < <(bash "${VM}" --emit-scrub-roots 2>/dev/null)
+  [ "${#_croots[@]}" -gt 0 ] || { echo "ERRO door-staleness: superfície declarada VAZIA — nada a comparar." >&2; exit 3; }
+  git -C "${REPO}" log --oneline "${COUNT_PIN}..${_tip}" -- "${_croots[@]}" \
+    ':(exclude).claude/validation/door-staleness-baseline.txt' | grep -c . || true
+  exit 0
+fi
 
 # FALHA FECHADA: sem registro ou sem SSOT do transporte a guarda não SABE o que julgar,
 # e guarda que não sabe não aprova — ela diz que não sabe.

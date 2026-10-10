@@ -765,7 +765,7 @@ END {
     }
     if (found && swarn == 0) print "  ✅ nenhum alvo de SUPERSEDES ficou por reconciliar"
 
-    # ⚠ DECISÃO `done` EM DEV (2026-10-06, sinal de campo onion-slm, operador MU-18): a gramática diz que
+    # ⚠ DECISÃO `done` EM DEV (2026-10-06, sinal de campo de um adotante, operador MU-18): a gramática diz que
     # `decision` só vira `done` verificada em PROD, e o motor só rebaixava a atenção (DEV/done = 0,5), sem
     # aviso — 20 de 20 mutações passaram caladas. ⚠ AGREGADO, não um por nó: o corpus tem 95 casos em 36
     # grafos, e 95 linhas por leitura ensinariam a ignorar o aviso. Não reprova (`problems` intocado).
@@ -967,7 +967,7 @@ END {
     } else {
       print "  ✅ schema_version " metaSchema " (bate com o radar)"
     }
-    # MULTI-DOCUMENTO (2026-10-06, sinal de campo onion-slm): este radar lê linha a linha e aceita
+    # MULTI-DOCUMENTO (2026-10-06, sinal de campo de um adotante): este radar lê linha a linha e aceita
     # `---` no meio do arquivo; o kg-drive-project.sh e o kg-realign-project.sh usam parser YAML de
     # documento ÚNICO e recusam (exit 2). Aviso, não reprova: o arquivo é legível AQUI.
     if (docSeps >= 2) {
