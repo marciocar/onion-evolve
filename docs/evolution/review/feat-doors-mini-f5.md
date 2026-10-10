@@ -2,7 +2,8 @@
 title: 'Resíduo — F5 das portas: o onion-mini gerado do core por allowlist'
 date: 2026-10-10
 branch: feat/doors-mini-f5
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a9ab5df93161bac31572ab614d267898fe5441eae6dfc848eb502136d903dd69
+reviewed_code_sha256: f5b7b339083a442667b38f320490f290aa66dda2d86db053d8051684fdb0aa08
 findings_total: 11
 findings_real: 11
 findings_fixed: 9
