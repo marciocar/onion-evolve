@@ -35,14 +35,16 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   - **PORTA** (`onion-core`, pública desde **2026-09-17**): a **face pública do core** — mesma
     plataforma, mesma maquinaria, **sem biografia**. Não é porte multi-IDE nem repo congelado: é
     **projeção gerada** de `origin/main` por `ops/materialize-door.sh`, re-materializada a cada leva
-    (18 vezes até 2026-09-23) e cobrada pela REGRA 85 (Porta pública espelha o core, com catraca).
+    (18 vezes até 2026-09-23). Desde a F3 a REGRA 85 (Porta pública espelha o core, com catraca)
+    só informa.
     Por ser projeção, **a história dela não tem valor autoral** — já foi reescrita com force-push
     uma vez, por vazamento medido de caminhos core-privados num baseline que viajou populado.
 
-    **Desde 2026-10-09 o regime PORTA tem quatro portas**, todas projeção do core. O destino é
-    publicá-las **sob demanda**, por comando, sem nunca travar o desenvolvimento. Isso ainda não vale:
-    até a F3, a REGRA 85 e o workflow `onion-door-staleness` seguem cobrando a defasagem do
-    `onion-core` depois de cada merge.
+    **Desde 2026-10-09 o regime PORTA tem quatro portas**, todas projeção do core, publicadas **sob
+    demanda** por `/meta:publish <porta>|--all|--status` (F3, 2026-10-10), sem nunca travar o
+    desenvolvimento. O motor `ops/publish-door.sh` materializa a partir de `origin/main`, verifica o
+    bundle e só empurra com confirmação. O selo é o carimbo da porta, lido do remoto, sem PR no core.
+    A REGRA 85 só informa, e o workflow `onion-door-staleness` virou relatório.
     - **`onion-core`** — o source publicado, sem biografia: toda a maquinaria, inclusive
       meta-fábrica, adoção e federação. É o core das empresas (carimbo `source` a partir da F2);
     - **`onion-standalone`** — uso direto num projeto individual: o core **menos** adoção e
@@ -54,10 +56,9 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
     Decisão do maestro de 2026-10-09 (plano das portas, SAC-88), registrada no nó
     `D_MATRIZ_DE_PORTAS_2026_10` de `docs/onion/graph/door-role-parity-2026-09.kg.yaml`. Ela tira
     o standalone e o mini dos congelados e supera o corte de 2026-09-14 (tudo viajava para o
-    standalone, adoção inclusa). O que já existe hoje: o `onion-core` e o `onion-standalone` saem
-    por `ops/materialize-door.sh`, e o `onion-plugins` pela skill `onion-publish`. O resto é das
-    fases seguintes: o corte por porta é a F2, o comando único `/meta:publish` é a F3 e o mini
-    gerado é a F5.
+    standalone, adoção inclusa). O corte por porta é a F2, e o comando único é a F3; as quatro portas passam
+    por ele (a skill `onion-publish` virou a condução). Falta a F4 (tirar `plugins/` do core) e a F5
+    (a 1ª materialização do mini, que até lá só ensaia).
 
   > ⚠️ **`onion-core` faltava nesta lista até 2026-09-23**, e a causa é de datas: a decisão dos dois
   > regimes foi selada em **16/09** e a porta nasceu pública em **17/09** — um dia depois, sem
@@ -89,7 +90,7 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
 
 **Inventário atual** (contagens canônicas vivem em [docs/onion/inventory.md](docs/onion/inventory.md) — **SSOT gerada do filesystem** por `.claude/validation/inventory.sh` e validada no CI; nunca edite os números à mão, rode `/meta:inventory`. Convenção de contagem: a contagem de Knowledge Bases inclui os READMEs de (sub)categoria e exclui `index.md`):
 
-- 114 comandos invocáveis por categoria (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `design`, `development`, `quick`) + `onion.md`, `warm-up.md` e `catch-up.md` no root; `common/` guarda fragmentos compartilhados (templates/prompts) e há READMEs de categoria. (`design/` é **categoria de comando**, não 4ª dimensão peer — esta permanece em 3: produto, engenharia, compliance; a promoção de `design-context` a peer é provisória e gated)
+- 115 comandos invocáveis por categoria (`product`, `git`, `engineer`, `docs`, `meta`, `validate`, `test`, `design`, `development`, `quick`) + `onion.md`, `warm-up.md` e `catch-up.md` no root; `common/` guarda fragmentos compartilhados (templates/prompts) e há READMEs de categoria. (`design/` é **categoria de comando**, não 4ª dimensão peer — esta permanece em 3: produto, engenharia, compliance; a promoção de `design-context` a peer é provisória e gated)
 - 51 agentes especializados de IA em 9 categorias (`compliance`, `deployment`, `development`, `git`, `meta`, `product`, `research`, `review`, `testing`)
 - 13 skills em `.claude/skills/` (`onion` — orquestrador; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes; `onion-retro` — retro/feedback como spec-as-code; `onion-publish` — condução da publicação do marketplace, core-only; `onion-research` — pesquisa com corpus primeiro e mercado invariante, conduz ao workflow `/onion-research`)
 - **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear, Zoho Projects) via `.claude/utils/task-manager/`

@@ -86,8 +86,8 @@ done
 # E o modo de falha e SILENCIOSO por natureza: um `.sql` a mais no diretorio nao chama atencao.
 # ⚠️ O ESCOPO E DECLARADO, nao adivinhado: so os diretorios `backups/` das ferramentas da casa.
 #    Varrer o disco atras de "coisa que parece backup" produziria falso-positivo em massa.
-# ⚠️ O ESCOPO JA FOI ESTREITO DEMAIS UMA VEZ. A 1a versao olhava so `/home/marcio/onion-vps-*/backups`
-#    e a passada adversarial contra ela achou DOIS diretorios de fora: `/home/marcio/backups/bridge`
+# ⚠️ O ESCOPO JA FOI ESTREITO DEMAIS UMA VEZ. A 1a versao olhava so `<home do operador>/onion-vps-*/backups`
+#    e a passada adversarial contra ela achou DOIS diretorios de fora: `<home do operador>/backups/bridge`
 #    (17 arquivos sem cifra, incluindo os `bridge-diario-*.tar.gz` que carregam o `.env` do bridge —
 #    ANTHROPIC_API_KEY e tokens de convite — e um deles em 644) e `/home/onion/.claude/backups`.
 #    Guarda com escopo menor que a classe e verde-vazia onde nao olha.
@@ -96,7 +96,15 @@ done
 #    "coisa que parece backup") produz falso-positivo em massa e vira ruido ignorado.
 # `BACKUP_DIRS_OVERRIDE` existe SO para a bancada poder testar o DETECTOR num diretorio proprio,
 # em vez de depender do estado do disco — teste que depende do vivo passa a mentir quando o vivo muda.
-for _bdir in ${BACKUP_DIRS_OVERRIDE:-/home/marcio/onion-vps-*/backups /home/marcio/backups/* /home/onion/.claude/backups}; do
+# ⚠️ A HOME DO OPERADOR É DERIVADA, não escrita (2026-10-10, F3 das portas): este arquivo VIAJA para as
+#    portas públicas, e a 1ª redação trazia a home da conta do maestro literal na linha do `for` — a
+#    varredura de vazamento do `ops/publish-door.sh` a acusou no 1º ensaio. O dono do próprio script é
+#    quem opera a VPS (o checkout do core é dele, inclusive quando o cron roda como root), então a home
+#    sai do `passwd` dele. Sem dono resolvível, os dois diretórios do operador ficam FORA e isto é dito.
+_op_home="$(getent passwd "$(stat -c %U "${BASH_SOURCE[0]}" 2>/dev/null)" 2>/dev/null | cut -d: -f6)"
+[ -n "${_op_home}" ] || [ -n "${BACKUP_DIRS_OVERRIDE:-}" ] \
+  || echo "  ⚠️ home do operador não resolvida (dono de ${BASH_SOURCE[0]}) — backups dele NÃO varridos" >&2
+for _bdir in ${BACKUP_DIRS_OVERRIDE:-${_op_home:+${_op_home}/onion-vps-*/backups ${_op_home}/backups/*} /home/onion/.claude/backups}; do
   [ -d "${_bdir}" ] || continue
   # `find` (nao glob) porque o glob expande no shell do chamador e devolve vazio sem acesso —
   # e vazio lido como ausencia e exatamente o fail-open que este arquivo existe para impedir.

@@ -116,7 +116,7 @@ cat > "${OUT}" <<YAML
 # no meta, datas entre aspas, provenance em todo nó confirmed ou PROD, label curto + narrative. A 1ª
 # redação trazia graph/title/layer/created/updated/owner/purpose/como_usar no TOPO, datas sem aspas e
 # labels de até 520 caracteres — 11 avisos SHOULD no 1º grafo de todo adotante.
-# DOCUMENTO ÚNICO de propósito (sinal de campo 2026-10-06, onion-slm): a 1ª redação abria e fechava
+# DOCUMENTO ÚNICO de propósito (sinal de campo de um adotante, 2026-10-06): a 1ª redação abria e fechava
 # este cabeçalho com linhas de três hífens, o que para um parser YAML são DOIS documentos. O radar (linha a linha)
 # aceitava; o kg-drive-project.sh e o kg-realign-project.sh recusavam com exit 2 — o 1º grafo de
 # todo adotante nascia fora do /meta:drive. Nenhum dos 138 grafos do core usa o separador.

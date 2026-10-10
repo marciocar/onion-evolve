@@ -1,6 +1,6 @@
 {
   "name": "onion-engineering",
-  "version": "0.1.142",
+  "version": "0.1.143",
   "description": "Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessões persistentes), gates pré-PR, especialistas de código (Node, React, Postgres, NX, Docker, segurança) e testes (unit/integration/e2e, estratégia de teste, QA story points).",
   "author": { "name": "Onion - Marcio Carvalho" },
   "homepage": "https://onionevolve.com",

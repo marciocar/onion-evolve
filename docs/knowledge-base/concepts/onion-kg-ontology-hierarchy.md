@@ -38,7 +38,7 @@ As **duas camadas** (a única taxonomia de grafo já canônica antes deste doc):
   epistêmico "limita sem derrubar" (a objeção sobrevivente; dissent que MATA é `REFUTES`).
   > **Por que `CONSTRAINS` está nas duas camadas (2026-10-06).** Esta lista o punha só em `domain`, e a
   > própria `kg-grammar.md` mandava usá-lo em audit para a objeção que limita. O corpus seguiu a gramática:
-  > das 777 arestas `CONSTRAINS`, 724 (93%) ligam nós de audit (sinal de campo do onion-slm, medido no
+  > das 777 arestas `CONSTRAINS`, 724 (93%) ligam nós de audit (sinal de campo de um adotante, medido no
   > commit `2d316566`). A ontologia passa a dizer o que a casa faz; reescrever 724 arestas para obedecer a
   > uma lista que contradizia a própria gramática seria corrigir o lado errado.
 - `layer: domain` — o SSOT de domínio: `entity`/`state`/`event`/`rule`/`invariant`/`policy`, arestas

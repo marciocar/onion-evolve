@@ -498,22 +498,11 @@ cat <<FIM
 
 ✅ Porta materializada em ${DEST} (papel '${ROLE}', pin ${_pin})
 
-   O PUSH É SEU — o script para aqui por desenho (I3: um escritor por repo, e
-   publicar é ato outward-facing). No destino:
+   O CAMINHO DE PUBLICAÇÃO É O /meta:publish (desde a F3 das portas, SAC-92): o motor
+   ops/publish-door.sh chama este script a partir de uma worktree em origin/main, verifica o
+   bundle (vazamento, paridade de papel, lint da porta), commita, empurra SÓ com --push e
+   confere no remoto. O selo é o carimbo da porta — não há PR de registro no core.
 
-     cd ${DEST} && git add -A
-     git commit -m "chore(door): materializa do core no pin ${_pin}"
-     git push
-
-   E DEPOIS DO PUSH, carimbe o registro — é o passo que faltava até 2026-09-26:
-
-     bash ops/door-seal-pin.sh ${_slug}
-
-   Ele confere o REMOTO pelo forge e só carimba se bater; sem isso o
-   \`onion_version\` do members.yaml fica atrás, e a REGRA 85 passa a medir a
-   MEMÓRIA em vez da porta (aconteceu duas vezes num dia). O baseline de
-   defasagem segue manual, por decisão do maestro.
-
-   E lembre do ciclo: porta sem re-materialização envelhece. O gatilho é toda
-   leva mergeada em main que toque a superfície que viaja.
+   Rodado à mão, este script para aqui por desenho (I3: um escritor por repo). A defasagem de
+   cada porta, lida do remoto: bash ops/publish-door.sh --status
 FIM

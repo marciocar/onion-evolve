@@ -139,7 +139,7 @@ mkdir -p "${DEST_DIR}" 2>/dev/null || { echo "ERRO: não foi possível criar ${D
 relayed=0 ; skipped=0
 for f in "${FILES[@]}"; do
   base="$(basename "$f")"
-  # COLISÃO DE NOME decide por CONTEÚDO, não pela existência (sinal do onion-kg-ssot, 2026-10-07):
+  # COLISÃO DE NOME decide por CONTEÚDO, não pela existência (sinal de um adotante, 2026-10-07):
   # esta checagem saía "já relayado" ANTES do dedup abaixo, e a versão atualizada de um sinal nunca
   # chegava (medido: `cmp` diferiu no byte 2871 e o carteiro calou) — o contrário do que o cabeçalho
   # promete. Idêntico → no-op. Diferente e o destino UNTRACKED (o core ainda não triou) → entrega por
