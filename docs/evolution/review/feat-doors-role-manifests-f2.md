@@ -2,6 +2,8 @@
 title: 'Resíduo — F2 das portas: manifestos por papel'
 date: 2026-10-10
 branch: feat/doors-role-manifests-f2
+reviewed_diff_sha256: e3c2470aec7d75c0e83621c5dab7c6befc839d8d800c927d5f5a53bdda0daee0
+reviewed_code_sha256: 1760bb76b7a82efe9dd7b389f6638b9dd49aadcd21ee7a7225cb136d78e78280
 findings_total: 10
 findings_real: 10
 findings_fixed: 8
