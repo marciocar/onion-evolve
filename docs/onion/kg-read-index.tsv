@@ -276,6 +276,7 @@
 .claude/utils/marketplace/assemble-plugin.sh	E_HOOKS_INERT_ON_INSTALL_FIXED	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	E_ONIONEVOLVE_AGORA_TEM_CORREIO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	E_ONIONEVOLVE_NAO_RECEBE_EMAIL	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
+.claude/utils/marketplace/assemble-plugin.sh	E_PLUGIN_VALIDATE_FIX_NAO_TOCA_OS_PLUGINS	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	E_README_DE_CATEGORIA_NAO_E_COMANDO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	E_TETO_DA_VERSAO_E_SO_PROSA	docs/onion/graph/fios-abertos.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	Q_EMAIL_DE_SUPORTE_VERIFICADO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
@@ -300,9 +301,12 @@
 .claude/utils/marketplace/verticals/onion.manifest.sh	D_DRIVE_VIAJA_NO_PLUGIN	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/utils/marketplace/verticals/onion.manifest.sh	D_PR08_FRONTEIRA_DO_BUNDLE	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/utils/marketplace/verticals/onion.manifest.sh	D_PR11_EXEMPLOS_EXECUTAVEIS	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
+.claude/utils/marketplace/verticals/onion.manifest.sh	E_DRIVE_NAO_E_MOAT_MAS_DEPS_NAO_VIAJAM	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/utils/marketplace/verticals/onion.manifest.sh	E_KGFRESHNESS_GAP_IN_PLUGIN	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/utils/marketplace/verticals/onion.manifest.sh	E_ONION_CORE_PLUGIN_BORN	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
+.claude/utils/marketplace/verticals/onion.manifest.sh	Q_KG_INBOX_FORA_DO_PLUGIN	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 .claude/utils/marketplace/verticals/onion.manifest.sh	Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
+.claude/utils/marketplace/verticals/onion.manifest.sh	Q_PLUGIN_SEM_DRIVE_NEM_ADOPT	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/utils/scope/resolve-scope-layers.sh	SY4_prod_show_scope_provenancia	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/utils/task-manager/adapters/clickup.md	E_CLICKUP_STATUS_POR_LIST_MEDIDO_AO_VIVO	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
 .claude/utils/task-manager/adapters/clickup.md	E_SDAAL_SEM_VAZAMENTO_DE_PROVIDER	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
@@ -2219,8 +2223,4 @@ ops/testing/selftest-summary.sh	E_O_SUMARIO_REPORTA_NAO_JULGA	docs/onion/graph/t
 ops/update-bridge.sh	E_W9_BRIDGE_DEPLOY_0902	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/verify-adopter-gate.sh	E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 ops/verify-adopter-gate.sh	E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
-plugins/onion/.claude-plugin/plugin.json	E_PLUGIN_VALIDATE_FIX_NAO_TOCA_OS_PLUGINS	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
-plugins/onion/commands/	E_DRIVE_NAO_E_MOAT_MAS_DEPS_NAO_VIAJAM	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
-plugins/onion/commands/	Q_KG_INBOX_FORA_DO_PLUGIN	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
-plugins/onion/commands/	Q_PLUGIN_SEM_DRIVE_NEM_ADOPT	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 site/src/pages	Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
