@@ -112,7 +112,23 @@ echo "  fonte: ${SRC_REF} ($(git -C "${REPO_ROOT}" rev-parse --short=12 "${SRC_R
 # ── (1) MONTAR pelo manifesto ────────────────────────────────────────────────
 # `git archive HEAD`, nunca cópia do disco: untracked e ignored NUNCA viajam,
 # nem por engano. É a segunda barreira da allowlist.
-mapfile -t SPEC < <(bash "${VM}" --role "${ROLE}" --repo "${REPO_ROOT}" 2>/dev/null)
+# ⚠️ O CORTE É CALCULADO NA PRÓPRIA `${SRC_REF}` (2026-10-10, passada adversarial da F2). Antes o
+# manifesto era calculado sobre o HEAD local e o roles.yaml do DISCO, e só o archive vinha da ref:
+# medido, `--from origin/main --role mini` saía ✅ com o corte da branch de trabalho, num pin cujo
+# roles.yaml nem conhecia o papel mini. A ref define o que viaja E como se corta; uma worktree
+# destacada nela dá aos dois leitores do vendor-manifest (ls-tree HEAD e roles.yaml) a mesma árvore.
+_vmwt="$(mktemp -d)/src"
+git -C "${REPO_ROOT}" worktree add --detach -q "${_vmwt}" "${SRC_REF}" >/dev/null 2>&1 \
+  || { echo "ERRO: não consegui destacar uma worktree em ${SRC_REF} para calcular o corte." >&2; exit 3; }
+trap 'git -C "${REPO_ROOT}" worktree remove --force "${_vmwt}" >/dev/null 2>&1; rm -rf "$(dirname "${_vmwt}")"' EXIT
+_spec_rc=0
+_spec_out="$(bash "${_vmwt}/.claude/utils/adopt/vendor-manifest.sh" --role "${ROLE}" --repo "${_vmwt}" 2>/dev/null)" || _spec_rc=$?
+if [ "${_spec_rc}" -ne 0 ]; then
+  echo "ERRO: o manifesto do papel '${ROLE}' em ${SRC_REF} falhou (rc=${_spec_rc}) — papel desconhecido nessa ref, ou SSOT do corte sem resposta. Nada foi copiado." >&2
+  exit 3
+fi
+mapfile -t SPEC <<< "${_spec_out}"
+[ -n "${_spec_out}" ] || SPEC=()
 if [ "${#SPEC[@]}" -eq 0 ]; then
   echo "ERRO: manifesto VAZIO para o papel '${ROLE}' — pathspec ausente significa TODOS para o git; abortando antes de copiar o repositório inteiro." >&2
   exit 3
@@ -392,7 +408,9 @@ _regen() {                                        # _regen <nome-do-script> <com
     return 1
   fi
   bash "${_src}" "${DEST}" 2>&1 | ${_cut} | sed 's/^/  (6) /'
-  return 0
+  # o rc é o do REGENERADOR, não o do `sed` (2026-10-10): o regen-baselines recusava a porta `source`
+  # como "é o CORE" e o script terminava com ✅, catracas vazias (passada adversarial da F2).
+  return "${PIPESTATUS[0]}"
 }
 # ⚠️ (6-pre) O ÍNDICE DO DESTINO TEM DE REFLETIR A ÁRVORE MATERIALIZADA — **antes** de regenerar.
 # Dois dos geradores de projeção SSOT (`harness-inventory.sh` → testing-inventory.md, e
@@ -441,7 +459,7 @@ _DOOR_HAS_LINT=0; [ -f "${DEST}/.claude/validation/lint-artifacts.sh" ] && _DOOR
 if [ "${_DOOR_HAS_LINT}" -eq 1 ]; then
 _regen regen-ssot-projections.sh || true
 # As catracas do core foram esvaziadas no passo (2); aqui elas renascem do corpus DA PORTA.
-_regen regen-baselines.sh 'tail -2' || true
+_regen regen-baselines.sh 'tail -2' || { echo "ERRO: o regen-baselines recusou ou falhou na porta — as catracas dela ficariam vazias. Nada a publicar." >&2; exit 3; }
 else
   echo "  (6) a porta não leva o lint (.claude/validation/lint-artifacts.sh): projeções SSOT e baselines não se aplicam"
 fi
