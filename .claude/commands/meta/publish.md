@@ -47,12 +47,14 @@ pelo `/meta:forge` em 2026-10-10. O caminho antigo de plugins agora passa por aq
 
 **Hoje:** !`date +%F`
 
-!`bash ops/publish-door.sh --status 2>&1 || true`
+!`if [ -f ops/publish-door.sh ]; then bash ops/publish-door.sh --status 2>&1; else echo "motor ausente: ops/ não viaja, e publicar portas é ato do core — nada a fazer aqui"; fi; true`
 
 > ⚠️ As duas linhas acima são **diretivas de injeção** (exclamação seguida de crase), e o harness
 > executa toda diretiva do arquivo, inclusive uma escrita como exemplo. Por isso a forma literal não
-> aparece em mais nenhum lugar daqui. O `|| true` mantém a carga viva quando o medidor sai com rc 3
-> (nenhuma porta medida). A mensagem dele chega no texto injetado, e isso **é** a medição.
+> aparece em mais nenhum lugar daqui. O `true` final mantém a carga viva quando o medidor sai com rc 3
+> (nenhuma porta medida); a mensagem dele chega no texto injetado, e isso **é** a medição. O teste de
+> existência existe porque este comando viaja para a porta onion-core (papel source) e o motor, em
+> `ops/`, não.
 
 Leia o status como ele se declara. A defasagem conta commits da superfície que viaja entre o pin
 **publicado** e `origin/main`. `NÃO-MEDIDO` é "não sei", nunca "em dia".
@@ -74,7 +76,7 @@ Leia o status como ele se declara. A defasagem conta commits da superfície que 
 3. **CONFIRMAR** com AskUserQuestion: a porta, o papel, o pin de `origin/main`, o resumo do commit
    ensaiado e o que vai a público. As opções são **publicar** ou **parar**. Nunca assuma.
 4. **PUBLICAR** só com o "sim":
-   `bash ops/publish-door.sh <porta> --push`
+   `bash ops/publish-door.sh <porta> --push --expect-pin <pin do ensaio>`
    O motor refaz a rodada inteira (verificação inclusa), empurra e confere no remoto com
    `git ls-remote`. Se a verificação não pôde ser medida (por exemplo, sem a CLI `claude` nos
    plugins), o push é recusado.

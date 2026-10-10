@@ -103,7 +103,11 @@ if [ -z "${SRC_REF}" ]; then
 else
   git -C "${REPO_ROOT}" rev-parse --verify --quiet "${SRC_REF}^{commit}" >/dev/null || {
     echo "ERRO: --from '${SRC_REF}' não resolve para um commit." >&2; exit 3; }
-  echo "  ⚠️  --from '${SRC_REF}': NÃO é origin/${_INTEG}. Materialização deliberada fora da integração — não publique sem saber por quê."
+  # O aviso só vale quando a ref NÃO é a integração: o /meta:publish passa o sha de origin/<integração>
+  # explícito (para a main não andar no meio da rodada), e avisar "não é origin/main" ali seria falso.
+  if [ "$(git -C "${REPO_ROOT}" rev-parse "${SRC_REF}^{commit}")" != "$(git -C "${REPO_ROOT}" rev-parse --verify --quiet "origin/${_INTEG}^{commit}" 2>/dev/null)" ]; then
+    echo "  ⚠️  --from '${SRC_REF}': NÃO é origin/${_INTEG}. Materialização deliberada fora da integração — não publique sem saber por quê."
+  fi
 fi
 
 echo "══ materialize-door — papel '${ROLE}' → ${DEST}"

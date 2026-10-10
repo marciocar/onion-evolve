@@ -39,7 +39,7 @@ selo no carimbo) vive em [`common:prompts:publish-doctrine`](../../commands/comm
    (mostre o achado e pare), rc 2 é recusa, rc 3 é fonte irresolúvel.
 4. **Confirmação** (AskUserQuestion): porta, papel, pin, resumo do commit ensaiado. Opções:
    publicar · parar.
-5. **Publicação.** `bash ops/publish-door.sh <porta> --push`, e confira com `--status`.
+5. **Publicação.** `bash ops/publish-door.sh <porta> --push --expect-pin <pin do ensaio>` (a main que andou desde o ensaio recusa), e confira com `--status`.
    Para os plugins, quem instala usa `/plugin marketplace add marciocar/onion-plugins` +
    `/plugin install onion@onion-plugins`.
 

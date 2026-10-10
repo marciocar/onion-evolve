@@ -18,9 +18,12 @@ comando, sem nunca travar o desenvolvimento**.
 ### 1. A fonte é `origin/<integração>`, sempre, inclusive o motor
 O motor (`ops/publish-door.sh`) destaca uma worktree em `origin/main` e roda **os materializadores dela**,
 não os do disco de quem chama. Assim, o que viaja e o código que decide o que viaja vêm do mesmo commit
-mergeado. Se `origin/main` não resolver, a rodada aborta com rc 3, e o HEAD local nunca serve de
-substituto, porque ele pode ser a branch de um PR aberto. O `--from <ref>` existe para **ensaiar uma
-branch** (ver o efeito de uma cura antes do merge) e é recusado junto com `--push`.
+mergeado. O **registro** (papel, destino, ids de adotante) também é lido da ref, não da árvore de
+trabalho: uma edição não commitada do `remote:` mandaria a porta para outro destino. Se `origin/main`
+não resolver, a rodada aborta com rc 3, e o HEAD local nunca serve de substituto, porque ele pode ser
+a branch de um PR aberto. O `--from <ref>` existe para **ensaiar uma branch** (ver o efeito de uma cura
+antes do merge) e é recusado junto com `--push` e com `--clone`, para que um commit de branch não
+mergeada nunca fique num clone de onde um push seguinte o levaria.
 
 ### 2. Verifica-se o que foi MONTADO, não o que se pretendia montar
 Antes de qualquer commit no clone da porta, quatro conferências sobre o bundle:
@@ -34,8 +37,8 @@ Antes de qualquer commit no clone da porta, quatro conferências sobre o bundle:
   `provenance.json` aponta o pin;
 - **o gate da própria porta:** o lint dela tem de dar 0 HARD (o mini não leva lint, por desenho). Nos
   plugins vale `claude plugin validate --strict` no catálogo e em cada plugin;
-- **o core intacto:** HEAD, árvore e lista de worktrees iguais antes e depois.
-Qualquer reprovação aborta a rodada com rc 1. Nada é commitado e nada é publicado.
+- **o core intacto:** HEAD e árvore do checkout iguais antes e depois, e nenhuma worktree deste motor sobrando (worktree de outra sessão nascendo no meio não é alteração dele).
+As três primeiras rodam antes de qualquer commit: reprovação aborta com rc 1, sem commit e sem publicação. A do core roda no fim, porque é sobre o efeito da rodada inteira: rc 1 no ensaio, rc 4 se a porta já tiver sido publicada.
 
 ### 3. Papel divergente recusa
 O registro (`members.yaml`) e o carimbo **publicado** da porta têm de concordar antes de materializar,
@@ -47,9 +50,14 @@ alinhado na leva seguinte (REGRA 92 (Papel da porta no registro concorda com o C
 ### 4. O push é confirmação explícita, e a conferência é no remoto
 Sem `--push` a rodada é **ensaio**: monta, verifica, commita num clone descartável e para. A superfície
 só passa `--push` depois de perguntar ao maestro (I3: um escritor por repo, e publicar é ato voltado ao
-público). Depois do push, `git ls-remote` tem de devolver o commit publicado; se não devolver, rc 1. Se
-alguma verificação não pôde ser medida (por exemplo, sem a CLI `claude` nos plugins), o `--push` é
-recusado, porque publicar sem medir é afirmar o que não se sabe.
+público), e passa junto o `--expect-pin` do ensaio: se a integração andou entre o ensaio e o "sim", a
+rodada recusa, porque o pin publicado tem de ser o pin confirmado. O clone começa **exatamente** em
+`origin/<ramo>` (o do maestro, via `--clone`, só se estiver limpo inclusive do ignorado, em dia e com o
+nome e o origin da porta), e o push leva **exatamente um** commit, o verificado. Depois do push,
+`git ls-remote` tem de devolver o commit empurrado; se não devolver, rc 4, que significa "publicado, mas
+uma pós-condição falhou" e nunca se confunde com o rc 1 de "nada publicado". Se alguma verificação não
+pôde ser medida (por exemplo, sem a CLI `claude` nos plugins), o `--push` é recusado, porque publicar
+sem medir é afirmar o que não se sabe.
 
 ### 5. O selo é o carimbo da porta, e nenhum PR no core depende dele
 O pin vive no `.claude/.onion-version` da porta (ou no `provenance.json`, nos plugins), escrito pela
@@ -75,7 +83,11 @@ para que a ausência não seja lida como esquecimento.
   CLAUDE.md didáticos são da F5 (SAC-94). Até lá o motor recusa (rc 2), porque o repo dela guarda a destilação curada, sem `.claude/`, e substituí-la é a própria 1ª materialização.
 - **Não roda as REGRAS 19/72–79/61 sobre um bundle temporário de plugins.** Isso é da F4 (SAC-93),
   junto com a saída de `plugins/` do core. Até lá elas seguem no lint do core.
-- **Não vê conta de máquina que não esteja no registro nem seja de quem roda.** É o teto declarado da
-  derivação.
+- **Não vê conta de OUTRA máquina.** As contas vêm dos `local_path` do registro, de quem roda e das
+  contas humanas do passwd local; uma conta que só existe noutra máquina fica fora. É o teto declarado
+  da derivação.
+- **Não mede a defasagem por papel.** O `--status` conta os commits das raízes que viajam para
+  qualquer papel; para standalone, plugins e mini ele pode contar commit que não chega nelas.
+  Superestima, nunca subestima, e é informativo.
 - **Não atualiza o clone local da porta nem o `members.yaml`.** A REGRA 92 lê o clone local, então
   depois de uma troca de papel ele precisa de `git pull` por quem o mantém.

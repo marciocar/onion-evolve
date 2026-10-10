@@ -27,7 +27,7 @@
 # ═══ O QUE É JULGÁVEL (o corte que decide a taxa de falso-positivo) ═══
 # Sem corte, o número sobe para 24 e ~46% são falso-positivo. Três classes são EXCLUÍDAS por
 # desenho, porque o repo não é autoridade sobre elas — e a supressão é CONTADA, nunca silenciosa:
-#   · caminho ABSOLUTO ou URL   → outra máquina/rede (ex.: /home/onion/onion-bridge/src/server.ts
+#   · caminho ABSOLUTO ou URL   → outra máquina/rede (ex.: /home/<conta>/onion-bridge/src/server.ts
 #                                  na VPS, /etc/caddy/...). Existe; só não aqui.
 #   · raiz externa DECLARADA    → `memory/` é o diretório de memória da sessão, fora do repo.
 #   · não parece caminho        → nome solto, chave de config (`permissions.additionalDirectories`),
