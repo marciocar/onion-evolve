@@ -1,5 +1,5 @@
 # Catraca de AUFHEBUNG DE RODADA DE RADAR — rodadas seladas toleradas SEM nenhuma
-# aresta SUPERSEDES e sem `meta.supersedes_none`/`supersedes_external` declarado.
+# aresta SUPERSEDES (em edges: ou external_edges:) e sem `meta.supersedes_none` declarado.
 # CHAVEADO (uma linha por rodada), como os 11 baselines irmãos: inteiro nu não diz QUAL
 # rodada está tolerada, e some no diff quando uma sai e outra entra.
 # Regenere: bash .claude/validation/radar-aufhebung-check.sh . --emit-baseline

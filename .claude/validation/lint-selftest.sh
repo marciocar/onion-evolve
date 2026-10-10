@@ -3884,6 +3884,43 @@ run_kg_radar_contract_selftests() {
       record_pass "kg-radar-contract: (i) (MUT) sem a provenance como origem, o caso (d) volta a cobrar — o teste morde"
     else record_fail "kg-radar-contract: (i) (MUT)" "o mutante não cobrou; out=${out}"; fi
   else record_fail "kg-radar-contract: (i) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+
+  # ── external_edges (contrato v4.3, 2026-10-10, SAC-98) — casos do VENDOR, matriz latest/integrity/external-local.
+  # O radar é de UM arquivo: a ponta EXTERNA é do gate (contra o corpus); aqui se decide a ponta LOCAL, que
+  # conta como ligação (nó ligado só por aresta externa não é órfão) e reprova quando não existe.
+  local xl="${REPO_ROOT}/vendor/kg-ssot/spec/conformance/fixtures/latest/integrity/external-local"
+  if [ ! -f "${xl}/valid-external-only-link.kg.yaml" ] || [ ! -f "${xl}/bad-external-local-missing.kg.yaml" ]; then
+    record_skip "kg-radar-contract: vendor sem a matriz latest/integrity/external-local (contrato < v4.3) — casos (j)-(m) pulados"
+  else
+    # (j) VALID: o nó ligado só por aresta externa passa no --integrity (não é órfão)
+    rc=0; out=$(LC_ALL=C bash "${radar}" "${xl}/valid-external-only-link.kg.yaml" --integrity 2>&1) || rc=$?
+    if [ "${rc}" -eq 0 ] && ! grep -q 'órfão' <<< "${out}"; then
+      record_pass "kg-radar-contract: (j) nó ligado só por external_edges não é órfão (valid-external-only-link)"
+    else record_fail "kg-radar-contract: (j) valid-external-only-link" "rc=${rc} $(grep -m2 '✗' <<< "${out}" | tr '\n' ' ')"; fi
+    # (k) BAD: ponta local inexistente reprova, nomeando a aresta externa (integrity.dangling-external-local)
+    rc=0; out=$(LC_ALL=C bash "${radar}" "${xl}/bad-external-local-missing.kg.yaml" --integrity 2>&1) || rc=$?
+    if [ "${rc}" -eq 1 ] && grep -q 'external_edges 1: to aponta nó inexistente: C_NAO_EXISTE' <<< "${out}"; then
+      record_pass "kg-radar-contract: (k) external_edges com ponta local inexistente → exit 1 (bad-external-local-missing)"
+    else record_fail "kg-radar-contract: (k) bad-external-local-missing" "rc=${rc} $(grep -m2 '✗' <<< "${out}" | tr '\n' ' ')"; fi
+    # (l) (MUT) a ponta local deixa de contar como ligação → (j) tem de reprovar como órfão
+    cp "${radar}" "${mut}/mut-xd.sh"
+    sed -i 's|if (xlocal\[i\] != "") deg\[xlocal\[i\]\]++|if (0) deg[xlocal[i]]++|' "${mut}/mut-xd.sh"
+    if grep -q 'if (0) deg\[xlocal' "${mut}/mut-xd.sh"; then
+      out="$(LC_ALL=C bash "${mut}/mut-xd.sh" "${xl}/valid-external-only-link.kg.yaml" --integrity 2>&1 || true)"
+      if grep -q 'nó órfão (grau 0): C_SO_EXTERNA' <<< "${out}"; then
+        record_pass "kg-radar-contract: (l) (MUT) sem contar a ponta local, o caso (j) vira órfão — o teste morde"
+      else record_fail "kg-radar-contract: (l) (MUT)" "o mutante não acusou órfão; out=$(head -c 300 <<< "${out}")"; fi
+    else record_fail "kg-radar-contract: (l) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+    # (m) (MUT) sem a seção external_edges o bloco cai na seção anterior → (k) não acha mais a ponta local
+    cp "${radar}" "${mut}/mut-xs.sh"
+    sed -i 's|^/\^external_edges:/ { section = "external"|/^MUTANTE_NUNCA:/ { section = "external"|' "${mut}/mut-xs.sh"
+    if grep -q '^/\^MUTANTE_NUNCA:/' "${mut}/mut-xs.sh"; then
+      out="$(LC_ALL=C bash "${mut}/mut-xs.sh" "${xl}/bad-external-local-missing.kg.yaml" --integrity 2>&1 || true)"
+      if ! grep -q 'external_edges 1: to aponta nó inexistente' <<< "${out}"; then
+        record_pass "kg-radar-contract: (m) (MUT) sem a seção external_edges, o caso (k) perde a ponta local — o teste morde"
+      else record_fail "kg-radar-contract: (m) (MUT)" "o mutante ainda acusa; out=$(head -c 300 <<< "${out}")"; fi
+    else record_fail "kg-radar-contract: (m) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+  fi
   rm -rf "${mut}"
 }
 
@@ -24070,6 +24107,19 @@ run_kg_contract_check_selftests() {
      && [ "${rcb}" -eq 0 ]; then
     record_pass "kg-contract-check: (h) locality fora do vocabulário → rc 1 com o código do v4.2 e a cura; locality válida → rc 0"
   else record_fail "kg-contract-check: (h)" "esperava rc 1 com a dica e rc 0 na válida: rc=${rc} rcb=${rcb} ${out} ${outb}"; fi
+  # (i) contrato v4.3 (2026-10-10, SAC-98): `external_edges` com alvo que EXISTE num grafo rastreado passa; com
+  #     id que não existe reprova no MUST (integrity.dangling-external) e traz a cura. O checador monta o índice
+  #     do corpus (os .kg.yaml rastreados) quando o grafo usa a chave. Mutante: medir sem o índice (None) faz a
+  #     ponta externa passar sem conferência e reprova este caso.
+  _kcc_graph extok > "${sb}/g/extok.kg.yaml"
+  printf 'external_edges:\n  - from: E_A\n    to: "g/limpo.kg.yaml#Q_A"\n    edge_type: SUPPORTS\n' >> "${sb}/g/extok.kg.yaml"
+  sed -e 's/limpo.kg.yaml#Q_A/limpo.kg.yaml#Q_NAO_EXISTE/' "${sb}/g/extok.kg.yaml" > "${sb}/g/extruim.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/extruim.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if outb="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/extok.kg.yaml 2>&1)"; then rcb=0; else rcb=$?; fi
+  if [ "${rc}" -eq 1 ] && LC_ALL=C grep -q 'MUST   integrity.dangling-external .*nunca invente' <<< "${out}" \
+     && [ "${rcb}" -eq 0 ]; then
+    record_pass "kg-contract-check: (i) external_edges com alvo inexistente → rc 1 no MUST com a cura; alvo existente → rc 0"
+  else record_fail "kg-contract-check: (i)" "esperava rc 1 dangling-external e rc 0 no válido: rc=${rc} rcb=${rcb} ${out} ${outb}"; fi
   # (f) o checador NÃO deixa bytecode no vendor. Medido em 2026-10-08: rodar o leitor de referência sem -B
   #     plantava tools/__pycache__/*.pyc, e o `kg_vendor.py check` seguinte reprovava o vendor como
   #     "divergente da tag" (o check rejeita bytecode de propósito). Rodamos sem PYTHONDONTWRITEBYTECODE,
@@ -24743,6 +24793,48 @@ assert a==b
 ' "${ybefore}" "${y}" 2>/dev/null; then
     record_pass "kg-migrate-v3: (l) --locality: repo/web/host/pessoa saem do source (sha só se o git o conhece); sem certeza fica sem a chave; mista vale a menos reverificável; locality já escrita fica; só a chave muda; 2ª passada no-op; o contrato v4.2 não acusa"
   else record_fail "kg-migrate-v3: (l)" "locality errada, inventada ou com efeito colateral: rc=${rc} idem=$([ "${h1}" = "${h2}" ] && echo sim || echo NÃO) ${out} ${y} ${contrato}"; fi
+  # (x) --external-edges (contrato v4.3, 2026-10-10, SAC-98): `meta.x_supersedes_external` (lista) vira um item
+  #     SUPERSEDES por alvo, sem from; `x_constrained_by` no nó N vira {from: alvo, to: N, CONSTRAINS}; a
+  #     narrative que citava a chave ganha a frase de onde a aresta mora; x_supersedes_none fica; o contrato com
+  #     --corpus aprova; a 2ª passada é no-op. E o alvo QUEBRADO (id que não existe) é recusado com rc 2 e o
+  #     arquivo intocado — a ferramenta nunca escreve aresta para o vazio. Mutantes que este caso reprova: pular a
+  #     conferência do alvo; inverter from/to do CONSTRAINS.
+  local ga gs gb hb1 hb2
+  ga="${lr}/docs/alvo.kg.yaml"; gs="${lr}/docs/src.kg.yaml"; gb="${lr}/docs/bad.kg.yaml"
+  _kmv_open() { printf '  - id: %s\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.5\n    label: "%s"\n' "$1" "$1"; }
+  { printf 'meta:\n  id: alvo\n  schema_version: "1"\nnodes:\n'; _kmv_open C_VELHA; _kmv_open D_MATRIZ
+    printf 'edges:\n  - from: D_MATRIZ\n    to: C_VELHA\n    edge_type: SUPPORTS\n'; } > "${ga}"
+  { printf 'meta:\n  id: src\n  schema_version: "1"\n  x_supersedes_external:\n    - docs/alvo.kg.yaml#C_VELHA\n    - "docs/alvo.kg.yaml#D_MATRIZ"\n  x_supersedes_none: "fica"\nnodes:\n'
+    _kmv_open C_NOVA; _kmv_open D_LIMITADA
+    printf '    x_constrained_by: "docs/alvo.kg.yaml#D_MATRIZ"\n    narrative: "limitada; a aresta mora em x_constrained_by"\n'
+    printf 'edges:\n  - from: C_NOVA\n    to: D_LIMITADA\n    edge_type: SUPPORTS\n'; } > "${gs}"
+  { printf 'meta:\n  id: bad\n  schema_version: "1"\nnodes:\n'; _kmv_open D_X
+    printf '    x_constrained_by: "docs/alvo.kg.yaml#D_NAO_EXISTE"\n'; } > "${gb}"
+  git -C "${lr}" add -A >/dev/null 2>&1
+  if out="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --external-edges "${gs}" 2>&1)"; then rc=0; else rc=$?; fi
+  h1="$(sha256sum "${gs}" | cut -d' ' -f1)"
+  LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --external-edges "${gs}" >/dev/null 2>&1 || true
+  h2="$(sha256sum "${gs}" | cut -d' ' -f1)"
+  contrato="$(cd "${lr}" && python3 -I -B "${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py" --corpus . docs/src.kg.yaml 2>&1)" || true
+  hb1="$(sha256sum "${gb}" | cut -d' ' -f1)"
+  local outb rcb
+  if outb="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --external-edges "${gb}" 2>&1)"; then rcb=0; else rcb=$?; fi
+  hb2="$(sha256sum "${gb}" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 0 ] && [ "${h1}" = "${h2}" ] && grep -q '^PASSA' <<< "${contrato}" \
+     && grep -q 'TOTAL · CONSTRAINS 1 · SUPERSEDES 2' <<< "${out}" \
+     && [ "${rcb}" -eq 2 ] && [ "${hb1}" = "${hb2}" ] && grep -q 'ALVO QUEBRADO docs/alvo.kg.yaml#D_NAO_EXISTE (id ausente)' <<< "${outb}" \
+     && python3 -I -B -c '
+import sys,yaml
+g=yaml.safe_load(open(sys.argv[1]))
+assert g["external_edges"]==[{"to":"docs/alvo.kg.yaml#C_VELHA","edge_type":"SUPERSEDES"},{"to":"docs/alvo.kg.yaml#D_MATRIZ","edge_type":"SUPERSEDES"},
+  {"from":"docs/alvo.kg.yaml#D_MATRIZ","to":"D_LIMITADA","edge_type":"CONSTRAINS"}], g["external_edges"]
+assert "x_supersedes_external" not in g["meta"] and g["meta"]["x_supersedes_none"]=="fica"
+n={x["id"]:x for x in g["nodes"]}
+assert "x_constrained_by" not in n["D_LIMITADA"]
+assert n["D_LIMITADA"]["narrative"].endswith(" · desde o contrato v4.3 (SAC-98), a aresta mora em external_edges, no topo do grafo")
+' "${gs}" 2>/dev/null; then
+    record_pass "kg-migrate-v3: (x) --external-edges: x_supersedes_external vira SUPERSEDES por alvo, x_constrained_by vira CONSTRAINS de fora para o nó, narrative anotada, x_supersedes_none fica, contrato com --corpus aprova, 2ª passada no-op; alvo inexistente → rc 2 e arquivo intocado"
+  else record_fail "kg-migrate-v3: (x)" "tradução errada, alvo inventado ou sem idempotência: rc=${rc} rcb=${rcb} idem=$([ "${h1}" = "${h2}" ] && echo sim || echo NÃO) intocado=$([ "${hb1}" = "${hb2}" ] && echo sim || echo NÃO) ${out} ${outb} ${contrato}"; fi
   rm -rf "${d}"
 }
 _family run_kg_migrate_v3_selftests
@@ -25176,14 +25268,21 @@ run_radar_aufhebung_selftests() {
   _r89 b  ""                                   "SUPERSEDES"  ; _esp b 0 "(b) rodada que reconciliou nao e acusada"
   _r89 c  '  supersedes_none: a razao real'    ""            ; _esp c 0 "(c) supersedes_none COM VALOR e desfecho legitimo"
 
-  # (d) a UNICA forma expressavel de Aufhebung cross-file — a aresta do motor e INTRA-arquivo, e o
-  #     /meta:radar manda grafo PROPRIO por rodada. Sem este caso a guarda pune quem obedece.
-  _r89 e  '  supersedes_external: "outro.kg.yaml#E_VELHO"' ""; _esp e 0 "(d) supersedes_external conta (a aresta nao cruza arquivo)"
-  # (d2) a forma de EXTENSAO do contrato v3 do .kg.yaml (chave com prefixo x_). Medido em 2026-10-08: o
-  #      contrato acusa `meta.supersedes_external` como chave desconhecida (SHOULD) e o gate por grafo do CI
-  #      reprova grafo NOVO que suba essa divida — toda rodada de radar nova reprovava. A guarda aceita as duas.
-  _r89 e2 '  x_supersedes_external: "outro.kg.yaml#E_VELHO"' ""; _esp e2 0 "(d2) x_supersedes_external (extensao do contrato v3) conta"
+  # (d) Aufhebung cross-file. ATE O CONTRATO v4.2 a aresta do motor era INTRA-arquivo, e a unica forma era a
+  #     chave `meta.(x_)supersedes_external` — que a guarda aceitava SEM conferir o alvo: este proprio caso
+  #     passava com `outro.kg.yaml#E_VELHO`, que nao existe. DESDE A v4.3 (2026-10-10, SAC-98) a forma e
+  #     `external_edges` no topo, e o gate do CI reprova alvo inexistente (integrity.dangling-external). A
+  #     chave velha deixou de contar, nas duas grafias: aceita-la manteria a porta sem conferencia aberta.
+  _r89 e  '  supersedes_external: "outro.kg.yaml#E_VELHO"' ""; _esp e 1 "(d) supersedes_external (chave velha, alvo sem conferencia) NAO conta mais"
+  _r89 e2 '  x_supersedes_external: "outro.kg.yaml#E_VELHO"' ""; _esp e2 1 "(d2) x_supersedes_external (chave velha do contrato v3) NAO conta mais"
   _r89 e3 '  x_supersedes_none: a razao real' ""; _esp e3 0 "(d3) x_supersedes_none (extensao do contrato v3) conta"
+  # (d4) a forma do contrato v4.3: um item SUPERSEDES em `external_edges`, sem `from` (a rodada inteira supera).
+  #      Escrito DEPOIS de `edges:` de proposito: a aresta conta pelo BLOCO em que esta, nao pela posicao.
+  _r89 e4 "" ""; printf 'external_edges:\n  - to: "docs/x/velho.kg.yaml#E_VELHO"\n    edge_type: SUPERSEDES\n' >> "$d/e4/docs/evolution/research/radar-x/rx.kg.yaml"
+  _esp e4 0 "(d4) external_edges com SUPERSEDES (contrato v4.3) conta como Aufhebung"
+  # (d5) aresta externa que LIMITA nao e Aufhebung: so SUPERSEDES conta, em qualquer dos dois blocos.
+  _r89 e5 "" ""; printf 'external_edges:\n  - from: "docs/x/velho.kg.yaml#E_VELHO"\n    to: E_UM\n    edge_type: CONSTRAINS\n' >> "$d/e5/docs/evolution/research/radar-x/rx.kg.yaml"
+  _esp e5 1 "(d5) external_edges so com CONSTRAINS NAO e Aufhebung"
 
   # (e) FAIL-OPEN provado no grafo REAL: bastava a PALAVRA para calar a guarda. Tres formas vazias.
   _r89 f1 '  supersedes_none:'                 ""            ; _esp f1 1 "(e1) supersedes_none VAZIO NAO cala a guarda"
@@ -25594,6 +25693,18 @@ run_cc_delta_census_selftests() {
   if [ "${rc}" -eq 0 ] && grep -q "^proxima_rodada$(printf '\t')docs/evolution/research/radar-E3-2026-10-08-r8/\$" <<< "${out}"; then
     record_pass "cc-delta-census: (f) próxima rodada derivada da baseline (r7 → r8)"
   else record_fail "cc-delta-census: (f)" "rc=${rc} $(_emit "${out}" | grep '^proxima_rodada' | tr '\t' ' ')"; fi
+  # (i) contrato v4.3 (2026-10-10, SAC-98): o esqueleto ensina a Aufhebung na forma NOVA — `external_edges` com
+  #     SUPERSEDES apontando o grafo da rodada ANTERIOR (o `kg:` do eixo E3), COMENTADO (descomentar sem nomear
+  #     o nó é alvo inventado) — e não cita mais a chave velha. Mutante: o gerador voltar a ensinar
+  #     `x_supersedes_external` reprova este caso.
+  g="${sb}/w/radar-E3-2026-10-08-r9/radar-E3-2026-10-08-r9.kg.yaml"
+  if [ -f "${g}" ] && LC_ALL=C grep -qx '# external_edges:' "${g}" \
+     && LC_ALL=C grep -qx '#   - to: "docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml#<NO_DERRUBADO>"' "${g}" \
+     && LC_ALL=C grep -qx '#     edge_type: SUPERSEDES' "${g}" \
+     && ! LC_ALL=C grep -q 'x_supersedes_external' "${g}" \
+     && ! LC_ALL=C grep -q '^external_edges:' "${g}"; then
+    record_pass "cc-delta-census: (i) o esqueleto ensina external_edges SUPERSEDES sobre a rodada anterior, comentado, sem a chave velha"
+  else record_fail "cc-delta-census: (i)" "forma da Aufhebung no esqueleto: $(LC_ALL=C grep -n 'external_edges\|supersedes' "${g}" 2>/dev/null | head -5 | tr '\n' ' ')"; fi
   # (e) o ESQUELETO escrito em (a) passa no radar (--integrity --schema) e no contrato v3
   g="${sb}/w/radar-E3-2026-10-08-r9/radar-E3-2026-10-08-r9.kg.yaml"
   if [ ! -f "${g}" ]; then record_fail "cc-delta-census: (e)" "esqueleto não escrito em ${g}"

@@ -1,6 +1,6 @@
 # FIXTURE `bad` da REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung),
 # com catraca). Rodada de radar que NAO reconciliou nada e NAO declara desfecho: nenhuma aresta
-# SUPERSEDES, nenhum `meta.supersedes_none`, nenhum `meta.supersedes_external`. A guarda DEVE
+# SUPERSEDES, nenhum `meta.supersedes_none`, nenhum `external_edges` SUPERSEDES. A guarda DEVE
 # acusar, e o caminho dela e o da convencao de diretorio (`*/radar-*/*.kg.yaml`) — razao de esta
 # fixture precisar da 6a coluna `inject` do manifesto: o nome fixo `.md` nunca a alcancaria.
 meta:

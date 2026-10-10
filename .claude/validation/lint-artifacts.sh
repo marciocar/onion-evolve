@@ -4888,7 +4888,7 @@ check_kg_source_tier_confidence() {
 #   escrever o que DERRUBOU. Sem a reconciliacao, o corpus superado segue vencendo a revisita da
 #   REGRA 67 para sempre, e cada rodada nova adiciona mais um orfao. Medido 2026-09-23: 2 de 6.
 # A guarda vive em `radar-aufhebung-check.sh` (o POR QUE inteiro esta la, inclusive a razao de ela
-# aceitar `supersedes_none`/`supersedes_external`). Extraida em vez de inline por dois motivos: e o
+# aceitar `supersedes_none` e `external_edges` com SUPERSEDES, contrato v4.3). Extraida em vez de inline por dois motivos: e o
 # molde da casa (door-staleness, identifier-language), e a bancada consegue exercita-la em segundos
 # em vez de rodar o lint INTEIRO quatro vezes — a 1a versao inline custava 12+ min numa familia so.
 _R89_BASE="${REPO_ROOT}/.claude/validation/radar-aufhebung-baseline.txt"
@@ -4933,7 +4933,7 @@ check_radar_aufhebung() {
           : # passivo conhecido, contabilizado no resumo abaixo
         else
           fresh=$((fresh + 1))
-          violation "HARD" "${val}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): rodada selada SEM Aufhebung e FORA do baseline — a catraca SO ENCOLHE. Reconcilie (no novo + SUPERSEDES datado), ou declare no bloco meta 'supersedes_none: <razao>' se nao derrubou nada, ou 'supersedes_external: <grafo>#<no>' (a aresta do motor e INTRA-arquivo, entao rodada em grafo proprio registra a Aufhebung cross-file assim). Declaracao SEM VALOR nao conta"
+          violation "HARD" "${val}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): rodada selada SEM Aufhebung e FORA do baseline — a catraca SO ENCOLHE. Reconcilie (no novo + SUPERSEDES datado), ou declare no bloco meta 'supersedes_none: <razao>' se nao derrubou nada, ou, se a Aufhebung e cross-file, 'external_edges:' no topo com '- to: <grafo>#<no>' e 'edge_type: SUPERSEDES' (contrato v4.3; a chave velha supersedes_external nao conta mais: migre com kg-migrate-v3.py --external-edges). Declaracao SEM VALOR nao conta"
         fi
         ;;
     esac

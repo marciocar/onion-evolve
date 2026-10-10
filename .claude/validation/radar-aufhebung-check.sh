@@ -27,13 +27,24 @@
 # suporte cross-file. Mas o `/meta:radar` manda, na mesma página, (i) grafo
 # PRÓPRIO por rodada E (ii) superseder a baseline ANTERIOR. Incompatíveis: quem
 # obedece (i) não alcança (ii). A rodada-mãe só consegue porque APENDA no próprio
-# grafo. Enquanto o motor não aprender aresta cross-file, `supersedes_external` é
-# a única forma honesta de registrar a Aufhebung que ocorreu.
+# grafo. Enquanto o motor não aprendeu aresta cross-file, `supersedes_external` foi
+# a única forma honesta de registrar a Aufhebung que ocorreu (ver o bloco v4.3 abaixo).
 #
 # DOIS DESFECHOS DECLARADOS, ambos de 1ª classe — forçar SUPERSEDES inventado
-# seria PIOR que a dívida. Ambos exigem VALOR e vivem no bloco `meta:`:
-#   · `meta.supersedes_none: <razão>`   — a rodada genuinamente não derrubou nada
-#   · `meta.supersedes_external: <ref>` — a Aufhebung é cross-file
+# seria PIOR que a dívida:
+#   · `meta.supersedes_none: <razão>` (ou `x_supersedes_none`) — a rodada genuinamente
+#     não derrubou nada; exige VALOR e vive no bloco `meta:`
+#   · `external_edges:` no topo com um item `edge_type: SUPERSEDES` — a Aufhebung é
+#     cross-file (contrato v4.3, 2026-10-10, SAC-98)
+#
+# ── DESDE O CONTRATO v4.3 A ARESTA CRUZA ARQUIVO, e a chave velha deixou de contar ──
+# Até a v4.2 a forma cross-file era `meta.(x_)supersedes_external: <ref>`, e a guarda a
+# aceitava sem conferir o alvo: o caso (d) da bancada passava com `outro.kg.yaml#E_VELHO`,
+# que não existe. A v4.3 deu a forma do contrato (`external_edges`), e o gate do CI reprova
+# alvo inexistente (`integrity.dangling-external`), conferido contra TODOS os .kg.yaml
+# rastreados. Aceitar a chave velha manteria a porta sem conferência aberta ao lado da
+# conferida; por isso ela NÃO conta mais, e a migração é `kg-migrate-v3.py --external-edges`.
+# A aresta intra-arquivo conta só dentro do bloco `edges:`; a externa, só no `external_edges:`.
 # ⚠️ O VALOR É OBRIGATÓRIO, e não é preciosismo: na 1ª versão um
 # `supersedes_none:` VAZIO calava a guarda, provado no grafo real. Bastava a
 # palavra — o fail-open exato que a regra existe para impedir.
@@ -89,9 +100,9 @@ _declares() { # $1=arquivo  → 0 se declarou COM VALOR NÃO-VAZIO no meta
   # ingênuo — mesma família do campo vazio, só que disfarçada.
   awk '
     /^[a-zA-Z_]/ && !/^meta:/ { exit 1 }
-    /^[[:space:]]+(x_)?supersedes_(none|external):/ {
+    /^[[:space:]]+(x_)?supersedes_none:/ {
       v = $0
-      sub(/^[[:space:]]+(x_)?supersedes_(none|external):[[:space:]]*/, "", v)
+      sub(/^[[:space:]]+(x_)?supersedes_none:[[:space:]]*/, "", v)
       gsub(/^["'"'"']|["'"'"']$/, "", v)
       gsub(/[[:space:]]/, "", v)
       if (v != "") { found = 1; exit 0 }
@@ -101,8 +112,16 @@ _declares() { # $1=arquivo  → 0 se declarou COM VALOR NÃO-VAZIO no meta
 }
 
 # aresta REAL: valor EXATO no fim da linha. Prefixo (`SUPERSEDESX_INVENTADO`) e
-# menção em prosa não contam — ambos passavam na 1ª versão.
-_has_edge() { grep -qE '^[[:space:]]+edge_type:[[:space:]]*SUPERSEDES[[:space:]]*(#.*)?$' "$1"; }
+# menção em prosa não contam — ambos passavam na 1ª versão. $2 = o bloco de topo onde
+# a aresta vale: `edges` (intra-arquivo) ou `external_edges` (contrato v4.3). Fora do
+# bloco certo não é aresta: um SUPERSEDES no `edges:` não vira externo e vice-versa.
+_has_edge() { # $1=arquivo $2=bloco de topo
+  awk -v want="$2" '
+    /^[a-zA-Z_]/ { blk = $0; sub(/:.*/, "", blk); next }
+    blk == want && /^[[:space:]]+(-[[:space:]]+)?edge_type:[[:space:]]*SUPERSEDES[[:space:]]*(#.*)?$/ { f = 1; exit }
+    END { exit (f ? 0 : 1) }
+  ' "$1"
+}
 
 [ -e "${BL}" ] || { [ "${EMIT}" -eq 1 ] || echo "TOTAL	0"; exit 0; }
 [ -r "${BL}" ] || { echo "ERRO	${BL} existe e não é legível — não pude julgar (≠ zero)"; exit 2; }
@@ -117,12 +136,13 @@ while read -r g; do
     dangling+=("${g}"); continue
   fi
   _declares "${ROOT}/${g}" && continue
-  _has_edge "${ROOT}/${g}" || accused+=("${g}")
+  _has_edge "${ROOT}/${g}" edges && continue
+  _has_edge "${ROOT}/${g}" external_edges || accused+=("${g}")
 done < <(_universe | sort -u)
 
 if [ "${EMIT}" -eq 1 ]; then
   echo "# Catraca de AUFHEBUNG DE RODADA DE RADAR — rodadas seladas toleradas SEM nenhuma"
-  echo "# aresta SUPERSEDES e sem \`meta.supersedes_none\`/\`supersedes_external\` declarado."
+  echo "# aresta SUPERSEDES (em edges: ou external_edges:) e sem \`meta.supersedes_none\` declarado."
   echo "# CHAVEADO (uma linha por rodada), como os 11 baselines irmãos: inteiro nu não diz QUAL"
   echo "# rodada está tolerada, e some no diff quando uma sai e outra entra."
   echo "# Regenere: bash .claude/validation/radar-aufhebung-check.sh . --emit-baseline"
