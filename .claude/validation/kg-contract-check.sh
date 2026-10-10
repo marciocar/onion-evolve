@@ -76,13 +76,19 @@ for f in files:
     if tracked:
         old = subprocess.run(["git", "-C", root, "show", f"HEAD:{path}"], capture_output=True, text=True)
         old_text = old.stdout if old.returncode == 0 else None
-    # o índice do corpus só se monta quando o grafo usa external_edges (como no gate), e desde o kit v4.3.2 só
-    # lê os grafos que as referências citam, na versão de agora e na do HEAD: alvo fora do índice reprova como
-    # dangling-external, igual a antes, e o caso comum segue custo zero
-    texts = [text] + ([old_text] if old_text is not None else [])
-    wanted = set().union(*(kg_gate.kg_validate.external_targets(t) for t in texts))
-    index = (kg_gate.kg_validate.corpus_index(root, [n for n in kg_gate.tracked_graphs(root) if n in wanted])
-             if any(kg_gate.kg_validate.uses_external(t) for t in texts) else None)
+    # o índice do corpus só se monta quando o grafo usa external_edges e, desde o kit v4.3.2, só lê os grafos
+    # que as referências citam. Os alvos saem do DOCUMENTO PARSEADO, não do regex de linha do kit: o regex
+    # perde alvo escrito com escape YAML (\x2F, \u0023, continuação de linha) ou chave entre aspas, e aí o
+    # índice incompleto reprovava alvo válido (refutador de 2026-10-10). Só a versão de agora entra: da do
+    # HEAD só se usa o SHOULD, que não consulta o corpus.
+    doc = kg_gate.kg_validate.parse_v1(text)[0]
+    ext = doc.get("external_edges") if isinstance(doc, dict) else None
+    index = None
+    if isinstance(ext, list):
+        refs = [v for e in ext if isinstance(e, dict) for v in (e.get("from"), e.get("to"))
+                if kg_gate.kg_validate.is_external(v)]
+        wanted = {r.rsplit("#", 1)[0] for r in refs}
+        index = kg_gate.kg_validate.corpus_index(root, [n for n in kg_gate.tracked_graphs(root) if n in wanted])
     now = kg_gate.measure_texts([(path, text)], index)[path]
     before = set()
     mp_before = collections.Counter()
