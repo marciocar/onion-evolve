@@ -241,7 +241,7 @@ Ferramentas MCP detectadas que podem ser úteis:
 > (MCP opcional); **forge** = CLI/API — **nunca MCP** (`integrations.md` §forge / CLAUDE.md §Forge).
 > `mcp__<provider>__*` direto só vive nos **adapters** e nos **especialistas** (`@jira-specialist`,
 > `@clickup-specialist`). MCP **genérico não-provider** (Playwright, code-understanding) é livre.
-> Ver `.claude/utils/task-manager/` e CLAUDE.md §Task Manager — e o bloco "via Adapter/MCP Opcional" abaixo.
+> Ver a abstração task-manager (`utils/task-manager/` no core; no plugin `onion`) e CLAUDE.md §Task Manager — e o bloco "via Adapter/MCP Opcional" abaixo.
 
 O agente precisa de acesso a:
 - **Ferramentas básicas** (Read, Write, Grep, Bash, etc.)
@@ -369,7 +369,7 @@ discovery: WebSearch
 ```yaml
 # Gestão de Projetos (provider-agnóstico via adapter)
 # Exemplo ClickUp: 50+ ferramentas MCP disponíveis quando TASK_MANAGER_TRANSPORT=mcp
-# Ver adapters/ em .claude/utils/task-manager/ para Jira/Asana/Linear/Zoho
+# Ver adapters/ da abstração task-manager (utils/task-manager/ no core; plugin onion) para Jira/Asana/Linear/Zoho
 
 # Versionamento
 github: ~30 ferramentas REST API (transporte padrão: cli/gh)

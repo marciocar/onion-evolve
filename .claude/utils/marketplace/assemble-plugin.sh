@@ -115,7 +115,7 @@ for d in "${DOCS[@]}"; do [ -f "${SRC}/${d}" ] || { echo "ERRO: doc-KB fonte aus
 # instalador já tem e o `tree_sha` que ela descreve) vivem no plugin PUBLICADO.
 #
 # ⚠️ DE ONDE VEM O ANTERIOR MUDOU NA F4 DAS PORTAS (2026-10-10, SAC-93). Até ali o anterior era o
-#    `plugins/<nome>` VERSIONADO DENTRO DO CORE, e a REGRA 19 regenerava em temp para comparar —
+#    `plugins/<nome>` VERSIONADO DENTRO DO CORE, e a REGRA 19 (Plugins de vertical sincronizados com as fontes) regenerava em temp para comparar —
 #    cada PR que tocava uma fonte bundlada tinha de regenerar e commitar o plugin (o auto-fix do
 #    pre-commit, conflitos de projeção no rebase). O `plugins/` saiu do core; o anterior agora é o
 #    PUBLICADO, em ordem:
@@ -135,6 +135,16 @@ _canon="${ONION_PLUGIN_PRIOR_DIR:-${DEST}}/.claude-plugin"
 _prior_version=""; _prior_tree=""
 [ -f "${_canon}/plugin.json" ]     && _prior_version="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'   "${_canon}/plugin.json"     | head -1)"
 [ -f "${_canon}/provenance.json" ] && _prior_tree="$(sed -n    's/.*"tree_sha"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "${_canon}/provenance.json" | head -1)"
+# O ANTERIOR TEM DE SER DESTE PLUGIN (passada adversarial da F4, achado I3): com ONION_PLUGIN_PRIOR_DIR
+# exportado no shell, o materialize de TODOS os plugins herdava a versão de UM (medido: 0.1.51 em cinco
+# plugins que não eram o onion-meta). Nome divergente = não há anterior válido — avisa e segue do manifesto.
+if [ -f "${_canon}/plugin.json" ]; then
+  _prior_name="$(sed -n 's/.*"name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "${_canon}/plugin.json" | head -1)"
+  if [ "${_prior_name}" != "${PLUGIN_NAME}" ]; then
+    printf 'assemble-plugin: o anterior em %s é do plugin "%s", não de "%s" — ignorado (a versão parte do manifesto)\n' "${_canon%/.claude-plugin}" "${_prior_name}" "${PLUGIN_NAME}" >&2
+    _prior_version=""; _prior_tree=""
+  fi
+fi
 
 rm -rf "${DEST}" 2>/dev/null
 mkdir -p "${DEST}/.claude-plugin" "${DEST}/commands" "${DEST}/agents" 2>/dev/null \

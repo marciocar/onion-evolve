@@ -158,7 +158,7 @@ argument-hint: "[staging|production] [v1.2.3]"
 Resuma as mudanças acima...
 ````
 
-> Nota: operações de forge (PR, review, CI) passam pelo adapter forge — `gh` é o transporte default, mas o consumidor usa a abstração via adapter (`.claude/utils/forge/adapters/github.md`).
+> Nota: operações de forge (PR, review, CI) passam pelo adapter forge — `gh` é o transporte default, mas o consumidor usa a abstração via adapter (`utils/forge/adapters/github.md` (no core; no plugin `onion`)).
 
 
 **Substituições** — para skills parametrizados:

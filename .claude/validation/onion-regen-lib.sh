@@ -79,7 +79,7 @@ ONION_GENERATED="docs/onion/inventory.md docs/onion/graph.md docs/onion/testing-
 # ⚠️ ESVAZIADO NA F4 DAS PORTAS (2026-10-10, SAC-93): o `plugins/` saiu do core — o bundle é montado na
 # publicação, nunca versionado aqui —, e o conflito que motivou esta variável deixou de poder existir. Ela
 # fica (vazia) porque o mecanismo é genérico: diretório gerado novo entra aqui. O catálogo da raiz
-# (`.claude-plugin/marketplace.json`, REGRA 76) virou projeção dos manifestos e entrou na lista exata acima.
+# (`.claude-plugin/marketplace.json`, REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos)) virou projeção dos manifestos e entrou na lista exata acima.
 ONION_GENERATED_DIRS=""
 
 # onion_is_generated <caminho> → rc 0 = projeção gerada (lista exata ou dentro de um diretório gerado)
