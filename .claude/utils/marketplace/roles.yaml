@@ -227,6 +227,7 @@ roles:
         /meta:adopt: "citado em comentario e mensagem de onion-version.sh, resolve-integration-branch.sh e engineer:pr sobre repo ADOTADO; o mini nao adota"
         /git:flow: "o product:feature e o adapter do GitHub o sugerem como proximo passo; no mini o caminho guiado e o engineer:start"
         /git/sync: "o engineer:pr e o product:feature sugerem sincronizar depois do merge; no mini basta atualizar a branch principal"
+        /git:sync: "o fragmento task-manager-auto-update o sugere depois do merge; no mini basta atualizar a branch principal"
         /product/task: "sugerido como alternativa ao product:feature; no mini a task nasce no product:feature"
         /product/estimate: "estimativa por story points e opcional (o gate do engineer:start nao bloqueia)"
         /product/create-task-structure: "o task-specialist o cita como irmao read-only; no mini o proprio agente decompoe"
