@@ -2,11 +2,10 @@
 title: 'Resíduo — adoção do kit KG-SSOT kg-ssot-v4.3.1 e migração para external_edges (SAC-98)'
 date: 2026-10-10
 branch: feat/kg-ssot-v431-external-edges
-reviewed_diff_sha256: 7f34c95a537e79cc9ebdddac2e0d798d10e935fd9aaa8b7018d8950696155718
-reviewed_code_sha256: ae636386c514fa55cd68eaf26b342c547fa663bc48eafbba98111c6cd3c39438
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
-findings_fixed: 4
+findings_fixed: 5
 tokens: 0
 duration_min: 110
 verdict: CORRIGIDO
@@ -16,6 +15,7 @@ nota: >-
   a tag. Aqui se prova a integração: vendor íntegro, migração por script com alvo conferido, gate rc 0 com
   a base regravada, os leitores e os geradores do core na forma nova, e a bancada das famílias afetadas
   verde com LC_ALL=C e um mutante por cura, cada um reprovando um caso.
+  O achado 4 foi resolvido por decisão do maestro, aplicada neste PR.
 ---
 
 # O que a v4.3.1 mudou e o que precisou mudar aqui
@@ -56,7 +56,7 @@ tradução. A narrative que citava `x_constrained_by` ganha a frase de onde a ar
 
 | Tipo | Arestas | Grafos |
 |---|---:|---|
-| SUPERSEDES | 17 | evolve-cures (7), door-role-parity (7), evolve-staleness, vetos-por-tokens, elenxo-bulbo |
+| SUPERSEDES | 17 migradas → 11 finais | evolve-cures (7), door-role-parity (7 → 1 pelo selo, achado 4), evolve-staleness, vetos-por-tokens, elenxo-bulbo |
 | CONSTRAINS | 6 | onion-identity (2), distribuicao-metodo-vivo (2), onion-tier-matrix, triagem-inbox |
 
 **Referências quebradas: zero.** Conferi os 23 alvos (arquivo e id) antes de migrar. Na 2ª passada, o
@@ -123,11 +123,18 @@ Dois comentários e uma narrative descreviam a chave velha como lugar da aresta,
    (plugins/*) sincronizados com as fontes) no `onion-engineering`, que também leva o kg-radar. Cura: a lente lê a
    seção, e os dois plugins foram remontados. O caso (n) traz o mutante que quebra a paridade. Depois da cura, o
    `--check` dá 0 HARD.
-4. **Real, NÃO curado (decisão do maestro): sobreposição em `door-role-parity`.** A migração é 1:1. A Aufhebung
+4. **Real, curado por decisão do maestro: sobreposição em `door-role-parity`.** A migração é 1:1. A Aufhebung
    do grafo virou SUPERSEDES do grafo inteiro sobre 7 alvos, e 6 desses alvos também recebem CONSTRAINS da
    `D_MATRIZ_DE_PORTAS_2026_10`, que o maestro selou em 2026-10-09 como "CONSTRAINS, sem flip". As duas chaves já
-   coexistiam antes. A migração não decide entre elas, porque mudar o tipo seria mudar a verdade do grafo. Fica
-   nomeado no nó `E_CONTRATO_V43_ADOTADO`.
+   coexistiam antes. A migração não decidiu entre elas, porque mudar o tipo seria mudar a verdade do grafo.
+   **Resolução:** o maestro decidiu pelo selo ("CONSTRAINS, sem flip": a superação é PARCIAL). Saíram as 6
+   SUPERSEDES do grafo inteiro cujo alvo também recebe a CONSTRAINS da matriz, e ficaram só as CONSTRAINS. A
+   SUPERSEDES sobre `D_FAMILIA_TEM_DOIS_REGIMES_2026_09`, que não tem CONSTRAINS par, ficou. O comentário do
+   grafo, a narrative da matriz e o nó `E_CONTRATO_V43_ADOTADO` dizem isso; o label anterior do nó foi para a
+   narrative. Depois da remoção: radar `--integrity` exit 0, `kg-contract-check` rc 0, paridade da lente, REGRA 89
+   com as mesmas 5 rodadas e gate rc 0.
+
+   **Contagem final:** 11 SUPERSEDES e 6 CONSTRAINS (17 arestas). Foram 23 referências migradas, menos as 6 retiradas.
 
 # Mutantes (LC_ALL=C, a cura revertida e o caso exigido em ✗)
 
