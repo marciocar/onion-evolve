@@ -507,39 +507,31 @@ if [ "${MODE}" = "list" ]; then
     docs       "$(_count '^docs/')" \
     total      "$(grep -c . <<< "${_lfiles}" || true)"
   # O MINI É ALLOWLIST: o que os arquivos dele citam e não viaja é ponteiro morto na porta didática.
-  # Dito aqui, contado, e nunca calado — a cura (simplificar a skill onion, decidir cada citação) é da F5.
+  # Desde a F5 (SAC-94) o detector é UM SÓ, o door-mini-check.sh — o mesmo que o motor do /meta:publish
+  # roda no bundle montado. Aqui ele mede uma montagem temporária do HEAD (manifesto + overlays), sem a
+  # conferência de allowlist exata (que só faz sentido no que o materializador escreveu). Até a F5 a
+  # detecção vivia inline aqui, e uma segunda cópia do detector seria a duplicação que este arquivo
+  # existe para impedir. Achado é AVISO no --list (a lista informa); no motor ele reprova.
   if [ "${ROLE}" = "mini" ]; then
-    _dang=""; _f=""; _c=""
-    while IFS= read -r _f; do
-      case "${_f}" in *.md|*.sh) : ;; *) continue ;; esac
-      while IFS= read -r _c; do
-        _c="${_c%[.,;:)]}"; _c="${_c%/}"
-        [ -n "${_c}" ] || continue
-        case "${_c}" in .claude/sessions*|.claude/.onion-version|.claude/projects*|.claude/settings*) continue ;; esac
-        grep -qxF "${_c}" <<< "${_lfiles}" && continue
-        grep -qF "${_c}/" <<< "${_lfiles}" && continue
-        grep -qxF "${_c}.md" <<< "${_lfiles}" && continue   # citação sem extensão de um .md que viaja
-        [ "$(tr -cd '/' <<< "${_c}" | wc -c)" -ge 2 ] || continue   # `.claude/utils` genérico não é ponteiro
-        _dang="${_dang}${_c} (citado por ${_f})"$'\n'
-      done < <(git -C "${REPO}" show "HEAD:${_f}" 2>/dev/null | grep -oE '\.claude/[A-Za-z0-9_./-]+' | LC_ALL=C sort -u)
-      # ⚠️ E O COMANDO CITADO POR NOME (`/categoria:comando`), que a 1a redação não contava: ela via 6
-      # caminhos e a passada adversarial achou ~30 comandos ausentes (inclusive /meta:setup-integration,
-      # o fallback que o CLAUDE.md manda sugerir). Nome de comando é a citação que mais viaja.
-      while IFS= read -r _c; do
-        [ -n "${_c}" ] || continue
-        _cp=".claude/commands/${_c#/}"; _cp="${_cp//://}.md"
-        grep -qxF "${_cp}" <<< "${_lfiles}" && continue
-        git -C "${REPO}" cat-file -e "HEAD:${_cp}" 2>/dev/null || continue   # só comando que EXISTE no core
-        _dangc="${_dangc:-}${_c} (citado por ${_f})"$'\n'
-      done < <(git -C "${REPO}" show "HEAD:${_f}" 2>/dev/null | grep -oE '/[a-z]+:[a-z][a-z0-9-]*(:[a-z][a-z0-9-]*)?' | LC_ALL=C sort -u)
-    done <<< "${_lfiles}"
-    if [ -n "${_dang}" ]; then
-      echo "AVISO: o mini cita $(printf '%s' "${_dang}" | grep -c .) caminho(s) que a allowlist NÃO leva (ponteiro morto na porta didática; a cura é da F5):" >&2
-      printf '%s' "${_dang}" | LC_ALL=C sort -u | sed 's/^/  /' >&2
-    fi
-    if [ -n "${_dangc:-}" ]; then
-      echo "AVISO: o mini cita $(printf '%s' "${_dangc}" | cut -d' ' -f1 | LC_ALL=C sort -u | grep -c .) comando(s) por nome que a allowlist NÃO leva ($(printf '%s' "${_dangc}" | grep -c .) citações; a cura é da F5):" >&2
-      printf '%s' "${_dangc}" | LC_ALL=C sort -u | sed 's/^/  /' >&2
+    _dmc="${REPO}/.claude/validation/door-mini-check.sh"
+    if [ ! -f "${_dmc}" ]; then
+      echo "AVISO: ${_dmc#${REPO}/} ausente — ponteiro morto do mini NÃO MEDIDO nesta lista." >&2
+    else
+      _mt="$(mktemp -d)"
+      if git -C "${REPO}" archive --format=tar HEAD -- "${_lspec[@]}" | tar -x -C "${_mt}" \
+         && bash "${_dmc}" --apply-overlays "${_mt}" --source "${REPO}" >/dev/null; then
+        _dmo=""; _dmrc=0
+        _dmo="$(bash "${_dmc}" --bundle "${_mt}" --source "${REPO}" --no-exact 2>&1)" || _dmrc=$?
+        case "${_dmrc}" in
+          0) printf '%s\n' "${_dmo}" | sed 's/^/── /' ;;
+          1) echo "AVISO: o mini, montado do HEAD com os overlays, tem achado(s) que o motor do /meta:publish REPROVA:" >&2
+             printf '%s\n' "${_dmo}" >&2 ;;
+          *) echo "AVISO: door-mini-check não mediu (rc=${_dmrc}): ${_dmo:0:200}" >&2 ;;
+        esac
+      else
+        echo "AVISO: não consegui montar o mini do HEAD para medir ponteiro morto (archive ou overlays falharam)." >&2
+      fi
+      rm -rf "${_mt}"
     fi
   fi
   if [ "${LIST_DIFF}" -eq 1 ]; then
