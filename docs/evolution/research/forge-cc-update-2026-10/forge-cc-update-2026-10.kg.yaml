@@ -39,7 +39,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/cc-update.md"
       locator: "Procedimento, passos 1 a 10"
-      method: "medição: superfície forjada pelo /meta:forge e invocada de verdade"
+      method: "leitura: .claude/commands/meta/cc-update.md, passos 1 a 10 do Procedimento"
       locality: "repo"
   - id: E_CENSO_DA_FORJA_0_PARA_6
     node_type: evidence
