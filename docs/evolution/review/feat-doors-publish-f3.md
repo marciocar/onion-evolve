@@ -2,8 +2,7 @@
 title: 'Resíduo — F3 das portas: /meta:publish sob demanda'
 date: 2026-10-10
 branch: feat/doors-publish-f3
-reviewed_diff_sha256: c3ee4a77661e60a229b585b32110644eb2f00b5e92225c6bbe0124007123bb26
-reviewed_code_sha256: 40e5f89be8efd4335fd08dea898890b5610a163482f74e393be1de3159a33872
+reviewed_diff_sha256: pendente
 findings_total: 13
 findings_real: 13
 findings_fixed: 11
@@ -11,7 +10,7 @@ tokens: 162568
 duration_min: 13
 verdict: REPROVADO_E_CURADO
 elenxo: sim
-nota: "passada adversarial (branch-code-reviewer, default reprovado) achou 2 bloqueadores, 4 importantes e 7 menores; 11 curados no mesmo laço com caso de bancada e mutante; 2 declarados (defasagem não é por papel; conta de outra máquina fora da derivação)"
+nota: "passada adversarial (branch-code-reviewer, default reprovado) achou 2 bloqueadores, 4 importantes e 7 menores; 11 curados no mesmo laço com caso de bancada e mutante; 2 declarados (defasagem não é por papel; conta de outra máquina fora da derivação). Re-revisão depois do CI do PR: role-cut (k) reprovou porque a REGRA 85 cita /meta:publish e o comando não viaja ao standalone; exceção declarada com razão (a regra é SEM-OBJETO fora da fonte), mutante reprova o caso"
 ---
 
 # Resíduo — REGRA 56
