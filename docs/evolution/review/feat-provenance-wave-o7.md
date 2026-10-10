@@ -3,7 +3,8 @@ title: "Revisão — onda O7 da migração de provenance (SAC-73): 93 linhas jul
 date: 2026-10-10
 branch: feat/provenance-wave-o7
 reviewer: "passada adversarial com o mandato de achar linha aplicada fora do veredito, item do maestro aplicado, label acima de 280, label anterior perdido ou com caminho, caminho de máquina que sobrou em qualquer campo de nó, isenção selada recusada, segredo que sobrou, nó fora da planilha alterado, TARGET-MISSING novo e regressão do gate. Conferi mecanicamente as 93 linhas contra os 36 arquivos finais e abri uma amostra estratificada de 10 aplicados (semente 20261010) com o nó antes e depois. Rodei a idempotência, a bancada kg_migrate_v3 18/18 com LC_ALL=C e 7 mutantes"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 155b673fb5ba23ae17271d43b9778be0f01a960144ab43e902430aefa86ca8a6
+reviewed_code_sha256: 2bb14d172511e90c170131989f879e53eb79581d0cd5ea14604167ba659ed2c4
 findings_total: 6
 findings_real: 2
 verdict: CORRIGIDO
