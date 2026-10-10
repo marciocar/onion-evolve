@@ -92,7 +92,9 @@ identidade/contratos e federa apenas a comunicação) + `fonte≠derivação`) �
 > `D_MATRIZ_DE_PORTAS_2026_10`).** Duas linhas desta tabela deixam de valer como destino, e seguem
 > valendo como estado até a fase que as muda:
 > - **`onion-standalone`** passa a **levar** a meta-fábrica; sai dele só adoção e federação. O corte
->   novo é a F2 do plano das portas; até lá o corte vigente é o desta tabela.
+>   novo **entrou na F2 do plano das portas (2026-10-10)**: `roles.yaml` particiona os comandos de
+>   `meta/` em conjuntos e o `vendor-manifest.sh --list standalone` mostra o que a porta leva. Vale a
+>   partir da próxima materialização dela.
 > - **`onion-mini`** deixa de ser destilação e passa a porta **gerada do core por allowlist** (vendoriza
 >   um recorte de `.claude/`), na F5. A destilação atual segue como artefato à parte.
 

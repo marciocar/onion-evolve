@@ -103,11 +103,11 @@ if isinstance(doc, dict):
     # allowlist e onion-plugins como o standalone empacotado. Na F0 este validador recusou os dois
     # (E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS), e a matriz ficou sem como ser escrita. Por serem papel
     # de porta, só valem com `kind: door` (regra abaixo): um adotante `role: mini` não tem sentido e
-    # passaria calado. TETO DECLARADO: este é o vocabulário do REGISTRO; o corte de maquinaria
-    # (`roles.yaml`, `vendor-manifest.sh --role`) ainda NÃO conhece mini nem plugins, e a ampliação dele
-    # é da F2. Nenhum leitor passa o `role:` do registro ao corte (medido: materialize-door e
-    # resolve-role-bundle leem o carimbo e o roles.yaml), e se um dia passar, o vendor-manifest recusa
-    # o papel desconhecido com rc 2, alto.
+    # passaria calado. Este é o vocabulário do REGISTRO; desde a F2 (2026-10-10, SAC-91) o corte de
+    # maquinaria também o conhece: `roles.yaml` tem os papéis plugins e mini, e `vendor-manifest.sh
+    # --role plugins|mini|source` corta (plugins = standalone) ou inclui por allowlist (mini). Nenhum
+    # leitor passa o `role:` do registro ao corte (materialize-door e resolve-role-bundle leem o
+    # carimbo e o roles.yaml); o `--diff` do vendor-manifest só LÊ o registro para achar o clone.
     ROLES = {"source", "hub", "standalone", "consumer", "mini", "plugins"}
     DOOR_ONLY_ROLES = {"mini", "plugins"}
     # `port` entrou em 2026-09-16 com o registro do onion-codex. Ele NÃO é `distillation`:

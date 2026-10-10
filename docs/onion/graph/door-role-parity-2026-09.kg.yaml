@@ -2,7 +2,8 @@
 # Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
-  x_drive_checkpoint: sealed
+  x_drive_checkpoint: pending
+  x_drive_checkpoint_note: "lote da F2 das portas (SAC-91, 2026-10-10): E_MANIFESTOS_POR_PAPEL_F2 nasce confirmed (DEV) apoiando D_MATRIZ_DE_PORTAS_2026_10; Q_STANDALONE_DE_ADOCAO_SEGUE_A_PORTA e Q_PERSONALITY_SYNC_SEM_CONJUNTO nascem open para o maestro; nenhum flip auto-selado; PR para merge humano"
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
@@ -347,6 +348,49 @@ nodes:
       method: "medição: ops/registry-pins.sh --check, members-validate.sh, projection-safety.sh e vendor-scrub-form-check.sh antes e depois em 2026-10-09"
       locality: "repo"
 
+  # ---- 2026-10-10: F2 das portas (SAC-91) — os manifestos por papel ----
+  - id: E_MANIFESTOS_POR_PAPEL_F2
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    valid_from: "2026-10-10"
+    verified_at: "2026-10-10"
+    verified_against: "vendor-manifest.sh --list por papel: source e hub 779 arquivos, standalone e plugins 709 (102 comandos, 51 agentes, 12 skills), mini 39 (10 comandos, 3 agentes, 1 skill); materialize-door standalone em diretório temporário com lint rc 0, 0 HARD e 12 SOFT; mini 44 arquivos sem lint por desenho; bancada role_cut, role_bundle, moat_boundary e materialize_repo sob LC_ALL=C, cada caso novo com mutante que reprova"
+    source_kind: repo
+    source_tier: 10
+    label: "F2 das portas: cada papel tem um manifesto medido — standalone e plugins levam a meta-fábrica sem adoção nem federação, o mini leva só a allowlist didática, source é igual ao hub, e o vendor-manifest --list mostra o que cada porta leva"
+    narrative: "O que mudou. (1) roles.yaml: work_tools virou lista de conjuntos que PARTICIONAM commands/meta/ (full, meta_factory, federation, adoption e pending), cobrada pela REGRA 37 (comando sem conjunto ou em dois reprova; allowlist com caminho morto também). co-evolve e co-relay saíram do full para federation; o conjunto downstream foi absorvido por federation; o hub passou a declarar todos os conjuntos, que é o que o transporte já entregava; o comentário que dizia meta-fábrica core-only foi corrigido. (2) vendor-manifest.sh: standalone e plugins cortam utils/adopt (menos o contrato), utils/co-evolution, utils/federation-transport, validation/federation-*, a skill onion-publish, o motor materialize-marketplace-repo e o hook do inbox, e DEVOLVEM utils/wizard, utils/vertical e utils/marketplace; source é igual ao hub; mini inclui só a allowlist do roles.yaml e falha alto sem ela; --list e --diff contam do transporte real. Diff contra a onion-standalone publicada no pin 947e69ce: 51 arquivos a mais (a meta-fábrica) e 8 a menos (co-evolve, co-relay, hook do inbox e utils/co-evolution). (3) REGRA 61 deixou de barrar create-*, evolve e absorb-skill e passou a barrar co-evolve, co-relay, o hook do inbox, personality-sync e o motor de publicação; o manifesto onion perdeu co-evolve e co-relay e o plugin foi regenerado. (4) REGRAS 19 e 37 só julgam quem publica o marketplace (papel source ou catálogo na raiz): a 1a materialização do standalone com utils/marketplace deu 21 HARD delas, mais 1 ponteiro morto para co-relay.md em utils/trust/interface.md; curados, 0 HARD. (5) O wizard ficou sensível ao papel: topology-projection.sh não projeta as 7 transições de adoção em standalone, plugins e mini. (6) write-stamp aceita source, plugins e mini só com --kind door; materialize-door copia o settings.json da ref de origem, poda hooks que não viajaram, escreve o README conforme o papel e não exige projeção SSOT de porta sem lint. Resíduo do mini, para a F5: 6 citações a caminhos fora da allowlist (kg-radar, agente onion, comando onion, aside-router-hook)."
+    trace: ".claude/utils/marketplace/roles.yaml · .claude/utils/adopt/vendor-manifest.sh · .claude/validation/lint-artifacts.sh · .claude/utils/wizard/topology-projection.sh · ops/materialize-door.sh"
+    provenance:
+      source: "branch feat/doors-role-manifests-f2 (PR da F2, SAC-91): roles.yaml, vendor-manifest.sh, resolve-role-bundle.sh, lint-artifacts.sh (REGRAS 19, 37 e 61), topology-projection.sh, write-stamp.sh, materialize-door.sh e lint-selftest.sh"
+      locator: "saída de vendor-manifest.sh --list e --diff por papel; casos role-cut (a2)(n)(n-MUT1)(n-MUT2)(o)(o-MUT)(o2)(p)(p-MUT)(q)(r)(r-MUT)(s)(s-MUT), role-bundle (p1)(p1-MUT), moat-boundary (a)(c)(d)(d-MUT) e materialize-repo (b)"
+      method: "medição: --list e --diff por papel, materialize-door standalone e mini em diretório temporário com o lint da porta, e bancada sob LC_ALL=C com um mutante por regra nova em 2026-10-10"
+      locality: "repo"
+
+  - id: Q_STANDALONE_DE_ADOCAO_SEGUE_A_PORTA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    label: "o papel standalone serve à porta E à adoção individual (/meta:adopt --role standalone): pela matriz o adotado standalone perde co-relay e co-evolve, o canal upstream com o core — GATILHO: decisão do maestro, ou o 1º adotado com carimbo standalone fazer --update"
+    narrative: "A matriz fala de portas. O vendor-manifest usa o mesmo papel para os dois usos, então um projeto adotado com carimbo standalone recebe a superfície da porta standalone e deixa de poder sinalizar o core pelo co-relay. Medido em 2026-10-10 nos clones locais: 24 carimbos adopted, 6 hub e 1 standalone (a própria porta), então hoje ninguém é afetado. Respostas possíveis: separar o papel de porta do papel de adoção, ou aceitar que o standalone adotado é solo de verdade."
+    trace: ".claude/utils/adopt/vendor-manifest.sh · .claude/commands/meta/adopt.md"
+
+  - id: Q_PERSONALITY_SYNC_SEM_CONJUNTO
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.8
+    status: open
+    label: "/meta:personality-sync não está na lista da matriz: escreve a linha personality_summary do members.yaml e tem tag federation, e ficou no conjunto pending (só source e hub) — GATILHO: decisão do maestro entre federation e meta_factory"
+    trace: ".claude/utils/marketplace/roles.yaml · .claude/commands/meta/personality-sync.md"
+
 edges:
   # o dano é a evidência de que a lacuna existia
   - from: E_DANO_85_ARQUIVOS
@@ -419,4 +463,18 @@ edges:
     edge_type: SUPPORTS
   - from: Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO
     to: E_REGISTRO_HONESTO_F15
+    edge_type: CONSTRAINS
+  # a F2 escreve no transporte a parte da matriz que é superfície por porta
+  - from: E_MANIFESTOS_POR_PAPEL_F2
+    to: D_MATRIZ_DE_PORTAS_2026_10
+    edge_type: SUPPORTS
+  # o corte por referência (#986) segue valendo dentro do corte novo
+  - from: E_MANIFESTOS_POR_PAPEL_F2
+    to: E_CORTE_DERIVA_COMPANHEIROS_DO_COMANDO
+    edge_type: DEPENDS_ON
+  - from: Q_STANDALONE_DE_ADOCAO_SEGUE_A_PORTA
+    to: E_MANIFESTOS_POR_PAPEL_F2
+    edge_type: CONSTRAINS
+  - from: Q_PERSONALITY_SYNC_SEM_CONJUNTO
+    to: E_MANIFESTOS_POR_PAPEL_F2
     edge_type: CONSTRAINS
