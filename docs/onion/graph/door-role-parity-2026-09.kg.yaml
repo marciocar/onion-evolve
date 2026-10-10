@@ -2,7 +2,8 @@
 # Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
-  x_drive_checkpoint: sealed
+  x_drive_checkpoint: pending
+  x_drive_checkpoint_note: "lote da F3 das portas (SAC-92, 2026-10-10): E_PUBLICAR_SOB_DEMANDA_F3 nasce confirmed (DEV) apoiando D_MATRIZ_DE_PORTAS_2026_10; Q_REGISTRO_ACOMPANHA_A_TROCA_DE_PAPEL nasce open para o maestro (gatilho: 1a publicação da onion-core como source); nenhum flip auto-selado; PR para merge humano"
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
