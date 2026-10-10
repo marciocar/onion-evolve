@@ -55,6 +55,12 @@ git -C "${SRC}" rev-parse --verify --quiet HEAD >/dev/null || { echo "ERRO: --so
 RESOLVER="${SRC}/.claude/utils/marketplace/resolve-role-bundle.sh"
 [ -f "${RESOLVER}" ] || { echo "ERRO: sem o resolvedor do roles.yaml em ${SRC} — não sei o que o mini leva" >&2; exit 2; }
 command -v python3 >/dev/null 2>&1 || { echo "ERRO: python3 necessário" >&2; exit 2; }
+# DISCO × HEAD (passada adversarial da F5): o resolvedor e o manifesto leem o roles.yaml do DISCO de
+# --source; a árvore do core e as fontes de overlay vêm do HEAD. No motor a worktree é limpa e as duas
+# coincidem; num checkout com o roles.yaml editado e não commitado elas contariam histórias diferentes.
+# Recusa em vez de misturar.
+git -C "${SRC}" diff --quiet HEAD -- .claude/utils/marketplace/roles.yaml 2>/dev/null \
+  || { echo "ERRO: o roles.yaml de ${SRC} tem edição não commitada — a allowlist do disco e a árvore do HEAD divergiriam; commite ou descarte antes de medir" >&2; exit 2; }
 
 _overlays() {  # "destino<TAB>fonte" por linha, do roles.yaml do core
   local o; o="$(bash "${RESOLVER}" mini --overlays 2>/dev/null)" || { echo "ERRO: o resolvedor não devolveu os overlays do mini" >&2; return 2; }
@@ -69,7 +75,8 @@ if [ -n "${APPLY}" ]; then
   n=0
   while IFS=$'\t' read -r dst src; do
     [ -n "${dst}" ] || continue
-    case "${dst}${src}" in *..*|/*) echo "ERRO: overlay com caminho inválido: '${dst}' ← '${src}'" >&2; exit 2 ;; esac
+    case "${dst}" in *..*|/*|.git|.git/*) echo "ERRO: overlay com destino inválido: '${dst}'" >&2; exit 2 ;; esac
+    case "${src}" in *..*|/*) echo "ERRO: overlay com fonte inválida: '${src}'" >&2; exit 2 ;; esac
     mkdir -p "$(dirname "${APPLY}/${dst}")"
     # do HEAD (git show), nunca do disco: o overlay é parte do que se publica e vem do mesmo commit
     git -C "${SRC}" show "HEAD:${src}" > "${APPLY}/${dst}" 2>/dev/null && [ -s "${APPLY}/${dst}" ] \
@@ -86,11 +93,16 @@ case "${FORMAT}" in text|tsv) : ;; *) echo "ERRO: --format text|tsv" >&2; exit 2
 
 T="$(mktemp -d)"; trap 'rm -rf "${T}"' EXIT
 # O que existe no core (só citação de algo real é ponteiro), lido do HEAD da fonte.
-git -C "${SRC}" -c core.quotePath=false ls-tree -r --name-only HEAD -- .claude/commands .claude/agents > "${T}/core.txt" \
+git -C "${SRC}" -c core.quotePath=false ls-tree -r --name-only HEAD -- .claude/commands .claude/agents docs > "${T}/core.txt" \
   || { echo "ERRO: não li a árvore do core" >&2; exit 2; }
 _ka_rc=0; bash "${RESOLVER}" mini --known-absent > "${T}/known.tsv" 2>"${T}/known.err" || _ka_rc=$?
 [ "${_ka_rc}" -eq 0 ] || { echo "ERRO: o resolvedor não devolveu o known_absent do mini: $(head -c 200 "${T}/known.err")" >&2; exit 2; }
 : > "${T}/expected.txt"
+# Os overlays escritos À MÃO para o mini (fonte em ops/door-templates/) são conteúdo PRÓPRIO dele: neles
+# nenhuma ausência declarada vale (a tolerância é para arquivo COMPARTILHADO com o core). Os overlays que
+# trazem um arquivo real do core (a SSOT do contrato de sessão) seguem a regra dos compartilhados.
+ov_all="$(_overlays)" || exit 2
+printf '%s\n' "${ov_all}" | awk -F'\t' '$2 ~ /^ops\/door-templates\// {print $1}' > "${T}/owned.txt"
 if [ "${EXACT}" -eq 1 ]; then
   _m_rc=0
   _spec="$(bash "${SRC}/.claude/utils/adopt/vendor-manifest.sh" --role mini --repo "${SRC}" 2>/dev/null)" || _m_rc=$?
@@ -105,9 +117,10 @@ if [ "${EXACT}" -eq 1 ]; then
   printf '%s\n' .claude/.onion-version LICENSE >> "${T}/expected.txt"
 fi
 
-python3 - "${BUNDLE}" "${T}/core.txt" "${T}/known.tsv" "${T}/expected.txt" "${EXACT}" > "${T}/out.tsv" <<'PY'
+python3 - "${BUNDLE}" "${T}/core.txt" "${T}/known.tsv" "${T}/expected.txt" "${EXACT}" "${T}/owned.txt" > "${T}/out.tsv" <<'PY'
 import os, re, sys
 bundle, core_txt, known_tsv, expected_txt, exact = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5] == "1"
+owned = set(l.strip() for l in open(sys.argv[6], encoding="utf-8") if l.strip())
 core = set(l.strip() for l in open(core_txt, encoding="utf-8") if l.strip())
 known = {}
 for l in open(known_tsv, encoding="utf-8"):
@@ -134,6 +147,11 @@ agents_here = {os.path.basename(p)[:-3] for p in fset if p.startswith(".claude/a
 SKIP = (".claude/sessions", ".claude/.onion-version", ".claude/projects", ".claude/settings")
 seen = set()
 def dangling(kind, cit, f):
+    if f in owned:
+        # arquivo PRÓPRIO do mini: nenhuma ausência vale, e a citação não conta como 'vista' (senão uma
+        # linha do known_absent sobreviveria à sua última citação compartilhada só por estar aqui)
+        out.append(("DANGLING", cit, f))
+        return
     seen.add(cit)
     if cit not in known:
         out.append(("DANGLING", cit, f))
@@ -144,7 +162,11 @@ re_cmd = re.compile(r"(?<![A-Za-z0-9_.~/-])/([a-z]+):([a-z][a-z0-9-]*)(?::([a-z]
 re_old = re.compile(r"(?<![A-Za-z0-9_.~/-])/([a-z]+)/([a-z][a-z0-9-]*)(?![A-Za-z0-9_/.-])")
 re_frag = re.compile(r"(?<![A-Za-z0-9_./-])common[:/](prompts|templates)[:/]([a-z0-9][a-z0-9-]*)")
 re_agent = re.compile(r"(?<![A-Za-z0-9_.])@([a-z][a-z0-9-]+)")
-re_home = re.compile(r"/home/[a-z_][a-z0-9_-]*/")
+re_root = re.compile(r"(?<![A-Za-z0-9_.~/:@`-])/([a-z][a-z0-9-]+)(?![A-Za-z0-9_/:.@-])")
+re_docs = re.compile(r"(?<![A-Za-z0-9_./-])docs/[A-Za-z0-9_./-]+\.(?:md|ya?ml|json|txt)")
+re_link = re.compile(r"\]\(([^)\s]+)\)")
+# home de QUALQUER conta, inclusive maiúscula, o /Users/ do macOS e o /root/ (passada adversarial da F5)
+re_home = re.compile(r"/home/[^/\s`'\"<>]+/|/Users/[^/\s`'\"<>]+/|(?<![A-Za-z0-9_.-])/root/")
 for f in sorted(files):
     p = os.path.join(bundle, f)
     try:
@@ -178,6 +200,27 @@ for f in sorted(files):
     for a in sorted(set(re_agent.findall(t))):
         if a in agents_core and a not in agents_here:
             dangling("agent", "@" + a, f)
+    # comando de RAIZ (/onion, /warm-up): existe no core como .claude/commands/<nome>.md e falta no mini
+    for n in sorted(set(re_root.findall(t))):
+        rel = ".claude/commands/%s.md" % n
+        if rel in core and rel not in fset:
+            dangling("cmd", "/" + n, f)
+    # documento citado por caminho do repo (docs/...): o mini só leva o que a allowlist nomeia
+    for c in sorted(set(re_docs.findall(t))):
+        if not path_ok(c):
+            dangling("doc", c, f)
+    # link markdown RELATIVO, resolvido contra o diretório do arquivo citante
+    for tgt in sorted(set(re_link.findall(t))):
+        if re.match(r"^(https?:|mailto:|#|/|<)", tgt):
+            continue
+        tgt = tgt.split("#", 1)[0].split("?", 1)[0]
+        if not tgt or "{" in tgt or "$" in tgt:
+            continue
+        r = os.path.normpath(os.path.join(os.path.dirname(f), tgt))
+        if r.startswith(".."):
+            dangling("link", "fora-da-porta:" + tgt, f)
+        elif not path_ok(r):
+            dangling("link", r, f)
 for k in sorted(known):
     if k not in seen:
         out.append(("STALE", k, "o known_absent declara e nenhum arquivo do mini cita mais — tire a linha"))

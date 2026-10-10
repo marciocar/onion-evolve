@@ -212,6 +212,12 @@ roles:
         README.md: ops/door-templates/mini/README.door.md
         CLAUDE.md: ops/door-templates/mini/CLAUDE.door.md
         .claude/skills/onion/SKILL.md: ops/door-templates/mini/skill-onion.door.md
+        # O CONTRATO DE SESSÃO (passada adversarial da F5): engineer:start, plan e work dizem que a
+        # estrutura do worklog e os badges [DONE]/[ACTIVE]/[TODO] "são definidos na SSOT" e mandam NÃO
+        # redefini-los. Sem estas duas KBs o ciclo didático apontava o próprio contrato para um documento
+        # que não viajava. Fonte = o arquivo real do core (cópia fiel, não extrato que envelhece).
+        docs/knowledge-base/frameworks/gitflow-patterns.md: docs/knowledge-base/frameworks/gitflow-patterns.md
+        docs/knowledge-base/concepts/worklog-protocol.md: docs/knowledge-base/concepts/worklog-protocol.md
       # AUSENCIAS DECLARADAS (F5): o que arquivos COMPARTILHADOS com o core citam e o mini deliberadamente
       # NAO leva, cada uma com o porque de ser inofensiva para o iniciante. Catraca nos dois sentidos
       # (door-mini-check.sh): citacao nova fora desta lista reprova, e linha que ninguem mais cita tambem.
