@@ -5,6 +5,12 @@ meta:
   schema_version: "1"
   baseline: 2026-07-19
   date: 2026-07-19
+# Arestas para nó de OUTRO grafo (contrato v4.3). Migradas de x_supersedes_external e
+# x_constrained_by em 2026-10-10 (SAC-98); sem `from`, quem aponta é o grafo inteiro.
+external_edges:
+  - from: "docs/onion/graph/door-role-parity-2026-09.kg.yaml#D_MATRIZ_DE_PORTAS_2026_10"
+    to: D_ADOPT_REFRAME
+    edge_type: CONSTRAINS
 nodes:
   # --- evidência ---
   - id: E_BASE_IDENTICAL
@@ -124,8 +130,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     label: "ADOTAR o reframe; codificar a fronteira std=hub-em-trabalho, hub=+federação, meta-fábrica core-only"
-    x_constrained_by: "docs/onion/graph/door-role-parity-2026-09.kg.yaml#D_MATRIZ_DE_PORTAS_2026_10"
-    narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAIU: 'meta-fabrica core-only' (a meta-fabrica viaja para standalone e plugins). SOBREVIVE: std = hub em trabalho."
+    narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAIU: 'meta-fabrica core-only' (a meta-fabrica viaja para standalone e plugins). SOBREVIVE: std = hub em trabalho. · desde o contrato v4.3 (SAC-98), a aresta mora em external_edges, no topo do grafo"
     provenance:
       source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"

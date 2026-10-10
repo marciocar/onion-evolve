@@ -11,16 +11,26 @@ meta:
   review_after: 2026-12-29
   # Aufhebung cross-file de D_MATRIZ_DE_PORTAS_2026_10 (o motor de arestas é intra-arquivo). Todas são
   # PARCIAIS: o que cai e o que sobrevive de cada uma está na narrative do nó. DECISÃO DO MAESTRO
-  # (2026-10-09): CONSTRAINS, sem flip — cada alvo leva x_constrained_by apontando a matriz; só o
+  # (2026-10-09): CONSTRAINS, sem flip — cada alvo leva x_constrained_by apontando a matriz (desde o
+  # contrato v4.3, 2026-10-10, SAC-98: uma aresta CONSTRAINS em external_edges no grafo do alvo); só o
   # D_FAMILIA_TEM_DOIS_REGIMES_2026_09 virou superseded (já recebia SUPERSEDES e estava confirmed por engano).
-  x_supersedes_external:
-    - docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
-    - docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT
-    - docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml#D_ADOPT_REFRAME
-    - docs/onion/graph/onion-identity-2026-07.kg.yaml#D_FAMILIA_TEM_DOIS_REGIMES_2026_09
-    - docs/onion/graph/onion-identity-2026-07.kg.yaml#D_FAMILIA_TEM_TRES_REGIMES_2026_09
-    - docs/onion/graph/onion-identity-2026-07.kg.yaml#E_FAMILIA_MULTIIDE_CONGELADA
-    - docs/evolution/research/triagem-inbox-2026-09/triagem-inbox-2026-09.kg.yaml#D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA
+# Arestas para nó de OUTRO grafo (contrato v4.3). Migradas de x_supersedes_external e
+# x_constrained_by em 2026-10-10 (SAC-98); sem `from`, quem aponta é o grafo inteiro.
+external_edges:
+  - to: "docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA"
+    edge_type: SUPERSEDES
+  - to: "docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT"
+    edge_type: SUPERSEDES
+  - to: "docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml#D_ADOPT_REFRAME"
+    edge_type: SUPERSEDES
+  - to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#D_FAMILIA_TEM_DOIS_REGIMES_2026_09"
+    edge_type: SUPERSEDES
+  - to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#D_FAMILIA_TEM_TRES_REGIMES_2026_09"
+    edge_type: SUPERSEDES
+  - to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#E_FAMILIA_MULTIIDE_CONGELADA"
+    edge_type: SUPERSEDES
+  - to: "docs/evolution/research/triagem-inbox-2026-09/triagem-inbox-2026-09.kg.yaml#D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA"
+    edge_type: SUPERSEDES
 nodes:
   # ---- o dano ----
   - id: E_DANO_85_ARQUIVOS
@@ -196,7 +206,7 @@ nodes:
     verified_at: "2026-10-09"
     verified_against: "decisão do maestro na sessão de 2026-10-09, respondida por AskUserQuestion e registrada na tabela de decisões do plano das portas (SAC-88)"
     label: "matriz das portas: onion-core = source sem biografia com toda a maquinaria; standalone = core menos adoção e federação, com meta-fábrica; plugins = o standalone empacotado; mini = allowlist didática; plugins/ sai do core; publicar é sob demanda e nunca trava o desenvolvimento"
-    narrative: "A tabela, porta por porta. ONION-CORE: o source publicado e versionado, sem dados particulares, o core das empresas; leva toda a maquinaria, inclusive meta-fábrica, adoção e federação; o carimbo passa a role: source (kind: door), não hub. ONION-STANDALONE: uso direto num projeto individual; é o core menos adoção e federação (saem adopt, federation-*, co-relay, co-evolve, co-deliver, co-announce, o hook de inbox, onion-publish e as transições de adoção no wizard) e LEVA a meta-fábrica. ONION-PLUGINS: a mesma superfície do standalone, empacotada em plugins; a meta-fábrica é liberada, o que responde Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN e pede revisão da REGRA 61. ONION-MINI: porta didática para iniciantes, gerada do core por ALLOWLIST (por volta de 15 comandos do ciclo produto e desenvolvimento, sem KG, meta e compliance); o GPT atual segue como artefato à parte. PLUGINS/ NO CORE: sai; as REGRAS 19 e 72 a 79 passam a rodar só na publicação. PUBLICAÇÃO: sob demanda, por comando, e nenhuma porta defasada trava PR comum. A Aufhebung atravessa arquivos (o motor de arestas é intra-arquivo), está declarada em meta.x_supersedes_external e é PARCIAL em todos os alvos. D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA: cai 'adoção e federação viajam para o standalone'; sobrevive 'tudo viaja' para o onion-core e 'a meta-fábrica viaja' para standalone e plugins. D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT: cai o standalone como vitrine com adoção (a vitrine com adoção passa a ser o onion-core); sobrevive o reenquadramento de que o cliente não forka e recebe o framework pelo /meta:adopt com onion/vendor. D_ADOPT_REFRAME: cai 'meta-fábrica core-only'; sobrevive std = hub em trabalho. D_FAMILIA_TEM_DOIS_REGIMES_2026_09, D_FAMILIA_TEM_TRES_REGIMES_2026_09 e E_FAMILIA_MULTIIDE_CONGELADA (onion-identity-2026-07): cai o mini e o standalone como congelados e o onion-core como porta única; sobrevivem os regimes congelado e linha viva. D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA (triagem-inbox-2026-09): cai a cobrança bloqueante da defasagem na main, mas só quando a F3 tornar o workflow informativo; até lá ela segue no vivo. SELO DO MAESTRO (2026-10-09): CONSTRAINS, sem flip; os alvos guardam o status e ganham x_constrained_by para esta matriz, com o que caiu na narrative; a exceção é D_FAMILIA_TEM_DOIS_REGIMES_2026_09, que vira superseded porque já recebia SUPERSEDES do D_FAMILIA_TEM_TRES_REGIMES_2026_09 e estava confirmed por engano."
+    narrative: "A tabela, porta por porta. ONION-CORE: o source publicado e versionado, sem dados particulares, o core das empresas; leva toda a maquinaria, inclusive meta-fábrica, adoção e federação; o carimbo passa a role: source (kind: door), não hub. ONION-STANDALONE: uso direto num projeto individual; é o core menos adoção e federação (saem adopt, federation-*, co-relay, co-evolve, co-deliver, co-announce, o hook de inbox, onion-publish e as transições de adoção no wizard) e LEVA a meta-fábrica. ONION-PLUGINS: a mesma superfície do standalone, empacotada em plugins; a meta-fábrica é liberada, o que responde Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN e pede revisão da REGRA 61. ONION-MINI: porta didática para iniciantes, gerada do core por ALLOWLIST (por volta de 15 comandos do ciclo produto e desenvolvimento, sem KG, meta e compliance); o GPT atual segue como artefato à parte. PLUGINS/ NO CORE: sai; as REGRAS 19 e 72 a 79 passam a rodar só na publicação. PUBLICAÇÃO: sob demanda, por comando, e nenhuma porta defasada trava PR comum. A Aufhebung atravessa arquivos (o motor de arestas é intra-arquivo), está declarada em meta.x_supersedes_external e é PARCIAL em todos os alvos. D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA: cai 'adoção e federação viajam para o standalone'; sobrevive 'tudo viaja' para o onion-core e 'a meta-fábrica viaja' para standalone e plugins. D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT: cai o standalone como vitrine com adoção (a vitrine com adoção passa a ser o onion-core); sobrevive o reenquadramento de que o cliente não forka e recebe o framework pelo /meta:adopt com onion/vendor. D_ADOPT_REFRAME: cai 'meta-fábrica core-only'; sobrevive std = hub em trabalho. D_FAMILIA_TEM_DOIS_REGIMES_2026_09, D_FAMILIA_TEM_TRES_REGIMES_2026_09 e E_FAMILIA_MULTIIDE_CONGELADA (onion-identity-2026-07): cai o mini e o standalone como congelados e o onion-core como porta única; sobrevivem os regimes congelado e linha viva. D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA (triagem-inbox-2026-09): cai a cobrança bloqueante da defasagem na main, mas só quando a F3 tornar o workflow informativo; até lá ela segue no vivo. SELO DO MAESTRO (2026-10-09): CONSTRAINS, sem flip; os alvos guardam o status e ganham x_constrained_by para esta matriz, com o que caiu na narrative; a exceção é D_FAMILIA_TEM_DOIS_REGIMES_2026_09, que vira superseded porque já recebia SUPERSEDES do D_FAMILIA_TEM_TRES_REGIMES_2026_09 e estava confirmed por engano. · desde o contrato v4.3 (SAC-98), a Aufhebung e as CONSTRAINS moram em external_edges, no topo deste grafo e no de cada alvo."
     provenance:
       source: "issue Linear SAC-88 (projeto 'Onion — core: próximas levas') e o plano das portas que ela referencia, arquivo local da sessão fora do repo"
       locator: "seção 'Decisões do maestro (2026-10-09)', tabela Porta × O que é × Superfície"

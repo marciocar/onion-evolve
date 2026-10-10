@@ -73,12 +73,16 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
     grafo, que o YAML relido é o de antes mais a chave nova (senão rc 2, nada gravado). Idempotente: re-rodar
     regenera o mesmo resultado, o que resolve conflito com PR paralelo. Os modos que ESCREVEM provenance (o de
     sempre, --routing e --apply-judged) passam a escrever a locality junto, pela mesma regra.
+  · COM --external-edges (contrato v4.3, 2026-10-10, SAC-98): traduz as chaves próprias que faziam papel de aresta
+    para nó de outro grafo — `meta.x_supersedes_external` vira um item SUPERSEDES por alvo e `x_constrained_by` no nó
+    N vira {from: <alvo>, to: N, edge_type: CONSTRAINS} — em `external_edges` no topo. `x_supersedes_none` fica.
+    Recusa alvo que não existe (nunca inventa) e prova que o YAML relido mudou só pela tradução. Ver migrate_external.
 O que ela NÃO faz (é decisão humana ou do contrato, nunca da ferramenta):
   · nó sem fonte derivável NÃO recebe provenance inventada: sai no relatório como "sem fonte recuperável"
     (a gramática diz: sem fonte verificável, o nó não é confirmed — rebaixar é decisão de quem conhece o nó);
   · label acima de 280 NÃO é cortado: separar fato e narrativa é semântico; sai no relatório.
 
-Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv> [--promote-unverifiable] [--verified-at AAAA-MM-DD] [--new-nodes <yaml>] [--hold <id>[:<regra>]]... | --locality] <arquivo.kg.yaml>...
+Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv> [--promote-unverifiable] [--verified-at AAAA-MM-DD] [--new-nodes <yaml>] [--hold <id>[:<regra>]]... | --locality | --external-edges] <arquivo.kg.yaml>...
 rc:    0 = nada pendente (ou aplicado) · 1 = --check e há mudança pendente · 2 = entrada quebrada
        (arquivo ausente, routing ilegível ou sem as colunas, YAML inválido antes ou DEPOIS da edição — a edição
        nunca grava YAML inválido).
@@ -1374,11 +1378,203 @@ def main_locality(files, check):
     return 1 if (check and pending) else 0
 
 
+# ── external_edges (contrato v4.3, 2026-10-10, SAC-98) ─────────────────────────────────────────────────────
+# Até a v4.2 o motor de arestas era intra-arquivo, e a referência a nó de OUTRO grafo morava em duas chaves
+# próprias do core: `meta.x_supersedes_external` (o grafo inteiro supera um nó de fora; escalar ou lista) e
+# `x_constrained_by` num nó N (um nó de fora limita N). A v4.3 dá a forma do contrato: `external_edges` no topo,
+# uma aresta por item, exatamente uma ponta externa `<caminho>#<id>`. A migração é a tradução 1:1, e nada mais:
+#   x_supersedes_external: [c#ID, …]   → {to: c#ID, edge_type: SUPERSEDES} por alvo (sem from = o grafo inteiro);
+#   x_constrained_by: c#ID  no nó N    → {from: c#ID, to: N, edge_type: CONSTRAINS};
+#   x_supersedes_none                  → fica (declara, não é aresta: o ADOPTING diz que segue como x_).
+# A narrative do nó que citava `x_constrained_by` ganha a frase de onde a aresta mora agora (a história fica).
+# Recusa (rc 2, nada gravado): referência fora da forma do contrato, ALVO QUE NÃO EXISTE (arquivo ou id: a
+# ferramenta nunca escreve aresta para o vazio, e o gate a reprovaria como integrity.dangling-external),
+# chave em forma que a edição por linha não sabe ler, e YAML relido que difira do de antes além da tradução.
+EXT_TYPES = ("SUPERSEDES", "CONSTRAINS", "SUPPORTS", "REFUTES", "TRACES_TO", "DEPENDS_ON")
+EXT_REF_RE = re.compile(r'^([^#\s]+)#([A-Za-z0-9_][A-Za-z0-9_.-]*)$')
+EXT_NARRATIVE = "desde o contrato v4.3 (SAC-98), a aresta mora em external_edges, no topo do grafo"
+
+
+def ext_ref_ok(ref):
+    """A ponta externa na forma do contrato: caminho relativo à raiz, com `/`, sem `.`, `..`, `\\` nem `:`."""
+    m = EXT_REF_RE.match(ref or "")
+    if not m or "\\" in ref or ":" in m.group(1) or m.group(1).startswith("/"):
+        return False
+    return all(seg not in ("", ".", "..") for seg in m.group(1).split("/"))
+
+
+def _ext_ids(path, root, cache):
+    if path not in cache:
+        try:
+            g = yaml.safe_load(open(os.path.join(root, path), encoding="utf-8"))
+            cache[path] = {n.get("id") for n in (g or {}).get("nodes") or [] if isinstance(n, dict)}
+        except (OSError, yaml.YAMLError):
+            cache[path] = None
+    return cache[path]
+
+
+def migrate_external(text):
+    """Tradução por linha. Devolve (texto, [arestas novas em dict], [ids de nó cuja narrative mudou])."""
+    lines = text.split("\n")
+    out, edges, narr, i, in_meta, in_nodes, nid = [], [], [], 0, False, False, None
+    con = {}  # nó → linha de onde saiu o x_constrained_by
+    while i < len(lines):
+        ln = lines[i]
+        if re.match(r'^[A-Za-z_]', ln):
+            in_meta = bool(re.match(r'^meta:\s*(#.*)?$', ln))
+            in_nodes = bool(re.match(r'^nodes:\s*(#.*)?$', ln))
+            nid = None
+        if in_meta:
+            m = re.match(r'^  x_supersedes_external:[ \t]*(.*)$', ln)
+            if m:
+                raw = re.sub(r'[ \t]+#.*$', '', m.group(1)).strip()
+                if raw:
+                    v = yaml.safe_load("k: " + raw)["k"]
+                    targets = [v] if isinstance(v, str) else v
+                    j = i + 1
+                else:
+                    targets, j = [], i + 1
+                    while j < len(lines) and re.match(r'^    - ', lines[j]):
+                        targets.append(yaml.safe_load("k: " + lines[j][6:])["k"]); j += 1
+                if not isinstance(targets, list) or not targets or not all(isinstance(t, str) for t in targets):
+                    raise BrokenInput("x_supersedes_external em forma que a edição por linha não lê")
+                edges += [{"to": t, "edge_type": "SUPERSEDES"} for t in targets]
+                i = j
+                continue
+        if in_nodes:
+            nm = NODE_RE.match(ln)
+            if nm:
+                nid = nm.group(1)
+            m = re.match(r'^    x_constrained_by:[ \t]*(.*)$', ln)
+            if m and nid:
+                v = scalar(m.group(1))
+                if not v:
+                    raise BrokenInput(f"x_constrained_by de {nid} em forma que a edição por linha não lê")
+                edges.append({"from": v, "to": nid, "edge_type": "CONSTRAINS"})
+                con[nid] = True
+                i += 1
+                continue
+        out.append(ln); i += 1
+    if not edges:
+        return text, [], []
+    # a narrative de quem citava a chave velha diz onde a aresta mora agora
+    lines, out, i, in_nodes = out, [], 0, False
+    while i < len(lines):
+        ln = lines[i]
+        if re.match(r'^[A-Za-z_]', ln):
+            in_nodes = bool(re.match(r'^nodes:\s*(#.*)?$', ln))
+        nm = NODE_RE.match(ln) if in_nodes else None
+        if nm and nm.group(1) in con:
+            j = i + 1
+            while j < len(lines) and not NODE_RE.match(lines[j]) and not re.match(r'^[A-Za-z_]', lines[j]):
+                j += 1
+            block = lines[i:j]
+            n, cur = _get_scalar(block, "narrative")
+            if n is not None and cur and "x_constrained_by" in cur:
+                block, changed = _append_narrative(block, EXT_NARRATIVE)
+                if changed:
+                    narr.append(nm.group(1))
+            out.extend(block); i = j
+            continue
+        out.append(ln); i += 1
+    # o bloco external_edges: acrescenta ao existente (sem repetir) ou nasce logo antes de `nodes:`
+    try:
+        have = (yaml.safe_load("\n".join(out)) or {}).get("external_edges") or []
+    except yaml.YAMLError:
+        raise BrokenInput("o texto sem as chaves x_ não é YAML válido")
+    fresh = [e for e in edges if e not in have]
+    item = []
+    for e in fresh:
+        first = True
+        for k in ("from", "to", "edge_type"):
+            if k in e:
+                val = e[k] if k == "edge_type" or "#" not in e[k] else q(e[k])
+                item.append(("  - " if first else "    ") + f"{k}: {val}")
+                first = False
+    top = next((k for k, x in enumerate(out) if re.match(r'^external_edges:\s*(#.*)?$', x)), None)
+    if top is not None:
+        e = top + 1
+        while e < len(out) and (out[e].startswith(" ") or not out[e].strip()):
+            e += 1
+        while e > top + 1 and not out[e - 1].strip():
+            e -= 1
+        out = out[:e] + item + out[e:]
+    elif fresh:
+        at = next((k for k, x in enumerate(out) if re.match(r'^nodes:\s*(#.*)?$', x)), len(out))
+        out = out[:at] + ["# Arestas para nó de OUTRO grafo (contrato v4.3). Migradas de x_supersedes_external e",
+                          "# x_constrained_by em 2026-10-10 (SAC-98); sem `from`, quem aponta é o grafo inteiro.",
+                          "external_edges:"] + item + out[at:]
+    return "\n".join(out), edges, narr
+
+
+def main_external(files, check):
+    """O laço do --external-edges. Prova, por grafo, que o YAML relido é o de antes sem as chaves x_ traduzidas,
+    mais `external_edges` e a frase da narrative — e nada mais (senão rc 2, nada gravado)."""
+    if not files:
+        print(__doc__.strip().split("\n\n")[-1], file=sys.stderr); return 2
+    pending, tot, cache = False, {}, {}
+    for f in files:
+        try:
+            text = open(f, encoding="utf-8").read()
+            before = yaml.safe_load(text)
+        except FileNotFoundError:
+            print(f"kg-migrate-v3: {f} não existe", file=sys.stderr); return 2
+        except yaml.YAMLError as e:
+            print(f"kg-migrate-v3: {f} não é YAML válido ({e.__class__.__name__}) — não toco", file=sys.stderr); return 2
+        root = repo_root_of(f) or os.getcwd()
+        try:
+            new, edges, narr = migrate_external(text)
+        except BrokenInput as e:
+            print(f"kg-migrate-v3: {f}: {e} — nada gravado", file=sys.stderr); return 2
+        for e in edges:
+            ref = e["to"] if e["edge_type"] == "SUPERSEDES" else e["from"]
+            if not ext_ref_ok(ref):
+                print(f"kg-migrate-v3: {f}: referência fora da forma do contrato: {ref} — nada gravado", file=sys.stderr); return 2
+            path, tid = ref.split("#", 1)
+            ids = _ext_ids(path, root, cache)
+            if ids is None or tid not in ids:
+                print(f"kg-migrate-v3: {f}: ALVO QUEBRADO {ref} ({'arquivo ausente' if ids is None else 'id ausente'})"
+                      " — não invento alvo: corrija pela origem; nada gravado", file=sys.stderr); return 2
+        try:
+            after = yaml.safe_load(new)
+        except yaml.YAMLError as e:
+            print(f"kg-migrate-v3: a migração de {f} daria YAML inválido ({e.__class__.__name__}) — nada gravado", file=sys.stderr); return 2
+        if edges:
+            want = dict(before)
+            want.get("meta", {}).pop("x_supersedes_external", None)
+            for n in want.get("nodes") or []:
+                if isinstance(n, dict):
+                    n.pop("x_constrained_by", None)
+                    if n.get("id") in narr:
+                        n["narrative"] = n["narrative"].rstrip() + " · " + EXT_NARRATIVE
+            got = dict(after)
+            ext = got.pop("external_edges", [])
+            base = want.pop("external_edges", [])
+            if got != want or ext[:len(base)] != base or not all(e in ext for e in edges):
+                print(f"kg-migrate-v3: a migração de {f} mudaria mais que a tradução — nada gravado", file=sys.stderr); return 2
+        changed = new != text
+        by = {}
+        for e in edges:
+            by[e["edge_type"]] = by.get(e["edge_type"], 0) + 1
+            tot[e["edge_type"]] = tot.get(e["edge_type"], 0) + 1
+        verb = ("PENDENTE" if check else "aplicado") if changed else "nada a migrar"
+        print(f"{f}: {verb} · " + (" · ".join(f"{k} {v}" for k, v in sorted(by.items())) or "sem chave x_ de aresta")
+              + (f" · narrative {len(narr)}" if narr else ""))
+        if changed:
+            pending = True
+            if not check:
+                open(f, "w", encoding="utf-8").write(new)
+    print("TOTAL · " + (" · ".join(f"{k} {v}" for k, v in sorted(tot.items())) or "nenhuma aresta"))
+    return 1 if (check and pending) else 0
+
+
 def main(argv):
     check = "--check" in argv
     argv = [a for a in argv if a != "--check"]
     if "--locality" in argv:
         return main_locality([a for a in argv if a != "--locality"], check)
+    if "--external-edges" in argv:
+        return main_external([a for a in argv if a != "--external-edges"], check)
     routing = judged = None
     if "--apply-judged" in argv:
         k = argv.index("--apply-judged")
