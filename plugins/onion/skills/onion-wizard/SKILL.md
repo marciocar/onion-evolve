@@ -26,9 +26,11 @@ o movimento à mão — nunca invente a lista.
 ### 1. Orient (contexto — sem perguntar ainda)
 - Papel deste repo: `bash ${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh | grep '^role:'` (`source` | `hub` | `adopted`, ou
   um papel de porta: `standalone` | `plugins` | `mini`).
-- **A projeção já é sensível ao papel:** num repo `standalone`, `plugins` ou `mini` ela NÃO devolve as
-  transições de adoção e federação (o motor delas não viaja para esses papéis) e diz quantas omitiu no
-  stderr. Lista vazia ali é a resposta certa, não defeito: diga que adotar outros repos é do `onion-core`.
+- **Papel sem adoção (`standalone`, `plugins`, `mini`):** adotar, promover, atualizar, convidar e
+  transferir **não existem aqui** — o motor não viaja para esses papéis. Diga isso e aponte o `onion-core`;
+  não ensine as fases à mão. Numa porta a projeção costuma nem rodar (sai 3: o grafo da topologia não
+  viaja); onde roda, ela já omite essas transições e diz quantas no stderr. Nos dois casos a resposta é
+  a mesma: o movimento não é deste papel.
 - Movimentos ativos: as linhas `confirmed` da projeção. Os `open` são **gated** ("em breve" — não execute;
   aponte o caminho manual da doutrina se perguntado).
 - **Regra de validade por papel** (diga, não deixe o maestro descobrir errando):
