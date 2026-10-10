@@ -86,9 +86,12 @@ para que a ausência não seja lida como esquecimento.
 - **Não roda o lint na porta didática.** O mini não leva o lint por desenho; a verificação dele é o
   `door-mini-check.sh` (allowlist exata, sem ponteiro morto, sem caminho de máquina). Ausência
   declarada no `known_absent` do roles.yaml é tolerada, uma linha por citação, com catraca nos dois
-  sentidos. Teto: o checador conta citação por forma (caminho, `/categoria:comando`, `/categoria/comando`,
-  `@agente`, `common:prompts:nome`); uma dependência citada só em prosa livre ("o agente de GitFlow")
-  não é vista.
+  sentidos, e ela não vale nos arquivos escritos à mão para o mini (README, CLAUDE.md, skill). Teto: o
+  checador conta citação por forma — caminho `.claude/…`, documento `docs/….md|yaml|json|txt`, link
+  markdown relativo com forma de caminho, `/categoria:comando`, `/categoria/comando`, comando de raiz
+  `/nome`, `@agente` e `common:prompts:nome`. Escapam: dependência citada só em prosa livre ("o agente
+  de GitFlow"), diretório citado sem arquivo (`docs/knowledge-base/`) e link cujo alvo não tem forma de
+  caminho (placeholder de template).
 - **Não julga as guardas de plugin na catraca contra origin/main.** Desde a F4 (SAC-93, 2026-10-10)
   o `plugins/` montado não é versionado no core, e as REGRAS 61 (metade do resultado), 72, 73, 74, 75,
   76 (catálogo × raiz), 77 e 79 rodam no passo (5d) sobre o bundle montado

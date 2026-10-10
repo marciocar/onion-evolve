@@ -259,6 +259,13 @@ if [ -n "${FROM_REF}" ]; then
   [ -z "${CLONE}" ] || { echo "ERRO: --from com --clone deixaria um commit de branch não mergeada no clone '${CLONE}', e um --push seguinte o levaria a público. Ensaio de branch é só em clone descartável." >&2; exit 2; }
   SRC_REF="${FROM_REF}"
 fi
+# --replace-foreign SÓ em clone descartável (passada adversarial da F5): o passo (2b) esvazia o clone antes
+# de materializar, e num clone do maestro uma materialização que falhasse deixaria deleções rastreadas e a
+# tag local na árvore dele. A 1ª materialização é rara e não precisa do clone de ninguém.
+if [ "${REPLACE_FOREIGN}" -eq 1 ] && [ -n "${CLONE}" ]; then
+  echo "ERRO: --replace-foreign com --clone — a 1ª materialização esvazia o clone; rode-a em clone descartável (sem --clone)." >&2
+  exit 2
+fi
 if ! git -C "${CORE}" rev-parse --verify --quiet "${SRC_REF}^{commit}" >/dev/null; then
   echo "ERRO: não consegui resolver '${SRC_REF}'. A porta é projeção da INTEGRAÇÃO mergeada; sem ela eu não publico nada (e não caio no HEAD local, que pode ser uma branch de PR aberto)." >&2
   exit 3
@@ -538,6 +545,8 @@ elif [ "${ROLE}" = "mini" ]; then
     elif [ "${_dmrc}" -eq 1 ]; then
       echo "✗ (5c) a porta didática reprovou na verificação própria (sem lint):" >&2
       printf '%s\n' "${_dmo}" | sed -n '1,15p' >&2
+      _dmn="$(grep -c '✗' <<< "${_dmo}" || true)"
+      [ "${_dmn}" -gt 15 ] && echo "      … ${_dmn} achado(s) no total — rode door-mini-check.sh no clone (--keep) para a lista inteira" >&2
       FAIL=1
     else
       echo "✗ (5c) door-mini-check NÃO mediu o bundle (rc=${_dmrc}): $(printf '%s' "${_dmo}" | tail -1 | cut -c1-200)" >&2; FAIL=1
