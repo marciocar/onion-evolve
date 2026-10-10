@@ -292,6 +292,15 @@ def index_texts(items):
     return index
 
 
+EXTERNAL_TARGET = re.compile(r"(?<![A-Za-z0-9_./-])((?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.yaml)#[A-Za-z]")
+
+
+def external_targets(text):
+    """Os caminhos que as referências externas de um texto citam (barato, por padrão): só eles precisam entrar no
+    corpus. Um caminho citado fora de external_edges só custa ler um arquivo a mais; nunca muda o veredito."""
+    return set(EXTERNAL_TARGET.findall(text)) if uses_external(text) else set()
+
+
 def uses_external(text):
     """Barato: o texto tem uma chave external_edges de topo? Só então vale montar o corpus."""
     return re.search(r"(?m)^external_edges\s*:", text) is not None

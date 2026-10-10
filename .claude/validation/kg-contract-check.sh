@@ -70,19 +70,25 @@ for f in files:
     if not os.path.isfile(os.path.join(root, path)):
         print(f"kg-contract-check: {f} não existe", file=sys.stderr); sys.exit(2)
     text = open(os.path.join(root, path), encoding="utf-8").read()
-    # o índice do corpus só se monta quando o grafo usa external_edges (como no gate): custo zero no caso comum
-    index = (kg_gate.kg_validate.corpus_index(root, kg_gate.tracked_graphs(root))
-             if kg_gate.kg_validate.uses_external(text) else None)
-    now = kg_gate.measure_texts([(path, text)], index)[path]
     tracked = subprocess.run(["git", "-C", root, "ls-files", "--error-unmatch", "--", path],
                              capture_output=True).returncode == 0
-    before = set()
-    mp_before = collections.Counter()
+    old_text = None
     if tracked:
         old = subprocess.run(["git", "-C", root, "show", f"HEAD:{path}"], capture_output=True, text=True)
-        if old.returncode == 0:
-            before = set(kg_gate.measure_texts([(path, old.stdout)], index)[path]["should"])
-            mp_before = collections.Counter(machine_path.scan_text(old.stdout, _hrx)[0])
+        old_text = old.stdout if old.returncode == 0 else None
+    # o índice do corpus só se monta quando o grafo usa external_edges (como no gate), e desde o kit v4.3.2 só
+    # lê os grafos que as referências citam, na versão de agora e na do HEAD: alvo fora do índice reprova como
+    # dangling-external, igual a antes, e o caso comum segue custo zero
+    texts = [text] + ([old_text] if old_text is not None else [])
+    wanted = set().union(*(kg_gate.kg_validate.external_targets(t) for t in texts))
+    index = (kg_gate.kg_validate.corpus_index(root, [n for n in kg_gate.tracked_graphs(root) if n in wanted])
+             if any(kg_gate.kg_validate.uses_external(t) for t in texts) else None)
+    now = kg_gate.measure_texts([(path, text)], index)[path]
+    before = set()
+    mp_before = collections.Counter()
+    if old_text is not None:
+        before = set(kg_gate.measure_texts([(path, old_text)], index)[path]["should"])
+        mp_before = collections.Counter(machine_path.scan_text(old_text, _hrx)[0])
     worse_should = sorted(set(now["should"]) - before)
     mp_now = machine_path.scan_text(open(os.path.join(root, path), encoding="utf-8").read(), _hrx)[0]
     worse_mp = sorted((collections.Counter(mp_now) - mp_before).elements())

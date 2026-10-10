@@ -38,14 +38,14 @@ O adotante usa só `update` e `check`.
 A primeira vez, a partir de um clone deste repo:
 
 ```bash
-python3 -I -B tools/kg_vendor.py update --tag kg-ssot-v4.3.1 --dest <adotante>/vendor/kg-ssot
+python3 -I -B tools/kg_vendor.py update --tag kg-ssot-v4.3.2 --dest <adotante>/vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.3.1 --source <caminho ou URL deste repo>
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.3.2 --source <caminho ou URL deste repo>
 ```
 
 - **Leitura:** o vendor lê a tag com `git archive`, nunca a árvore de trabalho. Os nomes são literais: um `*`
@@ -257,7 +257,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance` (no primeiro adotante, seis deles emitiam `method` livre).
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.3.1 --source <caminho ou URL deste repo>`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.3.2 --source <caminho ou URL deste repo>`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
@@ -285,7 +285,7 @@ external_edges:
 ```
 
 Os tipos são `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO` e `DEPENDS_ON`. O gate confere o alvo contra
-todos os `.kg.yaml` rastreados do repo, inclusive os que o `--exclude` tira do corpus: alvo que não existe, ou grafo-alvo
+os `.kg.yaml` rastreados do repo, inclusive os que o `--exclude` tira do corpus, e lê só os que alguma referência cita: alvo que não existe, ou grafo-alvo
 apagado, reprova quem aponta (`integrity.dangling-external`). Fora do gate, `kg_validate.py --corpus <raiz do repo>`
 faz a mesma conferência: num repo git, contra os `.kg.yaml` rastreados; fora de um repo, contra todo `.kg.yaml` sob o
 diretório. Sem `--corpus`, o leitor confere só a forma e a ponta local, e diz quantos arquivos ficaram com a ponta externa
