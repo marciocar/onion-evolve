@@ -31,7 +31,7 @@ esac
 
 _scan() {  # $1=root · <arquivo><TAB><contagem>, relativo ao root
   local r="$1" dirs=() d
-  for d in .claude/validation .claude/utils .claude/hooks .githooks; do [ -d "${r}/${d}" ] && dirs+=("${r}/${d}"); done
+  for d in .claude/validation .claude/utils .claude/hooks .githooks ops; do [ -d "${r}/${d}" ] && dirs+=("${r}/${d}"); done
   [ "${#dirs[@]}" -gt 0 ] || return 0
   local hits
   # ⚠️ O PRODUTOR NÃO É MAIS UMA LISTA — e a troca foi paga com dois defeitos no mesmo dia.
@@ -61,11 +61,16 @@ if [ "${MODE}" = --selftest ]; then
   printf 'if printf "%%s" "$x" | grep -q PAD; then :; fi\n' > "${sb}/.claude/validation/mau.sh"
   printf 'if grep -q PAD <<< "$x"; then :; fi\n'            > "${sb}/.claude/validation/bom.sh"
   printf '# if printf "%%s" "$x" | grep -q PAD\n'            > "${sb}/.claude/validation/comentado.sh"
+  # (d) ops/ entra na varredura (2026-10-10): o sítio do `ops/publish-door.sh` (`git ls-tree | grep -q`) barrou o
+  #     1º ensaio do onion-plugins com "destino não reconhecido" e a guarda não o via, porque ops/ estava fora.
+  mkdir -p "${sb}/ops"
+  printf '    git ls-tree -r HEAD | grep -q X \\\n      || exit 2\n' > "${sb}/ops/motor.sh"
   out="$(_scan "${sb}")"
+  grep -q 'ops/motor\.sh' <<< "${out}" || { echo "  ✗ (d) não varre ops/ (os motores moram lá)"; fails=$((fails+1)); }
   grep -q 'mau\.sh' <<< "${out}" || { echo "  ✗ (a) não achou o sítio frágil"; fails=$((fails+1)); }
   grep -q 'bom\.sh' <<< "${out}" && { echo "  ✗ (b) acusou here-string (falso-positivo)"; fails=$((fails+1)); }
   grep -q 'comentado\.sh' <<< "${out}" && { echo "  ✗ (c) acusou COMENTÁRIO"; fails=$((fails+1)); }
-  [ "${fails}" -eq 0 ] && echo "  ✅ acha o frágil, ignora here-string e comentário"
+  [ "${fails}" -eq 0 ] && echo "  ✅ acha o frágil (inclusive em ops/), ignora here-string e comentário"
   rm -rf "${sb}"
   [ "${fails}" -eq 0 ] && { echo "pipe-verdict-check selftest: OK"; exit 0; }
   echo "pipe-verdict-check selftest: ${fails} falha(s)"; exit 1
