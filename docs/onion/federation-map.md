@@ -95,4 +95,4 @@ flowchart TD
 | jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `df031ef53683` |
 | onion-slm | standalone | greenfield | slm, eval-de-dominio, roteiro-gradual | `9e75a73d0401` |
 | onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `7818b8a25ae6` |
-| onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `0d293c077a28` |
+| onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `54ef8ebdf150` |
