@@ -5539,6 +5539,40 @@ check_cited_directive_live() {
 }
 check_cited_directive_live
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 99 (Nó de .kg.yaml sem caminho de máquina, julgado pela classe) — HARD, com catraca
+#   DANO MEDIDO (SAC-103): as ondas O4 a O7 da migração de provenance (SAC-73, 2026-10-09/10) tiraram do
+#   corpus o caminho de máquina — 247 ocorrências em 180 nós no corpus de 2026-10-08, medidas pela classe
+#   desta regra — e nada impedia que ele voltasse. A régua das ondas era uma LISTA de diretórios, que errou
+#   pelo vocabulário dos dois lados. A classe e as isenções seladas (P3, P4, A4, A6) moram em
+#   .claude/utils/kg/machine_path.py; a catraca, em kg-machine-path-check.sh (passivo hoje: ZERO; 3 nós
+#   isentos por x_path_is_content). O kg-contract-check.sh cobra o mesmo no grafo NOVO, antes do commit.
+check_kg_machine_path() {
+  local helper="${SCRIPT_DIR}/kg-machine-path-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *.kg.yaml|*/kg-machine-path-check.sh|*/kg-machine-path-baseline.txt|*/utils/kg/machine_path.py|*/lint-artifacts.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    case "${_path}" in /*) : ;; *) _path="${REPO_ROOT}/${_path#./}" ;; esac
+    violation "${_sev:-SOFT}" "${_path}" "REGRA 99 (Nó de .kg.yaml sem caminho de máquina, julgado pela classe): [${_code}] ${_msg}"
+  done <<< "${_out}"
+  # helper >=2 ⇒ declarou que NAO pode julgar; rc!=0 sem linha também (morte calada). Nunca aprovação.
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${REPO_ROOT}/.claude/validation/kg-machine-path-check.sh" "REGRA 99 (Nó de .kg.yaml sem caminho de máquina, julgado pela classe): a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — o corpus não foi verificado; isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_kg_machine_path
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================

@@ -12119,6 +12119,7 @@ run_seed_adoption_graph_selftests() {
     local _v3o _v3rc _v3sb; _v3sb="$(mktemp -d)"
     mkdir -p "${_v3sb}/.claude/validation" "${_v3sb}/vendor" "${_v3sb}/g"
     cp "${REPO_ROOT}/.claude/validation/kg-contract-check.sh" "${_v3sb}/.claude/validation/"
+    mkdir -p "${_v3sb}/.claude/utils/kg"; cp "${REPO_ROOT}/.claude/utils/kg/machine_path.py" "${_v3sb}/.claude/utils/kg/"
     cp -a "${REPO_ROOT}/vendor/kg-ssot" "${_v3sb}/vendor/"
     cp "${d}/docs/onion/graph/onion-adoption.kg.yaml" "${_v3sb}/g/semente.kg.yaml"
     git -C "${_v3sb}" init -q 2>/dev/null
@@ -19855,6 +19856,7 @@ PY
     local v3o v3rc
     rm -f "$d/$g"; mkdir -p "$d/.claude/validation" "$d/vendor" "$d/docs/onion/graph"
     cp "${REPO_ROOT}/.claude/validation/kg-contract-check.sh" "$d/.claude/validation/"; cp -a "${REPO_ROOT}/vendor/kg-ssot" "$d/vendor/"
+    mkdir -p "$d/.claude/utils/kg"; cp "${REPO_ROOT}/.claude/utils/kg/machine_path.py" "$d/.claude/utils/kg/"
     printf 'meta:\n  id: fx\n  schema_version: "1"\nnodes:\n  - id: N_GATED\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: "2026-01-01"\n    verified_against: x\n    label: "a"\n  - id: N_OK\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: "2026-01-01"\n    verified_against: x\n    label: "b"\n\nedges:\n  - from: N_GATED\n    to: N_OK\n    edge_type: SUPPORTS\n' > "$d/$g"
     python3 - "$d/c.json" "$g" <<'PY'
 import json,sys
@@ -24071,8 +24073,9 @@ run_kg_contract_check_selftests() {
   python3 -c 'import yaml, jsonschema' >/dev/null 2>&1 || { record_skip "kg-contract-check: PyYAML/jsonschema ausentes (SUT não exercido)"; return; }
   local sb out rc long
   sb="$(TMPDIR=/tmp mktemp -d)"
-  mkdir -p "${sb}/.claude/validation" "${sb}/vendor" "${sb}/g"
+  mkdir -p "${sb}/.claude/validation" "${sb}/vendor" "${sb}/g" "${sb}/.claude/utils/kg"
   cp "${chk}" "${sb}/.claude/validation/"; cp -a "${ven}" "${sb}/vendor/"
+  cp "${REPO_ROOT}/.claude/utils/kg/machine_path.py" "${sb}/.claude/utils/kg/"
   _kcc_graph limpo > "${sb}/g/limpo.kg.yaml"
   _kcc_graph divida | sed -e 's/verified_at: "2026-10-08"/verified_at: 2026-10-08/' > "${sb}/g/divida.kg.yaml"
   ( cd "${sb}" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm base ) >/dev/null 2>&1 \
@@ -24135,6 +24138,26 @@ run_kg_contract_check_selftests() {
      && [ "${rcb}" -eq 0 ]; then
     record_pass "kg-contract-check: (i) external_edges com alvo inexistente → rc 1 no MUST com a cura; alvo existente → rc 0"
   else record_fail "kg-contract-check: (i)" "esperava rc 1 dangling-external e rc 0 no válido: rc=${rc} rcb=${rcb} ${out} ${outb}"; fi
+  # (j) REGRA 99 (SAC-103, 2026-10-10): caminho de máquina pela CLASSE (machine_path.py). Grafo NOVO com o
+  #     `cd /outro/repo` que as ondas O4–O7 deixaram num label → rc 1 nomeando MACHINE-PATH; RASTREADO com o
+  #     caminho herdado e edição sem relação → rc 0 (a dívida herdada é da catraca do lint); RASTREADO que ganha
+  #     um caminho novo → rc 1. Mutante: tirar o bloco worse_mp do checador deixa (j1) e (j3) verdes → reprova.
+  _kcc_graph mpnovo | sed -e 's|label: "pergunta A"|label: "medido com cd /outro/repo \&\& git push"|' > "${sb}/g/mpnovo.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/mpnovo.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q "MACHINE-PATH Q_A.label: '/outro/repo' (shell)" <<< "${out}"; then
+    record_pass "kg-contract-check: (j1) grafo novo com caminho de máquina → rc 1 MACHINE-PATH"
+  else record_fail "kg-contract-check: (j1)" "esperava rc 1 com MACHINE-PATH: rc=${rc} ${out}"; fi
+  _kcc_graph mpherd | sed -e 's|label: "pergunta A"|label: "lido em /tmp/x"|' > "${sb}/g/mpherd.kg.yaml"
+  ( cd "${sb}" && git add g/mpherd.kg.yaml && git -c user.email=t@t -c user.name=t commit -qm mp ) >/dev/null 2>&1
+  sed -i 's/label: "evidência A"/label: "evidência A, revista"/' "${sb}/g/mpherd.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/mpherd.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ]; then record_pass "kg-contract-check: (j2) rastreado com caminho herdado e edição sem relação → rc 0"
+  else record_fail "kg-contract-check: (j2)" "caminho herdado cobrado como novo: rc=${rc} ${out}"; fi
+  sed -i 's/label: "evidência A, revista"/label: "evidência A, em Read(\/\/home\/conta\/x)"/' "${sb}/g/mpherd.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/mpherd.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q "MACHINE-PATH E_A.label: '//home/' (dbl)" <<< "${out}" && ! grep -q "Q_A.label" <<< "${out}"; then
+    record_pass "kg-contract-check: (j3) rastreado que ganha caminho novo → rc 1 só pelo novo (o herdado não é cobrado)"
+  else record_fail "kg-contract-check: (j3)" "esperava rc 1 só com o //home novo: rc=${rc} ${out}"; fi
   # (f) o checador NÃO deixa bytecode no vendor. Medido em 2026-10-08: rodar o leitor de referência sem -B
   #     plantava tools/__pycache__/*.pyc, e o `kg_vendor.py check` seguinte reprovava o vendor como
   #     "divergente da tag" (o check rejeita bytecode de propósito). Rodamos sem PYTHONDONTWRITEBYTECODE,
@@ -24150,6 +24173,126 @@ run_kg_contract_check_selftests() {
   rm -rf "${sb}"
 }
 _family run_kg_contract_check_selftests
+
+# REGRA 99 (Nó de .kg.yaml sem caminho de máquina, julgado pela classe) — SAC-103, 2026-10-10. As ondas O4–O7
+# da migração de provenance (SAC-73) limparam o caminho de máquina do corpus; nada impedia a volta, e a régua
+# era uma LISTA que errou pelo vocabulário dos dois lados. A classe mora em .claude/utils/kg/machine_path.py
+# (importada pelo migrador, pela catraca e pelo kg-contract-check); a catraca, em kg-machine-path-check.sh.
+# Casos: (a) as duas polaridades verbatim · (b) o modo que o lint consome, no corpus real · (c)–(f) a catraca
+# num repo-sandbox · (g) o dispatcher de produção · (h) sem a classe → rc 2 · (m) UM MUTANTE POR FORMA.
+run_kg_machine_path_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/kg-machine-path-check.sh" lib="${REPO_ROOT}/.claude/utils/kg/machine_path.py"
+  if [ ! -f "${chk}" ] || [ ! -f "${lib}" ]; then record_fail "kg-machine-path" "guarda ou classe ausente"; return; fi
+  python3 -c 'import yaml' >/dev/null 2>&1 || { record_skip "kg-machine-path: PyYAML ausente (SUT não exercido)"; return; }
+  local o rc
+  # (a) o --selftest próprio: acusa cada forma medida e cala em cada isenção selada
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE '^kg-machine-path selftest: [0-9]+ passaram, 0 falharam$' <<< "${o}"; then
+    record_pass "kg-machine-path: (a) --selftest verde ($(grep -c '✅' <<< "${o}") casos: 15 formas acusadas, 12 isenções caladas, 10 de P4)"
+  else record_fail "kg-machine-path: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: --tsv sai 0 e silencioso (passivo ZERO; os 3 isentos
+  #     estão no baseline). CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
+  if o="$(cd "${REPO_ROOT}" && bash "${REPO_ROOT}/.claude/validation/kg-machine-path-check.sh" "${REPO_ROOT}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then record_pass "kg-machine-path: (b) corpus real → rc 0 e silencioso no modo tsv"
+  else record_fail "kg-machine-path: (b) corpus real" "rc=${rc}; [$(head -3 <<< "${o}" | tr '\n' '|')]"; fi
+  # repo-sandbox com a guarda COMO O RUNNER A INVOCA (script + classe + predicado de fixture)
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${sb}/.claude/validation" "${sb}/.claude/utils/kg" "${sb}/g"
+  cp "${chk}" "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "${sb}/.claude/validation/"
+  cp "${lib}" "${sb}/.claude/utils/kg/"
+  _kmp() {  # $1=id $2=label do Q_A $3=marcador opcional
+    printf 'meta:\n  id: %s\n  schema_version: "1"\nnodes:\n  - id: Q_A\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    label: "%s"\n' "$1" "$2"
+    [ -z "${3:-}" ] || printf '    x_path_is_content: "%s"\n' "$3"
+  }
+  _kmp limpo "rode /meta:kg e POST /v1/messages 2>/dev/null" > "${sb}/g/limpo.kg.yaml"
+  ( cd "${sb}" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm base ) >/dev/null 2>&1 \
+    || { record_skip "kg-machine-path: git init falhou"; rm -rf "${sb}"; return; }
+  local s="${sb}/.claude/validation/kg-machine-path-check.sh" b="${sb}/.claude/validation/kg-machine-path-baseline.txt"
+  # (c) grafo rastreado com o `cd /outro/repo` verbatim → HARD CAMINHO-DE-MAQUINA, rc 1, 4 campos
+  _kmp sujo "todos cd /outro/repo && git push origin main" > "${sb}/g/sujo.kg.yaml"; ( cd "${sb}" && git add -A ) >/dev/null 2>&1
+  if o="$(bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q $'^HARD\tCAMINHO-DE-MAQUINA\tg/sujo.kg.yaml\tnó Q_A, campo label: \'/outro/repo\' (shell)' <<< "${o}" \
+     && [ "$(awk -F'\t' 'NR==1{print NF}' <<< "${o}")" = "4" ]; then
+    record_pass "kg-machine-path: (c) caminho de máquina rastreado → HARD CAMINHO-DE-MAQUINA (rc 1, tsv de 4 campos)"
+  else record_fail "kg-machine-path: (c)" "rc=${rc}; [${o}]"; fi
+  # (d) o mesmo caminho no baseline (passivo) → SOFT PASSIVO, rc 0
+  bash "${s}" "${sb}" --emit-baseline > "${b}"
+  if o="$(bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q $'^SOFT\tPASSIVO\t' <<< "${o}" && ! grep -q '^HARD' <<< "${o}"; then
+    record_pass "kg-machine-path: (d) caminho no baseline → SOFT PASSIVO, rc 0"
+  else record_fail "kg-machine-path: (d)" "rc=${rc}; [${o}]"; fi
+  # (e) CATRACA: origin/main com passivo 0 e a branch com 1 → HARD CATRACA-VIOLADA (crescer é afrouxar)
+  ( cd "${sb}" && git rm -q --cached g/sujo.kg.yaml && bash "${s}" "${sb}" --emit-baseline > "${b}" && git add -A \
+      && git -c user.email=t@t -c user.name=t commit -qm zero && git update-ref refs/remotes/origin/main HEAD \
+      && git add -A g/sujo.kg.yaml && bash "${s}" "${sb}" --emit-baseline > "${b}" ) >/dev/null 2>&1
+  if o="$(bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q $'^HARD\tCATRACA-VIOLADA\t.claude/validation/kg-machine-path-baseline.txt\to passivo CRESCEU: 0 → 1' <<< "${o}"; then
+    record_pass "kg-machine-path: (e) baseline que cresce vs origin/main → HARD CATRACA-VIOLADA"
+  else record_fail "kg-machine-path: (e) catraca" "rc=${rc}; [${o}]"; fi
+  ( cd "${sb}" && git rm -q -f g/sujo.kg.yaml && bash "${s}" "${sb}" --emit-baseline > "${b}" ) >/dev/null 2>&1
+  # (f) nó MARCADO (selo P4) isenta, mas isenção nova não passa calada: SOFT ISENCAO-NOVA até o baseline;
+  #     vetor com home de conta NÃO isenta (HARD)
+  _kmp cita "curl -o ~/.claude/skills/x/SKILL.md" "citação" > "${sb}/g/cita.kg.yaml"; ( cd "${sb}" && git add -A ) >/dev/null 2>&1
+  local o2 rc2
+  if o="$(bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  bash "${s}" "${sb}" --emit-baseline > "${b}"
+  if o2="$(bash "${s}" "${sb}" --tsv 2>&1)"; then rc2=0; else rc2=$?; fi
+  _kmp vetor "cat ~/.ssh/id" "vetor" > "${sb}/g/vetor.kg.yaml"; ( cd "${sb}" && git add -A ) >/dev/null 2>&1
+  local o3 rc3; if o3="$(bash "${s}" "${sb}" --tsv 2>&1)"; then rc3=0; else rc3=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q $'^SOFT\tISENCAO-NOVA\tg/cita.kg.yaml\t' <<< "${o}" && [ "${rc2}" -eq 0 ] && [ -z "${o2}" ] \
+     && [ "${rc3}" -eq 1 ] && grep -q $'^HARD\tCAMINHO-DE-MAQUINA\tg/vetor.kg.yaml\t' <<< "${o3}"; then
+    record_pass "kg-machine-path: (f) citação isenta (SOFT ISENCAO-NOVA → silêncio após o baseline); vetor com ~/ acusa HARD"
+  else record_fail "kg-machine-path: (f) P4" "rc=${rc}/${rc2}/${rc3}; [${o}] [${o2}] [${o3}]"; fi
+  # (g) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, num repo com o defeito, emite a REGRA 99
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null; mkdir -p "${sd}/docs/x"
+  _kmp lintfx "o arquivo ficou em /tmp e sumiu" > "${sd}/docs/x/fx.kg.yaml"
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/docs/x/fx.kg.yaml" 2>&1 || true)"
+  if grep -q "REGRA 99 (Nó de .kg.yaml sem caminho de máquina, julgado pela classe): \[CAMINHO-DE-MAQUINA\] nó Q_A, campo label: '/tmp'" <<< "${l}"; then
+    record_pass "kg-machine-path: (g) o lint de produção (dispatcher) emite a REGRA 99 sobre o defeito"
+  else record_fail "kg-machine-path: (g) dispatcher" "$(grep -E 'REGRA 99|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  rm -rf "${sd}"
+  # (h) sem a classe → rc 2 (NAO VERIFICADO), nunca verde
+  mv "${sb}/.claude/utils/kg/machine_path.py" "${sb}/mp.bak"
+  if o="$(bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ]; then record_pass "kg-machine-path: (h) sem a classe → rc 2 (não julga, não passa)"
+  else record_fail "kg-machine-path: (h)" "sem a classe saiu rc=${rc}"; fi
+  mv "${sb}/mp.bak" "${sb}/.claude/utils/kg/machine_path.py"
+  # (m) MUTANTES — um por forma e um por isenção: reverte a cura na CÓPIA da classe e EXIGE que o caso
+  #     nomeado reprove. Mutante que não se aplica (o texto mudou) é FALHA, nunca verde por vacuidade.
+  local spec old new want mo mrc
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cp "${lib}" "${sb}/.claude/utils/kg/machine_path.py"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p).read(); sys.exit(3) if s.count(a)!=1 else open(p,"w").write(s.replace(a,b))' \
+         "${sb}/.claude/utils/kg/machine_path.py" "${old}" "${new}"; then
+      record_fail "kg-machine-path: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "kg-machine-path: (m) mutante morde → ✗ ${want}"
+    else record_fail "kg-machine-path: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<EOF_MUT
+(?:cd|pushd|$(printf '\x1f')(?:pushd|$(printf '\x1f')acusa: cd /outro/repo
+_ROOTS_BARE = "|".join(_BARE_OK)$(printf '\x1f')_ROOTS_BARE = "x-nenhuma"$(printf '\x1f')acusa: /tmp sem barra
+"bin", "boot", "dev"$(printf '\x1f')"bin", "dev"$(printf '\x1f')acusa: /boot
+"mnt", "opt",$(printf '\x1f')"mnt",$(printf '\x1f')acusa: /opt
+(?P<dbl>//(?=$(printf '\x1f')(?P<dbl>//x(?=$(printf '\x1f')acusa: barra dupla
+(?P<acct>~[a-z_]$(printf '\x1f')(?P<acct>~X[a-z_]$(printf '\x1f')acusa: ~<conta>/
+(?P<tilde>~/)$(printf '\x1f')(?P<tilde>~X/)$(printf '\x1f')acusa: ~/ (til do home)
+(?P<file>file://$(printf '\x1f')(?P<file>fileX://$(printf '\x1f')acusa: file://
+    if hrx is not None:$(printf '\x1f')    if False:$(printf '\x1f')acusa: hostname
+_DEV_STD = r'(?!dev/$(printf '\x1f')_DEV_STD = r'(?!xdev/$(printf '\x1f')cala: /dev/null
+_TS = r'(?:^|$(printf '\x1f')_TS = r'(?:|$(printf '\x1f')cala: /lib/ dentro
+[A-Za-z0-9_+@-]+/)'$(printf '\x1f')[A-Za-z0-9_+@.-]+/)'$(printf '\x1f')cala: URL sem scheme
+_ROOTS_SLASH = "|".join(FS_ROOTS)$(printf '\x1f')_ROOTS_SLASH = r'[A-Za-z0-9._@+-]+'$(printf '\x1f')cala: endpoint POST /v1/messages
+_BARE_OK = tuple(r for r in FS_ROOTS if r != "run")$(printf '\x1f')_BARE_OK = FS_ROOTS$(printf '\x1f')cala: /run nu
+if valid and (mark == "citação" or not is_home(kind, tok)):$(printf '\x1f')if valid:$(printf '\x1f')P4 acusa: vetor com ~/
+valid = isinstance(mark, str) and mark in P4_MARKS$(printf '\x1f')valid = bool(mark)$(printf '\x1f')P4 acusa: marcador booleano
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_kg_machine_path_selftests
 
 # Modo kg-migrate-v3 — SAC-73 parte 1: a ferramenta de migração do corpus ao contrato v3
 # (.claude/utils/kg/kg-migrate-v3.py) cita datas, deriva provenance SÓ de fonte que o nó já traz,
