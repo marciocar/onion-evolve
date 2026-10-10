@@ -22214,7 +22214,8 @@ run_door_cycle_selftests() {
 #   sem a família de termos `onion-*` → (d) · sem a derivação das contas de máquina → (d2)
 #   paridade de papel desligada → (e) · fonte caindo no HEAD local → (j) · push sem exigir --push → (a)
 #   --status lendo o pin do registro → (c) · cleanup sem remover a worktree → (g)
-#   lint da porta ignorado → (h) · --from aceito com --push → (i)
+#   lint da porta ignorado → (h) · --from aceito com --push → (i) · --count sempre 0 → (c3)
+#   sem a recusa da porta nunca materializada → (k) · rc 3 trocado por cair no HEAD → (f)
 run_publish_selftests() {
   local sut="${REPO_ROOT}/ops/publish-door.sh"
   if [ ! -f "${sut}" ]; then record_skip "publish: ops/publish-door.sh ausente (adotante) → pulado"; return; fi
@@ -22398,6 +22399,26 @@ STUB
      && [ "$(git -C "${cl}" show HEAD:.claude/.onion-version 2>/dev/null | sed -n 's/^source_commit: //p')" = "$(git -C "${core}" rev-parse --short=12 origin/main)" ]; then
     record_pass "publish: (j) a fonte é origin/main — commit só no HEAD local não viaja"
   else record_fail "publish: (j) a porta saiu do HEAD local" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (k) porta NUNCA materializada (pin n/a) cujo repo guarda OUTRO conteúdo (o onion-mini é a
+  #     destilação curada, sem .claude/) ⇒ recusa com a fase nomeada, e o repo dela fica intacto.
+  #     O esboço do materializador NÃO tem a guarda de destino do real: é o motor que tem de parar.
+  local mup="${d}/porta-m.git" mseed="${d}/mseed"
+  git init -q --bare -b main "${mup}" >/dev/null 2>&1 || true
+  git clone -q "${mup}" "${mseed}" >/dev/null 2>&1 || true
+  printf 'destilacao curada\n' > "${mseed}/PROMPT.md"
+  git -C "${mseed}" add -A >/dev/null 2>&1 || true
+  git -C "${mseed}" "${G[@]}" commit -qm destilacao >/dev/null 2>&1 || true
+  git -C "${mseed}" push -q origin HEAD:main >/dev/null 2>&1 || true
+  local mtip; mtip="$(git ls-remote "${mup}" refs/heads/main 2>/dev/null | awk '{print $1}')"
+  printf '  - id: porta-m\n    kind: door\n    role: mini\n    remote: %s\n    onion_version: n/a\n' "${mup}" \
+    >> "${core}/docs/evolution/federation/members.yaml"
+  _pub porta-m
+  if [ "${_r}" -eq 2 ] && grep -q 'F5' <<< "${_o}" \
+     && [ "$(git ls-remote "${mup}" refs/heads/main 2>/dev/null | awk '{print $1}')" = "${mtip}" ]; then
+    record_pass "publish: (k) porta nunca materializada com outro conteúdo ⇒ recusa nomeando a F5"
+  else record_fail "publish: (k) o motor seguiria apagando a destilação" "rc=${_r} out=${_o:0:250}"; fi
+  _pub_members standalone "${NEWPIN}"
 
   # (f) origin/main IRRESOLÚVEL ⇒ aborta com rc 3, sem cair no HEAD local
   local lone="${d}/lone"

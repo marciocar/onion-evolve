@@ -72,7 +72,7 @@ para que a ausência não seja lida como esquecimento.
 ## O que esta doutrina NÃO promete
 
 - **Não publica a 1ª materialização do onion-mini.** O registro dele tem pin `n/a`, e o README e o
-  CLAUDE.md didáticos são da F5 (SAC-94). Ensaiar pode; o `--push` recusa.
+  CLAUDE.md didáticos são da F5 (SAC-94). Até lá o motor recusa (rc 2), porque o repo dela guarda a destilação curada, sem `.claude/`, e substituí-la é a própria 1ª materialização.
 - **Não roda as REGRAS 19/72–79/61 sobre um bundle temporário de plugins.** Isso é da F4 (SAC-93),
   junto com a saída de `plugins/` do core. Até lá elas seguem no lint do core.
 - **Não vê conta de máquina que não esteja no registro nem seja de quem roda.** É o teto declarado da

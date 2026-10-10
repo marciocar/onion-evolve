@@ -38,7 +38,8 @@
 # · NÃO empurra sem --push. E NÃO escreve no members.yaml: o pin vive no carimbo da porta (selo sem
 #   PR no core). O registro guarda o membro; o `onion_version` dele virou cache.
 # · NÃO publica a 1ª materialização do onion-mini (registro com pin n/a): ela é a F5 (SAC-94), com
-#   README e CLAUDE.md didáticos que ainda não existem. O ensaio roda; o --push recusa.
+#   README e CLAUDE.md didáticos que ainda não existem. O --push recusa, e o ensaio também, enquanto
+#   o repo dela guardar outro conteúdo (a destilação curada, sem .claude/).
 # =============================================================================
 set -uo pipefail
 
@@ -283,6 +284,15 @@ else
 fi
 BRANCH="$(git -C "${DEST}" symbolic-ref --short HEAD 2>/dev/null || true)"
 [ -n "${BRANCH}" ] || { echo "ERRO: o clone da porta está em HEAD destacado — não sei que ramo publicar." >&2; exit 2; }
+# PORTA QUE NUNCA FOI MATERIALIZADA e cujo repo tem OUTRO conteúdo (o onion-mini é hoje a destilação
+# curada, sem `.claude/`): o materialize-door recusa limpar destino que não parece porta, e com razão.
+# Dizer isso aqui, com a fase nomeada, em vez de deixar a recusa sair como "verificação reprovou"
+# (1º ensaio do mini, 2026-10-10: rc 1 com uma mensagem que apontava o lugar errado).
+if [ "${REG_PIN}" = "n/a" ] && [ ! -d "${DEST}/.claude" ] \
+   && [ -n "$(ls -A "${DEST}" 2>/dev/null | grep -v '^\.git$' || true)" ]; then
+  echo "ERRO: '${DOOR}' nunca foi materializada pelo motor (pin n/a) e o repo dela guarda outro conteúdo, sem .claude/. Substituí-lo é a 1ª materialização, uma fase própria (onion-mini: F5, SAC-94) — este motor não apaga o que não reconhece como porta." >&2
+  exit 2
+fi
 
 # ── (3) PARIDADE DE PAPEL antes de materializar ──────────────────────────────────────────────
 # Registro × carimbo publicado (HEAD do clone). Divergência RECUSA: foi lendo uma fonte em vez da
@@ -363,9 +373,9 @@ fi
 if [ "${ROLE}" = "plugins" ]; then
   _refs="$(find "${DEST}/plugins" -path '*/.claude-plugin/provenance.json' -exec sed -n 's/.*"ref"[[:space:]]*:[[:space:]]*"\([0-9a-f]*\)".*/\1/p' {} + 2>/dev/null | sort -u)"
   if [ "${_refs}" = "${PIN_FULL}" ]; then
-    echo "  (5b) paridade: todo provenance.json aponta ${PIN} (origin/${INTEG})"
+    echo "  (5b) paridade: todo provenance.json aponta ${PIN} (${SRC_REF})"
   else
-    echo "✗ (5b) provenance.json não aponta origin/${INTEG} (${PIN}): $(printf '%s' "${_refs}" | tr '\n' ' ')" >&2; FAIL=1
+    echo "✗ (5b) provenance.json não aponta ${SRC_REF} (${PIN}): $(printf '%s' "${_refs}" | tr '\n' ' ')" >&2; FAIL=1
   fi
 else
   _new="$(cat "${DEST}/.claude/.onion-version" 2>/dev/null || true)"

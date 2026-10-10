@@ -58,7 +58,7 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
     o standalone e o mini dos congelados e supera o corte de 2026-09-14 (tudo viajava para o
     standalone, adoção inclusa). O corte por porta é a F2, e o comando único é a F3; as quatro portas passam
     por ele (a skill `onion-publish` virou a condução). Falta a F4 (tirar `plugins/` do core) e a F5
-    (a 1ª materialização do mini, que até lá só ensaia).
+    (a 1ª materialização do mini, que até lá o motor recusa).
 
   > ⚠️ **`onion-core` faltava nesta lista até 2026-09-23**, e a causa é de datas: a decisão dos dois
   > regimes foi selada em **16/09** e a porta nasceu pública em **17/09** — um dia depois, sem
