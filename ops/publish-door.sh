@@ -525,7 +525,11 @@ if [ "${PUSH}" -ne 1 ]; then
   echo
   if [ "${COMMITTED}" -eq 1 ]; then
     echo "✅ ENSAIO concluído: verificado e commitado no clone, NÃO publicado (pin ${PIN_FULL})."
-    echo "   Para publicar: /meta:publish ${DOOR} — que pergunta antes e passa --push --expect-pin ${PIN}."
+    if [ -n "${FROM_REF}" ]; then
+      echo "   Ensaio de BRANCH: isto não se publica. Depois do merge, ensaie de origin/${INTEG} e publique pelo /meta:publish ${DOOR}."
+    else
+      echo "   Para publicar: /meta:publish ${DOOR} — que pergunta antes e passa --push --expect-pin ${PIN}."
+    fi
   else
     echo "✅ ENSAIO concluído: verificado; a porta já espelha ${SRC_REF}, nada a publicar."
   fi
