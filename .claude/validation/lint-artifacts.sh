@@ -371,6 +371,19 @@ _role() {
   [ -n "${_ROLE_OF_THIS_REPO}" ] || _ROLE_OF_THIS_REPO="source"
   printf '%s' "${_ROLE_OF_THIS_REPO}"
 }
+# ── QUEM PUBLICA O MARKETPLACE (2026-10-10, F2 das portas) ──────────────────────────────────────
+# As REGRAS 19 e 37 julgam a SAÍDA de publicação do core (plugins/ e .claude-plugin/marketplace.json). Até
+# a F2 só o adotante e o hub as pulavam (IS_DERIVED); o standalone não levava utils/marketplace e elas
+# não tinham o que ler. Com a matriz, o standalone LEVA utils/marketplace (o /meta:create-vertical o usa)
+# e as duas regras passaram a reprovar a porta por não ter o marketplace que ela não publica — 21 HARD
+# medidos na materialização de 2026-10-10. A pergunta certa não é "este repo é derivado?" (IS_DERIVED,
+# que é porteiro de 17 guardas e o standalone NÃO pode entrar nele), é "este repo publica o marketplace?":
+# sim na fonte (`source`), e em qualquer papel que de fato tenha o catálogo na raiz. Fora disso, nada a
+# julgar. No core o catálogo existe e o papel é `source`, logo a cobrança ali não muda.
+_publishes_marketplace() {
+  [ "$(_role)" = "source" ] && return 0
+  [ -f "${REPO_ROOT}/.claude-plugin/marketplace.json" ]
+}
 # A ausência só é LEGÍTIMA se o objeto de fato não existe E o papel não é a fonte. Existir-e-estar-
 # quebrado continua HARD em qualquer papel: o recorte é sobre NÃO RECEBER, nunca sobre "está ruim".
 _without_object_for_role() {
@@ -1573,6 +1586,7 @@ check_plugins_sync() {
   # vendorizada mas a SAÍDA gerada (plugins/ + marketplace.json) não. Guarda POR PAPEL (não só por
   # ferramenta) — sinal de campo 2026-07-10 (12 HARD falsos bloqueavam todo commit do adotante).
   [ "${IS_DERIVED}" -eq 1 ] && return 0
+  _publishes_marketplace || return 0     # porta que não publica o catálogo (standalone/plugins/mini) — F2 das portas
   [ -f "${asm}" ] || return 0            # sem assembler → nada a checar (repo sem a feature)
   [ -d "${vdir}" ] || return 0
   command -v jq >/dev/null 2>&1 || return 0   # sem jq → pula gracioso (mesma graça dos outros)
@@ -1714,6 +1728,7 @@ check_role_bundle_sync() {
   local mkt="${REPO_ROOT}/.claude-plugin/marketplace.json"
   # consumidor não carrega marketplace.json — mesma guarda por papel de check_plugins_sync (sinal de campo)
   [ "${IS_DERIVED}" -eq 1 ] && return 0
+  _publishes_marketplace || return 0     # porta que não publica o catálogo — F2 das portas
   [ -f "${roles}" ] || return 0
   command -v python3 >/dev/null 2>&1 || return 0
   python3 -c "import yaml" >/dev/null 2>&1 || return 0
