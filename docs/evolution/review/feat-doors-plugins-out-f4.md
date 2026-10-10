@@ -2,7 +2,8 @@
 title: 'Resíduo — F4 das portas: o plugins/ montado sai do core'
 date: 2026-10-10
 branch: feat/doors-plugins-out-f4
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: de9ad8758d6bf88082067b9da11a6a55986e29fa996882d8fa54c29bdcc62e45
+reviewed_code_sha256: 24cdcae71a7c97096188bb9b6105cd08011df1cdc50eac0b1ee370c80e03b9e8
 findings_total: 16
 findings_real: 16
 findings_fixed: 12
