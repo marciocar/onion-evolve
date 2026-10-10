@@ -1,0 +1,225 @@
+# kg-backlog-guard: on
+# ═══ TETO: 16 NÓS ═══
+meta:
+  id: machine-path-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-10"
+  review_after: "2026-11-24"
+  note: "Forja (/meta:forge-guard) da guarda de CAMINHO DE MÁQUINA pela CLASSE nos .kg.yaml, SAC-103, selo P3 do maestro na onda O5 do SAC-73. O fato mora aqui; o backlog só cita estes ids."
+nodes:
+  - id: E_DEFEITO_CAMINHO_DE_MAQUINA_NAS_ONDAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: "2026-10-10"
+    verified_against: "a classe de machine_path.py rodada sobre os 147 grafos não-fixture de origin/main em e03952c2 (2026-10-08, antes das ondas) e sobre os 146 de hoje; resumos das ondas O5 e O7 em data/provenance-triage do grafo contrato-kg-absorcao-2026-10"
+    label: "O DEFEITO, DATADO: antes das ondas O4–O7 (SAC-73, 2026-10-09/10) o corpus tinha 247 caminhos de máquina em 180 nós; as ondas os limparam à mão e restaram 3 nós marcados. Nada impedia a volta: a única régua era uma lista de diretórios no migrador."
+    narrative: "Medido nesta forja com a classe nova: no corpus de 2026-10-08 (e03952c2), 247 ocorrências em 180 nós — 213 de raiz de sistema, 19 de til do home, 8 de hostname, 5 de til de conta, 1 de barra dupla e 1 de argumento de shell. Hoje: 0 acusações e 9 ocorrências isentas em 3 nós com x_path_is_content (2 citação, 1 receita). A lista de diretórios errou pelo vocabulário dos dois lados, medido nas ondas: falsos negativos o cd para outro repo por caminho absoluto (omissão do juiz da O5), as raízes tmp e proc sem barra final e as raízes boot e opt fora do brief (M1 da O5), a barra dupla da permissão (J-O7-1) e o til de conta (A7); falsos positivos o diretório lib dentro de caminho relativo (4 nós na O5), os comandos do namespace meta, endpoints, URLs e globs relativos. O juiz da O5 mediu que a busca de classe SEM isenções casava 161 nós, 97 deles falsos positivos (P3)."
+    provenance:
+      source: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o5-juiz-resumo.md"
+      locator: "Busca própria (regra 1), itens P3 e P4; o5-resumo.md P3 e M1; o7-juiz-resumo.md J-O7-1 e A7; contagem pré-ondas pela classe em e03952c2"
+      method: "medição: kg-machine-path-check.sh e a classe de machine_path.py sobre o corpus de e03952c2 extraído por git archive e sobre o corpus vivo"
+      locality: "repo"
+
+  - id: E_CENSO_CLASSE_NOVA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-10"
+    verified_against: "GUARD_CENSUS_QUERY='path machine caminho provenance ' bash .claude/validation/guard-census.sh . --markdown"
+    label: "O censo de guardas (2026-10-10) não achou guarda da classe — nenhum arquivo de guarda menciona os termos — e mediu 229 famílias de bancada e 17 moldes de check de lint; a classe era nova."
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "seções 'já existe guarda' e 'moldes por SUBSTRATO' da saída de 2026-10-10"
+      method: "medição: guard-census.sh com GUARD_CENSUS_QUERY, rodado pela sessão da forja"
+      locality: "repo"
+
+  - id: D_SUBSTRATO_CONTRATO_E_CATRACA_NO_LINT
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/validation/kg-machine-path-check.sh"
+    label: "Substrato: dois lugares e uma classe. O kg-contract-check.sh cobra o grafo NOVO limpo e o rastreado sem piora; a REGRA 99 do lint é a catraca do corpus (passivo zero). A classe vive em machine_path.py, importada também pelo migrador."
+    narrative: "Molde copiado: kg-yaml-validity-check.sh (REGRA 78), a catraca com baseline versionado e CATRACA-VIOLADA contra origin/main, escolhido no censo entre os 17 moldes de check de lint porque é o único sobre o corpus de .kg.yaml com baseline. O baseline também lista os nós isentos: marcar é permitido pelo selo P4, mas isenção nova sai SOFT (ISENCAO-NOVA) até entrar no baseline, à vista no diff. Hook PreToolUse foi descartado: o grafo nasce por Write/Edit de muitas formas e a pergunta é de corpus, não de comando. A regex ABS_FS_RE do kg-migrate-v3.py foi EXTRAÍDA (não copiada) para machine_path.py; o migrador a importa com o mesmo nome, e as 26 asserções do kg_migrate_v3 e do kg_contract_check seguiram verdes."
+
+  - id: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    trace: ".claude/utils/kg/machine_path.py"
+    label: "A classe é: absoluto de RAIZ DE SISTEMA no início de token (FHS 3.0 + snap, nix, Users, Volumes, private), com ou sem barra; absoluto de QUALQUER raiz como argumento de shell; barra dupla; file://; til do home; til de conta; hostname."
+    narrative: "Por que não o absoluto puro no início de token, que é a letra do selo: medido no corpus de hoje, ele casa 107 caminhos de vários segmentos fora das raízes de sistema, em 62 nós, e todos são endpoint (as rotas v1, admin e api), caminho de URL, rota do site, caminho dentro de imagem de contêiner ou caminho enraizado em placeholder do cgroupfs — zero caminho de máquina. Endpoint e caminho de host são lexicamente indistinguíveis fora de contexto, e a doutrina manda a guarda errar para CALAR. O único caminho de raiz não-sistema que as ondas mediram como verdadeiro (o outro repo do E_REEXECUCAO) vinha como argumento de cd, e a classe o pega por esse contexto. A raiz de sistema não é lista ad hoc: é o FHS, o padrão que define a árvore de um host. A raiz run NUA fica de fora (também é comando); com barra final ela acusa. Hostname: o do processo e os lineages.*.host do members.yaml."
+
+  - id: E_HOSTNAME_DO_MEMBERS_NOMEIA_SERVICO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-10-10"
+    verified_against: "1ª redação de known_hosts() lendo todo host: do members.yaml, rodada no corpus vivo"
+    label: "A 1ª redação lia todo host: do members.yaml e acusou 218 citações legítimas: um bloco de deploy usa host: com o NOME DO SERVIÇO (onion-bridge), não da máquina. Curado no mesmo laço: só lineages.*.host vale como máquina."
+    provenance:
+      source: "docs/evolution/federation/members.yaml"
+      locator: "chave host: do bloco de deploy do bridge, ao lado das lineages workstation e product"
+      method: "medição: varredura do corpus com a 1ª e a 2ª redação de known_hosts(), 218 → 0 acusações de hostname"
+      locality: "repo"
+
+  - id: E_DOGFOOD_CORPUS_ACHOU_O_QUE_AS_ONDAS_DEIXARAM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-10"
+    verified_against: "bash .claude/validation/kg-machine-path-check.sh . e --list-exempt, antes e depois da cura do label"
+    label: "Dogfood no corpus real: a 1ª passada acusou 1 caminho que as quatro ondas não viram — o cd para outro repo por caminho absoluto, no label de E_REEXECUCAO_DOS_COMANDOS_REAIS (a O5 reescreveu só a provenance). Curado pela forma; agora 0 acusações e 3 nós isentos."
+    narrative: "Depois da cura: 146 grafos, 0 acusações, 3 nós isentos com 9 ocorrências — E_SKILL_INSTALL_PROMPT_AND_CURL (citação, til do home em verified_against e locator), E_F4_CLAUDE_JSON_CONCORRENTE (citação, til do home no locator) e E_m3_portabilidade_executada (receita, as raízes usr, bin e tmp em verified_against e locator). O label foi reescrito pela forma, como a O5 fez com E_DEFEITO: o literal segue versionado nos rótulos _case da bancada dos vetos. Comparação com a regex antiga (a da O7) sobre o corpus de e03952c2: 201 valores acusados pelas duas, 0 só pela antiga, 1 só pela nova (o outro repo) — a classe não perdeu nada do que a lista via."
+    provenance:
+      source: ".claude/validation/kg-machine-path-check.sh"
+      locator: "saída humana e --list-exempt no corpus vivo; vetos-por-tokens-2026-10.kg.yaml, label de E_REEXECUCAO_DOS_COMANDOS_REAIS"
+      method: "medição: a guarda no corpus vivo antes e depois da cura, e a regex antiga contra a nova no corpus de e03952c2"
+      locality: "repo"
+
+  - id: E_DOGFOOD_MODO_DE_FALHA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-10"
+    verified_against: "grafo-fixture novo (não rastreado) com as formas argumento de cd, barra dupla da permissão, raiz tmp e til de conta, mais um comando do namespace meta, um POST de endpoint e o descarte de stderr, julgado por kg-contract-check.sh"
+    label: "Modo de falha: um grafo novo com quatro formas de caminho de máquina reprovou no kg-contract-check com rc 1 e quatro MACHINE-PATH; o comando do namespace meta, o POST de endpoint e o descarte de stderr no mesmo grafo calaram."
+    provenance:
+      source: ".claude/validation/kg-contract-check.sh"
+      locator: "saída: quatro linhas MACHINE-PATH, kinds acct e fs em E_A.verified_against, dbl e shell em Q_A.label; rc=1"
+      method: "medição: kg-contract-check.sh sobre o grafo-fixture, apagado depois"
+      locality: "repo"
+
+  - id: E_MUTANTES_MORDEM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-10"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families kg_machine_path,kg_contract_check, com e sem mutantes"
+    label: "Mutantes: 16 na classe (um por forma e um por isenção, automatizados na bancada) e 4 na produção (registro no dispatcher, worse_mp e mp_before do kg-contract-check, a catraca) — todos morderam com LC_ALL=C."
+    narrative: "Na classe: tirar cd do verbo, a raiz nua, boot, opt, a barra dupla, o til de conta, o til, o file://, o hostname, a isenção dos fluxos padrão de dev, o início de token, o ponto no segmento da barra dupla, a raiz de sistema (trocada por qualquer raiz), o /run nu, a condição do P4 e a validade do marcador — cada um reprova o caso nomeado, e mutante que não se aplica é FALHA, nunca verde. Na produção: comentar check_kg_machine_path reprova (g); worse_mp vazio reprova (i1) e (i3); mp_before vazio reprova (i2); desligar a catraca reprova (e)."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_kg_machine_path_selftests (casos a–h e m) e run_kg_contract_check_selftests (i1–i3)"
+      method: "medição: bancada com LC_ALL=C, 24/24 e 29/29 verdes; cada mutante de produção aplicado à mão e revertido"
+      locality: "repo"
+
+  - id: C_TETO_RAIZ_QUE_NAO_E_DE_SISTEMA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    trace: ".claude/utils/kg/machine_path.py"
+    label: "TETO: absoluto de raiz que não é de sistema FORA de argumento de shell (raízes como workspace ou data em prosa) passa calado — é indistinguível de endpoint, e a guarda erra para calar. Caminho dentro de imagem de contêiner (raiz app) também passa, por desenho."
+
+  - id: C_TETO_VARIAVEL_WINDOWS_E_FORA_DE_NO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.85
+    trace: ".claude/utils/kg/machine_path.py"
+    label: "TETO: não vê a variável HOME (não é literal), caminho Windows (C:\\), o que está fora de nó (meta.note, arestas) nem comentário YAML. A O7 achou um hostname num meta.note; aquela classe fica fora desta guarda."
+
+  - id: C_TETO_HOSTNAME_DE_OUTRA_MAQUINA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    trace: ".claude/utils/kg/machine_path.py"
+    label: "TETO: hostname só vale para o host do processo e os lineages.*.host do members.yaml. No CI o processo é o runner, então ali a guarda vê só o do members; hostname de máquina que não está lá (adotante, outra VPS) passa calado."
+
+  - id: C_TETO_MARCADOR_AUTODECLARADO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    trace: ".claude/validation/kg-machine-path-check.sh"
+    label: "TETO: o x_path_is_content é declarado por quem escreve o nó. A guarda não sabe se o caminho É o conteúdo; ela só torna a isenção visível (SOFT ISENCAO-NOVA até o baseline) e nega a isenção a home de conta e hostname fora de citação."
+
+  - id: C_TETO_VERBOS_DE_SHELL_SAO_LISTA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.75
+    trace: ".claude/utils/kg/machine_path.py"
+    label: "TETO: o contexto de shell é uma LISTA de verbos e o redirecionamento. Raiz não-sistema depois de outro verbo (um clone para destino absoluto) passa calada: guarda de lista falha pelo vocabulário."
+    narrative: "Os verbos: cd, pushd, ls, cat, source, rm, cp, mv, mkdir, touch, stat, tee, du, find, chmod, chown e a flag -C; mais o redirecionamento depois de espaço, dígito ou e-comercial."
+
+  - id: C_TETO_FALAR_DA_FORMA_EXIGE_PERIFRASE
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-10-10"
+    verified_against: "kg-contract-check.sh sobre a 1ª redação deste grafo: rc 1 com 20 MACHINE-PATH, em 6 nós que DESCREVIAM as formas da guarda"
+    label: "TETO medido na própria forja: a guarda não distingue USAR um caminho de FALAR dele. A 1ª redação deste grafo levou 20 acusações nos nós que descreviam as formas; curei por perífrase. Pesquisa sobre caminhos terá de marcar o nó ou parafrasear."
+    narrative: "O marcador x_path_is_content resolve parte: vetor e receita isentam as raízes de sistema, mas, pelo selo P4, não isentam til do home, til de conta nem hostname — só a citação de terceiro isenta esses. Descrever a guarda num nó, portanto, exige perífrase para essas três formas. É o mesmo preço que a REGRA 98 cobrou da superfície do /meta:forge-guard (a diretiva que não pode ser escrita, só descrita). Se a reincidência aparecer em pesquisa legítima, o gatilho de revisão é um 4º valor de marcador para FORMA DESCRITA, selado pelo maestro."
+    provenance:
+      source: ".claude/validation/kg-contract-check.sh"
+      locator: "1ª passada sobre docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml, antes da perífrase"
+      method: "medição: kg-contract-check.sh rodado pela sessão da forja, rc 1 e depois rc 0"
+      locality: "repo"
+
+edges:
+  - from: C_TETO_FALAR_DA_FORMA_EXIGE_PERIFRASE
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: CONSTRAINS
+  - from: E_DEFEITO_CAMINHO_DE_MAQUINA_NAS_ONDAS
+    to: D_SUBSTRATO_CONTRATO_E_CATRACA_NO_LINT
+    edge_type: SUPPORTS
+  - from: E_CENSO_CLASSE_NOVA
+    to: D_SUBSTRATO_CONTRATO_E_CATRACA_NO_LINT
+    edge_type: SUPPORTS
+  - from: E_DEFEITO_CAMINHO_DE_MAQUINA_NAS_ONDAS
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: SUPPORTS
+  - from: E_HOSTNAME_DO_MEMBERS_NOMEIA_SERVICO
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_CORPUS_ACHOU_O_QUE_AS_ONDAS_DEIXARAM
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_MODO_DE_FALHA
+    to: D_SUBSTRATO_CONTRATO_E_CATRACA_NO_LINT
+    edge_type: SUPPORTS
+  - from: E_MUTANTES_MORDEM
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: SUPPORTS
+  - from: C_TETO_RAIZ_QUE_NAO_E_DE_SISTEMA
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: CONSTRAINS
+  - from: C_TETO_VARIAVEL_WINDOWS_E_FORA_DE_NO
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: CONSTRAINS
+  - from: C_TETO_HOSTNAME_DE_OUTRA_MAQUINA
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: CONSTRAINS
+  - from: C_TETO_VERBOS_DE_SHELL_SAO_LISTA
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: CONSTRAINS
+  - from: C_TETO_MARCADOR_AUTODECLARADO
+    to: D_SUBSTRATO_CONTRATO_E_CATRACA_NO_LINT
+    edge_type: CONSTRAINS

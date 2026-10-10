@@ -1,0 +1,7 @@
+# kg-machine-path-baseline — a dívida TOLERADA da REGRA 99 (caminho de máquina em nó de .kg.yaml).
+# Gerado por: bash .claude/validation/kg-machine-path-check.sh --emit-baseline
+# passivo<TAB>grafo<TAB>nó<TAB>campo<TAB>token — caminho tolerado; o número só ENCOLHE (crescer vs origin/main é HARD).
+# isento<TAB>grafo<TAB>nó<TAB>marcador — nó com x_path_is_content (selo P4) que isenta algo; isenção nova sai SOFT até entrar aqui.
+isento	docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml	E_SKILL_INSTALL_PROMPT_AND_CURL	citação
+isento	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml	E_m3_portabilidade_executada	receita
+isento	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml	E_F4_CLAUDE_JSON_CONCORRENTE	citação

@@ -686,18 +686,14 @@ O4_KEEP = re.compile(r'^\(inalterad[oa]\)$')
 #   Recusa atômica por linha, além das da O4: CAMINHO DE MÁQUINA (absoluto de sistema ou ~/) que sobre em source,
 #   locator OU method finais (inclusive no valor mantido), e plano incompatível com a ação.
 O5_ACTIONS = ("reescrever-locator-method", "manter-prod-binario", "manter-dev-binario", "dev-sem-versao")
-# caminho de arquivo do host (não rota HTTP como /threads): raiz de sistema ou ~/. Desde a O7 (achado J-O7-1 do
-# juiz, item A7 selado): também a BARRA DUPLA (`Read(//home/…)`, a sintaxe de permissão do Claude Code; exige a barra
-# depois do diretório e não casa depois de `:`, para `https://dev.to` não virar caminho) e `~<conta>/` seguido de
-# letra (`~onion/whatsapp-sender`; `~abril/2026`, que é aproximação de data, fica de fora).
-# Selo A4 do maestro (2026-10-10): /dev/null, /dev/stdin, /dev/stdout e /dev/stderr são parte do comando, iguais em
-# qualquer Linux — não são caminho desta máquina, ficam literais e a guarda os isenta. Selo A6: caminho RELATIVO do
-# repo (docs/discussions/onion-pessoal-marcio/…) é legítimo; a guarda nunca o olhou (só raiz de sistema e ~).
-_DEV_STD = r'(?!dev/(?:null|stdin|stdout|stderr)(?![\w/.-]))'
-_SYS_DIRS = _DEV_STD + r'(?:home|etc|var|usr|tmp|opt|root|srv|boot|run|proc|sys|mnt|lib|bin|sbin|dev|snap|media)'
-ABS_FS_RE = re.compile(r'(?:^|[\s"\'(=,;\[`:])(?:~/|/' + _SYS_DIRS + r'(?:/|\b))'
-                       r'|(?:^|[\s"\'(=,;\[`])//' + _SYS_DIRS + r'/'
-                       r'|(?:^|[\s"\'(=,;\[`:])~[a-z_][a-z0-9_-]*/(?=[A-Za-z._])')
+# caminho de máquina: A CLASSE mora em machine_path.py (SAC-103, 2026-10-10), importada daqui e pela guarda
+# (kg-machine-path-check.sh, kg-contract-check.sh) — uma regex, nunca duas cópias. A história das extensões
+# (a barra dupla e o til de conta da O7, item A7; os selos A4 e A6) está no cabeçalho do módulo. O nome
+# ABS_FS_RE fica: o uso aqui é `ABS_FS_RE.search(v)`, e o módulo o oferece com essa forma.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import machine_path  # noqa: E402
+
+ABS_FS_RE = machine_path.ABS_FS_RE
 
 
 def _get_provenance(block):
@@ -906,13 +902,8 @@ _LABEL_PREV = "label anterior: "
 _TRACE_PREV_HOST = "trace anterior (só no host): "
 
 
-def _host_re():
-    import socket
-    h = (socket.gethostname() or "").split(".")[0]
-    return re.compile(r'\b' + re.escape(h) + r'\b') if len(h) >= 6 else None
-
-
-_HOST_RE = _host_re()
+# o hostname deste host (e os de KG_MACHINE_PATH_HOSTS), pela mesma fonte da guarda
+_HOST_RE = machine_path.host_re(machine_path.known_hosts())
 
 
 def _machine(v):
