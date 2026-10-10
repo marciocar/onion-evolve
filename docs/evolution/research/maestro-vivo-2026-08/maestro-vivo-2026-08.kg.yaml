@@ -945,7 +945,8 @@ nodes:
     confidence: 0.95
     verified_at: 2026-09-01
     verified_against: 'dogfood ponta-a-ponta do modo-de-falha do TETO (wf_15ebe561-003): teto 150k selecionou 2/8 por atencao, nomeou 6 NAO_MEDIDO_POR_TETO, juiz reprovou os 2 CONFIRMED preguicosos e a selagem recusou carimbo (0 stamps — AUDIT integro); extrator provou retomada KG-runtime (22 a-medir pos-revisao = exatamente os reprovados); bancada census-extract 3/3'
-    label: 'A forma que rodou 2x a 5M+ renascendo em /tmp virou COMANDO: /meta:census (extrator determinstico + molde versionado com teto que PARA por contagem + selagem AUDIT + listagem-projecao). Ordem do maestro cumprida: KG-SSOT first/runtime (estado de retomada = carimbo nos grafos) e custo mecanico (incremental default; custo/no observado 88k no dogfood vs price 74k — recalibrar na 1a rodada real).'
+    label: "A forma que rodou 2x a 5M+ renascendo no diretório temporário virou o comando /meta:census (extrator determinístico, molde com teto que PARA, selagem AUDIT, listagem-projeção): retomada pelos grafos, incremental por padrão; custo/nó 88k no dogfood vs 74k previsto."
+    narrative: "label anterior: A forma que rodou 2x a 5M+ ⟨renascendo no diretório temporário⟩ virou COMANDO: /meta:census (extrator determinstico + molde versionado com teto que PARA por contagem + selagem AUDIT + listagem-projecao). Ordem do maestro cumprida: KG-SSOT first/runtime (estado de retomada = carimbo nos grafos) e custo mecanico (incremental default; custo/no observado 88k no dogfood vs price 74k — recalibrar na 1a rodada real)."
     trace: ".claude/commands/meta/census.md · docs/analysis/backlog-real-census-dogfood-2026-09-01.md"
     provenance:
       source: ".claude/commands/meta/census.md · docs/analysis/backlog-real-census-dogfood-2026-09-01.md"

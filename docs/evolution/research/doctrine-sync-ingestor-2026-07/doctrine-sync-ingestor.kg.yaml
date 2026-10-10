@@ -57,7 +57,8 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-18
-    label: "deep-research (skill do harness) despeja em /tmp efemero e nao persiste no KG-SSOT — write(KG) depende de lembrar (semente + desbloqueio do onion-pessoal)"
+    label: "deep-research (skill do harness) despeja no diretório temporário efemero e nao persiste no KG-SSOT — write(KG) depende de lembrar (semente + desbloqueio do marcio-pessoal)"
+    narrative: "label anterior: deep-research (skill do harness) ⟨despeja no diretório temporário efemero⟩ e nao persiste no KG-SSOT — write(KG) depende de lembrar (semente + ⟨desbloqueio do marcio-pessoal⟩)"
     trace: "docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md"
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md"
@@ -73,7 +74,8 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "granaai entregou 4 sinais de doutrina ao core: integridade-nao-eh-rastreabilidade (TRACES_TO), fail-open do radar, validador-local-delega-radar, formalizar /meta:kg map"
-    narrative: "trace anterior (só no host): docs/evolution/inbox/_processed/ do clone local de granaai (host). No remoto do granaai, até 2026-07-18, esse diretório só tinha .gitkeep (último commit 570a45a1, 2026-07-09); os 4 sinais (from: granaai) estão versionados na cópia do core, que a source deste nó já cita."
+    narrative: "trace anterior (só no host): docs/evolution/inbox/_processed/ do clone local de granaai (host). No remoto do granaai, até 2026-07-18, esse diretório só tinha .gitkeep (último commit 570a45a1, 2026-07-09); os 4 sinais (from: granaai) estão versionados na cópia do core, que a source deste nó já cita. · trace na O7 (selo do maestro 2026-10-10, 3º ramo): aponta as 4 cópias versionadas no core (from: granaai), que são o próprio sinal entregue. O original no clone do granaai não existe mais para comparar: o _processed de lá só tem .gitkeep (medido em 2026-10-10)."
+    trace: "onion-evolve@00e9ac24:docs/evolution/inbox/_processed/2026-07-17-redogfood-kg-sdaal-validation-gaps.md · onion-evolve@80dcfc71:docs/evolution/inbox/_processed/2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md · onion-evolve@00e9ac24:docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md · onion-evolve@00e9ac24:docs/evolution/inbox/_processed/2026-07-17-kg-discovery-granaai-canonical-monorepo.md"
     provenance:
       source: "docs/evolution/inbox/_processed/ (onion-evolve)"
       locator: "_processed/2026-07-17-redogfood-kg-sdaal-validation-gaps.md l.2, l.15 (rastreabilidade/TRACES_TO); 2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md l.2 (fail-open do radar); 2026-07-17-kg-fail-open-primo-validador-local-duplicado.md l.2, l.20 (validador local duplicado → radar); 2026-07-17-kg-discovery-granaai-canonical-monorepo.md l.69 ('/meta:kg map <projeto>'); SYNTHESIS.md l.48-51"

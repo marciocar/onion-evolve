@@ -20,7 +20,7 @@ nodes:
     verified_against: "leva de 2026-10-07/08, sessão do core e dois forks: 7 vetos do pretooluse-env-guard.sh, todos reproduzidos na cura do SAC-68 com o JSON do PreToolUse"
     trace: ".claude/hooks/pretooluse-env-guard.sh"
     label: "o veto do .env barra comando que não lê .env e leitura que não expõe valor; em uma leva foram 7 vetos e 7 contornos"
-    narrative: "Dois em comando que não tocava .env nenhum: o laço de espera do CI (um `*)` de case lido como glob na posição de comando) e um grep com glob ops/testing/*. Três em leitura que não expunha valor: laço sobre diretórios chamando o env-check.sh de cada repo, glob /home/marcio/*/ e grep -c de CR no .env. Um num corpo de heredoc (`base:**` virando o glob `**`). E um no próprio registro deste nó: heredoc que só CITAVA o nome do arquivo num texto de grafo."
+    narrative: "Dois em comando que não tocava .env nenhum: o laço de espera do CI (um `*)` de case lido como glob na posição de comando) e um grep com glob ops/testing/*. Três em leitura que não expunha valor: laço sobre diretórios chamando o env-check.sh de cada repo, ⟨glob sobre os diretórios do home da conta⟩ e grep -c de CR no .env. Um num corpo de heredoc (`base:**` virando o glob `**`). E um no próprio registro deste nó: heredoc que só CITAVA o nome do arquivo num texto de grafo."
     provenance:
       source: ".claude/hooks/pretooluse-env-guard.sh na main 2beae385"
       locator: "as 7 formas reproduzidas no harness do SAC-68 (6 vetos com a mensagem literal de cada um)"

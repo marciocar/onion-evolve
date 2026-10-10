@@ -213,8 +213,8 @@ nodes:
     confidence: 1.0
     verified_at: 2026-08-29
     verified_against: "md5sum + PyYAML nos dois caminhos, medido direto"
-    label: 'EXISTEM DUAS CÓPIAS DO SSOT DA FEDERAÇÃO NESTA MÁQUINA, E ELAS DIVERGEM. /home/marcio/onion-evolve/docs/evolution/federation/members.yaml — md5 a31526aa, mtime 2026-08-17, 9 adopters (o vivo, versionado em git). /home/onion/onion-evolve/…/members.yaml — md5 ad1701c9, mtime 2026-08-13, 8 adopters: falta `poc-venda-direta-pdi`. Foi esta divergência que produziu o 9-vs-8 entre dois workers da mesma rodada — um rodou o projetor a partir do repo vivo, o outro leu o espelho caduco. Divergência de fonte entre workers é ACHADO, não ruído, e este cobrou a dívida: um nó foi declarado CONFIRMED sobre uma enumeração errada.'
-    narrative: "trace anterior também apontava a 2ª cópia do members.yaml na home da conta de serviço onion (host, sem permissão hoje)."
+    label: "Há DUAS cópias do members.yaml nesta máquina e elas divergem: a do clone vivo do core (md5 a31526aa, 9 adopters, versionada) e um espelho caduco no clone do core da conta de serviço do bridge (md5 ad1701c9, 8, sem poc-venda-direta-pdi). Isso gerou o 9-vs-8 entre workers."
+    narrative: "trace anterior também apontava a 2ª cópia do members.yaml na home da conta de serviço onion (host, sem permissão hoje). · label anterior: EXISTEM DUAS CÓPIAS DO SSOT DA FEDERAÇÃO NESTA MÁQUINA, E ELAS DIVERGEM. ⟨docs/evolution/federation/members.yaml do clone vivo do core⟩ — md5 a31526aa, mtime 2026-08-17, 9 adopters (o vivo, versionado em git). ⟨a cópia do members.yaml no clone do core da conta de serviço do bridge⟩ — md5 ad1701c9, mtime 2026-08-13, 8 adopters: falta `poc-venda-direta-pdi`. Foi esta divergência que produziu o 9-vs-8 entre dois workers da mesma rodada — um rodou o projetor a partir do repo vivo, o outro leu o espelho caduco. Divergência de fonte entre workers é ACHADO, não ruído, e este cobrou a dívida: um nó foi declarado CONFIRMED sobre uma enumeração errada."
     trace: "docs/evolution/federation/members.yaml"
     provenance:
       source: "ec4c8442 (corpo do commit) + ec4c8442:docs/evolution/federation/members.yaml"

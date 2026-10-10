@@ -576,7 +576,8 @@ nodes:
     status: confirmed
     verified_against: research-2026-07
     verified_at: 2026-07-17
-    label: "Doc oficial confirma cascata managed > cli > local > project > user, locais de  (/etc/claude-code/, …"
+    label: "Doc oficial confirma cascata managed > cli > local > project > user, locais de  (diretório de config de sistema do claude-code, …"
+    narrative: "label anterior: Doc oficial confirma cascata managed > cli > local > project > user, ⟨locais de  (diretório de config de sistema do claude-code, …⟩"
     trace: "ver H3"
     provenance:
       source: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"

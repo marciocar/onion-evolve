@@ -402,7 +402,8 @@ nodes:
     source_tier: 10
     source_kind: internal-audit
     label: 'OBJECAO 1 (Elenxo, 1 agente sem votacao) — o achado PROVA O CONTRARIO do que a pergunta precisa: se o exit 2 e NATIVO da plataforma e documentado publicamente, ele e um PRIMITIVO GRATIS disponivel a qualquer concorrente, nao unidade bilhetavel nem moat. Qualquer um escreve um hook que sai 2; ninguem paga pelo que a plataforma da de graca. E o CLAUDE.md ja diz que isso compra o acoplamento — comprar acoplamento NAO e gerar receita, e a rodada confunde as duas coisas. CORRECAO DE NUMERO desta sessao, porque refutador tambem se re-mede: o Elenxo declarou 117 ocorrencias de PreToolUse no binario; medido aqui com `grep -ao` sao 243 (provavel diferenca de metodo, linhas versus ocorrencias). A direcao da objecao nao muda.'
-    narrative: "trace anterior (só no host): o binário do Claude Code 2.1.286 no diretório de versões do usuário (host; versão não mais instalada)."
+    narrative: "trace anterior (só no host): o binário do Claude Code 2.1.286 no diretório de versões do usuário (host; versão não mais instalada). · trace restaurado na O7 (selo do maestro 2026-10-10, item 1 da O6): o binário de versão fixa volta ao trace na forma binário do Claude Code <versão>, público no npm."
+    trace: "binário do Claude Code 2.1.286"
     provenance:
       source: "binário do Claude Code 2.1.286"
       locator: "achado 1 (exit 2 nativo, tier 9) lido contra a medicao local de 2026-10-01: o binario 2.1.286 traz 243 ocorrencias de PreToolUse e 195 de bypassPermissions — o Elenxo declarou 117, numero que NAO reproduz aqui"
