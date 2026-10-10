@@ -376,7 +376,8 @@ _role() {
   fi
   [ -n "${_ROLE_OF_THIS_REPO}" ] || _ROLE_OF_THIS_REPO="source"
   # a porta `source` (kind: door) não é a fonte: a ausência de objeto nela é legítima como em toda porta
-  if [ "${_ROLE_OF_THIS_REPO}" = "source" ] && _stamp_has '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)'; then
+  # (grep direto no stamp, sem `_stamp_has`: a bancada role_scope extrai SÓ este bloco e o roda isolado)
+  if [ "${_ROLE_OF_THIS_REPO}" = "source" ] && grep -qE '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)' "${stamp}" 2>/dev/null; then
     _ROLE_OF_THIS_REPO="source-door"
   fi
   printf '%s' "${_ROLE_OF_THIS_REPO}"
@@ -1813,17 +1814,18 @@ for t, names in sorted(owner.items()):
 mdir = os.path.join(root, ".claude", "commands", "meta")
 # A partição julga o que é RASTREADO (o que o transporte pode levar): a bancada planta sondas não
 # rastreadas em commands/meta/ para testar OUTRAS regras, e contá-las reprovava 3 casos alheios (medido
-# no 1º gate). Fora de um repo git, o diretório inteiro.
+# no gate). Fora de um repo git não há "rastreado" a julgar, e a partição NÃO roda: o sandbox da
+# bancada de fixtures é cópia sem git, e contar o diretório ali reprovava sondas de outras regras.
 import subprocess
 names = None
 try:
-    out = subprocess.run(["git", "-C", root, "ls-files", "-z", "--", ".claude/commands/meta"],
-                         capture_output=True, check=True).stdout.decode("utf-8", "replace")
-    names = sorted(os.path.basename(p) for p in out.split("\0") if p)
+    out = subprocess.run(["git", "-C", root, "rev-parse", "--show-toplevel"], capture_output=True, check=True).stdout.decode().strip()
+    if os.path.realpath(out) == os.path.realpath(root):
+        out = subprocess.run(["git", "-C", root, "ls-files", "-z", "--", ".claude/commands/meta"],
+                             capture_output=True, check=True).stdout.decode("utf-8", "replace")
+        names = sorted(os.path.basename(p) for p in out.split("\0") if p)
 except Exception:
     names = None
-if names is None and os.path.isdir(mdir):
-    names = sorted(os.listdir(mdir))
 if sets and names:
     for f in names:
         if f.endswith(".md") and f != "README.md" and f[:-3] not in owner:
