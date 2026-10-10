@@ -13477,6 +13477,9 @@ PY
   cp "${mkt}" "${sb}/.claude-plugin/marketplace.json"
   cp "${REPO_ROOT}"/.claude/commands/meta/*.md "${sb}/.claude/commands/meta/"
   printf -- '---\nname: sonda-sem-conjunto\n---\nsonda\n' > "${sb}/.claude/commands/meta/sonda-sem-conjunto.md"
+  # a partição julga o RASTREADO: o sandbox é repo git e a sonda é commitada (fora de git ela não roda)
+  git -C "${sb}" init -q >/dev/null 2>&1; git -C "${sb}" add -A >/dev/null 2>&1
+  git -C "${sb}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
   local _p1o; _p1o="$(LC_ALL=C bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
   if grep -q 'sonda-sem-conjunto não está em NENHUM work_tool_set' <<< "${_p1o}" \
      && grep -q "allowlist do papel 'mini'" <<< "${_p1o}"; then
