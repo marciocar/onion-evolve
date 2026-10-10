@@ -3,7 +3,8 @@ title: "Revisão — onda O6 da migração de provenance (SAC-73): 157 linhas ju
 date: 2026-10-10
 branch: feat/provenance-wave-o6
 reviewer: "passada adversarial com o mandato de achar linha aplicada fora do veredito, item do maestro aplicado, trace removido sem a linha na narrative, marcador P4 que não é string, caminho de máquina que sobrou em source, locator, method, verified_against ou trace, nó fora da planilha alterado, aresta perdida na reconciliação, TARGET-MISSING novo e regressão do gate. Conferi mecanicamente as 157 linhas aplicáveis contra os 50 arquivos finais e abri uma amostra estratificada de 10 aplicados (semente 20261010) com o nó antes e depois. Rodei a idempotência, a bancada kg_migrate_v3 17/17 com LC_ALL=C e 5 mutantes"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6fd43eb60e9f02999e21d3563976bb3ac286bfcbbcec72995be83ea94459b566
+reviewed_code_sha256: b5554fd631cc7e57e266cc4dde6268f1c04a9875859301331e0238248dbc3b4f
 findings_total: 7
 findings_real: 2
 verdict: CORRIGIDO
