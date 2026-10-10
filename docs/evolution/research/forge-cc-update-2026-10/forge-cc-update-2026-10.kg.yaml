@@ -23,7 +23,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/radar-E3-2026-10-08-r8/SYNTHESIS.md"
       locator: "seções Juiz e Cura feita nesta rodada"
-      method: "leitura do artefato selado"
+      method: "leitura: o artefato selado"
       locality: "repo"
   - id: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
     node_type: decision
@@ -39,7 +39,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/cc-update.md"
       locator: "Procedimento, passos 1 a 10"
-      method: "superfície forjada pelo /meta:forge e invocada de verdade"
+      method: "medição: superfície forjada pelo /meta:forge e invocada de verdade"
       locality: "repo"
   - id: E_CENSO_DA_FORJA_0_PARA_6
     node_type: evidence
@@ -54,7 +54,7 @@ nodes:
     provenance:
       source: ".claude/validation/forge-census.sh"
       locator: "linha cc-update da saída --tsv"
-      method: "execução do medidor antes e depois de ligar as peças"
+      method: "medição: execução do medidor antes e depois de ligar as peças"
       locality: "repo"
   - id: E_DELTA_DO_SANDBOX_IGUAL_A_R8
     node_type: evidence
@@ -70,7 +70,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/radar-E3-2026-10-08-r8/data/"
       locator: "2.1.290.txt a 2.1.295.txt"
-      method: "diff -r contra a saída do medidor"
+      method: "medição: diff -r contra a saída do medidor"
       locality: "repo"
   - id: E_DOGFOOD_DE_CARGA_ACHOU_O_OVERRIDE_MUDO
     node_type: evidence
@@ -86,7 +86,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/cc-update.md"
       locator: "diretivas de injeção do contexto medido"
-      method: "invocação headless do comando, nos dois modos"
+      method: "medição: invocação headless do comando, nos dois modos"
       locality: "repo"
   - id: E_BANCADA_9_CASOS_9_MUTANTES
     node_type: evidence
@@ -101,7 +101,7 @@ nodes:
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_cc_delta_census_selftests"
-      method: "execução da família e de 9 versões defeituosas do medidor"
+      method: "medição: execução da família e de 9 versões defeituosas do medidor"
       locality: "repo"
   - id: C_MEDIDOR_NAO_LIGA_ITEM_A_SUPERFICIE
     node_type: claim

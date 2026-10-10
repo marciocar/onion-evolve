@@ -25,7 +25,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-10-08-matriz-leitor-caso.md"
       locator: "item 1 (o gate do core não checa forma) e item 2 (o radar reprova 3 casos válidos)"
-      method: "leitura do sinal; a matriz foi medida pelo adotante"
+      method: "testemunho: sinal do adotante; a matriz foi medida por ele"
       locality: "repo"
   - id: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
     node_type: decision
@@ -41,7 +41,7 @@ nodes:
     provenance:
       source: "resposta do maestro à pergunta da triagem do /meta:co-evolve em 2026-10-08 (PR #963)"
       locator: "pergunta 'Gate do core vs contrato do .kg.yaml'"
-      method: "selo humano registrado no resíduo do PR #963"
+      method: "testemunho: selo humano registrado no resíduo do PR #963"
       locality: "pessoa"
   - id: Q_ABSORVER_VALIDADOR_DO_CONTRATO
     node_type: question
@@ -65,7 +65,7 @@ nodes:
     provenance:
       source: "docs/evolution/inbox/_processed/2026-10-07-contrato-v2-migracao-narrative.md e 2026-10-07-contrato-v3-proveniencia-estruturada.md"
       locator: "seção 1 de cada sinal (a migração medida)"
-      method: "leitura dos sinais; contagens medidas pelo adotante no commit d31ef4c0da6a"
+      method: "testemunho: sinais do adotante; contagens medidas por ele no commit d31ef4c0da6a"
   - id: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
     node_type: question
     layer: audit
@@ -99,7 +99,7 @@ nodes:
     provenance:
       source: "run 37731420161 do onion-validate.yml (PR #967, merge 69409a84)"
       locator: "passo 'Contrato KG-SSOT (vendor íntegro + gate por grafo)'"
-      method: "leitura do log do CI e execução local do gate e do mutante"
+      method: "medição: leitura do log do CI e execução local do gate e do mutante"
   - id: E_GERADORES_ESCREVEM_O_CONTRATO_V3
     node_type: evidence
     layer: audit
@@ -115,7 +115,7 @@ nodes:
     provenance:
       source: "branch feat/kg-generators-contract-v3 do core"
       locator: "famílias kg_contract_check, research_workflow (p), seed_adoption_graph (v3) e census_seal (v3)"
-      method: "execução da bancada com LC_ALL=C e mutantes"
+      method: "medição: execução da bancada com LC_ALL=C e mutantes"
   - id: E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO
     node_type: evidence
     layer: audit
@@ -131,7 +131,7 @@ nodes:
     provenance:
       source: ".claude/validation/kg-drive-project.sh (função _ckpt)"
       locator: "linhas que escrevem drive_checkpoint e drive_checkpoint_note"
-      method: "execução do --close-lot num sandbox e medição pelo kg-contract-check"
+      method: "medição: execução do --close-lot num sandbox e medição pelo kg-contract-check"
       locality: "repo"
   - id: E_FERRAMENTA_DE_MIGRACAO_E_ONDA_PILOTO
     node_type: evidence
@@ -148,7 +148,7 @@ nodes:
     provenance:
       source: ".claude/utils/kg/kg-migrate-v3.py e docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml"
       locator: "saída da ferramenta e do kg_gate.py na worktree feat/kg-corpus-migration-tool"
-      method: "medição executada (ferramenta, radar, kg-contract-check, kg_gate) em 2026-10-08"
+      method: "medição: execução (ferramenta, radar, kg-contract-check, kg_gate) em 2026-10-08"
       locality: "repo"
   - id: E_TRIAGEM_DA_PROVENANCE_DO_CORPUS
     node_type: evidence

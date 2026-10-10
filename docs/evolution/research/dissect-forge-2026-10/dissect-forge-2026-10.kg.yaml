@@ -22,7 +22,7 @@ nodes:
     provenance:
       source: ".claude/commands/meta/dissect.md e os .kg.yaml do core"
       locator: "grep -rl 'meta:dissect' --include='*.kg.yaml' (2 arquivos) e ls docs/evolution/research (nenhum dissect)"
-      method: "medição por grep no repositório em 2026-10-08"
+      method: "medição: grep no repositório em 2026-10-08"
   - id: Q_COSTURA_DISSECT_FORGE
     node_type: question
     layer: audit
