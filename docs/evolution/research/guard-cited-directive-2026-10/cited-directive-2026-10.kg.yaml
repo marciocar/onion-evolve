@@ -114,7 +114,7 @@ nodes:
     status: confirmed
     verified_at: "2026-10-09"
     valid_from: "2026-10-09"
-    verified_against: "binario 2.1.295 (~/.local/share/claude/versions/2.1.295) lido por bytes; copia 2.1.290 de HEAD normalizada por renomeacao e comparada a copia 2.1.295: IDENTICAS; 2.1.293 e 2.1.294 com a forma da 2.1.290; corpus --tsv rc 0 e vazio com as duas copias"
+    verified_against: "binario do Claude Code 2.1.295 lido por bytes; copia 2.1.290 de af4a420a~1 normalizada por renomeacao e comparada a copia 2.1.295: IDENTICAS; 2.1.293 e 2.1.294 com a forma da 2.1.290; corpus --tsv rc 0 e vazio com as duas copias"
     trace: ".claude/validation/cited-directive-check.sh"
     label: "Na 2.1.295 o parser de diretivas so mudou NOMES, inclusive as locais do laco (g/h viraram h/y). A bancada (f) reprovou DERIVA porque o molde fixava g/h; o comportamento e o mesmo e o corpus nao ganhou nem perdeu acusacao."
     narrative: >
@@ -126,7 +126,7 @@ nodes:
       Licao mecanizada no cc-delta-census.sh: o relatorio lista as guardas de deriva de binario (familias que
       leem `command -v claude`, hoje so cited_directive), caso (h) na bancada, porque o CI nao tem o binario.
     provenance:
-      source: "binário do Claude Code 2.1.295 e git show HEAD:.claude/validation/cited-directive-check.sh"
+      source: "binário do Claude Code 2.1.295 e git show af4a420a~1:.claude/validation/cited-directive-check.sh"
       locator: "binário do Claude Code 2.1.295, offset 215300431 (função UPe até Ltr); bloco verbatim do _engine da guarda"
       method: "medição: extracao por python lendo bytes, comparacao normalizada por renomeacao, bancada --families cited_directive e tres mutantes"
       locality: "web"

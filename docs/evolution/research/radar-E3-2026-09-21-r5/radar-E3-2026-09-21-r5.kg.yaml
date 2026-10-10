@@ -125,7 +125,8 @@ nodes:
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md + docs/evolution/research/radar-E3-2026-09-21-r5/data/claude-help-2.1.278.txt + SYNTHESIS.md + docs/evolution/review/feat-ptbr-identifier-guard.md"
       locator: "CHANGELOG: seção \"## 2.1.251\" (\"Added `attach`, `logs`, `stop`, `respawn`, and `rm` to `claude --help`\") e seção \"## 2.1.144\" (\"Fixed `claude respawn <id>` on a stopped background session\"); claude-help-2.1.278.txt l.285 (\"Restart a background session\"); SYNTHESIS.md l.65-67 (achado de uso, sessão de 20/09); feat-ptbr-identifier-guard.md l.131-132 (deriva 2.1.276→2.1.278)"
-      method: "leitura: CHANGELOG oficial (seções 2.1.251 e 2.1.144) + --help gravado + SYNTHESIS + resíduo"
+      method: "medição: `claude respawn --help` e `claude --help` no binário do Claude Code 2.1.278 (saída de `claude --help` gravada em data/claude-help-2.1.278.txt l.285) + leitura do CHANGELOG oficial (## 2.1.251 e ## 2.1.144), SYNTHESIS.md l.65-67 e do resíduo feat-ptbr-identifier-guard.md l.131-132"
+      locality: "web"
 
   - id: E_PLUGIN_DIR_ACEITA_ARVORE_DE_VARIOS_PLUGINS
     node_type: evidence

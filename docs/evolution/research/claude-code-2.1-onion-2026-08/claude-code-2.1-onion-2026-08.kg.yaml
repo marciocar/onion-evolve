@@ -140,7 +140,7 @@ nodes:
 
   - id: E_CONTRATO_DE_HOOKS_EXPLODIU
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.85
@@ -150,8 +150,8 @@ nodes:
     provenance:
       source: "docs/evolution/review/docs-claude-code-2-1-audit.md + CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md)"
       locator: "resíduo PR #616 §'Verificação cruzada' (revisor re-mediu os eventos no binário 2.1.233) · CHANGELOG ## 2.1.214 'Fixed hooks with exit code 2 not blocking… when stdout JSON fails schema validation'"
-      method: "juízes: re-medição independente do revisor adversarial registrada no resíduo R56 do PR #616"
-      locality: "repo"
+      method: "medição: grep no ELF do Claude Code 2.1.233 instalado com controle (PreToolUse 93, SessionStart 79), re-medido pelo revisor adversarial do PR #616 (resíduo docs/evolution/review/docs-claude-code-2-1-audit.md §Verificação cruzada) + leitura do CHANGELOG ## 2.1.214, flags do grep não registradas"
+      locality: "web"
 
   - id: E_PLATAFORMA_ABSORVEU_DISTRIBUICAO_E_ISOLAMENTO
     node_type: evidence
@@ -380,6 +380,7 @@ nodes:
       source: "gustavo-pulga@21ff04f:.claude/diary/"
       locator: "9 entradas 2026-07-14..16; 2026-07-16-retro-como-instrumento-spec-as-code.md:10 next_recommended 'Avaliar uma skill de retro/feedback… como produto do core'"
       method: "leitura: diário autoral do adotante em gustavo-pulga@21ff04f (clone local; id do members.yaml)"
+      locality: "repo"
 
   - id: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6
     node_type: evidence

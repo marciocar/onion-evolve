@@ -75,7 +75,7 @@ nodes:
   # ── PLATAFORMA: Claude Code 2.1.258 ─────────────────────────────────────────────────────
   - id: E_DEEP_RESEARCH_EMBUTIDO_E_A_BASE
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.95
@@ -86,8 +86,8 @@ nodes:
     provenance:
       source: "docs/evolution/research/meta-research-lens-2026-09/data/ext-neighbors-deep-research-deepdive.md"
       locator: "code.claude.com/docs/en/workflows (Bundled workflows) + script extraido do binario 2.1.258 (431 linhas: VOTES_PER_CLAIM=3, REFUTATIONS_REQUIRED=2, MAX_FETCH=15, MAX_VERIFY_CLAIMS=25; fases Scope -> Search -> URL-dedup -> Fetch+Extract -> Verify 3 votos -> Synthesize; sem model/effort por fase; claims nao-checaveis saem UNVERIFIED, nao refutadas)"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "repo"
+      method: "medição: extração do script do workflow /deep-research do binário do Claude Code 2.1.258 (431 linhas, constantes VOTES_PER_CLAIM/REFUTATIONS_REQUIRED/MAX_FETCH/MAX_VERIFY_CLAIMS) + leitura de code.claude.com/docs/en/workflows, comando de extração não registrado"
+      locality: "web"
 
   - id: E_PLATAFORMA_TEM_AS_PECAS_DA_LENTE_SEM_REDIGIR
     node_type: evidence

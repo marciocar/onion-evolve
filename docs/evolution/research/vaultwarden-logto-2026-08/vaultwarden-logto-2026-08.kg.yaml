@@ -162,11 +162,11 @@ nodes:
     impact: 4
     confidence: 1.0
     label: "DEPENDE DO MAESTRO — nao e minha decisao fechar ferramenta da VPS. Medido por mim, nao herdado do agente: `/etc/caddy/conf.d/logto-console.caddy` esta ATIVO (sem sufixo `.disabled`) e `console.onionevolve.com` responde 302. TRES documentos declaram que ele fica DESLIGADO por padrao — o README do onion-logto, o proprio bloco do vhost, e o cabecalho do `logto-provision.sh` (`o vhost console.onionevolve.com esta DESLIGADO por desenho`). E `declarado != verificado` no painel de administracao do provedor de identidade. O interruptor existe e valida antes de aplicar: `/home/marcio/onion-vps-logto/console.sh off`. POR QUE ISTO ENTRA NUMA PESQUISA SOBRE COFRE: somar um cofre de senhas a caixa enquanto o painel do IdP esta aberto e a combinacao que merece decisao explicita, nao silencio."
-    trace: "/etc/caddy/conf.d/logto-console.caddy"
+    narrative: "trace anterior (só no host): o vhost conf.d/logto-console.caddy do Caddy do host (fora de repo)."
     provenance:
       source: "4b3c70fb"
       locator: "corpo de 4b3c70fb (#577, 2026-08-10): \"ambas escritas enquanto o vhost respondia 302\" (logto-console.caddy \"Fica DESLIGADO por padrão\"; logto-provision.sh \"está DESLIGADO por desenho\"), console.sh off/on testado; onion-logto@617364f:README.md l.9, l.32 (console \"ligado sob demanda\", \"não fica exposto 24/7\")"
-      method: "testemunho: medição da sessão 2026-08-10 (302 no console, interruptor off/on), registrada em 1ª pessoa no corpo de 4b3c70fb; 3º documento por leitura do README do onion-vps-logto@617364f"
+      method: "testemunho: medição da sessão 2026-08-10 (302 no console, interruptor off/on), registrada em 1ª pessoa no corpo de 4b3c70fb; 3º documento por leitura do README do onion-logto@617364f"
       locality: "repo"
 
   - id: I_PROVISION_FICOU_PARA_TRAS_NO_RENAME

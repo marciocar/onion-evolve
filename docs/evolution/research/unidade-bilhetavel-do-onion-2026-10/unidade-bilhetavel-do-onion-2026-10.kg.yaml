@@ -65,7 +65,7 @@ nodes:
     impact: 5
     confidence: 0.98
     verified_at: 2026-10-01
-    verified_against: 'medicao nesta maquina em 2026-10-01 — `claude --version` = 2.1.286; o binario /home/marcio/.local/share/claude/versions/2.1.286 e ELF 64-bit e `grep -ao` nele devolve PreToolUse 243x, bypassPermissions 195x e billing 167x; `ls .claude/hooks/*.sh` = 15 hooks, dos quais 6 contem `exit 2`; `wc -l .claude/validation/lint-artifacts.sh` = 5282 com 203 chamadas `violation "` e 13 arquivos de baseline-catraca'
+    verified_against: "medicao nesta maquina em 2026-10-01 — `claude --version` = 2.1.286; o binario do Claude Code 2.1.286 e ELF 64-bit e `grep -ao` nele devolve PreToolUse 243x, bypassPermissions 195x e billing 167x; `ls .claude/hooks/*.sh` = 15 hooks, dos quais 6 contem `exit 2`; `wc -l .claude/validation/lint-artifacts.sh` = 5282 com 203 chamadas `violation \"` e 13 arquivos de baseline-catraca"
     valid_from: 2026-10-01
     source_tier: 10
     source_kind: internal-audit
@@ -402,7 +402,7 @@ nodes:
     source_tier: 10
     source_kind: internal-audit
     label: 'OBJECAO 1 (Elenxo, 1 agente sem votacao) — o achado PROVA O CONTRARIO do que a pergunta precisa: se o exit 2 e NATIVO da plataforma e documentado publicamente, ele e um PRIMITIVO GRATIS disponivel a qualquer concorrente, nao unidade bilhetavel nem moat. Qualquer um escreve um hook que sai 2; ninguem paga pelo que a plataforma da de graca. E o CLAUDE.md ja diz que isso compra o acoplamento — comprar acoplamento NAO e gerar receita, e a rodada confunde as duas coisas. CORRECAO DE NUMERO desta sessao, porque refutador tambem se re-mede: o Elenxo declarou 117 ocorrencias de PreToolUse no binario; medido aqui com `grep -ao` sao 243 (provavel diferenca de metodo, linhas versus ocorrencias). A direcao da objecao nao muda.'
-    trace: '/home/marcio/.local/share/claude/versions/2.1.286'
+    narrative: "trace anterior (só no host): o binário do Claude Code 2.1.286 no diretório de versões do usuário (host; versão não mais instalada)."
     provenance:
       source: "binário do Claude Code 2.1.286"
       locator: "achado 1 (exit 2 nativo, tier 9) lido contra a medicao local de 2026-10-01: o binario 2.1.286 traz 243 ocorrencias de PreToolUse e 195 de bypassPermissions — o Elenxo declarou 117, numero que NAO reproduz aqui"

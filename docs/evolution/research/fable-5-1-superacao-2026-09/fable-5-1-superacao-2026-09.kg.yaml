@@ -454,7 +454,7 @@ nodes:
 
   - id: E_PREMODELSWITCH_DISPARO_MEDIDO_0902
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 0.95
@@ -465,8 +465,8 @@ nodes:
     provenance:
       source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md"
       locator: "log da sonda .model-switch.log — 2 linhas (PreModelSwitch + PostModelSwitch) na sessao a331b306, binario 2.1.258, troca claude-opus-5[1m] -> claude-fable-5-1 via picker"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "repo"
+      method: "medição: sonda não-bloqueante PreModelSwitch/PostModelSwitch registrada no settings.json, binário do Claude Code 2.1.258, troca Opus 5 → Fable 5.1 pelo picker em 2026-09-02; log verbatim em data/probe-premodelswitch.md l.5-8; o script da sonda não foi versionado"
+      locality: "web"
 
   - id: E_GUARDA_PREMODELSWITCH_APLICADA_0902
     node_type: evidence

@@ -129,7 +129,7 @@ nodes:
     impact: 5
     confidence: 0.98
     verified_at: 2026-09-02
-    verified_against: 'binario ~/.local/share/claude/versions/2.1.258 (python re.finditer): `var Ee=200;function BQn(){return a.CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION??Ee}` e a mensagem `this session has used its web search budget (${v} of ${k} WebSearch calls)... ask the user to raise CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` junto de `n.taskRegistry.incrementWebSearchCalls()`'
+    verified_against: "binario do Claude Code 2.1.258 (python re.finditer): `var Ee=200;function BQn(){return a.CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION??Ee}` e a mensagem `this session has used its web search budget (${v} of ${k} WebSearch calls)... ask the user to raise CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` junto de `n.taskRegistry.incrementWebSearchCalls()`"
     valid_from: 2026-09-01
     source_tier: 10
     source_kind: primary

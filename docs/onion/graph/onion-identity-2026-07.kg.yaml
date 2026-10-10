@@ -1038,7 +1038,7 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: "metagamify origin/main = 239 arquivos .claude, ultimo commit 2026-06-26 (bfb9bce2, 39 dias parada); develop = f016e3d3 (andou ate 07-14), rhilo/main = f7e4b034 e rhilo/develop = 07e19aaf VIVAS — a topologia de 3 linhagens NAO colapsou"
-    trace: "git ls-remote --heads + git ls-tree -r --name-only origin/main -- .claude, em /home/marcio/rhilo-metagamify (origin = github.com/marciocar/metagamify)"
+    trace: "git ls-remote --heads + git ls-tree -r --name-only origin/main -- .claude, no clone local de metagamify (origin = github.com/marciocar/metagamify)"
     verified_at: 2026-08-04
     verified_against: "marciocar/metagamify @ 2026-08-04, medido no clone local com ls-remote (estado remoto vivo, sem fetch)"
     provenance:

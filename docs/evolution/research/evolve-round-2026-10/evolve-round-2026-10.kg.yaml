@@ -32,7 +32,7 @@ nodes:
 
   - id: C_CREATE_SKILL_EXECUTA_GIT_DIFF_A_CADA_INVOCACAO
     node_type: claim
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.9
     status: superseded
@@ -43,12 +43,12 @@ nodes:
     provenance:
       source: ".claude/commands/meta/create-skill.md"
       locator: "regex do binario 2.1.289 (cDn/uDn sobre pTe) simuladas em node sobre commands, skills, agents e plugins; linhas 86 e 219 de create-skill.md"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
-      locality: "repo"
+      method: "medição: regex cDn/uDn sobre pTe extraídas do binário do Claude Code 2.1.289 e simuladas em node sobre commands, skills, agents e plugins + leitura de .claude/commands/meta/create-skill.md l.86 e l.219, comando não registrado"
+      locality: "web"
 
   - id: C_RAIO_X_PUBLICA_ALVOS_FALSOS_DE_SKILLS
     node_type: claim
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.95
     status: superseded
@@ -59,8 +59,8 @@ nodes:
     provenance:
       source: ".claude/validation/instructions-loaded-census.sh"
       locator: "string do evento InstructionsLoaded no binario 2.1.289; instructions-loaded-census.sh:32; lista de skills ativas da sessao"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
-      locality: "repo"
+      method: "medição: string do evento InstructionsLoaded no binário do Claude Code 2.1.289 + leitura de .claude/validation/instructions-loaded-census.sh:32 e da lista de skills ativas da sessão, comando não registrado"
+      locality: "web"
 
   - id: C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA
     node_type: claim

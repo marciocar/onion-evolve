@@ -20,7 +20,7 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: '2026-10-05'
-    verified_against: 'payload JSON sintetico contra pretooluse-merge-gate.sh e pretooluse-protect-main.sh do main (2786f56c): +main, "main", TZ=… bash -c, timeout, gh -R, /usr/bin/gh, eval, xargs, $(echo gh), & simples, if/then, heredoc SEM aspas com $(…), {gh,} — rc=0 nos dois; branch protection do host: 403'
+    verified_against: "payload JSON sintetico contra pretooluse-merge-gate.sh e pretooluse-protect-main.sh do main (2786f56c): +main, \"main\", TZ=… bash -c, timeout, gh -R, gh por caminho absoluto, eval, xargs, $(echo gh), & simples, if/then, heredoc SEM aspas com $(…), {gh,} — rc=0 nos dois; branch protection do host: 403"
     trace: '.claude/hooks/lib/invocation-lines.sh'
     label: 'O DEFEITO, DATADO: em 2026-10-05 o juiz do radar E3 mediu 15 formas que escapavam dos dois vetos com rc=0, a pior o force-push git push origin +main — num repo cujo host NAO protege a main (403), logo o hook e a unica barreira. O estudo achou mais dois escapes que o juiz nao listou: heredoc SEM aspas com $(gh pr merge 1) no corpo (EXECUTA o merge; a lib descartava o corpo inteiro) e brace expansion no nome do comando. E no MESMO dia um FALSO POSITIVO: o sed partia texto ENTRE ASPAS no ; e vetou um comando cuja unica mencao a gh pr merge era uma string literal. A lista de formas barradas era menor que a lingua do shell — guarda-por-lista falhando pelo vocabulario pela 2a vez na mesma lib.'
     provenance:
@@ -52,7 +52,7 @@ nodes:
     verified_at: '2026-10-05'
     source_tier: 10
     source_kind: primary
-    verified_against: 'binario 2.1.289 (/home/marcio/.local/share/claude/versions/2.1.289): parseCommand(e) devolve rootNode (tree-sitter); 145 strings reason: distintas extraidas por offset em torno de "tree-sitter mis-parse"'
+    verified_against: "binario do Claude Code 2.1.289: parseCommand(e) devolve rootNode (tree-sitter); 145 strings reason: distintas extraidas por offset em torno de \"tree-sitter mis-parse\""
     label: 'ESTUDO 2, o binario: o Claude Code 2.1.289 analisa comando para as regras de permissao com TREE-SITTER e mantem ~145 motivos de RECUSA — o que ele nao consegue provar sobre o que o shell vai executar, ele nao supoe. Os que importam a estes vetos e viraram regra aqui: "Command name is runtime-determined", "Brace expansion", eval ("evaluates arguments as shell code" — RECUSADO, nao recursado), "timeout/stdbuf/nice … can''t be checked before it runs" para argumento runtime, "What xargs adds to X can''t be checked", e "Heredoc with unquoted delimiter undergoes shell expansion" — este ultimo revelou o escape do heredoc que ninguem tinha listado.'
     provenance:
       source: "commit 0766a4d7 (sessão session_01NSeoZ75idrWT2wShxLsVfA) ; .claude/hooks/lib/invocation-lines.sh l.22-23"
@@ -138,7 +138,7 @@ nodes:
     confidence: 0.6
     status: open
     verified_at: '2026-10-05'
-    verified_against: 'estado vivo medido: nenhum mod instalado (~/.claude/mods e .claude/mods ausentes; settings.json sem chave mods) — hoje o desvio nao pode ocorrer nesta casa; a PERGUNTA (o mod passa por cima do exit 2?) segue sem medida'
+    verified_against: "estado vivo medido: nenhum mod instalado (diretório mods do usuário e .claude/mods ausentes; settings.json sem chave mods) — hoje o desvio nao pode ocorrer nesta casa; a PERGUNTA (o mod passa por cima do exit 2?) segue sem medida"
     label: 'TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se ela passa tambem por cima do EXIT 2 de um PreToolUse — e nesse exit 2 que estes dois vetos (e o CLAUDE.md, como razao do acoplamento) se apoiam. Sem mod instalado para testar. GATILHO: o primeiro mod instalado nesta casa, ou a doc do harness responder.'
     provenance:
       source: "docs/evolution/research/radar-E3-2026-10-05-r7/data/2.1.289.txt"

@@ -1613,8 +1613,9 @@ nodes:
     impact: 5
     confidence: 0.95
     verified_at: 2026-07-21
-    trace: "git 83a7830; git 419a390; .claude/validation/lint-artifacts.sh (REGRA 28, linhas 670-741); /home/marcio/onion-pessoal/docs/evolution/inbound/"
+    trace: "git 83a7830; git 419a390; .claude/validation/lint-artifacts.sh (REGRA 28, linhas 670-741)"
     label: "REFUTA o enquadramento de junho (o gargalo era protocolo/liveness): o que travou de fato foi mundano — 11 anúncios apodreceram em staging até 13 dias (4 arquivados em 83a7830; 6 de marcio-pessoal + 1 órfão de onion-hub em 419a390) porque um membro method-only (onion_version: n/a) NÃO TINHA CAIXA POSTAL. Fix: caixa postal ≠ framework (inbound/ sem vendorizar) + lint REGRA 28 (SOFT, 3 classes) para o repo sozinho decidir 'este membro tem canal?'"
+    narrative: "trace anterior incluía também a caixa docs/evolution/inbound/ do clone local de marcio-pessoal (host; o remoto é declarado não publicado no members.yaml)."
     provenance:
       source: "git 83a7830d + git 419a3907 (onion-evolve)"
       locator: "83a7830d --stat (4 anúncios para _processed); 419a3907 --stat (6 de marcio-pessoal + 1 órfão de onion-hub) e corpo; lint-artifacts.sh@4e54b052 l.670 (REGRA 28 [SOFT]) e l.689 ('TRÊS classes')"
@@ -1627,7 +1628,7 @@ nodes:
     impact: 5
     confidence: 0.95
     verified_at: 2026-07-21
-    trace: "git rev-list --count c9eb2c40bc3b..HEAD = 292; git rev-list --count b8208cc1a3da..91d5dbb05a6d = 42; docs/evolution/federation/members.yaml (granaai onion_version, gustavo-pulga onion_version); /home/marcio/gustavo-pulga/.claude/.onion-version"
+    trace: "git rev-list --count c9eb2c40bc3b..HEAD = 292; git rev-list --count b8208cc1a3da..91d5dbb05a6d = 42; docs/evolution/federation/members.yaml (granaai onion_version, gustavo-pulga onion_version); gustavo-pulga@21ff04f:.claude/.onion-version (clone local; id do members.yaml)"
     label: "REFUTA 'o híbrido subtree+pin é o padrão certo, resolvido': a métrica que doeu em julho foi drift de pin silencioso — gustavo-pulga está 292 commits atrás do core (pin c9eb2c40bc3b, verificado por rev-list) e granaai chegou a 42 atrás antes de a própria sessão do adotante atualizar em 2026-07-19 (b8208cc1a3da→91d5dbb05a6d, 13 atrás hoje). Nenhum dos 9 docs de junho modela envelhecimento de pin"
     provenance:
       source: "git rev-list (onion-evolve) + docs/evolution/federation/members.yaml@4e54b052"
@@ -5578,7 +5579,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    trace: "docs/evolution/scope-convention-2026.md (pessoa = ~/.claude/settings.json + settings.local.json; nenhuma convenção members/<pessoa> versionada no repo) · .claude/utils/scope/resolve-scope-layers.sh:51 (camada pessoa = HOME, fora do git)"
+    trace: "docs/evolution/scope-convention-2026.md (pessoa = settings.json + settings.local.json do HOME do usuário; nenhuma convenção members/<pessoa> versionada no repo) · .claude/utils/scope/resolve-scope-layers.sh:51 (camada pessoa = HOME, fora do git)"
     label: "SEGUE ABERTO — o 4º nível: a camada pessoa resolve por ~/.claude (fora do git), então pessoa-dentro-do-time VERSIONÁVEL/COMPARTILHÁVEL continua sem mecanismo; a hipótese members/<pessoa> não foi materializada nem dogfoodada"
   - id: SY4_open_dogfood_regulated_member_escopo
     node_type: question

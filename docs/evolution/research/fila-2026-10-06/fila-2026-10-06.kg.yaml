@@ -270,7 +270,7 @@ nodes:
     impact: 3
     confidence: 0.6
     verified_at: 2026-10-07
-    verified_against: "door-role-parity-check.sh sobre o vivo ([adotante/CARIMBO-AUSENTE] em /home/marcio/granaai) + resposta do maestro 2026-10-07: o projeto granaai foi abandonado, o trabalho vive no brain-granaai"
+    verified_against: "door-role-parity-check.sh sobre o vivo ([adotante/CARIMBO-AUSENTE] no clone local de granaai) + resposta do maestro 2026-10-07: o projeto granaai foi abandonado, o trabalho vive no brain-granaai"
     label: "aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o validador não tem status de membro aposentado"
   # ── 2026-10-07, noite: seleção do pre-commit (pedido do maestro) ─────────────────────────────
   - id: E_PRECOMMIT_SELECAO_GROSSA

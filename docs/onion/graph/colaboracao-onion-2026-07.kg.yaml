@@ -47,7 +47,7 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-09-01
-    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. cd /home/marcio/onion-evolve && ls -la docs/evolution/inbox/ docs/evolution/outbox/ docs/e => Claim 1 (repositório é meio de colaboração assíncrona): CONFIRMADO ao vivo. `docs/evolution/{inbox,outbox,inbo…'
+    verified_against: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. cd <raiz do clone> && ls -la docs/evolution/inbox/ docs/evolution/outbox/ docs/e => Claim 1 (repositório é meio de colaboração assíncrona): CONFIRMADO ao vivo. `docs/evolution/{inbox,outbox,inbo…"
     label: "repositorio — meio de colaboracao assincrona e SSOT-de-registro"
     provenance:
       source: "docs/evolution/inbox"
@@ -62,7 +62,7 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-09-01
-    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. cd /home/marcio/onion-evolve && test -f .claude/commands/meta/create-vertical.md && echo E => EXISTS. Linha 123: "`.claude/skills/<slug>/SKILL.md` — hub-roteador homônimo (deriva da SSOT viva, nunca hardc…'
+    verified_against: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. cd <raiz do clone> && test -f .claude/commands/meta/create-vertical.md && echo E => EXISTS. Linha 123: \"`.claude/skills/<slug>/SKILL.md` — hub-roteador homônimo (deriva da SSOT viva, nunca hardc…"
     label: "vertical Onion (book/SSOT + hub + helpers) — produzida a partir de spec"
     provenance:
       source: ".claude/commands/meta/create-vertical.md"
@@ -466,7 +466,7 @@ nodes:
     impact: 4
     confidence: 0.95
     verified_at: 2026-09-01
-    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED 3/3 — cd /home/marcio/<membro-t2> && ls -la docs/<dominio-t2>/graph/<dominio-t2>.kg.yaml && grep -c ''🔒'' '
+    verified_against: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED 3/3 — cd <clone local de membro-t2> && ls -la docs/<dominio-t2>/graph/<dominio-t2>.kg.yaml && grep -c '🔒'"
     label: 'MEDIDO 2026-09-01, a verdade atual supera o label de julho: O label afirma ''nos 🔒 marcados'' (plural, marcação estrutural explícita por nó). No vivo: só 1 nó (D_UPSELL) está marcado como confidencial, e o marcador real é ⚠️ num comentário de cabeçalho do arquivo — não 🔒, não um campo por nó, não plural. As outras duas cláusulas do label (''fica no repo dev'' e ''nunca sai'') s'
     provenance:
       source: "gustavo-pulga@4113a55:docs/<dominio-t2>/graph/<dominio-t2>.kg.yaml"

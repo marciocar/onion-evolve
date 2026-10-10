@@ -195,7 +195,7 @@ nodes:
     impact: 3
     confidence: 0.95
     verified_at: 2026-09-02
-    verified_against: 'git config core.hooksPath = /home/marcio/onion-evolve/.githooks (medido nesta sessao); .git/hooks/pre-commit inexistente (so .sample); .githooks/pre-commit:30-36 (main/develop), :122-127 (HARD), :142-149 (selftest das guardas se toca validation/)'
+    verified_against: "git config core.hooksPath = <raiz do clone>/.githooks (valor absoluto, config local do host) (medido nesta sessao); .git/hooks/pre-commit inexistente (so .sample); .githooks/pre-commit:30-36 (main/develop), :122-127 (HARD), :142-149 (selftest das guardas se toca validation/)"
     label: 'Os 5 vetos do .githooks/pre-commit (commit em main/develop, HARD do lint, schema do kg-freshness, auto-fix fora do stage, regressao da bancada) sao VETO-MECANICO CONDICIONAL: dependem de `core.hooksPath` LOCAL (config nao versionada — clone fresco nasce sem guarda) e caem com `--no-verify` (escape documentado no proprio hook). Nesta maquina esta armado (medido). O relatorio do gates-ci ("nenhum pre-commit instalado") estava PARCIALMENTE errado: leu .git/hooks/, nao core.hooksPath — discrepancia entre workers resolvida por medicao, nao por voto.'
     trace: '.githooks/pre-commit'
     provenance:

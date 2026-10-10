@@ -91,7 +91,8 @@ nodes:
     source_tier: 10
     source_kind: installed-artifact
     label: 'MEDIDO (tier 10, artefato instalado + historia do proprio repo, custo = 4 comandos): a assimetria adiciona-vs-deleta e REAL AQUI — 323 linhas adicionadas contra 77 removidas em 59 commits, e a maior remocao unica de toda a historia do CLAUDE.md e de 5 linhas. Mas o tamanho NAO e o constrangimento: 17.041 bytes sao ~0,5% da janela de 1M do opus-5[1m]. E a plataforma ja entrega a cura recomendada: so a `description` do frontmatter entra sempre; o corpo do SKILL.md carrega sob demanda, e duas skills do core ja declaram `paths:`. Densidade de imperativos em CLAUDE.md: 13 bullets pelo grep literal / 29 com -i, em 110 bullets — duas ordens de grandeza abaixo do regime de 500 instrucoes de qualquer benchmark de densidade.'
-    trace: 'CLAUDE.md · .claude/skills/*/SKILL.md · /home/marcio/.local/share/claude/versions/2.1.259'
+    narrative: "trace anterior incluía também o binário do Claude Code 2.1.259 no diretório de versões do usuário (host; versão não mais instalada)."
+    trace: "CLAUDE.md · .claude/skills/*/SKILL.md"
     provenance:
       source: "CLAUDE.md · .claude/skills/*/SKILL.md · binário do Claude Code 2.1.259"
       locator: "medicao propria, 4 comandos no repo e no binario instalado: (1) `git log --follow --numstat -- CLAUDE.md` = 59 commits, adds=323, dels=77, maior remocao unica de toda a historia = 5 linhas; (2) `wc -lc CLAUDE.md` = 246 linhas / 17.041 bytes (~5k tokens = ~0,5% de uma janela de 1M); (3) `grep -n \"^paths:\" .claude/skills/*/SKILL.md` = onion-patterns [\".claude/**\",\"docs/onion/**\"] e onion-validation [\".claude/**\"] JA declaram escopo por path; (4) `grep -ao InstructionsLoaded <binario 2.1.259>` = 21 ocorrencias, incluindo executeInstructionsLoadedHooks / hasInstructionsLoadedHook e a lista de eventos de hook — o hook EXISTE no artefato instalado."
@@ -235,7 +236,7 @@ nodes:
     impact: 5
     confidence: 0.95
     verified_at: 2026-09-03
-    verified_against: 'artefato instalado, 1 comando, sem web: binario /home/marcio/.local/share/claude/versions/2.1.259 + a listagem de skills do proprio prompt desta sessao (so descriptions no contexto; o corpo de onion-orchestration, 296 linhas, so entra via ferramenta Skill) + docs/knowledge-base/tools/agent-skills.md:131 documentando `paths` para skill'
+    verified_against: "artefato instalado, 1 comando, sem web: binario do Claude Code 2.1.259 + a listagem de skills do proprio prompt desta sessao (so descriptions no contexto; o corpo de onion-orchestration, 296 linhas, so entra via ferramenta Skill) + docs/knowledge-base/tools/agent-skills.md:131 documentando `paths` para skill"
     valid_from: '2026-09-03'
     source_tier: 10
     source_kind: installed-artifact
@@ -324,12 +325,12 @@ nodes:
       locality: "repo"
   - id: E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 0.95
     verified_at: 2026-09-03
-    verified_against: 'binario instalado 2.1.259 (~/.local/share/claude/versions/2.1.259, strings): schema Toe = base + file_path + memory_type in [User,Project,Local,Managed] + load_reason in Eoe=[session_start,nested_traversal,path_glob_match,include,compact] + globs? + trigger_file_path? + parent_file_path?; 15 ocorrencias'
+    verified_against: "binario do Claude Code 2.1.259 instalado (strings): schema Toe = base + file_path + memory_type in [User,Project,Local,Managed] + load_reason in Eoe=[session_start,nested_traversal,path_glob_match,include,compact] + globs? + trigger_file_path? + parent_file_path?; 15 ocorrencias"
     source_tier: 10
     source_kind: primary
     label: 'PRE-REQUISITO da decisao RESOLVIDO (tier 10, o binario): o hook InstructionsLoaded entrega file_path, memory_type (User|Project|Local|Managed), load_reason (session_start|nested_traversal|path_glob_match|include|compact), globs, trigger_file_path, parent_file_path. Registra CARGA e motivo — NAO distingue carregou de influenciou. Consequencia para a opcao C re-especificada: o hook mede COBERTURA (camada L1, barata, mecanismo: hook logger + censo por arquivo x motivo, candidatas = SO-SESSION-START e NUNCA); INFLUENCIA exige replay de comportamento (camada L2, cara, dirigida pelas candidatas do L1, nos dois tiers). A decisao deixa de ter dependencia e passa a ter ORDEM: L1 agora, L2 quando o censo tiver >= 20 sessoes ou 14 dias.'
@@ -337,8 +338,8 @@ nodes:
     provenance:
       source: "docs/analysis/poda-instrucoes-protocolo-2026-09.md"
       locator: "binário do Claude Code 2.1.259 (strings): schema Toe = base + file_path + memory_type in [User,Project,Local,Managed] + load_reason in Eoe=[session_start,nested_traversal,path_glob_match,include,compact] + globs? + trigger_file_path? + parent_file_path?; 15 ocorrencias"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "repo"
+      method: "medição: leitura de strings do binário do Claude Code 2.1.259 em 2026-09-03 (schema Toe/Eoe do InstructionsLoaded, 15 ocorrências), comando não registrado"
+      locality: "web"
 
 edges:
   # ── evidências sustentam a pergunta ──
