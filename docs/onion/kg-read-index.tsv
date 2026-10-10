@@ -256,6 +256,12 @@
 .claude/utils/guardrails/onion-untrusted-wrap.sh	E_UTILS_GUARDAS_SEM_HOOK	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/utils/guardrails/onion-untrusted-wrap.sh	Q_R15_WRAP_NO_CAMINHO_CRITICO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/utils/kg/kg-migrate-v3.py	E_FERRAMENTA_DE_MIGRACAO_E_ONDA_PILOTO	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
+.claude/utils/kg/machine_path.py	C_TETO_HOSTNAME_DE_OUTRA_MAQUINA	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
+.claude/utils/kg/machine_path.py	C_TETO_RAIZ_QUE_NAO_E_DE_SISTEMA	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
+.claude/utils/kg/machine_path.py	C_TETO_ROTA_COM_NOME_DE_RAIZ	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
+.claude/utils/kg/machine_path.py	C_TETO_VARIAVEL_WINDOWS_E_FORA_DE_NO	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
+.claude/utils/kg/machine_path.py	C_TETO_VERBOS_DE_SHELL_SAO_LISTA	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
+.claude/utils/kg/machine_path.py	D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	D_CONTATO_DESACOPLADO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	D_CURA_POR_CONSTRUCAO_NO_ASSEMBLER	docs/onion/graph/residuos-2026-08-18.kg.yaml
@@ -366,6 +372,8 @@
 .claude/validation/kg-coverage-baseline.txt	E_OBJECAO_6_CATRACA_JA_E_MENOS_PERMISSIVO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/kg-drive-project.sh	E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 .claude/validation/kg-drive-project.sh	E_LEVA2_CHECKPOINT_DO_DRIVE_NO_GRAFO	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
+.claude/validation/kg-machine-path-check.sh	C_TETO_MARCADOR_AUTODECLARADO	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
+.claude/validation/kg-machine-path-check.sh	D_SUBSTRATO_CONTRATO_E_CATRACA_NO_LINT	docs/evolution/research/guard-machine-path-2026-10/machine-path-2026-10.kg.yaml
 .claude/validation/kg-narrate-validate.sh	D_regra47_mechanism	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/kg-provenance-coverage.sh	SY_evid_provenance_coverage_gate	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/validation/kg-radar-integrity.sh	D_VALID_FROM_INTEIRO_E_SOFT	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
