@@ -1,6 +1,5 @@
 ---
-reviewed_diff_sha256: ac24b0c51adfd4941c2c8131f8f7ca70dfe40b3106800d65169488aace12fd64
-reviewed_code_sha256: fcbde9fe93f2d54cfbe33979d4fcadd10d63b04cd28122a7984378d81db46c63
+reviewed_diff_sha256: pendente
 findings_total: 7
 findings_real: 5
 tokens: 109350
@@ -14,24 +13,27 @@ nota: >
   5 foram curados no mesmo laço (d8f90695): os alvos vêm do documento parseado, só da versão de agora.
   Ele também achou um falso negativo anterior à poda (chave entre aspas), fechado pela mesma cura. A
   bancada dele foi re-rodada: os 10 casos agora dão o veredito do kg_validate --corpus. APROVADO
-  descreve o estado depois das curas.
+  descreve o estado depois das curas. Depois do 1º push, o dono do kit publicou a cura do gate como
+  kg-ssot-v4.3.3 e o vendor foi trocado: a mudança nova é só vendor + prosa. Revista por mim: check
+  íntegro, sha do contrato igual, gate rc 0 em 15,9 s, a bancada (55 ✓) e os 10 casos do refutador
+  re-rodados com o vendor novo, mesmo veredito.
 ---
 
 # Resíduo — `chore/kg-ssot-v4.3.2`
 
-Adoção do kit `kg-ssot-v4.3.2` (60c6835eec2c). O contrato é o mesmo: o sha dos schemas MUST e SHOULD
+Adoção do kit `kg-ssot-v4.3.3` (c32e6496be74), que substituiu a 4.3.2 (60c6835eec2c) no mesmo PR. O contrato é o mesmo: o sha dos schemas MUST e SHOULD
 é idêntico ao do v4.3.1. O índice de corpus do gate passa a ler só os grafos que alguma referência cita.
 O `kg-contract-check.sh` do core recebeu a mesma poda.
 
 | # | lado | achado | desfecho |
 |---|---|---|---|
 | 1 | FN | a poda criaria falso negativo? | **não**: menos entradas no índice nunca absolvem |
-| 2 | FP, executado (4) | `external_targets` (regex no texto cru) perde alvo com escape YAML (`\x2F`, `#`, continuação de linha) | curado: alvos do documento parseado; caso (i2) e mutante. O gate do vendor tem o mesmo regex: **sinal** ao onion-kg-ssot |
+| 2 | FP, executado (4) | `external_targets` (regex no texto cru) perde alvo com escape YAML (`\x2F`, `#`, continuação de linha) | curado: alvos do documento parseado; caso (i2) e mutante. O gate do vendor tinha o mesmo regex: **sinal** ao onion-kg-ssot, curado na `kg-ssot-v4.3.3`, adotada aqui |
 | 3 | FP, executado | a inclusão dos alvos do HEAD liga o índice com alvos errados | curado: só a versão de agora |
 | 4 | prosa | "as duas são medidas contra ele" era falso (do HEAD só se usa o SHOULD) | curado no nó `E_CONTRATO_V43_ADOTADO` |
 | 5 | FN anterior | com a chave entre aspas, o índice ficava `None` e o alvo inexistente passava | curado pela mesma derivação; caso (i2) |
 | 6 | prosa ok | sha dos schemas igual; tempo do checador compatível | — |
 | 7 | prosa | a provenance do nó só citava o v4.3.1 | curado: o source cita a branch do v4.3.2 |
 
-**Teto declarado:** o gate do CI (`kg_gate.main`, vendor) segue com o regex e cura só por tag nova do
-kit. No corpus vivo: 29 referências, 0 perdidas.
+**Teto declarado:** o checador do core e o gate do vendor derivam os alvos cada um pelo seu código (a
+mesma regra, duas implementações). No corpus vivo: 29 referências, 0 perdidas.

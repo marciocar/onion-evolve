@@ -36,6 +36,7 @@ Uso:
 import argparse
 import collections
 import datetime
+import functools
 import json
 import math
 import pathlib
@@ -292,18 +293,28 @@ def index_texts(items):
     return index
 
 
-EXTERNAL_TARGET = re.compile(r"(?<![A-Za-z0-9_./-])((?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.yaml)#[A-Za-z]")
+def external_info(text):
+    """(usa external_edges?, {caminhos citados}), tirados do documento PARSEADO (o mesmo valor que is_external
+    confere): escape YAML, chave entre aspas e continuação de linha não enganam, ao contrário de ler o texto cru (o
+    achado do refutador do core em 2026-10-10). O parse é o mesmo, guardado, que o gate já faz para medir."""
+    if "external_edges" not in text and "\\" not in text:  # sem nenhuma das duas, nem a chave escapada existe
+        return False, set()
+    _, doc, err = parse_v1(text)  # o mesmo parse que codes() e warnings() reaproveitam
+    if not doc or err or "external_edges" not in doc:
+        return False, set()
+    edges = doc["external_edges"] if isinstance(doc["external_edges"], list) else []
+    return True, {ref.rsplit("#", 1)[0] for e in edges if isinstance(e, dict) for ref in (e.get("from"), e.get("to"))
+                  if is_external(ref)}
 
 
 def external_targets(text):
-    """Os caminhos que as referências externas de um texto citam (barato, por padrão): só eles precisam entrar no
-    corpus. Um caminho citado fora de external_edges só custa ler um arquivo a mais; nunca muda o veredito."""
-    return set(EXTERNAL_TARGET.findall(text)) if uses_external(text) else set()
+    """Os caminhos que as external_edges de um texto citam (external_info)."""
+    return external_info(text)[1]
 
 
 def uses_external(text):
-    """Barato: o texto tem uma chave external_edges de topo? Só então vale montar o corpus."""
-    return re.search(r"(?m)^external_edges\s*:", text) is not None
+    """O documento tem external_edges no topo, inclusive com a chave entre aspas (external_info)?"""
+    return external_info(text)[0]
 
 
 def corpus_index(root, files=None):
@@ -453,8 +464,11 @@ def form_codes(error):
     return [f"form.{kind}.{scope}.{'.'.join(names) if names else 'root'}"]
 
 
+@functools.lru_cache(maxsize=1024)
 def parse_v1(text):
-    """O parse do contrato v1, um só para codes() e warnings(): (documento cru, canônico, código)."""
+    """O parse do contrato v1, um só para codes(), warnings() e external_info(): (documento cru, canônico, código).
+    Guardado por texto (lru_cache): o mesmo arquivo é parseado uma vez por processo, e nenhum chamador altera o
+    documento devolvido, que é compartilhado."""
     try:
         raw = list(yaml.load_all(text, Loader=Yaml12CoreLoader))
     except DuplicateKeyError:
