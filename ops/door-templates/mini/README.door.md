@@ -1,0 +1,79 @@
+# 🧅 Onion Mini
+
+**O jeito mais simples de começar a construir software com o Claude Code, do jeito Onion.**
+
+O Onion Mini é para quem está começando. Ele traz **um caminho só**, do começo ao fim: você anota
+uma ideia, transforma a ideia numa tarefa, desenvolve a tarefa com a ajuda do Claude e abre um Pull
+Request no final. Nada além disso. Quando você quiser mais, a versão completa do Onion continua lá.
+
+## Do que você precisa
+
+- O **Claude Code** instalado (`claude` no terminal).
+- O **git** instalado, e um projeto seu (pode ser uma pasta vazia).
+- Opcional: uma conta no **GitHub**, para abrir o Pull Request no final.
+
+## Como instalar
+
+Copie a pasta `.claude/` deste repositório para dentro do seu projeto, e o `CLAUDE.md` também:
+
+```bash
+git clone https://github.com/marciocar/onion-mini.git
+cp -r onion-mini/.claude onion-mini/CLAUDE.md seu-projeto/
+cd seu-projeto && claude
+```
+
+Pronto. Dentro do Claude Code, os comandos começam com `/`.
+
+## O caminho, passo a passo
+
+| Passo | Comando | O que acontece |
+|---|---|---|
+| 1. Conhecer o projeto | `/warm-up` | O Claude lê o seu projeto e entende onde está pisando |
+| 2. Anotar a ideia | `/product:collect` | Você conta a ideia (uma funcionalidade nova, um bug) e ela fica registrada |
+| 3. Deixar a ideia clara | `/product:refine` | O Claude faz perguntas até a ideia ficar sem dúvida |
+| 4. Escrever o que vai ser feito | `/product:spec` | A ideia vira uma especificação curta |
+| 5. Criar a tarefa | `/product:feature` | A especificação vira uma tarefa pronta para desenvolver |
+| 6. Começar | `/engineer:start` | O Claude cria a branch, abre uma sessão e entende a tarefa |
+| 7. Planejar | `/engineer:plan` | O trabalho é dividido em fases pequenas |
+| 8. Trabalhar | `/engineer:work` | Uma fase de cada vez, com você aprovando cada uma |
+| 9. Entregar | `/engineer:pr` | O Claude abre o Pull Request |
+
+Os passos 3 e 4 são opcionais: se a ideia já está clara, vá direto do 2 para o 5.
+
+**Parou no meio?** Ao voltar, rode `/catch-up`: o Claude reconstrói onde vocês pararam.
+
+**Perdido?** Digite só `onion` e o Claude explica qual é o próximo passo.
+
+## Gerenciador de tarefas (opcional)
+
+Sem configurar nada, o Onion Mini funciona **sem gerenciador de tarefas**: as tarefas ficam na sua
+sessão local. Se você usa Jira, ClickUp, Asana, Linear ou Zoho Projects e quer que as tarefas
+apareçam lá, rode `/meta:setup-integration` e siga as perguntas.
+
+## Quem ajuda você no caminho
+
+O Claude chama estes especialistas quando precisa:
+
+- `@product-agent` — organiza e prioriza as ideias;
+- `@task-specialist` — quebra uma tarefa grande em partes menores;
+- `@code-reviewer` — revisa o código antes do Pull Request;
+- `@test-engineer` — ajuda a escrever testes.
+
+## O que o Mini não tem, de propósito
+
+O Mini é o ciclo de produto e desenvolvimento, e só ele. A versão completa do Onion tem muito mais:
+grafo de conhecimento, documentação gerada, compliance, guardas automáticas no CI e as ferramentas
+para criar novos comandos e agentes. Alguns comandos do Mini mencionam essas ferramentas; quando você
+encontrar uma que não está aqui, ela é da versão completa e o seu caminho continua sem ela.
+
+Quer a versão completa? Ela é o `onion-standalone` (para um projeto seu) ou o `onion-core` (para
+empresas), em `github.com/marciocar`.
+
+## Licença
+
+MIT — veja `LICENSE`.
+
+---
+
+Este repositório é **gerado** a partir do core do Onion e não recebe Pull Request: uma correção feita
+aqui seria sobrescrita na próxima geração.

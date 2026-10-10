@@ -234,7 +234,26 @@ echo "  (4) varredura independente: nenhum ponteiro a documento privado nomeado"
 # Onion; um `LICENSE-ONION` ali seria a evasiva, não a proteção.
 _slug="$(basename "${DEST}")"
 _pin_ph="$(git -C "${REPO_ROOT}" rev-parse --short=12 "${SRC_REF}")"
-cp "${REPO_ROOT}/LICENSE" "${DEST}/LICENSE" 2>/dev/null || echo "  (5) AVISO: LICENSE do core não encontrada" >&2
+# A LICENSE vem de ${SRC_REF}, não do disco (a mesma classe do settings.json, curada na F2).
+git -C "${REPO_ROOT}" show "${SRC_REF}:LICENSE" > "${DEST}/LICENSE" 2>/dev/null && [ -s "${DEST}/LICENSE" ] \
+  || { rm -f "${DEST}/LICENSE"; echo "  (5) AVISO: LICENSE ausente em ${SRC_REF}" >&2; }
+
+# ── (5-mini) A PORTA DIDÁTICA TEM RAIZ PRÓPRIA (F5 das portas, SAC-94) ───────────────────────────────
+# Até a F5 o mini recebia o README e o CLAUDE.md genéricos abaixo, e os dois mandavam rodar
+# `lint-artifacts.sh` e `/meta:inventory` — que o mini NÃO leva. Um iniciante recebia, na primeira
+# linha que lê, uma instrução impossível de cumprir. O mini agora tem README, CLAUDE.md e skill onion
+# PRÓPRIOS (os overlays do roles.yaml, guardados em ops/door-templates/mini/), escritos pelo
+# door-mini-check.sh da ref de origem (`_vmwt`), nunca do disco. Sem LICENSE-DOCS: o mini não leva
+# docs/, e a licença de documentação não rege nada nele.
+if [ "${ROLE}" = "mini" ]; then
+  _ov_rc=0
+  bash "${_vmwt}/.claude/validation/door-mini-check.sh" --apply-overlays "${DEST}" --source "${_vmwt}" 2>&1 \
+    | sed 's/^/  (5) /'
+  _ov_rc="${PIPESTATUS[0]}"
+  [ "${_ov_rc}" -eq 0 ] || { echo "ERRO: os overlays do mini falharam (rc=${_ov_rc}) — a porta didática não sai sem README, CLAUDE.md e skill próprios." >&2; exit 3; }
+  printf '\nMaterializado do core no pin `%s` · papel `mini`.\n' "${_pin_ph}" >> "${DEST}/README.md"
+  echo "  (5) raiz da porta didática: README.md · CLAUDE.md · skill onion (overlays) · LICENSE"
+else
 cp "${REPO_ROOT}/LICENSE-DOCS" "${DEST}/LICENSE-DOCS" 2>/dev/null || true
 # O "Está:" do README depende do papel (F2 das portas): a 1ª redação dizia "maquinaria completa" em
 # toda porta, e o standalone sem adoção nem federação publicaria uma frase falsa sobre si mesmo.
@@ -304,6 +323,7 @@ viaja por desenho. Se um comando citar um documento marcado \`(core-only)\`, ele
 privado, e não aqui.
 CLAUDEMD
 echo "  (5) raiz da porta: README.md · CLAUDE.md · LICENSE · LICENSE-DOCS"
+fi
 
 # ── (6) A PORTA PRECISA SABER QUEM É, E TER AS PROJEÇÕES QUE AS PRÓPRIAS GUARDAS COBRAM ──────
 # Os três achados vieram da 1ª sessão REAL dentro da porta (`/warm-up`, 2026-09-17) — não de mim:

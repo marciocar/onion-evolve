@@ -166,8 +166,9 @@ roles:
     work_tools: none    # sem KG, sem meta, sem compliance
     downstream: false
     # O vendor-manifest.sh --role mini INCLUI so o que esta lista nomeia (o inverso do corte). Caminhos
-    # relativos a .claude/; diretorio termina em `/`. A materializacao da porta (README e CLAUDE.md
-    # didaticos, skill onion simplificada) e da F5 (SAC-94).
+    # relativos a .claude/; diretorio termina em `/`. Materializada pela 1a vez na F5 (SAC-94): a
+    # verificacao dela, que NAO leva o lint, e o .claude/validation/door-mini-check.sh (allowlist exata,
+    # sem ponteiro morto, sem caminho de maquina), chamado pelo motor do /meta:publish.
     allowlist:
       commands:
         - commands/warm-up.md
@@ -180,22 +181,69 @@ roles:
         - commands/engineer/plan.md
         - commands/engineer/work.md
         - commands/engineer/pr.md
+        # F5: o fallback que TODO adapter de task manager e de forge manda rodar quando falta variavel
+        # (6 citacoes nos arquivos que ja viajavam). Sem ele o iniciante recebe, no primeiro erro de
+        # configuracao, uma instrucao que nao pode cumprir. Nao cita nada fora do mini (medido).
+        - commands/meta/setup-integration.md
       agents:
         - agents/product/product-agent.md
+        # F5: com TASK_MANAGER_PROVIDER=none (o default de quem comeca) e ele quem decompoe; o
+        # product-agent e dois adapters o chamam pelo nome.
+        - agents/product/task-specialist.md
         - agents/review/code-reviewer.md
         - agents/testing/test-engineer.md
       skills:
-        - skills/onion/
+        - skills/onion/       # o SKILL.md e SUBSTITUIDO pelo overlay simplificado (abaixo)
       # BASE MINIMA de que os comandos acima dependem, medida por citacao em 2026-10-10: o engineer:start
       # e o product:* chamam o task manager (env-check.sh, 7 citacoes), o engineer:pr passa pelo forge, e
-      # resolve-integration-branch/onion-version sao lidos pelos fluxos git. Citacao que NAO esta aqui
-      # (kg-radar, agente onion, hooks) sai como AVISO no --list mini: e o que a F5 resolve.
+      # resolve-integration-branch/onion-version sao lidos pelos fluxos de versionamento.
       support:
         - utils/task-manager/
         - utils/forge/
         - validation/onion-version.sh
         - validation/resolve-integration-branch.sh
         - commands/common/prompts/clickup-patterns.md
+        # F5: os dois fragmentos que o engineer:start e o engineer:work mandam SEGUIR. O detector da F2
+        # nao via fragmento citado como `common:prompts:<nome>`; a 1a passada da F5 viu.
+        - commands/common/prompts/task-manager-provider-detection.md
+        - commands/common/prompts/task-manager-auto-update.md
+      # OVERLAYS (F5): arquivos PROPRIOS do mini, que o core guarda em ops/door-templates/mini/ e o
+      # materializador escreve por cima do que o manifesto leva. destino na porta: fonte no core (os dois
+      # relativos a RAIZ do repo). As fontes NAO se chamam README.md/CLAUDE.md/SKILL.md de proposito: um
+      # CLAUDE.md dentro do core seria carregado como instrucao por quem tocasse o diretorio, e um
+      # SKILL.md seria contado como skill do core.
+      overlays:
+        README.md: ops/door-templates/mini/README.door.md
+        CLAUDE.md: ops/door-templates/mini/CLAUDE.door.md
+        .claude/skills/onion/SKILL.md: ops/door-templates/mini/skill-onion.door.md
+      # AUSENCIAS DECLARADAS (F5): o que arquivos COMPARTILHADOS com o core citam e o mini deliberadamente
+      # NAO leva, cada uma com o porque de ser inofensiva para o iniciante. Catraca nos dois sentidos
+      # (door-mini-check.sh): citacao nova fora desta lista reprova, e linha que ninguem mais cita tambem.
+      # A cura de uma linha e tirar a citacao do arquivo compartilhado ou trazer o alvo para a allowlist.
+      known_absent:
+        .claude/validation/kg-radar.sh: "warm-up, catch-up e engineer:work so o rodam SE houver um .kg.yaml no repo; o mini nao tem grafo, o passo nao dispara"
+        .claude/hooks/aside-router-hook.sh: "o warm-up descreve o hook de marcadores; o mini nao leva hook nenhum, e o marcador vira texto comum"
+        /meta:co-evolve: "warm-up e catch-up so o sugerem quando o hook de inbox sinaliza mensagem; o mini nao tem inbox nem hook"
+        /meta:adopt: "citado em comentario e mensagem de onion-version.sh, resolve-integration-branch.sh e engineer:pr sobre repo ADOTADO; o mini nao adota"
+        /git:flow: "o product:feature e o adapter do GitHub o sugerem como proximo passo; no mini o caminho guiado e o engineer:start"
+        /git/sync: "o engineer:pr e o product:feature sugerem sincronizar depois do merge; no mini basta atualizar a branch principal"
+        /product/task: "sugerido como alternativa ao product:feature; no mini a task nasce no product:feature"
+        /product/estimate: "estimativa por story points e opcional (o gate do engineer:start nao bloqueia)"
+        /product/create-task-structure: "o task-specialist o cita como irmao read-only; no mini o proprio agente decompoe"
+        /product/warm-up: "o warm-up lista os warm-ups por dimensao; o mini tem so o geral"
+        /engineer/warm-up: "o warm-up lista os warm-ups por dimensao; o mini tem so o geral"
+        /engineer/hotfix: "o product:feature o cita para correcao urgente em producao; fora do ciclo didatico"
+        /engineer/pre-pr: "o code-reviewer o cita como gate antes do PR; no mini o review e o proprio code-reviewer"
+        /engineer/validate-phase-sync: "citado no adapter de operacao do ClickUp; e da versao completa"
+        common:prompts:story-points-gate: "gate de estimativa opcional do engineer:start (nao bloqueia, so orienta)"
+        common:prompts:story-points-estimation: "o product:feature o cita para estimar; estimativa e opcional no mini"
+        "@story-points-framework-specialist": "estimativa por story points e opcional no mini"
+        "@gitflow-specialist": "o engineer:pr o cita para GitFlow avancado; o PR do mini sai direto do engineer:pr"
+        "@metaspec-gate-keeper": "o warm-up o cita para conformidade com meta-specs; o mini nao tem meta-specs"
+        "@onion": "o warm-up cita o agente orquestrador; no mini a orientacao e a skill onion (digite onion)"
+        "@branch-code-reviewer": "o code-reviewer cita o irmao diff-scoped; no mini o review e o proprio code-reviewer"
+        "@clickup-specialist": "o product-agent e o task-specialist o chamam para operacao avancada de ClickUp; o adapter cobre o basico"
+        "@jira-specialist": "o task-specialist o chama para operacao avancada de Jira; o adapter cobre o basico"
 
   distilled:     # LEGADO — a destilacao curada antiga do onion-mini (prompt-as-bytecode). A porta mini usa `mini`;
                  # este papel fica porque o grafo da topologia o declara (ROLE_distilled, REGRA 41).

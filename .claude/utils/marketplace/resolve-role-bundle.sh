@@ -2,7 +2,7 @@
 # resolve-role-bundle.sh — resolve o bundle de verticais (plugins) de um papel.
 # Lê o mapa role→bundle (roles.yaml) e imprime os verticais que o papel instala.
 #
-# Uso : resolve-role-bundle.sh <role> [--with-optional] [--tools] [--allowlist] [roles.yaml]
+# Uso : resolve-role-bundle.sh <role> [--with-optional] [--tools] [--allowlist|--overlays|--known-absent] [roles.yaml]
 #         <role>          = source | hub | standalone | plugins | consumer | mini | distilled
 #         --with-optional = inclui os verticais opcionais (default: só os base)
 #         --tools         = emite os WORK_TOOLS do papel (comandos de commands/meta/), não os verticais
@@ -10,6 +10,11 @@
 #                           um nome ou uma lista de nomes; none/tbd = vazio)
 #         --allowlist     = emite a ALLOWLIST do papel (só o mini a declara): um caminho relativo a
 #                           .claude/ por linha (diretório termina em `/`). Papel sem allowlist → vazio.
+#         --overlays      = emite os OVERLAYS da allowlist (F5 das portas): "destino<TAB>fonte" por linha,
+#                           os dois relativos à RAIZ do repo — arquivos próprios da porta (README, CLAUDE.md,
+#                           skill simplificada) que substituem ou somam ao que o manifesto leva.
+#         --known-absent  = emite as AUSÊNCIAS DECLARADAS da allowlist: "citação<TAB>porquê" por linha —
+#                           o que os arquivos da porta citam e ela deliberadamente não leva.
 # Saída: um vertical (ou tool, ou caminho) por linha (ordenado). Papel desconhecido → exit 2. Vazio → ok.
 #
 # Determinístico. Consome roles.yaml (SSOT do escopo por papel). Não confundir com o trust model.
@@ -29,6 +34,8 @@ for arg in "$@"; do
     --with-optional) WITH_OPT=1 ;;
     --tools) MODE="tools" ;;
     --allowlist) MODE="allowlist" ;;
+    --overlays) MODE="overlays" ;;
+    --known-absent) MODE="known_absent" ;;
     *) [ -f "${arg}" ] && ROLES="${arg}" ;;
   esac
 done
@@ -71,6 +78,16 @@ if mode == "allowlist":
         out += list(al.get(key) or [])
     for p in sorted(set(out)):
         print(p)
+    sys.exit(0)
+if mode in ("overlays", "known_absent"):
+    al = r.get("allowlist") or {}
+    m = al.get(mode) or {}
+    if not isinstance(m, dict):
+        sys.stderr.write("ERRO: allowlist.%s do papel %s tem de ser um mapa\n" % (mode, role))
+        sys.exit(2)
+    for k in sorted(m):
+        v = str(m[k] if m[k] is not None else "").replace("\t", " ").replace("\n", " ")
+        print("%s\t%s" % (k, v))
     sys.exit(0)
 vs = list(r.get("base") or [])
 if with_opt:
