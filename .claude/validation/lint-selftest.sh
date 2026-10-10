@@ -1328,14 +1328,16 @@ run_moat_boundary_selftests() {
   # citando a fixture com a assinatura, e `grep -F … | grep -qF …` devolveu FALSO. É a classe pipe-verdict
   # (o leitor que fecha cedo sob pipefail) que só o runner de 2 núcleos expõe. Duas passadas por here-string.
   _moat_hit() { local _h; _h="$(grep -F "${mfbase}" <<< "$1" || true)"; grep -qF "${sig}" <<< "${_h}"; }
-  # (a) RED abrangente — todo tipo de moat que o revisor apontou (C1): auto-evolução, federação
-  #     downstream+ledger, absorb-skill (fábrica), grafo FORA de docs/onion/graph (o life-KG privado).
+  # (a) RED abrangente — todo tipo de moat que o revisor apontou (C1): adoção, federação
+  #     downstream+ledger, grafo FORA de docs/onion/graph (o life-KG privado).
+  #     ⚠️ Até 2026-10-10 a fixture levava evolve e absorb-skill (fábrica). A matriz das portas
+  #     (D_MATRIZ_DE_PORTAS_2026_10) libera a meta-fábrica para os plugins; eles migraram para o GREEN (c).
   cat > "${mf}" <<'RED'
 PLUGIN_NAME="__mbguard__"
 PLUGIN_VERSION="0.1.0"
 PLUGIN_DESC="fixture"
 KEYWORDS=(test)
-COMMANDS=(".claude/commands/meta/evolve.md" ".claude/commands/meta/federation-publish.md" ".claude/commands/meta/co-deliver.md" ".claude/commands/meta/absorb-skill.md")
+COMMANDS=(".claude/commands/meta/adopt.md" ".claude/commands/meta/federation-publish.md" ".claude/commands/meta/co-deliver.md")
 DOCS=("docs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml")
 UTILS=(".claude/utils/federation")
 CONFORMANCE="bronze"
@@ -1345,7 +1347,7 @@ LOADS=()
 RED
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
   if _moat_hit "${out}"; then
-    record_pass "moat-boundary: (a) evolve/federação/absorb-skill/life-KG → HARD (C1 do revisor)"
+    record_pass "moat-boundary: (a) adopt/federação/life-KG → HARD (C1 do revisor)"
   else record_fail "moat-boundary: (a)" "vazamento C1 não pego: rc=${rc}"; fi
   # (b) RED por DIRETÓRIO-PAI (C2): declarar commands/meta (dir) arrasta a fábrica; a guarda checa a
   #     EXPANSÃO, não a string — tem de pegar mesmo sem nenhum arquivo de fábrica citado literalmente.
@@ -1370,14 +1372,16 @@ RED
     # NENHUMA citou) e as primeiras HARD, que e o que separa "a guarda nao viu" de "o lint morreu".
     record_fail "moat-boundary: (b)" "bypass por dir-pai nao pego: rc=${rc}; citando a fixture: [$( { grep -F "${mfbase}" <<< "${out}" || true; } | head -3 | tr '\n' '|' | cut -c1-300)]; 1as HARD do lint: [$( { grep '^VIOLATION' <<< "${out}" || true; } | head -2 | cut -c1-160 | tr '\n' '|')]"
   fi
-  # (c) GREEN — capacidade + upstream (co-evolve/co-relay) + produto (create-task-structure) + dir de
-  #     skill/utils limpos: NÃO dispara (o comentário que MENCIONA meta-fábrica também não).
+  # (c) GREEN — capacidade + META-FÁBRICA (create-command, evolve, absorb-skill: liberadas pela matriz
+  #     das portas em 2026-10-10) + produto (create-task-structure) + dir de skill/utils limpos: NÃO
+  #     dispara (o comentário que MENCIONA adoção também não). Até a F2 o GREEN levava co-evolve
+  #     ("upstream permitido"); a matriz o pôs entre o que sai, e ele foi para o RED (d).
   cat > "${mf}" <<'GREEN'
 PLUGIN_NAME="__mbguard__"
 PLUGIN_VERSION="0.1.0"
-PLUGIN_DESC="fixture cita create-vertical/adopt no comentario mas nao nos arrays"
+PLUGIN_DESC="fixture cita co-relay/adopt no comentario mas nao nos arrays"
 KEYWORDS=(test)
-COMMANDS=(".claude/commands/warm-up.md" ".claude/commands/meta/co-evolve.md" ".claude/commands/product/create-task-structure.md")
+COMMANDS=(".claude/commands/warm-up.md" ".claude/commands/meta/create-command.md" ".claude/commands/meta/evolve.md" ".claude/commands/meta/absorb-skill.md" ".claude/commands/product/create-task-structure.md")
 SKILLS=(".claude/skills/onion")
 UTILS=(".claude/utils/task-manager")
 CONFORMANCE="bronze"
@@ -1392,8 +1396,26 @@ GREEN
   # este caso por algo que não é dele. Um caso GREEN que falha por manifesto alheio não mede a
   # guarda: mede a vizinhança.
   if ! _moat_hit "${out}"; then
-    record_pass "moat-boundary: (c) capacidade+upstream+produto+dir limpos → sem HARD"
+    record_pass "moat-boundary: (c) capacidade+meta-fábrica+produto+dir limpos → sem HARD (a matriz libera a fábrica)"
   else record_fail "moat-boundary: (c)" "falso-positivo em manifesto de capacidade limpo"; fi
+  # (d) RED — a federação UPSTREAM (co-evolve, co-relay) e o hook do inbox, que até 2026-10-10 eram
+  #     "permitidos por desenho" e a matriz das portas tira do standalone (logo dos plugins).
+  cat > "${mf}" <<'RED'
+PLUGIN_NAME="__mbguard__"
+PLUGIN_VERSION="0.1.0"
+PLUGIN_DESC="fixture"
+KEYWORDS=(test)
+COMMANDS=(".claude/commands/meta/co-evolve.md")
+HOOKS=(".claude/hooks/co-evolution-inbox-check.sh")
+CONFORMANCE="bronze"
+PROVIDES=("x")
+REQUIRES=()
+LOADS=()
+RED
+  rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
+  if _moat_hit "${out}"; then
+    record_pass "moat-boundary: (d) co-evolve + hook do inbox (federação upstream) → HARD desde a matriz das portas"
+  else record_fail "moat-boundary: (d)" "federação upstream passou no manifesto publicável: rc=${rc}"; fi
   rm -f "${mf}"
 }
 
@@ -1412,12 +1434,13 @@ run_materialize_repo_selftests() {
      && [ -f "${tgt}/README.md" ]; then
     record_pass "materialize-repo: (a) repo self-contained (name onion-plugins, plugins, README)"
   else record_fail "materialize-repo: (a)" "materialize falhou (rc=${rc}) ou faltou name/plugins/README"; fi
-  # (b) 2ª guarda de moat: ZERO arquivo de meta-fábrica/grafo no repo materializado
-  local leak; leak="$(find "${tgt}/plugins" -type f \( -name 'create-vertical.md' -o -name 'create-command.md' \
-    -o -name 'create-skill.md' -o -name 'adopt.md' -o -name 'federation-*.md' -o -name 'co-deliver.md' \
+  # (b) 2ª guarda de moat: ZERO arquivo de adoção/federação/grafo no repo materializado. Desde a matriz
+  #     das portas (2026-10-10) a meta-fábrica NÃO é mais moat; co-evolve/co-relay passaram a ser.
+  local leak; leak="$(find "${tgt}/plugins" -type f \( -name 'adopt.md' -o -name 'federation-*.md' \
+    -o -name 'co-deliver.md' -o -name 'co-evolve.md' -o -name 'co-relay.md' -o -name 'co-announce.md' \
     -o -name '*.kg.yaml' \) 2>/dev/null | grep -c . || true)"
   if [ "${leak}" = "0" ]; then
-    record_pass "materialize-repo: (b) zero fonte de meta-fábrica/grafo no repo público (moat intacto)"
+    record_pass "materialize-repo: (b) zero fonte de adoção/federação/grafo no repo público (moat intacto)"
   else record_fail "materialize-repo: (b)" "${leak} vazamento(s) de moat no repo materializado"; fi
   # (c) PODA — plugin que SUMIU do core tem de sumir do marketplace, e o catálogo refletir isso.
   #     Medido 2026-09-06 ao materializar a consolidação 8→5: o laço só removia o diretório que ia
@@ -13424,6 +13447,32 @@ PY
   done
   if [ "${ok}" = 1 ]; then record_pass "role-bundle: verticais referenciados existem + registrados"
   else record_fail "role-bundle: consistência" "vertical '${bad}' sem manifesto ou fora do marketplace"; fi
+
+  # (p1) PARTIÇÃO DE commands/meta/ (2026-10-10, F2 das portas): comando novo sem conjunto REPROVA, e a
+  #      allowlist do mini com caminho morto também. Repo sintético com o lint REAL e o roles.yaml REAL,
+  #      rodado sob --only no roles.yaml (o gate da REGRA 37); um comando-sonda sem classificação.
+  local sb; sb="$(mktemp -d)"
+  mkdir -p "${sb}/.claude/validation" "${sb}/.claude/utils/marketplace/verticals" "${sb}/.claude/commands/meta" "${sb}/.claude-plugin"
+  cp "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" "${sb}/.claude/validation/"
+  cp "${roles}" "${sb}/.claude/utils/marketplace/roles.yaml"
+  cp "${vdir}"/*.manifest.sh "${sb}/.claude/utils/marketplace/verticals/"
+  cp "${mkt}" "${sb}/.claude-plugin/marketplace.json"
+  cp "${REPO_ROOT}"/.claude/commands/meta/*.md "${sb}/.claude/commands/meta/"
+  printf -- '---\nname: sonda-sem-conjunto\n---\nsonda\n' > "${sb}/.claude/commands/meta/sonda-sem-conjunto.md"
+  local _p1o; _p1o="$(LC_ALL=C bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
+  if grep -q 'sonda-sem-conjunto não está em NENHUM work_tool_set' <<< "${_p1o}" \
+     && grep -q "allowlist do papel 'mini'" <<< "${_p1o}"; then
+    record_pass "role-bundle: (p1) comando de meta/ sem conjunto e allowlist do mini com caminho morto → HARD da REGRA 37"
+  else record_fail "role-bundle: (p1)" "a partição ou a allowlist não reprovou: $(grep -c 'NENHUM work_tool_set' <<< "${_p1o}" || true) UNSET, $(grep -c "allowlist do papel" <<< "${_p1o}" || true) ALLOWDEAD"; fi
+  # (p1-MUT) sem a emissão UNSET, a sonda passa calada — prova que (p1) mede a partição.
+  sed 's|^            print("UNSET\\t%s\\t" % f\[:-3\])$|            pass|' "${sb}/.claude/validation/lint-artifacts.sh" > "${sb}/.claude/validation/lint-mut.sh"
+  if ! cmp -s "${sb}/.claude/validation/lint-artifacts.sh" "${sb}/.claude/validation/lint-mut.sh"; then
+    local _p1m; _p1m="$(LC_ALL=C bash "${sb}/.claude/validation/lint-mut.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
+    if ! grep -q 'sonda-sem-conjunto' <<< "${_p1m}"; then
+      record_pass "role-bundle: (p1-MUT) sem a cobrança da partição a sonda não classificada passa calada — (p1) é load-bearing"
+    else record_fail "role-bundle: (p1-MUT)" "o mutante ainda acusa a sonda — (p1) não prova a partição"; fi
+  else record_fail "role-bundle: (p1-MUT) setup" "a mutação não foi aplicada"; fi
+  rm -rf "${sb}"
 }
 
 # ---------------------------------------------------------------------------
@@ -16560,14 +16609,18 @@ run_role_cut_selftests() {
     record_pass "role-cut: (a) --role standalone devolve lista DIFERENTE de adopted (o papel corta)"
   else record_fail "role-cut: (a)" "as listas dos papéis voltaram a ser idênticas — o --role virou decorativo de novo"; fi
 
-  # (a2) …e o corte é do lado CERTO: quem some é a meta-fábrica, não a doutrina.
+  # (a2) …e o corte é do lado CERTO: quem some é adoção e federação, não a doutrina nem a fábrica.
+  #      ⚠️ Até 2026-10-10 este caso exigia que a META-FÁBRICA saísse (commands/meta, utils/marketplace).
+  #      A matriz das portas (D_MATRIZ_DE_PORTAS_2026_10) inverteu: o standalone LEVA a fábrica e perde
+  #      adoção e federação. O caso (n) abaixo mede a matriz inteira no bundle extraído.
   local _fab=0
-  grep -q ':(exclude).claude/commands/meta/' <<< "${_sa}" && _fab=$((_fab+1))
-  grep -q ':(exclude).claude/utils/marketplace/' <<< "${_sa}" && _fab=$((_fab+1))
+  grep -q ':(exclude).claude/commands/meta/adopt.md' <<< "${_sa}" && _fab=$((_fab+1))
+  grep -q ':(exclude).claude/utils/co-evolution/' <<< "${_sa}" && _fab=$((_fab+1))
   grep -q ':(exclude).claude/validation/federation-' <<< "${_sa}" && _fab=$((_fab+1))
-  if [ "${_fab}" -eq 3 ] && ! grep -q ':(exclude)docs/knowledge-base' <<< "${_sa}"; then
-    record_pass "role-cut: (a2) o standalone perde a meta-fábrica e MANTÉM a doutrina (kb intacta)"
-  else record_fail "role-cut: (a2)" "fábrica cortada=${_fab}/3 · doutrina cortada=$(grep -c ':(exclude)docs/knowledge-base' <<< "${_sa}" || true)"; fi
+  if [ "${_fab}" -eq 3 ] && ! grep -q ':(exclude)docs/knowledge-base' <<< "${_sa}" \
+     && ! grep -q ':(exclude).claude/commands/meta/create-command.md' <<< "${_sa}"; then
+    record_pass "role-cut: (a2) o standalone perde adoção e federação e MANTÉM a doutrina e a meta-fábrica"
+  else record_fail "role-cut: (a2)" "adoção/federação cortadas=${_fab}/3 · doutrina cortada=$(grep -c ':(exclude)docs/knowledge-base' <<< "${_sa}" || true) · create-command cortado=$(grep -c ':(exclude).claude/commands/meta/create-command.md' <<< "${_sa}" || true)"; fi
 
   # (a-MUT) esvaziar `_role_cut` faz standalone voltar a ser adopted — prova que (a) mede algo.
   local mut="${d}/vm-mut.sh"
@@ -16780,6 +16833,158 @@ run_role_cut_selftests() {
   else record_fail "role-cut: (m-MUT) setup" "a mutação não foi aplicada"; fi
   unset -f _m_check
 
+  # ── A MATRIZ DAS PORTAS (2026-10-10, F2 = SAC-91; nó D_MATRIZ_DE_PORTAS_2026_10) ──────────────────
+  # Cada porta leva EXATAMENTE o que a matriz manda, medido no bundle EXTRAÍDO (git archive), com um
+  # oráculo que o corte NÃO define: a lista abaixo é a tabela do maestro em caminhos, escrita aqui, não
+  # lida do vendor-manifest. Um mutante por regra prova que cada caso mede o que diz.
+  _rc_bundle() {  # $1=manifesto (um pathspec por linha) → arquivos que o git archive copiaria, ordenados
+    local _sp=(); mapfile -t _sp <<< "$1"
+    git -C "${REPO_ROOT}" archive HEAD -- "${_sp[@]}" 2>/dev/null | tar -t 2>/dev/null | grep -v '/$' | LC_ALL=C sort
+  }
+  _matrix_check() {  # $1=lista de arquivos → vazio se bate a matriz do standalone/plugins; senão o desvio
+    local _l="$1" _x _bad=""
+    # SAI: adoção e federação (comando, skill, hook, motores)
+    for _x in .claude/commands/meta/adopt.md .claude/commands/meta/federation-status.md \
+              .claude/commands/meta/co-evolve.md .claude/commands/meta/co-relay.md \
+              .claude/commands/meta/co-deliver.md .claude/commands/meta/co-announce.md \
+              .claude/hooks/co-evolution-inbox-check.sh .claude/skills/onion-publish/SKILL.md \
+              .claude/utils/co-evolution/co-relay.sh .claude/utils/marketplace/materialize-marketplace-repo.sh; do
+      grep -qxF "${_x}" <<< "${_l}" && _bad="${_bad} vazou:${_x}"
+    done
+    grep -q '^\.claude/utils/federation-transport/' <<< "${_l}" && _bad="${_bad} vazou:utils/federation-transport/"
+    grep -q '^\.claude/validation/federation-' <<< "${_l}" && _bad="${_bad} vazou:validation/federation-*"
+    # FICA: a meta-fábrica e a condução, e o contrato
+    for _x in .claude/commands/meta/create-command.md .claude/commands/meta/create-vertical.md \
+              .claude/commands/meta/forge.md .claude/commands/meta/forge-guard.md .claude/commands/meta/evolve.md \
+              .claude/commands/meta/dissect.md .claude/commands/meta/cc-update.md .claude/commands/meta/absorb-skill.md \
+              .claude/utils/wizard/topology-projection.sh .claude/utils/marketplace/roles.yaml \
+              .claude/skills/onion-wizard/SKILL.md .claude/utils/adopt/vendor-manifest.sh; do
+      grep -qxF "${_x}" <<< "${_l}" || _bad="${_bad} faltou:${_x}"
+    done
+    grep -q '^\.claude/utils/vertical/' <<< "${_l}" || _bad="${_bad} faltou:utils/vertical/"
+    printf '%s' "${_bad}"
+  }
+  # (n) STANDALONE e PLUGINS: com meta-fábrica, sem adoção nem federação — e os dois manifestos são IGUAIS.
+  local _sa_l _pl _pl_l _nbad
+  _sa_l="$(_rc_bundle "${_sa}")"
+  _pl="$(bash "${vm}" --role plugins --repo "${REPO_ROOT}" 2>/dev/null)"
+  _pl_l="$(_rc_bundle "${_pl}")"
+  _nbad="$(_matrix_check "${_sa_l}")"
+  if [ -n "${_sa_l}" ] && [ -z "${_nbad}" ] && [ "${_pl}" = "${_sa}" ]; then
+    record_pass "role-cut: (n) standalone leva a meta-fábrica e não leva adopt/federation-*/co-*/hook do inbox/onion-publish; plugins = standalone ($(grep -c . <<< "${_sa_l}") arquivos)"
+  else record_fail "role-cut: (n)" "desvio da matriz:${_nbad:- —} · plugins igual ao standalone=$([ "${_pl}" = "${_sa}" ] && echo sim || echo NÃO)"; fi
+  # (n-MUT1) devolver o hook do inbox ao standalone (tirá-lo do corte) TEM de reprovar (n).
+  local mut4="${d}/vm-hook.sh"
+  sed '/^        \.claude\/hooks\/co-evolution-inbox-check\.sh$/d; s|^        \.claude/validation/federation- \\$|        .claude/validation/federation-|' "${vm}" > "${mut4}"
+  if ! cmp -s "${vm}" "${mut4}"; then
+    if [ -n "$(_matrix_check "$(_rc_bundle "$(bash "${mut4}" --role standalone --repo "${REPO_ROOT}" 2>/dev/null)")")" ]; then
+      record_pass "role-cut: (n-MUT1) sem o hook do inbox no corte, o standalone volta a levá-lo e (n) reprova"
+    else record_fail "role-cut: (n-MUT1)" "o mutante não mudou o veredito — (n) não mede o hook do inbox"; fi
+  else record_fail "role-cut: (n-MUT1) setup" "a mutação não foi aplicada"; fi
+  # (n-MUT2) voltar a cortar a meta-fábrica (o corte de antes da matriz) TEM de reprovar (n).
+  local mut5="${d}/vm-fabrica.sh"
+  sed 's|^        \.claude/utils/adopt/ \\$|        .claude/utils/adopt/ \\\n        .claude/utils/wizard/ \\\n        .claude/utils/vertical/ \\|' "${vm}" > "${mut5}"
+  if ! cmp -s "${vm}" "${mut5}"; then
+    if [ -n "$(_matrix_check "$(_rc_bundle "$(bash "${mut5}" --role standalone --repo "${REPO_ROOT}" 2>/dev/null)")")" ]; then
+      record_pass "role-cut: (n-MUT2) com o corte antigo da meta-fábrica o standalone perde wizard/vertical e (n) reprova"
+    else record_fail "role-cut: (n-MUT2)" "o mutante não mudou o veredito — (n) não mede a meta-fábrica"; fi
+  else record_fail "role-cut: (n-MUT2) setup" "a mutação não foi aplicada"; fi
+
+  # (o) MINI: só a allowlist do roles.yaml — nada de meta, KG ou compliance, e todo arquivo vem da lista.
+  local _mi _mi_l _al _obad="" _f _ok _a
+  _mi="$(bash "${vm}" --role mini --repo "${REPO_ROOT}" 2>/dev/null)"
+  _mi_l="$(_rc_bundle "${_mi}")"
+  _al="$(bash "${_resolver}" mini --allowlist 2>/dev/null)"
+  while IFS= read -r _f; do
+    [ -n "${_f}" ] || continue
+    _ok=0
+    while IFS= read -r _a; do
+      [ -n "${_a}" ] || continue
+      case "${_f}" in ".claude/${_a}"|".claude/${_a%/}/"*) _ok=1; break ;; esac
+    done <<< "${_al}"
+    [ "${_ok}" -eq 1 ] || _obad="${_obad} fora-da-lista:${_f}"
+  done <<< "${_mi_l}"
+  grep -qE '^\.claude/commands/meta/|^\.claude/validation/kg-|^\.claude/agents/compliance/|^docs/' <<< "${_mi_l}" && _obad="${_obad} meta/kg/compliance/docs-no-mini"
+  for _f in .claude/commands/engineer/start.md .claude/commands/product/collect.md .claude/skills/onion/SKILL.md \
+            .claude/agents/review/code-reviewer.md .claude/utils/task-manager/env-check.sh; do
+    grep -qxF "${_f}" <<< "${_mi_l}" || _obad="${_obad} faltou:${_f}"
+  done
+  if [ -n "${_mi_l}" ] && [ -z "${_obad}" ]; then
+    record_pass "role-cut: (o) mini leva SÓ a allowlist ($(grep -c . <<< "${_mi_l}") arquivos): ciclo produto→engenharia, sem meta/KG/compliance/docs"
+  else record_fail "role-cut: (o)" "${_obad:- bundle do mini vazio}"; fi
+  # (o-MUT) o mini cair no `_base` (o default de todos os outros papéis) TEM de reprovar (o).
+  local mut6="${d}/vm-mini-base.sh"
+  sed 's|^  if \[ "\${ROLE}" = "mini" \]; then$|  if false; then|' "${vm}" > "${mut6}"
+  if ! cmp -s "${vm}" "${mut6}"; then
+    local _mm; _mm="$(_rc_bundle "$(bash "${mut6}" --role mini --repo "${REPO_ROOT}" 2>/dev/null)")"
+    if grep -q '^\.claude/commands/meta/' <<< "${_mm}"; then
+      record_pass "role-cut: (o-MUT) sem o modo allowlist o mini receberia o core inteiro — (o) é load-bearing"
+    else record_fail "role-cut: (o-MUT)" "o mutante não levou meta/ ao mini — (o) não prova que a allowlist corta"; fi
+  else record_fail "role-cut: (o-MUT) setup" "a mutação não foi aplicada"; fi
+  # (o2) sem a SSOT da allowlist o mini FALHA ALTO (cair no default entregaria o core ao iniciante).
+  local _rc_o2=0; bash "${vm}" --role mini --repo "${r}" >/dev/null 2>&1 || _rc_o2=$?
+  if [ "${_rc_o2}" -ne 0 ]; then
+    record_pass "role-cut: (o2) repo sem roles.yaml → --role mini sai ≠0 (rc=${_rc_o2}) em vez de cair no _base"
+  else record_fail "role-cut: (o2)" "o mini sem allowlist saiu 0 — o default levaria o core inteiro à porta didática"; fi
+
+  # (p) SOURCE = HUB = a superfície inteira (a porta onion-core leva toda a maquinaria; b3 mede o hub).
+  local _so; _so="$(bash "${vm}" --role source --repo "${REPO_ROOT}" 2>/dev/null)"
+  if [ -n "${_so}" ] && [ "${_so}" = "${_hub}" ]; then
+    record_pass "role-cut: (p) --role source devolve o MESMO manifesto do hub (toda a maquinaria; a biografia sai pela allowlist)"
+  else record_fail "role-cut: (p)" "source ≠ hub — a porta onion-core deixaria de levar a maquinaria inteira"; fi
+  # (p-MUT) acrescentar `source` ao corte do standalone TEM de reprovar (p).
+  local mut7="${d}/vm-source.sh"
+  sed 's#^    standalone|plugins)$#    standalone|plugins|source)#' "${vm}" > "${mut7}"
+  if ! cmp -s "${vm}" "${mut7}"; then
+    if [ "$(bash "${mut7}" --role source --repo "${REPO_ROOT}" 2>/dev/null)" != "${_hub}" ]; then
+      record_pass "role-cut: (p-MUT) com source no corte, source ≠ hub e (p) reprova"
+    else record_fail "role-cut: (p-MUT)" "o mutante não mudou o manifesto do source"; fi
+  else record_fail "role-cut: (p-MUT) setup" "a mutação não foi aplicada"; fi
+
+  # (q) --list conta o transporte REAL: o total impresso é o número de arquivos que o git archive copia.
+  local _lt; _lt="$(bash "${vm}" --list standalone --repo "${REPO_ROOT}" 2>/dev/null | awk '$1=="total"{print $2; exit}')"
+  if [ -n "${_lt}" ] && [ "${_lt}" = "$(grep -c . <<< "${_sa_l}")" ]; then
+    record_pass "role-cut: (q) --list standalone imprime total=${_lt}, o mesmo que o bundle extraído"
+  else record_fail "role-cut: (q)" "--list disse total='${_lt}', o bundle tem $(grep -c . <<< "${_sa_l}") — a listagem virou segunda lista"; fi
+
+  # (r) O WIZARD É SENSÍVEL AO PAPEL: sem adoção, a projeção não oferece transição de adoção.
+  local _tp="${REPO_ROOT}/.claude/utils/wizard/topology-projection.sh"
+  if [ -f "${_tp}" ] && [ -f "${REPO_ROOT}/docs/onion/graph/onion-family-topology-2026-07.kg.yaml" ]; then
+    local _tsa _tso
+    _tsa="$(bash "${_tp}" --role standalone 2>/dev/null)"; _tso="$(bash "${_tp}" --role source 2>/dev/null)"
+    if grep -q 'TX_adopt' <<< "${_tso}" && ! grep -qE 'commands/meta/adopt\.md|utils/adopt/' <<< "${_tsa}"; then
+      record_pass "role-cut: (r) a projeção do wizard tira as transições de adoção do standalone e as mantém no source"
+    else record_fail "role-cut: (r)" "source com TX_adopt=$(grep -c TX_adopt <<< "${_tso}" || true) · standalone com transição de adoção=$(grep -cE 'adopt' <<< "${_tsa}" || true)"; fi
+    local mut8="${d}/tp-mut.sh"
+    sed 's|^NO_ADOPTION = {"standalone", "plugins", "mini"}$|NO_ADOPTION = set()|' "${_tp}" > "${mut8}"
+    if ! cmp -s "${_tp}" "${mut8}"; then
+      mkdir -p "${d}/tp/.claude/utils/wizard"; cp "${mut8}" "${d}/tp/.claude/utils/wizard/topology-projection.sh"
+      mkdir -p "${d}/tp/docs/onion/graph"; cp "${REPO_ROOT}/docs/onion/graph/onion-family-topology-2026-07.kg.yaml" "${d}/tp/docs/onion/graph/"
+      if grep -q 'commands/meta/adopt\.md' <<< "$(bash "${d}/tp/.claude/utils/wizard/topology-projection.sh" --role standalone 2>/dev/null)"; then
+        record_pass "role-cut: (r-MUT) sem o filtro por papel o standalone volta a ver as transições de adoção — (r) é load-bearing"
+      else record_fail "role-cut: (r-MUT)" "o mutante não devolveu as transições — (r) não prova o filtro"; fi
+    else record_fail "role-cut: (r-MUT) setup" "a mutação não foi aplicada"; fi
+  else record_skip "role-cut: (r)" "projeção ou grafo da topologia ausentes"; fi
+
+  # (s) PAPEL DE PORTA SÓ COM --kind door: um adotado `mini`/`source` não tem transporte que o produza.
+  local _wsd="${d}/ws-door"; mkdir -p "${_wsd}/.claude"
+  local _rc_s1=0 _rc_s2=0
+  bash "${ws:-${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh}" "${_wsd}" --framework x --commit abc123 --commit-date 2026-01-01 --role mini >/dev/null 2>&1 || _rc_s1=$?
+  bash "${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh" "${_wsd}" --framework x --commit abc123 --commit-date 2026-01-01 --role mini --kind door >/dev/null 2>&1 || _rc_s2=$?
+  if [ "${_rc_s1}" -ne 0 ] && [ "${_rc_s2}" -eq 0 ] && grep -qx 'role: mini' "${_wsd}/.claude/.onion-version" 2>/dev/null; then
+    record_pass "role-cut: (s) write-stamp recusa --role mini sem porta (rc=${_rc_s1}) e carimba com --kind door"
+  else record_fail "role-cut: (s)" "sem porta rc=${_rc_s1} (esperava ≠0) · com porta rc=${_rc_s2} (esperava 0)"; fi
+  local mut9="${d}/ws-mut.sh"
+  sed 's#^    \[ "\${KIND}" = door \] || { echo "ERRO: --role#    true || { echo "ERRO: --role#' "${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh" > "${mut9}"
+  if ! cmp -s "${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh" "${mut9}"; then
+    local _wsm="${d}/ws-mut-t"; mkdir -p "${_wsm}/.claude"; local _rc_sm=0
+    bash "${mut9}" "${_wsm}" --framework x --commit abc123 --commit-date 2026-01-01 --role mini >/dev/null 2>&1 || _rc_sm=$?
+    if [ "${_rc_sm}" -eq 0 ]; then
+      record_pass "role-cut: (s-MUT) sem a guarda de porta o adotado sai carimbado 'mini' — (s) é load-bearing"
+    else record_fail "role-cut: (s-MUT)" "o mutante ainda recusa (rc=${_rc_sm}) — (s) não prova a guarda"; fi
+  else record_fail "role-cut: (s-MUT) setup" "a mutação não foi aplicada"; fi
+  unset -f _rc_bundle _matrix_check
+
   # (k) A SSOT DO ESCOPO NÃO PODE DEFASAR EM SILÊNCIO — o critério é medido, não opinado:
   #     **comando que as mensagens das guardas mandam o ALVO rodar tem de viajar para o alvo.**
   #     Entregar a guarda sem o comando que ela manda rodar é dar uma instrução impossível de cumprir.
@@ -16823,7 +17028,11 @@ run_role_cut_selftests() {
         #     cada versão do Claude Code (radar E3 + selo da baseline do core), declara `Core-only`
         #     na própria `description:`, e o `cc-delta-census.sh` o cita só no docstring. Quarto
         #     comando pego na PRIMEIRA corrida depois de nascer (CI do PR #980).
-        adopt|evolve|forge|dissect|forge-guard|cc-update|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
+        # ⚠️ 2026-10-10 (matriz das portas): a meta-fábrica (evolve, forge, dissect, forge-guard,
+        #     cc-update, create-*) SAIU das exceções — o standalone passou a recebê-la, então comando
+        #     de fábrica que uma guarda manda rodar TEM de viajar como qualquer outro. Ficam só
+        #     adoção e federação, que a matriz tira do standalone.
+        adopt|federation-*|co-announce|co-deliver|co-evolve|co-relay|personality-sync) continue ;;  # adoção/federação/pendente
         nao|federation-) continue ;;                                            # falsos positivos do grep
       esac
       [ -f "${REPO_ROOT}/.claude/commands/meta/${_c}.md" ] || continue          # comando que não existe
