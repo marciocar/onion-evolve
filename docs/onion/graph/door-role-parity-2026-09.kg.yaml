@@ -2,8 +2,7 @@
 # Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
-  x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote da F5 das portas (SAC-94, 2026-10-10): E_MINI_GERADO_F5 e E_DESTILACAO_DO_MINI_VIRA_ARTEFATO_ARQUIVADO nascem confirmed (DEV) apoiando D_MATRIZ_DE_PORTAS_2026_10; Q_MINI_CONFIGURA_INTEGRACAO_PELO_ENV, Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA e Q_PIN_NA_DO_MINI_DEPOIS_DA_PUBLICACAO nascem open para o maestro (gatilhos: iniciante travado configurando; antes do 1o --push do mini; o 1o --push do mini); nenhum flip auto-selado; PR para merge humano"
+  x_drive_checkpoint: sealed
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
