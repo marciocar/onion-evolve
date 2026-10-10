@@ -2,7 +2,8 @@
 title: 'Resíduo — adoção do kit KG-SSOT kg-ssot-v4.3.1 e migração para external_edges (SAC-98)'
 date: 2026-10-10
 branch: feat/kg-ssot-v431-external-edges
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 5e625444146bf62c982caf007305864dd1e6ba9416840a65f2aa15ae1c1897cd
+reviewed_code_sha256: 3107f36a3b7797daf4da5b9b498afa9765d0e75a8bf9b9a9b76b42742dd31975
 findings_total: 5
 findings_real: 5
 findings_fixed: 5
