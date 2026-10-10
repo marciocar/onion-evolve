@@ -69,7 +69,8 @@ Use o estado acima para decidir:
 ## Gerenciador de tarefas
 
 Sem configuração, tudo funciona offline: as tarefas ficam na sessão local. Para usar Jira, ClickUp,
-Asana, Linear ou Zoho Projects, a pessoa roda `/meta:setup-integration`. Nunca abra o `.env`: o
+Asana, Linear ou Zoho Projects, a pessoa põe `TASK_MANAGER_PROVIDER` e as variáveis do gerenciador
+num `.env` na raiz (a lista está em `.claude/utils/task-manager/README.md`). Nunca abra o `.env`: o
 provedor ativo vem do comando de estado acima.
 
 ## Quando pedirem algo que o Mini não tem

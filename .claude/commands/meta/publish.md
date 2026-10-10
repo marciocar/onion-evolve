@@ -9,7 +9,7 @@ tags:
   - doors
   - publish
   - forge
-version: "1.0.0"
+version: "1.1.0"
 updated: "2026-10-10"
 related_commands:
   - /meta:forge
@@ -74,6 +74,11 @@ Leia o status como ele se declara. A defasagem conta commits da superfície que 
    - Troca de papel deliberada (a onion-core de `hub` para `source`, decidida na matriz):
      `--role source --force-role-change`.
    - Para ensaiar uma **branch** antes do merge: `--from <ref>` (o `--push` é recusado com ele).
+   - **1ª materialização** de uma porta cujo repo guarda outro conteúdo (o onion-mini, com a destilação
+     antiga): `--replace-foreign`. O motor arquiva o conteúdo atual numa tag `archive/pre-door-<data>`,
+     empurrada e conferida ANTES da porta no `--push`, e só então o substitui. Sem a flag, rc 2.
+     O mini não leva lint: a verificação dele (passo 5c) é o `door-mini-check.sh` — allowlist exata,
+     sem ponteiro morto, sem caminho de máquina.
 3. **CONFIRMAR** com AskUserQuestion: a porta, o papel, o pin de `origin/main`, o resumo do commit
    ensaiado e o que vai a público. As opções são **publicar** ou **parar**. Nunca assuma.
 4. **PUBLICAR** só com o "sim":
@@ -87,14 +92,15 @@ Leia o status como ele se declara. A defasagem conta commits da superfície que 
    grafo `door-role-parity` na leva seguinte, com `kg-radar` exit 0 (peça 5 da doutrina). Publicação
    rotineira não gera nó nem PR.
 
-`--all` roda o ensaio (ou, com `--push`, a publicação) porta a porta, cada uma em clone próprio. O
-onion-mini é recusado até a F5 (SAC-94): o repo dele guarda a destilação curada, e substituí-la é a 1ª materialização.
+`--all` roda o ensaio (ou, com `--push`, a publicação) porta a porta, cada uma em clone próprio. Ele
+**nunca** repassa `--replace-foreign`: a 1ª materialização do onion-mini é rodada sozinha, de propósito.
 
 ## O que este comando NÃO faz
 
-- Não publica a 1ª materialização do onion-mini (F5). (As guardas de plugin — REGRAS 61, 72–77 e 79 —
-  rodam desde a F4 no passo 5d, sobre o bundle montado, por `plugin-bundle-check.sh`; elas não estão
-  mais no lint de PR, porque o core não versiona mais o `plugins/` montado.)
+- Não substitui conteúdo que não reconhece como porta sem `--replace-foreign`, e com ele não apaga:
+  arquiva numa tag antes. (As guardas de plugin — REGRAS 61, 72–77 e 79 — rodam desde a F4 no passo
+  5d, sobre o bundle montado, por `plugin-bundle-check.sh`; elas não estão mais no lint de PR, porque o
+  core não versiona mais o `plugins/` montado.)
 - Não empurra sem confirmação, não força push e não reescreve a história de porta nenhuma.
 - Não atualiza o clone local da porta nem o `role:` do registro depois de uma troca de papel. Isso vai
   como instrução no fim da rodada.
@@ -105,6 +111,7 @@ onion-mini é recusado até a F5 (SAC-94): o repo dele guarda a destilação cur
 - Motor e medidor (peça 3): `ops/publish-door.sh` (`--status`) · contagem: `door-staleness-check.sh --count`
 - Lente (peça 6): `.claude/rules/publish-lens.md`
 - Bancada (peça 7): `run_publish_selftests` e `run_door_staleness_severity_selftests` em `lint-selftest.sh`
+- Verificação do mini (sem lint): `.claude/validation/door-mini-check.sh` · overlays em `ops/door-templates/mini/`
 - Materializadores: `ops/materialize-door.sh` (core, standalone, mini) ·
   `.claude/utils/marketplace/materialize-marketplace-repo.sh` (plugins)
 - Grafo da decisão: `docs/onion/graph/door-role-parity-2026-09.kg.yaml` (`D_MATRIZ_DE_PORTAS_2026_10`)

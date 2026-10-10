@@ -48,7 +48,9 @@ Os passos 3 e 4 são opcionais: se a ideia já está clara, vá direto do 2 para
 
 Sem configurar nada, o Onion Mini funciona **sem gerenciador de tarefas**: as tarefas ficam na sua
 sessão local. Se você usa Jira, ClickUp, Asana, Linear ou Zoho Projects e quer que as tarefas
-apareçam lá, rode `/meta:setup-integration` e siga as perguntas.
+apareçam lá, crie um arquivo `.env` na raiz do projeto com `TASK_MANAGER_PROVIDER` e as variáveis do
+seu gerenciador. A lista de cada um está em `.claude/utils/task-manager/README.md`. Nunca coloque o
+`.env` no git: ele guarda as suas chaves.
 
 ## Quem ajuda você no caminho
 
