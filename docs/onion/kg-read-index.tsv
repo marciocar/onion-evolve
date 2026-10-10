@@ -1286,6 +1286,7 @@ docs/evolution/federation/members.yaml	C_trust_matrix_stays_onion	docs/onion/gra
 docs/evolution/federation/members.yaml	D_ICP_EMPRESA_MAIS_N1	docs/onion/graph/onion-identity-2026-07.kg.yaml
 docs/evolution/federation/members.yaml	EN_CORE	docs/onion/graph/federation-health-2026-07.kg.yaml
 docs/evolution/federation/members.yaml	E_ELENXO_MEMBERS_YAML_HAS_NO_PLATFORM_IDENTITY	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
+docs/evolution/federation/members.yaml	E_ESPELHO_CADUCO_DO_SSOT_DA_FEDERACAO	docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml
 docs/evolution/federation/members.yaml	E_GRANAAI_PIN_REVERIFIED	docs/onion/graph/federation-health-2026-07.kg.yaml
 docs/evolution/federation/members.yaml	E_MEDIDO_FEDERACAO_22_MEMBROS_1001	docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml
 docs/evolution/federation/members.yaml	E_METAGAMIFY_PIN_REVERIFIED	docs/onion/graph/federation-health-2026-07.kg.yaml
@@ -2190,6 +2191,7 @@ ops/mcp-onion-exec/server.py	E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA	
 ops/mcp-onion-kg/server.py	E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
+ops/mcp-onion-kg/server.py	Q_ONION_KG_MCP_NEXT	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 ops/pr-finalize.sh	E_CONFLITO_DE_PROJECAO_GERADA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 ops/pr-finalize.sh	E_ELENXO_2_REABRIU_B1_PELA_FORMA_DO_HASH	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/pr-finalize.sh	E_ELENXO_REPROVOU_O_MOTOR_QUE_LAVAVA_RESIDUO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
