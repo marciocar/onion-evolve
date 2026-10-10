@@ -6,14 +6,23 @@ meta:
   layer: audit
   baseline: 2026-10-04
   review_after: 2026-11-18
-  x_supersedes_external:
-    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_CREATE_SKILL_EXECUTA_GIT_DIFF_A_CADA_INVOCACAO
-    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_LINK_QUEBRADO_NA_DOUTRINA_DE_CLIENTE
-    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_RAIO_X_PUBLICA_ALVOS_FALSOS_DE_SKILLS
-    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#E_D9_NAO_E_NOOP_NO_CORE
-    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_FINDINGSCHEMA_DO_EVOLVE_NAO_E_JSON_SCHEMA
-    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_QUATRO_SIMBOLOS_FANTASMAS_NO_EVOLVE
-    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA
+# Arestas para nó de OUTRO grafo (contrato v4.3). Migradas de x_supersedes_external e
+# x_constrained_by em 2026-10-10 (SAC-98); sem `from`, quem aponta é o grafo inteiro.
+external_edges:
+  - to: "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_CREATE_SKILL_EXECUTA_GIT_DIFF_A_CADA_INVOCACAO"
+    edge_type: SUPERSEDES
+  - to: "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_LINK_QUEBRADO_NA_DOUTRINA_DE_CLIENTE"
+    edge_type: SUPERSEDES
+  - to: "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_RAIO_X_PUBLICA_ALVOS_FALSOS_DE_SKILLS"
+    edge_type: SUPERSEDES
+  - to: "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#E_D9_NAO_E_NOOP_NO_CORE"
+    edge_type: SUPERSEDES
+  - to: "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_FINDINGSCHEMA_DO_EVOLVE_NAO_E_JSON_SCHEMA"
+    edge_type: SUPERSEDES
+  - to: "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_QUATRO_SIMBOLOS_FANTASMAS_NO_EVOLVE"
+    edge_type: SUPERSEDES
+  - to: "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA"
+    edge_type: SUPERSEDES
 nodes:
   - id: E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS
     node_type: evidence

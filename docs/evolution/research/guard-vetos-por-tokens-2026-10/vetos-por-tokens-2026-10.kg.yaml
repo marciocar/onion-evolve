@@ -6,12 +6,15 @@ meta:
   layer: audit
   baseline: 2026-10-05
   review_after: 2026-11-19
-  x_supersedes_external:
-    - docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml#Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH
   # Forja de CURA DE CLASSE (/meta:forge-guard) dos dois vetos PreToolUse existentes — não guarda
   # nova. O maestro pediu que fosse BEM ESTUDADA antes de forjada: os nós E_ESTUDO_* são o estudo, e
   # vieram ANTES do artefato. A 1ª forma desta lib (sed, 2026-09-02) mora no grafo
   # audit-textual-gates-2026-09.
+# Arestas para nó de OUTRO grafo (contrato v4.3). Migradas de x_supersedes_external e
+# x_constrained_by em 2026-10-10 (SAC-98); sem `from`, quem aponta é o grafo inteiro.
+external_edges:
+  - to: "docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml#Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH"
+    edge_type: SUPERSEDES
 nodes:
   - id: E_DEFEITO_QUINZE_FORMAS_E_UM_FALSO_POSITIVO
     node_type: evidence

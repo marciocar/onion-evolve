@@ -16,8 +16,14 @@ meta:
   # TETO declarado (Elenxo 2026-10-06): nenhuma guarda le este campo fora das rodadas de radar
   # (radar-aufhebung-check.sh varre so docs/evolution/research/*/radar-*); aqui e declaracao sem cobranca,
   # e o grafo de 2026-06 nao aponta para frente.
-  x_supersedes_external:
-    - docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml#S7_claim_llm_as_vm
+  # 2026-10-10 (SAC-98): a ligacao saiu de meta.x_supersedes_external para external_edges (contrato v4.3),
+  # e desde entao o gate do contrato COBRA que o alvo exista (integrity.dangling-external) — o teto acima
+  # cai pela metade: a existencia do alvo e cobrada; a superacao em si segue sem guarda fora do radar.
+# Arestas para nó de OUTRO grafo (contrato v4.3). Migradas de x_supersedes_external e
+# x_constrained_by em 2026-10-10 (SAC-98); sem `from`, quem aponta é o grafo inteiro.
+external_edges:
+  - to: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml#S7_claim_llm_as_vm"
+    edge_type: SUPERSEDES
 nodes:
   # ---- decidido (as nomeacoes assentadas) ----
   - id: D_ELENXO_IS_METHOD

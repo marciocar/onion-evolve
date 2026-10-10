@@ -5,7 +5,11 @@ meta:
   schema_version: "1"
   baseline: 2026-10-04
   review_after: 2026-11-18
-  x_supersedes_external: "docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml#Q_GATILHO_DO_EVOLVE_QUAL_E"
+# Arestas para nó de OUTRO grafo (contrato v4.3). Migradas de x_supersedes_external e
+# x_constrained_by em 2026-10-10 (SAC-98); sem `from`, quem aponta é o grafo inteiro.
+external_edges:
+  - to: "docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml#Q_GATILHO_DO_EVOLVE_QUAL_E"
+    edge_type: SUPERSEDES
 nodes:
   - id: E_O_EVOLVE_ERA_O_UNICO_ORGAO_SEM_GATILHO
     node_type: evidence

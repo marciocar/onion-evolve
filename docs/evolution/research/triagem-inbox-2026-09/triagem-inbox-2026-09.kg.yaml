@@ -11,6 +11,12 @@ meta:
   # medido, e o maestro promove ao backlog o que escolher quando colher uma onda.
   # Sem marcador de opt-in da REGRA 62 — de propósito: este grafo não projeta em docs/backlog.md.
 
+# Arestas para nó de OUTRO grafo (contrato v4.3). Migradas de x_supersedes_external e
+# x_constrained_by em 2026-10-10 (SAC-98); sem `from`, quem aponta é o grafo inteiro.
+external_edges:
+  - from: "docs/onion/graph/door-role-parity-2026-09.kg.yaml#D_MATRIZ_DE_PORTAS_2026_10"
+    to: D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA
+    edge_type: CONSTRAINS
 nodes:
   - id: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
     node_type: evidence
@@ -186,8 +192,7 @@ nodes:
     verified_at: '2026-09-24'
     verified_against: 'derivado de E_REGRA_85_E_INSATISFAZIVEL_ANTES_DO_MERGE, medido no PR #869'
     label: 'DECISAO DO MAESTRO: em que MOMENTO cobrar a defasagem da porta. Hoje a cobranca e no lint de PR, e a cura so existe depois do merge — entao todo PR nasce com 2 HARD que ele nao pode limpar, e o registro do `door-staleness-baseline.txt` mostra que isto ja se repetiu ao menos quatro vezes ("O gate fica VERMELHO ate o push"). Tres opcoes. (1) MANTER e tratar o vermelho como espera legitima — honesto, mas normaliza merge com gate vermelho, que e o unico habito capaz de corroer todos os outros gates. (2) MOVER A COBRANCA PARA DEPOIS DO MERGE: um passo no push para `main` que abre issue/avisa, casando o gatilho com o unico momento em que a cura E possivel. (3) TOLERAR UMA JANELA EXPLICITA no baseline (ex.: teto 0 vira "0 desde o ultimo push verificado"), o que exige a guarda saber ler o remoto. RECOMENDO A (2): nao pede catedral, so muda o momento, e passa no teste do gatilho — a dor ja ocorreu 4+ vezes e esta registrada no proprio baseline.'
-    x_constrained_by: "docs/onion/graph/door-role-parity-2026-09.kg.yaml#D_MATRIZ_DE_PORTAS_2026_10"
-    narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAI (quando a F3 tornar o workflow informativo): a cobranca bloqueante da defasagem da porta na main. Ate la ela segue no vivo; sobrevive a fronteira SEM-BASELINE/PIN-DESCONHECIDO/ERRO como HARD."
+    narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAI (quando a F3 tornar o workflow informativo): a cobranca bloqueante da defasagem da porta na main. Ate la ela segue no vivo; sobrevive a fronteira SEM-BASELINE/PIN-DESCONHECIDO/ERRO como HARD. · desde o contrato v4.3 (SAC-98), a aresta mora em external_edges, no topo do grafo"
     sealed_by: maestro
     sealed_at: '2026-09-24'
     resolution: >-
