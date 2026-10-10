@@ -501,6 +501,31 @@ else
   echo "✗ (5c) o papel '${ROLE}' leva o lint e ele NÃO veio no bundle — porta sem o próprio gate." >&2; FAIL=1
 fi
 
+# (5d) AS GUARDAS DE PLUGIN sobre o BUNDLE MONTADO (F4 das portas, SAC-93). Até a F4 elas rodavam no
+#      lint de todo PR sobre um `plugins/` versionado no core; ele saiu, e elas julgam aqui o que vai a
+#      público: REGRA 61 (metade do resultado), 72, 73, 74, 75, 76 (catálogo × raiz), 77 e 79. Rodam com
+#      o checador DA WORKTREE (o motor também é de origin/main) e a fonte é a worktree. rc 2 = não
+#      mediu, e não medir reprova: publicar sem medir é afirmar o que não sei.
+if [ "${ROLE}" = "plugins" ]; then
+  _pb="${WT}/.claude/validation/plugin-bundle-check.sh"
+  if [ ! -f "${_pb}" ]; then
+    echo "✗ (5d) plugin-bundle-check.sh ausente em ${SRC_REF} — as guardas de plugin não têm como rodar." >&2; FAIL=1
+  else
+    _pbo=""; _pbrc=0
+    _pbo="$(bash "${_pb}" --source "${WT}" --bundle "${DEST}" --format tsv 2>&1)" || _pbrc=$?
+    _pbh="$(printf '%s\n' "${_pbo}" | awk -F'\t' '$1=="HARD"' | grep -c . || true)"
+    if [ "${_pbrc}" -eq 0 ]; then
+      echo "  (5d) guardas de plugin no bundle (REGRAS 61/72-77/79): 0 HARD"
+    elif [ "${_pbrc}" -eq 1 ]; then
+      echo "✗ (5d) guardas de plugin no bundle: ${_pbh} HARD" >&2
+      printf '%s\n' "${_pbo}" | awk -F'\t' '$1=="HARD" {printf "      REGRA %s [%s] %s: %s\n", $2, $3, $4, substr($5,1,160)}' | head -10 >&2
+      FAIL=1
+    else
+      echo "✗ (5d) as guardas de plugin NÃO mediram o bundle (rc=${_pbrc}): $(printf '%s' "${_pbo}" | tail -1 | cut -c1-200)" >&2; FAIL=1
+    fi
+  fi
+fi
+
 if [ "${FAIL}" -ne 0 ]; then
   echo "✗ VERIFICAÇÃO REPROVOU — nada foi commitado nem publicado." >&2
   exit 1

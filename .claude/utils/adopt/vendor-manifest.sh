@@ -465,6 +465,10 @@ _emit_role_excludes() {  # $1=REPO $2=papel
 # `git archive` copia para o adotante. Um `plugins` ali faria o plugin montado VIAJAR dentro do bundle,
 # que é outra coisa e está errada. A assimetria é o desenho declarado dez linhas acima: varrer mais do
 # que viaja nunca é fail-open; varrer menos é. Portanto o extra só sai no modo `scrub`.
+# F4 DAS PORTAS (2026-10-10): o core não versiona mais `plugins/` — o bundle é montado na publicação e a
+# varredura de vazamento dele é o passo (5a) do ops/publish-door.sh, sobre o clone montado. A raiz segue
+# aqui porque quem consome esta lista pula diretório ausente, e um adotante que monta os próprios
+# plugins com o /meta:create-vertical continua tendo o `plugins/` dele varrido.
 _SCRUB_EXTRA=(plugins)
 
 if [ "${MODE}" = "scrub" ]; then

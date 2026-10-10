@@ -58,7 +58,7 @@ nodes:
     verified_at: '2026-10-05'
     source_tier: 10
     verified_against: 'ls plugins/*/.claude-plugin: capability.json plugin.json provenance.json, nenhum marketplace.json; o marketplace.json mora so na raiz; claude plugin validate plugins/onion --strict: Validation passed'
-    trace: 'plugins/onion/.claude-plugin/plugin.json'
+    trace: '.claude/utils/marketplace/assemble-plugin.sh'  # era plugins/onion/.claude-plugin/plugin.json — saiu do core na F4 das portas (2026-10-10); quem escreve o plugin.json é o assembler
     label: 'A 2.1.289 corrige o claude plugin validate PULANDO o plugin quando a pasta tambem tinha um manifesto de marketplace — ou seja, ate a 2.1.288 um "validacao passou" ali podia ser validacao que nao rodou. Medido: nenhuma pasta de plugin desta casa tem os dois manifestos juntos (o marketplace.json mora so na raiz), logo os "Validation passed" anteriores eram validacao de verdade.'
     provenance:
       source: "plugins/onion/.claude-plugin/plugin.json"

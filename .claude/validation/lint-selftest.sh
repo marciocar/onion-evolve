@@ -1627,39 +1627,40 @@ run_site_deeplink_selftests() {
 # `repository` e canal de suporte — 404 para o instalador). A isenção de provenance.json é
 # load-bearing: sem ela a guarda acusaria os 5 arquivos que DEVEM carregar o slug de origem,
 # e uma guarda que grita no lugar certo pelo motivo errado é a que se aprende a ignorar.
+# F4 DAS PORTAS (2026-10-10): a guarda saiu do lint de PR (o core não versiona mais plugins/) e julga o
+# BUNDLE MONTADO no plugin-bundle-check.sh. A fixture deixou de nascer no dir vivo: o bundle é um
+# temporário, e a asserção é pela linha da REGRA 79 (as outras regras do checador acusam o bundle
+# sintético incompleto, e isso não é o que este caso mede).
 run_plugin_private_url_selftests() {
-  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
-  local plugdir="${REPO_ROOT}/plugins"
-  [ -d "${plugdir}" ] || { record_pass "plugin-private-url: sem plugins/ — nada a testar (adotante)"; return; }
+  local chk="${SCRIPT_DIR}/plugin-bundle-check.sh"
+  [ -f "${chk}" ] || { record_fail "plugin-private-url" "plugin-bundle-check.sh ausente"; return; }
   local slug
   slug="$(git -C "${REPO_ROOT}" remote get-url origin 2>/dev/null | sed -E 's#(git@|https://)([^/:]+)[/:]##; s#\.git$##' || true)"
-  [ -n "${slug}" ] || { record_pass "plugin-private-url: sem remote origin — guarda sem sujeito"; return; }
-  # Fixture no dir VIVO (o caso testa a guarda REAL, que varre plugins/). Coberta pelo
-  # .gitignore em `plugins/__*__/`; removida no RETURN.
-  local fdir="${plugdir}/__selftest79__"
-  trap 'rm -rf "'"${fdir}"'"' RETURN
+  [ -n "${slug}" ] || { record_skip "plugin-private-url: sem remote origin — guarda sem sujeito"; return; }
+  local d; d="$(mktemp -d)"
+  local fdir="${d}/plugins/__selftest79__"
   mkdir -p "${fdir}/.claude-plugin"
-  local out rc=0 tf="${fdir}/README.md"
+  local out tf="${fdir}/README.md"
   # (a) home CRUA do source privado num artefato de plugin → HARD (é o degrau a mais vs REGRA 35)
   printf 'Fonte: https://github.com/%s\n' "${slug}" > "${tf}"
-  out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
-  if grep -q 'plugin/404-privado' <<< "${out}"; then
-    record_pass "plugin-private-url: (a) home crua do source privado em plugins/ → HARD"
-  else record_fail "plugin-private-url: (a)" "home crua não foi pega: rc=${rc} out=${out}"; fi
+  out="$(bash "${chk}" --source "${REPO_ROOT}" --bundle "${d}" --format tsv 2>&1 || true)"
+  if grep -q '^HARD	79	404-privado	plugins/__selftest79__/README.md' <<< "${out}"; then
+    record_pass "plugin-private-url: (a) home crua do source privado no bundle → HARD"
+  else record_fail "plugin-private-url: (a)" "home crua não foi pega: $(grep '	79	' <<< "${out}" | head -2 | tr '\n' ' ')"; fi
   # (b) provenance.json com o MESMO slug → limpo (a isenção; lá é marca de origem, não endereço)
-  local pf="${fdir}/.claude-plugin/provenance.json"
-  printf '{ "repository": "%s", "tree_sha": "deadbeef" }\n' "${slug}" > "${pf}"
-  rc=0; out="$(bash "${lint}" --only="${pf}" 2>&1)" || rc=$?
-  if ! grep -q 'plugin/404-privado' <<< "${out}"; then
+  printf 'Sem link aqui.\n' > "${tf}"
+  printf '{ "repository": "%s", "tree_sha": "deadbeef" }\n' "${slug}" > "${fdir}/.claude-plugin/provenance.json"
+  out="$(bash "${chk}" --source "${REPO_ROOT}" --bundle "${d}" --format tsv 2>&1 || true)"
+  if ! grep -q '	79	' <<< "${out}"; then
     record_pass "plugin-private-url: (b) provenance.json com o slug de origem → limpo (isenção)"
-  else record_fail "plugin-private-url: (b)" "isenção do provenance quebrou: ${out}"; fi
+  else record_fail "plugin-private-url: (b)" "isenção do provenance quebrou: $(grep '	79	' <<< "${out}" | head -1)"; fi
   # (c) URL do repo PÚBLICO → limpo (não superreage a github.com)
   printf 'Issues: https://github.com/marciocar/onion-plugins/issues\n' > "${tf}"
-  rc=0; out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
-  if ! grep -q 'plugin/404-privado' <<< "${out}"; then
+  out="$(bash "${chk}" --source "${REPO_ROOT}" --bundle "${d}" --format tsv 2>&1 || true)"
+  if ! grep -q '	79	' <<< "${out}"; then
     record_pass "plugin-private-url: (c) URL do repo público → limpo (sem superreação a github.com)"
-  else record_fail "plugin-private-url: (c)" "falso-positivo no canal público: ${out}"; fi
-  rm -rf "${fdir}"
+  else record_fail "plugin-private-url: (c)" "falso-positivo no canal público: $(grep '	79	' <<< "${out}" | head -1)"; fi
+  rm -rf "${d}"
 }
 
 # Modo harness-inventory — REGRA 80. A SSOT gerada dos números do PRÓPRIO harness. Nasceu de
@@ -2364,7 +2365,7 @@ run_kg_status_factor_selftests() {
     sed 's#^\s*"\.claude/validation/lib/status-factor\.awk".*$##' "${mf}" > "$d/sem-lib.manifest.sh"
     # (2026-09-03, Elenxo das faixas) ANTES este caso montava no plugins/onion/ REAL (dest default do
     # assembler = SRC/plugins/<nome>, com rm -rf): regravava provenance.json no repo vivo a cada bancada e, sob
-    # --jobs, corria com plugins_sync (que lê esse diretório). Agora o destino é um mktemp e "não tocou no
+    # --jobs, corria com plugins_sync (família aposentada na F4 das portas, que lia esse diretório). Agora o destino é um mktemp e "não tocou no
     # destino" é medido pelo snapshot da árvore, não por git status do repo vivo.
     local rc_ok rc_sem dirty_before dirty_after dest="$d/dest"
     rc_ok=0;  bash "${asm}" "${mf}" "${REPO_ROOT}" "${dest}" >/dev/null 2>&1 || rc_ok=$?
@@ -6601,10 +6602,10 @@ run_pre_push_selftests() {
     ( cd "${sb}/o" && git config user.email o@o && git config user.name o && sed -i 2s/.*/MAIN/ c.txt && git commit -qam main2 && git push -q origin main ) >/dev/null 2>&1
     g="$(_pf "${sb}" --rebase)"; _pfc "rebase limpo sobre main que mexe noutra linha → passa" 0 "${g}" "${sb}"
   fi
-  # ── SAC-67 (2026-10-08): conflito SÓ de projeção em plugins/ se resolve no --rebase; conflito de FONTE
-  # continua recusa. Medido antes: dois PRs que tocam fontes DIFERENTES conflitaram em 4 arquivos de
-  # plugins/ (provenance.json, README.md) e em 0 de fonte. Plugin de mentira: plugins/vx/README.md =
-  # s1.txt + s2.txt, montado por um assemble-plugin.sh que lê as fontes da árvore em que roda.
+  # ── SAC-67 (2026-10-08) → F4 DAS PORTAS (2026-10-10): até a F4, conflito SÓ em plugins/ era projeção e o
+  # --rebase o remontava das fontes. O `plugins/` saiu do core e deixou de ser projeção: um conflito ali é
+  # tão REAL quanto qualquer outro, e o motor recusa. Conflito de FONTE continua recusa. Plugin de mentira:
+  # plugins/vx/README.md = s1.txt + s2.txt (o assemble-plugin.sh de mentira lê as fontes da árvore).
   _plugsb() {  # <nome> → sandbox com plugins/vx na main, PR mexendo em s1.txt (linha adjacente à de s2)
     sb="${d}/$1"; _sbmk "${sb}" || { record_fail "pr-finalize: sandbox $1" "não montou"; return 1; }
     ( cd "${sb}/w" && git switch -q main \
@@ -6618,17 +6619,18 @@ run_pre_push_selftests() {
       && echo v1 > a.txt && sed -i 50s/.*/PR/ c.txt && echo s1-PR > s1.txt && cat s1.txt s2.txt > plugins/vx/README.md \
       && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
   }
-  # (x1) a main mexe em s2.txt (outra FONTE): o README do plugin conflita, a fonte não → remonta e passa
+  # (x1) a main mexe em s2.txt (outra FONTE): conflita SÓ plugins/vx/README.md — que não é mais projeção ⇒
+  #      RECUSA (rebase abortado, HEAD intacto). Se plugins/ voltar a ONION_GENERATED_DIRS, o motor o
+  #      resolveria em silêncio e este caso reprova.
   if _plugsb plug1; then
-    g="$(_pf "${sb}" -m t1)"
+    g="$(_pf "${sb}" -m t1)"; _h0="$(git -C "${sb}/w" rev-parse HEAD)"
     git clone -q "${sb}/remote.git" "${sb}/o" 2>/dev/null
     ( cd "${sb}/o" && git config user.email o@o && git config user.name o && echo s2-MAIN > s2.txt \
       && cat s1.txt s2.txt > plugins/vx/README.md && git commit -qam main-s2 && git push -q origin main ) >/dev/null 2>&1
     g="$(_pf "${sb}" --rebase)"
-    _rd="$(tr '\n' '|' < "${sb}/w/plugins/vx/README.md" 2>/dev/null)"
-    if [ "${g}" = 0 ] && [ "${_rd}" = "s1-PR|s2-MAIN|" ] && grep -q 'remontado das fontes mescladas' "${sb}/out"; then
-      record_pass "pr-finalize: SAC-67 (x1) conflito só de projeção em plugins/ → remontado das fontes mescladas (rc=0)"
-    else record_fail "pr-finalize: SAC-67 (x1) plugin em conflito" "rc=${g} README=${_rd}: $(tail -2 "${sb}/out" | tr '\n' ' ')"; fi
+    if [ "${g}" = 1 ] && grep -q 'conflito REAL em plugins/vx/README.md' "${sb}/out" && [ "$(git -C "${sb}/w" rev-parse HEAD)" = "${_h0}" ]; then
+      record_pass "pr-finalize: F4 (x1) plugins/ não é mais projeção — conflito ali é REAL e o rebase recusa (HEAD intacto)"
+    else record_fail "pr-finalize: F4 (x1) plugins/ tratado como projeção" "rc=${g}: $(tail -2 "${sb}/out" | tr '\n' ' ')"; fi
   fi
   # (x2) a main mexe na MESMA fonte (s1.txt): conflito REAL → recusa, rebase abortado, nada mudou
   if _plugsb plug2; then
@@ -6637,7 +6639,7 @@ run_pre_push_selftests() {
     ( cd "${sb}/o" && git config user.email o@o && git config user.name o && echo s1-MAIN > s1.txt \
       && cat s1.txt s2.txt > plugins/vx/README.md && git commit -qam main-s1 && git push -q origin main ) >/dev/null 2>&1
     g="$(_pf "${sb}" --rebase)"
-    if [ "${g}" = 1 ] && grep -q 'conflito REAL em s1.txt' "${sb}/out" && [ "$(git -C "${sb}/w" rev-parse HEAD)" = "${_h0}" ]; then
+    if [ "${g}" = 1 ] && grep -q 'conflito REAL em ' "${sb}/out" && [ "$(git -C "${sb}/w" rev-parse HEAD)" = "${_h0}" ]; then
       record_pass "pr-finalize: SAC-67 (x2) conflito em FONTE continua recusa (rebase abortado, HEAD intacto)"
     else record_fail "pr-finalize: SAC-67 (x2) conflito de fonte escondido" "rc=${g}: $(tail -2 "${sb}/out" | tr '\n' ' ')"; fi
   fi
@@ -6925,7 +6927,7 @@ run_site_inventory_selftests() {
 }
 
 # ---------------------------------------------------------------------------
-# Modo adopted-role — os checks de marketplace (plugins_sync/role_bundle_sync) devem PULAR
+# Modo adopted-role — os checks de marketplace (role_bundle_sync e marketplace_root_sync; até a F4 das portas também plugins_sync) devem PULAR
 # em role: adopted (consumidor não distribui plugins). Sinal de um adotante regulado 2026-07-10: rodando como
 # source, o selftest mascarava a regressão — este caso roda o lint num sandbox COM stamp adopted
 # e SEM plugins/ + marketplace.json, e assere zero violação de marketplace.
@@ -13015,7 +13017,7 @@ run_assemble_plugin_selftests() {
   # em quem publica plugins (o core tem plugins/ committed). Um consumidor não republica
   # → pular gracioso em vez de cair no assemble (que exige todos os componentes-fonte do
   # manifest presentes) sob set -e e abortar o harness inteiro.
-  if [ ! -d "${REPO_ROOT}/plugins" ]; then record_skip "assemble-plugin: sem plugins/ vendorizados → pulado (consumidor não publica plugins)"; return; fi
+  case "${SELFTEST_ROLE}" in ""|source) : ;; *) record_skip "assemble-plugin: papel '${SELFTEST_ROLE}' não publica plugins → pulado (desde a F4 o core também não versiona plugins/; o predicado é o PAPEL)"; return ;; esac
   local d rc
 
   # (a) DESIGN: estrutura com utils + gate (commands+agents+utils+validation+manifest+proveniência)
@@ -13377,55 +13379,102 @@ run_scaffold_diagnose_selftests() {
 }
 
 # ---------------------------------------------------------------------------
-# Modo plugins-sync — exercita o drift-guard (REGRA 19 check_plugins_sync) do
-# lint-artifacts: cada plugins/<name> committado DEVE bater com a regeneração da
-# fonte (diff -x provenance + tree_sha). Cobre: em-sync (catch de regen esquecida)
-# + detecção de adulteração + insensibilidade a ref/commit_date voláteis.
+# Modo plugin-bundle — as guardas de PLUGIN rodam sobre um BUNDLE TEMPORÁRIO, nunca a árvore viva
+# (F4 das portas, SAC-93, 2026-10-10). Substitui a família plugins-sync, que exercitava a REGRA 19
+# (Plugins de vertical (plugins/*) sincronizados com as fontes) — aposentada junto com o `plugins/`
+# versionado. Polaridades, cada uma com o seu mutante:
+#   (a) as FONTES VIVAS montadas num temporário passam limpas no plugin-bundle-check (0 HARD, rc 0)
+#       — a cobrança que antes era o lint de PR agora é esta, sobre um bundle que nasce e morre aqui;
+#   (b) defeito PLANTADO numa cópia do bundle é barrado, por regra: 61 (moat no resultado), 72
+#       (namespace), 74 (caminho nu), 75 (link morto), 76 (catálogo × raiz) e 79 (repo privado);
+#   (c) bundle vazio = rc 2 (não medi), nunca "limpo";
+#   (d) NÃO TRAVAR: o pre-commit não monta plugin (o lint de PR sobre fonte bundlada alterada é o caso
+#       only-gate (ii) da família capability);
+#   (e) a raiz do core não versiona plugins/ e o catálogo dela aponta o repo PÚBLICO.
 # ---------------------------------------------------------------------------
-run_plugins_sync_selftests() {
-  local asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
-  # A BARRA FINAL é de propósito (2026-10-06): o `_selftest_family_map` só trata como PREFIXO o caminho
-  # que termina em `/`. Esta família regenera CADA manifesto e compara com o plugin commitado — é a
-  # cobertura real de uma mudança de manifesto. Sem a barra, `onion-engineering`/`onion-product` não eram
-  # reivindicados por ninguém e o pre-commit caía no failsafe "tudo": 217 famílias, 27 min medidos no
-  # PR #932. O `//` resultante em "${vdir}/x" é inócuo (medido pela passada adversarial).
+run_plugin_bundle_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/plugin-bundle-check.sh"
+  local mat="${REPO_ROOT}/.claude/utils/marketplace/materialize-marketplace-repo.sh"
+  # A BARRA FINAL é de propósito (2026-10-06, herdada da família plugins-sync): o `_selftest_family_map`
+  # só trata como PREFIXO o caminho que termina em `/`, e esta família é a cobertura real de uma mudança
+  # de manifesto — ela MONTA cada um. Sem a barra, manifesto que ninguém cita pelo nome caía no failsafe
+  # "tudo" do pre-commit (217 famílias, 27 min medidos no PR #932).
   local vdir="${REPO_ROOT}/.claude/utils/marketplace/verticals/"
-  if [ ! -f "${asm}" ] || [ ! -d "${vdir}" ]; then record_fail "plugins-sync" "assembler/verticals ausentes"; return; fi
-  if ! command -v jq >/dev/null 2>&1; then record_skip "plugins-sync: jq ausente → pulado (gracioso)"; return; fi
-  # Drift-guard de plugins committed é core-only: o adotante não vendoriza plugins/
-  # (só verticals/*.manifest.sh). Sem plugins/ não há "committed" para comparar → pular.
-  if [ ! -d "${REPO_ROOT}/plugins" ]; then record_skip "plugins-sync: sem plugins/ vendorizados → pulado (consumidor não publica plugins)"; return; fi
-  local manifest name committed d csha tsha
+  if [ ! -f "${chk}" ] || [ ! -f "${mat}" ] || [ ! -d "${vdir}" ]; then record_fail "plugin-bundle" "plugin-bundle-check/materialize/verticals ausentes"; return; fi
+  command -v python3 >/dev/null 2>&1 || { record_skip "plugin-bundle: python3 ausente → pulado"; return; }
+  # Só a FONTE monta plugins (o materialize recusa outro papel): porta e adotante não publicam.
+  case "${SELFTEST_ROLE}" in ""|source) : ;; *) record_skip "plugin-bundle: papel '${SELFTEST_ROLE}' não publica plugins → pulado"; return ;; esac
+  local d out rc tgt bad slug
+  d="$(mktemp -d)"; tgt="${d}/tgt"
+  if ! bash "${mat}" "${tgt}" --no-commit >/dev/null 2>&1 || ! ls -d "${tgt}"/plugins/*/ >/dev/null 2>&1; then
+    record_fail "plugin-bundle: montagem" "materialize-marketplace-repo.sh não montou o bundle temporário das fontes vivas"
+    rm -rf "${d}"; return
+  fi
 
-  for manifest in "${vdir}"/*.manifest.sh; do
-    [ -f "${manifest}" ] || continue
-    name="$(. "${manifest}" >/dev/null 2>&1; printf '%s' "${PLUGIN_NAME:-}")"
-    [ -n "${name}" ] || continue
-    committed="${REPO_ROOT}/plugins/${name}"
-    d="$(mktemp -d)"
-    bash "${asm}" "${manifest}" "${REPO_ROOT}" "${d}/${name}" >/dev/null 2>&1
-    csha="$(jq -r '.tree_sha' "${committed}/.claude-plugin/provenance.json" 2>/dev/null)"
-    tsha="$(jq -r '.tree_sha' "${d}/${name}/.claude-plugin/provenance.json" 2>/dev/null)"
-    # (a) committed em-sync com a fonte (diff ignorando provenance + tree_sha igual)
-    if diff -r -x provenance.json "${committed}" "${d}/${name}" >/dev/null 2>&1 && [ "${csha}" = "${tsha}" ]; then
-      record_pass "plugins-sync: ${name} committed em-sync com a fonte"
-    else record_fail "plugins-sync: ${name} em-sync" "plugin committado diverge da regeneração — regenere"; fi
-    # (b) adulteração no plugin → diff detecta
-    printf '\n# tamper\n' >> "${d}/${name}/.claude-plugin/plugin.json"
-    if ! diff -r -x provenance.json "${committed}" "${d}/${name}" >/dev/null 2>&1; then
-      record_pass "plugins-sync: ${name} adulteração detectada"
-    else record_fail "plugins-sync: ${name} detecção" "diff não pegou a adulteração"; fi
-    rm -rf "${d}"
+  # (a) fontes vivas → bundle temporário → 0 HARD
+  rc=0; out="$(bash "${chk}" --source "${REPO_ROOT}" --bundle "${tgt}" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q '^HARD' <<< "${out}"; then
+    record_pass "plugin-bundle: (a) fontes vivas montadas num temporário passam limpas (0 HARD, rc 0)"
+  else record_fail "plugin-bundle: (a) bundle vivo" "rc=${rc}: $(grep '^HARD' <<< "${out}" | head -3 | tr '\n' ' ' | cut -c1-300)"; fi
+
+  # (b) defeitos plantados numa CÓPIA — um por regra, todos na mesma cópia, cada um cobrado pelo seu nº
+  bad="${d}/bad"; cp -R "${tgt}" "${bad}"
+  local pcmd; pcmd="$(find "${bad}/plugins/onion-product/commands" -name '*.md' | LC_ALL=C sort | head -1)"
+  printf -- '---\nname: adopt\ndescription: x\n---\nplantado\n' > "${bad}/plugins/onion/commands/adopt.md"         # 61
+  printf '\nRode /engineer:pr depois.\n' >> "${pcmd}"                                                             # 72
+  printf '\nVeja `.claude/utils/zz-nao-viaja/x.md`.\n' >> "${pcmd}"                                               # 74
+  printf '\nIrmã: [morta](../kb/zz-morta-plantada.md)\n' >> "${pcmd}"                                             # 75
+  python3 - "${bad}/.claude-plugin/marketplace.json" <<'PYB'
+import json, sys
+p = sys.argv[1]; d = json.load(open(p, encoding="utf-8"))
+d["plugins"] = [x for x in d["plugins"] if x["name"] != "onion-design"]          # some do bundle, segue na raiz
+for x in d["plugins"]:
+    if x["name"] == "onion-compliance": x["source"] = "./plugins/zz-inexistente"  # source que não resolve
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+PYB
+  slug="$(git -C "${REPO_ROOT}" remote get-url origin 2>/dev/null | sed -E 's#(git@|https://)([^/:]+)[/:]##; s#\.git$##' || true)"
+  [ -n "${slug}" ] && printf '\nSuporte: https://github.com/%s/issues\n' "${slug}" >> "${bad}/plugins/onion/README.md"   # 79
+  rc=0; out="$(bash "${chk}" --source "${REPO_ROOT}" --bundle "${bad}" --format tsv 2>&1)" || rc=$?
+  local miss="" r
+  for r in "61	moat-no-bundle" "72	" "74	NOVO" "75	" "76	source-do-bundle" "76	sem-plugin-no-bundle"; do
+    grep -q "^HARD	${r}" <<< "${out}" || miss="${miss} [${r//	/:}]"
   done
+  if [ -n "${slug}" ]; then grep -q "^HARD	79	404-privado" <<< "${out}" || miss="${miss} [79]"; fi
+  if [ "${rc}" -eq 1 ] && [ -z "${miss}" ]; then
+    record_pass "plugin-bundle: (b) defeito plantado barrado por regra — 61, 72, 74, 75, 76 (source e entrada sumida)$([ -n "${slug}" ] && printf ', 79') — rc 1"
+  else record_fail "plugin-bundle: (b) plantados" "rc=${rc}; faltou:${miss}"; fi
+  [ -n "${slug}" ] || record_skip "plugin-bundle: (b79) sem remote origin — o slug privado não é derivável, a REGRA 79 não tem sujeito aqui"
 
-  # (c) insensível a ref/commit_date voláteis: 2 provenances iguais salvo ref/date → diff -x ignora
-  local p1 p2; p1="$(mktemp -d)"; p2="$(mktemp -d)"
-  printf '{"tree_sha":"X","ref":"aaa","commit_date":"2020"}' > "${p1}/provenance.json"
-  printf '{"tree_sha":"X","ref":"bbb","commit_date":"2099"}' > "${p2}/provenance.json"
-  if diff -r -x provenance.json "${p1}" "${p2}" >/dev/null 2>&1; then
-    record_pass "plugins-sync: ref/commit_date voláteis ignorados (diff -x provenance)"
-  else record_fail "plugins-sync: voláteis" "diff -x provenance não isolou os campos voláteis"; fi
-  rm -rf "${p1}" "${p2}"
+  # (c) bundle sem plugin montado = NÃO MEDI (rc 2), nunca limpo
+  mkdir -p "${d}/vazio/plugins"
+  rc=0; bash "${chk}" --source "${REPO_ROOT}" --bundle "${d}/vazio" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "plugin-bundle: (c) bundle vazio = rc 2 (não medi), nunca 'limpo'"
+  else record_fail "plugin-bundle: (c) bundle vazio" "rc=${rc} — nada montado passou como medido"; fi
+
+  # (d) NÃO TRAVAR — a metade "lint de PR sobre fonte bundlada alterada não cobra plugin" mora na família
+  #     capability (caso only-gate (ii)), que altera a fonte num SANDBOX e roda o lint real por --only.
+  #     Aqui, a outra metade: o pre-commit não monta plugin.
+  if ! grep -vE '^[[:space:]]*#' "${REPO_ROOT}/.githooks/pre-commit" 2>/dev/null | grep -q 'assemble-plugin\.sh'; then
+    record_pass "plugin-bundle: (d2) o pre-commit não monta plugin (o auto-fix da REGRA 19 saiu)"
+  else record_fail "plugin-bundle: (d2) pre-commit" "o pre-commit invoca assemble-plugin.sh — o atrito de regenerar plugin por commit voltou"; fi
+
+  # (e) a raiz não versiona plugins/ e o catálogo dela aponta o PÚBLICO
+  local tracked; tracked="$(git -C "${REPO_ROOT}" ls-files -- plugins 2>/dev/null | head -1 || true)"
+  local pubsrc
+  pubsrc="$(python3 - "${REPO_ROOT}/.claude-plugin/marketplace.json" "${REPO_ROOT}/.claude/utils/marketplace/public-face.sh" <<'PYE'
+import json, re, sys
+d = json.load(open(sys.argv[1], encoding="utf-8"))
+face = open(sys.argv[2], encoding="utf-8").read()
+m = re.search(r'ONION_PUBLIC_REPOSITORY:=([^}"]+)', face)
+pub = (m.group(1).rstrip("/") if m else "") + ".git"
+bad = [p["name"] for p in d.get("plugins", []) if not (isinstance(p.get("source"), dict) and p["source"].get("url") == pub and p["source"].get("path") == "plugins/" + p["name"])]
+print("OK" if d.get("plugins") and not bad else "BAD:" + ",".join(bad or ["(catálogo vazio)"]))
+PYE
+)"
+  if [ -z "${tracked}" ] && [ "${pubsrc}" = "OK" ]; then
+    record_pass "plugin-bundle: (e) a raiz não versiona plugins/ e todo source do catálogo aponta o repo público"
+  else record_fail "plugin-bundle: (e) raiz" "plugins/ rastreado='${tracked}' · catálogo=${pubsrc}"; fi
+  rm -rf "${d}"
 }
 
 # ---------------------------------------------------------------------------
@@ -13549,10 +13598,10 @@ run_capability_selftests() {
   # de HOJE são honestos; nunca prova que um desonesto seria pego. Injeta no vdir do
   # SANDBOX (cp -a de .claude — ver topo do arquivo) um manifesto sintético e roda o
   # lint-artifacts.sh de VERDADE (caixa-preta, sem refator — mesma disciplina do resto
-  # deste arquivo). check_plugins_sync (REGRA 19) sempre dispara 'plugin ausente' pra
-  # qualquer manifesto injetado (não há plugins/selftest-fixture-probe committado) — por
-  # isso a asserção grepa a MENSAGEM específica de over-claim ('mas só cumpre'), não
-  # 'nenhuma violação citando o path' (que reprovaria SEMPRE, até no caso honesto).
+  # deste arquivo). Outras guardas de manifesto (REGRA 27, 61…) podem citar o manifesto
+  # injetado — por isso a asserção grepa a MENSAGEM específica de over-claim ('mas só cumpre'),
+  # não 'nenhuma violação citando o path'. (Até a F4 das portas a REGRA 19 disparava 'plugin
+  # ausente' para todo manifesto injetado; ela foi aposentada com o plugins/ versionado.)
   local cap_vdir="${SANDBOX}/.claude/utils/marketplace/verticals"
   local cap_dst="${cap_vdir}/selftest-fixture-probe.manifest.sh"
 
@@ -13607,29 +13656,26 @@ run_capability_selftests() {
   else
     record_skip "only-gate: não-canônico → fixture r20 ausente"
   fi
-  # (ii) DRIFT EM FONTE BUNDLADA via --only deve acusar a R19 — a 1ª versão do gate (prefixo de
-  #      path) engolia 2 HARD aqui; a cura é pertencimento ao manifesto (grep -qF). Se alguém
-  #      estreitar o gate de volta para só marketplace/plugins, este caso FALHA.
+  # (ii) NÃO TRAVAR (F4 das portas, 2026-10-10): uma fonte BUNDLADA alterada, vista pelo lint de PR via
+  #      --only, NÃO cobra plugin regenerado. Até a F4 este caso provava o contrário — que a REGRA 19
+  #      (Plugins de vertical sincronizados com as fontes) acusava o drift ("fora de sincronia" no repo
+  #      real, "plugin ausente" no sandbox) — porque o core versionava plugins/ e todo PR que tocava uma
+  #      fonte bundlada tinha de regenerar e commitar o plugin. O plugins/ saiu do core; o bundle nasce na
+  #      publicação. Se a cobrança voltar ao lint de PR (por qualquer guarda), este caso FALHA.
   local bd_probe="${SANDBOX}/.claude/commands/meta/kg.md"
-  if [ -f "${bd_probe}" ]; then
+  if [ -f "${bd_probe}" ] && grep -qF '.claude/commands/meta/kg.md' "${SANDBOX}/.claude/utils/marketplace/verticals/onion.manifest.sh" 2>/dev/null; then
     printf '\n<!-- only-gate-probe -->\n' >> "${bd_probe}"
     local bd_out
     bd_out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${bd_probe}" 2>&1)" || true
     # restaura o sandbox (outros casos usam o mesmo)
     sed -i '/only-gate-probe/d' "${bd_probe}"
-    # A prova de vida da R19 tem DUAS formas, e a diferenca e o AMBIENTE, nao a guarda: no repo
-    # real (plugins/ presente) o drift sai como "fora de sincronia"; no SANDBOX da bancada (que
-    # copia .claude/ + docs/ mas NAO plugins/) sai como "plugin ausente". As duas provam que a
-    # guarda RODOU sob --only de fonte bundlada. Se o gate regredir para prefixo-de-path, NENHUMA
-    # aparece. (A 1a versao asserava so a 1a forma e falhou no sandbox — medido, nao suposto.)
-    if printf '%s
-' "${bd_out}" | grep -qE "fora de sincronia|plugin ausente"; then
-      record_pass "only-gate: drift em fonte bundlada via --only acusa R19 (pertencimento ao manifesto vivo)"
+    if ! grep -E '^VIOLATION' <<< "${bd_out}" | grep -qE 'fora de sincronia|plugin ausente|tree_sha divergente|plugins/'; then
+      record_pass "only-gate: fonte bundlada alterada via --only NÃO cobra plugin regenerado (F4: o PR comum não regenera nada)"
     else
-      record_fail "only-gate: fonte bundlada" "R19 não viu drift em comando bundlado sob --only — o gate regrediu para prefixo de path?"
+      record_fail "only-gate: fonte bundlada" "o lint de PR cobrou plugin regenerado por uma fonte bundlada — o atrito da F4 voltou: $(grep -E '^VIOLATION' <<< "${bd_out}" | grep -E 'sincronia|ausente|tree_sha|plugins/' | head -1 | cut -c1-200)"
     fi
   else
-    record_skip "only-gate: fonte bundlada → kg.md ausente no sandbox"
+    record_fail "only-gate: fonte bundlada" "kg.md ausente no sandbox ou fora do manifesto onion — o caso perdeu a fonte bundlada que exercita"
   fi
 }
 
@@ -13665,10 +13711,10 @@ run_graph_selftests() {
 
   if ! command -v jq >/dev/null 2>&1; then record_skip "graph: jq ausente → demais checks pulados (gracioso)"; return; fi
   # Core-only: o grafo canônico (graph.md em-sync) e o --impact assumem as verticais
-  # PUBLICADAS (ex.: onion-design). Um consumidor não vendoriza plugins/ → a regeneração
+  # PUBLICADAS (ex.: onion-design). Um consumidor tem outro corpus → a regeneração
   # local diverge do graph.md committed por construção. Pular gracioso (a guarda de drift
-  # do grafo é autoral do core, onde plugins/ existe e é validada estritamente).
-  if [ ! -d "${REPO_ROOT}/plugins" ]; then record_pass "graph: sem plugins/ vendorizados → pulado (grafo canônico é autoral do core)"; return; fi
+  # do grafo é autoral do core; os capability contracts vêm dos manifestos desde a F4).
+  case "${SELFTEST_ROLE}" in ""|source) : ;; *) record_pass "graph: papel '${SELFTEST_ROLE}' → pulado (grafo canônico é autoral do core; desde a F4 o predicado é o PAPEL, não a presença de plugins/)"; return ;; esac
 
   local tmp; tmp="$(mktemp)"; bash "${gen}" --markdown > "${tmp}" 2>/dev/null
   if diff -q "${gfile}" "${tmp}" >/dev/null 2>&1; then record_pass "graph: graph.md em-sync com a spec-as-code"
@@ -17635,8 +17681,9 @@ _family run_bootstrap_vertical_selftests || true
 _family run_scaffold_book_selftests || true
 _family run_scaffold_diagnose_selftests || true
 
-# Modo plugins-sync — drift-guard (REGRA 19): committed bate com a regeneração da fonte.
-_family run_plugins_sync_selftests || true
+# Modo plugin-bundle — as guardas de plugin sobre um bundle TEMPORÁRIO montado das fontes vivas (F4 das
+# portas, 2026-10-10; substitui o plugins-sync, que exercitava a REGRA 19 aposentada).
+_family run_plugin_bundle_selftests || true
 
 # Modo capability — Capability Contract (REGRA 20): contrato honesto + resolução de requires.
 _family run_capability_selftests
@@ -17834,7 +17881,7 @@ PYABORT
     record_pass "selftest-lanes: (g) failsafe: arquivo desconhecido no domínio ⇒ todas"
   else record_fail "selftest-lanes: (g) failsafe desconhecido" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
   # (g2) TODO manifesto de vertical — inclusive um que ninguém cita pelo nome — seleciona as famílias que
-  #      percorrem o diretório inteiro (plugins_sync), e NÃO cai no failsafe "tudo". Medido em
+  #      percorrem o diretório inteiro (plugin_bundle; até a F4 das portas era plugins_sync), e NÃO cai no failsafe "tudo". Medido em
   #      2026-10-06: onion-engineering/onion-product compravam 217 famílias (27 min, PR #932) porque essas
   #      duas famílias citavam `verticals` sem a barra final e o mapa só lê como prefixo o que termina em `/`.
   #      O caminho é montado SEM o prefixo literal de REPO_ROOT de propósito: o mapa captura todo literal
@@ -17845,11 +17892,11 @@ PYABORT
   _names+=("zz-ninguem-cita.manifest.sh")
   for _mf in "${_names[@]}"; do
     out="$(bash "${sut}" --affected "${_vd}/${_mf}" --dry-run 2>&1 || true)"
-    if grep -q 'famílias=<todas>' <<< "${out}" || ! grep -q 'plugins_sync' <<< "${out}"; then
+    if grep -q 'famílias=<todas>' <<< "${out}" || ! grep -q 'plugin_bundle' <<< "${out}"; then
       _bad_g2="${_bad_g2} ${_mf}"; fi
   done
   if [ -z "${_bad_g2}" ]; then
-    record_pass "selftest-lanes: (g2) manifesto de vertical (inclusive um que ninguém cita) ⇒ plugins_sync pelo prefixo, sem failsafe 'tudo'"
+    record_pass "selftest-lanes: (g2) manifesto de vertical (inclusive um que ninguém cita) ⇒ plugin_bundle pelo prefixo, sem failsafe 'tudo'"
   else record_fail "selftest-lanes: (g2) manifesto caiu no failsafe ou perdeu a família que o cobre" "${_bad_g2}"; fi
   # (h)(i)(j) cópia hermética com famílias sintéticas (REPO_ROOT da cópia = sandbox)
   # o top-level da bancada copia .claude/docs/CLAUDE.md p/ o sandbox e lê inventory.sh --env (grep vazio sob
@@ -18569,190 +18616,81 @@ run_model_ladder_selftests() {
 _family run_model_ladder_selftests
 # Modo plugin-version-derived — a versão do plugin ANDA com o conteúdo (sinal de campo 2026-09-03: `claude plugin update`
 # compara só a versão; manifesto parado em 0.1.0 = updater no-op com o cache 89 arquivos atrás). Sandbox git próprio.
+# ⚠️ REESCRITA NA F4 DAS PORTAS (2026-10-10, SAC-93), não remendada. A família anterior codificava a versão como
+#    FATO COMMITADO no `plugins/` versionado do core (casos de squash, PR concorrente, GitFlow e a REGRA 19
+#    comparando canônico × temp). O `plugins/` saiu do core; a versão passou a ser FATO PUBLICADO — o anterior
+#    vem do plugin que já está no destino (o clone de onion-plugins) ou de ONION_PLUGIN_PRIOR_DIR. Os casos de
+#    histórico perderam o objeto: só a publicação deriva versão, e ela é serial (I3). Teste que afirma um
+#    contrato morto é pior que teste ausente: ele dá confiança no errado.
 run_plugin_version_derived_selftests() {
   local asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
   [ -f "${asm}" ] || { record_fail "plugin-version-derived" "assembler ausente"; return; }
-  local d v1 v2 v3 v4; d="$(mktemp -d)"
+  local d; d="$(mktemp -d)"
   mkdir -p "${d}/src/.claude/commands/quick" "${d}/src/.claude/utils/marketplace/verticals"
   printf -- '---\nname: ping\ndescription: x\ncategory: quick\ntags: [a, b, c]\nversion: "1.0.0"\nupdated: "2026-09-03"\n---\n# ping\n' > "${d}/src/.claude/commands/quick/ping.md"
   printf 'PLUGIN_NAME="probe"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="probe"\nKEYWORDS=(probe)\nCOMMANDS=(.claude/commands/quick/ping.md)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh"
   ( cd "${d}/src" && git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm seed ) >/dev/null 2>&1
-  # GERA NO CANONICO (`<src>/plugins/<name>`), que e de onde o fato commitado e lido. Gerar num
-  # `out/` lateral faria todo caso partir de "sem anterior" e o contrato nao seria exercitado.
-  _ver() { bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" >/dev/null 2>&1; sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "${d}/src/plugins/probe/.claude-plugin/plugin.json" | head -1; }
-  # ⚠️ OS CASOS (a)(b)(c) FORAM REESCRITOS, nao remendados. Eles codificavam a semantica ANTIGA
-  #    (`0.1.<n de commits que tocaram as fontes>`), que caiu na passada adversarial de 2026-09-11.
-  #    Ajustar so os numeros esperados manteria a forma de um contrato que nao existe mais — e
-  #    teste que afirma um contrato morto e pior que teste ausente: ele da confianca no errado.
+  local man="${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" pub="${d}/pub/plugins/probe"
+  _vof() { sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$1/.claude-plugin/plugin.json" 2>/dev/null | head -1; }
+  local v1 v2 v3
 
-  # (a) A VERSAO SAI DO FATO COMMITADO, nao do historico. Sem plugin gerado ainda, fica a do
-  #     manifesto; gerado e commitado, a proxima geracao parte DAQUELE numero.
-  v1="$(_ver)"
-  ( cd "${d}/src" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
-  v2="$(_ver)"
-  if [ "${v1}" = "0.1.0" ] && [ "${v2}" = "0.1.0" ]; then
-    record_pass "plugin-version-derived: (a) 1a geracao usa a versao do manifesto (${v1}) e nao anda sozinha depois de commitada"
-  else record_fail "plugin-version-derived: (a)" "v1=${v1} v2=${v2} (esperado 0.1.0 nas duas — a versao nao pode nascer de historico)"; fi
+  # (a) 1ª geração (destino sem plugin publicado, sem ONION_PLUGIN_PRIOR_DIR) ⇒ a versão do manifesto
+  bash "${asm}" "${man}" "${d}/src" "${pub}" >/dev/null 2>&1; v1="$(_vof "${pub}")"
+  if [ "${v1}" = "0.1.0" ]; then record_pass "plugin-version-derived: (a) 1ª geração usa a versão do manifesto (${v1})"
+  else record_fail "plugin-version-derived: (a)" "esperava 0.1.0 na 1ª geração, veio '${v1}'"; fi
 
-  # (b) CONTEUDO MUDOU ⇒ +1, e o numero e o MESMO antes e depois do commit. E o invariante que faz
-  #     o pre-commit e o CI concordarem: os dois derivam da ARVORE, nao do estado do indice.
+  # (b) o destino JÁ É o publicado: conteúdo mudou ⇒ +1; nada mudou ⇒ o mesmo (idempotente). O anterior é
+  #     lido ANTES do `rm -rf` do destino — a cicatriz de 2026-09 (255 publicadas zeradas) mora aqui.
   printf '# ping v2\n' >> "${d}/src/.claude/commands/quick/ping.md"
-  v3="$(_ver)"
-  ( cd "${d}/src" && git add -A && git -c user.email=t@t -c user.name=t commit -qm change ) >/dev/null 2>&1
-  v4="$(_ver)"
-  if [ "${v3}" = "0.1.1" ] && [ "${v4}" = "0.1.1" ]; then
-    record_pass "plugin-version-derived: (b) conteudo mudou ⇒ 0.1.1, identico antes E depois do commit (pre-commit = CI)"
-  else record_fail "plugin-version-derived: (b)" "antes=${v3} depois=${v4} (esperado 0.1.1/0.1.1)"; fi
+  bash "${asm}" "${man}" "${d}/src" "${pub}" >/dev/null 2>&1; v2="$(_vof "${pub}")"
+  bash "${asm}" "${man}" "${d}/src" "${pub}" >/dev/null 2>&1; v3="$(_vof "${pub}")"
+  if [ "${v2}" = "0.1.1" ] && [ "${v3}" = "0.1.1" ]; then
+    record_pass "plugin-version-derived: (b) no destino publicado: conteúdo mudou ⇒ 0.1.1; remontar sem mudança mantém 0.1.1"
+  else record_fail "plugin-version-derived: (b)" "mudou=${v2} remontado=${v3} (esperado 0.1.1/0.1.1)"; fi
 
-  # (c) COMMIT QUE NAO TOCA AS FONTES nao anda a versao — o `tree_sha` nao muda, logo nao ha +1.
-  #     Intencao preservada do caso original; so a aritmetica mudou de referencial.
-  printf '# outro\n' > "${d}/src/README.md"
-  ( cd "${d}/src" && git add -A && git -c user.email=t@t -c user.name=t commit -qm unrelated ) >/dev/null 2>&1
-  v1="$(_ver)"
-  if [ "${v1}" = "0.1.1" ]; then
-    record_pass "plugin-version-derived: (c) commit que NAO toca as fontes nao anda a versao (${v1})"
-  else record_fail "plugin-version-derived: (c)" "esperava 0.1.1 apos commit alheio, veio ${v1}"; fi
+  # (c) ONION_PLUGIN_PRIOR_DIR: montar FORA do clone e ainda assim partir do publicado. Discrimina porque o
+  #     publicado (0.1.1) difere do manifesto (0.1.0): um motor que ignorasse a variável daria 0.1.0.
+  printf '# ping v3\n' >> "${d}/src/.claude/commands/quick/ping.md"
+  ONION_PLUGIN_PRIOR_DIR="${pub}" bash "${asm}" "${man}" "${d}/src" "${d}/fora/probe" >/dev/null 2>&1; v1="$(_vof "${d}/fora/probe")"
+  if [ "${v1}" = "0.1.2" ]; then record_pass "plugin-version-derived: (c) ONION_PLUGIN_PRIOR_DIR parte do publicado (0.1.1 → ${v1}) num destino novo"
+  else record_fail "plugin-version-derived: (c)" "esperava 0.1.2 com o anterior em ONION_PLUGIN_PRIOR_DIR, veio '${v1}'"; fi
 
-  v1="$(ONION_PLUGIN_VERSION_DERIVED=0 bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out2" >/dev/null 2>&1; grep -oE '"version": *"[^"]+"' "${d}/out2/.claude-plugin/plugin.json" | grep -oE '[0-9.]+')"
+  # (d) ONION_PLUGIN_VERSION_DERIVED=0 ⇒ versão do manifesto (legado)
+  v1="$(ONION_PLUGIN_VERSION_DERIVED=0 bash "${asm}" "${man}" "${d}/src" "${pub}" >/dev/null 2>&1; _vof "${pub}")"
   if [ "${v1}" = "0.1.0" ]; then record_pass "plugin-version-derived: (d) ONION_PLUGIN_VERSION_DERIVED=0 ⇒ versão do manifesto (legado)"
   else record_fail "plugin-version-derived: (d)" "esperava 0.1.0, veio ${v1}"; fi
 
-  # ── A VERSAO E UM FATO COMMITADO — um caso por REQUISITO ────────────────────────────────────
-  # Os casos (e)..(i) nasceram de uma passada adversarial que reprovou as DUAS tentativas
-  # anteriores. A licao: enquanto a versao for funcao do HISTORICO ou do REMOTO, ela nao pode ser
-  # ao mesmo tempo reproduzivel-da-arvore (o que a REGRA 19 exige) e estavel (o que um PR aberto
-  # exige). Cada caso abaixo prende UM dos quatro requisitos, e cada um morreu com mutante proprio.
-  local e out1 out2
-  _setup_repo() {   # $1 = dir; repo com um plugin ja GERADO e commitado
-    e="$1"; mkdir -p "${e}/.claude/commands/quick" "${e}/.claude/utils/marketplace/verticals"
-    cp -r "${REPO_ROOT}/.claude/utils/marketplace" "${e}/.claude/utils/" 2>/dev/null || true
-    printf -- '---\nname: ping\ndescription: x\ncategory: quick\ntags: [a, b, c]\nversion: "1.0.0"\nupdated: "2026-09-03"\n---\n# ping\n' > "${e}/.claude/commands/quick/ping.md"
-    printf 'PLUGIN_NAME="probe"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="probe"\nKEYWORDS=(probe)\nCOMMANDS=(.claude/commands/quick/ping.md)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${e}/.claude/utils/marketplace/verticals/probe.manifest.sh"
-    ( cd "${e}" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm seed ) >/dev/null 2>&1
-  }
-  _regen() { bash "${asm}" "$1/.claude/utils/marketplace/verticals/probe.manifest.sh" "$1" "${2:-$1/plugins/probe}" >/dev/null 2>&1; }
-  _vof()   { sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$1/.claude-plugin/plugin.json" | head -1; }
-  _bump()  { printf '# %s\n' "$2" >> "$1/.claude/commands/quick/ping.md"
-             _regen "$1"
-             ( cd "$1" && git add -A && git -c user.email=t@t -c user.name=t commit -qm "$2" ) >/dev/null 2>&1; }
+  # (e) A F4 EM UMA LINHA: um `plugins/` no repo-FONTE não é mais a fonte da versão. Planta ali um plugin com
+  #     versão absurda e tree_sha diferente; montar num destino novo, sem anterior, TEM de dar a do manifesto.
+  #     Se alguém devolver a leitura para `${SRC}/plugins/<nome>`, sai 9.9.100 e o caso reprova.
+  mkdir -p "${d}/src/plugins/probe/.claude-plugin"
+  printf '{\n  "name": "probe",\n  "version": "9.9.99"\n}\n' > "${d}/src/plugins/probe/.claude-plugin/plugin.json"
+  printf '{\n  "tree_sha": "nao-e-este"\n}\n' > "${d}/src/plugins/probe/.claude-plugin/provenance.json"
+  bash "${asm}" "${man}" "${d}/src" "${d}/novo/probe" >/dev/null 2>&1; v1="$(_vof "${d}/novo/probe")"
+  if [ "${v1}" = "0.1.0" ]; then record_pass "plugin-version-derived: (e) plugins/ no repo-fonte NÃO dita a versão (destino novo sem anterior ⇒ ${v1})"
+  else record_fail "plugin-version-derived: (e)" "a versão veio do plugins/ da FONTE ('${v1}') — o anterior tem de ser o publicado, não uma cópia no core"; fi
+  rm -rf "${d}/src/plugins"
 
-  # (e) REQUISITO 1 — MESMA ARVORE, MESMO NUMERO. E o que a REGRA 19 compara: ela regenera num
-  #     mktemp e confronta com o canonico. Se os dois nao derivarem igual, o gate reprova SEMPRE.
-  #     ⚠️ Este caso pegou um defeito REAL antes de qualquer commit: a 1a versao lia o fato
-  #     commitado DEPOIS do `rm -rf "${DEST}"`, entao regenerar no canonico zerava a versao para
-  #     0.1.0 — um plugin com 255 publicadas voltaria a zero.
-  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
-  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
-  # ⚠️ A VERSAO COMMITADA TEM DE DIVERGIR DA DO MANIFESTO, senao o caso nao discrimina: um motor
-  #    que lesse o anterior do lugar ERRADO cairia no default do manifesto e daria o MESMO numero
-  #    por acidente. Medido — o mutante "le o anterior do DEST" (o bug do `rm -rf`, que aconteceu
-  #    de verdade) sobrevivia a este caso enquanto as duas versoes eram 0.1.0.
-  _bump "$e" antes-da-comparacao
-  local _canon_v _temp_v _t; _t="$(mktemp -d)"
-  _regen "$e"; _canon_v="$(_vof "$e/plugins/probe")"
-  _regen "$e" "$_t/probe"; _temp_v="$(_vof "$_t/probe")"
-  if [ -n "${_canon_v}" ] && [ "${_canon_v}" = "${_temp_v}" ]; then
-    if [ "${_canon_v}" = "0.1.0" ]; then
-      record_fail "plugin-version-derived: (e)" "os dois deram 0.1.0 (o default do manifesto) — o caso nao discrimina; a fixture precisa de versao commitada != manifesto"
-    else
-      record_pass "plugin-version-derived: (e) canonico e temp derivam o MESMO numero (${_canon_v}, != manifesto) — e o que a REGRA 19 compara"
-    fi
-  else record_fail "plugin-version-derived: (e)" "canonico=${_canon_v} temp=${_temp_v} — a REGRA 19 reprovaria sempre"; fi
-  rm -rf "$_t" "$e"
-
-  # (f) REQUISITO 2 — IMUNE AO SQUASH-MERGE, que e como esta casa funde. A tentativa 1 quebrava
-  #     aqui: N commits da branch viravam UM no main, a branch publicava N a mais.
-  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
-  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
-  local _base_v _branch_v _main_v _re_v
-  _base_v="$(_vof "$e/plugins/probe")"
-  ( cd "$e" && git checkout -qb feat ) >/dev/null 2>&1
-  _bump "$e" c1; _bump "$e" c2
-  _branch_v="$(_vof "$e/plugins/probe")"
-  ( cd "$e" && git checkout -q main && git merge --squash -q feat >/dev/null 2>&1 && git -c user.email=t@t -c user.name=t commit -qm squash ) >/dev/null 2>&1
-  _main_v="$(_vof "$e/plugins/probe")"
-  _regen "$e"; _re_v="$(_vof "$e/plugins/probe")"
-  if [ "${_branch_v}" = "${_main_v}" ] && [ "${_main_v}" = "${_re_v}" ] && [ "${_branch_v}" != "${_base_v}" ]; then
-    record_pass "plugin-version-derived: (f) squash real: branch previu ${_branch_v}, main ficou ${_main_v}, regeneracao no main deu ${_re_v} — os tres batem"
-  else record_fail "plugin-version-derived: (f)" "base=${_base_v} branch=${_branch_v} main-pos-squash=${_main_v} regenerado=${_re_v} — o squash dessincronizou"; fi
-  rm -rf "$e"
-
-  # (g) REQUISITO 3 — ESTAVEL AO QUE OUTRO PR FAZ. A tentativa 2 quebrava aqui: a versao virava
-  #     funcao do REMOTO e um PR aberto passava a reprovar a REGRA 19 sozinho quando OUTRO mergeava.
-  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
-  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen && git checkout -qb meupr ) >/dev/null 2>&1
-  _bump "$e" meu
-  local _before _after; _before="$(_vof "$e/plugins/probe")"
-  ( cd "$e" && git stash -q -u 2>/dev/null; git checkout -q main && git checkout -qb outro ) >/dev/null 2>&1
-  _bump "$e" outro
-  ( cd "$e" && git checkout -q main && git merge --squash -q outro >/dev/null 2>&1 && git -c user.email=t@t -c user.name=t commit -qm sq2 && git checkout -q meupr ) >/dev/null 2>&1
-  _regen "$e"; _after="$(_vof "$e/plugins/probe")"
-  if [ "${_before}" = "${_after}" ]; then
-    record_pass "plugin-version-derived: (g) o PR aberto ficou em ${_before} enquanto OUTRO mergeava — versao nao e funcao do remoto"
-  else record_fail "plugin-version-derived: (g)" "o PR aberto mudou de ${_before} para ${_after} sozinho — a REGRA 19 reprovaria um PR que ninguem tocou"; fi
-  rm -rf "$e"
-
-  # (h) REQUISITO 4 — NAO CONGELA SOB GITFLOW. A tentativa 2 congelava: `main` parado, `develop`
-  #     andando, cinco commits e o MESMO numero — literalmente o dano que ela invocava como razao.
-  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
-  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen && git checkout -qb develop ) >/dev/null 2>&1
-  local _seq="" _k
-  for _k in d1 d2 d3; do _bump "$e" "${_k}"; _seq="${_seq} $(_vof "$e/plugins/probe")"; done
-  if [ "$(printf '%s\n' ${_seq} | sort -u | grep -c . || true)" = "3" ]; then
-    record_pass "plugin-version-derived: (h) em GitFlow (main parado, develop andando) a versao ANDA:${_seq}"
-  else record_fail "plugin-version-derived: (h)" "a versao congelou em develop:${_seq}"; fi
-  rm -rf "$e"
-
-  # (j) O TETO DA VERSAO E BARRADO DUAS VEZES — e este caso existe porque eu afirmei o contrario.
-  #     Dois PRs concorrentes, da mesma base, calculam o MESMO numero. A afirmacao de 2026-09-12 foi
-  #     que no esquema de fato commitado a colisao passaria CALADA. Medido com squash real em
-  #     2026-09-13, e falso, e o selo do maestro fechou a decisao SEM codigo por isso. O que sobra e
-  #     garantir que as duas barreiras nao sumam em silencio numa mudanca de formato da projecao:
-  #       (j1) o GIT conflita no merge do 2o PR — as projecoes divergem;
-  #       (j2) resolvido DESCUIDADO (aceitando um lado), a REGRA 19 acusa drift, porque o tree_sha
-  #            commitado e de UM lado e a arvore real e A+B.
-  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
-  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
-  ( cd "$e" && git checkout -qb prA ) >/dev/null 2>&1; _bump "$e" A
-  ( cd "$e" && git checkout -q main && git checkout -qb prB ) >/dev/null 2>&1
-  printf '# B\n' > "$e/.claude/commands/quick/extra-b.md"
-  sed -i 's|COMMANDS=(.claude/commands/quick/ping.md)|COMMANDS=(.claude/commands/quick/ping.md .claude/commands/quick/extra-b.md)|' "$e/.claude/utils/marketplace/verticals/probe.manifest.sh"
-  _regen "$e"; ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm B ) >/dev/null 2>&1
-  local _merge_rc=0 _vA _j2_c _j2_d _t
-  ( cd "$e" && git checkout -q main && git merge --squash -q prA >/dev/null 2>&1 && git -c user.email=t@t -c user.name=t commit -qm sqA ) >/dev/null 2>&1
-  _vA="$(_vof "$e/plugins/probe")"
-  ( cd "$e" && git merge --squash prB ) >/dev/null 2>&1 || _merge_rc=$?
-  if [ "${_merge_rc}" -ne 0 ]; then
-    record_pass "plugin-version-derived: (j1) 2o PR concorrente sem rebase CONFLITA no git — a colisao nao entra calada"
-  else record_fail "plugin-version-derived: (j1)" "o merge do 2o PR NAO conflitou — a 1a barreira do teto sumiu (formato da projecao mudou?)"; fi
-  # resolucao DESCUIDADA: aceita o plugins/ de UM lado (o do prB), por checkout EXPLICITO da branch e
-  # nao por `--theirs`. Medido 2026-09-13: o caso passava no git 2.43 local e MATAVA o worker no git 2.55
-  # do CI (a familia "reivindicada e NAO concluida") — a resolucao por estagio de conflito depende da
-  # versao do git, e um passo que falha sob `set -e` nao reprova, some. Agora nenhum passo pode sumir:
-  # cada um tolera a falha e o caso REPROVA dizendo em qual parou.
-  local _j2_step="ok"
-  ( cd "$e" && git checkout prB -- plugins/ && git add -A && git -c user.email=t@t -c user.name=t commit -qm sqB-descuidado ) >/dev/null 2>&1 || _j2_step="resolucao-nao-commitou"
-  _t="$(mktemp -d)"
-  _j2_c="$(_vof "$e/plugins/probe" 2>/dev/null || true)"
-  _regen "$e" "$_t/probe" || _j2_step="${_j2_step}+regen-falhou"
-  _j2_d="$(_vof "$_t/probe" 2>/dev/null || true)"
-  if [ "${_j2_step}" = "ok" ] && [ -n "${_j2_c}" ] && [ -n "${_j2_d}" ] && [ "${_j2_c}" != "${_j2_d}" ]; then
-    record_pass "plugin-version-derived: (j2) resolucao descuidada e pega pela REGRA 19 — commitado ${_j2_c}, derivado ${_j2_d}"
-  else record_fail "plugin-version-derived: (j2)" "passo=${_j2_step} · commitado=[${_j2_c}] derivado=[${_j2_d}] — se os dois batem, a 2a barreira do teto sumiu e a colisao passaria calada"; fi
-  rm -rf "$_t" "$e"
-
-  # (i) IDEMPOTENCIA — regenerar sem mudar conteudo NAO pode andar. Sem isto a versao dispararia a
-  #     cada invocacao do lint e a REGRA 19 nunca fecharia.
-  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
-  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
-  local _i1 _i2 _i3
-  _regen "$e"; _i1="$(_vof "$e/plugins/probe")"
-  _regen "$e"; _i2="$(_vof "$e/plugins/probe")"
-  _regen "$e"; _i3="$(_vof "$e/plugins/probe")"
-  if [ "${_i1}" = "${_i2}" ] && [ "${_i2}" = "${_i3}" ]; then
-    record_pass "plugin-version-derived: (i) tres regeneracoes sem mudar conteudo mantem ${_i1} — a versao nao dispara sozinha"
-  else record_fail "plugin-version-derived: (i)" "a versao andou sem mudanca de conteudo: ${_i1} ${_i2} ${_i3}"; fi
-  rm -rf "$e"
+  # (f) O MATERIALIZADOR DA PUBLICAÇÃO preserva o anterior. Ele monta DENTRO do clone de onion-plugins; se
+  #     apagasse o plugin antes de chamar o assembler (como fazia até a F4), toda publicação zeraria a
+  #     versão. Sandbox: as utils de marketplace REAIS, só com o manifesto-sonda (os reais exigiriam as fontes).
+  local e="${d}/mat" t="${d}/alvo"
+  mkdir -p "${e}/.claude/commands/quick" "${e}/.claude/utils"
+  cp -r "${REPO_ROOT}/.claude/utils/marketplace" "${e}/.claude/utils/" 2>/dev/null
+  rm -f "${e}/.claude/utils/marketplace/verticals/"*.manifest.sh
+  cp "${man}" "${e}/.claude/utils/marketplace/verticals/probe.manifest.sh"
+  cp "${d}/src/.claude/commands/quick/ping.md" "${e}/.claude/commands/quick/ping.md"
+  ( cd "${e}" && git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm seed ) >/dev/null 2>&1
+  local m1 m2 mrc=0
+  bash "${e}/.claude/utils/marketplace/materialize-marketplace-repo.sh" "${t}" --no-commit >/dev/null 2>&1 || mrc=$?
+  m1="$(_vof "${t}/plugins/probe")"
+  printf '# ping v4\n' >> "${e}/.claude/commands/quick/ping.md"
+  ( cd "${e}" && git add -A && git -c user.email=t@t -c user.name=t commit -qm v4 ) >/dev/null 2>&1
+  bash "${e}/.claude/utils/marketplace/materialize-marketplace-repo.sh" "${t}" --no-commit >/dev/null 2>&1 || mrc=$?
+  m2="$(_vof "${t}/plugins/probe")"
+  if [ "${mrc}" -eq 0 ] && [ "${m1}" = "0.1.0" ] && [ "${m2}" = "0.1.1" ]; then
+    record_pass "plugin-version-derived: (f) o materialize lê o plugin PUBLICADO no alvo antes de remontar (${m1} → ${m2})"
+  else record_fail "plugin-version-derived: (f)" "rc=${mrc} 1ª=${m1} 2ª=${m2} (esperado 0.1.0 → 0.1.1) — o materialize apagou o anterior antes do assembler?"; fi
 
   rm -rf "${d}"
 }
@@ -18982,23 +18920,41 @@ run_plugin_dead_link_selftests() {
 }
 _family run_plugin_dead_link_selftests
 
-# REGRA 76 — marketplace.json da raiz == gerador (helper marketplace-root-check.sh; --write seguro).
+# REGRA 76 — marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos MANIFESTOS (helper
+# marketplace-root-check.sh; --write seguro). Repensada na F4 das portas (2026-10-10): a raiz não lista mais
+# `./plugins/<nome>` (o core não guarda o bundle); o source de cada entrada é o subdiretório do plugin no repo
+# público. Polaridades: (a) stale/relativo → HARD com a classe própria do relativo; (b) --write → limpo, topo
+# preservado, source público; (c) a raiz depende SÓ do manifesto — mexer no CORPO de uma fonte bundlada não a
+# deixa defasada (é o "não travar" do lado do catálogo); (d) mudar a descrição no manifesto a defasa.
 run_marketplace_root_sync_selftests() {
   local h="${REPO_ROOT}/.claude/validation/marketplace-root-check.sh"
   [ -f "${h}" ] || { record_fail "marketplace-root-sync" "helper ausente"; return; }
   local d out; d="$(mktemp -d)"
-  mkdir -p "${d}/r/.claude-plugin" "${d}/r/plugins/probe/.claude-plugin"
-  printf '{\n  "name": "probe",\n  "version": "0.1.3",\n  "description": "Sonda",\n  "author": { "name": "t" },\n  "keywords": ["a"],\n  "license": "MIT",\n  "homepage": "https://x",\n  "repository": "https://x"\n}\n' > "${d}/r/plugins/probe/.claude-plugin/plugin.json"
-  printf '{\n  "name": "probe-mkt",\n  "owner": { "name": "t" },\n  "plugins": []\n}\n' > "${d}/r/.claude-plugin/marketplace.json"
-  # (a) stale → HARD (modo consumido --format tsv)
+  mkdir -p "${d}/r/.claude-plugin" "${d}/r/.claude/utils/marketplace/verticals" "${d}/r/.claude/agents/x"
+  printf -- '---\nname: a1\n---\ncorpo\n' > "${d}/r/.claude/agents/x/a1.md"
+  printf 'PLUGIN_NAME="probe"\nPLUGIN_DESC="Sonda"\nKEYWORDS=(a b)\nAGENTS=(.claude/agents/x/a1.md)\n' > "${d}/r/.claude/utils/marketplace/verticals/probe.manifest.sh"
+  printf '{\n  "name": "probe-mkt",\n  "owner": { "name": "t" },\n  "plugins": [\n    { "name": "probe", "source": "./plugins/probe" }\n  ]\n}\n' > "${d}/r/.claude-plugin/marketplace.json"
+  # (a) stale + source relativo → HARD (modo consumido --format tsv), com a classe do relativo nomeada
   out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
-  if grep -q '^HARD	desatualizado' <<< "${out}"; then record_pass "marketplace-root-sync: (a) marketplace.json stale → HARD"
+  if grep -q '^HARD	desatualizado' <<< "${out}" && grep -q '^HARD	source-local' <<< "${out}"; then record_pass "marketplace-root-sync: (a) raiz stale com source ./plugins/ → HARD desatualizado + source-local"
   else record_fail "marketplace-root-sync: (a)" "$(printf '%s' "${out}" | cut -c1-200)"; fi
-  # (b) --write regenera com top-level preservado → limpo
+  # (b) --write regenera com top-level preservado e source PÚBLICO → limpo
   bash "${h}" "${d}/r" --write >/dev/null 2>&1
   out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
-  if [ -z "${out}" ] && grep -q '"probe-mkt"' "${d}/r/.claude-plugin/marketplace.json" && grep -q '"probe"' "${d}/r/.claude-plugin/marketplace.json"; then record_pass "marketplace-root-sync: (b) --write regenera (temp+mv), top-level preservado, limpo"
-  else record_fail "marketplace-root-sync: (b)" "$(printf '%s' "${out}" | cut -c1-200)"; fi
+  if [ -z "${out}" ] && grep -q '"probe-mkt"' "${d}/r/.claude-plugin/marketplace.json" \
+     && python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); s=d["plugins"][0]["source"]; sys.exit(0 if isinstance(s,dict) and s.get("path")=="plugins/probe" and s.get("url","").endswith("/onion-plugins.git") else 1)' "${d}/r/.claude-plugin/marketplace.json"; then
+    record_pass "marketplace-root-sync: (b) --write regenera (temp+mv), topo preservado, source = plugins/probe no repo público"
+  else record_fail "marketplace-root-sync: (b)" "$(printf '%s' "${out}" | cut -c1-200) · $(tr -d '\n' < "${d}/r/.claude-plugin/marketplace.json" | cut -c1-200)"; fi
+  # (c) NÃO TRAVAR no catálogo: mudar o CORPO da fonte bundlada não defasa a raiz
+  printf 'corpo mudou\n' >> "${d}/r/.claude/agents/x/a1.md"
+  out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
+  if [ -z "${out}" ]; then record_pass "marketplace-root-sync: (c) mexer no corpo de uma fonte bundlada não defasa a raiz (depende só do manifesto)"
+  else record_fail "marketplace-root-sync: (c)" "a raiz ficou defasada por mudança de CORPO: $(printf '%s' "${out}" | cut -c1-200)"; fi
+  # (d) mudar a DESCRIÇÃO no manifesto defasa a raiz → HARD (a projeção segue cobrada)
+  sed -i 's/PLUGIN_DESC="Sonda"/PLUGIN_DESC="Sonda nova"/' "${d}/r/.claude/utils/marketplace/verticals/probe.manifest.sh"
+  out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
+  if grep -q '^HARD	desatualizado' <<< "${out}"; then record_pass "marketplace-root-sync: (d) descrição mudou no manifesto → raiz defasada (HARD)"
+  else record_fail "marketplace-root-sync: (d)" "a raiz não acusou a descrição nova: $(printf '%s' "${out}" | cut -c1-200)"; fi
   rm -rf "${d}"
 }
 _family run_marketplace_root_sync_selftests
@@ -19683,62 +19639,10 @@ run_kg_reverify_schema_selftests() {
   fi
 }
 
-run_hook_autofix_selftests() {
-  # CATRACA DO AUTO-FIX DO PRE-COMMIT (parecer do CI no PR #590: guard alterada/criada SEM fixture
-  # automatizada — commands.md §11; os repros eram manuais e não sobreviviam ao próximo commit).
-  # Roda os blocos REAIS do hook (extraídos por sed do arquivo vivo — não uma cópia que envelhece)
-  # dentro de um CLONE LOCAL descartável, porque o hook precisa de git e o SANDBOX da bancada não é repo.
-  local hook="${REPO_ROOT}/.githooks/pre-commit"
-  [ -f "${hook}" ] || { record_skip "hook-autofix: pre-commit ausente"; return; }
-  grep -q "AUTO-REGENERAÇÃO DE PLUGINS" "${hook}" || { record_skip "hook-autofix: bloco ausente do hook"; return; }
-  local hc; hc="$(mktemp -d)"
-  # clone local raso: hardlinks, ~1-2s; working tree completa para o assemble ler
-  if ! git clone --quiet --local --no-hardlinks --depth 1 "file://${REPO_ROOT}" "${hc}/repo" 2>/dev/null; then
-    record_skip "hook-autofix: clone local falhou"; rm -rf "${hc}"; return
-  fi
-  local blk="${hc}/blk.sh"
-  { echo 'set -euo pipefail'; echo 'REPO_ROOT="$(git rev-parse --show-toplevel)"'
-    sed -n '/AUTO-REGENERAÇÃO DE PLUGINS COM RASTRO/,/^fi$/p' "${hook}"; echo 'echo BLOCO_FIM'; } > "${blk}"
-  local out
-  # (a) entrada-DIRETÓRIO dispara (o repro que a v1 do auto-fix NÃO cobria — 43% das fontes)
-  ( cd "${hc}/repo" && printf '\n<!-- catraca-dir -->\n' >> .claude/commands/engineer/plan.md \
-    && git add .claude/commands/engineer/plan.md ) >/dev/null 2>&1
-  out="$(cd "${hc}/repo" && bash "${blk}" 2>&1)" || true
-  if grep -q "onion-engineering" <<< "${out}"&& grep -q "BLOCO_FIM" <<< "${out}"; then
-    record_pass "hook-autofix: (a) fonte em entrada-DIRETÓRIO dispara a regeneração (a cegueira da v1 não volta)"
-  else
-    record_fail "hook-autofix: (a) entrada-dir" "não regenerou — o matcher regrediu para grep textual?"
-  fi
-  ( cd "${hc}/repo" && git checkout -q -- . && git reset -q ) >/dev/null 2>&1
-  # (b) GIT_INDEX_FILE temporário PULA com aviso (o revert-fantasma do commit-por-pathspec não volta)
-  ( cd "${hc}/repo" && printf '\n<!-- x -->\n' >> .claude/commands/meta/kg.md && git add .claude/commands/meta/kg.md ) >/dev/null 2>&1
-  out="$(cd "${hc}/repo" && GIT_INDEX_FILE=".git/next-index-999.lock" bash "${blk}" 2>&1)" || true
-  if grep -q "PULADO" <<< "${out}"&& ! grep -q "🔁" <<< "${out}"; then
-    record_pass "hook-autofix: (b) índice temporário pula com aviso (sem revert fantasma)"
-  else
-    record_fail "hook-autofix: (b) índice temporário" "não pulou — o gate por GIT_INDEX_FILE sumiu?"
-  fi
-  ( cd "${hc}/repo" && git checkout -q -- . && git reset -q ) >/dev/null 2>&1
-  # (c) staging PARCIAL de fonte casada ABORTA (o vazamento de WIP não volta)
-  ( cd "${hc}/repo" && printf '\n<!-- staged -->\n' >> .claude/commands/meta/kg.md \
-    && git add .claude/commands/meta/kg.md && printf '\n<!-- unstaged -->\n' >> .claude/commands/meta/kg.md ) >/dev/null 2>&1
-  local rc_c=0
-  out="$(cd "${hc}/repo" && bash "${blk}" 2>&1)" || rc_c=$?
-  if [ "${rc_c}" -ne 0 ] && grep -q "ABORTADO" <<< "${out}"; then
-    record_pass "hook-autofix: (c) staging parcial aborta com instrução (WIP não vaza para o plugin)"
-  else
-    record_fail "hook-autofix: (c) staging parcial" "não abortou (rc=${rc_c}) — o assemble publicaria WIP não-staged"
-  fi
-  # (d) R19 alterada: assemble FALHO acusa E SOMA (era morte rc=2 sem sumário)
-  ( cd "${hc}/repo" && rm -rf .claude/skills/onion-orchestration ) >/dev/null 2>&1
-  out="$(cd "${hc}/repo" && bash .claude/validation/lint-artifacts.sh --only="${hc}/repo/.claude/utils/marketplace/verticals/onion.manifest.sh" 2>&1)" || true
-  if grep -q "assemble FALHOU" <<< "${out}"&& grep -q "Sumário" <<< "${out}"; then
-    record_pass "hook-autofix: (d) assemble falho vira violation E o lint soma (morte silenciosa não volta)"
-  else
-    record_fail "hook-autofix: (d) assemble falho" "não acusou ou não somou — a R19 regrediu para morte rc=2?"
-  fi
-  rm -rf "${hc}"
-}
+# (APOSENTADA na F4 das portas, 2026-10-10, SAC-93) a família hook-autofix exercitava o bloco
+# "AUTO-REGENERAÇÃO DE PLUGINS COM RASTRO" do pre-commit — o auto-fix da REGRA 19 (Plugins de vertical
+# sincronizados com as fontes). O `plugins/` saiu do core e o bloco saiu do hook; o que a família provava
+# deixou de existir. A ausência do bloco é cobrada pela família plugin_bundle, caso (d2).
 
 # Deploy do site (ops/deploy-site.sh) — a bancada dele é embutida (--selftest, sandbox
 # em mktemp, sem sudo, nunca toca fonte/webroot reais). Nasceu da revisão adversarial do
@@ -21089,8 +20993,16 @@ run_kg_yaml_validity_selftests() {
 }
 
 run_plugin_runtime_selftests() {
-  local root="${REPO_ROOT}"
-  if [ ! -d "${root}/plugins" ]; then record_skip "plugin-runtime: sem plugins/ (adotante)"; return; fi
+  # F4 DAS PORTAS (2026-10-10): o core não versiona mais plugins/. O bundle é montado AQUI, num
+  # temporário, a partir das fontes vivas (o mesmo materializador da publicação) — nunca a árvore viva.
+  case "${SELFTEST_ROLE}" in ""|source) : ;; *) record_skip "plugin-runtime: papel '${SELFTEST_ROLE}' não monta plugins → pulado"; return ;; esac
+  local _mat="${REPO_ROOT}/.claude/utils/marketplace/materialize-marketplace-repo.sh" broot
+  [ -f "${_mat}" ] || { record_fail "plugin-runtime" "materialize-marketplace-repo.sh ausente — não há como montar o bundle"; return; }
+  broot="$(mktemp -d)"
+  if ! bash "${_mat}" "${broot}/b" --no-commit >/dev/null 2>&1; then
+    record_fail "plugin-runtime" "o bundle temporário não montou das fontes vivas"; rm -rf "${broot}"; return
+  fi
+  local root="${broot}/b"
   local scripts; scripts="$(grep -rl 'CLAUDE_PLUGIN_ROOT' "${root}/plugins" --include='*.sh' 2>/dev/null | sort 2>/dev/null || true)"
   if [ -z "${scripts}" ]; then record_skip "plugin-runtime: nenhum .sh empacotado cita a variável"; return; fi
   local host; host="$(mktemp -d)"; mkdir -p "${host}/docs"
@@ -21156,7 +21068,7 @@ EOF_HOST
     fi
   done
   [ "${ok}" = "1" ] || true
-  rm -rf "${host}"
+  rm -rf "${host}" "${broot}"
 }
 
 run_site_derivation_selftests() {
@@ -22265,6 +22177,22 @@ SRC="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"; T="$
 mkdir -p "${T}/plugins/onion/.claude-plugin" "${T}/.claude-plugin"
 printf '{"ref": "%s"}\n' "$(git -C "${SRC}" rev-parse HEAD)" > "${T}/plugins/onion/.claude-plugin/provenance.json"
 printf '{"name":"x","plugins":[]}\n' > "${T}/.claude-plugin/marketplace.json"
+# defeitos PLANTADOS quando a fonte pede (casos q3/q4): moat dentro do bundle; checador que não mede
+[ -f "${SRC}/payload/PLANT-MOAT" ] && { mkdir -p "${T}/plugins/onion/commands"; printf 'plantado\n' > "${T}/plugins/onion/commands/adopt.md"; }
+[ -f "${SRC}/payload/NM" ] && touch "${T}/plugins/onion/NAO-MEDE"
+exit 0
+STUB
+  # o checador do BUNDLE esboçado (F4 das portas): mesma interface e contrato de rc do real
+  # (0 limpo · 1 HARD · 2 não medi). O real é exercitado pela família plugin_bundle; aqui se mede
+  # se o MOTOR o chama no que montou e respeita o rc.
+  cat > "${core}/.claude/validation/plugin-bundle-check.sh" <<'STUB'
+#!/usr/bin/env bash
+B=""; while [ $# -gt 0 ]; do case "$1" in --bundle) B="$2"; shift 2 ;; *) shift ;; esac; done
+[ -d "${B}/plugins" ] || { echo "sem plugins/" >&2; exit 2; }
+[ -f "${B}/plugins/onion/NAO-MEDE" ] && { echo "nao medi" >&2; exit 2; }
+if [ -f "${B}/plugins/onion/commands/adopt.md" ]; then
+  printf 'HARD\t61\tmoat-no-bundle\tplugins/onion/commands/adopt.md\tplantado\n'; exit 1
+fi
 exit 0
 STUB
   # o registrador de nomes comerciais REAL (a REGRA 36 o usa), para a família de termos não ser vazia
@@ -22506,6 +22434,23 @@ STUB
   if [ "${_r}" -eq 0 ] && grep -q 'todo provenance.json aponta' <<< "${_o}"; then
     record_pass "publish: (q2) plugins: provenance no pin de origin/main e validate ok ⇒ ensaio passa"
   else record_fail "publish: (q2)" "rc=${_r} out=${_o:0:300}"; fi
+  # (q3) F4 DAS PORTAS: as guardas de plugin rodam no BUNDLE MONTADO (passo 5d). Defeito de moat plantado
+  #      na fonte ⇒ o checador o acusa no que foi montado, o motor recusa e o remoto NÃO anda, com --push.
+  printf 'x\n' > "${core}/payload/PLANT-MOAT"; _cp planta-moat
+  ptip="$(git ls-remote "${plugup}" refs/heads/main 2>/dev/null | awk '{print $1}')"
+  PATH="${fk}:${PATH}" _pub porta-p --push
+  if [ "${_r}" -eq 1 ] && grep -q '(5d) guardas de plugin no bundle: 1 HARD' <<< "${_o}" && grep -q 'moat-no-bundle' <<< "${_o}" \
+     && [ "$(git ls-remote "${plugup}" refs/heads/main 2>/dev/null | awk '{print $1}')" = "${ptip}" ]; then
+    record_pass "publish: (q3) defeito plantado no bundle de plugins ⇒ (5d) barra e o remoto NÃO anda"
+  else record_fail "publish: (q3) bundle com defeito publicado" "rc=${_r} out=${_o:0:300}"; fi
+  rm -f "${core}/payload/PLANT-MOAT"; _cp tira-moat
+  # (q4) o checador que NÃO mede (rc 2) também recusa: não medir não é limpo
+  printf 'x\n' > "${core}/payload/NM"; _cp nao-mede
+  PATH="${fk}:${PATH}" _pub porta-p
+  if [ "${_r}" -eq 1 ] && grep -q 'NÃO mediram o bundle' <<< "${_o}"; then
+    record_pass "publish: (q4) checador do bundle sem medir (rc 2) ⇒ a verificação reprova"
+  else record_fail "publish: (q4) não medir passou como limpo" "rc=${_r} out=${_o:0:300}"; fi
+  rm -f "${core}/payload/NM"; _cp tira-nm
 
   # (p) --status e --all SEM porta no registro ⇒ rc 3 (sem objeto não é 'tudo em dia')
   local nodoor="${d}/nodoor.yaml"
@@ -22703,7 +22648,7 @@ run_role_scope_selftests() {
   rm -rf "${sb3}"
 }
 
-_family run_hook_autofix_selftests
+# _family run_hook_autofix_selftests — aposentada na F4 das portas (ver o comentário no lugar da função)
 _family run_kg_reverify_schema_selftests
 _family run_backtick_ref_selftests
 _family run_site_deeplink_selftests

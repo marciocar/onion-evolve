@@ -67,7 +67,8 @@ Leia o status como ele se declara. A defasagem conta commits da superfície que 
 2. **ENSAIAR** (sempre, antes de qualquer push):
    `bash ops/publish-door.sh <porta>`
    O motor monta em clone descartável, verifica e commita sem empurrar. Leia o resultado de cada
-   etapa. rc 1 significa que a verificação reprovou: mostre o achado (vazamento, papel, lint) e
+   etapa. rc 1 significa que a verificação reprovou: mostre o achado (vazamento, papel, lint e, nos
+   plugins, as guardas de plugin sobre o bundle montado) e
    **pare**. A cura vai para o core por PR, nunca para a porta. rc 2 é precondição ou recusa, e rc 3
    é fonte irresolúvel.
    - Troca de papel deliberada (a onion-core de `hub` para `source`, decidida na matriz):
@@ -91,8 +92,9 @@ onion-mini é recusado até a F5 (SAC-94): o repo dele guarda a destilação cur
 
 ## O que este comando NÃO faz
 
-- Não publica a 1ª materialização do onion-mini (F5) nem roda as REGRAS 19/72–79/61 sobre um bundle de
-  plugins temporário (F4, SAC-93).
+- Não publica a 1ª materialização do onion-mini (F5). (As guardas de plugin — REGRAS 61, 72–77 e 79 —
+  rodam desde a F4 no passo 5d, sobre o bundle montado, por `plugin-bundle-check.sh`; elas não estão
+  mais no lint de PR, porque o core não versiona mais o `plugins/` montado.)
 - Não empurra sem confirmação, não força push e não reescreve a história de porta nenhuma.
 - Não atualiza o clone local da porta nem o `role:` do registro depois de uma troca de papel. Isso vai
   como instrução no fim da rodada.

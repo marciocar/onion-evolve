@@ -185,16 +185,16 @@ CATEGORIES = [
      [1, 2, 3, 12, 17, 23, 51]),
     ("Higiene de artefato",
      "Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.",
-     [5, 6, 13, 14, 15, 22, 48, 60, 71, 72, 73, 74, 75, 94]),
+     [5, 6, 13, 14, 15, 22, 48, 60, 71, 94]),
     ("Fronteiras & contratos de arquitetura",
      "Proibições estruturais, documentação no lugar certo e os contratos de conformance e de adoção.",
-     [7, 18, 20, 40, 53, 77]),
+     [7, 18, 20, 40, 53]),
     ("SDAAL — abstração de provider",
      "O consumidor fala com a abstração, nunca com o provider direto.",
      [10, 11]),
     ("SSOT anti-drift",
-     "Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, plugins, topologia.",
-     [8, 9, 16, 19, 21, 27, 37, 39, 41, 50, 59, 62, 63, 70, 76, 80, 81, 83, 84, 85, 90, 92, 96]),
+     "Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, catálogo, topologia.",
+     [8, 9, 16, 21, 27, 37, 39, 41, 50, 59, 62, 63, 70, 76, 80, 81, 83, 84, 85, 90, 92, 96]),
     ("KG & proveniência",
      "Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca "
      "(por citação e por marcador autodeclarado); e frescor doutrinário — afirmação "
@@ -208,10 +208,9 @@ CATEGORIES = [
      [24, 25, 28, 38, 46, 66, 95]),
     ("Projeção & privacidade",
      "O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e "
-     "deep-link privado nunca vazam (nem a HOME crua do source privado, num artefato de "
-     "plugin); e o compose commitado nunca publica porta em "
+     "deep-link privado nunca vazam; e o compose commitado nunca publica porta em "
      "0.0.0.0 nem sobe com segredo de fallback.",
-     [30, 33, 34, 35, 36, 45, 61, 64, 79]),
+     [30, 33, 34, 35, 36, 45, 61, 64]),
     ("Processo com resíduo",
      "O trabalho PROPOSTO carrega rastro material de ter sido revisado — o gate cria a cadência, "
      "o worker testa a verdade.",

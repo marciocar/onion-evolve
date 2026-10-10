@@ -47,6 +47,8 @@ selo no carimbo) vive em [`common:prompts:publish-doctrine`](../../commands/comm
 
 - Superfície: [`/meta:publish`](../../commands/meta/publish.md) · motor: `ops/publish-door.sh`
 - Materializador de plugins: `.claude/utils/marketplace/materialize-marketplace-repo.sh`
-- Guarda de moat: REGRA 61 (Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado), em `lint-artifacts.sh`
+- Guarda de moat: REGRA 61 (Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado), em `lint-artifacts.sh` (a declaração) e no bundle montado (o resultado)
+- Guardas do bundle de plugins (desde a F4, 2026-10-10): `.claude/validation/plugin-bundle-check.sh`,
+  passo 5d do motor — REGRAS 61, 72–77 e 79 sobre o que vai a público; o core não versiona `plugins/`
 - Grafos: `docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml` ·
   `docs/onion/graph/door-role-parity-2026-09.kg.yaml`

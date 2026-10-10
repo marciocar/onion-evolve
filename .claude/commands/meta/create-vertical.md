@@ -148,11 +148,15 @@ Preencher as seções `_(...)_` dos esqueletos gerados com o domínio real da ve
 ls .claude/utils/marketplace/verticals/*.manifest.sh   # ex.: onion-design.manifest.sh
 #     escrever verticals/<slug>.manifest.sh (PLUGIN_NAME/VERSION/DESC, COMMANDS/AGENTS/SKILLS/...)
 
-# 4b. montar o plugin a partir do manifesto
-bash .claude/utils/marketplace/assemble-plugin.sh .claude/utils/marketplace/verticals/<slug>.manifest.sh
+# 4b/4c NO CORE (papel source, desde a F4 das portas): NÃO monte o plugin aqui — o bundle nasce na
+#        publicação (/meta:publish onion-plugins). Só regenere o catálogo da raiz, que é projeção dos
+#        manifestos e aponta o repo público (o pre-commit também o faz quando o manifesto entra no commit):
+bash .claude/validation/marketplace-root-check.sh --write
 
-# 4c. regenerar o registro do marketplace (fecha o sinal A3 — derivado dos plugin.json)
-bash .claude/utils/marketplace/generate-marketplace.sh > .claude-plugin/marketplace.json
+# 4b/4c NUM ADOTANTE que publica os próprios plugins: montar e gerar o catálogo do bundle
+bash .claude/utils/marketplace/assemble-plugin.sh .claude/utils/marketplace/verticals/<slug>.manifest.sh
+#        (nunca `gerador > .claude-plugin/marketplace.json`: trunca o topo antes de o gerador lê-lo)
+tmp="$(mktemp)" && bash .claude/utils/marketplace/generate-marketplace.sh . > "$tmp" && mv "$tmp" .claude-plugin/marketplace.json
 
 # 4d. registrar a vertical no bundle de papel (roles.yaml) conforme o sujeito
 #     editar roles.yaml → adicionar onion-<slug> ao(s) role(s) certo(s)

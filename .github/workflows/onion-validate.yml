@@ -6,10 +6,11 @@ on:
       - '.claude/**'
       - 'docs/meta-specs/**'
       - 'docs/design-context/**'
-      # plugins/ são artefatos GERADOS guardados pela REGRA 19 (drift vs fonte).
-      # Sem este path, um PR que só toca plugins/ contorna o drift-guard
-      # (incidente 2026-07-04: fix de drift do #241 mergeou sem o lint rodar).
-      - 'plugins/**'
+      # .claude-plugin/ = o catálogo da RAIZ, projeção dos manifestos guardada pela REGRA 76.
+      # Até a F4 das portas (2026-10-10) aqui estava 'plugins/**' (artefatos gerados guardados pela
+      # REGRA 19; incidente 2026-07-04: fix de drift do #241 mergeou sem o lint rodar). O plugins/
+      # saiu do core; a mesma lição vale para o catálogo: PR que só toca a projeção tem de ser julgado.
+      - '.claude-plugin/**'
       # .github/workflows/ = o proprio CI. Sem este path, um PR que mexe no
       # workflow NAO dispara o lint — foi medido no #509: adicionar 'ops/**' aos
       # paths nao fez o lint rodar, porque o filtro e avaliado contra a definicao

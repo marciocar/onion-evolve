@@ -151,7 +151,7 @@ Duas camadas complementares e **desacopladas**:
 ### 3.1 Review determinístico (dogfood mecânico — CI)
 
 `.github/workflows/onion-validate.yml`: roda em PRs que tocam `.claude/**`, `docs/meta-specs/**`,
-`docs/design-context/**`, `plugins/**`, `docs/**` ou `CLAUDE.md`. **Quatro** steps sequenciais
+`docs/design-context/**`, `.claude-plugin/**` (o catálogo da raiz; até a F4 das portas era `plugins/**`), `docs/**` ou `CLAUDE.md`. **Quatro** steps sequenciais
 (teto `timeout-minutes: 25`; **medido no run 31649485283**, o mesmo que mediu os 798 casos:
 job 16m22s · lint 44s · selftest 15m30s):
 1. `bash .claude/validation/lint-artifacts.sh` — linter determinístico — 3279 linhas, 59 regras (53 HARD/11 SOFT, SSOT

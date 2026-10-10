@@ -69,14 +69,18 @@ onion_staged() {
 # SEM conferi-la: código mudado depois da revisão saía com carimbo de revisado — o B1 que o motor
 # curou seguia vivo no hook (provado em sandbox pela avaliação do pr-finalize).
 # shellcheck disable=SC2034
-ONION_GENERATED="docs/onion/inventory.md docs/onion/graph.md docs/onion/testing-state.md docs/onion/testing-inventory.md docs/onion/kg-read-index.tsv docs/onion/federation-console.html docs/backlog.md .claude/validation/lint-rules.md docs/onion/federation-map.md"
+ONION_GENERATED="docs/onion/inventory.md docs/onion/graph.md docs/onion/testing-state.md docs/onion/testing-inventory.md docs/onion/kg-read-index.tsv docs/onion/federation-console.html docs/backlog.md .claude/validation/lint-rules.md docs/onion/federation-map.md .claude-plugin/marketplace.json"
 # Diretórios INTEIROS gerados (SAC-67, 2026-10-08): plugins/<vertical>/ é montado pelo assemble-plugin.sh
 # a partir das fontes em .claude/ (REGRA 19). Medido: dois PRs paralelos que tocam fontes DIFERENTES
 # conflitam SÓ aqui (provenance.json e README.md de cada plugin, 4 arquivos, 0 de fonte), e a lista
 # exata acima não os conhecia — o --rebase do pr-finalize recusava como "conflito REAL" e o rebase
 # virava trabalho à mão (3 vezes na leva de 2026-10-07/08). O mapa da federação (REGRA 38) entrou na
 # lista pelo mesmo motivo: o motor não o regenerava e o lint do commit o cobrava depois.
-ONION_GENERATED_DIRS="plugins/"
+# ⚠️ ESVAZIADO NA F4 DAS PORTAS (2026-10-10, SAC-93): o `plugins/` saiu do core — o bundle é montado na
+# publicação, nunca versionado aqui —, e o conflito que motivou esta variável deixou de poder existir. Ela
+# fica (vazia) porque o mecanismo é genérico: diretório gerado novo entra aqui. O catálogo da raiz
+# (`.claude-plugin/marketplace.json`, REGRA 76) virou projeção dos manifestos e entrou na lista exata acima.
+ONION_GENERATED_DIRS=""
 
 # onion_is_generated <caminho> → rc 0 = projeção gerada (lista exata ou dentro de um diretório gerado)
 onion_is_generated() {

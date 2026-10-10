@@ -221,6 +221,11 @@
 - onion-engineering **requires** agent:test-engineer
 - onion-engineering **requires** agent:test-planner
 - onion-engineering **requires** skill:onion-engineering-context
+- onion-meta **provides** meta-factory
+- onion-meta **provides** self-audit
+- onion-meta **provides** skill-absorption
+- onion-meta **requires** plugin:onion
+- onion-meta **requires** skill:onion-patterns
 - onion-product **loads** embed:kb/framework-story-points.md
 - onion-product **loads** embed:kb/identificar-precificar-dor-cliente.md
 - onion-product **loads** when:spec -> resolve:business-context (skill onion-product-context)
@@ -679,6 +684,11 @@ onion-kg-ssot	specialization	produto
 onion-kg-ssot	specialization	schema	
 onion-kg-ssot	tier	standalone	
 onion-kg-ssot	trust-advises	onion-evolve	
+onion-meta	provides	meta-factory	
+onion-meta	provides	self-audit	
+onion-meta	provides	skill-absorption	
+onion-meta	requires	plugin:onion	
+onion-meta	requires	skill:onion-patterns	
 onion-mini	adopts	onion-evolve	
 onion-mini	mode	distilled	
 onion-mini	pin	n/a	

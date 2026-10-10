@@ -280,7 +280,7 @@ nodes:
     label: "LACUNA DECLARADA (achado do Elenxo de 2026-09-05, medida): o /meta:kg-inbox NAO esta em plugins/onion/commands/ — o diretorio tem 20 comandos, entre eles os irmaos kg.md e kg-freshness.md, e nenhum manifesto do marketplace o cita. Consequencia: quem INSTALA o plugin recebe o produtor e o radar, mas nao o SELO; quem ADOTA recebe (o .claude/commands inteiro viaja). Por que isso NAO e defeito deste PR: install != adopt e doutrina desta casa, e o selo pressupoe a fila docs/evolution/kg-inbox/ mais um grafo vivo do repo — nenhum dos dois existe num repo que so instalou o plugin, logo distribuir o comando produziria um comando que nasce morto (a classe que a REGRA 74 persegue). A decisao correta depende de resolver ANTES onde o instalador guarda fila e grafo. GATILHO NOMEADO: alguem que INSTALOU o plugin (nao adotou) pedir para selar proposta, OU a decisao de dar ao instalador uma topologia de grafo — o que vier primeiro. Ate lá, ausencia por desenho, declarada aqui para nao ser redescoberta como surpresa."
     verified_at: '2026-09-05'
     verified_against: 'medido 2026-09-05: ls plugins/onion/commands/ = 20 arquivos, kg.md e kg-freshness.md presentes, kg-inbox.md AUSENTE; grep kg-inbox nos *.manifest.sh do marketplace = 0 hits'
-    trace: 'plugins/onion/commands/'
+    trace: '.claude/utils/marketplace/verticals/onion.manifest.sh'  # era plugins/onion/commands/ — o plugins/ montado saiu do core na F4 das portas (2026-10-10); a fonte do que ele listava é o manifesto
     provenance:
       source: "plugins/onion/commands/"
       locator: "medido 2026-09-05: ls plugins/onion/commands/ = 20 arquivos, kg.md e kg-freshness.md presentes, kg-inbox.md AUSENTE; grep kg-inbox nos *.manifest.sh do marketplace = 0 hits"
