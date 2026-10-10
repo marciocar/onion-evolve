@@ -24632,7 +24632,7 @@ for k in ("E_P_VA_RUIM","E_P_RM_RUIM","E_P_MARK_BOOL","E_P_MARK_FORA","E_P_MARK_
   #     planilha à narrative; label acima de 280, label anterior com caminho de máquina, label sem o "label anterior",
   #     barra dupla (`Read(//home/…)`), `~<conta>/` e `/dev/shm/…` são recusados ATOMICAMENTE; os isentos selados
   #     passam: /dev/null|stdin|stdout|stderr (A4), caminho relativo do repo (A6) e o domínio público + o arquivo de
-  #     deploy do gmill (exceção selada). A substituição inteira da narrative vem ANTES do label do mesmo nó (o
+  #     deploy de demo de adotante (exceção selada). A substituição inteira da narrative vem ANTES do label do mesmo nó (o
   #     label anterior não se perde); reverify_note e locator trocados; 2ª passada no-op. Mutantes que este caso
   #     reprova: teto de 280 desligado, label anterior não escrito, barra dupla e `~conta/` fora da guarda, isenção
   #     do /dev/null desligada e a ordem narrative→label invertida.
@@ -24641,7 +24641,7 @@ for k in ("E_P_VA_RUIM","E_P_RM_RUIM","E_P_MARK_BOOL","E_P_MARK_FORA","E_P_MARK_
   {
     printf 'meta:\n  id: q\n  schema_version: "1"\n  baseline: "2026-10-10"\nnodes:\n'
     _kmv_o7() { printf '  - id: %s\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_at: "2026-09-01"\n    verified_against: "x"\n    label: "%s antigo em /home/x/a"\n%b    provenance:\n      source: "ops/a.sh"\n      locator: "l.1 de /home/x/a"\n      method: "leitura: x"\n' "$1" "$1" "$2"; }
-    for k in E_Q_OK E_Q_LONGO E_Q_ANT_SUJO E_Q_SEM_ANT E_Q_DUPLA E_Q_TIL E_Q_SHM E_Q_DEVNULL E_Q_REL E_Q_GMILL E_Q_LOC; do _kmv_o7 "${k}" ''; done
+    for k in E_Q_OK E_Q_LONGO E_Q_ANT_SUJO E_Q_SEM_ANT E_Q_DUPLA E_Q_TIL E_Q_SHM E_Q_DEVNULL E_Q_REL E_Q_DEMO E_Q_LOC; do _kmv_o7 "${k}" ''; done
     _kmv_o7 E_Q_AMBOS '    narrative: "label anterior: velho em /home/x/b"\n    reverify_note: "medido em /home/x/c"\n'
   } > "${qg}"
   local longo; longo="$(printf 'a%.0s' $(seq 1 281))"
@@ -24657,7 +24657,7 @@ for k in ("E_P_VA_RUIM","E_P_RM_RUIM","E_P_MARK_BOOL","E_P_MARK_FORA","E_P_MARK_
     _q E_Q_SHM 'grava em /dev/shm/fila' 'label anterior: s'
     _q E_Q_DEVNULL 'curl -o /dev/null e cat /dev/stdin > /dev/stderr' 'label anterior: o curl ⟨do home⟩'
     _q E_Q_REL 'em docs/discussions/onion-pessoal-marcio/a.md' 'label anterior: r ⟨do home⟩'
-    _q E_Q_GMILL 'gmill.onionevolve.com servido por ops/caddy/conf.d/gmill.caddy' 'label anterior: g ⟨do home⟩'
+    _q E_Q_DEMO 'demo-adotante.onionevolve.com servido por ops/caddy/conf.d/demo-adotante.caddy' 'label anterior: g ⟨do home⟩'
     printf 'E_Q_LOC,docs/q/q.kg.yaml,provenance.locator,reescrever,APROVADO,reescrever,l.1 do clone,m,0.9\n'
     _q E_Q_AMBOS 'novo ambos' 'label anterior: E_Q_AMBOS antigo em ⟨o home⟩'
     printf 'E_Q_AMBOS,docs/q/q.kg.yaml,narrative,reescrever,CORRIGIDO,reescrever,label anterior: velho em ⟨o home⟩,m,0.9\n'
@@ -24674,7 +24674,7 @@ n={x["id"]:x for x in json.loads(sys.argv[1])["nodes"]}
 assert n["E_Q_OK"]["label"]=="novo curto" and n["E_Q_OK"]["narrative"]=="label anterior: E_Q_OK antigo em ⟨o home da conta⟩"
 assert n["E_Q_DEVNULL"]["label"].startswith("curl -o /dev/null")
 assert n["E_Q_REL"]["label"]=="em docs/discussions/onion-pessoal-marcio/a.md"
-assert n["E_Q_GMILL"]["label"]=="gmill.onionevolve.com servido por ops/caddy/conf.d/gmill.caddy"
+assert n["E_Q_DEMO"]["label"]=="demo-adotante.onionevolve.com servido por ops/caddy/conf.d/demo-adotante.caddy"
 assert n["E_Q_LOC"]["provenance"]["locator"]=="l.1 do clone"
 a=n["E_Q_AMBOS"]
 assert a["label"]=="novo ambos" and a["reverify_note"]=="medido no clone"
@@ -24689,7 +24689,7 @@ for k in ("E_Q_LONGO","E_Q_ANT_SUJO","E_Q_SEM_ANT","E_Q_DUPLA","E_Q_TIL","E_Q_SH
      && grep -q 'E_Q_TIL \[regra label; narrative\] (caminho de máquina no label final)' <<< "${out}" \
      && grep -q 'E_Q_SHM \[regra label; narrative\] (caminho de máquina no label final)' <<< "${out}" \
      && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --apply-judged "${qc}" "${qg}" >/dev/null 2>&1; then
-    record_pass "kg-migrate-v3: (q) onda O7: reescrever-label troca o label e leva o 'label anterior' à narrative; >280, label anterior com caminho, sem label anterior, barra dupla, ~conta/ e /dev/shm recusados atomicamente; /dev/null|stdin|stderr, caminho relativo do repo e o domínio+deploy do gmill passam; narrative substituída antes do label do mesmo nó; reverify_note e locator trocados; 2ª passada no-op"
+    record_pass "kg-migrate-v3: (q) onda O7: reescrever-label troca o label e leva o 'label anterior' à narrative; >280, label anterior com caminho, sem label anterior, barra dupla, ~conta/ e /dev/shm recusados atomicamente; /dev/null|stdin|stderr, caminho relativo do repo e o domínio+deploy da demo de adotante passam; narrative substituída antes do label do mesmo nó; reverify_note e locator trocados; 2ª passada no-op"
   else record_fail "kg-migrate-v3: (q)" "onda O7 aceitou label longo ou com caminho, perdeu o label anterior, recusou isento selado ou não é idempotente: rc=${rc} ${out} ${y}"; fi
   # (l) --locality (contrato v4.2, 2026-10-09, SAC-97): num repo git de verdade (a regra de `repo` confere a raiz
   #     e o sha com o git), cada classe sai do source; o sha que o git não conhece, a citação bibliográfica e a
