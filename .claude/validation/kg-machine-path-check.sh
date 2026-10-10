@@ -90,7 +90,7 @@ check("cala: comando /meta:* e /engineer:pr", "rode /meta:kg-freshness e depois 
 check("cala: endpoint POST /v1/messages", "POST /v1/messages com /admin/stats e /api/sessions", None)
 check("cala: URL com scheme://", "https://github.com/home/tmp/x e https://dev.to/x", None)
 check("cala: URL sem scheme (//host)", "carregado de //cdn.example.com/lib/x.js", None)
-check("cala: glob relativo", "git ls-files '*.kg.yaml' | grep -v '/fixtures/'", None)
+check("cala: glob relativo", "ls docs/*/data/*.tsv e o padrão '**/snapshots/*.json'", None)
 check("cala: /dev/null, /dev/stdin, /dev/stdout, /dev/stderr (A4)", "x 2>/dev/null; y </dev/stdin >/dev/stdout 2>/dev/stderr", None)
 check("cala: caminho relativo do repo (A6)", "docs/discussions/onion-pessoal-marcio/x.md", None)
 check("cala: ~abril/2026 (data aproximada)", "por volta de ~abril/2026", None)
