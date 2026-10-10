@@ -433,9 +433,18 @@ fi
 git -C "${DEST}" add -A \
   || { echo "ERRO: 'git add -A' no destino FALHOU — as projeções contariam o índice DEFASADO. Recusa antes de gerar." >&2; exit 3; }
 
+# ⚠️ PORTA SEM LINT NÃO TEM PROJEÇÃO A SATISFAZER (2026-10-10, F2 das portas). As projeções SSOT e os
+# baselines existem para o lint DA PORTA passar; o mini (allowlist didática, sem meta) não leva o lint,
+# e exigir as 5 projeções dele abortava a materialização com rc 3 por uma cobrança sem objeto. O
+# predicado é DERIVADO do que viajou (o lint está no destino?), não do nome do papel.
+_DOOR_HAS_LINT=0; [ -f "${DEST}/.claude/validation/lint-artifacts.sh" ] && _DOOR_HAS_LINT=1
+if [ "${_DOOR_HAS_LINT}" -eq 1 ]; then
 _regen regen-ssot-projections.sh || true
 # As catracas do core foram esvaziadas no passo (2); aqui elas renascem do corpus DA PORTA.
 _regen regen-baselines.sh 'tail -2' || true
+else
+  echo "  (6) a porta não leva o lint (.claude/validation/lint-artifacts.sh): projeções SSOT e baselines não se aplicam"
+fi
 
 # ── (6-pos) RE-STAJAR, e CONFERIR O EFEITO — as duas metades que faltavam ────────────────────────
 # (i) O `add -A` de cima roda logo depois de o passo (0) apagar `docs/onion/` (que não viaja no
@@ -450,7 +459,7 @@ _regen regen-baselines.sh 'tail -2' || true
 git -C "${DEST}" add -A \
   || { echo "ERRO: 'git add -A' final FALHOU — as projeções regeneradas ficariam FORA do commit da porta." >&2; exit 3; }
 _faltam=""
-for _proj in docs/onion/inventory.md docs/onion/graph.md docs/onion/kg-read-index.tsv \
+[ "${_DOOR_HAS_LINT}" -eq 1 ] && for _proj in docs/onion/inventory.md docs/onion/graph.md docs/onion/kg-read-index.tsv \
              docs/onion/testing-inventory.md docs/onion/testing-state.md; do
   [ -s "${DEST}/${_proj}" ] || _faltam="${_faltam} ${_proj}"
 done
