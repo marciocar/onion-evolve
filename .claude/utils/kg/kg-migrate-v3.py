@@ -58,6 +58,9 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
     reescrever-locator-method, manter-prod-binario (fica PROD), manter-dev-binario (fica DEV, plano nunca muda) e
     dev-sem-versao (PROD→DEV); caminho de máquina (absoluto ou ~/) que sobre em source, locator OU method finais
     recusa a linha inteira. Ver _o5_row.
+  · ONDA O6 (2026-10-10, SAC-73): o6-juiz.csv com `campo` + `valor_final` aplica verified_against, trace (troca ou
+    remoção com a linha na narrative), o marcador P4 `x_path_is_content` (string), binário DEV/PROD, locality/source/
+    method e o reconciliar (nó novo de --new-nodes + SUPERSEDES). `--hold <id>[:<regra>]` = item ao maestro. Ver o6_ops.
   · COM --locality (contrato v4.2, 2026-10-09, SAC-97): só ACRESCENTA `provenance.locality` (repo|web|host|
     pessoa) às provenances em bloco que ainda não a têm, quando o `source` a determina pela regra de locality_of
     (ver o bloco "provenance.locality" abaixo); sem certeza, o nó fica sem a chave e sai na contagem. Prova, por
@@ -69,7 +72,7 @@ O que ela NÃO faz (é decisão humana ou do contrato, nunca da ferramenta):
     (a gramática diz: sem fonte verificável, o nó não é confirmed — rebaixar é decisão de quem conhece o nó);
   · label acima de 280 NÃO é cortado: separar fato e narrativa é semântico; sai no relatório.
 
-Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv> [--promote-unverifiable] [--verified-at AAAA-MM-DD] | --locality] <arquivo.kg.yaml>...
+Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv> [--promote-unverifiable] [--verified-at AAAA-MM-DD] [--new-nodes <yaml>] [--hold <id>[:<regra>]]... | --locality] <arquivo.kg.yaml>...
 rc:    0 = nada pendente (ou aplicado) · 1 = --check e há mudança pendente · 2 = entrada quebrada
        (arquivo ausente, routing ilegível ou sem as colunas, YAML inválido antes ou DEPOIS da edição — a edição
        nunca grava YAML inválido).
@@ -424,8 +427,9 @@ def load_judged(path):
         rows = list(csv.DictReader(open(path, encoding="utf-8", newline="")))
     except OSError as e:
         raise BrokenInput(f"planilha julgada ilegível ({path}): {e.__class__.__name__}")
-    if not rows or any(c not in rows[0] for c in JUDGED_COLS):
-        raise BrokenInput(f"planilha julgada sem as colunas {', '.join(JUDGED_COLS)} ({path})")
+    cols = O6_COLS if rows and "campo" in rows[0] else JUDGED_COLS  # O6: campo + valor_final no lugar dos *_final
+    if not rows or any(c not in rows[0] for c in cols):
+        raise BrokenInput(f"planilha julgada sem as colunas {', '.join(cols)} ({path})")
     out = {}
     by_rule = "regra" in rows[0]  # formato O4: o mesmo nó pode vir numa linha por regra
     for r in rows:
@@ -818,6 +822,415 @@ def apply_judged_o4(text, judged, verified_at=None):
     return "\n".join(out), rep
 
 
+# ── onda O6 (2026-10-10, SAC-73): o6-juiz.csv troca os *_final por `campo` + `valor_final` ────────────────────────
+#   O `valor_final` é literal quando o `campo` é um só (verified_against, trace, provenance.<k>), ou uma lista
+#   `<chave>: <valor> · <chave>: <valor>` quando são vários (plane, method, locality, source, locator, trace,
+#   x_path_is_content, `narrative (acrescentar|nova linha)` e o verbo `remover trace`). `locator: troca "A" por "B"`
+#   troca só o trecho. Ações:
+#     dev-sem-comando          → o nó fica (ou vai) a DEV; provenance intocada (o rótulo do desfecho é da planilha);
+#     binario-dev              → plane DEV + method + locality web;
+#     binario-prod             → fica em PROD (plane tem de ser PROD), method `medição: …`, locality web;
+#     marcar-path-conteudo     → `x_path_is_content: "<citação|vetor|receita>"` (STRING; booleano é recusado) +
+#                                a linha na narrative; o literal do caminho FICA (é o conteúdo);
+#     reescrever-va            → troca o `verified_against`;
+#     reescrever-trace         → troca o `trace` (`remoto@sha:caminho` ou relativo) e, se a linha trouxer, a narrative;
+#     remover-trace-narrative  → apaga a linha `trace:` e leva a descrição à narrative como
+#                                "trace anterior (só no host): …" (a história não se apaga, o caminho de máquina sim);
+#     reconciliar              → insere o nó novo de --new-nodes depois do antigo, cria a aresta SUPERSEDES
+#                                novo→antigo, e o antigo passa a `status: superseded` e `plane: DEV` (as arestas
+#                                que saem do antigo ficam nele);
+#     add-locality | reescrever-source | reescrever-method → troca o(s) campo(s) da provenance indicados.
+#   Recusa atômica por linha (nada dela é aplicado): caminho de máquina (ABS_FS_RE) ou o hostname deste host em
+#   qualquer valor escrito (verified_against, trace, source, locator, method, linha da narrative); marcador fora de
+#   citação|vetor|receita ou sem aspas; method fora das classes; locality fora do contrato; plano incompatível;
+#   remover trace sem trace e sem a linha na narrative; chave fora do `campo` declarado; provenance com chave
+#   além de source/locator/method/locality; reconciliar sem o nó novo em --new-nodes. `--hold <id>[:<regra>]` deixa
+#   a linha intocada como ITEM AO MAESTRO (o resumo do juiz manda não aplicar). A 2ª aplicação é no-op.
+O6_COLS = ("id", "grafo", "regra", "veredito", "proposta_final", "campo", "valor_final", "locality_final")
+O6_ACTIONS = ("dev-sem-comando", "binario-dev", "binario-prod", "marcar-path-conteudo", "reescrever-va",
+              "reescrever-trace", "remover-trace-narrative", "reconciliar", "add-locality", "reescrever-source",
+              "reescrever-method")
+P4_MARKS = ("citação", "vetor", "receita")
+_O6_KEY = re.compile(r'(?:^|\s·\s)(remover trace(?=\s·\s|$)|(?:plane|method|locality|source|locator|trace|x_path_is_content|'
+                     r'narrative)(?: \([^)]*\))?:\s)')
+_O6_SUB = re.compile(r'^troca "(.*)" por "(.*)"$', re.S)
+_TRACE_PREV = "trace anterior: "
+_TRACE_PREV_HOST = "trace anterior (só no host): "
+
+
+def _host_re():
+    import socket
+    h = (socket.gethostname() or "").split(".")[0]
+    return re.compile(r'\b' + re.escape(h) + r'\b') if len(h) >= 6 else None
+
+
+_HOST_RE = _host_re()
+
+
+def _machine(v):
+    """Motivo se `v` carrega caminho de máquina ou o hostname deste host; senão None."""
+    if ABS_FS_RE.search(v):
+        return "caminho de máquina"
+    if _HOST_RE and _HOST_RE.search(v):
+        return "hostname do host"
+    return None
+
+
+def o6_ops(r):
+    """A linha O6 vira uma lista de operações: ("top", chave, valor) · ("del", "trace") · ("narr", texto) ·
+    ("prov", chave, valor) · ("sub", chave, de, para) · ("mark", valor). BrokenInput-like: devolve (ops, motivo)."""
+    campo, val = r["campo"].strip(), r["valor_final"].strip()
+    fields = {c.strip() for c in campo.split(";") if c.strip()}
+    if r["proposta_final"].strip() in ("dev-sem-comando", "reconciliar"):
+        return [], None
+    if len(fields) == 1 and not _O6_KEY.match(val):
+        f = next(iter(fields))
+        if f in ("verified_against", "trace"):
+            return [("top", f, val)], None
+        if f.startswith("provenance."):
+            k = f.split(".", 1)[1]
+            m = _O6_SUB.match(val)
+            return ([("sub", k, m.group(1), m.group(2))] if m else [("prov", k, val)]), None
+        return None, f"campo {f} sem forma literal conhecida"
+    marks = list(_O6_KEY.finditer(val))
+    if not marks or marks[0].start() != 0:
+        return None, "valor_final fora da forma `<chave>: <valor> · …`"
+    ops, seen = [], set()
+    for n, m in enumerate(marks):
+        end = marks[n + 1].start() if n + 1 < len(marks) else len(val)
+        key = m.group(1).strip().rstrip(":")
+        raw = val[m.end():end].strip()
+        qm = re.match(r'^"(.*)"$', raw, re.S)
+        v = qm.group(1) if qm else raw
+        if key == "remover trace":
+            ops.append(("del", "trace")); seen.add("trace"); continue
+        if key.startswith("narrative"):
+            ops.append(("narr", v)); seen.add("narrative"); continue
+        if key == "x_path_is_content":
+            if not qm:
+                return None, f"marcador P4 sem aspas ({raw}): tem de ser STRING"
+            ops.append(("mark", v)); seen.add("x_path_is_content"); continue
+        if key in ("plane", "trace"):
+            ops.append(("top", key, v)); seen.add(key); continue
+        if key == "locality":
+            v = re.match(r'^(\S+)', v).group(1) if v else v
+        sm = _O6_SUB.match(raw)
+        ops.append(("sub", key, sm.group(1), sm.group(2)) if sm else ("prov", key, v))
+        seen.add("provenance." + key)
+    extra = seen - fields - {"provenance.locality"}
+    if extra:
+        return None, f"chave fora do campo declarado ({', '.join(sorted(extra))})"
+    return ops, None
+
+
+def _top_span(block, key):
+    """(início, fim) da chave de nó `    <key>:` com as linhas de continuação; (None, None) se ausente."""
+    for n, b in enumerate(block[1:], 1):
+        fm = FIELD_RE.match(b)
+        if fm and fm.group(1) == key:
+            e = n + 1
+            while e < len(block) and block[e].startswith("      "):
+                e += 1
+            return n, e
+    return None, None
+
+
+def _put_top(block, key, value):
+    """`    <key>: "<value>"` no lugar (as continuações saem) ou antes da provenance. (bloco, mudou?)."""
+    n, e = _top_span(block, key)
+    # vocabulário fechado (plane, status) vai sem aspas, como o resto do corpus; texto livre vai entre aspas
+    line = f"    {key}: " + (value if key in ("plane", "status") and re.match(r'^[A-Za-z_]+$', value) else q(value))
+    if n is not None:
+        if e == n + 1 and scalar(FIELD_RE.match(block[n]).group(2)) == value:
+            return block, False
+        return block[:n] + [line] + block[e:], True
+    p, _ = _top_span(block, "provenance")
+    at = p if p is not None else len(block)
+    return block[:at] + [line] + block[at:], True
+
+
+def _o6_row(block, r, new_nodes):
+    """Aplica UMA linha da O6 ao bloco. (bloco, chave do relatório ou None, recusa ou None, nó novo a inserir)."""
+    act = r["proposta_final"].strip()
+    _, plane = _get_scalar(block, "plane")
+    if act == "dev-sem-comando":
+        if plane == "DEV":
+            return block, None, None, None
+        block, changed, _ = _set_field(block, "plane", "PROD", "DEV")
+        return (block, "plane", None, None) if changed else (block, False, f"dev-sem-comando sobre plane {plane}", None)
+    if act == "reconciliar":
+        m = re.search(r'aresta nova (\S+) SUPERSEDES (\S+)', r["valor_final"])
+        if not m or m.group(2) != r["id"]:
+            return block, False, "reconciliar sem `aresta nova <novo> SUPERSEDES <este nó>` no valor_final", None
+        nid = m.group(1)
+        if nid not in (new_nodes or {}):
+            return block, False, f"reconciliar sem o nó novo {nid} em --new-nodes", None
+        node = new_nodes[nid]["node"]
+        p = node.get("provenance") or {}
+        if not re.match(r'^(' + "|".join(METHOD_CLASSES) + r'): \S', str(p.get("method", ""))) \
+                or any(_machine(str(p.get(k, ""))) for k in ("source", "locator", "method")):
+            return block, False, f"nó novo {nid} com method fora das classes ou caminho de máquina na provenance", None
+        key = None
+        for k, v in (("status", "superseded"), ("plane", "DEV")):
+            block, c = _put_top(block, k, v)
+            key = key or ("reconcile" if c else None)
+        return block, key, None, nid
+    ops, why = o6_ops(r)
+    if why:
+        return block, False, why, None
+    cur = _get_provenance(block)
+    if cur is False:
+        return block, False, "provenance em forma de fluxo", None
+    prov = dict(cur or {})
+    if set(prov) - {"source", "locator", "method", "locality"}:
+        return block, False, "provenance com chave além de source/locator/method/locality", None
+    loc_final = (r.get("locality_final") or "").strip()
+    if act in ("binario-dev", "binario-prod"):
+        loc_final = loc_final or "web"
+        if loc_final != "web":
+            return block, False, f"{act} com locality {loc_final} (a regra P2 é web)", None
+    if act == "binario-prod" and plane != "PROD":
+        return block, False, f"binario-prod sobre plane {plane}", None
+    want = {"binario-dev": {"top", "prov"}, "binario-prod": {"prov"}, "marcar-path-conteudo": {"mark", "narr"},
+            "reescrever-va": {"top"}, "reescrever-trace": {"top", "narr"}, "remover-trace-narrative": {"del", "narr"},
+            "add-locality": {"prov"}, "reescrever-source": {"prov", "sub"}, "reescrever-method": {"prov"}}[act]
+    if {o[0] for o in ops} - want:
+        return block, False, f"{act} com operação fora da ação ({', '.join(sorted({o[0] for o in ops} - want))})", None
+    if act == "marcar-path-conteudo" and not any(o[0] == "mark" for o in ops):
+        return block, False, "marcar-path-conteudo sem x_path_is_content", None
+    if act == "remover-trace-narrative" and not (any(o[0] == "del" for o in ops) and any(o[0] == "narr" for o in ops)):
+        return block, False, "remover-trace-narrative sem `remover trace` e a linha da narrative", None
+    if act == "binario-dev" and ("top", "plane", "DEV") not in ops:
+        return block, False, "binario-dev sem plane: DEV", None
+    changed = False
+    prov_touched = False
+    for o in ops:
+        if o[0] == "top":
+            if o[1] == "plane" and o[2] not in ("DEV", "PROD"):
+                return block, False, f"plane fora do vocabulário ({o[2]})", None
+            if o[1] != "plane" and _machine(o[2]):
+                return block, False, f"{_machine(o[2])} no {o[1]} final", None
+            block, c = _put_top(block, o[1], o[2]); changed |= c
+        elif o[0] == "del":
+            n, e = _top_span(block, "trace")
+            if n is not None:
+                block = block[:n] + block[e:]; changed = True
+            else:
+                txt = next(x[1] for x in ops if x[0] == "narr")
+                txt = _TRACE_PREV_HOST + txt[len(_TRACE_PREV):] if txt.startswith(_TRACE_PREV) else txt
+                _, narr = _get_scalar(block, "narrative")
+                if not (narr and txt in narr):
+                    return block, False, "remover trace sem trace no nó e sem a linha na narrative", None
+        elif o[0] == "narr":
+            txt = o[1]
+            if act == "remover-trace-narrative" and txt.startswith(_TRACE_PREV):
+                txt = _TRACE_PREV_HOST + txt[len(_TRACE_PREV):]
+            if _machine(txt):
+                return block, False, f"{_machine(txt)} na linha da narrative", None
+            block, c = _append_narrative(block, txt)
+            if c is None:
+                return block, False, "narrative em bloco (> |): não reescrevo por linha", None
+            changed |= c
+        elif o[0] == "mark":
+            if o[1] not in P4_MARKS:
+                return block, False, f"marcador P4 fora de {'|'.join(P4_MARKS)} ({o[1]})", None
+            block, c = _put_top(block, "x_path_is_content", o[1]); changed |= c
+        elif o[0] == "prov":
+            prov[o[1]] = o[2]; prov_touched = True
+        elif o[0] == "sub":
+            curv = prov.get(o[1])
+            if not isinstance(curv, str):
+                return block, False, f"troca no {o[1]} sem {o[1]} atual", None
+            if o[2] in curv:
+                prov[o[1]] = curv.replace(o[2], o[3])
+            elif o[3] not in curv:
+                return block, False, f"troca no {o[1]}: o trecho de origem não está no valor atual", None
+            prov_touched = True
+    if act in ("binario-dev", "binario-prod", "add-locality", "reescrever-source", "reescrever-method") and loc_final:
+        prov["locality"] = loc_final; prov_touched = True
+    if prov_touched:
+        src, loc, method, locality = (prov.get(k) for k in ("source", "locator", "method", "locality"))
+        if not all(isinstance(x, str) and x for x in (src, loc, method)):
+            return block, False, "source/locator/method vazio (nem final nem atual)", None
+        if not re.match(r'^(' + "|".join(METHOD_CLASSES) + r'): \S', method):
+            return block, False, "method fora das classes do contrato", None
+        if act == "binario-prod" and not method.startswith("medição: "):
+            return block, False, "binario-prod sem method medição", None
+        if locality is not None and locality not in LOCALITIES:
+            return block, False, f"locality fora do contrato ({locality or 'vazia'})", None
+        for k, v in (("source", src), ("locator", loc), ("method", method)):
+            # caminho de máquina recusa inclusive no valor MANTIDO (a linha não o deixa para trás); o hostname só no
+            # valor que a linha ESCREVE — no mantido ele é da O7 (achado J-O6-1 do juiz: hostname em method)
+            why = _machine(v) if v != (cur or {}).get(k) else ("caminho de máquina" if ABS_FS_RE.search(v) else None)
+            if why:
+                return block, False, f"{why} no {k} final", None
+        block, c = _put_provenance(block, src, loc, method, locality=locality, derive=False)
+        if c is None:
+            return block, False, "provenance em forma de fluxo", None
+        changed |= c
+    return block, ({"binario-dev": "plane", "dev-sem-comando": "plane"}.get(act, act) if changed else None), None, None
+
+
+def load_new_nodes(path):
+    """{id: {"node": dict, "lines": [linhas cruas do nó]}} e [(from, to, edge_type)] do YAML de nós novos."""
+    try:
+        text = open(path, encoding="utf-8").read()
+        doc = yaml.safe_load(text) or {}
+    except (OSError, yaml.YAMLError) as e:
+        raise BrokenInput(f"--new-nodes ilegível ({path}): {e.__class__.__name__}")
+    lines, out, i = text.split("\n"), {}, 0
+    nodes = {n["id"]: n for n in doc.get("nodes") or [] if isinstance(n, dict) and n.get("id")}
+    while i < len(lines):
+        m = NODE_RE.match(lines[i])
+        if m and m.group(1) in nodes:
+            j = i + 1
+            while j < len(lines) and (lines[j].startswith("    ") or not lines[j].strip()) and not NODE_RE.match(lines[j]):
+                j += 1
+            while j > i + 1 and not lines[j - 1].strip():
+                j -= 1
+            out[m.group(1)] = {"node": nodes[m.group(1)], "lines": lines[i:j]}
+            i = j
+            continue
+        i += 1
+    return out
+
+
+def _insert_reconciled(text, inserts):
+    """inserts=[(antigo, novo, linhas do novo)]: o nó novo entra logo depois do antigo e a aresta SUPERSEDES no fim
+    de `edges:`. Idempotente: nó ou aresta que já existe não entra de novo."""
+    g = yaml.safe_load(text) or {}
+    ids = {n.get("id") for n in g.get("nodes") or [] if isinstance(n, dict)}
+    have = {(e.get("from"), e.get("to"), e.get("edge_type")) for e in g.get("edges") or [] if isinstance(e, dict)}
+    lines = text.split("\n")
+    for old, new, nl in inserts:
+        if new not in ids:
+            i = next(k for k, ln in enumerate(lines) if (m := NODE_RE.match(ln)) and m.group(1) == old)
+            j = i + 1
+            while j < len(lines) and (lines[j].startswith("    ") or not lines[j].strip() or lines[j].lstrip().startswith("#")) \
+                    and not NODE_RE.match(lines[j]):
+                j += 1
+            while j > i + 1 and (not lines[j - 1].strip() or lines[j - 1].lstrip().startswith("#")):
+                j -= 1
+            lines = lines[:j] + nl + lines[j:]
+        if (new, old, "SUPERSEDES") not in have:
+            e = next((k for k, ln in enumerate(lines) if re.match(r'^edges:\s*(#.*)?$', ln)), None)
+            edge = [f"  - from: {new}", f"    to: {old}", "    edge_type: SUPERSEDES"]
+            if e is None:
+                while lines and not lines[-1].strip():
+                    lines.pop()
+                lines += ["edges:"] + edge + [""]
+            else:
+                k = e + 1
+                while k < len(lines) and not re.match(r'^[A-Za-z_]', lines[k]):
+                    k += 1
+                while k > e + 1 and not lines[k - 1].strip():
+                    k -= 1
+                lines = lines[:k] + edge + lines[k:]
+    return "\n".join(lines)
+
+
+def apply_judged_o6(text, judged, new_nodes=None, hold=()):
+    """judged={id: [linhas, uma por regra]}: aplica só APROVADO/CORRIGIDO das ações O6 (recusa atômica por linha).
+    hold: {"id", "id:regra"} intocados como item ao maestro. Devolve (texto, relatório, [ids novos])."""
+    lines = text.split("\n")
+    keys = ("plane",) + tuple(a for a in O6_ACTIONS if a not in ("dev-sem-comando", "binario-dev")) \
+        + ("same", "rejected", "sealed", "held", "refused", "missing")
+    rep = {k: [] for k in keys}
+    seen, out, in_nodes, i, inserts = set(), [], False, 0, []
+    while i < len(lines):
+        ln = lines[i]
+        if re.match(r'^nodes:\s*(#.*)?$', ln):
+            in_nodes = True
+        elif re.match(r'^[A-Za-z_]', ln):
+            in_nodes = False
+        m = NODE_RE.match(ln) if in_nodes else None
+        if not m or m.group(1) not in judged:
+            out.append(ln); i += 1; continue
+        nid, j = m.group(1), i + 1
+        seen.add(nid)
+        while j < len(lines) and (lines[j].startswith("    ") or not lines[j].strip() or lines[j].lstrip().startswith("#")) \
+                and not NODE_RE.match(lines[j]):
+            j += 1
+        end = j
+        while end > i + 1 and (not lines[end - 1].strip() or lines[end - 1].lstrip().startswith("#")):
+            end -= 1
+        block = lines[i:end]
+        for r in sorted(judged[nid], key=lambda x: x["regra"]):
+            act, verdict = r["proposta_final"].strip(), r["veredito"].strip()
+            tag = f"{nid} [regra {r['regra']}]"
+            if verdict not in JUDGED_OK:
+                rep["rejected"].append(f"{tag} ({verdict})"); continue
+            if act not in O6_ACTIONS:
+                rep["sealed"].append(f"{tag} ({act})"); continue
+            if nid in hold or f"{nid}:{r['regra']}" in hold:
+                rep["held"].append(f"{tag} ({act})"); continue
+            before = list(block)
+            block, key, refused, new = _o6_row(block, r, new_nodes)
+            if refused is not None:
+                block = before  # recusa atômica: nada da linha é aplicado
+                rep["refused"].append(f"{tag} ({refused})")
+                continue
+            if new:
+                inserts.append((nid, new, new_nodes[new]["lines"]))
+            if key:
+                rep["reconciliar" if key == "reconcile" else key].append(tag)
+            elif new and not re.search(r'^  - id:[ \t]*' + re.escape(new) + r'[ \t]*$', text, re.M):
+                rep["reconciliar"].append(tag)
+            else:
+                rep["same"].append(tag)
+        out.extend(block)
+        out.extend(lines[end:j])
+        i = j
+    rep["missing"] = sorted(set(judged) - seen)
+    new_text = "\n".join(out)
+    if inserts:
+        new_text = _insert_reconciled(new_text, inserts)
+    return new_text, rep, [n for _, n, _ in inserts]
+
+
+def main_judged_o6(files, judged, check, new_nodes=None, hold=()):
+    """O laço do --apply-judged no formato O6: um grafo por vez, YAML conferido antes e depois, e a prova de que só
+    os nós da planilha mudaram — mais o nó novo e a aresta SUPERSEDES do reconciliar (senão rc 2, nada gravado)."""
+    if not files:
+        print(__doc__.strip().split("\n\n")[-1], file=sys.stderr); return 2
+    pending, tot = False, {}
+    for f in files:
+        try:
+            text = open(f, encoding="utf-8").read()
+            before = yaml.safe_load(text)
+        except FileNotFoundError:
+            print(f"kg-migrate-v3: {f} não existe", file=sys.stderr); return 2
+        except yaml.YAMLError as e:
+            print(f"kg-migrate-v3: {f} não é YAML válido antes da migração ({e.__class__.__name__}) — não toco", file=sys.stderr); return 2
+        _, rows = routes_for(judged, f)
+        new, rep, added = apply_judged_o6(text, rows, new_nodes, hold)
+        try:
+            after = yaml.safe_load(new)
+        except yaml.YAMLError as e:
+            print(f"kg-migrate-v3: a aplicação em {f} daria YAML inválido ({e.__class__.__name__}) — nada gravado", file=sys.stderr); return 2
+        strip = lambda g: {k: v for k, v in (g or {}).items() if k not in ("nodes", "edges")}
+        others = lambda g: [n for n in (g or {}).get("nodes") or [] if not (isinstance(n, dict) and (n.get("id") in rows or n.get("id") in added))]
+        edges = lambda g: [e for e in (g or {}).get("edges") or [] if not (isinstance(e, dict) and e.get("from") in added and e.get("edge_type") == "SUPERSEDES")]
+        if strip(after) != strip(before) or others(after) != others(before) or edges(after) != edges(before):
+            print(f"kg-migrate-v3: a aplicação em {f} mudaria nó ou aresta fora da planilha — nada gravado", file=sys.stderr); return 2
+        changed = new != text
+        verb = ("PENDENTE" if check else "aplicado") if changed else "nada a aplicar"
+        print(f"{f}: {verb} · nós julgados {len(rows)} · " + " · ".join(f"{k} {len(v)}" for k, v in rep.items() if v))
+        for k, title in (("held", "ITEM AO MAESTRO (intocado)"), ("rejected", "REPROVADO pelo juiz (intocado)"),
+                         ("sealed", "FORA DAS AÇÕES O6 (intocado)"), ("refused", "RECUSADO (intocado)"),
+                         ("missing", "AUSENTE DO GRAFO")):
+            if rep[k]:
+                print(f"  {title}: " + ", ".join(rep[k]))
+        for k, v in rep.items():
+            tot[k] = tot.get(k, 0) + len(v)
+        if changed:
+            pending = True
+            if not check:
+                open(f, "w", encoding="utf-8").write(new)
+    print("TOTAL · " + " · ".join(f"{k} {v}" for k, v in tot.items()))
+    return 1 if (check and pending) else 0
+
+
 def refuted_dependents(text, ids):
     """Para cada nó refutado agora: quem ainda se apoia nele (SUPPORTS saindo dele, DEPENDS_ON entrando nele) e
     quem ele REFUTA. É o relatório da reconciliação: a gramática cobra o status do alvo de REFUTES
@@ -908,6 +1321,25 @@ def main(argv):
                 print("kg-migrate-v3: --verified-at pede uma data AAAA-MM-DD", file=sys.stderr); return 2
             vat = argv[k + 1]
             argv = argv[:k] + argv[k + 2:]
+        hold = set()
+        while "--hold" in argv:
+            k = argv.index("--hold")
+            if k + 1 >= len(argv):
+                print("kg-migrate-v3: --hold pede <id>[:<regra>]", file=sys.stderr); return 2
+            hold.add(argv[k + 1]); argv = argv[:k] + argv[k + 2:]
+        new_nodes = None
+        if "--new-nodes" in argv:
+            k = argv.index("--new-nodes")
+            if k + 1 >= len(argv):
+                print("kg-migrate-v3: --new-nodes pede o YAML dos nós novos", file=sys.stderr); return 2
+            try:
+                new_nodes = load_new_nodes(argv[k + 1])
+            except BrokenInput as e:
+                print(f"kg-migrate-v3: {e}", file=sys.stderr); return 2
+            argv = argv[:k] + argv[k + 2:]
+        first = next(iter(judged.values()), None) if judged else None
+        if isinstance(first, list) and "campo" in first[0]:
+            return main_judged_o6(argv, judged, check, new_nodes, hold)
         if judged and isinstance(next(iter(judged.values())), list):
             return main_judged_o4(argv, judged, check, vat)
         return main_judged(argv, judged, check, promote, wave)

@@ -24544,6 +24544,89 @@ assert all(n[k]["status"]=="confirmed" for k in n)
      && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --apply-judged "${co}" "${go}" >/dev/null 2>&1; then
     record_pass "kg-migrate-v3: (o) onda O5: campo vazio mantém o atual; manter-prod-binario fica em PROD e manter-dev-binario fica em DEV, ambos com locality web; manter-dev-binario sobre PROD recusado sem mudar o plano; dev-sem-versao PROD→DEV; caminho de máquina (~/ inclusive, e no valor mantido) recusa a linha; REPROVADO e ao-maestro-P4 intocados; 2ª passada no-op"
   else record_fail "kg-migrate-v3: (o)" "onda O5 mudou o plano do manter-dev-binario, ignorou a locality web ou deixou caminho de máquina: rc=${rc} ${out} ${y}"; fi
+  # (p) onda O6 (SAC-73, 2026-10-10), o6-juiz.csv: `campo` + `valor_final` no lugar dos *_final. reescrever-va troca o
+  #     verified_against e RECUSA caminho de máquina no valor final; reescrever-trace escreve `remoto@sha:caminho`, que o
+  #     kg-trace-resolve NÃO julga como caminho (nada de TARGET-MISSING); remover-trace-narrative apaga o `trace:` e leva
+  #     a descrição à narrative como "trace anterior (só no host): …"; com caminho de máquina na linha da narrative, a
+  #     recusa é ATÔMICA (o trace fica); marcar-path-conteudo escreve `x_path_is_content` como STRING do vocabulário
+  #     e recusa booleano, valor fora do vocabulário e marcador sem aspas (nada da linha entra); binario-dev leva PROD→DEV
+  #     com locality web; reconciliar insere o nó novo, cria SUPERSEDES novo→antigo, e o antigo vira superseded/DEV com
+  #     a aresta CONSTRAINS que já tinha; --hold deixa a linha intocada como item ao maestro; 2ª passada no-op. Mutantes
+  #     que este caso reprova: a linha da narrative do trace removido não escrita, a guarda de caminho no
+  #     verified_against desligada, o vocabulário do marcador desligado, a recusa sem desfazer (atômica) e o
+  #     reconciliar sem trocar o status.
+  local pr="${d}/prepo" gp cp np
+  mkdir -p "${pr}/docs/x"; gp="${pr}/docs/x/p.kg.yaml"; cp="${d}/o6-p.csv"; np="${d}/o6-novos.yaml"
+  {
+    printf 'meta:\n  id: p\n  schema_version: "1"\n  baseline: "2026-10-10"\nnodes:\n'
+    _kmv_o6() { printf '  - id: %s\n    node_type: evidence\n    plane: %s\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_at: "2026-09-01"\n    verified_against: "grep em /home/x/repo l.1"\n    label: "%s"\n%b    provenance:\n      source: "binário do Claude Code 2.1.258"\n      locator: "offset 12"\n      method: "derivado: x"\n      locality: "web"\n' "$1" "$2" "$1" "$3"; }
+    _kmv_o6 E_P_VA DEV ''
+    _kmv_o6 E_P_VA_RUIM DEV ''
+    _kmv_o6 E_P_TRACE DEV '    trace: "/home/x/onion-bridge/src/a.ts"\n'
+    _kmv_o6 E_P_RM DEV '    narrative: "n0"\n    trace: "/home/x/caddy/Caddyfile"\n'
+    _kmv_o6 E_P_RM_RUIM DEV '    trace: "/home/x/caddy/Caddyfile"\n'
+    _kmv_o6 E_P_MARK DEV ''
+    _kmv_o6 E_P_MARK_BOOL DEV ''
+    _kmv_o6 E_P_MARK_FORA DEV ''
+    _kmv_o6 E_P_MARK_NUA DEV ''
+    _kmv_o6 E_P_HOLD DEV ''
+    _kmv_o6 E_P_BIN PROD ''
+    _kmv_o6 E_P_OLD DEV ''
+    printf 'edges:\n  - from: E_P_OLD\n    to: E_P_VA\n    edge_type: CONSTRAINS\n'
+  } > "${gp}"
+  {
+    printf 'nodes:\n  - id: E_P_NEW\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n    impact: 2\n    confidence: 0.9\n'
+    printf '    verified_at: "2026-10-10"\n    verified_against: "free -m em 2026-10-10"\n    label: "medido de novo"\n'
+    printf '    provenance:\n      source: "medição do host em 2026-10-10"\n      locator: "free -m"\n      method: "medição: free -m"\n      locality: "host"\n'
+  } > "${np}"
+  {
+    printf 'id,grafo,regra,proposta_original,veredito,proposta_final,campo,valor_final,locality_final,motivo,confianca\n'
+    printf 'E_P_VA,docs/x/p.kg.yaml,P5-va,reescrever-va,APROVADO,reescrever-va,verified_against,grep em <clone do repo> l.1,,m,0.9\n'
+    printf 'E_P_VA_RUIM,docs/x/p.kg.yaml,P5-va,reescrever-va,APROVADO,reescrever-va,verified_against,grep em /home/x/outro l.2,,m,0.9\n'
+    printf 'E_P_TRACE,docs/x/p.kg.yaml,P5-trace,reescrever-trace,APROVADO,reescrever-trace,trace,onion-bridge@abc1234:src/a.ts,,m,0.9\n'
+    printf 'E_P_RM,docs/x/p.kg.yaml,P5-trace,x,CORRIGIDO,remover-trace-narrative,trace; narrative,"remover trace · narrative (acrescentar): ""trace anterior: o Caddyfile do host (fora de repo).""",,m,0.9\n'
+    printf 'E_P_RM_RUIM,docs/x/p.kg.yaml,P5-trace,x,CORRIGIDO,remover-trace-narrative,trace; narrative,"remover trace · narrative (acrescentar): ""trace anterior: /home/x/caddy/Caddyfile""",,m,0.9\n'
+    printf 'E_P_MARK,docs/x/p.kg.yaml,P4,x,CORRIGIDO,marcar-path-conteudo,x_path_is_content; narrative,"x_path_is_content: ""citação"" · narrative (nova linha): ""Caminho como conteúdo: citação verbatim.""",,m,0.9\n'
+    printf 'E_P_MARK_BOOL,docs/x/p.kg.yaml,P4,x,CORRIGIDO,marcar-path-conteudo,x_path_is_content; narrative,"x_path_is_content: true · narrative (nova linha): ""BOOL""",,m,0.9\n'
+    printf 'E_P_MARK_FORA,docs/x/p.kg.yaml,P4,x,CORRIGIDO,marcar-path-conteudo,x_path_is_content; narrative,"x_path_is_content: ""sim"" · narrative (nova linha): ""FORA""",,m,0.9\n'
+    printf 'E_P_MARK_NUA,docs/x/p.kg.yaml,P4,x,CORRIGIDO,marcar-path-conteudo,x_path_is_content; narrative,"x_path_is_content: citação · narrative (nova linha): ""NUA""",,m,0.9\n'
+    printf 'E_P_HOLD,docs/x/p.kg.yaml,P4,x,CORRIGIDO,marcar-path-conteudo,x_path_is_content; narrative,"x_path_is_content: ""citação"" · narrative (nova linha): ""HOLD""",,m,0.9\n'
+    printf 'E_P_BIN,docs/x/p.kg.yaml,P2,binario-dev,APROVADO,binario-dev,plane; provenance.method; provenance.locality,"plane: DEV · method: medição: strings do binário 2.1.258, comando não registrado · locality: web",web,m,0.9\n'
+    printf 'E_P_OLD,docs/x/p.kg.yaml,HEADROOM,reconciliar,APROVADO,reconciliar,status; aresta,status: superseded · aresta nova E_P_NEW SUPERSEDES E_P_OLD,host,m,0.9\n'
+  } > "${cp}"
+  local p_before p_args; p_before="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${gp}" 2>&1)" || true
+  p_args=(--apply-judged "${cp}" --new-nodes "${np}" --hold E_P_HOLD:P4)
+  if out="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" "${p_args[@]}" "${gp}" 2>&1)"; then rc=0; else rc=$?; fi
+  y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${gp}" 2>&1)" || true
+  ( cd "${pr}" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm p ) >/dev/null 2>&1 || true
+  local tr_out tr_rc
+  if tr_out="$(bash "${REPO_ROOT}/.claude/validation/kg-trace-resolve.sh" "${pr}" 2>&1)"; then tr_rc=0; else tr_rc=$?; fi
+  if [ "${rc}" -eq 0 ] \
+     && python3 -I -B -c '
+import json,sys
+o={x["id"]:x for x in json.loads(sys.argv[2])["nodes"]}
+g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}
+assert n["E_P_VA"]["verified_against"]=="grep em <clone do repo> l.1"
+assert n["E_P_TRACE"]["trace"]=="onion-bridge@abc1234:src/a.ts"
+assert "trace" not in n["E_P_RM"] and n["E_P_RM"]["narrative"]=="n0 · trace anterior (só no host): o Caddyfile do host (fora de repo)."
+assert n["E_P_MARK"]["x_path_is_content"]=="citação" and isinstance(n["E_P_MARK"]["x_path_is_content"],str) and n["E_P_MARK"]["narrative"]=="Caminho como conteúdo: citação verbatim."
+assert n["E_P_BIN"]["plane"]=="DEV" and n["E_P_BIN"]["provenance"]["method"].startswith("medição: strings") and n["E_P_BIN"]["provenance"]["locality"]=="web"
+assert n["E_P_OLD"]["status"]=="superseded" and n["E_P_OLD"]["plane"]=="DEV" and n["E_P_NEW"]["status"]=="confirmed"
+e={(x["from"],x["to"],x["edge_type"]) for x in g["edges"]}
+assert e=={("E_P_OLD","E_P_VA","CONSTRAINS"),("E_P_NEW","E_P_OLD","SUPERSEDES")}, e
+for k in ("E_P_VA_RUIM","E_P_RM_RUIM","E_P_MARK_BOOL","E_P_MARK_FORA","E_P_MARK_NUA","E_P_HOLD"):
+    assert n[k]==o[k], k
+' "${y}" "${p_before}" 2>/dev/null \
+     && grep -q 'E_P_VA_RUIM \[regra P5-va\] (caminho de máquina no verified_against final)' <<< "${out}" \
+     && grep -q 'E_P_RM_RUIM \[regra P5-trace\] (caminho de máquina na linha da narrative)' <<< "${out}" \
+     && grep -q 'E_P_MARK_BOOL \[regra P4\] (marcador P4 sem aspas' <<< "${out}" \
+     && grep -q 'E_P_MARK_FORA \[regra P4\] (marcador P4 fora de' <<< "${out}" \
+     && grep -q 'E_P_MARK_NUA \[regra P4\] (marcador P4 sem aspas' <<< "${out}" \
+     && grep -q 'ITEM AO MAESTRO (intocado): E_P_HOLD \[regra P4\]' <<< "${out}" \
+     && [ "${tr_rc}" -eq 0 ] && grep -q 'TARGET-MISSING: 0' <<< "${tr_out}" \
+     && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check "${p_args[@]}" "${gp}" >/dev/null 2>&1; then
+    record_pass "kg-migrate-v3: (p) onda O6: verified_against e trace trocados (remoto@sha:caminho não vira TARGET-MISSING); trace removido vai à narrative como 'trace anterior (só no host)'; caminho de máquina no valor final recusa a linha, atomicamente; marcador P4 só como string do vocabulário (booleano, fora do vocabulário e sem aspas recusados); binario-dev PROD→DEV com locality web; reconciliar insere o nó novo, cria SUPERSEDES e leva o antigo a superseded/DEV com a aresta que tinha; --hold intocado; 2ª passada no-op"
+  else record_fail "kg-migrate-v3: (p)" "onda O6 aplicou valor com caminho de máquina, perdeu o trace sem narrative, aceitou marcador fora da forma ou não reconciliou: rc=${rc} tr_rc=${tr_rc} ${out} ${y} ${tr_out}"; fi
   # (l) --locality (contrato v4.2, 2026-10-09, SAC-97): num repo git de verdade (a regra de `repo` confere a raiz
   #     e o sha com o git), cada classe sai do source; o sha que o git não conhece, a citação bibliográfica e a
   #     fonte já com locality ficam como estão; fonte mista vale a MENOS reverificável (repo + host → host); o YAML
