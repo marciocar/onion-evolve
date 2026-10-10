@@ -132,6 +132,12 @@ _ROLE_TAIL='[[:space:]]*(#.*)?$'
 # ausencia e de OBJETO e a isencao e correta. Aqui a pergunta e outra — "devo julgar este repo?" —
 # e a porta DEVE ser julgada: ela distribui a maquinaria completa.
 IS_DERIVED=0; _stamp_has "^([[:space:]]*role:[[:space:]]*(adopted|hub)${_ROLE_TAIL}|[[:space:]]*decoupled_from:)" && IS_DERIVED=1
+# ⚠️ A PORTA `source` (2026-10-10, F2 das portas) entra no porteiro, e não é a exceção que o aviso acima
+# proíbe: ela SUCEDE a porta onion-core, que hoje se carimba `hub` e já é IS_DERIVED=1. Trocar o carimbo
+# para `source` sem isto faria a mesma árvore passar de 0 HARD a 4 (medido: lentes sem objeto viram HARD
+# "na fonte", REGRAS 85/92 sem members.yaml) — a porta seria julgada como o core que ela não é. O que
+# a distingue do core é `kind: door`, escrito só pelo materializador.
+_stamp_has "^[[:space:]]*role:[[:space:]]*source${_ROLE_TAIL}" && _stamp_has '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)' && IS_DERIVED=1
 IS_LEAF=0;    _stamp_has "^[[:space:]]*role:[[:space:]]*adopted${_ROLE_TAIL}" && IS_LEAF=1
 
 # ---------------------------------------------------------------------------
@@ -369,6 +375,10 @@ _role() {
     _ROLE_OF_THIS_REPO="$(awk '/^role:/{print $2; exit}' "${stamp}" 2>/dev/null)"
   fi
   [ -n "${_ROLE_OF_THIS_REPO}" ] || _ROLE_OF_THIS_REPO="source"
+  # a porta `source` (kind: door) não é a fonte: a ausência de objeto nela é legítima como em toda porta
+  if [ "${_ROLE_OF_THIS_REPO}" = "source" ] && _stamp_has '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)'; then
+    _ROLE_OF_THIS_REPO="source-door"
+  fi
   printf '%s' "${_ROLE_OF_THIS_REPO}"
 }
 # ── QUEM PUBLICA O MARKETPLACE (2026-10-10, F2 das portas) ──────────────────────────────────────
