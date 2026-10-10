@@ -392,7 +392,10 @@ STAMP_ROLE="$(_stamp_field "${STAMP_HEAD}" role)"
 # não é o que o registro diz (repo errado, porta apagada) — recusa em vez de materializar por cima.
 if [ "${REG_PIN}" != "n/a" ]; then
   if [ "${ROLE}" = "plugins" ]; then
-    git -C "${DEST}" ls-tree -r --name-only HEAD -- plugins 2>/dev/null | grep -q '/\.claude-plugin/provenance\.json$' \
+    # conteúdo na variável e grep por here-string: `ls-tree | grep -q` sob pipefail é a classe do leitor que fecha
+    # cedo (o ls-tree toma EPIPE e o teste sai FALSO com o arquivo presente) — medido no 1º ensaio pós-F5
+    _tree="$(git -C "${DEST}" ls-tree -r --name-only HEAD -- plugins 2>/dev/null || true)"
+    grep -q '/\.claude-plugin/provenance\.json$' <<< "${_tree}" \
       || { echo "ERRO: o registro diz que '${DOOR}' foi publicada (pin ${REG_PIN}), mas o repo não tem nenhum plugins/*/.claude-plugin/provenance.json — destino não reconhecido." >&2; exit 2; }
   elif [ -z "${STAMP_HEAD}" ]; then
     echo "ERRO: o registro diz que '${DOOR}' foi publicada (pin ${REG_PIN}), mas o repo não tem .claude/.onion-version — destino não reconhecido como esta porta." >&2
@@ -417,7 +420,7 @@ _mrc=0
 # ANTES de a materialização reescrevê-lo). Pin fora da história deste core ou ausente = sem anterior, dito.
 PREV_BL=""
 if [ "${ROLE}" = "plugins" ]; then
-  _pref="$(find "${DEST}/plugins" -path '*/.claude-plugin/provenance.json' -exec sed -n 's/.*"ref"[[:space:]]*:[[:space:]]*"\([0-9a-f]*\)".*/\1/p' {} + 2>/dev/null | sort -u | head -1)"
+  _pref="$(find "${DEST}/plugins" -path '*/.claude-plugin/provenance.json' -exec sed -n 's/.*"ref"[[:space:]]*:[[:space:]]*"\([0-9a-f]*\)".*/\1/p' {} + 2>/dev/null | sort -u | sed -n '1p')"
   if [ -n "${_pref}" ] && git -C "${CORE}" show "${_pref}:.claude/validation/plugin-bare-path-baseline.txt" > "${T}/prev-baseline.txt" 2>/dev/null; then
     PREV_BL="${T}/prev-baseline.txt"
   else
