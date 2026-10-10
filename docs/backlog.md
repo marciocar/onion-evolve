@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**413 itens abertos** em 88 grafo(s) com aberto (de 113 no escopo) · 89 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**421 itens abertos** em 89 grafo(s) com aberto (de 114 no escopo) · 90 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -261,6 +261,19 @@
 | 5.4 | `E_LACUNAS_DECLARADAS_PODA_0903` | poda-instruction-bloat-2026-09 | LACUNAS (custo declarado: 40 fontes, 12 claims, 2 confirmadas, 8 refutadas, 0 nao-verificadas por 403/truncagem). REFUTADAS QUE O  |
 | 2.8 | `C_OPCAO_D_NAO_PODAR` | poda-instruction-bloat-2026-09 | OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e  |
 | 2.4 | `C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR` | poda-instruction-bloat-2026-09 | OPCAO B — manter o CLAUDE.md e comprimir. A favor: custo zero de arquitetura, nada se move de lugar, nenhum risco de doutrina su |
+
+## machine-path-2026-10 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 38.4 | `D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL` | machine-path-2026-10 | A classe é: absoluto de RAIZ DE SISTEMA no início de token (FHS 3.0 + snap, nix, Users, Volumes, private), com ou sem barra; abs |
+| 17.0 | `D_SUBSTRATO_CONTRATO_E_CATRACA_NO_LINT` | machine-path-2026-10 | Substrato: dois lugares e uma classe. O kg-contract-check.sh cobra o grafo NOVO limpo e o rastreado sem piora; a REGRA 99 do lint  |
+| 5.1 | `C_TETO_HOSTNAME_DE_OUTRA_MAQUINA` | machine-path-2026-10 | TETO: hostname só vale para o host do processo e os lineages.*.host do members.yaml. No CI o processo é o runner, então ali a g |
+| 5.1 | `C_TETO_ROTA_COM_NOME_DE_RAIZ` | machine-path-2026-10 | TETO (lado do falso positivo, aceito): rota HTTP ou chave de config cujo 1º segmento tem nome de raiz de sistema (home, media, de |
+| 4.8 | `C_TETO_MARCADOR_AUTODECLARADO` | machine-path-2026-10 | TETO: o x_path_is_content é declarado por quem escreve o nó. A guarda não sabe se o caminho É o conteúdo; ela só torna a ise |
+| 4.8 | `C_TETO_RAIZ_QUE_NAO_E_DE_SISTEMA` | machine-path-2026-10 | TETO: absoluto de raiz que não é de sistema FORA de argumento de shell (raízes como workspace ou data em prosa) passa calado  |
+| 3.4 | `C_TETO_VARIAVEL_WINDOWS_E_FORA_DE_NO` | machine-path-2026-10 | TETO: não vê a variável HOME (não é literal), caminho Windows (C:\\), o que está fora de nó (meta.note, arestas) nem coment |
+| 3.0 | `C_TETO_VERBOS_DE_SHELL_SAO_LISTA` | machine-path-2026-10 | TETO: o contexto de shell é uma LISTA de verbos e o redirecionamento. Raiz não-sistema depois de outro verbo (um clone para dest |
 
 ## radar-E3-2026-09-04 — 1 item(ns)
 
