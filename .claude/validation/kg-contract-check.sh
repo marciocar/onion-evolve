@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# kg-contract-check.sh — julga UM ou mais .kg.yaml contra o contrato vendorizado (hoje v4.2), ANTES do commit.
+# kg-contract-check.sh — julga UM ou mais .kg.yaml contra o contrato vendorizado (hoje v4.3), ANTES do commit.
 #
 # Por que existe (2026-10-08, SAC-71): desde que o gate do contrato entrou no CI (vendor/kg-ssot,
 # kg_gate.py), todo grafo NOVO tem de nascer limpo no SHOULD — e o gate só enxerga arquivo rastreado
@@ -9,6 +9,10 @@
 #
 # NÃO reimplementa o contrato: importa o leitor de referência do vendor (kg_gate.measure_texts, a mesma
 # medição que a catraca usa). O vendor não se edita aqui; o que o contrato decidir chega pela tag.
+#
+# Aresta para OUTRO grafo (contrato v4.3, 2026-10-10, SAC-98): quando o arquivo tem `external_edges`, a ponta
+# externa é conferida contra os .kg.yaml rastreados do repo (o mesmo índice do gate: corpus_index) — alvo que não
+# existe reprova aqui, no MUST, com a dica de cura, em vez de só no CI. Sem `external_edges`, nada se monta.
 #
 # Regra por arquivo:
 #   · arquivo FORA do índice do git (grafo novo) → MUST e SHOULD vazios;
@@ -48,27 +52,34 @@ HINT = {
     "integrity.verified-before-fact": "verified_at anterior ao valid_from: não se verifica um fato antes de ele valer; corrija uma das datas",
     # aviso do v4.2 (2026-10-09, SAC-97): locality é opcional, mas quando vem tem de estar no vocabulário
     "form.enum.node.provenance.locality": "provenance.locality fora do vocabulário: use repo, web, host ou pessoa (ou tire a chave; kg-migrate-v3.py --locality a deriva do source)",
+    # MUST do v4.3 (2026-10-10, SAC-98): external_edges
+    "integrity.dangling-external": "external_edges aponta arquivo ou id que não existe entre os .kg.yaml rastreados: corrija o alvo pela origem (nunca invente; arquivo novo precisa de git add)",
+    "integrity.dangling-external-local": "external_edges com a ponta LOCAL inexistente: o id sem `#` tem de ser um nó deste arquivo",
 }
 rc = 0
 for f in files:
     path = os.path.relpath(os.path.abspath(f), root)
     if not os.path.isfile(os.path.join(root, path)):
         print(f"kg-contract-check: {f} não existe", file=sys.stderr); sys.exit(2)
-    now = kg_gate.measure_texts([(path, open(os.path.join(root, path), encoding="utf-8").read())])[path]
+    text = open(os.path.join(root, path), encoding="utf-8").read()
+    # o índice do corpus só se monta quando o grafo usa external_edges (como no gate): custo zero no caso comum
+    index = (kg_gate.kg_validate.corpus_index(root, kg_gate.tracked_graphs(root))
+             if kg_gate.kg_validate.uses_external(text) else None)
+    now = kg_gate.measure_texts([(path, text)], index)[path]
     tracked = subprocess.run(["git", "-C", root, "ls-files", "--error-unmatch", "--", path],
                              capture_output=True).returncode == 0
     before = set()
     if tracked:
         old = subprocess.run(["git", "-C", root, "show", f"HEAD:{path}"], capture_output=True, text=True)
         if old.returncode == 0:
-            before = set(kg_gate.measure_texts([(path, old.stdout)])[path]["should"])
+            before = set(kg_gate.measure_texts([(path, old.stdout)], index)[path]["should"])
     worse_should = sorted(set(now["should"]) - before)
     if now["must"] or worse_should:
         rc = 1
         kind = "rastreado" if tracked else "novo"
         print(f"✗ {path} ({kind})")
         for c in now["must"]:
-            print(f"    MUST   {c}")
+            print(f"    MUST   {c}" + (f" — {HINT[c]}" if c in HINT else ""))
         for c in worse_should:
             print(f"    SHOULD {c} — {HINT.get(c, 'ver vendor/kg-ssot/spec')}")
     else:
