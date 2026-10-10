@@ -49,70 +49,12 @@ LINT="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
 # Sem o linter no repo (ex.: projeto-alvo sem .claude/validation) → não bloqueia.
 [ -f "${LINT}" ] || exit 0
 
-# ── AUTO-REGENERAÇÃO DE PLUGINS COM RASTRO (Q_R19_AUTOFIX, opção b do maestro; v2 pós-4º Elenxo) ──
-# A R19 nunca acusa nada DECIDÍVEL — cura única mecânica é candidata a auto-fix COM RASTRO; a R19
-# segue intacta como guarda e HARD no CI. A v1 deste bloco fechou 57% do que declarava (4º Elenxo):
-# o grep textual do manifesto era CEGO a entradas-DIRETÓRIO (72 de 167 fontes), o `git add` sob
-# commit-por-pathspec ia para um índice TEMPORÁRIO (deixando um revert staged para o commit
-# seguinte), e o assemble lê a ÁRVORE — staging parcial publicaria WIP que o autor deixou fora.
-# TETO DECLARADO: rename de fonte (git mv) não dispara o auto-fix — o assemble-falho da R19
-# bloqueia o commit de qualquer forma (fail-loud, não silêncio).
-ASM="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
-VDIR="${REPO_ROOT}/.claude/utils/marketplace/verticals"
-_autofix_on=1
-# A2: commit por pathspec usa índice temporário (next-index-*.lock) — o add iria para o índice
-# REAL, que o commit em curso não usa: o plugin velho ficaria staged como um revert fantasma.
-case "${GIT_INDEX_FILE:-}" in
-  ""|*/index|*/index.lock) : ;;
-  *) echo "⏭️  auto-fix de plugins PULADO: commit por pathspec usa índice temporário — se tocou fonte bundlada, rode o assemble e 'git add plugins/<vertical>' à mão (a R19 do CI confere)."
-     _autofix_on=0 ;;
-esac
-if [ "${_autofix_on}" -eq 1 ] && [ -f "${ASM}" ] && [ -d "${VDIR}" ]; then
-  _staged_f="$(mktemp)"; _pat_f="$(mktemp)"
-  git diff --cached --name-only --diff-filter=ACMRD > "${_staged_f}" || true
-  if [ -s "${_staged_f}" ]; then
-    for _m in "${VDIR}"/*.manifest.sh; do
-      [ -f "${_m}" ] || continue
-      # A1/A4: as fontes vêm de SOURCE do manifesto — a MESMA leitura do assemble e da R19,
-      # que enxerga arquivos E diretórios como declarados (o grep textual não). O manifesto e o
-      # próprio assembler também mudam a saída, então entram como fontes. Cada fonte vira o par
-      # de padrões ^f$|^f/ (match exato OU qualquer arquivo sob o dir), materializado em ARQUIVO
-      # — não em pipe — porque `printf lista | grep -q` sob pipefail morre de SIGPIPE acima de
-      # ~78KB de lista e o match é ENGOLIDO (fail-open medido pelo 4º Elenxo; classe do PR #502).
-      { ( . "${_m}" >/dev/null 2>&1 || true
-          printf '%s\n' ${COMMANDS[@]+"${COMMANDS[@]}"} ${AGENTS[@]+"${AGENTS[@]}"} \
-            ${SKILLS[@]+"${SKILLS[@]}"} ${VALIDATION[@]+"${VALIDATION[@]}"} \
-            ${UTILS[@]+"${UTILS[@]}"} ${DOCS[@]+"${DOCS[@]}"} ${HOOKS[@]+"${HOOKS[@]}"} )
-        printf '%s\n' "${_m#${REPO_ROOT}/}" "${ASM#${REPO_ROOT}/}"
-      } | sed 's|/$||; /^$/d; s/[.[\*^$()+?{|]/\\&/g; s|.*|^&$\|^&/|' > "${_pat_f}"
-      grep -qEf "${_pat_f}" "${_staged_f}" || continue
-      _name="$(basename "${_m}" .manifest.sh)"
-      # A3: o assemble lê a ÁRVORE. Fonte casada com mudança NÃO-staged = o auto-fix publicaria
-      # conteúdo que o autor deliberadamente deixou fora do commit, dentro de artefato gerado que
-      # ninguém lê em review. Abortar com instrução é a única resposta que não mente.
-      _dirty="$(git diff --name-only | grep -Ef "${_pat_f}" | head -1 || true)"
-      if [ -n "${_dirty}" ]; then
-        echo "❌ auto-fix de ${_name} ABORTADO: '${_dirty}' tem mudança NÃO-staged e o assemble lê a árvore — publicaria conteúdo fora do commit. Stagee tudo (git add) ou guarde (git stash -k) antes."
-        rm -f "${_staged_f}" "${_pat_f}"; exit 1
-      fi
-      echo "🔁 fonte bundlada de ${_name} no commit → regenerando o plugin (auto-fix com rastro; a R19 segue HARD no CI)"
-      if ! bash "${ASM}" "${_m}" >/dev/null 2>&1; then
-        echo "❌ assemble de ${_name} FALHOU (fonte ausente/quebrada?) — rode 'bash ${ASM#${REPO_ROOT}/} ${_m#${REPO_ROOT}/}' e leia o erro."
-        rm -f "${_staged_f}" "${_pat_f}"; exit 1
-      fi
-      # A8: se o add falhar, o rastro acima teria mentido — falha vira aviso explícito, nunca ||true mudo.
-      git add "${REPO_ROOT}/plugins/${_name}" || echo "⚠️  git add de plugins/${_name} FALHOU — stagee à mão antes de commitar de novo."
-      _any_regen=1
-    done
-  fi
-  rm -f "${_staged_f}" "${_pat_f}"
-  # REGRA 76: plugin regenerado ⇒ marketplace.json da raiz regenerado junto (temp+mv; redirecionar direto trunca).
-  MRC="${REPO_ROOT}/.claude/validation/marketplace-root-check.sh"
-  if [ "${_any_regen:-0}" -eq 1 ] && [ -f "${MRC}" ]; then
-    if bash "${MRC}" "${REPO_ROOT}" --write >/dev/null 2>&1; then git add "${REPO_ROOT}/.claude-plugin/marketplace.json" || echo "⚠️  git add de .claude-plugin/marketplace.json FALHOU — stagee à mão."
-    else echo "⚠️  marketplace.json NÃO regenerado (marketplace-root-check --write falhou) — a REGRA 76 vai acusar."; fi
-  fi
-fi
+# ── (APOSENTADO na F4 das portas, 2026-10-10, SAC-93) AUTO-REGENERAÇÃO DE PLUGINS ─────────────────
+# Aqui morava o auto-fix da REGRA 19: fonte bundlada no commit ⇒ remontar plugins/<vertical> e o
+# marketplace.json e stagear. Era a cura MECÂNICA de um atrito que a F4 tirou pela raiz: o `plugins/`
+# versionado saiu do core (o bundle é montado na publicação, /meta:publish onion-plugins, e julgado lá
+# pelo plugin-bundle-check.sh). Um PR que toca uma fonte bundlada não regenera mais nada. O catálogo da
+# raiz (REGRA 76) depende só dos MANIFESTOS e entrou na tabela de projeções abaixo.
 
 # ── PROJEÇÃO GERADA REGENERADA JUNTO, POR TABELA (REGRAS 8/16, 39, 62, 80, 81, 84) ───────────
 # POR QUE EXISTE, e a história é de reincidência medida: a primeira versão deste bloco cobria UMA
@@ -162,17 +104,23 @@ _V="${REPO_ROOT}/.claude/validation"
   && [ -f "${_V}/federation-console.sh" ] \
   && onion_regen docs/onion/federation-console.html 24 bash "${_V}/federation-console.sh"
 [ -n "$(onion_staged '.claude/commands' '.claude/agents' '.claude/skills' 'docs/knowledge-base')" ]   && [ -f "${_V}/inventory.sh" ]   && onion_regen docs/onion/inventory.md 8 bash "${_V}/inventory.sh" --markdown
+# O catálogo da RAIZ (REGRA 76) é projeção dos MANIFESTOS desde a F4 das portas (2026-10-10): só muda
+# quando muda um manifesto (nome/descrição/keywords), o gerador ou a face pública — nunca por uma fonte
+# bundlada. O gerador lê o topo do arquivo existente, por isso ele escreve em temp e o alvo é trocado
+# pelo onion_regen (redirecionar direto truncaria o topo antes da leitura).
+[ -n "$(onion_staged '.claude/utils/marketplace/verticals' '.claude/utils/marketplace/generate-marketplace.sh' '.claude/utils/marketplace/public-face.sh')" ] \
+  && [ -f "${REPO_ROOT}/.claude/utils/marketplace/generate-marketplace.sh" ] && [ -f "${REPO_ROOT}/.claude-plugin/marketplace.json" ] \
+  && onion_regen .claude-plugin/marketplace.json 76 bash "${REPO_ROOT}/.claude/utils/marketplace/generate-marketplace.sh" "${REPO_ROOT}" --from-manifests
 # O MAPA e o GRAFO fecham a tabela, e as duas lacunas foram descobertas pelo gate neste mesmo PR:
 # · REGRA 38 (mapa da federação) deriva do members.yaml — registrar um adotante deixava o mapa
 #   defasado e o commit barrado, com a correção óbvia e manual.
-# · REGRA 21 (grafo) deriva, entre outras fontes, do `capability.json` dos plugins — que o AUTO-FIX
-#   acima regenera e stageia. Ou seja: o próprio hook produzia a defasagem que depois cobrava. Por
-#   isso o gatilho é 'plugins' (já staged quando a tabela roda, pois o auto-fix vem ANTES) além das
-#   fontes de spec-as-code.
+# · REGRA 21 (grafo) deriva, entre outras fontes, do capability contract dos plugins. Até a F4 das
+#   portas ele vinha de plugins/*/capability.json (que o auto-fix regenerava); desde 2026-10-10 vem dos
+#   MANIFESTOS, então o gatilho é o diretório deles além das fontes de spec-as-code.
 [ -n "$(onion_staged 'docs/evolution/federation/members.yaml')" ] \
   && [ -f "${_V}/graph.sh" ] \
   && onion_regen docs/onion/federation-map.md 38 bash "${_V}/graph.sh" --map
-[ -n "$(onion_staged 'plugins' '.claude/commands' '.claude/agents' '.claude/skills' 'docs/evolution/federation/members.yaml')" ] \
+[ -n "$(onion_staged '.claude/utils/marketplace/verticals' '.claude/commands' '.claude/agents' '.claude/skills' 'docs/evolution/federation/members.yaml')" ] \
   && [ -f "${_V}/graph.sh" ] \
   && onion_regen docs/onion/graph.md 21 bash "${_V}/graph.sh" --markdown
 if [ -n "$(onion_staged '*.kg.yaml')" ]; then

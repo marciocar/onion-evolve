@@ -88,8 +88,8 @@ ele **não** diz que um item toca o Onion.
    `.env`; a criação segue `.claude/utils/task-manager/adapters/linear.md`. **Declare:** o adapter
    executável ainda é prosa (SAC-65). Provider diferente de `linear` ou chave ausente → avise em pt-BR,
    sugira `/meta:setup-integration` e deixe só o nó.
-9. **FECHAR.** Regenere o plugin onion (REGRA 19 (Plugins de vertical (plugins/*) sincronizados com as fontes)) e
-   as projeções; `bash ops/pr-finalize.sh --push`; PR com corpo em pt-BR; merge **só** por
+9. **FECHAR.** Regenere as projeções (o plugin onion não se regenera mais no core desde a F4 das
+   portas: ele nasce na publicação, `/meta:publish onion-plugins`); `bash ops/pr-finalize.sh --push`; PR com corpo em pt-BR; merge **só** por
    `ops/pr-merge-verified.sh`, com a dispensa nomeada quando o revisor do CI estiver sem crédito.
 10. **RELATAR.** Versão medida (baseline → instalada), quantos nós, o veredito do juiz, as issues
     criadas, o PR e o merge.

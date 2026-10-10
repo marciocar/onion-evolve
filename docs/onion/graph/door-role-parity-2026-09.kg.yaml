@@ -2,8 +2,7 @@
 # Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
-  x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote da F3 das portas (SAC-92, 2026-10-10): E_PUBLICAR_SOB_DEMANDA_F3 nasce confirmed (DEV) apoiando D_MATRIZ_DE_PORTAS_2026_10; Q_REGISTRO_ACOMPANHA_A_TROCA_DE_PAPEL nasce open para o maestro (gatilho: 1a publicação da onion-core como source); nenhum flip auto-selado; PR para merge humano"
+  x_drive_checkpoint: sealed
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
@@ -424,6 +423,39 @@ nodes:
     narrative: "O motor não escreve no members.yaml (o selo é o carimbo, sem PR no core) nem no clone local da porta. A REGRA 92 compara o role do registro com o carimbo do CLONE LOCAL, então depois da troca as duas leituras divergem até o registro passar a source e o clone receber git pull. Respostas possíveis: alinhar à mão na leva seguinte (o que o motor instrui hoje), ou a REGRA 92 ler o carimbo do remoto como o --status já faz."
     trace: "ops/publish-door.sh · .claude/validation/door-role-parity-check.sh · docs/evolution/federation/members.yaml"
 
+  - id: E_PLUGINS_FORA_DO_CORE_F4
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    valid_from: "2026-10-10"
+    verified_at: "2026-10-10"
+    verified_against: "bancada sob LC_ALL=C em 35 famílias tocadas (300 casos verdes depois da cura do único achado — um caminho .claude/ nu que a própria edição de KB desta F4 pôs num plugin, pego pelo caso plugin-bundle (a)), com 19 mutantes plantados por ops/mutate-and-restore.sh, todos reprovando o caso nomeado; bundle temporário das fontes vivas (6 plugins) com 0 HARD no plugin-bundle-check e claude plugin validate --strict aprovando catálogo e onion-meta"
+    source_kind: repo
+    source_tier: 10
+    label: "F4 das portas: o plugins/ montado saiu do core; a versão vem do plugin publicado, as guardas de plugin julgam o bundle na publicação e numa bancada sobre bundle temporário, e o marketplace.json da raiz aponta o repo público — PR comum que toca fonte bundlada não regenera nada"
+    narrative: "O que mudou. (1) VERSÃO: assemble-plugin.sh lê o anterior do plugin PUBLICADO (ONION_PLUGIN_PRIOR_DIR, senão o próprio destino, que na publicação é o clone de onion-plugins em origin/<ramo>), nunca de um plugins/ do repo-fonte; o materialize-marketplace-repo.sh deixou de apagar o plugin antes de chamar o assembler (zeraria a versão a cada publicação). (2) SAÍDA DO CORE: 269 arquivos de plugins/ removidos e /plugins/ ignorado; o auto-fix do pre-commit e o ramo de plugins/ do pr-finalize --rebase saíram; ONION_GENERATED_DIRS ficou vazio; o graph.sh lê os capability contracts dos manifestos (saída idêntica fora do plugin novo); cc-delta-census conta plugins pelos manifestos. (3) GUARDAS: a REGRA 19 (Plugins de vertical sincronizados com as fontes) foi aposentada — não há cópia versionada para sincronizar; as REGRAS 72, 73, 74, 75, 77 e 79 saíram do lint de PR para o plugin-bundle-check.sh, junto com a metade do RESULTADO da REGRA 61 e a paridade catálogo × raiz da REGRA 76; o publish-door.sh roda o checador no passo 5d sobre o bundle montado (rc 2 = não medi = reprova). A metade da DECLARAÇÃO da REGRA 61 (manifestos) ficou no lint de PR: custa nada e não exige montar. A REGRA 78 (YAML válido de .kg.yaml) não é de plugin e não se moveu — o intervalo 72–79 do plano a cobria por acaso. (4) REGRA 76 repensada: a raiz é projeção dos MANIFESTOS (generate-marketplace.sh --from-manifests) com source git-subdir sobre o repo público, validado no claude plugin validate --strict (CC 2.1.296; um tipo de source inventado reprova); entra na tabela de projeções do pre-commit e no pr-finalize. (5) META-FÁBRICA: plugin novo onion-meta com 9 comandos (absorb-skill, create-abstraction, create-agent, create-agent-express, create-command, create-knowledge-base, create-skill, dissect, evolve), 3 agentes e 3 templates; FORA, declarados: create-vertical (o --plugin dele depende do motor do marketplace, que a REGRA 61 segue tratando como moat — é a peça 'parametrizar destino' que Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN, em distribuicao-metodo-vivo-2026-09, já nomeava como a única que exige decisão) e forge/forge-guard/cc-update (os motores medem o harness lint-artifacts/lint-selftest, que plugin não carrega; o assembler recusa o grafo de dependências). A REGRA 74 ganhou CONSUMER_TARGET_ROOTS no manifesto: o caminho .claude/ nu que é DESTINO no projeto de quem instala sai num SOFT agregado (145 refs no onion-meta, todas desta natureza), nunca calado."
+    trace: ".claude/validation/plugin-bundle-check.sh · .claude/utils/marketplace/assemble-plugin.sh · .claude/utils/marketplace/generate-marketplace.sh · .claude/validation/marketplace-root-check.sh · .claude/utils/marketplace/verticals/onion-meta.manifest.sh · ops/publish-door.sh"
+    provenance:
+      source: "branch feat/doors-plugins-out-f4 (PR da F4, SAC-93): plugin-bundle-check.sh, assemble-plugin.sh, generate-marketplace.sh --from-manifests, marketplace-root-check.sh, publish-door.sh (5d), lint-artifacts.sh, pre-commit e lint-selftest.sh"
+      locator: "famílias plugin_bundle, plugin_version_derived, marketplace_root_sync, plugin_private_url, publish (q3, q4), capability (only-gate ii) e pre_push (F4 x1); bundle temporário das fontes vivas com 0 HARD"
+      method: "medição: bancada sob LC_ALL=C nas famílias tocadas, com mutante por caso plantado por ops/mutate-and-restore.sh, e montagem das fontes vivas num bundle temporário validado pelo claude plugin validate --strict"
+      locality: "repo"
+
+  - id: Q_CREATE_VERTICAL_E_O_MOTOR_DO_MARKETPLACE_NO_PLUGIN
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    owner: maestro
+    label: "F4 das portas: o plugins/ montado saiu do core; versão vem do publicado, guardas de plugin julgam o bundle na publicação e numa bancada temporária, e a raiz do catálogo aponta o repo público — PR comum não regenera nada"
+    narrative: "A matriz diz plugins = superfície do standalone, e o standalone leva utils/marketplace inteiro menos o materializador (F2). A REGRA 61 (Fronteira de MOAT) segue barrando assemble-plugin/generate-marketplace e /utils/marketplace/ em manifesto publicável, e a F4 escolheu a recomendação mais estreita: não mover o moat sem decisão do maestro. forge/forge-guard/cc-update ficam fora por outro motivo, mecânico: os motores medem o harness do repo, que a instalação por plugin não tem."
+    trace: ".claude/utils/marketplace/verticals/onion-meta.manifest.sh · .claude/validation/lint-artifacts.sh"
+
 edges:
   # o dano é a evidência de que a lacuna existia
   - from: E_DANO_85_ARQUIVOS
@@ -520,4 +552,14 @@ edges:
     edge_type: DEPENDS_ON
   - from: Q_REGISTRO_ACOMPANHA_A_TROCA_DE_PAPEL
     to: E_PUBLICAR_SOB_DEMANDA_F3
+    edge_type: CONSTRAINS
+  # a F4 escreve no mecanismo a parte da matriz que é "plugins/ sai do core"
+  - from: E_PLUGINS_FORA_DO_CORE_F4
+    to: D_MATRIZ_DE_PORTAS_2026_10
+    edge_type: SUPPORTS
+  - from: E_PLUGINS_FORA_DO_CORE_F4
+    to: E_PUBLICAR_SOB_DEMANDA_F3
+    edge_type: DEPENDS_ON
+  - from: Q_CREATE_VERTICAL_E_O_MOTOR_DO_MARKETPLACE_NO_PLUGIN
+    to: E_PLUGINS_FORA_DO_CORE_F4
     edge_type: CONSTRAINS

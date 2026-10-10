@@ -66,7 +66,12 @@ __pycache__/
 # ver manifesto órfão → REGRA 19 HARD. Aconteceu 3× em 2026-09-05. Ignorar é a cura barata; mover a
 # fixture exigiria redesenhar o caso (ele PRECISA do dir vivo).
 .claude/**/__*__.*
-plugins/__*__/
+
+# plugins/ NA RAIZ não se versiona desde a F4 das portas (2026-10-10, SAC-93): o bundle é montado na
+# publicação (/meta:publish onion-plugins) e vive no repo público onion-plugins. O `assemble-plugin.sh`
+# ainda usa `<raiz>/plugins/<nome>` como destino default (útil num adotante que monta os próprios) —
+# aqui no core, uma montagem à mão cai num diretório ignorado em vez de reabrir o atrito por acidente.
+/plugins/
 
 # Scratchpad da SESSÃO — parking-lot de nota e material baixado para leitura (PDFs de fonte primária,
 # rascunho de script). É transitório por definição: o que vale vira nó no grafo, caso de bancada ou

@@ -113,7 +113,7 @@ Tabela longa + fontes + a decisão de migração:
 ### De artefato
 | Predicado | Domínio → Alcance | Declarado em |
 |---|---|---|
-| `requires` `provides` `loads` | Plugin/Vertical → dep/capacidade/contexto-condicional | `plugins/*/.claude-plugin/capability.json` |
+| `requires` `provides` `loads` | Plugin/Vertical → dep/capacidade/contexto-condicional | `.claude/utils/marketplace/verticals/*.manifest.sh` (`PROVIDES`/`REQUIRES`/`LOADS`; vira `capability.json` no plugin publicado) |
 | `related` | Agent → Agent/Command | frontmatter `related_agents`/`related_commands` |
 | `implements` | Adapter → Interface | SDAAL (`.claude/utils/<abs>/adapters/`) |
 | `produces` `consumes` | Repo → Contrato | federation ledger |

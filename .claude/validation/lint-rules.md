@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**95 regras** no total — **83 HARD**, **33 SOFT**.
+**88 regras** no total — **76 HARD**, **31 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -62,10 +62,6 @@ Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.
 | 48 | Referência de caminho `.claude/…` em backtick (prosa) que não resolve | HARD | referência .claude/ em backtick na prosa apontando p/ arquivo inexistente (ponteiro morto silencioso) |
 | 60 | Identificador de código em INGLÊS | HARD | identificador em pt-BR entrando no código sem que nenhuma guarda mecânica o veja. |
 | 71 | Comando não declara model: no frontmatter — segue a escada da sessão | HARD | o Claude Code 2.1.259 passou a HONRAR model: de comando em sessão interativa (radar E3 rodada 2, l.17): |
-| 72 | Namespace de comando em plugin é /<plugin>:<cmd>, nunca o do core | HARD | comando empacotado citando `/engineer:pr` — ponteiro que não resolve no consumidor |
-| 73 | Hook empacotado resolve no plugin instalado | HARD | hook morto e silencioso no plugin (script ausente, motor não embarcado, caminho $REPO/${CLAUDE_PLUGIN_ROOT}, matcher perdido) |
-| 74 | Caminho .claude/ NU dentro de plugin só resolve no core, com catraca | HARD + SOFT | comando/agente empacotado apontando .claude/{utils,commands,templates,…} que não viajou — ponteiro morto no consumidor |
-| 75 | Link markdown relativo dentro de plugin resolve no plugin | HARD | `[irmã](../kb/x.md)` num plugin apontando para arquivo que não viajou — 404 no consumidor |
 | 94 | MUTANTE esquecido na árvore | HARD + SOFT | teste de mutação que morre no meio e deixa o repo PIOR que antes |
 
 ## Fronteiras & contratos de arquitetura
@@ -79,7 +75,6 @@ Proibições estruturais, documentação no lugar certo e os contratos de confor
 | 20 | Capability Contract: tier de conformance cumprido | HARD | componente reivindica um tier de conformance que não cumpre |
 | 40 | Adotante: .onion-version DEVE estar trackeado no git | HARD | adotante com .onion-version não-trackeado — 156 falso-HARD |
 | 53 | Regra path-scoped declara `paths:` que casa algo real | HARD | regra em .claude/rules/ que nunca carrega — instrução que o modelo jamais vê |
-| 77 | Contrato de dependência entre plugins | HARD + SOFT | dois plugins embarcando a mesma skill/KB (cópias divergem) ou um plugin usando skill que só outro embarca sem declarar |
 
 ## SDAAL — abstração de provider
 
@@ -92,14 +87,13 @@ O consumidor fala com a abstração, nunca com o provider direto.
 
 ## SSOT anti-drift
 
-Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, plugins, topologia.
+Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, catálogo, topologia.
 
 | Nº | Regra | Severidade | O que previne |
 |---:|-------|:----------:|---------------|
 | 8 | Inventário canônico sincronizado com o filesystem | HARD | inventário mentindo vs o filesystem real (contagem drifta) |
 | 9 | Contagens no CLAUDE.md em sincronia com a SSOT | HARD | contagens no CLAUDE.md drifta da SSOT do inventário |
 | 16 | Contagem de inventário-TOTAL divergente da SSOT | SOFT | contagem-TOTAL do inventário divergindo da SSOT |
-| 19 | Plugins de vertical (plugins/*) sincronizados com as fontes | HARD | plugin de vertical driftando das fontes — bundle de adoção errado |
 | 21 | Grafo (docs/onion/graph.md) sincronizado com a spec-as-code | HARD | docs/onion/graph.md desatualizado vs a spec-as-code |
 | 27 | Dependência de script de comando empacotado | HARD | comando empacotado dependendo de script ausente no bundle |
 | 37 | Mapa role→bundle (roles.yaml) consistente com os verticais | HARD | mapa role->bundle (roles.yaml) driftando dos verticais |
@@ -110,7 +104,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 62 | Projeção GERADA em sincronia com a fonte (docs/backlog.md) | HARD | projeção gerada que envelhece calada — o item existe no grafo e some da superfície que as sessões leem |
 | 63 | Colheita de grafo emite os ids colhidos no resíduo de revisão | HARD + SOFT | nó removido de um .kg.yaml sem registro consultável de que existiu — a promessa "a história fica no artefato de revisão" cumprida só na letra |
 | 70 | fallbackModel do settings.json é PROJEÇÃO da escada de modelos (eixo E6) | HARD | a escada (session_models + session_floor em docs/onion/radar-baselines.yaml) e o fallback nativo do |
-| 76 | marketplace.json da raiz é projeção do gerador | HARD | .claude-plugin/marketplace.json envelhecendo calado (o core também é marketplace instalável) |
+| 76 | marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos | HARD | .claude-plugin/marketplace.json envelhecendo calado ou apontando um plugins/ local que o core não guarda mais |
 | 80 | Números do harness saem de SSOT gerada, nunca de comentário | HARD | contagem sobre o próprio harness escrita à mão, que envelhece calada e é citada como medição |
 | 81 | Painel de estado é GERADO dos produtores, nunca redigido | HARD | painel de testes com número sem produtor — metas redesenhadas como medição, que foi o defeito real deste repo |
 | 83 | Id de modelo VERSIONADO só na SSOT declarada | HARD | versão literal de modelo espalhada por config, que caduca sem aviso |
@@ -173,7 +167,7 @@ Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.
 
 ## Projeção & privacidade
 
-O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e deep-link privado nunca vazam (nem a HOME crua do source privado, num artefato de plugin); e o compose commitado nunca publica porta em 0.0.0.0 nem sobe com segredo de fallback.
+O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e deep-link privado nunca vazam; e o compose commitado nunca publica porta em 0.0.0.0 nem sobe com segredo de fallback.
 
 | Nº | Regra | Severidade | O que previne |
 |---:|-------|:----------:|---------------|
@@ -185,7 +179,6 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 | 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT | link vivo em superfície vendorizada para caminho core-privado — morto no adotante |
 | 61 | Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado | HARD | publicar a ADOÇÃO e a FEDERAÇÃO (adopt/federation-*/co-*/marketplace/decouple) ou o SSOT PRIVADO |
 | 64 | Compose sem bind local ou com segredo em fallback literal | HARD + SOFT | porta publicada em todas as interfaces (o Docker ignora o firewall do HOST — ufw/iptables |
-| 79 | Artefato de plugin não publica o repo-fonte PRIVADO como endereço | HARD | plugin/marketplace publicando a URL do source privado — 404 no instalador |
 
 ## Processo com resíduo
 

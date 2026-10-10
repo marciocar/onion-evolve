@@ -22,8 +22,8 @@
 #             real passaria; 1 = recusaria, com o motivo.
 #
 #   --rebase  traz a branch para cima da origin/main antes de tudo. Conflito em PROJEÇÃO GERADA é
-#             resolvido pela versão do commit e regenerado logo depois — e conflito em plugins/<v>/ é
-#             remontado das fontes mescladas no próprio passo (SAC-67); conflito em qualquer outro
+#             resolvido pela versão do commit e regenerado logo depois (até a F4 das portas, conflito em
+#             plugins/<v>/ era remontado das fontes; o `plugins/` saiu do core); conflito em qualquer outro
 #             arquivo = recusa (rebase abortado, nada muda). Motivo medido (2026-10-05): três PRs do
 #             mesmo dia mexiam nas mesmas projeções, e o merge do primeiro deixou os outros dois em
 #             conflito ou defasados — o CI nem dispara com o PR em conflito.
@@ -139,26 +139,14 @@ if [ "${REBASE}" = 1 ]; then
     for _r in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
       _c="$(git diff --name-only --diff-filter=U)"
       [ -n "${_c}" ] || break
-      _plug=""
       for _f in ${_c}; do
         if ! onion_is_generated "${_f}"; then
           git rebase --abort >/dev/null 2>&1; die "conflito REAL em ${_f} — rebase abortado, nada mudou; resolva à mão"
         fi
-        case "${_f}" in
-          plugins/*) _n="${_f#plugins/}"; _n="${_n%%/*}"; case " ${_plug} " in *" ${_n} "*) ;; *) _plug="${_plug} ${_n}" ;; esac ;;
-          *) git checkout --theirs -- "${_f}" && git add -- "${_f}" ;;
-        esac
-      done
-      # plugin em conflito = as FONTES dele mudaram dos dois lados: nenhum dos lados está certo, então
-      # monta de novo a partir das fontes já mescladas deste passo (SAC-67). Montagem falha → recusa.
-      for _n in ${_plug}; do
-        _m=".claude/utils/marketplace/verticals/${_n}.manifest.sh"; _t="$(mktemp -d)"
-        if [ -f "${_m}" ] && bash .claude/utils/marketplace/assemble-plugin.sh "${_m}" "$(pwd)" "${_t}/${_n}" >/dev/null 2>&1; then
-          rm -rf "plugins/${_n}" && cp -R "${_t}/${_n}" "plugins/${_n}" && git add -A -- "plugins/${_n}"
-          rm -rf "${_t}"; echo "PR-FINALIZE: conflito só de projeção em plugins/${_n} — remontado das fontes mescladas"
-        else
-          rm -rf "${_t}"; git rebase --abort >/dev/null 2>&1; die "plugins/${_n} em conflito e a remontagem falhou — rebase abortado, nada mudou"
-        fi
+        # projeção gerada em conflito: o lado da main vence aqui e a regeneração adiante a refaz.
+        # (Até a F4 das portas, 2026-10-10, plugins/<vertical> tinha ramo próprio, remontado das fontes
+        # mescladas — SAC-67. O `plugins/` saiu do core e o ramo saiu com ele.)
+        git checkout --theirs -- "${_f}" && git add -- "${_f}"
       done
       GIT_EDITOR=true git rebase --continue >/dev/null 2>&1 && break
     done
@@ -217,6 +205,11 @@ _regen() {  # regenera TODA projeção gerada com catraca no lint e stageia só 
     local con; con="$(mktemp)"
     bash .claude/validation/federation-console.sh > "${con}" || { rm -f "${con}"; die "federation-console.sh falhou"; }
     [ -s "${con}" ] && mv "${con}" docs/onion/federation-console.html || rm -f "${con}"
+  fi
+  # catálogo da raiz (REGRA 76): projeção dos manifestos desde a F4 das portas (2026-10-10). O --write já
+  # escreve por temp+mv (o gerador lê o topo do próprio arquivo).
+  if [ -f .claude/validation/marketplace-root-check.sh ] && [ -f .claude-plugin/marketplace.json ]; then
+    bash .claude/validation/marketplace-root-check.sh "${ROOT}" --write >/dev/null || die "marketplace-root-check.sh --write falhou"
   fi
   # mapa da federação (REGRA 38): projeção do members.yaml que o motor não regenerava (SAC-67)
   if [ -f .claude/validation/graph.sh ] && [ -f docs/evolution/federation/members.yaml ]; then

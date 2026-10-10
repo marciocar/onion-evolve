@@ -175,7 +175,9 @@ if os.path.isfile(bl):
         prev_kg = k.group(1)
         r = re.search(r'-r(\d+)/', prev_kg)
         if r: next_dir = f'docs/evolution/research/radar-E3-{today}-r{int(r.group(1)) + 1}/'
-inv['plugins'] = sorted(os.path.basename(d) for d in glob.glob(os.path.join(repo, 'plugins/*')) if os.path.isdir(d))
+# Os plugins que o core PUBLICA saem dos MANIFESTOS (F4 das portas, 2026-10-10): o `plugins/` montado não é
+# mais versionado aqui. O nome do arquivo é o PLUGIN_NAME por convenção (verticals/<nome>.manifest.sh).
+inv['plugins'] = sorted(os.path.basename(m)[:-len('.manifest.sh')] for m in glob.glob(os.path.join(repo, '.claude/utils/marketplace/verticals/*.manifest.sh')) if not os.path.basename(m).startswith('__'))
 inv['marketplace'] = os.path.isfile(os.path.join(repo, '.claude-plugin/marketplace.json'))
 wf = []
 for pat in ('.claude/**/*.md', '.claude/**/*.js', '.claude/**/*.mjs'):

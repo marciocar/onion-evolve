@@ -10,7 +10,7 @@
 #             TBox: docs/knowledge-base/concepts/onion-relation-vocabulary.md
 #
 # Fontes    : docs/onion/actors.yaml (atores/canais/comunicação) + capability.json
-#             dos plugins (requires/provides/loads) + frontmatter dos agentes
+#             dos plugins (requires/provides/loads, lidos dos manifestos verticals/*.manifest.sh) + frontmatter dos agentes
 #             (related_agents/related_commands) + has-member (onion → artefatos).
 #
 # Uso       : graph.sh [--markdown|--triples|--impact <nó>|--path <de> <até>|--closure <nó>|--orphans|--map]
@@ -131,17 +131,23 @@ emit_triples() {
     done
   fi
 
-  # (2) capability contracts dos plugins (requires/provides/loads)
-  if have_jq; then
-    for cap in "${REPO_ROOT}"/plugins/*/.claude-plugin/capability.json; do
-      [ -f "${cap}" ] || continue
-      local nm; nm="$(jq -r '.name' "${cap}" 2>/dev/null)"
-      [ -n "${nm}" ] || continue
-      jq -r '.requires[]?' "${cap}" 2>/dev/null | while IFS= read -r r; do printf '%s\trequires\t%s\t\n' "${nm}" "${r}"; done
-      jq -r '.provides[]?' "${cap}" 2>/dev/null | while IFS= read -r r; do printf '%s\tprovides\t%s\t\n' "${nm}" "${r}"; done
-      jq -r '.loads[]?'    "${cap}" 2>/dev/null | while IFS= read -r r; do printf '%s\tloads\t%s\t\n' "${nm}" "${r}"; done
-    done
-  fi
+  # (2) capability contracts dos plugins (requires/provides/loads) — lidos dos MANIFESTOS.
+  #     Até a F4 das portas (2026-10-10) vinham de plugins/*/.claude-plugin/capability.json, que o core
+  #     versionava; o `plugins/` saiu do core. O capability.json é a MESMA declaração materializada pelo
+  #     assembler (name + REQUIRES + `plugin:<REQUIRES_PLUGINS>` + PROVIDES + LOADS), então a fonte passa
+  #     a ser a que ele lê. Fixture de teste (`__*`) não é plugin publicável e fica fora, como no assembler.
+  local _vd="${REPO_ROOT}/.claude/utils/marketplace/verticals" _m
+  for _m in "${_vd}"/*.manifest.sh; do
+    [ -f "${_m}" ] || continue
+    case "$(basename "${_m}")" in __*) continue ;; esac
+    ( set +u; PLUGIN_NAME=""; PROVIDES=(); REQUIRES=(); REQUIRES_PLUGINS=(); LOADS=()
+      . "${_m}" >/dev/null 2>&1 || true
+      [ -n "${PLUGIN_NAME}" ] || exit 0
+      for r in "${REQUIRES[@]}"; do [ -n "${r}" ] && printf '%s\trequires\t%s\t\n' "${PLUGIN_NAME}" "${r}"; done
+      for r in "${REQUIRES_PLUGINS[@]}"; do [ -n "${r}" ] && printf '%s\trequires\tplugin:%s\t\n' "${PLUGIN_NAME}" "${r}"; done
+      for r in "${PROVIDES[@]}"; do [ -n "${r}" ] && printf '%s\tprovides\t%s\t\n' "${PLUGIN_NAME}" "${r}"; done
+      for r in "${LOADS[@]}";    do [ -n "${r}" ] && printf '%s\tloads\t%s\t\n'    "${PLUGIN_NAME}" "${r}"; done )
+  done
 
   # (3) frontmatter dos agentes (related_agents / related_commands) — atores especialistas
   while IFS= read -r ag; do

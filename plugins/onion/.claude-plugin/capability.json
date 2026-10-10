@@ -1,8 +1,0 @@
-{
-  "name": "onion",
-  "version": "0.1.331",
-  "conformance": "silver",
-  "provides": ["master-orchestration","knowledge-graph-runtime","kg-freshness-reverify","sdaal-task-manager","sdaal-forge","session-runtime","dogfood-doctrine","language-standards","knowledge-graph-sdaal","learning-diary","orchestration","metaspec-validation","freshness-audits","constellation-map","plan-graph-drive","plan-graph-realign","guided-conduction","guided-onboarding","retro-feedback"],
-  "requires": ["skill:onion-orchestration","agent:metaspec-gate-keeper"],
-  "loads": ["embed:kb/onion-dogfooding-doctrine.md","embed:kb/knowledge-graph-sdaal.md","embed:kb/behavior-over-declaration.md","when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)","embed:kb/onion-elenxo-doctrine.md","when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)","when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)","when:diary -> run:validation/diary-index.sh","embed:kb/onion-drive-doctrine.md","embed:kb/onion-kg-ontology-hierarchy.md","when:drive -> run:validation/kg-drive-project.sh (censo determinístico) + validation/kg-seal-exception.sh (predicado do selo)","when:realign -> run:validation/kg-realign-project.sh (verificador-por-turno; --check é o dente)"]
-}

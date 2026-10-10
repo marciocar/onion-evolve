@@ -72,7 +72,9 @@ for m in "${VDIR}"/*.manifest.sh; do
   case "$(basename "${m}")" in __*) continue ;; esac   # ignora fixtures de teste
   pname="$( set +u; . "${m}" >/dev/null 2>&1; printf '%s' "${PLUGIN_NAME:-}" )"
   [ -n "${pname}" ] || { echo "⚠️  ${m}: sem PLUGIN_NAME — pulado." >&2; continue; }
-  rm -rf "${TARGET}/plugins/${pname}"
+  # SEM `rm -rf` do destino aqui (F4 das portas, 2026-10-10): o plugin que está no alvo é o
+  # PUBLICADO, e é dele que o assembler lê a versão anterior antes de limpar o destino ele mesmo.
+  # Apagar antes zeraria a versão de todo plugin a cada publicação (o updater ficaria no-op).
   if bash "${ASM}" "${m}" "${SRC}" "${TARGET}/plugins/${pname}" >/dev/null 2>&1; then
     echo "  ✓ ${pname}"
     PRODUZIDOS="${PRODUZIDOS} ${pname}"

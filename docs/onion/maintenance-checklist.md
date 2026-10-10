@@ -432,8 +432,8 @@ de diagnóstico) **rejuvenesce o atime e zera o relógio**. Nada consegue envelh
 - **A bancada roda em FAIXAS** desde 2026-09-03 (`lint-selftest.sh --jobs auto` = 8 workers com fila
   dinâmica, ~8 min; `--affected-staged` no pre-commit roda só as famílias afetadas; `--help` lista as
   opções). A "corrida SOLO" de antes (~13-20 min serial) segue válida sem argumentos. Duas bancadas
-  simultâneas no MESMO repo ainda não são recomendadas: famílias que leem o repo vivo (`git status
-  plugins/`, `git archive HEAD`) e um caso intermitente conhecido (`kg-backlog (e)`,
+  simultâneas no MESMO repo ainda não são recomendadas: famílias que leem o repo vivo (`git archive
+  HEAD`; o `git status plugins/` saiu com o `plugins/` versionado na F4 das portas) e um caso intermitente conhecido (`kg-backlog (e)`,
   `Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO`) — a falha falsa de 2026-08 tinha esta forma.
 - **`consumed-mode-check.sh` está LIGADO** — e esta linha dizia o contrário até 2026-09-08.
   É a REGRA 59, chamada incondicionalmente em `lint-artifacts.sh:4116`, severidade HARD. Medido

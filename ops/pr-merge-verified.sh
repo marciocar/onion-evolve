@@ -239,11 +239,11 @@ _kg_guard_post() { # depois do merge PROVADO: cada sha da branch tem de ser ance
 _kg_guard_pre
 # ══ AUTO-REBASE: PR em CONFLICTING não dispara CI ══════════════════════════════════════════════
 # Defeito medido em 2026-10-07/08: 25 PRs, 33 commits de "projeções geradas regeneradas". Todo PR
-# commita as projeções (backlog, testing-state, kg-read-index, plugins/), então cada merge deixa os
+# commita as projeções (backlog, testing-state, kg-read-index; plugins/ até a F4 das portas), então cada merge deixa os
 # PRs abertos CONFLICTING — e o GitHub NÃO dispara CI em PR em conflito. A espera ficava parada em
 # "no checks reported" (#957 duas vezes, #959, #960, #975) até alguém rodar o rebase à mão. Desde o
-# #973 o `pr-finalize --rebase --push` resolve com segurança o conflito SÓ de projeção (remonta
-# plugins/ das fontes, regenera o resto) e RECUSA conflito de fonte. Aqui ele é DISPARADO sozinho:
+# #973 o `pr-finalize --rebase --push` resolve com segurança o conflito SÓ de projeção (regenera
+# as projeções) e RECUSA conflito de fonte. Aqui ele é DISPARADO sozinho:
 #   · só na worktree LOCAL da branch do PR (achada por `git worktree list`), nunca às cegas: sem
 #     worktree, digo o comando exato e paro (fail-loud — esperar em silêncio era o defeito);
 #   · conflito de FONTE para com rc≠0 nomeando o arquivo — o rebase nunca esconde conflito real;

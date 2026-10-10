@@ -7,7 +7,7 @@
 # A bancada cria fixtures NA ÁRVORE VIVA (é deliberado: ela precisa exercitar guardas que só
 # existem num repo de verdade). Uma rodada INTERROMPIDA — sessão que cai, Ctrl+C, timeout — as
 # deixa para trás. O lint seguinte então as vê como artefatos REAIS e reprova:
-#   · `plugins/__mbguard__` → REGRA 19 "plugin ausente"
+#   · `plugins/__mbguard__` → REGRA 19 "plugin ausente" (até a F4 das portas, 2026-10-10; hoje /plugins/ inteiro é ignorado)
 #   · `verticals/__mbguard__<pid>.manifest.sh` → REGRA 61 + 14 ocorrências da REGRA 27
 #   · `site/__selftest-deeplink__.html` → REGRA 35
 # Medido 3x em 2026-09-15, uma delas com 271 HARD, e as três vezes a cura foi eu LEMBRAR de limpar.

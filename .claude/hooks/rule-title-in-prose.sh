@@ -21,20 +21,24 @@
 set -u
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LINT="${HERE}/../validation/lint-artifacts.sh"
+# As guardas de PLUGIN (REGRAS 72-75, 77, 79) saíram do lint para o checador da publicação na F4 das
+# portas (2026-10-10); os títulos delas moram lá, no MESMO formato de cabeçalho. Ler os dois arquivos.
+BUNDLE="${HERE}/../validation/plugin-bundle-check.sh"
 
 _check_text() {   # stdin: texto do assistente · stdout: linhas "N|forma-correta" das menções sem título
   # O texto vai por ARQUIVO: `python3 - <<'PY'` já ocupa o stdin com o script (classe medida 3× em 2026-09-04).
   local tf; tf="$(mktemp)"; cat > "${tf}"
-  python3 - "${LINT}" "${tf}" <<'PY'
+  python3 - "${LINT}" "${tf}" "${BUNDLE}" <<'PY'
 import re, sys
-lint, tf = sys.argv[1], sys.argv[2]
+lint, tf, bundle = sys.argv[1], sys.argv[2], sys.argv[3]
 titles = {}
-try:
-    for line in open(lint, encoding="utf-8", errors="replace"):
-        m = re.match(r"^# REGRA (\d+) — (.+?)\s*\[(?:HARD|SOFT)[^\]]*\]\s*$", line)
-        if m: titles[int(m.group(1))] = m.group(2).strip()
-except Exception:
-    pass
+for src in (lint, bundle):
+    try:
+        for line in open(src, encoding="utf-8", errors="replace"):
+            m = re.match(r"^# REGRA (\d+) — (.+?)\s*\[(?:HARD|SOFT)[^\]]*\]\s*$", line)
+            if m: titles.setdefault(int(m.group(1)), m.group(2).strip())
+    except Exception:
+        pass
 txt = open(tf, encoding="utf-8", errors="replace").read()
 txt = re.sub(r"```.*?```", "", txt, flags=re.S)          # blocos de código não são prosa
 seen = set()
@@ -52,9 +56,10 @@ PY
 
 if [ "${1:-}" = "--selftest" ]; then
   fails=0
-  out="$(printf 'A REGRA 19 acusou e a REGRA 74 também.\n' | _check_text)"
-  if printf '%s' "${out}" | grep -q '^19|REGRA 19 (Plugins de vertical' && printf '%s' "${out}" | grep -q '^74|REGRA 74 ('; then echo "  ✅ (a) menções sem título detectadas com a forma correta"; else echo "  ✗ (a): ${out}"; fails=$((fails+1)); fi
-  out="$(printf 'A REGRA 19 (Plugins de vertical sincronizados) passou; veja `REGRA 74` em ```REGRA 62```.\n' | _check_text)"
+  out="$(printf 'A REGRA 21 acusou e a REGRA 74 também.\n' | _check_text)"
+  # 74 mora no checador de bundle desde a F4: o título TEM de vir de lá, não de "não encontrado"
+  if printf '%s' "${out}" | grep -q '^21|REGRA 21 (Grafo' && printf '%s' "${out}" | grep -q '^74|REGRA 74 (Caminho .claude/ NU'; then echo "  ✅ (a) menções sem título detectadas com a forma correta"; else echo "  ✗ (a): ${out}"; fails=$((fails+1)); fi
+  out="$(printf 'A REGRA 21 (Grafo sincronizado) passou; veja `REGRA 74` em ```REGRA 62```.\n' | _check_text)"
   if [ -z "$(printf '%s' "${out}" | grep -v '^74|')" ] && printf '%s' "${out}" | grep -q '^74|'; then echo "  ✅ (b) titulada e bloco de código isentos; crase não isenta"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
   out="$(printf 'Sem regra nenhuma aqui.\n' | _check_text)"
   if [ -z "${out}" ]; then echo "  ✅ (c) texto limpo = vazio"; else echo "  ✗ (c): ${out}"; fails=$((fails+1)); fi

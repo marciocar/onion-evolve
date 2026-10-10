@@ -5,14 +5,13 @@
   },
   "metadata": {
     "description": "Marketplace de plugins Onion (verticais como spec-as-code).",
-    "version": "0.1.0",
-    "pluginRoot": "./plugins"
+    "version": "0.1.0"
   },
   "plugins": [
     {
       "name": "onion-compliance",
       "displayName": "Onion · Compliance",
-      "source": "./plugins/onion-compliance",
+      "source": { "source": "git-subdir", "url": "https://github.com/marciocar/onion-plugins.git", "path": "plugins/onion-compliance" },
       "description": "Vertical de compliance do Onion: documentacao de conformidade como spec-as-code (ISO 27001/22301, SOC2, PMBOK) via agentes especialistas + build-compliance-docs. Auto-adapta ao compliance-context do consumidor (SDAAL).",
       "category": "vertical",
       "tags": ["compliance","iso-27001","iso-22301","soc2","pmbok","onion"],
@@ -24,7 +23,7 @@
     {
       "name": "onion-design",
       "displayName": "Onion · Design",
-      "source": "./plugins/onion-design",
+      "source": { "source": "git-subdir", "url": "https://github.com/marciocar/onion-plugins.git", "path": "plugins/onion-design" },
       "description": "Vertical de design do Onion: identidade visual como spec-as-code (tokens W3C/DTCG), gate WCAG e materializacao via design-sink. Auto-adapta ao design-context do consumidor.",
       "category": "vertical",
       "tags": ["design","design-tokens","wcag","dtcg","onion","sdaal"],
@@ -36,7 +35,7 @@
     {
       "name": "onion-engineering",
       "displayName": "Onion · Engineering",
-      "source": "./plugins/onion-engineering",
+      "source": { "source": "git-subdir", "url": "https://github.com/marciocar/onion-plugins.git", "path": "plugins/onion-engineering" },
       "description": "Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessões persistentes), gates pré-PR, especialistas de código (Node, React, Postgres, NX, Docker, segurança) e testes (unit/integration/e2e, estratégia de teste, QA story points).",
       "category": "vertical",
       "tags": ["engineering","gitflow","pull-request","code-review","testing","qa","nodejs","react","onion"],
@@ -46,9 +45,21 @@
       "author": { "name": "Onion - Marcio Carvalho" }
     },
     {
+      "name": "onion-meta",
+      "displayName": "Onion · Meta",
+      "source": { "source": "git-subdir", "url": "https://github.com/marciocar/onion-plugins.git", "path": "plugins/onion-meta" },
+      "description": "Meta-fábrica do Sistema Onion: cria comandos, agentes, skills, abstrações SDAAL e knowledge bases pelos templates do framework, audita o próprio framework (evolve, dissect) e absorve skills de terceiros com proveniência.",
+      "category": "vertical",
+      "tags": ["onion","meta-factory","scaffolding","agents","commands","skills","self-audit"],
+      "license": "MIT",
+      "homepage": "https://onionevolve.com",
+      "repository": "https://github.com/marciocar/onion-plugins",
+      "author": { "name": "Onion - Marcio Carvalho" }
+    },
+    {
       "name": "onion-product",
       "displayName": "Onion · Product",
-      "source": "./plugins/onion-product",
+      "source": { "source": "git-subdir", "url": "https://github.com/marciocar/onion-plugins.git", "path": "plugins/onion-product" },
       "description": "Vertical de produto do Onion: descoberta a backlog (collect→refine→spec→feature), decomposição de tasks agnóstica ao provider, story points, extração de reuniões, apresentações e documentação de contexto (business/technical context, C4 + Mermaid, engenharia reversa, docs-health).",
       "category": "vertical",
       "tags": ["product","backlog","task-management","story-points","discovery","docs","c4","mermaid","spec-as-code","onion"],
@@ -60,7 +71,7 @@
     {
       "name": "onion",
       "displayName": "Onion",
-      "source": "./plugins/onion",
+      "source": { "source": "git-subdir", "url": "https://github.com/marciocar/onion-plugins.git", "path": "plugins/onion" },
       "description": "Núcleo operacional do Sistema Onion: o orquestrador mestre (skill onion), runtime de knowledge graph (kg + radar soberano + kg-freshness), sessões e diário, orquestração de subagentes, condução (wizard/onboarding/retro), validação de meta-specs e os adapters SDAAL de task-manager e forge.",
       "category": "core",
       "tags": ["onion","orchestration","knowledge-graph","sdaal","dogfood","elenxo","runtime","diary","metaspec"],

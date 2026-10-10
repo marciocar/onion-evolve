@@ -57,8 +57,11 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
     `D_MATRIZ_DE_PORTAS_2026_10` de `docs/onion/graph/door-role-parity-2026-09.kg.yaml`. Ela tira
     o standalone e o mini dos congelados e supera o corte de 2026-09-14 (tudo viajava para o
     standalone, adoção inclusa). O corte por porta é a F2, e o comando único é a F3; as quatro portas passam
-    por ele (a skill `onion-publish` virou a condução). Falta a F4 (tirar `plugins/` do core) e a F5
-    (a 1ª materialização do mini, que até lá o motor recusa).
+    por ele (a skill `onion-publish` virou a condução). A F4 tirou o `plugins/` montado do core: o
+    bundle nasce na publicação, a versão vem do plugin publicado, as guardas de plugin julgam o
+    bundle lá (`plugin-bundle-check.sh`), e o `marketplace.json` da raiz aponta o repo público.
+    Um PR que toca uma fonte bundlada não regenera mais nada. Falta a F5 (a 1ª materialização do
+    mini, que até lá o motor recusa).
 
   > ⚠️ **`onion-core` faltava nesta lista até 2026-09-23**, e a causa é de datas: a decisão dos dois
   > regimes foi selada em **16/09** e a porta nasceu pública em **17/09** — um dia depois, sem

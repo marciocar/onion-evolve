@@ -81,8 +81,13 @@ para que a ausência não seja lida como esquecimento.
 
 - **Não publica a 1ª materialização do onion-mini.** O registro dele tem pin `n/a`, e o README e o
   CLAUDE.md didáticos são da F5 (SAC-94). Até lá o motor recusa (rc 2), porque o repo dela guarda a destilação curada, sem `.claude/`, e substituí-la é a própria 1ª materialização.
-- **Não roda as REGRAS 19/72–79/61 sobre um bundle temporário de plugins.** Isso é da F4 (SAC-93),
-  junto com a saída de `plugins/` do core. Até lá elas seguem no lint do core.
+- **Não julga as guardas de plugin na catraca contra origin/main.** Desde a F4 (SAC-93, 2026-10-10)
+  o `plugins/` montado não é versionado no core, e as REGRAS 61 (metade do resultado), 72, 73, 74, 75,
+  76 (catálogo × raiz), 77 e 79 rodam no passo (5d) sobre o bundle montado
+  (`.claude/validation/plugin-bundle-check.sh`). A raiz temporária do checador não é repo git, então
+  a CATRACA-VIOLADA da REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca)
+  não roda ali; o baseline ainda separa passivo (SOFT) de novo (HARD). A REGRA 19 (Plugins de
+  vertical sincronizados com as fontes) foi aposentada: não há mais cópia versionada para sincronizar.
 - **Não vê conta de OUTRA máquina.** As contas vêm dos `local_path` do registro, de quem roda e das
   contas humanas do passwd local; uma conta que só existe noutra máquina fica fora. É o teto declarado
   da derivação.
