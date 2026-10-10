@@ -2,8 +2,7 @@
 title: 'Resíduo — F4 das portas: o plugins/ montado sai do core'
 date: 2026-10-10
 branch: feat/doors-plugins-out-f4
-reviewed_diff_sha256: 82b022a1b3ef60a381a02498c3787e42386777e12adacfd6f379ce4bcbcccde2
-reviewed_code_sha256: 8001e34c30a7fd8b9e5f3c05052d0dd02c9f1a5c47d6df73774a7314e1f6f4c5
+reviewed_diff_sha256: pendente
 findings_total: 16
 findings_real: 16
 findings_fixed: 12
@@ -69,3 +68,12 @@ completa não rodou local: o CI é o gate.
 
 - `Q_CREATE_VERTICAL_E_O_MOTOR_DO_MARKETPLACE_NO_PLUGIN`: abrir o motor do marketplace aos plugins.
 - A 1ª publicação do `onion-plugins` depois deste merge (o `onion-meta` passa a existir no público).
+
+## Mudança depois da revisão (re-revisada)
+
+O CI do #1009 reprovou a família `shell_pipefail_robustness` em dois sítios novos da bancada desta F4:
+`sort | head -1` nos plantios do caso `plugin-bundle (b)` (fechador precoce sob pipefail) e dois
+vereditos `produtor | grep -q` (casos `plugin-bundle (d2)` e `only-gate (ii)`). A cura é a forma que a
+guarda pede — `sed -n '1p'` drena a lista, e o veredito lê a variável por here-string — e não muda o
+que os casos julgam. Re-revisado no diff: só higiene de pipe, os mesmos predicados.
+`shell_pipefail_robustness` 3/0 e `plugin_bundle` + `capability` 18/0, sob `LC_ALL=C`.
