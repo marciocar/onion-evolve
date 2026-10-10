@@ -181,10 +181,6 @@ roles:
         - commands/engineer/plan.md
         - commands/engineer/work.md
         - commands/engineer/pr.md
-        # F5: o fallback que TODO adapter de task manager e de forge manda rodar quando falta variavel
-        # (6 citacoes nos arquivos que ja viajavam). Sem ele o iniciante recebe, no primeiro erro de
-        # configuracao, uma instrucao que nao pode cumprir. Nao cita nada fora do mini (medido).
-        - commands/meta/setup-integration.md
       agents:
         - agents/product/product-agent.md
         # F5: com TASK_MANAGER_PROVIDER=none (o default de quem comeca) e ele quem decompoe; o
@@ -224,6 +220,7 @@ roles:
         .claude/validation/kg-radar.sh: "warm-up, catch-up e engineer:work so o rodam SE houver um .kg.yaml no repo; o mini nao tem grafo, o passo nao dispara"
         .claude/hooks/aside-router-hook.sh: "o warm-up descreve o hook de marcadores; o mini nao leva hook nenhum, e o marcador vira texto comum"
         /meta:co-evolve: "warm-up e catch-up so o sugerem quando o hook de inbox sinaliza mensagem; o mini nao tem inbox nem hook"
+        /meta:setup-integration: "os adapters o sugerem quando falta variavel; o mini nao leva meta (a matriz), e as variaveis vao a mao no .env conforme utils/task-manager/README.md — sem elas o mini trabalha offline (provider none)"
         /meta:adopt: "citado em comentario e mensagem de onion-version.sh, resolve-integration-branch.sh e engineer:pr sobre repo ADOTADO; o mini nao adota"
         /git:flow: "o product:feature e o adapter do GitHub o sugerem como proximo passo; no mini o caminho guiado e o engineer:start"
         /git/sync: "o engineer:pr e o product:feature sugerem sincronizar depois do merge; no mini basta atualizar a branch principal"

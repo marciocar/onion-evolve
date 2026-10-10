@@ -14,7 +14,8 @@
 # Discriminador medivel por tras: `onion_version: n/a` marca quem NAO vendoriza.
 # PAPEIS DE PORTA (2026-10-09, F1.5 das portas, SAC-90): `role: plugins` (o standalone empacotado em
 # marketplace) e `role: mini` (porta didatica gerada por allowlist) so valem com `kind: door`. A `mini`
-# e a unica porta que pode declarar `onion_version: n/a`, ate a 1a materializacao (F5).
+# e a unica porta que pode declarar `onion_version: n/a`, ate a 1a publicacao (o caminho existe desde
+# a F5: `publish-door.sh onion-mini --replace-foreign`; publicar e do maestro, F6).
 # REGISTRO GUARDA ESTADO, NAO BIOGRAFIA: o historico de pins e as narrativas que moravam em comentario
 # foram para o grafo docs/onion/graph/door-role-parity-2026-09.kg.yaml (no E_REGISTRO_HONESTO_F15 e
 # vizinhos). O pin de adotante se confere com `ops/registry-pins.sh --check` e se carimba com `--seal`;
@@ -202,15 +203,16 @@ members:
 
   - id: onion-mini
     name: onion-mini (Onion Mini — a versão mini e portátil, ex-onion-portable)
-    # PORTA DIDÁTICA (D_MATRIZ_DE_PORTAS_2026_10). A materialização por ALLOWLIST a partir do core vem
-    #   na F5 (SAC-94); até lá o repo segue sendo a destilação antiga, sem carimbo, e por isso o pin é
-    #   `n/a` (exceção nomeada no members-validate.sh) e a REGRA 92 declara a paridade não-medida.
+    # PORTA DIDÁTICA (D_MATRIZ_DE_PORTAS_2026_10). A materialização por ALLOWLIST a partir do core tem
+    #   caminho desde a F5 (SAC-94); até a 1ª publicação (do maestro) o repo segue sendo a destilação
+    #   antiga, sem carimbo, e por isso o pin é `n/a` (exceção nomeada no members-validate.sh) e a
+    #   REGRA 92 declara a paridade não-medida. A destilação fica numa tag de arquivo no próprio repo.
     role: mini                  # papel de porta: allowlist didática para iniciantes
-    kind: door                  # distribui; até a F5, conteúdo ainda é a destilação curada
+    kind: door                  # distribui; até a 1ª publicação, conteúdo ainda é a destilação curada
     parent: onion-evolve
     remote: github.com/marciocar/onion-mini
     local_path: "/home/marcio/onion-mini"
-    onion_version: n/a          # ainda não materializada pelo carimbo (F5, SAC-94)
+    onion_version: n/a          # ainda não publicada pelo carimbo (caminho desde a F5, SAC-94)
     adopted_at: 2026-07-05      # data da adoção definitiva/rebrand (repo existe desde jun/2026)
     mode: distilled             # anotação livre; o trust engine só valida role
     published_at: "https://onionevolve.com/mini/"   # vitrine no site da família (M2 ✅ 2026-07-05); código: github.com/marciocar/onion-mini

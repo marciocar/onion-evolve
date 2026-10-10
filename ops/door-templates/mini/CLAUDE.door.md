@@ -14,8 +14,12 @@ sempre qual é o próximo comando.
   ainda tem dúvida.
 - `/engineer:plan` divide o trabalho em fases pequenas; o `/engineer:work` executa uma fase por vez.
 - `/catch-up` retoma de onde a pessoa parou. A palavra `onion`, sozinha, pede orientação.
-- Se o comando pedir uma variável de ambiente que falta, sugira `/meta:setup-integration`. Sem
-  gerenciador configurado, trabalhe offline (`TASK_MANAGER_PROVIDER=none`): as tarefas ficam na sessão.
+- Sem gerenciador configurado, trabalhe offline (`TASK_MANAGER_PROVIDER=none`): as tarefas ficam na
+  sessão. Se um comando pedir uma variável que falta, explique que ela vai no `.env` (a lista por
+  gerenciador está em `.claude/utils/task-manager/README.md`), e siga offline enquanto isso. Nunca abra
+  nem imprima o `.env`: ele guarda chaves.
+- Alguns comandos sugerem um comando de configurar integração que é da versão completa; no Mini a
+  configuração é o `.env`, como acima.
 
 ## Onde as coisas ficam
 

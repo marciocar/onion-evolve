@@ -170,8 +170,8 @@ if isinstance(doc, dict):
         if ver in (None, ""):
             err(f"{tag}: 'onion_version' ausente (use 'n/a' só p/ distillation/method)")
         elif kind in VENDOR:
-            # EXCEÇÃO ÚNICA E NOMEADA: a porta `mini` ainda não foi materializada pelo carimbo (a 1ª
-            # materialização por allowlist é a F5, SAC-94). Até lá não existe pin, e escrever um seria
+            # EXCEÇÃO ÚNICA E NOMEADA: a porta `mini` ainda não foi publicada pelo carimbo (o caminho da
+            # 1ª materialização existe desde a F5, SAC-94; publicar é do maestro). Até lá não existe pin, e escrever um seria
             # inventar. Só `role: mini` com `kind: door` pode declarar `n/a`; o `plugins` não, porque o
             # pin dele existe (o `ref` do provenance.json publicado).
             if str(ver) == "n/a" and kind == "door" and role == "mini":

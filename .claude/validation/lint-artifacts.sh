@@ -1738,6 +1738,13 @@ for role, spec in (d.get("roles") or {}).items():
         for x in (al.get(key) or []):
             if not os.path.exists(os.path.join(root, ".claude", x)):
                 print("ALLOWDEAD\t%s\t%s" % (role, x))
+    # OVERLAYS (F5 das portas): a fonte de cada um tem de existir — mas só onde portas se materializam
+    # (o motor está aqui). O roles.yaml viaja; as fontes, em ops/, não, e cobrá-las numa porta seria
+    # cobrar o que a matriz não lhe dá.
+    if os.path.isfile(os.path.join(root, "ops", "materialize-door.sh")):
+        for dst, src in sorted((al.get("overlays") or {}).items()):
+            if not os.path.isfile(os.path.join(root, str(src))):
+                print("OVERDEAD\t%s\t%s" % (role, src))
 owner = {}
 for name, lst in sets.items():
     for t in (lst or []):
@@ -1775,6 +1782,7 @@ PY
       DUPSET) violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' está em MAIS DE UM conjunto (${b}) — os conjuntos particionam commands/meta/: deixe o comando em um só" ;;
       UNSET) violation "HARD" "utils/marketplace/roles.yaml" "comando /meta:${a} não está em NENHUM work_tool_set — classifique-o (full, meta_factory, federation, adoption ou pending) em roles.yaml; sem classificação o corte por papel decide por default, em silêncio" ;;
       ALLOWDEAD) violation "HARD" "utils/marketplace/roles.yaml" "a allowlist do papel '${a}' nomeia '.claude/${b}', que não existe — corrija o caminho ou tire-o da lista" ;;
+      OVERDEAD) violation "HARD" "utils/marketplace/roles.yaml" "o overlay do papel '${a}' aponta a fonte '${b}', que não existe — a porta sairia sem o arquivo próprio dela (o materializador recusa); crie a fonte ou corrija o caminho" ;;
     esac
   done <<< "${wt_out}"
   local wtman="${vdir}/onion.manifest.sh" ft   # 2026-09-04: onion absorveu onion-work-tools (F2)

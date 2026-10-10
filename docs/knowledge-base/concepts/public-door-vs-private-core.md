@@ -96,7 +96,10 @@ identidade/contratos e federa apenas a comunicação) + `fonte≠derivação`) �
 >   `meta/` em conjuntos e o `vendor-manifest.sh --list standalone` mostra o que a porta leva. Vale a
 >   partir da próxima materialização dela.
 > - **`onion-mini`** deixa de ser destilação e passa a porta **gerada do core por allowlist** (vendoriza
->   um recorte de `.claude/`), na F5. A destilação atual segue como artefato à parte.
+>   um recorte de `.claude/`). O caminho existe desde a F5 (2026-10-10): README, CLAUDE.md e skill onion
+>   próprios, verificação sem lint (allowlist exata, sem ponteiro morto, sem caminho de máquina), e a
+>   destilação antiga arquivada numa tag do próprio repo na 1ª publicação. Ela segue como artefato à
+>   parte (o GPT a usa); a publicação é do maestro.
 
 **Os KGs são soberanos por repo.** Os `.kg.yaml` do core (investigações/domínio) são privados e **não
 viajam** (só destilado circula). Um door que investigue gera os **seus** `.kg.yaml` locais — estado dele,

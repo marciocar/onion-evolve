@@ -156,9 +156,10 @@ while IFS=$'\x1f' read -r mid role path kind; do
   #     papel se reconhece pela FORMA do repo. Medido no clone em 2026-10-09: 5 plugins, nenhum
   #     `.claude/`. Sem este ramo a guarda acusaria CARIMBO-AUSENTE e mandaria rodar o
   #     materialize-door.sh, que monta uma árvore `.claude/` — a cura ERRADA para essa porta.
-  #   · `mini` ainda NÃO foi materializada pelo carimbo: a 1ª materialização por allowlist é a F5
-  #     (SAC-94). Hoje o clone é a destilação antiga, sem carimbo. A guarda DECLARA não-medido, como
-  #     no CI; depois da F5 o carimbo existe e cai na comparação normal abaixo.
+  #   · `mini` ainda NÃO foi PUBLICADA pelo carimbo: a 1ª materialização por allowlist tem caminho
+  #     desde a F5 (SAC-94, `publish-door.sh --replace-foreign`), e a publicação é ato do maestro (F6).
+  #     Até ela o clone é a destilação antiga, sem carimbo. A guarda DECLARA não-medido, como no CI;
+  #     depois da publicação o carimbo existe e cai na comparação normal abaixo.
   #   Se uma dessas portas tiver `.onion-version`, NENHUM ramo especial vale: compara como as outras.
   #   TETO DECLARADO: para `plugins` esta guarda mede só a PRESENÇA da proveniência (a forma), não
   #   compara o `ref` com o `onion_version` do registro — isso é pin, e o pin é da REGRA 85 e do
@@ -198,7 +199,7 @@ if [ "${adopter_unreadable}" -gt 0 ]; then
   echo "door-role-parity: ${adopter_unreadable} adotante(s) com clone INALCANÇÁVEL — compatibilidade registro×carimbo NÃO MEDIDA neles." >&2
 fi
 if [ "${mini_pending}" -gt 0 ]; then
-  echo "door-role-parity: ${mini_pending} porta(s) \`mini\` ainda sem carimbo (a materialização por allowlist é a F5, SAC-94) — paridade NÃO MEDIDA nelas." >&2
+  echo "door-role-parity: ${mini_pending} porta(s) \`mini\` ainda sem carimbo (a 1ª publicação por allowlist é do maestro: /meta:publish onion-mini --replace-foreign) — paridade NÃO MEDIDA nelas." >&2
 fi
 if [ "${unreadable}" -gt 0 ]; then
   echo "door-role-parity: ${unreadable} porta(s) com clone INALCANÇÁVEL (sem local_path, ou diretório ausente) — paridade NÃO MEDIDA nelas. É o caso esperado no CI, onde o clone não existe; medir exigiria rede e credencial dentro do lint." >&2
