@@ -13419,17 +13419,17 @@ run_plugin_bundle_selftests() {
 
   # (b) defeitos plantados numa CÓPIA — um por regra, todos na mesma cópia, cada um cobrado pelo seu nº
   bad="${d}/bad"; cp -R "${tgt}" "${bad}"
-  local pcmd; pcmd="$(find "${bad}/plugins/onion-product/commands" -name '*.md' | LC_ALL=C sort | head -1)"
+  local pcmd; pcmd="$(find "${bad}/plugins/onion-product/commands" -name '*.md' | LC_ALL=C sort | sed -n '1p')"
   printf -- '---\nname: adopt\ndescription: x\n---\nplantado\n' > "${bad}/plugins/onion/commands/adopt.md"         # 61
   printf '\nRode /engineer:pr depois.\n' >> "${pcmd}"                                                             # 72
   printf '\nVeja `.claude/utils/zz-nao-viaja/x.md`.\n' >> "${pcmd}"                                               # 74
   printf '\nIrmã: [morta](../kb/zz-morta-plantada.md)\n' >> "${pcmd}"                                             # 75
   # 74 no plugin QUE TEM a isenção de destino (onion-meta): ponteiro de LEITURA fundo continua julgado —
   # a isenção cobre raiz, categoria de 1 nível e placeholder, nunca um caminho de conteúdo do core
-  local mcmd; mcmd="$(find "${bad}/plugins/onion-meta/commands" -name '*.md' 2>/dev/null | LC_ALL=C sort | head -1)"
+  local mcmd; mcmd="$(find "${bad}/plugins/onion-meta/commands" -name '*.md' 2>/dev/null | LC_ALL=C sort | sed -n '1p')"
   [ -n "${mcmd}" ] && printf '\nLeia `.claude/utils/zz-leitura-plantada/y.md`.\n' >> "${mcmd}"                   # 74 (isenção estreita)
   # 77: conhecimento DUPLICADO entre plugins (a mesma skill em dois)
-  local sk; sk="$(find "${bad}/plugins/onion/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | LC_ALL=C sort | head -1)"
+  local sk; sk="$(find "${bad}/plugins/onion/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | LC_ALL=C sort | sed -n '1p')"
   [ -n "${sk}" ] && mkdir -p "${bad}/plugins/onion-product/skills" && cp -R "${sk}" "${bad}/plugins/onion-product/skills/"   # 77
   python3 - "${bad}/.claude-plugin/marketplace.json" "${bad}/plugins/onion/hooks/hooks.json" <<'PYB'
 import json, sys
@@ -13481,7 +13481,8 @@ PYB
   # (d) NÃO TRAVAR — a metade "lint de PR sobre fonte bundlada alterada não cobra plugin" mora na família
   #     capability (caso only-gate (ii)), que altera a fonte num SANDBOX e roda o lint real por --only.
   #     Aqui, a outra metade: o pre-commit não monta plugin.
-  if ! grep -vE '^[[:space:]]*#' "${REPO_ROOT}/.githooks/pre-commit" 2>/dev/null | grep -q 'assemble-plugin\.sh'; then
+  local _hook_code; _hook_code="$(grep -vE '^[[:space:]]*#' "${REPO_ROOT}/.githooks/pre-commit" 2>/dev/null || true)"
+  if ! grep -q 'assemble-plugin\.sh' <<< "${_hook_code}"; then
     record_pass "plugin-bundle: (d2) o pre-commit não monta plugin (o auto-fix da REGRA 19 saiu)"
   else record_fail "plugin-bundle: (d2) pre-commit" "o pre-commit invoca assemble-plugin.sh — o atrito de regenerar plugin por commit voltou"; fi
 
@@ -13709,7 +13710,8 @@ run_capability_selftests() {
     bd_out="$(bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${bd_probe}" 2>&1)" || true
     # restaura o sandbox (outros casos usam o mesmo)
     sed -i '/only-gate-probe/d' "${bd_probe}"
-    if ! grep -E '^VIOLATION' <<< "${bd_out}" | grep -qE 'fora de sincronia|plugin ausente|tree_sha divergente|plugins/'; then
+    local bd_viol; bd_viol="$(grep -E '^VIOLATION' <<< "${bd_out}" || true)"
+    if ! grep -qE 'fora de sincronia|plugin ausente|tree_sha divergente|plugins/' <<< "${bd_viol}"; then
       record_pass "only-gate: fonte bundlada alterada via --only NÃO cobra plugin regenerado (F4: o PR comum não regenera nada)"
     else
       record_fail "only-gate: fonte bundlada" "o lint de PR cobrou plugin regenerado por uma fonte bundlada — o atrito da F4 voltou: $(grep -E '^VIOLATION' <<< "${bd_out}" | grep -E 'sincronia|ausente|tree_sha|plugins/' | head -1 | cut -c1-200)"
