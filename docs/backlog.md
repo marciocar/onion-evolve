@@ -36,7 +36,7 @@
 |--:|---|---|---|
 | 87.0 | `Q_RULE_CORPUS_ENGINEERING_1001` | engenharia-de-corpus-de-regras-2026-10 | Como a comunidade GERENCIA, MEDE e APOSENTA um corpus grande de regras escritas à mão, e o que o Onion ABSORVE, ADOTA ou RECUSA  |
 | 45.0 | `D_RULE_CORPUS_STRATEGY_1001` | engenharia-de-corpus-de-regras-2026-10 | DECISÃO ABERTA — o que o Onion faz com a engenharia do seu corpus de 93 guardas. OPÇÕES NOMEADAS: A — ABSORVER cobertura de |
-| 33.8 | `C_OPCAO_B_ABSORVER_ORDEM_DERIVADA` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO B — ABSORVER ordem DERIVADA: inferir os conjuntos escreve/lê de cada etapa EXECUTANDO o pipeline que já existe (diff d |
+| 33.8 | `C_OPCAO_B_ABSORVER_ORDEM_DERIVADA` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO B (confiança 0.75): absorver a ordem DERIVADA — inferir escreve/lê de cada etapa executando o pipeline, fixers até fi |
 | 17.5 | `C_OPCAO_E_RECUSAR_AGORA_E_RE_RODAR_ESTREITO` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO E — RECUSAR decidir agora e RE-RODAR a pesquisa, ESTREITA, nas 5 fontes não lidas do eixo 3/2 (nx inferred-tasks, ruff, |
 | 9.8 | `C_OPCAO_A_ABSORVER_COBERTURA_DE_REGRA` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO A — ABSORVER cobertura de regra: contador por regra dentro do motor de lint que já existe, mais baseline de regras-que- |
 | 6.6 | `C_OPCAO_F_ABSORVER_TESTE_DE_MUTACAO_DE_REGRA` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO F — ABSORVER teste de mutação de regra: automatizar na bancada o que hoje esta casa faz À MÃO (mutar o sujeito e exi |
@@ -95,7 +95,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 66.0 | `Q_INFRA_VPS_TREATMENT_2026` | infra-vps-2026-10 | Como o Onion deve tratar INFRA/VPS — sistema operacional, servicos, Docker, firewall, reboot e updates pendentes, sessoes orfas  |
-| 22.0 | `C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS` | infra-vps-2026-10 | OPCAO B linha (B enxuta) — RECOMENDADA pelo Elenxo: censo shell que COMPOE sinais nativos (needrestart -b, /var/run/reboot-requi |
+| 22.0 | `C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS` | infra-vps-2026-10 | OPÇÃO B linha (B enxuta), recomendada pelo Elenxo: censo shell que compõe sinais nativos (needrestart -b, reboot-required.pkgs, |
 | 12.0 | `C_OPCAO_B_GRAFO_CENSO_COMANDO` | infra-vps-2026-10 | OPCAO B — grafo de dominio da VPS como SSOT viva + censo determinístico ops/vps-census.sh medindo o vivo contra o grafo + coman |
 | 5.4 | `Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA` | infra-vps-2026-10 | VAZAMENTO JA EXISTENTE, achado ao medir a pergunta do maestro: a guarda vps-exposure-check.sh mora em .claude/validation/ (raiz qu |
 | 4.0 | `C_OPCAO_A_NADA_NOVO` | infra-vps-2026-10 | OPCAO A — nada novo: manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh. A FA |
@@ -291,19 +291,19 @@
 | 4.5 | `C_OPCAO_B_ARCO_DIATAXIS` | deck-patterns-2026-09 | OPCAO (B): arco Diataxis — reorganizar o deck nas 4 categorias (tutorials -> how-to -> reference -> explanation) mantendo-as est |
 | 1.6 | `C_OPCAO_E_APLICAR_OS_QUATRO_ACHADOS` | deck-patterns-2026-09 | OPCAO (E): aplicar literalmente os 4 achados sobreviventes — Diataxis + teto de 2 camadas de progressive disclosure sobre o deck |
 
+## contrato-kg-absorcao-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 32.4 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
+| 9.6 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
+| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
+
 ## radar-E3-2026-09-03 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 31.2 | `Q_E3_DELTA_2_1_259` | radar-E3-2026-09-03 | O que mudou no Claude Code entre 2.1.257 e 2.1.259 que altera a ADEQUACAO da estrategia do Onion (tiering, hooks exit 2, orquestra |
-
-## contrato-kg-absorcao-2026-10 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 30.6 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
-| 9.6 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
-| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
 ## onion-identity-2026-07 — 4 item(ns)
 
@@ -462,7 +462,7 @@
 | 7.7 | `D_FASE_E_PRODUCT_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE E — onion-product (49 artefatos) em EN. Maior massa do bundle. Mesmo protocolo; baseline encolhe. |
 | 7.2 | `D_PR03_GATE_VALIDATE_NA_CASA` | plugins-en-compliance-2026-09 | PR 3 — o gate da Anthropic vira gate da casa. Helper .claude/validation/plugin-cli-validate.sh no contrato TSV de plugin-bare-pa |
 | 5.7 | `Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO` | plugins-en-compliance-2026-09 | O caminho verificado de merge tem a falha INVERSA da que ele cura: da FALSO NEGATIVO. Ele existe para nunca declarar sucesso falso |
-| 5.7 | `Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO` | plugins-en-compliance-2026-09 | A casa para onde o desacoplamento manda o publico nao tem porta nem balcao. `homepage` passa a apontar para onionevolve.com, mas / |
+| 5.7 | `Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO` | plugins-en-compliance-2026-09 | A casa para onde o desacoplamento manda o público não tem porta nem balcão: onionevolve.com/en/ dá 404 e o site não tem pági |
 | 5.4 | `Q_SEMVER_DA_L0` | plugins-en-compliance-2026-09 | DECISAO DO @metaspec-gate-keeper — 2.0.0 ou 1.1.0. Revogar uma linha da qual 176 artefatos dependem tem cara de major; se o gate |
 | 5.4 | `Q_SUBMISSAO_AO_PORTAL` | plugins-en-compliance-2026-09 | ATO DO MAESTRO — apertar o botao. O submissivel e o marketplace COMUNITARIO; o oficial e curadoria discricionaria da Anthropic e |
 | 5.1 | `D_FASE_F_META_FABRICA_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE F — os 38 artefatos NAO embarcados (meta-fabrica). Por que existem nesta onda: deixar 38 description: em pt-BR na me |
@@ -508,7 +508,7 @@
 | 10.8 | `C_docker_floor_gap` | m2-bridge-logto-2026-07 | GAP (impacto ELEVADO na v2+, porque o Logto virou caminho crítico): Logto+Postgres (docker) só têm teto duro. MEDIDO no cgroup: |
 | 10.2 | `D_logto_not_ssot` | m2-bridge-logto-2026-07 | INVARIANTE herdada do M3: Logto = emissor/validador de identidade (commodity-BUY), NUNCA SSOT de autorização fina. A autorizaç |
 | 6.0 | `Q_route_inventory` | m2-bridge-logto-2026-07 | VPS-DECLARADO: o inventário EXATO das rotas do app Hono só existe no host. A tabela do §3.4 é CONTRATO, não fato. P0.2 enumer |
-| 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2 — PROVA NOVA no P0.6: a semântica de cgroup_parent DEPENDE do cgroup driver do docker. MEDIDO hoje: driver = systemd (h |
+| 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
 
 ## m3-federation-admin-2026-07 — 11 item(ns)
@@ -563,7 +563,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 14.2 | `E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO` | identidade-onion-vps-2026-08 | O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotan |
-| 12.0 | `Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO` | identidade-onion-vps-2026-08 | ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. Medido em `/home/marcio/onion-adopt-arandek/dock |
+| 12.0 | `Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO` | identidade-onion-vps-2026-08 | ACHADO DE ADOTANTE, não comunicado (ação do maestro): o docker-compose.yml rastreado em ArandekBR/arandek tem cinco segredos li |
 | 8.0 | `E_MEMORIA_DE_AGENTE_E_COMMODITY_PELO_DINHEIRO` | identidade-onion-vps-2026-08 | O EIXO DO DINHEIRO RESPONDE O QUE DOUTRINA NENHUMA RESPONDE, e o veredito e desconfortavel: `Agent Memory Systems` e **3,4% dos de |
 | 6.4 | `Q_REFUTES_EDGE_SEM_PAR` | identidade-onion-vps-2026-08 | A lacuna REAL que restou do Q_LACUNA refutado: a aresta REFUTES tipada (refutacao como cidada de 1a classe do grafo, com reconcili |
 | 5.6 | `Q_LOGTO_QUANDO_FECHAR_O_CADASTRO` | identidade-onion-vps-2026-08 | quando fechar de novo o cadastro do Logto (signInMode: SignIn) — GATILHO: o propósito do cadastro aberto acabar, surgir conta q |
@@ -575,7 +575,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 14.2 | `Q_UPDATE_EXIGE_ADOCAO_INTEGRADA` | onion-plugin-publication-2026-08 | ACHADO DO 1o --update REAL DE UM GREENFIELD (2026-09-05, medido): o `vendor-branch update` recusa com rc=11 BASE CRUZADA enquanto  |
-| 7.6 | `Q_LINT_ABORTA_SEM_PYTHON_E_NAO_DIZ` | onion-plugin-publication-2026-08 | FAIL-OPEN DE GATE, PRE-EXISTENTE, medido 2026-09-06 in-tree nos dois lados: sem `python3` no PATH, o `lint-artifacts.sh` ABORTA lo |
+| 7.6 | `Q_LINT_ABORTA_SEM_PYTHON_E_NAO_DIZ` | onion-plugin-publication-2026-08 | FAIL-OPEN DE GATE pré-existente (medido in-tree, 2026-09-06): sem python3 no PATH, o lint-artifacts.sh aborta após a REGRA 39 se |
 | 7.6 | `Q_MARKETPLACE_PUBLICO_EM_GERACAO_ANTIGA` | onion-plugin-publication-2026-08 | DIVIDA MEDIDA (sinal de campo 2026-09-05): o repo publico marciocar/onion-plugins esta na geracao PRE-CONSOLIDACAO (8 plugins) enq |
 | 5.7 | `Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA` | onion-plugin-publication-2026-08 | ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEI |
 | 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
@@ -654,7 +654,7 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 8.4 | `D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO` | audit-textual-gates-2026-09 | DECISAO PROPOSTA: dos 4 itens do MOAT do /meta:drive (merge · deploy · repo alheio · relogio), o merge ganhou veto neste PR; de |
+| 8.4 | `D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO` | audit-textual-gates-2026-09 | DECISÃO PROPOSTA: do MOAT do /meta:drive só o merge ganhou veto; deploy fora dos wrappers, push em repo alheio (git -C <clone de |
 | 4.8 | `Q_REGRA56_VERACIDADE_DOS_ACHADOS` | audit-textual-gates-2026-09 | Quanto os campos findings_total/findings_real/verdict do residuo R56 correspondem a achados REAIS quando o revisor e a propria ses |
 | 3.6 | `Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO` | audit-textual-gates-2026-09 | O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotant |
 | 3.6 | `Q_R15_WRAP_NO_CAMINHO_CRITICO` | audit-textual-gates-2026-09 | onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted- |
