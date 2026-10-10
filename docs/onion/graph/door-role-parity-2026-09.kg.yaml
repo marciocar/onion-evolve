@@ -2,8 +2,7 @@
 # Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
-  x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote da F4 das portas (SAC-93, 2026-10-10): E_PLUGINS_FORA_DO_CORE_F4 nasce confirmed (DEV) apoiando D_MATRIZ_DE_PORTAS_2026_10; Q_CREATE_VERTICAL_E_O_MOTOR_DO_MARKETPLACE_NO_PLUGIN nasce open para o maestro (gatilho: 1o pedido de criar vertical numa instalação por plugin); nenhum flip auto-selado; PR para merge humano"
+  x_drive_checkpoint: sealed
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
