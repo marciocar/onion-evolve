@@ -1416,6 +1416,24 @@ RED
   if _moat_hit "${out}"; then
     record_pass "moat-boundary: (d) co-evolve + hook do inbox (federação upstream) → HARD desde a matriz das portas"
   else record_fail "moat-boundary: (d)" "federação upstream passou no manifesto publicável: rc=${rc}"; fi
+  # (d-MUT) com a denylist ANTERIOR à matriz (co-evolve/co-relay permitidos, hook fora), (d) passa calado.
+  #     O lint mutante roda num sandbox FORA da árvore viva (um .sh a mais em validation/ seria fixture
+  #     disputável pelas faixas paralelas), com utils/commands/hooks em symlink para o repo real — assim
+  #     ele enxerga a MESMA fixture em verticals/ que os casos acima.
+  local sbx; sbx="$(mktemp -d)"
+  mkdir -p "${sbx}/.claude/validation"
+  local _lk; for _lk in utils commands hooks agents skills; do ln -s "${REPO_ROOT}/.claude/${_lk}" "${sbx}/.claude/${_lk}"; done
+  sed -e "s#co-(announce|deliver|evolve|relay)|co-evolution-inbox-check|#co-(announce|deliver)|#" "${lint}" > "${sbx}/.claude/validation/lint-artifacts.sh"
+  cp "${lint}" "${sbx}/.claude/validation/lint-orig.sh"
+  if ! cmp -s "${lint}" "${sbx}/.claude/validation/lint-artifacts.sh"; then
+    # controle positivo: o lint ORIGINAL no mesmo sandbox acusa — senão o "passa" do mutante seria sandbox quebrado
+    local _ctl; _ctl="$(bash "${sbx}/.claude/validation/lint-orig.sh" --only="${mf}" 2>&1 || true)"
+    rc=0; out="$(bash "${sbx}/.claude/validation/lint-artifacts.sh" --only="${mf}" 2>&1)" || rc=$?
+    if _moat_hit "${_ctl}" && ! _moat_hit "${out}"; then
+      record_pass "moat-boundary: (d-MUT) com a denylist de antes da matriz a federação upstream passa — (d) é load-bearing"
+    else record_fail "moat-boundary: (d-MUT)" "o mutante ainda barra co-evolve/hook — (d) não prova a fronteira nova"; fi
+  else record_fail "moat-boundary: (d-MUT) setup" "a mutação não foi aplicada"; fi
+  rm -rf "${sbx}"
   rm -f "${mf}"
 }
 
@@ -16624,7 +16642,8 @@ run_role_cut_selftests() {
 
   # (a-MUT) esvaziar `_role_cut` faz standalone voltar a ser adopted — prova que (a) mede algo.
   local mut="${d}/vm-mut.sh"
-  sed 's|^    standalone)|    standalone) : ;;\n    __nunca__)|' "${vm}" > "${mut}"
+  # a âncora acompanha o `case` do _role_cut, que desde 2026-10-10 é `standalone|plugins)` (F2 das portas)
+  sed 's#^    standalone|plugins)$#    standalone|plugins) : ;;\n    __nunca__)#' "${vm}" > "${mut}"
   if ! cmp -s "${vm}" "${mut}"; then
     local _m; _m="$(bash "${mut}" --role standalone --repo "${REPO_ROOT}" 2>/dev/null)"
     if [ "${_m}" = "${_ad}" ]; then
@@ -16942,7 +16961,10 @@ run_role_cut_selftests() {
   else record_fail "role-cut: (p-MUT) setup" "a mutação não foi aplicada"; fi
 
   # (q) --list conta o transporte REAL: o total impresso é o número de arquivos que o git archive copia.
-  local _lt; _lt="$(bash "${vm}" --list standalone --repo "${REPO_ROOT}" 2>/dev/null | awk '$1=="total"{print $2; exit}')"
+  # SEM `exit` no awk: fechar o pipe cedo dá SIGPIPE no produtor e, sob pipefail+set -e, mata a suíte
+  # (medido no 1º gate deste caso: exit 141 — a classe pipefail-epipe-early-closer).
+  local _lo _lt; _lo="$(bash "${vm}" --list standalone --repo "${REPO_ROOT}" 2>/dev/null || true)"
+  _lt="$(awk '$1=="total"{print $2}' <<< "${_lo}")"
   if [ -n "${_lt}" ] && [ "${_lt}" = "$(grep -c . <<< "${_sa_l}")" ]; then
     record_pass "role-cut: (q) --list standalone imprime total=${_lt}, o mesmo que o bundle extraído"
   else record_fail "role-cut: (q)" "--list disse total='${_lt}', o bundle tem $(grep -c . <<< "${_sa_l}") — a listagem virou segunda lista"; fi

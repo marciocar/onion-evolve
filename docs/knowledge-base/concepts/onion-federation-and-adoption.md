@@ -324,7 +324,9 @@ faltava em `members.yaml`: drift de registro regularizado em 07-19).
 
 ### 6.7 A porta pública Claude — `onion-standalone`
 `role: standalone`, mas é **porta de framework**, não projeto-adotante: distribui o **bundle
-standalone** (eng/product/testing/docs), **sem meta-factory nem memória privada de evolução**. Nasceu
+standalone** (eng/product/testing/docs), **sem memória privada de evolução** (e, até a F2 das portas de
+2026-10-10, também sem meta-factory: pela matriz `D_MATRIZ_DE_PORTAS_2026_10` ela passa a levar a fábrica e
+perde só adoção e federação). Nasceu
 2026-07-19 via `/meta:adopt` **role-scoped**, com pin verificado — a 1ª peça que desfaz o colapso
 "porta ≡ core" ([public-door-vs-private-core.md](public-door-vs-private-core.md)). Nasceu privada e **flipou PÚBLICA em 2026-07-19** (`onion-standalone` é público — verificado ao vivo).
 Resta **gated** só **reapontar o redirect** `onion-claude → onion-standalone`: o `onion-claude` segue
