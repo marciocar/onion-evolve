@@ -24181,6 +24181,7 @@ _family run_kg_contract_check_selftests
 # Casos: (a) as duas polaridades verbatim · (b) o modo que o lint consome, no corpus real · (c)–(f) a catraca
 # num repo-sandbox · (g) o dispatcher de produção · (h) sem a classe → rc 2 · (m) UM MUTANTE POR FORMA.
 run_kg_machine_path_selftests() {
+  # o baseline (.claude/validation/kg-machine-path-baseline.txt) é exercitado pelo (b), no corpus real
   local chk="${REPO_ROOT}/.claude/validation/kg-machine-path-check.sh" lib="${REPO_ROOT}/.claude/utils/kg/machine_path.py"
   if [ ! -f "${chk}" ] || [ ! -f "${lib}" ]; then record_fail "kg-machine-path" "guarda ou classe ausente"; return; fi
   python3 -c 'import yaml' >/dev/null 2>&1 || { record_skip "kg-machine-path: PyYAML ausente (SUT não exercido)"; return; }
@@ -24188,7 +24189,7 @@ run_kg_machine_path_selftests() {
   # (a) o --selftest próprio: acusa cada forma medida e cala em cada isenção selada
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE '^kg-machine-path selftest: [0-9]+ passaram, 0 falharam$' <<< "${o}"; then
-    record_pass "kg-machine-path: (a) --selftest verde ($(grep -c '✅' <<< "${o}") casos: 15 formas acusadas, 12 isenções caladas, 10 de P4)"
+    record_pass "kg-machine-path: (a) --selftest verde ($(grep -c '✅' <<< "${o}") casos: 19 formas acusadas, 15 isenções caladas, 10 de P4)"
   else record_fail "kg-machine-path: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: --tsv sai 0 e silencioso (passivo ZERO; os 3 isentos
   #     estão no baseline). CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
@@ -24289,6 +24290,10 @@ _ROOTS_SLASH = "|".join(FS_ROOTS)$(printf '\x1f')_ROOTS_SLASH = r'[A-Za-z0-9._@+
 _BARE_OK = tuple(r for r in FS_ROOTS if r != "run")$(printf '\x1f')_BARE_OK = FS_ROOTS$(printf '\x1f')cala: /run nu
 if valid and (mark == "citação" or not is_home(kind, tok)):$(printf '\x1f')if valid:$(printf '\x1f')P4 acusa: vetor com ~/
 valid = isinstance(mark, str) and mark in P4_MARKS$(printf '\x1f')valid = bool(mark)$(printf '\x1f')P4 acusa: marcador booleano
+[\s"\'(=,;\[:>|{⟨«“‘→])|(?<=^$(printf '\x1f')[\s"\'(=,;\[\`:>|{⟨«“‘→])|(?<=^$(printf '\x1f')cala: crase que FECHA
+(?<=^[\d&])|(?<=\s[\d&]))>>?$(printf '\x1f')(?<=[\d&]))>>?$(printf '\x1f')cala: placeholder que fecha
+r'(?:/' + _SEG + r')*/?)'$(printf '\x1f')r'(?:/' + _SEG + r')+/?)'$(printf '\x1f')acusa: cd para absoluto de um segmento
+(?![A-Za-z0-9_-])', re.I)$(printf '\x1f')(?![A-Za-z0-9_-])')$(printf '\x1f')acusa: hostname em maiúsculas
 EOF_MUT
   rm -rf "${sb}"
 }

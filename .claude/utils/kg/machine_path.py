@@ -49,7 +49,10 @@ P4_MARKS = ("citação", "vetor", "receita")
 _DEV_STD = r'(?!dev/(?:null|stdin|stdout|stderr)(?![\w/.-]))'
 # início de token: começo, espaço, aspas, abre-parêntese/colchete/chave, atribuição, separadores, crase,
 # dois-pontos (PATH=/usr/bin:/bin), redirecionamento e os abre-aspas tipográficos da narrative
-_TS = r'(?:^|(?<=[\s"\'(=,;\[`:<>|{⟨«“]))'
+# a crase só abre token quando ELA abre (depois de início, espaço ou delimitador): a que FECHA, seguida de
+# `/raiz` no sentido de "ou" (`plane:`/`status:`/etc.), não é caminho (achado F1 do Elenxo, 2 casos na prosa).
+# `<` fica de fora: `</var>` é tag de fechamento (F3); `< /etc/x` com espaço segue acusado.
+_TS = r'(?:^|(?<=[\s"\'(=,;\[:>|{⟨«“‘→])|(?<=^`)|(?<=[\s(\[{"\'>*_]`))'
 _SEG = r'[A-Za-z0-9._@+-]+'
 # fim de raiz nua: não segue letra/dígito/_/-, e ponto só se for fim de frase (não `/tmp.x`)
 _END = r'(?![A-Za-z0-9_-]|\.[A-Za-z0-9])'
@@ -60,7 +63,7 @@ _FS = r'/' + _DEV_STD + r'(?:(?:' + _ROOTS_SLASH + r')/|(?:' + _ROOTS_BARE + r')
 
 CLASS_RE = re.compile(
     _TS + r'(?P<fs>' + _FS + r')'
-    + r'|(?:^|(?<=[\s"\'(=,;\[`<>|{⟨«“]))(?P<dbl>//(?=[A-Za-z0-9_+-])' + r'[A-Za-z0-9_+@-]+/)'   # sem `:` antes, sem ponto
+    + r'|(?:^|(?<=[\s"\'(=,;\[>|{⟨«“‘→])|(?<=^`)|(?<=[\s(\[{"\'>*_]`))(?P<dbl>//(?=[A-Za-z0-9_+-])' + r'[A-Za-z0-9_+@-]+/)'   # sem `:` antes, sem ponto
     + r'|(?P<file>file://(?:localhost)?' + _FS + r')'
     + r'|' + _TS + r'(?P<tilde>~/)'
     + r'|' + _TS + r'(?P<acct>~[a-z_][a-z0-9_-]*/(?=[A-Za-z._]))'
@@ -68,8 +71,11 @@ CLASS_RE = re.compile(
 # argumento de caminho de shell: o verbo (ou a flag -C, ou o redirecionamento) e um absoluto de QUALQUER raiz
 SHELL_ARG_RE = re.compile(
     r'(?:(?:^|(?<=[\s;&|(`"\'$⟨]))(?:cd|pushd|ls|cat|source|rm|cp|mv|mkdir|touch|stat|tee|du|find|chmod|chown|-C)'
-    r'(?:\s+-[A-Za-z]+)*\s+|(?:^|(?<=[\s\d&]))>>?\s*)'
-    r'(?P<shell>/' + _DEV_STD + _SEG + r'(?:/' + _SEG + r')+/?)'
+    # redirecionamento: `>` depois de espaço, ou `N>`/`&>` cujo dígito/e-comercial ABRE o token. O `>` que
+    # fecha um placeholder (`docs/<dominio-t2>/graph/…`) não é redirecionamento — medido no corpus quando o
+    # argumento de shell passou a aceitar um segmento só (colaboracao-onion-2026-07, 2026-10-10).
+    r'(?:\s+-[A-Za-z]+)*\s+|(?:^|(?<=\s)|(?<=^[\d&])|(?<=\s[\d&]))>>?\s*)'
+    r'(?P<shell>/' + _DEV_STD + _SEG + r'(?:/' + _SEG + r')*/?)'   # `cd /workspace` (1 segmento) também: F7
 )
 
 
@@ -121,7 +127,7 @@ def host_re(hosts):
     hosts = [h for h in hosts if h]
     if not hosts:
         return None
-    return re.compile(r'(?<![A-Za-z0-9_.-])(?:' + "|".join(re.escape(h) for h in hosts) + r')(?![A-Za-z0-9_-])')
+    return re.compile(r'(?<![A-Za-z0-9_.-])(?:' + "|".join(re.escape(h) for h in hosts) + r')(?![A-Za-z0-9_-])', re.I)   # hostname não diferencia caixa (F9)
 
 
 def _root_of(token):
