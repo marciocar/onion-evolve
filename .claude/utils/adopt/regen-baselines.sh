@@ -91,6 +91,13 @@ fi
 if [ -z "${_role}" ] && [ -f "${DEST}/.claude/.onion-version" ]; then
   _role="$(awk '/^role:/{print $2; exit}' "${DEST}/.claude/.onion-version" 2>/dev/null)"
 fi
+# ⚠️ A PORTA `source` NÃO É O CORE (2026-10-10, F2 das portas): a onion-core passa a se carimbar
+# `role: source` com `kind: door`, e esta guarda a tomava pelo core e deixava as catracas da porta
+# esvaziadas pelo --stub-baselines (medido pela passada adversarial: porta source com 12 HARD). A porta
+# é projeção regenerada inteira; o ledger dela nasce do corpus dela, como em qualquer outra porta.
+if [ "${_role}" = "source" ] && grep -qE '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)' "${DEST}/.claude/.onion-version" 2>/dev/null; then
+  _role="source-door"
+fi
 if [ "${_role}" = "source" ]; then
   echo "⛔ regen-baselines: '${DEST}' é o CORE (role: source) — abortado." >&2
   echo "   Ali o baseline é o ledger da dívida própria, não passivo herdado: regenerar apagaria a medição." >&2

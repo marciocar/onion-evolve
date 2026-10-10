@@ -62,6 +62,11 @@ set -uo pipefail
 
 ROLE="adopted"; REPO=""; MODE="manifest"; BUNDLE=""; LIST_DIFF=0
 while [ $# -gt 0 ]; do
+  # flag que exige valor e veio por último: `shift 2` com um argumento só não anda e o laço não termina
+  # (medido pela passada adversarial da F2: `--list` no fim saía por timeout).
+  case "$1" in --role|--repo|--check-bundle|--stub-baselines|--list|--diff)
+    [ $# -ge 2 ] || { echo "ERRO: $1 exige um valor" >&2; exit 2; } ;;
+  esac
   case "$1" in
     --role) ROLE="${2:-}"; shift 2 ;;
     --repo) REPO="${2:-}"; shift 2 ;;
@@ -207,9 +212,14 @@ _emit_command_excludes() {  # $1=REPO $2=papel → :(exclude) dos comandos de me
   local _repo="$1" _role="$2" _f _base_name _tools _resolver
   [ -n "$(_role_cut "${_role}")" ] || return 0   # papel que não corta nada também não corta comando
   _resolver="${_repo}/.claude/utils/marketplace/resolve-role-bundle.sh"
-  [ -f "${_resolver}" ] || return 0               # sem a SSOT não se adivinha: o corte de comando não acontece
-  _tools="$(bash "${_resolver}" "${_role}" --tools 2>/dev/null)" || return 0
-  [ -n "${_tools}" ] || return 0                  # papel sem work_tools declarados → não corta comando
+  # ⚠️ FAIL-CLOSED desde 2026-10-10 (passada adversarial da F2): as três linhas abaixo faziam `return 0`
+  # quando a SSOT não respondia — resolvedor ausente, PyYAML ausente, conjunto inexistente no roles.yaml
+  # (rc 2). Medido: sem PyYAML o `--list standalone` saía rc 0, stderr vazio, com os 12 comandos de
+  # adoção e federação DE VOLTA, e o aviso ainda dizia "corta N arquivos". Papel que corta e não sabe
+  # o que cortar não emite manifesto: rc 3, como o mini.
+  [ -f "${_resolver}" ] || { echo "ERRO: o papel '${_role}' corta comandos pelo roles.yaml, e o resolvedor não existe em '${_repo}'" >&2; return 3; }
+  _tools="$(bash "${_resolver}" "${_role}" --tools 2>/dev/null)" || { echo "ERRO: o resolvedor não devolveu os work_tools do papel '${_role}' (PyYAML ausente? conjunto inexistente?) — sem eles o corte de comandos falharia aberto" >&2; return 3; }
+  [ -n "${_tools}" ] || { echo "ERRO: o papel '${_role}' corta, mas o roles.yaml não lhe dá nenhum work_tool — o corte tiraria TODOS os comandos de meta/ ou nenhum" >&2; return 3; }
   while IFS= read -r -d '' _f; do
     [ -n "${_f}" ] || continue
     _base_name="$(basename "${_f}" .md)"
@@ -472,8 +482,10 @@ if [ "${MODE}" = "list" ]; then
   git -C "${REPO}" rev-parse HEAD >/dev/null 2>&1 || { echo "ERRO: --list exige repositório git com HEAD em '${REPO}'" >&2; exit 2; }
   _lerr="$(mktemp)"; _lrc=0
   _lout="$(bash "${BASH_SOURCE[0]}" --role "${ROLE}" --repo "${REPO}" 2>"${_lerr}")" || _lrc=$?
-  if [ "${_lrc}" -ne 0 ]; then cat "${_lerr}" >&2; rm -f "${_lerr}"; exit "${_lrc}"; fi
-  rm -f "${_lerr}"
+  # o stderr do manifesto vai junto mesmo com rc 0: é lá que moram os avisos de lente forçada e de
+  # ponteiro morto, e o `--list` que os descartava escondia exatamente o que existe para ser visto.
+  cat "${_lerr}" >&2; rm -f "${_lerr}"
+  [ "${_lrc}" -eq 0 ] || exit "${_lrc}"
   _lspec=(); mapfile -t _lspec <<< "${_lout}"
   _lfiles="$(git -C "${REPO}" -c core.quotePath=false diff-tree -r --name-only --no-commit-id \
               4b825dc642cb6eb9a060e54bf8d69288fbee4904 HEAD -- "${_lspec[@]}" | LC_ALL=C sort)"
@@ -506,10 +518,24 @@ if [ "${MODE}" = "list" ]; then
         [ "$(tr -cd '/' <<< "${_c}" | wc -c)" -ge 2 ] || continue   # `.claude/utils` genérico não é ponteiro
         _dang="${_dang}${_c} (citado por ${_f})"$'\n'
       done < <(git -C "${REPO}" show "HEAD:${_f}" 2>/dev/null | grep -oE '\.claude/[A-Za-z0-9_./-]+' | LC_ALL=C sort -u)
+      # ⚠️ E O COMANDO CITADO POR NOME (`/categoria:comando`), que a 1a redação não contava: ela via 6
+      # caminhos e a passada adversarial achou ~30 comandos ausentes (inclusive /meta:setup-integration,
+      # o fallback que o CLAUDE.md manda sugerir). Nome de comando é a citação que mais viaja.
+      while IFS= read -r _c; do
+        [ -n "${_c}" ] || continue
+        _cp=".claude/commands/${_c#/}"; _cp="${_cp//://}.md"
+        grep -qxF "${_cp}" <<< "${_lfiles}" && continue
+        git -C "${REPO}" cat-file -e "HEAD:${_cp}" 2>/dev/null || continue   # só comando que EXISTE no core
+        _dangc="${_dangc:-}${_c} (citado por ${_f})"$'\n'
+      done < <(git -C "${REPO}" show "HEAD:${_f}" 2>/dev/null | grep -oE '/[a-z]+:[a-z][a-z0-9-]*(:[a-z][a-z0-9-]*)?' | LC_ALL=C sort -u)
     done <<< "${_lfiles}"
     if [ -n "${_dang}" ]; then
       echo "AVISO: o mini cita $(printf '%s' "${_dang}" | grep -c .) caminho(s) que a allowlist NÃO leva (ponteiro morto na porta didática; a cura é da F5):" >&2
       printf '%s' "${_dang}" | LC_ALL=C sort -u | sed 's/^/  /' >&2
+    fi
+    if [ -n "${_dangc:-}" ]; then
+      echo "AVISO: o mini cita $(printf '%s' "${_dangc}" | cut -d' ' -f1 | LC_ALL=C sort -u | grep -c .) comando(s) por nome que a allowlist NÃO leva ($(printf '%s' "${_dangc}" | grep -c .) citações; a cura é da F5):" >&2
+      printf '%s' "${_dangc}" | LC_ALL=C sort -u | sed 's/^/  /' >&2
     fi
   fi
   if [ "${LIST_DIFF}" -eq 1 ]; then
@@ -571,7 +597,9 @@ if [ "${MODE}" = "manifest" ]; then
     done
   fi
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_role_excludes "${REPO}" "${ROLE}")
-  while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_command_excludes "${REPO}" "${ROLE}")
+  # o rc do corte de comandos É LIDO: `< <(…)` o engolia, e foi assim que o fail-open passou calado.
+  _cmd_out="$(_emit_command_excludes "${REPO}" "${ROLE}")" || exit 3
+  while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done <<< "${_cmd_out}"
   # Os companheiros SÓ podem ser derivados DEPOIS dos dois cortes acima: eles são definidos pelo que
   # já saiu. Ordem invertida = nenhum comando cortado ainda = nenhum companheiro achado, em silêncio.
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(
@@ -629,7 +657,10 @@ if [ "${MODE}" = "manifest" ]; then
   # HARD medido em 2026-09-15. Desde a matriz (2026-10-10) o standalone LEVA a meta-fábrica, e o número
   # velho virou declaração sem medição; o resíduo atual se mede com `--list` e com o lint da porta.
   if [ -n "$(_role_cut "${ROLE}")" ]; then
-    echo "AVISO: papel '${ROLE}' corta $(( $(grep -c '^:(exclude)' <<< "$(printf '%s\n' "${_spec[@]}")") - ${#_IDENTITY_EXCLUDES[@]} )) arquivo(s) de ADOÇÃO e FEDERAÇÃO do transporte." >&2
+    # conta ARQUIVOS pela diferença real contra a superfície sem corte, não pathspecs (a 1a redação
+    # contava pathspecs e dizia 72 onde a diferença era 70 — passada adversarial da F2).
+    _sem_corte="$(git -C "${REPO}" diff-tree -r --name-only --no-commit-id "${_EMPTY_TREE}" HEAD -- "${_base[@]}" "${_IDENTITY_EXCLUDES[@]}" | grep -c . || true)"
+    echo "AVISO: papel '${ROLE}' corta $(( _sem_corte - _n_sobrou )) arquivo(s) do transporte (adoção, federação, comandos fora do papel e os companheiros deles)." >&2
     echo "       Contrato preservado (a guarda do alvo o lê): ${_ROLE_CONTRACT[*]}" >&2
   fi
   printf '%s\n' "${_spec[@]}"

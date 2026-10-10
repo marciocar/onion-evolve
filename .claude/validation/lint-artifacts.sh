@@ -380,8 +380,11 @@ _role() {
 # que é porteiro de 17 guardas e o standalone NÃO pode entrar nele), é "este repo publica o marketplace?":
 # sim na fonte (`source`), e em qualquer papel que de fato tenha o catálogo na raiz. Fora disso, nada a
 # julgar. No core o catálogo existe e o papel é `source`, logo a cobrança ali não muda.
+# ⚠️ E A PORTA `source` NÃO É O CORE: a onion-core se carimba `role: source` com `kind: door` e não leva
+# o catálogo. Pelo papel ela seria cobrada pelo marketplace que não publica (12 HARD, medido pela passada
+# adversarial). Porta (`kind: door`) responde pelo catálogo, nunca pelo papel.
 _publishes_marketplace() {
-  [ "$(_role)" = "source" ] && return 0
+  if [ "$(_role)" = "source" ] && ! _stamp_has '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)'; then return 0; fi
   [ -f "${REPO_ROOT}/.claude-plugin/marketplace.json" ]
 }
 # A ausência só é LEGÍTIMA se o objeto de fato não existe E o papel não é a fonte. Existir-e-estar-
@@ -1761,11 +1764,22 @@ PY
   #   (5) a ALLOWLIST de papel (o mini) nomeia caminhos que existem: allowlist com caminho morto encolhe a
   #       porta sem ninguém notar (o vendor-manifest só AVISA, porque a decisão é de quem escreveu a lista).
   local wt_out kind a b
-  wt_out="$(python3 - "${roles}" "${REPO_ROOT}" <<'PY'
+  wt_out="$(python3 - "${roles}" "${REPO_ROOT}" "$(_role)" <<'PY'
 import sys, yaml, os
 d = yaml.safe_load(open(sys.argv[1])) or {}
-root = sys.argv[2]
+root, me = sys.argv[2], sys.argv[3]
 sets = d.get("work_tool_sets") or {}
+# O comando de um conjunto só é COBRADO no repo cujo papel o recebe (2026-10-10, passada adversarial da
+# F2): o roles.yaml viaja inteiro, e um standalone que publica o próprio catálogo levava 12 HARD por
+# "adopt/co-*/federation-* sem comando" — exatamente o que a matriz tira dele. Papel desconhecido ou
+# source: cobra tudo, como antes.
+mine = None
+spec_me = (d.get("roles") or {}).get(me)
+if me != "source" and spec_me is not None:
+    wt_me = spec_me.get("work_tools")
+    mine = set()
+    for n in (wt_me if isinstance(wt_me, list) else [wt_me]):
+        mine |= set(sets.get(n) or [])
 valid = set(sets.keys()) | {"none", "tbd"}
 for role, spec in (d.get("roles") or {}).items():
     wt = (spec or {}).get("work_tools")
@@ -1780,7 +1794,8 @@ for role, spec in (d.get("roles") or {}).items():
 owner = {}
 for name, lst in sets.items():
     for t in (lst or []):
-        print("TOOL\t%s\t" % t)
+        if mine is None or t in mine:
+            print("TOOL\t%s\t" % t)
         owner.setdefault(t, []).append(name)
 for t, names in sorted(owner.items()):
     if len(names) > 1:

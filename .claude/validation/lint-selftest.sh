@@ -16747,6 +16747,9 @@ run_role_cut_selftests() {
   #     aplicada ao transporte — assere-se a FORMA (o prefixo), não os nomes.
   local r="${d}/repo"; mkdir -p "${r}/.claude/utils/adopt" "${r}/.claude/commands/git" "${r}/docs/meta-specs"
   cp "${vm}" "${r}/.claude/utils/adopt/vendor-manifest.sh"
+  # desde 2026-10-10 o papel que corta EXIGE a SSOT do escopo (fail-closed): o repo sintético a carrega
+  mkdir -p "${r}/.claude/utils/marketplace"
+  cp "${REPO_ROOT}/.claude/utils/marketplace/resolve-role-bundle.sh" "${REPO_ROOT}/.claude/utils/marketplace/roles.yaml" "${r}/.claude/utils/marketplace/"
   printf '#!/usr/bin/env bash\n# helper inventado AGORA\n' > "${r}/.claude/utils/adopt/helper-novissimo.sh"
   printf 'x\n' > "${r}/.claude/commands/git/x.md"; printf 'y\n' > "${r}/docs/meta-specs/y.md"
   git -C "${r}" init -q >/dev/null 2>&1
@@ -16941,10 +16944,36 @@ run_role_cut_selftests() {
     else record_fail "role-cut: (o-MUT)" "o mutante não levou meta/ ao mini — (o) não prova que a allowlist corta"; fi
   else record_fail "role-cut: (o-MUT) setup" "a mutação não foi aplicada"; fi
   # (o2) sem a SSOT da allowlist o mini FALHA ALTO (cair no default entregaria o core ao iniciante).
-  local _rc_o2=0; bash "${vm}" --role mini --repo "${r}" >/dev/null 2>&1 || _rc_o2=$?
+  local rn="${d}/repo-sem-ssot"; mkdir -p "${rn}/.claude/utils/adopt" "${rn}/.claude/commands/meta" "${rn}/docs/meta-specs"
+  cp "${vm}" "${rn}/.claude/utils/adopt/vendor-manifest.sh"
+  printf 'x\n' > "${rn}/.claude/commands/meta/adopt.md"; printf 'y\n' > "${rn}/docs/meta-specs/y.md"
+  git -C "${rn}" init -q >/dev/null 2>&1; git -C "${rn}" add -A >/dev/null 2>&1
+  git -C "${rn}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  local _rc_o2=0; bash "${vm}" --role mini --repo "${rn}" >/dev/null 2>&1 || _rc_o2=$?
   if [ "${_rc_o2}" -ne 0 ]; then
     record_pass "role-cut: (o2) repo sem roles.yaml → --role mini sai ≠0 (rc=${_rc_o2}) em vez de cair no _base"
   else record_fail "role-cut: (o2)" "o mini sem allowlist saiu 0 — o default levaria o core inteiro à porta didática"; fi
+  # (t) O CORTE DE COMANDOS FALHA FECHADO (passada adversarial da F2): sem a SSOT do escopo o standalone
+  #     levava os 12 comandos de adoção e federação de volta, com rc 0 e stderr vazio. Dois modos de
+  #     falha: resolvedor AUSENTE (o repo acima) e resolvedor que RESPONDE ERRO (conjunto inexistente).
+  local _rc_t1=0 _rc_t2=0
+  bash "${vm}" --role standalone --repo "${rn}" >/dev/null 2>&1 || _rc_t1=$?
+  local rt="${d}/repo-resolver-erro"; cp -r "${rn}" "${rt}"; mkdir -p "${rt}/.claude/utils/marketplace"
+  printf '#!/usr/bin/env bash\necho "ERRO: work_tool_set inexistente" >&2; exit 2\n' > "${rt}/.claude/utils/marketplace/resolve-role-bundle.sh"
+  git -C "${rt}" add -A >/dev/null 2>&1; git -C "${rt}" -c user.email=t@t -c user.name=t commit -qm resolver >/dev/null 2>&1
+  bash "${vm}" --role standalone --repo "${rt}" >/dev/null 2>&1 || _rc_t2=$?
+  if [ "${_rc_t1}" -ne 0 ] && [ "${_rc_t2}" -ne 0 ]; then
+    record_pass "role-cut: (t) sem resolvedor (rc=${_rc_t1}) ou com resolvedor em erro (rc=${_rc_t2}) o standalone NÃO emite manifesto"
+  else record_fail "role-cut: (t)" "ausente rc=${_rc_t1} · em erro rc=${_rc_t2} — o corte de comandos falhou ABERTO (adopt e federation-* viajariam)"; fi
+  # (t-MUT) o `|| return 3` de volta a `|| return 0` (a forma de antes) TEM de reprovar (t).
+  local mut10="${d}/vm-failopen.sh"
+  sed 's#^  _tools="$(bash "${_resolver}" "${_role}" --tools 2>/dev/null)" || {.*#  _tools="$(bash "${_resolver}" "${_role}" --tools 2>/dev/null)" || return 0#' "${vm}" > "${mut10}"
+  if ! cmp -s "${vm}" "${mut10}"; then
+    local _rc_tm=0; bash "${mut10}" --role standalone --repo "${rt}" >/dev/null 2>&1 || _rc_tm=$?
+    if [ "${_rc_tm}" -eq 0 ]; then
+      record_pass "role-cut: (t-MUT) com o fail-open de antes o standalone sai rc 0 com o resolvedor em erro — (t) é load-bearing"
+    else record_fail "role-cut: (t-MUT)" "o mutante ainda falha (rc=${_rc_tm}) — (t) não prova o fail-closed"; fi
+  else record_fail "role-cut: (t-MUT) setup" "a mutação não foi aplicada"; fi
 
   # (p) SOURCE = HUB = a superfície inteira (a porta onion-core leva toda a maquinaria; b3 mede o hub).
   local _so; _so="$(bash "${vm}" --role source --repo "${REPO_ROOT}" 2>/dev/null)"
