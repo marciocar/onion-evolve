@@ -85,7 +85,7 @@ Leia o status como ele se declara. A defasagem conta commits da superfície que 
    rotineira não gera nó nem PR.
 
 `--all` roda o ensaio (ou, com `--push`, a publicação) porta a porta, cada uma em clone próprio. O
-onion-mini só ensaia até a F5 (SAC-94).
+onion-mini é recusado até a F5 (SAC-94): o repo dele guarda a destilação curada, e substituí-la é a 1ª materialização.
 
 ## O que este comando NÃO faz
 
