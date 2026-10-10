@@ -221,6 +221,23 @@ BEGIN { section = ""; nid = ""; ne = 0; metaClosed = 0; metaFieldIndent = -1 }
 /^nodes:/ { section = "nodes"; metaClosed = 1; next }
 /^edges:/ { section = "edges"; nid = ""; metaClosed = 1; next }
 /^meta:/  { section = "meta"; next }
+# ARESTA PARA NÓ DE OUTRO GRAFO (contrato v4.3, 2026-10-10, SAC-98): `external_edges:` no topo, uma
+# aresta por item, exatamente uma ponta externa `<caminho>#<id>` (a outra é um nó daqui; `from` ausente
+# = o grafo inteiro). Este radar é de UM arquivo: não confere a ponta externa (é o gate do contrato que
+# a confere contra o corpus, integrity.dangling-external). Lê a ponta LOCAL, porque ela conta como
+# ligação (nó ligado só por aresta externa NÃO é órfão) e porque ponta local inexistente é integridade
+# deste arquivo. Sem esta seção o bloco caía na seção anterior: depois de `edges:`, um `- from:` externo
+# virava aresta intra-arquivo pendurada e o `edge_type:` do item sobrescrevia o da última aresta.
+/^external_edges:/ { section = "external"; nid = ""; metaClosed = 1; next }
+section == "external" && /^[[:space:]]+-[[:space:]]/ { nx++ }
+section == "external" && /^[[:space:]]+(-[[:space:]]+)?(from|to):/ {
+  v = $0; sub(/^[[:space:]]+(-[[:space:]]+)?/, "", v)
+  xk = v; sub(/:.*/, "", xk); sub(/^(from|to):/, "", v); v = trim(v)
+  if (v !~ /#/) { xlocal[nx] = v; xlocalKey[nx] = xk }
+  next
+}
+section == "external" && /^[[:space:]]+(-[[:space:]]+)?edge_type:/ { v = $0; sub(/^[[:space:]]+(-[[:space:]]+)?edge_type:/, "", v); xtype[nx] = trim(v); next }
+section == "external" { next }
 
 # Legibilidade da gramática (guarda anti-fail-open — sinal de campo 2026-07-17): conta as
 # linhas COM conteúdo dentro de nodes:. Se a seção tem conteúdo e mesmo assim o parser não extrai
@@ -436,6 +453,7 @@ section == "meta" && metaClosed == 0 && /^[[:space:]]+target:/ {
 END {
   VN = "entity claim decision question evidence artifact state event rule invariant policy"
   VE = "SUPPORTS REFUTES SUPERSEDES CAUSES DEPENDS_ON TRACES_TO HAS_STATE TRANSITIONS EMITS CONSTRAINS READS WRITES"
+  VX = " SUPERSEDES CONSTRAINS SUPPORTS REFUTES TRACES_TO DEPENDS_ON "   # external_edges (contrato v4.3): lista fechada, casamento por palavra inteira
   VP = "DEV PROD"
   VL = "audit domain"
   problems = 0
@@ -496,6 +514,9 @@ END {
     if (eon[i] != "")              { onUsed[eon[i]] = 1; deg[eon[i]]++ }  # trigger: (ou on: legado) conecta o evento (não é órfão)
     outDeg[efrom[i]]++
   }
+  # a ponta local de uma aresta externa conta como ligação (contrato v4.3): sem isto, um nó ligado só
+  # a outro grafo saía "órfão (grau 0)" num grafo que o contrato aprova
+  for (i = 1; i <= nx; i++) if (xlocal[i] != "") deg[xlocal[i]]++
 
   if (mode == "--triples") {
     for (i = 1; i <= ne; i++) {
@@ -1113,6 +1134,13 @@ END {
       }
       # `on:` LEGADO: lido, nunca reprovado (grafo antigo fora do corpus não quebra), sempre dito.
       if (eonLegacy[i]) print "  ⚠ ON-LEGADO aresta " i " (" efrom[i] " -> " eto[i] "): o gatilho usa a chave on:, que YAML 1.1 lê como booleano — renomeie para trigger: " eon[i]
+    }
+    # aresta externa: só a ponta LOCAL se decide aqui (a externa é do gate, contra o corpus)
+    for (i = 1; i <= nx; i++) {
+      if (xlocal[i] != "" && !(xlocal[i] in nodeSeen)) {
+        if (isProposal) { dangling++ } else { print "  ✗ external_edges " i ": " xlocalKey[i] " aponta nó inexistente: " xlocal[i]; problems++ }
+      }
+      if (index(VX, " " xtype[i] " ") == 0 || xtype[i] == "") { print "  ✗ external_edges " i ": edge_type fora da lista do contrato v4.3: [" xtype[i] "]"; problems++ }
     }
     for (i = 1; i <= nn; i++) {
       id = order[i]
