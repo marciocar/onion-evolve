@@ -459,7 +459,13 @@ _DOOR_HAS_LINT=0; [ -f "${DEST}/.claude/validation/lint-artifacts.sh" ] && _DOOR
 if [ "${_DOOR_HAS_LINT}" -eq 1 ]; then
 _regen regen-ssot-projections.sh || true
 # As catracas do core foram esvaziadas no passo (2); aqui elas renascem do corpus DA PORTA.
-_regen regen-baselines.sh 'tail -2' || { echo "ERRO: o regen-baselines recusou ou falhou na porta — as catracas dela ficariam vazias. Nada a publicar." >&2; exit 3; }
+# rc 3 = "algum baseline não resolvido", parcial DECLARADO na saída (o comportamento de sempre); rc 2 =
+# RECUSA (alvo tomado pelo core, uso inválido) — essa não pode terminar em ✅.
+_rb_rc=0; _regen regen-baselines.sh 'tail -2' || _rb_rc=$?
+if [ "${_rb_rc}" -ne 0 ] && [ "${_rb_rc}" -ne 3 ]; then
+  echo "ERRO: o regen-baselines RECUSOU a porta (rc=${_rb_rc}) — as catracas dela ficariam vazias. Nada a publicar." >&2
+  exit 3
+fi
 else
   echo "  (6) a porta não leva o lint (.claude/validation/lint-artifacts.sh): projeções SSOT e baselines não se aplicam"
 fi

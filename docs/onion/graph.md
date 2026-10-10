@@ -97,7 +97,6 @@
 - **onion** --loads--> when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)
 - **onion** --loads--> when:realign -> run:validation/kg-realign-project.sh (verificador-por-turno; --check é o dente)
 - **onion** --loads--> when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)
-- **onion** --provides--> co-evolution-upstream
 - **onion** --provides--> constellation-map
 - **onion** --provides--> dogfood-doctrine
 - **onion** --provides--> freshness-audits
@@ -147,7 +146,6 @@
 - onion **loads** when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)
 - onion **loads** when:realign -> run:validation/kg-realign-project.sh (verificador-por-turno; --check é o dente)
 - onion **loads** when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)
-- onion **provides** co-evolution-upstream
 - onion **provides** constellation-map
 - onion **provides** dogfood-doctrine
 - onion **provides** freshness-audits
@@ -532,7 +530,6 @@ onion	loads	when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seu
 onion	loads	when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)	
 onion	loads	when:realign -> run:validation/kg-realign-project.sh (verificador-por-turno; --check é o dente)	
 onion	loads	when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)	
-onion	provides	co-evolution-upstream	
 onion	provides	constellation-map	
 onion	provides	dogfood-doctrine	
 onion	provides	freshness-audits	
