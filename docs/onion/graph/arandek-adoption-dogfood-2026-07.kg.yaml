@@ -185,6 +185,7 @@ nodes:
       source: "arandek@1aa794f9 ; arandek@88d93f26"
       locator: "git ls-tree -r --name-only 88d93f26^ -- .claude"
       method: "leitura: git show/ls-tree dos commits 1aa794f9 e 88d93f26 no clone local de arandek"
+      locality: "repo"
 
   - id: E_C1_SSOT
     node_type: evidence
@@ -475,7 +476,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: 2026-09-02
-    verified_against: "grep -rl <8hex do pin anterior> em /home/marcio/{aura,gustavo-pulga,mvp-venda-direta-pdi,<adotante-a>,onion-arthur,onion-pedro,onion-standalone,poc-venda-direta-pdi,pulse-mais,rhilo-metagamify} (pins anteriores lidos do git log do .onion-version)"
+    verified_against: "grep -rl <8hex do pin anterior> nos 10 clones locais de {<adotante-sem-registro>,gustavo-pulga,poc-venda-direta-pdi (2 clones),<adotante-a>,onion-arthur,onion-pedro,onion-standalone,pulse-mais,metagamify} (ids do members.yaml) (pins anteriores lidos do git log do .onion-version)"
     label: "RESPOSTA a Q_PIN_GREP_WORTH_IT (drive W9, 2026-09-02): dos 10 adotantes locais, 5 tiveram update; 4 deles ainda citam pin anterior em 22 arquivos — 19 sao historia legitima (docs/evolution/inbox|inbound processados, que DEVEM citar o pin da epoca) e 3 sao SSOT viva (technical-context/index.md no <adotante-a>; project.kg.yaml e onion-adoption.kg.yaml no mvp-venda-direta-pdi). Conclusao: o grep vale UM grep — mas so com exclusao de historia, senao 86% e ruido. Implementado em write-stamp.sh (detecta, nao conserta; bancada + mutacao provadas)."
     trace: ".claude/utils/adopt/write-stamp.sh"
     provenance:

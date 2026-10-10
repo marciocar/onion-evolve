@@ -75,7 +75,7 @@ nodes:
     impact: 3
     confidence: 0.9
     verified_at: 2026-09-02
-    verified_against: 'CHANGELOG l.98; grep -l bypassPermissions em 26 settings*.json (/home/marcio/*/.claude + core) rc=1 (ausencia); onion-bridge src/workspace.ts:105 + config.ts:28; juiz EMENDOU 2 numeros'
+    verified_against: "CHANGELOG l.98; grep -l bypassPermissions em 26 settings*.json (.claude dos clones na home da conta + core) rc=1 (ausencia); onion-bridge src/workspace.ts:105 + config.ts:28; juiz EMENDOU 2 numeros"
     label: 'F3 EMENDADO. `defaultMode: "bypassPermissions"` em `.claude/settings.json`/`settings.local.json` de PROJETO passa a ser IGNORADO (como "auto"); vale so em user/managed settings ou `--permission-mode` (l.98). Medido: 26 settings*.json varridos (nao "10 adotantes"), 0 ocorrencias, rc=1 = ausencia e nao erro. O bridge ESCREVE `.claude/settings.json` no workspace do convidado com `defaultMode: "default"` (workspace.ts:105) e o bypass vem de `config.permissionMode` do SDK (config.ts:28, fail-closed) — nao de settings. Impacto hoje: nenhum; a doutrina "exit 2 barra ate sob bypassPermissions" segue valida.'
     trace: 'CLAUDE.md'
     provenance:
@@ -91,7 +91,7 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: 2026-09-02
-    verified_against: 'CHANGELOG l.16; kg-freshness.md:120-126 ("Bloqueio de acesso so vale TENTADO", cita /home/onion/onion-bridge/src/)'
+    verified_against: "CHANGELOG l.16; 8320b1c3:.claude/commands/meta/kg-freshness.md:120-126 (\"Bloqueio de acesso so vale TENTADO\", cita o src/ do clone de produção do onion-bridge na conta de serviço)"
     label: 'F4 APROVADO. Auto mode ganha prompt unico antes da 1a leitura fora dos working dirs + `permissions.blockReadsOutsideWorkingDirectories` (l.16). O censo, o kg-freshness e o drive LEEM adotantes em /home/marcio/* e o bridge em /home/onion a partir da sessao do core. Se o bloqueio for ativado, workers passam a devolver UNVERIFIABLE por acesso — e a elevacao que a doutrina manda tentar (`sudo`) NAO vence esse bloqueio: e o harness, nao o FS. A doutrina precisa do caso distinto.'
     trace: '.claude/commands/meta/kg-freshness.md'
     provenance:
@@ -279,7 +279,7 @@ nodes:
     impact: 4
     confidence: 0.95
     verified_at: 2026-09-02
-    verified_against: '/proc/<pid>/exe da sessao interativa do maestro → …/versions/2.1.247 (deleted), iniciada 2026-08-27; disco (symlink ~/.local/bin/claude) → 2.1.258; picker do /model: "Fable 5.1 (disabled) — Update to 2.1.255+"; lint REGRA 65 dizia instalado=2.1.258'
+    verified_against: "o link exe do procfs do processo da sessao interativa do maestro → …/versions/2.1.247 (deleted), iniciada 2026-08-27; disco (symlink do launcher do usuário) → 2.1.258; picker do /model: \"Fable 5.1 (disabled) — Update to 2.1.255+\"; lint REGRA 65 dizia instalado=2.1.258"
     label: 'MEDIDO: o auto-updater troca o binario com a sessao VIVA — a sessao do maestro rodou 2.1.247 por 6 dias com o disco em 2.1.258. Picker de modelo, hooks (PreModelSwitch so existe em >= 2.1.251) e capacidades refletem o PROCESSO, nao o disco. A REGRA 65 comparava cc_version com `claude --version` (DISCO) e afirmava "instalado=2.1.258": declarado != verificado, exatamente a classe que a regra existe para pegar. Dano: Fable 5.1 invisivel por 6 dias; 1 rodada de medicao do hook perdida. 4 sessoes abaixo de 2.1.255 no host naquele momento.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md'
     provenance:

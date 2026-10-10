@@ -253,6 +253,7 @@ nodes:
       source: "branch fix/adopt-robust-f1 (PR da F1, SAC-89): .claude/validation/lint-selftest.sh run_adopt_robust_selftests e as famílias door, door_seal_pin, role_cut, role_promotion"
       locator: "casos adopt-robust (a1)(a2)(b1)(b2)(b3)(c1)-(c6)(d1)(e1), door (f2), door-seal-pin (l)(m), role-cut (i), role-promotion (a); resíduo R56 docs/evolution/review/fix-adopt-robust-f1.md"
       method: "medição: bancada sob LC_ALL=C com um mutante por caso (cada um reprova) e dogfood executando os blocos do próprio adopt.md num sandbox temporário"
+      locality: "repo"
 
   - id: Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA
     node_type: question

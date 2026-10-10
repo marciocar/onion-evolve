@@ -352,7 +352,7 @@ nodes:
     impact: 3
     confidence: 0.8
     verified_at: 2026-09-08
-    verified_against: 'E_DOCTR_PYTHON_311_PLUS (https://mindee.github.io/doctr/getting_started/installing.html, tier 9, 3-0) confrontada com o venv real do projeto (/opt/venv: numpy, pillow, pypdf, openpyxl) e com o requisito (c) do enunciado'
+    verified_against: "E_DOCTR_PYTHON_311_PLUS (https://mindee.github.io/doctr/getting_started/installing.html, tier 9, 3-0) confrontada com o venv real do projeto (venv de sistema do projeto: numpy, pillow, pypdf, openpyxl) e com o requisito (c) do enunciado"
     source_tier: 9
     source_kind: analysis
     label: 'OBJECAO SOBREVIVENTE 4 — TIER 9 RESPONDENDO EIXO QUE NAO DECIDE NADA. Compatibilidade do FRAMEWORK nao e o custo: docTR carrega PyTorch ou TensorFlow, e no venv medido aqui (numpy, pillow, pypdf, openpyxl) isso e da ordem de 2,5GB de wheel mais dependencias transitivas — o oposto de dependency-light, que e requisito declarado. E o eixo que importava ficou INTOCADO: os pesos pre-treinados de reconhecimento do docTR sao de vocabulario latino majoritariamente treinado em ingles, e ninguem verificou desempenho em portugues com serifa, acentuacao e cedilha, que e o corpus real. Achado verdadeiro e IRRELEVANTE ocupando vaga de achado confirmado — o sintoma e que uma rodada com 5 confirmacoes gastou uma delas num fato que nenhuma opcao usa para vencer ou perder.'

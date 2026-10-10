@@ -127,7 +127,9 @@ nodes:
     verified_at: 2026-08-06
     verified_against: "env -i PATH=/usr/bin:/bin HOME=/tmp/nohome bash <script>"
     label: "M3 — PORTABILIDADE EXECUTADA, nao estimada: dos 39 scripts em .claude/validation/, 28 saem exit 0 sob `env -i` (sem HOME, sem PATH do usuario, sem Claude Code) e 9 saem 1/2 por USAGE SEM ARGUMENTO, nao por dependencia. CORRECAO DE UM NUMERO HERDADO: a leitura anterior dizia 30/39; re-executando, os 2 'timeouts' eram ARTEFATO DO INSTRUMENTO (corte de 25s) — lint-artifacts.sh roda sob env -i em 43s e seu exit 1 e VEREDITO DE LINT, nao falha de portabilidade. Este no ACRESCENTA chao a C_POSTURA_ACOPLAMENTO; nao a edita nem a contradiz"
+    narrative: "Caminho como conteúdo: receita de comando: o valor exato de PATH (os dois diretórios de binários de sistema de qualquer Linux) e de HOME (um diretório temporário que não existe, de propósito) É o experimento; reescrever pela forma apaga a receita, e o literal não está versionado em outro lugar (achado D2 do juiz da O5)."
     trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+    x_path_is_content: "receita"
     provenance:
       source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
       locator: "env -i PATH=/usr/bin:/bin HOME=/tmp/nohome bash <script>"

@@ -214,7 +214,8 @@ nodes:
     verified_at: 2026-08-29
     verified_against: "md5sum + PyYAML nos dois caminhos, medido direto"
     label: 'EXISTEM DUAS CÓPIAS DO SSOT DA FEDERAÇÃO NESTA MÁQUINA, E ELAS DIVERGEM. /home/marcio/onion-evolve/docs/evolution/federation/members.yaml — md5 a31526aa, mtime 2026-08-17, 9 adopters (o vivo, versionado em git). /home/onion/onion-evolve/…/members.yaml — md5 ad1701c9, mtime 2026-08-13, 8 adopters: falta `poc-venda-direta-pdi`. Foi esta divergência que produziu o 9-vs-8 entre dois workers da mesma rodada — um rodou o projetor a partir do repo vivo, o outro leu o espelho caduco. Divergência de fonte entre workers é ACHADO, não ruído, e este cobrou a dívida: um nó foi declarado CONFIRMED sobre uma enumeração errada.'
-    trace: "/home/marcio/onion-evolve/docs/evolution/federation/members.yaml · /home/onion/onion-evolve/…"
+    narrative: "trace anterior também apontava a 2ª cópia do members.yaml na home da conta de serviço onion (host, sem permissão hoje)."
+    trace: "docs/evolution/federation/members.yaml"
     provenance:
       source: "ec4c8442 (corpo do commit) + ec4c8442:docs/evolution/federation/members.yaml"
       locator: "corpo de ec4c8442 l.20 ('existem DOIS members.yaml nesta máquina (9 e 8 adotantes)'); git show ec4c8442:docs/evolution/federation/members.yaml | md5sum = a31526aa; último commit do arquivo 31f9d697 (2026-08-17)"
@@ -261,7 +262,7 @@ nodes:
     impact: 4
     confidence: 1.0
     verified_at: 2026-08-29
-    verified_against: "console.sh status → LIGADO; /etc/caddy/conf.d/logto-console.caddy sem .disabled"
+    verified_against: "console.sh status → LIGADO; vhost conf.d/logto-console.caddy do Caddy do host sem .disabled"
     label: '`C_console_not_the_path` afirma que o console admin "existe PRONTO e DESLIGADO" (arquivo `.caddy.disabled`) — premissa central da tese. MEDIDO HOJE: o maestro decidiu LIGAR o console em 2026-08-10 (`console.sh on`; o arquivo perdeu o `.disabled`, mtime Aug 10 22:25) e ele segue LIGADO em 2026-08-29. O nó continua `status: confirmed` com `verified_at: 2026-07-26`. E O PONTO QUE IMPORTA: o `reverify_note` de 2026-08-23 JÁ REGISTRAVA esse drift — em prosa, grampeada ao nó, sem tocar o `status`. É a demonstração exata de por que este comando existe: nota de re-verificação não é reconciliação; enquanto o `status` não flipa, o radar segue verde e a atenção segue ordenando um cadáver no topo.'
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml (C_console_not_the_path, reverify_note)"
     provenance:

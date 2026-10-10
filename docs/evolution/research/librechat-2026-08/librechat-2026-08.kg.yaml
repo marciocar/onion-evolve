@@ -107,7 +107,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.95
-    status: confirmed
+    status: superseded
     verified_at: 2026-08-20
     verified_against: "free -h no host: swap 8G 100% consumido, 11Gi 'disponiveis' majoritariamente page cache; consumidores reais: 2 VS Code servers ~3.5G + ~7 processos claude ~6G; docker atual ~3.6G"
     label: "O headroom de RAM da VPS é apertado (o swap desta VPS já esteve 100%): o stack entra com mem_limit em TUDO (api 1g, mongo/meili/vectordb 512m, rag 1g)"
@@ -116,6 +116,23 @@ nodes:
       source: "onion-vps-librechat@7338dcb:docker-compose.yml (repo local sem remoto alcançável, host)"
       locator: "7338dcb:docker-compose.yml l.6 ('mem_limit em tudo (o swap desta VPS já esteve 100%)'), l.16, l.82, l.100, l.119, l.137; corpo de 7338dcb (mesma frase)"
       method: "testemunho: leitura do commit 7338dcb do repo onion-vps-librechat (local, sem remoto alcançável) no host 2026-08-20 (docker-compose.yml + corpo)"
+      locality: "host"
+  - id: E_HEADROOM_RAM_MEDIDO_1009
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-09"
+    valid_from: "2026-10-09"
+    verified_against: "free -m e swapon --show na VPS em 2026-10-09T23:13Z: RAM available 24276 de 32094 MiB (buff/cache 23428), swap 3592 de 8191 MiB (/swapfile 8G, 3.5G usados); docker inspect HostConfig.Memory: onion-vps-librechat e -rag 1073741824, -vectordb, -mongo, -meilisearch e -admin 536870912; docker stats --no-stream: 505 MiB somados nos 6 containers do stack, ~3004 MiB nos 34 containers do host"
+    label: "Medido em 2026-10-09: a VPS tem 23,7 GiB de RAM disponível de 31,3 GiB e o swap em 3,5 de 8 GiB (44%). O stack do LibreChat segue com mem_limit nos 6 containers (api e rag 1g; vectordb, mongo, meili e admin 512m) e usa 505 MiB. O headroom não está apertado hoje."
+    narrative: "Reconcilia E_HEADROOM_SWAP_100 (2026-08-20), que dizia no presente que o headroom de RAM É apertado, com o swap já tendo estado em 100%. Em 08-20 o aperto tinha causa nomeada no próprio nó: 2 servidores do VS Code (~3,5G) e ~7 processos claude (~6G). Hoje, com o mesmo host, há 23,7 GiB disponíveis e o swap está em 44%, então o claim do presente não se sustenta e o nó antigo vira histórico (superseded, em DEV). O que se mantém é a CONSEQUÊNCIA de desenho: os mem_limit do compose estão em vigor, com os mesmos valores, mais o container admin, que entrou depois com 512m. O passado (swap a 100% em agosto) não se re-mede e fica no nó antigo. A medição é um instante: o headroom muda com o número de sessões no host, por isso o verified_at manda e o /meta:kg-freshness é o caminho de revisitar."
+    provenance:
+      source: "medição da VPS em 2026-10-09T23:13Z: free -m, swapon --show e, nos 6 containers do LibreChat, docker inspect e docker stats --no-stream"
+      locator: "saídas resumidas no verified_against (RAM available 24276/32094 MiB; swap 3592/8191 MiB; mem_limit por container; uso 505 MiB); o compose que fixa os mem_limit: onion-vps-librechat@7338dcb:docker-compose.yml l.6, l.16, l.82, l.100, l.119, l.137 (repo local sem remoto alcançável, host)"
+      method: "medição: free -m; swapon --show; docker inspect --format '{{.Name}} mem={{.HostConfig.Memory}}' e docker stats --no-stream --format '{{.Name}} {{.MemUsage}} {{.MemPerc}}' sobre onion-vps-librechat, -rag, -vectordb, -mongo, -meilisearch e -admin, em 2026-10-09"
       locality: "host"
 
   - id: E_SKILLSYNC_DORMANT_V087
@@ -165,7 +182,6 @@ nodes:
       locality: "repo"
   - id: D_STACK_PADRAO_ONION_VPS
     node_type: decision
-    trace: /home/marcio/onion-vps-librechat/docker-compose.yml
     layer: audit
     plane: DEV
     impact: 5
@@ -174,7 +190,7 @@ nodes:
     verified_at: 2026-08-20
     verified_against: "repo onion-vps-librechat commitado (7338dcb): 5 servicos pinados (api v0.8.7, mongo 8.0.20, meili 1.35.1, pgvector 0.8.0-pg15, rag v0.9.0 — tags conferidas no registry), compose config valida com segredos reais, fail-closed provado por recusa, app OIDC sqov79y2x3s6qawreafga provisionado via Management API e verificado por releitura"
     label: "DECISÕES DO MAESTRO SELADAS (plano 2026-08-20): chat.onionevolve.com · SSO Logto (Onion ID), com admin LOCAL e login local ativo (OIDC liga só se o segredo existir) · só Anthropic na v1 · escopo completo com RAG (5 containers pinados) — stack construído no padrão da casa"
-    narrative: "label anterior: DECISOES DO MAESTRO SELADAS: chat.onionevolve.com · SSO Logto obrigatorio (janela do 1o admin local) · so Anthropic server-key · escopo COMPLETO (5 containers com RAG) — e o stack ja esta construido no padrao da casa"
+    narrative: "label anterior: DECISOES DO MAESTRO SELADAS: chat.onionevolve.com · SSO Logto obrigatorio (janela do 1o admin local) · so Anthropic server-key · escopo COMPLETO (5 containers com RAG) — e o stack ja esta construido no padrao da casa · trace anterior (só no host): docker-compose.yml do repo local onion-vps-librechat (commit 7338dcb), sem remoto alcançável (host)."
     provenance:
       source: "onion-vps-librechat@c943a9b:README.md + @7338dcb (docker-compose.yml, librechat.yaml, up.sh) (repo local sem remoto alcançável, host)"
       locator: "c943a9b:README.md l.10-13 ('Plano aprovado pelo maestro (2026-08-20)… SSO Logto (Onion ID), só Anthropic na v1… escopo completo com RAG. Decisões seladas'), l.17-25; 7338dcb:docker-compose.yml l.33-38 (ALLOW_EMAIL_LOGIN true para sempre), l.44-46, l.53-56 (OIDC vazio = login local segue); 7338dcb:up.sh l.17-22"
@@ -253,3 +269,6 @@ edges:
   - from: Q_EMBEDDINGS_KEY_PENDENTE
     to: D_STACK_PADRAO_ONION_VPS
     edge_type: CONSTRAINS
+  - from: E_HEADROOM_RAM_MEDIDO_1009
+    to: E_HEADROOM_SWAP_100
+    edge_type: SUPERSEDES

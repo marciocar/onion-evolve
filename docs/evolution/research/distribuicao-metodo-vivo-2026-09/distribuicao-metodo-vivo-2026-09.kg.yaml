@@ -500,7 +500,7 @@ nodes:
     impact: 5
     confidence: 0.95
     verified_at: 2026-09-13
-    verified_against: 'medicao local em /home/marcio/onion-evolve nesta rodada: ls .claude/diary | wc -l = 127 arquivos (o primeiro e 2026-07-01-audit-dogfood-finds-code-bugs.md); grep -c exclude .claude/commands/meta/adopt.md = 0; docs/evolution/federation/members.yaml e docs/analysis/arandek-repo-exposure-2026-08.md presentes no working tree. CORRECAO de rota feita nesta medicao: o Elenxo citou docs/diary, que NAO EXISTE — o diario vive em .claude/diary, ou seja, DENTRO do diretorio que o /meta:adopt vendoriza'
+    verified_against: "medicao local na raiz do clone (onion-evolve@27179d37) nesta rodada: ls .claude/diary | wc -l = 127 arquivos (o primeiro e 2026-07-01-audit-dogfood-finds-code-bugs.md); grep -c exclude .claude/commands/meta/adopt.md = 0; docs/evolution/federation/members.yaml e docs/analysis/arandek-repo-exposure-2026-08.md presentes no working tree. CORRECAO de rota feita nesta medicao: o Elenxo citou docs/diary, que NAO EXISTE — o diario vive em .claude/diary, ou seja, DENTRO do diretorio que o /meta:adopt vendoriza"
     source_tier: 10
     source_kind: local-measurement
     label: 'A biografia nao vaza pela HISTORIA, vaza pela ARVORE — e pior do que o Elenxo supos: os 127 arquivos do diario vivem em .claude/diary, DENTRO do diretorio que o /meta:adopt copia, e o adopt.md nao tem UMA ocorrencia da palavra exclude (zero mecanismo de filtro). members.yaml e o achado de seguranca do arandek estao no working tree. Logo: template de 1 commit publica a biografia inteira com historia limpa, e fork publica tudo duas vezes. O filtro nao existe hoje em nenhum dos veiculos.'

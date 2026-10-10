@@ -469,7 +469,7 @@ nodes:
     impact: 4
     confidence: 0.95
     verified_at: '2026-09-15'
-    verified_against: 'write-stamp.sh --role standalone saia 2; /home/marcio/onion-standalone/.claude/.onion-version carrega role: adopted'
+    verified_against: "write-stamp.sh --role standalone saia 2; o .claude/.onion-version do clone local de onion-standalone carrega role: adopted"
     label: 'O MECANISMO NAO TINHA PORTA DE ENTRADA. O transporte aprendeu a cortar por papel e o `--update` aprendeu a LER o papel do stamp — mas `write-stamp.sh` recusava `standalone` (so `adopted|hub`), e o unico standalone do mundo, o repo PUBLICO, carrega `role: adopted` ate hoje. Somado ao `ONION_ROLE` que nenhum codigo atribuia, o corte nao disparava para adotante NENHUM que exista: gap invisivel trocado por gap invisivel, que e exatamente a tese do no que este PR fecha. Curado: o stamp aceita o papel e o `--update` EXPORTA `ONION_ROLE` para quem copia.'
     trace: '.claude/utils/adopt/write-stamp.sh'
     provenance:
@@ -501,7 +501,7 @@ nodes:
     impact: 5
     confidence: 0.95
     verified_at: '2026-09-15'
-    verified_against: 'adocao real do jogo-da-vida abortou com rc=1; `core.hooksPath` = /home/marcio/jogo-da-vida/.githooks (absoluto) contra a comparacao `[ "${DIR}" != ".githooks" ]`; apos a cura com -ef o mesmo alvo devolve GATE VIVO'
+    verified_against: "adocao real do jogo-da-vida abortou com rc=1; `core.hooksPath` = <raiz do clone de jogo-da-vida>/.githooks (absoluto) contra a comparacao `[ \"${DIR}\" != \".githooks\" ]`; apos a cura com -ef o mesmo alvo devolve GATE VIVO"
     label: 'O VERIFICADOR QUE EXISTE PARA PROVAR COMPORTAMENTO DECIDIA POR DECLARACAO DE PATH — e ABORTOU UMA ADOCAO REAL. `ops/verify-adopter-gate.sh` comparava `core.hooksPath` por STRING contra `.githooks`; um alvo com o caminho na forma ABSOLUTA (que o git aceita e resolve para o MESMO diretorio) reprovava. O veredito saia contradizendo as proprias linhas seguintes do script: `✗ o git IGNORA o hook` impresso LOGO ACIMA de `✓ o hook EXECUTOU no commit` e `✓ o commit foi BARRADO — bloqueio provado`. O `ABS` resolvido ja era calculado 15 linhas antes, exatamente para isto; so esta checagem nao o usava. E a causa de FUNDO nao e o operador `!=`: e que `ops/verify-adopter-gate.sh` tinha ZERO cobertura de bancada, sendo ele quem a adocao consulta para decidir se ENTREGOU o produto. Guarda sem bancada e guarda cujo defeito so aparece no repo de um cliente. Curado: comparacao por IDENTIDADE (`-ef`) + familia `adopter_gate` (4 casos), com mutante que devolve a comparacao a string e prova o caso, e um caso que mantem o fail-closed do gate SOMBREADO (husky ocupando o hooksPath) para a cura nao virar fail-open.'
     trace: 'ops/verify-adopter-gate.sh'
     provenance:
@@ -533,7 +533,7 @@ nodes:
     impact: 5
     confidence: 0.95
     verified_at: '2026-09-15'
-    verified_against: 'ops/audit-adopters-registry.sh /home/marcio — varredura por STAMP (.claude/.onion-version com role != source) cruzada com members.yaml: 19 adotantes no disco, 9 sem entrada'
+    verified_against: "ops/audit-adopters-registry.sh <home da conta do host> — varredura por STAMP (.claude/.onion-version com role != source) cruzada com members.yaml: 19 adotantes no disco, 9 sem entrada"
     label: 'O SINAL APONTOU UM CASO; A VARREDURA REVELOU UMA CLASSE — 9 de 19 adotantes no disco (47%) estao FORA do registro da federacao. Alguns sao residuo (onion-pedro-old, onion-pedro-hub-bak, onion-adopt-granaa-ai = worktree de adocao), mas ha repos REAIS na lista: aura, gustavo-pulga, rhilo-metagamify, poc-venda-direta-pdi, venda-direta-pdi, venda-direta-pdi-entrega. CONSEQUENCIA: o core nao resolve o `--target` do /meta:co-deliver para nenhum deles, entao todo anuncio futuro do CHANGELOG fica SEM DESTINATARIO — e cada um segue verde, porque o hook do adotante conta o que CHEGOU, nao o que deveria ter chegado. POR QUE NENHUM GATE ACUSOU, e e a licao: a reconciliacao `outbox x inbound` compara o que o core transportou contra o que chegou, e para um membro que NAO EXISTE ela compara DOIS CONJUNTOS VAZIOS e sai limpa. Toda guarda desta casa pergunta pelo que ESTA; esta precisou perguntar pelo que DEVERIA ESTAR, e para isso precisou de uma fonte independente — o disco. Ausencia nao dispara nada por construcao. O numero (9) e do maestro decidir: parte e lixo a podar, parte e registro a fazer, e a distincao exige julgamento (NDA, id, papel).'
     trace: 'ops/audit-adopters-registry.sh'
     provenance:
@@ -688,7 +688,7 @@ nodes:
     impact: 5
     confidence: 0.98
     verified_at: '2026-09-17'
-    verified_against: 'lint-artifacts.sh rodado na porta REAL (/home/marcio/onion-core, repo git, pin 7a3504e6b121): 1 HARD em .claude/rules/research-lens.md — contra o "rc=0, 0 HARD" que eu declarei do MESMO pin, medido num destino materializado SEM git init'
+    verified_against: "lint-artifacts.sh rodado na porta REAL (clone local de onion-core, repo git, pin 7a3504e6b121): 1 HARD em .claude/rules/research-lens.md — contra o \"rc=0, 0 HARD\" que eu declarei do MESMO pin, medido num destino materializado SEM git init"
     label: 'O `_rule_glob_matches` tinha dois ramos e eles DISCORDAVAM. Em repo git usava `git ls-files`; fora dele, `find -name "${g##*/}"` — e `${g##*/}` de `docs/evolution/research/**` e `**`, um curinga que casa QUALQUER arquivo. Consequencia: num destino sem `git init` toda regra path-scoped passava trivialmente. Eu materializei a porta de dogfood num destino assim e declarei 0 HARD; a porta real e repo git e reprovava. O modo de falha e o pior desta casa: a medicao BARATA era a que mentia, e foi a que escolhi — [[testar-no-caminho-errado-e-nao-testar]] dentro do harness da propria porta, o instrumento que deveria prevenir exatamente isso. Quem achou nao fui eu: foi a PORTA, num sinal de campo escrito por uma sessao limpa dela. CURADO: o ramo nao-git passa a respeitar o PREFIXO literal do glob, como o pathspec do git faz, com dois casos de bancada segurando os dois lados (nao casar quando o objeto falta; ainda casar quando existe — cura que cega a guarda nao e cura).'
     trace: '.claude/validation/lint-artifacts.sh'
     provenance:
@@ -801,7 +801,7 @@ nodes:
     confidence: 0.9
     owner: maestro
     verified_at: '2026-09-16'
-    verified_against: 'grep de /home/<conta>/ e do host de backend nas 11 raizes de varredura: 14 sitios remanescentes, todos em codigo funcional (defaults de varredura, endpoints, URL de pull)'
+    verified_against: "grep do prefixo de home de conta e do host de backend nas 11 raizes de varredura: 14 sitios remanescentes, todos em codigo funcional (defaults de varredura, endpoints, URL de pull)"
     label: 'ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles tem desfechos OPOSTOS. (1) NARRATIVA — anedota de campo, topologia de hospedagem, ponteiro para documento do core: 7 sitios, CURADOS neste PR (inclusive a secao 10 da KB de identidade, que descrevia backend, TLS e o caminho do clone em disco, e que viaja no `plugins/onion/kb/` publico). (2) FUNCIONAL — `vps-exposure-check.sh` varre diretorios de backup por default, `a2a-agent-card.sh` publica endpoint, `inbox-pull.sh` tem URL de core: 14 sitios. Ali o caminho NAO e prosa a limpar, e VALOR PADRAO a PARAMETRIZAR, e parametrizar destino e desenho, nao limpeza. E exatamente a peca (4) que o no Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN ja nomeia como a unica que o criterio "sem segredo" nao resolve sozinho: `marketplace/*` publica NO REPO DO MAESTRO. Gatilho: a decisao do maestro sobre parametrizar destino — a mesma decisao cobre os dois.'
     trace: '.claude/validation/vps-exposure-check.sh'
     provenance:
@@ -875,7 +875,7 @@ nodes:
     impact: 5
     confidence: 0.95
     verified_at: '2026-09-19'
-    verified_against: 'extracao por jq sobre 29 transcricoes de ~/.claude/projects/-home-marcio-onion-evolve (841 MB): 19.084 chamadas de ferramenta com nome e alvo; recorte por ocorrencia de `.kg.yaml` em file_path/command/pattern/path'
+    verified_against: "extracao por jq sobre 29 transcricoes do diretório de projetos do Claude Code do usuário para este repo (841 MB): 19.084 chamadas de ferramenta com nome e alvo; recorte por ocorrencia de `.kg.yaml` em file_path/command/pattern/path"
     trace: '.claude/hooks/kg-read-leg.sh'
     label: 'A MEDICAO QUE DECIDIA ENTRE OS TRES DESENHOS, e ela e mais extrema do que a hipotese. Das 2.457 chamadas que TOCAM um `.kg.yaml`: Bash 2.341 (95,3%) · Edit 83 (3,4%) · Read 17 (0,7%) · Write 16 (0,7%). O hook vigiava `Read` — ZERO-VIRGULA-SETE POR CENTO da superficie que existe para vigiar. Isso REPROVA o desenho (b) (mover para Edit|Write cobriria 4,1%) e escolhe o (a). CUSTO DO (a), tambem medido: `Bash` e 16.338 das 19.084 chamadas da base (86%), entao o hook passa a rodar em quase tudo — por isso a saida muda vem ANTES de qualquer parse, num `case` de shell sobre a string crua. TETO DA MEDICAO, declarado: ela conta CHAMADAS, nao sessoes-que-deviam-ter-lido. Um `bash` que roda o radar conta igual a um que edita o grafo. O numero diz ONDE o hook precisa estar; nao diz quantas vezes ele teria mudado um resultado. E POR ISSO O (c) ENTROU JUNTO, nao no lugar: um aviso perdido entre 16 mil chamadas de shell tem chance real de passar despercebido, e o (c) fala no PR, onde a proposta ja esta escrita e ainda da tempo de voltar.'
     provenance:

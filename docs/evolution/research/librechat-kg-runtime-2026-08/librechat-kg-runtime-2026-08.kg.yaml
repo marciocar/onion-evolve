@@ -72,7 +72,7 @@ nodes:
       locality: "repo"
   - id: Q_ONION_KG_MCP_NEXT
     node_type: question
-    trace: /home/marcio/onion-evolve/ops/mcp-onion-kg/server.py
+    trace: "ops/mcp-onion-kg/server.py"
     layer: audit
     plane: DEV
     impact: 4

@@ -526,7 +526,7 @@ nodes:
     status: open
     trace: .claude/utils/adopt/vendor-branch.sh
     verified_at: 2026-09-01
-    verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 5/5 claims; juiz APROVADO. Lidos os 2 adotantes citados (poc(47)=/home/marcio/poc-venda-direta-pdi, gustavo => <membro-t2>: onion/vendor HEAD=54849f7 possui 52 linhas de baseline rastreado, incluindo chaves `oni…'
+    verified_against: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 5/5 claims; juiz APROVADO. Lidos os 2 adotantes citados (poc(47)=clone local de poc-venda-direta-pdi, gustavo => <membro-t2>: onion/vendor HEAD=54849f7 possui 52 linhas de baseline rastreado, incluindo chaves `oni…"
     label: "FOLLOW-UP M2 (gatilho: o veneno congelado voltar a incomodar): poc(47)/gustavo(48) tem chaves estrangeiras JA rastreadas no onion/vendor, congeladas inertes pela cura (vendor==merge-base → merge toma *ours*). A cura NAO as remove, so as impede de avancar. Scrub/re-seed do baseline do vendor removeria o passivo latente. Hoje inerte; promover so se a equivalencia vendor==merge-base quebrar"
   - id: E_PRIMEIRO_DOGFOOD_REAL
     node_type: evidence

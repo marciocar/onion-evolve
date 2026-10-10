@@ -62,7 +62,7 @@ nodes:
     confidence: 0.9
     verified_at: 2026-07-25
     label: "L2 pin herdado — DECLARADO: pin 1.36.0 do compose destilado tratado (pela acao) como transporte neutro herdado; VERIFICADO: versao e conteudo, 5 minors atras (1.36->1.41), faltavam fixes de seguranca reais (account enumeration 1.39, MFA adaptativa 1.38, KEK do Secret Vault) — heranca seletiva de ceticismo, gap so achado por pergunta do maestro"
-    trace: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md; source_commit 65d8a7501a03; stack /home/marcio/onion-logto commit 7c008b2"
+    trace: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md; source_commit 65d8a7501a03; stack onion-logto@7c008b2"
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md; source_commit 65d8a7501a03; onion-logto@7c008b2e"
       locator: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md; source_commit 65d8a7501a03; stack onion-logto commit 7c008b2"

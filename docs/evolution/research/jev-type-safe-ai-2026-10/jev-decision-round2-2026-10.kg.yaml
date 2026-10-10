@@ -71,7 +71,7 @@ nodes:
     impact: 4
     confidence: 0.95
     verified_at: 2026-10-01
-    verified_against: 'rodado por mim: `git ls-files | grep -i llms-full` → vazio; `find /home/marcio/onion-evolve -name "*llms-full*" -not -path "*/.git/*"` → vazio; `find docs/evolution/research/typesafe-ai-2026-09 -type f` → exatamente 2 arquivos (SYNTHESIS.md, typesafe-ai-2026-09.kg.yaml)'
+    verified_against: "rodado por mim: `git ls-files | grep -i llms-full` → vazio; (na raiz do clone) `find . -name \"*llms-full*\" -not -path \"*/.git/*\"` → vazio; `find docs/evolution/research/typesafe-ai-2026-09 -type f` → exatamente 2 arquivos (SYNTHESIS.md, typesafe-ai-2026-09.kg.yaml)"
     source_tier: 10
     source_kind: primary
     label: 'CORRECAO MEDIDA a uma premissa do Elenxo: o `docs.typesafe.ai/llms-full.txt` de 903 KB NAO esta em disco nem versionado. Foi baixado na rodada de 2026-09-21 e DESCARTADO — o que sobrou sao 64 KB de derivado (34,8 KB de grafo + 29,3 KB de sintese). Isso tem duas consequencias que mudam a decisao: (a) a Opcao D ("fechar as lacunas pelo corpus local JA PAGO") esta parcialmente falsa — reler o primario exige buscar de novo, e o fabricante pausou cadastros, logo "ja pago" vale para as CONCLUSOES, nao para o TEXTO; (b) o primario e, para esta rodada, "primario citado, nao lido" — o que o Elenxo cita dele e intermediado pelos nos de 09-21, que sao tier 10 e confiaveis, mas sao resumo, nao fonte. A lacuna de mecanismo e maior que este caso: uma rodada de pesquisa baixa 903 KB de primario e nao versiona nada, e a rodada seguinte nao tem como re-ancorar uma citacao.'

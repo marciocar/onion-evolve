@@ -265,7 +265,7 @@ nodes:
       locality: "repo"
   - id: E_FALLBACK_NATIVO_MEDIDO_0903
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 0.9
@@ -278,8 +278,8 @@ nodes:
     provenance:
       source: "docs/onion/radar-baselines.yaml"
       locator: "binario 2.1.259 (strings): chave de settings fallbackModel (aceita LISTA — merge especial), flag --fallback-model, classe FallbackTriggeredError(originalModel, fallbackModel, reason=\"overloaded\") apos retries de 529, headers x-cc-fallback-from-model/-trigger/-category; NAO encontrado fallback por COTA do plano"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "repo"
+      method: "medição: leitura de strings do binário do Claude Code 2.1.259 em 2026-09-03 (fallbackModel, --fallback-model, FallbackTriggeredError, headers x-cc-fallback-*), comando não registrado"
+      locality: "web"
   - id: E_ESCADA_DE_MODELOS_IMPLEMENTADA_0903
     node_type: evidence
     plane: PROD
