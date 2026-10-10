@@ -50,5 +50,5 @@ ITrustManager:
 ## Consumidores desta interface
 
 - `.claude/validation/trust-topology-check.sh` — gate determinístico (Shell)
-- `.claude/commands/meta/co-relay.md` (extensão Fase 3) — antes de `--to peer:<id>`
+- `/meta:co-relay` (extensão Fase 3; comando de federação, que não viaja para as portas sem federação) — antes de `--to peer:<id>`
 - `.claude/commands/meta/diary.md` — `export-sharable` verifica classification antes de empacotar
