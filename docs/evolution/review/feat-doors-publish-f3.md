@@ -2,7 +2,8 @@
 title: 'Resíduo — F3 das portas: /meta:publish sob demanda'
 date: 2026-10-10
 branch: feat/doors-publish-f3
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c3ee4a77661e60a229b585b32110644eb2f00b5e92225c6bbe0124007123bb26
+reviewed_code_sha256: 40e5f89be8efd4335fd08dea898890b5610a163482f74e393be1de3159a33872
 findings_total: 13
 findings_real: 13
 findings_fixed: 11
