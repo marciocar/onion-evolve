@@ -56,7 +56,9 @@ check_ladder() {
   # o `members.yaml` (que legitimamente nao viaja) saia HARD. A classe e conhecida nesta casa: em
   # guarda de lista, o defeito dominante e o VOCABULARIO, nao a logica. O papel nasceu no manifesto e
   # ninguem voltou nos predicados que o julgam.
-  local adopted=""; grep -qE '^(role: (adopted|hub|standalone)|decoupled_from:)' "${root}/.claude/.onion-version" 2>/dev/null && adopted=1
+  # `kind: door` (2026-10-10, F2 das portas): os papéis de porta plugins, mini e source não cabem na
+  # lista acima; o carimbo de porta os cobre (medido: a porta source saía com 1 HARD daqui).
+  local adopted=""; grep -qE '^(role: (adopted|hub|standalone)|decoupled_from:|kind: door)' "${root}/.claude/.onion-version" 2>/dev/null && adopted=1
   if [ ! -f "${registry}" ]; then
     [ "${FORMAT}" = "tsv" ] || echo "  (sem registry — escada não declarada; nasce silencioso)"
     return 0
