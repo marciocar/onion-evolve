@@ -162,7 +162,7 @@ re_cmd = re.compile(r"(?<![A-Za-z0-9_.~/-])/([a-z]+):([a-z][a-z0-9-]*)(?::([a-z]
 re_old = re.compile(r"(?<![A-Za-z0-9_.~/-])/([a-z]+)/([a-z][a-z0-9-]*)(?![A-Za-z0-9_/.-])")
 re_frag = re.compile(r"(?<![A-Za-z0-9_./-])common[:/](prompts|templates)[:/]([a-z0-9][a-z0-9-]*)")
 re_agent = re.compile(r"(?<![A-Za-z0-9_.])@([a-z][a-z0-9-]+)")
-re_root = re.compile(r"(?<![A-Za-z0-9_.~/:@`-])/([a-z][a-z0-9-]+)(?![A-Za-z0-9_/:.@-])")
+re_root = re.compile(r"(?<![A-Za-z0-9_.~/:@-])/([a-z][a-z0-9-]+)(?![A-Za-z0-9_/:.@-])")
 re_docs = re.compile(r"(?<![A-Za-z0-9_./-])docs/[A-Za-z0-9_./-]+\.(?:md|ya?ml|json|txt)")
 re_link = re.compile(r"\]\(([^)\s]+)\)")
 # home de QUALQUER conta, inclusive maiúscula, o /Users/ do macOS e o /root/ (passada adversarial da F5)
@@ -214,7 +214,9 @@ for f in sorted(files):
         if re.match(r"^(https?:|mailto:|#|/|<)", tgt):
             continue
         tgt = tgt.split("#", 1)[0].split("?", 1)[0]
-        if not tgt or "{" in tgt or "$" in tgt:
+        # só o que tem FORMA de caminho: `[texto](url)` de template e `](.+)` de regex em bloco de código
+        # não são ponteiros (1a medição da forma: dois falsos positivos exatamente assim)
+        if not re.fullmatch(r"[A-Za-z0-9_./-]+", tgt or "") or not (re.search(r"\.[A-Za-z0-9]+$", tgt) or "/" in tgt):
             continue
         r = os.path.normpath(os.path.join(os.path.dirname(f), tgt))
         if r.startswith(".."):
