@@ -629,7 +629,8 @@ elif [ "${COMMITTED}" -eq 1 ]; then
     git -C "${DEST}" push -q origin "refs/tags/${ARCHIVE_TAG}" 2>&1 | sed 's/^/  │ /'
     _trc="${PIPESTATUS[0]}"
     _tl="$(git -C "${DEST}" rev-parse "refs/tags/${ARCHIVE_TAG}" 2>/dev/null)"
-    _tr="$(git ls-remote "${REMOTE_URL}" "refs/tags/${ARCHIVE_TAG}" 2>/dev/null | awk '{print $1}')"
+    # a tag ANOTADA aparece duas vezes no ls-remote (o objeto e o `^{}` descascado): compare o objeto
+    _tr="$(git ls-remote "${REMOTE_URL}" "refs/tags/${ARCHIVE_TAG}" 2>/dev/null | awk -v r="refs/tags/${ARCHIVE_TAG}" '$2==r {print $1}')"
     if [ "${_trc}" -ne 0 ] || [ -z "${_tr}" ] || [ "${_tr}" != "${_tl}" ]; then
       echo "✗ a tag de arquivo ${ARCHIVE_TAG} NÃO chegou ao remoto (rc=${_trc}, remoto='${_tr:0:12}') — a porta NÃO foi empurrada; o conteúdo anterior segue intacto." >&2
       exit 2
