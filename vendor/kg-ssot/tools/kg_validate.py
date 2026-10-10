@@ -20,6 +20,7 @@ da suíte, os de codes() e warnings() (parse.*, form.*, integrity.*, yaml.*), co
 Sem --schema, o contrato é o vigente (CONTRACT_MUST) e os avisos são do SHOULD dele (CONTRACT_SHOULD). Com
 --schema S, o SHOULD é --should-schema, ou o vizinho S.should.schema.json quando existe, ou nenhum.
 
+--corpus DIR liga a conferência da ponta externa das external_edges (v4.3) contra os .kg.yaml sob DIR.
 --where acrescenta, por arquivo, uma linha por ocorrência com o nó ou a aresta (where()); a saída padrão não muda.
 --spike troca a saída humana e o rc pelos do spike (check() e classify(), perfil Yaml12BoolLoader), para
 reproduzir a medição do spike. --json OUT grava SEMPRE o formato do spike ({summary, results}),
@@ -254,8 +255,19 @@ def classify(error):
     return [f"{scope}.{field}:{v}"]
 
 
+EXTERNAL_REF = re.compile(r"^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\.kg\.yaml#[A-Za-z][A-Za-z0-9_]*$")
+
+
+def is_external(ref):
+    return isinstance(ref, str) and EXTERNAL_REF.match(ref) is not None
+
+
 def item_place(key, index, item):
     """O lugar legível de um item: o nó pelo id (ou pela posição, contando de 1), a aresta pela posição e pelas pontas."""
+    if key == "external_edges":
+        if isinstance(item, dict):
+            return f"aresta externa #{index + 1} ({item.get('from', '(o grafo)')} -> {item.get('to')})"
+        return f"aresta externa #{index + 1}"
     if key == "nodes":
         nid = item.get("id") if isinstance(item, dict) else None
         return f"nó {nid}" if isinstance(nid, str) and nid else f"nó #{index + 1}"
@@ -270,8 +282,48 @@ def _located(doc, key):
     return [(x, item_place(key, i, x)) for i, x in enumerate(raw) if isinstance(x, dict)] if isinstance(raw, list) else []
 
 
-def integrity_located(doc, refs=("on",)):
-    """Os códigos de integridade com o lugar de cada ocorrência: lista de (código, lugar)."""
+def index_texts(items):
+    """[(caminho, texto)] → {caminho: {ids}}: o corpus montado de textos já lidos (a catraca lê o core por git show)."""
+    index = {}
+    for name, text in items:
+        _, doc, _ = parse_v1(text)
+        nodes = doc.get("nodes") if doc and isinstance(doc.get("nodes"), list) else []
+        index[name] = {str(n["id"]) for n in nodes if isinstance(n, dict) and n.get("id") is not None}
+    return index
+
+
+def uses_external(text):
+    """Barato: o texto tem uma chave external_edges de topo? Só então vale montar o corpus."""
+    return re.search(r"(?m)^external_edges\s*:", text) is not None
+
+
+def corpus_index(root, files=None):
+    """O corpus para conferir a ponta externa (v4.3): {caminho relativo a root: {ids}}. files: os caminhos a ler (o gate
+    passa os .kg.yaml rastreados); sem files, os .kg.yaml rastreados se root é repo git, senão todo .kg.yaml sob root.
+    Arquivo ilegível entra sem ids. root que não é diretório é entrada quebrada (ValueError)."""
+    root = pathlib.Path(root)
+    if not root.is_dir():
+        raise ValueError(f"corpus {root} não é um diretório")
+    if files is None:  # num repo git, os rastreados (como o gate); fora dele, todo arquivo regular sob root
+        out = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--", "*.kg.yaml"], capture_output=True)
+        if out.returncode == 0:
+            files = [n for n in out.stdout.decode("utf-8").split("\0") if n]
+        else:
+            files = sorted(p.relative_to(root).as_posix() for p in root.rglob("*.kg.yaml")
+                           if ".git" not in p.relative_to(root).parts)
+    names = [n for n in files if (root / n).is_file()]  # FIFO, diretório e apagado ficam fora
+    items = []
+    for name in names:
+        try:
+            items.append((name, (root / name).read_text(encoding="utf-8")))
+        except (OSError, UnicodeDecodeError):
+            items.append((name, ""))
+    return index_texts(items)
+
+
+def integrity_located(doc, refs=("on",), corpus=None):
+    """Os códigos de integridade com o lugar de cada ocorrência: lista de (código, lugar). corpus (corpus_index) liga
+    a conferência da ponta externa das external_edges; sem ele, só a ponta local é conferida."""
     out = []
     nodes = _located(doc, "nodes")
     # Só ids presentes entram no conjunto: um sentinela como str(None) casaria com um nó de id "None".
@@ -298,6 +350,19 @@ def integrity_located(doc, refs=("on",)):
                     out.append((f"integrity.dangling-{key}", place))
                 else:
                     touched.add(str(e[key]))
+    for e, place in _located(doc, "external_edges"):  # v4.3: a ponta local existe; a externa, com o corpus
+        for end in ("from", "to"):
+            ref = e.get(end)
+            if ref is None:
+                continue  # from ausente: o grafo inteiro
+            if isinstance(ref, str) and "#" in ref:  # externa; a malformada já reprova na forma, e só a bem formada vai ao corpus
+                path, nid = ref.rsplit("#", 1)
+                if corpus is not None and is_external(ref) and nid not in corpus.get(path, ()):
+                    out.append(("integrity.dangling-external", place))
+            elif str(ref) in ids:
+                touched.add(str(ref))
+            else:
+                out.append(("integrity.dangling-external-local", place))
     # Nó de grau 0 o radar reprova (achado do próprio spike: o leitor neutro não checava). Nó sem id
     # não pode ser ponta de aresta, então também tem grau 0.
     first = {}
@@ -309,10 +374,10 @@ def integrity_located(doc, refs=("on",)):
     return out
 
 
-def integrity(doc, refs=("on",)):
+def integrity(doc, refs=("on",), corpus=None):
     """refs: as chaves de aresta que também são referência a nó. O spike usa só on (o legado que o
     radar lia); o contrato v1 usa trigger, e on segue como referência para não acusar o evento duas vezes."""
-    return [code for code, _ in integrity_located(doc, refs)]
+    return [code for code, _ in integrity_located(doc, refs, corpus)]
 
 
 def check(text, validator):
@@ -353,7 +418,8 @@ def form_codes(error):
     """
     path = list(error.absolute_path)
     scope = scope_of(path) if path else "top"
-    prefix = inner_names(path) if scope != "top" else []
+    # no topo, um objeto dentro de uma lista do topo (external_edges) leva o nome da lista no código
+    prefix = inner_names(path) if scope != "top" else [p for p in path if not isinstance(p, int)]
     if "propertyNames" in error.schema_path:  # nível SHOULD: o nome da chave
         if error.validator == "pattern":  # nome que não é slug (<<, 1.0, chave com espaço)
             return [f"form.pattern.{scope}.{'.'.join(prefix + ['key'])}"]
@@ -372,7 +438,8 @@ def form_codes(error):
     # O erro é de um VALOR. Um item de lista que não é mapa (nodes: [a]) vira o campo `item`.
     scope = scope_of(path) if len(path) >= 2 else "top"
     if path and isinstance(path[-1], int):
-        return [f"form.{kind}.{scope}.item"]
+        lead = [p for p in path[:-1] if not isinstance(p, int)] if scope == "top" else []
+        return [f"form.{kind}.{scope}.{'.'.join(lead + ['item'])}"]
     names = inner_names(path) if scope != "top" else [p for p in path if not isinstance(p, int)]
     return [f"form.{kind}.{scope}.{'.'.join(names) if names else 'root'}"]
 
@@ -400,7 +467,7 @@ def parse_v1(text):
         return None, None, "parse.yaml-error"
 
 
-def code_counts(text, validator):
+def code_counts(text, validator, corpus=None):
     """Os códigos MUST de codes() com a contagem de ocorrências: Counter código → quantas vezes.
 
     As chaves são exatamente as de codes(); a contagem é o que a saída humana mostra (33 nós sem
@@ -411,7 +478,7 @@ def code_counts(text, validator):
         return collections.Counter([parse_code])
     out = collections.Counter(c for err in validator.iter_errors(doc) for c in form_codes(err))
     out.update(non_finite_codes(doc))
-    out.update(integrity(doc, refs=("trigger", "on")))
+    out.update(integrity(doc, refs=("trigger", "on"), corpus=corpus))
     edges = doc.get("edges") if isinstance(doc.get("edges"), list) else []
     with_on = sum(1 for e in edges if isinstance(e, dict) and "on" in e)
     if with_on:
@@ -419,14 +486,14 @@ def code_counts(text, validator):
     return out
 
 
-def codes(text, validator):
+def codes(text, validator, corpus=None):
     """Os códigos MUST que este leitor emite para um arquivo: lista ordenada, sem repetição.
 
     É a interface da suíte de conformidade (spec/conformance/). Mede as mesmas três camadas de
     check() (parse, schema, integridade), mas com a taxonomia estável da suíte (form_codes) em vez
     das chaves de classify(), e conta documentos nulos no parse.
     """
-    return sorted(code_counts(text, validator))
+    return sorted(code_counts(text, validator, corpus))
 
 
 def _has_unquoted_date(value):
@@ -500,13 +567,13 @@ def warning_counts(text, validator, should_validator):
 
 def schema_place(doc, path):
     """O lugar de um erro do schema a partir do caminho: o nó ou a aresta, o meta, ou o topo."""
-    if path and path[0] in ("nodes", "edges") and len(path) >= 2 and isinstance(path[1], int):
+    if path and path[0] in ("nodes", "edges", "external_edges") and len(path) >= 2 and isinstance(path[1], int):
         items = doc.get(path[0]) if isinstance(doc.get(path[0]), list) else []
         return item_place(path[0], path[1], items[path[1]] if path[1] < len(items) else None)
     return "meta" if path and path[0] == "meta" else "topo"
 
 
-def where(text, validator, should_validator=None):
+def where(text, validator, should_validator=None, corpus=None):
     """Cada ocorrência com o lugar: lista de (nível, código, lugar), nível MUST ou SHOULD (Q_VALIDATOR_NODE_LOCATIONS).
 
     Os códigos são exatamente os que code_counts() e warning_counts() contam, ocorrência por ocorrência (o teste
@@ -523,7 +590,7 @@ def where(text, validator, should_validator=None):
             out.append(("MUST", code, place))
             must.add(code)
     out += [("MUST", code, "arquivo") for code in sorted(non_finite_codes(doc))]
-    out += [("MUST", code, place) for code, place in integrity_located(doc, refs=("trigger", "on"))]
+    out += [("MUST", code, place) for code, place in integrity_located(doc, refs=("trigger", "on"), corpus=corpus)]
     out += [("MUST", "yaml.forbidden-key-on", place) for e, place in _located(doc, "edges") if "on" in e]
     if should_validator is not None:
         for err in should_validator.iter_errors(doc):
@@ -628,6 +695,8 @@ def main(argv=None):
     ap.add_argument("--json", help="grava o formato do spike ({summary, results})")
     ap.add_argument("--spike", action="store_true", help="saída humana e rc do spike (check/classify)")
     ap.add_argument("--where", action="store_true", help="lista cada ocorrência com o nó ou a aresta em que ela sai")
+    ap.add_argument("--corpus", metavar="DIR", help="raiz do repo: confere a ponta externa das external_edges contra os"
+                                                     " .kg.yaml sob DIR (sem ela, só a forma e a ponta local)")
     ap.add_argument("files", nargs="*")
     args = ap.parse_args(argv)
     if args.where and args.spike:
@@ -645,20 +714,26 @@ def main(argv=None):
     except (OSError, ValueError, UnicodeDecodeError, subprocess.CalledProcessError) as exc:
         print(f"ENTRADA QUEBRADA  {exc}")
         return 2
-    results, lines, failed, warned = [], [], 0, 0
+    try:
+        corpus = corpus_index(args.corpus) if args.corpus else None
+    except ValueError as exc:
+        print(f"ENTRADA QUEBRADA  {exc}")
+        return 2
+    results, lines, failed, warned, unchecked = [], [], 0, 0, 0
     for name, text in sources:
         r = check(text, validator)
         r["file"] = name
         results.append(r)
         if args.spike:
             continue
-        must = code_counts(text, validator)
+        must = code_counts(text, validator, corpus)
+        unchecked += corpus is None and uses_external(text)
         should = warning_counts(text, validator, should_v) if should_v is not None else collections.Counter()
         failed += bool(must)
         warned += bool(should)
         lines += report(name, must, should)
         if args.where:  # a mesma ocorrência repetida (os ramos if/then do schema) vira uma linha com ×n
-            found = collections.Counter(where(text, validator, should_v))
+            found = collections.Counter(where(text, validator, should_v, corpus))
             lines += [f"    {level:<6} {code}  {place}" + (f" ×{n}" if n > 1 else "")
                       for (level, code, place), n in sorted(found.items(), key=lambda x: (x[0][0] != "MUST", x[0][1:]))]
     summary = summarize(results)
@@ -671,6 +746,9 @@ def main(argv=None):
     contract = pathlib.Path(args.schema).name + (f" + {pathlib.Path(should_path).name}" if should_path else "")
     lines.append(f"· {len(sources)} arquivos; {len(sources) - failed} passam no MUST; {warned} com aviso SHOULD"
                  f" ({contract})")
+    if unchecked:
+        lines.append(f"· {unchecked} arquivo(s) com external_edges: a ponta externa NÃO foi conferida (rode com --corpus"
+                     " <raiz do repo>)")
     print("\n".join(lines))
     return 1 if failed else 0
 

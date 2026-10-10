@@ -1,0 +1,39 @@
+{
+  "description": "A ponta externa conferida contra o corpus (v4.3): o caso declara corpus, o diretório que faz de raiz do repo, e o arquivo e o id do alvo têm de existir nele (integrity.dangling-external). O leitor sem corpus reporta n/a.",
+  "layer": "integrity",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "alvo.kg.yaml",
+      "description": "o grafo-alvo das referências deste grupo; válido sozinho",
+      "valid": true,
+      "codes": [],
+      "corpus": "."
+    },
+    {
+      "file": "valid-corpus-target-exists.kg.yaml",
+      "description": "o arquivo e o id do alvo existem no corpus",
+      "valid": true,
+      "codes": [],
+      "corpus": "."
+    },
+    {
+      "file": "bad-corpus-target-id-missing.kg.yaml",
+      "description": "o arquivo existe, o id não",
+      "valid": false,
+      "codes": [
+        "integrity.dangling-external"
+      ],
+      "corpus": "."
+    },
+    {
+      "file": "bad-corpus-target-file-missing.kg.yaml",
+      "description": "o arquivo do alvo não existe no corpus",
+      "valid": false,
+      "codes": [
+        "integrity.dangling-external"
+      ],
+      "corpus": "."
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "description": "A forma das arestas entre grafos (v4.3, Q_CROSS_GRAPH_REFS): exatamente uma ponta externa <caminho>#<id>, a outra um id deste arquivo (ou o grafo inteiro, sem from), e só os tipos SUPERSEDES, CONSTRAINS, SUPPORTS, REFUTES, TRACES_TO e DEPENDS_ON.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-external-graph-supersedes.kg.yaml",
+      "description": "sem from: o grafo inteiro supera um nó de outro grafo",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-external-constrains-in.kg.yaml",
+      "description": "um nó de fora limita um nó daqui",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-external-local-to-external.kg.yaml",
+      "description": "um nó daqui sustenta um nó de fora, com chave x_",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-external-both-external.kg.yaml",
+      "description": "as duas pontas externas: a aresta não descreve nada deste grafo",
+      "valid": false,
+      "codes": [
+        "form.pattern.top.external_edges.to"
+      ]
+    },
+    {
+      "file": "bad-external-both-local.kg.yaml",
+      "description": "as duas pontas locais: é aresta comum, vai em edges",
+      "valid": false,
+      "codes": [
+        "form.pattern.top.external_edges.to"
+      ]
+    },
+    {
+      "file": "bad-external-domain-type.kg.yaml",
+      "description": "tipo da camada domain não cruza grafos",
+      "valid": false,
+      "codes": [
+        "form.enum.top.external_edges.edge_type"
+      ]
+    },
+    {
+      "file": "bad-external-absolute-path.kg.yaml",
+      "description": "caminho absoluto: a referência é relativa à raiz do repo",
+      "valid": false,
+      "codes": [
+        "form.pattern.top.external_edges.to"
+      ]
+    },
+    {
+      "file": "bad-external-unknown-key.kg.yaml",
+      "description": "chave desconhecida sem x_ na aresta externa",
+      "valid": false,
+      "codes": [
+        "form.unknown-key.top.external_edges.motivo"
+      ]
+    },
+    {
+      "file": "bad-external-missing-to.kg.yaml",
+      "description": "sem to",
+      "valid": false,
+      "codes": [
+        "form.required.top.external_edges.to"
+      ]
+    },
+    {
+      "file": "bad-external-dot-segment.kg.yaml",
+      "description": "segmento .. no caminho: a referência não sai da raiz do repo",
+      "valid": false,
+      "codes": [
+        "form.pattern.top.external_edges.to"
+      ]
+    },
+    {
+      "file": "bad-external-windows-path.kg.yaml",
+      "description": "caminho com : ou \\\\ (Windows): a referência é relativa, com /",
+      "valid": false,
+      "codes": [
+        "form.pattern.top.external_edges.to"
+      ]
+    },
+    {
+      "file": "bad-external-item-scalar.kg.yaml",
+      "description": "item da lista que não é mapa: o código leva o nome da lista",
+      "valid": false,
+      "codes": [
+        "form.type.top.external_edges.item"
+      ]
+    }
+  ]
+}

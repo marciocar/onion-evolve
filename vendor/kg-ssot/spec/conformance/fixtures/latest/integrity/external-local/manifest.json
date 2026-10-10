@@ -1,0 +1,21 @@
+{
+  "description": "A ponta local de uma aresta entre grafos (v4.3) existe neste arquivo, e conta como ligação: o nó ligado só por aresta externa não é órfão. Sem corpus, a ponta externa não é conferida.",
+  "layer": "integrity",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-external-only-link.kg.yaml",
+      "description": "nó ligado só por aresta externa: não é órfão",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-external-local-missing.kg.yaml",
+      "description": "a ponta local não existe neste arquivo",
+      "valid": false,
+      "codes": [
+        "integrity.dangling-external-local"
+      ]
+    }
+  ]
+}

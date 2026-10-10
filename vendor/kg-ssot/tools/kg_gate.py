@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """O gate do adotante (E6, EPIC_6_CORE_GRADUATION): os grafos de um repo contra o contrato, com catraca POR GRAFO.
 
+A ponta externa das external_edges (v4.3) é conferida contra TODOS os .kg.yaml rastreados, inclusive os excluídos do
+corpus: alvo inexistente ou apagado reprova quem aponta (integrity.dangling-external).
+
 Mede os .kg.yaml rastreados por git no repo (árvore de trabalho; fora */fixtures/* e docs/materials/*, como no
 spike, ou o que --exclude disser) contra o MUST e o SHOULD do contrato vigente, e compara com a linha de base:
   failing — grafo → códigos MUST que ele carrega hoje (a dívida herdada, nomeada por caminho);
@@ -57,7 +60,7 @@ def validators():
     return load(kg_validate.CONTRACT_MUST), load(kg_validate.CONTRACT_SHOULD)
 
 
-def measure_texts(items):
+def measure_texts(items, corpus=None):
     """[(caminho, texto)] → {caminho: {"must": [códigos], "should": [códigos]}}: a medição de um corpus.
 
     É a mesma lógica que a catraca daqui (kg_ratchet.core_numbers) usa para medir o core por fora.
@@ -66,7 +69,7 @@ def measure_texts(items):
     out = {}
     for name, text in items:
         counts = kg_validate.warning_counts(text, must, should)
-        out[name] = {"must": kg_validate.codes(text, must), "should": sorted(counts), "should_counts": dict(counts)}
+        out[name] = {"must": kg_validate.codes(text, must, corpus), "should": sorted(counts), "should_counts": dict(counts)}
     return out
 
 
@@ -85,6 +88,15 @@ def corpus(repo, exclude=DEFAULT_EXCLUDE):
         if path.is_file():  # rastreado mas apagado na árvore de trabalho: saiu do corpus
             items.append((n, path.read_text(encoding="utf-8")))
     return items
+
+
+def tracked_graphs(repo):
+    """Todos os .kg.yaml rastreados, sem os filtros do corpus: é contra eles que a ponta externa é conferida (um alvo
+    num grafo excluído do gate continua sendo alvo válido)."""
+    out = subprocess.run(["git", "-C", str(repo), "ls-files", "-z", "--", "*.kg.yaml"], capture_output=True)
+    if out.returncode != 0:
+        raise Broken(f"{repo} não é um repositório git: {out.stderr.decode('utf-8', 'replace').strip()[:200]}")
+    return [n for n in out.stdout.decode("utf-8").split("\0") if n and (pathlib.Path(repo) / n).is_file()]
 
 
 def contract_identity():
@@ -225,8 +237,11 @@ def main(argv=None):
         return 2
     path = pathlib.Path(args.baseline) if args.baseline else pathlib.Path(args.repo) / DEFAULT_BASELINE
     try:
-        measured = measure_texts(corpus(args.repo, (() if args.no_default_excludes else DEFAULT_EXCLUDE)
-                                        + tuple(args.exclude)))
+        items = corpus(args.repo, (() if args.no_default_excludes else DEFAULT_EXCLUDE) + tuple(args.exclude))
+        # o índice só se monta se algum grafo usa external_edges: sem isso, nada a conferir e nenhum custo
+        index = (kg_validate.corpus_index(args.repo, tracked_graphs(args.repo))
+                 if any(kg_validate.uses_external(t) for _, t in items) else None)
+        measured = measure_texts(items, index)
         if path.is_file():
             base = read_base(path)
         elif args.update:

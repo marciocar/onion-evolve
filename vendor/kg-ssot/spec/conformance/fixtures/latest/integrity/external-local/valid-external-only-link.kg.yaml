@@ -1,0 +1,37 @@
+meta:
+  schema_version: "1"
+  id: valid-external-only-link
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: EV_A
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "A evidência sintética que sustenta A."
+    provenance:
+      source: "medição sintética"
+      locator: "caso de conformidade"
+      method: "medição: caso de conformidade"
+  - id: C_SO_EXTERNA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: "Nó ligado só por aresta externa."
+edges:
+  - from: EV_A
+    to: Q_A
+    edge_type: SUPPORTS
+external_edges:
+  - from: docs/outro.kg.yaml#C_T
+    to: C_SO_EXTERNA
+    edge_type: CONSTRAINS
