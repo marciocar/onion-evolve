@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**421 itens abertos** em 89 grafo(s) com aberto (de 114 no escopo) · 90 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**423 itens abertos** em 89 grafo(s) com aberto (de 114 no escopo) · 90 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -696,13 +696,15 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## door-role-parity-2026-09 — 3 item(ns)
+## door-role-parity-2026-09 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.2 | `Q_PREDICADO_SUCESSOR` | door-role-parity-2026-09 | a paridade é cega a 'ambas as fontes erradas do mesmo modo'; o sucessor mede o CONTEÚDO da porta contra o corte (vendor-manifest |
 | 6.3 | `Q_ROLE_DUPLA_LEITURA` | door-role-parity-2026-09 | o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade |
 | 5.4 | `Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA` | door-role-parity-2026-09 | o commit durável da adoção deixa .gitignore e .env.example fora: a proteção de segredo que a adoção escreve no .gitignore n |
+| 4.8 | `Q_STANDALONE_DE_ADOCAO_SEGUE_A_PORTA` | door-role-parity-2026-09 | o papel standalone serve à porta E à adoção individual (/meta:adopt --role standalone): pela matriz o adotado standalone perde |
+| 3.2 | `Q_PERSONALITY_SYNC_SEM_CONJUNTO` | door-role-parity-2026-09 | /meta:personality-sync não está na lista da matriz: escreve a linha personality_summary do members.yaml e tem tag federation, e  |
 
 ## forge-cc-update-2026-10 — 2 item(ns)
 
