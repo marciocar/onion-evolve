@@ -13583,6 +13583,19 @@ PY
       record_pass "role-bundle: (p1-MUT) sem a cobrança da partição a sonda não classificada passa calada — (p1) é load-bearing"
     else record_fail "role-bundle: (p1-MUT)" "o mutante ainda acusa a sonda — (p1) não prova a partição"; fi
   else record_fail "role-bundle: (p1-MUT) setup" "a mutação não foi aplicada"; fi
+  # (p2) OVERLAYS DO MINI (F5 das portas): onde portas se materializam (o motor existe), fonte de overlay
+  #      ausente REPROVA; sem o motor (porta, adotante) a cobrança não roda, porque ops/ não viaja.
+  local _p2a _p2b _p2c
+  _p2a="$(LC_ALL=C bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
+  mkdir -p "${sb}/ops"; : > "${sb}/ops/materialize-door.sh"
+  _p2b="$(LC_ALL=C bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
+  mkdir -p "${sb}/ops/door-templates/mini"
+  cp "${REPO_ROOT}"/ops/door-templates/mini/*.door.md "${sb}/ops/door-templates/mini/" 2>/dev/null || true
+  _p2c="$(LC_ALL=C bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
+  if ! grep -q 'o overlay do papel' <<< "${_p2a}" && grep -q "o overlay do papel 'mini' aponta a fonte 'ops/door-templates/mini/README.door.md'" <<< "${_p2b}" \
+     && ! grep -q 'o overlay do papel' <<< "${_p2c}"; then
+    record_pass "role-bundle: (p2) fonte de overlay do mini ausente → HARD só onde o motor de portas existe; presente → silêncio"
+  else record_fail "role-bundle: (p2)" "sem-motor=$(grep -c 'o overlay do papel' <<< "${_p2a}" || true) com-motor-sem-fonte=$(grep -c 'o overlay do papel' <<< "${_p2b}" || true) com-fonte=$(grep -c 'o overlay do papel' <<< "${_p2c}" || true)"; fi
   rm -rf "${sb}"
 }
 
@@ -22268,6 +22281,16 @@ if [ -f "${B}/plugins/onion/commands/adopt.md" ]; then
 fi
 exit 0
 STUB
+  # o checador da PORTA DIDÁTICA esboçado (F5 das portas): mesma interface e contrato de rc do real
+  # (0 limpo · 1 achado · 2 não medi). O real é exercitado pela família door_mini; aqui se mede se o
+  # MOTOR o chama no que montou, para o papel mini, e respeita o rc.
+  cat > "${core}/.claude/validation/door-mini-check.sh" <<'STUB'
+#!/usr/bin/env bash
+B=""; while [ $# -gt 0 ]; do case "$1" in --bundle) B="$2"; shift 2 ;; *) shift ;; esac; done
+[ -d "${B}" ] || { echo "sem bundle" >&2; exit 2; }
+if [ -f "${B}/PLANT-DANGLING" ]; then echo "  ✗ ponteiro morto: /meta:evolve (citado por PLANT-DANGLING)"; exit 1; fi
+echo "door-mini-check: esboço · allowlist exata"; exit 0
+STUB
   # o registrador de nomes comerciais REAL (a REGRA 36 o usa), para a família de termos não ser vazia
   cp "${REPO_ROOT}/.claude/validation/projection-safety.sh" "${core}/.claude/validation/"
   printf '#!/usr/bin/env bash\necho "  Violações HARD : %s"\n' 0 > "${core}/payload/.claude/validation/lint-artifacts.sh"
@@ -22536,8 +22559,9 @@ STUB
   else record_fail "publish: (p)" "status rc=${_rs} all rc=${_r} out=${_o:0:200}"; fi
 
   # (k) porta NUNCA materializada (pin n/a) cujo repo guarda OUTRO conteúdo (o onion-mini é a
-  #     destilação curada, sem .claude/) ⇒ recusa com a fase nomeada, e o repo dela fica intacto.
-  #     O esboço do materializador NÃO tem a guarda de destino do real: é o motor que tem de parar.
+  #     destilação curada, sem .claude/) ⇒ SEM --replace-foreign recusa nomeando a flag, e o repo dela
+  #     fica intacto. O esboço do materializador NÃO tem a guarda de destino do real: é o motor que para.
+  #     Desde a F5 (SAC-94) esta é a ÚNICA recusa: com a flag, o motor arquiva e materializa (k2).
   local mup="${d}/porta-m.git" mseed="${d}/mseed"
   git init -q --bare -b main "${mup}" >/dev/null 2>&1 || true
   git clone -q "${mup}" "${mseed}" >/dev/null 2>&1 || true
@@ -22546,14 +22570,43 @@ STUB
   git -C "${mseed}" "${G[@]}" commit -qm destilacao >/dev/null 2>&1 || true
   git -C "${mseed}" push -q origin HEAD:main >/dev/null 2>&1 || true
   local mtip; mtip="$(git ls-remote "${mup}" refs/heads/main 2>/dev/null | awk '{print $1}')"
+  _mtip() { git ls-remote "${mup}" refs/heads/main 2>/dev/null | awk '{print $1}'; }
+  _mtags() { git ls-remote --tags "${mup}" 2>/dev/null | grep -c 'refs/tags/archive/pre-door-' || true; }
   printf '  - id: porta-m\n    kind: door\n    role: mini\n    remote: %s\n    onion_version: n/a\n' "${mup}" \
     >> "${core}/docs/evolution/federation/members.yaml"
   _cp porta-m
-  _pub porta-m
-  if [ "${_r}" -eq 2 ] && grep -q 'F5' <<< "${_o}" \
-     && [ "$(git ls-remote "${mup}" refs/heads/main 2>/dev/null | awk '{print $1}')" = "${mtip}" ]; then
-    record_pass "publish: (k) porta nunca materializada com outro conteúdo ⇒ recusa nomeando a F5"
-  else record_fail "publish: (k) o motor seguiria apagando a destilação" "rc=${_r} out=${_o:0:250}"; fi
+  _pub porta-m --push
+  if [ "${_r}" -eq 2 ] && grep -q -- '--replace-foreign' <<< "${_o}" && [ "$(_mtip)" = "${mtip}" ] && [ "$(_mtags)" = "0" ]; then
+    record_pass "publish: (k) porta nunca materializada com outro conteúdo e sem --replace-foreign ⇒ recusa e o repo fica intacto"
+  else record_fail "publish: (k) o motor substituiria a destilação sem a flag" "rc=${_r} out=${_o:0:250}"; fi
+  # (k3) com a flag, a verificação PRÓPRIA do mini (sem lint) roda no montado: defeito plantado ⇒ (5c)
+  #      barra, e NEM a porta NEM a tag de arquivo chegam ao remoto (o arquivo só sobe com a porta).
+  printf 'x\n' > "${core}/payload/PLANT-DANGLING"; _cp planta-dangling
+  _pub porta-m --replace-foreign --push
+  if [ "${_r}" -eq 1 ] && grep -q '(5c) a porta didática reprovou' <<< "${_o}" && [ "$(_mtip)" = "${mtip}" ] && [ "$(_mtags)" = "0" ]; then
+    record_pass "publish: (k3) mini com ponteiro morto no montado ⇒ (5c) barra; porta e arquivo NÃO sobem"
+  else record_fail "publish: (k3) mini com defeito publicado" "rc=${_r} tags=$(_mtags) out=${_o:0:300}"; fi
+  rm -f "${core}/payload/PLANT-DANGLING"; _cp tira-dangling
+  # (k2) O MOTOR DEIXA DE RECUSAR O MINI (F5): com --replace-foreign --push a destilação é ARQUIVADA numa
+  #      tag empurrada e conferida ANTES da porta, a porta sobe POR CIMA dela (a história fica: o pai do
+  #      commit publicado é a ponta antiga) e o carimbo publicado diz role mini.
+  _pub porta-m --replace-foreign --push
+  local _mnew _mtag _mpar _mrole
+  _mnew="$(_mtip)"
+  _mtag="$(git ls-remote --tags "${mup}" 2>/dev/null | awk '/refs\/tags\/archive\/pre-door-.*\^\{\}$/ {print $1; exit}')"
+  _mpar="$(git --git-dir="${mup}" rev-parse "${_mnew}^" 2>/dev/null || true)"
+  _mrole="$(git --git-dir="${mup}" show "${_mnew}:.claude/.onion-version" 2>/dev/null | sed -n 's/^role: //p')"
+  if [ "${_r}" -eq 0 ] && [ "${_mnew}" != "${mtip}" ] && [ "${_mtag}" = "${mtip}" ] && [ "${_mpar}" = "${mtip}" ] \
+     && [ "${_mrole}" = "mini" ] && grep -q 'arquivo empurrado e CONFERIDO' <<< "${_o}" && grep -q '(5c) porta didática' <<< "${_o}"; then
+    record_pass "publish: (k2) 1ª materialização do mini: destilação arquivada em tag conferida, porta publicada por cima, carimbo mini"
+  else record_fail "publish: (k2) a 1ª materialização do mini não saiu como devia" "rc=${_r} tag=${_mtag:0:12} pai=${_mpar:0:12} antiga=${mtip:0:12} role=${_mrole} out=${_o:0:300}"; fi
+  # (k4) depois de publicada, a flag não vale mais: a porta já é porta, e repetir a 'substituição' seria
+  #      um ato sem objeto (rc 2), nunca um sucesso silencioso.
+  _pub porta-m --replace-foreign
+  if [ "${_r}" -eq 2 ] && grep -q 'só vale na 1ª materialização' <<< "${_o}"; then
+    record_pass "publish: (k4) --replace-foreign numa porta já materializada ⇒ recusa"
+  else record_fail "publish: (k4)" "rc=${_r} out=${_o:0:250}"; fi
+  unset -f _mtip _mtags
   _pub_members standalone "${NEWPIN}"
 
   # (f) origin/main IRRESOLÚVEL ⇒ aborta com rc 3, sem cair no HEAD local
@@ -22567,6 +22620,95 @@ STUB
   else record_fail "publish: (f)" "rc=${_r} out=${_o:0:250}"; fi
 
   unset -f _pub _pub_members _door_tip _door_pin _snap _cp
+  rm -rf "${d}"
+}
+
+# ── PORTA DIDÁTICA (onion-mini): a verificação de quem NÃO leva o lint (F5 das portas, SAC-94) ──────
+# O mini é uma allowlist didática e não leva guarda nenhuma; a pergunta "esta porta está boa?" tem outra
+# resposta: allowlist EXATA, sem ponteiro morto, sem caminho de máquina (door-mini-check.sh). A bancada
+# MATERIALIZA o mini de verdade (ops/materialize-door.sh --role mini, do HEAD do core) e planta, numa
+# cópia, cada defeito. Cada caso tem mutante que o reprova, rodado com ops/mutate-and-restore.sh e
+# registrado no nó E_MINI_GERADO_F5 (door-role-parity): (a) tirar os overlays do materializador;
+# (b) desligar o EXTRA; (c) caminho; (c2) comando; (c3) agente; (d) /home/; (e) o STALE; (f) o rc 2.
+run_door_mini_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/door-mini-check.sh" mat="${REPO_ROOT}/ops/materialize-door.sh"
+  if [ ! -f "${chk}" ] || [ ! -f "${mat}" ]; then record_skip "door-mini: checador ou materializador ausente (adotante) → pulado"; return; fi
+  command -v python3 >/dev/null 2>&1 || { record_skip "door-mini: python3 ausente"; return; }
+  local d; d="$(mktemp -d)"
+  local m="${d}/porta/onion-mini" _o _r
+  mkdir -p "${d}/porta"
+  if ! _o="$(bash "${mat}" "${m}" --role mini --from HEAD 2>&1)"; then
+    record_fail "door-mini: (a) setup" "o materializador recusou o mini: $(printf '%s' "${_o}" | tail -3 | tr '\n' ' ' | cut -c1-300)"
+    rm -rf "${d}"; return
+  fi
+  _dmc() { if _o="$(bash "${chk}" --bundle "$1" --source "${REPO_ROOT}" 2>&1)"; then _r=0; else _r=$?; fi; }
+  _copy() { rm -rf "${d}/c"; cp -r "${m}" "${d}/c"; }
+
+  # (a) o mini MATERIALIZADO sai limpo: allowlist exata, raiz própria, e a raiz não manda rodar o que
+  #     não viaja (a classe que a F2 declarou: README e CLAUDE.md genéricos mandavam rodar o lint).
+  _dmc "${m}"
+  local _abad=""
+  [ "${_r}" -eq 0 ] || _abad="${_abad} rc=${_r}"
+  { [ -f "${m}/README.md" ] && [ -f "${m}/CLAUDE.md" ] && [ -f "${m}/LICENSE" ]; } || _abad="${_abad} raiz-incompleta"
+  [ ! -e "${m}/LICENSE-DOCS" ] || _abad="${_abad} LICENSE-DOCS-sem-docs"
+  ! grep -qE 'lint-artifacts|/meta:inventory|kg-radar' "${m}/README.md" "${m}/CLAUDE.md" || _abad="${_abad} raiz-manda-rodar-o-que-nao-viaja"
+  grep -qx 'role: mini' "${m}/.claude/.onion-version" 2>/dev/null || _abad="${_abad} carimbo"
+  if [ -z "${_abad}" ]; then
+    record_pass "door-mini: (a) o mini materializado sai com allowlist exata, raiz própria e sem ponteiro morto"
+  else record_fail "door-mini: (a)" "${_abad} out=$(printf '%s' "${_o}" | head -c 300)"; fi
+
+  # (b) arquivo a MAIS (o core vazando para o iniciante) ⇒ reprova nomeando o arquivo
+  _copy; mkdir -p "${d}/c/.claude/commands/meta"; printf '# vazou\n' > "${d}/c/.claude/commands/meta/evolve.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && grep -q 'arquivo a MAIS: .claude/commands/meta/evolve.md' <<< "${_o}"; then
+    record_pass "door-mini: (b) arquivo fora da allowlist plantado ⇒ reprova"
+  else record_fail "door-mini: (b)" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (c) ponteiro morto por CAMINHO: o README manda rodar o lint, que o mini não leva
+  _copy; printf '\nRode `bash .claude/validation/lint-artifacts.sh` antes do PR.\n' >> "${d}/c/README.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && grep -qF 'ponteiro morto: .claude/validation/lint-artifacts.sh (citado por README.md)' <<< "${_o}"; then
+    record_pass "door-mini: (c) README que manda rodar o lint (que não viaja) ⇒ reprova"
+  else record_fail "door-mini: (c)" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (c2) ponteiro morto por COMANDO citado por nome (existe no core, não no mini)
+  _copy; printf '\nDepois, rode /meta:evolve.\n' >> "${d}/c/CLAUDE.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && grep -qF 'ponteiro morto: /meta:evolve (citado por CLAUDE.md)' <<< "${_o}"; then
+    record_pass "door-mini: (c2) comando do core citado por nome e ausente no mini ⇒ reprova"
+  else record_fail "door-mini: (c2)" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (c3) ponteiro morto por AGENTE (@nome que existe no core e não no mini) — o que a F2 não media
+  _copy; printf '\nPara diagramas, chame @c4-architecture-specialist.\n' >> "${d}/c/.claude/skills/onion/SKILL.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && grep -qF 'ponteiro morto: @c4-architecture-specialist' <<< "${_o}"; then
+    record_pass "door-mini: (c3) agente do core citado e ausente no mini ⇒ reprova"
+  else record_fail "door-mini: (c3)" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (d) caminho de máquina, de conta qualquer (no mini a regra é absoluta)
+  _copy; printf '\nexemplo: /home/alguem/projeto\n' >> "${d}/c/.claude/commands/warm-up.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && grep -qF 'caminho de máquina: .claude/commands/warm-up.md' <<< "${_o}"; then
+    record_pass "door-mini: (d) /home/<conta>/ plantado ⇒ reprova"
+  else record_fail "door-mini: (d)" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (e) ausência declarada que NINGUÉM cita ⇒ reprova (a lista de tolerância não pode só crescer). Sem o
+  #     warm-up, o hook de marcadores (declarado só por ele) vira linha órfã do known_absent.
+  _copy; rm -f "${d}/c/.claude/commands/warm-up.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && grep -qF 'ausência declarada que ninguém cita: .claude/hooks/aside-router-hook.sh' <<< "${_o}"; then
+    record_pass "door-mini: (e) linha do known_absent sem citação ⇒ reprova (catraca nos dois sentidos)"
+  else record_fail "door-mini: (e)" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (f) sem a SSOT (resolvedor do roles.yaml) a verificação NÃO MEDE: rc 2, nunca limpo
+  local _ns="${d}/semssot"; mkdir -p "${_ns}"; git -C "${_ns}" init -q >/dev/null 2>&1
+  git -C "${_ns}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m x >/dev/null 2>&1
+  _r=0; bash "${chk}" --bundle "${m}" --source "${_ns}" >/dev/null 2>&1 || _r=$?
+  if [ "${_r}" -eq 2 ]; then
+    record_pass "door-mini: (f) fonte sem o roles.yaml ⇒ rc 2 (não medi), nunca limpo"
+  else record_fail "door-mini: (f)" "rc=${_r} — sem SSOT a verificação não pode passar"; fi
+
+  unset -f _dmc _copy
   rm -rf "${d}"
 }
 
@@ -23087,6 +23229,7 @@ _family run_door_seal_pin_selftests
 _family run_registry_pins_selftests
 _family run_door_cycle_selftests
 _family run_publish_selftests
+_family run_door_mini_selftests
 # ── REGRA 86: workflow que não parseia é workflow MORTO, e o repo não sabe ────────────────────
 # Nasceu de um `env:` duplicado que deixou o `onion-review-diagnose.yml` inexecutável por um dia
 # inteiro — e era exatamente o instrumento que a doutrina manda rodar antes de escrever causa
