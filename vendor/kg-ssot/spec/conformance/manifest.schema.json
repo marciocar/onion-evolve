@@ -39,7 +39,11 @@
         "description": { "type": "string", "minLength": 1 },
         "valid": { "type": "boolean" },
         "codes": { "$ref": "#/$defs/codes" },
-        "warnings": { "$ref": "#/$defs/codes" }
+        "warnings": { "$ref": "#/$defs/codes" },
+        "corpus": {
+          "description": "Caso de corpus (v4.3): o diretório, relativo ao manifesto, que faz de raiz do repo para conferir a ponta externa das external_edges. O leitor sem corpus reporta n/a.",
+          "type": "string", "minLength": 1
+        }
       },
       "if": { "properties": { "valid": { "const": true } } },
       "then": { "properties": { "codes": { "maxItems": 0 } } },

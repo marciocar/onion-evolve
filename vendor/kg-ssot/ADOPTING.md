@@ -23,7 +23,7 @@ suíte, inclusive comercialmente, mantendo o `LICENSE` e o `NOTICE`.
 
 Do lado do mantenedor deste repo, uma conferência de higiene que não viaja confere essa lista no CI:
 - toda entrada é coberta por arquivo rastreado;
-- a tag é `contract-v<version>`;
+- a tag é `kg-ssot-v<version>` (até a 4.3.0, `contract-v<version>`; as tags antigas continuam valendo);
 - o contrato citado é o vigente;
 - nenhum arquivo da release tem referência privada.
 
@@ -31,17 +31,21 @@ O adotante usa só `update` e `check`.
 
 ## 1. Trazer a release
 
+> **O nome da tag mudou na 4.3.1:** de `contract-vX.Y.Z` para `kg-ssot-vX.Y.Z`, para a tag dizer o produto também
+> no carimbo do adotante. Nada mais muda: as tags antigas seguem existindo, e o próximo update só troca a string do
+> `--tag`.
+
 A primeira vez, a partir de um clone deste repo:
 
 ```bash
-python3 -I -B tools/kg_vendor.py update --tag contract-v4.2.0 --dest <adotante>/vendor/kg-ssot
+python3 -I -B tools/kg_vendor.py update --tag kg-ssot-v4.3.1 --dest <adotante>/vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.2.0 --source <caminho ou URL deste repo>
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.3.1 --source <caminho ou URL deste repo>
 ```
 
 - **Leitura:** o vendor lê a tag com `git archive`, nunca a árvore de trabalho. Os nomes são literais: um `*`
@@ -241,15 +245,19 @@ O que muda no v4:
 - **Chave desconhecida sem o prefixo `x_` reprova** no topo, no `meta`, no nó e na aresta
   (`form.unknown-key.<escopo>.<chave>`), e o nome sem `x_` que nem é slug reprova como
   `form.pattern.<escopo>.key`. Dentro de `provenance`, a chave desconhecida segue só alertando.
-- **`provenance.method` tem vocabulário** (SHOULD no v4, MUST no v5): `'<classe>: <detalhe>'`, com a classe em
-  `medição` (o autor do grafo executou), `leitura` (documento primário), `juízes` (painel de agentes ou juízes),
-  `derivado` (derivação mecânica de campo, não reverificada) ou `testemunho` (uma pessoa ou sessão afirmou;
-  inclui a medição de terceiro lida aqui). Fora disso alerta como `form.pattern.node.provenance.method`.
+- **`provenance.method` tem vocabulário** (SHOULD no v4, MUST no v5): `'<classe>: <detalhe>'`. A classe diz **de que
+  tipo é a evidência que sustenta a afirmação**: `medição` (quem estabeleceu a afirmação executou e registrou o
+  comando), `leitura` (documento primário), `juízes` (painel de agentes ou juízes), `testemunho` (uma pessoa ou sessão
+  afirmou; inclui a medição de terceiro lida aqui) ou `derivado` (a afirmação é concluída de outras afirmações ou
+  campos, sem evidência própria). Fora disso alerta como `form.pattern.node.provenance.method`.
+  Quando uma migração preenche a `provenance` a partir do que o nó já trazia, a classe é a da evidência original, e o
+  detalhe diz que a migração não re-verificou, por exemplo `medição: <o que foi medido>; não reverificado na migração`
+  (decisão do mantenedor em 2026-10-09, `D_METHOD_CLASS_IS_EVIDENCE`).
   **Atenção:** se o seu CI cobra que grafo novo saia limpo também no SHOULD, este alerta já reprova lá no v4, e não só
   no v5. Ajuste antes os geradores que escrevem `provenance` (no primeiro adotante, seis deles emitiam `method` livre).
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.2.0 --source <caminho ou URL deste repo>`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.3.1 --source <caminho ou URL deste repo>`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
@@ -262,6 +270,27 @@ O caminho, num PR só:
 próprio repo), `web` (endereço público), `host` (só existe numa máquina: um journal local, um caminho fora do repo) ou
 `pessoa` (o relato de alguém). Fora desses valores, alerta como `form.enum.node.provenance.locality`. Serve para medir
 o que um terceiro consegue reverificar e para barrar `host` quando o grafo vai a público.
+
+**Referência a nó de outro grafo** (`external_edges`, opcional, desde a `contract-v4.3.0`): uma lista no topo do grafo,
+cada aresta com exatamente uma ponta externa `<caminho relativo à raiz do repo>#<id>` e a outra um id deste arquivo.
+Sem `from`, quem aponta é o grafo inteiro.
+
+```yaml
+external_edges:
+  - to: docs/pesquisa/outra.kg.yaml#C_ANTIGA      # este grafo supera um nó de outro grafo
+    edge_type: SUPERSEDES
+  - from: docs/graph/portas.kg.yaml#D_MATRIZ       # um nó de fora limita um nó daqui
+    to: D_CORTE
+    edge_type: CONSTRAINS
+```
+
+Os tipos são `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO` e `DEPENDS_ON`. O gate confere o alvo contra
+todos os `.kg.yaml` rastreados do repo, inclusive os que o `--exclude` tira do corpus: alvo que não existe, ou grafo-alvo
+apagado, reprova quem aponta (`integrity.dangling-external`). Fora do gate, `kg_validate.py --corpus <raiz do repo>`
+faz a mesma conferência: num repo git, contra os `.kg.yaml` rastreados; fora de um repo, contra todo `.kg.yaml` sob o
+diretório. Sem `--corpus`, o leitor confere só a forma e a ponta local, e diz quantos arquivos ficaram com a ponta externa
+sem conferir. Uma referência ao próprio arquivo passa como externa; use `edges` para isso. Uma chave `x_` própria que fazia esse papel migra para cá; a que só declara algo, sem ser
+aresta, segue como `x_`.
 
 **Label corrigido.** Quando uma revisão troca o label de um nó, o label anterior vai para a `narrative`, começando
 por `label anterior: …`. O git guarda o resto do histórico; o contrato não tem campo próprio para isso.

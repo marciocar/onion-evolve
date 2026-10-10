@@ -93,6 +93,22 @@ Os três `integrity.*` cruzam campos ou arestas, por isso o leitor os computa fo
 | `integrity.verified-before-fact` | `verified_at` anterior a `valid_from`, comparados na granularidade do mais curto (`AAAA`, `AAAA-MM`, `AAAA-MM-DD`); data fora dessa forma não é comparada |
 | `integrity.untraced-decision` | `decision` que não é `superseded` nem `refuted` sem `trace`, sem `provenance` e sem aresta `TRACES_TO` saindo dela |
 
+O v4.3 acrescenta `external_edges`, opcional, no topo: arestas entre grafos com **exatamente uma** ponta externa
+`<caminho relativo à raiz do repo>#<id>`, e a outra um id deste arquivo ou ausente (`from` ausente vale o grafo inteiro).
+Os tipos são `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO` e `DEPENDS_ON`. Os casos estão em
+`latest/form/external-edges/`, `latest/integrity/external-local/` e `latest/integrity/external-corpus/`.
+
+| Código | Quando reprova |
+|---|---|
+| `form.pattern.top.external_edges.to` (ou `.from`) | as duas pontas externas, as duas locais, ou a referência fora da forma (caminho absoluto, sem `.kg.yaml#`) |
+| `form.enum.top.external_edges.edge_type` | tipo fora dos seis (os da camada domain não cruzam grafos) |
+| `integrity.dangling-external-local` | a ponta local não existe neste arquivo |
+| `integrity.dangling-external` | **com o corpus**: o arquivo ou o id da ponta externa não existe |
+
+A aresta externa conta como ligação: o nó ligado só por ela não é órfão. Sem o corpus, a ponta externa não é conferida, e
+o leitor diz isso na saída. A referência é relativa e com `/`: segmentos começam por letra, dígito ou `_`, sem `.` ou
+`..`, sem `\` e sem `:`.
+
 O v4.2 acrescenta `provenance.locality`, opcional, com o enum `repo`, `web`, `host` ou `pessoa`. O valor fora do enum
 alerta como `form.enum.node.provenance.locality` (`latest/form/provenance-locality/`), e nenhum veredito muda.
 O mesmo código pode aparecer como MUST num caso e como SHOULD em outro, porque a severidade é do
@@ -117,7 +133,7 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 207 casos contra o v4.2. Os grupos do
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 222 casos contra o v4.3. Os grupos do
 rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
 `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito
 viraram `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de
@@ -156,6 +172,9 @@ runner**: `runner <caso>` imprime, na última linha do stdout, UM objeto JSON, e
   espera `reject`; um caso válido, mesmo com `warnings`, espera `accept`.
 - `codes` é o nível 2, só para quem expõe motivo, comparado por conjunto nas camadas que o registro declara
   em `layers`. `null` quer dizer que o leitor não diz o porquê.
+- **Caso de corpus** (v4.3): o caso que declara `corpus` no manifesto é julgado com a raiz desse diretório como o
+  repo, e o runner recebe `runner <caso> --corpus <dir>`. Um leitor que não confere a ponta externa das
+  `external_edges` fica `n/a` nesses casos.
 - `error` quer dizer que o leitor caiu. Saída que não é JSON, `verdict` desconhecido, rc diferente de 0 ou
   tempo estourado também viram `error`. É divergência e nunca some da matriz.
 

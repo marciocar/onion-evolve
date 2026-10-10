@@ -86,6 +86,9 @@ def suite_errors(suite, meta_validator):
         files = [c["file"] for c in data["cases"]]
         out += [f"{rel}: arquivo repetido no manifesto: {f}" for f in sorted({f for f in files if files.count(f) > 1})]
         out += [f"{rel}: caso sem arquivo {f}" for f in files if not (m.parent / f).is_file()]
+        # um corpus que não existe faria o caso bad-* passar por vacuidade (toda ponta externa sumiria)
+        out += [f"{rel}: corpus {c['corpus']!r} de {c['file']} não é um diretório" for c in data["cases"]
+                if "corpus" in c and not (m.parent / c["corpus"]).is_dir()]
         referenced |= {(m.parent / f).resolve() for f in files}
         latest_cases += len(files) if folder == "latest" else 0
     # Um arquivo de caso fora de todo manifesto nunca roda, e ninguém fica sabendo.
@@ -117,7 +120,8 @@ def run_cases(suite, validator, should_validator, proposals=None):
             }
             try:
                 text = path.read_text(encoding="utf-8")
-                got_codes = sorted(set(kg_validate.codes(text, must_v)))
+                corpus = kg_validate.corpus_index(m.parent / case["corpus"]) if "corpus" in case else None
+                got_codes = sorted(set(kg_validate.codes(text, must_v, corpus)))
                 got_warn = sorted(set(kg_validate.warnings(text, must_v, should_v)))
             except Exception as exc:  # noqa: BLE001 — o leitor caiu: falha DO CASO, o gate da pasta decide o rc
                 row.update({"pass": False, "emitted": None, "error": f"{exc.__class__.__name__}: {exc}"})
