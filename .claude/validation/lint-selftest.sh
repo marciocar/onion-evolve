@@ -22338,8 +22338,8 @@ STUB
   # (c) --status lê o carimbo do REMOTO, não o cache do registro (que aqui mente: diz OLDPIN)
   _pub_members standalone "${OLDPIN}"
   _pub --status
-  if [ "${_r}" -eq 0 ] && grep -E "^porta-a" <<< "${_o}" | grep -q "${NEWPIN}" \
-     && grep -E "^porta-a" <<< "${_o}" | grep -q 'em dia'; then
+  if [ "${_r}" -eq 0 ] && grep -qE "^porta-a .*${NEWPIN}" <<< "${_o}" \
+     && grep -qE "^porta-a .*em dia" <<< "${_o}"; then
     record_pass "publish: (c) --status lê o pin PUBLICADO no remoto (em dia), não o cache do registro"
   else record_fail "publish: (c) status não leu o remoto" "rc=${_r} out=${_o:0:300}"; fi
 
@@ -22358,7 +22358,7 @@ STUB
   git -C "${core}" "${G[@]}" commit -qm "anda de novo" >/dev/null 2>&1 || true
   git -C "${core}" push -q origin main >/dev/null 2>&1 || true
   _pub --status
-  if [ "${_r}" -eq 0 ] && grep -E "^porta-a" <<< "${_o}" | grep -qE '[[:space:]]1[[:space:]]+DEFASADA'; then
+  if [ "${_r}" -eq 0 ] && grep -qE "^porta-a .*[[:space:]]1[[:space:]]+DEFASADA" <<< "${_o}"; then
     record_pass "publish: (c3) commit que viaja depois da publicação ⇒ --status mede 1 e diz DEFASADA"
   else record_fail "publish: (c3) defasagem não medida" "rc=${_r} out=${_o:0:300}"; fi
 
@@ -26386,7 +26386,7 @@ run_door_staleness_severity_selftests() {
   # (e) o workflow pos-merge e RELATORIO: le o REMOTO e nunca devolve o rc da defasagem (main verde)
   local wf="${REPO_ROOT}/.github/workflows/onion-door-staleness.yml"
   if [ -f "${wf}" ] && grep -q 'branches: \[main\]' "${wf}" && grep -qE 'publish-door\.sh --status' "${wf}" \
-     && ! grep -vE '^[[:space:]]*#' "${wf}" | grep -qwE 'exit'; then
+     && ! grep -qE '^[^#]*\<exit\>' "${wf}"; then
     record_pass "porta-severidade: (e) o workflow pos-merge le o remoto e nao falha a main"
   else record_fail "porta-severidade: (e)" "o workflow nao existe, nao le o remoto, ou ainda devolve o rc da defasagem (main vermelha)"; fi
 
