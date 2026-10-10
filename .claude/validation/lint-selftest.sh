@@ -22579,6 +22579,11 @@ STUB
   if [ "${_r}" -eq 2 ] && grep -q -- '--replace-foreign' <<< "${_o}" && [ "$(_mtip)" = "${mtip}" ] && [ "$(_mtags)" = "0" ]; then
     record_pass "publish: (k) porta nunca materializada com outro conteúdo e sem --replace-foreign ⇒ recusa e o repo fica intacto"
   else record_fail "publish: (k) o motor substituiria a destilação sem a flag" "rc=${_r} out=${_o:0:250}"; fi
+  # (k5) --replace-foreign com --clone ⇒ recusa antes de tocar qualquer clone (o 2b esvazia o clone)
+  _pub porta-m --replace-foreign --clone "${mseed}"
+  if [ "${_r}" -eq 2 ] && grep -q 'rode-a em clone descartável' <<< "${_o}" && [ -f "${mseed}/PROMPT.md" ]; then
+    record_pass "publish: (k5) --replace-foreign com --clone ⇒ recusa e o clone fica intacto"
+  else record_fail "publish: (k5)" "rc=${_r} out=${_o:0:250}"; fi
   # (k3) com a flag, a verificação PRÓPRIA do mini (sem lint) roda no montado: defeito plantado ⇒ (5c)
   #      barra, e NEM a porta NEM a tag de arquivo chegam ao remoto (o arquivo só sobe com a porta).
   printf 'x\n' > "${core}/payload/PLANT-DANGLING"; _cp planta-dangling
@@ -22685,11 +22690,43 @@ run_door_mini_selftests() {
     record_pass "door-mini: (c3) agente do core citado e ausente no mini ⇒ reprova"
   else record_fail "door-mini: (c3)" "rc=${_r} out=${_o:0:300}"; fi
 
-  # (d) caminho de máquina, de conta qualquer (no mini a regra é absoluta)
-  _copy; printf '\nexemplo: /home/alguem/projeto\n' >> "${d}/c/.claude/commands/warm-up.md"
+  # (b2) arquivo a MENOS (o ciclo quebrado: a allowlist nomeia e não foi montado) ⇒ reprova nomeando
+  _copy; rm -f "${d}/c/.claude/commands/engineer/pr.md"
   _dmc "${d}/c"
-  if [ "${_r}" -eq 1 ] && grep -qF 'caminho de máquina: .claude/commands/warm-up.md' <<< "${_o}"; then
-    record_pass "door-mini: (d) /home/<conta>/ plantado ⇒ reprova"
+  if [ "${_r}" -eq 1 ] && grep -qF 'arquivo a MENOS: .claude/commands/engineer/pr.md' <<< "${_o}"; then
+    record_pass "door-mini: (b2) arquivo da allowlist ausente no montado ⇒ reprova"
+  else record_fail "door-mini: (b2)" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (c4) link markdown RELATIVO para fora do mini, (c5) comando de RAIZ e (c6) documento docs/ — as três
+  #      formas que a passada adversarial da F5 mostrou passando como "sem ponteiro morto"
+  _copy; printf '\nVeja [o adopt](../meta/adopt.md).\n' >> "${d}/c/.claude/commands/engineer/work.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && grep -qF 'ponteiro morto: .claude/commands/meta/adopt.md (citado por .claude/commands/engineer/work.md)' <<< "${_o}"; then
+    record_pass "door-mini: (c4) link relativo para arquivo que não viaja ⇒ reprova"
+  else record_fail "door-mini: (c4)" "rc=${_r} out=${_o:0:300}"; fi
+  _copy; printf '\nPara orientação, rode `/onion`.\n' >> "${d}/c/README.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && grep -qF 'ponteiro morto: /onion (citado por README.md)' <<< "${_o}"; then
+    record_pass "door-mini: (c5) comando de raiz do core (em crase) ausente no mini ⇒ reprova"
+  else record_fail "door-mini: (c5)" "rc=${_r} out=${_o:0:300}"; fi
+  _copy; printf '\nLeia docs/meta-specs/code-standards.md antes.\n' >> "${d}/c/.claude/commands/engineer/plan.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && grep -qF 'ponteiro morto: docs/meta-specs/code-standards.md (citado por .claude/commands/engineer/plan.md)' <<< "${_o}"; then
+    record_pass "door-mini: (c6) documento docs/ que não viaja ⇒ reprova"
+  else record_fail "door-mini: (c6)" "rc=${_r} out=${_o:0:300}"; fi
+  # (c7) no arquivo PRÓPRIO do mini (overlay escrito à mão) nenhuma ausência declarada vale: o CLAUDE.md
+  #      citar /meta:setup-integration (declarado para os compartilhados) reprova
+  _copy; printf '\nConfigure com /meta:setup-integration.\n' >> "${d}/c/CLAUDE.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && grep -qF 'ponteiro morto: /meta:setup-integration (citado por CLAUDE.md)' <<< "${_o}"; then
+    record_pass "door-mini: (c7) ausência declarada citada num arquivo próprio do mini ⇒ reprova"
+  else record_fail "door-mini: (c7)" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (d) caminho de máquina, de conta qualquer (no mini a regra é absoluta)
+  _copy; printf '\nexemplo: /home/alguem/projeto\nno mac: /Users/Alguem/x\n' >> "${d}/c/.claude/commands/warm-up.md"
+  _dmc "${d}/c"
+  if [ "${_r}" -eq 1 ] && [ "$(grep -cF 'caminho de máquina: .claude/commands/warm-up.md' <<< "${_o}")" -ge 2 ]; then
+    record_pass "door-mini: (d) /home/<conta>/ e /Users/<Conta>/ plantados ⇒ reprova os dois"
   else record_fail "door-mini: (d)" "rc=${_r} out=${_o:0:300}"; fi
 
   # (e) ausência declarada que NINGUÉM cita ⇒ reprova (a lista de tolerância não pode só crescer). Sem o

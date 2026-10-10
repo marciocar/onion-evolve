@@ -14,13 +14,24 @@ Request no final. Nada além disso. Quando você quiser mais, a versão completa
 
 ## Como instalar
 
-Copie a pasta `.claude/` deste repositório para dentro do seu projeto, e o `CLAUDE.md` também:
+Copie a pasta `.claude/` deste repositório para dentro do seu projeto, **sem sobrescrever nada que já
+exista lá**, e deixe de fora o arquivo `.claude/.onion-version` (ele é a etiqueta deste repositório,
+não do seu projeto):
 
 ```bash
 git clone https://github.com/marciocar/onion-mini.git
-cp -r onion-mini/.claude onion-mini/CLAUDE.md seu-projeto/
+cp -rn onion-mini/.claude seu-projeto/
+# a etiqueta copiada é a do Mini: se for idêntica à dele, saiu daqui e não é sua
+cmp -s onion-mini/.claude/.onion-version seu-projeto/.claude/.onion-version && rm seu-projeto/.claude/.onion-version
+cp -n onion-mini/CLAUDE.md seu-projeto/
 cd seu-projeto && claude
 ```
+
+- O `-n` não sobrescreve: se o seu projeto já tiver um arquivo com o mesmo nome, o seu fica.
+- Se o seu projeto **já tinha** um `CLAUDE.md`, o do Mini não foi copiado: cole o conteúdo dele no fim
+  do seu.
+- Os `docs/` deste repositório são o contrato das sessões de trabalho; copie-os também se o seu projeto
+  ainda não tiver uma pasta `docs/knowledge-base/`: `cp -rn onion-mini/docs seu-projeto/`.
 
 Pronto. Dentro do Claude Code, os comandos começam com `/`.
 
