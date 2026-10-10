@@ -4,7 +4,7 @@
 #
 # Uso:
 #   ops/publish-door.sh <porta> [--push] [--expect-pin <sha>] [--clone <dir>] [--keep]
-#                               [--role <papel> --force-role-change] [--from <ref>]
+#                               [--role <papel> --force-role-change] [--from <ref>] [--replace-foreign]
 #   ops/publish-door.sh --all [--push]
 #   ops/publish-door.sh --status
 #   (--members <registro> substitui o registro de origin/main — só para bancada, e é anunciado)
@@ -18,6 +18,11 @@
 #   --from   ENSAIO de uma branch (ver o efeito de uma cura antes do merge). Recusado com --push e
 #            com --clone (o commit de uma branch não mergeada não pode ficar no clone de ninguém).
 #   --status lê o CARIMBO PUBLICADO de cada porta no REMOTO e mede a defasagem contra origin/main.
+#   --replace-foreign  a 1ª materialização de uma porta cujo repo guarda OUTRO conteúdo (sem .claude/,
+#            pin n/a no registro — o onion-mini com a destilação antiga). Dito em voz alta, como o
+#            --force-role-change: o conteúdo anterior é ARQUIVADO numa tag `archive/pre-door-<data>` no
+#            clone (empurrada antes do commit, com --push) e só então substituído. Nada se apaga da
+#            história do repo público; o --all nunca o repassa.
 #
 # rc: 0 ok · 1 a verificação reprovou (nada publicado) · 2 precondição ou recusa · 3 fonte irresolúvel
 #     ou não pude medir (nunca vira "está tudo bem") · 4 PUBLICADO, mas uma pós-condição falhou (leia).
@@ -44,8 +49,8 @@
 # · NÃO empurra sem --push, e NÃO empurra commit que não verificou: o clone tem de estar EXATAMENTE em
 #   origin/<ramo> antes de materializar, e o push leva exatamente um commit, o verificado.
 # · NÃO escreve no members.yaml: o pin vive no carimbo da porta (selo sem PR no core).
-# · NÃO publica a 1ª materialização do onion-mini (registro com pin n/a): ela é a F5 (SAC-94). O
-#   --push recusa, e o ensaio também, enquanto o repo dela guardar outro conteúdo (a destilação).
+# · NÃO substitui conteúdo que não reconhece como porta sem --replace-foreign, e mesmo com ele NÃO
+#   apaga: o conteúdo anterior fica numa tag de arquivo, empurrada antes da porta (F5, SAC-94).
 # =============================================================================
 set -uo pipefail
 export GIT_TERMINAL_PROMPT=0   # remoto privado ou inexistente não pode virar prompt de senha num TTY
@@ -55,7 +60,7 @@ CORE="$(cd "${HERE}/.." && pwd)"
 MEMBERS_REL="docs/evolution/federation/members.yaml"
 
 MODE="publish"; DOOR=""; CLONE=""; ROLE_OVERRIDE=""; FORCE_ROLE=0; PUSH=0; KEEP=0; FROM_REF=""
-EXPECT_PIN=""; MEMBERS_OVERRIDE=""
+EXPECT_PIN=""; MEMBERS_OVERRIDE=""; REPLACE_FOREIGN=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --status) MODE="status"; shift ;;
@@ -68,7 +73,8 @@ while [ $# -gt 0 ]; do
     --from) FROM_REF="${2:?--from exige uma ref}"; shift 2 ;;
     --expect-pin) EXPECT_PIN="${2:?--expect-pin exige um sha}"; shift 2 ;;
     --members) MEMBERS_OVERRIDE="${2:?--members exige um caminho}"; shift 2 ;;
-    -h|--help) sed -n '2,24p' "${BASH_SOURCE[0]}"; exit 0 ;;
+    --replace-foreign) REPLACE_FOREIGN=1; shift ;;
+    -h|--help) sed -n '2,29p' "${BASH_SOURCE[0]}"; exit 0 ;;
     -*) echo "ERRO: opção desconhecida: $1" >&2; exit 2 ;;
     *) [ -z "${DOOR}" ] && DOOR="$1" || { echo "ERRO: porta já informada ('${DOOR}')." >&2; exit 2; }; shift ;;
   esac
@@ -186,7 +192,7 @@ _status() {
           fi
         fi
         if [ -z "${rpin}" ]; then
-          state="SEM-CARIMBO (porta nunca materializada pelo motor$([ "${pin}" = "n/a" ] && printf ' — F5'))"
+          state="SEM-CARIMBO (porta nunca materializada pelo motor$([ "${pin}" = "n/a" ] && printf ' — 1ª publicação: /meta:publish %s --replace-foreign' "${id}"))"
           measured=$((measured + 1))
         elif ! git -C "${CORE}" rev-parse --verify --quiet "${rpin}^{commit}" >/dev/null; then
           state="PIN-FORA-DA-HISTÓRIA (${rpin} não é commit deste core)"
@@ -274,10 +280,9 @@ ROLE="${ROLE_OVERRIDE:-${REG_ROLE}}"
 [ -n "${ROLE}" ] || { echo "ERRO: '${DOOR}' sem role: no registro — não materializo sem saber o corte." >&2; exit 2; }
 REMOTE_URL="$(_url_of "${REG_REMOTE}")"
 [ -n "${REMOTE_URL}" ] || { echo "ERRO: '${DOOR}' sem remoto clonável no registro (remote='${REG_REMOTE}')." >&2; exit 2; }
-if [ "${PUSH}" -eq 1 ] && [ "${REG_PIN}" = "n/a" ]; then
-  echo "ERRO: '${DOOR}' nunca foi materializada pelo carimbo (pin n/a no registro). A 1ª materialização dela é uma fase própria (onion-mini: F5, SAC-94)." >&2
-  exit 2
-fi
+# (Até a F5 aqui havia uma recusa de --push para todo pin n/a, nomeando a fase. A 1ª materialização
+#  agora tem caminho: o passo (2b) abaixo exige --replace-foreign quando o repo guarda outro conteúdo, e
+#  arquiva esse conteúdo antes de substituí-lo. Pin n/a com repo VAZIO segue direto: não há o que perder.)
 
 # ── O estado do core ANTES — o que é DESTE motor ─────────────────────────────────────────────
 _core_state() {
@@ -341,12 +346,32 @@ if [ "$(git -C "${DEST}" rev-parse HEAD 2>/dev/null)" != "$(git -C "${DEST}" rev
 fi
 echo "══ /meta:publish ${DOOR} — papel '${ROLE}' · fonte ${SRC_REF} (${PIN}) · destino ${REMOTE_URL}@${BRANCH} · $([ "${PUSH}" -eq 1 ] && echo PUBLICAÇÃO || echo ENSAIO)"
 
-# PORTA QUE NUNCA FOI MATERIALIZADA e cujo repo tem OUTRO conteúdo (o onion-mini é hoje a destilação
-# curada, sem `.claude/`): o materialize-door recusa limpar destino que não parece porta, e com razão.
-# Dizer isso aqui, com a fase nomeada (1º ensaio do mini, 2026-10-10: saía rc 1 apontando o lugar errado).
+# ── (2b) PORTA QUE NUNCA FOI MATERIALIZADA e cujo repo tem OUTRO conteúdo ─────────────────────
+# O onion-mini guardava a destilação curada antiga (prompt + GPT), sem `.claude/`, e o materialize-door
+# recusa limpar destino que não parece porta — com razão. Até a F5 o motor parava aqui nomeando a fase.
+# Agora a substituição é um ATO DITO (--replace-foreign) e ARQUIVADO: a ponta anterior ganha uma tag
+# `archive/pre-door-<data>` no clone, que o --push empurra ANTES do commit da porta e confere no remoto.
+# A destilação segue alcançável por nome no próprio repo público; nada sai da história dele.
+ARCHIVE_TAG=""
 if [ "${REG_PIN}" = "n/a" ] && [ ! -d "${DEST}/.claude" ] \
    && [ -n "$(ls -A "${DEST}" 2>/dev/null | grep -v '^\.git$' || true)" ]; then
-  echo "ERRO: '${DOOR}' nunca foi materializada pelo motor (pin n/a) e o repo dela guarda outro conteúdo, sem .claude/. Substituí-lo é a 1ª materialização, uma fase própria (onion-mini: F5, SAC-94) — este motor não apaga o que não reconhece como porta." >&2
+  if [ "${REPLACE_FOREIGN}" -ne 1 ]; then
+    echo "ERRO: '${DOOR}' nunca foi materializada pelo motor (pin n/a) e o repo dela guarda outro conteúdo, sem .claude/. Substituí-lo é a 1ª materialização: diga isso em voz alta com --replace-foreign (o conteúdo atual é arquivado numa tag antes de sair da ponta)." >&2
+    exit 2
+  fi
+  ARCHIVE_TAG="archive/pre-door-$(date -u +%Y-%m-%d)"
+  if git -C "${DEST}" rev-parse --verify --quiet "refs/tags/${ARCHIVE_TAG}" >/dev/null; then
+    [ "$(git -C "${DEST}" rev-parse "refs/tags/${ARCHIVE_TAG}^{commit}")" = "$(git -C "${DEST}" rev-parse HEAD)" ] \
+      || { echo "ERRO: a tag ${ARCHIVE_TAG} já existe no clone e aponta outro commit — não reescrevo arquivo." >&2; exit 2; }
+  else
+    git -C "${DEST}" tag -a "${ARCHIVE_TAG}" -m "conteúdo anterior à 1ª materialização da porta ${DOOR} pelo core (pin ${PIN})" HEAD \
+      || { echo "ERRO: não consegui criar a tag de arquivo ${ARCHIVE_TAG} no clone." >&2; exit 2; }
+  fi
+  find "${DEST}" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} + \
+    || { echo "ERRO: não consegui esvaziar a superfície anterior do clone." >&2; exit 2; }
+  echo "  (2b) conteúdo anterior ARQUIVADO na tag ${ARCHIVE_TAG} ($(git -C "${DEST}" rev-parse --short=12 HEAD)) e retirado da superfície — a porta nasce no lugar dele"
+elif [ "${REPLACE_FOREIGN}" -eq 1 ]; then
+  echo "ERRO: --replace-foreign sem conteúdo estranho a substituir ('${DOOR}' já é porta, ou o repo está vazio, ou o registro tem pin real) — a flag só vale na 1ª materialização." >&2
   exit 2
 fi
 
@@ -497,6 +522,27 @@ if [ "${ROLE}" = "plugins" ]; then
     NOT_MEASURED="${NOT_MEASURED} plugin-validate"
     echo "  (5c) ⚠️ CLI claude ausente — validate --strict NÃO MEDIDO (o --push recusa sem ele)"
   fi
+elif [ "${ROLE}" = "mini" ]; then
+  # O MINI NÃO LEVA O LINT (allowlist didática): a verificação dele é outra, e não é "não se aplica" —
+  # allowlist exata, sem ponteiro morto, sem caminho de máquina (F5, SAC-94). Até a F5 este ramo só
+  # dizia que o gate não se aplicava, e a porta didática saía sem verificação própria nenhuma.
+  # O checador é o DA WORKTREE (o motor também é de origin/main); rc 2 = não mediu, e não medir reprova.
+  _dm="${WT}/.claude/validation/door-mini-check.sh"
+  if [ ! -f "${_dm}" ]; then
+    echo "✗ (5c) door-mini-check.sh ausente em ${SRC_REF} — a porta didática não tem como ser verificada." >&2; FAIL=1
+  else
+    _dmo=""; _dmrc=0
+    _dmo="$(bash "${_dm}" --bundle "${DEST}" --source "${WT}" 2>&1)" || _dmrc=$?
+    if [ "${_dmrc}" -eq 0 ]; then
+      echo "  (5c) porta didática: ${_dmo#door-mini-check: }"
+    elif [ "${_dmrc}" -eq 1 ]; then
+      echo "✗ (5c) a porta didática reprovou na verificação própria (sem lint):" >&2
+      printf '%s\n' "${_dmo}" | sed -n '1,15p' >&2
+      FAIL=1
+    else
+      echo "✗ (5c) door-mini-check NÃO mediu o bundle (rc=${_dmrc}): $(printf '%s' "${_dmo}" | tail -1 | cut -c1-200)" >&2; FAIL=1
+    fi
+  fi
 elif [ -f "${DEST}/.claude/validation/lint-artifacts.sh" ]; then
   _lo="$( (cd "${DEST}" && bash .claude/validation/lint-artifacts.sh) 2>&1 || true)"
   _hard="$(printf '%s\n' "${_lo}" | sed -n 's/.*Violações HARD[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' | tail -1)"
@@ -507,8 +553,6 @@ elif [ -f "${DEST}/.claude/validation/lint-artifacts.sh" ]; then
     printf '%s\n' "${_lo}" | grep -E '^VIOLATION' | head -10 | sed 's/^/      /' >&2
     FAIL=1
   fi
-elif [ "${ROLE}" = "mini" ]; then
-  echo "  (5c) o papel mini não leva o lint (allowlist didática) — gate da porta não se aplica"
 else
   echo "✗ (5c) o papel '${ROLE}' leva o lint e ele NÃO veio no bundle — porta sem o próprio gate." >&2; FAIL=1
 fi
@@ -579,6 +623,19 @@ elif [ "${COMMITTED}" -eq 1 ]; then
   # exatamente UM commit vai a público: o verificado (o passo 2 garantiu a base)
   _ahead="$(git -C "${DEST}" rev-list --count "origin/${BRANCH}..HEAD" 2>/dev/null || echo '?')"
   [ "${_ahead}" = "1" ] || { echo "✗ o clone tem ${_ahead} commit(s) à frente de origin/${BRANCH}, não 1 — não empurro o que não verifiquei." >&2; exit 2; }
+  # O ARQUIVO VAI ANTES DA PORTA (passo 2b): se a tag não chegar ao remoto, a porta não sobe — substituir
+  # o conteúdo anterior sem ele estar guardado no próprio repo seria apagar, e isso este motor não faz.
+  if [ -n "${ARCHIVE_TAG}" ]; then
+    git -C "${DEST}" push -q origin "refs/tags/${ARCHIVE_TAG}" 2>&1 | sed 's/^/  │ /'
+    _trc="${PIPESTATUS[0]}"
+    _tl="$(git -C "${DEST}" rev-parse "refs/tags/${ARCHIVE_TAG}" 2>/dev/null)"
+    _tr="$(git ls-remote "${REMOTE_URL}" "refs/tags/${ARCHIVE_TAG}" 2>/dev/null | awk '{print $1}')"
+    if [ "${_trc}" -ne 0 ] || [ -z "${_tr}" ] || [ "${_tr}" != "${_tl}" ]; then
+      echo "✗ a tag de arquivo ${ARCHIVE_TAG} NÃO chegou ao remoto (rc=${_trc}, remoto='${_tr:0:12}') — a porta NÃO foi empurrada; o conteúdo anterior segue intacto." >&2
+      exit 2
+    fi
+    echo "  (7) arquivo empurrado e CONFERIDO no remoto: ${ARCHIVE_TAG} = ${_tl:0:12}"
+  fi
   git -C "${DEST}" push -q origin "HEAD:${BRANCH}" 2>&1 | sed 's/^/  │ /'
   _prc="${PIPESTATUS[0]}"
   [ "${_prc}" -eq 0 ] || { echo "✗ push recusado pelo remoto (rc=${_prc}) — nada publicado." >&2; exit 2; }
