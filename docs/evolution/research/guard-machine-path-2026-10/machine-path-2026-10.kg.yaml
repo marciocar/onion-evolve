@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 16 NÓS ═══
+# ═══ TETO: 18 NÓS ═══
 meta:
   id: machine-path-2026-10
   schema_version: "1"
@@ -113,12 +113,12 @@ nodes:
     confidence: 0.95
     verified_at: "2026-10-10"
     verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families kg_machine_path,kg_contract_check, com e sem mutantes"
-    label: "Mutantes: 16 na classe (um por forma e um por isenção, automatizados na bancada) e 4 na produção (registro no dispatcher, worse_mp e mp_before do kg-contract-check, a catraca) — todos morderam com LC_ALL=C."
+    label: "Mutantes: 20 na classe (um por forma e um por isenção, 4 deles das curas do Elenxo, automatizados na bancada) e 4 na produção (registro no dispatcher, worse_mp e mp_before do kg-contract-check, a catraca) — todos morderam com LC_ALL=C."
     narrative: "Na classe: tirar cd do verbo, a raiz nua, boot, opt, a barra dupla, o til de conta, o til, o file://, o hostname, a isenção dos fluxos padrão de dev, o início de token, o ponto no segmento da barra dupla, a raiz de sistema (trocada por qualquer raiz), o /run nu, a condição do P4 e a validade do marcador — cada um reprova o caso nomeado, e mutante que não se aplica é FALHA, nunca verde. Na produção: comentar check_kg_machine_path reprova (g); worse_mp vazio reprova (i1) e (i3); mp_before vazio reprova (i2); desligar a catraca reprova (e)."
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_kg_machine_path_selftests (casos a–h e m) e run_kg_contract_check_selftests (i1–i3)"
-      method: "medição: bancada com LC_ALL=C, 24/24 e 29/29 verdes; cada mutante de produção aplicado à mão e revertido"
+      method: "medição: bancada com LC_ALL=C, 28/28 e 29/29 verdes; cada mutante de produção aplicado à mão e revertido"
       locality: "repo"
 
   - id: C_TETO_RAIZ_QUE_NAO_E_DE_SISTEMA
@@ -183,7 +183,39 @@ nodes:
       method: "medição: kg-contract-check.sh rodado pela sessão da forja, rc 1 e depois rc 0"
       locality: "repo"
 
+  - id: E_ELENXO_APROVOU_COM_RESSALVAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-10"
+    verified_against: "refutador opus com mandato de falso positivo, sobre bfaee623: banco de frases realistas e a prosa de 227 .md de docs/knowledge-base e docs/evolution/research como proxy"
+    label: "Elenxo (2026-10-10): APROVA COM RESSALVAS. Zero falso positivo em nó; 1 classe medida na prosa (crase que FECHA seguida de raiz no sentido de 'ou', 2 casos) e 4 falsos negativos baratos. Curados no mesmo laço; a cura do segmento único expôs e curou um 3º."
+    narrative: "Curados: a crase só abre token quando ela abre (F1); tag de fechamento HTML deixou de abrir token (F3); argumento de shell de um segmento só passou a acusar (F7); aspas tipográficas simples e seta abrem token (F8); hostname sem distinção de caixa (F9). A cura F7 fez o corpus acusar 2 campos de colaboracao-onion-2026-07: o fecha-placeholder antes de um caminho relativo era lido como redirecionamento por estar depois de um dígito; o redirecionamento agora exige que o dígito abra o token. Declarados como teto, sem cura mecânica: rota HTTP ou chave de config com nome de raiz de sistema, padrão ancorado de gitignore, shebang, raiz app depois de verbo de shell e a entrada por menor-que sem espaço. Selftest: 44 casos; corpus: 0 acusações; corpus pré-ondas: os mesmos 247."
+    provenance:
+      source: ".claude/utils/kg/machine_path.py"
+      locator: "achados F1, F3, F7, F8, F9 do refutador e os casos novos do --selftest de kg-machine-path-check.sh"
+      method: "juízes: refutador opus com mandato de falso positivo; curas re-medidas pelo --selftest, pelo corpus vivo e pelo corpus de e03952c2"
+      locality: "repo"
+
+  - id: C_TETO_ROTA_COM_NOME_DE_RAIZ
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    trace: ".claude/utils/kg/machine_path.py"
+    label: "TETO (lado do falso positivo, aceito): rota HTTP ou chave de config cujo 1º segmento tem nome de raiz de sistema (home, media, dev de stage, private) e padrão ancorado de gitignore ACUSAM. Zero no corpus hoje; a saída é marcar vetor/receita ou parafrasear."
+    narrative: "Medido pelo refutador em frases sintéticas; nenhuma ocorrência no corpus de grafos nem na prosa. Calar raiz nua de home ou media abriria falso negativo real (listar a home de verdade), então a classe não muda. Também declarados: shebang cala (o ponto de exclamação não abre token), raiz app depois de verbo de shell acusa enquanto a mesma raiz em prosa cala, e a entrada por menor-que colada no caminho cala."
+
 edges:
+  - from: E_ELENXO_APROVOU_COM_RESSALVAS
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: SUPPORTS
+  - from: C_TETO_ROTA_COM_NOME_DE_RAIZ
+    to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
+    edge_type: CONSTRAINS
   - from: C_TETO_FALAR_DA_FORMA_EXIGE_PERIFRASE
     to: D_CLASSE_RAIZ_DE_SISTEMA_MAIS_ARGUMENTO_DE_SHELL
     edge_type: CONSTRAINS

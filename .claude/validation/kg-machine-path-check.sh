@@ -79,6 +79,11 @@ check("acusa: file:// para raiz de sistema", "abra file:///home/conta/x.html", "
 check("acusa: redirecionamento 2>/tmp", "cmd 2>/tmp/err.log", "fs")
 check("acusa: PATH=/usr/bin:/bin", "env -i PATH=/usr/bin:/bin bash", "fs")
 check("acusa: hostname da máquina", "medido no srvteste123 em 10-09", "host")
+# ── curas do Elenxo (2026-10-10): o que a 1ª redação deixava passar ───────────────────────────────────────
+check("acusa: cd para absoluto de um segmento (Elenxo F7)", "rode cd /workspace e depois", "shell")
+check("acusa: hostname em maiúsculas (Elenxo F9)", "o SRVTESTE123 respondeu", "host")
+check("acusa: caminho entre aspas tipográficas simples (Elenxo F8)", "lido em ‘/tmp/x’", "fs")
+check("acusa: caminho entre crases que ABREM", "em `/home/conta/x` e (`/tmp`)", "fs")
 # ── cala (cada isenção selada e cada falso positivo medido) ───────────────────────────────────────────────
 check("cala: /lib/ dentro de caminho relativo (O5, 4 FP)", ".claude/hooks/lib/invocation-lines.sh l.10", None)
 check("cala: comando /meta:* e /engineer:pr", "rode /meta:kg-freshness e depois /engineer:pr", None)
@@ -92,6 +97,9 @@ check("cala: ~abril/2026 (data aproximada)", "por volta de ~abril/2026", None)
 check("cala: /run nu (é também comando)", "use /run para subir o app", None)
 check("cala: caminho enraizado em placeholder", "cat <cgroupfs>/onion.slice/onion-auth.slice/memory.min", None)
 check("cala: rota do bridge", "as rotas /chat, /a2a e /en/doutrinas/ respondem", None)
+check("cala: crase que FECHA + barra de 'ou' (Elenxo F1, prosa real)", "os campos `plane:`/`status:`/etc. e legível só por `onion`/root", None)
+check("cala: tag de fechamento (Elenxo F3)", "<var>x</var> e <root>y</root>", None)
+check("cala: placeholder que fecha antes do caminho (corpus, 2026-10-10)", "ls -la docs/<dominio-t2>/graph/<dominio-t2>.kg.yaml", None)
 # ── P4: o marcador isenta, com a condição de home/hostname ─────────────────────────────────────────────────
 def node(mark, text):
     n = {"id": "N", "label": text}
