@@ -380,6 +380,18 @@ fi
 # O pin vai EXPLÍCITO ao materializador (--from <sha>): sem isso ele refaria o fetch, e uma main que
 # andasse no meio sairia como recusa confusa no (5b).
 _mrc=0
+# A CATRACA da REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca) no bundle:
+# o baseline anterior é o do pin PUBLICADO antes (o `ref` do provenance que o clone ainda guarda, lido
+# ANTES de a materialização reescrevê-lo). Pin fora da história deste core ou ausente = sem anterior, dito.
+PREV_BL=""
+if [ "${ROLE}" = "plugins" ]; then
+  _pref="$(find "${DEST}/plugins" -path '*/.claude-plugin/provenance.json' -exec sed -n 's/.*"ref"[[:space:]]*:[[:space:]]*"\([0-9a-f]*\)".*/\1/p' {} + 2>/dev/null | sort -u | head -1)"
+  if [ -n "${_pref}" ] && git -C "${CORE}" show "${_pref}:.claude/validation/plugin-bare-path-baseline.txt" > "${T}/prev-baseline.txt" 2>/dev/null; then
+    PREV_BL="${T}/prev-baseline.txt"
+  else
+    echo "  ℹ️ sem baseline do pin publicado antes (${_pref:-sem provenance}) — a catraca da REGRA 74 no bundle não tem anterior nesta rodada"
+  fi
+fi
 if [ "${ROLE}" = "plugins" ]; then
   TMPDIR="${T}/tmp" bash "${WT}/.claude/utils/marketplace/materialize-marketplace-repo.sh" "${DEST}" --no-commit 2>&1 | sed 's/^/  │ /'
   _mrc="${PIPESTATUS[0]}"
@@ -512,7 +524,8 @@ if [ "${ROLE}" = "plugins" ]; then
     echo "✗ (5d) plugin-bundle-check.sh ausente em ${SRC_REF} — as guardas de plugin não têm como rodar." >&2; FAIL=1
   else
     _pbo=""; _pbrc=0
-    _pbo="$(bash "${_pb}" --source "${WT}" --bundle "${DEST}" --format tsv 2>&1)" || _pbrc=$?
+    _pba=(--source "${WT}" --bundle "${DEST}" --format tsv); [ -n "${PREV_BL}" ] && _pba+=(--prev-baseline "${PREV_BL}")
+    _pbo="$(bash "${_pb}" "${_pba[@]}" 2>&1)" || _pbrc=$?
     _pbh="$(printf '%s\n' "${_pbo}" | awk -F'\t' '$1=="HARD"' | grep -c . || true)"
     if [ "${_pbrc}" -eq 0 ]; then
       echo "  (5d) guardas de plugin no bundle (REGRAS 61/72-77/79): 0 HARD"

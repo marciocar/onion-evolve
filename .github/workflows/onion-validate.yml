@@ -6,9 +6,9 @@ on:
       - '.claude/**'
       - 'docs/meta-specs/**'
       - 'docs/design-context/**'
-      # .claude-plugin/ = o catálogo da RAIZ, projeção dos manifestos guardada pela REGRA 76.
+      # .claude-plugin/ = o catálogo da RAIZ, projeção dos manifestos guardada pela REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos).
       # Até a F4 das portas (2026-10-10) aqui estava 'plugins/**' (artefatos gerados guardados pela
-      # REGRA 19; incidente 2026-07-04: fix de drift do #241 mergeou sem o lint rodar). O plugins/
+      # REGRA 19 (Plugins de vertical sincronizados com as fontes); incidente 2026-07-04: fix de drift do #241 mergeou sem o lint rodar). O plugins/
       # saiu do core; a mesma lição vale para o catálogo: PR que só toca a projeção tem de ser julgado.
       - '.claude-plugin/**'
       # .github/workflows/ = o proprio CI. Sem este path, um PR que mexe no

@@ -13380,7 +13380,7 @@ run_scaffold_diagnose_selftests() {
 
 # ---------------------------------------------------------------------------
 # Modo plugin-bundle — as guardas de PLUGIN rodam sobre um BUNDLE TEMPORÁRIO, nunca a árvore viva
-# (F4 das portas, SAC-93, 2026-10-10). Substitui a família plugins-sync, que exercitava a REGRA 19
+# (F4 das portas, SAC-93, 2026-10-10). Substitui a família plugins-sync, que exercitava a REGRA 19 (Plugins de vertical sincronizados com as fontes)
 # (Plugins de vertical (plugins/*) sincronizados com as fontes) — aposentada junto com o `plugins/`
 # versionado. Polaridades, cada uma com o seu mutante:
 #   (a) as FONTES VIVAS montadas num temporário passam limpas no plugin-bundle-check (0 HARD, rc 0)
@@ -13424,26 +13424,53 @@ run_plugin_bundle_selftests() {
   printf '\nRode /engineer:pr depois.\n' >> "${pcmd}"                                                             # 72
   printf '\nVeja `.claude/utils/zz-nao-viaja/x.md`.\n' >> "${pcmd}"                                               # 74
   printf '\nIrmã: [morta](../kb/zz-morta-plantada.md)\n' >> "${pcmd}"                                             # 75
-  python3 - "${bad}/.claude-plugin/marketplace.json" <<'PYB'
+  # 74 no plugin QUE TEM a isenção de destino (onion-meta): ponteiro de LEITURA fundo continua julgado —
+  # a isenção cobre raiz, categoria de 1 nível e placeholder, nunca um caminho de conteúdo do core
+  local mcmd; mcmd="$(find "${bad}/plugins/onion-meta/commands" -name '*.md' 2>/dev/null | LC_ALL=C sort | head -1)"
+  [ -n "${mcmd}" ] && printf '\nLeia `.claude/utils/zz-leitura-plantada/y.md`.\n' >> "${mcmd}"                   # 74 (isenção estreita)
+  # 77: conhecimento DUPLICADO entre plugins (a mesma skill em dois)
+  local sk; sk="$(find "${bad}/plugins/onion/skills" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | LC_ALL=C sort | head -1)"
+  [ -n "${sk}" ] && mkdir -p "${bad}/plugins/onion-product/skills" && cp -R "${sk}" "${bad}/plugins/onion-product/skills/"   # 77
+  python3 - "${bad}/.claude-plugin/marketplace.json" "${bad}/plugins/onion/hooks/hooks.json" <<'PYB'
 import json, sys
 p = sys.argv[1]; d = json.load(open(p, encoding="utf-8"))
 d["plugins"] = [x for x in d["plugins"] if x["name"] != "onion-design"]          # some do bundle, segue na raiz
 for x in d["plugins"]:
     if x["name"] == "onion-compliance": x["source"] = "./plugins/zz-inexistente"  # source que não resolve
+    if x["name"] == "onion-product": x["description"] = "divergente da raiz"       # 76 entrada-diverge
 json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+h = sys.argv[2]                                                                    # 73: hook aponta script ausente
+hj = json.load(open(h, encoding="utf-8"))
+ev = next(iter(hj["hooks"]))
+hj["hooks"][ev][0]["hooks"][0]["command"] = 'bash "${CLAUDE_PLUGIN_ROOT}/hooks/zz-ausente-plantado.sh"'
+json.dump(hj, open(h, "w", encoding="utf-8"), indent=2)
 PYB
   slug="$(git -C "${REPO_ROOT}" remote get-url origin 2>/dev/null | sed -E 's#(git@|https://)([^/:]+)[/:]##; s#\.git$##' || true)"
   [ -n "${slug}" ] && printf '\nSuporte: https://github.com/%s/issues\n' "${slug}" >> "${bad}/plugins/onion/README.md"   # 79
   rc=0; out="$(bash "${chk}" --source "${REPO_ROOT}" --bundle "${bad}" --format tsv 2>&1)" || rc=$?
   local miss="" r
-  for r in "61	moat-no-bundle" "72	" "74	NOVO" "75	" "76	source-do-bundle" "76	sem-plugin-no-bundle"; do
+  for r in "61	moat-no-bundle" "72	" "73	script-ausente" "74	NOVO	plugins/onion-product/" "74	NOVO	plugins/onion-meta/" "75	" \
+           "76	source-do-bundle" "76	sem-plugin-no-bundle" "76	entrada-diverge" "77	duplicado"; do
     grep -q "^HARD	${r}" <<< "${out}" || miss="${miss} [${r//	/:}]"
   done
   if [ -n "${slug}" ]; then grep -q "^HARD	79	404-privado" <<< "${out}" || miss="${miss} [79]"; fi
   if [ "${rc}" -eq 1 ] && [ -z "${miss}" ]; then
-    record_pass "plugin-bundle: (b) defeito plantado barrado por regra — 61, 72, 74, 75, 76 (source e entrada sumida)$([ -n "${slug}" ] && printf ', 79') — rc 1"
+    record_pass "plugin-bundle: (b) defeito plantado barrado por regra — 61, 72, 73, 74 (inclusive no plugin com isenção de destino), 75, 76 (source, entrada sumida e entrada divergente), 77$([ -n "${slug}" ] && printf ', 79') — rc 1"
   else record_fail "plugin-bundle: (b) plantados" "rc=${rc}; faltou:${miss}"; fi
   [ -n "${slug}" ] || record_skip "plugin-bundle: (b79) sem remote origin — o slug privado não é derivável, a REGRA 79 não tem sujeito aqui"
+
+  # (b2) A CATRACA DA REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca) NA PUBLICAÇÃO (achado I2 da passada adversarial): com o baseline do pin
+  #      publicado antes MENOR que o atual (alguém acrescentou passivo), o bundle vivo reprova com
+  #      CATRACA-VIOLADA; com o mesmo baseline, não.
+  local blf="${REPO_ROOT}/.claude/validation/plugin-bare-path-baseline.txt"
+  if [ "$(grep -vc '^#' "${blf}" 2>/dev/null || true)" -gt 0 ]; then
+    grep -v '^#' "${blf}" | sed '$d' > "${d}/prev-menor.txt"
+    rc=0; out="$(bash "${chk}" --source "${REPO_ROOT}" --bundle "${tgt}" --format tsv --prev-baseline "${d}/prev-menor.txt" 2>&1)" || rc=$?
+    local rc_eq=0; bash "${chk}" --source "${REPO_ROOT}" --bundle "${tgt}" --format tsv --prev-baseline "${blf}" >/dev/null 2>&1 || rc_eq=$?
+    if [ "${rc}" -eq 1 ] && grep -q '^HARD	74	CATRACA-VIOLADA' <<< "${out}" && [ "${rc_eq}" -eq 0 ]; then
+      record_pass "plugin-bundle: (b2) baseline maior que o do pin publicado ⇒ CATRACA-VIOLADA; igual ⇒ limpo"
+    else record_fail "plugin-bundle: (b2) catraca na publicação" "rc=${rc} rc_igual=${rc_eq}: $(grep '	74	' <<< "${out}" | head -2 | tr '\n' ' ' | cut -c1-200)"; fi
+  else record_skip "plugin-bundle: (b2) baseline vazio — a catraca não tem o que encolher aqui"; fi
 
   # (c) bundle sem plugin montado = NÃO MEDI (rc 2), nunca limpo
   mkdir -p "${d}/vazio/plugins"
@@ -13474,6 +13501,19 @@ PYE
   if [ -z "${tracked}" ] && [ "${pubsrc}" = "OK" ]; then
     record_pass "plugin-bundle: (e) a raiz não versiona plugins/ e todo source do catálogo aponta o repo público"
   else record_fail "plugin-bundle: (e) raiz" "plugins/ rastreado='${tracked}' · catálogo=${pubsrc}"; fi
+
+  # (f) A CATRACA DA REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca) NO LINT DE PR, sem bundle: um repo git cujo origin/main tem o baseline com N
+  #     linhas e a árvore com N+1 ⇒ o lint (o check REAL, num repo sintético com o lint copiado) acusa.
+  local g="${d}/rat"
+  mkdir -p "${g}/.claude"; cp -a "${REPO_ROOT}/.claude/validation" "${g}/.claude/validation"
+  mkdir -p "${g}/.claude/utils/marketplace/verticals" "${g}/.claude-plugin"
+  printf '{\n  "name": "x",\n  "owner": { "name": "t" },\n  "plugins": []\n}\n' > "${g}/.claude-plugin/marketplace.json"
+  ( cd "${g}" && git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm base && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1
+  printf 'plugins/p/x.md|.claude/utils/zz-cresceu\n' >> "${g}/.claude/validation/plugin-bare-path-baseline.txt"
+  out="$(cd "${g}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only "${g}/.claude/validation/plugin-bare-path-baseline.txt" 2>&1 || true)"
+  if grep -q 'plugin-bare-path/CATRACA-VIOLADA' <<< "${out}"; then
+    record_pass "plugin-bundle: (f) baseline do passivo cresceu contra origin/main ⇒ o lint de PR acusa CATRACA-VIOLADA (sem montar bundle)"
+  else record_fail "plugin-bundle: (f) catraca no lint de PR" "$(grep -E 'VIOLATION|MORREU' <<< "${out}" | head -2 | cut -c1-200)"; fi
   rm -rf "${d}"
 }
 
@@ -13598,9 +13638,9 @@ run_capability_selftests() {
   # de HOJE são honestos; nunca prova que um desonesto seria pego. Injeta no vdir do
   # SANDBOX (cp -a de .claude — ver topo do arquivo) um manifesto sintético e roda o
   # lint-artifacts.sh de VERDADE (caixa-preta, sem refator — mesma disciplina do resto
-  # deste arquivo). Outras guardas de manifesto (REGRA 27, 61…) podem citar o manifesto
+  # deste arquivo). Outras guardas de manifesto (REGRA 27 (Dependência de script de comando empacotado), 61…) podem citar o manifesto
   # injetado — por isso a asserção grepa a MENSAGEM específica de over-claim ('mas só cumpre'),
-  # não 'nenhuma violação citando o path'. (Até a F4 das portas a REGRA 19 disparava 'plugin
+  # não 'nenhuma violação citando o path'. (Até a F4 das portas a REGRA 19 (Plugins de vertical sincronizados com as fontes) disparava 'plugin
   # ausente' para todo manifesto injetado; ela foi aposentada com o plugins/ versionado.)
   local cap_vdir="${SANDBOX}/.claude/utils/marketplace/verticals"
   local cap_dst="${cap_vdir}/selftest-fixture-probe.manifest.sh"
@@ -13657,7 +13697,7 @@ run_capability_selftests() {
     record_skip "only-gate: não-canônico → fixture r20 ausente"
   fi
   # (ii) NÃO TRAVAR (F4 das portas, 2026-10-10): uma fonte BUNDLADA alterada, vista pelo lint de PR via
-  #      --only, NÃO cobra plugin regenerado. Até a F4 este caso provava o contrário — que a REGRA 19
+  #      --only, NÃO cobra plugin regenerado. Até a F4 este caso provava o contrário — que a REGRA 19 (Plugins de vertical sincronizados com as fontes)
   #      (Plugins de vertical sincronizados com as fontes) acusava o drift ("fora de sincronia" no repo
   #      real, "plugin ausente" no sandbox) — porque o core versionava plugins/ e todo PR que tocava uma
   #      fonte bundlada tinha de regenerar e commitar o plugin. O plugins/ saiu do core; o bundle nasce na
@@ -17682,7 +17722,7 @@ _family run_scaffold_book_selftests || true
 _family run_scaffold_diagnose_selftests || true
 
 # Modo plugin-bundle — as guardas de plugin sobre um bundle TEMPORÁRIO montado das fontes vivas (F4 das
-# portas, 2026-10-10; substitui o plugins-sync, que exercitava a REGRA 19 aposentada).
+# portas, 2026-10-10; substitui o plugins-sync, que exercitava a REGRA 19 (Plugins de vertical sincronizados com as fontes) aposentada).
 _family run_plugin_bundle_selftests || true
 
 # Modo capability — Capability Contract (REGRA 20): contrato honesto + resolução de requires.
@@ -18617,7 +18657,7 @@ _family run_model_ladder_selftests
 # Modo plugin-version-derived — a versão do plugin ANDA com o conteúdo (sinal de campo 2026-09-03: `claude plugin update`
 # compara só a versão; manifesto parado em 0.1.0 = updater no-op com o cache 89 arquivos atrás). Sandbox git próprio.
 # ⚠️ REESCRITA NA F4 DAS PORTAS (2026-10-10, SAC-93), não remendada. A família anterior codificava a versão como
-#    FATO COMMITADO no `plugins/` versionado do core (casos de squash, PR concorrente, GitFlow e a REGRA 19
+#    FATO COMMITADO no `plugins/` versionado do core (casos de squash, PR concorrente, GitFlow e a REGRA 19 (Plugins de vertical sincronizados com as fontes)
 #    comparando canônico × temp). O `plugins/` saiu do core; a versão passou a ser FATO PUBLICADO — o anterior
 #    vem do plugin que já está no destino (o clone de onion-plugins) ou de ONION_PLUGIN_PRIOR_DIR. Os casos de
 #    histórico perderam o objeto: só a publicação deriva versão, e ela é serial (I3). Teste que afirma um
@@ -18670,6 +18710,15 @@ run_plugin_version_derived_selftests() {
   if [ "${v1}" = "0.1.0" ]; then record_pass "plugin-version-derived: (e) plugins/ no repo-fonte NÃO dita a versão (destino novo sem anterior ⇒ ${v1})"
   else record_fail "plugin-version-derived: (e)" "a versão veio do plugins/ da FONTE ('${v1}') — o anterior tem de ser o publicado, não uma cópia no core"; fi
   rm -rf "${d}/src/plugins"
+
+  # (e2) ONION_PLUGIN_PRIOR_DIR de OUTRO plugin não contamina (achado I3 da passada adversarial): exportada
+  #      no shell, ela fazia todo plugin herdar a versão de um só. Nome divergente ⇒ ignorada ⇒ manifesto.
+  mkdir -p "${d}/outro/.claude-plugin"
+  printf '{\n  "name": "outro",\n  "version": "0.1.50"\n}\n' > "${d}/outro/.claude-plugin/plugin.json"
+  printf '{\n  "tree_sha": "zz"\n}\n' > "${d}/outro/.claude-plugin/provenance.json"
+  ONION_PLUGIN_PRIOR_DIR="${d}/outro" bash "${asm}" "${man}" "${d}/src" "${d}/novo2/probe" >/dev/null 2>&1; v1="$(_vof "${d}/novo2/probe")"
+  if [ "${v1}" = "0.1.0" ]; then record_pass "plugin-version-derived: (e2) ONION_PLUGIN_PRIOR_DIR de outro plugin é ignorada (${v1}, não 0.1.51)"
+  else record_fail "plugin-version-derived: (e2)" "o anterior de OUTRO plugin contaminou a versão: '${v1}'"; fi
 
   # (f) O MATERIALIZADOR DA PUBLICAÇÃO preserva o anterior. Ele monta DENTRO do clone de onion-plugins; se
   #     apagasse o plugin antes de chamar o assembler (como fazia até a F4), toda publicação zeraria a
@@ -18920,7 +18969,7 @@ run_plugin_dead_link_selftests() {
 }
 _family run_plugin_dead_link_selftests
 
-# REGRA 76 — marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos MANIFESTOS (helper
+# REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos) — marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos MANIFESTOS (helper
 # marketplace-root-check.sh; --write seguro). Repensada na F4 das portas (2026-10-10): a raiz não lista mais
 # `./plugins/<nome>` (o core não guarda o bundle); o source de cada entrada é o subdiretório do plugin no repo
 # público. Polaridades: (a) stale/relativo → HARD com a classe própria do relativo; (b) --write → limpo, topo
@@ -18955,6 +19004,28 @@ run_marketplace_root_sync_selftests() {
   out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
   if grep -q '^HARD	desatualizado' <<< "${out}"; then record_pass "marketplace-root-sync: (d) descrição mudou no manifesto → raiz defasada (HARD)"
   else record_fail "marketplace-root-sync: (d)" "a raiz não acusou a descrição nova: $(printf '%s' "${out}" | cut -c1-200)"; fi
+  # (e) O MANIFESTO TEM DE MONTAR: fonte declarada que sumiu (apagada/renomeada) → HARD no lint de PR,
+  #     sem montar nada (achado I4 da passada adversarial: a REGRA 19 (Plugins de vertical sincronizados com as fontes) aposentada era o único gate disso)
+  bash "${h}" "${d}/r" --write >/dev/null 2>&1
+  rm -f "${d}/r/.claude/agents/x/a1.md"
+  out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
+  if grep -q '^HARD	fonte-do-manifesto-ausente	.*probe:.claude/agents/x/a1.md' <<< "${out}"; then record_pass "marketplace-root-sync: (e) fonte bundlada apagada → HARD fonte-do-manifesto-ausente (o manifesto não montaria)"
+  else record_fail "marketplace-root-sync: (e)" "fonte apagada não acusada: $(printf '%s' "${out}" | cut -c1-200)"; fi
+  # (f) PAPEL ≠ CORE com os PRÓPRIOS plugins (achado B2): um standalone que monta plugin pelo
+  #     /meta:create-vertical tem manifesto + plugins/ + catálogo em modo bundle, e isso é LIMPO — a raiz
+  #     só aponta o repo público do Onion no core. A cura sugerida pelo erro, se houvesse, apontaria o
+  #     catálogo dele para um caminho inexistente no público.
+  local s="${d}/std"
+  mkdir -p "${s}/.claude/utils/marketplace/verticals" "${s}/.claude-plugin" "${s}/plugins/acme-x/.claude-plugin"
+  printf 'role: standalone\n' > "${s}/.claude/.onion-version"
+  printf 'PLUGIN_NAME="acme-x"\nPLUGIN_DESC="x"\nKEYWORDS=(a)\n' > "${s}/.claude/utils/marketplace/verticals/acme-x.manifest.sh"
+  printf '{\n  "name": "acme-x",\n  "version": "0.1.0",\n  "description": "x",\n  "author": { "name": "t" },\n  "keywords": ["a"]\n}\n' > "${s}/plugins/acme-x/.claude-plugin/plugin.json"
+  printf '{\n  "name": "acme-mkt",\n  "owner": { "name": "t" },\n  "plugins": []\n}\n' > "${s}/.claude-plugin/marketplace.json"
+  bash "${h}" "${s}" --write >/dev/null 2>&1
+  out="$(bash "${h}" "${s}" --format tsv 2>/dev/null)"
+  if [ -z "${out}" ] && grep -q '"source": "./plugins/acme-x"' "${s}/.claude-plugin/marketplace.json"; then
+    record_pass "marketplace-root-sync: (f) standalone com plugin próprio: catálogo em modo bundle (./plugins/acme-x) é limpo — o repo público só vale no core"
+  else record_fail "marketplace-root-sync: (f)" "out=$(printf '%s' "${out}" | cut -c1-160) · $(tr -d '\n' < "${s}/.claude-plugin/marketplace.json" | cut -c1-200)"; fi
   rm -rf "${d}"
 }
 _family run_marketplace_root_sync_selftests

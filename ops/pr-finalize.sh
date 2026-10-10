@@ -206,7 +206,7 @@ _regen() {  # regenera TODA projeção gerada com catraca no lint e stageia só 
     bash .claude/validation/federation-console.sh > "${con}" || { rm -f "${con}"; die "federation-console.sh falhou"; }
     [ -s "${con}" ] && mv "${con}" docs/onion/federation-console.html || rm -f "${con}"
   fi
-  # catálogo da raiz (REGRA 76): projeção dos manifestos desde a F4 das portas (2026-10-10). O --write já
+  # catálogo da raiz (REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos)): projeção dos manifestos desde a F4 das portas (2026-10-10). O --write já
   # escreve por temp+mv (o gerador lê o topo do próprio arquivo).
   if [ -f .claude/validation/marketplace-root-check.sh ] && [ -f .claude-plugin/marketplace.json ]; then
     bash .claude/validation/marketplace-root-check.sh "${ROOT}" --write >/dev/null || die "marketplace-root-check.sh --write falhou"

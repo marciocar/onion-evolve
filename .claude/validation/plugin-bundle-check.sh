@@ -13,7 +13,7 @@
 #             · REGRA 73 (Hook empacotado resolve no plugin instalado);
 #             · REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca);
 #             · REGRA 75 (Link markdown relativo dentro de plugin resolve no plugin);
-#             · REGRA 76 — metade da PUBLICAÇÃO: o catálogo do bundle tem source relativo para um plugin
+#             · REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos) — metade da PUBLICAÇÃO: o catálogo do bundle tem source relativo para um plugin
 #               que existe, e as entradas dele são as MESMAS da raiz do core (fora o `source`). A metade
 #               da raiz (aponta o público, projeção dos manifestos) segue no lint de PR;
 #             · REGRA 77 (Contrato de dependência entre plugins);
@@ -22,7 +22,7 @@
 # POR QUÊ : F4 das portas (SAC-93, 2026-10-10, D_MATRIZ_DE_PORTAS_2026_10). Até a F4 o core VERSIONAVA
 #           `plugins/` e estas guardas rodavam no lint de todo PR sobre essa cópia — o que obrigava cada
 #           PR que tocasse uma fonte bundlada a regenerar e commitar o plugin (o auto-fix do pre-commit,
-#           a REGRA 19, conflitos de projeção no rebase). O `plugins/` saiu do core. As guardas não
+#           a REGRA 19 (Plugins de vertical sincronizados com as fontes), conflitos de projeção no rebase). O `plugins/` saiu do core. As guardas não
 #           sumiram: mudaram de OBJETO. Julgam o bundle que vai a público, na hora em que ele vai
 #           (`ops/publish-door.sh onion-plugins`, passo 5d), e a bancada as exercita sobre um bundle
 #           TEMPORÁRIO montado das fontes vivas (família plugin_bundle) — nunca a árvore viva.
@@ -30,9 +30,12 @@
 # COMO    : monta uma raiz temporária com `.claude` → link para a FONTE e cópias de `plugins/` e
 #           `.claude-plugin/` do BUNDLE, e chama os helpers de sempre com essa raiz. Os helpers não
 #           mudaram: eles sempre leram `<raiz>/plugins` e `<raiz>/.claude/...`.
-#           TETO DECLARADO: a catraca da REGRA 74 (CATRACA-VIOLADA contra o baseline de origin/main) não
-#           roda aqui — a raiz temporária não é repo git. Na publicação a fonte JÁ É origin/main, então a
-#           comparação não teria o que medir; o baseline ainda separa passivo (SOFT) de novo (HARD).
+#           A CATRACA da REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca)
+#           roda em dois lugares (achado I2 da passada adversarial da F4, que mediu que ela tinha sumido):
+#           no lint de PR (check_plugin_bare_path_ratchet: o baseline não cresce contra origin/main) e
+#           aqui, com --prev-baseline <arquivo> = o baseline do pin PUBLICADO antes (o publish-door.sh o
+#           extrai do provenance do clone). Sem --prev-baseline a raiz temporária não tem histórico e a
+#           catraca daqui não tem com o que comparar; o baseline ainda separa passivo (SOFT) de novo (HARD).
 #
 # OS CABEÇALHOS das regras que moram AQUI (saíram do lint-artifacts.sh na F4), no formato que o hook
 # rule-title-in-prose.sh lê para sugerir o título — número é chave, título é significado:
@@ -43,7 +46,7 @@
 # REGRA 77 — Contrato de dependência entre plugins [HARD + SOFT]
 # REGRA 79 — Artefato de plugin não publica o repo-fonte PRIVADO como endereço [HARD]
 #
-# USO     : plugin-bundle-check.sh --source <FONTE> --bundle <BUNDLE> [--format text|tsv]
+# USO     : plugin-bundle-check.sh --source <FONTE> --bundle <BUNDLE> [--format text|tsv] [--prev-baseline <arquivo>]
 # SAÍDA   : tsv: SEV<TAB>REGRA<TAB>classe<TAB>caminho<TAB>mensagem · text: legível + sumário
 # rc      : 0 nenhum HARD · 1 há HARD · 2 não pude medir (bundle sem plugins/, fonte inválida,
 #           helper ausente, python ausente) — "não medi" nunca vira "limpo".
@@ -56,6 +59,7 @@ while [ $# -gt 0 ]; do
     --source) SRC="${2:-}"; shift 2 ;;
     --bundle) BUNDLE="${2:-}"; shift 2 ;;
     --format) FORMAT="${2:-text}"; shift 2 ;;
+    --prev-baseline) export ONION_BAREPATH_PREV_FILE="${2:-}"; shift 2 ;;
     -h|--help) sed -n '2,45p' "$0"; exit 0 ;;
     *) echo "plugin-bundle-check: argumento desconhecido '$1'" >&2; exit 2 ;;
   esac
@@ -94,7 +98,7 @@ _delegate 74 plugin-bare-path-check.sh
 _delegate 75 plugin-dead-link-check.sh
 _delegate 77 plugin-deps-check.sh
 
-# ── REGRA 61, metade do RESULTADO: moat no que foi MONTADO ───────────────────────────────────────
+# ── REGRA 61 (Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado), metade do RESULTADO: moat no que foi MONTADO ───────────────────────────────────────
 # As MESMAS listas da check_moat_boundary (lint-artifacts.sh): basename de adoção/federação/motor do
 # marketplace, e caminho de utils de adoção/federação/marketplace/co-evolução, skill onion-publish e
 # qualquer *.kg.yaml. No bundle os utils moram em plugins/<p>/utils/<rel>, então o caminho casa igual.
@@ -108,7 +112,7 @@ while IFS= read -r f; do
   fi
 done < <(find "${R}/plugins" -type f 2>/dev/null | LC_ALL=C sort)
 
-# ── REGRA 79: o repo-fonte PRIVADO nunca como endereço ───────────────────────────────────────────
+# ── REGRA 79 (Artefato de plugin não publica o repo-fonte PRIVADO como endereço): o repo-fonte PRIVADO nunca como endereço ───────────────────────────────────────────
 # O slug privado é DERIVADO do remote `origin` da FONTE (quem forkar herda a guarda). provenance.json
 # é a única isenção: lá o slug é marca de origem, não link.
 src_slug="$(git -C "${SRC}" remote get-url origin 2>/dev/null | sed -E 's#(git@|https://)([^/:]+)[/:]##; s#\.git$##' || true)"
@@ -124,7 +128,7 @@ if [ -n "${src_slug}" ] && [ "${ONION_SOURCE_IS_PRIVATE:-1}" = "1" ]; then
               [ -f "${R}/.claude-plugin/marketplace.json" ] && printf '%s\n' "${R}/.claude-plugin/marketplace.json"; } | LC_ALL=C sort )
 fi
 
-# ── REGRA 76, metade da PUBLICAÇÃO: catálogo do bundle × raiz do core ────────────────────────────
+# ── REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos), metade da PUBLICAÇÃO: catálogo do bundle × raiz do core ────────────────────────────
 GEN="${SRC}/.claude/utils/marketplace/generate-marketplace.sh"
 if [ ! -f "${R}/.claude-plugin/marketplace.json" ]; then
   _row "HARD" "76" "catalogo-ausente" ".claude-plugin/marketplace.json" "o bundle não tem catálogo — o marketplace público não instala nada"

@@ -12,9 +12,9 @@
 # ⚠️ O QUE NÃO VIAJA, e por quê (a recomendação mais estreita, declarada):
 #   · `/meta:create-vertical` FICA FORA. O caminho `--plugin` dele monta plugin e catálogo com
 #     `.claude/utils/marketplace/{assemble-plugin,generate-marketplace}.sh` — o MOTOR do marketplace, que a
-#     REGRA 61 segue tratando como moat (a matriz o lista com a adoção). Levá-lo exigiria abrir o moat
+#     REGRA 61 (Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado) segue tratando como moat (a matriz o lista com a adoção). Levá-lo exigiria abrir o moat
 #     (decisão do maestro, não desta fase) ou publicar um comando cujo `allowed-tools` aponta um motor que
-#     não viaja (a REGRA 74 o chama de NASCIDO MORTO). Fica no core e no standalone; o fio está em
+#     não viaja (a REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca) o chama de NASCIDO MORTO). Fica no core e no standalone; o fio está em
 #     "para o final" da F4.
 #   · `/meta:forge`, `/meta:forge-guard` e `/meta:cc-update` FICAM FORA. Os motores deles
 #     (forge-census.sh, guard-census.sh, cc-delta-census.sh) medem o HARNESS do repo — lint-artifacts.sh e
@@ -61,9 +61,9 @@ DOCS=()
 REQUIRES_PLUGINS=(onion)
 # A fábrica ESCREVE no `.claude/` do projeto de quem instala (agente novo em .claude/agents/<cat>/,
 # comando em .claude/commands/, skill em .claude/skills/, abstração em .claude/utils/<nome>/; o
-# evolve-staleness-check lê .claude/hooks/). Ali o caminho nu é DESTINO, não ponteiro morto — a REGRA 74
+# evolve-staleness-check lê .claude/hooks/). Ali o caminho nu é DESTINO, não ponteiro morto — a REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca)
 # (Caminho .claude/ NU dentro de plugin só resolve no core) lê esta lista e reporta as refs isentas num
-# SOFT agregado. Medido no 1º bundle: 145 refs, todas desta natureza.
+# SOFT agregado. Medido no 1º bundle: 145 refs; a passada adversarial achou 9 que eram LEITURA (ponteiros mortos para o core), não destino — a isenção ficou estreita (raiz, categoria de 1 nível, placeholder; nunca allowed-tools) e as 7 de leitura viraram citação sem caminho na fonte.
 CONSUMER_TARGET_ROOTS=(agents commands skills hooks utils)
 
 CONFORMANCE="bronze"

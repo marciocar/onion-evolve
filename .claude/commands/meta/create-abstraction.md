@@ -56,7 +56,7 @@ Este comando **orquestra** a criação. O conhecimento de fundo já existe nas K
 
 - **Critério de elegibilidade** (o Passo 0 abaixo — *quando* algo vira SDAAL): [`onion-abstraction-doctrine.md`](../../../docs/knowledge-base/concepts/onion-abstraction-doctrine.md)
 - **Padrão SDAAL** (fundamentos, arquitetura, design patterns, anti-patterns): [`specification-driven-ai-abstraction-layer.md`](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
-- **Implementação de referência real**: [`task-manager-abstraction.md`](../../../docs/knowledge-base/concepts/task-manager-abstraction.md) e `.claude/utils/task-manager/`
+- **Implementação de referência real**: [`task-manager-abstraction.md`](../../../docs/knowledge-base/concepts/task-manager-abstraction.md) e a abstração task-manager (`utils/task-manager/` no core; num plugin, ela vem no plugin `onion`)
 - **Templates completos de geração** (README, interface, types, detector, factory, adapters, none, .env): [`sdaal-examples.md`](../../../docs/knowledge-base/patterns/sdaal-examples.md)
 
 ## 🚦 Passo 0 (OBRIGATÓRIO) — Teste do Eixo: isto merece ser SDAAL?
@@ -222,7 +222,7 @@ Acrescentar ao `.env.example` o bloco de configuração (template seção 8 em [
 📚 Documentação:
 ∟ Pattern: docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md
 ∟ Templates: docs/knowledge-base/patterns/sdaal-examples.md
-∟ Exemplo real: .claude/utils/task-manager/
+∟ Exemplo real: a abstração task-manager (utils/task-manager/ no core; plugin onion)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```

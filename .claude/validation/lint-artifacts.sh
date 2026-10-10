@@ -384,7 +384,7 @@ _role() {
 }
 # ── QUEM PUBLICA O MARKETPLACE (2026-10-10, F2 das portas) ──────────────────────────────────────
 # As REGRAS 37 e 76 julgam o catálogo de publicação do core (.claude-plugin/marketplace.json; até a F4 das
-# portas, 2026-10-10, a REGRA 19 julgava também o plugins/ versionado, que saiu do core). Até
+# portas, 2026-10-10, a REGRA 19 (Plugins de vertical sincronizados com as fontes) julgava também o plugins/ versionado, que saiu do core). Até
 # a F2 só o adotante e o hub as pulavam (IS_DERIVED); o standalone não levava utils/marketplace e elas
 # não tinham o que ler. Com a matriz, o standalone LEVA utils/marketplace (o /meta:create-vertical o usa)
 # e as duas regras passaram a reprovar a porta por não ter o marketplace que ela não publica — 21 HARD
@@ -1666,10 +1666,10 @@ check_role_bundle_sync() {
   # GATE sob --only (Elenxo 2026-08-13, KG: docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml):
   # guarda de estado GLOBAL que rodava inteira em toda invocação --only custava segundos para validar 1
   # arquivo alheio. O gate decide pela ÁREA da guarda — e a área tem de incluir TODA fonte que ela lê,
-  # não só o prefixo óbvio (a 1ª versão do gate da antiga REGRA 19 casava só o prefixo e ficou cega a
+  # não só o prefixo óbvio (a 1ª versão do gate da antiga REGRA 19 (Plugins de vertical sincronizados com as fontes) casava só o prefixo e ficou cega a
   # drift de fonte via --only: 2 HARD engolidas, provado pelo 2º Elenxo). Este é o racional que as
   # outras guardas citam ("ver o racional em check_role_bundle_sync"); morava na check_plugins_sync,
-  # que saiu com a REGRA 19 na F4 das portas (2026-10-10). Inclui commands/meta/:
+  # que saiu com a REGRA 19 (Plugins de vertical sincronizados com as fontes) na F4 das portas (2026-10-10). Inclui commands/meta/:
   # a REGRA valida work_tool -> comando EXISTENTE, então rename/delete de um comando meta tem de
   # disparar (2º Elenxo provou a cegueira com mv co-deliver.md: o PRE acusava, o gate estreito não).
   if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in */utils/marketplace/*|*/.claude-plugin/*|*/commands/meta/*) : ;; *) return 0 ;; esac; fi
@@ -1859,7 +1859,7 @@ check_graph_sync() {
   local gen="${SCRIPT_DIR}/graph.sh"
   local gfile="${REPO_ROOT}/docs/onion/graph.md"
   [ -f "${gen}" ] || return 0
-  command -v jq >/dev/null 2>&1 || return 0     # graph.sh usa jq p/ capability → pula gracioso sem jq
+  # (o gate por jq saiu na F4 das portas: graph.sh deixou de usar jq — a capability vem dos manifestos)
   have_py_yaml || return 0                        # graph.sh usa python+yaml p/ members.yaml → pula gracioso sem eles
   if [ ! -f "${gfile}" ]; then
     violation "HARD" "docs/onion/graph.md" "grafo ausente — rode 'bash .claude/validation/graph.sh --markdown > docs/onion/graph.md'"
@@ -5047,8 +5047,8 @@ check_commands_without_model() {
 # REGRA 76 — marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos [HARD]
 # previne: .claude-plugin/marketplace.json envelhecendo calado ou apontando um plugins/ local que o core não guarda mais
 #   Medido 2026-09-04: o arquivo estava no formato pré-2026-09-04 (version 0.1.0 em todas as entradas,
-#   sem displayName/category/tags) e nenhuma guarda o comparava ao gerador (a REGRA 37 só faz grep).
-#   Mesma classe da REGRA 62. REPENSADA na F4 das portas (2026-10-10, SAC-93): o `plugins/` versionado
+#   sem displayName/category/tags) e nenhuma guarda o comparava ao gerador (a REGRA 37 (Mapa role→bundle (roles.yaml) consistente com os verticais) só faz grep).
+#   Mesma classe da REGRA 62 (Projeção GERADA em sincronia com a fonte (docs/backlog.md)). REPENSADA na F4 das portas (2026-10-10, SAC-93): o `plugins/` versionado
 #   saiu do core, e a raiz deixou de listar `./plugins/<nome>`. Agora ela é a projeção dos MANIFESTOS
 #   (`generate-marketplace.sh --from-manifests`), com `source` apontando o subdiretório do plugin no repo
 #   público — instalar pela raiz instala o PUBLICADO. Depende só de manifesto + face pública, então um PR
@@ -5075,6 +5075,33 @@ check_marketplace_root_sync() {
     [ -n "${sev}" ] || continue
     violation "HARD" "${REPO_ROOT}/${path}" "[marketplace-raiz/${cls}] ${msg}"
   done <<< "${out}"
+}
+
+# ===========================================================================
+# REGRA 74 — Caminho .claude/ NU dentro de plugin só resolve no core, com catraca [HARD + SOFT]
+# previne: baseline de passivo crescendo calado — um PR transformava ref NOVA (HARD) em PASSIVO (SOFT) acrescentando linha
+#   F4 das portas (2026-10-10): a varredura dos plugins MONTADOS saiu para a publicação (plugin-bundle-check.sh,
+#   passo 5d do /meta:publish), porque o core não versiona mais plugins/. A CATRACA ficou aqui — a passada
+#   adversarial da F4 mediu que ela tinha sumido de todo gate (achado I2): a raiz temporária da publicação não
+#   é repo git, e nada mais comparava o baseline com origin/main. A catraca não precisa de bundle: compara
+#   `plugin-bare-path-baseline.txt` com o de origin/main e reprova se CRESCEU. Só ela é julgada aqui.
+# ===========================================================================
+check_plugin_bare_path_ratchet() {
+  local helper="${SCRIPT_DIR}/plugin-bare-path-check.sh"
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  _publishes_marketplace || return 0
+  [ -f "${helper}" ] || return 0
+  [ -f "${SCRIPT_DIR}/plugin-bare-path-baseline.txt" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in */plugin-bare-path-baseline.txt|*/plugin-bare-path-check.sh) : ;; *) return 0 ;; esac
+  fi
+  local out sev cls path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  while IFS=$'\t' read -r sev cls path msg; do
+    [ "${cls}" = "CATRACA-VIOLADA" ] || continue
+    violation "HARD" "${REPO_ROOT}/${path}" "[plugin-bare-path/${cls}] ${msg}"
+  done <<< "${out}"
+  return 0
 }
 
 # ===========================================================================
@@ -5259,6 +5286,7 @@ check_backtick_path_refs
 check_kg_yaml_validity
 check_kg_census_parity
 check_marketplace_root_sync
+check_plugin_bare_path_ratchet
 
 # REGRA 96 — Diretiva de contexto INJETADO não corta listagem em silêncio [HARD]
 # previne: a projeção que o harness injeta é lida pela sessão COMO SE FOSSE o conjunto — não há

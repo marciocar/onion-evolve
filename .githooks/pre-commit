@@ -50,11 +50,11 @@ LINT="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
 [ -f "${LINT}" ] || exit 0
 
 # ── (APOSENTADO na F4 das portas, 2026-10-10, SAC-93) AUTO-REGENERAÇÃO DE PLUGINS ─────────────────
-# Aqui morava o auto-fix da REGRA 19: fonte bundlada no commit ⇒ remontar plugins/<vertical> e o
+# Aqui morava o auto-fix da REGRA 19 (Plugins de vertical sincronizados com as fontes): fonte bundlada no commit ⇒ remontar plugins/<vertical> e o
 # marketplace.json e stagear. Era a cura MECÂNICA de um atrito que a F4 tirou pela raiz: o `plugins/`
 # versionado saiu do core (o bundle é montado na publicação, /meta:publish onion-plugins, e julgado lá
 # pelo plugin-bundle-check.sh). Um PR que toca uma fonte bundlada não regenera mais nada. O catálogo da
-# raiz (REGRA 76) depende só dos MANIFESTOS e entrou na tabela de projeções abaixo.
+# raiz (REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos)) depende só dos MANIFESTOS e entrou na tabela de projeções abaixo.
 
 # ── PROJEÇÃO GERADA REGENERADA JUNTO, POR TABELA (REGRAS 8/16, 39, 62, 80, 81, 84) ───────────
 # POR QUE EXISTE, e a história é de reincidência medida: a primeira versão deste bloco cobria UMA
@@ -104,7 +104,7 @@ _V="${REPO_ROOT}/.claude/validation"
   && [ -f "${_V}/federation-console.sh" ] \
   && onion_regen docs/onion/federation-console.html 24 bash "${_V}/federation-console.sh"
 [ -n "$(onion_staged '.claude/commands' '.claude/agents' '.claude/skills' 'docs/knowledge-base')" ]   && [ -f "${_V}/inventory.sh" ]   && onion_regen docs/onion/inventory.md 8 bash "${_V}/inventory.sh" --markdown
-# O catálogo da RAIZ (REGRA 76) é projeção dos MANIFESTOS desde a F4 das portas (2026-10-10): só muda
+# O catálogo da RAIZ (REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos)) é projeção dos MANIFESTOS desde a F4 das portas (2026-10-10): só muda
 # quando muda um manifesto (nome/descrição/keywords), o gerador ou a face pública — nunca por uma fonte
 # bundlada. O gerador lê o topo do arquivo existente, por isso ele escreve em temp e o alvo é trocado
 # pelo onion_regen (redirecionar direto truncaria o topo antes da leitura).

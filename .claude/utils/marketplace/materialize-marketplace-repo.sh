@@ -67,6 +67,9 @@ fi
 
 # Monta cada plugin publicável fresco no TARGET (SRC=core lê a fonte; DEST=alvo/plugins/<nome>).
 count=0; PRODUZIDOS=""
+# O anterior de cada plugin é o que está NO ALVO (o publicado). Uma ONION_PLUGIN_PRIOR_DIR herdada do
+# shell apontaria todos para um diretório só (achado I3 da passada adversarial da F4).
+unset ONION_PLUGIN_PRIOR_DIR
 for m in "${VDIR}"/*.manifest.sh; do
   [ -f "${m}" ] || continue
   case "$(basename "${m}")" in __*) continue ;; esac   # ignora fixtures de teste

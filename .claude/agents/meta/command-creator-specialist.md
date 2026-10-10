@@ -461,7 +461,7 @@ Analise o contexto atual e proponha [solução]
 ## Integração com Task Manager
 
 > Detecte o provider ativo (`TASK_MANAGER_PROVIDER`: jira | clickup | asana | linear | zoho)
-> e opere via abstração em `.claude/utils/task-manager/`, delegando ao especialista
+> e opere via a abstração task-manager (`utils/task-manager/` no core; no plugin `onion`), delegando ao especialista
 > correto (`@jira-specialist`, `@clickup-specialist` ou `@task-specialist`).
 
 ### Leitura de Task
@@ -1029,7 +1029,7 @@ Três templates prontos cobrem os níveis de complexidade ao instanciar um coman
 
 **Comandos Existentes:** `.claude/commands/`
 **Agentes Disponíveis:** `.claude/agents/`
-**Templates:** `.claude/commands/common/templates/`
+**Templates:** `.claude/commands/common/templates/command-template.md` (e os irmãos na mesma pasta)
 **Catálogo de Padrões (KB):** `docs/knowledge-base/meta/command-creation-patterns.md` — templates por categoria, anti-patterns, best practices e templates rápidos. **LEIA antes de projetar/implementar o comando.**
 
 **Padrão de Nome:** `/categoria/comando` ou `/categoria/sub/comando`

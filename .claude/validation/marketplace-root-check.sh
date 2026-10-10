@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
 # marketplace-root-check.sh — o marketplace.json da RAIZ aponta o repo PÚBLICO e é projeção dos
-# manifestos (REGRA 76)
+# manifestos (REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos))
 #
 # O QUE   : `.claude-plugin/marketplace.json` do core deve ser byte-a-byte a saída de
 #           `generate-marketplace.sh <repo> --from-manifests`: as entradas vêm dos manifestos
@@ -10,7 +10,7 @@
 #           guarda mais os plugins montados.
 #
 # POR QUÊ : (1) 2026-09-04 — o arquivo da raiz estava no formato pré-2026-09-04 e nenhuma guarda o
-#           comparava ao gerador; projeção que envelhece calada é pior que ausente (classe da REGRA 62).
+#           comparava ao gerador; projeção que envelhece calada é pior que ausente (classe da REGRA 62 (Projeção GERADA em sincronia com a fonte (docs/backlog.md))).
 #           (2) 2026-10-10, F4 das portas (SAC-93) — o `plugins/` versionado saiu do core. Até ali a
 #           raiz listava `./plugins/<nome>` e esta guarda regenerava a partir de plugins/*/plugin.json,
 #           o que obrigava todo PR que tocasse uma fonte bundlada a regenerar e commitar plugin +
@@ -23,7 +23,7 @@
 #           --write regenera COM SEGURANÇA (temp + mv). `gerador > marketplace.json` direto TRUNCA o arquivo
 #           antes de o gerador ler o top-level dele (name/owner viram default) — medido no selftest desta guarda.
 # SAÍDA   : HARD<TAB><classe><TAB>.claude-plugin/marketplace.json<TAB><msg> · vazio = limpo
-#           classes: ausente · gerador-falhou · source-local · desatualizado
+#           classes: ausente · gerador-falhou · source-local · fonte-do-manifesto-ausente · desatualizado
 # =============================================================================
 set -u
 MODE="check"; FORMAT="text"; REPO=""
@@ -40,29 +40,71 @@ done
 [ -n "${REPO}" ] || REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 GEN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/marketplace/generate-marketplace.sh"
 
+# ── O MODO É ESCOLHIDO PELO PAPEL (passada adversarial da F4, achado B2) ───────────────────────────
+# A 1ª versão desta guarda exigia `--from-manifests` sempre que havia um manifesto. Um STANDALONE (ou um
+# fork) que monta os PRÓPRIOS plugins pelo /meta:create-vertical tem manifesto, `plugins/` e catálogo em
+# modo bundle — e levava HARD source-local, com uma cura (`--write`) que reescreveria o catálogo dele
+# para o repo público do Onion, num caminho que não existe lá. Medido em repo sintético role: standalone.
+#   · CORE (sem carimbo, ou role source que não é porta) → a raiz é projeção dos MANIFESTOS e aponta o
+#     repo público (o plugins/ montado não mora aqui desde a F4);
+#   · qualquer outro repo COM plugins/ montado → a comparação pré-F4: catálogo = gerador em modo bundle;
+#   · fora disso → nada a julgar.
+_mode() {
+  local repo="$1" st="${1}/.claude/.onion-version" role="" door=0
+  if [ -f "${st}" ]; then
+    role="$(awk -F': *' '/^role:/{print $2; exit}' "${st}" 2>/dev/null)"
+    grep -qE '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)' "${st}" 2>/dev/null && door=1
+  fi
+  if { [ -z "${role}" ] || [ "${role}" = "source" ]; } && [ "${door}" -eq 0 ]; then
+    ls "${repo}"/.claude/utils/marketplace/verticals/*.manifest.sh >/dev/null 2>&1 && { echo manifests; return; }
+  fi
+  [ -d "${repo}/plugins" ] && { echo bundle; return; }
+  echo none
+}
+
 _check() {
-  local repo="$1" fmt="$2" f="${1}/.claude-plugin/marketplace.json" tmp
+  local repo="$1" fmt="$2" f="${1}/.claude-plugin/marketplace.json" tmp mode
   [ -f "${GEN}" ] || return 0
-  # O objeto desta guarda é o catálogo de quem PUBLICA a partir de manifestos (a fonte). Sem
-  # manifestos não há o que projetar — e quem chama já decidiu o papel (_publishes_marketplace).
-  ls "${repo}"/.claude/utils/marketplace/verticals/*.manifest.sh >/dev/null 2>&1 || return 0
+  mode="$(_mode "${repo}")"
+  [ "${mode}" != "none" ] || return 0
   [ -f "${f}" ] || { _emit "${fmt}" "ausente" "arquivo ausente — gere: bash .claude/validation/marketplace-root-check.sh --write"; return 0; }
-  # Mensagem PRÓPRIA para o defeito que a F4 tirou do core: source relativo aponta um plugins/ que
-  # não existe mais aqui. O byte-a-byte também pegaria, mas diria só "desatualizado".
-  if grep -qE '"source"[[:space:]]*:[[:space:]]*"\./' "${f}"; then
-    _emit "${fmt}" "source-local" "entrada com source RELATIVO ($(grep -cE '"source"[[:space:]]*:[[:space:]]*"\./' "${f}")) — o core não guarda plugins montados desde a F4; a raiz aponta o repo público (git-subdir). Regenere: bash .claude/validation/marketplace-root-check.sh --write"
+  if [ "${mode}" = "manifests" ]; then
+    # Mensagem PRÓPRIA para o defeito que a F4 tirou do core: source relativo aponta um plugins/ que
+    # não existe mais aqui. O byte-a-byte também pegaria, mas diria só "desatualizado".
+    if grep -qE '"source"[[:space:]]*:[[:space:]]*"\./' "${f}"; then
+      _emit "${fmt}" "source-local" "entrada com source RELATIVO ($(grep -cE '"source"[[:space:]]*:[[:space:]]*"\./' "${f}")) — o core não guarda plugins montados desde a F4; a raiz aponta o repo público. Regenere: bash .claude/validation/marketplace-root-check.sh --write"
+    fi
+    # O MANIFESTO TEM DE MONTAR (achado I4 da passada adversarial): a REGRA 19 (Plugins de vertical sincronizados com as fontes) aposentada era o único
+    # gate de PR que acusava fonte bundlada apagada/renomeada ("assemble FALHOU"). Sem ela, a main ficaria
+    # impublicável em silêncio até o /meta:publish. Conferir que cada entrada declarada EXISTE não exige
+    # montar nem regenerar nada — é o atrito que a F4 tirou, sem devolver o atrito.
+    local m e missing=""
+    for m in "${repo}"/.claude/utils/marketplace/verticals/*.manifest.sh; do
+      case "$(basename "${m}")" in __*) continue ;; esac
+      while IFS= read -r e; do
+        [ -n "${e}" ] || continue
+        [ -e "${repo}/${e}" ] || missing="${missing} $(basename "${m}" .manifest.sh):${e}"
+      done < <( set +u; COMMANDS=(); AGENTS=(); UTILS=(); VALIDATION=(); TEMPLATES=(); SKILLS=(); HOOKS=(); DOCS=()
+                . "${m}" >/dev/null 2>&1 || true
+                printf '%s\n' "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}" "${DOCS[@]}" )
+    done
+    [ -z "${missing}" ] || _emit "${fmt}" "fonte-do-manifesto-ausente" "o manifesto declara fonte que não existe — o plugin não monta na publicação:$(printf '%s' "${missing}" | cut -c1-300). Corrija o manifesto (ou restaure a fonte)"
   fi
   tmp="$(mktemp)"; trap 'rm -f "${tmp}"' RETURN
-  if ! bash "${GEN}" "${repo}" --from-manifests > "${tmp}" 2>/dev/null; then _emit "${fmt}" "gerador-falhou" "generate-marketplace.sh --from-manifests saiu ≠ 0 — não dá para comparar"; return 0; fi
+  local _flag=""; [ "${mode}" = "manifests" ] && _flag="--from-manifests"
+  if ! bash "${GEN}" "${repo}" ${_flag} > "${tmp}" 2>/dev/null; then _emit "${fmt}" "gerador-falhou" "generate-marketplace.sh ${_flag} saiu ≠ 0 — não dá para comparar"; return 0; fi
   if ! cmp -s "${f}" "${tmp}"; then
-    _emit "${fmt}" "desatualizado" "difere da projeção dos manifestos ($(diff "${f}" "${tmp}" | grep -c '^[<>]') linha(s)) — regenere: bash .claude/validation/marketplace-root-check.sh --write"
+    _emit "${fmt}" "desatualizado" "difere da saída do gerador (modo ${mode}; $(diff "${f}" "${tmp}" | grep -c '^[<>]') linha(s)) — regenere: bash .claude/validation/marketplace-root-check.sh --write"
   fi
 }
 _write() {
-  local repo="$1" f="${1}/.claude-plugin/marketplace.json" tmp
+  local repo="$1" f="${1}/.claude-plugin/marketplace.json" tmp mode _flag=""
   [ -f "${GEN}" ] || { printf 'gerador ausente: %s\n' "${GEN}" >&2; return 2; }
-  tmp="$(mktemp)"; bash "${GEN}" "${repo}" --from-manifests > "${tmp}" || { rm -f "${tmp}"; return 2; }
-  mkdir -p "$(dirname "${f}")"; mv "${tmp}" "${f}"; printf 'marketplace.json regenerado: %s\n' "${f#${repo}/}"
+  mode="$(_mode "${repo}")"
+  [ "${mode}" != "none" ] || { printf 'nada a projetar aqui (nem fonte com manifestos, nem plugins/ montado)\n' >&2; return 2; }
+  [ "${mode}" = "manifests" ] && _flag="--from-manifests"
+  tmp="$(mktemp)"; bash "${GEN}" "${repo}" ${_flag} > "${tmp}" || { rm -f "${tmp}"; return 2; }
+  mkdir -p "$(dirname "${f}")"; mv "${tmp}" "${f}"; printf 'marketplace.json regenerado (modo %s): %s\n' "${mode}" "${f#${repo}/}"
 }
 _emit() { if [ "$1" = "tsv" ]; then printf 'HARD\t%s\t.claude-plugin/marketplace.json\t%s\n' "$2" "$3"; else printf 'HARD [%s] .claude-plugin/marketplace.json: %s\n' "$2" "$3"; fi; }
 

@@ -42,9 +42,14 @@ _scan() {
   local prev=""
   # baseline anterior (catraca): a versão commitada em origin/main, se houver
   prev="$(git -C "${REPO}" show "origin/main:${BASELINE_REL}" 2>/dev/null || true)"
+  # Na PUBLICAÇÃO a raiz é temporária (não é git): o anterior vem de fora — o baseline do pin PUBLICADO
+  # antes, que o publish-door.sh entrega por ONION_BAREPATH_PREV_FILE (achado I2 da passada da F4).
+  if [ -n "${ONION_BAREPATH_PREV_FILE:-}" ] && [ -f "${ONION_BAREPATH_PREV_FILE}" ]; then
+    prev="$(cat "${ONION_BAREPATH_PREV_FILE}")"
+  fi
   # ALVO DO CONSUMIDOR (F4 das portas, 2026-10-10): plugin de META-FÁBRICA escreve no `.claude/` do
   # PROJETO de quem instala (`.claude/agents/<cat>/`, `.claude/commands/`…) — ali o caminho nu não é
-  # ponteiro morto, é o DESTINO. Medido no 1º bundle do onion-meta: 145 HARD, todos desta natureza. O
+  # ponteiro morto, é o DESTINO. Medido no 1º bundle do onion-meta: 145 HARD, a maioria destino — e 9 de LEITURA, que a 1ª isenção larga escondia (achado I1). O
   # plugin DECLARA no manifesto quais raízes são alvo (CONSUMER_TARGET_ROOTS); só agents/commands/
   # skills/hooks/utils são aceitas (validation/kb/templates são do plugin, nunca do projeto), e o que a
   # isenção cobre sai num SOFT agregado — visível, nunca calado. Plugin sem a declaração: nada muda.
@@ -87,7 +92,18 @@ if os.path.isdir(pdir):
                     for m in PAT.finditer(line):
                         ref = m.group(0).rstrip(".,;:)")
                         at = in_fm and line.lstrip().startswith("allowed-tools")
-                        if ref.split("/")[1] in targets.get(plugin, ()):
+                        # A isenção é ESTREITA (passada adversarial da F4, achado I1): a 1ª versão isentava
+                        # toda ref de raiz declarada, e escondia no SOFT agregado ponteiros de LEITURA mortos
+                        # no consumidor (`.claude/utils/task-manager/`, `.claude/commands/common/templates/`).
+                        # Só é DESTINO: nunca em allowed-tools; a raiz nua (`.claude/agents`); uma categoria
+                        # de um nível (`.claude/agents/<cat>`; mais fundo que isso, como `common/templates`, é conteúdo); ou um
+                        # caminho com placeholder (`{{…}}`, `<…>`, `X`, `*`). O resto segue julgado.
+                        _parts = ref.split("/")
+                        _dest = (not at) and _parts[1] in targets.get(plugin, ()) and (
+                            len(_parts) == 2
+                            or (len(_parts) == 3 and _parts[1] in ("agents", "commands", "skills"))
+                            or re.search(r"\{\{|<|>|\*|(^|/)X(/|\.|$)", ref) is not None)
+                        if _dest:
                             consumer[plugin] = consumer.get(plugin, 0) + 1
                             continue
                         found.append((rel, ref, at, i))

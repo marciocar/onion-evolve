@@ -155,8 +155,8 @@ quem edita o core:
   **nunca edite os números à mão**, rode `/meta:inventory`
 - **REGRA 9** [HARD] — contagens no `CLAUDE.md` em sincronia com a SSOT do inventário
 - **REGRA 16** [SOFT] — contagem-TOTAL do inventário divergente da SSOT
-- **REGRA 19/21/37/38** [HARD] — plugins de vertical, grafo (`docs/onion/graph.md`), mapa role→bundle
-  (`roles.yaml`) e mapa da federação sincronizados com suas fontes
+- **REGRA 21/37/38/76** [HARD] — grafo (`docs/onion/graph.md`), mapa role→bundle
+  (`roles.yaml`), mapa da federação e catálogo da raiz sincronizados com suas fontes (a REGRA 19 (Plugins de vertical sincronizados com as fontes) foi aposentada na F4 das portas, 2026-10-10: o `plugins/` montado saiu do core)
 - **REGRA 39** [HARD] — o próprio registro `lint-rules.md` em paridade com as guardas (nº duplicado ou
   regra órfã falha)
 
