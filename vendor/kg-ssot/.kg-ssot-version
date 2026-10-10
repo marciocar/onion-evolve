@@ -1,15 +1,15 @@
 {
   "product": "kg-ssot",
-  "tag": "kg-ssot-v4.3.2",
-  "commit": "60c6835eec2c014bdfb943f44203c63cc4111852",
-  "version": "4.3.2",
+  "tag": "kg-ssot-v4.3.3",
+  "commit": "c32e6496be74c4d979723f8eae8f2ded1c6d999a",
+  "version": "4.3.3",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"
   },
   "vendored_at": "2026-10-10",
   "files": {
-    "ADOPTING.md": "f6c44bccf91b77d59aa1fd5e8de254cd9a0a5db2fee5ca94a6cc51bf2597df3d",
+    "ADOPTING.md": "6dddc2ccb50585c258f45c8781953af0c655f71687a1e8f2aef7f37d00b744ab",
     "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "NOTICE": "8fda6b9f7eeaeaf4874bfd1a56a0a461d0225c9840b4cc94d83a687011fe0807",
     "spec/conformance/README.md": "271f3611b70bae15db202e8bed864d16da0d0a570f5407fe0faf7d2c541ca7b1",
@@ -300,10 +300,10 @@
     "spec/conformance/metaschema-tests/good/valid-with-warning.json": "013208da50d8eb7c9340d123b32134f1041d8f7a01831326b1dab814f479b5e9",
     "spec/kg-contract-v4.schema.json": "6277fc83fa1dad5509d13b5a6401455366120d0c86ea9a1e5e9a3d3ee394b8c3",
     "spec/kg-contract-v4.should.schema.json": "034e3a6ee169e699953556654d756bf0d425127a223f93c642446f9b09211f23",
-    "spec/release.json": "121b5084dd07b4db8dfe12ffc5b5a0b9396a98f582748aef6ee73bb50142ccae",
+    "spec/release.json": "11cc2727e858587b35eb663b2bb39dd3ce33256a163a7b0b6c10132e3b952b15",
     "tools/kg_conformance.py": "29489bd0c2aa4342c52363d17f32887538a5606746bd615d59800ac00b786e2a",
-    "tools/kg_gate.py": "b813c2700dce35684a00fe10fbe297887436e7d7787f0cafcebb81ae8b57780c",
-    "tools/kg_validate.py": "ca0c2cefb95c98c7a6287b408b10939eb424c4e45735c646fc042c0476feb5a1",
+    "tools/kg_gate.py": "52e3419b36ca41df14e14cb8b9e5b0504e6c8da397741815006e2f2398e849d0",
+    "tools/kg_validate.py": "fa1c7c0bd3ce358b44e28f28436fcce40b55aabab31b970e62138a5cb132c4aa",
     "tools/kg_vendor.py": "5c1ccb826f71d2d7158232441b6f4c4f58a7fd718dd5759547845d090001c646",
     "tools/requirements.txt": "2fcd231402474b045e7806616f37e77641a01f39e888462ab2f0ab5153a2c405"
   }

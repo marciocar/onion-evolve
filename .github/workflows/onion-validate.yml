@@ -130,7 +130,7 @@ jobs:
 
       - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
         # O radar (kg-radar.sh) é o leitor de semântica e integridade; a FORMA do .kg.yaml é julgada pelo
-        # contrato v4.3 vendorizado por pin (tag kg-ssot-v4.3.2 do adotante dedicado ao KG-SSOT; o v4.1 trouxe
+        # contrato v4.3 vendorizado por pin (tag kg-ssot-v4.3.3 do adotante dedicado ao KG-SSOT; o v4.1 trouxe
         # 4 avisos SHOULD ao v4.0, o v4.2 traz a dívida POR NÓ e o `provenance.locality` opcional, adotado em
         # 2026-10-09, SAC-97; o v4.3 traz `external_edges`, a aresta para nó de outro grafo, conferida contra
         # TODOS os .kg.yaml rastreados, inclusive os do --exclude; adotado em 2026-10-10, SAC-98). Medido em

@@ -240,9 +240,10 @@ def main(argv=None):
         items = corpus(args.repo, (() if args.no_default_excludes else DEFAULT_EXCLUDE) + tuple(args.exclude))
         # o índice só lê os grafos que alguma referência externa cita (rastreados, inclusive fora do corpus do gate):
         # o alvo que não está lá fica fora do índice e reprova como dangling-external, igual a antes
-        wanted = set().union(*(kg_validate.external_targets(t) for _, t in items)) if items else set()
+        info = [kg_validate.external_info(t) for _, t in items]  # um parse por texto que pode citar, e só esses
+        wanted = set().union(*(targets for _, targets in info)) if info else set()
         index = (kg_validate.corpus_index(args.repo, [n for n in tracked_graphs(args.repo) if n in wanted])
-                 if any(kg_validate.uses_external(t) for _, t in items) else None)
+                 if any(uses for uses, _ in info) else None)
         measured = measure_texts(items, index)
         if path.is_file():
             base = read_base(path)
