@@ -103,7 +103,7 @@ Posso usar (parte d)este depoimento como case/material? **sim/não** — e condi
 
 - **Por que skill e não comando:** a retro é um **workflow reusável** que se ativa por reconhecimento
   ("fechar o ciclo"), não um passo fixo de pipeline. Compõe com `/onion:diary` (migalha) e
-  `/onion:co-evolve` (relay do sinal), sem substituí-los.
+  `meta:co-evolve` (relay do sinal), sem substituí-los.
 - **Soberania/federação:** o que viaja é o **método + o template**, não o conteúdo de nenhuma retro
   específica (que é do respondente/da instância). Cada adotante roda a própria.
 - **Fronteira de dados:** a retro é client-safe **por construção** quando cruza fronteira; o gate

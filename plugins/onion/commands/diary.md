@@ -5,7 +5,7 @@ description: |
   Cria, lista, exporta e RE-TESTA entradas estruturadas (learning/decision/error/innovation/observation)
   que orientam a absorção correta do contexto em sessões futuras e entre instâncias federadas — o
   sub-comando review é o gatilho invariável de reflexão (⏰ migalha vencida → re-testar, nunca re-carimbar).
-  O diário é autobiografia viva: não registra o passado, orienta o futuro. Relacionado: /onion:co-relay,
+  O diário é autobiografia viva: não registra o passado, orienta o futuro. Relacionado: meta:co-relay,
   meta:personality-sync (Fase 2, gated), RFC-0003.
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *) Bash(find *) Bash(awk *) Bash(grep *) Bash(sort *)
 argument-hint: "create | list [--classification <c>] [--type <t>] [--sharable] | export-sharable [--dry-run] | index | review"
@@ -188,7 +188,7 @@ Sinalizar entradas com `review_after` < hoje: `⏰ VENCIDO` ao lado.
 ### `export-sharable` — Empacotar entradas compartilháveis para co-relay
 
 Identifica entradas com `share_with != []` OU `classification` em `[peer, downstream, public, collective]`
-e as empacota para transporte via `/onion:co-relay`.
+e as empacota para transporte via `meta:co-relay`.
 
 ```bash
 REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
@@ -213,7 +213,7 @@ done
 
 echo ""
 echo "Outbox: $OUTBOX"
-echo "Próximo passo: /onion:co-relay --to core (ou --to peer:<peer-id>) para transportar"
+echo "Próximo passo: meta:co-relay --to core (ou --to peer:<peer-id>) para transportar"
 ```
 
 Se `--dry-run`: listar sem copiar.
@@ -323,7 +323,7 @@ O diário é o **conteúdo** que o protocolo co-evolução **transporta**. A seq
 ```
 1. /onion:diary create            # cria a migalha localmente
 2. /onion:diary export-sharable   # empacota para transporte
-3. /onion:co-relay --to core      # (ou --to peer:<id> — Fase 3, gated)
-4. Core: /onion:co-evolve         # tria o sinal recebido
+3. meta:co-relay --to core      # (ou --to peer:<id> — Fase 3, gated)
+4. Core: meta:co-evolve         # tria o sinal recebido
 5. Loop fecha: learning adotado, ajuste enviado de volta, ou knowledge base atualizada
 ```

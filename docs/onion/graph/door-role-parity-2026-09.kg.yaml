@@ -2,8 +2,7 @@
 # Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
-  x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote do selo granaai (2026-10-09, no PR da onda O4): Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO flip para done; granaai vira linhagem histórica (superseded_by: brain-granaai) no members.yaml; registry-pins pula superseded_by (caso h) e members-validate cobra o alvo (2 fixtures); termos da REGRA 36 inalterados; 4 nós deste grafo PROD→DEV pela onda O4; PR para merge humano"
+  x_drive_checkpoint: sealed
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30

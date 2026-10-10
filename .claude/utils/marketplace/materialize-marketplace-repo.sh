@@ -85,19 +85,21 @@ done
 
 
 # 2ª GUARDA DE MOAT (cinto-e-suspensório): nenhum plugin materializado pode conter ARQUIVO de
-# meta-fábrica nem grafo privado. A REGRA 61 já barra na declaração; aqui barra no resultado.
-# Nomes ESPECÍFICOS da meta-fábrica (comandos achatados no plugin → só o basename resta; um glob
-# `create-*` false-positivaria em create-task-structure, comando de PRODUTO legítimo). + federação
-# downstream/ledger + QUALQUER grafo .kg.yaml.
+# adoção, federação nem grafo privado. A REGRA 61 já barra na declaração; aqui barra no resultado.
+# Nomes ESPECÍFICOS (comandos achatados no plugin → só o basename resta) + QUALQUER grafo .kg.yaml.
+# ⚠️ MUDOU EM 2026-10-10 (F2 das portas, D_MATRIZ_DE_PORTAS_2026_10): a meta-fábrica (create-*, evolve,
+# absorb-skill) deixou de ser moat — plugins = a superfície do standalone, que a leva. A lista passou a
+# ser a da REGRA 61 nova: adoção, federação (co-evolve e co-relay inclusos) e o comando ainda não
+# classificado pela matriz (personality-sync).
 leak="$(find "${TARGET}/plugins" -type f \( \
-        -name 'create-abstraction.md' -o -name 'create-agent.md' -o -name 'create-agent-express.md' \
-        -o -name 'create-command.md' -o -name 'create-knowledge-base.md' -o -name 'create-skill.md' \
-        -o -name 'create-vertical.md' -o -name 'adopt.md' -o -name 'evolve.md' \
-        -o -name 'co-announce.md' -o -name 'co-deliver.md' -o -name 'federation-*.md' -o -name 'absorb-skill.md' \
+        -name 'adopt.md' -o -name 'federation-*.md' -o -name 'personality-sync.md' \
+        -o -name 'co-announce.md' -o -name 'co-deliver.md' -o -name 'co-evolve.md' -o -name 'co-relay.md' \
+        -o -name 'co-evolution-inbox-check.sh' \
         -o -name 'assemble-plugin.sh' -o -name 'generate-marketplace.sh' -o -name 'decouple-source.sh' \
+        -o -name 'materialize-marketplace-repo.sh' \
         -o -name '*.kg.yaml' \) 2>/dev/null || true)"
 if [ -n "${leak}" ]; then
-  echo "ABORTA (moat): plugin materializado contém fonte de meta-fábrica/grafo privado:" >&2
+  echo "ABORTA (moat): plugin materializado contém fonte de adoção/federação/grafo privado:" >&2
   printf '%s\n' "${leak}" | sed 's/^/    /' >&2
   exit 3
 fi

@@ -2,8 +2,11 @@
 # vendor-manifest.sh — SSOT do que VIAJA do core para um adotante, por PAPEL.
 #
 # Uso : vendor-manifest.sh [--role <papel>] [--repo <root>] [--emit-scrub-roots] [--check-bundle <dir>]
-#         --role              adopted (default) | hub | standalone
+#         --role              adopted (default) | source | hub | standalone | plugins | mini
 #         --repo              raiz do core (default: git rev-parse --show-toplevel)
+#         --list <papel>      imprime o que o papel LEVA: contagem por tipo + a lista de arquivos
+#         --diff <papel>      o mesmo, mais o diff contra a publicação anterior (o clone da porta que o
+#                             members.yaml registra com aquele papel, via local_path), se existir
 #         --emit-scrub-roots  imprime as raízes que a REGRA 36 tem de varrer (= o que viaja)
 #         --check-bundle DIR  varre um bundle JÁ EXTRAÍDO e reprova se houver biografia dentro
 #         --stub-baselines DIR  reescreve, no bundle, os baselines que citam caminho privado do core
@@ -57,7 +60,7 @@
 # VERMELHO — trocando um gap invisível por outro.
 set -uo pipefail
 
-ROLE="adopted"; REPO=""; MODE="manifest"; BUNDLE=""
+ROLE="adopted"; REPO=""; MODE="manifest"; BUNDLE=""; LIST_DIFF=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --role) ROLE="${2:-}"; shift 2 ;;
@@ -65,10 +68,14 @@ while [ $# -gt 0 ]; do
     --emit-scrub-roots) MODE="scrub"; shift ;;
     --check-bundle) MODE="check"; BUNDLE="${2:-}"; shift 2 ;;
     --stub-baselines) MODE="stub"; BUNDLE="${2:-}"; shift 2 ;;
+    --list) MODE="list"; ROLE="${2:-}"; shift 2 ;;
+    --diff) MODE="list"; LIST_DIFF=1; ROLE="${2:-}"; shift 2 ;;
     *) echo "ERRO: argumento desconhecido: $1" >&2; exit 2 ;;
   esac
 done
-case "${ROLE}" in adopted|hub|standalone) : ;; *) echo "ERRO: --role desconhecido: '${ROLE}' (adopted|hub|standalone)" >&2; exit 2 ;; esac
+# Os papéis de PORTA (source, plugins, mini) entraram em 2026-10-10, F2 das portas (SAC-91), pela matriz
+# D_MATRIZ_DE_PORTAS_2026_10. `adopted` segue sendo o default de quem ADOTA um projeto.
+case "${ROLE}" in adopted|source|hub|standalone|plugins|mini) : ;; *) echo "ERRO: --role desconhecido: '${ROLE}' (adopted|source|hub|standalone|plugins|mini)" >&2; exit 2 ;; esac
 [ -n "${REPO}" ] || REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
 # ── A LISTA, por papel ────────────────────────────────────────────────────────────────────────
@@ -99,8 +106,21 @@ _base=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/vali
 # SUBCAMINHOS da meta-fábrica que cada papel NÃO recebe. Pathspecs de `git ls-tree` (o `:(glob)`
 # cobre o prefixo `federation-`, que é família de arquivos e não diretório).
 #
-#   standalone → porta PÚBLICA: recebe o método, não a fábrica que o publica. 108 de 685 arquivos
-#                saem (medido 2026-09-15); é o corte que o onion-standalone fez à mão em 2026-07-19.
+#   standalone → MATRIZ DAS PORTAS (2026-10-09, D_MATRIZ_DE_PORTAS_2026_10; F2 = SAC-91): o core MENOS
+#                adoção e federação. Saem utils/adopt (menos o contrato), utils/co-evolution,
+#   plugins      utils/federation-transport, validation/federation-*, a skill onion-publish com o motor
+#                de publicação do marketplace e o hook do inbox; os comandos saem pelo roles.yaml
+#                (conjuntos `federation`, `adoption` e `pending`). A META-FÁBRICA VOLTA: utils/wizard,
+#                utils/vertical, utils/marketplace (o create-vertical a usa) e os comandos create-*,
+#                forge, forge-guard, dissect, evolve, cc-update, absorb-skill.
+#                ⚠️ ATÉ 2026-10-10 o standalone cortava a meta-fábrica ("recebe o método, não a fábrica
+#                que o publica", 108 de 685 arquivos, medido 2026-09-15). A matriz inverteu o critério:
+#                o que distingue uma porta individual não é a fábrica, é a ADOÇÃO de outros repos e a
+#                FEDERAÇÃO com eles. `plugins` é a mesma superfície, empacotada.
+#   source     → NADA sai (= hub). É a porta onion-core e o próprio core: toda a maquinaria; a biografia
+#                fica fora pela ALLOWLIST (`_base`) e pelo `--stub-baselines`, não por corte de papel.
+#   mini       → não corta: INCLUI. Allowlist didática do roles.yaml (`roles.mini.allowlist`), no lugar
+#                de `_base` — ver `_mini_positives`, logo abaixo.
 #   hub       → NADA sai, e isto é INVARIANTE, não default. Ordem do maestro (2026-09-15): *"vamos
 #                mandar tudo incluindo meta fábrica, temos que ter um que tenha tudo do core para
 #                trabalhar como o core"*. O hub é esse papel: ele re-distribui para os projetos da
@@ -141,17 +161,23 @@ _base=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/vali
 # dependencia skill→motor que hoje so existe em prosa dentro de cada SKILL.md.
 _role_cut() {  # $1=papel → subcaminhos a cortar, um por linha (vazio = nada a cortar)
   case "$1" in
-    standalone)
+    standalone|plugins)
       # PREFIXOS de caminho (não pathspecs): `git ls-tree` recusa magia, e prefixo dispensa
       # distinguir diretório de família de arquivos — `validation/federation-` é a segunda.
+      # ADOÇÃO: utils/adopt (o contrato sobrevive), a skill onion-publish e o MOTOR dela
+      #   (materialize-marketplace-repo.sh — o resto de utils/marketplace é do create-vertical, que fica).
+      # FEDERAÇÃO: utils/co-evolution (carteiros co-relay/co-deliver e o receptor de correio),
+      #   utils/federation-transport, validation/federation-* e o hook que avisa o inbox.
+      # ⚠️ utils/wizard e utils/vertical SAÍRAM DESTA LISTA em 2026-10-10: são meta-fábrica e condução,
+      #   e a matriz as devolve. O wizard ficou sensível ao papel (topology-projection.sh).
       printf '%s\n' \
         .claude/utils/adopt/ \
-        .claude/utils/marketplace/ \
-        .claude/utils/wizard/ \
-        .claude/utils/vertical/ \
+        .claude/utils/marketplace/materialize-marketplace-repo.sh \
+        .claude/skills/onion-publish/ \
+        .claude/utils/co-evolution/ \
         .claude/utils/federation-transport/ \
         .claude/validation/federation- \
-        .claude/skills/onion-publish/
+        .claude/hooks/co-evolution-inbox-check.sh
       ;;
     *) : ;;
   esac
@@ -338,6 +364,26 @@ _emit_companion_excludes() {  # $1=REPO $2=papel, stdin = caminhos já cortados 
   for _z in "${!_gone[@]}"; do printf ':(exclude)%s\n' "${_z}"; done | LC_ALL=C sort
 }
 
+# ── O MINI NÃO CORTA: INCLUI (2026-10-10, F2 das portas) ──────────────────────────────────────
+# A porta didática é o inverso das outras: em vez de `_base` menos o corte, ela leva SÓ o que a
+# allowlist do roles.yaml nomeia (`roles.mini.allowlist`: comandos, agentes, skill e a base mínima de
+# suporte). É o desenho do cabeçalho levado ao extremo — allowlist falha FECHADA —, e por isso sem a
+# SSOT o modo FALHA ALTO em vez de cair em `_base` (cair no default entregaria o core inteiro ao
+# iniciante, em silêncio). Os caminhos do roles.yaml são relativos a `.claude/`.
+_mini_positives() {  # $1=REPO → pathspecs positivos do mini, um por linha; rc 3 se a SSOT não responde
+  local _repo="$1" _resolver _al _p
+  _resolver="${_repo}/.claude/utils/marketplace/resolve-role-bundle.sh"
+  [ -f "${_resolver}" ] || { echo "ERRO: --role mini exige a allowlist do roles.yaml, e o resolvedor não existe em '${_repo}'" >&2; return 3; }
+  _al="$(bash "${_resolver}" mini --allowlist 2>/dev/null)" || { echo "ERRO: o resolvedor não devolveu a allowlist do mini" >&2; return 3; }
+  [ -n "${_al}" ] || { echo "ERRO: allowlist do mini VAZIA no roles.yaml — sem ela o mini não tem o que levar" >&2; return 3; }
+  while IFS= read -r _p; do
+    [ -n "${_p}" ] || continue
+    _p=".claude/${_p%/}"
+    if [ -n "$(git -C "${_repo}" ls-tree HEAD -- "${_p}")" ]; then printf '%s\n' "${_p}"
+    else echo "AVISO: a allowlist do mini nomeia '${_p}', que não existe em HEAD — não viaja." >&2; fi
+  done <<< "${_al}"
+}
+
 # CONTRATO — arquivos que vivem DENTRO de um subcaminho cortado e AINDA ASSIM viajam, porque uma
 # guarda do ALVO os lê em runtime. Lista curta e manual de propósito: cada entrada custa uma
 # justificativa nomeada, e a bancada prova que ela está COMPLETA (nenhum consumidor sobrevivente
@@ -416,6 +462,93 @@ if [ "${MODE}" = "scrub" ]; then
   exit 0
 fi
 
+# ── --list / --diff: O QUE CADA PORTA LEVA, contado do transporte REAL (2026-10-10, F2 das portas) ──
+# Não é uma segunda lista: roda o PRÓPRIO modo manifesto (recursão sobre este arquivo) e conta o que o
+# `git archive` copiaria — `diff-tree` contra a árvore vazia, a mesma medição da guarda de bundle vazio.
+# Contar à parte seria abrir a duplicação que este arquivo existe para impedir.
+# O `--diff` compara com a PUBLICAÇÃO ANTERIOR: o clone que o members.yaml registra (kind door, mesmo
+# papel) em `local_path`. Só lê; nunca escreve na porta (I3). Clone ausente ou sem árvore .claude/ é DITO.
+if [ "${MODE}" = "list" ]; then
+  git -C "${REPO}" rev-parse HEAD >/dev/null 2>&1 || { echo "ERRO: --list exige repositório git com HEAD em '${REPO}'" >&2; exit 2; }
+  _lerr="$(mktemp)"; _lrc=0
+  _lout="$(bash "${BASH_SOURCE[0]}" --role "${ROLE}" --repo "${REPO}" 2>"${_lerr}")" || _lrc=$?
+  if [ "${_lrc}" -ne 0 ]; then cat "${_lerr}" >&2; rm -f "${_lerr}"; exit "${_lrc}"; fi
+  rm -f "${_lerr}"
+  _lspec=(); mapfile -t _lspec <<< "${_lout}"
+  _lfiles="$(git -C "${REPO}" -c core.quotePath=false diff-tree -r --name-only --no-commit-id \
+              4b825dc642cb6eb9a060e54bf8d69288fbee4904 HEAD -- "${_lspec[@]}" | LC_ALL=C sort)"
+  _count() { grep -cE "$1" <<< "${_lfiles}" || true; }
+  echo "papel: ${ROLE} · fonte: HEAD $(git -C "${REPO}" rev-parse --short=12 HEAD)"
+  printf '  %-11s %5s\n' \
+    comandos   "$(grep -E '^\.claude/commands/.+\.md$' <<< "${_lfiles}" | grep -vE '/README\.md$|^\.claude/commands/common/' | grep -c . || true)" \
+    agentes    "$(grep -E '^\.claude/agents/.+\.md$' <<< "${_lfiles}" | grep -vE '/README\.md$' | grep -c . || true)" \
+    skills     "$(grep -oE '^\.claude/skills/[^/]+/' <<< "${_lfiles}" | LC_ALL=C sort -u | grep -c . || true)" \
+    utils      "$(_count '^\.claude/utils/')" \
+    validation "$(_count '^\.claude/validation/')" \
+    hooks      "$(_count '^\.claude/hooks/')" \
+    rules      "$(_count '^\.claude/rules/')" \
+    workflows  "$(_count '^\.claude/workflows/')" \
+    docs       "$(_count '^docs/')" \
+    total      "$(grep -c . <<< "${_lfiles}" || true)"
+  # O MINI É ALLOWLIST: o que os arquivos dele citam e não viaja é ponteiro morto na porta didática.
+  # Dito aqui, contado, e nunca calado — a cura (simplificar a skill onion, decidir cada citação) é da F5.
+  if [ "${ROLE}" = "mini" ]; then
+    _dang=""; _f=""; _c=""
+    while IFS= read -r _f; do
+      case "${_f}" in *.md|*.sh) : ;; *) continue ;; esac
+      while IFS= read -r _c; do
+        _c="${_c%[.,;:)]}"; _c="${_c%/}"
+        [ -n "${_c}" ] || continue
+        case "${_c}" in .claude/sessions*|.claude/.onion-version|.claude/projects*|.claude/settings*) continue ;; esac
+        grep -qxF "${_c}" <<< "${_lfiles}" && continue
+        grep -qF "${_c}/" <<< "${_lfiles}" && continue
+        grep -qxF "${_c}.md" <<< "${_lfiles}" && continue   # citação sem extensão de um .md que viaja
+        [ "$(tr -cd '/' <<< "${_c}" | wc -c)" -ge 2 ] || continue   # `.claude/utils` genérico não é ponteiro
+        _dang="${_dang}${_c} (citado por ${_f})"$'\n'
+      done < <(git -C "${REPO}" show "HEAD:${_f}" 2>/dev/null | grep -oE '\.claude/[A-Za-z0-9_./-]+' | LC_ALL=C sort -u)
+    done <<< "${_lfiles}"
+    if [ -n "${_dang}" ]; then
+      echo "AVISO: o mini cita $(printf '%s' "${_dang}" | grep -c .) caminho(s) que a allowlist NÃO leva (ponteiro morto na porta didática; a cura é da F5):" >&2
+      printf '%s' "${_dang}" | LC_ALL=C sort -u | sed 's/^/  /' >&2
+    fi
+  fi
+  if [ "${LIST_DIFF}" -eq 1 ]; then
+    _mem="${REPO}/docs/evolution/federation/members.yaml"
+    _prev=""
+    if [ -f "${_mem}" ] && command -v python3 >/dev/null 2>&1; then
+      _prev="$(python3 - "${_mem}" "${ROLE}" <<'PY' 2>/dev/null
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1])) or {}
+for m in (d.get("members") or []):
+    if (m or {}).get("kind") == "door" and str(m.get("role", "")) == sys.argv[2] and m.get("local_path"):
+        print("%s\t%s" % (m.get("id", "?"), m["local_path"])); break
+PY
+)"
+    fi
+    if [ -z "${_prev}" ]; then
+      echo "── diff: nenhuma porta registrada com role '${ROLE}' e local_path no members.yaml — sem publicação anterior a comparar"
+    else
+      _pid="${_prev%%$'\t'*}"; _ppath="${_prev#*$'\t'}"
+      if [ ! -d "${_ppath}/.claude" ]; then
+        echo "── diff: a porta '${_pid}' (${_ppath}) não tem árvore .claude/ neste disco — sem lista anterior comparável (porta de marketplace ou clone ausente)"
+      else
+        _old="$(git -C "${_ppath}" -c core.quotePath=false ls-files -- .claude docs/meta-specs docs/knowledge-base docs/sdaal 2>/dev/null \
+                | grep -vE '^\.claude/(\.onion-version|settings\.json)$' | LC_ALL=C sort)"   # o materializador os escreve FORA do manifesto
+        _now="$(grep -E '^(\.claude/|docs/(meta-specs|knowledge-base|sdaal)/)' <<< "${_lfiles}" || true)"
+        _add="$(LC_ALL=C comm -13 <(printf '%s\n' "${_old}") <(printf '%s\n' "${_now}") | grep . || true)"
+        _rem="$(LC_ALL=C comm -23 <(printf '%s\n' "${_old}") <(printf '%s\n' "${_now}") | grep . || true)"
+        echo "── diff contra a publicação anterior: porta '${_pid}' (${_ppath}, pin $(awk '/^(source_commit|onion_version|commit):/{print $2; exit}' "${_ppath}/.claude/.onion-version" 2>/dev/null))"
+        echo "   + $(grep -c . <<< "${_add}" || true) a mais · - $(grep -c . <<< "${_rem}" || true) a menos"
+        [ -n "${_add}" ] && sed 's/^/   + /' <<< "${_add}"
+        [ -n "${_rem}" ] && sed 's/^/   - /' <<< "${_rem}"
+      fi
+    fi
+  fi
+  echo "── arquivos ($(grep -c . <<< "${_lfiles}" || true))"
+  printf '%s\n' "${_lfiles}"
+  exit 0
+fi
+
 # ── EXCLUSÃO UNIVERSAL: chave de membro nunca viaja, em NENHUM papel ─────────────────────────
 # Não é corte de papel — é fronteira de identidade. `jwks/<membro>-N.pem` é chave PÚBLICA (não há
 # segredo a proteger), mas o NOME DO ARQUIVO é o nome do cliente, e ele viajava para todo adotante
@@ -429,9 +562,14 @@ if [ "${MODE}" = "manifest" ]; then
   git -C "${REPO}" rev-parse HEAD >/dev/null 2>&1 || {
     echo "ERRO: '${REPO}' não é repositório git com HEAD — o manifesto de transporte é declarado ∩ HEAD; use --emit-scrub-roots para a superfície declarada" >&2; exit 2; }
   _spec=() local_p=""
-  for local_p in "${_base[@]}"; do
-    [ -n "$(git -C "${REPO}" ls-tree HEAD -- "${local_p}")" ] && _spec+=("${local_p}")
-  done
+  if [ "${ROLE}" = "mini" ]; then
+    _mini_out="$(_mini_positives "${REPO}")" || exit 3
+    while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done <<< "${_mini_out}"
+  else
+    for local_p in "${_base[@]}"; do
+      [ -n "$(git -C "${REPO}" ls-tree HEAD -- "${local_p}")" ] && _spec+=("${local_p}")
+    done
+  fi
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_role_excludes "${REPO}" "${ROLE}")
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_command_excludes "${REPO}" "${ROLE}")
   # Os companheiros SÓ podem ser derivados DEPOIS dos dois cortes acima: eles são definidos pelo que
@@ -487,12 +625,12 @@ if [ "${MODE}" = "manifest" ]; then
   #   · REGRA 16 (14×) — prosa com contagem fixa ("109 comandos") num bundle de 67.
   # Dizer isto em voz alta é o ponto: o gap anterior não era a ausência do corte, era o corte ser
   # INVISÍVEL. Silenciar o resíduo o reintroduziria uma camada acima.
+  # ⚠️ A 1a redação deste aviso dizia "corta N arquivo(s) da meta-fábrica" e citava um resíduo de ~69
+  # HARD medido em 2026-09-15. Desde a matriz (2026-10-10) o standalone LEVA a meta-fábrica, e o número
+  # velho virou declaração sem medição; o resíduo atual se mede com `--list` e com o lint da porta.
   if [ -n "$(_role_cut "${ROLE}")" ]; then
-    echo "AVISO: papel '${ROLE}' corta $(( ${#_spec[@]} - ${#_base[@]} )) arquivo(s) da meta-fábrica do transporte." >&2
+    echo "AVISO: papel '${ROLE}' corta $(( $(grep -c '^:(exclude)' <<< "$(printf '%s\n' "${_spec[@]}")") - ${#_IDENTITY_EXCLUDES[@]} )) arquivo(s) de ADOÇÃO e FEDERAÇÃO do transporte." >&2
     echo "       Contrato preservado (a guarda do alvo o lê): ${_ROLE_CONTRACT[*]}" >&2
-    echo "       RESÍDUO MEDIDO 2026-09-15: o bundle deste papel nasce com ~69 HARD contra ~32 de 'adopted'" >&2
-    echo "       — REGRA 22 (link relativo p/ comando cortado) e REGRA 16 (contagem fixa na prosa). NÃO é" >&2
-    echo "       defeito do corte: é doutrina vendorizada que cita caminho do core. Fio aberto, declarado." >&2
   fi
   printf '%s\n' "${_spec[@]}"
   exit 0

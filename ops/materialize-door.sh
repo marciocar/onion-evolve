@@ -23,7 +23,8 @@
 # NÃO faz `git push`. Publicar é ato outward-facing e é do maestro (I3 — um
 # escritor por repo). O script prepara, verifica e PARA, dizendo o comando.
 #
-# Uso : ops/materialize-door.sh <dir-destino> [--role hub|standalone|adopted] [--force-role-change]
+# Uso : ops/materialize-door.sh <dir-destino> [--role source|hub|standalone|plugins|mini|adopted] [--force-role-change]
+#       (source/plugins/mini = papéis de porta da matriz D_MATRIZ_DE_PORTAS_2026_10, F2 = SAC-91)
 #       --role default: hub (a porta leva a maquinaria COMPLETA, meta-fábrica
 #       inclusa — decisão do maestro em 2026-09-16, coerente com a liberação da
 #       meta-fábrica selada no mesmo dia).
@@ -215,6 +216,13 @@ _slug="$(basename "${DEST}")"
 _pin_ph="$(git -C "${REPO_ROOT}" rev-parse --short=12 "${SRC_REF}")"
 cp "${REPO_ROOT}/LICENSE" "${DEST}/LICENSE" 2>/dev/null || echo "  (5) AVISO: LICENSE do core não encontrada" >&2
 cp "${REPO_ROOT}/LICENSE-DOCS" "${DEST}/LICENSE-DOCS" 2>/dev/null || true
+# O "Está:" do README depende do papel (F2 das portas): a 1ª redação dizia "maquinaria completa" em
+# toda porta, e o standalone sem adoção nem federação publicaria uma frase falsa sobre si mesmo.
+case "${ROLE}" in
+  standalone|plugins) _what="a maquinaria do core MENOS adoção e federação — \`.claude/\` (comandos, agentes, skills, hooks, utils, validation, meta-fábrica inclusa), as meta-specs e a knowledge base. Adotar outros repos e federar com eles é do onion-core." ;;
+  mini) _what="o ciclo didático produto→engenharia (allowlist do roles.yaml): poucos comandos, três agentes e a skill onion. Sem knowledge graph, sem meta e sem compliance." ;;
+  *) _what="a maquinaria completa — \`.claude/\` (comandos, agentes, skills, hooks, utils, validation), as meta-specs e a knowledge base." ;;
+esac
 cat > "${DEST}/README.md" <<README
 # 🧅 Onion — a maquinaria
 
@@ -228,8 +236,7 @@ cobre três dimensões peer do ciclo: produto, engenharia e compliance.
 
 ## O que está aqui, e o que não está
 
-**Está:** a maquinaria completa — \`.claude/\` (comandos, agentes, skills, hooks, utils, validation),
-as meta-specs e a knowledge base.
+**Está:** ${_what}
 
 **Não está, e é desenho:** a **biografia** do core — diário, análises, discussões, registro da
 federação e materiais. Método viaja; história, não. A allowlist que decide isso é
@@ -320,9 +327,48 @@ echo "  (6) carimbo de identidade: role=${ROLE}, kind=door, source_commit=${_pin
 # MERGE never-clobber; a porta não tinha passo equivalente e nascia com 3 HARD.
 # Aqui a cópia é DIRETA, e a diferença é de objeto: a porta não tem instância prévia a preservar —
 # ela É a materialização. Never-clobber protegeria um estado que não existe.
-if [ ! -f "${DEST}/.claude/settings.json" ] && [ -f "${REPO_ROOT}/.claude/settings.json" ]; then
-  cp "${REPO_ROOT}/.claude/settings.json" "${DEST}/.claude/settings.json"
-  echo "  (6) settings.json copiado (3 docs que viajam o citam; sem ele a REGRA 48 reprova ponteiro morto)"
+# ⚠️ DOIS AJUSTES DE 2026-10-10 (F2 das portas):
+#   · a cópia vem de `${SRC_REF}`, não do disco: a 1ª redação copiava a ÁRVORE DE TRABALHO, o único
+#     arquivo da porta que não nascia da integração mergeada (a mesma classe do `git archive HEAD`).
+#   · a porta sem federação (standalone, plugins) não leva o hook do inbox, e o settings.json do core o
+#     chama no SessionStart — a porta nasceria com um hook que sai 127 a cada sessão. Os hooks cujo
+#     script NÃO viajou saem do settings.json da porta, DERIVADO do que existe no destino (nada de
+#     lista: hook novo cortado amanhã sai daqui sozinho). O mini não leva hook nenhum, nem settings.
+if [ "${ROLE}" != "mini" ] && [ ! -f "${DEST}/.claude/settings.json" ] \
+   && git -C "${REPO_ROOT}" cat-file -e "${SRC_REF}:.claude/settings.json" 2>/dev/null; then
+  git -C "${REPO_ROOT}" show "${SRC_REF}:.claude/settings.json" > "${DEST}/.claude/settings.json"
+  echo "  (6) settings.json copiado de ${SRC_REF} (3 docs que viajam o citam; sem ele a REGRA 48 reprova ponteiro morto)"
+  _pruned="$(python3 - "${DEST}" <<'PY'
+import json, re, sys, os
+dest = sys.argv[1]
+p = os.path.join(dest, ".claude", "settings.json")
+d = json.load(open(p, encoding="utf-8"))
+gone = []
+hooks = d.get("hooks") or {}
+for ev in list(hooks):
+    groups = []
+    for g in hooks[ev] or []:
+        keep = []
+        for h in (g.get("hooks") or []):
+            m = re.search(r'\.claude/hooks/([A-Za-z0-9_.-]+)', h.get("command", ""))
+            if m and not os.path.isfile(os.path.join(dest, ".claude", "hooks", m.group(1))):
+                gone.append("%s:%s" % (ev, m.group(1)))
+                continue
+            keep.append(h)
+        if keep:
+            g["hooks"] = keep
+            groups.append(g)
+    if groups:
+        hooks[ev] = groups
+    else:
+        del hooks[ev]
+if gone:
+    json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    open(p, "a").write("\n")
+print(" ".join(gone))
+PY
+)" || { echo "ERRO: não consegui podar os hooks ausentes do settings.json da porta" >&2; exit 3; }
+  [ -n "${_pruned}" ] && echo "  (6) settings.json: hook(s) que o papel '${ROLE}' não leva, removido(s): ${_pruned}"
 fi
 
 # ⚠️ O REGENERADOR PODE NAO TER VIAJADO — e procura-lo SO no destino era FAIL-OPEN SILENCIOSO.

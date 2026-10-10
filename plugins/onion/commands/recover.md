@@ -286,7 +286,7 @@ Adapter: `${CLAUDE_PLUGIN_ROOT}/utils/task-manager/adapters/<provider>.md`.
 
 Canal upstream (sinal→core): `docs/evolution/inbox/`
 Canal downstream (update/anúncio do core): `docs/evolution/inbound/`
-Rode `/onion:co-evolve` para ler/gerenciar.
+Rode `meta:co-evolve` para ler/gerenciar.
 
 ---
 
@@ -306,7 +306,7 @@ if [ ! -f "$REPO/docs/evolution/README.md" ]; then
 # Co-evolução (consumidor)
 
 Este repo é **CONSUMIDOR** do Onion. Canais: `inbox/` para sinalizar o core (upstream) e `inbound/`
-para receber relatórios de update/anúncios do core (downstream). Rode `/onion:co-evolve` para ler/gerenciar.
+para receber relatórios de update/anúncios do core (downstream). Rode `meta:co-evolve` para ler/gerenciar.
 PTR
 fi
 ```

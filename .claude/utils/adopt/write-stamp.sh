@@ -21,7 +21,7 @@
 #     com ela, os 3 restantes eram SSOT viva (technical-context/index.md, project.kg.yaml) — o alvo.
 #
 # Uso : write-stamp.sh <target_root> --framework <n> --commit <sha> --commit-date <AAAA-MM-DD>
-#         [--adopted-from <url>] [--mode <m>] [--role <adopted|hub|standalone>] [--integration-branch <b>]
+#         [--adopted-from <url>] [--mode <m>] [--role <adopted|hub|standalone|source*|plugins*|mini*>] [--integration-branch <b>]   (* só com --kind door)
 #         [--members <members.yaml>] [--member-id <id>] [--kind door]
 #   --kind door: carimbo de PORTA (ops/materialize-door.sh). A porta é PROJEÇÃO regenerada inteira a
 #           cada materialização, então: --role é OBRIGATÓRIO (a porta nunca herda papel — a REGRA 92
@@ -137,7 +137,17 @@ fi
 # recusava justamente o papel que corta. Medido pela passada adversarial: o único standalone do mundo
 # (o repo PÚBLICO onion-standalone) carrega `role: adopted`, então um `--update` nele republicaria a
 # meta-fábrica exatamente como antes. Corte que não pode ser carimbado é corte que não acontece.
-case "${ROLE}" in adopted|hub|standalone) : ;; *) echo "ERRO: --role deve ser 'adopted', 'hub' ou 'standalone' (veio '${ROLE}')" >&2; exit 2 ;; esac
+# ⚠️ OS PAPÉIS DE PORTA (source, plugins, mini) entraram em 2026-10-10 (F2 das portas, matriz
+# D_MATRIZ_DE_PORTAS_2026_10) e SÓ com `--kind door`: são o que uma PORTA distribui, não o papel de um
+# projeto adotado. Um adotado `source` se declararia o core (o PASSO 0 do adopt passaria); um adotado
+# `mini` ou `plugins` não tem transporte que o produza. Recusar fora da porta é o mesmo critério do
+# members-validate.sh (mini/plugins só com kind door).
+case "${ROLE}" in
+  adopted|hub|standalone) : ;;
+  source|plugins|mini)
+    [ "${KIND}" = door ] || { echo "ERRO: --role '${ROLE}' é papel de PORTA — só com --kind door (projeto adotado usa adopted, hub ou standalone)" >&2; exit 2; } ;;
+  *) echo "ERRO: --role deve ser 'adopted', 'hub' ou 'standalone' (ou, com --kind door, 'source', 'plugins' ou 'mini'; veio '${ROLE}')" >&2; exit 2 ;;
+esac
 
 # restauração do adopted_at perdido (re-carimbo pré-fix) — do members.yaml do core, nunca inventado
 if [ -n "${OLD_EXISTS}" ] && [ -z "${ADOPTED_AT}" ] && [ -n "${MEMBERS}" ] && [ -n "${MEMBER_ID}" ] \
