@@ -15,11 +15,11 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-16
-    label: "recon 2026-07-16: 33 arquivos em .claude/diary/ e 10 .kg.yaml fora de fixtures no repo (git ls-tree dcb29e96^); 20 memórias fora do repo; VPS = srv1812846"
-    narrative: "label anterior: recon 2026-07-16: 33 migalhas + 10 KGs + 1 sessao IN-REPO; 20 memorias FORA; VPS=srv1812846; Avell nao-alcancavel da VPS"
+    label: "recon 2026-07-16: 33 arquivos em .claude/diary/ e 10 .kg.yaml fora de fixtures no repo (git ls-tree dcb29e96^); 20 memórias fora do repo; VPS = o host do core (hostname omitido)"
+    narrative: "label anterior: recon 2026-07-16: 33 migalhas + 10 KGs + 1 sessao IN-REPO; 20 memorias FORA; ⟨VPS=o host do core (hostname omitido)⟩; Avell nao-alcancavel da VPS · label anterior: recon 2026-07-16: 33 arquivos em .claude/diary/ e 10 .kg.yaml fora de fixtures no repo (git ls-tree dcb29e96^); 20 memórias fora do repo; ⟨VPS = o host do core (hostname omitido)⟩"
     provenance:
       source: "dcb29e96^ (árvore git, core) + .claude/diary/2026-07-16-two-homes-origin-and-coexistence.md"
-      locator: "git ls-tree -r --name-only dcb29e96^ (.claude/diary/ = 33 arquivos; .kg.yaml fora de fixtures = 10); diário l.18 (srv1812846), l.29 (20 arqs)"
+      locator: "git ls-tree -r --name-only dcb29e96^ (.claude/diary/ = 33 arquivos; .kg.yaml fora de fixtures = 10); diário l.18 (hostname da VPS), l.29 (20 arqs)"
       method: "medição: git ls-tree -r --name-only dcb29e96^ | grep -c '^\\.claude/diary/' e | grep '\\.kg\\.yaml$' | grep -vc fixtures; + leitura do diário 2026-07-16 l.18,l.29"
       locality: "repo"
   - id: C_GIT_COEXISTS
@@ -44,7 +44,8 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-16
-    label: "memoria (~/.claude/.../memory, 20 arqs) e FORA do repo → nao coexiste por git (unica lacuna real)"
+    label: "memoria (diretório de memória do Claude Code no home do usuário, 20 arqs) e FORA do repo → nao coexiste por git (unica lacuna real)"
+    narrative: "label anterior: ⟨memoria (diretório de memória do Claude Code no home do usuário, 20 arqs)⟩ e FORA do repo → nao coexiste por git (unica lacuna real)"
     provenance:
       source: ".claude/diary/2026-07-16-two-homes-origin-and-coexistence.md"
       locator: ".claude/diary/2026-07-16-two-homes-origin-and-coexistence.md l.25,l.29"

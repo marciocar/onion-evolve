@@ -240,7 +240,8 @@ nodes:
     confidence: 1.0
     verified_at: 2026-07-31
     verified_against: ssh-permission-denied-2-chaves-3-usuarios
-    label: "BLOQUEIO MEDIDO: esta sessao NAO tem acesso a VPS. ssh com id_ed25519 E com onion_vps_deploy (comentario 'onion-kvm8(srv1812846)-deploy-2026-07-08'), usuarios onion/marcio/root -> todos 'Permission denied (publickey)'. O alias 'onion-kvm8' nao resolve; bridge.onionevolve.com NAO resolve daqui (auth./onionevolve.com resolvem -> 179.197.65.94). Logo o deploy em PRODUCAO e o pareamento do numero (QR) sao atos do MAESTRO, nao desta sessao. O dogfood local cobriu tudo que nao exige a VPS nem o telefone"
+    label: "BLOQUEIO MEDIDO: a sessão não tinha acesso à VPS — ssh com as duas chaves e usuários onion/marcio/root deram Permission denied, e o alias onion-kvm8 e bridge.onionevolve.com não resolviam. Logo deploy em produção e pareamento do QR seriam atos do maestro."
+    narrative: "label anterior: BLOQUEIO MEDIDO: esta sessao NAO tem acesso a VPS. ssh com id_ed25519 E com onion_vps_deploy (comentario ⟨'onion-kvm8(<hostname da VPS>)-deploy-2026-07-08'⟩), usuarios onion/marcio/root -> todos 'Permission denied (publickey)'. O alias 'onion-kvm8' nao resolve; bridge.onionevolve.com NAO resolve daqui (auth./onionevolve.com resolvem -> 179.197.65.94). Logo o deploy em PRODUCAO e o pareamento do numero (QR) sao atos do MAESTRO, nao desta sessao. O dogfood local cobriu tudo que nao exige a VPS nem o telefone"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
     provenance:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
@@ -257,7 +258,8 @@ nodes:
     confidence: 1.0
     verified_at: 2026-07-31
     verified_against: hostname-whoami-hostnamectl-systemctl
-    label: "REFUTA Q_vps_access_blocked: a sessao RODA NA PROPRIA VPS. hostname=srv1812846, user=marcio, Virtualization=kvm, Ubuntu 24.04.4; caddy+docker+onion-bridge ativos aqui. O ssh falhava porque 179.197.65.94 NAO e a VPS (auth./onionevolve.com resolvem p/ la, mas o host e este) — eu inferi 'maquina local' das falhas de ssh SEM antes rodar `hostname`. Licao verify-access-before-specifying aplicada ao contrario: tentei o acesso REMOTO sem checar se ja estava DENTRO. CONSEQUENCIA POSITIVA: o dogfood do WAHA foi executado NA VPS — as medicoes (NOWEB 420.7 vs WEBJS 788.8 MiB) sao representativas de PRODUCAO, nao de laptop"
+    label: "REFUTA Q_vps_access_blocked: a sessão RODA NA PRÓPRIA VPS (hostname dela, user marcio, kvm, Ubuntu 24.04.4, caddy+docker+bridge ativos). O ssh falhava porque 179.197.65.94 não é a VPS; inferi 'máquina local' sem rodar hostname. As medições do WAHA são de produção."
+    narrative: "label anterior: REFUTA Q_vps_access_blocked: a sessao RODA NA PROPRIA VPS. ⟨hostname = o da VPS,⟩ user=marcio, Virtualization=kvm, Ubuntu 24.04.4; caddy+docker+onion-bridge ativos aqui. O ssh falhava porque 179.197.65.94 NAO e a VPS (auth./onionevolve.com resolvem p/ la, mas o host e este) — eu inferi 'maquina local' das falhas de ssh SEM antes rodar `hostname`. Licao verify-access-before-specifying aplicada ao contrario: tentei o acesso REMOTO sem checar se ja estava DENTRO. CONSEQUENCIA POSITIVA: o dogfood do WAHA foi executado NA VPS — as medicoes (NOWEB 420.7 vs WEBJS 788.8 MiB) sao representativas de PRODUCAO, nao de laptop"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
     provenance:
       source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
@@ -273,7 +275,8 @@ nodes:
     confidence: 0.95
     verified_at: 2026-07-31
     verified_against: ls-home-onion-mais-find-whatsapp-web.js-na-vps
-    label: "ACHADO GRANDE: o whatsapp-sender NAO EXISTE MAIS na VPS. /home/onion/ contem apenas onion-bridge (+ dotfiles); find por 'whatsapp-web.js' na maquina inteira = ZERO. O parecer de 2026-07-05 dizia 'reinstalado no VPS (~onion/whatsapp-sender)' — declarado != verificado, 26 dias depois sumiu. REFUTA a premissa da F1 ('1 provider REAL rodando + 1 dirigido'): hoje ha ZERO capacidade de WhatsApp na VPS. Resolve Q_wwebjs_unread por AUSENCIA (nao ha o que ler) e muda o Teste do Eixo — com o WAHA deployado passamos a ter 1 provider real, nao 2"
+    label: "ACHADO: o whatsapp-sender não existe mais na VPS — o home da conta de serviço do bridge só contém onion-bridge e o find por whatsapp-web.js dá zero, contra o parecer de 07-05. Refuta a premissa da F1: hoje há zero capacidade de WhatsApp na VPS."
+    narrative: "label anterior: ACHADO GRANDE: o whatsapp-sender NAO EXISTE MAIS na VPS. ⟨o home da conta de serviço do bridge contem apenas⟩ onion-bridge (+ dotfiles); find por 'whatsapp-web.js' na maquina inteira = ZERO. O parecer de 2026-07-05 dizia 'reinstalado no VPS ⟨(whatsapp-sender no home da conta onion)⟩' — declarado != verificado, 26 dias depois sumiu. REFUTA a premissa da F1 ('1 provider REAL rodando + 1 dirigido'): hoje ha ZERO capacidade de WhatsApp na VPS. Resolve Q_wwebjs_unread por AUSENCIA (nao ha o que ler) e muda o Teste do Eixo — com o WAHA deployado passamos a ter 1 provider real, nao 2"
     trace: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
     provenance:
       source: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
@@ -289,8 +292,8 @@ nodes:
     confidence: 1.0
     verified_at: 2026-07-31
     verified_against: docker-compose-up-mais-curl-na-vps
-    label: "WAHA DEPLOYADO NA VPS (o gatilho, metade infra): /home/marcio/onion-vps-waha/docker-compose.yml no padrao da casa (stacks em /home/marcio/<projeto>). container onion-waha, restart unless-stopped, bind 127.0.0.1:3999 (SEM superficie publica — o consumidor roda no mesmo host), engine NOWEB (decidido POR MEDICAO), volume ./sessions persistente, segredos gerados por openssl em .env com umask 077 + .gitignore. PROVAS: 401 sem X-Api-Key / 200 com; POST /api/sessions -> SCAN_QR_CODE; GET /auth/qr -> 200 png 5379 bytes; RAM em producao 412.9 MiB. FALTA SO o ato fisico do maestro: escanear o QR (parear o numero)"
-    narrative: "trace anterior (só no host): docker-compose.yml do clone de onion-waha no host. Na data do nó (2026-07-31) o arquivo não estava em remoto algum: o único commit de marciocar/onion-waha é 86662e01, de 2026-08-02T23:22Z. A versão publicada mais próxima, posterior ao nó, é onion-waha@86662e01:docker-compose.yml."
+    label: "WAHA DEPLOYADO NA VPS: compose do onion-waha no padrão da casa, container onion-waha, bind 127.0.0.1:3999, engine NOWEB, sessões persistentes, segredos em .env 077. Provas: 401/200 por X-Api-Key, SCAN_QR_CODE, QR 200, RAM 412.9 MiB. Falta só o maestro parear o QR."
+    narrative: "trace anterior (só no host): docker-compose.yml do clone de onion-waha no host. Na data do nó (2026-07-31) o arquivo não estava em remoto algum: o único commit de marciocar/onion-waha é 86662e01, de 2026-08-02T23:22Z. A versão publicada mais próxima, posterior ao nó, é onion-waha@86662e01:docker-compose.yml. · label anterior: WAHA DEPLOYADO NA VPS (o gatilho, metade infra): ⟨o docker-compose.yml do onion-waha (host)⟩ no padrao da casa ⟨(stacks em pastas por projeto no home do maestro)⟩. container onion-waha, restart unless-stopped, bind 127.0.0.1:3999 (SEM superficie publica — o consumidor roda no mesmo host), engine NOWEB (decidido POR MEDICAO), volume ./sessions persistente, segredos gerados por openssl em .env com umask 077 + .gitignore. PROVAS: 401 sem X-Api-Key / 200 com; POST /api/sessions -> SCAN_QR_CODE; GET /auth/qr -> 200 png 5379 bytes; RAM em producao 412.9 MiB. FALTA SO o ato fisico do maestro: escanear o QR (parear o numero)"
     provenance:
       source: "container onion-vps-waha e seu docker-compose.yml no host (host)"
       locator: "docker-compose-up-mais-curl-na-vps"
@@ -343,7 +346,7 @@ nodes:
     narrative: "trace anterior (só no host): docker-compose.yml do clone de onion-waha no host. Na data do nó (2026-08-01) o arquivo não estava em remoto algum: o único commit de marciocar/onion-waha é 86662e01, de 2026-08-02T23:22Z. A versão publicada mais próxima, posterior ao nó, é onion-waha@86662e01:docker-compose.yml."
     provenance:
       source: "commit 18ec63f2 + docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
-      locator: "corpo do commit 18ec63f2 (2026-08-01 04:35) parágrafo \"CAUSA RAIZ\"; SYNTHESIS.md l.70-81; onion-vps-waha@86662e0:README.md l.33-34"
+      locator: "corpo do commit 18ec63f2 (2026-08-01 04:35) parágrafo \"CAUSA RAIZ\"; SYNTHESIS.md l.70-81; onion-waha@86662e0:README.md l.33-34 (lido em onion-waha@86662e0, posterior ao nó: commit de 2026-08-02T23:22Z, nó de 2026-08-01)"
       method: "testemunho: medição da sessão 2026-08-01 (3 envios controlados), comando não registrado; relatada em 1ª pessoa no commit 18ec63f2"
       locality: "repo"
 

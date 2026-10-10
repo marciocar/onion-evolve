@@ -85,8 +85,10 @@ nodes:
     verified_against: 'CHANGELOG l.7; contagem "40 processos claude" e da memoria de 2026-09-02 e NAO foi re-medida nesta rodada (juiz)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
-    label: 'F4 EMENDADO. l.7: sessoes concorrentes deixam de reverter em silencio as mudancas de ~/.claude.json (trust do workspace nao reseta; estado MCP/projeto nao se perde). A VPS do core roda dezenas de sessoes (numero de 09-02, nao re-medido): perda de trust/MCP entre sessoes era sintoma plausivel e nunca registrado. Nota, sem acao.'
+    label: "F4 EMENDADO. l.7: sessões concorrentes deixam de reverter em silêncio as mudanças do .claude.json do usuário (trust e estado MCP não se perdem). A VPS do core roda dezenas de sessões (nº de 09-02, não re-medido): perda de trust/MCP era sintoma plausível. Nota, sem ação."
+    narrative: "label anterior: F4 EMENDADO. l.7: sessoes concorrentes deixam de reverter em silencio ⟨as mudancas do .claude.json do usuário⟩ (trust do workspace nao reseta; estado MCP/projeto nao se perde). A VPS do core roda dezenas de sessoes (numero de 09-02, nao re-medido): perda de trust/MCP entre sessoes era sintoma plausivel e nunca registrado. Nota, sem acao. · Caminho como conteúdo: citação verbatim de terceiro: o caminho do arquivo de estado é texto da l.7 do CHANGELOG oficial do Claude Code (data/changelog-2.1.258-259.md), não caminho desta máquina; reescrever falsificaria a citação."
     trace: 'docs/analysis/onion-vps-network-exposure-2026-08.md'
+    x_path_is_content: "citação"
     provenance:
       source: "docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md"
       locator: "l.7 (\"Fixed concurrent sessions silently reverting each other's ~/.claude.json changes — workspace trust no longer resets and MCP/project state is no longer lost\") + SYNTHESIS.md l.21-25 (F4 emendado) + data/f1-findings-pre-juiz.md (F4: \"40 processos claude medidos em 09-02\")"

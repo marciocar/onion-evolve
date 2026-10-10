@@ -4921,7 +4921,8 @@ nodes:
       locality: "web"
   - id: PR_322
     node_type: decision
-    label: "docs(convention): convenção de worktrees — umbrella ~/worktrees/<repo>/<branch-slug>"
+    label: "docs(convention): convenção de worktrees — umbrella <home do usuário>/worktrees/<repo>/<branch-slug>"
+    narrative: "label anterior: docs(convention): convenção de worktrees — ⟨umbrella <home do usuário>/worktrees/<repo>/<branch-slug>⟩"
     plane: PROD
     impact: 2
     confidence: 1.0

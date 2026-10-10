@@ -268,8 +268,10 @@ nodes:
     verified_against: 'citacao verbatim "curl -o ~/.claude/skills/jev/SKILL.md --create-dirs https://jevtypesafeai.com/skill/SKILL.md" — /agent-skill, "Copy to your agent" ("Any agent — paste this prompt" e "Any agent — install the file manually"); ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia).'
     source_tier: 6
     source_kind: vendor-reseller
-    label: 'Distribuicao da skill por DOIS caminhos sem pacote: um prompt de colar que manda o agente buscar a URL do SKILL.md, e um curl para ~/.claude/skills/jev/. O caminho ~/.claude/ e o layout do Claude Code, mas a pagina NAO declara o formato da skill nem cita a Agent Skills spec — e o SKILL.md nao foi conferido nesta rodada.'
+    label: "Distribuição da skill por DOIS caminhos sem pacote: um prompt de colar que manda o agente buscar o SKILL.md, e um curl para o diretório de skills do Claude Code no home do usuário. A página NÃO declara o formato nem cita a Agent Skills spec; o SKILL.md não foi conferido."
+    narrative: "label anterior: Distribuicao da skill por DOIS caminhos sem pacote: um prompt de colar que manda o agente buscar a URL do SKILL.md, e ⟨um curl para o diretório de skills (jev) do .claude no home do usuário. Esse diretório e o layout⟩ do Claude Code, mas a pagina NAO declara o formato da skill nem cita a Agent Skills spec — e o SKILL.md nao foi conferido nesta rodada. · Caminho como conteúdo: citação verbatim de terceiro: o caminho do comando curl é texto da página https://jevtypesafeai.com/agent-skill, não caminho desta máquina; reescrever falsificaria a citação."
     trace: 'https://jevtypesafeai.com/agent-skill'
+    x_path_is_content: "citação"
     provenance:
       source: "https://jevtypesafeai.com/agent-skill"
       locator: "citacao verbatim \"curl -o ~/.claude/skills/jev/SKILL.md --create-dirs https://jevtypesafeai.com/skill/SKILL.md\" — /agent-skill, \"Copy to your agent\" (\"Any agent — paste this prompt\" e \"Any agent — install the file manually\"); ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia)."

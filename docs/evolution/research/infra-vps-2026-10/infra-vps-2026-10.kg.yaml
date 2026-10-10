@@ -243,7 +243,8 @@ nodes:
     valid_from: 2025-06
     source_tier: 6
     source_kind: primary
-    label: 'Com Livepatch habilitado, o postinst do kernel deliberadamente NAO cria /var/run/reboot-required: o sinal reboot pendente some mesmo com kernel novo em disco. Lição geral: sinal declarado pode ser suprimido; cruzar uname -r com /boot/vmlinuz-*.'
+    label: "Com Livepatch habilitado, o postinst do kernel deliberadamente NAO cria o marcador reboot-required do sistema: o sinal reboot pendente some mesmo com kernel novo em disco. Lição geral: sinal declarado pode ser suprimido; cruzar uname -r com os vmlinuz-* do diretório de boot."
+    narrative: "label anterior: Com Livepatch habilitado, o postinst do kernel deliberadamente ⟨NAO cria o marcador reboot-required do sistema:⟩ o sinal reboot pendente some mesmo com kernel novo em disco. Lição geral: sinal declarado pode ser suprimido; cruzar uname -r ⟨com os vmlinuz-* do diretório de boot.⟩"
     trace: 'https://lists.snapcraft.io/archives/foundations-bugs/2025-June/539876.html'
     provenance:
       source: "https://lists.snapcraft.io/archives/foundations-bugs/2025-June/539876.html"
@@ -299,7 +300,8 @@ nodes:
     verified_against: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps — votos 3-0'
     source_tier: 5
     source_kind: engineer
-    label: 'A cadeia DOCKER-USER e avaliada antes do forwarding do Docker; rotea-la para ufw-user-forward via /etc/ufw/after.rules faz o UFW filtrar portas de containers (testado em Ubuntu 24.04 e Debian 12). E MUDANCA de firewall, nao medicao — fora do escopo de um censo.'
+    label: "A cadeia DOCKER-USER e avaliada antes do forwarding do Docker; rotea-la para ufw-user-forward via o after.rules do ufw faz o UFW filtrar portas de containers (testado em Ubuntu 24.04 e Debian 12). E MUDANCA de firewall, nao medicao — fora do escopo de um censo."
+    narrative: "label anterior: A cadeia DOCKER-USER e avaliada antes do forwarding do Docker; rotea-la para ufw-user-forward ⟨via o after.rules do ufw⟩ faz o UFW filtrar portas de containers (testado em Ubuntu 24.04 e Debian 12). E MUDANCA de firewall, nao medicao — fora do escopo de um censo."
     trace: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps'
     provenance:
       source: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps"
@@ -483,7 +485,8 @@ nodes:
     status: open
     impact: 5
     confidence: 0.55
-    label: 'OPCAO B linha (B enxuta) — RECOMENDADA pelo Elenxo: censo shell que COMPOE sinais nativos (needrestart -b, /var/run/reboot-required.pkgs, uname -r x /boot/vmlinuz-*, apt list --upgradable, docker inspect restart policy, idade de sessoes) e estende vps-exposure-check.sh; SSOT = grafos de infra existentes; sem categoria /ops nova; sem hook; invocacao explicita e o lint so detecta a IDADE do ultimo censo (padrao REGRA 65). Restringida por E_OBJECAO_CHECKRESTART_AUSENTE (instrumento = needrestart -b), E_OBJECAO_INSTRUMENTO_NAO_VERIFICADO (certeza do restart e campo nao verificado ate medir) e E_OBJECAO_LIVEPATCH_CRUZAR_SINAIS (cruzar sinais e marcar qual sustentou o veredito).'
+    label: "OPÇÃO B linha (B enxuta), recomendada pelo Elenxo: censo shell que compõe sinais nativos (needrestart -b, reboot-required.pkgs, uname x vmlinuz do boot, apt, restart policy) e estende o vps-exposure-check.sh; SSOT nos grafos de infra, sem /ops novo nem hook; o lint só vê a idade."
+    narrative: "label anterior: OPCAO B linha (B enxuta) — RECOMENDADA pelo Elenxo: censo shell que COMPOE sinais nativos (needrestart -b, ⟨o reboot-required.pkgs do sistema⟩, ⟨uname -r x os vmlinuz-* do diretório de boot⟩, apt list --upgradable, docker inspect restart policy, idade de sessoes) e estende vps-exposure-check.sh; SSOT = grafos de infra existentes; sem categoria /ops nova; sem hook; invocacao explicita e o lint so detecta a IDADE do ultimo censo (padrao REGRA 65). Restringida por E_OBJECAO_CHECKRESTART_AUSENTE (instrumento = needrestart -b), E_OBJECAO_INSTRUMENTO_NAO_VERIFICADO (certeza do restart e campo nao verificado ate medir) e E_OBJECAO_LIVEPATCH_CRUZAR_SINAIS (cruzar sinais e marcar qual sustentou o veredito)."
     trace: 'docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml'
 
   - id: C_OPCAO_C_VERTICAL_INFRA
@@ -512,7 +515,8 @@ nodes:
     status: done
     impact: 5
     confidence: 0.5
-    label: 'DECISAO ABERTA (o maestro sela; esta sessao NUNCA sela): como o Onion trata INFRA/VPS. OPCOES NOMEADAS: (A) nada novo, manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh; (B) grafo de dominio da VPS como SSOT viva + censo ops/vps-census.sh medindo o vivo contra o grafo + comando /ops:vps via /meta:forge, core-only; (B linha) B enxuta, censo shell que compoe sinais nativos (needrestart -b, reboot-required.pkgs, uname x /boot, apt upgradable, docker inspect restart policy, idade de sessoes) e estende vps-exposure-check.sh, SSOT nos grafos de infra existentes, sem categoria /ops nova, sem hook; (C) vertical de engenharia infra que viaja; (D) 4a dimensao peer. ═══ RECOMENDACAO DO ELENXO (UM agente, sem votacao — hipotese) ═══ B linha, core-only. C e D reprovadas: nenhum 2o adotante pediu, 3 dimensoes sao doutrina selada, substrato especifico desta VPS. A pura reprovada: recorrencia N muito maior que 1 resolvida a mao pede mecanismo. B integral reprovada em quatro pontos; constraint 1 = sem hook e sem SessionStart (MOAT W7, hook com timeout falha aberto), invocacao explicita e lint detecta a IDADE do ultimo censo (padrao REGRA 65); constraint 2 = compor o que ja esta instalado (needrestart...). A recomendacao chegou TRUNCADA a partir do constraint 2 — ver E_LACUNAS_INFRA_VPS_1005. Reboot e upgrade continuam decisao humana: o censo so propoe; nunca encerra nem propoe encerrar ferramenta da VPS.'
+    label: "DECISÃO ABERTA (o maestro sela): como o Onion trata INFRA/VPS — (A) nada novo, (B) grafo + censo + /ops:vps, (B linha) censo shell enxuto que compõe sinais nativos, (C) vertical que viaja, (D) 4ª dimensão. O Elenxo recomenda B linha, core-only; a recomendação chegou truncada."
+    narrative: "label anterior: DECISAO ABERTA (o maestro sela; esta sessao NUNCA sela): como o Onion trata INFRA/VPS. OPCOES NOMEADAS: (A) nada novo, manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh; (B) grafo de dominio da VPS como SSOT viva + censo ops/vps-census.sh medindo o vivo contra o grafo + comando /ops:vps via /meta:forge, core-only; (B linha) B enxuta, censo shell que compoe sinais nativos (needrestart -b, reboot-required.pkgs, ⟨uname x diretório de boot⟩, apt upgradable, docker inspect restart policy, idade de sessoes) e estende vps-exposure-check.sh, SSOT nos grafos de infra existentes, sem categoria /ops nova, sem hook; (C) vertical de engenharia infra que viaja; (D) 4a dimensao peer. ═══ RECOMENDACAO DO ELENXO (UM agente, sem votacao — hipotese) ═══ B linha, core-only. C e D reprovadas: nenhum 2o adotante pediu, 3 dimensoes sao doutrina selada, substrato especifico desta VPS. A pura reprovada: recorrencia N muito maior que 1 resolvida a mao pede mecanismo. B integral reprovada em quatro pontos; constraint 1 = sem hook e sem SessionStart (MOAT W7, hook com timeout falha aberto), invocacao explicita e lint detecta a IDADE do ultimo censo (padrao REGRA 65); constraint 2 = compor o que ja esta instalado (needrestart...). A recomendacao chegou TRUNCADA a partir do constraint 2 — ver E_LACUNAS_INFRA_VPS_1005. Reboot e upgrade continuam decisao humana: o censo so propoe; nunca encerra nem propoe encerrar ferramenta da VPS."
     verified_at: '2026-10-05'
     verified_against: 'SELADO PELO MAESTRO em 2026-10-05 (AskUserQuestion): opcao B INTEGRAL — grafo de dominio da VPS + censo deterministico + comando /ops:vps, core-only — e NAO a B linha que o Elenxo recomendava. Restricao do mesmo selo, pergunta do maestro: o dado da VPS nao viaja para adotante. Medido no vendor-manifest: docs/onion e docs/evolution nao viajam, ops/ nao viaja; .claude/commands e .claude/validation viajam — logo o censo mora em ops/ e o comando sai do pacote por corte, com caso de bancada que reprova se aparecer'
     trace: 'docs/evolution/research/infra-vps-2026-10/SYNTHESIS.md'
@@ -584,8 +588,8 @@ nodes:
     verified_against: "medido nesta VPS em 2026-10-05: canonical-livepatch ausente; o marcador reboot-required do sistema existe com .pkgs libc6, linux-image-6.8.0-142-generic, linux-base; uname -r 139"
     source_tier: 10
     source_kind: internal-audit
-    label: 'OBJECAO (Elenxo, 1 agente) ao achado 4: Livepatch nao se aplica a este host (ausente, e o reboot-required existe). A licao geral sobrevive: o censo cruza uname -r (139) com /boot/vmlinuz-* (142) e marca qual sinal sustentou o veredito. Premissa a corrigir: kernel 146 disponivel nao foi reproduzido.'
-    narrative: "trace anterior (só no host): marcador reboot-required.pkgs do sistema e diretório de boot (estado do host, sem repo)."
+    label: "OBJEÇÃO (Elenxo) ao achado 4: Livepatch não se aplica a este host (ausente; o reboot-required existe). A lição sobrevive: o censo cruza uname -r (139) com os vmlinuz do diretório de boot (142) e marca qual sinal sustentou o veredito. O kernel 146 não foi reproduzido."
+    narrative: "trace anterior (só no host): marcador reboot-required.pkgs do sistema e diretório de boot (estado do host, sem repo). · label anterior: OBJECAO (Elenxo, 1 agente) ao achado 4: Livepatch nao se aplica a este host (ausente, e o reboot-required existe). A licao geral sobrevive: o censo cruza uname -r (139) ⟨com os vmlinuz-* do diretório de boot (142)⟩ e marca qual sinal sustentou o veredito. Premissa a corrigir: kernel 146 disponivel nao foi reproduzido."
     provenance:
       source: "reboot-required.pkgs e kernels em boot do host (host)"
       locator: "medido nesta VPS em 2026-10-05: canonical-livepatch ausente; o marcador reboot-required do sistema existe com .pkgs libc6, linux-image-6.8.0-142-generic, linux-base; uname -r 139"

@@ -73,7 +73,7 @@ nodes:
     confidence: 0.5
     status: done
     verified_at: 2026-09-01
-    verified_against: 'I_FECHAMENTOS_TRIVIAIS (Onda 8): lineage product adicionada ao members.yaml (host srv1812846, branch main, consumidores nomeados: site+bridge+IdP); members-validate rc=0'
+    verified_against: "I_FECHAMENTOS_TRIVIAIS (Onda 8): lineage product adicionada ao members.yaml (host = a VPS do core, branch main, consumidores nomeados: site+bridge+IdP); members-validate rc=0"
     label: "onde a main-produto entra no mapa de linhagens do members.yaml"
   - id: Q_CLIENT_SCOPE
     node_type: question

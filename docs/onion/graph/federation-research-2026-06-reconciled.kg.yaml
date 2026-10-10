@@ -5386,7 +5386,8 @@ nodes:
     confidence: 0.7
     verified_at: 2026-07-21
     trace: "docs/evolution/scope-convention-2026.md:1-80 (tabela 3 planos × 4 escopos; 'Plano 1 — cavalgar o nativo, zero código'; Plano 3 SUPERSEDES marcado gated)"
-    label: "A convenção de escopo virou documento operacional: time = <time-dir>/.claude/ (nativo, zero código), pessoa = ~/.claude/, plano conhecimento (SUPERSEDES) declarado GATED atrás de dogfood — a divisão de trabalho que os 4 streams propuseram"
+    label: "A convenção de escopo virou documento operacional: time = <time-dir>/.claude/ (nativo, zero código), pessoa = .claude/ no home do usuário, plano conhecimento (SUPERSEDES) declarado GATED atrás de dogfood — a divisão de trabalho que os 4 streams propuseram"
+    narrative: "label anterior: A convenção de escopo virou documento operacional: time = <time-dir>/.claude/ (nativo, zero código), ⟨pessoa = .claude/ no home do usuário⟩, plano conhecimento (SUPERSEDES) declarado GATED atrás de dogfood — a divisão de trabalho que os 4 streams propuseram"
     provenance:
       source: "docs/evolution/scope-convention-2026.md:1-80 (tabela 3 planos × 4 escopos; 'Plano 1 — cavalgar o nativo, zero código'; Plano 3 SUPERSEDES marcado gated)"
       locator: "docs/evolution/scope-convention-2026.md:1-80 (tabela 3 planos × 4 escopos; 'Plano 1 — cavalgar o nativo, zero código'; Plano 3 SUPERSEDES marcado gated)"
@@ -5580,7 +5581,8 @@ nodes:
     impact: 3
     confidence: 0.7
     trace: "docs/evolution/scope-convention-2026.md (pessoa = settings.json + settings.local.json do HOME do usuário; nenhuma convenção members/<pessoa> versionada no repo) · .claude/utils/scope/resolve-scope-layers.sh:51 (camada pessoa = HOME, fora do git)"
-    label: "SEGUE ABERTO — o 4º nível: a camada pessoa resolve por ~/.claude (fora do git), então pessoa-dentro-do-time VERSIONÁVEL/COMPARTILHÁVEL continua sem mecanismo; a hipótese members/<pessoa> não foi materializada nem dogfoodada"
+    label: "SEGUE ABERTO — o 4º nível: a camada pessoa resolve pelo .claude do home do usuário (fora do git), então pessoa-dentro-do-time VERSIONÁVEL/COMPARTILHÁVEL continua sem mecanismo; a hipótese members/<pessoa> não foi materializada nem dogfoodada"
+    narrative: "label anterior: SEGUE ABERTO — o 4º nível: a camada pessoa ⟨resolve pelo .claude do home do usuário (fora do git)⟩, então pessoa-dentro-do-time VERSIONÁVEL/COMPARTILHÁVEL continua sem mecanismo; a hipótese members/<pessoa> não foi materializada nem dogfoodada"
   - id: SY4_open_dogfood_regulated_member_escopo
     node_type: question
     layer: audit

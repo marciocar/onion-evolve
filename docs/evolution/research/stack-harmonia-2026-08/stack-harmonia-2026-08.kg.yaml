@@ -278,8 +278,8 @@ nodes:
     confidence: 1.0
     verified_at: 2026-08-08
     verified_against: rev-list-nos-dois-sentidos-no-checkout-de-producao-mais-status-porcelain-limpo
-    label: "REFUTA C_producao_nao_e_o_repo. O checkout de producao do bridge (/home/onion/onion-bridge, o WorkingDirectory do onion-vps-bridge.service) esta em `a1b6c87`, que e EXATAMENTE `origin/main` do proprio bridge: zero commits a frente, zero atras, arvore limpa. O commit que curou a deriva esta la e nomeia o que era: 'versiona o medidor de consumo de IA (existia so em producao)'. A deriva de 4 dias que o no registrava foi PAGA — e a consequencia epistemica que ele declarava (toda conclusao sobre o bridge tirada do main pode estar errada) deixa de valer."
-    narrative: "trace anterior (só no host): o clone de produção do onion-bridge na conta de serviço (host). O claim deste nó É o clone de produção, por isso não aponta o remoto."
+    label: "REFUTA C_producao_nao_e_o_repo: o checkout de produção do bridge (o WorkingDirectory do onion-vps-bridge.service) está em a1b6c87, exatamente o origin/main, árvore limpa. A deriva de 4 dias foi paga e a ressalva sobre conclusões tiradas do main deixa de valer."
+    narrative: "trace anterior (só no host): o clone de produção do onion-bridge na conta de serviço (host). O claim deste nó É o clone de produção, por isso não aponta o remoto. · label anterior: REFUTA C_producao_nao_e_o_repo. O checkout de producao do bridge ⟨(o clone na conta de serviço, o WorkingDirectory⟩ do onion-vps-bridge.service) esta em `a1b6c87`, que e EXATAMENTE `origin/main` do proprio bridge: zero commits a frente, zero atras, arvore limpa. O commit que curou a deriva esta la e nomeia o que era: 'versiona o medidor de consumo de IA (existia so em producao)'. A deriva de 4 dias que o no registrava foi PAGA — e a consequencia epistemica que ele declarava (toda conclusao sobre o bridge tirada do main pode estar errada) deixa de valer."
     provenance:
       source: "checkout de produção do onion-bridge (git rev-list/status no host)"
       locator: "rev-list-nos-dois-sentidos-no-checkout-de-producao-mais-status-porcelain-limpo"
