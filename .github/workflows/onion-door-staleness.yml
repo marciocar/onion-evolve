@@ -28,6 +28,10 @@ on:
       - 'docs/knowledge-base/**'
       - 'docs/sdaal/**'
       - 'docs/evolution/federation/members.yaml'
+      # e quando muda o próprio instrumento (achado da passada adversarial da F3)
+      - 'ops/publish-door.sh'
+      - 'ops/materialize-door.sh'
+      - '.github/workflows/onion-door-staleness.yml'
   workflow_dispatch:
 
 permissions:

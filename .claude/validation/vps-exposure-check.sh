@@ -89,7 +89,7 @@ done
 # ⚠️ O ESCOPO JA FOI ESTREITO DEMAIS UMA VEZ. A 1a versao olhava so `<home do operador>/onion-vps-*/backups`
 #    e a passada adversarial contra ela achou DOIS diretorios de fora: `<home do operador>/backups/bridge`
 #    (17 arquivos sem cifra, incluindo os `bridge-diario-*.tar.gz` que carregam o `.env` do bridge —
-#    ANTHROPIC_API_KEY e tokens de convite — e um deles em 644) e `/home/onion/.claude/backups`.
+#    ANTHROPIC_API_KEY e tokens de convite — e um deles em 644) e `<home da conta do bridge>/.claude/backups`.
 #    Guarda com escopo menor que a classe e verde-vazia onde nao olha.
 #    O escopo agora e DECLARADO E EXPLICITO, um caminho por linha: acrescentar diretorio de backup
 #    novo exige acrescentar aqui, e essa friccao e o ponto — o alternativo (varrer o disco atras de
@@ -104,7 +104,10 @@ done
 _op_home="$(getent passwd "$(stat -c %U "${BASH_SOURCE[0]}" 2>/dev/null)" 2>/dev/null | cut -d: -f6)"
 [ -n "${_op_home}" ] || [ -n "${BACKUP_DIRS_OVERRIDE:-}" ] \
   || echo "  ⚠️ home do operador não resolvida (dono de ${BASH_SOURCE[0]}) — backups dele NÃO varridos" >&2
-for _bdir in ${BACKUP_DIRS_OVERRIDE:-${_op_home:+${_op_home}/onion-vps-*/backups ${_op_home}/backups/*} /home/onion/.claude/backups}; do
+# A conta de serviço do bridge também sai do passwd (a passada adversarial da F3 achou a home dela
+# literal aqui, e ela é conta REAL da máquina — o mesmo vazamento da home do operador).
+_svc_home="$(getent passwd onion 2>/dev/null | cut -d: -f6)"
+for _bdir in ${BACKUP_DIRS_OVERRIDE:-${_op_home:+${_op_home}/onion-vps-*/backups ${_op_home}/backups/*} ${_svc_home:+${_svc_home}/.claude/backups}}; do
   [ -d "${_bdir}" ] || continue
   # `find` (nao glob) porque o glob expande no shell do chamador e devolve vazio sem acesso —
   # e vazio lido como ausencia e exatamente o fail-open que este arquivo existe para impedir.

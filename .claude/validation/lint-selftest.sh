@@ -8739,7 +8739,7 @@ run_empty_result_guard_selftests() {
   [ "${_b4_fail}" -eq 0 ] && record_pass "empty-result-guard: (b4c) os 4 fail-opens da 1a versao seguem fechados (isencao e POR INVOCACAO, nao por comando)"
 
   # (c) REAGE: glob sob sudo + erro engolido virando número (os 7 .env.bak que viraram 0)
-  out="$(_erg '"sudo -n ls -1 /home/onion/.env.bak-* 2>/dev/null | wc -l"' '"0"' || true)"
+  out="$(_erg '"sudo -n ls -1 /home/conta/.env.bak-* 2>/dev/null | wc -l"' '"0"' || true)"
   if grep -q 'GLOB-SOB-SUDO' <<< "${out}"&& grep -q 'ERRO-ENGOLIDO' <<< "${out}"; then
     record_pass "empty-result-guard: (c) glob sob sudo + erro engolido em contagem → avisa os dois"
   else record_fail "empty-result-guard: (c)" "não reagiu ao glob/erro engolido: ${out}"; fi
@@ -8827,13 +8827,13 @@ run_empty_result_guard_selftests() {
   # heredoc entrou no escaneamento). (f) prova que o ruido morreu; (g) prova que a cura NAO CEGOU a
   # guarda. Filtro anti-ruido sem o par (g) e como se silencia um alarme inteiro e passa no teste.
   local hd_quiet hd_loud
-  hd_quiet='{"tool_input":{"command":"git commit -F - <<'"'"'EOF'"'"'\nfeat: descreve os detectores\n  tail f | sed x; echo $?\n  sudo -n ls /home/onion/.env.bak-*\n  cmd 2>/dev/null | wc -l\nEOF"},"tool_response":{"stdout":"ok"}}'
+  hd_quiet='{"tool_input":{"command":"git commit -F - <<'"'"'EOF'"'"'\nfeat: descreve os detectores\n  tail f | sed x; echo $?\n  sudo -n ls /home/conta/.env.bak-*\n  cmd 2>/dev/null | wc -l\nEOF"},"tool_response":{"stdout":"ok"}}'
   out="$(printf '%s' "${hd_quiet}" | bash "${hook}" 2>&1 || true)"
   if ! grep -q 'pode MENTIR' <<< "${out}"; then
     record_pass "empty-result-guard: (f) padroes dentro de CORPO de heredoc (texto) → SILENCIOSO"
   else record_fail "empty-result-guard: (f)" "falso-positivo em prosa de heredoc: ${out}"; fi
 
-  hd_loud='{"tool_input":{"command":"sudo -n ls /home/onion/x/.env.bak-* 2>/dev/null | wc -l\ngit commit -F - <<'"'"'EOF'"'"'\ntexto inocente\nEOF"},"tool_response":{"stdout":"0"}}'
+  hd_loud='{"tool_input":{"command":"sudo -n ls /home/conta/x/.env.bak-* 2>/dev/null | wc -l\ngit commit -F - <<'"'"'EOF'"'"'\ntexto inocente\nEOF"},"tool_response":{"stdout":"0"}}'
   out="$(printf '%s' "${hd_loud}" | bash "${hook}" 2>&1 || true)"
   if grep -q 'GLOB-SOB-SUDO' <<< "${out}"&& grep -q 'ERRO-ENGOLIDO' <<< "${out}"; then
     record_pass "empty-result-guard: (g) MESMO comando, padrao FORA do heredoc → AINDA DISPARA (o filtro nao cegou)"
@@ -22216,6 +22216,10 @@ run_door_cycle_selftests() {
 #   --status lendo o pin do registro → (c) · cleanup sem remover a worktree → (g)
 #   lint da porta ignorado → (h) · --from aceito com --push → (i) · --count sempre 0 → (c3)
 #   sem a recusa da porta nunca materializada → (k) · rc 3 trocado por cair no HEAD → (f)
+#   (curas da passada adversarial) projection-safety pelo CWD → (l) · clone fora de origin/<ramo> → (m)
+#   --from com --clone aceito → (m2) · ignorado fora da limpeza → (m3) · --expect-pin ignorado → (n)
+#   registro lido do disco → (o) · --role sem --force aceito → (r) · validate ignorado → (q)
+#   provenance não conferido → (q2) · --all sem porta com rc 0 → (p)
 run_publish_selftests() {
   local sut="${REPO_ROOT}/ops/publish-door.sh"
   if [ ! -f "${sut}" ]; then record_skip "publish: ops/publish-door.sh ausente (adotante) → pulado"; return; fi
@@ -22241,23 +22245,44 @@ R="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"; DEST="$1"; shift; ROLE=hub
 while [ $# -gt 0 ]; do case "$1" in --role) ROLE="$2"; shift 2 ;; --from) FROM="$2"; shift 2 ;; *) shift ;; esac; done
 find "${DEST}" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 mkdir -p "${DEST}/.claude"
-git -C "${R}" archive --format=tar "${FROM}" -- payload | tar -x -C "${DEST}" --strip-components=1
+git -C "${R}" archive --format=tar "${FROM}" -- payload | tar -x -C "${DEST}" --strip-components=1 || exit 3
 printf 'framework: %s\nsource_commit: %s\nrole: %s\nkind: door\n' "$(basename "${DEST}")" \
   "$(git -C "${R}" rev-parse --short=12 "${FROM}")" "${ROLE}" > "${DEST}/.claude/.onion-version"
 exit 0
 STUB
+  # o materializador de MARKETPLACE esboçado: SRC = o toplevel do próprio script (a worktree), como o
+  # real; escreve um plugin com provenance.json cujo `ref` é o HEAD dessa worktree
+  mkdir -p "${core}/.claude/utils/marketplace"
+  cat > "${core}/.claude/utils/marketplace/materialize-marketplace-repo.sh" <<'STUB'
+#!/usr/bin/env bash
+set -uo pipefail
+SRC="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"; T="$1"
+mkdir -p "${T}/plugins/onion/.claude-plugin" "${T}/.claude-plugin"
+printf '{"ref": "%s"}\n' "$(git -C "${SRC}" rev-parse HEAD)" > "${T}/plugins/onion/.claude-plugin/provenance.json"
+printf '{"name":"x","plugins":[]}\n' > "${T}/.claude-plugin/marketplace.json"
+exit 0
+STUB
+  # o registrador de nomes comerciais REAL (a REGRA 36 o usa), para a família de termos não ser vazia
+  cp "${REPO_ROOT}/.claude/validation/projection-safety.sh" "${core}/.claude/validation/"
   printf '#!/usr/bin/env bash\necho "  Violações HARD : %s"\n' 0 > "${core}/payload/.claude/validation/lint-artifacts.sh"
   printf 'conteudo publico\n' > "${core}/payload/README.md"
-  _pub_members() {  # $1 = papel da porta no registro ; $2 = pin-cache
+  local plugup="${d}/porta-p.git"
+  git init -q --bare -b main "${plugup}" >/dev/null 2>&1 || true
+  _cp() {  # commita e empurra o core falso: o motor lê o registro e o conteúdo de origin/main
+    git -C "${core}" add -A >/dev/null 2>&1 || true
+    git -C "${core}" "${G[@]}" commit -qm "$1" >/dev/null 2>&1 || true
+    git -C "${core}" push -q origin main >/dev/null 2>&1 || true
+  }
+  _pub_members() {  # $1 = papel da porta no registro ; $2 = pin-cache ; registro COMMITADO e empurrado
     { printf 'members:\n'
       printf '  - id: onion-fulano\n    kind: adopter\n    role: standalone\n    local_path: "/home/fulano/onion-fulano"\n    onion_version: aaaaaaaaaaaa\n'
+      printf '  - id: acmecorp\n    name: "acmecorp (Megacliente — CONFIDENCIAL)"\n    kind: adopter\n    role: standalone\n    onion_version: bbbbbbbbbbbb\n'
       printf '  - id: porta-a\n    kind: door\n    role: %s\n    remote: %s\n    onion_version: %s\n' "$1" "${doorup}" "$2"
+      printf '  - id: porta-p\n    kind: door\n    role: plugins\n    remote: %s\n    onion_version: cccccccccccc\n' "${plugup}"
     } > "${core}/docs/evolution/federation/members.yaml"
+    _cp "registro $1"
   }
   _pub_members standalone n0
-  git -C "${core}" add -A >/dev/null 2>&1 || true
-  git -C "${core}" "${G[@]}" commit -qm base >/dev/null 2>&1 || true
-  git -C "${core}" push -q origin main >/dev/null 2>&1 || true
   local OLDPIN; OLDPIN="$(git -C "${core}" rev-parse --short=12 HEAD)"
   # a porta publicada: carimbada no pin antigo, papel standalone
   local seed="${d}/seed"
@@ -22267,6 +22292,14 @@ STUB
   git -C "${seed}" add -A >/dev/null 2>&1 || true
   git -C "${seed}" "${G[@]}" commit -qm porta >/dev/null 2>&1 || true
   git -C "${seed}" push -q origin HEAD:main >/dev/null 2>&1 || true
+  # a porta de marketplace publicada: provenance.json no pin antigo
+  local pseed="${d}/pseed"
+  git clone -q "${plugup}" "${pseed}" >/dev/null 2>&1 || true
+  mkdir -p "${pseed}/plugins/onion/.claude-plugin"
+  printf '{"ref": "%s"}\n' "$(git -C "${core}" rev-parse HEAD)" > "${pseed}/plugins/onion/.claude-plugin/provenance.json"
+  git -C "${pseed}" add -A >/dev/null 2>&1 || true
+  git -C "${pseed}" "${G[@]}" commit -qm plugins >/dev/null 2>&1 || true
+  git -C "${pseed}" push -q origin HEAD:main >/dev/null 2>&1 || true
   # main do core ANDA (algo que viaja) → a porta fica 1 atrás
   printf '# agente b\n' > "${core}/.claude/agents/b.md"
   git -C "${core}" add -A >/dev/null 2>&1 || true
@@ -22311,9 +22344,9 @@ STUB
   else record_fail "publish: (c) status não leu o remoto" "rc=${_r} out=${_o:0:300}"; fi
 
   # (c2) --status com o remoto ilegível declara NÃO-MEDIDO e sai 3 (zero medido não é "em dia")
-  local _sv="${doorup}"; mv "${doorup}" "${d}/sumiu.git"
+  mv "${doorup}" "${d}/sumiu.git"; mv "${plugup}" "${d}/sumiu-p.git"
   _pub --status
-  mv "${d}/sumiu.git" "${_sv}"
+  mv "${d}/sumiu.git" "${doorup}"; mv "${d}/sumiu-p.git" "${plugup}"
   if [ "${_r}" -eq 3 ] && grep -q 'NÃO-MEDIDO' <<< "${_o}"; then
     record_pass "publish: (c2) remoto ilegível ⇒ NÃO-MEDIDO e rc 3, nunca 'em dia'"
   else record_fail "publish: (c2)" "rc=${_r} out=${_o:0:250}"; fi
@@ -22399,6 +22432,85 @@ STUB
      && [ "$(git -C "${cl}" show HEAD:.claude/.onion-version 2>/dev/null | sed -n 's/^source_commit: //p')" = "$(git -C "${core}" rev-parse --short=12 origin/main)" ]; then
     record_pass "publish: (j) a fonte é origin/main — commit só no HEAD local não viaja"
   else record_fail "publish: (j) a porta saiu do HEAD local" "rc=${_r} out=${_o:0:300}"; fi
+  git -C "${core}" reset -q --hard origin/main >/dev/null 2>&1 || true
+
+  # (m) --clone com commit LOCAL à frente do remoto (o ensaio de (j) deixou um) ⇒ recusa: o push
+  #     levaria junto um commit que esta rodada não verificou
+  local tip3; tip3="$(_door_tip)"
+  _pub porta-a --clone "${cl}" --push
+  if [ "${_r}" -eq 2 ] && grep -q 'não está em origin/main' <<< "${_o}" && [ "$(_door_tip)" = "${tip3}" ]; then
+    record_pass "publish: (m) clone à frente do remoto ⇒ recusa (commit não verificado não vai a público)"
+  else record_fail "publish: (m) empurraria commit não verificado" "rc=${_r} out=${_o:0:300}"; fi
+  git -C "${cl}" reset -q --hard origin/main >/dev/null 2>&1 || true
+  # (m2) --from com --clone ⇒ recusa (commit de branch não mergeada não fica no clone de ninguém)
+  _pub porta-a --from HEAD --clone "${cl}"
+  if [ "${_r}" -eq 2 ] && grep -q -- '--from com --clone' <<< "${_o}"; then
+    record_pass "publish: (m2) --from com --clone ⇒ recusa"
+  else record_fail "publish: (m2)" "rc=${_r} out=${_o:0:250}"; fi
+  # (m3) clone com arquivo IGNORADO (um .env) ⇒ recusa e o arquivo continua lá
+  printf 'TOKEN=x\n' > "${cl}/.env"; printf '.env\n' >> "${cl}/.git/info/exclude"
+  _pub porta-a --clone "${cl}"
+  if [ "${_r}" -eq 2 ] && [ -f "${cl}/.env" ]; then
+    record_pass "publish: (m3) clone com arquivo ignorado ⇒ recusa e o .env sobrevive"
+  else record_fail "publish: (m3) a materialização apagaria o ignorado" "rc=${_r} env=$([ -f "${cl}/.env" ] && echo ok || echo APAGADO) out=${_o:0:200}"; fi
+  rm -f "${cl}/.env"
+
+  # (l) NOME COMERCIAL (marcado CONFIDENCIAL no registro) plantado, motor chamado de um CWD ESTRANHO
+  #     ao core ⇒ barra. A 1ª versão pedia os termos ao projection-safety sem o registro, e ele os
+  #     procurava pelo CWD: de fora do core, vazio com rc 0 — varredura limpa sem ter procurado.
+  printf 'case do Megacliente\n' > "${core}/payload/nota.md"; _cp nome-comercial
+  if _o="$(cd "${d}" && GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t \
+            bash "${core}/ops/publish-door.sh" porta-a 2>&1)"; then _r=0; else _r=$?; fi
+  if [ "${_r}" -eq 1 ] && grep -q 'VAZAMENTO' <<< "${_o}"; then
+    record_pass "publish: (l) nome comercial CONFIDENCIAL ⇒ barra mesmo com o motor chamado de fora do core"
+  else record_fail "publish: (l) nome comercial passou" "rc=${_r} out=${_o:0:300}"; fi
+  printf 'exemplo: /home/conta/x\n' > "${core}/payload/nota.md"; _cp limpa
+
+  # (n) --expect-pin que não é o de origin/main (a main andou desde o ensaio) ⇒ recusa
+  _pub porta-a --push --expect-pin "${OLDPIN}"
+  if [ "${_r}" -eq 2 ] && grep -q 'pin confirmado' <<< "${_o}"; then
+    record_pass "publish: (n) --expect-pin divergente ⇒ recusa (o pin publicado é o pin confirmado)"
+  else record_fail "publish: (n)" "rc=${_r} out=${_o:0:250}"; fi
+
+  # (o) o REGISTRO vem de origin/main: um remote: editado e NÃO commitado não desvia o destino
+  sed -i "s#remote: ${doorup}#remote: ${d}/outro-destino.git#" "${core}/docs/evolution/federation/members.yaml"
+  _pub porta-a
+  if [ "${_r}" -eq 0 ] && grep -qF "destino ${doorup}@main" <<< "${_o}"; then
+    record_pass "publish: (o) edição não commitada do registro não desvia o destino (vale o de origin/main)"
+  else record_fail "publish: (o) o destino veio da árvore de trabalho" "rc=${_r} out=${_o:0:300}"; fi
+  git -C "${core}" checkout -q -- docs/evolution/federation/members.yaml >/dev/null 2>&1 || true
+
+  # (r) --role diferente do carimbo, sem --force-role-change ⇒ recusa (o caminho do dano de 2026-09-30)
+  _pub porta-a --role hub
+  if [ "${_r}" -eq 2 ] && grep -q -- '--force-role-change' <<< "${_o}"; then
+    record_pass "publish: (r) --role sem --force-role-change ⇒ recusa"
+  else record_fail "publish: (r)" "rc=${_r} out=${_o:0:250}"; fi
+
+  # (q) porta de MARKETPLACE: provenance no pin de origin/main e validate --strict. Com o validate
+  #     reprovando ⇒ recusa e o remoto não anda; com ele aprovando ⇒ o ensaio passa.
+  local fk="${d}/fakebin"; mkdir -p "${fk}"
+  printf '#!/usr/bin/env bash\nexit 1\n' > "${fk}/claude"; chmod +x "${fk}/claude"
+  local ptip; ptip="$(git ls-remote "${plugup}" refs/heads/main 2>/dev/null | awk '{print $1}')"
+  PATH="${fk}:${PATH}" _pub porta-p --push
+  if [ "${_r}" -eq 1 ] && grep -q 'validate --strict reprovou' <<< "${_o}" \
+     && [ "$(git ls-remote "${plugup}" refs/heads/main 2>/dev/null | awk '{print $1}')" = "${ptip}" ]; then
+    record_pass "publish: (q) plugins com validate --strict reprovando ⇒ recusa e o remoto não anda"
+  else record_fail "publish: (q) plugin inválido publicado" "rc=${_r} out=${_o:0:300}"; fi
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${fk}/claude"
+  PATH="${fk}:${PATH}" _pub porta-p
+  if [ "${_r}" -eq 0 ] && grep -q 'todo provenance.json aponta' <<< "${_o}"; then
+    record_pass "publish: (q2) plugins: provenance no pin de origin/main e validate ok ⇒ ensaio passa"
+  else record_fail "publish: (q2)" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (p) --status e --all SEM porta no registro ⇒ rc 3 (sem objeto não é 'tudo em dia')
+  local nodoor="${d}/nodoor.yaml"
+  printf 'members:\n  - id: onion-fulano\n    kind: adopter\n    onion_version: aaaaaaaaaaaa\n' > "${nodoor}"
+  _pub --status --members "${nodoor}"
+  local _rs="${_r}"
+  _pub --all --members "${nodoor}"
+  if [ "${_rs}" -eq 3 ] && [ "${_r}" -eq 3 ]; then
+    record_pass "publish: (p) --status e --all sem porta no registro ⇒ rc 3"
+  else record_fail "publish: (p)" "status rc=${_rs} all rc=${_r} out=${_o:0:200}"; fi
 
   # (k) porta NUNCA materializada (pin n/a) cujo repo guarda OUTRO conteúdo (o onion-mini é a
   #     destilação curada, sem .claude/) ⇒ recusa com a fase nomeada, e o repo dela fica intacto.
@@ -22413,6 +22525,7 @@ STUB
   local mtip; mtip="$(git ls-remote "${mup}" refs/heads/main 2>/dev/null | awk '{print $1}')"
   printf '  - id: porta-m\n    kind: door\n    role: mini\n    remote: %s\n    onion_version: n/a\n' "${mup}" \
     >> "${core}/docs/evolution/federation/members.yaml"
+  _cp porta-m
   _pub porta-m
   if [ "${_r}" -eq 2 ] && grep -q 'F5' <<< "${_o}" \
      && [ "$(git ls-remote "${mup}" refs/heads/main 2>/dev/null | awk '{print $1}')" = "${mtip}" ]; then
@@ -22430,7 +22543,7 @@ STUB
     record_pass "publish: (f) origin/main irresolúvel ⇒ aborta rc 3 (não publica do HEAD local)"
   else record_fail "publish: (f)" "rc=${_r} out=${_o:0:250}"; fi
 
-  unset -f _pub _pub_members _door_tip _door_pin _snap
+  unset -f _pub _pub_members _door_tip _door_pin _snap _cp
   rm -rf "${d}"
 }
 
@@ -26273,7 +26386,7 @@ run_door_staleness_severity_selftests() {
   # (e) o workflow pos-merge e RELATORIO: le o REMOTO e nunca devolve o rc da defasagem (main verde)
   local wf="${REPO_ROOT}/.github/workflows/onion-door-staleness.yml"
   if [ -f "${wf}" ] && grep -q 'branches: \[main\]' "${wf}" && grep -qE 'publish-door\.sh --status' "${wf}" \
-     && ! grep -qE '^[[:space:]]*exit "?\$\{?rc\}?"?' "${wf}"; then
+     && ! grep -vE '^[[:space:]]*#' "${wf}" | grep -qwE 'exit'; then
     record_pass "porta-severidade: (e) o workflow pos-merge le o remoto e nao falha a main"
   else record_fail "porta-severidade: (e)" "o workflow nao existe, nao le o remoto, ou ainda devolve o rc da defasagem (main vermelha)"; fi
 
