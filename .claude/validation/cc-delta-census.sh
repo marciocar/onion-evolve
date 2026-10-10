@@ -23,9 +23,11 @@
 # ── O esqueleto não sela nada ─────────────────────────────────────────────────────────────
 # Ele nasce com 2 nós (a evidência do delta, com provenance, e a pergunta aberta da rodada) e SEM a
 # chave de Aufhebung: a REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung),
-# com catraca) acusa a ausência até a rodada decidir entre `x_supersedes_external` e
-# `x_supersedes_none`. Chave com prefixo `x_` porque o contrato v3 do `.kg.yaml` só reconhece
-# extensão assim (medido em 2026-10-08: a forma sem prefixo reprovava toda rodada nova no gate).
+# com catraca) acusa a ausência até a rodada decidir entre `external_edges` com SUPERSEDES (a
+# rodada derrubou nó da anterior; contrato v4.3, 2026-10-10, SAC-98, e o gate confere que o alvo existe)
+# e `meta.x_supersedes_none: <razão>` (não derrubou nada). O esqueleto traz as duas formas COMENTADAS,
+# com o grafo da rodada anterior já preenchido: descomentar sem nomear o nó é alvo inventado, e o gate
+# reprova (integrity.dangling-external). A chave velha `x_supersedes_external` não conta mais na REGRA 89.
 #
 # Uso:  bash .claude/validation/cc-delta-census.sh [<repo>] [--markdown|--tsv] [--write <dir>]
 # Env (bancada e sandbox; NUNCA para fingir medição):
@@ -213,7 +215,7 @@ if write:
         kg = f'''# kg-backlog-guard: on
 # Radar E3 (ecossistema Claude Code): o delta de {delta[0]} a {delta[-1]} contra a baseline {base}.
 # ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
-# no vivo), o juiz refuta, e a rodada decide a Aufhebung: x_supersedes_external ou x_supersedes_none.
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
 meta:
   id: {rid}
   schema_version: "1"
@@ -221,6 +223,12 @@ meta:
   review_after: "{review}"   # 30d: cadência de ferramenta
   # ═══ TETO: 25 NÓS ═══
   #   2 no esqueleto ({today}).
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
+# external_edges:
+#   - to: "{prev_kg or '<grafo da rodada anterior>'}#<NO_DERRUBADO>"
+#     edge_type: SUPERSEDES
+#   (b) não derrubou nada → no meta: x_supersedes_none: "<a razão medida>"
 nodes:
   - id: E_DELTA_DA_RODADA
     node_type: evidence

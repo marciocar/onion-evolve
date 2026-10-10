@@ -70,11 +70,12 @@ ele **não** diz que um item toca o Onion.
    `effort: high`) com mandato **REFUTAR**: conferir cada citação byte a byte contra o CHANGELOG
    oficial (URL no nó `E_DELTA_DA_RODADA`), medir cada ligação no vivo, julgar cada nó em
    SUSTENTA · EXAGERA · REPROVA e **listar o que a rodada deixou de ver**. Ele julga também a
-   superação: `x_supersedes_external` (nomeando o grafo superado) ou `x_supersedes_none` (com razão).
+   superação: `external_edges` SUPERSEDES (nomeando o nó superado) ou `x_supersedes_none` (com razão).
 5. **APLICAR.** Reprovado → corrigido ou rebaixado (impacto 1); exagerado → reescrito; omissão de
-   impacto alto → nó novo. Grave a decisão de superação em `meta` com o prefixo `x_` — a forma sem
-   prefixo reprova no contrato v3 (cláusula 4) e a REGRA 89 (Rodada de radar selada reconcilia o
-   corpus que superou (Aufhebung), com catraca) acusa a ausência. Re-rode radar exit 0 e
+   impacto alto → nó novo. Grave a decisão de superação: `external_edges` SUPERSEDES no topo (contrato
+   v4.3; o gate confere o alvo) ou `meta.x_supersedes_none` com o prefixo `x_` — a forma sem prefixo
+   reprova no contrato (cláusula 4) e a REGRA 89 (Rodada de radar selada reconcilia o corpus que
+   superou (Aufhebung), com catraca) acusa a ausência. Re-rode radar exit 0 e
    kg-contract-check rc 0.
 6. **SYNTHESIS.** `SYNTHESIS.md` ao lado do grafo, com o **contrato de custo** no frontmatter
    (`run_id` · `tokens` · `agents` · `duration_min`; sem run de Workflow, declare a ausência no

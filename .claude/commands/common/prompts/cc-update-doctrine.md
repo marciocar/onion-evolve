@@ -43,9 +43,10 @@ modelo diante do Haiku 5.5 (a guarda é allowlist sem haiku). Sem medição, o d
 ### 4. A Aufhebung é decidida pela rodada, na forma de extensão do contrato
 O esqueleto nasce **sem** a chave de superação, e a REGRA 89 (Rodada de radar selada reconcilia o
 corpus que superou (Aufhebung), com catraca) acusa até a rodada decidir. As formas aceitas são
-`meta.x_supersedes_external` (a rodada supera grafo anterior, nomeado) ou `meta.x_supersedes_none`
-(com a razão). A forma sem prefixo é chave desconhecida para o contrato v3 do `.kg.yaml` e reprova no
-gate do CI — medido na própria r8. Rodada que só **acrescenta** versões à anterior normalmente é
+`external_edges` com um item `{to: <grafo anterior>#<nó>, edge_type: SUPERSEDES}` por nó derrubado
+(contrato v4.3, 2026-10-10, SAC-98; o gate confere que o alvo existe) ou `meta.x_supersedes_none`
+(com a razão). O esqueleto traz as duas comentadas, com o grafo anterior preenchido. A chave velha
+`x_supersedes_external` não conta mais. Rodada que só **acrescenta** versões à anterior normalmente é
 `x_supersedes_none`: o juiz da r8 reprovou um `supersedes` sobre a r7 por isso.
 
 ### 5. Ação proposta não se implementa aqui
