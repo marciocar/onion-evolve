@@ -151,6 +151,16 @@ BEGIN { section = ""; nid = ""; ne = 0; nn = 0 }
 /^nodes:/ { section = "nodes"; next }
 /^edges:/ { section = "edges"; nid = ""; next }
 /^meta:/  { section = "meta"; next }
+# external_edges (contrato v4.3, SAC-98): a ponta LOCAL conta no grau, em paridade com o kg-radar.sh — sem
+# isto o motor e a lente discordam do grau dos nós ligados a outro grafo, logo da atenção (REGRA 31(b)).
+/^external_edges:/ { section = "external"; nid = ""; next }
+section == "external" && /^[[:space:]]+-[[:space:]]/ { nx++ }
+section == "external" && /^[[:space:]]+(-[[:space:]]+)?(from|to):/ {
+  v = $0; sub(/^[[:space:]]+(-[[:space:]]+)?(from|to):/, "", v); v = trim(v)
+  if (v !~ /#/) xlocal[nx] = v
+  next
+}
+section == "external" { next }
 
 section == "meta" && /^[[:space:]]*id:/ { v=$0; sub(/^[[:space:]]*id:/,"",v); gid=trim(v); next }
 
@@ -189,6 +199,7 @@ END {
   # grafo tem ZERO `on:`. Ao estender a paridade aos 58, apareceu na hora, e a correlação foi
   # perfeita: os 5 que reprovaram são EXATAMENTE os 5 que usam `on:`; os 53 sem `on:` passaram.
   for (i = 1; i <= ne; i++) { deg[efrom[i]]++; deg[eto[i]]++; if (eon[i] != "") deg[eon[i]]++ }
+  for (i = 1; i <= nx; i++) if (xlocal[i] != "") deg[xlocal[i]]++   # ponta local da aresta externa (v4.3)
   for (i = 1; i <= nn; i++) {
     id = order[i]; sf = statusFactor(nstatus[id]); if (sf < 0) sf = 0
     att[id] = impact[id] * conf[id] * sf * (1 + deg[id])

@@ -3920,6 +3920,21 @@ run_kg_radar_contract_selftests() {
         record_pass "kg-radar-contract: (m) (MUT) sem a seção external_edges, o caso (k) perde a ponta local — o teste morde"
       else record_fail "kg-radar-contract: (m) (MUT)" "o mutante ainda acusa; out=$(head -c 300 <<< "${out}")"; fi
     else record_fail "kg-radar-contract: (m) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+    # (n) a LENTE (kg-view.sh) conta a ponta local no grau como o motor: --assert-parity rc 0 no caso (j). Medido
+    #     no 1º pr-finalize desta cura: só o motor contava, e a REGRA 31 (paridade) reprovou 4 grafos migrados.
+    #     (MUT) a lente sem a soma da ponta local → a paridade quebra.
+    local view="${SCRIPT_DIR}/kg-view.sh"
+    rc=0; out=$(LC_ALL=C bash "${view}" "${xl}/valid-external-only-link.kg.yaml" --assert-parity 2>&1) || rc=$?
+    cp "${view}" "${mut}/mut-xv.sh"; cp -r "${SCRIPT_DIR}/lib" "${mut}/lib" 2>/dev/null || true
+    cp "${radar}" "${mut}/kg-radar.sh"
+    sed -i 's|if (xlocal\[i\] != "") deg\[xlocal\[i\]\]++|if (0) deg[xlocal[i]]++|' "${mut}/mut-xv.sh"
+    local rcm=0 outm=""
+    if grep -q 'if (0) deg\[xlocal' "${mut}/mut-xv.sh"; then
+      outm=$(LC_ALL=C bash "${mut}/mut-xv.sh" "${xl}/valid-external-only-link.kg.yaml" --assert-parity 2>&1) || rcm=$?
+    else rcm=-1; fi
+    if [ "${rc}" -eq 0 ] && [ "${rcm}" -ne 0 ] && [ "${rcm}" -ne -1 ]; then
+      record_pass "kg-radar-contract: (n) a lente conta a ponta local da aresta externa como o motor (paridade); o mutante quebra a paridade"
+    else record_fail "kg-radar-contract: (n)" "rc=${rc} rcm=${rcm} $(head -c 300 <<< "${out}") || MUT: $(head -c 300 <<< "${outm}")"; fi
   fi
   rm -rf "${mut}"
 }
