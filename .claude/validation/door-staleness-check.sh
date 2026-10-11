@@ -65,8 +65,9 @@ fi
 # ── EMISSÃO SEM REGISTRO: baseline VAZIO, não falha (medido em 2026-10-11) ─────────────────────
 # No `/meta:adopt --update` de um adotante (portal-gamificacao), o `regen-baselines.sh` imprimiu
 # "emissor falhou (door-staleness-check.sh) — baseline mantido COMO VEIO DO CORE": o `--emit-baseline`
-# caía na falha fechada abaixo, e o baseline do CORE (as portas do core, com os tetos do core) viajava
-# intacto para quem não tem porta nenhuma. Num repo sem `members.yaml` a regra NÃO TEM OBJETO — não é
+# caía na falha fechada abaixo, e o baseline ficava como chegou — ali era o stub do `--ensure-from`
+# (o `vendor-branch.sh` já tira o do core), mas noutro alvo seriam as portas do core com os tetos do
+# core, cobradas de quem não tem porta. Num repo sem `members.yaml` a regra NÃO TEM OBJETO — não é
 # "não sei julgar", é "não há o que julgar". Então a EMISSÃO devolve o baseline vazio (só cabeçalho)
 # com rc 0. A CHECAGEM continua falhando fechada: ali o "não sei" tem de ser dito, e quem a chama (o
 # lint) já traduz o ERRO em NAO-MEDIDO, nunca em "portas em dia".

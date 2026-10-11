@@ -12758,7 +12758,10 @@ PFSTUB
   # (w6) ref remoto no HEAD novo, API velha para sempre ⇒ para no teto dizendo que o GitHub não refletiu
   git -C "${r2}" remote set-url origin "${r2}" >/dev/null 2>&1 || true
   _mv_out="$(export GH_HEAD_STALE_FIRST=2 GH_HEAD_STALE_LAST=999; _mva "CONFLICTING MERGEABLE" ok feat/alguma-coisa; printf '%s' "${_mv_out}")"
-  if grep -q "o GitHub não refletiu o push" <<< "${_mv_out}" && [ ! -s "${d}/margs" ]; then
+  # ⚠️ o oráculo é a frase EXCLUSIVA deste ramo: "o GitHub não refletiu o push" também aparece na
+  #    mensagem do ramo "ref ilegível", e com ela o caso passava com o diagnóstico trocado (passada adversarial).
+  if grep -q "a branch remota já está em" <<< "${_mv_out}" && ! grep -q "não foi legível" <<< "${_mv_out}" \
+     && [ ! -s "${d}/margs" ]; then
     record_pass "pr-merge-verified: (w6) push chegou mas a API não reflete ⇒ para no teto nomeando a causa"
   else record_fail "pr-merge-verified: (w6) diagnóstico" "margs=[$(cat "${d}/margs")] out=${_mv_out}"; fi
   git -C "${r2}" remote remove origin >/dev/null 2>&1 || true
@@ -22480,6 +22483,15 @@ run_door_cycle_selftests() {
   if [ "${rcm}" -eq 0 ] && [ "${_keys}" -eq 0 ] && grep -q '✓ door-staleness-baseline.txt' <<< "${outm}"; then
     record_pass "door-cycle: (l) regen-baselines no adotante sem registro ⇒ baseline do core trocado pelo vazio"
   else record_fail "door-cycle: (l)" "o baseline do core viajou (rc=${rcm}, chaves=${_keys}): ${outm:0:160}"; fi
+  # (m) registro PRESENTE mas sem porta com pin ⇒ emissão rc 0 e ZERO chaves: a frase "nenhuma porta
+  #     com pin" sai como COMENTÁRIO (crua, entrava no baseline como chave sem barra, que o filtro preserva)
+  mkdir -p "${sbe}/docs/evolution/federation"
+  printf 'members:\n  - id: adotante-x\n    kind: adopter\n    onion_version: abc123\n' > "${sbe}/docs/evolution/federation/members.yaml"
+  rcm=0; outm="$(bash "${sbe}/.claude/validation/door-staleness-check.sh" "${sbe}" --emit-baseline 2>&1)" || rcm=$?
+  _keys="$(grep -cvE '^[[:space:]]*(#|$)' <<< "${outm}")" || _keys=0
+  if [ "${rcm}" -eq 0 ] && [ "${_keys}" -eq 0 ] && grep -q 'nenhuma porta com pin' <<< "${outm}"; then
+    record_pass "door-cycle: (m) registro sem porta com pin ⇒ emissão rc 0, zero chaves (a frase vira comentário)"
+  else record_fail "door-cycle: (m)" "a frase entrou como chave (rc=${rcm}, chaves=${_keys}): ${outm:0:140}"; fi
   rm -rf "${sbe}"
   rm -rf "${sbm}"
 }
