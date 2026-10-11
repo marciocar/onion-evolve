@@ -84,6 +84,12 @@ interface CreateTaskInput {
   
   /** Estimativa de tempo (minutos) */
   timeEstimate?: number;
+
+  /** Estimativa de complexidade (story points) — grandeza distinta do tempo. Capacidade estimate.points */
+  storyPoints?: number;
+
+  /** Nível do item: 'task' (default em createTask) · 'epic' (createEpic) · 'subtask' (createSubtask) */
+  level?: ItemLevel;
 }
 ```
 
@@ -123,6 +129,9 @@ interface UpdateTaskInput {
   
   /** Nova estimativa */
   timeEstimate?: number;
+
+  /** Novos story points */
+  storyPoints?: number;
 }
 ```
 
@@ -162,6 +171,40 @@ interface SearchQuery {
   
   /** Direção da ordenação */
   orderDirection?: 'asc' | 'desc';
+}
+```
+
+---
+
+## 🧩 Tipos da Onda 2 (SAC-63)
+
+Os tipos que as capacidades opcionais da [interface](./interface.md) usam. Quem não implementa a
+capacidade não precisa deles; a declaração `adapters/<provedor>.capabilities.tsv` diz quem implementa.
+
+```typescript
+/** Nível do item na hierarquia canônica. A profundidade máxima de subtask NÃO foi ancorada para nenhum provedor. */
+type ItemLevel = 'epic' | 'task' | 'subtask';
+
+/** Cursor opaco de paginação: o consumidor só o repassa. Pode EXPIRAR (Jira Cloud: 7 dias; Asana: "after some time"). */
+type PageCursor = string & { readonly __opaque: unique symbol };
+
+/** Uma página de resultados; next = null quando acabou. */
+interface Page<T> { items: T[]; next: PageCursor | null }
+
+/** Anexo a enviar. */
+interface AttachmentInput { filename: string; contentType: string; bytes: Uint8Array }
+interface AttachmentOutput { id: string; filename: string; url?: string }
+
+/** Sprint (Jira, ClickUp) ou cycle (Linear). */
+interface Iteration { id: string; name: string; startDate?: string; endDate?: string }
+
+/** Vínculo canônico. Tipo sem equivalente no provedor é ERRO do adapter, nunca aproximação silenciosa. */
+type LinkType = 'blocks' | 'blocked_by' | 'relates' | 'duplicates';
+
+/** Resultado de lote: por item, porque lote parcial existe (o adapter fatia pelo limite declarado). */
+interface BulkResult<T> {
+  succeeded: T[];
+  failed: Array<{ index: number; error: string }>;
 }
 ```
 
@@ -433,7 +476,7 @@ const STATUS_MAPPING: Partial<Record<TaskManagerProvider, Record<TaskStatus, str
 
 ---
 
-**Versão**: 1.1.0
+**Versão**: 1.2.0
 **Criado em**: 2025-11-24
-**Atualizado em**: 2026-06-13
+**Atualizado em**: 2026-10-11 (Onda 2: `storyPoints`, `level` e os tipos das capacidades opcionais)
 

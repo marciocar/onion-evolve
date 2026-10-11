@@ -1,0 +1,30 @@
+# ClickUp (REST v2; MCP opcional) — Onda 2, SAC-63, 2026-10-11.
+# Declaração de capacidades do adapter — formato e semântica em ../interface.md §Capacidades.
+# Cobrada pela REGRA 103 do lint. Fonte kg: = evidência ancorada (grafo de pesquisa do core);
+# adapter: = medição datada registrada no próprio adapter; local = sem chamada ao provedor.
+# unverified = o adapter tem a superfície, mas ninguém ancorou nem mediu o comportamento. Não invente: meça.
+capability	requirement	status	api_version	source	note
+item.create	required	implemented	v2	adapter:clickup.md§confirmado: `due_date`/`time_estimate` em ms com a flag;kg:task-manager-vocabulario-2026-10#E_CLICKUP_MARKDOWN_CONTENT_OVER_DESCRIPTION	medição ao vivo de 2026-10-02 (datas em ms com a flag) e markdown_content ancorado
+item.read	required	implemented	v2	adapter:clickup.md§devolveu 42 subtasks	include_subtasks=true, medido em 2026-10-02
+item.update	required	implemented	v2	adapter:clickup.md§TAGS NÃO VÃO NO BODY DO PUT	medido em 2026-10-02; tags NÃO são aplicadas pelo update
+item.delete	optional	unverified	v2	-	a medição de 2026-10-02 apagou tasks, mas não registra que foi pelo deleteTask do adapter
+hierarchy.subtask_create	required	implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_SUBTASK_VIA_PARENT_NESTABLE	parent na mesma List; níveis máximos não ancorados
+hierarchy.subtask_list	required	implemented	v2	adapter:clickup.md§devolveu 42 subtasks	
+hierarchy.epic	optional	not_implemented	v2	-	hierarquia Space/Folder/List não ancorada
+status.transition	required	implemented	v2	adapter:clickup.md§Status são propriedade da LIST	status por List, casados por sinônimo; sem equivalente o campo é omitido com aviso
+priority.set	optional	implemented	v2	adapter:clickup.md§só INTEIRO 1–4 é aceito;kg:task-manager-vocabulario-2026-10#E_CLICKUP_POINTS_NATIVE_PRIORITY_INT	inteiro 1 (urgent) a 4 (low); string devolve 400
+estimate.points	optional	not_implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_POINTS_NATIVE_PRIORITY_INT	provedor tem points nativo (pré-requisito do ClickApp Sprints não tocado); o adapter não envia
+estimate.time	optional	implemented	v2	adapter:clickup.md§confirmado: `due_date`/`time_estimate` em ms com a flag	time_estimate em milissegundos
+comment.add	required	unverified	v2	-	comment_text; o formato do comentário não foi ancorado (E_ELENXO_CLICKUP_COMMENT_FORMAT_OPEN)
+comment.list	required	unverified	v2	-	
+attachment.add	optional	not_implemented	v2	-	anexo não ancorado
+label.set	optional	unverified	v2	-	tags vão no create; no update NÃO (só POST/DELETE /task/{id}/tag/{name}, medido em 2026-10-02), e o adapter não chama esse endpoint
+iteration.assign	optional	not_implemented	v2	-	sprint não ancorada
+link.create	optional	not_implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_DEPENDENCY_ONE_DIRECTION	provedor: dependência numa direção por requisição; task links não ancorados
+search.query	required	unverified	v2	-	o adapter usa GET /team/{id}/task com search_text e page_size; a Onda 1 ancorou GET /list/{id}/task (E_CLICKUP_GET_TASKS_PAGE_100), outro endpoint
+search.paginate	optional	not_implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_GET_TASKS_PAGE_100	provedor pagina por índice (100 por página); o sinal de fim não foi ancorado
+bulk.create	optional	not_implemented	v2	-	clickup-operacao.md documenta create_bulk_tasks pelo MCP (ignora parent), fora da interface; bulk REST não ancorado
+bulk.update	optional	not_implemented	v2	-	
+project.list	required	unverified	v2	-	
+project.read	required	unverified	v2	-	
+id.validate	required	implemented	v2	local	9 caracteres alfanuméricos

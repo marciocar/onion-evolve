@@ -1,0 +1,30 @@
+# Asana (REST 1.0; MCP opcional) — Onda 2, SAC-63, 2026-10-11.
+# Declaração de capacidades do adapter — formato e semântica em ../interface.md §Capacidades.
+# Cobrada pela REGRA 103 do lint. Fonte kg: = evidência ancorada (grafo de pesquisa do core);
+# adapter: = medição datada registrada no próprio adapter; local = sem chamada ao provedor.
+# unverified = o adapter tem a superfície, mas ninguém ancorou nem mediu o comportamento. Não invente: meça.
+capability	requirement	status	api_version	source	note
+item.create	required	unverified	1.0	-	
+item.read	required	unverified	1.0	-	
+item.update	required	unverified	1.0	-	
+item.delete	optional	unverified	1.0	-	
+hierarchy.subtask_create	required	unverified	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_SUBTASK_OWN_ENDPOINT	ACHADO: a primária ancorou o endpoint próprio de subtask; o adapter usa POST /tasks com parent, caminho NÃO ancorado
+hierarchy.subtask_list	required	unverified	1.0	-	
+hierarchy.epic	optional	not_implemented	1.0	-	projects/sections não ancorados
+status.transition	required	unverified	1.0	-	completed true/false; status por section ou custom field não ancorado
+priority.set	optional	not_implemented	1.0	-	sem prioridade nativa no adapter (custom field); não ancorado
+estimate.points	optional	not_implemented	1.0	-	estimativa não ancorada
+estimate.time	optional	not_implemented	1.0	-	
+comment.add	required	implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_STORY_TEXT_OR_HTML	story com text; o markdown canônico chega como texto puro (html_text não usado)
+comment.list	required	unverified	1.0	-	
+attachment.add	optional	not_implemented	1.0	-	anexo não ancorado
+label.set	optional	not_implemented	1.0	-	o adapter só LÊ tags
+iteration.assign	optional	not_implemented	1.0	-	iteração não ancorada
+link.create	optional	not_implemented	1.0	-	dependências não ancoradas
+search.query	required	implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_SEARCH_PREMIUM_ONLY	só em conta premium; a paginação do search não foi ancorada (E_ELENXO_ASANA_SEARCH_PAGINATION_UNANCHORED)
+search.paginate	optional	not_implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_PAGINATION_LIMIT_1_100;kg:task-manager-vocabulario-2026-10#E_ASANA_OFFSET_EXPIRES	offset opaco que expira, nos endpoints de lista (não no search)
+bulk.create	optional	not_implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_BATCH_MAX_10_ACTIONS	provedor: batch genérico de 10 ações por requisição, não bulk de tasks
+bulk.update	optional	not_implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_BATCH_MAX_10_ACTIONS	idem
+project.list	required	unverified	1.0	-	
+project.read	required	unverified	1.0	-	
+id.validate	required	implemented	1.0	local	gid numérico

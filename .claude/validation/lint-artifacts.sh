@@ -5559,6 +5559,42 @@ check_veto_onfailure() {
 }
 check_veto_onfailure
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 103 — Adapter do task-manager declara todas as capacidades da interface, com fonte [HARD]
+# previne: capacidade declarada que o adapter não exerce, e célula "medida" sem fonte nenhuma.
+#   DANO MEDIDO (SAC-63, 2026-10-11, depois da Onda 1 de primárias, PR #1027): o CLAUDE.md prescrevia
+#   "Bulk-first" pelo `/issue/bulk` do Jira e nenhum adapter implementava lote (o jira.md dizia "não
+#   usado aqui"); a interface publicava o mapa de prioridade do Zoho "da UI, não medido" no mesmo
+#   formato das colunas medidas. Cada `adapters/<p>.capabilities.tsv` declara as capacidades do bloco
+#   `<!-- capabilities:begin/end -->` de interface.md (required|optional, implemented|not_implemented|
+#   unverified, api_version, fonte) e a guarda confere conjunto, enum, fonte que resolve e superfície
+#   presente/ausente no adapter. Lógica e teto em task-manager-capabilities-check.sh. Roda também no
+#   derivado (o task-manager viaja); lá a ref kg: cujo grafo não viajou não é conferida.
+check_task_manager_capabilities() {
+  local helper="${SCRIPT_DIR}/task-manager-capabilities-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then          # --only: só quando o arquivo é do task-manager (ou a própria guarda)
+    case "${ONLY_PATH}" in
+      */fixtures/*) return 0 ;;
+      */utils/task-manager/*|*/task-manager-capabilities-check.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    violation "${_sev:-HARD}" "${REPO_ROOT}/${_path#./}" "REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte): [${_code}] ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${REPO_ROOT}/.claude/validation/task-manager-capabilities-check.sh" "REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte): a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_task_manager_capabilities
+
 # ===========================================================================
 # REGRA 102 — Chave de frontmatter de agente pertence à allowlist (oficiais + as da casa) [HARD + SOFT]
 # previne: typo de chave de agente (`tool:` no lugar de `tools:`, `modle:`) que o Claude Code ignora em silêncio
