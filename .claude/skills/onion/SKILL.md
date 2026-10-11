@@ -227,7 +227,7 @@ Correto: `user-authentication`. Errado: `user_authentication`, `UserAuth`, `user
 Regra geral: `/nome` → comando/skill · `@nome` → agente · nome no texto → skill por match semântico. `#` e `$` **não** invocam.
 
 **Search Jira 2025**
-`GET /rest/api/3/search` foi removido em maio/2025. Usar `POST /rest/api/3/search/jql` com `nextPageToken`.
+`GET /rest/api/3/search` está em remoção (CHANGE-2046, "currently being removed" na referência v3). Usar `POST /rest/api/3/search/jql` com `nextPageToken`.
 
 ---
 

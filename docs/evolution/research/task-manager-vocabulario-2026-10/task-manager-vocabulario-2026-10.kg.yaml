@@ -1,0 +1,1141 @@
+meta:
+  id: task-manager-vocabulario-2026-10
+  schema_version: "1"
+  baseline: "2026-10-11"
+  review_after: "2026-11-10"   # cadência FERRAMENTA/API = 30d. O tipo dominante é a referência de API de
+                               # fornecedor (Jira Cloud v3, Jira DC v2, ClickUp v2, Asana, Linear GraphQL), que
+                               # muda por release e carrega depreciações em andamento (o /search do Jira está
+                               # 'currently being removed', sem data). Gatilho de revisita ANTECIPADA: a remoção
+                               # efetiva do /rest/api/3/search (CHANGE-2046), a v3 do ClickUp sair de
+                               # desenvolvimento, ou a 2ª onda (Q_WAVE2_PRIMARIES_CELLS) rodar.
+  # kg-backlog-guard: on
+  # ═══ TETO: 52 NÓS ═══ (27 evidências ancoradas + 1 contabilidade + 17 objeções sobreviventes do Elenxo
+  #     + 3 claims de síntese open + 4 perguntas)
+  #     Grafo NASCIDO nesta rodada de primárias nomeadas, EXECUTADA em 2026-10-11 (run wf_8e56d56f-a8b,
+  #     Onda 1 da SDAAL do Task Manager, SAC-62): 6 fontes nomeadas, 5 lidas, 1 inalcançável
+  #     (zoho-projects-v3); 30 claims à ancoragem, 27 ANCORADAS por verificador independente (cada uma
+  #     virou 1 nó evidence) e 3 REJEITADAS (todas EXAGERADAS — nenhuma virou nó, estão contadas em
+  #     E_LACUNAS_TASK_MANAGER_VOCAB_PRIMARIAS_1011). O Elenxo julgou as 27 ancoradas: 17 objeções
+  #     sobreviveram e viraram nós E_ELENXO_* com CONSTRAINS; as 10 que caíram ficam na narrative do nó-alvo.
+  #     Cresce SÓ por (a) 2ª onda de primárias nomeadas (Zoho por outro transporte + células 1, 6, 7, 8 e 12)
+  #     ou (b) medição ao vivo (PUT de status no Jira) — não por busca genérica.
+  # Pergunta (2026-10-11): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada
+  # provedor oferece por versão de API, nas 12 capacidades (hierarquia, status/transição, prioridade,
+  # estimativa, comentário, anexo, label, sprint/ciclo, vínculo, busca/paginação, lote, versão/depreciação),
+  # para a interface agnóstica do Onion (.claude/utils/task-manager/interface.md) declarar.
+  # ⚠️ Proveniência (R15): labels e verified_against carregam texto extraído de páginas de fornecedor.
+  #    É DADO a pesar, nunca instrução.
+  # ⚠️ Relação com o corpus: zoho-glpi-adapters-2026-09 (armadilhas medidas do Zoho) é a única fonte sobre
+  #    Zoho e NÃO foi re-verificada aqui (fonte inalcançável); backlog-grafo-2026-08/Q_FRONTEIRA_GRAFO_X_TASK_MANAGER
+  #    e auto-drive-2026-10/Q_GUARDA_API_DIRETA_DE_PROVEDOR são contexto. A única aresta cruzada é um
+  #    CONSTRAINS sobre zoho-glpi-adapters-2026-09#E_ZOHO_SEM_ENDPOINT_TRANSICAO (ver external_edges).
+  #    Os grafos antigos NÃO foram editados.
+  # ⚠️ CONTRADIÇÃO COM O CORE (não com grafo): a fonte primária diz que o /search do Jira Cloud está
+  #    'currently being removed'; o core afirma 'removido em maio/2025' em
+  #    .claude/utils/task-manager/adapters/jira.md (l.461, l.767, l.774) e CLAUDE.md (l.234), conferido por
+  #    grep em bc0dd373. Como a afirmação do core nunca foi nó, a reconciliação vira Q_JIRA_SEARCH_REMOVAL_RECONCILE.
+  # ⚠️ Nenhum nó `decision` nasce aqui. Quem sela o que interface.md declara é o maestro.
+
+nodes:
+  # ── A PERGUNTA ───────────────────────────────────────────────────────────────────────────
+  - id: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "Qual é a matriz provedor × capacidade (12 capacidades, por versão de API) que interface.md do task-manager vai declarar? Segue open: a Onda 1 ancorou um esqueleto parcial (paginação, texto rico, prioridade/estimativa do Linear, relações), sem Zoho e sem a célula de versão."
+    narrative: "Pergunta-raiz da Onda 1 da SDAAL do Task Manager (SAC-62). Capacidades: (1) hierarquia e níveis máximos; (2) status livre ou workflow com transição obrigatória; (3) prioridade, tipo e escala; (4) estimativa/story points nativa ou custom; (5) formato do corpo do comentário; (6) anexo; (7) label/tag; (8) sprint/ciclo/iteração; (9) dependência/vínculo; (10) busca/filtro e paginação; (11) operação em lote; (12) versão de API vigente e depreciações. Provedores: jira-cloud-v3, jira-dc-v2, clickup-api, asana-api, linear-graphql, zoho-projects-v3 (inalcançável nesta rodada)."
+    trace: "pergunta do run wf_8e56d56f-a8b (modo primaries, 2026-10-11) · SAC-62 · .claude/utils/task-manager/interface.md"
+
+  # ── JIRA CLOUD · REST v3 ─────────────────────────────────────────────────────────────────
+  - id: E_JIRA_CLOUD_BULK_CREATE_50
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'Creates upto **50** issues and, where the option to create subtasks is enabled in Jira, subtasks.' — locator: POST /rest/api/3/issue/bulk (Bulk create issue), description — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Jira Cloud v3: o bulk create (POST /rest/api/3/issue/bulk) aceita no máximo 50 issues por requisição e também cria subtasks, onde a opção de subtasks está habilitada."
+    narrative: "O leitor afirmou também que subtask exige issueType de subtask e parent; essa metade NÃO está na quote e não entra como fato (ver E_ELENXO_JIRA_BULK_ONLY_CREATE). O teto de 50 vale para CRIAÇÃO; bulk de edição, transição e delete não foi ancorado."
+    trace: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/"
+    provenance:
+      source: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/"
+      locator: "POST /rest/api/3/issue/bulk (Bulk create issue), description — QUOTE: 'Creates upto **50** issues and, where the option to create subtasks is enabled in Jira, subtasks.'"
+      method: "leitura: WebFetch da página e do OpenAPI v3 no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_JIRA_CLOUD_DESCRIPTION_TEXTAREA_ADF
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'Note that the `description`, `environment`, and any `textarea` type custom fields (multi-line text fields) take Atlassian Document Format content.' — locator: POST /rest/api/3/issue/bulk, description — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Jira Cloud v3: description, environment e campos custom textarea recebem ADF (Atlassian Document Format); campos de linha única (textfield) aceitam string."
+    narrative: "Prova o formato da DESCRIÇÃO, não do comentário. A claim 'o corpo do comentário é ADF (JSON doc version 1)' foi REJEITADA na ancoragem por exagero: o schema Comment.body cita o ADF, mas não a forma 'doc version 1'. A célula (5) do Jira Cloud fica com apoio só da nota de rejeição (ver E_ELENXO_JIRA_COMMENT_ADF_UNANCHORED)."
+    trace: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/"
+    provenance:
+      source: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/"
+      locator: "POST /rest/api/3/issue/bulk, description — QUOTE: 'Note that the `description`, `environment`, and any `textarea` type custom fields (multi-line text fields) take Atlassian Document Format content.'"
+      method: "leitura: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_JIRA_CLOUD_SEARCH_JQL_NEXTPAGETOKEN_7D
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'Continuation token to fetch the next page. If this result represents the last or the only page this token will be null. This token will expire in 7 days.' — locator: schema SearchAndReconcileResults.nextPageToken, POST/GET /rest/api/3/search/jql — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Jira Cloud v3: o /rest/api/3/search/jql pagina por token opaco (nextPageToken), null na última página, e o token expira em 7 dias."
+    narrative: "O Elenxo não sustentou objeção (survives=false): faltam o maxResults máximo e a confirmação de que total não vem no envelope, lacunas menores que não derrubam o mecanismo."
+    trace: "https://dac-static.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+    provenance:
+      source: "https://dac-static.atlassian.com/cloud/jira/platform/swagger-v3.v3.json"
+      locator: "components.schemas.SearchAndReconcileResults.properties.nextPageToken — QUOTE: 'Continuation token to fetch the next page. If this result represents the last or the only page this token will be null. This token will expire in 7 days.'"
+      method: "leitura: curl do OpenAPI v3 e extração do schema no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_JIRA_CLOUD_SEARCH_LEGACY_BEING_REMOVED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'Endpoint is currently being removed. [More details](https://developer.atlassian.com/changelog/#CHANGE-2046)' — locator: GET e POST /rest/api/3/search, description; reconcileIssues em /search/jql — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Jira Cloud v3: o /rest/api/3/search antigo (GET e POST) está 'currently being removed' (CHANGE-2046), e o /search/jql oferece reconcileIssues para consistência read-after-write."
+    narrative: "A fonte diz EM REMOÇÃO, sem data — não 'removido'. Isso contradiz o core, que afirma 'removido em maio/2025' em adapters/jira.md (l.461, l.767, l.774) e CLAUDE.md (l.234). A reconciliação está proposta em Q_JIRA_SEARCH_REMOVAL_RECONCILE; esta rodada não sela qual dos dois vale."
+    trace: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/"
+    provenance:
+      source: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/"
+      locator: "GET e POST /rest/api/3/search, description — QUOTE: 'Endpoint is currently being removed. [More details](https://developer.atlassian.com/changelog/#CHANGE-2046)'"
+      method: "leitura: WebFetch da página e do OpenAPI v3 no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_JIRA_CLOUD_STATUS_VIA_TRANSITION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'Performs an issue transition and, if the transition has a screen, updates the fields from the transition screen.' — locator: POST /rest/api/3/issue/{issueIdOrKey}/transitions (Transition issue), description — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Jira Cloud v3: a mudança de status se faz por transição (POST /issue/{key}/transitions), que atualiza os campos da tela da transição quando ela tem tela."
+    narrative: "Prova que o endpoint de transição existe e o que ele faz. NÃO prova que a transição é OBRIGATÓRIA (que PUT /issue não consegue definir status): essa negativa não foi ancorada (E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN, Q_JIRA_STATUS_BY_PUT_MEASURE)."
+    trace: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/"
+    provenance:
+      source: "https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/"
+      locator: "POST /rest/api/3/issue/{issueIdOrKey}/transitions (Transition issue), description — QUOTE: 'Performs an issue transition and, if the transition has a screen, updates the fields from the transition screen.'"
+      method: "leitura: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  # ── JIRA DATA CENTER / SERVER · REST v2 ──────────────────────────────────────────────────
+  - id: E_JIRA_DC_COMMENT_BODY_STRING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: '\"body\":{\"type\":\"string\"},\"renderedBody\":{\"type\":\"string\"}' — locator: POST /rest/api/2/issue/{issueIdOrKey}/comment, schema JSON do Comment (idem GET/PUT comment) — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "Jira DC/Server REST v2: o corpo do comentário é string simples (sem ADF); o schema de Comment declara body como string, e renderedBody (HTML) só vem sob expand."
+    narrative: "Tier não declarado pelo leitor; atribuído 8 (doc oficial do fornecedor, servida para a versão 9.17.0). String não distingue wiki markup de texto puro: o wiki markup que o CLAUDE.md cita para o DC NÃO foi provado (E_ELENXO_JIRA_DC_WIKI_MARKUP_UNPROVEN)."
+    trace: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
+    provenance:
+      source: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
+      locator: "POST /rest/api/2/issue/{issueIdOrKey}/comment, schema JSON do Comment — QUOTE: '\"body\":{\"type\":\"string\"},\"renderedBody\":{\"type\":\"string\"}'"
+      method: "leitura: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_JIRA_DC_RENDEREDBODY_EXPAND_OPTIN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'expandstringoptional flags: renderedBody (provides body rendered in HTML)' — locator: query parameters de GET/POST/PUT /rest/api/2/issue/{issueIdOrKey}/comment — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Jira DC v2: o HTML renderizado do comentário (renderedBody) é opt-in pelo parâmetro expand nos endpoints de comentário."
+    narrative: "O leitor acrescentou 'coerente com corpo armazenado como texto de marcação' — inferência dele, fora do texto (E_ELENXO_JIRA_DC_RENDERED_INFERENCE)."
+    trace: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
+    provenance:
+      source: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
+      locator: "query parameters de GET/POST/PUT /rest/api/2/issue/{issueIdOrKey}/comment — QUOTE: 'expandstringoptional flags: renderedBody (provides body rendered in HTML)'"
+      method: "leitura: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_JIRA_DC_PAGINATION_STARTAT_MAXRESULTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'A client should always assume that the requested page can be empty. REST API consumers should also consider the field to be optional.' — locator: seção Pagination, parágrafos após o exemplo JSON — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "Jira DC v2: a paginação genérica da REST é por startAt e maxResults; o envelope traz startAt, maxResults e total, com total opcional e página podendo vir vazia; cada API tem limite próprio."
+    narrative: "Tier não declarado pelo leitor; atribuído 8. A seção é a Pagination GENÉRICA da doc, não a do /rest/api/2/search; o vínculo startAt↔search é inferido (E_ELENXO_JIRA_DC_PAGINATION_GENERIC_SECTION)."
+    trace: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
+    provenance:
+      source: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
+      locator: "seção Pagination, parágrafos após o exemplo JSON — QUOTE: 'A client should always assume that the requested page can be empty. REST API consumers should also consider the field to be optional.'"
+      method: "leitura: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_JIRA_DC_SEARCH_JQL_GET_POST
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'If the JQL query is too large to be encoded as a query param you should instead POST to this resource.' — locator: GET /rest/api/2/search, seções Sorting e GET vs POST — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Jira DC v2: a busca é JQL em GET /rest/api/2/search, com POST no mesmo recurso quando o JQL é grande; fields seleciona campos e o default é só navigable."
+    narrative: "O Elenxo não sustentou objeção (survives=false): a quote prova o que diz."
+    trace: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
+    provenance:
+      source: "https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/"
+      locator: "GET /rest/api/2/search, seções Sorting e GET vs POST — QUOTE: 'If the JQL query is too large to be encoded as a query param you should instead POST to this resource.'"
+      method: "leitura: curl da doc 9.17.0 e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_JIRA_DC_BULK_CREATE_DOC_9_17
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'POST /rest/api/2/issue/bulkCreates issues or sub-tasks from a JSON representation.' — locator: Create issues, POST /rest/api/2/issue/bulk; HTTP 302 de /software/jira/docs/api/REST/latest/ para /REST/9.17.0/ — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "Jira DC v2: a operação em lote existe como criação em bulk (POST /rest/api/2/issue/bulk) de issues ou sub-tasks; o /latest/ da doc redireciona hoje para a 9.17.0."
+    narrative: "Tier não declarado pelo leitor; atribuído 8. Bulk só de criação, a mesma limitação do Cloud. O redirect prova qual versão a DOC serve, não qual versão do produto DC está vigente (E_ELENXO_JIRA_DC_VERSION_NOT_PRODUCT)."
+    trace: "https://docs.atlassian.com/software/jira/docs/api/REST/latest/"
+    provenance:
+      source: "https://docs.atlassian.com/software/jira/docs/api/REST/latest/"
+      locator: "HTTP 302 para /REST/9.17.0/; Create issues, POST /rest/api/2/issue/bulk — QUOTE: 'POST /rest/api/2/issue/bulkCreates issues or sub-tasks from a JSON representation.'"
+      method: "leitura: curl com redirect seguido e extração de texto no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  # ── CLICKUP · API v2 ─────────────────────────────────────────────────────────────────────
+  - id: E_CLICKUP_SUBTASK_VIA_PARENT_NESTABLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'The `parent` task ID you include can be a subtask, but must be in the same List specified in the path parameter.' — locator: POST /api/v2/list/{list_id}/task, body.parent (createtask) — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "ClickUp v2: subtask se cria via Create Task com parent = ID de task existente na mesma List; o parent pode ser ele mesmo uma subtask (aninhamento além de um nível dentro da List)."
+    narrative: "Tier não declarado pelo leitor; atribuído 8. Não dá NÍVEIS MÁXIMOS, e a hierarquia Space/Folder/List não foi ancorada (E_ELENXO_CLICKUP_MAX_DEPTH_AND_HIERARCHY_OPEN)."
+    trace: "https://developer.clickup.com/reference/createtask"
+    provenance:
+      source: "https://developer.clickup.com/reference/createtask"
+      locator: "POST /api/v2/list/{list_id}/task, body.parent — QUOTE: 'The `parent` task ID you include can be a subtask, but must be in the same List specified in the path parameter.'"
+      method: "leitura: WebFetch da referência e curl da versão .md no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_CLICKUP_POINTS_NATIVE_PRIORITY_INT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'Add Sprint Points to the task.' — locator: POST /api/v2/list/{list_id}/task, body.points (priority: integer|null, time_estimate: integer, sem descrição) — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "ClickUp v2: sprint points são o campo nativo points no create task; priority é integer|null e time_estimate integer, sem escala nem unidade descritas na referência."
+    narrative: "Tier não declarado pelo leitor; atribuído 8. A escala de priority 1-4 vem SÓ da medição do core (CLAUDE.md), não desta fonte; a unidade de time_estimate não foi ancorada; o pré-requisito do ClickApp Sprints não foi tocado (E_ELENXO_CLICKUP_PRIORITY_SCALE_CORE_ONLY)."
+    trace: "https://developer.clickup.com/reference/createtask"
+    provenance:
+      source: "https://developer.clickup.com/reference/createtask"
+      locator: "POST /api/v2/list/{list_id}/task, body.points — QUOTE: 'Add Sprint Points to the task.'"
+      method: "leitura: WebFetch da referência e curl da versão .md no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_CLICKUP_MARKDOWN_CONTENT_OVER_DESCRIPTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: '`markdown_content` will be used instead of `description`.' — locator: POST /api/v2/list/{list_id}/task, body.markdown_content — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "ClickUp v2: a descrição da task em markdown vai por markdown_content, que prevalece sobre description."
+    narrative: "Tier não declarado pelo leitor; atribuído 8. Concorda com a medição do core de 2026-10-02 (CLAUDE.md). Prova a DESCRIÇÃO; o formato do corpo do COMENTÁRIO do ClickUp não foi ancorado (E_ELENXO_CLICKUP_COMMENT_FORMAT_OPEN)."
+    trace: "https://developer.clickup.com/reference/createtask"
+    provenance:
+      source: "https://developer.clickup.com/reference/createtask"
+      locator: "POST /api/v2/list/{list_id}/task, body.markdown_content — QUOTE: '`markdown_content` will be used instead of `description`.'"
+      method: "leitura: WebFetch da referência e curl da versão .md no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_CLICKUP_GET_TASKS_PAGE_100
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'Responses are limited to 100 tasks per page.' — locator: GET /api/v2/list/{list_id}/task, params page, subtasks, include_timl, statuses, tags, due_date_gt — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "ClickUp v2: Get Tasks pagina por índice de página (page) com 100 por página, lista só tasks da home List, exclui tasks em várias listas salvo include_timl, e exclui subtasks por padrão."
+    narrative: "Tier não declarado pelo leitor; atribuído 8. O Elenxo não sustentou objeção (survives=false), mas registrou: aqui o parâmetro é subtasks, em GET /list/{id}/task, enquanto o core usa include_subtasks em GET /task/{id} (adapters/clickup.md l.58). São endpoints diferentes, sem contradição; interface.md precisa separar os dois. O sinal de fim (last_page) não foi ancorado."
+    trace: "https://developer.clickup.com/reference/gettasks"
+    provenance:
+      source: "https://developer.clickup.com/reference/gettasks"
+      locator: "GET /api/v2/list/{list_id}/task, param page — QUOTE: 'Responses are limited to 100 tasks per page.'"
+      method: "leitura: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_CLICKUP_DEPENDENCY_ONE_DIRECTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'You can only use one per request.' — locator: POST /api/v2/task/{task_id}/dependency (adddependency), requestBody — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "ClickUp v2: dependências se adicionam em uma direção por requisição (POST /task/{id}/dependency), via depends_on OU dependency_of."
+    narrative: "Tier não declarado pelo leitor; atribuído 8. Task links (links_to) e o estado da v3 seguem sem âncora: a claim sobre a v3 foi REJEITADA na ancoragem (E_ELENXO_CLICKUP_TASK_LINKS_OPEN)."
+    trace: "https://developer.clickup.com/reference/adddependency"
+    provenance:
+      source: "https://developer.clickup.com/reference/adddependency"
+      locator: "POST /api/v2/task/{task_id}/dependency, requestBody — QUOTE: 'You can only use one per request.'"
+      method: "leitura: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  # ── ASANA · REST ─────────────────────────────────────────────────────────────────────────
+  - id: E_ASANA_PAGINATION_LIMIT_1_100
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'The value must be between 1 and 100.' — locator: Docs > Pagination, parâmetro limit — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Asana: a paginação dos endpoints de lista é por offset opaco com limit entre 1 e 100."
+    narrative: "O Elenxo não sustentou objeção (survives=false), com a ressalva: a matriz não pode generalizar o offset para o endpoint de search, que indica outro mecanismo (E_ASANA_SEARCH_PREMIUM_ONLY)."
+    trace: "https://developers.asana.com/docs/pagination"
+    provenance:
+      source: "https://developers.asana.com/docs/pagination"
+      locator: "Docs > Pagination, parâmetro limit — QUOTE: 'The value must be between 1 and 100.'"
+      method: "leitura: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_ASANA_OFFSET_EXPIRES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'Note that an offset token will expire after some time, as data may have changed.' — locator: Docs > Pagination, parâmetro offset — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Asana: o token de offset expira depois de algum tempo, e next_page vem null ao fim."
+    narrative: "O Elenxo não sustentou objeção (survives=false): a quote é literal."
+    trace: "https://developers.asana.com/docs/pagination"
+    provenance:
+      source: "https://developers.asana.com/docs/pagination"
+      locator: "Docs > Pagination, parâmetro offset — QUOTE: 'Note that an offset token will expire after some time, as data may have changed.'"
+      method: "leitura: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_ASANA_BATCH_MAX_10_ACTIONS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'The maximum number of actions allowed in a single batch request is 10' — locator: Docs > Batch requests — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Asana: a Batch API aceita no máximo 10 ações por requisição e é medida por ação; é envelope genérico de N chamadas, não bulk de tasks."
+    narrative: "O Elenxo não sustentou objeção (survives=false), com a ressalva de que a célula (11) deve dizer 'batch genérico, 10 ações', não 'bulk de tasks'."
+    trace: "https://developers.asana.com/docs/batch-requests"
+    provenance:
+      source: "https://developers.asana.com/docs/batch-requests"
+      locator: "Docs > Batch requests — QUOTE: 'The maximum number of actions allowed in a single batch request is 10'"
+      method: "leitura: WebFetch da página no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_ASANA_STORY_TEXT_OR_HTML
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'The plain text of the comment to add. Cannot be used with html_text.' — locator: Reference > Create a story on a task, campo text — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Asana: o comentário (story) aceita text OU html_text, mutuamente exclusivos."
+    narrative: "O Elenxo não sustentou objeção (survives=false). O subconjunto de HTML aceito em html_text não foi ancorado (lacuna menor)."
+    trace: "https://developers.asana.com/reference/createstoryfortask"
+    provenance:
+      source: "https://developers.asana.com/reference/createstoryfortask"
+      locator: "Reference > Create a story on a task, campo text — QUOTE: 'The plain text of the comment to add. Cannot be used with html_text.'"
+      method: "leitura: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_ASANA_SEARCH_PREMIUM_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'this search endpoint will only be available to premium Asana users.' — locator: Reference > Search tasks in a workspace, descrição — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Asana: a busca de tasks por workspace só está disponível para conta premium."
+    narrative: "O leitor afirmou também '402 caso contrário' e 'pagina manualmente por created_at'; essas metades NÃO estão na quote e não entram como fato (E_ELENXO_ASANA_SEARCH_PAGINATION_UNANCHORED)."
+    trace: "https://developers.asana.com/reference/searchtasksforworkspace"
+    provenance:
+      source: "https://developers.asana.com/reference/searchtasksforworkspace"
+      locator: "Reference > Search tasks in a workspace, descrição — QUOTE: 'this search endpoint will only be available to premium Asana users.'"
+      method: "leitura: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_ASANA_SUBTASK_OWN_ENDPOINT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'Creates a new subtask and adds it to the parent task.' — locator: Reference > Create a subtask for a task, descrição — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Asana: subtask se cria por endpoint próprio (Create a subtask for a task), que a adiciona à task-pai."
+    narrative: "O leitor afirmou 'a doc não declara profundidade máxima' — afirmação de AUSÊNCIA a partir de uma página, que não prova inexistência de limite (E_ELENXO_ASANA_DEPTH_ABSENCE_NOT_PROOF)."
+    trace: "https://developers.asana.com/reference/createsubtaskfortask"
+    provenance:
+      source: "https://developers.asana.com/reference/createsubtaskfortask"
+      locator: "Reference > Create a subtask for a task, descrição — QUOTE: 'Creates a new subtask and adds it to the parent task.'"
+      method: "leitura: WebFetch da referência no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  # ── LINEAR · GraphQL ─────────────────────────────────────────────────────────────────────
+  - id: E_LINEAR_PRIORITY_0_4
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.' — locator: schema.graphql, type Issue, priority — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "Linear: prioridade numérica 0-4 (0 sem prioridade, 1 urgente, 2 alta, 3 média, 4 baixa), tipo Float! no type Issue."
+    narrative: "Tier não declarado pelo leitor; atribuído 8 (schema do SDK oficial, lido da branch master — não pinado a commit). O Elenxo não sustentou objeção (survives=false)."
+    trace: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+    provenance:
+      source: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+      locator: "type Issue, campo priority — QUOTE: 'The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.'"
+      method: "leitura: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_LINEAR_ESTIMATE_NATIVE_TEAM_SCALE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'The estimate of the complexity of the issue. The specific scale used depends on the team's estimation configuration (e.g., points, T-shirt sizes). Null if no estimate has been set.' — locator: schema.graphql, type Issue, estimate — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Linear: estimate é campo nativo Float cuja escala depende da configuração de estimativa do team (pontos, T-shirt), null quando não definido."
+    narrative: "O Elenxo não sustentou objeção (survives=false). Quais escalas existem (exponencial, fibonacci, linear, T-shirt) não foi ancorado; a célula 'nativo, escala por team' está sustentada."
+    trace: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+    provenance:
+      source: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+      locator: "type Issue, campo estimate — QUOTE: 'The estimate of the complexity of the issue. The specific scale used depends on the team's estimation configuration (e.g., points, T-shirt sizes). Null if no estimate has been set.'"
+      method: "leitura: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_LINEAR_COMMENT_BODY_MARKDOWN_DERIVED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'The comment content in markdown format. This is a derived representation of the canonical bodyData ProseMirror content.' — locator: schema.graphql, type Comment, body — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Linear: o body do comentário é markdown DERIVADO do conteúdo canônico ProseMirror (bodyData), no type Comment."
+    narrative: "Descreve o campo de LEITURA. O formato de entrada de CommentCreateInput.body não foi ancorado; como o canônico é ProseMirror e o markdown é derivação, a semântica de round-trip muda (E_ELENXO_LINEAR_COMMENT_WRITE_FORMAT_OPEN)."
+    trace: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+    provenance:
+      source: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+      locator: "type Comment, campo body — QUOTE: 'The comment content in markdown format. This is a derived representation of the canonical bodyData ProseMirror content.'"
+      method: "leitura: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_LINEAR_RELATION_FOUR_TYPES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'enum IssueRelationType { blocks duplicate related similar }' — locator: schema.graphql, enum IssueRelationType — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Linear: relações entre issues têm 4 tipos (enum IssueRelationType): blocks, duplicate, related, similar."
+    narrative: "O Elenxo não sustentou objeção (survives=false): o enum é literal."
+    trace: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+    provenance:
+      source: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+      locator: "enum IssueRelationType — QUOTE: 'enum IssueRelationType { blocks duplicate related similar }'"
+      method: "leitura: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_LINEAR_STATE_WORKFLOWSTATE_PARENT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'The workflow state (issue status) that the issue is currently in. Workflow states represent the issue's progress through the team's workflow, such as Triage, Todo, In Progress, Done, or Canceled.' — locator: schema.graphql, type Issue, state: WorkflowState!; type Issue, parent: Issue; type WorkflowState, team e type — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "Linear: state é WorkflowState! obrigatório na issue (workflow por team, status tipados), não string livre; sub-issue se faz via parent: Issue."
+    narrative: "Tier não declarado pelo leitor; atribuído 8. Prova status tipado do workflow do team; NÃO prova se há transição obrigatória ou livre entre estados, nem profundidade de sub-issue, nem Team/Project como níveis (E_ELENXO_LINEAR_TRANSITION_FREEDOM_UNANCHORED)."
+    trace: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+    provenance:
+      source: "https://raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+      locator: "type Issue, campos state e parent; type WorkflowState — QUOTE: 'The workflow state (issue status) that the issue is currently in. Workflow states represent the issue's progress through the team's workflow, such as Triage, Todo, In Progress, Done, or Canceled.'"
+      method: "leitura: curl do schema.graphql (branch master, não pinado) no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  - id: E_LINEAR_CURSOR_PAGINATION_BATCH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "QUOTE: 'The first 50 results are returned by default without query arguments.' — locator: linear.app/developers/pagination; schema.graphql Mutation issueBatchCreate e issueBatchUpdate — ancorada por verificador independente (wf_8e56d56f-a8b)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "Linear: a paginação é cursor Relay (first/after) com 50 resultados por padrão; as mutations issueBatchCreate e issueBatchUpdate existem."
+    narrative: "Tier não declarado pelo leitor; atribuído 8. A quote sustenta o default de 50 e o schema a existência das mutations; 'atômica', o tamanho máximo do lote e o teto de first NÃO foram ancorados (E_ELENXO_LINEAR_BATCH_SEMANTICS_OPEN)."
+    trace: "https://linear.app/developers/pagination"
+    provenance:
+      source: "https://linear.app/developers/pagination"
+      locator: "página Pagination — QUOTE: 'The first 50 results are returned by default without query arguments.'; Mutation issueBatchCreate/issueBatchUpdate em raw.githubusercontent.com/linear/linear/master/packages/sdk/src/schema.graphql"
+      method: "leitura: WebFetch da página e curl do schema.graphql no run wf_8e56d56f-a8b; ancorada por verificador independente"
+      locality: "web"
+
+  # ── CONTABILIDADE DA RODADA ──────────────────────────────────────────────────────────────
+  - id: E_LACUNAS_TASK_MANAGER_VOCAB_PRIMARIAS_1011
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "retorno do run wf_8e56d56f-a8b (modo primaries): 6 fontes nomeadas (jira-cloud-v3, jira-dc-v2, clickup-api, asana-api, linear-graphql, zoho-projects-v3), 5 lidas, 1 inalcançável; 30 claims à ancoragem, 27 ANCORADAS, 3 REJEITADAS (3 exageradas, 0 não-encontradas); Elenxo: 27 objeções julgadas, 17 sobreviventes"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "CONTABILIDADE 2026-10-11: 5 fontes lidas, 1 inalcançável (zoho-projects-v3); 27 claims ancoradas (cada uma virou nó) e 3 REJEITADAS por exagero; 17 objeções do Elenxo sobreviveram. Rejeições e lacunas abertas na narrative."
+    narrative: "CONTABILIDADE 2026-10-11 (run wf_8e56d56f-a8b). FONTES: lidas 5 (jira-cloud-v3, jira-dc-v2, clickup-api, asana-api, linear-graphql); inalcançável 1 (zoho-projects-v3 — o leitor tentou projects.zoho.com/api-docs, /api-docs/v3 e zoho.com/projects/help/rest-api sem conteúdo útil). CLAIMS: 27 ancoradas, 3 REJEITADAS na ancoragem, todas EXAGERADAS: (1) jira-cloud-v3 'o corpo do comentário é ADF (JSON doc version 1)' — Comment.body.description cita o ADF, mas 'doc version 1' vem de conhecimento externo, e a operação Add comment nada diz do formato; (2) jira-dc-v2 'transições são recurso próprio, com os campos obrigatórios da tela; o status é de workflow, não livre' — os campos só vêm com expand=transitions.fields, e 'não livre' é inferência do leitor; (3) clickup-api 'os docs da v3 dizem que ela está em desenvolvimento e usam parent e links_to; a v3 não é a superfície estável' — a frase de parent/dependências está em docs/tasks sem atribuição à v3; o único texto sobre v3 é 'We're developing API v3 to address these issues' (timeouts); 'não é estável' é inferência; links_to não está no body do Create Task v2. LACUNAS QUE CONTINUAM ABERTAS (Elenxo gapsOpen): zoho-projects-v3 INTEIRA (só se sabe o que o nó zoho-glpi-adapters-2026-09 mediu); jira-cloud-v3 (1) hierarquia e issue types, (3) prioridade, (4) story points como custom, (6) anexo, (7) labels, (8) sprint pela Agile API, (9) issue links, (2) transição obrigatória (negativa do PUT não ancorada), (11) bulk além de create, (12) data de remoção do /search; jira-dc-v2 wiki markup não provado, paginação de seção genérica, versão vigente do produto não sustentada, transições com claim rejeitada; clickup-api hierarquia Space/Folder/List e níveis máximos, (2) status por lista, escala de priority, unidade de time_estimate, (5) comentário, (6) anexo, (7) tags, task links, (12) v3; asana-api (1) projects/sections e profundidade, (2) status por section ou custom field, (3) prioridade como custom field, (4) estimativa, (6) anexo, (7) tags, (9) dependências, paginação do search, (12) versão; linear-graphql Team/Project e profundidade de sub-issue, (6) attachments, (7) labels, (8) cycles, formato de ESCRITA do comentário, atomicidade e limite do batch, teto de first, (12) versão; TRANSVERSAL: a célula (12) versão e depreciações não fechou com âncora primária para nenhum provedor."
+    trace: "run wf_8e56d56f-a8b (modo primaries, 2026-10-11) — retorno repassado ao escritor pelo workflow"
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result: sources, anchored, rejected, unreachable e elenxo.gapsOpen"
+      method: "testemunho: retorno do run wf_8e56d56f-a8b repassado pelo workflow ao escritor em 2026-10-11"
+      locality: "host"
+
+  # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (17 de 27) ──────────────────────────────────────────
+  - id: E_ELENXO_JIRA_BULK_ONLY_CREATE
+    node_type: evidence
+    trace: "docs/evolution/research/task-manager-vocabulario-2026-10/SYNTHESIS.md"
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 1 (target: Claim 1 [jira-cloud-v3] bulk create com teto de 50), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "O teto de 50 vale só para CRIAÇÃO e com condição (subtasks onde habilitadas); 'subtask exige issueType e parent' não está na quote. A matriz não pode declarar 'Jira: bulk = sim' sem restringir a create."
+    narrative: "Bulk de edição, de transição e de delete não foi ancorado nesta rodada."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[0] (objeção 1, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 1"
+      locality: "host"
+
+  - id: E_ELENXO_JIRA_COMMENT_ADF_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 2 (target: Claim 2 [jira-cloud-v3] description e textarea em ADF), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "A claim prova ADF para description/environment/textarea, não para o COMENTÁRIO; a claim do comentário foi rejeitada. Comentário em ADF no Jira Cloud tem apoio só pela nota de rejeição, não por claim ancorada."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[1] (objeção 2, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 2"
+      locality: "host"
+
+  - id: E_ELENXO_JIRA_SEARCH_REMOVAL_CONTRADICTS_CORE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 4 (target: Claim 4 [jira-cloud-v3] /search em remoção, CHANGE-2046), survives=true; linhas do core conferidas por grep em bc0dd373"
+    source_tier: 6
+    source_kind: analysis
+    label: "A primária diz que o /search está 'currently being removed', sem data; o core afirma 'removido em maio/2025' (adapters/jira.md l.461, l.767, l.774; CLAUDE.md l.234). Contradição a reconciliar antes que interface.md herde a data."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[3] (objeção 4, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 4"
+      locality: "host"
+
+  - id: E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 5 (target: Claim 5 [jira-cloud-v3] status muda por transição), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "O endpoint de transição existe, mas 'transição OBRIGATÓRIA' exige provar que PUT /issue não define status; essa negativa não foi ancorada. A regra 'nunca setar status direto' do CLAUDE.md segue sem lastro primário nesta rodada."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[4] (objeção 5, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 5"
+      locality: "host"
+
+  - id: E_ELENXO_JIRA_DC_WIKI_MARKUP_UNPROVEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 6 (target: Claim 6 [jira-dc-v2] body do comentário é string), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "O schema prova que o corpo do comentário no DC é string, não ADF; string não distingue wiki markup de texto puro. O formato de marcação (wiki markup) NÃO foi provado."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[5] (objeção 6, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 6"
+      locality: "host"
+
+  - id: E_ELENXO_JIRA_DC_RENDERED_INFERENCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 7 (target: Claim 7 [jira-dc-v2] renderedBody só sob expand), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "renderedBody opt-in está provado; 'coerente com corpo armazenado como texto de marcação' é inferência do leitor, fora do texto. Não fecha o wiki markup."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[6] (objeção 7, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 7"
+      locality: "host"
+
+  - id: E_ELENXO_JIRA_DC_PAGINATION_GENERIC_SECTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 8 (target: Claim 8 [jira-dc-v2] paginação startAt/maxResults), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "A seção citada é a Pagination GENÉRICA da doc REST, não a do /rest/api/2/search, e ela mesma diz que cada API tem limite próprio sem dar o da busca. O vínculo startAt↔search é inferido."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[7] (objeção 8, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 8"
+      locality: "host"
+
+  - id: E_ELENXO_JIRA_DC_VERSION_NOT_PRODUCT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 10 (target: Claim 10 [jira-dc-v2] bulk create e /latest → 9.17.0), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "Bulk do DC também é só de criação. O 302 de /latest/ para 9.17.0 prova qual versão a DOC serve, não qual versão do DC está vigente; a célula (12) do DC fica sem sustentação."
+    narrative: "O Elenxo levantou, como HIPÓTESE não verificada nesta rodada, que já existe Jira DC 10.x."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[9] (objeção 10, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 10"
+      locality: "host"
+
+  - id: E_ELENXO_CLICKUP_MAX_DEPTH_AND_HIERARCHY_OPEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 11 (target: Claim 11 [clickup-api] parent pode ser subtask), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "Aninhamento além de um nível dentro da List está provado, mas NÍVEIS MÁXIMOS não; a hierarquia Space/Folder/List não foi ancorada em nenhuma claim."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[10] (objeção 11, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 11"
+      locality: "host"
+
+  - id: E_ELENXO_CLICKUP_PRIORITY_SCALE_CORE_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 12 (target: Claim 12 [clickup-api] points nativo, priority inteiro, time_estimate inteiro), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "A quote sustenta só que points existe. A escala de priority 1-4 vem só da medição do core (CLAUDE.md); a unidade de time_estimate não foi ancorada; o pré-requisito do ClickApp Sprints não foi tocado."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[11] (objeção 12, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 12"
+      locality: "host"
+
+  - id: E_ELENXO_CLICKUP_COMMENT_FORMAT_OPEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 13 (target: Claim 13 [clickup-api] markdown_content prevalece sobre description), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "markdown_content prova o formato da DESCRIÇÃO; o corpo do COMENTÁRIO do ClickUp (comment_text ou comment em rich-text) não foi ancorado. A célula (5) do ClickUp segue aberta."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[12] (objeção 13, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 13"
+      locality: "host"
+
+  - id: E_ELENXO_CLICKUP_TASK_LINKS_OPEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 15 (target: Claim 15 [clickup-api] dependência em uma direção por requisição), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "Dependências estão provadas; task links não: a claim sobre links_to foi rejeitada (0 ocorrências em createtask.md, página sem atribuição à v3). Task links e o estado da v3 seguem sem âncora."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[14] (objeção 15, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 15"
+      locality: "host"
+
+  - id: E_ELENXO_ASANA_SEARCH_PAGINATION_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 20 (target: Claim 20 [asana-api] search exige premium e pagina por created_at), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "A quote sustenta só a exigência de premium; 'pagina manualmente por created_at' e o 402 não estão nela. A metade de paginação, que a célula (10) precisa, está sem âncora."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[19] (objeção 20, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 20"
+      locality: "host"
+
+  - id: E_ELENXO_ASANA_DEPTH_ABSENCE_NOT_PROOF
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 21 (target: Claim 21 [asana-api] subtask por endpoint próprio, profundidade não declarada), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "'A doc não declara profundidade máxima' é afirmação de AUSÊNCIA feita a partir de uma página e não prova que não existe limite. A célula (1), níveis máximos, segue aberta para o Asana."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[20] (objeção 21, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 21"
+      locality: "host"
+
+  - id: E_ELENXO_LINEAR_COMMENT_WRITE_FORMAT_OPEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 24 (target: Claim 24 [linear-graphql] comment body em markdown derivado de bodyData), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "A quote descreve o campo de LEITURA (Comment.body derivado). O formato de entrada de CommentCreateInput.body não foi ancorado; com o canônico em ProseMirror, a semântica de round-trip da interface muda."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[23] (objeção 24, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 24"
+      locality: "host"
+
+  - id: E_ELENXO_LINEAR_TRANSITION_FREEDOM_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 26 (target: Claim 26 [linear-graphql] state WorkflowState! por team; parent), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "Status tipado do workflow do team está provado; se a transição é obrigatória ou livre (ir a qualquer estado do team) não foi ancorado, nem a profundidade de sub-issue, nem Team e Project como níveis."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[25] (objeção 26, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 26"
+      locality: "host"
+
+  - id: E_ELENXO_LINEAR_BATCH_SEMANTICS_OPEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "Elenxo do run wf_8e56d56f-a8b, objeção 27 (target: Claim 27 [linear-graphql] cursor first/after com default 50; issueBatchCreate/Update), survives=true"
+    source_tier: 6
+    source_kind: analysis
+    label: "A quote sustenta o default de 50; 'atômica' em issueBatchCreate, o tamanho máximo de lote e o teto de first não estão nela. A célula (11) do Linear sustenta só 'existe batch create/update'."
+    provenance:
+      source: "journal wf_8e56d56f-a8b (host)"
+      locator: "result.elenxo.objections[26] (objeção 27, survives=true)"
+      method: "juízes: veredito do Elenxo do run wf_8e56d56f-a8b, objeção 27"
+      locality: "host"
+
+  # ── SÍNTESE (open — não selada) ──────────────────────────────────────────────────────────
+  - id: C_PAGINATION_AS_OPAQUE_ITERATOR
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "interface.md deve expor a paginação como iterador opaco (próxima página ou fim), sem expor offset, índice nem cursor: os 5 provedores alcançados usam 5 mecanismos diferentes, dois com token que expira."
+    narrative: "Mecanismos ancorados: token opaco nextPageToken com expiração de 7 dias (Jira Cloud /search/jql); startAt/maxResults (Jira DC, com ressalva de seção genérica); índice de página com 100 por página (ClickUp Get Tasks); offset opaco que expira, limit 1-100 (Asana, fora do search); cursor Relay first/after com default 50 (Linear). Recomendação do Elenxo desta rodada — claim de desenho, não selada; o maestro decide o que interface.md declara."
+    trace: "Elenxo do run wf_8e56d56f-a8b, campo recommendation"
+
+  - id: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.55
+    label: "O formato do texto rico (descrição e comentário) é heterogêneo e deve ser resolvido no adapter, não na interface: ADF no Jira Cloud v3, string no DC v2, markdown_content no ClickUp, text|html_text no Asana, markdown derivado de ProseMirror no Linear."
+    narrative: "Parcial: o formato do COMENTÁRIO só está ancorado para Jira DC (string), Asana (text|html_text) e Linear (leitura). Jira Cloud (comentário), ClickUp (comentário) e a escrita no Linear seguem abertos."
+    trace: "Elenxo do run wf_8e56d56f-a8b, campo recommendation"
+
+  - id: C_BULK_IS_PER_OPERATION_NOT_UNIFORM
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Operação em lote não é capacidade uniforme: Jira (Cloud e DC) ancora só bulk create (Cloud até 50), Asana tem batch genérico de 10 ações, Linear tem issueBatchCreate/Update sem limite ancorado. interface.md deve declarar lote por operação, com limite."
+    narrative: "ClickUp sem bulk ancorado nesta rodada; Zoho não lido. Bulk de edição/transição no Jira e a atomicidade do Linear seguem abertos."
+    trace: "Elenxo do run wf_8e56d56f-a8b, campos gapsClosed e gapsOpen"
+
+  # ── PERGUNTAS QUE A RODADA ABRE ──────────────────────────────────────────────────────────
+  - id: Q_JIRA_SEARCH_REMOVAL_RECONCILE
+    node_type: question
+    plane: DEV
+    status: done
+    verified_at: "2026-10-11"
+    verified_against: "core corrigido em 5 superfícies (CLAUDE.md, adapters/jira.md, jira-specialist, skill onion) para em remoção, CHANGE-2046, sem data; o changelog público lido em 2026-10-11 (página e busca por CHANGE-2046) não trouxe a entrada"
+    impact: 4
+    confidence: 0.6
+    label: "Reconciliar o core com a primária: adapters/jira.md (l.461, l.767, l.774) e CLAUDE.md (l.234) dizem 'removido em maio/2025'; a referência v3 diz 'currently being removed' (CHANGE-2046), sem data. Ler o changelog CHANGE-2046 antes de interface.md herdar o fato."
+    narrative: "Fechada pela via conservadora em 2026-10-11: o core passou a afirmar só o que a primária sustenta (em remoção, sem data). O changelog público não trouxe a entrada CHANGE-2046 nas páginas lidas, então a data real segue desconhecida e o core não a inventa. Proposta original: Caminho: abrir developer.atlassian.com/changelog/#CHANGE-2046 (fonte primária com a data), e só então corrigir o texto do core, com a data e o estado reais."
+    trace: "Elenxo do run wf_8e56d56f-a8b, objeção 4"
+
+  - id: Q_JIRA_STATUS_BY_PUT_MEASURE
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Medir ao vivo se PUT /rest/api/3/issue/{key} consegue definir status, antes de interface.md declarar 'transição obrigatória' para o Jira; a negativa não tem âncora primária nesta rodada."
+    trace: "Elenxo do run wf_8e56d56f-a8b, objeção 5 e campo recommendation"
+
+  - id: Q_WAVE2_PRIMARIES_CELLS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as células (1) hierarquia, (6) anexo, (7) label, (8) sprint/ciclo e (12) versão de cada provedor."
+    narrative: "Descartar o Zoho por orçamento volta como objeção (Elenxo). A célula (12) não fechou para nenhum provedor."
+    trace: "Elenxo do run wf_8e56d56f-a8b, campo recommendation"
+
+edges:
+  # ── Elenxo limita as evidências ──
+  - from: E_ELENXO_JIRA_BULK_ONLY_CREATE
+    to: E_JIRA_CLOUD_BULK_CREATE_50
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_JIRA_COMMENT_ADF_UNANCHORED
+    to: E_JIRA_CLOUD_DESCRIPTION_TEXTAREA_ADF
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_JIRA_SEARCH_REMOVAL_CONTRADICTS_CORE
+    to: E_JIRA_CLOUD_SEARCH_LEGACY_BEING_REMOVED
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN
+    to: E_JIRA_CLOUD_STATUS_VIA_TRANSITION
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_JIRA_DC_WIKI_MARKUP_UNPROVEN
+    to: E_JIRA_DC_COMMENT_BODY_STRING
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_JIRA_DC_RENDERED_INFERENCE
+    to: E_JIRA_DC_RENDEREDBODY_EXPAND_OPTIN
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_JIRA_DC_PAGINATION_GENERIC_SECTION
+    to: E_JIRA_DC_PAGINATION_STARTAT_MAXRESULTS
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_JIRA_DC_VERSION_NOT_PRODUCT
+    to: E_JIRA_DC_BULK_CREATE_DOC_9_17
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CLICKUP_MAX_DEPTH_AND_HIERARCHY_OPEN
+    to: E_CLICKUP_SUBTASK_VIA_PARENT_NESTABLE
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CLICKUP_PRIORITY_SCALE_CORE_ONLY
+    to: E_CLICKUP_POINTS_NATIVE_PRIORITY_INT
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CLICKUP_COMMENT_FORMAT_OPEN
+    to: E_CLICKUP_MARKDOWN_CONTENT_OVER_DESCRIPTION
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CLICKUP_TASK_LINKS_OPEN
+    to: E_CLICKUP_DEPENDENCY_ONE_DIRECTION
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_ASANA_SEARCH_PAGINATION_UNANCHORED
+    to: E_ASANA_SEARCH_PREMIUM_ONLY
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_ASANA_DEPTH_ABSENCE_NOT_PROOF
+    to: E_ASANA_SUBTASK_OWN_ENDPOINT
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_LINEAR_COMMENT_WRITE_FORMAT_OPEN
+    to: E_LINEAR_COMMENT_BODY_MARKDOWN_DERIVED
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_LINEAR_TRANSITION_FREEDOM_UNANCHORED
+    to: E_LINEAR_STATE_WORKFLOWSTATE_PARENT
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_LINEAR_BATCH_SEMANTICS_OPEN
+    to: E_LINEAR_CURSOR_PAGINATION_BATCH
+    edge_type: CONSTRAINS
+  # ── paginação como iterador opaco ──
+  - from: E_JIRA_CLOUD_SEARCH_JQL_NEXTPAGETOKEN_7D
+    to: C_PAGINATION_AS_OPAQUE_ITERATOR
+    edge_type: SUPPORTS
+  - from: E_JIRA_DC_PAGINATION_STARTAT_MAXRESULTS
+    to: C_PAGINATION_AS_OPAQUE_ITERATOR
+    edge_type: SUPPORTS
+  - from: E_JIRA_DC_SEARCH_JQL_GET_POST
+    to: C_PAGINATION_AS_OPAQUE_ITERATOR
+    edge_type: SUPPORTS
+  - from: E_CLICKUP_GET_TASKS_PAGE_100
+    to: C_PAGINATION_AS_OPAQUE_ITERATOR
+    edge_type: SUPPORTS
+  - from: E_ASANA_PAGINATION_LIMIT_1_100
+    to: C_PAGINATION_AS_OPAQUE_ITERATOR
+    edge_type: SUPPORTS
+  - from: E_ASANA_OFFSET_EXPIRES
+    to: C_PAGINATION_AS_OPAQUE_ITERATOR
+    edge_type: SUPPORTS
+  - from: E_LINEAR_CURSOR_PAGINATION_BATCH
+    to: C_PAGINATION_AS_OPAQUE_ITERATOR
+    edge_type: SUPPORTS
+  - from: E_ELENXO_JIRA_DC_PAGINATION_GENERIC_SECTION
+    to: C_PAGINATION_AS_OPAQUE_ITERATOR
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_ASANA_SEARCH_PAGINATION_UNANCHORED
+    to: C_PAGINATION_AS_OPAQUE_ITERATOR
+    edge_type: CONSTRAINS
+  # ── texto rico no adapter ──
+  - from: E_JIRA_CLOUD_DESCRIPTION_TEXTAREA_ADF
+    to: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    edge_type: SUPPORTS
+  - from: E_JIRA_DC_COMMENT_BODY_STRING
+    to: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    edge_type: SUPPORTS
+  - from: E_CLICKUP_MARKDOWN_CONTENT_OVER_DESCRIPTION
+    to: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    edge_type: SUPPORTS
+  - from: E_ASANA_STORY_TEXT_OR_HTML
+    to: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    edge_type: SUPPORTS
+  - from: E_LINEAR_COMMENT_BODY_MARKDOWN_DERIVED
+    to: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    edge_type: SUPPORTS
+  - from: E_ELENXO_JIRA_COMMENT_ADF_UNANCHORED
+    to: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_JIRA_DC_WIKI_MARKUP_UNPROVEN
+    to: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CLICKUP_COMMENT_FORMAT_OPEN
+    to: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_LINEAR_COMMENT_WRITE_FORMAT_OPEN
+    to: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    edge_type: CONSTRAINS
+  # ── lote por operação ──
+  - from: E_JIRA_CLOUD_BULK_CREATE_50
+    to: C_BULK_IS_PER_OPERATION_NOT_UNIFORM
+    edge_type: SUPPORTS
+  - from: E_JIRA_DC_BULK_CREATE_DOC_9_17
+    to: C_BULK_IS_PER_OPERATION_NOT_UNIFORM
+    edge_type: SUPPORTS
+  - from: E_ASANA_BATCH_MAX_10_ACTIONS
+    to: C_BULK_IS_PER_OPERATION_NOT_UNIFORM
+    edge_type: SUPPORTS
+  - from: E_LINEAR_CURSOR_PAGINATION_BATCH
+    to: C_BULK_IS_PER_OPERATION_NOT_UNIFORM
+    edge_type: SUPPORTS
+  - from: E_ELENXO_JIRA_BULK_ONLY_CREATE
+    to: C_BULK_IS_PER_OPERATION_NOT_UNIFORM
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_LINEAR_BATCH_SEMANTICS_OPEN
+    to: C_BULK_IS_PER_OPERATION_NOT_UNIFORM
+    edge_type: CONSTRAINS
+  # ── síntese e células avulsas respondem à pergunta-raiz ──
+  - from: C_PAGINATION_AS_OPAQUE_ITERATOR
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: C_BULK_IS_PER_OPERATION_NOT_UNIFORM
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_LINEAR_PRIORITY_0_4
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_LINEAR_ESTIMATE_NATIVE_TEAM_SCALE
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_LINEAR_RELATION_FOUR_TYPES
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_LINEAR_STATE_WORKFLOWSTATE_PARENT
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_CLICKUP_POINTS_NATIVE_PRIORITY_INT
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_CLICKUP_SUBTASK_VIA_PARENT_NESTABLE
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_CLICKUP_DEPENDENCY_ONE_DIRECTION
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_ASANA_SUBTASK_OWN_ENDPOINT
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_ASANA_SEARCH_PREMIUM_ONLY
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_JIRA_CLOUD_STATUS_VIA_TRANSITION
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_JIRA_DC_RENDEREDBODY_EXPAND_OPTIN
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_TASK_MANAGER_VOCAB_PRIMARIAS_1011
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: CONSTRAINS
+  # ── perguntas abertas pela rodada ──
+  - from: E_JIRA_CLOUD_SEARCH_LEGACY_BEING_REMOVED
+    to: Q_JIRA_SEARCH_REMOVAL_RECONCILE
+    edge_type: SUPPORTS
+  - from: E_ELENXO_JIRA_SEARCH_REMOVAL_CONTRADICTS_CORE
+    to: Q_JIRA_SEARCH_REMOVAL_RECONCILE
+    edge_type: SUPPORTS
+  - from: E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN
+    to: Q_JIRA_STATUS_BY_PUT_MEASURE
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_TASK_MANAGER_VOCAB_PRIMARIAS_1011
+    to: Q_WAVE2_PRIMARIES_CELLS
+    edge_type: SUPPORTS
+  - from: E_ELENXO_JIRA_DC_VERSION_NOT_PRODUCT
+    to: Q_WAVE2_PRIMARIES_CELLS
+    edge_type: SUPPORTS
+
+external_edges:
+  # O nó do Zoho afirma, entre parênteses, que o Jira 'exige POST /issue/{key}/transitions'; esta rodada
+  # ancorou o endpoint, mas não a obrigatoriedade. Limita (não derruba) a comparação feita lá.
+  - from: E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN
+    to: "docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml#E_ZOHO_SEM_ENDPOINT_TRANSICAO"
+    edge_type: CONSTRAINS

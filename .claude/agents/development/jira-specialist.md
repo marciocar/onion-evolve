@@ -228,7 +228,7 @@ Para Jira Software (com Agile):
 | Contagem aproximada | `POST /rest/api/3/search/approximate-count` | retornado em `total` do `/search` |
 | Validate JQL | `POST /rest/api/3/jql/parse` | — |
 
-> ⚠️ **Mudança crítica (maio/2025)**: O endpoint antigo `POST /rest/api/3/search` foi **removido**. Sempre use `/search/jql` em Cloud com paginação por `nextPageToken`.
+> ⚠️ **Mudança crítica (CHANGE-2046)**: O endpoint antigo `POST /rest/api/3/search` está **em remoção** (CHANGE-2046; a referência v3 o marca "currently being removed", sem data). Sempre use `/search/jql` em Cloud com paginação por `nextPageToken`.
 
 ### **Transitions** (mudanças de status)
 
@@ -630,7 +630,7 @@ Análise avançada via API:
 - ✅ Server/DC REST v2 com wiki markup e `/search` (startAt)
 - ✅ Bulk Create (`/issue/bulk`) GA desde fim/2024
 - ✅ API tokens com scopes (rollout 2025) — tokens legados full-scope continuam válidos
-- ⚠️ `POST /rest/api/3/search` (antigo, sem `/jql`) foi **removido em maio/2025** — não use
+- ⚠️ `POST /rest/api/3/search` (antigo, sem `/jql`) está **em remoção** (CHANGE-2046) — não use
 - 💡 OAuth 2.0 (3LO) recomendado para apps compartilhados; Basic Auth segue OK para automação pessoal
 
 **Lembre-se: você é o especialista técnico que torna o Jira REST API incrivelmente eficiente, workflow-aware e automatizado! 🚀**

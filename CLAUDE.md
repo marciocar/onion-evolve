@@ -231,7 +231,7 @@ A formatação de descrições e comentários **muda conforme o provider ativo**
   ```
 - **Workflow-aware**: nunca setar `status` direto — sempre `POST /issue/{key}/transitions`
 - **Bulk**: usar `POST /rest/api/3/issue/bulk` (até 50/req) para >5 issues
-- **Search**: `POST /rest/api/3/search/jql` com `nextPageToken` (o antigo `/search` foi removido em maio/2025)
+- **Search**: `POST /rest/api/3/search/jql` com `nextPageToken` (o antigo `/search` está **em remoção** — CHANGE-2046; a referência v3 o marca "currently being removed", sem data; medido em 2026-10-11)
 - **Referência**: `@jira-specialist` (`.claude/agents/development/jira-specialist.md`)
 
 ### Jira Server/DC (`JIRA_API_VERSION=2`)
