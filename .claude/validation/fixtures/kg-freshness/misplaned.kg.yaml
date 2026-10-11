@@ -74,7 +74,7 @@ nodes:
     verified_against: branch
     label: "mesmo defeito, mas RECONCILIADO — historia nao se cobra (mesmo racional do STALE)"
 
-  # Sentido da palavra (sinal de campo do adotante onion-kg-ssot, 2026-10-11): `commit` que o gate
+  # Sentido da palavra (sinal de campo de um adotante, 2026-10-11): `commit` que o gate
   # BARROU e execucao ao vivo — PROD legitimo. `commit <sha>` e leitura de fonte e segue acusando,
   # inclusive quando a mesma frase tambem cita um commit-sonda.
   - id: E_PROD_COMMIT_SONDA_BARRADO
