@@ -45,7 +45,7 @@
 .claude/commands/meta/adopt.md	E_VERIFY_ADOPT	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/commands/meta/adopt.md	E_adopt_cmd	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/commands/meta/adopt.md	I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
-.claude/commands/meta/adopt.md	Q_UPDATE_REMEDE_DEPOIS_DO_MERGE	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
+.claude/commands/meta/adopt.md	Q_UPDATE_REMEDE_DEPOIS_DO_MERGE	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
 .claude/commands/meta/adopt.md	SY4_prod_prettierignore_adopt	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/adopt.md	SY6_ev_integration_branch_helper	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/adopt.md	TX_adopt	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
@@ -161,7 +161,7 @@
 .claude/hooks/pretooluse-merge-gate.sh	E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
-.claude/hooks/pretooluse-protect-main.sh	Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
+.claude/hooks/pretooluse-protect-main.sh	Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
 .claude/hooks/session-version-drift.sh	D_REGRA65_MEDE_O_PROCESSO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/hooks/task-manager-provider-hook.sh	D_FIX_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/rules/dissect-lens.md	C_LENTES_CASAM_O_ARTEFATO_NAO_A_INVOCACAO	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
@@ -202,14 +202,14 @@
 .claude/utils/adopt/durable-commit.sh	C_TETO_ADOCAO_INICIAL_NAO_PASSA_A_LISTA	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
 .claude/utils/adopt/durable-commit.sh	E_HAVIA_UMA_QUINTA_COPIA_DA_LISTA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/durable-commit.sh	E_UPDATE_PERDIA_ARQUIVO_NOVO_IGNORADO	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
-.claude/utils/adopt/durable-commit.sh	Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
+.claude/utils/adopt/durable-commit.sh	Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
 .claude/utils/adopt/durable-commit.sh	SY5_adopt_durability_closed	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/utils/adopt/invite-collaborator.sh	TX_invite	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
 .claude/utils/adopt/regen-baselines.sh	D_ADOPT_MUST_EMIT_MISSING_BASELINES	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/utils/adopt/regen-baselines.sh	E_LISTA_2_REGEN_BASELINES_TOMOU_O_LINT_POR_EMISSOR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/regen-ssot-projections.sh	A_ADOTANTE_GREENFIELD_NASCE_COM_HARD	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
-.claude/utils/adopt/regen-ssot-projections.sh	E_REGEN_POS_MERGE_MUDOU_O_INVENTARIO	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
-.claude/utils/adopt/regen-ssot-projections.sh	E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
+.claude/utils/adopt/regen-ssot-projections.sh	E_REGEN_POS_MERGE_MUDOU_O_INVENTARIO	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
+.claude/utils/adopt/regen-ssot-projections.sh	E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
 .claude/utils/adopt/scope-claude-gitignore.sh	D_FIX_GAP2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/utils/adopt/starter-research-seed.sh	E_ADOCAO_COMPLETA_NASCE_VERDE_MEDIDA_0915	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/transfer-ownership.sh	TX_transfer	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
@@ -237,7 +237,7 @@
 .claude/utils/adopt/vendor-manifest.sh	E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	E_QUATRO_COPIAS_DA_MESMA_LISTA_DUAS_DRIFTADAS	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	E_SKILL_CORE_ONLY_VIAJOU	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
-.claude/utils/adopt/vendor-manifest.sh	Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
+.claude/utils/adopt/vendor-manifest.sh	Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
 .claude/utils/adopt/write-stamp.sh	E_CORTE_QUE_NAO_SE_CARIMBA_NAO_ACONTECE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/write-stamp.sh	E_W9_PIN_GREP_MEDIDO	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/utils/census/census-workflow.mjs	Q_PROBE_WORKFLOW_ALIAS	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
@@ -496,6 +496,7 @@
 .claude/validation/lint-selftest.sh	E_OBJECAO_1_DOR_E_SCRIPT_SEQUENCIAL_NAO_HOOK	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_PRECOMMIT_SELECAO_GROSSA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/lint-selftest.sh	E_REPLACE_PRIMEIRO_ACERTOU_O_COMENTARIO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
+.claude/validation/lint-selftest.sh	E_SEIS_CASOS_SEIS_MUTANTES_MORDEM	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_SELFTEST	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_minha_guarda_deu_fail_open	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_reproduction_3_tries	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
@@ -509,8 +510,11 @@
 .claude/validation/ops-citation-travel-check.sh	D_TRES_DECLARACOES_E_O_MARCADOR	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
 .claude/validation/pin-integrity-check.sh	E_pin_integrity_check	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/pipe-verdict-check.sh	E_LISTA_3_CATRACA_DO_EPIPE_SEM_GIT_E_SEM_BASH	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/validation/projection-safety.sh	C_TETO_VOCABULARIO_E_LABEL	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/projection-safety.sh	C_soberania_engajamento	docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml
+.claude/validation/projection-safety.sh	D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/projection-safety.sh	D_p7_terms_extension	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
+.claude/validation/projection-safety.sh	E_ELENXO_REPROVOU_E_AS_CURAS	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/projection-safety.sh	E_PRIMITIVE_EXISTS	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	E_projection_safety	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	E_projection_safety_exists	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
@@ -1357,11 +1361,11 @@ docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-result
 docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
-docs/evolution/inbox/_processed/2026-09-30-gmill-kbs-zoho-glpi.md	Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-09-30-gmill-kbs-zoho-glpi.md	Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md	Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md	Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-02-promocao-a-hub.md	Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
-docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md	E_GMILL_VEREDITO_DOS_TRES_FALSOS_POSITIVOS	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md	E_HUB_OPERACOES_ENTERPRISE_VEREDITO_DOS_TRES_FALSOS_POSITIVOS	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-06-radar-cego-mu07-mu18.md	E_RADAR_CEGO_A_TIPO_TROCADO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
@@ -1432,6 +1436,7 @@ docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartil
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/REPORT.md	E_TRIAGEM_DA_PROVENANCE_DO_CORPUS	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o3-universe.tsv	E_ONDA_O2_APLICADA	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
+docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o7-juiz-resumo.md	E_ID_E_CAMINHO_FORA_DO_ALCANCE_DA_REGRA_30	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/routing-v4.tsv	E_ONDA_O1_APLICADA	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/v41-testimony-in-prod.tsv	E_CONTRATO_V41_ADOTADO	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml	C_OPCAO_E_APLICAR_OS_QUATRO_ACHADOS	docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml
@@ -1624,6 +1629,7 @@ docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS_SINGLE_SOURCE_MES
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS_TARGETING_SCHEMA_OPEN	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS_TOOL_POISONING_STAT_DOWNGRADED	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS_VPS_SUFFICES	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml	E_RENOME_COM_RECONCILIACAO_E_ARESTA_CONFERIDA	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml	C_GUARDA_PARIDADE_CARIMBO_IMPLICA_REGISTRO	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 docs/evolution/research/infra-vps-2026-10/SYNTHESIS.md	D_INFRA_VPS_TREATMENT	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
 docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml	C_OPCAO_A_NADA_NOVO	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
@@ -2231,3 +2237,4 @@ ops/update-bridge.sh	E_W9_BRIDGE_DEPLOY_0902	docs/onion/graph/m2-bridge-logto-20
 ops/verify-adopter-gate.sh	E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 ops/verify-adopter-gate.sh	E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 site/src/pages	Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
+vendor/kg-ssot/spec/kg-contract-v4.schema.json	C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml

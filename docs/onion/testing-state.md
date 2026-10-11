@@ -13,10 +13,10 @@
 | Dimensão | Nº | Produtor |
 |---|---:|---|
 | Famílias na bancada | **232** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **1752** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **1766** | `bash .claude/validation/harness-inventory.sh --env` |
 | Regras do lint | **89** | `bash .claude/validation/rules-registry.sh --counts` |
 | — HARD | **77** | `bash .claude/validation/rules-registry.sh --counts` |
-| Pares de modo consumido | **56** | `bash .claude/validation/consumed-mode-check.sh .` |
+| Pares de modo consumido | **57** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | `bash .claude/validation/consumed-mode-check.sh .` |
 | Baselines de catraca | **15** | `git ls-files '.claude/validation/*-baseline.txt'` |
 
@@ -54,15 +54,15 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **464** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados totais | **2478** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados REAIS | **2132** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **465** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados totais | **2485** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados REAIS | **2139** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **86%** | `bash .claude/validation/review-ledger.sh --env` |
-| Tokens por achado REAL | **123010** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **370** | `bash .claude/validation/review-ledger.sh --env` |
+| Tokens por achado REAL | **122689** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **371** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **94** | `bash .claude/validation/review-ledger.sh --env` |
 
-A média de tokens cobre os **248** resíduos com custo > 0; os demais declaram `tokens: 0`
+A média de tokens cobre os **249** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
 não é média — mas seus achados continuam contados no total.
 
