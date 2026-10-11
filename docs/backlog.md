@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**448 itens abertos** em 95 grafo(s) com aberto (de 121 no escopo) · 96 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**445 itens abertos** em 94 grafo(s) com aberto (de 121 no escopo) · 95 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -515,14 +515,6 @@
 | 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
 | 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 
-## conductor-2026-10 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 18.0 | `A_PLAN_VERIFICACAO_PELO_MOTOR` | conductor-2026-10 | PLANO N4 — absorver no onion-research o CONCEITO 'quem verifica nao e quem produz, e o teto de correcao e contado pelo motor': p |
-| 9.6 | `Q_CONDUCTOR_ABSORVER_OU_NAO_1011` | conductor-2026-10 | O Onion absorve, costura, parqueia ou rejeita o Conductor (Microsoft) — orquestracao multiagente declarada em YAML que valida a  |
-| 3.0 | `E_N3_SCHEMA_NATIVO_LACUNA` | conductor-2026-10 | LACUNA NOMEADA — a validacao de FORMA o Onion ja recebe do harness (todo agente do onion-research.js leva schema:). Se o harness |
-
 ## guard-forge-2026-10 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -705,13 +697,6 @@
 | 3.6 | `Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO` | audit-textual-gates-2026-09 | O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotant |
 | 3.6 | `Q_R15_WRAP_NO_CAMINHO_CRITICO` | audit-textual-gates-2026-09 | onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted- |
 
-## dissect-forge-2026-10 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.4 | `D_PLANO_DE_ABSORCAO_E_NO` | dissect-forge-2026-10 | desenho da costura: o N4 do dissect escreve nos x_absorb_* no grafo (KG-SSOT first), o dissect-plans.sh os le, mede as pecas do al |
-| 5.4 | `Q_COSTURA_DISSECT_FORGE` | dissect-forge-2026-10 | costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprend |
-
 ## company-brain-market-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -881,12 +866,6 @@
 |--:|---|---|---|
 | 4.2 | `Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO` | radar-E3-2026-10-05-r7 | A 2.1.289 adiciona agent.spawn para teammates, um id de agente unico atraves dos eventos de hook de plugin, e estados idle/waiting |
 
-## radar-E3-2026-10-08-r8 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.2 | `Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT` | radar-E3-2026-10-08-r8 | curar o custo quadrático do env-guard num token gigante: com onFailure block, um comando de ~520 KB sem espaço passa a ser BARRA |
-
 ## vps-shared-tools-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -898,6 +877,19 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
+
+## dissect-forge-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.6 | `Q_COSTURA_DISSECT_FORGE` | dissect-forge-2026-10 | costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprend |
+
+## vetos-fail-closed-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.2 | `C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON` | vetos-fail-closed-2026-10 | o recorte sem python3 dos dois vetos é sombreado no core: o env-guard, registrado no mesmo matcher, barra todo Read, Grep e Bash  |
+| 2.8 | `C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL` | vetos-fail-closed-2026-10 | falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, po |
 
 ## inbox-triage-2026-10-04 — 1 item(ns)
 
