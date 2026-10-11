@@ -1,5 +1,6 @@
 ---
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b2429f7fa4318605896ac0b85a64ea88a53499b2aae76643fa4b29441ece58d3
+reviewed_code_sha256: da392a352f0a29202d77e21c0210f2c34bb14bd386cd2d0d041adf363acd298f
 findings_total: 10
 findings_real: 9
 tokens: 174415
