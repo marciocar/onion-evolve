@@ -407,7 +407,7 @@ nodes:
     confidence: 0.8
     status: open
     verified_at: '2026-10-05'
-    verified_against: 'caso medido no mesmo dia: o /meta:setup-integration manda ler o .env com Read "sem expor valores" e o Read expoe tudo (sinal do hub gmill, 2026-10-05) — instrucao de prosa que nenhuma guarda confere'
+    verified_against: 'caso medido no mesmo dia: o /meta:setup-integration manda ler o .env com Read "sem expor valores" e o Read expoe tudo (sinal do hub-operacoes-enterprise, 2026-10-05) — instrucao de prosa que nenhuma guarda confere'
     trace: '.claude/commands/meta/setup-integration.md'
     label: 'O QUE A SUPERACAO AINDA NAO COBRE: bytecode que nenhum teste confere — instrucao em prosa de comando que a VM obedece sem verificador. Exemplo medido no mesmo dia: o setup-integration afirma que ler o .env com Read "nao expoe valores", e expoe; a doutrina dizia o contrario do que a ferramenta faz, e nada pegou ate um adotante usar. A medida desta lacuna e a fila de trabalho do Elenxo como movimento de superacao: cada instrucao critica de prosa ganha guarda (fix-must-become-mechanism) ou fica declarada como confianca-no-modelo. GATILHO: cada defeito de prosa medido em campo.'
 
