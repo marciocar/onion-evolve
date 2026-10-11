@@ -1,8 +1,9 @@
 ---
-reviewed_diff_sha256: b35e8f6f04d0f97560855cef1f0d8f56a641086337aea7c1b6db80240a182bc7
-reviewed_code_sha256: 43e7a506ceda5a090241c0d66415157ddd8d7df25849330eba7dc1918cf4ed4f
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
+tokens: 83679
+duration_min: 5
 verdict: APROVADO
 elenxo: sim
 nota: >
