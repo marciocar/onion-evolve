@@ -1,8 +1,7 @@
 ---
 branch: feat/task-manager-executable-adapter
 date: 2026-10-11
-reviewed_diff_sha256: 480cc8898d64bff3dbe41345ab8c80e357d737c8c45332f6eb41f13413f47911
-reviewed_code_sha256: cb61073f4e7637cd85a09acb493118d28e20cd0db1b8e74a03bc3a5914046d2f
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_fixed: 3
@@ -21,7 +20,7 @@ escrita **relida** por trás, ou foi promovido porque o executável devolveu exi
 
 O `item.update` saiu rc 0, e a releitura mostrou a descrição **diferente** da enviada: o Linear passa o
 texto pelo ProseMirror e auto-linka token com cara de domínio fora de crase (`tm.sh` nu voltou como
-`[tm.sh](<http://tm.sh>)`). Não é defeito do executável, é comportamento do provedor, e quem comparar o
+um link markdown cujo alvo é `http://tm.sh`). Não é defeito do executável, é comportamento do provedor, e quem comparar o
 texto relido com o enviado (um verificador de sincronização, por exemplo) vai acusar diferença falsa.
 Registrado na medição do `linear.md`. Sem a releitura, o `implemented` teria saído com a nota "texto
 igual" — exatamente o declarado ≠ verificado que a tarefa pedia para evitar.
