@@ -41,7 +41,8 @@
 #                     mas SEM verified_against: — carimbo sem alvo declarado; os demais tipos
 #                     ancoram por trace:/TRACES_TO e não são cobrados) · MISPLANED (plane:PROD
 #                     com verified_against: branch|commit — o nó afirma sobre o VIVO e declara
-#                     ter olhado a FONTE; contradição interna, vale p/ TODOS os tipos), e
+#                     ter olhado a FONTE; contradição interna, vale p/ TODOS os tipos; `commit`
+#                     de sentido-EXECUÇÃO — commit-sonda, commit barrado/recusado — não acusa), e
 #                     plane:PROD com base em relato (`evidence_class: testimony` ou
 #                     `provenance.method: testemunho: …` — contrato v4.1, SAC-96).
 #                     Determinístico: compara duas datas / dois campos do arquivo, sem "agora"
@@ -210,6 +211,25 @@ function pendingTarget(s, t) { return (s != "superseded" && s != "refuted" && !(
 function trabalhoPendente(s) { return (s != "confirmed" && s != "done" && s != "superseded" && s != "refuted") }
 
 function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["'\'']$/, "", s); return s }
+
+# MISPLANED, sentido da palavra: `commit` em verified_against só é LEITURA DE FONTE quando nomeia
+# o commit lido. Quando nomeia o commit que o gate BARROU (commit-sonda, commit recusado/bloqueado,
+# hook que bloqueia o commit), é EXECUÇÃO ao vivo, e PROD ali é legítimo.
+# Crédito: sinal de campo do adotante onion-kg-ssot (2026-10-11): o DETERMINISTIC_GATE dele
+# carimbava "commit-sonda que o gate barrou" e levou MISPLANED; contornou reescrevendo a frase.
+# Cura POR OCORRÊNCIA, nunca por nó: (1) `commit <sha>` acusa SEMPRE, venha o que vier antes ou
+# depois; (2) só as ocorrências de sentido-execução saem da string; (3) o que sobrar de
+# branch|commit continua acusando. Assim um carimbo com as DUAS leituras segue acusado.
+# `@<sha>` sozinho NÃO passou a acusar: `onion@<sha>` é stamp de pin, o caso ambíguo que o
+# MISPLANED deixa fora de propósito; alargar o gate não é o objeto desta cura.
+function misplanedSourceRead(v,   w) {
+  w = tolower(v)
+  if (w ~ /(^|[^a-z])commit[-_ :]+[0-9a-f]{7,40}([^0-9a-z]|$)/) return 1
+  gsub(/commit[-_ ]sonda/, " ", w)
+  gsub(/commit[-_ ]((foi|e|sai|saiu|ficou)[-_ ])?(barrad|recusad|bloquead|vetad|reprovad)[oa]s?/, " ", w)
+  gsub(/(barr|recus|bloque|vet|reprov)[a-z]*[-_ ]((o|a|um|seu)[-_ ])?(([0-9]+[^-_ ]*|primeiro|proprio)[-_ ])?commit([^a-z]|$)/, " ", w)
+  return (w ~ /(^|[^a-z])(branch|commit)([^a-z]|$)/)
+}
 
 BEGIN { section = ""; nid = ""; ne = 0; metaClosed = 0; metaFieldIndent = -1 }
 
@@ -1065,7 +1085,8 @@ END {
       # declaração é verdadeira — um nó que escreve `deploy` medindo bench local passa. Isso é
       # limite honesto, não defeito: fecha a contradição legível, não a mentira deliberada.
       # `pin` NÃO é cobrado de propósito: é ambíguo (ler o stamp do checkout vivo é PROD legítimo).
-      if (plane[id] == "PROD" && verifiedAgainst[id] ~ /(^|[^a-zA-Z])(branch|commit)([^a-zA-Z]|$)/) {
+      # `misplanedSourceRead`: commit-sonda/commit barrado é EXECUÇÃO, não leitura (ver a função).
+      if (plane[id] == "PROD" && verifiedAgainst[id] ~ /(^|[^a-zA-Z])(branch|commit)([^a-zA-Z]|$)/ && misplanedSourceRead(verifiedAgainst[id])) {
         print "  ⚠ MISPLANED: " id " (plane:PROD mas verified_against: " verifiedAgainst[id] " — o nó afirma sobre o VIVO e declara ter olhado a FONTE; reclassifique para plane:DEV ou re-verifique contra o artefato vivo)"; fwarns++
       }
     }

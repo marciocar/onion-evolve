@@ -1052,6 +1052,46 @@ run_kg_freshness_selftests() {
   else
     record_fail "kg-freshness: (t) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   fi
+
+  # ── sentido da palavra `commit` (sinal de campo do adotante onion-kg-ssot, 2026-10-11) ──
+  # O DETERMINISTIC_GATE dele carimbava "commit-sonda que o gate barrou" (execução ao vivo) e
+  # levava MISPLANED. As duas polaridades: execução cala; `commit <sha>` segue acusando, inclusive
+  # na frase MISTA e com verbo de execução logo antes do sha.
+  # (u) execução cala.
+  if ! grep -qE 'MISPLANED: (E_PROD_COMMIT_SONDA_BARRADO|E_PROD_HOOK_BLOQUEIA_O_COMMIT)' <<<"${out}"; then
+    record_pass "kg-freshness: (u) commit-sonda barrado e hook que bloqueia o commit NÃO disparam (execução, não leitura)"
+  else record_fail "kg-freshness: (u) falso-positivo do commit de execução" "out=${out}"; fi
+
+  # (v) `commit <sha>` acusa sempre — a cura é por ocorrência, não por nó.
+  if grep -q 'MISPLANED: C_PROD_SONDA_MAS_LEU_COMMIT_SHA' <<<"${out}" \
+     && grep -q 'MISPLANED: C_PROD_REPROVADO_NO_COMMIT_SHA' <<<"${out}"; then
+    record_pass "kg-freshness: (v) commit <sha> segue acusando, mesmo ao lado de um commit-sonda ou de um verbo de execução"
+  else record_fail "kg-freshness: (v) a cura escondeu leitura de fonte" "out=${out}"; fi
+
+  # (w) (MUT) sem o filtro de sentido, o commit-sonda VOLTA a disparar — reproduz o sinal.
+  cp "${radar}" "${mut}/mut-sense.sh"; _lib_beside "${mut}"
+  sed -i 's/ \&\& misplanedSourceRead(verifiedAgainst\[id\])) {/) {/' "${mut}/mut-sense.sh"
+  if ! grep -q '&& misplanedSourceRead(verifiedAgainst' "${mut}/mut-sense.sh"; then
+    local msen; msen="$(bash "${mut}/mut-sense.sh" "${fxm}" --freshness 2>&1 || true)"
+    if grep -q 'MISPLANED: E_PROD_COMMIT_SONDA_BARRADO' <<< "${msen}"; then
+      record_pass "kg-freshness: (w) (MUT) sem o filtro de sentido o commit-sonda volta a disparar — reproduz o sinal"
+    else record_fail "kg-freshness: (w) (MUT)" "remover o filtro não mudou o veredito; out=${msen}"; fi
+  else
+    record_fail "kg-freshness: (w) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+
+  # (x) (MUT) sem o atalho do `commit <sha>`, a limpeza de sentido apaga "reprovou o commit <sha>"
+  # e o nó CALA — prova que o atalho é o que impede a cura de esconder leitura de fonte.
+  cp "${radar}" "${mut}/mut-sha.sh"; _lib_beside "${mut}"
+  sed -i 's/  if (w ~ \/(^|\[^a-z\])commit\[-_ :\]+\[0-9a-f\]{7,40}(\[^0-9a-z\]|\$)\/) return 1/  if (0) return 1/' "${mut}/mut-sha.sh"
+  if grep -q '  if (0) return 1' "${mut}/mut-sha.sh"; then
+    local msha; msha="$(bash "${mut}/mut-sha.sh" "${fxm}" --freshness 2>&1 || true)"
+    if ! grep -q 'MISPLANED: C_PROD_REPROVADO_NO_COMMIT_SHA' <<< "${msha}"; then
+      record_pass "kg-freshness: (x) (MUT) sem o atalho do commit <sha> a leitura de fonte some — o atalho é load-bearing"
+    else record_fail "kg-freshness: (x) (MUT)" "remover o atalho não mudou o veredito; out=${msha}"; fi
+  else
+    record_fail "kg-freshness: (x) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
 }
 
 # ---------------------------------------------------------------------------
