@@ -157,7 +157,12 @@ if isinstance(doc, dict):
 
         is_source_role = role == "source"
         is_source_kind = kind == "source"
-        if is_source_role != is_source_kind:
+        # A porta onion-core publica o papel `source` (matriz das portas, D_MATRIZ_DE_PORTAS_2026_10, 2026-10-09):
+        # `role: source` com `kind: door` é a FACE PÚBLICA da fonte. Ela não ganha a isenção da fonte (o `continue`
+        # abaixo exige os dois): segue para a validação plena de derivado, com parent e pin verificado.
+        if is_source_role and kind == "door":
+            pass
+        elif is_source_role != is_source_kind:
             err(f"{tag}: 'role:source' e 'kind:source' têm de vir juntos (fonte≠derivação); veio role='{role}' kind='{kind}'")
         if is_source_role and is_source_kind:
             continue
