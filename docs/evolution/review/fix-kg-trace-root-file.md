@@ -2,7 +2,8 @@
 branch: fix/kg-trace-root-file
 pr: pendente
 date: 2026-10-11
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c10d0e3896fea7d61082fdf875c08804918b0ffcaf5444b9622bd4450dd17f63
+reviewed_code_sha256: 8cb577bf071aca0d08cb5159e87929d24fc2b0c19ef610016d9e930536a39178
 findings_total: 3
 findings_real: 1
 findings_fixed: 1
