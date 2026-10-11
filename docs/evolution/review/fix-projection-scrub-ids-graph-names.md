@@ -31,7 +31,7 @@ nota: >-
   no label virou `external_edge` conferida pelo gate.
 - **REGRA 63 (Colheita de grafo emite os ids colhidos no resíduo de revisão)** reconhece renome
   declarado por `x_renamed_from`.
-- **kg-contract-check** reconhece renome (`git diff --cached -M90%`).
+- **kg-contract-check** reconhece renome: o par que o `git diff --cached -M` detecta E que preserva ao menos metade dos ids de nó.
 - `rito-task-manager-2026-09`: `gatilho` → `x_gatilho` (MUST herdado); `.kg-ssot/gate.json` travado.
 
 ## Ids renomeados (REGRA 63)
@@ -56,7 +56,7 @@ novo o nome que o renome veio tirar. Os novos:
 | 4 | menor | Falso negativo: nome partido em tokens (`E_BETA_HAUSS_X`) | forma espremida (P7h) |
 | 5 | menor | Falso positivo: sigla dentro de palavra e `id:` dentro de bloco escalar | termo curto casa só como token (P7g, P7j); bloco escalar é texto (P7i) |
 | 6 | menor | O P7f grepava o fonte do lint, não o comportamento | P7f roda o `lint-artifacts.sh` de verdade num repo-sandbox |
-| 7 | menor | Renome com limiar 50% herdaria dívida de grafo apagado | `-M90%`; caso (k3), mutante `-M` reprova |
+| 7 | menor | Renome com limiar 50% herdaria dívida de grafo apagado | renome exige também metade dos ids de nó em comum; caso (k3), mutante reprova. O limiar de texto 90% sugerido foi medido e descartado: o próprio renome deste PR ficou em 85% |
 
 **Não curado, declarado (teto):** id em estilo flow (`{id: X}`), com chave entre aspas ou com acento não
 é visto. O radar, que é awk, também só lê o estilo de bloco, e id só aceita `[A-Za-z0-9_]`.
@@ -66,7 +66,7 @@ novo o nome que o renome veio tirar. Os novos:
 P7: sem client-terms · sem exclusão de id público · sem teste de caminho · sem normalização · sem
 varredura de id · sem token para termo curto · sem forma espremida · sem pular bloco escalar ·
 dispatcher sem a chamada · dispatcher com `IS_LEAF` invertido. REGRA 63: sem o bloco do
-`x_renamed_from`. kg-contract-check: sem o bloco de renome; `-M90%` → `-M`. Todos mordem.
+`x_renamed_from`. kg-contract-check: sem o bloco de renome; sem a exigência de ids em comum. Todos mordem.
 
 ## Confirmed conferidos (REGRA 87)
 

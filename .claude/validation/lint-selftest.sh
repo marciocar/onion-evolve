@@ -25458,15 +25458,15 @@ run_kg_contract_check_selftests() {
   if [ "${rc}" -eq 1 ] && grep -q 'form.range.node.label' <<< "${out}"; then
     record_pass "kg-contract-check: (k2) renomeado que ganha label longo → rc 1 (o renome não isenta a piora)"
   else record_fail "kg-contract-check: (k2)" "piora no renomeado não acusada: rc=${rc} ${out}"; fi
-  # (k3) NÃO é renome: apagar o grafo A com dívida e criar, no mesmo índice, um B parecido mas reescrito
-  #      (data sem aspas + metade dos nós trocada) → B nasce novo e a dívida É cobrada. Com o limiar padrão
-  #      do git (50%) o par A→B virava "renome" e B herdava a tolerância de A. Mutante: -M90% → -M reprova.
+  # (k3) NÃO é renome: apagar o grafo A com dívida e criar, no mesmo índice, um B com o mesmo esqueleto mas
+  #      OUTROS nós (ids trocados) → o git pareia A→B pelo texto (>=50%), mas B é outro grafo: nasce novo e a
+  #      dívida É cobrada. Só o limiar de texto faria B herdar a tolerância de A. Mutante: tirar a exigência de
+  #      ids em comum reprova este caso.
   _kcc_graph antiga | sed -e 's/baseline: "2026-10-08"/baseline: 2026-10-08/' > "${sb}/g/antiga.kg.yaml"
   ( cd "${sb}" && git add g/antiga.kg.yaml && git -c user.email=t@t -c user.name=t commit -qm antiga \
     && git rm -qf g/antiga.kg.yaml ) >/dev/null 2>&1 || true
   { _kcc_graph outro | sed -e 's/baseline: "2026-10-08"/baseline: 2026-10-08/' \
-      -e 's/label: "pergunta A"/label: "outra pergunta, reescrita"/' -e 's/label: "evidência A"/label: "outra evidência, reescrita"/' \
-      -e 's/source: "caminho@commit"/source: "outro@commit"/' -e 's/locator: "linha 1"/locator: "linha 9"/'; } > "${sb}/g/outro.kg.yaml"
+      -e 's/Q_A$/Q_OUTRA/' -e 's/E_A$/E_OUTRA/' -e 's/: Q_A$/: Q_OUTRA/' -e 's/: E_A$/: E_OUTRA/'; } > "${sb}/g/outro.kg.yaml"
   ( cd "${sb}" && git add g/outro.kg.yaml ) >/dev/null 2>&1 || true
   if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/outro.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 1 ] && grep -q 'yaml.unquoted-date' <<< "${out}"; then
