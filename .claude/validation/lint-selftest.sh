@@ -182,7 +182,7 @@ SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHA
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -8035,6 +8035,72 @@ run_gitattributes_eol_selftests() {
   else record_fail "gitattributes-eol: índice" "${n} arquivo(s) eol=lf com CRLF no índice — rode git add --renormalize ."; fi
 }
 _family run_gitattributes_eol_selftests
+
+# O eol=lf VIAJA (passo seguinte do SAC-107, PR #1023): o .gitattributes do core não viaja no manifesto,
+# e a porta pública e o adotante — clonados em qualquer máquina — recebiam os .sh sem a cura. O helper
+# emit-eol-gitattributes.sh escreve a raiz da porta (projeção: reescreve) e a do adotante (never-clobber).
+# CORE-ONLY: os casos (g) e (h) leem o .gitattributes do core e o ops/, que não viajam.
+run_eol_gitattributes_selftests() {
+  local h="${REPO_ROOT}/.claude/utils/adopt/emit-eol-gitattributes.sh" d out before p miss=""
+  [ -f "${h}" ] || { record_fail "eol-gitattributes: helper" "emit-eol-gitattributes.sh ausente"; return; }
+  # (a) porta: subconjunto MEDIDO — só o padrão que casa arquivo; sem .githooks/ não há a linha
+  d="$(mktemp -d)"; mkdir -p "${d}/x"; : > "${d}/x/a.sh"; : > "${d}/b.py"
+  bash "${h}" "${d}" --door >/dev/null 2>&1 || true
+  if grep -qxF '*.sh text eol=lf' "${d}/.gitattributes" 2>/dev/null && grep -qxF '*.py text eol=lf' "${d}/.gitattributes" \
+     && ! grep -qF '.githooks/*' "${d}/.gitattributes" && ! grep -qF '*.ts' "${d}/.gitattributes"; then
+    record_pass "eol-gitattributes: (a) porta recebe só os padrões que casam arquivo montado"
+  else record_fail "eol-gitattributes: (a)" "conteúdo: $(tr '\n' '|' < "${d}/.gitattributes" 2>/dev/null)"; fi
+  rm -rf "${d}"
+  # (b) adotante sem .gitattributes → criado, com .githooks/* quando o hook existe
+  d="$(mktemp -d)"; mkdir -p "${d}/.githooks"; : > "${d}/.githooks/pre-commit"; : > "${d}/run.sh"
+  bash "${h}" "${d}" --adopt >/dev/null 2>&1 || true
+  if grep -qxF '*.sh text eol=lf' "${d}/.gitattributes" 2>/dev/null && grep -qxF '.githooks/* text eol=lf' "${d}/.gitattributes"; then
+    record_pass "eol-gitattributes: (b) adotante sem .gitattributes → criado com *.sh e .githooks/*"
+  else record_fail "eol-gitattributes: (b)" "conteúdo: $(tr '\n' '|' < "${d}/.gitattributes" 2>/dev/null)"; fi
+  # (c) idempotente: a 2ª rodada não muda um byte
+  before="$(cat "${d}/.gitattributes" 2>/dev/null || true)"; bash "${h}" "${d}" --adopt >/dev/null 2>&1 || true
+  if [ "$(cat "${d}/.gitattributes" 2>/dev/null || true)" = "${before}" ]; then record_pass "eol-gitattributes: (c) 2ª rodada no adotante é idempotente"
+  else record_fail "eol-gitattributes: (c)" "a 2ª rodada mudou o arquivo"; fi
+  rm -rf "${d}"
+  # (d) só merge=union do adopt (não governa EOL) → preservado e acrescido (o --update de quem já adotou)
+  d="$(mktemp -d)"; : > "${d}/run.sh"; printf 'docs/evolution/**/CHANGELOG.md merge=union\n' > "${d}/.gitattributes"
+  bash "${h}" "${d}" --adopt >/dev/null 2>&1 || true
+  if [ "$(head -1 "${d}/.gitattributes")" = 'docs/evolution/**/CHANGELOG.md merge=union' ] && grep -qxF '*.sh text eol=lf' "${d}/.gitattributes"; then
+    record_pass "eol-gitattributes: (d) .gitattributes só com merge=union → preservado e acrescido"
+  else record_fail "eol-gitattributes: (d)" "conteúdo: $(tr '\n' '|' < "${d}/.gitattributes")"; fi
+  rm -rf "${d}"
+  # (e) NEVER-CLOBBER: alvo que já governa EOL não é tocado, e o helper DECLARA a linha
+  d="$(mktemp -d)"; : > "${d}/run.sh"; printf '# do adotante\n*.sh text eol=crlf\n' > "${d}/.gitattributes"
+  before="$(cat "${d}/.gitattributes" 2>/dev/null || true)"; out="$(bash "${h}" "${d}" --adopt 2>&1 || true)"
+  if [ "$(cat "${d}/.gitattributes" 2>/dev/null || true)" = "${before}" ] && grep -q 'NÃO APLICADO (never-clobber).*linha 2' <<< "${out}"; then
+    record_pass "eol-gitattributes: (e) alvo que governa EOL fica intocado e a linha é declarada"
+  else record_fail "eol-gitattributes: (e)" "arquivo: $(tr '\n' '|' < "${d}/.gitattributes") · saída: ${out:0:160}"; fi
+  rm -rf "${d}"
+  # (f) CRLF NO ÍNDICE do alvo → o padrão fica de fora e é NOMEADO (eol=lf mudaria bytes rastreados dele)
+  d="$(mktemp -d)"; git -C "${d}" init -q; git -C "${d}" config core.autocrlf false
+  printf 'echo a\r\n' > "${d}/x.sh"; printf 'print(1)\n' > "${d}/y.py"; git -C "${d}" add x.sh y.py
+  out="$(bash "${h}" "${d}" --adopt 2>&1 || true)"
+  if ! grep -qxF '*.sh text eol=lf' "${d}/.gitattributes" 2>/dev/null && grep -qxF '*.py text eol=lf' "${d}/.gitattributes" \
+     && grep -q 'CRLF no índice.*\*\.sh' <<< "${out}"; then
+    record_pass "eol-gitattributes: (f) .sh com CRLF no índice do alvo → *.sh fora e nomeado; *.py entra"
+  else record_fail "eol-gitattributes: (f)" "arquivo: $(tr '\n' '|' < "${d}/.gitattributes" 2>/dev/null) · saída: ${out:0:160}"; fi
+  rm -rf "${d}"
+  # (g) PARIDADE: todo padrão do helper é uma linha `text eol=lf` do .gitattributes do core
+  #     (laço por `read`, nunca `for p in $(…)`: o `*.sh` sem aspas EXPANDE contra o cwd — medido no 1º run)
+  while IFS= read -r p; do
+    [ -n "${p}" ] || continue
+    grep -qE "^$(printf '%s' "${p}" | sed 's/[.*]/\\&/g')[[:space:]]+text eol=lf$" "${REPO_ROOT}/.gitattributes" || miss="${miss} ${p}"
+  done < <(sed -n "s/^PATTERNS=(\(.*\))$/\1/p" "${h}" | tr -d "'" | tr ' ' '\n')
+  if [ -n "$(sed -n 's/^PATTERNS=(\(.*\))$/\1/p' "${h}")" ] && [ -z "${miss}" ]; then
+    record_pass "eol-gitattributes: (g) os padrões do helper são subconjunto do eol=lf do core"
+  else record_fail "eol-gitattributes: (g)" "fora do .gitattributes do core (ou PATTERNS ilegível):${miss:- PATTERNS vazio}"; fi
+  # (h) registro: o /meta:adopt e o materializador da porta CHAMAM o helper (helper que ninguém chama é guarda morta)
+  if grep -q 'emit-eol-gitattributes.sh" "\$DEST" --adopt' "${REPO_ROOT}/.claude/commands/meta/adopt.md" \
+     && grep -q 'emit-eol-gitattributes.sh" "${DEST}" --door' "${REPO_ROOT}/ops/materialize-door.sh"; then
+    record_pass "eol-gitattributes: (h) o /meta:adopt (--adopt) e a materialização da porta (--door) chamam o helper"
+  else record_fail "eol-gitattributes: (h)" "uma das duas superfícies não chama o helper"; fi
+}
+_family run_eol_gitattributes_selftests
 
 run_scope_gitignore_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/scope-claude-gitignore.sh"
@@ -22166,6 +22232,11 @@ run_door_selftests() {
     for f in README.md CLAUDE.md LICENSE LICENSE-DOCS; do [ -f "${d3}/${f}" ] || faltam="${faltam} ${f}"; done
     if [ -z "${faltam}" ]; then record_pass "door: (c) raiz completa (README · CLAUDE.md · LICENSE · LICENSE-DOCS)"
     else record_fail "door: (c)" "faltam na raiz:${faltam}"; fi
+    # (c2) o .gitattributes com eol=lf CHEGA à raiz montada (passo seguinte do SAC-107): a porta é o que
+    #      se clona num Windows com autocrlf, e o do core não viaja. Sem .githooks/ na porta, sem a linha.
+    if grep -qxF '*.sh text eol=lf' "${d3}/.gitattributes" 2>/dev/null && ! grep -qF '.githooks/' "${d3}/.gitattributes"; then
+      record_pass "door: (c2) a raiz montada leva .gitattributes com *.sh text eol=lf (subconjunto do que a porta carrega)"
+    else record_fail "door: (c2)" "raiz sem o eol=lf dos executáveis: $(tr '\n' '|' < "${d3}/.gitattributes" 2>/dev/null || echo ausente)"; fi
     # (d) o LICENSE da porta é NU, não LICENSE-ONION: aqui o repositório É o Onion. No adotante
     #     seria o inverso, e o emit-licenses.sh faz o inverso lá — a diferença é de OBJETO.
     if [ -f "${d3}/LICENSE" ] && [ ! -f "${d3}/LICENSE-ONION" ]; then

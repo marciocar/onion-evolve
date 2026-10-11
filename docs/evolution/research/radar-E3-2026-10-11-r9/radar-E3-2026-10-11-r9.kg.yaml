@@ -219,6 +219,7 @@ nodes:
       method: "medição: contagem de EOL no índice e no checkout simulado do Windows, antes e depois da mudança, mais 5 mutantes via ops/mutate-and-restore.sh"
       locality: "repo"
     label: "fixar eol=lf no .gitattributes do core (e no que viaja às portas) para scripts e grafos, medindo antes que nenhum arquivo rastreado muda de bytes"
+    narrative: "A metade que NÃO VIAJAVA fechou no passo seguinte, em 2026-10-11 (branch fix/small-registry-and-door-gaps): o helper .claude/utils/adopt/emit-eol-gitattributes.sh escreve o eol=lf dos executáveis na raiz da porta, em todo papel, com o subconjunto medido no montado (o standalone recebe *.sh *.awk *.py *.js *.mjs, sem .githooks/ porque a porta não o leva). No adotante ele roda no passo 7 do /meta:adopt em modo never-clobber: alvo cujo .gitattributes já governa EOL não é tocado e a linha é declarada; padrão que casa arquivo com CRLF no índice fica de fora, nomeado. Cobertura: família eol_gitattributes (8 casos) e o caso door (c2), com 7 mutantes mortos. *.md, *.yaml e *.json seguem só no core: a cura que viaja é a dos executáveis."
 edges:
   - from: E_TIERING_DOS_WORKFLOWS_E_O_MODELO_UNICO
     to: Q_CHECAGEM_DE_MODELO_FORCADO_CEGA_A_VARIAVEL_NOVA
