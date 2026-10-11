@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**435 itens abertos** em 93 grafo(s) com aberto (de 118 no escopo) · 94 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**438 itens abertos** em 93 grafo(s) com aberto (de 119 no escopo) · 94 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -290,6 +290,15 @@
 | 12.6 | `C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR` | plugin-language-policy-2026-09 | OPCAO (i) — superficies GERADAS em ingles (description do plugin.json, README do plugin e do marketplace, argument-hint, marketp |
 | 6.3 | `C_OPCAO_II_BILINGUE_POR_CAMPOS` | plugin-language-policy-2026-09 | OPCAO (ii) — bilingue por campos: `description` + `description_en` no plugin.json, README com EN em cima e pt-BR abaixo, ambos c |
 | 3.8 | `C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS` | plugin-language-policy-2026-09 | OPCAO (iii) — ingles integral nas superficies e corpos traduzidos progressivamente. A favor: e a unica que casa 100% com o norte |
+
+## agent-frontmatter-keys-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 34.0 | `D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV` | agent-frontmatter-keys-2026-10 | Substrato: check de lint (REGRA 102) com SSOT em .tsv e juiz em awk. Molde: kg-machine-path-check.sh (helper com --selftest e --ts |
+| 3.2 | `C_TETO_COMANDOS_SKILLS_E_PLUGINS` | agent-frontmatter-keys-2026-10 | TETO: comandos e skills não entram (outros campos, sem medição nesta forja), e o bundle de plugin não roda o lint; o agente em |
+| 3.2 | `C_TETO_SO_CHAVE_DE_TOPO` | agent-frontmatter-keys-2026-10 | TETO: a guarda julga só a chave de TOPO; chave aninhada (dentro de hooks, mcpServers, experimental) e VALOR ficam com outras regr |
+| 3.0 | `C_TETO_DOC_OFICIAL_ENVELHECE` | agent-frontmatter-keys-2026-10 | TETO: a lista oficial é a da doc em 2026-10-11; chave oficial nova é acusada até entrar no .tsv, e chave que a doc remover cont |
 
 ## deck-patterns-2026-09 — 8 item(ns)
 
@@ -799,12 +808,6 @@
 |--:|---|---|---|
 | 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
 | 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
-
-## radar-E3-2026-10-11-r9 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 5.4 | `Q_MEDIR_HOOKS_E_FRONTMATTER_COM_O_DEBUG` | radar-E3-2026-10-11-r9 | medir com o --debug da 2.1.296 a duração dos hooks sem latência medida e as chaves de frontmatter dos agentes, depois de uma al |
 
 ## kg-id-valid-from-2026-10 — 2 item(ns)
 
