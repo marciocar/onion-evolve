@@ -2,6 +2,9 @@
 # resolve-manifest.sh — resolve o manifesto de transporte de um papel, LENDO O rc.
 #
 # Uso: resolve-manifest.sh <SOURCE_ROOT> [<papel>]   → um pathspec por linha
+#      ONION_KIND=door|adoption (default adoption): o DESTINO. Este helper é o caminho da ADOÇÃO, então o
+#      default é adoption; o `--update` do adopt.md passa `door` quando o carimbo do alvo tem `kind: door`.
+#      Só pesa no papel standalone (decisão do maestro, 2026-10-11: o adotado mantém o canal upstream).
 #
 # ══ POR QUE EXISTE ════════════════════════════════════════════════════════════════════════════
 # Porque `mapfile -t manifest < <(vendor-manifest.sh …)` ENGOLE O rc DO PRODUTOR, e esse é o caminho
@@ -20,10 +23,11 @@ set -uo pipefail
 
 SRC="${1:?uso: resolve-manifest.sh <SOURCE_ROOT> [<papel>]}"
 ROLE="${2:-${ONION_ROLE:-adopted}}"
+KIND="${ONION_KIND:-adoption}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 _rc=0
-_out="$(bash "${HERE}/vendor-manifest.sh" --role "${ROLE}" --repo "${SRC}")" || _rc=$?
+_out="$(bash "${HERE}/vendor-manifest.sh" --role "${ROLE}" --kind "${KIND}" --repo "${SRC}")" || _rc=$?
 if [ "${_rc}" -ne 0 ]; then
   echo "ERRO: o manifesto de transporte falhou (rc=${_rc}) para o papel '${ROLE}' — seguir daqui copiaria o repositório inteiro." >&2
   exit 3

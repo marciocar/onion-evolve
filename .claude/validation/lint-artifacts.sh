@@ -1754,6 +1754,12 @@ for name, lst in sets.items():
 for t, names in sorted(owner.items()):
     if len(names) > 1:
         print("DUPSET\t%s\t%s" % (t, ",".join(names)))
+# adoption_keeps (2026-10-11, papel de ADOÇÃO ≠ papel de PORTA): o que o adotado mantém e a porta do mesmo
+# papel não leva. Nome fora da partição seria capacidade prometida que o corte não sabe entregar.
+for role, spec in (d.get("roles") or {}).items():
+    for t in ((spec or {}).get("adoption_keeps") or []):
+        if t not in owner:
+            print("KEEPBAD\t%s\t%s" % (role, t))
 mdir = os.path.join(root, ".claude", "commands", "meta")
 # A partição julga o que é RASTREADO (o que o transporte pode levar): a bancada planta sondas não
 # rastreadas em commands/meta/ para testar OUTRAS regras, e contá-las reprovava 3 casos alheios (medido
@@ -1780,6 +1786,7 @@ PY
       BADSET) violation "HARD" "utils/marketplace/roles.yaml" "papel '${a}' referencia work_tools set '${b}' inexistente em work_tool_sets" ;;
       TOOL) [ -f "${REPO_ROOT}/.claude/commands/meta/${a}.md" ] || violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' sem comando em .claude/commands/meta/${a}.md — crie com /meta:create-command ${a} (ou corrija o nome em work_tool_sets se foi digitado errado)" ;;
       DUPSET) violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' está em MAIS DE UM conjunto (${b}) — os conjuntos particionam commands/meta/: deixe o comando em um só" ;;
+      KEEPBAD) violation "HARD" "utils/marketplace/roles.yaml" "o papel '${a}' declara adoption_keeps '${b}', que não está em NENHUM work_tool_set — o adotado receberia um nome que o corte não sabe entregar; corrija o nome ou classifique o comando" ;;
       UNSET) violation "HARD" "utils/marketplace/roles.yaml" "comando /meta:${a} não está em NENHUM work_tool_set — classifique-o (full, meta_factory, federation, adoption ou pending) em roles.yaml; sem classificação o corte por papel decide por default, em silêncio" ;;
       ALLOWDEAD) violation "HARD" "utils/marketplace/roles.yaml" "a allowlist do papel '${a}' nomeia '.claude/${b}', que não existe — corrija o caminho ou tire-o da lista" ;;
       OVERDEAD) violation "HARD" "utils/marketplace/roles.yaml" "o overlay do papel '${a}' aponta a fonte '${b}', que não existe — a porta sairia sem o arquivo próprio dela (o materializador recusa); crie a fonte ou corrija o caminho" ;;

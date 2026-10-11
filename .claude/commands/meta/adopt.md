@@ -726,6 +726,11 @@ TARGET_ROLE="$(awk '/^role:/{print $2; exit}' "$TARGET/.claude/.onion-version")"
 # ⚠️ O EXPORT faz o papel chegar ao `vendor-branch.sh` (quem COPIA no --update); sem ele, 106 arquivos da
 # meta-fábrica caíam num alvo `role: standalone` com a bancada verde (medido 2026-09-15).
 export ONION_ROLE="$TARGET_ROLE"
+# O DESTINO também vem do stamp (decisão do maestro, 2026-10-11): `kind: door` é PORTA, e a porta
+# standalone perde o canal upstream (co-relay, co-evolve, o hook do inbox); sem `kind: door` o alvo é um
+# projeto ADOTADO, e o adotado standalone o mantém. É o mesmo predicado que a F2 introduziu no carimbo.
+TARGET_KIND="$(awk '/^kind:/{print $2; exit}' "$TARGET/.claude/.onion-version")"
+if [ "$TARGET_KIND" = door ]; then export ONION_KIND=door; else export ONION_KIND=adoption; fi
 # Mesma função da cópia segura (o `mapfile … < <(…) || ABORTADO` daqui engolia o rc — ver load-manifest.sh).
 source "$SOURCE_ROOT/.claude/utils/adopt/load-manifest.sh"
 onion_load_manifest "$SOURCE_ROOT" "$TARGET_ROLE" || exit 1
