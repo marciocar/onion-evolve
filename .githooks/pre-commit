@@ -255,7 +255,7 @@ SELFTEST="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
 # arquivo→família. A lista fica como failsafe: o mapa pode não existir (adotante sem a projeção) ou
 # ser incompleto, e infraestrutura da bancada tem de disparar mesmo sem ele.
 _bench_touched() {
-  local _staged; _staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+  local _staged; _staged="$(git diff --cached --name-only --diff-filter=ACMRD)"   # exclusão também toca a bancada (SAC-72)
   [ -n "${_staged}" ] || return 1
   # (1) failsafe por prefixo — infraestrutura da bancada dispara sempre
   grep -qE '^(\.claude/(validation|hooks|utils)/|ops/|\.githooks/|\.github/workflows/)' <<< "${_staged}" && return 0
@@ -268,9 +268,21 @@ _bench_touched() {
     [ -n "${_f}" ] || continue
     LC_ALL=C awk -F'\t' -v a="${_f}" '$2 == a { found=1 } END { exit !found }' <<< "${_map}" && return 0
   done <<< "${_staged}"
+  # (3) o SELETOR (SAC-72, achado do PR #1024): o mapa acima só casa caminho EXATO, e uma skill/comando/
+  #     agente empacotado num plugin não é citado por família nenhuma pelo nome — o commit que quebrou o
+  #     plugin `onion` nem disparava a bancada. O seletor sabe expandir prefixo, cobertura declarada e o
+  #     conjunto empacotado pelos manifestos; dispara quando ele pega família ALÉM do núcleo fixo.
+  local _cov; _cov="$(bash "${SELFTEST}" --affected-staged --dry-run 2>/dev/null || true)"
+  grep -qE '^#ONION_SELFTEST_SELECTION covered=(ALL|[1-9][0-9]*)$' <<< "${_cov}" && return 0
   return 1
 }
-if [ -f "${SELFTEST}" ] && _bench_touched; then
+# CHECKPOINT DECLARADO (SAC-72): `ONION_PRECOMMIT_CHECKPOINT=1 git commit …` mostra a seleção que a bancada
+# rodaria e NÃO a roda, dizendo em voz alta que não é validação — no lugar do `--no-verify`, que pula o
+# pre-commit inteiro calado. O resto do pre-commit (lint, projeções) segue rodando.
+if [ -f "${SELFTEST}" ] && [ "${ONION_PRECOMMIT_CHECKPOINT:-0}" = "1" ] && _bench_touched; then
+  echo "🧪 Onion pre-commit — CHECKPOINT declarado: seleção da bancada (não roda):"
+  bash "${SELFTEST}" --affected-staged --checkpoint || true
+elif [ -f "${SELFTEST}" ] && _bench_touched; then
   echo "🧪 Onion pre-commit — mudança no domínio da bancada → self-test das guardas AFETADAS (paralelo)…"
   if ! bash "${SELFTEST}" --affected-staged --jobs auto; then
     echo ""
