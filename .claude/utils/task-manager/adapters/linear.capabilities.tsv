@@ -7,12 +7,12 @@ capability	requirement	status	api_version	source	note
 item.create	required	unverified	graphql (schema não pinado)	-	
 item.read	required	unverified	graphql (schema não pinado)	-	
 item.update	required	unverified	graphql (schema não pinado)	-	
-item.delete	optional	unverified	graphql (schema não pinado)	-	issueArchive: arquiva, não apaga
-hierarchy.subtask_create	required	implemented	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_STATE_WORKFLOWSTATE_PARENT	sub-issue por parent; profundidade não ancorada
+item.delete	optional	unverified	graphql (schema não pinado)	-	o adapter chama issueArchive; a semântica da mutation não foi ancorada
+hierarchy.subtask_create	required	unverified	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_STATE_WORKFLOWSTATE_PARENT	ancorado o campo de LEITURA Issue.parent; a escrita por IssueCreateInput.parentId não foi ancorada
 hierarchy.subtask_list	required	unverified	graphql (schema não pinado)	-	
 hierarchy.epic	optional	not_implemented	graphql (schema não pinado)	-	Project como nível não ancorado
-status.transition	required	implemented	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_STATE_WORKFLOWSTATE_PARENT	resolve o stateId no workflow do team; se a transição é livre não foi ancorado
-priority.set	optional	implemented	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_PRIORITY_0_4	0 sem prioridade, 1 urgente a 4 baixa
+status.transition	required	unverified	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_STATE_WORKFLOWSTATE_PARENT	ancorado Issue.state (leitura); a escrita por IssueUpdateInput.stateId e a liberdade de transição (E_ELENXO_LINEAR_TRANSITION_FREEDOM_UNANCHORED) não
+priority.set	optional	unverified	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_PRIORITY_0_4	ancorada a escala 0-4 do campo de LEITURA Issue.priority; a escrita pelo input não foi ancorada
 estimate.points	optional	not_implemented	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_ESTIMATE_NATIVE_TEAM_SCALE	provedor: estimate nativo com escala por team; o adapter não envia
 estimate.time	optional	not_implemented	graphql (schema não pinado)	-	
 comment.add	required	unverified	graphql (schema não pinado)	-	a escrita de CommentCreateInput.body não foi ancorada (E_ELENXO_LINEAR_COMMENT_WRITE_FORMAT_OPEN)
@@ -21,7 +21,7 @@ attachment.add	optional	not_implemented	graphql (schema não pinado)	-	attachmen
 label.set	optional	not_implemented	graphql (schema não pinado)	-	o adapter só LÊ labels
 iteration.assign	optional	not_implemented	graphql (schema não pinado)	-	cycles não ancorados
 link.create	optional	not_implemented	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_RELATION_FOUR_TYPES	provedor: blocks, duplicate, related, similar; o adapter não cria
-search.query	required	implemented	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_CURSOR_PAGINATION_BATCH	first N (default 50), sem after
+search.query	required	unverified	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_CURSOR_PAGINATION_BATCH	ancorado só o default de 50 do first; o filtro (title.contains, team, state.type) não foi ancorado
 search.paginate	optional	not_implemented	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_CURSOR_PAGINATION_BATCH	provedor: cursor Relay first/after; teto de first não ancorado
 bulk.create	optional	not_implemented	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_CURSOR_PAGINATION_BATCH	issueBatchCreate existe; limite e atomicidade não ancorados
 bulk.update	optional	not_implemented	graphql (schema não pinado)	kg:task-manager-vocabulario-2026-10#E_LINEAR_CURSOR_PAGINATION_BATCH	issueBatchUpdate existe; idem

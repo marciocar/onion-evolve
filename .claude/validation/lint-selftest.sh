@@ -26284,8 +26284,8 @@ run_task_manager_capabilities_selftests() {
   local o rc
   # (a) o --selftest próprio: o defeito verbatim acusa, o honesto cala, e cada classe de declaração falsa reprova
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 18/18 verdes' <<< "${o}"; then
-    record_pass "task-manager-capabilities: (a) --selftest verde (18 casos: o honesto, os dois defeitos verbatim, conjunto, enum, fonte, superfície, derivado)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 27/27 verdes' <<< "${o}"; then
+    record_pass "task-manager-capabilities: (a) --selftest verde (27 casos: o honesto, os dois defeitos verbatim, conjunto, enum, fonte, superfície, derivado e os 9 da passada adversarial)"
   else record_fail "task-manager-capabilities: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: as 5 declarações reais saem limpas (rc 0, sem HARD).
   #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
@@ -26323,8 +26323,8 @@ run_task_manager_capabilities_selftests() {
     if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "task-manager-capabilities: (m) mutante morde → ✗ ${want}"
     else record_fail "task-manager-capabilities: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
   done <<'EOF_MUT'
-grep -qF -- "${sf}" "${adapter}" && _emit "superficie-diverge"@@@! grep -qF -- "${sf}" "${adapter}" && _emit "superficie-diverge"@@@(i)
-grep -qF -- "${sf}" "${adapter}" || _emit "superficie-diverge"@@@true || _emit "superficie-diverge"@@@(ii)
+_defines "${adapter}" "${sf}" && _emit "superficie-diverge"@@@! _defines "${adapter}" "${sf}" && _emit "superficie-diverge"@@@(i)
+_defines "${adapter}" "${sf}" || _emit "superficie-diverge"@@@true || _emit "superficie-diverge"@@@(ii)
 if ($3 == "implemented" && ($5 == "" || $5 == "-"))@@@if (0)@@@(iii)
 if [ ! -f "${decl}" ]; then@@@if false; then@@@(iv)
 if (!(order[i] in seen)) print "capacidade-faltando"@@@if (0) print "capacidade-faltando"@@@(v)
@@ -26332,9 +26332,9 @@ if (!(cap in req)) { print "capacidade-inventada"@@@if (0) { print "capacidade-i
 if (req[cap] == "required" && $3 == "not_implemented")@@@if (0)@@@(vii)
 else if ($2 != req[cap]) print "requisito-diverge"@@@else if (0) print "requisito-diverge"@@@(viii)
 if ($4 ~ /^[[:space:]]*$/) print@@@if (0) print@@@(ix)
-elif ! grep -qE "^[[:space:]]*- id: ${node}[[:space:]]*$" "${gf}"; then@@@elif false; then@@@(x)
+[ "${hit}" -eq 1 ] || _emit "fonte-nao-resolve"@@@true || _emit "fonte-nao-resolve"@@@(x)
 elif ! grep -qF -- "${anchor}" "${tm}/adapters/${afile}"; then@@@elif false; then@@@(xi)
-grep -qF -- "${sf}" "${adapter}" && _emit "superficie-diverge"@@@false && _emit "superficie-diverge"@@@(xii)
+_defines "${adapter}" "${sf}" && _emit "superficie-diverge"@@@false && _emit "superficie-diverge"@@@(xii)
 if [ "${st}" != "not_implemented" ] && ! grep -qw -- "${tok}" "${adapter}"; then@@@if false; then@@@(xiii)
 grep -qxF -- "${base}" <<< "${providers}" || \@@@true || \@@@(xiv)
 [ "${derived}" -eq 1 ] || _emit "fonte-nao-resolve"@@@true || _emit "fonte-nao-resolve"@@@(xv)
@@ -26342,6 +26342,16 @@ local derived=0; [ -f "${repo}/.claude/.onion-version" ] && derived=1@@@local de
 if (cap in seen) { print "duplicada"@@@if (0) { print "duplicada"@@@(xvi)
 if [ -z "${vocab}" ]; then@@@if false; then@@@(xvii)
 [ "${sc}" = "local" ] || _emit "fonte-invalida"@@@true || _emit "fonte-invalida"@@@(xviii)
+if [ "${#anchor}" -lt 12 ] || [ "${anchor}" = "${sf}" ]; then@@@if false; then@@@(xix)
+case "${afile}" in "${p}.md"|"${p}"-*.md) : ;; *)@@@case "${afile}" in *) : ;; __never__)@@@(xx)
+if ! [[ "${g}" =~ ^[A-Za-z0-9._-]+$ && "${node}" =~ ^[A-Za-z0-9_]+$ ]]; then@@@if false; then@@@(xxi)
+index(l, m) == 1 { found = 1; exit }@@@index(l, m) > 0 { found = 1; exit }@@@(xxii)
+_norm() { LC_ALL=C sed -e '1s/^\xEF\xBB\xBF//' -e 's/\r$//' "$1"; }@@@_norm() { cat "$1"; }@@@(xxiii)
+if [ "${st}" = "implemented" ] && [ "${strong}" -eq 0 ]; then@@@if false; then@@@(xxiv)
+END { exit found ? 0 : 1 }' "${f}" && printf@@@END { exit 0 }' "${f}" && printf@@@(xxv)
+if (v == want) { found = 1; exit } }@@@if (v == want "X") { found = 1; exit } }@@@(xxv)
+if [ -n "${vbad}" ]; then@@@if false; then@@@(xxvi)
+if ($0 ~ /;/) exit }')"@@@exit }')"@@@(xxvii)
 EOF_MUT
   rm -rf "${sb}"
 }

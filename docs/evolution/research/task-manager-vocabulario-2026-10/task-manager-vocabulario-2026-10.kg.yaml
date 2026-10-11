@@ -46,7 +46,7 @@ nodes:
     plane: DEV
     status: done
     verified_at: "2026-10-11"
-    verified_against: "Onda 2 (SAC-63): interface.md declara 24 capacidades num bloco lido por máquina; os 5 adapters/<p>.capabilities.tsv declaram as 120 células (34 implemented, 38 unverified, 48 not_implemented); a REGRA 103 sai limpa no corpus"
+    verified_against: "Onda 2 (SAC-63): interface.md declara 24 capacidades num bloco lido por máquina; os 5 adapters/<p>.capabilities.tsv declaram as 120 células (22 implemented, 50 unverified, 48 not_implemented, depois da passada adversarial); a REGRA 103 sai limpa no corpus"
     impact: 4
     confidence: 0.4
     label: "Qual é a matriz provedor × capacidade (12 capacidades, por versão de API) que interface.md do task-manager vai declarar? Segue open: a Onda 1 ancorou um esqueleto parcial (paginação, texto rico, prioridade/estimativa do Linear, relações), sem Zoho e sem a célula de versão."
@@ -923,8 +923,8 @@ nodes:
     impact: 4
     confidence: 0.75
     trace: ".claude/utils/task-manager/interface.md"
-    label: "Onda 2: interface.md declara o vocabulário canônico e 24 capacidades (11 required, 13 optional) com assinatura; cada adapter declara as 24 num .capabilities.tsv com status, api_version e fonte; a REGRA 103 cobra. Herda as três claims de síntese da Onda 1."
-    narrative: "Paginação: searchPage com cursor opaco que pode expirar (C_PAGINATION_AS_OPAQUE_ITERATOR). Texto rico: corpo canônico em Markdown, conversão no adapter, e o formato não ancorado vira unverified (C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN). Lote: bulk.create e bulk.update separados, com o limite na nota de cada adapter (C_BULK_IS_PER_OPERATION_NOT_UNIFORM). As objeções CONSTRAINS foram respeitadas célula a célula: a transição do Jira está implemented pelo endpoint, com a obrigatoriedade declarada como não provada; o comentário do Jira Cloud, do ClickUp e a escrita do Linear ficam unverified; o bulk do Jira é só criação; o Asana tem batch genérico, não bulk de tasks; o Zoho vem só das sondas do adapter. Nasce open: quem sela é o maestro, no merge."
+    label: "Onda 2: interface.md declara o vocabulário canônico e 24 capacidades (12 required, 12 optional) com assinatura; cada adapter declara as 24 num .capabilities.tsv com status, api_version e fonte; a REGRA 103 cobra. Herda as três claims de síntese da Onda 1."
+    narrative: "Paginação: searchPage com cursor opaco que pode expirar (C_PAGINATION_AS_OPAQUE_ITERATOR). Texto rico: corpo canônico em Markdown, conversão no adapter, e o formato não ancorado vira unverified (C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN). Lote: bulk.create e bulk.update separados, com o limite na nota de cada adapter (C_BULK_IS_PER_OPERATION_NOT_UNIFORM). As objeções CONSTRAINS foram respeitadas célula a célula: a transição do Jira fica unverified (só o POST do Cloud está ancorado, e a obrigatoriedade não); o comentário do Jira Cloud, do ClickUp e a escrita do Linear ficam unverified; o bulk do Jira é só criação; o Asana tem batch genérico, não bulk de tasks; o Zoho vem só das sondas do adapter. Nasce open: quem sela é o maestro, no merge."
 
   - id: E_WAVE2_CAPABILITY_MATRIX_1011
     node_type: evidence
@@ -934,8 +934,8 @@ nodes:
     confidence: 0.85
     verified_at: "2026-10-11"
     verified_against: "contagem das 5 declarações (awk sobre a coluna status) e task-manager-capabilities-check.sh . --format tsv com rc 0"
-    label: "A matriz declarada (2026-10-11): 120 células, 34 implemented, 38 unverified e 48 not_implemented. Nenhuma capacidade nova (anexo, iteração, vínculo, épico, pontos, searchPage, lote) tem adapter; o Zoho tem as 12 required implementadas, todas por sonda do adapter."
-    narrative: "Por provedor (implemented, unverified, not_implemented): jira 3, 13, 8; clickup 9, 7, 8; asana 3, 10, 11; linear 6, 8, 10; zoho 13, 0, 11. O Jira, o adapter mais citado na doutrina, tem só 3 células implemented: a transição, a busca JQL e a validação local de id; o resto do CRUD nunca foi ancorado nem medido. O Zoho é o inverso: a primária foi inalcançável, mas o adapter foi escrito por sonda contra um portal real, então as fontes dele são adapter:, não kg:."
+    label: "A matriz declarada (2026-10-11): 120 células, 22 implemented, 50 unverified e 48 not_implemented. Nenhuma capacidade nova (anexo, iteração, vínculo, épico, pontos, searchPage, lote) tem adapter; o Zoho tem 8 das 12 required implemented, por sonda do adapter."
+    narrative: "Por provedor (implemented, unverified, not_implemented): jira 2, 14, 8; clickup 7, 9, 8; asana 2, 11, 11; linear 2, 12, 10; zoho 9, 4, 11. A 1ª redação declarava 34 implemented; a passada adversarial rebaixou 12 células a unverified porque a fonte citada não sustentava o positivo: trecho de adapter que registra a FALHA medida (ClickUp status e update, Zoho search e subtask_list), nó que ancora o campo de LEITURA quando o adapter escreve por outro tipo de entrada (Linear subtask, status e prioridade), evidência só do Cloud numa célula que vale para o DC (Jira transição), e a declaração geral de um arquivo no lugar de sonda (Zoho read de task e de projeto). O Jira, o adapter mais citado na doutrina, fica com 2 implemented: a busca JQL e a validação local de id."
     provenance:
       source: ".claude/utils/task-manager/adapters/jira.capabilities.tsv"
       locator: "coluna status das 5 declarações: jira, clickup, asana, linear e zoho .capabilities.tsv"
@@ -1001,7 +1001,7 @@ nodes:
     impact: 4
     confidence: 0.5
     label: "2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as células (1) hierarquia, (6) anexo, (7) label, (8) sprint/ciclo e (12) versão de cada provedor."
-    narrative: "Descartar o Zoho por orçamento volta como objeção (Elenxo). A célula (12) não fechou para nenhum provedor. Desde a Onda 2 (SAC-63, 2026-10-11) o alvo desta rodada é mecânico: as 38 células unverified dos adapters/<p>.capabilities.tsv (grep unverified), e a coluna api_version declara a versão que o adapter MIRA, não a vigente."
+    narrative: "Descartar o Zoho por orçamento volta como objeção (Elenxo). A célula (12) não fechou para nenhum provedor. Desde a Onda 2 (SAC-63, 2026-10-11) o alvo desta rodada é mecânico: as 50 células unverified dos adapters/<p>.capabilities.tsv (grep unverified), e a coluna api_version declara a versão que o adapter MIRA, não a vigente."
     trace: "Elenxo do run wf_8e56d56f-a8b, campo recommendation"
 
 edges:

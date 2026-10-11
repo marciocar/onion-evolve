@@ -82,13 +82,29 @@ nodes:
     impact: 4
     confidence: 0.9
     verified_at: "2026-10-11"
-    verified_against: "--selftest com LC_ALL=C (18/18), família run_task_manager_capabilities_selftests (22/22), 20 mutantes pelo mutate-and-restore.sh sobre a guarda real e o dispatcher, com o hash da guarda conferido igual depois"
-    label: "Dezoito casos no --selftest, cada um com mutante que morde (rc 1 e o caso nomeado em vermelho); o mutante do registro (dispatcher sem a chamada) derruba o caso c da bancada. O corpus real sai limpo; uma cópia com três defeitos plantados sai com as quatro HARD esperadas."
+    verified_against: "--selftest com LC_ALL=C (27/27), família run_task_manager_capabilities_selftests (32/32, 29 mutantes), e 33 mutantes pelo mutate-and-restore.sh sobre a guarda real e o dispatcher, com o hash da guarda conferido igual depois"
+    label: "27 casos no --selftest, cada um com mutante que morde (rc 1 e o caso nomeado em vermelho); o mutante do registro (dispatcher sem a chamada) derruba o caso c da bancada. O corpus real sai limpo; uma cópia com três defeitos plantados sai com as quatro HARD esperadas."
     narrative: "O dogfood pegou dois defeitos meus. (1) Antes da 1ª execução, na leitura: a saída do awk era lida com IFS de TAB, e o read colapsa campos vazios consecutivos, o que deslocaria a coluna seguinte; curado com o separador US (0x1f). (2) Na 1ª rodada do mutate-and-restore.sh, três mutantes não morderam: o marcador obrigatório de mutante no fim da linha comentava os argumentos do _emit e o ;; do case, e o mutante quebrava a sintaxe em vez de reverter a cura (rc 2). Refeito com o marcador como 1ª expressão; 20 de 20 mordem."
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_task_manager_capabilities_selftests, casos a, b, c e m"
       method: "medição: mutate-and-restore.sh com restauração por hash, e a família rodada com LC_ALL=C"
+      locality: "repo"
+
+  - id: E_ELENXO_REPROVOU_E_FOI_CURADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "refutador em worktree isolada sobre c7419e27, com mandato de capacidade declarada sem fonte, falso positivo e falso negativo; fixtures em mktemp; curas re-medidas pelo --selftest, pelos mutantes e pelo corpus real"
+    label: "Elenxo (2026-10-11) REPROVOU a 1ª versão: 12 células implemented sem fonte que sustentasse o positivo, e furos na guarda (trecho vazio, adapter de outro provedor, curinga no nó, prosa contando como método, CRLF, homônimo). Curado no mesmo laço."
+    narrative: "Dados: as 12 células viraram unverified com a razão na nota (ver E_WAVE2_CAPABILITY_MATRIX_1011 no grafo da Onda 1), e a ref ao nó do Zoho que afirmava escrita por custom_status saiu da transição do Zoho, porque o adapter mediu o contrário. Guarda: trecho de adapter com 12+ caracteres, diferente da superfície e do adapter do próprio provedor; nó do kg: validado pela forma e conferido por igualdade (com aspas e comentário aceitos); grafo achado pelo meta.id; objeção do Elenxo sozinha não prova implemented; superfície de método por DEFINIÇÃO (linha de código ou cabeçalho), não por citação; entrada normalizada (BOM, CR); união de provedores multilinha; o próprio vocabulário da interface conferido. Nove casos novos no --selftest, cada um com mutante. Interface: a tabela de vocabulário deixou de afirmar ADF no comentário do Jira Cloud, e o exemplo deixou de chamar capacidade opcional pela presença do método. Declarado como teto, sem cura mecânica: a guarda não julga se a fonte SUSTENTA, e um grafo fabricado com o meta.id certo resolve."
+    provenance:
+      source: ".claude/validation/task-manager-capabilities-check.sh"
+      locator: "casos xix a xxvii do --selftest e os mutantes correspondentes da bancada"
+      method: "juízes: refutador com mandato de fonte que não sustenta e de falso positivo; curas re-medidas pelo --selftest, mutantes e corpus real"
       locality: "repo"
 
   - id: C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA
@@ -107,7 +123,7 @@ nodes:
     impact: 2
     confidence: 0.8
     trace: ".claude/validation/task-manager-capabilities-check.sh"
-    label: "TETO: superfície de método é o token nome( em qualquer lugar do adapter, inclusive prosa. Um adapter que só cita o método numa frase passa por implementado; um not_implemented cujo método aparece citado reprova."
+    label: "TETO: superfície de método é DEFINIÇÃO por forma (linha que começa por nome( ou cabeçalho com `nome(). Um cabeçalho markdown que nomeia o método sem implementá-lo passa, e uma chamada que abre a linha conta como definição."
 
   - id: C_TETO_FONTE_EXISTE_NAO_SUSTENTA
     node_type: claim
@@ -128,6 +144,9 @@ nodes:
     label: "TETO: no repo derivado, a ref kg: cujo grafo não viajou não é conferida (o core a conferiu antes de publicar); na porta onion-mini a guarda não roda, porque o lint não viaja para lá."
 
 edges:
+  - from: E_ELENXO_REPROVOU_E_FOI_CURADO
+    to: D_FORMATO_TSV_IRMAO_DO_ADAPTER
+    edge_type: SUPPORTS
   - from: E_DEFEITO_BULK_DECLARADO_SEM_ADAPTER
     to: D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA
     edge_type: SUPPORTS
