@@ -103,10 +103,18 @@ NONDOT_PROBES = ('app.env', 'prod.env')
 CTX = {'base': None, 'strict': True}                  # Read/Grep e entrada sem cwd: fechado, como antes
 RAW = {'cmd': ''}
 
+def _fnm(name, pat):
+    """fnmatch sem o caso quadrático da stdlib (passada adversarial, 2026-10-11): o translate varre até o
+    fim a cada `[` sem `]` depois dele — 172 s num token de 80 KB de `[`. Um `[` depois do ÚLTIMO `]` nunca
+    fecha, então é literal, e nenhum alvo testado aqui contém `[`: o resultado é False, como na stdlib."""
+    if '[' in pat[pat.rfind(']') + 1:] and '[' not in name:
+        return False
+    return fnmatch.fnmatch(name, pat)
+
 def glob_reaches_env(pattern, b):
-    if b.startswith('.') and any(fnmatch.fnmatch(p, b) for p in DOT_PROBES):
+    if b.startswith('.') and any(_fnm(p, b) for p in DOT_PROBES):
         return True
-    if not any(fnmatch.fnmatch(p, b) for p in NONDOT_PROBES):
+    if not any(_fnm(p, b) for p in NONDOT_PROBES):
         return False
     # glob que NOMEIA env (`*.env`, `*env*`) declara a intenção, e o disco do topo não basta: `grep -r
     # --include=*.env .` desce às subpastas. Escape que a 1ª redação desta cura abria — pego pelo caso (h2).

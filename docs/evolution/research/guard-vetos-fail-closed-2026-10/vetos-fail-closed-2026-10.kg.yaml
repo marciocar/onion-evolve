@@ -8,7 +8,7 @@ meta:
   baseline: "2026-10-11"
   review_after: "2026-11-10"   # 30d: defeito de guarda
   # ═══ TETO: 10 NÓS ═══
-  #   9 em 2026-10-11 (fix/vetos-fail-closed).
+  #   9 em 2026-10-11 (fix/vetos-fail-closed) + 1 da passada adversarial (opção longa abreviada do git push).
 nodes:
   - id: Q_VETOS_FECHAM_POR_DENTRO_E_POR_FORA
     node_type: question
@@ -46,13 +46,13 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: "2026-10-11"
-    verified_against: "corpus dos 31.183 comandos Bash únicos dos transcripts do core em 2026-10-11: a forma da lib inteira fecharia 1.361 (4,36%, 853 deles gh api de leitura); o recorte adotado fecha 117 (0,38%) no protect-main e 858 (2,75%) no merge-gate. Bancada: 13 casos sem python3 (np-*) e mutantes M1 a M6, todos mordendo"
+    verified_against: "corpus dos 31.183 comandos Bash únicos dos transcripts do core em 2026-10-11: a forma da lib inteira fecharia 1.361 (4,36%, 853 deles gh api de leitura); a 1ª redação do recorte fechava 117 (0,38%) no protect-main e 858 (2,75%) no merge-gate, e a final, com as regras de aspas e de construção dinâmica da passada adversarial, fecha 660 (2,12%) e 1.779 (5,71%). Bancada: 19 casos sem python3 (np-*) e mutantes M1 a M6 e M10 a M12, todos mordendo"
     trace: ".claude/hooks/lib/invocation-lines.sh"
-    label: "sem python3 os vetos fecham SÓ o que pode tocar o objeto: force-push no protect-main (0,38% dos comandos reais) e push, gh merge, gh api com rota de merge/contents/refs/graphql e gh repo sync no merge-gate (2,75%)"
-    narrative: "O JSON é lido sem python (onion_json_string_field: grep -oE de DFA e desescape de \\\\, \\\", \\n, \\t, \\r, \\/; 0,45 s a 1 MB) e, se o campo command nem aparecer, julga-se o JSON cru: o erro só pode fechar. O push do merge-gate não foi afinado por marca de main/HEAD/push nu: cobriria 445 dos 502 pushes e abriria espaço para fail-open. Custo declarado do modo degradado: push de feature, echo e heredoc que CITAM push/merge passam a ser barrados no merge-gate, e `rm -rf x && git push origin feat` no protect-main (o -rf parece marca de force). A mensagem diz que falta python3."
+    label: "sem python3 os vetos fecham SÓ o que pode tocar o objeto: force-push no protect-main (2,12% dos comandos reais) e push, gh merge, gh api com rota e gh repo sync no merge-gate (5,71%), contando a construção dinâmica"
+    narrative: "O JSON é lido sem python (onion_json_string_field: grep -oE de DFA e desescape de \\\\, \\\", \\n, \\t, \\r, \\/; 0,45 s a 1 MB) e, se o campo command nem aparecer, julga-se o JSON cru: o erro só pode fechar. O push do merge-gate não foi afinado por marca de main/HEAD/push nu: cobriria 445 dos 502 pushes e abriria espaço para fail-open. Custo declarado do modo degradado: push de feature, echo e heredoc que CITAM push/merge passam a ser barrados no merge-gate, e `rm -rf x && git push origin feat` no protect-main (o -rf parece marca de force). A mensagem diz que falta python3. PASSADA ADVERSARIAL (2026-10-11) reprovou a 1ª redação, que dizia 'errar aqui só pode fechar': `git pu''sh -f origin main`, `gh pr me\\rge 1`, a rota numa variável e o push vindo do xargs ABRIAM sem python3. Curado: aspas e barra saem antes de casar (o shell as junta), construção dinâmica ($, crase, xargs, eval, escape \\u00.. do JSON) com git/gh e uma palavra do objeto fecha, e a marca de force do protect-main passou a valer só no segmento do push. O leitor de JSON trocou o `${v//…}` do bash (41 s a 1 MB de aspas escapadas, quadrático) por um awk (0,93 s). Tetos declarados: escape \\uXXXX fora da faixa ASCII imprimível fica literal; com chave `command` repetida vale a 1ª (o Claude Code não gera nenhum dos dois)."
     provenance:
       source: "transcripts do core (sessões e subagentes) e a bancada run_pretooluse_veto_selftests"
-      locator: "casos (np-pm-force) a (np-desarme); mutantes M1 a M6 via ops/mutate-and-restore.sh"
+      locator: "casos (np-pm-force) a (np-seg); mutantes M1 a M6 e M10 a M12 via ops/mutate-and-restore.sh"
       method: "medição: regex do recorte sobre o corpus e bancada com LC_ALL=C e mutante por cura"
       locality: "repo"
   - id: C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON
@@ -87,14 +87,14 @@ nodes:
     node_type: claim
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
     confidence: 0.8
     verified_at: "2026-10-11"
     verified_against: "sonda com PATH sem python3: o read do payload falha e o premodelswitch-guard sai 0 em todas as entradas (é exit 0, o block não alcança)"
     trace: ".claude/hooks/premodelswitch-guard.sh"
-    label: "o premodelswitch-guard também abre por dentro sem python3 (sai 0), e o onFailure block não cobre isso"
-    narrative: "Fora do escopo desta cura, declarado: o veto guarda downgrade de modelo, não ação irreversível, e a troca é desfeita com outro /model. Gatilho: o mesmo de C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON, a primeira máquina real sem python3."
+    label: "o premodelswitch-guard também abria por dentro sem python3 (saía 0, o block não cobre); curado na passada adversarial: lê o JSON em bash e veta o downgrade"
+    narrative: "Declarado fora do escopo na 1ª redação; a passada adversarial o classificou MÉDIO (downgrade para um modelo fora do lineup saía 0 em 10 ms sem python3) e a cura é a mesma dos dois vetos: os campos string do payload saem do leitor de JSON em bash da lib. Bancada: caso 'sem python3' da família premodelswitch_guard e mutante M14."
   - id: E_ENV_GUARD_LINEAR
     node_type: evidence
     layer: audit
@@ -105,11 +105,11 @@ nodes:
     verified_at: "2026-10-11"
     verified_against: "comando `echo <token único>` no env-guard: antes 21,6 s a 100 KB, 208 s a 300 KB e mais de 900 s a 1 MB (o medidor cortou); depois 0,14 s, 0,32 s e 0,89 s (2 MB: 1,73 s). Vereditos antes×depois em processo: 31.189 entradas reais e 24.834 sintéticas, zero divergência e zero exceção"
     trace: ".claude/hooks/pretooluse-env-guard.sh"
-    label: "o env-guard ficou linear: um token único de 1 MB leva 0,89 s (antes passava de 900 s) e nenhum veredito mudou em 56 mil entradas"
-    narrative: "Duas causas quadráticas, achadas por cProfile. (1) O regex `[\\w-]+\\.env\\b` de cites_env recomeçava de cada posição de uma palavra longa e voltava: 1,25 s de 1,30 s a 25 KB. Virou `(?<=[\\w-])\\.env\\b`, o mesmo booleano sem backtracking. (2) Curado o regex, o shlex da stdlib dominou (15 s a 1 MB): `self.token += nextchar` num atributo copia o token a cada caractere. O LinearShlex troca só o acumulador por uma propriedade que junta os pedaços no fim do token; a máquina de estados é a da stdlib. O corpus sintético estressou a fronteira de .env (prefixos de palavra, Unicode, hífen, ponto, aspas) e o acumulador (aspas vazias, coladas, escapes, aspas abertas, pontuação, comentário, heredoc, tokens de 1 a 20 mil caracteres)."
+    label: "o env-guard ficou linear: um token único de 1 MB leva 0,89 s (antes passava de 900 s) e nenhum veredito mudou em 866 mil entradas"
+    narrative: "Duas causas quadráticas, achadas por cProfile. (1) O regex `[\\w-]+\\.env\\b` de cites_env recomeçava de cada posição de uma palavra longa e voltava: 1,25 s de 1,30 s a 25 KB. Virou `(?<=[\\w-])\\.env\\b`, o mesmo booleano sem backtracking. (2) Curado o regex, o shlex da stdlib dominou (15 s a 1 MB): `self.token += nextchar` num atributo copia o token a cada caractere. O LinearShlex troca só o acumulador por uma propriedade que junta os pedaços no fim do token; a máquina de estados é a da stdlib. O corpus sintético estressou a fronteira de .env (prefixos de palavra, Unicode, hífen, ponto, aspas) e o acumulador (aspas vazias, coladas, escapes, aspas abertas, pontuação, comentário, heredoc, tokens de 1 a 20 mil caracteres). (3) A passada adversarial achou o terceiro, anterior a esta branch: `cat ` seguido de muitos `[` sem `]` (172 s a 80 KB), no fnmatch.translate da stdlib, que varre até o fim a cada `[` aberto. Um `[` depois do último `]` é literal e nenhum alvo testado contém `[`, então o resultado é False sem chamar o fnmatch: 1 MB de `[` em 1,05 s. Comparação final antes×depois: 866.219 entradas (o corpus real, dois sintéticos e nove corpora de fuzz do refutador), zero divergência e zero exceção."
     provenance:
       source: "env-guard da main 6a429e73 contra o da branch fix/vetos-fail-closed"
-      locator: "cites_env e as duas chamadas de LinearShlex; caso (q) e mutantes da família env_exposure"
+      locator: "cites_env, as duas chamadas de LinearShlex e _fnm; caso (q) e mutantes M7, M8 e M15"
       method: "medição: tempo de parede do hook por tamanho e comparação de vereditos em processo sobre o corpus real e um sintético"
       locality: "repo"
   - id: C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL
@@ -140,7 +140,27 @@ nodes:
       locator: "EVENTS = (PreToolUse, PreModelSwitch); casos (xiv) e (c); mutante do EVENTS"
       method: "medição: selftest próprio, família com LC_ALL=C e mutante"
       locality: "repo"
+  - id: E_PUSH_OPCAO_ABREVIADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "passada adversarial: num remoto bare, git push --mirr origin fez 'main -> main (forced update)' e passava pelos dois vetos COM python3 (rc 0 antes e depois da 1ª redação); git 2.43 aceita prefixo único de opção longa (--mi e --mirr = --mirror, --al = --all, --b = --branches) e recusa o ambíguo (--forc, --fo)"
+    trace: ".claude/hooks/lib/invocation-lines.sh"
+    label: "opção longa abreviada do git push (`--mirr`) forçava a main e passava pelos dois vetos com python3; a lib agora expande o prefixo único como o git faz"
+    narrative: "Anterior a esta branch e fora dos 3 achados pedidos, curado por ser ALTO e barato: push_long_opt expande o prefixo contra a lista de opções do git push, no laço canônico, no ramo do xargs e em touches_main. Comparação antes×depois COM python3 nos 1.361 comandos reais com forma git/gh, nos dois hooks: 2.722 julgamentos, zero divergência. Bancada: --mirr, --mi e --al vetam; mutante M9."
+    provenance:
+      source: "git push -h (git 2.43) e sandbox com remoto bare"
+      locator: "casos 'git push --mirr origin', '--mi', '--al' de run_pretooluse_veto_selftests; mutante M9"
+      method: "medição: git push --dry-run com cada prefixo e bancada com LC_ALL=C"
+      locality: "repo"
 edges:
+  - from: E_PUSH_OPCAO_ABREVIADA
+    to: Q_VETOS_FECHAM_POR_DENTRO_E_POR_FORA
+    edge_type: SUPPORTS
   - from: E_VETOS_ABRIAM_SEM_PYTHON
     to: Q_VETOS_FECHAM_POR_DENTRO_E_POR_FORA
     edge_type: SUPPORTS
