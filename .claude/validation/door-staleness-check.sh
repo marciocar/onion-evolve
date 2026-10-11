@@ -63,7 +63,7 @@ if [ -n "${COUNT_PIN}" ]; then
 fi
 
 # ── EMISSÃO SEM REGISTRO: baseline VAZIO, não falha (medido em 2026-10-11) ─────────────────────
-# No `/meta:adopt --update` de um adotante (portal-gamificacao), o `regen-baselines.sh` imprimiu
+# No `/meta:adopt --update` de um adotante, o `regen-baselines.sh` imprimiu
 # "emissor falhou (door-staleness-check.sh) — baseline mantido COMO VEIO DO CORE": o `--emit-baseline`
 # caía na falha fechada abaixo, e o baseline ficava como chegou — ali era o stub do `--ensure-from`
 # (o `vendor-branch.sh` já tira o do core), mas noutro alvo seriam as portas do core com os tetos do
