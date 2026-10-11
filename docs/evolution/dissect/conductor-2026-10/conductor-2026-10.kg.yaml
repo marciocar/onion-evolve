@@ -194,16 +194,21 @@ nodes:
   - id: D_CONDUCTOR_1011
     node_type: decision
     plane: DEV
-    status: open
+    status: confirmed
     impact: 5
     confidence: 0.6
     x_dissect_level: 4
     x_dissect_verdict: absorver
     verified_at: "2026-10-11"
-    verified_against: "NAO SELADA. O /meta:dissect nunca sela: status open, aguardando o maestro."
-    label: "VEREDITO PROPOSTO — ABSORVER o conceito (verificacao pelo motor + teto contado em codigo), via A_PLAN_VERIFICACAO_PELO_MOTOR; REJEITAR o validador fail-open; nada a absorver da forma (nativa). O maestro sela."
+    verified_against: "SELADA pelo maestro em 2026-10-11 por pergunta com opções: absorver o conceito (verificação pelo motor e teto de tentativas contado em código no onion-research.js), rejeitar o validador fail-open; reescrita, sem vendorizar código. A execução é a próxima onda (plano A_PLAN_VERIFICACAO_PELO_MOTOR); decision fica confirmed em DEV até a absorção chegar a PROD"
+    label: "VEREDITO SELADO — ABSORVER o conceito (verificacao pelo motor + teto contado em codigo), via A_PLAN_VERIFICACAO_PELO_MOTOR; REJEITAR o validador fail-open; nada a absorver da forma (nativa). O maestro sela."
     narrative: "Nao e costurar: o Conductor e outro orquestrador (Python, YAML) e adapter para ele trocaria o substrato que o Onion escolheu (Workflow nativo). Nao e parquear: o defeito interno (radarExit declarado) e medido hoje. A absorcao em si NAO e deste PR: proxima onda, com gatilho = selo do maestro neste no; o forge a recebe pelo dissect-census.sh --plans conductor."
     trace: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
+    provenance:
+      source: "decisão do maestro na sessão de 2026-10-11, pergunta com opções sobre D_CONDUCTOR_1011"
+      locator: "opção escolhida: Absorver o conceito (Recomendado)"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      locality: "pessoa"
 
 edges:
 
