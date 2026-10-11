@@ -12,15 +12,15 @@
 # MODOS   : --door   a raiz da porta é PROJEÇÃO: o arquivo é (re)escrito inteiro a cada materialização.
 #           --adopt  a raiz do adotante é DELE: never-clobber. Três desfechos, todos declarados:
 #                    (1) sem .gitattributes → cria com o bloco;
-#                    (2) .gitattributes que já governa EOL (text/eol/crlf, ou binary em padrão nosso
-#                        ou em `*`) → NÃO toca e diz qual linha governa;
+#                    (2) .gitattributes que já governa EOL (text/eol/crlf/binary num padrão NOSSO, em
+#                        `*` ou em `**`; `[attr]` e padrão alheio não contam) → NÃO toca e diz a linha;
 #                    (3) .gitattributes sem governo de EOL (ex.: só as linhas merge=union do adopt) →
 #                        acrescenta só os padrões ausentes (idempotente).
 #
 # SUBCONJUNTO MEDIDO, não lista cega: só entra o padrão que CASA arquivo no destino (a porta não leva
-# .githooks/, então não ganha a linha). E no adotante, padrão que casa arquivo com CRLF NO ÍNDICE fica
-# de fora e é nomeado: acrescentar `eol=lf` ali mudaria bytes rastreados dele (renormalize pendente
-# aparecendo como modificação fantasma) — a mesma régua do core, que mediu ZERO bytes mudando antes de
+# .githooks/, então não ganha a linha). E no adotante, padrão que casa arquivo com CRLF NO ÍNDICE (ou
+# rastreado como binário, i/-text) fica de fora e é nomeado: acrescentar `eol=lf` ali mudaria bytes
+# rastreados dele (renormalize pendente aparecendo como modificação fantasma) — a mesma régua do core, que mediu ZERO bytes mudando antes de
 # fixar. Fora de propósito: *.md, *.yaml, *.json (o core os fixa, mas a cura aqui é dos EXECUTÁVEIS).
 #
 # PARIDADE: os padrões abaixo são subconjunto das linhas `text eol=lf` do .gitattributes do core; a
@@ -48,7 +48,13 @@ _present() {   # $1 = padrão → 0 se casa ao menos um arquivo do destino (fora
 
 _crlf_in_index() {   # $1 = padrão → 0 se algum arquivo rastreado que casa vive com CRLF no índice
   git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1 || return 1
-  git -C "${DEST}" ls-files --eol -- "$1" 2>/dev/null | awk '$1=="i/crlf" || $1=="i/mixed" {f=1} END {exit !f}'
+  #   `:(glob)` porque o pathspec cru casa RECURSIVO (`.githooks/*` pegaria `.githooks/sub/x`), e a linha
+  #   do .gitattributes não. E `i/-text` também barra: é arquivo rastreado que o git trata como BINÁRIO
+  #   (um vídeo MPEG-TS em `*.ts`); `text eol=lf` sobre ele tiraria os bytes CR na próxima renormalização.
+  #   Padrão SEM barra casa em qualquer profundidade (como no .gitattributes); com barra, ancorado na raiz.
+  local -a ps=(":(glob)$1"); case "$1" in */*) : ;; *) ps+=(":(glob)**/$1") ;; esac
+  git -C "${DEST}" ls-files --eol -- "${ps[@]}" 2>/dev/null \
+    | awk '$1=="i/crlf" || $1=="i/mixed" || $1=="i/-text" {f=1} END {exit !f}'
 }
 
 _ours() {   # $1 = linha → 0 se é uma linha que ESTE helper escreve
@@ -73,12 +79,16 @@ fi
 if [ -f "${GA}" ]; then
   gov="$(awk -v pats="$(printf '%s\n' "${PATTERNS[@]}")" '
     BEGIN { n = split(pats, P, "\n"); for (i = 1; i <= n; i++) ours[P[i]] = 1 }
+    { sub(/\r$/, "") }
     /^[[:space:]]*(#|$)/ { next }
+    /^[[:space:]]*\[attr\]/ { next }   # definição de macro não governa arquivo nenhum
     { pat = $1; line = $0; sub(/^[[:space:]]+/, "", line); sub(/[[:space:]]+$/, "", line)
       if ((pat in ours) && line == pat " text eol=lf") next
+      # só governa o NOSSO padrão quem fala dele ou de tudo (`*`, `**`): `*.png -text` não diz nada sobre .sh
+      if (!((pat in ours) || pat == "*" || pat == "**")) next
       for (i = 2; i <= NF; i++) {
         a = $i
-        if (a ~ /^[-!]?text(=.*)?$/ || a ~ /^eol=/ || a ~ /^[-!]?crlf$/ || (a == "binary" && (pat in ours || pat == "*" || pat == "**"))) {
+        if (a ~ /^[-!]?text(=.*)?$/ || a ~ /^eol=/ || a ~ /^[-!]?crlf$/ || a == "binary") {
           print NR ": " line; exit
         }
       }
@@ -91,7 +101,9 @@ fi
 
 add=(); skipped=()
 for p in "${present[@]}"; do
-  if [ -f "${GA}" ] && grep -qxF "${p} text eol=lf" "${GA}"; then continue; fi
+  # comparação APARADA (espaços nas pontas e CR), a mesma do awk acima — senão a linha do adotante com
+  # CRLF ou recuo seria reconhecida como nossa ali e reacrescentada aqui
+  if [ -f "${GA}" ] && sed 's/\r$//; s/^[[:space:]]*//; s/[[:space:]]*$//' "${GA}" | grep -xF "${p} text eol=lf" >/dev/null; then continue; fi  # sem -q: sob pipefail o -q fecha o pipe cedo (EPIPE)
   if _crlf_in_index "${p}"; then skipped+=("${p}"); continue; fi
   add+=("${p}")
 done

@@ -8078,12 +8078,43 @@ run_eol_gitattributes_selftests() {
   rm -rf "${d}"
   # (f) CRLF NO ÍNDICE do alvo → o padrão fica de fora e é NOMEADO (eol=lf mudaria bytes rastreados dele)
   d="$(mktemp -d)"; git -C "${d}" init -q; git -C "${d}" config core.autocrlf false
-  printf 'echo a\r\n' > "${d}/x.sh"; printf 'print(1)\n' > "${d}/y.py"; git -C "${d}" add x.sh y.py
+  #     (o .sh CRLF mora num SUBDIRETÓRIO: `*.sh` sem barra casa em qualquer profundidade, e o pathspec tem de casar igual)
+  mkdir -p "${d}/sub"; printf 'echo a\r\n' > "${d}/sub/x.sh"; printf 'print(1)\n' > "${d}/y.py"; git -C "${d}" add sub/x.sh y.py
   out="$(bash "${h}" "${d}" --adopt 2>&1 || true)"
   if ! grep -qxF '*.sh text eol=lf' "${d}/.gitattributes" 2>/dev/null && grep -qxF '*.py text eol=lf' "${d}/.gitattributes" \
      && grep -q 'CRLF no índice.*\*\.sh' <<< "${out}"; then
     record_pass "eol-gitattributes: (f) .sh com CRLF no índice do alvo → *.sh fora e nomeado; *.py entra"
   else record_fail "eol-gitattributes: (f)" "arquivo: $(tr '\n' '|' < "${d}/.gitattributes" 2>/dev/null) · saída: ${out:0:160}"; fi
+  rm -rf "${d}"
+  # (f2) BINÁRIO rastreado (i/-text: um vídeo MPEG-TS em `*.ts`) → o padrão fica de fora: eol=lf tiraria CRs dele
+  d="$(mktemp -d)"; git -C "${d}" init -q; git -C "${d}" config core.autocrlf false
+  printf 'G\r\x00\x01\r\n' > "${d}/clip.ts"; printf 'echo a\n' > "${d}/x.sh"; git -C "${d}" add clip.ts x.sh
+  out="$(bash "${h}" "${d}" --adopt 2>&1 || true)"
+  if ! grep -qF '*.ts' "${d}/.gitattributes" 2>/dev/null && grep -qxF '*.sh text eol=lf' "${d}/.gitattributes"; then
+    record_pass "eol-gitattributes: (f2) .ts rastreado como binário → *.ts fora; *.sh entra"
+  else record_fail "eol-gitattributes: (f2)" "arquivo: $(tr '\n' '|' < "${d}/.gitattributes" 2>/dev/null) · saída: ${out:0:160}"; fi
+  rm -rf "${d}"
+  # (f3) `.githooks/*` é ANCORADO e não recursivo: CRLF em .githooks/sub/ não tira a cura do hook da raiz
+  d="$(mktemp -d)"; git -C "${d}" init -q; git -C "${d}" config core.autocrlf false; mkdir -p "${d}/.githooks/sub"
+  printf 'echo a\n' > "${d}/.githooks/pre-commit"; printf 'x\r\n' > "${d}/.githooks/sub/lib"; git -C "${d}" add .githooks
+  bash "${h}" "${d}" --adopt >/dev/null 2>&1 || true
+  if grep -qxF '.githooks/* text eol=lf' "${d}/.gitattributes" 2>/dev/null; then
+    record_pass "eol-gitattributes: (f3) CRLF em .githooks/sub/ não barra .githooks/* (padrão ancorado, não recursivo)"
+  else record_fail "eol-gitattributes: (f3)" "arquivo: $(tr '\n' '|' < "${d}/.gitattributes" 2>/dev/null || echo ausente)"; fi
+  rm -rf "${d}"
+  # (e2) padrão ALHEIO e macro [attr] não governam o NOSSO: `*.png -text` e `[attr]x -text` não barram a cura
+  d="$(mktemp -d)"; : > "${d}/run.sh"; printf '*.png -text\n[attr]mybin -text -diff\n' > "${d}/.gitattributes"
+  bash "${h}" "${d}" --adopt >/dev/null 2>&1 || true
+  if grep -qxF '*.sh text eol=lf' "${d}/.gitattributes" && grep -qxF '*.png -text' "${d}/.gitattributes"; then
+    record_pass "eol-gitattributes: (e2) *.png -text e [attr] não contam como governo do .sh → cura aplicada"
+  else record_fail "eol-gitattributes: (e2)" "arquivo: $(tr '\n' '|' < "${d}/.gitattributes")"; fi
+  rm -rf "${d}"
+  # (c2) a linha NOSSA com recuo ou CR do adotante é reconhecida — não é reacrescentada
+  d="$(mktemp -d)"; : > "${d}/run.sh"; printf '  *.sh text eol=lf  \r\n' > "${d}/.gitattributes"
+  bash "${h}" "${d}" --adopt >/dev/null 2>&1 || true
+  if [ "$(grep -c 'eol=lf' "${d}/.gitattributes")" = "1" ]; then
+    record_pass "eol-gitattributes: (c2) linha nossa com recuo/CR reconhecida — sem duplicata"
+  else record_fail "eol-gitattributes: (c2)" "arquivo: $(tr '\n\r' '|~' < "${d}/.gitattributes")"; fi
   rm -rf "${d}"
   # (g) PARIDADE: todo padrão do helper é uma linha `text eol=lf` do .gitattributes do core
   #     (laço por `read`, nunca `for p in $(…)`: o `*.sh` sem aspas EXPANDE contra o cwd — medido no 1º run)
