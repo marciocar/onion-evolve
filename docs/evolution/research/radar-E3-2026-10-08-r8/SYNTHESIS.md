@@ -23,6 +23,12 @@ estão em `data/2.1.29x.txt`, e o juiz os conferiu byte a byte contra o `CHANGEL
   passar; isso é documentado. É o modo de falha que o exit 2 não cobre por construção. Proposta aberta:
   `Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS`, com medição ao vivo como condição, porque a documentação oficial
   de hooks ainda não menciona o campo.
+  **Fechado em 2026-10-11 (SAC-83).** A medição ao vivo foi feita no 2.1.296: sem o campo, o hook
+  quebrado deixa a ação passar; com `block`, a ação é barrada; e os casos honestos não mudam. O campo
+  entrou nos 3 vetos (env-guard, protect-main, merge-gate). O kg-read-leg ficou de fora, porque é
+  aviso. Quem cobra o campo agora é a REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block).
+  O 2.1.294 ignora a chave sem erro. Os detalhes estão em `E_ONFAILURE_BLOCK_BARRA_HOOK_QUEBRADO` e
+  `E_ONFAILURE_IGNORADO_ANTES_DE_295`.
 - **Lentes por caminho carregam também via Bash** (2.1.293). As 5 rules com `paths:` passam a valer
   quando o arquivo é lido por `cat`, `head`, `sed -n` ou `grep`.
 - **Mods:** 4 correções em 3 versões na janela de restart do worker, e mais uma falha aberta na 2.1.295.
@@ -57,9 +63,11 @@ impacto viraram nós. **O `supersedes` sobre a r7 era indevido** e foi trocado p
 
 ## NÃO-VERIFICADOS
 
-- `onFailure`: a única fonte é o CHANGELOG, porque a documentação oficial de hooks não tem nenhuma
-  ocorrência do campo. Nada foi medido ao vivo.
-- Efeito da chave `onFailure` em adotantes pinados abaixo de 2.1.295: não medido.
+- ~~`onFailure`: a única fonte é o CHANGELOG, porque a documentação oficial de hooks não tem nenhuma
+  ocorrência do campo. Nada foi medido ao vivo.~~ Caducou em 2026-10-11: a doc oficial de hooks já
+  documenta o campo, e ele foi medido ao vivo (SAC-83).
+- ~~Efeito da chave `onFailure` em adotantes pinados abaixo de 2.1.295: não medido.~~ Medido no 2.1.294
+  em 2026-10-11: a chave é ignorada sem erro. Versões mais antigas que essa seguem sem medição.
 - Itens do juiz que não viraram nó: permissões com curinga (2.1.290:54, :78, :80, :106), effort em
   fallback e Max só para a sessão, `allowed-tools` perdido em `-p`, correções de SendMessage, e
   `agent.spawn` com agentes de workflow, que toca o Q_AGENT_SPAWN da r7, ainda aberto.

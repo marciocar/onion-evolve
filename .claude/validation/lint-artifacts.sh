@@ -5531,6 +5531,34 @@ check_ops_citation_travel() {
 }
 check_ops_citation_travel
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block) — HARD
+#   DANO MEDIDO (SAC-83, 2026-10-11, Claude Code 2.1.296, `claude -p` em sandbox): PreToolUse com script
+#   ausente saiu 127 e a ação RODOU; com `"onFailure": "block"` a mesma falha barrou. Os 3 vetos do core
+#   (env-guard, protect-main, merge-gate) falhavam ABERTO quando o hook nem rodava. Aviso (sem exit 2)
+#   não é cobrado; aviso COM block é SOFT. Lógica em veto-onfailure-check.sh.
+check_veto_onfailure() {
+  local helper="${SCRIPT_DIR}/veto-onfailure-check.sh"
+  local st="${ONION_SETTINGS_JSON:-${REPO_ROOT}/.claude/settings.json}"
+  [ -f "${helper}" ] && [ -f "${st}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in "${st}"|*/veto-onfailure-check.sh|"${REPO_ROOT}"/.claude/hooks/*) : ;; *) return 0 ;; esac
+  fi
+  local _out _hrc=0 _err
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_code:-}" ] || continue
+    violation "${_sev:-SOFT}" "${st}" "REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block): [${_code}] ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ne 0 ]; then
+    violation "HARD" "${helper}" "REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block): a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_veto_onfailure
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
