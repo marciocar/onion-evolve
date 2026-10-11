@@ -1,7 +1,8 @@
 ---
 branch: feat/dissect-forge-seam
 date: 2026-10-11
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 018e6961b11e293f63302d28533169cd98185a5760acef7245e856ada0a0d675
+reviewed_code_sha256: 9d234cf74439835003cf6de55525cedd08b81612ea069dfc6d01f7c8f729ea9f
 findings_total: 6
 findings_real: 6
 findings_fixed: 4
