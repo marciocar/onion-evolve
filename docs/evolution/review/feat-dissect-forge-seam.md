@@ -1,15 +1,14 @@
 ---
 branch: feat/dissect-forge-seam
 date: 2026-10-11
-reviewed_diff_sha256: 11145052452a1937cf4fa0aee03fa3289ca2df9b66f15fb3ca7cc4a2a565cfce
-reviewed_code_sha256: 51d3e95c1630292d79d65bbc08c020c6ad24f4f8ba73749fdf166707112a0bea
-findings_total: 5
-findings_real: 5
-findings_fixed: 3
-tokens: 230000
-duration_min: 75
+reviewed_diff_sha256: pendente
+findings_total: 6
+findings_real: 6
+findings_fixed: 4
+tokens: 290000
+duration_min: 100
 verdict: REPROVADO_E_CURADO
-reviewer: passada própria sobre o próprio artefato (sem subagente), default reprovado — gate mecânico: família run_dissect_selftests (20 casos) + 6 mutantes + kg-radar + kg-contract-check
+reviewer: passada própria sobre o próprio artefato (sem subagente), default reprovado — gate mecânico: famílias dissect (19 casos), forge, plugin_bundle, materialize_repo e plugin_runtime + 7 mutantes + kg-radar + kg-contract-check
   Depois do PR aberto, o maestro selou D_CONDUCTOR_1011 (absorver o conceito, rejeitar o validador fail-open)
   e o contexto principal aplicou o selo no nó (confirmed, com provenance de testemunho), radar e contrato rc 0.
 ---
@@ -53,11 +52,27 @@ existiu ainda) — gatilho: o 1º plano cuja licença divergir da fonte.
 ## Achado 5 — o forge passou a "ter a peça 3" por causa desta mudança (REAL, DECLARADO)
 
 O `forge-census` conta a peça 3 pela diretiva `!` de medição. O `forge.md` tinha **0** (o censo
-dele mesmo está numa cerca `bash`, que a sessão roda à mão); com a diretiva do `--plans` passou a
+dele mesmo está numa cerca `bash`, que a sessão roda à mão); com a diretiva do leitor de planos (hoje `dissect-plans.sh`) passou a
 **1**. É contexto medido de verdade, mas não é o censo da forja. Corolário do mesmo teto que o
 dogfood achou no dissect (7/7 contando o motor pela citação): presença e referência, nunca
 comportamento. Não converti a cerca do censo em diretiva — mudaria o volume de contexto de toda
 invocação da forja, fora do escopo; fica como achado para quem tocar a forja.
+
+## Achado 6 — o censo que VIAJA passou a depender de um que não viaja (REAL, achado pelo CI, curado)
+
+> **Nota de re-revisão (pós-CI):** o carimbo anterior caiu, porque o diff mudou depois dele. Este achado não
+> veio da minha passada: veio da faixa 3 do CI, que reprovou 4 casos (plugin-bundle, materialize-repo
+> a e c, plugin-runtime). Ao contrário do que eu tinha escrito, a passada própria **não** viu o defeito.
+
+A hipótese inicial era o `forge.md` ter levado ao plugin uma diretiva sem o script dela. Medida no
+assembler, estava **invertida**: o forge nem viaja no `onion-meta`. O erro inteiro foi *"dissect-census.sh
+precisa de forge-census.sh, que NAO esta no VALIDATION[] deste manifesto"*. O `--plans` foi posto dentro
+do `dissect-census.sh`, que viaja, e fez dele invocador do `forge-census.sh`, que não viaja porque mede
+o harness do repo. O manifesto já declarava essa fronteira em prosa; eu a cruzei sem ler o manifesto.
+**Cura**, no padrão do próprio forge-census: o leitor sai para `dissect-plans.sh` (core e standalone, do
+lado do forge), e o censo que viaja volta a não ter a dependência. **Mutante**: o censo voltando a
+invocar o forge-census derruba a montagem do plugin (`plugin-bundle: montagem`). Correção de número: a
+família `dissect` tem **19** casos, não os 20 que eu tinha escrito.
 
 ## O que ficou fora, por desenho
 
