@@ -21,6 +21,10 @@
 #   · hook `async`/`asyncRewake` — a doc diz que o campo não tem efeito em hook de fundo;
 #   · outros eventos (UserPromptSubmit, PermissionRequest…) — só o PreToolUse foi MEDIDO. Teto declarado.
 #   · script que o settings cita e não existe — é outro defeito, de outra guarda; aqui cala.
+#   TETO DECLARADO (passada adversarial de 2026-10-11): não enxerga veto que sai por `exit "$rc"`, por
+#   função de lib sourced, por `sys.exit(2)` de interpretador embutido, nem por JSON `permissionDecision:
+#   deny` com exit 0; não varre settings.local.json nem hook fora de `.claude/hooks/*.sh`. Nenhum hook do
+#   core cai nesses casos hoje; o detector é textual, não executa o script.
 #
 # COMPATIBILIDADE MEDIDA: o Claude Code 2.1.294 (anterior ao campo) IGNORA a chave em silêncio — o veto
 # honesto (exit 2) continua barrando e o hook quebrado continua passando, como antes. Adotante com harness
@@ -68,7 +72,9 @@ def is_veto(path):
         s = line.lstrip()
         if not s or s.startswith("#"):
             continue
-        code = re.split(r'\s#', line, maxsplit=1)[0]   # corta comentário de fim de linha (aproximação)
+        # aspas fora ANTES do corte: `echo 'use exit 2'` não é veto, e `echo "a #b"; exit 2` é (passada adversarial)
+        code = re.sub(r"'[^']*'|\"(?:\\.|[^\"\\])*\"", "''", line)
+        code = re.split(r'\s#', code, maxsplit=1)[0]   # corta comentário de fim de linha (aproximação)
         if VETO.search(code):
             return True
     return False
@@ -146,6 +152,14 @@ _selftest() {
   # (xi) veto em OUTRO evento não é cobrado (teto declarado: só PreToolUse foi medido)
   printf '{"hooks":{"UserPromptSubmit":[{"hooks":[%s]}]}}\n' "$(_h veto.sh)" > "${tmp}/.claude/settings.json"; _run
   if [ -z "${out}" ]; then _ok "(xi) fora do PreToolUse cala"; else _ko "(xi) fora do PreToolUse cala"; fi
+  # (xii) `exit 2` dentro de aspas num aviso não é veto (falso positivo achado na passada adversarial)
+  printf '#!/usr/bin/env bash\necho '"'"'use exit 2 para vetar'"'"'\necho "ou exit 2"\nexit 0\n' > "${tmp}/.claude/hooks/aspas.sh"
+  _w "$(_h aspas.sh)"; _run
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then _ok "(xii) exit 2 entre aspas não é veto"; else _ko "(xii) exit 2 entre aspas não é veto"; fi
+  # (xiii) `#` dentro de aspas não esconde o exit 2 que vem depois (falso negativo achado na mesma passada)
+  printf '#!/usr/bin/env bash\necho "a #b"; exit 2\n' > "${tmp}/.claude/hooks/hash.sh"
+  _w "$(_h hash.sh)"; _run
+  if grep -q $'^HARD\tveto-sem-onfailure\t.*hash.sh' <<< "${out}"; then _ok "(xiii) # entre aspas não esconde o exit 2"; else _ko "(xiii) # entre aspas não esconde o exit 2"; fi
 
   rm -rf "${tmp}"; echo "  selftest: $((total-fails))/${total} verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1

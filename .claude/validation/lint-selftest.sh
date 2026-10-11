@@ -26222,8 +26222,8 @@ run_veto_onfailure_selftests() {
   local o rc
   # (a) o --selftest próprio
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 11/11 verdes' <<< "${o}"; then
-    record_pass "veto-onfailure: (a) --selftest verde (11 casos: veto sem/com block, aviso, comentário, função, exit 20, inválido, async, ausente, ilegível, fora do PreToolUse)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 13/13 verdes' <<< "${o}"; then
+    record_pass "veto-onfailure: (a) --selftest verde (13 casos: veto sem/com block, aviso, comentário, função, exit 20, inválido, async, ausente, ilegível, fora do PreToolUse, aspas)"
   else record_fail "veto-onfailure: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) O MODO QUE A PRODUÇÃO CONSOME, no settings.json real: os 3 vetos declaram block → tsv vazio, rc 0.
   #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
@@ -26260,7 +26260,8 @@ json.dump(d, open(sys.argv[2], "w"), indent=2)' "${REPO_ROOT}/.claude/settings.j
   done <<EOF_MUT
         if v and of != "block":$(printf '\x1f')        if v and of == "nunca":$(printf '\x1f')(i) veto sem onFailure acusa
         if not s or s.startswith("#"):$(printf '\x1f')        if not s:$(printf '\x1f')(iii) aviso sem block cala
-        code = re.split(r'\s#', line, maxsplit=1)[0]$(printf '\x1f')        code = line$(printf '\x1f')(iii) aviso sem block cala
+        code = re.split(r'\s#', code, maxsplit=1)[0]$(printf '\x1f')        code = code$(printf '\x1f')(iii) aviso sem block cala
+        code = re.sub(r"'[^']*'|\"(?:\\\\.|[^\"\\\\])*\"", "''", line)$(printf '\x1f')        code = line$(printf '\x1f')(xii) exit 2 entre aspas não é veto
         elif (not v) and of == "block":$(printf '\x1f')        elif False:$(printf '\x1f')(iv) aviso com block é SOFT
 exit[ \t]+2(?=\$|[\s;&|})#])$(printf '\x1f')exit[ \t]+2$(printf '\x1f')(vi) exit 20 não é veto
         if of is not None and of not in ("continue", "block"):$(printf '\x1f')        if False:$(printf '\x1f')(vii) onFailure inválido acusa
