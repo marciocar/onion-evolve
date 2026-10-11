@@ -27862,6 +27862,94 @@ run_cc_delta_census_selftests() {
 }
 _family run_cc_delta_census_selftests
 
+# REGRA 102 (Chave de frontmatter de agente pertence à allowlist) — SAC-106, radar E3 r9, 2026-10-11. O Claude
+# Code ignora a chave que não reconhece: `tool:` no lugar de `tools:` deixa o agente com todas as ferramentas, sem
+# erro. A SSOT é agent-frontmatter-keys.tsv; o juiz, agent-frontmatter-keys-check.sh. Casos: (a) as polaridades
+# do --selftest · (b) o modo que o lint consome, no corpus real · (c) a CLI num repo-sandbox, fonte e derivado ·
+# (d) o dispatcher de produção, fonte (HARD) e adotante (SOFT) · (e) sem a allowlist → rc 2 · (m) UM MUTANTE POR
+# CASO, na CÓPIA da guarda — mutante que não se aplica é FALHA, nunca verde por vacuidade.
+run_agent_frontmatter_keys_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/agent-frontmatter-keys-check.sh" al="${REPO_ROOT}/.claude/validation/agent-frontmatter-keys.tsv"
+  if [ ! -f "${chk}" ] || [ ! -f "${al}" ]; then record_fail "agent-fm-keys" "guarda ou allowlist ausente"; return; fi
+  local o rc
+  # (a) o --selftest próprio
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE '^agent-frontmatter-keys selftest: [0-9]+ passaram, 0 falharam$' <<< "${o}"; then
+    record_pass "agent-fm-keys: (a) --selftest verde ($(grep -c '✅' <<< "${o}") casos)"
+  else record_fail "agent-fm-keys: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real (51 agentes, passivo ZERO). CAMINHO LITERAL (REGRA 59).
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/agent-frontmatter-keys-check.sh" "${REPO_ROOT}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then record_pass "agent-fm-keys: (b) corpus real → rc 0 e silencioso no modo tsv"
+  else record_fail "agent-fm-keys: (b) corpus real" "rc=${rc}; [$(head -3 <<< "${o}" | tr '\n' '|')]"; fi
+  # (c) a CLI num repo-sandbox COMO O RUNNER A INVOCA (script + allowlist ao lado)
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${sb}/.claude/validation" "${sb}/.claude/agents/meta"
+  cp "${chk}" "${al}" "${sb}/.claude/validation/"
+  printf -- '---\nname: fx\ndescription: d\ntool: Read\nmodel: sonnet\ncategory: meta\n---\n' > "${sb}/.claude/agents/meta/fx.md"
+  printf -- '# leia-me\ntool: x\n' > "${sb}/.claude/agents/meta/README.md"
+  local s="${sb}/.claude/validation/agent-frontmatter-keys-check.sh" o2 rc2
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if o2="$(LC_ALL=C bash "${s}" "${sb}" --tsv --derived 2>&1)"; then rc2=0; else rc2=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q $'^HARD\tCHAVE-DESCONHECIDA\t.claude/agents/meta/fx.md\t.*"tools"' <<< "${o}" \
+     && [ "$(grep -c . <<< "${o}")" = 1 ] && [ "$(awk -F'\t' 'NR==1{print NF}' <<< "${o}")" = 4 ] \
+     && [ "${rc2}" -eq 0 ] && grep -q $'^SOFT\tCHAVE-DESCONHECIDA\t.claude/agents/meta/fx.md\t' <<< "${o2}"; then
+    record_pass "agent-fm-keys: (c) CLI: tool: → HARD rc 1 (tsv de 4 campos, README fora); --derived → SOFT rc 0"
+  else record_fail "agent-fm-keys: (c) CLI" "rc=${rc}/${rc2}; [${o}] [${o2}]"; fi
+  # (e) sem a allowlist → rc 2 (NAO VERIFICADO), nunca verde
+  mv "${sb}/.claude/validation/agent-frontmatter-keys.tsv" "${sb}/al.bak"
+  if o="$(LC_ALL=C bash "${s}" "${sb}" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ]; then record_pass "agent-fm-keys: (e) sem a allowlist → rc 2 (não julga, não passa)"
+  else record_fail "agent-fm-keys: (e)" "sem a allowlist saiu rc=${rc}"; fi
+  mv "${sb}/al.bak" "${sb}/.claude/validation/agent-frontmatter-keys.tsv"
+  # (d) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, num repo com o typo, emite a REGRA 102 — HARD na fonte e
+  #     SOFT no adotante (o carimbo role: adopted liga IS_DERIVED)
+  #     A linha VIOLATION não diz a severidade: a HARD é lida no ONION_LINT_HARD_FILE, que só recebe as HARD.
+  local sd l l2 hf hf2; sd="$(TMPDIR=/tmp mktemp -d)"; hf="${sd}.hard"; hf2="${sd}.hard2"; : > "${hf}"; : > "${hf2}"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null
+  printf -- '---\nname: fx-typo\ndescription: d\ntool: Read\nmodel: sonnet\ncategory: meta\n---\n' > "${sd}/.claude/agents/meta/fx-typo.md"
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  l="$(cd "${sd}" && ONION_LINT_HARD_FILE="${hf}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/.claude/agents/meta/fx-typo.md" 2>&1 || true)"
+  printf 'role: adopted\n' > "${sd}/.claude/.onion-version"
+  l2="$(cd "${sd}" && ONION_LINT_HARD_FILE="${hf2}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/.claude/agents/meta/fx-typo.md" 2>&1 || true)"
+  local _rx='^VIOLATION: \.claude/agents/meta/fx-typo\.md: REGRA 102 \(Chave de frontmatter de agente pertence à allowlist \(oficiais \+ as da casa\)\): \[CHAVE-DESCONHECIDA\] chave de frontmatter de agente "tool"'
+  if grep -qE "${_rx}" <<< "${l}" && grep -qE "${_rx}" "${hf}" \
+     && grep -qE "${_rx}" <<< "${l2}" && ! grep -q 'REGRA 102' "${hf2}"; then
+    record_pass "agent-fm-keys: (d) o lint de produção emite a REGRA 102 — HARD na fonte, SOFT no adotante"
+  else record_fail "agent-fm-keys: (d) dispatcher" "fonte: $(grep -E 'REGRA 102' <<< "${l}" | head -2 | tr '\n' '|') adotante: $(grep -E 'REGRA 102' <<< "${l2}" | head -2 | tr '\n' '|')"; fi
+  rm -rf "${sd}" "${hf}" "${hf2}"
+  # (m) MUTANTES — reverte cada cura na CÓPIA da guarda e EXIGE que o caso nomeado do --selftest reprove
+  local old new want mo mrc
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cp "${chk}" "${s}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p).read(); sys.exit(3) if s.count(a)!=1 else open(p,"w").write(s.replace(a,b))' \
+         "${s}" "${old}" "${new}"; then
+      record_fail "agent-fm-keys: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "agent-fm-keys: (m) mutante morde → ✗ ${want}"
+    else record_fail "agent-fm-keys: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<EOF_MUT
+      if (k in ok) next$(printf '\x1f')      if (0) next$(printf '\x1f')cala: agente honesto
+      if (k in ok) next$(printf '\x1f')      next$(printf '\x1f')acusa: tool: no lugar de tools:
+    { sub(/\r\$/, "") }$(printf '\x1f')    { x = 0 }$(printf '\x1f')acusa: colour: num arquivo CRLF
+    infm && \$0 == "---" { done = 1; next }$(printf '\x1f')    infm && \$0 == "-x-" { done = 1; next }$(printf '\x1f')cala: agente honesto
+      if (\$0 ~ /^[[:space:]]/ ||$(printf '\x1f')      if (\$0 ~ /^xx/ ||$(printf '\x1f')cala: agente honesto
+\$0 ~ /^(#|-|\$)/) next$(printf '\x1f')\$0 ~ /^(-|\$)/) next$(printf '\x1f')cala: agente honesto
+      k = substr(\$0, 1, p - 1); sub(/[[:space:]]+\$/, "", k)$(printf '\x1f')      k = substr(\$0, 1, p - 1)$(printf '\x1f')cala: 'tools :'
+\047.*\047\$/) k = substr(k, 2, length(k) - 2)$(printf '\x1f')\047.*\047\$/) k = k$(printf '\x1f')acusa: chave entre aspas
+      return (bd <= 2) ? best : ""$(printf '\x1f')      return (bd <= 0) ? best : ""$(printf '\x1f')acusa: modle: com a dica model
+      return (bd <= 2) ? best : ""$(printf '\x1f')      return (bd <= 9) ? best : ""$(printf '\x1f')acusa: chave sem parente próximo
+    FNR == 1 { if (\$0 == "---") infm = 1; else done = 1; next }$(printf '\x1f')    FNR == 1 { infm = 1; next }$(printf '\x1f')cala: arquivo sem frontmatter
+        if (c[1] in ok) {$(printf '\x1f')        if (0) {$(printf '\x1f')rc 2: chave duplicada
+(c[2] != "oficial" && c[2] != "casa")$(printf '\x1f')(0)$(printf '\x1f')rc 2: origem fora de oficial|casa
+      if (nok == 0) {$(printf '\x1f')      if (0) {$(printf '\x1f')rc 2: allowlist só com comentários
+      if (sev == "HARD") hard = 1$(printf '\x1f')      hard = 0$(printf '\x1f')acusa: tool: no lugar de tools:
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_agent_frontmatter_keys_selftests
+
 
 
 

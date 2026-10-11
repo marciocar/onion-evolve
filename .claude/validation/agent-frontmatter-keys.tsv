@@ -1,0 +1,46 @@
+# agent-frontmatter-keys.tsv — SSOT das chaves de frontmatter de AGENTE aceitas (REGRA 102).
+#
+# Lido por: .claude/validation/agent-frontmatter-keys-check.sh (a guarda) e pela REGRA 102 do lint.
+# Uma chave de topo do frontmatter de .claude/agents/**/*.md fora desta lista é acusada: é assim que
+# um typo (`tool:` no lugar de `tools:`, `modle:`) deixa de passar calado. O Claude Code IGNORA chave
+# que não reconhece, então `tool: Read` some e o agente herda TODAS as ferramentas da sessão.
+#
+# Colunas (TAB): chave · origem (oficial|casa) · quem lê / por que existe
+#
+# OFICIAIS — tabela "Supported frontmatter fields" de https://code.claude.com/docs/en/sub-agents,
+# lida em 2026-10-11 (18 campos), mais `autoCompactWindow`, que o CHANGELOG da 2.1.296 adicionou ao
+# frontmatter de subagente e que a tabela ainda não lista. Chave oficial nova: acrescente aqui com a
+# fonte; a guarda acusa até lá, e esse é o comportamento desejado (adoção explícita, nunca calada).
+#
+# DA CASA — as 11 medidas nos 51 agentes em 2026-10-11 (344 ocorrências, SAC-106). O Claude Code as
+# trata como "não reconhecidas" (o --debug as nomeia); elas existem para o Onion, não para o runtime.
+name	oficial	Claude Code — identificador do subagente (obrigatório; REGRA 1)
+description	oficial	Claude Code — quando delegar (obrigatório; REGRA 1)
+tools	oficial	Claude Code — allowlist de ferramentas (REGRA 1, REGRA 12)
+disallowedTools	oficial	Claude Code — ferramentas negadas
+model	oficial	Claude Code — modelo (valor restrito pela REGRA 3)
+permissionMode	oficial	Claude Code — modo de permissão
+maxTurns	oficial	Claude Code — teto de turnos
+skills	oficial	Claude Code — skills pré-carregadas
+mcpServers	oficial	Claude Code — servidores MCP do subagente
+hooks	oficial	Claude Code — hooks do ciclo de vida do subagente
+memory	oficial	Claude Code — escopo de memória persistente
+background	oficial	Claude Code — roda em background
+omitClaudeMd	oficial	Claude Code — sobe sem os CLAUDE.md
+effort	oficial	Claude Code — nível de esforço
+isolation	oficial	Claude Code — worktree temporária
+color	oficial	Claude Code — cor no task list e no transcript
+initialPrompt	oficial	Claude Code — 1º turno automático quando roda como agente principal
+experimental	oficial	Claude Code — opções experimentais (ex.: cacheTtl)
+autoCompactWindow	oficial	Claude Code — CHANGELOG 2.1.296 (ainda fora da tabela da doc em 2026-10-11)
+category	casa	REGRA 23 (HARD) — inventário e roteamento; nome do subdiretório em .claude/agents/
+related_agents	casa	graph.sh — aresta `related` do grafo de atores (projeção da REGRA 21)
+related_commands	casa	graph.sh — aresta `related` do grafo de atores (projeção da REGRA 21)
+expertise	casa	agent-template e /meta:create-agent — áreas de especialização (leitura humana e do @onion)
+priority	casa	agent-template e /meta:create-agent — alta|média|baixa (nenhum script lê)
+version	casa	agent-template — versão do agente (nenhum script lê)
+updated	casa	agent-template — carimbo de frescor do agente (nenhum script lê)
+required_env	casa	especialistas de provider (jira, clickup, gamma) — variáveis exigidas, lidas por humano e pelo modelo
+optional_env	casa	especialistas de provider — variáveis opcionais, lidas por humano e pelo modelo
+integrations	casa	@onion e especialistas de task manager — integrações declaradas, lidas pelo modelo
+knowledge_bases	casa	especialistas de reunião e postgres — KBs de apoio, lidas pelo modelo

@@ -5560,6 +5560,47 @@ check_veto_onfailure() {
 check_veto_onfailure
 
 # ===========================================================================
+# REGRA 102 — Chave de frontmatter de agente pertence à allowlist (oficiais + as da casa) [HARD + SOFT]
+# previne: typo de chave de agente (`tool:` no lugar de `tools:`, `modle:`) que o Claude Code ignora em silêncio
+#   (com `tool:`, o agente perde a restrição de ferramentas e herda todas as da sessão, sem erro em lugar nenhum)
+#   DANO MEDIDO (SAC-106, radar E3 r9, 2026-10-11): nenhuma das regras de frontmatter (1, 3, 12, 17, 23) cobrava
+#   chave desconhecida; os 51 agentes usavam 11 chaves fora da tabela oficial em 344 ocorrências, e o --debug da
+#   2.1.296, que nomeia campo não reconhecido, não separava o typo real dessas chaves da casa. A SSOT é
+#   agent-frontmatter-keys.tsv (oficiais da doc + as da casa, cada uma com quem a lê); o juiz, em
+#   agent-frontmatter-keys-check.sh. Passivo medido na forja: ZERO, por isso nasce HARD e sem catraca. No
+#   adotante/porta (IS_DERIVED) sai SOFT: lá o agente pode ser autoria do adotante, com chave própria legítima.
+# ===========================================================================
+check_agent_frontmatter_keys() {
+  local helper="${SCRIPT_DIR}/agent-frontmatter-keys-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      */agents/*.md|*/agent-frontmatter-keys*|*/lint-artifacts.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err _flag=""
+  [ "${IS_DERIVED}" -eq 1 ] && _flag="--derived"
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --tsv ${_flag} 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    if [ "${_sev}" = "HARD" ]; then
+      violation "HARD" "${REPO_ROOT}/${_path#./}" "[${_code}] ${_msg}"
+    else
+      violation "SOFT" "${REPO_ROOT}/${_path#./}" "[${_code}] ${_msg}"
+    fi
+  done <<< "${_out}"
+  # helper >=2 ⇒ declarou que NAO pode julgar; rc!=0 sem linha também (morte calada). Nunca aprovação.
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${REPO_ROOT}/.claude/validation/agent-frontmatter-keys-check.sh" "a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — as chaves de frontmatter dos agentes não foram verificadas; isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_agent_frontmatter_keys
+
+# ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
 _LINT_SUMMARY_REACHED=1   # daqui para baixo, a saida E veredito (ver o trap no topo)
