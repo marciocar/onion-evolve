@@ -1,0 +1,1241 @@
+# kg-backlog-guard: on
+# ═══ TETO: 57 NÓS ═══
+# MODO DECISÃO: D_PLAYBOOK_SDAAL_SAC52 nasce OPEN — o maestro sela, esta sessão NUNCA sela.
+# Objeções do Elenxo: 45 sobreviventes, 28 modeladas como nó (CONSTRAINS), 17 nomeadas em E_LACUNAS_PLAYBOOK_SDAAL_1011.
+meta:
+  id: playbook-sdaal-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-11"
+  review_after: "2026-11-10"
+  # 30d: o tipo DOMINANTE é ferramenta/formato — cacao-roaster (trajetória não medida), campos de
+  # skill do Claude Code (mudam por release), Runbook.v1 e runbook-agent (repos sem adoção medida).
+  # O mercado (AI SRE) pediria 90d e a doutrina (SDAAL por provider, 3 dimensões) 12m, mas a
+  # opção D é um gate de pesquisa CURTA (Arazzo 1.0.1, runme, espec CACAO v2.0): manda a cadência curta.
+  # Gatilhos extras nomeados: (1) um adotante pedir playbook de domínio com estado; (2) um adotante
+  # operar SOAR/CACAO; (3) o maestro decidir sobre GTM como 4ª dimensão peer.
+  note: "Pesquisa SAC-52 (playbook SDAAL) em modo decisão. Corpus conferido: o catálogo recognition-primed da onion-patterns já existe (7 playbooks) e supersede SY5_playbooks_materialization_open."
+
+external_edges:
+  # Medido hoje: o catálogo tem 7 playbooks; o nó de 2026-06 dizia haver uma linha e nenhuma seção.
+  - from: E_MEDIDO_CATALOGO_SETE_PLAYBOOKS_1011
+    to: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml#SY5_playbooks_materialization_open"
+    edge_type: SUPERSEDES
+  # A opção A se apoia nas 3 camadas do método: seleção via playbooks, execução via PFR, validação via dogfood.
+  - from: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    to: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml#B6_9_entity_three_layers"
+    edge_type: DEPENDS_ON
+
+nodes:
+  - id: "Q_PLAYBOOK_SDAAL_SAC52"
+    node_type: "question"
+    plane: "DEV"
+    status: "open"
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "rodada de 2026-10-11: 40 fontes levantadas, 17 claims confirmadas, 8 refutadas por fonte fraca, 0 não verificadas; Elenxo: 52 objeções julgadas, 45 sobreviventes"
+    label: "SAC-52: o core deve criar uma abstração SDAAL de playbooks (interface agnóstica + adapters por tipo e por framework em .claude/utils/playbook/) para montar, executar e acompanhar playbooks de domínio?"
+    narrative: "Quatro sub-decisões: (1) template que se instancia ou processo vivo com estado, e onde mora o estado (KG, task manager, sessão); (2) qual framework entra primeiro como fatia de dogfood (MEDDICC/SPICED, PagerDuty IR, NIST 800-61, ISO 22301, OST/dual-track); (3) se há formato aberto de playbook executável em out/2026 a costurar em vez de inventar; (4) relação com o catálogo recognition-primed da onion-patterns. Fica OPEN: a decisão D_PLAYBOOK_SDAAL_SAC52 é do maestro, e a sub-decisão (3) depende de fontes primárias que esta rodada não leu (Arazzo 1.0.1, especificação CACAO v2.0, runme)."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+
+  - id: "D_PLAYBOOK_SDAAL_SAC52"
+    node_type: "decision"
+    plane: "DEV"
+    status: "open"
+    impact: 5
+    confidence: 0.6
+    label: "SAC-52: A (template em PFR, sem .claude/utils/playbook/) · B (SDAAL completa) · C (CACAO como 1º adapter) · D (gate de pesquisa antes) · E (unificar no catálogo). Elenxo recomenda A com o gate de D e rejeita B e C agora."
+    narrative: "Recomendação do Elenxo, não selo: o maestro sela. Restrições que sobrevivem: (R1) SDAAL fora do lugar — framework (MEDDICC, NIST 800-61, ISO 22301, OST) é CONTEÚDO, não provider com transporte; não há capacidade a declarar nem catraca no molde da REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte). Um seam SDAAL só entra com DOIS substratos de execução reais e consumidor (ex.: SOAR CACAO de um adotante ao lado da sessão PFR). (R2) A premissa dos '4 domínios peer' promove GTM a 4ª dimensão sem decisão do maestro (o CLAUDE.md diz que permanecem 3). (R3) Não há consumidor medido: o único playbook de domínio de adotante (object-led discovery, metagamify) coube no catálogo existente. (R4) A sub-decisão (3) não fecha sem ler Arazzo 1.0.1, a especificação CACAO v2.0 e runme. (R5) A fatia de dogfood se escolhe por incidente/caso real, não por nome de framework. (R6) O estado da instância mora na sessão PFR em arquivo (.claude/sessions/<feature>/), que sobrevive à queda da conversa; a skill-template lê esse estado na invocação. COMPLEMENTO relido do retorno integral do run wf_790beee5-fa8 (o prompt do write(KG) cortou a recomendação em 1500 de 3107 caracteres — defeito curado no PR #1036): (R4') concorrente no mesmo substrato — plugins de primeira parte já entregam skills de playbook de domínio (engineering:incident-response, operations:runbook) e o capital de AI SRE (Resolve AI, Traversal) ocupa a execução; o Onion não compete no motor, o diferencial é seleção, estado verificável e gate. Sub-decisão (1): a instância é PFR com estado em sessão e decisões/evidência como nós do KG; o task manager é só projeção, nunca SSOT; o estado é OBSERVADO (hook PostToolUse registra a execução), não autodeclarado; efeito colateral sob disable-model-invocation e gate exit 2, com equivalente declarado para o onion-codex. Sub-decisão (2): a 1ª fatia vem de incidente real do PRÓPRIO core (VPS e CI, ex.: o bypass do ufw pelo Docker), com a NIST 800-61r3 só como checklist de fases; nem MEDDICC (proprietário) nem CACAO (exige SOARCA). Sub-decisão (4): um formato e dois catálogos — os recognition-primed da onion-patterns (trabalho do Onion) e os de domínio (do adotante) compartilham o esquema seleção/execução/validação (B6_9) mas vivem separados; os de domínio precisam de gatilho mecânico de frescor no molde dos /meta:*-freshness (a evidência de apodrecimento foi descartada sem refutação e segue de pé)."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+
+  - id: "C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA"
+    node_type: "claim"
+    plane: "DEV"
+    status: "open"
+    impact: 4
+    confidence: 0.55
+    label: "Opção A: NÃO criar agora .claude/utils/playbook/ com adapters por framework; o playbook de domínio é template (skill ou markdown com esquema) instanciado num PFR, com estado na sessão e no KG."
+    narrative: "Responde (1) com 'template + instância com estado', que é o desenho que o PFR já tem (ADR phased-resumable). Responde (4) com 'separar': o catálogo da onion-patterns é seleção dos playbooks do PRÓPRIO trabalho do Onion; o de domínio é conteúdo do adotante. Absorve princípios sem adotar formato: estado observado e não autodeclarado (Runbook.v1), LLM lê e gate determinístico escreve (runbook-agent), aprovação por ação (hook PreToolUse / disable-model-invocation). Recomendada pelo Elenxo junto com o gate de D."
+
+  - id: "C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS"
+    node_type: "claim"
+    plane: "DEV"
+    status: "open"
+    impact: 4
+    confidence: 0.2
+    label: "Opção B: criar a abstração SDAAL completa (interface Playbook + adapters por tipo e por framework) nos 4 domínios, como pede a issue SAC-52."
+    narrative: "É o pedido literal da issue. Rejeitada pelo Elenxo neste momento: framework não é provider com transporte (R1), a premissa dos 4 domínios não foi decidida (R2), não há consumidor (R3), e a execução de runbook já é categoria capitalizada (AI SRE). Não está refutada por evidência: fica open e limitada por CONSTRAINS."
+
+  - id: "C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER"
+    node_type: "claim"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.25
+    label: "Opção C: costurar o CACAO v2.0 (OASIS) por SDAAL como primeiro adapter, na fatia de compliance/segurança."
+    narrative: "CACAO é padrão aberto real (OASIS, 2023-11-27), mas restrito a cibersegurança, e executá-lo exige orquestrador externo (SOARCA). Nenhum adotante medido opera SOAR, e as verticais de compliance do Onion produzem documentação. A especificação técnica completa não foi lida nesta rodada. Rejeitada pelo Elenxo agora; candidata a reabrir se um adotante trouxer SOAR."
+
+  - id: "C_OPCAO_D_GATE_DE_PESQUISA"
+    node_type: "claim"
+    plane: "DEV"
+    status: "open"
+    impact: 4
+    confidence: 0.55
+    label: "Opção D: adiar com gate — rodar antes uma rodada curta de primárias nomeadas (Arazzo 1.0.1, runme, especificação CACAO v2.0, guia incident.io) e só então decidir costurar ou inventar."
+    narrative: "O gate é a forma 'primárias nomeadas' da doutrina de pesquisa: as lacunas JÁ têm nome. O Elenxo recomenda D como gate da sub-decisão (3), não como substituto de A: A decide o que não se constrói agora; D decide se existe formato aberto genérico a costurar quando houver consumidor."
+
+  - id: "C_OPCAO_E_UNIFICAR_NO_CATALOGO"
+    node_type: "claim"
+    plane: "DEV"
+    status: "open"
+    impact: 3
+    confidence: 0.25
+    label: "Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo."
+    narrative: "O catálogo é seleção dos playbooks do próprio Onion (7 hoje, medido). Misturar conteúdo de domínio de adotante num skill do core inflaria um catálogo que já carrega doutrina, e os domínios de engenharia/ops já têm skills de plugins de primeira parte no mesmo substrato. Sem objeção direta que o refute; limitado."
+
+  - id: "E_MEDIDO_CATALOGO_SETE_PLAYBOOKS_1011"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-11"
+    verified_against: "awk sobre .claude/skills/onion-patterns/SKILL.md a partir do cabeçalho §Playbooks até o próximo '## ': 7 subseções '### ' (HEAD dc06bb9b)"
+    valid_from: "2026-06-24"
+    source_tier: 10
+    source_kind: "internal-audit"
+    label: "MEDIDO: o catálogo recognition-primed da onion-patterns tem 7 playbooks (descoberta→backlog, planejamento→entrega, assumir repo, prod-durante-dev, laço sem guarda, object-led discovery, Elenxo). A premissa da issue de que o core não tem playbook é falsa."
+    narrative: "Supersede o nó SY5_playbooks_materialization_open do grafo federation-research-2026-06-reconciled, que dizia haver UMA linha de doutrina e nenhuma seção de 3-5 playbooks: hoje há 7 subseções (PR #164 e sinais de campo posteriores). São playbooks do PRÓPRIO trabalho do Onion; o único de domínio vindo de adotante é o object-led discovery (metagamify), e ele coube no catálogo sem camada SDAAL."
+    trace: ".claude/skills/onion-patterns/SKILL.md"
+    provenance:
+      source: ".claude/skills/onion-patterns/SKILL.md@dc06bb9b"
+      locator: "§Playbooks (recognition-primed — catálogo, blip #9), l.176 em diante, 7 cabeçalhos ###"
+      method: "medição: awk de contagem dos ### na seção"
+      locality: "repo"
+
+  - id: "E_MEDIDO_SDAAL_E_POR_PROVIDER_1011"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-11"
+    verified_against: "git ls-files: 5 adapters/*.capabilities.tsv no task-manager (asana, clickup, jira, linear, zoho), 2 adapters no forge (github, none), 0 arquivos em .claude/utils/playbook*"
+    valid_from: "2026-10-11"
+    source_tier: 10
+    source_kind: "internal-audit"
+    label: "MEDIDO: no Onion todo adapter SDAAL é de PROVIDER com transporte (5 do task-manager com .capabilities.tsv cobrado pela REGRA 103, 2 do forge); não existe .claude/utils/playbook/. Não há precedente de adapter por framework."
+    narrative: "Sustenta a restrição R1 do Elenxo com medição: a catraca da REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte) cobra capacidades que um provider implementa ou não; um framework de domínio (MEDDICC, NIST 800-61) não tem capacidades a declarar."
+    trace: ".claude/utils/task-manager/adapters/"
+    provenance:
+      source: ".claude/utils/task-manager/adapters/@dc06bb9b · .claude/utils/forge/adapters/@dc06bb9b"
+      locator: "git ls-files dos adapters e de .claude/utils/playbook*"
+      method: "medição: git ls-files contado nesta sessão"
+      locality: "repo"
+
+  - id: "E_MEDIDO_PLUGINS_JA_TEM_IR_E_RUNBOOK_1011"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "find no cache de plugins sincronizados do Claude Code nesta máquina: engineering/skills/incident-response/SKILL.md e operations/skills/runbook/SKILL.md presentes"
+    valid_from: "2026-10-11"
+    source_tier: 10
+    source_kind: "internal-audit"
+    label: "MEDIDO: plugins de primeira parte instalados aqui já entregam playbooks de engenharia/ops como skills (engineering/incident-response e operations/runbook), no mesmo substrato do Onion."
+    narrative: "Corrobora a objeção do Elenxo ao achado 2: para engenharia/ops existe concorrente gratuito no MESMO substrato (skill). Um SDAAL de playbooks do core competiria com ele em vez de costurar."
+    trace: "⟨cache de plugins sincronizados do Claude Code⟩/engineering/skills/incident-response/SKILL.md"
+    provenance:
+      source: "⟨cache de plugins sincronizados do Claude Code nesta máquina⟩"
+      locator: "engineering/skills/incident-response/SKILL.md · operations/skills/runbook/SKILL.md"
+      method: "medição: find por caminho de skill nesta sessão"
+      locality: "host"
+
+  - id: "E_CACAO_V2_PADRAO_ABERTO_OASIS"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/ — votos 3-0"
+    valid_from: "2023-11-27"
+    source_tier: 9
+    source_kind: "primary"
+    label: "CACAO v2.0 é padrão aberto OASIS de playbooks de cibersegurança, aprovado em 2023-11-27 pelo TC CACAO; existe formato aberto, limitado a segurança, que o Onion poderia costurar em vez de inventar."
+    narrative: "O fato se sustenta; a inferência 'pode costurar' é limitada pela objeção do Elenxo (sem consumidor SOAR, execução exige SOARCA)."
+    trace: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/"
+    provenance:
+      source: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_SKILLS_PADRAO_AGENT_SKILLS_NAO_EXECUTAVEL"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "https://code.claude.com/docs/en/skills — votos 3-0"
+    source_tier: 9
+    source_kind: "primary"
+    label: "Skills do Claude Code seguem o padrão aberto Agent Skills (SKILL.md com frontmatter YAML + markdown): formato aberto de instrução empacotada, mas não de playbook executável com estado (não é SOAR/CACAO/Rundeck)."
+    trace: "https://code.claude.com/docs/en/skills"
+    provenance:
+      source: "https://code.claude.com/docs/en/skills"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_SKILL_E_TEMPLATE_SEM_ESTADO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "https://code.claude.com/docs/en/skills — votos 2-1"
+    source_tier: 9
+    source_kind: "primary"
+    label: "Uma skill é template carregado na invocação, sem estado de execução persistente nativo; o estado de um playbook vivo teria de morar fora dela (KG, sessão, task manager)."
+    narrative: "Voto 2-1, argumento pelo silêncio da doc. O Onion já resolve 'template + instância com estado' no PFR (.claude/sessions/<feature>/)."
+    trace: "https://code.claude.com/docs/en/skills"
+    provenance:
+      source: "https://code.claude.com/docs/en/skills"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 2-1 do run"
+      locality: "web"
+
+  - id: "E_NIST_IACD_PLAYBOOKS_SEM_DETALHE"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-11"
+    verified_against: "https://www.eecs.tufts.edu/~dvotipka/files/papers/Stevens2022Playbooks.pdf — votos 3-0"
+    valid_from: "2022-04"
+    source_tier: 8
+    source_kind: "paper"
+    label: "Playbooks feitos com NIST e IACD frequentemente carecem de detalhe para uso real: especialistas julgaram insuficientes 6 de 12 IACD e 5 de 12 NIST (12 profissionais, 24 playbooks)."
+    narrative: "Amostra pequena, de 2022, só resposta a incidente de segurança. Vale como restrição de esquema (detalhe executável + links externos), não como critério de fatia."
+    trace: "https://www.eecs.tufts.edu/~dvotipka/files/papers/Stevens2022Playbooks.pdf"
+    provenance:
+      source: "https://www.eecs.tufts.edu/~dvotipka/files/papers/Stevens2022Playbooks.pdf"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_CACAO_ROASTER_GERA_E_EXECUTA"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-10-11"
+    verified_against: "https://github.com/opencybersecurityalliance/cacao-roaster — votos 2-1"
+    valid_from: "2023"
+    source_tier: 8
+    source_kind: "primary"
+    label: "O cacao-roaster (OCA) implementa CACAO v2.0 e gera, valida, visualiza e executa playbooks legíveis por máquina; candidato a costura, restrito a cibersegurança."
+    narrative: "Trajetória do projeto (último commit, stars, releases, mantenedores) NÃO medida nesta rodada."
+    trace: "https://github.com/opencybersecurityalliance/cacao-roaster"
+    provenance:
+      source: "https://github.com/opencybersecurityalliance/cacao-roaster"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 2-1 do run"
+      locality: "web"
+
+  - id: "E_CACAO_ROASTER_DELEGA_AO_SOARCA"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-10-11"
+    verified_against: "https://github.com/opencybersecurityalliance/cacao-roaster — votos 2-1"
+    source_tier: 8
+    source_kind: "primary"
+    label: "A execução CACAO no cacao-roaster é delegada a orquestrador externo (SOARCA, via SOARCA_URL); a ferramenta não documenta estado de execução nem persistência, logo estado vivo exige outro componente."
+    trace: "https://github.com/opencybersecurityalliance/cacao-roaster"
+    provenance:
+      source: "https://github.com/opencybersecurityalliance/cacao-roaster"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 2-1 do run"
+      locality: "web"
+
+  - id: "E_AI_SRE_CATEGORIA_FINANCIADA"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/ — votos 3-0"
+    valid_from: "2026-02"
+    source_tier: 5
+    source_kind: "analyst"
+    label: "'AI SRE' é categoria emergente de automação de troubleshooting com ao menos dois concorrentes bem financiados: Resolve AI (US$125M, unicórnio, fev/2026) e Traversal (Sequoia)."
+    trace: "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/"
+    provenance:
+      source: "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_EXECUCAO_DE_RUNBOOK_TEM_ESTADO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "https://tianpan.co/blog/2026-04-12-ai-assisted-incident-response-giving-your-on-call-agent-a-runbook — votos 3-0"
+    valid_from: "2026-04"
+    source_tier: 4
+    source_kind: "engineer"
+    label: "Executar um runbook é processo com estado: o agente propõe ações via approval cards, monitora numa janela e faz rollback/escalonamento, com registro completo; a fonte não diz onde o estado mora."
+    trace: "https://tianpan.co/blog/2026-04-12-ai-assisted-incident-response-giving-your-on-call-agent-a-runbook"
+    provenance:
+      source: "https://tianpan.co/blog/2026-04-12-ai-assisted-incident-response-giving-your-on-call-agent-a-runbook"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_MEDDICC_PLAYBOOK_PROPRIETARIO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "https://meddicc.com/llm-info — votos 3-0"
+    valid_from: "2025-09"
+    source_tier: 4
+    source_kind: "primary"
+    label: "O MEDDICC Playbook (repositório de GTM plays, set/2025) é entregue pela plataforma proprietária mOS, sem formato aberto ou API pública documentados na página."
+    narrative: "Página llm-info do próprio vendor. MEDDICC/SPICED como METODOLOGIA são domínio público; playbook baseado nelas é conteúdo."
+    trace: "https://meddicc.com/llm-info"
+    provenance:
+      source: "https://meddicc.com/llm-info"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_MOS_SEM_CONTRATO_PUBLICO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-10-11"
+    verified_against: "https://meddicc.com/llm-info — votos 2-1"
+    source_tier: 4
+    source_kind: "primary"
+    label: "A única integração documentada do mOS é com CRM; sem exportação, API ou formato do catálogo de playbooks, um adapter SDAAL para ele não tem contrato público onde se apoiar."
+    trace: "https://meddicc.com/llm-info"
+    provenance:
+      source: "https://meddicc.com/llm-info"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 2-1 do run"
+      locality: "web"
+
+  - id: "E_RUNBOOK_V1_MANIFESTO_MCP"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "https://github.com/CorpusIQ/runbook-spec — votos 3-0"
+    source_tier: 3
+    source_kind: "engineer"
+    label: "Runbook.v1 é contrato de camada de aplicação para hosts MCP, com manifesto JSON versionado (runbook_id, version, mode, failure_policy, checkpoints, completion) e schema publicado."
+    narrative: "Repositório de um único vendor (CorpusIQ), sem órgão de padronização e com adoção não medida: referência de desenho, não padrão a costurar."
+    trace: "https://github.com/CorpusIQ/runbook-spec"
+    provenance:
+      source: "https://github.com/CorpusIQ/runbook-spec"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_RUNBOOK_V1_ESTADO_OBSERVADO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "https://github.com/CorpusIQ/runbook-spec — votos 3-0"
+    source_tier: 3
+    source_kind: "engineer"
+    label: "No Runbook.v1 o estado de execução é derivado pelo host do stream de tool-calls (observado, não autodeclarado pelo modelo), e a conclusão gera recibo legível por máquina; não diz onde persiste."
+    narrative: "Converge com behavior-over-declaration e exit-code-não-é-a-verificação. O princípio se absorve sem o formato: no Onion, hook PostToolUse registrando a execução no estado da sessão PFR."
+    trace: "https://github.com/CorpusIQ/runbook-spec"
+    provenance:
+      source: "https://github.com/CorpusIQ/runbook-spec"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_CAST_GARTNER_NAO_RESPONDE"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 2
+    confidence: 0.4
+    verified_at: "2026-10-11"
+    verified_against: "https://cast.ai/gartner-market-guide-for-ai-sre-tooling/ — votos 3-0"
+    source_tier: 3
+    source_kind: "vendor-on-competitor"
+    label: "A página da cast.ai sobre o Gartner Market Guide for AI SRE Tooling não menciona runbooks, playbooks, SOAR, CACAO, PagerDuty, NIST 800-61, ISO 22301, Backstage, Port ou Rundeck; não sustenta nenhuma das 4 decisões."
+    narrative: "Registro de fonte inútil, não achado: o eixo de analistas fica ABERTO (o guia do Gartner só foi visto por reimpressão de vendor)."
+    trace: "https://cast.ai/gartner-market-guide-for-ai-sre-tooling/"
+    provenance:
+      source: "https://cast.ai/gartner-market-guide-for-ai-sre-tooling/"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_RUNBOOK_AGENT_YAML_MAQUINA_DE_ESTADOS"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 2
+    confidence: 0.4
+    verified_at: "2026-10-11"
+    verified_against: "https://github.com/nutcas3/runbook-agent — votos 2-1"
+    source_tier: 3
+    source_kind: "engineer"
+    label: "O runbook-agent trata o runbook como template declarativo em YAML (triggers, safe_state, diagnostic_steps, recovery_actions com rollback_command) e o transforma em máquina de estados executável."
+    narrative: "Projeto pessoal sem adoção medida: um exemplo de 'template que vira instância com estado', não estado da arte."
+    trace: "https://github.com/nutcas3/runbook-agent"
+    provenance:
+      source: "https://github.com/nutcas3/runbook-agent"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 2-1 do run"
+      locality: "web"
+
+  - id: "E_CACAO_ESCOPO_SO_CIBER"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/ — votos 3-0"
+    valid_from: "2023-11-27"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O escopo do CACAO é restrito a cibersegurança (detectar, investigar, mitigar, remediar ameaças); não cobre GTM, produto ou engenharia genérica, logo não serve de interface agnóstica para os 4 domínios."
+    narrative: "Única objeção do Elenxo que NÃO sobreviveu: não houve evidência de uso do esquema CACAO fora de ciber."
+    trace: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/"
+    provenance:
+      source: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_CACAO_PAGINA_NAO_DESCREVE_FORMATO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/ — votos 3-0"
+    source_tier: 9
+    source_kind: "primary"
+    label: "A página institucional do CACAO não descreve formato, modelo de execução nem distinção template/instância; a sub-decisão (1) exige a especificação técnica completa, não lida."
+    trace: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/"
+    provenance:
+      source: "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 3-0 do run"
+      locality: "web"
+
+  - id: "E_CAMPOS_DE_EXECUCAO_SAO_SO_CLAUDE_CODE"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "https://code.claude.com/docs/en/skills — votos 2-1"
+    source_tier: 9
+    source_kind: "primary"
+    label: "Os campos context: fork, hooks, disable-model-invocation e agent são extensões exclusivas do Claude Code, fora do padrão aberto; playbook que se apoie neles fica acoplado."
+    trace: "https://code.claude.com/docs/en/skills"
+    provenance:
+      source: "https://code.claude.com/docs/en/skills"
+      locator: "página lida no Fetch da rodada"
+      method: "juízes: votação 2-1 do run"
+      locality: "web"
+
+  - id: "E_MERCADO_PLAYBOOK_SDAAL_1011"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/ (tier 5) · https://cast.ai/gartner-market-guide-for-ai-sre-tooling/ (tier 3) · https://meddicc.com/llm-info (tier 4) — síntese do worker de mercado"
+    valid_from: "2026-02"
+    source_tier: 5
+    source_kind: "analyst"
+    label: "MERCADO: o capital está na EXECUÇÃO de engenharia/ops (AI SRE: Resolve AI US$125M unicórnio, Traversal/Sequoia); GTM monetiza conteúdo em plataforma fechada (MEDDICC mOS); nenhum sinal de capital em formato aberto de playbook."
+    narrative: "Follow-the-money pesa CONTRA o Onion entrar na execução de runbooks de incidente: a execução já está capitalizada. O fosso do Onion é o mecanismo verificável (radar determinístico, gate exit 2), não o motor de execução. O guia do Gartner para AI SRE só foi visto por reimpressão de vendor (cast.ai) e não cobre nenhuma das 4 decisões: eixo de analistas aberto. Rodadas, M&A e down rounds de SOAR/runbook automation (Rundeck/PagerDuty, FireHydrant, incident.io) não foram medidos."
+    trace: "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/"
+    provenance:
+      source: "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/"
+      locator: "anúncio da rodada da Resolve AI e menção à Traversal"
+      method: "juízes: votação 3-0 do run (claim AI SRE) + síntese do worker de mercado"
+      locality: "web"
+
+  - id: "E_OBJECAO_CACAO_SEM_CONSUMIDOR"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "escopo só ciber (OASIS, tier 9) + execução exige SOARCA (cacao-roaster) + agentes iso-27001/iso-22301/soc2 documentam e não operam SOAR; caso SendMessage do CLAUDE.md, reconferido nesta sessão: git grep SendMessage em .claude rastreado = 0"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 1): CACAO é padrão OASIS, mas costurá-lo sem consumidor repete o acoplamento declarado e não usado; nenhum adotante medido opera SOAR e as verticais de compliance produzem documentação."
+    narrative: "Conferido aqui: as 834 ocorrências que um grep cru acha em .claude vêm todas de worktrees não rastreadas; o git grep sobre arquivos rastreados devolve 0, como o CLAUDE.md afirma."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_SKILL_E_SUBSTRATO_NATIVO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "skills engineering/incident-response (modos new/update/postmortem) e operations/runbook presentes no cache de plugins desta máquina (ver E_MEDIDO_PLUGINS_JA_TEM_IR_E_RUNBOOK_1011)"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 2): skill é o substrato NATIVO do Onion, não provider a abstrair; plugins de primeira parte já entregam incident-response e runbook como skills, e um SDAAL de playbooks competiria com eles."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_PFR_JA_E_TEMPLATE_MAIS_ESTADO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "ADR onion-adr-phased-resumable-pattern-2026-06 (core-only) e o catálogo da onion-patterns que diz 'a execução não-trivial costuma ser um PFR'"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 3): o PFR (ADR phased-resumable, .claude/sessions/<feature>/) já é 'definição template + instância com estado'; o estado mora na sessão PFR existente e não pede camada nova."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_AMOSTRA_NIST_PEQUENA"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "Stevens et al. 2022 (tier 8), contrapeso do excesso de detalhe cortado por orçamento"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 4): 12 profissionais, 24 playbooks, 2022, só IR de segurança; generalizar a GTM ou produto é extrapolação, e o mesmo estudo diz que excesso de detalhe atrasa a resposta."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_ROASTER_TRAJETORIA_NAO_MEDIDA"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "voto 2-1 no achado; nenhum dado de trajetória do repositório opencybersecurityalliance/cacao-roaster no retorno"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 5): a trajetória do cacao-roaster (último commit, stars, releases, mantenedores) não foi medida; search-by-trajectory exige esse eixo antes de recomendar dependência."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_SOARCA_E_INFRA_NOVA"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "cacao-roaster delega execução ao SOARCA por SOARCA_URL e não documenta persistência (tier 8, 2-1)"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 6): para ter playbook CACAO vivo o adotante teria de operar um SOARCA (infra nova), contra a postura de acoplamento e o custo de manutenção; e o estado continua sem endereço."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_EXECUCAO_JA_CAPITALIZADA"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "TechCrunch fev/2026 (tier 5): Resolve AI US$125M; moat do Onion = mecanismo verificável (memória onion-moat-verifiable-mechanism)"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 7): pelo follow-the-money, o capital em AI SRE pesa CONTRA o Onion entrar na execução de runbooks; se IR entrar, que seja dogfood de seleção, estado e verificação, nunca motor de execução."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_MEDDICC_E_METODOLOGIA_PUBLICA"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "a fonte é a página llm-info do próprio vendor (tier 4); ausência de API numa página não prova ausência de API"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 9): MEDDICC/SPICED são METODOLOGIAS de domínio público; playbook baseado nelas é CONTEÚDO e não depende de API do vendor. Fica de pé: não há formato aberto a costurar em GTM."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_SDAAL_FORA_DO_LUGAR"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "task-manager com 5 *.capabilities.tsv cobrados pela REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte) e forge com github/none — medido em E_MEDIDO_SDAAL_E_POR_PROVIDER_1011"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 10): SDAAL abstrai substratos/providers com transporte; framework é dado ou template. 'Adapter por framework' criaria N adapters sem capacidade a declarar, sem catraca possível e com custo de manutenção."
+    narrative: "A objeção mais forte contra B. Fica CONSTRAINS e não REFUTES: é afirmação de um agente sem votação, e a decisão é do maestro."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_RUNBOOK_V1_NAO_E_PADRAO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "github.com/CorpusIQ/runbook-spec (tier 3), sem stars, implementações ou hosts medidos"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 11): Runbook.v1 é repositório de um único vendor, sem órgão de padronização e com adoção não medida; serve de referência de desenho, não de padrão aberto a costurar."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_PRINCIPIO_SEM_FORMATO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "convergência com behavior-over-declaration e exit-code-não-é-a-verificação; fonte tier 3 não diz onde o estado persiste"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 12): o estado observado (não autodeclarado) do Runbook.v1 se absorve como princípio sem adotar o formato; no Onion, um hook PostToolUse que registra a execução na sessão PFR."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_EIXO_ANALISTAS_ABERTO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "o guia do Gartner só aparece por reimpressão de vendor (cast.ai, vendor-on-competitor, tier 3); primário citado, não lido"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 13): a página da cast.ai é registro de fonte inútil e deixa o eixo de analistas como coberto quando NÃO foi; o Gartner Market Guide for AI SRE Tooling não foi lido."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_ESPEC_CACAO_NAO_LIDA"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "docs.oasis-open.org/cacao/security-playbooks/v2.0 — primário citado, não lido"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 16): a especificação completa do CACAO v2.0 não foi lida, e é ela que diz se separa definição do estado de execução; a decisão (3) para compliance foi tomada sem a fonte técnica."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_CODEX_PERDE_O_CONTROLE"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "campos exclusivos do Claude Code (code.claude.com/docs/en/skills, tier 9, 2-1) + precedente do model: em TOML que a REGRA 3 (Campo model: restrito à allowlist sonnet|opus|haiku|fable) não enxergava"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (achado 17): disable-model-invocation compra segurança real em playbook com efeito colateral, mas o onion-codex (LINHA VIVA desde 16/09) perderia o controle; declare o equivalente no Codex ou o playbook não viaja."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_QUATRO_DOMINIOS_SEM_DECISAO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "CLAUDE.md, seção Contexto do Projeto ('Cobre três dimensões peer do ciclo' e 'esta permanece em 3'), conferido nesta sessão"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO à premissa: o CLAUDE.md diz que o Onion cobre TRÊS dimensões peer (produto, engenharia, compliance) e que 'permanece em 3'; a issue promove GTM a 4º domínio sem decisão do maestro."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_SEM_CONSUMIDOR_PULL_NOT_PUSH"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "docs/evolution/federation/outbox/metagamify/_processed/2026-07-01-object-led-discovery-playbook.md, presença conferida nesta sessão; nenhum pedido de adotante por interface Playbook"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO à premissa: não há consumidor medido. O único playbook de domínio de adotante (object-led discovery, metagamify) coube no catálogo existente; criar a camada agora é push, não pull."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_INSTITUCIONALIZACAO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "Stevens et al. 2022 (tier 8), recomendação explícita de institucionalização"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO a descarte por comodismo: frameworks só funcionam dentro de institucionalização (tabletop, revisão, mentoria), como a mesma fonte recomenda; o descarte não citou contraevidência."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_PLAYBOOK_APODRECE"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "Stevens et al. 2022 (tier 8), n=1 organização; falta segunda medição de apodrecimento"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO a descarte por comodismo: um ano depois o NDC não refez tabletops (apodrecimento); um catálogo de domínio precisa de gatilho mecânico de frescor (como /meta:*-freshness), não de disciplina."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_LLM_LE_GATE_ESCREVE"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-10-11"
+    verified_against: "README de github.com/nutcas3/runbook-agent (tier 3), convergente com o achado 8"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO a descarte por comodismo: o runbook-agent separa diagnóstico read-only do LLM da escrita no executor com aprovação humana; restrição de desenho que casa com o gate exit 2 do Onion."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_APROVACAO_POR_ACAO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-10-11"
+    verified_against: "item cortado sem avaliação no retorno (fonte do blog tianpan.co, tier 4)"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO a corte por orçamento: risco e aprovação atribuídos por AÇÃO, não por agente, é restrição central de esquema para playbook com efeito colateral; mapeia para hooks PreToolUse e disable-model-invocation."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_FATIA_POR_INCIDENTE_REAL"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "item cortado sem avaliação no retorno; converge com o dogfood master do Onion"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO a corte por orçamento: o critério da primeira fatia é empírico (auditar casos reais: um serviço, um tipo de incidente, um runbook), não nome de framework — responde direto à sub-decisão (2)."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_SESSAO_PFR_SOBREVIVE_A_QUEDA"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "item cortado sem avaliação; .claude/sessions/<feature>/ é arquivo versionável, a conversa não"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO a corte por orçamento: execução durável recria estado após queda, coisa que a conversa não dá; a sessão PFR em arquivo sobrevive, e esse teste devia ter decidido onde o estado mora."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_SKILL_LE_ESTADO_NA_INVOCACAO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "code.claude.com/docs/en/skills (tier 9), item cortado sem avaliação"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO a corte por orçamento: skills suportam injeção dinâmica de contexto por shell e leem estado externo na invocação; é a peça que fecha a sub-decisão (1) sem camada nova."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_DISABLE_MODEL_INVOCATION"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "code.claude.com/docs/en/skills (tier 9), item cortado sem avaliação"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO a corte por orçamento: disable-model-invocation faz playbook com efeito colateral disparar só por /nome; capacidade de segurança tier 9 que faltou pesar contra a portabilidade para o onion-codex."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_ARAZZO_NAO_LIDO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "Arazzo Specification 1.0.1 — primário citado, não lido"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO (a mais grave): o Arazzo 1.0.1 (OpenAPI Initiative/Linux Foundation), workflow executável agnóstico de domínio, não foi lido; é o único candidato que contradiria 'não há formato aberto genérico'."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_RUNME_NAO_LIDO"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "github.com/runmedev/runme — primário citado, não lido"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO: runmedev/runme (runbook executável em Markdown) não foi lido; é o MESMO substrato do Onion (.md) e mostraria se há formato aberto de runbook-em-markdown com estado."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_MERCADO_RUNBOOK_SEM_FONTE"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "incident.io, guia de ferramentas de automação de runbook 2026 — citado, não lido"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO: o guia incident.io de automação de runbook 2026 não foi lido; o eixo de mercado (Rundeck, PagerDuty Runbook Automation, FireHydrant) que a sub-decisão (3) cita ficou sem fonte."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_OBJECAO_ENGINES_DURAVEIS_NAO_MEDIDAS"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "upstash, comparação de engines de workflow durável 2026 — citado, não lido"
+    source_tier: 5
+    source_kind: "internal-audit"
+    label: "OBJEÇÃO: a comparação de engines de workflow durável 2026 (Temporal, Inngest, Restate, DBOS) não foi lida; mediria custo e acoplamento das alternativas de estado contra a sessão PFR em arquivo."
+    trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "lista de objeções do Elenxo, item com survives=true"
+      method: "juízes: objeção de UM agente do Elenxo, sem votação"
+      locality: "host"
+
+  - id: "E_LACUNAS_PLAYBOOK_SDAAL_1011"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "retorno do run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL): 40 fontes, 39 claims levantadas, 17 confirmadas, 8 refutadas por fonte fraca, 0 não verificadas; Elenxo 52 objeções, 45 sobreviventes, 28 modeladas"
+    source_tier: 10
+    source_kind: "internal-audit"
+    label: "CONTABILIDADE 2026-10-11: 40 fontes, 39 claims, 17 confirmadas, 8 refutadas por fonte fraca, 0 não verificadas. Elenxo: 52 objeções, 45 sobreviventes, 28 modeladas como E_OBJECAO_, 17 nomeadas na narrative."
+    narrative: "REFUTADAS POR FONTE FRACA (8): institucionalização dos frameworks (Stevens 2022, tier 8); tabletop alimenta atualização mas o NDC não refez em um ano (Stevens 2022); Temporal espera indefinida sem compute (docs.temporal.io, tier 8); estado em atributos do Workflow via Signal (tier 8, impreciso: o durável é a Event History); runbook como grafo de ações tipadas com permissões por passo (tianpan.co, tier 4); Temporal Event History recria estado (blog temporal.io, tier 4); runbook como serviço chamável (shiftmag.dev, tier 4); runbook-agent separa diagnóstico read-only da escrita (tier 3). NÃO VERIFICADAS: 0. CORTADAS POR ORÇAMENTO: 40 fontes levantadas e 39 claims; as fontes não lidas que o Elenxo nomeou: Arazzo 1.0.1, TC CACAO, SmartBear/Arazzo, devopsaitoolkit, runme, arxiv 2608.09524, incident.io, sachin-11/incident-runbook-agent, OASIS ?p=10546, upstash. OBJEÇÕES SOBREVIVENTES NÃO MODELADAS (17 de 45, alvo de cada uma): achado 8 (execução de runbook com estado: um blog tier 4, sem primária); achado 14 (runbook-agent: projeto pessoal, um caso não define o estado da arte); descarte Temporal espera indefinida sem compute (fora do substrato, não refutado); descarte Temporal Event History recria o estado (bastava ler docs.temporal.io); corte trilha de auditoria completa (interseção com ISO 27001/SOC2 e KG bi-temporal); corte LLM stateless exige estado em armazenamento durável; corte Activities do Temporal como costura análoga ao SDAAL acoplada ao SDK; corte playbooks MEDDICC dependem do estágio do deal (falta fonte independente); corte playbook declara intenção por tarefa e suporta ação não linear (Stevens 2022); corte excesso de detalhe atrasa a resposta (contrapeso do achado 4); corte Runbook.v1 fail-closed, allow-list e version pinning; fonte não lida: TC CACAO no OASIS (trajetória do padrão); fonte não lida: SmartBear sobre Arazzo em workflows de agentes; fonte não lida: devopsaitoolkit, guia de tipos de runbook (marginal); fonte não lida: arxiv 2608.09524 (runbooks com agentes, ago/2026); fonte não lida: sachin-11/incident-runbook-agent (marginal); fonte não lida: OASIS ?p=10546 (estado de execução durável no CACAO). Objeções que NÃO sobreviveram (7): escopo só-ciber do CACAO, estado em atributos do Workflow, grafo de ações tipadas, runbook como serviço chamável, página MEDDICC negativa, série A da Resolve (redundante), TechCrunch negativo."
+    trace: "docs/evolution/research/playbook-sdaal-2026-10/SYNTHESIS.md"
+    provenance:
+      source: "retorno do Elenxo repassado pelo workflow (run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL))"
+      locator: "contagens do retorno (confirmadas, refutadas, objeções com survives)"
+      method: "medição: contagem dos itens do retorno nesta escrita"
+      locality: "host"
+
+edges:
+  - from: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: C_OPCAO_D_GATE_DE_PESQUISA
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: C_OPCAO_E_UNIFICAR_NO_CATALOGO
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: D_PLAYBOOK_SDAAL_SAC52
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_CATALOGO_SETE_PLAYBOOKS_1011
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_SDAAL_E_POR_PROVIDER_1011
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_PLUGINS_JA_TEM_IR_E_RUNBOOK_1011
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_CATALOGO_SETE_PLAYBOOKS_1011
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_SDAAL_E_POR_PROVIDER_1011
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_CACAO_V2_PADRAO_ABERTO_OASIS
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_CACAO_V2_PADRAO_ABERTO_OASIS
+    to: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    edge_type: SUPPORTS
+  - from: E_SKILLS_PADRAO_AGENT_SKILLS_NAO_EXECUTAVEL
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_SKILLS_PADRAO_AGENT_SKILLS_NAO_EXECUTAVEL
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_SKILL_E_TEMPLATE_SEM_ESTADO
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_SKILL_E_TEMPLATE_SEM_ESTADO
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_NIST_IACD_PLAYBOOKS_SEM_DETALHE
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_CACAO_ROASTER_GERA_E_EXECUTA
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_CACAO_ROASTER_GERA_E_EXECUTA
+    to: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    edge_type: SUPPORTS
+  - from: E_CACAO_ROASTER_DELEGA_AO_SOARCA
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_AI_SRE_CATEGORIA_FINANCIADA
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_EXECUCAO_DE_RUNBOOK_TEM_ESTADO
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_MEDDICC_PLAYBOOK_PROPRIETARIO
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_MOS_SEM_CONTRATO_PUBLICO
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_MOS_SEM_CONTRATO_PUBLICO
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_RUNBOOK_V1_MANIFESTO_MCP
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_RUNBOOK_V1_ESTADO_OBSERVADO
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_RUNBOOK_V1_ESTADO_OBSERVADO
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_CAST_GARTNER_NAO_RESPONDE
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_RUNBOOK_AGENT_YAML_MAQUINA_DE_ESTADOS
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_RUNBOOK_AGENT_YAML_MAQUINA_DE_ESTADOS
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_CACAO_ESCOPO_SO_CIBER
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_CACAO_PAGINA_NAO_DESCREVE_FORMATO
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_CAMPOS_DE_EXECUCAO_SAO_SO_CLAUDE_CODE
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_MERCADO_PLAYBOOK_SDAAL_1011
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_CACAO_SEM_CONSUMIDOR
+    to: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SKILL_E_SUBSTRATO_NATIVO
+    to: C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SKILL_E_SUBSTRATO_NATIVO
+    to: C_OPCAO_E_UNIFICAR_NO_CATALOGO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PFR_JA_E_TEMPLATE_MAIS_ESTADO
+    to: C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_AMOSTRA_NIST_PEQUENA
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ROASTER_TRAJETORIA_NAO_MEDIDA
+    to: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SOARCA_E_INFRA_NOVA
+    to: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EXECUCAO_JA_CAPITALIZADA
+    to: C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MEDDICC_E_METODOLOGIA_PUBLICA
+    to: C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SDAAL_FORA_DO_LUGAR
+    to: C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SDAAL_FORA_DO_LUGAR
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RUNBOOK_V1_NAO_E_PADRAO
+    to: C_OPCAO_D_GATE_DE_PESQUISA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PRINCIPIO_SEM_FORMATO
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EIXO_ANALISTAS_ABERTO
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ESPEC_CACAO_NAO_LIDA
+    to: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ESPEC_CACAO_NAO_LIDA
+    to: C_OPCAO_D_GATE_DE_PESQUISA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CODEX_PERDE_O_CONTROLE
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_QUATRO_DOMINIOS_SEM_DECISAO
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_QUATRO_DOMINIOS_SEM_DECISAO
+    to: C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SEM_CONSUMIDOR_PULL_NOT_PUSH
+    to: C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_INSTITUCIONALIZACAO
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PLAYBOOK_APODRECE
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PLAYBOOK_APODRECE
+    to: C_OPCAO_E_UNIFICAR_NO_CATALOGO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LLM_LE_GATE_ESCREVE
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_APROVACAO_POR_ACAO
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_FATIA_POR_INCIDENTE_REAL
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SESSAO_PFR_SOBREVIVE_A_QUEDA
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SKILL_LE_ESTADO_NA_INVOCACAO
+    to: C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DISABLE_MODEL_INVOCATION
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ARAZZO_NAO_LIDO
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ARAZZO_NAO_LIDO
+    to: C_OPCAO_D_GATE_DE_PESQUISA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RUNME_NAO_LIDO
+    to: C_OPCAO_D_GATE_DE_PESQUISA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MERCADO_RUNBOOK_SEM_FONTE
+    to: C_OPCAO_D_GATE_DE_PESQUISA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ENGINES_DURAVEIS_NAO_MEDIDAS
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_PLAYBOOK_SDAAL_1011
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_PLAYBOOK_SDAAL_1011
+    to: C_OPCAO_D_GATE_DE_PESQUISA
+    edge_type: SUPPORTS

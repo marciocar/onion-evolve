@@ -1,0 +1,921 @@
+{
+ "question": "SAC-52: o core do Onion deve criar uma abstração SDAAL de playbooks (interface Playbook agnóstica + adapters por tipo e por framework, em .claude/utils/playbook/, no molde do task-manager e do forge) para que agentes e comandos montem, executem e acompanhem playbooks de domínio nos 4 domínios peer (negócio/GTM: vendas, customer success, onboarding; engenharia/ops: runbook, resposta a incidente, deploy; produto: discovery, experimentação, lançamento; compliance: incidente de segurança, BCP/DRP, auditoria)? Decidir: (1) playbook é TEMPLATE que se instancia ou PROCESSO VIVO executado com estado (e onde mora o estado: KG .kg.yaml, task manager, sessão); (2) qual framework entra primeiro como fatia vertical de dogfood (candidatos: MEDDICC/SPICED, PagerDuty IR/SRE runbooks, NIST 800-61, ISO 22301, Opportunity Solution Tree/dual-track); (3) se existe padrão/formato aberto de playbook executável no estado da arte de out/2026 (ex.: formatos de runbook executável, playbooks de agentes, SOAR/CACAO, Backstage/Port scorecards, Rundeck) que o Onion deveria costurar por SDAAL em vez de inventar; (4) relação com o catálogo de playbooks recognition-primed que JÁ existe na skill onion-patterns (playbooks do próprio Onion) — estender, separar ou unificar. Considere o custo de manter adapters por framework e a postura de acoplamento do Onion.",
+ "today": "2026-10-11",
+ "kgPath": "/home/marcio/onion-evolve/docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml",
+ "radarExit": 0,
+ "summary": "Resposta: não criar agora uma abstração SDAAL \"de playbooks\" com adapters por framework. O que a pesquisa sustenta é uma separação explícita. (a) DEFINIÇÃO = template declarativo e versionado: é o que skills, Runbook.v1, runbook-agent e CACAO fazem. (b) EXECUÇÃO = processo vivo com estado. Esse estado não mora no template; nenhuma fonte confirmada diz onde persistir. No Onion o lugar natural é o mecanismo que já existe: o PFR/sessão, com o recibo carimbado no KG. Não existe padrão aberto executável que cubra os 4 domínios. O único padrão aberto maduro, o CACAO v2.0 da OASIS, é restrito a cibersegurança. Por isso SDAAL cabe só onde há contrato público para costurar: CACAO em compliance/segurança e, talvez, Runbook.v1 para MCP. Em GTM (MEDDICC/mOS) não há contrato público, e um adapter seria conteúdo próprio, contra a postura de acoplamento. O catálogo recognition-primed da onion-patterns é ESTENDIDO, não fundido: a mecânica é a mesma (reconhecer→aplicar→deliberar→resíduo vira playbook), mas os objetos são diferentes (o trabalho do próprio Onion vs. o domínio do adotante). A fatia de dogfood sugerida é resposta a incidente: NIST 800-61 pelo lado compliance, com CACAO como formato a costurar. É inferência de síntese, não claim confirmada.",
+ "market": "O sinal de capital está concentrado em engenharia/ops. 'AI SRE' é categoria emergente com rodada grande: a Resolve AI confirmou US$125M com valuation de unicórnio em fev/2026 (TechCrunch), e a Traversal tem a Sequoia como investidora. O guia de mercado do Gartner para ferramentas de AI SRE (citado pela cast.ai) não menciona runbooks, playbooks, SOAR, CACAO, PagerDuty, NIST, ISO 22301, Backstage, Port nem Rundeck, então não serve para nenhuma das 4 decisões. Em GTM, o MEDDICC empacota os playbooks numa plataforma proprietária (mOS, set/2025), sem formato aberto: monetiza o conteúdo e não abre o contrato. Em compliance/segurança o padrão é aberto e institucional (OASIS CACAO, OCA), sem sinal de capital específico encontrado. Não houve sinal de M&A nem rodada sobre playbook executável agnóstico multi-domínio, nem para produto (OST/dual-track). Leitura: o capital está no motor de execução de ops e no conteúdo proprietário de GTM, dois espaços onde o core do Onion não deve competir. O formato aberto real só existe em segurança.",
+ "findings": [
+  {
+   "claim": "Existe um padrão aberto de playbook executável, o CACAO Security Playbooks v2.0 (OASIS, aprovado em 2023-11-27). O escopo dele é restrito a cibersegurança (detectar, investigar, mitigar, remediar ameaças), então não serve de interface agnóstica para os 4 domínios. Só é candidato a costura SDAAL na vertical de compliance/segurança.",
+   "confidence": "high",
+   "sources": [
+    "https://www.oasis-open.org/standard/cacao-security-playbooks-v2-0/"
+   ],
+   "evidence": "Fonte primária tier 9, duas claims com votos 3-0 (existência/aprovação e escopo restrito). A página institucional NÃO descreve o modelo de execução nem a distinção template/instância (também 3-0), então a decisão (1) não sai desta fonte.",
+   "vote": "3-0 / 3-0 / 3-0"
+  },
+  {
+   "claim": "Existe implementação aberta do CACAO: o cacao-roaster (OCA) gera, valida, visualiza e executa playbooks CACAO v2.0. A execução, porém, é delegada a um orquestrador externo (SOARCA via SOARCA_URL), e o estado/persistência da execução não está documentado. Ou seja, a costura existe para a DEFINIÇÃO, e o estado vivo exige outro componente.",
+   "confidence": "medium",
+   "sources": [
+    "https://github.com/opencybersecurityalliance/cacao-roaster"
+   ],
+   "evidence": "Fonte primária tier 8, votos 2-1 nas duas claims. Coerente com o padrão geral: o formato aberto cobre o template, e o estado fica fora.",
+   "vote": "2-1 / 2-1"
+  },
+  {
+   "claim": "Skills do Claude Code seguem o padrão aberto Agent Skills (SKILL.md + frontmatter YAML): instrução empacotada carregada na invocação, sem estado de execução persistente nativo. Um playbook vivo teria o estado fora da skill (KG, sessão ou task manager). Os campos de execução controlada (context: fork, hooks, disable-model-invocation, agent) são extensões exclusivas do Claude Code, e apoiar o playbook neles é acoplamento.",
+   "confidence": "high",
+   "sources": [
+    "https://code.claude.com/docs/en/skills"
+   ],
+   "evidence": "Fonte primária tier 9. Formato aberto: 3-0. Template sem estado: 2-1. Campos exclusivos = acoplamento: 2-1. Pela postura do Onion, o acoplamento só se justifica se a capacidade não existir fora; o exit 2 de hook é a que compra.",
+   "vote": "3-0 / 2-1 / 2-1"
+  },
+  {
+   "claim": "No estado da arte de 2026, os formatos de runbook executável para agentes tratam a DEFINIÇÃO como manifesto/template declarativo versionado. O Runbook.v1 (contrato para hosts MCP) usa um manifesto JSON com runbook_id, version, mode, failure_policy, checkpoints e completion. O runbook-agent usa YAML com triggers, safe_state, diagnostic_steps e recovery_actions com rollback_command, que vira máquina de estados. A EXECUÇÃO é processo com estado.",
+   "confidence": "medium",
+   "sources": [
+    "https://github.com/CorpusIQ/runbook-spec",
+    "https://github.com/nutcas3/runbook-agent",
+    "https://tianpan.co/blog/2026-04-12-ai-assisted-incident-response-giving-your-on-call-agent-a-runbook"
+   ],
+   "evidence": "As fontes são tier 3-4 (engenheiros e repos de trajetória, não padrão de mercado). Runbook.v1: 3-0. runbook-agent: 2-1. Execução com approval cards/monitoramento/rollback e registro completo: 3-0. Nenhuma das três diz onde o estado persiste. Sustenta a resposta à decisão (1): template + instância viva, com o local do estado em aberto.",
+   "vote": "3-0 / 2-1 / 3-0"
+  },
+  {
+   "claim": "No Runbook.v1 o estado de execução é DERIVADO pelo host a partir do stream de tool-calls (observado, não autodeclarado pelo modelo), e a conclusão gera um recibo legível por máquina. Isso converge com o behavior-over-declaration do Onion e com o radar determinístico: candidato a costura SDAAL, não a reinvenção.",
+   "confidence": "medium",
+   "sources": [
+    "https://github.com/CorpusIQ/runbook-spec"
+   ],
+   "evidence": "Tier 3, votos 3-0. Converge com a doutrina do corpus (o fosso é o mecanismo verificável). O peso de mercado da spec é baixo: repo de trajetória, sem adoção medida.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "No domínio GTM, o MEDDICC Playbook (lançado em set/2025) é entregue pela plataforma proprietária mOS. Não há formato aberto nem API documentados, e a única integração é com CRM. Um adapter SDAAL para o MEDDICC não tem contrato público em que se apoiar: viraria conteúdo próprio do Onion, e o custo de manter cairia todo no core.",
+   "confidence": "medium",
+   "sources": [
+    "https://meddicc.com/llm-info"
+   ],
+   "evidence": "Fonte primária do fornecedor, mas tier 4. Lançamento proprietário: 3-0. Ausência de contrato público: 2-1. Pesa contra o MEDDICC/SPICED como 1ª fatia, se o critério for costurar em vez de inventar.",
+   "vote": "3-0 / 2-1"
+  },
+  {
+   "claim": "Os playbooks produzidos com os frameworks NIST e IACD muitas vezes não têm detalhe suficiente para uso real: os especialistas julgaram insuficientes 5 de 12 playbooks NIST e 6 de 12 IACD. Adotar um framework como template não basta; o playbook precisa de detalhe operacional e verificação.",
+   "confidence": "medium",
+   "sources": [
+    "https://www.eecs.tufts.edu/~dvotipka/files/papers/Stevens2022Playbooks.pdf"
+   ],
+   "evidence": "Paper tier 8, votos 3-0, mas a amostra é pequena (12 profissionais, 24 playbooks) e de 2022. Apoia a ideia de que o valor do Onion está no mecanismo verificável e no dogfood, não no catálogo de templates de framework.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "A automação de SRE/incidente com IA virou categoria de mercado ('AI SRE') com concorrentes bem financiados (Resolve AI, Traversal apoiada pela Sequoia). Um adapter de runbook de ops no core competiria num espaço capitalizado; o Onion deve costurar, não construir motor de execução de incidente.",
+   "confidence": "medium",
+   "sources": [
+    "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/"
+   ],
+   "evidence": "Analista/imprensa tier 5, votos 3-0. A recomendação de costurar em vez de construir é inferência da síntese, não está na fonte.",
+   "vote": "3-0"
+  }
+ ],
+ "caveats": "1) A pesquisa NÃO responde onde o estado vivo deve morar. Nenhuma fonte confirmada diz onde persistir (Runbook.v1, cacao-roaster e tianpan são silentes). As claims sobre o Temporal (estado durável no engine) foram refutadas e não podem ser usadas. A escolha entre PFR/sessão, KG .kg.yaml e task manager é de DESENHO frente ao corpus, não de transferência. O corpus já tem a peça: o ADR phased-resumable (PFR = execução) e a entidade em três camadas B6_9 (Seleção via playbooks, Execução via PFR, Validação via dogfood+adversarial). A tríade é a resposta natural a desenhar, não algo provado lá fora. 2) A recomendação da fatia vertical (resposta a incidente, NIST 800-61 + CACAO na vertical de compliance, onde já existem os agentes iso-27001/iso-22301/soc2) é inferência da síntese. Nenhuma claim confirmada compara os candidatos entre si. ISO 22301 (BCP/DRP), PagerDuty IR e OST/dual-track não tiveram claims sobreviventes. 3) Backstage/Port scorecards e Rundeck não foram cobertos por nenhuma claim confirmada: a decisão (3) para eles fica em aberto. 4) Premissa da issue corrigida pelo corpus: o core JÁ tem conceito de playbook (catálogo recognition-primed em .claude/skills/onion-patterns/SKILL.md §Playbooks, l.176, PR #164). Ele cobre o trabalho do próprio Onion (hotfix, migração, auditoria), não domínio de negócio. O único playbook de domínio no corpus veio do adotante metagamify (object-led discovery, PR #213). A relação recomendada (estender a mecânica, separar o catálogo por objeto) é desenho frente ao corpus, não achado externo. 5) .claude/utils/playbook/ não existe hoje (medido com ls em 2026-10-11). O molde SDAAL (task-manager/forge com interface.md + adapters + capabilities.tsv cobrados pela REGRA 103 (adapter declara capacidades em TSV)) pressupõe um provedor EXTERNO com contrato. Para playbooks esse contrato só existe em segurança (CACAO) e, fracamente, em MCP (Runbook.v1). Um adapter 'por framework' sem contrato externo não é SDAAL, é catálogo de conteúdo, e contraria a postura de acoplamento e a tese de que o fosso é o mecanismo, não o conteúdo. 6) As fontes de runbook com agentes são tier 3-4: servem de sinal de convergência de design, não de padrão adotado.",
+ "openQuestions": [
+  "Onde persiste o estado da instância viva: PFR/sessão em .claude/sessions/ como execução, com o recibo de conclusão carimbado como nó no KG (molde do recibo do Runbook.v1), ou o task manager como espelho? Precisa de nó de decisão no KG e Elenxo antes de selar.",
+  "O 'adapter por tipo/framework' é SDAAL legítimo só onde há contrato externo (CACAO, Runbook.v1)? Para GTM/produto, o certo seria tratar o framework como CONTEÚDO (templates/KB com licença CC, seguindo distribuicao-metodo-vivo-2026-09) e não como adapter?",
+  "A fatia vertical deve ser resposta a incidente (NIST 800-61, costurando CACAO via cacao-roaster), onde há formato aberto e vertical de compliance existente? Ou deve vir de um adotante com dor real (pull-not-push / Teste-do-Gatilho), como o metagamify fez com o object-led discovery?",
+  "O catálogo da onion-patterns deve ganhar um campo 'domínio' (onion-self vs. domínio do adotante), mantendo uma mecânica recognition-primed única com catálogos separados? E o catálogo de domínio vive no core ou só nos adotantes, absorvido quando provado (strategic-pieces-in-separate-repos)?",
+  "Alguma guarda determinística (exit 2 de hook, lint) acompanharia a execução do playbook, por exemplo um passo com aprovação humana obrigatória? Sem isso não há capacidade que justifique acoplar ao Claude Code (context: fork, hooks), e o playbook deveria ficar no padrão aberto Agent Skills.",
+  "Ler a especificação técnica completa do CACAO v2.0 (não só a página institucional) para responder se o formato separa template de instância e como modela o estado."
+ ],
+ "refuted": [
+  {
+   "claim": "Os frameworks de playbook sozinhos não bastam: só funcionam dentro de um processo maior de desenvolvimento e institucionalização (tabletop, revisão iterativa, mentoria), evidência contra tratar playbook como template estático gerado e esquecido.",
+   "vote": "1-2",
+   "source": "https://www.eecs.tufts.edu/~dvotipka/files/papers/Stevens2022Playbooks.pdf",
+   "tier": 8
+  },
+  {
+   "claim": "Exercícios tabletop revelam lacunas e alimentam atualização iterativa do playbook (processo vivo); porém, um ano depois o NDC não havia feito novos exercícios por demanda operacional, indicando risco de apodrecimento da manutenção.",
+   "vote": "0-3",
+   "source": "https://www.eecs.tufts.edu/~dvotipka/files/papers/Stevens2022Playbooks.pdf",
+   "tier": 8
+  },
+  {
+   "claim": "No Temporal, um agente com aprovação humana espera de horas a indefinidamente sem consumir compute, o que sustenta o modelo de processo vivo com estado durável em vez de template estático.",
+   "vote": "1-2",
+   "source": "https://docs.temporal.io/ai-cookbook/human-in-the-loop-python.md",
+   "tier": 8
+  },
+  {
+   "claim": "O estado de execução mora como atributos do próprio Workflow, escritos pelo handler de Signal e usados na condição de espera. Não está em task manager nem em KG externo.",
+   "vote": "1-2",
+   "source": "https://docs.temporal.io/ai-cookbook/human-in-the-loop-python.md",
+   "tier": 8
+  },
+  {
+   "claim": "Um runbook executável por agente deve ser definido como grafo dirigido de ações com entradas/saídas tipadas, decisões com limiares concretos e permissões por passo (definição declarativa tipo template).",
+   "vote": "0-3",
+   "source": "https://tianpan.co/blog/2026-04-12-ai-assisted-incident-response-giving-your-on-call-agent-a-runbook",
+   "tier": 4
+  },
+  {
+   "claim": "O Temporal registra o estado de cada execução de workflow (Event History, event sourcing) e o recria após falha, o que sustenta o modelo 'processo vivo com estado durável': a definição do playbook seria template e cada execução teria estado próprio no engine, não em arquivo ou sessão.",
+   "vote": "1-2",
+   "source": "https://temporal.io/blog/durable-execution-meets-ai-why-temporal-is-the-perfect-foundation-for-ai",
+   "tier": 4
+  },
+  {
+   "claim": "Um runbook executável se comporta como um serviço chamável (entradas, passos, resultado), o que favorece modelar playbook como ferramenta invocável e não como template estático.",
+   "vote": "0-3",
+   "source": "https://shiftmag.dev/?p=11880",
+   "tier": 4
+  },
+  {
+   "claim": "O projeto separa diagnóstico read-only (LLM) de escrita: toda ação de recuperação roda no executor, após checagens de segurança e aprovação humana via dashboard.",
+   "vote": "0-3",
+   "source": "https://github.com/nutcas3/runbook-agent",
+   "tier": 3
+  }
+ ],
+ "unverified": [],
+ "notVerifiedByBudget": [
+  {
+   "claim": "O nível de risco/aprovação deve ser atribuído por ação e não por agente, o que sugere permissões declaradas por passo na interface do playbook.",
+   "source": "https://tianpan.co/blog/2026-04-12-ai-assisted-incident-response-giving-your-on-call-agent-a-runbook",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Para escolher a primeira fatia vertical, o artigo recomenda critério empírico: auditar incidentes reais e começar com um serviço, um tipo de incidente, um runbook; não avalia nenhum framework ou padrão aberto (CACAO, Rundeck, NIST 800-61).",
+   "source": "https://tianpan.co/blog/2026-04-12-ai-assisted-incident-response-giving-your-on-call-agent-a-runbook",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Exige trilha de auditoria completa de cada decisão, evidência e ação proposta ou executada pelo agente.",
+   "source": "https://tianpan.co/blog/2026-04-12-ai-assisted-incident-response-giving-your-on-call-agent-a-runbook",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Em execução durável, se a instância cair o estado é recriado ao reiniciar. Isso é a propriedade que um playbook vivo (por exemplo, resposta a incidente) precisa e que uma sessão efêmera não dá.",
+   "source": "https://temporal.io/blog/durable-execution-meets-ai-why-temporal-is-the-perfect-foundation-for-ai",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Agentes de IA são tratados como sistemas distribuídos, e o LLM é stateless. O estado de um playbook executado por agente precisa então morar fora do modelo, em armazenamento durável.",
+   "source": "https://temporal.io/blog/durable-execution-meets-ai-why-temporal-is-the-perfect-foundation-for-ai",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Chamadas externas (equivalentes aos adapters por tipo) são encapsuladas como Activities com resiliência embutida. Isso mostra um padrão de costura análogo ao SDAAL, mas com acoplamento ao SDK do Temporal.",
+   "source": "https://temporal.io/blog/durable-execution-meets-ai-why-temporal-is-the-perfect-foundation-for-ai",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Playbooks de GTM no MEDDICC são orientação dependente do estágio do deal (processo vivo com estado), não só template estático.",
+   "source": "https://meddicc.com/llm-info",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A página não cobre SPICED, PagerDuty IR, NIST 800-61, ISO 22301, OST, SOAR/CACAO nem runbooks executáveis. É material de marketing de um vendor e não serve para decidir os itens (2) e (3) do SAC-52.",
+   "source": "https://meddicc.com/llm-info",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Playbooks devem declarar a intenção de cada tarefa, não só as ações, e suportar ações não lineares (paralelas/cenários múltiplos); isso também ajuda a implementar automação a partir do playbook.",
+   "source": "https://www.eecs.tufts.edu/~dvotipka/files/papers/Stevens2022Playbooks.pdf",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Mais detalhe também tem custo: excesso de informação pode atrasar a resposta; mitigação proposta é linkar referências externas em vez de poluir o playbook. NIST e IACD dominam o cenário de frameworks de playbook de IR (IACD com foco em automação, NIST com texto detalhado).",
+   "source": "https://www.eecs.tufts.edu/~dvotipka/files/papers/Stevens2022Playbooks.pdf",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Skills suportam injeção dinâmica de contexto por shell e arquivos de apoio, permitindo que um playbook-skill leia o estado externo (ex.: KG) no momento da invocação.",
+   "source": "https://code.claude.com/docs/en/skills",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "disable-model-invocation permite que um playbook com efeitos colaterais (ex.: deploy, incidente) só seja disparado manualmente por /name.",
+   "source": "https://code.claude.com/docs/en/skills",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Em 2026-02-04 a Resolve AI confirmou Série A de US$125M com valuation de US$1B, liderada pela Lightspeed Venture Partners.",
+   "source": "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O artigo não menciona runbooks, playbooks executáveis, CACAO, Rundeck, SOAR, NIST 800-61 nem catálogos de playbooks; não embasa as decisões (1) a (4) do SAC-52 além de sinalizar capital em resposta a incidentes por IA.",
+   "source": "https://techcrunch.com/2026/02/04/ai-sre-resolve-ai-confirms-125m-raise-unicorn-valuation/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Runbook.v1 aplica fail-closed e allow-list de ferramentas declaradas no manifesto, com version pinning absoluto: se o host não cumpre o contrato, retorna runbook_failed.",
+   "source": "https://github.com/CorpusIQ/runbook-spec",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O repositório tem maturidade baixa (2 estrelas, 0 forks, 2 commits, sem releases, MIT, 24 testes de conformidade reportados pelo próprio README), logo não é padrão consolidado e serve só como referência de design, não como dependência a costurar por SDAAL.",
+   "source": "https://github.com/CorpusIQ/runbook-spec",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Gartner publicou em 26/01/2026 o Market Guide for AI Site Reliability Engineering Tooling (Betts, Saunderson, Ennaciri), segundo a página do fornecedor Cast AI.",
+   "source": "https://cast.ai/gartner-market-guide-for-ai-sre-tooling/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Gartner projeta que 85% das empresas usarão ferramentas de AI SRE até 2029, contra menos de 5% em 2025. Isso indica demanda por remediação automatizada, mas não define formato de playbook.",
+   "source": "https://cast.ai/gartner-market-guide-for-ai-sre-tooling/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A análise da Cast AI diz que as ferramentas de AI SRE devem executar remediação automatizada, e não só sugerir. Os humanos continuam como aprovadores em falhas complexas. Isso favorece execução com estado e etapas de aprovação, mas é inferência do fornecedor e não responde se playbook é template ou processo vivo.",
+   "source": "https://cast.ai/gartner-market-guide-for-ai-sre-tooling/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Runbooks de suporte deixaram de ser prosa para humanos e passaram a ser artefatos executáveis lidos também por sistemas (agentes) que não conseguem interpretar prosa ambígua; isso favorece tratar playbook como processo executável e não só como template.",
+   "source": "https://tianpan.co/blog/2026/06/02/the-support-runbook-your-humans-wrote-that-your-support-agent-could-not-parse",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Padrão de runbook para agentes: separar a prosa (o porquê) da seção executável (o quê); a seção executável é estruturada e validável.",
+   "source": "https://tianpan.co/blog/2026/06/02/the-support-runbook-your-humans-wrote-that-your-support-agent-could-not-parse",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A seção executável do runbook deve passar por lint contra o catálogo de ferramentas; runbook que falha no lint não pode ser a versão ativa carregada pelo agente (gate determinístico, análogo às guardas do Onion).",
+   "source": "https://tianpan.co/blog/2026/06/02/the-support-runbook-your-humans-wrote-that-your-support-agent-could-not-parse",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O custo de manutenção é drift da seção executável, mitigado por replay de tickets antigos resolvidos por humanos como golden set de regressão (eval como contrato entre as equipes).",
+   "source": "https://tianpan.co/blog/2026/06/02/the-support-runbook-your-humans-wrote-that-your-support-agent-could-not-parse",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O CACAO está alinhado a STIX e OpenC2 e cobre processos de operações de cibersegurança. A página não cita GTM, produto nem engenharia geral, então o formato só cobre o domínio de compliance/segurança dos 4 domínios peer.",
+   "source": "https://github.com/opencybersecurityalliance/cacao-roaster",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O cacao-roaster é estável (v1.3.0), tem licença Apache 2.0, 99 commits e 43 stars, e declara manutenção contínua. Isso indica maturidade moderada e baixa adoção.",
+   "source": "https://github.com/opencybersecurityalliance/cacao-roaster",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O estado da execução do playbook não é documentado no README. O único registro persistente descrito é um audit trail (SQLite por padrão), então o estado vivo fica fora do formato do runbook.",
+   "source": "https://github.com/nutcas3/runbook-agent",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O README não menciona CACAO, SOAR, Rundeck nem outro padrão aberto de playbook. O YAML é um formato próprio, então a fonte não sustenta a tese de que existe padrão aberto a costurar.",
+   "source": "https://github.com/nutcas3/runbook-agent",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O projeto tem maturidade mínima, com 0 stars, 1 fork e 11 commits. É prova de conceito, não evidência de padrão de mercado.",
+   "source": "https://github.com/nutcas3/runbook-agent",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A decisão humana entra no processo em execução por Signal assíncrono, o que é um padrão de passo humano em playbook vivo.",
+   "source": "https://docs.temporal.io/ai-cookbook/human-in-the-loop-python.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Timers duráveis sobrevivem a interrupções, então limites de tempo em passos humanos (SLA de aprovação) são garantidos pelo runtime. A página não explica o mecanismo de persistência.",
+   "source": "https://docs.temporal.io/ai-cookbook/human-in-the-loop-python.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A execução durável gera trilha de auditoria completa das decisões, relevante para playbooks de compliance. A página não trata de playbooks, SOAR/CACAO, frameworks nem catálogo existente, então não responde às decisões 2 a 4.",
+   "source": "https://docs.temporal.io/ai-cookbook/human-in-the-loop-python.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Opportunity Solution Tree é tratado como artefato VIVO de discovery contínuo (nunca finalizado, evolui e é reorganizado), não como template estático; isso sustenta, para o framework de produto, a leitura de playbook como processo com estado.",
+   "source": "https://www.producttalk.org/tools-of-the-trade-opportunity-solution-tree.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Modelos de OST existem (FigJam, Miro) e ferramentas opinativas como Vistaly trazem a estrutura pronta, mas o uso é iterativo: começa-se por um template ou rascunho descartável e a instância evolui.",
+   "source": "https://www.producttalk.org/tools-of-the-trade-opportunity-solution-tree.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Manter o OST por entrada manual em ferramentas genéricas degrada com o tempo; isso é evidência de custo de manutenção e fadiga de ferramenta relevante para decidir se o Onion deve manter o estado do playbook em adapters e SSOT próprios.",
+   "source": "https://www.producttalk.org/tools-of-the-trade-opportunity-solution-tree.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A página não trata de SDAAL, formatos abertos de playbook executável (SOAR/CACAO, Backstage, Rundeck), MEDDICC, PagerDuty, NIST 800-61 ou ISO 22301. As decisões (2) a (4) do SAC-52 não podem ser fundamentadas nesta fonte. Publicada em 2023-09-20 e atualizada em 2026-09-29.",
+   "source": "https://www.producttalk.org/tools-of-the-trade-opportunity-solution-tree.md",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Ferramentas executáveis devem ser independentemente chamáveis para que runbooks de nível superior as componham, sem duplicar passos.",
+   "source": "https://shiftmag.dev/?p=11880",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O estado de execução aparece apenas como log do que foi feito e como idempotência; o artigo não define onde persiste o estado.",
+   "source": "https://shiftmag.dev/?p=11880",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A ordem de adoção recomendada é pelo procedimento mais temido (ex.: db-failover), não por framework; o artigo não cita CACAO, SOAR, Backstage, Port, Rundeck, NIST nem ISO, só n8n, MCP e Slack como interfaces.",
+   "source": "https://shiftmag.dev/?p=11880",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A barreira técnica para construir runbooks executáveis caiu, o que reduz o custo de criação, mas o artigo não trata do custo de manter adapters por framework.",
+   "source": "https://shiftmag.dev/?p=11880",
+   "reason": "orçamento maxVerify"
+  }
+ ],
+ "budgetDropped": [
+  {
+   "url": "https://www.openapis.org/blog/2025/01/24/announcing-arazzo-specification-version-1-0-1",
+   "title": "Arazzo Specification 1.0.1 (OpenAPI Initiative)",
+   "angle": "Padrões abertos executáveis",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=cacao",
+   "title": "OASIS CACAO TC página do comitê",
+   "angle": "Padrões abertos executáveis",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://smartbear.com/blog/from-endpoints-to-intent-rethinking-agent-api-workflows-with-arazzo/",
+   "title": "SmartBear: Designing AI Agent Workflows with Arazzo and MCP (blog de fornecedor)",
+   "angle": "Padrões abertos executáveis",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://devopsaitoolkit.com/blog/devops-on-call-runbook-types-a-2026-field-guide/",
+   "title": "DevOps On-Call Runbook Types: A 2026 Field Guide (blog, baixa autoridade)",
+   "angle": "Padrões abertos executáveis",
+   "relevance": "low"
+  },
+  {
+   "url": "https://github.com/runmedev/runme",
+   "title": "runmedev/runme (GitHub)",
+   "angle": "Runbook executável com agentes de IA",
+   "relevance": "high"
+  },
+  {
+   "url": "https://arxiv.org/pdf/2608.09524",
+   "title": "STAIR: Effective Incident Response Using an End-to-End Agentic Planning Framework (arXiv)",
+   "angle": "Runbook executável com agentes de IA",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://incident.io/blog/runbook-automation-tools-2026-the-complete-guide",
+   "title": "Runbook automation tools 2026: the complete guide (incident.io, vendor blog)",
+   "angle": "Runbook executável com agentes de IA",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/sachin-11/incident-runbook-agent",
+   "title": "sachin-11/incident-runbook-agent (GitHub)",
+   "angle": "Runbook executável com agentes de IA",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.oasis-open.org/?p=10546",
+   "title": "CACAO Security Playbooks v2.0 (OASIS Committee Specification)",
+   "angle": "Estado de execução durável",
+   "relevance": "high"
+  },
+  {
+   "url": "https://upstash.com/blog/durable-workflow-engines-compared-every-major-option-in-2026.md",
+   "title": "Durable Workflow Engines in 2026: Every Major Option Compared (Upstash, vendor)",
+   "angle": "Estado de execução durável",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://automationatlas.io/answers/camunda-vs-temporal-2026/",
+   "title": "Camunda vs Temporal for workflow orchestration in 2026",
+   "angle": "Estado de execução durável",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.zenml.io/blog/camunda-alternatives",
+   "title": "We Tried and Tested 11 Camunda Alternatives for Agentic Orchestration (ZenML, vendor)",
+   "angle": "Estado de execução durável",
+   "relevance": "low"
+  },
+  {
+   "url": "https://tessl.io/registry/skills/github/phuryn/pm-skills/opportunity-solution-tree",
+   "title": "Tessl registry: skill opportunity-solution-tree (phuryn/pm-skills)",
+   "angle": "Playbooks de GTM e produto em frameworks",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.avoma.com/blog/meddpicc-sales-methodology",
+   "title": "Avoma: MEDDPICC e como automatizar com IA",
+   "angle": "Playbooks de GTM e produto em frameworks",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.momentum.io/blog/automate-meddic-or-meddpic-in-your-crm-using-ai",
+   "title": "Momentum: automatizar MEDDIC no CRM com IA",
+   "angle": "Playbooks de GTM e produto em frameworks",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://skillselion.com/skills/deanpeters/product-manager-skills/opportunity-solution-tree",
+   "title": "Skillselion: opportunity-solution-tree (deanpeters/product-manager-skills)",
+   "angle": "Playbooks de GTM e produto em frameworks",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://nhimg.org/glossary/playbook-drift/",
+   "title": "Playbook drift (NHI Mgmt Group glossary)",
+   "angle": "Contrarian: apodrecimento e overengineering",
+   "relevance": "high"
+  },
+  {
+   "url": "https://opspilot.com/?p=17255",
+   "title": "The Runbook Problem: Why Most Runbooks Are Already Out of Date",
+   "angle": "Contrarian: apodrecimento e overengineering",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://docs.rootly.com/glossary/runbook-vs-playbook",
+   "title": "Rootly: runbook vs playbook",
+   "angle": "Contrarian: apodrecimento e overengineering",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://dev.to/zop_8abedcc7e12/self-healing-infrastructure-4-runbooks-we-deleted-after-automating-them-1kla",
+   "title": "Self-healing infrastructure: 4 runbooks we deleted after automating them",
+   "angle": "Contrarian: apodrecimento e overengineering",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://code.claude.com/docs/en/changelog",
+   "title": "Claude Code official CHANGELOG",
+   "angle": "claude-code-atual",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://pub.towardsai.net/claude-code-skills-vs-subagents-vs-hooks-vs-workflows-which-to-use-in-2026-120db6ae5b3c",
+   "title": "Claude Code Skills vs Subagents vs Hooks vs Workflows: Which to Use in 2026",
+   "angle": "claude-code-atual",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://claudemarket.ai/blog/claude-code-changelog",
+   "title": "Claude Market Blog: Claude Code changelog summary",
+   "angle": "claude-code-atual",
+   "relevance": "low"
+  },
+  {
+   "url": "https://developerintheloop.substack.com/p/the-ultimate-guide-to-configuring",
+   "title": "The Ultimate Guide to Configuring Claude Code (2026 Update)",
+   "angle": "claude-code-atual",
+   "relevance": "low"
+  },
+  {
+   "url": "https://techcrunch.com/2025/12/19/ex-splunk-execs-startup-resolve-ai-hits-1-billion-valuation-with-series-a",
+   "title": "Resolve AI atinge US$1B de valuation na Series A (TechCrunch, dez/2025)",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://techcrunch.com/2025/04/10/incident-io-raises-62m-at-a-400m-valuation-to-help-it-teams-move-fast-when-things-break",
+   "title": "incident.io levanta US$62M Series B, ~US$400M (TechCrunch, abr/2025)",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.goodwinlaw.com/en/news-and-events/news/2025/06/announcements-technology-goodwin-represents-traversal",
+   "title": "Traversal: US$48M Series A, Kleiner Perkins e Sequoia (jun/2025)",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://thechief.io/c/news/pagerduty-acquire-rundeck/",
+   "title": "PagerDuty adquire Rundeck (2020)",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.cxodigitalpulse.com/sales-playbook-automation-startup-sharpsell-ai-raises-inr-30-cr-in-series-a-round/",
+   "title": "Sharpsell.ai levanta INR 30 Cr, Series A (playbook de vendas)",
+   "angle": "mercado-capital",
+   "relevance": "low"
+  },
+  {
+   "url": "https://github.com/Tommy-yw/RunbookHermes",
+   "title": "RunbookHermes – AIOps agent for evidence-driven incident response",
+   "angle": "repos-trajetoria",
+   "relevance": "high"
+  },
+  {
+   "url": "https://github.com/henryqin1997/statem",
+   "title": "statem – CLI runbook for long-running agent tasks",
+   "angle": "repos-trajetoria",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.relvy.ai",
+   "title": "Launch HN: Relvy (YC F24) – On-call runbooks, automated",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/aiengram/engram",
+   "title": "Engram – Shared procedural runbook memory for AI coding agents via MCP",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/BagelHole/DevOps-Security-Agent-Skills",
+   "title": "DevOps-Security-Agent-Skills – 80+ agent-ready skills for DevOps, security and compliance",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://kissflow.com/no-code/gartner-hype-cycle-agentic-automation/",
+   "title": "Gartner Hype Cycle for Agentic Automation (jul/2026), via Kissflow",
+   "angle": "analistas",
+   "relevance": "high"
+  },
+  {
+   "url": "https://faddom.com/wp-content/uploads/2026/08/Hype-Cycle-ITSM-2026.pdf",
+   "title": "Hype Cycle for ITSM 2026 (cópia secundária)",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.pagerduty.com/fr/resources/itops/analyst-report/gartner-predicts-report-2026-ai-agents-transform-it-infrastructure-operations/",
+   "title": "Gartner Predicts 2026: AI Agents Transform IT Infrastructure & Operations (via PagerDuty)",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://ww2.dzone.com/agentic-ai-for-devops-dynamic-playbooks-from-live-telemetry/",
+   "title": "Agentic AI for DevOps: dynamic playbooks from live telemetry (DZone)",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://agentpatterns.ai/workflows/runbooks-as-agent-instructions/",
+   "title": "Runbooks as Agent Instructions",
+   "angle": "comunidade",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.aviator.co/runbooks",
+   "title": "Show HN: Runbooks – Shareable Claude Code Sessions (Aviator)",
+   "angle": "comunidade",
+   "relevance": "medium"
+  }
+ ],
+ "decision": {
+  "options": [
+   "A: NÃO criar agora .claude/utils/playbook/ com adapters por framework; tratar o playbook de domínio como template (skill ou markdown com esquema) instanciado num PFR com estado na sessão e no KG",
+   "B: Criar a abstração SDAAL completa (interface Playbook + adapters por tipo e por framework) nos 4 domínios, como pede a issue",
+   "C: Costurar o CACAO v2.0 por SDAAL como primeiro adapter (fatia de compliance/segurança)",
+   "D: Adiar com gate: rodar antes uma rodada curta de pesquisa (Arazzo 1.0.1, runme, especificação CACAO v2.0, guia incident.io) e só então decidir costurar ou inventar",
+   "E: Unificar tudo no catálogo recognition-primed da onion-patterns (playbooks do core e de domínio no mesmo catálogo)"
+  ],
+  "objections": [
+   {
+    "target": "Achado 1: CACAO v2.0 é padrão aberto OASIS (27/11/2023), logo o Onion pode costurá-lo por SDAAL",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "O fato (padrão OASIS aprovado) se sustenta. A inferência 'pode costurar em vez de inventar' não se sustenta. O próprio achado 15 (tier 9) restringe o CACAO a cibersegurança, e o achado 6 mostra que executá-lo exige um orquestrador externo (SOARCA). As verticais de compliance do Onion (iso-27001, iso-22301, soc2) produzem documentação e não operam SOAR. Nenhum adotante medido tem SOAR. Uma costura sem consumidor repete o acoplamento declarado e não usado do caso SendMessage, que o CLAUDE.md registra como 'a pior categoria' (grep = ZERO)."
+   },
+   {
+    "target": "Achado 2: skills seguem o padrão aberto Agent Skills, um formato para costurar por SDAAL, mas não são playbook executável",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A moldura 'costurar por SDAAL' está errada. Skill é o substrato NATIVO do Onion: não existe provider alternativo a abstrair. Medido localmente, playbooks de domínio já circulam como skills de plugins de primeira parte: ~/.claude/plugins/synced/.../engineering/skills/incident-response/SKILL.md (modos new/update/postmortem) e operations/skills/runbook. Existe portanto um concorrente gratuito no MESMO substrato para os domínios de engenharia e ops, e um SDAAL de playbooks do core competiria com ele em vez de costurar."
+   },
+   {
+    "target": "Achado 3: skill é template sem estado persistente nativo, e o estado teria de morar fora (KG, sessão, task manager)",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "O voto foi 2-1 e o argumento vem do silêncio da doc. A conclusão é verdadeira, mas o Onion já a resolveu: o PFR (ADR phased-resumable, .claude/sessions/<feature>/) é exatamente uma 'definição template + instância com estado'. O achado não traz informação nova para a decisão (1). Ele confirma que o estado mora na sessão PFR que já existe e não pede uma camada nova."
+   },
+   {
+    "target": "Achado 4: playbooks NIST/IACD carecem de detalhe (6/12 e 5/12 julgados insuficientes)",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A amostra é pequena (12 profissionais, 24 playbooks), de 2022, e cobre só resposta a incidente de segurança. Generalizar para GTM ou produto é extrapolação. O mesmo estudo traz o contrapeso cortado por orçamento: excesso de detalhe atrasa a resposta. O dado vale como restrição (o playbook precisa de detalhe executável e de links externos), não como prova de que um framework deva entrar primeiro."
+   },
+   {
+    "target": "Achado 5: o cacao-roaster (OCA) gera, valida e executa CACAO v2.0 e é candidato a costura",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "O voto foi 2-1. Não se mediu a trajetória do projeto (data do último commit, stars, releases, mantenedores). A doutrina search-by-trajectory exige esse eixo antes de recomendar uma dependência, e uma ferramenta OCA de nicho pode estar parada. Além disso, o escopo é só ciber (achado 15)."
+   },
+   {
+    "target": "Achado 6: a execução no cacao-roaster é delegada ao SOARCA, sem estado nem persistência documentados",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Este achado se volta contra a costura CACAO: o adotante teria de operar um SOARCA (infraestrutura nova) para ter 'playbook vivo'. Isso contraria a postura de acoplamento (acoplar só quando a capacidade não existe fora e há necessidade) e o custo de manutenção que a pergunta manda considerar. Ele também não documenta onde o estado mora, e a decisão (1) continua sem resposta por essa via."
+   },
+   {
+    "target": "Achado 7: 'AI SRE' é categoria emergente com concorrentes bem financiados (Resolve AI US$125M/unicórnio, Traversal/Sequoia)",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A fonte é tier 5 (TechCrunch). Pelo eixo follow-the-money, o sinal pesa CONTRA o Onion entrar na EXECUÇÃO de runbooks de incidente: a execução já está capitalizada. O fosso do Onion, registrado em onion-moat-verifiable-mechanism, é o mecanismo verificável (radar determinístico, gates exit 2), não o motor de execução. Se o IR entrar como fatia, que entre como dogfood de seleção, estado e verificação, nunca como produto de execução concorrente."
+   },
+   {
+    "target": "Achado 8: executar um runbook é processo com estado (approval cards, janela de monitoração, rollback) e exige registro completo",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "É um único blog (tianpan.co), tier 4, sem fonte primária, e não diz onde o estado mora. Ele sustenta 'processo vivo' só como opinião. As restrições de design que traz (aprovação por ação, trilha de auditoria) aparecem em itens cortados por orçamento, que deveriam ter sido pesados com fonte melhor."
+   },
+   {
+    "target": "Achado 9: o MEDDICC Playbook (set/2025) é entregue pela plataforma proprietária mOS, sem formato aberto nem API",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A fonte é a página llm-info do próprio vendor (tier 4), e a ausência de API numa página não prova ausência de API. Há também um erro de categoria: MEDDICC/SPICED são METODOLOGIAS de domínio público (as letras de qualificação). Um playbook baseado nelas é CONTEÚDO e não depende de API do vendor. A conclusão útil fica de pé: não existe formato aberto a costurar para GTM."
+   },
+   {
+    "target": "Achado 10: sem contrato público do mOS, um adapter SDAAL não tem onde se apoiar",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A objeção é estrutural e derruba a premissa da pergunta. No Onion, SDAAL abstrai SUBSTRATOS e PROVIDERS com transporte (task-manager: Jira, ClickUp, Asana, Linear, Zoho, com *.capabilities.tsv cobrados pela REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte); forge: github). Um framework (MEDDICC, NIST 800-61, ISO 22301, OST) não é provider com transporte, é dado ou template. 'Adapter por framework' usa o SDAAL fora do lugar e criaria N adapters sem capacidade a declarar, com custo de manutenção e sem catraca possível."
+   },
+   {
+    "target": "Achado 11: Runbook.v1 é um contrato de manifesto JSON versionado para hosts MCP",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Fonte tier 3: o repositório de um único vendor (CorpusIQ), sem órgão de padronização e com adoção não medida (stars, implementações, hosts que o suportam). Não é 'padrão aberto do estado da arte' no sentido que a decisão (3) exige. Serve como referência de desenho, não como algo a costurar."
+   },
+   {
+    "target": "Achado 12: no Runbook.v1 o estado é derivado do stream de tool-calls (observado, não autodeclarado) e gera recibo",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A ideia de desenho converge com a doutrina behavior-over-declaration do Onion e com o 'exit-code-não-é-a-verificação', e merece ser absorvida como princípio. A fonte, porém, é tier 3 e não diz onde o estado persiste. A objeção que sobrevive é que o princípio se absorve sem adotar o formato. No Onion, o equivalente natural é um hook PostToolUse que registra a execução no estado da sessão PFR."
+   },
+   {
+    "target": "Achado 13: a página da cast.ai sobre o Gartner Market Guide não menciona runbooks/CACAO/etc.",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Isto não é achado, é registro de fonte inútil. Pior: deixa o eixo de analistas como coberto quando NÃO foi. O próprio Gartner Market Guide for AI SRE Tooling foi lido só por uma reimpressão de vendor e não foi lido de fato. A lacuna de analista fica aberta."
+   },
+   {
+    "target": "Achado 14: o runbook-agent trata o runbook como template YAML declarativo convertido em máquina de estados",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Fonte tier 3, voto 2-1. É um projeto pessoal (nutcas3) sem adoção medida. É um exemplo de 'template que vira instância com estado', mas um caso só não define o estado da arte. Corrobora a decisão (1) sem decidi-la."
+   },
+   {
+    "target": "Achado 15: o escopo do CACAO é restrito a cibersegurança e não serve de interface agnóstica para os 4 domínios",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Tentei derrubar o achado dizendo que o esquema do CACAO (workflow steps, agents, targets, variables) é estruturalmente genérico. Não encontrei evidência de uso fora de ciber, e a página do OASIS (tier 9) define o escopo como detectar, investigar, mitigar e remediar ameaças. O achado fica de pé."
+   },
+   {
+    "target": "Achado 16: a página institucional do CACAO não descreve formato nem template vs instância, e é preciso ler a especificação completa",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A objeção é contra o PROCESSO: a especificação completa (docs.oasis-open.org/cacao/security-playbooks/v2.0) não foi lida, e é ela que responde se o CACAO separa a definição do playbook do estado de execução (que delega ao orquestrador). A decisão (3) para o domínio de compliance foi tomada sem a fonte primária técnica."
+   },
+   {
+    "target": "Achado 17: os campos context: fork, hooks, disable-model-invocation e agent são extensões exclusivas do Claude Code",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Pela postura de acoplamento, usar disable-model-invocation num playbook com efeito colateral (deploy, incidente) compra uma capacidade de segurança real e é aceitável. Há uma restrição que sobrevive: o onion-codex é LINHA VIVA (decisão de 16/09) e perderia esse controle. Por isso o equivalente no Codex precisa ser declarado, ou o playbook não viaja para lá. O caso do model: em TOML (REGRA 3 (Campo model: restrito à allowlist sonnet|opus|haiku|fable)) mostra que a guarda do core assume o substrato sem dizer."
+   },
+   {
+    "target": "Objeção à premissa: '4 domínios peer' (negócio/GTM, engenharia, produto, compliance)",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "O CLAUDE.md diz que o Onion 'Cobre três dimensões peer do ciclo: produto, engenharia, compliance/governança' e que 'esta permanece em 3'. A pergunta promove GTM a 4º domínio peer sem a decisão do maestro. Uma abstração 'nos 4 domínios' muda a doutrina de identidade por tabela e exige nó próprio e decisão prévia."
+   },
+   {
+    "target": "Objeção à premissa: não há consumidor medido (pull-not-push)",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "O corpus registra UM playbook de domínio vindo de adotante, o object-led discovery, que chegou pelo outbox do metagamify (docs/evolution/federation/outbox/metagamify/_processed/2026-07-01-object-led-discovery-playbook.md) e coube no catálogo existente sem precisar de camada SDAAL. Nenhum adotante pediu uma interface Playbook com adapters por framework. Pelo Teste do Gatilho (apply-pull-not-push), criar a camada agora é push."
+   },
+   {
+    "target": "Descartado: frameworks só funcionam dentro de um processo de institucionalização (tabletop, revisão, mentoria)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "A mesma fonte tier 8 (Stevens 2022) recomenda explicitamente a institucionalização. O descarte não cita contraevidência e parece ter sido por desconforto com a conclusão, que é a evidência contrária que o Scope pediu. Faltou mostrar QUAL fonte a refuta."
+   },
+   {
+    "target": "Descartado: tabletop alimenta a atualização do playbook, mas um ano depois o NDC não tinha feito novos exercícios (apodrecimento)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Esta é exatamente a evidência de que 'playbooks apodrecem' pedida pelo Scope. O n=1 organização limita a generalização mas não refuta o dado. Para o Onion, ela indica que um catálogo de domínio precisa de gatilho mecânico de frescor (como os /meta:*-freshness), não de disciplina. Faltou buscar uma segunda medição de apodrecimento."
+   },
+   {
+    "target": "Descartado: no Temporal, um agente com aprovação humana espera indefinidamente sem consumir compute",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "O fato está documentado na doc primária do Temporal (docs.temporal.io: durable timers e signals). O descarte não traz contraevidência. A relevância para o Onion é baixa, porque o Onion não roda engine durável e a postura evita infraestrutura pesada. O descarte correto seria 'fora do substrato', não 'refutado'."
+   },
+   {
+    "target": "Descartado: o estado mora em atributos do Workflow escritos pelo handler de Signal",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Tecnicamente incompleto: o estado durável do Temporal é a Event History (event sourcing), e os atributos são reconstruídos por replay. O descarte por imprecisão é legítimo."
+   },
+   {
+    "target": "Descartado: o runbook executável deve ser um grafo dirigido de ações tipadas com permissões por passo (tier 4)",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "É prescrição de um blog tier 4, não fato medido. Descartá-lo como evidência é legítimo, e a ideia de permissões por passo reaparece com fonte melhor nos itens cortados."
+   },
+   {
+    "target": "Descartado: o Temporal registra a Event History e recria o estado após falha (tier 4)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "A afirmação é verdadeira e verificável na doc primária do Temporal. Foi descartada por ter vindo de fonte tier 4, quando bastava trocar para a primária. Faltou ler docs.temporal.io."
+   },
+   {
+    "target": "Descartado: o runbook se comporta como serviço chamável (tier 4)",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "É analogia opinativa de blog, sem medição. O descarte é legítimo."
+   },
+   {
+    "target": "Descartado: o runbook-agent separa o diagnóstico read-only do LLM da escrita no executor com aprovação humana",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "O padrão é verificável no README e converge com o achado 8 e com o modelo de gate exit 2 do Onion (a capacidade que compra o acoplamento). Mesmo com fonte tier 3, é uma restrição de desenho relevante: LLM lê, gate determinístico escreve. Não houve refutação."
+   },
+   {
+    "target": "Cortado: o risco e a aprovação são atribuídos por ação, não por agente",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Cortado por orçamento sem avaliação. É uma restrição central para o esquema de qualquer playbook com efeito colateral e mapeia direto para hooks PreToolUse e disable-model-invocation."
+   },
+   {
+    "target": "Cortado: o critério da primeira fatia é empírico (auditar incidentes reais, um serviço, um tipo de incidente, um runbook)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Responde DIRETAMENTE à decisão (2) e foi cortado por orçamento. Ele diz para escolher a fatia por incidente real e não por nome de framework, o que combina com o dogfood master do Onion."
+   },
+   {
+    "target": "Cortado: exigência de trilha de auditoria completa de cada decisão e ação do agente",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Faz interseção com as verticais de compliance (ISO 27001/SOC2 pedem evidência) e com o KG bi-temporal. Foi cortado sem avaliação."
+   },
+   {
+    "target": "Cortado: na execução durável, o estado é recriado após a queda, coisa que uma sessão efêmera não dá",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É a objeção mais forte contra 'estado na sessão Claude'. A sessão PFR em arquivo (.claude/sessions/) sobrevive à queda e a conversa não. Era preciso pesar isso para decidir onde o estado mora, e o corte deixou a decisão (1) sem esse teste."
+   },
+   {
+    "target": "Cortado: o LLM é stateless, e o estado do playbook precisa morar fora do modelo, em armazenamento durável",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Corrobora o achado 3 com uma moldura de sistemas distribuídos. Foi cortado sem contraevidência."
+   },
+   {
+    "target": "Cortado: as Activities do Temporal são uma costura análoga ao SDAAL, mas acopladas ao SDK",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É evidência de custo de acoplamento, exatamente o que a pergunta manda considerar. Faltou pesar."
+   },
+   {
+    "target": "Cortado: os playbooks de GTM no MEDDICC dependem do estágio do deal (processo vivo)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Sustentaria 'processo vivo' também em GTM, mas a fonte é o vendor (tier 4). Faltou uma fonte independente sobre a execução de playbooks de vendas por estágio."
+   },
+   {
+    "target": "Cortado: a página do MEDDICC não cobre SPICED, PagerDuty, NIST etc.",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "É um achado negativo, sem valor de decisão. O corte é legítimo."
+   },
+   {
+    "target": "Cortado: o playbook deve declarar a intenção de cada tarefa e suportar ações não lineares",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Vem de Stevens 2022 (tier 8) e é uma restrição concreta de esquema (intent + paralelismo). Foi cortado sem avaliação."
+   },
+   {
+    "target": "Cortado: excesso de detalhe atrasa a resposta, e a mitigação é linkar referências externas",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É o contrapeso do achado 4, que sem ele fica enviesado para 'mais detalhe'. Cortar o contrapeso enviesa o conjunto de achados."
+   },
+   {
+    "target": "Cortado: skills suportam injeção dinâmica de contexto por shell e lêem estado externo na invocação",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É a peça que fecha a decisão (1) sem camada nova: a skill-template lê o estado da instância (sessão PFR ou nó KG) no momento da invocação. A fonte é tier 9 (code.claude.com/docs/en/skills). Foi cortada sem avaliação."
+   },
+   {
+    "target": "Cortado: disable-model-invocation faz o playbook com efeito colateral disparar só por /name",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É fonte tier 9 e uma capacidade de segurança diretamente aplicável a deploy e incidente. Faltou pesar contra a portabilidade (onion-codex)."
+   },
+   {
+    "target": "Cortado: série A de US$125M da Resolve AI, liderada pela Lightspeed",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "É redundante com o achado 7, que já registra o sinal de capital. O corte é legítimo."
+   },
+   {
+    "target": "Cortado: o artigo do TechCrunch não menciona runbooks, CACAO etc.",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "É negativo e sem valor de decisão. O corte é legítimo."
+   },
+   {
+    "target": "Cortado: Runbook.v1 aplica fail-closed, allow-list e version pinning",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Converge com a doutrina fail-closed do Onion (fail-closed-exposes-incomplete-harness) e é uma restrição de desenho relevante, ainda que a fonte seja tier 3."
+   },
+   {
+    "target": "Fonte não lida: Arazzo Specification 1.0.1 (OpenAPI Initiative)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É a omissão MAIS grave. O Arazzo é uma especificação aberta da Linux Foundation/OAI para workflows executáveis AGNÓSTICOS de domínio (sequências de chamadas de API com entradas, saídas, critérios de sucesso e ramificação). É o único candidato da lista que poderia contradizer 'não há formato aberto genérico'. A decisão (3) não fecha sem lê-lo."
+   },
+   {
+    "target": "Fonte não lida: o TC CACAO no OASIS",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Mostraria o estado atual do TC (v2.x, atividade em 2026), ou seja, a trajetória do padrão. Faltou."
+   },
+   {
+    "target": "Fonte não lida: SmartBear, Arazzo e workflows de agentes",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Mostraria se o Arazzo está sendo usado por agentes de IA em 2026, o que é diretamente pertinente. Faltou."
+   },
+   {
+    "target": "Fonte não lida: devopsaitoolkit, guia de tipos de runbook",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Tem valor baixo (blog), mas foi descartado sem leitura. Peso marginal."
+   },
+   {
+    "target": "Fonte não lida: runmedev/runme (runbooks executáveis em Markdown)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É muito pertinente: Markdown executável é o MESMO substrato do Onion (comandos e skills .md). Mostraria se existe formato aberto de runbook-em-markdown com estado a costurar antes de inventar. Faltou."
+   },
+   {
+    "target": "Fonte não lida: arxiv 2608.09524",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É provável fonte acadêmica de agosto de 2026 sobre runbooks com agentes, ou seja, o estado da arte datado. Faltou."
+   },
+   {
+    "target": "Fonte não lida: incident.io, guia de ferramentas de automação de runbook 2026",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Cobriria o eixo de mercado (Rundeck, PagerDuty Runbook Automation, FireHydrant), que a decisão (3) cita e que ficou sem fonte. Faltou."
+   },
+   {
+    "target": "Fonte não lida: sachin-11/incident-runbook-agent",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É um projeto pessoal de baixo peso, mas foi descartado sem leitura. Marginal."
+   },
+   {
+    "target": "Fonte não lida: OASIS ?p=10546",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Trata de estado de execução durável numa fonte OASIS e poderia mostrar se o CACAO evoluiu para cobrir o estado de execução. Faltou."
+   },
+   {
+    "target": "Fonte não lida: upstash, comparação de engines de workflow durável 2026",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Mediria o custo e o acoplamento das alternativas de estado durável (Temporal, Inngest, Restate, DBOS) contra a sessão PFR em arquivo. Faltou para a decisão (1)."
+   }
+  ],
+  "recommendation": "Recomendo a opção A com o gate de pesquisa da opção D, e rejeito B e C neste momento.\n\nRestrições que sobrevivem:\n\n(R1) SDAAL fora do lugar. Frameworks (MEDDICC, NIST 800-61, ISO 22301, OST) são CONTEÚDO e não providers com transporte. Por isso não existe 'adapter por framework': não há capacidade a declarar nem catraca no estilo da REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte). Um seam SDAAL só entra quando houver DOIS substratos de execução reais com consumidor, por exemplo um SOAR CACAO de um adotante ao lado da sessão PFR.\n\n(R2) Premissa dos 4 domínios. O CLAUDE.md fixa 3 dimensões peer. Promover GTM exige decisão própria do maestro, e o SAC-52 não pode fazer isso por tabela.\n\n(R3) Pull-not-push. Só existe um playbook de domínio vindo de adotante (o object-led) e ele coube no catálogo atual. Não há pedido medido de interface com adapters.\n\n(R4) Concorrente no mesmo substrato. Plugins de primeira parte já entregam skills de playbook de domínio (engineering:incident-response e operations:runbook, medidos em ~/.claude/plugins/synced/), e o capital de AI SRE (Resolve AI, Traversal) ocupa a execução. O Onion não deve competir no motor. O diferencial é seleção, estado verificável e gate.\n\nDecisão (1): o template se instancia. A definição é uma skill ou markdown com esquema mínimo: passos com intent, risco e aprovação por ação, e links externos em vez de detalhe inline. A instância é um PFR com estado na sessão (.claude/sessions/<slug>/, que sobrevive à queda), com decisões e evidência como nós no KG bi-temporal (trilha de auditoria). O task manager é só projeção, nunca SSOT. O estado deve ser OBSERVADO (hook PostToolUse registra a execução), não autodeclarado pelo modelo, princípio do Runbook.v1 absorvido sem adotar o formato. Efeito colateral fica sob disable-model-invocation e gate exit 2, com o equivalente declarado para o onion-codex (linha viva).\n\nDecisão (2): a primeira fatia se escolhe por incidente real e não por nome de framework. Use resposta a incidente ou runbook de ops do PRÓPRIO core (VPS e CI, que têm incidentes registrados como o bypass do ufw pelo Docker), usando a NIST 800-61r3 só como checklist de fases. Não comece por MEDDICC (proprietário, sem formato aberto) nem por CACAO (exige SOARCA).\n\nDecisão (3): por ora, nada a costurar. O CACAO é só ciber e depende de orquestrador externo. O Runbook.v1 e o runbook-agent são tier 3 sem adoção medida. Mas a decisão está INCOMPLETA até ler o Arazzo 1.0.1 (o único formato aberto agnóstico de domínio da lista), o runme (markdown executável, mesmo substrato) e a especificação técnica do CACAO v2.0.\n\nDecisão (4): um formato e dois catálogos. Os playbooks recognition-primed da onion-patterns são do trabalho do próprio Onion, e os de domínio são do adotante. Compartilham o esquema de seleção, execução e validação (B6_9), mas vivem separados por público. Os de domínio precisam de gatilho mecânico de frescor no molde dos /meta:*-freshness, porque a evidência de apodrecimento (o NDC sem exercícios depois de um ano) foi descartada sem refutação e continua de pé.",
+  "sealedBy": "maestro (nó D_ open no grafo; tabela de selagem do /meta:drive)"
+ },
+ "stats": {
+  "anglesTopic": 5,
+  "anglesFixed": 5,
+  "sources": 15,
+  "claims": 64,
+  "verified": 25,
+  "confirmed": 17,
+  "refuted": 8,
+  "unverified": 0,
+  "dupes": 3,
+  "maxFetch": 15,
+  "maxVerify": 25
+ }
+}
