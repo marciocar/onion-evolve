@@ -22511,7 +22511,7 @@ run_kg_read_leg_selftests() {
 }
 
 # ── SAC-81 — o ARQUIVO DA RAIZ entra no índice de leitura (e `./X` casa nos dois lados) ────────
-# Sinal do adotante onion-curation (2026-10-08): `trace: "CLAUDE.md"` caía em não-caminho (regra (b)
+# Sinal de campo de um adotante (2026-10-08): `trace: "CLAUDE.md"` caía em não-caminho (regra (b)
 # exige barra) e `./CLAUDE.md` nunca casava (o hook tira o `./` do caminho lido; o índice não).
 # Efeito: o CLAUDE.md, a âncora mais importante de um adotante, ficava SEM vigilância do hook.
 # A bancada roda o gerador COMO O RUNNER O INVOCA (`--emit-index` sobre um repo git com o motor
@@ -22585,6 +22585,23 @@ run_kg_trace_root_file_selftests() {
   if grep -q 'C_RAIZ' <<< "${o1}" && grep -q 'C_RAIZ' <<< "${o2}"; then
     record_pass "kg-trace-root: (f) hook: ./CLAUDE.md e ././CLAUDE.md casam o índice"
   else record_fail "kg-trace-root: (f)" "o hook não normalizou o ./ (o1=${o1:0:80} · o2=${o2:0:80})"; fi
+
+  # (g) REGRESSÃO QUE O REFUTADOR MEDIU NA 1ª REDAÇÃO: normalizar o `./` ANTES da regra (b) tirava
+  #     a barra de `./x.md`, e o ponteiro morto `./SUMIDO.md` deixava de reprovar (TARGET-MISSING
+  #     calado). E `./VIZINHO.md` (ao lado do grafo) saía de vigilância. `./` declara caminho.
+  printf '# vizinho\n' > "${sb}/docs/onion/graph/VIZINHO.md"
+  { printf 'meta:\n  id: g2\n  schema_version: "1"\nnodes:\n'
+    _no C_MORTO_PONTO './SUMIDO.md'
+    _no C_VIZINHO     './VIZINHO.md'
+    printf 'edges: []\n'; } > "${sb}/docs/onion/graph/g2.kg.yaml"
+  ( cd "${sb}" && git add -A ) >/dev/null 2>&1
+  local tsv idx2
+  tsv="$(bash "${sb}/.claude/validation/kg-trace-resolve.sh" "${sb}" --format tsv 2>&1 || true)"
+  idx2="$(bash "${sb}/.claude/validation/kg-trace-resolve.sh" "${sb}" --emit-index 2>&1 || true)"
+  if grep -q $'\tC_MORTO_PONTO\t.*TARGET-MISSING' <<< "${tsv}" \
+     && grep -q $'^docs/onion/graph/VIZINHO.md\tC_VIZINHO\t' <<< "${idx2}"; then
+    record_pass "kg-trace-root: (g) ./SUMIDO.md segue TARGET-MISSING e ./VIZINHO.md entra como docs/…/VIZINHO.md"
+  else record_fail "kg-trace-root: (g)" "o ./ tirou o alvo de julgamento (tsv=${tsv:0:160} · idx=$(grep VIZINHO <<< "${idx2}" | head -c 120))"; fi
   unset -f _no
   rm -rf "${sb}"
 }
