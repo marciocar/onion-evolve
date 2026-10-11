@@ -367,6 +367,78 @@ def closure(paths):
     return out
 for f in fams:
     if weak[f]: weak[f] |= closure(weak[f])
+# ENTRADAS DE DADO DOS SCRIPTS EXERCITADOS (falso negativo medido no rebase sobre a main 9ef87725, 2026-10-11):
+# o fecho acima segue NOME DE SCRIPT, não o DADO que a guarda lê. A REGRA 103 lê `interface.md` e
+# `adapters/*.capabilities.tsv` da abstração de task manager; mudar interface.md não selecionava
+# task_manager_capabilities. A cura é de classe e DERIVADA: de todo script que a família cita (ou alcança pelo
+# fecho), cada caminho de dado (.md/.tsv/.yaml/.json/.txt/.csv, com glob) e cada diretório do repo que o texto
+# do script nomeia viram cobertura FRACA. Sobre-seleciona (o nome pode estar num comentário) — só acrescenta.
+import fnmatch, subprocess
+try:
+    TRACKED = subprocess.run(["git", "-C", ROOT, "ls-files"], capture_output=True, text=True, check=True).stdout.split("\n")
+    TRACKED = [x for x in TRACKED if x]
+except Exception:
+    TRACKED = []
+    for dp, dn, fn in os.walk(ROOT):
+        dn[:] = [x for x in dn if x not in (".git", "node_modules", "__pycache__", "worktrees")]
+        TRACKED += [os.path.relpath(os.path.join(dp, x), ROOT) for x in fn]
+TRACKED_SET = set(TRACKED)
+TRACKED_DIRS = set()
+for x in TRACKED:
+    d = os.path.dirname(x)
+    while d: TRACKED_DIRS.add(d); d = os.path.dirname(d)
+BYBASE = {}
+for x in TRACKED: BYBASE.setdefault(os.path.basename(x), []).append(x)
+DATA_RE = re.compile(r"(?:[A-Za-z0-9_.*-]+/)*[A-Za-z0-9_*-][A-Za-z0-9_.*-]*\.(?:md|tsv|yaml|yml|json|txt|csv)\b")
+DIR_RE = re.compile(r"(?<![A-Za-z0-9_.-])((?:\.claude|\.github|docs|ops|site)(?:/[A-Za-z0-9_.-]+)*)/?")
+# raízes do domínio da bancada (e do repo) nunca viram cobertura de DADO: lá o arquivo é script (mapeado pelo
+# nome) ou dado citado pelo nome exato, e um diretório-raiz ligaria dezenas de famílias a qualquer mudança —
+# medido: `.claude/validation/` derivado punha 78 famílias num commit de um helper só
+DOMAIN_ROOTS = {".claude/", ".claude/validation/", ".claude/validation/lib/", ".claude/hooks/", ".claude/hooks/lib/",
+                ".claude/utils/", "ops/", "docs/"}
+_data_cache = {}
+def data_inputs(script):
+    if script in _data_cache: return _data_cache[script]
+    out = set()
+    try: txt = open(os.path.join(ROOT, script), encoding="utf-8", errors="replace").read()
+    except OSError: _data_cache[script] = out; return out
+    # só linha de CÓDIGO: o que a guarda LÊ aparece no código (nome citado em comentário não é leitura)
+    txt = "\n".join(l for l in txt.split("\n") if not l.lstrip().startswith("#"))
+    for tok in set(DATA_RE.findall(txt)):
+        tok = tok.lstrip("./")
+        if "*" not in tok and tok in TRACKED_SET: out.add(tok); continue
+        if "/" not in tok:
+            if "*" in tok:
+                out.update(x for x in TRACKED if fnmatch.fnmatch(os.path.basename(x), tok))
+            else:
+                out.update(BYBASE.get(tok, ()))
+        else:
+            out.update(x for x in TRACKED if x == tok or fnmatch.fnmatch(x, tok) or fnmatch.fnmatch(x, "*/" + tok))
+    for d in set(DIR_RE.findall(txt)):
+        d = d.rstrip("/.")
+        if d in TRACKED_DIRS and d + "/" not in DOMAIN_ROOTS: out.add(d + "/")
+    _data_cache[script] = out
+    return out
+for f in fams:
+    # o lint (`lint-artifacts.sh`) fica de fora: ele é infraestrutura da bancada (mudá-lo já compra TUDO) e as
+    # famílias que o usam o rodam sobre FIXTURE, não sobre o dado vivo — derivá-lo poria ~100 famílias em todo
+    # commit de skill sem que nenhuma leia a skill viva
+    scripts = [x for x in (fams[f] | weak[f]) if x.endswith((".sh", ".py", ".awk"))
+               and x not in (".claude/validation/lint-selftest.sh", ".claude/validation/lint-artifacts.sh")]
+    for sc in scripts:
+        weak[f] |= data_inputs(sc)
+# compacta: entrada FRACA já coberta por um diretório fraco da mesma família não muda a seleção (o prefixo a
+# casa) — só incha o mapa. Entrada forte nunca sai.
+for f in fams:
+    # 3+ arquivos fracos no mesmo diretório viram o diretório (sobre-seleciona os vizinhos; nunca estreita)
+    for _ in range(1):
+        par = {}
+        for x in weak[f]:
+            if not x.endswith("/") and not x.startswith("@") and "/" in x: par.setdefault(os.path.dirname(x) + "/", []).append(x)
+        for d, xs in par.items():
+            if len(xs) >= 3 and d not in DOMAIN_ROOTS: weak[f] -= set(xs); weak[f].add(d)
+    dirs = sorted(x for x in weak[f] if x.endswith("/"))
+    weak[f] = {x for x in weak[f] if not any(x != d and x.startswith(d) for d in dirs)}
 # @plugin-bundled (achado do PR #1024, 2026-10-11): a família que MONTA ou JULGA plugin a partir das fontes
 # vivas depende de TODO arquivo que algum manifesto empacota — skill, comando, agente, util, KB. O mapa só
 # via o assembler/manifesto, então mudar uma skill empacotada não selecionava `plugin_bundle` e a bancada
@@ -19179,8 +19251,10 @@ run_selftest_selection_selftests() {
   if [ -z "${_bad_b}" ]; then record_pass "selftest-selection: (b) arquivo empacotado por manifesto (skill, KB, hook) ⇒ plugin_bundle, com o motivo impresso"
   else record_fail "selftest-selection: (b) empacotado sem plugin_bundle" "${_bad_b}"; fi
   out="$(bash "${sut}" --affected .claude/skills/onion-publish/SKILL.md --dry-run 2>&1 || true)"
-  if grep -q '^dry-run: famílias=' <<< "${out}" && ! grep -q 'plugin_bundle' <<< "${out}"; then
-    record_pass "selftest-selection: (b2) skill que nenhum manifesto empacota NÃO puxa plugin_bundle (derivado do manifesto, não do prefixo)"
+  # (a família ainda pode vir pelo DADO que os scripts dela leem — .claude/skills/ —, e isso é rodar mais; o que
+  #  se prova aqui é que a regra do EMPACOTADO lê o manifesto, não o prefixo)
+  if grep -q '^dry-run: famílias=' <<< "${out}" && ! grep -q 'empacotado: ' <<< "${out}"; then
+    record_pass "selftest-selection: (b2) skill que nenhum manifesto empacota NÃO aciona a regra do empacotado (derivada do manifesto, não do prefixo)"
   else record_fail "selftest-selection: (b2) precisão" "$(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
 
   # (c) BLOCO — cópia da bancada num repo git próprio; mexe no repo da cópia, nunca na árvore viva
@@ -19279,10 +19353,26 @@ run_selftest_selection_selftests() {
   grep -q '^dry-run: famílias=.*model_ssot' <<< "${out}" || _f_ok=0
   if [ "${_f_ok}" = "1" ]; then record_pass "selftest-selection: (f) script que o SUT declarado chama (por fecho) seleciona a família — marketplace-readme.sh/plugin-namespace-check.sh ⇒ materialize_repo; validation/ ⇒ model_ssot"
   else record_fail "selftest-selection: (f) fecho" "a dependência transitiva não selecionou a família: $(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
+  # (h) DADO que a guarda lê seleciona a família (falso negativo medido no rebase sobre a main 9ef87725):
+  #     a REGRA 103 lê interface.md e adapters/*.capabilities.tsv; a REGRA 102 lê agent-frontmatter-keys.tsv
+  local _h_bad="" _hp _hf
+  for _hp in ".claude/utils/task-manager/interface.md:task_manager_capabilities" \
+             ".claude/utils/task-manager/adapters/clickup.capabilities.tsv:task_manager_capabilities" \
+             ".claude/validation/agent-frontmatter-keys.tsv:agent_frontmatter_keys"; do
+    _hf="${_hp##*:}"; _hp="${_hp%:*}"
+    [ -e "${REPO_ROOT}/${_hp}" ] || { _h_bad="${_h_bad} ${_hp}(ausente)"; continue; }
+    out="$(bash "${sut}" --affected "${_hp}" --dry-run 2>&1 || true)"
+    grep -qE "^dry-run: famílias=(<todas>|.*\\b${_hf}\\b)" <<< "${out}" || _h_bad="${_h_bad} ${_hp}→${_hf}"
+  done
+  if [ -z "${_h_bad}" ]; then record_pass "selftest-selection: (h) arquivo de DADO que o script da guarda lê seleciona a família (interface.md/capabilities.tsv ⇒ task_manager_capabilities; agent-frontmatter-keys.tsv ⇒ agent_frontmatter_keys)"
+  else record_fail "selftest-selection: (h) dado da guarda" "não selecionou:${_h_bad}"; fi
 
   # (d) cobertura FRACA não desliga failsafe: template que só anotação cita ⇒ todas
+  #     (o tsv do adapter é coberto FRACO por task_manager_capabilities via diretório não-raiz — é o caso que
+  #      a exclusão da 3ª coluna segura; o template, por diretório-raiz, segura pela outra exclusão)
   out="$(bash "${sut}" --affected .claude/utils/vertical/templates/help.tpl --dry-run 2>&1 || true)"
-  if grep -q 'famílias=<todas>' <<< "${out}"; then
+  out="${out}"$'\n'"$(bash "${sut}" --affected .claude/utils/task-manager/adapters/jira.capabilities.tsv --dry-run 2>&1 || true)"
+  if [ "$(grep -c 'famílias=<todas>' <<< "${out}")" -eq 2 ]; then
     record_pass "selftest-selection: (d) arquivo do domínio citado só por '# selftest-covers:' continua comprando todas (fraca só acrescenta)"
   else record_fail "selftest-selection: (d) fraca estreitou" "$(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
   # (d2) o failsafe seguro FICA: hook que ninguém cita ⇒ todas, motivo impresso

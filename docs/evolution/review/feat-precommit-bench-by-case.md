@@ -2,11 +2,11 @@
 title: 'Resíduo — o pre-commit escolhe a bancada por caso, e o refutador pegou a cobertura escrita à mão'
 date: 2026-10-11
 branch: feat/precommit-bench-by-case
-reviewed_diff_sha256: 643b4fd0eea60f8c488e318b5d35f638eb5fe83f1958da629668f3b750b81d02
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 6de4dd040f3734dfedd0041624c6753a3c844dcfb55532a00b2dc8d55dda8fb6
-findings_total: 5
-findings_real: 5
-findings_fixed: 5
+findings_total: 6
+findings_real: 6
+findings_fixed: 6
 tokens: 179065
 duration_min: 17
 verdict: CORRIGIDO
@@ -14,7 +14,10 @@ elenxo: sim
 nota: >-
   Passada adversarial com mandato de achar FALSO NEGATIVO (a seleção nova rodando menos do que devia),
   default reprovado. Reprovou com um falso negativo real, provado por mutação. Os cinco achados foram
-  curados, cada um com caso de bancada e mutante que o mata.
+  curados, cada um com caso de bancada e mutante que o mata. Depois do rebase sobre a main 9ef87725
+  (REGRAS 102 e 103), o contexto principal mediu um 6º falso negativo: a cobertura derivada seguia nome de
+  script, não o DADO que a guarda lê (interface.md não selecionava task_manager_capabilities). Curado por
+  classe; o resíduo volta a pendente para o hash ser recalculado no diff novo.
 ---
 
 # Seleção por caso no pre-commit (SAC-72)
@@ -61,6 +64,25 @@ Os 8 mutantes reprovam o caso certo da família `selftest_selection`: regra do b
 derivação do empacotado desligada, cobertura fraca contada como conhecida, 2ª camada de heredoc
 desligada, núcleo sem razão, fecho desligado, renome/exclusão fora do staged e estado de aspas zerado
 nas linhas de família.
+
+## 6º achado (contexto principal, depois do rebase sobre 9ef87725)
+
+**O dado lido pela guarda não selecionava a família.** A REGRA 103 lê `interface.md` e
+`adapters/*.capabilities.tsv`. Mudar `interface.md` selecionava 30 famílias, e
+`task_manager_capabilities` não estava entre elas. **Cura de classe, derivada:** de todo script que a
+família cita, ou alcança pelo fecho, cada caminho de dado nomeado no CÓDIGO (`.md/.tsv/.yaml/.json/.txt/.csv`,
+inclusive glob) e cada diretório não-raiz do repo viram cobertura fraca. Ficam fora:
+- o `lint-artifacts.sh`, que é infraestrutura (mudá-lo já compra tudo) e roda sobre fixture;
+- as raízes do domínio (`.claude/validation/` derivado punha 78 famílias num commit de um helper só, e o
+  `selftest_lanes` (e) acusou).
+
+O caso (h) e o 9º mutante (derivação de dado desligada) provam a cura. O mutante da cobertura fraca
+contada como conhecida tinha deixado de morder, porque a compactação levou a cobertura do template a
+`.claude/utils/`, uma raiz que o failsafe já exclui por outra via. O caso (d) ganhou o `.tsv` do adapter,
+que só uma cobertura fraca não-raiz alcança, e o mutante voltou a reprovar.
+
+**Custo:** commit de skill empacotada sobe para 73 famílias (~520 s medidos hoje + ~175 s pela série de
+09-11, com 17 sem medida). O commit só de doc segue com 1.
 
 ## Limite declarado
 
