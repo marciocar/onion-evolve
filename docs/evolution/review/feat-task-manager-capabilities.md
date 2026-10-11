@@ -1,6 +1,5 @@
 ---
-reviewed_diff_sha256: f7b4691740a6871707b0624ec48fc3793786dd42037a22160709e773f50bedba
-reviewed_code_sha256: d91519fb82ec4df89479d3b6ea23116d097664f9e65cae39469f85418287b483
+reviewed_diff_sha256: pendente
 findings_total: 19
 findings_real: 18
 tokens: 195983
@@ -14,6 +13,9 @@ nota: >
   não sustentava o positivo, e isso repetia o defeito que o PR dizia curar. A guarda tinha furos de forma
   baratos de fechar. Tudo foi curado no mesmo laço: as 12 células viraram unverified, houve 9 casos novos
   no --selftest (27 ao todo), 29 mutantes na bancada e 33 pelo mutate-and-restore.sh, todos mordendo.
+  Depois do PR aberto, o motor de merge rebaseou sobre a main com a REGRA 102 (#1028): o git fundiu os blocos
+  no lint-artifacts e no lint-selftest. Revisto pelo contexto principal: famílias task_manager_capabilities,
+  agent_frontmatter_keys e veto_onfailure verdes.
 ---
 
 # Resíduo — `feat/task-manager-capabilities`

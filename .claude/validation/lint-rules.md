@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**90 regras** no total — **78 HARD**, **32 SOFT**.
+**91 regras** no total — **79 HARD**, **33 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -46,6 +46,7 @@ Campos obrigatórios, válidos e bem-formados no frontmatter de agentes e comand
 | 17 | Frontmatter: valor escalar com ': ' não-aspado | HARD | YAML de frontmatter quebrado por escalar com ': ' não-aspado |
 | 23 | Frontmatter: category: em agentes (a metade 'model: em comandos' foi REVOGADA pela REGRA 71) | HARD | agente sem category: — o roteamento/inventário dependem dele. Até 2026-09-03 esta regra também EXIGIA |
 | 51 | Agentes branch-* documentam a distinção vs o par geral | SOFT | par de agentes com overlap invisível — dispatcher que roteia por description não escolhe |
+| 102 | Chave de frontmatter de agente pertence à allowlist (oficiais + as da casa) | HARD + SOFT | typo de chave de agente (`tool:` no lugar de `tools:`, `modle:`) que o Claude Code ignora em silêncio |
 
 ## Higiene de artefato
 
