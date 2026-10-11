@@ -84,6 +84,10 @@ UTILS=(
   # dead-ref, que é a REGRA 27 (Dependência de script de comando empacotado) na forma mais crua:
   # entregar metade do comando. UTILS aceita DIRETÓRIO (o assemble valida com `-d`).
   ".claude/utils/census"
+  # Helper que a skill onion-orchestration manda rodar no passo 8 (SAC-105, 2026-10-11). Mesma classe
+  # do workflow-syntax-check.sh abaixo: sem ele aqui, a skill viaja com um caminho que não existe no
+  # bundle. Achado pela passada adversarial do PR, não pelo --affected (que não seleciona plugin_bundle).
+  ".claude/utils/orchestration"
 )
 VALIDATION=(
   # ⚠️ EMPACOTAR o script que a skill CITA, senão a guarda nasce MORTA no consumidor. Medido em

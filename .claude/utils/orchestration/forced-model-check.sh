@@ -15,9 +15,12 @@
 #     spawn e por definição de agente;
 #   · CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL (2.1.296) não-vazia → todo agente de Workflow roda nela.
 # O QUE NÃO FORÇA: CLAUDE_CODE_SUBAGENT_MODEL sozinha (piso; `model:` e o spawn têm precedência).
-# NOVIDADE FALHA ALTO: qualquer outra `CLAUDE_CODE_*AGENT_MODEL*` exportada e não-vazia, fora do
+# NOVIDADE FALHA ALTO: qualquer outra `CLAUDE_CODE_*MODEL*` exportada e não-vazia, fora do
 # catálogo, vira AVISO "não catalogada" — a classe do defeito é nome novo invisível, e um aviso a
 # mais custa uma linha; um aviso a menos custa um relatório de tiering falso.
+# LACUNA DECLARADA (não verificada na doc nesta rodada): o remapeamento de alias por
+# ANTHROPIC_DEFAULT_{OPUS,SONNET,HAIKU}_MODEL troca o modelo que `model: sonnet` executa sem forçar
+# nada. É outra classe (remapeamento, não força) e este helper não a cobre.
 #
 # USO      bash .claude/utils/orchestration/forced-model-check.sh
 # SAÍDA    stdout: uma linha `AVISO: tiering declarado ≠ executado (env force) …` por causa, ou nada.
@@ -28,31 +31,40 @@ set -uo pipefail
 
 if [ "$#" -ne 0 ]; then sed -n '/^# USO/,/^# Determin/p' "$0" >&2; exit 2; fi
 
-_lower() { printf '%s' "$1" | tr '[:upper:]' '[:lower:]'; }
+# Só builtins do bash daqui em diante (nada de tr/grep): sem uma ferramenta externa no PATH, a
+# checagem não pode cair em silêncio + rc 0 — achado da passada adversarial (fail-open).
+_trim() { local v="$1"; v="${v#"${v%%[![:space:]]*}"}"; v="${v%"${v##*[![:space:]]}"}"; printf '%s' "${v}"; }
 _warn=0
 _emit_warning() { echo "AVISO: tiering declarado ≠ executado (env force) — $*"; _warn=1; }
 
-_floor="${CLAUDE_CODE_SUBAGENT_MODEL:-}"
+_floor="$(_trim "${CLAUDE_CODE_SUBAGENT_MODEL:-}")"
 _effective="${_floor:-o modelo principal da sessão}"
 
 if [ -n "${CLAUDE_CODE_SUBAGENT_MODEL_FORCE+x}" ]; then
-  case "$(_lower "${CLAUDE_CODE_SUBAGENT_MODEL_FORCE}")" in
+  _force="$(_trim "${CLAUDE_CODE_SUBAGENT_MODEL_FORCE}")"
+  case "${_force,,}" in
     1|true|yes|on) _emit_warning "CLAUDE_CODE_SUBAGENT_MODEL_FORCE=${CLAUDE_CODE_SUBAGENT_MODEL_FORCE}: todo subagente e agente de Workflow roda em ${_effective}" ;;
     ''|0|false|no|off) : ;;
     *) _emit_warning "CLAUDE_CODE_SUBAGENT_MODEL_FORCE=${CLAUDE_CODE_SUBAGENT_MODEL_FORCE} (valor ambíguo, tratado como ligado): modelo efetivo provável ${_effective}" ;;
   esac
 fi
 
-if [ -n "${CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL:-}" ]; then
-  _emit_warning "CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL=${CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL}: todo agente de Workflow roda nele"
+_workflow="$(_trim "${CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL:-}")"
+if [ -n "${_workflow}" ]; then
+  _emit_warning "CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL=${_workflow}: todo agente de Workflow roda nele"
 fi
 
-while IFS= read -r _name; do
+# Rede de novidade: qualquer CLAUDE_CODE_*MODEL* exportada fora do catálogo. Larga de propósito
+# (pega TEAMMATE_MODEL, AGENT_TEAMS_MODEL…): o custo de um aviso a mais é uma linha.
+for _name in $(compgen -e); do
   case "${_name}" in
     CLAUDE_CODE_SUBAGENT_MODEL|CLAUDE_CODE_SUBAGENT_MODEL_FORCE|CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL) continue ;;
+    CLAUDE_CODE_*MODEL*) : ;;
+    *) continue ;;
   esac
-  [ -n "${!_name:-}" ] || continue
-  _emit_warning "${_name}=${!_name} (não catalogada neste helper): trate como forçada até medir o que ela faz"
-done < <(compgen -e | LC_ALL=C grep -E '^CLAUDE_CODE_[A-Z0-9_]*AGENT_MODEL[A-Z0-9_]*$' || true)
+  _value="$(_trim "${!_name:-}")"
+  [ -n "${_value}" ] || continue
+  _emit_warning "${_name}=${_value} (não catalogada neste helper): trate como forçada até medir o que ela faz"
+done
 
 exit "${_warn}"
