@@ -26,6 +26,7 @@ external_edges:
 nodes:
   - id: E_DELTA_DA_RODADA
     node_type: evidence
+    trace: "docs/evolution/research/radar-E3-2026-10-11-r9/SYNTHESIS.md"
     layer: audit
     plane: DEV
     status: confirmed
