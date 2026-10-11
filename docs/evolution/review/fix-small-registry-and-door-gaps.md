@@ -1,6 +1,5 @@
 ---
-reviewed_diff_sha256: 2900b3d9fe327995bfd16d655c48f96e482aa12d4a4ff6e97beface1df924788
-reviewed_code_sha256: 91a7078d32b17ea7ef623a9517c7efca884966ce265213e751135052bebe3d2a
+reviewed_diff_sha256: pendente
 findings_total: 7
 findings_real: 6
 tokens: 148078
@@ -16,7 +15,8 @@ nota: >
   (26 das 93 regras). A projeção desatualizada é pendência de fechamento, resolvida pelo pr-finalize.
   Depois do PR aberto, o contexto principal rebaseou sobre a main com as REGRAS 102 (#1028) e 103 (#1029).
   O registro gerado (lint-rules.md) conflitou e foi regenerado: 95 regras, 98-103 presentes. Famílias
-  rules_registry, eol_gitattributes, gitattributes_eol, door e door_mini com 51 verdes; selftest do hook de título OK.
+  rules_registry, eol_gitattributes, gitattributes_eol, door e door_mini com 51 verdes; selftest do hook de título OK. O CI acusou 2 sítios novos de veredito por pipe
+  (selftest do hook de título e door-mini-check); trocados por here-string, catraca de volta ao passivo.
 ---
 
 # Resíduo: `fix/small-registry-and-door-gaps`

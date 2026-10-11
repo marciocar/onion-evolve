@@ -65,7 +65,7 @@ if [ "${1:-}" = "--selftest" ]; then
   #     encontrado" (medido 2026-10-11). A catraca nº7 do rules-registry.sh impede a forma voltar; aqui
   #     o hook prova que lê a ponta mais nova do registro.
   out="$(printf 'A REGRA 98 e a REGRA 101 acusaram.\n' | _check_text)"
-  if printf '%s' "${out}" | grep -q '^98|REGRA 98 (Diretiva de injeção' && printf '%s' "${out}" | grep -q '^101|REGRA 101 (Veto PreToolUse'; then echo "  ✅ (d) regras mais novas (98, 101) resolvem o título"; else echo "  ✗ (d): ${out}"; fails=$((fails+1)); fi
+  if grep -q '^98|REGRA 98 (Diretiva de injeção' <<< "${out}" && grep -q '^101|REGRA 101 (Veto PreToolUse' <<< "${out}"; then echo "  ✅ (d) regras mais novas (98, 101) resolvem o título"; else echo "  ✗ (d): ${out}"; fails=$((fails+1)); fi
   out="$(printf 'Sem regra nenhuma aqui.\n' | _check_text)"
   if [ -z "${out}" ]; then echo "  ✅ (c) texto limpo = vazio"; else echo "  ✗ (c): ${out}"; fails=$((fails+1)); fi
   [ "${fails}" -eq 0 ] && { echo "rule-title-in-prose selftest: OK"; exit 0; }
