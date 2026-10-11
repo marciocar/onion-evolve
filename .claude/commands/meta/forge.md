@@ -40,6 +40,26 @@ que existe mas o artefato não cita conta como ausente — de propósito, porque
 superfície também não a acharia. Na primeira medição (2026-09-28) a própria instância de referência
 tinha lente e bancada e **não citava nenhuma das duas**.
 
+## Entrada vinda do `/meta:dissect` — planos de absorção (SAC-77)
+
+Quando a forja nasce de um veredito `absorver`/`costurar`, a entrada **não é a entrevista**: é o
+plano que o [`/meta:dissect`](dissect.md) escreveu como nós `x_absorb_*` no grafo da dissecação.
+O leitor roda na carga e mede as peças do alvo no `forge-census.sh`:
+
+!`bash .claude/validation/dissect-census.sh . --plans || true`
+
+- Plano **INCOMPLETO** (sem origem com pin, sem licença, sem família de paridade, forma fora do
+  enum, alvo fora do censo) **não se forja**: volte ao dissect. A doutrina é a §4b de
+  [`common:prompts:dissect-doctrine`](../common/prompts/dissect-doctrine.md).
+- As peças marcadas `falta` são as que a forja emite (dentro do que esta versão gera: 2, 3, 7).
+  As `existe` **mudam, não se recriam** — e esta versão **não tem passo próprio de mudar**: a
+  mudança segue o fluxo normal (`/engineer:*`) com o plano como especificação, e a forja cobra
+  os passos 5 e 6 (dogfood + paridade com mutante). Medido no 1º plano (Conductor, 2026-10-11):
+  ele pede as peças 4 e 7 de um alvo que já tem as duas — é mudança, não emissão.
+- A **origem e a licença** vão no cabeçalho do artefato forjado, e o caso de **paridade** entra na
+  família que o plano nomeia — reprovando sem a peça (passo 6).
+- `costurar` = adapter SDAAL; nunca cópia. `vendor-pin` só para licença que o permita.
+
 ## Procedimento
 
 1. **MEDIR** — rode o censo acima. Sem ele, o resto é palpite. Se ele sair `3`, ele está declarando
