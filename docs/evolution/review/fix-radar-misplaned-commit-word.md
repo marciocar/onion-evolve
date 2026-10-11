@@ -2,7 +2,8 @@
 title: 'Resíduo — o MISPLANED distingue commit barrado (execução) de commit lido (fonte)'
 date: 2026-10-11
 branch: fix/radar-misplaned-commit-word
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 19b1f609d446d8e73187c6b089f80fec954868c3e321e78c5665ce94be47216e
+reviewed_code_sha256: 46b974dbaad808402d0b5a2ea12c7b3751d484fcfc1e7802ff3ab480456f0fbf
 findings_total: 5
 findings_real: 4
 findings_fixed: 3
