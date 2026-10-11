@@ -68,6 +68,15 @@ varredura de id · sem token para termo curto · sem forma espremida · sem pula
 dispatcher sem a chamada · dispatcher com `IS_LEAF` invertido. REGRA 63: sem o bloco do
 `x_renamed_from`. kg-contract-check: sem o bloco de renome; `-M90%` → `-M`. Todos mordem.
 
+## Confirmed conferidos (REGRA 87)
+
+Os `confirmed` dos grafos editados foram lidos antes de editar, e nenhum contraria o renome: o renome
+muda o id, não a afirmação. `E_HUB_OPERACOES_ENTERPRISE_VEREDITO_DOS_TRES_FALSOS_POSITIVOS` e
+`E_hub_operacoes_enterprise_demo_route_caddy` seguem com o mesmo label e a mesma provenance (só o nome
+privado nos labels e na narração do update virou o id). No grafo da forja, `E_ID_E_CAMINHO_FORA_DO_ALCANCE_DA_REGRA_30`,
+`E_SEIS_CASOS_SEIS_MUTANTES_MORDEM` e `E_ELENXO_REPROVOU_E_AS_CURAS` são os que este PR produz; o
+segundo teve o label atualizado depois do Elenxo (10 casos, um mutante por cura).
+
 ## Teto
 
 O P7 falha pelo vocabulário: nome que não está nem nos termos derivados nem no `client-terms.txt` passa.
