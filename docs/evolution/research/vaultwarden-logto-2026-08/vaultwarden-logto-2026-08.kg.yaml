@@ -195,6 +195,24 @@ nodes:
       method: "leitura: README do onion-vps-vaultwarden em 6d82b1b (commit noutro repo) + README upstream do Vaultwarden"
       locality: "repo"
 
+  # ── SAC-100 (2026-10-11): re-medição do I_CONSOLE_DO_LOGTO_ESTA_PUBLICO contra o vivo ──
+  - id: E_CONSOLE_DO_LOGTO_FECHADO_SAC100_2026_10
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-11"
+    verified_against: "ls do conf.d do Caddy do host + config viva do Caddy pela API admin local (0 ocorrências) + ss -ltnp (:3012 só em 127.0.0.1) + curl em console.onionevolve.com (falha de TLS) e em auth.onionevolve.com"
+    label: "Re-medido (SAC-100): o console admin do Logto NÃO está mais público. O vhost está como logto-console.caddy.disabled, a config viva do Caddy não cita o host nem a porta 3012, o :3012 escuta só no loopback e console.onionevolve.com falha no TLS."
+    narrative: "Mede o que o nó antigo dizia (console admin exposto), não o cadastro aberto do Logto — esse é intencional por decisão do maestro e fica fora deste nó. MEDIDO em 2026-10-11: (1) `sudo ls -la` do ⟨conf.d do Caddy do host⟩ lista `logto-console.caddy.disabled` (mtime 2026-08-10 22:25 — compatível com o `console.sh off` testado na própria sessão do nó antigo, mas o mtime é indício, não prova de autoria). (2) Config VIVA, não o arquivo: GET http://127.0.0.1:2019/config/ — `console.onionevolve.com` 0 ocorrências, `127.0.0.1:3012` 0 ocorrências (controle: `auth.onionevolve.com` 2 ocorrências). (3) `ss -ltnp`: o docker-proxy da porta 3012 (console) escuta em 127.0.0.1, nunca em 0.0.0.0. (4) Borda: `curl https://console.onionevolve.com/` = curl (35) tlsv1 alert internal error, código 000 — o Caddy não tem vhost nem certificado para esse nome (o DNS ainda resolve para o IP da VPS, o que é só registro, não exposição). (5) CONTRAPROVA de falso positivo: https://auth.onionevolve.com/console devolve 200, mas é o SPA da experiência de login (window.logtoSsr.signInExperience) — o mesmo corpo que uma rota inexistente (/xyz-nao-existe-sac100 também 200). Não é o console admin. O que o nó antigo pedia ao maestro (decidir fechar o console) foi feito; a decisão de deixar o cadastro aberto é outra e segue de pé."
+    trace: "ops/bridge-auth/logto-provision.sh"
+    provenance:
+      source: "config viva do Caddy pela API admin local + conf.d do Caddy do host + ss -ltnp + curl na borda pública"
+      locator: "GET http://127.0.0.1:2019/config/ (console.onionevolve.com 0, 127.0.0.1:3012 0, auth.onionevolve.com 2); conf.d com logto-console.caddy.disabled; ss 127.0.0.1:3012; curl console.onionevolve.com = (35) tlsv1 alert internal error"
+      method: "medição: leitura da config viva do Caddy e do conf.d + ss -ltnp + curl de status/erro TLS na borda pública, 2026-10-11"
+      locality: "host"
+
 edges:
   - from: C_SSO_NAO_REDUZ_SEGREDO
     to: D_VIAVEL_COM_EXPECTATIVA_CALIBRADA
@@ -232,3 +250,6 @@ edges:
   - from: I_PROVISION_FICOU_PARA_TRAS_NO_RENAME
     to: E_TERRENO_E_COPIAVEL
     edge_type: CONSTRAINS
+  - from: E_CONSOLE_DO_LOGTO_FECHADO_SAC100_2026_10
+    to: I_CONSOLE_DO_LOGTO_ESTA_PUBLICO
+    edge_type: SUPERSEDES

@@ -2188,6 +2188,7 @@ ops/bridge-auth/logto-provision.sh	C_scaffold_removed_proof_was_invalid	docs/oni
 ops/bridge-auth/logto-provision.sh	D_capability_by_scope	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	D_enroll_instead_of_invite	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	D_org_born_on_demand	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+ops/bridge-auth/logto-provision.sh	E_CONSOLE_DO_LOGTO_FECHADO_SAC100_2026_10	docs/evolution/research/vaultwarden-logto-2026-08/vaultwarden-logto-2026-08.kg.yaml
 ops/bridge-auth/logto-provision.sh	E_bridge_write_regranted_2026_08	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	E_d5_divergence_fires	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	E_dormant_privileged_duplicate	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
