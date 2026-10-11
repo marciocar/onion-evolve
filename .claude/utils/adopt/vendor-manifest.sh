@@ -3,6 +3,10 @@
 #
 # Uso : vendor-manifest.sh [--role <papel>] [--repo <root>] [--emit-scrub-roots] [--check-bundle <dir>]
 #         --role              adopted (default) | source | hub | standalone | plugins | mini
+#         --kind              door | adoption — o DESTINO, que só pesa no papel standalone (decisão do
+#                             maestro, 2026-10-11): a PORTA standalone perde o canal upstream (co-relay,
+#                             co-evolve, o hook do inbox e utils/co-evolution/); o projeto ADOTADO com
+#                             papel standalone o mantém. Ausente = corte de PORTA (ver o `_role_cut`).
 #         --repo              raiz do core (default: git rev-parse --show-toplevel)
 #         --list <papel>      imprime o que o papel LEVA: contagem por tipo + a lista de arquivos
 #         --diff <papel>      o mesmo, mais o diff contra a publicação anterior (o clone da porta que o
@@ -60,16 +64,17 @@
 # VERMELHO — trocando um gap invisível por outro.
 set -uo pipefail
 
-ROLE="adopted"; REPO=""; MODE="manifest"; BUNDLE=""; LIST_DIFF=0
+ROLE="adopted"; REPO=""; MODE="manifest"; BUNDLE=""; LIST_DIFF=0; KIND=""
 while [ $# -gt 0 ]; do
   # flag que exige valor e veio por último: `shift 2` com um argumento só não anda e o laço não termina
   # (medido pela passada adversarial da F2: `--list` no fim saía por timeout).
-  case "$1" in --role|--repo|--check-bundle|--stub-baselines|--list|--diff)
+  case "$1" in --role|--repo|--kind|--check-bundle|--stub-baselines|--list|--diff)
     [ $# -ge 2 ] || { echo "ERRO: $1 exige um valor" >&2; exit 2; } ;;
   esac
   case "$1" in
     --role) ROLE="${2:-}"; shift 2 ;;
     --repo) REPO="${2:-}"; shift 2 ;;
+    --kind) KIND="${2:-}"; shift 2 ;;
     --emit-scrub-roots) MODE="scrub"; shift ;;
     --check-bundle) MODE="check"; BUNDLE="${2:-}"; shift 2 ;;
     --stub-baselines) MODE="stub"; BUNDLE="${2:-}"; shift 2 ;;
@@ -81,6 +86,18 @@ done
 # Os papéis de PORTA (source, plugins, mini) entraram em 2026-10-10, F2 das portas (SAC-91), pela matriz
 # D_MATRIZ_DE_PORTAS_2026_10. `adopted` segue sendo o default de quem ADOTA um projeto.
 case "${ROLE}" in adopted|source|hub|standalone|plugins|mini) : ;; *) echo "ERRO: --role desconhecido: '${ROLE}' (adopted|source|hub|standalone|plugins|mini)" >&2; exit 2 ;; esac
+# O DESTINO (decisão do maestro, 2026-10-11, D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA): `door` é a
+# porta materializada (carimbo com `kind: door`); `adoption` é um projeto adotado (carimbo sem ele).
+# Só o standalone serve aos dois destinos: source, plugins e mini são papéis só de porta, e combiná-los
+# com `adoption` é erro de chamada, não corte.
+case "${KIND}" in
+  ""|door) : ;;
+  adoption)
+    case "${ROLE}" in adopted|hub|standalone) : ;;
+      *) echo "ERRO: --kind adoption com --role '${ROLE}': ${ROLE} é papel só de PORTA (adoção usa adopted, hub ou standalone)" >&2; exit 2 ;;
+    esac ;;
+  *) echo "ERRO: --kind desconhecido: '${KIND}' (door|adoption)" >&2; exit 2 ;;
+esac
 [ -n "${REPO}" ] || REPO="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
 # ── A LISTA, por papel ────────────────────────────────────────────────────────────────────────
@@ -179,10 +196,20 @@ _role_cut() {  # $1=papel → subcaminhos a cortar, um por linha (vazio = nada a
         .claude/utils/adopt/ \
         .claude/utils/marketplace/materialize-marketplace-repo.sh \
         .claude/skills/onion-publish/ \
-        .claude/utils/co-evolution/ \
         .claude/utils/federation-transport/ \
-        .claude/validation/federation- \
-        .claude/hooks/co-evolution-inbox-check.sh
+        .claude/validation/federation-
+      # O CANAL UPSTREAM só sai da PORTA (decisão do maestro, 2026-10-11): o projeto ADOTADO com papel
+      # standalone (carimbo sem `kind: door`, chamado com `--kind adoption`) mantém o carteiro co-relay,
+      # o receptor de correio e o hook que avisa o inbox, porque é por eles que o adotado sinaliza o
+      # core. A federação cross-repo (federation-transport, federation-*) e a adoção de terceiros seguem
+      # fora nos dois destinos; o hook tolera a ausência do inbox-pull.sh. `plugins` é porta sempre.
+      # Destino ausente = porta: errar para o corte de porta tira capacidade de um adotado, e errar para
+      # o outro lado poria o canal numa porta pública.
+      if [ "$1" = plugins ] || [ "${KIND}" != adoption ]; then
+        printf '%s\n' \
+          .claude/utils/co-evolution/ \
+          .claude/hooks/co-evolution-inbox-check.sh
+      fi
       ;;
     *) : ;;
   esac
@@ -218,7 +245,9 @@ _emit_command_excludes() {  # $1=REPO $2=papel → :(exclude) dos comandos de me
   # adoção e federação DE VOLTA, e o aviso ainda dizia "corta N arquivos". Papel que corta e não sabe
   # o que cortar não emite manifesto: rc 3, como o mini.
   [ -f "${_resolver}" ] || { echo "ERRO: o papel '${_role}' corta comandos pelo roles.yaml, e o resolvedor não existe em '${_repo}'" >&2; return 3; }
-  _tools="$(bash "${_resolver}" "${_role}" --tools 2>/dev/null)" || { echo "ERRO: o resolvedor não devolveu os work_tools do papel '${_role}' (PyYAML ausente? conjunto inexistente?) — sem eles o corte de comandos falharia aberto" >&2; return 3; }
+  local _kind_arg=()
+  [ "${KIND}" = adoption ] && _kind_arg=(--kind adoption)   # o adotado soma o canal upstream (roles.yaml: adoption_keeps)
+  _tools="$(bash "${_resolver}" "${_role}" --tools "${_kind_arg[@]}" 2>/dev/null)" || { echo "ERRO: o resolvedor não devolveu os work_tools do papel '${_role}' (PyYAML ausente? conjunto inexistente?) — sem eles o corte de comandos falharia aberto" >&2; return 3; }
   [ -n "${_tools}" ] || { echo "ERRO: o papel '${_role}' corta, mas o roles.yaml não lhe dá nenhum work_tool — o corte tiraria TODOS os comandos de meta/ ou nenhum" >&2; return 3; }
   while IFS= read -r -d '' _f; do
     [ -n "${_f}" ] || continue
@@ -485,7 +514,7 @@ fi
 if [ "${MODE}" = "list" ]; then
   git -C "${REPO}" rev-parse HEAD >/dev/null 2>&1 || { echo "ERRO: --list exige repositório git com HEAD em '${REPO}'" >&2; exit 2; }
   _lerr="$(mktemp)"; _lrc=0
-  _lout="$(bash "${BASH_SOURCE[0]}" --role "${ROLE}" --repo "${REPO}" 2>"${_lerr}")" || _lrc=$?
+  _lout="$(bash "${BASH_SOURCE[0]}" --role "${ROLE}" ${KIND:+--kind "${KIND}"} --repo "${REPO}" 2>"${_lerr}")" || _lrc=$?
   # o stderr do manifesto vai junto mesmo com rc 0: é lá que moram os avisos de lente forçada e de
   # ponteiro morto, e o `--list` que os descartava escondia exatamente o que existe para ser visto.
   cat "${_lerr}" >&2; rm -f "${_lerr}"

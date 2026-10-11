@@ -13603,6 +13603,44 @@ PY
      && ! grep -q 'o overlay do papel' <<< "${_p2c}"; then
     record_pass "role-bundle: (p2) fonte de overlay do mini ausente → HARD só onde o motor de portas existe; presente → silêncio"
   else record_fail "role-bundle: (p2)" "sem-motor=$(grep -c 'o overlay do papel' <<< "${_p2a}" || true) com-motor-sem-fonte=$(grep -c 'o overlay do papel' <<< "${_p2b}" || true) com-fonte=$(grep -c 'o overlay do papel' <<< "${_p2c}" || true)"; fi
+  # (p3) PAPEL DE ADOÇÃO NO RESOLVEDOR (decisão do maestro, 2026-10-11): `--tools --kind adoption` soma o
+  #      adoption_keeps (o standalone adotado: co-relay e co-evolve); sem destino, ou `--kind door`, é o
+  #      conjunto da porta; papel sem adoption_keeps (hub) não muda; e personality-sync está no conjunto
+  #      federation (source e hub o recebem, standalone e plugins não), com `pending` vazio.
+  local _p3="" _p3a _p3d _p3x
+  _p3a="$(bash "${resolver}" standalone --tools --kind adoption 2>/dev/null)"
+  _p3d="$(bash "${resolver}" standalone --tools 2>/dev/null)"
+  _p3x="$(bash "${resolver}" standalone --tools --kind door 2>/dev/null)"
+  grep -qx co-relay <<< "${_p3a}" && grep -qx co-evolve <<< "${_p3a}" || _p3="${_p3} adoção-sem-canal"
+  grep -qx co-deliver <<< "${_p3a}" && _p3="${_p3} adoção-levou-co-deliver"
+  grep -qx co-relay <<< "${_p3d}" && _p3="${_p3} porta-levou-co-relay"
+  [ "${_p3d}" = "${_p3x}" ] || _p3="${_p3} default≠door"
+  [ "$(bash "${resolver}" hub --tools --kind adoption 2>/dev/null)" = "$(bash "${resolver}" hub --tools 2>/dev/null)" ] || _p3="${_p3} hub-mudou-com-adoption"
+  grep -qx personality-sync <<< "$(bash "${resolver}" source --tools 2>/dev/null)" || _p3="${_p3} source-sem-personality-sync"
+  grep -qx personality-sync <<< "$(bash "${resolver}" standalone --tools --kind adoption 2>/dev/null)" && _p3="${_p3} standalone-com-personality-sync"
+  python3 -c "import sys,yaml; d=yaml.safe_load(open(sys.argv[1])); s=d['work_tool_sets']; sys.exit(0 if 'personality-sync' in (s.get('federation') or []) and not (s.get('pending') or []) else 1)" "${roles}" || _p3="${_p3} personality-sync-fora-de-federation"
+  if [ -z "${_p3}" ]; then
+    record_pass "role-bundle: (p3) --tools --kind adoption soma co-relay/co-evolve só ao standalone adotado; porta e hub inalterados; personality-sync em federation"
+  else record_fail "role-bundle: (p3)" "divergiu:${_p3}"; fi
+  # (p4) adoption_keeps com nome fora de qualquer conjunto: o resolvedor sai rc 2 e a REGRA 37 reprova.
+  #      Mesmo sandbox do (p1), com o roles.yaml copiado e uma sonda no adoption_keeps do standalone.
+  sed 's|^    adoption_keeps: \[co-evolve, co-relay\]$|    adoption_keeps: [co-evolve, co-relay, sonda-keep]|' "${roles}" > "${sb}/.claude/utils/marketplace/roles.yaml"
+  if ! cmp -s "${roles}" "${sb}/.claude/utils/marketplace/roles.yaml"; then
+    local _p4rc=0 _p4o
+    bash "${resolver}" standalone --tools --kind adoption "${sb}/.claude/utils/marketplace/roles.yaml" >/dev/null 2>&1 || _p4rc=$?
+    _p4o="$(LC_ALL=C bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
+    if [ "${_p4rc}" -eq 2 ] && grep -q "declara adoption_keeps 'sonda-keep'" <<< "${_p4o}"; then
+      record_pass "role-bundle: (p4) adoption_keeps fora da partição → resolvedor rc 2 e HARD da REGRA 37"
+    else record_fail "role-bundle: (p4)" "resolvedor rc=${_p4rc} (espera 2) · KEEPBAD=$(grep -c 'declara adoption_keeps' <<< "${_p4o}" || true)"; fi
+    # (p4-MUT) sem a emissão KEEPBAD, a sonda passa calada no lint — prova que (p4) mede a cobrança.
+    sed 's|^            print("KEEPBAD\\t%s\\t%s" % (role, t))$|            pass|' "${sb}/.claude/validation/lint-artifacts.sh" > "${sb}/.claude/validation/lint-mut4.sh"
+    if ! cmp -s "${sb}/.claude/validation/lint-artifacts.sh" "${sb}/.claude/validation/lint-mut4.sh"; then
+      local _p4m; _p4m="$(LC_ALL=C bash "${sb}/.claude/validation/lint-mut4.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
+      if ! grep -q 'sonda-keep' <<< "${_p4m}"; then
+        record_pass "role-bundle: (p4-MUT) sem a cobrança do adoption_keeps a sonda passa calada — (p4) é load-bearing"
+      else record_fail "role-bundle: (p4-MUT)" "o mutante ainda acusa a sonda — (p4) não prova a cobrança"; fi
+    else record_fail "role-bundle: (p4-MUT) setup" "a mutação não foi aplicada"; fi
+  else record_fail "role-bundle: (p4) setup" "a sonda não entrou no adoption_keeps (âncora do roles.yaml mudou?)"; fi
   rm -rf "${sb}"
 }
 
@@ -17016,7 +17054,8 @@ run_role_cut_selftests() {
   else record_fail "role-cut: (n)" "desvio da matriz:${_nbad:- —} · plugins igual ao standalone=$([ "${_pl}" = "${_sa}" ] && echo sim || echo NÃO)"; fi
   # (n-MUT1) devolver o hook do inbox ao standalone (tirá-lo do corte) TEM de reprovar (n).
   local mut4="${d}/vm-hook.sh"
-  sed '/^        \.claude\/hooks\/co-evolution-inbox-check\.sh$/d; s|^        \.claude/validation/federation- \\$|        .claude/validation/federation-|' "${vm}" > "${mut4}"
+  # a âncora acompanha o bloco do canal upstream do _role_cut (2026-10-11: o hook só sai da PORTA)
+  sed '/^          \.claude\/hooks\/co-evolution-inbox-check\.sh$/d; s|^          \.claude/utils/co-evolution/ \\$|          .claude/utils/co-evolution/|' "${vm}" > "${mut4}"
   if ! cmp -s "${vm}" "${mut4}"; then
     if [ -n "$(_matrix_check "$(_rc_bundle "$(bash "${mut4}" --role standalone --repo "${REPO_ROOT}" 2>/dev/null)")")" ]; then
       record_pass "role-cut: (n-MUT1) sem o hook do inbox no corte, o standalone volta a levá-lo e (n) reprova"
@@ -17086,7 +17125,7 @@ run_role_cut_selftests() {
   else record_fail "role-cut: (t)" "ausente rc=${_rc_t1} · em erro rc=${_rc_t2} — o corte de comandos falhou ABERTO (adopt e federation-* viajariam)"; fi
   # (t-MUT) o `|| return 3` de volta a `|| return 0` (a forma de antes) TEM de reprovar (t).
   local mut10="${d}/vm-failopen.sh"
-  sed 's#^  _tools="$(bash "${_resolver}" "${_role}" --tools 2>/dev/null)" || {.*#  _tools="$(bash "${_resolver}" "${_role}" --tools 2>/dev/null)" || return 0#' "${vm}" > "${mut10}"
+  sed 's#^  _tools="$(bash "${_resolver}" "${_role}" --tools "${_kind_arg\[@\]}" 2>/dev/null)" || {.*#  _tools="$(bash "${_resolver}" "${_role}" --tools 2>/dev/null)" || return 0#' "${vm}" > "${mut10}"
   if ! cmp -s "${vm}" "${mut10}"; then
     local _rc_tm=0; bash "${mut10}" --role standalone --repo "${rt}" >/dev/null 2>&1 || _rc_tm=$?
     if [ "${_rc_tm}" -eq 0 ]; then
@@ -17290,6 +17329,121 @@ run_role_cut_selftests() {
   if [ -z "${_j}" ]; then
     record_pass "role-cut: (j) a enumeração é NUL-separada e imune a core.quotePath (acento/espaço não vazam)"
   else record_fail "role-cut: (j)" "falhou em:${_j} — caminho com acento sai C-quotado, o prefixo não casa e o arquivo VAZA em silêncio"; fi
+
+  # (u) PAPEL DE ADOÇÃO ≠ PAPEL DE PORTA (decisão do maestro, 2026-10-11, nó
+  #     D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA). O projeto ADOTADO com papel standalone (carimbo sem
+  #     `kind: door`, chamado com `--kind adoption`) mantém o canal upstream com o core: co-relay, co-evolve,
+  #     utils/co-evolution/ e o hook do inbox. A PORTA standalone (default, ou `--kind door`) não. Nas duas
+  #     polaridades, a adoção de terceiros e a federação cross-repo seguem fora, e personality-sync
+  #     (conjunto federation desde a mesma data) também. Medido no bundle EXTRAÍDO, não na lista.
+  local _t_up=(.claude/commands/meta/co-relay.md .claude/commands/meta/co-evolve.md
+               .claude/hooks/co-evolution-inbox-check.sh .claude/utils/co-evolution/co-relay.sh)
+  local _t_out=(.claude/commands/meta/adopt.md .claude/commands/meta/co-deliver.md
+                .claude/commands/meta/co-announce.md .claude/commands/meta/personality-sync.md
+                .claude/utils/federation-transport/inbox-pull.sh .claude/skills/onion-publish/SKILL.md)
+  _t_bundle() {  # $1=arquivo-saída, demais = argumentos do vendor-manifest → lista do bundle extraído
+    local _o="$1"; shift
+    local _s _a=()
+    _s="$(bash "$@" 2>/dev/null)" || { : > "${_o}"; return 1; }
+    mapfile -t _a <<< "${_s}"
+    git -C "${REPO_ROOT}" archive HEAD -- "${_a[@]}" 2>/dev/null | tar -t 2>/dev/null | grep -v '/$' > "${_o}" || true
+  }
+  _t_judge() {  # $1=lista $2=up|door → vazio se a polaridade bate, senão o que divergiu
+    local _l="$1" _pol="$2" _x _bad=""
+    for _x in "${_t_up[@]}"; do
+      if [ "${_pol}" = up ]; then grep -qxF "${_x}" "${_l}" || _bad="${_bad} faltou:${_x##*/}"
+      else grep -qxF "${_x}" "${_l}" && _bad="${_bad} vazou:${_x##*/}"; fi
+    done
+    for _x in "${_t_out[@]}"; do grep -qxF "${_x}" "${_l}" && _bad="${_bad} vazou:${_x##*/}"; done
+    [ "$(grep -c . "${_l}" || true)" -gt 0 ] || _bad="${_bad} bundle-vazio"
+    printf '%s' "${_bad}"
+  }
+  local _t_ad="${d}/t-adoption.lst" _t_do="${d}/t-door.lst" _t_dx="${d}/t-door-explicit.lst" _t_bad
+  _t_bundle "${_t_ad}" "${vm}" --role standalone --kind adoption --repo "${REPO_ROOT}"
+  _t_bundle "${_t_do}" "${vm}" --role standalone --repo "${REPO_ROOT}"
+  _t_bundle "${_t_dx}" "${vm}" --role standalone --kind door --repo "${REPO_ROOT}"
+  _t_bad="$(_t_judge "${_t_ad}" up)"
+  if [ -z "${_t_bad}" ]; then
+    record_pass "role-cut: (u) o ADOTADO standalone recebe co-relay, co-evolve, utils/co-evolution e o hook do inbox, e segue sem adoção, co-deliver/co-announce, personality-sync e federation-transport"
+  else record_fail "role-cut: (u)" "polaridade de adoção divergiu:${_t_bad}"; fi
+  _t_bad="$(_t_judge "${_t_do}" door)$(_t_judge "${_t_dx}" door)"
+  if [ -z "${_t_bad}" ] && cmp -s "${_t_do}" "${_t_dx}"; then
+    record_pass "role-cut: (u2) a PORTA standalone (default e --kind door, bundles idênticos) segue sem o canal upstream e sem adoção e federação"
+  else record_fail "role-cut: (u2)" "polaridade de porta divergiu:${_t_bad:- (default ≠ --kind door)}"; fi
+  # (u3) o destino de adoção só existe para os papéis de adoção: plugins, mini e source são só de porta.
+  local _t3="" _t3r _t3rc
+  for _t3r in plugins mini source; do
+    _t3rc=0; bash "${vm}" --role "${_t3r}" --kind adoption --repo "${REPO_ROOT}" >/dev/null 2>&1 || _t3rc=$?
+    [ "${_t3rc}" -eq 2 ] || _t3="${_t3} ${_t3r}:rc=${_t3rc}"
+  done
+  _t3rc=0; bash "${vm}" --role standalone --kind outro --repo "${REPO_ROOT}" >/dev/null 2>&1 || _t3rc=$?
+  [ "${_t3rc}" -eq 2 ] || _t3="${_t3} kind-desconhecido:rc=${_t3rc}"
+  if [ -z "${_t3}" ]; then
+    record_pass "role-cut: (u3) --kind adoption com papel só de porta (plugins, mini, source) e --kind desconhecido saem rc 2"
+  else record_fail "role-cut: (u3)" "aceitou o que devia recusar:${_t3}"; fi
+  # (u-MUT1) reverter o PREDICADO do destino no _role_cut (o canal sai sempre) devolve o corte de porta
+  #          ao adotado: (u) tem de reprovar. Âncora: a linha do `if` do canal upstream.
+  local _tm1="${d}/vm-t-mut1.sh" _tm1l="${d}/t-mut1.lst"
+  sed 's#^      if \[ "\$1" = plugins \] || \[ "\${KIND}" != adoption \]; then$#      if true; then#' "${vm}" > "${_tm1}"
+  if ! cmp -s "${vm}" "${_tm1}"; then
+    _t_bundle "${_tm1l}" "${_tm1}" --role standalone --kind adoption --repo "${REPO_ROOT}"
+    if [ -n "$(_t_judge "${_tm1l}" up)" ]; then
+      record_pass "role-cut: (u-MUT1) sem o predicado do destino o adotado standalone perde o canal upstream — (u) é load-bearing"
+    else record_fail "role-cut: (u-MUT1)" "o mutante ainda entrega o canal ao adotado — (u) não prova o predicado"; fi
+  else record_fail "role-cut: (u-MUT1) setup" "a mutação não foi aplicada (âncora do if mudou?)"; fi
+  # (u-MUT2) o predicado invertido (o canal fica sempre) poria o canal na PORTA: (u2) tem de reprovar.
+  local _tm2="${d}/vm-t-mut2.sh" _tm2l="${d}/t-mut2.lst"
+  sed 's#^      if \[ "\$1" = plugins \] || \[ "\${KIND}" != adoption \]; then$#      if [ "$1" = plugins ]; then#' "${vm}" > "${_tm2}"
+  if ! cmp -s "${vm}" "${_tm2}"; then
+    _t_bundle "${_tm2l}" "${_tm2}" --role standalone --repo "${REPO_ROOT}"
+    if [ -n "$(_t_judge "${_tm2l}" door)" ]; then
+      record_pass "role-cut: (u-MUT2) com o predicado ignorando o destino a PORTA standalone recebe o canal upstream — (u2) é load-bearing"
+    else record_fail "role-cut: (u-MUT2)" "o mutante não vazou o canal para a porta — (u2) não prova o predicado"; fi
+  else record_fail "role-cut: (u-MUT2) setup" "a mutação não foi aplicada (âncora do if mudou?)"; fi
+  # (u-MUT3) o destino que não chega ao RESOLVEDOR (sem o --kind adoption no corte de comandos): o hook
+  #          viaja e os comandos co-relay/co-evolve não — metade do canal. (u) tem de reprovar.
+  local _tm3="${d}/vm-t-mut3.sh" _tm3l="${d}/t-mut3.lst"
+  sed 's#^  \[ "\${KIND}" = adoption \] && _kind_arg=(--kind adoption)#  :#' "${vm}" > "${_tm3}"
+  if ! cmp -s "${vm}" "${_tm3}"; then
+    _t_bundle "${_tm3l}" "${_tm3}" --role standalone --kind adoption --repo "${REPO_ROOT}"
+    if grep -q 'faltou:co-relay.md' <<< "$(_t_judge "${_tm3l}" up)"; then
+      record_pass "role-cut: (u-MUT3) sem o destino no resolvedor o adotado perde os comandos do canal — (u) mede o roles.yaml, não só o pathspec"
+    else record_fail "role-cut: (u-MUT3)" "o mutante ainda entrega co-relay ao adotado — (u) não prova o adoption_keeps"; fi
+  else record_fail "role-cut: (u-MUT3) setup" "a mutação não foi aplicada (âncora do _kind_arg mudou?)"; fi
+  # (u4) O DESTINO CHEGA A QUEM COPIA — medido EXECUTANDO os dois helpers da adoção: o resolve-manifest
+  #      (adoção nova) e o vendor-branch (--update), com o default deles (adoption) e com ONION_KIND=door.
+  local _t4="" _t4a _t4d
+  _t4a="$(bash "${REPO_ROOT}/.claude/utils/adopt/resolve-manifest.sh" "${REPO_ROOT}" standalone 2>/dev/null)"
+  _t4d="$(ONION_KIND=door bash "${REPO_ROOT}/.claude/utils/adopt/resolve-manifest.sh" "${REPO_ROOT}" standalone 2>/dev/null)"
+  grep -qxF ':(exclude).claude/commands/meta/co-relay.md' <<< "${_t4a}" && _t4="${_t4} resolve-manifest:adoção-cortou-co-relay"
+  grep -qxF ':(exclude).claude/commands/meta/co-relay.md' <<< "${_t4d}" || _t4="${_t4} resolve-manifest:door-não-cortou"
+  grep -qxF ':(exclude).claude/commands/meta/adopt.md' <<< "${_t4a}" || _t4="${_t4} resolve-manifest:adoção-levou-adopt"
+  _t4a="$(ONION_ROLE=standalone ONION_KIND= bash "${vb}" --print-manifest "${REPO_ROOT}" 2>/dev/null)"
+  _t4d="$(ONION_ROLE=standalone ONION_KIND=door bash "${vb}" --print-manifest "${REPO_ROOT}" 2>/dev/null)"
+  grep -qxF ':(exclude).claude/hooks/co-evolution-inbox-check.sh' <<< "${_t4a}" && _t4="${_t4} vendor-branch:adoção-cortou-hook"
+  grep -qxF ':(exclude).claude/hooks/co-evolution-inbox-check.sh' <<< "${_t4d}" || _t4="${_t4} vendor-branch:door-não-cortou"
+  if [ -z "${_t4}" ]; then
+    record_pass "role-cut: (u4) resolve-manifest e vendor-branch entregam o canal upstream ao adotado standalone por default e o cortam com ONION_KIND=door"
+  else record_fail "role-cut: (u4)" "o destino não chegou a quem copia:${_t4}"; fi
+  # (u5) o --update do adopt.md DERIVA o destino do carimbo do alvo (kind: door → door; sem ele → adoption).
+  #      As duas linhas são EXTRAÍDAS do adopt.md e executadas contra dois carimbos sintéticos.
+  local _t5code _t5="" _t5k
+  _t5code="$(grep -E '^TARGET_KIND=|^if \[ "\$TARGET_KIND" = door \]' "${REPO_ROOT}/.claude/commands/meta/adopt.md" || true)"
+  if [ "$(grep -c . <<< "${_t5code}")" -ne 2 ]; then
+    record_fail "role-cut: (u5) setup" "o adopt.md não tem o par TARGET_KIND=/if — o --update não deriva o destino do carimbo"
+  else
+    mkdir -p "${d}/t5-door/.claude" "${d}/t5-adopted/.claude"
+    printf 'framework: x\nrole: standalone\nkind: door\n' > "${d}/t5-door/.claude/.onion-version"
+    printf 'framework: x\nrole: standalone\n' > "${d}/t5-adopted/.claude/.onion-version"
+    _t5k="$(TARGET="${d}/t5-door" bash -c "${_t5code}"$'\n''printf %s "$ONION_KIND"' 2>/dev/null)"
+    [ "${_t5k}" = door ] || _t5="${_t5} carimbo-door→'${_t5k}'"
+    _t5k="$(TARGET="${d}/t5-adopted" ONION_KIND=door bash -c "${_t5code}"$'\n''printf %s "$ONION_KIND"' 2>/dev/null)"
+    [ "${_t5k}" = adoption ] || _t5="${_t5} carimbo-sem-kind→'${_t5k}'"
+    if [ -z "${_t5}" ]; then
+      record_pass "role-cut: (u5) o --update do adopt.md deriva o destino do carimbo do alvo (kind: door → door; sem kind → adoption, mesmo com ONION_KIND=door herdado)"
+    else record_fail "role-cut: (u5)" "destino derivado errado:${_t5}"; fi
+  fi
+  unset -f _t_bundle _t_judge
 
   rm -rf "${d}"
 }

@@ -47,7 +47,10 @@ _manifest() {  # $1=SOURCE_ROOT → imprime pathspecs existentes, um por linha
   # sem o dir o comando NASCE MORTO no adotante (sinal de campo de um adotante, 2026-09-04).
   # A lista vive UMA vez, em vendor-manifest.sh (SSOT). Quatro cópias eram três a mais, e duas já
   # tinham driftado (medido 2026-09-13).
-  bash "${HERE}/vendor-manifest.sh" --role "${ONION_ROLE:-adopted}" --repo "$1"
+  # o DESTINO (2026-10-11): quem usa o vendor-branch é a ADOÇÃO, e o adotado standalone mantém o canal
+  # upstream que a porta standalone perde. O `--update` do adopt.md exporta ONION_KIND=door se o carimbo
+  # do alvo tiver `kind: door`.
+  bash "${HERE}/vendor-manifest.sh" --role "${ONION_ROLE:-adopted}" --kind "${ONION_KIND:-adoption}" --repo "$1"
 }
 
 # `--print-manifest <SOURCE_ROOT>` — expõe a decisão de transporte que este helper toma, para que

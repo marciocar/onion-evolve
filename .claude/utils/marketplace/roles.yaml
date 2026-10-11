@@ -96,11 +96,15 @@ work_tool_sets:
   # o hook do inbox (hooks/co-evolution-inbox-check.sh), utils/co-evolution/ e utils/federation-transport/.
   # ⚠️ O conjunto `downstream` (co-deliver, co-announce) foi ABSORVIDO aqui em 2026-10-10: era a mesma
   # natureza com outro nome. O campo `downstream:` de cada papel segue como anotação de Camada 3.
+  # personality-sync MOROU em `pending` até 2026-10-11 e entrou aqui por decisão do maestro
+  # (Q_PERSONALITY_SYNC_SEM_CONJUNTO): escreve a linha personality_summary do members.yaml, o registro da
+  # federação. O corte das portas não muda: federation e pending iam para os mesmos papéis (source e hub).
   federation:
     - co-evolve
     - co-relay
     - co-deliver
     - co-announce
+    - personality-sync
   # ADOPTION — instalar e governar o framework em OUTROS repos, e o ledger da federação (federation-*).
   # Companheiros cortados por pathspec: utils/adopt/ (menos o CONTRATO vendor-manifest.sh),
   # validation/federation-*, skills/onion-publish/ e o motor de publicação do marketplace.
@@ -114,10 +118,9 @@ work_tool_sets:
     - federation-status
     - publish                # /meta:publish (F3 das portas, SAC-92): publicar portas é ato da FONTE, par da skill onion-publish
   # PENDING — comando que a matriz NÃO classificou. Fica com source e hub (o status quo dele) e NÃO viaja
-  # para standalone/plugins até o maestro decidir. personality-sync escreve a linha personality_summary do
-  # members.yaml (registro da federação) e tem tag `federation`, mas não está na lista da matriz.
-  pending:
-    - personality-sync
+  # para standalone/plugins até o maestro decidir. VAZIO desde 2026-10-11 (personality-sync foi para
+  # `federation`), e fica como o lugar de quem nascer sem classificação.
+  pending: []
   # MINIMAL (consumer T2) — A DEFINIR quando nascer um consumer real (subconjunto de full).
 
 roles:
@@ -147,6 +150,13 @@ roles:
     optional: [onion-design, onion-compliance]
     work_tools: [full, meta_factory]
     downstream: false   # exposes_downstream sempre vazio — sem sub-adotados
+    # PAPEL DE ADOÇÃO ≠ PAPEL DE PORTA (decisão do maestro, 2026-10-11, nó
+    # D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA): o projeto ADOTADO com papel standalone (carimbo SEM
+    # `kind: door`) mantém o canal upstream com o core; a PORTA onion-standalone (kind: door) segue sem
+    # adoção e federação. Lido só com `--kind adoption` (resolve-role-bundle.sh --tools, vendor-manifest.sh);
+    # os companheiros que não são comando (utils/co-evolution/ e o hook do inbox) seguem o mesmo destino
+    # pelo `_role_cut` do vendor-manifest.sh. Cada nome tem de morar num conjunto (REGRA 37).
+    adoption_keeps: [co-evolve, co-relay]
 
   plugins:       # PORTA onion-plugins — a superficie do standalone empacotada como plugins do Claude Code.
     base: [onion-engineering, onion-product]
