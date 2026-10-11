@@ -1758,7 +1758,9 @@ for t, names in sorted(owner.items()):
 # papel não leva. Nome fora da partição seria capacidade prometida que o corte não sabe entregar.
 for role, spec in (d.get("roles") or {}).items():
     for t in ((spec or {}).get("adoption_keeps") or []):
-        if t not in owner:
+        # e nunca um comando de ADOÇÃO: o companheiro dele (utils/adopt/) segue cortado do standalone, e o
+        # comando nasceria morto no adotado (passada adversarial de 2026-10-11)
+        if t not in owner or "adoption" in owner.get(t, []):
             print("KEEPBAD\t%s\t%s" % (role, t))
 mdir = os.path.join(root, ".claude", "commands", "meta")
 # A partição julga o que é RASTREADO (o que o transporte pode levar): a bancada planta sondas não
@@ -1786,7 +1788,7 @@ PY
       BADSET) violation "HARD" "utils/marketplace/roles.yaml" "papel '${a}' referencia work_tools set '${b}' inexistente em work_tool_sets" ;;
       TOOL) [ -f "${REPO_ROOT}/.claude/commands/meta/${a}.md" ] || violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' sem comando em .claude/commands/meta/${a}.md — crie com /meta:create-command ${a} (ou corrija o nome em work_tool_sets se foi digitado errado)" ;;
       DUPSET) violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' está em MAIS DE UM conjunto (${b}) — os conjuntos particionam commands/meta/: deixe o comando em um só" ;;
-      KEEPBAD) violation "HARD" "utils/marketplace/roles.yaml" "o papel '${a}' declara adoption_keeps '${b}', que não está em NENHUM work_tool_set — o adotado receberia um nome que o corte não sabe entregar; corrija o nome ou classifique o comando" ;;
+      KEEPBAD) violation "HARD" "utils/marketplace/roles.yaml" "o papel '${a}' declara adoption_keeps '${b}', que não está em NENHUM work_tool_set ou é do conjunto adoption — o adotado receberia um nome que o corte não sabe entregar (ou um comando sem o motor dele); corrija o nome ou classifique o comando" ;;
       UNSET) violation "HARD" "utils/marketplace/roles.yaml" "comando /meta:${a} não está em NENHUM work_tool_set — classifique-o (full, meta_factory, federation, adoption ou pending) em roles.yaml; sem classificação o corte por papel decide por default, em silêncio" ;;
       ALLOWDEAD) violation "HARD" "utils/marketplace/roles.yaml" "a allowlist do papel '${a}' nomeia '.claude/${b}', que não existe — corrija o caminho ou tire-o da lista" ;;
       OVERDEAD) violation "HARD" "utils/marketplace/roles.yaml" "o overlay do papel '${a}' aponta a fonte '${b}', que não existe — a porta sairia sem o arquivo próprio dela (o materializador recusa); crie a fonte ou corrija o caminho" ;;
@@ -1826,8 +1828,8 @@ check_moat_boundary() {
   # PODEM entrar num manifesto publicável (o empacotamento é da F4, SAC-93), e o que a regra protege é
   # o que a matriz tira do standalone: adoção (adopt, federation-*, onion-publish, decouple, o motor do
   # marketplace) e federação. Por isso co-evolve e co-relay, que eram "upstream permitido por desenho",
-  # passaram a ser barrados: a matriz os nomeia entre o que sai. personality-sync entra pela mesma razão
-  # do roles.yaml (conjunto `pending`): a matriz não o classificou, e o lado seguro é não publicá-lo.
+  # passaram a ser barrados: a matriz os nomeia entre o que sai. personality-sync também: desde 2026-10-11
+  # ele mora no conjunto `federation` do roles.yaml (decisão do maestro), e federação não se publica.
   # O grafo (*.kg.yaml) segue moat em todo papel: é o SSOT privado, não fábrica.
   local moat_base='^(adopt|federation-.*|co-(announce|deliver|evolve|relay)|co-evolution-inbox-check|personality-sync|decouple-source|assemble-plugin|generate-marketplace|materialize-marketplace-repo)\.(md|sh)$'
   local moat_path='(/utils/adopt/|/utils/marketplace/|/utils/federation/|/utils/federation-transport/|/utils/co-evolution/|/skills/onion-publish/|\.kg\.yaml$)'

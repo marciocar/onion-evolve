@@ -51,8 +51,10 @@ python3 - "${KG}" "${MODE}" "${ROLE}" <<'PY'
 import sys, yaml
 d = yaml.safe_load(open(sys.argv[1], encoding='utf-8')) or {}
 mode, role = sys.argv[2], sys.argv[3]
-# Papéis sem adoção nem federação, e os prefixos do procedimento que eles NÃO recebem (os mesmos
-# que o vendor-manifest.sh corta desses papéis, mais os comandos dos conjuntos adoption/federation).
+# Papéis sem adoção nem federação, e os prefixos do procedimento que eles NÃO recebem (os que o
+# vendor-manifest.sh corta da PORTA desses papéis, mais os comandos dos conjuntos adoption/federation).
+# ⚠️ O kind não é lido aqui: o ADOTADO standalone mantém co-relay/co-evolve (2026-10-11), e nenhuma
+# transição tem procedimento neles hoje (medido), então a projeção é a mesma. Nó com gatilho no grafo.
 NO_ADOPTION = {"standalone", "plugins", "mini"}
 CUT = (".claude/commands/meta/adopt.md", ".claude/commands/meta/federation-", ".claude/commands/meta/co-",
        ".claude/utils/adopt/", ".claude/utils/co-evolution/", ".claude/utils/federation-transport/")

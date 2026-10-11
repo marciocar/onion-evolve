@@ -94,8 +94,8 @@ done
 # Nomes ESPECÍFICOS (comandos achatados no plugin → só o basename resta) + QUALQUER grafo .kg.yaml.
 # ⚠️ MUDOU EM 2026-10-10 (F2 das portas, D_MATRIZ_DE_PORTAS_2026_10): a meta-fábrica (create-*, evolve,
 # absorb-skill) deixou de ser moat — plugins = a superfície do standalone, que a leva. A lista passou a
-# ser a da REGRA 61 nova: adoção, federação (co-evolve e co-relay inclusos) e o comando ainda não
-# classificado pela matriz (personality-sync).
+# ser a da REGRA 61 nova: adoção e federação (co-evolve, co-relay e, desde 2026-10-11, personality-sync,
+# que saiu de `pending` para o conjunto `federation` do roles.yaml).
 leak="$(find "${TARGET}/plugins" -type f \( \
         -name 'adopt.md' -o -name 'federation-*.md' -o -name 'personality-sync.md' \
         -o -name 'co-announce.md' -o -name 'co-deliver.md' -o -name 'co-evolve.md' -o -name 'co-relay.md' \

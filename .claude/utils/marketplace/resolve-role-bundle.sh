@@ -80,6 +80,10 @@ if mode == "tools":
     # o papel de ADOÇÃO soma o que a porta do mesmo papel não leva (2026-10-11). O nome tem de morar num
     # conjunto: comando fora da partição não é capacidade, é erro de digitação (a REGRA 37 também cobra).
     if kind == "adoption":
+        # papel só de PORTA não tem destino de adoção (o vendor-manifest.sh também recusa, rc 2)
+        if role in ("source", "plugins", "mini", "distilled"):
+            sys.stderr.write("ERRO: --kind adoption com o papel %s, que é só de PORTA\n" % role)
+            sys.exit(2)
         known = set()
         for lst in sets.values():
             known |= set(lst or [])
