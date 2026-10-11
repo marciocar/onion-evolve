@@ -120,8 +120,30 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: 2026-10-11
-    verified_against: "o gate reprovou o commit 7d104066"
-    label: "verbo de execucao ANTES de commit <sha> (a forma que a limpeza de sentido apagaria) — o sha manda: DEVE disparar"
+    verified_against: "o gate barrou o commit `7d104066` lido no historico"
+    label: "verbo de execucao ANTES de commit <sha> entre crases (a forma que a limpeza de sentido apagaria) — o sha manda: DEVE disparar"
+
+  - id: C_PROD_REVISOR_REPROVOU_LENDO_O_DIFF
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-10-11
+    verified_against: "reprovei o commit no review lendo o diff"
+    label: "reprovar e vocabulario de REVISOR: ler o diff e leitura de fonte — DEVE disparar"
+
+  - id: C_PROD_DESBLOQUEADO_O_COMMIT
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-10-11
+    verified_against: "desbloqueado o commit e lido o diff"
+    label: "desbloqueado nao e barrado (o radical tem ancora a esquerda) — DEVE disparar"
 
 edges:
   - from: E_PROD_MAS_LEU_COMMIT
@@ -146,5 +168,11 @@ edges:
     to: C_PROD_MAS_LEU_BRANCH
     edge_type: DEPENDS_ON
   - from: C_PROD_REPROVADO_NO_COMMIT_SHA
+    to: C_PROD_MAS_LEU_BRANCH
+    edge_type: DEPENDS_ON
+  - from: C_PROD_REVISOR_REPROVOU_LENDO_O_DIFF
+    to: C_PROD_MAS_LEU_BRANCH
+    edge_type: DEPENDS_ON
+  - from: C_PROD_DESBLOQUEADO_O_COMMIT
     to: C_PROD_MAS_LEU_BRANCH
     edge_type: DEPENDS_ON
