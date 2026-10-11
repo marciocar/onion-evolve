@@ -2,7 +2,8 @@
 title: 'Resíduo — a REGRA 30 varre ids de nó e caminhos de grafo, e o corpus é renomeado pelo id (SAC-99)'
 date: 2026-10-11
 branch: fix/projection-scrub-ids-graph-names
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f08d74bc09f9f8369a86e78b02016b3b061780a8f42a4d13410a3d756c65bbab
+reviewed_code_sha256: 19887b5450f5e05522a5c3c28fd1f30ea57b9235fe7f77067e8601eaca4d9a8e
 findings_total: 7
 findings_real: 7
 findings_fixed: 6

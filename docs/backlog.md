@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**426 itens abertos** em 90 grafo(s) com aberto (de 115 no escopo) · 91 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**428 itens abertos** em 91 grafo(s) com aberto (de 116 no escopo) · 92 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -501,7 +501,7 @@
 | 7.6 | `Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE` | inbox-triage-2026-10 | A REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela) declara fronteira `kind: door` — logo NENHUMA guarda compara |
 | 7.2 | `Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP` | inbox-triage-2026-10 | O `_clean_baseline` NUNCA acha base num adotante cujo `docs/knowledge-base` mistura KBs locais com as do core — relato de brain- |
 | 5.1 | `I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU` | inbox-triage-2026-10 | O GATILHO DESTE ITEM GATED JA DISPAROU E NINGUEM REAVALIOU. O `adopt.md:685` diz, literalmente, "implementacao gated ate o 1o caso |
-| 3.0 | `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM` | inbox-triage-2026-10 | TRES relatos de FALSO POSITIVO de gate, do hub gmill (sinal de 2026-09-30), arquivados sem triagem registrada — o commit de arqu |
+| 3.0 | `Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM` | inbox-triage-2026-10 | TRES relatos de FALSO POSITIVO de gate, do hub-operacoes-enterprise (sinal de 2026-09-30), arquivados sem triagem registrada — o |
 
 ## m2-bridge-logto-2026-07 — 6 item(ns)
 
@@ -643,12 +643,12 @@
 |--:|---|---|---|
 | 10.5 | `Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS` | radar-E3-2026-10-08-r8 | adotar onFailure: block nos PreToolUse (env-guard, protect-main, merge-gate e avaliar o kg-read-leg) e provar ao vivo, com um hook |
 
-## gmill-update-547-2026-10 — 2 item(ns)
+## hub-operacoes-enterprise-update-547-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | gmill-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
-| 8.5 | `Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN` | gmill-update-547-2026-10 | A CURA DE CLASSE DOS VETOS (PR #921) AINDA ASSUME QUE A PRODUCAO SE CHAMA main. Num adotante com GitFlow cuja producao e master  |
+| 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
+| 8.5 | `Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN` | hub-operacoes-enterprise-update-547-2026-10 | A CURA DE CLASSE DOS VETOS (PR #921) AINDA ASSUME QUE A PRODUCAO SE CHAMA main. Num adotante com GitFlow cuja producao e master  |
 
 ## federation-health-2026-07 — 2 item(ns)
 
@@ -726,7 +726,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.2 | `Q_CLAUSULA_11_ONDA_DERIVADA` | rito-task-manager-2026-09 | candidata a CLAUSULA 11 da doutrina de pesquisa: ONDA PRINCIPAL -> GARGALO DERIVADO. Capital mostra o escasso de HOJE; a onda deri |
-| 7.2 | `Q_GMILL_MAIN_DIVERGIU` | rito-task-manager-2026-09 | o main do clone do adotante DIVERGIU do remoto (3x3): push apagaria o ADR da equipe, pull cego reescreveria os updates do Onion  |
+| 7.2 | `Q_HUB_OPERACOES_ENTERPRISE_MAIN_DIVERGIU` | rito-task-manager-2026-09 | o main do clone do adotante DIVERGIU do remoto (3x3): push apagaria o ADR da equipe, pull cego reescreveria os updates do Onion  |
 | 6.0 | `Q_LADO_CLASSICO_DO_ZEN_NAO_MEDIDO` | rito-task-manager-2026-09 | nao ha resposta sobre SUBSTITUTO do ZEN Engine: o lado classico voltou vazio, e o maestro selou 'nao agora' em 2026-10-01 |
 | 4.8 | `Q_COMPROMISSO_ESPERA_COLHEITA` | rito-task-manager-2026-09 | o COMPROMISSO de implementar este rito ainda NAO entrou em fios-abertos.kg.yaml, e a razao e o contrato daquele arquivo: teto de 1 |
 
@@ -787,6 +787,13 @@
 |--:|---|---|---|
 | 5.4 | `Q_MERGE_VERIFICADO_EM_REPO_SEM_CI` | guard-pre-push-2026-10 | LACUNA DO CAMINHO VERIFICADO: ele fecha PR com CI vivo e, pelo escape --ci-inoperante, com CI MORTO (rajada de startup_failure). R |
 | 4.2 | `Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO` | guard-pre-push-2026-10 | REVER (nota do maestro, 2026-10-05: "precisamos rever isso em algum momento"). Nasceu no CI DESTE PR: a faixa 4 da bancada estouro |
+
+## projection-ids-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
+| 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
 
 ## kg-id-valid-from-2026-10 — 2 item(ns)
 
