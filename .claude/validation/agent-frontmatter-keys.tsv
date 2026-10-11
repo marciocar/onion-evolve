@@ -5,7 +5,10 @@
 # um typo (`tool:` no lugar de `tools:`, `modle:`) deixa de passar calado. O Claude Code IGNORA chave
 # que não reconhece, então `tool: Read` some e o agente herda TODAS as ferramentas da sessão.
 #
-# Colunas (TAB): chave · origem (oficial|casa) · quem lê / por que existe
+# Colunas (TAB): chave · origem (oficial|runtime|casa) · quem lê / por que existe
+#
+# RUNTIME — chaves que o binário do Claude Code LÊ do frontmatter de agente sem a doc listá-las (achado do
+# Elenxo da forja, conferido no binário 2.1.296 em 2026-10-11). Acusá-las seria falso positivo contra o runtime.
 #
 # OFICIAIS — tabela "Supported frontmatter fields" de https://code.claude.com/docs/en/sub-agents,
 # lida em 2026-10-11 (18 campos), mais `autoCompactWindow`, que o CHANGELOG da 2.1.296 adicionou ao
@@ -44,3 +47,6 @@ required_env	casa	especialistas de provider (jira, clickup, gamma) — variávei
 optional_env	casa	especialistas de provider — variáveis opcionais, lidas por humano e pelo modelo
 integrations	casa	@onion e especialistas de task manager — integrações declaradas, lidas pelo modelo
 knowledge_bases	casa	especialistas de reunião e postgres — KBs de apoio, lidas pelo modelo
+observer	runtime	Claude Code 2.1.296 — lido pelo schema de agente do binário (lista de exclusão de plugin com initialPrompt, observer, observerMessage, observeSubagents); ausente da doc em 2026-10-11
+observerMessage	runtime	Claude Code 2.1.296 — idem (postamble do observer); ausente da doc em 2026-10-11
+observeSubagents	runtime	Claude Code 2.1.296 — idem; ausente da doc em 2026-10-11

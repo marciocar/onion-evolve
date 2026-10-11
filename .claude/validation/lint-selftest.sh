@@ -27933,18 +27933,25 @@ run_agent_frontmatter_keys_selftests() {
       if (k in ok) next$(printf '\x1f')      if (0) next$(printf '\x1f')cala: agente honesto
       if (k in ok) next$(printf '\x1f')      next$(printf '\x1f')acusa: tool: no lugar de tools:
     { sub(/\r\$/, "") }$(printf '\x1f')    { x = 0 }$(printf '\x1f')acusa: colour: num arquivo CRLF
-    infm && \$0 == "---" { done = 1; next }$(printf '\x1f')    infm && \$0 == "-x-" { done = 1; next }$(printf '\x1f')cala: agente honesto
+    infm && \$0 ~ /^---[ \t]*\$/ { done = 1; flush(); next }$(printf '\x1f')    infm && \$0 == "-x-" { done = 1; flush(); next }$(printf '\x1f')acusa: tool: no lugar de tools:
+    infm && \$0 ~ /^---[ \t]*\$/ { done = 1; flush(); next }$(printf '\x1f')    infm && \$0 == "---" { done = 1; flush(); next }$(printf '\x1f')cala: fecho '---' com tab
+    FNR == 1 { sub(/^\357\273\277/, "");$(printf '\x1f')    FNR == 1 {$(printf '\x1f')acusa: BOM na linha 1
+if (\$0 ~ /^---[ \t]*\$/) infm = 1; else done = 1; next }$(printf '\x1f')if (\$0 == "---") infm = 1; else done = 1; next }$(printf '\x1f')acusa: abertura '--- '
+if (\$0 ~ /^---[ \t]*\$/) infm = 1; else done = 1; next }$(printf '\x1f')infm = 1; next }$(printf '\x1f')cala: arquivo sem frontmatter
+      if (index(\$0, "---") > 0) {$(printf '\x1f')      if (0) {$(printf '\x1f')acusa: '---' no meio do frontmatter
+    END { if (bad) exit 2;$(printf '\x1f')    END { flush(); if (bad) exit 2;$(printf '\x1f')cala: frontmatter sem fecho
+      if (k == "<<") {$(printf '\x1f')      if (0) {$(printf '\x1f')avisa: merge key sai SOFT
+c[2] != "runtime" && $(printf '\x1f')$(printf '\x1f')cala: as 19 chaves oficiais e as 3 de runtime
       if (\$0 ~ /^[[:space:]]/ ||$(printf '\x1f')      if (\$0 ~ /^xx/ ||$(printf '\x1f')cala: agente honesto
 \$0 ~ /^(#|-|\$)/) next$(printf '\x1f')\$0 ~ /^(-|\$)/) next$(printf '\x1f')cala: agente honesto
       k = substr(\$0, 1, p - 1); sub(/[[:space:]]+\$/, "", k)$(printf '\x1f')      k = substr(\$0, 1, p - 1)$(printf '\x1f')cala: 'tools :'
 \047.*\047\$/) k = substr(k, 2, length(k) - 2)$(printf '\x1f')\047.*\047\$/) k = k$(printf '\x1f')acusa: chave entre aspas
       return (bd <= 2) ? best : ""$(printf '\x1f')      return (bd <= 0) ? best : ""$(printf '\x1f')acusa: modle: com a dica model
       return (bd <= 2) ? best : ""$(printf '\x1f')      return (bd <= 9) ? best : ""$(printf '\x1f')acusa: chave sem parente próximo
-    FNR == 1 { if (\$0 == "---") infm = 1; else done = 1; next }$(printf '\x1f')    FNR == 1 { infm = 1; next }$(printf '\x1f')cala: arquivo sem frontmatter
         if (c[1] in ok) {$(printf '\x1f')        if (0) {$(printf '\x1f')rc 2: chave duplicada
-(c[2] != "oficial" && c[2] != "casa")$(printf '\x1f')(0)$(printf '\x1f')rc 2: origem fora de oficial|casa
+(c[2] != "oficial" && c[2] != "runtime" && c[2] != "casa")$(printf '\x1f')(0)$(printf '\x1f')rc 2: origem fora do vocabulário
       if (nok == 0) {$(printf '\x1f')      if (0) {$(printf '\x1f')rc 2: allowlist só com comentários
-      if (sev == "HARD") hard = 1$(printf '\x1f')      hard = 0$(printf '\x1f')acusa: tool: no lugar de tools:
+if (pendsev[i] == "HARD") hard = 1$(printf '\x1f')hard = 0$(printf '\x1f')acusa: tool: no lugar de tools:
 EOF_MUT
   rm -rf "${sb}"
 }
