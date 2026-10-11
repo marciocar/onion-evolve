@@ -1,17 +1,25 @@
 # kg-backlog-guard: on
 # ═══ TETO: 7 NÓS ═══  (emenda 6->7 em 2026-10-05: os achados dos dois updates rodados no mesmo dia)
 meta:
-  id: gmill-update-547-2026-10
+  id: hub-operacoes-enterprise-update-547-2026-10
   schema_version: "1"
   baseline: 2026-10-05
   review_after: 2026-11-05
-  # Triagem do sinal do hub gmill (hub-operacoes-enterprise) de 2026-10-05, resposta ao anúncio de
+  # Triagem do sinal do hub hub-operacoes-enterprise de 2026-10-05, resposta ao anúncio de
   # 2026-10-02 sobre os três falsos positivos. Mora aqui, e não em inbox-triage-2026-10, porque aquele
   # grafo está no teto (7/7). O nó que este sinal responde é
-  # inbox-triage-2026-10#Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM — a aresta é intra-arquivo, então a ligação
-  # vai por id no label.
+  # inbox-triage-2026-10#Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM. Até 2026-10-11 a
+  # ligação ia só por id no label (aresta era intra-arquivo); desde o contrato v4.3 ela é a external_edge
+  # abaixo, que o gate confere contra o corpus — um renome futuro do alvo reprova em vez de calar.
+  # RENOME (SAC-99, 2026-10-11): o id e o caminho deste grafo carregavam o nome da pasta privada do hub
+  # (forma antiga: ⟨pasta privada⟩-update-547-2026-10). Registros históricos (resíduos R56, mailbox
+  # _processed, CHANGELOG da federação) citam o caminho antigo e ficam como estão.
+external_edges:
+  - from: E_HUB_OPERACOES_ENTERPRISE_VEREDITO_DOS_TRES_FALSOS_POSITIVOS
+    to: "docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml#Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM"
+    edge_type: SUPPORTS
 nodes:
-  - id: E_GMILL_VEREDITO_DOS_TRES_FALSOS_POSITIVOS
+  - id: E_HUB_OPERACOES_ENTERPRISE_VEREDITO_DOS_TRES_FALSOS_POSITIVOS
     node_type: evidence
     plane: PROD
     impact: 2
@@ -21,7 +29,8 @@ nodes:
     verified_against: 'sinal docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md, medido pelo hub no pin 547e2e3edf3b com lint-artifacts.sh'
     source_kind: adopter-signal
     trace: 'docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md'
-    label: 'O HUB DEU O VEREDITO dos tres relatos de inbox-triage-2026-10#Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM, medido la: (1) REGRA 45 (Link vendorizado nao aponta caminho core-privado, com catraca) RESOLVIDA — 0 BASELINE-OBSOLETA apos o --update, so um ESCOPO-EXPANDIDO SOFT de uma rodada; (2) vendor-scrub `contains&criteria` ACEITO como por-desenho, o caso vai ao baseline deles; (3) bash-empty-result-guard com heredoc SEGUE SEM MEDICAO — nos dois disparos que eles viram nesta sessao o aviso era pertinente (diff vazio; $? apos pipe). Dois tercos do no fecham; o terco do heredoc fica aberto.'
+    label: 'O HUB DEU O VEREDITO dos tres relatos de inbox-triage-2026-10#Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM, medido la: (1) REGRA 45 (Link vendorizado nao aponta caminho core-privado, com catraca) RESOLVIDA — 0 BASELINE-OBSOLETA apos o --update, so um ESCOPO-EXPANDIDO SOFT de uma rodada; (2) vendor-scrub `contains&criteria` ACEITO como por-desenho, o caso vai ao baseline deles; (3) bash-empty-result-guard com heredoc SEGUE SEM MEDICAO — nos dois disparos que eles viram nesta sessao o aviso era pertinente (diff vazio; $? apos pipe). Dois tercos do no fecham; o terco do heredoc fica aberto.'
+    narrative: "id anterior (SAC-99, 2026-10-11): E_⟨pasta privada⟩_VEREDITO_DOS_TRES_FALSOS_POSITIVOS — o id carregava o nome da pasta privada do hub e foi trocado pelo id do members.yaml (selo da O7: labels e ids usam o id). Registros históricos (resíduos R56, mailbox _processed, CHANGELOG da federação) citam a forma antiga e ficam como estão."
     provenance:
       source: "docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md"
       locator: "sinal docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md, medido pelo hub no pin 547e2e3edf3b com lint-artifacts.sh"
@@ -129,7 +138,7 @@ edges:
   - from: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1
     to: Q_UPDATE_REMEDE_DEPOIS_DO_MERGE
     edge_type: SUPPORTS
-  - from: E_GMILL_VEREDITO_DOS_TRES_FALSOS_POSITIVOS
+  - from: E_HUB_OPERACOES_ENTERPRISE_VEREDITO_DOS_TRES_FALSOS_POSITIVOS
     to: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1
     edge_type: SUPPORTS
   - from: Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE

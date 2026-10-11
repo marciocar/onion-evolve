@@ -76,6 +76,19 @@ for f in files:
     if tracked:
         old = subprocess.run(["git", "-C", root, "show", f"HEAD:{path}"], capture_output=True, text=True)
         old_text = old.stdout if old.returncode == 0 else None
+        # RENOME (SAC-99, 2026-10-11): `git mv` deixa o arquivo rastreado no índice, mas HEAD não tem o caminho
+        # novo — e sem esta busca a dívida HERDADA do arquivo inteiro voltava cobrada como piora (o grafo
+        # renomeado no SAC-99 acusou 7 labels longos e 1 data sem aspas que ele sempre teve). Renomear não é
+        # escrever: a versão de antes é a do caminho ANTIGO em HEAD, e só o rename que o próprio git detecta conta.
+        if old_text is None:
+            ren = subprocess.run(["git", "-C", root, "diff", "--cached", "-M", "--name-status", "--diff-filter=R",
+                                  "HEAD", "--"], capture_output=True, text=True)
+            for line in ren.stdout.splitlines():
+                parts = line.split("\t")
+                if len(parts) == 3 and parts[2] == path:
+                    old = subprocess.run(["git", "-C", root, "show", f"HEAD:{parts[1]}"], capture_output=True, text=True)
+                    old_text = old.stdout if old.returncode == 0 else None
+                    break
     # o índice do corpus só se monta quando o grafo usa external_edges e, desde o kit v4.3.2, só lê os grafos
     # que as referências citam. Os alvos saem do DOCUMENTO PARSEADO, não do regex de linha do kit: o regex
     # perde alvo escrito com escape YAML (\x2F, \u0023, continuação de linha) ou chave entre aspas, e aí o

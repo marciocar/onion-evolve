@@ -2809,6 +2809,60 @@ MEOF
   if ! bash "${helper}" --terms "${tmp}/nao-existe.txt" "${tmp}/surface" >/dev/null 2>&1; then
     record_pass "projection-safety: (T3) --terms ausente → HARD (P0, mesma disciplina do members)"
   else record_fail "projection-safety: (T3)" "sem lista de termos a guarda passou verde — proteção fantasma"; fi
+
+  # ── P7 (SAC-99, 2026-10-11) — IDS DE NÓ e CAMINHOS DE GRAFO (`--kg-identifiers`) ──────────────
+  # O defeito VERBATIM na forma (onda O4): um id `Q_<pasta>_MAIN_DIVERGIU` e um grafo
+  # `<pasta>-update-547-2026-10/` com o nome da pasta privada de um hub cujo id é slug neutro — e o nome
+  # só constava do client-terms.txt, que esta guarda não lia. Termos INVENTADOS (Fantasia, Beta Co).
+  # Roda como o lint roda: `--kg-identifiers --format tsv <raiz>`, contando as linhas HARD.
+  mkdir -p "${tmp}/kg/fantasia-update-547-2026-10" "${tmp}/kg/limpo"
+  printf '# lista declarada (fixture)\nFantasia\nopenly-public\nBeta Co\n' > "${tmp}/client-terms.txt"
+  _p7_graph() {  # $1 = id de um nó · $2 = label (o resto é fixo)
+    printf 'meta:\n  id: limpo\n  schema_version: "1"\nnodes:\n  - id: %s\n    node_type: question\n    status: open\n    label: "%s"\n' "$1" "$2"
+  }
+  _p7() {  # → imprime a saída tsv do helper sobre ${tmp}/kg
+    bash "${helper}" --kg-identifiers --format tsv --members "${tmp}/members.yaml" "${tmp}/kg" 2>/dev/null || true
+  }
+  local p7o
+  # (P7a) id de nó com o nome DECLARADO só no client-terms → HARD ID-NO, pela LINHA, sem ecoar o id no log
+  _p7_graph Q_FANTASIA_MAIN_DIVERGIU "pergunta" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  p7o="$(_p7)"
+  if LC_ALL=C grep -q $'^HARD\tID-NO\t.*limpo.kg.yaml\tid na linha 5 ' <<< "${p7o}" && ! grep -qi 'fantasia_main' <<< "${p7o}"; then
+    record_pass "projection-safety: (P7a) id de nó com nome declarado no client-terms → HARD ID-NO pela linha (o id não vaza no log)"
+  else record_fail "projection-safety: (P7a)" "esperava HARD ID-NO na linha 5 sem ecoar o id: ${p7o:0:300}"; fi
+  # (P7b) CAMINHO do grafo com o nome declarado → HARD NOME-GRAFO
+  _p7_graph Q_NEUTRO "pergunta" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  _p7_graph Q_NEUTRO "pergunta" > "${tmp}/kg/fantasia-update-547-2026-10/fantasia-update-547-2026-10.kg.yaml"
+  p7o="$(_p7)"
+  if LC_ALL=C grep -q $'^HARD\tNOME-GRAFO\t.*fantasia-update-547-2026-10.kg.yaml' <<< "${p7o}" \
+     && ! LC_ALL=C grep -q $'\t.*limpo.kg.yaml\t' <<< "${p7o}"; then
+    record_pass "projection-safety: (P7b) caminho de grafo com nome declarado → HARD NOME-GRAFO (o grafo limpo cala)"
+  else record_fail "projection-safety: (P7b)" "esperava NOME-GRAFO só no grafo do caminho sujo: ${p7o:0:300}"; fi
+  rm -rf "${tmp}/kg/fantasia-update-547-2026-10"
+  # (P7c) POLARIDADE HONESTA — o termo declarado que É id público de membro (openly-public) no id de nó, e o
+  #       nome declarado DENTRO DO LABEL (o selo da O7 mantém domínio e arquivo de deploy verbatim) → cala
+  _p7_graph Q_OPENLY_PUBLIC_ATUALIZOU "rota fantasia.exemplo.com no vhost fantasia.caddy" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  p7o="$(_p7)"
+  if ! LC_ALL=C grep -q '^HARD' <<< "${p7o}"; then
+    record_pass "projection-safety: (P7c) id público de membro no id e nome declarado só no label → cala (sem falso positivo)"
+  else record_fail "projection-safety: (P7c)" "falso positivo no id público ou no label: ${p7o:0:300}"; fi
+  # (P7d) termo DERIVADO do members.yaml (a anotação CONFIDENCIAL) também alimenta o P7
+  _p7_graph E_ACMECORP_VEREDITO "evidência" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  p7o="$(_p7)"
+  if LC_ALL=C grep -q $'^HARD\tID-NO\t' <<< "${p7o}"; then
+    record_pass "projection-safety: (P7d) nome derivado do members.yaml num id de nó → HARD ID-NO"
+  else record_fail "projection-safety: (P7d)" "o termo derivado não chegou ao P7: ${p7o:0:300}"; fi
+  # (P7e) NORMALIZAÇÃO — termo com espaço (Beta Co) acha o id com `_` (E_BETA_CO_X)
+  _p7_graph E_BETA_CO_X "evidência" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  p7o="$(_p7)"
+  if LC_ALL=C grep -q $'^HARD\tID-NO\t' <<< "${p7o}"; then
+    record_pass "projection-safety: (P7e) termo com espaço acha o id com sublinhado (normalização)"
+  else record_fail "projection-safety: (P7e)" "a normalização não casou Beta Co com E_BETA_CO_X: ${p7o:0:300}"; fi
+  # (P7f) o DISPATCHER do lint chama o P7 sobre docs/ (a guarda exercitada e não registrada nunca dispara)
+  if grep -q -- '--kg-identifiers --format tsv "${REPO_ROOT}/docs"' "${SCRIPT_DIR}/lint-artifacts.sh"; then
+    record_pass "projection-safety: (P7f) o check_projection_safety do lint invoca o P7 sobre docs/"
+  else record_fail "projection-safety: (P7f)" "o lint não chama --kg-identifiers — o P7 nunca dispara"; fi
+  rm -f "${tmp}/client-terms.txt"
 }
 
 # Guardas do modo --state (a fila de abertos) — irmão do --radar.
@@ -25325,6 +25379,18 @@ run_kg_contract_check_selftests() {
   if [ "${rc}" -eq 1 ] && grep -q "MACHINE-PATH E_A.label: '//home/' (dbl)" <<< "${out}" && ! grep -q "Q_A.label" <<< "${out}"; then
     record_pass "kg-contract-check: (j3) rastreado que ganha caminho novo → rc 1 só pelo novo (o herdado não é cobrado)"
   else record_fail "kg-contract-check: (j3)" "esperava rc 1 só com o //home novo: rc=${rc} ${out}"; fi
+  # (k) RENOME (SAC-99, 2026-10-11): `git mv` de um grafo com dívida HERDADA (data sem aspas desde a base) não
+  #     vira piora — a versão de antes é a do caminho antigo em HEAD. E o renomeado que GANHA código novo segue
+  #     reprovando (o renome não vira isenção). Mutante: tirar o bloco do rename deixa (k1) rc 1 → reprova.
+  ( cd "${sb}" && git mv g/divida.kg.yaml g/renomeada.kg.yaml ) >/dev/null 2>&1
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/renomeada.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ]; then record_pass "kg-contract-check: (k1) grafo renomeado com dívida herdada → rc 0 (renomear não é escrever)"
+  else record_fail "kg-contract-check: (k1)" "dívida herdada do renomeado cobrada como nova: rc=${rc} ${out}"; fi
+  sed -i "s/label: \"evidência A\"/label: \"${long}\"/" "${sb}/g/renomeada.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/renomeada.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q 'form.range.node.label' <<< "${out}"; then
+    record_pass "kg-contract-check: (k2) renomeado que ganha label longo → rc 1 (o renome não isenta a piora)"
+  else record_fail "kg-contract-check: (k2)" "piora no renomeado não acusada: rc=${rc} ${out}"; fi
   # (f) o checador NÃO deixa bytecode no vendor. Medido em 2026-10-08: rodar o leitor de referência sem -B
   #     plantava tools/__pycache__/*.pyc, e o `kg_vendor.py check` seguinte reprovava o vendor como
   #     "divergente da tag" (o check rejeita bytecode de propósito). Rodamos sem PYTHONDONTWRITEBYTECODE,

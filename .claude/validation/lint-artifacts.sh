@@ -3993,6 +3993,8 @@ check_kg_view_sync() {
 #   Termos são DERIVADOS de members.yaml (nunca hardcoded — nome de cliente no
 #   script seria o próprio vazamento).
 #   Hub de privacidade: as REGRAS 33 e 36 derivam desta (threat models distintos).
+#   P7 (SAC-99, 2026-10-11): também IDS DE NÓ e CAMINHOS DE GRAFO de todo o corpus em docs/, com os
+#   termos do client-terms.txt — o id e o caminho saem para as projeções geradas de qualquer grafo.
 # ===========================================================================
 check_projection_safety() {
   local helper="${SCRIPT_DIR}/projection-safety.sh"
@@ -4000,7 +4002,7 @@ check_projection_safety() {
   # Honra --only com a MESMA semântica do _find (mantém o selftest O(fixtures × 1)).
   if [ -n "${ONLY_PATH}" ]; then
     case "${ONLY_PATH}" in
-      "${REPO_ROOT}"/site/*|"${REPO_ROOT}"/docs/onion/graph/*|*/federation-console.html|*/members.yaml) : ;;
+      "${REPO_ROOT}"/site/*|"${REPO_ROOT}"/docs/onion/graph/*|*/federation-console.html|*/members.yaml|"${REPO_ROOT}"/docs/*.kg.yaml|*/client-terms.txt) : ;;
       *) return 0 ;;
     esac
   fi
@@ -4025,6 +4027,14 @@ check_projection_safety() {
                "${REPO_ROOT}/docs/onion/federation-map.md")
   fi
   out="$(bash "${helper}" --format tsv "${surfaces[@]}" 2>/dev/null || true)"
+  # P7 (SAC-99, 2026-10-11): IDS DE NÓ e CAMINHOS DE GRAFO de todo o corpus em docs/. O id e o caminho são
+  # o que as projeções geradas (índice de leitura do KG, backlog projetado) copiam de QUALQUER grafo, não só
+  # dos de docs/onion/graph — e a varredura de conteúdo acima não os via (dano medido na onda O4: 4 ids e 1
+  # grafo com o nome da pasta privada de um hub). Folha não entra: lá os grafos são do próprio adotante.
+  if [ "${IS_LEAF}" -ne 1 ] && [ -d "${REPO_ROOT}/docs" ]; then
+    out="${out}
+$(bash "${helper}" --kg-identifiers --format tsv "${REPO_ROOT}/docs" 2>/dev/null || true)"
+  fi
   [ -n "${out}" ] || return 0
   while IFS=$'\t' read -r sev tag path msg; do
     [ -n "${sev}" ] || continue

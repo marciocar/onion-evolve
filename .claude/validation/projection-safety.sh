@@ -43,6 +43,9 @@
 #  P4 — O TERMO CONTA EM QUALQUER POSIÇÃO, inclusive dentro de identificadores.
 #       Lição de campo (leva 3 da modelagem): nome de cliente vazou para o `id:`
 #       de um nó, não só para o label — scrub que só olha prosa não vê.
+#  P7 — ID DE NÓ E CAMINHO DE GRAFO (`--kg-identifiers`, SAC-99, 2026-10-11): o id e o caminho de
+#       todo .kg.yaml saem para as projeções geradas, então são varridos no corpus inteiro, com os
+#       termos derivados MAIS o client-terms.txt. Detalhe e teto no bloco P7, mais abaixo.
 #  P5 — LISTA VAZIA É SUSPEITA, não sucesso. Se a derivação não produzir termo
 #       algum, a guarda não tem o que proteger e passaria verde para sempre —
 #       exatamente o NO-OP silencioso. Zero termos → FALHA ALTO.
@@ -52,6 +55,7 @@
 #   projection-safety.sh [<superfície>...]     # default: site/
 #   projection-safety.sh --emit-terms          # imprime os termos derivados
 #   projection-safety.sh --members <path> ...  # fonte alternativa (fixtures)
+#   projection-safety.sh --kg-identifiers [<raiz>...]  # P7: ids de nó e caminhos de grafo (default: docs/)
 #
 # Saída: 0 = limpo · 1 = violação HARD ou pressuposto quebrado
 
@@ -62,6 +66,7 @@ MEMBERS="${REPO_DIR}/docs/evolution/federation/members.yaml"
 MARKERS='CONFIDENCIAL|PRIVADO'          # P1 — vocabulário fechado
 EMIT_ONLY=0
 FEDERATION=0
+KG_IDS=0
 FORMAT=human
 TERMS_FILE=""                           # #7 do relay: lista de termos DECLARADA (client-safe do adotante)
 SURFACES=()
@@ -70,6 +75,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --emit-terms) EMIT_ONLY=1; shift ;;
     --federation) FEDERATION=1; shift ;;
+    --kg-identifiers) KG_IDS=1; shift ;;      # SAC-99: ids de nó e nomes de grafo (ver bloco P7)
     --members)    MEMBERS="$2"; shift 2 ;;
     --terms)      TERMS_FILE="$2"; shift 2 ;;   # gate client-safe genérico: o adotante declara os PRÓPRIOS termos (nomes de cliente)
     --format)     FORMAT="$2"; shift 2 ;;
@@ -83,6 +89,7 @@ done
 # ficavam FORA da auditoria default, então a guarda nasceu cega justamente para a superfície do seu
 # próprio incidente de origem. Agora entram por padrão (ambos estavam limpos ao serem incluídos —
 # ampliar cobertura aqui não trocou verde por vermelho, só deixou de ser cego).
+N_USER_SURFACES=${#SURFACES[@]}   # o P7 (--kg-identifiers) tem raiz default própria: docs/
 if [ ${#SURFACES[@]} -eq 0 ]; then
   SURFACES=("${REPO_DIR}/site")
   for extra in "${REPO_DIR}/docs/onion/federation-console.html" "${REPO_DIR}/docs/onion/federation-map.md"; do
@@ -366,6 +373,97 @@ if [ "${n_terms}" -lt 2 ]; then
   echo "  (P5) Sem termos a guarda passaria verde para sempre: é NO-OP, não aprovação."
   echo "  Confira o vocabulário de marcadores (${MARKERS}) contra members.yaml."
   exit 1
+fi
+
+# ── P7: IDS DE NÓ e NOMES DE GRAFO (`--kg-identifiers`, SAC-99) ──────────────
+#
+# O PONTO CEGO (medido 2026-10-10, onda O4 da migração de provenance; renomeado em 2026-10-11): o `id:` de
+# quatro nós e o caminho de um grafo carregavam o nome da PASTA PRIVADA de um hub cujo `id` público é slug
+# neutro. Nada acusava, por DOIS motivos que se somavam:
+#   (1) a varredura de conteúdo só olha as superfícies públicas enumeradas — e grafo de pesquisa não é
+#       uma delas, embora o id e o caminho dele SAIAM para as projeções geradas (o índice de leitura do KG,
+#       o backlog projetado), que copiam exatamente estas duas coisas: id e caminho;
+#   (2) o nome privado não estava nos termos DERIVADOS do members.yaml — morava só no `client-terms.txt`,
+#       a fonte declarada que a REGRA 36 já lê e esta guarda não lia. Slug neutro fecha a vitrine e, no
+#       mesmo movimento, desliga a busca (a lição já registrada no próprio client-terms.txt).
+# ESCOPO DELIBERADO — id e caminho, não label: label tem trilha própria (as ondas da migração trocam o nome
+# privado pelo id com juiz linha a linha), e o selo do maestro na O7 manteve verbatim o DOMÍNIO e o ARQUIVO
+# DE DEPLOY. Varrer label aqui acusaria o que o selo manteve — falso positivo, que treina a ignorar o veto.
+# TERMOS: os derivados (P0–P2) + o client-terms.txt ao lado do members.yaml (aditivo: ausente, nada muda),
+# MENOS o termo cuja forma normalizada É um id de membro — id é público por P2 (`granaai` no id de nó é o
+# id, não o nome comercial). NORMALIZAÇÃO: caixa baixa e `-` `.` espaço → `_`, porque o id de nó usa `_` e
+# o caminho usa `-` (`Grana AI` tem de achar `GRANA_AI` e `grana-ai`).
+# A saída NÃO imprime o id nem o caminho casados: diz a LINHA. O log do lint não pode ser o novo vazamento.
+kg_ids_audit() {
+  local ct="${FED_DIR}/client-terms.txt" files=() f r terms pubids out
+  local roots=()
+  if [ "${N_USER_SURFACES}" -gt 0 ]; then roots=("${SURFACES[@]}"); else roots=("${REPO_DIR}/docs"); fi
+  terms="${TERMS_CI}"
+  [ -r "${ct}" ] && terms="${terms}
+$(grep -vE '^[[:space:]]*(#|$)' "${ct}" || true)"
+  pubids="$(awk '/^[[:space:]]*-[[:space:]]*id:[[:space:]]/{v=$0; sub(/^[^:]*:[[:space:]]*/,"",v); sub(/[[:space:]]*#.*$/,"",v); gsub(/^[[:space:]]+|[[:space:]]+$/,"",v); if (v!="") print v}' "${MEMBERS}" 2>/dev/null || true)"
+  for r in "${roots[@]}"; do
+    [ -e "${r}" ] || continue
+    while IFS= read -r f; do [ -n "${f}" ] && files+=("${f}"); done <<EOF
+$(find "${r}" -type f -name '*.kg.yaml' -not -path '*/fixtures/*' -not -path '*/kg-inbox/_rejected/*' -not -path '*/kg-inbox/_sealed/*' 2>/dev/null | sort)
+EOF
+  done
+  out="$(awk -v terms="${terms}" -v pubids="${pubids}" -v repo="${REPO_DIR}/" '
+    function norm(s) { s=tolower(s); gsub(/[-. ]/,"_",s); return s }
+    BEGIN {
+      np=split(pubids, P, "\n"); for (i=1;i<=np;i++) if (P[i]!="") pub[norm(P[i])]=1
+      nt=split(terms, T, "\n"); k=0
+      for (i=1;i<=nt;i++) { t=T[i]; gsub(/^[[:space:]]+|[[:space:]]+$/,"",t)
+        if (length(t)<3) continue; t=norm(t); if (t in pub) continue; if (t in seen) continue
+        seen[t]=1; term[++k]=t }
+      if (k==0) { print "NOTERMS"; exit }
+    }
+    FNR==1 {
+      rel=FILENAME; if (index(rel,repo)==1) rel=substr(rel,length(repo)+1)
+      nrel=norm(rel)
+      for (j=1;j<=k;j++) if (index(nrel,term[j])) { print "NOME\t" rel "\t0"; break }
+    }
+    /^[[:space:]]*(-[[:space:]]+)?id:[[:space:]]*/ {
+      v=$0; sub(/^[^:]*:[[:space:]]*/,"",v); sub(/[[:space:]]+#.*$/,"",v); gsub(/["'"'"']/,"",v)
+      nv=norm(v)
+      for (j=1;j<=k;j++) if (index(nv,term[j])) { print "ID\t" rel "\t" FNR; break }
+    }
+  ' "${files[@]}" /dev/null)"
+  if [ "${out}" = "NOTERMS" ]; then
+    if [ "${FORMAT}" = "tsv" ]; then
+      printf 'HARD\tNO-OP\tdocs/evolution/federation/members.yaml\tP7 sem termo algum depois de excluir os ids públicos — a varredura de ids e nomes de grafo passaria verde para sempre (P5)\n'
+    else echo "✗ HARD projection-safety (P7): nenhum termo para varrer ids e nomes de grafo — NO-OP não é aprovação."; fi
+    return 1
+  fi
+  local viol=0 kind path line
+  while IFS="$(printf '\t')" read -r kind path line; do
+    [ -n "${kind}" ] || continue
+    viol=$((viol+1))
+    if [ "${kind}" = "NOME" ]; then
+      if [ "${FORMAT}" = "tsv" ]; then
+        printf 'HARD\tNOME-GRAFO\t%s\to CAMINHO do grafo carrega nome comercial de membro privado — o caminho sai para o índice de leitura do KG e o backlog projetado; renomeie usando o id do members.yaml (git mv + referências)\n' "${path}"
+      else echo "  ✗ HARD [NOME-GRAFO] ${path}: o caminho do grafo carrega nome comercial de membro privado — renomeie pelo id do members.yaml"; fi
+    else
+      if [ "${FORMAT}" = "tsv" ]; then
+        printf 'HARD\tID-NO\t%s\tid na linha %s carrega nome comercial de membro privado — o id sai para as projeções do KG; troque pelo id do members.yaml e reescreva as arestas (selo O7: labels e ids usam o id)\n' "${path}" "${line}"
+      else echo "  ✗ HARD [ID-NO] ${path}:${line}: id carrega nome comercial de membro privado — troque pelo id do members.yaml"; fi
+    fi
+  done <<EOF
+${out}
+EOF
+  if [ "${FORMAT}" != "tsv" ]; then
+    echo "=== Segurança de projeção — ids de nó e nomes de grafo (P7) ==="
+    echo "  Grafos varridos : ${#files[@]}"
+    if [ "${viol}" -gt 0 ]; then echo "✗ REPROVA — ${viol} id(s)/caminho(s) com nome comercial."; return 1; fi
+    echo "OK ✓ — nenhum id de nó nem caminho de grafo carrega nome comercial."
+  fi
+  return 0
+}
+if [ "${KG_IDS}" = "1" ]; then
+  kg_ids_audit
+  rc=$?
+  [ "${FORMAT}" = "tsv" ] && [ "${rc}" -ne 0 ] && exit 0   # tsv: a linha HARD já saiu; o lint decide pelo conteúdo
+  exit "${rc}"
 fi
 
 # ── P6: o TRECHO PROJETADO do `name:` tem de ser o próprio slug ──────────────

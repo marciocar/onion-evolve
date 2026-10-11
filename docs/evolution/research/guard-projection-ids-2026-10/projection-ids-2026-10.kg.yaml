@@ -1,0 +1,112 @@
+# kg-backlog-guard: on
+# ═══ TETO: 6 NÓS ═══
+meta:
+  id: guard-projection-ids-2026-10
+  schema_version: "1"
+  baseline: "2026-10-11"
+  review_after: "2026-11-25"
+  note: "Forja do SAC-99 (selado pelo maestro em 2026-10-09): a REGRA 30 (Segurança de PROJEÇÃO: nome comercial de membro privado não sai) passa a varrer ids de nó e caminhos de grafo (P7, --kg-identifiers), e o corpus é renomeado com reconciliação. Destino da forja de guarda (peça 5 do conjunto do comando /meta:forge-guard)."
+nodes:
+  - id: E_ID_E_CAMINHO_FORA_DO_ALCANCE_DA_REGRA_30
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-10-11"
+    source_tier: 10
+    label: "O DEFEITO MEDIDO: 4 ids de nó e 1 grafo (id e caminho) carregavam o nome da pasta privada do hub-operacoes-enterprise, e a REGRA 30 não acusava. Achado na onda O4 da migração de provenance (P6/M6) e listado pelo juiz da O7 (A3)."
+    narrative: "Duas causas somadas. (1) A varredura de conteúdo da REGRA 30 só olha as superfícies públicas enumeradas (site, docs/onion/graph, console, mapa), mas o id e o caminho de QUALQUER grafo saem para as projeções geradas (índice de leitura do KG e backlog projetado), que copiam exatamente essas duas coisas. (2) O nome privado não estava entre os termos derivados do members.yaml: o id do membro é slug neutro e o nome só constava do client-terms.txt, que a REGRA 36 lia e a REGRA 30 não. Reprodução em 2026-10-11: o P7 rodado sobre as versões de origin/main (e06d2fae) dos quatro grafos devolve 6 HARD — 4 ID-NO de nó, 1 ID-NO do meta.id e 1 NOME-GRAFO — e ZERO nos ids com o id público granaai."
+    trace: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o7-juiz-resumo.md"
+    verified_against: "o7-juiz-resumo.md §A3 (os 4 ids) e o4-resumo.md item 8 (o grafo); reprodução: bash .claude/validation/projection-safety.sh --kg-identifiers --format tsv sobre cópias de origin/main e06d2fae dos 4 grafos = 6 linhas HARD"
+    provenance:
+      source: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o7-juiz-resumo.md"
+      locator: "§Itens para o maestro, A3 (os quatro ids com o nome privado); o4-resumo.md item 8 e o4-juiz-resumo.md M6 (o grafo e a REGRA 30 não olhar ids)"
+      method: "medição: P7 rodado sobre as versões de origin/main e06d2fae, depois da leitura dos resumos das ondas O4 e O7"
+      locality: "repo"
+
+  - id: D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: done
+    verified_at: "2026-10-11"
+    label: "Substrato: estender a guarda que JÁ cobre a classe (projection-safety.sh, REGRA 30) com o modo P7 --kg-identifiers, chamado pelo check_projection_safety sobre docs/. Escopo: id e caminho, nunca label."
+    narrative: "O censo da forja (guard-census, 2026-10-11) mostrou a classe coberta por projection-safety.sh; re-forjar seria a segunda verdade numa guarda de segurança. Termos: os derivados do members.yaml + o client-terms.txt ao lado dele (aditivo), menos o termo cuja forma normalizada é id de membro (id é público, P2). Normalização caixa-baixa com - . espaço → _, porque o id de nó usa _ e o caminho usa -. Label fica FORA de propósito: o selo do maestro na O7 manteve verbatim o domínio e o arquivo de deploy, e a trilha dos labels é a das ondas com juiz linha a linha; varrer label aqui seria falso positivo. A saída diz a LINHA, nunca o id casado — o log do lint não pode ser o vazamento novo. Folha (role adopted) não entra."
+    trace: ".claude/validation/projection-safety.sh"
+    provenance:
+      source: ".claude/validation/projection-safety.sh"
+      locator: "bloco P7 (kg_ids_audit) e a chamada em lint-artifacts.sh check_projection_safety"
+      method: "leitura: o artefato escrito nesta forja, conferido contra o censo de guardas"
+      locality: "repo"
+
+  - id: E_SEIS_CASOS_SEIS_MUTANTES_MORDEM
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-10-11"
+    label: "Bancada: 6 casos novos em run_projection_safety_selftests (P7a–P7f), as duas polaridades, e 6 mutantes por ops/mutate-and-restore.sh, todos mordendo com LC_ALL=C. No corpus real (146 grafos de docs/) o P7 cala depois do renome."
+    narrative: "Mutantes: (M1) sem ler o client-terms → P7a, P7b e P7e reprovam; (M2) sem excluir id público → P7c (polaridade honesta) reprova; (M3) sem o teste do caminho → P7b; (M4) sem normalização → P7e; (M5) sem a varredura de id → P7a, P7d, P7e; (M6) o dispatcher sem --kg-identifiers → P7f. O caso honesto P7c põe o nome declarado DENTRO do label (a forma do domínio mantido pelo selo) e um termo declarado que é id público no id do nó: cala."
+    trace: ".claude/validation/lint-selftest.sh"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families projection_safety = 19/19; cada mutante via ops/mutate-and-restore.sh com a mesma família reprovando o(s) caso(s) nomeado(s); restauração conferida (0 ONION_MUTANTE)"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_projection_safety_selftests, bloco P7 (casos P7a a P7f)"
+      method: "medição: bancada e seis mutantes rodados nesta sessão"
+      locality: "repo"
+
+  - id: E_RENOME_COM_RECONCILIACAO_E_ARESTA_CONFERIDA
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-11"
+    label: "Corpus renomeado pelo id do members.yaml: 4 ids de nó e 1 grafo (diretório, arquivo e meta.id). Arestas reescritas, id antigo registrado em narrative com a parte privada marcada, e a ligação por id no label virou external_edge conferida."
+    narrative: "Os ids novos mantêm o SUFIXO (…_MAIN_DIVERGIU, …_FALSOS_POSITIVOS_SEM_TRIAGEM), então quem lê um registro histórico com a forma antiga ainda acha o nó pelo resto do nome. Registros históricos (resíduos R56, mailbox _processed, CHANGELOG da federação, planilhas da migração, o motivo de regressão aceita no .kg-ssot/gate.json) citam a forma antiga e ficam como estão: história reconcilia, não apaga. Nenhuma external_edge do corpus apontava para os ids antigos (medido por git grep). O kg-contract-check passou a reconhecer RENOME (git diff --cached -M): sem isso o grafo renomeado acusava como piora 7 labels longos e 1 data sem aspas que ele sempre teve (casos k1/k2, mutante mordendo). No rito-task-manager-2026-09, tocado pelo renome, a chave gatilho virou x_gatilho (MUST herdado form.unknown-key.node.gatilho)."
+    trace: "docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml"
+    verified_against: "kg-radar --integrity --schema exit 0 e kg-contract-check rc 0 nos 4 grafos tocados; kg_gate do CI rc 0; P7 sobre docs/ = 0 HARD"
+    provenance:
+      source: "docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml"
+      locator: "meta (comentário RENOME e external_edges); narratives 'id anterior' nos 4 nós renomeados"
+      method: "medição: radar, contrato e gate rodados depois do renome"
+      locality: "repo"
+
+  - id: C_TETO_VOCABULARIO_E_LABEL
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: "TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não registrado passa), e não olha label, narrative, comentário nem nome de resíduo R56."
+    narrative: "Medido em 2026-10-11: o nome privado ainda aparece 25 vezes em 6 grafos fora de id e caminho (9 em label; o resto em locator, source e comentário), parte delas o domínio e o arquivo de deploy que o selo da O7 manteve, e dois resíduos R56 têm o nome no arquivo (o nome do arquivo é o slug da branch). Nada disso é cobrado aqui, por desenho. Gatilho para estender: um label com nome privado chegar a uma superfície pública enumerada (aí a varredura de conteúdo da própria REGRA 30 já o pega, se o termo estiver entre os derivados)."
+    trace: ".claude/validation/projection-safety.sh"
+
+  - id: C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: open
+    label: "TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preservado e a narrative 'id anterior' de cada nó renomeado."
+    narrative: "Não há mecanismo de alias de id no contrato (medido: zero chaves former_id/renamed_from no corpus e no kit). Se um consumidor mecânico precisar resolver o id antigo, o caminho é uma chave x_ de alias no contrato, e isso é decisão do kit, não desta guarda."
+    trace: "vendor/kg-ssot/spec/kg-contract-v4.schema.json"
+edges:
+  - from: E_ID_E_CAMINHO_FORA_DO_ALCANCE_DA_REGRA_30
+    to: D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO
+    edge_type: SUPPORTS
+  - from: E_SEIS_CASOS_SEIS_MUTANTES_MORDEM
+    to: D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO
+    edge_type: SUPPORTS
+  - from: E_RENOME_COM_RECONCILIACAO_E_ARESTA_CONFERIDA
+    to: D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO
+    edge_type: SUPPORTS
+  - from: C_TETO_VOCABULARIO_E_LABEL
+    to: D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO
+    edge_type: CONSTRAINS
+  - from: C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA
+    to: E_RENOME_COM_RECONCILIACAO_E_ARESTA_CONFERIDA
+    edge_type: CONSTRAINS

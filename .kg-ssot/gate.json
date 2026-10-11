@@ -1,7 +1,7 @@
 {
   "contract": "kg-contract-v4.schema.json",
   "contract_sha256": "5d3fec7b48f5ad2af1ce80d8193c50032cdbc7aa14827ce04e4c165de10082e5",
-  "graphs": 139,
+  "graphs": 141,
   "failing": {
     "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml": [
       "form.unknown-key.meta.label",
@@ -55,9 +55,6 @@
       "form.unknown-key.edge.provenance"
     ],
     "docs/onion/graph/review-gate-saldo-2026-09.kg.yaml": [
-      "form.unknown-key.node.gatilho"
-    ],
-    "docs/onion/graph/rito-task-manager-2026-09.kg.yaml": [
       "form.unknown-key.node.gatilho"
     ],
     "docs/onion/graph/testes-evidencia-2026-09.kg.yaml": [

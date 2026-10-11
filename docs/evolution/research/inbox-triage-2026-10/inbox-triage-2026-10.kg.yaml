@@ -74,13 +74,14 @@ nodes:
     trace: 'docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md'
     verified_against: 'sinal lido integralmente em 2026-10-02; `_clean_baseline` existe em .claude/utils/adopt/vendor-branch.sh e nao le baseline do stamp'
 
-  - id: Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM
+  - id: Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM
     node_type: question
     plane: DEV
     impact: 2
     confidence: 0.75
     status: open
     label: 'TRES relatos de FALSO POSITIVO de gate, do hub gmill (sinal de 2026-09-30), arquivados sem triagem registrada — o commit de arquivamento afirmou apenas que as 3 KBs do sinal estao em main, o que e verdade e NAO cobre esta secao. Os tres: (1) vendor-scrub FORMA acusando `contains&criteria` — provavelmente POR DESENHO (forma gera candidato, o baseline so encolhe), falta so DECLARAR isso ao remetente; (2) `bash-empty-result-guard` disparando em `$?` apos redirecionamento ou `git commit -F - <<EOF` — o guard tem tratamento de redirect, e o caso do heredoc NAO foi provado (o refutador nao conseguiu executar a sonda na worktree); ⚠️ eu mesmo tropecei numa variante disso em 2026-10-02, travando um `git commit -F -` por 31 minutos a espera de stdin, o que sugere que o caso do heredoc merece medicao e nao descarte; (3) REGRA 45 com ~40 BASELINE-OBSOLETA pos-update — o `--stub-baselines` provavelmente cobre, nao verificado. GATILHO: os tres sao BARATOS de medir e a divida e de COMUNICACAO (o remetente nao sabe o veredito) — fecha na proxima leva que tocar vendor-scrub, o guard de shell, ou o adopt.'
+    narrative: "id anterior (SAC-99, 2026-10-11): Q_⟨pasta privada⟩_FALSOS_POSITIVOS_SEM_TRIAGEM — o id carregava o nome da pasta privada do hub e foi trocado pelo id do members.yaml (selo da O7: labels e ids usam o id). Registros históricos (resíduos R56, mailbox _processed, CHANGELOG da federação) citam a forma antiga e ficam como estão."
     trace: 'docs/evolution/inbox/_processed/2026-09-30-gmill-kbs-zoho-glpi.md'
     verified_against: 'sinal lido integralmente em 2026-10-02 por refutador adversarial; nenhum dos tres relatos tem resposta nos outbox nem no CHANGELOG'
 
@@ -129,7 +130,7 @@ edges:
     to: Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP
     edge_type: SUPPORTS
   - from: E_TRIAGEM_DECLAROU_ENDERECADO_SEM_LER_O_SINAL_INTEIRO
-    to: Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM
+    to: Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM
     edge_type: SUPPORTS
   - from: Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP
     to: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
