@@ -82,6 +82,7 @@ nodes:
       locality: "repo"
 
   - id: E_hub_operacoes_enterprise_demo_route_caddy
+    x_renamed_from: "7186d6f34e5e"
     node_type: evidence
     plane: PROD
     status: confirmed

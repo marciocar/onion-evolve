@@ -390,10 +390,16 @@ fi
 # privado pelo id com juiz linha a linha), e o selo do maestro na O7 manteve verbatim o DOMÍNIO e o ARQUIVO
 # DE DEPLOY. Varrer label aqui acusaria o que o selo manteve — falso positivo, que treina a ignorar o veto.
 # TERMOS: os derivados (P0–P2) + o client-terms.txt ao lado do members.yaml (aditivo: ausente, nada muda),
-# MENOS o termo cuja forma normalizada É um id de membro — id é público por P2 (`granaai` no id de nó é o
-# id, não o nome comercial). NORMALIZAÇÃO: caixa baixa e `-` `.` espaço → `_`, porque o id de nó usa `_` e
-# o caminho usa `-` (`Grana AI` tem de achar `GRANA_AI` e `grana-ai`).
-# A saída NÃO imprime o id nem o caminho casados: diz a LINHA. O log do lint não pode ser o novo vazamento.
+# MENOS o termo cuja forma normalizada É um id de membro — id é público por P2 (`acme-adopter` no id de nó é
+# o id, não o nome comercial). NORMALIZAÇÃO: caixa baixa e `-` `.` espaço → `_`, porque o id de nó usa `_` e
+# o caminho usa `-` (`Acme Corp` tem de achar `ACME_CORP` e `acme-corp`).
+# A saída NÃO imprime o id casado: diz a LINHA (o log do lint não pode ser o vazamento novo). O CAMINHO do
+# grafo SUJO é impresso, sim, porque é o próprio artefato a renomear e o lint precisa apontá-lo; ele já está
+# no histórico do core, que não sai (correção da 1ª redação deste comentário, que afirmava o contrário).
+# TETO declarado: só o estilo de bloco (`- id:` / `id:` numa linha) — o radar, que é awk, também só lê
+# esse; id em estilo flow (`{id: X}`) ou com acento (id só aceita [A-Za-z0-9_]) não é id para o corpus.
+# Não olha o alvo de `trace:` nem o label: o índice de leitura copia o caminho do `trace:` e o backlog
+# copia o label, e o nome privado pode chegar por ali (resíduo nomeado no grafo do SAC-99).
 kg_ids_audit() {
   local ct="${FED_DIR}/client-terms.txt" files=() f r terms pubids out
   local roots=()
@@ -409,24 +415,41 @@ $(find "${r}" -type f -name '*.kg.yaml' -not -path '*/fixtures/*' -not -path '*/
 EOF
   done
   out="$(awk -v terms="${terms}" -v pubids="${pubids}" -v repo="${REPO_DIR}/" '
-    function norm(s) { s=tolower(s); gsub(/[-. ]/,"_",s); return s }
+    function norm(s) { s=tolower(s); gsub(/[-. \/]/,"_",s); return s }
+    function sq(s) { s=tolower(s); gsub(/[^a-z0-9]/,"",s); return s }
+    # termo CURTO (<=4 depois de espremido) so casa como TOKEN inteiro (entre _ ou borda): substring de
+    # sigla acha dentro de palavra alheia (E_SHPE_ORDER, E_CAPITAU_LIMITE — refutador de 2026-10-11).
+    # termo LONGO casa por substring na forma normalizada OU na espremida (sem separador nenhum), que
+    # e a que acha o nome comercial partido em tokens (E_BETA_HAUSS_X para BetaHauss).
+    function hit(s, j,   ns) {
+      ns=norm(s)
+      if (short[j]) return index("_" ns "_", "_" term[j] "_") > 0
+      return index(ns, term[j]) > 0 || index(sq(s), tsq[j]) > 0
+    }
     BEGIN {
-      np=split(pubids, P, "\n"); for (i=1;i<=np;i++) if (P[i]!="") pub[norm(P[i])]=1
+      np=split(pubids, P, "\n"); for (i=1;i<=np;i++) if (P[i]!="") { pub[norm(P[i])]=1; pubsq[sq(P[i])]=1 }
       nt=split(terms, T, "\n"); k=0
       for (i=1;i<=nt;i++) { t=T[i]; gsub(/^[[:space:]]+|[[:space:]]+$/,"",t)
-        if (length(t)<3) continue; t=norm(t); if (t in pub) continue; if (t in seen) continue
-        seen[t]=1; term[++k]=t }
+        if (length(t)<3) continue; if ((norm(t) in pub) || (sq(t) in pubsq)) continue
+        if (norm(t) in seen) continue
+        seen[norm(t)]=1; k++; term[k]=norm(t); tsq[k]=sq(t); short[k]=(length(tsq[k])<=4) }
       if (k==0) { print "NOTERMS"; exit }
+    }
+    # bloco escalar (`narrative: |`): as linhas mais indentadas que a chave são TEXTO, não chave — um
+    # `id:` citado ali não é id (falso positivo medido pelo refutador de 2026-10-11).
+    FNR==1 { blk=-1 }
+    {
+      match($0, /^[ ]*/); ind=RLENGTH
+      if (blk >= 0) { if ($0 ~ /^[[:space:]]*$/ || ind > blk) next; blk=-1 }
+      if ($0 ~ /:[[:space:]]*[|>][-+0-9]*[[:space:]]*$/) blk=ind
     }
     FNR==1 {
       rel=FILENAME; if (index(rel,repo)==1) rel=substr(rel,length(repo)+1)
-      nrel=norm(rel)
-      for (j=1;j<=k;j++) if (index(nrel,term[j])) { print "NOME\t" rel "\t0"; break }
+      for (j=1;j<=k;j++) if (hit(rel,j)) { print "NOME\t" rel "\t0"; break }
     }
     /^[[:space:]]*(-[[:space:]]+)?id:[[:space:]]*/ {
       v=$0; sub(/^[^:]*:[[:space:]]*/,"",v); sub(/[[:space:]]+#.*$/,"",v); gsub(/["'"'"']/,"",v)
-      nv=norm(v)
-      for (j=1;j<=k;j++) if (index(nv,term[j])) { print "ID\t" rel "\t" FNR; break }
+      for (j=1;j<=k;j++) if (hit(v,j)) { print "ID\t" rel "\t" FNR; break }
     }
   ' "${files[@]}" /dev/null)"
   if [ "${out}" = "NOTERMS" ]; then

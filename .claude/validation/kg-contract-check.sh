@@ -79,9 +79,11 @@ for f in files:
         # RENOME (SAC-99, 2026-10-11): `git mv` deixa o arquivo rastreado no índice, mas HEAD não tem o caminho
         # novo — e sem esta busca a dívida HERDADA do arquivo inteiro voltava cobrada como piora (o grafo
         # renomeado no SAC-99 acusou 7 labels longos e 1 data sem aspas que ele sempre teve). Renomear não é
-        # escrever: a versão de antes é a do caminho ANTIGO em HEAD, e só o rename que o próprio git detecta conta.
+        # escrever: a versão de antes é a do caminho ANTIGO em HEAD, e só conta o rename que o próprio git detecta
+        # com similaridade >= 90%. Com o limiar padrão (50%), apagar um grafo A com dívida e criar um B diferente
+        # no mesmo commit faria B herdar a tolerância de A em vez de nascer limpo (refutador de 2026-10-11).
         if old_text is None:
-            ren = subprocess.run(["git", "-C", root, "diff", "--cached", "-M", "--name-status", "--diff-filter=R",
+            ren = subprocess.run(["git", "-C", root, "diff", "--cached", "-M90%", "--name-status", "--diff-filter=R",
                                   "HEAD", "--"], capture_output=True, text=True)
             for line in ren.stdout.splitlines():
                 parts = line.split("\t")
