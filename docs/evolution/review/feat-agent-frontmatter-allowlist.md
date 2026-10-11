@@ -1,6 +1,5 @@
 ---
-reviewed_diff_sha256: e1a6f186d86dd805ac1c3ba8079ec31a952f545bd2df69f099b792a605fa083f
-reviewed_code_sha256: 52b6853e85b7b2a08bdb4711876772e28dbe2778c21f900cf9f57311fb085214
+reviewed_diff_sha256: pendente
 findings_total: 9
 findings_real: 5
 tokens: 152921
@@ -16,6 +15,9 @@ nota: >
   Os cinco foram curados neste PR; os teóricos baratos também (merge key sai SOFT, frontmatter sem fecho
   não é julgado). Fica no teto o mapping de topo todo indentado. 24 casos no --selftest, 22 mutantes
   mordem na bancada, mais 3 por mutate-and-restore. Não houve 2ª passada.
+  Depois do PR aberto, o contexto principal rebaseou sobre a main com a REGRA 101 (#1026): o git fundiu
+  sozinho os dois blocos no lint-artifacts e no lint-selftest. Revisto: famílias agent_frontmatter_keys e
+  veto_onfailure com 40 verdes, 0 vermelhos.
 ---
 
 # Resíduo — `feat/agent-frontmatter-allowlist`
