@@ -709,7 +709,7 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 8.4 | `D_PLANO_DE_ABSORCAO_E_NO` | dissect-forge-2026-10 | desenho da costura: o N4 do dissect escreve nos x_absorb_* no grafo (KG-SSOT first), o dissect-census.sh --plans os le, mede as pe |
+| 8.4 | `D_PLANO_DE_ABSORCAO_E_NO` | dissect-forge-2026-10 | desenho da costura: o N4 do dissect escreve nos x_absorb_* no grafo (KG-SSOT first), o dissect-plans.sh os le, mede as pecas do al |
 | 5.4 | `Q_COSTURA_DISSECT_FORGE` | dissect-forge-2026-10 | costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprend |
 
 ## company-brain-market-2026-07 — 1 item(ns)
