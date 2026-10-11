@@ -2,11 +2,12 @@
 title: 'Resíduo — o nome privado do hub sai de label e narrativa, e o cache do registro alcança a release onion-v1.0.0'
 date: 2026-10-11
 branch: chore/kg-private-name-scrub-and-door-pins
-reviewed_diff_sha256: a76d93f7e776cf9d95adb19d52a7b498a4587d1d6789638369158a69efdfe2e0
-reviewed_code_sha256: ab95ed7405c50096941938f0d82570aed80db6f613cee351664a10b42ea5c05d
+reviewed_diff_sha256: pendente
 findings_total: 2
 findings_real: 2
 findings_fixed: 0
+tokens: 101333
+duration_min: 2
 verdict: APROVADO
 elenxo: sim
 nota: >-
