@@ -676,7 +676,7 @@ else
 fi
 _pin_date="$(git -C "${CORE}" log -1 --format=%cd --date=short "${PIN_FULL}" 2>/dev/null)"
 {
-  printf 'Onion %s%s — porta %s\n\n' "${TAG_PREFIX}" "${VERSION:-${PROPOSED}}" "${DOOR}"
+  printf 'Release %s%s — porta %s\n\n' "${TAG_PREFIX}" "${VERSION:-${PROPOSED}}" "${DOOR}"
   if [ -n "${VERSION}" ]; then printf 'Release selada pelo maestro.\n\n'
   else printf 'PROPOSTA do motor, NÃO selada (ensaio): o número só vale quando o maestro o sela.\n\n'; fi
   printf -- '- pin do core: %s (%s)\n' "${PIN}" "${_pin_date}"
