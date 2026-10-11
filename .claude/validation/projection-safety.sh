@@ -418,9 +418,9 @@ EOF
     function norm(s) { s=tolower(s); gsub(/[-. \/]/,"_",s); return s }
     function sq(s) { s=tolower(s); gsub(/[^a-z0-9]/,"",s); return s }
     # termo CURTO (<=4 depois de espremido) so casa como TOKEN inteiro (entre _ ou borda): substring de
-    # sigla acha dentro de palavra alheia (E_SHPE_ORDER, E_CAPITAU_LIMITE — refutador de 2026-10-11).
+    # sigla acha dentro de palavra alheia (termo Qux em E_QUXE_ORDER — o refutador de 2026-10-11 mediu a forma com siglas reais).
     # termo LONGO casa por substring na forma normalizada OU na espremida (sem separador nenhum), que
-    # e a que acha o nome comercial partido em tokens (E_BETA_HAUSS_X para BetaHauss).
+    # e a que acha o nome comercial partido em tokens (E_FOO_BAR_X para FooBar).
     function hit(s, j,   ns) {
       ns=norm(s)
       if (short[j]) return index("_" ns "_", "_" term[j] "_") > 0
