@@ -40,7 +40,7 @@
 # positivo. Julgar nome solto exigiria adivinhar a raiz pretendida — e um aviso que adivinha é o
 # que treina o leitor a ignorar. Preferi cobertura menor e crível a cobertura maior e barulhenta.
 #
-# EXCEÇÃO À REGRA (b), SAC-81 (sinal do adotante onion-curation, 2026-10-08): o nome solto que é
+# EXCEÇÃO À REGRA (b), SAC-81 (sinal de campo de um adotante, 2026-10-08): o nome solto que é
 # ARQUIVO RASTREADO NA RAIZ DO REPO, com o nome EXATO, entra. O caso que pagou: `trace: "CLAUDE.md"`
 # — a âncora mais importante de um adotante — caía em não-caminho, e o CLAUDE.md ficava FORA do
 # índice de leitura, logo sem vigilância do hook kg-read-leg. Aqui não há raiz a adivinhar: a raiz
@@ -133,10 +133,15 @@ while IFS= read -r g; do
     case "${target}" in *[!A-Za-z0-9_./-]*) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;; esac
     # `./X` e `X` são o MESMO alvo. Normaliza aqui, antes de julgar e de emitir o índice: o hook
     # kg-read-leg tira o `./` do caminho lido, e um índice com `./CLAUDE.md` nunca casava (SAC-81).
+    # ⚠️ AS REGRAS (b) E (c) LEEM O ALVO ORIGINAL (`_orig`), NÃO O NORMALIZADO. A 1ª redação julgava
+    #    o normalizado, e o refutador mediu a regressão: `./missing.md` perdia a barra, caía em
+    #    não-caminho e o TARGET-MISSING que antes reprovava ficava CALADO; `./SYNTHESIS.md` saía de
+    #    vigilância. Quem escreveu `./` declarou caminho; a normalização só serve para casar o índice.
+    _orig="${target}"
     while :; do case "${target}" in ./*) target="${target#./}" ;; *) break ;; esac; done
     [ -n "${target}" ] || { SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue; }
     _root_file=0
-    case "${target}" in
+    case "${_orig}" in
       */*) : ;;
       *)  # (b) com a exceção SAC-81: arquivo rastreado na raiz, nome exato, sem homônimo vizinho.
           case "${ROOT_FILES}" in *"
@@ -158,7 +163,7 @@ ${target}
     #     toda a superfície `.claude/` seria descartada).
     #     O arquivo da raiz (SAC-81) não tem 1º segmento de caminho — `CLAUDE.md` tem ponto e seria
     #     tomado por hostname; ele já provou que existe na raiz, então pula este teste.
-    _first="${target%%/*}"
+    _first="${_orig%%/*}"
     [ "${_root_file}" -eq 1 ] || case "${_first}" in
       .*)  : ;;                                                    # `.claude/…`, `.githooks/…`
       *.*) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;;         # hostname → não julgável
