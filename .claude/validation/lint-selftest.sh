@@ -12392,6 +12392,14 @@ case "$args" in
       fi
       exit 0 ;;
   *"pr view"*headRefOid*)
+      # SAC-85: a API do PR ATRASA o push. As chamadas de nº GH_HEAD_STALE_FIRST..GH_HEAD_STALE_LAST
+      # devolvem o head de ANTES do rebase (o pai do HEAD da worktree), como o GitHub fez no #985.
+      if [ -n "${GH_HEAD_STALE_FIRST:-}" ]; then
+        hk=$(cat "${STUB_HK}" 2>/dev/null || echo 0); hk=$((hk+1)); echo "$hk" > "${STUB_HK}"
+        if [ "$hk" -ge "${GH_HEAD_STALE_FIRST}" ] && [ "$hk" -le "${GH_HEAD_STALE_LAST:-${GH_HEAD_STALE_FIRST}}" ]; then
+          git -C "${STUB_HEAD_FROM}" rev-parse HEAD~1; exit 0
+        fi
+      fi
       if [ -n "${STUB_HEAD_SHA:-}" ]; then echo "${STUB_HEAD_SHA}"
       elif [ -n "${STUB_HEAD_FROM:-}" ]; then git -C "${STUB_HEAD_FROM}" rev-parse HEAD; else echo "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"; fi
       exit 0 ;;
@@ -12684,14 +12692,16 @@ echo "$*" >> "${PF_LOG}"
 if [ "${PF_MODE:-ok}" = fail ]; then
   echo "PR-FINALIZE: conflito REAL em src/x.sh — rebase abortado, nada mudou; resolva à mão" >&2; exit 1
 fi
-echo "r$(wc -l < "${PF_LOG}")" > r; git add r; git -c user.email=t@t -c user.name=t commit -qm rebase
+# --allow-empty: o conteúdo de `r` repete entre casos (o PF_LOG é zerado a cada um), e sem a flag o
+# "rebase" não andava o HEAD — os casos SAC-85 (w3-w6) mediam um rebase que não aconteceu.
+echo "r$(wc -l < "${PF_LOG}")" > r; git add r; git -c user.email=t@t -c user.name=t commit -q --allow-empty -m rebase
 echo "PR-FINALIZE: enviado feat/alguma-coisa @ $(git rev-parse --short HEAD)"
 PFSTUB
   _mva() { # $1=sequência de mergeable  $2=PF_MODE  $3=headRefName ; o SUT roda a partir do repo principal
-    echo 0 > "${d}/n"; echo 0 > "${d}/mk"; : > "${d}/pflog"; : > "${d}/margs"
-    _mv_out="$(cd "${r2}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MK="${d}/mk" GH_MERGEABLE_SEQ="$1" \
+    echo 0 > "${d}/n"; echo 0 > "${d}/mk"; echo 0 > "${d}/hk"; : > "${d}/pflog"; : > "${d}/margs"
+    _mv_out="$(cd "${r2}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MK="${d}/mk" STUB_HK="${d}/hk" GH_MERGEABLE_SEQ="$1" \
                PF_MODE="$2" PF_LOG="${d}/pflog" GH_HEAD_REF="$3" STUB_HEAD_FROM="${w2}" STUB_MERGE_ARGS="${d}/margs" \
-               ONION_MERGE_POLL_SECS=0 ONION_MERGE_WAIT_SECS=5 \
+               ONION_MERGE_POLL_SECS=0 ONION_MERGE_WAIT_SECS=5 ONION_MERGE_HEAD_SYNC_TRIES=3 ONION_MERGE_HEAD_SYNC_POLL=0 \
                GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_MERGE_RC=0 GH_MERGE_OUT=merged \
                bash "${_sut_a:-${sut}}" 999 2>&1)"; _mv_rc=$?
   }
@@ -12721,6 +12731,37 @@ PFSTUB
   if [ "${_mv_rc}" -ne 0 ] && grep -q "depois de 2 rebase" <<< "${_mv_out}" && [ "$(grep -c -- '--rebase' "${d}/pflog")" -eq 2 ]; then
     record_pass "pr-merge-verified: (z) conflito recorrente ⇒ limite de 2 rebases, sem laço"
   else record_fail "pr-merge-verified: (z) laço/limite" "rc=${_mv_rc} pf=[$(cat "${d}/pflog")] out=${_mv_out}"; fi
+
+  # ── (w3)-(w6) A API DO PR ATRASA O PUSH (SAC-85, medido no merge do #985) ──────────────────────
+  # O push da branch rebaseada chegou, e o `headRefOid` lido logo depois ainda era o VELHO; o script
+  # parou dizendo que a branch não era a do PR. O FATO é o ref remoto (`git ls-remote`); a API do PR
+  # é esperada com teto. MUTANTES (ops/mutate-and-restore.sh): teto fixo em 1 leitura (a forma
+  # antiga) → (w3) · sem a parada pelo ref remoto → (w5).
+  # (w3) API velha UMA vez, depois a nova ⇒ espera, o merge segue
+  _mv_out="$(export GH_HEAD_STALE_FIRST=2; _mva "CONFLICTING MERGEABLE" ok feat/alguma-coisa; printf '%s\n__rc=%s' "${_mv_out}" "${_mv_rc}")"
+  if grep -q "__rc=0" <<< "${_mv_out}" && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}" \
+     && [ "$(cat "${d}/hk")" -ge 3 ]; then
+    record_pass "pr-merge-verified: (w3) head do PR atrasado uma leitura ⇒ espera com teto e o merge segue"
+  else record_fail "pr-merge-verified: (w3) corrida do SAC-85" "hk=$(cat "${d}/hk") out=${_mv_out}"; fi
+  # (w4) API velha para sempre, sem ref remoto legível ⇒ para no teto (call 1 + 3 leituras), sem merge
+  _mv_out="$(export GH_HEAD_STALE_FIRST=2 GH_HEAD_STALE_LAST=999; _mva "CONFLICTING MERGEABLE" ok feat/alguma-coisa; printf '%s' "${_mv_out}")"
+  if grep -q "não virou o HEAD da worktree" <<< "${_mv_out}" && [ ! -s "${d}/margs" ] && [ "$(cat "${d}/hk")" -eq 4 ]; then
+    record_pass "pr-merge-verified: (w4) head do PR nunca converge ⇒ para no teto (3 leituras), sem merge"
+  else record_fail "pr-merge-verified: (w4) teto da espera" "hk=$(cat "${d}/hk") margs=[$(cat "${d}/margs")] out=${_mv_out}"; fi
+  # (w5) o ref REMOTO ficou para trás, mesmo com a API concordando ⇒ para na hora (o fato vence a API)
+  git clone -q --bare "${r2}" "${d}/r2-origin.git" >/dev/null 2>&1 || true
+  git -C "${r2}" remote add origin "${d}/r2-origin.git" >/dev/null 2>&1 || true
+  _mva "CONFLICTING MERGEABLE" ok feat/alguma-coisa
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "o push não chegou à branch do PR" <<< "${_mv_out}" && [ ! -s "${d}/margs" ]; then
+    record_pass "pr-merge-verified: (w5) ref remoto atrás do HEAD da worktree ⇒ para na hora, sem merge"
+  else record_fail "pr-merge-verified: (w5) fato do ref remoto ignorado" "rc=${_mv_rc} margs=[$(cat "${d}/margs")] out=${_mv_out}"; fi
+  # (w6) ref remoto no HEAD novo, API velha para sempre ⇒ para no teto dizendo que o GitHub não refletiu
+  git -C "${r2}" remote set-url origin "${r2}" >/dev/null 2>&1 || true
+  _mv_out="$(export GH_HEAD_STALE_FIRST=2 GH_HEAD_STALE_LAST=999; _mva "CONFLICTING MERGEABLE" ok feat/alguma-coisa; printf '%s' "${_mv_out}")"
+  if grep -q "o GitHub não refletiu o push" <<< "${_mv_out}" && [ ! -s "${d}/margs" ]; then
+    record_pass "pr-merge-verified: (w6) push chegou mas a API não reflete ⇒ para no teto nomeando a causa"
+  else record_fail "pr-merge-verified: (w6) diagnóstico" "margs=[$(cat "${d}/margs")] out=${_mv_out}"; fi
+  git -C "${r2}" remote remove origin >/dev/null 2>&1 || true
 
   # ── (kg-a)-(kg-g) PROVENANCE DA BRANCH × REBASE (SAC-80, 2026-10-09) ─────────────────────────
   # Defeito medido num adotante: o .kg.yaml do PR citava `caminho@<sha>` de commit da PRÓPRIA branch,
@@ -22404,6 +22445,42 @@ run_door_cycle_selftests() {
   if grep -q 'ANDOU-PARA-TRAS' <<< "${outm}"; then
     record_pass "door-cycle: (h) mudança REAL junto do baseline volta a contar (exclusão cirúrgica)"
   else record_fail "door-cycle: (h)" "a exclusão virou salvo-conduto — framework novo passou batido: ${outm:0:140}"; fi
+
+  # (i)-(l) O EMISSOR NUM REPO SEM REGISTRO (medido em 2026-10-11, `/meta:adopt --update` de um
+  #   adotante): o `--emit-baseline` saía 3 com "members.yaml ausente", o `regen-baselines.sh` dizia
+  #   "emissor falhou — baseline mantido COMO VEIO DO CORE", e as portas do core viajavam com os tetos
+  #   do core para quem não tem porta. Sem registro a regra não tem OBJETO: emite vazio, rc 0.
+  #   MUTANTE (ops/mutate-and-restore.sh): sem o ramo da emissão sem registro → (j) e (l) reprovam.
+  # (i) com registro, a emissão segue dando as chaves — a cura não esvazia a catraca do core
+  rcm=0; outm="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" --emit-baseline 2>&1)" || rcm=$?
+  if [ "${rcm}" -eq 0 ] && grep -qE '^porta-x [0-9]+$' <<< "${outm}"; then
+    record_pass "door-cycle: (i) com members.yaml a emissão traz a chave da porta (porta-x <n>)"
+  else record_fail "door-cycle: (i)" "emissão com registro perdeu a chave (rc=${rcm}): ${outm:0:140}"; fi
+  local sbe; sbe="$(mktemp -d)"
+  mkdir -p "${sbe}/.claude/validation" "${sbe}/.claude/utils/adopt"
+  cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" "${sbe}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${sbe}/.claude/utils/adopt/"
+  printf '# baseline do CORE, como viaja na cópia\nonion-standalone 423\nonion-core 0\n' > "${sbe}/.claude/validation/door-staleness-baseline.txt"
+  ( cd "${sbe}" && git init -q . && git add -A && git -c user.email=t@l -c user.name=t commit -qm base ) >/dev/null 2>&1 || true
+  # (j) sem members.yaml ⇒ emissão rc 0, ZERO chaves, e o cabeçalho diz o porquê
+  rcm=0; outm="$(bash "${sbe}/.claude/validation/door-staleness-check.sh" "${sbe}" --emit-baseline 2>&1)" || rcm=$?
+  local _keys; _keys="$(grep -cvE '^[[:space:]]*(#|$)' <<< "${outm}")" || _keys=0
+  if [ "${rcm}" -eq 0 ] && [ "${_keys}" -eq 0 ] && grep -q 'SEM OBJETO' <<< "${outm}"; then
+    record_pass "door-cycle: (j) sem members.yaml a emissão sai 0 com baseline VAZIO (só cabeçalho)"
+  else record_fail "door-cycle: (j)" "emissão sem registro (rc=${rcm}, chaves=${_keys}): ${outm:0:140}"; fi
+  # (k) …e a CHECAGEM segue fechada: sem registro ela diz que não sabe (rc 3), nunca "em dia"
+  rcm=0; outm="$(bash "${sbe}/.claude/validation/door-staleness-check.sh" "${sbe}" 2>&1)" || rcm=$?
+  if [ "${rcm}" -eq 3 ] && grep -q 'members.yaml ausente' <<< "${outm}"; then
+    record_pass "door-cycle: (k) sem members.yaml a checagem segue falhando fechada (rc 3)"
+  else record_fail "door-cycle: (k)" "checagem sem registro afrouxou (rc=${rcm}): ${outm:0:140}"; fi
+  # (l) COMO O RUNNER INVOCA: o `regen-baselines.sh --emit` no alvo troca o baseline do core pelo vazio
+  cp "${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh" "${sbe}/.claude/utils/adopt/"
+  rcm=0; outm="$(bash "${sbe}/.claude/utils/adopt/regen-baselines.sh" "${sbe}" --emit 2>&1)" || rcm=$?
+  _keys="$(grep -cvE '^[[:space:]]*(#|$)' "${sbe}/.claude/validation/door-staleness-baseline.txt")" || _keys=0
+  if [ "${rcm}" -eq 0 ] && [ "${_keys}" -eq 0 ] && grep -q '✓ door-staleness-baseline.txt' <<< "${outm}"; then
+    record_pass "door-cycle: (l) regen-baselines no adotante sem registro ⇒ baseline do core trocado pelo vazio"
+  else record_fail "door-cycle: (l)" "o baseline do core viajou (rc=${rcm}, chaves=${_keys}): ${outm:0:160}"; fi
+  rm -rf "${sbe}"
   rm -rf "${sbm}"
 }
 

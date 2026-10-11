@@ -280,9 +280,37 @@ while [ "$_mg" = CONFLICTING ]; do
     die "auto-rebase RECUSADO (${_real:-rc=${_rb_rc}}) — conflito de FONTE não se resolve sozinho e não escondo conflito real; resolva à mão na worktree ${_wt}. pr-finalize disse: $(printf '%s\n' "$_rb_out" | tail -2 | tr '\n' ' ')"
   fi
   _new="$(git -C "$_wt" rev-parse HEAD 2>/dev/null)"
-  HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOid' 2>/dev/null)"
-  [ -n "$_new" ] && [ "$HEAD_SHA" != "$_new" ] \
-    && die "depois do auto-rebase o head do PR (${HEAD_SHA:0:8}) não é o HEAD da worktree (${_new:0:8}) — a branch rebaseada não é a do PR; paro."
+  # ══ A API DO PR ATRASA O PUSH (SAC-85, medido em 2026-10-09 no merge do #985) ══════════════════
+  # O push da branch rebaseada já tinha chegado (remoto em 74f0441a), e a leitura do `headRefOid`,
+  # feita logo depois, ainda devolveu o head VELHO (4f535a00). O script parou dizendo que "a branch
+  # rebaseada não é a do PR" — diagnóstico errado: era só a API do PR que ainda não tinha refletido
+  # o push. A cura separa as duas perguntas:
+  #   · o FATO é o ref remoto da branch (`git ls-remote`), não a API do PR. Se ele é legível e NÃO é
+  #     o HEAD da worktree, o push não chegou à branch do PR → paro na hora, sem esperar nada;
+  #   · a API do PR é ESPERADA, com teto (ONION_MERGE_HEAD_SYNC_TRIES × ONION_MERGE_HEAD_SYNC_POLL),
+  #     porque o `mergeable` e as runs lidas adiante dependem de o PR já enxergar o head novo.
+  #     Teto vencido = paro e digo qual das duas coisas aconteceu, nunca sigo com o head velho.
+  if [ -n "$_new" ]; then
+    _ls="$(git -C "$_wt" ls-remote origin "refs/heads/${HEAD_REF}" 2>/dev/null)" || _ls=""
+    _remote="${_ls%%[[:space:]]*}"
+    [ -n "$_remote" ] && [ "$_remote" != "$_new" ] \
+      && die "depois do auto-rebase a branch remota '${HEAD_REF}' está em ${_remote:0:8}, e o HEAD da worktree em ${_new:0:8} — o push não chegou à branch do PR; paro."
+    _sync_max="${ONION_MERGE_HEAD_SYNC_TRIES:-24}"; _sync_poll="${ONION_MERGE_HEAD_SYNC_POLL:-5}"
+    _s=0
+    while :; do
+      HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOid' 2>/dev/null)"
+      [ "$HEAD_SHA" = "$_new" ] && break
+      _s=$((_s+1))
+      if [ "$_s" -ge "$_sync_max" ]; then
+        [ -n "$_remote" ] \
+          && die "depois do auto-rebase a branch remota já está em ${_new:0:8}, mas o PR #${PR} ainda mostra o head ${HEAD_SHA:0:8} após ${_sync_max} leituras — o GitHub não refletiu o push; rode este comando de novo em instantes."
+        die "depois do auto-rebase o head do PR (${HEAD_SHA:0:8}) não virou o HEAD da worktree (${_new:0:8}) em ${_sync_max} leituras, e o ref remoto não foi legível — ou a branch rebaseada não é a do PR, ou o GitHub não refletiu o push; paro."
+      fi
+      sleep "${_sync_poll}"
+    done
+  else
+    HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOid' 2>/dev/null)"
+  fi
   _mg="$(pr_mergeable)"
   _n=0; while [ "$_mg" = UNKNOWN ] && [ "$_n" -lt 6 ]; do sleep "${_POLL_SECS}"; _mg="$(pr_mergeable)"; _n=$((_n+1)); done
 done
