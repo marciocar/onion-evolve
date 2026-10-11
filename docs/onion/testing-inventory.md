@@ -13,9 +13,9 @@
 |----------|---:|----------|
 | Famílias na bancada | **231** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
 | Sítios de asserção (**não** asserções executadas) | **1716** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
-| Linhas do manifesto de fixtures | **113** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
+| Linhas do manifesto de fixtures | **116** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
-| Arquivos de fixture rastreados | **157** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
+| Arquivos de fixture rastreados | **160** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
 | Regras do lint | **89** | `bash .claude/validation/rules-registry.sh --counts` |
 | — das quais HARD | **77** | idem |
 | — das quais SOFT | **32** | idem |

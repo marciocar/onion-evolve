@@ -15,7 +15,7 @@ flowchart TD
   hub_operacoes_enterprise["hub-operacoes-enterprise<br/>hub · greenfield"]:::hub
   brain_granaai["brain-granaai<br/>hub · brownfield"]:::hub
   vendas_pdi_enterprise["vendas-pdi-enterprise<br/>standalone · greenfield"]:::standalone
-  onion_core["onion-core<br/>hub · greenfield"]:::hub
+  onion_core["onion-core<br/>source · greenfield"]:::source
   onion_plugins["onion-plugins<br/>plugins · greenfield"]:::plugins
   onion_codex["onion-codex<br/>standalone · distilled"]:::standalone
   marcio_pessoal["marcio-pessoal<br/>standalone · regulated"]:::standalone
@@ -74,13 +74,13 @@ flowchart TD
 | pulse-mais | standalone | greenfield | education, srl-plea, learning-materials | `c711baa17617` |
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `6cc162f32d1c` |
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `7fd9392cd43b` |
-| onion-mini | mini | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
-| onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `947e69ce069d` |
+| onion-mini | mini | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `0bf23f0c7032` |
+| onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `0bf23f0c7032` |
 | hub-operacoes-enterprise | hub | greenfield | hub, task-manager-integration, itsm | `8278fee79d1c` |
 | brain-granaai | hub | brownfield | company-brain, clickup, pesquisa-primaria | `6f3ab3a3905c` |
 | vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `4299290b73d4` |
-| onion-core | hub | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `947e69ce069d` |
-| onion-plugins | plugins | greenfield | plugin-marketplace, public-distribution, claude-code | `947e69ce069d` |
+| onion-core | source | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `0bf23f0c7032` |
+| onion-plugins | plugins | greenfield | plugin-marketplace, public-distribution, claude-code | `0bf23f0c7032` |
 | onion-codex | standalone | distilled | substrate-port, openai-codex, portability-proof, deterministic-guards | `n/a` |
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |
