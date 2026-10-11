@@ -37,7 +37,7 @@ VENDOR="${KG_CONTRACT_VENDOR:-${ROOT}/vendor/kg-ssot}"
 _KG_LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../utils/kg"
 [ -f "${_KG_LIB}/machine_path.py" ] || { echo "kg-contract-check: a classe do caminho de máquina (machine_path.py) não está em ${_KG_LIB} — não dá para julgar" >&2; exit 2; }
 python3 -I -B - "${VENDOR}/tools" "${ROOT}" "${_KG_LIB}" "$@" <<'PY'
-import collections, os, subprocess, sys
+import collections, os, re, subprocess, sys
 tools, root, kglib, files = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4:]
 sys.path.insert(0, tools)
 sys.path.insert(0, kglib)
@@ -79,17 +79,23 @@ for f in files:
         # RENOME (SAC-99, 2026-10-11): `git mv` deixa o arquivo rastreado no índice, mas HEAD não tem o caminho
         # novo — e sem esta busca a dívida HERDADA do arquivo inteiro voltava cobrada como piora (o grafo
         # renomeado no SAC-99 acusou 7 labels longos e 1 data sem aspas que ele sempre teve). Renomear não é
-        # escrever: a versão de antes é a do caminho ANTIGO em HEAD, e só conta o rename que o próprio git detecta
-        # com similaridade >= 90%. Com o limiar padrão (50%), apagar um grafo A com dívida e criar um B diferente
-        # no mesmo commit faria B herdar a tolerância de A em vez de nascer limpo (refutador de 2026-10-11).
+        # escrever: a versão de antes é a do caminho ANTIGO em HEAD. Conta o rename que o próprio git detecta E
+        # que preserva a maioria dos ids de nó: só o limiar de texto do git (50%) deixaria apagar um grafo A com
+        # dívida e criar um B diferente no mesmo commit, e B herdaria a tolerância de A em vez de nascer limpo
+        # (refutador de 2026-10-11). Limiar de texto alto (90%) não serve: o próprio renome do SAC-99, que
+        # trocou o id de um nó e reescreveu labels, ficou em 85%. Grafo é a população de ids, não o texto.
         if old_text is None:
-            ren = subprocess.run(["git", "-C", root, "diff", "--cached", "-M90%", "--name-status", "--diff-filter=R",
+            ren = subprocess.run(["git", "-C", root, "diff", "--cached", "-M", "--name-status", "--diff-filter=R",
                                   "HEAD", "--"], capture_output=True, text=True)
+            _idre = re.compile(r"(?m)^[ \t]*-[ \t]+id:[ \t]*([A-Za-z0-9_]+)")
             for line in ren.stdout.splitlines():
                 parts = line.split("\t")
                 if len(parts) == 3 and parts[2] == path:
                     old = subprocess.run(["git", "-C", root, "show", f"HEAD:{parts[1]}"], capture_output=True, text=True)
-                    old_text = old.stdout if old.returncode == 0 else None
+                    if old.returncode == 0:
+                        ids_old, ids_now = set(_idre.findall(old.stdout)), set(_idre.findall(text))
+                        if ids_old and len(ids_old & ids_now) * 2 >= len(ids_old):
+                            old_text = old.stdout
                     break
     # o índice do corpus só se monta quando o grafo usa external_edges e, desde o kit v4.3.2, só lê os grafos
     # que as referências citam. Os alvos saem do DOCUMENTO PARSEADO, não do regex de linha do kit: o regex
