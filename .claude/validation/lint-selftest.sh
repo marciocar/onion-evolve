@@ -13641,6 +13641,15 @@ PY
       else record_fail "role-bundle: (p4-MUT)" "o mutante ainda acusa a sonda — (p4) não prova a cobrança"; fi
     else record_fail "role-bundle: (p4-MUT) setup" "a mutação não foi aplicada"; fi
   else record_fail "role-bundle: (p4) setup" "a sonda não entrou no adoption_keeps (âncora do roles.yaml mudou?)"; fi
+  # (p5) comando do conjunto ADOPTION no adoption_keeps também reprova (o motor dele, utils/adopt/, segue
+  #      cortado: o comando nasceria morto no adotado), e o resolvedor recusa adoção em papel só de porta.
+  sed 's|^    adoption_keeps: \[co-evolve, co-relay\]$|    adoption_keeps: [co-evolve, co-relay, adopt]|' "${roles}" > "${sb}/.claude/utils/marketplace/roles.yaml"
+  local _p5o _p5rc=0
+  _p5o="$(LC_ALL=C bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/utils/marketplace/roles.yaml" 2>&1 || true)"
+  bash "${resolver}" plugins --tools --kind adoption >/dev/null 2>&1 || _p5rc=$?
+  if grep -q "declara adoption_keeps 'adopt'" <<< "${_p5o}" && [ "${_p5rc}" -eq 2 ]; then
+    record_pass "role-bundle: (p5) adopt no adoption_keeps → HARD da REGRA 37; --kind adoption com plugins → resolvedor rc 2"
+  else record_fail "role-bundle: (p5)" "KEEPBAD de adopt=$(grep -c "adoption_keeps 'adopt'" <<< "${_p5o}" || true) · resolvedor plugins rc=${_p5rc} (espera 2)"; fi
   rm -rf "${sb}"
 }
 
@@ -17443,6 +17452,30 @@ run_role_cut_selftests() {
       record_pass "role-cut: (u5) o --update do adopt.md deriva o destino do carimbo do alvo (kind: door → door; sem kind → adoption, mesmo com ONION_KIND=door herdado)"
     else record_fail "role-cut: (u5)" "destino derivado errado:${_t5}"; fi
   fi
+  # (u6) ENV PERDIDO NÃO MUDA O DESTINO (passada adversarial de 2026-10-11): o `--update` exporta o env
+  #      num bloco e chama o vendor-branch noutro, e a shell do agente não persiste. Com o env VAZIO, o
+  #      vendor-branch lê papel e destino do carimbo do ALVO (o mesmo caminho do `update`, exposto pelo
+  #      --print-manifest <SRC> <TARGET>): porta standalone corta o canal, adotado standalone o mantém.
+  local _u6="" _u6d _u6a
+  _u6d="$(ONION_ROLE= ONION_KIND= bash "${vb}" --print-manifest "${REPO_ROOT}" "${d}/t5-door" 2>/dev/null)"
+  _u6a="$(ONION_ROLE= ONION_KIND= bash "${vb}" --print-manifest "${REPO_ROOT}" "${d}/t5-adopted" 2>/dev/null)"
+  grep -qxF ':(exclude).claude/hooks/co-evolution-inbox-check.sh' <<< "${_u6d}" || _u6="${_u6} porta-sem-corte-do-canal"
+  grep -qxF ':(exclude).claude/commands/meta/adopt.md' <<< "${_u6d}" || _u6="${_u6} porta-sem-papel(não cortou adopt)"
+  grep -qxF ':(exclude).claude/hooks/co-evolution-inbox-check.sh' <<< "${_u6a}" && _u6="${_u6} adotado-perdeu-o-canal"
+  grep -qxF ':(exclude).claude/commands/meta/adopt.md' <<< "${_u6a}" || _u6="${_u6} adotado-sem-papel(não cortou adopt)"
+  if [ -z "${_u6}" ]; then
+    record_pass "role-cut: (u6) com o env vazio o vendor-branch deriva papel e destino do carimbo do alvo (porta corta o canal, adotado o mantém)"
+  else record_fail "role-cut: (u6)" "derivação pelo carimbo falhou:${_u6}"; fi
+  # (u6-MUT) sem a leitura do kind no carimbo, o destino cai no default (adoption) e a PORTA recebe o canal.
+  local _vbm="${d}/vb-u6-mut.sh"
+  sed 's#^    if \[ "\$(awk .\/\^kind:\/{print \$2; exit}. "\${_st}")" = door \]; then ONION_KIND=door; else ONION_KIND=adoption; fi$#    ONION_KIND=adoption#' "${vb}" > "${_vbm}"
+  if ! cmp -s "${vb}" "${_vbm}"; then
+    cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${d}/vendor-manifest.sh"
+    local _u6m; _u6m="$(ONION_ROLE= ONION_KIND= bash "${_vbm}" --print-manifest "${REPO_ROOT}" "${d}/t5-door" 2>/dev/null)"
+    if ! grep -qxF ':(exclude).claude/hooks/co-evolution-inbox-check.sh' <<< "${_u6m}"; then
+      record_pass "role-cut: (u6-MUT) sem ler o kind do carimbo a porta recebe o canal upstream — (u6) é load-bearing"
+    else record_fail "role-cut: (u6-MUT)" "o mutante ainda corta o canal da porta — (u6) não prova a leitura do kind"; fi
+  else record_fail "role-cut: (u6-MUT) setup" "a mutação não foi aplicada (âncora do kind mudou?)"; fi
   unset -f _t_bundle _t_judge
 
   rm -rf "${d}"

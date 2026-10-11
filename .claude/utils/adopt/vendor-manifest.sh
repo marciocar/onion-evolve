@@ -129,7 +129,8 @@ _base=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/vali
 # cobre o prefixo `federation-`, que é família de arquivos e não diretório).
 #
 #   standalone → MATRIZ DAS PORTAS (2026-10-09, D_MATRIZ_DE_PORTAS_2026_10; F2 = SAC-91): o core MENOS
-#                adoção e federação. Saem utils/adopt (menos o contrato), utils/co-evolution,
+#                adoção e federação (utils/co-evolution e o hook do inbox só na PORTA: o ADOTADO standalone,
+#                `--kind adoption`, os mantém — decisão do maestro de 2026-10-11). Saem utils/adopt (menos o contrato), utils/co-evolution,
 #   plugins      utils/federation-transport, validation/federation-*, a skill onion-publish com o motor
 #                de publicação do marketplace e o hook do inbox; os comandos saem pelo roles.yaml
 #                (conjuntos `federation`, `adoption` e `pending`). A META-FÁBRICA VOLTA: utils/wizard,
@@ -523,7 +524,7 @@ if [ "${MODE}" = "list" ]; then
   _lfiles="$(git -C "${REPO}" -c core.quotePath=false diff-tree -r --name-only --no-commit-id \
               4b825dc642cb6eb9a060e54bf8d69288fbee4904 HEAD -- "${_lspec[@]}" | LC_ALL=C sort)"
   _count() { grep -cE "$1" <<< "${_lfiles}" || true; }
-  echo "papel: ${ROLE} · fonte: HEAD $(git -C "${REPO}" rev-parse --short=12 HEAD)"
+  echo "papel: ${ROLE} · destino: ${KIND:-door (padrão)} · fonte: HEAD $(git -C "${REPO}" rev-parse --short=12 HEAD)"
   printf '  %-11s %5s\n' \
     comandos   "$(grep -E '^\.claude/commands/.+\.md$' <<< "${_lfiles}" | grep -vE '/README\.md$|^\.claude/commands/common/' | grep -c . || true)" \
     agentes    "$(grep -E '^\.claude/agents/.+\.md$' <<< "${_lfiles}" | grep -vE '/README\.md$' | grep -c . || true)" \

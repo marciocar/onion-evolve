@@ -53,13 +53,28 @@ _manifest() {  # $1=SOURCE_ROOT → imprime pathspecs existentes, um por linha
   bash "${HERE}/vendor-manifest.sh" --role "${ONION_ROLE:-adopted}" --kind "${ONION_KIND:-adoption}" --repo "$1"
 }
 
-# `--print-manifest <SOURCE_ROOT>` — expõe a decisão de transporte que este helper toma, para que
+# O PAPEL E O DESTINO SÃO DO ALVO, e o env é só um atalho (passada adversarial de 2026-10-11): o
+# `--update` do adopt.md exporta ONION_ROLE/ONION_KIND num bloco e chama o `update` noutro, e a shell de
+# um agente não persiste entre chamadas. Env perdido = papel `adopted` (não corta nada) e destino
+# `adoption` (o canal upstream iria para uma porta). Quando o env veio vazio, lê-se o carimbo do alvo,
+# o mesmo predicado do adopt.md (`role:` e `kind: door`). Env presente vence: é a escolha de quem chama.
+_from_target_stamp() {  # $1=TARGET → preenche ONION_ROLE/ONION_KIND vazios a partir do carimbo dele
+  local _st="$1/.claude/.onion-version"
+  [ -f "${_st}" ] || return 0
+  [ -n "${ONION_ROLE:-}" ] || ONION_ROLE="$(awk '/^role:/{print $2; exit}' "${_st}")"
+  if [ -z "${ONION_KIND:-}" ]; then
+    if [ "$(awk '/^kind:/{print $2; exit}' "${_st}")" = door ]; then ONION_KIND=door; else ONION_KIND=adoption; fi
+  fi
+}
+
+# `--print-manifest <SOURCE_ROOT> [<TARGET>]` — expõe a decisão de transporte que este helper toma, para que
 # ela possa ser MEDIDA em vez de inferida. Nasceu porque a bancada "provava" a propagação do papel
 # com três `grep` de string literal, e a passada adversarial (2026-09-15) mostrou que ela aprovava um
 # caminho quebrado: 106 arquivos da meta-fábrica caindo num alvo `role: standalone`, tudo verde.
 # Guarda `behavior-over-declaration` que testa declaração não é guarda.
 if [ "${1:-}" = "--print-manifest" ]; then
-  [ -n "${2:-}" ] || { echo "uso: vendor-branch.sh --print-manifest <SOURCE_ROOT>" >&2; exit 2; }
+  [ -n "${2:-}" ] || { echo "uso: vendor-branch.sh --print-manifest <SOURCE_ROOT> [<TARGET>]" >&2; exit 2; }
+  [ -n "${3:-}" ] && _from_target_stamp "$3"   # o mesmo caminho do `update`, para a bancada medir
   _manifest "$2"
   exit 0
 fi
@@ -198,6 +213,7 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   # Aplica o framework NOVO no onion/vendor, num worktree (não sai da integração).
   local wt; wt="$(mktemp -d)/onion-vendor-wt"
   git -C "$T" worktree add -q "$wt" "$VENDOR" 2>/dev/null || { echo "ERRO: worktree do $VENDOR falhou." >&2; return 2; }
+  _from_target_stamp "$T"
   local mf; mf="$(_manifest "$SRC")"
   [ -n "$mf" ] || { echo "ERRO: manifest vazio (core sem framework?)." >&2; git -C "$T" worktree remove --force "$wt" 2>/dev/null; return 2; }
   # O sha é resolvido UMA vez: transporte e lista de exigidos saem do MESMO commit (Elenxo: com dois
