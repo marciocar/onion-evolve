@@ -1,6 +1,5 @@
 ---
-reviewed_diff_sha256: bed2c2316c577264352fb35efdd2ad109f3148c862d0017b220f03652f328be6
-reviewed_code_sha256: 72a27a705bf9f9f3b0ce8efec55fca5a00f2fbfd3d757cb4015c3080df124149
+reviewed_diff_sha256: pendente
 findings_total: 3
 findings_real: 3
 tokens: 110036
@@ -13,7 +12,10 @@ nota: >
   com a onion-core em role:source, o trust-topology-check (camada 1 do a2a-verify) passou a dar
   autoridade de fonte a quem só declara o papel. Ele construiu um adotante disfarçado que passava no
   validador e ficava AUTORIZADO a `correct` qualquer membro. Os 3 achados foram curados no mesmo laço.
-  Os pins das 4 portas conferem no remoto. APROVADO descreve o estado depois das curas.
+  Os pins das 4 portas conferem no remoto. APROVADO descreve o estado depois das curas. Depois do
+  1º push, o CI reprovou 10 casos do a2a-verify: o members.yaml de sandbox da bancada declarava a fonte
+  sem kind: source, e a autoridade passou a se ler pelo kind (fail-closed expondo harness incompleto).
+  A fonte ganhou kind: source nos sandboxes que não o tinham. Revisto por mim: a2a e trust com 46 casos verdes.
 ---
 
 # Resíduo — `chore/doors-registry-after-f6`
