@@ -1,6 +1,5 @@
 ---
-reviewed_diff_sha256: 80193662294f7b27aa2375859d3c1ae7389822f458499de8149dd03139e2a7d3
-reviewed_code_sha256: dc1432ba56acf2130b91f6427ee8156ff900e38c0c56a7d5f8c89263eb4f07c0
+reviewed_diff_sha256: pendente
 findings_total: 10
 findings_real: 9
 tokens: 174415
@@ -14,6 +13,11 @@ nota: >
   declarado no teto da doutrina. Antes da passada, o dogfood por ensaio real (--from desta branch, sem
   --push) nas quatro portas achou um defeito meu (ponteiro morto no mini) e um passivo de origin/main
   (o lint do onion-standalone sai com 1 HARD), declarado.
+  2ª rodada (pedido do coordenador, 2026-10-11): o passivo do standalone foi CURADO neste PR (a lente e a
+  doutrina de publicação seguem o comando; o baseline de catraca deixou de ancorar no corte por papel),
+  e o mesmo ensaio achou outro passivo de origin/main, o id de um adotante no crédito do MISPLANED, que
+  barrava as quatro portas; curado também. O diff mudou depois do carimbo anterior, então o resíduo
+  volta a pendente e o pr-finalize recarimba.
 ---
 
 # Resíduo — `feat/onion-release-versioning`
@@ -28,8 +32,7 @@ Versionamento das portas, decisão do maestro de 2026-10-11 (nó `D_VERSIONAR_AS
   `door-mini-check` acusou ponteiro morto. Curado.
 - **Passivo de origin/main, declarado:** o ensaio do `onion-standalone` sai com 1 HARD no lint da
   porta também a partir de `origin/main` (a lente `publish-lens.md` viaja e o glob dela aponta um
-  arquivo que o corte do standalone não leva). Não é deste PR, e trava a release do standalone até ser
-  curado.
+  arquivo que o corte do standalone não leva). **Curado na 2ª rodada, abaixo.**
 
 ## Passada adversarial — REPROVADA (10 achados, 9 reais)
 
@@ -66,3 +69,29 @@ describe`; a publicação da família não é atômica; a proposta lê nomes e c
 
 `run_publish_release_selftests` 26/26 com `LC_ALL=C`; mutantes por caso via `ops/mutate-and-restore.sh`
 (core-only); `run_publish_selftests`, `run_write_stamp_selftests` e `run_door_selftests` verdes.
+
+## A decisão foi ajustada num ponto
+
+A decisão do maestro dizia que o changelog da release "filtra ruído (`docs:`)". Depois da passada,
+**os assuntos de commit não viajam de jeito nenhum**: só a contagem por tipo Conventional, sem os
+`docs:`. A razão é o bloqueador 1 e o achado 4: a porta é sem biografia, e um assunto com nome de
+adotante, que é imutável, travaria toda release seguinte. O coordenador confirmou o ajuste em
+2026-10-11 ("o mais seguro"). O nó `D_VERSIONAR_AS_PORTAS_POR_RELEASE` registra isso na narrative.
+
+## 2ª rodada — o passivo do standalone e o crédito com id de adotante
+
+- **A trava do standalone, curada.** A `publish-lens.md` viajava ao standalone porque o
+  `ops-citation-travel-baseline.txt` a citava (junto com a `publish-doctrine.md`) e o `vendor-manifest.sh`
+  contava baseline como âncora. Baseline de catraca agora não ancora: lista dívida, não consome. A lente
+  também passou a citar o `/meta:publish` (o caminho da "lente forçada"). Medido com `--list` nos seis
+  papéis: saem só as duas peças, e só de standalone e plugins.
+- **Caso r14 com mutante:** a lente e a doutrina não estão no `--list standalone` e estão no `--list
+  source`. O mutante "o baseline volta a ancorar" reprova o caso. O mutante que desliga só a lente
+  forçada sobrevive, e isso é correto: o corte pelo baseline já basta, e a citação é um segundo
+  caminho.
+- **Passivo de origin/main achado no mesmo ensaio:** o crédito do MISPLANED (`kg-radar.sh`, a fixture
+  e a bancada) nomeava o id de um adotante registrado, em superfície que viaja. O passo (5a) do motor
+  barrava as quatro portas. O crédito passou a dizer "um adotante".
+- **Prova:** ensaio `--from` desta branch, sem `--push`, nas quatro portas: 0 HARD, vazamento limpo,
+  proposta `onion-v1.0.0 (primeira)`. As famílias publish_release (27), kg_freshness, role_cut,
+  vendor_manifest, door_mini e door passaram com `LC_ALL=C`.
