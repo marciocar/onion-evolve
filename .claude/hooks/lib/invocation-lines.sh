@@ -103,18 +103,18 @@ onion_nopy_touches() {
   t=$(printf '%s' "$2" | tr -d "\"'\\\\")
   local push="(^|${a})git(${a}${seg})?${a}(push|send-pack)(${a}|\$)"
   dyn=0
-  if printf '%s' "$2" | grep -qE '\$|`|(^|[^[:alnum:]_])(xargs|eval)([^[:alnum:]_]|$)|\\u00[2-7]' \
-     && printf '%s' "$t" | grep -qE "(^|${a})(git|gh)(${a}|\$)"; then dyn=1; fi
+  if grep -qE '\$|`|(^|[^[:alnum:]_])(xargs|eval)([^[:alnum:]_]|$)|\\u00[2-7]' <<< "$2" \
+     && grep -qE "(^|${a})(git|gh)(${a}|\$)" <<< "$t"; then dyn=1; fi
   case "$kind" in
     force-main)
-      [ "$dyn" = 1 ] && printf '%s' "$t" | grep -qE 'push|send-pack' && return 0
-      printf '%s' "$t" | tr ';&|' '\n\n\n' | grep -E "$push" \
-        | grep -qE -- '--force|--mi|(^|[[:space:]])-[[:alnum:]]*f[[:alnum:]]*([[:space:]]|$)|[[:space:]:]\+[^[:space:]]'
+      [ "$dyn" = 1 ] && grep -qE 'push|send-pack' <<< "$t" && return 0
+      local _segs; _segs="$(printf '%s' "$t" | tr ';&|' '\n\n\n' | grep -E "$push" || true)"
+      grep -qE -- '--force|--mi|(^|[[:space:]])-[[:alnum:]]*f[[:alnum:]]*([[:space:]]|$)|[[:space:]:]\+[^[:space:]]' <<< "$_segs"
       ;;
     merge-gate)
       kw='push|send-pack|merge|graphql|contents|git/refs|sync'
-      [ "$dyn" = 1 ] && printf '%s' "$t" | grep -qE "$kw" && return 0
-      printf '%s' "$t" | grep -qE "$push|mergePullRequest|(^|${a})gh(${a}${seg})?${a}merge(${a}|\$)|(^|${a})gh(${a}${seg})?${a}api(${a}${seg})?(merge|contents|git/refs|graphql)|(^|${a})gh(${a}${seg})?${a}repo${a}${seg}sync(${a}|\$)"
+      [ "$dyn" = 1 ] && grep -qE "$kw" <<< "$t" && return 0
+      grep -qE "$push|mergePullRequest|(^|${a})gh(${a}${seg})?${a}merge(${a}|\$)|(^|${a})gh(${a}${seg})?${a}api(${a}${seg})?(merge|contents|git/refs|graphql)|(^|${a})gh(${a}${seg})?${a}repo${a}${seg}sync(${a}|\$)" <<< "$t"
       ;;
     *) return 0 ;;
   esac
@@ -126,7 +126,7 @@ onion_invocation_lines() {
   # Python AUSENTE ou morto: só fecha se o texto tem a FORMA do que os vetos guardam — senão todo
   # comando da sessão seria vetado por falta de motor.
   ONION_ROOT="$root" ONION_CWD="${ONION_CWD:-$PWD}" python3 /dev/fd/4 3<<<"$cmd" 4<<'ONION_TOKENIZER_PY' 2>/dev/null \
-    || { printf '%s' "$cmd" | grep -qE 'mergePullRequest|(^|[^[:alnum:]_])gh([^[:alnum:]_][^;&|]*)?[^[:alnum:]_](merge|api)([^[:alnum:]_]|$)|(^|[^[:alnum:]_])git([^[:alnum:]_][^;&|]*)?[^[:alnum:]_]push([^[:alnum:]_]|$)' \
+    || { grep -qE 'mergePullRequest|(^|[^[:alnum:]_])gh([^[:alnum:]_][^;&|]*)?[^[:alnum:]_](merge|api)([^[:alnum:]_]|$)|(^|[^[:alnum:]_])git([^[:alnum:]_][^;&|]*)?[^[:alnum:]_]push([^[:alnum:]_]|$)' <<< "$cmd" \
          && printf '__ONION_UNANALYZABLE__ merge=1 main=1 :: %s\n' "$(printf '%s' "$cmd" | tr '\n' ' ' | cut -c1-400)"; }
 import os, re, shlex, subprocess, sys, codecs
 
