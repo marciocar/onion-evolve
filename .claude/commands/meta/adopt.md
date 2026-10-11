@@ -716,19 +716,14 @@ fi
 # A lista é a MESMA do transporte, e vem da SSOT (vendor-manifest.sh) — só o delta olha `.env.example`,
 # que no transporte é never-clobber e por isso não entra no manifesto.
 #
-# ⚠️ O PAPEL VEM DO STAMP DO ALVO, e antes de 2026-09-15 esta linha NÃO O PASSAVA. Enquanto o `--role`
-# era decorativo isso não tinha efeito observável; no instante em que ele passou a CORTAR, um
-# `--update` cego republicaria a meta-fábrica inteira num alvo standalone — desfazendo o corte da
-# instalação pela porta dos fundos da atualização. O papel é do ALVO, então lê-se o stamp DELE
-# (`onion-version.sh` hardcoda `role: source` por ser a identidade da FONTE — não serve aqui).
+# ⚠️ O PAPEL VEM DO STAMP DO ALVO (antes de 2026-09-15 esta linha NÃO O PASSAVA): com o `--role` cortando, um
+# `--update` cego republicaria a meta-fábrica num alvo standalone, desfazendo o corte pela porta dos fundos.
+# O papel é do ALVO (`onion-version.sh` hardcoda `role: source`, a identidade da FONTE — não serve aqui).
 TARGET_ROLE="$(awk '/^role:/{print $2; exit}' "$TARGET/.claude/.onion-version")"
 [ -n "$TARGET_ROLE" ] || TARGET_ROLE=adopted   # stamp sem campo role → adotado por definição
-# ⚠️ O EXPORT faz o papel chegar ao `vendor-branch.sh` (quem COPIA no --update); sem ele, 106 arquivos da
-# meta-fábrica caíam num alvo `role: standalone` com a bancada verde (medido 2026-09-15).
+# ⚠️ O EXPORT leva papel e destino a quem COPIA no --update (vendor-branch.sh); sem ele, 106 arquivos da meta-fábrica
+# caíam num standalone (2026-09-15). Destino: `kind: door` = PORTA, sem o canal upstream; sem ele = ADOTADO, que o mantém (maestro, 2026-10-11).
 export ONION_ROLE="$TARGET_ROLE"
-# O DESTINO também vem do stamp (decisão do maestro, 2026-10-11): `kind: door` é PORTA, e a porta
-# standalone perde o canal upstream (co-relay, co-evolve, o hook do inbox); sem `kind: door` o alvo é um
-# projeto ADOTADO, e o adotado standalone o mantém. É o mesmo predicado que a F2 introduziu no carimbo.
 TARGET_KIND="$(awk '/^kind:/{print $2; exit}' "$TARGET/.claude/.onion-version")"
 if [ "$TARGET_KIND" = door ]; then export ONION_KIND=door; else export ONION_KIND=adoption; fi
 # Mesma função da cópia segura (o `mapfile … < <(…) || ABORTADO` daqui engolia o rc — ver load-manifest.sh).

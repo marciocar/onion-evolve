@@ -22,6 +22,10 @@ meta:
 external_edges:
   - to: "docs/onion/graph/onion-identity-2026-07.kg.yaml#D_FAMILIA_TEM_DOIS_REGIMES_2026_09"
     edge_type: SUPERSEDES
+  # decisão do maestro de 2026-10-11: a liberação da meta-fábrica ao plugin é PARCIAL (D_FABRICA_DE_VERTICAIS_FICA_FORA_DO_PLUGIN)
+  - from: D_FABRICA_DE_VERTICAIS_FICA_FORA_DO_PLUGIN
+    to: "docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml#Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN"
+    edge_type: SUPERSEDES
 nodes:
   # ---- o dano ----
   - id: E_DANO_85_ARQUIVOS
@@ -375,9 +379,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.8
-    status: open
+    status: done
     label: "o papel standalone serve à porta E à adoção individual (/meta:adopt --role standalone): pela matriz o adotado standalone perde co-relay e co-evolve, o canal upstream com o core — GATILHO: decisão do maestro, ou o 1º adotado com carimbo standalone fazer --update"
-    narrative: "A matriz fala de portas. O vendor-manifest usa o mesmo papel para os dois usos, então um projeto adotado com carimbo standalone recebe a superfície da porta standalone e deixa de poder sinalizar o core pelo co-relay. Medido em 2026-10-10 nos clones locais: 24 carimbos adopted, 6 hub e 1 standalone (a própria porta), então hoje ninguém é afetado. Respostas possíveis: separar o papel de porta do papel de adoção, ou aceitar que o standalone adotado é solo de verdade."
+    narrative: "A matriz fala de portas. O vendor-manifest usa o mesmo papel para os dois usos, então um projeto adotado com carimbo standalone recebe a superfície da porta standalone e deixa de poder sinalizar o core pelo co-relay. Medido em 2026-10-10 nos clones locais: 24 carimbos adopted, 6 hub e 1 standalone (a própria porta), então hoje ninguém é afetado. Respostas possíveis: separar o papel de porta do papel de adoção, ou aceitar que o standalone adotado é solo de verdade. FECHADO em 2026-10-11 pela decisão do maestro D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA: separar papéis; o adotado standalone mantém o canal upstream e a porta segue sem ele."
     trace: ".claude/utils/adopt/vendor-manifest.sh · .claude/commands/meta/adopt.md"
 
   - id: Q_PERSONALITY_SYNC_SEM_CONJUNTO
@@ -386,8 +390,9 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.8
-    status: open
+    status: done
     label: "/meta:personality-sync não está na lista da matriz: escreve a linha personality_summary do members.yaml e tem tag federation, e ficou no conjunto pending (só source e hub) — GATILHO: decisão do maestro entre federation e meta_factory"
+    narrative: "FECHADO em 2026-10-11 pela decisão do maestro D_PERSONALITY_SYNC_NO_CONJUNTO_FEDERACAO: personality-sync entra no conjunto federation, com o corte das portas idêntico."
     trace: ".claude/utils/marketplace/roles.yaml · .claude/commands/meta/personality-sync.md"
 
   # ---- 2026-10-10: F3 das portas (SAC-92) — publicar sob demanda ----
@@ -418,9 +423,9 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.85
-    status: open
+    status: done
     label: "a 1ª publicação da onion-core como source muda o carimbo publicado, e o registro (role hub) e o clone local seguem no papel velho até alguém alinhá-los — GATILHO: o maestro publicar a onion-core com --role source --force-role-change (F6)"
-    narrative: "O motor não escreve no members.yaml (o selo é o carimbo, sem PR no core) nem no clone local da porta. A REGRA 92 compara o role do registro com o carimbo do CLONE LOCAL, então depois da troca as duas leituras divergem até o registro passar a source e o clone receber git pull. Respostas possíveis: alinhar à mão na leva seguinte (o que o motor instrui hoje), ou a REGRA 92 ler o carimbo do remoto como o --status já faz."
+    narrative: "O motor não escreve no members.yaml (o selo é o carimbo, sem PR no core) nem no clone local da porta. A REGRA 92 compara o role do registro com o carimbo do CLONE LOCAL, então depois da troca as duas leituras divergem até o registro passar a source e o clone receber git pull. Respostas possíveis: alinhar à mão na leva seguinte (o que o motor instrui hoje), ou a REGRA 92 ler o carimbo do remoto como o --status já faz. FECHADO em 2026-10-11 por E_PORTAS_PUBLICADAS_F6: alinhado à mão na leva seguinte, como o motor instruía; o PR #1012 passou a onion-core a source no registro, e o door-role-parity-check não acusa divergência de porta."
     trace: "ops/publish-door.sh · .claude/validation/door-role-parity-check.sh · docs/evolution/federation/members.yaml"
 
   - id: E_PLUGINS_FORA_DO_CORE_F4
@@ -450,10 +455,10 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.85
-    status: open
+    status: done
     owner: maestro
     label: "o plugin onion-meta leva /meta:create-vertical (e o motor do marketplace, parametrizando o destino) e forge/forge-guard/cc-update, ou a fábrica de verticais fica só no core e no standalone? GATILHO: o 1º pedido de criar vertical numa instalação por plugin"
-    narrative: "A matriz diz plugins = superfície do standalone, e o standalone leva utils/marketplace inteiro menos o materializador (F2). A REGRA 61 (Fronteira de MOAT) segue barrando assemble-plugin/generate-marketplace e /utils/marketplace/ em manifesto publicável, e a F4 escolheu a recomendação mais estreita: não mover o moat sem decisão do maestro. forge/forge-guard/cc-update ficam fora por outro motivo, mecânico: os motores medem o harness do repo, que a instalação por plugin não tem."
+    narrative: "A matriz diz plugins = superfície do standalone, e o standalone leva utils/marketplace inteiro menos o materializador (F2). A REGRA 61 (Fronteira de MOAT) segue barrando assemble-plugin/generate-marketplace e /utils/marketplace/ em manifesto publicável, e a F4 escolheu a recomendação mais estreita: não mover o moat sem decisão do maestro. forge/forge-guard/cc-update ficam fora por outro motivo, mecânico: os motores medem o harness do repo, que a instalação por plugin não tem. FECHADO em 2026-10-11 pela decisão do maestro D_FABRICA_DE_VERTICAIS_FICA_FORA_DO_PLUGIN: manter fechado; create-vertical segue core-only e o motor do marketplace segue moat."
     trace: ".claude/utils/marketplace/verticals/onion-meta.manifest.sh · .claude/validation/lint-artifacts.sh"
 
   - id: E_MINI_GERADO_F5
@@ -504,10 +509,10 @@ nodes:
     plane: DEV
     impact: 2
     confidence: 0.8
-    status: open
+    status: done
     owner: maestro
     label: "o mini leva o /meta:setup-integration (é configuração, não fábrica) ou segue sem meta, com a integração pelo .env à mão? GATILHO: o 1º iniciante que travar configurando o task manager no mini"
-    narrative: "A F5 escolheu o literal da matriz (sem meta) e a bancada role-cut (o) cobra isso. O custo: seis citações do comando em adapters e comandos que viajam viraram ausência declarada, e o caminho do iniciante para Jira/ClickUp/Asana/Linear/Zoho é escrever o .env pela lista do README do task manager. O comando não cita nada fora do mini (medido), então trazê-lo é uma linha na allowlist, a troca do oráculo (o) e a retirada de duas linhas do known_absent."
+    narrative: "A F5 escolheu o literal da matriz (sem meta) e a bancada role-cut (o) cobra isso. O custo: seis citações do comando em adapters e comandos que viajam viraram ausência declarada, e o caminho do iniciante para Jira/ClickUp/Asana/Linear/Zoho é escrever o .env pela lista do README do task manager. O comando não cita nada fora do mini (medido), então trazê-lo é uma linha na allowlist, a troca do oráculo (o) e a retirada de duas linhas do known_absent. FECHADO em 2026-10-11 pela decisão do maestro D_MINI_SEGUE_ENXUTO: o setup-integration é uma das 49 ausências declaradas e o mini segue sem meta; o gatilho de revisita passa a ser o da decisão."
     trace: ".claude/utils/marketplace/roles.yaml · .claude/validation/lint-selftest.sh"
 
   - id: Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA
@@ -528,11 +533,126 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.85
-    status: open
+    status: done
     owner: maestro
     label: "depois da 1ª publicação do mini, quem troca o onion_version n/a do registro? Sem isso a exceção do members-validate fica permanente e a REGRA 85 nunca mede a defasagem do mini. GATILHO: o 1º --push do onion-mini (F6)"
-    narrative: "Achado da passada adversarial da F5 (I2). O motor não escreve no members.yaml (o selo é o carimbo, sem PR no core), o members-validate aceita n/a para role mini sem condição, o door-staleness-check pula porta com pin n/a e a recusa 'registro diz publicada e não há carimbo' do publish-door só vale com pin real. Cura proposta, a decidir na F6: o door-role-parity-check (que já lê o clone local) reprova mini com n/a quando o clone tem carimbo, ou o members-validate exige pin real quando a porta tem carimbo publicado. Não curado na F5 porque a publicação ainda não aconteceu e a regra nova reprovaria um estado que hoje é verdadeiro."
+    narrative: "Achado da passada adversarial da F5 (I2). O motor não escreve no members.yaml (o selo é o carimbo, sem PR no core), o members-validate aceita n/a para role mini sem condição, o door-staleness-check pula porta com pin n/a e a recusa 'registro diz publicada e não há carimbo' do publish-door só vale com pin real. Cura proposta, a decidir na F6: o door-role-parity-check (que já lê o clone local) reprova mini com n/a quando o clone tem carimbo, ou o members-validate exige pin real quando a porta tem carimbo publicado. Não curado na F5 porque a publicação ainda não aconteceu e a regra nova reprovaria um estado que hoje é verdadeiro. FECHADO em 2026-10-11 por E_PORTAS_PUBLICADAS_F6: o PR #1012 trocou o pin do mini para 0bf23f0c no registro e tirou a exceção n/a do members-validate (87179f16); o --status mede a defasagem do mini como a das outras portas."
     trace: ".claude/validation/members-validate.sh · .claude/validation/door-staleness-check.sh · .claude/validation/door-role-parity-check.sh · docs/evolution/federation/members.yaml"
+
+  # ---- 2026-10-11: F6 das portas — as quatro publicadas, e o fecho das decisões do maestro ----
+  - id: E_PORTAS_PUBLICADAS_F6
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    valid_from: "2026-10-10"
+    verified_at: "2026-10-11"
+    verified_against: "ops/publish-door.sh --status contra os quatro remotos públicos em 2026-10-11 (ls-remote e clone raso, sem credencial): onion-core (source), onion-standalone, onion-mini e onion-plugins com pin publicado 0bf23f0c7032 igual ao pin do registro, defasagem de 3 commits da superfície até ce60ec13; door-role-parity-check.sh sem divergência de porta (o único achado é o resíduo conhecido do clone local da granaai)"
+    source_kind: repo
+    source_tier: 10
+    label: "F6 das portas: as quatro portas (onion-core como source, onion-standalone, onion-mini e onion-plugins) foram publicadas em 2026-10-10 pelo /meta:publish no pin 0bf23f0c e conferidas no remoto; o registro as alcançou no PR #1012"
+    narrative: "O que a F6 mostrou. (1) PUBLICAÇÃO: o /meta:publish subiu as quatro portas de origin/main no pin 0bf23f0c, cada uma conferida no remoto pelo próprio motor; o onion-mini e o onion-standalone foram com --replace-foreign, e a destilação antiga do mini ficou na tag archive/pre-door-2026-10-10. (2) O 1º ENSAIO ACHOU PIPE FRÁGIL NO MOTOR: o publish-door não reconhecia o onion-plugins publicado, e a guarda do veredito por pipe não varria ops/; os dois foram curados no PR #1011 (8d26637a), e a guarda passou a varrer ops/. (3) REGISTRO: no PR #1012 os pins das quatro portas foram para 0bf23f0c e a onion-core passou a role source no members.yaml (4a240a0a), com o members-validate aceitando a face pública da fonte. (4) O REFUTADOR DO ALINHAMENTO achou a brecha de autoridade de fonte: o trust-topology-check (camada 1 do a2a-verify) decidia a autoridade só por role source, então um adotante disfarçado de porta source ficaria autorizado a corrigir qualquer membro. A cura lê kind: a autoridade e o inbox do core se reconhecem por kind source, o members-validate aceita no máximo uma porta role source com kind door, e a exceção n/a do mini saiu (87179f16). Medido de novo nesta passada pelo --status, sem confiar na memória da sessão que publicou."
+    trace: "ops/publish-door.sh · .claude/validation/door-role-parity-check.sh · .claude/validation/members-validate.sh · .claude/validation/trust-topology-check.sh · docs/evolution/federation/members.yaml"
+    provenance:
+      source: "ops/publish-door.sh --status contra os remotos públicos das quatro portas, e os commits 8d26637a (PR #1011), 4a240a0a e 87179f16 (PR #1012) na main"
+      locator: "tabela do --status de 2026-10-11 (pin publicado, pin do registro e defasagem por porta) e as mensagens dos três commits"
+      method: "medição: --status lido do remoto em 2026-10-11 e saída do door-role-parity-check.sh; o relato do 1º ensaio e do refutador vem das mensagens de commit"
+      locality: "web"
+
+  - id: D_FABRICA_DE_VERTICAIS_FICA_FORA_DO_PLUGIN
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "decisão do maestro por pergunta com opções em 2026-10-11, a recomendada; conferido no onion-meta.manifest.sh que create-vertical, forge, forge-guard e cc-update seguem fora e os create-*, evolve, dissect e absorb-skill viajam"
+    label: "DECISÃO DO MAESTRO (2026-10-11): MANTER FECHADO. O create-vertical segue core-only (core e standalone), o motor do marketplace segue moat pela REGRA 61, e a liberação da meta-fábrica ao plugin é PARCIAL: viaja no onion-meta, menos create-vertical, forge, forge-guard e cc-update"
+    narrative: "Fecha Q_CREATE_VERTICAL_E_O_MOTOR_DO_MARKETPLACE_NO_PLUGIN e, por aresta entre grafos, Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN (distribuicao-metodo-vivo-2026-09), que a matriz dava como respondida por inteiro. A liberação é parcial: os 9 comandos de autoria (absorb-skill, create-abstraction, create-agent, create-agent-express, create-command, create-knowledge-base, create-skill, dissect, evolve) viajam no plugin onion-meta desde a F4; create-vertical fica fora porque o caminho --plugin dele monta catálogo com assemble-plugin e generate-marketplace, o motor que a REGRA 61 (Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado) trata como moat; forge, forge-guard e cc-update ficam fora por motivo mecânico (os motores medem o harness do repo, que a instalação por plugin não tem). Limita a D_MATRIZ_DE_PORTAS_2026_10 sem derrubá-la: a matriz dizia que a meta-fábrica é liberada ao plugin e pedia revisão da REGRA 61; a revisão foi feita e a regra fica como está. Nada muda no mecanismo: o comentário do onion-meta.manifest.sh passa a citar esta decisão."
+    trace: ".claude/utils/marketplace/verticals/onion-meta.manifest.sh · .claude/validation/lint-artifacts.sh"
+    provenance:
+      source: "decisão do maestro na sessão de 2026-10-11, por pergunta com opções"
+      locator: "pergunta 1 de 4: o create-vertical e o motor do marketplace no plugin; opção escolhida MANTER FECHADO (a recomendada)"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      locality: "pessoa"
+
+  - id: D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "decisão do maestro por pergunta com opções em 2026-10-11, a recomendada; mecanismo medido em E_CORTE_POR_DESTINO_MEDIDO"
+    label: "DECISÃO DO MAESTRO (2026-10-11): SEPARAR PAPÉIS. O projeto ADOTADO com papel standalone (carimbo sem kind: door) mantém co-relay, co-evolve e o hook do inbox, o canal upstream com o core; a PORTA onion-standalone (kind: door) segue sem adoção e federação"
+    narrative: "Fecha Q_STANDALONE_DE_ADOCAO_SEGUE_A_PORTA. O predicado é o da F2: kind: door no carimbo. O corte da porta só se aplica quando o destino é porta. No mecanismo: o vendor-manifest.sh ganhou --kind door|adoption (ausente = porta, o lado que não expõe canal numa porta pública); o roles.yaml declara adoption_keeps: [co-evolve, co-relay] no standalone, lido pelo resolve-role-bundle.sh --tools --kind adoption; resolve-manifest.sh e vendor-branch.sh, que são o caminho da adoção, passam adoption por default; o --update do adopt.md deriva o destino do kind do carimbo do alvo; a REGRA 37 (Mapa role→bundle (roles.yaml) consistente com os verticais) cobra que todo adoption_keeps more num conjunto. O que NÃO volta ao adotado standalone: adopt e federation-*, co-deliver e co-announce (o lado do core), personality-sync, utils/federation-transport (o hook tolera a ausência do inbox-pull.sh) e a skill onion-publish. Limita a D_MATRIZ_DE_PORTAS_2026_10: a linha ONION-STANDALONE (core menos adoção e federação) vale para a porta, não para todo carimbo standalone. A projeção do wizard (topology-projection.sh) segue cortando por papel sem ler o kind, e isso é declarado: medido em 2026-10-11, nenhuma transição da topologia tem procedimento em co-relay, co-evolve ou utils/co-evolution, então a projeção é a mesma."
+    trace: ".claude/utils/adopt/vendor-manifest.sh · .claude/utils/marketplace/roles.yaml · .claude/utils/marketplace/resolve-role-bundle.sh · .claude/utils/adopt/resolve-manifest.sh · .claude/utils/adopt/vendor-branch.sh · .claude/commands/meta/adopt.md"
+    provenance:
+      source: "decisão do maestro na sessão de 2026-10-11, por pergunta com opções"
+      locator: "pergunta 2 de 4: o standalone de adoção segue a porta?; opção escolhida SEPARAR PAPÉIS (a recomendada)"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      locality: "pessoa"
+
+  - id: E_CORTE_POR_DESTINO_MEDIDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    valid_from: "2026-10-11"
+    verified_at: "2026-10-11"
+    verified_against: "vendor-manifest.sh por papel antes (origin/main ce60ec13) e depois: adopted, source, hub, standalone, plugins e mini com manifesto byte a byte IGUAL ao de antes no destino padrão; standalone --kind adoption difere do da porta em exatamente 9 linhas (o hook do inbox, os 5 arquivos de utils/co-evolution e os comandos co-evolve e co-relay); --kind adoption com plugins, mini e source sai rc 2; bancada role_cut e role_bundle sob LC_ALL=C verdes, mais 15 famílias vizinhas"
+    source_kind: repo
+    source_tier: 10
+    label: "o corte por destino foi medido: as seis superfícies de antes saem idênticas no destino padrão, e só o standalone adotado ganha o canal upstream (9 caminhos), com mutante que reverte o predicado reprovando nas duas polaridades"
+    narrative: "Bancada nova: role-cut (u) adotado standalone recebe co-relay, co-evolve, utils/co-evolution e o hook, e segue sem adopt, co-deliver, co-announce, personality-sync, federation-transport e onion-publish, no bundle extraído; (u2) a porta (default e --kind door, bundles idênticos) segue sem o canal; (u3) destino de adoção com papel só de porta sai rc 2; (u4) resolve-manifest e vendor-branch entregam o canal por default e o cortam com ONION_KIND=door; (u5) as duas linhas do --update do adopt.md, executadas contra dois carimbos sintéticos, derivam door e adoption; role-bundle (p3) o resolvedor por destino e personality-sync em federation, (p4) adoption_keeps fora da partição faz o resolvedor sair rc 2 e a REGRA 37 reprovar. Mutantes internos: (u-MUT1) predicado sempre verdadeiro, (u-MUT2) predicado ignorando o destino, (u-MUT3) destino que não chega ao resolvedor, (p4-MUT) sem a cobrança KEEPBAD. Mutantes plantados por ops/mutate-and-restore.sh na árvore viva, cada um reprovando o caso nomeado: os dois do predicado, o adoption_keeps vazio, o --update que não deriva door, o default door no resolve-manifest e no vendor-branch, e personality-sync de volta ao pending. As âncoras de dois mutantes antigos, (n-MUT1) e (t-MUT), acompanharam o bloco novo."
+    trace: ".claude/validation/lint-selftest.sh · .claude/utils/adopt/vendor-manifest.sh · .claude/utils/marketplace/resolve-role-bundle.sh"
+    provenance:
+      source: "branch feat/doors-decisions-sealed: vendor-manifest.sh, resolve-role-bundle.sh, roles.yaml, resolve-manifest.sh, vendor-branch.sh, adopt.md, lint-artifacts.sh (REGRA 37) e lint-selftest.sh"
+      locator: "comparação dos manifestos por papel contra um worktree de origin/main; casos role-cut (u)-(u5) e role-bundle (p3)(p4)"
+      method: "medição: manifesto por papel antes e depois, bancada sob LC_ALL=C nas famílias tocadas e mutantes plantados por ops/mutate-and-restore.sh em 2026-10-11"
+      locality: "repo"
+
+  - id: D_MINI_SEGUE_ENXUTO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "decisão do maestro por pergunta com opções em 2026-10-11, a recomendada; resolve-role-bundle.sh mini --known-absent devolve 49 ausências declaradas"
+    label: "DECISÃO DO MAESTRO (2026-10-11): o onion-mini segue ENXUTO, com as 49 ausências declaradas como estão — GATILHO DE REVISITA: um aluno ou usuário do mini reclamar de ponteiro ausente"
+    narrative: "Nada muda no mecanismo. As 49 linhas do known_absent do roles.yaml seguem sendo o contrato: citação nova fora da lista reprova no door-mini-check, e linha que ninguém mais cita também. Fecha Q_MINI_CONFIGURA_INTEGRACAO_PELO_ENV, porque o /meta:setup-integration é uma das 49 (nas duas formas do nome): o mini segue sem meta, com a integração pelo .env à mão conforme o README do task manager. O gatilho de revisita desta decisão cobre o gatilho que a pergunta tinha (o iniciante que travar configurando o task manager é um usuário reclamando de ponteiro ausente)."
+    trace: ".claude/utils/marketplace/roles.yaml · .claude/validation/door-mini-check.sh"
+    provenance:
+      source: "decisão do maestro na sessão de 2026-10-11, por pergunta com opções"
+      locator: "pergunta 3 de 4: o mini com 49 ausências declaradas; opção escolhida MANTER ENXUTO (a recomendada)"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      locality: "pessoa"
+
+  - id: D_PERSONALITY_SYNC_NO_CONJUNTO_FEDERACAO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "decisão do maestro por pergunta com opções em 2026-10-11, a recomendada; roles.yaml com personality-sync em federation e pending vazio; manifesto das seis superfícies idêntico ao de antes (E_CORTE_POR_DESTINO_MEDIDO)"
+    label: "DECISÃO DO MAESTRO (2026-10-11): CONJUNTO FEDERAÇÃO. /meta:personality-sync sai de pending e entra em federation no roles.yaml: viaja para source e hub, não para standalone, plugins e mini, o mesmo corte de antes"
+    narrative: "Fecha Q_PERSONALITY_SYNC_SEM_CONJUNTO. O comando escreve a linha personality_summary do members.yaml, que é registro da federação, e já tinha tag federation. O conjunto pending fica vazio, como o lugar de quem nascer sem classificação. Conferido que o corte resultante é o mesmo para as portas: federation e pending eram declarados pelos mesmos papéis (source e hub), e o manifesto de cada papel saiu idêntico ao de origin/main. O adoption_keeps do standalone adotado não inclui personality-sync."
+    trace: ".claude/utils/marketplace/roles.yaml"
+    provenance:
+      source: "decisão do maestro na sessão de 2026-10-11, por pergunta com opções"
+      locator: "pergunta 4 de 4: personality-sync sem conjunto; opção escolhida CONJUNTO FEDERAÇÃO (a recomendada)"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      locality: "pessoa"
 
 edges:
   # o dano é a evidência de que a lacuna existia
@@ -663,3 +783,55 @@ edges:
   - from: Q_PIN_NA_DO_MINI_DEPOIS_DA_PUBLICACAO
     to: E_MINI_GERADO_F5
     edge_type: CONSTRAINS
+  # ---- 2026-10-11: F6 e o fecho das decisões do maestro ----
+  # a F6 escreve no remoto a parte da matriz que é publicação
+  - from: E_PORTAS_PUBLICADAS_F6
+    to: D_MATRIZ_DE_PORTAS_2026_10
+    edge_type: SUPPORTS
+  - from: E_PORTAS_PUBLICADAS_F6
+    to: E_PUBLICAR_SOB_DEMANDA_F3
+    edge_type: DEPENDS_ON
+  - from: E_PORTAS_PUBLICADAS_F6
+    to: E_MINI_GERADO_F5
+    edge_type: DEPENDS_ON
+  # o registro alinhado responde as duas perguntas que esperavam a 1a publicação
+  - from: E_PORTAS_PUBLICADAS_F6
+    to: Q_REGISTRO_ACOMPANHA_A_TROCA_DE_PAPEL
+    edge_type: SUPERSEDES
+  - from: E_PORTAS_PUBLICADAS_F6
+    to: Q_PIN_NA_DO_MINI_DEPOIS_DA_PUBLICACAO
+    edge_type: SUPERSEDES
+  # decisão 1: a fábrica de verticais fica fora do plugin; limita a matriz sem derrubá-la
+  - from: D_FABRICA_DE_VERTICAIS_FICA_FORA_DO_PLUGIN
+    to: Q_CREATE_VERTICAL_E_O_MOTOR_DO_MARKETPLACE_NO_PLUGIN
+    edge_type: SUPERSEDES
+  - from: D_FABRICA_DE_VERTICAIS_FICA_FORA_DO_PLUGIN
+    to: D_MATRIZ_DE_PORTAS_2026_10
+    edge_type: CONSTRAINS
+  # decisão 2: papel de adoção ≠ papel de porta; o corte medido a sustenta
+  - from: D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA
+    to: Q_STANDALONE_DE_ADOCAO_SEGUE_A_PORTA
+    edge_type: SUPERSEDES
+  - from: D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA
+    to: D_MATRIZ_DE_PORTAS_2026_10
+    edge_type: CONSTRAINS
+  - from: E_CORTE_POR_DESTINO_MEDIDO
+    to: D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA
+    edge_type: SUPPORTS
+  - from: E_CORTE_POR_DESTINO_MEDIDO
+    to: E_MANIFESTOS_POR_PAPEL_F2
+    edge_type: DEPENDS_ON
+  # decisão 3: o mini segue enxuto
+  - from: D_MINI_SEGUE_ENXUTO
+    to: Q_MINI_CONFIGURA_INTEGRACAO_PELO_ENV
+    edge_type: SUPERSEDES
+  - from: D_MINI_SEGUE_ENXUTO
+    to: E_MINI_GERADO_F5
+    edge_type: DEPENDS_ON
+  # decisão 4: personality-sync no conjunto federação, com o corte medido idêntico
+  - from: D_PERSONALITY_SYNC_NO_CONJUNTO_FEDERACAO
+    to: Q_PERSONALITY_SYNC_SEM_CONJUNTO
+    edge_type: SUPERSEDES
+  - from: E_CORTE_POR_DESTINO_MEDIDO
+    to: D_PERSONALITY_SYNC_NO_CONJUNTO_FEDERACAO
+    edge_type: SUPPORTS

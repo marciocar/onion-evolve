@@ -14,8 +14,10 @@
 #     `.claude/utils/marketplace/{assemble-plugin,generate-marketplace}.sh` — o MOTOR do marketplace, que a
 #     REGRA 61 (Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado) segue tratando como moat (a matriz o lista com a adoção). Levá-lo exigiria abrir o moat
 #     (decisão do maestro, não desta fase) ou publicar um comando cujo `allowed-tools` aponta um motor que
-#     não viaja (a REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca) o chama de NASCIDO MORTO). Fica no core e no standalone; o fio está em
-#     "para o final" da F4.
+#     não viaja (a REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca) o chama de NASCIDO MORTO). Fica no core e no standalone.
+#     DECIDIDO em 2026-10-11 pelo maestro (D_FABRICA_DE_VERTICAIS_FICA_FORA_DO_PLUGIN, no grafo
+#     door-role-parity-2026-09): MANTER FECHADO. O motor do marketplace segue moat e o create-vertical segue
+#     fora deste plugin; a liberação da meta-fábrica ao plugin é PARCIAL, nos termos desta lista.
 #   · `/meta:forge`, `/meta:forge-guard` e `/meta:cc-update` FICAM FORA. Os motores deles
 #     (forge-census.sh, guard-census.sh, cc-delta-census.sh) medem o HARNESS do repo — lint-artifacts.sh e
 #     lint-selftest.sh —, e o assembler recusa o bundle porque o grafo de dependências não fecha (medido:
