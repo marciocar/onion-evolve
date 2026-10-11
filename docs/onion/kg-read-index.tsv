@@ -156,6 +156,7 @@
 .claude/hooks/premodelswitch-guard.sh	E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_VETOU_COMANDO_SEM_ENV	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_GLOB_JULGADO_PELO_DISCO	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
+.claude/hooks/pretooluse-env-guard.sh	Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT	docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_CURA_MERGE_GATE_2O_VETO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_MERGE_GATE_INERTE_NO_ADOTANTE	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
@@ -537,6 +538,7 @@
 .claude/validation/vendor-scrub-form-check.sh	E_VAZAMENTO_REAL_DE_CLIENTE_NA_SUPERFICIE_QUE_VIAJA	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/validation/vendor/kg-console/cytoscape.min.js	E_headless_valid	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/vendor/kg-console/provenance.md	D_renderer_cytoscape_core	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
+.claude/validation/veto-onfailure-check.sh	Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS	docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml
 .claude/validation/vps-exposure-check.sh	A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/vps-exposure-check.sh	E_OBJECAO_BIND_LOOPBACK_JA_E_REGRA	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
 .claude/validation/vps-exposure-check.sh	Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml

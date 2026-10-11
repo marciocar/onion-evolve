@@ -648,12 +648,6 @@
 | 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
 | 5.4 | `Q_KG_INBOX_FORA_DO_PLUGIN` | librechat-kg-runtime-2026-08 | LACUNA DECLARADA (achado do Elenxo de 2026-09-05, medida): o /meta:kg-inbox NAO esta em plugins/onion/commands/ — o diretorio te |
 
-## radar-E3-2026-10-08-r8 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 10.5 | `Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS` | radar-E3-2026-10-08-r8 | adotar onFailure: block nos PreToolUse (env-guard, protect-main, merge-gate e avaliar o kg-read-leg) e provar ao vivo, com um hook |
-
 ## hub-operacoes-enterprise-update-547-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -857,6 +851,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.2 | `Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO` | radar-E3-2026-10-05-r7 | A 2.1.289 adiciona agent.spawn para teammates, um id de agente unico atraves dos eventos de hook de plugin, e estados idle/waiting |
+
+## radar-E3-2026-10-08-r8 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.2 | `Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT` | radar-E3-2026-10-08-r8 | curar o custo quadrático do env-guard num token gigante: com onFailure block, um comando de ~520 KB sem espaço passa a ser BARRA |
 
 ## vps-shared-tools-2026-07 — 1 item(ns)
 
