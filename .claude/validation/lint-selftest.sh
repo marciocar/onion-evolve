@@ -7318,6 +7318,7 @@ run_a2a_verify_selftests() {
 members:
   - id: onion-evolve
     role: source
+    kind: source
     remote: github.com/marciocar/onion-evolve
     a2a: { keys: [k1] }
   - id: acme
@@ -7439,6 +7440,7 @@ run_agent_card_selftests() {
 members:
   - id: onion-evolve
     role: source
+    kind: source
     remote: github.com/marciocar/onion-evolve
   - id: acme-secret
     role: standalone
