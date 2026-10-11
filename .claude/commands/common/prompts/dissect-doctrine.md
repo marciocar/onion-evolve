@@ -90,7 +90,7 @@ Até 2026-10-11 o veredito terminava em prosa no nó de decisão e nada o entreg
 N4). O dogfood do Conductor, a 1ª dissecação a chegar ao N4, fixou a forma mínima, sem comando novo:
 
 1. **Peças** — `x_absorb_target` + `x_absorb_pieces`. Quais já existem no alvo **não se escreve**:
-   o leitor (`dissect-census.sh --plans`) roda o `forge-census.sh` e mede. Campo digitado de
+   o leitor (`dissect-plans.sh`) roda o `forge-census.sh` e mede. Campo digitado de
    "peça existe" seria plano preenchido sem medir.
 2. **Proveniência e licença** — `x_absorb_origin` (URL **com pin**) + `x_absorb_license`. Absorver
    sem registrar a origem é o roubo que a casa proíbe.

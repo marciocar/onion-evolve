@@ -76,8 +76,10 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
    `adapter-sdaal` · `vendor-pin`; proprietário **nunca** `vendor-pin`) · `x_absorb_parity:` (o
    caso que prova que a peça faz o que a original fazia, **nomeando** a família
    `run_<n>_selftests`). **Não escreva quais peças já existem** — o leitor as mede ao vivo:
-   `bash .claude/validation/dissect-census.sh . --plans <ferramenta>` (rc 1 = plano INCOMPLETO,
-   com o motivo). Rode-o antes do passo 5 e só siga com rc 0.
+   `bash .claude/validation/dissect-plans.sh . <ferramenta>` (rc 1 = plano INCOMPLETO,
+   com o motivo). Rode-o antes do passo 5 e só siga com rc 0. O leitor mora do lado do forge
+   (core e standalone): no plugin `onion-meta` o forge não viaja, o leitor também não, e o plano
+   fica no grafo esperando quem o forje.
 5. **DESTINO (peça 5)** — `write(KG)` em
    `docs/evolution/dissect/<ferramenta>-<AAAA-MM>/<ferramenta>-<AAAA-MM>.kg.yaml` com os
    marcadores que o censo lê (`meta.x_dissect_tool:`, `x_dissect_level:` por nó, `x_dissect_verdict:` no
