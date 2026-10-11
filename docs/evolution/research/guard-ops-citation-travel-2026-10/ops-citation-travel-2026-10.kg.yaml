@@ -1,0 +1,178 @@
+# kg-backlog-guard: on
+# ═══ TETO: 16 NÓS ═══
+meta:
+  id: ops-citation-travel-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-11"
+  review_after: "2026-11-25"
+  note: "Forja (/meta:forge-guard) da REGRA 100: superfície que viaja não cita ops/ como se o destinatário o tivesse (SAC-86). O fato mora aqui; o backlog só cita estes ids."
+nodes:
+  - id: E_DEFEITO_LENTE_DESCREVE_OPS_AO_ADOTANTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-11"
+    verified_against: "leitura de .claude/rules/kg-grammar.md, .claude/hooks/pretooluse-merge-gate.sh e .claude/skills/onion-orchestration/SKILL.md em origin/main 699a88e3, e o manifesto de transporte por papel (vendor-manifest.sh --role adopted, hub, standalone, plugins, mini)"
+    label: "O DEFEITO, DATADO (SAC-86, 2026-10-09, materialização do onion-standalone no pin 947e69ce): a lente kg-grammar.md dizia ao adotante que o script de merge verificado de ops/ recusa o rebase. ops/ não viaja para porta nem adotante."
+    narrative: "A lente carrega sozinha ao tocar um .kg.yaml, inclusive no adotante, e ali descrevia um comportamento que o destinatário não tem. A mesma classe já estava publicada antes no hook pretooluse-merge-gate.sh (cabeçalho e mensagem de veto) e na onion-orchestration/SKILL.md. Nenhuma guarda via: a checagem de ponteiro morto não cobre ops/, e a citação existe em outra superfície publicada. Medido nesta forja: nenhum papel do manifesto inclui ops/ (adopted, hub e source levam as 11 raízes sem exclusão; standalone, plugins e mini levam menos)."
+    provenance:
+      source: ".claude/rules/kg-grammar.md@699a88e3"
+      locator: "linha da tabela do campo provenance (SAC-80); pretooluse-merge-gate.sh cabeçalho e função deny; onion-orchestration/SKILL.md seção Gotchas"
+      method: "leitura: os três sítios em origin/main e a saída de vendor-manifest.sh por papel"
+      locality: "repo"
+
+  - id: E_CENSO_SEM_GUARDA_DA_CLASSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "GUARD_CENSUS_QUERY='ops ' bash .claude/validation/guard-census.sh . --markdown"
+    label: "O censo (2026-10-11) não achou guarda da classe: os dois arquivos que mencionam o termo (session-beacon.sh, identifier-language-check.sh) não julgam citação de ops/. Mediu 18 moldes de check de lint e 231 famílias de bancada."
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "seções 'já existe guarda' e 'moldes por SUBSTRATO' da saída de 2026-10-11"
+      method: "medição: guard-census.sh com GUARD_CENSUS_QUERY, rodado pela sessão da forja"
+      locality: "repo"
+
+  - id: E_PASSIVO_MEDIDO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "grep da forma ops/<nome> nas 11 raízes que viajam, e ops-citation-travel-check.sh --emit-baseline antes e depois das curas"
+    label: "Passivo: 203 citações cruas de ops/ nas raízes que viajam; 36 pares arquivo-alvo sem declaração antes das curas, 33 depois, e 31 depois das curas da passada adversarial (uma era fixture de selftest, outra arquivo que testa a presença). A bancada fica fora por desenho."
+    provenance:
+      source: ".claude/validation/ops-citation-travel-baseline.txt"
+      locator: "31 entradas no formato arquivo, token e contagem; escopo declarado na linha scope"
+      method: "medição: ops-citation-travel-check.sh --emit-baseline sobre a worktree da forja"
+      locality: "repo"
+
+  - id: D_SUBSTRATO_CHECK_DE_LINT_COM_CATRACA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/validation/ops-citation-travel-check.sh"
+    label: "Substrato: check de lint (REGRA 100) com catraca, no core, na hora da autoria. Molde: kb-vendored-link-check.sh (6 casos), a guarda irmã de ponteiro para o que não viaja. As raízes vêm do manifesto real, nunca de lista própria."
+    narrative: "Escolhido no censo entre os 18 moldes de check de lint porque é o único que já julga o corpus que viaja por raízes derivadas do vendor-manifest.sh --emit-scrub-roots e tem catraca escopo-ciente. O passo de verificação do materializador da porta foi descartado como substrato principal: ele roda na publicação, depois do merge, e o defeito nasce na autoria; o lint pega antes. Hook PreToolUse descartado: a pergunta é de corpus, não de comando. No adotante e na porta derivada o check não roda (IS_DERIVED): ali não há ops/ a citar, e o passivo é do core."
+
+  - id: D_TRES_DECLARACOES_E_O_MARCADOR
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    trace: ".claude/validation/ops-citation-travel-check.sh"
+    label: "A guarda não decide se a frase descreve o destinatário; obriga o autor a declarar. Três declarações calam: o marcador (core-only) na linha, o teste de presença na linha, e o arquivo que se declara Core-only no frontmatter."
+    narrative: "O marcador (core-only) não foi inventado: tinha 54 usos no core em 2026-10-11 para citar artefato que o destinatário não tem, e é o que o passo de varredura independente do materializador da porta já pede para documento privado nomeado. O teste de presença é a forma honesta em código (o hook de merge só arma onde o script existe). O frontmatter Core-only é a convenção de /meta:publish, /meta:forge, /meta:forge-guard, /meta:dissect e /meta:cc-update: o arquivo inteiro descreve o core, e exigir o marcador linha a linha ali seria falso positivo."
+
+  - id: E_CURA_DOS_TRES_SITIOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "ops-citation-travel-check.sh --emit-baseline sem entrada para os três arquivos depois da cura"
+    label: "Curados os três sítios: a lente kg-grammar.md passou a dizer o que o destinatário faz (mergear com merge commit) e marca o script como (core-only); o hook e a skill marcam cada citação."
+    provenance:
+      source: ".claude/rules/kg-grammar.md"
+      locator: "linha do campo provenance; pretooluse-merge-gate.sh cabeçalho e deny; onion-orchestration/SKILL.md Gotchas"
+      method: "medição: emissão do baseline antes (36) e depois (33) da cura"
+      locality: "repo"
+
+  - id: E_MUTANTES_MORDEM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "ops/mutate-and-restore.sh sobre a guarda real (um mutante por caso do --selftest) e sobre o lint-artifacts.sh (registro); bancada run_ops_citation_travel_selftests com LC_ALL=C"
+    label: "Dezenove mutantes, ao menos um por caso dos 17 do --selftest, mordem com rc 1 e o caso nomeado em vermelho; o mutante do registro (dispatcher sem a chamada) derruba o caso c da bancada. Bancada: 22/22 verdes."
+    narrative: "O dogfood pegou dois defeitos meus no mesmo laço: a 1ª execução do --selftest saiu 6/9 porque o script não era executável e o selftest o chamava por caminho, e os seis verdes eram VACUIDADE (saída vazia cala tudo); curado chamando por bash. E o 1º marcador no hook saiu como (core-only; …), que a guarda não reconhece; curado para (core-only). Um mutante plantado com comentário dentro do awk quebrou a sintaxe em vez de reverter a cura; refeito com o marcador numa expressão válida."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_ops_citation_travel_selftests, casos a, b, c e m"
+      method: "medição: mutate-and-restore.sh com hash de restauração conferido, e a família rodada com LC_ALL=C"
+      locality: "repo"
+
+  - id: E_ELENXO_REPROVOU_E_FOI_CURADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "refutador em worktree isolada com mandato de falso positivo, sobre b143f0dc: fixtures sintéticas e o lint de produção com --only"
+    label: "Elenxo (2026-10-11) REPROVOU a 1ª versão: quatro falsos positivos reais (ops/ de outro projeto, presença testada em outra linha, sandbox de selftest, variação do marcador) e um falso negativo de catraca (2ª citação de token tolerado). Curados no mesmo laço."
+    narrative: "Prova do refutador no modo de produção: uma rule com src/ops/handler.ts saía HARD e travava o merge. Curas: o token só conta no início de palavra ou depois de variável de raiz em lista fechada; o teste de presença guarda o token testado no arquivo inteiro, inclusive pela variável atribuída, e só ele; o marcador aceita caixa e complemento; o baseline conta ocorrências por par. Também curados os baratos: CRLF e BOM no frontmatter, token que não é arquivo, frontmatter negado ou sem fechamento, e o paths: de rule tratado como gatilho. Declarados como teto: árvore em bloco cercado, isenção de .yaml, hook sem extensão e a catraca sem referência no PR de bootstrap. Durante a cura, o dogfood pegou um defeito meu: o join por FNR igual a NR casava o 2º arquivo quando o baseline estava vazio. A 2ª passada (APROVA COM RESSALVAS) achou que a presença propagada ao arquivo inteiro reabria o defeito verbatim em prosa: um exemplo com teste de presença calava a frase do SAC-86. Curado: em código a presença vale no arquivo; em prosa, só na linha. Também -r e -L como teste, e marcador e frontmatter com mais pontuação."
+    provenance:
+      source: ".claude/validation/ops-citation-travel-check.sh"
+      locator: "casos x a xvii do --selftest e os mutantes correspondentes da bancada"
+      method: "juízes: refutador com mandato de falso positivo; curas re-medidas pelo --selftest, pelos mutantes e pelo corpus real"
+      locality: "repo"
+
+  - id: C_TETO_FORMA_NAO_SENTIDO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    trace: ".claude/validation/ops-citation-travel-check.sh"
+    label: "TETO: a guarda vê a FORMA (ops/<arquivo> sem declaração), não o SENTIDO. Ela acusa igual a frase que descreve o destinatário e a que descreve o core sem se marcar, e confia na declaração de quem escreve."
+
+  - id: C_TETO_CLASSE_SEM_O_TOKEN
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    trace: ".claude/validation/ops-citation-travel-check.sh"
+    label: "TETO: comportamento do core descrito SEM o caminho (o script de merge verificado recusa…) passa calado. A classe sem o token ops/ é invisível a esta guarda."
+
+  - id: C_TETO_BANCADA_E_CORE_ONLY_FORA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    trace: ".claude/validation/ops-citation-travel-check.sh"
+    label: "TETO: lint-selftest.sh, fixtures/ e baselines ficam fora (a bancada executa o que cita e falha alto); árvore genérica em bloco cercado acusa; .yaml não tem isenção de arquivo; variável de raiz é lista fechada e o resto cala."
+
+edges:
+  - from: E_ELENXO_REPROVOU_E_FOI_CURADO
+    to: D_TRES_DECLARACOES_E_O_MARCADOR
+    edge_type: SUPPORTS
+  - from: E_DEFEITO_LENTE_DESCREVE_OPS_AO_ADOTANTE
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_CATRACA
+    edge_type: SUPPORTS
+  - from: E_CENSO_SEM_GUARDA_DA_CLASSE
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_CATRACA
+    edge_type: SUPPORTS
+  - from: E_PASSIVO_MEDIDO
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_CATRACA
+    edge_type: SUPPORTS
+  - from: E_CURA_DOS_TRES_SITIOS
+    to: E_DEFEITO_LENTE_DESCREVE_OPS_AO_ADOTANTE
+    edge_type: TRACES_TO
+  - from: E_MUTANTES_MORDEM
+    to: D_TRES_DECLARACOES_E_O_MARCADOR
+    edge_type: SUPPORTS
+  - from: C_TETO_FORMA_NAO_SENTIDO
+    to: D_TRES_DECLARACOES_E_O_MARCADOR
+    edge_type: CONSTRAINS
+  - from: C_TETO_CLASSE_SEM_O_TOKEN
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_CATRACA
+    edge_type: CONSTRAINS
+  - from: C_TETO_BANCADA_E_CORE_ONLY_FORA
+    to: D_TRES_DECLARACOES_E_O_MARCADOR
+    edge_type: CONSTRAINS

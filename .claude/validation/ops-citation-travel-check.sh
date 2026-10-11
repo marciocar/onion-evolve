@@ -50,7 +50,9 @@
 #   · o marcador `(core-only)` cala a LINHA inteira, inclusive um 2º token nela;
 #   · variável de raiz é LISTA FECHADA (R, root, REPO_ROOT, CLAUDE_PROJECT_DIR…): `${outra}/ops/x.sh`
 #     cala — erra para calar; `$HOME/ops/x.sh` também cala por isso;
-#   · teste de presença guarda o token no ARQUIVO inteiro, inclusive uma frase de prosa nele;
+#   · em CÓDIGO, o teste de presença guarda o token no arquivo inteiro, inclusive um `echo` de prosa nele;
+#   · `$(…)/ops/x.sh` conta como raiz (é a forma de `$(git rev-parse …)/ops/`), e um `$(mktemp -d)/ops/`
+#     acusa — marque a linha;
 #   · hook sem extensão não é varrido (não há nenhum hoje);
 #   · `--base-ref` cuja ref não tem o baseline deixa a catraca sem referência, e no PR que cria a guarda
 #     a catraca compara com o próprio HEAD (bootstrap).
@@ -89,10 +91,11 @@ fi
 #     `$root/ops/`, `$(…)/ops/`). Depois de segmento literal (`src/ops/x.ts`, URL, `./ops/`) é o `ops/` de
 #     OUTRO projeto, e depois de variável de sandbox (`${tmp}/ops/`) é fixture de selftest: calam;
 #   · nome e extensão começam com letra, e o diretório tem 2+ caracteres (`ops/s/…`, `ops/1.5`, `ops/v1.2` calam);
-#   · o teste de presença guarda o TOKEN TESTADO no arquivo inteiro — inclusive pela variável que o recebe
-#     (`P="$R/ops/a.sh"` … `[ -f "$P" ]`) —, e não a linha (`[ -f ops/a.sh ] && bash ops/b.sh` acusa o b);
+#   · o teste de presença (`-f -e -x -d -s -r -L`) guarda o TOKEN TESTADO — em CÓDIGO no arquivo inteiro,
+#     inclusive pela variável que o recebe (`P="$R/ops/a.sh"` … `[ -f "$P" ]`); em PROSA só na mesma linha.
+#     Nunca a linha toda: `[ -f ops/a.sh ] && bash ops/b.sh` acusa o b;
 #   · marcador `(core-only)` aceita a caixa e o complemento (`(Core-only)`, `(core only)`, `(core-only, …)`);
-#   · frontmatter isenta só se FECHA e se o `description:` traz a frase `Core-only.` sem negação;
+#   · frontmatter isenta só se FECHA e se o `description:` declara `Core-only` (`.`, `,` ou `)`) sem negação;
 #     CRLF e BOM não escondem o `---`.
 collect_violations() { # <repo_dir>
   local repo="$1" r bases=()
@@ -126,32 +129,37 @@ collect_violations() { # <repo_dir>
         return n
       }
       FNR == 1 { flush(); rel = FILENAME; if (index(rel, prefix) == 1) rel = substr(rel, length(prefix) + 1)
-                 fm = 0; isfm = 0; fmclosed = 0; fmcore = 0; indesc = 0; inpaths = 0 }
+                 fm = 0; isfm = 0; fmclosed = 0; fmcore = 0; indesc = 0; inpaths = 0
+                 code = (FILENAME ~ /\.(sh|py|js|mjs|ts)$/) }
       { l = $0; sub(/\r$/, "", l); if (FNR == 1) sub(/^\357\273\277/, "", l) }
       FNR == 1 && l == "---" && FILENAME ~ /\.md$/ { fm = 1; isfm = 1; next }
       fm == 1  { if (l == "---") { fm = 0; fmclosed = 1; next }
                  if (l ~ /^description:/) indesc = 1; else if (l ~ /^[A-Za-z_][A-Za-z0-9_-]*:/) indesc = 0
                  if (l ~ /^paths:/) inpaths = 1; else if (l ~ /^[A-Za-z_][A-Za-z0-9_-]*:/) inpaths = 0
                  if (inpaths) next   # paths: da rule é GATILHO de carga (só casa onde o arquivo existe), não descrição
-                 if (indesc && l ~ /Core-only\./ && l !~ /(NÃO|Não|não|NAO|Nao|nao|NOT|Not|not)[^.]*Core-only/) fmcore = 1 }
+                 if (indesc && l ~ /[Cc]ore-only[.,)]/ && l !~ /(NÃO|Não|não|NAO|Nao|nao|NOT|Not|not)[^.]*[Cc]ore-only/) fmcore = 1 }
       # (as linhas do frontmatter também são varridas: citação ali, num arquivo que não se declara, acusa;
       #  e frontmatter que nunca fecha não isenta nada — a isenção só vale com o `---` de fechamento)
-      l ~ /\([Cc]ore[- ]only[),]/ { next }
+      l ~ /\([Cc]ore[- ]only[),;[:space:]]/ { next }
       { n = tokens(l)
         # atribuição a variável: P="$R/ops/a.sh" → vtok[P]
         if (n > 0 && match(l, /^[[:space:]]*(local[[:space:]]+|export[[:space:]]+|readonly[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*=/)) {
           v = substr(l, RSTART, RLENGTH - 1); sub(/^[[:space:]]*(local|export|readonly)?[[:space:]]*/, "", v); vtok[v] = toks[1]
         }
         # teste de presença: guarda o OPERANDO testado (token literal ou variável que o recebeu)
-        s = l
-        while (match(s, /(\[\[?|test)[[:space:]]+(![[:space:]]+)?-[efxsd][[:space:]]+[^] ]+/)) {
+        #   ⚠️ em CÓDIGO o token testado fica guardado no arquivo inteiro (o uso vem depois do teste); em
+        #   PROSA só na mesma linha — senão um bloco de exemplo com `[ -f ops/x.sh ]` calaria a frase do
+        #   SAC-86 dez linhas acima (falso negativo do defeito verbatim, 2ª passada adversarial).
+        s = l; split("", lg)
+        while (match(s, /(\[\[?|test)[[:space:]]+(![[:space:]]+)?-[efxsdrL][[:space:]]+[^] ]+/)) {
           op = substr(s, RSTART, RLENGTH); s = substr(s, RSTART + RLENGTH)
-          sub(/^.*-[efxsd][[:space:]]+/, "", op); gsub(/"/, "", op)
-          if (tokens(op) > 0) gtok[toks[1]] = 1
-          else if (op ~ /^\$\{?[A-Za-z_][A-Za-z0-9_]*\}?$/) { gsub(/[${}]/, "", op); if (op in vtok) gtok[vtok[op]] = 1 }
-          n = tokens(l)
+          sub(/^.*-[efxsdrL][[:space:]]+/, "", op); gsub(/"/, "", op)
+          if (tokens(op) > 0) lg[toks[1]] = 1
+          else if (op ~ /^\$\{?[A-Za-z_][A-Za-z0-9_]*\}?$/) { gsub(/[${}]/, "", op); if (op in vtok) lg[vtok[op]] = 1 }
         }
-        for (i = 1; i <= n; i++) cand[++nc] = toks[i]
+        for (t in lg) if (code) gtok[t] = 1
+        n = tokens(l)
+        for (i = 1; i <= n; i++) if (!(toks[i] in lg)) cand[++nc] = toks[i]
       }
       END { flush() }' 2>/dev/null | LC_ALL=C sort
 }
@@ -160,7 +168,7 @@ collect_violations() { # <repo_dir>
 # SELFTEST (self-contido, à la kb-vendored-link-check.sh) — as polaridades
 # ---------------------------------------------------------------------------
 run_selftest() {
-  local tmp; tmp="$(mktemp -d)"; local fails=0 out total=15
+  local tmp; tmp="$(mktemp -d)"; local fails=0 out total=17
   mkdir -p "${tmp}/.claude/rules" "${tmp}/.claude/hooks" "${tmp}/.claude/validation/fixtures" \
            "${tmp}/.claude/commands/meta" "${tmp}/docs/sdaal" "${tmp}/ops" "${tmp}/docs/analysis"
   local BL="${tmp}/.claude/validation/ops-citation-travel-baseline.txt"
@@ -246,7 +254,7 @@ run_selftest() {
 
   # (xii) variações honestas do marcador => calam
   _reset
-  printf 'veja ops/deploy.sh (core-only, não viaja)\nveja ops/x.sh (Core-only)\n' > "${tmp}/.claude/rules/m.md"
+  printf 'veja ops/deploy.sh (core-only, não viaja)\nveja ops/x.sh (Core-only)\nveja ops/y.sh (core-only; idem)\n' > "${tmp}/.claude/rules/m.md"
   _run
   if _has 'm.md'; then echo "  ✗ (xii) (core-only, …) e (Core-only) deveriam calar"; fails=$((fails+1)); else echo "  ✅ (xii) variações do marcador calam"; fi
 
@@ -269,6 +277,18 @@ run_selftest() {
   printf -- '---\npaths:\n  - "ops/publish-door.sh"\n---\nrode `bash ops/publish-door.sh`\n' > "${tmp}/.claude/rules/pl.md"
   _run
   if _has $'^HARD\tNEW\t.claude/rules/pl.md\t.*(1 ocorr'; then echo "  ✅ (xv) paths: do frontmatter cala; o corpo acusa"; else echo "  ✗ (xv)"; fails=$((fails+1)); fi
+
+  # (xvi) em PROSA a presença NÃO se propaga: a frase do SAC-86 com um exemplo `[ -f … ]` abaixo => acusa
+  _reset
+  printf 'O `ops/pr-merge-verified.sh` recusa o rebase.\n\n```bash\n[ -f ops/pr-merge-verified.sh ] || echo sem\n```\n' > "${tmp}/.claude/rules/lente.md"
+  _run
+  if _has $'^HARD\tNEW\t.claude/rules/lente.md\t.*(1 ocorr'; then echo "  ✅ (xvi) em prosa a presença vale só na linha (a frase do SAC-86 acusa)"; else echo "  ✗ (xvi)"; fails=$((fails+1)); fi
+
+  # (xvii) `-r` antes de `source` é teste de presença honesto => cala
+  _reset
+  printf '[ -r "$R/ops/j.sh" ] && . "$R/ops/j.sh"\n' > "${tmp}/.claude/hooks/j.sh"
+  _run
+  if _has 'hooks/j.sh'; then echo "  ✗ (xvii) -r deveria calar"; fails=$((fails+1)); else echo "  ✅ (xvii) [ -r …ops/… ] cala"; fi
 
   rm -rf "${tmp}"; echo "  selftest: $((total-fails))/${total} verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1
