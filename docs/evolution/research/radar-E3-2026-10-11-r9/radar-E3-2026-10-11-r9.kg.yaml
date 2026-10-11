@@ -176,12 +176,18 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
-    confidence: 0.8
+    confidence: 0.9
     verified_at: "2026-10-11"
-    verified_against: "aberta pela rodada r9 a partir de E_TIERING_DOS_WORKFLOWS_E_O_MODELO_UNICO; o grep do passo 8 da onion-orchestration dá 0 para a variável nova"
+    verified_against: "SAC-105: helper forced-model-check.sh cobre CLAUDE_CODE_SUBAGENT_MODEL_FORCE e CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL (e nome CLAUDE_CODE_*AGENT_MODEL* fora do catálogo); família forced_model 6/6 sob LC_ALL=C; 3 mutantes mortos, o do grep antigo reprova 6 de 6 casos; zero sítio vivo com o grep de substring"
     label: "ampliar a checagem de modelo forçado da skill onion-orchestration e da KB agent-orchestration para CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL, com caso de bancada que reprove o grep antigo"
+    narrative: "Fechada pelo SAC-105. A checagem virou helper determinístico em vez de prosa: a skill (passo 8) e a KB agent-orchestration o citam. O grep antigo errava nos dois sentidos: dava 0 para a variável de 2.1.296 e acusava CLAUDE_CODE_SUBAGENT_MODEL sozinha, que desde 2.1.251 é piso e não força. Os sítios em docs/evolution/research são registro histórico e não foram reescritos. Flip de nó selado na main, proposto no relatório e aplicado por ordem do maestro."
+    provenance:
+      source: ".claude/utils/orchestration/forced-model-check.sh e a família forced_model de .claude/validation/lint-selftest.sh"
+      locator: "casos (a) a (f) da família; mutantes plantados no helper (grep antigo, checagem de Workflow desligada) e na skill (grep antigo de volta)"
+      method: "medição: lint-selftest --families forced_model sob LC_ALL=C (6 passam) e três mutantes via mutate-and-restore (todos reprovam, restauração conferida por hash)"
+      locality: "repo"
   - id: Q_FIXAR_EOL_LF_NO_GITATTRIBUTES
     node_type: question
     layer: audit

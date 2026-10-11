@@ -6356,6 +6356,57 @@ run_pretooluse_veto_selftests() {
 # worktree POSITIVA (o mutante que trocava o `worktree add` sobrevivia), gh FALHANDO (B3), marcador.
 # ---------------------------------------------------------------------------
 # ═══════════════════════════════════════════════════════════════════════════════
+# forced_model — o tiering declarado é o executado? (SAC-105, radar E3 r9, 2026-10-11)
+# O Claude Code 2.1.296 criou CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL e a checagem do passo 8 da skill
+# onion-orchestration, um grep de substring CLAUDE_CODE_SUBAGENT_MODEL, dava 0 para ela. Polaridades:
+# cada variável que força → AVISO + rc 1; nada, piso sozinho ou FORCE=0 → silêncio + rc 0; nome fora do
+# catálogo → AVISO. O MUTANTE que devolve o grep antigo ao helper reprova (a) e (c). (f) vigia o corpus.
+# ═══════════════════════════════════════════════════════════════════════════════
+run_forced_model_selftests() {
+  local h="${REPO_ROOT}/.claude/utils/orchestration/forced-model-check.sh"
+  if [ ! -f "${h}" ]; then record_fail "forced-model" "helper ausente: ${h}"; return; fi
+  local out rc
+  _fm_run() { rc=0; out="$(env -i PATH="${PATH}" "$@" bash "${h}" 2>&1)" || rc=$?; }
+  # (a) a variável NOVA (2.1.296) — o caso que o grep antigo não via
+  _fm_run CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL=haiku
+  if [ "${rc}" = 1 ] && grep -q '^AVISO: tiering declarado ≠ executado (env force) — CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL=haiku' <<< "${out}"; then
+    record_pass "forced-model: (a) CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL setada → AVISO + rc 1"
+  else record_fail "forced-model: (a) variável de Workflow" "rc=${rc}: ${out:0:160}"; fi
+  # (b) FORCE ligada → AVISO com o modelo efetivo (o piso, quando há)
+  _fm_run CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1 CLAUDE_CODE_SUBAGENT_MODEL=sonnet
+  if [ "${rc}" = 1 ] && grep -q '^AVISO: .*CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1: .* roda em sonnet$' <<< "${out}"; then
+    record_pass "forced-model: (b) CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1 → AVISO com o modelo efetivo"
+  else record_fail "forced-model: (b) FORCE" "rc=${rc}: ${out:0:160}"; fi
+  # (c) o piso sozinho NÃO força (desde 2.1.251) — o falso positivo do grep antigo
+  _fm_run CLAUDE_CODE_SUBAGENT_MODEL=sonnet
+  if [ "${rc}" = 0 ] && [ -z "${out}" ]; then record_pass "forced-model: (c) CLAUDE_CODE_SUBAGENT_MODEL sozinha (piso) → silêncio + rc 0"
+  else record_fail "forced-model: (c) piso sozinho" "rc=${rc}: ${out:0:160}"; fi
+  # (d) nada setado, FORCE desligada, Workflow vazia → silêncio
+  local ok=1 e
+  for e in X=1 CLAUDE_CODE_SUBAGENT_MODEL_FORCE=0 CLAUDE_CODE_SUBAGENT_MODEL_FORCE=false CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL=; do
+    _fm_run "${e}"; if [ "${rc}" != 0 ] || [ -n "${out}" ]; then ok=0; record_fail "forced-model: (d) silêncio" "${e} → rc=${rc}: ${out:0:120}"; fi
+  done
+  [ "${ok}" = 1 ] && record_pass "forced-model: (d) nenhuma força (vazio, FORCE=0/false, Workflow vazia) → silêncio + rc 0"
+  # (e) nome fora do catálogo falha alto; argumento inválido → rc 2
+  _fm_run CLAUDE_CODE_TEAMMATE_AGENT_MODEL=opus
+  if [ "${rc}" = 1 ] && grep -q 'CLAUDE_CODE_TEAMMATE_AGENT_MODEL=opus (não catalogada' <<< "${out}"; then
+    rc=0; bash "${h}" --x >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" = 2 ]; then record_pass "forced-model: (e) variável não catalogada → AVISO; argumento → rc 2"
+    else record_fail "forced-model: (e) uso inválido" "rc=${rc} (esperado 2)"; fi
+  else record_fail "forced-model: (e) não catalogada" "rc=${rc}: ${out:0:160}"; fi
+  # (f) o corpus não volta ao grep de substring e cita o helper (skill + KB)
+  local hits sk="${REPO_ROOT}/.claude/skills/onion-orchestration/SKILL.md" kb="${REPO_ROOT}/docs/knowledge-base/concepts/agent-orchestration.md"
+  # perl -0777: a redação antiga QUEBRAVA a linha no meio do comando (`grep -c` ⏎ `CLAUDE_…`) — grep por
+  # linha não a veria. O padrão casa o `env | grep [-flags] CLAUDE_CODE_SUBAGENT_MODEL` através de quebras.
+  hits="$(cd "${REPO_ROOT}" && git ls-files -z -- '.claude' 'docs/knowledge-base' 'plugins' 2>/dev/null \
+          | xargs -0 -r perl -0777 -ne 'print "$ARGV\n" if /env\s*\|\s*grep(?:\s+-\w+)*\s+CLAUDE_CODE_SUBAGENT_MODEL/' 2>/dev/null || true)"
+  if [ -z "${hits}" ] && grep -q 'forced-model-check.sh' "${sk}" && grep -q 'forced-model-check.sh' "${kb}"; then
+    record_pass "forced-model: (f) skill e KB citam o helper; nenhum sítio vivo repete o grep de substring"
+  else record_fail "forced-model: (f) corpus" "grep antigo em: ${hits:-nenhum}; ou a skill/KB não cita o helper"; fi
+  unset -f _fm_run
+}
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # env_exposure — o .env nunca chega ao modelo (sinal de campo de um hub, dogfood do Zoho, 2026-10-05)
 # O setup-integration mandava ler o .env com Read "sem expor valores" — e Read expõe tudo; 40 comandos/
 # projeções liberavam `Bash(cat .env*)`. A cura é o helper env-check.sh (devolve NOMES e o provider, nunca
@@ -16662,6 +16713,7 @@ _family run_show_scope_selftests
 
 # Modo resolve-target — targeting fino por seletor no alvo: (F1.2 federação — mata o ruído).
 _family run_env_exposure_selftests
+_family run_forced_model_selftests
 _family run_pre_push_selftests
 _family run_resolve_target_selftests
 
