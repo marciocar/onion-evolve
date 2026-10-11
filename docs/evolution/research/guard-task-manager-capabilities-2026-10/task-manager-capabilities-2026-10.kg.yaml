@@ -84,7 +84,7 @@ nodes:
     verified_at: "2026-10-11"
     verified_against: "--selftest com LC_ALL=C (18/18), família run_task_manager_capabilities_selftests (22/22), 20 mutantes pelo mutate-and-restore.sh sobre a guarda real e o dispatcher, com o hash da guarda conferido igual depois"
     label: "Dezoito casos no --selftest, cada um com mutante que morde (rc 1 e o caso nomeado em vermelho); o mutante do registro (dispatcher sem a chamada) derruba o caso c da bancada. O corpus real sai limpo; uma cópia com três defeitos plantados sai com as quatro HARD esperadas."
-    narrative: "O dogfood pegou dois defeitos meus. (1) Antes da 1ª execução, na leitura: a saída do awk era lida com IFS de TAB, e o read colapsa campos vazios consecutivos, o que deslocaria a coluna seguinte; curado com o separador US (0x1f). (2) Na 1ª rodada do mutate-and-restore.sh, três mutantes não morderam: o marcador ONION_MUTANTE no fim da linha comentava os argumentos do _emit e o ;; do case, e o mutante quebrava a sintaxe em vez de reverter a cura (rc 2). Refeito com o marcador como 1ª expressão; 20 de 20 mordem."
+    narrative: "O dogfood pegou dois defeitos meus. (1) Antes da 1ª execução, na leitura: a saída do awk era lida com IFS de TAB, e o read colapsa campos vazios consecutivos, o que deslocaria a coluna seguinte; curado com o separador US (0x1f). (2) Na 1ª rodada do mutate-and-restore.sh, três mutantes não morderam: o marcador obrigatório de mutante no fim da linha comentava os argumentos do _emit e o ;; do case, e o mutante quebrava a sintaxe em vez de reverter a cura (rc 2). Refeito com o marcador como 1ª expressão; 20 de 20 mordem."
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_task_manager_capabilities_selftests, casos a, b, c e m"
