@@ -1,8 +1,10 @@
 ---
-reviewed_diff_sha256: 71bdb137b4eacf03551285127cc6626ea2e3a1528fa847b29457665e8baa6bd5
+reviewed_diff_sha256: 80193662294f7b27aa2375859d3c1ae7389822f458499de8149dd03139e2a7d3
 reviewed_code_sha256: dc1432ba56acf2130b91f6427ee8156ff900e38c0c56a7d5f8c89263eb4f07c0
 findings_total: 10
 findings_real: 9
+tokens: 174415
+duration_min: 10
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >
