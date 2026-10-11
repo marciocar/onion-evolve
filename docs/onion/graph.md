@@ -771,7 +771,7 @@ poc-venda-direta-pdi	tier	standalone
 poc-venda-direta-pdi	trust-advises	onion-evolve	
 portal-gamificacao	adopts	onion-evolve	
 portal-gamificacao	mode	greenfield	
-portal-gamificacao	pin	2e3f3a6f88ce	
+portal-gamificacao	pin	ce60ec13f298	
 portal-gamificacao	specialization	collaborator-layer	
 portal-gamificacao	specialization	domain-kb-two-layers	
 portal-gamificacao	specialization	gamification	

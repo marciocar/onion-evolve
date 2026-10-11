@@ -91,7 +91,7 @@ flowchart TD
 | sge | standalone | regulated | licitacao-publica, lei-14133, regulated-greenfield, analise-tecnica, checklist-qualidade | `ba0d2d423c17` |
 | hub-formacao-enterprise | hub | greenfield | hub-de-adocao, formacao-hands-on, company-brain, spec-as-code | `f32e2f931c73` |
 | sacola-de-ideias | standalone | greenfield | astro-site, institutional, greenfield-dogfood | `8e2517724c0a` |
-| portal-gamificacao | standalone | greenfield | gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers | `2e3f3a6f88ce` |
+| portal-gamificacao | standalone | greenfield | gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers | `ce60ec13f298` |
 | jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `df031ef53683` |
 | onion-slm | standalone | greenfield | slm, eval-de-dominio, roteiro-gradual | `9e75a73d0401` |
 | onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `7818b8a25ae6` |
