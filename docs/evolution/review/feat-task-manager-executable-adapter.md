@@ -1,8 +1,8 @@
 ---
 branch: feat/task-manager-executable-adapter
 date: 2026-10-11
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: cb61073f4e7637cd85a09acb493118d28e20cd0db1b8e74a03bc3a5914046d2f
+reviewed_diff_sha256: 4a75d6a0c644a6824415b258ae9461b081b82d54ff374d590f001a22c0917e60
+reviewed_code_sha256: 7341016ab99c83a19c0417c296be8c28d4dbac6ffca658f12c43f8c445a0490f
 findings_total: 5
 findings_real: 5
 findings_fixed: 3
