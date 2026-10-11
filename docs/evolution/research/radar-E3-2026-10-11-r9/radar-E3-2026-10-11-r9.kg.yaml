@@ -9,7 +9,7 @@ meta:
   review_after: "2026-11-10"   # 30d: cadência de ferramenta
   x_supersedes_none: "a rodada mediu 2.1.296 contra a baseline E3 (r8, 2.1.295) e não derrubou nenhum nó da r8: E_HOOK_ONFAILURE_BLOCK segue verdadeiro (20 hooks, 0 com onFailure) e nenhum item do delta contradiz um nó selado"
   # ═══ TETO: 25 NÓS ═══
-  #   2 no esqueleto (2026-10-11); 12 depois da rodada e do juiz (2026-10-11).
+  #   2 no esqueleto (2026-10-11); 12 depois da rodada e do juiz (2026-10-11); 13 com a sonda --debug (SAC-106).
 # ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
 #   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
 # external_edges:
@@ -150,12 +150,28 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
-    confidence: 0.6
+    confidence: 0.85
     verified_at: "2026-10-11"
-    verified_against: "aberta pela rodada r9 em 2026-10-11 a partir de E_FRONTMATTER_DE_AGENTE_SEM_GUARDA_DE_CHAVE e E_DEBUG_DE_HOOK_MEDE_DURACAO; nada foi rodado com --debug ainda"
+    verified_against: "SAC-106, fechada em 2026-10-11 por E_SONDA_DEBUG_HOOKS_E_FRONTMATTER: a allowlist das chaves da casa nasceu antes (agent-frontmatter-keys.tsv, REGRA 102) e a sonda --debug, sem as configurações do usuário, bateu agente a agente com ela (344 chaves em 51 arquivos, zero typo) e mediu 17 dos 20 hooks; nenhum se aproxima de limite. Os 3 que não dispararam (PreCompact, PreModelSwitch, PostModelSwitch) seguem sem latência medida"
     label: "medir com o --debug da 2.1.296 a duração dos hooks sem latência medida e as chaves de frontmatter dos agentes, depois de uma allowlist das chaves da casa; a sonda com -p dispara o hook Stop do usuário"
+  - id: E_SONDA_DEBUG_HOOKS_E_FRONTMATTER
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "uma chamada claude -p na 2.1.296, modelo haiku, com --setting-sources project,local e --debug-file, dentro de uma worktree do core; custo registrado no log de US$ 0,0139. O log não traz ntfy nem curl e só registra os 2 hooks Stop do projeto: o Stop do usuário, que notifica o celular do maestro, não carregou"
+    label: "a sonda --debug da 2.1.296 acusou chave não reconhecida nos 51 agentes, idêntica arquivo a arquivo às 11 chaves da casa (344), sem typo; 17 dos 20 hooks mediram, o mais lento a 1119 ms contra timeout de 5 s"
+    narrative: "Frontmatter: o Claude Code loga um WARN por agente com as chaves que não reconhece nem aplica, e trunca a lista em cinco nomes seguidos de 'and N more'. Somando os nomes e o N por arquivo, os 51 arquivos dão 344, idêntico arquivo a arquivo à contagem das chaves da casa feita pela guarda. Nenhuma linha traz dica de typo. Por causa do truncamento, version, updated, required_env, optional_env, integrations e knowledge_bases quase nunca aparecem pelo nome: o log não é inventário, e a allowlist do repo é. Hooks com duração no log (ms): SessionStart task-manager-provider 175, worklog-capture-session 179, session-beacon up 287, co-evolution-inbox-check 1119 (timeout 5 s, 22% do teto); UserPromptSubmit session-degraded-notice 28 (sem timeout), session-version-drift 29, aside-router 79, session-beacon refresh 98; PreToolUse Bash kg-read-leg 26, env-guard 56, merge-gate 103, protect-main 108 (os quatro sem timeout); PostToolUse bash-empty-result-guard 78 (sem timeout); Stop background-state-needs-evidence 132 e rule-title-in-prose 137 (sem timeout). InstructionsLoaded e SessionEnd completaram com status 0, mas a linha deles não traz duração. PreCompact, PreModelSwitch e PostModelSwitch não dispararam numa chamada curta. Hook sem timeout herda o padrão do Claude Code; o mais lento deles fica em 137 ms, então não há timeout a propor por esta medição (proposta só com caso lento medido). Única chamada; o efeito colateral no repo (uma linha no session-lifecycle.jsonl pelo SessionEnd) foi revertido."
+    provenance:
+      source: "claude -p --debug-file na 2.1.296, sem as configurações do usuário"
+      locator: "linhas WARN 'has frontmatter keys Claude Code does not recognize or apply' e linhas 'Hooks: <evento> [comando] finished with status 0 (N ms)' do log da sonda"
+      method: "medição: uma chamada claude -p com --setting-sources project,local, log de debug lido por grep e somado por arquivo contra a contagem da guarda"
+      locality: "host"
   - id: E_GITATTRIBUTES_SEM_EOL_LF
     node_type: evidence
     layer: audit
@@ -223,6 +239,9 @@ edges:
     to: Q_MEDIR_HOOKS_E_FRONTMATTER_COM_O_DEBUG
     edge_type: SUPPORTS
   - from: E_DEBUG_DE_HOOK_MEDE_DURACAO
+    to: Q_MEDIR_HOOKS_E_FRONTMATTER_COM_O_DEBUG
+    edge_type: SUPPORTS
+  - from: E_SONDA_DEBUG_HOOKS_E_FRONTMATTER
     to: Q_MEDIR_HOOKS_E_FRONTMATTER_COM_O_DEBUG
     edge_type: SUPPORTS
   - from: E_PRECO_DO_CACHE_DO_SONNET_CAIU

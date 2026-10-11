@@ -1,0 +1,177 @@
+# kg-backlog-guard: on
+# ═══ TETO: 12 NÓS ═══
+meta:
+  id: agent-frontmatter-keys-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-11"
+  review_after: "2026-11-25"
+  note: "Forja (/meta:forge-guard) da REGRA 102: chave de frontmatter de agente pertence à allowlist, oficiais do Claude Code mais as da casa (SAC-106, radar E3 r9). O fato mora aqui; o backlog só cita estes ids."
+external_edges:
+  - from: E_DEFEITO_CHAVE_DESCONHECIDA_PASSA_CALADA
+    to: "docs/evolution/research/radar-E3-2026-10-11-r9/radar-E3-2026-10-11-r9.kg.yaml#E_FRONTMATTER_DE_AGENTE_SEM_GUARDA_DE_CHAVE"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_DEFEITO_CHAVE_DESCONHECIDA_PASSA_CALADA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "leitura das REGRAS 1, 3, 12, 17 e 23 do lint-artifacts.sh em origin/main bc0dd373 e censo das chaves de topo dos 51 agentes"
+    label: "O DEFEITO, DATADO (radar E3 r9, 2026-10-11): nenhuma regra de frontmatter cobrava chave desconhecida, e o Claude Code ignora a chave que não reconhece; um typo em tools: deixa o agente com todas as ferramentas, sem erro."
+    narrative: "As cinco regras de frontmatter julgam presença (name, description, tools, category) e valor (model, tools, escalar com dois-pontos), nunca o NOME da chave. O censo da forja contou 17 chaves de topo nos 51 agentes: 6 oficiais (name, description, tools, model, color e a própria tools) e 11 da casa em 344 ocorrências (category, related_agents e expertise nos 51; priority 48; version, updated e related_commands 45; required_env 3; integrations 2; knowledge_bases 2; optional_env 1). O --debug da 2.1.296 passou a nomear campo não reconhecido, mas sem allowlist o typo real some no meio das 344."
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh@bc0dd373"
+      locator: "funções check_agent_frontmatter, check_no_gpt4_model, check_frontmatter_model_category e vizinhas; awk das chaves de topo entre o par de --- da linha 1"
+      method: "medição: leitura das regras e contagem das chaves de topo pela sessão da forja"
+      locality: "repo"
+
+  - id: E_TABELA_OFICIAL_LIDA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    valid_from: "2026-10-11"
+    source_tier: 1
+    source_kind: vendor-doc
+    verified_at: "2026-10-11"
+    verified_against: "WebFetch da página de subagentes e grep do CHANGELOG oficial por frontmatter"
+    label: "A tabela oficial de campos de subagente lista 18 chaves em 2026-10-11; o autoCompactWindow, do CHANGELOG da 2.1.296, ainda não está nela. A allowlist leva as 19, mais 3 de runtime achadas pelo Elenxo, cada uma com a fonte."
+    narrative: "Campos da tabela: name, description, tools, disallowedTools, model, permissionMode, maxTurns, skills, mcpServers, hooks, memory, background, omitClaudeMd, effort, isolation, color, initialPrompt, experimental. O CHANGELOG da 2.1.296 diz 'Added autoCompactWindow to subagent frontmatter'. Chave oficial nova que a doc ganhar é acusada até entrar no .tsv: adoção explícita, nunca calada."
+    provenance:
+      source: "https://code.claude.com/docs/en/sub-agents"
+      locator: "seção Supported frontmatter fields; e a seção ## 2.1.296 de https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      method: "leitura: WebFetch da página inteira (dois trechos) e grep do CHANGELOG"
+      locality: "web"
+
+  - id: E_CENSO_SEM_GUARDA_DA_CLASSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "GUARD_CENSUS_QUERY='frontmatter agent ' bash .claude/validation/guard-census.sh . --markdown"
+    label: "O censo (2026-10-11) não achou guarda da classe e mediu 17 moldes de check de lint e 235 famílias de bancada; passivo de hook morto zero."
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "seções 'já existe guarda' e 'moldes por SUBSTRATO' da saída de 2026-10-11"
+      method: "medição: guard-census.sh com GUARD_CENSUS_QUERY, injetado na carga do /meta:forge-guard"
+      locality: "repo"
+
+  - id: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/validation/agent-frontmatter-keys-check.sh"
+    label: "Substrato: check de lint (REGRA 102) com SSOT em .tsv e juiz em awk. Molde: kg-machine-path-check.sh (helper com --selftest e --tsv, dispatcher fail-closed). HARD na fonte porque o passivo medido é zero; SOFT no adotante e na porta."
+    narrative: "Hook descartado: a pergunta é de corpus (os arquivos de agente), não de comando. Sem catraca nem baseline: passivo zero não precisa de tolerância. A lista mora num .tsv com coluna de origem e de leitor para que a chave da casa carregue sempre quem a lê; chave nova legítima entra com a razão, e esse é o atrito desejado. No adotante o agente pode ser autoria dele, com chave própria, por isso SOFT: avisa sem travar o CI de quem só atualizou o Onion. awk em vez de Python: o lint roda em adotante sem PyYAML, e a guarda não precisa de parser para ler chave de topo."
+
+  - id: E_SONDA_BATE_COM_A_ALLOWLIST
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "log da sonda claude -p --debug-file com --setting-sources project,local, somado por arquivo e comparado por diff com a contagem da guarda"
+    label: "A sonda --debug da 2.1.296 nomeou chave não reconhecida nos 51 agentes, e a soma por arquivo bateu exatamente com as chaves da casa da allowlist (344, diff vazio), sem dica de typo."
+    narrative: "O log trunca em cinco nomes e 'and N more', então ele não serve de inventário: version, updated e as chaves raras quase nunca aparecem pelo nome. A conferência foi pela soma. Detalhe dos hooks no nó E_SONDA_DEBUG_HOOKS_E_FRONTMATTER do grafo da r9."
+    provenance:
+      source: "claude -p --debug-file na 2.1.296, sem as configurações do usuário"
+      locator: "linhas WARN 'has frontmatter keys Claude Code does not recognize or apply'"
+      method: "medição: uma chamada, log lido por grep, soma por arquivo e diff com a contagem da guarda"
+      locality: "host"
+
+  - id: E_MUTANTES_MORDEM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "família run_agent_frontmatter_keys_selftests com LC_ALL=C (27 de 27, depois das curas do Elenxo) e ops/mutate-and-restore.sh sobre o lint-artifacts.sh e o .tsv"
+    label: "Vinte e dois mutantes na cópia da guarda mordem, cada um derrubando o caso nomeado do --selftest (24 casos); três por mutate-and-restore (flag de derivado, gate do --only e chave da casa tirada do .tsv) derrubam o caso d da bancada ou acusam 45 agentes."
+    narrative: "O dogfood pegou cinco defeitos meus no mesmo laço: o juiz devolvia rc 0 mesmo acusando HARD (7 casos do 1º --selftest vermelhos); o caso de dispatcher procurava a severidade na linha VIOLATION, que não a traz (curado lendo o ONION_LINT_HARD_FILE); o mutante da allowlist ausente não mordia porque duas defesas cobrem o mesmo caso, então ele virou um caso próprio de allowlist só com comentários; e, depois das curas do Elenxo, dois mutantes não mordiam porque o frontmatter sem fecho passou a calar: as fixtures ganharam um --- de régua horizontal no corpo, que é o caso real em markdown."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_agent_frontmatter_keys_selftests, casos a a e mais m"
+      method: "medição: a família rodada com LC_ALL=C e mutate-and-restore.sh com hash de restauração conferido"
+      locality: "repo"
+
+  - id: E_ELENXO_REPROVOU_E_FOI_CURADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "refutador em worktree isolada com mandato de falso positivo, sobre afbfe5f2, medindo contra o parser do binário 2.1.296 reproduzido em Bun e varrendo 1685 agentes de 34 repos locais"
+    label: "Elenxo (2026-10-11) REPROVOU a 1ª versão: dois falsos positivos reais (fecho --- com espaço ou tab no fim; observer, observerMessage e observeSubagents, lidos pelo runtime sem doc) e três falsos negativos (BOM ou --- com espaço na abertura; --- no meio do frontmatter). Curados."
+    narrative: "O Claude Code 2.1.296 tira o BOM, recorta o frontmatter com uma regex cujo fecho é --- seguido de espaço opcional e NÃO ancorado no início da linha, e lê com o YAML do Bun. A guarda exigia --- exato, então lia o corpo como frontmatter (4 HARD num agente real com o fecho mudado) e calava o tool: atrás de um BOM. Curas: abertura e fecho como o runtime; classe nova FECHO-AMBIGUO para --- no meio do frontmatter, onde o runtime corta e o tools: seguinte some; origem runtime no .tsv para as três chaves observer*, conferidas no binário pela sessão da forja; frontmatter sem fecho não é julgado (as acusações ficam pendentes até o fecho); merge key sai SOFT com mensagem própria. Fica no teto o mapping de topo todo indentado, que o runtime lê e a guarda pula. Nos 1685 agentes a extração de chaves da guarda não divergiu do runtime em nenhuma acusação."
+    provenance:
+      source: ".claude/validation/agent-frontmatter-keys-check.sh"
+      locator: "casos do --selftest marcados Elenxo 1, 2, 3, 4, FN-A e FN-C, e os mutantes correspondentes da bancada"
+      method: "juízes: refutador adversarial com fixtures em diretório temporário, e as curas re-medidas pelo --selftest e pela bancada"
+      locality: "repo"
+
+  - id: C_TETO_SO_CHAVE_DE_TOPO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    label: "TETO: a guarda julga só a chave de TOPO; chave aninhada (dentro de hooks, mcpServers, experimental) e VALOR ficam com outras regras ou com ninguém."
+    narrative: "Um typo em experimental.cacheTl passa. Valor de model é da REGRA 3 e de tools da REGRA 12. Arquivo sem frontmatter na linha 1, ou sem fecho, é da REGRA 1; YAML inválido, da REGRA 17. Mapping de topo todo indentado (dois espaços antes de tool:) é lido pelo Claude Code e pulado pela guarda: falso negativo declarado (Elenxo, FN-B)."
+
+  - id: C_TETO_COMANDOS_SKILLS_E_PLUGINS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    label: "TETO: comandos e skills não entram (outros campos, sem medição nesta forja), e o bundle de plugin não roda o lint; o agente empacotado é julgado só na fonte, antes da publicação."
+    narrative: "Gatilho nomeado para estender a comandos e skills: um typo medido em frontmatter de comando ou skill que o Claude Code ignorou. Na porta e no adotante a guarda roda como SOFT; na porta mini não roda, porque ela não leva o lint."
+
+  - id: C_TETO_DOC_OFICIAL_ENVELHECE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.75
+    label: "TETO: a lista oficial é a da doc em 2026-10-11; chave oficial nova é acusada até entrar no .tsv, e chave que a doc remover continua aceita até alguém tirá-la."
+    narrative: "O /meta:cc-update é o momento natural de reler a tabela; o radar E3 que nomeia campo novo de frontmatter deve abrir a revisão do .tsv."
+
+edges:
+  - from: E_DEFEITO_CHAVE_DESCONHECIDA_PASSA_CALADA
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
+    edge_type: SUPPORTS
+  - from: E_TABELA_OFICIAL_LIDA
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
+    edge_type: SUPPORTS
+  - from: E_CENSO_SEM_GUARDA_DA_CLASSE
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
+    edge_type: SUPPORTS
+  - from: E_SONDA_BATE_COM_A_ALLOWLIST
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
+    edge_type: SUPPORTS
+  - from: E_MUTANTES_MORDEM
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
+    edge_type: SUPPORTS
+  - from: C_TETO_SO_CHAVE_DE_TOPO
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
+    edge_type: CONSTRAINS
+  - from: C_TETO_COMANDOS_SKILLS_E_PLUGINS
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
+    edge_type: CONSTRAINS
+  - from: C_TETO_DOC_OFICIAL_ENVELHECE
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_REPROVOU_E_FOI_CURADO
+    to: D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV
+    edge_type: SUPPORTS

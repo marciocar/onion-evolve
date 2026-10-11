@@ -17,13 +17,18 @@
 #       bash agent-frontmatter-keys-check.sh --selftest
 #       --derived: o repo é adotante/porta (o agente pode ser autoria do adotante) → SOFT, nunca HARD.
 # Saída (--tsv): SEV<TAB>CLASSE<TAB>caminho-relativo<TAB>mensagem · vazio = limpo
-#       classes: CHAVE-DESCONHECIDA
+#       classes: CHAVE-DESCONHECIDA · FECHO-AMBIGUO (`---` no meio do frontmatter: o Claude Code corta ali)
+#                · MERGE-KEY (sempre SOFT)
+# Leitura do frontmatter ESPELHA a do Claude Code 2.1.296 (conferida no binário pelo Elenxo da forja): BOM
+#       tirado, abertura e fecho `---` com espaço/tab no fim, fecho NÃO ancorado; arquivo sem fecho não é julgado.
 # Exit: 0 = limpo (ou só SOFT) · 1 = violação HARD · 2 = não pôde julgar (NAO VERIFICADO; nunca é verde)
 #
 # TETO (o que esta guarda NÃO vê):
 #   - só a chave de TOPO; chave aninhada (dentro de hooks:, mcpServers:, experimental:) não é julgada;
 #   - não julga VALOR (o valor de model: é da REGRA 3, o de tools: da REGRA 12);
-#   - agente sem frontmatter na linha 1 não é julgado (é da REGRA 1);
+#   - agente sem frontmatter na linha 1, ou sem fecho, não é julgado (é da REGRA 1);
+#   - mapping de topo todo INDENTADO (`  tool: Read`) é lido pelo Claude Code e pulado aqui (falso negativo);
+#   - merge key (<<) sai SOFT e as chaves mescladas não são julgadas;
 #   - chave citada entre aspas ("tools":) é lida sem as aspas; YAML inválido é da REGRA 17;
 #   - comandos e skills NÃO entram: os campos deles são outros e não há medição deles nesta forja;
 #   - a lista oficial é a da doc no dia da leitura: chave oficial nova é acusada até entrar no .tsv.
@@ -79,7 +84,7 @@ _judge() {
         sub(/\r$/, "", line)
         if (line ~ /^[[:space:]]*(#|$)/) continue
         n = split(line, c, "\t")
-        if (n < 3 || c[1] == "" || (c[2] != "oficial" && c[2] != "casa") || c[3] == "") {
+        if (n < 3 || c[1] == "" || (c[2] != "oficial" && c[2] != "runtime" && c[2] != "casa") || c[3] == "") {
           printf "agent-frontmatter-keys: linha malformada na allowlist: %s — NAO VERIFICADO\n", line > "/dev/stderr"; bad = 1; exit 2
         }
         if (c[1] in ok) { printf "agent-frontmatter-keys: chave duplicada na allowlist: %s — NAO VERIFICADO\n", c[1] > "/dev/stderr"; bad = 1; exit 2 }
@@ -88,23 +93,36 @@ _judge() {
       close(allowfile)
       if (nok == 0) { print "agent-frontmatter-keys: allowlist vazia — NAO VERIFICADO" > "/dev/stderr"; bad = 1; exit 2 }
     }
-    FNR == 1 { infm = 0; done = 0; rel = FILENAME; if (index(rel, root) == 1) rel = substr(rel, length(root) + 1) }
+    # As acusações de um arquivo ficam PENDENTES até o fecho do frontmatter: arquivo que não fecha não tem
+    # frontmatter para o Claude Code (é da REGRA 1), e julgá-lo seria somar ruído (Elenxo, achado 4).
+    function flush(   i) { for (i = 1; i <= np; i++) { print pend[i]; if (pendsev[i] == "HARD") hard = 1 }; np = 0 }
+    function acc(s, cls, m) { np++; pend[np] = s "\t" cls "\t" rel "\t" m; pendsev[np] = s }
+    FNR == 1 { np = 0; infm = 0; done = 0; rel = FILENAME; if (index(rel, root) == 1) rel = substr(rel, length(root) + 1) }
     done { next }
     { sub(/\r$/, "") }
-    FNR == 1 { if ($0 == "---") infm = 1; else done = 1; next }
-    infm && $0 == "---" { done = 1; next }
+    # abertura e fecho como o Claude Code os lê (2.1.296: BOM tirado; `---` com espaço/tab no fim) — Elenxo 1 e FN-A
+    FNR == 1 { sub(/^\357\273\277/, ""); if ($0 ~ /^---[ \t]*$/) infm = 1; else done = 1; next }
+    infm && $0 ~ /^---[ \t]*$/ { done = 1; flush(); next }
     infm {
+      # o fecho do Claude Code não é ancorado: um `---` em QUALQUER ponto corta o frontmatter ali, e o que
+      # vem depois (tools: inclusive) some calado (Elenxo, FN-C)
+      if (index($0, "---") > 0) {
+        acc(sev, "FECHO-AMBIGUO", "linha do frontmatter contém \"---\" fora do fecho — o Claude Code corta o frontmatter AQUI, e as chaves seguintes (tools: inclusive) somem sem erro. Troque o \"---\" (ex.: por \"—\") ou mova o texto para o corpo")
+      }
       if ($0 ~ /^[[:space:]]/ || $0 ~ /^(#|-|$)/) next
       p = index($0, ":"); if (p == 0) next
       k = substr($0, 1, p - 1); sub(/[[:space:]]+$/, "", k)
       if (k ~ /^".*"$/ || k ~ /^\047.*\047$/) k = substr(k, 2, length(k) - 2)
       if (k in ok) next
+      if (k == "<<") {   # merge key é YAML válido: avisa, não barra (a guarda erra para o lado de calar)
+        acc("SOFT", "MERGE-KEY", "merge key (<<) no frontmatter — as chaves mescladas NÃO são julgadas por esta guarda; prefira escrever as chaves direto")
+        next
+      }
       h = hint(k)
       msg = "chave de frontmatter de agente \"" k "\" fora da allowlist — o Claude Code IGNORA chave que não reconhece (um typo em tools: deixa o agente com TODAS as ferramentas)"
       if (h != "") msg = msg "; você quis dizer \"" h "\"?"; else msg = msg "."
       msg = msg " Se a chave é legítima, registre-a com origem e leitor em .claude/validation/agent-frontmatter-keys.tsv"
-      printf "%s\tCHAVE-DESCONHECIDA\t%s\t%s\n", sev, rel, msg
-      if (sev == "HARD") hard = 1
+      acc(sev, "CHAVE-DESCONHECIDA", msg)
     }
     END { if (bad) exit 2; if (hard) exit 1 }
   ' "$@"
@@ -147,9 +165,22 @@ if [ "${MODE}" = "selftest" ]; then
   # ── cala (o caso honesto: o agente real do core) ──────────────────────────────────────────────────
   mk honest '---\nname: x\ndescription: |\n  linha com dois-pontos: dentro do bloco\n  tool: isto e texto, nao chave\ntools: Read\nmodel: sonnet\ncolor: blue\ncategory: meta\nexpertise:\n  - a\nrelated_agents: []\nrelated_commands: []\npriority: alta\nversion: "1.0"\nupdated: "2026-10-11"\nrequired_env:\n  - name: X\n# comentario: com dois-pontos\n---\ntool: no corpo nao e frontmatter\n'
   check "cala: agente honesto com as chaves da casa, bloco | e comentário" "${AL}" "${T}/honest.md" '' 0
-  mk official '---\nname: x\ndescription: y\ndisallowedTools: Bash\npermissionMode: plan\nmaxTurns: 5\nskills: []\nmcpServers: {}\nhooks: {}\nmemory: project\nbackground: true\nomitClaudeMd: true\neffort: high\nisolation: worktree\ninitialPrompt: oi\nexperimental:\n  cacheTtl: 1h\nautoCompactWindow: 100000\ncategory: meta\n---\n'
-  check "cala: as 19 chaves oficiais" "${AL}" "${T}/official.md" '' 0
-  mk nofm   'sem frontmatter\ntool: x\n'
+  mk official '---\nname: x\ndescription: y\ndisallowedTools: Bash\npermissionMode: plan\nmaxTurns: 5\nskills: []\nmcpServers: {}\nhooks: {}\nmemory: project\nbackground: true\nomitClaudeMd: true\neffort: high\nisolation: worktree\ninitialPrompt: oi\nexperimental:\n  cacheTtl: 1h\nautoCompactWindow: 100000\nobserver: true\nobserverMessage: x\nobserveSubagents: true\ncategory: meta\n---\n'
+  check "cala: as 19 chaves oficiais e as 3 de runtime (observer*, Elenxo 2)" "${AL}" "${T}/official.md" '' 0
+  # ── a leitura do frontmatter espelha a do Claude Code (Elenxo da forja, binário 2.1.296) ─────────────
+  mk tabclose '---\nname: x\ndescription: y\n---\t\nNota: corpo\n\n---\n'
+  check "cala: fecho '---' com tab no fim fecha o frontmatter (Elenxo 1)" "${AL}" "${T}/tabclose.md" '' 0
+  mk bom '\xef\xbb\xbf---\nname: x\ntool: Read\n---\n'
+  check "acusa: BOM na linha 1 não esconde o tool: (Elenxo FN-A)" "${AL}" "${T}/bom.md" '"tool".*"tools"' 1
+  mk spcopen '--- \nname: x\ntool: Read\n---\n'
+  check "acusa: abertura '--- ' com espaço não esconde o tool: (Elenxo FN-A)" "${AL}" "${T}/spcopen.md" '"tool".*"tools"' 1
+  mk ambig '---\nname: x\ndescription: use --- para separar\ntools: Read\n---\n'
+  check "acusa: '---' no meio do frontmatter corta o tools: (Elenxo FN-C)" "${AL}" "${T}/ambig.md" 'FECHO-AMBIGUO	ambig.md' 1
+  mk unclosed '---\nname: x\nNota: algo\n'
+  check "cala: frontmatter sem fecho não é julgado (é da REGRA 1, Elenxo 4)" "${AL}" "${T}/unclosed.md" '' 0
+  mk merge '---\nname: x\n<<: {color: blue}\n---\n'
+  check "avisa: merge key sai SOFT, não barra (Elenxo 3)" "${AL}" "${T}/merge.md" '^SOFT	MERGE-KEY	merge.md' 0
+  mk nofm   'sem frontmatter\ntool: x\n---\n'
   check "cala: arquivo sem frontmatter na linha 1 (é da REGRA 1)" "${AL}" "${T}/nofm.md" '' 0
   mk late   '\n---\ntool: x\n---\n'
   check "cala: '---' que não está na linha 1 não abre frontmatter" "${AL}" "${T}/late.md" '' 0
@@ -164,7 +195,7 @@ if [ "${MODE}" = "selftest" ]; then
   printf 'name\toficial\tx\nname\tcasa\ty\n' > "${T}/dup.tsv"
   check "rc 2: chave duplicada na allowlist" "${T}/dup.tsv" "${T}/honest.md" 'duplicada' 2
   printf 'name\tterceiro\tx\n' > "${T}/orig.tsv"
-  check "rc 2: origem fora de oficial|casa" "${T}/orig.tsv" "${T}/honest.md" 'malformada' 2
+  check "rc 2: origem fora do vocabulário" "${T}/orig.tsv" "${T}/honest.md" 'malformada' 2
   # ── severidade no derivado ────────────────────────────────────────────────────────────────────────
   if out="$(_judge "${AL}" SOFT "${T}" "${T}/tool.md" 2>&1)" && grep -q '^SOFT	CHAVE-DESCONHECIDA' <<< "${out}"; then
     ok=$((ok + 1)); echo "  ✅ derivado: a mesma acusação sai SOFT e rc 0"
