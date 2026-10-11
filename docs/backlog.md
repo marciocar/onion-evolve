@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**429 itens abertos** em 92 grafo(s) com aberto (de 117 no escopo) · 93 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**436 itens abertos** em 93 grafo(s) com aberto (de 118 no escopo) · 94 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -339,6 +339,17 @@
 | 16.8 | `C_OPEN_SHOWCASE_PRIVATE_HOLDOUT` | slm-capitalizacao-2026-10 | LEITURA (forma do bench): a tensao aberto x prova (Scale: privado preserva valor probatorio) sugere o desenho HIBRIDO — fatia ab |
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
+
+## task-manager-vocabulario-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 26.4 | `C_PAGINATION_AS_OPAQUE_ITERATOR` | task-manager-vocabulario-2026-10 | interface.md deve expor a paginação como iterador opaco (próxima página ou fim), sem expor offset, índice nem cursor: os 5 pr |
+| 25.6 | `Q_TASK_MANAGER_VOCABULARY_MATRIX` | task-manager-vocabulario-2026-10 | Qual é a matriz provedor × capacidade (12 capacidades, por versão de API) que interface.md do task-manager vai declarar? Segue  |
+| 24.2 | `C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN` | task-manager-vocabulario-2026-10 | O formato do texto rico (descrição e comentário) é heterogêneo e deve ser resolvido no adapter, não na interface: ADF no Jir |
+| 12.0 | `C_BULK_IS_PER_OPERATION_NOT_UNIFORM` | task-manager-vocabulario-2026-10 | Operação em lote não é capacidade uniforme: Jira (Cloud e DC) ancora só bulk create (Cloud até 50), Asana tem batch genéric |
+| 6.0 | `Q_WAVE2_PRIMARIES_CELLS` | task-manager-vocabulario-2026-10 | 2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as célu |
+| 3.0 | `Q_JIRA_STATUS_BY_PUT_MEASURE` | task-manager-vocabulario-2026-10 | Medir ao vivo se PUT /rest/api/3/issue/{key} consegue definir status, antes de interface.md declarar 'transição obrigatória' pa |
 
 ## meta-research-lens-2026-09 — 3 item(ns)
 
@@ -795,11 +806,12 @@
 | 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
 | 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
 
-## radar-E3-2026-10-11-r9 — 1 item(ns)
+## radar-E3-2026-10-11-r9 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 5.4 | `Q_MEDIR_HOOKS_E_FRONTMATTER_COM_O_DEBUG` | radar-E3-2026-10-11-r9 | medir com o --debug da 2.1.296 a duração dos hooks sem latência medida e as chaves de frontmatter dos agentes, depois de uma al |
+| 4.8 | `Q_CHECAGEM_DE_MODELO_FORCADO_CEGA_A_VARIAVEL_NOVA` | radar-E3-2026-10-11-r9 | ampliar a checagem de modelo forçado da skill onion-orchestration e da KB agent-orchestration para CLAUDE_CODE_WORKFLOW_SUBAGENT_ |
 
 ## kg-id-valid-from-2026-10 — 2 item(ns)
 
