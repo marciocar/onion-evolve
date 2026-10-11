@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**463 itens abertos** em 98 grafo(s) com aberto (de 125 no escopo) · 99 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**443 itens abertos** em 94 grafo(s) com aberto (de 120 no escopo) · 95 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -128,18 +128,6 @@
 | 2.4 | `C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA` | ocr-local-sei-2026-09 | OPCAO (4): Surya (datalab-to) — NAO RECOMENDAVEL A PARTIR DESTE DOSSIE, e a razao nao e desempenho: e que o corpo de evidencia s |
 | 1.2 | `C_OPCAO_MINERU_OLMOCR` | ocr-local-sei-2026-09 | OPCAO (6): MinerU 2.5 / olmOCR. Praticamente NAO PESQUISADOS nesta rodada — aparecem so como termo de comparacao dentro de claim |
 
-## onion-brain-mcp-remoto-2026-10 — 7 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 54.0 | `C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG` | onion-brain-mcp-remoto-2026-10 | OPÇÃO B: MCP remoto público por streamable-http stateless, resource server OAuth 2.1 (PRM, RFC 9728) com o Logto como AS e clai |
-| 42.5 | `Q_ONION_BRAIN_MCP_REMOTO_2026_10` | onion-brain-mcp-remoto-2026-10 | SAC-70: o Onion deve oferecer um MCP remoto só leitura (kg_list, kg_radar, kg_node, docs_search) para o time não técnico de um  |
-| 19.2 | `C_OPCAO_A_REATIVAR_PRECEDENTE_VIA_LIBRECHAT` | onion-brain-mcp-remoto-2026-10 | OPÇÃO A: reativar o precedente ops/mcp-onion-kg apontado para o clone do brain-granaai, consumido só pelo LibreChat da VPS (SSO |
-| 4.5 | `C_OPCAO_C_GATEWAY_DE_TERCEIROS` | onion-brain-mcp-remoto-2026-10 | OPÇÃO C: gateway de terceiros (Pomerium, agentgateway, Cloudflare Access) na frente de um servidor MCP sem auth própria, fazend |
-| 3.6 | `C_OPCAO_E_MULTI_TENANT_POR_CLAIM` | onion-brain-mcp-remoto-2026-10 | OPÇÃO E: multi-tenant único com a raiz escolhida por claim do token — adiada até haver mais de um hub. |
-| 1.5 | `C_OPCAO_D_WORKERS_AS_PROXY` | onion-brain-mcp-remoto-2026-10 | OPÇÃO D: padrão Cloudflare Workers com o servidor atuando como AS proxy para o IdP do hub — listada como rejeitada por acopla |
-| 1.2 | `C_OPCAO_F_SEM_MCP_LEITOR_JS` | onion-brain-mcp-remoto-2026-10 | OPÇÃO F: não fazer MCP — manter o segundo leitor JS do corpus (o paliativo atual do hub). |
-
 ## onda-derivada-e-o-lugar-do-onion-2026-10 — 9 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -184,17 +172,6 @@
 | 10.5 | `C_OPCAO_D_NAO_DECIDIR_E_REABRIR_AS_FAIXAS_NAO_LIDAS` | motores-de-regras-deterministicos-2026-10 | OPCAO D — nao decidir agora: reabrir a pesquisa nas faixas nao lidas (Drools, Camunda/DMN e o status ISO/OMG, OpenL Tablets, Eas |
 | 9.6 | `C_OPCAO_C_HIBRIDO_SHELL_EXTRAI_MOTOR_DECIDE` | motores-de-regras-deterministicos-2026-10 | OPCAO C — hibrido: o shell continua EXTRAINDO fatos e devolvendo exit 2, e um motor declarativo decide atras de um handler de ho |
 | 7.5 | `C_OPCAO_B_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO` | motores-de-regras-deterministicos-2026-10 | OPCAO B — migrar o gate determinístico para um motor declarativo (Cedar, OPA/Rego, DMN ou JDM) e expressar as 93 regras como po |
-
-## playbook-sdaal-2026-10 — 6 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 48.0 | `Q_PLAYBOOK_SDAAL_SAC52` | playbook-sdaal-2026-10 | SAC-52: o core deve criar uma abstração SDAAL de playbooks (interface agnóstica + adapters por tipo e por framework em .claude/ |
-| 41.8 | `C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA` | playbook-sdaal-2026-10 | Opção A: NÃO criar agora .claude/utils/playbook/ com adapters por framework; o playbook de domínio é template (skill ou markd |
-| 17.6 | `C_OPCAO_D_GATE_DE_PESQUISA` | playbook-sdaal-2026-10 | Opção D: adiar com gate — rodar antes uma rodada curta de primárias nomeadas (Arazzo 1.0.1, runme, especificação CACAO v2.0 |
-| 8.0 | `C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS` | playbook-sdaal-2026-10 | Opção B: criar a abstração SDAAL completa (interface Playbook + adapters por tipo e por framework) nos 4 domínios, como pede  |
-| 6.0 | `C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER` | playbook-sdaal-2026-10 | Opção C: costurar o CACAO v2.0 (OASIS) por SDAAL como primeiro adapter, na fatia de compliance/segurança. |
-| 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
 
 ## zoho-glpi-adapters-2026-09 — 8 item(ns)
 
@@ -698,13 +675,6 @@
 | 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
 | 8.5 | `Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN` | hub-operacoes-enterprise-update-547-2026-10 | A CURA DE CLASSE DOS VETOS (PR #921) AINDA ASSUME QUE A PRODUCAO SE CHAMA main. Num adotante com GitFlow cuja producao e master  |
 
-## conductor-2026-10 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 9.6 | `Q_CONDUCTOR_ABSORVER_OU_NAO_1011` | conductor-2026-10 | O Onion absorve, costura, parqueia ou rejeita o Conductor (Microsoft) — orquestracao multiagente declarada em YAML que valida a  |
-| 3.0 | `E_N3_SCHEMA_NATIVO_LACUNA` | conductor-2026-10 | LACUNA NOMEADA — a validacao de FORMA o Onion ja recebe do harness (todo agente do onion-research.js leva schema:). Se o harness |
-
 ## federation-health-2026-07 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -726,13 +696,6 @@
 | 4.8 | `Q_REGRA56_VERACIDADE_DOS_ACHADOS` | audit-textual-gates-2026-09 | Quanto os campos findings_total/findings_real/verdict do residuo R56 correspondem a achados REAIS quando o revisor e a propria ses |
 | 3.6 | `Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO` | audit-textual-gates-2026-09 | O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotant |
 | 3.6 | `Q_R15_WRAP_NO_CAMINHO_CRITICO` | audit-textual-gates-2026-09 | onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted- |
-
-## dissect-forge-2026-10 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.4 | `D_PLANO_DE_ABSORCAO_E_NO` | dissect-forge-2026-10 | desenho da costura: o N4 do dissect escreve nos x_absorb_* no grafo (KG-SSOT first), o dissect-plans.sh os le, mede as pecas do al |
-| 5.4 | `Q_COSTURA_DISSECT_FORGE` | dissect-forge-2026-10 | costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprend |
 
 ## company-brain-market-2026-07 — 1 item(ns)
 
@@ -798,7 +761,7 @@
 |--:|---|---|---|
 | 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
 
-## fila-2026-10-06 — 13 item(ns)
+## fila-2026-10-06 — 12 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -806,7 +769,6 @@
 | 4.8 | `Q_TASK_MANAGER_SDAAL_COMPLETO` | fila-2026-10-06 | programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, bu |
 | 4.2 | `Q_MERGE_GATE_AVISA_NO_ADOTANTE` | fila-2026-10-06 | a trava de merge deve avisar no adotante em vez de sair calada |
 | 3.6 | `Q_GRANAAI_CLONE_SEM_CARIMBO` | fila-2026-10-06 | aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o valida |
-| 3.6 | `Q_PRECOMMIT_SELECAO_POR_CASO` | fila-2026-10-06 | re-forjar o pre-commit para escolher por caso: família pelo bloco que mudou na bancada, núcleo fixo justificado ou podado, motiv |
 | 3.2 | `Q_MAPA_NOMEAR_MERGE_ONION_HOOKS` | fila-2026-10-06 | nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar |
 | 3.0 | `Q_CANAL_VIVO_ENTRE_SESSOES` | fila-2026-10-06 | o canal vivo entre sessões vira 3ª via da co-evolução (envelope fixo, registro do envio, decisão descendo ao grafo)? aguarda  |
 | 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
@@ -903,6 +865,12 @@
 |--:|---|---|---|
 | 4.2 | `Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO` | radar-E3-2026-10-05-r7 | A 2.1.289 adiciona agent.spawn para teammates, um id de agente unico atraves dos eventos de hook de plugin, e estados idle/waiting |
 
+## radar-E3-2026-10-08-r8 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.2 | `Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT` | radar-E3-2026-10-08-r8 | curar o custo quadrático do env-guard num token gigante: com onFailure block, um comando de ~520 KB sem espaço passa a ser BARRA |
+
 ## vps-shared-tools-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -915,19 +883,11 @@
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
 
-## task-progress-story-points-2026-10 — 2 item(ns)
+## dissect-forge-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 3.6 | `Q_ADAPTER_LER_STORY_POINTS` | task-progress-story-points-2026-10 | Qual adapter passa primeiro a ler os pontos (estimate.points_read) e com que medição? ClickUp e Linear têm campo nativo ancorad |
-| 3.2 | `C_TETO_STATUS_BINARIO_POR_SUBTASK` | task-progress-story-points-2026-10 | TETO: o status é binário por subtask (meio feita conta como não feita), e numa task-mãe de task-mãe cada filha entra com os p |
-
-## vetos-fail-closed-2026-10 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 3.2 | `C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON` | vetos-fail-closed-2026-10 | o recorte sem python3 dos dois vetos é sombreado no core: o env-guard, registrado no mesmo matcher, barra todo Read, Grep e Bash  |
-| 2.8 | `C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL` | vetos-fail-closed-2026-10 | falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, po |
+| 3.6 | `Q_COSTURA_DISSECT_FORGE` | dissect-forge-2026-10 | costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprend |
 
 ## inbox-triage-2026-10-04 — 1 item(ns)
 
