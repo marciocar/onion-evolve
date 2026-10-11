@@ -114,6 +114,10 @@ function calculateProgress(task) {
 // Progresso: `${calculateProgress(task)}%`
 ```
 
+> Isto é o progresso dos **itens de checklist**. O % da **task-mãe sobre as subtasks** é outra conta — a
+> derivação `progress` da interface (story points das feitas ÷ total, contagem declarada sem pontos),
+> executada por `.claude/utils/task-manager/progress.sh`. Não use o de checklist no lugar dela.
+
 ---
 
 ## 🔧 Troubleshooting (ClickUp)

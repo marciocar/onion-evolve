@@ -26669,6 +26669,103 @@ EOF_MUT
 }
 _family run_task_manager_capabilities_selftests
 
+# Derivação `progress` do task-manager (SAC-64, Onda 3, 2026-10-11) — o % da task-mãe por story points.
+# DEFEITO DATADO (nó E_TM_PERCENTUAL_IGNORA_STORY_POINTS, 2026-10-07): o % gravado pesava as fases igual,
+# ignorava os pontos, e ninguém dizia por qual método o número saiu. A regra mora na interface; o helper a
+# executa. Casos: (a) as bordas do --selftest · (b) os DOIS modos que a prosa consome (arquivo e entrada
+# padrão) · (c) os consumidores citam o helper, não refazem a conta · (d) a dependência declarada nos 5
+# adapters · (m) UM MUTANTE POR CURA, na CÓPIA do helper — mutante que não se aplica é FALHA.
+run_task_progress_selftests() {
+  local h="${REPO_ROOT}/.claude/utils/task-manager/progress.sh"
+  [ -f "${h}" ] || { record_fail "task-progress" "helper ausente: ${h}"; return; }
+  local o rc
+  # (a) as bordas: todas pontuadas, nenhuma, misturada, pontos 0, cancelada, sem subtasks, entrada inválida
+  if o="$(LC_ALL=C bash "${h}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 30/30 verdes' <<< "${o}"; then
+    record_pass "task-progress: (a) --selftest verde (30 casos: pondera, contagem declarada, mixed nomeando, pontos 0, cancelada fora, none, arredondamento, id #123, frases, 8 entradas inválidas)"
+  else record_fail "task-progress: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) OS MODOS QUE A PRODUÇÃO CONSOME: a prosa manda `progress.sh <arquivo>`; o helper também lê a entrada padrão
+  local tf; tf="$(TMPDIR=/tmp mktemp)"
+  printf 'a\tdone\t3\nb\tclosed\t2\nc\ttodo\t3\nd\tcanceled\t8\n' > "${tf}"
+  if o="$(LC_ALL=C bash "${h}" "${tf}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE $'^percent=62\tmethod=story_points\tdone=2\ttotal=3\texcluded=1\t' <<< "${o}" \
+     && grep -qE '^declared: progresso por story points: 5 de 8 pontos' <<< "${o}"; then
+    record_pass "task-progress: (b) modo arquivo → 62% por story points (a contagem daria 66), cancelada fora, método declarado"
+  else record_fail "task-progress: (b) modo arquivo" "rc=${rc}: ${o}"; fi
+  if o="$(LC_ALL=C bash "${h}" < "${tf}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE $'^percent=62\tmethod=story_points\t' <<< "${o}"; then
+    record_pass "task-progress: (b2) modo entrada padrão → mesmo resultado do modo arquivo"
+  else record_fail "task-progress: (b2) entrada padrão" "rc=${rc}: ${o}"; fi
+  printf 'a\tfeito\t3\n' > "${tf}"
+  if o="$(LC_ALL=C bash "${h}" "${tf}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && ! grep -q '^percent=' <<< "${o}"; then
+    record_pass "task-progress: (b3) status fora do vocabulário → rc 2 e NENHUM percent (fail-closed, não 0% calado)"
+  else record_fail "task-progress: (b3) fail-closed" "rc=${rc}: ${o}"; fi
+  if o="$(LC_ALL=C bash "${h}" "" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && ! grep -q '^percent=' <<< "${o}"; then
+    record_pass "task-progress: (b4) argumento vazio (variável não preenchida) → rc 2, não cai calado na entrada padrão"
+  else record_fail "task-progress: (b4) argumento vazio" "rc=${rc}: ${o}"; fi
+  rm -f "${tf}"
+  # (c) os consumidores CITAM o helper: a conta não volta para a prosa
+  local f miss=""
+  for f in .claude/utils/task-manager/interface.md .claude/commands/common/prompts/task-manager-auto-update.md \
+           .claude/commands/engineer/work.md .claude/utils/task-manager/adapters/zoho.md \
+           .claude/utils/task-manager/adapters/clickup-operacao.md .claude/commands/product/task-check.md \
+           .claude/commands/engineer/pre-pr.md .claude/commands/common/prompts/output-formats.md; do
+    grep -qF 'progress.sh' "${REPO_ROOT}/${f}" || miss="${miss} ${f}"
+  done
+  # o % fixo à mão que a passada adversarial achou no /engineer:pre-pr (o "para 90%") não volta
+  grep -qE 'Atualizar progresso\*\* para [0-9]+%' "${REPO_ROOT}/.claude/commands/engineer/pre-pr.md" && miss="${miss} pre-pr.md(%-fixo)"
+  if grep -qF 'proporcional às fases' "${REPO_ROOT}/.claude/utils/task-manager/adapters/zoho.md" \
+     && ! grep -qF 'Até 2026-10-11 era "proporcional às fases do plano"' "${REPO_ROOT}/.claude/utils/task-manager/adapters/zoho.md"; then
+    miss="${miss} zoho.md(fórmula-antiga-viva)"
+  fi
+  if [ -z "${miss}" ]; then record_pass "task-progress: (c) interface + 7 consumidores citam progress.sh; nem a fórmula das fases no Zoho nem o % fixo no pre-pr"
+  else record_fail "task-progress: (c) consumidor sem o helper" "${miss}"; fi
+  # (d) a dependência é DECLARADA: os 5 adapters dizem se leem os pontos (estimate.points_read)
+  local p bad=""
+  for p in asana clickup jira linear zoho; do
+    grep -qE $'^estimate\\.points_read\toptional\t(implemented|not_implemented|unverified)\t' \
+      "${REPO_ROOT}/.claude/utils/task-manager/adapters/${p}.capabilities.tsv" || bad="${bad} ${p}"
+  done
+  if [ -z "${bad}" ]; then record_pass "task-progress: (d) os 5 adapters declaram estimate.points_read (a dependência do progresso ponderado)"
+  else record_fail "task-progress: (d) declaração ausente" "${bad}"; fi
+  # (m) MUTANTES — revertem cada cura na CÓPIA do helper e EXIGEM que o caso nomeado reprove.
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"
+  local s="${sb}/progress.sh" line old new want rest mo mrc
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    old="${line%%@@@*}"; rest="${line#*@@@}"; new="${rest%%@@@*}"; want="${rest#*@@@}"
+    cp "${h}" "${s}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${s}" "${old}" "${new}"; then
+      record_fail "task-progress: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "task-progress: (m) mutante morde → ✗ ${want}"
+    else record_fail "task-progress: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<'EOF_MUT'
+} else if (pointed == total && tp > 0) {@@@} else if (0) {@@@(a) todas pontuadas pondera
+method = "mixed"; pct@@@method = "count"; pct@@@(c) misturada: mixed pela contagem
+printf "declared: %s\n", decl@@@printf ""@@@(b2) a frase declarada nomeia a CONTAGEM
+if (st == "canceled") { excluded++; next }@@@if (0) { excluded++; next }@@@(e) cancelada sai do total
+if (pct != "n/a" && done < total && pct >= 100) {@@@if (0) {@@@(d3) subtask aberta de 0 ponto segura em 99
+pointed == total && tp > 0@@@pointed == total@@@(d) todas com 0 ponto
+if (st !~ /^(backlog@@@if (0 && st !~ /^(backlog@@@(i) status fora do vocabulário reprova
+if (total == 0) {@@@if (0) {@@@(f) lista vazia = none
+if (pt == "" || pt == "-") { unpointed++;@@@if (pt == "") { unpointed++;@@@(b) nenhuma pontuada cai na contagem
+/^#[^\t]*$/ { next }@@@/^#/ { next }@@@(j) id #13 conta
+if (NF != 3) fail(@@@if (NF < 3) fail(@@@(i6) coluna a mais reprova
+pct = int(100 * dp / tp + 1e-9)@@@pct = int(100 * dp / tp)@@@(h3) 0,57 de 1 ponto = 57
+if (id == "") fail("id vazio")@@@if (0) fail("id vazio")@@@(i7) id vazio reprova
+exc = (excluded > 0) ?@@@exc = (0) ?@@@(k) a frase diz quantas canceladas
+decl = decl " — 99, não 100: há subtask aberta de 0 ponto"@@@decl = decl@@@(k3) o 99 forçado se explica
+pt !~ /^[0-9]{1,6}(@@@pt !~ /^[0-9]+(@@@(h4) pontos acima de 999999 reprovam
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_task_progress_selftests
+
 # Modo kg-migrate-v3 — SAC-73 parte 1: a ferramenta de migração do corpus ao contrato v3
 # (.claude/utils/kg/kg-migrate-v3.py) cita datas, deriva provenance SÓ de fonte que o nó já traz,
 # nunca corta label, --check não escreve, e a 2ª aplicação é no-op. O risco que a família vigia é a

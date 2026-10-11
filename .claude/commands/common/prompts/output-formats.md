@@ -129,6 +129,9 @@
 
 ### Progresso
 
+> Formato de **exibição** por fases do plano. O % da **task-mãe no task manager** não sai daqui: é a
+> derivação `progress` (`.claude/utils/task-manager/progress.sh`, story points ou contagem declarada).
+
 ```markdown
 📊 Progresso: 3/5 (60%)
 ▓▓▓▓▓▓░░░░ 60%

@@ -14,6 +14,7 @@ hierarchy.epic	optional	not_implemented	v2	-	hierarquia Space/Folder/List não a
 status.transition	required	unverified	v2	adapter:clickup.md§Status são propriedade da LIST	a medição de 2026-10-02 registra a FALHA (400 Status not found); a cura por sinônimo (resolveStatusForTask) não tem medição registrada
 priority.set	optional	implemented	v2	adapter:clickup.md§só INTEIRO 1–4 é aceito;kg:task-manager-vocabulario-2026-10#E_CLICKUP_POINTS_NATIVE_PRIORITY_INT	inteiro 1 (urgent) a 4 (low); string devolve 400
 estimate.points	optional	not_implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_POINTS_NATIVE_PRIORITY_INT	provedor tem points nativo (pré-requisito do ClickApp Sprints não tocado); o adapter não envia
+estimate.points_read	optional	not_implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_POINTS_NATIVE_PRIORITY_INT	provedor tem points nativo; o mapeamento de leitura do adapter não traz o campo: o adapter não lê, então o progresso sai por contagem (progress.sh declara)
 estimate.time	optional	implemented	v2	adapter:clickup.md§confirmado: `due_date`/`time_estimate` em ms com a flag	time_estimate em milissegundos
 comment.add	required	unverified	v2	-	comment_text; o formato do comentário não foi ancorado (E_ELENXO_CLICKUP_COMMENT_FORMAT_OPEN)
 comment.list	required	unverified	v2	-	
