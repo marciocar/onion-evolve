@@ -316,6 +316,8 @@
 .claude/utils/task-manager/adapters/zoho.md	E_TM_PERCENTUAL_IGNORA_STORY_POINTS	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/utils/task-manager/factory.md	C_D7_19	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/utils/task-manager/factory.md	E_J_D7_19	docs/onion/graph/onion-evolution-2026-07.kg.yaml
+.claude/utils/task-manager/interface.md	D_FORMATO_TSV_IRMAO_DO_ADAPTER	docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml
+.claude/utils/task-manager/interface.md	D_TASK_MANAGER_INTERFACE_WAVE2	docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml
 .claude/validation/	E_sem_gate_client_safe	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 .claude/validation/agent-frontmatter-keys-check.sh	D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV	docs/evolution/research/guard-agent-frontmatter-keys-2026-10/agent-frontmatter-keys-2026-10.kg.yaml
 .claude/validation/aside-router.sh	E_ASIDE_ROUTER_GATE_E_PROMPT	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
@@ -529,6 +531,11 @@
 .claude/validation/rules-registry.sh	D_TAG_OBRIGATORIO	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/validation/rules-registry.sh	E_OBJECAO_DRIFT_DO_ONION_E_DOCSTRING_VS_CORPO	docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml
 .claude/validation/session-beacon.sh	Q_BEACON_NAO_LIBERA_NO_STOP	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
+.claude/validation/task-manager-capabilities-check.sh	C_TETO_DERIVADO_E_MINI	docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml
+.claude/validation/task-manager-capabilities-check.sh	C_TETO_FONTE_EXISTE_NAO_SUSTENTA	docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml
+.claude/validation/task-manager-capabilities-check.sh	C_TETO_METODO_CITADO_EM_PROSA	docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml
+.claude/validation/task-manager-capabilities-check.sh	C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA	docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml
+.claude/validation/task-manager-capabilities-check.sh	D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA	docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml
 .claude/validation/testing-state.sh	E_ARTEFATO_CATRACADO_NAO_IMPRIME_HOJE	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/trust-topology-check.sh	E_trust_topology_check	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/vendor-scrub-form-check.sh	A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml

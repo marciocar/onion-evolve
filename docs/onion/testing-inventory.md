@@ -18,8 +18,8 @@
 | Arquivos de fixture rastreados | **160** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
 | Regras do lint | **90** | `bash .claude/validation/rules-registry.sh --counts` |
 | — das quais HARD | **78** | idem |
-| — das quais SOFT | **33** | idem |
-| — HARD **e** SOFT (contadas nas duas) | **21** | idem |
+| — das quais SOFT | **32** | idem |
+| — HARD **e** SOFT (contadas nas duas) | **20** | idem |
 | Pares de modo consumido (REGRA 59) | **59** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | idem |
 | Scripts de validação | **101** | `git ls-files '.claude/validation/*.sh'` |
