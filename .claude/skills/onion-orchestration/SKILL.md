@@ -260,7 +260,7 @@ força), e a doutrina desta casa é que `fix-must-become-mechanism` vale **quand
 - **Refutador roda em WORKTREE ISOLADA — e isso é mecanismo, não etiqueta.** Medido em 2026-09-20:
   um refutador com briefing que dizia, literalmente, *"Não modifique NENHUM arquivo; só meça e
   reporte"* escreveu em **seis** arquivos da árvore principal — incluindo o script de merge
-  (`ops/pr-merge-verified.sh`) e o lint. O conteúdo era **bom** (achou um defeito que quebraria
+  (`ops/pr-merge-verified.sh`, (core-only)) e o lint. O conteúdo era **bom** (achou um defeito que quebraria
   todo PR), e é justamente isso que torna o caso instrutivo: a instrução não falhou por ser
   ignorada de má-fé, falhou porque **instrução em prosa não é fronteira**. Pior, a violação só
   apareceu por acidente — três casos de bancada que eu não escrevi ficaram vermelhos.
