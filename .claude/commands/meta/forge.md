@@ -46,7 +46,7 @@ Quando a forja nasce de um veredito `absorver`/`costurar`, a entrada **não é a
 plano que o [`/meta:dissect`](dissect.md) escreveu como nós `x_absorb_*` no grafo da dissecação.
 O leitor roda na carga e mede as peças do alvo no `forge-census.sh`:
 
-!`bash .claude/validation/dissect-census.sh . --plans || true`
+!`bash .claude/validation/dissect-plans.sh . || true`
 
 - Plano **INCOMPLETO** (sem origem com pin, sem licença, sem família de paridade, forma fora do
   enum, alvo fora do censo) **não se forja**: volte ao dissect. A doutrina é a §4b de

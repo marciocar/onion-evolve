@@ -10,7 +10,7 @@ meta:
   # SEGUNDA dissecacao do /meta:dissect e PRIMEIRA a chegar ao N4. E dogfood do SAC-77 (costura
   # dissect→forge): a pergunta nao era so "o Onion absorve o Conductor?", era "onde o veredito do
   # dissect para hoje, e o que falta para o /meta:forge agir sobre ele". O N4 daqui e o primeiro
-  # PLANO DE ABSORCAO em forma de no (`x_absorb_*`), lido por `dissect-census.sh --plans`.
+  # PLANO DE ABSORCAO em forma de no (`x_absorb_*`), lido por `dissect-plans.sh`.
   # N1 entrou PAGO pelo corpus (agent-command-composition-2026-09); N0 e N2 foram MEDIDOS hoje:
   # N0 pela API do GitHub, N2 lendo o codigo-fonte no sha fixado (nada foi instalado nem executado).
 
@@ -168,7 +168,7 @@ nodes:
     x_absorb_form: reescrita
     x_absorb_parity: "run_research_workflow_selftests: caso que injeta write(KG) devolvendo radarExit 0 sobre grafo que o radar reprova; tem de REPROVAR hoje e PASSAR depois (o motor re-mede, nao aceita o inteiro do produtor), e o teto de tentativas sai do prompt para constante do JS"
     label: "PLANO N4 — absorver no onion-research o CONCEITO 'quem verifica nao e quem produz, e o teto de correcao e contado pelo motor': peca 4 (workflow) muda, peca 7 (bancada) prova. Forma: reescrita na gramatica da casa, nenhum codigo vendorizado."
-    narrative: "Origem e licenca registradas (MIT, sha fixado). A peca que muda e o write(KG): o radar e re-medido por um passo que o produtor nao controla (agente verificador so com Bash e sem Write, ou o proprio substrato se o Workflow permitir rodar comando — medir no PR da absorcao), e o 'max 3 tentativas' vira constante do JS. A rubrica semantica fail-open fica de fora (E_N3_FAIL_OPEN_NAO_TRANSFERE). As pecas que ja existem no alvo NAO estao escritas aqui de proposito: dissect-census.sh --plans as mede ao vivo no forge-census."
+    narrative: "Origem e licenca registradas (MIT, sha fixado). A peca que muda e o write(KG): o radar e re-medido por um passo que o produtor nao controla (agente verificador so com Bash e sem Write, ou o proprio substrato se o Workflow permitir rodar comando — medir no PR da absorcao), e o 'max 3 tentativas' vira constante do JS. A rubrica semantica fail-open fica de fora (E_N3_FAIL_OPEN_NAO_TRANSFERE). As pecas que ja existem no alvo NAO estao escritas aqui de proposito: dissect-plans.sh as mede ao vivo no forge-census."
     trace: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
 
   - id: E_DOGFOOD_DISSECT_PARAVA_NO_VEREDITO
@@ -183,7 +183,7 @@ nodes:
     source_tier: 10
     source_kind: internal-audit
     label: "DOGFOOD — onde o dissect parava: (1) o passo 3 promete 'um worker por nivel, gate em JS' no onion-research.js, que tem ZERO mencao a dissect; (2) o forge nao tinha entrada nem palavra sobre licenca; (3) o N4 nao tinha forma — terminava em prosa no no de decisao."
-    narrative: "Corolario do (1): o forge-census conta 7/7 ao proprio dissect porque ele CITA o motor — presenca e referencia, nunca comportamento, exatamente o teto que o censo declara. A dissecacao desta rodada foi feita direto, sem o motor, e isso fica declarado no comando em vez de escondido. A costura nasce daqui: o N4 vira nos x_absorb_*, o dissect-census.sh --plans os le e mede as pecas do alvo no forge-census, e o /meta:forge injeta essa leitura."
+    narrative: "Corolario do (1): o forge-census conta 7/7 ao proprio dissect porque ele CITA o motor — presenca e referencia, nunca comportamento, exatamente o teto que o censo declara. A dissecacao desta rodada foi feita direto, sem o motor, e isso fica declarado no comando em vez de escondido. A costura nasce daqui: o N4 vira nos x_absorb_*, o dissect-plans.sh os le e mede as pecas do alvo no forge-census, e o /meta:forge injeta essa leitura."
     trace: ".claude/commands/meta/dissect.md"
     provenance:
       source: ".claude/workflows/onion-research.js, .claude/commands/meta/forge.md, .claude/validation/forge-census.sh"
@@ -202,7 +202,7 @@ nodes:
     verified_at: "2026-10-11"
     verified_against: "SELADA pelo maestro em 2026-10-11 por pergunta com opções: absorver o conceito (verificação pelo motor e teto de tentativas contado em código no onion-research.js), rejeitar o validador fail-open; reescrita, sem vendorizar código. A execução é a próxima onda (plano A_PLAN_VERIFICACAO_PELO_MOTOR); decision fica confirmed em DEV até a absorção chegar a PROD"
     label: "VEREDITO SELADO — ABSORVER o conceito (verificacao pelo motor + teto contado em codigo), via A_PLAN_VERIFICACAO_PELO_MOTOR; REJEITAR o validador fail-open; nada a absorver da forma (nativa). O maestro sela."
-    narrative: "Nao e costurar: o Conductor e outro orquestrador (Python, YAML) e adapter para ele trocaria o substrato que o Onion escolheu (Workflow nativo). Nao e parquear: o defeito interno (radarExit declarado) e medido hoje. A absorcao em si NAO e deste PR: proxima onda, com gatilho = selo do maestro neste no; o forge a recebe pelo dissect-census.sh --plans conductor."
+    narrative: "Nao e costurar: o Conductor e outro orquestrador (Python, YAML) e adapter para ele trocaria o substrato que o Onion escolheu (Workflow nativo). Nao e parquear: o defeito interno (radarExit declarado) e medido hoje. A absorcao em si NAO e deste PR: proxima onda, com gatilho = selo do maestro neste no; o forge a recebe pelo dissect-plans.sh conductor."
     trace: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
     provenance:
       source: "decisão do maestro na sessão de 2026-10-11, pergunta com opções sobre D_CONDUCTOR_1011"
