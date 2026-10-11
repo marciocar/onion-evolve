@@ -227,7 +227,7 @@ nodes:
       method: "leitura: corpos dos commits 265f6a89 e fbf9ac12 e o adapter zoho.md em 265f6a89"
       locality: "repo"
 
-  - id: Q_GMILL_MAIN_DIVERGIU
+  - id: Q_HUB_OPERACOES_ENTERPRISE_MAIN_DIVERGIU
     node_type: question
     plane: PROD
     impact: 4
@@ -238,10 +238,11 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "o main do clone do adotante DIVERGIU do remoto (3x3): push apagaria o ADR da equipe, pull cego reescreveria os updates do Onion — reconciliacao e sobre CONTEUDO deles, nao minha de decidir"
-    gatilho: "o maestro dizer qual lado ganha em cada um dos 6 arquivos sobrepostos, OU a equipe do adotante reconciliar no repo dela. Ate la o Onion entrega em branch dedicada a partir do origin/main REAL, sem tocar o main."
+    x_gatilho: "o maestro dizer qual lado ganha em cada um dos 6 arquivos sobrepostos, OU a equipe do adotante reconciliar no repo dela. Ate la o Onion entrega em branch dedicada a partir do origin/main REAL, sem tocar o main."
+    narrative: "id anterior (SAC-99, 2026-10-11): Q_⟨pasta privada⟩_MAIN_DIVERGIU — o id carregava o nome da pasta privada do hub e foi trocado pelo id do members.yaml (selo da O7: labels e ids usam o id). Registros históricos (resíduos R56, mailbox _processed, CHANGELOG da federação) citam a forma antiga e ficam como estão."
     provenance:
       source: "commit c383df21 (corpo) · hub-operacoes-enterprise@e1e0ec3e e @148a87e2"
-      locator: "c383df21 corpo §Q_GMILL_MAIN_DIVERGIU (\"divergiu 3x3 do remoto... PR #2 da equipe (ADR, 219 linhas)... seis arquivos se sobrepõem\") · hub-operacoes-enterprise@e1e0ec3 (Merge PR #2 ... SAC-59, 2026-09-30 15:40) · hub-operacoes-enterprise@148a87e numstat adr-zoho-projects-task-mapping.md +219"
+      locator: "c383df21 corpo §<o id anterior deste nó, ver narrative> (\"divergiu 3x3 do remoto... PR #2 da equipe (ADR, 219 linhas)... seis arquivos se sobrepõem\") · hub-operacoes-enterprise@e1e0ec3 (Merge PR #2 ... SAC-59, 2026-09-30 15:40) · hub-operacoes-enterprise@148a87e numstat adr-zoho-projects-task-mapping.md +219"
       method: "leitura: corpo do commit c383df21 (2026-09-30) + commits e1e0ec3 e 148a87e no clone hub-operacoes-enterprise"
       locality: "repo"
 
@@ -254,7 +255,7 @@ nodes:
     verified_at: 2026-09-30
     verified_against: "medido: a KB do adotante estava em v1.2 (com /api/v3.1/, global-statuses, escopo custom_fields.READ) contra a v1.1 que o core absorveu. Aplicar o bundle por cima seria REGRESSAO para ele."
     label: "o update NAO sobrescreve KB de terceiro que o adotante evoluiu: o manifesto transporta docs/knowledge-base, mas never-clobber tem de valer ali tambem — o core absorve o que falta, nunca o contrario"
-    gatilho: "mecanizar: hoje a exclusao das 3 KBs e MANUAL na entrega. Vira guarda quando um segundo adotante tiver KB propria mais nova que a do core."
+    x_gatilho: "mecanizar: hoje a exclusao das 3 KBs e MANUAL na entrega. Vira guarda quando um segundo adotante tiver KB propria mais nova que a do core."
     provenance:
       source: "commit c383df21 (corpo) · hub-operacoes-enterprise@148a87e2:docs/knowledge-base/platforms/zoho-projects-api.md · docs/knowledge-base/platforms/zoho-projects-api.md@198393e4"
       locator: "c383df21 corpo §D_NAO_SOBRESCREVER_KB_DE_ADOTANTE · hub-operacoes-enterprise@148a87e zoho-projects-api.md:16,18,232,304 (v1.2, /api/v3.1/, global-statuses, custom_fields.READ) · core@198393e4 zoho-projects-api.md:26 (v1.1)"
@@ -287,7 +288,7 @@ nodes:
     verified_against: "selado pelo maestro: 'nenhuma agora, PRIMEIRO tem que analisar a proposta de cada uma e suas consequencias e o que pode quebrar para ter um plano de implementacao sem falhas'. Plano escrito em docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md"
     label: "nenhuma das tres capacidades (ordem leitor/escritor, diferencial spec-impl, SMT de conflito) se absorve sem plano que diga o que QUEBRA — o plano existe e a execucao e decisao do maestro"
     trace: docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md
-    gatilho: "o maestro mandar executar. O passo 1 da Capacidade 1 (classificar as 91 por le-arquivo / escreve / depende-de-ordem, IMPRIMINDO sem julgar) e o unico trabalho que paga duas contas: serve a ordem E ao gatilho da Capacidade 3."
+    x_gatilho: "o maestro mandar executar. O passo 1 da Capacidade 1 (classificar as 91 por le-arquivo / escreve / depende-de-ordem, IMPRIMINDO sem julgar) e o unico trabalho que paga duas contas: serve a ordem E ao gatilho da Capacidade 3."
     provenance:
       source: "docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md"
       locator: "selado pelo maestro: 'nenhuma agora, PRIMEIRO tem que analisar a proposta de cada uma e suas consequencias e o que pode quebrar para ter um plano de implementacao sem falhas'. Plano escrito em docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md"
@@ -303,7 +304,7 @@ nodes:
     verified_at: 2026-10-01
     verified_against: "a rodada atacou Drools, Camunda/DMN, OpenL, json-rules-engine, Easy Rules, NRules, Clara e GoRules BRMS e NENHUMA claim sobreviveu aos votos adversariais — licenca, cadencia e sinal de vida seguem nao medidos. A unica alegacao de versao 2026 foi REFUTADA."
     label: "nao ha resposta sobre SUBSTITUTO do ZEN Engine: o lado classico voltou vazio, e o maestro selou 'nao agora' em 2026-10-01"
-    gatilho: "o projeto ADOTANTE de gamificacao sinalizar dor real com o ZEN. A urgencia e dele, nao do core — nao ha motor ZEN no core, so o agente @zen-engine-specialist. Modo recomendado quando reabrir: primarias nomeadas (~42k/no) e nao varredura (~291k/no), porque os motores ja tem nome."
+    x_gatilho: "o projeto ADOTANTE de gamificacao sinalizar dor real com o ZEN. A urgencia e dele, nao do core — nao ha motor ZEN no core, so o agente @zen-engine-specialist. Modo recomendado quando reabrir: primarias nomeadas (~42k/no) e nao varredura (~291k/no), porque os motores ja tem nome."
     provenance:
       source: "docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md"
       locator: "docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md:42-45 (§'NÃO-VERIFICADOS, e esta lacuna importa')"
@@ -336,7 +337,7 @@ nodes:
     verified_at: 2026-10-01
     verified_against: "reforco do maestro em 2026-10-01: 'toda onda principal gera oportunidades derivadas, o que e a automacao de hoje gera novos gargalos e necessidades'. Medido contra a doutrina vigente (common/prompts/research-doctrine.md, 10 clausulas): a clausula 4 (Caminho do dinheiro) pergunta ONDE O CAPITAL ESTA HOJE; esta pergunta e outra — o que a onda CRIA como gargalo derivado, e quem JA PAGA pela onda e por isso tem orcamento para o passo seguinte."
     label: "candidata a CLAUSULA 11 da doutrina de pesquisa: ONDA PRINCIPAL -> GARGALO DERIVADO. Capital mostra o escasso de HOJE; a onda derivada mostra o que fica escasso DEPOIS, como consequencia do que esta sendo automatizado agora"
-    gatilho: "a rodada que o maestro pediu (Onion como ponto de partida / gargalos derivados da automacao) PROVAR que o eixo rende achado que os outros 10 nao renderiam. Se render, vira clausula com mecanismo (worker proprio no fan-out, como o de mercado). Se nao render, fica como pergunta refutada — e isso tambem e resultado."
+    x_gatilho: "a rodada que o maestro pediu (Onion como ponto de partida / gargalos derivados da automacao) PROVAR que o eixo rende achado que os outros 10 nao renderiam. Se render, vira clausula com mecanismo (worker proprio no fan-out, como o de mercado). Se nao render, fica como pergunta refutada — e isso tambem e resultado."
 
 edges:
   # o diagnóstico sustenta as decisões
@@ -375,7 +376,7 @@ edges:
   - from: E_IMPOSSIBILIDADE_ERA_FORMA_NAO_TESTADA
     to: E_ADOTANTE_CORRIGIU_O_CORE
     edge_type: SUPPORTS
-  - from: Q_GMILL_MAIN_DIVERGIU
+  - from: Q_HUB_OPERACOES_ENTERPRISE_MAIN_DIVERGIU
     to: D_NAO_SOBRESCREVER_KB_DE_ADOTANTE
     edge_type: CONSTRAINS
   - from: E_O_LINT_SO_LE_E_O_HOOK_ESCREVE
