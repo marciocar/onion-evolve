@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**428 itens abertos** em 89 grafo(s) com aberto (de 114 no escopo) · 90 grupo(s), agrupados por `owner:` (10 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**422 itens abertos** em 89 grafo(s) com aberto (de 114 no escopo) · 90 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -446,19 +446,6 @@
 |--:|---|---|---|
 | 19.2 | `Q_WEBSEARCH_CAP_2_1_258` | websearch-cap-2026-09 | Qual e o teto de chamadas WebSearch por sessao no Claude Code 2.1.258 — a env var CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION, seu  |
 
-## maestro — 8 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 19.0 | `Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN` | distribuicao-metodo-vivo-2026-09 | PERGUNTA DO MAESTRO (2026-09-15), com o CRITERIO DELE dado em seguida: liberar a meta-fabrica ao plugin PUBLICO, "sem nada pessoal |
-| 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
-| 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
-| 5.1 | `Q_CREATE_VERTICAL_E_O_MOTOR_DO_MARKETPLACE_NO_PLUGIN` | door-role-parity-2026-09 | o plugin onion-meta leva /meta:create-vertical (e o motor do marketplace, parametrizando o destino) e forge/forge-guard/cc-update, |
-| 5.1 | `Q_PIN_NA_DO_MINI_DEPOIS_DA_PUBLICACAO` | door-role-parity-2026-09 | depois da 1ª publicação do mini, quem troca o onion_version n/a do registro? Sem isso a exceção do members-validate fica perm |
-| 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
-| 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
-| 3.2 | `Q_MINI_CONFIGURA_INTEGRACAO_PELO_ENV` | door-role-parity-2026-09 | o mini leva o /meta:setup-integration (é configuração, não fábrica) ou segue sem meta, com a integração pelo .env à mão?  |
-
 ## plugins-en-compliance-2026-09 — 23 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -682,6 +669,16 @@
 |--:|---|---|---|
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
 
+## maestro — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
+| 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
+| 5.1 | `Q_CARIMBO_DO_ADOTADO_STANDALONE` | door-role-parity-2026-09 | o adotado standalone ganha o canal, mas o lint e a REGRA 92 ainda leem role standalone sem kind door como PORTA. Que carimbo ele d |
+| 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
+| 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
+
 ## onion-doctrine-elenxo-bulbo-2026-07 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -700,16 +697,13 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## door-role-parity-2026-09 — 6 item(ns)
+## door-role-parity-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.2 | `Q_PREDICADO_SUCESSOR` | door-role-parity-2026-09 | a paridade é cega a 'ambas as fontes erradas do mesmo modo'; o sucessor mede o CONTEÚDO da porta contra o corte (vendor-manifest |
 | 6.3 | `Q_ROLE_DUPLA_LEITURA` | door-role-parity-2026-09 | o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade |
 | 5.4 | `Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA` | door-role-parity-2026-09 | o commit durável da adoção deixa .gitignore e .env.example fora: a proteção de segredo que a adoção escreve no .gitignore n |
-| 5.1 | `Q_REGISTRO_ACOMPANHA_A_TROCA_DE_PAPEL` | door-role-parity-2026-09 | a 1ª publicação da onion-core como source muda o carimbo publicado, e o registro (role hub) e o clone local seguem no papel vel |
-| 4.8 | `Q_STANDALONE_DE_ADOCAO_SEGUE_A_PORTA` | door-role-parity-2026-09 | o papel standalone serve à porta E à adoção individual (/meta:adopt --role standalone): pela matriz o adotado standalone perde |
-| 3.2 | `Q_PERSONALITY_SYNC_SEM_CONJUNTO` | door-role-parity-2026-09 | /meta:personality-sync não está na lista da matriz: escreve a linha personality_summary do members.yaml e tem tag federation, e  |
 
 ## forge-cc-update-2026-10 — 2 item(ns)
 
