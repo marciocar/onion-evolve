@@ -6,7 +6,8 @@
 #             A identidade é o PIN, e este script não emite semver. Desde 2026-10-11
 #             (architecture.md §6.1, D_VERSIONAR_AS_PORTAS_POR_RELEASE) a família tem
 #             um RÓTULO de release `onion-vX.Y.Z`, mas ele mora nas tags e no carimbo
-#             das PORTAS (`release:`), nasce no /meta:publish e nenhuma guarda o lê —
+#             das PORTAS (`release:`), nasce na publicação das portas (ato do core) e
+#             nenhuma guarda o lê —
 #             não é identidade, é apelido de um pin publicado. (Até 1.3.0 a meta-spec
 #             dizia "não há semver formal"; isso foi superado pelo rótulo, não pelo
 #             pin.) É o irmão de inventory.sh: deriva do estado real, não digita à mão.
