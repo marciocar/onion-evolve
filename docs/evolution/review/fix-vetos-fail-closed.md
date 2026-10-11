@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: 995e64d9f7dc35f9228d1dd4a3ca4f314546aedc62bd3decc3b7fe28df794742
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: c4c6e7d3fc50b78bf8ee24484c44b1d2e210a102c2a468e0c8aa85a840555c16
 findings_total: 7
 findings_real: 7
@@ -117,3 +117,11 @@ um `cd` com variável, ele barra um glob absoluto sem relação com `.env`. Est�
 ## Commits
 
 Os commits usaram `--no-verify` como checkpoint. O gate final é o `ops/pr-finalize.sh` com o CI.
+
+## Passada pós-CI (2026-10-11)
+
+O selftest da faixa 2 reprovou na catraca do pipefail: 7 sítios `printf | grep -q` em
+`.claude/hooks/lib/invocation-lines.sh` contra a catraca de 1. Convertidos para here-string,
+e o pipe de segmentos do push virou variável intermediária, com o veredito por here-string.
+Comportamento idêntico: `pretooluse_veto` + `env_exposure` + `shell_pipefail_robustness`
+deram 228/228. O SHA volta a `pendente` e o `pr-finalize` recalcula.
