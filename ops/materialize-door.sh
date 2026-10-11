@@ -328,6 +328,14 @@ privado, e não aqui.
 CLAUDEMD
 echo "  (5) raiz da porta: README.md · CLAUDE.md · LICENSE · LICENSE-DOCS"
 fi
+# (5-eol) O .gitattributes com eol=lf dos executáveis, em TODO papel (passo seguinte do SAC-107, PR #1023):
+# o core fixou eol=lf, mas o arquivo dele não viaja, e a porta pública é justamente o que se clona num
+# Windows com autocrlf, onde os .sh chegam com CRLF e o bash quebra. Subconjunto MEDIDO no montado (a
+# porta não leva .githooks/, logo não ganha a linha). Lido de REPO_ROOT, como o LICENSE-DOCS acima: no
+# motor do /meta:publish é a worktree da ref de origem.
+_eol_out="$(bash "${REPO_ROOT}/.claude/utils/adopt/emit-eol-gitattributes.sh" "${DEST}" --door 2>&1)" \
+  || { echo "ERRO: o .gitattributes da porta não foi escrito: ${_eol_out}" >&2; exit 3; }
+echo "  (5) ${_eol_out}"
 
 # ── (6) A PORTA PRECISA SABER QUEM É, E TER AS PROJEÇÕES QUE AS PRÓPRIAS GUARDAS COBRAM ──────
 # Os três achados vieram da 1ª sessão REAL dentro da porta (`/warm-up`, 2026-09-17) — não de mim:

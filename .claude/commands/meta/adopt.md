@@ -288,9 +288,9 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/offer-onion-ci.sh" "$DEST" || true
 # ↑ rc≠0 aqui significa "lint do alvo reprovando" — NÃO aborta a adoção (o gate local de (6)
 #   já está vivo); é convite a consertar o lint e reofertar o CI depois.
 
-# (7) .gitattributes merge=union — reduz conflito ESPÚRIO no merge de vendor-branch (Achado #2) em
-#     arquivos append-only do doc-bridge (CHANGELOG/_processed): duas pontas apendam → união, não conflito.
-#     Never-clobber por-linha (idempotente): só adiciona as regras Onion ausentes.
+# (7) .gitattributes: eol=lf nos executáveis (SAC-107; never-clobber, desfechos no helper) e merge=union
+#     nos append-only do doc-bridge (CHANGELOG/_processed; Achado #2: duas pontas apendam → união). Idempotente.
+bash "$SOURCE_ROOT/.claude/utils/adopt/emit-eol-gitattributes.sh" "$DEST" --adopt
 for rule in 'docs/evolution/**/CHANGELOG.md merge=union' 'docs/evolution/**/_processed/** merge=union'; do
   grep -qxF "$rule" "$DEST/.gitattributes" 2>/dev/null || printf '%s\n' "$rule" >> "$DEST/.gitattributes"
 done
