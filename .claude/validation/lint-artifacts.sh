@@ -5423,7 +5423,8 @@ check_evolve_staleness() {
 check_evolve_staleness
 
 # ─────────────────────────────────────────────────────────────────────────────
-# REGRA 98 (Diretiva de injeção escrita como CITAÇÃO não pode estar VIVA) — HARD
+# REGRA 98 — Diretiva de injeção escrita como CITAÇÃO não pode estar VIVA [HARD]
+# previne: exemplo de documentação que o harness lê como diretiva e EXECUTA a cada invocação do comando.
 #   DANO CONSUMADO (2026-10-04, rodada do /meta:evolve): o /meta:create-skill EXECUTAVA git diff
 #   a cada invocação, porque dois exemplos de documentação (crase dupla; bloco cercado) casam as
 #   regex do harness 2.1.289 — que NÃO pula bloco cercado e NÃO mascara crase dupla. Era a 2ª
@@ -5457,7 +5458,8 @@ check_cited_directive_live() {
 check_cited_directive_live
 
 # ─────────────────────────────────────────────────────────────────────────────
-# REGRA 99 (Nó de .kg.yaml sem caminho de máquina, julgado pela classe) — HARD, com catraca
+# REGRA 99 — Nó de .kg.yaml sem caminho de máquina, julgado pela classe [HARD + SOFT]
+# previne: caminho de máquina voltando ao corpus depois de a migração de provenance tirá-lo (com catraca).
 #   DANO MEDIDO (SAC-103): as ondas O4 a O7 da migração de provenance (SAC-73, 2026-10-09/10) tiraram do
 #   corpus o caminho de máquina — 247 ocorrências em 180 nós no corpus de 2026-10-08, medidas pela classe
 #   desta regra — e nada impedia que ele voltasse. A régua das ondas era uma LISTA de diretórios, que errou
@@ -5491,7 +5493,8 @@ check_kg_machine_path() {
 check_kg_machine_path
 
 # ─────────────────────────────────────────────────────────────────────────────
-# REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse) — HARD, com catraca
+# REGRA 100 — Superfície que viaja não cita ops/ como se o destinatário o tivesse [HARD + SOFT]
+# previne: porta/adotante recebendo instrução que aponta para ops/, que não viaja (com catraca).
 #   DANO MEDIDO (SAC-86, 2026-10-09, materialização do onion-standalone no pin 947e69ce): a lente
 #   kg-grammar.md afirmava ao adotante que o `ops/pr-merge-verified.sh` (core-only) recusa o rebase —
 #   e `ops/` não viaja para porta nem adotante. A classe já estava publicada no pretooluse-merge-gate.sh
@@ -5532,7 +5535,8 @@ check_ops_citation_travel() {
 check_ops_citation_travel
 
 # ─────────────────────────────────────────────────────────────────────────────
-# REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block) — HARD
+# REGRA 101 — Veto PreToolUse por exit 2 declara onFailure: block [HARD + SOFT]
+# previne: veto que falha ABERTO quando o hook nem roda (script ausente sai 127 e a ação passa).
 #   DANO MEDIDO (SAC-83, 2026-10-11, Claude Code 2.1.296, `claude -p` em sandbox): PreToolUse com script
 #   ausente saiu 127 e a ação RODOU; com `"onFailure": "block"` a mesma falha barrou. Os 3 vetos do core
 #   (env-guard, protect-main, merge-gate) falhavam ABERTO quando o hook nem rodava. Aviso (sem exit 2)

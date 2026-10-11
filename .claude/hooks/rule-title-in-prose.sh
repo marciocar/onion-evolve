@@ -61,6 +61,11 @@ if [ "${1:-}" = "--selftest" ]; then
   if printf '%s' "${out}" | grep -q '^21|REGRA 21 (Grafo' && printf '%s' "${out}" | grep -q '^74|REGRA 74 (Caminho .claude/ NU'; then echo "  ✅ (a) menções sem título detectadas com a forma correta"; else echo "  ✗ (a): ${out}"; fails=$((fails+1)); fi
   out="$(printf 'A REGRA 21 (Grafo sincronizado) passou; veja `REGRA 74` em ```REGRA 62```.\n' | _check_text)"
   if [ -z "$(printf '%s' "${out}" | grep -v '^74|')" ] && printf '%s' "${out}" | grep -q '^74|'; then echo "  ✅ (b) titulada e bloco de código isentos; crase não isenta"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
+  # (d) 98-101 nasceram com cabeçalho `# REGRA N (Título) — HARD` e este hook as via como "título não
+  #     encontrado" (medido 2026-10-11). A catraca nº7 do rules-registry.sh impede a forma voltar; aqui
+  #     o hook prova que lê a ponta mais nova do registro.
+  out="$(printf 'A REGRA 98 e a REGRA 101 acusaram.\n' | _check_text)"
+  if printf '%s' "${out}" | grep -q '^98|REGRA 98 (Diretiva de injeção' && printf '%s' "${out}" | grep -q '^101|REGRA 101 (Veto PreToolUse'; then echo "  ✅ (d) regras mais novas (98, 101) resolvem o título"; else echo "  ✗ (d): ${out}"; fails=$((fails+1)); fi
   out="$(printf 'Sem regra nenhuma aqui.\n' | _check_text)"
   if [ -z "${out}" ]; then echo "  ✅ (c) texto limpo = vazio"; else echo "  ✗ (c): ${out}"; fails=$((fails+1)); fi
   [ "${fails}" -eq 0 ] && { echo "rule-title-in-prose selftest: OK"; exit 0; }
