@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**421 itens abertos** em 89 grafo(s) com aberto (de 114 no escopo) · 90 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**426 itens abertos** em 90 grafo(s) com aberto (de 115 no escopo) · 91 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -513,6 +513,16 @@
 | 6.0 | `Q_route_inventory` | m2-bridge-logto-2026-07 | VPS-DECLARADO: o inventário EXATO das rotas do app Hono só existe no host. A tabela do §3.4 é CONTRATO, não fato. P0.2 enumer |
 | 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash> |
 | 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
+
+## ops-citation-travel-2026-10 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 17.0 | `D_SUBSTRATO_CHECK_DE_LINT_COM_CATRACA` | ops-citation-travel-2026-10 | Substrato: check de lint (REGRA 100) com catraca, no core, na hora da autoria. Molde: kb-vendored-link-check.sh (6 casos), a guard |
+| 16.0 | `D_TRES_DECLARACOES_E_O_MARCADOR` | ops-citation-travel-2026-10 | A guarda não decide se a frase descreve o destinatário; obriga o autor a declarar. Três declarações calam: o marcador (core-o |
+| 5.1 | `C_TETO_CLASSE_SEM_O_TOKEN` | ops-citation-travel-2026-10 | TETO: comportamento do core descrito SEM o caminho (o script de merge verificado recusa…) passa calado. A classe sem o token ops |
+| 5.1 | `C_TETO_FORMA_NAO_SENTIDO` | ops-citation-travel-2026-10 | TETO: a guarda vê a FORMA (ops/<arquivo> sem declaração), não o SENTIDO. Ela acusa igual a frase que descreve o destinatário  |
+| 3.2 | `C_TETO_BANCADA_E_CORE_ONLY_FORA` | ops-citation-travel-2026-10 | TETO: lint-selftest.sh, fixtures/ e baselines ficam fora (a bancada executa o que cita e falha alto); árvore genérica em bloco c |
 
 ## m3-federation-admin-2026-07 — 11 item(ns)
 
