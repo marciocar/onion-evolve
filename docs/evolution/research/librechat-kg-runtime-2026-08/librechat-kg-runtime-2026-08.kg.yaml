@@ -77,7 +77,7 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.9
-    status: done
+    status: superseded
     verified_at: 2026-08-20
     verified_against: "CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
     label: "RESOLVIDA — o MCP onion-kg esta VIVO: os agentes do core tem a mesma perna read(KG) que a PoC; o write segue proposta-que-o-core-sela (fila kg-inbox CONSTRUIDA e recebendo — ver E_SERVER_LEGS_PROVEN; a SELAGEM e que segue manual — ver Q_SEALING_NO_MECHANISM)"
@@ -320,7 +320,26 @@ nodes:
       locality: "repo"
 
 
+  - id: E_ONION_KG_MCP_DESLIGADO_DE_PROPOSITO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "systemctl is-active/is-enabled onion-vps-mcp-kg = inactive/disabled; journal retido desde 2026-10-04 sem nenhuma entrada do serviço; librechat.yaml sem bloco do MCP onion-kg e com o comentário de 2026-08-27 (os 4 servidores MCP do host desligados); git remote do repo local do LibreChat vazio"
+    label: "o MCP onion-kg está desligado e desabilitado desde a limpeza de 2026-08-27, de propósito, e nada o consome: o LibreChat não tem mais o bloco dele"
+    narrative: "Medido para o SAC-101 em 2026-10-11. O nó Q_ONION_KG_MCP_NEXT dizia que o MCP estava vivo, com o testemunho de 2026-08-20; a O4 o levou a DEV. Na leitura de hoje: o serviço systemd está inactive e disabled, o journal guarda só desde 2026-10-04 e não traz nenhuma entrada dele, e o librechat.yaml registra em comentário que em 2026-08-27 os blocos skillSync, mcpSettings e mcpServers do Onion foram removidos e os 4 servidores MCP do host desligados. Não houve falha: houve decisão, e o grafo não a registrou. O serviço não foi religado nem em teste, porque não há consumidor para chamá-lo. O código segue no core (ops/mcp-onion-kg/server.py, última mudança em 2026-08-21) caso o MVP o peça de novo, declarado. Na mesma medição, para o SAC-102: o repo local do LibreChat da VPS está sem remote nenhum (git remote vazio, nenhuma chave remote.* na config). O origin que o juiz da O4 mediu em 2026-10-09 apontando para o repo do onion-bridge saiu entre as duas medições, e um push ali agora falha em vez de mandar a história ao repo errado; se o repo precisar de remoto, a escolha é do maestro."
+    provenance:
+      source: "estado do serviço onion-vps-mcp-kg no host e o librechat.yaml do repo local do LibreChat da VPS"
+      locator: "systemctl is-active / is-enabled; journalctl -u onion-vps-mcp-kg; comentário de 2026-08-27 no topo do librechat.yaml"
+      method: "medição: systemctl, journalctl e leitura do librechat.yaml no host em 2026-10-11"
+      locality: "host"
 edges:
+  - from: E_ONION_KG_MCP_DESLIGADO_DE_PROPOSITO
+    to: Q_ONION_KG_MCP_NEXT
+    edge_type: SUPERSEDES
   - from: E_AGENTE_VITRINE_ONION
     to: D_TRIADE_MCP_POR_EIXO
     edge_type: SUPPORTS
