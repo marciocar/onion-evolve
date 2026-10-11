@@ -522,6 +522,7 @@
 .claude/validation/lint-selftest.sh	E_minha_guarda_deu_fail_open	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_reproduction_3_tries	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_skeleton_vazio_reprova	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
+.claude/validation/lint-selftest.sh	Q_PRECOMMIT_SELECAO_POR_CASO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/lint-selftest.sh	Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/members-validate.sh	Q_members_ci_gate	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	C_TETO_BANCADA_E_CORE_ONLY_FORA	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
