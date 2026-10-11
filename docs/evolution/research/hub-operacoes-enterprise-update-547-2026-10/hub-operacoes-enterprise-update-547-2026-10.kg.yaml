@@ -5,7 +5,7 @@ meta:
   schema_version: "1"
   baseline: 2026-10-05
   review_after: 2026-11-05
-  # Triagem do sinal do hub hub-operacoes-enterprise de 2026-10-05, resposta ao anúncio de
+  # Triagem do sinal do hub-operacoes-enterprise de 2026-10-05, resposta ao anúncio de
   # 2026-10-02 sobre os três falsos positivos. Mora aqui, e não em inbox-triage-2026-10, porque aquele
   # grafo está no teto (7/7). O nó que este sinal responde é
   # inbox-triage-2026-10#Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM. Até 2026-10-11 a
@@ -20,6 +20,7 @@ external_edges:
     edge_type: SUPPORTS
 nodes:
   - id: E_HUB_OPERACOES_ENTERPRISE_VEREDITO_DOS_TRES_FALSOS_POSITIVOS
+    x_renamed_from: "81dd982a52d8"
     node_type: evidence
     plane: PROD
     impact: 2
@@ -63,7 +64,7 @@ nodes:
     verified_at: 2026-10-07
     verified_against: "PR fix/adopter-quick-cures: remeasure-hard.sh + adopt.md (--update cita HARD MEDIDO); bancada remeasure_hard (a)-(d), mutante (c) morde"
     trace: '.claude/commands/meta/adopt.md'
-    label: 'CURA PROPOSTA (o pedido do hub, conferido no core e coerente com exit-code-nao-e-a-verificacao): o --update regenera as projecoes SSOT DEPOIS do merge de onion/vendor e re-roda o lint antes de escrever o relatorio; o numero de HARD do relatorio passa a ser o MEDIDO nessa passada, nunca herdado. Antes da cura, medir a causa exata (ordem do passo 8 vs. merge, ou alvo do regen). GATILHO: antes do proximo --update de qualquer hub (gmill e brain-granaai estao em espera por ordem do maestro, 2026-10-05).'
+    label: 'CURA PROPOSTA (o pedido do hub, conferido no core e coerente com exit-code-nao-e-a-verificacao): o --update regenera as projecoes SSOT DEPOIS do merge de onion/vendor e re-roda o lint antes de escrever o relatorio; o numero de HARD do relatorio passa a ser o MEDIDO nessa passada, nunca herdado. Antes da cura, medir a causa exata (ordem do passo 8 vs. merge, ou alvo do regen). GATILHO: antes do proximo --update de qualquer hub (hub-operacoes-enterprise e brain-granaai estao em espera por ordem do maestro, 2026-10-05).'
     provenance:
       source: ".claude/commands/meta/adopt.md"
       locator: "PR fix/adopter-quick-cures: remeasure-hard.sh + adopt.md (--update cita HARD MEDIDO); bancada remeasure_hard (a)-(d), mutante (c) morde"
@@ -79,7 +80,7 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: "vendor-manifest.sh: _role_cut (l.142) so tem ramo para standalone (`*) : ;;` para o resto) e _emit_command_excludes retorna cedo quando o corte do papel e vazio; resolve-role-bundle.sh hub --tools lista 23 work_tools SEM forge; o .claude/commands/meta/ do clone local de hub-operacoes-enterprise (id do members.yaml) tem forge.md, evolve.md, create-*.md, co-announce.md, co-deliver.md, federation-publish.md"
     trace: '.claude/utils/adopt/vendor-manifest.sh'
-    label: 'A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do vendor-manifest so existe para `standalone`; para `hub` e `adopted` o _role_cut e vazio e o corte de comandos de meta/ nem roda — mesmo o resolve-role-bundle declarando, para hub, 23 work_tools que NAO incluem forge. Resultado medido no gmill: a autoria do framework inteira viajou (forge, evolve, create-*, co-announce, co-deliver, federation-publish), contra o adopt.md:94 ("O que NAO ganha: a autoria do framework — Camada 1, so o core"). O forge-guard, mais novo que o pin dele, iria no proximo update. CURA: o corte de comandos de meta/ passa a valer para todo papel com work_tools declarados, com caso de bancada que reprova se um comando core-only aparecer no pacote de hub. GATILHO: antes do proximo --update de qualquer hub.'
+    label: 'A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do vendor-manifest so existe para `standalone`; para `hub` e `adopted` o _role_cut e vazio e o corte de comandos de meta/ nem roda — mesmo o resolve-role-bundle declarando, para hub, 23 work_tools que NAO incluem forge. Resultado medido no hub-operacoes-enterprise: a autoria do framework inteira viajou (forge, evolve, create-*, co-announce, co-deliver, federation-publish), contra o adopt.md:94 ("O que NAO ganha: a autoria do framework — Camada 1, so o core"). O forge-guard, mais novo que o pin dele, iria no proximo update. CURA: o corte de comandos de meta/ passa a valer para todo papel com work_tools declarados, com caso de bancada que reprova se um comando core-only aparecer no pacote de hub. GATILHO: antes do proximo --update de qualquer hub.'
     provenance:
       source: ".claude/utils/adopt/vendor-manifest.sh"
       locator: "vendor-manifest.sh: _role_cut (l.142) so tem ramo para standalone (`*) : ;;` para o resto) e _emit_command_excludes retorna cedo quando o corte do papel e vazio; resolve-role-bundle.sh hub --tools lista 23 work_tools SEM forge; o clone de hub-operacoes-enterprise (host) tem em .claude/commands/meta/ forge.md, evolve.md, create-*.md, co-announce.md, co-deliver.md, federation-publish.md"
@@ -93,12 +94,12 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: '2026-10-05'
-    verified_against: 'update do gmill 547e2e3->ab08cde (branch chore/onion-update-ab08cde675fa, relatorio inbound/2026-10-05-update-ab08cde675fa.md): a regeneracao rodada DEPOIS do merge da onion/vendor levou o inventory.md de 111 para 113 comandos (meta 43->45); uma 2a regeneracao nao mudou nada; a oferta de CI rodada entre o merge e a regeneracao acusou o lint reprovando'
+    verified_against: 'update do hub-operacoes-enterprise 547e2e3->ab08cde (branch chore/onion-update-ab08cde675fa, relatorio inbound/2026-10-05-update-ab08cde675fa.md): a regeneracao rodada DEPOIS do merge da onion/vendor levou o inventory.md de 111 para 113 comandos (meta 43->45); uma 2a regeneracao nao mudou nada; a oferta de CI rodada entre o merge e a regeneracao acusou o lint reprovando'
     trace: '.claude/utils/adopt/regen-ssot-projections.sh'
-    label: 'A CAUSA DO DEFEITO 1 FOI MEDIDA, nao suposta: docs/onion/ NAO viaja na onion/vendor, entao o merge sozinho deixa as projecoes SSOT do alvo defasadas, e qualquer regeneracao feita ANTES do merge fica velha. No update de 2026-10-05 a mitigacao manual (regenerar e re-rodar o lint depois do merge) levou o gmill a 0 HARD medido, e o brain-granaai tambem (0 HARD). Isto vira a cura de Q_UPDATE_REMEDE_DEPOIS_DO_MERGE: o passo (8) do --update passa para depois do merge, e o relatorio carimba o numero dessa passada.'
+    label: 'A CAUSA DO DEFEITO 1 FOI MEDIDA, nao suposta: docs/onion/ NAO viaja na onion/vendor, entao o merge sozinho deixa as projecoes SSOT do alvo defasadas, e qualquer regeneracao feita ANTES do merge fica velha. No update de 2026-10-05 a mitigacao manual (regenerar e re-rodar o lint depois do merge) levou o hub-operacoes-enterprise a 0 HARD medido, e o brain-granaai tambem (0 HARD). Isto vira a cura de Q_UPDATE_REMEDE_DEPOIS_DO_MERGE: o passo (8) do --update passa para depois do merge, e o relatorio carimba o numero dessa passada.'
     provenance:
       source: ".claude/utils/adopt/regen-ssot-projections.sh"
-      locator: "update do gmill 547e2e3->ab08cde (branch chore/onion-update-ab08cde675fa, relatorio inbound/2026-10-05-update-ab08cde675fa.md): a regeneracao rodada DEPOIS do merge da onion/vendor levou o inventory.md de 111 para 113 comandos (meta 43->45); uma 2a regeneracao nao mudou nada; a oferta de CI rodada entre o merge e a regeneracao acusou o lint reprovando"
+      locator: "update do hub-operacoes-enterprise 547e2e3->ab08cde (branch chore/onion-update-ab08cde675fa, relatorio inbound/2026-10-05-update-ab08cde675fa.md): a regeneracao rodada DEPOIS do merge da onion/vendor levou o inventory.md de 111 para 113 comandos (meta 43->45); uma 2a regeneracao nao mudou nada; a oferta de CI rodada entre o merge e a regeneracao acusou o lint reprovando"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 

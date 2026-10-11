@@ -1565,6 +1565,22 @@ check_harvest_names_removed_nodes() {
   added="$(grep -E '^[+][[:space:]]*-[[:space:]]*id:' <<< "${_kgdiff}" \
              | sed -E 's/^[+][[:space:]]*-[[:space:]]*id:[[:space:]]*//; s/[[:space:]]*$//' | sort -u || true)"
   [ -n "${added}" ] && removed="$(comm -23 <(printf '%s\n' "${removed}") <(printf '%s\n' "${added}") | sed '/^$/d')"
+  # RENOME não é colheita (SAC-99, 2026-10-11): o nó renomeado declara `x_renamed_from: "<sha256[:12] do id
+  # antigo>"`, e o id antigo cujo hash aparece numa linha ADICIONADA do diff sai da cobrança. Por HASH e não
+  # pelo id: o renome do SAC-99 existiu para TIRAR um nome privado do id, e cobrar o id antigo verbatim no
+  # resíduo obrigaria a gravar o nome de novo (o refutador mediu: 4 vezes). Nada se perde — o nó segue no grafo.
+  local _ren _rid _h _keep=""
+  _ren="$(grep -E '^[+][[:space:]]+x_renamed_from:' <<< "${_kgdiff}" \
+          | sed -E 's/^[+][[:space:]]+x_renamed_from:[[:space:]]*//; s/["'"'"'[:space:]]//g' || true)"
+  if [ -n "${_ren}" ] && [ -n "${removed}" ]; then
+    while IFS= read -r _rid; do
+      [ -n "${_rid}" ] || continue
+      _h="$(printf '%s' "${_rid}" | sha256sum 2>/dev/null)"; _h="${_h:0:12}"
+      grep -qxF -- "${_h}" <<< "${_ren}" || _keep="${_keep}${_rid}
+"
+    done <<< "${removed}"
+    removed="$(sed '/^$/d' <<< "${_keep}")"
+  fi
   [ -n "${removed}" ] || return 0   # não houve colheita → nada a julgar
 
   slug="$(printf '%s' "${branch}" | tr '/' '-')"

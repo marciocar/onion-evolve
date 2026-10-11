@@ -2858,10 +2858,57 @@ MEOF
   if LC_ALL=C grep -q $'^HARD\tID-NO\t' <<< "${p7o}"; then
     record_pass "projection-safety: (P7e) termo com espaço acha o id com sublinhado (normalização)"
   else record_fail "projection-safety: (P7e)" "a normalização não casou Beta Co com E_BETA_CO_X: ${p7o:0:300}"; fi
-  # (P7f) o DISPATCHER do lint chama o P7 sobre docs/ (a guarda exercitada e não registrada nunca dispara)
-  if grep -q -- '--kg-identifiers --format tsv "${REPO_ROOT}/docs"' "${SCRIPT_DIR}/lint-artifacts.sh"; then
-    record_pass "projection-safety: (P7f) o check_projection_safety do lint invoca o P7 sobre docs/"
-  else record_fail "projection-safety: (P7f)" "o lint não chama --kg-identifiers — o P7 nunca dispara"; fi
+  # (P7g) termo CURTO (<=4) só casa como token inteiro: `Qux` acusa E_QUX_X e cala em E_QUXE_ORDER
+  #       (o falso positivo de sigla dentro de palavra alheia, medido pelo refutador de 2026-10-11)
+  printf '# lista (fixture)\nQux\nFooBar\n' > "${tmp}/client-terms.txt"
+  _p7_graph E_QUXE_ORDER "evidência" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  p7o="$(_p7)"
+  local p7o2
+  _p7_graph E_QUX_X "evidência" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  p7o2="$(_p7)"
+  if ! LC_ALL=C grep -q '^HARD' <<< "${p7o}" && LC_ALL=C grep -q $'^HARD\tID-NO\t' <<< "${p7o2}"; then
+    record_pass "projection-safety: (P7g) termo curto casa só como token (E_QUX_X acusa, E_QUXE_ORDER cala)"
+  else record_fail "projection-safety: (P7g)" "termo curto: esperava calar em E_QUXE_ORDER e acusar E_QUX_X: [${p7o:0:150}] [${p7o2:0:150}]"; fi
+  # (P7j) termo CURTO no CAMINHO (qux-relay-2026-10/) acusa: a normalização faz de `-` e `/` borda de token.
+  #       Sem ela o termo curto nunca casaria em caminho (é o caso que prova a normalização, já que a forma
+  #       espremida cobre o termo longo sozinha).
+  _p7_graph E_QUXE_ORDER "evidência" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  mkdir -p "${tmp}/kg/qux-relay-2026-10"
+  _p7_graph Q_NEUTRO "pergunta" > "${tmp}/kg/qux-relay-2026-10/qux-relay-2026-10.kg.yaml"
+  p7o="$(_p7)"
+  if LC_ALL=C grep -q $'^HARD\tNOME-GRAFO\t.*qux-relay-2026-10.kg.yaml' <<< "${p7o}"; then
+    record_pass "projection-safety: (P7j) termo curto no caminho do grafo → NOME-GRAFO (- e / são borda de token)"
+  else record_fail "projection-safety: (P7j)" "termo curto no caminho escapou: ${p7o:0:200}"; fi
+  rm -rf "${tmp}/kg/qux-relay-2026-10"
+  # (P7h) nome comercial em camelCase partido em tokens (FooBar → E_FOO_BAR_X) acusa pela forma espremida
+  _p7_graph E_FOO_BAR_X "evidência" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  p7o="$(_p7)"
+  if LC_ALL=C grep -q $'^HARD\tID-NO\t' <<< "${p7o}"; then
+    record_pass "projection-safety: (P7h) nome partido em tokens (FooBar em E_FOO_BAR_X) → HARD pela forma espremida"
+  else record_fail "projection-safety: (P7h)" "o nome partido em tokens escapou: ${p7o:0:200}"; fi
+  # (P7i) `id:` citado DENTRO de bloco escalar (narrative: |) é texto, não id → cala
+  { _p7_graph Q_NEUTRO "pergunta"; printf '    narrative: |\n      id: E_FOOBAR_CITADO\n'; } > "${tmp}/kg/limpo/limpo.kg.yaml"
+  p7o="$(_p7)"
+  if ! LC_ALL=C grep -q '^HARD' <<< "${p7o}"; then
+    record_pass "projection-safety: (P7i) id citado dentro de bloco escalar cala (é texto, não chave)"
+  else record_fail "projection-safety: (P7i)" "falso positivo em bloco escalar: ${p7o:0:200}"; fi
+  # (P7f) o DISPATCHER, como o runner o invoca: o lint-artifacts.sh de verdade num repo-sandbox (members,
+  #       client-terms e um grafo de pesquisa sujo em docs/) → [projeção/ID-NO]; o grafo limpo → silêncio.
+  #       Exercita o caminho inteiro (IS_LEAF, o --only, a chamada, a leitura do tsv), não a string no fonte.
+  local sbx; sbx="$(mktemp -d)"; sbx="$(cd "${sbx}" && pwd -P)"
+  mkdir -p "${sbx}/.claude/validation" "${sbx}/docs/evolution/federation" "${sbx}/docs/evolution/research/caso"
+  cp "${SCRIPT_DIR}/lint-artifacts.sh" "${SCRIPT_DIR}/projection-safety.sh" "${sbx}/.claude/validation/"
+  cp "${tmp}/members.yaml" "${sbx}/docs/evolution/federation/members.yaml"
+  printf '# lista (fixture)\nFantasia\n' > "${sbx}/docs/evolution/federation/client-terms.txt"
+  local kgx="${sbx}/docs/evolution/research/caso/caso.kg.yaml" lo1 lo2
+  _p7_graph Q_FANTASIA_MAIN_DIVERGIU "pergunta" > "${kgx}"
+  lo1="$(cd "${sbx}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${kgx}" 2>&1 || true)"
+  _p7_graph Q_HUB_NEUTRO_MAIN_DIVERGIU "pergunta" > "${kgx}"
+  lo2="$(cd "${sbx}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${kgx}" 2>&1 || true)"
+  if grep -q 'projeção/ID-NO' <<< "${lo1}" && ! grep -q 'projeção/ID-NO' <<< "${lo2}"; then
+    record_pass "projection-safety: (P7f) o lint-artifacts.sh de verdade acusa [projeção/ID-NO] no grafo sujo e cala no limpo"
+  else record_fail "projection-safety: (P7f)" "o dispatcher não levou o P7 ao veredito: sujo=[$(grep -c 'projeção/' <<< "${lo1}" || true)] limpo=[$(grep -c 'projeção/ID-NO' <<< "${lo2}" || true)] ${lo1:0:300}"; fi
+  rm -rf "${sbx}"
   rm -f "${tmp}/client-terms.txt"
 }
 
@@ -20366,6 +20413,26 @@ PY2
      && ! grep -q 'colheita sem registro' <<< "${out}" && ! grep -q 'não há resíduo de revisão' <<< "${out}"; then
     record_pass "harvest-residue: nó só MOVIDO (sai e volta no diff) → guarda cala"
   else record_fail "harvest-residue: movido" "nó movido virou colheita (ou o cenário não moveu): ${out}"; fi
+
+  # (f) RENOME declarado (SAC-99): N_SEGUNDO vira N_SEGUNDO_NEUTRO com `x_renamed_from` = sha256[:12] do id
+  #     antigo → não é colheita, cala sem exigir o id antigo no resíduo. (f2) o MESMO renome SEM a declaração
+  #     segue cobrado — o hash é o que isenta, não o fato de haver id novo. Mutante: tirar o bloco do
+  #     x_renamed_from do lint reprova (f).
+  local _h2; _h2="$(printf '%s' N_SEGUNDO | sha256sum)"; _h2="${_h2:0:12}"
+  ( cd "${sb}" && git checkout -q main && git checkout -q -b test/rename-case
+    sed -i "s/  - id: N_SEGUNDO/  - id: N_SEGUNDO_NEUTRO\n    x_renamed_from: \"${_h2}\"/; s/to: N_SEGUNDO/to: N_SEGUNDO_NEUTRO/" docs/onion/graph/alvo.kg.yaml
+    git -c user.email=t@t -c user.name=t commit -qam renome ) >/dev/null 2>&1 || true
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
+  if grep -q 'N_SEGUNDO_NEUTRO' "${sb}/docs/onion/graph/alvo.kg.yaml" \
+     && ! grep -q 'colheita sem registro' <<< "${out}" && ! grep -q 'não há resíduo de revisão' <<< "${out}"; then
+    record_pass "harvest-residue: (f) renome com x_renamed_from (hash do id antigo) não é colheita → cala"
+  else record_fail "harvest-residue: (f) renome" "renome declarado virou colheita (ou o cenário não renomeou): ${out:0:300}"; fi
+  ( cd "${sb}" && sed -i '/x_renamed_from:/d' docs/onion/graph/alvo.kg.yaml \
+    && git -c user.email=t@t -c user.name=t commit -qam sem-hash ) >/dev/null 2>&1 || true
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
+  if grep -q 'não há resíduo de revisão' <<< "${out}"; then
+    record_pass "harvest-residue: (f2) o mesmo renome SEM x_renamed_from segue cobrado como colheita"
+  else record_fail "harvest-residue: (f2) renome sem hash" "renome sem declaração passou calado: ${out:0:300}"; fi
   ( cd "${sb}" && git checkout -q test/harvest-case ) >/dev/null 2>&1 || true
 
   # (d) SEM base resolvível → SOFT que DECLARA, nunca silêncio (o modo que matava a guarda no CI)
@@ -25391,6 +25458,20 @@ run_kg_contract_check_selftests() {
   if [ "${rc}" -eq 1 ] && grep -q 'form.range.node.label' <<< "${out}"; then
     record_pass "kg-contract-check: (k2) renomeado que ganha label longo → rc 1 (o renome não isenta a piora)"
   else record_fail "kg-contract-check: (k2)" "piora no renomeado não acusada: rc=${rc} ${out}"; fi
+  # (k3) NÃO é renome: apagar o grafo A com dívida e criar, no mesmo índice, um B parecido mas reescrito
+  #      (data sem aspas + metade dos nós trocada) → B nasce novo e a dívida É cobrada. Com o limiar padrão
+  #      do git (50%) o par A→B virava "renome" e B herdava a tolerância de A. Mutante: -M90% → -M reprova.
+  _kcc_graph antiga | sed -e 's/baseline: "2026-10-08"/baseline: 2026-10-08/' > "${sb}/g/antiga.kg.yaml"
+  ( cd "${sb}" && git add g/antiga.kg.yaml && git -c user.email=t@t -c user.name=t commit -qm antiga \
+    && git rm -qf g/antiga.kg.yaml ) >/dev/null 2>&1 || true
+  { _kcc_graph outro | sed -e 's/baseline: "2026-10-08"/baseline: 2026-10-08/' \
+      -e 's/label: "pergunta A"/label: "outra pergunta, reescrita"/' -e 's/label: "evidência A"/label: "outra evidência, reescrita"/' \
+      -e 's/source: "caminho@commit"/source: "outro@commit"/' -e 's/locator: "linha 1"/locator: "linha 9"/'; } > "${sb}/g/outro.kg.yaml"
+  ( cd "${sb}" && git add g/outro.kg.yaml ) >/dev/null 2>&1 || true
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/outro.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q 'yaml.unquoted-date' <<< "${out}"; then
+    record_pass "kg-contract-check: (k3) apagar A e criar B reescrito não é renome → a dívida de B é cobrada"
+  else record_fail "kg-contract-check: (k3)" "B herdou a tolerância de A: rc=${rc} ${out} [$(cd "${sb}" && git diff --cached -M --name-status HEAD 2>&1 | tr '\n' ' ')]"; fi
   # (f) o checador NÃO deixa bytecode no vendor. Medido em 2026-10-08: rodar o leitor de referência sem -B
   #     plantava tools/__pycache__/*.pyc, e o `kg_vendor.py check` seguinte reprovava o vendor como
   #     "divergente da tag" (o check rejeita bytecode de propósito). Rodamos sem PYTHONDONTWRITEBYTECODE,
