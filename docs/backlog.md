@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**438 itens abertos** em 93 grafo(s) com aberto (de 119 no escopo) · 94 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**441 itens abertos** em 94 grafo(s) com aberto (de 119 no escopo) · 95 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -291,15 +291,6 @@
 | 6.3 | `C_OPCAO_II_BILINGUE_POR_CAMPOS` | plugin-language-policy-2026-09 | OPCAO (ii) — bilingue por campos: `description` + `description_en` no plugin.json, README com EN em cima e pt-BR abaixo, ambos c |
 | 3.8 | `C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS` | plugin-language-policy-2026-09 | OPCAO (iii) — ingles integral nas superficies e corpos traduzidos progressivamente. A favor: e a unica que casa 100% com o norte |
 
-## agent-frontmatter-keys-2026-10 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 34.0 | `D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV` | agent-frontmatter-keys-2026-10 | Substrato: check de lint (REGRA 102) com SSOT em .tsv e juiz em awk. Molde: kg-machine-path-check.sh (helper com --selftest e --ts |
-| 3.2 | `C_TETO_COMANDOS_SKILLS_E_PLUGINS` | agent-frontmatter-keys-2026-10 | TETO: comandos e skills não entram (outros campos, sem medição nesta forja), e o bundle de plugin não roda o lint; o agente em |
-| 3.2 | `C_TETO_SO_CHAVE_DE_TOPO` | agent-frontmatter-keys-2026-10 | TETO: a guarda julga só a chave de TOPO; chave aninhada (dentro de hooks, mcpServers, experimental) e VALOR ficam com outras regr |
-| 3.0 | `C_TETO_DOC_OFICIAL_ENVELHECE` | agent-frontmatter-keys-2026-10 | TETO: a lista oficial é a da doc em 2026-10-11; chave oficial nova é acusada até entrar no .tsv, e chave que a doc remover cont |
-
 ## deck-patterns-2026-09 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -336,6 +327,17 @@
 | 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
 | 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
 
+## task-manager-vocabulario-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 28.8 | `C_PAGINATION_AS_OPAQUE_ITERATOR` | task-manager-vocabulario-2026-10 | interface.md deve expor a paginação como iterador opaco (próxima página ou fim), sem expor offset, índice nem cursor: os 5 pr |
+| 26.4 | `C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN` | task-manager-vocabulario-2026-10 | O formato do texto rico (descrição e comentário) é heterogêneo e deve ser resolvido no adapter, não na interface: ADF no Jir |
+| 18.0 | `D_TASK_MANAGER_INTERFACE_WAVE2` | task-manager-vocabulario-2026-10 | Onda 2: interface.md declara o vocabulário canônico e 24 capacidades (12 required, 12 optional) com assinatura; cada adapter dec |
+| 13.5 | `C_BULK_IS_PER_OPERATION_NOT_UNIFORM` | task-manager-vocabulario-2026-10 | Operação em lote não é capacidade uniforme: Jira (Cloud e DC) ancora só bulk create (Cloud até 50), Asana tem batch genéric |
+| 8.0 | `Q_WAVE2_PRIMARIES_CELLS` | task-manager-vocabulario-2026-10 | 2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as célu |
+| 3.0 | `Q_JIRA_STATUS_BY_PUT_MEASURE` | task-manager-vocabulario-2026-10 | Medir ao vivo se PUT /rest/api/3/issue/{key} consegue definir status, antes de interface.md declarar 'transição obrigatória' pa |
+
 ## slm-capitalizacao-2026-10 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -348,17 +350,6 @@
 | 16.8 | `C_OPEN_SHOWCASE_PRIVATE_HOLDOUT` | slm-capitalizacao-2026-10 | LEITURA (forma do bench): a tensao aberto x prova (Scale: privado preserva valor probatorio) sugere o desenho HIBRIDO — fatia ab |
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
-
-## task-manager-vocabulario-2026-10 — 6 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 26.4 | `C_PAGINATION_AS_OPAQUE_ITERATOR` | task-manager-vocabulario-2026-10 | interface.md deve expor a paginação como iterador opaco (próxima página ou fim), sem expor offset, índice nem cursor: os 5 pr |
-| 25.6 | `Q_TASK_MANAGER_VOCABULARY_MATRIX` | task-manager-vocabulario-2026-10 | Qual é a matriz provedor × capacidade (12 capacidades, por versão de API) que interface.md do task-manager vai declarar? Segue  |
-| 24.2 | `C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN` | task-manager-vocabulario-2026-10 | O formato do texto rico (descrição e comentário) é heterogêneo e deve ser resolvido no adapter, não na interface: ADF no Jir |
-| 12.0 | `C_BULK_IS_PER_OPERATION_NOT_UNIFORM` | task-manager-vocabulario-2026-10 | Operação em lote não é capacidade uniforme: Jira (Cloud e DC) ancora só bulk create (Cloud até 50), Asana tem batch genéric |
-| 6.0 | `Q_WAVE2_PRIMARIES_CELLS` | task-manager-vocabulario-2026-10 | 2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as célu |
-| 3.0 | `Q_JIRA_STATUS_BY_PUT_MEASURE` | task-manager-vocabulario-2026-10 | Medir ao vivo se PUT /rest/api/3/issue/{key} consegue definir status, antes de interface.md declarar 'transição obrigatória' pa |
 
 ## meta-research-lens-2026-09 — 3 item(ns)
 
@@ -435,6 +426,17 @@
 |--:|---|---|---|
 | 21.2 | `Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA` | forge-evolve-2026-10 | O EVOLVE ESTA FORJADO E NAO FOI RODADO, e isso e deliberado: o dogfood desta forja era a CARGA (a superficie executa a injecao), n |
 | 7.2 | `Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL` | forge-evolve-2026-10 | A PECA QUE FALTA E UMA CONTRADICAO INTERNA, nao so uma lacuna: o evolve manda "Autore o script Workflow" INLINE, e a skill `onion- |
+
+## task-manager-capabilities-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 20.4 | `D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA` | task-manager-capabilities-2026-10 | Substrato: check de lint (REGRA 103), HARD, que roda também no repo derivado, porque os adapters viajam. Molde: ops-citation-trav |
+| 14.4 | `D_FORMATO_TSV_IRMAO_DO_ADAPTER` | task-manager-capabilities-2026-10 | Formato: TSV irmão do adapter (adapters/<p>.capabilities.tsv), com o vocabulário num bloco TSV marcado na interface. Nem YAML ne |
+| 6.8 | `C_TETO_FONTE_EXISTE_NAO_SUSTENTA` | task-manager-capabilities-2026-10 | TETO: a guarda confere que a fonte EXISTE (nó do grafo, trecho do adapter), não que ela SUSTENTA a afirmação. Um kg: que apont |
+| 5.1 | `C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA` | task-manager-capabilities-2026-10 | TETO: superfície de campo (field:priority, field:tags) é conferida só pela presença da palavra no adapter. Pega o adapter que  |
+| 3.4 | `C_TETO_DERIVADO_E_MINI` | task-manager-capabilities-2026-10 | TETO: no repo derivado, a ref kg: cujo grafo não viajou não é conferida (o core a conferiu antes de publicar); na porta onion-m |
+| 3.2 | `C_TETO_METODO_CITADO_EM_PROSA` | task-manager-capabilities-2026-10 | TETO: superfície de método é DEFINIÇÃO por forma (linha que começa por nome( ou cabeçalho com `nome(). Um cabeçalho markdo |
 
 ## fable-5-1-superacao-2026-09 — 9 item(ns)
 
@@ -808,6 +810,12 @@
 |--:|---|---|---|
 | 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
 | 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
+
+## radar-E3-2026-10-11-r9 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `Q_MEDIR_HOOKS_E_FRONTMATTER_COM_O_DEBUG` | radar-E3-2026-10-11-r9 | medir com o --debug da 2.1.296 a duração dos hooks sem latência medida e as chaves de frontmatter dos agentes, depois de uma al |
 
 ## kg-id-valid-from-2026-10 — 2 item(ns)
 
