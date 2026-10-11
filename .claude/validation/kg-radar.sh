@@ -222,12 +222,18 @@ function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["
 # branch|commit continua acusando. Assim um carimbo com as DUAS leituras segue acusado.
 # `@<sha>` sozinho NÃO passou a acusar: `onion@<sha>` é stamp de pin, o caso ambíguo que o
 # MISPLANED deixa fora de propósito; alargar o gate não é o objeto desta cura.
+# Passada adversarial (2026-10-11) apertou três pontos: o sha vale com até 3 separadores quaisquer
+# (crase, parêntese, #), porque sha entre crases é a forma comum; `reprov`/`vet` SAÍRAM da lista,
+# porque são vocabulário de REVISOR, e revisor lendo o diff é leitura de fonte; e o radical tem
+# âncora à esquerda (`desbloqueado o commit` não é commit barrado). TETO DECLARADO: `recusado o
+# commit` dito por um revisor ainda cala, e um carimbo que cita commit barrado E leitura sem as
+# palavras branch/commit/sha (ex.: `HEAD lido`) também cala. É o limite de regra por vocabulário.
 function misplanedSourceRead(v,   w) {
   w = tolower(v)
-  if (w ~ /(^|[^a-z])commit[-_ :]+[0-9a-f]{7,40}([^0-9a-z]|$)/) return 1
+  if (w ~ /(^|[^a-z])commit[^0-9a-z]{1,3}[0-9a-f]{7,40}([^0-9a-z]|$)/) return 1
   gsub(/commit[-_ ]sonda/, " ", w)
-  gsub(/commit[-_ ]((foi|e|sai|saiu|ficou)[-_ ])?(barrad|recusad|bloquead|vetad|reprovad)[oa]s?/, " ", w)
-  gsub(/(barr|recus|bloque|vet|reprov)[a-z]*[-_ ]((o|a|um|seu)[-_ ])?(([0-9]+[^-_ ]*|primeiro|proprio)[-_ ])?commit([^a-z]|$)/, " ", w)
+  gsub(/commit[-_ ]((foi|e|sai|saiu|ficou)[-_ ])?(barrad|recusad|bloquead)[oa]s?/, " ", w)
+  gsub(/(^|[^a-z])(barr|recus|bloque)[a-z]*[-_ ]((o|a|um|seu)[-_ ])?(([0-9]+[^-_ ]*|primeiro|proprio)[-_ ])?commit([^a-z]|$)/, " ", w)
   return (w ~ /(^|[^a-z])(branch|commit)([^a-z]|$)/)
 }
 

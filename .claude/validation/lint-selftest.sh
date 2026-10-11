@@ -1064,8 +1064,10 @@ run_kg_freshness_selftests() {
 
   # (v) `commit <sha>` acusa sempre — a cura é por ocorrência, não por nó.
   if grep -q 'MISPLANED: C_PROD_SONDA_MAS_LEU_COMMIT_SHA' <<<"${out}" \
-     && grep -q 'MISPLANED: C_PROD_REPROVADO_NO_COMMIT_SHA' <<<"${out}"; then
-    record_pass "kg-freshness: (v) commit <sha> segue acusando, mesmo ao lado de um commit-sonda ou de um verbo de execução"
+     && grep -q 'MISPLANED: C_PROD_REPROVADO_NO_COMMIT_SHA' <<<"${out}" \
+     && grep -q 'MISPLANED: C_PROD_REVISOR_REPROVOU_LENDO_O_DIFF' <<<"${out}" \
+     && grep -q 'MISPLANED: C_PROD_DESBLOQUEADO_O_COMMIT' <<<"${out}"; then
+    record_pass "kg-freshness: (v) commit <sha> (até entre crases), revisor que reprova lendo o diff e desbloqueado seguem acusando"
   else record_fail "kg-freshness: (v) a cura escondeu leitura de fonte" "out=${out}"; fi
 
   # (w) (MUT) sem o filtro de sentido, o commit-sonda VOLTA a disparar — reproduz o sinal.
@@ -1083,7 +1085,7 @@ run_kg_freshness_selftests() {
   # (x) (MUT) sem o atalho do `commit <sha>`, a limpeza de sentido apaga "reprovou o commit <sha>"
   # e o nó CALA — prova que o atalho é o que impede a cura de esconder leitura de fonte.
   cp "${radar}" "${mut}/mut-sha.sh"; _lib_beside "${mut}"
-  sed -i 's/  if (w ~ \/(^|\[^a-z\])commit\[-_ :\]+\[0-9a-f\]{7,40}(\[^0-9a-z\]|\$)\/) return 1/  if (0) return 1/' "${mut}/mut-sha.sh"
+  sed -i 's/  if (w ~ \/(^|\[^a-z\])commit\[^0-9a-z\]{1,3}\[0-9a-f\]{7,40}(\[^0-9a-z\]|\$)\/) return 1/  if (0) return 1/' "${mut}/mut-sha.sh"
   if grep -q '  if (0) return 1' "${mut}/mut-sha.sh"; then
     local msha; msha="$(bash "${mut}/mut-sha.sh" "${fxm}" --freshness 2>&1 || true)"
     if ! grep -q 'MISPLANED: C_PROD_REPROVADO_NO_COMMIT_SHA' <<< "${msha}"; then
@@ -1091,6 +1093,18 @@ run_kg_freshness_selftests() {
     else record_fail "kg-freshness: (x) (MUT)" "remover o atalho não mudou o veredito; out=${msha}"; fi
   else
     record_fail "kg-freshness: (x) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+
+  # (y) (MUT) sem a âncora à esquerda do radical, `desbloqueado o commit` vira commit barrado e CALA.
+  cp "${radar}" "${mut}/mut-anchor.sh"; _lib_beside "${mut}"
+  sed -i 's/gsub(\/(^|\[^a-z\])(barr|recus|bloque)/gsub(\/(barr|recus|bloque)/' "${mut}/mut-anchor.sh"
+  if grep -q 'gsub(/(barr|recus|bloque)' "${mut}/mut-anchor.sh"; then
+    local manc; manc="$(bash "${mut}/mut-anchor.sh" "${fxm}" --freshness 2>&1 || true)"
+    if ! grep -q 'MISPLANED: C_PROD_DESBLOQUEADO_O_COMMIT' <<< "${manc}"; then
+      record_pass "kg-freshness: (y) (MUT) sem a âncora do radical, desbloqueado cala — a âncora é load-bearing"
+    else record_fail "kg-freshness: (y) (MUT)" "remover a âncora não mudou o veredito; out=${manc}"; fi
+  else
+    record_fail "kg-freshness: (y) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   fi
 }
 
