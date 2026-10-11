@@ -9806,10 +9806,25 @@ run_empty_result_guard_selftests() {
 
   # (o) aspa DENTRO de aspa e literal — par-de-regex nao sabe disso e apagava o miolo inteiro,
   # pipe real junto. Por isso a varredura passou a ser por ESTADO, caractere a caractere.
-  out="$(_erg '"echo \"it'"'"'s\"; ls | wc -l; echo \"don'"'"'t\"; echo $?"' '"x"' || true)"
+  # (o) reescrito em 2026-10-11: a forma antiga terminava em `echo "don't"; echo $?`, e ali o `$?` e
+  # do `echo`, nao do pipe — a expectativa de disparo era o falso-positivo da 5a classe. O proposito
+  # (apostrofo dentro de aspas duplas nao desemparelha a varredura) fica: o `$?` agora vem logo apos o pipe.
+  out="$(_erg '"echo \"it'"'"'s\"; ls | wc -l; echo \"don'"'"'t $?\""' '"x"' || true)"
   if grep -q 'EXIT-CODE-DE-PIPE' <<< "${out}"; then
     record_pass "empty-result-guard: (o) apostrofo DENTRO de aspas duplas → AINDA DISPARA (aspa em aspa e literal)"
   else record_fail "empty-result-guard: (o)" "o gsub desemparelhado apagou o pipe real do meio do comando: ${out}"; fi
+
+  # (o2..o4) O `$?` LE A INSTRUCAO IMEDIATAMENTE ANTERIOR (5a classe de falso-positivo, 3x em 2026-10-11).
+  out="$(_erg '"ls /tmp | head -3; true >/dev/null 2>&1; echo rc=$?"' '"x"' || true)"
+  if grep -q 'EXIT-CODE-DE-PIPE' <<< "${out}"; then
+    record_fail "empty-result-guard: (o2)" "o \$? e do comando COM redirect, nao do pipe anterior — gritou errado: ${out}"
+  else record_pass "empty-result-guard: (o2) pipe numa instrucao, \$? depois de OUTRA instrucao com redirect → CALA"; fi
+  out="$(_erg '"ls /tmp | head -3 && echo rc=$?"' '"x"' || true)"
+  if grep -q 'EXIT-CODE-DE-PIPE' <<< "${out}"; then record_pass "empty-result-guard: (o3) pipe && echo \$? → DISPARA (&& separa, mas a instrucao anterior E o pipe)"
+  else record_fail "empty-result-guard: (o3)" "o \$? logo apos o pipe por && calou: ${out}"; fi
+  out="$(_erg '"true; ls /tmp | wc -l || echo falhou=$?"' '"x"' || true)"
+  if grep -q 'EXIT-CODE-DE-PIPE' <<< "${out}"; then record_pass "empty-result-guard: (o4) pipe || echo \$? → DISPARA (o || nao vira pipe nem esconde o anterior)"
+  else record_fail "empty-result-guard: (o4)" "o || confundiu a separacao: ${out}"; fi
 
   # (q)/(r) sao o PAR do 4o filtro anti-ruido (ORDEM na mesma linha, 2026-08-09). O caso real:
   # `echo "rc=$?"; grep ... arquivo | head -4` — o `$?` e do comando da linha ANTERIOR e o pipe vem

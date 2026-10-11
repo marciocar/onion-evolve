@@ -117,10 +117,14 @@ case "$cmd" in *pipefail*) : ;; *)
             c = substr(s, i, 1)
             if (q == "") { if (c == "'"'"'" || c == "\"") { q = c } else { o = o c } }
             else if (c == q) { q = "" }
+            else if (q == "\"" && substr(s, i, 2) == "$?") { o = o "$?"; i++ }   # "rc=$?" LE o exit: o $? sobrevive
           }
           if (q != "") return s        # aspas ABERTAS no fim da linha: indeterminado -> crua
           return o
         }
+      function stmts(s,   t) {              # separa instrucoes: `||` e `&&` e `;` viram \034 (o `|` solto fica)
+        t = s; gsub(/\|\||&&|;/, "\034", t); return t
+      }
       function lastQ(s,   pos, off, ult) {
         off = 0; ult = 0
         while ((pos = index(substr(s, off + 1), "$?")) > 0) { ult = off + pos; off = ult + 1 }
@@ -142,10 +146,19 @@ case "$cmd" in *pipefail*) : ;; *)
         # de verdade. Lendo os dois em `nu`, `ls | wc -l; echo "rc=$?"` ficava sem `$?` nenhum e a
         # guarda CALAVA — o modo-de-falha nº2 que a FUNDOU, cegado pela cura de ordem. Achado por
         # passada adversarial, com main DISPARANDO e HEAD calado no mesmo comando.
-        p_ord = index(nu, "|"); q_ord = lastQ(cur)
-        mesmaLinha = (p_ord > 0 && q_ord > 0 && p_ord < q_ord)
-        if (cur ~ /\$\?/ && (mesmaLinha || prevNu ~ /\|/)) { found = 1; exit }
-        if (cur ~ /[^ \t]/) { prev = cur; prevNu = nu }       # linha em branco não quebra a vizinhança
+        # ⚠️ O `$?` LE O EXIT DA INSTRUCAO IMEDIATAMENTE ANTERIOR, nao de qualquer pipe da linha —
+        # 5a classe de falso-positivo, medida 3x num so dia (2026-10-11): `a | head; b >/dev/null
+        # 2>&1; echo rc=$?` acusava, mas o `$?` e do `b`. A linha agora se parte em INSTRUCOES
+        # (`;` `&&` `||`, lidas no texto sem aspas) e cada `$?` olha so a instrucao de antes —
+        # na propria linha, ou a ultima da linha anterior. A instrucao do proprio `$?` tambem conta
+        # se tiver pipe ANTES dele. Continua valendo "algum `$?`", nao so o ultimo.
+        n = split(stmts(nu), st, "\034")
+        for (k = 1; k <= n; k++) {
+          if (index(st[k], "$?") == 0) continue
+          antes = (k > 1) ? st[k - 1] : prevLast
+          if (antes ~ /\|/ || index(substr(st[k], 1, index(st[k], "$?")), "|") > 0) { found = 1; exit }
+        }
+        if (cur ~ /[^ \t]/) { prevLast = st[n] }       # linha em branco não quebra a vizinhança
       }
       END { exit(found ? 0 : 1) }'; then
     add 'EXIT-CODE-DE-PIPE: você leu `$?` logo depois de um pipe — ele é do ÚLTIMO elemento (o `tail`/`head`/`grep`), não do comando que interessa. Rode o comando sozinho e capture `$?` na linha seguinte, ou use `set -o pipefail`.'
