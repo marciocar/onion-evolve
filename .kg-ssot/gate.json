@@ -48,10 +48,6 @@
       "form.required.node.provenance",
       "form.unknown-key.meta.title"
     ],
-    "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml": [
-      "form.unknown-key.node.reverify_note",
-      "form.unknown-key.node.superseded_note"
-    ],
     "docs/onion/graph/onion-evolution-2026-07.kg.yaml": [
       "form.unknown-key.meta.source_run"
     ],

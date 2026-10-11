@@ -988,7 +988,7 @@ nodes:
     impact: 4
     confidence: 0.8
     status: confirmed
-    reverify_note: "reverify-2026-08-23 (4/5 PARCIAL): a TESE (console fora do caminho critico; provisionar via M2M) segue valida. Mas o ESTADO citado como evidencia DRIFTOU: o console foi LIGADO por decisao do maestro em 2026-08-10 (arquivo .caddy sem .disabled; console.onionevolve.com 302), controlado por console.sh on|off|status. Claim do app m-default nao re-medido (token MAPI indisponivel)"
+    x_reverify_note: "reverify-2026-08-23 (4/5 PARCIAL): a TESE (console fora do caminho critico; provisionar via M2M) segue valida. Mas o ESTADO citado como evidencia DRIFTOU: o console foi LIGADO por decisao do maestro em 2026-08-10 (arquivo .caddy sem .disabled; console.onionevolve.com 302), controlado por console.sh on|off|status. Claim do app m-default nao re-medido (token MAPI indisponivel)"
     verified_at: 2026-07-26
     verified_against: caddy-conf-e-logto-db-medidos
     label: "O CONSOLE NAO ESTA NO CAMINHO CRITICO — o objetivo e PROVISIONAR o tenant, nao entrar numa tela. Medido: o vhost console.onionevolve.com existe PRONTO e DESLIGADO (conf.d/logto-console.caddy.disabled; o Caddyfile importa *.caddy, e .disabled nunca carrega — dai o TLS falhar), o console vive so em 127.0.0.1:3012 (HTTP 302), e auth.onionevolve.com e o ISSUER OIDC (porta 3011) — bater nele no browser da /unknown-session. As duas saidas obvias sao ruins: expor o console publica o painel do provedor de identidade que esta virando caminho critico (e o sign_up esta ABERTO nos dois tenants); tunel SSH e inviavel do celular, que e como o maestro opera. A saida BOA dissolve o problema: o app M2M 'm-default' ja existe COM secret e ha o papel machine:mapi:default — da para provisionar headless pela Management API. Melhor que clicar: reproduzivel, auditavel, versionado, sem exposicao nova. E e o MESMO caminho que o P1-P3 precisa (API Resource + app M2M + app SPA/PKCE + role)"
@@ -1007,7 +1007,7 @@ nodes:
     impact: 5
     confidence: 0.8
     status: confirmed
-    reverify_note: "reverify-2026-08-23 (6/8 PARCIAL): 6 confirmadas (M2M service, SPA/PKCE, resource, scope, role->app, bind docker 127.0.0.1:3011/3012). Nao medidas: idempotencia (exigiria re-executar = mutacao) e o .onion-logto-bootstrap no home do root (ausente hoje)"
+    x_reverify_note: "reverify-2026-08-23 (6/8 PARCIAL): 6 confirmadas (M2M service, SPA/PKCE, resource, scope, role->app, bind docker 127.0.0.1:3011/3012). Nao medidas: idempotencia (exigiria re-executar = mutacao) e o .onion-logto-bootstrap no home do root (ausente hoje)"
     verified_at: 2026-07-26
     verified_against: logto-api-e-db-conferidos
     label: "P1-P3 executados headless em 2026-07-26 por script versionado e idempotente: usuário do maestro (senha aleatória num arquivo 0600 no home do root), API Resource, scope bridge:invoke, app M2M, SPA PKCE e role M2M. Conferido por psql. Console do bootstrap só em loopback."
@@ -1025,7 +1025,7 @@ nodes:
     impact: 5
     confidence: 0.75
     status: confirmed
-    reverify_note: "reverify-2026-08-23 (2/4 PARCIAL): mecanismo RFC 8707 + ES384 + aud-binding vivo (reconfirmado com client PAT_EXCHANGE). MAS o client original m-default esta INVALIDADO (invalid_client; janela EXPIRA 2026-08-10 passou) — a prova especifica nao e mais reproduzivel como descrita"
+    x_reverify_note: "reverify-2026-08-23 (2/4 PARCIAL): mecanismo RFC 8707 + ES384 + aud-binding vivo (reconfirmado com client PAT_EXCHANGE). MAS o client original m-default esta INVALIDADO (invalid_client; janela EXPIRA 2026-08-10 passou) — a prova especifica nao e mais reproduzivel como descrita"
     verified_at: 2026-07-26
     verified_against: token-emitido-e-decodificado
     label: "[⚠ 2026-08-23 superficie parcialmente obsoleta — ver reverify_note] P4.1 PROVADO — PLANO A. Token client_credentials do app onion-bridge-service com resource=https://bridge.onionevolve.com decodificado (node, base64url nativo): aud=https://bridge.onionevolve.com · scope=bridge:invoke · iss=https://auth.onionevolve.com/oidc · header alg=ES384 typ=at+jwt. O Logto 1.41.0 self-hosted HONRA Resource Indicators (RFC 8707) e emite audiencia vinculada. A escada B1->B2->B3 do §3.6 NAO sera necessaria e o aud-binding do §3.3 se sustenta. ALG A PINAR: ES384 (nao RS256). Prova colateral de que o binding e REAL, e nao decorativo: durante o bootstrap, apresentar um token com aud=https://default.logto.app/api ao endpoint do tenant admin devolveu ERR_JWT_CLAIM_VALIDATION_FAILED/aud — o gate rejeitou o uso errado antes de qualquer codigo nosso"
@@ -1044,7 +1044,7 @@ nodes:
     impact: 5
     confidence: 0.75
     status: confirmed
-    reverify_note: "reverify-2026-08-23 (8/9 PARCIAL): DRIFT real — P11 (08-13) removeu o caminho legado do binario (BRIDGE_AUTH_MODE/AUTH_TOKEN nao existem; boot assert 'auth: enforce', nao 'dual-legacy'). Sub-claims tecnicas (ES384 pinado, fail-closed, cache JWKS 1h/60s) seguem CONFIRMED. 'PROVAS 7/7' com caso 'legado 200' obsoleto"
+    x_reverify_note: "reverify-2026-08-23 (8/9 PARCIAL): DRIFT real — P11 (08-13) removeu o caminho legado do binario (BRIDGE_AUTH_MODE/AUTH_TOKEN nao existem; boot assert 'auth: enforce', nao 'dual-legacy'). Sub-claims tecnicas (ES384 pinado, fail-closed, cache JWKS 1h/60s) seguem CONFIRMED. 'PROVAS 7/7' com caso 'legado 200' obsoleto"
     verified_at: 2026-07-27
     verified_against: bridge-reiniciado-e-7-provas-executadas
     label: "[⚠ 2026-08-23 superficie parcialmente obsoleta — ver reverify_note] P5 VIVO 2026-07-27. src/identity.ts instalado no bridge (copia REVISAVEL no repo — codigo de seguranca que so existe no host e codigo que ninguem revisa). authGuard tenta OIDC PRIMEIRO; o legado so e alcancavel sob BRIDGE_AUTH_MODE=dual-legacy. Sem `jose`: o bridge e producao SEM repo git e o alg e PINADO (ES384), o que fecha a confusao de algoritmo — em troca, cada caso negativo foi PROVADO contra o issuer vivo. Verificacao ES384 = ECDSA P-384 + SHA-384 com assinatura IEEE-P1363 (nao DER). Fail-closed em toda excecao (JWKS fora do ar nao vira 'pode entrar'). JWKS com cache 1h + piso de re-fetch 60s (kid desconhecido pode ser rotacao, mas re-buscar por request faria de um token forjado um amplificador de DoS). Assert de boot: 'JWKS OK (1 chave ES384) | auth: dual-legacy'. PROVAS 7/7 contra app.onionevolve.com/commands: OIDC valido 200 · legado 200 (janela) · sem token 401 · aud de OUTRO recurso 401 · sem scope bridge:invoke 401 · assinatura adulterada 401 · lixo 401. BONUS: C_permission_mode_fail_open CORRIGIDO — o default do PERMISSION_MODE deixou de ser bypassPermissions"
@@ -1065,7 +1065,7 @@ nodes:
     status: refuted
     verified_at: 2026-07-27
     verified_against: grep-no-fonte-da-pwa
-    superseded_note: "fechado pelo P6 — ver E_p6_pkce_live"
+    x_superseded_note: "fechado pelo P6 — ver E_p6_pkce_live"
     label: "O FLIP ESTA BLOQUEADO, e nao pelo que o spec supunha. A PWA NAO TEM UMA LINHA DE OIDC/PKCE: grep por code_verifier|pkce|oidc|authorize|logto em web/src e public devolve ZERO; ela obtem o token de getToken() (convite colado pelo usuario). Logo, flipar agora (remover BRIDGE_AUTH_MODE) trancaria o caminho HUMANO inteiro — o lockout que o spec teme, pela porta que o spec nao olhou. O P6 nao e formalidade ('os dois chamadores mandam Bearer'): para a PWA e implementar Authorization Code + PKCE de verdade (redirect ao authorize com code_challenge, rota /callback ja registrada como redirect URI do app SPA, troca do code com code_verifier, storage, refresh). CONSEQUENCIA DE ESCOPO: o item 1 fica num plato seguro (mecanismo pronto e provado, rollback de uma linha) e o P6 merece passada propria"
     narrative: "Ressalva: até 2026-08-08 o clone de produção do onion-bridge divergia do repo (C_producao_nao_e_o_repo); o sha do trace é o que o remoto tinha na data do nó, não necessariamente o que rodava em produção."
     provenance:
@@ -1098,7 +1098,7 @@ nodes:
     impact: 5
     confidence: 0.75
     status: confirmed
-    reverify_note: "reverify-2026-08-23 (6/8 PARCIAL): PKCE S256 e role bridge-user (scope bridge:invoke, marciocar) CONFIRMADOS ao vivo. DRIFT de infra: o dominio publico migrou bridge.onionevolve.com (HTTP 000, nao resolve) -> app.onionevolve.com (redirect_uris no Logto). trace stale: web-oidc.ts -> web/src/auth/oidc.ts. Nao medido: client-publico real + pacote de regressao completo"
+    x_reverify_note: "reverify-2026-08-23 (6/8 PARCIAL): PKCE S256 e role bridge-user (scope bridge:invoke, marciocar) CONFIRMADOS ao vivo. DRIFT de infra: o dominio publico migrou bridge.onionevolve.com (HTTP 000, nao resolve) -> app.onionevolve.com (redirect_uris no Logto). trace stale: web-oidc.ts -> web/src/auth/oidc.ts. Nao medido: client-publico real + pacote de regressao completo"
     verified_at: 2026-07-27
     verified_against: bundle-servido-e-authorize-medidos
     label: "P6 VIVO 2026-07-27 — a PWA agora faz Authorization Code + PKCE. TRES escolhas de desenho: (1) client PUBLICO, zero segredo no device; (2) redirect na RAIZ e nao /callback, porque o bridge serve a PWA com catch-all estatico SEM fallback de SPA — /callback daria 404 e exigiria mudar o roteamento do servidor; na raiz o ?code= chega e o app limpa a URL com replaceState: ZERO mudanca no servidor; (3) getToken() continua SINCRONO — e a costura unica por onde todo o app ja passava, entao o login entra por ali e nada mais muda. BURACO DO P3 FECHADO no caminho: todas as roles eram MachineToMachine e o usuario NAO TINHA ROLE — o token humano sairia sem bridge:invoke e o gate recusaria: login funcionaria e acesso nao, o pior desfecho (parece configurado, nao e). Criada role bridge-user (type User) com o scope, atribuida. PROVAS: 6/6 marcas de PKCE no bundle SERVIDO (nao no build), authorize com os parametros reais devolve 303 -> /sign-in?app_id=<spa>, banco confirma marcio->bridge-user->bridge:invoke, redirect URIs raiz+/callback, refresh token 14d. Regressao: OIDC 200 · convite legado 200 (janela) · sem token 401 · PWA 200. FRONTEIRA: o login humano completo (senha + troca do code) NAO foi executado — exige browser; e o passo do maestro"
@@ -1117,7 +1117,7 @@ nodes:
     impact: 5
     confidence: 0.8
     status: confirmed
-    reverify_note: "reverify-2026-08-23 (9/14 PARCIAL): nucleo do flip PRESERVADO (AUTH_TOKEN sumiu inteiro do .env; 401/200/200/401 batem). MAS prova de superficie OBSOLETA: unit renomeado onion-bridge->onion-vps-bridge; rotas /admin/tokens|/admin/stats|/a2a hoje 404 (sumiram do source). Prova positiva exige OIDC interativo (nao read-only)"
+    x_reverify_note: "reverify-2026-08-23 (9/14 PARCIAL): nucleo do flip PRESERVADO (AUTH_TOKEN sumiu inteiro do .env; 401/200/200/401 batem). MAS prova de superficie OBSOLETA: unit renomeado onion-bridge->onion-vps-bridge; rotas /admin/tokens|/admin/stats|/a2a hoje 404 (sumiram do source). Prova positiva exige OIDC interativo (nao read-only)"
     verified_at: 2026-07-27
     verified_against: bridge-reiniciado-e-gates-medidos-pos-flip
     label: "[⚠ 2026-08-23 superficie parcialmente obsoleta — ver reverify_note] P7 O FLIP EXECUTADO 2026-07-27 (carta branca do maestro). Removida a linha BRIDGE_AUTH_MODE=dual-legacy do .env (backup .env.bak-pre-flip-20260727-152720; rollback = re-adicionar + restart, segundos) e systemctl restart onion-bridge. Boot mede 'JWKS OK (1 chave ES384) | auth: ENFORCE' e o AVISO dual-legacy SUMIU. PROVAS em localhost:8787 (probe barato /commands, que NAO dispara o Agent SDK): sem token 401 · AUTH_TOKEN legado 401 (era 200 na baseline pre-flip) · convite courtesy 401 (era 200) · POST /chat com AUTH_TOKEN 401 (barrado no gate, agente nao roda). CONTROLES intactos: /health 200 · PWA raiz 200 · /admin/tokens com AUTH_TOKEN 200 (adminGuard nao olha authMode) · /a2a com token a2a 403 (handler, nao 401 — gate vivo). ESCOPO: so P7 por decisao do maestro; convites courtesy/byok podem ser cortados (sem usuario dependente). PROVA POSITIVA FECHADA 2026-07-27: login humano OIDC na PWA -> /chat EXECUTOU o Agent SDK (custo/tokens medidos na propria UI) e /commands 200 (menu de comandos carregou). PRE-REQUISITO DESCOBERTO NO CAMINHO: o maestro criou a conta 'marciocar' por SIGN-UP (o sign-up do Logto esta ABERTO — P3.4 nunca executado) e ela nasceu SEM role; a camada 2 do RBAC (D_rbac_two_layers) SEGUROU — token sem scope bridge:invoke -> 401 — e o acesso so liberou apos atribuir a role bridge-user a marciocar (INSERT em users_roles no DB do Logto + re-login). /admin/stats segue 401 sob OIDC: ESPERADO, confirma C_p9_blocked_no_admin_oidc (adminGuard so AUTH_TOKEN, Identity OIDC sem conceito de admin). GAP ABERTO: sign-up do tenant default ABERTO (fechar = P3.4)."
@@ -1188,7 +1188,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    reverify_note: "reverify-2026-08-23 (7/8): 7 medidas confirmam; AUTH_TOKEN removido do binario inteiro (08-13, reforco). Lacuna: claim 6 (identidade-de-servico 200/401) exige JWT M2M real, nao medido read-only"
+    x_reverify_note: "reverify-2026-08-23 (7/8): 7 medidas confirmam; AUTH_TOKEN removido do binario inteiro (08-13, reforco). Lacuna: claim 6 (identidade-de-servico 200/401) exige JWT M2M real, nao medido read-only"
     verified_at: 2026-07-27
     verified_against: rotas-medidas-apos-restart-e-remocao
     label: "P9 COMPLETO 2026-07-27. (1) scope bridge:admin criado e concedido SO a role humana — o app de servico NAO recebe (M2M nao cunha convite; conceder por conveniencia e como menor privilegio morre). (2) adminGuard passou a exigir identidade com bridge:admin; verifyAccessToken ganhou parametro `required` para exigir outro scope sem duplicar a verificacao de assinatura/audiencia — um caminho de validacao, dois niveis de acesso. (3) a2aGuard perdeu o bypass do segredo de admin: so o pool dedicado entra (zero trafego em 30 dias, fechar nao interrompeu ninguem). (4) AUTH_TOKEN REMOVIDO do .env. PROVAS apos restart: segredo aposentado => 401 em /commands, /admin/stats E /a2a (era 200 no admin); identidade de SERVICO => 200 em /commands e 401 em /admin (menor privilegio visivel); pool a2a => 400 (passa o guard, falha no payload); PWA e /health => 200. FRONTEIRA: o caminho ADMIN pelo token HUMANO nao foi provado por esta sessao — exige browser e a role e do maestro; recusei conceder bridge:admin ao servico 'para testar'"
@@ -2187,6 +2187,25 @@ nodes:
       method: "testemunho: deploy medido no serviço do host 2026-09-02 (update-bridge.sh rc, systemctl show, journal, /health, git log do clone de produção)"
       locality: "host"
 
+  # ── SAC-100 (2026-10-11): re-medição do Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA ──
+  - id: E_JWKS_PISO_NA_TENTATIVA_MEDIDO_SAC100_2026_10
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "identity.ts copiado byte a byte do clone de produção do onion-bridge (sha256 75286a55…, HEAD 1f7fb3f1) e exercitado por sonda local com o IdP inalcançável: 5 requests, 1 fetch; 5003 ms no 1º e 0 ms nos seguintes"
+    label: "Re-medido (SAC-100): o piso do JWKS vale na FALHA. O identity.ts de produção, rodado com o IdP inalcançável, faz 1 fetch em 5 requests e corta em 5 s. Falta a 3ª peça da cura: jwksSelfCheck devolve ok:true com 0 chaves dentro do piso."
+    narrative: "COMO SE MEDIU SEM TEMPESTADE NEM CARGA: o arquivo src/identity.ts do clone de produção (refs/heads/main = 1f7fb3f158566d32, o mesmo bridge do deploy E_W9 de 2026-09-02) foi copiado para uma pasta descartável (sha256 75286a5574a975beb12d445253824ea65c153134d569f7f6e49e42a7ee4b05e7) e importado por uma sonda Node 22 (--experimental-strip-types) que embrulha globalThis.fetch num contador e chama verifyAccessToken 5× com um token ES384 de kid desconhecido. Nada tocou o Logto nem o serviço de produção. Com OIDC_ISSUER na porta discard local (conexão recusada): 5 requests, fetches_acumulados=1. Com OIDC_ISSUER num IP privado não roteável (buraco negro): req1 5003 ms, req2-5 0 ms, fetches_acumulados=1. Isto é o critério de fechamento do nó (1 fetch por janela de 60 s com o IdP caído), medido no CÓDIGO deployado — não no processo vivo durante uma queda real, que segue sem acontecer de forma observável: o journal do onion-vps-bridge só retém desde 2026-10-04 e não tem entradas no período. RESÍDUO MEDIDO: a cura desenhada pelo Elenxo tinha 3 peças; jwksAttemptedAt e o timeout de 5 s estão lá, mas `jwksSelfCheck` ainda devolve `{ok:true, keys:0}` quando loadJwks(true) retorna cedo pelo piso (medido: selfcheck_dentro_do_piso={\"ok\":true,\"keys\":0}). Hoje ele só roda no boot, quando jwksAttemptedAt=0 e o piso não morde, então o boot não mente; a mentira fica latente para qualquer chamador futuro (por exemplo, um /health que consulte identidade). E o /health continua estático (`ok: true` sem olhar identidade), o que é coerente com C_logto_now_critical (/health não consulta o Logto para não virar loop de restart)."
+    trace: "onion-bridge@1f7fb3f1:src/identity.ts"
+    provenance:
+      source: "onion-bridge@1f7fb3f1:src/identity.ts"
+      locator: "loadJwks: `if (now - jwksAttemptedAt < JWKS_MIN_REFETCH_MS) return; jwksAttemptedAt = now;` + fetch com AbortSignal.timeout(5000); jwksSelfCheck devolve ok:true sem checar jwksCache.size; sonda: 5 req / 1 fetch / 5003 ms→0 ms"
+      method: "medição: sonda local sobre cópia byte a byte do identity.ts de produção com o IdP inalcançável (porta recusada e IP não roteável), contando chamadas de fetch, 2026-10-11"
+      locality: "host"
+
 edges:
   - from: E_floors_effective_measured_20260729
     to: D_fix_ancestor_floor
@@ -2790,5 +2809,8 @@ edges:
     to: Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP
     edge_type: SUPPORTS
   - from: E_W9_BRIDGE_DEPLOY_0902
+    to: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
+    edge_type: SUPPORTS
+  - from: E_JWKS_PISO_NA_TENTATIVA_MEDIDO_SAC100_2026_10
     to: Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA
     edge_type: SUPPORTS
