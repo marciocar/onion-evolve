@@ -1944,6 +1944,22 @@ run_rules_registry_selftests() {
     record_pass "rules-registry: (g) REGRA sem '# previne:' → gerador falha (exit 2)"
   else record_fail "rules-registry: (g)" "regra sem previne não detectada (rc=${rc}, esperado 2)"; fi
 
+  # (h) REGRA EMITIDA pelo dispatcher com cabeçalho FORA da forma canônica → exit 2 (catraca nº7).
+  #     Dano medido 2026-10-11: REGRAS 98-101 com `# REGRA N (Título) — HARD` rodavam no lint e
+  #     ficavam fora do registro, sem acusação — as catracas 1-6 só veem o que o parser já casou.
+  #     Controle positivo no MESMO fixture: com o cabeçalho canônico o gerador sai 0 (senão o rc=2
+  #     poderia vir de outra catraca e o caso aprovaria pelo motivo errado).
+  local hdr_bad='# REGRA 6 (Filenames kebab) — SOFT' hdr_ok='# REGRA 6 — Filenames kebab [SOFT]'
+  local body='# previne: z\ncheck_b() {\n  violation "SOFT" "x" "REGRA 6 (Filenames kebab): y"\n}\n'
+  printf "# REGRA 1 — a [HARD]\n# previne: z\ncheck_a() {\n  violation \"HARD\" \"x\" \"y\"\n}\n%s\n${body}" "${hdr_bad}" > "${tmp}/unreg.sh"
+  printf "# REGRA 1 — a [HARD]\n# previne: z\ncheck_a() {\n  violation \"HARD\" \"x\" \"y\"\n}\n%s\n${body}" "${hdr_ok}" > "${tmp}/reg.sh"
+  local h_err rc_ok=0
+  rc=0; h_err="$(RULES_LINT_SRC="${tmp}/unreg.sh" bash "${gen}" 2>&1 >/dev/null)" || rc=$?
+  RULES_LINT_SRC="${tmp}/reg.sh" bash "${gen}" >/dev/null 2>&1 || rc_ok=$?
+  if [ "${rc}" -eq 2 ] && [ "${rc_ok}" -eq 0 ] && grep -q 'AUSENTE(S) do registro: \[6\]' <<< "${h_err}"; then
+    record_pass "rules-registry: (h) REGRA emitida no dispatcher e ausente do registro → gerador falha (exit 2)"
+  else record_fail "rules-registry: (h)" "cabeçalho fora da forma não acusado (rc=${rc}, controle rc=${rc_ok}, err=${h_err:0:160})"; fi
+
   # (f) GUARD verde no estado real (--only escopa ao doc)
   # (2026-09-03) era `bash lint | grep -q 'OK ✓'`: o grep -q fecha o pipe no 1º match, o lint leva SIGPIPE e,
   # sob pipefail, o `if` vê falha — corrida que só aparecia com a bancada em paralelo (2 runs de 8 workers, 2×).
