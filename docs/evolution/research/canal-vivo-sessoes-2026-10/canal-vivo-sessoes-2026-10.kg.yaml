@@ -17,11 +17,11 @@ meta:
   #     (cada uma virou 1 nó evidence), 11 rejeitadas na ancoragem (todas EXAGERADAS — nenhuma virou nó,
   #     estão contadas em E_LACUNAS_CANAL_VIVO_PRIMARIAS_1007), 7 objeções sobreviventes do Elenxo
   #     modeladas como nó CONSTRAINS, 1 pergunta-raiz e 1 claim de síntese (open, não selada).
-  #     Cresce SÓ por (a) medição do estado dos toggles/planos por adotante (granaai, gmill) ou
+  #     Cresce SÓ por (a) medição do estado dos toggles/planos por adotante (granaai, hub-operacoes-enterprise) ou
   #     (b) emenda de Elenxo — não por mais busca genérica.
   # Pergunta (2026-10-07): comunicação DIRETA entre sessões Claude Code em máquinas diferentes, restrita a
   # membros autorizados (members.yaml / federação / allowlist) — o que o Claude Code 2.1.293 oferece, o que
-  # existe entre CONTAS diferentes, Slack (granaai) e Teams (gmill) como transporte, A2A como espinha
+  # existe entre CONTAS diferentes, Slack (granaai) e Teams (hub-operacoes-enterprise) como transporte, A2A como espinha
   # entre organizações — para desenhar uma classe 'live' na federation-transport
   # (.claude/utils/federation-transport/; adapter por adotante cc-peer|slack|teams|a2a), com humano no
   # circuito e o corpo da mensagem como DADO.
@@ -696,14 +696,14 @@ nodes:
     impact: 5
     confidence: 0.85
     verified_at: 2026-10-07
-    verified_against: "docs/evolution/federation/members.yaml: granaai (l.140-182) traz só remote/local_path e keys: [granaai-1] (JWKS do A2A); gmill (membro hub-operacoes-enterprise, l.298-304) sem campo keys algum; grep -ciE slack|teams|claude_account no arquivo = 0 (re-medido pelo escritor em 2026-10-07)"
+    verified_against: "docs/evolution/federation/members.yaml: granaai (l.140-182) traz só remote/local_path e keys: [granaai-1] (JWKS do A2A); hub-operacoes-enterprise (l.298-304) sem campo keys algum; grep -ciE slack|teams|claude_account no arquivo = 0 (re-medido pelo escritor em 2026-10-07)"
     source_tier: 10
     source_kind: measurement
     label: "members.yaml não tem campo de Slack user ID, tenant do Teams nem conta claude.ai — só a chave A2A pinada. 'Restrita a membros do members.yaml' não tem caminho ancorado para cc-peer, slack nem teams; só a2a tem âncora de identidade hoje. A classe 'live' exige estender o registro antes de qualquer allowlist de plataforma."
     trace: "docs/evolution/federation/members.yaml"
     provenance:
       source: "docs/evolution/federation/members.yaml"
-      locator: "docs/evolution/federation/members.yaml: granaai (l.140-182) traz só remote/local_path e keys: [granaai-1] (JWKS do A2A); gmill (membro hub-operacoes-enterprise, l.298-304) sem campo keys algum; grep -ciE slack|teams|claude_account no arquivo = 0 (re-medido pelo escritor em 2026-10-07)"
+      locator: "docs/evolution/federation/members.yaml: granaai (l.140-182) traz só remote/local_path e keys: [granaai-1] (JWKS do A2A); hub-operacoes-enterprise (l.298-304) sem campo keys algum; grep -ciE slack|teams|claude_account no arquivo = 0 (re-medido pelo escritor em 2026-10-07)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
@@ -785,14 +785,15 @@ nodes:
     impact: 3
     confidence: 0.7
     verified_at: 2026-10-07
-    verified_against: "Elenxo do run wf_da77c143-24c sobre a claim 13 de channels: o mecanismo está provado, mas a rodada não mediu plano claude.ai nem estado dos toggles (channelsEnabled, Remote Control) nas orgs da granaai e da gmill"
+    verified_against: "Elenxo do run wf_da77c143-24c sobre a claim 13 de channels: o mecanismo está provado, mas a rodada não mediu plano claude.ai nem estado dos toggles (channelsEnabled, Remote Control) nas orgs da granaai e do hub-operacoes-enterprise"
     source_tier: 6
     source_kind: analysis
-    label: "Lacuna OPERACIONAL, não documental: sem medir o plano claude.ai e o estado de channelsEnabled/Remote Control por adotante (granaai, gmill), não dá para escolher o adapter por adotante."
+    label: "Lacuna OPERACIONAL, não documental: sem medir o plano claude.ai e o estado de channelsEnabled/Remote Control por adotante (granaai, hub-operacoes-enterprise), não dá para escolher o adapter por adotante."
+    narrative: "label anterior (SAC-99, 2026-10-11): Lacuna OPERACIONAL, não documental: sem medir o plano claude.ai e o estado de channelsEnabled/Remote Control por adotante (granaai, ⟨nome privado⟩), não dá para escolher o adapter por adotante. O nome privado do hub virou o id do members.yaml (selo da O7: labels e ids usam o id)."
     trace: "https://code.claude.com/docs/en/channels"
     provenance:
       source: "https://code.claude.com/docs/en/channels"
-      locator: "Elenxo do run wf_da77c143-24c sobre a claim 13 de channels: o mecanismo está provado, mas a rodada não mediu plano claude.ai nem estado dos toggles (channelsEnabled, Remote Control) nas orgs da granaai e da gmill"
+      locator: "Elenxo do run wf_da77c143-24c sobre a claim 13 de channels: o mecanismo está provado, mas a rodada não mediu plano claude.ai nem estado dos toggles (channelsEnabled, Remote Control) nas orgs da granaai e do hub-operacoes-enterprise"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "web"
 
@@ -817,7 +818,8 @@ nodes:
     verified_against: "retorno do run wf_da77c143-24c (modo primaries): 8 fontes nomeadas (cc-cross-session, cc-remote-control, cc-channels, cc-agent-teams-claude-tag, cc-plugins-official-discord, slack-mcp-events, teams-workiq-mcp, a2a-spec-lf), 8 lidas, 0 inalcançáveis; 45 claims à ancoragem, 34 ANCORADAS, 11 REJEITADAS (11 exageradas, 0 não-encontradas)"
     source_tier: 10
     source_kind: internal-audit
-    label: "CONTABILIDADE 2026-10-07. Fontes: 8 lidas, 0 inalcançáveis. Claims: 34 ancoradas (cada uma virou nó), 11 REJEITADAS na ancoragem, todas EXAGERADAS: (1) crossSessionInbound accept/hold/refuse 'com humano aprovando' — diálogo só existe no default; hold explícito não expira e não abre diálogo, refuse descarta sem humano; (2) RC 'cliente remoto deve usar mesma conta e org' — frase é do passo de push notifications do app móvel, locator errado; (3) Channels 'não há Slack nem Teams oficial' — inferência por silêncio, e omitia a rota de allowlist da org; (4) Agent Teams 'sem transporte de rede entre máquinas' — inferência, a página só descreve escrita em arquivo local; (5) Agent Teams 'corpo como dado' — não está nesta página (estaria em cross-session-messaging); (6) Claude Tag 'sandbox na nuvem, não alcança sessão local' — 'nuvem' e o alcance são inferência; (7) Claude Tag 'intra-organização, não entre contas' — a doc não discute entre contas, e por padrão qualquer um do workspace Slack pareado marca @Claude sem seat; (8) plugin telegram 'filtro só por ID' — vale para chat privado, grupo exige groupAllowFrom+requireMention; (9) 'Slack e Teams não constam como plugin oficial' — FALSO para Slack: o marketplace.json oficial tem a entrada slack (slackapi/slack-mcp-plugin), só não está em external_plugins; Teams de fato ausente; (10) Slack MCP 'modelo pull, sem push' — ausência observada não é afirmação do texto; (11) A2A 'spec delega autorização sem escopo/validade/revogação' — a quote era de §7.6.4 (escopo de auth in-task), não geral. LACUNAS QUE CONTINUAM ABERTAS: comunicação entre CONTAS claude.ai (não documentada); comportamento do default com receptor em modo normal; Slack entregar evento de um bot a OUTRO app (sessão↔sessão via Slack); Slack MCP com push/evento; estado GA do Work IQ; Teams bot↔bot; plano e toggles (Remote Control, channelsEnabled) medidos por adotante (granaai, gmill); identidade de plataforma no members.yaml; ancoragem à versão 2.1.293; e orientação A2A para conteúdo de agente não confiável. ⚠️ CORRIGIDO 2026-10-07: o Elenxo julgou as 38 objeções; o workflow cortava o JSON em 7.000 chars antes do escritor (cura em fix/research-elenxo-not-truncated). As 13 sobreviventes além do corte foram recuperadas do journal do run e viraram os nós E_ELENXO_* com CONSTRAINS."
+    label: "CONTABILIDADE 2026-10-07: 8 fontes lidas, 0 inalcançáveis; 34 claims ancoradas (cada uma virou nó) e 11 REJEITADAS na ancoragem, todas EXAGERADAS. As 11 rejeições, as lacunas que seguem abertas e a correção do corte do Elenxo estão na narrative."
+    narrative: "CONTABILIDADE 2026-10-07. Fontes: 8 lidas, 0 inalcançáveis. Claims: 34 ancoradas (cada uma virou nó), 11 REJEITADAS na ancoragem, todas EXAGERADAS: (1) crossSessionInbound accept/hold/refuse 'com humano aprovando' — diálogo só existe no default; hold explícito não expira e não abre diálogo, refuse descarta sem humano; (2) RC 'cliente remoto deve usar mesma conta e org' — frase é do passo de push notifications do app móvel, locator errado; (3) Channels 'não há Slack nem Teams oficial' — inferência por silêncio, e omitia a rota de allowlist da org; (4) Agent Teams 'sem transporte de rede entre máquinas' — inferência, a página só descreve escrita em arquivo local; (5) Agent Teams 'corpo como dado' — não está nesta página (estaria em cross-session-messaging); (6) Claude Tag 'sandbox na nuvem, não alcança sessão local' — 'nuvem' e o alcance são inferência; (7) Claude Tag 'intra-organização, não entre contas' — a doc não discute entre contas, e por padrão qualquer um do workspace Slack pareado marca @Claude sem seat; (8) plugin telegram 'filtro só por ID' — vale para chat privado, grupo exige groupAllowFrom+requireMention; (9) 'Slack e Teams não constam como plugin oficial' — FALSO para Slack: o marketplace.json oficial tem a entrada slack (slackapi/slack-mcp-plugin), só não está em external_plugins; Teams de fato ausente; (10) Slack MCP 'modelo pull, sem push' — ausência observada não é afirmação do texto; (11) A2A 'spec delega autorização sem escopo/validade/revogação' — a quote era de §7.6.4 (escopo de auth in-task), não geral. LACUNAS QUE CONTINUAM ABERTAS: comunicação entre CONTAS claude.ai (não documentada); comportamento do default com receptor em modo normal; Slack entregar evento de um bot a OUTRO app (sessão↔sessão via Slack); Slack MCP com push/evento; estado GA do Work IQ; Teams bot↔bot; plano e toggles (Remote Control, channelsEnabled) medidos por adotante (granaai, hub-operacoes-enterprise); identidade de plataforma no members.yaml; ancoragem à versão 2.1.293; e orientação A2A para conteúdo de agente não confiável. ⚠️ CORRIGIDO 2026-10-07: o Elenxo julgou as 38 objeções; o workflow cortava o JSON em 7.000 chars antes do escritor (cura em fix/research-elenxo-not-truncated). As 13 sobreviventes além do corte foram recuperadas do journal do run e viraram os nós E_ELENXO_* com CONSTRAINS. · label anterior (SAC-99, 2026-10-11), só o trecho alterado: 'plano e toggles (Remote Control, channelsEnabled) medidos por adotante (granaai, ⟨nome privado⟩)'. O nome privado do hub virou o id do members.yaml (selo da O7: labels e ids usam o id); o resto do texto segue igual; o label-parágrafo foi condensado a ≤280 e o texto inteiro mora aqui (convenção da O7)."
     trace: "docs/evolution/research/canal-vivo-sessoes-2026-10/SYNTHESIS.md"
     provenance:
       source: "docs/evolution/research/canal-vivo-sessoes-2026-10/SYNTHESIS.md"
@@ -947,7 +949,8 @@ nodes:
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 30 (26 [teams-workiq-mcp] sem exigência de licença M365 Copilot por usuário), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
-    label: "Sai do silêncio da página de habilitação, e silêncio não é dispensa. Serve para DERRUBAR a afirmação da rodada prévia ('Work IQ exige licença M365 Copilot'), que fica sem âncora, mas não prova o contrário. O licenciamento da gmill segue indefinido."
+    label: "Sai do silêncio da página de habilitação, e silêncio não é dispensa. Serve para DERRUBAR a afirmação da rodada prévia ('Work IQ exige licença M365 Copilot'), que fica sem âncora, mas não prova o contrário. O licenciamento do hub-operacoes-enterprise segue indefinido."
+    narrative: "label anterior (SAC-99, 2026-10-11): Sai do silêncio da página de habilitação, e silêncio não é dispensa. Serve para DERRUBAR a afirmação da rodada prévia ('Work IQ exige licença M365 Copilot'), que fica sem âncora, mas não prova o contrário. O licenciamento do ⟨nome privado⟩ segue indefinido. O nome privado do hub virou o id do members.yaml (selo da O7: labels e ids usam o id)."
     provenance:
       source: "journal wf_da77c143-24c (host)"
       locator: "result.elenxo.objections[29] (objeção 30, target \"26 [teams-workiq-mcp] sem exigência de licença M365 Copilot\", survives=true)"
