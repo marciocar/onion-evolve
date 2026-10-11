@@ -115,6 +115,12 @@ if [ "${EXACT}" -eq 1 ]; then
   printf '%s\n' "${ov}" | cut -f1 >> "${T}/expected.txt"
   # o que o materializador escreve FORA do manifesto (o carimbo e a licença do código)
   printf '%s\n' .claude/.onion-version LICENSE >> "${T}/expected.txt"
+  # e o .gitattributes com eol=lf dos executáveis (SAC-107): o helper só o escreve se a porta carrega
+  # executável, então ele é esperado SE existir — o iniciante, num Windows com autocrlf, é quem mais precisa
+  #   (e só o NOSSO: um .gitattributes sem o cabeçalho do helper segue acusado como arquivo a mais)
+  if [ -f "${BUNDLE}/.gitattributes" ] && head -1 "${BUNDLE}/.gitattributes" | grep -q '^# EOL fixado em LF nos executáveis (Onion'; then
+    printf '%s\n' .gitattributes >> "${T}/expected.txt"
+  fi
 fi
 
 python3 - "${BUNDLE}" "${T}/core.txt" "${T}/known.tsv" "${T}/expected.txt" "${EXACT}" "${T}/owned.txt" > "${T}/out.tsv" <<'PY'

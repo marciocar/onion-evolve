@@ -98,6 +98,10 @@ if dups:
 # porque as catracas 1-6 só olham o que `rx` JÁ casou: cabeçalho que o parser não vê não tem
 # categoria a faltar, previne a faltar nem tag a faltar. A população conferida aqui vem de OUTRA
 # fonte (a mensagem que a guarda emite), e é por isso que ela vê o que as outras não podem ver.
+# TETO (medido pelo refutador, 2026-10-11): ela só vê a regra cujo `violation` cabe numa linha com o
+# prefixo "REGRA N" na mensagem: 26 das 93 hoje. Escapam a emissão multilinha (`violation "SEV" "p" \`,
+# 16 sítios), a mensagem sem prefixo (rotulada pela função) e o cabeçalho com sufixo (`# REGRA 65b — …`,
+# que já vive fora do registro: achado declarado, não curado aqui). A 98-101 caíam todas dentro do alcance.
 emitrx = re.compile(r'violation\s+"[^"]*"\s+"[^"]*"\s+"REGRA (\d+)\b')
 emitted = {}
 for ln, l in enumerate(lines, 1):
