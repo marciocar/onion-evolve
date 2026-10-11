@@ -5599,6 +5599,41 @@ check_task_manager_capabilities() {
 }
 check_task_manager_capabilities
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 104 — Executável do adapter e declaração de capacidades listam os mesmos verbos [HARD]
+# previne: executável do task-manager que exerce verbo declarado not_implemented (ou não declarado), e medição adapter: que nenhum executável roda.
+#   DANO MEDIDO (SAC-65, 2026-10-11): nasceu o 1º executável (adapters/linear.py, chamado por tm.sh), e com
+#   ele duas fontes da mesma verdade — a lista de `--capabilities` e o tsv. No 1º estado da branch o
+#   executável implementava 12 verbos que o tsv declarava `unverified`, e o `comment.list` estava
+#   `implemented` sem nada que o executasse; o precedente da classe é o "Bulk-first" do CLAUDE.md (SAC-63).
+#   A guarda roda `<exe> --capabilities` com ambiente LIMPO (sem chave, sem rede) e cobra: verbo listado
+#   declarado ≠ not_implemented; `implemented` com fonte adapter: presente na lista; executável sem tsv ou
+#   mudo reprova. Lógica e teto em task-manager-executable-check.sh.
+check_task_manager_executable() {
+  local helper="${SCRIPT_DIR}/task-manager-executable-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      */fixtures/*) return 0 ;;
+      */utils/task-manager/*|*/task-manager-executable-check.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    violation "${_sev:-HARD}" "${REPO_ROOT}/${_path#./}" "REGRA 104 (Executável do adapter e declaração de capacidades listam os mesmos verbos): [${_code}] ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${REPO_ROOT}/.claude/validation/task-manager-executable-check.sh" "REGRA 104 (Executável do adapter e declaração de capacidades listam os mesmos verbos): a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_task_manager_executable
+
 # ===========================================================================
 # REGRA 102 — Chave de frontmatter de agente pertence à allowlist (oficiais + as da casa) [HARD + SOFT]
 # previne: typo de chave de agente (`tool:` no lugar de `tools:`, `modle:`) que o Claude Code ignora em silêncio

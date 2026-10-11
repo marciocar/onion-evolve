@@ -30,11 +30,13 @@ task-manager/
 ├── types.md           # Tipos compartilhados
 ├── detector.md        # Detecção de provedor
 ├── factory.md         # Factory para adapters
+├── tm.sh              # EXECUTÁVEL: tm.sh <capability> [args] → adapter executável do provider ativo (JSON)
 └── adapters/
     ├── clickup.md     # Adapter ClickUp
     ├── asana.md       # Adapter Asana
     ├── jira.md        # Adapter Jira
     ├── linear.md      # Adapter Linear (API-first; MCP opcional)
+    ├── linear.py      # Adapter EXECUTÁVEL do Linear (stdlib, GraphQL) — chamado pelo tm.sh
     ├── zoho.md        # Adapter Zoho Projects (API V3 apenas — sem MCP nativo)
     └── <p>.capabilities.tsv  # O que cada adapter implementa, não implementa e ninguém verificou, com fonte
 ```
