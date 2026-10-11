@@ -44,6 +44,16 @@
 #   citação que descreve o destinatário de uma que descreve o core sem se marcar — por isso acusa as
 #   duas e pede a declaração. E não vê comportamento do core citado SEM o caminho (ex.: "o script de
 #   merge verificado recusa…"): a classe sem o token `ops/` passa.
+#   Declarados pela passada adversarial de 2026-10-11 (sem cura mecânica, por custo ou por calar):
+#   · árvore genérica de projeto em bloco cercado (`└── ops/deploy.sh`) ACUSA — marque a linha;
+#   · `.yaml` não tem isenção de arquivo (só .md tem frontmatter): marque a linha;
+#   · o marcador `(core-only)` cala a LINHA inteira, inclusive um 2º token nela;
+#   · variável de raiz é LISTA FECHADA (R, root, REPO_ROOT, CLAUDE_PROJECT_DIR…): `${outra}/ops/x.sh`
+#     cala — erra para calar; `$HOME/ops/x.sh` também cala por isso;
+#   · teste de presença guarda o token no ARQUIVO inteiro, inclusive uma frase de prosa nele;
+#   · hook sem extensão não é varrido (não há nenhum hoje);
+#   · `--base-ref` cuja ref não tem o baseline deixa a catraca sem referência, e no PR que cria a guarda
+#     a catraca compara com o próprio HEAD (bootstrap).
 #
 # Uso    : ops-citation-travel-check.sh [REPO_DIR] [--format text|tsv] [--summary]
 #          ops-citation-travel-check.sh [REPO_DIR] --emit-baseline > <baseline>
@@ -71,49 +81,93 @@ if [ "${#VENDORED_ROOTS[@]}" -eq 0 ]; then
                   .claude/hooks .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal)
 fi
 
-# Extrai "<rel>|<ops/token>" de cada citação NÃO declarada nas raízes que viajam.
+# Extrai "<rel>|<ops/token>" — UMA LINHA POR OCORRÊNCIA (a contagem por par alimenta a catraca) — de cada
+# citação NÃO declarada nas raízes que viajam.
+#
+# AS FORMAS, curadas pela passada adversarial de 2026-10-11 (achados 1–4, 6, 7, 10–12):
+#   · o token é `ops/` do CORE só no início de palavra, ou depois de uma variável de RAIZ (`${R}/ops/`,
+#     `$root/ops/`, `$(…)/ops/`). Depois de segmento literal (`src/ops/x.ts`, URL, `./ops/`) é o `ops/` de
+#     OUTRO projeto, e depois de variável de sandbox (`${tmp}/ops/`) é fixture de selftest: calam;
+#   · nome e extensão começam com letra, e o diretório tem 2+ caracteres (`ops/s/…`, `ops/1.5`, `ops/v1.2` calam);
+#   · o teste de presença guarda o TOKEN TESTADO no arquivo inteiro — inclusive pela variável que o recebe
+#     (`P="$R/ops/a.sh"` … `[ -f "$P" ]`) —, e não a linha (`[ -f ops/a.sh ] && bash ops/b.sh` acusa o b);
+#   · marcador `(core-only)` aceita a caixa e o complemento (`(Core-only)`, `(core only)`, `(core-only, …)`);
+#   · frontmatter isenta só se FECHA e se o `description:` traz a frase `Core-only.` sem negação;
+#     CRLF e BOM não escondem o `---`.
 collect_violations() { # <repo_dir>
   local repo="$1" r bases=()
   for r in "${VENDORED_ROOTS[@]}"; do [ -d "${repo}/${r}" ] && bases+=("${repo}/${r}"); done
   [ "${#bases[@]}" -gt 0 ] || return 0
   find "${bases[@]}" -type f \
        \( -name '*.md' -o -name '*.sh' -o -name '*.yaml' -o -name '*.yml' -o -name '*.json' \
-          -o -name '*.py' -o -name '*.js' -o -name '*.tpl' -o -name '*.txt' -o -name '*.toml' \) \
+          -o -name '*.py' -o -name '*.js' -o -name '*.mjs' -o -name '*.ts' -o -name '*.tpl' \
+          -o -name '*.txt' -o -name '*.toml' \) \
        ! -name '*baseline.txt' ! -name 'lint-selftest.sh' ! -name "${SELF_NAME}" \
        ! -path '*/fixtures/*' -print0 2>/dev/null \
   | xargs -0 -r awk -v prefix="${repo}/" '
-      FNR == 1 { rel = FILENAME; if (index(rel, prefix) == 1) rel = substr(rel, length(prefix) + 1)
-                 fm = 0; filecore = 0
-                 if ($0 == "---" && FILENAME ~ /\.md$/) { fm = 1; next } }
-      fm == 1  { if ($0 == "---") { fm = 0; next }
-                 if ($0 ~ /[Cc]ore-only/) filecore = 1
-                 next }
-      filecore { next }
-      index($0, "(core-only)") { next }
-      { line = $0
-        # (b) teste de presença: `[ -f …ops/…`, `test -x …ops/…` na mesma linha
-        guarded = ($0 ~ /(\[|test)[[:space:]]+(![[:space:]]+)?-[efxsd][[:space:]]+[^]]*ops\//)
-        while (match(line, /(^|[^A-Za-z0-9_.-])ops\/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+|\/[A-Za-z0-9_.*-]*)/)) {
-          tok = substr(line, RSTART, RLENGTH); line = substr(line, RSTART + RLENGTH)
-          sub(/^[^A-Za-z]/, "", tok); sub(/[.*]+$/, "", tok)
-          if (guarded) continue
-          print rel "|" tok
+      function flush(   i) {
+        if (rel != "" && !(fmcore && fmclosed)) for (i = 1; i <= nc; i++) if (!(cand[i] in gtok)) print rel "|" cand[i]
+        nc = 0; split("", cand); split("", gtok); split("", vtok)
+      }
+      # a variável que precede `/ops/` é de RAIZ? (lista fechada: na dúvida a guarda CALA)
+      function rootvar(s) {
+        return (s ~ /(\$\{|\$)(R|root|ROOT|repo|REPO|_repo|REPO_ROOT|repo_root|CORE|core|CORE_ROOT|top|TOP|CLAUDE_PROJECT_DIR|PROJECT_DIR)\}?$/ || s ~ /\)$/)
+      }
+      # extrai os tokens de ops/ do CORE de uma linha; devolve em toks[1..n]
+      function tokens(s,   n, off, pre, c, t) {
+        n = 0; off = 0; split("", toks)
+        while (match(substr(s, off + 1), /ops\/([A-Za-z][A-Za-z0-9_-]*\.[A-Za-z][A-Za-z0-9]*|[A-Za-z][A-Za-z0-9_-]+\/[A-Za-z0-9_.*-]*)/)) {
+          t = substr(s, off + RSTART, RLENGTH); pre = substr(s, 1, off + RSTART - 1); off = off + RSTART + RLENGTH - 1
+          c = substr(pre, length(pre), 1)
+          if (c ~ /[A-Za-z0-9_.@-]/) continue                       # devops/, gitops/, foo.ops/
+          if (c == "/" && !rootvar(substr(pre, 1, length(pre) - 1))) continue   # src/ops/, URL, ./ops/, ${tmp}/ops/
+          sub(/[.*]+$/, "", t); toks[++n] = t
         }
-      }' 2>/dev/null | LC_ALL=C sort -u
+        return n
+      }
+      FNR == 1 { flush(); rel = FILENAME; if (index(rel, prefix) == 1) rel = substr(rel, length(prefix) + 1)
+                 fm = 0; isfm = 0; fmclosed = 0; fmcore = 0; indesc = 0; inpaths = 0 }
+      { l = $0; sub(/\r$/, "", l); if (FNR == 1) sub(/^\357\273\277/, "", l) }
+      FNR == 1 && l == "---" && FILENAME ~ /\.md$/ { fm = 1; isfm = 1; next }
+      fm == 1  { if (l == "---") { fm = 0; fmclosed = 1; next }
+                 if (l ~ /^description:/) indesc = 1; else if (l ~ /^[A-Za-z_][A-Za-z0-9_-]*:/) indesc = 0
+                 if (l ~ /^paths:/) inpaths = 1; else if (l ~ /^[A-Za-z_][A-Za-z0-9_-]*:/) inpaths = 0
+                 if (inpaths) next   # paths: da rule é GATILHO de carga (só casa onde o arquivo existe), não descrição
+                 if (indesc && l ~ /Core-only\./ && l !~ /(NÃO|Não|não|NAO|Nao|nao|NOT|Not|not)[^.]*Core-only/) fmcore = 1 }
+      # (as linhas do frontmatter também são varridas: citação ali, num arquivo que não se declara, acusa;
+      #  e frontmatter que nunca fecha não isenta nada — a isenção só vale com o `---` de fechamento)
+      l ~ /\([Cc]ore[- ]only[),]/ { next }
+      { n = tokens(l)
+        # atribuição a variável: P="$R/ops/a.sh" → vtok[P]
+        if (n > 0 && match(l, /^[[:space:]]*(local[[:space:]]+|export[[:space:]]+|readonly[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*=/)) {
+          v = substr(l, RSTART, RLENGTH - 1); sub(/^[[:space:]]*(local|export|readonly)?[[:space:]]*/, "", v); vtok[v] = toks[1]
+        }
+        # teste de presença: guarda o OPERANDO testado (token literal ou variável que o recebeu)
+        s = l
+        while (match(s, /(\[\[?|test)[[:space:]]+(![[:space:]]+)?-[efxsd][[:space:]]+[^] ]+/)) {
+          op = substr(s, RSTART, RLENGTH); s = substr(s, RSTART + RLENGTH)
+          sub(/^.*-[efxsd][[:space:]]+/, "", op); gsub(/"/, "", op)
+          if (tokens(op) > 0) gtok[toks[1]] = 1
+          else if (op ~ /^\$\{?[A-Za-z_][A-Za-z0-9_]*\}?$/) { gsub(/[${}]/, "", op); if (op in vtok) gtok[vtok[op]] = 1 }
+          n = tokens(l)
+        }
+        for (i = 1; i <= n; i++) cand[++nc] = toks[i]
+      }
+      END { flush() }' 2>/dev/null | LC_ALL=C sort
 }
 
 # ---------------------------------------------------------------------------
 # SELFTEST (self-contido, à la kb-vendored-link-check.sh) — as polaridades
 # ---------------------------------------------------------------------------
 run_selftest() {
-  local tmp; tmp="$(mktemp -d)"; local fails=0 out total=9
+  local tmp; tmp="$(mktemp -d)"; local fails=0 out total=15
   mkdir -p "${tmp}/.claude/rules" "${tmp}/.claude/hooks" "${tmp}/.claude/validation/fixtures" \
            "${tmp}/.claude/commands/meta" "${tmp}/docs/sdaal" "${tmp}/ops" "${tmp}/docs/analysis"
   local BL="${tmp}/.claude/validation/ops-citation-travel-baseline.txt"
   # captura em VAR e here-string — nunca `produtor | grep -q` (SIGPIPE sob pipefail).
   _run() { out="$(bash "$0" "${tmp}" --format tsv 2>/dev/null)"; }
   _has() { command grep -q -- "$1" <<< "${out}"; }
-  _reset() { rm -rf "${tmp}/.claude/rules"/* "${tmp}/.claude/hooks"/* "${tmp}/.claude/commands/meta"/* \
+  _reset() { rm -rf "${tmp}/.claude/rules"/* "${tmp}/.claude/hooks"/* "${tmp}/.claude/commands/meta"/* "${tmp}/.claude/rules"/.??* \
                     "${tmp}/docs/sdaal"/* "${tmp}/docs/analysis"/* "${tmp}/.claude/validation/fixtures"/*
              printf '# baseline vazio\n' > "${BL}"; }
 
@@ -138,7 +192,7 @@ run_selftest() {
   # (iv) passivo no baseline => SOFT, sem HARD
   _reset
   printf 'o `ops/pr-merge-verified.sh` recusa\n' > "${tmp}/.claude/rules/kg-grammar.md"
-  printf '.claude/rules/kg-grammar.md|ops/pr-merge-verified.sh\n' >> "${BL}"
+  printf '.claude/rules/kg-grammar.md|ops/pr-merge-verified.sh|1\n' >> "${BL}"
   _run
   if _has '^HARD'; then echo "  ✗ (iv) passivo baselined não deveria dar HARD"; fails=$((fails+1)); else echo "  ✅ (iv) passivo no baseline tolerado (SOFT)"; fi
 
@@ -156,7 +210,7 @@ run_selftest() {
 
   # (vii) `ops/s` (unidade) e fixture de bancada => calam
   _reset
-  printf -- '- alto throughput (>1k ops/s por agente)\n' > "${tmp}/docs/sdaal/sdaal.md"
+  printf -- '- alto throughput (>1k ops/s por agente); medimos ops/s/core\n' > "${tmp}/docs/sdaal/sdaal.md"
   printf 'bash ops/x.sh\n' > "${tmp}/.claude/validation/fixtures/f.md"
   _run
   if _has 'sdaal.md' || _has 'fixtures'; then echo "  ✗ (vii) ops/s ou fixture não deveriam acusar"; fails=$((fails+1)); else echo "  ✅ (vii) ops/s (unidade) e fixture calam"; fi
@@ -164,7 +218,7 @@ run_selftest() {
   # (viii) CATRACA: baseline que CRESCE vs a versão anterior => HARD
   _reset
   printf 'o `ops/a.sh` faz\n' > "${tmp}/.claude/rules/r.md"
-  printf '# scope: %s\n.claude/rules/r.md|ops/a.sh\n' "$(_scope_now)" > "${BL}"
+  printf '# scope: %s\n.claude/rules/r.md|ops/a.sh|1\n' "$(_scope_now)" > "${BL}"
   printf '# scope: %s\n' "$(_scope_now)" > "${tmp}/prev.txt"
   out="$(bash "$0" "${tmp}" --format tsv --previous-baseline "${tmp}/prev.txt" 2>/dev/null)"
   if _has $'^HARD\tCATRACA'; then echo "  ✅ (viii) baseline que cresce = CATRACA VIOLADA"; else echo "  ✗ (viii)"; fails=$((fails+1)); fi
@@ -174,6 +228,47 @@ run_selftest() {
   printf 'o `ops/a.sh` faz\n' > "${tmp}/.claude/rules/r.md"
   _run
   if _has 'NO-BASELINE'; then echo "  ✅ (ix) baseline ausente = HARD acionável"; else echo "  ✗ (ix)"; fails=$((fails+1)); fi
+
+  # ── casos da passada adversarial de 2026-10-11 (achados 1–4, 6, 9–11) ──
+  # (x) o `ops/` de OUTRO projeto (segmento literal antes, URL) e o sandbox de selftest => calam
+  _reset
+  printf 'handlers vivem em `src/ops/handler.ts`; veja https://github.com/x/y/blob/main/ops/run.md\n' > "${tmp}/.claude/rules/stack.md"
+  printf 'printf x > "${tmp}/ops/motor.sh"\n' > "${tmp}/.claude/hooks/st.sh"
+  _run
+  if _has 'stack.md' || _has 'st.sh'; then echo "  ✗ (x) ops/ de outro projeto ou de sandbox não deveria acusar"; fails=$((fails+1)); else echo "  ✅ (x) src/ops/, URL e \${tmp}/ops/ calam"; fi
+
+  # (xi) teste de presença em OUTRA linha (literal e por variável) => cala; mas guarda só o token TESTADO
+  _reset
+  printf 'if [ -f "$R/ops/a.sh" ]; then\n  bash "$R/ops/a.sh"\nfi\nP="$R/ops/c.sh"\n[ -f "$P" ] || exit 0\nbash "$P"; echo "$R/ops/c.sh"\n' > "${tmp}/.claude/hooks/h.sh"
+  printf '[ -f ops/a.sh ] && bash ops/b.sh\n' > "${tmp}/.claude/hooks/h2.sh"
+  _run
+  if ! _has $'\th.sh\t' && ! _has 'hooks/h.sh' && _has "h2.sh.*ops/b.sh" && ! _has "h2.sh.*ops/a.sh"; then echo "  ✅ (xi) presença guarda o token testado no arquivo inteiro, e só ele"; else echo "  ✗ (xi)"; fails=$((fails+1)); fi
+
+  # (xii) variações honestas do marcador => calam
+  _reset
+  printf 'veja ops/deploy.sh (core-only, não viaja)\nveja ops/x.sh (Core-only)\n' > "${tmp}/.claude/rules/m.md"
+  _run
+  if _has 'm.md'; then echo "  ✗ (xii) (core-only, …) e (Core-only) deveriam calar"; fails=$((fails+1)); else echo "  ✅ (xii) variações do marcador calam"; fi
+
+  # (xiii) CONTAGEM: 2ª citação do mesmo token num arquivo com 1 no baseline => HARD (cresceu)
+  _reset
+  printf 'o `ops/a.sh` faz\ne o `ops/a.sh` agora também publica\n' > "${tmp}/.claude/rules/r.md"
+  printf '.claude/rules/r.md|ops/a.sh|1\n' >> "${BL}"
+  _run
+  if _has $'^HARD\tNEW\t.claude/rules/r.md\t.*cresceu de 1 para 2'; then echo "  ✅ (xiii) citação a mais de token tolerado = HARD (cresceu)"; else echo "  ✗ (xiii)"; fails=$((fails+1)); fi
+
+  # (xiv) frontmatter NEGADO acusa; frontmatter com CRLF que declara Core-only cala
+  _reset
+  printf -- '---\ndescription: Este comando NÃO é Core-only.\n---\nrode `bash ops/x.sh`\n' > "${tmp}/.claude/commands/meta/neg.md"
+  printf -- '---\r\ndescription: Publica. Core-only.\r\n---\r\nrode `bash ops/x.sh`\r\n' > "${tmp}/.claude/commands/meta/crlf.md"
+  _run
+  if _has 'neg.md' && ! _has 'crlf.md'; then echo "  ✅ (xiv) frontmatter negado acusa; CRLF não esconde a declaração"; else echo "  ✗ (xiv)"; fails=$((fails+1)); fi
+
+  # (xv) paths: no frontmatter de uma rule é gatilho de carga, não descrição => cala; corpo da mesma rule acusa
+  _reset
+  printf -- '---\npaths:\n  - "ops/publish-door.sh"\n---\nrode `bash ops/publish-door.sh`\n' > "${tmp}/.claude/rules/pl.md"
+  _run
+  if _has $'^HARD\tNEW\t.claude/rules/pl.md\t.*(1 ocorr'; then echo "  ✅ (xv) paths: do frontmatter cala; o corpo acusa"; else echo "  ✗ (xv)"; fails=$((fails+1)); fi
 
   rm -rf "${tmp}"; echo "  selftest: $((total-fails))/${total} verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1
@@ -208,13 +303,15 @@ BASELINE_REL=".claude/validation/ops-citation-travel-baseline.txt"
 [ -n "${BASELINE}" ] || BASELINE="${REPO_DIR}/${BASELINE_REL}"
 
 TMP="$(mktemp -d)"; trap 'rm -rf "${TMP}"' EXIT
-collect_violations "${REPO_DIR}" > "${TMP}/current"
+# Contagem por par (achado 9 da passada adversarial): com `arquivo|token` puro, a 2ª citação de um token já
+# tolerado no MESMO arquivo passava calada. O baseline guarda `arquivo|token|N` e a catraca cobra o N.
+collect_violations "${REPO_DIR}" | awk '{ n[$0]++ } END { for (k in n) print k "|" n[k] }' | LC_ALL=C sort > "${TMP}/current"
 
 # --emit-baseline: bootstrap operado À MÃO (o script nunca ESCREVE o baseline — desarmaria a catraca).
 if [ "${EMIT_BASELINE}" -eq 1 ]; then
   printf '# Baseline de citações de ops/<arquivo> em superfície que VIAJA — PASSIVO TOLERADO (REGRA 100).\n'
   printf '# Gerado por: bash .claude/validation/%s --emit-baseline > %s\n' "${SELF_NAME}" "${BASELINE_REL}"
-  printf '# formato: <rel>|<ops/token>. SÓ PODE ENCOLHER: reescreva para o que o destinatário tem, ou marque (core-only), e remova a linha.\n'
+  printf '# formato: <rel>|<ops/token>|<ocorrências>. SÓ PODE ENCOLHER: reescreva para o que o destinatário tem, ou marque (core-only), e remova a linha.\n'
   printf '# scope: %s\n' "${VENDORED_ROOTS[*]}"
   cat "${TMP}/current"
   exit 0
@@ -230,14 +327,25 @@ if [ ! -f "${BASELINE}" ]; then
   while IFS= read -r p; do [ -n "${p}" ] && say "SOFT" "NO-BASELINE-CITE" "${p%%|*}" "cita '${p#*|}' (severidade rebaixada: sem baseline)"; done < "${TMP}/current"
 else
   read_baseline "${BASELINE}" > "${TMP}/baseline"
-  LC_ALL=C comm -23 "${TMP}/current" "${TMP}/baseline" > "${TMP}/novos"
-  while IFS= read -r p; do
-    [ -n "${p}" ] || continue
-    say "HARD" "NEW" "${p%%|*}" "cita '${p#*|}' num arquivo que VIAJA — ops/ não vai a nenhuma porta nem adotante, e lá a frase descreve um comportamento que o destinatário não tem: ${FIX}"
-  done < "${TMP}/novos"
-  LC_ALL=C comm -12 "${TMP}/current" "${TMP}/baseline" > "${TMP}/passivo"
-  while IFS= read -r p; do [ -n "${p}" ] && say "SOFT" "PASSIVO" "${p%%|*}" "passivo: cita '${p#*|}' — ${FIX}, e remova do baseline"; done < "${TMP}/passivo"
-  while IFS= read -r p; do [ -n "${p}" ] && ! command grep -qxF -- "${p}" "${TMP}/current" && say "SOFT" "BASELINE-OBSOLETA" "${BASELINE_REL}" "entrada OBSOLETA '${p}' — já não existe. Remova do baseline (só encolhe)"; done < "${TMP}/baseline"
+  # join por `arquivo|token`: o último campo é a contagem
+  awk -F'|' '
+    function key(   k, i) { k = $1; for (i = 2; i < NF; i++) k = k "|" $i; return k }
+    FILENAME == ARGV[1] { b[key()] = $NF; next }   # nunca FNR==NR: com 1º arquivo VAZIO ele casa o 2º
+    { k = key(); c = $NF; seen[k] = 1
+      if (!(k in b))              print "HARD\tNEW\t" $1 "\t" k "\t" c " ocorrência(s), fora do baseline"
+      else if (c + 0 > b[k] + 0)  print "HARD\tNEW\t" $1 "\t" k "\tcresceu de " b[k] " para " c " ocorrência(s)"
+      else { print "SOFT\tPASSIVO\t" $1 "\t" k "\t" c " ocorrência(s)"
+             if (c + 0 < b[k] + 0) print "SOFT\tBASELINE-OBSOLETA\t" $1 "\t" k "\tencolheu de " b[k] " para " c " — atualize a contagem no baseline (só encolhe)" } }
+    END { for (k in b) if (!(k in seen)) print "SOFT\tBASELINE-OBSOLETA\t" k "\t" k "\tjá não existe — remova do baseline (só encolhe)" }
+  ' "${TMP}/baseline" "${TMP}/current" | LC_ALL=C sort > "${TMP}/join"
+  while IFS=$'\t' read -r sev tag path k detail; do
+    [ -n "${sev}" ] || continue
+    case "${tag}" in
+      NEW)     say "HARD" "NEW" "${path}" "cita '${k#*|}' (${detail}) num arquivo que VIAJA — ops/ não vai a nenhuma porta nem adotante, e lá a frase descreve um comportamento que o destinatário não tem: ${FIX}" ;;
+      PASSIVO) say "SOFT" "PASSIVO" "${path}" "passivo: cita '${k#*|}' (${detail}) — ${FIX}, e remova do baseline" ;;
+      *)       say "SOFT" "BASELINE-OBSOLETA" "${BASELINE_REL}" "entrada '${k}': ${detail}" ;;
+    esac
+  done < "${TMP}/join"
   # CATRACA — baseline SÓ ENCOLHE (vs origin/integração > HEAD), escopo-ciente (molde kb-vendored-link-check)
   : > "${TMP}/prev"; PREV_SOURCE=""; PREV_RAW=""
   if [ -n "${PREV_BASELINE}" ] && [ -f "${PREV_BASELINE}" ]; then
@@ -263,8 +371,13 @@ else
     if [ "${CUR_SCOPE}" != "${PREV_SCOPE}" ]; then
       say "SOFT" "ESCOPO-EXPANDIDO" "${BASELINE_REL}" "escopo MUDOU ('${PREV_SCOPE:-<ausente>}' → '${CUR_SCOPE}') — catraca de crescimento SUSPENSA nesta rodada (passivos de escopos distintos não são comparáveis)."
     else
-      LC_ALL=C comm -13 "${TMP}/prev" "${TMP}/baseline" > "${TMP}/added"
-      while IFS= read -r p; do [ -n "${p}" ] && say "HARD" "CATRACA" "${BASELINE_REL}" "CATRACA VIOLADA: '${p}' ACRESCENTADO ao baseline (vs ${PREV_SOURCE}) — só pode ENCOLHER. Citação nova se declara (core-only) ou se reescreve; não se amplia a tolerância"; done < "${TMP}/added"
+      # cresceu = par novo OU contagem maior que a da referência
+      awk -F'|' '
+        function key(   k, i) { k = $1; for (i = 2; i < NF; i++) k = k "|" $i; return k }
+        FILENAME == ARGV[1] { p[key()] = $NF; next }
+        { k = key(); if (!(k in p) || $NF + 0 > p[k] + 0) print k "|" $NF }
+      ' "${TMP}/prev" "${TMP}/baseline" > "${TMP}/added"
+      while IFS= read -r p; do [ -n "${p}" ] && say "HARD" "CATRACA" "${BASELINE_REL}" "CATRACA VIOLADA: '${p}' ACRESCENTADO ou AUMENTADO no baseline (vs ${PREV_SOURCE}) — só pode ENCOLHER. Citação nova se declara (core-only) ou se reescreve; não se amplia a tolerância"; done < "${TMP}/added"
     fi
   fi
 fi

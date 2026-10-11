@@ -25424,8 +25424,8 @@ run_ops_citation_travel_selftests() {
   local o rc
   # (a) o --selftest próprio: acusa o defeito verbatim e cala nas três declarações + fora do escopo
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 9/9 verdes' <<< "${o}"; then
-    record_pass "ops-citation-travel: (a) --selftest verde (9 casos: acusa, cala marcado/não-viaja/passivo/presença/Core-only/ops-s, catraca, sem baseline)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 15/15 verdes' <<< "${o}"; then
+    record_pass "ops-citation-travel: (a) --selftest verde (15 casos: o defeito verbatim, as três declarações, fora do escopo, catraca por contagem e os achados da passada adversarial)"
   else record_fail "ops-citation-travel: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: --format tsv sai 0, sem HARD, e com o passivo à vista.
   #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
@@ -25457,16 +25457,23 @@ run_ops_citation_travel_selftests() {
     if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "ops-citation-travel: (m) mutante morde → ✗ ${want}"
     else record_fail "ops-citation-travel: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
   done <<EOF_MUT
-          print rel "|" tok$(printf '\x1f')          print ""$(printf '\x1f')(i)
-      index(\$0, "(core-only)") { next }$(printf '\x1f')      index(\$0, "(core-only-X)") { next }$(printf '\x1f')(ii)
+if (!(cand[i] in gtok)) print rel "|" cand[i]$(printf '\x1f')if (0) print rel "|" cand[i]$(printf '\x1f')(i)
+l ~ /\([Cc]ore[- ]only[),]/ { next }$(printf '\x1f')l ~ /\(XCore[- ]only[),]/ { next }$(printf '\x1f')(ii)
   [ "\${#bases[@]}" -gt 0 ] || return 0$(printf '\x1f')  bases+=("\${repo}/docs"); [ "\${#bases[@]}" -gt 0 ] || return 0$(printf '\x1f')(iii)
-  LC_ALL=C comm -23 "\${TMP}/current" "\${TMP}/baseline" > "\${TMP}/novos"$(printf '\x1f')  cat "\${TMP}/current" > "\${TMP}/novos"$(printf '\x1f')(iv)
-          if (guarded) continue$(printf '\x1f')          if (0) continue$(printf '\x1f')(v)
-      filecore { next }$(printf '\x1f')      filecore && 0 { next }$(printf '\x1f')(vi)
-ops\/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+|\/[A-Za-z0-9_.*-]*)/)$(printf '\x1f')ops\/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+|\/[A-Za-z0-9_.*-]*)?/)$(printf '\x1f')(vii)
+else if (c + 0 > b[k] + 0)$(printf '\x1f')else if (c + 0 >= b[k] + 0)$(printf '\x1f')(iv)
+if (tokens(op) > 0) gtok[toks[1]] = 1$(printf '\x1f')if (tokens(op) > 0) gtok["x"] = 1$(printf '\x1f')(v)
+) fmcore = 1 }$(printf '\x1f')) fmcore = 0 }$(printf '\x1f')(vi)
        ! -path '*/fixtures/*' -print0$(printf '\x1f')       -print0$(printf '\x1f')(vii)
-say "HARD" "CATRACA" "\${BASELINE_REL}"$(printf '\x1f')say "SOFT" "CATRACA" "\${BASELINE_REL}"$(printf '\x1f')(viii)
+|[A-Za-z][A-Za-z0-9_-]+\/[A-Za-z0-9_.*-]*)/$(printf '\x1f')|[A-Za-z][A-Za-z0-9_-]*\/[A-Za-z0-9_.*-]*)/$(printf '\x1f')(vii)
+\$NF + 0 > p[k] + 0) print k "|" \$NF }$(printf '\x1f')\$NF + 0 > p[k] + 0) k = k }$(printf '\x1f')(viii)
 if [ ! -f "\${BASELINE}" ]; then$(printf '\x1f')if false; then$(printf '\x1f')(ix)
+if (c == "/" && !rootvar(substr(pre, 1, length(pre) - 1))) continue$(printf '\x1f')if (0) continue$(printf '\x1f')(x)
+if (op in vtok) gtok[vtok[op]] = 1$(printf '\x1f')if (op in vtok) gtok["x"] = 1$(printf '\x1f')(xi)
+l ~ /\([Cc]ore[- ]only[),]/ { next }$(printf '\x1f')l ~ /\([Cc]ore[- ]only[)]/ { next }$(printf '\x1f')(xii)
+else if (c + 0 > b[k] + 0)$(printf '\x1f')else if (c + 0 > b[k] + 99)$(printf '\x1f')(xiii)
+sub(/\r\$/, "", l);$(printf '\x1f')sub(/\rX\$/, "", l);$(printf '\x1f')(xiv)
+(NÃO|Não|não|NAO|Nao|nao|NOT|Not|not)$(printf '\x1f')(XYZ)$(printf '\x1f')(xiv)
+if (inpaths) next$(printf '\x1f')if (0) next$(printf '\x1f')(xv)
 EOF_MUT
   rm -rf "${sb}"
 }
