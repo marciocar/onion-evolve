@@ -26273,6 +26273,80 @@ EOF_MUT
 }
 _family run_veto_onfailure_selftests
 
+# REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte) — SAC-63, medido em
+# 2026-10-11 depois da Onda 1 de primárias: o CLAUDE.md prescrevia "Bulk-first" pelo /issue/bulk e nenhum adapter
+# implementava lote; a interface publicava um mapa de prioridade "da UI, não medido" no formato das colunas medidas.
+# Casos: (a) as polaridades do --selftest · (b) o corpus real no modo que o lint consome · (c) o dispatcher de produção
+# sobre o defeito verbatim · (m) UM MUTANTE POR CASO, na CÓPIA da guarda — mutante que não se aplica é FALHA.
+run_task_manager_capabilities_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/task-manager-capabilities-check.sh"
+  [ -f "${chk}" ] || { record_fail "task-manager-capabilities" "guarda ausente"; return; }
+  local o rc
+  # (a) o --selftest próprio: o defeito verbatim acusa, o honesto cala, e cada classe de declaração falsa reprova
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 18/18 verdes' <<< "${o}"; then
+    record_pass "task-manager-capabilities: (a) --selftest verde (18 casos: o honesto, os dois defeitos verbatim, conjunto, enum, fonte, superfície, derivado)"
+  else record_fail "task-manager-capabilities: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: as 5 declarações reais saem limpas (rc 0, sem HARD).
+  #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/task-manager-capabilities-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && ! grep -q '^HARD' <<< "${o}"; then
+    record_pass "task-manager-capabilities: (b) corpus real → rc 0, sem HARD, nas declarações de .claude/utils/task-manager/adapters/"
+  else record_fail "task-manager-capabilities: (b) corpus real" "rc=${rc}; [$(grep '^HARD' <<< "${o}" | head -3 | tr '\n' '|')]"; fi
+  # (c) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, com o defeito VERBATIM (Jira declarando bulk.create
+  #     implementado com a fonte real do provedor, e o adapter sem bulkCreate), emite a REGRA 103
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null
+  local jt="${sd}/.claude/utils/task-manager/adapters/jira.capabilities.tsv"
+  if [ -f "${jt}" ]; then
+    sed -i 's/^bulk\.create\toptional\tnot_implemented\t/bulk.create\toptional\timplemented\t/' "${jt}"
+    ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+    local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${jt}" 2>&1 || true)"
+    if grep -q "REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte): \[superficie-diverge\] bulk.create: declarada implemented" <<< "${l}"; then
+      record_pass "task-manager-capabilities: (c) o lint de produção (dispatcher) emite a REGRA 103 sobre o defeito verbatim"
+    else record_fail "task-manager-capabilities: (c) dispatcher" "$(grep -E 'REGRA 103|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  else record_fail "task-manager-capabilities: (c) dispatcher" "jira.capabilities.tsv ausente no sandbox"; fi
+  rm -rf "${sd}"
+  # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove.
+  #     Heredoc QUOTADO (as âncoras têm `${…}` e `$3`), separador @@@ (as âncoras têm `||`).
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"; mkdir -p "${sb}/.claude/validation"
+  local s="${sb}/.claude/validation/task-manager-capabilities-check.sh" line old new want rest mo mrc
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    old="${line%%@@@*}"; rest="${line#*@@@}"; new="${rest%%@@@*}"; want="${rest#*@@@}"
+    cp "${chk}" "${s}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${s}" "${old}" "${new}"; then
+      record_fail "task-manager-capabilities: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "task-manager-capabilities: (m) mutante morde → ✗ ${want}"
+    else record_fail "task-manager-capabilities: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<'EOF_MUT'
+grep -qF -- "${sf}" "${adapter}" && _emit "superficie-diverge"@@@! grep -qF -- "${sf}" "${adapter}" && _emit "superficie-diverge"@@@(i)
+grep -qF -- "${sf}" "${adapter}" || _emit "superficie-diverge"@@@true || _emit "superficie-diverge"@@@(ii)
+if ($3 == "implemented" && ($5 == "" || $5 == "-"))@@@if (0)@@@(iii)
+if [ ! -f "${decl}" ]; then@@@if false; then@@@(iv)
+if (!(order[i] in seen)) print "capacidade-faltando"@@@if (0) print "capacidade-faltando"@@@(v)
+if (!(cap in req)) { print "capacidade-inventada"@@@if (0) { print "capacidade-inventada"@@@(vi)
+if (req[cap] == "required" && $3 == "not_implemented")@@@if (0)@@@(vii)
+else if ($2 != req[cap]) print "requisito-diverge"@@@else if (0) print "requisito-diverge"@@@(viii)
+if ($4 ~ /^[[:space:]]*$/) print@@@if (0) print@@@(ix)
+elif ! grep -qE "^[[:space:]]*- id: ${node}[[:space:]]*$" "${gf}"; then@@@elif false; then@@@(x)
+elif ! grep -qF -- "${anchor}" "${tm}/adapters/${afile}"; then@@@elif false; then@@@(xi)
+grep -qF -- "${sf}" "${adapter}" && _emit "superficie-diverge"@@@false && _emit "superficie-diverge"@@@(xii)
+if [ "${st}" != "not_implemented" ] && ! grep -qw -- "${tok}" "${adapter}"; then@@@if false; then@@@(xiii)
+grep -qxF -- "${base}" <<< "${providers}" || \@@@true || \@@@(xiv)
+[ "${derived}" -eq 1 ] || _emit "fonte-nao-resolve"@@@true || _emit "fonte-nao-resolve"@@@(xv)
+local derived=0; [ -f "${repo}/.claude/.onion-version" ] && derived=1@@@local derived=0; false && derived=1@@@(xv)
+if (cap in seen) { print "duplicada"@@@if (0) { print "duplicada"@@@(xvi)
+if [ -z "${vocab}" ]; then@@@if false; then@@@(xvii)
+[ "${sc}" = "local" ] || _emit "fonte-invalida"@@@true || _emit "fonte-invalida"@@@(xviii)
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_task_manager_capabilities_selftests
+
 # Modo kg-migrate-v3 — SAC-73 parte 1: a ferramenta de migração do corpus ao contrato v3
 # (.claude/utils/kg/kg-migrate-v3.py) cita datas, deriva provenance SÓ de fonte que o nó já traz,
 # nunca corta label, --check não escreve, e a 2ª aplicação é no-op. O risco que a família vigia é a

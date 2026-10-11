@@ -1,0 +1,32 @@
+# Zoho Projects (REST v3; só API, sem MCP nativo) — Onda 2, SAC-63, 2026-10-11.
+# A doc primária da Zoho foi INALCANÇÁVEL na Onda 1; as fontes aqui são as sondas do adapter (2026-09-30 e 2026-10-07)
+# e o grafo zoho-glpi-adapters-2026-09.
+# Declaração de capacidades do adapter — formato e semântica em ../interface.md §Capacidades.
+# Cobrada pela REGRA 103 do lint. Fonte kg: = evidência ancorada (grafo de pesquisa do core);
+# adapter: = medição datada registrada no próprio adapter; local = sem chamada ao provedor.
+# unverified = o adapter tem a superfície, mas ninguém ancorou nem mediu o comportamento. Não invente: meça.
+capability	requirement	status	api_version	source	note
+item.create	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§O vínculo com a tasklist é **objeto aninhado**	tasklist como objeto; owners_and_work na criação
+item.read	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§TUDO NESTE ARQUIVO FOI MEDIDO CONTRA O PORTAL REAL	coberto pela declaração geral das sondas de 2026-09-30, sem trecho próprio
+item.update	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§**`PATCH` e só `PATCH`**	
+item.delete	optional	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§**Assimetria medida:**	DELETE para task; projeto vai por trash
+hierarchy.subtask_create	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§Medido em 2026-09-30, e **conferido no corpo**	parental_info aninhado
+hierarchy.subtask_list	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§O parâmetro é aceito e ignorado	filtro no cliente por parental_info
+hierarchy.epic	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	milestone está documentado em prosa (§Hierarquia), sem a superfície createEpic
+status.transition	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	kg:zoho-glpi-adapters-2026-09#E_ZOHO_SEM_ENDPOINT_TRANSICAO;adapter:zoho.md§No layout PADRÃO não há `In Progress`	PATCH status {id} ou completion_percentage; teto: um portal no layout padrão
+priority.set	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	o mapa da interface vem da UI e não foi medido contra a API; o adapter não envia
+estimate.points	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	
+estimate.time	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	owners_and_work traz total_work; não mapeado
+comment.add	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§o campo é `comment`	markdown simples
+comment.list	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§"comments": [...]	
+attachment.add	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	
+label.set	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	
+iteration.assign	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	
+link.create	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	
+search.query	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§`?search=` não filtra	pagina por page_info.has_next_page e filtra no cliente
+search.paginate	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	
+bulk.create	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	
+bulk.update	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	
+project.list	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§ARRAY no topo (não envelope)	
+project.read	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§TUDO NESTE ARQUIVO FOI MEDIDO CONTRA O PORTAL REAL	coberto pela declaração geral das sondas, sem trecho próprio
+id.validate	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	local	teto: id numérico não identifica o Zoho com certeza

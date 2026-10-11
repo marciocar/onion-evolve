@@ -1,0 +1,30 @@
+# Jira (Cloud REST v3 e Server/DC REST v2) — Onda 2, SAC-63, 2026-10-11.
+# Declaração de capacidades do adapter — formato e semântica em ../interface.md §Capacidades.
+# Cobrada pela REGRA 103 do lint. Fonte kg: = evidência ancorada (grafo de pesquisa do core);
+# adapter: = medição datada registrada no próprio adapter; local = sem chamada ao provedor.
+# unverified = o adapter tem a superfície, mas ninguém ancorou nem mediu o comportamento. Não invente: meça.
+capability	requirement	status	api_version	source	note
+item.create	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_CLOUD_DESCRIPTION_TEXTAREA_ADF	o formato ADF da descrição está ancorado; o POST /issue em si não foi ancorado nem medido
+item.read	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	GET /issue não ancorado na Onda 1
+item.update	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	PUT /issue não ancorado; se ele muda status é Q_JIRA_STATUS_BY_PUT_MEASURE
+item.delete	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	
+hierarchy.subtask_create	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	hierarquia e issue types não ancorados (lacuna da Onda 1)
+hierarchy.subtask_list	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	
+hierarchy.epic	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	épico não ancorado; o adapter não cria
+status.transition	required	implemented	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_CLOUD_STATUS_VIA_TRANSITION	o endpoint de transição está ancorado; a OBRIGATORIEDADE dele não (E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN)
+priority.set	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	Highest/High/Medium/Low do esquema padrão; prioridade não ancorada
+estimate.points	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	story points no Jira é campo custom, não ancorado; o adapter não envia
+estimate.time	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	timetracking.originalEstimate; não ancorado
+comment.add	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_DC_COMMENT_BODY_STRING	DC: corpo string ancorado; Cloud: ADF do comentário sem âncora (E_ELENXO_JIRA_COMMENT_ADF_UNANCHORED)
+comment.list	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_DC_RENDEREDBODY_EXPAND_OPTIN	renderedBody (HTML) só sob expand no DC; leitura no Cloud não ancorada
+attachment.add	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	anexo não ancorado
+label.set	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	fields.labels; labels não ancoradas
+iteration.assign	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	sprint pela Agile API, não ancorada
+link.create	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	issue links não ancorados
+search.query	required	implemented	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_CLOUD_SEARCH_JQL_NEXTPAGETOKEN_7D;kg:task-manager-vocabulario-2026-10#E_JIRA_DC_SEARCH_JQL_GET_POST	Cloud POST /search/jql; DC GET /rest/api/2/search; o /rest/api/3/search está em remoção (CHANGE-2046, sem data)
+search.paginate	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_CLOUD_SEARCH_JQL_NEXTPAGETOKEN_7D	o adapter pagina por dentro (searchByJQL com nextPageToken/startAt), mas não expõe searchPage; token expira em 7 dias
+bulk.create	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_CLOUD_BULK_CREATE_50;kg:task-manager-vocabulario-2026-10#E_JIRA_DC_BULK_CREATE_DOC_9_17	provedor: só criação em lote, até 50 por requisição no Cloud; o adapter não chama
+bulk.update	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_ELENXO_JIRA_BULK_ONLY_CREATE	bulk de edição não ancorado
+project.list	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	
+project.read	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	
+id.validate	required	implemented	rest-v3 (cloud) | rest-v2 (dc)	local	forma KEY-123
