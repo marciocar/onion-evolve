@@ -2,7 +2,7 @@
 title: 'Resíduo — a checagem de modelo forçado cegava a variável nova, e a cura quase quebrou o plugin'
 date: 2026-10-11
 branch: fix/forced-model-check-workflow-var
-reviewed_diff_sha256: 5495e455462452c791cfabf0993ac83767ada7ada708264ab16de3c89838c2b9
+reviewed_diff_sha256: d2c23f600bac457dbae80d70f268243c9fb6b4e771866acc77ecffc8c62292b5
 reviewed_code_sha256: 3c5c1f8aff9e2bb2638b6a8fcd7b3f1a7ff9894df18f1f29181f19afe714ec10
 findings_total: 6
 findings_real: 6
