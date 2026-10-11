@@ -1,1 +1,37 @@
-.claude/session-lifecycle.jsonl merge=union
+# EOL fixado em LF (SAC-107, rodada r9 do radar E3): num checkout Windows com
+# core.autocrlf=true os .sh chegariam com CRLF e o bash dos hooks quebraria.
+# Lista decidida pela medição do repo (git ls-files --eol, 2026-10-11): só
+# extensões que vivem no repo. *.csv fica FORA de propósito: 13 CSVs de
+# provenance-triage já vivem com CRLF no índice e não podem mudar de bytes.
+
+# Executáveis (shell, hooks sem extensão, interpretados)
+*.sh        text eol=lf
+*.awk       text eol=lf
+*.py        text eol=lf
+*.js        text eol=lf
+*.mjs       text eol=lf
+*.ts        text eol=lf
+.githooks/* text eol=lf
+
+# Dados e especificação lidos pelos scripts
+*.yaml      text eol=lf
+*.yml       text eol=lf
+*.json      text eol=lf
+*.jsonl     text eol=lf
+*.tsv       text eol=lf
+*.tpl       text eol=lf
+*.md        text eol=lf
+
+# Estratégia de merge preservada (append-only)
+.claude/session-lifecycle.jsonl text eol=lf merge=union
+
+# Binários: nunca normalizar
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary

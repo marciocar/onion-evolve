@@ -186,11 +186,16 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
-    confidence: 0.7
+    confidence: 0.9
     verified_at: "2026-10-11"
-    verified_against: "aberta pela rodada r9 a partir de E_GITATTRIBUTES_SEM_EOL_LF"
+    verified_against: "SAC-107, fechada em 2026-10-11. ANTES: git ls-files --eol = 2790 i/lf, 13 i/crlf (todos .csv de provenance-triage), 6 i/none, 3 -text; checkout-index com core.autocrlf=true saía com CRLF em 209/209 .sh, nos 2 hooks sem extensão e em 2438 md/yaml/json/py/js/mjs. DEPOIS (.gitattributes com text eol=lf em sh awk py js mjs ts yaml yml json jsonl tsv tpl md e .githooks/*, merge=union preservado, binários marcados): git add --renormalize . mudou ZERO bytes rastreados além do próprio .gitattributes; o mesmo checkout sai com 0 CRLF nesses tipos e o woff2 é idêntico byte a byte. FORA de propósito: *.csv (13 já vivem CRLF no índice; normalizar mudaria bytes). NÃO VIAJA: vendor-manifest (source e standalone) cobre só .claude/ e docs/, e a raiz da porta leva README, CLAUDE.md, LICENSE e LICENSE-DOCS; levar o .gitattributes às portas fica como recomendação. Guarda: família gitattributes_eol (5 casos, core-only), 5 mutantes mortos"
+    provenance:
+      source: ".gitattributes e .claude/validation/lint-selftest.sh (família gitattributes_eol)"
+      locator: "git ls-files --eol antes e depois; git add --renormalize .; checkout-index com core.autocrlf=true em diretório temporário; vendor-manifest.sh --list nos papéis source e standalone"
+      method: "medição: contagem de EOL no índice e no checkout simulado do Windows, antes e depois da mudança, mais 5 mutantes via ops/mutate-and-restore.sh"
+      locality: "repo"
     label: "fixar eol=lf no .gitattributes do core (e no que viaja às portas) para scripts e grafos, medindo antes que nenhum arquivo rastreado muda de bytes"
 edges:
   - from: E_TIERING_DOS_WORKFLOWS_E_O_MODELO_UNICO

@@ -182,7 +182,7 @@ SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHA
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry,ops_citation_travel"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -7925,6 +7925,34 @@ run_secret_gitignore_selftests() {
   else record_fail "secret-gitignore: (g)" "o CI do adotante não dispara em .githooks/**"; fi
 }
 _family run_secret_gitignore_selftests
+
+# EOL fixado em LF no .gitattributes (SAC-107, rodada r9 do radar E3, 2026-10-11). Num checkout Windows com
+# core.autocrlf=true, sem `eol=lf` os 209 .sh e os 2 hooks sem extensão saíam com CRLF (medido por
+# checkout-index com autocrlf: 209/209 antes, 0 depois) e o bash dos hooks quebra. A guarda lê o ATRIBUTO
+# RESOLVIDO (`git check-attr`), não o texto do arquivo: é o que o git aplica no checkout. CORE-ONLY: o
+# .gitattributes não viaja no manifesto; no adotante o arquivo é dele.
+run_gitattributes_eol_selftests() {
+  local r="${REPO_ROOT}" a f n
+  # (a) .sh de hook e (b) hook sem extensão resolvem eol=lf com text
+  for f in .claude/hooks/pretooluse-env-guard.sh .githooks/pre-commit; do
+    a="$(git -C "${r}" check-attr text eol -- "${f}" 2>/dev/null | awk -F': ' '{printf "%s=%s ", $2, $3}')"
+    if [ "${a}" = "text=set eol=lf " ]; then record_pass "gitattributes-eol: ${f} resolve text + eol=lf"
+    else record_fail "gitattributes-eol: ${f}" "atributo resolvido '${a}' (esperado 'text=set eol=lf') — checkout Windows traria CRLF ao bash"; fi
+  done
+  # (c) a estratégia append-only do lifecycle sobrevive junto do eol
+  a="$(git -C "${r}" check-attr merge eol -- .claude/session-lifecycle.jsonl 2>/dev/null | awk -F': ' '{printf "%s ", $3}')"
+  if [ "${a}" = "union lf " ]; then record_pass "gitattributes-eol: session-lifecycle.jsonl mantém merge=union + eol=lf"
+  else record_fail "gitattributes-eol: session-lifecycle.jsonl" "obtido '${a}' (esperado 'union lf')"; fi
+  # (d) binário nunca normalizado
+  a="$(git -C "${r}" check-attr text -- site/public/fonts/fraunces-var.woff2 2>/dev/null | awk -F': ' '{print $3}')"
+  if [ "${a}" = "unset" ]; then record_pass "gitattributes-eol: woff2 é binário (text unset)"
+  else record_fail "gitattributes-eol: woff2" "text='${a}' — binário marcado como texto seria corrompido"; fi
+  # (e) dívida zero: nenhum arquivo com eol=lf vive com CRLF no índice (renormalize pendente)
+  n="$(git -C "${r}" ls-files --eol 2>/dev/null | awk '$1=="i/crlf" && /eol=lf/' | wc -l | tr -d ' ')"
+  if [ "${n}" = "0" ]; then record_pass "gitattributes-eol: 0 arquivo eol=lf com CRLF no índice"
+  else record_fail "gitattributes-eol: índice" "${n} arquivo(s) eol=lf com CRLF no índice — rode git add --renormalize ."; fi
+}
+_family run_gitattributes_eol_selftests
 
 run_scope_gitignore_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/scope-claude-gitignore.sh"
