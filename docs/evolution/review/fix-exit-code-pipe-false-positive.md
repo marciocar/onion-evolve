@@ -1,8 +1,7 @@
 ---
 branch: fix/exit-code-pipe-false-positive
 date: 2026-10-11
-reviewed_diff_sha256: 150372236134f53be2529f67b1b2fede552156a5c17bde31093ef6a3f894931e
-reviewed_code_sha256: 4f4cb58b5c53f45a348f309871a7862f696d707f0d234bac54acfa868c89ae21
+reviewed_diff_sha256: pendente
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
