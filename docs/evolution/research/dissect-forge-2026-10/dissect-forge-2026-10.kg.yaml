@@ -59,7 +59,7 @@ nodes:
     confidence: 0.7
     verified_against: "desenho do PR do SAC-77; a selar pelo maestro no merge"
     label: "desenho da costura: o N4 do dissect escreve nos x_absorb_* no grafo (KG-SSOT first), o dissect-plans.sh os le, mede as pecas do alvo no forge-census e recusa plano sem origem com pin, licenca, paridade ou forma; o /meta:forge injeta essa leitura"
-    narrative: "Sem comando novo e sem REGRA nova: o defeito medido nao era um plano sem licenca passando (nao havia plano nenhum), era a ausencia de forma e de leitor. Por isso o mecanismo e o medidor do proprio dissect, com bancada de polaridade e cinco mutantes mortos, e nao uma guarda de lint. Proxima onda, com gatilho = selo do maestro em D_CONDUCTOR_1011: o /meta:forge executa A_PLAN_VERIFICACAO_PELO_MOTOR no onion-research.js. A prova de generalizacao (ferramenta nova, fora dos tres exemplos) segue no Q."
+    narrative: "Sem comando novo e sem REGRA nova: o defeito medido nao era um plano sem licenca passando (nao havia plano nenhum), era a ausencia de forma e de leitor. Por isso o mecanismo e o medidor do proprio dissect, com bancada de polaridade e sete mutantes mortos (um deles a regressao do plugin onion-meta, que levou o leitor para dissect-plans.sh, do lado do forge), e nao uma guarda de lint. Proxima onda, com gatilho = selo do maestro em D_CONDUCTOR_1011: o /meta:forge executa A_PLAN_VERIFICACAO_PELO_MOTOR no onion-research.js. A prova de generalizacao (ferramenta nova, fora dos tres exemplos) segue no Q."
     trace: ".claude/validation/dissect-census.sh"
 edges:
   - from: E_DISSECT_QUASE_NAO_USADO
