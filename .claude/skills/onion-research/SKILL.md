@@ -42,8 +42,9 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
    ```
    Fases: Corpus → Scope (ângulos do tema + 5 eixos fixos) → Search → Fetch (tier/kind/validFrom por fonte)
    → Verify (3 votos, 2 refutam; `vendor-on-competitor` sem primária = refutada) → Synthesize (seção
-   **mercado obrigatória**) → **write(KG)** (o agente escreve o grafo e prova radar exit 0; sem 0 o run
-   devolve erro).
+   **mercado obrigatória**) → **write(KG)** (o agente escreve o grafo; um **verificador separado**, que não
+   escreveu, roda o radar e o contrato, e o laço de correção é contado no motor, até 3 tentativas;
+   sem radar 0 pelo verificador o run devolve erro, e `writeAttempts` mostra o declarado contra o medido).
 5. **Depois do run** (o que o workflow não faz): `SYNTHESIS.md` como PROJEÇÃO do grafo com o contrato de
    custo no frontmatter (`kg:`, `run_id`, `tokens`, `agents`, `duration_min`) e as seções **NÃO-VERIFICADOS**
    (do retorno: `unverified`, `refuted` por fonte fraca, `notVerifiedByBudget`, `budgetDropped`) e

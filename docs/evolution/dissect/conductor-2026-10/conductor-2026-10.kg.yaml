@@ -157,9 +157,11 @@ nodes:
   - id: A_PLAN_VERIFICACAO_PELO_MOTOR
     node_type: claim
     plane: DEV
-    status: open
+    status: confirmed
     impact: 5
-    confidence: 0.6
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "SAC-108 executado: bloco engine-verify em .claude/workflows/onion-research.js (agente verificador separado roda kg-radar e kg-contract-check; MAX_WRITE_ATTEMPTS = 3 contado no JS); run_research_workflow_selftests (ev1)/(ev2) verdes e reprovando contra os dois mutantes (confiar no radarExit declarado; teto 5)"
     x_dissect_level: 4
     x_absorb_target: onion-research
     x_absorb_pieces: "4,7"
@@ -169,7 +171,12 @@ nodes:
     x_absorb_parity: "run_research_workflow_selftests: caso que injeta write(KG) devolvendo radarExit 0 sobre grafo que o radar reprova; tem de REPROVAR hoje e PASSAR depois (o motor re-mede, nao aceita o inteiro do produtor), e o teto de tentativas sai do prompt para constante do JS"
     label: "PLANO N4 — absorver no onion-research o CONCEITO 'quem verifica nao e quem produz, e o teto de correcao e contado pelo motor': peca 4 (workflow) muda, peca 7 (bancada) prova. Forma: reescrita na gramatica da casa, nenhum codigo vendorizado."
     narrative: "Origem e licenca registradas (MIT, sha fixado). A peca que muda e o write(KG): o radar e re-medido por um passo que o produtor nao controla (agente verificador so com Bash e sem Write, ou o proprio substrato se o Workflow permitir rodar comando — medir no PR da absorcao), e o 'max 3 tentativas' vira constante do JS. A rubrica semantica fail-open fica de fora (E_N3_FAIL_OPEN_NAO_TRANSFERE). As pecas que ja existem no alvo NAO estao escritas aqui de proposito: dissect-plans.sh as mede ao vivo no forge-census."
-    trace: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
+    trace: ".claude/workflows/onion-research.js"
+    provenance:
+      source: ".claude/workflows/onion-research.js e .claude/validation/lint-selftest.sh"
+      locator: "bloco // >>> engine-verify … // <<< engine-verify; casos (ev1) e (ev2) de run_research_workflow_selftests"
+      method: "medição: bancada executada com stub que separa escritor e verificador, mais dois mutantes que a reprovam"
+      locality: "repo"
 
   - id: E_DOGFOOD_DISSECT_PARAVA_NO_VEREDITO
     node_type: evidence
