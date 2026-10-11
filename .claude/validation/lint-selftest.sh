@@ -6370,26 +6370,39 @@ run_forced_model_selftests() {
   # (a) a variável NOVA (2.1.296) — o caso que o grep antigo não via
   _fm_run CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL=haiku
   if [ "${rc}" = 1 ] && grep -q '^AVISO: tiering declarado ≠ executado (env force) — CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL=haiku' <<< "${out}"; then
-    record_pass "forced-model: (a) CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL setada → AVISO + rc 1"
+    if [ "$(grep -c '^AVISO:' <<< "${out}")" = 1 ]; then record_pass "forced-model: (a) CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL setada → UM AVISO + rc 1"
+    else record_fail "forced-model: (a) AVISO duplicado" "${out:0:200}"; fi
   else record_fail "forced-model: (a) variável de Workflow" "rc=${rc}: ${out:0:160}"; fi
+  # (a2) sem tr/grep no PATH a checagem NÃO cai em silêncio (fail-open achado pelo refutador)
+  # PATH apontando para um dir VAZIO: com PATH ausente o bash cai num PATH default e acha o tr
+  # (o mutante que devolvia o tr sobreviveu a um `env -i` sem PATH — medido).
+  local nopath; nopath="$(mktemp -d)"
+  rc=0; out="$(env -i PATH="${nopath}" CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1 "${BASH}" "${h}" 2>&1)" || rc=$?
+  rmdir "${nopath}" 2>/dev/null || true
+  if [ "${rc}" = 1 ] && grep -q 'CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1' <<< "${out}"; then record_pass "forced-model: (a2) PATH vazio → ainda AVISO + rc 1 (só builtins)"
+  else record_fail "forced-model: (a2) PATH vazio" "rc=${rc}: ${out:0:160}"; fi
   # (b) FORCE ligada → AVISO com o modelo efetivo (o piso, quando há)
   _fm_run CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1 CLAUDE_CODE_SUBAGENT_MODEL=sonnet
   if [ "${rc}" = 1 ] && grep -q '^AVISO: .*CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1: .* roda em sonnet$' <<< "${out}"; then
     record_pass "forced-model: (b) CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1 → AVISO com o modelo efetivo"
   else record_fail "forced-model: (b) FORCE" "rc=${rc}: ${out:0:160}"; fi
+  # (b2) FORCE sem piso → o modelo efetivo é o principal, e a mensagem diz isso (TRUE maiúsculo vale)
+  _fm_run CLAUDE_CODE_SUBAGENT_MODEL_FORCE=TRUE
+  if [ "${rc}" = 1 ] && grep -q 'roda em o modelo principal da sessão$' <<< "${out}"; then record_pass "forced-model: (b2) FORCE=TRUE sem piso → AVISO nomeia o modelo principal"
+  else record_fail "forced-model: (b2) FORCE sem piso" "rc=${rc}: ${out:0:160}"; fi
   # (c) o piso sozinho NÃO força (desde 2.1.251) — o falso positivo do grep antigo
   _fm_run CLAUDE_CODE_SUBAGENT_MODEL=sonnet
   if [ "${rc}" = 0 ] && [ -z "${out}" ]; then record_pass "forced-model: (c) CLAUDE_CODE_SUBAGENT_MODEL sozinha (piso) → silêncio + rc 0"
   else record_fail "forced-model: (c) piso sozinho" "rc=${rc}: ${out:0:160}"; fi
   # (d) nada setado, FORCE desligada, Workflow vazia → silêncio
   local ok=1 e
-  for e in X=1 CLAUDE_CODE_SUBAGENT_MODEL_FORCE=0 CLAUDE_CODE_SUBAGENT_MODEL_FORCE=false CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL=; do
+  for e in X=1 CLAUDE_CODE_SUBAGENT_MODEL_FORCE=0 CLAUDE_CODE_SUBAGENT_MODEL_FORCE=false CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL= 'CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL= '; do
     _fm_run "${e}"; if [ "${rc}" != 0 ] || [ -n "${out}" ]; then ok=0; record_fail "forced-model: (d) silêncio" "${e} → rc=${rc}: ${out:0:120}"; fi
   done
-  [ "${ok}" = 1 ] && record_pass "forced-model: (d) nenhuma força (vazio, FORCE=0/false, Workflow vazia) → silêncio + rc 0"
+  [ "${ok}" = 1 ] && record_pass "forced-model: (d) nenhuma força (vazio, FORCE=0/false, Workflow vazia ou só espaço) → silêncio + rc 0"
   # (e) nome fora do catálogo falha alto; argumento inválido → rc 2
-  _fm_run CLAUDE_CODE_TEAMMATE_AGENT_MODEL=opus
-  if [ "${rc}" = 1 ] && grep -q 'CLAUDE_CODE_TEAMMATE_AGENT_MODEL=opus (não catalogada' <<< "${out}"; then
+  _fm_run CLAUDE_CODE_TEAMMATE_MODEL=opus
+  if [ "${rc}" = 1 ] && grep -q 'CLAUDE_CODE_TEAMMATE_MODEL=opus (não catalogada' <<< "${out}"; then
     rc=0; bash "${h}" --x >/dev/null 2>&1 || rc=$?
     if [ "${rc}" = 2 ]; then record_pass "forced-model: (e) variável não catalogada → AVISO; argumento → rc 2"
     else record_fail "forced-model: (e) uso inválido" "rc=${rc} (esperado 2)"; fi
@@ -6397,9 +6410,11 @@ run_forced_model_selftests() {
   # (f) o corpus não volta ao grep de substring e cita o helper (skill + KB)
   local hits sk="${REPO_ROOT}/.claude/skills/onion-orchestration/SKILL.md" kb="${REPO_ROOT}/docs/knowledge-base/concepts/agent-orchestration.md"
   # perl -0777: a redação antiga QUEBRAVA a linha no meio do comando (`grep -c` ⏎ `CLAUDE_…`) — grep por
-  # linha não a veria. O padrão casa o `env | grep [-flags] CLAUDE_CODE_SUBAGENT_MODEL` através de quebras.
-  hits="$(cd "${REPO_ROOT}" && git ls-files -z -- '.claude' 'docs/knowledge-base' 'plugins' 2>/dev/null \
-          | xargs -0 -r perl -0777 -ne 'print "$ARGV\n" if /env\s*\|\s*grep(?:\s+-\w+)*\s+CLAUDE_CODE_SUBAGENT_MODEL/' 2>/dev/null || true)"
+  # linha não a veria. O padrão casa o env encanado num grep até UMA quebra de linha e 80 caracteres por
+  # linha antes do nome: pega aspas, flag longa e regex ancorada (escapavam da 1ª redação, refutador).
+  # --others: arquivo novo ainda não rastreado também conta.
+  hits="$(cd "${REPO_ROOT}" && git ls-files -z --cached --others --exclude-standard -- '.claude' 'docs/knowledge-base' 'plugins' 2>/dev/null \
+          | xargs -0 -r perl -0777 -ne 'print "$ARGV\n" if /env\s*\|\s*grep\b[^\n|;]{0,80}(?:\n[^\n|;]{0,80})?CLAUDE_CODE_SUBAGENT_MODEL/' 2>/dev/null || true)"
   if [ -z "${hits}" ] && grep -q 'forced-model-check.sh' "${sk}" && grep -q 'forced-model-check.sh' "${kb}"; then
     record_pass "forced-model: (f) skill e KB citam o helper; nenhum sítio vivo repete o grep de substring"
   else record_fail "forced-model: (f) corpus" "grep antigo em: ${hits:-nenhum}; ou a skill/KB não cita o helper"; fi
