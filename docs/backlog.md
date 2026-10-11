@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**430 itens abertos** em 92 grafo(s) com aberto (de 117 no escopo) · 93 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**429 itens abertos** em 92 grafo(s) com aberto (de 117 no escopo) · 93 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -795,12 +795,11 @@
 | 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
 | 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
 
-## radar-E3-2026-10-11-r9 — 2 item(ns)
+## radar-E3-2026-10-11-r9 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 5.4 | `Q_MEDIR_HOOKS_E_FRONTMATTER_COM_O_DEBUG` | radar-E3-2026-10-11-r9 | medir com o --debug da 2.1.296 a duração dos hooks sem latência medida e as chaves de frontmatter dos agentes, depois de uma al |
-| 4.8 | `Q_CHECAGEM_DE_MODELO_FORCADO_CEGA_A_VARIAVEL_NOVA` | radar-E3-2026-10-11-r9 | ampliar a checagem de modelo forçado da skill onion-orchestration e da KB agent-orchestration para CLAUDE_CODE_WORKFLOW_SUBAGENT_ |
 
 ## kg-id-valid-from-2026-10 — 2 item(ns)
 
