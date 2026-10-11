@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: a316a92840de4e8cd0e8693969fb2630f25a7982409d0065e0e1858d71b3e9b8
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 293f8aebf629d0526f9f944d6ea516c0b4939a65a6d3ec93f8be7aa556dd5402
 findings_total: 19
 findings_real: 7
@@ -14,6 +14,9 @@ nota: >
   de token já tolerado). A 2ª APROVOU COM RESSALVAS e achou que uma cura da 1ª reabria o defeito
   verbatim em prosa. Os sete reais foram curados; os teóricos baratos também; o resto está no teto do
   cabeçalho. 17 casos no selftest, 19 mutantes mordem.
+  Depois do 1º push, o CI reprovou o caso door (g): a fixture do selftest (iii) nomeava um doc de
+  docs/analysis num arquivo que viaja, e o passo (4) do materialize-door abortava a porta antes do
+  ponto medido. Fixture movida para docs/evolution; door + ops_citation_travel 33/33 verdes.
 ---
 
 # Resíduo — `fix/traveling-surfaces-cite-ops`
@@ -76,5 +79,15 @@ Os achados 3 e 4 (pontuação do marcador e do frontmatter) foram curados numa l
 
 Ela vê a FORMA, não o SENTIDO. A citação que descreve o core sem se marcar é acusada igual à que
 descreve o destinatário. A classe descrita sem o token `ops/` passa calada.
+
+## Depois do 1º push — o CI pegou o que a bancada local não exercia
+
+O caso door (g) reprovou no CI: "seguiu calada sem o regenerador". **Causa medida:** a fixture do
+selftest (iii) escrevia num documento NOMEADO de `docs/analysis`, e o arquivo da guarda viaja. O passo
+(4) do materialize-door, a varredura de documento privado nomeado, abortava a porta antes do ponto
+que o caso mede. Não foi o marcador `(core-only)` nem o check: a varredura do passo (4) não olha
+`ops/`. Cura: fixture em `docs/evolution`. Reproduzido antes (door (g) vermelho) e depois (verde) com
+`--families door,ops_citation_travel`. O caso mede o commitado (`--from HEAD`), então a prova exigiu o
+commit.
 
 Passivo na catraca: 31 pares (`arquivo|token|N`).
