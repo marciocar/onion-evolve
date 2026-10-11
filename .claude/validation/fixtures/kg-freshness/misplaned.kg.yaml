@@ -74,6 +74,55 @@ nodes:
     verified_against: branch
     label: "mesmo defeito, mas RECONCILIADO — historia nao se cobra (mesmo racional do STALE)"
 
+  # Sentido da palavra (sinal de campo do adotante onion-kg-ssot, 2026-10-11): `commit` que o gate
+  # BARROU e execucao ao vivo — PROD legitimo. `commit <sha>` e leitura de fonte e segue acusando,
+  # inclusive quando a mesma frase tambem cita um commit-sonda.
+  - id: E_PROD_COMMIT_SONDA_BARRADO
+    node_type: evidence
+    trace: docs/exemplo.md:30
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-10-11
+    verified_against: "commit-sonda que o gate barrou ao vivo (exit 2); o commit recusado nao entrou no historico"
+    label: "commit-sonda barrado e EXECUCAO, nao leitura de fonte — NAO deve disparar"
+
+  - id: E_PROD_HOOK_BLOQUEIA_O_COMMIT
+    node_type: evidence
+    trace: docs/exemplo.md:40
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-10-11
+    verified_against: schema-sabotado-staged-bloqueia-o-commit-e-o-integro-passa
+    label: "hook que bloqueia o commit e execucao (forma do corpus do core) — NAO deve disparar"
+
+  - id: C_PROD_SONDA_MAS_LEU_COMMIT_SHA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-10-11
+    verified_against: "commit-sonda barrado (exit 2) e leitura do commit 5e511195 no historico"
+    label: "frase MISTA: a sonda e execucao, mas o commit <sha> e leitura de fonte — DEVE disparar"
+
+  - id: C_PROD_REPROVADO_NO_COMMIT_SHA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-10-11
+    verified_against: "o gate reprovou o commit 7d104066"
+    label: "verbo de execucao ANTES de commit <sha> (a forma que a limpeza de sentido apagaria) — o sha manda: DEVE disparar"
+
 edges:
   - from: E_PROD_MAS_LEU_COMMIT
     to: C_PROD_MAS_LEU_BRANCH
@@ -85,5 +134,17 @@ edges:
     to: C_PROD_MAS_LEU_BRANCH
     edge_type: DEPENDS_ON
   - from: C_PROD_BRANCH_SUPERSEDED
+    to: C_PROD_MAS_LEU_BRANCH
+    edge_type: DEPENDS_ON
+  - from: E_PROD_COMMIT_SONDA_BARRADO
+    to: C_PROD_MAS_LEU_BRANCH
+    edge_type: SUPPORTS
+  - from: E_PROD_HOOK_BLOQUEIA_O_COMMIT
+    to: C_PROD_MAS_LEU_BRANCH
+    edge_type: SUPPORTS
+  - from: C_PROD_SONDA_MAS_LEU_COMMIT_SHA
+    to: C_PROD_MAS_LEU_BRANCH
+    edge_type: DEPENDS_ON
+  - from: C_PROD_REPROVADO_NO_COMMIT_SHA
     to: C_PROD_MAS_LEU_BRANCH
     edge_type: DEPENDS_ON

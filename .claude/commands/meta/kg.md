@@ -155,7 +155,7 @@ bash .claude/validation/kg-console.sh <arquivo> > grafo.html                    
   `meta.baseline`) · **UNANCHORED** (`node_type: claim` com `verified_at:` mas **sem** `verified_against:` —
   carimbo sem alvo declarado; os demais tipos ancoram por `trace:`/`TRACES_TO` e entram numa linha `ℹ` contada,
   nunca suprimidos em silêncio) · **MISPLANED** (`plane: PROD` com `verified_against: branch|commit` — o nó
-  afirma sobre o **vivo** e declara ter olhado a **fonte**; contradição interna, vale para **todos** os tipos). Cobre nós DEV que rastreiam artefato móvel (branch/commit), não só PROD. Um nó stale
+  afirma sobre o **vivo** e declara ter olhado a **fonte**; contradição interna, vale para **todos** os tipos; `commit` de sentido-**execução** — commit-sonda, commit barrado/recusado pelo gate — não acusa, e `commit <sha>` acusa sempre). Cobre nós DEV que rastreiam artefato móvel (branch/commit), não só PROD. Um nó stale
   **mente**, não corrompe — o veredito é "re-verifique". *Nasceu da lição-mestra do dogfood de campo.*
 - **SCHEMA** (✗ **reprova**, exit 1) = `meta.schema_version` bate com o que o radar entende? Divergência
   = recusa (o radar não sabe ler o arquivo); ausência = ⚠ retrocompat. *Teria pego o fork de ferramenta
