@@ -12,11 +12,11 @@
 
 | Dimensão | Nº | Produtor |
 |---|---:|---|
-| Famílias na bancada | **236** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **1804** | `bash .claude/validation/harness-inventory.sh --env` |
+| Famílias na bancada | **237** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **1808** | `bash .claude/validation/harness-inventory.sh --env` |
 | Regras do lint | **89** | `bash .claude/validation/rules-registry.sh --counts` |
 | — HARD | **77** | `bash .claude/validation/rules-registry.sh --counts` |
-| Pares de modo consumido | **57** | `bash .claude/validation/consumed-mode-check.sh .` |
+| Pares de modo consumido | **58** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | `bash .claude/validation/consumed-mode-check.sh .` |
 | Baselines de catraca | **15** | `git ls-files '.claude/validation/*-baseline.txt'` |
 
@@ -54,15 +54,15 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **472** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados totais | **2539** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados REAIS | **2184** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **473** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados totais | **2548** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados REAIS | **2189** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **86%** | `bash .claude/validation/review-ledger.sh --env` |
-| Tokens por achado REAL | **120932** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **378** | `bash .claude/validation/review-ledger.sh --env` |
+| Tokens por achado REAL | **120719** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **379** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **94** | `bash .claude/validation/review-ledger.sh --env` |
 
-A média de tokens cobre os **255** resíduos com custo > 0; os demais declaram `tokens: 0`
+A média de tokens cobre os **256** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
 não é média — mas seus achados continuam contados no total.
 
