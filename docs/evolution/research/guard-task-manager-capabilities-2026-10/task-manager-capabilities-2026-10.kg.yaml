@@ -1,0 +1,160 @@
+# kg-backlog-guard: on
+# ═══ TETO: 14 NÓS ═══
+meta:
+  id: task-manager-capabilities-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-11"
+  review_after: "2026-11-10"
+  note: "Forja (/meta:forge-guard) da REGRA 103: adapter do task-manager declara todas as capacidades da interface, com fonte (SAC-63, Onda 2 da SDAAL do Task Manager). O fato mora aqui; a matriz e a reconciliação da pergunta da Onda 1 moram no grafo task-manager-vocabulario-2026-10."
+nodes:
+  - id: E_DEFEITO_BULK_DECLARADO_SEM_ADAPTER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-11"
+    verified_against: "grep -n bulk em CLAUDE.md e em .claude/utils/task-manager/ no origin/main 46df6ad6"
+    label: "O DEFEITO (1), DATADO: o CLAUDE.md prescreve lote pelo /issue/bulk do Jira e por endpoints de bulk do ClickUp, e nenhum adapter implementa lote; o jira.md diz que o bulk não é usado ali. A doutrina declara uma capacidade que a abstração não tem."
+    narrative: "O consumidor fala com taskManager.* (REGRA 10), então a prescrição de lote no CLAUDE.md não tem caminho: ou o comando chama o provedor direto (o que a REGRA 10 proíbe), ou faz N chamadas. É a classe 'declara capacidade que não exerce', que o corpus já nomeou como a pior (zoho-glpi-adapters-2026-09, C_OPCAO_B_GLPI_DENTRO_TASK_MANAGER). Nenhuma guarda via, porque a interface não tinha onde dizer o que cada adapter implementa."
+    provenance:
+      source: "CLAUDE.md@46df6ad6"
+      locator: "l.233 (Bulk: usar POST /rest/api/3/issue/bulk) e l.284 (Bulk-first); .claude/utils/task-manager/adapters/jira.md l.782 (não usado aqui); nenhuma ocorrência de bulkCreate nos adapters"
+      method: "medição: grep -n de bulk no CLAUDE.md e nos adapters do task-manager"
+      locality: "repo"
+
+  - id: E_DEFEITO_MAPA_SEM_FONTE_NA_INTERFACE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "leitura de .claude/utils/task-manager/interface.md no origin/main 46df6ad6, tabela de prioridade"
+    label: "O DEFEITO (2), DATADO: a interface publicava o mapa de prioridade do Zoho 'da UI, não medido contra a API' no mesmo formato das colunas medidas, e o Asana como '-', sem dizer qual célula tinha fonte."
+    narrative: "No mesmo dia a Onda 1 achou uma afirmação sem fonte (o /search do Jira 'removido em maio/2025') em 5 superfícies do core, vista só por uma rodada de pesquisa (task-manager-vocabulario-2026-10, Q_JIRA_SEARCH_REMOVAL_RECONCILE). A prosa de adapter não tem campo para 'ninguém mediu isto'; a cura é o campo estruturado (status unverified, coluna source) e a guarda que o cobra."
+    provenance:
+      source: ".claude/utils/task-manager/interface.md@46df6ad6"
+      locator: "seção Mapeamento por Provedor, tabela Prioridade e a nota de que o mapa do Zoho vem da UI"
+      method: "leitura: a interface antes da Onda 2"
+      locality: "repo"
+
+  - id: E_CENSO_SEM_GUARDA_DA_CLASSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "saída do guard-census.sh injetada pelo /meta:forge-guard em 2026-10-11"
+    label: "O censo de 2026-10-11 não achou guarda da classe: 19 moldes de check de lint e 2 de hook, 236 famílias de bancada, nenhum julgando declaração de capacidade de adapter. O mais exercitado dos checks era o ops-citation-travel-check.sh, com 17 casos."
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "seções 'moldes por SUBSTRATO' e 'passivo' da saída de 2026-10-11"
+      method: "medição: censo injetado na carga do /meta:forge-guard"
+      locality: "repo"
+
+  - id: D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/validation/task-manager-capabilities-check.sh"
+    label: "Substrato: check de lint (REGRA 103), HARD, que roda também no repo derivado, porque os adapters viajam. Molde: ops-citation-travel-check.sh, o check mais exercitado do censo (17 casos): saída TSV, dispatcher que acusa 'não rodou' e bancada com mutante por caso."
+    narrative: "A pergunta é de corpus (os arquivos declaram o que deveriam?), não de comando: hook PreToolUse foi descartado. Ao contrário do molde, que pula no derivado (IS_DERIVED: lá não há ops/), esta guarda roda no adotante e nas portas que levam o lint, porque o task-manager viaja inteiro (o vendor-manifest leva .claude/utils e .claude/validation). Na porta onion-mini o task-manager viaja e o lint não: a guarda não roda lá, por desenho da allowlist didática."
+
+  - id: D_FORMATO_TSV_IRMAO_DO_ADAPTER
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    trace: ".claude/utils/task-manager/interface.md"
+    label: "Formato: TSV irmão do adapter (adapters/<p>.capabilities.tsv), com o vocabulário num bloco TSV marcado na interface. Nem YAML nem bloco dentro da prosa."
+    narrative: "TSV se lê com awk, sem depender de PyYAML (cuja falta já produziu falhas fantasmas no gate desta casa), e cada linha é uma afirmação que se cita, se diffa e se conta. Arquivo irmão viaja junto com o adapter e não mistura a declaração com 800 linhas de prosa TypeScript. A fonte é uma ref curta (kg:<id-do-grafo>#<NÓ>), não um caminho: a pesquisa do core não viaja, e um caminho para docs/evolution numa superfície vendorizada seria ponteiro morto."
+
+  - id: E_DOGFOOD_E_MUTANTES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "--selftest com LC_ALL=C (18/18), família run_task_manager_capabilities_selftests (22/22), 20 mutantes pelo mutate-and-restore.sh sobre a guarda real e o dispatcher, com o hash da guarda conferido igual depois"
+    label: "Dezoito casos no --selftest, cada um com mutante que morde (rc 1 e o caso nomeado em vermelho); o mutante do registro (dispatcher sem a chamada) derruba o caso c da bancada. O corpus real sai limpo; uma cópia com três defeitos plantados sai com as quatro HARD esperadas."
+    narrative: "O dogfood pegou dois defeitos meus. (1) Antes da 1ª execução, na leitura: a saída do awk era lida com IFS de TAB, e o read colapsa campos vazios consecutivos, o que deslocaria a coluna seguinte; curado com o separador US (0x1f). (2) Na 1ª rodada do mutate-and-restore.sh, três mutantes não morderam: o marcador ONION_MUTANTE no fim da linha comentava os argumentos do _emit e o ;; do case, e o mutante quebrava a sintaxe em vez de reverter a cura (rc 2). Refeito com o marcador como 1ª expressão; 20 de 20 mordem."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_task_manager_capabilities_selftests, casos a, b, c e m"
+      method: "medição: mutate-and-restore.sh com restauração por hash, e a família rodada com LC_ALL=C"
+      locality: "repo"
+
+  - id: C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    trace: ".claude/validation/task-manager-capabilities-check.sh"
+    label: "TETO: superfície de campo (field:priority, field:tags) é conferida só pela presença da palavra no adapter. Pega o adapter que nem menciona o campo, mas não distingue LER de ESCREVER, e não há conferência reversa para not_implemented de campo."
+
+  - id: C_TETO_METODO_CITADO_EM_PROSA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    trace: ".claude/validation/task-manager-capabilities-check.sh"
+    label: "TETO: superfície de método é o token nome( em qualquer lugar do adapter, inclusive prosa. Um adapter que só cita o método numa frase passa por implementado; um not_implemented cujo método aparece citado reprova."
+
+  - id: C_TETO_FONTE_EXISTE_NAO_SUSTENTA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/validation/task-manager-capabilities-check.sh"
+    label: "TETO: a guarda confere que a fonte EXISTE (nó do grafo, trecho do adapter), não que ela SUSTENTA a afirmação. Um kg: que aponta um nó real sobre outra coisa passa; isso é juízo da passada adversarial, não forma."
+
+  - id: C_TETO_DERIVADO_E_MINI
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.85
+    trace: ".claude/validation/task-manager-capabilities-check.sh"
+    label: "TETO: no repo derivado, a ref kg: cujo grafo não viajou não é conferida (o core a conferiu antes de publicar); na porta onion-mini a guarda não roda, porque o lint não viaja para lá."
+
+edges:
+  - from: E_DEFEITO_BULK_DECLARADO_SEM_ADAPTER
+    to: D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA
+    edge_type: SUPPORTS
+  - from: E_DEFEITO_MAPA_SEM_FONTE_NA_INTERFACE
+    to: D_FORMATO_TSV_IRMAO_DO_ADAPTER
+    edge_type: SUPPORTS
+  - from: E_CENSO_SEM_GUARDA_DA_CLASSE
+    to: D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_E_MUTANTES
+    to: D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA
+    edge_type: SUPPORTS
+  - from: C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA
+    to: D_FORMATO_TSV_IRMAO_DO_ADAPTER
+    edge_type: CONSTRAINS
+  - from: C_TETO_METODO_CITADO_EM_PROSA
+    to: D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA
+    edge_type: CONSTRAINS
+  - from: C_TETO_FONTE_EXISTE_NAO_SUSTENTA
+    to: D_FORMATO_TSV_IRMAO_DO_ADAPTER
+    edge_type: CONSTRAINS
+  - from: C_TETO_DERIVADO_E_MINI
+    to: D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA
+    edge_type: CONSTRAINS
+
+external_edges:
+  # A forma da declaração herda as três claims de síntese da Onda 1 e responde à pergunta-raiz dela.
+  - from: D_FORMATO_TSV_IRMAO_DO_ADAPTER
+    to: "docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml#Q_TASK_MANAGER_VOCABULARY_MATRIX"
+    edge_type: SUPPORTS
