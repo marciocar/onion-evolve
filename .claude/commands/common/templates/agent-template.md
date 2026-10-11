@@ -4,6 +4,11 @@
 
 ## 📋 Estrutura YAML Obrigatória
 
+> **Chaves aceitas = allowlist** (`.claude/validation/agent-frontmatter-keys.tsv`, REGRA 102): os campos
+> oficiais do Claude Code mais as chaves da casa abaixo. O Claude Code **ignora em silêncio** a chave que não
+> reconhece — `tool:` no lugar de `tools:` deixa o agente com todas as ferramentas —, por isso o lint acusa
+> chave fora da lista. Chave nova legítima entra no `.tsv` com origem e leitor.
+
 ```yaml
 ---
 # ═══════════════════════════════════════════════════════════════════════════════
