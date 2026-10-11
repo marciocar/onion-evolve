@@ -249,15 +249,17 @@ for fp in sorted(glob.glob(os.path.join(src, ".claude", "settings*.json"))):
                 cmd = hk.get("command", "")
                 for bn in bundled:
                     if bn in cmd and bn not in [x[0] for x in events.get(event, [])]:
-                        # (basename, matcher) — o matcher do core viaja; sem ele PostToolUse roda em TODA tool (REGRA 73)
-                        events.setdefault(event, []).append((bn, grp.get("matcher")))
+                        # (basename, matcher, onFailure) — o matcher do core viaja; sem ele PostToolUse roda em
+                        # TODA tool (REGRA 73). O onFailure também: sem ele o veto empacotado falha ABERTO quando
+                        # o hook não roda (REGRA 101, SAC-83 — medido ao vivo em 2026-10-11).
+                        events.setdefault(event, []).append((bn, grp.get("matcher"), hk.get("onFailure")))
 result = {"hooks": {}}
 for event, bns in events.items():
     result["hooks"][event] = [
-        ({"matcher": matcher} if matcher else {}) | {"hooks": [{"type": "command", "command": f'bash "${{CLAUDE_PLUGIN_ROOT}}/hooks/{bn}"'}]}
-        for bn, matcher in bns
+        ({"matcher": matcher} if matcher else {}) | {"hooks": [{"type": "command", "command": f'bash "${{CLAUDE_PLUGIN_ROOT}}/hooks/{bn}"'} | ({"onFailure": onf} if onf else {})]}
+        for bn, matcher, onf in bns
     ]
-mapped = {bn for bns in events.values() for bn, _m in bns}
+mapped = {bn for bns in events.values() for bn, _m, _o in bns}
 missing = [bn for bn in bundled if bn not in mapped]
 if missing:
     sys.stderr.write("AVISO assemble: hook(s) sem evento no settings.json do core (NÃO registrados): %s\n" % ", ".join(missing))

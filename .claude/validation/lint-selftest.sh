@@ -19409,13 +19409,16 @@ run_plugin_hooks_resolvable_selftests() {
   mkdir -p "${d}/src/.claude/hooks" "${d}/src/.claude/validation" "${d}/src/.claude/utils/marketplace/verticals"
   printf '#!/usr/bin/env bash\nHERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"\nENGINE="${HERE}/../validation/engine.sh"\n[ -f "$ENGINE" ] || exit 0\nexit 0\n' > "${d}/src/.claude/hooks/g.sh"; chmod +x "${d}/src/.claude/hooks/g.sh"
   printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/src/.claude/validation/engine.sh"
-  printf '{"hooks":{"PostToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"bash \\"$CLAUDE_PROJECT_DIR/.claude/hooks/g.sh\\""}]}]}}\n' > "${d}/src/.claude/settings.json"
+  printf '{"hooks":{"PostToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"bash \\"$CLAUDE_PROJECT_DIR/.claude/hooks/g.sh\\"","onFailure":"block"}]}]}}\n' > "${d}/src/.claude/settings.json"
   printf 'PLUGIN_NAME="hp"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="x"\nKEYWORDS=(x)\nCOMMANDS=()\nAGENTS=()\nUTILS=()\nVALIDATION=(.claude/validation/engine.sh)\nTEMPLATES=()\nSKILLS=()\nHOOKS=(.claude/hooks/g.sh)\nDOCS=()\n' > "${d}/src/.claude/utils/marketplace/verticals/hp.manifest.sh"
   ( cd "${d}/src" && git init -q && git add -A && git commit -qm seed ) >/dev/null 2>&1
   bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/hp.manifest.sh" "${d}/src" "${d}/src/plugins/hp" >/dev/null 2>&1 || true
   # (a) hooks.json gerado carrega o matcher do core
   if grep -q '"matcher": "Bash"' "${d}/src/plugins/hp/hooks/hooks.json" 2>/dev/null; then record_pass "plugin-hooks-resolvable: (a) hooks.json gerado carrega o matcher do core"
   else record_fail "plugin-hooks-resolvable: (a) matcher" "$(cat "${d}/src/plugins/hp/hooks/hooks.json" 2>/dev/null | tr -d '\n ' | cut -c1-160)"; fi
+  # (d) o onFailure do core também viaja (REGRA 101, SAC-83): sem ele o veto empacotado falha ABERTO se não rodar
+  if grep -q '"onFailure": "block"' "${d}/src/plugins/hp/hooks/hooks.json" 2>/dev/null; then record_pass "plugin-hooks-resolvable: (d) hooks.json gerado carrega o onFailure do core"
+  else record_fail "plugin-hooks-resolvable: (d) onFailure" "$(cat "${d}/src/plugins/hp/hooks/hooks.json" 2>/dev/null | tr -d '\n ' | cut -c1-160)"; fi
   # (b) modo consumido: --format tsv vazio no plugin correto
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
   if [ -z "${out}" ]; then record_pass "plugin-hooks-resolvable: (b) --format tsv vazio (hook + motor + matcher resolvem)"
@@ -19424,9 +19427,12 @@ run_plugin_hooks_resolvable_selftests() {
   rm -f "${d}/src/plugins/hp/validation/engine.sh"
   printf 'ENGINE="$REPO/${CLAUDE_PLUGIN_ROOT}/validation/engine.sh"\n' >> "${d}/src/plugins/hp/hooks/g.sh"
   sed -i 's/"matcher": "Bash",//' "${d}/src/plugins/hp/hooks/hooks.json"
+  python3 -I -B -c 'import json,sys; p=sys.argv[1]; d=json.load(open(p))
+[h.pop("onFailure", None) for v in d["hooks"].values() for g in v for h in g["hooks"]]
+json.dump(d, open(p, "w"), indent=2)' "${d}/src/plugins/hp/hooks/hooks.json"
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q "motor-ausente" && printf '%s' "${out}" | grep -q "repo-prefixado" && printf '%s' "${out}" | grep -q "matcher-divergente"; then
-    record_pass "plugin-hooks-resolvable: (c) mutante → motor-ausente + repo-prefixado + matcher-divergente"
+  if printf '%s' "${out}" | grep -q "motor-ausente" && printf '%s' "${out}" | grep -q "repo-prefixado" && printf '%s' "${out}" | grep -q "matcher-divergente" && printf '%s' "${out}" | grep -q "onfailure-divergente"; then
+    record_pass "plugin-hooks-resolvable: (c) mutante → motor-ausente + repo-prefixado + matcher-divergente + onfailure-divergente"
   else record_fail "plugin-hooks-resolvable: (c) mutante" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-240)"; fi
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
   rm -rf "${d}"
@@ -26203,6 +26209,68 @@ EOF_MUT
   rm -rf "${sb}"
 }
 _family run_ops_citation_travel_selftests
+
+# REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block) — SAC-83, medido ao vivo em 2026-10-11 (CC
+# 2.1.296, `claude -p` em sandbox): PreToolUse com script ausente saiu 127 e a ação RODOU; com onFailure: block
+# barrou. Casos: (a) as polaridades do --selftest · (b) o modo que o lint consome, no settings.json REAL · (c) o
+# dispatcher de produção sobre o settings de ANTES da cura (os 3 vetos sem o campo) · (m) UM MUTANTE POR CASO,
+# na CÓPIA da guarda — mutante que não se aplica é FALHA, nunca verde por vacuidade.
+run_veto_onfailure_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/veto-onfailure-check.sh"
+  [ -f "${chk}" ] || { record_fail "veto-onfailure" "guarda ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "veto-onfailure: python3 ausente"; return; }
+  local o rc
+  # (a) o --selftest próprio
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 11/11 verdes' <<< "${o}"; then
+    record_pass "veto-onfailure: (a) --selftest verde (11 casos: veto sem/com block, aviso, comentário, função, exit 20, inválido, async, ausente, ilegível, fora do PreToolUse)"
+  else record_fail "veto-onfailure: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no settings.json real: os 3 vetos declaram block → tsv vazio, rc 0.
+  #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/veto-onfailure-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then
+    record_pass "veto-onfailure: (b) settings.json real → rc 0, nenhum veto sem onFailure"
+  else record_fail "veto-onfailure: (b) settings.json real" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
+  # (c) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, sobre o settings de ANTES da cura (o campo removido dos
+  #     3 vetos), emite a REGRA 101 para cada um — e não para o kg-read-leg (aviso).
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  python3 -I -B -c 'import json,sys; d=json.load(open(sys.argv[1]))
+for g in d["hooks"]["PreToolUse"]:
+    for h in g["hooks"]: h.pop("onFailure", None)
+json.dump(d, open(sys.argv[2], "w"), indent=2)' "${REPO_ROOT}/.claude/settings.json" "${sd}/settings.json"
+  local l; l="$(cd "${REPO_ROOT}" && ONION_SETTINGS_JSON="${sd}/settings.json" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/settings.json" 2>&1 || true)"
+  local n; n="$(grep -c 'REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block): \[veto-sem-onfailure\]' <<< "${l}" || true)"
+  if [ "${n}" -eq 3 ] && ! grep -q 'REGRA 101.*kg-read-leg' <<< "${l}"; then
+    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 3 vetos de antes da cura, e cala no aviso"
+  else record_fail "veto-onfailure: (c) dispatcher" "n=${n}; $(grep -E 'REGRA 101' <<< "${l}" | head -4 | cut -c1-160 | tr '\n' '|')"; fi
+  rm -rf "${sd}"
+  # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"; mkdir -p "${sb}/.claude/validation"
+  local s="${sb}/.claude/validation/veto-onfailure-check.sh" old new want mo mrc
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cp "${chk}" "${s}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${s}" "${old}" "${new}"; then
+      record_fail "veto-onfailure: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "veto-onfailure: (m) mutante morde → ✗ ${want}"
+    else record_fail "veto-onfailure: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<EOF_MUT
+        if v and of != "block":$(printf '\x1f')        if v and of == "nunca":$(printf '\x1f')(i) veto sem onFailure acusa
+        if not s or s.startswith("#"):$(printf '\x1f')        if not s:$(printf '\x1f')(iii) aviso sem block cala
+        code = re.split(r'\s#', line, maxsplit=1)[0]$(printf '\x1f')        code = line$(printf '\x1f')(iii) aviso sem block cala
+        elif (not v) and of == "block":$(printf '\x1f')        elif False:$(printf '\x1f')(iv) aviso com block é SOFT
+exit[ \t]+2(?=\$|[\s;&|})#])$(printf '\x1f')exit[ \t]+2$(printf '\x1f')(vi) exit 20 não é veto
+        if of is not None and of not in ("continue", "block"):$(printf '\x1f')        if False:$(printf '\x1f')(vii) onFailure inválido acusa
+        if hk.get("async") or hk.get("asyncRewake"):$(printf '\x1f')        if False:$(printf '\x1f')(viii) hook async isento
+    sys.stderr.write(f"veto-onfailure-check: settings não parseia: {e}\n"); sys.exit(2)$(printf '\x1f')    sys.stderr.write(f"veto-onfailure-check: settings não parseia: {e}\n"); sys.exit(0)$(printf '\x1f')(x) settings ilegível sai 2
+for grp in ((hooks or {}).get("PreToolUse") or []):$(printf '\x1f')for grp in [g for v in (hooks or {}).values() for g in (v or [])]:$(printf '\x1f')(xi) fora do PreToolUse cala
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_veto_onfailure_selftests
 
 # Modo kg-migrate-v3 — SAC-73 parte 1: a ferramenta de migração do corpus ao contrato v3
 # (.claude/utils/kg/kg-migrate-v3.py) cita datas, deriva provenance SÓ de fonte que o nó já traz,

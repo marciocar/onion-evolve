@@ -7,7 +7,8 @@
 #           com `$REPO/${CLAUDE_PLUGIN_ROOT}` (variável absoluta prefixada — sempre inválido);
 #           (3) todo `${CLAUDE_PLUGIN_ROOT}/<x>` citado DENTRO de um script de hook existe no plugin
 #           (o motor que o hook chama viajou?); (4) o `matcher` de cada evento espelha o do
-#           settings.json do core para o mesmo script (sem matcher, PostToolUse roda em TODA tool).
+#           settings.json do core para o mesmo script (sem matcher, PostToolUse roda em TODA tool);
+#           (5) o `onFailure` também espelha o do core (SAC-83: veto sem block falha ABERTO se não roda).
 #
 # POR QUÊ : medido 2026-09-04: `plugins/onion/hooks/aside-router-hook.sh:24` fazia
 #           ENGINE="$REPO/${CLAUDE_PLUGIN_ROOT}/validation/aside-router.sh" e o motor não estava
@@ -17,7 +18,7 @@
 #
 # USO     : plugin-hooks-check.sh [REPO] [--format text|tsv] [--summary] | --selftest
 # SAÍDA   : HARD<TAB><classe><TAB><rel><TAB><msg>   classes: script-ausente · repo-prefixado ·
-#           motor-ausente · matcher-divergente   · vazio = limpo
+#           motor-ausente · matcher-divergente · onfailure-divergente   · vazio = limpo
 # =============================================================================
 set -u
 MODE="check"; FORMAT="text"; SUMMARY=0; REPO=""
@@ -42,6 +43,7 @@ rows = []
 PR = "${CLAUDE_PLUGIN_ROOT}"
 # matchers do core por basename do script
 core_match = {}
+core_onf = {}   # onFailure do core por (evento, script): o veto empacotado herda o fail-closed (REGRA 101)
 try:
     st = json.load(open(os.path.join(repo, ".claude", "settings.json"), encoding="utf-8"))
     for ev, lst in (st.get("hooks") or {}).items():
@@ -49,7 +51,9 @@ try:
             for hk in entry.get("hooks") or []:
                 bn = os.path.basename(hk.get("command", "").strip().rstrip('"').split('"')[-1].split()[0]) if hk.get("command") else ""
                 m = re.search(r'/([A-Za-z0-9_.-]+\.sh)', hk.get("command", ""))
-                if m: core_match[(ev, m.group(1))] = entry.get("matcher")
+                if m:
+                    core_match[(ev, m.group(1))] = entry.get("matcher")
+                    core_onf[(ev, m.group(1))] = hk.get("onFailure")
 except Exception:
     pass
 pdir = os.path.join(repo, "plugins")
@@ -76,6 +80,9 @@ if os.path.isdir(pdir):
                     cm = core_match.get((ev, bn), "__none__")
                     if cm != "__none__" and (entry.get("matcher") or None) != (cm or None):
                         rows.append(("HARD", "matcher-divergente", rel_hj, f"{ev}/{bn}: matcher do plugin={entry.get('matcher')!r} ≠ core={cm!r} (sem matcher, PostToolUse roda em TODA tool)"))
+                    co = core_onf.get((ev, bn), "__none__")
+                    if co != "__none__" and (hk.get("onFailure") or None) != (co or None):
+                        rows.append(("HARD", "onfailure-divergente", rel_hj, f"{ev}/{bn}: onFailure do plugin={hk.get('onFailure')!r} ≠ core={co!r} (sem block, o veto empacotado falha ABERTO quando o hook não roda; REGRA 101)"))
                     txt = open(script, encoding="utf-8", errors="surrogateescape").read()
                     rel_s = os.path.relpath(script, repo)
                     for i, line in enumerate(txt.splitlines(), 1):
