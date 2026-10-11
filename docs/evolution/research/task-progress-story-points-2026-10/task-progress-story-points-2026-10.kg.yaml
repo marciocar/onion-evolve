@@ -1,0 +1,177 @@
+# kg-backlog-guard: on
+# ═══ TETO: 10 NÓS ═══
+meta:
+  id: task-progress-story-points-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-11"
+  review_after: "2026-11-10"
+  note: "Onda 3 da SDAAL do Task Manager (SAC-64): o % de progresso da task-mãe passa a ser a soma dos story points das subtasks feitas sobre o total, com contagem declarada quando faltam pontos. A regra mora na interface (derivação progress); o helper .claude/utils/task-manager/progress.sh a executa. O programa (Q_TASK_MANAGER_SDAAL_COMPLETO) segue aberto no grafo da fila de 2026-10-06."
+# Arestas para nó de OUTRO grafo (contrato v4.3). A fila de 2026-10-06 está no teto de 30 nós, então o
+# nó que a supera mora aqui e aponta para ela.
+external_edges:
+  - from: E_PERCENTUAL_PONDERADO_E_DECLARADO
+    to: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml#E_TM_PERCENTUAL_IGNORA_STORY_POINTS"
+    edge_type: SUPERSEDES
+  - from: E_PERCENTUAL_PONDERADO_E_DECLARADO
+    to: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml#Q_TASK_MANAGER_SDAAL_COMPLETO"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_DEFEITO_PERCENTUAL_SEM_METODO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "git grep no origin/main 9ef87725: zoho.md l.325 e o bloco TaskOutput de types.md"
+    label: "O DEFEITO, re-medido antes da cura: o único % gravado (Zoho) pesava as fases do plano por igual; o TaskOutput não tinha storyPoints, então nenhum adapter podia devolver pontos na leitura; e nada dizia por qual método o número saía."
+    narrative: "Confirma o nó da fila (E_TM_PERCENTUAL_IGNORA_STORY_POINTS, 2026-10-07) e acrescenta o que ele não viu: a falta era também de TIPO. storyPoints existia só nos tipos de entrada (Create/UpdateTaskInput, Onda 2); a saída não o carregava. Ponderar por pontos era impossível pela interface, não só esquecido. E o /engineer:work mandava atualizar o progresso % do plan.md sem dizer como calcular, o que deixava a conta a cargo de quem lesse a prosa."
+    provenance:
+      source: ".claude/utils/task-manager/adapters/zoho.md@9ef87725"
+      locator: "zoho.md l.325 (n proporcional às fases concluídas do plano); types.md, interface TaskOutput (termina em timeSpent, sem storyPoints); engineer/work.md l.37 (progresso % sem fórmula)"
+      method: "medição: git grep sobre origin/main 9ef87725"
+      locality: "repo"
+
+  - id: D_PROGRESS_E_DERIVACAO_COM_HELPER
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "a regra na interface e o helper que a executa, conferidos pela família run_task_progress_selftests"
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/utils/task-manager/progress.sh"
+    label: "A regra mora em UM lugar, a interface (derivação progress, com a tabela de bordas), e quem a executa é um helper determinístico com --selftest. Os consumidores citam o helper e não refazem a conta em prosa."
+    narrative: "Prosa que descreve uma fórmula é declaração; helper que a executa é comportamento. Um helper que recebe a lista já normalizada (id, status canônico, storyPoints) não depende de provedor, então não é capacidade de adapter e não ganha linha nos capabilities.tsv. O que depende do adapter é LER os pontos, e isso virou capacidade própria."
+    provenance:
+      source: ".claude/utils/task-manager/interface.md"
+      locator: "seção Derivação progress (tabela de bordas) e o cabeçalho de progress.sh"
+      method: "leitura: a regra na interface e o helper que a executa, conferidos pela família run_task_progress_selftests"
+      locality: "repo"
+
+  - id: D_LEITURA_DE_PONTOS_E_CAPACIDADE_PROPRIA
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "task-manager-capabilities-check.sh sobre o corpus, saída vazia"
+    impact: 3
+    confidence: 0.8
+    trace: ".claude/utils/task-manager/interface.md"
+    label: "Ler os story points virou a capacidade estimate.points_read, separada de estimate.points (escrever), declarada not_implemented nos 5 adapters, com TaskOutput.storyPoints no tipo de saída."
+    narrative: "Um adapter pode escrever pontos e não lê-los, ou o contrário; uma capacidade só para os dois esconderia isso. Declarada not_implemented nos cinco porque nenhum mapeamento de leitura traz o campo; onde a Onda 1 ancorou o suporte do lado do provedor (points nativo do ClickUp, estimate do Linear), a fonte kg: aponta para ele. Consequência honesta: na prática o progresso sai por contagem hoje, e o helper diz isso. A superfície de campo herda o teto da REGRA 103 (C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA no grafo da Onda 2): presença da palavra, sem distinguir ler de escrever."
+    provenance:
+      source: ".claude/utils/task-manager/interface.md"
+      locator: "bloco de capacidades (linha estimate.points_read) e os 5 adapters/*.capabilities.tsv"
+      method: "medição: task-manager-capabilities-check.sh sobre o corpus, saída vazia"
+      locality: "repo"
+
+  - id: D_MIXED_CAI_NA_CONTAGEM
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "--selftest com LC_ALL=C"
+    impact: 3
+    confidence: 0.75
+    trace: ".claude/utils/task-manager/progress.sh"
+    label: "Pontos incompletos (algumas subtasks com pontos, outras sem) dão método mixed e % pela contagem, nomeando os ids sem pontos. Nem ponderar só as pontuadas, nem imputar a média."
+    narrative: "Ponderar só as pontuadas dá peso zero a trabalho real (uma subtask grande sem estimativa sumiria do %); imputar a média inventaria pontos que ninguém estimou, contra a regra de não inventar da interface. A contagem é a base neutra, e o rótulo, com os ids, diz o que falta para ponderar. Pontos todos 0 também caem na contagem, com o motivo, porque não há o que ponderar."
+    provenance:
+      source: ".claude/utils/task-manager/progress.sh"
+      locator: "casos c, c2, d e d2 do --selftest"
+      method: "medição: --selftest com LC_ALL=C"
+      locality: "repo"
+
+  - id: E_PERCENTUAL_PONDERADO_E_DECLARADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "progress.sh --selftest com 30 casos verdes; família run_task_progress_selftests da bancada verde com LC_ALL=C"
+    trace: ".claude/utils/task-manager/progress.sh"
+    label: "O % da task-mãe agora é derivado: pontos das subtasks feitas sobre o total quando todas têm pontos (5 de 8 dá 62, a contagem daria 66), contagem declarada quando não, cancelada fora, n/a sem subtasks, e entrada inválida reprova com rc 2."
+    narrative: "O % da task-mãe agora é derivado: soma dos pontos das subtasks feitas sobre o total quando todas têm pontos (5 de 8 pontos dá 62, onde a contagem daria 66), contagem declarada quando não têm, cancelada fora do total, n/a sem subtasks, 100 só com tudo feito, e entrada inválida reprova com rc 2 em vez de virar 0% calado. Supera E_TM_PERCENTUAL_IGNORA_STORY_POINTS da fila de 2026-10-06. Os consumidores (fragmento de auto-update, /engineer:work, o completion_percentage do Zoho, a nota de checklist do ClickUp e a completude do /product:task-check) citam o helper; a bancada cobra a citação e reprova a fórmula das fases viva no Zoho. A linha declared: vai no comentário de progresso junto do número."
+    provenance:
+      source: ".claude/utils/task-manager/progress.sh"
+      locator: "casos a a k do --selftest; casos a, b, b2, b3, b4, c, d e m de run_task_progress_selftests em .claude/validation/lint-selftest.sh"
+      method: "medição: --selftest e a família da bancada rodados com LC_ALL=C em 2026-10-11"
+      locality: "repo"
+
+  - id: E_PROGRESS_MUTANTES_MORDEM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "16 mutantes na cópia do helper dentro da bancada e 8 pelo mutate-and-restore.sh sobre os arquivos reais, com a restauração conferida por hash"
+    label: "Cada cura do helper tem mutante que morde (16 na bancada), e quatro consumidores também: a fórmula das fases de volta no Zoho, o /engineer:work sem o helper, o % fixo de volta no /engineer:pre-pr e um adapter sem a linha estimate.points_read."
+    narrative: "Cada cura tem mutante que morde: ignorar os pontos (volta à contagem calada), trocar o rótulo mixed por count, apagar a linha declared:, contar a cancelada, tirar o teto de 99, dividir por soma 0, aceitar status fora do vocabulário, tratar lista vazia, ler o traço como ponto; e, fora do helper, a fórmula das fases de volta no Zoho, o /engineer:work sem o helper e um adapter sem a linha estimate.points_read. O primeiro mutante pelo mutate-and-restore.sh mostrou uma fragilidade minha: o ramo que declara 'todas têm 0 ponto' dependia da ORDEM dos ramos (só era verdade porque o ramo anterior pegava soma > 0). Com o ramo de story points desligado, a frase afirmava uma causa falsa. Curado tornando a condição explícita (pointed == total e soma 0) e o último ramo exclusivo (0 < pontuadas < total)."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_task_progress_selftests, caso m (16 mutantes); mutate-and-restore.sh sobre progress.sh, zoho.md, engineer/work.md, engineer/pre-pr.md e jira.capabilities.tsv"
+      method: "medição: mutantes com rc 1 e o caso nomeado em vermelho; restauração conferida por hash"
+      locality: "repo"
+
+  - id: E_ELENXO_REPROVOU_E_FOI_CURADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "refutador com veredito default reprovado, fixtures em mktemp, sobre a 1ª versão da branch; curas re-medidas pelo --selftest (30 casos) e pela família da bancada com 16 mutantes"
+    label: "Elenxo (2026-10-11) REPROVOU a 1ª versão por dois achados: um id que começa com # sumia como comentário e a frase declarava 'nenhuma subtask', e o /engineer:pre-pr ainda gravava 90% à mão. Mais oito menores. Curados no mesmo laço."
+    narrative: "Bloqueantes: (1) o helper pulava toda linha iniciada por # (ids no formato #123, que o próprio /engineer:work escreve), e com duas subtasks devolvia method none e 'nenhuma subtask', rc 0: fallback calado com frase falsa. Cura: comentário só é a linha com # e SEM TAB. (2) o /engineer:pre-pr mandava 'Atualizar progresso para 90%', fora da migração e fora da bancada. Cura: passo pela derivação, e a bancada reprova o % fixo de volta. Menores curados: épsilon do arredondamento sem caso (0,57 de 1 ponto dava 56 sem ele); estouro de float saía nan com rc 0 (pontos limitados a 999999); coluna a mais aceita (ponderaria pelo campo errado); argumento vazio caía na entrada padrão; o 99 forçado não se explicava na frase; frases de cancelada e de 'e mais N' sem caso; o /engineer:work usava progress sem atribuí-lo e imprimiria 'n/a%'; o template de exibição por fases ganhou o rótulo. Linha morta (forçar 100 com tudo feito) removida: nenhum mutante a distinguia. Teto aceito: a capacidade de leitura tem a mesma superfície de campo da escrita, e a guarda não distingue (registrado na interface)."
+    provenance:
+      source: ".claude/utils/task-manager/progress.sh"
+      locator: "casos h3, h4, i6, i7, j, k, k2, k3 e k4 do --selftest; casos b4 e c de run_task_progress_selftests"
+      method: "juízes: refutador com mandato de % errado em borda e fallback silencioso; curas re-medidas por --selftest e mutantes"
+      locality: "repo"
+
+  - id: C_TETO_STATUS_BINARIO_POR_SUBTASK
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    trace: ".claude/utils/task-manager/progress.sh"
+    label: "TETO: o status é binário por subtask (meio feita conta como não feita), e numa task-mãe de task-mãe cada filha entra com os próprios pontos e o próprio status, não com o % dela."
+
+  - id: Q_ADAPTER_LER_STORY_POINTS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Qual adapter passa primeiro a ler os pontos (estimate.points_read) e com que medição? ClickUp e Linear têm campo nativo ancorado pela Onda 1; o Jira depende do id do campo custom de cada instância. Até lá o progresso sai por contagem, declarado."
+
+edges:
+  - from: E_DEFEITO_PERCENTUAL_SEM_METODO
+    to: D_PROGRESS_E_DERIVACAO_COM_HELPER
+    edge_type: SUPPORTS
+  - from: E_DEFEITO_PERCENTUAL_SEM_METODO
+    to: D_LEITURA_DE_PONTOS_E_CAPACIDADE_PROPRIA
+    edge_type: SUPPORTS
+  - from: D_PROGRESS_E_DERIVACAO_COM_HELPER
+    to: E_PERCENTUAL_PONDERADO_E_DECLARADO
+    edge_type: SUPPORTS
+  - from: D_MIXED_CAI_NA_CONTAGEM
+    to: E_PERCENTUAL_PONDERADO_E_DECLARADO
+    edge_type: SUPPORTS
+  - from: E_PROGRESS_MUTANTES_MORDEM
+    to: E_PERCENTUAL_PONDERADO_E_DECLARADO
+    edge_type: SUPPORTS
+  - from: E_ELENXO_REPROVOU_E_FOI_CURADO
+    to: E_PERCENTUAL_PONDERADO_E_DECLARADO
+    edge_type: SUPPORTS
+  - from: C_TETO_STATUS_BINARIO_POR_SUBTASK
+    to: E_PERCENTUAL_PONDERADO_E_DECLARADO
+    edge_type: CONSTRAINS
+  - from: D_LEITURA_DE_PONTOS_E_CAPACIDADE_PROPRIA
+    to: Q_ADAPTER_LER_STORY_POINTS
+    edge_type: SUPPORTS

@@ -281,6 +281,10 @@ interface TaskOutput {
   
   /** Tempo gasto (minutos) */
   timeSpent?: number;
+
+  /** Story points LIDOS do provedor. Capacidade estimate.points_read (not_implemented nos 5 adapters em
+   *  2026-10-11): ausente = sem pontos, e a derivação `progress` (progress.sh) cai na contagem declarando. */
+  storyPoints?: number;
 }
 ```
 

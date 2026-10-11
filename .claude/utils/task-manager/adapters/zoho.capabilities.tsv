@@ -16,6 +16,7 @@ hierarchy.epic	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para de
 status.transition	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§No layout PADRÃO não há `In Progress`	PATCH status {id} ou completion_percentage, medido em 2026-10-07; teto: um portal no layout padrão. O nó E_ZOHO_SEM_ENDPOINT_TRANSICAO não é fonte: ele afirma escrita por custom_status, que o adapter mediu recusar
 priority.set	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	o mapa da interface vem da UI e não foi medido contra a API; o adapter não envia
 estimate.points	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	
+estimate.points_read	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	pontos não ancorados; o adapter não lê, então o progresso sai por contagem (progress.sh declara)
 estimate.time	optional	not_implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	-	owners_and_work traz total_work; não mapeado
 comment.add	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§o campo é `comment`	markdown simples
 comment.list	required	implemented	v3 (/api/v3/portal/{id}); V2 só para descobrir o portal	adapter:zoho.md§"comments": [...]	

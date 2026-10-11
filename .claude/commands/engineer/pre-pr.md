@@ -54,7 +54,7 @@ Os quatro agentes abaixo são **independentes** — execute-os como uma **orques
 5. **Validar critérios de aceitação** - Verificar todos os checkboxes
 6. **Adicionar comentário de preparação** no Task Manager configurado automaticamente (conforme `TASK_MANAGER_PROVIDER`)
 7. **Aplicar tags** (ready-for-pr ou needs-fixes)
-8. **Atualizar progresso** para 90%
+8. **Atualizar progresso** pela derivação `progress` (`bash .claude/utils/task-manager/progress.sh <subtasks.tsv>`), com a linha `declared:` no comentário — nunca um % fixo à mão (até 2026-10-11 este passo gravava 90%)
 
 Você também precisará lidar com todo o feedback que esses agentes fornecerem e fazer mudanças e correções conforme necessário.
 

@@ -14,6 +14,7 @@ hierarchy.epic	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	épico 
 status.transition	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_CLOUD_STATUS_VIA_TRANSITION	só o POST de transição do Cloud está ancorado; o GET /transitions que o adapter faz antes, a transição no DC e a obrigatoriedade (E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN) não
 priority.set	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	Highest/High/Medium/Low do esquema padrão; prioridade não ancorada
 estimate.points	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	story points no Jira é campo custom, não ancorado; o adapter não envia
+estimate.points_read	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	story points no Jira é campo custom (id por instância), não ancorado; o adapter não lê, então o progresso sai por contagem (progress.sh declara)
 estimate.time	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	timetracking.originalEstimate; não ancorado
 comment.add	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_DC_COMMENT_BODY_STRING	DC: corpo string ancorado; Cloud: ADF do comentário sem âncora (E_ELENXO_JIRA_COMMENT_ADF_UNANCHORED)
 comment.list	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_DC_RENDEREDBODY_EXPAND_OPTIN	renderedBody (HTML) só sob expand no DC; leitura no Cloud não ancorada

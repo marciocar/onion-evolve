@@ -35,6 +35,9 @@ timestamp + status; offline → registrar em `plan.md`/`notes.md`, sem persistir
 
 **Gatilho deste comando:** a cada FASE concluída → comentário de progresso +
 `updateStatus(subtaskId, 'done')` + atualização do `plan.md` (status, decisões, progresso %).
+O **progresso %** é o da derivação `progress` (story points das subtasks feitas ÷ total; sem pontos,
+contagem declarada): `bash .claude/utils/task-manager/progress.sh <subtasks.tsv>` — e a linha
+`declared:` vai junto do número no comentário da task principal (ver o fragmento acima).
 
 ### **🔗 CRITICAL: Phase→Subtask Mapping**
 **OBRIGATÓRIO**: Quando uma fase é completada, o sistema deve:
@@ -84,9 +87,15 @@ ${decisions.map(d => `   ∟ ${d}`).join('\n')}
   // 3. Atualizar STATUS da SUBTASK
   await taskManager.updateStatus(subtaskId, 'done');
 
+  // 3b. Progresso da task-mãe: DEPOIS do update, com as subtasks relidas (antes, sai defasado em uma).
+  //     getSubtasks(mainTaskId) → linhas id<TAB>status<TAB>storyPoints → progress.sh → { percent, method, declared }
+  const progress = derive(await taskManager.getSubtasks(mainTaskId)); // bash .claude/utils/task-manager/progress.sh
+  const progressLine = progress.method === 'none' ? progress.declared : `${progress.percent}% · ${progress.declared}`;
+
   // 4. Comentário RESUMIDO na TASK PRINCIPAL
   await taskManager.addComment(mainTaskId, `
 📝 PROGRESSO: Fase ${phaseNum}/${totalPhases} Completada
+📈 ${progressLine}
 
 ✅ ${phaseName} - Concluída
    ∟ Subtask: #${subtaskId}

@@ -14,6 +14,7 @@ hierarchy.epic	optional	not_implemented	1.0	-	projects/sections não ancorados
 status.transition	required	unverified	1.0	-	completed true/false; status por section ou custom field não ancorado
 priority.set	optional	not_implemented	1.0	-	sem prioridade nativa no adapter (custom field); não ancorado
 estimate.points	optional	not_implemented	1.0	-	estimativa não ancorada
+estimate.points_read	optional	not_implemented	1.0	-	estimativa não ancorada; o adapter não lê, então o progresso sai por contagem (progress.sh declara)
 estimate.time	optional	not_implemented	1.0	-	
 comment.add	required	implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_STORY_TEXT_OR_HTML	story com text; o markdown canônico chega como texto puro (html_text não usado)
 comment.list	required	unverified	1.0	-	

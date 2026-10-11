@@ -32,6 +32,28 @@ Ao registrar progresso de um item com subtasks:
 Sem hierarquia de subtask, registrar um único comentário na task.
 Use `updateStatus(taskId, ...)` via adapter quando o evento muda o estado da task.
 
+## 📈 % de progresso da task-mãe (derivado, nunca à mão)
+
+O % da task com subtasks é a **derivação `progress`** da interface
+([`interface.md`](../../../utils/task-manager/interface.md#derivação-progress--o--da-task-mãe-por-story-points)):
+soma dos **story points** das subtasks feitas sobre o total; sem pontos, cai na **contagem** e diz.
+Quem calcula é o helper determinístico — o comando não refaz a conta em prosa:
+
+```bash
+# uma linha por subtask (de getSubtasks): id<TAB>status canônico<TAB>storyPoints (vazio = sem pontos)
+bash .claude/utils/task-manager/progress.sh subtasks.tsv
+# percent=62  method=story_points  done=2  total=3  excluded=0  done_points=5  total_points=8  unpointed=0
+# declared: progresso por story points: 5 de 8 pontos (2 de 3 subtasks feitas)
+```
+
+- **A linha `declared:` vai no comentário resumido da task principal**, junto do número. `method` é
+  `story_points`, `count`, `mixed` (pontos incompletos: conta, e nomeia quem não tem pontos) ou `none`
+  (sem subtasks no total: vale o status da própria task).
+- rc 2 = entrada inválida (status fora do vocabulário, pontos negativos ou não numéricos): **não**
+  grave % nenhum; corrija a lista.
+- Hoje nenhum adapter lê os pontos (`estimate.points_read` é `not_implemented` nos cinco), então o
+  método sai `count` — e o comentário diz isso, em vez de apresentar contagem como se fosse ponderação.
+
 ## 📝 Requisitos de todo comentário
 
 - **Timestamp + status** obrigatórios no rodapé.

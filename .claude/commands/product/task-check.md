@@ -296,6 +296,10 @@ ativo via adapter; comentário formatado por provider; timestamp + status; offli
 
 ### **⚠️ Confirmação Necessária PARA:**
 - **Mudança de status para 'Done'** quando verificação indica 100% completo
+
+> A **Completude** deste comando é a da verificação do código contra os critérios. O **progresso** da
+> task-mãe sobre as subtasks é outra grandeza, a derivação `progress` (`.claude/utils/task-manager/progress.sh`,
+> story points ou contagem declarada). Quando citar as duas, rotule cada uma.
 - **Mudança de prioridade** se análise indica urgência diferente
 - **Quebra em subtasks** se escopo for muito complexo
 - **Reatribuição** se detectar que precisa de skills diferentes

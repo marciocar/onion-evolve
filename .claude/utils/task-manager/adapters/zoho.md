@@ -322,8 +322,11 @@ que é "feito".
 **O mecanismo, por status canônico:**
 
 - **`in_progress`** → se o mapa conhecido tiver um status de nome `In Progress`, use o id dele. Senão,
-  **mantenha `Open`** e grave `PATCH {"completion_percentage": <n>}`, com `n` proporcional às fases
-  concluídas do plano (1–99). É o que o layout padrão tem para "em andamento".
+  **mantenha `Open`** e grave `PATCH {"completion_percentage": <n>}`, com `n` = o `percent` da
+  derivação `progress` sobre as subtasks (`.claude/utils/task-manager/progress.sh`, story points ou
+  contagem declarada), limitado a 1–99. Até 2026-10-11 era "proporcional às fases do plano", que pesava
+  todas igual e ignorava os pontos. Sem subtasks (`method=none`), 1. É o que o layout padrão tem para
+  "em andamento".
 - **`done`** (e `closed`/`canceled` quando não houver status terminal próprio) → `PATCH
   {"completion_percentage": 100}`. A resposta traz o status `Closed` com o **id**, que passa a compor o
   mapa. É o caminho para o terminal que **não depende de saber o id antes**.

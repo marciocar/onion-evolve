@@ -318,7 +318,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 3
     confidence: 0.9
     verified_at: 2026-10-07

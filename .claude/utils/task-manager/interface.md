@@ -29,6 +29,7 @@ forma do provedor.
 | **Status** | `TaskStatus` (7 valores) + **transição** por `updateStatus` | o adapter resolve o nome do provedor; nunca inventa status que o projeto/lista não tem |
 | **Prioridade** | `TaskPriority` (`urgent` \| `high` \| `normal` \| `low`) | normalizada; o mapa por provedor está em [Prioridade](#prioridade), com a fonte de cada coluna |
 | **Estimativa** | `storyPoints?: number` (complexidade) e `timeEstimate?: number` (minutos) | duas grandezas, nunca uma: pontos não são tempo |
+| **Progresso** | `percent` + `method` (`story_points` \| `count` \| `mixed` \| `none`), **derivado** das subtasks | nunca lido do provedor nem escrito à mão: é a [derivação `progress`](#derivação-progress--o--da-task-mãe-por-story-points), executada por `progress.sh` |
 | **Comentário** | corpo canônico em **Markdown**; a conversão é do adapter | string no Jira DC e `text`/`html_text` no Asana (ancorados); ADF no comentário do Jira Cloud **não** ancorado — a interface não vê o formato ([texto rico](#texto-rico-é-assunto-do-adapter)) |
 | **Anexo** | `AttachmentInput { filename, contentType, bytes }` | |
 | **Label** | `tags: string[]` | no ClickUp a escrita de tag **não** vai no corpo do update (medido em 2026-10-02) |
@@ -234,6 +235,7 @@ hierarchy.epic	optional	remote	createEpic(
 status.transition	required	remote	updateStatus(
 priority.set	optional	remote	field:priority
 estimate.points	optional	remote	field:storyPoints
+estimate.points_read	optional	remote	field:storyPoints
 estimate.time	optional	remote	field:timeEstimate
 comment.add	required	remote	addComment(
 comment.list	required	remote	getComments(
@@ -313,6 +315,59 @@ conferida** (a pesquisa do core não viaja); o core a conferiu antes de publicar
 
 ---
 
+## 📈 Derivação `progress` — o % da task-mãe por story points
+
+Desde a **Onda 3** (SAC-64, 2026-10-11). O % de progresso de uma task com subtasks (a task-mãe) é
+**derivado**, não declarado: sai das subtasks normalizadas pelo adapter, por **uma** fórmula, e sempre
+com o **método** que a produziu. Esta seção é a regra; quem a executa é o helper determinístico
+[`progress.sh`](./progress.sh) (com `--selftest` de 30 casos). Comando nenhum recalcula o % em prosa:
+monta a lista e chama o helper.
+
+**Entrada** — uma linha por subtask, separada por TAB: `id`, status canônico (`TaskStatus`) e
+`storyPoints` (vazio ou `-` = sem pontos). É o que `getSubtasks(taskId)` devolve, já traduzido.
+
+**A fórmula, por caso de borda:**
+
+| Caso | Total | Método | % |
+|---|---|---|---|
+| todas as subtasks do total com pontos, soma > 0 | sem as canceladas | `story_points` | pontos das feitas ÷ pontos do total |
+| nenhuma com pontos | sem as canceladas | `count` | feitas ÷ total |
+| algumas com pontos, outras sem | sem as canceladas | `mixed` | feitas ÷ total — e os ids sem pontos saem **nomeados** |
+| todas com pontos e soma 0 | sem as canceladas | `count` | feitas ÷ total, com o motivo declarado |
+| sem subtasks, ou todas canceladas | 0 | `none` | `n/a` — o progresso é o status da própria task |
+
+- **Feita** = `done` ou `closed`. **Fora do total** = `canceled` (some do numerador e do denominador).
+  `backlog`, `todo`, `in_progress` e `review` estão no total e **não** contam como feitas.
+- **Por que `mixed` cai na contagem:** ponderar só as pontuadas dá peso zero a trabalho real, e imputar
+  a média inventaria pontos que ninguém estimou. A contagem é a base neutra, e o rótulo diz que os pontos
+  ficaram de fora — com os ids, para alguém estimar.
+- **Arredondamento para baixo**, e **100 só quando todas as do total estão feitas**: uma subtask aberta
+  de 0 ponto segura a task-mãe em 99. (É também o que o Zoho precisa: `completion_percentage` entre 1 e
+  99 mantém `Open`, e 100 fecha a task.)
+- **Entrada que não se entende reprova** (rc 2): status fora do vocabulário, pontos negativos, não
+  numéricos, com vírgula ou acima de 999999, id vazio ou repetido, linha sem exatamente 3 colunas,
+  argumento vazio. Nunca vira 0% calado. Comentário é a linha que começa por `#` **sem TAB** — um id
+  `#123` é dado. Arquivo vazio é "sem subtasks" (`none`): se o produtor da lista falhou, quem confere é o
+  consumidor, antes de chamar.
+
+**Saída** — linha 1 de máquina (`percent=… method=… done=… total=… excluded=… done_points=…
+total_points=… unpointed=…`, separados por TAB) e linha 2 `declared: <frase>`. **A frase vai no
+comentário de progresso**: o número sem o método é a omissão que esta derivação existe para fechar.
+
+**A dependência, declarada:** ponderar exige **ler** os pontos, e isso é a capacidade
+`estimate.points_read` — distinta de `estimate.points` (escrever), porque um adapter pode fazer uma e
+não a outra. Hoje ela é `not_implemented` nos cinco adapters (o `TaskOutput` nem carregava o campo até
+esta onda), então **na prática o progresso sai `count`, e diz isso**. Quando um adapter passar a ler os
+pontos, a declaração muda no mesmo commit e o progresso passa a ponderar, sem tocar em comando nenhum.
+Teto herdado da REGRA 103: a superfície das duas é o mesmo `field:storyPoints`, e a guarda confere só a
+presença da palavra — não distingue ler de escrever. Declarar `estimate.points_read` como `implemented`
+exige fonte que mostre a **leitura**, e isso é juízo da revisão, não da guarda.
+
+**Teto:** o status é binário por subtask (sem crédito fracionário); numa task-mãe de task-mãe, cada
+filha entra com os próprios pontos e o próprio status, não com o % dela.
+
+---
+
 ## 📊 Métodos por Categoria
 
 | Categoria | Métodos | Capacidades |
@@ -322,6 +377,7 @@ conferida** (a pesquisa do core não viaja); o core a conferiu antes de publicar
 | **Hierarquia** | `createSubtask`, `getSubtasks`, `createEpic?` | `hierarchy.*` |
 | **Status** | `updateStatus` | `status.transition` |
 | **Campos** | `priority`, `storyPoints`, `timeEstimate`, `tags` em Create/UpdateTaskInput | `priority.set`, `estimate.*`, `label.set` |
+| **Derivação** | `progress` (sobre `getSubtasks` + `storyPoints` lido), executada por [`progress.sh`](./progress.sh) | lê `hierarchy.subtask_list` e `estimate.points_read`; não é capacidade do adapter |
 | **Comentários** | `addComment`, `getComments` | `comment.*` |
 | **Anexo · Iteração · Vínculo** | `addAttachment?`, `assignIteration?`/`listIterations?`, `createLink?` | `attachment.add`, `iteration.assign`, `link.create` |
 | **Busca** | `searchTasks`, `searchPage?` | `search.*` |
