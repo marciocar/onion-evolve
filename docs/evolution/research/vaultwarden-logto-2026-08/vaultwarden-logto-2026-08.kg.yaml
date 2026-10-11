@@ -159,7 +159,7 @@ nodes:
     plane: DEV
     verified_at: 2026-08-10
     verified_against: logto-console.caddy-sem-.disabled-e-HTTP-302-no-dominio-publico
-    status: open
+    status: superseded
     impact: 4
     confidence: 1.0
     label: "DEPENDE DO MAESTRO: medido, o vhost logto-console no conf.d do Caddy do host está ATIVO e console.onionevolve.com responde 302, enquanto três documentos o declaram DESLIGADO por padrão. O interruptor é o console.sh off do onion-logto. Cofre com IdP aberto pede decisão explícita."
