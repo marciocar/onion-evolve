@@ -1,7 +1,7 @@
 ---
 branch: feat/task-manager-executable-adapter
 date: 2026-10-11
-reviewed_diff_sha256: 480cc8898d64bff3dbe41345ab8c80e357d737c8c45332f6eb41f13413f47911
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: cb61073f4e7637cd85a09acb493118d28e20cd0db1b8e74a03bc3a5914046d2f
 findings_total: 5
 findings_real: 5
@@ -56,3 +56,7 @@ Um helper solto em `adapters/` sem tsv reprovaria como `executavel-sem-declaraca
 - `item.delete` não foi exercitado (arquivar exige confirmação do maestro): segue `unverified` e fora
   do executável.
 - Forja/wizard/onboarding de adapter executável novo (outro provider) são as fatias seguintes da SAC-65.
+
+## Rebase sobre o #1034 (2026-10-11, sessão principal)
+
+O conflito no `lint-selftest.sh` eram duas famílias independentes (`run_task_progress_selftests` do #1034 e as deste PR); ficaram as duas. O `linear.capabilities.tsv` fundiu sozinho e mantém `estimate.points_read` e os 12 `implemented`. Famílias `task_manager_capabilities` + `task_manager_executable` + `task_manager_dispatcher` + `task_progress`: 75/75.
