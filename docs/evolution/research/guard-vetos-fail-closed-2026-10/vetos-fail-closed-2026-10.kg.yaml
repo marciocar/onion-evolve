@@ -1,0 +1,174 @@
+# kg-backlog-guard: on
+# Os 3 achados que a passada adversarial do PR #1026 (SAC-83, onFailure: block nos vetos) deixou abertos:
+# o veto que abre por DENTRO sem python3, o PreModelSwitch sem o campo e o env-guard quadrático.
+# Nasce aqui porque o grafo da r8 (radar-E3-2026-10-08-r8) está no teto de 20 nós.
+meta:
+  id: vetos-fail-closed-2026-10
+  schema_version: "1"
+  baseline: "2026-10-11"
+  review_after: "2026-11-10"   # 30d: defeito de guarda
+  # ═══ TETO: 10 NÓS ═══
+  #   9 em 2026-10-11 (fix/vetos-fail-closed).
+nodes:
+  - id: Q_VETOS_FECHAM_POR_DENTRO_E_POR_FORA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "fix/vetos-fail-closed: as 3 curas medidas antes e depois, famílias pretooluse_veto, veto_onfailure, premodelswitch_guard e env_exposure verdes em LC_ALL=C, um mutante por cura mordendo o caso dele"
+    label: "os vetos do core falham fechados também quando o hook RODA mas não consegue julgar (sem python3), o PreModelSwitch ganhou onFailure block, e o env-guard ficou linear"
+    narrative: "O #1026 cobriu o hook que NÃO RODA (onFailure block). A passada adversarial dele deixou três buracos que o campo não alcança ou que ele mesmo agrava: exit 0 por dentro quando falta python3 (o block não cobre exit 0), um quarto veto sem o campo (o premodelswitch-guard) e um custo quadrático que, com block, viraria barrar depois de 10 minutos."
+  - id: E_VETOS_ABRIAM_SEM_PYTHON
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "protect-main e merge-gate da main 6a429e73 rodados com um PATH sem python3 (symlinks de tudo em usr/bin menos python*), sandbox git com o caminho verificado presente: 20 de 20 sondas saíram rc 0, inclusive git push --force origin main e gh pr merge 1"
+    trace: ".claude/hooks/pretooluse-merge-gate.sh"
+    label: "medido: sem python3, protect-main e merge-gate deixavam passar force-push na main e gh pr merge com rc 0"
+    narrative: "Os dois hooks liam o JSON com python3 e, sem ele, o comando saía vazio: exit 0 antes de chegar à lib (que já tinha um fallback por forma, nunca alcançado). O onFailure block não cobre exit 0. O env-guard já fechava por dentro (`|| out=fechado`), mas para TUDO: sem python3 ele barra todo Read, Grep e Bash."
+    provenance:
+      source: ".claude/hooks/pretooluse-protect-main.sh e pretooluse-merge-gate.sh na main 6a429e73"
+      locator: "o bloco parsed=$(… python3 …) seguido de [ -z \"$cmd\" ] && exit 0"
+      method: "medição: hooks rodados com env -i e PATH sem python3, JSON do PreToolUse no stdin, rc lido"
+      locality: "repo"
+  - id: E_RECORTE_SEM_PYTHON_MEDIDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "corpus dos 31.183 comandos Bash únicos dos transcripts do core em 2026-10-11: a forma da lib inteira fecharia 1.361 (4,36%, 853 deles gh api de leitura); o recorte adotado fecha 117 (0,38%) no protect-main e 858 (2,75%) no merge-gate. Bancada: 13 casos sem python3 (np-*) e mutantes M1 a M6, todos mordendo"
+    trace: ".claude/hooks/lib/invocation-lines.sh"
+    label: "sem python3 os vetos fecham SÓ o que pode tocar o objeto: force-push no protect-main (0,38% dos comandos reais) e push, gh merge, gh api com rota de merge/contents/refs/graphql e gh repo sync no merge-gate (2,75%)"
+    narrative: "O JSON é lido sem python (onion_json_string_field: grep -oE de DFA e desescape de \\\\, \\\", \\n, \\t, \\r, \\/; 0,45 s a 1 MB) e, se o campo command nem aparecer, julga-se o JSON cru: o erro só pode fechar. O push do merge-gate não foi afinado por marca de main/HEAD/push nu: cobriria 445 dos 502 pushes e abriria espaço para fail-open. Custo declarado do modo degradado: push de feature, echo e heredoc que CITAM push/merge passam a ser barrados no merge-gate, e `rm -rf x && git push origin feat` no protect-main (o -rf parece marca de force). A mensagem diz que falta python3."
+    provenance:
+      source: "transcripts do core (sessões e subagentes) e a bancada run_pretooluse_veto_selftests"
+      locator: "casos (np-pm-force) a (np-desarme); mutantes M1 a M6 via ops/mutate-and-restore.sh"
+      method: "medição: regex do recorte sobre o corpus e bancada com LC_ALL=C e mutante por cura"
+      locality: "repo"
+  - id: C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-11"
+    verified_against: "leitura do pretooluse-env-guard.sh: out=$(… python3 -c …) || out=\"o analisador do veto falhou — fechado por segurança\"; matcher Read|Grep|Bash no settings.json"
+    label: "o recorte sem python3 dos dois vetos é sombreado no core: o env-guard, registrado no mesmo matcher, barra todo Read, Grep e Bash quando falta python3"
+    narrative: "Mantido por desenho: Edit e Write seguem livres e a mensagem do env-guard diz o que falhou. O recorte estreito dos dois vetos vale quando eles rodam sem o env-guard (settings.local, porta ou adotante que o tire). Gatilho para revisitar: a primeira máquina real sem python3 numa sessão."
+  - id: E_PREMODELSWITCH_ONFAILURE_MEDIDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "Claude Code 2.1.296, claude -p --setting-sources project,local --model haiku \"/model sonnet\" em 4 sandboxes, PostModelSwitch gravando um marcador: script ausente sem campo → rc 127 e a troca APLICADA; script ausente com block → barrada ('PreModelSwitch command hook failed; blocking (onFailure: \"block\")'), Post não rodou; exit 2 → barrada com a mensagem; exit 0 com block → aplicada. Log de debug: só hooks PreModelSwitch e PostModelSwitch, nenhum Stop"
+    trace: ".claude/settings.json"
+    label: "medido ao vivo: um PreModelSwitch quebrado deixa a troca de modelo passar, e com onFailure block passa a barrá-la; o caso honesto não muda"
+    narrative: "A doc oficial de hooks não lista o PreModelSwitch entre os eventos em que o campo não tem efeito (Stop, SubagentStop, TaskCompleted, TeammateIdle e hooks async) e diz que, com block, a falha faz o que o exit 2 faz no evento: no PreModelSwitch, bloquear a troca. A sonda de caminho honesto do premodelswitch-guard (56 entradas: vazia, não-JSON, lista, null, campos ausentes, nomes com colchete e espaço, com e sem baseline, com e sem python3) não produziu nenhum código fora de 0/2. Adotado: o campo no PreModelSwitch do settings.json, e a REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block) passou a cobrar o evento, com o caso (xiv) e um mutante. O PostModelSwitch roda o mesmo script, mas não veta nada, e fica de fora."
+    provenance:
+      source: "sandbox de medição do PreModelSwitch (4 variantes de settings.json, logs de debug)"
+      locator: "variantes A (sem campo), B (block + script ausente), C (exit 2), D (block + exit 0)"
+      method: "medição: claude -p com /model em sandbox, marcador do PostModelSwitch e linhas Hooks do log de debug"
+      locality: "host"
+  - id: C_PREMODELSWITCH_ABRE_SEM_PYTHON
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-11"
+    verified_against: "sonda com PATH sem python3: o read do payload falha e o premodelswitch-guard sai 0 em todas as entradas (é exit 0, o block não alcança)"
+    trace: ".claude/hooks/premodelswitch-guard.sh"
+    label: "o premodelswitch-guard também abre por dentro sem python3 (sai 0), e o onFailure block não cobre isso"
+    narrative: "Fora do escopo desta cura, declarado: o veto guarda downgrade de modelo, não ação irreversível, e a troca é desfeita com outro /model. Gatilho: o mesmo de C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON, a primeira máquina real sem python3."
+  - id: E_ENV_GUARD_LINEAR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "comando `echo <token único>` no env-guard: antes 21,6 s a 100 KB, 208 s a 300 KB e mais de 900 s a 1 MB (o medidor cortou); depois 0,14 s, 0,32 s e 0,89 s (2 MB: 1,73 s). Vereditos antes×depois em processo: 31.189 entradas reais e 24.834 sintéticas, zero divergência e zero exceção"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "o env-guard ficou linear: um token único de 1 MB leva 0,89 s (antes passava de 900 s) e nenhum veredito mudou em 56 mil entradas"
+    narrative: "Duas causas quadráticas, achadas por cProfile. (1) O regex `[\\w-]+\\.env\\b` de cites_env recomeçava de cada posição de uma palavra longa e voltava: 1,25 s de 1,30 s a 25 KB. Virou `(?<=[\\w-])\\.env\\b`, o mesmo booleano sem backtracking. (2) Curado o regex, o shlex da stdlib dominou (15 s a 1 MB): `self.token += nextchar` num atributo copia o token a cada caractere. O LinearShlex troca só o acumulador por uma propriedade que junta os pedaços no fim do token; a máquina de estados é a da stdlib. O corpus sintético estressou a fronteira de .env (prefixos de palavra, Unicode, hífen, ponto, aspas) e o acumulador (aspas vazias, coladas, escapes, aspas abertas, pontuação, comentário, heredoc, tokens de 1 a 20 mil caracteres)."
+    provenance:
+      source: "env-guard da main 6a429e73 contra o da branch fix/vetos-fail-closed"
+      locator: "cites_env e as duas chamadas de LinearShlex; caso (q) e mutantes da família env_exposure"
+      method: "medição: tempo de parede do hook por tamanho e comparação de vereditos em processo sobre o corpus real e um sintético"
+      locality: "repo"
+  - id: C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "veto ao vivo nesta sessão: `cd \"$VAR\"; for f in ⟨glob absoluto da pasta de binários do sistema⟩ …` barrado como \"'for' lendo ⟨o glob⟩\"; o mesmo laço sem o cd passa (rc 0), e nenhum arquivo .env existe nas pastas do glob"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, porque a pasta desconhecida fecha todo glob"
+    narrative: "glob_reaches_env fecha quando CTX['base'] é desconhecida, mas um glob absoluto não depende da pasta corrente. Não curado aqui (é outro defeito, anterior a esta branch, e mexer no glob muda veredito). Gatilho: o segundo veto desta forma em sessão real."
+  - id: E_ONFAILURE_COBERTO_NA_REGRA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "veto-onfailure-check.sh --selftest 15/15; família veto_onfailure 25 de 25 com LC_ALL=C, o caso (c) emitindo a REGRA 101 nos 4 vetos de antes da cura pelo dispatcher do lint, e o mutante EVENTS=PreToolUse reprovando (xiv)"
+    trace: ".claude/validation/veto-onfailure-check.sh"
+    label: "a REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block) passa a cobrar também o PreModelSwitch; o título fica, porque é o nome que os documentos citam"
+    provenance:
+      source: ".claude/validation/veto-onfailure-check.sh e run_veto_onfailure_selftests"
+      locator: "EVENTS = (PreToolUse, PreModelSwitch); casos (xiv) e (c); mutante do EVENTS"
+      method: "medição: selftest próprio, família com LC_ALL=C e mutante"
+      locality: "repo"
+edges:
+  - from: E_VETOS_ABRIAM_SEM_PYTHON
+    to: Q_VETOS_FECHAM_POR_DENTRO_E_POR_FORA
+    edge_type: SUPPORTS
+  - from: E_RECORTE_SEM_PYTHON_MEDIDO
+    to: Q_VETOS_FECHAM_POR_DENTRO_E_POR_FORA
+    edge_type: SUPPORTS
+  - from: E_PREMODELSWITCH_ONFAILURE_MEDIDO
+    to: Q_VETOS_FECHAM_POR_DENTRO_E_POR_FORA
+    edge_type: SUPPORTS
+  - from: E_ONFAILURE_COBERTO_NA_REGRA
+    to: E_PREMODELSWITCH_ONFAILURE_MEDIDO
+    edge_type: SUPPORTS
+  - from: E_ENV_GUARD_LINEAR
+    to: Q_VETOS_FECHAM_POR_DENTRO_E_POR_FORA
+    edge_type: SUPPORTS
+  - from: C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON
+    to: E_RECORTE_SEM_PYTHON_MEDIDO
+    edge_type: CONSTRAINS
+  - from: C_PREMODELSWITCH_ABRE_SEM_PYTHON
+    to: E_PREMODELSWITCH_ONFAILURE_MEDIDO
+    edge_type: CONSTRAINS
+  - from: C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL
+    to: E_ENV_GUARD_LINEAR
+    edge_type: CONSTRAINS
+external_edges:
+  - from: E_ENV_GUARD_LINEAR
+    to: "docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml#Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT"
+    edge_type: SUPPORTS
+  - from: E_VETOS_ABRIAM_SEM_PYTHON
+    to: "docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml#E_ONFAILURE_BLOCK_BARRA_HOOK_QUEBRADO"
+    edge_type: SUPPORTS

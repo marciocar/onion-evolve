@@ -6358,8 +6358,41 @@ run_pretooluse_veto_selftests() {
   _casew "protect-main: worktree NA MAIN, raiz na feat: push -f nu → VETO" 2 "${pm}" feat "${d}/wt-parent/na-main" 'git push -f'
   _casew "merge-gate: worktree NA MAIN, raiz na feat: push origin HEAD → VETO" 2 "${mg}" feat "${d}/wt-parent/na-main" 'git push origin HEAD'
   git -C "${d}" worktree remove --force "${d}/wt-parent/na-main" 2>/dev/null || true
+  # SEM python3 (fix/vetos-fail-closed, 2026-10-11): os dois vetos liam o JSON com python3 e, sem ele,
+  # saíam 0 por dentro — `git push --force origin main` e `gh pr merge 1` passavam (medido), e o onFailure
+  # block não cobre exit 0. O PATH abaixo tem só as ferramentas que os hooks usam, SEM python3. O JSON nasce
+  # com o python3 da bancada e carrega uma `description` que cita push/merge: se o hook julgasse o JSON
+  # cru em vez do campo `command`, o caso (np-campo) vetaria um `git status`.
+  local np; np="$(mktemp -d)"; local tl
+  for tl in bash cat grep head dirname git tr cut awk sed; do ln -s "$(command -v "${tl}")" "${np}/${tl}"; done
+  _pvn() {  # <hook> <branch> <comando> → rc do hook rodando sem python3
+    local rc=0
+    git -C "${d}" checkout -q "$2" 2>/dev/null || git -C "${d}" checkout -q -b "$2"
+    printf '%s' "$3" | python3 -c 'import json,sys;print(json.dumps({"session_id":"s","cwd":sys.argv[1],"tool_name":"Bash","tool_input":{"command":sys.stdin.read(),"description":"git push --force origin main e gh pr merge 1 (prosa)"}}))' "${d}" \
+      | (cd "${d}" && env -i HOME="${HOME}" PATH="${np}" CLAUDE_PROJECT_DIR="${d}" "${np}/bash" "$1" >/dev/null 2>&1) || rc=$?
+    printf '%s' "${rc}"
+  }
+  _casen() {  # <nome> <esperado> <hook> <branch> <comando>
+    local got; got="$(_pvn "$3" "$4" "$5")"
+    if [ "${got}" = "$2" ]; then record_pass "pretooluse-veto: sem python3: $1 (rc=$2)"
+    else record_fail "pretooluse-veto: sem python3: $1" "esperava rc=$2, veio rc=${got} — cmd: $5"; fi
+  }
+  _casen "(np-pm-force) protect-main: force-push main → FECHA"   2 "${pm}" feat 'git push --force origin main'
+  _casen "(np-pm-plus) protect-main: +main → FECHA"              2 "${pm}" feat 'git push origin +main'
+  _casen "(np-pm-push) protect-main: push sem force → passa"     0 "${pm}" feat 'git push origin feat'
+  _casen "(np-pm-ls) protect-main: ls → passa"                   0 "${pm}" feat 'ls -la'
+  _casen "(np-mg-merge) merge-gate: gh pr merge → FECHA"         2 "${mg}" feat 'gh pr merge 1 --rebase'
+  _casen "(np-mg-push) merge-gate: git push origin main → FECHA" 2 "${mg}" feat 'git push origin main'
+  _casen "(np-mg-api) merge-gate: gh api …/merge → FECHA"        2 "${mg}" feat 'gh api -X PUT repos/o/r/pulls/1/merge'
+  _casen "(np-mg-nl) merge-gate: merge na 2ª linha (\\n desescapado) → FECHA" 2 "${mg}" feat $'echo x\ngh pr merge 1'
+  _casen "(np-mg-view) merge-gate: gh pr view → passa"           0 "${mg}" feat 'gh pr view 1 --json state'
+  _casen "(np-mg-apiget) merge-gate: gh api de leitura → passa"  0 "${mg}" feat 'gh api repos/o/r/pulls --jq .[].number'
+  _casen "(np-campo) merge-gate: git status com description citando merge → passa" 0 "${mg}" feat 'git status'
+  _casen "(np-campo) protect-main: git status com description citando force-push → passa" 0 "${pm}" feat 'git status'
   # desarme: sem ops/pr-merge-verified.sh (adotante) o gate NÃO veta o único caminho de merge
   rm -f "${d}/ops/pr-merge-verified.sh"
+  _casen "(np-desarme) merge-gate: sem caminho verificado → DESARMA" 0 "${mg}" feat 'gh pr merge 1'
+  rm -rf "${np}"
   _case "merge-gate: sem caminho verificado → DESARMA (passa)" 0 "${mg}" feat 'gh pr merge 1'
   rm -rf "${d}"
 }
@@ -6503,6 +6536,21 @@ run_env_exposure_selftests() {
     [ "$(_eg '{"tool_name":"Grep","tool_input":{"pattern":"T","path":".env"}}')" = 2 ] || { bad=1; record_fail "env-exposure: (h) veto" "Grep em .env passou"; }
     [ "$(_eg '{"tool_name":"Read","tool_input":{"file_path":"/x/.env.example"}}')" = 0 ] || { bad=1; record_fail "env-exposure: (h) veto" "Read de .env.example barrado"; }
     [ "${bad}" = 0 ] && record_pass "env-exposure: (h) o veto barra 13 leituras do .env e deixa passar 14 caminhos honestos"
+  fi
+  # (q) CUSTO LINEAR (fix/vetos-fail-closed, 2026-10-11): token único de 2 MB. Antes, o regex de cites_env e
+  #     o acumulador do shlex eram quadráticos (208 s a 300 KB; com onFailure block, barrar após 600 s).
+  #     Depois: 1,7 s a 2 MB. O teto de 20 s é folgado para CI de 2 núcleos e curto para qualquer dos dois
+  #     mutantes (regex antigo: horas; shlex da stdlib: ~60 s). As duas polaridades no mesmo tamanho.
+  if [ -f "${guard}" ]; then
+    local qd qrc1=0 qrc2=0; qd="$(mktemp -d)"
+    python3 -c 'import json,sys;t="QUJD"*(2*1024*1024//4)
+json.dump({"tool_name":"Bash","cwd":"/","tool_input":{"command":"echo "+t}},open(sys.argv[1]+"/eco.json","w"))
+json.dump({"tool_name":"Bash","cwd":"/","tool_input":{"command":"cat "+t+".env"}},open(sys.argv[1]+"/cat.json","w"))' "${qd}"
+    timeout 20 bash "${guard}" < "${qd}/eco.json" >/dev/null 2>&1 || qrc1=$?
+    timeout 20 bash "${guard}" < "${qd}/cat.json" >/dev/null 2>&1 || qrc2=$?
+    rm -rf "${qd}"
+    if [ "${qrc1}" = 0 ] && [ "${qrc2}" = 2 ]; then record_pass "env-exposure: (q) token único de 2 MB julgado em menos de 20 s (echo passa, cat <token>.env veta)"
+    else record_fail "env-exposure: (q) custo linear" "rc echo=${qrc1} (esperado 0), rc cat=${qrc2} (esperado 2); 124 = estourou os 20 s"; fi
   fi
   # (h2) escapes e falsos positivos da 2ª passada do Elenxo (2026-10-06)
   if [ -f "${guard}" ]; then
@@ -26445,26 +26493,29 @@ run_veto_onfailure_selftests() {
   local o rc
   # (a) o --selftest próprio
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 13/13 verdes' <<< "${o}"; then
-    record_pass "veto-onfailure: (a) --selftest verde (13 casos: veto sem/com block, aviso, comentário, função, exit 20, inválido, async, ausente, ilegível, fora do PreToolUse, aspas)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 15/15 verdes' <<< "${o}"; then
+    record_pass "veto-onfailure: (a) --selftest verde (15 checagens: veto sem/com block, aviso, comentário, função, exit 20, inválido, async, ausente, ilegível, fora dos eventos medidos, aspas, PreModelSwitch)"
   else record_fail "veto-onfailure: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
-  # (b) O MODO QUE A PRODUÇÃO CONSOME, no settings.json real: os 3 vetos declaram block → tsv vazio, rc 0.
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no settings.json real: os 4 vetos declaram block → tsv vazio, rc 0.
   #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
   if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/veto-onfailure-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then
     record_pass "veto-onfailure: (b) settings.json real → rc 0, nenhum veto sem onFailure"
   else record_fail "veto-onfailure: (b) settings.json real" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
   # (c) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, sobre o settings de ANTES da cura (o campo removido dos
-  #     3 vetos), emite a REGRA 101 para cada um — e não para o kg-read-leg (aviso).
+  #     3 vetos PreToolUse e do PreModelSwitch), emite a REGRA 101 para os 4 — e não para o kg-read-leg (aviso)
+  #     nem para o PostModelSwitch, que roda o mesmo script mas não veta nada.
   local sd; sd="$(TMPDIR=/tmp mktemp -d)"
   python3 -I -B -c 'import json,sys; d=json.load(open(sys.argv[1]))
-for g in d["hooks"]["PreToolUse"]:
-    for h in g["hooks"]: h.pop("onFailure", None)
+for ev in ("PreToolUse", "PreModelSwitch"):
+    for g in d["hooks"][ev]:
+        for h in g["hooks"]: h.pop("onFailure", None)
 json.dump(d, open(sys.argv[2], "w"), indent=2)' "${REPO_ROOT}/.claude/settings.json" "${sd}/settings.json"
   local l; l="$(cd "${REPO_ROOT}" && ONION_SETTINGS_JSON="${sd}/settings.json" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/settings.json" 2>&1 || true)"
   local n; n="$(grep -c 'REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block): \[veto-sem-onfailure\]' <<< "${l}" || true)"
-  if [ "${n}" -eq 3 ] && ! grep -q 'REGRA 101.*kg-read-leg' <<< "${l}"; then
-    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 3 vetos de antes da cura, e cala no aviso"
+  if [ "${n}" -eq 4 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
+     && ! grep -q 'REGRA 101.*kg-read-leg' <<< "${l}" && ! grep -q 'REGRA 101.*PostModelSwitch' <<< "${l}"; then
+    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 4 vetos de antes da cura (3 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
   else record_fail "veto-onfailure: (c) dispatcher" "n=${n}; $(grep -E 'REGRA 101' <<< "${l}" | head -4 | cut -c1-160 | tr '\n' '|')"; fi
   rm -rf "${sd}"
   # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove
@@ -26490,7 +26541,8 @@ exit[ \t]+2(?=\$|[\s;&|})#])$(printf '\x1f')exit[ \t]+2$(printf '\x1f')(vi) exit
         if of is not None and of not in ("continue", "block"):$(printf '\x1f')        if False:$(printf '\x1f')(vii) onFailure inválido acusa
         if hk.get("async") or hk.get("asyncRewake"):$(printf '\x1f')        if False:$(printf '\x1f')(viii) hook async isento
     sys.stderr.write(f"veto-onfailure-check: settings não parseia: {e}\n"); sys.exit(2)$(printf '\x1f')    sys.stderr.write(f"veto-onfailure-check: settings não parseia: {e}\n"); sys.exit(0)$(printf '\x1f')(x) settings ilegível sai 2
-for grp in ((hooks or {}).get("PreToolUse") or []):$(printf '\x1f')for grp in [g for v in (hooks or {}).values() for g in (v or [])]:$(printf '\x1f')(xi) fora do PreToolUse cala
+for ev, grp in [(e, g) for e in EVENTS for g in ((hooks or {}).get(e) or [])]:$(printf '\x1f')for ev, grp in [(e, g) for e, v in (hooks or {}).items() for g in (v or [])]:$(printf '\x1f')(xi) fora do PreToolUse cala
+EVENTS = ("PreToolUse", "PreModelSwitch")$(printf '\x1f')EVENTS = ("PreToolUse",)$(printf '\x1f')(xiv) PreModelSwitch: veto sem block acusa
 EOF_MUT
   rm -rf "${sb}"
 }

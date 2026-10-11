@@ -165,6 +165,7 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/premodelswitch-guard.sh\"",
             "timeout": 5,
+            "onFailure": "block",
             "statusMessage": "Guarda de modelo da sessão (Onion): veta downgrade fora do lineup"
           }
         ]

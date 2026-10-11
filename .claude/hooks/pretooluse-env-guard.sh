@@ -47,6 +47,45 @@ input="$(cat)"
 GUARD_PY=$(cat <<'PY'
 import fnmatch, glob, json, os, re, shlex, sys
 
+# ── shlex LINEAR (fix/vetos-fail-closed, 2026-10-11) ───────────────────────────────────────────
+# O shlex da stdlib monta cada token com `self.token += nextchar`. Num ATRIBUTO o CPython não otimiza a
+# concatenação no lugar, e cada caractere copia o token inteiro: custo quadrático no comprimento do token.
+# Medido depois de curar o regex de cites_env: 15 s num token único de 1 MB, quase tudo em read_token. A
+# cura troca só o ACUMULADOR: `token` vira uma propriedade que guarda os pedaços numa lista e entrega a
+# string montada uma vez, no fim do token. A máquina de estados do shlex é a mesma, e os tokens também.
+# Se uma versão futura do Python mudar o read_token, o pior caso é perder a otimização ou estourar uma
+# exceção; e exceção aqui cai no `|| out=…` lá embaixo, que FECHA (nunca abre).
+class _TokenAcc:
+    __slots__ = ('parts', 'n')
+    def __init__(self, s=''):
+        self.parts = [s] if s else []
+        self.n = len(s)
+    def __iadd__(self, s):
+        self.parts.append(s); self.n += len(s)
+        return self
+    def __bool__(self):
+        return self.n > 0
+    def __len__(self):
+        return self.n
+    def __str__(self):
+        if len(self.parts) > 1:
+            self.parts = [''.join(self.parts)]
+        return self.parts[0] if self.parts else ''
+    def __eq__(self, other):
+        return str(self) == (str(other) if isinstance(other, _TokenAcc) else other)
+    __hash__ = None
+
+class LinearShlex(shlex.shlex):
+    @property
+    def token(self):
+        return self._acc
+    @token.setter
+    def token(self, v):
+        self._acc = v if isinstance(v, _TokenAcc) else _TokenAcc(v)
+    def read_token(self):
+        r = super().read_token()
+        return str(r) if isinstance(r, _TokenAcc) else r
+
 # ── O QUE É UM ARQUIVO .env ───────────────────────────────────────────────────────────────────
 SAFE_SUFFIX = re.compile(r'^(example|sample|template|dist|example\.onion)$', re.I)
 PROBES = ('.env', '.env.local', '.env.production', 'app.env')   # alvos contra os quais um GLOB é testado
@@ -113,9 +152,16 @@ def is_env_token(tok):
             return True                                                    # glob que alcança um .env
     return False
 
+# `(?<=[\w-])\.env\b` no lugar de `[\w-]+\.env\b`: a mesma pergunta (há um `.env` colado a um caractere de
+# palavra?), sem backtracking. A forma antiga recomeçava de cada posição de uma palavra longa, varria até o
+# fim e voltava: quadrática. Medido em 2026-10-11, token único de 300 KB: 186 s; perto de 520 KB passaria do
+# timeout de 600 s e o onFailure block BARRARIA (Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT). Só o booleano importa,
+# e o booleano é idêntico: existe match ⇔ existe `.env` com um [\w-] imediatamente antes e \b depois.
+CITES_DOT = re.compile(r'(^|[\s/<"\'=:(`])\.env(\.[A-Za-z0-9_.-]+)?($|[\s"\';|&)>`])')
+CITES_NAMED = re.compile(r'(?<=[\w-])\.env\b')
+
 def cites_env(text):
-    return bool(re.search(r'(^|[\s/<"\'=:(`])\.env(\.[A-Za-z0-9_.-]+)?($|[\s"\';|&)>`])', text)) or \
-           bool(re.search(r'[\w-]+\.env\b', text))
+    return bool(CITES_DOT.search(text)) or bool(CITES_NAMED.search(text))
 
 # ── QUEM PODE RECEBER UM .env SEM LER O CONTEÚDO ─────────────────────────────────────────────
 METADATA = {'source', '.', 'test', '[', '[[', 'ls', 'stat', 'touch', 'chmod', 'chown', 'rm', 'mkdir', 'echo', 'printf',
@@ -153,7 +199,7 @@ def strip_comments(cmd):
 
 def segments(cmd):
     cmd = strip_comments(cmd).replace('\\\n', ' ')
-    lex = shlex.shlex(cmd, posix=True, punctuation_chars=';&|()<>\n')
+    lex = LinearShlex(cmd, posix=True, punctuation_chars=';&|()<>\n')
     lex.whitespace = ' \t\r'
     lex.whitespace_split = True
     lex.commenters = ''
@@ -219,7 +265,7 @@ def split_heredocs(cmd):
         return cmd, []
     quoted = bool(re.search(r'["\'\\]', word))
     try:
-        lex = shlex.shlex(strip_comments(prefix), posix=True, punctuation_chars=';&|()<>')
+        lex = LinearShlex(strip_comments(prefix), posix=True, punctuation_chars=';&|()<>')
         lex.whitespace_split = True
         lex.commenters = ''
         toks = list(lex)
