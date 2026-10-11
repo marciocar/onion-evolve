@@ -96,7 +96,7 @@ nodes:
   - id: C_bypass_permissions_exposto
     node_type: claim
     plane: DEV
-    status: open
+    status: drifted
     impact: 4
     confidence: 0.9
     verified_at: 2026-08-01

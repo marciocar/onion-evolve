@@ -649,7 +649,7 @@ nodes:
     plane: DEV
     verified_at: 2026-09-02
     verified_against: "CURA DEPLOYADA 2026-09-02 (E_W9_BRIDGE_DEPLOY_0902: jwksAttemptedAt em src/identity.ts do clone de produção do onion-bridge, 4 ocorrencias); segue open porque o criterio de fechamento e MEDICAO no vivo — 1 fetch por janela de 60s durante queda real do IdP — e nao se simula queda do Logto em producao. GATILHO: 1a queda real do IdP (journal do onion-vps-bridge)"
-    status: open
+    status: done
     impact: 3
     confidence: 0.95
     label: "PRE-EXISTENTE, mas o P11 ELEVOU O RAIO — e essa mudanca de risco precisa morar aqui: antes, numa queda do Logto, o caminho legado ainda autenticava (degradado); agora NINGUEM autentica (queda total) E cada request re-busca o JWKS (medido pelo 6o Elenxo com IdP num buraco negro: 3 reqs seguidas, 5s cada, um fetch novo por request — retry storm contra a dependencia que ja esta caindo). O piso de 60s (identity.ts:41) so guarda o ramo force=true; o ramo normal so retorna cedo com cache POPULADO e fresco, e jwksFetchedAt so atualiza no sucesso. CURA DESENHADA pelo Elenxo (jwksAttemptedAt marcando a TENTATIVA + timeout de 5s no fetch + jwksSelfCheck reportando ok=cache.size>0). GATILHO: PR proprio no bridge; e o /health mentindo ok:true durante queda do IdP entra na mesma cura."
