@@ -5464,6 +5464,47 @@ check_kg_machine_path() {
 }
 check_kg_machine_path
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse) — HARD, com catraca
+#   DANO MEDIDO (SAC-86, 2026-10-09, materialização do onion-standalone no pin 947e69ce): a lente
+#   kg-grammar.md afirmava ao adotante que o `ops/pr-merge-verified.sh` (core-only) recusa o rebase —
+#   e `ops/` não viaja para porta nem adotante. A classe já estava publicada no pretooluse-merge-gate.sh
+#   e na onion-orchestration/SKILL.md, e nenhuma guarda via. A citação nova num arquivo que viaja é HARD
+#   até se declarar: marcador `(core-only)` na linha, teste de presença na linha, ou arquivo que se
+#   declara Core-only no frontmatter. Passivo no baseline = SOFT; baseline só encolhe. Lógica em
+#   ops-citation-travel-check.sh; baseline em ops-citation-travel-baseline.txt.
+check_ops_citation_travel() {
+  local helper="${SCRIPT_DIR}/ops-citation-travel-check.sh"
+  [ -f "${helper}" ] || return 0
+  [ "${IS_DERIVED}" -eq 1 ] && return 0   # no adotante/porta não há ops/ a citar nem baseline a cobrar
+  if [ -n "${ONLY_PATH}" ]; then          # --only: só quando o arquivo está numa raiz que viaja (ou é a própria guarda)
+    case "${ONLY_PATH}" in
+      */ops-citation-travel-*) : ;;
+      */fixtures/*) return 0 ;;
+      "${REPO_ROOT}"/.claude/*|"${REPO_ROOT}"/docs/meta-specs/*|"${REPO_ROOT}"/docs/knowledge-base/*|"${REPO_ROOT}"/docs/sdaal/*) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err passivo=0
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    if [ "${_code}" = "PASSIVO" ]; then passivo=$(( passivo + 1 )); continue; fi
+    violation "${_sev:-SOFT}" "${REPO_ROOT}/${_path#./}" "REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse): [${_code}] ${_msg}"
+  done <<< "${_out}"
+  if [ "${passivo}" -gt 0 ]; then
+    violation "SOFT" "${REPO_ROOT}/.claude/validation/ops-citation-travel-baseline.txt" \
+      "REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse): [PASSIVO] ${passivo} citação(ões) tolerada(s) pelo baseline — a saúde é este número DIMINUINDO (detalhe: bash .claude/validation/ops-citation-travel-check.sh)"
+  fi
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${REPO_ROOT}/.claude/validation/ops-citation-travel-check.sh" "REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse): a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_ops_citation_travel
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================

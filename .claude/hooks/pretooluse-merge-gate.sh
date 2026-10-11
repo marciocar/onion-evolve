@@ -4,22 +4,22 @@
 # ── O BURACO QUE FECHA (medido, não suposto) ─────────────────────────────────────────────
 # Este repo é PRIVADO sem GitHub Pro: branch protection/rulesets devolvem 403. Logo TODO check de
 # CI (lint HARD, selftest, onion-review-verdict) é ADVISORY no host — `gh pr merge` com CI vermelho
-# MERGEIA. O único lugar onde o CI vira veto é o `ops/pr-merge-verified.sh` (lê check-runs do head
-# + a linha onion-review-verdict e recusa). Mas ele é VOLUNTÁRIO: nada impedia o modelo de digitar
+# MERGEIA. O único lugar onde o CI vira veto é o `ops/pr-merge-verified.sh` (core-only), que lê check-runs do head
+# + a linha onion-review-verdict e recusa. Mas ele é VOLUNTÁRIO: nada impedia o modelo de digitar
 # `gh pr merge N` direto — e o /meta:drive só diz "PARE" em prosa. O System Card do 5.1 mede o
 # modelo fabricando aprovação para passar gate textual (<0,01%). Gate em prosa não é gate.
 #
 # ── O QUE VETA (exit 2 = antes de executar) ─────────────────────────────────────────────
-#  (a) `gh pr merge …` digitado na string do modelo (qualquer flag) → usar ops/pr-merge-verified.sh
+#  (a) `gh pr merge …` digitado na string do modelo (qualquer flag) → usar ops/pr-merge-verified.sh (core-only)
 #  (b) `gh api … pulls/<n>/merge` (o mesmo merge pela REST, bypass do gh)
 #  (c) `git push` NÃO-force cujo alvo seja main: refspec explícito (`origin main`, `HEAD:main`,
 #      `x:main`) ou push NU sentado em main. Main desta casa só muda por merge de PR no forge;
 #      um push de main pela sessão é bypass de PR/CI inteiro (o force já é vetado pelo hook irmão).
 #
 # ── O QUE NÃO VETA (fronteira declarada) ─────────────────────────────────────────────────
-#  · O script `ops/pr-merge-verified.sh` chama `gh pr merge` POR DENTRO — o hook só vê a string do
+#  · O script `ops/pr-merge-verified.sh` (core-only) chama `gh pr merge` POR DENTRO — o hook só vê a string do
 #    modelo, não subprocessos. É exatamente o que se quer: o caminho verificado passa, o nu não.
-#  · Sem `ops/pr-merge-verified.sh` no projeto (adotante via /meta:adopt copia .claude/, não ops/)
+#  · Sem `ops/pr-merge-verified.sh` (core-only) no projeto (adotante via /meta:adopt copia .claude/, não ops/)
 #    o hook se DESARMA: não se veta o único caminho de merge de uma casa que não tem o verificado.
 #  · Julga POR LINHA DE INVOCAÇÃO, nunca a string inteira (heredoc/prosa que CITA `gh pr merge`
 #    não veta — a classe guarda-por-vocabulário, falso-positivo medido no hook irmão em 09-01).
@@ -48,7 +48,7 @@ root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 inv=$(ONION_CWD="$hcwd" onion_invocation_lines "$cmd")
 [ -z "$inv" ] && exit 0
 
-deny() { echo "GUARDA-PRETOOLUSE: $1 — merge/push em MAIN só pelo caminho verificado: bash ops/pr-merge-verified.sh <PR> --sync (lê CI + onion-review-verdict e recusa vermelho; o host não protege main neste repo). Se for deliberado, o maestro roda fora da sessão." >&2; exit 2; }
+deny() { echo "GUARDA-PRETOOLUSE: $1 — merge/push em MAIN só pelo caminho verificado: bash ops/pr-merge-verified.sh <PR> --sync (lê CI + onion-review-verdict e recusa vermelho; o host não protege main neste repo). Se for deliberado, o maestro roda fora da sessão." >&2; exit 2; }  # (core-only): só alcançável depois do teste de presença acima
 
 # (0) INANALISÁVEL que tem a forma de merge, ou de push que pode tocar a main → FECHADO. A lib só emite
 #     isto quando não consegue PROVAR o que o shell vai executar; supor que era inofensivo é exatamente

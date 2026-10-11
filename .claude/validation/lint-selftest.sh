@@ -182,7 +182,7 @@ SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHA
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry,ops_citation_travel"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -25411,6 +25411,66 @@ EOF_MUT
   rm -rf "${sb}"
 }
 _family run_kg_machine_path_selftests
+
+# REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse) — SAC-86, medido em 2026-10-09
+# na materialização do onion-standalone (pin 947e69ce): a lente kg-grammar.md descrevia ao adotante o
+# comportamento de um script de ops/, que não viaja. Casos: (a) as polaridades do --selftest · (b) o modo que o
+# lint consome, no corpus real · (c) o dispatcher de produção sobre o defeito verbatim · (m) UM MUTANTE POR CASO,
+# na CÓPIA da guarda — mutante que não se aplica é FALHA, nunca verde por vacuidade.
+run_ops_citation_travel_selftests() {
+  # o baseline (.claude/validation/ops-citation-travel-baseline.txt) é exercitado pelo (b), no corpus real
+  local chk="${REPO_ROOT}/.claude/validation/ops-citation-travel-check.sh"
+  [ -f "${chk}" ] || { record_fail "ops-citation-travel" "guarda ausente"; return; }
+  local o rc
+  # (a) o --selftest próprio: acusa o defeito verbatim e cala nas três declarações + fora do escopo
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 9/9 verdes' <<< "${o}"; then
+    record_pass "ops-citation-travel: (a) --selftest verde (9 casos: acusa, cala marcado/não-viaja/passivo/presença/Core-only/ops-s, catraca, sem baseline)"
+  else record_fail "ops-citation-travel: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: --format tsv sai 0, sem HARD, e com o passivo à vista.
+  #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/ops-citation-travel-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && ! grep -q '^HARD' <<< "${o}" && grep -q $'^SOFT\tPASSIVO\t' <<< "${o}"; then
+    record_pass "ops-citation-travel: (b) corpus real → rc 0, sem HARD, passivo SOFT no modo tsv"
+  else record_fail "ops-citation-travel: (b) corpus real" "rc=${rc}; [$(grep '^HARD' <<< "${o}" | head -3 | tr '\n' '|')]"; fi
+  # (c) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, num repo com o defeito VERBATIM numa lente, emite a REGRA 100
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null; mkdir -p "${sd}/.claude/rules"
+  printf '| x | o rebase reescreve o sha — o `ops/pr-merge-verified.sh` recusa e pede `--merge-commit` (SAC-80) |\n' > "${sd}/.claude/rules/fx-lens.md"
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/.claude/rules/fx-lens.md" 2>&1 || true)"
+  if grep -q "REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse): \[NEW\] cita 'ops/pr-merge-verified.sh'" <<< "${l}"; then
+    record_pass "ops-citation-travel: (c) o lint de produção (dispatcher) emite a REGRA 100 sobre o defeito verbatim"
+  else record_fail "ops-citation-travel: (c) dispatcher" "$(grep -E 'REGRA 100|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  rm -rf "${sd}"
+  # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"; mkdir -p "${sb}/.claude/validation"
+  local s="${sb}/.claude/validation/ops-citation-travel-check.sh" old new want mo mrc
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cp "${chk}" "${s}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${s}" "${old}" "${new}"; then
+      record_fail "ops-citation-travel: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "ops-citation-travel: (m) mutante morde → ✗ ${want}"
+    else record_fail "ops-citation-travel: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<EOF_MUT
+          print rel "|" tok$(printf '\x1f')          print ""$(printf '\x1f')(i)
+      index(\$0, "(core-only)") { next }$(printf '\x1f')      index(\$0, "(core-only-X)") { next }$(printf '\x1f')(ii)
+  [ "\${#bases[@]}" -gt 0 ] || return 0$(printf '\x1f')  bases+=("\${repo}/docs"); [ "\${#bases[@]}" -gt 0 ] || return 0$(printf '\x1f')(iii)
+  LC_ALL=C comm -23 "\${TMP}/current" "\${TMP}/baseline" > "\${TMP}/novos"$(printf '\x1f')  cat "\${TMP}/current" > "\${TMP}/novos"$(printf '\x1f')(iv)
+          if (guarded) continue$(printf '\x1f')          if (0) continue$(printf '\x1f')(v)
+      filecore { next }$(printf '\x1f')      filecore && 0 { next }$(printf '\x1f')(vi)
+ops\/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+|\/[A-Za-z0-9_.*-]*)/)$(printf '\x1f')ops\/[A-Za-z0-9_-]+(\.[A-Za-z0-9]+|\/[A-Za-z0-9_.*-]*)?/)$(printf '\x1f')(vii)
+       ! -path '*/fixtures/*' -print0$(printf '\x1f')       -print0$(printf '\x1f')(vii)
+say "HARD" "CATRACA" "\${BASELINE_REL}"$(printf '\x1f')say "SOFT" "CATRACA" "\${BASELINE_REL}"$(printf '\x1f')(viii)
+if [ ! -f "\${BASELINE}" ]; then$(printf '\x1f')if false; then$(printf '\x1f')(ix)
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_ops_citation_travel_selftests
 
 # Modo kg-migrate-v3 — SAC-73 parte 1: a ferramenta de migração do corpus ao contrato v3
 # (.claude/utils/kg/kg-migrate-v3.py) cita datas, deriva provenance SÓ de fonte que o nó já traz,
