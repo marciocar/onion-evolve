@@ -1,0 +1,221 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.296 a 2.1.296 contra a baseline 2.1.295.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-11-r9
+  schema_version: "1"
+  baseline: "2026-10-11"
+  review_after: "2026-11-10"   # 30d: cadência de ferramenta
+  x_supersedes_none: "a rodada mediu 2.1.296 contra a baseline E3 (r8, 2.1.295) e não derrubou nenhum nó da r8: E_HOOK_ONFAILURE_BLOCK segue verdadeiro (20 hooks, 0 com onFailure) e nenhum item do delta contradiz um nó selado"
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-11); 12 depois da rodada e do juiz (2026-10-11).
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
+# external_edges:
+#   - to: "docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml#<NO_DERRUBADO>"
+#     edge_type: SUPERSEDES
+#   (b) não derrubou nada → no meta: x_supersedes_none: "<a razão medida>"
+external_edges:
+  - from: E_DELTA_DA_RODADA
+    to: "docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml#E_MODS_GUARDA_NO_RESTART_CURADA"
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: "docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml#E_ZERO_SILENCIOSO_NAS_FERRAMENTAS"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "CHANGELOG oficial: seções 2.1.296 (82 linhas, 79 itens); baseline 2.1.295, disco 2.1.296, processo 2.1.296"
+    label: "o delta desde a baseline 2.1.295 são 1 versão(ões), de 2.1.296 a 2.1.296, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.296 a ## 2.1.296 (cópias em docs/evolution/research/radar-E3-2026-10-11-r9/data/)"
+      method: "medição: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "respondida pela rodada r9 em 2026-10-11: 6 itens ligados a superfície medida no vivo, julgados pelo juiz opus (2 sustentam, 4 corrigidos, 1 reprovado e corrigido), 1 omissão de impacto 2 incorporada; os demais itens não tocam o core (gerenciado, Windows, VSCode, nuvem, Claude Tag) ou foram medidos com impacto 1"
+    label: "quais itens de 2.1.296 a 2.1.296 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+  - id: E_VETO_PROPRIO_JA_PEGA_INDIRECAO_POR_VARIAVEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "merge-gate e protect-main alimentados com o JSON do PreToolUse (medição da rodada + juiz): merge-gate rc 2 em gh pr merge, BASH_ARGV0=gh com $BASH_ARGV0, X=gh com $X, X=git com $X push origin main e BASH_ARGV0=git com $BASH_ARGV0 push origin +main; rc 0 no echo literal e em push de feature; protect-main rc 2 no force-push por BASH_ARGV0; os dois rc 2 na forma BASH_ARGV0=git seguida de $0"
+    label: "a 2.1.296 fechou no permissionador a indireção por BASH_ARGV0; os vetos do core já a barravam: a lib resolve a atribuição literal e fecha por inanalisável a indireção via $0"
+    narrative: "Item 2.1.296 data linha 33. Corrigido pelo juiz: a lib invocation-lines RESOLVE a atribuição literal (mapa de atribuições) e entrega o comando real, por isso $BASH_ARGV0 e $X viram gh pr merge e git push --force origin main; o fechamento por inanalisável acontece na forma que a nota provavelmente mira, BASH_ARGV0=git seguido de $0, que vale o novo BASH_ARGV0. Nas duas classes os dois vetos saem rc 2. O protect-main sai rc 0 em push sem force para main, que é escopo do merge-gate, e este o barra. A correção do Claude Code não muda o comportamento do core."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.296, item 'Fixed Bash permission checks auto-approving some commands that assign the `BASH_ARGV0` shell variable and then use it'"
+      method: "medição: execução do pretooluse-merge-gate.sh com 4 comandos sob o JSON de PreToolUse"
+      locality: "web"
+  - id: E_TIERING_DOS_WORKFLOWS_E_O_MODELO_UNICO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "ocorrências literais de model nos 3 scripts de Workflow: haiku 4, opus 4, sonnet 5 (há mais linhas com model via tabela de tier); a variável nova não aparece no core nem no ambiente; o passo 8 da skill onion-orchestration e a KB agent-orchestration checam o modelo forçado por grep de CLAUDE_CODE_SUBAGENT_MODEL, que dá 0 para CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL"
+    label: "a 2.1.296 criou uma variável que roda todo agente de Workflow num modelo só, e a checagem de modelo forçado da skill onion-orchestration é cega a ela: o grep procura outro nome"
+    narrative: "Item 2.1.296 data linha 5. O tiering por fase é a régua da casa (eficiência, não economia). A skill onion-orchestration (passo 8) e a KB agent-orchestration já avisam 'tiering declarado ≠ executado' quando o ambiente força um modelo, mas o grep delas procura CLAUDE_CODE_SUBAGENT_MODEL, que não casa com CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL (medido pelo juiz: 0). Ligada a variável nova, o relatório declararia um tiering que não rodou. Corrigido pelo juiz: o rascunho dizia 'nada muda'."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.296, item 'Added `CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL` to run every workflow agent on one model while other subagents keep theirs'"
+      method: "medição: grep das linhas model: nos scripts de Workflow e da variável nova em .claude e ops"
+      locality: "web"
+  - id: E_USERPROMPTSUBMIT_DO_CORE_NAO_VETA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "os 4 hooks UserPromptSubmit do settings.json (aside-router, session-beacon, session-version-drift, session-degraded-notice): exit 2 aparece 1 vez, só no comentário do aside-router que diz 'NUNCA bloqueia'; nos outros 3, zero"
+    label: "a 2.1.296 corrigiu Esc durante hook UserPromptSubmit deixando passar o prompt não checado; nenhum hook UserPromptSubmit do core veta, então a correção não muda nada aqui"
+    narrative: "Item 2.1.296 data linha 21. A correção importa para quem usa UserPromptSubmit como gate. Os 4 do core injetam contexto (rota de aparte, farol, aviso de versão, aviso de degradação) e saem 0. Se um dia um deles virar veto, essa é a versão mínima que fecha o atalho do Esc."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.296, item 'Fixed Esc or an interrupt during a `UserPromptSubmit` hook'"
+      method: "medição: grep de exit 2 nos 4 hooks UserPromptSubmit registrados"
+      locality: "web"
+  - id: E_FRONTMATTER_DE_AGENTE_SEM_GUARDA_DE_CHAVE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-11"
+    verified_against: "lint-artifacts.sh: REGRA 1 (name/description/tools), REGRA 23 (category, HARD), REGRA 12 (valores de tools), REGRA 17 (YAML) e REGRA 3 (valor de model) — nenhuma cobra chave desconhecida; contra a tabela oficial de campos de subagente, os 51 agentes usam 11 chaves não oficiais em 344 ocorrências (category, related_agents e expertise nos 51; priority em 48; version, updated e related_commands em 45)"
+    label: "os 51 agentes usam 11 chaves de frontmatter fora da tabela oficial (344 ocorrências), uma delas exigida por REGRA HARD; o --debug da 2.1.296 vai acusar todos, e um typo real some no ruído"
+    narrative: "Itens 2.1.296 data linhas 4 e 57. Corrigido pelo juiz: o rascunho dizia que só a REGRA 3 valida o frontmatter; são cinco regras, mas nenhuma cobra chave desconhecida. O achado real é que a convenção do Onion (category, related_agents, expertise, priority, version, updated, related_commands e outras) é 'não reconhecida' para o Claude Code. Antes de usar o --debug como medidor de typo, é preciso uma allowlist que separe as chaves da casa das oficiais. O autoCompactWindow é capacidade nova que nenhum agente usa."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.296, itens 'Added `autoCompactWindow` to subagent frontmatter' e 'Improved `--debug` output to name unrecognized frontmatter fields in custom agent files'"
+      method: "medição: grep no lint-artifacts.sh por guarda de chave de frontmatter de agente"
+      locality: "web"
+  - id: E_DEBUG_DE_HOOK_MEDE_DURACAO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "settings.json: 20 hooks, 11 com timeout 5 e 9 sem timeout declarado (o rascunho invertera); latência dos vetos PreToolUse já medida no grafo guard-vetos-por-tokens-2026-10 (~125 ms de mediana, p90 até 162 ms) e do kg-read-leg no lint (8 ms)"
+    label: "a 2.1.296 passou a logar a duração de cada hook de comando no --debug; o core tem 20 hooks, 9 sem timeout, e só os PreToolUse e o kg-read-leg têm latência medida"
+    narrative: "Item 2.1.296 data linha 59. Reprovado pelo juiz e corrigido: eram 9 hooks sem timeout, não 11, e o 'nunca mediu' era falso: os vetos PreToolUse têm latência medida (~125 ms de mediana) e o kg-read-leg, 8 ms. O --debug acrescenta a medida por turno dos demais (SessionStart, UserPromptSubmit, PostToolUse, Stop) sem instrumentação própria."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.296, item 'Improved `--debug` output for hooks'"
+      method: "medição: inventário de hooks do cc-delta-census.sh contra o settings.json"
+      locality: "web"
+  - id: E_PRECO_DO_CACHE_DO_SONNET_CAIU
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "51 agentes: 43 em sonnet e 8 em opus, nenhum sem model (os 9 restantes do censo são READMEs de categoria); grep de preço de cache no core = 0; o review-verdict.sh lê total_cost_usd do revisor de CI, que roda sonnet"
+    label: "a 2.1.296 passou a precificar a leitura de cache do Sonnet 5.5 a US$ 0,10 por milhão (era 0,20); 43 dos 51 agentes do core rodam em sonnet, e nenhum script fixa preço"
+    narrative: "Item 2.1.296 data linha 61. Informativo: a régua da casa é eficiência, não custo. Corrigido pelo juiz: o censo era 43 de 51, não de 60. Ressalva: a série de custo dos resíduos (total_cost_usd do revisor de CI em sonnet) muda de base a partir desta versão; impacto baixo, porque o custo só entra na detecção de zero."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.296, item 'Updated `/cost`, the status line, `--max-budget-usd` and the SDK's cost figures to price Sonnet 5.5 cache reads at $0.10 per million tokens'"
+      method: "medição: censo de agentes por model e grep de preço de cache no core"
+      locality: "web"
+  - id: Q_MEDIR_HOOKS_E_FRONTMATTER_COM_O_DEBUG
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "aberta pela rodada r9 em 2026-10-11 a partir de E_FRONTMATTER_DE_AGENTE_SEM_GUARDA_DE_CHAVE e E_DEBUG_DE_HOOK_MEDE_DURACAO; nada foi rodado com --debug ainda"
+    label: "medir com o --debug da 2.1.296 a duração dos hooks sem latência medida e as chaves de frontmatter dos agentes, depois de uma allowlist das chaves da casa; a sonda com -p dispara o hook Stop do usuário"
+  - id: E_GITATTRIBUTES_SEM_EOL_LF
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: ".gitattributes do core só declara merge=union, sem eol=lf nem text=; o item da 2.1.296 cura o Workflow que recusava scriptPath com CRLF"
+    label: "a 2.1.296 deixou o Workflow aceitar script com CRLF, mas o core não fixa eol=lf: num checkout Windows com autocrlf, os hooks e scripts .sh continuam quebrando com o retorno de carro"
+    narrative: "Omissão apontada pelo juiz (item 2.1.296 data linha 45). A cura do Claude Code cobre só os scripts de Workflow. Adotante ou aluno no Windows com core.autocrlf recebe os .sh com CRLF, e bash falha nos hooks. Fixar eol=lf no .gitattributes para .sh, .js, .mjs, .py e .kg.yaml fecha a classe na origem."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.296, item 'Fixed the Workflow tool refusing script files with CRLF line endings, such as files checked out on Windows'"
+      method: "medição: leitura do .gitattributes do core pelo juiz da rodada"
+      locality: "web"
+  - id: Q_CHECAGEM_DE_MODELO_FORCADO_CEGA_A_VARIAVEL_NOVA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-11"
+    verified_against: "aberta pela rodada r9 a partir de E_TIERING_DOS_WORKFLOWS_E_O_MODELO_UNICO; o grep do passo 8 da onion-orchestration dá 0 para a variável nova"
+    label: "ampliar a checagem de modelo forçado da skill onion-orchestration e da KB agent-orchestration para CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL, com caso de bancada que reprove o grep antigo"
+  - id: Q_FIXAR_EOL_LF_NO_GITATTRIBUTES
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "aberta pela rodada r9 a partir de E_GITATTRIBUTES_SEM_EOL_LF"
+    label: "fixar eol=lf no .gitattributes do core (e no que viaja às portas) para scripts e grafos, medindo antes que nenhum arquivo rastreado muda de bytes"
+edges:
+  - from: E_TIERING_DOS_WORKFLOWS_E_O_MODELO_UNICO
+    to: Q_CHECAGEM_DE_MODELO_FORCADO_CEGA_A_VARIAVEL_NOVA
+    edge_type: SUPPORTS
+  - from: E_GITATTRIBUTES_SEM_EOL_LF
+    to: Q_FIXAR_EOL_LF_NO_GITATTRIBUTES
+    edge_type: SUPPORTS
+  - from: E_VETO_PROPRIO_JA_PEGA_INDIRECAO_POR_VARIAVEL
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_TIERING_DOS_WORKFLOWS_E_O_MODELO_UNICO
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_USERPROMPTSUBMIT_DO_CORE_NAO_VETA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_FRONTMATTER_DE_AGENTE_SEM_GUARDA_DE_CHAVE
+    to: Q_MEDIR_HOOKS_E_FRONTMATTER_COM_O_DEBUG
+    edge_type: SUPPORTS
+  - from: E_DEBUG_DE_HOOK_MEDE_DURACAO
+    to: Q_MEDIR_HOOKS_E_FRONTMATTER_COM_O_DEBUG
+    edge_type: SUPPORTS
+  - from: E_PRECO_DO_CACHE_DO_SONNET_CAIU
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS

@@ -13,14 +13,14 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-10-08
-    cc_version: "2.1.295"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "4/12 reprovados no juiz + 3 exagerados corrigidos + o supersedes sobre a r7 reprovado (trocado por x_supersedes_none)"
-                            # rodada 8 (2.1.290->2.1.295, SEIS versões contíguas). O achado principal: onFailure: block
-                            # para hooks, que nenhum dos 20 hooks do Onion usa. Os reprovados afirmavam ligação com o
-                            # core que não existe (reescrita de input, SessionStart async, guarda de modelo). Historico
-                            # da r7 no proprio kg dela.
-    kg: docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml
+    last_run: 2026-10-11
+    cc_version: "2.1.296"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "1/7 reprovado no juiz (contagem de hooks sem timeout invertida) + 4 exagerados corrigidos + 1 omissão incorporada (eol=lf)"
+                            # rodada 9 (2.1.295->2.1.296, uma versão, 79 itens), a 1ª pelo /meta:cc-update forjado.
+                            # O achado principal: a checagem de modelo forçado da onion-orchestration é cega à variável
+                            # nova CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL, e os 51 agentes usam 11 chaves de frontmatter
+                            # fora da tabela oficial (o --debug novo vai acusar todos). Histórico da r8 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-10-11-r9/radar-E3-2026-10-11-r9.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
