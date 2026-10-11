@@ -62,6 +62,24 @@ if [ -n "${COUNT_PIN}" ]; then
   exit 0
 fi
 
+# ── EMISSÃO SEM REGISTRO: baseline VAZIO, não falha (medido em 2026-10-11) ─────────────────────
+# No `/meta:adopt --update` de um adotante (portal-gamificacao), o `regen-baselines.sh` imprimiu
+# "emissor falhou (door-staleness-check.sh) — baseline mantido COMO VEIO DO CORE": o `--emit-baseline`
+# caía na falha fechada abaixo, e o baseline do CORE (as portas do core, com os tetos do core) viajava
+# intacto para quem não tem porta nenhuma. Num repo sem `members.yaml` a regra NÃO TEM OBJETO — não é
+# "não sei julgar", é "não há o que julgar". Então a EMISSÃO devolve o baseline vazio (só cabeçalho)
+# com rc 0. A CHECAGEM continua falhando fechada: ali o "não sei" tem de ser dito, e quem a chama (o
+# lint) já traduz o ERRO em NAO-MEDIDO, nunca em "portas em dia".
+_emit_header() {
+  printf '# Catraca de DEFASAGEM DE PORTA (door-staleness-baseline.txt) — emitida por\n'
+  printf '#   bash .claude/validation/door-staleness-check.sh --emit-baseline\n'
+  printf '# %s\n' "$1"
+}
+if [ "${EMIT}" -eq 1 ] && [ ! -f "${MEMBERS}" ]; then
+  _emit_header "SEM OBJETO neste repo: não há docs/evolution/federation/members.yaml, logo não há porta a julgar."
+  exit 0
+fi
+
 # FALHA FECHADA: sem registro ou sem SSOT do transporte a guarda não SABE o que julgar,
 # e guarda que não sabe não aprova — ela diz que não sabe.
 [ -f "${MEMBERS}" ] || { echo "ERRO door-staleness: members.yaml ausente — sem registro não há porta a julgar." >&2; exit 3; }
@@ -84,7 +102,11 @@ for blk in re.split(r'\n  - id: ', s)[1:]:
         print(f"{mid}\t{pin.group(1)}")
 PY
 )"
-[ -n "${_doors}" ] || { echo "door-staleness: nenhuma porta com pin no registro — nada a julgar."; exit 0; }
+# Na EMISSÃO a frase vira COMENTÁRIO: impressa crua, ela entraria no baseline como uma "chave".
+if [ -z "${_doors}" ]; then
+  [ "${EMIT}" -eq 1 ] && { _emit_header "nenhuma porta com pin no registro — nada a julgar."; exit 0; }
+  echo "door-staleness: nenhuma porta com pin no registro — nada a julgar."; exit 0
+fi
 
 # A PONTA a medir: o último ponto que de fato está no ramo default (ver a nota abaixo, no `log`).
 _TIP="HEAD"
