@@ -559,6 +559,13 @@
 .github/workflows/onion-review.yml	Q_POR_QUE_O_REVISOR_SEMANTICO_MORRE	docs/onion/graph/fios-abertos.kg.yaml
 .github/workflows/onion-validate.yml	E_GATE_DO_CONTRATO_NO_CI	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 .kg-ssot/gate.json	E_CONTRATO_V4_ADOTADO	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
+CLAUDE.md	C_IDENTITY_CANON	docs/onion/graph/onion-identity-2026-07.kg.yaml
+CLAUDE.md	C_p4_gate_visibility	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
+CLAUDE.md	D_FAMILIA_TEM_DOIS_REGIMES_2026_09	docs/onion/graph/onion-identity-2026-07.kg.yaml
+CLAUDE.md	E_CLAUDE_MD	docs/onion/graph/onion-identity-2026-07.kg.yaml
+CLAUDE.md	E_F3_BYPASS_EM_PROJECT_SETTINGS_IGNORADO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
+CLAUDE.md	E_F3_PERMISSION_PROMPTS_NONE	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
+LICENSE	SY6_ev_licenca_mit	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/INDEX.md	C_D7_18	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/INDEX.md	E_J_D7_18	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/INDEX.md	SY5_index_residual_drift	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml

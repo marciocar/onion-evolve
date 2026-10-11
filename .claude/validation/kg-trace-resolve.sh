@@ -40,6 +40,21 @@
 # positivo. Julgar nome solto exigiria adivinhar a raiz pretendida — e um aviso que adivinha é o
 # que treina o leitor a ignorar. Preferi cobertura menor e crível a cobertura maior e barulhenta.
 #
+# EXCEÇÃO À REGRA (b), SAC-81 (sinal do adotante onion-curation, 2026-10-08): o nome solto que é
+# ARQUIVO RASTREADO NA RAIZ DO REPO, com o nome EXATO, entra. O caso que pagou: `trace: "CLAUDE.md"`
+# — a âncora mais importante de um adotante — caía em não-caminho, e o CLAUDE.md ficava FORA do
+# índice de leitura, logo sem vigilância do hook kg-read-leg. Aqui não há raiz a adivinhar: a raiz
+# do repo é a 1ª raiz do resolvedor, e o alvo só entra se ESTÁ lá. Três travas contra falso positivo:
+#   · nome EXATO de arquivo rastreado (`git ls-files`), comparado por string — `README` não casa
+#     `README.md`, `readme.md` não casa `README.md` nem em disco case-insensitive (macOS), e um
+#     arquivo local não rastreado (`.env`) não entra (senão o índice divergiria do clone do CI);
+#   · tem de ser ARQUIVO (`-f`): `plugins` (diretório) segue fora;
+#   · se o MESMO nome existe ao lado do grafo (ou no pai dele), é ambíguo — o autor pode ter
+#     querido o vizinho (`SYNTHESIS.md`, o `README.md` da pasta) — e segue fora, como antes.
+# O teto que sobra continua declarado: se o arquivo da raiz SUMIR, o nome volta a parecer palavra
+# solta e esta guarda CALA (não acusa TARGET-MISSING). Preço aceito: acusar exigiria julgar todo
+# nome solto, e é isso que a regra (b) existe para não fazer.
+#
 # TRÊS RAÍZES, e cada uma foi paga por um falso-positivo medido:
 #   1. raiz do REPO            — o caso comum.
 #   2. diretório DO GRAFO      — 7 dos 8 primeiros "quebrados" eram `SYNTHESIS.md` ao lado do grafo;
@@ -73,6 +88,12 @@ EMIT_INDEX=0; INDEX=""
 for a in "$@"; do case "$a" in --format) : ;; tsv) FORMAT=tsv ;; --format=tsv) FORMAT=tsv ;; --emit-index) EMIT_INDEX=1 ;; esac; done
 
 cd "${REPO_ROOT}"
+
+# Arquivos RASTREADOS na raiz (sem barra) — a lista da exceção SAC-81 à regra (b). Delimitada por
+# quebra de linha nas duas pontas para o casamento por `case` ser de linha INTEIRA (nome exato).
+ROOT_FILES="
+$(git ls-files 2>/dev/null | LC_ALL=C grep -v / || true)
+"
 
 # Descoberta ao vivo — o glob hardcoded era 36% cego (achado da casa, REGRA do kg-grammar).
 # ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
@@ -110,7 +131,21 @@ while IFS= read -r g; do
     #   (c) último segmento tem → mata domínio/URL sem esquema: `support.claude.com/.../13837433`
     #       extensão              e `kubernetes.io/.../kustomization/` passam em (a) e (b).
     case "${target}" in *[!A-Za-z0-9_./-]*) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;; esac
-    case "${target}" in */*) : ;; *) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;; esac
+    # `./X` e `X` são o MESMO alvo. Normaliza aqui, antes de julgar e de emitir o índice: o hook
+    # kg-read-leg tira o `./` do caminho lido, e um índice com `./CLAUDE.md` nunca casava (SAC-81).
+    while :; do case "${target}" in ./*) target="${target#./}" ;; *) break ;; esac; done
+    [ -n "${target}" ] || { SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue; }
+    _root_file=0
+    case "${target}" in
+      */*) : ;;
+      *)  # (b) com a exceção SAC-81: arquivo rastreado na raiz, nome exato, sem homônimo vizinho.
+          case "${ROOT_FILES}" in *"
+${target}
+"*) [ -f "${target}" ] && _root_file=1 ;; esac
+          if [ "${_root_file}" -eq 1 ] && [ "${gdir}" != "." ] \
+             && { [ -e "${gdir}/${target}" ] || [ -e "${gdir}/../${target}" ]; }; then _root_file=0; fi
+          [ "${_root_file}" -eq 1 ] || { SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue; } ;;
+    esac
     # (c) O TESTE DE DOMÍNIO MUDOU DE LUGAR — e isso amplia a cobertura sem perder precisão.
     #     Antes: "o último segmento precisa ter extensão". Matava domínio (`support.claude.com/...`)
     #     mas também matava CAMINHO REAL sem extensão — medido: 14 âncoras vivas ficavam fora de
@@ -121,8 +156,10 @@ while IFS= read -r g; do
     #     ponto ali (`support.claude.com`, `kubernetes.io`); um caminho do repo, não (`docs`,
     #     `.claude` — que começa com ponto, e por isso a exceção do prefixo é necessária, senão
     #     toda a superfície `.claude/` seria descartada).
+    #     O arquivo da raiz (SAC-81) não tem 1º segmento de caminho — `CLAUDE.md` tem ponto e seria
+    #     tomado por hostname; ele já provou que existe na raiz, então pula este teste.
     _first="${target%%/*}"
-    case "${_first}" in
+    [ "${_root_file}" -eq 1 ] || case "${_first}" in
       .*)  : ;;                                                    # `.claude/…`, `.githooks/…`
       *.*) SKIP_NOTPATH=$((SKIP_NOTPATH + 1)); continue ;;         # hostname → não julgável
     esac

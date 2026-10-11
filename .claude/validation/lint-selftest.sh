@@ -22510,6 +22510,85 @@ run_kg_read_leg_selftests() {
 
 }
 
+# ── SAC-81 — o ARQUIVO DA RAIZ entra no índice de leitura (e `./X` casa nos dois lados) ────────
+# Sinal do adotante onion-curation (2026-10-08): `trace: "CLAUDE.md"` caía em não-caminho (regra (b)
+# exige barra) e `./CLAUDE.md` nunca casava (o hook tira o `./` do caminho lido; o índice não).
+# Efeito: o CLAUDE.md, a âncora mais importante de um adotante, ficava SEM vigilância do hook.
+# A bancada roda o gerador COMO O RUNNER O INVOCA (`--emit-index` sobre um repo git com o motor
+# inteiro copiado) e o hook com payload real. Os controles negativos (b)/(c) são metade do caso: a
+# exceção afrouxa a regra (b), e afrouxar sem prender o falso positivo é dar licença.
+run_kg_trace_root_file_selftests() {
+  local sb out
+  sb="$(mktemp -d)"
+  mkdir -p "${sb}/.claude/validation" "${sb}/.claude/hooks" "${sb}/docs/onion/graph" "${sb}/pasta"
+  cp "${REPO_ROOT}/.claude/validation/kg-trace-resolve.sh" "${sb}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "${sb}/.claude/validation/" 2>/dev/null || true
+  cp "${REPO_ROOT}/.claude/hooks/kg-read-leg.sh" "${sb}/.claude/hooks/"
+  printf '# raiz\n' > "${sb}/CLAUDE.md"
+  printf '# leia\n' > "${sb}/README.md"
+  printf '# notas da raiz\n' > "${sb}/NOTAS.md"
+  printf '# notas do grafo\n' > "${sb}/docs/onion/graph/NOTAS.md"
+  _no() { printf '  - id: %s\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: x\n    trace: "%s"\n' "$1" "$2"; }
+  { printf 'meta:\n  id: g\n  schema_version: "1"\nnodes:\n'
+    _no C_RAIZ       'CLAUDE.md'
+    _no C_PONTO      './README.md'
+    _no C_AUSENTE    'NAO-EXISTE.md'
+    _no C_QUASE      'README'
+    _no C_DIRETORIO  'pasta'
+    _no C_LOCAL      'LOCAL.md'
+    _no C_SUMIU      'SUMIU.md'
+    _no C_AMBIGUO    'NOTAS.md'
+    printf 'edges: []\n'; } > "${sb}/docs/onion/graph/g.kg.yaml"
+  printf '# sumiu\n' > "${sb}/SUMIU.md"
+  printf 'x\n' > "${sb}/pasta/dentro.md"
+  ( cd "${sb}" && git init -q . && git add -A ) >/dev/null 2>&1
+  rm -f "${sb}/SUMIU.md"                         # rastreado, mas apagado do disco: não pode entrar
+  printf 'nao rastreado\n' > "${sb}/LOCAL.md"   # existe no disco, FORA do git: não pode entrar
+  printf 'nao rastreado\n' > "${sb}/README"     # prefixo de README.md: só o nome EXATO rastreado vale
+  out="$(bash "${sb}/.claude/validation/kg-trace-resolve.sh" "${sb}" --emit-index 2>&1 || true)"
+
+  # (a) nome solto que É arquivo rastreado na raiz → entra no índice
+  if grep -q $'^CLAUDE.md\tC_RAIZ\t' <<< "${out}"; then
+    record_pass "kg-trace-root: (a) trace \"CLAUDE.md\" (arquivo da raiz) → entra no índice"
+  else record_fail "kg-trace-root: (a)" "o arquivo da raiz ficou fora do índice — o hook segue cego para ele: ${out:0:200}"; fi
+
+  # (b) nome que NÃO existe, nome QUASE igual (`README` x `README.md`, com um `README` solto no
+  #     disco para o prefixo ter onde casar), diretório, arquivo NÃO rastreado e rastreado-mas-
+  #     apagado → nenhum entra. Cada um é um falso positivo que a exceção poderia abrir.
+  local vaz=""
+  for _id in C_AUSENTE C_QUASE C_DIRETORIO C_LOCAL C_SUMIU; do grep -q $'\t'"${_id}"$'\t' <<< "${out}" && vaz="${vaz} ${_id}"; done
+  if [ -z "${vaz}" ]; then
+    record_pass "kg-trace-root: (b) inexistente · quase-igual · diretório · não-rastreado · apagado → fora (nome EXATO de arquivo rastreado)"
+  else record_fail "kg-trace-root: (b)" "a exceção vazou para:${vaz}"; fi
+
+  # (c) HOMÔNIMO ao lado do grafo → ambíguo, fica fora (o autor pode ter querido o vizinho)
+  if ! grep -q $'\tC_AMBIGUO\t' <<< "${out}"; then
+    record_pass "kg-trace-root: (c) NOTAS.md na raiz E ao lado do grafo → ambíguo, fora do índice"
+  else record_fail "kg-trace-root: (c)" "indexou o homônimo da raiz — o aviso apontaria o arquivo errado: ${out:0:200}"; fi
+
+  # (d) `./README.md` no trace → o índice grava SEM o `./` (o lado gerador da normalização)
+  if grep -q $'^README.md\tC_PONTO\t' <<< "${out}" && ! grep -q '^\./' <<< "${out}"; then
+    record_pass "kg-trace-root: (d) trace \"./README.md\" → índice grava README.md (sem ./)"
+  else record_fail "kg-trace-root: (d)" "o índice guardou o ./ — o hook nunca casaria: ${out:0:200}"; fi
+
+  # (e) inexistente NÃO vira TARGET-MISSING: nome solto continua palavra solta, não acusação
+  local rc=0; bash "${sb}/.claude/validation/kg-trace-resolve.sh" "${sb}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "kg-trace-root: (e) nome solto inexistente → SKIP contado, não TARGET-MISSING (exit 0)"
+  else record_fail "kg-trace-root: (e)" "a exceção virou acusação (rc=${rc}) — palavra solta reprovaria o gate"; fi
+
+  # (f) o lado HOOK: `./CLAUDE.md` e `././CLAUDE.md` lidos casam a linha `CLAUDE.md` do índice
+  printf 'CLAUDE.md\tC_RAIZ\tdocs/onion/graph/g.kg.yaml\n' > "${sb}/docs/onion/kg-read-index.tsv"
+  local o1 o2
+  o1="$(printf '{"tool_name":"Read","tool_input":{"file_path":"./CLAUDE.md"}}' | bash "${sb}/.claude/hooks/kg-read-leg.sh" 2>&1 || true)"
+  o2="$(printf '{"tool_name":"Read","tool_input":{"file_path":"././CLAUDE.md"}}' | bash "${sb}/.claude/hooks/kg-read-leg.sh" 2>&1 || true)"
+  if grep -q 'C_RAIZ' <<< "${o1}" && grep -q 'C_RAIZ' <<< "${o2}"; then
+    record_pass "kg-trace-root: (f) hook: ./CLAUDE.md e ././CLAUDE.md casam o índice"
+  else record_fail "kg-trace-root: (f)" "o hook não normalizou o ./ (o1=${o1:0:80} · o2=${o2:0:80})"; fi
+  unset -f _no
+  rm -rf "${sb}"
+}
+
 
 # ── A CURA DA MORTE DO WORKER TEM BANCADA (senão é fé) ────────────────────────────────────────
 # Uma cura de ambiente é a mais fácil de perder: some numa refatoração e ninguém nota até o CI
@@ -24450,6 +24529,7 @@ _family run_model_ssot_selftests
 _family run_role_vocabulary_selftests
 _family run_kg_edit_confirmed_selftests
 _family run_kg_read_leg_selftests
+_family run_kg_trace_root_file_selftests
 _family run_sandbox_gc_selftests
 _family run_family_topology_selftests
 _family run_decouple_source_selftests
