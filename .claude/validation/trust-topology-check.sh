@@ -77,6 +77,18 @@ get_role() {
   ' "$MEMBERS"
 }
 
+# Obter kind de um membro. A AUTORIDADE DE FONTE se reconhece pela NATUREZA (kind: source), nunca só pelo
+# papel: desde a matriz das portas (2026-10-09) a porta onion-core publica `role: source` com `kind: door`,
+# e o refutador de 2026-10-10 mostrou um adotante disfarçado de porta source AUTORIZADO a `correct` qualquer
+# membro quando a decisão lia só o role.
+get_kind() {
+  local ID="$1"
+  awk -v id="$ID" '
+    /^  - id:/ { found = ($NF == id) }
+    found && /^    kind:/ { print $2; exit }
+  ' "$MEMBERS"
+}
+
 # Verificar se ID está em uma lista YAML (campo: [a, b, c])
 # Indentação LIVRE (os campos de trust vivem a 6 espaços, aninhados sob `trust:`)
 # e comentário inline removido ANTES da comparação — sem isso o match é sempre-falso
@@ -147,9 +159,11 @@ EOF
 
 FROM_ROLE="$(get_member_role "$FROM_ID")"
 TO_ROLE="$(get_member_role "$TO_ID")"
+FROM_KIND="$(get_kind "$FROM_ID")"
+TO_KIND="$(get_kind "$TO_ID")"
 
 # source (core) pode enviar para qualquer membro — autoridade emissora
-if [ "$FROM_ROLE" = "source" ]; then
+if [ "$FROM_KIND" = "source" ]; then
   log_attempt "AUTORIZADO" "core (source) tem autoridade emissora universal"
   echo "✅ AUTORIZADO: $FROM_ID ($FROM_ROLE) → $TO_ID ($TO_ID) [$ACTION]"
   echo "   Razão: core (source) tem autoridade emissora — sem restrição de saída."
@@ -157,7 +171,7 @@ if [ "$FROM_ROLE" = "source" ]; then
 fi
 
 # Qualquer membro pode enviar para o core via relay/advise
-if [ "$TO_ROLE" = "source" ] && [ "$ACTION" != "correct" ]; then
+if [ "$TO_KIND" = "source" ] && [ "$ACTION" != "correct" ]; then
   log_attempt "AUTORIZADO" "inbox do core é aberto para relay e advise"
   echo "✅ AUTORIZADO: $FROM_ID ($FROM_ROLE) → $TO_ID (core) [$ACTION]"
   echo "   Razão: inbox do core é aberto para relay e advise de qualquer membro."
@@ -165,7 +179,7 @@ if [ "$TO_ROLE" = "source" ] && [ "$ACTION" != "correct" ]; then
 fi
 
 # correct para o core: verificar can_correct_to
-if [ "$TO_ROLE" = "source" ] && [ "$ACTION" = "correct" ]; then
+if [ "$TO_KIND" = "source" ] && [ "$ACTION" = "correct" ]; then
   AUTHORIZED="$(id_in_list "onion-evolve" "$FROM_ID" "can_correct_to")"
   if [ "$AUTHORIZED" = "yes" ]; then
     log_attempt "AUTORIZADO" "can_correct_to inclui onion-evolve"
@@ -243,7 +257,7 @@ if [ "$FROM_ROLE" = "hub" ] && [ "$TO_ROLE" = "hub" ] && [ "$ACTION" = "correct"
 fi
 
 # standalone → qualquer não-core: bloqueado
-if [ "$FROM_ROLE" = "standalone" ] && [ "$TO_ROLE" != "source" ]; then
+if [ "$FROM_ROLE" = "standalone" ] && [ "$TO_KIND" != "source" ]; then
   REASON="standalone não tem canal lateral. Comunicação só via core."
   log_attempt "BLOQUEADO" "$REASON"
   echo "🚫 BLOQUEADO: $FROM_ID (standalone) → $TO_ID [$ACTION]" >&2

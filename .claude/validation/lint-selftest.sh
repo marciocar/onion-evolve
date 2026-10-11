@@ -14450,6 +14450,10 @@ version: 2
 members:
   - id: onion-evolve
     role: source
+    kind: source
+  - id: porta-src
+    role: source
+    kind: door
   - id: hub-a
     role: hub
     trust:
@@ -14491,8 +14495,12 @@ YAML
   tt onion-evolve hub-a relay   0 "source tem autoridade universal"
   tt hub-b onion-evolve advise  0 "inbox do core aberto p/ advise"
   tt ghost hub-a relay          2 "membro inexistente → exit 2"
+  # Porta com `role: source` + `kind: door` (a onion-core desde 2026-10-10) NÃO é a fonte: a autoridade se lê
+  # pelo kind. Mutante: decidir pelo role devolve AUTORIZADO nos dois (refutador de 2026-10-10).
+  tt porta-src hub-a correct    1 "porta source (kind door) não herda a autoridade emissora"
+  tt hub-b porta-src advise     1 "porta source (kind door) não é o inbox do core"
   # Invariante de auditabilidade: toda tentativa logada (no sandbox, não no real)
-  if [ -f "${d}/docs/evolution/trust-log.md" ] && [ "$(grep -c '^|' "${d}/docs/evolution/trust-log.md")" -ge 10 ]; then
+  if [ -f "${d}/docs/evolution/trust-log.md" ] && [ "$(grep -c '^|' "${d}/docs/evolution/trust-log.md")" -ge 12 ]; then
     record_pass "trust: toda tentativa logada (sandbox via --repo)"
   else record_fail "trust: log auditável" "trust-log.md do sandbox ausente/incompleto"; fi
 

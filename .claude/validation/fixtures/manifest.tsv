@@ -43,6 +43,8 @@ members	members/members-bad-plugins-na.yaml	-	fail
 members	members/members-good-superseded.yaml	-	pass	
 members	members/members-bad-superseded-unknown.yaml	-	fail	
 members	members/members-bad-source-door-no-pin.yaml	-	fail	
+members	members/members-bad-mini-na.yaml	-	fail	
+members	members/members-bad-two-source-doors.yaml	-	fail	
 merge	adopt-settings-merge/target-empty.json	-	-
 merge	adopt-settings-merge/target-with-own.json	-	-
 merge	adopt-settings-merge/target-with-own-attribution.json	-	-

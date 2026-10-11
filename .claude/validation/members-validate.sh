@@ -175,11 +175,9 @@ if isinstance(doc, dict):
         if ver in (None, ""):
             err(f"{tag}: 'onion_version' ausente (use 'n/a' só p/ distillation/method)")
         elif kind in VENDOR:
-            # EXCEÇÃO ÚNICA E NOMEADA: a porta `mini` ainda não foi publicada pelo carimbo (o caminho da
-            # 1ª materialização existe desde a F5, SAC-94; publicar é do maestro). Até lá não existe pin, e escrever um seria
-            # inventar. Só `role: mini` com `kind: door` pode declarar `n/a`; o `plugins` não, porque o
-            # pin dele existe (o `ref` do provenance.json publicado).
-            if str(ver) == "n/a" and kind == "door" and role == "mini":
+            # A exceção do `n/a` da porta mini saiu em 2026-10-10: o mini foi publicado pelo carimbo (F6) e tem
+            # pin. Mantê-la deixaria o pin voltar a `n/a` sem nada reprovar (refutador de 2026-10-10).
+            if False:
                 pass
             elif str(ver) == "n/a":
                 err(f"{tag}: kind '{kind}' vendoriza — 'onion_version' não pode ser 'n/a' (pin VERIFICADO obrigatório)")
@@ -208,6 +206,11 @@ if isinstance(doc, dict):
     n_sources = sum(1 for m in members if isinstance(m, dict) and m.get("kind") == "source")
     if n_sources != 1:
         err(f"registro: esperado EXATAMENTE 1 membro fonte (kind:source), encontrado {n_sources} (fonte≠derivação: uma só fonte)")
+    # A porta pública da fonte (`role: source` + `kind: door`) é UMA: duas seriam um adotante disfarçado de porta
+    # source, a forma que o refutador de 2026-10-10 construiu para herdar autoridade num leitor que lia só o role.
+    n_source_doors = sum(1 for m in members if isinstance(m, dict) and m.get("role") == "source" and m.get("kind") == "door")
+    if n_source_doors > 1:
+        err(f"registro: no máximo 1 porta com role:source e kind:door (a face pública da fonte), encontradas {n_source_doors}")
 
     # LINHAGEM HISTÓRICA (2026-10-09, selo do maestro sobre dois membros no mesmo remoto):
     # `superseded_by: <id>` tira o membro do escopo do ops/registry-pins.sh. Por isso o campo é

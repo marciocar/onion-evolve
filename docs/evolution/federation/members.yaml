@@ -203,10 +203,9 @@ members:
 
   - id: onion-mini
     name: onion-mini (Onion Mini — a versão mini e portátil, ex-onion-portable)
-    # PORTA DIDÁTICA (D_MATRIZ_DE_PORTAS_2026_10). A materialização por ALLOWLIST a partir do core tem
-    #   caminho desde a F5 (SAC-94); até a 1ª publicação (do maestro) o repo segue sendo a destilação
-    #   antiga, sem carimbo, e por isso o pin é `n/a` (exceção nomeada no members-validate.sh) e a
-    #   REGRA 92 declara a paridade não-medida. A destilação fica numa tag de arquivo no próprio repo.
+    # PORTA DIDÁTICA (D_MATRIZ_DE_PORTAS_2026_10), materializada por ALLOWLIST a partir do core (F5, SAC-94)
+    #   e publicada pelo carimbo em 2026-10-10 (F6). A destilação antiga ficou na tag
+    #   archive/pre-door-2026-10-10 do próprio repo; a exceção do `n/a` saiu do members-validate.sh.
     role: mini                  # papel de porta: allowlist didática para iniciantes
     kind: door                  # distribui; destilação antiga na tag archive/pre-door-2026-10-10
     parent: onion-evolve
@@ -331,9 +330,9 @@ members:
       exposes_downstream: []
 
   - id: onion-core
-    name: onion-core (porta pública do core — maquinaria completa, papel hub, sem biografia)
-    # A troca do papel para `source` (D_MATRIZ_DE_PORTAS_2026_10) vem com a F2/F3 e a re-materialização,
-    #   nessa ordem: carimbo primeiro, registro depois. Trocar só aqui faria a REGRA 92 reprovar.
+    name: onion-core (porta pública do core — maquinaria completa, papel source, sem biografia)
+    # Papel `source` (D_MATRIZ_DE_PORTAS_2026_10) desde a publicação de 2026-10-10: carimbo primeiro, registro
+    #   depois. É a FACE PÚBLICA da fonte (kind: door): não herda a autoridade de fonte, que se lê pelo kind.
     role: source                # = carimbo da porta (REGRA 92); source desde a publicação de 2026-10-10 (F6)
     kind: door                  # DISTRIBUI a maquinaria; é a face pública do core
     parent: onion-evolve
