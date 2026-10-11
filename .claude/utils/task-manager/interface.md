@@ -29,7 +29,7 @@ forma do provedor.
 | **Status** | `TaskStatus` (7 valores) + **transição** por `updateStatus` | o adapter resolve o nome do provedor; nunca inventa status que o projeto/lista não tem |
 | **Prioridade** | `TaskPriority` (`urgent` \| `high` \| `normal` \| `low`) | normalizada; o mapa por provedor está em [Prioridade](#prioridade), com a fonte de cada coluna |
 | **Estimativa** | `storyPoints?: number` (complexidade) e `timeEstimate?: number` (minutos) | duas grandezas, nunca uma: pontos não são tempo |
-| **Comentário** | corpo canônico em **Markdown**; a conversão é do adapter | ADF no Jira Cloud, string no DC, `text`/`html_text` no Asana — a interface não vê o formato ([texto rico](#texto-rico-é-assunto-do-adapter)) |
+| **Comentário** | corpo canônico em **Markdown**; a conversão é do adapter | string no Jira DC e `text`/`html_text` no Asana (ancorados); ADF no comentário do Jira Cloud **não** ancorado — a interface não vê o formato ([texto rico](#texto-rico-é-assunto-do-adapter)) |
 | **Anexo** | `AttachmentInput { filename, contentType, bytes }` | |
 | **Label** | `tags: string[]` | no ClickUp a escrita de tag **não** vai no corpo do update (medido em 2026-10-02) |
 | **Iteração** | `Iteration { id, name, startDate?, endDate? }` | sprint (Jira, ClickUp) ou cycle (Linear) |
@@ -266,7 +266,7 @@ capability	requirement	status	api_version	source	note
 | `requirement` | `required` \| `optional` | igual à do bloco acima (a declaração não rebaixa o contrato) |
 | `status` | `implemented` \| `not_implemented` \| `unverified` | ver abaixo |
 | `api_version` | texto livre não vazio | a versão que **o adapter mira** — não a "vigente", que a Onda 1 não ancorou para nenhum provedor |
-| `source` | refs separadas por `;`, ou `-` | `kg:<id-do-grafo>#<NÓ>` (evidência ancorada) · `adapter:<arquivo>§<trecho literal>` (medição datada registrada no adapter) · `local` (só para `scope: local`) |
+| `source` | refs separadas por `;`, ou `-` | `kg:<id-do-grafo>#<NÓ>` (evidência ancorada; objeção `E_ELENXO_*` sozinha não prova `implemented`) · `adapter:<arquivo>§<trecho literal>` (medição datada registrada no adapter **deste** provedor, trecho de 12+ caracteres) · `local` (só para `scope: local`) |
 | `note` | texto livre | limite de lote, restrição, a lacuna que deixou a célula aberta |
 
 O que cada `status` afirma:
@@ -293,9 +293,18 @@ Onion reprova (HARD):
 - `requirement` diferente do bloco acima; valor fora do enum; `api_version` vazia;
 - `required` declarada `not_implemented`;
 - `implemented` sem fonte, ou com fonte que não resolve (`kg:` aponta nó inexistente; `adapter:` cita
-  trecho que não está no adapter);
-- **declaração que não bate com o adapter**: `implemented`/`unverified` sem a superfície no adapter, ou
-  `not_implemented` com o método presente.
+  trecho que não está no adapter), ou fonte fraca demais (trecho curto, adapter de outro provedor, só
+  objeção do Elenxo);
+- vocabulário inválido neste bloco (capacidade duplicada, enum ou superfície mal formada);
+- **declaração que não bate com o adapter**: `implemented`/`unverified` sem que o adapter **defina** a
+  superfície (linha de código que começa pelo método, ou cabeçalho que o nomeia), ou `not_implemented`
+  com o método definido. Citar o método em prosa não conta para nenhum dos dois lados.
+
+O que a guarda **não** faz: julgar se a fonte **sustenta** a afirmação. Na passada adversarial de
+2026-10-11, quatro trechos `adapter:` registravam a medição da **falha** (o 400, o filtro ignorado)
+e estavam citados como prova do positivo; e três `kg:` do Linear ancoravam o campo de **leitura**
+enquanto o adapter escreve por outro tipo de entrada. Os sete viraram `unverified`. Isso é juízo,
+e continua sendo da revisão.
 
 Onde ela roda: no core e em todo repo que recebe o lint (adotante, porta `onion-core`, `onion-standalone`).
 **Não roda na porta `onion-mini`**, que leva o task-manager mas não leva o lint — por desenho da allowlist
@@ -402,9 +411,11 @@ await taskManager.addComment(task.id, '🚀 Desenvolvimento iniciado!');
 // Atualizar status
 await taskManager.updateStatus(subtask.id, 'in_progress');
 
-// Capacidade OPCIONAL: só chame o que o adapter declara implementar
-if (taskManager.bulkCreate) {
-  await taskManager.bulkCreate([{ name: 'A' }, { name: 'B' }]);
+// Capacidade OPCIONAL: a presença do método NÃO basta — consulte a declaração do adapter ativo
+// (adapters/<provedor>.capabilities.tsv). Hoje bulk.create é not_implemented nos 5 adapters,
+// então o fluxo faz N chamadas e DIZ que fez.
+for (const input of [{ name: 'A' }, { name: 'B' }]) {
+  await taskManager.createTask(input);
 }
 ```
 

@@ -11,7 +11,7 @@ item.delete	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-
 hierarchy.subtask_create	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	hierarquia e issue types não ancorados (lacuna da Onda 1)
 hierarchy.subtask_list	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	
 hierarchy.epic	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	épico não ancorado; o adapter não cria
-status.transition	required	implemented	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_CLOUD_STATUS_VIA_TRANSITION	o endpoint de transição está ancorado; a OBRIGATORIEDADE dele não (E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN)
+status.transition	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_CLOUD_STATUS_VIA_TRANSITION	só o POST de transição do Cloud está ancorado; o GET /transitions que o adapter faz antes, a transição no DC e a obrigatoriedade (E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN) não
 priority.set	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	Highest/High/Medium/Low do esquema padrão; prioridade não ancorada
 estimate.points	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	story points no Jira é campo custom, não ancorado; o adapter não envia
 estimate.time	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	timetracking.originalEstimate; não ancorado

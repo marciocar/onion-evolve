@@ -21,7 +21,7 @@ attachment.add	optional	not_implemented	1.0	-	anexo não ancorado
 label.set	optional	not_implemented	1.0	-	o adapter só LÊ tags
 iteration.assign	optional	not_implemented	1.0	-	iteração não ancorada
 link.create	optional	not_implemented	1.0	-	dependências não ancoradas
-search.query	required	implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_SEARCH_PREMIUM_ONLY	só em conta premium; a paginação do search não foi ancorada (E_ELENXO_ASANA_SEARCH_PAGINATION_UNANCHORED)
+search.query	required	unverified	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_SEARCH_PREMIUM_ONLY	ancorado só que o endpoint exige conta premium (fora dela esta capacidade required falha); os filtros text, projects.any, assignee.any e completed e a paginação não foram ancorados
 search.paginate	optional	not_implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_PAGINATION_LIMIT_1_100;kg:task-manager-vocabulario-2026-10#E_ASANA_OFFSET_EXPIRES	offset opaco que expira, nos endpoints de lista (não no search)
 bulk.create	optional	not_implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_BATCH_MAX_10_ACTIONS	provedor: batch genérico de 10 ações por requisição, não bulk de tasks
 bulk.update	optional	not_implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_BATCH_MAX_10_ACTIONS	idem
