@@ -67,7 +67,7 @@ const CONTRACT_V3 = '\n\n## CONTRATO v3 do .kg.yaml (não negociável — o gate
   + '  **`locality` (contrato v4.2), uma 4ª chave no mesmo bloco, quando a fonte é conhecida**: `locality: "web"` para URL; `"repo"` para caminho@commit deste repo; `"host"` para caminho absoluto da máquina ou journal de run (wf_…); `"pessoa"` para relato de sessão ou do maestro. Só esses quatro valores (fora deles o contrato acusa form.enum.node.provenance.locality); na dúvida, omita a chave.\n'
   + '- **label ≤ 280 caracteres**: só a afirmação curta. Contexto, porquê e detalhe vão em `narrative: "…"` no mesmo nó.\n'
   + '- **Contrato v4.1 (avisos que reprovam grafo novo no kg-contract-check)**: (1) todo nó com `verified_at` leva `verified_against` (o alvo do carimbo); (2) todo nó `decision` (inclusive o `D_` open) leva `trace: "<run, pergunta ou fonte que a originou>"`; (3) `testemunho` é classe de nó DEV: nó PROD não se apoia em testemunho; (4) `verified_at` nunca é anterior ao `valid_from` do mesmo nó.\n'
-  + '- Depois do radar, rode `bash .claude/validation/kg-contract-check.sh ' + KG_PATH + '` e exija rc 0 — ele usa o leitor de referência do contrato vendorizado; rc 1 = CORRIJA e rode de novo (máx 3 tentativas); rc 2 = o contrato não está vendorizado neste repo: declare no summary e siga (não é reprovação).'
+  + '- Depois do radar, rode `bash .claude/validation/kg-contract-check.sh ' + KG_PATH + '` e exija rc 0 — ele usa o leitor de referência do contrato vendorizado; rc 1 = CORRIJA e rode de novo (o motor reconfere por verificador independente e conta as tentativas); rc 2 = o contrato não está vendorizado neste repo: declare no summary e siga (não é reprovação).'
 let CORPUS = String(A.corpus || '')
 const MODE = String(A.mode || 'research')
 // ─── mode: 'primaries' — as lacunas JÁ TÊM NOME (F5) ───
@@ -146,6 +146,42 @@ const KG_SCHEMA = { type: 'object', required: ['kgPath', 'radarExit', 'nodes', '
 // (1º dogfood do F3: o patch mirou uma âncora inexistente e o agente NUNCA recebeu o bloco de decisão — 5 nós, 0 D_)
 const KG_SCHEMA_DECISION = { ...KG_SCHEMA, required: [...KG_SCHEMA.required, 'decisionNodeId', 'optionNodeIds', 'constrainsEdges'],
   properties: { ...KG_SCHEMA.properties, decisionNodeId: { type: 'string', pattern: '^D_' }, optionNodeIds: { type: 'array', minItems: 2, items: { type: 'string' } }, constrainsEdges: { type: 'integer', minimum: 1 } } }
+
+// >>> engine-verify — QUEM VERIFICA NÃO É QUEM PRODUZ (SAC-108, conceito absorvido do Conductor, MIT, reescrito)
+// Até 2026-10-11 o radarExit era o número que o PRÓPRIO escritor devolvia: declaração, não comportamento. E o
+// "máx 3 tentativas" existia só no prompt. Agora o motor manda um agente SEPARADO (que não escreveu e não edita)
+// rodar o kg-radar e o kg-contract-check sobre o arquivo escrito, e o laço de correção é contado AQUI.
+// O script não tem shell: o verificador é o braço executor do motor, e o veredito que vale é o dele.
+const MAX_WRITE_ATTEMPTS = 3
+const VERIFY_SCHEMA = { type: 'object', required: ['radarExit', 'contractExit', 'output'], properties: {
+  radarExit: { type: 'integer' }, contractExit: { type: 'integer' }, output: { type: 'string' } } }
+const engineVerify = (absPath, attempt) => agent(
+  '## Verificador do motor — você NÃO escreveu este grafo e NÃO o edita (nem Write nem Edit).\n' +
+  'A partir da raiz do repositório, rode EXATAMENTE os dois comandos e copie o RC que cada um imprimir:\n' +
+  '1. bash .claude/validation/kg-radar.sh "' + absPath + '" --integrity --schema; echo "RC=$?"\n' +
+  '2. bash .claude/validation/kg-contract-check.sh "' + absPath + '"; echo "RC=$?"\n' +
+  'Devolva radarExit e contractExit = os RC LITERAIS impressos (arquivo ausente ou comando que não rodou = 99), e output = as linhas de erro das falhas (até 60 linhas; vazio se os dois deram 0). Não conserte, não interprete.',
+  { label: 'verify-kg-' + attempt, phase: 'write(KG)', schema: VERIFY_SCHEMA, model: 'sonnet', effort: 'low' })
+const engineOk = v => !!v && v.radarExit === 0 && v.contractExit !== 1   // contrato rc 2 = não vendorizado aqui (declarado)
+async function writeAndVerify(firstPrompt, opts) {
+  const attempts = []
+  let res = null, ver = null
+  for (let i = 1; i <= MAX_WRITE_ATTEMPTS; i++) {
+    const prompt = i === 1 ? firstPrompt
+      : '## Correção do write(KG) — tentativa ' + i + ' de ' + MAX_WRITE_ATTEMPTS + '\nO verificador INDEPENDENTE do motor reprovou o grafo em ' + res.kgPath +
+        ': kg-radar rc ' + (ver ? ver.radarExit : '?') + ', kg-contract-check rc ' + (ver ? ver.contractExit : '?') + '.\nSaída do motor:\n' + (ver ? ver.output : '(o verificador não devolveu)') +
+        '\n\nEdite SÓ o que a saída acusa (não reescreva o que está certo) e devolva o mesmo schema, com os números reais do grafo ao fim.\n\nSomente saída estruturada.'
+    res = await ag(prompt, { ...opts, label: opts.label + (i > 1 ? '-fix' + i : '') })
+    if (!res) return { res: null, ver, attempts }
+    const pathErr = kgPathOk(res.kgPath)
+    if (pathErr) return { res, ver: null, attempts, pathErr }
+    ver = await engineVerify(res.kgPath, i)
+    attempts.push({ attempt: i, declaredRadarExit: res.radarExit, radarExit: ver ? ver.radarExit : null, contractExit: ver ? ver.contractExit : null })
+    if (engineOk(ver)) break
+  }
+  return { res, ver, attempts }
+}
+// <<< engine-verify
 
 // ─── Phase 0: Corpus (0 tokens — vem pronto da skill via kg-corpus-grep) ───
 phase('Corpus')
@@ -283,7 +319,7 @@ if (MODE === 'primaries') {
   if (pElenxo) log('Elenxo: ' + pElenxo.objections.length + ' objeções (' + pElenxo.objections.filter(o => o.survives).length + ' sobrevivem) · lacunas fechadas: ' + pElenxo.gapsClosed.length + ' · abertas: ' + pElenxo.gapsOpen.length)
 
   phase('write(KG)')
-  const pKg = await ag(
+  const pW = await writeAndVerify(
     '## write(KG) — escreva o grafo desta rodada de primárias e prove que o radar o lê\n\n' +
     'Pergunta: "' + QUESTION + '"\nData de hoje (verified_at): ' + TODAY + '\nCaminho do grafo: ' + KG_PATH + '\n\n' +
     'Leia ANTES: `.claude/rules/kg-grammar.md`, `.claude/commands/common/prompts/research-doctrine.md` (cláusulas 7-8) e, **se o arquivo já existir, o grafo inteiro**.\n\n' +
@@ -305,16 +341,18 @@ if (MODE === 'primaries') {
     '\n\n### Corpus prévio\n' + (CORPUS || '(vazio)') +
     '\n\n### Elenxo (inteiro — NÃO corte: em 2026-10-07 um .slice(0, 7000) jogou fora 22 de 38 objeções, e 13 sobreviventes nunca viraram nó)\n' + JSON.stringify(pElenxo || {}) +
     KG_ANCHOR + CONTRACT_V3 +
-    '\n\n## Passos\n1. Read do arquivo (se existir). 2. Write/Edit. 3. `bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema` — capture o exit code; se ≠ 0, CORRIJA e rode de novo (máx 3 tentativas). 3b. `bash .claude/validation/kg-contract-check.sh ' + KG_PATH + '` — rc 1 = CORRIJA e rode de novo; rc 2 = contrato não vendorizado aqui, declare no summary. 4. Devolva kgPath, radarExit (o último), nodes (os ADICIONADOS nesta rodada), edges (idem), nodesTotal (o total do grafo ao fim) e summary (1 frase).\n\n' +
+    '\n\n## Passos\n1. Read do arquivo (se existir). 2. Write/Edit. 3. `bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema` — capture o exit code; se ≠ 0, CORRIJA e rode de novo. O motor RECONFERE por um verificador independente e conta as tentativas em código; o seu número é declaração. 3b. `bash .claude/validation/kg-contract-check.sh ' + KG_PATH + '` — rc 1 = CORRIJA e rode de novo; rc 2 = contrato não vendorizado aqui, declare no summary. 4. Devolva kgPath, radarExit (o último), nodes (os ADICIONADOS nesta rodada), edges (idem), nodesTotal (o total do grafo ao fim) e summary (1 frase).\n\n' +
     'Somente saída estruturada.',
     { label: 'write-kg-primarias', phase: 'write(KG)', schema: KG_SCHEMA_PRIMARIES, model: TIER.judge.model, effort: TIER.judge.effort })
+  const pKg = pW.res
   if (!pKg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, anchoredCount: anchored.length, elenxo: pElenxo }
-  { const _e = kgPathOk(pKg.kgPath); if (_e) return { error: 'write(KG): ' + _e, question: QUESTION, kgPath: pKg.kgPath } }
-  if (pKg.radarExit !== 0) return { error: 'radar exit ' + pKg.radarExit + ' em ' + pKg.kgPath + ' — grafo escrito mas ILEGÍVEL pelo motor; não conte a rodada como feita.', question: QUESTION, kgPath: pKg.kgPath, radarExit: pKg.radarExit }
-  log('write(KG): ' + pKg.kgPath + ' — +' + pKg.nodes + ' nós / +' + pKg.edges + ' arestas, total ' + pKg.nodesTotal + ', radar exit ' + pKg.radarExit)
+  if (pW.pathErr) return { error: 'write(KG): ' + pW.pathErr, question: QUESTION, kgPath: pKg.kgPath }
+  if (!engineOk(pW.ver)) return { error: 'o MOTOR reprovou o grafo em ' + pKg.kgPath + ' depois de ' + pW.attempts.length + ' tentativa(s): radar rc ' + (pW.ver ? pW.ver.radarExit : 'sem veredito') + ', contrato rc ' + (pW.ver ? pW.ver.contractExit : 'sem veredito') + ' (o escritor declarou ' + pKg.radarExit + '); não conte a rodada como feita.', question: QUESTION, kgPath: pKg.kgPath, writeAttempts: pW.attempts }
+  pKg.radarExit = pW.ver.radarExit
+  log('write(KG): ' + pKg.kgPath + ' — +' + pKg.nodes + ' nós / +' + pKg.edges + ' arestas, total ' + pKg.nodesTotal + ', radar exit ' + pKg.radarExit + ' (pelo motor, ' + pW.attempts.length + ' tentativa(s))')
 
   return {
-    mode: 'primaries', question: QUESTION, today: TODAY, kgPath: pKg.kgPath, radarExit: pKg.radarExit,
+    mode: 'primaries', question: QUESTION, today: TODAY, kgPath: pKg.kgPath, radarExit: pKg.radarExit, writeAttempts: pW.attempts,
     summary: pKg.summary, unreachable, anchored, rejected,
     elenxo: pElenxo ? { objections: pElenxo.objections, gapsClosed: pElenxo.gapsClosed, gapsOpen: pElenxo.gapsOpen, recommendation: pElenxo.recommendation } : null,
     stats: { sources: SOURCES.length, reached: SOURCES.length - unreachable.length, anchored: anchored.length, rejected: rejected.length,
@@ -479,26 +517,28 @@ if (MODE === 'decision') {
 
 // ─── write(KG): um agente ESCREVE o grafo, roda o radar, devolve o exit ───
 phase('write(KG)')
-const kg = await ag(
+const kgW = await writeAndVerify(
   KG_ANCHOR +
   '## write(KG) — escreva o grafo da pesquisa e prove que o radar o lê\n\nPergunta: "' + QUESTION + '"\nData de hoje (verified_at): ' + TODAY + '\nCaminho do grafo: ' + KG_PATH + '\n\n' +
   'Leia ANTES: .claude/rules/kg-grammar.md e .claude/commands/common/prompts/research-doctrine.md (cláusulas 7-8). Formato estrito: uma chave por linha; arestas em bloco (- from:/to:/edge_type:); id em inglês, label em pt-BR; meta com id, schema_version "1", baseline ' + TODAY + ', review_after (cadência: ferramenta/preço 30d · modelos 45d · mercado 90d · benchmark 120d · doutrina 12m — escolha pelo tipo dominante e justifique em comentário), `# kg-backlog-guard: on` e `# ═══ TETO: N NÓS ═══`.\n\n' +
-  (MODE === 'decision' && elenxo ? '## MODO DECISÃO — LEIA PRIMEIRO. Este grafo é de DECISÃO. OBRIGATÓRIO (o schema de retorno exige; sem isto o run falha): (1) 1 nó decision `D_…` com status OPEN (o maestro sela — você NUNCA sela), label = a decisão + as opções nomeadas + a recomendação do Elenxo; (2) 1 nó claim por OPÇÃO (`C_OPCAO_…`, status open) — opções: ' + JSON.stringify(elenxo.options || []) + '; (3) para cada objeção SOBREVIVENTE do Elenxo, 1 nó evidence `E_OBJECAO_…` (plane DEV, confirmed, verified_at hoje, verified_against = a evidência da objeção) com aresta CONSTRAINS para a opção/decisão que ela limita (dissent que LIMITA é CONSTRAINS; REFUTES só para opção morta por evidência, e aí o status da opção vira refuted); (4) devolva decisionNodeId, optionNodeIds e constrainsEdges (contagem REAL das arestas escritas); (5) se o TETO de nós impedir modelar TODAS as objeções sobreviventes, o nó E_LACUNAS_… declara a contagem EXATA (N sobreviventes, M modeladas) e NOMEIA o alvo de cada uma não modelada — nunca um número menor que o real (1º dogfood 2026-09-13: 40 sobreviventes, 10 nós, e o grafo dizia "3 reabertos"); (6) objeção do Elenxo é afirmação de UM agente sem votação: confidence ≤ 0.6, e fonte primária que ele CITA sem ter sido lida na rodada entra no label como "primário citado, não lido" — nunca como tier alto confirmado. Objeções do Elenxo: ' + JSON.stringify(elenxo.objections) + ' Recomendação: ' + webText(elenxo.recommendation).slice(0, 1500) + '\n\n' : '') +
+  (MODE === 'decision' && elenxo ? '## MODO DECISÃO — LEIA PRIMEIRO. Este grafo é de DECISÃO. OBRIGATÓRIO (o schema de retorno exige; sem isto o run falha): (1) 1 nó decision `D_…` com status OPEN (o maestro sela — você NUNCA sela), label = a decisão + as opções nomeadas + a recomendação do Elenxo; (2) 1 nó claim por OPÇÃO (`C_OPCAO_…`, status open) — opções: ' + JSON.stringify(elenxo.options || []) + '; (3) para cada objeção SOBREVIVENTE do Elenxo, 1 nó evidence `E_OBJECAO_…` (plane DEV, confirmed, verified_at hoje, verified_against = a evidência da objeção) com aresta CONSTRAINS para a opção/decisão que ela limita (dissent que LIMITA é CONSTRAINS; REFUTES só para opção morta por evidência, e aí o status da opção vira refuted); (4) devolva decisionNodeId, optionNodeIds e constrainsEdges (contagem REAL das arestas escritas); (5) se o TETO de nós impedir modelar TODAS as objeções sobreviventes, o nó E_LACUNAS_… declara a contagem EXATA (N sobreviventes, M modeladas) e NOMEIA o alvo de cada uma não modelada — nunca um número menor que o real (1º dogfood 2026-09-13: 40 sobreviventes, 10 nós, e o grafo dizia "3 reabertos"); (6) objeção do Elenxo é afirmação de UM agente sem votação: confidence ≤ 0.6, e fonte primária que ele CITA sem ter sido lida na rodada entra no label como "primário citado, não lido" — nunca como tier alto confirmado. Objeções do Elenxo: ' + JSON.stringify(elenxo.objections) + ' Recomendação (INTEIRA — em 2026-10-11 um .slice(0, 1500) cortou o degrau 2 do SAC-70 e o escritor o completou de memória): ' + webText(elenxo.recommendation) + '\n\n' : '') +
   '## Conteúdo\n- 1 nó question (Q_…, status open ou done se respondida) para a pergunta.\n- 1 nó evidence por claim CONFIRMADA (E_…, plane DEV, status confirmed, impact 2-5 pelo peso, confidence pelo tier+votos (tier ≤3 nunca acima de 0.7), verified_at ' + TODAY + ', verified_against = URL + votos, valid_from quando houver e SEMPRE entre aspas ("2026", "2026-10-01" — sem aspas o ano vira inteiro), source_tier, source_kind, label = a claim em pt-BR, trace = URL).\n- 1 nó evidence E_MERCADO_… com o eixo mercado/capital (mesmo que "sem sinal").\n- 1 nó evidence E_LACUNAS_… listando refutadas por fonte fraca, não verificadas (' + unverified.length + ') e cortadas por orçamento (' + budgetDropped.length + ' fontes, ' + notVerifiedByBudget.length + ' claims).\n- Se o corpus já tinha nós sobre o tema e a pesquisa os CONTRADIZ, NÃO edite o grafo antigo: modele a aresta em `external_edges` no topo deste grafo (contrato v4.3), um item por nó, `- from: <id daqui>` / `to: "<caminho do grafo antigo>#<id>"` / `edge_type: SUPERSEDES` (ou REFUTES). O gate confere que o grafo e o id existem: copie o caminho e o id do corpus, nunca invente.\n- Arestas SUPPORTS de cada evidência para a question.\n\n' +
   '## Dados\n### Confirmadas\n' + confirmed.map(c => '- ' + WEB_NOTE + '"' + webText(c.claim) + '" | ' + webText(c.sourceUrl) + ' | kind=' + webText(c.sourceKind) + ' tier=' + c.sourceTier + ' validFrom=' + webText(c.validFrom || '') + ' votos=' + (c.verdicts.length - c.refutedVotes) + '-' + c.refutedVotes).join('\n') +
   '\n### Mercado (do sintetizador)\n' + (report ? webText(report.market) : '(sem síntese: 0 confirmadas)') +
   '\n### Não verificadas / refutadas\n' + unverified.map(c => '- ? ' + webText(c.claim) + ' | ' + webText(c.sourceUrl)).join('\n') + '\n' + killed.map(c => '- ✗ ' + webText(c.claim) + ' | ' + webText(c.sourceUrl) + ' tier=' + c.sourceTier).join('\n') +
   '\n### Corpus prévio\n' + (CORPUS || '(vazio)') +
-  (REVISIT ? '\n\n## MODO REVISITA — o grafo JÁ EXISTE (' + REVISIT + '): NÃO reescreva. Para cada nó revisitado: se a claim SOBREVIVEU, edite só verified_at=' + TODAY + ' (+ verified_against com o voto); se foi REFUTADA, apende um nó evidence novo E_…_REVISITA_' + TODAY.replace(/-/g, '') + ' com a verdade atual e aresta SUPERSEDES para o nó antigo, e mude o status do antigo para superseded (Aufhebung — nunca apague). Atualize meta.review_after para hoje + cadência. Nós revisitados: ' + JSON.stringify(rankedClaims.map(c => ({ id: c.revisitId, verdict: confirmed.includes(c) ? 'CONFIRMED' : killed.includes(c) ? 'REFUTED' : 'UNVERIFIED' }))) : '') + '\n\n## Passos\n1. ' + (REVISIT ? 'Edit do arquivo ' + REVISIT : 'Write do arquivo em ' + KG_PATH + ' (crie o diretório)') + '.\n2. Rode: bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema — capture o exit code. Se ≠ 0, CORRIJA e rode de novo (máx 3 tentativas).\n2b. Rode: bash .claude/validation/kg-contract-check.sh ' + KG_PATH + ' — contrato v3: rc 1 = CORRIJA e rode de novo; rc 2 = contrato não vendorizado aqui, declare no summary.' + CONTRACT_V3 + '\n3. Devolva kgPath, radarExit (o último), nodes, edges, summary (1 frase).\n\nSomente saída estruturada.',
+  (REVISIT ? '\n\n## MODO REVISITA — o grafo JÁ EXISTE (' + REVISIT + '): NÃO reescreva. Para cada nó revisitado: se a claim SOBREVIVEU, edite só verified_at=' + TODAY + ' (+ verified_against com o voto); se foi REFUTADA, apende um nó evidence novo E_…_REVISITA_' + TODAY.replace(/-/g, '') + ' com a verdade atual e aresta SUPERSEDES para o nó antigo, e mude o status do antigo para superseded (Aufhebung — nunca apague). Atualize meta.review_after para hoje + cadência. Nós revisitados: ' + JSON.stringify(rankedClaims.map(c => ({ id: c.revisitId, verdict: confirmed.includes(c) ? 'CONFIRMED' : killed.includes(c) ? 'REFUTED' : 'UNVERIFIED' }))) : '') + '\n\n## Passos\n1. ' + (REVISIT ? 'Edit do arquivo ' + REVISIT : 'Write do arquivo em ' + KG_PATH + ' (crie o diretório)') + '.\n2. Rode: bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema — capture o exit code. Se ≠ 0, CORRIJA e rode de novo. O motor RECONFERE por um verificador independente e conta as tentativas em código; o seu número é declaração.\n2b. Rode: bash .claude/validation/kg-contract-check.sh ' + KG_PATH + ' — contrato v3: rc 1 = CORRIJA e rode de novo; rc 2 = contrato não vendorizado aqui, declare no summary.' + CONTRACT_V3 + '\n3. Devolva kgPath, radarExit (o último), nodes, edges, summary (1 frase).\n\nSomente saída estruturada.',
   { label: 'write-kg', phase: 'write(KG)', schema: (MODE === 'decision' && elenxo) ? KG_SCHEMA_DECISION : KG_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
+const kg = kgW.res
 if (!kg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, findings: report ? report.findings : [] }
 if (MODE === 'decision' && elenxo && (!kg.decisionNodeId || !(kg.constrainsEdges >= 1))) return { error: 'modo decisão sem nó D_/CONSTRAINS no grafo — o write(KG) não cumpriu o contrato de decisão; nada selado.', question: QUESTION, kgPath: kg.kgPath, radarExit: kg.radarExit }
-{ const _e = kgPathOk(kg.kgPath); if (_e) return { error: 'write(KG): ' + _e, question: QUESTION, kgPath: kg.kgPath } }
-if (kg.radarExit !== 0) return { error: 'radar exit ' + kg.radarExit + ' em ' + kg.kgPath + ' — grafo escrito mas ILEGÍVEL pelo motor; não conte a pesquisa como feita.', question: QUESTION, kgPath: kg.kgPath, radarExit: kg.radarExit }
-log('write(KG): ' + kg.kgPath + ' — ' + kg.nodes + ' nós / ' + kg.edges + ' arestas, radar exit ' + kg.radarExit)
+if (kgW.pathErr) return { error: 'write(KG): ' + kgW.pathErr, question: QUESTION, kgPath: kg.kgPath }
+if (!engineOk(kgW.ver)) return { error: 'o MOTOR reprovou o grafo em ' + kg.kgPath + ' depois de ' + kgW.attempts.length + ' tentativa(s): radar rc ' + (kgW.ver ? kgW.ver.radarExit : 'sem veredito') + ', contrato rc ' + (kgW.ver ? kgW.ver.contractExit : 'sem veredito') + ' (o escritor declarou ' + kg.radarExit + '); não conte a pesquisa como feita.', question: QUESTION, kgPath: kg.kgPath, writeAttempts: kgW.attempts }
+kg.radarExit = kgW.ver.radarExit
+log('write(KG): ' + kg.kgPath + ' — ' + kg.nodes + ' nós / ' + kg.edges + ' arestas, radar exit ' + kg.radarExit + ' (pelo motor, ' + kgW.attempts.length + ' tentativa(s))')
 
 return {
-  question: QUESTION, today: TODAY, kgPath: kg.kgPath, radarExit: kg.radarExit,
+  question: QUESTION, today: TODAY, kgPath: kg.kgPath, radarExit: kg.radarExit, writeAttempts: kgW.attempts,
   summary: report ? report.summary : 'Nenhuma claim confirmada; ver refuted/unverified.',
   market: report ? report.market : '',
   findings: report ? report.findings : [],

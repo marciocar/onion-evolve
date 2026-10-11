@@ -5772,6 +5772,33 @@ run_research_workflow_selftests() {
     else if grep -qE "ReferenceError|SyntaxError" "${d2}/err"; then record_fail "research-workflow: (i)" "$(head -c 200 "${d2}/err")"; else record_pass "research-workflow: (i) corpo EXECUTA com stubs sem ReferenceError/SyntaxError (ordem de declaração)"; fi; fi
     rm -rf "${d2}"
   fi
+  # (ev) QUEM VERIFICA NÃO É QUEM PRODUZ (SAC-108): até 2026-10-11 o radarExit era o número que o PRÓPRIO
+  #      escritor devolvia, e o "máx 3 tentativas" vivia só no prompt. EXECUTA o bloco engine-verify com um
+  #      stub que separa escritor e verificador pelo label: o escritor DECLARA 0, o verificador mede 1.
+  #      (ev1) o motor reprova pelo veredito do verificador e para em 3 tentativas contadas em código;
+  #      (ev2) quando o verificador aprova na 2ª, o laço para ali.
+  if command -v node >/dev/null 2>&1; then
+    local evd ev1 ev2; evd="$(mktemp -d)"
+    if ! grep -q '^// >>> engine-verify' "${wf}" || ! grep -q '^// <<< engine-verify' "${wf}"; then
+      record_fail "research-workflow: (ev)" "marcadores do bloco engine-verify ausentes no workflow"
+    else
+      for okAt in 0 2; do
+        { printf '%s\n' "const TASK_ANCHOR='';const KG_PATH='d/x.kg.yaml';const kgPathOk=p=>String(p).startsWith('/')?'':'rel';let vcalls=0,wcalls=0;const okAt=${okAt};" \
+            "const agent=async(p,o)=>{ if(String(o.label).startsWith('verify-kg-')){vcalls++;return okAt&&vcalls>=okAt?{radarExit:0,contractExit:0,output:''}:{radarExit:1,contractExit:0,output:'ERRO'}} wcalls++; return {kgPath:'/r/d/x.kg.yaml',radarExit:0,nodes:1,edges:0,summary:'s'} };const ag=(p,o)=>agent(p,o);"
+          awk '/^\/\/ >>> engine-verify/{f=1} f{print} /^\/\/ <<< engine-verify/{f=0}' "${wf}"
+          printf '%s\n' "(async()=>{const r=await writeAndVerify('p',{label:'write-kg'});console.log(JSON.stringify({n:r.attempts.length,ok:engineOk(r.ver),declared:r.res.radarExit,w:wcalls,v:vcalls}))})().catch(e=>console.log(JSON.stringify({thrown:String(e)})))"
+        } > "${evd}/ev${okAt}.mjs"
+      done
+      ev1="$(node "${evd}/ev0.mjs" 2>&1 || true)"; ev2="$(node "${evd}/ev2.mjs" 2>&1 || true)"
+      if grep -qF '"n":3,"ok":false,"declared":0,"w":3,"v":3' <<< "${ev1}"; then
+        record_pass "research-workflow: (ev1) escritor declara radar 0, verificador mede 1 ⇒ o MOTOR reprova e para em 3 tentativas contadas em código"
+      else record_fail "research-workflow: (ev1)" "esperava 3 tentativas reprovadas pelo verificador, veio: ${ev1:0:220}"; fi
+      if grep -qF '"n":2,"ok":true' <<< "${ev2}"; then
+        record_pass "research-workflow: (ev2) verificador aprova na 2ª ⇒ o laço para ali (não gasta a 3ª)"
+      else record_fail "research-workflow: (ev2)" "esperava parar na 2ª tentativa aprovada, veio: ${ev2:0:220}"; fi
+    fi
+    rm -rf "${evd}"
+  fi
   local n; n=$(grep -cE '^  - id: ' "${rs}")
   [ "${n}" -ge 5 ] && grep -q "vendor-on-competitor" "${rs}" && record_pass "research-workflow: (e) radar-sources.yaml com ${n} eixos e tier vendor-on-competitor declarado" \
     || record_fail "research-workflow: (e)" "roster com ${n} eixos ou sem vendor-on-competitor"
