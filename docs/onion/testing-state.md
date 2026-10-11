@@ -12,8 +12,8 @@
 
 | Dimensão | Nº | Produtor |
 |---|---:|---|
-| Famílias na bancada | **241** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **1843** | `bash .claude/validation/harness-inventory.sh --env` |
+| Famílias na bancada | **242** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **1857** | `bash .claude/validation/harness-inventory.sh --env` |
 | Regras do lint | **95** | `bash .claude/validation/rules-registry.sh --counts` |
 | — HARD | **83** | `bash .claude/validation/rules-registry.sh --counts` |
 | Pares de modo consumido | **60** | `bash .claude/validation/consumed-mode-check.sh .` |
@@ -54,15 +54,15 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **477** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados totais | **2589** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados REAIS | **2224** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **480** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados totais | **2614** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados REAIS | **2248** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **86%** | `bash .claude/validation/review-ledger.sh --env` |
-| Tokens por achado REAL | **119123** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **383** | `bash .claude/validation/review-ledger.sh --env` |
+| Tokens por achado REAL | **118115** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **386** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **94** | `bash .claude/validation/review-ledger.sh --env` |
 
-A média de tokens cobre os **260** resíduos com custo > 0; os demais declaram `tokens: 0`
+A média de tokens cobre os **263** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
 não é média — mas seus achados continuam contados no total.
 
