@@ -1,7 +1,8 @@
 ---
 branch: docs/sac-52-playbook-decision
 date: 2026-10-11
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4cefc5fc935dd37ed6e8d43b39ab928f873b7df3d6b01800e4d3d38f005d932f
+reviewed_code_sha256: 6e9151ed77630ce4def21857565f4726e4698f7ea9bc6ce835f98d440c355b13
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
