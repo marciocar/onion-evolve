@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**91 regras** no total — **79 HARD**, **33 SOFT**.
+**95 regras** no total — **83 HARD**, **36 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -65,6 +65,7 @@ Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.
 | 71 | Comando não declara model: no frontmatter — segue a escada da sessão | HARD | o Claude Code 2.1.259 passou a HONRAR model: de comando em sessão interativa (radar E3 rodada 2, l.17): |
 | 74 | Caminho .claude/ NU dentro de plugin só resolve no core, com catraca | HARD + SOFT | baseline de passivo crescendo calado — um PR transformava ref NOVA (HARD) em PASSIVO (SOFT) acrescentando linha |
 | 94 | MUTANTE esquecido na árvore | HARD + SOFT | teste de mutação que morre no meio e deixa o repo PIOR que antes |
+| 98 | Diretiva de injeção escrita como CITAÇÃO não pode estar VIVA | HARD | exemplo de documentação que o harness lê como diretiva e EXECUTA a cada invocação do comando. |
 
 ## Fronteiras & contratos de arquitetura
 
@@ -143,6 +144,7 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 87 | PR que EDITA um `.kg.yaml` enxergou os `confirmed` dele | SOFT | propor contra o próprio corpus — o defeito medido em 2026-09-19 |
 | 89 | Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca | HARD + SOFT | a UNICA divida deste corpus que piora sozinha — rodada de radar selada como baseline sem |
 | 93 | KB de terceiro declara a QUE VERSÃO se aplica | HARD + SOFT | documentação que caduca sem dizer para qual versão ela valia |
+| 99 | Nó de .kg.yaml sem caminho de máquina, julgado pela classe | HARD + SOFT | caminho de máquina voltando ao corpus depois de a migração de provenance tirá-lo (com catraca). |
 
 ## Automação Graduada
 
@@ -182,6 +184,7 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 | 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT | link vivo em superfície vendorizada para caminho core-privado — morto no adotante |
 | 61 | Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado | HARD | publicar a ADOÇÃO e a FEDERAÇÃO (adopt/federation-*/co-*/marketplace/decouple) ou o SSOT PRIVADO |
 | 64 | Compose sem bind local ou com segredo em fallback literal | HARD + SOFT | porta publicada em todas as interfaces (o Docker ignora o firewall do HOST — ufw/iptables |
+| 100 | Superfície que viaja não cita ops/ como se o destinatário o tivesse | HARD + SOFT | porta/adotante recebendo instrução que aponta para ops/, que não viaja (com catraca). |
 
 ## Processo com resíduo
 
@@ -193,10 +196,11 @@ O trabalho PROPOSTO carrega rastro material de ter sido revisado — o gate cria
 
 ## Integridade do próprio gate
 
-As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a olhar?' — porque varredura cega devolve zero violações, que é indistinguível de conformidade. Categoria nova em 2026-08-04, quando o lint rodou de dentro de um worktree de harness e varreu 0 dos 51 agentes sem emitir uma linha de aviso. A REGRA 86 entrou aqui em 2026-09-17 pelo mesmo motivo, um andar acima: um workflow que não PARSEIA não é um gate que falhou, é um gate que nunca rodou — e o repo o contava como existente. A REGRA 88 entrou em 2026-09-20 pela versão mais perversa da classe: o gate rodava, mas sem árvore — `bash <script do repo>` saía 127, o job reprovava TODO PR e a mensagem culpava o código revisado. Gate que nunca olhou, acusando.
+As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a olhar?' — porque varredura cega devolve zero violações, que é indistinguível de conformidade. Categoria nova em 2026-08-04, quando o lint rodou de dentro de um worktree de harness e varreu 0 dos 51 agentes sem emitir uma linha de aviso. A REGRA 86 entrou aqui em 2026-09-17 pelo mesmo motivo, um andar acima: um workflow que não PARSEIA não é um gate que falhou, é um gate que nunca rodou — e o repo o contava como existente. A REGRA 88 entrou em 2026-09-20 pela versão mais perversa da classe: o gate rodava, mas sem árvore — `bash <script do repo>` saía 127, o job reprovava TODO PR e a mensagem culpava o código revisado. Gate que nunca olhou, acusando. A REGRA 101 entrou em 2026-10-11 pela versão do veto: o hook que nem roda (script ausente, rc=127) deixava a ação passar — veto que não executou, contado como veto.
 
 | Nº | Regra | Severidade | O que previne |
 |---:|-------|:----------:|---------------|
 | 54 | A varredura ENXERGA o que existe (guarda-das-guardas) | HARD | gate que varre ZERO arquivo e mesmo assim reporta OK — verde sem ter olhado |
 | 86 | Workflow de CI PARSEIA como YAML | HARD | workflow inexecutável passando por existente, e guarda morta por sintaxe |
 | 88 | Job de workflow que EXECUTA arquivo do repo faz checkout | HARD + SOFT | job sem `actions/checkout` invocando script versionado; o bash sai 127 e o `rc != 0` |
+| 101 | Veto PreToolUse por exit 2 declara onFailure: block | HARD + SOFT | veto que falha ABERTO quando o hook nem roda (script ausente sai 127 e a ação passa). |

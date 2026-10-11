@@ -1,6 +1,5 @@
 ---
-reviewed_diff_sha256: 9bd8b6c169d3e51893f2ddd4a3f8c3007f8d9ca01dc514e58b68a7a834f65e02
-reviewed_code_sha256: 90b34f9fa3260f9d6f08104302c072a302f2069ae427b1c4a38244ab6a63fda6
+reviewed_diff_sha256: pendente
 findings_total: 7
 findings_real: 6
 tokens: 148078
@@ -14,6 +13,9 @@ nota: >
   rastreado, pathspec recursivo em .githooks/* e linha aparada reacrescentada. Os cinco foram curados,
   cada um com caso e mutante. A catraca nº7 do registro tem um teto, que ficou declarado no código
   (26 das 93 regras). A projeção desatualizada é pendência de fechamento, resolvida pelo pr-finalize.
+  Depois do PR aberto, o contexto principal rebaseou sobre a main com as REGRAS 102 (#1028) e 103 (#1029).
+  O registro gerado (lint-rules.md) conflitou e foi regenerado: 95 regras, 98-103 presentes. Famílias
+  rules_registry, eol_gitattributes, gitattributes_eol, door e door_mini com 51 verdes; selftest do hook de título OK.
 ---
 
 # Resíduo: `fix/small-registry-and-door-gaps`
