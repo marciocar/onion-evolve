@@ -1,6 +1,5 @@
 ---
-reviewed_diff_sha256: c30b0a97964e9a08d8812cfe975b28f29829dc82187953cbab5b16ba8ab54bd2
-reviewed_code_sha256: a066bb538bc126900937e59e3fbcaf4b2c3bd6ac054f53827c52f2a3a5483132
+reviewed_diff_sha256: pendente
 findings_total: 10
 findings_real: 10
 tokens: 170004
@@ -15,6 +14,8 @@ nota: >
   SUPERSEDES com o alvo aberto, e por 9 achados menores. Os 10 foram tratados no mesmo laço. O
   bloqueante foi respondido por escrito, porque o flip do nó selado é do maestro. APROVADO descreve o
   estado depois das curas.
+  Depois do PR aberto, o maestro selou os três flips (console → superseded, JWKS → done, bypass →
+  drifted) e o contexto principal os aplicou e rebaseou sobre a main; revisto, só status nos 3 nós.
 ---
 
 # Resíduo — `docs/kg-security-remeasure-sac100`

@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**422 itens abertos** em 89 grafo(s) com aberto (de 114 no escopo) · 90 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**421 itens abertos** em 89 grafo(s) com aberto (de 114 no escopo) · 90 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -503,12 +503,11 @@
 | 5.1 | `I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU` | inbox-triage-2026-10 | O GATILHO DESTE ITEM GATED JA DISPAROU E NINGUEM REAVALIOU. O `adopt.md:685` diz, literalmente, "implementacao gated ate o 1o caso |
 | 3.0 | `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM` | inbox-triage-2026-10 | TRES relatos de FALSO POSITIVO de gate, do hub gmill (sinal de 2026-09-30), arquivados sem triagem registrada — o commit de arqu |
 
-## m2-bridge-logto-2026-07 — 7 item(ns)
+## m2-bridge-logto-2026-07 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 18.0 | `D_middleware_order_first` | m2-bridge-logto-2026-07 | FIX C fecho — EXIGÊNCIA no P5: app.use('*', requireIdentity) é o PRIMEIRO handler registrado, antes de TODA rota, de TODO app. |
-| 17.1 | `Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA` | m2-bridge-logto-2026-07 | PRE-EXISTENTE, mas o P11 ELEVOU O RAIO — e essa mudanca de risco precisa morar aqui: antes, numa queda do Logto, o caminho legad |
 | 10.8 | `C_docker_floor_gap` | m2-bridge-logto-2026-07 | GAP (impacto ELEVADO na v2+, porque o Logto virou caminho crítico): Logto+Postgres (docker) só têm teto duro. MEDIDO no cgroup: |
 | 10.2 | `D_logto_not_ssot` | m2-bridge-logto-2026-07 | INVARIANTE herdada do M3: Logto = emissor/validador de identidade (commodity-BUY), NUNCA SSOT de autorização fina. A autorizaç |
 | 6.0 | `Q_route_inventory` | m2-bridge-logto-2026-07 | VPS-DECLARADO: o inventário EXATO das rotas do app Hono só existe no host. A tabela do §3.4 é CONTRATO, não fato. P0.2 enumer |
