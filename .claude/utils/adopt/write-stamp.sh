@@ -32,8 +32,9 @@
 #           em toda porta, porque procurava o campo que só este script escreve.
 #   --release: o RÓTULO DE RELEASE da família (decisão do maestro de 2026-10-11,
 #           D_VERSIONAR_AS_PORTAS_POR_RELEASE). Só com --kind door, só semver X.Y.Z, e sai como `release:`.
-#           É APELIDO do pin, nunca a verdade: nenhuma guarda lê este campo (REGRA 85, REGRA 92 e o
-#           `--status` medem `source_commit`). Ausente = a materialização não é release (ensaio): o campo
+#           É APELIDO do pin, nunca a verdade: nenhuma guarda lê este campo (a REGRA 85 (Porta pública
+#           espelha o core, com catraca), a REGRA 92 (Papel da porta no registro concorda com o CARIMBO
+#           dela) e o `--status` do motor de publicação medem `source_commit`). Ausente = a materialização não é release (ensaio): o campo
 #           não sai, e a versão daquele pin se DERIVA (estilo `git describe`), nunca se guarda.
 #   --role: papel de adoção. Default 'adopted' (consumidor). 'hub' = empresa que adota os próprios
 #           projetos (Camada 2 — pode rodar /meta:adopt local; ver adopter-onboarding.md). Sem --role

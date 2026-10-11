@@ -69,7 +69,8 @@ e nada mais fica bloqueado por ela.
 ### 6. A versão é rótulo de release: o motor propõe, o maestro sela, a tag mora na porta
 Decisão do maestro de 2026-10-11 (nó `D_VERSIONAR_AS_PORTAS_POR_RELEASE`, por pergunta com opções).
 - **Rótulo, não verdade.** A versão `onion-vX.Y.Z` é apelido de um pin publicado. Nenhuma guarda a
-  lê: a REGRA 85, a REGRA 92 e o `--status` medem o pin, e o `--status` só **exibe** a versão lida do
+  lê: a REGRA 85 (Porta pública espelha o core, com catraca), a REGRA 92 (Papel da porta no registro
+  concorda com o CARIMBO dela) e o `--status` medem o pin, e o `--status` só **exibe** a versão lida do
   carimbo remoto. Um pin que não é release tem a versão derivada no estilo `git describe`
   (`onion-v1.0.0-31-g<sha>`), que nunca vira campo guardado no `members.yaml`.
 - **Toda publicação é uma release.** O `--push` exige `--version X.Y.Z`; sem ele, rc 2. O ensaio
@@ -84,14 +85,22 @@ Decisão do maestro de 2026-10-11 (nó `D_VERSIONAR_AS_PORTAS_POR_RELEASE`, por 
   `kg-ssot-vX.Y.Z`), empurra depois do ramo e a confere no remoto como confere o pin. O core privado
   fica intocado, inclusive de tags, e o passo 8 confere isso. A porta `onion-core` (papel source) é o
   livro-razão das releases.
-- **Número único da família, começando em 1.0.0.** O `--all` agrega as portas: parte da maior tag e
-  aplica o maior bump proposto. Os plugins mantêm o `version` do `plugin.json` por conteúdo (é o que
+- **Número único da família, começando em 1.0.0.** Cada rodada lê as tags de **todas** as portas do
+  registro: a proposta parte do máximo da família, e o número selado tem de ser maior que ele. A
+  exceção é a mesma publicação: uma porta pode tomar um número que já existe noutra se for o **mesmo
+  pin** (é como as quatro saem da mesma release); em pin diferente, rc 2. Tags ilegíveis tornam a
+  proposta NÃO-MEDIDA, nunca "primeira release". O `--all` agrega as propostas (maior bump sobre o
+  máximo) e declara NÃO MEDIDA se alguma porta não chegou à proposta. Os plugins mantêm o `version` do `plugin.json` por conteúdo (é o que
   dirige o update do Claude Code). A versão da família vai em `metadata.version` do `marketplace.json`
   e em `onion_release` de cada `provenance.json`. Nas outras portas ela vai no carimbo (`release:`, pelo
   `write-stamp.sh`).
-- **O changelog da release é a mensagem da tag**, gerada pelo motor. O intervalo vai do
-  `source_commit` do carimbo da tag anterior ao pin novo, filtrado pelos caminhos que a porta mudou. Os
-  commits `docs:` ficam fora. A seção "Quebras nesta porta" diz **"nenhuma quebra nesta porta"**
+- **O changelog da release é a mensagem da tag**, gerada pelo motor. Ele compara a montagem com a
+  **tag anterior** desta porta (não com a ponta, para que a re-rodada que só recupera uma tag não grave
+  um changelog vazio). O intervalo de commits vai do `source_commit` do carimbo da tag anterior ao pin
+  novo, filtrado pelos caminhos que a porta mudou. **Os assuntos de commit não viajam**: a porta é sem
+  biografia, e um assunto é biografia do core, além de imutável (um só com nome de adotante travaria
+  toda release seguinte). Viaja a **contagem por tipo** Conventional, sem os `docs:`; o que mudou de
+  fato é a seção de superfície. A seção "Quebras nesta porta" diz **"nenhuma quebra nesta porta"**
   quando ela não quebrou. Do CHANGELOG da federação só viaja a **contagem** de entradas BREAKING, nunca
   o texto. O changelog passa pela **mesma** varredura de vazamento do bundle, porque assunto de
   commit do core é superfície nova de vazamento.
@@ -148,8 +157,12 @@ para que a ausência não seja lida como esquecimento.
 - **Não publica a família de forma atômica.** O `--all --push` publica porta a porta. Se uma reprovar,
   as outras já saíram com o número. A cura é re-rodar com o **mesmo** `--version` depois da correção:
   a porta que já está na release passa como re-rodada idempotente (ou só empurra a tag que faltou), e
-  a que faltava sai. A re-rodada noutro dia também passa: com o mesmo pin e a mesma release, a única
-  diferença é o `materialized_at`, e o motor não a trata como conteúdo novo. Se `origin/main` andou
-  no meio, o `--expect-pin` recusa antes.
+  a que faltava sai. A re-rodada noutro dia também passa: com o mesmo pin e a mesma release, o motor
+  confere que a única diferença é a linha `materialized_at` do carimbo e não a trata como conteúdo
+  novo; qualquer outra diferença (uma troca de papel, por exemplo) recusa com rc 2. Se `origin/main`
+  andou no meio, o `--expect-pin` recusa antes. Teto: com `--clone`, uma tag local que sobrou de uma
+  rodada anterior apontando outro commit faz a re-rodada sair rc 4 até ser apagada à mão.
+- **A versão derivada do `--status` é aproximação.** O `onion-vX-N-g<sha>` junta a tag da porta com
+  a contagem e o sha do core; não é o `git describe` de repositório nenhum. É só exibição.
 - **Não atualiza o clone local da porta nem o `members.yaml`.** A REGRA 92 lê o clone local, então
   depois de uma troca de papel ele precisa de `git pull` por quem o mantém.

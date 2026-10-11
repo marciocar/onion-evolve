@@ -43,6 +43,7 @@ while [ $# -gt 0 ]; do
     --role=*) ROLE="${1#--role=}"; shift ;;
     --force-role-change) FORCE_ROLE_CHANGE=1; shift ;;
     --release) RELEASE="${2:?--release exige X.Y.Z}"; shift 2 ;;
+    --release=*) RELEASE="${1#--release=}"; shift ;;
     -h|--help) sed -n '1,40p' "${BASH_SOURCE[0]}"; exit 0 ;;
     *) DEST="$1"; shift ;;
   esac

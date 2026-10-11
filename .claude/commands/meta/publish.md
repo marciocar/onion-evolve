@@ -92,7 +92,9 @@ lido do carimbo remoto (`—` = porta sem release). Numa porta defasada, o estad
    commit ensaiado, o que vai a público e a **versão**. As opções são **publicar como
    `onion-v<proposta>`** (a recomendada, com os motivos do motor), **publicar com outro número**
    (o maestro diz qual; tem de ser maior que a última tag) e **parar**. No `--all`, a pergunta usa a
-   **PROPOSTA DA FAMÍLIA**, porque o número é único nas quatro portas. Nunca assuma o número.
+   **PROPOSTA DA FAMÍLIA**, porque o número é único nas quatro portas (mesmo numa porta só, a
+   proposta já parte do máximo da família, e o motor recusa um número que outra porta usa noutro pin).
+   Nunca assuma o número.
 4. **PUBLICAR** só com o "sim":
    `bash ops/publish-door.sh <porta> --push --expect-pin <pin do ensaio> --version <número selado>`
    O motor refaz a rodada inteira (verificação inclusa), empurra o ramo, cria a tag anotada
