@@ -9822,7 +9822,7 @@ run_empty_result_guard_selftests() {
   out="$(_erg '"ls /tmp | head -3 && echo rc=$?"' '"x"' || true)"
   if grep -q 'EXIT-CODE-DE-PIPE' <<< "${out}"; then record_pass "empty-result-guard: (o3) pipe && echo \$? → DISPARA (&& separa, mas a instrucao anterior E o pipe)"
   else record_fail "empty-result-guard: (o3)" "o \$? logo apos o pipe por && calou: ${out}"; fi
-  out="$(_erg '"true; ls /tmp | wc -l || echo falhou=$?"' '"x"' || true)"
+  out="$(_erg '"true; ls /tmp | wc -l || echo failed=$?"' '"x"' || true)"
   if grep -q 'EXIT-CODE-DE-PIPE' <<< "${out}"; then record_pass "empty-result-guard: (o4) pipe || echo \$? → DISPARA (o || nao vira pipe nem esconde o anterior)"
   else record_fail "empty-result-guard: (o4)" "o || confundiu a separacao: ${out}"; fi
 
