@@ -214,3 +214,10 @@ onion-core 0
 #   espelhar sem uma publicacao — que e o `/meta:publish` da F3. Ressalva declarada: a catraca conta as
 #   raizes do `--emit-scrub-roots` (a superficie vendorizada), nao a superficie do bundle de plugins.
 onion-plugins 12
+# 2026-10-11 (release onion-v1.0.0): as quatro portas publicadas no pin 9b5c89318dfc, conferido no remoto
+#   por `ops/publish-door.sh --status`, e o cache do registro alinhado (door-seal-pin.sh para core e
+#   standalone; plugins e mini à mão, citando o --status). `onion-mini` entra nesta catraca com o passivo
+#   MEDIDO, 0: era `kind: door` no registro desde a F6 (2026-10-10) sem linha aqui, e a guarda acusava
+#   SEM-BASELINE (SOFT desde a F3) em toda rodada. As outras três linhas ficam como estão: baixar teto
+#   aqui é decisão manual da catraca, não deste alinhamento de cache.
+onion-mini 0
