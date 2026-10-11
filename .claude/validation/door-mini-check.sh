@@ -118,7 +118,7 @@ if [ "${EXACT}" -eq 1 ]; then
   # e o .gitattributes com eol=lf dos executáveis (SAC-107): o helper só o escreve se a porta carrega
   # executável, então ele é esperado SE existir — o iniciante, num Windows com autocrlf, é quem mais precisa
   #   (e só o NOSSO: um .gitattributes sem o cabeçalho do helper segue acusado como arquivo a mais)
-  if [ -f "${BUNDLE}/.gitattributes" ] && head -1 "${BUNDLE}/.gitattributes" | grep -q '^# EOL fixado em LF nos executáveis (Onion'; then
+  if [ -f "${BUNDLE}/.gitattributes" ] && grep -q '^# EOL fixado em LF nos executáveis (Onion' <<< "$(sed -n '1p' "${BUNDLE}/.gitattributes")"; then
     printf '%s\n' .gitattributes >> "${T}/expected.txt"
   fi
 fi
