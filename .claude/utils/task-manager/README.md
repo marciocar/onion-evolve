@@ -26,7 +26,7 @@ Não existem wrappers MCP por provider. Cada adapter documenta as duas vias (API
 ```
 task-manager/
 ├── README.md          # Este arquivo
-├── interface.md       # Interface ITaskManager
+├── interface.md       # Interface ITaskManager + vocabulário de capacidades (lido por máquina)
 ├── types.md           # Tipos compartilhados
 ├── detector.md        # Detecção de provedor
 ├── factory.md         # Factory para adapters
@@ -35,8 +35,14 @@ task-manager/
     ├── asana.md       # Adapter Asana
     ├── jira.md        # Adapter Jira
     ├── linear.md      # Adapter Linear (API-first; MCP opcional)
-    └── zoho.md        # Adapter Zoho Projects (API V3 apenas — sem MCP nativo)
+    ├── zoho.md        # Adapter Zoho Projects (API V3 apenas — sem MCP nativo)
+    └── <p>.capabilities.tsv  # O que cada adapter implementa, não implementa e ninguém verificou, com fonte
 ```
+
+Antes de chamar uma capacidade **opcional** (anexo, iteração, vínculo, lote, `searchPage`…), consulte
+a declaração do adapter ativo: `not_implemented` não se emula em silêncio no comando. O formato está em
+[`interface.md`](interface.md) §Capacidades, e o lint (REGRA 103) cobra que toda declaração esteja
+completa e com fonte.
 
 ## Uso Rápido
 

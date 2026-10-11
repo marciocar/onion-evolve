@@ -9,8 +9,8 @@ meta:
                                # efetiva do /rest/api/3/search (CHANGE-2046), a v3 do ClickUp sair de
                                # desenvolvimento, ou a 2ª onda (Q_WAVE2_PRIMARIES_CELLS) rodar.
   # kg-backlog-guard: on
-  # ═══ TETO: 52 NÓS ═══ (27 evidências ancoradas + 1 contabilidade + 17 objeções sobreviventes do Elenxo
-  #     + 3 claims de síntese open + 4 perguntas)
+  # ═══ TETO: 56 NÓS ═══ (27 evidências ancoradas + 1 contabilidade + 17 objeções sobreviventes do Elenxo
+  #     + 3 claims de síntese open + 4 perguntas; + 4 da Onda 2 em 2026-10-11: 1 decisão e 3 evidências)
   #     Grafo NASCIDO nesta rodada de primárias nomeadas, EXECUTADA em 2026-10-11 (run wf_8e56d56f-a8b,
   #     Onda 1 da SDAAL do Task Manager, SAC-62): 6 fontes nomeadas, 5 lidas, 1 inalcançável
   #     (zoho-projects-v3); 30 claims à ancoragem, 27 ANCORADAS por verificador independente (cada uma
@@ -18,7 +18,9 @@ meta:
   #     E_LACUNAS_TASK_MANAGER_VOCAB_PRIMARIAS_1011). O Elenxo julgou as 27 ancoradas: 17 objeções
   #     sobreviveram e viraram nós E_ELENXO_* com CONSTRAINS; as 10 que caíram ficam na narrative do nó-alvo.
   #     Cresce SÓ por (a) 2ª onda de primárias nomeadas (Zoho por outro transporte + células 1, 6, 7, 8 e 12)
-  #     ou (b) medição ao vivo (PUT de status no Jira) — não por busca genérica.
+  #     ou (b) medição ao vivo (PUT de status no Jira) — não por busca genérica. (c) A Onda 2 (SAC-63, 2026-10-11)
+  #     acrescentou a decisão de desenho da interface e a matriz declarada; ela não cresce por aqui de novo:
+  #     a matriz vive nos adapters/<p>.capabilities.tsv e a forja da guarda em guard-task-manager-capabilities-2026-10.
   # Pergunta (2026-10-11): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada
   # provedor oferece por versão de API, nas 12 capacidades (hierarquia, status/transição, prioridade,
   # estimativa, comentário, anexo, label, sprint/ciclo, vínculo, busca/paginação, lote, versão/depreciação),
@@ -34,18 +36,21 @@ meta:
   #    'currently being removed'; o core afirma 'removido em maio/2025' em
   #    .claude/utils/task-manager/adapters/jira.md (l.461, l.767, l.774) e CLAUDE.md (l.234), conferido por
   #    grep em bc0dd373. Como a afirmação do core nunca foi nó, a reconciliação vira Q_JIRA_SEARCH_REMOVAL_RECONCILE.
-  # ⚠️ Nenhum nó `decision` nasce aqui. Quem sela o que interface.md declara é o maestro.
+  # ⚠️ A Onda 1 não criou nó `decision`. A Onda 2 (SAC-63) criou UM, D_TASK_MANAGER_INTERFACE_WAVE2, e ele
+  #    nasce `open`: quem sela o que interface.md declara é o maestro, no merge.
 
 nodes:
   # ── A PERGUNTA ───────────────────────────────────────────────────────────────────────────
   - id: Q_TASK_MANAGER_VOCABULARY_MATRIX
     node_type: question
     plane: DEV
-    status: open
+    status: done
+    verified_at: "2026-10-11"
+    verified_against: "Onda 2 (SAC-63): interface.md declara 24 capacidades num bloco lido por máquina; os 5 adapters/<p>.capabilities.tsv declaram as 120 células (34 implemented, 38 unverified, 48 not_implemented); a REGRA 103 sai limpa no corpus"
     impact: 4
     confidence: 0.4
     label: "Qual é a matriz provedor × capacidade (12 capacidades, por versão de API) que interface.md do task-manager vai declarar? Segue open: a Onda 1 ancorou um esqueleto parcial (paginação, texto rico, prioridade/estimativa do Linear, relações), sem Zoho e sem a célula de versão."
-    narrative: "Pergunta-raiz da Onda 1 da SDAAL do Task Manager (SAC-62). Capacidades: (1) hierarquia e níveis máximos; (2) status livre ou workflow com transição obrigatória; (3) prioridade, tipo e escala; (4) estimativa/story points nativa ou custom; (5) formato do corpo do comentário; (6) anexo; (7) label/tag; (8) sprint/ciclo/iteração; (9) dependência/vínculo; (10) busca/filtro e paginação; (11) operação em lote; (12) versão de API vigente e depreciações. Provedores: jira-cloud-v3, jira-dc-v2, clickup-api, asana-api, linear-graphql, zoho-projects-v3 (inalcançável nesta rodada)."
+    narrative: "Pergunta-raiz da Onda 1 da SDAAL do Task Manager (SAC-62). Capacidades: (1) hierarquia e níveis máximos; (2) status livre ou workflow com transição obrigatória; (3) prioridade, tipo e escala; (4) estimativa/story points nativa ou custom; (5) formato do corpo do comentário; (6) anexo; (7) label/tag; (8) sprint/ciclo/iteração; (9) dependência/vínculo; (10) busca/filtro e paginação; (11) operação em lote; (12) versão de API vigente e depreciações. Provedores: jira-cloud-v3, jira-dc-v2, clickup-api, asana-api, linear-graphql, zoho-projects-v3 (inalcançável nesta rodada). FECHADA PELA ONDA 2 (SAC-63, 2026-10-11) na parte que ela resolve: a pergunta era QUAL matriz a interface vai declarar, e a resposta é a matriz declarada, com cada célula aberta marcada unverified em vez de inventada (E_WAVE2_CAPABILITY_MATRIX_1011). O que ela NÃO resolve continua aberto em Q_WAVE2_PRIMARIES_CELLS: as células unverified são a lista de trabalho da 2ª rodada de primárias, agora derivável por grep nas declarações."
     trace: "pergunta do run wf_8e56d56f-a8b (modo primaries, 2026-10-11) · SAC-62 · .claude/utils/task-manager/interface.md"
 
   # ── JIRA CLOUD · REST v3 ─────────────────────────────────────────────────────────────────
@@ -910,6 +915,63 @@ nodes:
     narrative: "ClickUp sem bulk ancorado nesta rodada; Zoho não lido. Bulk de edição/transição no Jira e a atomicidade do Linear seguem abertos."
     trace: "Elenxo do run wf_8e56d56f-a8b, campos gapsClosed e gapsOpen"
 
+  # ── ONDA 2 (SAC-63, 2026-10-11): a interface declara e cada adapter se declara ─────────
+  - id: D_TASK_MANAGER_INTERFACE_WAVE2
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    trace: ".claude/utils/task-manager/interface.md"
+    label: "Onda 2: interface.md declara o vocabulário canônico e 24 capacidades (11 required, 13 optional) com assinatura; cada adapter declara as 24 num .capabilities.tsv com status, api_version e fonte; a REGRA 103 cobra. Herda as três claims de síntese da Onda 1."
+    narrative: "Paginação: searchPage com cursor opaco que pode expirar (C_PAGINATION_AS_OPAQUE_ITERATOR). Texto rico: corpo canônico em Markdown, conversão no adapter, e o formato não ancorado vira unverified (C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN). Lote: bulk.create e bulk.update separados, com o limite na nota de cada adapter (C_BULK_IS_PER_OPERATION_NOT_UNIFORM). As objeções CONSTRAINS foram respeitadas célula a célula: a transição do Jira está implemented pelo endpoint, com a obrigatoriedade declarada como não provada; o comentário do Jira Cloud, do ClickUp e a escrita do Linear ficam unverified; o bulk do Jira é só criação; o Asana tem batch genérico, não bulk de tasks; o Zoho vem só das sondas do adapter. Nasce open: quem sela é o maestro, no merge."
+
+  - id: E_WAVE2_CAPABILITY_MATRIX_1011
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "contagem das 5 declarações (awk sobre a coluna status) e task-manager-capabilities-check.sh . --format tsv com rc 0"
+    label: "A matriz declarada (2026-10-11): 120 células, 34 implemented, 38 unverified e 48 not_implemented. Nenhuma capacidade nova (anexo, iteração, vínculo, épico, pontos, searchPage, lote) tem adapter; o Zoho tem as 12 required implementadas, todas por sonda do adapter."
+    narrative: "Por provedor (implemented, unverified, not_implemented): jira 3, 13, 8; clickup 9, 7, 8; asana 3, 10, 11; linear 6, 8, 10; zoho 13, 0, 11. O Jira, o adapter mais citado na doutrina, tem só 3 células implemented: a transição, a busca JQL e a validação local de id; o resto do CRUD nunca foi ancorado nem medido. O Zoho é o inverso: a primária foi inalcançável, mas o adapter foi escrito por sonda contra um portal real, então as fontes dele são adapter:, não kg:."
+    provenance:
+      source: ".claude/utils/task-manager/adapters/jira.capabilities.tsv"
+      locator: "coluna status das 5 declarações: jira, clickup, asana, linear e zoho .capabilities.tsv"
+      method: "medição: contagem por awk e a guarda da REGRA 103 sobre o corpus"
+      locality: "repo"
+
+  - id: E_WAVE2_ASANA_SUBTASK_PATH_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-11"
+    verified_against: "leitura de adapters/asana.md, createSubtask (ramo REST), contra E_ASANA_SUBTASK_OWN_ENDPOINT"
+    label: "ACHADO da Onda 2: a primária do Asana ancorou um endpoint PRÓPRIO de subtask, e o adapter cria subtask por POST /tasks com parent, caminho não ancorado. Por isso hierarchy.subtask_create do Asana fica unverified, não implemented."
+    provenance:
+      source: ".claude/utils/task-manager/adapters/asana.md"
+      locator: "createSubtask, ramo REST: fetch de ASANA_BASE/tasks com body.data.parent"
+      method: "leitura: o código do adapter comparado à evidência ancorada da Onda 1"
+      locality: "repo"
+
+  - id: E_WAVE2_CLICKUP_SEARCH_ENDPOINT_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-11"
+    verified_against: "leitura de adapters/clickup.md, searchTasks (ramo REST), contra E_CLICKUP_GET_TASKS_PAGE_100"
+    label: "ACHADO da Onda 2: o searchTasks do ClickUp usa GET /team/{id}/task com search_text e page_size; a Onda 1 ancorou GET /list/{id}/task, outro endpoint. search.query do ClickUp fica unverified, e os dois parâmetros podem ser aceitos e ignorados, como no Zoho."
+    provenance:
+      source: ".claude/utils/task-manager/adapters/clickup.md"
+      locator: "searchTasks, ramo REST: GET /team/{workspaceId}/task com page, search_text e page_size"
+      method: "leitura: o código do adapter comparado à evidência ancorada da Onda 1"
+      locality: "repo"
+
   # ── PERGUNTAS QUE A RODADA ABRE ──────────────────────────────────────────────────────────
   - id: Q_JIRA_SEARCH_REMOVAL_RECONCILE
     node_type: question
@@ -939,7 +1001,7 @@ nodes:
     impact: 4
     confidence: 0.5
     label: "2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as células (1) hierarquia, (6) anexo, (7) label, (8) sprint/ciclo e (12) versão de cada provedor."
-    narrative: "Descartar o Zoho por orçamento volta como objeção (Elenxo). A célula (12) não fechou para nenhum provedor."
+    narrative: "Descartar o Zoho por orçamento volta como objeção (Elenxo). A célula (12) não fechou para nenhum provedor. Desde a Onda 2 (SAC-63, 2026-10-11) o alvo desta rodada é mecânico: as 38 células unverified dos adapters/<p>.capabilities.tsv (grep unverified), e a coluna api_version declara a versão que o adapter MIRA, não a vigente."
     trace: "Elenxo do run wf_8e56d56f-a8b, campo recommendation"
 
 edges:
@@ -1116,6 +1178,37 @@ edges:
   - from: E_LACUNAS_TASK_MANAGER_VOCAB_PRIMARIAS_1011
     to: Q_TASK_MANAGER_VOCABULARY_MATRIX
     edge_type: CONSTRAINS
+  # ── Onda 2 (SAC-63) ──
+  - from: C_PAGINATION_AS_OPAQUE_ITERATOR
+    to: D_TASK_MANAGER_INTERFACE_WAVE2
+    edge_type: SUPPORTS
+  - from: C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN
+    to: D_TASK_MANAGER_INTERFACE_WAVE2
+    edge_type: SUPPORTS
+  - from: C_BULK_IS_PER_OPERATION_NOT_UNIFORM
+    to: D_TASK_MANAGER_INTERFACE_WAVE2
+    edge_type: SUPPORTS
+  - from: E_WAVE2_CAPABILITY_MATRIX_1011
+    to: D_TASK_MANAGER_INTERFACE_WAVE2
+    edge_type: SUPPORTS
+  - from: E_WAVE2_CAPABILITY_MATRIX_1011
+    to: Q_TASK_MANAGER_VOCABULARY_MATRIX
+    edge_type: SUPPORTS
+  - from: E_WAVE2_CAPABILITY_MATRIX_1011
+    to: Q_WAVE2_PRIMARIES_CELLS
+    edge_type: SUPPORTS
+  - from: E_WAVE2_ASANA_SUBTASK_PATH_UNANCHORED
+    to: E_WAVE2_CAPABILITY_MATRIX_1011
+    edge_type: SUPPORTS
+  - from: E_WAVE2_ASANA_SUBTASK_PATH_UNANCHORED
+    to: E_ASANA_SUBTASK_OWN_ENDPOINT
+    edge_type: CONSTRAINS
+  - from: E_WAVE2_CLICKUP_SEARCH_ENDPOINT_UNANCHORED
+    to: E_WAVE2_CAPABILITY_MATRIX_1011
+    edge_type: SUPPORTS
+  - from: E_WAVE2_CLICKUP_SEARCH_ENDPOINT_UNANCHORED
+    to: E_CLICKUP_GET_TASKS_PAGE_100
+    edge_type: CONSTRAINS
   # ── perguntas abertas pela rodada ──
   - from: E_JIRA_CLOUD_SEARCH_LEGACY_BEING_REMOVED
     to: Q_JIRA_SEARCH_REMOVAL_RECONCILE
@@ -1134,6 +1227,10 @@ edges:
     edge_type: SUPPORTS
 
 external_edges:
+  # Onda 2: a forja da guarda que cobra a declaração (REGRA 103) é o mecanismo desta decisão.
+  - from: D_TASK_MANAGER_INTERFACE_WAVE2
+    to: "docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml#D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA"
+    edge_type: DEPENDS_ON
   # O nó do Zoho afirma, entre parênteses, que o Jira 'exige POST /issue/{key}/transitions'; esta rodada
   # ancorou o endpoint, mas não a obrigatoriedade. Limita (não derruba) a comparação feita lá.
   - from: E_ELENXO_JIRA_TRANSITION_MANDATORY_UNPROVEN
