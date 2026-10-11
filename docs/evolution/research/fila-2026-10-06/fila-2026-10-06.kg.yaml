@@ -277,10 +277,11 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 3
     confidence: 0.9
     verified_at: 2026-10-07
+    narrative: "Superado em 2026-10-11 (SAC-72, branch feat/precommit-bench-by-case). Re-medido com a seleção nova: docs/README.md → 1 família (gitattributes_eol, com razão escrita); bloco de decouple_source mudado → 12 (a família + quem lê a bancada como dado), não todas; código fora de família continua → todas, com a linha impressa."
     verified_against: "lint-selftest.sh --affected <arquivo> --dry-run em origin/main 33d4067a: lint-selftest.sh → TODAS (failsafe); docs/README.md → 14; kg-grammar.md → 14; pr-merge-verified.sh → 16; as 14 de docs/README.md estão nas três seleções"
     trace: ".claude/validation/lint-selftest.sh"
     label: "a seleção do pre-commit é grossa: tocar a própria bancada roda tudo, e um núcleo fixo de 14 famílias entra em qualquer commit"
@@ -293,11 +294,19 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
-    confidence: 0.6
-    verified_against: "pedido do maestro 2026-10-07 após pular o pre-commit nos PRs do Zoho e do dado do KG"
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "lint-selftest.sh --affected <arquivo> --dry-run antes (origin/main e9a2f994) e depois, na branch feat/precommit-bench-by-case; família run_selftest_selection_selftests 17/17 e 8 mutantes via ops/mutate-and-restore.sh, todos reprovando o caso certo"
     label: "re-forjar o pre-commit para escolher por caso: família pelo bloco que mudou na bancada, núcleo fixo justificado ou podado, motivo de cada failsafe impresso, modo checkpoint; o failsafe seguro fica"
+    narrative: "Feito em 2026-10-11 (SAC-72). Bloco: mudança dentro de run_*_selftests roda a família dele e quem lê a bancada como dado; fora de família, tudo, com a linha impressa. Núcleo: 14 → 1, com razão escrita. Empacotado: arquivo que um manifesto de plugin empacota puxa plugin_bundle (achado do PR #1024), e o pre-commit passa a disparar a bancada nesse caso. Checkpoint declarado por ONION_PRECOMMIT_CHECKPOINT=1. O refutador reprovou a 1ª cura (cobertura à mão deixava materialize_repo de fora); a cobertura virou fecho derivado."
+    trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "_selftest_affected_families, _selftest_block_families e run_selftest_selection_selftests"
+      method: "medição: --affected --dry-run em 4 diffs representativos antes e depois; bancada da família nova 17/17; 8 mutantes reprovados; passada adversarial com 5 achados curados"
+      locality: "repo"
   - id: E_PR_FINALIZE_ATRITO_MEDIDO
     node_type: evidence
     layer: audit

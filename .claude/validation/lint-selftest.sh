@@ -162,6 +162,8 @@ STRICT="${ONION_SELFTEST_STRICT:-0}"
 #   --jobs N|auto              N workers (auto = nproc); 1 = serial (default)
 #   --timing                   imprime ⏱ por família (para calibrar a partição)
 #   --dry-run                  imprime a seleção (faixa) e sai sem rodar nada
+#   --checkpoint               = --dry-run + declaração de que NADA foi validado (pre-commit com
+#                              ONION_PRECOMMIT_CHECKPOINT=1 usa isto no lugar de pular calado)
 #   --report <ABS.tsv>         grava o resultado legível por máquina: uma linha por família
 #                              (familia⇥pass⇥fail⇥skip⇥segundos), as linhas FAIL/SKIP nomeadas
 #                              e um TOTAL. Caminho ABSOLUTO. Escrito pelo PAI, depois da
@@ -196,6 +198,7 @@ while [ $# -gt 0 ]; do
     --report=*) SELFTEST_REPORT="${1#--report=}" ;;
     --child) SELFTEST_CHILD=1 ;;
     --dry-run) SELFTEST_DRY=1 ;;
+    --checkpoint) SELFTEST_DRY=1; SELFTEST_CHECKPOINT=1 ;;
     --jobs) shift; SELFTEST_JOBS="${1:-1}" ;;
     --jobs=*) SELFTEST_JOBS="${1#--jobs=}" ;;
     --families) shift; SELFTEST_FAMILIES="${1:-}" ;;
@@ -297,12 +300,26 @@ _selftest_family_map() {
   command -v python3 >/dev/null 2>&1 || return 1
   python3 - "${BASH_SOURCE[0]}" <<'PYMAP'
 import re, sys
-L = open(sys.argv[1], encoding="utf-8").read().split("\n"); cur = None; fams = {}
+L = open(sys.argv[1], encoding="utf-8").read().split("\n"); cur = None; fams = {}; weak = {}; always = {}
 for ln in L:
     m = re.match(r"^run_([a-z0-9_]+)_selftests\(\) \{", ln)
-    if m: cur = m.group(1); fams[cur] = set(); continue
+    if m: cur = m.group(1); fams[cur] = set(); weak[cur] = set(); continue
     if cur and ln.startswith("}"): cur = None; continue
     if not cur: continue
+    # ANOTAÇÕES DECLARADAS (SAC-72, 2026-10-11) — o núcleo fixo de 14 famílias entrava em QUALQUER commit
+    # porque o corpo delas cita o SUT por `${SCRIPT_DIR}/../…`, por alias (`local r="${REPO_ROOT}"`) ou por
+    # helper, formas que as regex abaixo não leem. Cura por DECLARAÇÃO no corpo, auditável:
+    #   `# selftest-covers: <caminho> [<caminho>…]`  → cobertura FRACA (3ª coluna `weak` no --map): seleciona
+    #       a família quando o caminho muda, mas NÃO conta como "conhecido" para o failsafe — arquivo do
+    #       domínio que só uma anotação cita continua comprando TUDO. Só ACRESCENTA; nunca estreita.
+    #   `# selftest-always: <razão>`  → a família fica no núcleo (`*`), com a razão impressa na seleção.
+    #       Família `*` SEM razão segue rodando sempre (na dúvida, roda mais) e a seleção a denuncia.
+    mc = re.match(r"^\s*#\s*selftest-covers:\s*(.+?)\s*$", ln)
+    if mc:
+        for p in mc.group(1).split(): weak[cur].add(p)
+        continue
+    ma = re.match(r"^\s*#\s*selftest-always:\s*(.+?)\s*$", ln)
+    if ma: always[cur] = ma.group(1); continue
     for p in re.findall(r"(?:\$\{?REPO_ROOT\}?|\$\{?SCRIPT_DIR\}?)/((?:\.claude|ops|docs|plugins|\.githooks|\.github)/[A-Za-z0-9_./-]+)", ln): fams[cur].add(p)
     # ARQUIVO DE RAIZ (2026-09-30): a lista de prefixos acima não alcança `CLAUDE.md`, `.env.example`
     # nem `README.md`, e isso NÃO cai no failsafe: o failsafe só vale quando o conjunto da família
@@ -314,28 +331,334 @@ for ln in L:
     if re.search(r"\brun_(lint|fix)_fixture\b|\$\{?LINT\}?\b", ln): fams[cur].add(".claude/validation/lint-artifacts.sh")
     if re.search(r"\brun_kg_fixture\b", ln): fams[cur].add(".claude/validation/kg-radar.sh")
     if re.search(r"\$\{?(FIX_DIR|MANIFEST)\}?", ln): fams[cur].add(".claude/validation/fixtures/")
+# FECHO DA COBERTURA FRACA (achado 1 do refutador, 2026-10-11): anotação escrita à mão é lista, e o defeito de
+# guarda por lista é o VOCABULÁRIO que falta. Medido: `materialize_repo` declarava o materializador e os
+# manifestos, mas o materializador chama marketplace-readme.sh, generate-marketplace.sh e o assembler, que chama
+# plugin-namespace-check.sh e plugin-dead-link-check.sh — mutar marketplace-readme.sh quebrava materialize_repo
+# e a seleção não a rodava (o arquivo é citado por outra família, então o failsafe não disparava). A cura é
+# DERIVAR: de cada script declarado, o diretório dele inteiro e, por fecho, todo script do repo que ele cita
+# pelo nome (e o diretório deste). Sobre-seleciona de propósito — o fecho só acrescenta família.
+import os
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[1]))))
+BYNAME = {}
+for base in (".claude", "ops"):
+    for dp, dn, fn in os.walk(os.path.join(ROOT, base)):
+        dn[:] = [x for x in dn if x not in ("__pycache__", "node_modules", "worktrees") and not x.startswith("__")]
+        for x in fn:
+            if x.endswith((".sh", ".py", ".awk")):
+                BYNAME.setdefault(x, []).append(os.path.relpath(os.path.join(dp, x), ROOT))
+SCRIPT_RE = re.compile(r"[A-Za-z0-9_.-]+\.(?:sh|py|awk)\b")
+def closure(paths):
+    out = set(); todo = [x for x in paths if x.endswith((".sh", ".py", ".awk"))]; seen = set()
+    while todo:
+        x = todo.pop()
+        if x in seen: continue
+        seen.add(x); out.add(x)
+        d = os.path.dirname(x)
+        if d: out.add(d + "/")
+        try: txt = open(os.path.join(ROOT, x), encoding="utf-8", errors="replace").read()
+        except OSError: continue
+        for b in set(SCRIPT_RE.findall(txt)):
+            for y in BYNAME.get(b, ()):
+                # a própria bancada não é dependência do SUT (é o harness — quem trata a mudança nela é a
+                # regra do BLOCO); só entra se a família a declarar de próprio punho
+                if y == ".claude/validation/lint-selftest.sh": continue
+                if y not in seen: todo.append(y)
+    return out
+for f in fams:
+    if weak[f]: weak[f] |= closure(weak[f])
+# @plugin-bundled (achado do PR #1024, 2026-10-11): a família que MONTA ou JULGA plugin a partir das fontes
+# vivas depende de TODO arquivo que algum manifesto empacota — skill, comando, agente, util, KB. O mapa só
+# via o assembler/manifesto, então mudar uma skill empacotada não selecionava `plugin_bundle` e a bancada
+# passou verde com o plugin `onion` quebrado. O token é DERIVADO de quem cita a maquinaria de plugin (não de
+# lista à mão); o seletor o expande para os caminhos que os manifestos empacotam.
+PLUGIN_SUT = {".claude/utils/marketplace/assemble-plugin.sh", ".claude/utils/marketplace/materialize-marketplace-repo.sh",
+              ".claude/validation/plugin-bundle-check.sh"}
+for f in fams:
+    if any(p in PLUGIN_SUT or p.startswith(".claude/utils/marketplace/verticals") for p in fams[f] | weak[f]):
+        weak[f].add("@plugin-bundled")
 for f in sorted(fams):
-    if fams[f]:
-        for p in sorted(fams[f]): print(f"{f}\t{p}")
-    else: print(f"{f}\t*")
+    for p in sorted(fams[f]): print(f"{f}\t{p}")
+    for p in sorted(weak[f] - fams[f]): print(f"{f}\t{p}\tweak")
+    if f in always: print(f"{f}\t*\talways: {always[f]}")
+    elif not fams[f] and not weak[f]: print(f"{f}\t*\talways: SEM-RAZAO")
 PYMAP
 }
 
 # Seleciona famílias pelos arquivos tocados. Imprime a lista (vírgulas) ou ALL; o motivo vai ao stderr.
 
+# ── SELEÇÃO POR CASO (SAC-72, 2026-10-11) ────────────────────────────────────────────────────
+# Medido com `--affected --dry-run` antes desta cura: tocar a própria bancada rodava TODAS as famílias, e
+# um núcleo fixo de 14 entrava em qualquer commit — até num que só mexe em docs/README.md. Três regras
+# novas, todas no sentido "na dúvida, roda MAIS":
+#   (1) BLOCO: diff em lint-selftest.sh seleciona só as famílias cujo bloco `run_*_selftests` mudou (e a
+#       linha `_family` dela). Linha mudada FORA de família (cabeçalho, helper, seletor) ⇒ TUDO, com a
+#       linha impressa. Comentário/linha vazia fora de família e fora de heredoc é neutro.
+#   (2) EMPACOTADO: arquivo que algum manifesto de plugin empacota ⇒ + as famílias `@plugin-bundled`.
+#       ACRESCENTA ao resultado; não conta como "conhecido", então não desliga failsafe nenhum.
+#   (3) NÚCLEO: cada família `*` imprime a razão escrita; sem razão, roda e é denunciada.
+# O CI continua rodando a bancada COMPLETA — esta seleção é só a faixa do pre-commit.
+
+# Caminhos que os manifestos de plugin empacotam (um por linha), mais as entradas não-manifesto que a
+# montagem lê. rc≠0 = não consegui derivar (o chamador trata como "tudo pode ser empacotado").
+_selftest_bundled_paths() {
+  local vd="${REPO_ROOT}/.claude/utils/marketplace/verticals" m n=0
+  [ -d "${vd}" ] || return 0   # sem maquinaria de marketplace (adotante): nada é empacotado aqui
+  for m in "${vd}"/*.manifest.sh; do
+    [ -f "${m}" ] || continue
+    n=$((n + 1))
+    REPO_ROOT="${REPO_ROOT}" bash -c '
+      COMMANDS=(); AGENTS=(); UTILS=(); VALIDATION=(); TEMPLATES=(); SKILLS=(); HOOKS=(); DOCS=()
+      . "$1" >/dev/null 2>&1 || exit 3
+      for x in ${COMMANDS[@]+"${COMMANDS[@]}"} ${AGENTS[@]+"${AGENTS[@]}"} ${UTILS[@]+"${UTILS[@]}"} \
+               ${VALIDATION[@]+"${VALIDATION[@]}"} ${TEMPLATES[@]+"${TEMPLATES[@]}"} ${SKILLS[@]+"${SKILLS[@]}"} \
+               ${HOOKS[@]+"${HOOKS[@]}"} ${DOCS[@]+"${DOCS[@]}"}; do printf "%s\n" "${x%/}"; done' _ "${m}" || return 1
+  done
+  [ "${n}" -gt 0 ] || return 1   # diretório existe e não tem manifesto: estado que não sei ler
+  # a montagem também lê: o registro de eventos dos hooks, o papel, a licença e o catálogo da raiz
+  printf '%s\n' .claude/settings.json .claude/.onion-version LICENSE .claude-plugin/marketplace.json
+}
+
+# Regra do BLOCO. $1 = staged|worktree. Imprime CSV de famílias ou ALL; motivo no stderr.
+_selftest_block_families() {
+  command -v python3 >/dev/null 2>&1 || { echo "ALL"; echo "  failsafe: python3 ausente — não sei ler o bloco que mudou → tudo" >&2; return 0; }
+  python3 - "${REPO_ROOT}" ".claude/validation/lint-selftest.sh" "$1" <<'PYBLOCK'
+import re, subprocess, sys
+root, rel, mode = sys.argv[1:4]
+def say(msg): print(msg, file=sys.stderr)
+def all_(why): print("ALL"); say("  failsafe: " + why + " → tudo"); sys.exit(0)
+G = ["git", "-C", root, "-c", "diff.interHunkContext=0", "-c", "core.quotepath=off"]
+def git(*a):
+    r = subprocess.run(G + list(a), capture_output=True, text=True, encoding="utf-8", errors="replace")
+    if r.returncode != 0: raise RuntimeError(" ".join(a[:2]))
+    return r.stdout
+try:
+    old = git("show", "HEAD:" + rel)
+    if mode == "staged":
+        new = git("show", ":" + rel)
+        diff = git("diff", "--cached", "-U0", "--no-color", "--no-ext-diff", "--no-textconv", "--", rel)
+    else:
+        new = open(root + "/" + rel, encoding="utf-8", errors="replace").read()
+        diff = git("diff", "-U0", "--no-color", "--no-ext-diff", "--no-textconv", "HEAD", "--", rel)
+except Exception as e:
+    all_("sem versão anterior/diff legível de %s (%s)" % (rel, e))
+old_ch, new_ch = set(), set(); o = n = 0; inh = False
+for ln in diff.split("\n"):
+    m = re.match(r"^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@", ln)
+    if m: o, n = int(m.group(1)), int(m.group(2)); inh = True; continue
+    if not inh: continue   # cabeçalho do diff (---/+++) vem antes do 1º @@
+    if ln.startswith("-"): old_ch.add(o); o += 1
+    elif ln.startswith("+"): new_ch.add(n); n += 1
+    elif ln.startswith(" "): o += 1; n += 1
+# -U0 com hunk de inserção pura traz "-N,0": o número é a linha ANTERIOR à inserção, sem linha a classificar.
+if not old_ch and not new_ch: all_("nenhuma linha mudada medida em %s (diff vazio contra HEAD)" % rel)
+FAM = re.compile(r"^run_([a-z0-9_]+)_selftests\(\) \{")
+INV = re.compile(r"^_family run_([a-z0-9_]+)_selftests(\s*\|\|\s*true)?\s*(#.*)?$")
+HDOP = re.compile(r"<<(-?)[ \t]*(?:'([^']*)'|\"([^\"]*)\"|\\?([A-Za-z_@][A-Za-z0-9_@]*))")
+def scan_q(ln, q=None):
+    """(texto fora de string, aspa aberta ao fim da linha, heredocs abertos na linha).
+    Tira '...', $'...' e "...": `<<EOF` citado dentro de string não é heredoc. O operador `<<` é lido ANTES
+    das aspas — `<<'EOF'` tem o delimitador entre aspas e é heredoc. String que atravessa linhas é rastreada."""
+    out = []; hds = []; i = 0; n = len(ln)
+    def close(i, q):
+        while i < n:
+            c = ln[i]
+            if c == "\\" and q != "'": i += 2; continue
+            if (q == '"' and c == '"') or (q in ("'", "$'") and c == "'"): return i + 1
+            i += 1
+        return -1
+    if q:
+        i = close(0, q)
+        if i < 0: return "", q, hds
+        out.append(" ")
+    while i < n:
+        c = ln[i]
+        if c == "\\": i += 2; continue
+        if c == "#" and (i == 0 or ln[i - 1] in " \t;"): break   # comentário até o fim
+        if ln.startswith("<<", i) and not ln.startswith("<<<", i) and (i == 0 or ln[i - 1] != "<"):
+            pre = "".join(out)
+            m = HDOP.match(ln, i)
+            if m and pre.count("((") <= pre.count("))"):   # `$((1<<x))` é deslocamento, não heredoc
+                hds.append((m.group(2) or m.group(3) or m.group(4), m.group(1) == "-"))
+                i = m.end(); out.append(" "); continue
+        q2 = "$'" if (c == "$" and i + 1 < n and ln[i + 1] == "'") else (c if c in ("'", '"') else None)
+        if q2:
+            j = close(i + (2 if q2 == "$'" else 1), q2)
+            if j < 0: return "".join(out), q2, hds
+            i = j; out.append(" "); continue
+        out.append(c); i += 1
+    return "".join(out), None, hds
+def parse(text):
+    """região por linha (1-based): ('fam',x) | ('inv',x) | ('neutral',) | ('code',) | ('amb',x).
+    Duas leituras independentes da fronteira do bloco: (A) a ingênua do --map (1º '}' na coluna 0) e
+    (B) a ciente de heredoc. Linha que só UMA delas põe dentro de família vira 'amb' ⇒ TUDO se mudar."""
+    L = text.split("\n"); N = len(L)
+    # índice dos terminadores possíveis: heredoc sem terminador adiante NÃO é heredoc (bash leria até o EOF,
+    # o que este arquivo nunca faz) — é `<<` dentro de citação aninhada que o leitor de aspas não desfaz
+    TERM = {}
+    for k, ln in enumerate(L, 1): TERM.setdefault(ln, []).append(k); TERM.setdefault("\t" + ln.lstrip("\t"), []).append(k)
+    def has_term(w, dash, k):
+        return any(t > k for t in TERM.get(w, ())) or (dash and any(t > k and L[t - 1].lstrip("\t") == w for t in TERM.get("\t" + w, ())))
+    inA = [None] * (N + 2); inB = [None] * (N + 2); inhd = [False] * (N + 2); nested = {}
+    cur = None; s0 = 0
+    for i, ln in enumerate(L, 1):
+        if cur is None:
+            m = FAM.match(ln)
+            if m: cur = m.group(1); s0 = i; inA[i] = cur
+        else:
+            inA[i] = cur
+            if ln.startswith("}"):
+                # transbordo: um bloco A que engole linha `_family` ou outro cabeçalho não é um bloco
+                if any(INV.match(L[k - 1]) or FAM.match(L[k - 1]) for k in range(s0 + 1, i)):
+                    for k in range(s0, i + 1): inA[k] = ("amb", cur)
+                cur = None
+    if cur is not None: return None
+    cur = None; hd = []
+    for i, ln in enumerate(L, 1):
+        if hd:
+            inhd[i] = True; inB[i] = cur
+            w, dash = hd[0]
+            if (ln.lstrip("\t") if dash else ln) == w: hd.pop(0)
+            continue
+        if cur is None:
+            m = FAM.match(ln)
+            if m: cur = m.group(1); inB[i] = cur; nested.setdefault(cur, set())
+        else:
+            inB[i] = cur
+            mn = re.match(r"^\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(\)\s*\{", ln)
+            if mn: nested[cur].add(mn.group(1))
+            if ln.startswith("}"): cur = None; continue
+        hd.extend(h for h in scan_q(ln)[2] if has_term(h[0], h[1], i))
+    if cur is not None or hd: return None
+    # transbordo (2): definição de função na coluna 0, fora de heredoc, DENTRO de um bloco A — o bloco
+    # real fechou antes (`}` indentado ou de uma linha) e A engoliu código de topo
+    TOP = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*\s*\(\)\s*\{")
+    for i, ln in enumerate(L, 1):
+        a = inA[i]
+        if a and not isinstance(a, tuple) and not inhd[i] and TOP.match(ln) and not FAM.match(ln):
+            k = i
+            while k >= 1 and inA[k] == a: inA[k] = ("amb", a); k -= 1
+            k = i + 1
+            while k <= N and inA[k] == a: inA[k] = ("amb", a); k += 1
+    bhd = inhd[:]   # corpos de heredoc vistos por B, antes das marcas de dado abaixo
+    # heredoc POSSÍVEL no top-level (leitura bruta, sem desfazer aspas — sobre-detecta de propósito): da linha
+    # do `<<W` até o 1º `W` adiante, nada é comentário neutro. Errar aqui só faz rodar MAIS.
+    RAW = re.compile(r"(?<!<)<<(?!<)(-?)[ \t]*['\"\\]?([A-Za-z_@][A-Za-z0-9_@]*)")
+    for i, ln in enumerate(L, 1):
+        if inA[i] or inB[i] or inhd[i]: continue
+        for m in RAW.finditer(ln):
+            w, dash = m.group(2), m.group(1) == "-"
+            for t in range(i + 1, N + 1):
+                if (L[t - 1].lstrip("\t") if dash else L[t - 1]) == w:
+                    for k in range(i + 1, t + 1):
+                        if not (inA[k] or inB[k]): inhd[k] = True
+                    break
+    # string que atravessa linhas: a linha de TOPO que começa dentro dela é DADO, nunca comentário neutro.
+    # O estado de aspas atravessa também as linhas de família (achado 3 do refutador, 2026-10-11: string
+    # aberta num bloco e "fechada" por um '}' na coluna 0 deixa linhas de topo que são dado). Corpo de
+    # heredoc é literal e não mexe no estado. Dessincronizar aqui só tira neutralidade — roda MAIS.
+    q = None
+    for i, ln in enumerate(L, 1):
+        if bhd[i]: continue
+        if FAM.match(ln): q = None   # cabeçalho de família na coluna 0: o estado de aspas recomeça
+        if q and not (inA[i] or inB[i]): inhd[i] = True
+        q = scan_q(ln, q)[1]
+    R = [None] * (N + 2)
+    for i, ln in enumerate(L, 1):
+        a, b = inA[i], inB[i]
+        if isinstance(a, tuple): R[i] = a
+        elif a and b and a == b: R[i] = ("fam", a)
+        elif a or b: R[i] = ("amb", a or b)
+        elif inhd[i]: R[i] = ("code",)
+        elif INV.match(ln): R[i] = ("inv", INV.match(ln).group(1))
+        elif ln.strip() == "" or ln.lstrip().startswith("#"): R[i] = ("neutral",)
+        else: R[i] = ("code",)
+    return R, L, nested
+po, pn = parse(old), parse(new)
+if po is None or pn is None: all_("estrutura de blocos ilegível em %s (bloco ou heredoc sem fim)" % rel)
+sel = set()
+for side, lines, (R, L, _) in (("antes", old_ch, po), ("depois", new_ch, pn)):
+    for i in sorted(lines):
+        r = R[i] if i < len(R) else None
+        if r is None: all_("linha %d (%s) fora do arquivo medido" % (i, side))
+        if r[0] in ("fam", "inv"): sel.add(r[1])
+        elif r[0] == "neutral": continue
+        elif r[0] == "amb": all_("linha %d (%s) na fronteira ambígua do bloco de %s (heredoc × '}' na coluna 0)" % (i, side, r[1]))
+        else: all_("linha %d (%s) fora de família — cabeçalho/helper/seletor: %s" % (i, side, L[i - 1].strip()[:90]))
+# acoplamento: função definida DENTRO de um bloco mudado e usada por outro bloco ou pelo top-level.
+# Fecho transitivo (lista de trabalho). Bloco que DEFINE o mesmo nome usa a própria definição e não
+# acopla; uso como VARIÁVEL (`$x`, `${x}`, `x=`, `read … x`) não é chamada.
+def calls(fn, ln):
+    if ln.lstrip().startswith("#"): return False
+    if re.search(r"\bread\b[^;|]*\b%s\b" % re.escape(fn), ln): return False
+    return re.search(r"(?<![\w${-])%s(?![\w=}])" % re.escape(fn), ln) is not None
+for R, L, nested in (po[0:3], pn[0:3]):
+    todo = sorted(sel); seen = set()
+    while todo:
+        f = todo.pop()
+        if f in seen: continue
+        seen.add(f)
+        for fn in sorted(nested.get(f, ())):
+            for i, ln in enumerate(L, 1):
+                r = R[i]
+                if r is None or not calls(fn, ln): continue
+                if r[0] == "fam" and r[1] != f and fn not in nested.get(r[1], ()):
+                    if r[1] not in sel: say("  bloco: %s define %s(), chamada por %s → também" % (f, fn, r[1]))
+                    sel.add(r[1]); todo.append(r[1])
+                elif r[0] in ("code", "amb"): all_("%s define %s(), chamada fora de família (linha %d)" % (f, fn, i))
+if not sel:
+    # comentário de bash fora de string/heredoc é inerte; quem lê a bancada como DADO (--help, âncoras de
+    # sed, varredura de .claude/validation/) é selecionado pelo mapa, no chamador
+    say("  bloco: só comentário/linha vazia fora de família mudou em %s — nenhuma família pelo bloco" % rel)
+else:
+    say("  bloco: %s mudou em %d família(s): %s" % (rel, len(sel), ",".join(sorted(sel))))
+print(",".join(sorted(sel)))
+PYBLOCK
+}
+
 _selftest_affected_families() {
-  local map p hit known sel="" always
+  local map p hit known sel="" always bundled="" bundled_rc=0 bfams
   if ! map="$(_selftest_family_map)" || [ -z "${map}" ]; then
     echo "ALL"; echo "  failsafe: mapa família→arquivo indisponível (python3 ausente?) → tudo" >&2; return 0
   fi
+  bfams="$(printf '%s\n' "${map}" | awk -F'\t' '$2=="@plugin-bundled"{print $1}' | sort -u | paste -sd, -)"
+  if [ -n "${bfams}" ]; then
+    bundled="$(_selftest_bundled_paths)" || bundled_rc=$?
+  fi
   for p in "$@"; do
+    # (2) EMPACOTADO — antes de qualquer failsafe, e SÓ acrescenta
+    if [ -n "${bfams}" ]; then
+      if [ "${bundled_rc}" -ne 0 ]; then
+        case "${p}" in .claude/*|docs/*|LICENSE|.claude-plugin/*)
+          sel="${sel:+${sel},}${bfams}"
+          echo "  empacotado?: manifestos ilegíveis — ${p} pode estar num plugin → + famílias de plugin" >&2 ;;
+        esac
+      elif awk -v p="${p}" '$0!="" && (p==$0 || index(p, $0 "/")==1) {f=1} END {exit !f}' <<< "${bundled}"; then
+        sel="${sel:+${sel},}${bfams}"
+        echo "  empacotado: ${p} viaja num plugin → + ${bfams}" >&2
+      fi
+    fi
+    # (1) BLOCO — a própria bancada
+    if [ "${p}" = ".claude/validation/lint-selftest.sh" ]; then
+      local _b
+      _b="$(_selftest_block_families "$( [ "${SELFTEST_AFFECTED_STAGED}" = "2" ] && echo staged || echo worktree )")"
+      if [ "${_b}" = "ALL" ]; then echo "ALL"; return 0; fi
+      # + quem lê a bancada como DADO: família que cita lint-selftest.sh ou um diretório que o contém
+      #   (shell_pipefail_robustness varre .claude/validation/ — um bloco novo pode trazer o antipadrão)
+      hit="$(awk -F'\t' -v p="${p}" '$2==p || ($3!="weak" && $2 ~ /\/$/ && index(p,$2)==1) {print $1}' <<< "${map}" | sort -u | paste -sd, -)"
+      [ -z "${hit}" ] || echo "  bloco: leem a bancada como dado → + ${hit}" >&2
+      sel="${sel:+${sel},}${_b}${hit:+,${hit}}"
+      continue
+    fi
     case "${p}" in
-      .claude/validation/lint-selftest.sh|.claude/validation/lint-artifacts.sh|.claude/validation/rules-registry.sh|.claude/validation/lint-rules.md|.claude/validation/fixtures/manifest.tsv|.claude/hooks/lib/*|.githooks/*|.github/workflows/*)
+      .claude/validation/lint-artifacts.sh|.claude/validation/rules-registry.sh|.claude/validation/lint-rules.md|.claude/validation/fixtures/manifest.tsv|.claude/hooks/lib/*|.githooks/*|.github/workflows/*)
         echo "ALL"; echo "  failsafe: ${p} é infraestrutura da bancada → tudo" >&2; return 0 ;;
     esac
     # exato = arquivo citado, ou diretório citado que NÃO é raiz de domínio (fixtures/ conta; .claude/validation/ não)
     hit="$(printf '%s\n' "${map}" | awk -F'\t' -v p="${p}" '$2==p || ($2 ~ /\/$/ && index(p,$2)==1) {print $1}' | sort -u | paste -sd, -)"
-    known="$(printf '%s\n' "${map}" | awk -F'\t' -v p="${p}" '$2==p || ($2 ~ /\/$/ && $2 !~ /^(\.claude\/|\.claude\/(validation|hooks|utils)\/|ops\/)$/ && index(p,$2)==1) {print $1}' | head -1)"
+    # `known` IGNORA a cobertura fraca (3ª coluna `weak`): anotação só acrescenta família, nunca tira o
+    # failsafe de um arquivo do domínio. E sem `| head -1` (produtor|head sob pipefail é corrida).
+    known="$(awk -F'\t' -v p="${p}" '!f && $3!="weak" && ($2==p || ($2 ~ /\/$/ && $2 !~ /^(\.claude\/|\.claude\/(validation|hooks|utils)\/|ops\/)$/ && index(p,$2)==1)) {print $1; f=1}' <<< "${map}")"
     if [ -n "${known}" ]; then
       sel="${sel:+${sel},}${hit}"
     else
@@ -360,10 +683,22 @@ _selftest_affected_families() {
           # FICA fail-closed. Reabrir exige: predicado que enxergue invocacao por helper, e a
           # medicao refeita com o seletor real.
           echo "ALL"; echo "  failsafe: ${p} não é citado por nenhuma família → tudo (recusa no incerto)" >&2; return 0 ;;
+        *)
+          # fora do domínio e só cobertura FRACA o cita: seleciona quem declarou cobri-lo
+          [ -n "${hit}" ] && sel="${sel:+${sel},}${hit}" ;;
       esac
     fi
   done
-  always="$(printf '%s\n' "${map}" | awk -F'\t' '$2=="*"{print $1}' | paste -sd, -)"
+  always="$(awk -F'\t' '$2=="*"{print $1}' <<< "${map}" | sort -u | paste -sd, -)"
+  # (3) NÚCLEO — cada família que roda sempre diz POR QUÊ; a sem razão roda e é denunciada
+  local _nr _sr
+  _nr="$(awk -F'\t' '$2=="*" && $3!="always: SEM-RAZAO"' <<< "${map}" | grep -c . || true)"
+  _sr="$(awk -F'\t' '$2=="*" && $3=="always: SEM-RAZAO"{print $1}' <<< "${map}" | paste -sd, -)"
+  if [ -n "${always}" ]; then
+    echo "  núcleo: ${_nr} família(s) com razão escrita rodam sempre:" >&2
+    awk -F'\t' '$2=="*" && $3!="always: SEM-RAZAO"{sub(/^always: /,"",$3); print "    · " $1 " — " $3}' <<< "${map}" >&2
+    [ -z "${_sr}" ] || echo "  núcleo SEM razão escrita (roda por segurança; declare '# selftest-always:' ou '# selftest-covers:'): ${_sr}" >&2
+  fi
   sel="${sel:+${sel},}${always}"
   printf '%s\n' "${sel}" | tr ',' '\n' | grep -v '^$' | sort -u | paste -sd, -
 }
@@ -371,8 +706,13 @@ _selftest_affected_families() {
 if [ "${SELFTEST_MAP}" = "1" ]; then SELFTEST_EXPECTED_EXIT=1; _selftest_family_map; exit "$?"; fi
 
 if [ "${SELFTEST_AFFECTED_STAGED}" = "1" ]; then
-  while IFS= read -r p; do [ -n "${p}" ] && SELFTEST_AFFECTED+=("${p}"); done \
-    < <(git -C "${REPO_ROOT}" diff --cached --name-only --diff-filter=ACMR 2>/dev/null)
+  # RENOME E EXCLUSÃO contam (achado 4 do refutador, 2026-10-11): com `--name-only --diff-filter=ACMR` um
+  # renome entregava só o caminho NOVO e a exclusão sumia — apagar/renomear uma skill empacotada deixava o
+  # manifesto apontando para o nada sem selecionar plugin_bundle. Aqui entram o caminho antigo e o novo.
+  while IFS=$'\t' read -r _st _p1 _p2; do
+    [ -n "${_p1}" ] && SELFTEST_AFFECTED+=("${_p1}")
+    [ -n "${_p2:-}" ] && SELFTEST_AFFECTED+=("${_p2}")
+  done < <(git -C "${REPO_ROOT}" -c core.quotepath=off diff --cached --name-status -M --diff-filter=ACMRD 2>/dev/null)
   SELFTEST_AFFECTED_STAGED=2   # marcador: seleção pedida, mesmo que nada esteja staged
 fi
 if { [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ] || [ "${SELFTEST_AFFECTED_STAGED}" = "2" ]; } && [ -z "${SELFTEST_FAMILIES}" ] && [ "${SELFTEST_CHILD}" = "0" ]; then
@@ -390,7 +730,24 @@ if { [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ] || [ "${SELFTEST_AFFECTED_STAGED}" = "
 fi
 
 if [ "${SELFTEST_DRY}" = "1" ]; then
-  echo "dry-run: famílias=${SELFTEST_FAMILIES:-<todas>} jobs=${SELFTEST_JOBS}"; SUMMARY_PRINTED=1; exit 0
+  echo "dry-run: famílias=${SELFTEST_FAMILIES:-<todas>} jobs=${SELFTEST_JOBS}"
+  # Linha de MÁQUINA para o gatilho do pre-commit: quantas famílias a seleção pegou ALÉM do núcleo
+  # (ALL = failsafe). Só o núcleo (=0) não justifica rodar a bancada num commit — o mesmo de antes.
+  if [ "${SELFTEST_AFFECTED_STAGED}" = "2" ] || [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ]; then
+    if [ -z "${SELFTEST_FAMILIES}" ]; then echo "#ONION_SELFTEST_SELECTION covered=ALL"
+    else
+      _core=",$(_selftest_family_map 2>/dev/null | awk -F'\t' '$2=="*"{print $1}' | sort -u | paste -sd, -),"
+      _cov=0
+      for _f in ${SELFTEST_FAMILIES//,/ }; do case "${_core}" in *",${_f},"*) ;; *) _cov=$((_cov + 1)) ;; esac; done
+      echo "#ONION_SELFTEST_SELECTION covered=${_cov}"
+    fi
+  fi
+  # CHECKPOINT DECLARADO (SAC-72): o `--no-verify` pulava TUDO calado. O checkpoint mostra o que NÃO
+  # rodou e por quê, e diz em voz alta que isto não é validação — o gate final é a bancada completa no CI.
+  if [ "${SELFTEST_CHECKPOINT:-0}" = "1" ]; then
+    echo "⏸  CHECKPOINT declarado: a seleção acima NÃO rodou — isto não é validação. O gate final é a bancada completa (CI); rode a faixa antes de pedir merge."
+  fi
+  SUMMARY_PRINTED=1; exit 0
 fi
 
 # Pai paralelo: lista, particiona, dispara --child por grupo, agrega trailers. Nenhuma família roda no pai.
@@ -1495,6 +1852,7 @@ RED
 # publicáveis num dir-alvo self-contained (marketplace.json name=onion-plugins) e NÃO faz push (I3). O
 # selftest materializa num tmp (--no-commit), afirma as invariantes e a 2ª guarda de moat por arquivo.
 run_materialize_repo_selftests() {
+  # selftest-covers: .claude/utils/marketplace/materialize-marketplace-repo.sh .claude/utils/marketplace/verticals/
   local helper="${SCRIPT_DIR}/../utils/marketplace/materialize-marketplace-repo.sh"
   [ -f "${helper}" ] || { record_pass "materialize-repo: helper ausente — nada a testar"; return; }
   local tgt; tgt="$(mktemp -d)/onion-plugins"
@@ -1591,6 +1949,7 @@ run_materialize_repo_selftests() {
 # viajava inerte). Fixture: core sintético com 1 hook + settings.json ligando-o a um evento; assemble →
 # hooks.json com o evento certo. (a) gerado+evento; (b) MUT: hook sem evento no settings → não registra.
 run_plugin_hooks_json_selftests() {
+  # selftest-covers: .claude/utils/marketplace/assemble-plugin.sh
   local asm="${SCRIPT_DIR}/../utils/marketplace/assemble-plugin.sh"
   [ -f "${asm}" ] || { record_pass "plugin-hooks-json: assemble ausente — nada a testar"; return; }
   local w; w="$(mktemp -d)"; trap 'rm -rf "'"$w"'"' RETURN
@@ -2187,6 +2546,7 @@ K
 # Modo decouple-source — transição 'desacoplar' (2026-07-23): um adotado/hub vira fonte soberana própria
 # (role: source + decoupled_from). Testa: dry-run NÃO toca; --confirm re-carimba; source recusa.
 run_decouple_source_selftests() {
+  # selftest-covers: .claude/utils/adopt/decouple-source.sh
   local dec="${SCRIPT_DIR}/../utils/adopt/decouple-source.sh"
   [ -f "${dec}" ] || return 0
   command -v git >/dev/null 2>&1 || { record_skip "decouple-source: git ausente (skip gracioso)"; return; }
@@ -2586,6 +2946,7 @@ assert e["i"]==3 and abs(e["c"]-1.0)<0.01, "impact/confidence não propagou: %r"
 # entra em modo EXPLORATÓRIO.
 # ---------------------------------------------------------------------------
 run_kg_scope_selftests() {
+  # selftest-covers: .claude/validation/kg-provenance-coverage.sh .claude/validation/resolve-integration-branch.sh
   local repo out rc
   repo="$(_prov_make_repo)"
   trap 'rm -rf "${repo}"' RETURN
@@ -8126,6 +8487,8 @@ _family run_secret_gitignore_selftests
 # RESOLVIDO (`git check-attr`), não o texto do arquivo: é o que o git aplica no checkout. CORE-ONLY: o
 # .gitattributes não viaja no manifesto; no adotante o arquivo é dele.
 run_gitattributes_eol_selftests() {
+  # selftest-always: o caso (índice) cobra TODO arquivo eol=lf do índice sem CRLF — qualquer commit pode introduzir um
+  # selftest-covers: .gitattributes
   local r="${REPO_ROOT}" a f n
   # (a) .sh de hook e (b) hook sem extensão resolvem eol=lf com text
   for f in .claude/hooks/pretooluse-env-guard.sh .githooks/pre-commit; do
@@ -13722,6 +14085,7 @@ MFX
 # idempotência, preservação do top-level, e caso vazio (sem plugins).
 # ---------------------------------------------------------------------------
 run_marketplace_generate_selftests() {
+  # selftest-covers: .claude/utils/marketplace/generate-marketplace.sh
   local helper="${SCRIPT_DIR}/../utils/marketplace/generate-marketplace.sh"
   if [ ! -f "${helper}" ]; then record_fail "generate-marketplace" "helper ausente: ${helper}"; return; fi
   local d out o1 o2
@@ -13773,6 +14137,7 @@ run_marketplace_generate_selftests() {
 # placeholder). Cobre: geração+substituição, never-clobber, dry-run, slug inválido.
 # ---------------------------------------------------------------------------
 run_bootstrap_vertical_selftests() {
+  # selftest-covers: .claude/utils/vertical/bootstrap-new-project.sh .claude/utils/vertical/templates/
   local helper="${SCRIPT_DIR}/../utils/vertical/bootstrap-new-project.sh"
   if [ ! -f "${helper}" ]; then record_fail "bootstrap-new-project" "helper ausente: ${helper}"; return; fi
   local d rc out
@@ -13812,6 +14177,7 @@ run_bootstrap_vertical_selftests() {
 # Cobre: geração+substituição, never-clobber, dry-run, slug inválido.
 # ---------------------------------------------------------------------------
 run_scaffold_book_selftests() {
+  # selftest-covers: .claude/utils/vertical/scaffold-book-dir.sh .claude/utils/vertical/templates/
   local helper="${SCRIPT_DIR}/../utils/vertical/scaffold-book-dir.sh"
   if [ ! -f "${helper}" ]; then record_fail "scaffold-book-dir" "helper ausente: ${helper}"; return; fi
   local d rc out
@@ -18783,6 +19149,160 @@ PYI
 }
 _family run_selftest_lanes_selftests
 
+# Modo selftest-selection — SELEÇÃO POR CASO do pre-commit (SAC-72, 2026-10-11). Cada regra nova tem caso:
+# (a) núcleo justificado: commit só de doc roda só o núcleo, e o núcleo diz POR QUÊ; (b) empacotado: skill
+# que viaja num plugin seleciona plugin_bundle (achado do PR #1024), skill que não viaja não; (c) bloco: a
+# bancada mudada num bloco roda a família dele, não tudo — e fora de família, tudo, com a linha impressa;
+# (d) a cobertura FRACA não desliga failsafe; (e) checkpoint declarado. Os MUTANTES (regra do bloco
+# desligada → tudo; derivação do empacotado desligada → plugin_bundle some) moram no PR, via
+# ops/mutate-and-restore.sh, e reprovam (c) e (b) respectivamente.
+run_selftest_selection_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/lint-selftest.sh" out
+  # (a) só docs/README.md ⇒ só o núcleo, sem failsafe, cada família do núcleo com razão escrita
+  out="$(bash "${sut}" --affected docs/README.md --dry-run 2>&1 || true)"
+  if grep -q '^dry-run: famílias=gitattributes_eol jobs' <<< "${out}" && grep -q 'núcleo: 1 família(s) com razão escrita' <<< "${out}" \
+     && ! grep -q 'failsafe' <<< "${out}" && ! grep -q 'SEM razão' <<< "${out}"; then
+    record_pass "selftest-selection: (a) docs/README.md ⇒ só o núcleo (1 família, razão impressa), sem failsafe"
+  else record_fail "selftest-selection: (a) núcleo" "$(grep -E '^(dry-run|  núcleo|  failsafe)' <<< "${out}" | tr '\n' ' ' | cut -c1-240)"; fi
+  # (a2) nenhuma família do núcleo sem razão escrita no --map
+  out="$(bash "${sut}" --map 2>/dev/null || true)"
+  local _sr; _sr="$(awk -F'\t' '$2=="*" && $3=="always: SEM-RAZAO"{print $1}' <<< "${out}" | paste -sd, -)"
+  if [ -n "${out}" ] && [ -z "${_sr}" ]; then record_pass "selftest-selection: (a2) toda família do núcleo (*) tem '# selftest-always:' com razão"
+  else record_fail "selftest-selection: (a2) núcleo sem razão" "${_sr:-<mapa vazio>}"; fi
+
+  # (b) skill EMPACOTADA ⇒ plugin_bundle; KB empacotada também; skill que NÃO viaja ⇒ sem plugin_bundle
+  local _bp _bad_b=""
+  for _bp in .claude/skills/onion/SKILL.md docs/knowledge-base/frameworks/framework-story-points.md .claude/hooks/pretooluse-env-guard.sh; do
+    out="$(bash "${sut}" --affected "${_bp}" --dry-run 2>&1 || true)"
+    if ! grep -q '^dry-run: famílias=.*plugin_bundle' <<< "${out}" || ! grep -q "empacotado: ${_bp}" <<< "${out}"; then _bad_b="${_bad_b} ${_bp}"; fi
+  done
+  if [ -z "${_bad_b}" ]; then record_pass "selftest-selection: (b) arquivo empacotado por manifesto (skill, KB, hook) ⇒ plugin_bundle, com o motivo impresso"
+  else record_fail "selftest-selection: (b) empacotado sem plugin_bundle" "${_bad_b}"; fi
+  out="$(bash "${sut}" --affected .claude/skills/onion-publish/SKILL.md --dry-run 2>&1 || true)"
+  if grep -q '^dry-run: famílias=' <<< "${out}" && ! grep -q 'plugin_bundle' <<< "${out}"; then
+    record_pass "selftest-selection: (b2) skill que nenhum manifesto empacota NÃO puxa plugin_bundle (derivado do manifesto, não do prefixo)"
+  else record_fail "selftest-selection: (b2) precisão" "$(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
+
+  # (c) BLOCO — cópia da bancada num repo git próprio; mexe no repo da cópia, nunca na árvore viva
+  command -v python3 >/dev/null 2>&1 || { record_skip "selftest-selection: (c) python3 ausente"; return; }
+  local d; d="$(mktemp -d)"; mkdir -p "${d}/.claude/validation"
+  cp "${sut}" "${d}/.claude/validation/lint-selftest.sh"
+  local c="${d}/.claude/validation/lint-selftest.sh"
+  printf '%s\n' 'run_zz_a_selftests() {' '  _zzh() { echo a; }' '  record_pass "zz a"' '}' '_family run_zz_a_selftests' \
+    'run_zz_b_selftests() {' '  _zzh' '}' '_family run_zz_b_selftests' >> "${c}"
+  git -C "${d}" init -q && git -C "${d}" add -A && git -C "${d}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  _sel_run() { (cd "${d}" && bash "${c}" "$@" --dry-run 2>&1) || true; }
+  _sel_reset() { git -C "${d}" reset -q 2>/dev/null; git -C "${d}" checkout -q -- . 2>/dev/null; }
+  # (c1) linha dentro do bloco de decouple_source ⇒ essa família, não TODAS, não vendor_pin
+  sed -i 's/record_pass "decouple-source: (c) já é fonte/record_pass "decouple-source: (c) JÁ é fonte/' "${c}"
+  out="$(_sel_run --affected .claude/validation/lint-selftest.sh)"
+  if grep -q '^dry-run: famílias=.*decouple_source' <<< "${out}" && ! grep -q 'famílias=<todas>' <<< "${out}" && ! grep -q 'vendor_pin' <<< "${out}"; then
+    record_pass "selftest-selection: (c1) bloco de decouple_source mudou ⇒ decouple_source (+ leitores da bancada), não todas"
+  else record_fail "selftest-selection: (c1) bloco" "$(grep -E '^(dry-run|  failsafe|  bloco)' <<< "${out}" | tr '\n' ' ' | cut -c1-260)"; fi
+  # (c6) o mesmo, STAGED (o caminho do pre-commit lê o índice, não a árvore)
+  git -C "${d}" add -A
+  out="$(_sel_run --affected-staged)"
+  if grep -q '^dry-run: famílias=.*decouple_source' <<< "${out}" && ! grep -q 'famílias=<todas>' <<< "${out}"; then
+    record_pass "selftest-selection: (c6) --affected-staged lê o bloco no ÍNDICE"
+  else record_fail "selftest-selection: (c6) staged" "$(grep -E '^(dry-run|  failsafe)' <<< "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  _sel_reset
+  # (c2) linha de CÓDIGO fora de família (cabeçalho) ⇒ TODAS, com a linha impressa
+  sed -i 's/^SELFTEST_EXPECTED_EXIT=0 /SELFTEST_EXPECTED_EXIT=0  /' "${c}"
+  out="$(_sel_run --affected .claude/validation/lint-selftest.sh)"
+  if grep -q 'famílias=<todas>' <<< "${out}" && grep -q 'fora de família — cabeçalho/helper/seletor: SELFTEST_EXPECTED_EXIT' <<< "${out}"; then
+    record_pass "selftest-selection: (c2) código fora de família ⇒ todas, com a linha que causou impressa"
+  else record_fail "selftest-selection: (c2) cabeçalho" "$(grep -E '^(dry-run|  failsafe)' <<< "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  _sel_reset
+  # (c3) família NOVA (bloco + linha _family) ⇒ só ela; (c4) comentário de topo ⇒ não compra tudo
+  printf '%s\n' 'run_zz_new_selftests() {' '  record_pass "zz new"' '}' '_family run_zz_new_selftests' '# nota de topo' >> "${c}"
+  out="$(_sel_run --affected .claude/validation/lint-selftest.sh)"
+  if grep -q '^dry-run: famílias=.*zz_new' <<< "${out}" && ! grep -q 'famílias=<todas>' <<< "${out}"; then
+    record_pass "selftest-selection: (c3) família nova + comentário de topo ⇒ a nova, não todas"
+  else record_fail "selftest-selection: (c3) família nova" "$(grep -E '^(dry-run|  failsafe)' <<< "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  _sel_reset
+  # (c5) ACOPLAMENTO: zz_a define _zzh(), zz_b a chama ⇒ mudar zz_a seleciona zz_b também
+  sed -i 's/record_pass "zz a"/record_pass "zz a2"/' "${c}"
+  out="$(_sel_run --affected .claude/validation/lint-selftest.sh)"
+  if grep -q '^dry-run: famílias=.*zz_a' <<< "${out}" && grep -q '^dry-run: famílias=.*zz_b' <<< "${out}"; then
+    record_pass "selftest-selection: (c5) função definida num bloco e chamada noutro ⇒ os dois"
+  else record_fail "selftest-selection: (c5) acoplamento" "$(grep -E '^(dry-run|  failsafe|  bloco)' <<< "${out}" | tr '\n' ' ' | cut -c1-240)"; fi
+  _sel_reset
+  # (c7) linha DENTRO de heredoc de topo que parece comentário NÃO é neutra
+  printf '%s\n' 'cat > /dev/null <<'"'"'ZZDOC'"'"'' '# parece comentario' 'ZZDOC' >> "${c}"
+  git -C "${d}" add -A && git -C "${d}" -c user.email=t@t -c user.name=t commit -qm doc >/dev/null 2>&1
+  sed -i 's/^# parece comentario$/# parece comentario mudado/' "${c}"
+  out="$(_sel_run --affected .claude/validation/lint-selftest.sh)"
+  if grep -q 'famílias=<todas>' <<< "${out}"; then
+    record_pass "selftest-selection: (c7) '#' dentro de heredoc de topo é DADO ⇒ todas (não é comentário inerte)"
+  else record_fail "selftest-selection: (c7) heredoc" "$(grep -E '^(dry-run|  bloco)' <<< "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  # (c8) heredoc aberto DENTRO de `"$(` — o leitor de aspas não o vê, e uma aspa no corpo fecha a string
+  #      antes do '#': só a leitura BRUTA (2ª camada) segura. Sem ela, a linha passaria por comentário inerte.
+  printf '%s\n' 'zz_v="$(cat <<'"'"'ZZD2'"'"'' 'fim"' '# outro comentario' 'ZZD2' ')"' >> "${c}"
+  git -C "${d}" add -A && git -C "${d}" -c user.email=t@t -c user.name=t commit -qm doc2 >/dev/null 2>&1
+  sed -i 's/^# outro comentario$/# outro comentario mudado/' "${c}"
+  out="$(_sel_run --affected .claude/validation/lint-selftest.sh)"
+  if grep -q 'famílias=<todas>' <<< "${out}"; then
+    record_pass "selftest-selection: (c8) heredoc dentro de \"\$( com aspa no corpo ⇒ todas (a leitura bruta é a 2ª camada)"
+  else record_fail "selftest-selection: (c8) heredoc aninhado" "$(grep -E '^(dry-run|  bloco)' <<< "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  # (c9) string aberta num bloco e "fechada" por '}' na coluna 0 (achado 3): o '#' que vem depois, ainda
+  #      dentro da string, é DADO — o estado de aspas atravessa as linhas de família
+  _sel_reset
+  printf '%s\n' 'run_zz_s_selftests() {' '  zz_o="$(bash -c '"'"'' '}' '# dentro da string' "' || true)\"" '}' '_family run_zz_s_selftests' >> "${c}"
+  git -C "${d}" add -A && git -C "${d}" -c user.email=t@t -c user.name=t commit -qm str >/dev/null 2>&1
+  sed -i 's/^# dentro da string$/# dentro da string mudada/' "${c}"
+  out="$(_sel_run --affected .claude/validation/lint-selftest.sh)"
+  if grep -q 'famílias=<todas>' <<< "${out}"; then
+    record_pass "selftest-selection: (c9) '#' dentro de string aberta num bloco e falso-fechada por '}' ⇒ todas"
+  else record_fail "selftest-selection: (c9) string atravessando o bloco" "$(grep -E '^(dry-run|  bloco)' <<< "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  # (g) RENOME e EXCLUSÃO staged de arquivo empacotado ⇒ plugin_bundle (o caminho antigo conta) — achado 4
+  _sel_reset
+  mkdir -p "${d}/.claude/utils/marketplace" "${d}/.claude/skills/onion"
+  cp -R "${REPO_ROOT}/.claude/utils/marketplace/verticals" "${d}/.claude/utils/marketplace/"
+  printf -- '---\nname: onion\n---\n' > "${d}/.claude/skills/onion/SKILL.md"
+  git -C "${d}" add -A && git -C "${d}" -c user.email=t@t -c user.name=t commit -qm skill >/dev/null 2>&1
+  local _bad_g=""
+  mkdir -p "${d}/.claude/skills/zz-renomeada"; git -C "${d}" mv .claude/skills/onion/SKILL.md .claude/skills/zz-renomeada/SKILL.md
+  out="$(_sel_run --affected-staged)"; grep -q '^dry-run: famílias=.*plugin_bundle' <<< "${out}" || _bad_g="${_bad_g} renome"
+  _sel_reset; rm -rf "${d}/.claude/skills/zz-renomeada"
+  git -C "${d}" rm -q .claude/skills/onion/SKILL.md
+  out="$(_sel_run --affected-staged)"; grep -q '^dry-run: famílias=.*plugin_bundle' <<< "${out}" || _bad_g="${_bad_g} exclusão"
+  if [ -z "${_bad_g}" ]; then record_pass "selftest-selection: (g) renome e exclusão staged de skill empacotada ⇒ plugin_bundle (o caminho antigo entra)"
+  else record_fail "selftest-selection: (g) renome/exclusão" "não selecionou plugin_bundle em:${_bad_g}"; fi
+  rm -rf "${d}"
+  # (f) FECHO da cobertura fraca — achado 1 do refutador: o materializador chama marketplace-readme.sh; a
+  #     mutação dele quebrava materialize_repo e a seleção não a rodava. E model_ssot roda o lint inteiro.
+  out="$(bash "${sut}" --affected .claude/utils/marketplace/marketplace-readme.sh --dry-run 2>&1 || true)"
+  local _f_ok=1
+  grep -q '^dry-run: famílias=.*materialize_repo' <<< "${out}" || _f_ok=0
+  out="$(bash "${sut}" --affected .claude/validation/plugin-namespace-check.sh --dry-run 2>&1 || true)"
+  grep -q '^dry-run: famílias=.*materialize_repo' <<< "${out}" || _f_ok=0
+  grep -q '^dry-run: famílias=.*model_ssot' <<< "${out}" || _f_ok=0
+  if [ "${_f_ok}" = "1" ]; then record_pass "selftest-selection: (f) script que o SUT declarado chama (por fecho) seleciona a família — marketplace-readme.sh/plugin-namespace-check.sh ⇒ materialize_repo; validation/ ⇒ model_ssot"
+  else record_fail "selftest-selection: (f) fecho" "a dependência transitiva não selecionou a família: $(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
+
+  # (d) cobertura FRACA não desliga failsafe: template que só anotação cita ⇒ todas
+  out="$(bash "${sut}" --affected .claude/utils/vertical/templates/help.tpl --dry-run 2>&1 || true)"
+  if grep -q 'famílias=<todas>' <<< "${out}"; then
+    record_pass "selftest-selection: (d) arquivo do domínio citado só por '# selftest-covers:' continua comprando todas (fraca só acrescenta)"
+  else record_fail "selftest-selection: (d) fraca estreitou" "$(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
+  # (d2) o failsafe seguro FICA: hook que ninguém cita ⇒ todas, motivo impresso
+  out="$(bash "${sut}" --affected .claude/hooks/rule-title-in-prose.sh --dry-run 2>&1 || true)"
+  if grep -q 'famílias=<todas>' <<< "${out}" && grep -q 'não é citado por nenhuma família' <<< "${out}"; then
+    record_pass "selftest-selection: (d2) hook sem família ⇒ todas, com o motivo (o failsafe ficou)"
+  else record_fail "selftest-selection: (d2) failsafe" "$(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
+
+  # (e) CHECKPOINT declarado: mostra a seleção, a linha de máquina e diz que não validou
+  out="$(bash "${sut}" --affected .claude/skills/onion/SKILL.md --checkpoint 2>&1 || true)"
+  if grep -q 'CHECKPOINT declarado' <<< "${out}" && grep -qE '^#ONION_SELFTEST_SELECTION covered=[1-9]' <<< "${out}" && ! grep -q '✓' <<< "${out}"; then
+    record_pass "selftest-selection: (e) --checkpoint declara que não validou, conta a cobertura e não roda caso nenhum"
+  else record_fail "selftest-selection: (e) checkpoint" "$(tail -3 <<< "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  out="$(bash "${sut}" --affected docs/README.md --dry-run 2>&1 || true)"
+  if grep -q '^#ONION_SELFTEST_SELECTION covered=0$' <<< "${out}"; then
+    record_pass "selftest-selection: (e2) só o núcleo ⇒ covered=0 (o gatilho do pre-commit não dispara por doc)"
+  else record_fail "selftest-selection: (e2) covered" "$(grep 'SELECTION' <<< "${out}")"; fi
+}
+_family run_selftest_selection_selftests
+
 # ── testing_state — O PAINEL (ONDA 0.7) ──────────────────────────────────────────────────────
 #
 #  As cinco defesas contra virar o SEGUNDO painel inventado não são cerimônia: o cadáver do
@@ -20242,6 +20762,7 @@ _family run_kg_fixture_paths_selftests
 # 2026-09-05): o guard mandava ler o check `onion-review-verdict` num repo que não o tem — texto certo,
 # contexto errado, e aviso que manda caçar fantasma gasta a confiança do canal.
 run_hook_reviewer_context_selftests() {
+  # selftest-covers: .claude/hooks/bash-empty-result-guard.sh .claude/.onion-version .github/workflows/onion-review.yml
   local h="${SCRIPT_DIR}/../hooks/bash-empty-result-guard.sh"
   if [ ! -f "${h}" ]; then record_skip "hook-reviewer-context: guard ausente"; return; fi
   local core="${SCRIPT_DIR}/../.." out miss=""
@@ -20278,6 +20799,7 @@ _family run_hook_reviewer_context_selftests
 # É a classe que o próprio predicado combate — guarda de lista falha pelo VOCABULÁRIO — cometida no
 # mecanismo que deveria proteger contra ela.
 run_bundle_dep_closure_selftests() {
+  # selftest-covers: .claude/utils/marketplace/assemble-plugin.sh .claude/utils/marketplace/verticals/onion.manifest.sh .claude/validation/kg-backlog-project.sh
   local asm="${SCRIPT_DIR}/../utils/marketplace/assemble-plugin.sh"
   local man="${SCRIPT_DIR}/../utils/marketplace/verticals/onion.manifest.sh"
   if [ ! -f "${asm}" ] || [ ! -f "${man}" ]; then record_skip "bundle-dep: assembler/manifesto ausente"; return; fi
@@ -20793,6 +21315,7 @@ PY2
 
 
 run_sdaal_workflows_selftests() {
+  # selftest-covers: .claude/validation/lint-artifacts.sh
   # Testa a FUNÇÃO com REPO_ROOT sintético (fixture fora do repo não seria varrida pelo _find
   # real — lição da 1ª redação desta própria família, 2026-09-01).
   local d; d="$(mktemp -d)"
@@ -21919,6 +22442,7 @@ EOF_HOST
 }
 
 run_site_derivation_selftests() {
+  # selftest-covers: .claude/validation/lint-artifacts.sh CLAUDE.md
   local sb2 out rc
   sb2="$(mktemp -d)"
   cp -a "${SANDBOX}/.claude" "${sb2}/.claude"
@@ -21956,6 +22480,7 @@ run_site_derivation_selftests() {
 # Os casos (c) e (d) são os que dão VALOR à guarda: sem eles ela acusaria comentário histórico e
 # a própria SSOT, e guarda que grita no inócuo ensina a ser ignorada.
 run_model_ssot_selftests() {
+  # selftest-covers: .claude/validation/lint-artifacts.sh
   local sb2 out rc
   sb2="$(mktemp -d)"
   cp -a "${SANDBOX}/.claude" "${sb2}/.claude"
@@ -22914,6 +23439,7 @@ run_kg_trace_root_file_selftests() {
 # Uma cura de ambiente é a mais fácil de perder: some numa refatoração e ninguém nota até o CI
 # morrer de novo, quatro reprovações depois. Este caso prende o mecanismo.
 run_sandbox_gc_selftests() {
+  # selftest-covers: .claude/validation/lint-selftest.sh
   local d
   d="$(mktemp -d)"
   ( cd "${d}" && git init -q . ) >/dev/null 2>&1
