@@ -186,8 +186,9 @@ Scripts sem LLM, mesma entrada (filesystem/git) → mesma saída. Dois são as
 
 ### `onion-version.sh` — SSOT de identidade/proveniência do framework
 - Propósito: emitir a identidade do framework **derivada do git** (commit curto
-  + data do commit), sem semver formal — "preserva architecture.md §6.1 ('versão
-  implícita no main')" (`.claude/validation/onion-version.sh:3-4`).
+  + data do commit). O script não emite semver: o rótulo de release
+  `onion-vX.Y.Z` (architecture.md §6.1, desde 2026-10-11) mora nas tags e no
+  carimbo das portas, nasce no `/meta:publish` e não é identidade.
 - No repo-fonte (este), a identidade é lida ao vivo do git — nunca há stamp
   committado (evita auto-referência arquivo↔commit e churn a cada commit).
 - Em repos **adotados**, `/meta:adopt` escreve `.claude/.onion-version` com essa

@@ -22,7 +22,7 @@
 #
 # Uso : write-stamp.sh <target_root> --framework <n> --commit <sha> --commit-date <AAAA-MM-DD>
 #         [--adopted-from <url>] [--mode <m>] [--role <adopted|hub|standalone|source*|plugins*|mini*>] [--integration-branch <b>]   (* só com --kind door)
-#         [--members <members.yaml>] [--member-id <id>] [--kind door]
+#         [--members <members.yaml>] [--member-id <id>] [--kind door] [--release <X.Y.Z>]   (--release só com --kind door)
 #   --kind door: carimbo de PORTA (ops/materialize-door.sh). A porta é PROJEÇÃO regenerada inteira a
 #           cada materialização, então: --role é OBRIGATÓRIO (a porta nunca herda papel — a REGRA 92
 #           compara este campo com o registro); os args VENCEM o stamp antigo; não há adopted_at nem
@@ -30,6 +30,11 @@
 #           tinha um heredoc PRÓPRIO com outra gramática (`onion_version` em vez de `source_commit`) —
 #           dois escritores do mesmo arquivo, e o `pin-integrity-check` lia `pin-untrusted unknown`
 #           em toda porta, porque procurava o campo que só este script escreve.
+#   --release: o RÓTULO DE RELEASE da família (decisão do maestro de 2026-10-11,
+#           D_VERSIONAR_AS_PORTAS_POR_RELEASE). Só com --kind door, só semver X.Y.Z, e sai como `release:`.
+#           É APELIDO do pin, nunca a verdade: nenhuma guarda lê este campo (REGRA 85, REGRA 92 e o
+#           `--status` medem `source_commit`). Ausente = a materialização não é release (ensaio): o campo
+#           não sai, e a versão daquele pin se DERIVA (estilo `git describe`), nunca se guarda.
 #   --role: papel de adoção. Default 'adopted' (consumidor). 'hub' = empresa que adota os próprios
 #           projetos (Camada 2 — pode rodar /meta:adopt local; ver adopter-onboarding.md). Sem --role
 #           num update, PRESERVA o role do stamp (não rebaixa hub→adopted). 'source' é o core, que
@@ -41,7 +46,7 @@ set -euo pipefail
 
 TARGET=""; FRAMEWORK=""; COMMIT=""; COMMIT_DATE=""; ADOPTED_FROM=""; MODE=""; IBRANCH=""
 FRAMEWORK_SET=""; COMMIT_SET=""; COMMIT_DATE_SET=""   # flag AUSENTE herda; PRESENTE E VAZIA e erro (F2)
-MEMBERS=""; MEMBER_ID=""; ROLE=""; KIND=""
+MEMBERS=""; MEMBER_ID=""; ROLE=""; KIND=""; RELEASE=""; RELEASE_SET=""
 while [ "$#" -gt 0 ]; do case "$1" in
   # ⚠️ `*_SET` existe por um FAIL-OPEN que o Elenxo mediu (F2, 2026-10-02): o fallback da 1a versao
   #    olhava so `[ -z "${COMMIT}" ]`, entao `--commit ""` — que e o que um `awk` de extracao
@@ -60,6 +65,7 @@ while [ "$#" -gt 0 ]; do case "$1" in
   --members)            MEMBERS="${2:-}"; shift 2 ;;
   --member-id)          MEMBER_ID="${2:-}"; shift 2 ;;
   --kind)               KIND="${2:-}"; shift 2 ;;
+  --release)            RELEASE="${2:-}"; RELEASE_SET=1; shift 2 ;;
   -*) echo "uso: write-stamp.sh <target_root> --framework <n> --commit <sha> --commit-date <d> [...]" >&2; exit 2 ;;
   *)  [ -z "${TARGET}" ] && TARGET="$1"; shift ;;
 esac; done
@@ -73,6 +79,13 @@ case "${KIND}" in
           || { echo "ERRO: --kind door exige --framework/--commit/--commit-date (a porta é projeção: nada se herda)." >&2; exit 2; } ;;
   *) echo "ERRO: --kind aceita só 'door' (veio '${KIND}')" >&2; exit 2 ;;
 esac
+# --release PRESENTE E VAZIO é erro (a mesma razão do F2 abaixo: extração falha a montante não vira "sem release")
+if [ -n "${RELEASE_SET}" ]; then
+  [ "${KIND}" = door ] || { echo "ERRO: --release é rótulo de release de PORTA — só com --kind door (adotante recebe pin, não release)." >&2; exit 2; }
+  _semver_re='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+  [[ "${RELEASE}" =~ ${_semver_re} ]] \
+    || { echo "ERRO: --release '${RELEASE}' não é X.Y.Z (semver sem prefixo nem sufixo; presente e vazio também recusa)." >&2; exit 2; }
+fi
 # ⚠️ NORMALIZA comentario inline e espaco final (F9 do Elenxo): o fallback abaixo e o 1o consumidor
 # que ESCREVE DE VOLTA o que `field()` le, e carimbo no mundo real tem `source_commit: abc # pin da
 # adocao`. Sem isto o pin voltava ao stamp COM o comentario dentro e o `pin-integrity-check` recusava.
@@ -177,6 +190,7 @@ mkdir -p "${TARGET}/.claude"
   [ -n "${MODE}" ]         && printf 'mode: %s\n'         "${MODE}"
   [ -n "${IBRANCH}" ]      && printf 'integration_branch: %s\n' "${IBRANCH}"
   [ "${KIND}" = door ]     && printf 'kind: door\nmaterialized_at: %s\n' "$(date -u +%F)"
+  [ -n "${RELEASE}" ]      && printf 'release: %s\n' "${RELEASE}"
 } > "${STAMP}"
 # D_GREP_OLD_PIN — detecta, não conserta: corrigir cada artefato exige a semântica de cada um.
 OLD_COMMIT="${OLD_COMMIT:-}"
@@ -189,5 +203,5 @@ if [ -n "${OLD_EXISTS}" ] && [ -n "${OLD_COMMIT}" ] && [ "${OLD_COMMIT:0:8}" != 
     printf '%s\n' "${stale}" | sed "s#^${TARGET}/##; s#^#  · #" >&2
   fi
 fi
-if [ "${KIND}" = door ]; then echo "stamp escrito: ${STAMP} (porta — role: ${ROLE}, source_commit: ${COMMIT})"; exit 0; fi
+if [ "${KIND}" = door ]; then echo "stamp escrito: ${STAMP} (porta — role: ${ROLE}, source_commit: ${COMMIT}${RELEASE:+, release: ${RELEASE}})"; exit 0; fi
 echo "stamp escrito: ${STAMP} ($([ -n "${OLD_EXISTS}" ] && echo "update — adopted_at preservado: ${ADOPTED_AT:-<ausente>}" || echo "adoção — adopted_at: ${ADOPTED_AT}"))"

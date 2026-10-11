@@ -24,6 +24,8 @@
 # escritor por repo). O script prepara, verifica e PARA, dizendo o comando.
 #
 # Uso : ops/materialize-door.sh <dir-destino> [--role source|hub|standalone|plugins|mini|adopted] [--force-role-change]
+#       [--release X.Y.Z]  rótulo de release da família, repassado ao write-stamp (`release:` no carimbo);
+#                          quem o passa é o motor do /meta:publish, só quando o maestro selou a versão
 #       (source/plugins/mini = papéis de porta da matriz D_MATRIZ_DE_PORTAS_2026_10, F2 = SAC-91)
 #       --role default: hub (a porta leva a maquinaria COMPLETA, meta-fábrica
 #       inclusa — decisão do maestro em 2026-09-16, coerente com a liberação da
@@ -32,7 +34,7 @@
 set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DEST=""; ROLE="hub"; SRC_REF=""; FORCE_ROLE_CHANGE=0
+DEST=""; ROLE="hub"; SRC_REF=""; FORCE_ROLE_CHANGE=0; RELEASE=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --role) ROLE="${2:-hub}"; shift 2 ;;
@@ -40,6 +42,7 @@ while [ $# -gt 0 ]; do
     --from=*) SRC_REF="${1#--from=}"; shift ;;
     --role=*) ROLE="${1#--role=}"; shift ;;
     --force-role-change) FORCE_ROLE_CHANGE=1; shift ;;
+    --release) RELEASE="${2:?--release exige X.Y.Z}"; shift 2 ;;
     -h|--help) sed -n '1,40p' "${BASH_SOURCE[0]}"; exit 0 ;;
     *) DEST="$1"; shift ;;
   esac
@@ -356,9 +359,10 @@ mkdir -p "${DEST}/.claude"
 _fw="${_slug}"
 _pin_date="$(git -C "${REPO_ROOT}" log -1 --format=%cd --date=short "${SRC_REF}")"
 bash "${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh" "${DEST}" --kind door --role "${ROLE}" \
-  --framework "${_fw}" --commit "${_pin_ph}" --commit-date "${_pin_date}" --adopted-from "${_slug}" >/dev/null \
+  --framework "${_fw}" --commit "${_pin_ph}" --commit-date "${_pin_date}" --adopted-from "${_slug}" \
+  ${RELEASE:+--release "${RELEASE}"} >/dev/null \
   || { echo "ERRO: o write-stamp recusou o carimbo da porta (papel '${ROLE}')." >&2; exit 3; }
-echo "  (6) carimbo de identidade: role=${ROLE}, kind=door, source_commit=${_pin_ph} (sem ele a porta se declara 'source')"
+echo "  (6) carimbo de identidade: role=${ROLE}, kind=door, source_commit=${_pin_ph}${RELEASE:+, release=${RELEASE}} (sem ele a porta se declara 'source')"
 
 # `settings.json` NÃO está no manifesto — e é deliberado: ele carrega hooks e permissões da
 # INSTÂNCIA, e um adotante não deve herdar as do core. Mas TRÊS docs que viajam o citam em

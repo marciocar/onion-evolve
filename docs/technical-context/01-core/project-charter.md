@@ -102,7 +102,7 @@ Restrições **não-negociáveis** do core, extraídas de `CLAUDE.md` e `docs/me
 7. **Idioma segregado por camada.** Chat/comentários/documentação/mensagens ao usuário em português brasileiro; código/variáveis/nomes de arquivo/branch em inglês; commits com **prefixo** Conventional em inglês e **assunto/corpo em pt-BR**; logs/debugging em inglês. Autoridade canônica: skill `language-standards`, alinhada a `docs/meta-specs/code-standards.md`.
    *(Fonte: `CLAUDE.md` §Diretrizes de Linguagem)*
 
-8. **Versão do framework é derivada do git, não semver formal do repo.** Meta-specs têm `version` semver simples no frontmatter; o repo-fonte não carrega stamp de versão committado (evita auto-referência arquivo↔commit); repos **adotados** recebem `.claude/.onion-version` gravado por `/meta:adopt`.
+8. **A identidade do framework é derivada do git (o pin); a versão `onion-vX.Y.Z` é rótulo de release das portas.** Desde 2026-10-11 a família ganhou um rótulo de release que nasce no `/meta:publish` e mora nas tags das portas; nenhuma guarda o lê, e o pin segue sendo a verdade. Meta-specs têm `version` semver simples no frontmatter; o repo-fonte não carrega stamp de versão committado (evita auto-referência arquivo↔commit); repos **adotados** recebem `.claude/.onion-version` gravado por `/meta:adopt`.
    *(Fonte: `docs/meta-specs/architecture.md:236-256`, §6.1 Versionamento)*
 
 9. **Inventário é SSOT gerada, nunca editada à mão.** Contagens de comandos/agentes/skills/KBs em `CLAUDE.md`, `index.md` e guias **derivam** de `docs/onion/inventory.md`, computado do filesystem por `.claude/validation/inventory.sh` e validado no CI.

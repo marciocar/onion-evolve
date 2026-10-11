@@ -33,13 +33,19 @@ selo no carimbo) vive em [`common:prompts:publish-doctrine`](../../commands/comm
 
 ## O fluxo
 
-1. **Status.** `bash ops/publish-door.sh --status` mostra a defasagem de cada porta, lida do remoto.
+1. **Status.** `bash ops/publish-door.sh --status` mostra a defasagem e a versão publicada de cada
+   porta, lidas do remoto. A versão é rótulo de release (cláusula 6 da doutrina): só se exibe, e
+   nenhuma guarda decide por ela.
 2. **Alvo.** Pergunte qual porta (ou `--all`), se o maestro não disse.
 3. **Ensaio.** `bash ops/publish-door.sh <porta>`. Leia cada etapa: rc 1 é verificação reprovada
-   (mostre o achado e pare), rc 2 é recusa, rc 3 é fonte irresolúvel.
-4. **Confirmação** (AskUserQuestion): porta, papel, pin, resumo do commit ensaiado. Opções:
-   publicar · parar.
-5. **Publicação.** `bash ops/publish-door.sh <porta> --push --expect-pin <pin do ensaio>` (a main que andou desde o ensaio recusa), e confira com `--status`.
+   (mostre o achado e pare), rc 2 é recusa, rc 3 é fonte irresolúvel. O passo (4b) traz a proposta
+   de bump e o fim do ensaio mostra o changelog da release (a mensagem da tag). No `--all`, use a
+   PROPOSTA DA FAMÍLIA: o número é único nas quatro portas.
+4. **Confirmação e selo** (AskUserQuestion): porta, papel, pin, resumo do commit ensaiado e a versão.
+   Opções: publicar como `onion-v<proposta>` (recomendada) · publicar com outro número · parar.
+5. **Publicação.** `bash ops/publish-door.sh <porta> --push --expect-pin <pin do ensaio> --version <número selado>`
+   (a main que andou desde o ensaio recusa; sem `--version` o push recusa). O motor cria e confere a tag
+   `onion-v<número>` na porta. Confira com `--status`.
    Para os plugins, quem instala usa `/plugin marketplace add marciocar/onion-plugins` +
    `/plugin install onion@onion-plugins`.
 

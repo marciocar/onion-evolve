@@ -3,9 +3,9 @@
 # publish-door.sh — o MOTOR do /meta:publish: publica uma PORTA do Onion a partir de origin/main.
 #
 # Uso:
-#   ops/publish-door.sh <porta> [--push] [--expect-pin <sha>] [--clone <dir>] [--keep]
+#   ops/publish-door.sh <porta> [--push --version <X.Y.Z>] [--expect-pin <sha>] [--clone <dir>] [--keep]
 #                               [--role <papel> --force-role-change] [--from <ref>] [--replace-foreign]
-#   ops/publish-door.sh --all [--push]
+#   ops/publish-door.sh --all [--push --version <X.Y.Z>]
 #   ops/publish-door.sh --status
 #   (--members <registro> substitui o registro de origin/main — só para bancada, e é anunciado)
 #
@@ -18,6 +18,8 @@
 #   --from   ENSAIO de uma branch (ver o efeito de uma cura antes do merge). Recusado com --push e
 #            com --clone (o commit de uma branch não mergeada não pode ficar no clone de ninguém).
 #   --status lê o CARIMBO PUBLICADO de cada porta no REMOTO e mede a defasagem contra origin/main.
+#   --version  o RÓTULO DE RELEASE selado pelo maestro (X.Y.Z, número único da família). OBRIGATÓRIO com
+#            --push; sem ele o ensaio só mostra a PROPOSTA de bump. Ver "VERSIONAMENTO" abaixo.
 #   --replace-foreign  a 1ª materialização de uma porta cujo repo guarda OUTRO conteúdo (sem .claude/,
 #            pin n/a no registro — o onion-mini com a destilação antiga). Dito em voz alta, como o
 #            --force-role-change: o conteúdo anterior é ARQUIVADO numa tag `archive/pre-door-<data>` no
@@ -51,6 +53,23 @@
 # · NÃO escreve no members.yaml: o pin vive no carimbo da porta (selo sem PR no core).
 # · NÃO substitui conteúdo que não reconhece como porta sem --replace-foreign, e mesmo com ele NÃO
 #   apaga: o conteúdo anterior fica numa tag de arquivo, empurrada antes da porta (F5, SAC-94).
+#
+# ══ VERSIONAMENTO (decisão do maestro de 2026-10-11, D_VERSIONAR_AS_PORTAS_POR_RELEASE) ══════════
+# · A versão é RÓTULO DE RELEASE, apelido de um pin. O pin (`source_commit`) segue sendo a verdade, e
+#   NENHUMA guarda lê a versão: REGRA 85, REGRA 92 e o `--status` medem o pin. A versão é exibida.
+# · A tag `onion-vX.Y.Z` mora NAS PORTAS, criada e empurrada aqui no passo (7) e conferida no remoto
+#   como o pin. O core privado fica intocado (a invariante do passo 8 não muda).
+# · O MOTOR PROPÕE, o MAESTRO SELA: a proposta sai do diff de SUPERFÍCIE entre a porta publicada e a
+#   montada (comando/agente/skill/hook removido ou renomeado, ou chave do carimbo mudada = major;
+#   superfície adicionada = minor; resto = patch), mais entrada BREAKING no CHANGELOG da federação
+#   desde a última tag (candidata a major). NÃO deriva de Conventional Commits (medido em 2026-10-11:
+#   0 `!` em 2432 commits). O selo é `--version`, que o /meta:publish passa depois da pergunta.
+# · O NÚMERO É ÚNICO NA FAMÍLIA: o `--all` agrega a proposta (o maior bump sobre a maior tag). Os
+#   plugins mantêm o `version` do plugin.json por conteúdo (é o que dirige o update do Claude Code) e
+#   levam a da família no `metadata.version` do marketplace.json e em `onion_release` do provenance.
+# · O CHANGELOG DA RELEASE é a mensagem da tag anotada, gerada aqui e varrida pela MESMA varredura de
+#   vazamento do passo (5a); intervalo = `source_commit` do carimbo da tag anterior → o pin novo. O
+#   canal do ADOTANTE segue sendo o CHANGELOG da federação (co-announce), não este.
 # =============================================================================
 set -uo pipefail
 export GIT_TERMINAL_PROMPT=0   # remoto privado ou inexistente não pode virar prompt de senha num TTY
@@ -60,7 +79,7 @@ CORE="$(cd "${HERE}/.." && pwd)"
 MEMBERS_REL="docs/evolution/federation/members.yaml"
 
 MODE="publish"; DOOR=""; CLONE=""; ROLE_OVERRIDE=""; FORCE_ROLE=0; PUSH=0; KEEP=0; FROM_REF=""
-EXPECT_PIN=""; MEMBERS_OVERRIDE=""; REPLACE_FOREIGN=0
+EXPECT_PIN=""; MEMBERS_OVERRIDE=""; REPLACE_FOREIGN=0; VERSION=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --status) MODE="status"; shift ;;
@@ -74,11 +93,33 @@ while [ $# -gt 0 ]; do
     --expect-pin) EXPECT_PIN="${2:?--expect-pin exige um sha}"; shift 2 ;;
     --members) MEMBERS_OVERRIDE="${2:?--members exige um caminho}"; shift 2 ;;
     --replace-foreign) REPLACE_FOREIGN=1; shift ;;
-    -h|--help) sed -n '2,29p' "${BASH_SOURCE[0]}"; exit 0 ;;
+    --version) VERSION="${2:?--version exige X.Y.Z}"; shift 2 ;;
+    -h|--help) sed -n '2,31p' "${BASH_SOURCE[0]}"; exit 0 ;;
     -*) echo "ERRO: opção desconhecida: $1" >&2; exit 2 ;;
     *) [ -z "${DOOR}" ] && DOOR="$1" || { echo "ERRO: porta já informada ('${DOOR}')." >&2; exit 2; }; shift ;;
   esac
 done
+
+# ── O selo da versão: forma checada ANTES de qualquer rede, e --push sem ele recusa ──────────
+TAG_PREFIX="onion-v"
+SEMVER_RE='^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+if [ -n "${VERSION}" ] && ! [[ "${VERSION}" =~ ${SEMVER_RE} ]]; then
+  echo "ERRO: --version '${VERSION}' não é X.Y.Z (semver sem prefixo: a tag sai ${TAG_PREFIX}X.Y.Z)." >&2; exit 2
+fi
+if [ "${PUSH}" -eq 1 ] && [ -z "${VERSION}" ] && [ "${MODE}" != "status" ]; then
+  echo "ERRO: --push sem --version. Toda publicação é uma release, e o número é SELADO pelo maestro: ensaie sem --push, leia a PROPOSTA de bump e passe --push --version X.Y.Z." >&2
+  exit 2
+fi
+[ -n "${VERSION}" ] && [ "${MODE}" = "status" ] && { echo "ERRO: --version não se aplica a --status (a versão publicada é LIDA do carimbo remoto)." >&2; exit 2; }
+
+# X.Y.Z > X'.Y'.Z' ? (sort -V lê tudo antes de responder: sem leitor que fecha cedo)
+_ver_gt() { [ "$1" != "$2" ] && [ "$(printf '%s\n%s\n' "$1" "$2" | sort -V | tail -n1)" = "$1" ]; }
+_bump() {  # $1 base X.Y.Z · $2 major|minor|patch
+  local M m p; IFS=. read -r M m p <<< "$1"
+  case "$2" in major) printf '%s.0.0' "$((M + 1))" ;; minor) printf '%s.%s.0' "${M}" "$((m + 1))" ;;
+               *) printf '%s.%s.%s' "${M}" "${m}" "$((p + 1))" ;; esac
+}
+_level_rank() { case "$1" in major) echo 3 ;; minor) echo 2 ;; patch) echo 1 ;; *) echo 0 ;; esac; }
 
 _integ() {
   local i; i="$(bash "${CORE}/.claude/validation/resolve-integration-branch.sh" "${CORE}" 2>/dev/null || true)"
@@ -164,13 +205,14 @@ _status() {
   [ -n "${doors}" ] || { echo "ERRO: nenhuma porta (kind: door) no registro de ${tip} — isto não é 'tudo em dia'." >&2; return 3; }
   local tmp; tmp="$(mktemp -d)"
   printf '══ /meta:publish --status — carimbo PUBLICADO × %s (%s)\n' "${tip}" "$(git -C "${CORE}" rev-parse --short=12 "${tip}")"
-  printf '%-18s %-10s %-14s %-14s %-11s %s\n' "porta" "papel" "pin publicado" "pin registro" "defasagem" "estado"
-  local id kind role remote pin lp url br stamp rpin rrole n state prov
+  printf '%-18s %-10s %-14s %-14s %-9s %-11s %s\n' "porta" "papel" "pin publicado" "pin registro" "versão" "defasagem" "estado"
+  local id kind role remote pin lp url br stamp rpin rrole rrel n state prov nall tip12
+  tip12="$(git -C "${CORE}" rev-parse --short=12 "${tip}")"
   while IFS=$'\037' read -r id kind role remote pin lp; do
     [ -n "${id}" ] || continue
     total=$((total + 1))
     url="$(_url_of "${remote}")"
-    rpin=""; rrole=""; n="—"; state=""
+    rpin=""; rrole=""; rrel=""; n="—"; state=""
     if [ -z "${url}" ]; then
       state="NÃO-MEDIDO (sem remoto no registro)"
     elif ! br="$(git ls-remote --symref "${url}" HEAD 2>/dev/null | awk '/^ref:/{sub("refs/heads/","",$2); print $2; exit}')" || [ -z "${br}" ]; then
@@ -183,12 +225,14 @@ _status() {
         stamp="$(git -C "${tmp}/${id}" show "HEAD:.claude/.onion-version" 2>/dev/null || true)"
         if [ -n "${stamp}" ]; then
           rpin="$(_stamp_pin "${stamp}")"; rrole="$(_stamp_field "${stamp}" role)"
+          rrel="$(_stamp_field "${stamp}" release)"
         else
           # porta de MARKETPLACE: o carimbo é o provenance.json do plugin (campo `ref`), sem `role:`
           prov="$(git -C "${tmp}/${id}" ls-tree -r --name-only HEAD -- plugins 2>/dev/null | grep -m1 '/\.claude-plugin/provenance\.json$' || true)"
           if [ -n "${prov}" ]; then
             rpin="$(git -C "${tmp}/${id}" show "HEAD:${prov}" 2>/dev/null | sed -n 's/.*"ref"[[:space:]]*:[[:space:]]*"\([0-9a-f]*\)".*/\1/p' | head -1)"
             rrole="plugins*"
+            rrel="$(git -C "${tmp}/${id}" show "HEAD:${prov}" 2>/dev/null | sed -n 's/.*"onion_release"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | sed -n '1p')"
           fi
         fi
         if [ -z "${rpin}" ]; then
@@ -201,7 +245,12 @@ _status() {
           n="$(bash "${CORE}/.claude/validation/door-staleness-check.sh" "${CORE}" --count "${rpin}" --tip "${tip}" 2>/dev/null || true)"
           case "${n}" in ''|*[!0-9]*) state="NÃO-MEDIDO (contagem falhou)"; n="—" ;;
             0) state="em dia"; measured=$((measured + 1)) ;;
-            *) state="DEFASADA — /meta:publish ${id}"; measured=$((measured + 1)) ;;
+            *) state="DEFASADA — /meta:publish ${id}"; measured=$((measured + 1))
+               # a versão de um pin que NÃO é release se DERIVA (estilo git describe) e nunca se guarda
+               if [ -n "${rrel}" ]; then
+                 nall="$(git -C "${CORE}" rev-list --count "${rpin}..${tip}" 2>/dev/null || true)"
+                 [ -n "${nall}" ] && state="${state} · ${tip} ≈ ${TAG_PREFIX}${rrel}-${nall}-g${tip12}"
+               fi ;;
           esac
           if [ -n "${pin}" ] && [ "${pin}" != "n/a" ] && [ "${pin:0:12}" != "${rpin:0:12}" ]; then
             state="${state} · cache do registro difere"
@@ -209,12 +258,14 @@ _status() {
         fi
       fi
     fi
-    printf '%-18s %-10s %-14s %-14s %-11s %s\n' "${id}" "${rrole:-${role}?}" "${rpin:0:12}" "${pin:0:12}" "${n}" "${state}"
+    printf '%-18s %-10s %-14s %-14s %-9s %-11s %s\n' "${id}" "${rrole:-${role}?}" "${rpin:0:12}" "${pin:0:12}" "${rrel:-—}" "${n}" "${state}"
   done <<< "${doors}"
   rm -rf "${tmp}"
   echo
   echo "  papel com '?' = o do REGISTRO (a porta não declara papel); 'plugins*' = marketplace, carimbo no provenance.json."
   echo "  A defasagem conta commits da superfície que viaja entre o pin PUBLICADO e ${tip}. Informativo: nenhum PR depende disto."
+  echo "  'versão' = o rótulo de release lido do carimbo remoto (release:, ou onion_release nos plugins); '—' = porta sem release."
+  echo "  É EXIBIÇÃO: nenhuma guarda, nem esta tabela, decide pela versão — quem decide é o pin."
   if [ "${measured}" -eq 0 ]; then
     echo "ERRO: ${total} porta(s) no registro e NENHUMA medida — isto não é 'tudo em dia'." >&2
     return 3
@@ -233,17 +284,44 @@ if [ "${MODE}" = "all" ]; then
   _load_members "origin/${INTEG}" || exit $?
   _doors_all="$(_members_tsv | awk -F'\037' '$2=="door" {print $1}')"
   [ -n "${_doors_all}" ] || { echo "ERRO: nenhuma porta (kind: door) no registro — --all sem objeto não é sucesso." >&2; exit 3; }
-  _worst=0
+  _worst=0; _famlog="$(mktemp)"
   while IFS= read -r _id; do
     [ -n "${_id}" ] || continue
     echo; echo "████ ${_id}"
     _a=("${_id}"); [ "${PUSH}" -eq 1 ] && _a+=(--push)
     [ -n "${MEMBERS_OVERRIDE}" ] && _a+=(--members "${MEMBERS_OVERRIDE}")
     [ -n "${EXPECT_PIN}" ] && _a+=(--expect-pin "${EXPECT_PIN}")
-    _r=0; bash "${BASH_SOURCE[0]}" "${_a[@]}" || _r=$?
+    [ -n "${VERSION}" ] && _a+=(--version "${VERSION}")
+    # tee lê tudo (não fecha cedo); o rc é o do motor filho, não o do tee
+    bash "${BASH_SOURCE[0]}" "${_a[@]}" < /dev/null 2>&1 | tee -a "${_famlog}"
+    _r="${PIPESTATUS[0]}"
     [ "${_r}" -gt "${_worst}" ] && _worst="${_r}"
   done <<< "${_doors_all}"
-  rm -f "${_TMPM}"
+  # NÚMERO ÚNICO DA FAMÍLIA: a maior tag entre as portas, com o maior bump proposto por qualquer uma.
+  # Porta sem tag (1ª release dela) não puxa o número: recebe o da família.
+  _fam="$(awk -F'\t' '$1=="PROPOSTA-DA-PORTA"' "${_famlog}")"
+  if [ -n "${_fam}" ]; then
+    _fbase="$(printf '%s\n' "${_fam}" | awk -F'\t' '$3!="—" {print $3}' | sort -V | tail -n1)"
+    _frank=0; _flevel=""
+    while IFS=$'\t' read -r _ _ _lr _lv _; do
+      [ "${_lr}" = "—" ] && continue
+      _rk="$(_level_rank "${_lv}")"; [ "${_rk}" -gt "${_frank}" ] && { _frank="${_rk}"; _flevel="${_lv}"; }
+    done <<< "${_fam}"
+    _ftags="$(printf '%s\n' "${_fam}" | awk -F'\t' '{print $3}' | sort -u | grep -c . || true)"
+    echo
+    if [ -z "${_fbase}" ]; then
+      _fver="1.0.0"; echo "══ PROPOSTA DA FAMÍLIA (número único): ${TAG_PREFIX}${_fver} — primeira release (nenhuma porta tem tag)"
+    else
+      _fver="$(_bump "${_fbase}" "${_flevel:-patch}")"
+      echo "══ PROPOSTA DA FAMÍLIA (número único): ${TAG_PREFIX}${_fver} — ${_flevel:-patch} sobre ${TAG_PREFIX}${_fbase}"
+    fi
+    [ "${_ftags}" -gt 1 ] && echo "  ⚠️ as portas não estão na mesma tag ($(printf '%s\n' "${_fam}" | awk -F'\t' '{printf "%s=%s ", $2, $3}')) — o número da família parte da maior."
+    if [ -n "${VERSION}" ] && [ "${VERSION}" != "${_fver}" ]; then
+      echo "  ⚠️ selado ${TAG_PREFIX}${VERSION}, proposta da família ${TAG_PREFIX}${_fver}: o selo é do maestro, e a divergência fica na mensagem de cada tag."
+    fi
+    [ -z "${VERSION}" ] && echo "   Para publicar a família: --all --push --version ${_fver} (o /meta:publish pergunta antes e passa o número selado)."
+  fi
+  rm -f "${_TMPM}" "${_famlog}"
   exit "${_worst}"
 fi
 
@@ -292,9 +370,12 @@ REMOTE_URL="$(_url_of "${REG_REMOTE}")"
 #  arquiva esse conteúdo antes de substituí-lo. Pin n/a com repo VAZIO segue direto: não há o que perder.)
 
 # ── O estado do core ANTES — o que é DESTE motor ─────────────────────────────────────────────
+# As TAGS entram desde o versionamento (2026-10-11): a tag `onion-vX.Y.Z` mora nas PORTAS, e uma tag
+# nascendo no core seria exatamente a invariante que a decisão preserva sendo quebrada sem aviso.
 _core_state() {
-  printf '%s|%s' "$(git -C "${CORE}" rev-parse HEAD 2>/dev/null)" \
-    "$(git -C "${CORE}" status --porcelain 2>/dev/null | sha256sum | cut -c1-16)"
+  printf '%s|%s|%s' "$(git -C "${CORE}" rev-parse HEAD 2>/dev/null)" \
+    "$(git -C "${CORE}" status --porcelain 2>/dev/null | sha256sum | cut -c1-16)" \
+    "$(git -C "${CORE}" tag -l 2>/dev/null | sha256sum | cut -c1-16)"
 }
 CORE_BEFORE="$(_core_state)"
 
@@ -411,6 +492,52 @@ if [ -n "${ROLE_OVERRIDE}" ] && [ "${ROLE_OVERRIDE}" != "${STAMP_ROLE:-${REG_ROL
   exit 2
 fi
 
+# ── (3b) A RELEASE ANTERIOR desta porta, lida do REMOTO ─────────────────────────────────────
+# As tags vêm de `git ls-remote` (o remoto é a medida; um clone do maestro pode ter tags velhas). O pin
+# da release anterior é o do CARIMBO DA TAG (source_commit; nos plugins, o `ref` do provenance), e é
+# dele que parte o intervalo do changelog. Nada disto decide guarda nenhuma: é rótulo e changelog.
+LAST_REL=""; PREV_SRC=""; REL_EXISTS=0
+_rtags=""
+if ! _rtags="$(git ls-remote --tags "${REMOTE_URL}" "refs/tags/${TAG_PREFIX}*" 2>/dev/null)"; then
+  if [ -n "${VERSION}" ]; then
+    echo "ERRO: não li as tags de ${REMOTE_URL} — sem a release anterior não confiro o número selado (${VERSION})." >&2; exit 3
+  fi
+  echo "  ⚠️ (3b) tags do remoto ilegíveis: a proposta de bump sai sem base (NÃO MEDIDO)"
+fi
+LAST_REL="$(printf '%s\n' "${_rtags}" | awk '{print $2}' | sed -n "s#^refs/tags/${TAG_PREFIX}##p" | grep -E "${SEMVER_RE}" | sort -V | tail -n1 || true)"
+if [ -n "${LAST_REL}" ]; then
+  _lt="refs/tags/${TAG_PREFIX}${LAST_REL}"
+  git -C "${DEST}" rev-parse --verify --quiet "${_lt}^{commit}" >/dev/null \
+    || git -C "${DEST}" fetch -q origin "${_lt}:${_lt}" 2>/dev/null || true
+  if [ "${ROLE}" = "plugins" ]; then
+    _lp="$(git -C "${DEST}" ls-tree -r --name-only "${_lt}" -- plugins 2>/dev/null | grep '/\.claude-plugin/provenance\.json$' | LC_ALL=C sort | sed -n '1p' || true)"
+    [ -n "${_lp}" ] && PREV_SRC="$(git -C "${DEST}" show "${_lt}:${_lp}" 2>/dev/null | sed -n 's/.*"ref"[[:space:]]*:[[:space:]]*"\([0-9a-f]*\)".*/\1/p' | sed -n '1p')"
+  else
+    PREV_SRC="$(_stamp_pin "$(git -C "${DEST}" show "${_lt}:.claude/.onion-version" 2>/dev/null || true)")"
+  fi
+fi
+if [ -n "${VERSION}" ]; then
+  _vt="refs/tags/${TAG_PREFIX}${VERSION}"
+  if awk -v r="${_vt}" '$2==r {f=1} END {exit !f}' <<< "${_rtags}"; then
+    # a release JÁ existe no remoto: só vale como re-rodada idempotente (a porta já está nela)
+    git -C "${DEST}" rev-parse --verify --quiet "${_vt}^{commit}" >/dev/null || git -C "${DEST}" fetch -q origin "${_vt}:${_vt}" 2>/dev/null || true
+    if [ "$(git -C "${DEST}" rev-parse "${_vt}^{commit}" 2>/dev/null)" != "$(git -C "${DEST}" rev-parse HEAD 2>/dev/null)" ]; then
+      echo "ERRO: a release ${TAG_PREFIX}${VERSION} já existe em ${REMOTE_URL} e aponta outro commit que não a ponta da porta — release publicada não se reescreve. Sele um número novo (a última é ${TAG_PREFIX}${LAST_REL})." >&2
+      exit 2
+    fi
+    REL_EXISTS=1
+    echo "  (3b) ${TAG_PREFIX}${VERSION} já publicada e na ponta da porta: re-rodada idempotente (só passa se o conteúdo for o mesmo)"
+  elif [ -n "${LAST_REL}" ] && ! _ver_gt "${VERSION}" "${LAST_REL}"; then
+    echo "ERRO: --version ${VERSION} não é maior que a última release desta porta (${TAG_PREFIX}${LAST_REL}). Release anda para frente." >&2
+    exit 2
+  fi
+fi
+if [ -n "${LAST_REL}" ]; then
+  echo "  (3b) release anterior: ${TAG_PREFIX}${LAST_REL} (pin ${PREV_SRC:-não lido})"
+else
+  echo "  (3b) release anterior: nenhuma tag ${TAG_PREFIX}* no remoto — esta seria a 1ª release da porta"
+fi
+
 # ── (4) MATERIALIZAR pelos scripts DA WORKTREE (o motor também é de origin/main) ─────────────
 # O pin vai EXPLÍCITO ao materializador (--from <sha>): sem isso ele refaria o fetch, e uma main que
 # andasse no meio sairia como recusa confusa no (5b).
@@ -432,11 +559,152 @@ if [ "${ROLE}" = "plugins" ]; then
   _mrc="${PIPESTATUS[0]}"
 else
   _ma=("${DEST}" --role "${ROLE}" --from "${PIN_FULL}"); [ "${FORCE_ROLE}" -eq 1 ] && _ma+=(--force-role-change)
+  [ -n "${VERSION}" ] && _ma+=(--release "${VERSION}")   # o write-stamp grava `release:` no carimbo
   TMPDIR="${T}/tmp" bash "${WT}/ops/materialize-door.sh" "${_ma[@]}" 2>&1 | sed 's/^/  │ /'
   _mrc="${PIPESTATUS[0]}"
 fi
 [ "${_mrc}" -eq 0 ] || { echo "✗ a materialização recusou (rc=${_mrc}) — nada a publicar." >&2; exit 1; }
 git -C "${DEST}" add -A || { echo "ERRO: git add no clone falhou." >&2; exit 2; }
+
+# ── (4a) PLUGINS: a versão da FAMÍLIA entra no metadata do catálogo e no provenance, nunca no plugin.json ──
+# O `version` do plugin.json é derivado do CONTEÚDO (F4: 0.1.N, é o que o `claude plugin update` compara);
+# trocá-lo pela família faria todo plugin "mudar" a cada release sem mudar nada. A família vai em
+# `metadata.version` do marketplace.json (o manifesto do catálogo) e em `onion_release` de cada
+# provenance.json. Edição de TEXTO (sem reformatar o JSON gerado); a paridade (5b) confere o resultado.
+if [ "${ROLE}" = "plugins" ] && [ -n "${VERSION}" ]; then
+  while IFS= read -r _pv; do
+    [ -n "${_pv}" ] || continue
+    awk -v v="${VERSION}" 'NR==1 && $0=="{" {print; printf "  \"onion_release\": \"%s\",\n", v; next}
+                           /"onion_release"[[:space:]]*:/ {next} {print}' "${_pv}" > "${_pv}.rel" && mv "${_pv}.rel" "${_pv}"
+  done <<< "$(find "${DEST}/plugins" -path '*/.claude-plugin/provenance.json' 2>/dev/null | LC_ALL=C sort)"
+  _mk="${DEST}/.claude-plugin/marketplace.json"
+  if [ -f "${_mk}" ]; then
+    awk -v v="${VERSION}" '/"metadata"[[:space:]]*:/ {inm=1}
+      inm && !done && /"version"[[:space:]]*:/ { sub(/"version"[[:space:]]*:[[:space:]]*"[^"]*"/, "\"version\": \"" v "\""); done=1 }
+      {print}' "${_mk}" > "${_mk}.rel" && mv "${_mk}.rel" "${_mk}"
+  fi
+  git -C "${DEST}" add -A || { echo "ERRO: git add no clone falhou." >&2; exit 2; }
+fi
+
+# ── (4b) A PROPOSTA DE BUMP e o CHANGELOG DA RELEASE ─────────────────────────────────────────
+# A proposta lê o diff de SUPERFÍCIE entre a porta PUBLICADA (HEAD do clone) e a MONTADA (índice):
+# comando/agente/skill/hook removido ou renomeado = major; adicionado = minor; resto = patch. A chave do
+# carimbo que muda (exceto o próprio rótulo) = major. Entrada BREAKING no CHANGELOG da federação desde a
+# release anterior = candidata a major. O motor PROPÕE; o número que vale é o `--version` do maestro.
+NOTES="${T}/release-notes.md"
+if git -C "${DEST}" rev-parse --verify --quiet HEAD >/dev/null; then
+  _ns="$(git -C "${DEST}" diff --cached -M --name-status HEAD 2>/dev/null || true)"
+else
+  _ns="$(git -C "${DEST}" diff --cached --name-status 2>/dev/null || true)"
+fi
+if [ "${ROLE}" = "plugins" ]; then
+  SURF_RE='^plugins/[^/]+/(commands/.+\.md|agents/.+\.md|skills/[^/]+/SKILL\.md|hooks/.+)$'
+else
+  SURF_RE='^\.claude/(commands/.+\.md|agents/.+\.md|skills/[^/]+/SKILL\.md|hooks/[^/]+)$'
+fi
+SURF_EX='(^|/)README\.md$|^\.claude/commands/common/'
+_surf="$(printf '%s\n' "${_ns}" | SURF_RE="${SURF_RE}" SURF_EX="${SURF_EX}" awk -F'\t' '
+  function s(p) { return p ~ ENVIRON["SURF_RE"] && p !~ ENVIRON["SURF_EX"] }
+  $1 ~ /^D/ && s($2) { print "REMOVED\t" $2; next }
+  $1 ~ /^R/ { if (s($2)) print "RENAMED\t" $2 "\t" $3; else if (s($3)) print "ADDED\t" $3; next }
+  $1 ~ /^A/ && s($2) { print "ADDED\t" $2 }')"
+_n_rm="$(awk -F'\t' '$1=="REMOVED"||$1=="RENAMED"' <<< "${_surf}" | grep -c . || true)"
+_n_add="$(awk -F'\t' '$1=="ADDED"' <<< "${_surf}" | grep -c . || true)"
+# o SCHEMA do carimbo: chaves (não valores) do publicado × do montado; o rótulo de release não conta
+_keys() { sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\):.*/\1/p' <<< "$1" | grep -vx 'release' | LC_ALL=C sort -u || true; }
+_jkeys() { grep -o '"[A-Za-z_][A-Za-z0-9_]*"[[:space:]]*:' <<< "$1" | sed 's/"//g; s/[[:space:]]*:$//' | grep -vx 'onion_release' | LC_ALL=C sort -u || true; }
+_old_stamp=""; _new_stamp=""
+if [ "${ROLE}" = "plugins" ]; then
+  _hp="$(git -C "${DEST}" ls-tree -r --name-only HEAD -- plugins 2>/dev/null | grep '/\.claude-plugin/provenance\.json$' | LC_ALL=C sort | sed -n '1p' || true)"
+  [ -n "${_hp}" ] && _old_stamp="$(_jkeys "$(git -C "${DEST}" show "HEAD:${_hp}" 2>/dev/null || true)")"
+  _np="$(find "${DEST}/plugins" -path '*/.claude-plugin/provenance.json' 2>/dev/null | LC_ALL=C sort | sed -n '1p')"
+  [ -n "${_np}" ] && _new_stamp="$(_jkeys "$(cat "${_np}")")"
+else
+  [ -n "${STAMP_HEAD}" ] && _old_stamp="$(_keys "${STAMP_HEAD}")"
+  _new_stamp="$(_keys "$(cat "${DEST}/.claude/.onion-version" 2>/dev/null || true)")"
+fi
+_schema=""
+if [ -n "${_old_stamp}" ] && [ "${_old_stamp}" != "${_new_stamp}" ]; then
+  _schema="$(comm -3 <(printf '%s\n' "${_old_stamp}") <(printf '%s\n' "${_new_stamp}") | sed 's/^\t/+/; /^+/!s/^/-/' | paste -sd' ' -)"
+fi
+# BREAKING no canal dos adotantes desde a release anterior (o texto da entrada é do core: só a CONTAGEM viaja)
+_brk=""; _brk_note=""
+if [ -n "${LAST_REL}" ]; then
+  if [ -n "${PREV_SRC}" ] && git -C "${CORE}" rev-parse --verify --quiet "${PREV_SRC}^{commit}" >/dev/null; then
+    _brk="$(git -C "${CORE}" diff "${PREV_SRC}" "${PIN_FULL}" -- docs/evolution/federation/CHANGELOG.md 2>/dev/null | grep -E '^\+## .*· BREAKING ·' | sed 's/^+## //' || true)"
+  else
+    _brk_note="CHANGELOG da federação NÃO MEDIDO (o pin da release anterior não é desta história)"
+  fi
+fi
+_n_brk="$(grep -c . <<< "${_brk}" || true)"
+LEVEL="patch"; _reasons=""
+[ "${_n_add}" -gt 0 ] && { LEVEL="minor"; _reasons="${_reasons}; superfície adicionada: ${_n_add}"; }
+[ "${_n_rm}" -gt 0 ] && { LEVEL="major"; _reasons="${_reasons}; superfície removida ou renomeada: ${_n_rm}"; }
+[ -n "${_schema}" ] && { LEVEL="major"; _reasons="${_reasons}; chave do carimbo mudou (${_schema})"; }
+[ "${_n_brk}" -gt 0 ] && { LEVEL="major"; _reasons="${_reasons}; candidata a major: ${_n_brk} entrada(s) BREAKING no CHANGELOG da federação desde ${TAG_PREFIX}${LAST_REL}"; }
+[ -n "${_brk_note}" ] && _reasons="${_reasons}; ${_brk_note}"
+_reasons="${_reasons#; }"; [ -n "${_reasons}" ] || _reasons="nenhuma superfície adicionada ou removida"
+if [ -z "${LAST_REL}" ]; then
+  LEVEL="primeira"; PROPOSED="1.0.0"; _reasons="primeira release desta porta (nenhuma tag ${TAG_PREFIX}* no remoto); ${_reasons}"
+else
+  PROPOSED="$(_bump "${LAST_REL}" "${LEVEL}")"
+fi
+# o intervalo do changelog: source_commit da tag anterior → o pin novo, filtrado pelos caminhos que a
+# porta mudou (core, standalone e mini espelham o caminho do core; nos plugins o filtro é .claude/)
+_changes=""; _changes_note=""
+if [ -z "${LAST_REL}" ]; then
+  _changes_note="primeira release: o intervalo é a história inteira do core e não é listado"
+elif [ -z "${PREV_SRC}" ] || ! git -C "${CORE}" rev-parse --verify --quiet "${PREV_SRC}^{commit}" >/dev/null; then
+  _changes_note="intervalo NÃO MEDIDO: o carimbo da ${TAG_PREFIX}${LAST_REL} não traz um pin desta história"
+else
+  _ps=()
+  if [ "${ROLE}" = "plugins" ]; then _ps=(.claude)
+  else
+    while IFS= read -r _f; do [ -n "${_f}" ] && _ps+=("${_f}"); done \
+      <<< "$(awk -F'\t' '{for (i = 2; i <= NF; i++) print $i}' <<< "${_ns}" | grep -v '^\.claude/\.onion-version$' | LC_ALL=C sort -u || true)"
+    [ "${#_ps[@]}" -gt 400 ] && { _ps=(.claude); _changes_note="teto: mais de 400 caminhos mudaram, o intervalo foi filtrado por .claude/"; }
+  fi
+  if [ "${#_ps[@]}" -eq 0 ]; then
+    _changes_note="nenhuma mudança de conteúdo além do carimbo"
+  else
+    _changes="$(git -C "${CORE}" log --no-merges --format='%s' "${PREV_SRC}..${PIN_FULL}" -- "${_ps[@]}" 2>/dev/null \
+                | grep -vE '^(docs|chore\(door\))(\([^)]*\))?!?:' | grep -v '^Merge ' || true)"
+    _nc="$(grep -c . <<< "${_changes}" || true)"
+    if [ "${_nc}" -gt 150 ]; then _changes="$(sed -n '1,150p' <<< "${_changes}")"; _changes_note="… e mais $((_nc - 150)) commit(s) no intervalo"; fi
+    [ "${_nc}" -eq 0 ] && _changes_note="${_changes_note:-nenhum commit fora de docs: no intervalo}"
+  fi
+fi
+_pin_date="$(git -C "${CORE}" log -1 --format=%cd --date=short "${PIN_FULL}" 2>/dev/null)"
+{
+  printf 'Onion %s%s — porta %s\n\n' "${TAG_PREFIX}" "${VERSION:-${PROPOSED}}" "${DOOR}"
+  if [ -n "${VERSION}" ]; then printf 'Release selada pelo maestro.\n\n'
+  else printf 'PROPOSTA do motor, NÃO selada (ensaio): o número só vale quando o maestro o sela.\n\n'; fi
+  printf -- '- pin do core: %s (%s)\n' "${PIN}" "${_pin_date}"
+  if [ -n "${LAST_REL}" ]; then printf -- '- release anterior: %s%s (pin %s)\n' "${TAG_PREFIX}" "${LAST_REL}" "${PREV_SRC:0:12}"
+  else printf -- '- release anterior: nenhuma (primeira release desta porta)\n'; fi
+  printf -- '- proposta do motor: %s%s (%s; %s)\n' "${TAG_PREFIX}" "${PROPOSED}" "${LEVEL}" "${_reasons}"
+  [ -n "${VERSION}" ] && [ "${VERSION}" != "${PROPOSED}" ] && printf -- '- selo do maestro: %s%s, diferente da proposta\n' "${TAG_PREFIX}" "${VERSION}"
+  printf '\nQuebras nesta porta\n'
+  [ -z "${LAST_REL}" ] && printf -- '- primeira release: não há release anterior desta porta com que comparar\n'
+  if [ "${_n_rm}" -eq 0 ] && [ -z "${_schema}" ] && [ "${_n_brk}" -eq 0 ]; then
+    [ -n "${LAST_REL}" ] && printf -- '- nenhuma quebra nesta porta\n'
+  else
+    awk -F'\t' '$1=="REMOVED" {print "- removido: " $2} $1=="RENAMED" {print "- renomeado: " $2 " -> " $3}' <<< "${_surf}"
+    [ -n "${_schema}" ] && printf -- '- chave do carimbo mudou: %s\n' "${_schema}"
+    [ "${_n_brk}" -gt 0 ] && printf -- '- candidata: %s entrada(s) BREAKING no canal de anúncio aos adotantes desde a release anterior\n' "${_n_brk}"
+  fi
+  printf '\nSuperfície adicionada\n'
+  if [ "${_n_add}" -gt 0 ]; then awk -F'\t' '$1=="ADDED" {print "- " $2}' <<< "${_surf}"; else printf -- '- nenhuma\n'; fi
+  printf '\nMudanças do core no intervalo (sem docs:)\n'
+  [ -n "${_changes}" ] && sed 's/^/- /' <<< "${_changes}"
+  [ -n "${_changes_note}" ] && printf -- '- %s\n' "${_changes_note}"
+} > "${NOTES}"
+echo "  (4b) proposta: ${TAG_PREFIX}${PROPOSED} (${LEVEL}) — ${_reasons}"
+[ -n "${_brk}" ] && printf '%s\n' "${_brk}" | sed 's/^/       BREAKING (core-only, não viaja): /'
+printf 'PROPOSTA-DA-PORTA\t%s\t%s\t%s\t%s\n' "${DOOR}" "${LAST_REL:-—}" "${LEVEL}" "${PROPOSED}"
+if [ -n "${VERSION}" ] && [ "${VERSION}" != "${PROPOSED}" ]; then
+  echo "  ⚠️ (4b) selado ${TAG_PREFIX}${VERSION}, proposta da porta ${TAG_PREFIX}${PROPOSED}: o selo é do maestro (no --all, a proposta da família agrega as portas)"
+fi
 
 # ── (5) VERIFICAR O QUE FOI MONTADO ──────────────────────────────────────────────────────────
 FAIL=0; NOT_MEASURED=""
@@ -464,14 +732,18 @@ _terms_sub="$( { printf '%s\n' "${_terms_names}"
                } 2>/dev/null | grep -v '^[[:space:]]*$' | sort -u || true)"
 _terms_word="$(_members_tsv | awk -F'\037' '($2=="adopter"||$2=="method") && $1 ~ /^onion-/ {print $1}' | sort -u || true)"
 _leaks=""
+# O CHANGELOG DA RELEASE vai a público como mensagem da tag: passa pela MESMA varredura que o bundle
+# (C5 do Elenxo do versionamento). Os assuntos de commit do core são a superfície nova de vazamento.
+_scan=("${DEST}" "${NOTES}")
+_rel_path() { sed "s|^${DEST}/||; s|^${NOTES}\$|‹changelog da release›|"; }
 while IFS= read -r _t; do
   [ -n "${_t}" ] || continue
-  _hit="$(grep -rilF --exclude-dir=.git -- "${_t}" "${DEST}" 2>/dev/null | sed "s|^${DEST}/||" | head -5 | tr '\n' ' ')"
+  _hit="$(grep -rilF --exclude-dir=.git -- "${_t}" "${_scan[@]}" 2>/dev/null | _rel_path | sed -n '1,5p' | tr '\n' ' ')"
   [ -n "${_hit}" ] && _leaks="${_leaks}    termo de adotante em: ${_hit}"$'\n'
 done <<< "${_terms_sub}"
 while IFS= read -r _t; do
   [ -n "${_t}" ] || continue
-  _hit="$(grep -rilwF --exclude-dir=.git -- "${_t}" "${DEST}" 2>/dev/null | sed "s|^${DEST}/||" | head -5 | tr '\n' ' ')"
+  _hit="$(grep -rilwF --exclude-dir=.git -- "${_t}" "${_scan[@]}" 2>/dev/null | _rel_path | sed -n '1,5p' | tr '\n' ' ')"
   [ -n "${_hit}" ] && _leaks="${_leaks}    id '${_t}' (prefixo onion-) em: ${_hit}"$'\n'
 done <<< "${_terms_word}"
 # As CONTAS reais são DERIVADAS — dos `local_path` do registro, de quem roda e das contas humanas da
@@ -485,7 +757,7 @@ _accts="$( { _members_tsv | awk -F'\037' '{print $6}' | sed -n 's#^/home/\([a-z_
              getent passwd 2>/dev/null | awk -F: '$3>=1000 && $3<60000 && $6 ~ "^/home/" {print $1}'
            } | grep -E '^[a-z_][a-z0-9_-]*$' | sort -u | paste -sd'|' -)"
 if [ -n "${_accts}" ]; then
-  _home_real="$(grep -rnoE --exclude-dir=.git "/home/(${_accts})/" "${DEST}" 2>/dev/null | sed "s|^${DEST}/||" || true)"
+  _home_real="$(grep -rnoE --exclude-dir=.git "/home/(${_accts})/" "${_scan[@]}" 2>/dev/null | _rel_path || true)"
   if [ -n "${_home_real}" ]; then
     _nh="$(printf '%s\n' "${_home_real}" | grep -c .)"
     _leaks="${_leaks}    caminho de máquina (conta real), ${_nh} ocorrência(s):"$'\n'"$(printf '%s\n' "${_home_real}" | head -10 | sed 's/^/      /')"$'\n'
@@ -496,7 +768,7 @@ if [ -n "${_leaks}" ]; then
   printf '%s' "${_leaks}" >&2
   FAIL=1
 elif [ "${FAIL}" -eq 0 ]; then
-  echo "  (5a) vazamento: nenhum termo de adotante (REGRA 36 + ids onion-*), nenhum caminho de máquina"
+  echo "  (5a) vazamento: nenhum termo de adotante (REGRA 36 + ids onion-*), nenhum caminho de máquina — no bundle e no changelog da release"
 fi
 
 # (5b) PARIDADE DE PAPEL no que foi montado: o carimbo que vai a público diz o papel pedido.
@@ -507,6 +779,18 @@ if [ "${ROLE}" = "plugins" ]; then
   else
     echo "✗ (5b) provenance.json não aponta ${SRC_REF} (${PIN}): $(printf '%s' "${_refs}" | tr '\n' ' ')" >&2; FAIL=1
   fi
+  if [ -n "${VERSION}" ]; then
+    _prels="$(while IFS= read -r _pv; do [ -n "${_pv}" ] || continue
+                _x="$(sed -n 's/.*"onion_release"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "${_pv}" | sed -n '1p')"
+                printf '%s\n' "${_x:-AUSENTE}"
+              done <<< "$(find "${DEST}/plugins" -path '*/.claude-plugin/provenance.json' 2>/dev/null)" | sort -u)"
+    _mver="$(awk '/"metadata"[[:space:]]*:/ {f=1} f && /"version"[[:space:]]*:/ {sub(/.*"version"[[:space:]]*:[[:space:]]*"/, ""); sub(/".*/, ""); print; exit}' "${DEST}/.claude-plugin/marketplace.json" 2>/dev/null)"
+    if [ "${_prels}" = "${VERSION}" ] && [ "${_mver}" = "${VERSION}" ]; then
+      echo "  (5b) release da família: onion_release=${VERSION} em todo provenance.json e metadata.version do catálogo (o version de cada plugin segue por conteúdo)"
+    else
+      echo "✗ (5b) a release da família não chegou ao montado: provenance onion_release='$(tr '\n' ' ' <<< "${_prels}")' · metadata.version='${_mver}' — esperado ${VERSION}" >&2; FAIL=1
+    fi
+  fi
 else
   _new="$(cat "${DEST}/.claude/.onion-version" 2>/dev/null || true)"
   _nrole="$(_stamp_field "${_new}" role)"; _npin="$(_stamp_pin "${_new}")"
@@ -514,6 +798,12 @@ else
     echo "  (5b) paridade: carimbo montado diz role=${_nrole}, source_commit=${_npin}"
   else
     echo "✗ (5b) o carimbo montado diz role='${_nrole}' pin='${_npin}' — esperado '${ROLE}' e ${PIN}." >&2; FAIL=1
+  fi
+  _nrel="$(_stamp_field "${_new}" release)"
+  if [ "${_nrel}" != "${VERSION}" ]; then
+    echo "✗ (5b) o carimbo montado diz release='${_nrel}', esperado '${VERSION:-<ausente, não é release>}'." >&2; FAIL=1
+  elif [ -n "${VERSION}" ]; then
+    echo "  (5b) release no carimbo: release=${_nrel} (rótulo do pin; nenhuma guarda o lê)"
   fi
 fi
 
@@ -607,11 +897,65 @@ if git -C "${DEST}" diff --cached --quiet 2>/dev/null; then
   echo "  (6) a porta já espelha ${SRC_REF} (${PIN}) — nada a commitar, nada a publicar."
   COMMITTED=0
 else
-  git -C "${DEST}" commit -q -m "chore(door): materializa do core no pin ${PIN} (papel ${ROLE})" \
-    || { echo "ERRO: o commit no clone falhou." >&2; exit 2; }
-  COMMITTED=1
-  echo "  (6) commit no clone: $(git -C "${DEST}" rev-parse --short=12 HEAD) — $(git -C "${DEST}" diff --stat HEAD~1 HEAD 2>/dev/null | tail -1)"
+  # Re-rodada da MESMA release no MESMO pin (o --all que reprovou numa porta e é re-rodado com o mesmo
+  # número): o materializador é do mesmo pin, então a única diferença possível é a data de materialização
+  # do carimbo. Isso não é conteúdo novo: o clone volta à ponta publicada e nada se commita.
+  _same_rel=0
+  if [ "${REL_EXISTS}" -eq 1 ]; then
+    if [ "${ROLE}" = "plugins" ]; then
+      _hpj="$(git -C "${DEST}" show "HEAD:${_hp:-x}" 2>/dev/null || true)"
+      [ "$(sed -n 's/.*"ref"[[:space:]]*:[[:space:]]*"\([0-9a-f]*\)".*/\1/p' <<< "${_hpj}" | sed -n '1p')" = "${PIN_FULL}" ] \
+        && [ "$(sed -n 's/.*"onion_release"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' <<< "${_hpj}" | sed -n '1p')" = "${VERSION}" ] && _same_rel=1
+    else
+      _hpin="$(_stamp_pin "${STAMP_HEAD}")"
+      [ -n "${_hpin}" ] && [ "${_hpin:0:12}" = "${PIN}" ] && [ "$(_stamp_field "${STAMP_HEAD}" release)" = "${VERSION}" ] && _same_rel=1
+    fi
+  fi
+  if [ "${_same_rel}" -eq 1 ]; then
+    git -C "${DEST}" reset -q --hard HEAD 2>/dev/null || true
+    echo "  (6) a porta já está na ${TAG_PREFIX}${VERSION} neste pin (${PIN}); a única diferença era a data de materialização — nada a commitar."
+    COMMITTED=0
+  elif [ "${REL_EXISTS}" -eq 1 ]; then
+    echo "ERRO: a release ${TAG_PREFIX}${VERSION} já está publicada e este pin muda o conteúdo da porta — release publicada não se reescreve. Sele um número novo (proposta: ${TAG_PREFIX}${PROPOSED})." >&2
+    exit 2
+  else
+    git -C "${DEST}" commit -q -m "chore(door): materializa do core no pin ${PIN} (papel ${ROLE}${VERSION:+, release ${TAG_PREFIX}${VERSION}})" \
+      || { echo "ERRO: o commit no clone falhou." >&2; exit 2; }
+    COMMITTED=1
+    echo "  (6) commit no clone: $(git -C "${DEST}" rev-parse --short=12 HEAD) — $(git -C "${DEST}" diff --stat HEAD~1 HEAD 2>/dev/null | tail -1)"
+  fi
 fi
+
+# ── A TAG DA RELEASE: anotada, com o changelog varrido como mensagem, conferida no remoto ─────────
+# Chamada só com --push (o ensaio não deixa tag em clone nenhum). Tag que já existe no remoto apontando
+# a ponta é re-rodada idempotente; apontando outro commit, o passo (3b) já recusou.
+TAG=""; [ -n "${VERSION}" ] && TAG="${TAG_PREFIX}${VERSION}"
+_push_release_tag() {
+  local _tl _tr _trc _head
+  _head="$(git -C "${DEST}" rev-parse HEAD)"
+  # o padrão do ls-remote precisa do `^{}` para devolver a linha descascada (o commit da tag)
+  _tr="$(git ls-remote "${REMOTE_URL}" "refs/tags/${TAG}^{}" 2>/dev/null | awk -v r="refs/tags/${TAG}^{}" '$2==r {print $1}')"
+  if [ "${_tr}" = "${_head}" ]; then
+    echo "  (7) release ${TAG} já está no remoto, na ponta da porta (${_head:0:12})"; return 0
+  fi
+  if git -C "${DEST}" rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null \
+     && [ "$(git -C "${DEST}" rev-parse "refs/tags/${TAG}^{commit}")" != "${_head}" ]; then
+    echo "✗ a tag ${TAG} existe no clone apontando outro commit — não a reescrevo (apague-a do clone ou sele outro número)." >&2; return 1
+  fi
+  git -C "${DEST}" rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null \
+    || git -C "${DEST}" tag -a "${TAG}" -F "${NOTES}" "${_head}" \
+    || { echo "✗ não consegui criar a tag ${TAG} no clone." >&2; return 1; }
+  git -C "${DEST}" push -q origin "refs/tags/${TAG}" 2>&1 | sed 's/^/  │ /'
+  _trc="${PIPESTATUS[0]}"
+  _tl="$(git -C "${DEST}" rev-parse "refs/tags/${TAG}" 2>/dev/null)"
+  # a tag ANOTADA aparece duas vezes no ls-remote (o objeto e o `^{}`): compare o objeto
+  _tr="$(git ls-remote "${REMOTE_URL}" "refs/tags/${TAG}" 2>/dev/null | awk -v r="refs/tags/${TAG}" '$2==r {print $1}')"
+  if [ "${_trc}" -ne 0 ] || [ -z "${_tr}" ] || [ "${_tr}" != "${_tl}" ]; then
+    echo "✗ a tag ${TAG} NÃO foi conferida no remoto (rc=${_trc}, remoto='${_tr:0:12}', local='${_tl:0:12}'). Rode de novo com o mesmo --version: a re-rodada empurra só a tag." >&2
+    return 1
+  fi
+  echo "  (7) release ${TAG} empurrada e CONFERIDA no remoto (tag ${_tl:0:12} → ${_head:0:12})"
+}
 
 # ── (7) PUSH, só com --push, e a CONFERÊNCIA no remoto ───────────────────────────────────────
 POST_FAIL=0
@@ -622,12 +966,15 @@ if [ "${PUSH}" -ne 1 ]; then
     if [ -n "${FROM_REF}" ]; then
       echo "   Ensaio de BRANCH: isto não se publica. Depois do merge, ensaie de origin/${INTEG} e publique pelo /meta:publish ${DOOR}${ARCHIVE_TAG:+ --replace-foreign}."
     else
-      echo "   Para publicar: /meta:publish ${DOOR}${ARCHIVE_TAG:+ --replace-foreign} — que pergunta antes e passa --push --expect-pin ${PIN}."
+      echo "   Para publicar: /meta:publish ${DOOR}${ARCHIVE_TAG:+ --replace-foreign} — que pergunta antes (inclusive o número da release) e passa --push --expect-pin ${PIN} --version ${VERSION:-<selado; proposta ${PROPOSED}>}."
     fi
   else
     echo "✅ ENSAIO concluído: verificado; a porta já espelha ${SRC_REF}, nada a publicar."
   fi
   [ "${KEEP}" -eq 1 ] || [ -n "${CLONE_GIVEN}" ] || echo "   (o clone descartável será removido; --keep o preserva para inspeção)"
+  echo "   ── changelog da release (a mensagem da tag ${TAG_PREFIX}${VERSION:-${PROPOSED}}, já varrida pelo passo 5a):"
+  sed -n '1,40p' "${NOTES}" | sed 's/^/   │ /'
+  _nl="$(grep -c . "${NOTES}" || true)"; [ "${_nl}" -gt 40 ] && echo "   │ … (${_nl} linhas no total)"
 elif [ -n "${NOT_MEASURED}" ]; then
   echo "✗ --push RECUSADO: verificação não medida (${NOT_MEASURED# }). Publicar sem medir é afirmar o que não sei." >&2
   exit 2
@@ -660,6 +1007,7 @@ elif [ "${COMMITTED}" -eq 1 ]; then
   else
     echo "  (7) publicado e CONFERIDO no remoto: ${BRANCH} = ${_local:0:12} · carimbo pin ${PIN}"
     echo "      O selo é o carimbo da porta: /meta:publish --status o lê do remoto. Nenhum PR no core."
+    _push_release_tag || POST_FAIL=1
   fi
   if [ "${ROLE}" != "${REG_ROLE}" ]; then
     echo "  ⚠️ o papel PUBLICADO ('${ROLE}') difere do registro ('${REG_ROLE}'): alinhe o role: da porta no members.yaml na próxima leva (REGRA 92), e atualize o clone local dela."
@@ -668,6 +1016,8 @@ else
   _remote="$(git ls-remote "${REMOTE_URL}" "refs/heads/${BRANCH}" 2>/dev/null | awk '{print $1}')"
   if [ "${_remote}" = "$(git -C "${DEST}" rev-parse HEAD)" ]; then
     echo "  (7) nada a empurrar: o remoto (${_remote:0:12}) já carrega este conteúdo."
+    # o ramo subiu numa rodada anterior e a tag não chegou: a re-rodada com o mesmo número a empurra
+    _push_release_tag || POST_FAIL=1
   else
     echo "✗ o remoto (${_remote:0:12}) andou desde o clone — rode de novo." >&2; exit 2
   fi

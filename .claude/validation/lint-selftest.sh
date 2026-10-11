@@ -7184,6 +7184,20 @@ run_write_stamp_selftests() {
   if ! bash "${helper}" "${wsb}/h" --framework x --commit c --commit-date 2026-07-23 --role banana >/dev/null 2>&1; then
     record_pass "write-stamp: --role inválido → rejeitado (exit 2)"
   else record_fail "write-stamp: role inválido" "aceitou role fora de adopted|hub"; fi
+  # 6. --release (rótulo de release da família, D_VERSIONAR_AS_PORTAS_POR_RELEASE): só com --kind door e
+  #    só X.Y.Z; sai como `release:`; sem a flag o campo NÃO sai (a materialização não é release)
+  mkdir -p "${wsb}/r"
+  local _rl_ok=1
+  bash "${helper}" "${wsb}/r" --kind door --role hub --framework p --commit c0ffee --commit-date 2026-10-11 --release 1.2.3 >/dev/null 2>&1 || _rl_ok=0
+  grep -q '^release: 1\.2\.3$' "${wsb}/r/.claude/.onion-version" 2>/dev/null || _rl_ok=0
+  bash "${helper}" "${wsb}/r" --kind door --role hub --framework p --commit c0ffee --commit-date 2026-10-11 >/dev/null 2>&1 || _rl_ok=0
+  ! grep -q '^release:' "${wsb}/r/.claude/.onion-version" 2>/dev/null || _rl_ok=0
+  ! bash "${helper}" "${wsb}/r" --kind door --role hub --framework p --commit c0ffee --commit-date 2026-10-11 --release v1.2 >/dev/null 2>&1 || _rl_ok=0
+  ! bash "${helper}" "${wsb}/r" --kind door --role hub --framework p --commit c0ffee --commit-date 2026-10-11 --release "" >/dev/null 2>&1 || _rl_ok=0
+  ! bash "${helper}" "${wsb}/h" --framework x --commit c --commit-date 2026-07-23 --release 1.0.0 >/dev/null 2>&1 || _rl_ok=0
+  if [ "${_rl_ok}" -eq 1 ]; then
+    record_pass "write-stamp: --release X.Y.Z só com --kind door ⇒ release:; sem a flag o campo não sai; v1.2, vazio e adotado ⇒ rc 2"
+  else record_fail "write-stamp: --release" "$(cat "${wsb}/r/.claude/.onion-version" 2>/dev/null)"; fi
   rm -rf "${wsb}"
 }
 
@@ -22049,10 +22063,15 @@ run_door_selftests() {
   local d4; d4="$(mktemp -d)"; rm -rf "${d4}"
   if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d4}" >/dev/null 2>&1; then
     : > "${d4}/INTRUSO-DE-MATERIALIZACAO-ANTERIOR.md"
-    if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d4}" >/dev/null 2>&1; then
+    # a 2ª leva --release (o que o motor do /meta:publish passa quando o maestro sela a versão): o
+    # materializador o repassa ao write-stamp, e o carimbo sai com `release:` (D_VERSIONAR_AS_PORTAS_POR_RELEASE)
+    if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d4}" --release 9.9.9 >/dev/null 2>&1; then
       if [ -f "${d4}/INTRUSO-DE-MATERIALIZACAO-ANTERIOR.md" ]; then
         record_fail "door: (e)" "arquivo da materialização anterior SOBREVIVEU — a porta publicaria o que saiu do manifesto"
       else record_pass "door: (e) materialização AUTORITATIVA (o que sai do manifesto sai da porta)"; fi
+      if grep -q '^release: 9\.9\.9$' "${d4}/.claude/.onion-version" 2>/dev/null; then
+        record_pass "door: (e2) --release repassado ao write-stamp ⇒ o carimbo da porta sai com release: 9.9.9"
+      else record_fail "door: (e2)" "o carimbo não traz release: — $(cat "${d4}/.claude/.onion-version" 2>/dev/null | tr '\n' ' ')"; fi
     else record_fail "door: (e)" "2ª materialização abortou"; fi
   else record_fail "door: (e)" "1ª materialização abortou"; fi
 
@@ -22710,13 +22729,14 @@ run_publish_selftests() {
   cat > "${core}/ops/materialize-door.sh" <<'STUB'
 #!/usr/bin/env bash
 set -uo pipefail
-R="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"; DEST="$1"; shift; ROLE=hub; FROM=origin/main
-while [ $# -gt 0 ]; do case "$1" in --role) ROLE="$2"; shift 2 ;; --from) FROM="$2"; shift 2 ;; *) shift ;; esac; done
+R="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"; DEST="$1"; shift; ROLE=hub; FROM=origin/main; REL=""
+while [ $# -gt 0 ]; do case "$1" in --role) ROLE="$2"; shift 2 ;; --from) FROM="$2"; shift 2 ;; --release) REL="$2"; shift 2 ;; *) shift ;; esac; done
 find "${DEST}" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 mkdir -p "${DEST}/.claude"
 git -C "${R}" archive --format=tar "${FROM}" -- payload | tar -x -C "${DEST}" --strip-components=1 || exit 3
 printf 'framework: %s\nsource_commit: %s\nrole: %s\nkind: door\n' "$(basename "${DEST}")" \
   "$(git -C "${R}" rev-parse --short=12 "${FROM}")" "${ROLE}" > "${DEST}/.claude/.onion-version"
+[ -z "${REL}" ] || printf 'release: %s\n' "${REL}" >> "${DEST}/.claude/.onion-version"
 exit 0
 STUB
   # o materializador de MARKETPLACE esboçado: SRC = o toplevel do próprio script (a worktree), como o
@@ -22727,8 +22747,8 @@ STUB
 set -uo pipefail
 SRC="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"; T="$1"
 mkdir -p "${T}/plugins/onion/.claude-plugin" "${T}/.claude-plugin"
-printf '{"ref": "%s"}\n' "$(git -C "${SRC}" rev-parse HEAD)" > "${T}/plugins/onion/.claude-plugin/provenance.json"
-printf '{"name":"x","plugins":[]}\n' > "${T}/.claude-plugin/marketplace.json"
+printf '{\n  "ref": "%s"\n}\n' "$(git -C "${SRC}" rev-parse HEAD)" > "${T}/plugins/onion/.claude-plugin/provenance.json"
+printf '{\n  "name": "x",\n  "metadata": {\n    "version": "0.1.0"\n  },\n  "plugins": []\n}\n' > "${T}/.claude-plugin/marketplace.json"
 # defeitos PLANTADOS quando a fonte pede (casos q3/q4): moat dentro do bundle; checador que não mede
 [ -f "${SRC}/payload/PLANT-MOAT" ] && { mkdir -p "${T}/plugins/onion/commands"; printf 'plantado\n' > "${T}/plugins/onion/commands/adopt.md"; }
 [ -f "${SRC}/payload/NM" ] && touch "${T}/plugins/onion/NAO-MEDE"
@@ -22824,7 +22844,7 @@ STUB
   else record_fail "publish: (g) o motor alterou o core" "antes ${snap0} depois $(_snap)"; fi
 
   # (b) --push publica, confere no remoto, e o carimbo publicado é o pin de origin/main
-  _pub porta-a --push
+  _pub porta-a --push --version 1.0.0
   if [ "${_r}" -eq 0 ] && [ "$(_door_tip)" != "${tip0}" ] && [ "$(_door_pin)" = "${NEWPIN}" ] \
      && grep -q 'CONFERIDO no remoto' <<< "${_o}" && [ "$(_snap)" = "${snap0}" ]; then
     record_pass "publish: (b) --push publica, confere o remoto, carimba ${NEWPIN} e não toca o core"
@@ -22863,7 +22883,7 @@ STUB
   git -C "${core}" add -A >/dev/null 2>&1 || true
   git -C "${core}" "${G[@]}" commit -qm vaza >/dev/null 2>&1 || true
   git -C "${core}" push -q origin main >/dev/null 2>&1 || true
-  _pub porta-a --push
+  _pub porta-a --push --version 2.0.0
   if [ "${_r}" -eq 1 ] && grep -q 'VAZAMENTO' <<< "${_o}" && grep -q 'onion-fulano' <<< "${_o}" && [ "$(_door_tip)" = "${tip1}" ]; then
     record_pass "publish: (d) id onion-* plantado ⇒ barra e o remoto NÃO anda (o ponto cego da REGRA 36)"
   else record_fail "publish: (d) vazamento passou" "rc=${_r} out=${_o:0:300}"; fi
@@ -22893,7 +22913,7 @@ STUB
   git -C "${core}" add -A >/dev/null 2>&1 || true
   git -C "${core}" "${G[@]}" commit -qm hard >/dev/null 2>&1 || true
   git -C "${core}" push -q origin main >/dev/null 2>&1 || true
-  _pub porta-a --push
+  _pub porta-a --push --version 2.0.0
   if [ "${_r}" -eq 1 ] && grep -q '2 HARD' <<< "${_o}" && [ "$(_door_tip)" = "${tip2}" ]; then
     record_pass "publish: (h) lint da porta com HARD ⇒ recusa e o remoto NÃO anda"
   else record_fail "publish: (h) porta vermelha publicada" "rc=${_r} out=${_o:0:300}"; fi
@@ -22904,14 +22924,14 @@ STUB
 
   # (e) PAPEL DIVERGENTE: registro diz hub, o carimbo publicado diz standalone ⇒ recusa
   _pub_members hub "${NEWPIN}"
-  _pub porta-a --push
+  _pub porta-a --push --version 2.0.0
   if [ "${_r}" -eq 2 ] && grep -q 'papel divergente' <<< "${_o}" && [ "$(_door_tip)" = "${tip2}" ]; then
     record_pass "publish: (e) registro × carimbo publicado divergentes ⇒ recusa antes de materializar"
   else record_fail "publish: (e) publicou com papéis divergentes" "rc=${_r} out=${_o:0:300}"; fi
   _pub_members standalone "${NEWPIN}"
 
   # (i) --from (ensaio de branch) com --push ⇒ recusa: porta pública só nasce de origin/main
-  _pub porta-a --from HEAD --push
+  _pub porta-a --from HEAD --push --version 2.0.0
   if [ "${_r}" -eq 2 ] && grep -q 'ensaio' <<< "${_o}"; then
     record_pass "publish: (i) --from com --push ⇒ recusa"
   else record_fail "publish: (i)" "rc=${_r} out=${_o:0:250}"; fi
@@ -22932,7 +22952,7 @@ STUB
   # (m) --clone com commit LOCAL à frente do remoto (o ensaio de (j) deixou um) ⇒ recusa: o push
   #     levaria junto um commit que esta rodada não verificou
   local tip3; tip3="$(_door_tip)"
-  _pub porta-a --clone "${cl}" --push
+  _pub porta-a --clone "${cl}" --push --version 2.0.0
   if [ "${_r}" -eq 2 ] && grep -q 'não está em origin/main' <<< "${_o}" && [ "$(_door_tip)" = "${tip3}" ]; then
     record_pass "publish: (m) clone à frente do remoto ⇒ recusa (commit não verificado não vai a público)"
   else record_fail "publish: (m) empurraria commit não verificado" "rc=${_r} out=${_o:0:300}"; fi
@@ -22962,7 +22982,7 @@ STUB
   printf 'exemplo: /home/conta/x\n' > "${core}/payload/nota.md"; _cp limpa
 
   # (n) --expect-pin que não é o de origin/main (a main andou desde o ensaio) ⇒ recusa
-  _pub porta-a --push --expect-pin "${OLDPIN}"
+  _pub porta-a --push --version 2.0.0 --expect-pin "${OLDPIN}"
   if [ "${_r}" -eq 2 ] && grep -q 'pin confirmado' <<< "${_o}"; then
     record_pass "publish: (n) --expect-pin divergente ⇒ recusa (o pin publicado é o pin confirmado)"
   else record_fail "publish: (n)" "rc=${_r} out=${_o:0:250}"; fi
@@ -22986,7 +23006,7 @@ STUB
   local fk="${d}/fakebin"; mkdir -p "${fk}"
   printf '#!/usr/bin/env bash\nexit 1\n' > "${fk}/claude"; chmod +x "${fk}/claude"
   local ptip; ptip="$(git ls-remote "${plugup}" refs/heads/main 2>/dev/null | awk '{print $1}')"
-  PATH="${fk}:${PATH}" _pub porta-p --push
+  PATH="${fk}:${PATH}" _pub porta-p --push --version 2.0.0
   if [ "${_r}" -eq 1 ] && grep -q 'validate --strict reprovou' <<< "${_o}" \
      && [ "$(git ls-remote "${plugup}" refs/heads/main 2>/dev/null | awk '{print $1}')" = "${ptip}" ]; then
     record_pass "publish: (q) plugins com validate --strict reprovando ⇒ recusa e o remoto não anda"
@@ -23000,7 +23020,7 @@ STUB
   #      na fonte ⇒ o checador o acusa no que foi montado, o motor recusa e o remoto NÃO anda, com --push.
   printf 'x\n' > "${core}/payload/PLANT-MOAT"; _cp planta-moat
   ptip="$(git ls-remote "${plugup}" refs/heads/main 2>/dev/null | awk '{print $1}')"
-  PATH="${fk}:${PATH}" _pub porta-p --push
+  PATH="${fk}:${PATH}" _pub porta-p --push --version 2.0.0
   if [ "${_r}" -eq 1 ] && grep -q '(5d) guardas de plugin no bundle: 1 HARD' <<< "${_o}" && grep -q 'moat-no-bundle' <<< "${_o}" \
      && [ "$(git ls-remote "${plugup}" refs/heads/main 2>/dev/null | awk '{print $1}')" = "${ptip}" ]; then
     record_pass "publish: (q3) defeito plantado no bundle de plugins ⇒ (5d) barra e o remoto NÃO anda"
@@ -23041,7 +23061,7 @@ STUB
   printf '  - id: porta-m\n    kind: door\n    role: mini\n    remote: %s\n    onion_version: n/a\n' "${mup}" \
     >> "${core}/docs/evolution/federation/members.yaml"
   _cp porta-m
-  _pub porta-m --push
+  _pub porta-m --push --version 1.0.0
   if [ "${_r}" -eq 2 ] && grep -q -- '--replace-foreign' <<< "${_o}" && [ "$(_mtip)" = "${mtip}" ] && [ "$(_mtags)" = "0" ]; then
     record_pass "publish: (k) porta nunca materializada com outro conteúdo e sem --replace-foreign ⇒ recusa e o repo fica intacto"
   else record_fail "publish: (k) o motor substituiria a destilação sem a flag" "rc=${_r} out=${_o:0:250}"; fi
@@ -23053,7 +23073,7 @@ STUB
   # (k3) com a flag, a verificação PRÓPRIA do mini (sem lint) roda no montado: defeito plantado ⇒ (5c)
   #      barra, e NEM a porta NEM a tag de arquivo chegam ao remoto (o arquivo só sobe com a porta).
   printf 'x\n' > "${core}/payload/PLANT-DANGLING"; _cp planta-dangling
-  _pub porta-m --replace-foreign --push
+  _pub porta-m --replace-foreign --push --version 1.0.0
   if [ "${_r}" -eq 1 ] && grep -q '(5c) a porta didática reprovou' <<< "${_o}" && [ "$(_mtip)" = "${mtip}" ] && [ "$(_mtags)" = "0" ]; then
     record_pass "publish: (k3) mini com ponteiro morto no montado ⇒ (5c) barra; porta e arquivo NÃO sobem"
   else record_fail "publish: (k3) mini com defeito publicado" "rc=${_r} tags=$(_mtags) out=${_o:0:300}"; fi
@@ -23061,7 +23081,7 @@ STUB
   # (k2) O MOTOR DEIXA DE RECUSAR O MINI (F5): com --replace-foreign --push a destilação é ARQUIVADA numa
   #      tag empurrada e conferida ANTES da porta, a porta sobe POR CIMA dela (a história fica: o pai do
   #      commit publicado é a ponta antiga) e o carimbo publicado diz role mini.
-  _pub porta-m --replace-foreign --push
+  _pub porta-m --replace-foreign --push --version 1.0.0
   local _mnew _mtag _mpar _mrole
   _mnew="$(_mtip)"
   _mtag="$(git ls-remote --tags "${mup}" 2>/dev/null | awk '/refs\/tags\/archive\/pre-door-.*\^\{\}$/ {print $1; exit}')"
@@ -23091,6 +23111,245 @@ STUB
   else record_fail "publish: (f)" "rc=${_r} out=${_o:0:250}"; fi
 
   unset -f _pub _pub_members _door_tip _door_pin _snap _cp
+  rm -rf "${d}"
+}
+
+# ── VERSIONAMENTO DAS PORTAS (decisão do maestro de 2026-10-11, D_VERSIONAR_AS_PORTAS_POR_RELEASE) ───
+# A versão é RÓTULO DE RELEASE de um pin: o motor PROPÕE o bump pelo diff de superfície e o maestro SELA
+# com --version, obrigatório com --push. A tag `onion-vX.Y.Z` nasce NAS PORTAS (o core fica intocado,
+# inclusive de tags), o carimbo leva `release:` pelo write-stamp REAL, os plugins levam a família no
+# metadata/provenance sem trocar o `version` por conteúdo, e o changelog da release (a mensagem da tag)
+# passa pela mesma varredura de vazamento do bundle. Mundo falso sem rede, como run_publish_selftests;
+# aqui o materializador esboçado espelha os CAMINHOS do core (como o real), para o intervalo do changelog
+# filtrar pelos caminhos que a porta mudou.
+run_publish_release_selftests() {
+  local sut="${REPO_ROOT}/ops/publish-door.sh"
+  if [ ! -f "${sut}" ]; then record_skip "publish_release: ops/publish-door.sh ausente (adotante) → pulado"; return; fi
+  local d; d="$(mktemp -d)"
+  local G=(-c user.email=t@t -c user.name=t)
+  local up="${d}/up.git" core="${d}/core" doorup="${d}/porta-a.git" plugup="${d}/porta-p.git"
+  git init -q --bare -b main "${up}" >/dev/null 2>&1 || true
+  git init -q --bare -b main "${doorup}" >/dev/null 2>&1 || true
+  git init -q --bare -b main "${plugup}" >/dev/null 2>&1 || true
+  git clone -q "${up}" "${core}" >/dev/null 2>&1 || true
+  git -C "${core}" checkout -q -b main >/dev/null 2>&1 || true
+  mkdir -p "${core}/ops" "${core}/.claude/validation" "${core}/.claude/utils/adopt" "${core}/.claude/agents" \
+           "${core}/.claude/commands/x" "${core}/.claude/utils/marketplace" "${core}/docs/evolution/federation"
+  cp "${sut}" "${core}/ops/publish-door.sh"
+  cp "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${core}/.claude/validation/" 2>/dev/null || true
+  cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" "${core}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/validation/projection-safety.sh" "${core}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${core}/.claude/utils/adopt/"
+  cp "${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh" "${core}/.claude/utils/adopt/"
+  printf '#!/usr/bin/env bash\necho "  Violações HARD : 0"\n' > "${core}/.claude/validation/lint-artifacts.sh"
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${core}/.claude/validation/plugin-bundle-check.sh"
+  printf '# agente\n' > "${core}/.claude/agents/a.md"
+  printf '# comando um\n' > "${core}/.claude/commands/x/one.md"
+  printf 'conteudo publico\n' > "${core}/README.md"
+  printf '# CHANGELOG\n\n' > "${core}/docs/evolution/federation/CHANGELOG.md"
+  # o materializador ESBOÇADO de porta: copia .claude/ e README.md NOS MESMOS CAMINHOS do core e carimba
+  # pelo write-stamp REAL (o --release do motor chega ao carimbo pelo mesmo escritor da produção)
+  cat > "${core}/ops/materialize-door.sh" <<'STUB'
+#!/usr/bin/env bash
+set -uo pipefail
+R="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"; DEST="$1"; shift; ROLE=hub; FROM=origin/main; REL=()
+while [ $# -gt 0 ]; do case "$1" in --role) ROLE="$2"; shift 2 ;; --from) FROM="$2"; shift 2 ;; --release) REL=(--release "$2"); shift 2 ;; *) shift ;; esac; done
+find "${DEST}" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+git -C "${R}" archive --format=tar "${FROM}" -- .claude README.md | tar -x -C "${DEST}" || exit 3
+bash "${R}/.claude/utils/adopt/write-stamp.sh" "${DEST}" --kind door --role "${ROLE}" --framework "$(basename "${DEST}")" \
+  --commit "$(git -C "${R}" rev-parse --short=12 "${FROM}")" --commit-date 2026-10-11 "${REL[@]}" >/dev/null || exit 3
+exit 0
+STUB
+  # o de MARKETPLACE: a FORMA do real (provenance multilinha com `ref`, catálogo com metadata.version) e um
+  # plugin.json com o version POR CONTEÚDO (0.1.7) que a família não pode tocar
+  cat > "${core}/.claude/utils/marketplace/materialize-marketplace-repo.sh" <<'STUB'
+#!/usr/bin/env bash
+set -uo pipefail
+SRC="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"; T="$1"
+mkdir -p "${T}/plugins/onion/.claude-plugin" "${T}/.claude-plugin"
+printf '{\n  "ref": "%s",\n  "tree_sha": "abc"\n}\n' "$(git -C "${SRC}" rev-parse HEAD)" > "${T}/plugins/onion/.claude-plugin/provenance.json"
+printf '{\n  "name": "onion",\n  "version": "0.1.7"\n}\n' > "${T}/plugins/onion/.claude-plugin/plugin.json"
+printf '{\n  "name": "x",\n  "metadata": {\n    "description": "d",\n    "version": "0.1.0"\n  },\n  "plugins": []\n}\n' > "${T}/.claude-plugin/marketplace.json"
+exit 0
+STUB
+  { printf 'members:\n'
+    printf '  - id: onion-fulano\n    kind: adopter\n    role: standalone\n    local_path: "/home/fulano/onion-fulano"\n    onion_version: aaaaaaaaaaaa\n'
+    printf '  - id: porta-a\n    kind: door\n    role: standalone\n    remote: %s\n    onion_version: bbbbbbbbbbbb\n' "${doorup}"
+    printf '  - id: porta-p\n    kind: door\n    role: plugins\n    remote: %s\n    onion_version: cccccccccccc\n' "${plugup}"
+  } > "${core}/docs/evolution/federation/members.yaml"
+  _cpr() {  # $1 = assunto do commit; o motor lê de origin/main
+    git -C "${core}" add -A >/dev/null 2>&1 || true
+    git -C "${core}" "${G[@]}" commit -qm "$1" >/dev/null 2>&1 || true
+    git -C "${core}" push -q origin main >/dev/null 2>&1 || true
+  }
+  _cpr "chore: core falso"
+  local OLDPIN; OLDPIN="$(git -C "${core}" rev-parse --short=12 HEAD)"
+  # as portas JÁ publicadas antes do versionamento: carimbo sem release, provenance sem onion_release
+  local seed="${d}/seed" pseed="${d}/pseed"
+  git clone -q "${doorup}" "${seed}" >/dev/null 2>&1 || true
+  mkdir -p "${seed}/.claude"
+  printf 'framework: porta-a\nsource_commit: %s\nsource_commit_date: 2026-10-11\nrole: standalone\nkind: door\nmaterialized_at: 2026-10-11\n' "${OLDPIN}" > "${seed}/.claude/.onion-version"
+  git -C "${seed}" add -A >/dev/null 2>&1 || true
+  git -C "${seed}" "${G[@]}" commit -qm porta >/dev/null 2>&1 || true
+  git -C "${seed}" push -q origin HEAD:main >/dev/null 2>&1 || true
+  git clone -q "${plugup}" "${pseed}" >/dev/null 2>&1 || true
+  mkdir -p "${pseed}/plugins/onion/.claude-plugin"
+  printf '{\n  "ref": "%s",\n  "tree_sha": "abc"\n}\n' "$(git -C "${core}" rev-parse HEAD)" > "${pseed}/plugins/onion/.claude-plugin/provenance.json"
+  git -C "${pseed}" add -A >/dev/null 2>&1 || true
+  git -C "${pseed}" "${G[@]}" commit -qm plugins >/dev/null 2>&1 || true
+  git -C "${pseed}" push -q origin HEAD:main >/dev/null 2>&1 || true
+  local fk="${d}/fakebin"; mkdir -p "${fk}"
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${fk}/claude"; chmod +x "${fk}/claude"
+
+  local _o _r
+  _pr() { if _o="$(PATH="${fk}:${PATH}" GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t \
+                    bash "${core}/ops/publish-door.sh" "$@" 2>&1)"; then _r=0; else _r=$?; fi; }
+  _tip() { git ls-remote "$1" refs/heads/main 2>/dev/null | awk '{print $1}' || true; }
+  _tags() { git ls-remote --tags "$1" 2>/dev/null | awk '$2 !~ /\^\{\}$/ {print $2}' | LC_ALL=C sort | paste -sd' ' - || true; }
+  _tagmsg() { git --git-dir="$1" cat-file -p "refs/tags/$2" 2>/dev/null || true; }
+  # o core intacto INCLUSIVE DE TAGS: a tag mora nas portas
+  _rsnap() { printf '%s|%s|%s|%s' "$(git -C "${core}" rev-parse HEAD)" "$(git -C "${core}" status --porcelain | sha256sum | cut -c1-12)" \
+               "$(git -C "${core}" tag -l | sha256sum | cut -c1-12)" "$(git -C "${core}" worktree list --porcelain | grep -c '^worktree ' || true)"; }
+  local snap0 atip; atip="$(_tip "${doorup}")"
+
+  # (r1) 1º ensaio sem tag nenhuma ⇒ proposta 1.0.0 ('primeira'), nada sobe, nenhuma tag nasce
+  printf '# agente b\n' > "${core}/.claude/agents/b.md"; _cpr "feat: agente b"
+  _pr porta-a
+  if [ "${_r}" -eq 0 ] && grep -qP '^PROPOSTA-DA-PORTA\tporta-a\t—\tprimeira\t1\.0\.0$' <<< "${_o}" \
+     && [ "$(_tip "${doorup}")" = "${atip}" ] && [ -z "$(_tags "${doorup}")" ]; then
+    record_pass "publish_release: (r1) sem tag no remoto ⇒ proposta onion-v1.0.0 'primeira'; ensaio não sobe nada nem cria tag"
+  else record_fail "publish_release: (r1)" "rc=${_r} tags=$(_tags "${doorup}") out=${_o:0:400}"; fi
+
+  # (r2) --push SEM --version ⇒ recusa antes de qualquer rede; e --version malformado também
+  _pr porta-a --push
+  local _r2="${_r}" _o2="${_o}"
+  _pr porta-a --push --version 1.0
+  if [ "${_r2}" -eq 2 ] && grep -q -- '--push sem --version' <<< "${_o2}" && [ "${_r}" -eq 2 ] && grep -q 'não é X.Y.Z' <<< "${_o}" \
+     && [ "$(_tip "${doorup}")" = "${atip}" ]; then
+    record_pass "publish_release: (r2) --push sem --version ⇒ rc 2 e o remoto não anda; --version fora de X.Y.Z ⇒ rc 2"
+  else record_fail "publish_release: (r2) publicaria sem o selo do maestro" "rc=${_r2}/${_r} out=${_o2:0:250}"; fi
+
+  # (r3) --push --version 1.0.0 ⇒ a tag com o NOME DO PRODUTO (onion-v1.0.0, nunca v1.0.0) aponta a ponta
+  #      publicada, o carimbo diz release: 1.0.0 (write-stamp real), a mensagem é o changelog, core intacto
+  snap0="$(_rsnap)"
+  _pr porta-a --push --version 1.0.0
+  local _t3 _st3 _m3
+  _t3="$(git ls-remote "${doorup}" 'refs/tags/onion-v1.0.0^{}' 2>/dev/null | awk '{print $1}' || true)"
+  _st3="$(git --git-dir="${doorup}" show main:.claude/.onion-version 2>/dev/null | sed -n 's/^release: //p' || true)"
+  _m3="$(_tagmsg "${doorup}" onion-v1.0.0)"
+  if [ "${_r}" -eq 0 ] && [ "$(_tags "${doorup}")" = "refs/tags/onion-v1.0.0" ] && [ -n "${_t3}" ] && [ "${_t3}" = "$(_tip "${doorup}")" ] \
+     && [ "${_st3}" = "1.0.0" ] && grep -q 'Quebras nesta porta' <<< "${_m3}" && grep -q 'primeira release' <<< "${_m3}" \
+     && grep -q 'release onion-v1.0.0 empurrada e CONFERIDA' <<< "${_o}" && [ "$(_rsnap)" = "${snap0}" ]; then
+    record_pass "publish_release: (r3) --push --version 1.0.0 ⇒ tag onion-v1.0.0 na ponta, conferida; carimbo release: 1.0.0; changelog na tag; core intacto (tags inclusive)"
+  else record_fail "publish_release: (r3)" "rc=${_r} tags=$(_tags "${doorup}") tag=${_t3:0:12} tip=$(_tip "${doorup}" | cut -c1-12) rel=${_st3} core=$(_rsnap)≠${snap0} out=${_o:0:400}"; fi
+
+  # (r3b) o ramo subiu e a TAG NÃO (simulado apagando-a do remoto): a re-rodada com o MESMO número não
+  #       commita nada e só empurra a tag, na mesma ponta
+  atip="$(_tip "${doorup}")"
+  git --git-dir="${doorup}" tag -d onion-v1.0.0 >/dev/null 2>&1 || true
+  _pr porta-a --push --version 1.0.0
+  _t3="$(git ls-remote "${doorup}" 'refs/tags/onion-v1.0.0^{}' 2>/dev/null | awk '{print $1}' || true)"
+  if [ "${_r}" -eq 0 ] && [ "$(_tip "${doorup}")" = "${atip}" ] && [ "${_t3}" = "${atip}" ] && grep -q 'nada a empurrar' <<< "${_o}"; then
+    record_pass "publish_release: (r3b) tag que não chegou ao remoto ⇒ a re-rodada com o mesmo número só empurra a tag (ponta intacta)"
+  else record_fail "publish_release: (r3b) a tag faltante não foi recuperada" "rc=${_r} tag=${_t3:0:12} tip=${atip:0:12} out=${_o:0:400}"; fi
+  # (r3c) e com a tag lá, a re-rodada é idempotente: rc 0, nada sobe, a tag não muda de objeto
+  local _tobj; _tobj="$(git ls-remote "${doorup}" refs/tags/onion-v1.0.0 2>/dev/null | awk '{print $1}' || true)"
+  _pr porta-a --push --version 1.0.0
+  if [ "${_r}" -eq 0 ] && [ "$(_tip "${doorup}")" = "${atip}" ] && grep -q 'já está no remoto' <<< "${_o}" \
+     && [ "$(git ls-remote "${doorup}" refs/tags/onion-v1.0.0 2>/dev/null | awk '{print $1}' || true)" = "${_tobj}" ]; then
+    record_pass "publish_release: (r3c) re-rodada da mesma release no mesmo pin ⇒ idempotente (nada sobe, a tag fica)"
+  else record_fail "publish_release: (r3c)" "rc=${_r} out=${_o:0:400}"; fi
+
+  # (r4) comando ADICIONADO ⇒ minor (1.1.0); o commit `docs:` não entra no changelog
+  printf '# comando dois\n' > "${core}/.claude/commands/x/two.md"; _cpr "feat: adiciona o comando dois"
+  printf '# agente (texto)\n' > "${core}/.claude/agents/a.md"; _cpr "docs: só texto do agente"
+  _pr porta-a
+  if [ "${_r}" -eq 0 ] && grep -qP '^PROPOSTA-DA-PORTA\tporta-a\t1\.0\.0\tminor\t1\.1\.0$' <<< "${_o}"; then
+    record_pass "publish_release: (r4) comando adicionado ⇒ proposta minor onion-v1.1.0"
+  else record_fail "publish_release: (r4) superfície adicionada não virou minor" "rc=${_r} out=${_o:0:400}"; fi
+  _pr porta-a --push --version 1.1.0
+  local _m4; _m4="$(_tagmsg "${doorup}" onion-v1.1.0)"
+  if [ "${_r}" -eq 0 ] && grep -q 'nenhuma quebra nesta porta' <<< "${_m4}" && grep -q '\.claude/commands/x/two\.md' <<< "${_m4}" \
+     && grep -q 'adiciona o comando dois' <<< "${_m4}" && ! grep -q 'só texto do agente' <<< "${_m4}"; then
+    record_pass "publish_release: (r4b) changelog da 1.1.0: 'nenhuma quebra nesta porta', o comando novo listado, o commit docs: filtrado"
+  else record_fail "publish_release: (r4b) changelog da release" "rc=${_r} msg=${_m4:0:500}"; fi
+
+  # (r5) release não anda para trás: --version menor que a última ⇒ rc 2, nada sobe
+  printf 'conteudo publico, revisto\n' > "${core}/README.md"; _cpr "fix: readme revisto"
+  atip="$(_tip "${doorup}")"
+  _pr porta-a --push --version 1.0.5
+  if [ "${_r}" -eq 2 ] && grep -q 'não é maior que a última release' <<< "${_o}" && [ "$(_tip "${doorup}")" = "${atip}" ]; then
+    record_pass "publish_release: (r5) --version 1.0.5 depois da 1.1.0 ⇒ rc 2 e o remoto não anda"
+  else record_fail "publish_release: (r5)" "rc=${_r} out=${_o:0:300}"; fi
+  # (r5b) e o MESMO número com conteúdo novo ⇒ rc 2 (release publicada não se reescreve)
+  _pr porta-a --push --version 1.1.0
+  if [ "${_r}" -eq 2 ] && grep -q 'não se reescreve' <<< "${_o}" && [ "$(_tip "${doorup}")" = "${atip}" ]; then
+    record_pass "publish_release: (r5b) --version de uma release já publicada com conteúdo novo ⇒ rc 2"
+  else record_fail "publish_release: (r5b)" "rc=${_r} out=${_o:0:300}"; fi
+
+  # (r6) só conteúdo fora da superfície ⇒ patch (1.1.1) e 'nenhuma quebra nesta porta' no changelog
+  _pr porta-a
+  if [ "${_r}" -eq 0 ] && grep -qP '^PROPOSTA-DA-PORTA\tporta-a\t1\.1\.0\tpatch\t1\.1\.1$' <<< "${_o}" && grep -q 'nenhuma quebra nesta porta' <<< "${_o}"; then
+    record_pass "publish_release: (r6) mudança fora da superfície ⇒ proposta patch onion-v1.1.1, 'nenhuma quebra nesta porta'"
+  else record_fail "publish_release: (r6)" "rc=${_r} out=${_o:0:400}"; fi
+
+  # (r7) comando REMOVIDO ⇒ major (2.0.0), e a quebra é nomeada no changelog
+  git -C "${core}" rm -q .claude/commands/x/one.md >/dev/null 2>&1 || true; _cpr "refactor: remove o comando um"
+  _pr porta-a
+  if [ "${_r}" -eq 0 ] && grep -qP '^PROPOSTA-DA-PORTA\tporta-a\t1\.1\.0\tmajor\t2\.0\.0$' <<< "${_o}" && grep -q 'removido: \.claude/commands/x/one\.md' <<< "${_o}"; then
+    record_pass "publish_release: (r7) comando removido ⇒ proposta major onion-v2.0.0 e a quebra nomeada"
+  else record_fail "publish_release: (r7) remoção não virou major" "rc=${_r} out=${_o:0:400}"; fi
+  printf '# comando um\n' > "${core}/.claude/commands/x/one.md"; _cpr "fix: devolve o comando um"
+
+  # (r8) entrada BREAKING no CHANGELOG da federação desde a última tag ⇒ candidata a major, só a CONTAGEM viaja
+  printf '## 2026-10-11 · renomeia algo · BREAKING · alvo: todos\n\ntexto do core\n' >> "${core}/docs/evolution/federation/CHANGELOG.md"; _cpr "feat: anuncia quebra"
+  _pr porta-a
+  if [ "${_r}" -eq 0 ] && grep -qP '^PROPOSTA-DA-PORTA\tporta-a\t1\.1\.0\tmajor\t2\.0\.0$' <<< "${_o}" && grep -q 'candidata a major: 1 entrada' <<< "${_o}" \
+     && grep -q 'candidata: 1 entrada(s) BREAKING' <<< "${_o}" && ! grep -q '│ .*renomeia algo' <<< "${_o}"; then
+    record_pass "publish_release: (r8) BREAKING no CHANGELOG da federação ⇒ candidata a major; o changelog leva a contagem, não o texto"
+  else record_fail "publish_release: (r8)" "rc=${_r} out=${_o:0:500}"; fi
+
+  # (r9) PLUGINS: a família vai no metadata do catálogo e em onion_release do provenance; o version do
+  #      plugin.json (por conteúdo) NÃO muda por causa da família; a tag nasce no repo de plugins
+  local ptip; ptip="$(_tip "${plugup}")"
+  _pr porta-p --push --version 1.0.0
+  local _pv _pm _pj
+  _pv="$(git --git-dir="${plugup}" show main:plugins/onion/.claude-plugin/provenance.json 2>/dev/null | sed -n 's/.*"onion_release": "\([^"]*\)".*/\1/p' || true)"
+  _pm="$(git --git-dir="${plugup}" show main:.claude-plugin/marketplace.json 2>/dev/null | sed -n 's/.*"version": "\([^"]*\)".*/\1/p' | sed -n '1p' || true)"
+  _pj="$(git --git-dir="${plugup}" show main:plugins/onion/.claude-plugin/plugin.json 2>/dev/null | sed -n 's/.*"version": "\([^"]*\)".*/\1/p' || true)"
+  if [ "${_r}" -eq 0 ] && [ "$(_tip "${plugup}")" != "${ptip}" ] && [ "${_pv}" = "1.0.0" ] && [ "${_pm}" = "1.0.0" ] && [ "${_pj}" = "0.1.7" ] \
+     && [ "$(_tags "${plugup}")" = "refs/tags/onion-v1.0.0" ]; then
+    record_pass "publish_release: (r9) plugins: onion_release e metadata.version = 1.0.0; plugin.json segue 0.1.7 (por conteúdo); tag onion-v1.0.0"
+  else record_fail "publish_release: (r9)" "rc=${_r} prov=${_pv} meta=${_pm} plugin=${_pj} tags=$(_tags "${plugup}") out=${_o:0:400}"; fi
+
+  # (r10) --status mostra a versão PUBLICADA, lida do carimbo remoto, e a derivada do pin que não é release
+  _pr --status
+  if [ "${_r}" -eq 0 ] && grep -qE '^porta-a .* 1\.1\.0 .*DEFASADA.*≈ onion-v1\.1\.0-[0-9]+-g[0-9a-f]{12}' <<< "${_o}" \
+     && grep -qE '^porta-p .* 1\.0\.0 ' <<< "${_o}"; then
+    record_pass "publish_release: (r10) --status: versão publicada por porta (1.1.0 · 1.0.0) e o pin novo derivado onion-v1.1.0-N-gSHA"
+  else record_fail "publish_release: (r10)" "rc=${_r} out=${_o:0:500}"; fi
+
+  # (r11) --all ensaia porta a porta e agrega o NÚMERO ÚNICO da família (maior tag, maior bump)
+  _pr --all
+  if grep -q 'PROPOSTA DA FAMÍLIA (número único): onion-v2.0.0 — major sobre onion-v1.1.0' <<< "${_o}"; then
+    record_pass "publish_release: (r11) --all agrega a proposta da família: onion-v2.0.0 (major sobre a maior tag)"
+  else record_fail "publish_release: (r11)" "rc=${_r} out=$(grep -E 'FAMÍLIA|PROPOSTA' <<< "${_o}" | head -5)"; fi
+
+  # (r12) o changelog da release vai a PÚBLICO: assunto de commit com id de adotante ⇒ (5a) barra
+  printf '# agente (rev)\n' > "${core}/.claude/agents/a.md"; _cpr "fix: sinal do onion-fulano"
+  atip="$(_tip "${doorup}")"
+  _pr porta-a --push --version 2.0.0
+  if [ "${_r}" -eq 1 ] && grep -q 'VAZAMENTO' <<< "${_o}" && grep -q '‹changelog da release›' <<< "${_o}" && [ "$(_tip "${doorup}")" = "${atip}" ] \
+     && ! grep -q 'onion-v2.0.0' <<< "$(_tags "${doorup}")"; then
+    record_pass "publish_release: (r12) id de adotante num assunto de commit do intervalo ⇒ o changelog barra; porta e tag NÃO sobem"
+  else record_fail "publish_release: (r12) changelog com termo de adotante passou" "rc=${_r} out=${_o:0:400}"; fi
+
+  # (r13) depois de tudo, o core falso segue intocado no que é do motor (HEAD andou pelos commits DA BANCADA)
+  if [ -z "$(git -C "${core}" tag -l)" ]; then
+    record_pass "publish_release: (r13) nenhuma tag nasceu no core em nenhuma rodada (a tag mora nas portas)"
+  else record_fail "publish_release: (r13) tag no core" "$(git -C "${core}" tag -l | tr '\n' ' ')"; fi
+
+  unset -f _pr _tip _tags _tagmsg _rsnap _cpr
   rm -rf "${d}"
 }
 
@@ -23732,6 +23991,7 @@ _family run_door_seal_pin_selftests
 _family run_registry_pins_selftests
 _family run_door_cycle_selftests
 _family run_publish_selftests
+_family run_publish_release_selftests
 _family run_door_mini_selftests
 # ── REGRA 86: workflow que não parseia é workflow MORTO, e o repo não sabe ────────────────────
 # Nasceu de um `env:` duplicado que deixou o `onion-review-diagnose.yml` inexecutável por um dia

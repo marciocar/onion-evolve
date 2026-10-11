@@ -1,7 +1,7 @@
 ---
 title: Meta-spec — Arquitetura do Sistema Onion
 date: 2026-06-16
-version: 1.3.0
+version: 1.4.0
 level: L0
 status: active
 gate-keeper: "@metaspec-gate-keeper"
@@ -239,14 +239,32 @@ Implicações:
 
 ### 6.1 Versionamento
 
-- Versão do framework: implícita no estado do branch `main` (não há semver formal)
+- **Identidade do framework: o pin** (commit + data), derivado do git. É a verdade que as guardas leem.
+- **Versão de release da família: `onion-vX.Y.Z`**, um **rótulo** de um pin publicado nas portas
+  (decisão do maestro de 2026-10-11, nó `D_VERSIONAR_AS_PORTAS_POR_RELEASE` em
+  `docs/onion/graph/door-role-parity-2026-09.kg.yaml`). Nasce no `/meta:publish`: o motor **propõe** o
+  bump pelo diff de superfície da porta e o maestro **sela** o número com `--version`. A tag mora nas
+  **portas**, nunca no core. Nenhuma guarda lê a versão (REGRA 85, REGRA 92 e o `--status` medem o pin).
+  Um pin que não é release tem a versão **derivada** no estilo `git describe` (`onion-v1.0.0-31-g<sha>`),
+  e ela nunca vira campo guardado no `members.yaml`. Número único na família, começando em `1.0.0`.
+  O que conta como API pública de cada porta (e dá sentido ao "major"): os comandos invocáveis, os
+  agentes, as skills e os hooks que ela distribui, o schema do carimbo e, para a porta `source`, o
+  contrato do `members.yaml`. Doutrina: `common:prompts:publish-doctrine`, cláusula 6.
 - Versão de meta-specs: campo `version` no frontmatter, semver simples (`1.0.0`)
-- Releases significativas: registradas em `docs/onion/RELEASE-NOTES-*.md` quando aplicável
+- Changelog de release: a **mensagem da tag anotada** `onion-vX.Y.Z` em cada porta, gerada pelo motor e
+  varrida como o bundle. (Até 2026-10-11 esta linha citava `docs/onion/RELEASE-NOTES-*.md` "quando
+  aplicável"; nenhum desses arquivos existiu, e a citação foi superada.) O canal do **adotante** segue
+  sendo o CHANGELOG da federação (`/meta:co-announce`), não o changelog da porta.
+
+> **SUPERADO em 2026-10-11:** até a versão 1.3.0 desta meta-spec a primeira linha dizia "versão
+> implícita no `main` (não há semver formal)". A identidade continua sendo o pin; o que mudou é que
+> a família ganhou um **rótulo de release** por cima dele, e o rótulo não substitui o pin em nenhuma
+> decisão de guarda.
 
 #### Stamp de versão (proveniência de repos adotados)
 
-A identidade do framework é **derivada do git** (commit + data), **não** um semver — coerente com
-"versão implícita no `main`" acima. O script `.claude/validation/onion-version.sh` (irmão de
+A identidade do framework é **derivada do git** (commit + data), **não** um semver: o rótulo de release
+`onion-vX.Y.Z` (acima) é apelido de um pin publicado e não entra na identidade. O script `.claude/validation/onion-version.sh` (irmão de
 `inventory.sh`) a emite ao vivo:
 
 ```yaml
@@ -276,7 +294,9 @@ Nas **portas** (`ops/materialize-door.sh`) o escritor é o **mesmo** `write-stam
 saem `framework`/`source_commit`/`source_commit_date`/`role`/`adopted_from` e, no lugar de
 `adopted_at`/`updated_at`, `kind: door` + `materialized_at: <YYYY-MM-DD>` — a porta é projeção regenerada
 inteira, então nada se herda do carimbo anterior e o `role` é obrigatório. Até 2026-10-09 a porta tinha
-um dialeto próprio (`onion_version`), que o `door-seal-pin.sh` ainda lê como fallback.
+um dialeto próprio (`onion_version`), que o `door-seal-pin.sh` ainda lê como fallback. Quando a
+materialização é uma **release** (o maestro selou `--version` no `/meta:publish`), o carimbo leva também
+`release: X.Y.Z`, regenerado a cada publicação; sem release o campo não sai. Nenhuma guarda o lê.
 
 O campo **`integration_branch`** (opcional) é o **SSOT versionado** da branch de integração — a que os PRs
 de evolução Onion miram (ex. `<projeto>-evolve`, separada da branch de produto). É **carimbado só quando
