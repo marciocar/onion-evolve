@@ -28,11 +28,15 @@ input=$(cat)
 # `cwd` do JSON é o diretório ONDE o comando roda — numa worktree de agente é a worktree, não a raiz
 # (`CLAUDE_PROJECT_DIR`). Julgar pela raiz vetava `git push -u origin HEAD` de agente e deixava passar
 # force-push de um checkout sentado na main (Elenxo, 2ª passada, 2026-10-05).
+# `errors=backslashreplace` e `tool_input` não-dict (passada adversarial, 2026-10-11): um surrogate solto no JSON
+# (`\ud800`) derrubava o print, e o hook caía no modo sem python — vetando um push honesto.
 parsed=$(printf '%s' "$input" | python3 -c 'import json,sys
+sys.stdout.reconfigure(errors="backslashreplace")
 try: d=json.load(sys.stdin)
 except Exception: d={}
 d=d if isinstance(d,dict) else {}
-print(str(d.get("cwd") or "").replace("\n"," ")); print((d.get("tool_input") or {}).get("command",""))' 2>/dev/null) && nopy=0 || nopy=1
+ti=d.get("tool_input"); ti=ti if isinstance(ti,dict) else {}
+print(str(d.get("cwd") or "").replace("\n"," ")); print(str(ti.get("command") or ""))' 2>/dev/null) && nopy=0 || nopy=1
 hcwd=${parsed%%$'\n'*}; cmd=${parsed#*$'\n'}; [ "$cmd" = "$parsed" ] && cmd=""
 # shellcheck source=lib/invocation-lines.sh
 . "$(dirname "${BASH_SOURCE[0]}")/lib/invocation-lines.sh"

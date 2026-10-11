@@ -6006,6 +6006,21 @@ run_premodelswitch_guard_selftests() {
      && grep -q '"decision":"unreadable"' "${d}/log.jsonl" && grep -q '"event":"PostModelSwitch".*"decision":"applied"' "${d}/log.jsonl"; then
     record_pass "premodelswitch-guard: log 9/9 com allow/block/disarmed/unreadable/applied"
   else record_fail "premodelswitch-guard: log" "esperava 9 linhas com todas as decisões, veio ${n}: $(head -c 300 "${d}/log.jsonl" 2>/dev/null)"; fi
+  # SEM python3 (fix/vetos-fail-closed, 2026-10-11): a guarda saía 0 por dentro e liberava o downgrade (o
+  # onFailure block não cobre exit 0). PATH só com o que ela usa, sem python3; log à parte (o de cima conta 9).
+  local np tl; np="$(mktemp -d)"
+  for tl in bash cat grep head awk tr date mkdir dirname; do ln -s "$(command -v "${tl}")" "${np}/${tl}"; done
+  _pgn() {  # <to_model> → rc sem python3
+    local rc=0
+    printf '{"hook_event_name":"PreModelSwitch","from_model":"claude-opus-5","to_model":"%s","source":"picker","context_tokens":10}' "$1" \
+      | env -i HOME="${HOME}" PATH="${np}" ONION_RADAR_BASELINES="${d}/bl.yaml" ONION_MODEL_SWITCH_LOG="${d}/log-np.jsonl" CLAUDE_PROJECT_DIR="${d}" \
+        "${np}/bash" "${hk}" >/dev/null 2>&1 || rc=$?
+    printf '%s' "${rc}"
+  }
+  local g1 g2; g1="$(_pgn claude-sonnet-5)"; g2="$(_pgn 'claude-fable-5-1[1m]')"
+  if [ "${g1}" = 2 ] && [ "${g2}" = 0 ]; then record_pass "premodelswitch-guard: sem python3 → downgrade VETA (rc=2), lineup passa (rc=0)"
+  else record_fail "premodelswitch-guard: sem python3" "downgrade rc=${g1} (esperado 2), lineup rc=${g2} (esperado 0)"; fi
+  rm -rf "${np}"
   rm -rf "${d}"
 }
 
@@ -6389,6 +6404,24 @@ run_pretooluse_veto_selftests() {
   _casen "(np-mg-apiget) merge-gate: gh api de leitura → passa"  0 "${mg}" feat 'gh api repos/o/r/pulls --jq .[].number'
   _casen "(np-campo) merge-gate: git status com description citando merge → passa" 0 "${mg}" feat 'git status'
   _casen "(np-campo) protect-main: git status com description citando force-push → passa" 0 "${pm}" feat 'git status'
+  # escapes da passada adversarial: o shell junta `pu''sh` e `p\ush`; variável e xargs não se provam sem tokenizador
+  _casen "(np-aspas) protect-main: git pu''sh -f origin main → FECHA"  2 "${pm}" feat "git pu''sh -f origin main"
+  _casen "(np-aspas) merge-gate: gh pr mer''ge 1 → FECHA"              2 "${mg}" feat "gh pr mer''ge 1"
+  _casen "(np-barra) merge-gate: gh pr me\\rge 1 → FECHA"              2 "${mg}" feat 'gh pr me\rge 1'
+  _casen "(np-dyn) merge-gate: rota em variável → FECHA"              2 "${mg}" feat 'R=merge; gh api -X PUT repos/o/r/pulls/1/$R'
+  _casen "(np-dyn) protect-main: push vindo do xargs → FECHA"         2 "${pm}" feat "printf 'push\\n-f\\norigin\\nmain\\n' | xargs git"
+  _casen "(np-seg) protect-main: rm -rf antes de push sem force → passa" 0 "${pm}" feat 'rm -rf x && git push origin feat'
+  # COM python3: opção longa abreviada do git (`--mirr` = `--mirror`, medido: força a main num remoto bare)
+  _case "protect-main: git push --mirr origin → VETO"       2 "${pm}" feat 'git push --mirr origin'
+  _case "merge-gate: git push --mi origin → VETO"           2 "${mg}" feat 'git push --mi origin'
+  _case "merge-gate: git push --al origin → VETO"           2 "${mg}" feat 'git push --al origin'
+  _case "protect-main: --force-w (prefixo) segue force → VETO" 2 "${pm}" feat 'git push --force-w origin main'
+  # COM python3: surrogate solto no JSON não derruba o leitor (antes caía no modo sem python e vetava push honesto)
+  local _sj rc_s=0
+  _sj='{"cwd":"'"${d}"'","tool_input":{"command":"git push origin feat \ud800"}}'
+  printf '%s' "${_sj}" | (cd "${d}" && CLAUDE_PROJECT_DIR="${d}" bash "${mg}" >/dev/null 2>&1) || rc_s=$?
+  if [ "${rc_s}" = 0 ]; then record_pass "pretooluse-veto: (surrogate) push de feature com \\ud800 no JSON → passa (rc=0)"
+  else record_fail "pretooluse-veto: (surrogate) push de feature com \\ud800" "esperava rc=0, veio rc=${rc_s}"; fi
   # desarme: sem ops/pr-merge-verified.sh (adotante) o gate NÃO veta o único caminho de merge
   rm -f "${d}/ops/pr-merge-verified.sh"
   _casen "(np-desarme) merge-gate: sem caminho verificado → DESARMA" 0 "${mg}" feat 'gh pr merge 1'
@@ -6545,12 +6578,16 @@ run_env_exposure_selftests() {
     local qd qrc1=0 qrc2=0; qd="$(mktemp -d)"
     python3 -c 'import json,sys;t="QUJD"*(2*1024*1024//4)
 json.dump({"tool_name":"Bash","cwd":"/","tool_input":{"command":"echo "+t}},open(sys.argv[1]+"/eco.json","w"))
-json.dump({"tool_name":"Bash","cwd":"/","tool_input":{"command":"cat "+t+".env"}},open(sys.argv[1]+"/cat.json","w"))' "${qd}"
+json.dump({"tool_name":"Bash","cwd":"/","tool_input":{"command":"cat "+t+".env"}},open(sys.argv[1]+"/cat.json","w"))
+json.dump({"tool_name":"Bash","cwd":"/","tool_input":{"command":"cat "+"["*(1024*1024)}},open(sys.argv[1]+"/brk.json","w"))' "${qd}"
+    local qrc3=0
     timeout 20 bash "${guard}" < "${qd}/eco.json" >/dev/null 2>&1 || qrc1=$?
     timeout 20 bash "${guard}" < "${qd}/cat.json" >/dev/null 2>&1 || qrc2=$?
+    # o `[` sem `]` era o 3º quadrático (fnmatch.translate da stdlib, achado pela passada adversarial): 172 s a 80 KB
+    timeout 20 bash "${guard}" < "${qd}/brk.json" >/dev/null 2>&1 || qrc3=$?
     rm -rf "${qd}"
-    if [ "${qrc1}" = 0 ] && [ "${qrc2}" = 2 ]; then record_pass "env-exposure: (q) token único de 2 MB julgado em menos de 20 s (echo passa, cat <token>.env veta)"
-    else record_fail "env-exposure: (q) custo linear" "rc echo=${qrc1} (esperado 0), rc cat=${qrc2} (esperado 2); 124 = estourou os 20 s"; fi
+    if [ "${qrc1}" = 0 ] && [ "${qrc2}" = 2 ] && [ "${qrc3}" = 0 ]; then record_pass "env-exposure: (q) token único de 2 MB e 1 MB de '[' julgados em menos de 20 s (echo passa, cat <token>.env veta, cat [[[… passa)"
+    else record_fail "env-exposure: (q) custo linear" "rc echo=${qrc1} (esperado 0), rc cat=${qrc2} (esperado 2), rc colchetes=${qrc3} (esperado 0); 124 = estourou os 20 s"; fi
   fi
   # (h2) escapes e falsos positivos da 2ª passada do Elenxo (2026-10-06)
   if [ -f "${guard}" ]; then

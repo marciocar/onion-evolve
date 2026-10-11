@@ -70,34 +70,50 @@
 
 # onion_json_string_field <campo> — lê o JSON da entrada padrão e imprime o 1º valor STRING do campo,
 # desescapado o bastante para julgar a forma (\\ \" \n \t \r \/). rc 1 quando o campo não aparece.
-# Aproximação declarada: `\uXXXX` fica literal. Linear (grep -oE de DFA; medido 0,45 s a 1 MB).
+# Aproximação declarada: `\uXXXX` fica literal (o recorte abaixo o trata como construção dinâmica) e, com a
+# chave repetida, vale a 1ª (o python valeria a última; o Claude Code não gera chave repetida).
+# Linear: grep -oE de DFA e um awk só. A 1ª redação desescapava com `${v//…}` do bash, que a passada
+# adversarial mediu quadrático com muitos escapes (41 s a 1 MB de `\"`); o awk faz 1 MB em menos de 1 s.
 onion_json_string_field() {
-  local pat v
+  local pat
   pat='"'"$1"'"[[:space:]]*:[[:space:]]*"([^"\\]|\\.)*"'
-  v=$(grep -oE "$pat" | head -n1) || true
-  [ -z "$v" ] && return 1
-  v=${v#*:}; v=${v#*\"}; v=${v%\"}
-  v=${v//\\\\/$'\x01'}; v=${v//\\\"/\"}; v=${v//\\n/$'\n'}; v=${v//\\t/$'\t'}; v=${v//\\r/$'\r'}
-  v=${v//\\\//\/}; v=${v//$'\x01'/\\}
-  printf '%s' "$v"
+  grep -oE "$pat" | head -n1 | awk 'BEGIN { RS = "\002"; found = 0 }
+    { found = 1; v = $0; sub(/\n$/, "", v); sub(/^[^:]*:[[:space:]]*"/, "", v); sub(/"$/, "", v)
+      gsub(/\\\\/, "\001", v); gsub(/\\"/, "\"", v); gsub(/\\n/, "\n", v); gsub(/\\t/, "\t", v)
+      gsub(/\\r/, "\r", v); gsub(/\\\//, "/", v); gsub(/\001/, "\\", v)
+      printf "%s", v }
+    END { exit found ? 0 : 1 }'
 }
 
 # onion_nopy_touches <force-main|merge-gate> <texto> — rc 0 quando, SEM tokenizador, o texto PODE tocar
 # o objeto do veto (o hook então fecha); rc 1 quando não pode (passa). O recorte foi medido nos 31.183
 # comandos Bash únicos dos transcripts do core (2026-10-11): fechar pela forma da lib inteira barraria
-# 4,36% (o `gh api` de leitura é 853 deles); este recorte barra 0,38% no protect-main (push com marca de
-# force) e 2,75% no merge-gate (todo push, gh merge, gh api com rota de merge/contents/refs/graphql, gh
-# repo sync). O push do merge-gate não foi afinado: a marca de main/HEAD/push nu cobriria 445 dos 502 e
-# abriria espaço para fail-open.
+# 4,36% (o `gh api` de leitura é 853 deles). Este recorte fecha 2,12% no protect-main e 5,71% no merge-gate:
+# a 1ª redação fechava 0,38% e 2,75%, e as duas regras abaixo (aspas e dinâmica), que a passada adversarial
+# exigiu por fail-open medido, custaram a diferença — no modo degradado, fechar a mais é o lado certo do erro.
+# O push do merge-gate não foi afinado por marca de main/HEAD/push nu: cobriria 445 dos 502 e abriria espaço
+# para fail-open.
+#  · antes de casar, aspas e `\` saem do texto: o shell junta `pu''sh` e `p\ush` em `push`, e o regex
+#    tem de ver o que o shell vê (fail-open medido pela passada adversarial);
+#  · construção DINÂMICA (`$`, crase, xargs, eval, `\u00..` no JSON) com git/gh e uma palavra do objeto em
+#    qualquer lugar fecha: `R=merge; gh api …/$R` e `printf 'push…' | xargs git` não se provam sem tokenizador;
+#  · no protect-main a marca de force é procurada no MESMO segmento do push (`rm -rf x && git push` passa).
 onion_nopy_touches() {
-  local kind="$1" t="$2" a='[^[:alnum:]_]' seg='[^;&|]*'
+  local kind="$1" t a='[^[:alnum:]_]' seg='[^;&|]*' dyn kw
+  t=$(printf '%s' "$2" | tr -d "\"'\\\\")
   local push="(^|${a})git(${a}${seg})?${a}(push|send-pack)(${a}|\$)"
+  dyn=0
+  if printf '%s' "$2" | grep -qE '\$|`|(^|[^[:alnum:]_])(xargs|eval)([^[:alnum:]_]|$)|\\u00[2-7]' \
+     && printf '%s' "$t" | grep -qE "(^|${a})(git|gh)(${a}|\$)"; then dyn=1; fi
   case "$kind" in
     force-main)
-      printf '%s' "$t" | grep -qE "$push" || return 1
-      printf '%s' "$t" | grep -qE -- '--force|--mirror|(^|[[:space:]])-[[:alpha:]]*f[[:alpha:]]*([[:space:]]|$)|[[:space:]:]\+[^[:space:]]'
+      [ "$dyn" = 1 ] && printf '%s' "$t" | grep -qE 'push|send-pack' && return 0
+      printf '%s' "$t" | tr ';&|' '\n\n\n' | grep -E "$push" \
+        | grep -qE -- '--force|--mi|(^|[[:space:]])-[[:alnum:]]*f[[:alnum:]]*([[:space:]]|$)|[[:space:]:]\+[^[:space:]]'
       ;;
     merge-gate)
+      kw='push|send-pack|merge|graphql|contents|git/refs|sync'
+      [ "$dyn" = 1 ] && printf '%s' "$t" | grep -qE "$kw" && return 0
       printf '%s' "$t" | grep -qE "$push|mergePullRequest|(^|${a})gh(${a}${seg})?${a}merge(${a}|\$)|(^|${a})gh(${a}${seg})?${a}api(${a}${seg})?(merge|contents|git/refs|graphql)|(^|${a})gh(${a}${seg})?${a}repo${a}${seg}sync(${a}|\$)"
       ;;
     *) return 0 ;;
@@ -685,6 +701,26 @@ def brace_expand(word):
     return out
 
 
+# Opção longa ABREVIADA do `git push` (fix/vetos-fail-closed, passada adversarial, 2026-10-11): o git aceita
+# qualquer prefixo único (`--mi`/`--mirr` = `--mirror`, `--al` = `--all`, `--b` = `--branches`). Medido num
+# remoto bare: `git push --mirr origin` fez "main -> main (forced update)" e passava pelos dois vetos com rc 0.
+# Prefixo ambíguo (`--forc`, `--fo`) o próprio git recusa, e aqui fica como está.
+PUSH_LONG = ("all", "atomic", "branches", "delete", "dry-run", "exec", "follow-tags", "force", "force-if-includes",
+             "force-with-lease", "ipv4", "ipv6", "mirror", "no-verify", "porcelain", "progress", "prune", "push-option",
+             "quiet", "receive-pack", "recurse-submodules", "repo", "set-upstream", "signed", "tags", "thin", "verbose",
+             "verify")
+
+
+def push_long_opt(a):
+    if not a.startswith("--") or len(a) < 3:
+        return a
+    name, eq, val = a[2:].partition("=")
+    if name in PUSH_LONG or (name.startswith("no-") and name[3:] in PUSH_LONG):
+        return a
+    cands = [o for o in PUSH_LONG if o.startswith(name)]
+    return "--" + cands[0] + eq + val if len(cands) == 1 else a
+
+
 PUSH_CFG = re.compile(r"^(remote\.[^=]*\.(push|mirror|pushurl|url)|push\.default|branch\.[^=]*\.(merge|remote|pushremote)|"
                       r"url\.[^=]*\.(pushinsteadof|insteadof))(=|$)", re.I)
 
@@ -769,7 +805,7 @@ def canonical_git(words, where, env=None):
         return "git " + " ".join(rest), None, False
     force, flags, pos, j = False, [], [], 1
     while j < len(rest):
-        a = rest[j]
+        a = push_long_opt(rest[j])
         if a == "--":
             pos += rest[j + 1:]; break
         if a.startswith("--"):
@@ -934,6 +970,8 @@ def canonical_gh(words):
 def touches_main(text, where=None):
     t = text
     if re.search(r"(^|[\s:/+])(refs/heads/|heads/)?main($|[\s:])|--mirror|--all\b|(^|\s)(HEAD|@)($|\s|:)", t):
+        return True
+    if any(push_long_opt(w) in ("--mirror", "--all", "--branches") for w in t.split()):
         return True
     return current_branch(where) == "main"
 
@@ -1217,7 +1255,7 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
         if tb in ("git", "gh") and (len(tail) < 2 or opaque(tail[1]) or (tb == "gh" and tail[1] == "pr" and (len(tail) < 3 or opaque(tail[2])))):
             emit_unanalyzable(words, CWD[-1], unknown_target=True); return   # o SUBCOMANDO vem do stdin
         if tb == "git" and "push" in tail:
-            forced = any(t.startswith("--force") or t == "--mirror" or (t.startswith("-") and not t.startswith("--") and "f" in t) or t.startswith("+") for t in tail)
+            forced = any(push_long_opt(t).startswith("--force") or push_long_opt(t) == "--mirror" or (t.startswith("-") and not t.startswith("--") and "f" in t) or t.startswith("+") for t in tail)
             if forced or current_branch(CWD[-1]) == "main":
                 emit_unanalyzable(words, CWD[-1], unknown_target=True)
             return                                      # push sem force de destinos do stdin, fora da main

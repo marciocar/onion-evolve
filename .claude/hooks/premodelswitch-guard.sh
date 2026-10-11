@@ -33,7 +33,16 @@ import json,sys
 try: d=json.load(sys.stdin)
 except Exception: d={}
 g=lambda k: str(d.get(k,"") or "").replace(" ","_") or "-"
-print(g("hook_event_name"),g("from_model"),g("to_model"),g("requested_model"),g("source"),g("context_tokens"),g("estimated_cache_write_usd"))' 2>/dev/null) || exit 0
+print(g("hook_event_name"),g("from_model"),g("to_model"),g("requested_model"),g("source"),g("context_tokens"),g("estimated_cache_write_usd"))' 2>/dev/null) || {
+  # SEM python3 (ausente ou morto) o `read` falhava e a guarda saía 0 — downgrade liberado por dentro, que o
+  # onFailure block não cobre (passada adversarial de fix/vetos-fail-closed, 2026-10-11). Os campos são
+  # strings simples: o leitor de JSON em bash dos vetos basta (os numéricos ficam "-", só vão ao log).
+  # shellcheck source=lib/invocation-lines.sh
+  . "$(dirname "${BASH_SOURCE[0]}")/lib/invocation-lines.sh" 2>/dev/null || exit 0
+  _f() { local v; v="$(printf '%s' "${input}" | onion_json_string_field "$1")" || v=""; v="${v// /_}"; printf '%s' "${v:--}"; }
+  ev="$(_f hook_event_name)"; from="$(_f from_model)"; to="$(_f to_model)"; req="$(_f requested_model)"
+  src="$(_f source)"; ctx=-; usd=-
+}
 [ -n "${ev:-}" ] && [ "${ev}" != "-" ] || exit 0
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 bl="${ONION_RADAR_BASELINES:-${root}/docs/onion/radar-baselines.yaml}"
