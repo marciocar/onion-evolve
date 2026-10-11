@@ -1,0 +1,944 @@
+{
+ "question": "SAC-70: o Onion deve oferecer um MCP remoto, só leitura, para o time não técnico de um hub (piloto: brain-granaai) consultar o Company Brain com o veredito do Onion fora do Claude Code (kg_list, kg_radar, kg_node pelo parser do radar, docs_search)? Decidir: (1) o framework mantém o servidor (core) ou a família hospeda (o hub, ou uma peça separada); (2) autenticação por organização (OAuth/OIDC com o IdP que o hub já tem, token por org, ou nenhum em rede privada); (3) escopo por raiz (qual repo/grafo cada org vê, multi-tenant ou uma instância por org); (4) frescor por commit (o servidor lê qual ref e como declara o commit servido); (5) transporte (streamable-http, SSE, stdio via proxy) e onde roda. Considere o estado da arte de MCP remoto em out/2026 (spec de autorização do MCP, clientes que o time não técnico usa: Claude.ai/Desktop com conector remoto, ChatGPT, LibreChat), o custo de manter e a postura de acoplamento do Onion (acoplar só quando a capacidade não existe fora).",
+ "today": "2026-10-11",
+ "kgPath": "/home/marcio/onion-evolve/.claude/worktrees/agent-a7cb11570d721ecfb/docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml",
+ "radarExit": 0,
+ "summary": "Sim, o Onion deve oferecer o MCP remoto só leitura, mas a família hospeda, não o core. O servidor fica numa peça separada operada pelo hub (piloto brain-granaai). O core guarda só o contrato: a especificação das 4 tools e a regra de que kg_radar e kg_node chamam o kg-radar.sh determinístico, sem reimplementá-lo. O desenho para as outras quatro decisões: (2) OAuth 2.1, com o servidor MCP como resource server, publicando Protected Resource Metadata (RFC 9728) e validando a audiência (RFC 8707), e o IdP que o hub já tem (Logto na VPS) como authorization server. Ficam fora o token estático por org e o 'nenhum em rede privada'. (3) Uma instância por org, com o tenant lido de uma claim verificada do token e nunca de argumento de tool. (4) O servidor lê um ref fixo (origin/main do repo do hub) com credencial própria e declara o SHA servido e a hora do fetch em toda resposta. (5) Streamable HTTP stateless, atrás de TLS na VPS. O critério do acoplamento aponta para fora do core: nada disso depende do Claude Code. O precedente medido (ops/mcp-onion-kg, desligado em 2026-08-27 por falta de consumidor) mostra que runtime hospedado no core apodrece sem dono.",
+ "market": "Sem sinal encontrado no eixo mercado/capital/analistas: a pesquisa não trouxe rodadas, M&A nem relatórios de analistas sobre MCP remoto de conhecimento corporativo. Os únicos sinais comerciais são de vendors explicando seu próprio caminho (Cloudflare com MCP remoto e auth BYO, AAIF/Keycloak como authorization server, Salesforce Hosted MCP na issue do claude.ai). Eles mostram que provedores de infraestrutura e de IAM disputam a camada de autorização e hospedagem do MCP. Isso é evidência de vendor, não de capital.",
+ "findings": [
+  {
+   "claim": "Decisão (2): o servidor MCP é resource server OAuth 2.1 e publica Protected Resource Metadata (RFC 9728) apontando authorization_servers. O authorization server pode ser separado, então o IdP do hub emite os tokens sem o Onion implementar um IdP.",
+   "confidence": "high",
+   "sources": [
+    "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization"
+   ],
+   "evidence": "Spec primária do MCP (tier 10), votos 3-0. Exige que o IdP do hub ofereça RFC 8414 ou OIDC Discovery. Com isso, o Logto que a VPS já usa em SSO (LibreChat, Vaultwarden) passa a ser candidato natural.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Decisão (2): o servidor precisa validar que o token foi emitido para ele (audience binding, RFC 8707) e rejeitar tokens de outra audiência. Token passthrough é proibido.",
+   "confidence": "high",
+   "sources": [
+    "https://modelcontextprotocol.io/specification/latest/basic/security_best_practices",
+    "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations"
+   ],
+   "evidence": "Duas páginas primárias da spec (tier 10, uma delas da revisão 2026-07-28), ambas 3-0. Consequência: a escolha do IdP do hub depende de ele suportar resource indicators/audience. Isso ainda não foi verificado para o Logto (ver openQuestions).",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Decisão (4): para ler o commit servido num repo privado, o servidor usa credencial própria (deploy key/token de leitura), nunca o token do usuário. Isso fecha a opção de proxy transparente de identidade até o forge.",
+   "confidence": "high",
+   "sources": [
+    "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations"
+   ],
+   "evidence": "Spec primária, 3-0. No desenho: um fetch periódico ou por requisição de um ref fixo do repo do hub com chave só de leitura. A resposta carrega {commit, ref, fetched_at}, que é a declaração de frescor.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Decisão (2): um MCP HTTP protegido precisa de um authorization server, e a recomendação é reaproveitar um IAM existente, não escrever um do zero.",
+   "confidence": "medium",
+   "sources": [
+    "https://aaif.io/blog/using-keycloak-as-an-mcp-authorization-server"
+   ],
+   "evidence": "Fonte de engenharia (tier 6), 3-0, ago/2026. Reforça a afirmação primária acima: o Onion não deve ser IdP, deve ser resource server.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Decisão (5): conectores remotos usam Streamable HTTP (recomendado) ou SSE. STDIO não é suportado em conectores, e o Streamable HTTP substituiu o HTTP+SSE como transporte remoto recomendado.",
+   "confidence": "medium",
+   "sources": [
+    "https://mer.vin/2026/08/local-vs-remote-mcp-claude-custom-connectors/",
+    "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/"
+   ],
+   "evidence": "Duas fontes tier 5, ambas 3-0. Stdio via proxy fica descartado para o time não técnico, que usa conector de Claude.ai/Desktop. O precedente do core (ops/mcp-onion-kg/server.py, 164 linhas de stdlib) já fala streamable-http, então o handler é aproveitável.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Decisão (5): a revisão 2026-07-28 da spec remove as sessões de protocolo e o header Mcp-Session-Id do Streamable HTTP. Um servidor só leitura pode ser stateless, com cada requisição aceita ou rejeitada sozinha.",
+   "confidence": "medium",
+   "sources": [
+    "https://ssojet.com/blog/mcp-authorization-spec-2026-07-28-what-changed"
+   ],
+   "evidence": "Fonte de vendor (tier 4), 3-0. Combina com o servidor do Onion: sem estado, réplica trivial por org, e o frescor fica declarado por resposta em vez de por sessão. Vale conferir na página primária da spec 2026-07-28 antes de selar.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Decisão (2): delegar a autenticação a um IdP próprio (bring your own) e receber o usuário já autenticado é um padrão viável em servidores MCP remotos.",
+   "confidence": "medium",
+   "sources": [
+    "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/"
+   ],
+   "evidence": "Tier 5, 3-0. É de mar/2025, anterior às revisões 2025-11 e 2026-07 da spec, então serve como sinal de viabilidade e não como contrato.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Decisão (3): no escopo por organização, a identidade do tenant vem de uma claim verificada do token, nunca de input de tool que o modelo possa influenciar.",
+   "confidence": "medium",
+   "sources": [
+    "https://wavect.io/blog/enterprise-mcp-authorization-architecture/"
+   ],
+   "evidence": "Tier 4, 3-0. No desenho: o mapeamento claim de org para raiz (repo/grafo) fica numa configuração do servidor. Com uma instância por org, o servidor só confere se a claim bate com a sua única raiz, e nenhuma tool recebe 'repo' ou 'org' como argumento.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Risco de cliente: no claude.ai, o OAuth de conector MCP remoto pode completar no provedor e mesmo assim falhar no cliente ('Authorization with the MCP server failed'). Isso foi relatado de abril a agosto de 2026.",
+   "confidence": "low",
+   "sources": [
+    "https://github.com/anthropics/claude-ai-mcp/issues/171"
+   ],
+   "evidence": "Issue de fórum (tier 4), votos 2-1. Pede um dogfood de ponta a ponta com o conector real do Claude.ai contra o Logto antes de prometer o piloto. É a materialização da doutrina de dogfood.",
+   "vote": "2-1"
+  }
+ ],
+ "caveats": "O que transfere do corpus (igual): o precedente ops/mcp-onion-kg/server.py (conferido nesta síntese) já é streamable-http em stdlib, só leitura por construção (git ls-files, kg-radar.sh, grep) e fail-closed: sem ONION_KG_TOKEN ele não sobe. Esse handler e a tríade D_TRIADE_MCP_POR_EIXO (onion-kg = eixo leitura) transferem.\nO que precisa ser desenhado (diferente): (a) a auth do precedente é X-Api-Key estática comparada por hmac. Não há PRM nem validação de audiência, logo ela não serve ao fluxo OAuth dos conectores. (b) A raiz é o próprio core (cwd), e o pedido é o grafo de um hub. (c) Nenhuma resposta declara o commit servido. (d) O consumidor era a bridge do LibreChat, e o pedido é o time não técnico em conectores.\nA pesquisa não cobre:\n- o suporte do Logto a RFC 8707 (resource indicators/audience) e a registro dinâmico de cliente ou client metadata;\n- o comportamento confirmado dos clientes ChatGPT e LibreChat como conectores OAuth de MCP remoto: nenhuma afirmação sobre eles sobreviveu;\n- se os conectores do Claude.ai exigem endpoint público. A afirmação nesse sentido foi refutada, mas isso não prova o contrário;\n- o custo medido de operar uma instância por org (TLS, rotação da deploy key, monitoramento);\n- o risco de vazamento de conteúdo do Company Brain por docs_search (filtragem de caminhos privados, REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente)).\nA recomendação de hospedar na família segue a postura de acoplamento do CLAUDE.md, a estratégia de peças em repos separados e o fato medido do desligamento por falta de consumidor. Ela é inferência de doutrina, não achado de fonte externa.",
+ "openQuestions": [
+  "O Logto da VPS emite tokens com audiência por API resource (RFC 8707) e expõe metadata RFC 8414/OIDC aceito pelos conectores do Claude.ai e do ChatGPT? Medir com o conector real antes de selar a decisão 2.",
+  "Qual é exatamente a raiz do piloto (repo do brain-granaai, qual ref) e quem guarda e rotaciona a deploy key só de leitura usada pelo servidor?",
+  "A peça separada vive em repo próprio da família (padrão de peça estratégica) ou dentro do repo do hub? E o core publica o contrato das tools como SSOT verificável (schema + selftest contra o kg-radar.sh)?",
+  "Como o servidor declara o frescor: campo {commit, ref, fetched_at} em toda resposta de tool, recusa explícita quando o fetch falha (fail-closed), ou serve o último commit com aviso?",
+  "O LibreChat ainda é cliente-alvo, depois de voltar ao estado base em 2026-08-27, e o seu cliente MCP suporta OAuth para MCP remoto?",
+  "Que filtro impede docs_search e kg_node de devolverem conteúdo core-privado ou de cliente sob NDA (paralelo à REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente))?",
+  "O que fazer com o resíduo do precedente desligado (systemd onion-vps-mcp-kg, regra ufw 3032, README do LibreChat que ainda o descreve): superar formalmente pela peça nova ou manter como molde?"
+ ],
+ "refuted": [
+  {
+   "claim": "A autorização no MCP é opcional; para transportes HTTP a spec recomenda (SHOULD) seguir o fluxo OAuth, e para stdio recomenda NÃO seguir, lendo credenciais do ambiente. Logo um servidor stdio via proxy não carrega OAuth por si; um MCP remoto HTTP para não técnicos precisa de OAuth para funcionar em conectores de cliente.",
+   "vote": "0-3",
+   "source": "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization",
+   "tier": 10
+  },
+  {
+   "claim": "O servidor MCP deve validar que o token foi emitido para ele (audience, RFC 8707) e não pode repassar o token do cliente a serviços a jusante. Isso exige um IdP que suporte resource/audience, e vale para qualquer servidor remoto do Company Brain.",
+   "vote": "0-3",
+   "source": "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization",
+   "tier": 10
+  },
+  {
+   "claim": "A spec exige que clientes MCP usem PKCE S256 e se recusem a prosseguir se o servidor de autorização não anunciar code_challenge_methods_supported; um IdP do hub sem esse metadado não funcionaria com conectores remotos (Claude.ai, ChatGPT, LibreChat).",
+   "vote": "0-3",
+   "source": "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations",
+   "tier": 10
+  },
+  {
+   "claim": "A spec 2025-11-25 traz Enterprise-Managed Authorization (Cross App Access) como extensão de autorização (não parte do núcleo), que devolve ao IdP corporativo o controle da autorização. Para um hub com IdP próprio é o caminho natural de auth por organização, se o cliente o suportar.",
+   "vote": "0-3",
+   "source": "https://aaronparecki.com/2025/11/25/1/sms:+15035678642",
+   "tier": 8
+  },
+  {
+   "claim": "Conectores remotos do Claude exigem servidor MCP alcançável pela internet pública, pois a chamada parte da nuvem da Anthropic; rede privada/VPN não funciona e túneis ainda não se aplicam aos apps do Claude (ago/2026).",
+   "vote": "1-2",
+   "source": "https://mer.vin/2026/08/local-vs-remote-mcp-claude-custom-connectors/",
+   "tier": 5
+  },
+  {
+   "claim": "A spec do MCP 2026-07-28 (release candidate em 18/06/2026) exige que servidores MCP implementem OAuth 2.0 Protected Resource Metadata (RFC 9728), tornando inadequado um MCP remoto sem autenticação.",
+   "vote": "0-3",
+   "source": "https://workos.com/blog/mcp-2026-spec-agent-authentication",
+   "tier": 5
+  },
+  {
+   "claim": "Um servidor remoto que hoje aceita conexões sem autenticação deve adotar OAuth 2.1; a opção 'nenhum em rede privada' conflita com a direção da spec.",
+   "vote": "0-3",
+   "source": "https://workos.com/blog/mcp-2026-spec-agent-authentication",
+   "tier": 5
+  },
+  {
+   "claim": "A spec 2026-07-28 traz a extensão Enterprise-Managed Authorization, que permite ao administrador controlar, por meio de um IdP existente, quais servidores MCP a equipe acessa. Isso favorece a opção OIDC com o IdP que o hub já tem para a autenticação por organização.",
+   "vote": "0-3",
+   "source": "https://startwithidentity.com/blog/2026-07-28-mcp-specification-ships-enterprise-managed-authorization/",
+   "tier": 5
+  },
+  {
+   "claim": "Um servidor MCP remoto deve ser apenas resource server OAuth que valida tokens, nunca o authorization server que os emite, o que implica reutilizar o IdP que o hub já tem.",
+   "vote": "0-3",
+   "source": "https://wavect.io/blog/enterprise-mcp-authorization-architecture/",
+   "tier": 4
+  },
+  {
+   "claim": "O conector remoto do claude.ai exige OAuth com PKCE S256 e usa a callback https://claude.ai/api/mcp/auth_callback. Os workarounds relatados foram o escopo correto (mcp_api mais refresh_token/offline_access), a URL do endpoint GA com o segmento platform/ e evitar o v1-beta.2.",
+   "vote": "0-3",
+   "source": "https://github.com/anthropics/claude-ai-mcp/issues/171",
+   "tier": 4
+  },
+  {
+   "claim": "Na revisão 2026-07-28 a autorização deve ir em toda requisição HTTP do cliente ao servidor, e os clientes devem guardar as credenciais persistidas por identificador do emissor (SEP-2352). Isso sustenta autenticação por organização, com um IdP por org.",
+   "vote": "1-2",
+   "source": "https://ssojet.com/blog/mcp-authorization-spec-2026-07-28-what-changed",
+   "tier": 4
+  },
+  {
+   "claim": "O mcp-auth-gateway envolve servidores MCP somente stdio e os expõe por Streamable HTTP/SSE para clientes remotos, o que cobre o transporte (decisão 5) sem o framework reescrever o servidor.",
+   "vote": "0-3",
+   "source": "https://github.com/nicknikolakakis/mcp-auth-gateway",
+   "tier": 3
+  },
+  {
+   "claim": "O gateway implementa OAuth 2.1 conforme a spec de autorização do MCP (PKCE, Dynamic Client Registration, refresh) com OIDC configurável por YAML, logo aceita o IdP que o hub já tem (decisão 2).",
+   "vote": "0-3",
+   "source": "https://github.com/nicknikolakakis/mcp-auth-gateway",
+   "tier": 3
+  },
+  {
+   "claim": "Todo servidor MCP customizado acaba implementando o próprio OAuth, pois o protocolo não padronizou OAuth, refresh de token nem isolamento de tenant; isso é custo recorrente de um MCP remoto autônomo.",
+   "vote": "0-3",
+   "source": "https://truto.one/blog/build-vs-buy-the-hidden-costs-of-custom-mcp-servers/",
+   "tier": 3
+  }
+ ],
+ "unverified": [],
+ "notVerifiedByBudget": [
+  {
+   "claim": "O registro de cliente prioriza pré-registro, depois Client ID Metadata Documents (SHOULD), e DCR (RFC 7591) é apenas MAY por compatibilidade retroativa. Um IdP corporativo sem DCR pode exigir pré-registro dos conectores (Claude.ai, ChatGPT, LibreChat) ou suporte a CIMD.",
+   "source": "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A spec exige PKCE S256 e que o cliente recuse prosseguir se o servidor de autorização não anunciar code_challenge_methods_supported. Um IdP de hub que não anuncie isso será rejeitado por clientes conformes. Escopos podem limitar o acesso (princípio do menor privilégio, ex.: scope de leitura), com 403 insufficient_scope para escalonamento.",
+   "source": "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "OAuth é opcional, mas fortemente recomendado para qualquer coisa não pública; cada usuário autoriza individualmente e, em Team/Enterprise, só Organization Owners adicionam o conector e os membros conectam individualmente.",
+   "source": "https://mer.vin/2026/08/local-vs-remote-mcp-claude-custom-connectors/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Pelo caminho de conector na API só chamadas de ferramenta MCP são expostas (prompts e resources não), então um MCP só leitura deve entregar tudo via tools.",
+   "source": "https://mer.vin/2026/08/local-vs-remote-mcp-claude-custom-connectors/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Resultados de ferramentas podem conter texto adversarial, relevante para servidor que devolve dados do Company Brain a usuários não técnicos; recomenda-se desabilitar ferramentas com escrita.",
+   "source": "https://mer.vin/2026/08/local-vs-remote-mcp-claude-custom-connectors/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Para muitos servidores e tenants, um gateway é a resposta usual, por centralizar isolamento e auditoria.",
+   "source": "https://wavect.io/blog/enterprise-mcp-authorization-architecture/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A autorização do MCP não se aplica a servidores STDIO (que leem credenciais do ambiente) e o MCP não tem fluxo SAML nativo, então um IdP só-SAML exige ponte OAuth/OIDC.",
+   "source": "https://wavect.io/blog/enterprise-mcp-authorization-architecture/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Em transporte HTTP, a spec exige o bearer token em toda requisição, que é autocontida; isso favorece servidor sem estado.",
+   "source": "https://wavect.io/blog/enterprise-mcp-authorization-architecture/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A versão 2026-07-28 da spec do MCP é stateless e sem sessões de protocolo. Estado entre requisições vira handle explícito, que deve ser vinculado ao usuário autenticado. Um servidor somente leitura sem estado de handle evita essa superfície de ataque.",
+   "source": "https://modelcontextprotocol.io/specification/latest/basic/security_best_practices",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Um servidor MCP que faz proxy para uma API de terceiros com client ID estático e registro dinâmico de clientes precisa de consentimento por cliente. Se o MCP do Onion só autenticar no IdP do hub e não repassar a API de terceiros, essa classe de ataque (confused deputy) não se aplica.",
+   "source": "https://modelcontextprotocol.io/specification/latest/basic/security_best_practices",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A spec recomenda escopos de menor privilégio, progressivos, com um conjunto inicial só de operações de leitura e descoberta. Isso se encaixa num MCP só leitura (kg_list, kg_radar, kg_node, docs_search) com escopo mínimo por organização, sem escopos curinga.",
+   "source": "https://modelcontextprotocol.io/specification/latest/basic/security_best_practices",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Para um servidor pensado para rodar localmente, a spec recomenda stdio, que limita o acesso ao cliente MCP. Se o transporte for HTTP, deve exigir token de autorização ou socket de domínio Unix. Num proxy que gerencia stdio, o risco é escalada para execução de comandos, o que desfavorece 'stdio via proxy' para o time não técnico.",
+   "source": "https://modelcontextprotocol.io/specification/latest/basic/security_best_practices",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Clientes que só suportam conexões locais (Claude Desktop, Cursor, Windsurf) acessam servidores remotos via adaptador mcp-remote (proxy stdio), em 2025; o post não cobre Claude.ai connectors, ChatGPT nem LibreChat.",
+   "source": "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A implementação de referência do post acopla o servidor à plataforma Cloudflare (Workers, Durable Objects por sessão, KV), e o controle de acesso mostrado é por usuário (allowlist), não por repositório/grafo ou organização; logo não responde escopo por raiz nem frescor por commit.",
+   "source": "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Os tokens são vinculados ao servidor (audience), não ao tenant: o isolamento entre organizações fica a cargo da aplicação, o que favorece uma instância por org ou checagem de escopo por chamada.",
+   "source": "https://workos.com/blog/mcp-2026-spec-agent-authentication",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Sem Mcp-Session-Id na spec nova, o servidor é stateless e qualquer instância atende qualquer requisição, viabilizando deploy atrás de load balancer comum.",
+   "source": "https://workos.com/blog/mcp-2026-spec-agent-authentication",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Clientes podem cachear tools/list via ttlMs, o que afeta a lista de ferramentas e não o frescor do conteúdo do Brain; o commit servido deve ser declarado nas respostas das ferramentas.",
+   "source": "https://workos.com/blog/mcp-2026-spec-agent-authentication",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A spec MCP 2026-07-28 exige que servidores de autorização devolvam o parâmetro `iss` e que os clientes o validem, com credenciais de cliente vinculadas ao servidor de autorização que as emitiu.",
+   "source": "https://startwithidentity.com/blog/2026-07-28-mcp-specification-ships-enterprise-managed-authorization/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Servidores MCP internos construídos recentemente costumam não implementar esse endurecimento de autorização e tendem a ter tokens amplos. Um servidor MCP do Onion construído agora herdaria esse risco, a menos que implemente a spec.",
+   "source": "https://startwithidentity.com/blog/2026-07-28-mcp-specification-ships-enterprise-managed-authorization/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O isolamento do gateway é por usuário autenticado (um processo MCP por usuário), não por organização nem por raiz de repo. Escopo por org (decisão 3) teria de vir de instância por org ou do servidor embrulhado.",
+   "source": "https://github.com/nicknikolakakis/mcp-auth-gateway",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O gateway roda em Kubernetes ou nuvem (imagem distroless, health probes), o que sugere hospedagem pelo hub e não pelo core. A fonte é um repo de adoção mínima (1 estrela, 3 commits), então o custo de manter e o risco de dependência pesam.",
+   "source": "https://github.com/nicknikolakakis/mcp-auth-gateway",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A página não trata de somente leitura, de frescor por commit nem de token por org ou rede privada. Essas decisões (4 e parte da 2) ficam com o servidor embrulhado ou com a camada do Onion.",
+   "source": "https://github.com/nicknikolakakis/mcp-auth-gateway",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O mantenedor do claude-ai-mcp fechou a issue como 'not planned' em 13/05/2026, atribuindo a falha à configuração do ambiente Salesforce e não ao cliente Claude. Quem for expor um MCP remoto não pode contar com o cliente para diagnosticar falhas de autorização do lado do servidor ou do IdP.",
+   "source": "https://github.com/anthropics/claude-ai-mcp/issues/171",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Um servidor MCP stdio local (@salesforce/mcp no Claude Desktop) funcionou nas mesmas orgs em que o conector remoto falhava. Isso mostra que stdio local é alternativa, mas exige instalação em cada máquina, o que é ruim para um time não técnico.",
+   "source": "https://github.com/anthropics/claude-ai-mcp/issues/171",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Mesmo um servidor MCP remoto só de leitura (sobject-reads) falhou na autorização do conector claude.ai em um relato de 18/06/2026. Um caso com Snowflake falhou da mesma forma. Separar leitura de escrita não evita os problemas de autenticação do conector.",
+   "source": "https://github.com/anthropics/claude-ai-mcp/issues/171",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A spec MCP 2025-11-25 introduz Client ID Metadata Documents (CIMD), em que o cliente se identifica por uma URL que ele controla, o que substitui o registro dinâmico (DCR) e identifica o cliente, não o usuário nem a organização.",
+   "source": "https://aaronparecki.com/2025/11/25/1/sms:+15035678642",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Com a autorização gerida pelo IdP, a revogação do acesso de IA a uma ferramenta interna fica num só lugar, o IdP da empresa, o que favorece reutilizar o IdP do hub em vez de token por org.",
+   "source": "https://aaronparecki.com/2025/11/25/1/sms:+15035678642",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O autor considera o Dynamic Client Registration (DCR) complexo e arriscado para ambos os lados, e a spec nova tenta evitá-lo.",
+   "source": "https://aaronparecki.com/2025/11/25/1/sms:+15035678642",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O registro dinâmico de cliente (DCR) foi depreciado nesta revisão (PR #2858). Os Client ID Metadata Documents são portáveis entre servidores de autorização, o que favorece um servidor que atende várias orgs com IdPs distintos.",
+   "source": "https://ssojet.com/blog/mcp-authorization-spec-2026-07-28-what-changed",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Os servidores devem implementar o RPC server/discover para anunciar versões do protocolo, capacidades e identidade. O handshake foi removido (SEP-2575), e a versão do protocolo vai no header MCP-Protocol-Version no Streamable HTTP.",
+   "source": "https://ssojet.com/blog/mcp-authorization-spec-2026-07-28-what-changed",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A resumabilidade de stream foi removida do Streamable HTTP: um stream de resposta quebrado perde a requisição em andamento e o cliente reemite com novo ID. Convém que as tools de consulta sejam idempotentes e curtas.",
+   "source": "https://ssojet.com/blog/mcp-authorization-spec-2026-07-28-what-changed",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O authorization server pode ficar no mesmo host do servidor MCP ou ser operado separadamente, o que sustenta separar auth do servidor de leitura do Onion.",
+   "source": "https://aaif.io/blog/using-keycloak-as-an-mcp-authorization-server",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Autenticar o usuário não implica autorizar todas as operações, o que justifica escopo por ferramenta/leitura mesmo com login feito.",
+   "source": "https://aaif.io/blog/using-keycloak-as-an-mcp-authorization-server",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Keycloak 26.7 oficial não suporta RFC 8707 Resource Indicators, o que limita o escopo por recurso (raiz/org) e exige workaround com escopos OAuth 2.0.",
+   "source": "https://aaif.io/blog/using-keycloak-as-an-mcp-authorization-server",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Todos os endpoints do servidor de autorização devem ser HTTPS e redirect URIs devem ser localhost ou HTTPS, o que descarta 'nenhum auth em rede privada' como caminho compatível com a spec para clientes de conector remoto que dependem do fluxo OAuth.",
+   "source": "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Proxies MCP com client ID estático devem obter consentimento do usuário para cada cliente registrado dinamicamente (mitigação de confused deputy), custo adicional se o Onion hospedar um proxy de autorização multi-org em vez de delegar ao IdP do hub.",
+   "source": "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O MCP não padronizou refresh de token, isolamento de tenant e rate limits, então um servidor multi-org precisa construir tenancy por conta própria.",
+   "source": "https://truto.one/blog/build-vs-buy-the-hidden-costs-of-custom-mcp-servers/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Quando o vendor do upstream não suporta DCR, o servidor MCP próprio precisa atuar como proxy de autorização, aumentando a superfície a manter.",
+   "source": "https://truto.one/blog/build-vs-buy-the-hidden-costs-of-custom-mcp-servers/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A fonte (um vendor que vende MCP gerenciado) estima que integração própria custa de 50 mil a 150 mil dólares por integração por ano e uma taxa de manutenção anual de 15 a 30% do desenvolvimento inicial. É número de fornecedor interessado, sem metodologia, e não se aplica diretamente a um servidor read-only pequeno.",
+   "source": "https://truto.one/blog/build-vs-buy-the-hidden-costs-of-custom-mcp-servers/",
+   "reason": "orçamento maxVerify"
+  }
+ ],
+ "budgetDropped": [
+  {
+   "url": "https://den.dev/blog/mcp-november-authorization-spec/",
+   "title": "den.dev: MCP November authorization spec",
+   "angle": "Spec de autorização do MCP e IdP do hub",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://astrix.security/learn/blog/mcps-first-year-the-missing-security-pieces-are-finally-falling-into-place-part1/",
+   "title": "Astrix: primeiro ano do MCP, peças de segurança (fornecedor de segurança)",
+   "angle": "Spec de autorização do MCP e IdP do hub",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://workos.com/blog/mcp-resource-indicators",
+   "title": "WorkOS: MCP e Resource Indicators (RFC 8707)",
+   "angle": "Spec de autorização do MCP e IdP do hub",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://glama.ai/mcp/servers/@cameronsjo/mouse-mcp/blob/e21ff429639a2244e3de8100084fed02fe573a53/docs/roadmap/authorization-server-comparison.md",
+   "title": "Comparação de authorization servers para MCP (notas de um dev)",
+   "angle": "Spec de autorização do MCP e IdP do hub",
+   "relevance": "low"
+  },
+  {
+   "url": "https://zuplo.com/learn/mcp/compatibility",
+   "title": "MCP compatibility matrix (Zuplo)",
+   "angle": "Clientes não técnicos e conector remoto",
+   "relevance": "high"
+  },
+  {
+   "url": "https://sunpeak.ai/blogs/how-claude-connectors-work",
+   "title": "How Claude connectors work",
+   "angle": "Clientes não técnicos e conector remoto",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.kadoa.com/changelog/2026-kadoa-mcp-remote",
+   "title": "Kadoa MCP Server — ChatGPT & Claude.ai Support",
+   "angle": "Clientes não técnicos e conector remoto",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://workos.com/blog/what-is-mcp-authorization",
+   "title": "What is MCP authorization (WorkOS)",
+   "angle": "Clientes não técnicos e conector remoto",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://mojoauth.com/blog/how-mcp-authorization-actually-works-oauth-2-1-resource-servers-and-resource-indicators",
+   "title": "How MCP Authorization Actually Works: OAuth 2.1, Resource Servers, and Resource Indicators (MojoAuth)",
+   "angle": "MCP somente leitura sobre repositório git, frescor e multi-tenant",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.descope.com/blog/post/mcp-auth-spec",
+   "title": "Descope: MCP auth spec",
+   "angle": "MCP somente leitura sobre repositório git, frescor e multi-tenant",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://glama.ai/mcp/servers/@basicmachines-co/basic-memory/blob/272a983709b457a3b6323268b711af8f10a00ab4/specs/SPEC-14-%20Cloud%20Git%20Versioning%20&%20GitHub%20Backup.md",
+   "title": "SPEC-14 Cloud Git Versioning & GitHub Backup (basic-memory)",
+   "angle": "MCP somente leitura sobre repositório git, frescor e multi-tenant",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://hub.docker.com/hardened-images/catalog/dhi/git-mcp/guides",
+   "title": "Git MCP Server, guia de imagem endurecida (Docker)",
+   "angle": "MCP somente leitura sobre repositório git, frescor e multi-tenant",
+   "relevance": "low"
+  },
+  {
+   "url": "https://labs.cloudsecurityalliance.org/research-rb/csa-whitepaper-mcp-security-agentic-attack-surface-20260516/",
+   "title": "CSA whitepaper (mai/2026): Tool Poisoning e Confused Deputy",
+   "angle": "Segurança e limitações de MCP remoto de conhecimento corporativo",
+   "relevance": "high"
+  },
+  {
+   "url": "https://mcp.directory/blog/mcp-security-200000-exposed-servers-owasp-mcp-top-10-cves",
+   "title": "MCP Security 2026: 200.000 servidores expostos, OWASP MCP Top 10 e CVEs (diretório, secundária)",
+   "angle": "Segurança e limitações de MCP remoto de conhecimento corporativo",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://docs.crewai.com/v1.15.4/en/mcp/security",
+   "title": "CrewAI docs: MCP security (blog de fornecedor concorrente, marcado como tal)",
+   "angle": "Segurança e limitações de MCP remoto de conhecimento corporativo",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://radar.apideck.com/blog/understanding-the-security-landscape-of-mcp",
+   "title": "Apideck: Understanding the security landscape of MCP (blog de fornecedor, marcado como tal)",
+   "angle": "Segurança e limitações de MCP remoto de conhecimento corporativo",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://obot.ai/blog/mcp-authentication-harder-than-it-looks/",
+   "title": "Why MCP Authentication Is Harder Than It Looks (Obot, vendor)",
+   "angle": "Contrarian: alternativas ao MCP próprio",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://apichangelog.substack.com/p/enterprise-mcp-authorization",
+   "title": "Enterprise MCP Authorization (API Changelog)",
+   "angle": "Contrarian: alternativas ao MCP próprio",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://home.mlops.community/public/blogs/mcp-2026-07-28-stateless-core-enterprise-authorization-and-sdk-betas",
+   "title": "MCP 2026-07-28: Stateless core, enterprise authorization, and SDK betas",
+   "angle": "claude-code-atual",
+   "relevance": "high"
+  },
+  {
+   "url": "https://support.claude.com/en/articles/11503834",
+   "title": "Anthropic: conectores customizados via servidores MCP remotos",
+   "angle": "claude-code-atual",
+   "relevance": "high"
+  },
+  {
+   "url": "https://zuplo.com/learn/mcp/compatibility/clients/claude-code.md",
+   "title": "Zuplo: compatibilidade do Claude Code com MCP",
+   "angle": "claude-code-atual",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.speakeasy.com/changelog/release/1.1.0",
+   "title": "Speakeasy changelog 2026-07-31: OAuth sem DCR",
+   "angle": "claude-code-atual",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://waxell.ai/blog/mcp-server-authentication-optional-by-design",
+   "title": "Waxell: MCP server authentication optional by design",
+   "angle": "claude-code-atual",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://mcp.directory/blog/mcp-enterprise-managed-authorization-2026",
+   "title": "MCP Enterprise-Managed Authorization, Explained (2026)",
+   "angle": "mercado-capital",
+   "relevance": "high"
+  },
+  {
+   "url": "https://letsdatascience.com/news/manufact-raises-63m-to-expand-mcp-infrastructure-d0ca67ef",
+   "title": "Manufact (mcp-use) raises $6.3M seed led by Peak XV for MCP infrastructure",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://mezha.net/eng/bukvy/ed926ce3_runlayer_and_rippling/",
+   "title": "Runlayer and Rippling withdraw MCP gateway lawsuits; Rippling launches rival product",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.permit.io/blog/mcp-auth-vs-tool-call-authorization-2026-07-28",
+   "title": "MCP Auth vs Tool-Call Authorization After the 2026-07-28 Spec",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.mintmcp.com/blog/gateways-ai-startups-with-mcp",
+   "title": "MintMCP: gateways for AI startups with MCP",
+   "angle": "mercado-capital",
+   "relevance": "low"
+  },
+  {
+   "url": "https://github.com/shigechika/mcp-stdio",
+   "title": "shigechika/mcp-stdio",
+   "angle": "repos-trajetoria",
+   "relevance": "high"
+  },
+  {
+   "url": "https://github.com/asashiki/mcp-switch",
+   "title": "asashiki/mcp-switch",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/ivantacca/anytype-mcp-remote-gateway",
+   "title": "ivantacca/anytype-mcp-remote-gateway",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/sheldon904/sparql-mcp",
+   "title": "sheldon904/sparql-mcp",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/ProfX777/quant-state-mcp",
+   "title": "ProfX777/quant-state-mcp",
+   "angle": "repos-trajetoria",
+   "relevance": "low"
+  },
+  {
+   "url": "https://www.thoughtworks.com/radar/platforms/model-context-protocol-mcp",
+   "title": "Thoughtworks Radar: Model Context Protocol (MCP)",
+   "angle": "analistas",
+   "relevance": "high"
+  },
+  {
+   "url": "https://workos.com/blog/everything-your-team-needs-to-know-about-mcp-in-2026",
+   "title": "WorkOS: Everything your team needs to know about MCP in 2026",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/skyhook-io/radar/pull/1920",
+   "title": "skyhook-io/radar PR #1920: OAuth para clientes OIDC remotos, endpoint MCP só leitura",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.truefoundry.com/blog/truefoundry-and-the-mcp-gateway-revolution-insights-from-gartners-2025-report",
+   "title": "TrueFoundry: MCP gateways segundo o relatório Gartner 2025",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://obot.ai/blog/the-13-best-mcp-gateways-for-enterprise-teams/",
+   "title": "Obot: 13 melhores gateways MCP para equipes (2026)",
+   "angle": "analistas",
+   "relevance": "low"
+  },
+  {
+   "url": "https://github.com/anthropics/claude-ai-mcp/issues/506",
+   "title": "claude-ai-mcp #506: MCP server URL connector failure (Entra-protected server)",
+   "angle": "comunidade",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.kapa.ai/blog/remote-mcp-servers-hosting-authentication-best-practices",
+   "title": "Kapa.ai: Remote MCP Servers - Hosting, Authentication and Best Practices (Mar 2026)",
+   "angle": "comunidade",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/hyprmcp/jetski",
+   "title": "HyprMCP Jetski: auth, logs and analytics proxy in front of MCP servers",
+   "angle": "comunidade",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/Klavis-AI/klavis",
+   "title": "Klavis AI: open-source hosted MCP with OAuth and multi-tenancy",
+   "angle": "comunidade",
+   "relevance": "low"
+  },
+  {
+   "url": "https://github.com/twentyhq/twenty/issues/19847",
+   "title": "twentyhq/twenty #19847: MCP connector bug report",
+   "angle": "comunidade",
+   "relevance": "low"
+  }
+ ],
+ "decision": {
+  "options": [
+   "A: Reativar o precedente (ops/mcp-onion-kg) apontado para o clone do brain-granaai, consumido só pelo LibreChat da VPS (SSO Logto já existente), bind privado e token estático — sem OAuth no MCP, sem exposição pública",
+   "B: MCP remoto público por streamable-http stateless, como resource server OAuth 2.1 (PRM RFC 9728) com o Logto como authorization server e claim de org obrigatória — uma instância por org — para Claude.ai/Desktop e ChatGPT",
+   "C: Gateway de terceiros (Pomerium/agentgateway/Cloudflare Access) na frente de um servidor MCP sem auth própria",
+   "D: Padrão Cloudflare Workers com o servidor atuando como AS proxy para o IdP do hub (rejeitada: acoplamento e confused deputy)",
+   "E: Multi-tenant único com raiz escolhida por claim (adiada até haver mais de um hub)",
+   "F: Não fazer MCP — manter o segundo leitor JS do corpus (paliativo atual)"
+  ],
+  "objections": [
+   {
+    "target": "Achado 1: MCP server como resource server com PRM (RFC 9728) e o IdP do hub como authorization server separado",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A mecânica está certa (spec 2025-11-25, tier 10). A premissa 'o IdP que o hub já tem' NÃO foi medida para o brain-granaai. O corpus (d) registra o Logto da VPS (SSO do LibreChat e do Vaultwarden) com CADASTRO ABERTO INTENCIONAL. Com isso, qualquer pessoa que se cadastre recebe um token válido para a audiência do MCP. Autenticar não é autorizar: o gate tem que ser uma claim de organização ou de papel atribuída pelo admin (Logto Organizations/RBAC), e não 'ter token'. Até alguém medir que o Logto emite token com resource indicator e claim de org para esse recurso, a decisão (2) fica com premissa não verificada."
+   },
+   {
+    "target": "Achado 2: proibição de token passthrough obriga a validar a audiência",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Está correto na best-practices da spec (tier 10). A ressalva é de enquadramento: o achado junta duas regras diferentes, validar aud e não repassar a jusante. No desenho provável, o servidor lê um clone git local e não chama API a jusante com o token do usuário, então passthrough não é risco vivo. Validar aud é o que sobra, e isso vale. O achado fica de pé."
+   },
+   {
+    "target": "Achado 3: a spec 2026-07-28 exige audience binding (RFC 8707)",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A 2026-07-28 saiu como RC em 18/06/2026. Ninguém mediu quais clientes (Claude.ai/Desktop, ChatGPT, LibreChat v0.8.8-rc1 da VPS) já negociam essa versão. Um servidor escrito só para a 2026-07-28 corre o risco de recusar clientes em 2025-06-18/2025-11-25. Restrição sobrevivente: aceitar a negociação de várias versões de protocolo. O audience binding já valia desde a 2025-06-18, então a conclusão sobre o IdP se mantém, mas atribuir a obrigação à 2026-07-28 sozinha é impreciso."
+   },
+   {
+    "target": "Achado 4: credencial própria para upstream fecha o proxy de identidade até o repo",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Correto e coerente com o precedente: ops/mcp-onion-kg/server.py roda git e o radar no clone local (subprocess cwd=REPO), sem upstream com token do usuário. Consequência a registrar, sem derrubar o achado: o servidor vira a autoridade de controle de acesso ao repo. A permissão por usuário do forge se perde, então o escopo (3) tem que ser imposto pelo servidor, e o fetch usa deploy key read-only própria."
+   },
+   {
+    "target": "Achado 5: não implementar o authorization server, reaproveitar IAM existente",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Na direção está certo, mas falta o requisito que decide se funciona: o IdP precisa servir os clientes reais. Isso exige DCR (RFC 7591), CIMD ou pré-registro por cliente, com redirect URIs de claude.ai/claude.com e ChatGPT. Não foi verificado se o Logto da VPS tem DCR/CIMD. O descarte orçamentário sobre CIMD/DCR, que ninguém olhou, é exatamente essa lacuna. A fonte é tier 6, um blog sobre Keycloak, e não o Logto."
+   },
+   {
+    "target": "Achado 6: conectores aceitam Streamable HTTP ou SSE, não STDIO",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Bate com a doc de conectores da Anthropic e com o achado 7. Fica de pé. Detalhe: SSE é legado (achado 7), então a decisão (5) descarta SSE e stdio via proxy e fica só com streamable-http."
+   },
+   {
+    "target": "Achado 7: Streamable HTTP substitui HTTP+SSE (mar/2025)",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Fato de spec (revisão 2025-03-26), sem contestação. O precedente local já é streamable-http em stdlib (server.py l.8). O achado fica de pé."
+   },
+   {
+    "target": "Achado 8: Cloudflare 'bring your own IdP' como base para autenticar com o IdP do hub",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "No padrão do workers-oauth-provider da Cloudflare, o Worker vira ele próprio authorization server e faz proxy OAuth para o IdP upstream. Isso contradiz o achado 5 (não ser AS) e reabre o confused deputy (a spec trata o proxy com client ID estático + DCR, e o descarte B10 diz que isso só não se aplica SE o Onion não fizer proxy). Também acopla a Workers/Durable Objects/KV, e o descarte B14 mostra controle por usuário (allowlist), sem escopo por repo. Pela postura de acoplamento (acoplar só quando a capacidade não existe fora), não serve de base."
+   },
+   {
+    "target": "Achado 9: identidade do tenant vem de claim verificada, nunca de input de ferramenta",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "Princípio sólido, mesmo com tier 4. É reforçado pelo B15 (o token amarra ao servidor, não ao tenant). Implicação concreta para o precedente: kg_radar recebe 'grafo' como argumento do modelo. Num multi-tenant, a raiz nunca pode vir do argumento, só da claim ou da instância. O achado fica de pé."
+   },
+   {
+    "target": "Achado 10: issue anthropics/claude-ai-mcp #171 (OAuth falha no claude.ai)",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Os votos foram 2-1 e o caso é específico do Salesforce Hosted MCP. O próprio descarte D10 relata workarounds de configuração do provedor (escopo mcp_api+refresh_token, endpoint GA com platform/). Não generaliza para 'o claude.ai falha com IdP próprio'. O que se pode tirar daí é uma restrição, não um veredito: o fluxo OAuth tem que ser dogfoodado ao vivo em cada cliente-alvo antes de declarar o suporte."
+   },
+   {
+    "target": "Achado 11: a 2026-07-28 remove sessões, o servidor pode ser stateless",
+    "kind": "finding",
+    "survives": false,
+    "evidence": "A conclusão (stateless) vale com qualquer versão: na 2025-03-26/06-18 o Mcp-Session-Id já era MAY do servidor, e o precedente não usa sessão. A fonte tier 4 sobre o RC não é necessária para sustentar o achado. Ele fica de pé."
+   },
+   {
+    "target": "D1: autorização opcional; HTTP SHOULD; remoto para não técnicos PRECISA de OAuth para funcionar em conectores",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "A primeira metade é spec literal. A conclusão é falsa porque os conectores remotos do Claude aceitam servidor authless. O que impõe OAuth é a sensibilidade do Company Brain mais a exposição pública (D5), e não o funcionamento do conector. O descarte é legítimo."
+   },
+   {
+    "target": "D2: validar audiência (RFC 8707), não repassar o token, IdP com resource/audience",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É inconsistente: o mesmo conteúdo foi CONFIRMADO 3-0 nos achados 2 e 3 (tier 10). Refutar aqui e confirmar lá é ruído de rodada. Faltou reconciliar os dois. A afirmação fica de pé."
+   },
+   {
+    "target": "D3: PKCE S256 e cliente recusa se o AS não anunciar code_challenge_methods_supported",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "A spec 2025-11-25 diz literalmente que, sem code_challenge_methods_supported, o cliente MUST refuse to proceed. A parte de spec é verdadeira. O que não foi medido é se Claude.ai/ChatGPT/LibreChat aplicam isso na prática e se o discovery do Logto publica o campo. Faltou ler o .well-known do Logto da VPS (um curl resolve)."
+   },
+   {
+    "target": "D4: Enterprise-Managed Authorization (Cross App Access) como caminho natural de auth por org",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "A própria afirmação é condicional ('se o cliente suportar'). A extensão depende de IdP com ID-JAG (padrão Okta), coisa que o Logto da VPS não tem, e de cliente enterprise. Para o piloto brain-granaai a condição não se cumpre. O descarte é legítimo pelo escopo, mas a evidência de suporte nos clientes não foi citada pela rodada."
+   },
+   {
+    "target": "D5: conectores do Claude exigem servidor alcançável pela internet pública (a chamada sai da nuvem da Anthropic); VPN e rede privada não funcionam",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Isso consta na documentação de conectores da Anthropic: a conexão parte da infraestrutura da Anthropic, que publica faixas de IP de saída para allowlist. O ChatGPT tem o mesmo modelo (servidor alcançável pela OpenAI). Este descarte decide a opção 'nenhum em rede privada': ela só existe para o LibreChat self-hosted, e para Claude.ai/ChatGPT é inviável. Faltou ler a página de conectores remotos da Anthropic, que é primária."
+   },
+   {
+    "target": "D6: 2026-07-28 exige PRM, logo sem autenticação é inadequado",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "PRM só é obrigatório para quem implementa autorização, e a autorização continua opcional. O descarte é legítimo."
+   },
+   {
+    "target": "D7: 'nenhum em rede privada' conflita com a direção da spec",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "A spec não obriga. A conclusão (não usar 'nenhum') se sustenta por outro caminho, D5 mais a sensibilidade do dado, e não por exigência da spec. O descarte é legítimo como afirmação de spec."
+   },
+   {
+    "target": "D8: Enterprise-Managed Authorization na 2026-07-28 favorece OIDC com o IdP do hub",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "É o mesmo caso do D4: depende de IdP com ID-JAG e de cliente enterprise, que o piloto não tem."
+   },
+   {
+    "target": "D9: o servidor deve ser só resource server, nunca o AS",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "A spec permite AS co-hospedado com o servidor MCP, então o 'nunca' é falso. A recomendação prática do achado 5 continua de pé por custo e risco, não por proibição."
+   },
+   {
+    "target": "D10: conector do claude.ai exige PKCE S256 e callback https://claude.ai/api/mcp/auth_callback; workarounds de escopo e endpoint",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Os workarounds são do Salesforce. A callback e o PKCE são justamente o que precisa entrar no pré-registro do cliente no Logto se não houver DCR (registrar também a variante claude.com). Faltou separar o específico do provedor do geral do cliente. A parte geral sobrevive como item de configuração."
+   },
+   {
+    "target": "D11: credenciais por emissor (SEP-2352) sustentam um IdP por org",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Credencial guardada por emissor no cliente não implica um IdP por org. O salto inferencial é legítimo de cortar."
+   },
+   {
+    "target": "D12: mcp-auth-gateway envolve servidor stdio e expõe HTTP",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Não se aplica: o precedente ops/mcp-onion-kg/server.py já é streamable-http nativo em stdlib, então não há servidor stdio a envolver. A fonte é tier 3."
+   },
+   {
+    "target": "D13: gateway com OAuth 2.1 e OIDC por YAML aceita o IdP do hub",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Foi cortado sem medir maturidade e sem comparar com gateways estabelecidos que fazem a parte de resource server MCP (Pomerium com suporte MCP, agentgateway, Cloudflare Access para MCP). Para o custo de manter, a pergunta 'Onion escreve a validação de JWT/PRM ou põe um gateway na frente' ficou sem resposta. A fonte tier 3 isolada justifica cortar ESSE projeto, não a classe."
+   },
+   {
+    "target": "D14: todo servidor customizado implementa OAuth próprio porque o protocolo não padronizou",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "É falso: a autorização OAuth está na spec desde 2025-03-26, e a 2025-06-18 separou RS de AS. O descarte é legítimo."
+   },
+   {
+    "target": "B1 (orçamento): ordem de registro pré-registro > CIMD (SHOULD) > DCR (MAY); IdP sem DCR exige pré-registro",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Este item decide se o Logto serve (achado 5). Faltou verificar o suporte do Logto a DCR/CIMD e se Claude.ai/ChatGPT aceitam client_id pré-registrado. O Claude.ai tem campos avançados de client ID/secret no conector personalizado, mas isso não foi medido nesta rodada."
+   },
+   {
+    "target": "B2 (orçamento): PKCE S256 obrigatório; escopos de menor privilégio; 403 insufficient_scope",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Duplica o D3 e sobrevive pelo mesmo motivo. Escopo único de leitura (ex.: brain:read) é a restrição natural de um servidor só leitura."
+   },
+   {
+    "target": "B3 (orçamento): em Team/Enterprise só o Owner adiciona o conector; cada membro conecta individualmente",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Pesa direto no rollout para o time não técnico: alguém com papel de Owner na conta Claude do hub tem que adicionar o conector. Faltou confirmar em que plano Claude/ChatGPT o time do granaai está, se é que tem algum."
+   },
+   {
+    "target": "B4 (orçamento): pelo caminho de conector via API só tools são expostas",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É restrição de desenho que custa zero: entregar tudo como tools, como o precedente já faz (6 tools, sem resources/prompts). Sobrevive como constraint."
+   },
+   {
+    "target": "B5 (orçamento): resultados de ferramenta podem trazer texto adversarial",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "O Company Brain de um hub ingere material de terceiros (atas, documentos de cliente), e o leitor é não técnico, sem o veredito do Claude Code em volta. Injeção indireta via kg_node/docs_search é risco real. Mitigação: servidor estritamente só leitura e saída marcada como dado não confiável, como faz a proveniência do fragmento untrusted-content-provenance do core."
+   },
+   {
+    "target": "B6 (orçamento): gateway como resposta usual para muitos tenants",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Para o piloto com uma org, o mais simples é uma instância por org. Gateway só se o número de hubs crescer. Isso não foi medido."
+   },
+   {
+    "target": "B7 (orçamento): sem fluxo SAML nativo; IdP só-SAML exige ponte OIDC",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Peso baixo no piloto (o Logto é OIDC), mas vale para hubs futuros com Entra/ADFS só-SAML. Nada foi olhado."
+   },
+   {
+    "target": "B8 (orçamento): bearer em toda requisição favorece servidor sem estado",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É coerente com o achado 11 e com o precedente. Sobrevive como constraint de desenho stateless."
+   },
+   {
+    "target": "B9 (orçamento): 2026-07-28 stateless; handles amarrados ao usuário",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Um servidor sem handle elimina a superfície. Duplica B8/achado 11 e sobrevive como restrição."
+   },
+   {
+    "target": "B10 (orçamento): confused deputy não se aplica se o MCP não for proxy de API de terceiros",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Este é o critério que derruba o achado 8: o confused deputy só fica fora se o Onion NÃO virar proxy OAuth no estilo Cloudflare. Cortar isso por orçamento escondeu a contradição entre os achados 5 e 8."
+   },
+   {
+    "target": "B11 (orçamento): escopos progressivos, conjunto inicial só leitura",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Encaixe direto com as 4 tools só leitura. Sobrevive como constraint (sem escopo curinga)."
+   },
+   {
+    "target": "B12 (orçamento): stdio para local; HTTP exige token; proxy stdio arrisca escalada para execução",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Elimina 'stdio via proxy' para não técnicos. Isso está alinhado ao D_TRIADE_MCP_POR_EIXO do corpus (separar leitura de execução, onion-kg ≠ onion-exec)."
+   },
+   {
+    "target": "B13 (orçamento): Claude Desktop acessa remoto via mcp-remote (2025)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Provavelmente está desatualizado: o Desktop hoje usa conectores remotos pela conta, e o LibreChat fala streamable-http nativo. Mesmo assim foi cortado sem verificar a data, e não por evidência."
+   },
+   {
+    "target": "B14 (orçamento): referência da Cloudflare acopla à plataforma e controla por usuário, não por repo/org",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Sustenta a objeção ao achado 8. Não responde escopo por raiz nem frescor por commit."
+   },
+   {
+    "target": "B15 (orçamento): o token amarra ao servidor, não ao tenant; isolamento é da aplicação",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Decide a (3): com um IdP compartilhado (o Logto da VPS), uma instância por org com audiência própria (resource indicator por org) dá isolamento por construção. Num multi-tenant, a checagem fica a cargo do código a cada chamada."
+   },
+   {
+    "target": "Fontes não lidas (den.dev, workos resource indicators, descope, zuplo compatibility, sunpeak, mojoauth, astrix, glama comparativo de AS)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Ficou sem leitura justamente a matriz de compatibilidade de clientes (zuplo.com/learn/mcp/compatibility) e o comparativo de authorization servers. São as duas lacunas que decidem a (2) e a (5) na prática. A rodada fechou suporte de cliente com um blog tier 5 e uma issue tier 4."
+   },
+   {
+    "target": "Lacuna local: o precedente ops/mcp-onion-kg/server.py usa X-Api-Key estático",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "server.py l.9 e l.117 autenticam com hmac.compare_digest(X-Api-Key, TOKEN). Isso funciona com o LibreChat (header no librechat.yaml), mas conectores do Claude.ai/ChatGPT só negociam OAuth ou authless, sem header estático configurável pelo usuário (inferência a confirmar ao vivo). Reaproveitar o precedente para os clientes 'fora do Claude Code' exige trocar a auth por RS OAuth (validar JWT do Logto: iss, aud, exp, claim de org) e publicar PRM."
+   },
+   {
+    "target": "Lacuna local: o precedente não tem frescor por commit",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "server.py roda git ls-files e kg-radar.sh na árvore de trabalho (cwd=REPO, l.21 e l.31-33). Não fixa ref nem declara commit, e REPO aponta para o próprio core, não para o hub. Para a (4): fetch periódico de origin/main do hub com deploy key read-only, servir de um worktree destacado no SHA verificado (o radar lê o filesystem, então não basta git show) e incluir served_commit e fetched_at em TODA resposta de tool. Também falta a tool kg_node."
+   },
+   {
+    "target": "Lacuna local: kb_search passa o termo do modelo ao grep sem '--'",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "server.py roda _run(['grep','-rin','-m','3', termo, 'docs/knowledge-base/', ...]). Um termo como '--file=/caminho' vira opção do grep (padrões lidos de arquivo arbitrário: oráculo de conteúdo), e o único filtro é len>=3. O argumento vem do modelo, que pode estar sob injeção (B5). A cura é inserir '--' antes do termo. É um defeito pré-existente que precisa ser curado antes de qualquer exposição pública."
+   },
+   {
+    "target": "Contrariano não explorado: alternativa sem MCP público, via LibreChat com SSO já existente",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "O corpus (b, d) mostra que o LibreChat da VPS já tem SSO Logto e já consumiu esse mesmo MCP de KG por loopback com token estático (Q_ONION_KG_MCP_NEXT, 2026-08-20). Ele foi desligado em 2026-08-27 por falta de consumidor, não por defeito. Para o time não técnico, isso entrega o veredito fora do Claude Code SEM OAuth no MCP e SEM exposição pública, com custo marginal mínimo. A rodada não pesou essa opção contra o MCP público."
+   }
+  ],
+  "recommendation": "Faria em dois degraus, com gatilho explícito entre eles. Em todos, o CÓDIGO do servidor fica no core (stdlib, sem acoplamento a Claude Code nem a nuvem, porque MCP é protocolo aberto e esta é a metade agnóstica do Onion). A HOSPEDAGEM e a operação ficam com a família, uma instância por org.\n\nDegrau 1 (piloto agora): opção A. Reativar o ops/mcp-onion-kg servindo o clone do brain-granaai, consumido pelo LibreChat que já tem SSO Logto. Rede privada, token estático, transporte streamable-http.\n\nDegrau 2 (opção B): só quando houver demanda medida de uso em Claude.ai ou ChatGPT. Aí entra endpoint público TLS na VPS, o servidor como resource server que valida JWT do Logto (iss, aud por resource indicator POR ORG, exp, escopo único de leitura, claim de organização atribuída pelo admin) e publica PRM, sem nunca virar AS ou proxy.\n\nRejeito D, SSE e stdio via proxy. 'Nenhum em rede privada' só vale para o LibreChat.\n\nRestrições que sobrevivem (todas antes de selar):\n(1) Curar os defeitos locais medidos: falta '--' no grep do kb_search; o servidor lê a árvore de trabalho e não declara commit; a raiz está fixa no core; falta a tool kg_node.\n(2) Frescor: fetch de origin/main do hub com deploy key read-only própria, servir de um worktree destacado no SHA, e incluir served_commit e fetched_at em TODA resposta.\n(3) A raiz e o tenant vêm da instância ou da claim, nunca de argumento de tool.\n(4) O cadastro aberto do Logto obriga gate por org/papel: ter token não basta.\n(5) Medir, antes do degrau 2, o discovery do Logto (code_challenge_methods_supported, resource indicators, DCR/CIMD ou pré-registro com as callbacks claude.ai/claude.com e ChatGPT) e o conector do Claude, que exige endpoint público porque a chamada sai da nuvem da Anthropic.\n(6) Dogfood ao vivo do fluxo OAuth em cada cliente-alvo antes de declarar suporte (a issue #171 mostra fragilidade).\n(7) Aceitar a negociação de várias versões de protocolo (2025-06-18/2025-11-25/2026-07-28, esta última RC) e operar stateless.\n(8) Só leitura estrita, saída marcada como dado não confiável (injeção indireta para usuário não técnico).\n(9) Declarar o custo recorrente: a principal manutenção é acompanhar a churn da spec de autorização (três revisões em ~18 meses). Isso justifica, no degrau 2, comparar antes um gateway maduro (opção C), comparação que a rodada não fez.",
+  "sealedBy": "maestro (nó D_ open no grafo; tabela de selagem do /meta:drive)"
+ },
+ "stats": {
+  "anglesTopic": 5,
+  "anglesFixed": 5,
+  "sources": 15,
+  "claims": 64,
+  "verified": 25,
+  "confirmed": 11,
+  "refuted": 14,
+  "unverified": 0,
+  "dupes": 2,
+  "maxFetch": 15,
+  "maxVerify": 25
+ }
+}

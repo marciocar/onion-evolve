@@ -1,0 +1,1173 @@
+meta:
+  id: onion-brain-mcp-remoto-2026-10
+  schema_version: "1"
+  baseline: "2026-10-11"
+  review_after: "2026-11-10"   # 30d: o tipo DOMINANTE é FERRAMENTA/PLATAFORMA. A decisão pende de
+                               # suporte de CLIENTE (Claude.ai/Desktop, ChatGPT, LibreChat) a OAuth,
+                               # PRM e versão de protocolo, e de uma spec em RC (2026-07-28, RC de
+                               # 18/06/2026). Isso muda numa release de cliente. A metade doutrinária
+                               # (postura de acoplamento) pediria 12m, mas a decisão pende do dado curto.
+                               # Gatilho extra: release final da spec 2026-07-28, ou o 1º pedido medido
+                               # de uso do Brain em Claude.ai/ChatGPT pelo time do brain-granaai.
+  # kg-backlog-guard: on
+  # ═══ TETO: 52 NÓS ═══
+  note: "SAC-70. MODO DECISÃO: D_ONION_BRAIN_MCP_REMOTO nasce OPEN, o maestro sela. 11 confirmadas, 14 refutadas por fonte fraca, 0 não verificadas por acesso, 43 fontes e 39 claims cortadas por orçamento; Elenxo 45 objeções, 30 sobreviventes, 30 modeladas."
+  #
+  # Corpus conferido antes de escrever (cláusula 0): fila-2026-10-06#Q_ONION_BRAIN_MCP (a pergunta
+  # aberta, sinal do brain-granaai) e librechat-kg-runtime-2026-08 (o precedente ops/mcp-onion-kg,
+  # desligado de propósito em 2026-08-27). Nada da pesquisa CONTRADIZ esses nós, por isso não há
+  # SUPERSEDES/REFUTES cross-grafo: as arestas externas são de rastro (TRACES_TO) e apoio (SUPPORTS).
+  #
+  # A recomendação do Elenxo chegou TRUNCADA no repasse ao agente de escrita; o texto integral foi
+  # relido do retorno do run (wf_19d83833-a3e) e o degrau 2 do D_ reescrito com ele em 2026-10-11.
+
+external_edges:
+  - from: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    to: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml#Q_ONION_BRAIN_MCP"
+    edge_type: TRACES_TO
+  - from: E_MEDIDO_LOCAL_PRECEDENTE_MCP_ONION_KG
+    to: "docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml#E_ONION_KG_MCP_DESLIGADO_DE_PROPOSITO"
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_STDIO_VIA_PROXY_ELIMINADO
+    to: "docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml#D_TRIADE_MCP_POR_EIXO"
+    edge_type: SUPPORTS
+
+nodes:
+
+  # ═══════════════════ A PERGUNTA ═══════════════════
+
+  - id: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "rodada /onion-research de 2026-10-11 (modo decisão): 11 claims confirmadas, 14 refutadas por fonte fraca, 0 não verificadas por acesso, 43 fontes e 39 claims cortadas por orçamento; 30 objeções sobreviventes do Elenxo; medição local de ops/mcp-onion-kg/server.py@8ade5598"
+    label: "SAC-70: o Onion deve oferecer um MCP remoto só leitura (kg_list, kg_radar, kg_node, docs_search) para o time não técnico de um hub (piloto brain-granaai) consultar o Company Brain fora do Claude Code — quem mantém, auth, escopo, frescor, transporte?"
+    narrative: "Cinco sub-decisões: (1) core mantém o servidor ou a família hospeda; (2) auth por org (OAuth/OIDC com o IdP do hub, token por org, ou nenhum em rede privada); (3) escopo por raiz (multi-tenant ou uma instância por org); (4) frescor por commit (qual ref e como declarar o commit servido); (5) transporte e onde roda. PERMANECE ABERTA: a decisão é do maestro, e as premissas que decidem a (2) — o Logto emite token com resource indicator e claim de org, tem DCR/CIMD, publica code_challenge_methods_supported — não foram medidas nesta rodada."
+    trace: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml (Q_ONION_BRAIN_MCP)"
+
+  # ═══════════════════ MEDIÇÃO LOCAL (tier 10 — o artefato antes da web) ═══════════════════
+
+  - id: E_MEDIDO_LOCAL_PRECEDENTE_MCP_ONION_KG
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: "2026-10-11"
+    verified_against: "ops/mcp-onion-kg/server.py@8ade5598 relido em 2026-10-11: l.8, l.9, l.13, l.21-24, l.31-54, l.117"
+    valid_from: "2026-08-21"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "MEDIDO AQUI: o precedente ops/mcp-onion-kg/server.py já é MCP streamable-http em stdlib com 6 tools só leitura, auth X-Api-Key estática, árvore de trabalho do próprio core e kb_search sem '--' no grep."
+    narrative: "Relido em 2026-10-11 (HEAD 9d802460; última mudança do arquivo em 8ade5598, contida em origin/main). Fatos: l.8 streamable-http em stdlib; l.9 e l.117 auth por X-Api-Key com hmac.compare_digest; l.13 e l.22-23 bind 172.23.0.1:3032 (bridge docker do LibreChat); l.21 REPO derivado do caminho do próprio arquivo (o core, não o hub); l.31-32 _run com cwd=REPO, sem ref fixa nem commit declarado; tools kg_list, kg_radar, kb_search, kb_get, diary_index, inventory (sem kg_node); l.54 grep -rin -m 3 termo sem '--'. Consequência: o código serve de base para a opção A quase como está (apontando REPO para o clone do hub e curando o '--'), e para a B exige trocar a auth, publicar PRM e servir de um SHA declarado."
+    trace: "ops/mcp-onion-kg/server.py"
+    provenance:
+      source: "ops/mcp-onion-kg/server.py@8ade5598"
+      locator: "l.8 (streamable-http), l.9 e l.117 (X-Api-Key), l.21 (REPO), l.31-32 (cwd=REPO), l.36-58 (tools), l.54 (grep sem '--')"
+      method: "medição: leitura do arquivo com grep -n e sed -n na árvore em 9d802460; git log -1 do arquivo = 8ade5598"
+      locality: "repo"
+
+  # ═══════════════════ EVIDÊNCIAS CONFIRMADAS DA RODADA ═══════════════════
+
+  - id: E_MCP_RS_PRM_AS_SEPARADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization — votos 3-0, tier 10"
+    valid_from: "2025-11"
+    source_tier: 10
+    source_kind: primary
+    label: "O servidor MCP age como resource server OAuth 2.1 e DEVE publicar Protected Resource Metadata (RFC 9728) com authorization_servers; o AS pode ser separado, então o IdP do hub emite os tokens sem o Onion implementar um IdP."
+    narrative: "Votos 3-0. Sustenta a separação RS/AS que torna a opção B viável sem o Onion virar IdP. Restringido pela objeção de premissa: o 'IdP que o hub já tem' (Logto da VPS, cadastro aberto) não foi medido para o brain-granaai."
+    trace: "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization"
+    provenance:
+      source: "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization"
+      locator: "seção Authorization Server Discovery / Protected Resource Metadata"
+      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      locality: "web"
+
+  - id: E_MCP_PROIBE_TOKEN_PASSTHROUGH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "https://modelcontextprotocol.io/specification/latest/basic/security_best_practices — votos 3-0, tier 10"
+    valid_from: "2025-06"
+    source_tier: 10
+    source_kind: primary
+    label: "A spec do MCP proíbe o servidor aceitar token não emitido explicitamente para ele (token passthrough): um MCP remoto do Onion tem de validar a audiência do token, não repassar o token do IdP do hub."
+    narrative: "Votos 3-0. O Elenxo separou duas regras que o achado junta: validar aud (vale) e não repassar a jusante (risco não vivo, porque o servidor lê um clone git local e não chama API a jusante com o token do usuário)."
+    trace: "https://modelcontextprotocol.io/specification/latest/basic/security_best_practices"
+    provenance:
+      source: "https://modelcontextprotocol.io/specification/latest/basic/security_best_practices"
+      locator: "seção Token Passthrough"
+      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      locality: "web"
+
+  - id: E_MCP_2026_07_28_AUDIENCE_BINDING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations — votos 3-0, tier 10"
+    valid_from: "2026-07-28"
+    source_tier: 10
+    source_kind: primary
+    label: "Pela spec MCP 2026-07-28, o servidor remoto protegido valida que o token foi emitido para ele (audience binding, RFC 8707) e rejeita outra audiência; isso exige um AS que suporte resource indicators."
+    narrative: "Votos 3-0. Objeção sobrevivente: o audience binding já valia desde a 2025-06-18, e atribuí-lo só à 2026-07-28 é impreciso; e ninguém mediu quais clientes já negociam a 2026-07-28 (RC de 18/06/2026), então o servidor precisa aceitar várias versões de protocolo."
+    trace: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations"
+    provenance:
+      source: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations"
+      locator: "seção security considerations — audience binding (RFC 8707)"
+      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      locality: "web"
+
+  - id: E_MCP_UPSTREAM_CREDENCIAL_PROPRIA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations — votos 3-0, tier 10"
+    valid_from: "2026-07-28"
+    source_tier: 10
+    source_kind: primary
+    label: "Se o servidor consultar uma API upstream (forge ou repo privado), não pode repassar o token do cliente: precisa de credencial própria. Isso fecha o proxy transparente de identidade do usuário até o repo."
+    narrative: "Votos 3-0. Consequência registrada pelo Elenxo: o servidor vira a autoridade de controle de acesso ao repo, a permissão por usuário do forge se perde, o escopo (3) é imposto pelo servidor e o fetch usa deploy key read-only própria."
+    trace: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations"
+    provenance:
+      source: "https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization/security-considerations"
+      locator: "seção security considerations — upstream tokens"
+      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      locality: "web"
+
+  - id: E_REUSAR_IAM_NAO_IMPLEMENTAR_AS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "https://aaif.io/blog/using-keycloak-as-an-mcp-authorization-server — votos 3-0, tier 6"
+    valid_from: "2026-08"
+    source_tier: 6
+    source_kind: engineer
+    label: "Um servidor MCP protegido com transporte HTTP precisa de um authorization server, e a recomendação é não implementá-lo do zero, reaproveitando um IAM existente (como o IdP que o hub já tem)."
+    narrative: "Votos 3-0, tier 6 e sobre Keycloak, não Logto. Falta o requisito decisivo: o IdP precisa servir os clientes reais (DCR RFC 7591, CIMD ou pré-registro com redirect URIs de claude.ai/claude.com e ChatGPT) — não verificado no Logto da VPS."
+    trace: "https://aaif.io/blog/using-keycloak-as-an-mcp-authorization-server"
+    provenance:
+      source: "https://aaif.io/blog/using-keycloak-as-an-mcp-authorization-server"
+      locator: "artigo sobre Keycloak como authorization server de MCP"
+      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      locality: "web"
+
+  - id: E_CONECTORES_HTTP_NAO_STDIO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "https://mer.vin/2026/08/local-vs-remote-mcp-claude-custom-connectors/ — votos 3-0, tier 5"
+    valid_from: "2026-08"
+    source_tier: 5
+    source_kind: engineer
+    label: "Conectores remotos suportam Streamable HTTP (recomendado) ou SSE; STDIO não é suportado em conectores."
+    narrative: "Votos 3-0, tier 5. Coerente com a revisão 2025-03-26 da spec. Como SSE é legado, a decisão (5) fica só com streamable-http."
+    trace: "https://mer.vin/2026/08/local-vs-remote-mcp-claude-custom-connectors/"
+    provenance:
+      source: "https://mer.vin/2026/08/local-vs-remote-mcp-claude-custom-connectors/"
+      locator: "comparativo local vs remoto em conectores personalizados do Claude"
+      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      locality: "web"
+
+  - id: E_STREAMABLE_HTTP_SUBSTITUI_SSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/ — votos 3-0, tier 5"
+    valid_from: "2025-03"
+    source_tier: 5
+    source_kind: vendor-on-competitor
+    label: "Desde mar/2025 o transporte remoto recomendado do MCP é Streamable HTTP, que substitui HTTP+SSE e permite HTTP stateless com upgrade opcional para SSE."
+    narrative: "Votos 3-0. Fato de spec (revisão 2025-03-26), sem contestação. O precedente local já é streamable-http em stdlib (server.py l.8)."
+    trace: "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/"
+    provenance:
+      source: "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/"
+      locator: "seção sobre transporte remoto"
+      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      locality: "web"
+
+  - id: E_CLOUDFLARE_BYO_IDP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.4
+    verified_at: "2026-10-11"
+    verified_against: "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/ — votos 3-0, tier 5"
+    valid_from: "2025-03"
+    source_tier: 5
+    source_kind: vendor-on-competitor
+    label: "Um MCP remoto pode delegar a autenticação a um IdP próprio (bring your own) e receber o usuário já autenticado — mas no padrão Cloudflare o Worker vira ele mesmo AS e proxy OAuth para o IdP upstream."
+    narrative: "Votos 3-0, mas o Elenxo derrubou a conclusão 'base viável': o padrão workers-oauth-provider contradiz o achado de não ser AS, reabre o confused deputy (proxy com client ID estático + DCR) e acopla a Workers/Durable Objects/KV. Ver a opção D e as objeções que a restringem."
+    trace: "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/"
+    provenance:
+      source: "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/"
+      locator: "seção sobre autenticação com provedores OAuth de terceiros"
+      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      locality: "web"
+
+  - id: E_TENANT_DE_CLAIM_NUNCA_DE_INPUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.45
+    verified_at: "2026-10-11"
+    verified_against: "https://wavect.io/blog/enterprise-mcp-authorization-architecture/ — votos 3-0, tier 4"
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: "No escopo por organização, a identidade do tenant vem de uma claim verificada do token, nunca de input de ferramenta que o modelo possa influenciar."
+    narrative: "Votos 3-0, tier 4. Implicação concreta: o kg_radar do precedente recebe 'grafo' como argumento do modelo; num multi-tenant a raiz nunca pode vir do argumento, só da claim ou da instância."
+    trace: "https://wavect.io/blog/enterprise-mcp-authorization-architecture/"
+    provenance:
+      source: "https://wavect.io/blog/enterprise-mcp-authorization-architecture/"
+      locator: "seção sobre isolamento por organização"
+      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      locality: "web"
+
+  - id: E_CLAUDE_AI_OAUTH_FALHA_ISSUE_171
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.35
+    verified_at: "2026-10-11"
+    verified_against: "https://github.com/anthropics/claude-ai-mcp/issues/171 — votos 2-1, tier 4"
+    valid_from: "2026-04"
+    source_tier: 4
+    source_kind: forum
+    label: "Em issue pública do claude.ai (#171), o OAuth de um conector remoto (Salesforce Hosted MCP) completa no provedor e o claude.ai mostra 'Authorization with the MCP server failed' (abr a ago/2026)."
+    narrative: "Votos 2-1. Caso específico do Salesforce, com workarounds de configuração do provedor. Não generaliza para 'o claude.ai falha com IdP próprio': vira restrição de dogfood ao vivo do fluxo OAuth em cada cliente-alvo antes de declarar suporte."
+    trace: "https://github.com/anthropics/claude-ai-mcp/issues/171"
+    provenance:
+      source: "https://github.com/anthropics/claude-ai-mcp/issues/171"
+      locator: "issue anthropics/claude-ai-mcp #171"
+      method: "juízes: votação adversarial 2-1 da rodada de 2026-10-11"
+      locality: "web"
+
+  - id: E_MCP_2026_07_28_SEM_SESSAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-10-11"
+    verified_against: "https://ssojet.com/blog/mcp-authorization-spec-2026-07-28-what-changed — votos 3-0, tier 4"
+    valid_from: "2026-07-28"
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: "A revisão 2026-07-28 remove sessões de protocolo e o header Mcp-Session-Id: um servidor só leitura (kg_list, kg_radar, kg_node, docs_search) pode ser stateless, cada requisição aceita ou rejeitada de forma independente."
+    narrative: "Votos 3-0, tier 4. A conclusão (stateless) vale com qualquer versão: na 2025-03-26/06-18 o Mcp-Session-Id já era MAY do servidor, e o precedente não usa sessão."
+    trace: "https://ssojet.com/blog/mcp-authorization-spec-2026-07-28-what-changed"
+    provenance:
+      source: "https://ssojet.com/blog/mcp-authorization-spec-2026-07-28-what-changed"
+      locator: "seção sobre remoção de sessões e Mcp-Session-Id"
+      method: "juízes: votação adversarial 3-0 da rodada de 2026-10-11"
+      locality: "web"
+
+  # ═══════════════════ MERCADO / CAPITAL (invariante — cláusula 4) ═══════════════════
+
+  - id: E_MERCADO_MCP_REMOTO_SEM_SINAL_DE_CAPITAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "síntese do eixo mercado/capital da rodada de 2026-10-11: zero rodada, zero M&A, zero analista; sinais comerciais só de vendor"
+    source_tier: 4
+    source_kind: aggregator
+    label: "SEM SINAL de capital: a rodada não trouxe rodadas, M&A nem analistas sobre MCP remoto de conhecimento corporativo; só vendors (Cloudflare, AAIF/Keycloak, Salesforce) explicando o próprio caminho na camada de auth e hospedagem."
+    narrative: "Leitura do sintetizador: provedores de infraestrutura e de IAM disputam a camada de autorização e hospedagem do MCP. Isso é evidência de vendor, não de capital. Nenhum analista de casa (Gartner, Forrester, IDC) foi lido. Para a decisão: o que é commodity disputada por vendors (AS, hospedagem) o Onion não deve construir — reforça reaproveitar IdP e não virar AS."
+    trace: "https://blog.cloudflare.com/remote-model-context-protocol-servers-mcp/"
+    provenance:
+      source: "síntese do worker de mercado da rodada /onion-research de 2026-10-11 (SAC-70)"
+      locator: "seção Mercado do repasse do sintetizador"
+      method: "testemunho: síntese de 1 agente sobre as fontes da rodada"
+      locality: "host"
+
+  # ═══════════════════ LACUNAS (cláusula 8 — lacuna vira nó) ═══════════════════
+
+  - id: E_LACUNAS_ONION_BRAIN_MCP_2026_10
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-11"
+    verified_against: "contagem direta sobre o repasse da rodada em 2026-10-11: 11 confirmadas, 14 refutadas, 0 não verificadas, 43 fontes e 39 claims cortadas, 45 objeções do Elenxo das quais 30 survives=true"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "CONTABILIDADE: 11 confirmadas; 14 refutadas por fonte fraca; 0 não verificadas por acesso; 43 fontes e 39 claims cortadas por orçamento; Elenxo 45 objeções, 30 sobreviventes, 30 modeladas (nenhuma fora)."
+    narrative: "(A) REFUTADAS POR FONTE FRACA (14): D1 OAuth obrigatório para conector funcionar (falso: conector aceita authless); D2 audiência RFC 8707 (refutado e confirmado na mesma rodada — ruído); D3 PKCE S256 e recusa sem code_challenge_methods_supported; D4 e D8 Enterprise-Managed Authorization (depende de ID-JAG, que o Logto não tem); D5 conector exige internet pública (sobrevive como objeção); D6 e D7 2026-07-28 tornaria authless inadequado (falso: autorização segue opcional); D9 servidor nunca AS (falso: AS co-hospedado é permitido); D10 callback/PKCE do claude.ai; D11 credencial por emissor implica IdP por org (salto); D12 mcp-auth-gateway envolve stdio (não se aplica: precedente já é HTTP); D13 gateway OIDC por YAML (tier 3); D14 'protocolo não padronizou OAuth' (falso). (B) NÃO VERIFICADAS por 403/truncagem: 0. (C) CORTADAS POR ORÇAMENTO: 43 fontes, 39 claims; entre as fontes não lidas, a matriz de compatibilidade de clientes (zuplo.com/learn/mcp/compatibility) e o comparativo de authorization servers (glama), além de den.dev, workos resource indicators, descope, sunpeak, mojoauth e astrix. (D) OBJEÇÕES: 45 do Elenxo, 30 sobreviventes, 30 modeladas como E_OBJECAO_*; as 15 não sobreviventes (achados 2, 4, 6, 7, 9, 11 e descartes D1, D4, D6, D7, D8, D9, D11, D12, D14) foram absorvidas nas narrativas das evidências. (E) NÃO MEDIDO E NOMEADO, decisivo para a (2): o .well-known do Logto da VPS (code_challenge_methods_supported, registration_endpoint, resource indicators), se o Logto emite claim de org/papel para o recurso, os campos de client ID do conector do Claude.ai, o plano Claude/ChatGPT do time granaai e a versão de protocolo negociada por cada cliente. (F) A recomendação do Elenxo chegou TRUNCADA no repasse."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/SYNTHESIS.md"
+    provenance:
+      source: "repasse da rodada /onion-research de 2026-10-11 (SAC-70) ao write(KG)"
+      locator: "listas Confirmadas, Não verificadas/refutadas e Objeções do Elenxo do repasse"
+      method: "testemunho: contagem do repasse pela sessão que escreveu o grafo"
+      locality: "host"
+
+  # ═══════════════════ AS OPÇÕES (uma claim por opção, todas open) ═══════════════════
+
+  - id: C_OPCAO_A_REATIVAR_PRECEDENTE_VIA_LIBRECHAT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: "OPÇÃO A: reativar o precedente ops/mcp-onion-kg apontado para o clone do brain-granaai, consumido só pelo LibreChat da VPS (SSO Logto), bind privado e token estático — sem OAuth no MCP, sem exposição pública."
+    narrative: "A FAVOR: código pronto e testado (6 tools, radar real, 401 sem token), desligado por falta de consumidor e não por defeito; custo marginal mínimo; sem acoplamento novo; entrega o veredito fora do Claude Code para quem usa o LibreChat. CONTRA: não atende Claude.ai/ChatGPT (conector chama da nuvem do fornecedor); o Logto tem cadastro aberto, então o acesso ao Brain pelo LibreChat precisa de restrição por papel; o precedente lê a árvore do core sem commit declarado, falta kg_node, e o kb_search tem a injeção de opção do grep a curar antes de religar. Restringida por E_OBJECAO_IDP_CADASTRO_ABERTO_NAO_AUTORIZA, E_OBJECAO_CONECTOR_EXIGE_INTERNET_PUBLICA, E_OBJECAO_PRECEDENTE_SEM_FRESCOR_POR_COMMIT e E_OBJECAO_KB_SEARCH_GREP_SEM_DUPLO_HIFEN."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+
+  - id: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.45
+    label: "OPÇÃO B: MCP remoto público por streamable-http stateless, resource server OAuth 2.1 (PRM, RFC 9728) com o Logto como AS e claim de org obrigatória, uma instância por org, para Claude.ai/Desktop e ChatGPT."
+    narrative: "A FAVOR: é o desenho que a spec 2025-11-25/2026-07-28 descreve (RS separado do AS, audience binding, stateless), atende os clientes que o time não técnico usa e não faz o Onion virar IdP. CONTRA: as premissas que decidem se funciona NÃO foram medidas — Logto com resource indicator e claim de org, DCR/CIMD ou pré-registro, code_challenge_methods_supported; negociação de versões; Owner adicionando conector; dogfood OAuth por cliente; e o build-vs-gateway ficou sem comparação. É exposição pública do Brain antes de demanda medida. A recomendação a põe como DEGRAU 2, com gatilho."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+
+  - id: C_OPCAO_C_GATEWAY_DE_TERCEIROS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: "OPÇÃO C: gateway de terceiros (Pomerium, agentgateway, Cloudflare Access) na frente de um servidor MCP sem auth própria, fazendo a parte de resource server OAuth."
+    narrative: "A FAVOR: tira do Onion a validação de JWT/PRM e a manutenção de segurança da borda. CONTRA: os gateways estabelecidos não foram comparados nesta rodada (maturidade, suporte MCP, escopo por org); acopla a um produto de terceiro; para uma org só, o B6 indica instância por org sem gateway; e o gateway também tem de ser público para Claude.ai/ChatGPT. Fica como alternativa ao código de RS da opção B, a medir quando B for disparada."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+
+  - id: C_OPCAO_D_WORKERS_AS_PROXY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.15
+    label: "OPÇÃO D: padrão Cloudflare Workers com o servidor atuando como AS proxy para o IdP do hub — listada como rejeitada por acoplamento e confused deputy."
+    narrative: "CONTRA (por isso listada como rejeitada): o Worker vira AS e proxy OAuth (contradiz reaproveitar IAM), reabre o confused deputy da spec (proxy com client ID estático + DCR), acopla a Workers/Durable Objects/KV — capacidade que existe fora, logo a postura de acoplamento a recusa — e controla por usuário, não por repo/org. Mantida OPEN porque quem sela é o maestro: as objeções a restringem, nenhuma evidência tier alto a matou nesta rodada."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+
+  - id: C_OPCAO_E_MULTI_TENANT_POR_CLAIM
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: "OPÇÃO E: multi-tenant único com a raiz escolhida por claim do token — adiada até haver mais de um hub."
+    narrative: "A FAVOR: escala para N hubs com um processo. CONTRA: com um piloto só, o isolamento por instância (audiência própria por org) é por construção, e o multi-tenant passa a checagem para o código a cada chamada; a raiz nunca pode vir de argumento de ferramenta. Adiada até haver mais de um hub medido."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+
+  - id: C_OPCAO_F_SEM_MCP_LEITOR_JS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.2
+    label: "OPÇÃO F: não fazer MCP — manter o segundo leitor JS do corpus (o paliativo atual do hub)."
+    narrative: "A FAVOR: custo zero agora. CONTRA: o paliativo é um segundo leitor do corpus que diverge do radar (o veredito do Onion é o parser do radar, não uma releitura JS), e existe um precedente pronto (opção A) com custo marginal mínimo. O pedido de campo do hub (E_BRAIN_MCP_PEDIDO_DE_CAMPO) continua aberto."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+
+  # ═══════════════════ A DECISÃO (OPEN — o maestro sela) ═══════════════════
+
+  - id: D_ONION_BRAIN_MCP_REMOTO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "NÃO SELADA. Esta sessão nunca sela: status open, aguardando o maestro. A recomendação é de UM agente sem votação."
+    label: "DECISÃO ABERTA (o maestro sela): MCP remoto do Brain — A reativar precedente via LibreChat · B público OAuth RS por org · C gateway · D Workers AS proxy · E multi-tenant · F sem MCP. Elenxo: código no core, hospedagem na família; A agora, B só com gatilho."
+    narrative: "RECOMENDAÇÃO DO ELENXO (afirmação de UM agente, sem votação; texto integral relido do retorno do run wf_19d83833-a3e em 2026-10-11): dois degraus com gatilho explícito. Em todos, o CÓDIGO do servidor fica no core (stdlib, sem acoplamento a Claude Code nem a nuvem: MCP é protocolo aberto e esta é a metade agnóstica do Onion); a HOSPEDAGEM e a operação ficam com a família, uma instância por org. DEGRAU 1 (piloto agora): opção A — reativar ops/mcp-onion-kg servindo o clone do brain-granaai, consumido pelo LibreChat com SSO Logto; rede privada, token estático, streamable-http. DEGRAU 2 (opção B): só quando houver demanda medida de uso em Claude.ai ou ChatGPT; aí entra endpoint público TLS na VPS, o servidor como resource server que valida JWT do Logto (iss, aud por resource indicator POR ORG, exp, escopo único de leitura, claim de organização atribuída pelo admin) e publica PRM, sem nunca virar AS ou proxy. Rejeita D, SSE e stdio via proxy; 'nenhum em rede privada' só vale para o LibreChat. Custo recorrente declarado: acompanhar a churn da spec de autorização (três revisões em ~18 meses), o que justifica comparar um gateway maduro (opção C) antes do degrau 2. PRÉ-CONDIÇÕES DO DEGRAU 1 (objeções medidas): curar o '--' do kb_search; apontar REPO para um worktree destacado do hub num SHA verificado, com served_commit e fetched_at em toda resposta; acrescentar kg_node pelo parser do radar; marcar a saída como dado não confiável; restringir o acesso ao agente/MCP no LibreChat por papel, porque o Logto tem cadastro aberto. PRÉ-CONDIÇÕES DO DEGRAU 2: medir o .well-known do Logto (code_challenge_methods_supported, DCR/CIMD, resource indicators, claim de org), o pré-registro com a callback do claude.ai/claude.com e do ChatGPT, a versão negociada por cliente, o plano do time, e comparar build de RS contra gateway (opção C); dogfood OAuth ao vivo em cada cliente-alvo. Sub-decisões no estado da recomendação: (1) código no core, hospedagem na família; (2) degrau 1 token estático em rede privada atrás do SSO do LibreChat, degrau 2 OAuth RS com o IdP do hub e claim de org; (3) uma instância por org, raiz fixada pela instância, nunca por argumento; (4) worktree destacado no SHA de origin/main do hub, fetch com deploy key read-only, commit declarado em toda resposta; (5) streamable-http stateless, sem SSE e sem stdio via proxy."
+    trace: "pergunta SAC-70 · docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml (Q_ONION_BRAIN_MCP)"
+
+  # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ──
+  # 30 sobreviventes entregues, 30 modeladas. Confiança <= 0.6 em TODAS: afirmação de UM
+  # agente, sem votação. Primário que o Elenxo CITA sem ter sido lido entra como 'primário citado, não lido'.
+
+  - id: E_OBJECAO_IDP_CADASTRO_ABERTO_NAO_AUTORIZA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "achado 1 contra o corpus (d): Logto da VPS com cadastro aberto intencional (SSO do LibreChat e do Vaultwarden)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo, 1 agente): o Logto da VPS tem cadastro ABERTO; autenticar não é autorizar. O gate tem de ser claim de org/papel atribuída pelo admin, não 'ter token' — e vale para o LibreChat da opção A também."
+    narrative: "Alvo: achado 1 (RS com PRM e IdP do hub como AS). A mecânica está certa (tier 10), mas a premissa 'o IdP que o hub já tem' não foi medida para o brain-granaai. O corpus (d) registra o Logto da VPS com cadastro aberto intencional: qualquer pessoa que se cadastre recebe token válido. Até medir que o Logto emite token com resource indicator e claim de org para esse recurso, a decisão (2) fica com premissa não verificada. Extensão desta sessão: o mesmo cadastro aberto dá ao LibreChat (opção A) acesso ao Brain para quem se cadastrar, se o acesso ao agente/MCP não for restrito por papel."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'Achado 1' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_NEGOCIAR_VARIAS_VERSOES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "achado 3 lido contra a data do RC (18/06/2026) e a ausência de medição de versão negociada por cliente"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): ninguém mediu quais clientes (Claude.ai/Desktop, ChatGPT, LibreChat v0.8.8-rc1) negociam a 2026-07-28; um servidor só-2026-07-28 arrisca recusar clientes em 2025-06-18/2025-11-25."
+    narrative: "Alvo: achado 3. Restrição sobrevivente: aceitar negociação de várias versões de protocolo. O audience binding já valia desde a 2025-06-18; atribuí-lo só à 2026-07-28 é impreciso, mas a conclusão sobre o IdP se mantém."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'Achado 3' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_LOGTO_DCR_CIMD_NAO_MEDIDO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "achado 5 (tier 6, Keycloak) contra a ausência de leitura da documentação do Logto sobre DCR/CIMD"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): reaproveitar o IAM só funciona se o IdP servir os clientes reais — DCR (RFC 7591), CIMD ou pré-registro com redirect URIs de claude.ai/claude.com e ChatGPT. Não verificado no Logto."
+    narrative: "Alvo: achado 5. A fonte é tier 6 e sobre Keycloak, não Logto. O descarte orçamentário sobre CIMD/DCR é exatamente essa lacuna. Primário citado, não lido: RFC 7591 e a documentação do Logto."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'Achado 5' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CLOUDFLARE_E_AS_PROXY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "achado 8 contra o descarte B10 (confused deputy) e B14 (controle por usuário) e a postura de acoplamento do CLAUDE.md"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): no padrão workers-oauth-provider o Worker vira AS e proxy OAuth do IdP upstream — contradiz 'não ser AS', reabre o confused deputy e acopla a Workers/DO/KV. Não serve de base."
+    narrative: "Alvo: achado 8. A spec trata o proxy com client ID estático + DCR como caso de confused deputy; o descarte B10 diz que isso só não se aplica SE o Onion não fizer proxy. B14 mostra controle por usuário (allowlist), sem escopo por repo. Pela postura de acoplamento (acoplar só quando a capacidade não existe fora), não serve."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'Achado 8' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_DOGFOOD_OAUTH_POR_CLIENTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "achado 10 (2-1) contra os workarounds do descarte D10"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): a issue #171 é do Salesforce (votos 2-1) e não generaliza; o que sobra é restrição: dogfoodar o fluxo OAuth ao vivo em cada cliente-alvo antes de declarar suporte."
+    narrative: "Alvo: achado 10. O próprio descarte D10 relata workarounds de configuração do provedor (escopo mcp_api+refresh_token, endpoint GA com platform/). Restrição, não veredito."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'Achado 10' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_D2_INCONSISTENTE_COM_ACHADOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "descarte D2 contra os achados 2 e 3 (tier 10, votos 3-0)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): o descarte D2 (validar audiência RFC 8707, não repassar token) refuta o que os achados 2 e 3 confirmaram 3-0 em tier 10 — ruído de rodada; a afirmação fica de pé."
+    narrative: "Alvo: descarte D2 (por comodismo). Faltou reconciliar os dois lados. A afirmação (IdP com resource/audience) sobrevive e restringe a escolha do AS na opção B."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'D2' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_PKCE_METADATA_DO_LOGTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "descarte D3 contra a spec 2025-11-25 (primário citado) e a ausência de leitura do .well-known do Logto"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): sem code_challenge_methods_supported o cliente MUST refuse (spec 2025-11-25). Não se leu o .well-known do Logto da VPS — um curl resolve."
+    narrative: "Alvo: descarte D3 (por comodismo). A parte de spec é verdadeira (primário citado, não relido na objeção). Não medido: se Claude.ai/ChatGPT/LibreChat aplicam isso na prática e se o discovery do Logto publica o campo."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'D3' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CONECTOR_EXIGE_INTERNET_PUBLICA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "descarte D5 contra a documentação de conectores remotos da Anthropic (primário citado, não lido)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): conectores do Claude e do ChatGPT chamam da nuvem do fornecedor; 'nenhum em rede privada' só existe para o LibreChat self-hosted e é inviável para Claude.ai/ChatGPT."
+    narrative: "Alvo: descarte D5 (por comodismo). Primário citado, não lido: a página de conectores remotos da Anthropic (que publica faixas de IP de saída para allowlist). Consequência: a opção A não atende 'fora do Claude Code' em Claude.ai/ChatGPT; atende só o LibreChat. Um gateway (C) também precisa ser público."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'D5' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CALLBACK_NO_PRE_REGISTRO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "descarte D10 contra a separação provedor/cliente da issue #171"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): sem DCR, a callback https://claude.ai/api/mcp/auth_callback (e a variante claude.com) e PKCE S256 entram no pré-registro do cliente no Logto — item de configuração geral, não do Salesforce."
+    narrative: "Alvo: descarte D10 (por comodismo). Faltou separar o específico do provedor (workarounds do Salesforce) do geral do cliente (callback e PKCE)."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'D10' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_GATEWAYS_ESTABELECIDOS_NAO_COMPARADOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "descarte D13 (tier 3) contra a ausência de comparação com gateways estabelecidos"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): cortou-se a classe 'gateway' sem comparar os estabelecidos (Pomerium com MCP, agentgateway, Cloudflare Access para MCP); 'o Onion escreve a validação JWT/PRM ou põe gateway na frente' ficou sem resposta."
+    narrative: "Alvo: descarte D13 (por comodismo). A fonte tier 3 isolada justifica cortar ESSE projeto (mcp-auth-gateway), não a classe. Pesa no custo de manter das opções B e C."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'D13' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_ORDEM_DE_REGISTRO_DO_CLIENTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "corte B1 contra a ausência de medição do Logto e dos campos avançados do conector"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): ordem pré-registro > CIMD (SHOULD) > DCR (MAY); IdP sem DCR exige pré-registro. Não se verificou o Logto nem se Claude.ai/ChatGPT aceitam client_id pré-registrado."
+    narrative: "Alvo: B1 (cortado por orçamento). O Claude.ai tem campos avançados de client ID/secret no conector personalizado, não medido nesta rodada. Decide se o Logto serve."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B1' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_ESCOPO_UNICO_DE_LEITURA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "corte B2 contra D3 e o desenho só leitura"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): PKCE S256 obrigatório e escopo de menor privilégio — um escopo único de leitura (ex.: brain:read) com 403 insufficient_scope é a restrição natural de um servidor só leitura."
+    narrative: "Alvo: B2 (cortado por orçamento). Duplica D3 e sobrevive pelo mesmo motivo."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B2' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_OWNER_ADICIONA_CONECTOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "corte B3 contra a ausência de medição do plano do time granaai"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): em Team/Enterprise só o Owner adiciona o conector e cada membro conecta individualmente — o rollout para o time não técnico depende do plano Claude/ChatGPT do granaai, não medido."
+    narrative: "Alvo: B3 (cortado por orçamento). Faltou confirmar em que plano Claude/ChatGPT o time do granaai está, se tem algum."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B3' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_SO_TOOLS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "corte B4 contra o precedente server.py (6 tools, sem resources/prompts)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): pelo caminho de conector via API só tools são expostas — entregar tudo como tools (como o precedente já faz, 6 tools, sem resources/prompts). Custo zero."
+    narrative: "Alvo: B4 (cortado por orçamento). Restrição de desenho que vale para qualquer opção que exponha MCP."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B4' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_INJECAO_INDIRETA_NO_BRAIN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "corte B5 contra o fragmento untrusted-content-provenance do core e a natureza do Brain do hub"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): o Company Brain ingere material de terceiros e o leitor é não técnico, sem o veredito do Claude Code em volta: injeção indireta via kg_node/docs_search é risco real."
+    narrative: "Alvo: B5 (cortado por orçamento). Mitigação: servidor estritamente só leitura e saída marcada como dado não confiável, como faz o fragmento untrusted-content-provenance do core. Vale para todas as opções que expõem o Brain, inclusive A."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B5' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_GATEWAY_SO_COM_MUITOS_HUBS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "corte B6 contra o piloto de uma org (brain-granaai)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): para o piloto com uma org, o mais simples é uma instância por org; gateway e multi-tenant só se o número de hubs crescer — o que não foi medido."
+    narrative: "Alvo: B6 (cortado por orçamento)."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B6' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_SAML_EXIGE_PONTE_OIDC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.45
+    verified_at: "2026-10-11"
+    verified_against: "corte B7 contra o IdP OIDC do piloto e hubs futuros só-SAML"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): sem fluxo SAML nativo; um hub futuro com IdP só-SAML (Entra/ADFS) exige ponte OIDC. Peso baixo no piloto (Logto é OIDC), nada foi olhado."
+    narrative: "Alvo: B7 (cortado por orçamento)."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B7' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_BEARER_POR_REQUISICAO_STATELESS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "corte B8 contra o achado 11 e o precedente sem sessão"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): bearer em toda requisição favorece servidor sem estado — restrição de desenho stateless, coerente com o achado 11 e com o precedente."
+    narrative: "Alvo: B8 (cortado por orçamento)."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B8' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_SEM_HANDLES_POR_USUARIO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.45
+    verified_at: "2026-10-11"
+    verified_against: "corte B9 contra B8 e o achado 11"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): na 2026-07-28 handles ficam amarrados ao usuário; um servidor sem handle elimina essa superfície. Duplica B8/achado 11, sobrevive como restrição."
+    narrative: "Alvo: B9 (cortado por orçamento)."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B9' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CONFUSED_DEPUTY_E_O_CRITERIO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "corte B10 contra a contradição entre os achados 5 e 8"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): o confused deputy só fica fora se o Onion NÃO virar proxy OAuth estilo Cloudflare; cortar isso por orçamento escondeu a contradição entre os achados 5 e 8."
+    narrative: "Alvo: B10 (cortado por orçamento). É o critério que derruba o achado 8 como base."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B10' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_ESCOPOS_PROGRESSIVOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.45
+    verified_at: "2026-10-11"
+    verified_against: "corte B11 contra as 4 tools só leitura pedidas"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): escopos progressivos com conjunto inicial só leitura encaixam direto nas 4 tools — sem escopo curinga."
+    narrative: "Alvo: B11 (cortado por orçamento)."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B11' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_STDIO_VIA_PROXY_ELIMINADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "corte B12 contra D_TRIADE_MCP_POR_EIXO do corpus librechat-kg-runtime-2026-08"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): stdio é para local; HTTP exige token; proxy stdio arrisca escalada para execução — elimina 'stdio via proxy' para não técnicos, alinhado ao D_TRIADE_MCP_POR_EIXO."
+    narrative: "Alvo: B12 (cortado por orçamento). Alinhado ao corpus: separar leitura de execução (onion-kg ≠ onion-exec)."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B12' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_MCP_REMOTE_DATA_NAO_CONFERIDA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.4
+    verified_at: "2026-10-11"
+    verified_against: "corte B13 contra a ausência de verificação de data do suporte do Desktop"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): 'Claude Desktop acessa remoto via mcp-remote (2025)' provavelmente está desatualizado (hoje conectores pela conta), mas foi cortado sem conferir a data, não por evidência."
+    narrative: "Alvo: B13 (cortado por orçamento). O LibreChat fala streamable-http nativo. Suporte de cliente ficou sem medição datada."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B13' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_CLOUDFLARE_CONTROLE_POR_USUARIO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-11"
+    verified_against: "corte B14 contra as decisões (3) e (4)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): a referência da Cloudflare acopla à plataforma e controla por usuário (allowlist), não por repo/org — não responde escopo por raiz nem frescor por commit."
+    narrative: "Alvo: B14 (cortado por orçamento). Sustenta a objeção ao achado 8."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B14' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_TOKEN_AMARRA_SERVIDOR_NAO_TENANT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "corte B15 contra o desenho de IdP compartilhado (Logto da VPS)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): o token amarra ao servidor, não ao tenant; com IdP compartilhado, uma instância por org com audiência própria isola por construção; no multi-tenant o código checa a cada chamada."
+    narrative: "Alvo: B15 (cortado por orçamento). Decide a (3) a favor de uma instância por org no piloto."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'B15' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_MATRIZ_DE_CLIENTES_NAO_LIDA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-11"
+    verified_against: "lista de fontes cortadas por orçamento contra as decisões (2) e (5)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): ficaram sem leitura a matriz de compatibilidade de clientes (zuplo) e o comparativo de authorization servers — as duas lacunas que decidem (2) e (5) na prática."
+    narrative: "Alvo: fontes cortadas (den.dev, workos resource indicators, descope, zuplo compatibility, sunpeak, mojoauth, astrix, glama). A rodada fechou suporte de cliente com um blog tier 5 e uma issue tier 4."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'Fontes não lidas' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+  - id: E_OBJECAO_PRECEDENTE_USA_X_API_KEY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "ops/mcp-onion-kg/server.py@8ade5598 l.9 e l.117 (hmac.compare_digest do X-Api-Key), relido em 2026-10-11"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "OBJEÇÃO (Elenxo), MEDIDA nesta sessão: o precedente autentica por X-Api-Key estático (server.py l.9 e l.117) — serve ao LibreChat, mas conectores Claude.ai/ChatGPT negociam OAuth ou authless."
+    narrative: "Alvo: lacuna local. A parte 'conectores não aceitam header estático configurável pelo usuário' é inferência a confirmar ao vivo. Reaproveitar o precedente para clientes fora do Claude Code exige trocar a auth por RS OAuth (validar JWT do Logto: iss, aud, exp, claim de org) e publicar PRM. A linha l.117 (hmac.compare_digest do X-Api-Key contra TOKEN) foi relida nesta sessão."
+    trace: "ops/mcp-onion-kg/server.py"
+    provenance:
+      source: "ops/mcp-onion-kg/server.py@8ade5598"
+      locator: "ops/mcp-onion-kg/server.py@8ade5598 l.9 e l.117 (hmac.compare_digest do X-Api-Key), relido em 2026-10-11"
+      method: "medição: objeção do Elenxo relida contra o arquivo com grep -n e sed -n em 2026-10-11"
+      locality: "repo"
+
+  - id: E_OBJECAO_PRECEDENTE_SEM_FRESCOR_POR_COMMIT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "ops/mcp-onion-kg/server.py@8ade5598 l.21 e l.31-37 (REPO e cwd=REPO), relido em 2026-10-11"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "OBJEÇÃO (Elenxo), MEDIDA nesta sessão: o precedente roda git ls-files e kg-radar.sh na árvore de trabalho (cwd=REPO, o próprio core), sem ref fixa nem commit declarado; falta a tool kg_node."
+    narrative: "Alvo: lacuna local. Para a (4): fetch periódico de origin/main do hub com deploy key read-only, servir de um worktree destacado no SHA verificado (o radar lê o filesystem, então não basta git show) e incluir served_commit e fetched_at em TODA resposta de tool. Relido nesta sessão: REPO é derivado do caminho do próprio arquivo (l.21) e _run usa cwd=REPO (l.31-32); as 6 tools são kg_list, kg_radar, kb_search, kb_get, diary_index, inventory."
+    trace: "ops/mcp-onion-kg/server.py"
+    provenance:
+      source: "ops/mcp-onion-kg/server.py@8ade5598"
+      locator: "ops/mcp-onion-kg/server.py@8ade5598 l.21 e l.31-37 (REPO e cwd=REPO), relido em 2026-10-11"
+      method: "medição: objeção do Elenxo relida contra o arquivo com grep -n e sed -n em 2026-10-11"
+      locality: "repo"
+
+  - id: E_OBJECAO_KB_SEARCH_GREP_SEM_DUPLO_HIFEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "ops/mcp-onion-kg/server.py@8ade5598 l.50-54 (grep -rin -m 3 termo sem '--'), relido em 2026-10-11"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "OBJEÇÃO (Elenxo), MEDIDA nesta sessão: kb_search passa o termo do modelo ao grep sem '--' (server.py l.54); '--file=<caminho>' vira opção do grep. Defeito pré-existente a curar antes de qualquer exposição."
+    narrative: "Alvo: lacuna local. O único filtro é len>=3 (l.52-53); o argumento vem do modelo, que pode estar sob injeção (B5): oráculo de conteúdo de arquivo arbitrário. Cura: inserir '--' antes do termo. Vale para A e B, porque ambas reativam este código."
+    trace: "ops/mcp-onion-kg/server.py"
+    provenance:
+      source: "ops/mcp-onion-kg/server.py@8ade5598"
+      locator: "ops/mcp-onion-kg/server.py@8ade5598 l.50-54 (grep -rin -m 3 termo sem '--'), relido em 2026-10-11"
+      method: "medição: objeção do Elenxo relida contra o arquivo com grep -n e sed -n em 2026-10-11"
+      locality: "repo"
+
+  - id: E_OBJECAO_CONTRARIANO_LIBRECHAT_NAO_PESADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-11"
+    verified_against: "corpus librechat-kg-runtime-2026-08 (Q_ONION_KG_MCP_NEXT, E_ONION_KG_MCP_DESLIGADO_DE_PROPOSITO)"
+    source_tier: 3
+    source_kind: analysis
+    label: "OBJEÇÃO (Elenxo): o LibreChat da VPS já tem SSO Logto e já consumiu este MCP por loopback com token estático; foi desligado por falta de consumidor, não por defeito. A rodada não pesou isso contra o MCP público."
+    narrative: "Alvo: contrariano não explorado. Corpus (b, d): Q_ONION_KG_MCP_NEXT (2026-08-20) e E_ONION_KG_MCP_DESLIGADO_DE_PROPOSITO (desligado em 2026-08-27). Entrega o veredito fora do Claude Code sem OAuth no MCP e sem exposição pública, com custo marginal mínimo. Pesa contra B (público antes de demanda medida) e contra F (o paliativo JS é pior que um precedente pronto)."
+    trace: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml"
+    provenance:
+      source: "repasse do Elenxo da rodada /onion-research de 2026-10-11 (SAC-70), modo decisão"
+      locator: "objeção ao alvo 'Contrariano LibreChat' (survives=true)"
+      method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
+      locality: "host"
+
+edges:
+
+  # ── evidências sustentam a pergunta; opções são candidatas da decisão ──
+  - from: E_MEDIDO_LOCAL_PRECEDENTE_MCP_ONION_KG
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_MCP_RS_PRM_AS_SEPARADO
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_MCP_PROIBE_TOKEN_PASSTHROUGH
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_MCP_2026_07_28_AUDIENCE_BINDING
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_MCP_UPSTREAM_CREDENCIAL_PROPRIA
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_REUSAR_IAM_NAO_IMPLEMENTAR_AS
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_CONECTORES_HTTP_NAO_STDIO
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_STREAMABLE_HTTP_SUBSTITUI_SSE
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_CLOUDFLARE_BYO_IDP
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_TENANT_DE_CLAIM_NUNCA_DE_INPUT
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_AI_OAUTH_FALHA_ISSUE_171
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_MCP_2026_07_28_SEM_SESSAO
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_MERCADO_MCP_REMOTO_SEM_SINAL_DE_CAPITAL
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_ONION_BRAIN_MCP_2026_10
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: SUPPORTS
+  - from: C_OPCAO_A_REATIVAR_PRECEDENTE_VIA_LIBRECHAT
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_C_GATEWAY_DE_TERCEIROS
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_D_WORKERS_AS_PROXY
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_E_MULTI_TENANT_POR_CLAIM
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_F_SEM_MCP_LEITOR_JS
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: SUPPORTS
+  - from: D_ONION_BRAIN_MCP_REMOTO
+    to: Q_ONION_BRAIN_MCP_REMOTO_2026_10
+    edge_type: TRACES_TO
+  - from: E_MEDIDO_LOCAL_PRECEDENTE_MCP_ONION_KG
+    to: C_OPCAO_A_REATIVAR_PRECEDENTE_VIA_LIBRECHAT
+    edge_type: SUPPORTS
+  - from: E_MCP_RS_PRM_AS_SEPARADO
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: SUPPORTS
+
+  # ── objeções sobreviventes LIMITAM opções/decisão (38 CONSTRAINS) ──
+  - from: E_OBJECAO_IDP_CADASTRO_ABERTO_NAO_AUTORIZA
+    to: C_OPCAO_A_REATIVAR_PRECEDENTE_VIA_LIBRECHAT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_IDP_CADASTRO_ABERTO_NAO_AUTORIZA
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_NEGOCIAR_VARIAS_VERSOES
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LOGTO_DCR_CIMD_NAO_MEDIDO
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CLOUDFLARE_E_AS_PROXY
+    to: C_OPCAO_D_WORKERS_AS_PROXY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DOGFOOD_OAUTH_POR_CLIENTE
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_D2_INCONSISTENTE_COM_ACHADOS
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PKCE_METADATA_DO_LOGTO
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CONECTOR_EXIGE_INTERNET_PUBLICA
+    to: C_OPCAO_A_REATIVAR_PRECEDENTE_VIA_LIBRECHAT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CONECTOR_EXIGE_INTERNET_PUBLICA
+    to: C_OPCAO_C_GATEWAY_DE_TERCEIROS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CALLBACK_NO_PRE_REGISTRO
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GATEWAYS_ESTABELECIDOS_NAO_COMPARADOS
+    to: C_OPCAO_C_GATEWAY_DE_TERCEIROS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GATEWAYS_ESTABELECIDOS_NAO_COMPARADOS
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ORDEM_DE_REGISTRO_DO_CLIENTE
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ESCOPO_UNICO_DE_LEITURA
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OWNER_ADICIONA_CONECTOR
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SO_TOOLS
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_INJECAO_INDIRETA_NO_BRAIN
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GATEWAY_SO_COM_MUITOS_HUBS
+    to: C_OPCAO_C_GATEWAY_DE_TERCEIROS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GATEWAY_SO_COM_MUITOS_HUBS
+    to: C_OPCAO_E_MULTI_TENANT_POR_CLAIM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SAML_EXIGE_PONTE_OIDC
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_BEARER_POR_REQUISICAO_STATELESS
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SEM_HANDLES_POR_USUARIO
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CONFUSED_DEPUTY_E_O_CRITERIO
+    to: C_OPCAO_D_WORKERS_AS_PROXY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ESCOPOS_PROGRESSIVOS
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_STDIO_VIA_PROXY_ELIMINADO
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MCP_REMOTE_DATA_NAO_CONFERIDA
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CLOUDFLARE_CONTROLE_POR_USUARIO
+    to: C_OPCAO_D_WORKERS_AS_PROXY
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TOKEN_AMARRA_SERVIDOR_NAO_TENANT
+    to: C_OPCAO_E_MULTI_TENANT_POR_CLAIM
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TOKEN_AMARRA_SERVIDOR_NAO_TENANT
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MATRIZ_DE_CLIENTES_NAO_LIDA
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PRECEDENTE_USA_X_API_KEY
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PRECEDENTE_SEM_FRESCOR_POR_COMMIT
+    to: C_OPCAO_A_REATIVAR_PRECEDENTE_VIA_LIBRECHAT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PRECEDENTE_SEM_FRESCOR_POR_COMMIT
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_KB_SEARCH_GREP_SEM_DUPLO_HIFEN
+    to: C_OPCAO_A_REATIVAR_PRECEDENTE_VIA_LIBRECHAT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_KB_SEARCH_GREP_SEM_DUPLO_HIFEN
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CONTRARIANO_LIBRECHAT_NAO_PESADO
+    to: C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CONTRARIANO_LIBRECHAT_NAO_PESADO
+    to: C_OPCAO_F_SEM_MCP_LEITOR_JS
+    edge_type: CONSTRAINS
