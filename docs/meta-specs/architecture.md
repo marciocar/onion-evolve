@@ -244,7 +244,8 @@ Implicações:
   (decisão do maestro de 2026-10-11, nó `D_VERSIONAR_AS_PORTAS_POR_RELEASE` em
   `docs/onion/graph/door-role-parity-2026-09.kg.yaml`). Nasce no `/meta:publish`: o motor **propõe** o
   bump pelo diff de superfície da porta e o maestro **sela** o número com `--version`. A tag mora nas
-  **portas**, nunca no core. Nenhuma guarda lê a versão (REGRA 85, REGRA 92 e o `--status` medem o pin).
+  **portas**, nunca no core. Nenhuma guarda lê a versão (a REGRA 85 (Porta pública espelha o core, com catraca), a REGRA 92
+  (Papel da porta no registro concorda com o CARIMBO dela) e o `--status` medem o pin).
   Um pin que não é release tem a versão **derivada** no estilo `git describe` (`onion-v1.0.0-31-g<sha>`),
   e ela nunca vira campo guardado no `members.yaml`. Número único na família, começando em `1.0.0`.
   O que conta como API pública de cada porta (e dá sentido ao "major"): os comandos invocáveis, os
