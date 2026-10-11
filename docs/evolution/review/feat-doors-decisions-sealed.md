@@ -1,6 +1,5 @@
 ---
-reviewed_diff_sha256: a94503e93a891a4964eeab2ea108f7cdd5dfae5ab859292dd52131b356bd0c50
-reviewed_code_sha256: dd011e680ec4975363bfde24b7e2c32126ac178d9f6acc3ff845ccdf0827f9e1
+reviewed_diff_sha256: pendente
 findings_total: 10
 findings_real: 10
 tokens: 183517
@@ -15,6 +14,9 @@ nota: >
   curados no mesmo laço. Os achados 1 e 6 viraram a pergunta Q_CARIMBO_DO_ADOTADO_STANDALONE, com
   gatilho. APROVADO descreve o estado depois das curas. Revisto por mim: as curas têm caso e mutante na
   bancada, e os mutantes plantados por ops/mutate-and-restore.sh foram mortos.
+  Depois do PR aberto, o contexto principal rebaseou sobre a main (que andou com #1012/#1013) e
+  acrescentou só o pin do portal-gamificacao no members.yaml (registry-pins --seal, remoto); revisto, sem
+  mudança no código do PR.
 ---
 
 # Resíduo — `feat/doors-decisions-sealed`
