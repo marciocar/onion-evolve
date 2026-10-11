@@ -208,11 +208,11 @@ members:
     #   antiga, sem carimbo, e por isso o pin é `n/a` (exceção nomeada no members-validate.sh) e a
     #   REGRA 92 declara a paridade não-medida. A destilação fica numa tag de arquivo no próprio repo.
     role: mini                  # papel de porta: allowlist didática para iniciantes
-    kind: door                  # distribui; até a 1ª publicação, conteúdo ainda é a destilação curada
+    kind: door                  # distribui; destilação antiga na tag archive/pre-door-2026-10-10
     parent: onion-evolve
     remote: github.com/marciocar/onion-mini
     local_path: "/home/marcio/onion-mini"
-    onion_version: n/a          # ainda não publicada pelo carimbo (caminho desde a F5, SAC-94)
+    onion_version: 0bf23f0c7032   # carimbo publicado no remoto (publish-door --status, 2026-10-10)
     adopted_at: 2026-07-05      # data da adoção definitiva/rebrand (repo existe desde jun/2026)
     mode: distilled             # anotação livre; o trust engine só valida role
     published_at: "https://onionevolve.com/mini/"   # vitrine no site da família (M2 ✅ 2026-07-05); código: github.com/marciocar/onion-mini
@@ -239,7 +239,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/onion-standalone   # PÚBLICO. Gated: reapontar o redirect onion-claude→onion-standalone
     local_path: "/home/marcio/onion-standalone"
-    onion_version: 947e69ce069d   # carimbado por ops/door-seal-pin.sh (remoto conferido)
+    onion_version: 0bf23f0c7032   # carimbado por ops/door-seal-pin.sh (remoto conferido)
     adopted_at: 2026-07-19
     mode: greenfield            # pasta vazia → adopt role-scoped; SÓ o bundle standalone (eng/product/testing/docs), meta-factory selada
     personality_summary: "A porta pública Claude do Onion: instância adotada role-scoped (bundle standalone: eng/product/testing/docs), SEM meta-factory nem memória privada de evolução. Derivação que cita o core (pin verificado). Desfaz o colapso porta≡core; nasce privada, flip público gated."
@@ -334,12 +334,12 @@ members:
     name: onion-core (porta pública do core — maquinaria completa, papel hub, sem biografia)
     # A troca do papel para `source` (D_MATRIZ_DE_PORTAS_2026_10) vem com a F2/F3 e a re-materialização,
     #   nessa ordem: carimbo primeiro, registro depois. Trocar só aqui faria a REGRA 92 reprovar.
-    role: hub                   # = carimbo da porta (REGRA 92); o incidente de 2026-09-30 está no grafo
+    role: source                # = carimbo da porta (REGRA 92); source desde a publicação de 2026-10-10 (F6)
     kind: door                  # DISTRIBUI a maquinaria; é a face pública do core
     parent: onion-evolve
     remote: github.com/marciocar/onion-core   # PÚBLICO desde 2026-09-17; história reescrita uma vez (vazamento medido)
     local_path: "/home/marcio/onion-core"
-    onion_version: 947e69ce069d   # carimbado por ops/door-seal-pin.sh (remoto conferido); pins 17ª–19ª no grafo
+    onion_version: 0bf23f0c7032   # carimbado por ops/door-seal-pin.sh (remoto conferido)
     adopted_at: 2026-09-17
     mode: greenfield            # repo vazio -> materializacao pelo manifesto (nunca copia de disco)
     personality_summary: "A porta pública do core: a maquinaria COMPLETA (comandos, agentes, skills, guardas, meta-fábrica) sem a biografia. Nasceu no dia em que o core foi fechado, e existe porque método viaja e história não. É PROJEÇÃO — não recebe PR; correção feita nela é sobrescrita na próxima materialização."
@@ -365,7 +365,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/onion-plugins   # PÚBLICO desde 2026-08-25; branch master
     local_path: "/home/marcio/onion-plugins"
-    onion_version: 947e69ce069d   # `ref` de plugins/onion/.claude-plugin/provenance.json no remoto (gh api, 2026-10-09)
+    onion_version: 0bf23f0c7032   # `ref` dos provenance.json no remoto (publish-door --status, 2026-10-10)
     adopted_at: 2026-08-25      # 1ª publicação (criação do repo e 1º commit)
     mode: greenfield            # repo gerado pelo assemble-plugin.sh, nunca editado à mão
     personality_summary: "A porta de instalação do Onion como plugins do Claude Code: a superfície do standalone empacotada em marketplace, sem adoção nem federação. É projeção gerada do core e carimba a origem por provenance.json, não por .onion-version."
