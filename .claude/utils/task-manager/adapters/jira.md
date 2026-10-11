@@ -458,7 +458,7 @@ class JiraAdapter implements ITaskManager {
    * Busca issues via JQL.
    *
    * Cloud (v3): usa POST /search/jql com paginação por nextPageToken (endpoint
-   * antigo /search foi removido em maio/2025).
+   * antigo /search está em remoção — CHANGE-2046, "currently being removed" na referência v3, sem data).
    * Server/DC (v2): usa GET /search com startAt (endpoint clássico).
    */
   private async searchByJQL(
@@ -764,14 +764,14 @@ class JiraAdapter implements ITaskManager {
 | Get issue | `GET /rest/api/3/issue/{key}` | ✅ Atual |
 | Update issue | `PUT /rest/api/3/issue/{key}` | ✅ Atual |
 | Delete issue | `DELETE /rest/api/3/issue/{key}` | ✅ Atual |
-| Buscar via JQL | `POST /rest/api/3/search/jql` | ✅ Atual (substituiu `/search` removido em maio/2025) |
+| Buscar via JQL | `POST /rest/api/3/search/jql` | ✅ Atual (substitui `/search`, em remoção — CHANGE-2046) |
 | Transitions | `GET/POST /rest/api/3/issue/{key}/transitions` | ✅ Atual |
 | Comments | `GET/POST /rest/api/3/issue/{key}/comment` | ✅ Atual |
 | Projects | `GET /rest/api/3/project/search` | ✅ Atual |
 
 ### Migrações importantes
 
-- **Maio/2025**: `GET/POST /rest/api/3/search` foi **removido**. Substituído por `POST /rest/api/3/search/jql` com **paginação por `nextPageToken`** (não mais `startAt`). Este adapter usa o endpoint novo em v3 e mantém `/search` clássico para v2 (Server/DC).
+- **Em remoção (CHANGE-2046)**: `GET/POST /rest/api/3/search` está marcado "currently being removed" na referência v3 (lida em 2026-10-11, sem data de remoção; a afirmação anterior, "removido em maio/2025", não tinha fonte). Substituído por `POST /rest/api/3/search/jql` com **paginação por `nextPageToken`** (não mais `startAt`). Este adapter usa o endpoint novo em v3 e mantém `/search` clássico para v2 (Server/DC).
 - **2024-2025**: Migração obrigatória para `accountId` em todos os campos de usuário (em vez de `name`/`username`). Já refletido no adapter.
 
 ### Considerações forward-looking

@@ -1,0 +1,867 @@
+{
+  "summary": "Pesquisa Onion: corpus primeiro, eixos fixos (Claude Code atual, mercado/capital, trajetória, analistas, comunidade) + ângulos do tema, tier de fonte, verificação adversarial 3/2, write(KG) bi-temporal com radar",
+  "agentCount": 13,
+  "logs": [
+    "Corpus: fornecido em formato NÃO-CANÔNICO (970 chars, 0 linhas grafo<TAB>ID) — a skill manda o bloco do kg-corpus-grep.sh VERBATIM; entra como prosa no Scope, na síntese, no Elenxo e no write(KG)",
+    "Modo PRIMÁRIAS: 6 fonte(s) NOMEADA(S), leitura integral — sem Scope/Search/Fetch/Verify. Medido 2026-09-13 na mesma pergunta: varredura 291k tokens/nó (19 de 25 claims refutadas, a maioria por fonte fraca) × primárias 42k tokens/nó.",
+    "Leitura: 5/6 fontes alcançadas · inalcançáveis: zoho-projects-v3",
+    "Ancoragem: 27 claim(s) ANCORADA(S) · 3 rejeitada(s) (exagerada ou não encontrada)",
+    "Elenxo: 27 objeções (17 sobrevivem) · lacunas fechadas: 6 · abertas: 7",
+    "write(KG): /home/marcio/onion-evolve/docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml — +52 nós / +62 arestas, total 52, radar exit 0"
+  ],
+  "result": {
+    "mode": "primaries",
+    "question": "Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máximos); (2) status e transição (status livre ou workflow com transições obrigatórias); (3) prioridade (tipo e escala); (4) estimativa/story points (campo nativo ou custom); (5) comentário (formato do corpo: ADF, markdown, HTML, texto); (6) anexo; (7) label/tag; (8) sprint/ciclo/iteração; (9) dependência/vínculo entre itens; (10) busca/filtro e paginação; (11) operação em lote; (12) versão de API vigente e depreciações. O objetivo é a matriz provedor × capacidade que a interface agnóstica do Onion (interface.md) vai declarar.",
+    "today": "2026-10-11",
+    "kgPath": "/home/marcio/onion-evolve/docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml",
+    "radarExit": 0,
+    "summary": "Grafo novo da Onda 1 (SAC-62, run wf_8e56d56f-a8b): 27 evidências ancoradas com URL primária, a contabilidade E_LACUNAS (5 fontes lidas, Zoho inalcançável, 3 claims rejeitadas por exagero, gapsOpen inteiros), 17 objeções sobreviventes do Elenxo como nós CONSTRAINS, 3 sínteses open e 4 perguntas, entre elas a reconciliação do \"removido em maio/2025\" do core com o \"currently being removed\" da primária. As 62 arestas são 61 internas mais 1 external_edge CONSTRAINS sobre zoho-glpi-adapters-2026-09#E_ZOHO_SEM_ENDPOINT_TRANSICAO. Nenhum selo. Radar --integrity --schema exit 0 e kg-contract-check rc 0.",
+    "unreachable": [
+      "zoho-projects-v3"
+    ],
+    "anchored": [
+      {
+        "source": "jira-cloud-v3",
+        "gap": "capacidades do Jira Cloud REST v3: hierarquia (epic/story/subtask, issue types), workflow e transições, prioridade, story points (campo custom), comentário em ADF, anexo, labels, sprint (Agile API), issue links, JQL e paginação por nextPageToken, bulk",
+        "claim": "Bulk create aceita no máximo 50 issues por requisição e também cria subtasks; subtask exige issueType de subtask e parent.",
+        "verdict": "ANCORADA",
+        "why": "A quote está literal, com o typo \"upto\" e os asteriscos de markdown. A mesma description diz que `issueType` deve ser um tipo de subtask e que `parent` deve conter o ID ou a chave do pai. Ressalva: a criação de subtasks vale só onde a opção está habilitada no Jira, e o claim omite essa condição. O texto também diz que transições e properties podem ser aplicadas no lote.",
+        "corrected": "",
+        "quote": "Creates upto **50** issues and, where the option to create subtasks is enabled in Jira, subtasks.",
+        "locator": "POST /rest/api/3/issue/bulk (Bulk create issue), description",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "jira-cloud-v3",
+        "gap": "capacidades do Jira Cloud REST v3: hierarquia (epic/story/subtask, issue types), workflow e transições, prioridade, story points (campo custom), comentário em ADF, anexo, labels, sprint (Agile API), issue links, JQL e paginação por nextPageToken, bulk",
+        "claim": "Descrição e campos textarea custom também são ADF; campos de linha única (textfield) aceitam string.",
+        "verdict": "ANCORADA",
+        "why": "A quote está literal. A frase seguinte da mesma description diz: \"Single line custom fields (`textfield`) accept a string and don't handle Atlassian Document Format content.\" Essa parte do claim está no documento, mas fora da quote citada. O texto também inclui `environment`, que o claim não menciona. Esse parágrafo descreve a criação em lote e vale para os campos definidos por `fields`/`update`.",
+        "corrected": "",
+        "quote": "Note that the `description`, `environment`, and any `textarea` type custom fields (multi-line text fields) take Atlassian Document Format content.",
+        "locator": "POST /rest/api/3/issue/bulk, description",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "jira-cloud-v3",
+        "gap": "capacidades do Jira Cloud REST v3: hierarquia (epic/story/subtask, issue types), workflow e transições, prioridade, story points (campo custom), comentário em ADF, anexo, labels, sprint (Agile API), issue links, JQL e paginação por nextPageToken, bulk",
+        "claim": "O /search/jql pagina por token opaco (nextPageToken), que expira em 7 dias.",
+        "verdict": "ANCORADA",
+        "why": "A quote está literal em components.schemas.SearchAndReconcileResults.properties.nextPageToken.description. O GET e o POST de /search/jql têm o parâmetro/campo nextPageToken para pedir páginas seguintes. Ressalvas: \"opaco\" é caracterização do leitor (o texto diz \"continuation token\"). O parâmetro de entrada diz que a primeira página tem nextPageToken null e que o campo não vem na resposta da última página, enquanto o schema de resposta diz \"will be null\".",
+        "corrected": "",
+        "quote": "Continuation token to fetch the next page. If this result represents the last or the only page this token will be null. This token will expire in 7 days.",
+        "locator": "Schema SearchAndReconcileResults.nextPageToken, POST/GET /rest/api/3/search/jql",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "jira-cloud-v3",
+        "gap": "capacidades do Jira Cloud REST v3: hierarquia (epic/story/subtask, issue types), workflow e transições, prioridade, story points (campo custom), comentário em ADF, anexo, labels, sprint (Agile API), issue links, JQL e paginação por nextPageToken, bulk",
+        "claim": "O /search antigo (GET e POST) está sendo removido (CHANGE-2046), e o /search/jql oferece reconcileIssues para consistência read-after-write.",
+        "verdict": "ANCORADA",
+        "why": "A quote abre a description tanto do GET quanto do POST de /rest/api/3/search, e os summaries começam com \"Currently being removed\". A description de /search/jql (GET e POST) diz que atualizações recentes podem não aparecer de imediato e que, para consistência read-after-write, se pode usar o parâmetro `reconcileIssues`, que aceita no máximo 50 ids. Ressalva: o texto diz \"being removed\" (remoção em curso), não que já foi removido. A segunda metade do claim está fora da quote citada, mas confere no documento.",
+        "corrected": "",
+        "quote": "Endpoint is currently being removed. [More details](https://developer.atlassian.com/changelog/#CHANGE-2046)",
+        "locator": "GET e POST /rest/api/3/search, description; reconcileIssues em /search/jql",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "jira-cloud-v3",
+        "gap": "capacidades do Jira Cloud REST v3: hierarquia (epic/story/subtask, issue types), workflow e transições, prioridade, story points (campo custom), comentário em ADF, anexo, labels, sprint (Agile API), issue links, JQL e paginação por nextPageToken, bulk",
+        "claim": "Mudança de status se faz por transição, com campos da tela da transição.",
+        "verdict": "ANCORADA",
+        "why": "A quote está literal. O texto acrescenta que os campos da tela da transição vão em `fields` ou `update` no corpo, e que `transitions.fields` do Get transitions detalha esses campos. Ressalva: a description diz que o endpoint executa uma transição. Ela não afirma que essa é a única via de mudar o status, então a exclusividade vem de inferência. O texto também não diz que as transições são obrigatórias em todo workflow.",
+        "corrected": "",
+        "quote": "Performs an issue transition and, if the transition has a screen, updates the fields from the transition screen.",
+        "locator": "POST /rest/api/3/issue/{issueIdOrKey}/transitions (Transition issue), description",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "jira-dc-v2",
+        "gap": "diferenças do Jira Server/Data Center REST v2 frente ao Cloud v3: formato de texto (wiki markup), search com startAt, ausência de ADF",
+        "claim": "No Jira DC/Server REST v2 o corpo do comentário é string simples (sem ADF); o schema de Comment declara body como string; renderedBody (HTML) só vem sob expand.",
+        "verdict": "ANCORADA",
+        "why": "A quote aparece literal no JSON Schema de Comment, nos schemas de GET/POST/PUT comment (a de POST em /issue/{id}/comment). O parametro expand 'renderedBody' é opcional nas mesmas operações. A ausência de ADF é inferência por silêncio (a doc v2 nem cita ADF), mas coerente com body:string.",
+        "corrected": "",
+        "quote": "\"body\":{\"type\":\"string\"},\"renderedBody\":{\"type\":\"string\"}",
+        "locator": "POST /rest/api/2/issue/{issueIdOrKey}/comment, schema JSON do Comment (idem GET/PUT comment)"
+      },
+      {
+        "source": "jira-dc-v2",
+        "gap": "diferenças do Jira Server/Data Center REST v2 frente ao Cloud v3: formato de texto (wiki markup), search com startAt, ausência de ADF",
+        "claim": "O HTML renderizado do comentário é opt-in pelo parâmetro expand, coerente com corpo armazenado como texto de marcação.",
+        "verdict": "ANCORADA",
+        "why": "A quote é a concatenação das células da tabela de parâmetros (expand | string | 'optional flags: renderedBody (provides body rendered in HTML)'), presente em Add comment, Update comment e também em Get comments/Get comment. A segunda frase do claim ('coerente com texto de marcação') é interpretação, não afirmação da doc, mas não contradiz.",
+        "corrected": "",
+        "quote": "expandstringoptional flags: renderedBody (provides body rendered in HTML)",
+        "locator": "query parameters de GET/POST/PUT /rest/api/2/issue/{issueIdOrKey}/comment",
+        "sourceTier": 9,
+        "validFrom": "Jira 9.17.0"
+      },
+      {
+        "source": "jira-dc-v2",
+        "gap": "diferenças do Jira Server/Data Center REST v2 frente ao Cloud v3: formato de texto (wiki markup), search com startAt, ausência de ADF",
+        "claim": "A paginação do DC v2 é por startAt e maxResults; o envelope traz startAt, maxResults e total, total opcional e página podendo vir vazia; cada API tem limite próprio.",
+        "verdict": "ANCORADA",
+        "why": "Quote literal (com quebra de linha no HTML). A mesma seção diz 'Each API may have a different limit for number of items returned', usa startAt/maxResults e o exemplo JSON tem startAt, maxResults, total e values. 'total' pode ser omitido quando caro de calcular.",
+        "corrected": "",
+        "quote": "A client should always assume that the requested page can be empty. REST API consumers should also consider the field to be optional.",
+        "locator": "seção Pagination, parágrafos após o exemplo JSON"
+      },
+      {
+        "source": "jira-dc-v2",
+        "gap": "diferenças do Jira Server/Data Center REST v2 frente ao Cloud v3: formato de texto (wiki markup), search com startAt, ausência de ADF",
+        "claim": "A busca do DC v2 é JQL em GET /rest/api/2/search, com POST no mesmo recurso quando o JQL é grande; fields seleciona campos e o default é só navigable.",
+        "verdict": "ANCORADA",
+        "why": "Quote literal sob 'GET vs POST'. Existem GET e POST /rest/api/2/search. O texto de fields diz 'By default, only navigable (*navigable) fields are returned in this search resource' e que no get-issue o default é *all.",
+        "corrected": "",
+        "quote": "If the JQL query is too large to be encoded as a query param you should instead POST to this resource.",
+        "locator": "GET /rest/api/2/search, seções 'Sorting' e 'GET vs POST'",
+        "sourceTier": 9,
+        "validFrom": "Jira 9.17.0"
+      },
+      {
+        "source": "jira-dc-v2",
+        "gap": "diferenças do Jira Server/Data Center REST v2 frente ao Cloud v3: formato de texto (wiki markup), search com startAt, ausência de ADF",
+        "claim": "A operação em lote existe como criação em bulk, POST /rest/api/2/issue/bulk, de issues ou sub-tasks. O /latest/ da doc redireciona hoje para a versão 9.17.0.",
+        "verdict": "ANCORADA",
+        "why": "Quote presente (o código do endpoint e o parágrafo adjacentes no HTML). Texto adicional: 'Creates many issues in one bulk operation'. O título da doc é 'Jira 9.17.0' e curl -I em /REST/latest/ devolveu 302 com location .../REST/9.17.0/ hoje. Observação: o único endpoint 'bulk' de issues é a criação (o outro, reindex/request/bulk, não é operação sobre issues em lote); não há bulk de update/delete na v2 desta versão.",
+        "corrected": "",
+        "quote": "POST /rest/api/2/issue/bulkCreates issues or sub-tasks from a JSON representation.",
+        "locator": "Create issues, POST /rest/api/2/issue/bulk; HTTP 302 de /software/jira/docs/api/REST/latest/ para /REST/9.17.0/"
+      },
+      {
+        "source": "clickup-api",
+        "gap": "capacidades do ClickUp API v2 (e o que existe na v3): hierarquia Space/Folder/List/Task/Subtask (níveis), status por lista, prioridade inteira, time estimate e sprint points, comentários, anexos, tags, dependências e task links, filtros e paginação, versão vigente",
+        "claim": "Subtask em v2 se cria via Create Task com parent=ID de task existente na mesma List; o parent pode ser ele mesmo uma subtask (aninhamento além de um nível dentro da List).",
+        "verdict": "ANCORADA",
+        "why": "O campo parent (string|null) tem a descrição \"You can create a subtask by including an existing task ID.\" seguida da frase citada, literal. O claim não passa disso: parent pode ser subtask, na mesma List do path.",
+        "corrected": "",
+        "quote": "The `parent` task ID you include can be a subtask, but must be in the same List specified in the path parameter.",
+        "locator": "POST /api/v2/list/{list_id}/task, body.parent (createtask)"
+      },
+      {
+        "source": "clickup-api",
+        "gap": "capacidades do ClickUp API v2 (e o que existe na v3): hierarquia Space/Folder/List/Task/Subtask (níveis), status por lista, prioridade inteira, time estimate e sprint points, comentários, anexos, tags, dependências e task links, filtros e paginação, versão vigente",
+        "claim": "Sprint points são o campo nativo `points` no create task; priority é integer|null e time_estimate integer, sem escala/unidade descrita na referência.",
+        "verdict": "ANCORADA",
+        "why": "points é number com a descrição literal \"Add Sprint Points to the task.\" priority é integer|null (int32) e time_estimate é integer (int32), ambos sem descrição no schema. O claim afirma só a ausência de escala/unidade nesse schema. Os valores 1 a 4 de priority aparecem na página docs/tasks (Setting Priority), que não é a referência citada.",
+        "corrected": "",
+        "quote": "Add Sprint Points to the task.",
+        "locator": "POST /api/v2/list/{list_id}/task, body.points (priority: integer|null, time_estimate: integer, sem descrição)"
+      },
+      {
+        "source": "clickup-api",
+        "gap": "capacidades do ClickUp API v2 (e o que existe na v3): hierarquia Space/Folder/List/Task/Subtask (níveis), status por lista, prioridade inteira, time estimate e sprint points, comentários, anexos, tags, dependências e task links, filtros e paginação, versão vigente",
+        "claim": "A descrição da task em markdown vai por markdown_content, que prevalece sobre description.",
+        "verdict": "ANCORADA",
+        "why": "O texto literal é \"If both `markdown_content` and `description` are provided, `markdown_content` will be used instead of `description`.\" A citação é um trecho exato e o claim bate com ela.",
+        "corrected": "",
+        "quote": "`markdown_content` will be used instead of `description`.",
+        "locator": "POST /api/v2/list/{list_id}/task, body.markdown_content"
+      },
+      {
+        "source": "clickup-api",
+        "gap": "capacidades do ClickUp API v2 (e o que existe na v3): hierarquia Space/Folder/List/Task/Subtask (níveis), status por lista, prioridade inteira, time estimate e sprint points, comentários, anexos, tags, dependências e task links, filtros e paginação, versão vigente",
+        "claim": "Get Tasks pagina por índice de página com 100 por página, lista só tasks da home List, exclui tasks em várias listas salvo include_timl, e exclui subtasks por padrão.",
+        "verdict": "ANCORADA",
+        "why": "Todos os pontos aparecem literais no texto. \"Responses are limited to 100 tasks per page.\", page \"starts at 0\", \"By default, subtasks are excluded.\", \"This endpoint only includes tasks where the specified `list_id` is their home List.\" e include_timl \"By default, tasks that exist in multiple lists are excluded\". Não conferi uma a uma as existências dos params statuses, tags e due_date_gt listados no locator.",
+        "corrected": "",
+        "quote": "Responses are limited to 100 tasks per page.",
+        "locator": "GET /api/v2/list/{list_id}/task, params page, subtasks, include_timl, statuses, tags, due_date_gt"
+      },
+      {
+        "source": "clickup-api",
+        "gap": "capacidades do ClickUp API v2 (e o que existe na v3): hierarquia Space/Folder/List/Task/Subtask (níveis), status por lista, prioridade inteira, time estimate e sprint points, comentários, anexos, tags, dependências e task links, filtros e paginação, versão vigente",
+        "claim": "Dependências são adicionadas em uma direção por requisição, via depends_on ou dependency_of.",
+        "verdict": "ANCORADA",
+        "why": "A descrição do requestBody diz \"You can only use one per request.\", e as descrições de depends_on (a task que deve ser concluída antes da task do path) e dependency_of (a task que espera a do path) existem. O claim bate com o texto.",
+        "corrected": "",
+        "quote": "You can only use one per request.",
+        "locator": "POST /api/v2/task/{task_id}/dependency (adddependency), requestBody"
+      },
+      {
+        "source": "asana-api",
+        "gap": "capacidades do Asana REST API: projects/sections/tasks/subtasks, status (sections ou custom fields), prioridade (custom field), estimativa, stories (comentários) em html_text, anexos, tags, dependências, busca e paginação por offset, batch API",
+        "claim": "Paginação do Asana por offset opaco com limit 1-100; offset expira.",
+        "verdict": "ANCORADA",
+        "why": "Aberta a página Pagination: a frase aparece literal, na descrição de limit. A parte do offset expirar está na frase do claim 2. A página não foi lida palavra por palavra para a palavra 'opaco', mas a mecânica de offset token é a descrita.",
+        "corrected": "",
+        "quote": "The value must be between 1 and 100.",
+        "locator": "Docs > Pagination, parâmetro limit",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "asana-api",
+        "gap": "capacidades do Asana REST API: projects/sections/tasks/subtasks, status (sections ou custom fields), prioridade (custom field), estimativa, stories (comentários) em html_text, anexos, tags, dependências, busca e paginação por offset, batch API",
+        "claim": "Token de offset expira e next_page é null ao fim.",
+        "verdict": "ANCORADA",
+        "why": "A quote aparece literal. A segunda metade do claim tem fonte na mesma página: 'If there are no more pages available, next_page will be null and no offset will be provided.' Ressalva: a página registra uma exceção, o endpoint de audit log events pode continuar devolvendo next_page sem eventos.",
+        "corrected": "",
+        "quote": "Note that an offset token will expire after some time, as data may have changed.",
+        "locator": "Docs > Pagination, parâmetro offset",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "asana-api",
+        "gap": "capacidades do Asana REST API: projects/sections/tasks/subtasks, status (sections ou custom fields), prioridade (custom field), estimativa, stories (comentários) em html_text, anexos, tags, dependências, busca e paginação por offset, batch API",
+        "claim": "Batch API aceita no máximo 10 ações por requisição e é medida por ação.",
+        "verdict": "ANCORADA",
+        "why": "A quote aparece literal na página Batch requests. A medição por ação também está lá: cada ação conta como uma requisição separada nos limitadores, e o batch em si não tem custo adicional. A página de referência do objeto Batch (docs/batch-api) não traz esse trecho e remete a esta.",
+        "corrected": "",
+        "quote": "The maximum number of actions allowed in a single batch request is 10",
+        "locator": "Docs > Batch requests (developers.asana.com/docs/batch-requests)",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "asana-api",
+        "gap": "capacidades do Asana REST API: projects/sections/tasks/subtasks, status (sections ou custom fields), prioridade (custom field), estimativa, stories (comentários) em html_text, anexos, tags, dependências, busca e paginação por offset, batch API",
+        "claim": "Comentário (story) aceita text ou html_text, mutuamente exclusivos.",
+        "verdict": "ANCORADA",
+        "why": "A quote é literal na descrição do campo text. O html_text existe com a descrição 'HTML formatted text for a comment. This will not include the name of the creator.' A exclusividade mútua vem da frase de text.",
+        "corrected": "",
+        "quote": "The plain text of the comment to add. Cannot be used with html_text.",
+        "locator": "Reference > Create a story on a task, campo text",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "asana-api",
+        "gap": "capacidades do Asana REST API: projects/sections/tasks/subtasks, status (sections ou custom fields), prioridade (custom field), estimativa, stories (comentários) em html_text, anexos, tags, dependências, busca e paginação por offset, batch API",
+        "claim": "Busca de tasks por workspace exige conta premium (402 caso contrário) e pagina manualmente por created_at.",
+        "verdict": "ANCORADA",
+        "why": "A quote é literal (a frase completa começa com 'Like the Asana web product's advance search feature,'). O 402 está na página: 'Making a search request using credentials of a non-premium user will result in a 402 Payment Required error.' A paginação manual está lá: 'you can paginate manually by sorting the search results by their creation time'. A página também diz que as respostas de busca não têm next_page e que o limite de página é 100.",
+        "corrected": "",
+        "quote": "this search endpoint will only be available to premium Asana users.",
+        "locator": "Reference > Search tasks in a workspace, descrição",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "asana-api",
+        "gap": "capacidades do Asana REST API: projects/sections/tasks/subtasks, status (sections ou custom fields), prioridade (custom field), estimativa, stories (comentários) em html_text, anexos, tags, dependências, busca e paginação por offset, batch API",
+        "claim": "Subtask criada via endpoint próprio com campo parent; a doc não declara profundidade máxima.",
+        "verdict": "ANCORADA",
+        "why": "A quote é literal (continua com 'Returns the full record for the newly created subtask.'). O corpo tem o campo opcional parent ('Gid of a task'), e a task pai também vem pelo path param task_gid. Nenhum limite de profundidade aparece nessa página. Ressalva: a ausência foi verificada só nesta página, não em toda a documentação do Asana.",
+        "corrected": "",
+        "quote": "Creates a new subtask and adds it to the parent task.",
+        "locator": "Reference > Create a subtask for a task, descrição",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "linear-graphql",
+        "gap": "capacidades do Linear GraphQL API: Team/Project/Issue/sub-issue (parentId), workflow states por team, prioridade inteira 0-4, estimate (pontos, escala configurável), comentários em markdown, anexos (attachments), labels, cycles, issue relations (blocks/duplicate/related), filtros e paginação por cursor, operações em lote",
+        "claim": "Prioridade numérica 0-4 (0 sem prioridade, 1 urgente ... 4 baixa), tipo Float!",
+        "verdict": "ANCORADA",
+        "why": "Descrição verbatim no schema, seguida de `priority: Float!`. Há também priorityLabel: String!, mas o claim não o contradiz.",
+        "corrected": "",
+        "quote": "The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.",
+        "locator": "schema.graphql, type Issue, priority"
+      },
+      {
+        "source": "linear-graphql",
+        "gap": "capacidades do Linear GraphQL API: Team/Project/Issue/sub-issue (parentId), workflow states por team, prioridade inteira 0-4, estimate (pontos, escala configurável), comentários em markdown, anexos (attachments), labels, cycles, issue relations (blocks/duplicate/related), filtros e paginação por cursor, operações em lote",
+        "claim": "Estimate é campo nativo Float cuja escala depende da configuração do team",
+        "verdict": "ANCORADA",
+        "why": "Quote verbatim, seguida de `estimate: Float` (anulável). O claim bate com o texto.",
+        "corrected": "",
+        "quote": "The estimate of the complexity of the issue. The specific scale used depends on the team's estimation configuration (e.g., points, T-shirt sizes). Null if no estimate has been set.",
+        "locator": "schema.graphql, type Issue, estimate",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "linear-graphql",
+        "gap": "capacidades do Linear GraphQL API: Team/Project/Issue/sub-issue (parentId), workflow states por team, prioridade inteira 0-4, estimate (pontos, escala configurável), comentários em markdown, anexos (attachments), labels, cycles, issue relations (blocks/duplicate/related), filtros e paginação por cursor, operações em lote",
+        "claim": "Comentário tem body em markdown, derivado do conteúdo canônico ProseMirror (bodyData)",
+        "verdict": "ANCORADA",
+        "why": "Quote verbatim, com `body: String!`. O schema marca bodyData como '[Internal]', mas o claim só cita a relação derivada e não a contradiz.",
+        "corrected": "",
+        "quote": "The comment content in markdown format. This is a derived representation of the canonical bodyData ProseMirror content.",
+        "locator": "schema.graphql, type Comment, body",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "linear-graphql",
+        "gap": "capacidades do Linear GraphQL API: Team/Project/Issue/sub-issue (parentId), workflow states por team, prioridade inteira 0-4, estimate (pontos, escala configurável), comentários em markdown, anexos (attachments), labels, cycles, issue relations (blocks/duplicate/related), filtros e paginação por cursor, operações em lote",
+        "claim": "Relações entre issues têm 4 tipos: blocks, duplicate, related, similar",
+        "verdict": "ANCORADA",
+        "why": "O enum tem exatamente esses 4 valores. A quote é a forma compacta do bloco, que no schema ocupa várias linhas, e o conteúdo é o mesmo.",
+        "corrected": "",
+        "quote": "enum IssueRelationType { blocks duplicate related similar }",
+        "locator": "schema.graphql, enum IssueRelationType",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "linear-graphql",
+        "gap": "capacidades do Linear GraphQL API: Team/Project/Issue/sub-issue (parentId), workflow states por team, prioridade inteira 0-4, estimate (pontos, escala configurável), comentários em markdown, anexos (attachments), labels, cycles, issue relations (blocks/duplicate/related), filtros e paginação por cursor, operações em lote",
+        "claim": "state é WorkflowState! obrigatório na issue (workflow por team, status tipados), não string livre; sub-issue via parent: Issue",
+        "verdict": "ANCORADA",
+        "why": "Quote verbatim e `state: WorkflowState!`. WorkflowState.team diz 'Each team has its own set of workflow states'. WorkflowState.type é enumerado por texto (triage, backlog, unstarted, started, completed, canceled, duplicate), mas é declarado `String!`, não enum GraphQL. 'Tipados' é aceitável, só não é enum no schema. `parent: Issue` existe ('The parent of the issue.'). A quote cobre só a parte do state, e o resto vem de campos vizinhos.",
+        "corrected": "",
+        "quote": "The workflow state (issue status) that the issue is currently in. Workflow states represent the issue's progress through the team's workflow, such as Triage, Todo, In Progress, Done, or Canceled.",
+        "locator": "schema.graphql, type Issue, state: WorkflowState!; type Issue, parent: Issue; type WorkflowState, team e type"
+      },
+      {
+        "source": "linear-graphql",
+        "gap": "capacidades do Linear GraphQL API: Team/Project/Issue/sub-issue (parentId), workflow states por team, prioridade inteira 0-4, estimate (pontos, escala configurável), comentários em markdown, anexos (attachments), labels, cycles, issue relations (blocks/duplicate/related), filtros e paginação por cursor, operações em lote",
+        "claim": "Paginação cursor Relay com first/after, padrão 50; issueBatchCreate (atômica) e issueBatchUpdate existem",
+        "verdict": "ANCORADA",
+        "why": "A página de paginação traz a quote verbatim e diz 'Relay style cursor-based pagination model with first/after and last/before', com endCursor passado como after. No schema, issueBatchCreate descreve 'Creates a list of issues atomically.' e issueBatchUpdate 'Updates multiple issues at once.' (linhas 26202 e 26211). Atomicidade só vale para o create, e o claim diz isso.",
+        "corrected": "",
+        "quote": "The first 50 results are returned by default without query arguments.",
+        "locator": "linear.app/developers/pagination; schema.graphql Mutation issueBatchCreate e issueBatchUpdate"
+      }
+    ],
+    "rejected": [
+      {
+        "source": "jira-cloud-v3",
+        "gap": "capacidades do Jira Cloud REST v3: hierarquia (epic/story/subtask, issue types), workflow e transições, prioridade, story points (campo custom), comentário em ADF, anexo, labels, sprint (Agile API), issue links, JQL e paginação por nextPageToken, bulk",
+        "claim": "O corpo do comentário é ADF (JSON doc version 1).",
+        "verdict": "EXAGERADA",
+        "why": "A quote está literal em components.schemas.Comment.properties.body.description. Ela sustenta só que o corpo está em Atlassian Document Format. \"JSON doc version 1\" não está nessa descrição: vem do conhecimento externo sobre a estrutura do ADF, que o texto apenas linka. A description da operação Add comment também não diz nada sobre o formato.",
+        "corrected": "O corpo do comentário (Comment.body) é texto em Atlassian Document Format, conforme o schema Comment. O detalhe de documento JSON com `type: doc` e `version: 1` vem da página de estrutura do ADF, que o schema só linka.",
+        "quote": "The comment text in [Atlassian Document Format](https://developer.atlassian.com/cloud/jira/platform/apis/document/structure/).",
+        "locator": "POST /rest/api/3/issue/{issueIdOrKey}/comment, schema Comment.body",
+        "sourceTier": 9,
+        "validFrom": ""
+      },
+      {
+        "source": "jira-dc-v2",
+        "gap": "diferenças do Jira Server/Data Center REST v2 frente ao Cloud v3: formato de texto (wiki markup), search com startAt, ausência de ADF",
+        "claim": "As transições são recurso próprio por issue: o GET lista as possíveis para o usuário atual, com os campos obrigatórios da tela de transição. O status é portanto de workflow, não livre.",
+        "verdict": "EXAGERADA",
+        "why": "A quote existe literal, mas o texto seguinte a qualifica: 'Fields will only be returned if expand=transitions.fields' (e só os campos da tela da transição). O claim omite que os campos NÃO vêm por default. Além disso, 'status é de workflow, não livre' é inferência do leitor: a doc dessa operação lista transições possíveis e não afirma que status não possa ser definido de outra forma.",
+        "corrected": "O GET em /rest/api/2/issue/{id}/transitions lista as transições possíveis para o usuário atual; os campos exigidos (com tipos) correspondem à tela da transição e só são devolvidos com expand=transitions.fields. Cada transição traz o status de destino (to), o que indica modelo de workflow com transições.",
+        "quote": "Get a list of the transitions possible for this issue by the current user, along with fields that are required and their types.",
+        "locator": "GET /rest/api/2/issue/{issueIdOrKey}/transitions"
+      },
+      {
+        "source": "clickup-api",
+        "gap": "capacidades do ClickUp API v2 (e o que existe na v3): hierarquia Space/Folder/List/Task/Subtask (níveis), status por lista, prioridade inteira, time estimate e sprint points, comentários, anexos, tags, dependências e task links, filtros e paginação, versão vigente",
+        "claim": "Os docs da v3 dizem que a v3 ainda está em desenvolvimento e usam os campos parent e links_to para hierarquia e dependências; a v3 não é a superfície estável.",
+        "verdict": "EXAGERADA",
+        "why": "A frase existe em docs/tasks, no bullet \"Parent and Dependencies\" da seção \"Tasks Overview\". Não há seção v3 nessa página, e a frase não se atribui à v3. O único texto sobre v3 está em \"Large Requests and other Considerations\": \"We're developing API v3 to address these issues\" (timeouts em requests grandes). A página não diz que a v3 \"não é a superfície estável\". Isso é inferência. links_to não está nos campos do body do Create Task v2 (grep em createtask.md = 0), o que sugere campo da v3, mas o texto não diz isso.",
+        "corrected": "A página docs/tasks lista, em \"Tasks Overview\", o campo `parent` para sub-tasks e o campo `links_to` para dependências, sem rotular nenhum dos dois como v3. Em \"Large Requests and other Considerations\" diz \"We're developing API v3 to address these issues\" (timeouts com listas grandes), o que indica que a v3 estava em desenvolvimento. A página não afirma que a v3 é instável nem descreve a v3 como a superfície de hierarquia e dependências.",
+        "quote": "The `parent` field to be defined for sub-tasks, and the `links_to` field to manage task dependencies.",
+        "locator": "developer.clickup.com/docs/tasks (seção v3)"
+      }
+    ],
+    "elenxo": {
+      "objections": [
+        {
+          "target": "Claim 1 [jira-cloud-v3] bulk create com teto de 50",
+          "survives": true,
+          "evidence": "A quote sustenta o teto de 50 só para CRIAÇÃO em POST /rest/api/3/issue/bulk, e com condição: subtasks só 'where the option to create subtasks is enabled'. A segunda metade do claim ('subtask exige issueType de subtask e parent') não está na quote. A capacidade (11) pede operação em lote em geral, e a rodada não ancorou bulk de edição, de transição nem de delete. A matriz não pode declarar 'Jira: bulk = sim' sem restringir a create."
+        },
+        {
+          "target": "Claim 2 [jira-cloud-v3] description e textarea em ADF",
+          "survives": true,
+          "evidence": "Prova o ADF para description, environment e campos textarea. A capacidade (5) é o formato do COMENTÁRIO, e esse claim foi REJEITADO como exagerado. A nota do verificador diz que Comment.body.description cita literalmente o 'Atlassian Document Format', mas não a forma 'doc version 1'. Então comentário em ADF tem apoio só pela nota de rejeição, não por um claim ancorado. O claim prova menos do que a célula 'comentário' precisa."
+        },
+        {
+          "target": "Claim 3 [jira-cloud-v3] nextPageToken com expiração de 7 dias",
+          "survives": false,
+          "evidence": "A quote do schema SearchAndReconcileResults.nextPageToken sustenta paginação por token opaco que vira null na última página. Faltam o maxResults máximo e a confirmação de que total não vem no envelope. São lacunas menores, que não derrubam o mecanismo."
+        },
+        {
+          "target": "Claim 4 [jira-cloud-v3] /search em remoção (CHANGE-2046)",
+          "survives": true,
+          "evidence": "A fonte primária diz 'Endpoint is currently being removed', ou seja, em remoção e não removido, e sem data. O core afirma outra coisa: .claude/utils/task-manager/adapters/jira.md, l.461 e l.767 (conferidas por grep), e o CLAUDE.md dizem 'removido em maio/2025'. A rodada NÃO sustenta a data nem o estado 'removido' que o core declara. É contradição a reconciliar antes que interface.md herde o fato."
+        },
+        {
+          "target": "Claim 5 [jira-cloud-v3] status muda por transição",
+          "survives": true,
+          "evidence": "A quote prova que o endpoint de transição existe e que ele atualiza a tela da transição. A capacidade (2) pede 'workflow com transições OBRIGATÓRIAS', e isso exige provar que PUT /issue não consegue definir status. Essa negativa não foi ancorada. A regra 'nunca setar status direto' do CLAUDE.md segue sem lastro primário nesta rodada."
+        },
+        {
+          "target": "Claim 6 [jira-dc-v2] body do comentário é string",
+          "survives": true,
+          "evidence": "O schema '\"body\":{\"type\":\"string\"}' prova que o corpo é string e não ADF. A lacuna nomeada pede WIKI MARKUP, e string não distingue wiki markup de texto puro. O formato de marcação não foi provado."
+        },
+        {
+          "target": "Claim 7 [jira-dc-v2] renderedBody só sob expand",
+          "survives": true,
+          "evidence": "A quote prova que renderedBody é opt-in. Já 'coerente com corpo armazenado como texto de marcação' é inferência do leitor e não está no texto. O claim não fecha o wiki markup."
+        },
+        {
+          "target": "Claim 8 [jira-dc-v2] paginação startAt/maxResults",
+          "survives": true,
+          "evidence": "A seção citada é a 'Pagination' genérica da doc REST, não a do /rest/api/2/search. E ela mesma diz que cada API tem limite próprio, sem dar o limite da busca. O vínculo entre startAt e /search é inferido, porque o claim 9, que é o da busca, não menciona startAt. Na dúvida, a objeção sobrevive."
+        },
+        {
+          "target": "Claim 9 [jira-dc-v2] busca JQL em GET/POST /rest/api/2/search",
+          "survives": false,
+          "evidence": "A quote 'If the JQL query is too large ... you should instead POST to this resource' sustenta a busca JQL, com POST quando a query é grande. Ela prova o que diz."
+        },
+        {
+          "target": "Claim 10 [jira-dc-v2] bulk create e /latest → 9.17.0",
+          "survives": true,
+          "evidence": "Prova bulk só de criação, a mesma limitação do claim 1. O redirect 302 de /latest/ para 9.17.0 prova qual versão a DOC serve, não qual versão do DC está vigente. Pelo meu conhecimento, já existe Jira DC 10.x. Isso não foi verificado nesta rodada e é hipótese. A capacidade (12), versão vigente e depreciações, fica sem sustentação para o DC."
+        },
+        {
+          "target": "Claim 11 [clickup-api] parent pode ser subtask",
+          "survives": true,
+          "evidence": "Prova aninhamento além de um nível dentro da mesma List, mas não dá NÍVEIS MÁXIMOS, que a capacidade (1) pede. A hierarquia Space/Folder/List, que a lacuna nomeia, não foi ancorada em nenhum claim."
+        },
+        {
+          "target": "Claim 12 [clickup-api] points nativo, priority inteiro, time_estimate inteiro",
+          "survives": true,
+          "evidence": "O próprio claim admite que priority e time_estimate vêm 'sem escala/unidade descrita na referência'. A escala de priority 1-4 vem só da medição do core (CLAUDE.md), e a unidade de time_estimate não foi ancorada em lugar nenhum. A quote sustenta apenas que 'points' existe. O pré-requisito do ClickApp Sprints não foi tocado."
+        },
+        {
+          "target": "Claim 13 [clickup-api] markdown_content prevalece sobre description",
+          "survives": true,
+          "evidence": "Prova o formato da DESCRIÇÃO. A capacidade (5) é o COMENTÁRIO, e o formato do corpo de comentário do ClickUp (comment_text ou comment em rich-text) não foi ancorado. A célula 'comentário' do ClickUp segue aberta."
+        },
+        {
+          "target": "Claim 14 [clickup-api] Get Tasks pagina 100 por page e exclui subtasks",
+          "survives": false,
+          "evidence": "A quote sustenta a página de 100. Um ponto para a matriz: o parâmetro aqui é `subtasks`, em GET /list/{id}/task, enquanto o core usa `include_subtasks`, em GET /task/{id} (.claude/utils/task-manager/adapters/clickup.md, l.58). São endpoints diferentes, não há contradição, mas interface.md precisa separar os dois. O sinal de fim de página (last_page) não foi ancorado."
+        },
+        {
+          "target": "Claim 15 [clickup-api] dependência em uma direção por requisição",
+          "survives": true,
+          "evidence": "Prova dependências. A lacuna nomeia também 'task links', e o claim sobre links_to foi REJEITADO: grep em createtask.md deu 0, e a página não se atribui à v3. Task links e o estado da v3 seguem sem âncora."
+        },
+        {
+          "target": "Claim 16 [asana-api] limit 1-100",
+          "survives": false,
+          "evidence": "A quote 'The value must be between 1 and 100' sustenta o limite. Mas a matriz não pode generalizar o offset para a busca: o claim 20 indica outro mecanismo no endpoint de search."
+        },
+        {
+          "target": "Claim 17 [asana-api] offset expira",
+          "survives": false,
+          "evidence": "A quote é literal e prova o que diz."
+        },
+        {
+          "target": "Claim 18 [asana-api] batch com no máximo 10 ações",
+          "survives": false,
+          "evidence": "A quote é literal. A ressalva é que o batch é genérico, um envelope de N chamadas, e não bulk de tasks. Na matriz, a célula deve dizer 'batch genérico, 10 ações'."
+        },
+        {
+          "target": "Claim 19 [asana-api] story aceita text ou html_text",
+          "survives": false,
+          "evidence": "A quote 'Cannot be used with html_text' prova que os dois são mutuamente exclusivos. O subconjunto de HTML aceito não foi ancorado, e isso é lacuna menor."
+        },
+        {
+          "target": "Claim 20 [asana-api] search exige premium e pagina por created_at",
+          "survives": true,
+          "evidence": "A quote sustenta só a exigência de premium. 'Pagina manualmente por created_at' e o código 402 não estão na quote. A metade sobre paginação, que é a que a capacidade (10) precisa, está sem âncora."
+        },
+        {
+          "target": "Claim 21 [asana-api] subtask por endpoint próprio, profundidade não declarada",
+          "survives": true,
+          "evidence": "'A doc não declara profundidade máxima' é afirmação de AUSÊNCIA feita a partir de uma única página e não prova que não existe limite. A capacidade (1), níveis máximos, segue aberta para o Asana."
+        },
+        {
+          "target": "Claim 22 [linear-graphql] priority 0-4",
+          "survives": false,
+          "evidence": "A quote do schema.graphql é literal, com a escala completa. Ela prova o que diz."
+        },
+        {
+          "target": "Claim 23 [linear-graphql] estimate Float com escala por team",
+          "survives": false,
+          "evidence": "A quote é literal. Quais escalas existem (exponencial, fibonacci, linear, t-shirt) não foi ancorado, mas a célula 'nativo, escala configurável por team' está sustentada."
+        },
+        {
+          "target": "Claim 24 [linear-graphql] comment body em markdown derivado de bodyData",
+          "survives": true,
+          "evidence": "A quote descreve o campo de LEITURA (type Comment.body como representação derivada). Para a escrita, o adapter precisa saber o formato de entrada de CommentCreateInput.body, e isso não foi ancorado. O Linear tem formato canônico ProseMirror, e markdown é derivação, o que muda a semântica round-trip da interface."
+        },
+        {
+          "target": "Claim 25 [linear-graphql] 4 tipos de relação",
+          "survives": false,
+          "evidence": "O enum IssueRelationType é literal e prova o que diz."
+        },
+        {
+          "target": "Claim 26 [linear-graphql] state WorkflowState! por team; parent",
+          "survives": true,
+          "evidence": "Prova que o status é tipado e vem do workflow do team. Já a lacuna 'workflow com transições obrigatórias' não está fechada: o Linear permite ir a qualquer estado do team, e isso também não foi ancorado. A profundidade máxima de sub-issue não aparece. Team e Project como níveis de hierarquia não foram ancorados."
+        },
+        {
+          "target": "Claim 27 [linear-graphql] cursor first/after com default 50; issueBatchCreate/Update",
+          "survives": true,
+          "evidence": "A quote sustenta o default de 50. O 'atômica' de issueBatchCreate e o tamanho máximo de lote não estão na quote, e o teto de first também não. A célula (11) do Linear sustenta só 'existe batch create/update', sem semântica nem limite."
+        }
+      ],
+      "gapsClosed": [
+        "jira-cloud-v3, células (10) busca e paginação: /search/jql com nextPageToken opaco, que expira em 7 dias (claim 3)",
+        "jira-cloud-v3, célula (5) parcial: description e textarea em ADF (claim 2). O comentário em ADF tem apoio só pela nota de rejeição",
+        "jira-dc-v2, célula (10): busca JQL em GET/POST /rest/api/2/search (claim 9)",
+        "clickup-api, células (4) points nativo, (10) página de 100 por índice e (9) dependência em uma direção por requisição (claims 12, 14, 15)",
+        "asana-api, células (5) story text|html_text, (11) batch genérico de 10 ações e (10) offset 1-100 que expira nos endpoints de lista (claims 16-19)",
+        "linear-graphql, células (3) priority 0-4, (4) estimate nativo com escala por team, (9) quatro tipos de relação e (10) cursor Relay com default 50 (claims 22, 23, 25, 27)"
+      ],
+      "gapsOpen": [
+        "zoho-projects-v3: lacuna INTEIRA aberta, a fonte ficou inalcançável. O que se sabe vem só das armadilhas medidas no nó zoho-glpi-adapters-2026-09, não da fonte primária desta rodada",
+        "jira-cloud-v3: faltam (1) hierarquia e issue types, (3) prioridade, (4) story points como campo custom, (6) anexo, (7) labels, (8) sprint pela Agile API e (9) issue links. Também ficam abertos (2) transição obrigatória (a negativa sobre PUT de status não foi ancorada), (11) bulk além de create e (12) a data de remoção do /search",
+        "jira-dc-v2: wiki markup NÃO provado (body só é string, claims 6 e 7). Paginação startAt vem de seção genérica e não da /search (claim 8). Versão vigente do DC não sustentada: o redirect para a doc 9.17.0 não prova versão do produto. Transições ficaram com claim rejeitado",
+        "clickup-api: faltam a hierarquia Space/Folder/List e os níveis máximos de subtask, (2) status por lista, a escala de priority e a unidade de time_estimate, (5) formato do comentário, (6) anexo, (7) tags, task links (links_to foi rejeitado) e (12) a v3 (claim rejeitado)",
+        "asana-api: faltam (1) projects/sections e profundidade de subtask (a ausência no claim 21 não prova nada), (2) status por section ou custom field, (3) prioridade como custom field, (4) estimativa, (6) anexo, (7) tags, (9) dependências, a paginação do search (claim 20 sem âncora nessa metade) e (12) versão",
+        "linear-graphql: faltam Team/Project na hierarquia e profundidade de sub-issue, (6) attachments, (7) labels, (8) cycles, o formato de ESCRITA do comentário (claim 24 descreve a leitura), a atomicidade e o limite do batch, o teto de first e (12) versão e depreciações",
+        "transversal (12) versão de API vigente e depreciações: nenhum provedor fechou essa célula com âncora primária"
+      ],
+      "recommendation": "A rodada SUSTENTA um esqueleto parcial da matriz, sem a matriz completa. Ficam ancoradas as células de paginação dos cinco provedores alcançados, com mecanismos heterogêneos: token opaco no Jira Cloud, startAt no Jira DC (com ressalva), índice de página no ClickUp, offset opaco no Asana fora do search, e cursor Relay no Linear. Esse é o primeiro forte argumento para interface.md expor a paginação como iterador opaco, sem expor offset ou página. Também estão ancorados os formatos de texto rico (ADF em Cloud v3 para descrição, string em DC v2, markdown_content no ClickUp, text|html_text no Asana, markdown derivado de ProseMirror no Linear), a prioridade numérica do Linear, os story points nativos no ClickUp e no Linear, e as relações do Linear. A rodada NÃO SUSTENTA: (a) nada sobre o Zoho Projects v3, porque a fonte ficou inalcançável, e descartar o Zoho por orçamento volta como objeção. (b) A célula (12) versão e depreciações de nenhum provedor. Em particular, a fonte primária diz que o /search do Jira está 'currently being removed', o que CONTRADIZ o 'removido em maio/2025' do core (adapters/jira.md, l.461 e l.767, e CLAUDE.md). Isso precisa ser reconciliado antes que interface.md herde a data. (c) 'Transição obrigatória' como fato de Jira ou de Linear, porque falta a negativa ancorada. (d) Wiki markup no DC v2. (e) A escala de priority do ClickUp, que vem só da medição do core. (f) Hierarquia e níveis máximos de qualquer provedor, além de anexo, label, sprint e cycle em quase todos. (g) Bulk além de create no Jira e a semântica atômica do batch do Linear. Próxima onda: reabrir a doc do Zoho por outro transporte (WebFetch ou busca, conforme a doutrina SDAAL de fallback), mirar as células (1), (6), (7), (8) e (12) de cada provedor, e medir ao vivo o PUT de status no Jira antes de declarar a transição obrigatória."
+    },
+    "stats": {
+      "sources": 6,
+      "reached": 5,
+      "anchored": 27,
+      "rejected": 3,
+      "nodesAdded": 52,
+      "edgesAdded": 62,
+      "nodesTotal": 52
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Corpus"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Scope"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Search"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 4,
+      "title": "Fetch"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 5,
+      "title": "Verify"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 6,
+      "title": "Synthesize"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 7,
+      "title": "write(KG)"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 8,
+      "title": "Leitura"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "ler:jira-cloud-v3",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a121dad125eb0f23e",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726019027,
+      "queuedAt": 1791726018970,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Jira Cloud Platform REST API v3 (OpenAPI oficial dac-static…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726044760,
+      "tokens": 72345,
+      "toolCalls": 7,
+      "durationMs": 25731,
+      "resultPreview": "{\"source\":\"Jira Cloud Platform REST API v3 (OpenAPI oficial dac-static.atlassian.com/cloud/jira/platform/swagger-v3.v3.json, o mesmo de developer.atlassian.com/cloud/jira/platform/rest/v3/)\",\"reachable\":true,\"claims\":[{\"claim\":\"Bulk create aceita no máximo 50 issues por requisição e também cria subtasks; subtask exige issueType de subtask e parent.\",\"quote\":\"Creates upto **50** issues and, where t…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "ler:jira-dc-v2",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a97680fad46bd2fef",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726019027,
+      "queuedAt": 1791726018971,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://docs.atlassian.com/software/jira/docs/api/REST/9.17…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726068713,
+      "tokens": 76034,
+      "toolCalls": 9,
+      "durationMs": 47773,
+      "resultPreview": "{\"source\":\"https://docs.atlassian.com/software/jira/docs/api/REST/9.17.0/ (Jira Data Center REST API, alvo do redirect de /latest/)\",\"reachable\":true,\"claims\":[{\"claim\":\"No Jira DC/Server REST v2 o corpo do comentário é uma string simples (sem ADF, sem objeto estruturado). O schema de Comment declara body como string; renderedBody (HTML) só vem sob expand.\",\"quote\":\"\\\"body\\\":{\\\"type\\\":\\\"string\\\"},…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "ler:clickup-api",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "af3b9a6860c6c5590",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726019028,
+      "queuedAt": 1791726018971,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "developer.clickup.com/reference (createtask, gettasks, addd…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726052313,
+      "tokens": 68668,
+      "toolCalls": 7,
+      "durationMs": 31371,
+      "resultPreview": "{\"source\":\"developer.clickup.com/reference (createtask, gettasks, adddependency, createtaskcomment, docs/tasks)\",\"reachable\":true,\"claims\":[{\"claim\":\"Subtask in v2 is created via Create Task with parent=existing task ID in the same List; the parent can itself be a subtask (nesting beyond one level allowed within a List).\",\"quote\":\"The `parent` task ID you include can be a subtask, but must be in t…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "ler:asana-api",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "af63b73b8ee93a178",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726019028,
+      "queuedAt": 1791726018971,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "developers.asana.com/docs e /reference (Pagination, Batch r…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726046517,
+      "tokens": 67692,
+      "toolCalls": 8,
+      "durationMs": 25574,
+      "resultPreview": "{\"source\":\"developers.asana.com/docs e /reference (Pagination, Batch requests, Stories, Subtasks, Search tasks)\",\"reachable\":true,\"claims\":[{\"claim\":\"Paginação do Asana por offset opaco com limit 1-100; offset expira.\",\"quote\":\"The value must be between 1 and 100.\",\"locator\":\"Docs > Pagination, parâmetro limit\",\"answersGap\":\"Busca e paginação por offset: limite máximo de 100 por página, next_page …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "ler:linear-graphql",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a8408dc217e84173a",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726019028,
+      "queuedAt": 1791726018971,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "linear/linear schema.graphql (packages/sdk/src/schema.graph…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726050173,
+      "tokens": 69047,
+      "toolCalls": 7,
+      "durationMs": 29229,
+      "resultPreview": "{\"source\":\"linear/linear schema.graphql (packages/sdk/src/schema.graphql) + linear.app/developers/pagination\",\"reachable\":true,\"claims\":[{\"claim\":\"Prioridade do Linear é numérica 0-4 (0 sem prioridade, 1 urgente ... 4 baixa); tipo declarado Float!.\",\"quote\":\"The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.\",\"locator\":\"schema.graphql, type Issue, campo priority…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "ler:zoho-projects-v3",
+      "phaseIndex": 8,
+      "phaseTitle": "Leitura",
+      "agentId": "a05c49926179a4101",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726019029,
+      "queuedAt": 1791726018972,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://projects.zoho.com/api-docs (v3) e https://www.zoho.…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726055532,
+      "tokens": 69026,
+      "toolCalls": 8,
+      "durationMs": 34588,
+      "resultPreview": "{\"source\":\"https://projects.zoho.com/api-docs (v3) e https://www.zoho.com/projects/help/rest-api/zohoprojectsapi.html\",\"reachable\":false,\"claims\":[{\"claim\":\"A API REST antiga (v1/v2) do Zoho Projects está marcada para depreciação e a v3 é a vigente; a página não nomeia as versões nem dá data.\",\"quote\":\"This REST API will be deprecated soon. Please transition to V3 API as soon as possible.\",\"locato…"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 9,
+      "title": "Ancoragem"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "ancorar:jira-cloud-v3",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a599006fa2788e700",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726044797,
+      "queuedAt": 1791726044765,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Jira Cloud Platform REST API v3, OpenAPI oficial (dac-stati…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726087488,
+      "tokens": 72273,
+      "toolCalls": 8,
+      "durationMs": 42691,
+      "resultPreview": "{\"source\":\"Jira Cloud Platform REST API v3, OpenAPI oficial (dac-static.atlassian.com/cloud/jira/platform/swagger-v3.v3.json, a spec que alimenta developer.atlassian.com/cloud/jira/platform/rest/v3/). As páginas HTML são SPA e o WebFetch devolveu só \\\"[Content truncated]\\\", então li o JSON da spec com python, campo a campo, e não as páginas.\",\"verdicts\":[{\"claim\":\"Bulk create aceita no máximo 50 i…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "ancorar:asana-api",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a88395d6c19d99482",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726046526,
+      "queuedAt": 1791726046521,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "developers.asana.com (Pagination, Batch requests, Create a …",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726075692,
+      "tokens": 67560,
+      "toolCalls": 8,
+      "durationMs": 29166,
+      "resultPreview": "{\"source\":\"developers.asana.com (Pagination, Batch requests, Create a story on a task, Search tasks in a workspace, Create a subtask for a task)\",\"verdicts\":[{\"claim\":\"Paginação do Asana por offset opaco com limit 1-100; offset expira.\",\"quoteFound\":true,\"claimMatchesText\":true,\"verdict\":\"ANCORADA\",\"quote\":\"The value must be between 1 and 100.\",\"locator\":\"Docs > Pagination, parâmetro limit\",\"why\":…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "ancorar:linear-graphql",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "ae71ee53beb5022a8",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726050180,
+      "queuedAt": 1791726050176,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "linear/linear schema.graphql (packages/sdk/src/schema.graph…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726077213,
+      "tokens": 69062,
+      "toolCalls": 6,
+      "durationMs": 27033,
+      "resultPreview": "{\"source\":\"linear/linear schema.graphql (packages/sdk/src/schema.graphql, baixado 2026-10-11) e linear.app/developers/pagination\",\"verdicts\":[{\"claim\":\"Prioridade numérica 0-4 (0 sem prioridade, 1 urgente ... 4 baixa), tipo Float!\",\"locator\":\"schema.graphql, type Issue, priority\",\"quote\":\"The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Medium, 4 = Low.\",\"quoteFound\":true,\"cla…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "ancorar:clickup-api",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "afcaa62388ac432f0",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726052360,
+      "queuedAt": 1791726052356,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "developer.clickup.com/reference (createtask, gettasks, addd…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726098194,
+      "tokens": 70587,
+      "toolCalls": 9,
+      "durationMs": 45833,
+      "resultPreview": "{\"source\":\"developer.clickup.com/reference (createtask, gettasks, adddependency) e developer.clickup.com/docs/tasks, abertos diretamente por WebFetch. A página docs/tasks também foi baixada via curl para checar o claim 6.\",\"verdicts\":[{\"claim\":\"Subtask em v2 se cria via Create Task com parent=ID de task existente na mesma List; o parent pode ser ele mesmo uma subtask (aninhamento além de um nível …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 11,
+      "label": "ancorar:jira-dc-v2",
+      "phaseIndex": 9,
+      "phaseTitle": "Ancoragem",
+      "agentId": "a8f9e5d572026fa74",
+      "model": "claude-sonnet-5-5",
+      "state": "done",
+      "startedAt": 1791726068721,
+      "queuedAt": 1791726068717,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Jira Data Center REST API 9.17.0 (docs.atlassian.com/softwa…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726118750,
+      "tokens": 74407,
+      "toolCalls": 7,
+      "durationMs": 50029,
+      "resultPreview": "{\"source\":\"Jira Data Center REST API 9.17.0 (docs.atlassian.com/software/jira/docs/api/REST/9.17.0/), HTML baixado e conferido por grep; /REST/latest/ devolve 302 para /REST/9.17.0/ em 2026-10-11\",\"verdicts\":[{\"claim\":\"No Jira DC/Server REST v2 o corpo do comentário é string simples (sem ADF); o schema de Comment declara body como string; renderedBody (HTML) só vem sob expand.\",\"quoteFound\":true,\"…"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 10,
+      "title": "Elenxo"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 12,
+      "label": "elenxo-primarias",
+      "phaseIndex": 10,
+      "phaseTitle": "Elenxo",
+      "agentId": "a02e98aa8be04c7d5",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1791726118793,
+      "queuedAt": 1791726118762,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "A rodada SUSTENTA um esqueleto parcial da matriz, sem a mat…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726209214,
+      "tokens": 74054,
+      "toolCalls": 2,
+      "durationMs": 90421,
+      "resultPreview": "{\"objections\":[{\"target\":\"Claim 1 [jira-cloud-v3] bulk create com teto de 50\",\"survives\":true,\"evidence\":\"A quote sustenta o teto de 50 só para CRIAÇÃO em POST /rest/api/3/issue/bulk, e com condição: subtasks só 'where the option to create subtasks is enabled'. A segunda metade do claim ('subtask exige issueType de subtask e parent') não está na quote. A capacidade (11) pede operação em lote em ge…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 13,
+      "label": "write-kg-primarias",
+      "phaseIndex": 7,
+      "phaseTitle": "write(KG)",
+      "agentId": "a6e5b97f53448422e",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1791726209250,
+      "queuedAt": 1791726209219,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "/home/marcio/onion-evolve/docs/evolution/research/task-mana…",
+      "promptPreview": "⚠️ ÂNCORA DA TAREFA: a sua tarefa é EXCLUSIVAMENTE a descrita abaixo, computada por este workflow a partir da pergunta original: Onda 1 da SDAAL do Task Manager (SAC-62): qual é o vocabulário padrão dos gerenciadores de tarefas e a matriz do que cada provedor oferece por versão de API. Para cada provedor, levantar na fonte primária: (1) hierarquia de itens (épico/projeto, task, subtask, níveis máx…",
+      "promptFramed": true,
+      "lastProgressAt": 1791726649677,
+      "tokens": 161753,
+      "toolCalls": 18,
+      "durationMs": 440427,
+      "resultPreview": "{\"kgPath\":\"/home/marcio/onion-evolve/docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml\",\"radarExit\":0,\"nodes\":52,\"edges\":62,\"nodesTotal\":52,\"summary\":\"Grafo novo da Onda 1 (SAC-62, run wf_8e56d56f-a8b): 27 evidências ancoradas com URL primária, a contabilidade E_LACUNAS (5 fontes lidas, Zoho inalcançável, 3 claims rejeitadas por exagero, gapsOpen int…"
+    }
+  ],
+  "totalTokens": 1012508,
+  "totalToolCalls": 104
+}
