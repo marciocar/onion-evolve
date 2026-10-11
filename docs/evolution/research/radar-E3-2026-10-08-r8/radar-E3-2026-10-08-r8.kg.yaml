@@ -9,7 +9,8 @@ meta:
   x_supersedes_none: "medido contra a baseline do eixo (r7, 2.1.289): nenhum nó dela derrubado; as correções de mod da r8 são evidência A FAVOR da tese da r7 (mod tem janelas de falha aberta), não superação — veredito do juiz"
   # ═══ TETO: 20 NÓS ═══
   #   17 em 2026-10-08 (12 da rodada, corrigidos pelo juiz, + 5 do que faltou).
-  #   19 em 2026-10-11: + 2 evidências medidas ao vivo que fecham o Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS (SAC-83).
+  #   20 em 2026-10-11: + 2 evidências medidas ao vivo que fecham o Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS (SAC-83)
+  #   + 1 Q aberto pela passada adversarial (env-guard quadrático chega ao timeout). Teto atingido.
 nodes:
   - id: E_DELTA_SEIS_VERSOES
     trace: "docs/evolution/research/radar-E3-2026-10-08-r8/SYNTHESIS.md"
@@ -36,8 +37,8 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-08"
     verified_against: "2.1.295: 'Added onFailure: block for command and HTTP hooks: a hook that can't start, times out, or exits with an unexpected code blocks the action instead of letting it through'; no core, .claude/settings.json tem 20 hooks command e NENHUM com onFailure (medido por leitura do JSON)"
-    label: "o harness ganhou onFailure: block (2.1.295) e nenhum dos 20 hooks do Onion o usa: nos PreToolUse, hook que não inicia, estoura o timeout ou sai com código fora de 0/2 deixa a ação passar (doc de hooks); o PreModelSwitch já bloqueia por timeout"
-    narrative: "Os vetos do Onion se apoiam no exit 2 (a capacidade que justifica o acoplamento, no CLAUDE.md). O modo de falha que eles não cobriam por construção é o hook que nem roda: python ausente, timeout, crash antes do exit 2. Esses casos eram tratados um a um dentro de cada script (fail-closed escrito à mão). O harness agora oferece fail-closed declarativo para o hook inteiro."
+    label: "o harness ganhou onFailure: block (2.1.295) e em 2026-10-08 nenhum dos 20 hooks do Onion o usava: nos PreToolUse, hook que não inicia, estoura o timeout ou sai com código fora de 0/2 deixa a ação passar (doc de hooks); o PreModelSwitch já bloqueia por timeout"
+    narrative: "Os vetos do Onion se apoiam no exit 2 (a capacidade que justifica o acoplamento, no CLAUDE.md). O modo de falha que eles não cobriam por construção é o hook que nem roda: python ausente, timeout, crash antes do exit 2. Esses casos eram tratados um a um dentro de cada script (fail-closed escrito à mão). O harness agora oferece fail-closed declarativo para o hook inteiro. RECONCILIAÇÃO 2026-10-11 (SAC-83): os 3 vetos PreToolUse passaram a declarar o campo; o retrato de 2026-10-08 fica como estado daquela data."
     provenance:
       source: "CHANGELOG 2.1.295 e .claude/settings.json@d56f685c"
       locator: "2.1.295, 1º item 'Added onFailure'; settings.json, chave hooks"
@@ -52,7 +53,7 @@ nodes:
     verified_at: "2026-10-11"
     verified_against: "SAC-83, 2026-10-11: medido ao vivo (E_ONFAILURE_BLOCK_BARRA_HOOK_QUEBRADO, E_ONFAILURE_IGNORADO_ANTES_DE_295); adotado nos 3 vetos do .claude/settings.json; o kg-read-leg fica fora (é aviso, sem exit 2); REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block) cobra o campo, com bancada run_veto_onfailure_selftests e mutantes"
     label: "adotar onFailure: block nos vetos PreToolUse e provar ao vivo que a ação fica bloqueada. Respondido em 2026-10-11: adotado em env-guard, protect-main e merge-gate; o kg-read-leg não recebe (só injeta contexto)"
-    narrative: "Não nos hooks de aviso (SessionStart, UserPromptSubmit, Stop), onde bloquear por falha do próprio hook travaria a sessão. Três cuidados do juiz: a doc oficial de hooks não tem nenhuma ocorrência de onFailure, então a única fonte é o CHANGELOG e a medição ao vivo é obrigatória; adotantes pinados abaixo de 2.1.295 recebem uma chave que o harness deles não conhece (medir o efeito antes de vendorizar); os PreToolUse não declaram timeout, logo vale o padrão de 600 s. RECONCILIAÇÃO 2026-10-11: o 1º cuidado caducou, a doc oficial de hooks HOJE documenta o campo (valores continue|block, default continue, mínimo 2.1.295, sem efeito em Stop e em hook async); os outros dois foram medidos e estão nos dois nós E_ONFAILURE_*. O plugin empacotado (que leva o env-guard) passou a herdar o campo pelo assemble, cobrado pela classe onfailure-divergente do plugin-hooks-check."
+    narrative: "Não nos hooks de aviso (SessionStart, UserPromptSubmit, Stop), onde bloquear por falha do próprio hook travaria a sessão. Três cuidados do juiz: a doc oficial de hooks não tem nenhuma ocorrência de onFailure, então a única fonte é o CHANGELOG e a medição ao vivo é obrigatória; adotantes pinados abaixo de 2.1.295 recebem uma chave que o harness deles não conhece (medir o efeito antes de vendorizar); os PreToolUse não declaram timeout, logo vale o padrão de 600 s. RECONCILIAÇÃO 2026-10-11: o 1º cuidado caducou, a doc oficial de hooks HOJE documenta o campo (valores continue|block, default continue, mínimo 2.1.295, sem efeito em Stop e em hook async); o 2º (adotante abaixo de 2.1.295) foi medido no 2.1.294 (E_ONFAILURE_IGNORADO_ANTES_DE_295); o 3º (timeout padrão de 600 s) NÃO foi medido ao vivo: a doc diz que timeout conta como falha, e a passada adversarial achou o caso real em Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT. Fora do escopo, declarado: o premodelswitch-guard.sh também veta por exit 2 (timeout 5) e não recebeu o campo, porque só o PreToolUse foi medido. O plugin empacotado (que leva o env-guard) passou a herdar o campo pelo assemble, cobrado pela classe onfailure-divergente do plugin-hooks-check."
     trace: ".claude/validation/veto-onfailure-check.sh"
   - id: E_ONFAILURE_BLOCK_BARRA_HOOK_QUEBRADO
     node_type: evidence
@@ -64,11 +65,23 @@ nodes:
     verified_at: "2026-10-11"
     verified_against: "Claude Code 2.1.296, claude -p --setting-sources project,local --model haiku --permission-mode bypassPermissions, num diretório temporário com .claude/settings.json mínimo; PreToolUse(Bash) apontando para script inexistente (sai 127): SEM onFailure o touch rodou e o arquivo nasceu; COM onFailure block a chamada foi barrada (debug: 'PreToolUse command hook failed; blocking (onFailure: \"block\")') e o arquivo não nasceu. Casos honestos com block: hook que sai 0 deixou passar; veto que sai 2 barrou com a própria mensagem"
     label: "medido ao vivo: com onFailure block, um PreToolUse que não roda passa a BARRAR a ação; sem o campo, a ação passa. O block não muda os casos honestos (exit 0 passa, exit 2 veta como antes)"
-    narrative: "Quatro sandboxes, um claude -p cada, as settings do usuário excluídas por --setting-sources (o hook Stop de notificação do maestro mora nelas; o log de debug confirma que nenhum Stop disparou). A sonda de caminho honesto nos 3 vetos reais (66 entradas: vazia, não-JSON, lista, null, ferramentas e comandos variados, com e sem python3 no PATH) não produziu nenhum código fora de 0/2: o block não barra trabalho honesto. O env-guard já fechava por dentro quando o analisador falha; o protect-main e o merge-gate abrem por dentro sem python3 (cmd vazio, exit 0), o que o onFailure não cobre, porque é exit 0."
+    narrative: "Quatro sandboxes, um claude -p cada, as settings do usuário excluídas por --setting-sources (o hook Stop de notificação do maestro mora nelas; o log de debug confirma que nenhum Stop disparou). A sonda de caminho honesto nos 3 vetos reais (66 entradas: vazia, não-JSON, lista, null, ferramentas e comandos variados, com e sem python3 no PATH) não produziu nenhum código fora de 0/2, e a passada adversarial repetiu com mais 26 sondas (stdin de 300 KB, 3000 pushes, bytes inválidos, sem CLAUDE_PROJECT_DIR), também sem código fora de 0/2. Exceção conhecida: um token único gigante no env-guard leva o hook ao timeout, e aí o block barra (Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT). Se o env-guard quebrar, Edit e Write seguem livres para consertá-lo. O env-guard já fechava por dentro quando o analisador falha; o protect-main e o merge-gate abrem por dentro sem python3 (cmd vazio, exit 0), o que o onFailure não cobre, porque é exit 0."
     provenance:
       source: "sandbox de medição do SAC-83 (4 variantes de settings.json, logs de debug de hooks)"
       locator: "variantes A (sem campo), B (block + script ausente), C (block + exit 0), D (block + exit 2)"
       method: "medição: claude -p em sandbox, existência do arquivo-marcador e linha 'Hooks: PreToolUse' do log de debug"
+  - id: Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-11"
+    verified_against: "passada adversarial do SAC-83: o pretooluse-env-guard.sh com um comando Bash de token único sem espaço levou 1,3 s a 25 KB, 5,3 s a 50 KB, 22,7 s a 100 KB e 186 s a 300 KB; um heredoc de 100 KB com várias linhas levou 0,07 s. Pela curva, perto de 520 KB passa dos 600 s do timeout padrão"
+    label: "curar o custo quadrático do env-guard num token gigante: com onFailure block, um comando de ~520 KB sem espaço passa a ser BARRADO depois de 10 min, em vez de passar"
+    narrative: "Para um veto, fechar é o desfecho certo, e o caso é raro (base64 inline gigante). Mas 10 minutos de espera para depois barrar é ruim. Há duas saídas: curar o laço quadrático do analisador ou declarar um timeout menor no hook, que também fecharia por block. Gatilho: a primeira sessão que esbarrar num comando desse tamanho."
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
   - id: E_ONFAILURE_IGNORADO_ANTES_DE_295
     node_type: evidence
     layer: audit
@@ -289,6 +302,9 @@ edges:
     edge_type: SUPPORTS
   - from: E_HOOK_ONFAILURE_BLOCK
     to: E_ONFAILURE_BLOCK_BARRA_HOOK_QUEBRADO
+    edge_type: SUPPORTS
+  - from: E_ONFAILURE_BLOCK_BARRA_HOOK_QUEBRADO
+    to: Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT
     edge_type: SUPPORTS
   - from: E_DELTA_SEIS_VERSOES
     to: E_HOOK_ONFAILURE_BLOCK
