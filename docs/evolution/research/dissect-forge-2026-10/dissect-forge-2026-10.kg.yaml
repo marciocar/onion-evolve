@@ -7,7 +7,7 @@ meta:
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: programa de trabalho
   # ═══ TETO: 10 NÓS ═══
-  #   2 em 2026-10-08.
+  #   2 em 2026-10-08; 4 em 2026-10-11 (dogfood do Conductor + desenho da costura).
 nodes:
   - id: E_DISSECT_QUASE_NAO_USADO
     node_type: evidence
@@ -33,7 +33,46 @@ nodes:
     verified_against: "nota do maestro 2026-10-08, que escolheu dogfood antes de desenho; projeção no Linear: SAC-77"
     label: "costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprender, guardar outros para a prova, e só então forjar a costura"
     narrative: "Sem comando novo ao lado dos três (dissect, absorb-skill, forge): o veredito absorver ou costurar do dissect passa a entregar ao forge um plano medido — quais das 7 peças, proveniência e licença da origem (absorver sem registrar é o roubo que a casa proíbe), prova de paridade na bancada (a peça faz o que a original fazia) e, no costurar, adapter SDAAL em vez de cópia (como o contrato do KG-SSOT, vendor por pin). Exemplos de construção e aprendizagem: o Channels do Claude Code (pesquisa canal-vivo-sessoes-2026-10), o Conductor (corpus agent-command-composition-2026-09) e o /fork do Claude Code (o subagente que herda o contexto, usado nesta leva). Ferramentas novas ficam para a prova, que mede se a costura generaliza além dos exemplos que a formaram."
+  - id: E_DOGFOOD_CONDUCTOR_ATE_N4
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-11"
+    verified_against: "/meta:dissect conductor --level 4 rodado em 2026-10-11: grafo docs/evolution/dissect/conductor-2026-10 com radar exit 0 e contrato rc 0; o motor onion-research.js tem 0 mencoes a dissect; o forge nao tinha entrada nem a palavra licenca; o dissect-census lia data so sem aspas e deu NAO-DECLARADO ao grafo escrito pela gramatica"
+    label: "o 1o dissect de ponta a ponta (Conductor, ate o N4) mostrou onde o veredito parava: sem forma de plano, sem licenca exigida, sem leitor no forge — e dois defeitos do proprio dissect (motor sem niveis, data entre aspas nao lida)"
+    narrative: "Alvo escolhido entre os tres do issue por menor custo e maior valor medido: o corpus ja pagava o N1 do Conductor (agent-command-composition-2026-09) e nunca registrara a licenca, que e o item 2 do SAC-77. Channels e /fork sao capacidades do proprio Claude Code (sem codigo a absorver, sem licenca a registrar) e testariam menos a costura."
+    trace: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
+      locator: "nos E_DOGFOOD_DISSECT_PARAVA_NO_VEREDITO e A_PLAN_VERIFICACAO_PELO_MOTOR"
+      method: "medição: dogfood do comando real e dos medidores em 2026-10-11"
+      locality: "repo"
+  - id: D_PLANO_DE_ABSORCAO_E_NO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    verified_against: "desenho do PR do SAC-77; a selar pelo maestro no merge"
+    label: "desenho da costura: o N4 do dissect escreve nos x_absorb_* no grafo (KG-SSOT first), o dissect-census.sh --plans os le, mede as pecas do alvo no forge-census e recusa plano sem origem com pin, licenca, paridade ou forma; o /meta:forge injeta essa leitura"
+    narrative: "Sem comando novo e sem REGRA nova: o defeito medido nao era um plano sem licenca passando (nao havia plano nenhum), era a ausencia de forma e de leitor. Por isso o mecanismo e o medidor do proprio dissect, com bancada de polaridade e cinco mutantes mortos, e nao uma guarda de lint. Proxima onda, com gatilho = selo do maestro em D_CONDUCTOR_1011: o /meta:forge executa A_PLAN_VERIFICACAO_PELO_MOTOR no onion-research.js. A prova de generalizacao (ferramenta nova, fora dos tres exemplos) segue no Q."
+    trace: ".claude/validation/dissect-census.sh"
 edges:
   - from: E_DISSECT_QUASE_NAO_USADO
     to: Q_COSTURA_DISSECT_FORGE
     edge_type: SUPPORTS
+  - from: E_DOGFOOD_CONDUCTOR_ATE_N4
+    to: D_PLANO_DE_ABSORCAO_E_NO
+    edge_type: SUPPORTS
+  - from: D_PLANO_DE_ABSORCAO_E_NO
+    to: Q_COSTURA_DISSECT_FORGE
+    edge_type: SUPPORTS
+
+external_edges:
+  - from: E_DOGFOOD_CONDUCTOR_ATE_N4
+    to: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml#E_DOGFOOD_DISSECT_PARAVA_NO_VEREDITO"
+    edge_type: TRACES_TO

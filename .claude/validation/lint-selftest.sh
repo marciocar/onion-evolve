@@ -25095,6 +25095,109 @@ KG
     record_pass "dissect: (h2) cabecalho do --markdown concorda com as linhas do --tsv (${tsv_n})"
   else record_fail "dissect: (h2)" "cabecalho diz '${md_n}' e o tsv tem ${tsv_n} linha(s) — a projecao mente"; fi
 
+  # (q) DATA ENTRE ASPAS (a forma que a gramatica EXIGE) e lida: o delta tem review_after
+  #     "2099-01-01" ⇒ fresco. Defeito MEDIDO no dogfood do SAC-77: a 2a dissecacao do corpus saiu
+  #     NAO-DECLARADO com review_after presente. MUTANTE: o sed sem `["']\{0,1\}` devolve
+  #     NAO-DECLARADO aqui — e o caso (x) nao pegava, porque so olha nivel e veredito.
+  _dc --tsv
+  if [ "$(_col delta 6)" = "fresco" ] && [ "$(_col delta 4)" = "2026-10-01" ]; then
+    record_pass "dissect: (q) baseline/review_after ENTRE ASPAS sao lidos (delta ⇒ fresco)"
+  else record_fail "dissect: (q)" "data entre aspas nao lida: baseline='$(_col delta 4)' frescor='$(_col delta 6)'"; fi
+
+  # ── (p*) --plans: a COSTURA dissect→forge (SAC-77). As pecas do alvo saem do forge-census
+  #     REAL copiado para a sandbox, nunca do plano; e proveniencia/licenca/paridade/forma sao
+  #     obrigatorias. Cada caso isola a sua ferramenta pelo filtro `--plans <ferramenta>`.
+  mkdir -p "${d}/.claude/validation" "${d}/.claude/commands/meta"
+  cp "${REPO_ROOT}/.claude/validation/forge-census.sh" "${d}/.claude/validation/"
+  # alvo com a peca 5 (destino) e SEM a 6 (lente): o plano pede "5,6" e nao diz qual existe.
+  printf -- '---\ndescription: alvo de bancada\n---\nFase final: write(KG) e radar exit 0.\n' \
+    > "${d}/.claude/commands/meta/alvo.md"
+  _plan() {  # $1=ferramenta $2=alvo $3=pecas $4=origem $5=licenca $6=forma $7=paridade
+    mkdir -p "${d}/docs/evolution/dissect/$1-2026-10"
+    cat > "${d}/docs/evolution/dissect/$1-2026-10/$1-2026-10.kg.yaml" <<KG
+meta:
+  id: $1-2026-10
+  x_dissect_tool: $1
+  baseline: "2026-10-11"
+  review_after: "2099-01-01"
+nodes:
+  - id: A_PLAN_$1
+    x_dissect_level: 4
+    x_absorb_target: $2
+    x_absorb_pieces: "$3"
+    x_absorb_origin: "$4"
+    x_absorb_license: $5
+    x_absorb_form: $6
+    x_absorb_parity: "$7"
+  - id: D_$1
+    x_dissect_verdict: absorver
+edges:
+  - from: A_PLAN_$1
+    to: D_$1
+KG
+  }
+  local pin="https://example.org/tool/blob/0123456789abcdef0123456789abcdef01234567/x.py"
+  local par="run_alvo_selftests: caso que reprova sem a peca"
+
+  # (p1) plano COMPLETO ⇒ rc=0, e as pecas vem MEDIDAS: 5:existe · 6:falta. MUTANTE: ler a
+  #      peca do plano (ou imprimir "existe" fixo) daria 6:existe — o plano nem carrega o campo.
+  _plan pok alvo "5,6" "${pin}" MIT reescrita "${par}"
+  git -C "${d}" add -A >/dev/null 2>&1
+  local po prc=0
+  if po="$(bash "${sut}" "${d}" --plans pok 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "0" ] && grep -q 'COMPLETO' <<< "${po}" && grep -q '5:existe · 6:falta' <<< "${po}"; then
+    record_pass "dissect: (p1) --plans COMPLETO ⇒ rc=0 com pecas MEDIDAS no forge-census (5:existe · 6:falta)"
+  else record_fail "dissect: (p1)" "esperado rc=0 + COMPLETO + 5:existe · 6:falta, veio rc=${prc}: $(_emit "${po}" | head -c 300)"; fi
+
+  # (p2) POLARIDADE — mesmo plano SEM licenca ⇒ rc=1 INCOMPLETO(licenca-ausente). Absorver sem
+  #      registrar a origem e o roubo que a casa proibe. MUTANTE: tirar o case da licenca ⇒ rc=0.
+  _plan pnolic alvo "5" "${pin}" unknown reescrita "${par}"
+  git -C "${d}" add -A >/dev/null 2>&1
+  if po="$(bash "${sut}" "${d}" --plans pnolic 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "1" ] && grep -q 'INCOMPLETO(licenca-ausente)' <<< "${po}"; then
+    record_pass "dissect: (p2) plano SEM licenca ⇒ rc=1 INCOMPLETO(licenca-ausente)"
+  else record_fail "dissect: (p2)" "plano sem licenca nao reprovou (rc=${prc}): $(_emit "${po}" | head -c 300)"; fi
+
+  # (p3) origem SEM PIN ⇒ INCOMPLETO(origem-sem-pin): alvo movel nao prova paridade.
+  _plan pnopin alvo "5" "https://example.org/tool/blob/main/x.py" MIT reescrita "${par}"
+  git -C "${d}" add -A >/dev/null 2>&1
+  if po="$(bash "${sut}" "${d}" --plans pnopin 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "1" ] && grep -q 'origem-sem-pin' <<< "${po}"; then
+    record_pass "dissect: (p3) origem sem pin (blob/main) ⇒ INCOMPLETO(origem-sem-pin)"
+  else record_fail "dissect: (p3)" "origem sem pin passou (rc=${prc}): $(_emit "${po}" | head -c 300)"; fi
+
+  # (p3b) hex SOLTO no nome do repo nao e pin. MUTANTE: o regex sem a posicao de pin (qualquer
+  #       7-hex na URL) aprovaria esta origem, que aponta `main` — um alvo que anda.
+  _plan phexrepo alvo "5" "https://example.org/deadbeefcafe-tool/blob/main/x.py" MIT reescrita "${par}"
+  git -C "${d}" add -A >/dev/null 2>&1
+  if po="$(bash "${sut}" "${d}" --plans phexrepo 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "1" ] && grep -q 'origem-sem-pin' <<< "${po}"; then
+    record_pass "dissect: (p3b) hex no NOME do repo com blob/main ⇒ origem-sem-pin (pin so na posicao de pin)"
+  else record_fail "dissect: (p3b)" "hex solto contou como pin (rc=${prc}): $(_emit "${po}" | head -c 300)"; fi
+
+  # (p4) codigo PROPRIETARIO nao se vendoriza ⇒ vendor-de-proprietario; e paridade sem bancada.
+  _plan pprop alvo "5" "${pin}" proprietary vendor-pin "a peca faz o mesmo"
+  git -C "${d}" add -A >/dev/null 2>&1
+  if po="$(bash "${sut}" "${d}" --plans pprop 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "1" ] && grep -q 'vendor-de-proprietario' <<< "${po}" && grep -q 'paridade-sem-bancada' <<< "${po}"; then
+    record_pass "dissect: (p4) vendor-pin de proprietary + paridade sem familia ⇒ os DOIS motivos nomeados"
+  else record_fail "dissect: (p4)" "esperado vendor-de-proprietario + paridade-sem-bancada (rc=${prc}): $(_emit "${po}" | head -c 300)"; fi
+
+  # (p5) alvo que o forge-census NAO conhece (e nao e `novo:`) ⇒ alvo-fora-do-forge-census.
+  _plan pghost fantasma "4" "${pin}" MIT adapter-sdaal "${par}"
+  git -C "${d}" add -A >/dev/null 2>&1
+  if po="$(bash "${sut}" "${d}" --plans pghost 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "1" ] && grep -q 'alvo-fora-do-forge-census' <<< "${po}"; then
+    record_pass "dissect: (p5) alvo inexistente no forge-census ⇒ INCOMPLETO(alvo-fora-do-forge-census)"
+  else record_fail "dissect: (p5)" "alvo fantasma passou (rc=${prc}): $(_emit "${po}" | head -c 300)"; fi
+
+  # (p6) sem forge-census.sh ⇒ rc=3: pecas que nao podem ser MEDIDAS nao viram plano julgado.
+  rm -f "${d}/.claude/validation/forge-census.sh"
+  if po="$(bash "${sut}" "${d}" --plans pok 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "3" ] && grep -q 'MEDIDAS, não digitadas' <<< "${po}"; then
+    record_pass "dissect: (p6) sem forge-census.sh ⇒ --plans recusa com rc=3 (nunca julga peca nao medida)"
+  else record_fail "dissect: (p6)" "sem forge-census nao recusou (rc=${prc}): $(_emit "${po}" | head -c 200)"; fi
+
   # (d) sem indice git ⇒ rc=3 DECLARANDO. Censo e do conjunto RASTREADO; zero nao e resultado
   #     quando a causa e nao ter podido olhar.
   local ng ong orc=0; ng="$(mktemp -d)"

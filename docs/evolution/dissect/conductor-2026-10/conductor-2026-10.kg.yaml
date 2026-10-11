@@ -1,0 +1,244 @@
+meta:
+  id: conductor-2026-10
+  schema_version: "1"
+  x_dissect_tool: conductor
+  baseline: "2026-10-11"
+  review_after: "2026-11-10"   # 30d: FERRAMENTA/LICENCA e o tipo dominante (cadencia da doutrina); o Conductor solta release por semana
+  # kg-backlog-guard: on
+  # ═══ TETO: 12 NÓS ═══
+  #
+  # SEGUNDA dissecacao do /meta:dissect e PRIMEIRA a chegar ao N4. E dogfood do SAC-77 (costura
+  # dissect→forge): a pergunta nao era so "o Onion absorve o Conductor?", era "onde o veredito do
+  # dissect para hoje, e o que falta para o /meta:forge agir sobre ele". O N4 daqui e o primeiro
+  # PLANO DE ABSORCAO em forma de no (`x_absorb_*`), lido por `dissect-census.sh --plans`.
+  # N1 entrou PAGO pelo corpus (agent-command-composition-2026-09); N0 e N2 foram MEDIDOS hoje:
+  # N0 pela API do GitHub, N2 lendo o codigo-fonte no sha fixado (nada foi instalado nem executado).
+
+nodes:
+
+  - id: Q_CONDUCTOR_ABSORVER_OU_NAO_1011
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    x_dissect_level: 0
+    label: "O Onion absorve, costura, parqueia ou rejeita o Conductor (Microsoft) — orquestracao multiagente declarada em YAML que valida a saida do agente e pede correcao na mesma sessao?"
+    trace: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
+
+  - id: E_N0_IDENTIDADE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    x_dissect_level: 0
+    verified_at: "2026-10-11"
+    verified_against: "gh api repos/microsoft/conductor: license MIT, created_at 2026-02-02, pushed_at 2026-10-07, 470 estrelas, nao arquivado; releases v0.1.40 (2026-09-23), v0.1.41 (2026-09-30), v0.1.42 (2026-10-06); ultimo commit fd7428774fd9 em 2026-10-07"
+    source_tier: 10
+    source_kind: primary
+    label: "N0 IDENTIDADE — Conductor: repo microsoft/conductor, Python, licenca MIT, criado em 2026-02, release SEMANAL ate 2026-10-06. Licenca compativel, mantenedor corporativo, vivo. PASSA o N0."
+    narrative: "Primeira vez que o corpus registra a LICENCA do Conductor: o grafo de 2026-09-28 que o estudou citava o anuncio e a doc, nunca a licenca. Achado do dogfood do SAC-77: sem campo exigindo licenca, a pesquisa que mais leu a ferramenta nao a anotou."
+    trace: "https://github.com/microsoft/conductor"
+    provenance:
+      source: "https://api.github.com/repos/microsoft/conductor"
+      locator: "campos license.spdx_id, created_at, pushed_at, stargazers_count, archived; /releases?per_page=3; /commits?per_page=1"
+      method: "medição: gh api em 2026-10-11"
+      locality: "web"
+
+  - id: E_N1_CORPUS_PAGOU
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    x_dissect_level: 1
+    verified_at: "2026-10-11"
+    verified_against: "corpus: E_CONDUCTOR_SCHEMA_VALIDATION_ANCORADO (tier 10, doc oficial) e E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME (tier 6) em agent-command-composition-2026-09; achados por kg-corpus-grep.sh conductor"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "N1 CAPACIDADE (pago pelo corpus) — verbos: declarar topologia em YAML (custo zero de token no orquestrador), VALIDAR a saida do agente contra schema e pedir correcao na mesma sessao, e um validador SEMANTICO opcional com rubrica."
+    trace: "docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml"
+      locator: "nos E_CONDUCTOR_SCHEMA_VALIDATION_ANCORADO e E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME"
+      method: "leitura: corpus primeiro (kg-corpus-grep.sh conductor devolveu 10 nos)"
+      locality: "repo"
+
+  - id: E_N2_RECUPERACAO_DE_FORMA_CAPADA_NO_CODIGO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    x_dissect_level: 2
+    verified_at: "2026-10-11"
+    verified_against: "src/conductor/config/schema.py@fd7428774fd9 l.618 (erro de schema nunca entra no retry de transiente), l.622 (max_parse_recovery_attempts: int | None = Field(default=None, ge=0, le=10)), l.629 (default do provider: Copilot=5, Claude=2), l.722 (validator max_retries: int = Field(default=1, ge=0, le=1))"
+    source_tier: 10
+    source_kind: primary
+    label: "N2 MECANISMO (codigo lido) — o teto de correcao mora no CODIGO, nao no prompt: tentativas de recuperacao de JSON sao campo tipado com limite (0..10), e o retry do validador semantico e capado em 1 por Field(le=1). O motor conta; o modelo nao se autopolicia."
+    trace: "https://github.com/microsoft/conductor/blob/fd7428774fd955643158c1db27f4f5580c6e099a/src/conductor/config/schema.py"
+    provenance:
+      source: "https://github.com/microsoft/conductor/blob/fd7428774fd955643158c1db27f4f5580c6e099a/src/conductor/config/schema.py"
+      locator: "l.618, l.622, l.629, l.722"
+      method: "leitura: codigo-fonte baixado pela API de conteudo do GitHub no sha fixado, lido com grep -n; nada instalado nem executado"
+      locality: "web"
+
+  - id: E_N2_VALIDADOR_SEMANTICO_FAIL_OPEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    x_dissect_level: 2
+    verified_at: "2026-10-11"
+    verified_against: "src/conductor/engine/validator.py@fd7428774fd9 l.22 (Validation is **fail-open**), l.207-213 (excecao na chamada do validador vira ValidationOutcome(passed=True, errored=True)), l.270-291 (resposta sem dict, sem passed ou passed nao-booleano: treating as pass), l.200 (suppress_mcp_servers=True)"
+    source_tier: 10
+    source_kind: primary
+    label: "N2 MECANISMO (codigo lido) — o validador semantico e uma 2a chamada de LLM e e FAIL-OPEN por desenho: erro, resposta sem 'passed' ou nao-booleana viram APROVADO. E roda sem ferramenta por sinal de execucao (suppress_mcp_servers), nao por instrucao."
+    narrative: "Dois achados num no so, e de sinais opostos para o Onion. O fail-open contradiz o P0 desta casa (guarda que nao sabe nunca afirma conformidade). O suppress_mcp_servers e a MESMA licao que esta casa mediu em 2026-09-20 (refutador com instrucao em prosa para nao escrever escreveu em seis arquivos): fronteira de ferramenta e mecanismo de execucao, nao texto no agente — o comentario do proprio codigo diz que tools: [] sozinho nao bastava."
+    trace: "https://github.com/microsoft/conductor/blob/fd7428774fd955643158c1db27f4f5580c6e099a/src/conductor/engine/validator.py"
+    provenance:
+      source: "https://github.com/microsoft/conductor/blob/fd7428774fd955643158c1db27f4f5580c6e099a/src/conductor/engine/validator.py"
+      locator: "l.22, l.200, l.207-213, l.270-291"
+      method: "leitura: codigo-fonte no sha fixado, grep -n; nada instalado nem executado"
+      locality: "web"
+
+  - id: E_N3_ONION_CONFIA_NO_RADAR_DECLARADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    x_dissect_level: 3
+    verified_at: "2026-10-11"
+    verified_against: "grep -n radarExit .claude/workflows/onion-research.js: l.142-143 (o schema pede radarExit inteiro ao AGENTE), l.313 e l.497 (o JS aceita o inteiro devolvido: if (kg.radarExit !== 0)); l.308 e l.492 (o teto de correcao 'max 3 tentativas' esta no PROMPT)"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "N3 IGUAL, logo TRANSFERE — o problema que o Conductor resolve no motor o Onion resolve por DECLARACAO: o radarExit do write(KG) e o inteiro que o proprio agente escritor devolve, e o teto 'max 3 tentativas' vive no prompt. Behavior-over-declaration violado no motor de pesquisa."
+    narrative: "Mesmo objeto (saida de agente que precisa passar num verificador antes de contar), mesmo risco (o produtor declara que passou). O Conductor separa quem produz de quem verifica e conta as tentativas em campo tipado; o onion-research.js pede ao produtor que rode o radar, conte as proprias tentativas e reporte o resultado. O JS e deterministico, mas o dado que ele julga nao e."
+    trace: ".claude/workflows/onion-research.js"
+    provenance:
+      source: ".claude/workflows/onion-research.js"
+      locator: "l.142-143, l.308, l.313, l.492, l.497 (grep -n radarExit e grep -n 'tentativas')"
+      method: "medição: grep -n na arvore do core em 2026-10-11"
+      locality: "repo"
+
+  - id: E_N3_FAIL_OPEN_NAO_TRANSFERE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    x_dissect_level: 3
+    verified_at: "2026-10-11"
+    verified_against: "E_N2_VALIDADOR_SEMANTICO_FAIL_OPEN contra o P0 da REGRA 30 citado na bancada (guarda que nao sabe nunca afirma conformidade) e contra o exit 3 = NAO PUDE MEDIR dos medidores desta casa"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "N3 DIFERENTE, logo NAO TRANSFERE — o validador semantico fail-open e rejeitado: aqui juiz que erra ou nao responde e 'nao sei', nunca 'aprovado'. Absorver a ideia de rubrica sim; a polaridade, nunca."
+    trace: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
+    provenance:
+      source: ".claude/validation/dissect-census.sh e .claude/validation/forge-census.sh"
+      locator: "Exit: 3 = NAO PUDE MEDIR (cabecalho dos dois medidores)"
+      method: "leitura: comparacao da polaridade documentada"
+      locality: "repo"
+
+  - id: E_N3_SCHEMA_NATIVO_LACUNA
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 3
+    label: "LACUNA NOMEADA — a validacao de FORMA o Onion ja recebe do harness (todo agente do onion-research.js leva schema:). Se o harness re-pede ao modelo quando a forma falha NAO foi medido aqui; nada se absorve desta metade."
+    narrative: "O no fica open por doutrina: mecanismo nao observado nao vira confirmed. Medir no PR da absorcao, com um agente cujo schema e violado de proposito."
+    trace: ".claude/workflows/onion-research.js"
+
+  - id: A_PLAN_VERIFICACAO_PELO_MOTOR
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    x_dissect_level: 4
+    x_absorb_target: onion-research
+    x_absorb_pieces: "4,7"
+    x_absorb_origin: "https://github.com/microsoft/conductor/blob/fd7428774fd955643158c1db27f4f5580c6e099a/src/conductor/config/schema.py"
+    x_absorb_license: MIT
+    x_absorb_form: reescrita
+    x_absorb_parity: "run_research_workflow_selftests: caso que injeta write(KG) devolvendo radarExit 0 sobre grafo que o radar reprova; tem de REPROVAR hoje e PASSAR depois (o motor re-mede, nao aceita o inteiro do produtor), e o teto de tentativas sai do prompt para constante do JS"
+    label: "PLANO N4 — absorver no onion-research o CONCEITO 'quem verifica nao e quem produz, e o teto de correcao e contado pelo motor': peca 4 (workflow) muda, peca 7 (bancada) prova. Forma: reescrita na gramatica da casa, nenhum codigo vendorizado."
+    narrative: "Origem e licenca registradas (MIT, sha fixado). A peca que muda e o write(KG): o radar e re-medido por um passo que o produtor nao controla (agente verificador so com Bash e sem Write, ou o proprio substrato se o Workflow permitir rodar comando — medir no PR da absorcao), e o 'max 3 tentativas' vira constante do JS. A rubrica semantica fail-open fica de fora (E_N3_FAIL_OPEN_NAO_TRANSFERE). As pecas que ja existem no alvo NAO estao escritas aqui de proposito: dissect-census.sh --plans as mede ao vivo no forge-census."
+    trace: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
+
+  - id: E_DOGFOOD_DISSECT_PARAVA_NO_VEREDITO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    x_dissect_level: 4
+    verified_at: "2026-10-11"
+    verified_against: "dogfood do /meta:dissect conductor --level 4 em 2026-10-11: grep -ci dissect .claude/workflows/onion-research.js = 0; grep -n licen nos .md do /meta:forge e da doutrina da forja = 0; forge-census --tsv da 7/7 ao dissect, contando a peca 4 pela CITACAO do onion-research.js; cedar-2026-10 (a unica dissecacao anterior) nao tem campo de licenca"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "DOGFOOD — onde o dissect parava: (1) o passo 3 promete 'um worker por nivel, gate em JS' no onion-research.js, que tem ZERO mencao a dissect; (2) o forge nao tinha entrada nem palavra sobre licenca; (3) o N4 nao tinha forma — terminava em prosa no no de decisao."
+    narrative: "Corolario do (1): o forge-census conta 7/7 ao proprio dissect porque ele CITA o motor — presenca e referencia, nunca comportamento, exatamente o teto que o censo declara. A dissecacao desta rodada foi feita direto, sem o motor, e isso fica declarado no comando em vez de escondido. A costura nasce daqui: o N4 vira nos x_absorb_*, o dissect-census.sh --plans os le e mede as pecas do alvo no forge-census, e o /meta:forge injeta essa leitura."
+    trace: ".claude/commands/meta/dissect.md"
+    provenance:
+      source: ".claude/workflows/onion-research.js, .claude/commands/meta/forge.md, .claude/validation/forge-census.sh"
+      locator: "grep -ci dissect (0); grep -n licen (0 no forge); forge-census --tsv linha dissect (7)"
+      method: "medição: dogfood do comando real em 2026-10-11"
+      locality: "repo"
+
+  - id: D_CONDUCTOR_1011
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    x_dissect_level: 4
+    x_dissect_verdict: absorver
+    verified_at: "2026-10-11"
+    verified_against: "NAO SELADA. O /meta:dissect nunca sela: status open, aguardando o maestro."
+    label: "VEREDITO PROPOSTO — ABSORVER o conceito (verificacao pelo motor + teto contado em codigo), via A_PLAN_VERIFICACAO_PELO_MOTOR; REJEITAR o validador fail-open; nada a absorver da forma (nativa). O maestro sela."
+    narrative: "Nao e costurar: o Conductor e outro orquestrador (Python, YAML) e adapter para ele trocaria o substrato que o Onion escolheu (Workflow nativo). Nao e parquear: o defeito interno (radarExit declarado) e medido hoje. A absorcao em si NAO e deste PR: proxima onda, com gatilho = selo do maestro neste no; o forge a recebe pelo dissect-census.sh --plans conductor."
+    trace: "docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml"
+
+edges:
+
+  - from: E_N0_IDENTIDADE
+    to: Q_CONDUCTOR_ABSORVER_OU_NAO_1011
+    edge_type: SUPPORTS
+  - from: E_N1_CORPUS_PAGOU
+    to: Q_CONDUCTOR_ABSORVER_OU_NAO_1011
+    edge_type: SUPPORTS
+  - from: E_N2_RECUPERACAO_DE_FORMA_CAPADA_NO_CODIGO
+    to: E_N3_ONION_CONFIA_NO_RADAR_DECLARADO
+    edge_type: SUPPORTS
+  - from: E_N2_VALIDADOR_SEMANTICO_FAIL_OPEN
+    to: E_N3_FAIL_OPEN_NAO_TRANSFERE
+    edge_type: SUPPORTS
+  - from: E_N3_ONION_CONFIA_NO_RADAR_DECLARADO
+    to: A_PLAN_VERIFICACAO_PELO_MOTOR
+    edge_type: SUPPORTS
+  - from: E_N3_FAIL_OPEN_NAO_TRANSFERE
+    to: A_PLAN_VERIFICACAO_PELO_MOTOR
+    edge_type: CONSTRAINS
+  - from: E_N3_SCHEMA_NATIVO_LACUNA
+    to: A_PLAN_VERIFICACAO_PELO_MOTOR
+    edge_type: CONSTRAINS
+  - from: A_PLAN_VERIFICACAO_PELO_MOTOR
+    to: D_CONDUCTOR_1011
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_DISSECT_PARAVA_NO_VEREDITO
+    to: A_PLAN_VERIFICACAO_PELO_MOTOR
+    edge_type: SUPPORTS
+  - from: D_CONDUCTOR_1011
+    to: Q_CONDUCTOR_ABSORVER_OU_NAO_1011
+    edge_type: SUPPORTS
+
+external_edges:
+  - from: E_N1_CORPUS_PAGOU
+    to: "docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml#E_CONDUCTOR_SCHEMA_VALIDATION_ANCORADO"
+    edge_type: TRACES_TO

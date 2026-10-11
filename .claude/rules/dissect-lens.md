@@ -27,4 +27,7 @@ O mínimo que não se negocia aqui:
   porque um arquivamento da SEC foi carimbado `source_tier: 1` em 2026-10-01, lendo ao contrário.)
 - **Marcadores obrigatórios** para o censo achar: `meta.x_dissect_tool:`, `x_dissect_level:` por nó,
   `x_dissect_verdict:` no nó de decisão.
+- **`absorver`/`costurar` no N4 escreve o plano como nós `x_absorb_*`** (alvo, peças, origem com
+  pin, licença, forma, paridade) e passa em `dissect-census.sh . --plans <ferramenta>` com rc 0 —
+  é o que o `/meta:forge` lê. Peça que "já existe" não se digita: o leitor mede.
 - **Grafo primeiro, prosa depois** — `kg-radar` exit 0 antes de qualquer `SYNTHESIS.md`.

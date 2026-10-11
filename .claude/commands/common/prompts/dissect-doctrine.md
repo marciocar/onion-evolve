@@ -25,7 +25,7 @@ nunca deve consumir uma análise de mecanismo.
 | **N1 CAPACIDADE** | o que ela FAZ que o Onion não faz? | lista de **verbos** extraída da superfície executável (CLI `--help`, API, schema), nunca do marketing | tudo que ela faz o Onion já faz, ou o delta não tem consumidor nomeado aqui |
 | **N2 MECANISMO** | COMO faz — substrato, estrutura de dados, onde mora o determinismo | rodou, ou leu o **código-fonte**; nomeia o invariante que ela garante e o que ela não garante | só há declaração do fornecedor sobre o próprio mecanismo |
 | **N3 TRANSFERIBILIDADE** | igual → transfere, diferente → desenha | a [régua de transferência](../../../../docs/knowledge-base/concepts/transfer-heuristic-aristotle.md) aplicada **com evidência**, e o veredito escrito | a analogia não sobrevive ao refutador (falsa analogia ou falsa distinção) |
-| **N4 ABSORÇÃO** | o plano: o que entra, por qual costura, qual guarda cobra, qual bancada prova | as quatro respostas, **nomeadas**: artefato, costura SDAAL, guarda determinística, caso de bancada que reprova sem a mudança | não se consegue nomear a guarda que cobraria — absorção sem guarda é desejo |
+| **N4 ABSORÇÃO** | o plano: o que entra, por qual costura, qual guarda cobra, qual bancada prova | as quatro respostas, **nomeadas**: artefato, costura SDAAL, guarda determinística, caso de bancada que reprova sem a mudança — **escritas como nós `x_absorb_*`** (§4b), que o `/meta:forge` lê | não se consegue nomear a guarda que cobraria — absorção sem guarda é desejo; ou o plano sai INCOMPLETO no leitor |
 
 **Níveis selecionáveis.** `--level N` **para** no nível pedido. É assim que uma varredura de 30
 ferramentas custa N0 vezes 30 e não N4 vezes 30.
@@ -80,6 +80,28 @@ desperdício que esta doutrina existe para cortar.
 
 E o inverso vale igual: dissecação **vencida** não se cita como se fosse de hoje. Página de
 preço, licença e mantenedor mudam em semanas — a cadência de revisita do grafo manda.
+
+---
+
+## 4b. A passagem para a forja — o plano é NÓ, e o que já existe é MEDIDO
+
+Até 2026-10-11 o veredito terminava em prosa no nó de decisão e nada o entregava ao
+[`/meta:forge`](../../meta/forge.md) (medido: só 2 grafos citavam o dissect, e nenhum chegara ao
+N4). O dogfood do Conductor, a 1ª dissecação a chegar ao N4, fixou a forma mínima, sem comando novo:
+
+1. **Peças** — `x_absorb_target` + `x_absorb_pieces`. Quais já existem no alvo **não se escreve**:
+   o leitor (`dissect-census.sh --plans`) roda o `forge-census.sh` e mede. Campo digitado de
+   "peça existe" seria plano preenchido sem medir.
+2. **Proveniência e licença** — `x_absorb_origin` (URL **com pin**) + `x_absorb_license`. Absorver
+   sem registrar a origem é o roubo que a casa proíbe.
+3. **Paridade** — `x_absorb_parity` nomeia a família de bancada onde o caso que reprova sem a peça
+   será cobrado: a peça faz o que a original fazia.
+4. **Forma** — `x_absorb_form`: `reescrita` (o conceito na gramática da casa), `adapter-sdaal`
+   (costurar: a ferramenta fica de fora) ou `vendor-pin` (como o contrato do KG-SSOT). Código
+   `proprietary` nunca é vendorizado.
+
+O leitor confere **forma**, não **verdade**: não abre a rede para provar que a licença é aquela.
+Quem preenche mede a origem (N0 com fonte primária); o leitor recusa o plano que nem a declara.
 
 ---
 
