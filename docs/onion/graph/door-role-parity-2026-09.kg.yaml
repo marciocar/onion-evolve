@@ -2,8 +2,7 @@
 # Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
 # apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
 meta:
-  x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote das decisões do maestro de 2026-10-11 (4 decisões, F6 com evidência no remoto, adotado standalone com canal upstream); selo do maestro pendente"
+  x_drive_checkpoint: sealed
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
@@ -667,6 +666,116 @@ nodes:
     narrative: "Achado 1 da passada adversarial de 2026-10-11, medido no código: door-role-parity-check.sh só permite o par registro standalone com carimbo adopted (o comentário diz que carimbo standalone liga o MODO PORTA no lint, medido em dois adotantes: 0 para 16 e 0 para 14 HARD), e o lint-artifacts.sh liga IS_DERIVED só para adopted e hub. Ao mesmo tempo, /meta:adopt --role standalone produz carimbo role standalone sem kind door. A decisão D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA resolve o TRANSPORTE; o julgamento do repo adotado não mudou. Medido em 2026-10-10 nos clones locais: o único carimbo standalone é a própria porta, então ninguém é afetado hoje. Respostas possíveis: o lint e a REGRA 92 passam a ler kind (standalone sem kind door = derivado), ou a decisão fixa que o adotado standalone carimba adopted com outro campo de corte. Na mesma família, declarados e não curados: a projeção do wizard (topology-projection.sh) corta co-* para todo standalone sem ler o kind (nenhuma transição tem procedimento em co-* hoje, medido), a skill onion-wizard diz que o standalone não leva a federação, e co-evolve.md e co-relay.md linkam co-announce.md e co-deliver.md, que não viajam ao adotado standalone."
     trace: ".claude/validation/door-role-parity-check.sh · .claude/validation/lint-artifacts.sh · .claude/commands/meta/adopt.md · .claude/utils/wizard/topology-projection.sh"
 
+  # ---- o versionamento das portas (decisão do maestro de 2026-10-11) ----
+  - id: D_VERSIONAR_AS_PORTAS_POR_RELEASE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: done
+    verified_at: "2026-10-11"
+    verified_against: "decisão do maestro por pergunta com opções em 2026-10-11, todas as recomendadas; mecanismo medido em E_VERSIONAMENTO_NA_BANCADA"
+    label: "DECISÃO DO MAESTRO (2026-10-11): VERSIONAR POR RELEASE. A versão onion-vX.Y.Z é rótulo de um pin, nasce no /meta:publish, mora em tag NAS PORTAS, o motor propõe o bump e o maestro sela; número único da família a partir de 1.0.0"
+    narrative: "Quatro escolhas, todas a recomendada. (1) Versionar sim, como RÓTULO DE RELEASE: apelido de um pin, nascido no /meta:publish; o pin segue sendo a verdade e nenhuma guarda lê a versão; pin que não é release tem a versão derivada no estilo git describe (onion-v1.0.0-31-gSHA), nunca guardada no members.yaml. (2) A tag mora NAS PORTAS, com o nome do produto (onion-vX.Y.Z, precedente kg-ssot-vX.Y.Z), criada e empurrada pelo motor e conferida no remoto como o pin; a porta onion-core (source) é o livro-razão; o core privado fica intocado, inclusive de tags, e o passo 8 do motor passou a conferir as tags. O intervalo do changelog vai do source_commit do carimbo da tag anterior ao pin novo. (3) O motor PROPÕE e o maestro SELA na pergunta que o /meta:publish já fazia: a proposta sai do diff de superfície entre a porta publicada e a montada (comando, agente, skill ou hook removido ou renomeado, ou chave do carimbo mudada = major; superfície adicionada = minor; resto = patch), e entrada BREAKING no CHANGELOG da federação desde a última tag é candidata a major. Não deriva de Conventional Commits: medido, 0 commits com ! em 2432. O selo é --version, obrigatório com --push. (4) Número único da família: o --all agrega a proposta (maior tag, maior bump); os plugins mantêm o version do plugin.json por conteúdo (0.1.N, o que dirige o update do Claude Code) e levam a família em metadata.version do marketplace.json e em onion_release do provenance.json; nas outras portas a versão entra no carimbo como release:, pelo write-stamp.sh. RECONCILIA a D_MATRIZ_DE_PORTAS_2026_10: 'o source publicado e versionado' passa a significar que a porta onion-core carrega as tags de release, e não que o core ganhou semver; a identidade continua sendo o pin. O changelog da release é a mensagem da tag anotada e passa pela mesma varredura de vazamento do bundle; o canal do adotante segue sendo o CHANGELOG da federação."
+    trace: "ops/publish-door.sh · .claude/utils/adopt/write-stamp.sh · ops/materialize-door.sh · .claude/commands/common/prompts/publish-doctrine.md · docs/meta-specs/architecture.md"
+    provenance:
+      source: "decisão do maestro na sessão de 2026-10-11, por pergunta com opções"
+      locator: "quatro perguntas do versionamento (versionar, onde mora a tag, quem decide o bump, número da família); escolhidas as recomendadas"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-11"
+      locality: "pessoa"
+
+  - id: E_VERSIONAMENTO_NA_BANCADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "run_publish_release_selftests com LC_ALL=C: 17 casos verdes; cada caso de comportamento novo com mutante plantado por ops/mutate-and-restore.sh (core-only) que o reprova; run_publish_selftests, run_write_stamp_selftests e run_door_selftests verdes com os casos novos"
+    source_kind: repo
+    source_tier: 10
+    label: "o versionamento medido num mundo falso sem rede: proposta major, minor, patch e primeira; push sem --version recusa; tag onion-v na porta e nunca no core; plugins sem trocar o version; changelog com id de adotante barra"
+    narrative: "Os casos: (r1) sem tag, proposta onion-v1.0.0 'primeira'; (r2) --push sem --version e --version fora de X.Y.Z dão rc 2; (r3) a tag onion-v1.0.0 nasce na ponta publicada, conferida, com o changelog como mensagem e o carimbo com release: pelo write-stamp real, e o core segue intacto, tags inclusive; (r3b) tag que não chegou ao remoto é recuperada pela re-rodada com o mesmo número; (r3c) a re-rodada da mesma release é idempotente; (r4) comando adicionado dá minor e o commit docs: fica fora do changelog; (r5) número menor que a última tag dá rc 2, e o mesmo número com conteúdo novo também; (r6) mudança fora da superfície dá patch com 'nenhuma quebra nesta porta'; (r7) comando removido dá major com a quebra nomeada; (r8) BREAKING no CHANGELOG da federação dá candidata a major, e só a contagem viaja; (r9) plugins levam a família no metadata e no provenance com o plugin.json intocado; (r10) o --status exibe a versão e a derivada do pin novo; (r11) o --all agrega a proposta da família; (r12) id de adotante num assunto de commit do intervalo barra o changelog; (r13) nenhuma tag nasce no core."
+    trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh, função run_publish_release_selftests, na branch feat/onion-release-versioning"
+      locator: "casos r1 a r13 e os mutantes de cada um"
+      method: "medição: bancada rodada com LC_ALL=C e mutantes plantados por ops/mutate-and-restore.sh (core-only), um por caso"
+      locality: "repo"
+
+  - id: C_MAJOR_EXIGE_API_DECLARADA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "cláusula 6 da publish-doctrine e architecture.md §6.1 declaram a API pública por porta; a proposta do motor lê só nomes da superfície e chaves do carimbo"
+    label: "objeção sobrevivente C2: 'major' só tem sentido com a API pública de cada porta declarada (manifesto do papel, comandos invocáveis, schema do carimbo; na source, o contrato do members.yaml)"
+    narrative: "Declarada na cláusula 6 e na meta-spec. O teto também ficou declarado: o motor mede nomes (removido, renomeado, adicionado) e as chaves do carimbo; um comando reescrito com o mesmo nome sai como patch, e o contrato do members.yaml não entra no diff (o sinal dele é a entrada BREAKING no CHANGELOG da federação). Por isso a proposta é proposta e o número é do maestro."
+    trace: ".claude/commands/common/prompts/publish-doctrine.md · docs/meta-specs/architecture.md"
+    provenance:
+      source: ".claude/commands/common/prompts/publish-doctrine.md"
+      locator: "cláusula 6, item 'API pública por porta', e o item 'Não mede todo o contrato que declara como API'"
+      method: "leitura: o texto escrito nesta leva, no locator citado"
+      locality: "repo"
+
+  - id: C_CHANGELOG_DIZ_NENHUMA_QUEBRA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "o changelog gerado escreve 'nenhuma quebra nesta porta' quando a porta não quebrou; casos r4b e r6 da bancada"
+    label: "objeção sobrevivente C3: o changelog por porta diz 'nenhuma quebra nesta porta' quando a porta não mudou de forma quebrável, para que o número único da família não sugira quebra onde não houve"
+    trace: "ops/publish-door.sh"
+    provenance:
+      source: "ops/publish-door.sh, passo (4b)"
+      locator: "seção 'Quebras nesta porta' do changelog gerado"
+      method: "medição: casos r4b e r6 de run_publish_release_selftests"
+      locality: "repo"
+
+  - id: C_VERSAO_NUNCA_E_GUARDA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "nenhuma guarda lê release: nem onion_release; REGRA 85, REGRA 92 e o --status medem o pin; o --status só exibe a versão"
+    label: "objeção sobrevivente C4: a versão nunca é fonte de guarda; o pin decide, a versão é exibida"
+    narrative: "O risco é a versão virar verdade paralela ao pin, que é a classe de duas fontes que custou 85 arquivos em 2026-09-30 (E_DANO_85_ARQUIVOS). No mecanismo: o write-stamp grava release: só com --kind door e o cabeçalho diz que nenhuma guarda o lê; o --status mostra a coluna versão e a derivada do pin novo, sem decidir nada por ela; door-role-parity-check e door-staleness-check não foram tocados."
+    trace: "ops/publish-door.sh · .claude/utils/adopt/write-stamp.sh"
+    provenance:
+      source: "ops/publish-door.sh e .claude/utils/adopt/write-stamp.sh"
+      locator: "cabeçalho VERSIONAMENTO do motor; comentário da flag --release do write-stamp; função _status"
+      method: "leitura: o cabeçalho e as funções citados no locator"
+      locality: "repo"
+
+  - id: C_RECONCILIAR_O_SEMVER_SUPERADO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-11"
+    verified_against: "architecture.md §6.1 reescrita com o bump 1.3.0 para 1.4.0; cabeçalho do onion-version.sh; project-charter e codebase-guide; a citação de docs/onion/RELEASE-NOTES-*.md, que nunca existiram, superada"
+    label: "objeção sobrevivente C5: o 'não há semver formal' da meta-spec, do onion-version.sh e do contexto técnico, e os RELEASE-NOTES citados e inexistentes, se reconciliam no mesmo movimento"
+    narrative: "Reconciliado no mesmo PR. A linha velha da meta-spec ficou como nota SUPERADO, e não apagada. A ambiguidade de 'versionado' na D_MATRIZ_DE_PORTAS_2026_10 se resolve na narrative da decisão. O changelog que viaja passa pela mesma varredura de vazamento do bundle (caso r12), e o canal do adotante segue sendo o CHANGELOG da federação."
+    trace: "docs/meta-specs/architecture.md · .claude/validation/onion-version.sh · docs/technical-context/01-core/project-charter.md · docs/technical-context/02-ai-context/codebase-guide.md"
+    provenance:
+      source: "docs/meta-specs/architecture.md"
+      locator: "§6.1 Versionamento e o frontmatter version"
+      method: "leitura: o texto escrito nesta leva, no locator citado"
+      locality: "repo"
+
 edges:
   # o dano é a evidência de que a lacuna existia
   - from: E_DANO_85_ARQUIVOS
@@ -851,4 +960,28 @@ edges:
   # o transporte foi resolvido; o julgamento do repo adotado standalone ainda não
   - from: Q_CARIMBO_DO_ADOTADO_STANDALONE
     to: D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA
+    edge_type: CONSTRAINS
+  # o versionamento das portas: as objeções sobreviventes do Elenxo limitam a decisão sem derrubá-la
+  - from: C_MAJOR_EXIGE_API_DECLARADA
+    to: D_VERSIONAR_AS_PORTAS_POR_RELEASE
+    edge_type: CONSTRAINS
+  - from: C_CHANGELOG_DIZ_NENHUMA_QUEBRA
+    to: D_VERSIONAR_AS_PORTAS_POR_RELEASE
+    edge_type: CONSTRAINS
+  - from: C_VERSAO_NUNCA_E_GUARDA
+    to: D_VERSIONAR_AS_PORTAS_POR_RELEASE
+    edge_type: CONSTRAINS
+  - from: C_RECONCILIAR_O_SEMVER_SUPERADO
+    to: D_VERSIONAR_AS_PORTAS_POR_RELEASE
+    edge_type: CONSTRAINS
+  - from: E_VERSIONAMENTO_NA_BANCADA
+    to: D_VERSIONAR_AS_PORTAS_POR_RELEASE
+    edge_type: SUPPORTS
+  # a versão como guarda seria a segunda fonte que já custou 85 arquivos
+  - from: E_DANO_85_ARQUIVOS
+    to: C_VERSAO_NUNCA_E_GUARDA
+    edge_type: SUPPORTS
+  # reconcilia o 'versionado' da matriz: tag de release na porta, não semver no core
+  - from: D_VERSIONAR_AS_PORTAS_POR_RELEASE
+    to: D_MATRIZ_DE_PORTAS_2026_10
     edge_type: CONSTRAINS
