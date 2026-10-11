@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**95 regras** no total — **83 HARD**, **36 SOFT**.
+**96 regras** no total — **84 HARD**, **36 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -88,6 +88,7 @@ O consumidor fala com a abstração, nunca com o provider direto.
 | 10 | SDAAL: sem chamada direta a provider no consumidor | HARD | consumidor chamando o provider direto, furando a abstração SDAAL |
 | 11 | Método de abstração usado no consumidor deve existir na interface | HARD | consumidor chama método de abstração que não existe na interface |
 | 103 | Adapter do task-manager declara todas as capacidades da interface, com fonte | HARD | capacidade declarada que o adapter não exerce, e célula "medida" sem fonte nenhuma. |
+| 104 | Executável do adapter e declaração de capacidades listam os mesmos verbos | HARD | executável do task-manager que exerce verbo declarado not_implemented (ou não declarado), e medição adapter: que nenhum executável roda. |
 
 ## SSOT anti-drift
 

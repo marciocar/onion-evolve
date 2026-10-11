@@ -26793,6 +26793,152 @@ EOF_MUT
 }
 _family run_task_progress_selftests
 
+# REGRA 104 (Executável do adapter e declaração de capacidades listam os mesmos verbos) — SAC-65, 2026-10-11: nasceu o
+# 1º executável (adapters/linear.py, via tm.sh) e, com ele, duas fontes da mesma verdade — `--capabilities` e o tsv.
+# Casos: (a) as polaridades do --selftest · (b) o corpus real no modo que o lint consome (roda o linear.py DE VERDADE,
+# com ambiente limpo) · (c) o dispatcher de produção sobre o defeito verbatim · (m) UM MUTANTE POR CASO, na CÓPIA.
+run_task_manager_executable_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/task-manager-executable-check.sh"
+  [ -f "${chk}" ] || { record_fail "task-manager-executable" "guarda ausente"; return; }
+  local o rc
+  # (a) o --selftest próprio
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 10/10 verdes' <<< "${o}"; then
+    record_pass "task-manager-executable: (a) --selftest verde (10 casos: coerente cala, verbo não declarado, declarado not_implemented, medição fora da lista, kg: cala, mudo, ambiente limpo, sem tsv, sem executável, .py com CRLF)"
+  else record_fail "task-manager-executable: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: o linear.py responde --capabilities sem chave e bate com o tsv.
+  #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/task-manager-executable-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && ! grep -q '^HARD' <<< "${o}"; then
+    record_pass "task-manager-executable: (b) corpus real → rc 0, sem HARD (linear.py --capabilities × linear.capabilities.tsv)"
+  else record_fail "task-manager-executable: (b) corpus real" "rc=${rc}; [$(grep '^HARD' <<< "${o}" | head -3 | tr '\n' '|')]"; fi
+  # (c) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, com o defeito VERBATIM da classe (o tsv do Linear declarando
+  #     not_implemented um verbo que o executável exerce — priority.set, optional, para a REGRA 103 não roubar o caso)
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null
+  local lt="${sd}/.claude/utils/task-manager/adapters/linear.capabilities.tsv"
+  if [ -f "${lt}" ] && [ -f "${sd}/.claude/utils/task-manager/adapters/linear.py" ]; then
+    sed -i 's/^priority\.set\toptional\timplemented\t/priority.set\toptional\tnot_implemented\t/' "${lt}"
+    ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+    local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${lt}" 2>&1 || true)"
+    if grep -q "REGRA 104 (Executável do adapter e declaração de capacidades listam os mesmos verbos): \[verbo-declarado-nao-implementado\] priority.set" <<< "${l}"; then
+      record_pass "task-manager-executable: (c) o lint de produção (dispatcher) emite a REGRA 104 sobre o defeito verbatim"
+    else record_fail "task-manager-executable: (c) dispatcher" "$(grep -E 'REGRA 104|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  else record_fail "task-manager-executable: (c) dispatcher" "linear.py ou linear.capabilities.tsv ausente no sandbox"; fi
+  rm -rf "${sd}"
+  # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove.
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"; mkdir -p "${sb}/.claude/validation"
+  local s="${sb}/.claude/validation/task-manager-executable-check.sh" line old new want rest mo mrc
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    old="${line%%@@@*}"; rest="${line#*@@@}"; new="${rest%%@@@*}"; want="${rest#*@@@}"
+    cp "${chk}" "${s}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${s}" "${old}" "${new}"; then
+      record_fail "task-manager-executable: (m) mutante não aplicou" "${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "task-manager-executable: (m) mutante morde → ✗ ${want}"
+    else record_fail "task-manager-executable: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
+  done <<'EOF_MUT'
+if [ -z "${row}" ]; then@@@if false; then@@@(ii)
+if [ "${st}" = "not_implemented" ]; then@@@if false; then@@@(iii)
+LC_ALL=C grep -qxF -- "${cap}" <<< "${caps}" || \@@@true || \@@@(iv)
+case ";${src};" in *";adapter:"*) : ;; *) continue ;; esac@@@case ";${src};" in *) : ;; esac@@@(v)
+if [ "${rc}" -ne 0 ] || [ -z "${caps}" ]; then@@@if false; then@@@(vi)
+env -i PATH="${PATH}" HOME="${HOME:-/tmp}" LC_ALL=C timeout 15 ${runner}@@@timeout 15 ${runner}@@@(vii)
+if [ ! -f "${decl}" ]; then@@@if false; then@@@(viii)
+caps="$(LC_ALL=C sed -e 's/\r$//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' <<< "${caps}" | LC_ALL=C grep -v '^$' || true)"@@@caps="$(LC_ALL=C grep -v '^$' <<< "${caps}" || true)"@@@(x)
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_task_manager_executable_selftests
+
+# tm.sh + adapters/linear.py (SAC-65, 2026-10-11) — o dispatcher executável do task manager, OFFLINE: nenhuma chave
+# real, nenhum .env, o Linear trocado por um servidor de loopback (costura TM_LINEAR_ENDPOINT, só 127.0.0.1).
+# O que a família vigia: provider sem executável sai rc 2 sem inventar outro; GraphQL que devolve 200 com `errors` é
+# ERRO (rc 1), nunca sucesso; HTTP de erro é rc 1; chave ausente é rc 2. (m) o mutante que aceita `errors` tem de morder.
+run_task_manager_dispatcher_selftests() {
+  local tm="${REPO_ROOT}/.claude/utils/task-manager/tm.sh" py="${REPO_ROOT}/.claude/utils/task-manager/adapters/linear.py"
+  [ -f "${tm}" ] && [ -f "${py}" ] || { record_fail "task-manager-dispatcher" "tm.sh ou adapters/linear.py ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "task-manager-dispatcher: python3 ausente"; return; }
+  local o e rc d; d="$(TMPDIR=/tmp mktemp -d)"
+  # ambiente limpo: sem chave do maestro, sem .env (TM_ENV_FILE aponta o vazio)
+  _tmrun() { env -u LINEAR_API_KEY -u LINEAR_TEAM_ID TM_ENV_FILE="${d}/nao-existe" "$@" >"${d}/out" 2>"${d}/err"; }
+  # (a) provider sem executável → rc 2, nomeando o que falta, sem trocar de provider
+  if _tmrun TASK_MANAGER_PROVIDER=jira bash "${tm}" item.read X-1; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -qF 'falta adapters/jira.py' "${d}/err"; then record_pass "task-manager-dispatcher: (a) provider sem executável → rc 2 nomeando adapters/jira.py"
+  else record_fail "task-manager-dispatcher: (a) provider sem executável" "rc=${rc} $(head -1 "${d}/err")"; fi
+  # (b) provider none → rc 2 (offline, nunca API call)
+  if _tmrun TASK_MANAGER_PROVIDER=none bash "${tm}" item.read X-1; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ]; then record_pass "task-manager-dispatcher: (b) provider none → rc 2"; else record_fail "task-manager-dispatcher: (b) none" "rc=${rc}"; fi
+  # (c) --capabilities sem chave e sem rede → a lista do linear.py, com os verbos medidos
+  if _tmrun TASK_MANAGER_PROVIDER=linear bash "${tm}" --capabilities; then rc=0; else rc=$?; fi
+  o="$(python3 -I -B "${py}" --capabilities 2>/dev/null)"
+  if [ "${rc}" -eq 0 ] && [ "$(cat "${d}/out")" = "${o}" ] && grep -qx 'status.transition' "${d}/out"; then record_pass "task-manager-dispatcher: (c) --capabilities local, sem chave, igual ao linear.py"
+  else record_fail "task-manager-dispatcher: (c) --capabilities" "rc=${rc}"; fi
+  # (d) verbo fora do executável (item.delete, não exercitado) → rc 2
+  if _tmrun TASK_MANAGER_PROVIDER=linear bash "${tm}" item.delete SAC-1; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -qF "não implementa 'item.delete'" "${d}/err"; then record_pass "task-manager-dispatcher: (d) verbo fora do executável → rc 2"
+  else record_fail "task-manager-dispatcher: (d) verbo fora" "rc=${rc} $(head -1 "${d}/err")"; fi
+  # (e) chave ausente → rc 2, sem chamada de rede
+  if _tmrun TASK_MANAGER_PROVIDER=linear bash "${tm}" item.read SAC-1; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -qF 'LINEAR_API_KEY ausente' "${d}/err"; then record_pass "task-manager-dispatcher: (e) chave ausente → rc 2"
+  else record_fail "task-manager-dispatcher: (e) chave ausente" "rc=${rc} $(head -1 "${d}/err")"; fi
+  # Servidor de loopback: responde em ordem as respostas roteirizadas (status<TAB>corpo), uma por requisição.
+  cat > "${d}/srv.py" <<'PYSRV'
+import http.server, sys
+script = [l.rstrip("\n").split("\t", 1) for l in open(sys.argv[1], encoding="utf-8") if l.strip()]
+class H(http.server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        self.rfile.read(int(self.headers.get("Content-Length", 0)))
+        code, body = script.pop(0) if script else ("500", '{"x":1}')
+        self.send_response(int(code)); self.send_header("Content-Type", "application/json"); self.end_headers()
+        self.wfile.write(body.encode())
+    def log_message(self, *a): pass
+s = http.server.HTTPServer(("127.0.0.1", 0), H)
+s.timeout = 20   # nunca pendura a bancada: sem requisição em 20 s, o servidor sai
+open(sys.argv[2], "w").write(str(s.server_address[1]))
+for _ in range(len(script)): s.handle_request()
+PYSRV
+  _srv() {  # $1 = arquivo de roteiro → exporta a porta em SRV_PORT
+    rm -f "${d}/port"; python3 -I -B "${d}/srv.py" "$1" "${d}/port" & local i=0
+    while [ ! -s "${d}/port" ] && [ "${i}" -lt 50 ]; do sleep 0.1; i=$((i+1)); done
+    SRV_PORT="$(cat "${d}/port" 2>/dev/null)"
+  }
+  _fake() {  # roda o verbo contra o loopback com chave falsa
+    env -u LINEAR_TEAM_ID TM_ENV_FILE="${d}/nao-existe" TASK_MANAGER_PROVIDER=linear LINEAR_API_KEY=lin_fake \
+      TM_LINEAR_ENDPOINT="http://127.0.0.1:${SRV_PORT}/graphql" bash "${1}" "${@:2}" >"${d}/out" 2>"${d}/err"
+  }
+  # (f) GraphQL 200 com `errors` → rc 1, stderr nomeia o erro, stdout vazio (o defeito clássico: tratar como sucesso)
+  printf '200\t{"data":null,"errors":[{"message":"Entity not found: Issue"}]}\n' > "${d}/s1"; _srv "${d}/s1"
+  if _fake "${tm}" item.read SAC-1; then rc=0; else rc=$?; fi; wait 2>/dev/null
+  if [ "${rc}" -eq 1 ] && grep -qF 'GraphQL errors: Entity not found' "${d}/err" && [ ! -s "${d}/out" ]; then record_pass "task-manager-dispatcher: (f) GraphQL 200 com errors → rc 1, nada em stdout"
+  else record_fail "task-manager-dispatcher: (f) GraphQL errors" "rc=${rc} $(head -1 "${d}/err")"; fi
+  # (g) HTTP 500 → rc 1
+  printf '500\t{"error":"boom"}\n' > "${d}/s2"; _srv "${d}/s2"
+  if _fake "${tm}" item.read SAC-1; then rc=0; else rc=$?; fi; wait 2>/dev/null
+  if [ "${rc}" -eq 1 ] && grep -qF 'HTTP 500' "${d}/err"; then record_pass "task-manager-dispatcher: (g) HTTP 500 → rc 1"
+  else record_fail "task-manager-dispatcher: (g) HTTP 500" "rc=${rc} $(head -1 "${d}/err")"; fi
+  # (h) sucesso → rc 0 e JSON com o identificador
+  printf '200\t{"data":{"issue":{"id":"u1","identifier":"SAC-1","title":"t","children":{"nodes":[]}}}}\n' > "${d}/s3"; _srv "${d}/s3"
+  if _fake "${tm}" item.read SAC-1; then rc=0; else rc=$?; fi; wait 2>/dev/null
+  if [ "${rc}" -eq 0 ] && python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["identifier"]=="SAC-1"' "${d}/out" 2>/dev/null; then record_pass "task-manager-dispatcher: (h) resposta válida → rc 0 e JSON em stdout"
+  else record_fail "task-manager-dispatcher: (h) sucesso" "rc=${rc} $(head -1 "${d}/err")"; fi
+  # (m) MUTANTE na CÓPIA: o executável que aceita `errors` como sucesso tem de reprovar o (f)
+  local cp_tm="${d}/tmcopy"; mkdir -p "${cp_tm}/adapters"
+  cp "${tm}" "${REPO_ROOT}/.claude/utils/task-manager/env-check.sh" "${cp_tm}/"; cp "${py}" "${cp_tm}/adapters/"
+  if python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+       "${cp_tm}/adapters/linear.py" '    if payload.get("errors"):' '    if False:'; then
+    _srv "${d}/s1"
+    if _fake "${cp_tm}/tm.sh" item.read SAC-1; then rc=0; else rc=$?; fi; wait 2>/dev/null
+    if [ "${rc}" -ne 1 ] || ! grep -qF 'GraphQL errors' "${d}/err"; then record_pass "task-manager-dispatcher: (m) mutante (errors aceito) morde → o (f) reprovaria (rc=${rc})"
+    else record_fail "task-manager-dispatcher: (m) mutante NÃO morde" "(f) segue verde com a cura revertida"; fi
+  else record_fail "task-manager-dispatcher: (m) mutante não aplicou" "(f)"; fi
+  rm -rf "${d}"
+}
+_family run_task_manager_dispatcher_selftests
+
 # Modo kg-migrate-v3 — SAC-73 parte 1: a ferramenta de migração do corpus ao contrato v3
 # (.claude/utils/kg/kg-migrate-v3.py) cita datas, deriva provenance SÓ de fonte que o nó já traz,
 # nunca corta label, --check não escreve, e a 2ª aplicação é no-op. O risco que a família vigia é a

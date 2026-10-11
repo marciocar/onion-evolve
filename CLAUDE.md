@@ -112,6 +112,12 @@ O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas — uma
 3. **Conferir** variáveis específicas do provider ativo (tabela abaixo)
 4. **Delegar** ao agente correto — via API (default) ou MCP (se ativado) — e usar formatação adequada
 
+> **Executável (desde 2026-10-11, SAC-65):** `bash .claude/utils/task-manager/tm.sh <capability> [args]`
+> resolve o provider e roda o adapter executável dele (`tm.sh item.read <ID>`, `comment.add`, `status.transition`,
+> `item.create`, `search.query`…; `tm.sh --capabilities` lista os verbos). **Linear é o primeiro** (`adapters/linear.py`);
+> provider sem executável sai com exit 2 nomeando o que falta. Use o `tm.sh` em vez de script avulso de API.
+> A REGRA 104 mantém a lista do executável e o `adapters/<p>.capabilities.tsv` coerentes.
+
 ### Mapa Provider → Variáveis → Agente → Adapter
 
 | Provider | Variáveis obrigatórias | Variáveis opcionais | Agente especialista | Adapter doc |
@@ -230,7 +236,7 @@ A formatação de descrições e comentários **muda conforme o provider ativo**
   ]}
   ```
 - **Workflow-aware**: nunca setar `status` direto — sempre `POST /issue/{key}/transitions`
-- **Bulk**: usar `POST /rest/api/3/issue/bulk` (até 50/req) para >5 issues
+- **Bulk**: o provedor oferece `POST /rest/api/3/issue/bulk` (até 50/req), mas o adapter **não o executa** (`bulk.create` = `not_implemented` em `jira.capabilities.tsv`)
 - **Search**: `POST /rest/api/3/search/jql` com `nextPageToken` (o antigo `/search` está **em remoção** — CHANGE-2046; a referência v3 o marca "currently being removed", sem data; medido em 2026-10-11)
 - **Referência**: `@jira-specialist` (`.claude/agents/development/jira-specialist.md`)
 
@@ -281,7 +287,7 @@ A formatação de descrições e comentários **muda conforme o provider ativo**
 - **Tags/labels** apropriadas para organização (`bug`, `feature`, `tech-debt`, etc.)
 - **Atualização de progresso em tempo real** via comments/transitions
 - **Comentar mudanças importantes** (PR aberto, blocker, decisão técnica) na própria task
-- **Bulk-first** quando operar em lote (Jira `/issue/bulk`, ClickUp bulk endpoints) — evita N+1 calls
+- **Lote é a direção desejada, não capacidade de hoje**: nenhum adapter executa bulk — `bulk.create`/`bulk.update` estão `not_implemented` nos cinco `adapters/<p>.capabilities.tsv`. Operação em lote hoje é N chamadas; quando um adapter implementar lote, a declaração dele muda primeiro (REGRA 103)
 
 ---
 
