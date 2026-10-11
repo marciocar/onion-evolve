@@ -300,6 +300,11 @@ _emit_command_excludes() {  # $1=REPO $2=papel → :(exclude) dos comandos de me
 _is_anchor() {  # $1=path → 0 se a citação dele mantém viva uma peça
   case "$1" in
     .claude/validation/lint-selftest.sh|.claude/validation/fixtures/*|.claude/utils/adopt/vendor-manifest.sh) return 1 ;;
+    # BASELINE de catraca também não ancora (2026-10-11, versionamento das portas): ele lista o passivo
+    # que uma guarda TOLERA, e citar um arquivo como dívida não é consumi-lo. Medido: o
+    # ops-citation-travel-baseline.txt mantinha viva no standalone a publish-doctrine, cuja lente e
+    # cujo comando o papel não recebe, e a doutrina viajava com ponteiro morto para a lente cortada.
+    .claude/validation/*-baseline.txt) return 1 ;;
   esac
   return 0
 }

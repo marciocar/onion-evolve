@@ -215,7 +215,7 @@ function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["
 # MISPLANED, sentido da palavra: `commit` em verified_against só é LEITURA DE FONTE quando nomeia
 # o commit lido. Quando nomeia o commit que o gate BARROU (commit-sonda, commit recusado/bloqueado,
 # hook que bloqueia o commit), é EXECUÇÃO ao vivo, e PROD ali é legítimo.
-# Crédito: sinal de campo do adotante onion-kg-ssot (2026-10-11): o DETERMINISTIC_GATE dele
+# Crédito: sinal de campo de um adotante (2026-10-11): o DETERMINISTIC_GATE dele
 # carimbava "commit-sonda que o gate barrou" e levou MISPLANED; contornou reescrevendo a frase.
 # Cura POR OCORRÊNCIA, nunca por nó: (1) `commit <sha>` acusa SEMPRE, venha o que vier antes ou
 # depois; (2) só as ocorrências de sentido-execução saem da string; (3) o que sobrar de

@@ -7,6 +7,13 @@ paths:
 
 # Lente de publicação: carrega quando você toca o motor ou um materializador de porta
 
+Superfície: [`/meta:publish`](../commands/meta/publish.md). Esta lente e a doutrina seguem o comando:
+o corte por papel (`vendor-manifest.sh`) as tira dos papéis que não recebem o `/meta:publish`
+(standalone, plugins, mini). Até 2026-10-11 elas viajavam ao standalone, porque o baseline da REGRA 100
+as citava e contava como âncora; lá o `paths:` desta lente não casa nada, e a REGRA 53 (Regra
+path-scoped declara `paths:` que casa algo real) reprovava o lint da porta com 1 HARD. A citação acima
+é um segundo caminho para o mesmo corte (a "lente forçada"): ela cita um comando que o papel não leva.
+
 Você está mexendo no caminho que leva o core a um repositório **público**. A doutrina inteira vive em
 um fragmento, e vale lê-lo antes de mudar qualquer linha:
 `.claude/commands/common/prompts/publish-doctrine.md`.

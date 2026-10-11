@@ -1053,7 +1053,7 @@ run_kg_freshness_selftests() {
     record_fail "kg-freshness: (t) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   fi
 
-  # ── sentido da palavra `commit` (sinal de campo do adotante onion-kg-ssot, 2026-10-11) ──
+  # ── sentido da palavra `commit` (sinal de campo de um adotante, 2026-10-11) ──
   # O DETERMINISTIC_GATE dele carimbava "commit-sonda que o gate barrou" (execução ao vivo) e
   # levava MISPLANED. As duas polaridades: execução cala; `commit <sha>` segue acusando, inclusive
   # na frase MISTA e com verbo de execução logo antes do sha.
@@ -23402,6 +23402,17 @@ STUB
      && ! grep -q 'onion-v3.0.0' <<< "$(_tags "${doorup}")"; then
     record_pass "publish_release: (r12b) id de adotante num nome de arquivo da superfície ⇒ o changelog barra; porta e tag NÃO sobem"
   else record_fail "publish_release: (r12b) changelog com termo de adotante passou" "rc=${_r} out=${_o:0:400}"; fi
+
+  # (r14) A LENTE SEGUE O COMANDO (o mecanismo REAL de corte por papel, no core real): o standalone não
+  #       recebe /meta:publish, então nem a publish-lens (cujo `paths:` lá não casaria nada: 1 HARD da
+  #       REGRA 53 no lint da porta, medido em 2026-10-11) nem a publish-doctrine viajam a ele; a source leva as duas
+  local _vmo _vms
+  _vmo="$(bash "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" --repo "${REPO_ROOT}" --list standalone 2>/dev/null || true)"
+  _vms="$(bash "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" --repo "${REPO_ROOT}" --list source 2>/dev/null || true)"
+  if [ -n "${_vmo}" ] && ! grep -qx '\.claude/rules/publish-lens\.md' <<< "${_vmo}" && ! grep -qx '\.claude/commands/common/prompts/publish-doctrine\.md' <<< "${_vmo}" \
+     && grep -qx '\.claude/rules/publish-lens\.md' <<< "${_vms}" && grep -qx '\.claude/commands/common/prompts/publish-doctrine\.md' <<< "${_vms}"; then
+    record_pass "publish_release: (r14) publish-lens e publish-doctrine saem do standalone com o comando; a source leva as duas"
+  else record_fail "publish_release: (r14) a lente viaja sem o comando" "standalone: $(grep -E 'publish-(lens|doctrine)' <<< "${_vmo}" | tr '\n' ' ') · source: $(grep -cE 'publish-(lens|doctrine)' <<< "${_vms}")"; fi
 
   # (r13) depois de tudo, o core falso segue intocado no que é do motor (HEAD andou pelos commits DA BANCADA)
   if [ -z "$(git -C "${core}" tag -l)" ]; then
