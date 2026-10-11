@@ -63,6 +63,47 @@
 # FORA da string, subprocess de outra linguagem, git/gh chamado por outro programa, `url.*.pushInsteadOf`
 # e config global/de sistema. Lista completa no nó C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE.
 
+# ── SEM python3: os dois vetos abriam por DENTRO (fix/vetos-fail-closed, 2026-10-11) ────────────
+# Os hooks liam o JSON com python3; sem ele o comando saía VAZIO e o hook dava exit 0 antes de chegar
+# aqui. O `onFailure: block` não cobre exit 0. Medido com PATH sem python3: `git push --force origin
+# main` e `gh pr merge 1` passavam com rc 0 nos dois vetos. As duas funções abaixo são o modo degradado.
+
+# onion_json_string_field <campo> — lê o JSON da entrada padrão e imprime o 1º valor STRING do campo,
+# desescapado o bastante para julgar a forma (\\ \" \n \t \r \/). rc 1 quando o campo não aparece.
+# Aproximação declarada: `\uXXXX` fica literal. Linear (grep -oE de DFA; medido 0,45 s a 1 MB).
+onion_json_string_field() {
+  local pat v
+  pat='"'"$1"'"[[:space:]]*:[[:space:]]*"([^"\\]|\\.)*"'
+  v=$(grep -oE "$pat" | head -n1) || true
+  [ -z "$v" ] && return 1
+  v=${v#*:}; v=${v#*\"}; v=${v%\"}
+  v=${v//\\\\/$'\x01'}; v=${v//\\\"/\"}; v=${v//\\n/$'\n'}; v=${v//\\t/$'\t'}; v=${v//\\r/$'\r'}
+  v=${v//\\\//\/}; v=${v//$'\x01'/\\}
+  printf '%s' "$v"
+}
+
+# onion_nopy_touches <force-main|merge-gate> <texto> — rc 0 quando, SEM tokenizador, o texto PODE tocar
+# o objeto do veto (o hook então fecha); rc 1 quando não pode (passa). O recorte foi medido nos 31.183
+# comandos Bash únicos dos transcripts do core (2026-10-11): fechar pela forma da lib inteira barraria
+# 4,36% (o `gh api` de leitura é 853 deles); este recorte barra 0,38% no protect-main (push com marca de
+# force) e 2,75% no merge-gate (todo push, gh merge, gh api com rota de merge/contents/refs/graphql, gh
+# repo sync). O push do merge-gate não foi afinado: a marca de main/HEAD/push nu cobriria 445 dos 502 e
+# abriria espaço para fail-open.
+onion_nopy_touches() {
+  local kind="$1" t="$2" a='[^[:alnum:]_]' seg='[^;&|]*'
+  local push="(^|${a})git(${a}${seg})?${a}(push|send-pack)(${a}|\$)"
+  case "$kind" in
+    force-main)
+      printf '%s' "$t" | grep -qE "$push" || return 1
+      printf '%s' "$t" | grep -qE -- '--force|--mirror|(^|[[:space:]])-[[:alpha:]]*f[[:alpha:]]*([[:space:]]|$)|[[:space:]:]\+[^[:space:]]'
+      ;;
+    merge-gate)
+      printf '%s' "$t" | grep -qE "$push|mergePullRequest|(^|${a})gh(${a}${seg})?${a}merge(${a}|\$)|(^|${a})gh(${a}${seg})?${a}api(${a}${seg})?(merge|contents|git/refs|graphql)|(^|${a})gh(${a}${seg})?${a}repo${a}${seg}sync(${a}|\$)"
+      ;;
+    *) return 0 ;;
+  esac
+}
+
 onion_invocation_lines() {
   local cmd="$1" root
   root="$(cd "${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}" 2>/dev/null && pwd -P)"

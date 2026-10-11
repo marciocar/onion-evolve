@@ -10,8 +10,17 @@ parsed=$(printf '%s' "$input" | python3 -c 'import json,sys
 try: d=json.load(sys.stdin)
 except Exception: d={}
 d=d if isinstance(d,dict) else {}
-print(str(d.get("cwd") or "").replace("\n"," ")); print((d.get("tool_input") or {}).get("command",""))' 2>/dev/null)
+print(str(d.get("cwd") or "").replace("\n"," ")); print((d.get("tool_input") or {}).get("command",""))' 2>/dev/null) && nopy=0 || nopy=1
 hcwd=${parsed%%$'\n'*}; cmd=${parsed#*$'\n'}; [ "$cmd" = "$parsed" ] && cmd=""
+# shellcheck source=lib/invocation-lines.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib/invocation-lines.sh"
+# SEM python3 (ausente ou morto) o comando saía vazio e o veto ABRIA por dentro — exit 0, que o
+# `onFailure: block` não cobre. Agora o JSON é lido sem python e, se o campo nem for achado, julga-se o
+# JSON cru: errar aqui só pode fechar, nunca abrir (fix/vetos-fail-closed, 2026-10-11).
+if [ "$nopy" = 1 ]; then
+  hcwd=$(printf '%s' "$input" | onion_json_string_field cwd) || hcwd=""
+  cmd=$(printf '%s' "$input" | onion_json_string_field command) || cmd="$input"
+fi
 [ -d "$hcwd" ] || hcwd=$PWD
 [ -z "$cmd" ] && exit 0
 # Julga POR LINHA DE INVOCAÇÃO, nunca a string inteira: heredoc/prosa num comando composto que
@@ -19,8 +28,12 @@ hcwd=${parsed%%$'\n'*}; cmd=${parsed#*$'\n'}; [ "$cmd" = "$parsed" ] && cmd=""
 # a classe guarda-por-vocabulário; o veto pegou o próprio commit desta feature). A redução mora na
 # lib partilhada com o merge-gate desde a auditoria de 2026-09-02, que mediu `command git push -f
 # origin main`, `\git push`, `env git push`, `bash -c "…"` e `git -C . push` passando rc=0 aqui.
-# shellcheck source=lib/invocation-lines.sh
-. "$(dirname "${BASH_SOURCE[0]}")/lib/invocation-lines.sh"
+# SEM python3 não há tokenizador: fecha SÓ o que tem forma de force-push (recorte medido, ver a lib).
+if [ "$nopy" = 1 ]; then
+  onion_nopy_touches force-main "$cmd" || exit 0
+  echo "GUARDA-PRETOOLUSE: python3 ausente ou quebrado — o veto não consegue analisar este comando, que tem forma de force-push (git push com --force, -f, +ref ou --mirror). Fechado por segurança: force-push na main é irreversível. Instale python3 (o tokenizador dos vetos); se for deliberado, o maestro roda fora da sessão." >&2
+  exit 2
+fi
 inv=$(ONION_CWD="$hcwd" onion_invocation_lines "$cmd")
 # INANALISÁVEL que cita push → FECHADO: não se prova que não é force-push na main (radar E3, 2026-10-05).
 if printf '%s\n' "$inv" | grep -E '^__ONION_UNANALYZABLE__ merge=[01] main=1 ::' | grep -qE '\bpush\b|updateRef|git/refs'; then

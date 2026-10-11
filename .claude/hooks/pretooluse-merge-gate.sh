@@ -32,19 +32,32 @@ parsed=$(printf '%s' "$input" | python3 -c 'import json,sys
 try: d=json.load(sys.stdin)
 except Exception: d={}
 d=d if isinstance(d,dict) else {}
-print(str(d.get("cwd") or "").replace("\n"," ")); print((d.get("tool_input") or {}).get("command",""))' 2>/dev/null)
+print(str(d.get("cwd") or "").replace("\n"," ")); print((d.get("tool_input") or {}).get("command",""))' 2>/dev/null) && nopy=0 || nopy=1
 hcwd=${parsed%%$'\n'*}; cmd=${parsed#*$'\n'}; [ "$cmd" = "$parsed" ] && cmd=""
+# shellcheck source=lib/invocation-lines.sh
+. "$(dirname "${BASH_SOURCE[0]}")/lib/invocation-lines.sh"
+# SEM python3 (ausente ou morto) o comando saía vazio e o veto ABRIA por dentro — exit 0, que o
+# `onFailure: block` não cobre. Agora o JSON é lido sem python e, se o campo nem for achado, julga-se o
+# JSON cru: errar aqui só pode fechar, nunca abrir (fix/vetos-fail-closed, 2026-10-11).
+if [ "$nopy" = 1 ]; then
+  hcwd=$(printf '%s' "$input" | onion_json_string_field cwd) || hcwd=""
+  cmd=$(printf '%s' "$input" | onion_json_string_field command) || cmd="$input"
+fi
 [ -d "$hcwd" ] || hcwd=$PWD
 [ -z "$cmd" ] && exit 0
 root="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 [ -f "${root}/ops/pr-merge-verified.sh" ] || exit 0
+# SEM python3 não há tokenizador: fecha SÓ o que pode tocar a main (recorte medido, ver a lib).
+if [ "$nopy" = 1 ]; then
+  onion_nopy_touches merge-gate "$cmd" || exit 0
+  echo "GUARDA-PRETOOLUSE: python3 ausente ou quebrado — o veto não consegue analisar este comando, que tem forma de merge ou push (git push, gh pr merge, gh api com rota de merge/contents/refs/graphql, gh repo sync). Fechado por segurança: o host não protege a main neste repo. Instale python3 (o tokenizador dos vetos); o merge segue pelo caminho verificado, bash ops/pr-merge-verified.sh <PR> --sync (core-only)." >&2
+  exit 2
+fi
 
 # Reduz a string do modelo a linhas de invocação (heredoc fora, operadores partidos, invólucros
 # `command`/`\`/`env`/`exec`/`sh -c` e opções globais do git removidos). A normalização mora na lib
 # porque o buraco foi medido nos DOIS vetos ao mesmo tempo (auditoria 2026-09-02): `command gh pr
 # merge 1` e `bash -c "git push -f origin main"` passavam com rc=0 em ambos.
-# shellcheck source=lib/invocation-lines.sh
-. "$(dirname "${BASH_SOURCE[0]}")/lib/invocation-lines.sh"
 inv=$(ONION_CWD="$hcwd" onion_invocation_lines "$cmd")
 [ -z "$inv" ] && exit 0
 

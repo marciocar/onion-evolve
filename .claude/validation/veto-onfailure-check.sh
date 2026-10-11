@@ -19,7 +19,15 @@
 #     transforma um índice quebrado em sessão travada; ali o desenho é falhar aberto. Um aviso COM
 #     `block` sai como SOFT `aviso-com-block` (pede decisão, não reprova);
 #   · hook `async`/`asyncRewake` — a doc diz que o campo não tem efeito em hook de fundo;
-#   · outros eventos (UserPromptSubmit, PermissionRequest…) — só o PreToolUse foi MEDIDO. Teto declarado.
+#   · outros eventos (UserPromptSubmit, PermissionRequest…) — só o PreToolUse e o PreModelSwitch foram
+#     MEDIDOS. Teto declarado. O PostModelSwitch não veta nada (a troca já aconteceu) e fica de fora.
+#
+# EXTENSÃO AO PreModelSwitch (fix/vetos-fail-closed, medido ao vivo em 2026-10-11, Claude Code 2.1.296,
+#           `claude -p "/model sonnet"` num sandbox com `--setting-sources project,local`): um PreModelSwitch
+#           apontando para script inexistente saiu 127 e a troca FOI aplicada (o PostModelSwitch gravou o
+#           marcador); com `onFailure: "block"` a troca foi barrada ("failed; blocking (onFailure: block)") e
+#           o PostModelSwitch não rodou. A doc de hooks não lista o PreModelSwitch entre os eventos em que o
+#           campo não tem efeito. O título da regra segue dizendo PreToolUse: é o nome que os documentos citam.
 #   · script que o settings cita e não existe — é outro defeito, de outra guarda; aqui cala.
 #   TETO DECLARADO (passada adversarial de 2026-10-11): não enxerga veto que sai por `exit "$rc"`, por
 #   função de lib sourced, por `sys.exit(2)` de interpretador embutido, nem por JSON `permissionDecision:
@@ -80,7 +88,8 @@ def is_veto(path):
     return False
 rows = []
 hooks = d.get("hooks") if isinstance(d, dict) else None
-for grp in ((hooks or {}).get("PreToolUse") or []):
+EVENTS = ("PreToolUse", "PreModelSwitch")   # os dois MEDIDOS ao vivo; o resto é teto declarado
+for ev, grp in [(e, g) for e in EVENTS for g in ((hooks or {}).get(e) or [])]:
     for hk in (grp.get("hooks") or []) if isinstance(grp, dict) else []:
         if not isinstance(hk, dict) or hk.get("type", "command") != "command":
             continue
@@ -91,7 +100,7 @@ for grp in ((hooks or {}).get("PreToolUse") or []):
         name = m.group(1)
         of = hk.get("onFailure")
         if of is not None and of not in ("continue", "block"):
-            rows.append(("HARD", "onfailure-invalido", rel, f"PreToolUse/{name}: onFailure={of!r} — a doc aceita só \"continue\" ou \"block\""))
+            rows.append(("HARD", "onfailure-invalido", rel, f"{ev}/{name}: onFailure={of!r} — a doc aceita só \"continue\" ou \"block\""))
             continue
         if hk.get("async") or hk.get("asyncRewake"):
             continue
@@ -99,9 +108,9 @@ for grp in ((hooks or {}).get("PreToolUse") or []):
         if v is None:
             continue
         if v and of != "block":
-            rows.append(("HARD", "veto-sem-onfailure", rel, f"PreToolUse/{name} veta por exit 2 e não declara \"onFailure\": \"block\" — se o hook não rodar (script ausente, timeout, crash), a ação PASSA; acrescente \"onFailure\": \"block\" ao hook"))
+            rows.append(("HARD", "veto-sem-onfailure", rel, f"{ev}/{name} veta por exit 2 e não declara \"onFailure\": \"block\" — se o hook não rodar (script ausente, timeout, crash), a ação PASSA; acrescente \"onFailure\": \"block\" ao hook"))
         elif (not v) and of == "block":
-            rows.append(("SOFT", "aviso-com-block", rel, f"PreToolUse/{name} não veta (sem exit 2) e declara onFailure: block — se ele quebrar, TODA chamada do matcher fica barrada; confirme que é isso que se quer"))
+            rows.append(("SOFT", "aviso-com-block", rel, f"{ev}/{name} não veta (sem exit 2) e declara onFailure: block — se ele quebrar, TODA chamada do matcher fica barrada; confirme que é isso que se quer"))
 for r in rows:
     print("\t".join(r) if fmt == "tsv" else f"{r[0]} [{r[1]}] {r[2]}: {r[3]}")
 PY
@@ -149,7 +158,7 @@ _selftest() {
   if [ -z "${out}" ]; then _ok "(ix) script ausente cala"; else _ko "(ix) script ausente cala"; fi
   printf '{nao json' > "${tmp}/.claude/settings.json"; _run
   if [ "${rc}" -eq 2 ]; then _ok "(x) settings ilegível sai 2 (não julgou)"; else _ko "(x) settings ilegível sai 2 (não julgou)"; fi
-  # (xi) veto em OUTRO evento não é cobrado (teto declarado: só PreToolUse foi medido)
+  # (xi) veto em OUTRO evento não é cobrado (teto declarado: só PreToolUse e PreModelSwitch foram medidos)
   printf '{"hooks":{"UserPromptSubmit":[{"hooks":[%s]}]}}\n' "$(_h veto.sh)" > "${tmp}/.claude/settings.json"; _run
   if [ -z "${out}" ]; then _ok "(xi) fora do PreToolUse cala"; else _ko "(xi) fora do PreToolUse cala"; fi
   # (xii) `exit 2` dentro de aspas num aviso não é veto (falso positivo achado na passada adversarial)
@@ -160,6 +169,13 @@ _selftest() {
   printf '#!/usr/bin/env bash\necho "a #b"; exit 2\n' > "${tmp}/.claude/hooks/hash.sh"
   _w "$(_h hash.sh)"; _run
   if grep -q $'^HARD\tveto-sem-onfailure\t.*hash.sh' <<< "${out}"; then _ok "(xiii) # entre aspas não esconde o exit 2"; else _ko "(xiii) # entre aspas não esconde o exit 2"; fi
+
+  # (xiv) veto no PreModelSwitch sem block acusa; com block cala (extensão medida em 2026-10-11)
+  printf '{"hooks":{"PreModelSwitch":[{"hooks":[%s]}],"PostModelSwitch":[{"hooks":[%s]}]}}\n' "$(_h veto.sh)" "$(_h veto.sh)" > "${tmp}/.claude/settings.json"; _run
+  if [ "${rc}" -eq 0 ] && grep -q $'^HARD\tveto-sem-onfailure\t.*PreModelSwitch/veto.sh' <<< "${out}" && [ "$(grep -c . <<< "${out}")" -eq 1 ]; then
+    printf '{"hooks":{"PreModelSwitch":[{"hooks":[%s]}]}}\n' "$(_h veto.sh ',"onFailure":"block"')" > "${tmp}/.claude/settings.json"; _run
+    if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then _ok "(xiv) PreModelSwitch: veto sem block acusa, com block cala, PostModelSwitch fora"; else _ko "(xiv) PreModelSwitch: veto sem block acusa, com block cala, PostModelSwitch fora"; fi
+  else _ko "(xiv) PreModelSwitch: veto sem block acusa, com block cala, PostModelSwitch fora"; fi
 
   rm -rf "${tmp}"; echo "  selftest: $((total-fails))/${total} verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1
