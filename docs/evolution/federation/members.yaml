@@ -665,7 +665,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/portal-gamificacao
     local_path: "/home/marcio/portal-gamificacao"
-    onion_version: 2e3f3a6f88ce   # pin-ok em 2026-09-05 apos o 1o --update (pin-integrity-check.sh, nao o stamp cru)
+    onion_version: ce60ec13f298   # carimbado por ops/registry-pins.sh (remoto develop conferido em 2026-10-11)
     integration_branch: develop   # vivia só em comentário; a main do remoto não tem carimbo (medido 2026-10-09)
     adopted_at: 2026-09-04
     mode: greenfield
