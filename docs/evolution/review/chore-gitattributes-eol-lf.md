@@ -2,7 +2,8 @@
 title: 'Resíduo — eol=lf no .gitattributes sem mudar um byte rastreado'
 date: 2026-10-11
 branch: chore/gitattributes-eol-lf
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 52ba18784e0fafc63ca4795b237aef28c24137b22f4057f6c0798d3845354171
+reviewed_code_sha256: 19031aa39886713fb9fea0794ae86e77ae4ce32e60c5ff15d98bd98f86b1b1bb
 findings_total: 2
 findings_real: 2
 findings_fixed: 0
