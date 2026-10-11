@@ -170,13 +170,13 @@ collect_violations() { # <repo_dir>
 run_selftest() {
   local tmp; tmp="$(mktemp -d)"; local fails=0 out total=17
   mkdir -p "${tmp}/.claude/rules" "${tmp}/.claude/hooks" "${tmp}/.claude/validation/fixtures" \
-           "${tmp}/.claude/commands/meta" "${tmp}/docs/sdaal" "${tmp}/ops" "${tmp}/docs/analysis"
+           "${tmp}/.claude/commands/meta" "${tmp}/docs/sdaal" "${tmp}/ops" "${tmp}/docs/evolution/notas"
   local BL="${tmp}/.claude/validation/ops-citation-travel-baseline.txt"
   # captura em VAR e here-string — nunca `produtor | grep -q` (SIGPIPE sob pipefail).
   _run() { out="$(bash "$0" "${tmp}" --format tsv 2>/dev/null)"; }
   _has() { command grep -q -- "$1" <<< "${out}"; }
   _reset() { rm -rf "${tmp}/.claude/rules"/* "${tmp}/.claude/hooks"/* "${tmp}/.claude/commands/meta"/* "${tmp}/.claude/rules"/.??* \
-                    "${tmp}/docs/sdaal"/* "${tmp}/docs/analysis"/* "${tmp}/.claude/validation/fixtures"/*
+                    "${tmp}/docs/sdaal"/* "${tmp}/docs/evolution/notas"/* "${tmp}/.claude/validation/fixtures"/*
              printf '# baseline vazio\n' > "${BL}"; }
 
   # (i) o defeito VERBATIM (SAC-86): lente que viaja descreve o ops/ ao destinatário => HARD
@@ -191,11 +191,13 @@ run_selftest() {
   _run
   if _has 'kg-grammar'; then echo "  ✗ (ii) marcador (core-only) deveria calar"; fails=$((fails+1)); else echo "  ✅ (ii) marcador (core-only) na linha cala"; fi
 
-  # (iii) arquivo que NÃO viaja (docs/analysis) => cala
+  # (iii) arquivo que NÃO viaja (docs/evolution) => cala. ⚠️ NUNCA um doc NOMEADO de docs/analysis aqui: este
+  #       arquivo viaja, e o passo (4) do materialize-door (core-only) aborta a porta por documento privado
+  #       nomeado — medido no CI do PR 1017: o caso door (g) parou nesse passo antes do ponto que ele mede.
   _reset
-  printf 'rode `bash ops/publish-door.sh --status`\n' > "${tmp}/docs/analysis/nota.md"
+  printf 'rode `bash ops/publish-door.sh --status`\n' > "${tmp}/docs/evolution/notas/nota.md"
   _run
-  if _has 'nota.md'; then echo "  ✗ (iii) docs/analysis não viaja, não deveria acusar"; fails=$((fails+1)); else echo "  ✅ (iii) arquivo que não viaja cala"; fi
+  if _has 'nota.md'; then echo "  ✗ (iii) docs/evolution não viaja, não deveria acusar"; fails=$((fails+1)); else echo "  ✅ (iii) arquivo que não viaja cala"; fi
 
   # (iv) passivo no baseline => SOFT, sem HARD
   _reset
