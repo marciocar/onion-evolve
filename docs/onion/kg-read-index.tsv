@@ -292,6 +292,7 @@
 .claude/utils/marketplace/plugin-readme.sh	Q_RESIDUOS_DA_FONTE_PRIVADA_NO_PUBLICO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/utils/marketplace/plugin-readme.sh	Q_TETO_DE_CONTEXTO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/utils/marketplace/public-face.sh	E_FACE_PUBLICA_VIROU_COSTURA_E_CATRACA	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
+.claude/utils/marketplace/roles.yaml	D_PERSONALITY_SYNC_NO_CONJUNTO_FEDERACAO	docs/onion/graph/door-role-parity-2026-09.kg.yaml
 .claude/utils/marketplace/roles.yaml	E_A_SSOT_DO_ESCOPO_ESTAVA_DEFASADA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/marketplace/roles.yaml	E_A_SSOT_DO_ESCOPO_JA_EXISTIA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/marketplace/roles.yaml	E_ROLES_YAML_E_OUTRA_GRANULARIDADE	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
