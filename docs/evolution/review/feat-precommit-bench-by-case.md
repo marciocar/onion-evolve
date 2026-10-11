@@ -2,7 +2,7 @@
 title: 'Resíduo — o pre-commit escolhe a bancada por caso, e o refutador pegou a cobertura escrita à mão'
 date: 2026-10-11
 branch: feat/precommit-bench-by-case
-reviewed_diff_sha256: e227389101a933e75147d7d41bf7b8495f9ac3a810ff185e96871067e12a74ee
+reviewed_diff_sha256: ec0c8ddf5a79f5f0f88e455118a999b782e19e71b8e580934d4f593cd4fa3ecc
 reviewed_code_sha256: e1785f84150953f084ad3618723ae2964feb84f4894ef1fd3524772c46aa4d39
 findings_total: 6
 findings_real: 6
