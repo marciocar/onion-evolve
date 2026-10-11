@@ -1,0 +1,52 @@
+# FIXTURE (fail) — duas portas role:source + kind:door: a segunda é um adotante disfarçado (refutador 2026-10-10).
+# Dados fictícios.
+version: 2
+trust_policy_version: 1
+members:
+  - id: onion-evolve
+    name: onion-evolve
+    role: source
+    kind: source
+    remote: github.com/exemplo/onion-evolve
+    path: "."
+    personality_summary: "A fonte (T0)."
+    specializations: [framework-template]
+    personality_last_sync: 2026-01-01
+  - id: exemplo-core
+    name: exemplo-core
+    role: source
+    kind: door
+    parent: onion-evolve
+    remote: github.com/exemplo/exemplo-core
+    local_path: "/tmp/exemplo-core"
+    onion_version: abcdef123456
+    adopted_at: 2026-01-02
+    mode: greenfield
+    personality_summary: "Porta pública da fonte."
+    specializations: [example]
+    personality_last_sync: 2026-01-02
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      exposes_downstream: []
+  - id: exemplo-falsa
+    name: exemplo-falsa
+    role: source
+    kind: door
+    parent: onion-evolve
+    remote: github.com/exemplo/exemplo-falsa
+    local_path: "/tmp/exemplo-falsa"
+    onion_version: abcdef123456
+    adopted_at: 2026-01-02
+    mode: greenfield
+    personality_summary: "Porta pública da fonte."
+    specializations: [example]
+    personality_last_sync: 2026-01-02
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      exposes_downstream: []

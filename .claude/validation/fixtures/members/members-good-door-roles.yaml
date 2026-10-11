@@ -1,4 +1,4 @@
-# FIXTURE (pass) — as portas da matriz: `role: plugins` com pin real, `role: mini` com `n/a` (ainda não materializada, F5)
+# FIXTURE (pass) — as portas da matriz: `role: plugins` com pin real, `role: mini` com pin (publicada pelo carimbo desde a F6)
 # e a face pública da fonte, `role: source` com `kind: door` e pin verificado (F6, 2026-10-10).
 # Exercita members-validate.sh (F1.5 das portas, SAC-90). Dados fictícios.
 version: 2
@@ -58,7 +58,7 @@ members:
     parent: onion-evolve
     remote: github.com/exemplo/exemplo-mini
     local_path: "/tmp/exemplo-mini"
-    onion_version: n/a
+    onion_version: abcdef123456
     adopted_at: 2026-01-02
     mode: greenfield
     personality_summary: "Adopter de exemplo."
