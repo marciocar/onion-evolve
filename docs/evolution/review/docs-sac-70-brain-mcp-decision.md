@@ -1,7 +1,7 @@
 ---
 branch: docs/sac-70-brain-mcp-decision
 date: 2026-10-11
-reviewed_diff_sha256: b4d5b6aadb43dea2767c4683cdca67c7c09181b651704c9eb2d7bc024a53ce60
+reviewed_diff_sha256: 38229b76f4efb5043461985086de19a6525b58a948a935fc641874066963d67c
 reviewed_code_sha256: 4d75c02021a614dd27c0c434a870cc22559aa5d99c7199d05b588481b17c5df2
 findings_total: 3
 findings_real: 3
