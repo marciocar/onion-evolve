@@ -71,6 +71,39 @@ nodes:
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
+  - id: E_SPIKE_SOBREVIVENCIA_PREMIA_O_TRIVIAL_1012
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "sinal relayado pelo /meta:co-relay (docs/evolution/inbox/_processed/2026-10-12-spike-value-criterion.md), pin dcdacf9ba196: três spikes da mesma hipótese de produto no adotante onion-kg-ssot, com critério commitado antes. Journal 17 de 64 sobreviventes (morreu); transcript 9 de 10 e PROV-JSON de terceiro 30 de 30 (passou na letra); valor com avaliador cego 0 de 8 (morreu)"
+    label: "num spike de hipótese de produto, o critério de sobrevivência à selagem premia a proposta trivial; só o critério de valor com avaliador cego separa cópia de conhecimento"
+    narrative: "A proposta que só copiava o arquivo relido pela selagem sobreviveu 100%. A 1ª leitura de um spike trocou o denominador depois de medir (26,6% para 68%), e o Elenxo a derrubou como régua movida; a partir daí critério e proponente foram commitados antes da amostra. Absorvido no core em duas doutrinas: §3.1 do onion-drive-doctrine e a pergunta fixa da etapa 3 do onion-elenxo-doctrine."
+    trace: "docs/evolution/inbox/_processed/2026-10-12-spike-value-criterion.md"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-12-spike-value-criterion.md"
+      locator: "a tabela dos três spikes e a seção 'O sinal de método'"
+      method: "testemunho: medição feita pelo adotante onion-kg-ssot e relayada como sinal de campo; não remedida no core"
+      locality: "repo"
+  - id: D_ABSORVER_CRITERIO_DE_VALOR_EM_SPIKE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    verified_against: "decisão do maestro em 2026-10-12, por pergunta com opções (/meta:decide): escolhida «Absorver nas duas doutrinas»"
+    label: "o sinal do critério de valor em spike é absorvido nas doutrinas do drive (§3.1) e do Elenxo (pergunta fixa da etapa 3)"
+    narrative: "Selado por /meta:decide em 2026-10-12: escolhida «Absorver nas duas doutrinas»; descartadas: «Só a pergunta fixa no Elenxo» · «Só registrar (backlog)»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-12: «O que fazer com o sinal do kg-ssot (spike: sobrevivência premia a proposta trivial; só valor com avaliador cego separa)?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      locality: "pessoa"
 edges:
   - from: E_RADAR_IGNORAVA_O_SEGUNDO_MODO
     to: C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO
@@ -81,3 +114,6 @@ edges:
   - from: E_CENSO_EM_VOO_LE_NOME_DE_BRANCH
     to: C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO
     edge_type: SUPPORTS
+  - from: D_ABSORVER_CRITERIO_DE_VALOR_EM_SPIKE
+    to: E_SPIKE_SOBREVIVENCIA_PREMIA_O_TRIVIAL_1012
+    edge_type: TRACES_TO
