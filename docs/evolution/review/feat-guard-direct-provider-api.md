@@ -2,7 +2,7 @@
 title: 'Resíduo — a sessão não reescreve mais o cliente do provedor'
 date: 2026-10-12
 branch: feat/guard-direct-provider-api
-reviewed_diff_sha256: 47da47e9f29d5dd9fd8059f6dfe844d26be7c89d79cfc033e173ae5cd30f793a
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 29c65f328a2913d7e210cc49955b93b65b9bf8055d383649fd706411a68718b0
 findings_total: 6
 findings_real: 6
@@ -75,3 +75,7 @@ São 26 mutantes (17 no hook, 9 na REGRA 105), e todos mordem. A família tem 32
 - O pre-commit foi pulado nos checkpoints (`--no-verify`). A validação é o `pr-finalize` sobre o commit
   final, e o CI.
 - O hook não tem flag de escape, por desenho. Verbo que o tm.sh não tem é achado: implementa-se no adapter.
+
+## Passada pós-CI (2026-10-12, sessão principal)
+
+O CI reprovou na faixa 1 o `zoho-adapter (j)`: os dois scripts novos enumeram providers e não citavam o zoho, a mesma omissão que já deixou o tipo sem o provider uma vez. A cura foi pelo sítio, não pela isenção: um caso de cada lado exercita o host do Zoho. A REGRA 105 acusa o provider sem executável em arquivo rastreado; o hook cala nesse mesmo caso, porque ali o curl é o caminho que o adapter prescreve. As contagens travadas passaram a 21/21 e 12/12. Famílias `zoho_adapter` e `direct_provider_api` com 51/51.

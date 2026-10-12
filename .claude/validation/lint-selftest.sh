@@ -27587,12 +27587,12 @@ run_direct_provider_api_selftests() {
   local o rc H; H="api.linear"; H="${H}.app"
   # (a) o --selftest do hook: 7 acusa + 7 cala, pelo caminho do runner (JSON no stdin, CLAUDE_PROJECT_DIR)
   if o="$(LC_ALL=C bash "${hook}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 20/20 verdes' <<< "${o}"; then
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 21/21 verdes' <<< "${o}"; then
     record_pass "direct-provider-api: (a) hook --selftest verde (20: heredoc verbatim, curl, -c, variável, avulso, gravado-e-rodado, bash -c | tm.sh, citação, cat, sem rede, sem executável, inativo, aspas abertas | Elenxo: heredoc em $(…), stdin de script, comentário, destino do cliente, texto citando a chamada, interpretador em $(…))"
   else record_fail "direct-provider-api: (a) hook --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) o --selftest da REGRA 105
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 11/11 verdes' <<< "${o}"; then
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 12/12 verdes' <<< "${o}"; then
     record_pass "direct-provider-api: (b) REGRA 105 --selftest verde (11: ops/ promovido, variável, jira sem executável, workflow | adapter, markdown, comentário, sem rede, não rastreado, sem mapa, docstring/mensagem/medição)"
   else record_fail "direct-provider-api: (b) REGRA 105 --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (c) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: passivo zero.
