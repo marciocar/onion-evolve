@@ -29255,6 +29255,52 @@ EOF_MUT
 }
 _family run_agent_frontmatter_keys_selftests
 
+# Modo mcp-onion-kg — o servidor MCP read(KG) do DEGRAU 1 de D_ONION_BRAIN_MCP_REMOTO (2026-10-12). O harness
+# (ops/mcp-onion-kg/selftest.py) sobe o servidor de VERDADE em 127.0.0.1 numa porta efêmera, contra uma raiz-
+# fixture em mktemp (clone + worktree DESTACADO), chama cada tool por JSON-RPC e mata só os processos que subiu.
+# Casos: (a) o harness passa inteiro, com a CONTAGEM de casos travada (caso apagado = falha, não verde menor) ·
+# (m) UM MUTANTE POR CURA, aplicado pelo próprio harness numa CÓPIA do servidor (nunca no arquivo vivo) — o
+# mutante tem de aplicar exatamente 1 vez e o caso NOMEADO tem de reprovar. As curas: `--` no grep do kb_search,
+# raiz por env, frescor (served_commit/fetched_at) em toda resposta, fail-closed da raiz (boot, runtime e
+# subdiretório), kg_node pelo parser do radar, marca de dado não confiável, fail-closed do token, symlink que
+# escapa da raiz. TETO DECLARADO: o `os.path.isabs` do confinamento é defesa redundante (o grafo tem de estar no
+# `git ls-files` e a KB tem prefixo fixo), então o mutante dele sobrevive — e não está aqui por isso.
+run_mcp_onion_kg_selftests() {
+  local h="${REPO_ROOT}/ops/mcp-onion-kg/selftest.py"
+  if [ ! -f "${h}" ] || [ ! -f "${REPO_ROOT}/ops/mcp-onion-kg/server.py" ]; then
+    record_skip "mcp-onion-kg: servidor ausente nesta árvore (ops/ não viaja para todo papel)"; return
+  fi
+  local want_total=21 o rc
+  if o="$(LC_ALL=C python3 -I -B "${h}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} " <<< "${o}" && ! grep -q '^FAIL ' <<< "${o}"; then
+    record_pass "mcp-onion-kg: (a) servidor real por HTTP — ${want_total} casos (401, raiz inválida, -efoo, kg_node, frescor)"
+  else record_fail "mcp-onion-kg: (a) harness" "rc=${rc}: $(grep -E '^(FAIL|TOTAL)' <<< "${o}" | head -4 | tr '\n' '|') ${o:0:200}"; fi
+  local old new want mo mrc
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    if mo="$(LC_ALL=C python3 -I -B "${h}" --mutate "${old}" "${new}" 2>&1)"; then mrc=0; else mrc=$?; fi
+    if grep -q 'MUTANTE-NAO-APLICOU' <<< "${mo}"; then record_fail "mcp-onion-kg: (m) mutante não aplicou" "${want}"; continue; fi
+    if [ "${mrc}" -ne 0 ] && grep -q "^FAIL ${want} " <<< "${mo}"; then record_pass "mcp-onion-kg: (m) mutante morde → FAIL ${want}"
+    else record_fail "mcp-onion-kg: (m) mutante NÃO morde" "${want} (rc=${mrc}) $(grep -E '^(FAIL|TOTAL)' <<< "${mo}" | head -3 | tr '\n' '|')"; fi
+  done <<EOF_MUT
+'--include=*.md', '-e', termo, '--', 'docs/knowledge-base/'$(printf '\x1f')termo, 'docs/knowledge-base/', '--include=*.md'$(printf '\x1f')kb_search-termo-com-hifen-e-padrao
+'--include=*.md', '-e', termo, '--', 'docs/knowledge-base/'$(printf '\x1f')termo, 'docs/knowledge-base/', '--include=*.md'$(printf '\x1f')kb_search-version-nao-vira-flag
+ROOT = os.path.realpath(_ROOT_ENV) if _ROOT_ENV else SERVER_REPO$(printf '\x1f')ROOT = SERVER_REPO$(printf '\x1f')raiz-por-env
+**fr, 'data': data}$(printf '\x1f')'data': data}$(printf '\x1f')frescor-served_commit
+for args in (['rev-parse', '--git-path', 'FETCH_HEAD'], ['rev-parse', '--git-common-dir']):$(printf '\x1f')for args in ():$(printf '\x1f')frescor-fetched_at-apos-fetch
+fr = freshness()  # RootUnavailable sobe$(printf '\x1f')fr = {}  # RootUnavailable sobe$(printf '\x1f')raiz-invalida-em-runtime-recusa
+        raise SystemExit(f'recuso subir: {e}$(printf '\x1f')        fr = {'root_source': '', 'served_commit': '0' * 40, 'fetched_at': None}; _x = (f'recuso subir: {e}$(printf '\x1f')raiz-invalida-recusa-no-boot
+if rc != 0 or os.path.realpath(top) != ROOT:$(printf '\x1f')if rc != 0:$(printf '\x1f')raiz-subdiretorio-recusa
+'kg_node': (kg_node,$(printf '\x1f')'kg_nodeX': (kg_node,$(printf '\x1f')tools-list-tem-kg_node
+node['label'] = o[11]$(printf '\x1f')node['label'] = ''$(printf '\x1f')kg_node-existente
+'untrusted_data': True, 'aviso': UNTRUSTED_NOTICE, 'tool': nome, **fr, 'data'$(printf '\x1f')'tool': nome, **fr, 'data'$(printf '\x1f')envelope-nao-confiavel
+    if not TOKEN:$(printf '\x1f')    if False:$(printf '\x1f')token-fail-closed
+return hmac.compare_digest(self.headers.get('X-Api-Key', '').encode(), TOKEN.encode())$(printf '\x1f')return True$(printf '\x1f')sem-token-401
+real = os.path.realpath(os.path.join(ROOT, rel))$(printf '\x1f')real = os.path.normpath(os.path.join(ROOT, rel))$(printf '\x1f')kb_get-symlink-para-fora-recusado
+EOF_MUT
+}
+_family run_mcp_onion_kg_selftests
+
 
 
 
