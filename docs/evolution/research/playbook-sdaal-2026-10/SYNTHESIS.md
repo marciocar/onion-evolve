@@ -102,3 +102,27 @@ O que a rodada sustenta, a favor da opção A já selada:
 Reconciliação: as 3 objeções do Elenxo de 2026-10-11 do tipo "primária citada, não lida" passam a `superseded`, com `SUPERSEDES` a partir das evidências ancoradas. Agora as primárias foram lidas.
 
 **Proposta aberta (não é selo):** `Q_SUBDECISAO_3_FECHAMENTO_1012` fecha a sub-decisão (3) como "nenhum formato aberto cobre os 6 eixos; o template em PFR declara o que pegou emprestado". Antes, faltam 3 leituras curtas: as notas da Arazzo 1.1.0, a doc do Runme sobre estado e aprovação, e o §3.1 do CACAO.
+
+## Leituras da sub-decisão (3) (2026-10-12, rodada B)
+
+As 3 leituras pedidas por `Q_SUBDECISAO_3_FECHAMENTO_1012` foram feitas à mão no modo primaries. Foram 9 documentos, 0 inalcançáveis e 10 claims ancoradas. As 21 citações foram reconferidas por busca literal no documento baixado, e todas foram encontradas. A contabilidade está em `E_LACUNAS_SUBDECISAO_3_1012B`.
+
+- **Arazzo 1.1.0** (2026-05-17): as notas trazem AsyncAPI v3, JSONPath/XPath, `querystring`, `$self` e inputs em ações de sucesso e falha. **Nenhum item acrescenta passo humano, aprovação ou estado persistido.** No texto inteiro da 1.1.0, o passo continua sendo operação OpenAPI, operação AsyncAPI ou outro workflow.
+- **Runme:**
+  - `interactive` é entrada no terminal, não aprovação. A doc se contradiz no default: a tabela diz `false` e a seção diz `true`.
+  - Os prompts são de variável (`promptEnv`) e de autenticação, mais uma pergunta antes do Run All no VS Code. `skipPrompts` desliga todos.
+  - O estado entre células é o da sessão de terminal (`$__`, variáveis de ambiente).
+  - **Nuance:** o *Session Outputs* é um **log persistido** de execução, com hora, duração e exit code por célula. Vem desligado por padrão e não deve ir para o versionamento. É registro, não estado retomável.
+  - O `version` da Lifecycle Identity é a versão do Runme, não a do runbook.
+- **CACAO §3.1:** `playbook_types` é **opcional** (SHOULD) e de **vocabulário aberto** (§10.13: qualquer string em minúsculas e com hífen). Usar CACAO fora de segurança **é válido na letra**, com duas condições:
+  - valor similar existente é obrigatório (§2.1);
+  - a spec se contradiz sobre exigir `playbook_activities`: a §3.1 a exige só quando o tipo vem da lista, a §3.2.2 a exige sempre.
+
+  Correção da seção anterior: onde se lê "o vocabulário de tipos é só de segurança", leia-se "o vocabulário **sugerido** é só de segurança, e é aberto".
+
+**Veredito: as leituras SUSTENTAM a proposta.** Nenhum formato aberto cobre os 6 eixos. Faltam, em todos, aprovação humana e estado de instância especificados. O template em PFR deve declarar dois empréstimos a mais:
+
+- o log de execução do Runme, no eixo estado;
+- o vocabulário aberto do CACAO como precedente de tipo de playbook extensível.
+
+**O selo segue com o maestro.** `Q_SUBDECISAO_3_FECHAMENTO_1012` e `D_PLAYBOOK_SDAAL_SAC52` continuam `open`.

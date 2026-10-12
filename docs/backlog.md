@@ -74,9 +74,9 @@
 |--:|---|---|---|
 | 78.0 | `Q_PLAYBOOK_SDAAL_SAC52` | playbook-sdaal-2026-10 | SAC-52: o core deve criar uma abstração SDAAL de playbooks (interface agnóstica + adapters por tipo e por framework em .claude/ |
 | 55.0 | `C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA` | playbook-sdaal-2026-10 | Opção A: NÃO criar agora .claude/utils/playbook/ com adapters por framework; o playbook de domínio é template (skill ou markd |
+| 33.6 | `Q_SUBDECISAO_3_FECHAMENTO_1012` | playbook-sdaal-2026-10 | PROPOSTA ao maestro (não selo): fechar a sub-decisão (3) como 'nenhum formato aberto cobre os 6 eixos; o template em PFR declara |
 | 19.8 | `C_OPCAO_D_GATE_DE_PESQUISA` | playbook-sdaal-2026-10 | Opção D: adiar com gate — rodar antes uma rodada curta de primárias nomeadas (Arazzo 1.0.1, runme, especificação CACAO v2.0 |
-| 9.6 | `Q_SUBDECISAO_3_FECHAMENTO_1012` | playbook-sdaal-2026-10 | PROPOSTA ao maestro (não selo): fechar a sub-decisão (3) como 'nenhum formato aberto cobre os 6 eixos; o template em PFR declara |
-| 8.2 | `C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER` | playbook-sdaal-2026-10 | Opção C: costurar o CACAO v2.0 (OASIS) por SDAAL como primeiro adapter, na fatia de compliance/segurança. |
+| 9.0 | `C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER` | playbook-sdaal-2026-10 | Opção C: costurar o CACAO v2.0 (OASIS) por SDAAL como primeiro adapter, na fatia de compliance/segurança. |
 | 8.0 | `C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS` | playbook-sdaal-2026-10 | Opção B: criar a abstração SDAAL completa (interface Playbook + adapters por tipo e por framework) nos 4 domínios, como pede  |
 | 4.8 | `Q_SDAAL_KIT_REPO_SEPARADO` | playbook-sdaal-2026-10 | GATED: extrair um KIT DE CONTRATO SDAAL para repo próprio versionado por pin, no molde do kg-ssot. Gatilho (os 2 juntos): execut |
 | 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
