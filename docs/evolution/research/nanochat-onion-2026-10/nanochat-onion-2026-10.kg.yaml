@@ -10,7 +10,7 @@ meta:
                              # VEICULO sim: se o nanochat voltar a andar ou ganhar loader de dominio, a opcao C
                              # muda de ordem no mesmo dia.
   # kg-backlog-guard: on
-  # ═══ TETO: 47 NÓS ═══  (emendas em 2026-10-05: 45->46 o eval de dominio; 46->47 o reenquadramento das doutrinas)
+  # ═══ TETO: 51 NÓS ═══  (emendas em 2026-10-05: 45->46 o eval de dominio; 46->47 o reenquadramento das doutrinas; 2026-10-12: 47->51 as 4 emendas do eixo D)
   #
   # Pesquisa /onion-research --mode:decision sobre o Nanochat (Karpathy) e o Onion no treino de um modelo de
   # DOMINIO (Dogfood, KG-SSOT First, Runtime SDAAL, Elenxo). Varredura larga: 17 fontes, 32 claims, 14
@@ -39,6 +39,47 @@ meta:
   # arquivo: os vizinhos vao por trace: e por id citado no label.
   #
   # ESTE GRAFO NAO SELA NADA. D_ fica OPEN — o maestro sela.
+  #
+  # EMENDAS DO EIXO D (2026-10-12, TETO 47 -> 51): o maestro selou «Aplicar as 4» em
+  # nanochat-eixo-d-2026-10#Q_EIXO_D_RECONCILE_PARENT_GRAPH (/meta:decide). Aplicadas por Aufhebung, sem
+  # apagar nada nem virar status: 4 nos novos (E_AXIS_D_REINFORCES_SEAL_A, E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ,
+  # C_OPTION_D_SECOND_GATE_PROTECTED_EVAL, E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ) que SUPPORTS/CONSTRAINS os
+  # nos velhos. O selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 NAO foi reaberto (a decisao segue byte a
+  # byte a mesma). As superacoes sao PARCIAIS: CONSTRAINS sem flip, como o selo do maestro de 2026-10-09. A
+  # referencia ao grafo do eixo D mora em external_edges (contrato v4.3), logo abaixo — a frase acima sobre
+  # o radar so ver arestas dentro do arquivo e de antes do contrato v4.3.
+# Arestas para no de OUTRO grafo (contrato v4.3): as 4 emendas do eixo D apontam a rodada que as propos.
+external_edges:
+  - from: E_AXIS_D_REINFORCES_SEAL_A
+    to: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#Q_EIXO_D_RECONCILE_PARENT_GRAPH"
+    edge_type: TRACES_TO
+  - from: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#C_EIXO_D_BUDGET_ORDER_OF_MAGNITUDE_ONLY"
+    to: E_AXIS_D_REINFORCES_SEAL_A
+    edge_type: SUPPORTS
+  - from: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN"
+    to: E_AXIS_D_REINFORCES_SEAL_A
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ
+    to: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#Q_EIXO_D_RECONCILE_PARENT_GRAPH"
+    edge_type: TRACES_TO
+  - from: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#E_LACUNAS_EIXO_D_2026_10"
+    to: E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ
+    edge_type: SUPPORTS
+  - from: C_OPTION_D_SECOND_GATE_PROTECTED_EVAL
+    to: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#Q_EIXO_D_RECONCILE_PARENT_GRAPH"
+    edge_type: TRACES_TO
+  - from: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#C_EIXO_D_OPTION_D_SECOND_GATE_EVAL"
+    to: C_OPTION_D_SECOND_GATE_PROTECTED_EVAL
+    edge_type: SUPPORTS
+  - from: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#E_SYNTH_EVAL_CONTAMINATION_PROTECTED_BENCH"
+    to: C_OPTION_D_SECOND_GATE_PROTECTED_EVAL
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ
+    to: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#Q_EIXO_D_RECONCILE_PARENT_GRAPH"
+    edge_type: TRACES_TO
+  - from: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml#E_TRACE2SKILL_NO_WEIGHT_UPDATE"
+    to: E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ
+    edge_type: SUPPORTS
 nodes:
   - id: Q_NANOCHAT_ONION_DOMAIN_MODEL_2026_10
     node_type: question
@@ -353,6 +394,7 @@ nodes:
     source_kind: primary
     label: 'O QUE ESTA RODADA NAO COBRIU, contado. (1) OBJECOES: 33 julgadas pelo Elenxo, 20 SOBREVIVENTES, 20 MODELADAS (12 sobre achados + 8 sobre descartes/cortes) — nenhuma fora do teto. O texto que chegou ao escritor vinha TRUNCADO no Achado 13; contei pelo retorno completo. (2) REFUTADAS/NAO VERIFICADAS na votacao: 11 — pipeline completo inclusive UI (tier 9, refutacao PROCEDE: E_NANOCHAT_MASTER_NARROWED); changelog sem mencao a SLM (tier 9, refutada por COMODISMO); 3.04 h/US$73 (tier 7, superada); Catalyst val_bpb 0.9361 (tier 6, refutada por COMODISMO — o numero consta, falta a baseline); pipeline de identidade em 4 passos e caminhos customjson/my_identity (tier 5, refutacao PROCEDE: 404 no master); US$72/US$20 (tier 5, superada); 8xH100 3 h US$73 (tier 5, duplicata); ~US$100/500M/ctx 2048 (tier 3, datada); qualidade baixa e variavel (tier 3, refutada por COMODISMO — direcao corroborada pela primaria); tokenizer/pretreino em dados proprios (tier 9, refutada por COMODISMO). 4 das 11 foram refutadas por comodismo e viraram objecao. Nao verificadas por rede: 0. (3) CORTADAS POR ORCAMENTO: 17 fontes e 32 claims; entre elas os eixos decisivos: forks de dominio (nanochat-jp/tohoku-nlp, discussions/420 e /710, nanochat-mlx, autoautoresearch — NENHUMA lida), arXiv 2603.25158 (treino com corpus agentico, eixo da opcao D), arXiv 2604.02621 (RL semi-supervisionado com LLM-judge), custo de dados sinteticos e esquecimento catastrofico, PRECO MEDIDO de GPU por hora (A100/H100 spot). (4) NAO EXISTE: o eval de dominio (holdout de nos ja selados com o zero-shot do LLM atual como baseline) — pre-requisito de qualquer treino. (5) Literatura de classificador tipado de dominio estreito <1B: busca nao feita.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml'
+    narrative: "CONSTRAINS por E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ, selado pelo maestro em 2026-10-12 sem flip (o status fica; emenda 4 do eixo D). CAIU: o arXiv 2603.25158 no item (3) como cortado sem leitura (foi lido; nao e treino em pesos). SOBREVIVE: o resto do inventario. O label fica como foi escrito em 2026-10-05."
     provenance:
       source: "docs/evolution/research/nanochat-onion-2026-10/data/wf_c8ba4e42-5e6.json · transcrito agent-a933a800bde71c94b do run wf_c8ba4e42-5e6 (host)"
       locator: "result.decision.objections (33; survives True=20); result.refuted (11); result.notVerifiedByBudget (32); result.budgetDropped (17); result.unverified (0); grep -c 'id: E_OBJECAO' = 20; jsonl do write-kg, 2ª linha: objeções cortadas em 'Achado 13'"
@@ -400,6 +442,7 @@ nodes:
     verified_against: 'E_CORPUS_SCALE_MEASURED; classification-por-vertical (PRIVATE nunca sai; DESTILADO so predicado provado); NDA de adotantes; arXiv 2603.25158 citado, NAO lido'
     label: 'OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo e transcripts. GATED. So o corpus PUBLICO e DESTILADO pode entrar — nunca PRIVATE, NDA, material de adotante ou transcript com dado de cliente; isso encolhe ainda mais um corpus que ja e pequeno. A pergunta "quem consome e por que" (MOAT W7, pull-not-push) nao tem resposta, e o eixo que a julgaria (custo de dado sintetico, esquecimento catastrofico, treino com corpus agentico) foi cortado por orcamento.'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
+    narrative: "CONSTRAINS por C_OPTION_D_SECOND_GATE_PROTECTED_EVAL (2o gate: eval de dominio interno e protegido) e por E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ, selados pelo maestro em 2026-10-12 (emendas 2 e 3 do eixo D). D segue open e GATED. O verified_against ('arXiv 2603.25158 citado, NAO lido') e de 2026-10-05; o paper foi lido depois (E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ)."
   - id: C_OPCAO_E_ONION_AS_WEIGHTS
     node_type: claim
     plane: DEV
@@ -674,6 +717,7 @@ nodes:
     verified_against: 'Elenxo sobre o corte por orcamento "custo de dados sinteticos, trade-off identidade x utilidade, autoconsciencia honesta": cortados sem leitura'
     label: 'OBJECAO (corte por comodismo): os tres temas cortados sao o EIXO da opcao D e do sentido (a). Falta medir o esquecimento catastrofico quando a identidade domina a mistura e o custo de gerar SFT so do corpus PUBLICO; "autoconsciencia honesta" toca S7_claim_analogy_breaks (auditabilidade). D e julgada no escuro.'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
+    narrative: "CONSTRAINS por E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ, selado pelo maestro em 2026-10-12 sem flip (o status fica; emenda 2 do eixo D). CAIU: 'cortados sem leitura' (a rodada de primarias do eixo D leu 7 fontes). SOBREVIVE: esquecimento sob mistura dominada pela identidade, custo e autoconsciencia honesta, sem evidencia que os feche."
     provenance:
       source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
       locator: "Elenxo sobre o corte por orcamento \"custo de dados sinteticos, trade-off identidade x utilidade, autoconsciencia honesta\": cortados sem leitura"
@@ -719,6 +763,7 @@ nodes:
     verified_against: 'Elenxo sobre "fontes nao lidas": discussions/420 e /710, nanochat-jp (tohoku-nlp), autoautoresearch, arXiv 2603.25158, nanochat-mlx, precos de GPU — todos primarios citados, NAO lidos'
     label: 'OBJECAO (fontes nao lidas por comodismo): o eixo "forks de dominio" da pergunta 1 ficou SEM fonte lida. O nanochat-jp (tohoku-nlp) e o unico fork de dominio/idioma nomeado e o caso mais proximo do sentido (a); o arXiv 2603.25158 (treino com corpus agentico) e o eixo da opcao D; o preco de GPU (A100/H100) nao foi medido. Sem eles, C e D sao julgadas no escuro.'
     trace: 'https://github.com/karpathy/nanochat/discussions'
+    narrative: "CONSTRAINS por E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ, selado pelo maestro em 2026-10-12 sem flip (o status fica; mesma correcao da emenda 4 do eixo D). CAIU: o arXiv 2603.25158 como primario nao lido. SOBREVIVE: forks de dominio, nanochat-jp, autoautoresearch, nanochat-mlx e preco de GPU seguem nao lidos."
     provenance:
       source: "https://github.com/karpathy/nanochat/discussions"
       locator: "Elenxo sobre \"fontes nao lidas\": discussions/420 e /710, nanochat-jp (tohoku-nlp), autoautoresearch, arXiv 2603.25158, nanochat-mlx, precos de GPU — todos primarios citados, NAO lidos"
@@ -750,6 +795,68 @@ nodes:
       locator: "transcript no host, mensagem do maestro 2026-10-05T18:19:47Z; journal args.question; assunto de 4d85438a ('a opção C se fortalece'); SYNTHESIS l.13 (A selada pelo maestro); D_QUATRO_PILARES l.334"
       method: "testemunho: leitura do arquivo 800cd025-….jsonl no host (mensagem do maestro, 2026-10-05) + pedido do estudo no journal versionado e assunto do commit 4d85438a da sessão"
       locality: "host"
+
+  # ═════════════ EMENDAS DO EIXO D (selo do maestro de 2026-10-12, «Aplicar as 4») ═════════════
+  - id: E_AXIS_D_REINFORCES_SEAL_A
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-12"
+    verified_against: 'nanochat-eixo-d-2026-10 lido inteiro (27 nos): C_EIXO_D_BUDGET_ORDER_OF_MAGNITUDE_ONLY, C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN e C_EIXO_D_OPTION_D_SECOND_GATE_EVAL somam custo ou pre-condicao, nenhum reduz; emenda (1) de Q_EIXO_D_RECONCILE_PARENT_GRAPH, selada pelo maestro em 2026-10-12'
+    label: 'EMENDA (1) do eixo D: a rodada de primarias REFORCA o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, sem reabri-lo. Cada achado soma custo ou pre-condicao a B, C e D, e nenhum reduz. Selo, status e rotulo da decisao ficam intocados.'
+    narrative: "O que reforca: o orcamento de identidade e so uma ORDEM DE GRANDEZA de dado (~10^3 exemplos, em regimes que nao sao o do Onion) e nenhum valor em dolar ou GPU-hora; o custo real tem ao menos quatro parcelas nao medidas (geracao por API, retreino de estagios a cada mudanca de doutrina, varredura de hiperparametros se for LoRA, eval interno protegido); identidade em pesos exige re-rodar midtraining+SFT, sem diff revisavel. Reforco nao e re-selo: a aresta para a decisao e SUPPORTS, nao ha SUPERSEDES nem flip, e o selo continua sendo o de 2026-10-05 (A: nao treinar agora; B, C e D cada uma no seu gatilho)."
+    provenance:
+      source: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml"
+      locator: "C_EIXO_D_BUDGET_ORDER_OF_MAGNITUDE_ONLY, C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN, C_EIXO_D_OPTION_D_SECOND_GATE_EVAL; Q_EIXO_D_RECONCILE_PARENT_GRAPH, proposta (1), status done em 2026-10-12"
+      method: "leitura: grafo do eixo D inteiro + selo do maestro por pergunta com opcoes (/meta:decide, «Aplicar as 4»)"
+      locality: "repo"
+  - id: E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-12"
+    verified_against: 'E_LACUNAS_EIXO_D_2026_10 do grafo do eixo D (7 fontes lidas, 21 claims ancoradas, gapsClosed 5, gapsOpen 11); emenda (2) de Q_EIXO_D_RECONCILE_PARENT_GRAPH, selada pelo maestro em 2026-10-12'
+    label: 'EMENDA (2), superacao PARCIAL de E_OBJECAO_SYNTHETIC_DATA_AXIS_UNREAD: o eixo D passa de julgado no escuro a julgado com leitura parcial. Esquecimento sob mistura dominada pela identidade, custo e autoconsciencia honesta seguem objecao SOBREVIVENTE.'
+    narrative: "O que a rodada de primarias de 2026-10-05 FECHOU (gapsClosed 5): LoRA no escopo Llama-2-7B; metodo e escala de identidade do nanochat (1.000 conversas sinteticas, re-rodar midtraining+SFT); riscos do sintetico (alucinacao, contaminacao de eval); ordem de grandeza do LIMA; Trace2Skill lido e desqualificado como SFT. O que NAO fechou e por isso continua objecao sobrevivente (clausula 6): esquecimento quando a identidade ou o dominio DOMINA a mistura, e replay; custo em dolar ou GPU-hora; identidade x utilidade; autoconsciencia honesta e auditabilidade (S7_claim_analogy_breaks), so com argumento estrutural. CONSTRAINS, sem flip: E_OBJECAO_SYNTHETIC_DATA_AXIS_UNREAD segue confirmed e de pe; o que caiu foi so a parte 'cortados sem leitura'. Nada foi apagado."
+    provenance:
+      source: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml"
+      locator: "E_LACUNAS_EIXO_D_2026_10, itens (3) ELENXO e (4) LACUNAS QUE CONTINUAM ABERTAS; Q_EIXO_D_RECONCILE_PARENT_GRAPH, proposta (2)"
+      method: "leitura: grafo do eixo D inteiro + selo do maestro por pergunta com opcoes (/meta:decide, «Aplicar as 4»)"
+      locality: "repo"
+  - id: C_OPTION_D_SECOND_GATE_PROTECTED_EVAL
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-12"
+    verified_against: 'C_EIXO_D_OPTION_D_SECOND_GATE_EVAL e E_SYNTH_EVAL_CONTAMINATION_PROTECTED_BENCH do grafo do eixo D; emenda (3) de Q_EIXO_D_RECONCILE_PARENT_GRAPH, selada pelo maestro em 2026-10-12; estado do eval do onion-slm medido por gh pr list no repo dele (PR 4 aberto)'
+    label: 'EMENDA (3): a opcao D ganha um 2o GATE alem da falta de consumidor (MOAT W7). Nenhum dataset do corpus abre sem ser medido num eval de dominio INTERNO e PROTEGIDO, porque o sintetico contamina eval publico. O instrumento e o eval selado do onion-slm.'
+    narrative: "O instrumento, citado so como texto (o eval e PRIVADO do adotante onion-slm e os casos nunca entram no core): a porta 0 do onion-slm PASSOU em 2026-10-06, no no Q_STAGE0_PASSES do grafo docs/onion/graph/onion-slm-stage0.kg.yaml daquele repo; a versao 5 do eval e o no ART_SEALED_EVAL_SET do mesmo grafo (232 casos no certificado, selo em eval/SEAL.sha256). Medido em 2026-10-12: o v5 vive no PR 4 do onion-slm, ainda ABERTO, e no main de la o eval vigente e o v4; a revisao adversarial do v5 (E_ADVERSARIAL_REVIEW_V5, de la) deu vermelho e gerou a decisao D_AUTHOR_SIGNALS_DONT_CONFIRM. O gate nao se cumpre por o eval existir: exige que qualquer dataset de D seja medido nele, com a regua do onion-slm (Claude zero-shot), antes de abrir. Agravante mantido: sintetico pedido ao Claude herda o erro correlacionado do gerador (E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR). C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY segue open e GATED; esta emenda a restringe, nao a fecha."
+    provenance:
+      source: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml · https://github.com/marciocar/onion-slm/pull/4"
+      locator: "C_EIXO_D_OPTION_D_SECOND_GATE_EVAL; E_SYNTH_EVAL_CONTAMINATION_PROTECTED_BENCH (2404.07503 §4: 'creating and maintaining in-house and protected evaluation benchmarks'); Q_EIXO_D_RECONCILE_PARENT_GRAPH, proposta (3); onion-slm PR 4 state OPEN em 2026-10-12"
+      method: "leitura: grafo do eixo D + grafo onion-slm-stage0 do adotante + gh pr list no repo dele + selo do maestro (/meta:decide, «Aplicar as 4»)"
+      locality: "repo"
+  - id: E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: 'E_TRACE2SKILL_NO_WEIGHT_UPDATE do grafo do eixo D (QUOTE §2.1, Eq. 1, ancorada por verificador independente em 2026-10-05); emenda (4) de Q_EIXO_D_RECONCILE_PARENT_GRAPH, selada pelo maestro em 2026-10-12'
+    label: 'EMENDA (4), correcao PARCIAL de E_LACUNAS_NANOCHAT_2026_10: o arXiv 2603.25158 (Trace2Skill) nao esta mais cortado sem leitura. Foi lido na rodada do eixo D e nao e treino em pesos: constroi skill em texto sem atualizar os pesos. O resto do inventario segue de pe.'
+    narrative: "A fonte que este grafo nomeava como 'treino com corpus agentico, eixo da opcao D' constroi uma SKILL (texto) a partir de trajetorias sem atualizar theta; nao mede esquecimento nem identidade em pesos, e por isso nao sustenta D. O mesmo item aparecia em E_OBJECAO_DOMAIN_FORKS_UNREAD (lista de primarios nao lidos), que recebe a mesma restricao. CONSTRAINS, sem flip: E_LACUNAS_NANOCHAT_2026_10 e E_OBJECAO_DOMAIN_FORKS_UNREAD seguem confirmed; forks de dominio, 2604.02621, preco de GPU e o resto continuam nao lidos. O paper nao foi re-lido nesta emenda: vale a ancoragem do eixo D."
+    provenance:
+      source: "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml · https://arxiv.org/abs/2603.25158"
+      locator: "E_TRACE2SKILL_NO_WEIGHT_UPDATE (QUOTE 'Trace2Skill constructs a new skill from evolving-set trajectories without updating θ', Secao 2.1); Q_EIXO_D_RECONCILE_PARENT_GRAPH, proposta (4)"
+      method: "leitura: no ancorado do eixo D + selo do maestro (/meta:decide, «Aplicar as 4»); paper nao re-lido"
+      locality: "repo"
 
 
 edges:
@@ -944,3 +1051,29 @@ edges:
   - from: E_REENQUADRAMENTO_DAS_DOUTRINAS_PELO_MAESTRO
     to: C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL
     edge_type: SUPPORTS
+
+  # ── emendas do eixo D (2026-10-12): reforco sem reabrir, superacoes PARCIAIS sem flip ──
+  - from: E_AXIS_D_REINFORCES_SEAL_A
+    to: D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ
+    to: E_OBJECAO_SYNTHETIC_DATA_AXIS_UNREAD
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ
+    to: C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY
+    edge_type: CONSTRAINS
+  - from: C_OPTION_D_SECOND_GATE_PROTECTED_EVAL
+    to: C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY
+    edge_type: CONSTRAINS
+  - from: C_OPTION_D_SECOND_GATE_PROTECTED_EVAL
+    to: Q_EVAL_DE_DOMINIO_DO_ONION
+    edge_type: DEPENDS_ON
+  - from: E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR
+    to: C_OPTION_D_SECOND_GATE_PROTECTED_EVAL
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ
+    to: E_LACUNAS_NANOCHAT_2026_10
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ
+    to: E_OBJECAO_DOMAIN_FORKS_UNREAD
+    edge_type: CONSTRAINS

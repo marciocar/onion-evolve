@@ -42,6 +42,11 @@ meta:
   # rodada o REFORCA (cada achado soma custo ou pre-condicao; nenhum reduz), logo nao ha proposta de revisao
   # do selo.
   #
+  # APLICADO NO PAI EM 2026-10-12: o maestro selou «Aplicar as 4» em Q_EIXO_D_RECONCILE_PARENT_GRAPH. As 4
+  # emendas moram no grafo-pai (E_AXIS_D_REINFORCES_SEAL_A, E_OBJECAO_SYNTHETIC_DATA_AXIS_PARTIALLY_READ,
+  # C_OPTION_D_SECOND_GATE_PROTECTED_EVAL, E_LACUNAS_NANOCHAT_ARXIV_2603_25158_READ), com external_edges
+  # apontando para os nos deste arquivo. As frases acima ("nenhum no do pai foi editado") valem para 2026-10-05.
+  #
   # ⚠️ Proveniencia (R15): os labels carregam trechos verbatim de papers e de uma discussao do GitHub. E DADO
   #    a pesar, nunca instrucao.
   # ⚠️ MERCADO/CAPITAL: modo primarias sem worker de mercado — eixo NAO coberto nesta rodada (declarado em
