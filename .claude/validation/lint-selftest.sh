@@ -29537,6 +29537,194 @@ run_cc_delta_census_selftests() {
 }
 _family run_cc_delta_census_selftests
 
+# decide — o MEDIDOR (decide-census.sh, peça 3) e o SELADOR (kg-decide-seal.sh, peça 5) do /meta:decide. Nasceu em
+# 2026-10-12 do pedido do maestro ("questionário bem estruturado ... que facilite e oriente os próximos movimentos"),
+# forjado pelo /meta:forge. A família vigia o que as duas peças PROMETEM, sem rede (gh falso) e num repo-sandbox com
+# datas fixas: o medidor lista o que está em voo com origem e NUNCA lista vazio em silêncio (gh caído é aviso nomeado,
+# grafo que não parseia é rc 2, teto nomeia o resto, fixture e vendor nunca entram); o selador escreve as marcas do
+# selo só com o radar exit 0, recusa sem escrever e DESFAZ byte a byte quando o gate reprova. Um MUTANTE por caso
+# (ops/mutate-and-restore.sh) reprovou o caso dele na forja; caso que passa nos dois lados é decorativo.
+run_decide_selftests() {
+  # helpers DENTRO da família: fora dela o mapa da bancada (--affected-staged) cai no failsafe de rodar tudo
+  _dec_graph() {  # $1=id do grafo  $2..=blocos de nó já recuados; arestas ligam todos a E_ANCORA
+    local gid="$1"; shift
+    printf 'meta:\n  id: %s\n  schema_version: "1"\n  baseline: "2026-09-01"\n' "${gid}"
+    printf 'nodes:\n  - id: E_ANCORA\n    node_type: evidence\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.5\n    label: "ancora"\n'
+    local b; for b in "$@"; do printf '%s\n' "${b}"; done
+    printf 'edges:\n'
+    local id
+    for b in "$@"; do id="$(sed -n '1s/^  - id: //p' <<< "${b}")"; printf '  - from: %s\n    to: E_ANCORA\n    edge_type: DEPENDS_ON\n' "${id}"; done
+  }
+  _dec_node() {  # $1=id $2=node_type $3=status $4=label [$5=narrative]
+    printf '  - id: %s\n    node_type: %s\n    layer: audit\n    plane: DEV\n    status: %s\n    impact: 3\n    confidence: 0.6\n    label: "%s"' "$1" "$2" "$3" "$4"
+    [ -n "${5:-}" ] && printf '\n    narrative: "%s"' "$5"
+    return 0
+  }
+  local sut="${REPO_ROOT}/.claude/validation/decide-census.sh" seal="${REPO_ROOT}/.claude/validation/kg-decide-seal.sh"
+  [ -f "${sut}" ] || { record_fail "decide" "medidor ausente: ${sut}"; return; }
+  [ -f "${seal}" ] || { record_fail "decide" "selador ausente: ${seal}"; return; }
+  command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 \
+    || { record_skip "decide: python3/PyYAML ausentes (SUT não exercido)"; return; }
+  local sb r out rc g h0 G=(git -c user.name=bancada -c user.email=bancada@example.invalid -c commit.gpgsign=false)
+  sb="$(TMPDIR=/tmp mktemp -d)"; r="${sb}/r"
+  mkdir -p "${r}/docs/a" "${r}/docs/b" "${r}/docs/c" "${r}/x/fixtures" "${r}/vendor/kg" "${r}/docs/evolution/inbox/_processed"
+  "${G[@]}" -C "${sb}" init -q r
+  _dec_graph a "$(_dec_node D_VELHO decision open 'decidir o velho')" \
+    "$(_dec_node Q_CITADO question open 'qual caminho?' '(a) caminho um com custo baixo; (b) caminho dois que destrava a fase 2.')" > "${r}/docs/a/a.kg.yaml"
+  { _dec_graph b "$(_dec_node D_B decision open 'decidir b')"; } > "${r}/docs/b/b.kg.yaml"
+  sed -i 's/^  baseline: "2026-09-01"$/&\n  x_drive_checkpoint: pending\n  x_drive_checkpoint_note: "lote L1 sem selo"/' "${r}/docs/b/b.kg.yaml"
+  { _dec_graph c "$(_dec_node D_C decision open 'decidir c')"; } > "${r}/docs/c/c.kg.yaml"
+  sed -i 's/^  baseline: "2026-09-01"$/&\n  x_drive_checkpoint: sealed/' "${r}/docs/c/c.kg.yaml"
+  { _dec_graph f "$(_dec_node D_FIXTURE decision open 'fixture')"; } > "${r}/x/fixtures/f.kg.yaml"
+  sed -i 's/^  baseline: "2026-09-01"$/&\n  x_drive_checkpoint: pending/' "${r}/x/fixtures/f.kg.yaml"
+  { _dec_graph v "$(_dec_node D_VENDOR decision open 'vendor')"; } > "${r}/vendor/kg/v.kg.yaml"
+  : > "${r}/docs/evolution/inbox/_processed/velho.md"
+  "${G[@]}" -C "${r}" add -A
+  GIT_AUTHOR_DATE="2026-09-01T12:00:00" GIT_COMMITTER_DATE="2026-09-01T12:00:00" "${G[@]}" -C "${r}" commit -q -m c1
+  "${G[@]}" -C "${r}" remote add origin "${sb}/sem-rede.git"
+  "${G[@]}" -C "${r}" update-ref refs/remotes/origin/main HEAD
+  # dentro da janela: nasce D_NOVO (commit não empurrado) e chega um item no inbox
+  python3 - "${r}/docs/a/a.kg.yaml" <<'DEC_PY'
+import sys
+p = sys.argv[1]; s = open(p, encoding='utf-8').read()
+s = s.replace('edges:\n', '  - id: D_NOVO\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.6\n    label: "decidir o novo"\nedges:\n  - from: D_NOVO\n    to: E_ANCORA\n    edge_type: DEPENDS_ON\n  - from: D_NOVO\n    to: Q_CITADO\n    edge_type: SUPPORTS\n', 1)
+open(p, 'w', encoding='utf-8').write(s)
+DEC_PY
+  "${G[@]}" -C "${r}" add -A
+  GIT_AUTHOR_DATE="2026-10-10T12:00:00" GIT_COMMITTER_DATE="2026-10-10T12:00:00" "${G[@]}" -C "${r}" commit -q -m c2
+  : > "${r}/docs/evolution/inbox/sinal-novo.md"
+  printf '#!/usr/bin/env bash\nprintf %s\n' "'[{\"number\":7,\"title\":\"feat x\",\"headRefName\":\"feat/x\",\"isDraft\":false,\"statusCheckRollup\":[{\"name\":\"lint\",\"status\":\"COMPLETED\",\"conclusion\":\"FAILURE\"},{\"name\":\"ok\",\"status\":\"COMPLETED\",\"conclusion\":\"SUCCESS\"}]}]'" > "${sb}/gh-ok"
+  chmod +x "${sb}/gh-ok"
+  printf 'conversa: falamos de Q_CITADO, de D_FIXTURE, de D_VENDOR e de D_INEXISTENTE_X.\n' > "${sb}/cite.txt"
+  # uma medição de produção-sandbox, lida por vários casos
+  if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-ok" bash "${sut}" "${r}" --tsv --cite "${sb}/cite.txt" 2>&1)"; then rc=0; else rc=$?; fi
+  # (a) checkpoint pendente aparece; o selado não; o de fixture nunca
+  if [ "${rc}" -eq 0 ] && grep -q "^checkpoint$(printf '\t')docs/b/b.kg.yaml$(printf '\t')docs/b/b.kg.yaml:5$(printf '\t')lote L1 sem selo" <<< "${out}" \
+     && ! grep -q "^checkpoint$(printf '\t')docs/c/" <<< "${out}" && ! grep -q "^checkpoint$(printf '\t')x/fixtures/" <<< "${out}"; then
+    record_pass "decide: (a) checkpoint pendente aparece com origem e nota; o selado e o de fixture não"
+  else record_fail "decide: (a)" "rc=${rc} $(_emit "${out}" | grep '^checkpoint' | tr '\t\n' '  ')"; fi
+  # (b) o nó CITADO aparece (via cite) com os trechos de opção copiados literalmente; o não citado fora da janela não
+  if grep -q "^seal$(printf '\t')Q_CITADO$(printf '\t')docs/a/a.kg.yaml:[0-9]*$(printf '\t').*$(printf '\t')cite$(printf '\t')(a) caminho um com custo baixo ⟂ (b) caminho dois que destrava a fase 2" <<< "${out}" \
+     && ! grep -q "$(printf '\t')D_VELHO$(printf '\t')" <<< "${out}"; then
+    record_pass "decide: (b) nó citado por id aparece com as opções lidas literalmente; o não citado fora da janela não"
+  else record_fail "decide: (b)" "$(_emit "${out}" | grep '^seal' | tr '\t\n' '  ')"; fi
+  # (j) quem CHEGA por aresta é listado: as opções às vezes vivem como nós vizinhos (C_OPCAO_* → D_), não na prosa
+  if grep -q "^seal$(printf '\t')Q_CITADO$(printf '\t').*$(printf '\t')D_NOVO (decision, SUPPORTS)\$" <<< "${out}"; then
+    record_pass "decide: (j) o nó vizinho que chega por aresta é listado com tipo e aresta"
+  else record_fail "decide: (j)" "$(_emit "${out}" | grep '^seal.Q_CITADO' | tr '\t\n' '  ')"; fi
+  # (c) a janela traz o nó cujo id/label mudou dentro dela (D_NOVO, commit de 2026-10-10)
+  if grep -q "^seal$(printf '\t')D_NOVO$(printf '\t').*$(printf '\t')window$(printf '\t')" <<< "${out}"; then
+    record_pass "decide: (c) nó nascido dentro da janela aparece (via window)"
+  else record_fail "decide: (c)" "$(_emit "${out}" | grep '^seal' | tr '\t\n' '  ')"; fi
+  # (d) fixture e vendor NUNCA entram como linha, nem citados por id (o aviso de (i) pode nomeá-los: é o porquê)
+  if ! grep -qE "^(seal|checkpoint)$(printf '\t').*(D_FIXTURE|D_VENDOR|fixtures/|vendor/)" <<< "${out}"; then
+    record_pass "decide: (d) grafo de fixture e de vendor nunca entra, mesmo citado por id"
+  else record_fail "decide: (d)" "$(_emit "${out}" | grep 'D_FIXTURE\|D_VENDOR' | tr '\t\n' '  ')"; fi
+  # (i) o id citado que NÃO está na fila é NOMEADO, nunca some calado (achado do dogfood da forja)
+  if grep -q "^warn$(printf '\t')-$(printf '\t')-$(printf '\t')citado e INEXISTENTE no corpus rastreado: D_INEXISTENTE_X" <<< "${out}"; then
+    record_pass "decide: (i) id citado e inexistente vira aviso nomeado"
+  else record_fail "decide: (i)" "$(_emit "${out}" | grep '^warn' | tr '\t\n' '  ')"; fi
+  # (e) PR do gh com check vermelho vira linha merge que NOMEIA o check; worktree com commit não empurrado e inbox também
+  if grep -q "^merge$(printf '\t')PR#7$(printf '\t')feat/x$(printf '\t')feat x$(printf '\t')checks 1 ok · 1 falha · 0 em curso (falha: lint)" <<< "${out}" \
+     && grep -q "^thread$(printf '\t').*$(printf '\t')1 arquivo(s) não commitado(s) · 1 commit(s) não empurrado(s)" <<< "${out}" \
+     && grep -q "^triage$(printf '\t')docs/evolution/inbox$(printf '\t').*1 item(ns) não processado(s): sinal-novo.md" <<< "${out}"; then
+    record_pass "decide: (e) PR com check vermelho nomeado, worktree com commit não empurrado e inbox de 1º nível medidos"
+  else record_fail "decide: (e)" "$(_emit "${out}" | grep -E '^(merge|thread|triage)' | tr '\t\n' '  ')"; fi
+  # (f) gh indisponível → AVISO NOMEADO, nunca lista vazia com cara de "zero PRs"
+  if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-nao-existe" bash "${sut}" "${r}" --markdown 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q 'gh indisponível — PRs abertos e CI NÃO medidos (binário ausente' <<< "${out}" \
+     && grep -q 'PRs=NÃO MEDIDOS' <<< "${out}" && ! grep -q '^## merge' <<< "${out}"; then
+    record_pass "decide: (f) gh indisponível vira aviso nomeado (e PRs=NÃO MEDIDOS), não lista vazia"
+  else record_fail "decide: (f)" "rc=${rc} $(_emit "${out}" | grep -iE 'gh|PRs=' | head -3 | tr '\n' ' ')"; fi
+  # (g) o TETO corta a projeção e NOMEIA o resto (lição do forge-census: ausência por corte ≠ zero)
+  if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-ok" DECIDE_CENSUS_TOP=1 bash "${sut}" "${r}" --markdown --cite "${sb}/cite.txt" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q 'TETO: mostradas 1 de 6 linhas' <<< "${out}" \
+     && grep -q 'NOMEADAS: .*seal:Q_CITADO.*seal:D_NOVO\|NOMEADAS: .*seal:D_NOVO.*seal:Q_CITADO' <<< "${out}"; then
+    record_pass "decide: (g) teto corta e nomeia as linhas restantes"
+  else record_fail "decide: (g)" "rc=${rc} $(_emit "${out}" | grep -A1 'TETO' | tr '\n' ' ')"; fi
+  # (h) grafo RASTREADO que não parseia → rc 2 nomeando o grafo (nunca "nada em voo")
+  printf 'meta:\n  id: quebrado\nnodes: [\n' > "${r}/docs/c/quebrado.kg.yaml"
+  "${G[@]}" -C "${r}" add docs/c/quebrado.kg.yaml
+  if out="$(DECIDE_TODAY=2026-10-12 bash "${sut}" "${r}" --no-gh 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'grafo rastreado que NÃO PARSEIA: docs/c/quebrado.kg.yaml' <<< "${out}"; then
+    record_pass "decide: (h) grafo rastreado que não parseia → rc 2 nomeando o arquivo"
+  else record_fail "decide: (h)" "rc=${rc} $(_emit "${out}" | head -2 | tr '\n' ' ')"; fi
+  "${G[@]}" -C "${r}" rm -q --cached docs/c/quebrado.kg.yaml; rm -f "${r}/docs/c/quebrado.kg.yaml"
+
+  # ── o SELADOR, sobre cópia descartável fora de git (o gate é só o radar) ──────────────────
+  g="${sb}/s.kg.yaml"; cp "${r}/docs/a/a.kg.yaml" "${g}"
+  # (s1) selo de decisão existente: marcas escritas, plane DEV (testemunho em PROD reprova no contrato), radar exit 0
+  if out="$(bash "${seal}" "${g}" D_VELHO --chosen "caminho um" --rejected "caminho dois|pesquisar antes" --date 2026-10-12 --question "qual?" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && python3 - "${g}" <<'DEC_PY'
+import sys, yaml
+n = [x for x in yaml.safe_load(open(sys.argv[1]))['nodes'] if x['id'] == 'D_VELHO'][0]
+ok = (n['status'] == 'done' and n['plane'] == 'DEV' and n['verified_at'] == '2026-10-12'
+      and n['provenance']['method'] == 'testemunho: decisão do maestro por pergunta com opções, 2026-10-12'
+      and n['provenance']['locality'] == 'pessoa'
+      and '«caminho um»' in n['narrative'] and '«caminho dois» · «pesquisar antes»' in n['narrative'])
+sys.exit(0 if ok else 1)
+DEC_PY
+  then
+    if bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${g}" --integrity --schema >/dev/null 2>&1; then
+      record_pass "decide: (s1) o selador escreve status/plane DEV/verified_at/method/escolhida+descartadas e o radar sai 0"
+    else record_fail "decide: (s1)" "o grafo selado reprova no radar"; fi
+  else record_fail "decide: (s1)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  # (s2) nó inexistente → rc 2 e o arquivo intacto
+  h0="$(sha256sum "${g}" | cut -d' ' -f1)"
+  if out="$(bash "${seal}" "${g}" D_NAO_EXISTE --chosen a --rejected b --date 2026-10-12 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'nó inexistente' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
+    record_pass "decide: (s2) nó inexistente → rc 2, nada escrito"
+  else record_fail "decide: (s2)" "rc=${rc} $(_emit "${out}" | tail -1)"; fi
+  # (s3) nó já done (o selado em s1) → rc 2 e intacto: selo não se re-carimba
+  if out="$(bash "${seal}" "${g}" D_VELHO --chosen x --rejected y --date 2026-10-13 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'já está done' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
+    record_pass "decide: (s3) nó já done → rc 2, nada escrito"
+  else record_fail "decide: (s3)" "rc=${rc} $(_emit "${out}" | tail -1)"; fi
+  # (s4) o gate reprova DEPOIS da escrita → rc 3 e a escrita DESFEITA byte a byte (radar falso que reprova o selado)
+  printf '#!/usr/bin/env bash\ngrep -q "meta:decide" "$1" && exit 1\nexit 0\n' > "${sb}/radar-reprova-selo.sh"
+  cp "${r}/docs/a/a.kg.yaml" "${sb}/u.kg.yaml"; h0="$(sha256sum "${sb}/u.kg.yaml" | cut -d' ' -f1)"
+  if out="$(DECIDE_SEAL_RADAR="${sb}/radar-reprova-selo.sh" bash "${seal}" "${sb}/u.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 3 ] && grep -q 'escrita DESFEITA' <<< "${out}" && [ "$(sha256sum "${sb}/u.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
+    record_pass "decide: (s4) radar reprovando o selado → rc 3 e o arquivo volta byte a byte"
+  else record_fail "decide: (s4)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  # (s5) decisão sem nó: --new cria D_ ligado ao nó de origem, com as mesmas marcas, e o radar sai 0
+  if out="$(bash "${seal}" "${g}" --new D_NOVA_DA_SESSAO --label "decidiu-se X" --link Q_CITADO --chosen "X" --rejected "Y|Z" --date 2026-10-12 --other 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && python3 - "${g}" <<'DEC_PY'
+import sys, yaml
+d = yaml.safe_load(open(sys.argv[1]))
+n = [x for x in d['nodes'] if x['id'] == 'D_NOVA_DA_SESSAO']
+e = [x for x in d['edges'] if x['from'] == 'D_NOVA_DA_SESSAO' and x['to'] == 'Q_CITADO']
+ok = (len(n) == 1 and len(e) == 1 and n[0]['status'] == 'done' and n[0]['plane'] == 'DEV'
+      and 'resposta livre do maestro' in n[0]['narrative'] and n[0]['provenance']['method'].startswith('testemunho: decisão do maestro'))
+sys.exit(0 if ok else 1)
+DEC_PY
+  then record_pass "decide: (s5) --new cria a decisão ligada à origem, com a marca de resposta livre, radar 0"
+  else record_fail "decide: (s5)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  # (s6) nó com campo CEGO → rc 2: gate humano às cegas não recebe selo de sessão
+  cp "${r}/docs/a/a.kg.yaml" "${sb}/b.kg.yaml"
+  sed -i 's/^    label: "qual caminho?"$/&\n    x_blind_verdict: ""/' "${sb}/b.kg.yaml"; h0="$(sha256sum "${sb}/b.kg.yaml" | cut -d' ' -f1)"
+  if out="$(bash "${seal}" "${sb}/b.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'campo CEGO' <<< "${out}" && [ "$(sha256sum "${sb}/b.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
+    record_pass "decide: (s6) nó com campo cego → rc 2, nada escrito"
+  else record_fail "decide: (s6)" "rc=${rc} $(_emit "${out}" | tail -1)"; fi
+  # (s7) onde o contrato está vendorizado, ele é o 2º gate: grafo RASTREADO, selo limpo → rc 0 com o contrato
+  #      julgado; opção com caminho de máquina (REGRA 99) → o contrato piora → rc 3 e a escrita DESFEITA.
+  #      Achado do dogfood da forja: o selo em PROD passava no radar e reprovava no contrato (testimony-in-prod).
+  if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && python3 -c 'import jsonschema' >/dev/null 2>&1; then
+    ln -s "${REPO_ROOT}/vendor/kg-ssot" "${r}/vendor/kg-ssot"
+    g="${r}/docs/b/b.kg.yaml"; h0="$(sha256sum "${g}" | cut -d' ' -f1)"
+    if out="$(bash "${seal}" "${g}" D_B --chosen "ir de /home/alguem/repo" --rejected "ficar" --date 2026-10-12 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" -eq 3 ] && grep -q 'o contrato REPROVOU' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
+      if out="$(bash "${seal}" "${g}" D_B --chosen "ir pelo caminho curto" --rejected "ficar" --date 2026-10-12 2>&1)"; then rc=0; else rc=$?; fi
+      if [ "${rc}" -eq 0 ] && ! grep -q 'NÃO JULGADO\|não vendorizado' <<< "${out}"; then
+        record_pass "decide: (s7) o contrato é o 2º gate: caminho de máquina na opção → rc 3 desfeito; selo limpo → rc 0 julgado"
+      else record_fail "decide: (s7)" "selo limpo: rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+    else record_fail "decide: (s7)" "caminho de máquina: rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  else record_skip "decide: (s7) contrato não vendorizado ou jsonschema ausente (o 2º gate NÃO verificado)"; fi
+  rm -rf "${sb}"
+}
+_family run_decide_selftests
+
 # REGRA 102 (Chave de frontmatter de agente pertence à allowlist) — SAC-106, radar E3 r9, 2026-10-11. O Claude
 # Code ignora a chave que não reconhece: `tool:` no lugar de `tools:` deixa o agente com todas as ferramentas, sem
 # erro. A SSOT é agent-frontmatter-keys.tsv; o juiz, agent-frontmatter-keys-check.sh. Casos: (a) as polaridades

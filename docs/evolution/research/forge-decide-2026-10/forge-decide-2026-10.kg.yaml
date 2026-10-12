@@ -1,0 +1,199 @@
+# kg-backlog-guard: on
+# Forja do /meta:decide pelo /meta:forge (2026-10-12): pedido, topologia selada, evidência medida e o que ficou gated.
+meta:
+  id: forge-decide-2026-10
+  schema_version: "1"
+  baseline: "2026-10-12"
+  review_after: "2026-11-11"   # 30d: cadência de ferramenta; a 1ª rodada de verdade com o maestro é o teste
+  x_supersedes_none: "Forja de superfície nova: nenhum grafo anterior é superado. O checkpoint do /meta:drive e o /meta:cc-update são MOLDES, não o superado."
+  # ═══ TETO: 14 NÓS ═══
+nodes:
+  - id: E_PEDIDO_DO_MAESTRO_QUESTIONARIO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: "2026-10-12"
+    verified_against: "pedido literal do maestro na abertura da forja, 2026-10-12"
+    label: "o maestro pediu algo que ajuste o que está em voo e o devolva como questionário estruturado, com sugestões, descrição e recomendações que orientem os próximos movimentos"
+    narrative: "Literal: quando tenho opções, tarefas pendentes, fios abertos e outros, principalmente quando tenho que tomar decisões ou selar algum entendimento quero poder rodar algo que ajusta o que está acontecendo e coloque em forma de questionário bem estruturado com as sugestões, descrição e recomendações que facilite e oriente os próximos movimentos."
+    provenance:
+      source: "maestro, na abertura da forja do /meta:decide"
+      locator: "pedido de 2026-10-12, transcrito na doutrina (seção Por que existe)"
+      method: "testemunho: pedido do maestro, 2026-10-12"
+      locality: "pessoa"
+  - id: D_TOPOLOGIA_DO_DECIDE_SELADA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    trace: ".claude/commands/meta/decide.md"
+    verified_against: "entrevista da forja, 2026-10-12, as quatro recomendadas: fonte = sessão e fios em voo; forma = AskUserQuestion em rodadas; destino = selo no grafo e segue; nome = /meta:decide"
+    label: "topologia do /meta:decide: a fonte é a sessão e os fios em voo, a forma é AskUserQuestion em rodadas com a recomendada primeiro, o destino é o selo no grafo com radar 0, e o nome é /meta:decide"
+    narrative: "O corpus entra só por referência (nó citado por id, tema passado, bloco tocado na janela). As opções descartadas na entrevista não chegaram a esta sessão de forja, só as escolhidas (todas as recomendadas); por isso este nó não as lista, em vez de reconstruí-las de memória."
+    provenance:
+      source: "maestro, na entrevista da forja do /meta:decide"
+      locator: "as quatro perguntas de topologia (fonte, forma, destino, nome)"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      locality: "pessoa"
+  - id: E_CORPUS_SEM_OPCOES_ESTRUTURADAS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: "2026-10-12"
+    verified_against: "PyYAML sobre git ls-files '*.kg.yaml' fora de fixtures e vendor: 159 grafos; 159 decision e 300 question open; 50 grafos com decisão aberta, 101 com pergunta aberta, 117 com uma das duas; 0 nós com campo options/x_options/alternatives/choices; 4 das 159 decisões com nó vizinho de opção (id com OPCAO/OPTION chegando por aresta) e 75 com algum claim chegando"
+    label: "o corpus tem 159 decisões e 300 perguntas abertas e nenhuma guarda as opções em campo estruturado: elas vivem em label e narrative, e em 4 decisões como nós vizinhos"
+    narrative: "O briefing da forja citava 50 grafos; a re-medição mostra que 50 é o número de grafos com DECISÃO aberta, e que as perguntas abertas se espalham por 101. Daí a escolha: o medidor copia trechos com forma de opção por padrão fixo, e o nó sem trecho legível diz isso em vez de inventar."
+    provenance:
+      source: "git ls-files '*.kg.yaml' (159 rastreados fora de fixtures e vendor)"
+      locator: "campos node_type, status e as chaves de cada nó decision/question open"
+      method: "medição: leitura por PyYAML de todos os grafos rastreados"
+      locality: "repo"
+  - id: E_JANELA_POR_BLOCO_ERA_RUIDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-10-12"
+    verified_against: "1º dogfood do medidor neste repo: janela de 7 d pelo bloco inteiro = 180 linhas em voo; pelas linhas de sentido (id, label, narrative) = 77 nós seal"
+    label: "a janela por bloco inteiro de nó trazia o corpus quase todo, porque migração em massa toca todo bloco; a janela passou a olhar só id, label e narrative"
+    narrative: "Achado do dogfood, curado no mesmo laço: as migrações do contrato (aspas em datas, locality, external_edges) mudam linhas em todos os nós, e isso não é fio em voo. O caso (c) da bancada prova que o nó nascido na janela entra."
+    provenance:
+      source: ".claude/validation/decide-census.sh"
+      locator: "bloco da janela (linhas de sentido de cada nó)"
+      method: "medição: execução do medidor antes e depois da cura"
+      locality: "repo"
+  - id: E_SELO_EM_PROD_REPROVA_NO_CONTRATO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: "2026-10-12"
+    verified_against: "kg-contract-check.sh sobre o grafo desta forja com a decisão em PROD e method testemunho: SHOULD integrity.testimony-in-prod; vendor/kg-ssot/tools/kg_validate.py, TESTIMONY_METHOD e coherence_located"
+    label: "o contrato reprova testemunho em PROD, e o radar pede decisão done em PROD: os dois discordam, e o selo do /meta:decide fica em DEV porque vence o contrato"
+    narrative: "A 1ª versão do selador subia a decisão selada para PROD, seguindo o aviso decision-done-em-DEV do radar (SOFT). O próprio grafo desta forja reprovou no kg-contract-check por isso. Cura no mesmo laço: o selo grava plane DEV, rebaixa um PROD dizendo isso na narrative, e o selador roda o contrato depois do radar onde ele está vendorizado (rc 3 e desfaz se piorar)."
+    provenance:
+      source: "vendor/kg-ssot/tools/kg_validate.py"
+      locator: "TESTIMONY_METHOD e coherence_located (integrity.testimony-in-prod)"
+      method: "medição: kg-contract-check.sh sobre o grafo da forja, antes e depois da cura"
+      locality: "repo"
+  - id: E_DOGFOOD_ACHOU_TRES_SILENCIOS_DO_MEDIDOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: "2026-10-12"
+    verified_against: "decide-census --cite sobre um texto com 3 ids reais abertos e 1 inexistente; seal de D_UNIDADE_BILHETAVEL_DO_ONION numa CÓPIA descartável fora do repo, com o hook do corpus nomeando os nós C_OPCAO_A a C_OPCAO_F"
+    label: "o dogfood achou três silêncios no medidor: id citado e inexistente sumia, os trechos de opção paravam em 4 e escondiam (e) e (f), e as opções que vivem como nós vizinhos não apareciam"
+    narrative: "Os três curados no mesmo laço, cada um com caso e mutante: aviso nomeado para o citado fora da fila (caso i), trechos sem teto, e a coluna de quem chega por aresta (caso j). O selo foi feito numa cópia em diretório temporário, nunca no nó real do corpus."
+    provenance:
+      source: ".claude/validation/decide-census.sh"
+      locator: "saída markdown com --cite e --window 0 sobre o repo vivo"
+      method: "medição: execução do medidor e do selador antes e depois das curas"
+      locality: "repo"
+  - id: E_DOGFOOD_DE_CARGA_PROPOS_SELO_EM_LOTE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-12"
+    verified_against: "invocação headless do /meta:decide (passos 1 e 2, sem AskUserQuestion e sem escrita): a injeção carregou viva, compôs 4 perguntas com a recomendada primeiro, e propôs selo em lote sem pergunta para oito decisões que julgou já exercitadas, filtrando só pelo texto do censo"
+    label: "a carga real do comando funcionou e revelou o furo do filtro: a sessão propôs selar em lote, sem perguntar, o que ela mesma julgou derivável"
+    narrative: "Curado no mesmo laço na doutrina (cláusula 1) e no passo 2 da superfície: o que o filtro tira NÃO passa pelo selador, cujo method é testemunho do maestro; nó fechado por medição fecha pelo /meta:kg-freshness ou pelo fluxo normal. E o filtro lê o nó, não o recorte do censo. Também: checkpoint respondido sela pelo kg-drive-project.sh --seal, e merge é ato do maestro. Teto: a cura é prosa lida pela sessão, não mecanismo; o selador não sabe se houve pergunta."
+    provenance:
+      source: ".claude/commands/meta/decide.md"
+      locator: "diretivas de injeção e passos 1 e 2 do Procedimento"
+      method: "medição: invocação headless do comando com ferramentas só de leitura"
+      locality: "repo"
+  - id: E_BANCADA_17_CASOS_17_MUTANTES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: "2026-10-12"
+    verified_against: "run_decide_selftests 17/17 sob LC_ALL=C; 17 mutantes por ops/mutate-and-restore.sh, um por caso, e cada um reprovou o caso que vigia"
+    label: "a família run_decide_selftests tem 17 casos (10 do medidor, 7 do selador, o contrato incluso), sem rede, e cada mutante reprova o caso dele"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_decide_selftests"
+      method: "medição: execução da família e de 14 versões defeituosas das duas peças"
+      locality: "repo"
+  - id: C_O_FILTRO_E_JULGAMENTO_DA_SESSAO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "fronteira declarada no cabeçalho do medidor e na doutrina (cláusula 1 e o que ela não promete)"
+    label: "teto declarado: o medidor lista o que está em voo e não decide o que é do maestro; o filtro medível/derivável/de outro dono é julgamento da sessão, e o que ele tira é listado com o porquê"
+  - id: Q_DECIDE_FICA_EM_PENDING
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-12"
+    verified_against: "roles.yaml, conjunto pending: decide nasceu nele, logo vai só para source e hub"
+    label: "o /meta:decide deve viajar para o standalone e o plugin, ou segue core-only? Gatilho: o maestro classificar, depois de uma rodada real medida do lado de quem consome"
+  - id: Q_OPCOES_EM_CAMPO_ESTRUTURADO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-12"
+    verified_against: "E_CORPUS_SEM_OPCOES_ESTRUTURADAS: zero nós com opções em campo; o medidor depende de padrão fixo sobre a prosa"
+    label: "o contrato do .kg.yaml deveria ganhar um campo x_options para decisões abertas? Gatilho: as rodadas do /meta:decide mostrarem que o padrão fixo erra opção que o autor do nó tinha escrito"
+edges:
+  - from: E_PEDIDO_DO_MAESTRO_QUESTIONARIO
+    to: D_TOPOLOGIA_DO_DECIDE_SELADA
+    edge_type: SUPPORTS
+  - from: E_CORPUS_SEM_OPCOES_ESTRUTURADAS
+    to: D_TOPOLOGIA_DO_DECIDE_SELADA
+    edge_type: SUPPORTS
+  - from: E_JANELA_POR_BLOCO_ERA_RUIDO
+    to: D_TOPOLOGIA_DO_DECIDE_SELADA
+    edge_type: SUPPORTS
+  - from: E_BANCADA_17_CASOS_17_MUTANTES
+    to: D_TOPOLOGIA_DO_DECIDE_SELADA
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_ACHOU_TRES_SILENCIOS_DO_MEDIDOR
+    to: D_TOPOLOGIA_DO_DECIDE_SELADA
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_DE_CARGA_PROPOS_SELO_EM_LOTE
+    to: C_O_FILTRO_E_JULGAMENTO_DA_SESSAO
+    edge_type: SUPPORTS
+  - from: E_SELO_EM_PROD_REPROVA_NO_CONTRATO
+    to: D_TOPOLOGIA_DO_DECIDE_SELADA
+    edge_type: CONSTRAINS
+  - from: C_O_FILTRO_E_JULGAMENTO_DA_SESSAO
+    to: D_TOPOLOGIA_DO_DECIDE_SELADA
+    edge_type: CONSTRAINS
+  - from: Q_DECIDE_FICA_EM_PENDING
+    to: D_TOPOLOGIA_DO_DECIDE_SELADA
+    edge_type: DEPENDS_ON
+  - from: Q_OPCOES_EM_CAMPO_ESTRUTURADO
+    to: E_CORPUS_SEM_OPCOES_ESTRUTURADAS
+    edge_type: DEPENDS_ON
