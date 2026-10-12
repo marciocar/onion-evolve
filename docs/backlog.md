@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**470 itens abertos** em 100 grafo(s) com aberto (de 128 no escopo) · 101 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**469 itens abertos** em 100 grafo(s) com aberto (de 129 no escopo) · 101 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -688,12 +688,11 @@
 | 10.2 | `C_O_FILTRO_E_JULGAMENTO_DA_SESSAO` | forge-decide-2026-10 | teto declarado: o medidor lista o que está em voo e não decide o que é do maestro; o filtro medível/derivável/de outro dono  |
 | 3.0 | `Q_OPCOES_EM_CAMPO_ESTRUTURADO` | forge-decide-2026-10 | o contrato do .kg.yaml deveria ganhar um campo x_options para decisões abertas? Gatilho: as rodadas do /meta:decide mostrarem que |
 
-## hub-operacoes-enterprise-update-547-2026-10 — 2 item(ns)
+## hub-operacoes-enterprise-update-547-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
-| 8.5 | `Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN` | hub-operacoes-enterprise-update-547-2026-10 | A CURA DE CLASSE DOS VETOS (PR #921) AINDA ASSUME QUE A PRODUCAO SE CHAMA main. Num adotante com GitFlow cuja producao e master  |
 
 ## triagem-evolve-kgssot-2026-10 — 12 item(ns)
 
