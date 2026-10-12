@@ -1,7 +1,8 @@
 ---
 branch: docs/eixo-d-parent-amendments
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f6f4436e718c74be4c60d6bfc5a3715e1552c3f45494beeb43940cb8bc3b3a49
+reviewed_code_sha256: dbf31c764910f75fecb8fc82850018b6f4cf7ac82a07eb1d096ed60db30eeaf3
 findings_total: 3
 findings_real: 3
 findings_fixed: 1
