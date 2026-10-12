@@ -400,11 +400,11 @@ nodes:
   - id: D_ONION_BRAIN_MCP_REMOTO
     node_type: decision
     plane: DEV
-    status: open
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "SELADA pelo maestro em 2026-10-12 por pergunta com opções: dois degraus com o CÓDIGO no core e a hospedagem na família (degrau 1 = reativar ops/mcp-onion-kg via LibreChat em rede privada com gate por papel; degrau 2 = OAuth RS público por org só com demanda medida). Degrau 1 é deploy na VPS, em janela do maestro; decision fica confirmed em DEV até chegar a PROD"
     impact: 5
     confidence: 0.5
-    verified_at: "2026-10-11"
-    verified_against: "NÃO SELADA. Esta sessão nunca sela: status open, aguardando o maestro. A recomendação é de UM agente sem votação."
     label: "DECISÃO ABERTA (o maestro sela): MCP remoto do Brain — A reativar precedente via LibreChat · B público OAuth RS por org · C gateway · D Workers AS proxy · E multi-tenant · F sem MCP. Elenxo: código no core, hospedagem na família; A agora, B só com gatilho."
     narrative: "RECOMENDAÇÃO DO ELENXO (afirmação de UM agente, sem votação; texto integral relido do retorno do run wf_19d83833-a3e em 2026-10-11): dois degraus com gatilho explícito. Em todos, o CÓDIGO do servidor fica no core (stdlib, sem acoplamento a Claude Code nem a nuvem: MCP é protocolo aberto e esta é a metade agnóstica do Onion); a HOSPEDAGEM e a operação ficam com a família, uma instância por org. DEGRAU 1 (piloto agora): opção A — reativar ops/mcp-onion-kg servindo o clone do brain-granaai, consumido pelo LibreChat com SSO Logto; rede privada, token estático, streamable-http. DEGRAU 2 (opção B): só quando houver demanda medida de uso em Claude.ai ou ChatGPT; aí entra endpoint público TLS na VPS, o servidor como resource server que valida JWT do Logto (iss, aud por resource indicator POR ORG, exp, escopo único de leitura, claim de organização atribuída pelo admin) e publica PRM, sem nunca virar AS ou proxy. Rejeita D, SSE e stdio via proxy; 'nenhum em rede privada' só vale para o LibreChat. Custo recorrente declarado: acompanhar a churn da spec de autorização (três revisões em ~18 meses), o que justifica comparar um gateway maduro (opção C) antes do degrau 2. PRÉ-CONDIÇÕES DO DEGRAU 1 (objeções medidas): curar o '--' do kb_search; apontar REPO para um worktree destacado do hub num SHA verificado, com served_commit e fetched_at em toda resposta; acrescentar kg_node pelo parser do radar; marcar a saída como dado não confiável; restringir o acesso ao agente/MCP no LibreChat por papel, porque o Logto tem cadastro aberto. PRÉ-CONDIÇÕES DO DEGRAU 2: medir o .well-known do Logto (code_challenge_methods_supported, DCR/CIMD, resource indicators, claim de org), o pré-registro com a callback do claude.ai/claude.com e do ChatGPT, a versão negociada por cliente, o plano do time, e comparar build de RS contra gateway (opção C); dogfood OAuth ao vivo em cada cliente-alvo. Sub-decisões no estado da recomendação: (1) código no core, hospedagem na família; (2) degrau 1 token estático em rede privada atrás do SSO do LibreChat, degrau 2 OAuth RS com o IdP do hub e claim de org; (3) uma instância por org, raiz fixada pela instância, nunca por argumento; (4) worktree destacado no SHA de origin/main do hub, fetch com deploy key read-only, commit declarado em toda resposta; (5) streamable-http stateless, sem SSE e sem stdio via proxy."
     trace: "pergunta SAC-70 · docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml (Q_ONION_BRAIN_MCP)"
@@ -412,6 +412,10 @@ nodes:
   # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ──
   # 30 sobreviventes entregues, 30 modeladas. Confiança <= 0.6 em TODAS: afirmação de UM
   # agente, sem votação. Primário que o Elenxo CITA sem ter sido lido entra como 'primário citado, não lido'.
+    provenance:
+      source: "decisão do maestro na sessão de 2026-10-12, pergunta com opções sobre D_ONION_BRAIN_MCP_REMOTO"
+      locator: "opção escolhida: 2 degraus, código no core (Recomendado)"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
 
   - id: E_OBJECAO_IDP_CADASTRO_ABERTO_NAO_AUTORIZA
     node_type: evidence
