@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {"matcher": "Bash", "hooks": [{"type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-protect-main.sh\""}]},
+      {"hooks": [
+        {"type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-direct-provider-api.sh\"", "x_nota_do_alvo": "fica"},
+        {"type": "command", "command": "bash meu-hook-sem-matcher.sh"}
+      ]},
+      {"hooks": [{"type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-merge-gate.sh\""}]}
+    ]
+  }
+}

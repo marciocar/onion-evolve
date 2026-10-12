@@ -4849,6 +4849,18 @@ run_merge_fixture() {
     | select([ ($o.hooks[$ev] // [])[] | select(.matcher == $mt) | .hooks[]?.command ] | index($c) == null)
     | "\($ev): \($c) sem matcher \($mt)"')"
   if [ -n "${matcher_bad}" ]; then record_fail "${fixture}" "hook da fonte fora do grupo com o matcher: ${matcher_bad}"; return; fi
+  # (6) REALOCAÇÃO (2026-10-12, 2º --update do onion-kg-ssot): nenhum hook Onion fica num grupo cujo matcher difere do
+  #     da fonte. O (5) só pedia que existisse uma cópia no grupo certo; o veto que o update anterior anexou SEM
+  #     matcher continuava lá, porque o refresh casa por command e não muda o hook de grupo.
+  local misplaced_bad
+  misplaced_bad="$(jq -nr --argjson s "$(cat "${src}")" --argjson o "${out}" '
+    ($s.hooks // {}) | keys[] as $ev
+    | ([ ($s.hooks[$ev] // [])[] | . as $g | .hooks[]? | select((.command | type) == "string")
+         | {key: .command, value: ($g.matcher // null)} ] | from_entries) as $mt
+    | ($o.hooks[$ev] // [])[] | . as $g | .hooks[]? | select((.command | type) == "string")
+    | .command as $c | select($mt | has($c)) | select(($g.matcher // null) != $mt[$c])
+    | "\($ev): \($c) no grupo \($g.matcher // "sem matcher") em vez de \($mt[$c] // "sem matcher")"')"
+  if [ -n "${misplaced_bad}" ]; then record_fail "${fixture}" "hook Onion num grupo com matcher errado: ${misplaced_bad}"; return; fi
 
   # attribution: ausente no alvo → chega o da fonte; presente no alvo → fica o do alvo (never-clobber)
   local attr_ok
