@@ -113,14 +113,14 @@ push_lines=$(printf '%s\n' "$inv" | grep -E '^git[[:space:]]+push([[:space:]]|$)
 [ -z "$push_lines" ] && exit 0
 while IFS= read -r line; do
   [ -z "$line" ] && continue
-  # refspec explícito: `main` como token final, `HEAD:main`, `algo:main`, `refs/heads/main`
+  # refspec explícito: `main` como token final, `HEAD:main`, `algo:main`, `refs/heads/main` — `main` é o
+  # NOME do ramo protegido: a lib converte nele o ramo de produção resolvido (paridade com o protect-main)
   if grep -qE '([[:space:]]|:)(refs/heads/)?main([[:space:]]|$)' <<< "$line"; then
     deny "'git push' com alvo MAIN negado ($line)"
   fi
   # push NU (só flags) sentado em main
   if grep -qE '^git[[:space:]]+push([[:space:]]+-[^[:space:]]+)*[[:space:]]*$' <<< "$line"; then
-    cur=$(git -C "$hcwd" branch --show-current 2>/dev/null)
-    [ "$cur" = "main" ] && deny "'git push' nu sentado em MAIN negado"
+    onion_on_protected_branch "$hcwd" && deny "'git push' nu sentado no ramo de PRODUÇÃO negado"
   fi
 done <<< "$push_lines"
 exit 0

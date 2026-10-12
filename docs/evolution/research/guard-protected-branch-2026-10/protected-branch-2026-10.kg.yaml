@@ -1,0 +1,115 @@
+# kg-backlog-guard: on
+# ═══ TETO: 5 NÓS ═══
+meta:
+  id: guard-protected-branch-2026-10
+  schema_version: "1"
+  baseline: "2026-10-12"
+  review_after: "2026-11-26"
+  note: "Forja (cura de classe, /meta:forge-guard) do nó Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN: os dois vetos PreToolUse passam a proteger o ramo de PRODUÇÃO resolvido do repo, não só o literal main. Destino da forja de guarda (peça 5 do conjunto do comando /meta:forge-guard)."
+external_edges:
+  - from: E_MASTER_PASSAVA_RC0_REPRODUZIDO
+    to: "docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml#Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN"
+    edge_type: SUPPORTS
+  - from: C_TETO_RESOLUCAO_LOCAL_E_FONTES
+    to: "docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml#C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE"
+    edge_type: CONSTRAINS
+nodes:
+  - id: E_MASTER_PASSAVA_RC0_REPRODUZIDO
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-10-12"
+    source_tier: 10
+    label: "O DEFEITO, reproduzido antes da cura: num repo cuja produção é master, o protect-main deixava passar git push origin +master e git push -f origin master com rc=0, e barrava só +main. O merge-gate tinha a mesma suposição no push não-force."
+    narrative: "Medido pela 1ª vez em 2026-10-05 pelo agente de update no brain-granaai (pin ab08cde). Reproduzido nesta forja num repo de bancada criado com git init -b master: +master rc=0, -f origin master rc=0, +main rc=2, force de feature rc=0. A configuração REAL do brain-granaai, lida sem escrever nada lá: origin/HEAD aponta develop e gitflow.branch.master = master. Esse dado mudou o desenho (ver a decisão): somar a branch padrão do remoto teria passado a vetar o force-push da develop."
+    trace: ".claude/hooks/pretooluse-protect-main.sh"
+    verified_against: "hook alimentado com payload PreToolUse num repo de bancada de produção master, antes da cura: +master rc=0, -f origin master rc=0, +main rc=2; config do brain-granaai lida em modo leitura: refs/remotes/origin/HEAD = develop, gitflow.branch.master = master"
+    provenance:
+      source: ".claude/hooks/pretooluse-protect-main.sh"
+      locator: "push_lines e o regex de alvo main (antes da cura); .git/config e refs/remotes/origin/HEAD do brain-granaai"
+      method: "medição: hook alimentado com payload JSON num repo de bancada de produção master, antes e depois da cura"
+      locality: "repo"
+
+  - id: D_RAMO_DE_PRODUCAO_RESOLVIDO_NA_LIB
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: done
+    verified_at: "2026-10-12"
+    label: "A resolução mora na lib partilhada: protected_branches = main sempre, mais gitflow.branch.master OU, sem ele, a branch padrão de cada remoto, ou master sem fonte nenhuma. O destino resolvido vira o token main que os dois hooks já julgam."
+    narrative: "Substrato: não é guarda nova, é cura de classe dos dois vetos PreToolUse que o censo já lista. A lib invocation-lines.sh é o lugar porque ela já canoniza o destino do push para os dois hooks: a paridade protect-main ↔ merge-gate sai de graça, sem segundo regex. O gitflow tem PRECEDÊNCIA sobre o origin/HEAD porque num GitFlow a branch padrão do host costuma ser a develop (é o caso medido no brain-granaai); somar as duas fontes vetaria o force-push da integração. Comparação sem caixa, como já era com main. O fallback de push nu nos hooks passa a usar onion_on_protected_branch, espelho bash da mesma resolução; a bancada cobra a paridade. Rotas de API do merge-gate (git/refs/heads/main, contents branch=, gh repo sync) seguem só com main: ele só se arma no core, cuja produção é main."
+    trace: ".claude/hooks/lib/invocation-lines.sh"
+    verified_against: "censo da forja (moldes por substrato; classe coberta pelos dois vetos PreToolUse); bancada pretooluse_veto 236/236 com LC_ALL=C; dogfood contra a config real do brain-granaai: +master rc=2, -f master rc=2, +main rc=2, -f develop rc=0, -f onion/develop rc=0; no core: +main rc=2, -f master rc=0"
+    provenance:
+      source: ".claude/hooks/lib/invocation-lines.sh"
+      locator: "def protected_branches; a passada final de canonical_git; touches_main; onion_protected_branches e onion_on_protected_branch"
+      method: "medição: bancada e dogfood do hook com payload contra a config real do adotante, sem escrever no repo dele"
+      locality: "repo"
+
+  - id: E_VINTE_E_SEIS_CASOS_SEIS_MUTANTES_MORDEM
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-10-12"
+    label: "Bancada: 26 casos novos (prod e pr-bash) em run_pretooluse_veto_selftests, em seis repos de bancada, um por fonte de resolução, com as duas polaridades. Seis mutantes por ops/mutate-and-restore.sh, todos mordendo com LC_ALL=C."
+    narrative: "Repos: sem remoto (fallback main+master), origin/HEAD→master, origin/HEAD→main (master NÃO é produção: tem de passar), origin/HEAD→trunk, gitflow.branch.master=trunk, e a forma do brain-granaai (origin/HEAD→develop + gitflow master). Mutantes: (M1) sem a passada final de normalização: 9 casos de VETO reprovam; (M2) sem o fallback master no tokenizador: 6; (M3) sem ler refs/remotes/*/HEAD: 4 (o trunk e as três polaridades honestas do origin/HEAD→main); (M4) sem ler o gitflow: 2; (M5) sem o fallback no espelho bash: 1 (pr-bash bm); (M6) sem a precedência do gitflow: 1 (pr-brain-dev, o force-push da develop). Família inteira 236/236 com a cura."
+    trace: ".claude/validation/lint-selftest.sh"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families pretooluse_veto = 236 passaram, 0 falharam; cada mutante via ops/mutate-and-restore.sh reprovando os casos nomeados; zero marcador de mutante na árvore depois"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_pretooluse_veto_selftests, bloco RAMO DE PRODUÇÃO RESOLVIDO (_prmk, _prcase, pr-bash)"
+      method: "medição: bancada e seis mutantes rodados nesta sessão"
+      locality: "repo"
+
+  - id: C_TETO_RESOLUCAO_LOCAL_E_FONTES
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-12"
+    label: "TETO da resolução: ela lê o que está no clone, não o host. origin/HEAD defasado, produção com outro nome sem gitflow nem origin/HEAD, e o padrão de um repo empurrado por URL não são vistos."
+    narrative: "O refs/remotes/origin/HEAD é gravado no clone e não se atualiza sozinho quando o host troca a branch padrão (git remote set-head origin -a atualiza). Um repo criado com git init + remote add, sem set-head e sem gitflow, cai no fallback main+master: produção chamada trunk ou production fica desprotegida, e uma branch de trabalho chamada master passa a ser vetada no force-push (fechado por desenho, raro). Push para URL literal usa a resolução do diretório local. GATILHO: o primeiro adotante com produção fora de main/master sem gitflow nem origin/HEAD."
+    trace: ".claude/hooks/lib/invocation-lines.sh"
+    verified_against: "cabeçalho da lib (bloco RAMO DE PRODUÇÃO na FRONTEIRA DECLARADA) e os casos da bancada que fixam cada fonte"
+    provenance:
+      source: ".claude/hooks/lib/invocation-lines.sh"
+      locator: "cabeçalho, FRONTEIRA DECLARADA, bloco RAMO DE PRODUÇÃO"
+      method: "leitura: o código da resolução escrito nesta forja, conferido contra os casos da bancada"
+      locality: "repo"
+
+  - id: C_TETO_PUSH_DIRETO_NO_ADOTANTE_SEGUE_SEM_VETO
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-12"
+    label: "TETO: no adotante o push NÃO-force direto na produção e a deleção (:master, --delete) seguem passando. Quem os barra é o merge-gate, que se desarma sem ops/pr-merge-verified.sh — por desenho. Vale igual para main."
+    narrative: "A cura dá ao merge-gate a mesma resolução (no repo de bancada armado ele barra git push origin master e o push nu sentado em master), mas no adotante ele não se arma: o desarme é a fronteira declarada no cabeçalho dele (não se veta o único caminho de merge de uma casa que não tem o verificado). O protect-main só olha force-push; deleção de ramo sem force não é dele, medido também para main (git push origin :main rc=0 antes e depois). GATILHO: um adotante pedir veto de push direto ou de deleção na produção, ou o primeiro incidente medido dessa forma."
+    trace: ".claude/hooks/pretooluse-merge-gate.sh"
+    verified_against: "repo de bancada de produção master: protect-main deixa passar git push origin :master e --delete origin master (rc=0), igual a :main; merge-gate armado barra os dois (rc=2); cabeçalho do merge-gate (desarme sem o caminho verificado)"
+    provenance:
+      source: ".claude/hooks/pretooluse-merge-gate.sh"
+      locator: "teste de presença de ops/pr-merge-verified.sh e o bloco (c) git push não-force"
+      method: "medição: hooks alimentados com payload num repo de bancada de produção master"
+      locality: "repo"
+
+edges:
+  - from: E_MASTER_PASSAVA_RC0_REPRODUZIDO
+    to: D_RAMO_DE_PRODUCAO_RESOLVIDO_NA_LIB
+    edge_type: SUPPORTS
+  - from: E_VINTE_E_SEIS_CASOS_SEIS_MUTANTES_MORDEM
+    to: D_RAMO_DE_PRODUCAO_RESOLVIDO_NA_LIB
+    edge_type: SUPPORTS
+  - from: C_TETO_RESOLUCAO_LOCAL_E_FONTES
+    to: D_RAMO_DE_PRODUCAO_RESOLVIDO_NA_LIB
+    edge_type: CONSTRAINS
+  - from: C_TETO_PUSH_DIRETO_NO_ADOTANTE_SEGUE_SEM_VETO
+    to: D_RAMO_DE_PRODUCAO_RESOLVIDO_NA_LIB
+    edge_type: CONSTRAINS

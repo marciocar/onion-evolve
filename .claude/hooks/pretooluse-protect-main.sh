@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PreToolUse(Bash) — o 1º uso REAL da capacidade que compra o acoplamento (Onda 7, 2026-09-01).
-# Nega force-push para main: a ação irreversível mais barata de barrar. exit 2 = veto ANTES de executar.
+# Nega force-push para o ramo de PRODUÇÃO (main, ou o resolvido do repo): a ação irreversível mais barata de barrar. exit 2 = veto ANTES de executar.
 # Escopo estreito por desenho: force-push de BRANCH DE TRABALHO segue livre (o fluxo de stack depende dele).
 input=$(cat)
 # `cwd` do JSON é o diretório ONDE o comando roda — numa worktree de agente é a worktree, não a raiz
@@ -48,6 +48,8 @@ push_lines=$(printf '%s\n' "$inv" | grep -E '^git[[:space:]]+push([[:space:]]|$)
 [ -z "$push_lines" ] && exit 0
 printf '%s' "$push_lines" | grep -qE '(--force([^-]|$)|--force-with-lease|[[:space:]]-[a-eg-z]*f[a-z]*([[:space:]]|$))' || exit 0
 main_target=0
+# `main` na linha canônica é o NOME do ramo protegido: a lib já converte nele o ramo de produção
+# resolvido (`master` num GitFlow clássico — Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN, 2026-10-12).
 # `HEAD:main` / `x:main` / `refs/heads/main` também são alvo main — a v1 exigia ESPAÇO antes de
 # `main` e deixava passar o refspec com dois-pontos (buraco achado pela bancada da auditoria
 # D_AUDITAR_GATES_TEXTUAIS, 2026-09-02: `git push -f origin HEAD:main` saía rc=0).
@@ -58,12 +60,11 @@ if [ "$main_target" -eq 0 ]; then
   # o 2º falso-positivo de produção (2026-09-01): loop de merge parado em main pushava "$br" de
   # feature e era vetado. Push nu = a linha termina após push+flags.
   if printf '%s' "$push_lines" | grep -qE 'git[[:space:]]+push([[:space:]]+-[^[:space:]]+)*[[:space:]]*$'; then
-    cur=$(git -C "$hcwd" branch --show-current 2>/dev/null)
-    [ "$cur" = "main" ] && main_target=1
+    onion_on_protected_branch "$hcwd" && main_target=1
   fi
 fi
 if [ "$main_target" -eq 1 ]; then
-  echo "GUARDA-PRETOOLUSE: force-push para MAIN negado (hook de produção, Onda 7) — reescrever a história da main é irreversível; se for deliberado, o maestro roda fora da sessão." >&2
+  echo "GUARDA-PRETOOLUSE: force-push para o ramo de PRODUÇÃO negado (main, ou o resolvido do repo: gitflow.branch.master ou a branch padrão do remoto; hook de produção, Onda 7) — reescrever a história da produção é irreversível; se for deliberado, o maestro roda fora da sessão." >&2
   exit 2
 fi
 exit 0

@@ -123,16 +123,16 @@ nodes:
     node_type: question
     plane: PROD
     impact: 5
-    confidence: 0.85
-    status: open
-    verified_at: '2026-10-05'
-    verified_against: 'teste do agente de update no brain-granaai (pin ab08cde): git push origin +main -> rc=2 (vetado); git push origin +master -> rc=0 (passa); a producao do alvo e master (GitFlow onion/develop -> develop -> master, estrategia CONFIRMADA pelo maestro em 2026-10-05); o merge-gate nao age no alvo porque depende de ops/pr-merge-verified.sh, que so existe no core'
+    confidence: 0.9
+    status: done
+    verified_at: '2026-10-12'
+    verified_against: 'CURADO em 2026-10-12 (fix/protect-main-default-branch): a lib dos vetos resolve o ramo de producao (main sempre + gitflow.branch.master, ou sem ele refs/remotes/*/HEAD, ou master sem fonte) e o converte no token main que os dois hooks julgam. Dogfood contra a config real do brain-granaai (origin/HEAD=develop, gitflow.branch.master=master): git push origin +master rc=2, -f origin master rc=2, +main rc=2, -f develop rc=0. Bancada pretooluse_veto 236/236 (LC_ALL=C), seis mutantes mordendo. Antes: +main rc=2, +master rc=0 (pin ab08cde, 2026-10-05). O push nao-force direto no adotante segue sem veto (merge-gate desarmado por desenho): teto em guard-protected-branch-2026-10.'
     trace: '.claude/hooks/pretooluse-protect-main.sh'
     label: 'A CURA DE CLASSE DOS VETOS (PR #921) AINDA ASSUME QUE A PRODUCAO SE CHAMA main. Num adotante com GitFlow cuja producao e master — o brain-granaai, cuja estrategia onion/develop -> develop -> master o maestro confirmou em 2026-10-05 — o force-push na producao passa com rc=0: o veto nao protege nada la. Nao e regressao do update; e a fronteira do proprio veto, nao declarada no TETO dele. CURA: a branch protegida passa a ser a de producao RESOLVIDA do repo (gitflow.branch.master, ou a padrao do remoto), com caso de bancada num repo cuja producao e master; e o TETO do grafo vetos-por-tokens-2026-10 ganha esta fronteira. GATILHO: ja disparou — ha adotante desprotegido hoje.'
     provenance:
       source: ".claude/hooks/pretooluse-protect-main.sh"
-      locator: "payload PreToolUse com git push origin +master / -f origin master"
-      method: "medição: hook alimentado com payload JSON (git push origin +master)"
+      locator: "payload PreToolUse com git push origin +master / -f origin master; .claude/hooks/lib/invocation-lines.sh def protected_branches"
+      method: "medição: hook alimentado com payload JSON (git push origin +master) num repo de bancada de produção master e contra a config real do brain-granaai, mais a família pretooluse_veto da bancada com seis mutantes"
       locality: "repo"
 
 edges:

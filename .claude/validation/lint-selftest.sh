@@ -6918,6 +6918,75 @@ run_pretooluse_veto_selftests() {
   rm -rf "${np}"
   _case "merge-gate: sem caminho verificado → DESARMA (passa)" 0 "${mg}" feat 'gh pr merge 1'
   rm -rf "${d}"
+  # ── RAMO DE PRODUÇÃO RESOLVIDO (Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN, 2026-10-12) ─────────
+  # Defeito medido: no brain-granaai (produção `master`) `git push origin +master` saía rc=0 — o veto só
+  # via `main` literal. Quatro repos, um por FONTE de resolução: sem remoto (fallback main+master),
+  # origin/HEAD→master, origin/HEAD→main (o `master` NÃO é produção: tem de passar) e gitflow.branch.master.
+  local pr_root; pr_root="$(mktemp -d)"
+  _prmk() {  # <nome> <modo> → cria ${pr_root}/<nome>, sentado em feat
+    local x="${pr_root}/$1" r="${pr_root}/$1.git"
+    case "$2" in
+      bare-master) git init -q -b master "${x}"; git -C "${x}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m b ;;
+      originhead-*)
+        git init -q --bare "${r}"; git init -q -b main "${x}"
+        git -C "${x}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m b
+        git -C "${x}" branch -q master; git -C "${x}" branch -q trunk
+        git -C "${x}" remote add origin "${r}"; git -C "${x}" push -q origin main master trunk 2>/dev/null
+        git -C "${x}" fetch -q origin; git -C "${x}" symbolic-ref refs/remotes/origin/HEAD "refs/remotes/origin/${2#originhead-}" ;;
+      gitflow-trunk)
+        git init -q -b main "${x}"; git -C "${x}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m b
+        git -C "${x}" branch -q trunk; git -C "${x}" branch -q master; git -C "${x}" config gitflow.branch.master trunk ;;
+      gitflow-brain)  # a forma medida no brain-granaai: origin/HEAD→develop E gitflow.branch.master=master
+        git init -q --bare "${r}"; git init -q -b master "${x}"
+        git -C "${x}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m b; git -C "${x}" branch -q develop
+        git -C "${x}" remote add origin "${r}"; git -C "${x}" push -q origin master develop 2>/dev/null
+        git -C "${x}" fetch -q origin; git -C "${x}" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/develop
+        git -C "${x}" config gitflow.branch.master master; git -C "${x}" config gitflow.branch.develop develop ;;
+    esac
+    mkdir -p "${x}/ops"; : > "${x}/ops/pr-merge-verified.sh"
+    git -C "${x}" checkout -q -b feat
+  }
+  _prcase() {  # <nome> <esperado> <hook> <repo> <branch> <comando>
+    local x="${pr_root}/$4" rc=0
+    git -C "${x}" checkout -q "$5" 2>/dev/null || git -C "${x}" checkout -q -b "$5"
+    printf '%s' "$6" | W="${x}" python3 -c 'import json,os,sys;print(json.dumps({"cwd":os.environ["W"],"tool_input":{"command":sys.stdin.read()}}))' \
+      | (cd "${x}" && CLAUDE_PROJECT_DIR="${x}" bash "$3" >/dev/null 2>&1) || rc=$?
+    if [ "${rc}" = "$2" ]; then record_pass "pretooluse-veto: (prod) $1 (rc=$2)"
+    else record_fail "pretooluse-veto: (prod) $1" "esperava rc=$2, veio rc=${rc} — cmd: $6 (repo $4 @$5)"; fi
+  }
+  _prmk bm bare-master; _prmk ohm originhead-master; _prmk ohn originhead-main; _prmk oht originhead-trunk; _prmk gft gitflow-trunk
+  _prmk gfb gitflow-brain
+  _prcase "(pr-brain) forma do brain-granaai: +master → VETO"                2 "${pm}" gfb feat 'git push origin +master'
+  _prcase "(pr-brain-dev) forma do brain: -f develop (padrão do remoto, não produção) → passa" 0 "${pm}" gfb feat 'git push -f origin develop'
+  # (pr-plus) o verbatim do defeito: produção master, refspec com `+`
+  _prcase "(pr-plus) master sem remoto: git push origin +master → VETO"      2 "${pm}" bm feat 'git push origin +master'
+  _prcase "(pr-f) master sem remoto: git push -f origin master → VETO"       2 "${pm}" bm feat 'git push -f origin master'
+  _prcase "(pr-ref) master: -f HEAD:refs/heads/master → VETO"                2 "${pm}" bm feat 'git push -f origin HEAD:refs/heads/master'
+  _prcase "(pr-nu) sentado em master: git push -f nu → VETO"                 2 "${pm}" bm master 'git push -f'
+  _prcase "(pr-main) main segue barrado no repo de master → VETO"            2 "${pm}" bm feat 'git push origin +main'
+  _prcase "(pr-feat) force de feature no repo de master → passa"             0 "${pm}" bm feat 'git push --force origin feat'
+  _prcase "(pr-plain) push simples de master não é do protect-main → passa"  0 "${pm}" bm feat 'git push origin master'
+  _prcase "(pr-ohm) origin/HEAD→master: +master → VETO"                      2 "${pm}" ohm feat 'git push origin +master'
+  _prcase "(pr-ohm-main) origin/HEAD→master: main segue barrado → VETO"      2 "${pm}" ohm feat 'git push -f origin main'
+  _prcase "(pr-oht) origin/HEAD→trunk: -f trunk → VETO"                      2 "${pm}" oht feat 'git push -f origin trunk'
+  _prcase "(pr-ohn) origin/HEAD→main: +master NÃO é produção → passa"        0 "${pm}" ohn feat 'git push origin +master'
+  _prcase "(pr-ohn-nu) origin/HEAD→main: sentado em master, -f nu → passa"   0 "${pm}" ohn master 'git push -f'
+  _prcase "(pr-gf) gitflow.branch.master=trunk: -f trunk → VETO"             2 "${pm}" gft feat 'git push -f origin trunk'
+  _prcase "(pr-gf-master) gitflow resolvido: master não é produção → passa"  0 "${pm}" gft feat 'git push -f origin master'
+  # paridade com o merge-gate (armado: o sandbox tem ops/pr-merge-verified.sh) — push não-force na produção
+  _prcase "(pr-mg) merge-gate: git push origin master (produção) → VETO"     2 "${mg}" bm feat 'git push origin master'
+  _prcase "(pr-mg-nu) merge-gate: push nu sentado em master → VETO"          2 "${mg}" bm master 'git push'
+  _prcase "(pr-mg-feat) merge-gate: push de feature no repo de master → passa" 0 "${mg}" bm feat 'git push origin feat'
+  _prcase "(pr-mg-ohn) merge-gate: origin/HEAD→main, push master → passa"    0 "${mg}" ohn feat 'git push origin master'
+  # (pr-bash) o espelho bash (`onion_protected_branches`, fallback dos hooks) resolve IGUAL ao tokenizador
+  local _pl
+  for _pl in "bm:main master" "ohm:main master" "ohn:main" "oht:main trunk" "gft:main trunk" "gfb:main master"; do
+    local _got; _got="$(. "${REPO_ROOT}/.claude/hooks/lib/invocation-lines.sh"; onion_protected_branches "${pr_root}/${_pl%%:*}" | LC_ALL=C sort -u | tr '\n' ' ')"
+    if [ "${_got% }" = "$(printf '%s\n' ${_pl#*:} | LC_ALL=C sort -u | tr '\n' ' ' | sed 's/ $//')" ]; then
+      record_pass "pretooluse-veto: (pr-bash) onion_protected_branches ${_pl%%:*} = ${_pl#*:}"
+    else record_fail "pretooluse-veto: (pr-bash) onion_protected_branches ${_pl%%:*}" "esperava '${_pl#*:}', veio '${_got% }'"; fi
+  done
+  rm -rf "${pr_root}"
 }
 
 # ---------------------------------------------------------------------------
