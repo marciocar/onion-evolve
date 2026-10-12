@@ -13,7 +13,7 @@
 | Dimensão | Nº | Produtor |
 |---|---:|---|
 | Famílias na bancada | **246** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **1880** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **1883** | `bash .claude/validation/harness-inventory.sh --env` |
 | Regras do lint | **97** | `bash .claude/validation/rules-registry.sh --counts` |
 | — HARD | **85** | `bash .claude/validation/rules-registry.sh --counts` |
 | Pares de modo consumido | **62** | `bash .claude/validation/consumed-mode-check.sh .` |
@@ -54,12 +54,12 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **498** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **499** | `bash .claude/validation/review-ledger.sh --env` |
 | Achados totais | **2651** | `bash .claude/validation/review-ledger.sh --env` |
 | Achados REAIS | **2284** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **86%** | `bash .claude/validation/review-ledger.sh --env` |
 | Tokens por achado REAL | **123554** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **404** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **405** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **94** | `bash .claude/validation/review-ledger.sh --env` |
 
 A média de tokens cobre os **270** resíduos com custo > 0; os demais declaram `tokens: 0`

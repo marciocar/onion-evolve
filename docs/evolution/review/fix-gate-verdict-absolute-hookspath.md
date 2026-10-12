@@ -1,7 +1,8 @@
 ---
 branch: fix/gate-verdict-absolute-hookspath
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: b46c7fbe8c19be006bd24fb67a480e4c325e5bcc34797ab63d95ca6654b910ab
+reviewed_code_sha256: e6f94fc0c9333666a2f0d0aa4830a780c8ab2cdb51f9ac7a85f645fb34ca4235
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
