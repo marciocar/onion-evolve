@@ -2305,6 +2305,7 @@ ops/bridge-auth/logto-provision.sh	I_PROVISION_FICOU_PARA_TRAS_NO_RENAME	docs/ev
 ops/materialize-door.sh	E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE	docs/onion/graph/federation-health-2026-07.kg.yaml
 ops/materialize-door.sh	E_MATERIALIZE_DOOR_FAIL_OPEN_NO_REGEN	docs/onion/graph/federation-health-2026-07.kg.yaml
 ops/mcp-onion-exec/server.py	E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
+ops/mcp-onion-kg/README.md	E_DEGRAU1_EM_PRODUCAO_1012	docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml
 ops/mcp-onion-kg/server.py	E_MEDIDO_LOCAL_PRECEDENTE_MCP_ONION_KG	docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
