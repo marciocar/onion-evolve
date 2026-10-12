@@ -17,6 +17,23 @@ O driver opera num **degrau declarado**, nunca acima:
 - **Nível 0** (auto sempre): atos reversíveis em worktree própria (branch/commit/PR/dogfood), `write(KG)` de append, **propor** ato-3.
 - **AUDIT** (o degrau da Fase 1): conduz um fio **até PR-verde sozinho**; **merge no main é 100% humano, em LOTE** num checkpoint.
 - **AUTOMATE** (Fase 2, gated): auto-merge só sob 3 pré-condições duras (enabler git-nativo · path-allowlist `git diff ∩ vendor = ∅` · política 100% mecânica, LLM veto-only).
+  **Decisão do maestro (2026-10-12, SAC-74): no AUTOMATE o merge é POR PADRÃO.** A sua ordem de
+  2026-08-18 ("até o final" = executar → commit → PR → **MERGE**, sem pedir de novo) vira degrau.
+  As 3 pré-condições ganham nome concreto nesta casa:
+  - o **enabler** é o `ops/pr-merge-verified.sh`, o único caminho de merge; o hook `merge-gate` veta
+    qualquer outro com exit 2;
+  - a **path-allowlist** é a parada dura "path vendorizado/outward-facing" (REGRA 36 e REGRA 30);
+  - a **política mecânica** são as **paradas duras**, todas PARA:
+    - decisão não tomada;
+    - Elenxo reprovado;
+    - CI vermelho inesperado (o veredito do revisor sem crédito é dispensa NOMEADA, não silêncio);
+    - repo alheio (I3);
+    - budget esgotado;
+    - ciclo na cadeia.
+
+  ⚠️ **O degrau só abre quando as paradas duras forem predicados executáveis com mutante (SAC-114).**
+  Antes disso o `/meta:drive` segue em AUDIT. Merge por padrão sobre parada em prosa é o carimbo
+  automático que esta doutrina existe para matar.
 - **MOAT** (nunca): deploy · escrever repo alheio (I3) · merge de path vendorizado/outward-facing · **agendar por relógio (W7)**. O driver é **maestro-invocado**, nunca cron/`/loop` sobre si.
 
 Alinhamento SOTA 2026: GAIE (arXiv 2606.22484) = os mesmos 3 tiers; Loop Engineering = *stopping-conditions + verificador determinístico SEPARADO checando o objetivo a cada turno, nunca o auto-relato* (= `kg-realign --check` / `kg-radar`, `declarado≠verificado`).
@@ -69,7 +86,7 @@ P6   PARA             nenhuma passada nova enquanto o checkpoint pende (batch-co
 | **REFUTED/SUPERSEDED de nó NUNCA SELADO** (§4.1) | mesmo ato, mas o par nasce e cai no MESMO PR | **AUTO nas 4 precondições** (`kg-seal-exception.sh`); a 4ª — o flip nomeado na `drive_checkpoint_note` do lote — mecanizada em 2026-10-04 |
 | verification **UNVERIFIABLE** | `blocked_by`, **não carimba** | **AUTO** (não-escrita; 1ª classe) |
 | execution → PR-verde | conduz em worktree | **AUTO até o PR** |
-| **merge no main** | — | **PARA** (100% humano, em lote) |
+| **merge no main** | — | **AUDIT: PARA** (100% humano, em lote) · **AUTOMATE: AUTO** pelo `ops/pr-merge-verified.sh`, salvo parada dura (§0; decisão de 2026-10-12, aberta só com o SAC-114) |
 | **decisão não-tomada** | frame + Elenxo + propõe | **PARA** (selo humano) |
 | drift tipo-(c) estrutural | novo nó + `SUPERSEDES` datado | **AUTO** (realign repara determinístico) |
 | **MOAT** | — | **NUNCA / PARA** |

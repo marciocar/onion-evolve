@@ -15,7 +15,7 @@
 | CORRIGIDO, sobre linhas do proponente | 17 |
 | CORRIGIDO, omissão nova | 1 |
 | REPROVADO | 0 |
-| **Total** | **93** |
+| **Soma da triagem** | **93** |
 
 - **Concordância com o proponente:** 75 de 92 linhas, ou **81,5%**.
 - **Os 61 labels condensados (variante A)** eram o foco. Saíram **47 aprovados** e **14 corrigidos**:
