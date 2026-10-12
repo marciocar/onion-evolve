@@ -27192,14 +27192,14 @@ run_veto_onfailure_selftests() {
   if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 15/15 verdes' <<< "${o}"; then
     record_pass "veto-onfailure: (a) --selftest verde (15 checagens: veto sem/com block, aviso, comentário, função, exit 20, inválido, async, ausente, ilegível, fora dos eventos medidos, aspas, PreModelSwitch)"
   else record_fail "veto-onfailure: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
-  # (b) O MODO QUE A PRODUÇÃO CONSOME, no settings.json real: os 4 vetos declaram block → tsv vazio, rc 0.
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no settings.json real: os 5 vetos declaram block → tsv vazio, rc 0.
   #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
   if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/veto-onfailure-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then
     record_pass "veto-onfailure: (b) settings.json real → rc 0, nenhum veto sem onFailure"
   else record_fail "veto-onfailure: (b) settings.json real" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
   # (c) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, sobre o settings de ANTES da cura (o campo removido dos
-  #     3 vetos PreToolUse e do PreModelSwitch), emite a REGRA 101 para os 4 — e não para o kg-read-leg (aviso)
+  #     4 vetos PreToolUse e do PreModelSwitch), emite a REGRA 101 para os 5 — e não para o kg-read-leg (aviso)
   #     nem para o PostModelSwitch, que roda o mesmo script mas não veta nada.
   local sd; sd="$(TMPDIR=/tmp mktemp -d)"
   python3 -I -B -c 'import json,sys; d=json.load(open(sys.argv[1]))
@@ -27209,9 +27209,9 @@ for ev in ("PreToolUse", "PreModelSwitch"):
 json.dump(d, open(sys.argv[2], "w"), indent=2)' "${REPO_ROOT}/.claude/settings.json" "${sd}/settings.json"
   local l; l="$(cd "${REPO_ROOT}" && ONION_SETTINGS_JSON="${sd}/settings.json" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/settings.json" 2>&1 || true)"
   local n; n="$(grep -c 'REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block): \[veto-sem-onfailure\]' <<< "${l}" || true)"
-  if [ "${n}" -eq 4 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
+  if [ "${n}" -eq 5 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
      && ! grep -q 'REGRA 101.*kg-read-leg' <<< "${l}" && ! grep -q 'REGRA 101.*PostModelSwitch' <<< "${l}"; then
-    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 4 vetos de antes da cura (3 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
+    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 5 vetos de antes da cura (4 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
   else record_fail "veto-onfailure: (c) dispatcher" "n=${n}; $(grep -E 'REGRA 101' <<< "${l}" | head -4 | cut -c1-160 | tr '\n' '|')"; fi
   rm -rf "${sd}"
   # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove
@@ -27570,6 +27570,114 @@ PYSRV
   rm -rf "${d}"
 }
 _family run_task_manager_dispatcher_selftests
+
+# REGRA 105 (Script rastreado não chama a API do provedor de task manager por fora do adapter) + o veto
+# pretooluse-direct-provider-api.sh — SAC-75, medido em 2026-10-12: 147 comandos Bash únicos das sessões tocaram
+# host de provedor, ~130 com cliente HTTP, e um deles DEPOIS do tm.sh existir (python3 heredoc com urllib direto no
+# Linear). Casos: (a)/(b) as polaridades dos dois --selftest · (c) o corpus real no modo que o lint consome ·
+# (d) o dispatcher de produção sobre o defeito verbatim · (e) o registro no settings.json real · (f) o hook armado
+# contra a ÁRVORE REAL (linear.py, mapa e env-check.sh de verdade) · (m) mutantes dos dois artefatos.
+# O host nasce em tempo de execução: esta bancada não carrega o host literal (o hook leria, a REGRA 105 também).
+run_direct_provider_api_selftests() {
+  local hook="${REPO_ROOT}/.claude/hooks/pretooluse-direct-provider-api.sh"
+  local chk="${REPO_ROOT}/.claude/validation/direct-provider-api-check.sh"
+  local map="${REPO_ROOT}/.claude/utils/task-manager/provider-hosts.tsv"
+  [ -f "${hook}" ] && [ -f "${chk}" ] && [ -f "${map}" ] || { record_fail "direct-provider-api" "hook, guarda ou mapa ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "direct-provider-api: python3 ausente"; return; }
+  local o rc H; H="api.linear"; H="${H}.app"
+  # (a) o --selftest do hook: 7 acusa + 7 cala, pelo caminho do runner (JSON no stdin, CLAUDE_PROJECT_DIR)
+  if o="$(LC_ALL=C bash "${hook}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 14/14 verdes' <<< "${o}"; then
+    record_pass "direct-provider-api: (a) hook --selftest verde (14: heredoc verbatim, curl, -c, variável, avulso, gravado-e-rodado, bash -c | tm.sh, citação, cat, sem rede, sem executável, inativo, aspas abertas)"
+  else record_fail "direct-provider-api: (a) hook --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (b) o --selftest da REGRA 105
+  if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 10/10 verdes' <<< "${o}"; then
+    record_pass "direct-provider-api: (b) REGRA 105 --selftest verde (10: ops/ promovido, variável, jira sem executável, workflow | adapter, markdown, comentário, sem rede, não rastreado, sem mapa)"
+  else record_fail "direct-provider-api: (b) REGRA 105 --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
+  # (c) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: passivo zero.
+  #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
+  if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/direct-provider-api-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then
+    record_pass "direct-provider-api: (c) corpus real → rc 0, nenhum script fora do adapter chama provedor"
+  else record_fail "direct-provider-api: (c) corpus real" "rc=${rc}; [$(head -3 <<< "${o}" | tr '\n' '|')]"; fi
+  # (d) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, com o defeito verbatim promovido a ops/
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null; mkdir -p "${sd}/ops"
+  printf 'import json,os,urllib.request\nr=urllib.request.Request("https://%s/graphql",data=b"{}")\n' "${H}" > "${sd}/ops/linear-move.py"
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  local l; l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/ops/linear-move.py" 2>&1 || true)"
+  if grep -q 'REGRA 105 (Script rastreado não chama a API do provedor de task manager por fora do adapter): \[chamada-direta\] 2: chama a API do linear' <<< "${l}"; then
+    record_pass "direct-provider-api: (d) o lint de produção (dispatcher) emite a REGRA 105 sobre o defeito verbatim"
+  else record_fail "direct-provider-api: (d) dispatcher" "$(grep -E 'REGRA 105|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  rm -rf "${sd}"
+  # (e) REGISTRO: o settings.json real declara o veto no PreToolUse(Bash), com onFailure: block (REGRA 101)
+  if python3 -I -B -c 'import json,sys
+d=json.load(open(sys.argv[1]))
+ok=any("pretooluse-direct-provider-api.sh" in h.get("command","") and h.get("onFailure")=="block"
+       for g in d["hooks"]["PreToolUse"] if "Bash" in (g.get("matcher") or "").split("|") for h in g["hooks"])
+sys.exit(0 if ok else 1)' "${REPO_ROOT}/.claude/settings.json" 2>/dev/null; then
+    record_pass "direct-provider-api: (e) settings.json registra o veto no PreToolUse(Bash) com onFailure: block"
+  else record_fail "direct-provider-api: (e) registro" "o veto não está no PreToolUse(Bash) do settings.json, ou sem onFailure: block"; fi
+  # (f) ARMADO CONTRA A ÁRVORE REAL: linear.py, provider-hosts.tsv e env-check.sh de verdade, provider pelo ambiente
+  _dpa_real() {  # <comando> → rc
+    local r=0
+    printf '%s' "$1" | C="${REPO_ROOT}" python3 -I -c 'import json,os,sys;print(json.dumps({"cwd":os.environ["C"],"tool_input":{"command":sys.stdin.read()}}))' \
+      | (cd "${REPO_ROOT}" && TASK_MANAGER_PROVIDER=linear TM_ENV_FILE=/nao-existe CLAUDE_PROJECT_DIR="${REPO_ROOT}" bash "${hook}" >/dev/null 2>&1) || r=$?
+    printf '%s' "${r}"
+  }
+  local r1 r2
+  r1="$(_dpa_real "python3 - <<'EOF'
+import json,urllib.request
+r=urllib.request.Request('https://${H}/graphql',data=b'{}')
+EOF")"
+  r2="$(_dpa_real "bash .claude/utils/task-manager/tm.sh item.read SAC-75")"
+  if [ "${r1}" = 2 ] && [ "${r2}" = 0 ]; then
+    record_pass "direct-provider-api: (f) na árvore real o veto ARMA (heredoc verbatim → rc 2) e o tm.sh passa (rc 0)"
+  else record_fail "direct-provider-api: (f) árvore real" "heredoc rc=${r1} (esperava 2), tm.sh rc=${r2} (esperava 0)"; fi
+  # (m) MUTANTES — revertem cada cura na CÓPIA e EXIGEM que o caso nomeado reprove. Linha: alvo@@@velho@@@novo@@@caso
+  local sb; sb="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${sb}/.claude/hooks" "${sb}/.claude/validation" "${sb}/.claude/utils/task-manager"
+  cp "${map}" "${sb}/.claude/utils/task-manager/"
+  local line tgt old new want rest src dst mo mrc
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    tgt="${line%%@@@*}"; rest="${line#*@@@}"; old="${rest%%@@@*}"; rest="${rest#*@@@}"; new="${rest%%@@@*}"; want="${rest#*@@@}"
+    if [ "${tgt}" = hook ]; then src="${hook}"; dst="${sb}/.claude/hooks/pretooluse-direct-provider-api.sh"
+    else src="${chk}"; dst="${sb}/.claude/validation/direct-provider-api-check.sh"; fi
+    cp "${src}" "${dst}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${dst}" "${old}" "${new}"; then
+      record_fail "direct-provider-api: (m) mutante não aplicou" "${tgt} ${want}"; continue
+    fi
+    if mo="$(LC_ALL=C bash "${dst}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    if [ "${mrc}" -ne 0 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "direct-provider-api: (m) mutante ${tgt} morde → ✗ ${want}"
+    else record_fail "direct-provider-api: (m) mutante NÃO morde" "${tgt} ${want} (rc=${mrc})"; fi
+  done <<'EOF_MUT'
+hook@@@judge_code(b, "heredoc " + base)@@@None@@@(i)
+hook@@@    if base in CLIENTS:@@@    if False:@@@(ii)
+hook@@@p = host_in(expand(w), False)@@@p = host_in(w, False)@@@(iv)
+hook@@@return open(path, encoding="utf-8", errors="replace").read()@@@return None@@@(v)
+hook@@@WRITES[path] = hds[0]@@@pass@@@(vi)
+hook@@@judge_shell(sub, depth + 1, cwd)@@@None@@@(vii)
+hook@@@    if base in CLIENTS:@@@    if base in CLIENTS or base in ("git", "echo", "grep"):@@@(ix)
+hook@@@if base in ("cat", "tee") and hds:@@@if [judge_shell(b, depth + 1, cwd) for b in hds] and False:@@@(x)
+hook@@@    if NET.search(text):@@@    if True:@@@(xi)
+hook@@@if os.path.isfile(os.path.join(ADAPTERS, p + ".py")) or os.path.isfile(os.path.join(ADAPTERS, p + ".sh"))]@@@if True]@@@(xii)
+hook@@@[ -n "${p}" ] && [ "${p}" = "${active}" ] || continue@@@[ -n "${p}" ] || continue@@@(xiii)
+hook@@@return                               # aspas abertas: não se prova — CALA@@@toks = text.split()@@@(xiv)
+check@@@hit = next((p for p, rx in pats if rx.search(ln)), None)@@@hit = None@@@(i)
+check@@@wf = rel.startswith(".github/workflows/") and rel.endswith((".yml", ".yaml"))@@@wf = False@@@(x)
+check@@@ or "utils/task-manager/" in "/" + rel:@@@:@@@(iv)
+check@@@EXT = (".sh",@@@EXT = (".md", ".sh",@@@(v)
+check@@@        if COMMENT.match(ln):@@@        if False:@@@(vi)
+check@@@    if not NET.search(text):@@@    if False:@@@(vii)
+check@@@git -C "${repo}" ls-files -z 2>/dev/null |@@@find "${repo}" -type f -not -path "*/.git/*" -printf "%P\0" 2>/dev/null |@@@(viii)
+check@@@if [ ! -f "${map}" ]; then@@@if false; then@@@(ix)
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_direct_provider_api_selftests
 
 # Modo kg-migrate-v3 — SAC-73 parte 1: a ferramenta de migração do corpus ao contrato v3
 # (.claude/utils/kg/kg-migrate-v3.py) cita datas, deriva provenance SÓ de fonte que o nó já traz,

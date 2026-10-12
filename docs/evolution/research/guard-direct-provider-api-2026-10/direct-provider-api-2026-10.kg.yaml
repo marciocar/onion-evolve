@@ -1,0 +1,190 @@
+# kg-backlog-guard: on
+# ═══ TETO: 10 NÓS ═══
+meta:
+  id: direct-provider-api-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-12"
+  review_after: "2026-11-26"
+  # Forja (/meta:forge-guard, SAC-75) da guarda que fecha a pergunta Q_GUARDA_API_DIRETA_DE_PROVEDOR do
+  # grafo auto-drive-2026-10: chamada direta à API de provedor de task manager fora do adapter executável.
+  # Duas peças, uma fronteira: o veto PreToolUse (o comando da sessão) e a REGRA 105 (o arquivo rastreado).
+external_edges:
+  - to: "docs/evolution/research/auto-drive-2026-10/auto-drive-2026-10.kg.yaml#Q_GUARDA_API_DIRETA_DE_PROVEDOR"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_DEFEITO_SESSAO_CHAMA_O_LINEAR_DIRETO
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "varredura dos transcripts ⟨transcripts .jsonl do Claude Code da conta⟩ em 2026-10-12: 147 comandos Bash únicos com host de provedor (2026-09-23 → 2026-10-12; onion-evolve 125, onion-kg-ssot 9, brain-granaai 7, avansat 5, gmill 1); o merge do tm.sh é c25296f9 (2026-10-11 18:37 UTC) e em 2026-10-12T03:21 a sessão principal rodou python3 - <<'EOF' com urllib.request.Request para o GraphQL do Linear"
+    trace: '.claude/hooks/pretooluse-direct-provider-api.sh'
+    label: "O DEFEITO, DATADO: a sessão reescreve o cliente do provedor em vez de usar o adapter."
+    narrative: "O DEFEITO, DATADO: a sessão reescreve o cliente do provedor em vez de usar o adapter. Em 2026-10-08 (SAC-66) isso moveu uma issue para o estado errado; em 2026-10-11 nasceu o executável (tm.sh + adapters/linear.py) e, nove horas depois, a sessão principal ainda chamou o Linear por python3 heredoc com urllib. Medido nos transcripts: 147 comandos únicos tocaram host de provedor em vinte dias, cinco repos."
+    provenance:
+      source: "transcripts do Claude Code (⟨diretório de projetos do Claude Code da conta⟩) e git log de .claude/utils/task-manager/tm.sh"
+      locator: "comandos Bash com host de provider-hosts.tsv; git log --format='%h %ad' -- .claude/utils/task-manager/tm.sh"
+      method: "medição: script Python sobre os .jsonl (forma redigida, sem token) e git log"
+      locality: "repo"
+
+  - id: E_PASSIVO_ZERO_NO_ARQUIVO_RASTREADO
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "git ls-files × grep -E dos hosts: 12 arquivos, dos quais só 2 de código (adapters/linear.py e env-check.sh, ambos em utils/task-manager); o resto é markdown (adapters, KBs, inbox) e um kg.yaml; git log -G nos .sh/.py/.js/.mjs/.ts: fora do task-manager só .cursor/utils/modern-cli-ux.sh (2025, já removido)"
+    trace: '.claude/validation/direct-provider-api-check.sh'
+    label: 'PASSIVO medido antes de escolher a severidade: ZERO arquivo de código rastreado fora do adapter chama provedor. O defeito não mora no repo, mora no comando da sessão. Por isso a REGRA 105 nasce HARD e sem catraca (mesma forma da REGRA 102), e o substrato principal é o hook.'
+    provenance:
+      source: "árvore de origin/main em 2026-10-12 (cd9d8128)"
+      locator: "git ls-files | xargs grep -lE <hosts>; git log --all -G <hosts> -- '*.sh' '*.py' '*.js' '*.mjs' '*.ts'"
+      method: "medição: grep nos arquivos rastreados e no histórico"
+      locality: "repo"
+
+  - id: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "guard-census.sh em 2026-10-12: classe NOVA (nenhuma guarda cita os hosts); moldes copiados: pretooluse-merge-gate.sh (veto PreToolUse por exit 2, registro com onFailure: block) e task-manager-executable-check.sh (helper tsv chamado pelo dispatcher, como a REGRA 104)"
+    trace: '.claude/settings.json'
+    label: "DECISÃO DE SUBSTRATO: o hook PreToolUse(Bash) é a guarda principal, porque é lá que o defeito medido mora; ele VETA (exit 2) e arma por provedor só quando existe adapters/<p>.py|.sh E <p> é o provider ativo."
+    narrative: "DECISÃO DE SUBSTRATO: o hook PreToolUse(Bash) é a guarda principal, porque é lá que o defeito medido mora; ele VETA (exit 2) e arma por provedor só quando existe adapters/<p>.py|.sh E <p> é o provider ativo. Sem executável o curl é o caminho que o adapter em prosa prescreve, e vetá-lo barraria o único caminho que existe, que é a condição escrita no nó Q. A REGRA 105 cobre a outra metade, o script avulso promovido ao repo, que o hook não lê; ela arma todos os provedores, porque o lugar do código de provedor é o adapter, com ou sem executável."
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "bash .claude/validation/guard-census.sh . --markdown; GUARD_CENSUS_QUERY='api.linear.app clickup atlassian provider '"
+      method: "medição: censo de guardas antes de escrever"
+      locality: "repo"
+
+  - id: E_REEXECUCAO_CONTRA_O_USO_REAL
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "replay dos 71 comandos únicos com o host do Linear contra o hook (CLAUDE_PROJECT_DIR = a worktree, provider linear): 68 vetados, todos com cliente HTTP real na string (a maioria encadeada depois de git/kg-radar/merge, terminando em python3 heredoc com urllib); 3 calados, todos só citando o host (censo de guardas, edição de nó, leitura de memória); 0 falso positivo, 0 escape; custo médio 70 ms por comando comum"
+    trace: '.claude/hooks/pretooluse-direct-provider-api.sh'
+    label: 'O hook contra o USO REAL: dos 71 comandos únicos que citaram o host do Linear, os 68 com chamada vetam e os 3 que só citam calam. Nenhum falso positivo nem escape na população medida. É a mesma régua da reescrita dos vetos por tokens (22.662 comandos reexecutados).'
+    provenance:
+      source: "transcripts do Claude Code (⟨diretório de projetos do Claude Code da conta⟩)"
+      locator: "replay: payload JSON {cwd, tool_input.command} por comando, rc do hook"
+      method: "medição: reexecução do hook sobre os comandos reais"
+      locality: "repo"
+
+  - id: E_MUTANTES_MORDEM
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "família run_direct_provider_api_selftests: 12 mutantes do hook e 8 da REGRA 105, cada um revertendo uma cura na cópia e exigindo o ✗ do caso nomeado — 20/20 mordem; a família inteira 26 ✓, 0 ✗, com LC_ALL=C"
+    trace: '.claude/validation/lint-selftest.sh'
+    label: "MUTANTES: as 20 curas foram revertidas uma a uma (heredoc, cliente, variável, arquivo fora, gravado-e-rodado, substituição, citação, cat, idioma de rede, armar por executável, provider ativo, aspas abertas; na REGRA 105:"
+    narrative: "MUTANTES: as 20 curas foram revertidas uma a uma (heredoc, cliente, variável, arquivo fora, gravado-e-rodado, substituição, citação, cat, idioma de rede, armar por executável, provider ativo, aspas abertas; na REGRA 105: acusa, workflow, adapter, markdown, comentário, idioma de rede, não rastreado, mapa ausente) e cada caso nomeado reprovou. Nenhum caso decorativo."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_direct_provider_api_selftests (m)"
+      method: "medição: bancada com LC_ALL=C --families direct_provider_api"
+      locality: "repo"
+
+  - id: C_TETO_O_QUE_O_HOOK_NAO_VE
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "cabeçalho do hook (O QUE NÃO VETA)"
+    trace: '.claude/hooks/pretooluse-direct-provider-api.sh'
+    label: "TETO do hook: não vê host montado em tempo de execução, variável vinda de fora da string, cat x | python3 -, herestring, WebFetch, cliente fora da lista, arquivo dentro do repo (é da REGRA 105) nem script sem python3 (cala, porque o adapter do Linear também é Python)."
+    narrative: "TETO do hook: não vê host montado em tempo de execução, variável vinda de fora da string, cat x | python3 -, herestring, WebFetch, cliente fora da lista, arquivo dentro do repo (é da REGRA 105) nem script sem python3 (cala, porque o adapter do Linear também é Python). String que não parseia cala. Não há flag de escape: verbo que o tm.sh não tem é achado, e se implementa no adapter."
+    provenance:
+      source: ".claude/hooks/pretooluse-direct-provider-api.sh"
+      locator: "cabeçalho, seção O QUE NÃO VETA"
+      method: "leitura: cabeçalho do artefato"
+      locality: "repo"
+
+  - id: C_TETO_O_QUE_A_REGRA_105_NAO_VE
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "cabeçalho de direct-provider-api-check.sh (FORA DO ESCOPO / TETO)"
+    trace: '.claude/validation/direct-provider-api-check.sh'
+    label: "TETO da REGRA 105: markdown não é julgado (documentar ≠ chamar, e o clickup.md PRESCREVE o curl enquanto não há executável); linha de comentário cala; host montado em tempo de execução passa; arquivo não rastreado ou sem extensão de código não é lido; no derivado não roda,"
+    narrative: "TETO da REGRA 105: markdown não é julgado (documentar ≠ chamar, e o clickup.md PRESCREVE o curl enquanto não há executável); linha de comentário cala; host montado em tempo de execução passa; arquivo não rastreado ou sem extensão de código não é lido; no derivado não roda, porque lá o produto do adotante pode integrar com o provedor."
+    provenance:
+      source: ".claude/validation/direct-provider-api-check.sh"
+      locator: "cabeçalho, FORA DO ESCOPO / TETO"
+      method: "leitura: cabeçalho do artefato"
+      locality: "repo"
+
+  - id: C_TETO_A_LISTA_DE_HOSTS_E_VOCABULARIO
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "provider-hosts.tsv: 5 provedores, regex do re do Python; o adapter zoho.md e a KB zoho-projects-api citam projects.zoho.com e projectsapi.zoho.com como a mesma raiz, os dois estão no mapa"
+    trace: '.claude/utils/task-manager/provider-hosts.tsv'
+    label: "TETO comum: os hosts são VOCABULÁRIO, e em guarda de lista é o vocabulário que falha. Host novo (região, gateway OAuth, versão) passa calado nas duas guardas até alguém acrescentar a linha no provider-hosts.tsv, a SSOT que as duas leem. GATILHO:"
+    narrative: "TETO comum: os hosts são VOCABULÁRIO, e em guarda de lista é o vocabulário que falha. Host novo (região, gateway OAuth, versão) passa calado nas duas guardas até alguém acrescentar a linha no provider-hosts.tsv, a SSOT que as duas leem. GATILHO: o adapter medir um host que não está no mapa."
+    provenance:
+      source: ".claude/utils/task-manager/provider-hosts.tsv"
+      locator: "linhas linear/clickup/jira/asana/zoho"
+      method: "leitura: o mapa"
+      locality: "repo"
+
+  - id: Q_ESTENDER_O_ARMAMENTO_A_OUTRO_PROVEDOR
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-12"
+    verified_against: "ls .claude/utils/task-manager/adapters/*.py *.sh: só linear.py"
+    label: "O hook arma sozinho para ClickUp, Jira, Asana ou Zoho no dia em que nascer adapters/<p>.py e o provider ativo for ele."
+    narrative: "O hook arma sozinho para ClickUp, Jira, Asana ou Zoho no dia em que nascer adapters/<p>.py e o provider ativo for ele. Não há trabalho a fazer agora; a pergunta é se esse dia chega com a bancada cobrindo o novo provedor (hoje os casos usam só o Linear e um ClickUp sem executável). GATILHO: o 2º executável de adapter."
+    provenance:
+      source: ".claude/utils/task-manager/adapters"
+      locator: "ls adapters/*.py adapters/*.sh"
+      method: "medição: listagem do diretório"
+      locality: "repo"
+edges:
+  - from: E_DEFEITO_SESSAO_CHAMA_O_LINEAR_DIRETO
+    to: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
+    edge_type: SUPPORTS
+  - from: E_PASSIVO_ZERO_NO_ARQUIVO_RASTREADO
+    to: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
+    edge_type: SUPPORTS
+  - from: E_REEXECUCAO_CONTRA_O_USO_REAL
+    to: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
+    edge_type: SUPPORTS
+  - from: E_MUTANTES_MORDEM
+    to: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
+    edge_type: SUPPORTS
+  - from: C_TETO_O_QUE_O_HOOK_NAO_VE
+    to: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
+    edge_type: CONSTRAINS
+  - from: C_TETO_O_QUE_A_REGRA_105_NAO_VE
+    to: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
+    edge_type: CONSTRAINS
+  - from: C_TETO_A_LISTA_DE_HOSTS_E_VOCABULARIO
+    to: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
+    edge_type: CONSTRAINS
+  - from: Q_ESTENDER_O_ARMAMENTO_A_OUTRO_PROVEDOR
+    to: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
+    edge_type: DEPENDS_ON
