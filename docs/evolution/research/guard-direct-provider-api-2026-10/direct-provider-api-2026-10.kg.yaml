@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 10 NÓS ═══
+# ═══ TETO: 12 NÓS ═══
 meta:
   id: direct-provider-api-2026-10
   schema_version: "1"
@@ -86,10 +86,10 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_at: "2026-10-12"
-    verified_against: "família run_direct_provider_api_selftests: 12 mutantes do hook e 8 da REGRA 105, cada um revertendo uma cura na cópia e exigindo o ✗ do caso nomeado — 20/20 mordem; a família inteira 26 ✓, 0 ✗, com LC_ALL=C"
+    verified_against: "família run_direct_provider_api_selftests: 17 mutantes do hook e 9 da REGRA 105, cada um revertendo uma cura na cópia e exigindo o ✗ do caso nomeado — 26/26 mordem; a família inteira 32 ✓, 0 ✗, com LC_ALL=C (depois da passada adversarial)"
     trace: '.claude/validation/lint-selftest.sh'
-    label: "MUTANTES: as 20 curas foram revertidas uma a uma (heredoc, cliente, variável, arquivo fora, gravado-e-rodado, substituição, citação, cat, idioma de rede, armar por executável, provider ativo, aspas abertas; na REGRA 105:"
-    narrative: "MUTANTES: as 20 curas foram revertidas uma a uma (heredoc, cliente, variável, arquivo fora, gravado-e-rodado, substituição, citação, cat, idioma de rede, armar por executável, provider ativo, aspas abertas; na REGRA 105: acusa, workflow, adapter, markdown, comentário, idioma de rede, não rastreado, mapa ausente) e cada caso nomeado reprovou. Nenhum caso decorativo."
+    label: "MUTANTES: as 26 curas (17 do hook, 9 da REGRA 105) foram revertidas uma a uma na cópia, e cada caso nomeado reprovou. Nenhum caso decorativo."
+    narrative: "Antes do Elenxo eram 20 mutantes (heredoc, cliente, variável, arquivo fora, gravado-e-rodado, substituição, citação, cat, idioma de rede, armar por executável, provider ativo, aspas abertas; na REGRA 105: acusa, workflow, adapter, markdown, comentário, idioma de rede, não rastreado, mapa ausente) e cada caso nomeado reprovou. Nenhum caso decorativo."
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_direct_provider_api_selftests (m)"
@@ -163,7 +163,26 @@ nodes:
       locator: "ls adapters/*.py adapters/*.sh"
       method: "medição: listagem do diretório"
       locality: "repo"
+  - id: E_ELENXO_ACHOU_FALSO_POSITIVO_E_ESCAPE
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "refutador em sessão isolada, mandato de falso positivo: 38 formas honestas e 16 de escape pelo caminho do runner; antes da cura 12 honestas vetavam (rc 2) e um heredoc dentro de $(…) derrubava o juiz inteiro (IndexError calado → rc 0 para o comando todo); depois da cura as 38 honestas calam, os escapes E01/E02/E05/E11/E13 vetam, a réplica do uso real segue 68/68 e a REGRA 105 cala nos três arquivos honestos do repo de teste"
+    trace: '.claude/hooks/pretooluse-direct-provider-api.sh'
+    label: "ELENXO: a 1ª forma vetava 12 comandos honestos (script de medição, heredoc que grava doc citando a chamada, comentário de shell, host num ?q= de busca, heredoc como DADO no stdin do tm.sh) e um heredoc em $(…) desligava o veto do comando inteiro. Curado no mesmo laço."
+    narrative: "As curas: idioma de rede de biblioteca (sem curl/wget em código), fora de literal de string, a até 3 linhas do host, sem comentário nem import; host ancorado no DESTINO do cliente; heredoc julgado só quando não há arquivo de script; comentário de shell recortado antes do shlex; corpos de heredoc globais para a recursão em $(…). Na REGRA 105, idioma por linguagem, janela de linhas, docstring e linha de mensagem caladas. Cada cura ganhou caso e mutante. Os escapes restantes (f-string, HTTPSConnection, perl -ne, env -S, uv run, cat | python3 -) foram para o teto do hook."
+    provenance:
+      source: ".claude/hooks/pretooluse-direct-provider-api.sh e .claude/validation/direct-provider-api-check.sh"
+      locator: "casos (xv)–(xx) do --selftest do hook e (xi) da REGRA 105; mutantes da família run_direct_provider_api_selftests"
+      method: "juízes: passada adversarial em sessão isolada, depois reexecução dos casos dela contra a cura"
+      locality: "repo"
 edges:
+  - from: E_ELENXO_ACHOU_FALSO_POSITIVO_E_ESCAPE
+    to: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
+    edge_type: CONSTRAINS
   - from: E_DEFEITO_SESSAO_CHAMA_O_LINEAR_DIRETO
     to: D_DOIS_SUBSTRATOS_UMA_FRONTEIRA
     edge_type: SUPPORTS
