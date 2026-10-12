@@ -1,5 +1,7 @@
 # kg-backlog-guard: on
-# ═══ TETO: 74 NÓS ═══
+# ═══ TETO: 85 NÓS ═══
+# LEITURAS DA SUB-DECISÃO (3) EXECUTADAS EM 2026-10-12 (rodada B): Arazzo 1.1.0, Runme (interactive, prompts, estado) e CACAO §3.1/§10.13;
+# +11 nós (10 evidências ancoradas, E_LACUNAS_SUBDECISAO_3_1012B). Veredito: SUSTENTA a proposta, com 2 nuances. Q_ e D_ seguem open.
 # RODADA DE PRIMÁRIAS EXECUTADA EM 2026-10-12 (gate D, sub-decisão 3): Arazzo 1.0.1, runme e spec CACAO v2.0 lidos;
 # +16 nós (14 evidências ancoradas, E_LACUNAS_PLAYBOOK_SDAAL_1012, Q_SUBDECISAO_3_FECHAMENTO_1012), 3 objeções 'não lido' superseded.
 # MODO DECISÃO: D_PLAYBOOK_SDAAL_SAC52 nasce OPEN — o maestro sela, esta sessão NUNCA sela.
@@ -1348,6 +1350,221 @@ nodes:
       locator: "maestro pediu o registro deste nó com o gatilho nomeado"
       method: "testemunho: pergunta e pedido de registro do maestro, 2026-10-12; medição: contagem de executáveis em .claude/utils/task-manager/adapters"
 
+  # ── Leituras da sub-decisão (3), 2026-10-12 (rodada B, à mão no modo primaries) ──
+  - id: "E_ARAZZO_110_NOTAS_SEM_PASSO_HUMANO_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "notas do release 1.1.0 (seção What's Changed): 'feat(spec): added support for AsyncAPI v3 by @nashjain in https://github.com/OAI/Arazzo-Specification/pull/367' — e a medição: 13 itens em What's Changed, zero ocorrências de approv, manual, human, persist, pause ou resume no corpo do release"
+    valid_from: "2026-05-17"
+    source_tier: 9
+    source_kind: "primary"
+    label: "As notas da Arazzo 1.1.0 trazem AsyncAPI v3, JSONPath/XPath, querystring da OAS 3.2, $self e inputs em ações de sucesso e falha. Nenhum dos 13 itens acrescenta passo humano, aprovação ou estado persistido."
+    narrative: "Fecha a lacuna (c) de E_LACUNAS_PLAYBOOK_SDAAL_1012. A 1.1.0 amplia o alcance para mensageria (AsyncAPI), mas continua sendo orquestração de chamadas. Elenxo à mão: release note é resumo do mantenedor e pode omitir mudança. Por isso a ausência foi conferida também no texto inteiro da spec 1.1.0 (E_ARAZZO_110_PASSO_E_OPERACAO_DE_API_1012B). O diff linha a linha 1.0.1...1.1.0 (link Full Changelog) NÃO foi lido. Datas: o Apêndice A da spec dá 2026-05-17; o release no GitHub foi publicado em 2026-05-18."
+    trace: "https://github.com/OAI/Arazzo-Specification/releases/tag/1.1.0"
+    provenance:
+      source: "https://github.com/OAI/Arazzo-Specification/releases/tag/1.1.0 (corpo lido por api.github.com/repos/OAI/Arazzo-Specification/releases)"
+      locator: "seção What's Changed, 1º item (PR #367); contagem dos 13 itens"
+      method: "leitura: curl do release; citação conferida por busca literal no corpo baixado; medição: grep de approv/manual/human/persist/pause/resume = 0"
+      locality: "web"
+
+  - id: "E_ARAZZO_110_PASSO_E_OPERACAO_DE_API_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "spec Arazzo 1.1.0 §5.8.5 Step Object: 'Describes a single workflow step which MAY be a call to an API operation (OpenAPI Operation Object), (AysncAPI Operations Object) or another Workflow Object.' (o typo AysncAPI está na spec) — e a medição no texto inteiro: approv 0, manual 0, persist 0, pause 0, resume 0; human só em 'human-readable' e 'human readable title'"
+    valid_from: "2026-05-17"
+    source_tier: 9
+    source_kind: "primary"
+    label: "Na Arazzo 1.1.0 o passo continua sendo chamada de operação OpenAPI, operação AsyncAPI ou outro workflow. A spec inteira não tem aprovação, passo manual nem estado persistido."
+    narrative: "Estende para a versão vigente o que E_ARAZZO_SEM_APROVACAO_NEM_ESTADO_1012 dizia só da 1.0.1, e responde à objeção de E_ARAZZO_APACHE_VERSAO_CORRENTE_1_1_0_1012 (estender era inferência; agora foi lido). O que se pode emprestar como inspiração nomeada: timeout por passo em milissegundos e dependsOn como ponto de junção (§5.8.5.1). NÃO verificado: se esses dois campos já existiam na 1.0.1. Elenxo à mão: ausência medida por grep no texto renderizado prova ausência de vocabulário, não impossibilidade de modelar um humano como 'operação' de uma API de aprovação. Esse caminho, porém, é extensão do autor e não semântica da spec, o mesmo problema já registrado (estender é inventar)."
+    trace: "https://spec.openapis.org/arazzo/v1.1.0.html"
+    provenance:
+      source: "https://spec.openapis.org/arazzo/v1.1.0.html"
+      locator: "§5.8.5 Step Object (1º parágrafo); §8 Appendix A Revision History (1.1.0, 2026-05-17)"
+      method: "leitura: curl da spec renderizada; citação conferida por busca literal no texto extraído; medição: grep case-insensitive dos termos no texto inteiro"
+      locality: "web"
+
+  - id: "E_RUNME_INTERACTIVE_E_ENTRADA_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "docs.runme.dev/configuration/cell-level, tabela de opções, linha interactive: 'Indicates if run should allow interactive input'; seção Interactive vs non-interactive cells: 'If a cell's commands do not require any input from the user it might be a good fit to include the cell's output inside the Notebook.'"
+    source_tier: 8
+    source_kind: "primary"
+    label: "No Runme o atributo interactive diz se a célula aceita entrada do usuário no terminal; não é gate de aprovação. A própria doc se contradiz no default: a tabela diz false e a seção diz true."
+    narrative: "Responde à 1ª leitura pendente do Runme. interactive=false serve para capturar a saída da célula no notebook e passá-la adiante, não para pedir licença. A contradição do default está na mesma página: a tabela de opções põe 'false' na linha interactive, e a seção Interactive vs non-interactive cells diz '... is for, and it defaults to true'. Tier 8 e não 9: é documentação de produto, não especificação normativa (o Runme não tem spec de formato com MUST/SHOULD)."
+    trace: "https://docs.runme.dev/configuration/cell-level"
+    provenance:
+      source: "https://docs.runme.dev/configuration/cell-level"
+      locator: "tabela de opções de célula, linha interactive; seção Interactive vs non-interactive cells"
+      method: "leitura: curl da página; citações conferidas por busca literal no texto extraído"
+      locality: "web"
+
+  - id: "E_RUNME_PROMPTS_DE_VARIAVEL_E_RUN_ALL_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "docs.runme.dev/configuration/cell-level, linha skipPrompts: 'Bypasses interactive prompts that require inputting environment vars or authentication confirmations.'; linha promptEnv: 'Prompt user to set exported environment vars'; docs.runme.dev/usage/run-all: '(you will be prompted if you would like to run all scripts before they are executed)'"
+    source_tier: 8
+    source_kind: "primary"
+    label: "As confirmações documentadas do Runme são de variável de ambiente (promptEnv), de autenticação e uma pergunta única antes do Run All no VS Code. Não há aprovação humana por passo especificada, e skipPrompts desliga todas."
+    narrative: "Reabre com fonte a claim (2) rejeitada como EXAGERADA em E_LACUNAS_PLAYBOOK_SDAAL_1012: o veredito agora é afirmativo e ancorado, sem o exagero. A doc documenta prompts de entrada e uma confirmação de lote, não um gate com quem aprovou, quando e com que decisão. Elenxo à mão: 'não documentado' não é 'impossível'. Um autor pode escrever uma célula com read -p para pedir confirmação, mas isso é script do autor, não semântica do formato, e o próprio --skip-prompts do CLI (runme run --all --allow-unnamed --skip-prompts) mostra que o desenho trata prompt como atrito a pular, não como controle."
+    trace: "https://docs.runme.dev/configuration/cell-level"
+    provenance:
+      source: "https://docs.runme.dev/configuration/cell-level · https://docs.runme.dev/usage/run-all"
+      locator: "tabela de opções, linhas promptEnv e skipPrompts; página Run all cells, seção Run All in VS Code"
+      method: "leitura: curl das páginas; citações conferidas por busca literal no texto extraído"
+      locality: "web"
+
+  - id: "E_RUNME_ESTADO_E_O_DO_TERMINAL_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "docs.runme.dev/usage/pipes-variables: 'Runme works a lot like a terminal, however, unlike Python's Jupyter it does not allow block-scope sharing of variables.'; README do runmedev/runme: 'Much like a terminal session, environment variables are retained across execution, and it is possible to pipe previous cells' output into successive cells.'"
+    source_tier: 8
+    source_kind: "primary"
+    label: "O estado entre células no Runme é o de uma sessão de terminal: variáveis de ambiente retidas, a saída anterior em $__ e células nomeadas em maiúsculas exportadas como variável. Não há escopo de variável por bloco."
+    narrative: "Reabre com fonte a claim (1) rejeitada como EXAGERADA em E_LACUNAS_PLAYBOOK_SDAAL_1012, agora com a frase inteira citada (inclusive o trecho do pipe que a rejeição apontou como cortado). É estado de processo, vivo enquanto a sessão existe; o registro persistido é outra coisa (E_RUNME_SESSION_OUTPUTS_REGISTRO_1012B)."
+    trace: "https://docs.runme.dev/usage/pipes-variables"
+    provenance:
+      source: "https://docs.runme.dev/usage/pipes-variables · https://raw.githubusercontent.com/runmedev/runme/main/README.md"
+      locator: "1º parágrafo de Usage of Piping and Variables; README, 2º parágrafo"
+      method: "leitura: curl da página e do README; citações conferidas por busca literal no texto extraído"
+      locality: "web"
+
+  - id: "E_RUNME_SESSION_OUTPUTS_REGISTRO_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "docs.runme.dev/usage/auto-save, seção Session Outputs: 'The session output file includes details on when each cell was run, the time it took to run the cell, and exit codes.'; seção Auto-save default: 'By default, auto-save is turned off'; aviso: 'It is strongly recommended that you do not deploy the session output files to your version control.'"
+    source_tier: 8
+    source_kind: "primary"
+    label: "O Runme tem um registro persistido de execução: o arquivo Session Outputs guarda, por célula, quando rodou, quanto durou e o exit code, mais hostname e usuário. Vem desligado por padrão e a doc manda não versioná-lo."
+    narrative: "NUANCE que limita a proposta sem derrubá-la: 'nenhum cobre estado de execução' é forte demais para o Runme. Ele tem um LOG de execução por sessão, não um estado de instância retomável (o arquivo vale até o 'Reset Session' e não é reaberto como notebook). O template em PFR pode declarar este registro como empréstimo nomeado no eixo 'estado de execução' (o que rodou, quando, com que resultado), deixando a retomada como contribuição própria. Elenxo à mão: é recurso da extensão e do cliente web, não do formato markdown; outro executor do mesmo markdown não o produz."
+    trace: "https://docs.runme.dev/usage/auto-save"
+    provenance:
+      source: "https://docs.runme.dev/usage/auto-save"
+      locator: "seções Session Outputs, Auto-save default e o aviso 💡 Session Outputs"
+      method: "leitura: curl da página; citações conferidas por busca literal no texto extraído"
+      locality: "web"
+
+  - id: "E_RUNME_VERSION_E_DA_FERRAMENTA_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "docs.runme.dev/configuration/lifecycle-identity, seção Usage: 'The current version number on your document is the version of Runme you are using.'"
+    source_tier: 8
+    source_kind: "primary"
+    label: "No Runme o campo version que a Lifecycle Identity grava no documento é a versão do próprio Runme, não a do runbook; o id é um identificador único por documento ou célula. O eixo versionamento do playbook fica com o git."
+    narrative: "Fecha o eixo versionamento para o Runme: o formato rastreia identidade (id) e a versão da ferramenta (version: v3 no exemplo), e o histórico do conteúdo depende do controle de versão do repositório. Elenxo à mão: identidade estável por célula é útil e pode ser emprestada (endereçar passo por id), mas não é versão semântica de template."
+    trace: "https://docs.runme.dev/configuration/lifecycle-identity"
+    provenance:
+      source: "https://docs.runme.dev/configuration/lifecycle-identity"
+      locator: "seção Usage, item version"
+      method: "leitura: curl da página; citação conferida por busca literal no texto extraído"
+      locality: "web"
+
+  - id: "E_CACAO_PLAYBOOK_TYPES_OPCIONAL_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    verified_against: "spec CACAO v2.0 CS01 §3.1 Playbook Properties, linha playbook_types (optional) list of open-vocab: 'A list of playbook types that specifies the operational roles that this playbook addresses. This property SHOULD be populated. The values for this property SHOULD come from the playbook-type-ov vocabulary (see section 3.1.1).'"
+    valid_from: "2023-11-27"
+    source_tier: 9
+    source_kind: "primary"
+    label: "No CACAO v2.0, playbook_types é OPCIONAL (SHOULD, não MUST) e do tipo open-vocab. O vocabulário sugerido (§3.1.1) tem 8 valores, todos de segurança: attack, detection, engagement, investigation, mitigation, notification, prevention, remediation."
+    narrative: "Responde à 3ª leitura (obrigatório? não). SHOULD em BCP 14 admite omissão justificada; um playbook de onboarding ou de release sem playbook_types é válido. O §3.2.1 reforça o peso ('considered very important and SHOULD be defined by authors') sem subir para MUST. A §10.10 sugere name e playbook_types como insumo do UUIDv5 do id, e também com SHOULD."
+    trace: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+    provenance:
+      source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+      locator: "§3.1 Playbook Properties, linha playbook_types; §3.1.1 Playbook Type Vocabulary; §3.2.1"
+      method: "leitura: curl da spec (CS01); citação conferida por busca literal no texto extraído"
+      locality: "web"
+
+  - id: "E_CACAO_OPEN_VOCAB_ACEITA_VALOR_PROPRIO_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    verified_against: "spec CACAO v2.0 CS01 §10.13 Open Vocabularies: 'When an open vocabulary is defined for a property the value or values for that property SHOULD come from the suggested vocabulary, but MAY be any other string value. Values that are not from the suggested vocabulary MUST be all lowercase and MUST use hyphens instead of spaces or underscores as word separators.'"
+    valid_from: "2023-11-27"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O vocabulário de playbook_types é ABERTO: a §10.13 admite qualquer string fora da lista sugerida, desde que em minúsculas e com hífen. Um tipo como 'onboarding' ou 'release' é valor válido pela spec."
+    narrative: "Responde à 3ª leitura (vocabulário aberto? sim; fora de segurança sem violar? sim, na letra). Matiza E_CACAO_ESCOPO_SO_CIBER: o ESCOPO declarado da spec é segurança (o nome é security-playbooks e a lista sugerida é toda de ciber), mas a GRAMÁTICA não proíbe outro domínio. Não muda o quadro dos 6 eixos: o que falta ao CACAO (aprovação humana e estado de instância especificados) continua faltando. Elenxo à mão: válido na letra não é interoperável na prática; um tipo próprio não será reconhecido por um SOAR que filtre por playbook-type-ov."
+    trace: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+    provenance:
+      source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+      locator: "§10.13 Open Vocabularies; §2.1 Vocabularies"
+      method: "leitura: curl da spec (CS01); citação conferida por busca literal no texto extraído"
+      locality: "web"
+
+  - id: "E_CACAO_TIPO_PROPRIO_TEM_CONDICOES_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "spec CACAO v2.0 CS01 §2.1: 'However, if a similar value is already in the vocabulary, that value MUST be used.'; §3.1 (playbook_activities): 'If the playbook_types property is populated and comes from the playbook-type-ov then this property MUST have at least one assigned activity.'; §3.2.2: 'This property MUST be defined if the playbook_types property is populated.'"
+    valid_from: "2023-11-27"
+    source_tier: 9
+    source_kind: "primary"
+    label: "Usar tipo próprio no CACAO tem condições: se houver valor similar na lista, ele é obrigatório. E a spec se contradiz sobre playbook_activities: a §3.1 só a exige quando o tipo vem da lista, a §3.2.2 a exige sempre que playbook_types estiver preenchido."
+    narrative: "Limita E_CACAO_OPEN_VOCAB_ACEITA_VALOR_PROPRIO_1012B sem derrubá-la. Pela leitura estrita da §3.2.2, um playbook fora de segurança que declare playbook_types próprio precisa também declarar playbook_activities. Como esse campo também é open-vocab, a exigência se cumpre com valores próprios, mas cada atividade listada MUST aparecer num passo do workflow (§3.1). É a 2ª inconsistência interna medida nesta spec (a 1ª é cacao-2.0 vs cacao-2.1, em E_CACAO_CS01_NAO_E_STANDARD_1012), o que pesa de novo contra costurar o CACAO como formato."
+    trace: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+    provenance:
+      source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+      locator: "§2.1 Vocabularies; §3.1 linha playbook_activities; §3.2.2 playbook_activities Property"
+      method: "leitura: curl da spec (CS01); citações conferidas por busca literal no texto extraído"
+      locality: "web"
+
+  - id: "E_LACUNAS_SUBDECISAO_3_1012B"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    verified_against: "contagem desta rodada: 9 documentos lidos, 0 inalcançáveis, 10 claims ancoradas com 21 citações, todas reconferidas por busca literal no documento baixado (21/21 encontradas), 0 rejeitadas"
+    source_tier: 10
+    source_kind: "internal-audit"
+    label: "CONTABILIDADE 2026-10-12 (rodada B): 9 documentos lidos, 0 inalcançáveis; 10 claims ancoradas, 21 citações reconferidas (21/21), 0 rejeitadas. Fecha as 3 leituras pedidas por Q_SUBDECISAO_3_FECHAMENTO_1012; o veredito SUSTENTA a proposta, com 2 nuances."
+    narrative: "FONTES LIDAS (9): release 1.1.0 da Arazzo (corpo via API do GitHub); spec.openapis.org/arazzo/v1.1.0.html; docs.runme.dev/configuration/cell-level; docs.runme.dev/usage/pipes-variables; docs.runme.dev/usage/auto-save; docs.runme.dev/usage/run-all; docs.runme.dev/configuration/lifecycle-identity; README do runmedev/runme; spec CACAO v2.0 CS01 (HTML). INALCANÇÁVEIS: nenhuma. Uma WebSearch sobre o estado de sessão no Runme não devolveu página do docs.runme.dev; foi contornada pelo sitemap.xml, que levou às páginas acima. MÉTODO: curl de cada documento, extração de texto, citação verbatim e reconferência por busca literal (script de verificação, 21/21). RESPOSTAS: (1) Arazzo 1.1.0 não acrescenta passo humano, aprovação nem estado persistido; acrescenta AsyncAPI. (2) Runme: interactive é entrada no terminal; os prompts são de variável, de autenticação e de Run All; o estado é o da sessão de terminal. Existe, porém, um LOG persistido de execução (Session Outputs), e a versão gravada é a da ferramenta. (3) CACAO: playbook_types é opcional (SHOULD) e de vocabulário aberto; uso fora de segurança é válido na letra, com as condições da §2.1 e a contradição §3.1 vs §3.2.2. VEREDITO: SUSTENTA 'nenhum formato aberto cobre os 6 eixos'. NUANCES para o template declarar: (a) no eixo estado de execução, o Runme tem registro de execução (não retomável), empréstimo nomeável; (b) a frase da SYNTHESIS 'o vocabulário de tipos é só de segurança' passa a 'o vocabulário SUGERIDO é só de segurança, e é aberto'. NÃO-VERIFICADOS: o diff linha a linha Arazzo 1.0.1...1.1.0 (só as notas e o texto 1.1.0); se timeout e dependsOn já existiam na 1.0.1; a adoção medida de qualquer dos três (lacuna (d) de E_LACUNAS_PLAYBOOK_SDAAL_1012, que segue aberta). O selo é do maestro: Q_SUBDECISAO_3_FECHAMENTO_1012 e D_PLAYBOOK_SDAAL_SAC52 seguem open."
+    trace: "docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml"
+    provenance:
+      source: "esta rodada de leitura (2026-10-12): os 9 documentos listados na narrative"
+      locator: "nós *_1012B deste grafo"
+      method: "medição: contagem de documentos, claims e citações reconferidas por busca literal"
+      locality: "web"
+
 edges:
   - from: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
     to: D_PLAYBOOK_SDAAL_SAC52
@@ -1680,3 +1897,54 @@ edges:
   - from: Q_SDAAL_KIT_REPO_SEPARADO
     to: D_PLAYBOOK_SDAAL_SAC52
     edge_type: DEPENDS_ON
+  # leituras da sub-decisão (3), rodada B (2026-10-12): o selo segue com o maestro
+  - from: E_ARAZZO_110_NOTAS_SEM_PASSO_HUMANO_1012B
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_110_PASSO_E_OPERACAO_DE_API_1012B
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_110_NOTAS_SEM_PASSO_HUMANO_1012B
+    to: E_ARAZZO_SEM_APROVACAO_NEM_ESTADO_1012
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_110_PASSO_E_OPERACAO_DE_API_1012B
+    to: E_ARAZZO_SEM_APROVACAO_NEM_ESTADO_1012
+    edge_type: SUPPORTS
+  - from: E_RUNME_INTERACTIVE_E_ENTRADA_1012B
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
+  - from: E_RUNME_PROMPTS_DE_VARIAVEL_E_RUN_ALL_1012B
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
+  - from: E_RUNME_ESTADO_E_O_DO_TERMINAL_1012B
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
+  - from: E_RUNME_VERSION_E_DA_FERRAMENTA_1012B
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
+  # limita sem derrubar: o Runme tem LOG persistido de execução (não estado retomável)
+  - from: E_RUNME_SESSION_OUTPUTS_REGISTRO_1012B
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: CONSTRAINS
+  - from: E_CACAO_PLAYBOOK_TYPES_OPCIONAL_1012B
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
+  - from: E_CACAO_OPEN_VOCAB_ACEITA_VALOR_PROPRIO_1012B
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
+  # o escopo declarado é ciber, mas a gramática admite outro domínio
+  - from: E_CACAO_PLAYBOOK_TYPES_OPCIONAL_1012B
+    to: E_CACAO_ESCOPO_SO_CIBER
+    edge_type: CONSTRAINS
+  - from: E_CACAO_OPEN_VOCAB_ACEITA_VALOR_PROPRIO_1012B
+    to: E_CACAO_ESCOPO_SO_CIBER
+    edge_type: CONSTRAINS
+  - from: E_CACAO_TIPO_PROPRIO_TEM_CONDICOES_1012B
+    to: E_CACAO_OPEN_VOCAB_ACEITA_VALOR_PROPRIO_1012B
+    edge_type: CONSTRAINS
+  - from: E_CACAO_TIPO_PROPRIO_TEM_CONDICOES_1012B
+    to: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_SUBDECISAO_3_1012B
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
