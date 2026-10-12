@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**464 itens abertos** em 98 grafo(s) com aberto (de 125 no escopo) · 99 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**465 itens abertos** em 98 grafo(s) com aberto (de 125 no escopo) · 99 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -68,7 +68,7 @@
 | 13.8 | `C_OPCAO_BD_PACOTE_NO_FORMATO_GURU` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (b mais d) — O PACOTE NA FORMA QUE O MERCADO JA VALIDOU: software de conhecimento VERIFICADO com conducao humana EMBUTIDA, |
 | 13.8 | `C_OPCAO_D_CONDUCAO_COMO_SERVICO` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (d) — CONDUCAO / ADOCAO COMO SERVICO: cobrar pelo metodo (/meta:adopt, gate instalado, federacao) de forma recorrente. A F |
 
-## playbook-sdaal-2026-10 — 7 item(ns)
+## playbook-sdaal-2026-10 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -78,6 +78,7 @@
 | 9.6 | `Q_SUBDECISAO_3_FECHAMENTO_1012` | playbook-sdaal-2026-10 | PROPOSTA ao maestro (não selo): fechar a sub-decisão (3) como 'nenhum formato aberto cobre os 6 eixos; o template em PFR declara |
 | 8.2 | `C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER` | playbook-sdaal-2026-10 | Opção C: costurar o CACAO v2.0 (OASIS) por SDAAL como primeiro adapter, na fatia de compliance/segurança. |
 | 8.0 | `C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS` | playbook-sdaal-2026-10 | Opção B: criar a abstração SDAAL completa (interface Playbook + adapters por tipo e por framework) nos 4 domínios, como pede  |
+| 4.8 | `Q_SDAAL_KIT_REPO_SEPARADO` | playbook-sdaal-2026-10 | GATED: extrair um KIT DE CONTRATO SDAAL para repo próprio versionado por pin, no molde do kg-ssot. Gatilho (os 2 juntos): execut |
 | 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
 
 ## canal-vivo-sessoes-2026-10 — 2 item(ns)

@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 73 NÓS ═══
+# ═══ TETO: 74 NÓS ═══
 # RODADA DE PRIMÁRIAS EXECUTADA EM 2026-10-12 (gate D, sub-decisão 3): Arazzo 1.0.1, runme e spec CACAO v2.0 lidos;
 # +16 nós (14 evidências ancoradas, E_LACUNAS_PLAYBOOK_SDAAL_1012, Q_SUBDECISAO_3_FECHAMENTO_1012), 3 objeções 'não lido' superseded.
 # MODO DECISÃO: D_PLAYBOOK_SDAAL_SAC52 nasce OPEN — o maestro sela, esta sessão NUNCA sela.
@@ -1332,6 +1332,22 @@ nodes:
     narrative: "Nenhum dos três cobre aprovação humana e estado de instância especificados, o que reforça a opção A já selada em D_PLAYBOOK_SDAAL_SAC52. Costuras parciais a registrar no template: JSON Schema 2020-12 para entradas, a semântica successCriteria/goto/end/retry do Arazzo como inspiração nomeada, os tipos de passo do CACAO (if/while/switch/parallel/playbook-action, timeout por passo, comando manual) como referência, e o Runme no máximo como substrato de execução plugável. A rodada NÃO sustenta: 'nenhum formato serve' para a Arazzo vigente (1.1.0), qualquer afirmação sobre estado e aprovação no Runme, CACAO inválido fora de segurança, ranking por adoção. Leituras pendentes: notas de versão da Arazzo 1.1.0; doc do Runme sobre interactive, confirmações e estado de sessão; CACAO §3.1 sobre playbook_types (obrigatório? vocabulário aberto?). Se nenhuma reverter o quadro, o maestro sela."
     trace: "run /onion-research wf_5ceb8e1b-6d6, gate D de D_PLAYBOOK_SDAAL_SAC52 (2026-10-12)"
 
+  - id: "Q_SDAAL_KIT_REPO_SEPARADO"
+    node_type: "question"
+    plane: "DEV"
+    status: "open"
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-12"
+    verified_against: "medido em 2026-10-12: há 1 provedor com executável (linear.py via tm.sh, PR #1038) e 0 consumidores fora do core. O precedente que funcionou separado é o kg-ssot (contrato executável consumido por pin em mais de um repo)"
+    label: "GATED: extrair um KIT DE CONTRATO SDAAL para repo próprio versionado por pin, no molde do kg-ssot. Gatilho (os 2 juntos): executável para 2+ provedores e 1 consumidor fora do Onion."
+    narrative: "Pergunta do maestro em 2026-10-12: o SDAAL deveria virar um repo separado, versionado e usado pelo Onion como o kg-ssot? Resposta: ainda não. O que viajaria é o KIT DE CONTRATO: o esquema da interface, o formato .capabilities.tsv, os checks das REGRAS 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte) e 104 (Executável do adapter e declaração de capacidades listam os mesmos verbos) e a bancada de conformidade. A doutrina (integrations.md) e os adapters acoplados aos comandos ficam no core. Separar antes do gatilho paga o custo do pin (bump e PR cruzado) sem ter quem receba, contra o pull-not-push. GATILHO, com as duas condições juntas: (1) o contrato estabiliza, com executável para 2 ou mais provedores; (2) existe um consumidor fora do Onion, por exemplo o MCP do Company Brain (SAC-70) operando tasks ou um adotante usando o tm.sh sem o framework. Casa com a estratégia de peças estratégicas em repos próprios, em que o core absorve o que elas provam."
+    trace: "pergunta do maestro na sessão de 2026-10-12 · .claude/utils/task-manager/tm.sh (PR #1038)"
+    provenance:
+      source: "pergunta do maestro na sessão de 2026-10-12 e medição do estado do SDAAL no core"
+      locator: "maestro pediu o registro deste nó com o gatilho nomeado"
+      method: "testemunho: pergunta e pedido de registro do maestro, 2026-10-12; medição: contagem de executáveis em .claude/utils/task-manager/adapters"
+
 edges:
   - from: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
     to: D_PLAYBOOK_SDAAL_SAC52
@@ -1661,3 +1677,6 @@ edges:
   - from: Q_SUBDECISAO_3_FECHAMENTO_1012
     to: D_PLAYBOOK_SDAAL_SAC52
     edge_type: TRACES_TO
+  - from: Q_SDAAL_KIT_REPO_SEPARADO
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: DEPENDS_ON
