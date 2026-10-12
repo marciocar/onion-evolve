@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**463 itens abertos** em 98 grafo(s) com aberto (de 125 no escopo) · 99 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**463 itens abertos** em 99 grafo(s) com aberto (de 126 no escopo) · 100 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -368,7 +368,7 @@
 | 26.4 | `C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN` | task-manager-vocabulario-2026-10 | O formato do texto rico (descrição e comentário) é heterogêneo e deve ser resolvido no adapter, não na interface: ADF no Jir |
 | 18.0 | `D_TASK_MANAGER_INTERFACE_WAVE2` | task-manager-vocabulario-2026-10 | Onda 2: interface.md declara o vocabulário canônico e 24 capacidades (12 required, 12 optional) com assinatura; cada adapter dec |
 | 13.5 | `C_BULK_IS_PER_OPERATION_NOT_UNIFORM` | task-manager-vocabulario-2026-10 | Operação em lote não é capacidade uniforme: Jira (Cloud e DC) ancora só bulk create (Cloud até 50), Asana tem batch genéric |
-| 8.0 | `Q_WAVE2_PRIMARIES_CELLS` | task-manager-vocabulario-2026-10 | 2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as célu |
+| 10.0 | `Q_WAVE2_PRIMARIES_CELLS` | task-manager-vocabulario-2026-10 | 2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as célu |
 | 3.0 | `Q_JIRA_STATUS_BY_PUT_MEASURE` | task-manager-vocabulario-2026-10 | Medir ao vivo se PUT /rest/api/3/issue/{key} consegue definir status, antes de interface.md declarar 'transição obrigatória' pa |
 
 ## slm-capitalizacao-2026-10 — 8 item(ns)
@@ -595,12 +595,11 @@
 | 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
 
-## auto-drive-2026-10 — 2 item(ns)
+## auto-drive-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 15.4 | `D_AUTO_DRIVE_DEGRAU_AUTOMATE` | auto-drive-2026-10 | proposta: forjar o degrau AUTOMATE do /meta:drive, que conduz 1..n raízes e a cadeia inteira até o merge, com paradas duras e re |
-| 3.6 | `Q_GUARDA_API_DIRETA_DE_PROVEDOR` | auto-drive-2026-10 | guarda que acusa chamada direta à API de provedor de task manager fora do adapter executável; só nasce depois do SAC-65 |
 
 ## cedar-2026-10 — 3 item(ns)
 
@@ -928,6 +927,12 @@
 |--:|---|---|---|
 | 3.2 | `C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON` | vetos-fail-closed-2026-10 | o recorte sem python3 dos dois vetos é sombreado no core: o env-guard, registrado no mesmo matcher, barra todo Read, Grep e Bash  |
 | 2.8 | `C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL` | vetos-fail-closed-2026-10 | falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, po |
+
+## direct-provider-api-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.8 | `Q_ESTENDER_O_ARMAMENTO_A_OUTRO_PROVEDOR` | direct-provider-api-2026-10 | O hook arma sozinho para ClickUp, Jira, Asana ou Zoho no dia em que nascer adapters/<p>.py e o provider ativo for ele. |
 
 ## inbox-triage-2026-10-04 — 1 item(ns)
 
