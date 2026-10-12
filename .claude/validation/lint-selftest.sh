@@ -29818,6 +29818,28 @@ DEC_PY
       record_pass "decide: (s11) dívida de contrato pré-existente → rc 2 no passo 0 (não é culpa do selo), nada escrito"
     else record_fail "decide: (s11)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
   else record_skip "decide: (s7)/(s11) contrato não vendorizado ou jsonschema ausente (o 2º gate NÃO verificado)"; fi
+  # (s12) repo que É o produto KG-SSOT (sem vendor/kg-ssot, com tools/kg_validate.py): o leitor local é o 2º
+  #       gate (sinal de campo do onion-kg-ssot, 2026-10-12: lá o selador selava sem conferir o contrato). O
+  #       leitor falso reprova só o grafo JÁ selado (com «), então o passo 0 passa e a reprovação é do selo.
+  local rk="${sb}/produto"; mkdir -p "${rk}/tools" "${rk}/docs"
+  "${G[@]}" -C "${rk}" init -q . 2>/dev/null
+  printf 'import sys\nsys.exit(1 if "\u00ab" in open(sys.argv[-1], encoding="utf-8").read() else 0)\n' > "${rk}/tools/kg_validate.py"
+  cp "${r}/docs/a/a.kg.yaml" "${rk}/docs/g.kg.yaml"; h0="$(sha256sum "${rk}/docs/g.kg.yaml" | cut -d' ' -f1)"
+  if out="$(bash "${seal}" "${rk}/docs/g.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 3 ] && grep -q 'o contrato REPROVOU o grafo selado' <<< "${out}" && [ "$(sha256sum "${rk}/docs/g.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
+    printf 'import sys\nsys.exit(0)\n' > "${rk}/tools/kg_validate.py"
+    if out="$(bash "${seal}" "${rk}/docs/g.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" -eq 0 ] && grep -q 'contrato rc 0 por tools/kg_validate.py' <<< "${out}"; then
+      record_pass "decide: (s12) sem vendor, o tools/kg_validate.py do produto é o 2º gate: reprova → rc 3 desfeito; passa → rc 0 nomeando o leitor"
+    else record_fail "decide: (s12)" "leitor local que passa: rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  else record_fail "decide: (s12)" "leitor local que reprova não desfez: rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  # (s13) repo git sem leitor nenhum: a mensagem diz que falta o LEITOR, não "fora de repo git"
+  local rn="${sb}/semleitor"; mkdir -p "${rn}"; "${G[@]}" -C "${rn}" init -q . 2>/dev/null
+  cp "${r}/docs/a/a.kg.yaml" "${rn}/g.kg.yaml"
+  if out="$(bash "${seal}" "${rn}/g.kg.yaml" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q 'repo git sem leitor de contrato' <<< "${out}" && ! grep -q 'fora de repo git' <<< "${out}"; then
+    record_pass "decide: (s13) repo git sem leitor de contrato é nomeado como tal, não como 'fora de repo git'"
+  else record_fail "decide: (s13)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
   rm -rf "${sb}"
 }
 _family run_decide_selftests
