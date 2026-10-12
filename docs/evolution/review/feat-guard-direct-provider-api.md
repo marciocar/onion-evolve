@@ -2,7 +2,8 @@
 title: 'Resíduo — a sessão não reescreve mais o cliente do provedor'
 date: 2026-10-12
 branch: feat/guard-direct-provider-api
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d4e393ceb7f8e60fab9575c022d0575cecd66d12ec0431a2eb8272dea34d54b2
+reviewed_code_sha256: 29c65f328a2913d7e210cc49955b93b65b9bf8055d383649fd706411a68718b0
 findings_total: 6
 findings_real: 6
 findings_fixed: 6

@@ -158,6 +158,10 @@
 .claude/hooks/premodelswitch-guard.sh	E_LACUNAS_E3_0903	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_LACUNAS_E3_0904	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
+.claude/hooks/pretooluse-direct-provider-api.sh	C_TETO_O_QUE_O_HOOK_NAO_VE	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
+.claude/hooks/pretooluse-direct-provider-api.sh	E_DEFEITO_SESSAO_CHAMA_O_LINEAR_DIRETO	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
+.claude/hooks/pretooluse-direct-provider-api.sh	E_ELENXO_ACHOU_FALSO_POSITIVO_E_ESCAPE	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
+.claude/hooks/pretooluse-direct-provider-api.sh	E_REEXECUCAO_CONTRA_O_USO_REAL	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_LINEAR	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_VETOU_COMANDO_SEM_ENV	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
@@ -177,6 +181,7 @@
 .claude/rules/kg-grammar.md	C_TETO_PERFIL_YAML_E_DO_CONTRATO	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
 .claude/rules/research-lens.md	E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 .claude/settings.json	C_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
+.claude/settings.json	D_DOIS_SUBSTRATOS_UMA_FRONTEIRA	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/settings.json	E_D2_SRC	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/settings.json	E_F5_DENY_READ_COBERTURA_E_O_ALLOW_DO_ENV	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/settings.json	E_F8_STOP_HOOK_NAO_SE_APLICA	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
@@ -333,6 +338,7 @@
 .claude/utils/task-manager/progress.sh	D_MIXED_CAI_NA_CONTAGEM	docs/evolution/research/task-progress-story-points-2026-10/task-progress-story-points-2026-10.kg.yaml
 .claude/utils/task-manager/progress.sh	D_PROGRESS_E_DERIVACAO_COM_HELPER	docs/evolution/research/task-progress-story-points-2026-10/task-progress-story-points-2026-10.kg.yaml
 .claude/utils/task-manager/progress.sh	E_PERCENTUAL_PONDERADO_E_DECLARADO	docs/evolution/research/task-progress-story-points-2026-10/task-progress-story-points-2026-10.kg.yaml
+.claude/utils/task-manager/provider-hosts.tsv	C_TETO_A_LISTA_DE_HOSTS_E_VOCABULARIO	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/validation/	E_sem_gate_client_safe	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 .claude/validation/agent-frontmatter-keys-check.sh	D_SUBSTRATO_CHECK_DE_LINT_COM_SSOT_TSV	docs/evolution/research/guard-agent-frontmatter-keys-2026-10/agent-frontmatter-keys-2026-10.kg.yaml
 .claude/validation/aside-router.sh	E_ASIDE_ROUTER_GATE_E_PROMPT	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
@@ -349,6 +355,8 @@
 .claude/validation/consumed-mode-check.sh	Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/cycle-completion.sh	Q_CYCLE_COMPLETION_MEDE_RECENCIA_PELO_STATE	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/validation/diary-index.sh	D_GUARDA_DO_MARCADOR_NA_FONTE	docs/onion/graph/residuos-2026-08-18.kg.yaml
+.claude/validation/direct-provider-api-check.sh	C_TETO_O_QUE_A_REGRA_105_NAO_VE	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
+.claude/validation/direct-provider-api-check.sh	E_PASSIVO_ZERO_NO_ARQUIVO_RASTREADO	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/validation/dissect-census.sh	D_PLANO_DE_ABSORCAO_E_NO	docs/evolution/research/dissect-forge-2026-10/dissect-forge-2026-10.kg.yaml
 .claude/validation/door-role-parity-check.sh	D_PAPEL_DUAS_DIMENSOES	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/door-staleness-baseline.txt	E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR	docs/onion/graph/federation-health-2026-07.kg.yaml
@@ -512,6 +520,7 @@
 .claude/validation/lint-selftest.sh	E_FAILSAFE_AFROUXADO_REPROVOU_POR_MEDICAO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_FIXTURE_NA_ARVORE_VIVA_CORRE_COM_AS_FAIXAS	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_MAPA_SEM_MERGE_ONION_HOOKS	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
+.claude/validation/lint-selftest.sh	E_MUTANTES_MORDEM	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_OBJECAO_1_DOR_E_SCRIPT_SEQUENCIAL_NAO_HOOK	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_PRECOMMIT_SELECAO_GROSSA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
