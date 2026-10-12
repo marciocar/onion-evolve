@@ -29833,6 +29833,34 @@ DEC_PY
       record_pass "decide: (s12) sem vendor, o tools/kg_validate.py do produto é o 2º gate: reprova → rc 3 desfeito; passa → rc 0 nomeando o leitor"
     else record_fail "decide: (s12)" "leitor local que passa: rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
   else record_fail "decide: (s12)" "leitor local que reprova não desfez: rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  # (s14) --new --link para um nó que NASCEU no mesmo movimento (órfão até o selo criar a aresta): tolerado só
+  #       quando a única reprovação é o órfão do PRÓPRIO alvo do --link (dogfood da triagem de um sinal, 2026-10-12)
+  local ro="${sb}/orfao.kg.yaml"; cp "${r}/docs/a/a.kg.yaml" "${ro}"
+  python3 - "${ro}" <<'DEC_ORF'
+import sys
+p = sys.argv[1]; s = open(p).read()
+n = ("  - id: E_NOVO_ORFAO\n    node_type: evidence\n    layer: audit\n    plane: DEV\n    status: confirmed\n    impact: 3\n"
+     "    confidence: 0.8\n    verified_at: \"2026-10-12\"\n    verified_against: \"medido\"\n    label: \"evidência nova\"\n"
+     "    provenance:\n      source: \"S\"\n      locator: \"L\"\n      method: \"medição: M\"\n      locality: \"repo\"\n")
+i = s.index("\nedges:"); open(p, "w").write(s[:i] + "\n" + n.rstrip("\n") + s[i:])
+DEC_ORF
+  local _ko=""
+  if out="$(bash "${seal}" "${ro}" --new D_DA_EVIDENCIA_NOVA --label "decidiu-se pela evidência nova" --link E_NOVO_ORFAO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 0 ] && grep -q 'órfão antes do selo — tolerado' <<< "${out}"; } || _ko="${_ko} link-para-orfao-rc${rc}"
+  cp "${r}/docs/a/a.kg.yaml" "${ro}"
+  python3 - "${ro}" <<'DEC_ORF2'
+import sys
+p = sys.argv[1]; s = open(p).read()
+n = ("  - id: E_OUTRO_ORFAO\n    node_type: evidence\n    layer: audit\n    plane: DEV\n    status: confirmed\n    impact: 3\n"
+     "    confidence: 0.8\n    verified_at: \"2026-10-12\"\n    verified_against: \"medido\"\n    label: \"órfão alheio\"\n"
+     "    provenance:\n      source: \"S\"\n      locator: \"L\"\n      method: \"medição: M\"\n      locality: \"repo\"\n")
+i = s.index("\nedges:"); open(p, "w").write(s[:i] + "\n" + n.rstrip("\n") + s[i:])
+DEC_ORF2
+  if out="$(bash "${seal}" "${ro}" --new D_OUTRA --label "outra" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 2 ] && grep -q 'JÁ reprova no radar' <<< "${out}"; } || _ko="${_ko} orfao-alheio-nao-recusou-rc${rc}"
+  if [ -z "${_ko}" ]; then
+    record_pass "decide: (s14) --link para nó nascido no mesmo movimento é tolerado; órfão de OUTRO nó segue recusado (rc 2)"
+  else record_fail "decide: (s14)" "${_ko}"; fi
   # (s13) repo git sem leitor nenhum: a mensagem diz que falta o LEITOR, não "fora de repo git"
   local rn="${sb}/semleitor"; mkdir -p "${rn}"; "${G[@]}" -C "${rn}" init -q . 2>/dev/null
   cp "${r}/docs/a/a.kg.yaml" "${rn}/g.kg.yaml"
