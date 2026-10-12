@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**465 itens abertos** em 100 grafo(s) com aberto (de 127 no escopo) · 101 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**458 itens abertos** em 99 grafo(s) com aberto (de 127 no escopo) · 100 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -80,12 +80,11 @@
 | 4.8 | `Q_SDAAL_KIT_REPO_SEPARADO` | playbook-sdaal-2026-10 | GATED: extrair um KIT DE CONTRATO SDAAL para repo próprio versionado por pin, no molde do kg-ssot. Gatilho (os 2 juntos): execut |
 | 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
 
-## canal-vivo-sessoes-2026-10 — 2 item(ns)
+## canal-vivo-sessoes-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 74.4 | `C_LIVE_CLASS_DESIGN_CONSTRAINTS` | canal-vivo-sessoes-2026-10 | Restrições que a evidência ancorada impõe ao desenho da classe 'live' (NÃO é decisão): (1) cc-peer só vale DENTRO da mesma |
-| 32.0 | `Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS` | canal-vivo-sessoes-2026-10 | Como desenhar a classe 'live' da federation-transport (adapter por adotante: cc-peer·slack·teams·a2a) para comunicação DIRETA |
 
 ## jev-decision-round2-2026-10 — 10 item(ns)
 
@@ -227,7 +226,7 @@
 | 4.0 | `Q_JEV_ARCHITECTURE_UNKNOWN` | jev-type-safe-ai-2026-10 | Como o JEV e CONSTRUIDO e TREINADO? Hipoteses a testar na rodada seguinte: LLM com decodificacao restrita ao conjunto de rotulos;  |
 | 2.0 | `E_OPENROUTER_SLUG_NOT_CONFIRMED` | jev-type-safe-ai-2026-10 | A unica tentativa de bater a lista de gateways num catalogo de ORIGEM falhou: o slug de OpenRouter citado pelo revendedor devolveu |
 
-## nanochat-eixo-d-2026-10 — 5 item(ns)
+## nanochat-eixo-d-2026-10 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -235,7 +234,6 @@
 | 42.2 | `C_EIXO_D_BUDGET_ORDER_OF_MAGNITUDE_ONLY` | nanochat-eixo-d-2026-10 | RESPOSTA A DUVIDA DO MAESTRO ("qual o orcamento de dados sinteticos e identidade?"): a rodada sustenta so uma ORDEM DE GRANDEZA DE |
 | 19.2 | `C_EIXO_D_OPTION_D_SECOND_GATE_EVAL` | nanochat-eixo-d-2026-10 | Projecao local de C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY (pai): a opcao D CONTINUA GATED e ganha um SEGUNDO gate alem da falta de co |
 | 11.0 | `C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN` | nanochat-eixo-d-2026-10 | Sentido (a) e S7_claim_analogy_breaks, na forma que a rodada consegue dar: identidade em pesos exige RETREINO DE ESTAGIOS por muda |
-| 7.2 | `Q_EIXO_D_RECONCILE_PARENT_GRAPH` | nanochat-eixo-d-2026-10 | PROPOSTA (o maestro decide; este grafo nao edita o pai nem toca o selo): (1) o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10  |
 
 ## unidade-bilhetavel-do-onion-2026-10 — 8 item(ns)
 
@@ -595,12 +593,6 @@
 | 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
 
-## auto-drive-2026-10 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 15.4 | `D_AUTO_DRIVE_DEGRAU_AUTOMATE` | auto-drive-2026-10 | proposta: forjar o degrau AUTOMATE do /meta:drive, que conduz 1..n raízes e a cadeia inteira até o merge, com paradas duras e re |
-
 ## cedar-2026-10 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -625,24 +617,22 @@
 | 5.1 | `Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA` | radar-E3-2026-10-03-r6 | BURACO DE FLUXO 2 (de 3), apontado pelo maestro: "visao da comunidade sobre a versao" NAO entra na rodada E3 por construcao. Medid |
 | 5.1 | `Q_SKILL_VERIFY_E_ABSORCAO_SEM_TROCAR_MECANISMO` | radar-E3-2026-10-03-r6 | A 2.1.286 (30/09) — e NAO a 2.1.287 como a 1a passada afirmou, e a versao errada era de DENTRO da janela que eu declarei selada  |
 
-## identidade-onion-vps-2026-08 — 7 item(ns)
+## identidade-onion-vps-2026-08 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 14.2 | `E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO` | identidade-onion-vps-2026-08 | O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotan |
-| 12.0 | `Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO` | identidade-onion-vps-2026-08 | ACHADO DE ADOTANTE, não comunicado (ação do maestro): o docker-compose.yml rastreado em ArandekBR/arandek tem cinco segredos li |
 | 8.0 | `E_MEMORIA_DE_AGENTE_E_COMMODITY_PELO_DINHEIRO` | identidade-onion-vps-2026-08 | O EIXO DO DINHEIRO RESPONDE O QUE DOUTRINA NENHUMA RESPONDE, e o veredito e desconfortavel: `Agent Memory Systems` e **3,4% dos de |
 | 6.4 | `Q_REFUTES_EDGE_SEM_PAR` | identidade-onion-vps-2026-08 | A lacuna REAL que restou do Q_LACUNA refutado: a aresta REFUTES tipada (refutacao como cidada de 1a classe do grafo, com reconcili |
 | 5.6 | `Q_LOGTO_QUANDO_FECHAR_O_CADASTRO` | identidade-onion-vps-2026-08 | quando fechar de novo o cadastro do Logto (signInMode: SignIn) — GATILHO: o propósito do cadastro aberto acabar, surgir conta q |
 | 5.4 | `Q_SENHA_CHAVE_ESTADO_2026_09` | identidade-onion-vps-2026-08 | ESTADO ATUAL da chave GPG com passphrase (substitui o no de 08-12 que misturava >=9 afirmacoes): a protecao FICA (decisao do maest |
 | 4.8 | `Q_MAIS_UM_IMUTAVEL_GATED` | identidade-onion-vps-2026-08 | O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda d |
 
-## onion-plugin-publication-2026-08 — 6 item(ns)
+## onion-plugin-publication-2026-08 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 14.2 | `Q_UPDATE_EXIGE_ADOCAO_INTEGRADA` | onion-plugin-publication-2026-08 | ACHADO DO 1o --update REAL DE UM GREENFIELD (2026-09-05, medido): o `vendor-branch update` recusa com rc=11 BASE CRUZADA enquanto  |
-| 7.6 | `Q_LINT_ABORTA_SEM_PYTHON_E_NAO_DIZ` | onion-plugin-publication-2026-08 | FAIL-OPEN DE GATE pré-existente (medido in-tree, 2026-09-06): sem python3 no PATH, o lint-artifacts.sh aborta após a REGRA 39 se |
 | 7.6 | `Q_MARKETPLACE_PUBLICO_EM_GERACAO_ANTIGA` | onion-plugin-publication-2026-08 | DIVIDA MEDIDA (sinal de campo 2026-09-05): o repo publico marciocar/onion-plugins esta na geracao PRE-CONSOLIDACAO (8 plugins) enq |
 | 5.7 | `Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA` | onion-plugin-publication-2026-08 | ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEI |
 | 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
@@ -725,15 +715,6 @@
 |--:|---|---|---|
 | 9.0 | `E_ITEM6_VERIFY` | session-2026-07-18-evolve-review-triage | drive-to-verify: os 5 pontos sao o MESMO conceito enquadrado por audiencia/profundidade (index vs normativo vs troubleshooting); e |
 
-## audit-textual-gates-2026-09 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.4 | `D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO` | audit-textual-gates-2026-09 | DECISÃO PROPOSTA: do MOAT do /meta:drive só o merge ganhou veto; deploy fora dos wrappers, push em repo alheio (git -C <clone de |
-| 4.8 | `Q_REGRA56_VERACIDADE_DOS_ACHADOS` | audit-textual-gates-2026-09 | Quanto os campos findings_total/findings_real/verdict do residuo R56 correspondem a achados REAIS quando o revisor e a propria ses |
-| 3.6 | `Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO` | audit-textual-gates-2026-09 | O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotant |
-| 3.6 | `Q_R15_WRAP_NO_CAMINHO_CRITICO` | audit-textual-gates-2026-09 | onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted- |
-
 ## dissect-forge-2026-10 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -805,7 +786,7 @@
 |--:|---|---|---|
 | 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
 
-## fila-2026-10-06 — 12 item(ns)
+## fila-2026-10-06 — 11 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -814,7 +795,6 @@
 | 4.2 | `Q_MERGE_GATE_AVISA_NO_ADOTANTE` | fila-2026-10-06 | a trava de merge deve avisar no adotante em vez de sair calada |
 | 3.6 | `Q_GRANAAI_CLONE_SEM_CARIMBO` | fila-2026-10-06 | aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o valida |
 | 3.2 | `Q_MAPA_NOMEAR_MERGE_ONION_HOOKS` | fila-2026-10-06 | nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar |
-| 3.0 | `Q_CANAL_VIVO_ENTRE_SESSOES` | fila-2026-10-06 | o canal vivo entre sessões vira 3ª via da co-evolução (envelope fixo, registro do envio, decisão descendo ao grafo)? aguarda  |
 | 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
 | 3.0 | `Q_ONION_BRAIN_MCP` | fila-2026-10-06 | MCP remoto só leitura do Onion (kg_list, kg_radar, kg_node com o parser do radar, docs_search) para o Company Brain fora do Claud |
 | 3.0 | `Q_PODA_CLAUDE_MD_REVISITA` | fila-2026-10-06 | revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros |
@@ -869,6 +849,14 @@
 |--:|---|---|---|
 | 5.1 | `C_TETO_PERFIL_YAML_E_DO_CONTRATO` | kg-id-valid-from-2026-10 | TETO: politica de extensoes e MUST x SHOULD de verified_at em PROD ficaram FORA de proposito — decisao do contrato formal do .kg |
 | 3.2 | `C_TETO_DATAS_ISO_SEM_ASPAS` | kg-id-valid-from-2026-10 | TETO: valid_from: 2026-10-01 sem aspas e lido como DATA (timestamp YAML 1.1) por um leitor tipado, nao como string — 88 ocorrenc |
+
+## audit-textual-gates-2026-09 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `Q_REGRA56_VERACIDADE_DOS_ACHADOS` | audit-textual-gates-2026-09 | Quanto os campos findings_total/findings_real/verdict do residuo R56 correspondem a achados REAIS quando o revisor e a propria ses |
+| 3.6 | `Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO` | audit-textual-gates-2026-09 | O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotant |
+| 3.6 | `Q_R15_WRAP_NO_CAMINHO_CRITICO` | audit-textual-gates-2026-09 | onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted- |
 
 ## evolve-cures-2026-10 — 1 item(ns)
 
