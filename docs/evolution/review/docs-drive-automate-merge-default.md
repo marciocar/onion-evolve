@@ -1,7 +1,8 @@
 ---
 branch: docs/drive-automate-merge-default
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 42e54afc64174455c8c64a6e25889ab49eb7b05b2d4e9a126c8d7597946f33a4
+reviewed_code_sha256: 3a8e1e4084116a9f4708b670a6ceedc62897fe938dc45f2e3cd2e29c78610f7e
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
