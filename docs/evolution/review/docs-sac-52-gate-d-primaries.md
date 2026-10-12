@@ -1,7 +1,8 @@
 ---
 branch: docs/sac-52-gate-d-primaries
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f36766c6d7dce179af7a37f9431f9761ea1609cc51a7e86a5207b8caa7d0e34e
+reviewed_code_sha256: 8d7eba21fbe03f9e3f11bff7061257af0be83c63cc5ddd4db61c061e974411c2
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
