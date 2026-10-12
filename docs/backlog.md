@@ -369,7 +369,7 @@
 | 26.4 | `C_RICH_TEXT_FORMAT_IS_ADAPTER_CONCERN` | task-manager-vocabulario-2026-10 | O formato do texto rico (descrição e comentário) é heterogêneo e deve ser resolvido no adapter, não na interface: ADF no Jir |
 | 18.0 | `D_TASK_MANAGER_INTERFACE_WAVE2` | task-manager-vocabulario-2026-10 | Onda 2: interface.md declara o vocabulário canônico e 24 capacidades (12 required, 12 optional) com assinatura; cada adapter dec |
 | 13.5 | `C_BULK_IS_PER_OPERATION_NOT_UNIFORM` | task-manager-vocabulario-2026-10 | Operação em lote não é capacidade uniforme: Jira (Cloud e DC) ancora só bulk create (Cloud até 50), Asana tem batch genéric |
-| 8.0 | `Q_WAVE2_PRIMARIES_CELLS` | task-manager-vocabulario-2026-10 | 2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as célu |
+| 10.0 | `Q_WAVE2_PRIMARIES_CELLS` | task-manager-vocabulario-2026-10 | 2ª onda de primárias nomeadas: reabrir a doc do Zoho Projects v3 por outro transporte (fallback SDAAL de busca) e mirar as célu |
 | 3.0 | `Q_JIRA_STATUS_BY_PUT_MEASURE` | task-manager-vocabulario-2026-10 | Medir ao vivo se PUT /rest/api/3/issue/{key} consegue definir status, antes de interface.md declarar 'transição obrigatória' pa |
 
 ## slm-capitalizacao-2026-10 — 8 item(ns)
