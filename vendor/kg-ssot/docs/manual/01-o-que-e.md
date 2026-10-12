@@ -36,6 +36,7 @@ O resultado é um arquivo que uma máquina consegue julgar no CI, como julga có
 | A suíte de conformidade | 225 casos em `latest/`, em dados puros, com o veredito e os códigos esperados de cada um |
 | O leitor de referência | `kg_validate.py`, em Python 3 com PyYAML e jsonschema, sem outra dependência |
 | O kit de adoção | `kg_vendor.py`, que traz uma release por tag, e `kg_gate.py`, a catraca por grafo no CI |
+| O exportador PROV-O | `kg_prov_export.py`, que leva a proveniência de cada nó para o ecossistema W3C PROV, em JSON-LD |
 
 ## Para quem
 

@@ -4,7 +4,7 @@ O KG-SSOT é um **grafo de conhecimento verificável** em arquivo texto. Cada af
 em que foi conferida e o que foi conferido, e um contrato formal decide se o arquivo está bem escrito. Este
 manual cobre o formato `.kg.yaml`, o contrato, as ferramentas e a adoção num repositório.
 
-Release descrita aqui: **4.3.5** (tag `kg-ssot-v4.3.5`). O contrato vigente dessa release é o **v4**.
+Release descrita aqui: **4.4.0** (tag `kg-ssot-v4.4.0`). O contrato vigente dessa release é o **v4**.
 
 ## Capítulos
 
@@ -14,7 +14,7 @@ Release descrita aqui: **4.3.5** (tag `kg-ssot-v4.3.5`). O contrato vigente dess
 | 2 | [Conceitos](02-conceitos.md) | Grafo, nó, tipos, status, planos, arestas, proveniência, carimbo de verificação |
 | 3 | [Referência do formato](03-formato.md) | Todos os campos do `.kg.yaml`, tirados do schema |
 | 4 | [O contrato](04-contrato.md) | MUST × SHOULD, códigos de erro, versões e tags |
-| 5 | [Ferramentas](05-ferramentas.md) | `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, com saídas reais |
+| 5 | [Ferramentas](05-ferramentas.md) | `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_prov_export`, com saídas reais |
 | 6 | [Adoção e CI](06-adocao-e-ci.md) | O caminho curto para levar o contrato a um repositório |
 | 7 | [Conformidade e leitores](07-conformidade-e-leitores.md) | A suíte de casos e como escrever um leitor próprio |
 | 8 | [Receitas](08-receitas.md) | Tarefas comuns, passo a passo |
