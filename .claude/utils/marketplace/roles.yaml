@@ -213,9 +213,6 @@ roles:
         # nao via fragmento citado como `common:prompts:<nome>`; a 1a passada da F5 viu.
         - commands/common/prompts/task-manager-provider-detection.md
         - commands/common/prompts/task-manager-auto-update.md
-        # SAC-116: o adapter do Linear baixa anexos e os marca como dado nao confiavel citando este
-        # fragmento; sem ele no mini, a citacao vira ponteiro morto e a regra de seguranca some da porta.
-        - commands/common/prompts/untrusted-content-provenance.md
       # OVERLAYS (F5): arquivos PROPRIOS do mini, que o core guarda em ops/door-templates/mini/ e o
       # materializador escreve por cima do que o manifesto leva. destino na porta: fonte no core (os dois
       # relativos a RAIZ do repo). As fontes NAO se chamam README.md/CLAUDE.md/SKILL.md de proposito: um
