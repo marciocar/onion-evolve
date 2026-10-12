@@ -339,6 +339,9 @@ section == "nodes" && nid != "" {
   # que codificou o relato, circular por construção. Sem o marcador, esses nós passavam nos três
   # vereditos com carimbo fresco, indistinguíveis de um nó medido. Default (ausente) = measured.
   if (line ~ /^[[:space:]]*evidence_class:/) { v = line; sub(/^[[:space:]]*evidence_class:/, "", v); eclass[nid] = trim(v) }
+  # provenance.method (2026-10-12, decisão do maestro sobre o selo do /meta:decide): só para reconhecer a decisão
+  # SELADA PELO MAESTRO, que é done em DEV por natureza (ver o aviso decision-done-em-DEV abaixo).
+  if (line ~ /^[[:space:]]+method:/) { v = line; sub(/^[[:space:]]+method:/, "", v); pmethod[nid] = trim(v) }
   if (line ~ /^[[:space:]]*verified_against:/) {
     v = line; sub(/^[[:space:]]*verified_against:/, "", v)
     if (nid in verifiedAgainst && verifiedAgainst[nid] != trim(v)) dupKey[nid "|verified_against"] = verifiedAgainst[nid] " -> " trim(v)
@@ -795,14 +798,20 @@ END {
     # `decision` só vira `done` verificada em PROD, e o motor só rebaixava a atenção (DEV/done = 0,5), sem
     # aviso — 20 de 20 mutações passaram caladas. ⚠ AGREGADO, não um por nó: o corpus tem 95 casos em 36
     # grafos, e 95 linhas por leitura ensinariam a ignorar o aviso. Não reprova (`problems` intocado).
-    ndd = 0; ddids = ""
+    ndd = 0; ddids = ""; ndm = 0
     for (i = 1; i <= nn; i++) {
       id = order[i]
+      # EXCEÇÃO (2026-10-12, decisão do maestro): decisão selada pelo maestro (método "testemunho: decisão do
+      # maestro…", o que o kg-decide-seal.sh grava) é conhecimento de ADOTAR, não claim verificada em produção — e
+      # em PROD o contrato a acusaria de testimony-in-prod. Ela fica em DEV e não entra no aviso; PROD continua
+      # exigindo medição. Sinal de campo do onion-kg-ssot, que achou a contradição em dogfood.
+      if (ntype[id] == "decision" && nstatus[id] == "done" && plane[id] == "DEV" && pmethod[id] ~ /^["\x27]?testemunho: decisão do maestro/) { ndm++; continue }
       if (ntype[id] == "decision" && nstatus[id] == "done" && plane[id] == "DEV") {
         ndd++
         if (ndd <= 5) ddids = ddids (ddids == "" ? "" : ", ") id
       }
     }
+    if (ndm > 0) printf "  · %d decisão(ões) selada(s) pelo maestro em DEV (testemunho do selo, aceita por desenho)\n", ndm
     if (ndd > 0)
       printf "  ⚠ decision-done-em-DEV: %d decisão(ões) `done` com plane: DEV (%s%s) — a gramática pede `done` verificada em PROD: promova o plane com verified_at, ou volte a open\n", ndd, ddids, (ndd > 5 ? ", …" : "")
     print ""
