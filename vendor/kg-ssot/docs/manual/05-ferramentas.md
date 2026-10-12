@@ -2,7 +2,7 @@
 
 [← O contrato](04-contrato.md) · [Índice](README.md) · [Adoção e CI →](06-adocao-e-ci.md)
 
-As quatro ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3 com as versões fixadas em
+As cinco ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3 com as versões fixadas em
 [`tools/requirements.txt`](../../tools/requirements.txt) (PyYAML e jsonschema, mais as dependências do jsonschema).
 
 ```bash
@@ -185,3 +185,53 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 **Por que `-B`?** Os scripts do kit não gravam bytecode, mas uma ferramenta sua que **importa** um módulo do kit
 grava o `.pyc` dentro do vendor, e o próximo `check` reprova. Rode tudo com `python3 -I -B`, ou com
 `PYTHONDONTWRITEBYTECODE=1`.
+
+## `kg_prov_export.py`: a proveniência em PROV-O
+
+Exporta um `.kg.yaml` para [PROV-O](https://www.w3.org/TR/prov-o/) em JSON-LD, para quem já usa ferramentas do
+ecossistema W3C PROV. Cada nó vira uma `prov:Entity`. Um nó com `provenance` ganha `prov:wasDerivedFrom` para a
+fonte e uma `prov:Derivation` cuja atividade carrega o `method`; o `locator` e a `locality` vão como propriedades
+`kg:`. Uma fonte que é inteira uma URL http(s) vira a própria IRI; qualquer outra (um caminho, um comando, duas
+URLs juntas) vira um nó em branco rotulado, um por texto distinto, para que nós com a mesma fonte apontem para a
+mesma entidade.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_prov_export.py \
+  vendor/kg-ssot/spec/conformance/fixtures/latest/form/method-vocabulary/valid-method-leitura.kg.yaml
+```
+
+Trecho da saída, o nó com `provenance`:
+
+```text
+   "@id": "urn:kg-ssot:graph:valid-method-leitura#EV_A",
+   "@type": "prov:Entity",
+   ...
+   "prov:wasDerivedFrom": {
+    "@id": "_:source0"
+   },
+   "prov:qualifiedDerivation": {
+    "@type": "prov:Derivation",
+    "prov:entity": {
+     "@id": "_:source0",
+     "rdfs:label": "Fonte A"
+    },
+    "prov:hadActivity": {
+     "@type": "prov:Activity",
+     "rdfs:label": "leitura: seção 3 do documento A"
+    },
+    "kg:locator": "caso de conformidade"
+   }
+```
+
+O que ele **não** exporta, de propósito:
+
+- **As arestas.** `SUPPORTS`, `REFUTES` e as outras são relações de evidência, e derivação em PROV é relação de
+  produção. Exportá-las como `wasDerivedFrom` diria algo que o grafo não diz.
+- **O carimbo como tempo de geração.** `verified_at` sai como `kg:verifiedAt` (tipado `xsd:date` quando é uma data),
+  não como `prov:generatedAtTime`: em PROV, o tempo de geração marca quando a entidade passou a existir, não quando
+  foi conferida.
+
+O exportador não valida o grafo: rode o `kg_validate.py` antes. `--base IRI` troca o prefixo das IRIs dos nós
+(o default é `urn:kg-ssot:graph:`, e cada nó fica em `<base><meta.id>#<id>`); o vocabulário `kg:` mora em
+`urn:kg-ssot:vocab#`, fora desse espaço. rc 2 quando o arquivo é ilegível, não é um documento YAML único ou tem
+`meta` ou `nodes` fora da forma.
