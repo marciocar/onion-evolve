@@ -1,7 +1,8 @@
 ---
 branch: chore/decide-round-1012
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 00364447888d7c3d6b7cf43e1fdb72c9ad5d361e05c9ab92b77a0476b7cc72c8
+reviewed_code_sha256: c0b1ebbf3ae16e83f02794d9130b7a32570271182f34e988c9f3d679b802265f
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
