@@ -279,7 +279,7 @@ def protected_branches(path):
     """Ramos de PRODUÇÃO do repo onde o comando roda: `main` SEMPRE, mais o resolvido — config do
     gitflow (`gitflow.branch.master`/`.main`) OU, sem ela, a branch padrão de cada remoto
     (`refs/remotes/*/HEAD`). Sem nenhuma das duas fontes, `master` entra por convenção (fechado). A 1ª forma dos vetos só via
-    `main` literal: no brain-granaai, cuja produção é `master`, `git push origin +master` saía rc=0
+    `main` literal: num adotante GitFlow cuja produção é `master`, `git push origin +master` saía rc=0
     (Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN, medido em 2026-10-05). A linha canônica segue
     escrevendo `main` como o NOME do ramo protegido — os hooks julgam esse token. Espelho em bash:
     `onion_protected_branches` (paridade cobrada pela bancada)."""
@@ -293,7 +293,7 @@ def protected_branches(path):
             if v:
                 s.add(v); resolved = True
         # o gitflow NOMEIA a produção e tem precedência: a branch padrão do remoto num GitFlow costuma ser a
-        # `develop` (medido no brain-granaai: origin/HEAD→develop, gitflow.branch.master=master) — somá-la
+        # `develop` (medido num adotante: origin/HEAD→develop, gitflow.branch.master=master) — somá-la
         # vetaria o force-push da integração, que hoje passa e não é a produção
         heads = "" if resolved else _git(["-C", base, "for-each-ref", "--format=%(symref)", "refs/remotes/*/HEAD"])
         for ref in heads.split("\n"):

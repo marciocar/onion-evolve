@@ -2,8 +2,7 @@
 branch: fix/protect-main-default-branch
 pr: pendente
 date: 2026-10-12
-reviewed_diff_sha256: 1922f2a7e71dab6d515c3d231a2f6390ad103882222ac453b8bcd6ee63d52161
-reviewed_code_sha256: 09896b3dd0c700278994ea3f1d483f58a320002add88bf1820cd2b11f4358af7
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 4
 findings_fixed: 1
@@ -23,7 +22,7 @@ positivo em branch de feature.
 
 | # | sev | achado | status |
 |---|---|---|---|
-| 1 | alta | **Falso positivo que o desenho óbvio teria criado.** Na config real do brain-granaai, lida sem escrever nada lá, o `origin/HEAD` aponta **`develop`** e `gitflow.branch.master = master`. Somar as duas fontes (a 1ª versão desta cura) vetaria `git push -f origin develop`, que hoje passa e não é produção. | **CURADO**: o gitflow tem precedência; o `origin/HEAD` só vale sem ele. Caso `pr-brain-dev` e mutante M6 (sem a precedência, o caso reprova). |
+| 1 | alta | **Falso positivo que o desenho óbvio teria criado.** Na config real do brain-granaai, lida sem escrever nada lá, o `origin/HEAD` aponta **`develop`** e `gitflow.branch.master = master`. Somar as duas fontes (a 1ª versão desta cura) vetaria `git push -f origin develop`, que hoje passa e não é produção. | **CURADO**: o gitflow tem precedência; o `origin/HEAD` só vale sem ele. Caso `pr-gfd-dev` e mutante M6 (sem a precedência, o caso reprova). |
 | 2 | média | **Push NÃO-force direto e deleção na produção do adotante seguem passando** (`git push origin master`, `:master`, `--delete origin master`). Quem os barra é o merge-gate, que se desarma sem `ops/pr-merge-verified.sh`, por desenho. O protect-main só olha force, e é igual para `main` (`git push origin :main` rc=0 antes e depois). | **DECLARADO** (teto `C_TETO_PUSH_DIRETO_NO_ADOTANTE_SEGUE_SEM_VETO`, com gatilho). No repo de bancada armado o merge-gate barra os dois (paridade medida). |
 | 3 | média | **A resolução lê o clone, não o host**: `origin/HEAD` defasado, produção com outro nome sem gitflow nem `origin/HEAD`, e o padrão de um repo empurrado por URL não são vistos. | **DECLARADO** (teto `C_TETO_RESOLUCAO_LOCAL_E_FONTES` e cabeçalho da lib). |
 | 4 | baixa | **Fallback fecha uma branch de trabalho chamada `master`** num repo sem gitflow e sem `origin/HEAD` (só `git init` + `remote add`). | **DECLARADO**: fechado por desenho, raro; com qualquer fonte resolvida, `master` que não é produção passa (`pr-ohn`, `pr-gf-master`). |
