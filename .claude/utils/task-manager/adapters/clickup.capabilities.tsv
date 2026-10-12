@@ -18,7 +18,12 @@ estimate.points_read	optional	not_implemented	v2	kg:task-manager-vocabulario-202
 estimate.time	optional	implemented	v2	adapter:clickup.md§confirmado: `due_date`/`time_estimate` em ms com a flag	time_estimate em milissegundos
 comment.add	required	unverified	v2	-	comment_text; o formato do comentário não foi ancorado (E_ELENXO_CLICKUP_COMMENT_FORMAT_OPEN)
 comment.list	required	unverified	v2	-	
+activity.list	optional	not_implemented	v2	-	histórico de mudanças da task (SAC-116): o adapter não lê; ClickUp é a 2ª fatia (ordem do maestro, 2026-10-12)
+hierarchy.context	optional	not_implemented	v2	-	mãe completa + irmãs + subtasks recursivas (SAC-116): o adapter não monta; ClickUp é a 2ª fatia (ordem do maestro, 2026-10-12)
 attachment.add	optional	not_implemented	v2	-	anexo não ancorado
+attachment.list	optional	not_implemented	v2	-	anexos e arquivos enviados (SAC-116): o adapter não lista; ClickUp é a 2ª fatia (ordem do maestro, 2026-10-12)
+attachment.read	optional	not_implemented	v2	-	download para quarentena (SAC-116): o adapter não baixa; ClickUp é a 2ª fatia (ordem do maestro, 2026-10-12)
+inline.refs	optional	not_implemented	v2	-	imagens/arquivos embutidos no texto (SAC-116): o adapter não extrai; ClickUp é a 2ª fatia (ordem do maestro, 2026-10-12)
 label.set	optional	unverified	v2	-	tags vão no create; no update NÃO (só POST/DELETE /task/{id}/tag/{name}, medido em 2026-10-02), e o adapter não chama esse endpoint
 iteration.assign	optional	not_implemented	v2	-	sprint não ancorada
 link.create	optional	not_implemented	v2	kg:task-manager-vocabulario-2026-10#E_CLICKUP_DEPENDENCY_ONE_DIRECTION	provedor: dependência numa direção por requisição; task links não ancorados

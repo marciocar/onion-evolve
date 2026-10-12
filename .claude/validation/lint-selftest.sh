@@ -27278,6 +27278,29 @@ run_task_manager_capabilities_selftests() {
     else record_fail "task-manager-capabilities: (c) dispatcher" "$(grep -E 'REGRA 103|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
   else record_fail "task-manager-capabilities: (c) dispatcher" "jira.capabilities.tsv ausente no sandbox"; fi
   rm -rf "${sd}"
+  # (d) SAC-116: as 5 capacidades novas (leitura completa e anexos) estão no vocabulário E nos 5 adapters; o
+  #     Linear só as declara implemented com a medição datada de 2026-10-12. E o caso que REPROVA: o ClickUp
+  #     sem a linha de attachment.read emite capacidade-faltando no lint de produção.
+  local cap p miss=""
+  for cap in activity.list hierarchy.context attachment.list attachment.read inline.refs; do
+    grep -qE "^${cap//./\\.}"$'\toptional\tremote\t' "${REPO_ROOT}/.claude/utils/task-manager/interface.md" || miss="${miss} interface:${cap}"
+    for p in asana clickup jira linear zoho; do
+      grep -qE "^${cap//./\\.}"$'\toptional\t' "${REPO_ROOT}/.claude/utils/task-manager/adapters/${p}.capabilities.tsv" || miss="${miss} ${p}:${cap}"
+    done
+    grep -qE "^${cap//./\\.}"$'\toptional\timplemented\t[^\t]*\tadapter:linear-leitura-completa\\.md§MEDIDO AO VIVO 2026-10-12 '"${cap//./\\.}"':' \
+      "${REPO_ROOT}/.claude/utils/task-manager/adapters/linear.capabilities.tsv" || miss="${miss} linear-medido:${cap}"
+  done
+  if [ -z "${miss}" ]; then record_pass "task-manager-capabilities: (d) SAC-116: 5 capacidades novas no vocabulário e nos 5 adapters; Linear implemented só com medição de 2026-10-12"
+  else record_fail "task-manager-capabilities: (d) SAC-116 declaração" "${miss}"; fi
+  sd="$(TMPDIR=/tmp mktemp -d)"; cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null
+  local ct="${sd}/.claude/utils/task-manager/adapters/clickup.capabilities.tsv"
+  sed -i '/^attachment\.read\t/d' "${ct}"
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${ct}" 2>&1 || true)"
+  if grep -q "REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte): \[capacidade-faltando\] attachment.read" <<< "${l}"; then
+    record_pass "task-manager-capabilities: (d2) adapter sem a linha de attachment.read → REGRA 103 capacidade-faltando no lint de produção"
+  else record_fail "task-manager-capabilities: (d2) capacidade nova faltando" "$(grep -E 'REGRA 103|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  rm -rf "${sd}"
   # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove.
   #     Heredoc QUOTADO (as âncoras têm `${…}` e `$3`), separador @@@ (as âncoras têm `||`).
   local sb; sb="$(TMPDIR=/tmp mktemp -d)"; mkdir -p "${sb}/.claude/validation"
@@ -27458,6 +27481,24 @@ run_task_manager_executable_selftests() {
     else record_fail "task-manager-executable: (c) dispatcher" "$(grep -E 'REGRA 104|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
   else record_fail "task-manager-executable: (c) dispatcher" "linear.py ou linear.capabilities.tsv ausente no sandbox"; fi
   rm -rf "${sd}"
+  # (d) SAC-116: o executável LISTA os 6 verbos da leitura completa e dos anexos; e o caso que REPROVA: tirar
+  #     attachment.read do executável (declarado implemented com medição) emite medido-fora-do-executavel.
+  local caps v miss=""
+  caps="$(env -i PATH="${PATH}" HOME="${HOME:-/tmp}" LC_ALL=C python3 -I -B "${REPO_ROOT}/.claude/utils/task-manager/adapters/linear.py" --capabilities 2>/dev/null)"
+  for v in activity.list hierarchy.context attachment.list attachment.read attachment.add inline.refs; do
+    grep -qxF "${v}" <<< "${caps}" || miss="${miss} ${v}"
+  done
+  if [ -z "${miss}" ]; then record_pass "task-manager-executable: (d) linear.py --capabilities lista os 6 verbos do SAC-116"
+  else record_fail "task-manager-executable: (d) verbos SAC-116 ausentes" "${miss}"; fi
+  sd="$(TMPDIR=/tmp mktemp -d)"; cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null
+  local lp="${sd}/.claude/utils/task-manager/adapters/linear.py"
+  python3 -I -B -c 'import sys; p=sys.argv[1]; s=open(p,encoding="utf-8").read(); s=s.replace("    \"attachment.read\",\n","",1).replace("    \"attachment.read\": v_attachment_read,\n","",1); open(p,"w",encoding="utf-8").write(s)' "${lp}"
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/.claude/utils/task-manager/adapters/linear.capabilities.tsv" 2>&1 || true)"
+  if grep -q "REGRA 104 (Executável do adapter e declaração de capacidades listam os mesmos verbos): \[medido-fora-do-executavel\] attachment.read" <<< "${l}"; then
+    record_pass "task-manager-executable: (d2) attachment.read medido e fora do executável → REGRA 104 no lint de produção"
+  else record_fail "task-manager-executable: (d2) verbo medido removido" "$(grep -E 'REGRA 104|HARD' <<< "${l}" | head -3 | tr '\n' '|')"; fi
+  rm -rf "${sd}"
   # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove.
   local sb; sb="$(TMPDIR=/tmp mktemp -d)"; mkdir -p "${sb}/.claude/validation"
   local s="${sb}/.claude/validation/task-manager-executable-check.sh" line old new want rest mo mrc
@@ -27554,8 +27595,8 @@ PYSRV
   else record_fail "task-manager-dispatcher: (g) HTTP 500" "rc=${rc} $(head -1 "${d}/err")"; fi
   # (h) sucesso → rc 0 e JSON com o identificador
   printf '200\t{"data":{"issue":{"id":"u1","identifier":"SAC-1","title":"t","children":{"nodes":[]}}}}\n' > "${d}/s3"; _srv "${d}/s3"
-  if _fake "${tm}" item.read SAC-1; then rc=0; else rc=$?; fi; wait 2>/dev/null
-  if [ "${rc}" -eq 0 ] && python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["identifier"]=="SAC-1"' "${d}/out" 2>/dev/null; then record_pass "task-manager-dispatcher: (h) resposta válida → rc 0 e JSON em stdout"
+  if _fake "${tm}" item.read SAC-1 --lean; then rc=0; else rc=$?; fi; wait 2>/dev/null
+  if [ "${rc}" -eq 0 ] && python3 -c 'import json,sys; assert json.load(open(sys.argv[1]))["identifier"]=="SAC-1"' "${d}/out" 2>/dev/null; then record_pass "task-manager-dispatcher: (h) resposta válida (item.read --lean) → rc 0 e JSON em stdout"
   else record_fail "task-manager-dispatcher: (h) sucesso" "rc=${rc} $(head -1 "${d}/err")"; fi
   # (m) MUTANTE na CÓPIA: o executável que aceita `errors` como sucesso tem de reprovar o (f)
   local cp_tm="${d}/tmcopy"; mkdir -p "${cp_tm}/adapters"
@@ -27567,6 +27608,167 @@ PYSRV
     if [ "${rc}" -ne 1 ] || ! grep -qF 'GraphQL errors' "${d}/err"; then record_pass "task-manager-dispatcher: (m) mutante (errors aceito) morde → o (f) reprovaria (rc=${rc})"
     else record_fail "task-manager-dispatcher: (m) mutante NÃO morde" "(f) segue verde com a cura revertida"; fi
   else record_fail "task-manager-dispatcher: (m) mutante não aplicou" "(f)"; fi
+  # ── SAC-116: leitura COMPLETA e anexos, contra um servidor ROTEADO (casa a operação GraphQL pelo nome
+  #    no corpo do POST, ou o caminho no GET; regra `once` é consumida na ordem). Cada caso REPROVA o
+  #    defeito nomeado; cada cura tem um mutante na CÓPIA do linear.py que EXIGE o FAIL do caso dela.
+  cat > "${d}/srv2.py" <<'PYSRV'
+import http.server, json, sys
+rules = json.load(open(sys.argv[1], encoding="utf-8"))
+state = {"done": False}
+class H(http.server.BaseHTTPRequestHandler):
+    def _pick(self, text):
+        for r in rules:
+            if not r.get("used") and r["match"] in text:
+                if r.get("once"): r["used"] = True
+                return r
+        return None
+    def _send(self, r):
+        if r is None:
+            code, ct, body = 500, "application/json", b'{"x":1}'
+        else:
+            code, ct = r.get("status", 200), r.get("ct", "application/json")
+            if r.get("deny_auth") and self.headers.get("Authorization"):
+                code = 403   # o host de fora do uploads RECEBEU a chave: o caso reprova
+            body = r["raw"].encode("latin-1") if "raw" in r else json.dumps(r["body"]).replace("{PORT}", str(PORT)).encode()
+        self.send_response(code); self.send_header("Content-Type", ct)
+        if r is not None and r.get("location"): self.send_header("Location", r["location"].replace("{PORT}", str(PORT)))
+        if r is None or not r.get("no_length"): self.send_header("Content-Length", str(len(body)))
+        self.end_headers(); self.wfile.write(body)
+    def do_POST(self):
+        self._send(self._pick(self.rfile.read(int(self.headers.get("Content-Length", 0))).decode("utf-8")))
+    def do_GET(self):
+        if self.path == "/__quit":
+            state["done"] = True; self.send_response(204); self.end_headers(); return
+        self._send(self._pick(self.path))
+    def log_message(self, *a): pass
+class S(http.server.HTTPServer):
+    def handle_timeout(self): state["done"] = True   # sem requisição em 20 s, sai: nunca pendura a bancada
+s = S(("127.0.0.1", 0), H); PORT = s.server_address[1]
+s.timeout = 20
+open(sys.argv[2], "w").write(str(PORT))
+while not state["done"]:
+    s.handle_request()
+PYSRV
+  cat > "${d}/mk.py" <<'PYMK'
+import json, sys
+case, out = sys.argv[1], sys.argv[2]
+E = {"nodes": [], "pageInfo": {"hasNextPage": False, "endCursor": None}}
+def base(**kw):
+    i = {"id": "u1", "identifier": "SAC-1", "title": "t", "description": "d", "parent": None,
+         "team": {"id": "t1", "key": "SAC", "name": "S"}, "state": {"name": "Todo", "type": "unstarted"}, "children": {"nodes": []}}
+    i.update(kw); return {"match": "IssueBase", "body": {"data": {"issue": i}}}
+def conn(op, field, nodes, nxt=None, once=False):
+    r = {"match": op, "body": {"data": {"issue": {field: {"nodes": nodes, "pageInfo": {"hasNextPage": nxt is not None, "endCursor": nxt}}}}}}
+    if once: r["once"] = True
+    return r
+png = "\x89PNG\r\n\x1a\n" + "x" * 92            # 100 bytes com a assinatura PNG
+up = "http://127.0.0.1:{PORT}/uploads/org/a/b"
+rules = []
+if case in ("full", "page2"):
+    rules = [base(),
+             conn("IssueComments", "comments", [{"id": "c-1", "body": "primeiro", "createdAt": "2026-01-01T00:00:00Z"}], nxt="cur1", once=True),
+             conn("IssueComments", "comments", [{"id": "c-2", "body": "segundo", "createdAt": "2026-01-02T00:00:00Z"}]),
+             conn("IssueHistory", "history", [{"id": "h1", "createdAt": "2026-01-01T00:00:00Z", "toState": {"name": "Done"}, "fromState": {"name": "Todo"}}]),
+             conn("IssueAttachments", "attachments", []), conn("IssueChildren", "children", [])]
+elif case in ("subtask", "siblings"):
+    rules = [base(parent={"id": "p1", "identifier": "SAC-0", "title": "mãe"}),
+             conn("IssueComments", "comments", []), conn("IssueHistory", "history", []), conn("IssueAttachments", "attachments", []),
+             conn("IssueChildren", "children", [], once=True),
+             {"match": "IssueParent", "body": {"data": {"issue": {"id": "p1", "identifier": "SAC-0", "title": "mãe",
+                 "description": "OBJETIVO DA MAE", "state": {"name": "In Progress", "type": "started"}, "estimate": 5}}}},
+             conn("IssueChildren", "children", [
+                 {"id": "u1", "identifier": "SAC-1", "title": "eu", "description": "", "state": {"name": "Todo", "type": "unstarted"}, "estimate": None},
+                 {"id": "u2", "identifier": "SAC-2", "title": "irmã", "description": "x", "state": {"name": "Done", "type": "completed"}, "estimate": 3}])]
+else:  # attachment.read: ok | cap_header | cap_bytes | mime | magic | redirect
+    get = {"match": "/uploads/org/a/b", "ct": "image/png", "raw": png}
+    if case == "redirect":
+        rules.append({"match": "/other/x", "ct": "image/png", "raw": png, "deny_auth": True})
+        get = {"match": "/uploads/org/a/b", "status": 302, "location": "http://127.0.0.1:{PORT}/other/x", "raw": ""}
+    if case == "cap_bytes": get["no_length"] = True
+    if case == "mime": get.update(ct="application/x-sh", raw="#!/bin/sh\necho oi\n")
+    if case == "magic": get["raw"] = "#!/bin/sh\necho oi\n"
+    rules = [base(description=f"veja ![shot.png]({up})"), conn("IssueComments", "comments", []),
+             conn("IssueAttachments", "attachments", []), get] + rules
+json.dump(rules, open(out, "w", encoding="utf-8"))
+PYMK
+  # _tmx <tm.sh> <caso> → rc 0 se o caso PASSA; motivo em ${d}/why
+  _tmx() {
+    local t="$1" c="$2" port i=0 cap="" verb=(item.read SAC-1)
+    python3 -I -B "${d}/mk.py" "${c}" "${d}/rules.json"
+    rm -f "${d}/port2"; rm -rf "${d}/q"; python3 -I -B "${d}/srv2.py" "${d}/rules.json" "${d}/port2" &
+    while [ ! -s "${d}/port2" ] && [ "${i}" -lt 50 ]; do sleep 0.1; i=$((i+1)); done
+    port="$(cat "${d}/port2" 2>/dev/null)"
+    case "${c}" in ok|cap_header|cap_bytes|mime|magic|redirect) verb=(attachment.read SAC-1 1) ;; esac
+    case "${c}" in cap_header|cap_bytes) cap=10 ;; esac
+    if env -u LINEAR_TEAM_ID TM_ENV_FILE="${d}/nao-existe" TASK_MANAGER_PROVIDER=linear LINEAR_API_KEY=lin_fake \
+         TM_LINEAR_ENDPOINT="http://127.0.0.1:${port}/graphql" TM_LINEAR_UPLOADS_BASE="http://127.0.0.1:${port}/uploads/" \
+         TM_ATTACHMENT_DIR="${d}/q" ${cap:+TM_ATTACHMENT_MAX_BYTES=${cap}} bash "${t}" "${verb[@]}" >"${d}/out" 2>"${d}/err"; then rc=0; else rc=$?; fi
+    python3 -I -B -c 'import sys,urllib.request; urllib.request.urlopen("http://127.0.0.1:%s/__quit" % sys.argv[1], timeout=5)' "${port}" 2>/dev/null
+    wait 2>/dev/null
+    local nfiles; nfiles="$(find "${d}/q" -type f 2>/dev/null | wc -l | tr -d ' ')"
+    printf 'rc=%s files=%s %s' "${rc}" "${nfiles}" "$(head -1 "${d}/err")" > "${d}/why"
+    case "${c}" in
+      full)    [ "${rc}" -eq 0 ] && python3 -I -B -c 'import json,sys; d=json.load(open(sys.argv[1])); ids=[c["id"] for c in d["comments"]]
+assert d["read_mode"]=="full" and d["counts"]["comments"]>=1 and "c-1" in ids and d["counts"]["activity"]==1, ids' "${d}/out" 2>>"${d}/why" ;;
+      page2)   [ "${rc}" -eq 0 ] && python3 -I -B -c 'import json,sys; d=json.load(open(sys.argv[1])); ids=[c["id"] for c in d["comments"]]
+assert ids==["c-1","c-2"], ids' "${d}/out" 2>>"${d}/why" ;;
+      subtask) [ "${rc}" -eq 0 ] && python3 -I -B -c 'import json,sys; h=json.load(open(sys.argv[1]))["hierarchy"]
+assert h["role"]=="subtask" and h["parent"]["description"]=="OBJETIVO DA MAE" and h["parent"]["estimate"]==5, h["parent"]' "${d}/out" 2>>"${d}/why" ;;
+      siblings) [ "${rc}" -eq 0 ] && python3 -I -B -c 'import json,sys; h=json.load(open(sys.argv[1]))["hierarchy"]
+assert [(s["identifier"], s["state"]["name"]) for s in h["siblings"]]==[("SAC-2","Done")], h["siblings"]' "${d}/out" 2>>"${d}/why" ;;
+      ok)      [ "${rc}" -eq 0 ] && python3 -I -B -c 'import json,os,stat,sys,hashlib; d=json.load(open(sys.argv[1]))
+b=open(d["path"],"rb").read(); m=stat.S_IMODE(os.stat(d["path"]).st_mode); dm=stat.S_IMODE(os.stat(os.path.dirname(d["path"])).st_mode)
+assert d["untrusted"] is True and d["mime"]=="image/png" and d["size"]==100 and hashlib.sha256(b).hexdigest()==d["sha256"] and m==0o600 and dm==0o700, (m, dm)' "${d}/out" 2>>"${d}/why" ;;
+      redirect) [ "${rc}" -eq 0 ] && [ "${nfiles}" = 1 ] ;;
+      cap_header) [ "${rc}" -eq 1 ] && [ "${nfiles}" = 0 ] && grep -qF '100 bytes acima do teto de 10' "${d}/err" ;;
+      cap_bytes)  [ "${rc}" -eq 1 ] && [ "${nfiles}" = 0 ] && grep -qF 'passa do teto de 10 bytes' "${d}/err" ;;
+      mime)    [ "${rc}" -eq 1 ] && [ "${nfiles}" = 0 ] && grep -qF "mime 'application/x-sh' fora da allowlist" "${d}/err" ;;
+      magic)   [ "${rc}" -eq 1 ] && [ "${nfiles}" = 0 ] && grep -qF 'não tem a assinatura' "${d}/err" ;;
+    esac
+  }
+  local cs desc
+  while IFS='|' read -r cs desc; do
+    if _tmx "${tm}" "${cs}"; then record_pass "task-manager-dispatcher: (${cs}) ${desc}"
+    else record_fail "task-manager-dispatcher: (${cs}) ${desc}" "$(cat "${d}/why")"; fi
+  done <<'EOF_CASES'
+full|item.read (padrão = completo) numa task com comentários e atividade traz os dois
+page2|comentários paginados: a 2ª página (endCursor → after) entra, na ordem cronológica
+subtask|subtask traz a mãe COMPLETA (objetivo, estado, pontos)
+siblings|subtask traz as irmãs com estado, sem ela mesma
+ok|attachment.read baixa para a quarentena (0700/0600), sha256 confere, marcado untrusted
+cap_header|attachment.read acima do teto (Content-Length) é recusado, nada gravado
+cap_bytes|attachment.read acima do teto sem Content-Length (bytes lidos) é recusado, nada gravado
+mime|attachment.read com mime fora da allowlist é recusado, nada gravado
+magic|attachment.read com mime que mente sobre os bytes é recusado, nada gravado
+redirect|attachment.read redirecionado para fora do host de uploads NÃO leva a chave
+EOF_CASES
+  # (m2) MUTANTES na CÓPIA do linear.py: cada um reverte UMA cura e EXIGE o FAIL do caso dela
+  local mx="${d}/mx" line old new want rest
+  mkdir -p "${mx}/adapters"; cp "${tm}" "${REPO_ROOT}/.claude/utils/task-manager/env-check.sh" "${mx}/"
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    old="${line%%@@@*}"; rest="${line#*@@@}"; new="${rest%%@@@*}"; want="${rest#*@@@}"
+    cp "${py}" "${mx}/adapters/linear.py"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' \
+         "${mx}/adapters/linear.py" "${old}" "${new}"; then
+      record_fail "task-manager-dispatcher: (m2) mutante não aplicou" "${want}"; continue
+    fi
+    if _tmx "${mx}/tm.sh" "${want}"; then record_fail "task-manager-dispatcher: (m2) mutante NÃO morde" "(${want}) segue verde com a cura revertida"
+    else record_pass "task-manager-dispatcher: (m2) mutante morde → (${want}) reprova"; fi
+  done <<'EOF_MUT'
+comments, c_trunc = _all_comments(iss["id"])@@@comments, c_trunc = [], False@@@full
+activity, a_trunc = _all_activity(iss["id"])@@@activity, a_trunc = [], False@@@full
+        after = info["endCursor"]@@@        return nodes, False@@@page2
+ctx["parent"] = _parent_full(iss["parent"]["id"])@@@ctx["parent"] = {"identifier": iss["parent"]["identifier"]}@@@subtask
+ctx["siblings"] = [_child_view(c) for c in sibs if c["id"] != iss["id"]]@@@ctx["siblings"] = []@@@siblings
+if declared and declared.isdigit() and int(declared) > cap:@@@if False:@@@cap_header
+    if len(data) > cap:@@@    if False:@@@cap_bytes
+    if mime not in MIME_ALLOW:@@@    if False:@@@mime
+        ok = any(data.startswith(m) for m in _MAGIC[mime])@@@        ok = True@@@magic
+        os.chmod(d, 0o700)@@@        os.chmod(d, 0o755)@@@ok
+getattr(os, "O_NOFOLLOW", 0), 0o600)@@@getattr(os, "O_NOFOLLOW", 0), 0o644)@@@ok
+            new.headers.pop("Authorization", None)@@@            pass@@@redirect
+EOF_MUT
   rm -rf "${d}"
 }
 _family run_task_manager_dispatcher_selftests

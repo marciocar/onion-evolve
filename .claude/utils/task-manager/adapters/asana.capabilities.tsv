@@ -18,7 +18,12 @@ estimate.points_read	optional	not_implemented	1.0	-	estimativa não ancorada; o 
 estimate.time	optional	not_implemented	1.0	-	
 comment.add	required	implemented	1.0	kg:task-manager-vocabulario-2026-10#E_ASANA_STORY_TEXT_OR_HTML	story com text; o markdown canônico chega como texto puro (html_text não usado)
 comment.list	required	unverified	1.0	-	
+activity.list	optional	not_implemented	1.0	-	histórico de mudanças da task (SAC-116): o adapter não lê; declarado sem executável até haver demanda (maestro, 2026-10-12)
+hierarchy.context	optional	not_implemented	1.0	-	mãe completa + irmãs + subtasks recursivas (SAC-116): o adapter não monta; declarado sem executável até haver demanda (maestro, 2026-10-12)
 attachment.add	optional	not_implemented	1.0	-	anexo não ancorado
+attachment.list	optional	not_implemented	1.0	-	anexos e arquivos enviados (SAC-116): o adapter não lista; declarado sem executável até haver demanda (maestro, 2026-10-12)
+attachment.read	optional	not_implemented	1.0	-	download para quarentena (SAC-116): o adapter não baixa; declarado sem executável até haver demanda (maestro, 2026-10-12)
+inline.refs	optional	not_implemented	1.0	-	imagens/arquivos embutidos no texto (SAC-116): o adapter não extrai; declarado sem executável até haver demanda (maestro, 2026-10-12)
 label.set	optional	not_implemented	1.0	-	o adapter só LÊ tags
 iteration.assign	optional	not_implemented	1.0	-	iteração não ancorada
 link.create	optional	not_implemented	1.0	-	dependências não ancoradas

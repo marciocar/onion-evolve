@@ -406,6 +406,42 @@ class LinearAdapter implements ITaskManager {
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // LEITURA COMPLETA · ANEXOS (SAC-116) — o executável é a fonte: linear.py
+  // Cada método abaixo é o verbo homônimo de `tm.sh`; a prosa não reimplementa o cliente.
+  // Toda conexão segue o cursor: issue.<conn>(first:50, after:$c){ nodes pageInfo{hasNextPage endCursor} }
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /** activity.list — Issue.history (IssueHistory), todas as páginas, cronológico, só pares from/to que mudaram. */
+  async getActivity(taskId: string): Promise<ActivityEntry[]> {
+    return tm('activity.list', taskId).activity;
+  }
+
+  /** hierarchy.context — subtask: issue.parent COMPLETO + parent.children (irmãs); mãe: issue.children recursivo. */
+  async getHierarchyContext(taskId: string): Promise<HierarchyContext> {
+    return tm('hierarchy.context', taskId);
+  }
+
+  /** attachment.list — refs inline no host de uploads + issue.attachments (Attachment = LINK no Linear). */
+  async getAttachments(taskId: string): Promise<AttachmentListing> {
+    return tm('attachment.list', taskId);
+  }
+
+  /** attachment.read — GET no host de uploads com Authorization; quarentena, teto, allowlist; DADO não confiável. */
+  async readAttachment(taskId: string, ref: string): Promise<DownloadedAttachment> {
+    return tm('attachment.read', taskId, ref);
+  }
+
+  /** inline.refs — URLs do host de uploads no markdown da descrição e dos comentários. */
+  async getInlineRefs(taskId: string): Promise<InlineRef[]> {
+    return tm('inline.refs', taskId).refs;
+  }
+
+  /** attachment.add — fileUpload → PUT na URL assinada → markdown com a assetUrl (comentário ou descrição). */
+  async addAttachment(taskId: string, file: AttachmentInput): Promise<AttachmentOutput> {
+    return tm('attachment.add', taskId, file.filename);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // STATUS
   // ═══════════════════════════════════════════════════════════════════════════
 
@@ -759,6 +795,15 @@ Nada foi deletado nem arquivado.
 - MEDIDO AO VIVO 2026-10-11 project.read: por id de projeto devolve o Project com seus teams; pela key `SAC` devolve o team.
 - Erro HTTP: chave inválida devolve **HTTP 401** e o executável sai rc 1 com a mensagem do Linear (a chave nunca é impressa).
 - **Não exercitado:** `item.delete` (arquivar exige confirmação do maestro) — segue `unverified` e fora do executável.
+
+---
+
+## 📖 Leitura completa, atividade, hierarquia e anexos (SAC-116, 2026-10-12)
+
+`tm.sh item.read <ID>` é a **leitura completa** (comentários paginados, atividade, hierarquia, anexos, refs
+inline; `--lean` = enxuta). Primárias, medição ao vivo (com o sha256 do round-trip) e a postura de segurança
+(quarentena, teto, allowlist de mime, chave só no host de uploads, conteúdo como DADO não confiável, imagem
+pelo Read do caminho): [`linear-leitura-completa.md`](linear-leitura-completa.md).
 
 ---
 

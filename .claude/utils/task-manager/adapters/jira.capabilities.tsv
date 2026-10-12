@@ -18,7 +18,12 @@ estimate.points_read	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	s
 estimate.time	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	timetracking.originalEstimate; não ancorado
 comment.add	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_DC_COMMENT_BODY_STRING	DC: corpo string ancorado; Cloud: ADF do comentário sem âncora (E_ELENXO_JIRA_COMMENT_ADF_UNANCHORED)
 comment.list	required	unverified	rest-v3 (cloud) | rest-v2 (dc)	kg:task-manager-vocabulario-2026-10#E_JIRA_DC_RENDEREDBODY_EXPAND_OPTIN	renderedBody (HTML) só sob expand no DC; leitura no Cloud não ancorada
+activity.list	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	histórico de mudanças da task (SAC-116): o adapter não lê; declarado sem executável até haver demanda (maestro, 2026-10-12)
+hierarchy.context	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	mãe completa + irmãs + subtasks recursivas (SAC-116): o adapter não monta; declarado sem executável até haver demanda (maestro, 2026-10-12)
 attachment.add	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	anexo não ancorado
+attachment.list	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	anexos e arquivos enviados (SAC-116): o adapter não lista; declarado sem executável até haver demanda (maestro, 2026-10-12)
+attachment.read	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	download para quarentena (SAC-116): o adapter não baixa; declarado sem executável até haver demanda (maestro, 2026-10-12)
+inline.refs	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	imagens/arquivos embutidos no texto (SAC-116): o adapter não extrai; declarado sem executável até haver demanda (maestro, 2026-10-12)
 label.set	optional	unverified	rest-v3 (cloud) | rest-v2 (dc)	-	fields.labels; labels não ancoradas
 iteration.assign	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	sprint pela Agile API, não ancorada
 link.create	optional	not_implemented	rest-v3 (cloud) | rest-v2 (dc)	-	issue links não ancorados

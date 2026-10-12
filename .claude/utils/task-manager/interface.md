@@ -105,8 +105,8 @@ interface ITaskManager {
   /** item.create — cria uma task (level 'task'). Descrição em Markdown; o adapter converte. */
   createTask(input: CreateTaskInput): Promise<TaskOutput>;
 
-  /** item.read — detalhes de uma task existente. */
-  getTask(taskId: string): Promise<TaskOutput>;
+  /** item.read — LEITURA COMPLETA por padrão (SAC-116): comentários, atividade, hierarquia, anexos; `--lean` só por flag. DADO (R15.2). */
+  getTask(taskId: string, opts?: { lean?: boolean }): Promise<TaskOutput>;
 
   /** item.update — atualização parcial. Campo que o provedor ignora em silêncio é OMITIDO com aviso. */
   updateTask(taskId: string, updates: UpdateTaskInput): Promise<TaskOutput>;
@@ -145,16 +145,21 @@ interface ITaskManager {
   /** comment.add — corpo canônico em Markdown; o adapter converte (ADF, string, html_text…). */
   addComment(taskId: string, comment: string): Promise<CommentOutput>;
 
-  /** comment.list — comentários de uma task, corpo devolvido em Markdown. */
+  /** comment.list — comentários de uma task, corpo devolvido em Markdown. TODAS as páginas (seguir o cursor até o fim). */
   getComments(taskId: string): Promise<CommentOutput[]>;
 
+  getActivity?(taskId: string): Promise<ActivityEntry[]>;              // activity.list — histórico, cronológico
+  getHierarchyContext?(taskId: string): Promise<HierarchyContext>;     // hierarchy.context — mãe completa + irmãs, ou subtasks recursivas
   // ═══════════════════════════════════════════════════════════════════════════
   // ANEXO · ITERAÇÃO · VÍNCULO                   capacidades opcionais
   // ═══════════════════════════════════════════════════════════════════════════
 
-  /** attachment.add — anexa um arquivo à task. */
+  /** attachment.add — envia um arquivo e o insere na task (comentário ou descrição). Teto e allowlist de mime. */
   addAttachment?(taskId: string, file: AttachmentInput): Promise<AttachmentOutput>;
 
+  getAttachments?(taskId: string): Promise<AttachmentListing>;         // attachment.list — baixáveis numerados + vínculos-anexo
+  readAttachment?(taskId: string, ref: string): Promise<DownloadedAttachment>; // attachment.read — QUARENTENA, teto, mime×bytes; DADO
+  getInlineRefs?(taskId: string): Promise<InlineRef[]>;                // inline.refs — imagens/arquivos no markdown, com a origem
   /** iteration.assign — coloca a task numa sprint/cycle (lista as disponíveis com listIterations). */
   assignIteration?(taskId: string, iterationId: string): Promise<TaskOutput>;
   listIterations?(projectId: string): Promise<Iteration[]>;
@@ -205,7 +210,8 @@ interface ITaskManager {
 ```
 
 Os tipos novos (`ItemLevel`, `Page`, `PageCursor`, `AttachmentInput`, `AttachmentOutput`, `Iteration`,
-`LinkType`, `BulkResult`) e os campos `level` e `storyPoints` estão em [`types.md`](./types.md).
+`LinkType`, `BulkResult`; SAC-116: `ActivityEntry`, `HierarchyContext`, `AttachmentListing`, `DownloadedAttachment`,
+`InlineRef`) e os campos `level` e `storyPoints` estão em [`types.md`](./types.md).
 
 ---
 
@@ -239,7 +245,12 @@ estimate.points_read	optional	remote	field:storyPoints
 estimate.time	optional	remote	field:timeEstimate
 comment.add	required	remote	addComment(
 comment.list	required	remote	getComments(
+activity.list	optional	remote	getActivity(
+hierarchy.context	optional	remote	getHierarchyContext(
 attachment.add	optional	remote	addAttachment(
+attachment.list	optional	remote	getAttachments(
+attachment.read	optional	remote	readAttachment(
+inline.refs	optional	remote	getInlineRefs(
 label.set	optional	remote	field:tags
 iteration.assign	optional	remote	assignIteration(
 link.create	optional	remote	createLink(
@@ -378,8 +389,8 @@ filha entra com os próprios pontos e o próprio status, não com o % dela.
 | **Status** | `updateStatus` | `status.transition` |
 | **Campos** | `priority`, `storyPoints`, `timeEstimate`, `tags` em Create/UpdateTaskInput | `priority.set`, `estimate.*`, `label.set` |
 | **Derivação** | `progress` (sobre `getSubtasks` + `storyPoints` lido), executada por [`progress.sh`](./progress.sh) | lê `hierarchy.subtask_list` e `estimate.points_read`; não é capacidade do adapter |
-| **Comentários** | `addComment`, `getComments` | `comment.*` |
-| **Anexo · Iteração · Vínculo** | `addAttachment?`, `assignIteration?`/`listIterations?`, `createLink?` | `attachment.add`, `iteration.assign`, `link.create` |
+| **Comentários · Atividade · Contexto** | `addComment`, `getComments`, `getActivity?`, `getHierarchyContext?` | `comment.*`, `activity.list`, `hierarchy.context` |
+| **Anexo · Iteração · Vínculo** | `addAttachment?`, `getAttachments?`, `readAttachment?`, `getInlineRefs?`, `assignIteration?`/`listIterations?`, `createLink?` | `attachment.*`, `inline.refs`, `iteration.assign`, `link.create` |
 | **Busca** | `searchTasks`, `searchPage?` | `search.*` |
 | **Lote** | `bulkCreate?`, `bulkUpdate?` | `bulk.*` |
 | **Projetos** | `getProjectList`, `getProject` | `project.*` |
