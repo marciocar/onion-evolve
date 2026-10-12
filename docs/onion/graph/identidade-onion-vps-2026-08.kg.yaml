@@ -318,20 +318,26 @@ nodes:
 
   - id: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
     node_type: question
-    plane: PROD
-    verified_at: "2026-08-30"
-    verified_against: grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo
     trace: docs/analysis/arandek-repo-exposure-2026-08.md
-    status: open
     impact: 4
     confidence: 1.0
     label: "ACHADO DE ADOTANTE, não comunicado (ação do maestro): o docker-compose.yml rastreado em ArandekBR/arandek tem cinco segredos literais e portas em 0.0.0.0 sem bind; nesta VPS só um overlay local as prende a 127.0.0.1. Recado em docs/analysis/arandek-repo-exposure-2026-08.md."
-    narrative: "label anterior: ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. ⟨Medido no docker-compose.yml do clone do adotante arandek, arquivo⟩ RASTREADO por git em `ArandekBR/arandek`: (1) cinco segredos LITERAIS — ⟨o `--requirepass` (valor omitido) na linha 60⟩ e `LANGFUSE_INIT_PROJECT_PUBLIC_KEY`/`LANGFUSE_INIT_PROJECT_SECRET_KEY`/`MINIO_ROOT_PASSWORD`/`MINIO_SECRET_ACCESS_KEY` nas linhas 147/148/210/231 (VALORES DELIBERADAMENTE FORA DESTE GRAFO — o core nao guarda segredo de adotante; leia no arquivo dele); (2) as portas publicam em `0.0.0.0` sem prefixo de bind — MinIO 9090/9091, Langfuse 3006, Milvus 19530/19531, Postgres `${POSTGRES_PORT:-5438}` e Redis `${REDIS_PORT:-6379}`. Num host de IP publico isso E internet, e o `ufw` NAO segura: porta publicada por Docker atravessa DNAT/FORWARD e nao ve o `INPUT DROP` — medido nesta VPS, foi assim que dois Redis sem senha ficaram expostos aqui, e e a mesma mecanica que [C_REDE_ISOLADA_POR_CONSTRUCAO] descreve do lado de ca. NESTA VPS os 15 containers dele estao seguros SO por causa do ⟨overlay local do adotante (compose.local.yml)⟩, que prefixa `127.0.0.1:` — sem o overlay nasceriam publicos. O redis vivo responde `NOAUTH`, entao a senha esta ativa: o defeito e ela ser publica no historico, nao ausente. RECADO REDIGIDO E PRONTO em `docs/analysis/arandek-repo-exposure-2026-08.md`. ⚠️ ARMADILHA QUE ME PEGOU: meu primeiro `grep` de portas voltou VAZIO e eu quase conclui 'ele nao publica nada' — o padrao nao cobria ASPAS SIMPLES (`- '9090:9000'`). Terceira vez no dia que o defeito estava no vocabulario do filtro, nao na logica."
+    status: done
+    plane: DEV
+    verified_at: "2026-10-12"
+    verified_against: "decisão do maestro em 2026-10-12, por pergunta com opções (/meta:decide): escolhida «Re-medir e enviar»"
+    narrative: |-
+      label anterior: ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. ⟨Medido no docker-compose.yml do clone do adotante arandek, arquivo⟩ RASTREADO por git em `ArandekBR/arandek`: (1) cinco segredos LITERAIS — ⟨o `--requirepass` (valor omitido) na linha 60⟩ e `LANGFUSE_INIT_PROJECT_PUBLIC_KEY`/`LANGFUSE_INIT_PROJECT_SECRET_KEY`/`MINIO_ROOT_PASSWORD`/`MINIO_SECRET_ACCESS_KEY` nas linhas 147/148/210/231 (VALORES DELIBERADAMENTE FORA DESTE GRAFO — o core nao guarda segredo de adotante; leia no arquivo dele); (2) as portas publicam em `0.0.0.0` sem prefixo de bind — MinIO 9090/9091, Langfuse 3006, Milvus 19530/19531, Postgres `${POSTGRES_PORT:-5438}` e Redis `${REDIS_PORT:-6379}`. Num host de IP publico isso E internet, e o `ufw` NAO segura: porta publicada por Docker atravessa DNAT/FORWARD e nao ve o `INPUT DROP` — medido nesta VPS, foi assim que dois Redis sem senha ficaram expostos aqui, e e a mesma mecanica que [C_REDE_ISOLADA_POR_CONSTRUCAO] descreve do lado de ca. NESTA VPS os 15 containers dele estao seguros SO por causa do ⟨overlay local do adotante (compose.local.yml)⟩, que prefixa `127.0.0.1:` — sem o overlay nasceriam publicos. O redis vivo responde `NOAUTH`, entao a senha esta ativa: o defeito e ela ser publica no historico, nao ausente. RECADO REDIGIDO E PRONTO em `docs/analysis/arandek-repo-exposure-2026-08.md`. ⚠️ ARMADILHA QUE ME PEGOU: meu primeiro `grep` de portas voltou VAZIO e eu quase conclui 'ele nao publica nada' — o padrao nao cobria ASPAS SIMPLES (`- '9090:9000'`). Terceira vez no dia que o defeito estava no vocabulario do filtro, nao na logica.
+
+      verified_against anterior: «grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo»
+      proveniência anterior: source «docs/analysis/arandek-repo-exposure-2026-08.md» · locator «grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo» · method «medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado» · locality «repo»
+      plane anterior: PROD, rebaixado a DEV porque a base do selo é testemunho (contrato: integrity.testimony-in-prod)
+      Selado por /meta:decide em 2026-10-12: escolhida «Re-medir e enviar»; descartadas: «Enviar já, como está» · «Não enviar e arquivar».
     provenance:
-      source: "docs/analysis/arandek-repo-exposure-2026-08.md"
-      locator: "grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "repo"
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-12: «O recado sobre os 5 segredos literais e as portas em 0.0.0.0 no docker-compose.yml rastreado de ArandekBR/arandek, redigido em 2026-08-30 e nunca enviado, deve ser enviado agora?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      locality: "pessoa"
 
   - id: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
     node_type: question

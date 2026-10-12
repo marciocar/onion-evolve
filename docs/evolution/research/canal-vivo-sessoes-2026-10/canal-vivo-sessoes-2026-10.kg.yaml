@@ -41,12 +41,21 @@ nodes:
   # ── A PERGUNTA ───────────────────────────────────────────────────────────────────────────
   - id: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
     node_type: question
-    plane: DEV
-    status: open
     impact: 4
     confidence: 0.5
     label: "Como desenhar a classe 'live' da federation-transport (adapter por adotante: cc-peer|slack|teams|a2a) para comunicação DIRETA entre sessões Claude Code em máquinas e CONTAS diferentes, restrita a membros autorizados, com humano no circuito e o corpo da mensagem como DADO? Segue open: o Claude Code documenta transporte entre máquinas só dentro da MESMA conta; entre contas o doc é silente; Slack/Teams/A2A têm âncora de mecanismo, mas members.yaml não carrega identidade de plataforma."
     trace: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml (Q_CANAL_VIVO_ENTRE_SESSOES) · .claude/utils/federation-transport/README.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-12"
+    verified_against: "decisão do maestro em 2026-10-12, por pergunta com opções (/meta:decide): escolhida «Sim, só entre suas máquinas»"
+    narrative: |-
+      Selado por /meta:decide em 2026-10-12: escolhida «Sim, só entre suas máquinas»; descartadas: «Sim, adapter por adotante» · «Não, só git-async» · «Pesquisar antes».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-12: «O canal vivo entre sessões vira a 3ª via da co-evolução ao lado do doc-bridge git-async (envelope fixo, registro do envio, decisão descendo ao grafo)?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      locality: "pessoa"
 
   # ── CLAUDE CODE · cross-session messaging ─────────────────────────────────────────────────
   - id: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC

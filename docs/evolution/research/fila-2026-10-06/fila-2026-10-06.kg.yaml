@@ -230,12 +230,21 @@ nodes:
   - id: Q_CANAL_VIVO_ENTRE_SESSOES
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.5
-    verified_against: ".claude/commands/meta/co-evolve.md"
     label: "o canal vivo entre sessões vira 3ª via da co-evolução (envelope fixo, registro do envio, decisão descendo ao grafo)? aguarda o maestro"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-12"
+    verified_against: "decisão do maestro em 2026-10-12, por pergunta com opções (/meta:decide): escolhida «Sim, só entre suas máquinas»"
+    narrative: |-
+      verified_against anterior: «.claude/commands/meta/co-evolve.md»
+      Selado por /meta:decide em 2026-10-12: escolhida «Sim, só entre suas máquinas»; descartadas: «Sim, adapter por adotante» · «Não, só git-async» · «Pesquisar antes».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-12: «O canal vivo entre sessões vira a 3ª via da co-evolução ao lado do doc-bridge git-async (envelope fixo, registro do envio, decisão descendo ao grafo)?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      locality: "pessoa"
   # ── 2026-10-07, fim do dia (lote do /meta:drive) ─────────────────────────────────────────────
   - id: D_PAPEL_DUAS_DIMENSOES
     node_type: decision
