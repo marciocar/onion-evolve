@@ -67,6 +67,7 @@
 .claude/commands/meta/create-skill.md	E_DEFEITO_CITACAO_EXECUTADA	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/commands/meta/create-skill.md	E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/commands/meta/create-vertical.md	E_create_vertical_existe	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
+.claude/commands/meta/decide.md	D_TOPOLOGIA_DO_DECIDE_SELADA	docs/evolution/research/forge-decide-2026-10/forge-decide-2026-10.kg.yaml
 .claude/commands/meta/diary.md	SY6_ev_diary_conflict_class	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/diary.md	SY6_ev_retestar_nunca_recarimbar	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/dissect.md	E_DOGFOOD_DISSECT_PARAVA_NO_VEREDITO	docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml
