@@ -52,6 +52,7 @@ Toda resposta de `tools/call`, de sucesso ou de erro, vem num envelope:
   "served_commit": "<sha do HEAD da raiz>",
   "fetched_at": "2026-10-12T14:03:22Z",
   "fetch_head_commit": "<1º sha do FETCH_HEAD, ou null>",
+  "arvore_limpa": true,
   "root_source": "env ONION_KG_ROOT",
   "data": { "...": "..." }
 }
@@ -61,7 +62,13 @@ Toda resposta de `tools/call`, de sucesso ou de erro, vem num envelope:
   resposta já declara o commit novo.
 - `fetched_at` é o mtime do `FETCH_HEAD` mais recente entre o do worktree e o do clone (o `FETCH_HEAD`
   é por worktree, medido). `null` quer dizer que **nunca houve fetch**. Não é a idade do commit servido:
-  se `fetch_head_commit` diferir de `served_commit`, o worktree está atrás do último fetch.
+  se `fetch_head_commit` diferir de `served_commit`, o worktree difere do último fetch (atrás, ou fixado
+  de propósito num SHA verificado, como manda o runbook).
+- `served_commit` só fala pelo que está **versionado**: `kg_radar`, `kg_node`, `kb_get`, `diary_index` e
+  `inventory` recusam arquivo fora do índice da raiz. O `kb_search` lê o disco; por isso o envelope traz
+  `arvore_limpa` (`git status --porcelain` vazio). Árvore suja = parte do que se lê não é o commit.
+- O HEAD é relido **depois** da tool: se ele andou durante a chamada (um `checkout` no meio), a resposta
+  é recusada em vez de sair com o carimbo antigo.
 - Se a raiz deixar de ser repo legível em runtime, a tool devolve erro com `served_commit: null`, um
   campo `recusa` e **nenhum** `data`. O servidor nunca serve conteúdo sem declarar o commit.
 - `untrusted_data` existe por causa de injeção indireta: o conteúdo do repo pode carregar instrução
@@ -70,13 +77,18 @@ Toda resposta de `tools/call`, de sucesso ou de erro, vem num envelope:
 
 Segurança das entradas: o termo do `kb_search` vai ao `grep` como `-e TERMO` seguido de `--`, então
 nunca vira opção. Caminhos absolutos, `..` e symlink que escapa da raiz são recusados, e o `grafo`
-tem de estar no `git ls-files` da raiz.
+tem de estar no `git ls-files` da raiz. Corpo com `Content-Length` negativo ou acima de 1 MB e
+`params` que não é objeto recebem 400.
+
+Tetos declarados: o termo do `kb_search` é regex BRE, então um padrão patológico pode segurar uma
+thread até o timeout de 60 s (exige token); o servidor não confere o header `Origin` (a rede privada e
+o token mitigam). Os dois ficam para o degrau 2, onde o endpoint deixa de ser privado.
 
 ## Teste
 
 ```bash
-LC_ALL=C python3 -I ops/mcp-onion-kg/selftest.py          # 21 casos por HTTP de verdade
-LC_ALL=C SELFTEST_FAMILIES=mcp_onion_kg bash .claude/validation/lint-selftest.sh   # + 14 mutantes
+LC_ALL=C python3 -I ops/mcp-onion-kg/selftest.py          # 29 casos por HTTP de verdade
+LC_ALL=C bash .claude/validation/lint-selftest.sh --families mcp_onion_kg   # + 20 mutantes
 ```
 
 O harness sobe o servidor em `127.0.0.1` numa porta efêmera contra uma fixture em `mktemp` e mata só
