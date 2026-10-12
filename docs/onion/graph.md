@@ -678,7 +678,7 @@ onion-evolve	specialization	sdaal
 onion-evolve	tier	source	
 onion-kg-ssot	adopts	onion-evolve	
 onion-kg-ssot	mode	greenfield	
-onion-kg-ssot	pin	381055568ee8	
+onion-kg-ssot	pin	dcdacf9ba196	
 onion-kg-ssot	specialization	kg-ssot	
 onion-kg-ssot	specialization	produto	
 onion-kg-ssot	specialization	schema	
