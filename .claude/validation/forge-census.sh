@@ -46,7 +46,11 @@ _tracked() { git -C "${REPO}" ls-files -- "$1" 2>/dev/null; }
 
 # CANDIDATOS: descobertos, não listados. Um comando-com-framework se anuncia por ter uma
 # superfície invocável (skill própria ou comando em meta/) — o resto o censo mede.
-mapfile -t CANDS < <( { _tracked '.claude/skills/*/SKILL.md'; _tracked '.claude/commands/meta/*.md'; } | sort -u )
+# ⚠️ README NÃO É SUPERFÍCIE: `commands/meta/README.md` entrava como candidato e saía 1/7, inflando os
+#    "comandos com só a superfície" do raio-X (MAQ-3, sinal do adotante onion-kg-ssot 2026-10-12). A
+#    exclusão espelha a do lint (`! -iname 'readme.md'` na REGRA dos branch-*).
+mapfile -t CANDS < <( { _tracked '.claude/skills/*/SKILL.md'; _tracked '.claude/commands/meta/*.md'; } \
+  | grep -viE '/readme[.]md$' | sort -u )
 [ "${#CANDS[@]}" -gt 0 ] \
   || { echo "forge-census: nenhum candidato RASTREADO em .claude/skills/ nem .claude/commands/meta/ — não emito censo vazio. Recusa." >&2; exit 3; }
 

@@ -52,6 +52,11 @@ julga qualidade e não prioriza. O valor do evolve é o **confronto** entre as s
 órgão isolado entrega. E a seção 4 mede se a doutrina **carregou**, nunca se **aterrissou**:
 achado sobre doutrina diz qual das duas coisas mediu.
 
+> **Num adotante**, a MAQ audita a maquinaria **vendorizada** (código do core no pin): o achado sobe
+> por `/meta:co-relay` e a cura volta pelo update; o `tools/` do produto adotante fica **fora** do
+> escopo (doutrina, cláusula 7). Lá o raio-X diz `n/a no adotante` para o plano do core e
+> `? NÃO MEDIDA (opt-out)` para a idade quando não há `docs/analysis/` — nunca ✅.
+
 ## 🎯 Objetivo
 
 Olhar para o **próprio Sistema Onion** com fan-out de auditores e produzir um
@@ -166,8 +171,10 @@ Workflow({ scriptPath: '.claude/workflows/evolve.js',
 
 O script carrega os schemas reais (`FINDINGS`, `VERDICT`), atribui o `id` estável
 (`<dim>-<ordinal>`) e passa todo achado `blocker`/`recommended` por um refutador `opus/high` — em
-pipeline, sem barreira. Devolve `dims` (vistos × devolvidos, por dimensão), `skipped` (não pedida
-ou sem alvo), **`lost`** (o worker lançou: lacuna, nunca zero), `survived`, **`unjudged`** (o juiz
+pipeline, sem barreira. Devolve **`complete`** (true só com as 10 — **nunca** daqui sozinho, porque
+D4/D5/D9/D10 são deste Passo 2.5), **`measured`**, **`not_measured: [{d, reason}]`** (cada dimensão
+que não mediu, com o motivo: composição, não pedida, Census recusado, lost, dead), `dims` (vistos ×
+devolvidos, por dimensão), `skipped` (lista nua, mantida por compatibilidade), **`lost`** (o worker lançou: lacuna, nunca zero), `survived`, **`unjudged`** (o juiz
 devolveu nulo ou falhou: vai ao grafo como **não julgado**, nunca como sobrevivente), `refuted` e
 `verdicts`. Entrada ruim (`args` que não é objeto nem JSON, `cap` fora de 1..30, dimensão D4/D5/D9/D10)
 **recusa** com `{error}` — nunca roda tudo em silêncio.
@@ -195,8 +202,15 @@ severidade — cujo alvo, proposta ou texto toque `engineer/`, `product/`, fusã
 achados do Passo 2.5 **não** passam por juiz e o relatório diz isso. (A 1ª versão julgava só por
 severidade, e um `opportunistic` que propusesse fundir fases escapava do veto — achado do Elenxo.)
 
+> ⚠️ **Disparar o workflow `evolve` pelo NOME, sem args, é o atalho parcial** (medido 2026-10-12 no
+> adotante `onion-kg-ssot`): cobre no máximo 6 das 10 dimensões, mais a MAQ. Sem `maqTargets`, uma
+> fase `Census` (haiku/low) roda o raio-X e o script extrai a seção 7 verbatim, conferindo os
+> cabeçalhos; se ela não vier inteira, a MAQ sai em `not_measured` com o motivo. O caminho completo
+> é **este comando**.
+
 ### Passo 3.2 — Completeness critic (no contexto principal, sobre o retorno)
 Não é um agente: é a conferência que **você** faz antes do fan-in, sobre o que o script devolveu.
+Parta do `not_measured`: tire dele o que o Passo 2.5 rodou de fato, e o que sobrar é lacuna do relatório.
 As 10 dimensões têm de aparecer em exatamente um lugar — `dims` (rodou), `skipped`, `lost`, ou o
 Passo 2.5 (rodou ou lacuna declarada). `lost` e `unjudged` não-vazios vão para o relatório **e** para
 o grafo. Vazio silencioso numa dimensão é falha, não sucesso — vale também para o D9 no core, cujos
