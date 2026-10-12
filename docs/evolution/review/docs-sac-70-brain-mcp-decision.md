@@ -1,7 +1,7 @@
 ---
 branch: docs/sac-70-brain-mcp-decision
 date: 2026-10-11
-reviewed_diff_sha256: 42c096b179a450634a68423e5e0bb1c37f4d832bf1c50dbe65ec89d9324cdac6
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: a5f7a381f2b018565c0f87d074d1315e19c22aa261f12e84366a12c12cbe80b2
 findings_total: 3
 findings_real: 3
@@ -31,3 +31,7 @@ reviewer: Elenxo do run wf_19d83833-a3e (refutador opus/high, 45 objeções) + p
 
 - As 39 claims cortadas por orçamento.
 - A divergência entre a síntese e o Elenxo sobre onde mora o código, que fica para o maestro selar.
+
+## Passada do selo (2026-10-12)
+
+O maestro selou o nó de decisão na opção recomendada, por pergunta com opções. Diff revisado: só o bloco do `D_` mudou (`status: confirmed`, `verified_at`, `verified_against` com a opção selada, `provenance` de testemunho), radar exit 0 e contrato rc 0. Nenhum outro nó foi tocado.
