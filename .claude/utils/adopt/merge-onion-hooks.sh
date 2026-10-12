@@ -18,8 +18,10 @@
 #             existe no alvo um hook com o MESMO .command (os commands Onion são
 #             canônicos e idênticos após a cópia do manifesto — bash .claude/
 #             hooks/X.sh / detector inline). Ausentes são ANEXADOS como grupo
-#             próprio ({hooks:[obj]}); tudo do alvo é preservado.
-#             IDEMPOTENTE: rodar 2× = no-op na 2ª (todos já presentes).
+#             próprio ({matcher?, hooks:[obj]}, com o matcher do grupo de origem); e os PRESENTES
+#             recebem as chaves da fonte por cima (refresh do que é do Onion: onFailure, timeout…).
+#             Hook próprio do alvo (command que a fonte não tem) e chave extra do alvo ficam.
+#             IDEMPOTENTE: rodar 2× = no-op na 2ª.
 #
 # Uso       : merge-onion-hooks.sh <source-settings.json> <target-settings.json>
 #             Emite o JSON merjado em STDOUT (não escreve no lugar — o chamador
@@ -66,12 +68,24 @@ jq -n \
   reduce (($src.hooks // {}) | keys[]) as $ev ($tgt;
     # commands Onion já presentes no alvo, para este evento
     ([ (.hooks[$ev] // [])[].hooks[]?.command ]) as $present
-    # entradas de hook da fonte (achatando os grupos) ainda ausentes no alvo
-    | ([ ($src.hooks[$ev] // [])[].hooks[]?
-         | select(.command as $c | ($present | index($c)) == null) ]) as $missing
-    # garante .hooks objeto e anexa cada ausente como grupo próprio
+    # mapa command -> objeto do hook na FONTE, para este evento
+    | ([ ($src.hooks[$ev] // [])[].hooks[]? | {key: .command, value: .} ] | from_entries) as $srcmap
+    # entradas da fonte ainda ausentes no alvo, LEVANDO o matcher do grupo de origem (2026-10-12: sem isto o
+    # veto pretooluse-direct-provider-api chegou ao adotante sem `matcher: "Bash"`)
+    | ([ ($src.hooks[$ev] // [])[] | . as $g | .hooks[]?
+         | select(.command as $c | ($present | index($c)) == null)
+         | if ($g.matcher != null) then {matcher: $g.matcher, hooks: [.]} else {hooks: [.]} end ]) as $missing
     | .hooks = (.hooks // {})
-    | .hooks[$ev] = ((.hooks[$ev] // []) + [ $missing[] | {hooks: [.]} ])
+    # REFRESH do que é do Onion (2026-10-12, medido no --update do onion-kg-ssot): hook do alvo com o MESMO
+    # .command de um hook da fonte é do Onion; as chaves da FONTE sobrepõem as do alvo (onFailure, timeout…),
+    # e chave extra que só o alvo tem fica. Antes, presente = intocado, e o `onFailure: block` dos 4 vetos
+    # nunca chegava a adotante antigo (REGRA 101 reprovava 4 HARD no pós-merge). Hook próprio do alvo
+    # (command que a fonte não tem) não é tocado, nem hook sem .command (type prompt/agent: indexar por null abortava o merge).
+    | .hooks[$ev] = ((.hooks[$ev] // []) | map(
+        if (.hooks | type) == "array"
+        then .hooks |= map(. as $h | if (($h.command | type) == "string" and $srcmap[$h.command] != null) then ($h + $srcmap[$h.command]) else $h end)
+        else . end))
+    | .hooks[$ev] = (.hooks[$ev] + $missing)
   )
   # attribution (a SSOT da assinatura de commit/PR) viaja NEVER-CLOBBER: só entra se o alvo não tem o
   # campo. Até 2026-10-05 este merge levava só hooks, e o pr.md do adotante dizia que a assinatura vinha de

@@ -47,6 +47,7 @@ members	members/members-bad-mini-na.yaml	-	fail
 members	members/members-bad-two-source-doors.yaml	-	fail	
 merge	adopt-settings-merge/target-empty.json	-	-
 merge	adopt-settings-merge/target-with-own.json	-	-
+merge	adopt-settings-merge/target-old-adopter-no-onfailure.json	-	-
 merge	adopt-settings-merge/target-with-own-attribution.json	-	-
 lint	r17-frontmatter-colon/bad-unquoted-colon.md	.claude/agents/development	bad	não-aspado
 lint	r17-frontmatter-colon/good-quoted.md	.claude/agents/development	good	

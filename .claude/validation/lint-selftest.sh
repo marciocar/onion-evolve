@@ -4832,6 +4832,24 @@ run_merge_fixture() {
   lost="$(jq -nr --argjson ref "$(cat "${tgt}")" --argjson out "${out}" "${diff_jq}")"
   if [ -n "${lost}" ]; then record_fail "${fixture}" "hook próprio do alvo PERDIDO (clobber): ${lost}"; return; fi
 
+  # (4) REFRESH do que é do Onion (2026-10-12, --update do onion-kg-ssot: 4 vetos ficaram sem onFailure e a
+  #     REGRA 101 reprovou 4 HARD): todo hook do resultado com o MESMO command de um da fonte traz as chaves
+  #     da fonte com os valores da fonte. (5) MATCHER: hook da fonte que estava num grupo com matcher aparece
+  #     no resultado num grupo com o MESMO matcher (o veto novo chegou sem `matcher: "Bash"`).
+  local refresh_bad matcher_bad
+  refresh_bad="$(jq -nr --argjson s "$(cat "${src}")" --argjson o "${out}" '
+    ($s.hooks // {}) | keys[] as $ev
+    | ([ ($s.hooks[$ev] // [])[].hooks[]? | {key: .command, value: .} ] | from_entries) as $m
+    | ($o.hooks[$ev] // [])[].hooks[]? | select((.command | type) == "string" and $m[.command] != null) | . as $h
+    | $m[.command] | to_entries[] | select($h[.key] != .value) | "\($ev): \($h.command) .\(.key)"')"
+  if [ -n "${refresh_bad}" ]; then record_fail "${fixture}" "hook Onion do alvo SEM o refresh da fonte: ${refresh_bad}"; return; fi
+  matcher_bad="$(jq -nr --argjson s "$(cat "${src}")" --argjson o "${out}" '
+    ($s.hooks // {}) | keys[] as $ev | ($s.hooks[$ev] // [])[] | select(.matcher != null) | .matcher as $mt
+    | .hooks[]?.command as $c
+    | select([ ($o.hooks[$ev] // [])[] | select(.matcher == $mt) | .hooks[]?.command ] | index($c) == null)
+    | "\($ev): \($c) sem matcher \($mt)"')"
+  if [ -n "${matcher_bad}" ]; then record_fail "${fixture}" "hook da fonte fora do grupo com o matcher: ${matcher_bad}"; return; fi
+
   # attribution: ausente no alvo → chega o da fonte; presente no alvo → fica o do alvo (never-clobber)
   local attr_ok
   attr_ok="$(jq -nr --argjson s "$(cat "${src}")" --argjson t "$(cat "${tgt}")" --argjson o "${out}" '
