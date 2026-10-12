@@ -29263,14 +29263,16 @@ _family run_agent_frontmatter_keys_selftests
 # mutante tem de aplicar exatamente 1 vez e o caso NOMEADO tem de reprovar. As curas: `--` no grep do kb_search,
 # raiz por env, frescor (served_commit/fetched_at) em toda resposta, fail-closed da raiz (boot, runtime e
 # subdiretório), kg_node pelo parser do radar, marca de dado não confiável, fail-closed do token, symlink que
-# escapa da raiz. TETO DECLARADO: o `os.path.isabs` do confinamento é defesa redundante (o grafo tem de estar no
-# `git ls-files` e a KB tem prefixo fixo), então o mutante dele sobrevive — e não está aqui por isso.
+# escapa da raiz, arquivo não versionado, árvore suja, corpo malformado. TETOS DECLARADOS (mutante sobrevive por
+# defesa DUPLA, por isso não está na lista): o `os.path.isabs` do confinamento (o grafo tem de estar no `git
+# ls-files` e a KB tem prefixo fixo) e a recusa de raiz em runtime, que vale ANTES e DEPOIS da tool (a re-leitura
+# do HEAD que fecha a janela frescor→leitura também recusa raiz ilegível; cada uma sozinha segura o caso).
 run_mcp_onion_kg_selftests() {
   local h="${REPO_ROOT}/ops/mcp-onion-kg/selftest.py"
   if [ ! -f "${h}" ] || [ ! -f "${REPO_ROOT}/ops/mcp-onion-kg/server.py" ]; then
     record_skip "mcp-onion-kg: servidor ausente nesta árvore (ops/ não viaja para todo papel)"; return
   fi
-  local want_total=21 o rc
+  local want_total=29 o rc
   if o="$(LC_ALL=C python3 -I -B "${h}" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} " <<< "${o}" && ! grep -q '^FAIL ' <<< "${o}"; then
     record_pass "mcp-onion-kg: (a) servidor real por HTTP — ${want_total} casos (401, raiz inválida, -efoo, kg_node, frescor)"
@@ -29288,7 +29290,6 @@ run_mcp_onion_kg_selftests() {
 ROOT = os.path.realpath(_ROOT_ENV) if _ROOT_ENV else SERVER_REPO$(printf '\x1f')ROOT = SERVER_REPO$(printf '\x1f')raiz-por-env
 **fr, 'data': data}$(printf '\x1f')'data': data}$(printf '\x1f')frescor-served_commit
 for args in (['rev-parse', '--git-path', 'FETCH_HEAD'], ['rev-parse', '--git-common-dir']):$(printf '\x1f')for args in ():$(printf '\x1f')frescor-fetched_at-apos-fetch
-fr = freshness()  # RootUnavailable sobe$(printf '\x1f')fr = {}  # RootUnavailable sobe$(printf '\x1f')raiz-invalida-em-runtime-recusa
         raise SystemExit(f'recuso subir: {e}$(printf '\x1f')        fr = {'root_source': '', 'served_commit': '0' * 40, 'fetched_at': None}; _x = (f'recuso subir: {e}$(printf '\x1f')raiz-invalida-recusa-no-boot
 if rc != 0 or os.path.realpath(top) != ROOT:$(printf '\x1f')if rc != 0:$(printf '\x1f')raiz-subdiretorio-recusa
 'kg_node': (kg_node,$(printf '\x1f')'kg_nodeX': (kg_node,$(printf '\x1f')tools-list-tem-kg_node
@@ -29297,6 +29298,13 @@ node['label'] = o[11]$(printf '\x1f')node['label'] = ''$(printf '\x1f')kg_node-e
     if not TOKEN:$(printf '\x1f')    if False:$(printf '\x1f')token-fail-closed
 return hmac.compare_digest(self.headers.get('X-Api-Key', '').encode(), TOKEN.encode())$(printf '\x1f')return True$(printf '\x1f')sem-token-401
 real = os.path.realpath(os.path.join(ROOT, rel))$(printf '\x1f')real = os.path.normpath(os.path.join(ROOT, rel))$(printf '\x1f')kb_get-symlink-para-fora-recusado
+'verified_at': f[7], 'verified_against': f[8]$(printf '\x1f')'verified_at': f[8], 'verified_against': f[7]$(printf '\x1f')kg_node-vivo-rastreado
+if g not in set(_tracked_graphs()) or not$(printf '\x1f')if not$(printf '\x1f')kg_radar-nao-versionado-recusado
+'grep', '-rin'$(printf '\x1f')'grep', '-Rin'$(printf '\x1f')kb_search-symlink-para-fora-nao-aparece
+    if not _tracked(p):$(printf '\x1f')    if False:$(printf '\x1f')kb_get-nao-versionado-recusado
+'arvore_limpa': (rc3 == 0 and st == '')$(printf '\x1f')'arvore_limpa': True$(printf '\x1f')arvore-suja-declarada
+if n < 0 or n > MAX_BODY:$(printf '\x1f')if False:$(printf '\x1f')content-length-negativo-400
+if not isinstance(params, dict):$(printf '\x1f')if False:$(printf '\x1f')params-nao-objeto-400
 EOF_MUT
 }
 _family run_mcp_onion_kg_selftests

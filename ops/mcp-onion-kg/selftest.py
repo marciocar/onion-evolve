@@ -138,6 +138,8 @@ def rpc(port, method, params=None, key=TOKEN, rid=1):
             return r.status, json.loads(r.read())
     except urllib.error.HTTPError as e:
         return e.code, json.loads(e.read() or b'{}')
+    except (OSError, ValueError) as e:  # conexão derrubada sem resposta = caso reprova, harness segue
+        return 0, {'_erro_transporte': str(e)}
 
 
 def call(port, tool, args=None):
@@ -266,6 +268,48 @@ def main():
         _, e7, pl = call(port, 'kg_node', {'grafo': 'docs/x.kg.yaml', 'id': 'NAO_EXISTE'})
         case('kg_node-inexistente-erro', e7 and 'inexistente' in pl.get('erro', '')
              and pl.get('served_commit') == head, pl)
+        # nó vivo rastreado: as colunas do --freshness-tsv chegam cada uma no campo certo
+        _, e9, pl = call(port, 'kg_node', {'grafo': 'docs/x.kg.yaml', 'id': 'C_FIRME'})
+        d = pl.get('data', {})
+        case('kg_node-vivo-rastreado', not e9 and d.get('node_type') == 'claim' and d.get('plane') == 'DEV'
+             and d.get('impact') == '4' and d.get('confidence') == '0.9'
+             and d.get('verified_at') == '2026-10-02' and d.get('verified_against') == 'fixture do selftest'
+             and d.get('veredito_frescor') == 'OK' and d.get('arestas_saindo') == ['C_FIRME SUPPORTS Q_ABERTA'], d)
+
+        # (6b) o grep do kb_search NÃO segue o symlink que aponta para fora da raiz (-r, não -R)
+        _, e10, pl = call(port, 'kb_search', {'termo': 'SEGREDO'})
+        case('kb_search-symlink-para-fora-nao-aparece', not e10 and 'SEGREDO-FORA' not in json.dumps(pl)
+             and pl.get('data', {}).get('ocorrencias') == 0, pl)
+
+        # (6c) só arquivo VERSIONADO fala pelo served_commit; árvore suja é declarada
+        case('arvore-limpa-declarada', pl.get('arvore_limpa') is True, pl.get('arvore_limpa'))
+        write(os.path.join(wt, 'docs/nv.kg.yaml'), GRAPH)
+        write(os.path.join(wt, 'docs/knowledge-base/nv.md'), 'nao versionado\n')
+        try:
+            _, e11, pl = call(port, 'kg_radar', {'grafo': 'docs/nv.kg.yaml'})
+            case('kg_radar-nao-versionado-recusado', e11 and 'versionado' in pl.get('erro', ''), pl)
+            _, e12, pl = call(port, 'kb_get', {'arquivo': 'docs/knowledge-base/nv.md'})
+            case('kb_get-nao-versionado-recusado', e12 and 'versionado' in pl.get('erro', ''), pl)
+            _, _, pl = call(port, 'kg_list')
+            case('arvore-suja-declarada', pl.get('arvore_limpa') is False, pl.get('arvore_limpa'))
+        finally:
+            os.remove(os.path.join(wt, 'docs/nv.kg.yaml'))
+            os.remove(os.path.join(wt, 'docs/knowledge-base/nv.md'))
+
+        # (6d) corpo malformado: Content-Length negativo e params que não é objeto respondem 400 na hora
+        import socket
+        s = socket.create_connection(('127.0.0.1', port), timeout=5)
+        try:
+            s.sendall(f'POST /mcp HTTP/1.1\r\nHost: x\r\nX-Api-Key: {TOKEN}\r\n'
+                      'Content-Length: -1\r\n\r\n'.encode())
+            first = s.recv(200).decode(errors='replace')
+        except OSError as e:
+            first = f'erro: {e}'
+        finally:
+            s.close()
+        case('content-length-negativo-400', ' 400 ' in first.split('\r\n')[0], first[:80])
+        code, resp = rpc(port, 'tools/call', [1])
+        case('params-nao-objeto-400', code == 400 and resp.get('error', {}).get('code') == -32602, resp)
 
         # (7) frescor acompanha o fetch (feito no clone, como no runbook)
         git(clone, 'fetch', '-q', clone)
