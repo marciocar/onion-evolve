@@ -126,8 +126,9 @@ registro de decisões por sessão), e aí a lente se deriva do caminho medido.
 - Não re-pesquisa: sem embasamento, a opção é "pesquisar antes" (`/onion-research`, modo `decision`).
 - Não faz merge, deploy nem escreve em repo alheio (MOAT); não muda hook, guarda ou regra.
 - Não lê o transcript: o que foi dito na conversa entra pelo `--cite`.
-- **Não viaja** (core-only): ele e o medidor estão no conjunto `pending` do `roles.yaml` até o
-  maestro classificar. Esta superfície não cita `ops/` (REGRA 100 (Superfície que viaja não cita ops/
+- **Não viaja para as portas** (standalone, plugins, mini): ele e o medidor estão no conjunto `pending`
+  do `roles.yaml` até o maestro classificar. O adotante de corte completo (carimbo `adopted`) recebe tudo e
+  o recebe também — o onion-kg-ssot rodou o 1º dogfood dele lá em 2026-10-12. Esta superfície não cita `ops/` (REGRA 100 (Superfície que viaja não cita ops/
   como se o destinatário o tivesse) não se aplica a quem não viaja, e mesmo assim não há citação).
 
 ## 🔗 Referências

@@ -81,9 +81,20 @@ command -v python3 >/dev/null 2>&1 || { echo "kg-decide-seal: python3 ausente" >
 bash "${RADAR}" "${GRAPH}" --integrity --schema >/dev/null 2>&1 \
   || { echo "kg-decide-seal: ${GRAPH} JÁ reprova no radar --integrity --schema antes do selo — conserte antes; nada escrito" >&2; exit 2; }
 ROOT="$(git -C "$(dirname "${GRAPH}")" rev-parse --show-toplevel 2>/dev/null || true)"
-_contract() {  # COUT/CRC do contrato sobre o grafo; CRC=99 quando não há contrato vendorizado
+# Leitor do contrato, por ordem: (1) o vendor do KG-SSOT (core e adotantes) pelo kg-contract-check, que mede
+# a piora contra o HEAD; (2) o leitor de referência do PRÓPRIO produto (`tools/kg_validate.py`), num repo que
+# é o KG-SSOT e por isso não o vendoriza — julgamento absoluto do grafo (rc 0 passa, 1 reprova), e o passo 0
+# já recusou o grafo que reprovava antes, então reprovar depois é culpa do selo. Sinal de campo do
+# onion-kg-ssot, 2026-10-12: lá o selador selava sem conferir o contrato. (3) nenhum: CRC=99, e a mensagem
+# diz qual falta — repo git ou leitor de contrato.
+CONTRACT_READER=""
+_contract() {  # COUT/CRC do contrato sobre o grafo; CRC=99 quando não há leitor de contrato
   if [ -n "${ROOT}" ] && [ -f "${ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && [ -f "${HERE}/kg-contract-check.sh" ]; then
+    CONTRACT_READER="vendor/kg-ssot (kg-contract-check)"
     COUT="$(cd "${ROOT}" && bash "${HERE}/kg-contract-check.sh" "${GRAPH}" 2>&1)"; CRC=$?
+  elif [ -n "${ROOT}" ] && [ -f "${ROOT}/tools/kg_validate.py" ]; then
+    CONTRACT_READER="tools/kg_validate.py (leitor de referência do produto)"
+    COUT="$(cd "${ROOT}" && python3 -I -B "${ROOT}/tools/kg_validate.py" "${GRAPH}" 2>&1)"; CRC=$?
   else COUT=""; CRC=99; fi
 }
 # e o CONTRATO também no passo 0 (achado 5 do refutador): dívida que o grafo já tinha na árvore seria
@@ -279,7 +290,11 @@ if [ "${CRC}" -ne 99 ]; then
     echo "kg-decide-seal: ⚠️ contrato NÃO JULGADO (rc ${CRC}) — o radar passou, o contrato não foi verificado: $(printf '%s' "${COUT}" | head -1)" >&2
   fi
 else
-  echo "kg-decide-seal: fora de repo git ou contrato não vendorizado — gate = só o radar (declarado)" >&2
+  if [ -z "${ROOT}" ]; then
+    echo "kg-decide-seal: fora de repo git — sem leitor de contrato; gate = só o radar (declarado)" >&2
+  else
+    echo "kg-decide-seal: repo git sem leitor de contrato (nem vendor/kg-ssot nem tools/kg_validate.py) — gate = só o radar (declarado)" >&2
+  fi
 fi
-echo "kg-decide-seal: ✅ selado — radar --integrity --schema exit 0"
+echo "kg-decide-seal: ✅ selado — radar --integrity --schema exit 0${CONTRACT_READER:+ · contrato rc 0 por ${CONTRACT_READER}}"
 exit 0
