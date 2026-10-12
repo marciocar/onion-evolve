@@ -1,7 +1,7 @@
 ---
 branch: feat/tm-linear-full-read-attachments
 date: 2026-10-12
-reviewed_diff_sha256: a21eb1fb42aabf6b45d1a3b14231609afc38976241a685e546a6c305ec08977d
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 8cffeceb0d5238622c7104fda6af8726b22e1897f459cdd8dbb2d3de45c8b2e1
 findings_total: 6
 findings_real: 6
@@ -67,3 +67,12 @@ consulta por conexão (comentários, histórico, anexos, filhos, mãe), não um 
   `assetUrl`, e a tarefa proíbe deletar.
 - ClickUp (2ª fatia) e Zoho Projects (3ª) declaram as 5 capacidades `not_implemented`; Jira e Asana idem, sem
   executável até haver demanda.
+
+## Passada pós-CI (2026-10-12, sessão principal)
+
+O CI reprovou o `door-mini (a)` na faixa 3: o `linear-leitura-completa.md` viaja para a porta mini (que leva `utils/task-manager/` inteiro) e citava o caminho do fragmento de conteúdo não confiável, que o mini não leva. Medi as duas saídas:
+
+- **Pôr o fragmento na allowlist:** arrastava `onion-untrusted-wrap.sh` e `onion-effect-gate.sh`, a cadeia de guardrails, para a porta didática.
+- **Citar pela forma de namespace:** o verificador também a resolve, e com razão, porque o leitor do mini não a acharia.
+
+A cura foi enunciar a regra R15.2 por inteiro no adapter, sem referência. As famílias `door_mini` e `task_manager_dispatcher` deram 44/44.
