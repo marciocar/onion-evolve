@@ -8,7 +8,8 @@ findings_real: 3
 findings_fixed: 2
 tokens: 0
 duration_min: 60
-verdict: RASCUNHO-COM-LACUNA-HUMANA-DECLARADA
+verdict: CORRIGIDO
+nota: rascunho; achado 2 (tarefas 2-4 não rodadas no app) e os critérios humanos ficam com o maestro
 reviewer: passada do autor contra a doutrina de material para cliente e contra a documentação oficial dos plugins
 REVISOU: true
 ---
