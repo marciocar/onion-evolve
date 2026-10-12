@@ -19367,12 +19367,13 @@ run_selftest_selection_selftests() {
   if [ -z "${_h_bad}" ]; then record_pass "selftest-selection: (h) arquivo de DADO que o script da guarda lê seleciona a família (interface.md/capabilities.tsv ⇒ task_manager_capabilities; agent-frontmatter-keys.tsv ⇒ agent_frontmatter_keys)"
   else record_fail "selftest-selection: (h) dado da guarda" "não selecionou:${_h_bad}"; fi
 
-  # (d) cobertura FRACA não desliga failsafe: template que só anotação cita ⇒ todas
-  #     (o tsv do adapter é coberto FRACO por task_manager_capabilities via diretório não-raiz — é o caso que
-  #      a exclusão da 3ª coluna segura; o template, por diretório-raiz, segura pela outra exclusão)
+  # (d) cobertura FRACA não desliga failsafe: template que só anotação cita ⇒ todas.
+  #     Até 2026-10-12 havia uma 2ª sonda, o tsv do adapter (fraco por diretório NÃO-raiz). Ela caiu porque o
+  #     próprio caso (h) deu cobertura FORTE ao tsv (arquivo de dado lido pelo script da guarda), e o outro
+  #     diretório anotado (marketplace/verticals/) também é forte. LACUNA DECLARADA: a exclusão da 3ª coluna
+  #     (fraca por diretório não-raiz) fica sem exemplo vivo até nascer um arquivo nessa condição.
   out="$(bash "${sut}" --affected .claude/utils/vertical/templates/help.tpl --dry-run 2>&1 || true)"
-  out="${out}"$'\n'"$(bash "${sut}" --affected .claude/utils/task-manager/adapters/jira.capabilities.tsv --dry-run 2>&1 || true)"
-  if [ "$(grep -c 'famílias=<todas>' <<< "${out}")" -eq 2 ]; then
+  if [ "$(grep -c 'famílias=<todas>' <<< "${out}")" -eq 1 ]; then
     record_pass "selftest-selection: (d) arquivo do domínio citado só por '# selftest-covers:' continua comprando todas (fraca só acrescenta)"
   else record_fail "selftest-selection: (d) fraca estreitou" "$(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
   # (d2) o failsafe seguro FICA: hook que ninguém cita ⇒ todas, motivo impresso

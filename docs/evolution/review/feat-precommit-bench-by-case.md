@@ -2,7 +2,7 @@
 title: 'Resíduo — o pre-commit escolhe a bancada por caso, e o refutador pegou a cobertura escrita à mão'
 date: 2026-10-11
 branch: feat/precommit-bench-by-case
-reviewed_diff_sha256: ec0c8ddf5a79f5f0f88e455118a999b782e19e71b8e580934d4f593cd4fa3ecc
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: e1785f84150953f084ad3618723ae2964feb84f4894ef1fd3524772c46aa4d39
 findings_total: 6
 findings_real: 6
@@ -89,3 +89,11 @@ que só uma cobertura fraca não-raiz alcança, e o mutante voltou a reprovar.
 O fecho sobre-seleciona: ele segue nomes de script citados até em comentário. Por isso, num commit do
 domínio, as 13 famílias saídas do núcleo quase sempre voltam. Elas só saem de vez nos commits fora do
 domínio, como doc e skill não empacotada. É o preço de não estreitar.
+
+## Passada pós-CI (2026-10-12)
+
+O CI reprovou o caso (d) de `selftest_selection` depois do rebase. A 2ª sonda do (d) usava o
+`jira.capabilities.tsv` como exemplo de cobertura **só fraca**, mas o caso (h) deste mesmo PR deu
+cobertura FORTE a esse tsv (arquivo de dado lido pelo script da guarda). Os dois casos se contradiziam.
+A sonda obsoleta saiu. Lacuna declarada no código: a exclusão da 3ª coluna (fraca por diretório
+não-raiz) fica sem exemplo vivo, porque o outro diretório anotado também é forte. A família fica 19/19.
