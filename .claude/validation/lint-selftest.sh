@@ -10333,11 +10333,12 @@ run_evolve_workflow_selftests() {
   # refuta SO o indice 1: assim correlacionar por indice em vez de id, ou nao filtrar nada, REPROVA
   # (a 1a versao refutava o indice 0 e os dois mutantes passavam — o Elenxo provou o caso decorativo).
   # MODE: '' normal · 'null-verdict' juiz devolve null · 'throw-D2' o scan de D2 lanca ·
-  #       'census-ok' o Census devolve o raio-X inteiro · 'census-cut' devolve a secao 7 sem o fecho.
+  #       'census-ok' o Census devolve o raio-X inteiro · 'census-cut' devolve a secao 7 sem o fecho ·
+  #       'census-rc1' raio-X com rc=1 · 'census-empty7' secao 7 sem alvo · 'bad-findings' scan sem findings[].
   #       Fora dos dois census-*, o agente do Census devolve null (morreu).
   _evw_run() {   # $1 = args JSON, $2 = MODE; imprime {r, calls, logs, schemas_ok, maqp, ev}
     { printf 'const args=%s;const MODE=%s;const CALLS=[];const SCH=[];const MAQP=[];const EV=[];\n' "$1" "\"$2\""
-      printf '%s\n' 'const agent=async(p,o)=>{CALLS.push(o.label);EV.push("A:"+o.label);if(o.schema)SCH.push(o.schema);if(o.label==="scan:MAQ")MAQP.push(p);if(o.label==="census"){if(MODE==="census-ok")return{stdout:"# raio-X\n## 6. A IDADE\n  x\n## 7. CONFRONTO\n  · alvo-x $& $1\n## O QUE NÃO FOI MEDIDO\n  todos\n",rc:0};if(MODE==="census-cut")return{stdout:"## 7. CONFRONTO\n  · resumo do agente",rc:0};return null}if(o.label.startsWith("scan:")){if(MODE==="throw-D2"&&o.label==="scan:D2")throw new Error("boom");return{total_seen:3,findings:[0,1,2].map(i=>({severity:i<2?"blocker":"opportunistic",finding:"f"+i,evidence:"e",target_artifact:"t",effort:"S",exec_command:"x"}))}}if(MODE==="null-verdict")return null;return{refuted:/-1$/.test(o.label),vetoed_phase_merge:false,reasoning:"r"}};'
+      printf '%s\n' 'const agent=async(p,o)=>{CALLS.push(o.label);EV.push("A:"+o.label);if(o.schema)SCH.push(o.schema);if(o.label==="scan:MAQ")MAQP.push(p);if(o.label==="census"){if(MODE==="census-ok")return{stdout:"# raio-X\n## 6. A IDADE\n  x\n## 7. CONFRONTO\n  · alvo-x $& $1\n## O QUE NÃO FOI MEDIDO\n  todos\n",rc:0};if(MODE==="census-cut")return{stdout:"## 7. CONFRONTO\n  · resumo do agente",rc:0};if(MODE==="census-rc1")return{stdout:"## 7. CONFRONTO\n  · x\n## O QUE NÃO FOI MEDIDO\n",rc:1};if(MODE==="census-empty7")return{stdout:"## 7. CONFRONTO — os ALVOS\n  · peças NÃO MEDIDAS — sem alvos de forja nesta rodada\n## O QUE NÃO FOI MEDIDO\n  x\n",rc:0};return null}if(MODE==="bad-findings"&&o.label.startsWith("scan:"))return{total_seen:2};if(o.label.startsWith("scan:")){if(MODE==="throw-D2"&&o.label==="scan:D2")throw new Error("boom");return{total_seen:3,findings:[0,1,2].map(i=>({severity:i<2?"blocker":"opportunistic",finding:"f"+i,evidence:"e",target_artifact:"t",effort:"S",exec_command:"x"}))}}if(MODE==="null-verdict")return null;return{refuted:/-1$/.test(o.label),vetoed_phase_merge:false,reasoning:"r"}};'
       printf '%s\n' 'const pipeline=async(items,...st)=>Promise.all(items.map(async(i,ix)=>{try{let r=i;for(const f of st)r=await f(r,i,ix);return r}catch(e){return null}}));const parallel=async(th)=>Promise.all(th.map(async t=>{try{return await t()}catch(e){return null}}));const phase=()=>{};const LOGS=[];const log=(m)=>{LOGS.push(m);EV.push("L:"+m)};'
       printf '%s\n' 'const sub=(o)=>!o||typeof o!=="object"?true:((o.required||[]).every(k=>o.properties&&k in o.properties)&&Object.values(o.properties||{}).every(sub)&&sub(o.items));'
       printf '(async()=>{\n'; awk 'f{print} /^}$/ && !f {f=1}' "${wf}"
@@ -10432,9 +10433,23 @@ print("OK" if ok else "BAD "+repr(ev[:2])[:240])' <<< "${_o}" 2>&1)"
     record_pass "evolve-workflow: (k) o FORA DESTA RODADA (D4/D5/D9/D10 + dependencia do Census) e o 1o evento, antes de qualquer agente"
   else record_fail "evolve-workflow: (k) log no inicio" "${_h}"; fi
 
-  # (l) whenToUse diz que o atalho e parcial e aponta o caminho completo
+  # (m) do REFUTADOR de 2026-10-12: Census com rc!=0, secao 7 SEM ALVO e scan sem findings[] nunca
+  #     viram "medido"; dims nao-array, chave desconhecida e maqTargets nao-string RECUSAM sem agente.
+  local _m=0 _mm=""
+  _o="$(_evw_run '{}' 'census-rc1')"; grep -q '"d":"MAQ","reason":"Census: evolve-census.sh saiu rc=1' <<< "${_o}" || { _m=1; _mm="${_mm} rc1"; }
+  _o="$(_evw_run '{}' 'census-empty7')"; grep -q '"d":"MAQ","reason":"Census: a seção 7 veio sem alvos' <<< "${_o}" && grep -q '"maqp":\[\]' <<< "${_o}" || { _m=1; _mm="${_mm} empty7"; }
+  _o="$(_evw_run '{"dims":["D1"]}' 'bad-findings')"; grep -q '"d":"D1","reason":"dead' <<< "${_o}" && ! grep -q '"measured":\["D1"' <<< "${_o}" || { _m=1; _mm="${_mm} bad-findings"; }
+  _o="$(_evw_run '{"dims":"D1"}' '')"; grep -q '"error":"dims tem de ser array' <<< "${_o}" && grep -q '"calls":0' <<< "${_o}" || { _m=1; _mm="${_mm} dims-string"; }
+  _o="$(_evw_run '{"dmis":["D1"]}' '')"; grep -q '"error":"chave desconhecida em args: dmis' <<< "${_o}" && grep -q '"calls":0' <<< "${_o}" || { _m=1; _mm="${_mm} chave"; }
+  _o="$(_evw_run '{"maqTargets":{}}' '')"; grep -q '"error":"maqTargets tem de ser string' <<< "${_o}" && grep -q '"calls":0' <<< "${_o}" || { _m=1; _mm="${_mm} maq-objeto"; }
+  if [ "${_m}" -eq 0 ]; then
+    record_pass "evolve-workflow: (m) Census rc!=0 e secao 7 sem alvo nao rodam a MAQ; scan sem findings[] e dead; dims/chave/maqTargets ruins recusam sem agente"
+  else record_fail "evolve-workflow: (m) entradas do refutador" "falharam:${_mm}"; fi
+
+  # (l) whenToUse diz que o atalho e parcial e aponta o caminho completo — PRESENCA DE TEXTO (so prova
+  #     que a frase nao foi apagada; o comportamento esta em (h)-(m))
   if grep -qE "whenToUse: '.*6 das 10.*/meta:evolve" "${wf}"; then
-    record_pass "evolve-workflow: (l) meta.whenToUse declara o atalho parcial (6/10) e o caminho completo /meta:evolve"
+    record_pass "evolve-workflow: (l) meta.whenToUse declara o atalho parcial (6/10) e o caminho completo /meta:evolve (presenca de texto)"
   else record_fail "evolve-workflow: (l) whenToUse" "o meta.whenToUse nao declara a cobertura parcial"; fi
   rm -rf "${d}"
 }
@@ -10588,6 +10603,7 @@ printf 'pecas\tcandidato\tdoutrina\tcontexto\tworkflow\tdestino\tlente\tbancada\
 printf '1\tfoo\t0\t0\t0\t0\t0\t0\t.claude/commands/meta/foo.md\n'
 printf '1\tbar\t0\t0\t0\t0\t0\t0\t.claude/commands/meta/bar.md\n'
 printf '1\tbaz\t0\t0\t0\t0\t0\t0\t.claude/skills/baz/SKILL.md\n'
+printf '1\tqux\t0\t0\t0\t0\t0\t0\t\n'
 FAKE
   cat > "${d}/.claude/validation/a-check.sh" <<'FAKE'
 #!/usr/bin/env bash
@@ -10595,16 +10611,31 @@ FAKE
 _msg="dano medido: o /meta:foo em .claude/commands/meta/foo.md"
 printf 'veja .claude/commands/meta/foo.md\n'
 x=1  # cauda: .claude/commands/meta/foo.md
+[ -n "$x" ] || fail "nao achei .claude/commands/meta/foo.md"
 FAKE
   printf '#!/usr/bin/env bash\nPAIRS=(\n  ".claude/utils/x.sh|.claude/commands/meta/bar.md"\n)\n' > "${d}/.claude/validation/b-check.sh"
   printf '#!/usr/bin/env bash\nfor f in .claude/skills/baz/*; do :; done\n' > "${d}/.claude/validation/c-check.sh"
   local _m _m7; _m="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
   _m7="$(sed -n '/VIGIADOS por guarda/,/^## O QUE/p' <<< "${_m}")"
   if grep -qE '^      bar$' <<< "${_m7}" && grep -qE '^      baz$' <<< "${_m7}" && ! grep -qE '^      foo$' <<< "${_m7}" \
-     && grep -q '3 superfícies com SÓ A SUPERFÍCIE (1/7): 2 comando(s) + 1 skill(s)' <<< "${_m}" \
-     && grep -qE '^      comandos: bar foo$' <<< "${_m}" && grep -qE '^      skills:   baz$' <<< "${_m}"; then
-    record_pass "evolve-census: (m) vigiado = CAMINHO em codigo (comentario/mensagem nao contam); 1/7 separados em comando x skill e nomeados"
+     && ! grep -qE '^      qux$' <<< "${_m7}" \
+     && grep -q '4 superfícies com SÓ A SUPERFÍCIE (1/7): 3 comando(s) + 1 skill(s)' <<< "${_m}" \
+     && grep -qE '^      comandos: bar foo qux$' <<< "${_m}" && grep -qE '^      skills:   baz$' <<< "${_m}"; then
+    record_pass "evolve-census: (m) vigiado = CAMINHO em codigo (comentario, mensagem e fail nao contam; caminho vazio nunca e vigiado); 1/7 separados em comando x skill e nomeados"
   else record_fail "evolve-census: (m) elo estrutural" "$(sed -n '/## 7/,/## O QUE/p' <<< "${_m}" | tr '\n' '|' | cut -c1-400)"; fi
+  rm -rf "${d}"
+
+  # (n) do REFUTADOR de 2026-10-12: medidor que sai 0 SEM A ÂNCORA (saída vazia) nao mediu — nunca
+  #     "0 com selftest", "passivo: nenhuma" ou "0 vencida(s)" ao lado de `?`; e a lista o nomeia.
+  d="$(mktemp -d)"; _evc_sandbox "${d}"
+  local _s; for _s in guard-census.sh dissect-census.sh; do printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/.claude/validation/${_s}"; done
+  local _n; _n="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
+  if grep -qE '^  \? com selftest' <<< "${_n}" && ! grep -q 'passivo: nenhuma' <<< "${_n}" \
+     && grep -q '? declarada(s) · ? vencida(s)' <<< "${_n}" \
+     && grep -q "guardas — NAO-MEDIDO: guard-census.sh saiu 0 sem a linha 'massa:'" <<< "${_n}" \
+     && grep -q 'dissect — NAO-MEDIDO: dissect-census.sh saiu 0 sem a linha de declaradas' <<< "${_n}"; then
+    record_pass "evolve-census: (n) medidor com rc 0 e saida vazia vira '?' e NAO-MEDIDO (guardas e dissecacoes) — nunca zero nem passivo limpo"
+  else record_fail "evolve-census: (n) rc0 vazio" "$(grep -E 'selftest|passivo|declarada|NAO-MEDIDO' <<< "${_n}" | tr '\n' '|' | cut -c1-400)"; fi
   rm -rf "${d}"
 }
 

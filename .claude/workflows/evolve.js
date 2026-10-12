@@ -45,6 +45,13 @@ const ag = (p, o) => agent(TASK_ANCHOR + p, o)
 let A = (typeof args === 'undefined' || args === null) ? {} : args
 if (typeof A === 'string') { try { A = JSON.parse(A) } catch (e) { return { error: 'args string nao e JSON: ' + A.slice(0, 80) } } }
 if (typeof A !== 'object' || Array.isArray(A)) return { error: 'args tem de ser objeto { dims, maqTargets, cap }' }
+// ⚠️ e a MESMA classe nos campos (refutador de 2026-10-12): `dims:"D1"` (string) ou a chave errada
+//    `dmis` caíam em "todas" e rodavam 13 agentes; `maqTargets:{}` virava o alvo "[object Object]".
+const KNOWN = ['dims', 'maqTargets', 'cap']
+const extra = Object.keys(A).filter(k => !KNOWN.includes(k))
+if (extra.length) return { error: 'chave desconhecida em args: ' + extra.join(',') + ' (válidas: ' + KNOWN.join(', ') + ')' }
+if (A.dims !== undefined && !Array.isArray(A.dims)) return { error: 'dims tem de ser array (veio: ' + JSON.stringify(A.dims).slice(0, 60) + ')' }
+if (A.maqTargets !== undefined && typeof A.maqTargets !== 'string') return { error: 'maqTargets tem de ser string (a seção 7 do raio-X)' }
 if (A.cap !== undefined && !(Number.isInteger(A.cap) && A.cap > 0 && A.cap <= 30)) return { error: 'cap tem de ser inteiro em 1..30 (veio: ' + JSON.stringify(A.cap) + ')' }
 const CAP = A.cap || 8
 const WANT = Array.isArray(A.dims) && A.dims.length ? A.dims.map(d => String(d).toUpperCase()) : null
@@ -123,6 +130,10 @@ if (wantMaq && !maqTargets) {
   if (!cen) NOT.set('MAQ', 'Census: o agente não devolveu (morreu ou lançou) — alvos não levantados')
   else if (i7 < 0 || iEnd < 0) NOT.set('MAQ', 'Census: a saída não trouxe a seção 7 inteira (cabeçalhos "## 7. CONFRONTO" e "## O QUE NÃO FOI MEDIDO") — recusada, nunca alvo inventado')
   else if (cen.rc !== 0) NOT.set('MAQ', 'Census: evolve-census.sh saiu rc=' + cen.rc + ' — alvos não levantados')
+  // seção 7 SEM ALVO (peças não medidas, ou corpo vazio) não é alvo: rodar a MAQ sobre ela seria
+  // "medida" sem nada a medir (refutador de 2026-10-12)
+  else if (!out7.slice(i7 + '## 7. CONFRONTO'.length, iEnd).replace(/^[^\n]*\n/, '').trim() || /peças NÃO MEDIDAS/.test(out7.slice(i7, iEnd)))
+    NOT.set('MAQ', 'Census: a seção 7 veio sem alvos (peças não medidas ou corpo vazio) — nada a confrontar')
   else maqTargets = out7.slice(i7).trim()
   if (NOT.has('MAQ')) log('MAQ: ' + NOT.get('MAQ') + ' — NÃO MEDIDA')
 }
@@ -139,7 +150,9 @@ const results = await pipeline(
   }),
   (scan, dim) => {
     if (!scan) { log(dim.d + ': worker morreu — dimensão NÃO MEDIDA'); return { d: dim.d, dead: true, total_seen: 0, findings: [] } }
-    const fs = (scan.findings || []).map((f, i) => ({ ...f, id: dim.d + '-' + i, dimension: dim.d }))
+    // findings ausente ou não-array é worker que não devolveu a forma: dead, nunca "mediu e achou zero"
+    if (!Array.isArray(scan.findings)) { log(dim.d + ': worker devolveu sem findings[] — dimensão NÃO MEDIDA'); return { d: dim.d, dead: true, total_seen: 0, findings: [] } }
+    const fs = scan.findings.map((f, i) => ({ ...f, id: dim.d + '-' + i, dimension: dim.d }))
     if ((scan.total_seen || 0) > fs.length) log(dim.d + ': ' + scan.total_seen + ' vistos, ' + fs.length + ' devolvidos (corte declarado)')
     // julga blocker/recommended E todo achado que toque o invariante de fase — inclusive opportunistic
     // (Elenxo: um opportunistic que propõe fundir fases escapava do veto, e a superfície prometia o oposto)
