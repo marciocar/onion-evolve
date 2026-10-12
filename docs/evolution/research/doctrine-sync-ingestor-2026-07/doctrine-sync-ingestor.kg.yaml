@@ -3,7 +3,7 @@
 meta:
   id: doctrine-sync-ingestor-2026-07
   schema_version: "1"
-  baseline: 2026-07-18
+  baseline: "2026-07-18"
   date: 2026-07-18
 nodes:
   - id: C_INGESTOR_GAP
@@ -13,7 +13,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "cadeia doutrina adotante->core partida no meio: metade produtora+transporte construida; metade ingestora no core desenhada mas GATED"
     provenance:
       source: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
@@ -27,7 +27,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "diary/export-sharable/co-relay/a2a-live construidos; personality-sync F2, synthesize-collective F4, SUPERSEDES RFC-0005 F3 todos gated; agregador-que-ingere-com-politica nomeado sem comando"
     trace: "docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md"
     provenance:
@@ -42,7 +42,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "granaai e onion-pessoal pressionam a MESMA doutrina: fechar read(KG)->verify->act->write(KG) — auto-persist, forma-nao-carimbo, arquivo:linha, domain+frescor"
     provenance:
       source: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
@@ -56,7 +56,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "deep-research (skill do harness) despeja no diretório temporário efemero e nao persiste no KG-SSOT — write(KG) depende de lembrar (semente + desbloqueio do marcio-pessoal)"
     narrative: "label anterior: deep-research (skill do harness) ⟨despeja no diretório temporário efemero⟩ e nao persiste no KG-SSOT — write(KG) depende de lembrar (semente + ⟨desbloqueio do marcio-pessoal⟩)"
     trace: "docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md"
@@ -72,7 +72,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "granaai entregou 4 sinais de doutrina ao core: integridade-nao-eh-rastreabilidade (TRACES_TO), fail-open do radar, validador-local-delega-radar, formalizar /meta:kg map"
     narrative: "trace anterior (só no host): docs/evolution/inbox/_processed/ do clone local de granaai (host). No remoto do granaai, até 2026-07-18, esse diretório só tinha .gitkeep (último commit 570a45a1, 2026-07-09); os 4 sinais (from: granaai) estão versionados na cópia do core, que a source deste nó já cita. · trace na O7 (selo do maestro 2026-10-10, 3º ramo): aponta as 4 cópias versionadas no core (from: granaai), que são o próprio sinal entregue. O original no clone do granaai não existe mais para comparar: o _processed de lá só tem .gitkeep (medido em 2026-10-10)."
     trace: "onion-evolve@00e9ac24:docs/evolution/inbox/_processed/2026-07-17-redogfood-kg-sdaal-validation-gaps.md · onion-evolve@80dcfc71:docs/evolution/inbox/_processed/2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md · onion-evolve@00e9ac24:docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md · onion-evolve@00e9ac24:docs/evolution/inbox/_processed/2026-07-17-kg-discovery-granaai-canonical-monorepo.md"
@@ -88,7 +88,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "onion-pessoal adota o METODO (nao vendoriza .claude): a raiz E o KG (marcio-*-f0.kg.yaml) com planes DEV/PROD, SUPERSEDES/Aufhebung e exit 1 honesto (contradicao viva)"
     trace: "docs/evolution/federation/members.yaml:185"
     provenance:
@@ -103,7 +103,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "Fase 1: write(KG) vira passo de fechamento da orquestracao (passo 7 da skill + Passo 4.5 do comando) — bookend simetrico do read(KG), mecanismo nao conselho"
     trace: ".claude/skills/onion-orchestration/SKILL.md"
     provenance:

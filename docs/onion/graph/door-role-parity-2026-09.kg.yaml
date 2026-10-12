@@ -7,8 +7,8 @@ meta:
   id: door-role-parity-2026-09
   schema_version: "1"
   date: 2026-09-30
-  baseline: 2026-09-30
-  review_after: 2026-12-29
+  baseline: "2026-09-30"
+  review_after: "2026-12-29"
   # Aufhebung cross-file de D_MATRIZ_DE_PORTAS_2026_10 (o motor de arestas é intra-arquivo). Todas são
   # PARCIAIS: o que cai e o que sobrevive de cada uma está na narrative do nó. DECISÃO DO MAESTRO
   # (2026-10-09): CONSTRAINS, sem flip — cada alvo leva x_constrained_by apontando a matriz (desde o
@@ -36,7 +36,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "medido na árvore da porta: a face pública perdeu 85 arquivos de meta-fábrica (adopt, create-*, federation-*, marketplace/, wizard/, skills/onion-publish/); restaurada em 4eb55ac"
     source_kind: repo
     source_tier: 10
@@ -54,7 +54,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "medido: nenhuma REGRA do lint comparava o role: do members.yaml com o role: do carimbo da porta; as regras que tocam members.yaml eram 24/28/30/37/38/85"
     label: "o papel da porta tinha DUAS fontes (registro anotado à mão + carimbo da materialização) e nada cobrava que concordassem"
     provenance:
@@ -87,7 +87,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "o dano não passou por PR nenhum: passou por um operador rodando ops/materialize-door.sh <clone> --role standalone"
     source_kind: repo
     source_tier: 10
@@ -104,7 +104,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "members.yaml:73 anota hub como 'central; PODE ter sub-adotados'; medido: parent: metagamify → 0 sub-adotados, e metagamify é hub"
     label: "o vocabulário de tier é de CAPACIDADE, não de uso — logo onion-core carimbada hub não é tier falso, e a objeção de que role: colide com tier nas portas cai"
     provenance:
@@ -121,7 +121,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "as duas implantadas e exercitadas: 11 casos em run_door_role_parity_selftests + 4 em run_door_role_change_refusal_selftests, todos verdes; mutante -d→-f morto pelo caso (k)"
     label: "a cura é em DUAS linhas: recusa dentro de ops/materialize-door.sh (--role que contradiz o carimbo aborta, rc=2, escape --force-role-change) + REGRA 92 no lint cobrando a paridade registro×carimbo"
     trace: ".claude/validation/door-role-parity-check.sh · ops/materialize-door.sh · .claude/validation/lint-selftest.sh"

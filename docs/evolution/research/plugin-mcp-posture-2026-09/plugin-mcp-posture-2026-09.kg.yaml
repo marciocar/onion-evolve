@@ -1,8 +1,8 @@
 meta:
   id: plugin-mcp-posture-2026-09
   schema_version: "1"
-  baseline: 2026-09-04
-  review_after: 2026-10-04   # cadência FERRAMENTA/PREÇO = 30d. O tipo dominante desta rodada é
+  baseline: "2026-09-04"
+  review_after: "2026-10-04"   # cadência FERRAMENTA/PREÇO = 30d. O tipo dominante desta rodada é
                              # REQUISITO DE PLATAFORMA (política do diretório de conectores, referência
                              # de plugins do Claude Code, repo oficial de plugins) — páginas que a
                              # Anthropic reescreve a cada release semanal, não doutrina (12m) nem
@@ -52,7 +52,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 10
@@ -71,7 +71,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 10
@@ -90,7 +90,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://code.claude.com/docs/en/plugins-reference — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 10
@@ -109,7 +109,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://code.claude.com/docs/en/plugins-reference — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 10
@@ -128,7 +128,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
     valid_from: '2026'
     source_tier: 10
@@ -147,7 +147,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
     source_tier: 10
     source_kind: primary
@@ -165,7 +165,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://code.claude.com/docs/en/plugin-marketplaces — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 9
@@ -184,7 +184,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://code.claude.com/docs/en/plugin-marketplaces — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 9
     source_kind: primary
@@ -202,7 +202,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://github.com/anthropics/claude-plugins-official — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026-09'
     source_tier: 9
@@ -221,7 +221,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.5
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
     valid_from: '2025-09'
     source_tier: 4
@@ -240,7 +240,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.5
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 4
     source_kind: vendor-on-competitor
@@ -258,7 +258,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://github.com/hilyfux/knowledge-graph — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 3
@@ -277,7 +277,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 10
@@ -296,7 +296,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 10
@@ -315,7 +315,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 10
@@ -335,7 +335,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'fan-out desta rodada (36 fontes): nenhum angulo devolveu rodada, M&A ou valuation ligado ao canal de plugins do Claude Code; confirma E_MERCADO_PLUGIN_DIRECTORY_0904 do corpus R1, medido na mesma data'
     source_tier: 3
     source_kind: synthesis
@@ -354,7 +354,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'contabilidade da propria rodada: 36 fontes consultadas, 18 claims levantadas, 15 confirmadas, 10 refutadas por fonte fraca, 0 nao-verificadas por falha de acesso, 3 parcelas de custo cortadas por orcamento'
     source_tier: 10
     source_kind: measurement
@@ -373,7 +373,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'SELO DO MAESTRO (2026-09-04, sessao do core): opcao (c) — nada agora, como POSICAO DE ESPERA (nao conclusao); (a) REPROVADA (core privado, nao e API de 1a parte, sem tenant, propose_kg_write sem cota); (b) REPROVADA COMO ESPECIFICADA (REPO resolve para o plugin sob CLAUDE_PLUGIN_ROOT, zero annotations, HTTP nao stdio); gatilho nomeado para reabrir (b): (i) regime de plugin-embedded lido nas 2 paginas de 1a parte, (ii) base rate de .mcp.json no diretorio oficial, (iii) raiz do projeto do adotante resolvida'
     label: 'DECISAO ABERTA (o maestro sela): o Onion deve se apresentar TAMBEM como MCP no canal publico de plugins? Opcoes — (a) expor a triade existente (onion-kg read-only 6 tools, onion-exec 4 tools com write-como-proposta, onion-framework 5 tools) como conector remoto publico em mcp.onionevolve.com com OAuth 2.1/PKCE, o F10 gated da federacao; (b) embarcar um servidor stdio read-only (adapter do onion-kg: kg_list, kg_radar, kb_search, kb_get, diary_index, inventory) via .mcp.json no plugin onion; (c) nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; (d) skill-bundle via git-subdir (cortada por orcamento nesta rodada, nao considerada). RECOMENDACAO DO ELENXO: **(c) — nada agora — mas com a ressalva que E o veredito principal: a decisao como posta ainda nao e decidivel, e (c) hoje e a escolha certa pelo motivo ERRADO.** O motivo errado seria "MCP aumenta superficie na triagem"; o motivo certo e que os dois caminhos alternativos foram medidos e nenhum esta pronto. (1) A opcao (a) esta REPROVADA, nao gated — tres bloqueios independentes, cada um suficiente: repo publico obrigatorio contra core PRIVADO (E_PLUGIN_EXIGE_REPO_PUBLICO + E_OBJECAO_5), separacao read/write que a triade JA viola no onion-exec (E_OBJECAO_1), e ZERO annotations nos tres servidores, o que faz de "expor" uma reescrita e nao uma exposicao (E_OBJECAO_2). (2) A opcao (b) nao e um adapter: e reescrita com um problema de resolucao de raiz NAO RESOLVIDO — ${CLAUDE_PLUGIN_ROOT} aponta para a raiz errada e o servidor serviria os arquivos do proprio plugin, jamais o KG do adotante (E_OBJECAO_3); e seu custo absoluto de conformidade e justamente o que a rodada cortou por orcamento (E_OBJECAO_6). (3) O peso a favor de "o ecossistema faz isso" esta inflado por contagem duplicada de um fato de sintaxe (E_OBJECAO_7 e E_OBJECAO_8) e a base rate de terceiros nunca foi medida. CONDICAO DE REABERTURA NOMEADA (nao data): reabre quando (i) a base rate de plugins do diretorio com .mcp.json for medida, E (ii) existir um caminho provado de resolucao da raiz do projeto do adotante a partir de um plugin instalado. Ate la, (c) — e as duas curas internas que a rodada revelou (o count-drift "91 KBs" contra 94 reais no onion-kg, e a mistura read/write no onion-exec) valem por si, independentemente da decisao.'
     trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml · projeção: docs/evolution/research/plugin-mcp-posture-2026-09/SYNTHESIS.md'
@@ -427,7 +427,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_ANTHROPIC_READ_WRITE_SEPARADOS (https://claude.com/docs/connectors/building/review-criteria) cruzada com medicao no repo: ops/mcp-onion-exec/server.py — dict TOOLS l.92-95 com run_lint, run_inventory, kg_freshness (leitura) e propose_kg_write (escrita, `open(fpath, "w")` em docs/evolution/kg-inbox/) NO MESMO SERVIDOR'
     source_tier: 10
     source_kind: measurement
@@ -445,7 +445,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'grep -c "readOnlyHint|destructiveHint|annotations" em ops/mcp-onion-kg/server.py, ops/mcp-onion-exec/server.py, ops/mcp-onion-framework/server.py -> 0, 0, 0 (executado 2026-09-04); a unica string "title" e a de serverInfo, nao por-tool'
     source_tier: 10
     source_kind: measurement
@@ -463,7 +463,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'ops/mcp-onion-kg/server.py l.21 `REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))` e todo `_run` com cwd=REPO; caminhos hardcoded do CORE (docs/knowledge-base/, .claude/validation/kg-radar.sh, .claude/diary/index.md, docs/onion/inventory.md) contra o layout medido do plugin materializado: plugins/onion/kb (4 arquivos) e plugins/onion/validation/kg-radar.sh'
     source_tier: 10
     source_kind: measurement
@@ -481,7 +481,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'ops/mcp-onion-kg/server.py l.85 declara "Busca um termo nas 91 KBs (docs/knowledge-base)" contra `find docs/knowledge-base -name "*.md" | wc -l` = 94 (executado 2026-09-04)'
     source_tier: 10
     source_kind: measurement
@@ -499,7 +499,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_PLUGIN_EXIGE_REPO_PUBLICO (review-criteria, tier 10, 3-0) cruzada com a topologia real: onion-claude equivale a onion-evolve e e PRIVATE (migalha family-repo-topology-door-core-collapse); as tools da triade servem docs/knowledge-base/, .claude/diary/ e os .kg.yaml, que so existem no repo privado'
     source_tier: 10
     source_kind: measurement
@@ -517,7 +517,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_POLITICA_REMOTO_VS_LOCAL (tier 10, 2-1) confrontada com a lista de cortes por orcamento desta rodada, registrada em E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904 itens (i), (ii) e (iii)'
     source_tier: 10
     source_kind: measurement
@@ -535,7 +535,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'find . -name .mcp.json (fora de .git) -> ZERO ocorrencias; .claude-plugin/marketplace.json com 8 plugins e `grep -c mcpServers` -> 0 (executado 2026-09-04)'
     source_tier: 10
     source_kind: measurement
@@ -553,7 +553,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_PLUGIN_JSON_CAMPO_MCPSERVERS e E_MARKETPLACE_JSON_MCPSERVERS compartilham URL, pagina e mecanismo (https://code.claude.com/docs/en/plugin-marketplaces); ambas registradas com votos 3-0'
     source_tier: 10
     source_kind: measurement
@@ -573,9 +573,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'gh api sobre anthropics/claude-plugins-official (291 entradas; 270 plugin.json lidos no SHA pinado; .mcp.json na raiz, mcpServers inline no plugin.json e na entrada do marketplace, hooks/hooks.json)'
-    valid_from: 2026-09
+    valid_from: "2026-09"
     source_tier: 9
     source_kind: primary
     label: 'MEDIDO — gatilho (ii) da reabertura de (b): 143 de 291 plugins do diretorio OFICIAL (49%) embarcam servidor MCP (128 com .mcp.json na raiz + 33 com mcpServers inline; 0 na entrada do marketplace); 48 embarcam hooks/hooks.json. Refuta a premissa de (c) "MCP embarcado e raro/penalizado na triagem": e a NORMA do venue. Nao muda a reprova de (b) COMO ESPECIFICADA (raiz do projeto, annotations, stdio) — muda o peso: (b) deixa de ser excecao e vira o padrao a cumprir. Dados: data/venue-official-probe-2026-09-04.json, data/crawl.py.'
@@ -592,9 +592,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'WebFetch claude.com/docs/plugins/submit ("separate and complementary directory from the Connectors Directory"; "a plugin can include any MCP of any kind in its .mcp.json"; "basic automated review"), connectors/building/submission ("The portal accepts remote MCP servers only. Local servers are distributed as desktop extensions or plugins"), review-criteria (escopo = servidores NO Connector Directory), Software Directory Policy §3.F e §5'
-    valid_from: 2026-09
+    valid_from: "2026-09"
     source_tier: 10
     source_kind: primary
     label: 'MEDIDO — gatilho (i) da reabertura de (b): o regime de review de um MCP EMBUTIDO em plugin e o do DIRETORIO DE PLUGINS (revisao automatica basica + selo Verified opcional), NAO o do Connector Directory (que so aceita servidores REMOTOS submetidos a parte). Resolve a CONSTRAIN 1 (conflacao de regime): os 5 achados tier 10 do review-criteria valem contra (a) e NAO se aplicam a (b). Ressalva do proprio venue: "we strongly encourage using connectors that already exist in the Connectors Directory… will reduce the number of warnings shown to users" — MCP proprio embarcado passa, com mais avisos. §5 da Software Directory Policy (Additional Requirements for MCP Servers) nao diz se cobre MCP embutido — NAO ESTABELECIDO.'

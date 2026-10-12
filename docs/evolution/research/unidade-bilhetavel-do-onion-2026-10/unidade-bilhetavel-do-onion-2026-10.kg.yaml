@@ -1,8 +1,8 @@
 meta:
   id: unidade-bilhetavel-do-onion-2026-10
   schema_version: "1"
-  baseline: 2026-10-01
-  review_after: 2026-10-31   # 30d: FERRAMENTA/PRECO e o tipo DOMINANTE. A pergunta e sobre MODELO DE
+  baseline: "2026-10-01"
+  review_after: "2026-10-31"   # 30d: FERRAMENTA/PRECO e o tipo DOMINANTE. A pergunta e sobre MODELO DE
                              # COBRANCA, e tudo que a rodada tem de concreto sao numeros de preco
                              # publicado (US$0,000025 por decisao da AWS, US$50/mes por 1M de appends
                              # do agent-custody, e a faixa Vanta/Semgrep que caiu no lado refutado).
@@ -53,7 +53,7 @@ nodes:
     confidence: 0.5
     label: 'Qual e a UNIDADE BILHETAVEL de um framework de orquestracao com gate deterministico, em outubro de 2026, dado que a identidade canonica do Onion e framework template em .claude/ — NAO produto npm, NAO CLI standalone? Seis eixos pedidos: (1) modelos de cobranca na vizinhanca, (2) quem vende governanca de agente e como empacota, (3) open-core em ferramenta de dev, (4) o padrao prova-como-produto, (5) o anti-padrao onde esse produto morreu, (6) mercado e capital. PERMANECE ABERTA, e a razao e medida: dos seis eixos, o 3 e o 5 nao tem UMA evidencia confirmada neste grafo (toda a faixa Semgrep/Sentry/Snyk caiu no lado refutado por fonte fraca), cinco das 17 confirmadas sao declaracoes de ausencia, e o unico preco por decisao do campo foi guardado em tier 6 depois de ter sido descartado em tier 9.'
     trace: docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/SYNTHESIS.md
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'rodada de 2026-10-01: 17 claims confirmadas e 17 refutadas por fonte fraca, 0 nao-verificadas por 403 ou truncagem; 10 objecoes sobreviventes do Elenxo (a decima chegou TRUNCADA no repasse); duas medicoes locais tier 10 acrescentadas nesta sessao (binario 2.1.286 e corpus de 109 grafos)'
 
   # ═══════════════════ MEDICAO LOCAL (tier 10 — o artefato antes da web) ═══════════════════
@@ -64,9 +64,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.98
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: "medicao nesta maquina em 2026-10-01 — `claude --version` = 2.1.286; o binario do Claude Code 2.1.286 e ELF 64-bit e `grep -ao` nele devolve PreToolUse 243x, bypassPermissions 195x e billing 167x; `ls .claude/hooks/*.sh` = 15 hooks, dos quais 6 contem `exit 2`; `wc -l .claude/validation/lint-artifacts.sh` = 5282 com 203 chamadas `violation \"` e 13 arquivos de baseline-catraca"
-    valid_from: 2026-10-01
+    valid_from: "2026-10-01"
     source_tier: 10
     source_kind: internal-audit
     label: 'MEDIDO AQUI, nao citado — e corrige o numero do proprio refutador: o binario instalado do Claude Code (2.1.286) traz 243 ocorrencias de PreToolUse e 195 de bypassPermissions, nao as 117 que a objecao 1 declarou (provavel diferenca de metodo: linhas com casamento versus ocorrencias). A direcao da objecao NAO muda — o veto por exit 2 e primitivo nativo e gratuito —, mas o numero de um refutador tambem precisa ser re-medido antes de virar premissa. O que a casa tem do lado dela, medido: 15 hooks, 6 deles com exit 2, um motor de 5.282 linhas com 203 violations e 13 baselines de catraca. Consequencia direta para a pergunta: o PRIMITIVO e gratis para todos; o que o Onion tem e o CORPUS de regras e as catracas construidos sobre ele, e e isso, nao o exit 2, que pode ser cobravel.'
@@ -83,9 +83,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'bash .claude/validation/kg-corpus-grep.sh "unidade bilhetavel" → 109 grafos varridos, 0 nos; contagem por termo nos mesmos 109 grafos via `git ls-files "*.kg.yaml" | grep -v /fixtures/ | xargs grep -il <termo> | wc -l`: pricing 11, cobranca 6, monetiz 4, open-core 3, "unidade bilhet" 0'
-    valid_from: 2026-10-01
+    valid_from: "2026-10-01"
     source_tier: 10
     source_kind: internal-audit
     label: 'AUSENCIA MEDIDA no corpus: em 109 grafos NAO existe um unico no sobre unidade bilhetavel. Preco aparece de raspao (pricing em 11 grafos, cobranca em 6, monetizacao em 4, open-core em 3) sempre como atributo de uma FERRAMENTA DE TERCEIRO que a casa estava avaliando — nunca como pergunta sobre o proprio Onion. Este grafo e a primeira entrada do tema: nao ha no previo a corroborar nem a contradizer, e por isso nenhum SUPERSEDES cross-grafo e escrito. Consequencia metodologica: uma decisao de modelo de negocio esta sendo tomada sobre corpus ZERO, o que por si so pesa a favor da opcao (f).'
@@ -104,7 +104,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://code.claude.com/docs/en/hooks — votos 3-0, fonte primaria da plataforma'
     source_tier: 9
     source_kind: primary
@@ -122,9 +122,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.45
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://systemprompt.io/guides/enterprise-claude-code-managed-settings — votos 3-0, mas source_kind vendor-on-competitor (clausula 7: sempre suspeito), sem numero de preco publicado'
-    valid_from: 2026-04
+    valid_from: "2026-04"
     source_tier: 4
     source_kind: vendor-on-competitor
     label: 'Hooks PreToolUse funcionam como gate deterministico (aprovar, negar ou modificar a chamada) e allowManagedHooksOnly forca o uso so de hooks gerenciados — ou seja, a coleira de agente que a opcao (c) quer vender JA EXISTE nativamente na plataforma, inclusive com a trava corporativa. O fornecedor que publica isto se posiciona como camada self-hosted ACIMA dos managed settings e NAO publica preco: cobra por seat ou deployment sob negociacao. Confianca rebaixada a 0,45 por tier 4 e por ser vendor falando do terreno do concorrente.'
@@ -143,9 +143,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371 (primaria, votos 2-1) cruzada com https://cloudnativenow.com/editorial-calendar/best-of-2025/apple-buys-styra-brains-opa-remains-open-2/ (agregador tier 5, votos 3-0)'
-    valid_from: 2025-08-20
+    valid_from: "2025-08-20"
     source_tier: 9
     source_kind: primary
     label: 'Em 2025-08-20 os criadores do OPA e varios membros da Styra passaram a integrar a Apple. A segunda fonte qualifica o fato e DESMONTA a leitura forte: foi acquihire SEM aquisicao — a Apple contratou os cofundadores e engenheiros core, sem comprar a empresa nem seus ativos. Logo "absorcao do principal vendedor comercial de motor de regras" e INFERENCIA, nao fato observado; nenhuma fonte de 2026 nesta rodada diz que a Styra parou de vender. Confianca 0,6 apesar do tier 9 por tres razoes somadas: votacao 2-1 (nao unanime), o fato tem 13 meses e a rodada nao o declarou como possivelmente superado, e a conclusao que dele se tira e inferida.'
@@ -162,9 +162,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371 — votos 3-0, fonte primaria dos proprios fundadores'
-    valid_from: 2025-08
+    valid_from: "2025-08"
     source_tier: 9
     source_kind: primary
     label: 'Os produtos COMERCIAIS da Styra (EOPA, a distribuicao otimizada do OPA, e o OPA Control Plane) foram encaminhados a organizacao CNCF OPA no GitHub: o que era vendavel virou comunidade aberta. E o unico caso desta rodada em que se ve, de ponta a ponta, o que acontece com um negocio construido em volta de um motor de regras aberto. ATENCAO a inferencia que NAO se sustenta: isto nao prova que motor de regras nao monetiza — prova que quem monetiza e a PLATAFORMA que opera o control plane, nao o vendedor do motor. Fato de 2025, N=1.'
@@ -183,9 +183,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://cloudburn.io/blog/amazon-bedrock-agentcore-pricing — votos 3-0, mas e analista de terceiro que DERIVA o numero; a pagina de precos da propria AWS (tier 9) foi REFUTADA nesta mesma rodada e NAO aparece lida de nenhum lado'
-    valid_from: 2026-05
+    valid_from: "2026-05"
     source_tier: 6
     source_kind: analyst
     label: 'O AWS Bedrock AgentCore Policy (autorizacao baseada em Cedar) e cobrado POR REQUISICAO DE AUTORIZACAO a US$0,000025 por request — cerca de US$0,025 por mil decisoes; 100 milhoes de chamadas de ferramenta por mes custam US$2.500. E o unico preco-por-veredito do campo achado nesta rodada, e e o piso contra o qual qualquer unidade da opcao (a) sera comparada: preco de COMMODITY de infraestrutura, so sustentavel para quem ja opera o control plane e o cobra junto com Gateway e Evaluations. Confianca 0,55 por tier 6 derivado e pela inversao de hierarquia: a versao tier 9 do MESMO fato foi descartada.'
@@ -202,9 +202,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://github.com/svayatta/agent-custody — repo Apache-2.0 com 8 estrelas, criado em 2026-09-04; preco no proprio repo; a claim do conteudo do produto veio com votos 2-1'
-    valid_from: 2026-09
+    valid_from: "2026-09"
     source_tier: 4
     source_kind: primary
     label: 'O caso MAIS PROXIMO do que o Onion tem, e e preciso dizer o tamanho dele: o repo svayatta/agent-custody vende a PROVA como produto — recibos assinados por chamada de ferramenta, log a prova de adulteracao com inclusao em Merkle, verificacao offline (verifyBundle) e um custody pack for counsel como evidence pack. A unidade bilhetavel e o RECIBO/APPEND, cobrado por volume: gratis ate 10 mil appends/mes, US$50/mes por 1 milhao. E o unico precedente de preco-por-prova achado. Tamanho real, declarado: 8 estrelas, menos de um mes de vida, sem receita, sem cliente conhecido — e precedente de FORMA, nunca prova de demanda.'
@@ -223,9 +223,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2608.00801 — votos 3-0 nas duas claims (a tecnica e a declaracao de que a fonte nao responde aos seis eixos)'
-    valid_from: 2026-08-01
+    valid_from: "2026-08-01"
     source_tier: 5
     source_kind: paper
     label: 'Atestacao composta: Evidence de hardware avaliada sob IETF RATS e vinculada a um AEP de software, demonstrada com TPM EMULADO — prova de conceito academica, sem produto comercial e sem preco. Para a pergunta isto tem valor duplo e contraditorio, e a rodada so extraiu metade: da FUNDAMENTO TECNICO a opcao (a), mostrando que veredito auditavel tem padrao aberto por tras (RATS), e ao mesmo tempo mostra que a area ainda esta no estagio de PAPER COM TPM EMULADO — o que e argumento CONTRA bilhetar prova hoje. A mesma fonte nao traz modelo de cobranca, preco, fornecedor, open-core, anti-padrao nem capital.'
@@ -242,9 +242,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.4
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://github.com/vectimus/vectimus (votos 2-1) e https://github.com/marcofanti/sondera-coding-agent-hooks-java (votos 3-0) — em AMBOS o que se mediu foi o REPOSITORIO, nao o site, docs ou release notes do fornecedor'
-    valid_from: 2026-10
+    valid_from: "2026-10"
     source_tier: 4
     source_kind: primary
     label: 'Dois dos entrantes da categoria nao publicam preco NO REPOSITORIO: o Vectimus e Apache-2.0 distribuido por pipx sem tier pago visivel, e a pagina do Sondera para hooks de agente nao traz preco, tier, SaaS, unidade bilhetavel nem atestacao de veredito. CONFIANCA DELIBERADAMENTE BAIXA (0,4) e o motivo e metodologico: ausencia de preco no README NAO e ausencia de monetizacao — e o padrao open-core, em que o preco mora no site (o Semgrep e LGPL no GitHub e cobra por contributor no site, e esse exato item caiu no lado refutado desta rodada). O que este no registra e uma MEDICAO INCOMPLETA, nao um fato de mercado.'
@@ -261,9 +261,9 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.thoughtworks.com/en-th/radar (votos 3-0) e https://www.openappa.com/ (votos 3-0) — ambas registradas como achado de AUSENCIA, nao de conteudo'
-    valid_from: 2026-09-28
+    valid_from: "2026-09-28"
     source_tier: 7
     source_kind: analyst
     label: 'Duas fontes foram seladas como achado dizendo apenas que NAO respondem: a pagina do Thoughtworks Radar nao traz modelo de cobranca, open-core, atestacao nem capital, e a openappa.com nao traz unidade bilhetavel, preco, rodada, M&A ou TAM. Registradas aqui com impacto 2 e confianca 0,5 porque sao, no maximo, lacuna documentada — e uma delas foi medida no CAMINHO ERRADO: thoughtworks.com/radar e a LANDING; o conteudo vive nos blips individuais e no PDF do volume, que ninguem abriu. O eixo de ANALISTA (Gartner, Forrester, Thoughtworks) esta, na pratica, VAZIO nesta rodada.'
@@ -282,9 +282,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'tres rodadas confirmadas em fontes de tiers diferentes: https://barc.com/?p=155644 (tier 7, votos 3-0), https://fortune.com/2026/05/28/geordie-security-governance-ai-agents/ (tier 6, votos 3-0) e https://newmarketpitch.com/blogs/news/ai-governance-funding-news (tier 5, votos 3-0); os agregados da MESMA fonte (12 rodadas, US$186,8M, Gray Swan, Cinder) ficaram no lado REFUTADO'
-    valid_from: 2026-07-28
+    valid_from: "2026-07-28"
     source_tier: 6
     source_kind: analyst
     label: 'O EIXO MERCADO FALOU, e o sinal e de CATEGORIA ADJACENTE, nao da unidade. Rodadas de 2026 em governanca/seguranca de agente: Neo saiu do stealth em 20/07/2026 com US$100M totais, incluindo Serie A de US$75M co-liderada por a16z e Bessemer; Geordie AI levantou US$30M Serie A liderada pela Balderton em 28/05/2026 a cerca de US$180M post-money (US$36,5M totais); Hush Security levantou US$30M Serie A em 28/07/2026 com a Akamai como investidor estrategico, para acesso just-in-time escopado, revogacao e trilhas de auditoria de agentes. TRES RESSALVAS que mudam o peso: (1) a fonte da Neo e permalink cru de WordPress sem slug nem autor para uma afirmacao de nove digitos que teria release primario, e a rodada nao diz O QUE a Neo faz; (2) os agregados que dariam tamanho a categoria (12 rodadas somando US$186,8M, Gray Swan US$40M, Cinder US$41M) foram REFUTADOS por fonte fraca, entao nao ha TAM nem numero de categoria neste grafo; (3) ZERO analista de casa (Gartner, Forrester, IDC) foi lido. Capital na vizinhanca nao e capital na unidade: dinheiro em runtime enforcement mais evidencia nao prova que alguem paga por veredito avulso.'
@@ -303,9 +303,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'contagem direta sobre o repasse da rodada em 2026-10-01: 17 claims confirmadas, 17 claims refutadas por fonte fraca, 0 nao-verificadas por 403/truncagem, 10 objecoes sobreviventes do Elenxo'
-    valid_from: 2026-10-01
+    valid_from: "2026-10-01"
     source_tier: 10
     source_kind: internal-audit
     label: "CONTABILIDADE (journal wf_8fc9168b-69a): 24 fontes lidas (31 URLs cortadas por orçamento), 90 claims, 34 verificadas: 17 confirmadas, 17 refutadas (incl. Semgrep, Vanta/Drata, Sentry, Snyk, OPA, Styra), 0 por falha de acesso; Elenxo: 60 objeções, 52 sobreviventes."
@@ -382,7 +382,7 @@ nodes:
     impact: 5
     confidence: 0.5
     label: 'DECISAO ABERTA (o maestro sela; esta sessao NUNCA sela): qual e a unidade bilhetavel do Onion que NAO contradiz a identidade canonica de framework template em .claude/ — sem produto npm, sem CLI standalone? OPCOES NOMEADAS: (a) VEREDITO DE GATE por execucao, cobrar pelo rodou-reprovou-aqui-esta-a-prova; (b) GRAFO/Company Brain ancorado como servico, KG mais chat-RAG mais radar deterministico; (c) GOVERNANCA DE AGENTE EM HOOK, vender a coleira onde o dinheiro do campo esta; (d) CONDUCAO/ADOCAO como servico, wizard mais onboarding mais manutencao do corpus de regras; (e) NADA, o valor e interno e o produto e outro; (f) NAO SELAR NESTA RODADA, segunda passada antes de qualquer unidade. RECOMENDACAO DO ELENXO: REPROVO (a) como unidade e REPROVO o selamento desta rodada; recomendo (f) agora e, como direcao PROVISORIA a testar na segunda passada, a combinacao (d) mais (b) com a prova como FEATURE, nunca como unidade. TRES RAZOES MEDIDAS: (1) o gate e primitivo GRATIS da plataforma — exit 2 em PreToolUse documentado em tier 9, e 243 ocorrencias de PreToolUse mais 195 de bypassPermissions no binario 2.1.286 medido aqui hoje; ninguem paga pelo que a Anthropic da de graca; (2) o unico preco-por-decisao do campo e da AWS a US$0,000025 (US$0,025 por mil), piso de commodity de quem OPERA o control plane — e a versao tier 9 desse mesmo fato foi REFUTADA enquanto a versao tier 6 foi selada, inversao de hierarquia que por si so desqualifica o selo; (3) dos seis eixos da pergunta, DOIS (open-core com numero e anti-padrao) nao tem UMA evidencia confirmada, e cinco das 17 confirmadas sao apenas declaracoes de que a fonte nao responde. ═══ AS SETE PERGUNTAS DE SELAGEM (o maestro pediu: faca as perguntas para eu selar) ═══ P1. QUEM PAGA? Empresa que adota o framework nos proprios projetos, consultoria conduzida por voce, ou terceiro que instala o plugin publico? Sem o pagador nomeado nenhuma unidade se escolhe, e esta rodada inteira foi feita sem ele. P2. A PROVA e PRODUTO ou FEATURE? Se produto, qual o piso aceitavel sabendo que a AWS cobra US$0,000025 por decisao e o unico precedente de preco-por-prova da 10 mil appends/mes de graca? P3. O Onion ACEITA OPERAR UM CONTROL PLANE — servico hospedado que recebe veredito ou append e cobra por volume? Isso contradiz framework template em .claude/ sem CLI standalone, ou o control plane e OUTRO produto com outra identidade? Sem resposta a P3 as opcoes (a) e (b) nao sao avaliaveis. P4. ONDE PASSA A LINHA DO GRATIS? O motor de lint, o radar, o grafo, a conducao — o que fica aberto para puxar adocao e o que fica atras da linha? P5. CONDUCAO E UNIDADE OU BOOTSTRAP? Receita de servico nao escala; ela e a unidade bilhetavel ou so o que paga a conta ate a unidade existir? P6. SE FOR (f), QUAL O GATILHO E A DATA? (f) sem gatilho nomeado e (e) disfarcada; nomeie as fontes da segunda passada e a data. P7. QUAL O ORCAMENTO DA SEGUNDA PASSADA e, se nao houver, voce aceita EXPLICITAMENTE selar por ausencia de dado nos eixos 3 e 5?'
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'NAO SELADA. Esta sessao nunca sela: status open, aguardando o maestro. A recomendacao do Elenxo e afirmacao de UM agente sem votacao — confianca rebaixada pela clausula de dissent.'
     trace: 'docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml'
 
@@ -397,7 +397,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 1 (exit 2 nativo, tier 9) lido contra a medicao local de 2026-10-01: o binario 2.1.286 traz 243 ocorrencias de PreToolUse e 195 de bypassPermissions — o Elenxo declarou 117, numero que NAO reproduz aqui'
     source_tier: 10
     source_kind: internal-audit
@@ -416,7 +416,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 2 (valid_from 2025-08-20) contra a EXIGENCIA DE ATUALIDADE da propria rodada, e contra o achado 12 da MESMA rodada (acquihire sem aquisicao)'
     source_tier: 9
     source_kind: internal-audit
@@ -434,7 +434,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 3 (produtos comerciais da Styra para a CNCF) lido contra o achado 7 da MESMA rodada (AWS cobrando por decisao de Cedar) — os dois juntos derrubam a inferencia que a rodada tirou do primeiro'
     source_tier: 9
     source_kind: internal-audit
@@ -452,7 +452,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 4 inspecionado: a fonte e barc.com/?p=155644, permalink cru de WordPress sem slug, sem autor e sem data no URL, carregando tier 7 para uma afirmacao de US$100M que teria release primario de a16z e Bessemer'
     source_tier: 7
     source_kind: internal-audit
@@ -470,7 +470,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 5 lido contra o corpus de metodo da casa: thoughtworks.com/en-th/radar e a LANDING do Radar; o conteudo vive nos blips individuais e no PDF do volume, nenhum dos quais aparece lido na rodada'
     source_tier: 7
     source_kind: internal-audit
@@ -488,7 +488,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 6 lido contra o item CORTADO POR ORCAMENTO na mesma rodada, que descreve o que a Geordie vende: discovery mais risk mapping mais remediacao por context engineering — packaging de plataforma, NAO gate deterministico por veredito'
     source_tier: 6
     source_kind: internal-audit
@@ -506,7 +506,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'comparacao direta das duas listas do repasse: a MESMA afirmacao de preco esta REFUTADA em tier 9 (aws.amazon.com/bedrock/agentcore/pricing) e CONFIRMADA em tier 6 (cloudburn.io); a pagina da propria AWS nao aparece lida em nenhum dos dois lados'
     source_tier: 9
     source_kind: internal-audit
@@ -524,7 +524,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 8 (votos 2-1) lido contra o padrao open-core documentado na propria rodada: o Semgrep e LGPL no GitHub e cobra US$35 por contributor/mes no SITE — e esse item caiu no lado refutado desta mesma rodada'
     source_tier: 5
     source_kind: internal-audit
@@ -542,7 +542,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 9: prova de conceito academica com TPM EMULADO, sem produto e sem preco — a propria descricao do item'
     source_tier: 5
     source_kind: internal-audit
@@ -560,7 +560,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'contagem direta no repasse: 5 dos 17 achados confirmados (5, 10, 13, 17 e parte do 8) dizem apenas que a fonte nao responde; a decima objecao do Elenxo chegou TRUNCADA no repasse, cortando em "A fonte nao responde as seis perguntas..."'
     source_tier: 10
     source_kind: internal-audit

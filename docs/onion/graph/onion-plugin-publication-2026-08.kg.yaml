@@ -1,7 +1,7 @@
 meta:
   id: onion-plugin-publication-2026-08
   schema_version: "1"
-  baseline: 2026-08-24
+  baseline: "2026-08-24"
   # A publicacao do Onion como plugin+marketplace num repo PUBLICO (onion-plugins), gerada do source.
   # O ADR de topologia de familia marcou o elo source->repo-publico (project-door) como GATED ate haver
   # gatilho; o pedido do maestro (2026-08-24) e o gatilho. Fase 1: o plugin-nucleo `onion` + a guarda de moat.
@@ -14,7 +14,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: "onion-adr-family-repo-topology-2026-07.md D5/F5: 'o core sabe empacotar in-repo e ser adotado, mas NAO sabe empurrar bundle para repo git publico externo' — project-door.sh gated-until-trigger (>=2 doors). O maestro pediu explicitamente o repo publico onion-plugins → gatilho disparado."
     trace: docs/analysis/onion-adr-family-repo-topology-2026-07.md
     label: "O elo source→repo-público-de-plugin (project-door, F5) estava GATED no ADR até ≥2 doors provarem o padrão; em 2026-08-24 o commit 65682c73 abriu a Fase 1 da publicação do Onion como plugin+marketplace, declarada 'o gatilho do project-door/F5', e registrou o gate aberto."
@@ -32,7 +32,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: "docs oficiais Claude Code (plugin-marketplaces.md) + diario 2026-07-08: install = /plugin marketplace add + /plugin install → capacidade read-only namespaced, atualiza por /plugin marketplace update (tag/SHA). SEM vendor-branch, SEM --update, SEM merge 3-way. Adopt (vendoriza+co-evolui) e canal SEPARADO. Coexistem por camada."
     trace: docs/analysis/onion-plugin-marketplace-runbook-2026-07.md
     label: "O canal de INSTALACAO (plugin) nao tem linkage de adopt: instala capacidade read-only, atualiza pelo plugin manager, nunca por merge. A cura da catraca-baseline (REGRA 49) nem se aplica (sem vendorizacao). Adopt segue como canal separado p/ quem customiza."
@@ -49,7 +49,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: "verticals/onion.manifest.sh + assemble-plugin.sh → plugins/onion/ (exit 0, tree_sha=b05c5e8b): skills(onion mestre+language-standards+patterns+validation+orchestration) + commands(warm-up/catch-up/onion) + agents(onion) + validation(kg-radar+lib) + hooks(exit-2+aside-router) + utils(task-manager+forge) + kb(dogfood/kg-sdaal/behavior). Prova de moat por ARQUIVO: 0 create-*/adopt/marketplace, 0 *.kg.yaml, 0 dir adopt/marketplace."
     trace: .claude/utils/marketplace/verticals/onion.manifest.sh
     label: "Nasceu o plugin-nucleo `onion` — o 'plugin do Onion' em si (orquestrador+skills core+runtime+motores+guardas+SDAAL+doutrina), a lacuna que o onion-work-tools nao cobria. Empacota so CAPACIDADE; o grafo do adotante nao viaja (KG-SSOT-First: leva o MOTOR, nao os dados)."
@@ -66,7 +66,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: done
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: "REGRA 61 (check_moat_boundary em lint-artifacts.sh): sourcia cada verticals/*.manifest.sh e REPROVA HARD se um array declarar meta-fabrica (create-*/adopt/marketplace/decouple) ou docs/onion/graph/*. Provada RED (fixture com create-vertical+adopt+grafo → HARD) + GREEN (so capacidade → limpo; comentario que MENCIONA meta-fabrica nao dispara, pois checa os ARRAYS via source, nao a prosa). Selftest run_moat_boundary_selftests 2/2."
     trace: .claude/validation/lint-artifacts.sh
     label: "A fronteira L1-distribui/L2-L3-moat virou MECANISMO, nao disciplina: vazar a meta-fabrica ou o SSOT privado num plugin publicavel e erro de LINT. Checa a DECLARACAO (manifesto), o ponto unico onde o que-se-publica e decidido. behavior-over-declaration: a cura e a guarda, nao a lembranca."
@@ -83,7 +83,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: done
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: "materialize-marketplace-repo.sh criado + testado por comportamento: materializa 8 plugins num tmp (name onion-plugins, sources relative-path, README), 0 vazamento de moat, commit no alvo SEM push (I3). Selftest run_materialize_repo_selftests 2/2."
     trace: .claude/utils/marketplace/materialize-marketplace-repo.sh
     label: "FASE 2 FEITA: o helper materialize-marketplace-repo.sh (o project-door que faltava) monta TODOS os plugins fresco + marketplace.json (name onion-plugins, self-contained) + README num dir-alvo; push HUMAN-GATED (I3). Falta: skill wizard onion-publish (Fase 3) e o repo publico marciocar/onion-plugins (Fase 5, o maestro cria+push)."
@@ -100,7 +100,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: "branch-code-reviewer adversarial (veredito 🔴 no commit inicial) provou 2 vazamentos reais: C1 (regex v1 cego a federacao/evolve/absorb-skill e a grafos FORA de docs/onion/graph — incl. o life-KG marcio.kg.yaml) e C2 (bypass por DIRETORIO-PAI: declarar commands/meta arrasta a fabrica sem casar a string). Guarda reescrita para checar a EXPANSAO (o que o assembler copiaria), nao a string. Provada RED (C1 abrangente + C2 dir-pai) + GREEN (upstream/produto/reais) + selftest run_moat_boundary_selftests 3/3."
     trace: .claude/validation/lint-artifacts.sh
     label: "A 1a guarda VAZAVA por dois caminhos que a revisao adversarial pegou (declarado≠verificado: o conserto estava na working tree, nao no commit). C1: regex fraco. C2: bypass estrutural por dir-pai — nenhum regex fecha, so checar a EXPANSAO. Endurecida e provada. Exemplo vivo de behavior-over-declaration: o revisor mediu o que o commit FAZIA, nao o que o header afirmava."
@@ -116,7 +116,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: ".claude/skills/onion-publish/SKILL.md criada e auto-descoberta (aparece na lista de skills do harness). Conduz: orient(role:source) → confirma moat → colhe alvo → materialize-marketplace-repo.sh → valida → PARA no push (human-gated I3). É CORE-ONLY (nao entra em plugin — publicar e ato da FONTE; distribui-la seria meta-fabrica)."
     trace: .claude/skills/onion-publish/SKILL.md
     label: "FASE 3 FEITA: a skill wizard onion-publish (par de onion-wizard) conduz a publicacao do marketplace, delegando ao helper deterministico e parando no push. Core-only por desenho — consistente com o moat (nao distribui a capacidade de gerar marketplace)."
@@ -132,7 +132,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-25
+    verified_at: "2026-08-25"
     verified_against: "gh repo view marciocar/onion-plugins → PUBLIC, branch master, url https://github.com/marciocar/onion-plugins. marketplace.json remoto: name onion-plugins, 8 plugins relative-path. plugin.json do onion acessivel via API. Verificacao final de moat ANTES do push: 0 meta-fabrica, 0 grafo, 0 dir sensivel, 0 segredo REAL (so mencao de var em docs), 0 nome comercial."
     trace: .claude/utils/marketplace/materialize-marketplace-repo.sh
     label: "FASE 5 FEITA (2026-08-25): o repo publico marciocar/onion-plugins esta NO AR, 8 plugins, instalavel por /plugin marketplace add. O maestro autorizou; a verificacao final de moat (irreversivel) passou limpa. O ciclo source→repo-publico (project-door) fechou de ponta a ponta."
@@ -148,7 +148,7 @@ nodes:
     impact: 3
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-25
+    verified_at: "2026-08-25"
     verified_against: "medido nos manifestos: /meta:kg + kb-freshness + context-freshness estao em onion-work-tools (distribuidos); kg-freshness NAO estava em NENHUM plugin (core-only). kg-freshness re-verifica os grafos do adotante contra o vivo (mede+re-carimba) — e runtime KG-SSOT do adotante, nao meta-fabrica nem grafo privado. Gap, nao moat. Achado por duvida do maestro apos a publicacao."
     trace: .claude/utils/marketplace/verticals/onion.manifest.sh
     label: "GAP de cobertura: o runtime KG do plugin `onion` levava o MOTOR (kg-radar) mas nao a re-verificacao (kg-freshness), que ficava core-only. Nao e moat — kg-freshness opera sobre os grafos DO ADOTANTE (KG-SSOT-First). Curado: kg-freshness entra no nucleo `onion`, junto do kg-radar, fechando a historia do runtime KG."
@@ -164,7 +164,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-25
+    verified_at: "2026-08-25"
     verified_against: "dogfood de INSTALL num Claude Code limpo (claude 2.1.243): claude plugin marketplace add marciocar/onion-plugins + install onion@onion-plugins → skills/comandos/agente OK, mas `details` mostrou Hooks: 0 — os 2 hooks (exit-2 guard PostToolUse + aside-router UserPromptSubmit) viajavam como ARQUIVO INERTE. Causa: assemble-plugin.sh so copiava o .sh, deixava o registro 'a cargo do consumidor'. Cura: assemble gera hooks/hooks.json (auto-descoberto) mapeando cada hook ao evento do settings.json do core, path ${CLAUDE_PLUGIN_ROOT}. Re-dogfood: install → Hooks: 2. Provado por comportamento."
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "DOGFOOD de INSTALL pegou o que lint nenhum acharia: o plugin empacotava os hooks mas nao os ATIVAVA (Hooks: 0) — a guarda exit-2 (a capacidade que 'compra' o acoplamento ao Claude Code) chegava morta. Assemble agora gera o hooks.json que o Claude Code auto-descobre. Instalar o onion = ganhar a guarda de verdade. fix→re-dogfood no mesmo loop."

@@ -1,8 +1,8 @@
 meta:
   id: radar-E3-2026-09-04
   schema_version: "1"
-  baseline: 2026-09-04
-  review_after: 2026-10-19   # revisita: versao do Claude Code, 45d (= REGRA 65) — REGRA 67
+  baseline: "2026-09-04"
+  review_after: "2026-10-19"   # revisita: versao do Claude Code, 45d (= REGRA 65) — REGRA 67
   # kg-backlog-guard: on
   # ═══ TETO: 20 NÓS. Rodada fechada: cresce só se uma re-medição do mesmo delta emendar um achado. ═══
   # Rodada 3 do /meta:radar, eixo E3 (claude-code-delta): delta 2.1.259 (baseline 2026-09-03,
@@ -28,7 +28,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG 2.1.260 l.42; juiz EMENDOU: supera SO a metade "cobertura por deny rule e opcao a adotar" do E_F5 da rodada 2; o ALLOW Bash(grep * .env) em settings.json:12 segue vivo (4 camadas de settings: zero deny, zero ask)'
     source_tier: 9
     source_kind: vendor-on-self
@@ -45,7 +45,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.20, l.21; juiz EMENDOU: l.20 e falha de carga de hook de PLUGIN — a guarda do core e hook de settings.json (PreModelSwitch entre 9 eventos/15 hooks), nao de plugin'
     source_tier: 9
     source_kind: vendor-on-self
@@ -62,7 +62,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.18; juiz EMENDOU: source=picker JA foi medido em 2026-09-02 18:28Z (unico registro de model-switch.jsonl, decision=block); ladder=restored so sai vindo de degrau abaixo — Fable→Fable da `same`'
     source_tier: 9
     source_kind: vendor-on-self
@@ -79,7 +79,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.95
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.17; juiz APROVOU e re-mediu: frontmatter entre os dois --- = 43 sonnet + 8 opus + 0 fable = 51 agentes (9 arquivos sem model: sao READMEs); grep fable em .claude/agents = 0; pin ANTHROPIC_DEFAULT_FABLE_MODEL ausente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -96,7 +96,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.19, l.51, l.4; juiz APROVOU'
     source_tier: 9
     source_kind: vendor-on-self
@@ -113,7 +113,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.49; juiz EMENDOU: o "~800k desta sessao" nao era verificavel — o unico contexto medido e context_tokens=457573 (registro de 09-02); numero retirado'
     source_tier: 9
     source_kind: vendor-on-self
@@ -130,7 +130,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.43, l.34; juiz EMENDOU substancialmente: allOf = 0 ocorrencias em onion-research.js; KG_SCHEMA_DECISION e spread + properties estreitadas, todo required existe em properties — nenhum schema do workflow e insatisfazivel'
     source_tier: 9
     source_kind: vendor-on-self
@@ -147,7 +147,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.29, l.31, l.61; juiz REPROVOU a ancora local (o bg-spare e desta sessao, 04-09, e /exit soltando so a visao do cliente e a semantica correta de job destacado — nao a duplicacao de l.31) e reduziu l.61 a nota (o teto de 1 h valia so para comandos de background de SUBAGENTES; a bancada roda do pre-commit e da sessao principal)'
     source_tier: 9
     source_kind: vendor-on-self
@@ -164,7 +164,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.5, l.35; juiz EMENDOU: "fecha o ciclo sem reiniciar" NAO foi medido e contraria evidencia da casa (hooks novos exigiram reinicio, 09-02); o plugin do Onion embarca hooks'
     source_tier: 9
     source_kind: vendor-on-self
@@ -181,7 +181,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.9, l.10, l.11, l.54; juiz APROVOU e reforcou: as 4 camadas de settings sao allow-only (13, 97, 3, 24 entradas), zero deny, zero ask'
     source_tier: 9
     source_kind: vendor-on-self
@@ -198,7 +198,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.39, l.40; juiz EMENDOU com medicao: a regex do parseRepoIdentity do spec do forge (detector.md) devolve owner=subgroup para gitlab.com/group/subgroup/project.git e owner=sub2 para group/sub1/sub2/project.git — o namespace e descartado; costura confere (detector.md:133, factory.md:75 case gitlab, sem adapter)'
     source_tier: 9
     source_kind: vendor-on-self
@@ -215,7 +215,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.59; juiz EMENDOU: o core nao tem configuracao de sandbox em nenhuma camada — l.59 e no-op hoje'
     source_tier: 9
     source_kind: vendor-on-self
@@ -232,7 +232,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'CHANGELOG l.16, l.55, l.8, l.13, l.28, l.44, l.60, l.4, l.22, l.46; juiz opus/high'
     source_tier: 9
     source_kind: vendor-on-self
@@ -249,7 +249,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'juiz opus/high 2026-09-04; model-switch.jsonl (1 registro, anterior ao campo ladder); instructions-loaded.jsonl (2 cargas de CLAUDE.md por session_start)'
     source_tier: 9
     source_kind: vendor-on-self

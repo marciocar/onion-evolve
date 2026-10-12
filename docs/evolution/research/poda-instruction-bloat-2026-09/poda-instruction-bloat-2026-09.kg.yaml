@@ -1,8 +1,8 @@
 meta:
   id: poda-instruction-bloat-2026-09
   schema_version: "1"
-  baseline: 2026-09-03
-  review_after: 2026-10-03   # cadência FERRAMENTA/PREÇO = 30d. Justificativa do tipo dominante: o objeto
+  baseline: "2026-09-03"
+  review_after: "2026-10-03"   # cadência FERRAMENTA/PREÇO = 30d. Justificativa do tipo dominante: o objeto
                              # desta decisão NÃO é doutrina (12m) nem mercado (90d) — é uma PROPRIEDADE DE
                              # RUNTIME do Claude Code (o que entra sempre no contexto: description de skill
                              # vs corpo sob demanda, `paths:` em rule/skill, o hook InstructionsLoaded), e
@@ -46,7 +46,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'https://www.alphaxiv.org/abs/2608.11095 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026-08'
     source_tier: 7
@@ -65,7 +65,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'https://www.thoughtworks.com/en-br/radar/techniques/agent-skills — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026-04'
     source_tier: 6
@@ -85,7 +85,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'medicao propria, 4 comandos no repo e no binario instalado: (1) `git log --follow --numstat -- CLAUDE.md` = 59 commits, adds=323, dels=77, maior remocao unica de toda a historia = 5 linhas; (2) `wc -lc CLAUDE.md` = 246 linhas / 17.041 bytes (~5k tokens = ~0,5% de uma janela de 1M); (3) `grep -n "^paths:" .claude/skills/*/SKILL.md` = onion-patterns [".claude/**","docs/onion/**"] e onion-validation [".claude/**"] JA declaram escopo por path; (4) `grep -ao InstructionsLoaded <binario 2.1.259>` = 21 ocorrencias, incluindo executeInstructionsLoadedHooks / hasInstructionsLoadedHook e a lista de eventos de hook — o hook EXISTE no artefato instalado.'
     valid_from: '2026-09-03'
     source_tier: 10
@@ -116,7 +116,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'varredura do eixo mercado/capital sobre as 12 claims da rodada: nenhuma rodada de investimento, M&A, valuation ou down round nomeado sobreviveu aos votos; o unico sinal de mercado e o analista (Thoughtworks Radar v34, abr/2026)'
     valid_from: '2026-04'
     source_tier: 6
@@ -136,7 +136,7 @@ nodes:
     status: unverifiable
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'contabilidade da propria rodada: 40 fontes varridas, 12 claims votadas, 2 confirmadas, 8 refutadas nos votos, 0 nao-verificadas por falha de acesso; 1 item cortado por orcamento'
     source_tier: 10
     source_kind: internal-audit
@@ -199,7 +199,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'a propria triagem da rodada: quatro claims saem do mesmo preprint (alphaXiv 2608.11095) e receberam vereditos opostos — a manchete do log-hazard -0.032 CONFIRMADA, e as tres irmas REFUTADAS (O(1) para adicionar vs O(2^|D|) para deletar; "poda estruturada eliminou 99,3%"; "refactor nao-estruturado retoma +4,1% a +4,9%"). Teste local que ninguem rodou e custa 1 comando: `git log --follow --numstat -- CLAUDE.md` = 59 commits, adds=323, dels=77, maior remocao unica = 5 linhas.'
     source_tier: 10
     source_kind: internal-audit
@@ -217,7 +217,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'tres furos medidos: (a) mistura de aneis — Agent Skills esta em TRIAL, nao e avaliacao CAUTION, e a correcao foi cortada por orcamento nesta mesma rodada; (b) `wc -c CLAUDE.md` = 17.041 bytes (~5k tokens) contra janela de 1M = ~0,5%, logo "esgotamento da janela de contexto" nao e o constrangimento vivo; (c) a listagem de skills desta propria sessao mostra apenas as `description` no contexto, e `grep -n "^paths:" .claude/skills/*/SKILL.md` devolve onion-patterns e onion-validation ja escopadas.'
     source_tier: 10
     source_kind: installed-artifact
@@ -235,7 +235,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: "artefato instalado, 1 comando, sem web: binario do Claude Code 2.1.259 + a listagem de skills do proprio prompt desta sessao (so descriptions no contexto; o corpo de onion-orchestration, 296 linhas, so entra via ferramenta Skill) + docs/knowledge-base/tools/agent-skills.md:131 documentando `paths` para skill"
     valid_from: '2026-09-03'
     source_tier: 10
@@ -254,7 +254,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'https://arxiv.org/pdf/2507.11538 (tier 8) — "o padrao de degradacao por densidade correlaciona com tamanho do modelo e capacidade de raciocinio, ou seja, o efeito NAO e uniforme" — cruzado com a doutrina de tiering do repo (memoria efficiency-over-economy: model+effort por fase; opus-5[1m] no maestro, modelos menores em subagentes)'
     valid_from: '2025-07'
     source_tier: 8
@@ -273,7 +273,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'https://www.alphaxiv.org/abs/2608.11095 (tier 7) — "adicionar instrucoes custa O(1), deletar com seguranca custa O(2^|D|)" — o MESMO preprint cuja manchete a rodada MANTEVE; corroborado localmente por adds=323 / dels=77 em 59 commits e maior remocao unica = 5 linhas'
     valid_from: '2026-08'
     source_tier: 7
@@ -292,7 +292,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'https://www.alphaxiv.org/abs/2608.11095 (tier 7) — "medir primeiro (telemetria de quais instrucoes influenciam decisoes) + comentarios registrando por que cada instrucao foi criada + poda estruturada eliminou 99,3% das instrucoes excedentes, mas so quando estruturada" — terceira claim do mesmo preprint, refutada enquanto a manchete ficou de pe'
     valid_from: '2026-08'
     source_tier: 7
@@ -311,7 +311,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'https://www.thoughtworks.com/radar/techniques/agent-instruction-bloat (tier 6) — "instrucoes longas e conflitantes fazem o modelo atender menos ao conteudo enterrado no meio de contextos longos" — corroborado ao vivo pelo corpus: kg-read-leg-2026-08/E_claude_md_has_control (a secao entrou no CLAUDE.md em 2026-06-22 e o caso C1 falhou ~6 semanas depois SOB ELA CARREGADA, com o agente arbitrando entre imperativos concorrentes) e o placar kg-read-leg-2026-08/E_replay_scoreboard (cura A = 1/9)'
     valid_from: '2026-04'
     source_tier: 6
@@ -329,7 +329,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: "binario do Claude Code 2.1.259 instalado (strings): schema Toe = base + file_path + memory_type in [User,Project,Local,Managed] + load_reason in Eoe=[session_start,nested_traversal,path_glob_match,include,compact] + globs? + trigger_file_path? + parent_file_path?; 15 ocorrencias"
     source_tier: 10
     source_kind: primary

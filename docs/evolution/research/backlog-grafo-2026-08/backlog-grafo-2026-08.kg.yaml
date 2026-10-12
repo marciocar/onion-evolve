@@ -7,7 +7,7 @@ meta:
   schema_version: '1'
   layer: audit
   label: 'Onda 1 — o que "gerir trabalho aberto" significa quando a FONTE e grafo e a projecao e pura'
-  baseline: 2026-08-28
+  baseline: "2026-08-28"
   trace: "docs/onion/graph/guardas-revisao-2026-08.kg.yaml"
   note: >
     Projecao humana deste grafo: SYNTHESIS.md (derivacao, nunca fonte — divergiu, o grafo ganha).
@@ -30,7 +30,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     trace: "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml"
     verified_against: 'invariante gravado na F0 para ser checado na porta da F3, como o plano aprovado prescreve'
     label: 'A ONDA 1 E PROIBIDA DE CONSTRUIR QUALQUER COISA QUE PRESSUPONHA A RESPOSTA DA FRONTEIRA (Onda 2). VERBOS VEDADOS: atribuir responsavel · data de entrega · sprint · estimativa · sincronizar status com provider · notificar. VERBOS PERMITIDOS: ordenar · medir · envelhecer · limitar · triar · projetar · reprovar — todos operacoes SOBRE O GRAFO, indiferentes a quem executa. Consequencia ja exercida: `owner:` cai do lado VEDADO, o que enquadrou a decisao de NAO construi-lo e apenas tornar sua morte visivel'
@@ -47,7 +47,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'git log -S "  - id: <ID>" -- <grafo> | tail -1 sobre os 186 abertos do escopo do projetor; cobertura 186/186, ~2min de shell'
     label: 'DISTRIBUICAO DE IDADE, medida com cobertura 100%: >60 dias = 0 · 31-60 dias = 113 (61%) · 8-30 = 67 (36%) · 0-7 = 6 (3%) · media 31 dias. Este retrato inteiro e INVISIVEL na superficie atual, e custou dois minutos de shell — sem tocar o schema, sem LLM, sem campo novo'
     provenance:
@@ -62,7 +62,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'idade derivada do git para os 15 itens de maior atencao: 12 dos 15 nasceram entre 25 e 26/07'
     label: "DEZ DOS QUINZE ITENS DE MAIOR ATENCAO (projecao de 2026-08-28) NASCERAM NA MESMA RAJADA (25-26/07) e seguem abertos; os outros cinco nasceram entre 11/07 e 11/08. Nenhum tem menos de 17 dias. E a assinatura de um plano-grafo ESCRITO UMA VEZ E NUNCA CONDUZIDO"
     narrative: "label anterior: DOZE DOS QUINZE ITENS DE MAIOR ATENCAO NASCERAM NA MESMA RAJADA (25-26/07) E NENHUM SE MOVEU EM 33 DIAS. Nada no topo e recente. E a assinatura de um plano-grafo ESCRITO UMA VEZ E NUNCA CONDUZIDO"
@@ -78,7 +78,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: open
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'kg-drive-project.sh:30 e kg-realign-project.sh:29 fixam fios-abertos; medido: fios-abertos = 0 abertos (20/20 teto) enquanto docs/backlog.md = 190'
     label: 'A ASSIMETRIA, REFINADA PELA MEDICAO (P3 do drive, 2026-08-28) — a versao anterior EXAGERAVA. Medido: (1) o `fios-abertos` e DEFAULT, nao trava — os dois scripts aceitam `*.kg.yaml` como argumento (linha 34), e o drive JA conduziu um grafo nao-default (a sessao drive-m3-federation-2026-08-27); (2) 37 dos 190 itens abertos (19%) JA aparecem citados em commits, logo a fila NAO esta sem condutor. O QUE PERSISTE, e por isso segue open: nao ha LACO CROSS-GRAFO — nada pega o topo do backlog e o entrega ao driver; conduzir exige o maestro ler a projecao e digitar o caminho. O default aponta para um grafo com ZERO abertos, entao a invocacao nua (`/meta:drive` sem argumento) e sempre um no-op'
     provenance:
@@ -89,7 +89,7 @@ nodes:
 
   - id: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
     node_type: question
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     # plane: DEV, e o CI corrigiu isto: como PROD com impact>=4 e sem verified_at, o no
     # AFIRMARIA sobre producao sem nunca ter olhado (guarda kg-verificacao/NOVO). E ele nao
     # afirma — PERGUNTA. A propria doutrina do fios-abertos ja dizia por que: "o backlog
@@ -113,7 +113,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'kg-radar --open-tsv sobre o escopo do projetor (186 itens): 183 open + 2 drifted + 1 unverifiable; dos open, 83 question / 54 claim / 35 decision'
     label: 'QUASE METADE DO BACKLOG NAO E TRABALHO PENDENTE: 83 dos 183 abertos (45%) sao `question`, e a cauda longa delas e gated com gatilho nomeado ("parado SOB CONTROLE != orfao"). Mas a tabela projetada nao tem coluna de TIPO, STATUS nem IDADE — quem le nao distingue "trabalho que espera alguem" de "pergunta que espera um gatilho", e essas duas coisas exigem acoes opostas'
     provenance:
@@ -128,7 +128,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'os 2 drifted do escopo: E_floors_effective_measured_20260729 e C_command_side_gap — este ultimo marcado pela PROPRIA sessao anterior'
     label: 'O MECANISMO PRODUZ `drifted` E NINGUEM OS RECONCILIA. Pelo status-factor.awk o `drifted` pesa 1.3 — ele SOBE no radar de proposito, porque alguem precisa reconciliar. Um dos dois foi marcado pela sessao imediatamente anterior e continua la'
     provenance:
@@ -144,7 +144,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'kg-backlog-check.sh docs/onion/graph/fios-abertos.kg.yaml => OK 20/20 nos'
     label: 'fios-abertos esta em 20/20 — TETO CHEIO. Um no novo estoura o TETO (HARD). Logo "colher a onda anterior" nao e boa pratica: e PRE-CONDICAO MECANICA para a Onda 1 conseguir registrar o proprio compromisso. A escassez e a feature — o programa nao PODE despejar 30 itens, e forcado a colher e escolher'
     provenance:
@@ -160,7 +160,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'WebFetch em www.reddit.com e old.reddit.com => "unable to fetch" nos dois; site:reddit.com na WebSearch nao devolve threads'
     label: 'REDDIT E INACESSIVEL DESTE HARNESS — medido, nao suposto. HN Algolia (API JSON estruturada), Lobsters, arxiv e LeadDev funcionam. Decisao do maestro: substituir o eixo por fontes verificadas, com a razao REGISTRADA — sem este no, a proxima sessao re-tenta em silencio e paga de novo. Eixo que ninguem consegue executar e eixo decorativo'
     provenance:
@@ -175,7 +175,7 @@ nodes:
     impact: 3
     confidence: 0.85
     status: superseded
-    verified_at: 2026-08-29
+    verified_at: "2026-08-29"
     verified_against: 'SELO DO MAESTRO 2026-08-29 (Aufhebung estrita): alvo preservado e superado por E_PRIOR_ART_AUDITADO_POR_LEITURA; a aresta REFUTES do achado do KARMA fica de pe, com genealogia auditavel'
     label: 'DRIFTOU AO SER LIDO — e a ressalva deste no ("citar titulo NAO e ter lido") pegou o proprio autor dele. Dos 5 itens citados, UM era FALSO: a alegacao de que KARMA usa utility scoring + multi-armed bandit veio de um resumo de busca ALUCINADO por terceiro e nao existe no paper (ver E_KARMA2502_CITACAO_MAB_E_FALSA). Os outros dois auditados SUSTENTAM nosso limite declarado em vez de refuta-lo: SGH (2604.11378) exclui do proprio escopo grafos cuja dependencia nao e conhecida antes da execucao — que e a definicao de grafo epistemico; GRADE (2606.22741), com bancada de 6 corpora reais, usa o grafo de dependencia so como DIAGNOSTICO POS-HOC e nunca reordena. Agent-as-a-Graph (2511.18194) e de outro problema (retrieval de tool) e NAO virou no: forcar aresta ali seria guarda que passa sempre'
 
@@ -186,7 +186,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     trace: "docs/evolution/review/feat-backlog-projection-ratchet.md"
     verified_against: 'PR #704 MERGED (84c659e9); bancada 8/8; 5 mutacoes reprovam; CI em runner distinto nao disparou a regra'
     label: 'O TRABALHO DE MECANISMO QUE JA TINHA GATILHO FOI ENTREGUE ANTES DA ONDA, de proposito: ele nao depende da pesquisa. REGRA 62 (catraca de projecao) + `--markdown` + `case` de args fechado + iconv fail-loud + LC_ALL pinado + rc do radar lido. Duas lacunas foram RESOLVIDAS POR SUBTRACAO em vez de mecanismo: `owner:` (a projecao passa a IMPRIMIR que zero nos o declaram) e o indice do diario (segue aberto com gatilho refinado por medicao)'
@@ -202,7 +202,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'grep pelos ids nomeados no plano em docs/onion/graph e docs/evolution/research => ZERO ocorrencias; o plano aprovado (33KB) esta fora do repositorio (git: "outside repository")'
     label: 'ACHADO DO PROPRIO /meta:realign, e a razao de este arquivo existir: o programa de tres ondas aprovado hoje NAO tinha casa em grafo nenhum — vivia so num arquivo de plano de 33KB FORA do repositorio, e as medicoes que o sustentam viviam so em prosa. O realign dizia ALINHADO com razao (os grafos existentes coerem) e era CEGO ao que nunca foi escrito. E o caso-ouro da porosidade que a doutrina do Elenxo descreve: conhecimento que nasce, e validado, e evapora fora da SSOT. O dente do realign e "achado vira NO, nao .md lateral" — este commit e esse dente'
     provenance:
@@ -217,7 +217,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'git log --all --grep=<id> para os 190 ids extraidos de docs/backlog.md => 37 com commit; grep GRAPH= em kg-drive-project.sh:30,34 e kg-realign-project.sh:30,34; .claude/sessions/drive-m3-federation-2026-08-27 conduziu grafo nao-default'
     label: 'MEDICAO QUE REFINA (e em parte DERRUBA) a manchete de C_O_DRIVER_CONDUZ_O_GRAFO_VAZIO. 37 de 190 abertos (19%) tem commit citando seu id — a fila e trabalhada, so nao POR AQUI. E o hardcode e default, nao trava: linha 34 dos dois scripts aceita `*.kg.yaml`, e ha precedente de uso com grafo nao-default. Registrado como medicao contra o vivo no P3 de um /meta:drive, nao como impressao: o driver medindo a propria assimetria que o motivou'
     provenance:
@@ -232,7 +232,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'git log --follow -- docs/backlog.md => 8 commits, 7 da construcao (22-28/08); para os 190 ids, primeira citacao em commit ANTES de 2026-08-22 = 24, DEPOIS = 13'
     label: 'A LENTE L1 (absorcao/uso real), medida por git em vez de perguntada. docs/backlog.md tem SEIS DIAS e quase todos os commits que o tocam sao da sua propria construcao. Dos 37 abertos com rastro, 24 nasceram no historico ANTES da projecao existir. Conclusao com o teto declarado: a projecao ainda NAO PODE ter mudado a selecao de trabalho, e afirmar que ela e "sub-usada" seria tao infundado quanto afirmar que e util — e jovem demais para as duas coisas. O que a medicao DERRUBA e a premissa da propria pergunta (parado/abandonado), nao o valor da superficie'
     provenance:
@@ -247,7 +247,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'leitura direta do PDF via Read (20/26 paginas de arxiv.org/pdf/2502.06472: corpo 1-9 + Limitations + apendice de prompts 11-20); ZERO ocorrencias de "multi-armed bandit", "Central Coordination Agent" ou "utility scor*"'
     label: "A CITACAO NAO VALE PARA A VERSAO VIGENTE, mas NAO era alucinada: a v1 do KARMA (fev/2025, §3.3, eq.2-3) tinha Central Controller Agent com utility scoring + exploracao a la multi-armed bandit. A v2 (jan/2026), a lida, removeu isso: sobra o Evaluator de gate binario (eq.12-15)"
     narrative: "label anterior: A CITACAO ERA FACTUALMENTE FALSA, E O ERRO FOI MEU. Nao existe Central Coordination Agent nem multi-armed bandit no KARMA; existe um Central Controller (Fig.2, sem detalhe algoritmico) e um Evaluator Agent que faz GATE BINARIO de qualidade (sigmoide + limiar, eq.12-15) sobre um triplo JA EXTRAIDO — nao ordenacao de qual tarefa processar primeiro. A alegacao veio de um resumo de busca alucinado por terceiro que eu repassei sem ler o paper. E o modo de falha que o proprio no-pai declarava, cometido pelo autor do no"
@@ -263,7 +263,7 @@ nodes:
     impact: 3
     confidence: 0.7
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'WebFetch em /html e /pdf de 2604.11378, 2 leituras convergentes; paper e POSITION/DESIGN, autor unico, ZERO experimento ("not a production implementation or empirical results") — peso rebaixado por isso'
     label: "SGH (DAG estatico, roteamento por topologia) limita o escopo a \"verifiable engineering tasks\" de dependencia \"articulated before execution begins\"; exploratorias (estrutura \"discovered during execution\") ficam fora: o caso do grafo epistemico. Fonte fraca: position paper"
     narrative: "label anterior: SGH propoe DAG estatico + despacho por PRONTIDAO TOPOLOGICA PURA (sem peso de prioridade/urgencia/custo) e declara o proprio limite: escopo e \"verifiable engineering tasks\" com dependencia conhecida ANTES da execucao, excluindo tarefas exploratorias e \"tasks without fully known dependencies at planning time\" — o que descreve, por definicao, um grafo EPISTEMICO onde claim e evidence EMERGEM da investigacao. Fonte fraca (N=0), mas o dado relevante e o LIMITE declarado, nao o resultado"
@@ -279,7 +279,7 @@ nodes:
     impact: 3
     confidence: 0.8
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'WebFetch em /abs e /html de 2606.22741; validado em 6 corpora REAIS (tau-bench, tau2-bench, SWE-agent, SWE-Gym, OpenHands, AgentRewardBench) + Who&When (126 runs falhos) + FLORA-Bench (~6e5 pares)'
     label: 'MESMO A LITERATURA MAIS ROBUSTA NAO CONVERTE DEPENDENCIA EM PRIORIDADE. GRADE constroi grafo de duas camadas sobre trace real de agente, mas e explicitamente DIAGNOSTICO POS-HOC: mantem a ordem original da trace FIXA e usa a dependencia para LOCALIZAR FALHA, nunca para reordenar execucao. Reforca que a conversao dependencia->ordem (nossa Fase 2 gated) e passo a parte e nao-trivial — prudencia alinhada ao estado da arte, nao omissao'
     provenance:
@@ -294,7 +294,7 @@ nodes:
     impact: 2
     confidence: 0.5
     status: open
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'mesma leitura de 2606.22741; achado de DOMINIO DIFERENTE (predicao de falha em trace de execucao, nao triagem de backlog epistemico) — transferencia e ANALOGIA, nao medicao sobre o nosso grafo'
     label: 'A TENTATIVA HONESTA DE REFUTAR A NOSSA REGUA, e ela nao caiu — mas deixou um fio. GRADE mede que "hub concentration" (centralidade DIRIGIDA/normalizada) prediz falha melhor e TRANSFERE entre corpora, enquanto contagem crua falha na transferencia. Sugere que grau NAO-DIRECIONADO bruto (nosso "1+grau") pode ser instrumento mais cego que uma centralidade dirigida. Fica OPEN de proposito: e hipotese analogica de outro dominio, nao medicao sobre o nosso corpus. GATILHO: medir as duas reguas sobre os nossos 45 grafos e comparar o que cada uma poe no topo'
 
@@ -327,7 +327,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     trace: "docs/knowledge-base/concepts/onion-abstraction-doctrine.md"
     verified_against: 'Teste do Eixo/Gatilho da doutrina de abstracao: SDAAL gradua com 2o provider REAL, nunca por simetria'
     label: 'NAO-COMPROMISSO EXPLICITO, escrito para impedir que alguem (inclusive eu) desenhe factory/interface/adapter de "backlog store" por simetria. SDAAL so gradua com SEGUNDO PROVIDER REAL. Desenhar a abstracao antes disso repete o anti-padrao que m3-federation-admin ja refutou por escrito, e e a catedral do .onion/ na sua forma mais tentadora: elegante, simetrica, e sem usuario'
@@ -361,7 +361,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     trace: ".claude/validation/automation-ladder-registry.txt"
     verified_against: 'invariante I3 (um escritor por repo) + o degrau MOAT da escada graduada, que nao tem gatilho de promocao por desenho'
     label: 'MOAT PERMANENTE, sem gatilho de promocao: LER ou ESCREVER backlog atravessando a fronteira de repo fere I3 (um escritor por repo). Isto nao e "ainda nao" — e "nunca automatizar". Registrado como decisao e nao como pergunta justamente para que ninguem o reabra como se fosse fio gated esperando amadurecer'
@@ -377,7 +377,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-29
+    verified_at: "2026-08-29"
     verified_against: 'os 4 papers LIDOS (KARMA direto do PDF, 20/26 paginas; SGH e GRADE via extracao com 2 leituras convergentes); veredito por tese registrado nos nos irmaos'
     label: "Prior-art LIDO (sucede o no superado). De pe: SGH (2604.11378) exclui tarefas cuja dependencia nao se articula antes da execucao; GRADE (2606.22741) usa dependencia para localizar falha, nunca reordena; KARMA: a citacao so vale p/ a v1 (fev/2025). Agent-as-a-Graph: outro problema"
     narrative: "label anterior: SUCESSOR do no superado — o prior-art depois de LIDO, nao citado. Fica de pe: (1) SGH (2604.11378) exclui do proprio escopo grafos cuja dependencia nao e conhecida antes da execucao — a definicao de grafo epistemico; (2) GRADE (2606.22741), com 6 corpora REAIS, usa dependencia so como diagnostico POS-HOC e nunca reordena. CAIU: a citacao do KARMA. NAO ENTROU: Agent-as-a-Graph (2511.18194), que e de outro problema — forcar aresta ali seria guarda que passa sempre. O saldo e que a literatura que constroi DAG dirigido de verdade CONFIRMA nosso limite declarado em vez de contradize-lo"

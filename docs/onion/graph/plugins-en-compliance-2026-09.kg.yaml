@@ -1,7 +1,7 @@
 meta:
   id: plugins-en-compliance-2026-09
   schema_version: "1"
-  baseline: 2026-09-07
+  baseline: "2026-09-07"
   # PLANO-GRAFO CONDUZIVEL da frente "plugins em conformidade TOP PREMIUM e em ingles integral".
   # Existe porque o /meta:drive NAO le markdown: o censo e kg-drive-project.sh sobre este arquivo, e o
   # STATUS DO NO E O PROGRESSO. Um no `decision` por PR (drive_kind: execution), com o criterio de aceite

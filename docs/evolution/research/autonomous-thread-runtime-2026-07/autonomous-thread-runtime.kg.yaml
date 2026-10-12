@@ -3,7 +3,7 @@
 meta:
   id: autonomous-thread-runtime-2026-07
   schema_version: "1"
-  baseline: 2026-07-18
+  baseline: "2026-07-18"
   date: 2026-07-18
 nodes:
   - id: E_SRC_GRADUATED
@@ -13,7 +13,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "web 2026: autonomia e escada graduada Audit-Assist-Automate; Automate e estado GANHO (earned trust: permissoes estreitas + caminho verificado)"
     trace: "https://www.mindstudio.ai/blog/progressive-autonomy-ai-agents-safe-deployment"
     provenance:
@@ -28,7 +28,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "web 2026: merge decidido por politica DETERMINISTICA, nunca probabilistica; IA sugere/acelera, politica decide/forca; agentic workflows read-only por padrao"
     trace: "https://medium.com/@mvtavares/ai-can-speed-up-code-review-but-merge-decisions-still-need-deterministic-guardrails"
     provenance:
@@ -43,7 +43,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "web 2026: humano mantem autoridade sobre a minoria arriscada/irreversivel; IA cuida da maioria rotineira; oversight por nivel de risco no mesmo workflow"
     trace: "https://ideaforgestudios.com/2026/07/17/human-in-the-loop-ai-agents-autonomy-playbook/"
     provenance:
@@ -58,7 +58,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "autonomia graduada ganha por dogfood casa com os 3 atos + toolbox-lifecycle + declarado-nao-verificado do Onion"
     provenance:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md · a275a6b4:docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
@@ -72,7 +72,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "merge por politica deterministica (nunca juizo de IA) casa com o gate mecanico do Onion (lint/selftest/radar) e hooks-sao-codigo"
     provenance:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
@@ -86,7 +86,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "revisor adversarial fable achou 10 furos; 4 ALTA foram contradicoes internas (vendor=outward, auto-merge vs main, LLM na politica, enabler git-nativo ignorado)"
     provenance:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md · a275a6b4:docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
@@ -100,7 +100,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "CONTRATO CRU superado: own-repo docs-mostly = auto-merge seguro; politica com checks de LLM afirmativos; moat so guardava a working-tree alheia"
     provenance:
       source: "docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
@@ -114,7 +114,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "CONTRATO CORRIGIDO: AUTOMATE gated (enabler git-nativo + path-allowlist vendor + politica 100 por cento mecanica, LLM veto-only); worktree propria + beacon-check; 3 guardas de parada"
     provenance:
       source: "a275a6b4:docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md · docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md"
@@ -128,7 +128,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED — ver E_MEDIDO_D_RUNTIME_CONTRACT_2026_09 (SUPERSEDES); label de julho preservado como historia'
     label: "DECISAO (proposed-GATED): escada graduada Nivel0/AUDIT/AUTOMATE-gated/MOAT; 1a passada so no AUDIT (main humano); sela so apos dogfood da Fase 2"
     trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
@@ -144,7 +144,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "W6-por-item superado: propor cada ato-3 e parar; a escada graduada em LOTE supera sem violar o gate do ato-3"
     provenance:
       source: "a275a6b4:docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
@@ -165,7 +165,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED 3/3 — cat docs/evolution/research/autonomous-thread-runtime-2026-07/autonomous-thread-runtime.kg.yaml (nó '
     label: "MEDIDO 2026-09-01: o status=open de D_RUNTIME_CONTRACT DRIFTED — o ADR já registra 'accepted (degrau AUDIT)', selado pelo maestro em 2026-08-27 (aceite qualificado; AUTOMATE segue GATED); o trace do nó (o ADR) existe"
     narrative: "label anterior: MEDIDO 2026-09-01, a verdade atual supera o label de julho: Claim 1 (status=open) DRIFTED: a fonte primária do próprio nó (o ADR) já registra \"accepted (degrau AUDIT)\" com selo do maestro em 2026-08-27 — o nó não reflete mais a decisão real, que evoluiu de proposta para aceite parcial/qualificado (AUDIT selado; AUTOMATE ainda gated). Claim 2 (trace existe) CONFIRMED. Claim 3 (g"

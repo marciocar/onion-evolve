@@ -1,8 +1,8 @@
 meta:
   id: agent-command-composition-2026-09
   schema_version: "1"
-  baseline: 2026-09-28
-  review_after: 2026-12-27   # cadência MERCADO = 90d. O tipo dominante desta rodada é MERCADO/
+  baseline: "2026-09-28"
+  review_after: "2026-12-27"   # cadência MERCADO = 90d. O tipo dominante desta rodada é MERCADO/
                              # ECOSSISTEMA (como o campo NOMEIA e PADRONIZA um movimento, quem
                              # publica especificação aberta, quantas plataformas adotaram) — não é
                              # doutrina (12m), porque o objeto é um rótulo em disputa em 2026, e não
@@ -82,7 +82,7 @@ nodes:
     node_type: question
     plane: DEV
     status: done
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'NAO e medicao do mundo, e declarado como tal: o carimbo afere a DECISAO do maestro de 2026-09-28 que tornou a pergunta sem valor de decisao (construir o /meta:forge), nao uma resposta ao que se perguntava. O nome do composto continua nao-provado em nenhuma direcao.'
     impact: 5
     confidence: 0.55
@@ -96,7 +96,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'https://www.thoughtworks.com/radar/techniques/agent-skills — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026-04'
     source_tier: 7
@@ -115,7 +115,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026-05-14'
     source_tier: 6
@@ -142,7 +142,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.75
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'https://www.newsletter.swirlai.com/p/state-of-context-engineering-in-2026 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2024-11'
     source_tier: 5
@@ -156,7 +156,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'https://www.my2cents.ai/deep-dive/claude-code-workflows/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 5
     source_kind: analyst
@@ -174,7 +174,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'https://strapi.io/blog/what-are-agent-skills-and-how-to-use-them — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 4
     source_kind: vendor-on-competitor
@@ -193,7 +193,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'Sintese da rodada 2026-09-28: eixo ANALISTA e eixo GOVERNANCA devolveram sinal confirmado (Thoughtworks Radar vol. 34 tier 7 nomeando o padrao; MCP sob a Agentic AI Foundation / Linux Foundation tier 5; adocao declarada em 26+ plataformas tier 4). Eixo CAPITAL — rodadas de investimento, M&A, valuation, down round — devolveu ZERO claim, confirmada ou refutada: nenhuma fonte alcancada nesta rodada tratou de dinheiro'
     source_tier: 10
     source_kind: measurement
@@ -212,7 +212,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'Contagem do payload desta rodada, feita nesta sessao: 35 fontes no escopo · 31 claims julgadas na votacao adversarial · 5 confirmadas · 20 refutadas com entrada individual no payload · 0 nao verificadas por falha de acesso (403, doc truncada, so agregador) · 11 URLs distintas produziram pelo menos uma claim · 6 claims aparecem na contagem de 31 sem entrada individual recebida por esta sessao · 24 das 35 fontes nao produziram claim alguma'
     source_tier: 10
     source_kind: measurement
@@ -243,7 +243,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "A context store is a backing system that persists context units: s=(σ,ι,ϕ) where σ is the store type (git repository, relational database, connector to external system, file system)... Stores are accessed exclusively through the Context Runtime Interface." — LOCATOR: arXiv:2604.11623v3, Seção 3.2 (Core Abstractions), Definição 3.3 (Context Store); paper.txt l.273-276 na cópia lida. DIVERGÊNCIA DECLARADA pelo próprio leitor: o número de página (p.6) NÃO é verificável na renderização HTML. ancorada por verificador independente'
     valid_from: '2026-04-16'
     source_tier: 4
@@ -262,7 +262,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "Freshness Manager (continuous monitoring with four states: fresh, stale, expired, conflicted)" — LOCATOR: arXiv:2604.11623v3, Seção 3.3 (arquitetura de sistema); paper.txt l.307 ("Freshness Manager (continuous mon-") e l.665 ("Liveness Probe / Freshness Manager / Health monitoring with corrective action"). DIVERGÊNCIA DECLARADA pelo próprio leitor: o Requisito 2.4 vive na Seção 2.3, não na 3.3; páginas (6-7) não verificáveis em HTML. ancorada por verificador independente'
     valid_from: '2026-04-16'
     source_tier: 4
@@ -281,7 +281,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "Requirement 2.4 (Context Freshness (NIST: Measure 2.6 — data quality and relevance)). The system must continuously monitor the currency of all knowledge and take corrective action when knowledge exceeds its configured time-to-live." — LOCATOR: arXiv:2604.11623v3, Seção 2.3 (subseção da Seção 2, Requirements); paper.txt l.225. DIVERGÊNCIA DECLARADA: página 5 não verificável em HTML. ancorada por verificador independente'
     valid_from: '2026-04-16'
     source_tier: 4
@@ -300,7 +300,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "This invariant is enforced at registration time: the Permission Engine rejects any agent profile that is not a strict subset, that includes operations outside the user''s role, or that specifies a less restrictive tier than the user''s." — LOCATOR: arXiv:2604.11623v3, Seção 3.4 (The Agent Permission Model), imediatamente após a Design Invariant 3.7 (Agent Permission Subset); paper.txt l.367-369. DIVERGÊNCIA DECLARADA: página 7 não verificável em HTML. MEDIÇÃO DE AUSÊNCIA no mesmo documento: "write(" ocorre UMA única vez no paper inteiro (l.286, assinatura de adapter "write(conn, path, c) → Result"), sem critério de aceitação, sem schema, sem validação descrita. ancorada por verificador independente'
     valid_from: '2026-04-16'
     source_tier: 4
@@ -319,7 +319,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "B0: Ungoverned RAG 375 26.5% 80.9% 0/5 ... B3: Context Kubernetes 307 20.9% 64.0% 5/5" — LOCATOR: arXiv:2604.11623v3, Tabela 6; paper.txt l.808-814. DIVERGÊNCIA DECLARADA pelo verificador: o claim citava "Seção 8, Tabela 6"; a Tabela 6 está na Seção 7.2 (Governance Impact Experiments), NÃO na Seção 8. Confirmados no texto/legenda: os quatro baselines (B0 Ungoverned RAG, B1 ACL-filtered RAG, B2 RBAC-aware RAG, B3 Context Kubernetes) e "Four governance baselines compared (200 queries, synthetic data)". ancorada por verificador independente'
     valid_from: '2026-04-16'
     source_tier: 4
@@ -338,7 +338,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "No production deployment. All experiments run against seed data in a local prototype... Organizational intelligence not implemented. Requirement R7 (Context Operators with pattern extraction, learning loops) is designed but not implemented in the prototype." — LOCATOR: arXiv:2604.11623v3, Seção 9.1 (Limitations); paper.txt l.1035-1040 e l.1055-1057. DIVERGÊNCIA DECLARADA: páginas 19-20 não verificáveis em HTML; entre as duas frases unidas pela elipse existe no original a frase intermediária "Single-author evaluation. The gap analysis (Table 8) and the experiment design are by the author." — nada foi omitido de conteúdo (o claim a menciona em prosa), houve reordenação na citação. AUTORIA lida no próprio documento: Charafeddine Mouzouni, OPIT – Open Institute of Technology, and Cohorte AI, Paris, France (l.1-13), preprint arXiv v3 de 16 abr 2026. ancorada por verificador independente'
     valid_from: '2026-04-16'
     source_tier: 4
@@ -357,7 +357,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "We formalize six core abstractions, a YAML-based declarative manifest for knowledge-architecture-as-code, a reconciliation loop, and a three-tier agent permission model where agent authority is always a strict subset of human authority." — LOCATOR: arxiv.org/abs/2604.11623v3, Abstract. ancorada por verificador independente'
     valid_from: '2026-04-16'
     source_tier: 4
@@ -377,7 +377,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "The `SKILL.md` file must contain YAML frontmatter followed by Markdown content." e, na tabela de Frontmatter, "| `name` | Yes | Max 64 characters. Lowercase letters, numbers, and hyphens only... | `description` | Yes | Max 1024 characters. Non-empty." — LOCATOR: agentskills.io/specification, seções "SKILL.md format" e "Frontmatter" (curl ao vivo, rc=200, 445 KB); license, compatibility, metadata e allowed-tools constam com Required=No. ancorada por DOIS leitores independentes e por verificador independente'
     source_tier: 9
     source_kind: standard-spec
@@ -395,7 +395,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "The Markdown body after the frontmatter contains the skill instructions. There are no format restrictions. Write whatever helps agents perform the task effectively." e "Keep file references one level deep from SKILL.md. Avoid deeply nested reference chains." — LOCATOR: agentskills.io/specification, seção "Body content". MEDIÇÃO DE AUSÊNCIA no payload inteiro da página: "orchestrat" = 0 ocorrências. ancorada por verificador independente'
     source_tier: 9
     source_kind: standard-spec
@@ -413,7 +413,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "Agents load skills *progressively*, pulling in more detail only as a task calls for it." e "A skill is a directory containing, at minimum, a `SKILL.md` file... Agents load skills through progressive disclosure, in three stages: Discovery... Activation... Execution" — LOCATOR: agentskills.io/specification, seção "Progressive disclosure" (itens 1-3: Metadata ~100 tokens · Instructions <5000 tokens · Resources as needed) e agentskills.io, seções "Directory structure" e "How do Agent Skills work?". MEDIÇÃO DE AUSÊNCIA na mesma página: "knowledge graph" = 0 ocorrências; as três subseções opcionais são scripts/, references/ e assets/ — todas de ENTRADA. ancorada por DOIS leitores independentes e por verificador independente'
     source_tier: 9
     source_kind: standard-spec
@@ -431,7 +431,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "Every Skill requires a `SKILL.md` file with YAML frontmatter... **Required fields:** `name` and `description`" — LOCATOR: platform.claude.com/docs/en/agents-and-tools/agent-skills/overview, seções "Why use Skills" e "Skill structure". ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-primary
@@ -450,7 +450,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "The orchestration layer consumes zero tokens. The structure is fixed at definition time—and that''s the point." — LOCATOR: opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/ (confirmado por grep no HTML bruto). ancorada por verificador independente'
     valid_from: '2026-05-14'
     source_tier: 6
@@ -470,7 +470,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "Model Context Protocol has been established as **Model Context Protocol a Series of LF Projects, LLC**." — LOCATOR: modelcontextprotocol.io/community/governance, seção "General Project Policies". A mesma página descreve a governança técnica hierárquica (Lead Maintainers/BDFL, Core Maintainers, Maintainers) e SEPs para mudança de spec. MEDIÇÃO DE AUSÊNCIA declarada pelos leitores: a página NÃO cita "Agentic AI Foundation" pelo nome. ancorada por DOIS leitores independentes e por verificador independente'
     source_tier: 9
     source_kind: project-primary
@@ -488,7 +488,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "The Linux Foundation announced the formation of the Agentic AI Foundation (AAIF) with founding contributions of leading technical projects including Anthropic''s Model Context Protocol (MCP), Block''s goose, and OpenAI''s AGENTS.md." — LOCATOR: linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, press release de 9 dez 2025 (HTML bruto conferido via curl, não newsletter nem blog de terceiro). ancorada por verificador independente'
     valid_from: '2025-12-09'
     source_tier: 10
@@ -507,7 +507,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'QUOTE verbatim: "Bringing these projects together under the AAIF ensures they can grow with the transparency and stability that only open governance provides. The Linux Foundation is proud to serve as the neutral home" — LOCATOR: linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, parágrafo de citação de apoio. ancorada por verificador independente'
     valid_from: '2025-12-09'
     source_tier: 10
@@ -527,7 +527,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'Contagem do payload desta rodada de primárias, feita nesta sessão: 4 leitores nomeados (context-kubernetes-paper, agentskills-spec, conductor-msft, mcp-governance) sobre 7 documentos primários distintos · 0 fontes inalcançáveis · 22 entradas de claim recebidas · 18 ANCORADAS · 4 REJEITADAS na ancoragem (3 EXAGERADAS + 1 NAO-ENCONTRADA) · 18 ancoradas consolidadas em 15 nós de evidência (3 claims ancoradas por DOIS leitores independentes cada, sem duplicar nó) · 9 objeções do Elenxo julgadas, das quais 6 SOBREVIVEM (todas contra o paper) e 3 NÃO sobrevivem (as três da especificação Agent Skills, que portanto ficam de pé)'
     source_tier: 10
     source_kind: measurement
@@ -545,7 +545,7 @@ nodes:
     node_type: question
     plane: DEV
     status: confirmed
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'leitura integral da fonte primaria (88 KB): (i) o abstract declara governar entrega/permissao; (ii) `write(` ocorre 1x, como assinatura de adapter, sem critério de aceitação; (iii) o único gate determinístico está no REGISTRO do perfil de agente e é `design invariant`, não `verified property`; (iv) o R7 (Context Operators) é design NÃO implementado.'
     impact: 5
     confidence: 0.8
@@ -565,7 +565,7 @@ nodes:
     status: confirmed
     source_tier: 10
     source_kind: primary-doc
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'curl do arquivo bruto: http 200, 176.749 BYTES (o que o curl emite em size_download; 176.151 é a contagem de CARACTERES de `wc -m`, e atribuir esse número ao curl era troca de unidade — apontado pela passada adversarial) + extração VERBATIM confirmada por `grep -F` (1 ocorrência cada) + contagens de termo CASE-INSENSITIVE; docs/workflow-syntax.md do repositório oficial'
     label: 'O Conductor VALIDA A SAÍDA DO AGENTE CONTRA SCHEMA e pede correção na MESMA sessão — VERBATIM: "When declared, conductor enforces a strict contract: stdout must be a single JSON object, the JSON gets merged onto the `{stdout, stderr, exit_code}` baseline, and the **merged dict** is validated against the schema"; e "If either check fails, a correction prompt is sent in the same session asking the model to fix its response", com o número de tentativas configurável ("This field controls how many correction prompts to send"). Medido no arquivo bruto, CASE-INSENSITIVE: `schema` 45x, `validat` 113x, `JSON` 79x, `retry` 26x (sensível a caixa: 39/102/50/25 — a distinção importa e estava omitida). CORROBORADO NA IMPLEMENTAÇÃO, não só na documentação do fornecedor: `src/conductor/config/schema.py` l.625-626, `providers/hermes.py` l.724 e `_pydantic_ai/structured_output.py` l.60 — sem isso, `source_tier: 10` afirmaria COMPORTAMENTO a partir de doc de fornecedor, que é a lacuna declarado-vs-verificado que a KB behavior-over-declaration nomeia. ISTO É MAIS FORTE que a claim original da rodada, que falava só de estrutura fixa em tempo de definição: há gate DETERMINÍSTICO sobre a FORMA da saída, com laço de correção. O que ele NÃO é: gate sobre o CONTEÚDO do que se produz, nem destino obrigatório — permanece convergente com o veredito de Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART.'
     trace: 'https://raw.githubusercontent.com/microsoft/conductor/main/docs/workflow-syntax.md'
@@ -579,7 +579,7 @@ nodes:
     node_type: question
     plane: DEV
     status: done
-    verified_at: 2026-09-28
+    verified_at: "2026-09-28"
     verified_against: 'micro-ancoragem executada nos dois locators: docs/workflow-syntax.md (http 200, 176.151 bytes) ANCOROU e gerou E_CONDUCTOR_SCHEMA_VALIDATION_ANCORADO; o post oficial (http 200, 242.008 bytes, 12.993 caracteres de texto) NAO contem a frase do roteamento-sem-veto — dez termos medidos, zero ocorrencias.'
     impact: 3
     confidence: 0.6

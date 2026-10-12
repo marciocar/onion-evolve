@@ -2,7 +2,7 @@
 meta:
   id: onion-brand-voice-2026-07
   schema_version: "1"
-  baseline: 2026-07-19
+  baseline: "2026-07-19"
   date: 2026-07-19
 nodes:
   - id: E_HOOK_IS_DATA
@@ -12,7 +12,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "o gancho anti-hype = especificidade do dado verificavel (0-20% delegacao; 40%/55%, Anthropic 2026), nao superlativo"
     provenance:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
@@ -26,7 +26,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "README de onion-standalone ja e padrao-ouro de arquitetura de marca (Onion H1; plataforma badge cinza + <sub>)"
     provenance:
       source: "onion-standalone@51b76be:README.md"
@@ -39,7 +39,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "tensao anti-hype-mas-fisga RESOLVIDA: a precisao do numero citado e a fisga; mantem tom denso do core sem hype"
     provenance:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
@@ -53,7 +53,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "Casa de Marca: Onion herói/mãe; plataforma = metadado de compatibilidade (nunca H1); universalidade citada como FATO"
     provenance:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
@@ -67,7 +67,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "voz sela a fronteira comercial: gratis=o texto (standalone completo); moat=a rede (federacao=hub). Nunca prometer federacao no standalone; nunca pricing na porta (D1)"
     provenance:
       source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"

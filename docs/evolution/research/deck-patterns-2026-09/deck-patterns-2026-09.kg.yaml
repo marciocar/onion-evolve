@@ -1,8 +1,8 @@
 meta:
   id: deck-patterns-2026-09
   schema_version: "1"
-  baseline: 2026-09-24
-  review_after: 2027-09-24   # cadência DOUTRINA = 12m. O tipo dominante desta rodada é DOUTRINA DE
+  baseline: "2026-09-24"
+  review_after: "2027-09-24"   # cadência DOUTRINA = 12m. O tipo dominante desta rodada é DOUTRINA DE
                              # APRESENTAÇÃO/DOCUMENTAÇÃO — Divio/Diátaxis (valid_from 2017/2020) e
                              # NN/g (progressive disclosure), textos que não são reescritos a cada
                              # release. NÃO é ferramenta/preço (30d) nem mercado (90d): o eixo
@@ -64,7 +64,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'https://docs.divio.com/documentation-system/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2017'
     source_tier: 8
@@ -83,7 +83,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'https://www.nngroup.com/articles/progressive-disclosure/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1), o consenso mais fragil da rodada'
     source_tier: 7
     source_kind: analyst
@@ -101,7 +101,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.65
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'https://ubuntu.com/blog/diataxis-a-new-foundation-for-canonical-documentation — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2020'
     source_tier: 6
@@ -120,7 +120,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'https://www.nngroup.com/articles/progressive-disclosure/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0). MESMA URL de E_DISCLOSURE_TETO_DUAS_CAMADAS'
     source_tier: 7
     source_kind: analyst
@@ -139,7 +139,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'Sintese da rodada: nenhuma claim do eixo mercado/capital/analistas sobreviveu a votacao adversarial. Zero rodadas de investimento, zero M&A, zero relatorio de analista confirmado. As 2 claims sobre o Thoughtworks Technology Radar (4 quadrantes; 4 aneis Adopt/Trial/Assess/Hold) — o item mais proximo de sinal de analista neste tema — foram REFUTADAS (tier 7 cada)'
     source_tier: 10
     source_kind: measurement
@@ -158,7 +158,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'Contagem do payload da rodada feita nesta sessao: 11 URLs distintas alcancadas, 28 claims julgadas, 4 confirmadas, 24 refutadas, 0 nao verificadas por falha de acesso'
     source_tier: 10
     source_kind: measurement
@@ -276,7 +276,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'Objecao do Elenxo (1 agente, sem votacao) cruzada com medicao propria nesta sessao: grep -n "Diataxis\|Zettelkasten" docs/knowledge-base/education/applications/educational-design-guidelines.md devolve l.30 com o texto verbatim "convergencia Zettelkasten (literature!=permanent notes) - Diataxis (reference!=how-to)", na coluna "vinculante", com "decisao do maestro 2026-07-05"; e o proprio Scope registra 5 claims refutadas que atribuiam ordem ao Diataxis'
     source_tier: 10
     source_kind: measurement
@@ -294,7 +294,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'Objecao do Elenxo (1 agente, sem votacao) cruzada com medicao propria: git show docs/deck-iftl-rebased:docs/evolution/decks/iftl-frameworks-agentes-2026-08.html | grep -o "short:1" | wc -l = 18, contra grep -c "^{act:" = 52 slides; e os rotulos "caminho curto" e "essenciais" presentes no mesmo arquivo'
     source_tier: 10
     source_kind: measurement
@@ -312,7 +312,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'Objecao do Elenxo (1 agente, sem votacao) verificavel no proprio payload da rodada: achados 1 e 3 sao a doutrina Diataxis (docs.divio.com tier 8 e ubuntu.com tier 6); achados 2 e 4 citam a URL IDENTICA https://www.nngroup.com/articles/progressive-disclosure/. 4 claims, 2 URLs-fonte'
     source_tier: 10
     source_kind: measurement
@@ -330,7 +330,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'Objecao do Elenxo (1 agente, sem votacao) cruzada com medicao propria: grep -oiE "(navegar|mapa|M fecha|Clique para saltar|caminho curto|essenciais)" no deck versionado devolve todos os rotulos presentes (Mapa, Clique para saltar, navegar, caminho curto, essenciais)'
     source_tier: 10
     source_kind: measurement
@@ -348,7 +348,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'Objecao do Elenxo (1 agente, sem votacao) cruzada com medicao propria nesta sessao — os 4 sitios existem e dizem o que ela afirma: ls docs/knowledge-base/education/theories/ = plea-rosario.md, srl-zimmerman.md; educational-design-guidelines.md l.3 "Versao 1.3.0 | 2026-07-05" e l.27 diretriz 2 com "Fan et al. 2025, RCT peer-reviewed" (srl-zimmerman.md l.53: BJET 56(2), DOI 10.1111/bjet.13544, N=117); onion-guided-lifecycle.md l.51-52 "Orient -> Activate -> Reinforce" e l.45 "3 perguntas criticas + avancado adiado"; .claude/skills/onion-onboarding/SKILL.md l.43-45 "comece pelo papel DELE ... Nao despeje os 6 papeis de uma vez"'
     source_tier: 10
     source_kind: measurement
@@ -366,7 +366,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-24
+    verified_at: "2026-09-24"
     verified_against: 'Objecao do Elenxo (1 agente, sem votacao) REPRODUZIDA nesta sessao: git branch -a --list "*deck*" = docs/deck-iftl-frameworks-agentes e docs/deck-iftl-rebased (+ os remotes); git ls-tree -r --name-only main | grep -c "evolution/decks/" = ZERO; no unico deck existente, grep -c "^{act:" = 52 e os atos distintos sao 9 (Ato 0 O gancho ... Ato 8 Sua vez). Nenhum artefato com 65 slides em nenhuma branch'
     source_tier: 10
     source_kind: measurement

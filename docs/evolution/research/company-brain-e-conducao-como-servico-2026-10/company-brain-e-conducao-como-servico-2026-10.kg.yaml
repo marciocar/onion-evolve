@@ -1,8 +1,8 @@
 meta:
   id: company-brain-e-conducao-como-servico-2026-10
   schema_version: "1"
-  baseline: 2026-10-01
-  review_after: 2026-10-31   # 30d: FERRAMENTA/PRECO e o tipo DOMINANTE, e nao por pouco — de 24
+  baseline: "2026-10-01"
+  review_after: "2026-10-31"   # 30d: FERRAMENTA/PRECO e o tipo DOMINANTE, e nao por pouco — de 24
                              # claims confirmadas, 15 sao LEITURA DE PAGINA DE PRECO (dust.tt,
                              # getzep.com, onyx.app, humanitec.com, port.io, roadie.io, keygen.sh,
                              # getguru.com, polar.sh). O eixo mercado/capital (Glean, Pivotal)
@@ -62,7 +62,7 @@ nodes:
     impact: 5
     confidence: 0.5
     label: 'Das duas candidatas que a rodada anterior NAO atacou e que sao as mais proximas da identidade do Onion — (b) o GRAFO/Company Brain como servico ancorado com proveniencia verificavel, e (d) a CONDUCAO/ADOCAO como servico —, qual tem unidade bilhetavel VIAVEL em outubro de 2026 sem contradizer a identidade canonica de framework template em .claude/ sem npm e sem CLI standalone, qual exige menos receptor hospedado para comecar, e qual delas o mercado JA PROVOU que morre? Sete eixos pedidos: (1) Company Brain com preco publicado e unidade de cobranca, (2) metodo como produto recorrente, (3) o cemiterio das duas categorias, (4) o receptor hospedado minimo e quanto dele ja e comprável, (5) proveniencia como feature paga, (6) ICP e disposicao a pagar, (7) mercado e capital. PERMANECE ABERTA, e a razao e medida: o eixo 1 tem preco em 6 fornecedores mas nenhum do lado SUITE (Rovo, Copilot sobre o Graph, Notion, Writer, Sana, Hebbia, Credal, Gradial nunca abertos); o eixo 3 tem UMA evidencia confirmada; o eixo 6 nao tem NENHUMA — nenhum caso publico com numero de quem assina o cheque; e o eixo 7 se resume a um ARR que a propria fonte chama de metrica questionavel.'
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'rodada de 2026-10-01: 7 fontes lidas, 67 claims levantadas, 24 confirmadas, 13 refutadas por fonte fraca, 0 nao verificadas por 403 ou truncagem; 10 objecoes sobreviventes do Elenxo, 10 modeladas; duas medicoes locais tier 10 acrescentadas nesta sessao (corpus de 114 grafos e 3.830.401 bytes; 22 membros na federacao)'
     trace: 'docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml'
 
@@ -74,9 +74,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.98
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'medido nesta maquina em 2026-10-01: `find docs -name "*.kg.yaml" -not -path "*/worktrees/*" | wc -l` = 114 arquivos; soma de bytes pelo mesmo find com -printf %s = 3.830.401; divisao por 350 bytes por credito (regra publicada do Zep) = 10.944 creditos para reingerir TODO o conhecimento do Onion uma vez'
-    valid_from: 2026-10-01
+    valid_from: "2026-10-01"
     source_tier: 10
     source_kind: internal-audit
     label: 'MEDIDO AQUI, e e o numero que decide a opcao (b) pelo VOLUME: o corpus inteiro de grafos do core sao 114 arquivos .kg.yaml e 3.830.401 bytes. Ao unico preco publicado de grafo-como-servico do mercado (Zep, 1 credito por episodio de ate 350 bytes), reingerir o ativo COMPLETO do Onion custa 10.944 creditos — pouco acima dos 10.000 que o plano FREE da por mes, e 22 por cento do plano Flex de US$125. Dito sem anestesia: ao preco do mercado, todo o conhecimento acumulado do Onion vale aproximadamente ZERO por mes. A unidade de consumo existe; o volume de um grafo CURADO A MAO nao alcanca o piso bilhetavel — e grafo curado a mao e exatamente a identidade do Onion, nao um defeito dele.'
@@ -93,9 +93,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'medido nesta maquina em 2026-10-01: `grep -c "^\s*-\s*id:" docs/evolution/federation/members.yaml` = 22, rc=0, arquivo de 64.096 bytes com data de 2026-09-30'
-    valid_from: 2026-09-30
+    valid_from: "2026-09-30"
     source_tier: 10
     source_kind: internal-audit
     label: 'MEDIDO AQUI, e e o que a opcao (d) tem de concreto: a federacao do Onion registra 22 membros em docs/evolution/federation/members.yaml. Ou seja, o Onion SABE contar repos adotados sem receptor hospedado nenhum — a unidade por repo onboarded e a unica que ele consegue medir hoje, com git e um arquivo versionado. O problema nao e medir: e que NENHUM fornecedor de metodo-como-produto cobra por essa unidade (ver E_OBJECAO_NINGUEM_PAGA_POR_REPO_ONBOARDED). A unidade que a casa tem e a unidade que ninguem paga.'
@@ -112,9 +112,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'bash .claude/validation/kg-corpus-grep.sh "company brain" em 2026-10-01 → acertos em 8 grafos, com o grafo DEDICADO docs/onion/graph/company-brain-market-2026-07.kg.yaml (30 nos, baseline 2026-07-25, nos de censo de 2026-09-01)'
-    valid_from: 2026-07-25
+    valid_from: "2026-07-25"
     source_tier: 10
     source_kind: internal-audit
     label: 'O CORPUS JA FALAVA DO TEMA, e isso muda o que esta rodada acrescenta. O grafo company-brain-market-2026-07 ja tinha: a categoria NOMEADA por fonte primaria (Company Brain e uma das 15 categorias do Request for Startups Summer 2026 da Y Combinator, com a ressalva de que RFS e lista de desejos de investidor, nao prova de demanda paga), Glean a US$7,2 bi de valuation com ARR indo de 200 para 300 milhoes, e o auto-exame dos TRES VERBOS da definicao da YC em que a casa FALHA no do meio (manter atual). ESTA rodada nao contradiz nada daquele grafo — ela SUPERSEDE POR COMPLETUDE uma frase do grafo IRMAO do mesmo dia, unidade-bilhetavel-do-onion-2026-10, cujo no C_OPCAO_B_GRAFO_COMPANY_BRAIN_ANCORADO afirma "zero evidencia externa nesta rodada sobre quem paga por grafo de conhecimento ancorado, zero comparavel de preco": agora existe comparavel (Zep por consumo, Onyx a US$20 por assento, Dust por assento mais credito) e existe o veredito de proveniencia (Guru a anuncia e NAO lhe da preco proprio). Sem aresta cross-arquivo por decisao de maquinaria: o radar reprova referencia pendurada fora do modo proposta.'
@@ -133,9 +133,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://dust.tt/pricing — votos 3-0, pagina de preco do proprio fornecedor'
-    valid_from: 2026-10
+    valid_from: "2026-10"
     source_tier: 9
     source_kind: primary
     label: 'A Dust publica preco Business por ASSENTO com credito embutido: Pro a 24 euros por mes no anual ou 30 no mensal, com 8.000 creditos por assento por mes; Max a 120 euros no anual ou 150 no mensal, com 40.000 creditos por assento; Enterprise sem preco, so contato comercial. A unidade e hibrida — assento mais consumo de mensagem de agente — e nao e por documento indexado, por consulta nem por conector. Para a pergunta do Onion isto e relevancia baixa e o label diz por que: um preco por assento so e transportavel para quem HOSPEDA IDENTIDADE, e um template vendorizado em .claude/ nao tem login, usuario autenticado nem quem conte assentos.'
@@ -152,9 +152,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://dust.tt/pricing — votos 2-1, leitura de ausencia na pagina de preco'
-    valid_from: 2026-10
+    valid_from: "2026-10"
     source_tier: 9
     source_kind: primary
     label: 'SOC 2 Type II e SSO aparecem em todos os planos pagos da Dust; SCIM, logs de auditoria e single-tenant ficam so no Enterprise. E a pagina NAO menciona grafo de conhecimento nem proveniencia como feature paga. Este e o achado que nao pode ser lido de forma confortavel: ausencia numa pagina de MARKETING nao e ausencia de feature, e ausencia de SALIENCIA COMERCIAL — se a proveniencia fechasse contrato, estaria ali. Lido contra o Onion, pesa CONTRA a tese de que proveniencia verificavel e diferencial pago, e nao a favor de lacuna de mercado.'
@@ -171,7 +171,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.onyx.app/pricing — votos 3-0, pagina de preco do proprio fornecedor'
     valid_from: "2026"
     source_tier: 9
@@ -190,7 +190,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.getzep.com/pricing — votos 2-1, pagina de preco do proprio fornecedor'
     source_tier: 9
     source_kind: primary
@@ -208,7 +208,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.getzep.com/pricing — votos 3-0, pagina de preco do proprio fornecedor'
     source_tier: 9
     source_kind: primary
@@ -226,7 +226,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://glean.com — votos 2-1, homepage do fornecedor; leitura de ausencia, tier rebaixado a 5 porque homepage nao e pagina de preco'
     source_tier: 5
     source_kind: primary
@@ -244,9 +244,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.getguru.com/pricing — votos 3-0, pagina de preco do proprio fornecedor; leitura de ausencia na pagina DEDICADA a preco'
-    valid_from: 2026-10
+    valid_from: "2026-10"
     source_tier: 8
     source_kind: primary
     label: 'O Guru NAO publica preco na propria pagina de precos em outubro de 2026: sem valor por assento, sem tiers, sem unidade de cobranca — o preco e sob consulta e personalizado por escala, complexidade do conhecimento e maturidade de IA. Isto e o VEREDITO do eixo 1 e vale mais que os precos publicados que a rodada coletou: o fornecedor que mais se aproxima do que o Onion quer vender (conhecimento VERIFICADO, com lineage, com fluxo de verificacao) e justamente o que renunciou a unidade publicada. A ausencia aqui nao e falta de saliencia: e desenho comercial.'
@@ -263,9 +263,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.getguru.com/pricing — votos 3-0, pagina de preco do proprio fornecedor'
-    valid_from: 2026-10
+    valid_from: "2026-10"
     source_tier: 8
     source_kind: primary
     label: 'O pacote cobrado do Guru inclui SERVICO HUMANO junto da plataforma: equipe de solution engineers, desenho da arquitetura de conhecimento e otimizacao continua. Ou seja, Company Brain vendido COM CONDUCAO EMBUTIDA, nao software puro. Este e o unico precedente da rodada que valida o PACOTE (b mais d) em vez de uma das duas isolada — e valida na forma que o mercado aceitou: preco fechado por contrato, nunca unidade publicada. Para o Onion, cuja Conducao ja existe implementada e com adotantes reais, isto e a evidencia mais acionavel do grafo.'
@@ -282,9 +282,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.getguru.com/pricing — votos 3-0, pagina de preco do proprio fornecedor'
-    valid_from: 2026-10
+    valid_from: "2026-10"
     source_tier: 8
     source_kind: primary
     label: 'O Guru vende como feature de GOVERNANCA respostas permission-aware com citacoes e lineage, mais fluxos de verificacao e sinais de uso — ou seja, proveniencia E anunciada, mas empacotada dentro do plano personalizado, SEM preco proprio. Resposta direta ao eixo 5: ALGUEM vende proveniencia, e ninguem a precifica separadamente. Logo a pergunta "e lacuna de mercado ou sinal de que ninguem paga por isso" tem terceira resposta medida: proveniencia e feature que SUSTENTA contrato de governanca, nao linha de fatura. Ela ajuda a fechar, nao a cobrar.'
@@ -303,9 +303,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://humanitec.com/pricing — votos 3-0, pagina de preco do proprio fornecedor'
-    valid_from: 2026-10
+    valid_from: "2026-10"
     source_tier: 9
     source_kind: primary
     label: 'A unidade recorrente de metodo e golden paths como produto no Humanitec e um PACOTE DE TIER — usuarios incluidos mais limite de projetos e ambientes — cobrado num receptor hospedado como SaaS ou instalado como self-hosted. NAO e por repo onboarded, NAO e por golden path mantido. Isto responde o eixo 2 e, lido inteiro, pesa contra (d): as duas unidades que o Onion poderia medir sem receptor nenhum sao exatamente as duas que o mercado nao comprou.'
@@ -322,7 +322,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.port.io/pricing — votos 3-0, pagina de preco do proprio fornecedor'
     valid_from: "2025"
     source_tier: 8
@@ -341,7 +341,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://roadie.io/pricing/ — votos 2-1, pagina de preco do proprio fornecedor'
     source_tier: 8
     source_kind: primary
@@ -354,7 +354,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://keygen.sh/pricing/ — votos 3-0, pagina de preco do proprio fornecedor'
     source_tier: 8
     source_kind: primary
@@ -374,9 +374,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://en.wikipedia.org/wiki/Pivotal_Software — votos 2-1, agregador; tier 5 e confianca 0,6 porque e enciclopedia e nao fonte primaria da operacao'
-    valid_from: 2019-12-30
+    valid_from: "2019-12-30"
     source_tier: 5
     source_kind: aggregator
     label: 'A VMware adquiriu a Pivotal — acordo em 22/08/2019, fechamento em 30/12/2019 — e absorveu o metodo dentro da suite Tanzu; a Pivotal Labs foi RENOMEADA VMware Tanzu Labs em janeiro de 2021. E o caso canonico de metodo-como-produto que nao sobrevive sozinho: absorvido por uma suite de plataforma, perdendo inclusive o nome. UNICA evidencia confirmada do eixo 3 neste grafo, e e pouco para selar um cemiterio: o caso mais decisivo — Thoughtworks Studios, divisao de PRODUTO criada em 2006 para comercializar metodo (Mingle, Twist/Gauge, Snap CI, GoCD) e FECHADA em 2020 — caiu no lado refutado por fonte fraca, sem contra-evidencia. Dois casos independentes apontando a mesma direcao, e so um deles sobreviveu ao filtro de tier.'
@@ -395,7 +395,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://polar.sh/docs/features/benefits/license-keys — votos 3-0, documentacao do proprio fornecedor'
     source_tier: 8
     source_kind: primary
@@ -413,7 +413,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://polar.sh/docs/features/benefits/license-keys — votos 3-0, documentacao do proprio fornecedor'
     source_tier: 8
     source_kind: primary
@@ -433,9 +433,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.thoughtworks.com/radar/techniques — votos 3-0, Technology Radar Vol 34 de abril de 2026, fonte de analista'
-    valid_from: 2026-04
+    valid_from: "2026-04"
     source_tier: 7
     source_kind: analyst
     label: 'O Thoughtworks Technology Radar Vol 34, de abril de 2026, coloca Context Graph em ASSESS: grafo de conhecimento em que decisoes, politicas, excecoes e precedentes sao nos conectados, estruturado para consumo por IA. Dois efeitos opostos para o Onion, e os dois contam. A FAVOR: a tecnica que a casa pratica desde 2026-07 acaba de ganhar NOME DE ANALISTA — deixa de ser idiossincrasia e passa a ser categoria citavel numa conversa de venda. CONTRA: Assess significa que a tecnica esta sendo avaliada por todos, logo a vantagem de ter chegado primeiro tem prazo, e quem a nomeou e uma consultoria que vende metodo — isto e, a categoria nasce publica justamente na mao de quem compete em (d).'
@@ -452,9 +452,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.thoughtworks.com/radar/techniques — votos 3-0, Technology Radar Vol 34 de abril de 2026, fonte de analista'
-    valid_from: 2026-04
+    valid_from: "2026-04"
     source_tier: 7
     source_kind: analyst
     label: 'Segundo o Radar Vol 34, o Context Graph se diferencia de GraphRAG por manter VALIDADE TEMPORAL em cada aresta, invalidando fatos supersedidos em vez de sobrescreve-los — que e literalmente o mecanismo do grafo do Onion (valid_from contra verified_at, SUPERSEDES e REFUTES, nunca apagar). Leitura honesta: isto CONFIRMA que a casa escolheu a arquitetura que o estado da arte reconhece, e simultaneamente mostra que ela NAO e proprietaria. O diferencial do Onion nao pode ser a bi-temporalidade, porque um analista acabou de publica-la como tecnica em avaliacao; se houver diferencial, ele esta na VERIFICACAO DATADA com radar determinístico sem LLM, que nenhuma fonte desta rodada menciona.'
@@ -471,9 +471,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.thoughtworks.com/radar — votos 3-0, leitura de ausencia na fonte de analista'
-    valid_from: 2026-04
+    valid_from: "2026-04"
     source_tier: 6
     source_kind: analyst
     label: 'O Radar Vol 34 nao traz precos publicados, unidades de cobranca, ICP, M&A nem cemiterio de knowledge management e enterprise search: ele NAO responde aos eixos comerciais da pergunta. Declarado como no para que a cobertura do grafo nao seja lida como maior do que e — a melhor fonte tecnica desta rodada e muda em 4 dos 7 eixos pedidos.'
@@ -490,9 +490,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://github.com/caelstewart/company-brain — votos 3-0, repositorio publico; tier 4 por ser projeto de engenheiro sem tracao declarada'
-    valid_from: 2026-04
+    valid_from: "2026-04"
     source_tier: 4
     source_kind: engineer
     label: 'O repositorio caelstewart/company-brain, da Merge Labs, e um motor open-source MIT de grafo de conhecimento TEMPORAL — entities, facts com valid_at e invalid_at, episodes imutaveis — sobre PostgreSQL com pgvector, declarado como alpha e prototipo de pesquisa, sem endurecimento para SOC2 ou auth. E o repo NAO contem preco publicado, oferta SaaS nem termos comerciais: a unica monetizacao citada e consultoria ad-hoc por contato direto, sem tabela. Leitura para (b): o motor que o Onion teria de construir ou integrar JA EXISTE de graca e sem receita, exatamente como o OPA no caso Styra da rodada anterior. Quem constroi o motor nao e quem cobra.'
@@ -509,7 +509,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.4
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md — votos 3-0, fonte primaria da plataforma, versoes 2.1.281 a 2.1.286'
     source_tier: 9
     source_kind: primary
@@ -529,9 +529,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://techcrunch.com/2026/05/28/gleans-top-line-crosses-300m-as-ai-budget-cutting-becomes-its-major-selling-point/ e https://theaieconomy.substack.com/p/glean-300m-arr-enterprise-ai-pilot-to-production — votos 2-1 em cada, DUAS fontes independentes para o MESMO fato, ambas tier 5'
-    valid_from: 2026-05
+    valid_from: "2026-05"
     source_tier: 5
     source_kind: analyst
     label: 'A Glean atingiu mais de US$300 milhoes de ARR em maio de 2026, TRIPLICANDO os US$100 milhoes alcancados 15 meses antes. Duas fontes independentes desta rodada relatam o mesmo numero, o que sustenta o fato sem elevar o tier: as duas sao imprensa e newsletter, nao demonstrativo. Para a pergunta: Company Brain enterprise e categoria com receita REAL e crescimento de tres digitos — a demanda existe e esta provada no lado do comprador grande. Nao e a existencia da demanda que trava (b); e a unidade e o receptor.'
@@ -548,9 +548,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://theaieconomy.substack.com/p/glean-300m-arr-enterprise-ai-pilot-to-production — votos 2-1, analise citando o TechCrunch'
-    valid_from: 2026-05
+    valid_from: "2026-05"
     source_tier: 5
     source_kind: analyst
     label: 'A MESMA fonte que celebra o numero o qualifica: o ARR da Glean e metrica questionavel, porque nao tem definicao contabil padrao e o modelo baseado em CONSUMO nao tem componente estritamente recorrente. Isto e o que o eixo 7 realmente entrega, e e desconfortavel: a prova de mercado da categoria (b) vem de uma metrica que a propria imprensa diz nao ser recorrente — ou seja, o lider da categoria cresce por CONSUMO, exatamente a unidade que o Zep mostra que o Onion nao gera em volume. Dois achados independentes convergindo para a mesma parede.'
@@ -567,9 +567,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'sintese do eixo mercado desta rodada em 2026-10-01 sobre as 7 fontes lidas: 2 fontes de receita (ambas tier 5, sobre a MESMA empresa), 6 fornecedores com preco publicado, 2 sem preco publicado, ZERO rodada de investimento nova, ZERO M&A de 2026, ZERO TAM, ZERO caso publico de cliente com numero'
-    valid_from: 2026-10-01
+    valid_from: "2026-10-01"
     source_tier: 10
     source_kind: internal-audit
     label: 'EIXO MERCADO E CAPITAL — SINAL ENCONTRADO, MAS ASSIMETRICO E FRACO NO QUE DECIDE. (1) RECEITA: existe e e grande, mas e UMA empresa (Glean, mais de US$300 milhoes de ARR em 2026-05, triplicando em 15 meses) e vem acompanhada da ressalva da propria fonte de que o ARR nao e recorrente. (2) PRECO COMO SINAL DE CATEGORIA, e e o achado estrutural: PUBLICAM preco os fornecedores de INFRAESTRUTURA e de plataforma de dev — Dust (assento mais credito, 24 a 150 euros), Onyx (US$20 por assento no anual), Port (US$30 a 40 por assento), Roadie (US$24 por dev contribuinte), Humanitec (pacote de tier), Zep (credito por episodio ingerido); NAO PUBLICAM os dois que vendem CONHECIMENTO VERIFICADO com conducao — Glean e Guru. A fronteira do preco publicado coincide com a fronteira entre vender capacidade e vender resultado organizacional. (3) CAPITAL: ZERO rodada nova medida nesta rodada, ZERO M&A de 2026, ZERO TAM sobrevivente, ZERO analista de casa consultado no eixo comercial, e nenhum caso publico de cliente com numero — o eixo 6 (ICP e disposicao a pagar) nao tem UMA evidencia. (4) O unico M&A do grafo e de 2019 (VMware compra Pivotal), citado como cemiterio e nao como sinal vivo. Conclusao para a decisao: a categoria (b) tem receita provada e unidade negociada; a categoria (d) nao tem UM fornecedor com receita publica nesta rodada.'
@@ -588,9 +588,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'contagem direta sobre o repasse da rodada em 2026-10-01: 7 fontes lidas, 67 claims levantadas, 24 confirmadas, 13 refutadas por fonte fraca, 0 nao verificadas por 403 ou truncagem, 10 objecoes sobreviventes do Elenxo'
-    valid_from: 2026-10-01
+    valid_from: "2026-10-01"
     source_tier: 10
     source_kind: internal-audit
     label: "CONTABILIDADE DO RUN wf_192911fe (2026-10-01, journal no host): 26 fontes, 103 claims, 36 levadas a voto — 24 confirmadas, 12 refutadas, 0 não verificadas; 67 claims cortadas por orçamento e 7 fontes descartadas por orçamento; 59 objeções do Elenxo, 51 sobreviventes."
@@ -649,7 +649,7 @@ nodes:
     impact: 5
     confidence: 0.5
     label: 'DECISAO ABERTA (o maestro sela; esta sessao NUNCA sela): entre as duas candidatas mais proximas da identidade do Onion, qual tem unidade bilhetavel viavel sem contradizer framework template em .claude/ sem npm e sem CLI standalone, qual exige menos receptor hospedado para comecar, e qual o mercado ja provou que morre? OPCOES NOMEADAS: (b) COMPANY BRAIN / GRAFO ANCORADO COMO SERVICO — cobrar pelo conhecimento organizacional com proveniencia verificavel; (d) CONDUCAO / ADOCAO COMO SERVICO — cobrar pelo metodo (/meta:adopt, gate instalado, federacao) de forma recorrente; (b mais d) O PACOTE NA FORMA QUE O MERCADO JA VALIDOU, o formato Guru — software de conhecimento verificado COM conducao humana embutida, preco fechado por contrato; NENHUMA AGORA — rodada de completude dos eixos 1 pelo lado suite, 3 cemiterio, 6 ICP e 7 capital antes de qualquer selo. ═══ RECOMENDACAO DO ELENXO (afirmacao de UM agente, sem votacao adversarial — tratar como hipotese) ═══ REPROVO o selo entre (b) e (d) sobre este corpus, e recomendo NENHUMA AGORA, com UMA direcao ja decidivel dentro dela: (d) e a candidata que o mercado JA PROVOU QUE MORRE, e a prova esta na pilha de descartes desta rodada, nao nos achados. Tres casos independentes convergem: Thoughtworks Studios, divisao de PRODUTO criada em 2006 para comercializar metodo, fechada em 2020 (verificada nesta rodada e descartada como refutada sem contra-evidencia); Pivotal Labs absorvida e RENOMEADA VMware Tanzu Labs em janeiro de 2021, metodo engolido pela suite; e, no vivo de 2026, o conteudo de metodo distribuido DE GRACA pelos proprios concorrentes — no Port, catalogo, Context Lake, Scorecards, Actions e AI Agents estao inclusive no plano Free, e o pago cobra SSO, SCIM, permissoes e SLA. ═══ AS TRES RAZOES MEDIDAS QUE SUSTENTAM A REPROVACAO DO SELO ═══ (1) VOLUME, e e aritmetica, nao opiniao: ao unico preco publicado de grafo-como-servico (Zep, 1 credito por episodio de ate 350 bytes), o corpus COMPLETO do Onion — 114 arquivos .kg.yaml, 3.830.401 bytes, medidos aqui hoje — da 10.944 creditos, contra 10.000 do plano FREE; o ativo inteiro da casa vale aproximadamente US$0 por mes na unidade que o mercado paga. (2) CURVA INVERTIDA: no mesmo Zep, leitura, armazenamento e o GRAFO saem a 0 credito e so a ESCRITA e bilhetada — o mercado da de graca exatamente o que o Onion faz bem (consultar, versionar, verificar, manter atual) e cobra o que ele quase nao faz (ingestao automatica em volume). (3) A UNIDADE QUE A CASA TEM E A QUE NINGUEM PAGA: o Onion sabe contar repos adotados sem receptor nenhum (22 membros medidos em members.yaml), e NENHUM fornecedor de metodo cobra por repo onboarded ou por golden path mantido — Humanitec cobra pacote de tier, Port e Roadie cobram por pessoa, todos num receptor hospedado. ═══ E A DIRECAO QUE SOBREVIVEU AO PROPRIO REFUTADOR ═══ o unico precedente POSITIVO do grafo e o Guru: vende conhecimento verificado COM conducao humana embutida e NAO publica preco — o que dissolve as duas paredes de uma vez, porque contrato nao disputa teto de assento nem piso de byte, e nao precisa de receptor para medir. Se o maestro quiser selar algo hoje em vez de adiar, esta e a unica forma com precedente de mercado. ═══ AS SEIS PERGUNTAS DE SELAGEM ═══ P1. QUEM PAGA, nomeado: empresa que adota o framework nos proprios projetos, cliente de consultoria conduzida por voce, ou terceiro que instala o plugin publico? O eixo 6 desta rodada tem ZERO evidencia, logo esta resposta nao vem de fora — tem de vir de voce. P2. O PRECO E PUBLICADO OU NEGOCIADO? Publicado obriga a disputar US$20 por assento (Onyx, motor gratis) ou centavos por byte (Zep); negociado obriga forca de vendas. As duas unicas fontes que vendem o que a casa quer vender (Glean e Guru) escolheram negociado. P3. A CASA ACEITA UM RECEPTOR HOSPEDADO DE TERCEIRO? A Polar vende endpoint de validacao e ativacao pronto, logo o receptor nao precisa ser construido — mas hook que valida licenca contra rede converte gate determinístico em gate dependente de rede. Isso contradiz a identidade ou e OUTRO produto? P4. ONDE PASSA A LINHA DO GRATIS? O motor de lint, o radar determinístico sem LLM, o grafo, a Conducao — o que fica aberto como funil e o que fica atras da linha? O mercado ja respondeu pelo lado dele: motor gratis, governanca paga. P5. CONDUCAO E UNIDADE OU BOOTSTRAP? Se o cemiterio esta certo, ela e o que paga a conta ate a unidade existir, nao a unidade. Voce aceita essa leitura? P6. SE FOR NENHUMA AGORA, QUAL O GATILHO, A DATA E O ORCAMENTO? Nomeie as fontes (lado suite do eixo 1, obituarios de knowledge management, casos publicos com numero no eixo 6, capital de 2026) e a data; sem isso a opcao de completude e adiamento com outro nome. E se nao houver orcamento, voce aceita EXPLICITAMENTE selar por ausencia de dado nos eixos 3, 6 e 7?'
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'NAO SELADA. Esta sessao nunca sela: status open, aguardando o maestro. A recomendacao do Elenxo e afirmacao de UM agente sem votacao adversarial — confianca rebaixada pela clausula de dissent, e as fontes primarias que ele cita sem terem sido lidas nesta rodada (Thoughtworks Studios) entram declaradas como primario citado, nao lido.'
     trace: 'docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml'
 
@@ -664,7 +664,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao 1 do Elenxo contra o achado Dust (preco por assento com creditos, tier 9, https://dust.tt/pricing); objecao de RELEVANCIA e nao de veracidade'
     source_tier: 9
     source_kind: primary
@@ -682,7 +682,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao 2 do Elenxo contra o achado de ausencia de grafo e proveniencia na pagina de preco do Dust (tier 9, https://dust.tt/pricing)'
     source_tier: 9
     source_kind: primary
@@ -700,7 +700,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao 3 do Elenxo contra o achado Zep (credito por episodio, tier 9), MEDIDA CONTRA O VIVO nesta sessao: find docs -name "*.kg.yaml" -not -path "*/worktrees/*" devolve 114 arquivos e 3.830.401 bytes, que a 350 bytes por credito da 10.944 creditos contra os 10.000 do plano FREE'
     source_tier: 10
     source_kind: internal-audit
@@ -718,7 +718,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao 4 do Elenxo contra o achado Zep de que recuperacao, armazenamento e grafo saem a 0 creditos e so a escrita e bilhetada (tier 9, https://www.getzep.com/pricing)'
     source_tier: 9
     source_kind: primary
@@ -736,7 +736,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao 5 do Elenxo contra o achado de ausencia no CHANGELOG do Claude Code 2.1.281-286 (tier 9, votos 3-0)'
     source_tier: 10
     source_kind: internal-audit
@@ -754,7 +754,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao 6 do Elenxo contra o achado Onyx de US$20 por usuario por mes no anual (tier 9, https://www.onyx.app/pricing)'
     source_tier: 9
     source_kind: primary
@@ -772,7 +772,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao 7 do Elenxo contra o achado Humanitec (pacote de tier, tier 9), cruzada com a medicao local de 2026-10-01: docs/evolution/federation/members.yaml tem 22 entradas'
     source_tier: 10
     source_kind: internal-audit
@@ -790,7 +790,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao 8 do Elenxo contra o achado Port de preco por assento (tier 8), juntado ao item que a rodada DESCARTOU: catalogo, Context Lake, Scorecards, Actions e AI Agents em TODOS os planos inclusive Free, pago adiciona SSO, SCIM, permissoes, workspaces, Private Link e SLA'
     source_tier: 8
     source_kind: primary
@@ -808,7 +808,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao 9 do Elenxo contra o achado Keygen de cobranca por active licensed users (tier 8, https://keygen.sh/pricing/)'
     source_tier: 8
     source_kind: primary
@@ -826,7 +826,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao 10 do Elenxo contra o achado Guru de nao publicar preco (tier 8); o repasse desta objecao chegou TRUNCADO, cortando em "Pivotal Labs foi absorvida e renomeada VMware Tanzu Labs em jan/2021 (acha" — modelada pelo que dela se le'
     source_tier: 8
     source_kind: primary
@@ -850,7 +850,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://roadie.io/pricing/ relida ao vivo em 2026-10-01 por tres refutadores independentes (curl, 161.818 bytes); a string "Existing subscribers only" aparece 2x no HTML, uma em cada plano por-dev, conferida por grep'
     source_tier: 9
     source_kind: primary
@@ -868,7 +868,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://docs.onyx.app/ (doc primaria do fornecedor, fetch 2026-10-01) + https://api.github.com/repos/onyx-dot-app/onyx/contents/backend/onyx/kg (codigo-fonte primario); tres refutadores independentes chegaram a mesma contra-evidencia'
     source_tier: 9
     source_kind: primary
@@ -886,7 +886,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'S-1 da propria Pivotal Software (SEC, 2018-03-23) e Form D (CIK 0001574135, arquivado 2013-04-15): "We were incorporated in the State of Delaware on April 1, 2013 under the name GoPivotal, Inc."; Form D declara ano 2013 e primeira venda 2013-04-01'
     source_tier: 10
     source_kind: primary
@@ -905,7 +905,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 1.0
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'arquivo conferido no disco; o frontmatter carrega o contrato de custo (run_id wf_192911fe-13d, 9.987.160 tokens, 148 agentes, 97 min) e aponta kg: para este grafo'
     label: 'SYNTHESIS.md desta rodada — PROJECAO deste grafo, nunca fonte paralela. Carrega as secoes que o grafo nao formata: NAO-VERIFICADOS (67 claims fora do repasse por teto de maxVerify, 7 URLs descartadas por orcamento — entre elas glean.com/pricing e cortex.io/pricing; o lado SUITE do eixo 1 intocado e o eixo 6 com ZERO evidencia) e valeu-a-pena (212 mil tokens por no contra 68-74 mil do historico: regressao de 2,9x declarada como ACHADO, nao rodape).'
     trace: 'docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/SYNTHESIS.md'

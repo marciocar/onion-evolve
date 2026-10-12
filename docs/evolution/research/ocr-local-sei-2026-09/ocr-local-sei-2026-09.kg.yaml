@@ -1,8 +1,8 @@
 meta:
   id: ocr-local-sei-2026-09
   schema_version: "1"
-  baseline: 2026-09-08
-  review_after: 2026-10-08   # cadência FERRAMENTA/PREÇO = 30d. O tipo dominante desta rodada NÃO é
+  baseline: "2026-09-08"
+  review_after: "2026-10-08"   # cadência FERRAMENTA/PREÇO = 30d. O tipo dominante desta rodada NÃO é
                              # doutrina (12m) nem mercado (90d) nem benchmark (120d): é ESCOLHA DE
                              # FERRAMENTA LOCAL com custo de instalação — versões de motor (Tesseract
                              # 5.5.x, PaddleOCR 3.4/PaddleOCR-VL 0.9B, dots.ocr/dots.mocr 3B com
@@ -51,7 +51,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'https://arxiv.org/pdf/2512.02498 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2025-12'
     source_tier: 7
@@ -70,7 +70,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'https://arxiv.org/html/2504.11101 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026-05'
     source_tier: 7
@@ -89,7 +89,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'https://github.com/rednote-hilab/dots.ocr — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026-03-19'
     source_tier: 6
@@ -108,7 +108,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'https://mindee.github.io/doctr/getting_started/installing.html — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 9
     source_kind: primary
@@ -126,7 +126,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'https://github.com/datalab-to/surya — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 7
     source_kind: primary
@@ -145,7 +145,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'fan-out desta rodada (39 fontes): nenhum angulo devolveu rodada de investimento, M&A, valuation, down round ou nota de analista que sobrevivesse aos votos adversariais para tesseract, PaddleOCR, docTR/Mindee, Surya/Datalab, MinerU/OpenDataLab, olmOCR/Ai2 ou dots.ocr/rednote-hilab'
     source_tier: 10
     source_kind: measurement
@@ -165,7 +165,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'contabilidade da propria rodada: 39 fontes consultadas, 23 claims levantadas, 5 confirmadas, 18 refutadas (a maioria por fonte fraca ou sem evidencia registrada), 0 nao-verificadas por falha de acesso, 1 disconfirmadora cortada por orcamento'
     source_tier: 10
     source_kind: measurement
@@ -185,7 +185,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'bash .claude/validation/kg-corpus-grep.sh — 92 grafos e 3289 nos varridos; casamentos apenas nas verticais de privacidade do Onion pessoal (classification-por-vertical, fronteira-decision, inference-mitigation), por termos genericos do enunciado (local, para, de, sem enviar)'
     source_tier: 10
     source_kind: measurement
@@ -297,7 +297,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'E_DOTSOCR_VLM_FIM_A_FIM (https://arxiv.org/pdf/2512.02498, tier 7, 3-0) confrontada com o requisito dominante do enunciado ("um erro de leitura produz uma superacao errada em silencio") — inversao de sinal da mesma propriedade arquitetural'
     source_tier: 7
     source_kind: analysis
@@ -315,7 +315,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'E_CONSENSUS_ENTROPY_SEM_TREINO (https://arxiv.org/html/2504.11101, tier 7, 3-0) confrontada com a propria lista de refutadas desta rodada, que marcou "refutada" a proposicao "quando os VLMs erram, as predicoes divergem" — a perna de sustentacao do mesmo achado'
     source_tier: 7
     source_kind: analysis
@@ -333,7 +333,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'E_DOTSOCR_SEM_CONFIDENCE_NEM_CARIMBO (https://github.com/rednote-hilab/dots.ocr, tier 6, 3-0) — a metade "nao ha mencao a robustez contra carimbo" e ausencia em README, nao medicao; confrontada com a doutrina behavior-over-declaration do repo'
     source_tier: 6
     source_kind: analysis
@@ -351,7 +351,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: "E_DOCTR_PYTHON_311_PLUS (https://mindee.github.io/doctr/getting_started/installing.html, tier 9, 3-0) confrontada com o venv real do projeto (venv de sistema do projeto: numpy, pillow, pypdf, openpyxl) e com o requisito (c) do enunciado"
     source_tier: 9
     source_kind: analysis
@@ -369,7 +369,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'E_SURYA_CPU_EXIGE_LLAMACPP (https://github.com/datalab-to/surya, tier 7, 3-0) confrontada com as 4 proposicoes tier 7 do MESMO repo marcadas refutada sem evidencia e com a disconfirmadora cortada por orcamento — corpo de evidencia mutuamente contraditorio'
     source_tier: 7
     source_kind: analysis
@@ -387,7 +387,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'proposicao tier 9 (doc oficial docTR, https://mindee.github.io/doctr/getting_started/installing.html) marcada "refutada" na lista desta rodada SEM evidencia registrada; e o teste de 1 comando que a decidiria (`pip install --dry-run python-doctr` neste venv) nunca foi executado'
     source_tier: 9
     source_kind: analysis
@@ -405,7 +405,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'proposicao tier 7 (https://arxiv.org/html/2504.11101) "o desacordo entre motores independentes e sinal detectavel de erro" marcada refutada sem evidencia, enquanto E_CONSENSUS_ENTROPY_SEM_TREINO, que dela depende, foi mantida confirmada'
     source_tier: 7
     source_kind: analysis
@@ -423,7 +423,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-08
+    verified_at: "2026-09-08"
     verified_against: 'quatro proposicoes tier 7 da MESMA fonte (https://github.com/datalab-to/surya) marcadas refutada sem evidencia registrada para nenhuma delas: 87,2% em 91 idiomas; Pareto-otimo sub-3B com 83,3% no olmOCR-bench; confidence score por bloco; ausencia de dados sobre robustez a carimbo'
     source_tier: 7
     source_kind: analysis

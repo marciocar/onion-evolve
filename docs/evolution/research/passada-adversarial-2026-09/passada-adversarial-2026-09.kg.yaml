@@ -1,8 +1,8 @@
 meta:
   id: passada-adversarial-2026-09
   schema_version: "1"
-  baseline: 2026-09-14
-  review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
+  baseline: "2026-09-14"
+  review_after: "2027-01-12"   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
   # ═══ TETO: 55 NOS (era 54: +1 pela CLASSE backtick-em-prosa-dentro-de-contexto-que-interpreta,
   #     TRES ocorrencias medidas em DOIS dias, todas com o artefato saindo 0 e parecendo certo. Cresce

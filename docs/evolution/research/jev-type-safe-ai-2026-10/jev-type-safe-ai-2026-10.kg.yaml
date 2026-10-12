@@ -1,8 +1,8 @@
 meta:
   id: jev-type-safe-ai-2026-10
   schema_version: "1"
-  baseline: 2026-10-01
-  review_after: 2026-10-31   # 30d: o tipo DOMINANTE desta rodada e FERRAMENTA/PRECO (modelo hospedado,
+  baseline: "2026-10-01"
+  review_after: "2026-10-31"   # 30d: o tipo DOMINANTE desta rodada e FERRAMENTA/PRECO (modelo hospedado,
                              # tabela de preco por token, regime de acesso, lista de gateways) — cadencia de
                              # 30d da clausula 8. A metade "mercado/capital" pediria 90d, mas ela NAO foi
                              # coberta nesta rodada (ver E_LACUNAS); e o preco e justamente o campo que o
@@ -52,7 +52,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "The AI model that returns typed decisions, not text." — Home, hero (h1; a quebra de linha fica entre "returns" e "typed decisions"); ancorada por verificador independente. CORROBORADA FORA do site lido pelo proprio fabricante (ver E_VENDOR_SYSTEM_ONE_CATEGORY), por isso a objecao do Elenxo caiu.'
     source_tier: 5
     source_kind: vendor-reseller
@@ -69,7 +69,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Jev = fast, typed decisions for AI agents and software — choice, score, or yes/no probability, in 70–500ms." — Home, linha logo abaixo do hero; ancorada por verificador independente. Latencia CORROBORADA por terceiro independente (eesel.ai, 2026-09-21: "70ms to 500ms" end-to-end e "40x to 200x faster").'
     source_tier: 5
     source_kind: vendor-reseller
@@ -86,7 +86,7 @@ nodes:
     status: refuted
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "0 hallucinations by construction" — Home, faixa de estatisticas do hero (ao lado de "40–200x faster than an LLM" e "Free live playground"; "Type errors, guaranteed" aparece na secao de numeros); ancorada por verificador independente. A busca por "closed set"/"constrained" na pagina NAO achou nada: a home nao nomeia mecanismo nenhum.'
     source_tier: 5
     source_kind: vendor-reseller
@@ -98,7 +98,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Pick one of up to 255 labelled options" — Home, secao "The three primitives" (choice, score, noul); ancorada por verificador independente. Taxonomia CORROBORADA por eesel.ai ("three primitives: Noul (probability), Choice (select from list), and Score (numeric rating)").'
     source_tier: 5
     source_kind: vendor-reseller
@@ -115,7 +115,7 @@ nodes:
     status: superseded
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "$0.25–$0.42/M Input tokens (output free)" — Home, faixa de numeros ("70–500 ms", "$0.25–$0.42 /M", "255", "0"), com "Jev is live — try it free, no signup" no topo e "real API · free · no signup" no playground; ancorada por verificador independente.'
     source_tier: 5
     source_kind: vendor-reseller
@@ -127,7 +127,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "No — Jev is a hosted model from TypeSafe AI, called over an API." — Home, FAQ "Is Jev open source?" (secao Getting started); ancorada por verificador independente. Sustentado por fonte do fabricante (console de sign-in, zero mencao a pesos abertos) e por eesel.ai ("hosted/closed", acesso via Cloudflare Workers AI e lista de early-access).'
     source_tier: 5
     source_kind: vendor-reseller
@@ -146,7 +146,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "One call: a state plus typed questions, calibrated answers back." — /docs, "Core API — /v1/decide"; ancorada por verificador independente. CORROBORADA por eesel.ai, que descreve multiplas perguntas avaliadas contra o mesmo state "in a single parallel pass".'
     source_tier: 5
     source_kind: vendor-reseller
@@ -163,7 +163,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Because every answer''s type is fixed by your request, you branch on it in plain code — no parsing, no regex." — /docs, "Response"; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia, ver E_SOURCE_TIER_INFLATED). CORROBORADA por eesel.ai: "cannot make a type error and cannot return an option that was not in your list".'
     source_tier: 6
     source_kind: vendor-reseller
@@ -180,7 +180,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Pin a model version in production so thresholds don''t shift." — /docs, "Best practice"; ancorada por verificador independente. Limites declarados na mesma secao: 64k tokens de state+perguntas, 32k para state+maior pergunta, ate 255 opcoes em choice, 2-10 niveis em score.'
     source_tier: 5
     source_kind: vendor-reseller
@@ -199,7 +199,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Run real Jev calls in your browser, no key and no signup." — /get-jev, item 1 "Try it now — free playground"; ancorada por verificador independente.'
     source_tier: 6
     source_kind: vendor-reseller
@@ -216,7 +216,7 @@ nodes:
     status: unverifiable
     impact: 3
     confidence: 0.4
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Vercel AI Gateway (typesafe-ai/jev), OpenRouter (typesafe/jev via its decisions endpoint) and Cloudflare AI Gateway" — /get-jev, item 3 "Through a gateway / provider"; item 4 cita o endpoint oficial /v1/systemone em console.typesafe.ai. Ancorada por verificador independente NO TEXTO, mas NAO CONFIRMADA em nenhum catalogo de ORIGEM.'
     source_tier: 6
     source_kind: vendor-reseller
@@ -228,7 +228,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Jev is developed by TypeSafe AI. This platform is independently operated by CODEFASHION TECH LTD and is not affiliated with or endorsed by TypeSafe AI." — /get-jev, aviso ao fim do corpo da pagina, repetido no rodape ("© 2026 CODEFASHION TECH LTD.", "Not affiliated with or endorsed by TypeSafe AI."); ancorada por verificador independente.'
     source_tier: 6
     source_kind: vendor-reseller
@@ -247,7 +247,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Give any AI coding agent a fast, typed "fuzzy if": one skill teaches it to call the Jev Decision API for routing, guardrails, scoring and gating" — /agent-skill, subtitulo de abertura sob "Add the Jev skill to your agent"; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia).'
     source_tier: 6
     source_kind: vendor-reseller
@@ -264,7 +264,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "curl -o ~/.claude/skills/jev/SKILL.md --create-dirs https://jevtypesafeai.com/skill/SKILL.md" — /agent-skill, "Copy to your agent" ("Any agent — paste this prompt" e "Any agent — install the file manually"); ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia).'
     source_tier: 6
     source_kind: vendor-reseller
@@ -283,7 +283,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "The exact request / response shape, so the agent branches on typed values with no parsing" — /agent-skill, "What the skill teaches your agent", itens 1 e 3; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia).'
     source_tier: 6
     source_kind: vendor-reseller
@@ -300,7 +300,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "When to call Jev instead of another LLM — routing, tool-call guardrails, context compaction, classification" — /agent-skill, "What the skill teaches your agent", itens 2 e 4; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia).'
     source_tier: 6
     source_kind: vendor-reseller
@@ -319,7 +319,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Call Jev from TypeScript/Node: install the SDK, set your key, and get a typed, calibrated choice / score / noul with a 30-line working example." — /integrations, card "SDK / TypeScript"; ancorada por verificador independente.'
     source_tier: 6
     source_kind: vendor-reseller
@@ -338,7 +338,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Paste an agent''s shell commands — Jev gates each one ALLOW / CONFIRM / BLOCK with a risk score." — /tools l.42-153, Featured demos; ancorada por verificador independente.'
     source_tier: 6
     source_kind: vendor-reseller
@@ -355,7 +355,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Route each task to the one tool an agent should call — web search, code, DB, email — with confidence." — /tools l.97-100 (Skill Router) e l.150-153 (Model Router); ancorada por verificador independente.'
     source_tier: 6
     source_kind: vendor-reseller
@@ -372,7 +372,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Paste a GitHub PR — Jev returns SAFE / REVIEW / BLOCK with structured checks, in one call." — /tools l.188-191, PR Judge; ancorada por verificador independente.'
     source_tier: 5
     source_kind: vendor-reseller
@@ -389,7 +389,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'citacao verbatim "Upload a CSV or paste rows, ask 1–8 questions, and get a typed answer for every row — filter, sort, export." — /tools l.269-308; ancorada por verificador independente.'
     source_tier: 6
     source_kind: vendor-reseller
@@ -408,7 +408,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'typesafe.ai (fonte do FABRICANTE, lida no Elenxo desta rodada): "Jev is TypeSafe''s first public System One Model, optimized for automation. Send Jev structured questions and get typed decisions with probabilities and confidence that your software can act on" e "System One Models are a new class of AI model built for decisions inside software".'
     source_tier: 10
     source_kind: primary
@@ -425,7 +425,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'typesafe.ai (fabricante): "Every Jev decision comes with a confidence estimate, so your software can act when confidence is high and escalate when it is not."'
     source_tier: 10
     source_kind: primary
@@ -442,7 +442,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'eesel.ai (cobertura independente, 2026-09-21): "a confidently wrong typed answer is still possible"; o teto da garantia e "cannot produce a type error" / "cannot make a type error and cannot return an option that was not in your list".'
     source_tier: 7
     source_kind: independent-coverage
@@ -459,7 +459,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'typesafe.ai (fabricante): "$42 Per Billion input tokens" = US$ 0,042 por milhao; CORROBORADO por eesel.ai: "$0.042 / MTok" e "238x lower than Claude Fable 5.1".'
     source_tier: 10
     source_kind: primary
@@ -476,7 +476,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'medicao do verificador independente sobre /docs ao rejeitar a claim "os tres tipos devolvem probabilidades e confianca calibradas": so choice e score devolvem `confidence` e `probabilities`; o noul devolve UM numero nu — exemplo da propria doc: {"type":"noul","noul":0.94}. A doc nao cita metodologia de calibracao nem garantia alguma; "calibrated" aparece so como adjetivo.'
     source_tier: 6
     source_kind: measurement
@@ -493,7 +493,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'conflito MEDIDO entre fontes: /docs (revendedor) declara 64k tokens para state+perguntas e 32k para state+maior pergunta; eesel.ai (independente) reporta "32,000 tokens" como a JANELA de jev-1.13.0. Nenhuma fonte reconcilia os dois numeros.'
     source_tier: 7
     source_kind: independent-coverage
@@ -510,7 +510,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'eesel.ai (independente): acesso ao JEV via "Cloudflare Workers AI" e por "early-access waitlist"; typesafe.ai expoe console de sign-in. O site do revendedor, por contraste, anuncia "live — try it free, no signup".'
     source_tier: 7
     source_kind: independent-coverage
@@ -527,7 +527,7 @@ nodes:
     status: unverifiable
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'medicao propria no Elenxo: https://openrouter.ai/typesafe/jev devolveu HTTP 404. O slug foi ADIVINHADO a partir do texto do revendedor, logo isto e AUSENCIA DE CONFIRMACAO, nao prova de inexistencia.'
     source_tier: 10
     source_kind: measurement
@@ -539,7 +539,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'auditoria da propria rodada: as 6 URLs do mandato (/, /get-jev, /docs, /agent-skill, /integrations, /tools) pertencem TODAS ao dominio jevtypesafeai.com, que declara nao ter afiliacao com a TypeSafe AI. typesafe.ai e console.typesafe.ai nao foram abertos na fase de leitura; abri-los no Elenxo custou 2 chamadas e devolveu categoria, mecanismo e preco real.'
     source_tier: 10
     source_kind: measurement
@@ -556,7 +556,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'auditoria dos tiers declarados: o leitor declarou tier 9 para 5 claims (/docs Response e as 4 de /agent-skill) e tier 6 para 9 claims, todas do MESMO dominio de terceiro nao afiliado. Pela clausula 7, fonte que fala de produto alheio sem afiliacao nao recebe tier de fonte definitiva. Rebaixadas a 6 (as de tier 9) e 5 (as sem tier declarado, onde o conteudo e numero de marketing).'
     source_tier: 10
     source_kind: measurement
@@ -613,7 +613,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'contabilidade fechada da rodada de primarias de 2026-10-01, conferida contra o retorno do verificador de ancoragem e contra o Elenxo'
     source_tier: 10
     source_kind: measurement

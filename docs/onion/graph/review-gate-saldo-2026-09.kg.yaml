@@ -2,8 +2,8 @@ meta:
   id: review-gate-saldo-2026-09
   schema_version: "1"
   date: 2026-09-30
-  baseline: 2026-09-30
-  review_after: 2026-12-29
+  baseline: "2026-09-30"
+  review_after: "2026-12-29"
   # Nasceu porque o grafo audit-textual-gates-2026-09 declara TETO de 26 nós e eu o levei a 28 ao
   # escrever isto lá. A REGRA 58 (O backlog cumpre as promessas do próprio `meta:`) reprovou no CI,
   # e com razão: "onda nova exige onda COLHIDA". Segunda vez no mesmo dia que eu escrevo num grafo
@@ -17,7 +17,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "artefato review-evidence-36782105288 do PR #895, lido do proprio run: {\"is_error\":true,\"api_error_status\":400,\"terminal_reason\":\"api_error\",\"result\":\"Credit balance is too low\",\"total_cost_usd\":0,\"num_turns\":1}. A run anterior (36781367066, 21:44Z) revisou com sucesso; a seguinte (21:51Z) ja falhou — o credito acabou entre as duas."
     source_kind: repo
     source_tier: 10
@@ -35,7 +35,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "no mesmo run: PREFLIGHT_HTTP=200 e HAS_ANTHROPIC_KEY=true, com o revisor morrendo em api_error_status 400 'Credit balance is too low'. O pre-voo existe para dizer a CAUSA e disse 200 — verde que nao cobre o modo de falha que de fato ocorreu."
     source_kind: repo
     source_tier: 10
@@ -53,7 +53,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: open
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "consequencia medida no PR #895: onion-review-verdict reprova com REVISOU=false e ACHADOS=-1, e o merge so passa por dispensa NOMEADA. Enquanto o saldo nao voltar, todo PR deste repo mergeia sem revisao semantica."
     source_kind: repo
     source_tier: 10
@@ -71,7 +71,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: "selado pelo maestro em 2026-10-01, em resposta direta a pergunta sobre como travar o revisor: 'so saber que neste momento nao vamos colocar credito ele nao vai funcionar no CI'. Nenhuma mudanca de workflow foi pedida nem feita."
     label: "DECISAO, nao espera: por ora NAO se repoe credito, e o revisor semantico do CI fica inerte. O verdict vermelho com REVISOU=false e ESTADO CONHECIDO — nao se diagnostica de novo, e o merge segue por dispensa NOMEADA no PR"
     gatilho: "o maestro dizer que quer o revisor de volta. Ate la: nao propor religar, nao reinvestigar a causa, nao mexer no onion-review.yml — e nao deixar o desligamento virar verde silencioso (o check CONTINUA vermelho de proposito, porque ausencia de revisao tem de ficar visivel no historico)."

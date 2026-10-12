@@ -3,8 +3,8 @@
 meta:
   id: forge-evolve-2026-10
   schema_version: "1"
-  baseline: 2026-10-04
-  review_after: 2026-11-18
+  baseline: "2026-10-04"
+  review_after: "2026-11-18"
   x_supersedes_none: >
     Re-forja de superficie existente, nao rodada de eixo: nao ha baseline de radar a reconciliar.
     O que esta leva CONSTRANGE vive em grafos de hoje e e reconciliado la (a aresta do motor e

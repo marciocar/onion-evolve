@@ -17,7 +17,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "gh pr list --state merged (672)"
     trace: "docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
     provenance:
@@ -32,7 +32,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "fase 2b"
     provenance:
       source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
@@ -46,7 +46,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "fase 2b"
     provenance:
       source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
@@ -60,7 +60,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "fase 2b"
     provenance:
       source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
@@ -74,7 +74,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "fase 2b"
     provenance:
       source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
@@ -88,7 +88,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "fase 2b"
     provenance:
       source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
@@ -102,7 +102,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     provenance:
       source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
       locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_VITRINE_PROVA); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md"
@@ -115,7 +115,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     provenance:
       source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
       locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_VITRINE_HISTORIA); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md"
@@ -128,7 +128,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     provenance:
       source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
       locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_VITRINE_TICKER); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md"
@@ -141,7 +141,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-13
+    verified_at: "2026-06-13"
     verified_against: "gh: PR #2 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/2"
     provenance:
@@ -156,7 +156,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-13
+    verified_at: "2026-06-13"
     verified_against: "gh: PR #3 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/3"
     provenance:
@@ -171,7 +171,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-13
+    verified_at: "2026-06-13"
     verified_against: "gh: PR #4 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/4"
     provenance:
@@ -186,7 +186,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-13
+    verified_at: "2026-06-13"
     verified_against: "gh: PR #5 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/5"
     provenance:
@@ -201,7 +201,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-13
+    verified_at: "2026-06-13"
     verified_against: "gh: PR #6 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/6"
     provenance:
@@ -216,7 +216,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-13
+    verified_at: "2026-06-13"
     verified_against: "gh: PR #7 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/7"
     provenance:
@@ -231,7 +231,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-13
+    verified_at: "2026-06-13"
     verified_against: "gh: PR #8 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/8"
     provenance:
@@ -246,7 +246,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-13
+    verified_at: "2026-06-13"
     verified_against: "gh: PR #9 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/9"
     provenance:
@@ -261,7 +261,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #10 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/10"
     provenance:
@@ -276,7 +276,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #11 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/11"
     provenance:
@@ -291,7 +291,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #12 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/12"
     provenance:
@@ -306,7 +306,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #13 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/13"
     provenance:
@@ -321,7 +321,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #14 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/14"
     provenance:
@@ -336,7 +336,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #15 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/15"
     provenance:
@@ -351,7 +351,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #16 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/16"
     provenance:
@@ -366,7 +366,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #17 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/17"
     provenance:
@@ -381,7 +381,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #18 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/18"
     provenance:
@@ -396,7 +396,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #19 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/19"
     provenance:
@@ -411,7 +411,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #20 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/20"
     provenance:
@@ -426,7 +426,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #21 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/21"
     provenance:
@@ -441,7 +441,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #22 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/22"
     provenance:
@@ -456,7 +456,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #23 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/23"
     provenance:
@@ -471,7 +471,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #24 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/24"
     provenance:
@@ -486,7 +486,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #25 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/25"
     provenance:
@@ -501,7 +501,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #26 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/26"
     provenance:
@@ -516,7 +516,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #27 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/27"
     provenance:
@@ -531,7 +531,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #28 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/28"
     provenance:
@@ -546,7 +546,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #29 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/29"
     provenance:
@@ -561,7 +561,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #30 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/30"
     provenance:
@@ -576,7 +576,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #31 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/31"
     provenance:
@@ -591,7 +591,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #32 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/32"
     provenance:
@@ -606,7 +606,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #33 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/33"
     provenance:
@@ -621,7 +621,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #34 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/34"
     provenance:
@@ -636,7 +636,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #35 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/35"
     provenance:
@@ -651,7 +651,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #36 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/36"
     provenance:
@@ -666,7 +666,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #37 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/37"
     provenance:
@@ -681,7 +681,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #38 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/38"
     provenance:
@@ -696,7 +696,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-14
+    verified_at: "2026-06-14"
     verified_against: "gh: PR #39 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/39"
     provenance:
@@ -711,7 +711,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #40 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/40"
     provenance:
@@ -726,7 +726,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #41 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/41"
     provenance:
@@ -741,7 +741,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #42 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/42"
     provenance:
@@ -756,7 +756,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #43 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/43"
     provenance:
@@ -771,7 +771,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #44 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/44"
     provenance:
@@ -786,7 +786,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #45 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/45"
     provenance:
@@ -801,7 +801,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #46 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/46"
     provenance:
@@ -816,7 +816,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #47 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/47"
     provenance:
@@ -831,7 +831,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #48 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/48"
     provenance:
@@ -846,7 +846,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #49 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/49"
     provenance:
@@ -861,7 +861,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #50 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/50"
     provenance:
@@ -876,7 +876,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #51 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/51"
     provenance:
@@ -891,7 +891,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #52 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/52"
     provenance:
@@ -906,7 +906,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #53 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/53"
     provenance:
@@ -921,7 +921,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #54 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/54"
     provenance:
@@ -936,7 +936,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #55 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/55"
     provenance:
@@ -951,7 +951,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #56 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/56"
     provenance:
@@ -966,7 +966,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #57 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/57"
     provenance:
@@ -981,7 +981,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #58 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/58"
     provenance:
@@ -996,7 +996,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #59 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/59"
     provenance:
@@ -1011,7 +1011,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #60 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/60"
     provenance:
@@ -1026,7 +1026,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #61 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/61"
     provenance:
@@ -1041,7 +1041,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #62 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/62"
     provenance:
@@ -1056,7 +1056,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #63 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/63"
     provenance:
@@ -1071,7 +1071,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #64 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/64"
     provenance:
@@ -1086,7 +1086,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #65 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/65"
     provenance:
@@ -1101,7 +1101,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-15
+    verified_at: "2026-06-15"
     verified_against: "gh: PR #66 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/66"
     provenance:
@@ -1116,7 +1116,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #67 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/67"
     provenance:
@@ -1131,7 +1131,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #68 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/68"
     provenance:
@@ -1146,7 +1146,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #69 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/69"
     provenance:
@@ -1161,7 +1161,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #70 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/70"
     provenance:
@@ -1176,7 +1176,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #71 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/71"
     provenance:
@@ -1191,7 +1191,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #72 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/72"
     provenance:
@@ -1206,7 +1206,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #73 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/73"
     provenance:
@@ -1221,7 +1221,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #74 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/74"
     provenance:
@@ -1236,7 +1236,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #75 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/75"
     provenance:
@@ -1251,7 +1251,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #76 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/76"
     provenance:
@@ -1266,7 +1266,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-16
+    verified_at: "2026-06-16"
     verified_against: "gh: PR #77 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/77"
     provenance:
@@ -1281,7 +1281,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #78 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/78"
     provenance:
@@ -1296,7 +1296,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #79 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/79"
     provenance:
@@ -1311,7 +1311,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #80 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/80"
     provenance:
@@ -1326,7 +1326,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #81 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/81"
     provenance:
@@ -1341,7 +1341,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #82 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/82"
     provenance:
@@ -1356,7 +1356,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #83 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/83"
     provenance:
@@ -1371,7 +1371,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #84 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/84"
     provenance:
@@ -1386,7 +1386,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #85 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/85"
     provenance:
@@ -1401,7 +1401,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #86 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/86"
     provenance:
@@ -1416,7 +1416,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #87 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/87"
     provenance:
@@ -1431,7 +1431,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-17
+    verified_at: "2026-06-17"
     verified_against: "gh: PR #88 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/88"
     provenance:
@@ -1446,7 +1446,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #89 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/89"
     provenance:
@@ -1461,7 +1461,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #90 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/90"
     provenance:
@@ -1476,7 +1476,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #91 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/91"
     provenance:
@@ -1491,7 +1491,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #92 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/92"
     provenance:
@@ -1506,7 +1506,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #93 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/93"
     provenance:
@@ -1521,7 +1521,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #94 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/94"
     provenance:
@@ -1536,7 +1536,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #95 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/95"
     provenance:
@@ -1551,7 +1551,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #96 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/96"
     provenance:
@@ -1566,7 +1566,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #97 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/97"
     provenance:
@@ -1581,7 +1581,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #98 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/98"
     provenance:
@@ -1596,7 +1596,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #99 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/99"
     provenance:
@@ -1611,7 +1611,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-18
+    verified_at: "2026-06-18"
     verified_against: "gh: PR #100 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/100"
     provenance:
@@ -1626,7 +1626,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #101 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/101"
     provenance:
@@ -1641,7 +1641,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #102 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/102"
     provenance:
@@ -1656,7 +1656,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #103 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/103"
     provenance:
@@ -1671,7 +1671,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #104 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/104"
     provenance:
@@ -1686,7 +1686,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #105 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/105"
     provenance:
@@ -1701,7 +1701,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #106 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/106"
     provenance:
@@ -1716,7 +1716,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #107 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/107"
     provenance:
@@ -1731,7 +1731,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #108 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/108"
     provenance:
@@ -1746,7 +1746,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #109 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/109"
     provenance:
@@ -1761,7 +1761,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #110 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/110"
     provenance:
@@ -1776,7 +1776,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #111 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/111"
     provenance:
@@ -1791,7 +1791,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-19
+    verified_at: "2026-06-19"
     verified_against: "gh: PR #112 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/112"
     provenance:
@@ -1806,7 +1806,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-20
+    verified_at: "2026-06-20"
     verified_against: "gh: PR #113 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/113"
     provenance:
@@ -1821,7 +1821,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-20
+    verified_at: "2026-06-20"
     verified_against: "gh: PR #114 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/114"
     provenance:
@@ -1836,7 +1836,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-20
+    verified_at: "2026-06-20"
     verified_against: "gh: PR #115 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/115"
     provenance:
@@ -1851,7 +1851,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-20
+    verified_at: "2026-06-20"
     verified_against: "gh: PR #116 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/116"
     provenance:
@@ -1866,7 +1866,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-21
+    verified_at: "2026-06-21"
     verified_against: "gh: PR #117 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/117"
     provenance:
@@ -1881,7 +1881,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-21
+    verified_at: "2026-06-21"
     verified_against: "gh: PR #118 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/118"
     provenance:
@@ -1896,7 +1896,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-21
+    verified_at: "2026-06-21"
     verified_against: "gh: PR #119 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/119"
     provenance:
@@ -1911,7 +1911,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-21
+    verified_at: "2026-06-21"
     verified_against: "gh: PR #120 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/120"
     provenance:
@@ -1926,7 +1926,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-21
+    verified_at: "2026-06-21"
     verified_against: "gh: PR #121 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/121"
     provenance:
@@ -1941,7 +1941,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-21
+    verified_at: "2026-06-21"
     verified_against: "gh: PR #122 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/122"
     provenance:
@@ -1956,7 +1956,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-21
+    verified_at: "2026-06-21"
     verified_against: "gh: PR #123 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/123"
     provenance:
@@ -1971,7 +1971,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #124 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/124"
     provenance:
@@ -1986,7 +1986,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #125 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/125"
     provenance:
@@ -2001,7 +2001,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #126 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/126"
     provenance:
@@ -2016,7 +2016,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #127 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/127"
     provenance:
@@ -2031,7 +2031,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #128 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/128"
     provenance:
@@ -2046,7 +2046,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #129 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/129"
     provenance:
@@ -2061,7 +2061,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #130 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/130"
     provenance:
@@ -2076,7 +2076,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #131 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/131"
     provenance:
@@ -2091,7 +2091,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #132 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/132"
     provenance:
@@ -2106,7 +2106,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #133 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/133"
     provenance:
@@ -2121,7 +2121,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #134 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/134"
     provenance:
@@ -2136,7 +2136,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #135 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/135"
     provenance:
@@ -2151,7 +2151,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #136 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/136"
     provenance:
@@ -2166,7 +2166,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #137 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/137"
     provenance:
@@ -2181,7 +2181,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #138 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/138"
     provenance:
@@ -2196,7 +2196,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #139 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/139"
     provenance:
@@ -2211,7 +2211,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #140 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/140"
     provenance:
@@ -2226,7 +2226,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #141 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/141"
     provenance:
@@ -2241,7 +2241,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-22
+    verified_at: "2026-06-22"
     verified_against: "gh: PR #142 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/142"
     provenance:
@@ -2256,7 +2256,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #143 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/143"
     provenance:
@@ -2271,7 +2271,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #144 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/144"
     provenance:
@@ -2286,7 +2286,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #145 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/145"
     provenance:
@@ -2301,7 +2301,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #146 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/146"
     provenance:
@@ -2316,7 +2316,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #147 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/147"
     provenance:
@@ -2331,7 +2331,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #148 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/148"
     provenance:
@@ -2346,7 +2346,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #149 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/149"
     provenance:
@@ -2361,7 +2361,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #150 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/150"
     provenance:
@@ -2376,7 +2376,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #151 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/151"
     provenance:
@@ -2391,7 +2391,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #152 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/152"
     provenance:
@@ -2406,7 +2406,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-23
+    verified_at: "2026-06-23"
     verified_against: "gh: PR #153 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/153"
     provenance:
@@ -2421,7 +2421,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #154 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/154"
     provenance:
@@ -2436,7 +2436,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #155 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/155"
     provenance:
@@ -2451,7 +2451,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #156 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/156"
     provenance:
@@ -2466,7 +2466,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #157 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/157"
     provenance:
@@ -2481,7 +2481,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #158 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/158"
     provenance:
@@ -2496,7 +2496,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #159 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/159"
     provenance:
@@ -2511,7 +2511,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #160 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/160"
     provenance:
@@ -2526,7 +2526,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #161 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/161"
     provenance:
@@ -2541,7 +2541,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #162 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/162"
     provenance:
@@ -2556,7 +2556,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #163 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/163"
     provenance:
@@ -2571,7 +2571,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #164 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/164"
     provenance:
@@ -2586,7 +2586,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #165 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/165"
     provenance:
@@ -2601,7 +2601,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #166 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/166"
     provenance:
@@ -2616,7 +2616,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #167 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/167"
     provenance:
@@ -2631,7 +2631,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #168 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/168"
     provenance:
@@ -2646,7 +2646,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #169 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/169"
     provenance:
@@ -2661,7 +2661,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #170 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/170"
     provenance:
@@ -2676,7 +2676,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #171 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/171"
     provenance:
@@ -2691,7 +2691,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #172 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/172"
     provenance:
@@ -2706,7 +2706,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #173 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/173"
     provenance:
@@ -2721,7 +2721,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #174 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/174"
     provenance:
@@ -2736,7 +2736,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-24
+    verified_at: "2026-06-24"
     verified_against: "gh: PR #175 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/175"
     provenance:
@@ -2751,7 +2751,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-25
+    verified_at: "2026-06-25"
     verified_against: "gh: PR #176 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/176"
     provenance:
@@ -2766,7 +2766,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-26
+    verified_at: "2026-06-26"
     verified_against: "gh: PR #177 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/177"
     provenance:
@@ -2781,7 +2781,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #178 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/178"
     provenance:
@@ -2796,7 +2796,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #179 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/179"
     provenance:
@@ -2811,7 +2811,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #180 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/180"
     provenance:
@@ -2826,7 +2826,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #181 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/181"
     provenance:
@@ -2841,7 +2841,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #182 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/182"
     provenance:
@@ -2856,7 +2856,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #183 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/183"
     provenance:
@@ -2871,7 +2871,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #184 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/184"
     provenance:
@@ -2886,7 +2886,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #185 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/185"
     provenance:
@@ -2901,7 +2901,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #186 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/186"
     provenance:
@@ -2916,7 +2916,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #187 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/187"
     provenance:
@@ -2931,7 +2931,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #188 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/188"
     provenance:
@@ -2946,7 +2946,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #189 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/189"
     provenance:
@@ -2961,7 +2961,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #190 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/190"
     provenance:
@@ -2976,7 +2976,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #191 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/191"
     provenance:
@@ -2991,7 +2991,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #192 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/192"
     provenance:
@@ -3006,7 +3006,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #193 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/193"
     provenance:
@@ -3021,7 +3021,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #194 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/194"
     provenance:
@@ -3036,7 +3036,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #195 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/195"
     provenance:
@@ -3051,7 +3051,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #196 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/196"
     provenance:
@@ -3066,7 +3066,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #197 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/197"
     provenance:
@@ -3081,7 +3081,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-27
+    verified_at: "2026-06-27"
     verified_against: "gh: PR #198 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/198"
     provenance:
@@ -3096,7 +3096,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #199 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/199"
     provenance:
@@ -3111,7 +3111,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #200 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/200"
     provenance:
@@ -3126,7 +3126,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #201 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/201"
     provenance:
@@ -3141,7 +3141,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #202 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/202"
     provenance:
@@ -3156,7 +3156,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #203 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/203"
     provenance:
@@ -3171,7 +3171,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #204 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/204"
     provenance:
@@ -3186,7 +3186,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #205 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/205"
     provenance:
@@ -3201,7 +3201,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #206 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/206"
     provenance:
@@ -3216,7 +3216,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #207 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/207"
     provenance:
@@ -3231,7 +3231,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #208 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/208"
     provenance:
@@ -3246,7 +3246,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #209 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/209"
     provenance:
@@ -3261,7 +3261,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #210 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/210"
     provenance:
@@ -3276,7 +3276,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-28
+    verified_at: "2026-06-28"
     verified_against: "gh: PR #211 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/211"
     provenance:
@@ -3291,7 +3291,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-06-30
+    verified_at: "2026-06-30"
     verified_against: "gh: PR #212 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/212"
     provenance:
@@ -3306,7 +3306,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-01
+    verified_at: "2026-07-01"
     verified_against: "gh: PR #213 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/213"
     provenance:
@@ -3321,7 +3321,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-01
+    verified_at: "2026-07-01"
     verified_against: "gh: PR #214 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/214"
     provenance:
@@ -3336,7 +3336,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #215 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/215"
     provenance:
@@ -3351,7 +3351,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #216 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/216"
     provenance:
@@ -3366,7 +3366,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #217 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/217"
     provenance:
@@ -3381,7 +3381,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #218 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/218"
     provenance:
@@ -3396,7 +3396,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #219 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/219"
     provenance:
@@ -3411,7 +3411,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #220 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/220"
     provenance:
@@ -3426,7 +3426,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #221 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/221"
     provenance:
@@ -3441,7 +3441,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #222 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/222"
     provenance:
@@ -3456,7 +3456,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #223 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/223"
     provenance:
@@ -3471,7 +3471,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #224 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/224"
     provenance:
@@ -3486,7 +3486,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #225 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/225"
     provenance:
@@ -3501,7 +3501,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-02
+    verified_at: "2026-07-02"
     verified_against: "gh: PR #226 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/226"
     provenance:
@@ -3516,7 +3516,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-03
+    verified_at: "2026-07-03"
     verified_against: "gh: PR #227 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/227"
     provenance:
@@ -3531,7 +3531,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-03
+    verified_at: "2026-07-03"
     verified_against: "gh: PR #228 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/228"
     provenance:
@@ -3546,7 +3546,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-03
+    verified_at: "2026-07-03"
     verified_against: "gh: PR #229 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/229"
     provenance:
@@ -3561,7 +3561,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-03
+    verified_at: "2026-07-03"
     verified_against: "gh: PR #230 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/230"
     provenance:
@@ -3576,7 +3576,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-03
+    verified_at: "2026-07-03"
     verified_against: "gh: PR #231 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/231"
     provenance:
@@ -3591,7 +3591,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-03
+    verified_at: "2026-07-03"
     verified_against: "gh: PR #232 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/232"
     provenance:
@@ -3606,7 +3606,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-03
+    verified_at: "2026-07-03"
     verified_against: "gh: PR #233 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/233"
     provenance:
@@ -3621,7 +3621,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-03
+    verified_at: "2026-07-03"
     verified_against: "gh: PR #234 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/234"
     provenance:
@@ -3636,7 +3636,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-03
+    verified_at: "2026-07-03"
     verified_against: "gh: PR #235 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/235"
     provenance:
@@ -3651,7 +3651,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-04
+    verified_at: "2026-07-04"
     verified_against: "gh: PR #236 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/236"
     provenance:
@@ -3666,7 +3666,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-04
+    verified_at: "2026-07-04"
     verified_against: "gh: PR #237 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/237"
     provenance:
@@ -3681,7 +3681,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-04
+    verified_at: "2026-07-04"
     verified_against: "gh: PR #238 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/238"
     provenance:
@@ -3696,7 +3696,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-04
+    verified_at: "2026-07-04"
     verified_against: "gh: PR #239 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/239"
     provenance:
@@ -3711,7 +3711,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-04
+    verified_at: "2026-07-04"
     verified_against: "gh: PR #240 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/240"
     provenance:
@@ -3726,7 +3726,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-04
+    verified_at: "2026-07-04"
     verified_against: "gh: PR #241 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/241"
     provenance:
@@ -3741,7 +3741,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-04
+    verified_at: "2026-07-04"
     verified_against: "gh: PR #242 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/242"
     provenance:
@@ -3756,7 +3756,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-04
+    verified_at: "2026-07-04"
     verified_against: "gh: PR #243 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/243"
     provenance:
@@ -3771,7 +3771,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-04
+    verified_at: "2026-07-04"
     verified_against: "gh: PR #244 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/244"
     provenance:
@@ -3786,7 +3786,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-04
+    verified_at: "2026-07-04"
     verified_against: "gh: PR #245 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/245"
     provenance:
@@ -3801,7 +3801,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-05
+    verified_at: "2026-07-05"
     verified_against: "gh: PR #246 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/246"
     provenance:
@@ -3816,7 +3816,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-05
+    verified_at: "2026-07-05"
     verified_against: "gh: PR #247 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/247"
     provenance:
@@ -3831,7 +3831,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-05
+    verified_at: "2026-07-05"
     verified_against: "gh: PR #248 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/248"
     provenance:
@@ -3846,7 +3846,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-05
+    verified_at: "2026-07-05"
     verified_against: "gh: PR #249 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/249"
     provenance:
@@ -3861,7 +3861,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-05
+    verified_at: "2026-07-05"
     verified_against: "gh: PR #250 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/250"
     provenance:
@@ -3876,7 +3876,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-05
+    verified_at: "2026-07-05"
     verified_against: "gh: PR #251 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/251"
     provenance:
@@ -3891,7 +3891,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-05
+    verified_at: "2026-07-05"
     verified_against: "gh: PR #252 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/252"
     provenance:
@@ -3906,7 +3906,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-05
+    verified_at: "2026-07-05"
     verified_against: "gh: PR #253 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/253"
     provenance:
@@ -3921,7 +3921,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #254 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/254"
     provenance:
@@ -3936,7 +3936,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #255 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/255"
     provenance:
@@ -3951,7 +3951,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #256 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/256"
     provenance:
@@ -3966,7 +3966,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #257 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/257"
     provenance:
@@ -3981,7 +3981,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #258 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/258"
     provenance:
@@ -3996,7 +3996,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #259 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/259"
     provenance:
@@ -4011,7 +4011,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #260 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/260"
     provenance:
@@ -4026,7 +4026,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #261 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/261"
     provenance:
@@ -4041,7 +4041,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #262 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/262"
     provenance:
@@ -4056,7 +4056,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #263 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/263"
     provenance:
@@ -4071,7 +4071,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #264 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/264"
     provenance:
@@ -4086,7 +4086,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #265 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/265"
     provenance:
@@ -4101,7 +4101,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #266 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/266"
     provenance:
@@ -4116,7 +4116,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #267 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/267"
     provenance:
@@ -4131,7 +4131,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #268 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/268"
     provenance:
@@ -4146,7 +4146,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #269 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/269"
     provenance:
@@ -4161,7 +4161,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #270 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/270"
     provenance:
@@ -4176,7 +4176,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #271 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/271"
     provenance:
@@ -4191,7 +4191,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #272 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/272"
     provenance:
@@ -4206,7 +4206,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #273 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/273"
     provenance:
@@ -4221,7 +4221,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #274 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/274"
     provenance:
@@ -4236,7 +4236,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #275 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/275"
     provenance:
@@ -4251,7 +4251,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #276 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/276"
     provenance:
@@ -4266,7 +4266,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #277 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/277"
     provenance:
@@ -4281,7 +4281,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #278 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/278"
     provenance:
@@ -4296,7 +4296,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #279 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/279"
     provenance:
@@ -4311,7 +4311,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #280 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/280"
     provenance:
@@ -4326,7 +4326,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #281 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/281"
     provenance:
@@ -4341,7 +4341,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #282 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/282"
     provenance:
@@ -4356,7 +4356,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #283 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/283"
     provenance:
@@ -4371,7 +4371,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-06
+    verified_at: "2026-07-06"
     verified_against: "gh: PR #284 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/284"
     provenance:
@@ -4386,7 +4386,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-07
+    verified_at: "2026-07-07"
     verified_against: "gh: PR #285 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/285"
     provenance:
@@ -4401,7 +4401,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-07
+    verified_at: "2026-07-07"
     verified_against: "gh: PR #286 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/286"
     provenance:
@@ -4416,7 +4416,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-07
+    verified_at: "2026-07-07"
     verified_against: "gh: PR #287 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/287"
     provenance:
@@ -4431,7 +4431,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-07
+    verified_at: "2026-07-07"
     verified_against: "gh: PR #288 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/288"
     provenance:
@@ -4446,7 +4446,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-08
+    verified_at: "2026-07-08"
     verified_against: "gh: PR #289 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/289"
     provenance:
@@ -4461,7 +4461,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-08
+    verified_at: "2026-07-08"
     verified_against: "gh: PR #290 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/290"
     provenance:
@@ -4476,7 +4476,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-08
+    verified_at: "2026-07-08"
     verified_against: "gh: PR #291 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/291"
     provenance:
@@ -4491,7 +4491,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-08
+    verified_at: "2026-07-08"
     verified_against: "gh: PR #292 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/292"
     provenance:
@@ -4506,7 +4506,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-08
+    verified_at: "2026-07-08"
     verified_against: "gh: PR #293 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/293"
     provenance:
@@ -4521,7 +4521,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-08
+    verified_at: "2026-07-08"
     verified_against: "gh: PR #294 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/294"
     provenance:
@@ -4536,7 +4536,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-08
+    verified_at: "2026-07-08"
     verified_against: "gh: PR #295 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/295"
     provenance:
@@ -4551,7 +4551,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-08
+    verified_at: "2026-07-08"
     verified_against: "gh: PR #296 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/296"
     provenance:
@@ -4566,7 +4566,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-08
+    verified_at: "2026-07-08"
     verified_against: "gh: PR #297 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/297"
     provenance:
@@ -4581,7 +4581,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-08
+    verified_at: "2026-07-08"
     verified_against: "gh: PR #298 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/298"
     provenance:
@@ -4596,7 +4596,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #299 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/299"
     provenance:
@@ -4611,7 +4611,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #300 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/300"
     provenance:
@@ -4626,7 +4626,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #301 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/301"
     provenance:
@@ -4641,7 +4641,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #302 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/302"
     provenance:
@@ -4656,7 +4656,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #303 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/303"
     provenance:
@@ -4671,7 +4671,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #304 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/304"
     provenance:
@@ -4686,7 +4686,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #305 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/305"
     provenance:
@@ -4701,7 +4701,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #306 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/306"
     provenance:
@@ -4716,7 +4716,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #307 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/307"
     provenance:
@@ -4731,7 +4731,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #308 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/308"
     provenance:
@@ -4746,7 +4746,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #309 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/309"
     provenance:
@@ -4761,7 +4761,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #310 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/310"
     provenance:
@@ -4776,7 +4776,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #311 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/311"
     provenance:
@@ -4791,7 +4791,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #312 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/312"
     provenance:
@@ -4806,7 +4806,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #313 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/313"
     provenance:
@@ -4821,7 +4821,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-09
+    verified_at: "2026-07-09"
     verified_against: "gh: PR #314 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/314"
     provenance:
@@ -4836,7 +4836,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #315 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/315"
     provenance:
@@ -4851,7 +4851,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #317 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/317"
     provenance:
@@ -4866,7 +4866,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #318 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/318"
     provenance:
@@ -4881,7 +4881,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #319 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/319"
     provenance:
@@ -4896,7 +4896,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #320 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/320"
     provenance:
@@ -4911,7 +4911,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #321 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/321"
     provenance:
@@ -4927,7 +4927,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #322 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/322"
     provenance:
@@ -4942,7 +4942,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #323 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/323"
     provenance:
@@ -4957,7 +4957,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #324 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/324"
     provenance:
@@ -4972,7 +4972,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #325 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/325"
     provenance:
@@ -4987,7 +4987,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #326 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/326"
     provenance:
@@ -5002,7 +5002,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #328 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/328"
     provenance:
@@ -5017,7 +5017,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #329 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/329"
     provenance:
@@ -5032,7 +5032,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #330 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/330"
     provenance:
@@ -5047,7 +5047,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-10
+    verified_at: "2026-07-10"
     verified_against: "gh: PR #331 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/331"
     provenance:
@@ -5062,7 +5062,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-11
+    verified_at: "2026-07-11"
     verified_against: "gh: PR #332 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/332"
     provenance:
@@ -5077,7 +5077,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-11
+    verified_at: "2026-07-11"
     verified_against: "gh: PR #333 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/333"
     provenance:
@@ -5092,7 +5092,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-11
+    verified_at: "2026-07-11"
     verified_against: "gh: PR #334 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/334"
     provenance:
@@ -5107,7 +5107,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-11
+    verified_at: "2026-07-11"
     verified_against: "gh: PR #335 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/335"
     provenance:
@@ -5122,7 +5122,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-11
+    verified_at: "2026-07-11"
     verified_against: "gh: PR #336 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/336"
     provenance:
@@ -5137,7 +5137,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-11
+    verified_at: "2026-07-11"
     verified_against: "gh: PR #337 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/337"
     provenance:
@@ -5152,7 +5152,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-11
+    verified_at: "2026-07-11"
     verified_against: "gh: PR #338 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/338"
     provenance:
@@ -5167,7 +5167,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-11
+    verified_at: "2026-07-11"
     verified_against: "gh: PR #339 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/339"
     provenance:
@@ -5182,7 +5182,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-11
+    verified_at: "2026-07-11"
     verified_against: "gh: PR #340 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/340"
     provenance:
@@ -5197,7 +5197,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-12
+    verified_at: "2026-07-12"
     verified_against: "gh: PR #341 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/341"
     provenance:
@@ -5212,7 +5212,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-12
+    verified_at: "2026-07-12"
     verified_against: "gh: PR #342 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/342"
     provenance:
@@ -5227,7 +5227,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-12
+    verified_at: "2026-07-12"
     verified_against: "gh: PR #343 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/343"
     provenance:
@@ -5242,7 +5242,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-12
+    verified_at: "2026-07-12"
     verified_against: "gh: PR #344 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/344"
     provenance:
@@ -5257,7 +5257,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #345 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/345"
     provenance:
@@ -5272,7 +5272,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #346 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/346"
     provenance:
@@ -5287,7 +5287,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #347 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/347"
     provenance:
@@ -5302,7 +5302,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #348 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/348"
     provenance:
@@ -5317,7 +5317,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #349 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/349"
     provenance:
@@ -5332,7 +5332,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #350 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/350"
     provenance:
@@ -5347,7 +5347,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #351 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/351"
     provenance:
@@ -5362,7 +5362,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #352 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/352"
     provenance:
@@ -5377,7 +5377,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #353 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/353"
     provenance:
@@ -5392,7 +5392,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #354 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/354"
     provenance:
@@ -5407,7 +5407,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #355 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/355"
     provenance:
@@ -5422,7 +5422,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #356 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/356"
     provenance:
@@ -5437,7 +5437,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-13
+    verified_at: "2026-07-13"
     verified_against: "gh: PR #357 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/357"
     provenance:
@@ -5452,7 +5452,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-14
+    verified_at: "2026-07-14"
     verified_against: "gh: PR #359 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/359"
     provenance:
@@ -5467,7 +5467,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-14
+    verified_at: "2026-07-14"
     verified_against: "gh: PR #360 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/360"
     provenance:
@@ -5482,7 +5482,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-14
+    verified_at: "2026-07-14"
     verified_against: "gh: PR #361 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/361"
     provenance:
@@ -5497,7 +5497,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-14
+    verified_at: "2026-07-14"
     verified_against: "gh: PR #363 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/363"
     provenance:
@@ -5512,7 +5512,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-14
+    verified_at: "2026-07-14"
     verified_against: "gh: PR #364 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/364"
     provenance:
@@ -5527,7 +5527,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-14
+    verified_at: "2026-07-14"
     verified_against: "gh: PR #365 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/365"
     provenance:
@@ -5542,7 +5542,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-14
+    verified_at: "2026-07-14"
     verified_against: "gh: PR #366 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/366"
     provenance:
@@ -5557,7 +5557,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-14
+    verified_at: "2026-07-14"
     verified_against: "gh: PR #367 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/367"
     provenance:
@@ -5572,7 +5572,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-14
+    verified_at: "2026-07-14"
     verified_against: "gh: PR #368 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/368"
     provenance:
@@ -5587,7 +5587,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-15
+    verified_at: "2026-07-15"
     verified_against: "gh: PR #369 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/369"
     provenance:
@@ -5602,7 +5602,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-15
+    verified_at: "2026-07-15"
     verified_against: "gh: PR #370 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/370"
     provenance:
@@ -5617,7 +5617,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #371 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/371"
     provenance:
@@ -5632,7 +5632,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #372 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/372"
     provenance:
@@ -5647,7 +5647,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #373 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/373"
     provenance:
@@ -5662,7 +5662,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #374 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/374"
     provenance:
@@ -5677,7 +5677,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #375 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/375"
     provenance:
@@ -5692,7 +5692,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #376 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/376"
     provenance:
@@ -5707,7 +5707,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #377 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/377"
     provenance:
@@ -5722,7 +5722,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #378 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/378"
     provenance:
@@ -5737,7 +5737,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #379 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/379"
     provenance:
@@ -5752,7 +5752,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #380 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/380"
     provenance:
@@ -5767,7 +5767,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #381 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/381"
     provenance:
@@ -5782,7 +5782,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #382 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/382"
     provenance:
@@ -5797,7 +5797,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #383 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/383"
     provenance:
@@ -5812,7 +5812,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #384 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/384"
     provenance:
@@ -5827,7 +5827,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #385 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/385"
     provenance:
@@ -5842,7 +5842,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #386 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/386"
     provenance:
@@ -5857,7 +5857,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #387 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/387"
     provenance:
@@ -5872,7 +5872,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #388 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/388"
     provenance:
@@ -5887,7 +5887,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #389 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/389"
     provenance:
@@ -5902,7 +5902,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #390 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/390"
     provenance:
@@ -5917,7 +5917,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #391 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/391"
     provenance:
@@ -5932,7 +5932,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #392 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/392"
     provenance:
@@ -5947,7 +5947,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #393 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/393"
     provenance:
@@ -5962,7 +5962,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #394 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/394"
     provenance:
@@ -5977,7 +5977,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #395 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/395"
     provenance:
@@ -5992,7 +5992,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     verified_against: "gh: PR #396 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/396"
     provenance:
@@ -6007,7 +6007,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #397 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/397"
     provenance:
@@ -6022,7 +6022,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #398 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/398"
     provenance:
@@ -6037,7 +6037,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #399 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/399"
     provenance:
@@ -6052,7 +6052,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #400 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/400"
     provenance:
@@ -6067,7 +6067,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #401 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/401"
     provenance:
@@ -6082,7 +6082,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #402 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/402"
     provenance:
@@ -6097,7 +6097,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #403 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/403"
     provenance:
@@ -6112,7 +6112,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #404 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/404"
     provenance:
@@ -6127,7 +6127,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #405 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/405"
     provenance:
@@ -6142,7 +6142,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #406 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/406"
     provenance:
@@ -6157,7 +6157,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #407 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/407"
     provenance:
@@ -6172,7 +6172,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #408 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/408"
     provenance:
@@ -6187,7 +6187,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #409 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/409"
     provenance:
@@ -6202,7 +6202,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #410 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/410"
     provenance:
@@ -6217,7 +6217,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #411 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/411"
     provenance:
@@ -6232,7 +6232,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #412 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/412"
     provenance:
@@ -6247,7 +6247,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     verified_against: "gh: PR #413 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/413"
     provenance:
@@ -6262,7 +6262,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #414 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/414"
     provenance:
@@ -6277,7 +6277,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #415 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/415"
     provenance:
@@ -6292,7 +6292,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #416 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/416"
     provenance:
@@ -6307,7 +6307,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #417 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/417"
     provenance:
@@ -6322,7 +6322,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #418 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/418"
     provenance:
@@ -6337,7 +6337,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #419 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/419"
     provenance:
@@ -6352,7 +6352,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #420 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/420"
     provenance:
@@ -6367,7 +6367,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #421 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/421"
     provenance:
@@ -6382,7 +6382,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #422 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/422"
     provenance:
@@ -6397,7 +6397,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #423 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/423"
     provenance:
@@ -6412,7 +6412,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #424 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/424"
     provenance:
@@ -6427,7 +6427,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #425 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/425"
     provenance:
@@ -6442,7 +6442,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #426 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/426"
     provenance:
@@ -6457,7 +6457,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #427 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/427"
     provenance:
@@ -6472,7 +6472,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #428 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/428"
     provenance:
@@ -6487,7 +6487,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #429 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/429"
     provenance:
@@ -6502,7 +6502,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #430 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/430"
     provenance:
@@ -6517,7 +6517,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #431 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/431"
     provenance:
@@ -6532,7 +6532,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #432 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/432"
     provenance:
@@ -6547,7 +6547,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #433 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/433"
     provenance:
@@ -6562,7 +6562,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     verified_against: "gh: PR #434 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/434"
     provenance:
@@ -6577,7 +6577,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #435 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/435"
     provenance:
@@ -6592,7 +6592,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #436 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/436"
     provenance:
@@ -6607,7 +6607,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #437 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/437"
     provenance:
@@ -6622,7 +6622,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #438 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/438"
     provenance:
@@ -6637,7 +6637,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #439 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/439"
     provenance:
@@ -6652,7 +6652,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #440 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/440"
     provenance:
@@ -6667,7 +6667,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #441 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/441"
     provenance:
@@ -6682,7 +6682,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #442 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/442"
     provenance:
@@ -6697,7 +6697,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #443 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/443"
     provenance:
@@ -6712,7 +6712,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #444 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/444"
     provenance:
@@ -6727,7 +6727,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #445 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/445"
     provenance:
@@ -6742,7 +6742,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #446 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/446"
     provenance:
@@ -6757,7 +6757,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #447 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/447"
     provenance:
@@ -6772,7 +6772,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #448 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/448"
     provenance:
@@ -6787,7 +6787,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #449 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/449"
     provenance:
@@ -6802,7 +6802,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #450 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/450"
     provenance:
@@ -6817,7 +6817,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #451 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/451"
     provenance:
@@ -6832,7 +6832,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #452 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/452"
     provenance:
@@ -6847,7 +6847,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     verified_against: "gh: PR #453 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/453"
     provenance:
@@ -6862,7 +6862,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     verified_against: "gh: PR #454 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/454"
     provenance:
@@ -6877,7 +6877,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     verified_against: "gh: PR #455 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/455"
     provenance:
@@ -6892,7 +6892,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     verified_against: "gh: PR #456 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/456"
     provenance:
@@ -6907,7 +6907,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     verified_against: "gh: PR #457 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/457"
     provenance:
@@ -6922,7 +6922,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     verified_against: "gh: PR #458 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/458"
     provenance:
@@ -6937,7 +6937,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     verified_against: "gh: PR #459 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/459"
     provenance:
@@ -6952,7 +6952,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     verified_against: "gh: PR #460 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/460"
     provenance:
@@ -6967,7 +6967,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: "gh: PR #461 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/461"
     provenance:
@@ -6982,7 +6982,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: "gh: PR #462 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/462"
     provenance:
@@ -6997,7 +6997,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: "gh: PR #463 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/463"
     provenance:
@@ -7012,7 +7012,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: "gh: PR #464 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/464"
     provenance:
@@ -7027,7 +7027,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: "gh: PR #465 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/465"
     provenance:
@@ -7042,7 +7042,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: "gh: PR #466 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/466"
     provenance:
@@ -7057,7 +7057,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: "gh: PR #467 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/467"
     provenance:
@@ -7072,7 +7072,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: "gh: PR #468 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/468"
     provenance:
@@ -7087,7 +7087,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: "gh: PR #469 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/469"
     provenance:
@@ -7102,7 +7102,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: "gh: PR #470 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/470"
     provenance:
@@ -7117,7 +7117,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: "gh: PR #471 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/471"
     provenance:
@@ -7132,7 +7132,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: "gh: PR #472 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/472"
     provenance:
@@ -7147,7 +7147,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: "gh: PR #473 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/473"
     provenance:
@@ -7162,7 +7162,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: "gh: PR #474 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/474"
     provenance:
@@ -7177,7 +7177,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: "gh: PR #475 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/475"
     provenance:
@@ -7192,7 +7192,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: "gh: PR #476 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/476"
     provenance:
@@ -7207,7 +7207,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: "gh: PR #477 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/477"
     provenance:
@@ -7222,7 +7222,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: "gh: PR #478 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/478"
     provenance:
@@ -7237,7 +7237,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #479 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/479"
     provenance:
@@ -7252,7 +7252,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #480 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/480"
     provenance:
@@ -7267,7 +7267,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #481 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/481"
     provenance:
@@ -7282,7 +7282,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #482 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/482"
     provenance:
@@ -7297,7 +7297,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #483 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/483"
     provenance:
@@ -7312,7 +7312,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #484 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/484"
     provenance:
@@ -7327,7 +7327,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #485 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/485"
     provenance:
@@ -7342,7 +7342,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #486 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/486"
     provenance:
@@ -7357,7 +7357,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #487 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/487"
     provenance:
@@ -7372,7 +7372,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #488 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/488"
     provenance:
@@ -7387,7 +7387,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #489 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/489"
     provenance:
@@ -7402,7 +7402,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #490 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/490"
     provenance:
@@ -7417,7 +7417,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: "gh: PR #491 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/491"
     provenance:
@@ -7432,7 +7432,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #492 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/492"
     provenance:
@@ -7447,7 +7447,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #493 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/493"
     provenance:
@@ -7462,7 +7462,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #494 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/494"
     provenance:
@@ -7477,7 +7477,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #495 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/495"
     provenance:
@@ -7492,7 +7492,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #496 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/496"
     provenance:
@@ -7507,7 +7507,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #497 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/497"
     provenance:
@@ -7522,7 +7522,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #498 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/498"
     provenance:
@@ -7537,7 +7537,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #499 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/499"
     provenance:
@@ -7552,7 +7552,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #500 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/500"
     provenance:
@@ -7567,7 +7567,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #501 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/501"
     provenance:
@@ -7582,7 +7582,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #502 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/502"
     provenance:
@@ -7597,7 +7597,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #503 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/503"
     provenance:
@@ -7612,7 +7612,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #504 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/504"
     provenance:
@@ -7627,7 +7627,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: "gh: PR #505 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/505"
     provenance:
@@ -7642,7 +7642,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-07-31
+    verified_at: "2026-07-31"
     verified_against: "gh: PR #506 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/506"
     provenance:
@@ -7657,7 +7657,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-01
+    verified_at: "2026-08-01"
     verified_against: "gh: PR #507 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/507"
     provenance:
@@ -7672,7 +7672,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-01
+    verified_at: "2026-08-01"
     verified_against: "gh: PR #508 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/508"
     provenance:
@@ -7687,7 +7687,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: "gh: PR #509 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/509"
     provenance:
@@ -7702,7 +7702,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: "gh: PR #510 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/510"
     provenance:
@@ -7717,7 +7717,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: "gh: PR #511 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/511"
     provenance:
@@ -7732,7 +7732,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: "gh: PR #512 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/512"
     provenance:
@@ -7747,7 +7747,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: "gh: PR #513 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/513"
     provenance:
@@ -7762,7 +7762,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: "gh: PR #514 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/514"
     provenance:
@@ -7777,7 +7777,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: "gh: PR #515 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/515"
     provenance:
@@ -7792,7 +7792,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #516 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/516"
     provenance:
@@ -7807,7 +7807,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #517 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/517"
     provenance:
@@ -7822,7 +7822,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #518 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/518"
     provenance:
@@ -7837,7 +7837,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #519 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/519"
     provenance:
@@ -7852,7 +7852,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #520 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/520"
     provenance:
@@ -7867,7 +7867,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #521 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/521"
     provenance:
@@ -7882,7 +7882,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #522 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/522"
     provenance:
@@ -7897,7 +7897,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #523 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/523"
     provenance:
@@ -7912,7 +7912,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #524 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/524"
     provenance:
@@ -7927,7 +7927,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #525 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/525"
     provenance:
@@ -7942,7 +7942,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #526 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/526"
     provenance:
@@ -7957,7 +7957,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #527 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/527"
     provenance:
@@ -7972,7 +7972,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #528 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/528"
     provenance:
@@ -7987,7 +7987,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #529 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/529"
     provenance:
@@ -8002,7 +8002,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #530 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/530"
     provenance:
@@ -8017,7 +8017,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #531 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/531"
     provenance:
@@ -8032,7 +8032,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #532 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/532"
     provenance:
@@ -8047,7 +8047,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: "gh: PR #533 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/533"
     provenance:
@@ -8062,7 +8062,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-04
+    verified_at: "2026-08-04"
     verified_against: "gh: PR #534 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/534"
     provenance:
@@ -8077,7 +8077,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-04
+    verified_at: "2026-08-04"
     verified_against: "gh: PR #535 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/535"
     provenance:
@@ -8092,7 +8092,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-04
+    verified_at: "2026-08-04"
     verified_against: "gh: PR #536 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/536"
     provenance:
@@ -8107,7 +8107,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-04
+    verified_at: "2026-08-04"
     verified_against: "gh: PR #537 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/537"
     provenance:
@@ -8122,7 +8122,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: "gh: PR #538 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/538"
     provenance:
@@ -8137,7 +8137,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: "gh: PR #539 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/539"
     provenance:
@@ -8152,7 +8152,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: "gh: PR #540 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/540"
     provenance:
@@ -8167,7 +8167,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: "gh: PR #541 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/541"
     provenance:
@@ -8182,7 +8182,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: "gh: PR #542 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/542"
     provenance:
@@ -8197,7 +8197,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #543 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/543"
     provenance:
@@ -8212,7 +8212,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #544 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/544"
     provenance:
@@ -8227,7 +8227,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #545 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/545"
     provenance:
@@ -8242,7 +8242,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #546 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/546"
     provenance:
@@ -8257,7 +8257,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #547 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/547"
     provenance:
@@ -8272,7 +8272,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #548 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/548"
     provenance:
@@ -8287,7 +8287,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #549 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/549"
     provenance:
@@ -8302,7 +8302,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #550 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/550"
     provenance:
@@ -8317,7 +8317,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #551 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/551"
     provenance:
@@ -8332,7 +8332,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #552 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/552"
     provenance:
@@ -8347,7 +8347,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "gh: PR #553 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/553"
     provenance:
@@ -8362,7 +8362,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-07
+    verified_at: "2026-08-07"
     verified_against: "gh: PR #554 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/554"
     provenance:
@@ -8377,7 +8377,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-07
+    verified_at: "2026-08-07"
     verified_against: "gh: PR #555 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/555"
     provenance:
@@ -8392,7 +8392,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-07
+    verified_at: "2026-08-07"
     verified_against: "gh: PR #556 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/556"
     provenance:
@@ -8407,7 +8407,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-07
+    verified_at: "2026-08-07"
     verified_against: "gh: PR #557 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/557"
     provenance:
@@ -8422,7 +8422,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-08
+    verified_at: "2026-08-08"
     verified_against: "gh: PR #558 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/558"
     provenance:
@@ -8437,7 +8437,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-08
+    verified_at: "2026-08-08"
     verified_against: "gh: PR #559 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/559"
     provenance:
@@ -8452,7 +8452,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-08
+    verified_at: "2026-08-08"
     verified_against: "gh: PR #560 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/560"
     provenance:
@@ -8467,7 +8467,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-08
+    verified_at: "2026-08-08"
     verified_against: "gh: PR #561 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/561"
     provenance:
@@ -8482,7 +8482,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-09
+    verified_at: "2026-08-09"
     verified_against: "gh: PR #562 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/562"
     provenance:
@@ -8497,7 +8497,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-09
+    verified_at: "2026-08-09"
     verified_against: "gh: PR #563 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/563"
     provenance:
@@ -8512,7 +8512,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-09
+    verified_at: "2026-08-09"
     verified_against: "gh: PR #564 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/564"
     provenance:
@@ -8527,7 +8527,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-09
+    verified_at: "2026-08-09"
     verified_against: "gh: PR #565 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/565"
     provenance:
@@ -8542,7 +8542,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-09
+    verified_at: "2026-08-09"
     verified_against: "gh: PR #566 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/566"
     provenance:
@@ -8557,7 +8557,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-09
+    verified_at: "2026-08-09"
     verified_against: "gh: PR #567 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/567"
     provenance:
@@ -8572,7 +8572,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-09
+    verified_at: "2026-08-09"
     verified_against: "gh: PR #568 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/568"
     provenance:
@@ -8587,7 +8587,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: "gh: PR #569 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/569"
     provenance:
@@ -8602,7 +8602,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-09
+    verified_at: "2026-08-09"
     verified_against: "gh: PR #570 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/570"
     provenance:
@@ -8617,7 +8617,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: "gh: PR #571 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/571"
     provenance:
@@ -8632,7 +8632,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: "gh: PR #572 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/572"
     provenance:
@@ -8647,7 +8647,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: "gh: PR #573 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/573"
     provenance:
@@ -8662,7 +8662,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: "gh: PR #574 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/574"
     provenance:
@@ -8677,7 +8677,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: "gh: PR #575 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/575"
     provenance:
@@ -8692,7 +8692,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: "gh: PR #576 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/576"
     provenance:
@@ -8707,7 +8707,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: "gh: PR #577 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/577"
     provenance:
@@ -8722,7 +8722,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-11
+    verified_at: "2026-08-11"
     verified_against: "gh: PR #578 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/578"
     provenance:
@@ -8737,7 +8737,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-11
+    verified_at: "2026-08-11"
     verified_against: "gh: PR #579 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/579"
     provenance:
@@ -8752,7 +8752,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-11
+    verified_at: "2026-08-11"
     verified_against: "gh: PR #580 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/580"
     provenance:
@@ -8767,7 +8767,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-11
+    verified_at: "2026-08-11"
     verified_against: "gh: PR #581 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/581"
     provenance:
@@ -8782,7 +8782,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-11
+    verified_at: "2026-08-11"
     verified_against: "gh: PR #582 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/582"
     provenance:
@@ -8797,7 +8797,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-12
+    verified_at: "2026-08-12"
     verified_against: "gh: PR #583 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/583"
     provenance:
@@ -8812,7 +8812,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-12
+    verified_at: "2026-08-12"
     verified_against: "gh: PR #584 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/584"
     provenance:
@@ -8827,7 +8827,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: "gh: PR #585 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/585"
     provenance:
@@ -8842,7 +8842,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: "gh: PR #586 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/586"
     provenance:
@@ -8857,7 +8857,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: "gh: PR #587 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/587"
     provenance:
@@ -8872,7 +8872,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: "gh: PR #588 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/588"
     provenance:
@@ -8887,7 +8887,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: "gh: PR #589 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/589"
     provenance:
@@ -8902,7 +8902,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: "gh: PR #590 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/590"
     provenance:
@@ -8917,7 +8917,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: "gh: PR #591 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/591"
     provenance:
@@ -8932,7 +8932,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: "gh: PR #592 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/592"
     provenance:
@@ -8947,7 +8947,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: "gh: PR #593 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/593"
     provenance:
@@ -8962,7 +8962,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: "gh: PR #594 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/594"
     provenance:
@@ -8977,7 +8977,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: "gh: PR #595 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/595"
     provenance:
@@ -8992,7 +8992,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: "gh: PR #596 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/596"
     provenance:
@@ -9007,7 +9007,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: "gh: PR #597 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/597"
     provenance:
@@ -9022,7 +9022,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: "gh: PR #598 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/598"
     provenance:
@@ -9037,7 +9037,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: "gh: PR #599 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/599"
     provenance:
@@ -9052,7 +9052,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: "gh: PR #600 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/600"
     provenance:
@@ -9067,7 +9067,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: "gh: PR #601 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/601"
     provenance:
@@ -9082,7 +9082,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: "gh: PR #602 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/602"
     provenance:
@@ -9097,7 +9097,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: "gh: PR #603 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/603"
     provenance:
@@ -9112,7 +9112,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: "gh: PR #604 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/604"
     provenance:
@@ -9127,7 +9127,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: "gh: PR #605 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/605"
     provenance:
@@ -9142,7 +9142,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: "gh: PR #606 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/606"
     provenance:
@@ -9157,7 +9157,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: "gh: PR #607 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/607"
     provenance:
@@ -9172,7 +9172,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: "gh: PR #608 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/608"
     provenance:
@@ -9187,7 +9187,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: "gh: PR #609 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/609"
     provenance:
@@ -9202,7 +9202,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: "gh: PR #610 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/610"
     provenance:
@@ -9217,7 +9217,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: "gh: PR #611 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/611"
     provenance:
@@ -9232,7 +9232,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: "gh: PR #612 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/612"
     provenance:
@@ -9247,7 +9247,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: "gh: PR #614 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/614"
     provenance:
@@ -9262,7 +9262,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: "gh: PR #615 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/615"
     provenance:
@@ -9277,7 +9277,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: "gh: PR #616 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/616"
     provenance:
@@ -9292,7 +9292,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: "gh: PR #617 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/617"
     provenance:
@@ -9307,7 +9307,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: "gh: PR #618 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/618"
     provenance:
@@ -9322,7 +9322,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: "gh: PR #619 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/619"
     provenance:
@@ -9337,7 +9337,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: "gh: PR #620 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/620"
     provenance:
@@ -9352,7 +9352,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: "gh: PR #621 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/621"
     provenance:
@@ -9367,7 +9367,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: "gh: PR #623 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/623"
     provenance:
@@ -9382,7 +9382,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: "gh: PR #624 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/624"
     provenance:
@@ -9397,7 +9397,7 @@ nodes:
     impact: 1
     confidence: 1.0
     status: done
-    verified_at: 2026-08-17
+    verified_at: "2026-08-17"
     verified_against: "gh: PR #625 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/625"
     provenance:
@@ -9412,7 +9412,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-17
+    verified_at: "2026-08-17"
     verified_against: "gh: PR #626 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/626"
     provenance:
@@ -9427,7 +9427,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-17
+    verified_at: "2026-08-17"
     verified_against: "gh: PR #627 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/627"
     provenance:
@@ -9442,7 +9442,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-17
+    verified_at: "2026-08-17"
     verified_against: "gh: PR #628 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/628"
     provenance:
@@ -9457,7 +9457,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-17
+    verified_at: "2026-08-17"
     verified_against: "gh: PR #629 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/629"
     provenance:
@@ -9472,7 +9472,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-18
+    verified_at: "2026-08-18"
     verified_against: "gh: PR #630 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/630"
     provenance:
@@ -9487,7 +9487,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-18
+    verified_at: "2026-08-18"
     verified_against: "gh: PR #631 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/631"
     provenance:
@@ -9502,7 +9502,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-18
+    verified_at: "2026-08-18"
     verified_against: "gh: PR #632 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/632"
     provenance:
@@ -9517,7 +9517,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-18
+    verified_at: "2026-08-18"
     verified_against: "gh: PR #633 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/633"
     provenance:
@@ -9532,7 +9532,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-19
+    verified_at: "2026-08-19"
     verified_against: "gh: PR #634 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/634"
     provenance:
@@ -9547,7 +9547,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-19
+    verified_at: "2026-08-19"
     verified_against: "gh: PR #635 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/635"
     provenance:
@@ -9562,7 +9562,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "gh: PR #636 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/636"
     provenance:
@@ -9577,7 +9577,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "gh: PR #637 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/637"
     provenance:
@@ -9592,7 +9592,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "gh: PR #638 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/638"
     provenance:
@@ -9607,7 +9607,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "gh: PR #639 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/639"
     provenance:
@@ -9622,7 +9622,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "gh: PR #640 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/640"
     provenance:
@@ -9637,7 +9637,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "gh: PR #641 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/641"
     provenance:
@@ -9652,7 +9652,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "gh: PR #642 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/642"
     provenance:
@@ -9667,7 +9667,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "gh: PR #643 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/643"
     provenance:
@@ -9682,7 +9682,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "gh: PR #644 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/644"
     provenance:
@@ -9697,7 +9697,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-21
+    verified_at: "2026-08-21"
     verified_against: "gh: PR #645 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/645"
     provenance:
@@ -9712,7 +9712,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-21
+    verified_at: "2026-08-21"
     verified_against: "gh: PR #646 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/646"
     provenance:
@@ -9727,7 +9727,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-21
+    verified_at: "2026-08-21"
     verified_against: "gh: PR #647 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/647"
     provenance:
@@ -9742,7 +9742,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-21
+    verified_at: "2026-08-21"
     verified_against: "gh: PR #648 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/648"
     provenance:
@@ -9757,7 +9757,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-21
+    verified_at: "2026-08-21"
     verified_against: "gh: PR #649 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/649"
     provenance:
@@ -9772,7 +9772,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-22
+    verified_at: "2026-08-22"
     verified_against: "gh: PR #650 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/650"
     provenance:
@@ -9787,7 +9787,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-22
+    verified_at: "2026-08-22"
     verified_against: "gh: PR #651 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/651"
     provenance:
@@ -9802,7 +9802,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-22
+    verified_at: "2026-08-22"
     verified_against: "gh: PR #652 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/652"
     provenance:
@@ -9817,7 +9817,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-22
+    verified_at: "2026-08-22"
     verified_against: "gh: PR #653 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/653"
     provenance:
@@ -9832,7 +9832,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-22
+    verified_at: "2026-08-22"
     verified_against: "gh: PR #654 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/654"
     provenance:
@@ -9847,7 +9847,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "gh: PR #655 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/655"
     provenance:
@@ -9862,7 +9862,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "gh: PR #656 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/656"
     provenance:
@@ -9877,7 +9877,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "gh: PR #657 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/657"
     provenance:
@@ -9892,7 +9892,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "gh: PR #658 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/658"
     provenance:
@@ -9907,7 +9907,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "gh: PR #659 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/659"
     provenance:
@@ -9922,7 +9922,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "gh: PR #660 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/660"
     provenance:
@@ -9937,7 +9937,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "gh: PR #661 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/661"
     provenance:
@@ -9952,7 +9952,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "gh: PR #662 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/662"
     provenance:
@@ -9967,7 +9967,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: "gh: PR #663 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/663"
     provenance:
@@ -9982,7 +9982,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: "gh: PR #664 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/664"
     provenance:
@@ -9997,7 +9997,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: "gh: PR #665 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/665"
     provenance:
@@ -10012,7 +10012,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-24
+    verified_at: "2026-08-24"
     verified_against: "gh: PR #666 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/666"
     provenance:
@@ -10027,7 +10027,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-25
+    verified_at: "2026-08-25"
     verified_against: "gh: PR #667 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/667"
     provenance:
@@ -10042,7 +10042,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-25
+    verified_at: "2026-08-25"
     verified_against: "gh: PR #668 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/668"
     provenance:
@@ -10057,7 +10057,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-25
+    verified_at: "2026-08-25"
     verified_against: "gh: PR #669 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/669"
     provenance:
@@ -10072,7 +10072,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-25
+    verified_at: "2026-08-25"
     verified_against: "gh: PR #670 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/670"
     provenance:
@@ -10087,7 +10087,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-25
+    verified_at: "2026-08-25"
     verified_against: "gh: PR #671 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/671"
     provenance:
@@ -10102,7 +10102,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-25
+    verified_at: "2026-08-25"
     verified_against: "gh: PR #672 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/672"
     provenance:
@@ -10117,7 +10117,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-25
+    verified_at: "2026-08-25"
     verified_against: "gh: PR #673 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/673"
     provenance:
@@ -10132,7 +10132,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "gh: PR #674 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/674"
     provenance:
@@ -10147,7 +10147,7 @@ nodes:
     impact: 2
     confidence: 1.0
     status: done
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "gh: PR #675 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/675"
     provenance:
@@ -10162,7 +10162,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "gh: PR #676 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/676"
     provenance:
@@ -10177,7 +10177,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "gh: PR #677 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/677"
     provenance:
@@ -10192,7 +10192,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "gh: PR #678 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/678"
     provenance:
@@ -10207,7 +10207,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "gh: PR #679 merged"
     trace: "https://github.com/marciocar/onion-evolve/pull/679"
     provenance:

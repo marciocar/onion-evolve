@@ -32,7 +32,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "L1 catraca de escopo — DECLARADO: gate '0 violacoes, verde, allowlist completa' le-se como fronteira coberta; VERIFICADO: das 8 travessias reais so 1 e pega, 7/8 invisiveis (wrapper streamAgent + export que lava a origem); falso-verde por ESCOPO DE DETECCAO (3o modo, gate correto mas mede a coisa errada)"
     trace: "docs/evolution/inbox/_processed/2026-07-25-sinal-catraca-falso-verde-arandek.md L24-61 (esp. L33-48); Arandek scripts/lint-provider-boundary.ts; source_commit 5e3ea5ee46ac"
     provenance:
@@ -46,7 +46,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "develop-fantasma — DECLARADO: existencia do ref origin/develop + prosa dos comentarios de deploy-staging.yml afirmam GitFlow (develop=integracao); VERIFICADO: triggers reais executam trunk-based (deploy-prod push em main; staging por tag staging-*), develop nao gateia nada, 95 commits atras / 43 dias parada; existencia != autoridade"
     trace: "docs/evolution/inbox/_processed/2026-07-25-contra-sinal-develop-fantasma-v2.md L24-72; core resolve-integration-branch.sh:49-51 (existencia antes de origin/HEAD); acao adotante commit b7182ccb"
     provenance:
@@ -60,7 +60,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "L2 pin herdado — DECLARADO: pin 1.36.0 do compose destilado tratado (pela acao) como transporte neutro herdado; VERIFICADO: versao e conteudo, 5 minors atras (1.36->1.41), faltavam fixes de seguranca reais (account enumeration 1.39, MFA adaptativa 1.38, KEK do Secret Vault) — heranca seletiva de ceticismo, gap so achado por pergunta do maestro"
     trace: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md; source_commit 65d8a7501a03; stack onion-logto@7c008b2"
     provenance:

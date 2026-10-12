@@ -3,7 +3,7 @@
 meta:
   id: onion-tier-matrix-2026-07
   schema_version: "1"
-  baseline: 2026-07-19
+  baseline: "2026-07-19"
   date: 2026-07-19
 # Arestas para nó de OUTRO grafo (contrato v4.3). Migradas de x_supersedes_external e
 # x_constrained_by em 2026-10-10 (SAC-98); sem `from`, quem aponta é o grafo inteiro.
@@ -20,7 +20,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "roles.yaml:20-25 — standalone.base == hub.base e optional byte-a-byte idênticos; só trust/downstream separa"
     provenance:
       source: ".claude/utils/marketplace/roles.yaml@9ed41811"
@@ -34,7 +34,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "work.md:24 cabeia kg-radar.sh no passo-0, mas onion-engineering.manifest.sh tem VALIDATION=() → dead-ref em todo standalone montado"
     provenance:
       source: ".claude/commands/engineer/work.md@9ed41811 + .claude/utils/marketplace/verticals/onion-engineering.manifest.sh@9ed41811"
@@ -48,7 +48,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "Anthropic: Agent Skills plenas em plano pago individual; marketplace+auto-install-por-grupo gated a Team/Enterprise (support.claude.com 13837433)"
     provenance:
       source: "https://support.claude.com/en/articles/13837433 + https://support.claude.com/en/articles/12512176"
@@ -62,7 +62,7 @@ nodes:
     impact: 3
     confidence: 0.8
     status: unverifiable
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "land-and-expand (Datadog): gatilho de expansão = chegada do MULTI (2º repo/2ª pessoa), não uso individual crescer"
   # --- claims ---
   - id: C_REFRAME_SUSTAINED
@@ -72,7 +72,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "reframe (hub=empresa-com-federação / standalone=solo-completo-sem-federação) SUSTENTADO: motor+doutrina+mercado convergem"
     provenance:
       source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
@@ -86,7 +86,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "matriz estruturalmente incompleta: roles.yaml só modela verticais (base/optional), sem eixo p/ os 16 work_tools; nenhum manifesto referencia commands/meta"
     provenance:
       source: ".claude/utils/marketplace/roles.yaml@9ed41811 + verticals/*.manifest.sh@9ed41811"
@@ -99,7 +99,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "doutrina: viaja o SCRIPT (kg-radar.sh), nunca o DADO (.kg.yaml do core); cláusula 'motor não viaja' é escopada à Federação de orgs, não ao door-mesma-família"
     provenance:
       source: "docs/knowledge-base/concepts/public-door-vs-private-core.md@9ed41811 + docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md@9ed41811"
@@ -113,7 +113,7 @@ nodes:
     impact: 4
     confidence: 0.8
     status: confirmed
-    verified_at: 2026-07-19
+    verified_at: "2026-07-19"
     label: "standalone = MOAT/advocacy/dogfood-de-campo, NÃO funil de receita (D5: solo não sustenta volume; receita mira P3/P4-empresa via hub+serviço)"
     provenance:
       source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"

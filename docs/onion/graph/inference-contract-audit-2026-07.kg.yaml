@@ -3,7 +3,7 @@ meta:
   schema_version: "1"
   title: "Audit das 8 passadas adversariais do contrato de conformidade de inferência (L1/L2)"
   layer: audit
-  baseline: 2026-07-23
+  baseline: "2026-07-23"
   note: >
     Elenxo materializado. Cada passada pôs uma correção (claim "está fechado") e o verify
     a REFUTOU um nível mais fundo — até a Regra de Admissão fechar o regresso. Fecha a perna
@@ -161,7 +161,7 @@ nodes:
     status: done
     impact: 5
     confidence: 1.0
-    verified_at: 2026-07-23
+    verified_at: "2026-07-23"
     label: "docs/knowledge-base/concepts/inference-mitigation.md — contrato L1/L2 no origin/main (commit ba6a85b); L3-L6 gated por dogfood do adotante"
     trace: "docs/knowledge-base/concepts/inference-mitigation.md"
     provenance:
@@ -176,7 +176,7 @@ nodes:
     status: done
     impact: 3
     confidence: 1.0
-    verified_at: 2026-07-20
+    verified_at: "2026-07-20"
     label: "migalha 2026-07-20-admission-rule-blindspot — a licao de metodo saiu do contrato para o diario, reusavel no proximo contrato"
     trace: ".claude/diary/2026-07-20-admission-rule-blindspot.md"
     provenance:

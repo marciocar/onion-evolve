@@ -1,8 +1,8 @@
 meta:
   id: typesafe-ai-2026-09
   schema_version: "1"
-  baseline: 2026-09-21
-  review_after: 2026-10-21   # 30d: o tipo DOMINANTE aqui e FERRAMENTA/PLATAFORMA (modelo em early access,
+  baseline: "2026-09-21"
+  review_after: "2026-10-21"   # 30d: o tipo DOMINANTE aqui e FERRAMENTA/PLATAFORMA (modelo em early access,
                              # precos e rate limits que a propria doc declara mutaveis "without notice").
                              # A metade capital/mercado pediria 90d, mas o vendor tem 6 DIAS de vida publica
                              # (launch 2026-09-15) — tudo aqui e cedo por construcao.
@@ -36,7 +36,7 @@ nodes:
     impact: 4
     confidence: 0.7
     label: 'O que e a TypeSafe AI, o que o Jev faz de fato, e qual a relacao (convergencia, atrito e rivalidade) com o Onion? ABERTA no que a rodada NAO fechou: nenhuma medicao propria da API, nenhuma reproducao de benchmark, nenhum dogfood — ver E_LACUNAS_TYPESAFE_0921.'
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'rodada de 2026-09-21: docs.typesafe.ai/llms-full.txt integral + 4 paginas de typesafe.ai + 1 busca de capital'
     trace: 'https://typesafe.ai/'
 
@@ -48,7 +48,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://typesafe.ai/manifesto — lido 2026-09-21'
     source_tier: 10
     source_kind: primary
@@ -66,7 +66,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/introduction/machine-learning-primer — citacao literal do bloco destacado'
     source_tier: 10
     source_kind: primary
@@ -84,8 +84,8 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-21
-    valid_from: 2026-09
+    verified_at: "2026-09-21"
+    valid_from: "2026-09"
     verified_against: 'imprensa concordante em >=4 veiculos (finsmes, theaiinsider, stackfutures, runtimewire) — NAO confirmado em fonte primaria do vendor; typesafe.ai/team diz apenas "top-tier investors" sem nomear'
     source_tier: 4
     source_kind: press
@@ -105,7 +105,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/concepts/system-one — lido integral'
     source_tier: 10
     source_kind: primary
@@ -123,7 +123,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/introduction/machine-learning-primer — as tres cartas RLHF/RLVR/RLCD'
     source_tier: 10
     source_kind: primary
@@ -141,7 +141,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/introduction/machine-learning-primer e https://docs.typesafe.ai/concepts/system-one — a ressalva aparece nas DUAS paginas'
     source_tier: 10
     source_kind: primary
@@ -159,7 +159,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/api e https://docs.typesafe.ai/primitives — request/response literais lidos'
     source_tier: 10
     source_kind: primary
@@ -177,7 +177,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/confidence — lido integral, incl. o exemplo de limiar por risco'
     source_tier: 10
     source_kind: primary
@@ -197,8 +197,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-21
-    valid_from: 2026-09-21
+    verified_at: "2026-09-21"
+    valid_from: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/models — tabela do jev-1.13.0'
     source_tier: 10
     source_kind: primary
@@ -216,7 +216,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://typesafe.ai/ (home) e o blog de lancamento — numeros LIDOS, nao reproduzidos; nenhuma chamada a API nesta rodada'
     source_tier: 10
     source_kind: primary
@@ -234,7 +234,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/models, /concepts/state, /primitives — ressalvas coletadas de 3 paginas'
     source_tier: 10
     source_kind: primary
@@ -252,7 +252,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/patterns — tabela dos 4 + as paginas de cada um'
     source_tier: 10
     source_kind: primary
@@ -270,7 +270,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/concepts/how-to-build-with-system-one — as tres abas de arquitetura'
     source_tier: 10
     source_kind: primary
@@ -288,7 +288,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/introduction/coding-agents — pagina dedicada a desfazer exatamente esta confusao'
     source_tier: 10
     source_kind: primary
@@ -306,7 +306,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'https://docs.typesafe.ai/agent-skill — comandos de instalacao literais'
     source_tier: 10
     source_kind: primary
@@ -326,7 +326,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'leitura cruzada de docs/knowledge-base/concepts/onion-engine-economy.md §1 e §3 contra E_SYSTEM_ONE_CLASSE_DE_MODELO + E_JEV_NAO_SUBSTITUI_LLM_DE_AGENTE'
     label: 'Jev NAO e um quarto motor do Onion: ele e a Economia de Motores encontrando um fornecedor para o MOTOR 2 que ate agora so existia como plano (o "SLM-ferramenta via SDAAL", cujo unico caso era o adapter `local-slm` do de-identification, GATED, esperando um adotante regulado com runtime). Encaixa nos tres criterios do motor 2 — tarefa estreita e esquematizada, nunca orquestra, entra atras de adapter. Com DOIS refinamentos que a KB nao previa: (a) nao e SLM local, e API remota, o que inverte o argumento de privacidade que motivava o motor 2; (b) traz uma saida que o Onion nao tinha em motor nenhum — decisao tipada COM incerteza calibrada. O shell devolve exit code (declaracao binaria) e o Transformer devolve prosa; nenhum dos dois devolve "nao sei" mensuravel.'
     trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
@@ -337,7 +337,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'docs/knowledge-base/concepts/onion-abstraction-doctrine.md §Teste do Eixo e §Teste do Gatilho, aplicados a E_SYSTEM_ONE_CLASSE_DE_MODELO'
     label: 'Aplicando a Abstraction Doctrine ao proprio achado: decisao-calibrada-como-servico tem HOJE um unico provider real (Jev e declaradamente o primeiro e unico System One Model). Pelo Teste do Eixo, um provider so reprova — o caminho correto e script/uso direto, NAO uma abstracao SDAAL nova. O Teste do Gatilho manda nomear a condicao em vez de pre-cozinhar a costura, e ela e nomeavel: um SEGUNDO fornecedor de decisao tipada com probabilidade calibrada (ou o Jev virar um caminho com consumidor real dentro do core). Enquanto isso nao acontece, escrever um adapter seria o anti-padrao que a propria doutrina cataloga.'
     trace: 'docs/knowledge-base/concepts/onion-abstraction-doctrine.md'
@@ -348,7 +348,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.85
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'E_CONFIDENCE_E_DERIVADO_DA_DISTRIBUICAO + E_CALIBRACAO_E_DE_GRUPO_NAO_DE_RESPOSTA lidos contra a doutrina Onion de certeza-como-campo'
     label: 'A convergencia doutrinaria e forte o bastante para ser desconfortavel: o Onion chegou por dor propria a "a pior verdade e aquela que nao temos certeza" e a certeza COMO CAMPO (verified_at, verified_against, source_tier, confidence no proprio .kg.yaml) — e a TypeSafe construiu um MODELO cujo contrato de treino e justamente devolver incerteza honesta como numero. As duas casas usam ate a mesma palavra: `confidence`. A diferenca material e de origem: no Onion o confidence e CARIMBADO por quem escreve o no (declaracao); no Jev ele e DERIVADO da distribuicao que o modelo produziu (medicao). Isso nao torna o do Onion invalido — torna-o de outra especie, e a distincao precisa ficar dita antes que alguem misture os dois numeros numa conta.'
     trace: 'docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md'
@@ -359,7 +359,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'mapeamento das 3 primitivas (E_TRES_PRIMITIVAS_TIPADAS) contra superficies do core lidas nesta rodada; NENHUM dogfood rodado'
     label: 'Onde no Onion o formato encaixaria, se encaixar — e o encaixe mais limpo ja existe com o nome pronto: o veredito do /meta:kg-freshness e literalmente um Choice de quatro opcoes (CONFIRMED/DRIFTED/REFUTED/UNVERIFIABLE) hoje produzido por um worker Transformer inteiro por no. Outros candidatos, em ordem decrescente de aderencia: triagem do inbox de co-evolucao (Choice de rota); o aside-router de marcadores tipados, hoje casamento de prefixo por lista — e a classe "guarda por lista falha pelo VOCABULARIO, nao pela logica" e exatamente o modo de falha que um Choice com criteria descritivo ataca; e o censo do backlog. ⚠️ CONTRA-FRONTEIRA INEGOCIAVEL: o kg-radar NAO entra nesta lista. Ele e deterministico e sem-LLM POR PROJETO — e o que REPROVA. Trocar o que reprova por um juizo probabilistico de terceiro destruiria a propriedade que o torna util, e nenhum ganho de custo compra isso.'
     trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
@@ -370,7 +370,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'E_PRECO_E_LIMITES_OPERACIONAIS (API remota, sem fine-tune, ZDR so em enterprise) contra a doutrina de de-identification e o INVARIANTE 0 do Onion pessoal'
     label: 'O atrito e estrutural, nao de configuracao: usar Jev significa mandar o `state` — que num core de KG E o conteudo dos nos — para um terceiro. Isso colide de frente com a linha que o Onion ja traçou e pagou: no de-identification o provider `none` RECUSA em vez de redigir-e-passar, e no Onion pessoal o INVARIANTE 0 diz que o KG cru nunca sai do device. Zero data retention existe, mas so em plano enterprise. Some-se a isso o ingles como lingua primaria (E_PRECO_E_LIMITES_OPERACIONAIS) contra um core cuja doutrina inteira e escrita em pt-BR, e o custo de adocao deixa de ser o preco por token.'
     trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
@@ -381,7 +381,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'E_AI_POWERED_SOFTWARE_CONTRA_AGENTES + E_MACHINE_NATIVE_INTELLIGENCE lidos contra a identidade canonica do Onion (orquestracao agentica em .claude/)'
     label: 'A relacao mais interessante nao e de integracao, e de TESE, e ela e adversaria: a TypeSafe diz "evite loops de agente quando um workflow de software expressa o mesmo comportamento" e projeta 99% maquina-para-maquina. O Onion e um framework de ORQUESTRACAO AGENTICA — sua aposta e que o juizo do Transformer conduzido por spec-as-code vale o custo. As duas teses nao podem estar ambas certas no mesmo territorio. O que DESARMA parcialmente o conflito e que o territorio nao e o mesmo: a TypeSafe mira o caminho de request de PRODUTO (rotear ticket, pontuar risco, classificar em 100ms), e o Onion mira o ciclo de DESENVOLVIMENTO, onde o humano esta no loop por desenho. Mas a fronteira e porosa justamente onde o Onion automatiza juizo sem humano — e e la que a tese rival merece ser medida, nao rebatida.'
     trace: 'docs/knowledge-base/meta/onion-framework-identity.md'
@@ -392,7 +392,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'E_SKILL_E_PLUGIN_NO_MARKETPLACE_CLAUDE_CODE contra o estado publicado do marketplace do Onion'
     label: 'Um lab de US$ 40M com fundador co-inventor do RLHF escolheu, para alcancar desenvolvedores, EXATAMENTE a superficie que o Onion escolheu: skill + plugin no marketplace do Claude Code, com auto-update e namespace /<plugin>:<skill>. Isso e sinal de mercado sobre a aposta de distribuicao do Onion — e vale como corroboracao externa, nao como novidade. O detalhe util e operacional: eles publicam a skill em repo PROPRIO (typesafe-ai/skills) e oferecem instalacao manual copiando o diretorio inteiro "including its reference files" — o mesmo problema de materializacao que o ciclo de publicacao do Onion resolve por clone e push.'
     trace: 'docs/knowledge-base/meta/onion-framework-identity.md'
@@ -405,7 +405,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     label: 'DECISAO desta rodada: documentar e NAO adotar. Nao escrever adapter (reprovado por C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO), nao alterar motor nenhum, nao abrir superficie. GATILHO REESCRITO em 2026-09-21 pela medicao: o gatilho original era "medir o veredito do /meta:kg-freshness como Choice de 4 contra nos ja julgados", e o experimento de auto-consistencia (E_AUTOCONSISTENCIA_MEDIDA_0921) mostrou que esse teste nao decidiria nada — a moda ja acerta 5/5 sem vendor, e o custo mora na MEDICAO, que Jev nao faz (C_JEV_NAO_COBRE_A_PARTE_CARA). O gatilho valido agora e outro, e mais estreito: uma superficie do Onion onde UMA medicao ja feita alimente MUITAS perguntas independentes (o speculative fan-out deles) — o candidato honesto e a triagem do inbox de co-evolucao, onde o arquivo ja esta lido e sobram N classificacoes sobre o mesmo texto. So ai a chave de API responde a uma pergunta que o Transformer sozinho nao responde de graca. Ate esse gatilho disparar, este grafo e leitura, nao backlog.'
     trace: 'docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md'
 
@@ -415,7 +415,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: '25 julgamentos REAIS rodados nesta maquina: 5 nos do proprio corpus x 5 repeticoes independentes, um subagente read-only por julgamento, cada um recebendo SO o enunciado (sem ver o status: selado, para nao copiar gabarito)'
     source_tier: 10
     source_kind: primary
@@ -433,7 +433,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.85
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'inspecao dos 25 campos COMANDO devolvidos pelos workers em E_AUTOCONSISTENCIA_MEDIDA_0921, contra a fronteira que a doc do vendor declara em E_SYSTEM_ONE_CLASSE_DE_MODELO'
     label: 'CORRECAO ao candidato #1 desta mesma rodada, vinda da medicao propria: no /meta:kg-freshness o custo NAO esta no julgamento, esta na MEDICAO. Os 38k tokens por worker foram gastos saindo e medindo — rodar git branch -a, grep no members.yaml, ls no automation-ladder-registry, abrir o repo de um adotante. Escolher o enum depois disso e a fracao barata. E Jev, por construcao, NAO mede: ele avalia um `state` que VOCE ja montou. Logo ele substituiria so o ultimo passo, que e justamente o que ja sai de graca — e NAO substituiria a exploracao, que e o que custa. O candidato #1 nao esta morto, mas esta REBAIXADO: o desenho que sobreviveria e o inverso do que escrevi (um worker Transformer MEDE e monta o state; Jev julga N perguntas sobre esse state de uma vez, com distribuicao), e ai o ganho e amortizar MUITAS perguntas sobre UMA medicao — que e o padrao speculative fan-out deles, nao o kg-freshness como ele existe hoje.'
     trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
@@ -444,7 +444,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-09-21
+    verified_at: "2026-09-21"
     verified_against: 'inventario do que esta rodada NAO fez — ausencia medida, nao esquecida'
     source_tier: 10
     source_kind: primary

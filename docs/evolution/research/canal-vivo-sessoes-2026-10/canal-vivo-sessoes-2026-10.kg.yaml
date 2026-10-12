@@ -1,8 +1,8 @@
 meta:
   id: canal-vivo-sessoes-2026-10
   schema_version: "1"
-  baseline: 2026-10-07
-  review_after: 2026-11-06   # cadência FERRAMENTA = 30d. Tipo dominante: comportamento do Claude Code
+  baseline: "2026-10-07"
+  review_after: "2026-11-06"   # cadência FERRAMENTA = 30d. Tipo dominante: comportamento do Claude Code
                              # (cross-session messaging, Remote Control, Channels em research preview,
                              # Agent Teams experimental), que muda por release e cujas flags o próprio doc
                              # declara instáveis. O eixo A2A (spec 1.0) e o de Slack/Teams mudam mais devagar,
@@ -55,7 +55,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'On another of your machines | Through Anthropic servers, arriving over that machine's [Remote Control](/docs/en/remote-control) connection' — locator: Message sessions on other machines, tabela de transporte — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -73,7 +73,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Your Remote Control sessions on other machines**: shown while this session is connected to [Remote Control](/docs/en/remote-control), and labeled `Remote Control`.' — locator: See which sessions Claude can reach, lista de linhas — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -91,7 +91,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'If this session isn't connected to Remote Control when Claude sends to a session beyond this machine, the message still goes through, but without a [reply address](#what-a-message-looks-like), so the receiving Claude can't answer it.' — locator: Message sessions on other machines, parágrafo após a lista de condições — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -109,7 +109,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'The receiving session bypasses permission prompts**: Claude Code holds each message for your approval. It delivers one only when the sending session identifies itself as also bypassing.' — locator: Control inbound messages, lista do default; Non-interactive sessions — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -127,7 +127,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Claude Code asks for your approval before Claude's message to a session beyond this machine leaves, even in `bypassPermissions` mode, which skips ordinary permission prompts.' — locator: Require approval for cross-machine messages — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -146,7 +146,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'available on Pro, Max, Team, and Enterprise plans. API keys are not supported. On Team and Enterprise, an Owner must first enable the Remote Control toggle in' — locator: Requirements, bullet Subscription (l.28); login claude.ai no bullet Authentication (l.29) e Troubleshooting (l.457) — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -164,7 +164,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Auto-connect signs in with your own claude.ai account, so a session it starts appears only in your own account's Claude apps and grants no one else access.' — locator: Enable Remote Control for all sessions (l.199) — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -182,7 +182,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.75
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'It ties Remote Control access to a known device and a recent authentication, not just a signed-in account.' — locator: Trusted Devices (l.237) — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -200,7 +200,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Your local Claude Code session makes outbound HTTPS requests only and never opens inbound ports on your machine.' — locator: Connection and security, parágrafo 1 (l.221); armazenamento da transcrição no parágrafo 3 (l.225) — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -218,7 +218,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Organizations with Zero Data Retention enabled, or with the HIPAA configuration applied, can't enable Remote Control.' — locator: Connection and security, último parágrafo (l.227) — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -237,7 +237,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Channels are a research preview feature. Availability is rolling out gradually, and the `--channels` flag syntax and protocol contract may change based on feedback.' — locator: channels, seção Research preview, par. 1 — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 10
     source_kind: vendor-on-self
@@ -255,7 +255,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.95
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'If you pass it in non-interactive mode with `-p` or through the Agent SDK, Claude Code ignores the flag and the channel doesn't register.' — locator: channels-reference, seção Test during the research preview, par. 2 — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 10
     source_kind: vendor-on-self
@@ -273,7 +273,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Master switch. Must be `true` for any channel to deliver messages. Blocks all channels including the development flag when off.' — locator: channels, seção Enterprise controls, tabela, linha channelsEnabled — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 10
     source_kind: vendor-on-self
@@ -291,7 +291,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Anyone who can reply through the channel can approve or deny tool use in your session, so only allowlist senders you trust with that authority.' — locator: channels, seção Security, último par. — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 10
     source_kind: vendor-on-self
@@ -309,7 +309,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Only declare the capability if your channel [authenticates the sender](#gate-inbound-messages), because anyone who can reply through your channel can approve or deny tool use in your session.' — locator: channels-reference, seção Relay permission prompts > Add relay to a chat bridge, par. após a lista de 3 componentes — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 10
     source_kind: vendor-on-self
@@ -328,7 +328,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: '**One team per session**: a session has exactly one team, scoped to that session. You can't create additional named teams or share a team across sessions.' — locator: agent-teams, Limitations — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -346,7 +346,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Agent teams are experimental and disabled by default. Enable them by setting `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in your [settings.json](/docs/en/settings) or environment.' — locator: agent-teams, Warning no topo; seção Enable agent teams — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -365,7 +365,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE (prefixo verbatim): 'client.on('messageCreate', msg => { if (msg.author.bot) return handleInbound(msg) [...]' — locator: external_plugins/discord/server.ts l.805-808; única ocorrência de author.bot (grep) em l.806 — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: repo
@@ -384,7 +384,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'The MCP server can retrieve and send messages throughout a Slack workspace:' — locator: slack-mcp-server, seção Retrieving and sending messages — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -402,7 +402,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Read channels — grab the complete message history of channels.' — locator: slack-mcp-server, Retrieving and sending messages — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -420,7 +420,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Only apps published in the Slack Marketplace and internal apps can use MCP at this time;' — locator: slack-mcp-server, Security concerns — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -438,7 +438,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Workspace admins can approve and manage all MCP client integrations, keeping your Slack data safe.' — locator: slack-mcp-server, overview e App Identity — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -456,7 +456,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'you can detect if a message was sent by a bot by the presence of the bot_id and bot_profile fields in the event payload.' — locator: reference/events/message/bot_message, Bot identification — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: vendor-on-self
@@ -475,7 +475,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'fetch /me/chats/{id}/messages → read Teams chat messages' — locator: Work IQ MCP overview, seção How tools work — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 8
     source_kind: vendor-on-self
@@ -493,7 +493,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'New workloads, backends, and data sources add **paths**, not tools. The tool surface stays fixed at 10.' — locator: Work IQ MCP overview, seção How tools work — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 8
     source_kind: vendor-on-self
@@ -511,7 +511,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'A usage-based billing plan set up in Copilot Studio with an Azure subscription and resource group assigned.' — locator: Enable your tenant for Work IQ, seção Prerequisites — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 8
     source_kind: vendor-on-self
@@ -529,7 +529,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Work IQ API for custom apps and agents' — locator: Usage-Based Billing for Copilot Credits, lista Services managed by usage-based billing — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 8
     source_kind: vendor-on-self
@@ -547,7 +547,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Allows the app to ask Work IQ agents questions and receive responses on behalf of the signed-in user.' — locator: Work IQ API permissions reference, seção WorkIQAgent.Ask — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 8
     source_kind: vendor-on-self
@@ -565,7 +565,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'By default, agents in group chats and channels only receive messages when they're directly @mentioned. They don't receive other messages sent to the conversation.' — locator: Channel and Group Conversation Chat for Agents - Teams, parágrafo 2 — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 8
     source_kind: vendor-on-self
@@ -584,8 +584,8 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-07
-    valid_from: 2026-04-09
+    verified_at: "2026-10-07"
+    valid_from: "2026-04-09"
     verified_against: "QUOTE: 'A2A's momentum accelerated with the release of version 1.0, its first stable specification.' — locator: LF press release, 2026-04-09 — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 8
     source_kind: vendor-on-self
@@ -603,8 +603,8 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-07
-    valid_from: 2026-04-09
+    verified_at: "2026-10-07"
+    valid_from: "2026-04-09"
     verified_against: "QUOTE: 'Cloud providers have reinforced that momentum by embedding A2A directly into their platforms.' — locator: LF press release, 2026-04-09 — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 8
     source_kind: vendor-on-self
@@ -622,7 +622,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Agent Cards MAY be digitally signed using JSON Web Signature (JWS)' — locator: A2A spec §8.4 Agent Card Signing — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: primary
@@ -640,7 +640,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Expired or revoked keys MUST NOT be used for verification' — locator: A2A spec §8.4 Agent Card Signing (§8.4.1 e §8.4.3) — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: primary
@@ -658,7 +658,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE: 'Agents MUST validate all input parameters before processing' — locator: A2A spec §13.4 Security Considerations, Input Validation — ancorada por verificador independente (wf_da77c143-24c)"
     source_tier: 9
     source_kind: primary
@@ -677,7 +677,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "`claude --version` nesta máquina = '2.1.293 (Claude Code)' (re-medido pelo escritor em 2026-10-07); nenhuma das claims cc-* ancora a versão da página citada (docs vivas, sem data no locator)"
     source_tier: 10
     source_kind: measurement
@@ -695,7 +695,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "docs/evolution/federation/members.yaml: granaai (l.140-182) traz só remote/local_path e keys: [granaai-1] (JWKS do A2A); hub-operacoes-enterprise (l.298-304) sem campo keys algum; grep -ciE slack|teams|claude_account no arquivo = 0 (re-medido pelo escritor em 2026-10-07)"
     source_tier: 10
     source_kind: measurement
@@ -713,7 +713,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c sobre as claims 1 e 2 de cross-session: 'On another of YOUR machines' prova transporte de UMA conta; o listing só mostra sessões do próprio usuário; nenhuma frase nega expressamente mensagens entre contas"
     source_tier: 6
     source_kind: analysis
@@ -731,7 +731,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "QUOTE (descrição da ferramenta ListAgents no runtime do Claude Code 2.1.293, lida pelo escritor nesta sessão): 'a cloud session receives your message but cannot message any session back yet — do not ask it to reply' — fonte rotulada: DECLARAÇÃO do produto instalado, não doc"
     source_tier: 9
     source_kind: vendor-on-self
@@ -748,7 +748,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c sobre a claim 4 de cross-session + a claim parceira sobre crossSessionInbound REJEITADA na ancoragem (hold explícito não abre diálogo; refuse descarta sem humano)"
     source_tier: 6
     source_kind: analysis
@@ -766,7 +766,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c sobre as claims 14 e 15 de channels: quem está na allowlist APROVA uso de ferramentas; a allowlist é por ID de plataforma"
     source_tier: 7
     source_kind: analysis
@@ -784,7 +784,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c sobre a claim 13 de channels: o mecanismo está provado, mas a rodada não mediu plano claude.ai nem estado dos toggles (channelsEnabled, Remote Control) nas orgs da granaai e do hub-operacoes-enterprise"
     source_tier: 6
     source_kind: analysis
@@ -814,7 +814,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "retorno do run wf_da77c143-24c (modo primaries): 8 fontes nomeadas (cc-cross-session, cc-remote-control, cc-channels, cc-agent-teams-claude-tag, cc-plugins-official-discord, slack-mcp-events, teams-workiq-mcp, a2a-spec-lf), 8 lidas, 0 inalcançáveis; 45 claims à ancoragem, 34 ANCORADAS, 11 REJEITADAS (11 exageradas, 0 não-encontradas)"
     source_tier: 10
     source_kind: internal-audit
@@ -833,7 +833,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 20 (Metade Claude Tag da lacuna cc-agent-teams-claude-tag), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -849,7 +849,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 21 (18 [cc-plugins-official-discord] o plugin Discord descarta mensagem de bot), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -865,7 +865,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 22 (Rejeição da claim do marketplace (Slack)), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -881,7 +881,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 24 (20 [slack-mcp-events] lê o histórico completo), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -897,7 +897,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 25 (21 [slack-mcp-events] só apps do Marketplace ou internos usam MCP), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -913,7 +913,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 27 (23 [slack-mcp-events] bot_message: bot_id/bot_profile; entrega a outro app não dita), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -929,7 +929,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 28 (24 [teams-workiq-mcp] 10 tools, sem subscrição/push), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -945,7 +945,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 30 (26 [teams-workiq-mcp] sem exigência de licença M365 Copilot por usuário), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -962,7 +962,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 31 (27 [teams-workiq-mcp] billing sem a marca 'Copilot license required'), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -978,7 +978,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 32 (28 [teams-workiq-mcp] WorkIQAgent.Ask delegada → identidade humana, não bot-a-bot), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -994,7 +994,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 33 (29 [teams-workiq-mcp] agente em canal só recebe @menção salvo RSC), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -1010,7 +1010,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 35 (31 [a2a-spec-lf] 150+ organizações, uso em produção), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis
@@ -1026,7 +1026,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "Elenxo do run wf_da77c143-24c, objeção 38 (34 [a2a-spec-lf] sem orientação dedicada a conteúdo de outro agente como não confiável), recuperada do journal: o corte do workflow a tinha impedido de chegar ao escritor"
     source_tier: 6
     source_kind: analysis

@@ -1,7 +1,7 @@
 meta:
   id: arandek-adoption-dogfood-2026-07
   schema_version: "1"
-  baseline: 2026-07-24
+  baseline: "2026-07-24"
   date: 2026-07-24
   note: "Dogfood da adoção ArandekBR/arandek (legacy). 2 gaps reais + 1 refutação + 4 achados de campo (sinal da 1ª sessão de trabalho no adotante). Todos incorporados no core via PR #454 (merge d6aba0e)."
 
@@ -26,7 +26,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "o ignore cego de .claude/ JÁ custara 242 arquivos (70 skills, 39 comandos) ao arandek em mai/2026 — custo real é o trabalho do adotante tirado do versionamento em silêncio, não só o stamp Onion"
     narrative: "label anterior: o ignore cego de .claude/ JÁ custara 242 arquivos (71 skills, 39 comandos) ao arandek em mai/2026 — custo real é o trabalho do adotante perdido em silêncio, não só o stamp Onion"
     trace: "arandek commits 1aa794f9 / 88d93f26"
@@ -65,7 +65,7 @@ nodes:
     impact: 3
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "contagens stale na KB de identidade (97 comandos / 8 skills / 76 KBs) vs SSOT gerada (99/51/10/86) — KB violando a própria nota anti-redrift"
     trace: "docs/knowledge-base/meta/onion-framework-identity.md"
     provenance:
@@ -135,7 +135,7 @@ nodes:
     impact: 5
     confidence: 0.98
     status: confirmed
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "verificado no arandek: .gitignore ignorava .claude/ (linhas 106+117); o durable-commit stajou 0 arquivos .claude/ (só docs/)"
     trace: "git ls-files .claude no onion-adopt-arandek pós 1º commit"
     provenance:
@@ -150,7 +150,7 @@ nodes:
     impact: 3
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "capability-registry.md do arandek ('100+ agentes' do PRODUTO deles) foi flagado pela regra como divergência do inventário Onion"
     trace: "arandek docs/specs/capability-registry.md"
     provenance:
@@ -178,7 +178,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "commits 1aa794f9 (remove .claude/) e 88d93f26 (untrack .claude/ mantém local) — 242 arquivos sumiram de todo checkout; busca exaustiva não achou cópia fora do git; sintoma = 8 refs mortas no CLAUDE.md"
     trace: "arandek git history mai/2026; git show 88d93f26^:.claude/"
     provenance:
@@ -193,7 +193,7 @@ nodes:
     impact: 3
     confidence: 0.98
     status: confirmed
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "docs/onion/inventory.md (SSOT gerada do filesystem no pin 5e3ee) = 99/51/10/86; a KB afirmava 97/8/76"
     trace: "docs/onion/inventory.md"
     provenance:
@@ -247,7 +247,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "selftest completo do core: 465 passaram, 0 falharam (inclui os novos scope-gitignore/inventory-adopter-scope/task-manager-hook)"
     trace: ".claude/validation/lint-selftest.sh"
     provenance:
@@ -261,7 +261,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "PR #454 CI verde: lint-onion-artifacts pass (6m11s) + onion-review pass (3m34s); mergeado como d6aba0e (merge commit, 6 commits preservados)"
     trace: "github.com/marciocar/onion-evolve/pull/454"
     provenance:
@@ -365,7 +365,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: done
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "PR #454 mergeado em main (d6aba0e) — os 6 fixes do dogfood vivos no core; merge commit preserva D1 revertável isolado"
     trace: "merge d6aba0e"
     provenance:
@@ -379,7 +379,7 @@ nodes:
     impact: 3
     confidence: 0.8
     status: superseded
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_ARANDEK_UPDATE (SUPERSEDES); label preservado como historia'
     label: "quando o arandek rodar /meta:adopt --update, recebe os 6 fixes; o contorno do D1 dele (technical-context ponteiro) simplifica p/ declarar context.technical → docs/specs/"
     trace: "próximo trabalho no adotante"
@@ -390,7 +390,7 @@ nodes:
     impact: 2
     confidence: 0.8
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó declara relay PENDENTE; o vivo mostra o relay já ENTREGUE e commitado no core (b01d740a, 2026-07-25) — um dia antes de qualquer verificação possível já estar obsolet"
     label: "relay do sinal (docs/evolution/inbox do arandek → inbox do core via /meta:co-relay) pendente — território da sessão do adotante (I3)"
     trace: "arandek docs/evolution/inbox/2026-07-24-sinal-adocao-arandek.md"
@@ -404,7 +404,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: stamps-e-frontmatter-do-adotante-comparados
     label: "O pin canonico vive DERIVADO em artefatos que o --update nao toca: memorias de sessao gravadas na adocao original, frontmatter de sinais em rascunho, docs que citam a versao do core. O update avanca o .onion-version e as copias ficam para tras EM SILENCIO — o artefato derivado passa a declarar um pin que nao e mais o vivo. Familia declarado!=verificado"
     provenance:
@@ -421,7 +421,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: frontmatter-do-sinal-vs-onion-version
     label: "CASO REAL: adocao em 24/07 (pin 5e3ea5ee46ac), update em 25/07 (pin 65d8a7501a03, branch develop). Um sinal upstream posterior carimbou no frontmatter source_commit: 5e3ea5e — o pin da ADOCAO ORIGINAL, nao o vivo — porque o valor veio da memoria de sessao nunca reconciliada no update. O CONTEUDO nao foi afetado (o adotante verificou os fixes contra o FILESYSTEM, nao a prosa), mas a classe de erro e real: se a triagem usasse o pin para aferir se um fix ja alcancou o adotante, a conta partiria de dois dias e um update de distancia"
     provenance:
@@ -438,7 +438,7 @@ nodes:
     impact: 3
     confidence: 0.8
     status: done
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 3/3 claims; juiz APROVADO. grep -n ''D_GREP_OLD_PIN'' -A40 docs/onion/graph/<adotante-a>-adoption-dogfood-2 => O nó pede: apos /meta:adopt --update reescrever .onion-version, rodar `grep -rl <pin-antigo>` no rep…'
     label: "BACKLOG (nao implementado; priorizar e do maestro). No /meta:adopt --update, apos reescrever o .onion-version: `grep -rl <pin-antigo>` no repo do adotante (excluindo .git/ e node_modules/) e reportar a CONTAGEM no relatorio — 'N referencias ao pin anterior neste repo — revise'. DETECTA, nao conserta: corrigir cada artefato exigiria entender a semantica de cada um (uma memoria pode citar o pin historicamente de proposito). Custo: um grep + uma linha. Toque em .claude/commands/meta/adopt.md, com selftest plantando um pin antigo"
 
@@ -449,7 +449,7 @@ nodes:
     impact: 2
     confidence: 0.5
     status: done
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 1/1 claims; juiz APROVADO. Lido o nó inteiro (linhas 347-354) e a aresta CONSTRAINS para D_GREP_OLD_PIN (li => A pergunta ("vale medir quantos artefatos derivados citam pin antes de implementar D_GREP_OLD_PIN") …'
     label: "FRONTEIRA DECLARADA PELO PROPRIO ADOTANTE (R15.2 — registrada como observacao, nao como pedido): 'pode ser que o custo nao compense para uma classe de erro que so morde quem escreve frontmatter a mao'. Vale medir quantos artefatos derivados citam pin nos adotantes reais antes de implementar"
 
@@ -459,7 +459,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — 1) git -C onion-evolve merge-base --is-ancestor d6aba0e 65d8a7501a03 (confirma que o pin d'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó estava formulado como pergunta em aberto sobre um evento futuro ("quando... rodar"); o evento não só ocorreu como foi superado por múltiplos ciclos adicionais de update no adotante. A pergunta não tem mais objeto: já foi respondida pelo próprio comportamento do adotante, e a segunda cláusula (s'
     provenance:
@@ -475,7 +475,7 @@ nodes:
     impact: 2
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: "grep -rl <8hex do pin anterior> nos 10 clones locais de {<adotante-sem-registro>,gustavo-pulga,poc-venda-direta-pdi (2 clones),<adotante-a>,onion-arthur,onion-pedro,onion-standalone,pulse-mais,metagamify} (ids do members.yaml) (pins anteriores lidos do git log do .onion-version)"
     label: "RESPOSTA a Q_PIN_GREP_WORTH_IT (drive W9, 2026-09-02): dos 10 adotantes locais, 5 tiveram update; 4 deles ainda citam pin anterior em 22 arquivos — 19 sao historia legitima (docs/evolution/inbox|inbound processados, que DEVEM citar o pin da epoca) e 3 sao SSOT viva (technical-context/index.md no <adotante-a>; project.kg.yaml e onion-adoption.kg.yaml no mvp-venda-direta-pdi). Conclusao: o grep vale UM grep — mas so com exclusao de historia, senao 86% e ruido. Implementado em write-stamp.sh (detecta, nao conserta; bancada + mutacao provadas)."
     trace: ".claude/utils/adopt/write-stamp.sh"

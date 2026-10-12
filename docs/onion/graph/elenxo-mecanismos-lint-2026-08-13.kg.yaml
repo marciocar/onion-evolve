@@ -2,7 +2,7 @@ meta:
   id: elenxo-mecanismos-lint-2026-08-13
   schema_version: "1"
   layer: audit
-  baseline: 2026-08-13
+  baseline: "2026-08-13"
   date: 2026-08-13
   run_id: wf_167fa138-c0a
   note: >
@@ -18,7 +18,7 @@ nodes:
   - id: C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO
     node_type: claim
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: patch-a-b-medido-only-cai-de-16-2s-para-5-3s-com-diff-de-veredito-vazio-em-dois-cenarios
     status: confirmed
     impact: 5
@@ -34,7 +34,7 @@ nodes:
   - id: E_QUATRO_LENTES_CONVERGIRAM_SEM_SE_VER
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: as-4-lentes-independentes-nomearam-check-plugins-sync-como-vilao-dominante
     status: confirmed
     impact: 4
@@ -50,7 +50,7 @@ nodes:
   - id: C_CAPABILITY_NAO_PODE_LEVAR_BLANKET_SKIP
     node_type: claim
     plane: DEV
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: fixture-bad-overclaim-injetada-com-blanket-skip-fica-cega-e-com-scope-filter-sem-normalizar-vdir-tambem
     status: confirmed
     impact: 5
@@ -66,7 +66,7 @@ nodes:
   - id: E_SHA1SUM_POR_NO_2486_SPAWNS
     node_type: evidence
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: re-medido-no-caminho-do-lint-format-tsv-0-95s-e-47-spawns-o-caminho-caro-so-dispara-com-orfas
     status: superseded
     impact: 4
@@ -82,7 +82,7 @@ nodes:
   - id: E_REGRESSAO_16S_86S_E_CONCENTRADA_NAO_LINEAR
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: guardas-27-para-59-2-19x-linhas-2-51x-tempo-5-37x-concentrado-em-3-guardas-novas
     status: confirmed
     impact: 4
@@ -98,7 +98,7 @@ nodes:
   - id: Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO
     node_type: question
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: tripla-regua-2026-08-13-consumed-mode-oficial-33-pares-0-sem-teste-e-o-unico-orfao-real-foi-ligado
     status: done
     impact: 3
@@ -114,7 +114,7 @@ nodes:
   - id: E_PISO_IRREDUTIVEL_DA_REFINARIA_SUPERADO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: only-de-12-16s-para-5s-com-diff-vazio-e-bancada-798-de-798-no-mesmo-ambiente
     status: confirmed
     impact: 4
@@ -130,7 +130,7 @@ nodes:
   - id: I_P4_HIGIENE_DE_VERDADE_DECLARADA_FECHADA
     node_type: decision
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: pre-commit-carimbado-78s-medido-e-cabecalho-do-consumed-mode-atualizado-para-o-wire-in-da-regra-59
     status: done
     impact: 3
@@ -146,7 +146,7 @@ nodes:
   - id: Q_GATILHO_DO_WIREIN_NAO_CASA_COM_O_SUT
     node_type: question
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: schema-sabotado-staged-bloqueia-o-commit-com-required-duplicado-e-o-integro-passa-em-0-2s
     status: done
     impact: 2
@@ -162,7 +162,7 @@ nodes:
   - id: I_P3_KG_VIEW_TRIPLO_PARSE_CURADO
     node_type: decision
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: a-b-intercalado-12-2-para-8-2s-com-veredito-byte-identico-nos-62-grafos-e-lint-full-78s
     status: done
     impact: 4
@@ -177,7 +177,7 @@ nodes:
   - id: Q_R19_AUTOFIX_COM_RASTRO_CANDIDATO
     node_type: question
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: v2-provada-nos-4-repros-do-4o-elenxo-inclusive-entrada-diretorio-que-a-v1-nao-cobria
     status: done
     impact: 3
@@ -193,7 +193,7 @@ nodes:
   - id: I_ASSEMBLE_FALHO_VIRA_VIOLATION
     node_type: decision
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: skill-bundlada-removida-e-o-lint-acusa-assemble-FALHOU-e-imprime-sumario-em-vez-de-morrer-rc2
     status: done
     impact: 3
@@ -209,7 +209,7 @@ nodes:
   - id: Q_PARECER_SOBRE_DIFF_INVERTIDO
     node_type: question
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: prova-viva-pr-593-guarda-rodou-no-verdict-e-ficou-muda-com-arvore-limpa-parecer-conforme
     status: done
     impact: 4
@@ -224,7 +224,7 @@ nodes:
   - id: Q_MUDEZ_DA_GUARDA_NAO_SE_IDENTIFICA
     node_type: question
     plane: PROD
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 8o-elenxo-no-caminho-benigno-a-guarda-nao-emite-nada-e-log-sem-guarda-e-indistinguivel-de-guarda-muda
     status: open
     impact: 3
@@ -240,7 +240,7 @@ nodes:
   - id: A_RUN_DO_ELENXO_DE_MECANISMOS
     node_type: artifact
     plane: DEV
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: workflow-de-4-agentes-com-241-tool-calls-e-os-4-schemas-validados
     status: confirmed
     impact: 2

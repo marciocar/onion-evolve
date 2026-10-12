@@ -2,9 +2,9 @@ meta:
   id: vaultwarden-logto-2026-08
   schema_version: "1"
   layer: audit
-  baseline: 2026-08-10
+  baseline: "2026-08-10"
   date: 2026-08-10
-  review_after: 2026-09-09
+  review_after: "2026-09-09"
   note: >
     Pesquisa profunda: adicionar Vaultwarden (cofre self-hosted) a VPS do Onion, integrado ao Logto.
     Tres frentes: estado externo do produto/SSO (fonte datada), terreno medido na propria VPS, e uma
@@ -32,7 +32,7 @@ nodes:
   - id: E_SEM_EQUIVALENTE_A_KEY_CONNECTOR
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: PR-7534-ABERTO-criado-2026-07-31-nao-mesclado
     status: confirmed
     impact: 5
@@ -49,7 +49,7 @@ nodes:
   - id: E_ES384_ERA_O_BLOQUEADOR_CANDIDATO
     node_type: evidence
     plane: PROD
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: discovery-vivo-declara-ES384-sem-RS256
     status: refuted
     impact: 4
@@ -65,7 +65,7 @@ nodes:
   - id: E_ES384_CAIU_NA_MEDICAO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: codigo-fonte-openidconnect-4.0.1-p384-VerifyingKey-verify-ativo
     status: confirmed
     impact: 4
@@ -81,7 +81,7 @@ nodes:
   - id: E_SSO_VALIDADO_PONTA_A_PONTA
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: cofre-307-para-logto-e-logto-303-para-sign-in-com-app_id-do-cofre
     status: confirmed
     impact: 5
@@ -97,7 +97,7 @@ nodes:
   - id: E_SSO_MADURO_MAS_JOVEM
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: PR-3899-merged-2025-08-08-v1.35.0-2025-12-27-CVEs-ate-v1.37.x
     status: confirmed
     impact: 3
@@ -113,7 +113,7 @@ nodes:
   - id: E_PRIMEIRO_CASO_DOCUMENTADO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: busca-literal-vaultwarden-logto-sem-resultado-guias-cobrem-outros-6
     status: superseded
     impact: 3
@@ -124,7 +124,7 @@ nodes:
   - id: E_TERRENO_E_COPIAVEL
     node_type: evidence
     plane: PROD
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: KB-vps-tool-repo-skeleton-mais-3-repos-vivos-e-caddy-com-conf.d
     status: confirmed
     impact: 3
@@ -141,7 +141,7 @@ nodes:
   - id: Q_QUATRO_PENDENCIAS_DO_TERRENO
     node_type: question
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: as-quatro-pagas-dns-resolve-backup-gpg-decifra-fail2ban-baniu-sso-303-sign-in
     status: done
     impact: 4
@@ -157,7 +157,7 @@ nodes:
   - id: I_CONSOLE_DO_LOGTO_ESTA_PUBLICO
     node_type: decision
     plane: DEV
-    verified_at: 2026-08-10
+    verified_at: "2026-08-10"
     verified_against: logto-console.caddy-sem-.disabled-e-HTTP-302-no-dominio-publico
     status: superseded
     impact: 4

@@ -1,7 +1,7 @@
 meta:
   id: m8-serial-2026-08
   schema_version: "1"
-  baseline: 2026-08-01
+  baseline: "2026-08-01"
 nodes:
   - id: A_M8_SERIAL_RUN
     node_type: artifact
@@ -10,7 +10,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "execucao-direta-9-agents-seriais-com-usage-por-item"
     label: "A CORRIDA SERIAL DO M8, lado serial executado em 2026-08-06 sobre docs/onion/graph/vps-shared-tools-2026-07.kg.yaml (9 nos da fila --freshness-tsv, ordenada por atencao). Contrato de worker identico ao paralelo (KgReverifySchema do /meta:kg-freshness), modelo sonnet/medium, READ-ONLY. Custo medido por item, nao estimado: 697.710 tokens, 78 tool-uses, 699s de tempo-de-agente, 37 min de relogio. Vereditos: 4 CONFIRMED, 4 DRIFTED, 1 UNVERIFIABLE"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
@@ -27,7 +27,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "9-de-9-itens-executados-pelos-4-passos-do-fragmento"
     label: "O fallback serial RODA, em teste forçado (Workflow disponível): Passos 2, 3 e 4 executaram em 9 de 9 itens, zero SKIP; Passos 0 e 1 não se aplicaram. Provado o caminho de código, não o gatilho automático, que segue não exercido."
     narrative: "label anterior: O FALLBACK SERIAL RODA — e esta era a pergunta mais valiosa do menu inteiro. O orchestration-fallback.md estava escrito, testavel, e NUNCA havia sido executado nem uma vez; o proprio W3 dizia que 'se o fallback nao rodar, a rede de seguranca da portabilidade e ficcao — o maior achado possivel do menu'. NAO E FICCAO: os 4 passos do fragmento (health-check do substrato, aviso obrigatorio, iteracao serial com Agent mantendo o mesmo schema, tratamento de falha parcial e fan-in) executaram como escritos, 9 de 9 itens, zero SKIP. RESSALVA DECLARADA, porque o proprio fragmento a exige: o Passo 0 manda acionar o fallback SO se o Workflow estiver indisponivel, e aqui ele estava DISPONIVEL. Foi teste forcado, nao degradacao real — e fingir que o substrato falhou seria a mesma mentira que o fragmento proibe ('nunca fingir paralelismo inexistente' vale nos dois sentidos). O que fica provado e o CAMINHO DE CODIGO, nao o gatilho automatico: o gatilho segue nao-exercido"
@@ -45,7 +45,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "usage-por-item-do-runtime-ver-ledger-por-item.tsv"
     label: "A MEDICAO, sem a inferencia junto: o item 2 (ENT_whatsapp) gastou 15 tool-uses e 132.214ms; o item 3 (ENT_logto), que recebeu como NOTA DE AMBIENTE o que o item 2 descobriu (`docker ps` sem sudo da permission denied; `sudo -n docker ps` funciona), gastou 4 tool-uses e 25.243ms. Delta: 5,3x em tempo, 73% em ferramentas. ORDEM REAL de execucao registrada no ledger — o --freshness-tsv DOCUMENTA 'atencao desc' e NAO ordena (bug pre-existente), entao quem executou aplicou sort por fora; sem o ledger nao dava para distinguir isso de rotulos trocados, e a inferencia se INVERTERIA se a ordem fosse outra"
     trace: "docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
@@ -71,7 +71,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "697710-tokens-medidos-contra-300k-estimados"
     label: "A estimativa do W3 para o M8 inteiro (~300k tokens; citação de journal não verificável no repo) errou por 2,3x: só o lado serial mediu 697.710 tokens. Com o lado paralelo, ~1,4M é PISO por extrapolação linear (serial x2), não estimativa. Só a execução revelou o erro."
     narrative: "label anterior: A ESTIMATIVA DO W3 ERRAVA POR 2,3x, e no sentido que importa. O menu dizia 'Alto: ~300k tokens, meia sessao (vs ~1,4M da corrida cheia)' para o M8 INTEIRO. Medido: so o LADO SERIAL consumiu 697.710 tokens — ja 2,3x a estimativa do item completo. Com o lado paralelo, a corrida projeta ~1,4M, que e exatamente o patamar da corrida cheia que o M8 foi reescopado para EVITAR. O item foi aprovado com um numero que nao se sustentou, e so a execucao disse isso — e essa e a justificativa concreta do contrato de custo do M6: sem carimbo por run, a proxima estimativa erraria igual, sem ninguem notar"
@@ -88,7 +88,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "4-DRIFTED-em-9-medidos-contra-o-host-vivo"
     label: "44% DE DRIFT (4 DRIFTED em 9) no grafo da VPS, medido contra o host vivo: ENT_substrate (bridge. sem vhost no Caddy), ENT_whatsapp (sem o SERVIÇO whatsapp-sender; o diretório existe), D_whatsapp_dual (um só lado material), D_structured_plan (KB por bypass do F0)."
     narrative: "label anterior: 44% DE DRIFT nas afirmacoes do grafo da VPS (4 DRIFTED em 9), medido contra o host vivo e nao contra doc. Bem acima do limiar de 30% que o proprio /meta:kg-freshness define para acionar juiz adversarial. Os quatro: (1) ENT_substrate — bridge.onionevolve.com esta no label e resolve por DNS, mas NAO tem vhost no Caddy (curl retorna 000); o onion-bridge serve sob app., nao sob bridge. (2) ENT_whatsapp — o nó afirma whatsapp-sender VIVO; busca full-filesystem com sudo nao encontra processo, container, unit systemd nem diretorio, apesar do parecer de 2026-07-05 registrar reinstalacao em ⟨whatsapp-sender no home da conta onion⟩. WAHA, esse sim, confirmado vivo. (3) D_whatsapp_dual_waha_default — o desenho 'dual adapter' tem so UM lado material hoje. (4) D_structured_plan_and_doctrine — a doutrina do catalogo FOI promovida a KB, mas por BYPASS do F0 direto, apos a fase F2 ser formalmente REPROVADA (stack-harmonia-2026-08, sintese com premissas fabricadas); A_analysis_structure segue `open`"
@@ -114,7 +114,7 @@ nodes:
     impact: 3
     confidence: 0.5
     status: open
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: "frontmatter-desta-sintese"
     label: "O GATILHO DO M6 PASSOU POR FORMA, NAO POR SUBSTANCIA — e a revisao adversarial mostrou que o nó original (status confirmed, confidence 1.0) tratava isso como aprovacao limpa. NASCEU com os 4 campos: verdade literal. MAS DOIS DELES CARREGAVAM A GRANDEZA ERRADA: `duration_min` recebeu TEMPO-DE-AGENTE (12 min, soma dos 9 usage) quando o contrato define `elapsedMin`, tempo de RELOGIO (37 min) — fator 3 de diferenca, e runs Workflow futuros carimbarao wall-clock e serao comparados com este sem marcador; e `tokens` somou so os SUBAGENTES, quando o contrato pede `budget.spent()` (o run inteiro, incluindo o orquestrador). Pior: a sintese pos 12 no frontmatter e '37 min de relogio' no CORPO — o EXATO modo de falha que o contrato do M6 nomeia ('so a co-locacao no frontmatter responde'), cometido pela primeira sintese a cumpri-lo. CORRIGIDO: duration_min=37, agent_time_min=12 como campo proprio. O registro original abaixo fica porque o erro e o achado.\n\nTEXTO ORIGINAL: O GATILHO DO M6 FOI TESTADO NA PRIMEIRA OPORTUNIDADE E PASSOU. O contrato declarou: 'se a proxima sintese nascer SEM os quatro campos, ai — e so ai — mecanize a emissao automatica'. Esta e a proxima sintese, e ela NASCEU COM os quatro campos. Logo a emissao automatica segue GATED, com razao medida e nao com fe: o contrato escrito bastou. RESSALVA HONESTA, porque sem ela o teste vale pouco: quem escreveu o contrato e quem escreveu esta sintese sao o mesmo agente na mesma sessao — o teste real e a PROXIMA sintese, de outra sessao, que nao viu o contrato nascer. Este resultado e necessario, nao suficiente"
 

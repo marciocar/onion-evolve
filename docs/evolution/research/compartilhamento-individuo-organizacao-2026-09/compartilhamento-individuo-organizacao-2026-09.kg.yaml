@@ -1,8 +1,8 @@
 meta:
   id: compartilhamento-individuo-organizacao-2026-09
   schema_version: "1"
-  baseline: 2026-09-13
-  review_after: 2026-12-12   # cadência MERCADO = 90d. Justificativa do tipo dominante: o eixo jurídico
+  baseline: "2026-09-13"
+  review_after: "2026-12-12"   # cadência MERCADO = 90d. Justificativa do tipo dominante: o eixo jurídico
                              # (GDPR art. 88, Bărbulescu, C-65/23, C-34/21) é doutrina (12m), mas o que
                              # CARREGA a decisão hoje é arte de produto e mercado — o piso de grupo do Viva
                              # Copilot Dashboard (padrão 10, reduzível a 5) mudou por changelog em 2025, o
@@ -75,7 +75,7 @@ nodes:
     status: superseded   # rodada 2 (2026-09-13): o primario EUR-Lex foi lido — E_R2_C65_23_E_TRANSFERENCIA_NAO_MONITORAMENTO
     impact: 4
     confidence: 0.5
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'https://www.gdpr-expert.com/article.html?mid=16&id=88&compare=9 — verificacao adversarial 3-0'
     source_tier: 6
     source_kind: analyst
@@ -88,7 +88,7 @@ nodes:
     status: superseded   # rodada 2 (2026-09-13): o primario formula de outro jeito — E_R2_EDPB_CONSENTIMENTO_IMPROVAVEL_NAO_REJEITADO
     impact: 4
     confidence: 0.55
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'https://www.gdpr-expert.com/article.html?mid=16&id=88&compare=9 — verificacao adversarial 3-0'
     source_tier: 6
     source_kind: analyst
@@ -101,7 +101,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.45
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'https://docs.glean.com/security/knowledge-graph — verificacao adversarial 3-0'
     source_tier: 5
     source_kind: vendor-on-competitor
@@ -119,7 +119,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.4
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/ — verificacao adversarial 3-0'
     valid_from: '2025-10'
     source_tier: 5
@@ -138,7 +138,7 @@ nodes:
     status: superseded   # rodada 2 (2026-09-13): o primario do fornecedor substitui o agregador — E_R2_VIVA_COPILOT_DASHBOARD_PISO_10
     impact: 2
     confidence: 0.35
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/ — verificacao adversarial 2-1'
     valid_from: '2025-10'
     source_tier: 5
@@ -152,7 +152,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'https://academic.oup.com/idpl/article/12/4/276/6668508 — verificacao adversarial 3-0'
     valid_from: '2022'
     source_tier: 8
@@ -172,7 +172,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'testemunho do adotante jogo-da-vida (docs/evolution/inbox/_processed/2026-09-13-fronteira-pessoa-empregador-no-company-brain.md), medido em produto vivo; NAO refutado por nenhuma fonte da rodada — coerente com o piso de grupo que a propria Microsoft aplica (padrao 10, piso 5) e com a literatura de ataque tracker (Denning, Denning & Schwartz 1979) e reconstrucao por consultas (Dinur & Nissim 2003), estas citadas pelo Elenxo e nao lidas nesta rodada'
     source_tier: 6
     source_kind: adopter-testimony
@@ -191,7 +191,7 @@ nodes:
     status: superseded   # rodada 2 (2026-09-13): ha sinal de capital, recuo de produto e litigio — E_R2_MERCADO_GLEAN_SERIE_F_150M
     impact: 3
     confidence: 0.4
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'sintetizador da rodada: 0 claims confirmadas sobre rodada de investimento, valuation, M&A, down round, processo judicial contra fornecedor ou recuo de produto por pressao de trabalhadores; 2 sinais de PRODUTO (E_GLEAN_PERSON_AS_IDENTITY_NODE, E_VIVA_COPILOT_DASHBOARD_MANAGER_COMPARISON)'
     source_tier: 5
     source_kind: synthesis
@@ -205,7 +205,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'retorno do run wf_88199ba9-b9a (data/wf_88199ba9-b9a-return.json): 56 URLs, 15 lidas, 41 cortadas; 38 claims, 25 verificadas (6 confirmadas, 19 refutadas), 13 cortadas por orcamento; Elenxo 47 objecoes, 40 sobreviventes (33 descartes por comodismo reabertos), 10 modeladas como no'
     source_tier: 10
     source_kind: internal-audit
@@ -283,7 +283,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EUR-Lex CELEX 62023CJ0065 / curia docid=293835 (MK v K GmbH, 19/12/2024, reenvio do Bundesarbeitsgericht): transferencia de dados de empregados do SAP para servidor da controladora nos EUA com base em Betriebsvereinbarung — nao monitoramento'
     valid_from: '2024-12-19'
     source_tier: 9
@@ -302,7 +302,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EDPB Guidelines 05/2020 sobre consentimento §3.1.1 (desequilibrio de poder no emprego); WP29 Opinion 2/2017 (data processing at work); BDSG §26(2)'
     source_tier: 9
     source_kind: regulator-guidance
@@ -320,7 +320,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'https://docs.glean.com/security/knowledge-graph — a mesma doc registra ACL por item de conteudo (descarte cortado da propria rodada); nenhuma afirmacao de sinais de atividade por pessoa expostos a terceiros'
     source_tier: 5
     source_kind: vendor-primary
@@ -338,7 +338,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'changelog Microsoft (Petri / M365 Admin): Minimum group size update for Copilot Dashboard — grupo minimo padrao 10, reduzivel a 5; o proprio artigo winbuzzer registra coorte externa de 20+ empresas e modelos randomizados'
     source_tier: 7
     source_kind: vendor-primary
@@ -356,7 +356,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'votacao 2-1 do achado + doc Microsoft do Copilot Dashboard (grupo minimo padrao 10, piso 5; benchmarks por coorte)'
     source_tier: 7
     source_kind: vendor-primary
@@ -374,7 +374,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'CCT belga n. 68 (cameras) vs CCT n. 81 (comunicacoes eletronicas, outra lista); GDPR art. 6(4) (tratamento posterior compativel); LGPD art. 6 I (finalidade) e II (adequacao)'
     source_tier: 9
     source_kind: statute
@@ -392,7 +392,7 @@ nodes:
     status: superseded
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'contagem dos 6 achados confirmados por eixo: LGPD/ANPD/TST = 0; autodeterminacao (Deci & Ryan) = 0; Contextual Integrity so em descartes; privacidade diferencial e ataques de diferenca so em descartes/cortes; referencias nao lidas: Denning, Denning & Schwartz 1979 (tracker); Dinur & Nissim 2003 (reconstrucao por consultas)'
     source_tier: 10
     source_kind: internal-audit
@@ -405,7 +405,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'CJEU C-34/21 (Hauptpersonalrat, 30/03/2023): regra nacional que so repete o GDPR nao vale como art. 88; Lei portuguesa 58/2019 art. 28(3) e desaplicacao pela CNPD; BDSG §26 pos-acordao nao lido'
     valid_from: '2023-03-30'
     source_tier: 9
@@ -424,7 +424,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'TEDH Barbulescu v. Romenia (Grande Camara, 05/09/2017, app. 61496/08, §121); Lopez Ribalda e outros v. Espanha II (Grande Camara, 2019)'
     valid_from: '2017-09-05'
     source_tier: 9
@@ -443,7 +443,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'coerencia com C-34/21 (fragmentacao) e C-65/23 (harmoniza so o piso arts. 5/6/9, nao o limiar); nenhuma evidencia contraria na rodada; fonte do descarte: https://academic.oup.com/idpl/article/12/4/276/6668508'
     source_tier: 8
     source_kind: paper
@@ -471,7 +471,7 @@ nodes:
     status: superseded   # rodada 3 (2026-09-13): o mesmo conteudo chegou com quote verbatim e locator de dispositivo — E_R3_LGPD_ART10_P2_TRANSPARENCIA_VERBATIM
     impact: 3
     confidence: 0.35
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'LGPD (Lei 13.709/2018), leitura do art. 10 — SEM locator de dispositivo e SEM quote verbatim no dossie; ancorada por verificador independente com a ressalva de citacao ausente'
     source_tier: 5
     source_kind: statute
@@ -485,7 +485,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Guia Orientativo da ANPD sobre legitimo interesse, Secao "Teste de balanceamento", p. 31-32 — "tres fases [...] fase 1. finalidade [...] fase 2. necessidade [...] fase 3. balanceamento e salvaguardas"; ancorada por verificador independente'
     source_tier: 9
     source_kind: regulator-guidance
@@ -502,7 +502,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Guia Orientativo da ANPD, Fase 2 (Necessidade), p. 32 — "somente os dados pessoais estritamente necessarios para a finalidade pretendida poderao ser tratados"; ancorada por verificador independente'
     source_tier: 9
     source_kind: regulator-guidance
@@ -519,7 +519,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Guia Orientativo da ANPD, Fase 3 (Balanceamento e salvaguardas), p. 33 — "o que a lgpd exige nao e o impacto zero"; ancorada por verificador independente'
     source_tier: 9
     source_kind: regulator-guidance
@@ -536,7 +536,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Guia Orientativo da ANPD, Secao "Legitima expectativa do titular", p. 23 — "a existencia de uma relacao previa do controlador com o titular; a fonte e a forma da coleta"; ancorada por verificador independente'
     source_tier: 9
     source_kind: regulator-guidance
@@ -553,7 +553,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Guia Orientativo da ANPD, Exemplo 7 "Instalacao de software para rastrear atividades e medir a produtividade de funcionarios" — Analise, p. 24-25 — "o tratamento nao poderia ser realizado e nao seria admissivel o recurso a hipotese legal do legitimo interesse"; ancorada por verificador independente'
     source_tier: 9
     source_kind: regulator-guidance
@@ -570,7 +570,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Guia Orientativo da ANPD, Exemplo 7, Analise, p. 24-25 (texto continuo entre paginas) — "mesmo que esta atividade possa ter sido previamente informada"; ancorada por verificador independente'
     source_tier: 9
     source_kind: regulator-guidance
@@ -588,7 +588,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.45
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'tst.jus.br, noticia "TST admite que empresa investigue e-mail de trabalho do empregado" sobre RR-613/2000-013-10-00.7 (1a Turma) — "natureza juridica equivalente a uma ferramenta de trabalho"; ancorada por verificador independente, com a ressalva de que o locator e NOTICIA, nao acordao'
     source_tier: 6
     source_kind: court-news
@@ -606,7 +606,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.45
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'tst.jus.br, mesma noticia sobre RR-613/2000-013-10-00.7 — "destina-se ao uso estritamente profissional"; ancorada por verificador independente (locator = noticia)'
     source_tier: 6
     source_kind: court-news
@@ -624,7 +624,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.5
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'tst.jus.br, mesma noticia sobre RR-613/2000-013-10-00.7 — "de forma moderada, generalizada e impessoal, o controle"; ancorada por verificador independente (locator = noticia)'
     source_tier: 6
     source_kind: court-news
@@ -642,7 +642,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.45
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'tst.jus.br, noticia "Fiscalizacao de empregados por meio de cameras em locais coletivos e considerada licita" sobre RR-21162-51.2015.5.04.0014 (1a Turma) — "desde que nao ofendam direitos de personalidade do trabalhador"; ancorada por verificador independente (locator = noticia)'
     source_tier: 6
     source_kind: court-news
@@ -659,7 +659,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.45
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'tst.jus.br, mesma noticia sobre RR-21162-51.2015.5.04.0014 — "sem afetar o nucleo essencial do direito de intimidade dos trabalhadores"; ancorada por verificador independente (locator = noticia)'
     source_tier: 6
     source_kind: court-news
@@ -677,7 +677,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EDPB Guidelines 05/2020 sobre consentimento (desequilibrio de poder no emprego) — leitura ancorada por verificador independente; ressalva: a ancoragem chegou SEM quote verbatim no dossie'
     source_tier: 9
     source_kind: regulator-guidance
@@ -695,7 +695,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EDPB Guidelines 05/2020 sobre consentimento — leitura ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 9
     source_kind: regulator-guidance
@@ -713,7 +713,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EDPB Guidelines 05/2020 sobre consentimento, excecao explicita — leitura ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 9
     source_kind: regulator-guidance
@@ -731,7 +731,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EDPB Guidelines 05/2020 sobre consentimento, exemplo pratico da filmagem de escritorio — leitura ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 9
     source_kind: regulator-guidance
@@ -749,7 +749,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EDPB Guidelines 05/2020 sobre consentimento, generalizacao do desequilibrio de poder — leitura ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 9
     source_kind: regulator-guidance
@@ -768,7 +768,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'TEDH Barbulescu v. Romenia (Grande Camara, 05/09/2017, app. 61496/08), §121 — os seis fatores (i)-(vi); ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2017-09-05'
     source_tier: 9
@@ -787,7 +787,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'TEDH Lopez Ribalda e outros v. Espanha II (Grande Camara, 2019) — extensao mutatis mutandis dos criterios de Barbulescu (e Kopke) a videovigilancia; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2019-10-17'
     source_tier: 9
@@ -806,7 +806,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'TEDH Lopez Ribalda II (Grande Camara, 2019) — notificacao como UM criterio entre outros; o Tribunal nao viu violacao apesar da ausencia reconhecida de informacao previa; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2019-10-17'
     source_tier: 9
@@ -825,7 +825,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'TEDH Lopez Ribalda II (Grande Camara, 2019) — glosa ausente em Barbulescu sobre suspeita razoavel e vigilancia encoberta; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2019-10-17'
     source_tier: 9
@@ -845,7 +845,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EUR-Lex CELEX 62023CJ0065, §15 (fatos do processo principal) — "transferred various personal data of its employees from the SAP software to a server of the D group''s parent company in the United States"; ancorada por verificador independente'
     valid_from: '2024-12-19'
     source_tier: 10
@@ -864,7 +864,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EUR-Lex CELEX 62023CJ0065, Ruling 1 do dispositivo — acordo/norma sob art. 88(1) deve obrigar cumprimento dos arts. 88(2), 5, 6(1) e 9(1)/(2); ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2024-12-19'
     source_tier: 10
@@ -883,7 +883,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EUR-Lex CELEX 62023CJ0065, Ruling 2 do dispositivo — margem de discricionariedade das partes nao impede controle judicial PLENO sobre a necessidade; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2024-12-19'
     source_tier: 10
@@ -902,7 +902,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EUR-Lex CELEX 62023CJ0065, cabecalho/ementa oficial — rotulos "Scope of judicial review" e "Margin of discretion"; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2024-12-19'
     source_tier: 10
@@ -921,7 +921,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'EUR-Lex CELEX 62023CJ0065 — o tribunal rejeita que o art. 88 permita margem que "afrouxe ou desconsidere" a exigencia de necessidade; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2024-12-19'
     source_tier: 10
@@ -941,7 +941,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'CJEU C-34/21 (Hauptpersonalrat, 30/03/2023), dispositivo ponto 1 (p. 20), reiterado nos §74-75 — "cannot constitute a ''more specific rule'' ... where it does not satisfy the conditions laid down in paragraph 2"; ancorada por verificador independente'
     valid_from: '2023-03-30'
     source_tier: 10
@@ -960,7 +960,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'CJEU C-34/21, §61 (retomado no §74) — "normative content specific to the area regulated, which is distinct from the general rules of that regulation"; ancorada por verificador independente'
     valid_from: '2023-03-30'
     source_tier: 10
@@ -979,7 +979,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'CJEU C-34/21, §71 (regra geral) e §65 (formulacao irma) — "cannot be limited to a reiteration of the conditions for the lawfulness ... set out, respectively, in Article 6 and Article 5"; ancorada por verificador independente'
     valid_from: '2023-03-30'
     source_tier: 10
@@ -998,7 +998,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'CJEU C-34/21, §81 — dispositivos que condicionam o tratamento a "necessidade" apenas reiteram o art. 6(1)(b); ancorada por verificador independente'
     valid_from: '2023-03-30'
     source_tier: 10
@@ -1017,7 +1017,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'CJEU C-34/21, dispositivo ponto 2 (p. 20), identico no §89, mecanismo nos §82-88 — "must be disregarded where those provisions do not comply with the conditions and limits laid down in Article 88(1) and (2)"; ancorada por verificador independente'
     valid_from: '2023-03-30'
     source_tier: 10
@@ -1036,7 +1036,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'CJEU C-34/21, §59 (aplicado ao art. 88 nos §72-73, citando a Opiniao do AG, pontos 56/70/73); ancorada por verificador independente'
     valid_from: '2023-03-30'
     source_tier: 10
@@ -1056,7 +1056,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Denning, Denning & Schwartz (1979), "The tracker: a threat to statistical database security" — definicao do tracker; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '1979'
     source_tier: 9
@@ -1074,7 +1074,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Denning et al. (1979), introducao — restringir severamente o tamanho minimo/maximo das query sets torna o banco inutil e ainda assim nao garante o sigilo; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '1979'
     source_tier: 9
@@ -1092,7 +1092,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Denning et al. (1979) — o general tracker dispensa conhecimento previo de alguem especifico e existe na maioria dos bancos; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '1979'
     source_tier: 9
@@ -1110,7 +1110,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Denning et al. (1979), exemplo motivador — k (piso minimo) e n-k (teto maximo) sao as defesas que a tecnica do tracker foi desenhada para quebrar; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '1979'
     source_tier: 9
@@ -1128,7 +1128,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Dinur & Nissim (2003), "Revealing information while preserving privacy" (PODS) — reconstrucao polinomial sob perturbacao o(sqrt n); ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2003'
     source_tier: 10
@@ -1146,7 +1146,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Dinur & Nissim (2003), Teorema 3 — qualquer algoritmo cuja perturbacao seja o(sqrt n) e poly(n)-nao-privado; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2003'
     source_tier: 10
@@ -1164,7 +1164,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Dinur & Nissim (2003), prova construtiva do Teorema 3 — t = n*(log n)^2 consultas uniformes ao acaso; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2003'
     source_tier: 10
@@ -1182,7 +1182,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Dinur & Nissim (2003), Teorema 2 — adversario ilimitado com todas as 2^n consultas quebra sob perturbacao o(n); ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2003'
     source_tier: 10
@@ -1200,7 +1200,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Dinur & Nissim (2003) — modelo de consulta: q e subconjunto de indices, resposta exata e a soma dos bits; ancorada por verificador independente; quote verbatim ausente no dossie'
     valid_from: '2003'
     source_tier: 10
@@ -1219,7 +1219,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'paper de k-anonimato lido na rodada 2, Secao 2.2, p. 28 — "indistinguishably related to no less than a certain number (k) of respondents"; ancorada por verificador independente'
     source_tier: 8
     source_kind: paper
@@ -1236,7 +1236,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'paper de k-anonimato, Secao 2.3, p. 30 — "is only a starting point for protecting privacy and further steps are needed to prevent attribute disclosure"; ancorada por verificador independente'
     source_tier: 8
     source_kind: paper
@@ -1253,7 +1253,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'paper de k-anonimato, Secao 2.3, p. 30 — ataque de homogeneidade em classe de equivalencia 3-anonima; ancorada por verificador independente'
     source_tier: 8
     source_kind: paper
@@ -1270,7 +1270,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'paper de k-anonimato, Secao 2.3, p. 30 — ataque de conhecimento externo (background knowledge); ancorada por verificador independente'
     source_tier: 8
     source_kind: paper
@@ -1287,7 +1287,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'paper de k-anonimato, Secao 2.3, p. 31 — ataque de skewness contra l-diversity; ancorada por verificador independente'
     source_tier: 8
     source_kind: paper
@@ -1304,7 +1304,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'IAPP, "Aggregating Over Anonymized Data" (secao sobre suppression/windowing attacks) — "A particularly common, slightly more-complex version of this pitfall comes when giving viewers the ability to slice data by time."; ancorada por verificador independente'
     source_tier: 6
     source_kind: analyst
@@ -1322,7 +1322,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — documentacao do Copilot Dashboard: tamanho minimo de grupo padrao 10; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1340,7 +1340,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com / Microsoft 365 admin center — o piso absoluto ao configurar o Copilot Dashboard nao pode ser menor que 5; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1358,7 +1358,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — Viva Insights (legado): tamanho minimo de grupo padrao 5, nao reduzivel abaixo de 5; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1376,7 +1376,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — a Microsoft afirma que combinar atributos organizacionais com dados de linha de-identificados pode permitir a um analista inferir identidade individual; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1393,7 +1393,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — exemplo concreto: nenhuma coluna isolada identifica, mas juntas os atributos devem ser tratados como dado pessoal potencial; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1411,7 +1411,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — definicao de "distribution masking" e as superficies a que se aplica; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1429,7 +1429,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — tres estrategias nomeadas de protecao de dados agregados, uma delas masked distributions; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1448,7 +1448,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'meta-analise de monitoramento eletronico de desempenho (EPM) lida na rodada 2 — mais restricoes e controle do ALVO associam-se a melhor percepcao de justica e autonomia e menor invasao de privacidade; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: paper
@@ -1465,7 +1465,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'mesma meta-analise EPM — transparencia associa-se a atitudes mais positivas mas nao muda desempenho de forma mensuravel; dados insuficientes para testar o efeito sobre estresse; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: paper
@@ -1482,7 +1482,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'mesma meta-analise EPM — o proposito comunicado do monitoramento mostrou pouco ou nenhum efeito moderador sobre desempenho, atitudes ou estresse; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: paper
@@ -1500,7 +1500,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'glean.com/press, titulo e corpo do press release da Serie F — "Glean raises $150M Series F at $7.2B valuation"; ancorada por verificador independente'
     source_tier: 5
     source_kind: vendor-primary
@@ -1518,7 +1518,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Microsoft 365 Blog, "Our commitment to privacy in Microsoft Productivity Score", Jared Spataro, 01/12/2020 — "we''re removing user names from the product"; ancorada por verificador independente'
     valid_from: '2020-12-01'
     source_tier: 8
@@ -1537,7 +1537,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Microsoft 365 Blog, mesmo post de 01/12/2020 — "No one in the organization will be able to use Productivity Score to access data about how an individual user is using apps and services"; ancorada por verificador independente'
     valid_from: '2020-12-01'
     source_tier: 8
@@ -1556,7 +1556,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.45
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Ross v. Netradyne, Inc., No. 3:23-cv-01443, acao ajuizada em 07/08/2023 sob a Illinois BIPA, conforme relatado por ClassAction.org; ancorada por verificador independente (locator = agregador de acoes coletivas, nao o docket)'
     valid_from: '2023-08-07'
     source_tier: 4
@@ -1575,7 +1575,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.45
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'Garcia v. Figueroa Tank Lines / Samsara, Inc., relatado por CDLLife (2026); demissao em 04/08/2025, cameras instaladas em maio de 2025; ancorada por verificador independente (locator = imprensa setorial, nao o docket)'
     valid_from: '2025-08-04'
     source_tier: 4
@@ -1594,7 +1594,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'contagem da propria rodada 2 (2026-09-13, run wf_1865aba9-e20, retorno versionado em data/): 13 fontes lidas, 0 inalcancaveis, 76 claims submetidas a ancoragem — 62 ANCORADAS e 14 REJEITADAS (13 EXAGERADAS, 1 NAO-ENCONTRADA); Elenxo: 95 objecoes julgadas, 78 sobreviventes, 11 lacunas fechadas e 14 abertas'
     source_tier: 10
     source_kind: internal-audit
@@ -1636,7 +1636,7 @@ nodes:
     status: unverifiable
     impact: 3
     confidence: 0.4
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'TST, acordao sobre e-mail corporativo (alvo tst-acordaos da rodada 3) — claim ANCORADA por verificador independente, porem SEM quote verbatim e SEM locator de processo/folhas no dossie; tier REBAIXADO por isso'
     source_tier: 5
     source_kind: court-decision-unlocated
@@ -1649,7 +1649,7 @@ nodes:
     status: unverifiable
     impact: 4
     confidence: 0.4
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'TST, mesmo acordao do e-mail corporativo — claim ANCORADA por verificador independente, SEM quote verbatim e SEM locator; tier REBAIXADO'
     source_tier: 5
     source_kind: court-decision-unlocated
@@ -1662,7 +1662,7 @@ nodes:
     status: unverifiable
     impact: 3
     confidence: 0.4
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'TST, mesmo acordao do e-mail corporativo — claim ANCORADA por verificador independente, SEM quote verbatim e SEM locator; tier REBAIXADO'
     source_tier: 5
     source_kind: court-decision-unlocated
@@ -1675,7 +1675,7 @@ nodes:
     status: unverifiable
     impact: 5
     confidence: 0.4
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'TST, mesmo acordao do e-mail corporativo, conclusao dispositiva — claim ANCORADA por verificador independente, SEM quote verbatim e SEM locator; tier REBAIXADO'
     source_tier: 5
     source_kind: court-decision-unlocated
@@ -1689,7 +1689,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.4
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'gov.br/anpd — pagina oficial de processos sancionadores, aberta pelo VERIFICADOR (o blog citado como locator pelo leitor devolveu 403 e nao pode ser conferido); a lista oficial confere item a item (ByteDance/TikTok, 2 do Ministerio da Saude, SAS-PE, SEEDF, INSS, Secretaria de Saude SC, JBRJ, IAMSPE, Telekall); ancorada por verificador independente, SEM quote verbatim'
     source_tier: 6
     source_kind: regulator-primary
@@ -1708,8 +1708,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-13
-    valid_from: 2018-08-14
+    verified_at: "2026-09-13"
+    valid_from: "2018-08-14"
     verified_against: 'Lei 13.709/2018 (LGPD), art. 7o, inciso IX — quote do leitor: "quando necessario para atender aos interesses legitimos do controlador ou de terceiro, exceto no caso de prevalecerem direitos e liberdades fundamentais do titular"; o VERIFICADOR mediu o dispositivo e achou o corte: o inciso TERMINA em "...do titular QUE EXIJAM A PROTECAO DOS DADOS PESSOAIS". Ancorada por verificador independente COM correcao de truncamento; planalto.gov.br devolveu ECONNRESET nas duas tentativas'
     source_tier: 8
     source_kind: statute
@@ -1726,8 +1726,8 @@ nodes:
     status: refuted
     impact: 3
     confidence: 0.2
-    verified_at: 2026-09-13
-    valid_from: 2018-08-14
+    verified_at: "2026-09-13"
+    valid_from: "2018-08-14"
     verified_against: 'Lei 13.709/2018, art. 10, caput — quote verbatim confere: "O legitimo interesse do controlador somente podera fundamentar tratamento de dados pessoais para finalidades legitimas, consideradas a partir de situacoes concretas, que incluem, mas nao se limitam a"; a CONCLUSAO da claim foi REFUTADA pelo verificador ao ler o artigo INTEIRO — ver E_R3_ELENXO_LGPD_ART10_PARAGRAFOS_TEM_A_MAQUINARIA'
     source_tier: 10
     source_kind: statute
@@ -1740,8 +1740,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-13
-    valid_from: 2018-08-14
+    verified_at: "2026-09-13"
+    valid_from: "2018-08-14"
     verified_against: 'Lei 13.709/2018, art. 10 INTEGRAL lido pelo verificador — par. 1o "somente os dados pessoais estritamente necessarios para a finalidade pretendida poderao ser tratados"; inciso II "respeitadas as legitimas expectativas dele e os direitos e liberdades fundamentais"; par. 3o relatorio de impacto a pedido da ANPD'
     source_tier: 10
     source_kind: statute
@@ -1758,8 +1758,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-09-13
-    valid_from: 2018-08-14
+    verified_at: "2026-09-13"
+    valid_from: "2018-08-14"
     verified_against: 'Lei 13.709/2018, art. 10, par. 2o — quote CONFERIDA VERBATIM pelo verificador na integra do artigo: "O controlador devera adotar medidas para garantir a transparencia do tratamento de dados baseado em seu legitimo interesse."; ancorada por verificador independente'
     source_tier: 10
     source_kind: statute
@@ -1776,8 +1776,8 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.4
-    verified_at: 2026-09-13
-    valid_from: 2018-08-14
+    verified_at: "2026-09-13"
+    valid_from: "2018-08-14"
     verified_against: 'Lei 13.709/2018, art. 11, caput — quote verbatim conferida: "O tratamento de dados pessoais sensiveis somente podera ocorrer nas seguintes hipoteses"; ancorada por verificador independente, mas a PONTE da claim (histograma de monitoramento -> dado sensivel) NAO foi ancorada'
     source_tier: 10
     source_kind: statute
@@ -1794,8 +1794,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-09-13
-    valid_from: 2018-08-14
+    verified_at: "2026-09-13"
+    valid_from: "2018-08-14"
     verified_against: 'Lei 13.709/2018, art. 20, caput — quote verbatim conferida: "O titular dos dados tem direito a solicitar a revisao de decisoes tomadas unicamente com base em tratamento automatizado de dados pessoais que afetem seus interesses, incluidas as decisoes destinadas a definir o seu perfil pessoal, profissional, de consumo e de credito ou os aspectos de sua personalidade."; ancorada por verificador independente; os PARAGRAFOS do art. 20 NAO foram lidos'
     source_tier: 10
     source_kind: statute
@@ -1812,8 +1812,8 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.45
-    verified_at: 2026-09-13
-    valid_from: 2018-08-14
+    verified_at: "2026-09-13"
+    valid_from: "2018-08-14"
     verified_against: 'Lei 13.709/2018, art. 9o, par. 1o — quote do leitor: "esse sera considerado nulo caso as informacoes fornecidas ao titular tenham conteudo enganoso ou abusivo ou nao tenham sido apresentadas previamente com transparencia, de forma clara e inequivoca"; o verificador registrou que a quote COMECA NO MEIO do dispositivo, omitindo a condicional de abertura "Na hipotese em que o consentimento e requerido," — truncamento sem reticencias; tier REBAIXADO'
     source_tier: 8
     source_kind: statute
@@ -1831,8 +1831,8 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-13
-    valid_from: 2000-01-01
+    verified_at: "2026-09-13"
+    valid_from: "2000-01-01"
     verified_against: 'Deci & Ryan (2000), American Psychologist 55(1), Abstract, p. 68 — quote verbatim conferida por verificador independente: "The findings have led to the postulate of three innate psychological needs - competence, autonomy, and relatedness - which when satisfied yield enhanced self-motivation and mental health and when thwarted lead to diminished motivation and well-being."'
     source_tier: 8
     source_kind: paper
@@ -1849,8 +1849,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-09-13
-    valid_from: 2000-01-01
+    verified_at: "2026-09-13"
+    valid_from: "2000-01-01"
     verified_against: 'Deci & Ryan (2000), secao "Self-Determination Theory", p. 69, col. 2 — quote verbatim conferida: "Inductively, using the empirical process, we have identified three such needs - the needs for competence (Harter, 1978; White, 1963), relatedness (Baumeister & Leary, 1995; Reis, 1994), and autonomy (deCharms, 1968; Deci, 1975) - that appear to be essential for facilitating optimal functioning of the natural propensities for growth and integration, as well as for constructive social development and personal well-being."'
     source_tier: 8
     source_kind: paper
@@ -1867,8 +1867,8 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-09-13
-    valid_from: 2023-01-01
+    verified_at: "2026-09-13"
+    valid_from: "2023-01-01"
     verified_against: 'Ravid et al. (2023), Personnel Psychology 76(1), Abstract, p. 5 (K=94 amostras, N=23.461) — quote verbatim conferida por verificador independente: "Results provide no evidence that EPM improves worker performance. Moreover, findings indicate that the presence of EPM is associated with increased worker stress, regardless of the characteristics of monitoring."'
     source_tier: 8
     source_kind: paper
@@ -1886,7 +1886,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — documentacao do Viva Insights: a doc confirma EXPLICITAMENTE que um bin de histograma PODE exibir dado de um unico individuo, como excecao a regra de tamanho minimo de grupo; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1903,7 +1903,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — a justificativa da doc para permitir bin com 1 individuo e que valores de bin/histograma derivam de metricas de COMPORTAMENTO OBSERVADO, nao de dados de RH, logo nao revelariam grupo demografico do individuo; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1921,7 +1921,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — a regra de minimum group size (padrao 5) NAO se aplica ao bin do histograma, e sim ao "filter group" que o alimenta: se o filtro estiver abaixo do minimo o histograma INTEIRO nao aparece, mas DENTRO dele os bins podem ter qualquer contagem, inclusive 1; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1939,7 +1939,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — pagina oficial de privacidade diferencial da Microsoft para Viva Insights: AUSENCIA MEDIDA de qualquer parametro epsilon, orcamento de privacidade ou garantia matematica formal; a pagina descreve apenas "introduzir pequenas variacoes nos dados" com base em metodos de pesquisadores, sem quantificacao; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1957,7 +1957,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'learn.microsoft.com — a garantia declarada pela Microsoft e QUALITATIVA ("nenhuma atividade individual pode ser discernida com certeza"), nao uma garantia formal com epsilon quantificado; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 8
     source_kind: vendor-primary
@@ -1976,8 +1976,8 @@ nodes:
     status: refuted
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-13
-    valid_from: 2017-11-11
+    verified_at: "2026-09-13"
+    valid_from: "2017-11-11"
     verified_against: 'CLT (Decreto-Lei 5.452/1943, redacao da Lei 13.467/2017), art. 611-A — a negociacao coletiva prevalece sobre a lei numa LISTA FECHADA de materias, e monitoramento/dados do trabalhador NAO esta entre os incisos; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 7
     source_kind: statute
@@ -1990,8 +1990,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-09-13
-    valid_from: 2017-11-11
+    verified_at: "2026-09-13"
+    valid_from: "2017-11-11"
     verified_against: 'CLT, art. 611-B — rol TAXATIVO de 30 incisos do que e objeto ILICITO de supressao/reducao por acordo coletivo; dados pessoais, intimidade e privacidade do trabalhador NAO aparecem nominalmente nessa lista de blindagem; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 7
     source_kind: statute
@@ -2008,8 +2008,8 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-09-13
-    valid_from: 2017-11-11
+    verified_at: "2026-09-13"
+    valid_from: "2017-11-11"
     verified_against: 'CLT, art. 611-B, paragrafo unico — restringe o que conta como "norma de saude, higiene e seguranca", excluindo regras de duracao e intervalo; ancorada por verificador independente; quote verbatim ausente no dossie'
     source_tier: 7
     source_kind: statute
@@ -2027,7 +2027,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-13
+    verified_at: "2026-09-13"
     verified_against: 'contagem da propria rodada 3 (2026-09-13, modo primarias nomeadas sobre os 4 alvos do Elenxo da rodada 2): 6 alvos/fontes submetidos, 30 claims submetidas a ancoragem — 22 ANCORADAS e 8 REJEITADAS (todas EXAGERADAS); nenhuma fonte declarada inalcancavel pelo run, mas 4 tentativas de acesso ao inteiro teor falharam DENTRO do alvo tst-acordaos'
     source_tier: 10
     source_kind: internal-audit

@@ -36,7 +36,7 @@ nodes:
     impact: 4
     confidence: 0.65
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó trata D5 como decisão ABERTA entre 4 opções (A escada/B adiar/C bundle/D segmentado) com apenas uma diretriz de piso de preço. O vivo (mesmo trace file, PR #480 de 2026-07-29,"
     label: "D5 — preço por camada (treino→certificação→compliance-pack→curadoria SOTA): A (escada por comparáveis) vs B (adiar/sob-consulta) vs C (bundle único) vs D (segmentado por comprador). Diretriz: ticket premium ($129+) > pipoca ($5-10)"
   - id: D_D3
@@ -56,7 +56,7 @@ nodes:
     impact: 5
     confidence: 0.5
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 3: worker CONFIRMED e juiz opus/high APROVOU (run wf_5f6d1c0f-ecd)"
     label: "D2-ATIVAÇÃO — ligar o flywheel de moeda-dado (SSOT 6 camadas L1-L6 de mitigação de inferência, dogfoodado). Direção RATIFICADA (local-first+destilado); ativação `gated`. Gate: declarado≠verificado — não vender garantia não-construída"
 
@@ -94,7 +94,7 @@ nodes:
     impact: 4
     confidence: 0.65
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): As 4 mecânicas da recomendação foram INCORPORADAS pela decisão do maestro (decisions.md, ratificação parcial 2026-07-29) e REFINADAS num KG irmão mais granular (d5-pricing-2026-07."
     label: "REC D5: BLEND A+B — escada por comparáveis SÓ p/ degraus vendíveis já (treino day-rate ~$1.2-2k; certificação $795-$1.5k + renovação baixa); trava 'sob consulta'/faixa larga p/ compliance-pack ($15-40k/ano citável não-fechado) e SOTA até 2-3 cases instrumentados. SOTA amarrado a D2 gated"
   - id: C_D3_rec
@@ -230,7 +230,7 @@ nodes:
     impact: 5
     confidence: 0.6
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): A pergunta pedia que o maestro decidisse se D6 era posicionamento OU pipeline, e reclamava que o card não distinguia as duas leituras. O vivo mostra que o maestro já deci"
     label: "D6 mistura 'comprador da MENSAGEM' com 'comprador que fatura PRIMEIRO' — o maestro precisa decidir se D6 é POSICIONAMENTO (a quem falar) ou PIPELINE (a quem vender antes). A recomendação assume perguntas separadas; o card não distingue"
   - id: Q_open_trigger
@@ -240,7 +240,7 @@ nodes:
     impact: 4
     confidence: 0.55
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 5: worker CONFIRMED e juiz opus/high APROVOU (run wf_1c9263d8-6c9)"
     label: "Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É o que realmente falta fechar em D1 — nenhuma fonte externa resolve, é decisão do maestro"
   - id: Q_instrument_metrics
@@ -250,7 +250,7 @@ nodes:
     impact: 5
     confidence: 0.5
     status: open
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'reconciliacao 2026-09-02: E_CENSO0901 REFINA (CONSTRAINS), nao supera — a Onda 8 pagou a PERSISTENCIA (ops/gtm/collect-metrics.sh + 4 ledgers jsonl + cron 12:30, I_GTM_JSONL_PERSISTIDO) mas o entregavel do no (NUMERO unico de valor por adotante + benchmark free->paid) segue ausente; gatilho: 1a serie de 30 dias nos ledgers'
     label: "Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de metodologia dev). Sem isso, preço de compliance-pack/SOTA é chute educado; D4 fica sem valor por degrau"
   - id: Q_p4_no_field_proof
@@ -260,7 +260,7 @@ nodes:
     impact: 4
     confidence: 0.55
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 4/4 claims; juiz APROVADO. git log --oneline --since=2026-07-25 -- docs/business-context/decisions.md; grep => decisions.md (ratificado 2026-07-25, última tocada 2026-08-13 no commit dd0f3ffb, texto inalterado d…'
     label: "Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Falta entrevistar 1-2 prospects regulados + reconciliar 'Claude Code-only' com demanda enterprise de multi-ambiente/on-prem (pressão sobre M3)"
 
@@ -272,7 +272,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Maestro ratificou 2026-07-25: D6 CINDIDO (MENSAGEM=P4 / PIPELINE=P3), D1=A (camadas), D3=C (desacoplar mentoria do app-consumer). Aplicado em decisions.md. D5 segue parcial (blend, número pendente instrumentação); D2-ativação segue gated"
     provenance:
       source: "docs/business-context/decisions.md"
@@ -286,7 +286,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 4/4 — git log --oneline -- .claude/validation/{cycle-completion,context-freshness-metric,session'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (07-2026) não sabe que a camada "barato-primeiro" da instrumentação FOI construída (4 scripts determinísticos, testados, rodáveis) em 2026-07-28 — mas o entregável que o nó realmente pede (um NÚMERO único de "valor medido por adotante" + benchmark de conversão free→paid) continua tão ausente qu'
     provenance:

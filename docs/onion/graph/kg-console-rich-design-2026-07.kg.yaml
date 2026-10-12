@@ -9,7 +9,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: PR-486-mergeado-no-main
     label: "Promover ao core o console rico narrável, evoluindo o kg-console.sh in-place — o que o estudo SEED deixou gated (D_DESKTOP_CYTOSCAPE, D_EVOLVE_NOT_ADOPT)"
     trace: "docs/analysis/onion-adr-kg-console-rich-2026-07.md"
@@ -32,7 +32,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: vendor-1-arquivo-sha-congelado
     label: "Renderer = Cytoscape core 3.34 vendorizado em UM arquivo (435KB, SHA congelado); layout cose EMBUTIDO em vez de fcose — evita a cadeia frágil de deps e mantém o vendoring num artefato só"
     trace: ".claude/validation/vendor/kg-console/provenance.md"
@@ -107,7 +107,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: html-gerado-sem-fetch-nem-src-externo
     label: "O HTML é autocontido (CSP-safe, file://, zero rede): injeção base64 à prova de </script>, vendor inline, sem fetch/XHR — verificado no HTML gerado"
     trace: ".claude/validation/lint-selftest.sh"
@@ -135,7 +135,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: hook-nativo-e-CI-486-verdes
     label: "36 selftests verdes (kg-view V6, kg-console, kg-narrate N1-N5, rules-registry, assemble-plugin) + lint 0 HARD; CI #486 pass (lint-onion-artifacts + onion-review)"
     trace: ".claude/validation/lint-selftest.sh"
@@ -150,7 +150,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: node-cytoscape-headless
     label: "Teste headless: Cytoscape instanciou com os elementos+style reais (underlay, double-border, tee/chevron aceitos), .closedNeighborhood() e concentric rodaram — o modelo+estilos são válidos"
     trace: ".claude/validation/vendor/kg-console/cytoscape.min.js"
@@ -165,7 +165,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: federation-research-881-nos
     label: "Escala provada: o console gera para 19/116/881 nós; o maior (881 nós/1086 arestas) em 0.35s, 1.1MB — colapso-por-cluster no grande via concentric por atenção"
     trace: ".claude/validation/kg-console.sh"
@@ -180,7 +180,7 @@ nodes:
     impact: 3
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: pesquisa-web-jul-2026
     label: "Pesquisa jul/2026: Cytoscape.js é o único renderer maduro single-file sem build; narração pré-cozida é o padrão p/ offline/CSP; GraphRAG/chat-over-graph são live (exigem runtime)"
     trace: "docs/analysis/onion-adr-kg-console-rich-2026-07.md"
@@ -195,7 +195,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: narracao-m2-valida-16-resumos
     label: "Dogfood: narração real do m2-bridge-logto (9 passos, 15 focos, 16 resumos) — válida pelo kg-narrate-validate; abre no arco canônico e fecha na fronteira stale"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.narration.json"
@@ -210,7 +210,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     verified_against: main-dd6677b
     label: "kg-console.sh — o projetor rico (Cytoscape inline, encoding epistêmico, player de tour); LLM-free"
     trace: ".claude/validation/kg-console.sh"
@@ -225,7 +225,7 @@ nodes:
     impact: 2
     confidence: 0.6
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó Q_f3_wow estava com status 'open' descrevendo F3 (partículas em arestas, semantic-zoom, minimapa, scrollytelling) como trabalho gated/pendente que 'vai por último de"
     label: "F3 wow polish (partículas em arestas, semantic-zoom, minimapa, scrollytelling) — gated, eye-candy destacável; vai por último de propósito"
     trace: "docs/analysis/onion-adr-kg-console-rich-2026-07.md"
@@ -235,7 +235,7 @@ nodes:
     impact: 2
     confidence: 0.5
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 7: worker CONFIRMED e juiz opus/high APROVOU (wf_ad4b2d7a-591)"
     label: "Narração LIVE opcional (POST a um LLM 'explique esta seleção') como enhancement que degrada gracioso offline — gated; a pré-cozida é o default de propósito"
     trace: "docs/analysis/onion-adr-kg-console-rich-2026-07.md"

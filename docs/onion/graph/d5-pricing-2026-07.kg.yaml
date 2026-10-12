@@ -55,7 +55,7 @@ nodes:
     impact: 4
     confidence: 0.6
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 4/4 claims; juiz APROVADO. 1) Lido o nó inteiro (label, edges SUPPORTS/DEPENDS_ON) em docs/onion/graph/d5-p => decisions.md linha 86 (ainda vigente, não editada desde a decisão original): "Degrau 3 — compliance-…'
     label: "DEGRAU 3 Compliance-pack (cunha P4): faixa $15k-40k/ano CITÁVEL não-fechado. Terço inferior do mercado compliance-automation (abaixo/na mediana Vanta $20k até Drata-Foundation $25-50k; muito abaixo de GRC enterprise $50-500k). Vende compliance-as-code (spec auditável), NÃO monitoramento contínuo. SOB-CONSULTA (gated D6: zero P4 entrevistado + escopo aberto). Confiança: média"
   - id: C_sota_subscription
@@ -65,7 +65,7 @@ nodes:
     impact: 4
     confidence: 0.45
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 4/4 claims; juiz APROVADO. Lido o nó inteiro (label + edges) e o gate Q_d2_l1l6_activation associado. Cruza => decisions.md §D2 (ativação) segue `gated`: "threat model N-tenant verificado... a verificar" — texto…'
     label: "DEGRAU 4 Assinatura SOTA: $150-400/mês indiv. · $250-600 base + $60-120/seat empresa. Acima das ferramentas de codificação genéricas (Cursor/Copilot/Claude Code Max) — vende curadoria+governança de contexto federado, não assistência de código. SOB-CONSULTA (gated D2: vende L1-L6 não-construído; cotar = declarado≠verificado = queima de moat). Faixa = ancoragem, não oferta. Confiança: baixa"
 
@@ -184,7 +184,7 @@ nodes:
     impact: 5
     confidence: 0.5
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O nó pedia CONSTRUIR a agregação por-adotante dos 4 sinais (o trabalho de instrumentação em si). Esse trabalho foi ENTREGUE integralmente: 4/4 scripts determinísticos exi"
     label: "GATE de instrumentação: 'valor medido por adotante' (metrics.md `[a instrumentar]`) — agregação por adotante de 4 sinais que já têm mecanismo host no core (ciclos concluídos via STATE.md barato-primeiro; frescor via /meta:context-freshness; velocidade/retrabalho via git+done_log; saúde federação via /meta:federation-status). Sem série temporal, nenhum degrau migra p/ preço-por-outcome (barreira BCG 2025)"
   - id: Q_p4_interviews
@@ -195,7 +195,7 @@ nodes:
     impact: 4
     confidence: 0.55
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 4/4 claims; juiz APROVADO. grep -n "P4|compliance-pack" docs/business-context/decisions.md; git log -p --fo => docs/business-context/decisions.md (linha 86, ainda vigente, sem edição desde 07-28) segue dizendo v…'
     label: "Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entrevistas P4 como pendência; falta também fechar o escopo do pack v1 (frameworks, nº artefatos, acompanhamento de auditoria) p/ achar custo-base/margem"
   - id: Q_d2_l1l6_activation
@@ -206,7 +206,7 @@ nodes:
     impact: 5
     confidence: 0.5
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 3: worker CONFIRMED e juiz opus/high APROVOU (run wf_5f6d1c0f-ecd)"
     label: "GATE D2: a assinatura SOTA vende o mecanismo L1-L6 (classificação-por-inferência + gate-por-propósito + ε-ledger) que segue GATED — construído+dogfoodado + threat model N-tenant verificado (hoje só N=1 pessoal). Cotar número antes = declarado≠verificado = queima de moat. Nenhum preço SOTA a cliente antes deste gate"
   - id: Q_train_cert_chaining
@@ -216,7 +216,7 @@ nodes:
     impact: 3
     confidence: 0.55
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 3/3 claims; juiz APROVADO. Lido o nó inteiro (label, trace ausente — herda decisions.md via edge TRACES_TO→ => A decisão do maestro em 2026-07-29 (decisions.md D5) fixou preços dos degraus 1 e 2 separadamente, m…'
     label: "Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento de percepção de valor entre dia-avulso ($1.8-3k) e cert inicial (~$1.25k). Só instrumentando 3+ engajamentos se confirma que não colidem. Decisão do maestro"
 
@@ -244,7 +244,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     label: "Maestro ratificou 2026-07-29 (parcial): degrau 1 treino = TESTAR 2-3 pontos ($1.8-3k/dia) antes de fixar (preço-por-descoberta); degrau 2 cert = só inicial ~$1.250, renovação gated no diretório público; degraus 3-4 seguem sob-consulta/gated (D6/D2); INSTRUMENTAÇÃO autorizada (scanner STATE.md + JSONL context-freshness). Aplicado em decisions.md"
     provenance:
       source: "docs/business-context/decisions.md"

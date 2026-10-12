@@ -1,8 +1,8 @@
 meta:
   id: websearch-cap-2026-09
   schema_version: "1"
-  baseline: 2026-09-02
-  review_after: 2026-10-02   # cadência FERRAMENTA/PREÇO = 30d: o objeto é um parâmetro de runtime do
+  baseline: "2026-09-02"
+  review_after: "2026-10-02"   # cadência FERRAMENTA/PREÇO = 30d: o objeto é um parâmetro de runtime do
                              # Claude Code (env var + default), que muda a cada release semanal — não é
                              # doutrina (12m) nem mercado (90d). Gatilho extra de revisita antecipada:
                              # qualquer update do Claude Code (migalha cc-version-e-gatilho-de-estrategia).
@@ -37,7 +37,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 3
@@ -56,7 +56,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 3
     source_kind: aggregator
@@ -74,7 +74,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 3
     source_kind: aggregator
@@ -92,7 +92,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'fan-out desta rodada: nenhum angulo devolveu material do eixo mercado/capital/analistas'
     source_tier: 3
     source_kind: synthesis
@@ -110,7 +110,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'contabilidade da propria rodada: 25 fontes varridas, 3 claims confirmadas, 1 claim refutada por fonte fraca, 0 claims nao-verificadas, 0 claims cortadas por orcamento'
     source_tier: 3
     source_kind: synthesis
@@ -128,9 +128,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.98
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: "binario do Claude Code 2.1.258 (python re.finditer): `var Ee=200;function BQn(){return a.CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION??Ee}` e a mensagem `this session has used its web search budget (${v} of ${k} WebSearch calls)... ask the user to raise CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` junto de `n.taskRegistry.incrementWebSearchCalls()`"
-    valid_from: 2026-09-01
+    valid_from: "2026-09-01"
     source_tier: 10
     source_kind: primary
     label: 'MEDIDO NO ARTEFATO (behavior-over-declaration): no 2.1.258 o teto de WebSearch por sessao tem default 200 e a env var CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION o sobrescreve; ao esgotar, o modelo recebe a instrucao de seguir com o que ja coletou e pedir ao usuario para subir a env — degrada em silencio narrativo, nao em erro. O contador e incrementado em taskRegistry (registro da SESSAO), logo as buscas de subagentes SOMAM no mesmo teto. O que /clear faz com o taskRegistry NAO foi medido (fica aberto). Fecha por medicao o achado 1 (tier 3) desta rodada e o NAO-VERIFICADO #1 de meta-research-lens.'
@@ -147,9 +147,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.98
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'binario 2.1.258: `_e=20;function FQn(){return a.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS??_e}` na mesma regiao do codigo'
-    valid_from: 2026-09-01
+    valid_from: "2026-09-01"
     source_tier: 10
     source_kind: primary
     label: 'MEDIDO NO ARTEFATO (colateral): CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS existe literalmente no 2.1.258 com default 20 — fecha o NAO-VERIFICADO #2 de meta-research-lens (nome literal e default lidos por resumo de doc, nao por citacao).'

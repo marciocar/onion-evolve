@@ -1,8 +1,8 @@
 meta:
   id: kg-multi-graph-view-2026-09
   schema_version: "1"
-  baseline: 2026-09-04
-  review_after: 2027-09-04   # cadência DOUTRINA = 12 meses. O tipo dominante desta rodada é DOUTRINA
+  baseline: "2026-09-04"
+  review_after: "2027-09-04"   # cadência DOUTRINA = 12 meses. O tipo dominante desta rodada é DOUTRINA
                              # DE ARQUITETURA DO MOTOR KG, apoiada em fontes que não se mexem: W3C RDF
                              # 1.1 Datasets (2014-02), SPARQL 1.1 Federated Query (2013-03) e a
                              # matemática de centralidade normalizada (Freeman) — nenhuma delas tem
@@ -68,7 +68,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://www.w3.org/TR/rdf11-datasets/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2014-02'
     source_tier: 10
@@ -87,7 +87,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://www.w3.org/TR/sparql11-federated-query/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2013-03'
     source_tier: 10
@@ -106,7 +106,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://neo4j.com/docs/operations-manual/current/fabric/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2023'
     source_tier: 8
@@ -125,7 +125,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.7
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://neo4j.com/docs/operations-manual/current/fabric/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
     valid_from: '2023'
     source_tier: 8
@@ -144,7 +144,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://en.wikipedia.org/wiki/Centrality — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 6
     source_kind: aggregator
@@ -162,7 +162,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://en.wikipedia.org/wiki/Centrality — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 6
     source_kind: aggregator
@@ -180,7 +180,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.75
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://en.wikipedia.org/wiki/Named_graph — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 6
     source_kind: aggregator
@@ -198,7 +198,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     valid_from: '2026'
     source_tier: 5
@@ -217,7 +217,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://github.com/bepitulaz/obsidian-multivault-mcp — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
     valid_from: '2026'
     source_tier: 5
@@ -236,7 +236,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://www.w3.org/TR/rdf11-datasets/ secao 3.2 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
     source_tier: 10
     source_kind: primary
@@ -255,7 +255,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'busca do eixo mercado/capital nesta rodada — nenhuma rodada de investimento, M&A ou nota de analista colhida sobre "visao agregada de N grafos de conhecimento peer" (KG pessoal ou organizacional); unico sinal adjacente e de FORNECEDOR: https://neo4j.com/docs/operations-manual/current/fabric/'
     source_tier: 6
     source_kind: aggregator
@@ -274,7 +274,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'contabilidade da propria rodada: 21 fontes consultadas, 10 claims confirmadas, 15 claims refutadas por verificacao adversarial, 0 nao-verificadas por falha de acesso'
     source_tier: 10
     source_kind: measurement
@@ -378,7 +378,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_W3C_SEM_SEMANTICA_UNICA_DATASETS (https://www.w3.org/TR/rdf11-datasets/) cruzada com E_W3C_MERGE_E_ESCOLHA_EXPLICITA (mesma fonte, secao 3.2) e com a medicao local: grep -c "system(|getline <|getline<" .claude/validation/kg-radar.sh -> 0 (executado 2026-09-04); kg-trace-resolve.sh l.19-23'
     source_tier: 10
     source_kind: measurement
@@ -396,7 +396,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_SPARQL_SERVICE_FEDERADO (https://www.w3.org/TR/sparql11-federated-query/) cruzada com o corpus: backlog-grafo-2026-08/Q_BACKLOG_FEDERADO ("ONDA 3 — visao agregada de backlog ENTRE adotantes. GATILHO: >=2 adotantes com backlog-grafo vivo E pedido explicito. Nunca antes.") e com o enunciado do caso: 4 arquivos .kg.yaml no MESMO repo, disco e dono'
     source_tier: 10
     source_kind: measurement
@@ -414,7 +414,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_NEO4J_COMPOSITE_QUERY_N_GRAFOS (https://neo4j.com/docs/operations-manual/current/fabric/ — vendor doc tier 8, edicao Enterprise) cruzada com o corpus: stack-harmonia-2026-08/D_anti_catalogo (confirmed 2026-08-01, "nao construir admin platform/painel agregado")'
     source_tier: 8
     source_kind: measurement
@@ -432,7 +432,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_NEO4J_ARESTA_NAO_ATRAVESSA_PROXY_NODE (https://neo4j.com/docs/operations-manual/current/fabric/) cruzada com medicao local: kg-trace-resolve.sh l.10-12 registra "54 grafos, 1.659 nos com trace: -> 13 ponteiros mortos (7 por arquivo movido para _processed/, 4 por prefixo perdido, 2 por reorganizacao)"; e grep -n orfao .claude/validation/kg-radar.sh -> l.744 `if (deg[id] == 0) print "✗ no orfao (grau 0)"` — unico guard de orfao do motor, INTRA-arquivo'
     source_tier: 10
     source_kind: measurement
@@ -450,7 +450,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_FREEMAN_CENTRALIZATION_NORMALIZADA + E_CLOSENESS_NORMALIZA_POR_TAMANHO (https://en.wikipedia.org/wiki/Centrality) cruzadas com medicao local: .claude/validation/kg-radar.sh l.354/407/446/457/487 -> att[id] = impact[id] * conf[id] * sf * (1 + deg[id]) com deg incrementado cru em l.303/316, ZERO normalizacao por tamanho; dispersao do corpus medida hoje: docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml = 882 nos / 1.087 arestas contra grafos de ~10 nos'
     source_tier: 10
     source_kind: measurement
@@ -468,7 +468,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'medicao local 2026-09-04: docs/backlog.md l.8 "122 itens abertos em 36 grafo(s) com aberto (de 58 no escopo) · 36 grupo(s)"; .claude/validation/kg-backlog-project.sh l.175-179 comentario "grupos ordenados por MAIOR atencao do grupo" + `sort -t$\t -k1,1nr`; ordem renderizada hoje coloca plugin-mcp-posture-2026-09 acima de m3-federation-admin-2026-07'
     source_tier: 10
     source_kind: measurement
@@ -486,7 +486,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_NAMED_GRAPHS_URI_PROVENIENCIA (https://en.wikipedia.org/wiki/Named_graph, tier 6) cruzada com medicao local: .claude/validation/kg-radar.sh l.390 — "a fila do corpus e o laco de quem chama — por isso a 1a coluna e o ARQUIVO, sem a qual o id sozinho nao localiza nada num corpus"; git ls-files "*.kg.yaml" | grep -v /fixtures/ | wc -l -> 88 grafos'
     source_tier: 10
     source_kind: measurement
@@ -504,7 +504,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_OBSIDIAN_LINK_QUALIFICADO_NAMESPACE (https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian, tier 5, plugin de terceiro em repo pessoal) cruzada com kg-trace-resolve.sh l.10-12 (13 ponteiros mortos medidos em 1.659 `trace:`)'
     source_tier: 5
     source_kind: measurement
@@ -522,7 +522,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_MULTIVAULT_MCP_SEM_VIEW_AGREGADA (https://github.com/bepitulaz/obsidian-multivault-mcp, tier 5, voto 2-1); ⚠️ o texto integral desta objecao chegou TRUNCADO no handoff do Elenxo ("kind":"fi...) — o que segue e derivado do proprio achado 9 e do seu tier/votos, sem completar por adivinhacao'
     source_tier: 5
     source_kind: engineer
@@ -540,7 +540,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'E_W3C_MERGE_E_ESCOLHA_EXPLICITA (https://www.w3.org/TR/rdf11-datasets/ secao 3.2, tier 10, 3-0) — a evidencia de maior autoridade da rodada, lida contra a tentacao de usar o achado 1 para reprovar O1'
     source_tier: 10
     source_kind: primary

@@ -36,7 +36,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: refuted
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: host-vps-medido-pos-flip
     label: "[EIXO DE EXECUÇÃO FECHADO 2026-07-27 — flip P7, ver E_p7_flip_live. /chat e /commands só entram por identidade OIDC (JWT Logto aud=bridge scope=bridge:invoke); o AUTH_TOKEN não abre mais execução com bypassPermissions. RESIDUAL VIVO, por isso status=open: AUTH_TOKEN ainda abre /admin e /a2a (sem QUEM ali) + a credencial OIDC agora mora no device (C_pkce_moves_credential_to_device) + P9 gated (C_p9_blocked_no_admin_oidc).] ORIGEM (verdadeiro até o flip): BURACO VIVO: o bridge (app.onionevolve.com) roda o Agent SDK com --permission-mode bypassPermissions contra um clone do core no VPS, e o ÚNICO portão de entrada é posse de um AUTH_TOKEN estático (segredo compartilhado, não identidade). Sem QUEM (0 usuario/papel/tier), sem RBAC (nao distingue ler de mutar), sem vinculo a members.yaml/Logto"
     provenance:
@@ -53,7 +53,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O fato histórico do label (o incidente de escrita de código a partir de um celular por bypassPermissions+git-local aconteceu) continua verdadeiro — não é isso que morreu."
     label: "NÃO é hipotético: precedente REAL de escrita de código de um celular por esse caminho (SDK bypassPermissions + git local no VPS). Escrita real já aconteceu — o buraco é risco materializado, não teórico"
     provenance:
@@ -70,7 +70,7 @@ nodes:
     impact: 3
     confidence: 0.8
     status: confirmed
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'host-vps-medido-pos-flip (recarimbo Onda 8, 2026-09-01) — claim medida VERDADEIRA: /a2a 403 com token a2a, a2aGuard nao olha authMode; flip open->confirmed no fechamento W8 (2026-09-02)'
     label: "[ATUALIZADO 2026-07-27 pós-flip P7: a cláusula final CAIU — o bridge/PWA NÃO segue mais autenticado só por AUTH_TOKEN; /chat e /commands agora exigem OIDC. Medido: /a2a segue caso à parte (a2aGuard não olha authMode) — 403 com token a2a = gate vivo, 3 tokens dedicados no pool.] Mitigação parcial existente NÃO cobre o bridge: a2a-verify.sh (6 camadas, fail-safe) gateia SÓ o canal /a2a (handshake entre cores, propose-only) — canal diferente e mais estreito"
     provenance:
@@ -88,7 +88,7 @@ nodes:
     confidence: 0.9
     status: superseded
     verified_against: endpoint-vivo
-    verified_at: 2026-07-29
+    verified_at: "2026-07-29"
     label: "Logto self-hosted 1.41.0 VIVO em auth.onionevolve.com (OIDC, emite JWT assinado + JWKS) desde 2026-07-25 — mas SEM NENHUM CONSUMIDOR plugado, nem o bridge. Capacidade de identidade já paga e ociosa. Com o flip deixa de ser ociosa E deixa de ser opcional (vira caminho crítico — C_logto_now_critical). FIX N: o sinal-fonte recebeu CORREÇÃO formal (Q_source_correction) — citar as duas juntas"
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md"
@@ -104,7 +104,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: refuted
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: host-vps-medido-pos-flip
     label: "[PÓS-FLIP 2026-07-27: REBAIXADO — não abre mais /chat nem /commands (execução exige OIDC). Sobrevive como chave de /admin (adminGuard) e /a2a (a2aGuard), que não olham o authMode. P9 (aposentar de vez) NÃO feito: gated em C_p9_blocked_no_admin_oidc, senão o /admin/* morre sem reposição.] AUTH_TOKEN próprio do bridge — segredo estático/compartilhado do serviço, não ligado a members.yaml nem a papel/tier. Era o artefato a APOSENTAR (P9) imediatamente após o P8; a janela dual-legacy fechou no P7, mas o valor sobrevive para admin/a2a"
     provenance:
@@ -131,7 +131,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): As 4 afirmações do label seguem tecnicamente verdadeiras e re-medidas hoje sem contradição — mas o nó é um DECISION que registra uma correção documental (postura + citaçã"
     label: "FIX G — a POSTURA (o maestro executa o flip de auth, a sessão especifica) se MANTÉM, mas ancorada onde de fato se ancora: (1) doutrina 'docs de deploy são declaração; O SERVIDOR É O VERIFICADO' (vps-lineage-odyssey:48) e (2) RISCO DE LOCKOUT — errar o gate de identidade da própria porta de entrada tranca o operador fora, e o rollback exige acesso ao host por outro canal. Citação de I3 corrigida nos 4 lugares"
 
@@ -144,7 +144,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: host-vps-medido
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     label: "FIX H: quem aplicou o endurecimento não-auth foi uma sessão anterior do core ao vivo neste host, não o maestro — drop-ins 10-memory-protection.conf de caddy e onion-bridge no systemd do host, mtime 2026-07-25. Hardening não-auth a sessão aplica e mede; flip de auth não (lockout)."
     narrative: "label anterior: FIX H — QUEM aplicou o endurecimento não-auth: foi uma SESSÃO ANTERIOR DO CORE ao vivo neste host, não o maestro à mão. Evidência medida: ⟨os drop-ins 10-memory-protection.conf de caddy e onion-bridge no systemd do host⟩, mtime 2026-07-25 19:00, com comentário-narrativa em pt-BR da própria sessão. FRONTEIRA HONESTA: este VPS É a casa do core (a sessão roda dentro dele) — hardening NÃO-AUTH a sessão aplica e mede; FLIP DE AUTH não (lockout). Confundir as duas produziu o erro do §5 (fix A)"
     provenance:
@@ -163,7 +163,7 @@ nodes:
     confidence: 0.95
     status: superseded
     verified_against: host-vps-medido
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     label: "FIX A — configurado != protegido: caddy e onion-bridge têm memory.min configurado e escrito no cgroup, mas o memory.min do system.slice é 0. Em cgroup v2 a proteção efetiva é limitada pela do ancestral, logo os floors valem zero; a verificação tem de percorrer a cadeia."
     narrative: "label anterior: FIX A — CONFIGURADO != PROTEGIDO. MEDIDO neste host (kernel 6.8.0-134, systemd 255): caddy.service memory.min=67108864 e onion-bridge.service memory.min=268435456 estão configurados E ESCRITOS no próprio cgroup — ⟨MAS o memory.min do system.slice no cgroupfs = 0⟩. Em cgroup v2 a proteção EFETIVA é LIMITADA pela do ANCESTRAL (o kernel distribui aos filhos uma fração do que o PAI afora; pai=0 => fração=0). Logo os floors 'JÁ FEITOS' de Caddy/bridge têm proteção efetiva ZERO. Não existe arquivo memory.min.effective — a verificação TEM de percorrer a cadeia de ancestrais"
     provenance:
@@ -181,7 +181,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_against: host-vps-medido
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     label: "FIX A(2): a condição que a v2 mandava conferir era a errada. memory_recursiveprot está presente nas opções de montagem do cgroup2, mas não é o gate: distribui a proteção não reivindicada do pai sem levantar o teto do ancestral. O que morde é o memory.min do ancestral."
     narrative: "label anterior: FIX A(2) — A CONDIÇÃO QUE A v2 MANDAVA CONFERIR ERA A ERRADA. MEDIDO: ⟨findmnt -no OPTIONS <montagem do cgroup2> =>⟩ rw,nosuid,nodev,noexec,relatime,nsdelegate,memory_recursiveprot — memory_recursiveprot ESTÁ PRESENTE. Ele NÃO é o gate: o que ele faz é distribuir aos descendentes a proteção NÃO-REIVINDICADA do pai, sem cada um declarar a sua; ele NÃO levanta o teto do ancestral (zero no pai continua zero para distribuir). O que MORDE é memory.min do ANCESTRAL, não a opção de montagem"
     provenance:
@@ -199,7 +199,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_against: host-vps-medido
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     label: "FIX A(3): OOMScoreAdjust=-500 funciona e independe do teto do ancestral — medido no oom_score_adj do processo real no procfs (-500). Metade do endurecimento (quem morre no OOM) está de pé; a outra (proteção contra reclaim) está zerada."
     narrative: "label anterior: FIX A(3) — o que NÃO estava quebrado, para a honestidade ser simétrica: OOMScoreAdjust=-500 FUNCIONA e independe do teto de ancestral. MEDIDO no processo real: ⟨oom_score_adj do pid 63903 no procfs => -500⟩. Ou seja METADE do endurecimento (viés de QUEM MORRE no OOM killer) está de pé; a outra metade (proteção contra RECLAMAÇÃO de página) está zerada. O risco residual é 'sem floor de reclaim', não 'nenhuma proteção'"
     provenance:
@@ -217,7 +217,7 @@ nodes:
     confidence: 0.5
     status: refuted
     verified_against: host-vps-medido
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     label: "REBAIXADO (era confidence 0.9 / status done / verified_against host-vps). A afirmação 'MemoryMin/MemoryLow JÁ FEITO para Caddy (64M/128M) e onion-bridge (256M/512M), confirmado no cgroup via systemctl show' é DECLARAÇÃO DE CONFIGURAÇÃO, NÃO PROTEÇÃO EFETIVA — refutada por C_ancestor_cap_zeroes_floors. O erro de MÉTODO: ler systemctl show (e até o memory.min do próprio cgroup, um nível só) e chamar de 'verificado'. O que sobrevive é só o OOMScoreAdjust (C_oom_bias_still_works)"
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
@@ -233,7 +233,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó D_fix_ancestor_floor está status=open descrevendo um FIX AINDA A APLICAR ('Comando: drop-in ... + daemon-reload + systemctl set-property'), mas a medição ao vivo mostra que as"
     label: "FIX A fecho: o conserto é declarar a proteção no ancestral, não mexer em Caddy/bridge. system.slice é filho direto da raiz, basta um nível: drop-in system.slice.d/10-memory-protection.conf com MemoryMin=384M/MemoryLow=768M + daemon-reload. memory.min é reserva dura: apertar."
     narrative: "label anterior: FIX A fecho — o conserto NÃO é mexer em Caddy/bridge (estão corretos no nível deles): é DECLARAR A PROTEÇÃO NO ANCESTRAL. MEDIDO: system.slice é filho direto de -.slice (raiz), e filho-direto-da-raiz NÃO TEM TETO ACIMA (o kernel usa o caminho curto pai==raiz), então basta UM nível. Comando: ⟨drop-in system.slice.d/10-memory-protection.conf no systemd do host⟩ com [Slice] MemoryMin=384M MemoryLow=768M (= soma APERTADA do que os descendentes reivindicam: 64+256 e 128+512, +folga) + daemon-reload + systemctl set-property --runtime. ATENÇÃO: memory.min é reserva DURA e não-reclamável — inflá-la aproxima o OOM global; manter apertado e SOMAR ao acrescentar serviço"
@@ -245,7 +245,7 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    verified_at: 2026-08-09
+    verified_at: "2026-08-09"
     verified_against: "varredura-host-wide-dos-3-drop-ins-com-caminhador-de-cadeia-na-vps-do-core"
     status: superseded
     label: "RESPONDIDA 2026-08-09 (varredura host-wide): a classe tem três drop-ins (system.slice, caddy, onion-bridge) e o do bridge é INERTE — protege onion-bridge.service, not-found, enquanto roda onion-vps-bridge.service com floors zero. Achado por grep nos arquivos, não pelo runtime."
@@ -266,7 +266,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_against: node-v22.23.1-neste-host
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     label: "FIX B — BYPASS REAL, REPRODUZIDO (node v22.23.1, o runtime deste host): decodeURI('/assets/%2e%2e/invoke') === '/assets/../invoke' e .startsWith('/assets/') === TRUE; decodeURIComponent('/assets/%2f%2f..%2finvoke') === '/assets///../invoke' também TRUE; '/assets/..%2finvoke' fura SEM decode nenhum. Ou seja: um PREFIXO ABERTO da allowlist ALCANÇA /invoke — o endpoint que aciona o Agent SDK sob bypassPermissions. O default-deny inteiro cai por uma string. Causa-raiz: o comentário '// c.req.path já vem normalizado' (v2:207) era CONFIANÇA SEM PROVA"
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
@@ -282,7 +282,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): A função canonicalPath especificada (laço de decode de 3 voltas, negação em '..'/'//'/'  '/%2e/%2f/%5c/byte de controle, defesa-em-profundidade) NUNCA foi construída como mecanismo"
     label: "FIX B fecho — GUARDA DE CANONICALIZAÇÃO OBRIGATÓRIA (canonicalPath), fail-closed: (1) decodifica em laço curto (3 voltas, pega %252e duplo-encode) e erro de decode => PROTEGIDO; (2) QUALQUER path que, no BRUTO ou em qualquer rodada decodificada, contenha '..', '//', '\\', %2e, %2f, %5c ou byte de controle => PROTEGIDO — não normaliza, NEGA; (3) ainda mudando na 3a volta => PROTEGIDO; (4) NUNCA assumir 'c.req.path já vem normalizado' sem prova, e mesmo com prova a guarda PERMANECE (defesa em profundidade — a premissa 'o framework normaliza' muda numa bump sem aviso). PROPRIEDADE que a torna segura: a guarda só sabe NEGAR MAIS — descasamento com o router só pode gerar 401 a mais, nunca 401 a menos. RODADA contra corpus: 12/12 ataques bloqueados, 11/11 paths legítimos abertos (inclusive /assets/logo%20final.svg)"
 
@@ -295,7 +295,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: superseded
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_hono_registration_order_bypass (SUPERSEDES); label preservado como historia'
     label: "FIX C — no Hono a cadeia segue a ORDEM DE REGISTRO: um handler registrado ANTES do app.use('*', requireIdentity) responde SEM PASSAR POR ELE = BYPASS TOTAL do default-deny. Silencioso, e invisível para qualquer teste que só exercite as rotas que alguém lembrou de listar. A v2 dizia 'montado globalmente' sem nunca exigir a POSIÇÃO — e 'montado globalmente' é verdade mesmo quando um app.route()/serveStatic veio antes"
 
@@ -307,7 +307,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1: worker CONFIRMED e juiz opus/high APROVOU a medicao (run wf_113a587e-715)"
     label: "FIX C fecho — EXIGÊNCIA no P5: app.use('*', requireIdentity) é o PRIMEIRO handler registrado, antes de TODA rota, de TODO app.route()/app.mount() e de TODO serveStatic. Nada de 'quase no topo'. Sub-app montado por app.route() só herda se o use global vier antes. E vira MECANISMO, não disciplina — ASSERTION DE BOOT que derruba o serviço: if (app.routes.findIndex(r => r.handler === requireIdentity) !== 0) { console.error('[FATAL] ...'); process.exit(1) }. Sem a assertion, 'o middleware é o primeiro' é afirmação de code review — a classe de garantia que o repo já decidiu não aceitar (fix-must-become-mechanism). P0.2b levanta a ordem atual; teste #14 prova"
 
@@ -321,7 +321,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_against: host-vps-medido
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     label: "FIX D: no systemd o hífen separa hierarquia — onion-auth.slice é filho de onion.slice. O cgroup real é onion.slice/onion-auth.slice/ na raiz do cgroupfs; a v2 lia onion-auth.slice/ direto na raiz, inexistente. Sem unit de onion.slice, só onion-auth.slice dá floor decorativo."
     narrative: "label anterior: FIX D — MEDIDO: systemctl show onion-auth.slice -p Slice => Slice=onion.slice. No systemd o HÍFEN é SEPARADOR DE HIERARQUIA em nome de slice: onion-auth.slice é filho de onion.slice, que é filho de -.slice. ⟨O cgroup real é onion.slice/onion-auth.slice/ na raiz do cgroupfs — a verificação #18 e o bloco do §5b' da v2 liam onion-auth.slice/ direto na raiz do cgroupfs, caminho INEXISTENTE⟩ (um cat de arquivo ausente daria 'erro', não 'gap', mascarando a causa). ERRO COMPOSTO com o fix A: onion.slice NÃO tem unit em disco ⟨(medido: nenhuma unit onion*.slice no systemd do host;⟩ LoadState=loaded era o systemd sintetizando slice implícito) e teria MemoryMin=0 => criar só onion-auth.slice produziria OUTRO FLOOR DECORATIVO"
     provenance:
@@ -352,7 +352,7 @@ nodes:
     confidence: 0.85
     status: open
     verified_against: host-vps-medido
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     label: "FIX L2: a semântica de cgroup_parent depende do cgroup driver do docker. Medido: driver = systemd (há system.slice/docker-<hash>.scope no cgroupfs, sem diretório docker na raiz), logo cgroup_parent recebe NOME de slice. Errar não dá erro, o floor só não se aplica. Re-conferir."
     narrative: "label anterior: FIX L2 — PROVA NOVA no P0.6: a semântica de cgroup_parent DEPENDE do cgroup driver do docker. MEDIDO hoje: driver = systemd ⟨(há system.slice/docker-<hash>.scope no cgroupfs e NÃO há o diretório docker na raiz dele)⟩. Com driver systemd, cgroup_parent recebe NOME DE SLICE (onion-auth.slice); com cgroupfs, recebe CAMINHO (/onion-auth). Errar NÃO GERA ERRO — os containers ficam onde estavam e o floor não se aplica (falha silenciosa). Segue question e não claim porque um daemon.json novo muda o driver sem aviso: RE-CONFERIR no dia com docker info --format '{{.CgroupDriver}}'"
     provenance:
@@ -370,7 +370,7 @@ nodes:
     confidence: 0.9
     status: open
     verified_against: "host-vps re-medido 2026-08-27 via 1o /meta:drive na onda m2-bridge (CONFIRMED, o gap persiste): onion-vps-logto min=0/low=0/max=1073741824(1GB) · onion-vps-logto-postgres min=0/low=0/max=536870912(512MB) — piso 0 e teto exato da claim. ⚠ lição verify-read-path: os scopes docker do ADOTANTE arandek dao max=max; medir o container do CORE (docker ps -> id -> scope), nao um scope docker qualquer, senao da DRIFTED falso"
-    verified_at: 2026-08-27
+    verified_at: "2026-08-27"
     label: "GAP (impacto ELEVADO na v2+, porque o Logto virou caminho crítico): Logto+Postgres (docker) só têm teto duro. MEDIDO no cgroup: os scopes docker-<hash>.scope sob system.slice têm memory.min=0 memory.low=0, e memory.max = 1073741824 (logto) / 536870912 (postgres). Causa: o nome do scope muda a cada recriação, então o drop-in fixo de Caddy/bridge não se aplica. Fecho em D_logto_same_protection_tier (slice pai + slice auth + compose)"
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
@@ -388,7 +388,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_against: host-vps-medido
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     label: "FIX E — o comando de prova do P1.2 (v2:436-437) NÃO FUNCIONA. REPRODUZIDO neste host: (1) 'base64 -d' não lê base64url sem padding — GNU coreutils 9.4 devolve 'base64: invalid input' (rc=1) sempre que o comprimento não é múltiplo de 4 (2 em cada 3 JWTs reais) e quebra de vez com o alfabeto base64url ('-'/'_'): com payload realista contendo '-', o pipeline deu 'jq: parse error: Unfinished string at EOF', EXIT 5; (2) o '2>/dev/null' ESCONDE exatamente o erro que explicaria o vermelho. GRAVIDADE: o passo de prova ROTEIA a decisão A->B1->B2->B3, então um FALSO-VERMELHO empurra o desenho a um plano-B MAIS FRACO (B2 acopla mais, B3 abre mão do aud-binding) SEM MOTIVO REAL — perde-se segurança por bug de shell"
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
@@ -404,7 +404,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): As 4 claims do label seguem TECNICAMENTE VERDADEIRAS (re-medidas ao vivo hoje, idênticas ao que o label descreve) — mas o nó é um DECISION com status:open, e uma decisão de 'qual c"
     label: "FIX E fecho — e o 'fix óbvio' TAMBÉM não serve: jq -R 'split(\".\")|.[1]|@base64d|fromjson' FALHA IGUAL (medido: jq-1.7 implementa @base64d como base64 ESTRITO, não base64url — com payload contendo '-' retorna 'is not valid base64 data', exit 5; ele tolera padding ausente, não o alfabeto). COMANDOS CORRETOS, ambos validados neste host: PRIMÁRIO decode_jwt() em node (MESMO runtime do bridge, v22.23.1, Buffer.from(s,'base64url') nativo, distingue 'NAO E JWT / token opaco' de 'meu decoder quebrou'); FALLBACK jq com gsub('-';'+')|gsub('_';'/') + repadding EXPLÍCITO. REGRA: a prova NUNCA silencia stderr e SEMPRE separa os 3 vereditos (3 partes+aud ok / 3 partes+aud errado / token opaco)"
 
@@ -427,7 +427,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó descreve uma DECISÃO de ordenação (P0 pré-flight -> ... -> P9 aposentar, linear, sem passo consumindo artefato de passo posterior) que estava status=open (pendente d"
     label: "FIX F fecho — ORDEM LINEAR: P0 pré-flight -> P1 API RESOURCE -> P2 M2M APP (sem role ainda) -> P3 ROLE/PERMISSÃO (P3.1 criar role, P3.2 atribuir a M2M+maestro, P3.3 SPA pública PKCE, P3.4 sign-up OFF, P3.5 token curto+refresh rotation) -> P4 PROVA (P4.1 RFC 8707, P4.1b prova do B1, P4.2 emissão humana, P4.3 registrar o plano adotado no spec+KG) -> P5 middleware -> P6 os dois chamadores -> P7 O FLIP -> P8 verificar -> P9 aposentar. Nenhum passo consome artefato de passo posterior"
 
@@ -440,7 +440,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O label descreve uma superfície de risco fixada no desenho de julho/2026 ('bridge:invoke é o ÚNICO scope... não há token de leitura'). Em 2026-08-15 o bridge implementou "
     label: "FIX I — RISCO NOVO QUE A v2 NÃO NOMEAVA: com PKCE o material bearer passa a VIVER NO BROWSER DA PWA (localStorage por padrão no SDK do Logto), com o MESMO PODER DE EXECUÇÃO — bridge:invoke é o ÚNICO scope e por trás dele está o Agent SDK em bypassPermissions; não há 'token de leitura'. O flip MOVE, não elimina, a superfície: de 'um segredo num EnvironmentFile no servidor' para 'um token num device'. Três vetores: ARMAZENAMENTO (localStorage é legível por qualquer JS da origem e persiste), XSS (dependência comprometida ou sw.js envenenado EXFILTRA o bearer e ganha execução de agente no clone do core), PERDA DE DEVICE (o token válido vai junto). Um spec de segurança que só lista ganhos não é um spec de segurança"
 
@@ -464,7 +464,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_against: decisao-do-maestro
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "RESOLVIDO PELO MAESTRO: o chamador do bridge é HÍBRIDO — (a) HUMANO operando a PWA no celular E (b) automação/serviço. Não é inferência do core: é entrada de decisão. Daqui sai o desenho de GRANT DUPLO; sem isto, todo o resto da v1 caía junto"
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
@@ -491,7 +491,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó está status=open (decisão pendente de execução), mas o desenho que ele descreve (gate OIDC duplo: 1 resource + PKCE humano + client_credentials serviço, mesmo middleware, subs"
     label: "GATE OIDC DUPLO: 1 API Resource (https://bridge.onionevolve.com) + 2 clients. (a) HUMANO = SPA/Native PÚBLICO com Authorization Code+PKCE — ZERO client_secret distribuído, sub = id do USUÁRIO (fecha o alvo 'não há QUEM'), revogável por pessoa. (b) SERVIÇO = M2M client_credentials, secret só no servidor (pass do VPS), sub == client_id. MESMA audiência, MESMO middleware, UM caminho de validação (distingue quem DEPOIS de validar). Substitui o AUTH_TOKEN; NÃO altera o bypassPermissions. Custo nomeado: C_pkce_moves_credential_to_device"
 
@@ -503,7 +503,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O no descreve um fecho em 2 camadas: (1) sign-up desligado (P3.4) e (2) role concede bridge:invoke restrito, com usuario-sem-role levando '403 insufficient_scope (!= 401)"
     label: "Corolário do grant duplo — com PKCE, sign-up ABERTO no Logto = qualquer pessoa vira usuário do tenant e passa em iss/aud. Fecho em 2 CAMADAS: (1) desligar o sign-up na Sign-in Experience (P3.4); (2) role bridge-operator concede o scope bridge:invoke só ao maestro e ao client M2M — usuário sem role recebe JWT válido SEM scope e leva 403 insufficient_scope (≠ 401). A camada 2 sustenta o fecho mesmo se a 1 for reaberta por engano"
 
@@ -515,7 +515,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 5/5 claims; juiz APROVADO. Medido ao vivo no host (sudo -n) contra o src/ do clone de produção do onion-bridge => 5 sub-afirmações no label, todas medidas: (1) \"Logto = emissor/validador de identidade\" — CONFIRMADO…"
     label: "INVARIANTE herdada do M3: Logto = emissor/validador de identidade (commodity-BUY), NUNCA SSOT de autorização fina. A autorização de domínio (membro/tier/escopo) é do control-plane Onion (members.yaml). O scope do JWT é ESPELHO de permissão, não a fonte da verdade. Vale também no plano B3: a allowlist de client_id mora no BRIDGE, não no Logto"
 
@@ -548,7 +548,7 @@ nodes:
     impact: 4
     confidence: 0.5
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 4/4 claims medidas ao vivo. sudo -n grep -n \"app\\.get(\\|app\\.post(\\|app\\.use(\\|app\\.route(\\|app\\.mount(\" <src/ do clone de produção do onion-bridge>… => Rodando no próprio host com sudo -n: (1) server.ts vivo mostra 46 registros app.get/post/... e middlewares…"
     label: "VPS-DECLARADO: o inventário EXATO das rotas do app Hono só existe no host. A tabela do §3.4 é CONTRATO, não fato. P0.2 enumera com comando — dump de RUNTIME (app.routes, comportamento) como autoritativo + grep na fonte (agora incluindo route|mount) como rede de segurança — e classifica cada rota PROTEGIDA/ABERTA/DUPLO-GATE. P0.2b anota o ÍNDICE de cada handler (fix C). P0.2c localiza o /a2a (fix L1)"
     provenance:
@@ -565,7 +565,7 @@ nodes:
     impact: 3
     confidence: 0.5
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O trabalho que o nó descreve como decisão pendente/prova a fazer já foi ENTREGUE e está vivo em produção: o /a2a tem cobertura dupla real e independente (a2aGuard por Bea"
     label: "FIX L1 — PROVA NOVA: na v2 o /a2a era 'CASO À PARTE' sem NENHUM teste, ou seja uma exceção sem verificação. Agora: o DEFAULT é COBERTURA DUPLA (requireIdentity E a2a-verify.sh, 6 camadas), a exceção exige justificativa escrita, e o TESTE #23 prova o que foi decidido — cobertura dupla: POST /a2a com envelope a2a válido e SEM Bearer => 401, e com Bearer válido mas envelope inválido => rejeitado pelo a2a-verify (não 200), provando as duas camadas vivas e INDEPENDENTES; exceção documentada: POST /a2a sem Bearer não dá 200 por conta do gate a2a, e o teste #16 confirma que /a2a não entrou na allowlist. P0.2c resolve onde ele vive"
     provenance:
@@ -582,7 +582,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó era uma pergunta LOAD-BEARING a confirmar: 'a PWA consome SSE por EventSource?' — com o risco de o caminho humano quebrar após o flip OIDC, e a prescrição de migrar "
     label: "FIX M — MANTIDO E DESTACADO (§3.4d próprio, não mais nota de rodapé). LOAD-BEARING a confirmar (P0.3): EventSource NÃO permite header customizado — não manda Authorization. É limitação da API do browser, não do desenho. Se a PWA consome SSE por EventSource, o CAMINHO HUMANO NÃO FUNCIONA depois do flip; o caminho correto é migrar para fetch + ReadableStream (aceita header, e dá controle de reconexão/abort que o EventSource não dá). RECUSADO explicitamente: token por QUERY STRING — vaza no log de acesso do Caddy, no header Referer e no histórico; um bearer com poder de bypassPermissions num log de acesso é o mesmo buraco com outra roupa. Se um ticket de curta duração por query for a única saída, vira decisão do maestro com risco declarado e PRAZO, não default do spec"
     provenance:
@@ -610,7 +610,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó descreve um mecanismo de fail-closed EM VIGOR para BRIDGE_AUTH_MODE (default enforce, parsing fail-closed, opt-out nomeado com data de expiração, WARN a cada boot, FLIP = remo"
     label: "FAIL-CLOSED (aprovado pelos verifies, PRESERVADO): BRIDGE_AUTH_MODE com AUSENTE = enforce; qualquer valor que não seja exatamente 'dual-legacy' (typo, vazio, 'false', '0') também cai em enforce (falhar fechado inclui falhar fechado no PARSING). O opt-out é explícito, nomeado, comentado com DATA DE EXPIRAÇÃO CONCRETA (fix K: '# EXPIRA 2026-08-08', não mais o placeholder '2026-07-2X' que ia COLADO pro EnvironmentFile) e loga WARN a cada boot. O FLIP (P7) é REMOVER a linha — o estado seguro é o estado SEM configuração, e o rollback é re-adicionar"
 
@@ -622,7 +622,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó descreve a CORREÇÃO da função legacyAuthTokenOk() (defini-la com leitura de AUTH_TOKEN, dual-header x-auth-token/Bearer, comparação em tempo constante via crypto.tim"
     label: "FIX K — legacyAuthTokenOk() era USADA (v2:219) e NUNCA DEFINIDA: num spec turnkey, um placeholder no caminho de auth é onde o operador improvisa (e improviso em comparação de segredo costuma virar '==' com vazamento por timing). Agora DEFINIDA: lê process.env.AUTH_TOKEN (ausente => nega), aceita x-auth-token ou o Bearer legado, compara em TEMPO CONSTANTE (crypto.timingSafeEqual, com checagem de comprimento antes para não estourar), e vive numa função SÓ para o P9 ser exclusão cirúrgica. Também corrigido o outro placeholder: '2026-07-2X' (v2:303,469) => 2026-08-08"
 
@@ -631,7 +631,7 @@ nodes:
     trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
     layer: audit
     plane: PROD
-    verified_at: 2026-08-13
+    verified_at: "2026-08-13"
     verified_against: p11-em-producao-boot-sem-linha-convites-era-2-agora-0-env-sem-courtesy-byok-e-sdk-0-3-231
     impact: 4
     confidence: 1.0
@@ -647,7 +647,7 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: "CURA DEPLOYADA 2026-09-02 (E_W9_BRIDGE_DEPLOY_0902: jwksAttemptedAt em src/identity.ts do clone de produção do onion-bridge, 4 ocorrencias); segue open porque o criterio de fechamento e MEDICAO no vivo — 1 fetch por janela de 60s durante queda real do IdP — e nao se simula queda do Logto em producao. GATILHO: 1a queda real do IdP (journal do onion-vps-bridge)"
     status: done
     impact: 3
@@ -664,7 +664,7 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: "FECHADA por deploy (ver E_W9_BRIDGE_DEPLOY_0902): sudo -n grep spawnSync src/a2a.ts (clone de produção do onion-bridge) = so o comentario da l.88; spawn( presente; bench pre-merge 4820ms->1,1ms; medicao em PROD sob request a2a real = proximo uso real"
     status: done
     impact: 4
@@ -686,7 +686,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó descreve uma deliberação de risco sobre 'o flip que vai criar dependência dura' — mas o flip já foi executado, endurecido e estabilizado há semanas: P11 (2026-08-13) removeu A"
     label: "O flip CRIA uma dependência dura que não existia (hoje o bridge compara uma string sozinho). Sob Logto-down: JWKS cacheado (cacheMaxAge 10min/cooldown 30s) segue validando JWTs já emitidos até rotação/expiração => 200; emissão de token novo falha => depois da expiração, 401 = entrada INACESSÍVEL. Fail-closed: SEGURO, porém INDISPONÍVEL. RECUSADO explicitamente: fallback 'se o Logto não responder, aceita o AUTH_TOKEN' — DOWNGRADE ACIONÁVEL POR ATACANTE (derrubar o IdP reativa o segredo). Mitigações: /health do bridge NÃO consulta o Logto (senão vira loop de restart); SSH por chave independe do Logto — o maestro nunca fica trancado fora da MÁQUINA, só da conveniência mobile, e é isso que sustenta o rollback do P7"
 
@@ -714,7 +714,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O label descrevia o mecanismo como 'fixar algorithms: ['RS256'] (ou ['ES256']...) no jwtVerify (jose)' — a implementação real diverge na FORMA (não usa a lib jose nem jwt"
     label: "ALG PINADO (aprovado pelos verifies, PRESERVADO): no jwtVerify (jose) do §3.3, fixar explicitamente algorithms: ['RS256'] (ou ['ES256'], conforme o alg REAL que o Logto emitir, provado no P4.1 decodificando o HEADER do JWT — agora com o decode_jwt que funciona, D_proof_command_fixed). Nunca deixar a lib herdar o alg do header do token: endurecimento padrão contra CONFUSÃO DE ALGORITMO (alg:none, HS256 com chave pública como segredo). Custo zero, uma linha"
 
@@ -727,7 +727,7 @@ nodes:
     impact: 4
     confidence: 0.5
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó está aberto como pergunta pendente ('Q aberta até P4.1 provar'), mas P4.1 JÁ ACONTECEU e a resposta foi A (Logto self-hosted honra resource=<api-identifier> RFC 8707"
     label: "LOAD-BEARING (não nota de rodapé): o aud-binding do §3.3 DEPENDE de o Logto 1.41.0 self-hosted honrar resource=<api-identifier> (RFC 8707). Se não honrar, o Logto tende a emitir token OPACO (userinfo), não JWT com aud do bridge — e a validação local NÃO FUNCIONA. Q aberta até o P4.1 provar contra o endpoint real, com o comando corrigido (C_proof_command_broken)"
 
@@ -739,7 +739,7 @@ nodes:
     impact: 3
     confidence: 0.4
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): A pergunta presume que o fallback B1 (default API resource) ainda precisa de um passo de prova próprio porque poderia ser adotado. Mas o Plano A (resource honrado via RFC"
     label: "FIX J — o 'default API resource do tenant' era apresentado como FALLBACK PREFERIDO (B1) SEM VERIFICAÇÃO NENHUMA: tão VPS-DECLARADO quanto o RFC 8707 que ele deveria substituir. Adotá-lo assim é trocar uma suposição por outra. Agora tem PASSO DE PROVA PRÓPRIO (P4.1b): marcar o recurso como default no console, pedir token SEM o parâmetro resource= e decodificar. VERDE do B1 = 3 partes E aud contém https://bridge.onionevolve.com sem ter mandado resource=. Qualquer outra coisa = B1 REPROVADO => descer para B2"
 
@@ -751,7 +751,7 @@ nodes:
     impact: 4
     confidence: 0.8
     status: refuted
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_D_resource_plan_b (SUPERSEDES); label preservado como historia'
     label: "ESCADA A->B1->B2->B3 (aprovada pelos verifies, PRESERVADA) — PROVA ANTES do desenho depender (P4.1) + PLANO-B escrito: A = resource honrado (§3.3 como está) -> B1 = marcar como DEFAULT API RESOURCE, agora COM PROVA PRÓPRIA (Q_default_api_resource_b1) -> B2 = token opaco: validar por GET /oidc/me (round-trip por request, cache 60s; acopla MAIS — Logto down fecha na hora) -> B3 ÚLTIMO RECURSO = iss+exp+scope+ALLOWLIST de client_id no bridge, com risco DECLARADO (sem aud-binding, token de outra audiência do mesmo tenant é replayável) e data de revisão. B3 só com aceite explícito do maestro. Em NENHUM cenário afrouxa para 'aceita qualquer JWT do issuer'. P4.3 registra no spec+KG o plano adotado ANTES de escrever o middleware"
 
@@ -764,7 +764,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): A_spec_turnkey descreve um desenho ESPECÍFICO (gate OIDC duplo + guarda de canonicalização dedicada `canonicalPath` com laço de decode de 3 voltas fail-closed + `app.use('*', requi"
     label: "SPEC TURNKEY M2 v3 (este doc, corrigido pelos 14 fixes A-N do 2º verify adversarial) — desenho do gate OIDC DUPLO + guarda de canonicalização + ordem de middleware por assertion + passos LINEARES reversíveis + endurecimento QUE PROTEGE DE FATO + 23 provas. Segurança defensiva; NÃO promete L1-L6. As posições superadas ficam inline marcadas, não apagadas. LIÇÃO-EIXO da revisão: CONFIGURADO NÃO É PROTEGIDO, DECLARADO NÃO É VERIFICADO — apareceu 3x (floor zerado pelo ancestral, allowlist atravessada por %2e%2e, comando de prova que rotearia a um plano-B mais fraco por bug de shell), e as 3 só apareceram porque alguém RODOU O COMANDO em vez de reler o texto"
 
@@ -776,7 +776,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O nó descreve um plano turnkey ABERTO (P0 pré-flight -> ... -> P9 aposentar) com a propriedade explícita 'Reversível em segundos por UMA LINHA DE ENV até P8'. A medição mostra que "
     label: "PASSOS TURNKEY v3 (ordem LINEAR, cada um com rollback): P0 pré-flight (P0.1 systemd/Caddyfile · P0.2 ENUMERAR ROTAS · P0.2b ORDEM DE REGISTRO · P0.2c onde vive o /a2a · P0.3 SSE · P0.4 cortesia/BYOK · P0.5 sign-up · P0.6 CGROUP DRIVER do docker) -> P1 API Resource -> P2 M2M App -> P3 role+atribuição+SPA PKCE+sign-up OFF+token curto -> P4 PROVAS (RFC 8707 com decode_jwt que funciona · prova do B1 · emissão humana · registrar o plano) -> P5 middleware (use PRIMEIRO + assertion de boot + guarda de path + alg pinado + legacyAuthTokenOk definida + EXPIRA 2026-08-08) -> P6 os DOIS chamadores mandam Bearer -> P7 O FLIP = REMOVER a linha -> P8 as 23 provas -> P9 aposentar na MESMA janela. Reversível em segundos por UMA LINHA DE ENV até P8"
 
@@ -788,7 +788,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): A_verification é o relatório v3 (23 provas) que sustentava a segurança do FLIP proposto pelas decisões D_default_deny_routes/D_fail_closed_default/D_gate_oidc_dual/D_path_canon_gua"
     label: "VERIFICAÇÃO v3 (23 provas; a v2 tinha 19): novas ou corrigidas incluem a prova do B1, path-traversal com 12 payloads e --path-as-is, nenhum 5xx, ordem do requireIdentity, floors pela cadeia, slice no caminho real do cgroupfs e /a2a gateado após o flip; mantidas 401/403 e JWKS."
     narrative: "label anterior: VERIFICAÇÃO v3 (23 provas; a v2 tinha 19). NOVAS/CORRIGIDAS: #3 prova do B1 (fix J); #12 PATH-TRAVERSAL — o MESMO corpus de 12 payloads que a guarda passou em bancada (%2e%2e, ..%2f, %2f%2f, //, %252e duplo-encode, %zz decode inválido, %00, %5c, sob /icons e /.well-known) todos 401 contra o host real, com --path-as-is OBRIGATÓRIO (sem ele o próprio curl normaliza e o teste vira teatro), MAIS o contra-teste que impede zelo cego: /assets/logo%20final.svg segue 200 (espaço percent-encoded não é traversal; guarda que nega isso quebra a PWA e será desligada); #13 nenhum 5xx no traversal (exceção não-tratada poderia contornar o gate); #14 ORDEM — assertion de boot não dispara, requireIdentity no índice 0, e teste NEGATIVO em dev (mover o use => o serviço TEM de morrer no boot); #21 FLOORS EFETIVOS via check_floor() percorrendo a cadeia (antes do fix, medido: TETO DE ANCESTRAL system.slice=0) + oom_score_adj do processo; ⟨#22 slice no PATH REAL <cgroupfs>/onion.slice/onion-auth.slice/;⟩ #23 /a2a segue gateado após o flip. MANTIDAS: emissão M2M+HUMANA, 401 sem/inválido/expirado/AUDIÊNCIA ERRADA, 403 sem scope, 200 nos dois, assets 200 sem token, /health 200, mutação em prefixo aberto 401, env some/lixo => 401, AUTH_TOKEN recusado após P9, janela real do JWKS medida"
@@ -803,7 +803,7 @@ nodes:
     confidence: 0.7
     status: done
     verified_against: host-vps-declarado
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "PIN+VERIFIER do Logto, declarado por sessão anterior e não re-medido (o sandbox bloqueou o crontab): verified_against vira host-vps-DECLARADO, confidence 0.7. check-version.sh semanal e backup 03:20. Re-medir no P0: crontab -l | grep -i logto e ls dos backups do onion-logto."
     narrative: "label anterior: PIN+VERIFIER do Logto — DECLARADO por sessão anterior, NÃO RE-MEDIDO nesta rodada (o sandbox desta sessão bloqueou a leitura do crontab), por isso verified_against desce de host-vps para host-vps-DECLARADO e a confidence de 0.9 para 0.7. Conteúdo: check-version.sh no crontab (seg 09:00 --quiet->logger) + backup diário 03:20; roda ✓ em dia (1.41.0). RE-MEDIR no P0: crontab -l | grep -i logto e ⟨ls -la do backups/ do onion-logto (host)⟩. Guardrail (PROPOSTA não-ratificada, inbox 2026-07-25): pin de auth exige checar delta antes de subir, peso extra. Com o flip o guardrail GANHA PESO"
     provenance:
@@ -821,7 +821,7 @@ nodes:
     confidence: 0.85
     status: superseded
     verified_against: 'fechamento W8 2026-09-02: SUPERSEDED por E_W8_CONSOLE_AUTOOFF_VIVO (auto-off medido no vivo); label preservado como historia'
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     label: "GAP: console.sh só tem on/off/status manuais (medido: o case tem on) off) status) e mais nada; console desligado agora). Fecho: no case on) agendar systemd-run --unit=onion-logto-console-autooff --on-active=30m em modo SYSTEM (sudo, NÃO --user — timers de usuário morrem com a sessão SSH); no case off) parar o timer. Reversível, sem estado persistente"
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
@@ -838,7 +838,7 @@ nodes:
     impact: 2
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó pede uma HIGIENE DE CITAÇÃO ainda pendente ('as duas fontes têm de ser citadas JUNTAS'; status: open). No vivo, essa higiene já foi APLICADA: o documento que origina"
     label: "FIX N — HIGIENE DE FONTE: o sinal citado por este spec (inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md) RECEBEU CORREÇÃO FORMAL. A correção REFUTA o diagnóstico do entrypoint ('o 503 do staging do Arandek vinha de seed && node init.mjs && npm start') — a causa real era AUTO-SHUTDOWN AGENDADO (min=0/max=0, desired=0, num sábado fora da janela seg-sex 07:00-21:00). NÃO ATINGE o que o M2 cita daquele sinal (Logto 1.41.0 vivo, pin+verifier), MAS as duas fontes têm de ser citadas JUNTAS: citar o sinal sem a correção reintroduz por transporte uma inferência já refutada. É a MESMA CLASSE de erro desta revisão — observação correta promovida a causa"
     provenance:
@@ -855,7 +855,7 @@ nodes:
     impact: 4
     confidence: 0.5
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó lista 8 lacunas de medição declaradas em 2026-07-05/07-26 ('o que esta sessão NÃO mediu'). Nesta passada, todas as 8 foram medidas diretamente no host vivo (VPS = a "
     label: "VPS-DECLARADO ('o servidor é o verificado') — o que esta sessão NÃO mediu: valor real do AUTH_TOKEN vivo; systemd unit/Caddyfile reais do bridge (inclusive se o reverse_proxy preserva o header Authorization e se não loga query string); config real de bypassPermissions/allowedTools do Agent SDK; inventário e ORDEM DE REGISTRO das rotas do Hono; como a PWA consome o SSE; modos cortesia/BYOK; estado do sign-up no Logto; onde vive o /a2a. P0 pré-flight resolve lendo no host antes de agir. NOTA: a v3 introduziu a distinção host-vps-MEDIDO vs host-vps-DECLARADO justamente porque o fix A mostrou que 'verificado' vinha sendo usado para configuração"
     provenance:
@@ -872,7 +872,7 @@ nodes:
     impact: 2
     confidence: 0.4
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 7 (run wf_05b33768-48c): os 2 modos cortesia+BYOK sairam do binario com o P11 — a pergunta ficou sem objeto"
     label: "INFERÊNCIA A VERIFICAR: a citação '2 modos cortesia-login + BYOK (X-Anthropic-Key)' vem do app-irmão onion-pessoal-app, NÃO do bridge. Não confirmado que o bridge tem esse par nem se OIDC deve gatear ambos — confirmar no host no P0.4"
     provenance:
@@ -890,7 +890,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó é um bucket composto de 7 itens declarados GATED 'não neste flip, derivar fresco quando o gate abrir' (gatilho: 1º role:consumer real). A medição mostra que o gatilh"
     label: "GATED (não neste flip): RBAC MULTI-OPERADOR / plataforma admin M3 (Logto Organizations só no gatilho 1º role:consumer real) — o login humano PKCE SAIU do gated; o que segue gated é a MALHA multi-operador. Também gated: ENDURECIMENTO DA PWA como cliente (CSP completa, SRI, auditoria de dependência, storage fora do localStorage — este flip só fixa as 3 mitigações baratas e NOMEIA que a PWA entrou na base de confiança, D_pkce_risk_mitigations); Caddy forward_auth/oauth2-proxy (redundante com PKCE in-app); RBAC fino por operação; revisão do bypassPermissions do SDK (eixo separado); cgroup delegation ao dockerd (se cgroup_parent não pegar); AUDITORIA DOS DEMAIS FLOORS do host com check_floor (o fix A é uma CLASSE, não um caso). Derivar fresco quando o gate abrir"
 
@@ -901,7 +901,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: host-vps-medido
     label: "FIX A APLICADO 2026-07-26 (sessão do core, permissão explícita do maestro; hardening NAO-AUTH, sem risco de lockout). Drop-in system.slice.d/10-memory-protection.conf com MemoryMin=384M/MemoryLow=768M + daemon-reload. VERIFICADO NO EFETIVO lendo o cgroup: system.slice/memory.min 0 -> 402653184 e memory.low 0 -> 805306368; caddy (67108864) e onion-bridge (268435456) agora tem ancestral que concede protecao. Reverter: rm o arquivo + daemon-reload. A CLASSE do problema (varredura dos demais floors) segue aberta em Q_floors_effective"
     narrative: "trace anterior (só no host): o drop-in system.slice.d/10-memory-protection.conf do systemd do host (fora de repo)."
@@ -918,7 +918,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: host-vps-medido
     label: "BRIDGE LIDO 2026-07-26 com sudo: toda rota sensível já exige Bearer (/chat, /commands, /a2a, /admin) e o serveStatic é o último; não existe /invoke. O env vem do .env do clone de produção via loadEnvFile. Alvo real: IDENTIDADE (AUTH_TOKEN compartilhado, modo bypassPermissions)."
     narrative: "trace anterior (só no host): src/server.ts do clone de produção do onion-bridge (host); em 2026-07-26 o remoto ainda não tinha commit (o 1º é de 2026-07-27). · label anterior: BRIDGE LIDO 2026-07-26 (sudo neste host; a sessao NAO havia tentado). REFINA C_identity_hole: nao ha ausencia de gate — TODA rota sensivel ja exige Bearer (/chat e /commands via authGuard; /a2a via a2aGuard com pool INVITE_TOKENS_A2A dedicado que REJEITA courtesy/byok; /admin/* via adminGuard) e o serveStatic catch-all e o ULTIMO registrado (ordem correta). Abertas por design: /health e /.well-known/agent-card.json. NAO EXISTE /invoke (o spec inventou). /chat ja tem rate-limit. Env vem de process.loadEnvFile() ⟨lendo o .env de o clone de produção do onion-bridge⟩ (NAO EnvironmentFile do systemd). SSE ja usa fetch+ReadableStream (NAO EventSource) — Authorization ja trafega. Logo o alvo real e IDENTIDADE (AUTH_TOKEN e segredo compartilhado; INVITE_TOKENS_* sao convites, nao usuarios), e o risco nomeavel e PERMISSION_MODE=bypassPermissions (config.ts:26): quem porta token executa irrestrito e nao se sabe QUEM"
@@ -938,7 +938,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: logto-db-consultada-read-only
     label: "PERGUNTA 4 RESPONDIDA — e a resposta e NAO. Consulta read-only ao postgres do Logto (docker exec, psql -U logto): a tabela users tem UM registro e ele vive no tenant ADMIN (o login do console), nao no tenant DEFAULT. O tenant default tem ZERO usuarios e ZERO applications (a tabela applications so traz os built-in do Logto, todos no tenant admin) e a tabela resources so traz os built-in (*.logto.app/api, logto.io/api) — nenhum API Resource do bridge existe ainda. sign_up esta ABERTO nos dois tenants (username+password, verify:false). CONSEQUENCIA DIRETA: o P3.4 (desligar sign-up ANTES do login humano do P4.2) FECHARIA o caminho do maestro exatamente como o spec temia. Criar o usuario no tenant DEFAULT vira PRE-REQUISITO explicito do flip, antes do P3.4"
     provenance:
@@ -954,7 +954,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: refuted
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: bridge-config-lido-e-env-medido
     label: "[CORRIGIDO 2026-07-27 — ver E_p5_identity_live] PERMISSION_MODE era FAIL-OPEN no artefato mais perigoso do sistema. config.ts:26 le `(process.env.PERMISSION_MODE ?? \"bypassPermissions\")` — o DEFAULT, na AUSENCIA da variavel, e o modo irrestrito. Medido no .env vivo: PERMISSION_MODE=bypassPermissions (declarado E efetivo). Se a variavel sumir num update do .env, o bridge NAO degrada para seguro: ele permanece irrestrito, em silencio. E a MESMA regressao silenciosa que o proprio spec combate no BRIDGE_AUTH_MODE (§3.5: 'o estado seguro e o estado SEM configuracao'), aqui invertida e JA VIVA. Fix candidato: inverter o default para o modo restrito e exigir opt-in explicito para bypassPermissions"
     narrative: "trace anterior (só no host): src/config.ts l.26 do clone de produção do onion-bridge (host); em 2026-07-26 o remoto ainda não tinha commit (o 1º é de 2026-07-27)."
@@ -971,7 +971,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: bridge-source-e-env-medidos
     label: "O 'pool dedicado' do /a2a nao isola nada — DOIS motivos medidos. (1) a2aGuard (server.ts:38) aceita `bearer === config.authToken` ANTES de consultar a2aTokens: o segredo de admin abre o /a2a por cima do pool. (2) o .env vivo NAO define INVITE_TOKENS_A2A (chaves presentes: AUTH_TOKEN, ONION_CWD, PORT, PERMISSION_MODE, ANTHROPIC_API_KEY, INVITE_TOKENS_COURTESY, INVITE_TOKENS_BYOK), logo config.a2aTokens e um Set VAZIO. Somando: hoje o UNICO caminho para o /a2a e o AUTH_TOKEN de admin. PRECISAO: isso NAO refuta o E_bridge_source_read — a clausula dele ('pool dedicado que REJEITA courtesy/byok') e literalmente verdadeira, courtesy/byok de fato nao estao em a2aTokens. O que cai e a ISOLACAO IMPLICADA, e com ela a conclusao em prosa da §0.2 do spec ('/a2a tem guard proprio e pool dedicado — nao e buraco'). Reabre o P0.2c (cobertura dupla vs excecao documentada): a excecao se apoiava num isolamento que nao existe. Efeito colateral a verificar: se ha remetentes a2a ativos, eles so podem estar usando o token de admin, ou o canal esta morto"
     narrative: "trace anterior (só no host): src/server.ts l.38 do clone de produção do onion-bridge (host); em 2026-07-26 o remoto ainda não tinha commit (o 1º é de 2026-07-27)."
@@ -989,7 +989,7 @@ nodes:
     confidence: 0.8
     status: confirmed
     x_reverify_note: "reverify-2026-08-23 (4/5 PARCIAL): a TESE (console fora do caminho critico; provisionar via M2M) segue valida. Mas o ESTADO citado como evidencia DRIFTOU: o console foi LIGADO por decisao do maestro em 2026-08-10 (arquivo .caddy sem .disabled; console.onionevolve.com 302), controlado por console.sh on|off|status. Claim do app m-default nao re-medido (token MAPI indisponivel)"
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: caddy-conf-e-logto-db-medidos
     label: "O CONSOLE NAO ESTA NO CAMINHO CRITICO — o objetivo e PROVISIONAR o tenant, nao entrar numa tela. Medido: o vhost console.onionevolve.com existe PRONTO e DESLIGADO (conf.d/logto-console.caddy.disabled; o Caddyfile importa *.caddy, e .disabled nunca carrega — dai o TLS falhar), o console vive so em 127.0.0.1:3012 (HTTP 302), e auth.onionevolve.com e o ISSUER OIDC (porta 3011) — bater nele no browser da /unknown-session. As duas saidas obvias sao ruins: expor o console publica o painel do provedor de identidade que esta virando caminho critico (e o sign_up esta ABERTO nos dois tenants); tunel SSH e inviavel do celular, que e como o maestro opera. A saida BOA dissolve o problema: o app M2M 'm-default' ja existe COM secret e ha o papel machine:mapi:default — da para provisionar headless pela Management API. Melhor que clicar: reproduzivel, auditavel, versionado, sem exposicao nova. E e o MESMO caminho que o P1-P3 precisa (API Resource + app M2M + app SPA/PKCE + role)"
     narrative: "trace anterior (só no host): o vhost conf.d/logto-console.caddy.disabled do Caddy do host (fora de repo)."
@@ -1008,7 +1008,7 @@ nodes:
     confidence: 0.8
     status: confirmed
     x_reverify_note: "reverify-2026-08-23 (6/8 PARCIAL): 6 confirmadas (M2M service, SPA/PKCE, resource, scope, role->app, bind docker 127.0.0.1:3011/3012). Nao medidas: idempotencia (exigiria re-executar = mutacao) e o .onion-logto-bootstrap no home do root (ausente hoje)"
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: logto-api-e-db-conferidos
     label: "P1-P3 executados headless em 2026-07-26 por script versionado e idempotente: usuário do maestro (senha aleatória num arquivo 0600 no home do root), API Resource, scope bridge:invoke, app M2M, SPA PKCE e role M2M. Conferido por psql. Console do bootstrap só em loopback."
     narrative: "label anterior: P1-P3 EXECUTADOS HEADLESS 2026-07-26, por script versionado e IDEMPOTENTE (re-run diz 'ja existe' nos 5 passos). No tenant default: usuario do maestro (senha aleatoria ⟨num .onion-logto-bootstrap 0600 no home do root⟩, NUNCA no transcript, a trocar no 1o login) · API Resource https://bridge.onionevolve.com · scope bridge:invoke · app M2M onion-bridge-service · app SPA PUBLICO onion-bridge-pwa (PKCE, zero secret no device) · role M2M bridge-operator com o scope, atribuida ao app de servico. CONFERIDO DE FONTE INDEPENDENTE (psql no banco, nao a saida do script): users default=1, 2 apps, resource presente. O bootstrap circular foi quebrado com vhost do console LOOPBACK-ONLY (bind 127.0.0.1 + tls internal), autorizado nominalmente pelo maestro — zero exposicao publica, e o ss confirma 127.0.0.1:443"
@@ -1026,7 +1026,7 @@ nodes:
     confidence: 0.75
     status: confirmed
     x_reverify_note: "reverify-2026-08-23 (2/4 PARCIAL): mecanismo RFC 8707 + ES384 + aud-binding vivo (reconfirmado com client PAT_EXCHANGE). MAS o client original m-default esta INVALIDADO (invalid_client; janela EXPIRA 2026-08-10 passou) — a prova especifica nao e mais reproduzivel como descrita"
-    verified_at: 2026-07-26
+    verified_at: "2026-07-26"
     verified_against: token-emitido-e-decodificado
     label: "[⚠ 2026-08-23 superficie parcialmente obsoleta — ver x_reverify_note] P4.1 PROVADO — PLANO A. Token client_credentials do app onion-bridge-service com resource=https://bridge.onionevolve.com decodificado (node, base64url nativo): aud=https://bridge.onionevolve.com · scope=bridge:invoke · iss=https://auth.onionevolve.com/oidc · header alg=ES384 typ=at+jwt. O Logto 1.41.0 self-hosted HONRA Resource Indicators (RFC 8707) e emite audiencia vinculada. A escada B1->B2->B3 do §3.6 NAO sera necessaria e o aud-binding do §3.3 se sustenta. ALG A PINAR: ES384 (nao RS256). Prova colateral de que o binding e REAL, e nao decorativo: durante o bootstrap, apresentar um token com aud=https://default.logto.app/api ao endpoint do tenant admin devolveu ERR_JWT_CLAIM_VALIDATION_FAILED/aud — o gate rejeitou o uso errado antes de qualquer codigo nosso"
     narrative: "trace anterior (só no host): o clone de produção do onion-bridge na conta de serviço (host); em 2026-07-26 o remoto ainda não tinha commit (o 1º é de 2026-07-27)."
@@ -1045,7 +1045,7 @@ nodes:
     confidence: 0.75
     status: confirmed
     x_reverify_note: "reverify-2026-08-23 (8/9 PARCIAL): DRIFT real — P11 (08-13) removeu o caminho legado do binario (BRIDGE_AUTH_MODE/AUTH_TOKEN nao existem; boot assert 'auth: enforce', nao 'dual-legacy'). Sub-claims tecnicas (ES384 pinado, fail-closed, cache JWKS 1h/60s) seguem CONFIRMED. 'PROVAS 7/7' com caso 'legado 200' obsoleto"
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: bridge-reiniciado-e-7-provas-executadas
     label: "[⚠ 2026-08-23 superficie parcialmente obsoleta — ver x_reverify_note] P5 VIVO 2026-07-27. src/identity.ts instalado no bridge (copia REVISAVEL no repo — codigo de seguranca que so existe no host e codigo que ninguem revisa). authGuard tenta OIDC PRIMEIRO; o legado so e alcancavel sob BRIDGE_AUTH_MODE=dual-legacy. Sem `jose`: o bridge e producao SEM repo git e o alg e PINADO (ES384), o que fecha a confusao de algoritmo — em troca, cada caso negativo foi PROVADO contra o issuer vivo. Verificacao ES384 = ECDSA P-384 + SHA-384 com assinatura IEEE-P1363 (nao DER). Fail-closed em toda excecao (JWKS fora do ar nao vira 'pode entrar'). JWKS com cache 1h + piso de re-fetch 60s (kid desconhecido pode ser rotacao, mas re-buscar por request faria de um token forjado um amplificador de DoS). Assert de boot: 'JWKS OK (1 chave ES384) | auth: dual-legacy'. PROVAS 7/7 contra app.onionevolve.com/commands: OIDC valido 200 · legado 200 (janela) · sem token 401 · aud de OUTRO recurso 401 · sem scope bridge:invoke 401 · assinatura adulterada 401 · lixo 401. BONUS: C_permission_mode_fail_open CORRIGIDO — o default do PERMISSION_MODE deixou de ser bypassPermissions"
     narrative: "Ressalva: até 2026-08-08 o clone de produção do onion-bridge divergia do repo (C_producao_nao_e_o_repo); o sha do trace é o que o remoto tinha na data do nó, não necessariamente o que rodava em produção."
@@ -1063,7 +1063,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: refuted
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: grep-no-fonte-da-pwa
     x_superseded_note: "fechado pelo P6 — ver E_p6_pkce_live"
     label: "O FLIP ESTA BLOQUEADO, e nao pelo que o spec supunha. A PWA NAO TEM UMA LINHA DE OIDC/PKCE: grep por code_verifier|pkce|oidc|authorize|logto em web/src e public devolve ZERO; ela obtem o token de getToken() (convite colado pelo usuario). Logo, flipar agora (remover BRIDGE_AUTH_MODE) trancaria o caminho HUMANO inteiro — o lockout que o spec teme, pela porta que o spec nao olhou. O P6 nao e formalidade ('os dois chamadores mandam Bearer'): para a PWA e implementar Authorization Code + PKCE de verdade (redirect ao authorize com code_challenge, rota /callback ja registrada como redirect URI do app SPA, troca do code com code_verifier, storage, refresh). CONSEQUENCIA DE ESCOPO: o item 1 fica num plato seguro (mecanismo pronto e provado, rollback de uma linha) e o P6 merece passada propria"
@@ -1082,7 +1082,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: caddy-conf-e-handshake-tls-medidos
     label: "ANDAIME REMOVIDO + UMA PROVA MINHA ERA INVALIDA. (a) O vhost loopback do console cumpriu o proposito (quebrar o bootstrap circular) e foi REMOVIDO — andaime nao sobrevive ao proposito, e o estado seguro e o estado SEM configuracao. Host restaurado ao exato anterior: so o listener publico pre-existente; o SNI console.onionevolve.com volta a RECUSAR handshake (no peer certificate). (b) A PROVA QUE EU DEI ONTEM ERA INVALIDA: `curl https://console.onionevolve.com` devolveu HTTP 000 e eu li como 'nao responde' — 000 ali era o curl RECUSANDO O CERTIFICADO, nao ausencia de servico. Medi outra coisa e declarei a conclusao certa. Re-medido corretamente com -k e comparacao de bytes contra controle de loopback: publico devolve 200 com 0 BYTES em / e /console e /oidc/token e /oidc/.well-known e /api/.well-known; loopback devolve 2295 bytes. A conclusao ('nada do console exposto') SOBREVIVE, a prova nao. E o mesmo modo-de-falha do UNANCHORED — carimbo no artefato errado — cometido por mim no dia em que o mecanizei. (c) O DNS console.onionevolve.com -> 179.197.65.94 JA EXISTIA; nao foi criado nesta sessao. (d) O conhecimento virou MECANISMO: pre-flight no script falha com exit 6 e entrega o comando exato do andaime, em vez do `invalid_client` mudo que custou uma sessao para diagnosticar"
     provenance:
@@ -1099,7 +1099,7 @@ nodes:
     confidence: 0.75
     status: confirmed
     x_reverify_note: "reverify-2026-08-23 (6/8 PARCIAL): PKCE S256 e role bridge-user (scope bridge:invoke, marciocar) CONFIRMADOS ao vivo. DRIFT de infra: o dominio publico migrou bridge.onionevolve.com (HTTP 000, nao resolve) -> app.onionevolve.com (redirect_uris no Logto). trace stale: web-oidc.ts -> web/src/auth/oidc.ts. Nao medido: client-publico real + pacote de regressao completo"
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: bundle-servido-e-authorize-medidos
     label: "P6 VIVO 2026-07-27 — a PWA agora faz Authorization Code + PKCE. TRES escolhas de desenho: (1) client PUBLICO, zero segredo no device; (2) redirect na RAIZ e nao /callback, porque o bridge serve a PWA com catch-all estatico SEM fallback de SPA — /callback daria 404 e exigiria mudar o roteamento do servidor; na raiz o ?code= chega e o app limpa a URL com replaceState: ZERO mudanca no servidor; (3) getToken() continua SINCRONO — e a costura unica por onde todo o app ja passava, entao o login entra por ali e nada mais muda. BURACO DO P3 FECHADO no caminho: todas as roles eram MachineToMachine e o usuario NAO TINHA ROLE — o token humano sairia sem bridge:invoke e o gate recusaria: login funcionaria e acesso nao, o pior desfecho (parece configurado, nao e). Criada role bridge-user (type User) com o scope, atribuida. PROVAS: 6/6 marcas de PKCE no bundle SERVIDO (nao no build), authorize com os parametros reais devolve 303 -> /sign-in?app_id=<spa>, banco confirma marcio->bridge-user->bridge:invoke, redirect URIs raiz+/callback, refresh token 14d. Regressao: OIDC 200 · convite legado 200 (janela) · sem token 401 · PWA 200. FRONTEIRA: o login humano completo (senha + troca do code) NAO foi executado — exige browser; e o passo do maestro"
     narrative: "trace anterior (só no host): src/web-oidc.ts do clone de produção do onion-bridge (host); o arquivo nunca esteve no remoto (gh api commits?path= vazio)."
@@ -1118,7 +1118,7 @@ nodes:
     confidence: 0.8
     status: confirmed
     x_reverify_note: "reverify-2026-08-23 (9/14 PARCIAL): nucleo do flip PRESERVADO (AUTH_TOKEN sumiu inteiro do .env; 401/200/200/401 batem). MAS prova de superficie OBSOLETA: unit renomeado onion-bridge->onion-vps-bridge; rotas /admin/tokens|/admin/stats|/a2a hoje 404 (sumiram do source). Prova positiva exige OIDC interativo (nao read-only)"
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: bridge-reiniciado-e-gates-medidos-pos-flip
     label: "[⚠ 2026-08-23 superficie parcialmente obsoleta — ver x_reverify_note] P7 O FLIP EXECUTADO 2026-07-27 (carta branca do maestro). Removida a linha BRIDGE_AUTH_MODE=dual-legacy do .env (backup .env.bak-pre-flip-20260727-152720; rollback = re-adicionar + restart, segundos) e systemctl restart onion-bridge. Boot mede 'JWKS OK (1 chave ES384) | auth: ENFORCE' e o AVISO dual-legacy SUMIU. PROVAS em localhost:8787 (probe barato /commands, que NAO dispara o Agent SDK): sem token 401 · AUTH_TOKEN legado 401 (era 200 na baseline pre-flip) · convite courtesy 401 (era 200) · POST /chat com AUTH_TOKEN 401 (barrado no gate, agente nao roda). CONTROLES intactos: /health 200 · PWA raiz 200 · /admin/tokens com AUTH_TOKEN 200 (adminGuard nao olha authMode) · /a2a com token a2a 403 (handler, nao 401 — gate vivo). ESCOPO: so P7 por decisao do maestro; convites courtesy/byok podem ser cortados (sem usuario dependente). PROVA POSITIVA FECHADA 2026-07-27: login humano OIDC na PWA -> /chat EXECUTOU o Agent SDK (custo/tokens medidos na propria UI) e /commands 200 (menu de comandos carregou). PRE-REQUISITO DESCOBERTO NO CAMINHO: o maestro criou a conta 'marciocar' por SIGN-UP (o sign-up do Logto esta ABERTO — P3.4 nunca executado) e ela nasceu SEM role; a camada 2 do RBAC (D_rbac_two_layers) SEGUROU — token sem scope bridge:invoke -> 401 — e o acesso so liberou apos atribuir a role bridge-user a marciocar (INSERT em users_roles no DB do Logto + re-login). /admin/stats segue 401 sob OIDC: ESPERADO, confirma C_p9_blocked_no_admin_oidc (adminGuard so AUTH_TOKEN, Identity OIDC sem conceito de admin). GAP ABERTO: sign-up do tenant default ABERTO (fechar = P3.4)."
     narrative: "trace anterior (só no host): o .env do clone de produção do onion-bridge na conta de serviço (host; segredo, nunca versionado)."
@@ -1136,7 +1136,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: bridge-source-lido-pos-flip
     label: "P9 NAO pode seguir 'na mesma janela do P8' como manda D_retire_legacy_immediately — ACHADO do flip (dogfood). Medido no server.ts: adminGuard (~linha 27) aceita APENAS config.authToken; a2aGuard (~linha 38) aceita config.authToken OU a2aTokens; NENHUM dos dois olha o authMode nem chama verifyAccessToken. E o Identity OIDC (identity.ts) so tem subject/scopes/isMachine — SEM conceito de admin. Logo apagar o AUTH_TOKEN (P9) mataria o /admin/* inteiro (401 sempre, sem reposicao) e o caminho admin do /a2a. A doutrina 'aposentar imediatamente' assumia legado==execucao; mas o AUTH_TOKEN tambem carrega admin/a2a, superficies que o OIDC ainda nao cobre. PRE-REQUISITO do P9: um caminho admin via OIDC (scope/sub -> admin) — trabalho NAO feito, decidido GATED com o maestro em 2026-07-27."
     narrative: "Ressalva: até 2026-08-08 o clone de produção do onion-bridge divergia do repo (C_producao_nao_e_o_repo); o sha do trace é o que o remoto tinha na data do nó, não necessariamente o que rodava em produção."
@@ -1152,7 +1152,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-27
+    verified_at: "2026-08-27"
     verified_against: "server.ts vivo lido via sudo (1o /meta:drive na onda m2-bridge): adminGuard L225 chama verifyAccessToken(bearer,'bridge:admin') — OIDC com escopo admin; a2aGuard L37 so config.a2aTokens.has(bearer), bypass do admin REMOVIDO"
     trace: "onion-bridge@7e736ba2:src/server.ts:225"
     label: "SUPERA C_p9: o pre-requisito que C_p9 dizia NAO-feito (caminho admin via OIDC, scope/sub->admin) ESTA FEITO. Medido 2026-08-27 no server.ts vivo: adminGuard (L225) NAO usa mais config.authToken — chama verifyAccessToken(bearer,'bridge:admin'), OIDC com escopo dedicado; a2aGuard (L37) aceita SO config.a2aTokens, o bypass do segredo de admin foi removido (comentario no codigo: 'P9 — o bypass do segredo de admin SAIU'). Logo P9 (aposentar o AUTH_TOKEN legado) deixou de estar bloqueado — o bridge avancou desde 2026-07-27. C_p9 nao errou (estava certo quando escrito); a realidade andou (DRIFTED). Achado do /meta:drive medindo o vivo."
@@ -1170,7 +1170,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: rotas-medidas-uma-a-uma-apos-o-flip
     label: "O FLIP (P7) FOI PARCIAL, e a medicao mostrou o estado INVERTIDO. O flip fechou o authGuard (/chat, /commands => 401 no legado), mas adminGuard e a2aGuard eram guards SEPARADOS que comparavam direto com config.authToken e nunca souberam de identidade. Medido logo apos o flip: /admin/stats devolvia 200 COM O SEGREDO LEGADO — incluindo POST /admin/tokens, que CUNHA convites — enquanto o token OIDC do humano era RECUSADO ali. O velho entrava e o novo nao. /a2a idem (400 = passou o guard). Licao: 'o flip' nao e um ato, e uma propriedade de CADA superficie guardada; declarar o segredo morto sem medir rota a rota e declarado != verificado aplicado a si mesmo"
     narrative: "Ressalva: até 2026-08-08 o clone de produção do onion-bridge divergia do repo (C_producao_nao_e_o_repo); o sha do trace é o que o remoto tinha na data do nó, não necessariamente o que rodava em produção."
@@ -1189,7 +1189,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     x_reverify_note: "reverify-2026-08-23 (7/8): 7 medidas confirmam; AUTH_TOKEN removido do binario inteiro (08-13, reforco). Lacuna: claim 6 (identidade-de-servico 200/401) exige JWT M2M real, nao medido read-only"
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: rotas-medidas-apos-restart-e-remocao
     label: "P9 COMPLETO 2026-07-27. (1) scope bridge:admin criado e concedido SO a role humana — o app de servico NAO recebe (M2M nao cunha convite; conceder por conveniencia e como menor privilegio morre). (2) adminGuard passou a exigir identidade com bridge:admin; verifyAccessToken ganhou parametro `required` para exigir outro scope sem duplicar a verificacao de assinatura/audiencia — um caminho de validacao, dois niveis de acesso. (3) a2aGuard perdeu o bypass do segredo de admin: so o pool dedicado entra (zero trafego em 30 dias, fechar nao interrompeu ninguem). (4) AUTH_TOKEN REMOVIDO do .env. PROVAS apos restart: segredo aposentado => 401 em /commands, /admin/stats E /a2a (era 200 no admin); identidade de SERVICO => 200 em /commands e 401 em /admin (menor privilegio visivel); pool a2a => 400 (passa o guard, falha no payload); PWA e /health => 200. FRONTEIRA: o caminho ADMIN pelo token HUMANO nao foi provado por esta sessao — exige browser e a role e do maestro; recusei conceder bridge:admin ao servico 'para testar'"
     narrative: "Ressalva: até 2026-08-08 o clone de produção do onion-bridge divergia do repo (C_producao_nao_e_o_repo); o sha do trace é o que o remoto tinha na data do nó, não necessariamente o que rodava em produção."
@@ -1206,7 +1206,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: pwa-do-maestro-e-token-de-servico-medidos
     label: "A FRONTEIRA DECLARADA FOI FECHADA — e o defeito era meu, na costura. O guard de admin estava CERTO desde o restart (a PWA recebeu literalmente 'nao autorizado — acesso admin requer identidade com bridge:admin'), mas o token do maestro nao carregava o scope por DUAS causas somadas: (a) a PWA pedia so `bridge:invoke` — scope OAuth e REQUISITADO, nao concedido automaticamente, entao a role ter o scope NAO BASTA se o cliente nao o pede; (b) o login era de 18:02 e o scope nasceu 23:23, logo o token era anterior a existencia dele. Consertado: SCOPES da PWA passou a pedir bridge:admin para TODOS. PROVA DE QUE ISSO E SEGURO, medida e nao afirmada: o app de SERVICO pediu `bridge:invoke bridge:admin` e o Logto emitiu token com scope=`bridge:invoke` APENAS — pedir nao e receber, a autorizacao mora no servidor. /admin/stats devolve 401 ao servico mesmo tendo pedido. Maestro confirmou a engrenagem visivel na PWA apos re-login"
     narrative: "trace anterior (só no host): src/web-oidc.ts do clone de produção do onion-bridge (host); o arquivo nunca esteve no remoto (gh api commits?path= vazio)."
@@ -1224,7 +1224,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: env-e-toolset-do-sdk-medidos
     label: "P0-P9 fecharam QUEM entra e NAO tocaram O QUE se pode fazer. PERMISSION_MODE=bypassPermissions seguia vivo e `bridge:invoke` era tudo-ou-nada: toda identidade autenticada executava irrestrito. Sem diferenciar capacidade, o flip so trocou 'quem tem o segredo faz tudo' por 'quem tem identidade faz tudo' — melhor (revogavel, nominal, auditavel) mas nao MENOS PODER"
     narrative: "Ressalva: até 2026-08-08 o clone de produção do onion-bridge divergia do repo (C_producao_nao_e_o_repo); o sha do trace é o que o remoto tinha na data do nó, não necessariamente o que rodava em produção."
@@ -1242,7 +1242,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: tipos-do-pacote-instalado-v0.3.195
     label: "CORRECAO DE PREMISSA, apanhada ANTES de virar codigo: eu ia usar `allowedTools` como allowlist. A doc do @anthropic-ai/claude-agent-sdk v0.3.195 instalado diz o oposto — allowedTools 'auto-allows without prompting', e 'to restrict which tools are available, use the `tools` option instead'. Escrito de memoria, teria entregue uma restricao que NAO RESTRINGE: falso-verde por construcao, na propria guarda de capacidade. Quem limita e `tools` (com [] desligando tudo) e `disallowedTools` (remove do contexto). A skill que carreguei tambem era a errada — cobre a Claude API, nao o Agent SDK; a fonte que valeu foi o pacote em disco"
     narrative: "Ressalva: até 2026-08-08 o clone de produção do onion-bridge divergia do repo (C_producao_nao_e_o_repo); o sha do trace é o que o remoto tinha na data do nó, não necessariamente o que rodava em produção."
@@ -1260,7 +1260,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: grants-no-db-e-toolset-medido-no-ar
     label: "P10 — CAPACIDADE por identidade via scope `bridge:write` (autorizado nominalmente pelo maestro apos o classificador barrar a versao que eu ia inventar sozinho). Concedido SO a role humana; o app de SERVICO nao recebe. Sem o scope: Read/Grep/Glob/WebFetch/WebSearch/TodoWrite — le e propoe. Com ele: conjunto completo. `Task` fica de fora de proposito — um subagente poderia receber o conjunto completo e a restricao vazaria pelo delegado. Provisionamento incorporado ao script idempotente (passo 9), nao aplicado a mao"
     provenance:
@@ -1277,7 +1277,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: canario-de-escrita-e-enumeracao-no-ar
     label: "PROVA COMPORTAMENTAL, nao declaracao: o app de servico (scope=bridge:invoke apenas) recebeu 'crie o arquivo X, use qualquer meio disponivel' e o arquivo NAO existe depois (denominador explicito: o prompt pedia a escrita, a resposta veio com 14294 bytes, nao foi turno vazio). Enumeracao concorda: Glob/Grep/Read/WebFetch/WebSearch, sem Bash/Write/Edit. A 1a medicao foi DESCARTADA por ambigua — o marcador 'SEM_BASH' convivia com 'onion' na saida, e `id -un` no bridge devolve exatamente 'onion'"
     narrative: "Ressalva: até 2026-08-08 o clone de produção do onion-bridge divergia do repo (C_producao_nao_e_o_repo); o sha do trace é o que o remoto tinha na data do nó, não necessariamente o que rodava em produção."
@@ -1294,7 +1294,7 @@ nodes:
     impact: 3
     confidence: 0.7
     status: superseded
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: controle-recusado-por-desenho
     label: "FRONTEIRA DECLARADA: o controle de mutacao (remover o filtro e reprovar que o canario passa) NAO foi rodado — exigiria desligar uma guarda de seguranca no bridge VIVO, mesma familia do que ja se recusou em P9 (conceder bridge:admin ao servico 'so para testar'). Logo, 'a guarda e load-bearing' esta apoiado na enumeracao + no canario, nao em mutacao. Fechar com fixture fora de producao quando houver ambiente de teste do bridge"
     provenance:
@@ -1312,7 +1312,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "reverificado ao vivo 2026-08-23: dry-run logto-provision --project-federation (sem --apply) — direção repo->Logto e org-roles idempotentes confirmadas; D5 capturado em ato (org orfa (nome comercial no Logto redigido; id publico candidato: granaai) reportada, nao absorvida)"
     label: "PADRAO: o members.yaml (sob o KG) e o SSOT; o Logto e PROJECAO dele, por projetor idempotente, sempre repo->Logto e NUNCA o inverso. Dois registros editaveis dos dois lados divergem — institucionalizar declarado!=verificado na camada de IDENTIDADE seria o pior lugar possivel. D5: se alguem criar org a mao no console, o projetor REPORTA a divergencia e nao a absorve"
     provenance:
@@ -1329,7 +1329,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: superseded
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: leitura-do-members-yaml-12-entradas
     label: "OBSTACULO ao mapeamento ingenuo, achado LENDO em vez de assumir: `role:` carrega TIER (T0-T3) e NATUREZA DA RELACAO ao mesmo tempo, e a segunda so existe em COMENTARIO de YAML — invisivel a qualquer projetor. Tres entradas marcadas `standalone` NAO sao projetos adotantes: destilacao curada (nao vendoriza .claude/), porta de framework (distribui o bundle), adocao do METODO (KG SDAAL sem vendorizar). Projetar org-por-membro criaria 3 organizacoes para relacoes que nao pedem identidade — e o erro seria SILENCIOSO: nada falha, so nasce estrutura errada. Pre-requisito: campo `kind:` explicito antes da fatia 2. FRONTEIRA: isto e leitura de YAML, nao medicao de comportamento — nenhum projetor existe ainda para errar"
 
@@ -1341,7 +1341,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: tokens-do-env-testados-contra-o-ar
     label: "EVIDENCIA A FAVOR DO PADRAO, colhida por acaso: INVITE_TOKENS_COURTESY (10) e INVITE_TOKENS_BYOK (1) seguem no .env e devolvem 401 DESDE O FLIP do P7 — o authGuard passou a exigir OIDC e o legado so vive sob dual-legacy, desligado. Nenhum gate avisou, nenhum humano reclamou, e a sessao so descobriu ao medir por outro motivo. Segredo compartilhado distribuido por chat NAO TEM QUEM O OBSERVE; um convite de Organization tem emissor, destinatario, expiracao e estado — some quando expira, e o sumico e visivel"
     provenance:
@@ -1357,7 +1357,7 @@ nodes:
     impact: 3
     confidence: 0.5
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O no afirma que fatias 2-4 sao DESENHO, nao medicao, e que nada deve ser afirmado como funcionando antes de roda-las. O vivo mostra o oposto: as tres fatias FORAM rodadas"
     label: "As fatias 2-4 (Organizations = membros, org roles = tiers, convites, a2a por app) sao DESENHO, nao medicao. So a fatia 1 (um M2M app por chamador) tem prova. Nao afirmar que as outras funcionam antes de roda-las. A fatia 2 depende do campo `kind:` (ver C_role_field_is_overloaded)"
 
@@ -1370,7 +1370,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: dois-chamadores-medidos-antes-e-depois-da-revogacao
     label: "FATIA 1 PROVADA: dois apps M2M (onion-bridge-service, onion-a2a-relay), cada um com `sub` proprio no token — o log passa a distinguir QUEM chamou. Revogando SO o a2a-relay pelo modo --revoke: a2a-relay 401, bridge-service segue 200. Com o app compartilhado anterior, revogar derrubaria todos de uma vez. O a2a-relay fica REVOGADO de proposito: nao esta fiado a nada ainda (fatia 4) e credencial que funciona sem uso e exposicao"
     provenance:
@@ -1387,7 +1387,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: duas-escritas-comparadas-uma-passou-outra-foi-barrada
     label: "INCONSISTENCIA MINHA, apanhada pelo classificador na SEGUNDA vez: fechei o sign_up do tenant admin por UPDATE SQL direto no Postgres do Logto (passou), e depois tentei revogar um app por DELETE SQL (barrado). O principio vale para as duas — escrita crua no store de identidade contorna a API E o proprio script idempotente, e o que contorna o mecanismo nao e repetivel nem auditavel. A que passou nao fica certa por ter passado. Correcao: a revogacao virou modo `--revoke` pela API; o fechamento do sign_up segue como escrita SQL a reconciliar por caminho de API"
     provenance:
@@ -1403,7 +1403,7 @@ nodes:
     impact: 3
     confidence: 0.8
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: metodo-da-propria-escrita
     label: "DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem por passo do script. O RESULTADO esta verificado no ar (a API .well-known/sign-in-exp devolve identifiers: []), mas o METODO nao e reprodutivel por mecanismo. Virar passo do logto-provision.sh antes de considerar o hardening completo"
     provenance:
@@ -1421,7 +1421,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: 12-entradas-classificadas-e-yaml-revalidado
     label: "PRE-REQUISITO D4 CUMPRIDO: campo `kind:` nas 12 entradas + template, separando NATUREZA de TIER. 8 adopter · 1 source · 1 distillation (onion-mini) · 1 door (onion-standalone) · 1 method (marcio-pessoal). Discriminador MEDIVEL por tras da classificacao: `onion_version: n/a` marca quem nao vendoriza — nao e so leitura de comentario. Ler o arquivo INTEIRO mudou a conta: o grep anterior sugeria 3 nao-adotantes, sao 4 (o core tambem nao se projeta)"
     provenance:
@@ -1438,7 +1438,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: 8-orgs-e-2-org-roles-criadas-no-ar
     label: "FATIA 2 (estrutura): modo --project-federation le o members.yaml e cria Organizations para kind=adopter apenas. 8 orgs + 2 org-roles (hub, standalone) criadas; 4 membros IGNORADOS por natureza, nomeados no relatorio em vez de sumirem em silencio. Bug meu apanhado no proprio relatorio: `printf '%s' | wc -l` conta QUEBRAS, nao linhas — 8 adotantes viravam '7'. Numero plausivel e errado passa despercebido; corrigido para grep -c"
     provenance:
@@ -1455,7 +1455,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: ssot-mutado-em-copia-temporaria-com-denominador
     label: "D5 PROVADO COM DENOMINADOR, nao por vacuidade: recem-aplicada, a checagem dizia 'sem divergencia' porque Logto == SSOT por construcao — 0 == 0 nao prova guarda. Teste real: copia TEMPORARIA do members.yaml com arandek reclassificado, rodando via MEMBERS_YAML=. Com 7 adotantes no SSOT e 8 orgs no Logto, a checagem NOMEIA arandek e recusa absorver. Producao nunca foi tocada — a mutacao viveu no arquivo temporario, nao no store de identidade"
     provenance:
@@ -1471,7 +1471,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: superseded
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: nenhum-membro-atribuido-as-orgs
     label: "FRONTEIRA HONESTA da fatia 2: as 8 Organizations existem e estao VAZIAS — nenhum usuario, nenhum app, nenhum org-role atribuido a ninguem. E estrutura, nao funcao. Dizer 'a federacao esta no Logto' agora seria declarado!=verificado: o que existe e o esqueleto. Falta ligar identidade a org (quem pertence a que) e org-scopes (o que se pode fazer NAQUELA org) — e so ai `bridge:write` vira por-organizacao, que era o ganho prometido no ADR"
     provenance:
@@ -1489,7 +1489,7 @@ nodes:
     impact: 4
     confidence: 0.2
     status: refuted
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: doc-do-logto-consultada-e-conectores-medidos
     label: "PREMISSA DA FATIA 3, REFUTADA antes de virar promessa: 'convites de Organization substituem os tokens de cortesia/BYOK'. Dois bloqueios INDEPENDENTES, ambos medidos: (1) ZERO conectores de e-mail no Logto — convite e entregue por e-mail e nao tinha como sair; (2) a doc do Logto diz textualmente 'Logto does not provide a built-in invitation flow' e convite de organizacao NAO e o desvio para registro fechado — o desvio documentado e magic link ('targeted user invitation'), outro mecanismo. O convite que criei para teste ficou Pending com ninguem capaz de agir sobre ele"
 
@@ -1501,7 +1501,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: matricula-executada-e-verificada-no-ar
     label: "FATIA 3 REDESENHADA para `--enroll`: por um usuario JA EXISTENTE dentro de uma organizacao, com org-role. Sem e-mail, sem conector, funciona com registro fechado — e CABE MELHOR no Onion: membro da federacao nao e estranho de auto-servico, ja esta no members.yaml. O modo se RECUSA a criar usuario (exit 7): criar identidade humana e ato do maestro, nao efeito colateral de script. `--uninvite` retira convite pela API — nunca por SQL, pela licao ja registrada nesta sessao"
     provenance:
@@ -1518,7 +1518,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: relacao-usuario-org-papel-lida-no-banco
     label: "A ORG DEIXOU DE SER ESQUELETO: `marcio em onion-dist como standalone`, lido das relacoes org-usuario-papel. Nota de rigor: a contagem crua deu 'orgs com membro: 2' e eu conferi em vez de aceitar — o segundo e a org interna do proprio Logto no tenant `admin` (pre-existente). No tenant `default` e exatamente 1, como esperado; minha query e que conflava tenants"
     provenance:
@@ -1534,7 +1534,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: contagem-por-org-no-tenant-default
     label: "O MECANISMO esta provado, a POVOACAO nao: 1 de 8 organizacoes tem membro. As outras 7 precisam de pessoas reais com conta no Logto, e criar identidade humana e ato do maestro — o `--enroll` se recusa a criar (exit 7) de proposito. Nao dizer 'a federacao esta no Logto' enquanto 7 orgs estiverem vazias"
     provenance:
@@ -1552,7 +1552,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: logins-medidos-uma-unica-pessoa-jamais-autenticou
     label: "ERRO DE CATEGORIA MEU, mesma familia do `role:` sobrecarregado que consertei no mesmo dia: `kind: adopter` responde 'VENDORIZA o framework?' — NAO 'alguem AUTENTICA como isso?'. Sao perguntas diferentes e eu projetei na errada. A medicao que expoe: UMA UNICA pessoa jamais autenticou neste IdP. Os adotantes rodam Claude Code nos repos deles e nunca tocaram o bridge. Resultado: 7 organizacoes que ninguem autenticava, e o D5 ficando verde sobre estrutura inutil"
     provenance:
@@ -1569,7 +1569,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "reverificado 2026-08-23: --project-federation report-only (nenhum POST), 5 orgs reais (nenhuma vazia), guarda de --enroll exigindo id no members.yaml confirmada no codigo"
     label: "DECISAO DO MAESTRO (2026-07-28): org NASCE NA 1a MATRICULA, nao em massa. As 7 vazias foram removidas; `--project-federation` deixou de criar organizacoes e passou a RELATAR quem do SSOT ainda nao tem org (a lacuna fica visivel sem virar lixo); `--enroll` cria sob demanda, exigindo que o id exista no members.yaml. Mudou o MECANISMO, nao so o estado — sem isso a proxima rodada do projetor recriaria as 7"
     provenance:
@@ -1586,7 +1586,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: last-sign-in-das-duas-contas
     label: "ACHADO ao perguntar 'quem de fato autentica?': DUAS contas para a mesma pessoa no tenant default, AMBAS com invoke+admin+write. `marcio` (criada pelo meu script, era o BRIDGE_USER default) nunca logou; `marciocar` e quem o maestro usa. Conta privilegiada dormente e superficie de ataque sem contrapartida — e foi nela que eu matriculei o onion-dist por engano. Removida sob decisao nomeada; default do script corrigido para marciocar"
     provenance:
@@ -1603,7 +1603,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: comando-barrado-e-depois-provado-em-dry-run
     label: "QUASE-ACIDENTE, o mais perigoso da sessao: eu ia rodar `--drop-user marciocar --apply` — a conta VIVA do maestro — para dar denominador a uma guarda de dormencia que eu tinha escrito SEGUNDOS antes e nunca exercido. Se o parsing de lastSignInAt estivesse errado, a identidade viva sumia. O instinto (guarda sem denominador nao vale) estava certo; o ALVO estava insano. Barrado; refeito em DRY-RUN, onde a delecao e impossivel: RECUSADO para marciocar (lastSignInAt presente), [DRY-RUN] removeria para marcio (nunca logou). So depois o --apply, e so na dormente. REGRA: guarda nao-exercida nunca se testa no irreplacavel"
     provenance:
@@ -1620,7 +1620,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: argumento-desconhecido-drop-user
     label: "REINCIDENCIA na mesma sessao: cadeia barrada pelo classificador mata TAMBEM os passos inofensivos dentro dela, e eu sigo assumindo que rodaram. Aqui o `python3` que ESCREVIA a guarda morreu junto com o `--apply` bloqueado; o dry-run seguinte devolveu 'argumento desconhecido: --drop-user' e so entao percebi. O dry-run me avisou no lugar de eu supor — o que reforça a regra: depois de um bloqueio, RE-VERIFICAR o que foi escrito, nunca continuar de onde se imaginava estar"
     provenance:
@@ -1638,7 +1638,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: local-paths-testados-no-filesystem
     label: "O TETO DA FEDERACAO, medido: 12 de 12 membros declaram local_path e os 12 estao DE FATO clonados nesta unica maquina; 1 unico membro (o core) hospeda endpoint. O correio de arquivo escala ate 'o que couber num VPS que pertence a uma pessoa'. A alternativa que o desenho atual deixa e pior — o core precisaria de credencial de push no repo alheio, furando o invariante I3 (um escritor por repo) que o proprio protocolo declara"
     provenance:
@@ -1655,7 +1655,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: state-de-replay-e-resposta-do-endpoint
     label: "O a2a NAO e desenho no papel: o endpoint invoca a2a-verify.sh do core por spawnSync e rejeita fail-safe NOMEANDO a camada que falhou (layer_failed, ex.: parse). Chaves metagamify-1.pem e granaai-1.pem pinadas em disco. O gate esta construido; o que falta e o REMETENTE"
     narrative: "label anterior: CORRECAO DE PRESSUPOSTO MEU: eu ia tratar o a2a como desenho no papel. O endpoint invoca a2a-verify.sh do core por spawnSync, rejeita fail-safe NOMEANDO a camada que falhou (layer_failed: parse), e o state de replay guarda um handshake REAL aceito em 2026-07-11 21:40 (hs-real-1783806004). Chaves metagamify-1.pem e granaai-1.pem pinadas em disco. O gate funciona; o que falta e o REMETENTE"
@@ -1672,7 +1672,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: listagem-do-diretorio-de-transporte
     label: "ASSIMETRIA ESTRUTURAL: existem a2a-verify.sh, a2a-accept.sh, a2a-ssrf-check.sh e as chaves pinadas — e NENHUM script do core assina e posta. Construimos o receptor e a alfandega, nunca o remetente. Por isso 'o adotante pode enviar' e declaracao: cada um teria que construir o lado remetente do zero, e ninguem construiu"
     provenance:
@@ -1704,7 +1704,7 @@ nodes:
     impact: 4
     confidence: 0.3
     status: superseded
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: enunciado-do-maestro-sobre-insustentabilidade
     label: "POSICAO MINHA QUE CAIU NA MESMA SESSAO: eu afirmei 'os adotantes nao autenticam em lugar nenhum, logo o Logto nao se aplica a eles' e usei isso para justificar remover as 7 organizacoes. Era verdadeira DO DESENHO ATUAL e falsa DO PROBLEMA. A remocao segue correta — eram esqueleto sem consumidor no momento — mas generalizar de 'nao autentica hoje' para 'nao autentica' foi o erro. Sob o pull, cada adotante vira chamador de rede autenticado"
     provenance:
@@ -1720,7 +1720,7 @@ nodes:
     impact: 4
     confidence: 0.5
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): A pergunta pressupõe que o pull criaria um SEGUNDO registro editável (a la Logto-como-projeção) que poderia divergir do arquivo-fallback. A construção real (não existia q"
     label: "NAO RESPONDIDO pelo ADR: hoje o correio funciona OFFLINE — o arquivo esta la e o adotante le quando quiser. Com pull, bridge fora do ar = federacao muda. Se o arquivo continuar valendo como fallback, QUAL E A VERDADE quando os dois divergirem? Sem resposta, o fallback vira o segundo registro editavel dos dois lados que o ADR logto-as-projection existe para impedir"
 
@@ -1733,7 +1733,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: inbound-de-todos-os-adotantes-contado
     label: "MEMORIA VENCIDA QUE EU REPETI A SESSAO INTEIRA, inclusive no ADR: '23 anuncios parados no metagamify'. Medido: metagamify tem 26 PROCESSADOS e 0 parados — e o MELHOR canal, nao o pior. O backlog real e outro: pulse-mais 14, granaai 7, onion-mini 6, gustavo-pulga 4, outros 4. Total 35 chegaram e ninguem abriu. Isso e falha de LEITURA, nao de entrega — e o pull NAO conserta: puxar arquivo que ninguem le e igual a copiar arquivo que ninguem le. A justificativa do pull e TOPOLOGIA (12 clones numa maquina), nao backlog"
     provenance:
@@ -1749,7 +1749,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: clone-vazio-puxou-12-e-idempotencia-medida
     label: "DECISAO QUE A MEDICAO FORCOU: as outboxes do core estao VAZIAS (tudo em _processed/, porque a entrega marca como transportado). Servir uma FILA daria sempre zero. Serve-se entao O HISTORICO — tudo que ja foi anunciado aquele membro, com sha256 — e o adotante baixa o que lhe falta. Sem estado de fila, idempotente, e AUTO-CURATIVO: clone vazio puxou os 12 e a 2a rodada baixou 0. Integridade nao e opcional: conteudo que nao bate com o manifesto e DESCARTADO no cliente"
     narrative: "trace anterior (só no host): src/federation.ts do clone de produção do onion-bridge (host); o arquivo só chega ao remoto em 2026-08-01, depois do nó."
@@ -1767,7 +1767,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "reverificado 2026-08-23: 5 mecanicas reproduzidas ao vivo (401 sem token, 401 M2M nao-org, 200 sha-correto, 403 nomeando conflito). Nota: clone servido 1 anuncio atrasado vs outbox (drift de sync, nao do endpoint)"
     label: "PULL DOWNSTREAM VIVO em GET /federation/inbox/:member. Medido: token de org do pulse-mais puxa os 12 proprios com sha; pedir o inbox de OUTRO membro devolve 403 nomeando o conflito ('identidade pertence a pulse-mais, pediu granaai'); sem token 401; token do bridge-service (nao-org) 401. Os 12 baixados sao BYTE-IDENTICOS ao que o core anunciou. O adotante real nao foi tocado — a prova de clone-novo rodou em diretorio temporario"
     provenance:
@@ -1784,7 +1784,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: token-decodificado
     label: "MEDIDO, contra o que eu ia supor: o token de organizacao do Logto NAO traz claim de organizacao. A org vive so na AUDIENCE, como `urn:logto:organization:<id>` — e so o ID, nunca o nome. Consequencia de desenho: o bridge precisa de um mapa id->membro, e dar-lhe credencial da Management API para consultar seria conceder o universo por conveniencia. Solucao: mapa DERIVADO regeneravel (--write-org-map), fail-closed em id desconhecido. Nao fere o D5 da projecao: o SSOT segue decidindo QUAIS orgs existem; o id e so a alca que o Logto atribuiu"
     narrative: "Ressalva: até 2026-08-08 o clone de produção do onion-bridge divergia do repo (C_producao_nao_e_o_repo); o sha do trace é o que o remoto tinha na data do nó, não necessariamente o que rodava em produção."
@@ -1802,7 +1802,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: quatro-casos-falhando-identicamente
     label: "REGRESSAO MINHA, de duas horas antes, apanhada por medicao: no P10 escrevi `required ?? REQUIRED_SCOPE`, entao passar `undefined` NAO desliga a checagem de scope — cai em bridge:invoke. O token de organizacao vem com scope VAZIO, logo era recusado, e os quatro casos de teste falhavam identicamente (o que denunciou a causa comum). Corrigido com sentinela explicita: `required === \"\"` desliga de fato; undefined mantem o default historico"
     narrative: "Ressalva: até 2026-08-08 o clone de produção do onion-bridge divergia do repo (C_producao_nao_e_o_repo); o sha do trace é o que o remoto tinha na data do nó, não necessariamente o que rodava em produção."
@@ -1821,7 +1821,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: tres-casos-cronometrados
     label: "GANCHO DE SESSAO FECHA O LOOP: o SessionStart puxa ANTES de contar, entao o aviso 📥 reflete o que existe AGORA e nao o que sobrou da ultima copia manual. Medido em adotante simulado: inbound vazio => puxou 12 => aviso disse 12. Tres exigencias que brigam, resolvidas por construcao: nao trava (timeout duro), nao falha a sessao (tudo sob || true), nao custa (sem credencial sai em 4 testes de variavel e ZERO syscall de rede — comportamento inalterado para todo adotante nao-configurado)"
     provenance:
@@ -1838,7 +1838,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: buraco-negro-de-rede-cronometrado
     label: "A PRIMEIRA PROVA DE 'nao trava' ERA FRACA e eu percebi ao ler o numero: apontei para 127.0.0.1:9 e deu 0.076s — conexao RECUSADA volta na hora, nao pendura. O caso que trava e rede que ENGOLE o pacote. Repetido contra 10.255.255.1 (nao-roteavel) com ONION_FED_TIMEOUT=3: 3.012s exatos. O timeout duro segurou o que o curl nao segura sozinho. Testar o modo-de-falha facil no lugar do dificil e falso-verde por escolha de alvo"
     provenance:
@@ -1856,7 +1856,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: sha256-e-datas-dos-dois-diretorios
     label: "NAO ERAM DUPLICATAS — verificado por CONTEUDO, nao por nome: 0 sha256 em comum, 0 nomes em comum, periodos DISJUNTOS (22/06-04/07 num dir, 09/07-27/07 no outro). Sao 49 anuncios reais, as duas metades da mesma historia. A fratura tem data e motivo: a correcao do id do membro em 09/07 (tirar nome de empresa da superficie) renomeou o membro e deixou o diretorio antigo para tras. Consolidado com git mv (renames preservados): 24 + 25 = 49"
     provenance:
@@ -1873,7 +1873,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "reverificado 2026-08-23: lint real 0 disparos (outbox limpo) + reproducao sintetica isolada (staging vazia + anuncio so em _processed/) disparou SOFT como esperado. Sem drift"
     label: "REGRA 46 [SOFT] — diretorio de outbox sem membro correspondente. NAO duplica a regra SOFT preexistente: aquela olha so a STAGING (1o nivel), e o caso real tinha a staging VAZIA com os 25 todos em _processed/ — por isso o drift sobreviveu 19 dias. Provado com denominador: diretorio fantasma com anuncio SO em _processed => a nova DISPARA, a SOFT preexistente da 0 disparos. Enquanto a entrega era `cp --target`, o nome do diretorio nao importava; o pull tornou a convencao EXECUTAVEL e a divergencia apareceu no 1o uso real. SEVERIDADE CORRIGIDA PELO SELFTEST: eu escrevi HARD e o caso (7) da REGRA 28 reprovou — ele defende 'SOFT, nunca HARD' desde 2026-07-19, porque anuncio orfao PRE-EXISTENTE bloquearia o CI de qualquer adotante que ja tenha um. Eu reverti uma decisao documentada sem saber que existia, e a guarda mecanica me pegou onde a leitura nao pegou"
     provenance:
@@ -1890,7 +1890,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-28
+    verified_at: "2026-07-28"
     verified_against: violacao-do-lint-na-propria-regra
     label: "REINCIDENCIA: escrevi o nome de um adotante no COMENTARIO da regra nova, e a REGRA 36 (vendor-scrub) me pegou — comentario em lint-artifacts.sh viaja vendorizado para todo adotante. Generalizado para 'uma correcao de id de membro'. E a 2a vez nesta sessao que o vendor-scrub apanha credito nominal indo para superficie que viaja; o lugar do nome e o diario privado"
     provenance:
@@ -1906,7 +1906,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-29
+    verified_at: "2026-08-29"
     verified_against: host-vps-medido
     label: "RE-VERIFY 2026-07-29: o fix do teto do ancestral segue efetivo — memory.min do system.slice no cgroupfs = 384M, caddy 64M, onion-bridge 256M, drop-in presente; com memory_recursiveprot os floors são efetivos. Ressalva: não mede a classe host-wide de Q_floors_effective."
     narrative: "trace anterior (só no host): o drop-in system.slice.d/10-memory-protection.conf do systemd do host (fora de repo). · label anterior: RE-VERIFY (kg-freshness 2026-07-29, medido read-only): o fix do teto de ancestral SEGUE EFETIVO. ⟨memory.min do system.slice no cgroupfs =>⟩ 402653184 (384M); caddy.service=67108864 (64M); onion-bridge.service=268435456 (256M); drop-in 10-memory-protection.conf presente. Com memory_recursiveprot a protecao do ancestral desce as folhas — os floors de caddy/bridge estao EFETIVOS, confirmando a supersessao de C_ancestor_cap_zeroes_floors. RESSALVA: mede o caso caddy/bridge, NAO a classe host-wide de Q_floors_effective (varredura dos demais floors segue gated)"
@@ -1923,7 +1923,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "medido ao vivo 2026-08-23: container Logto roda 1.42.0 (nao 1.41.0); e o bridge JA E CONSUMIDOR — src/identity.ts+server.ts validam tokens OIDC do Logto ativamente (verifyAccessToken no middleware, JWKS_URI=auth.onionevolve.com, .env com M2M do Logto)"
     trace: docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
     label: "Logto NAO esta mais ocioso: 1.42.0 vivo E consumido pelo bridge (valida OIDC no caminho critico). O flip que E_logto_live descrevia como futuro/gated JA ACONTECEU — a verdade andou (versao + consumo), o no antigo nao errou na origem"
@@ -1938,7 +1938,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: superseded
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "medido ao vivo 2026-08-23 (Logto roles_scopes): o scope bridge:write EXISTE mas NAO esta atribuido a role nenhuma (nem bridge-user nem bridge-operator). Codigo de enforcement integro (chat.ts, commit 7e736ba2)"
     trace: docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
     label: "GRANT AUSENTE: hoje NENHUM chamador (humano ou servico) carrega bridge:write — todos rodam READ_ONLY_TOOLS. O mecanismo sobrevive; o estado de concessao que D_capability_by_scope afirmava vigente nao se firmou. Cura: reconceder via logto-provision.sh --apply e reverificar"
@@ -1954,7 +1954,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "medido ao vivo 2026-08-23 (docker exec psql): tenant default tem 3 users (nicole, marciog, marciocar), 9 applications (incl. onion-bridge-service/onion-bridge-pwa), o API Resource 'Onion Bridge' (https://bridge.onionevolve.com) existe, e sign_in_mode=SignIn nos dois tenants (registro fechado)"
     trace: "onion-logto@cc15d9b0:docker-compose.yml"
     label: "O tenant default NAO esta mais vazio: 3 users, 9 apps, resource do bridge existe, sign-up FECHADO. O pre-requisito que E_p0 descrevia (criar user antes do flip) foi cumprido E o P3.4 (desligar sign-up) tambem ja foi aplicado, na ordem recomendada. O snapshot de 07-26 foi ultrapassado pela linha do tempo"
@@ -1970,7 +1970,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "medido ao vivo 2026-08-23 (systemctl show): a correcao sugerida FOI aplicada — o drop-in agora e onion-vps-bridge.service.d/ (onion-bridge.service.d/ nao existe mais); onion-vps-bridge.service carrega MemoryMin=256M/MemoryLow=512M (loaded/active)"
     trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
     label: "Os floors de memoria AGORA PROTEGEM o alvo certo: onion-vps-bridge.service com MemoryMin=256M/MemoryLow=512M; o drop-in fantasma (que apontava para o unit renomeado) sumiu. Os 3 drop-ins protegem os 3 alvos (system.slice, caddy, onion-vps-bridge). A classe do achado FECHA — nenhum floor inerte"
@@ -1986,7 +1986,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "medido ao vivo 2026-08-23: a relacao nucleo (marciocar em onion-dist como standalone) segue verdadeira. Mas o tenant default tem HOJE 2 orgs com membro, nao 1: onion-dist/marciocar/standalone (original) + granaai/marciog/admin (novo, provavelmente via --enroll)"
     trace: ops/bridge-auth/logto-provision.sh
     label: "A cardinalidade DRIFTOU: 'tenant default = exatamente 1 org com membro' virou 2 (+ granaai/marciog/admin). Se o onboarding continua (o adotante granaai via --enroll), a claim do no deveria ser sobre cardinalidade CRESCENTE, nao um valor fixo. A relacao nucleo segue medida e verdadeira"
@@ -2002,7 +2002,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "reconcedido e provado por comportamento 2026-08-23 (ordem do maestro): via Management API do Logto (token m-default), a role humana bridge-user NAO tinha bridge:write ANTES (GET /roles/{}/scopes = ausente); POST /roles/{}/scopes {scopeIds:[bridge:write]} concedeu; GET DEPOIS = PRESENTE. O servico (bridge-operator) NAO recebeu. Grant cirurgico (um POST), sem rodar o --apply inteiro"
     trace: ops/bridge-auth/logto-provision.sh
     label: "bridge:write RECONCEDIDO a role humana (bridge-user) em 2026-08-23 — restaura o estado que D_capability_by_scope afirmava (capacidade SO a pessoa; servico segue READ_ONLY). O chamador humano volta ao conjunto completo de tools; o M2M nao. Supera o achado E_bridge_write_grant_absent (grant ausente) que a re-verificacao pegara"
@@ -2018,7 +2018,7 @@ nodes:
     impact: 3
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-23
+    verified_at: "2026-08-23"
     verified_against: "acolhimento provado por comportamento 2026-08-23 (ordem do maestro): a org orfa no Logto (nome comercial, id 9mt40fgqoudb, membro marciog) foi RENOMEADA para o id publico do membro via PATCH /organizations; ANTES nome comercial / DEPOIS name=granaai; a projecao --project-federation passou a reportar '✅ sem divergencia: Logto == SSOT' e granaai saiu de 'sem org'. Mapa docs/onion/federation-orgs.json regenerado (--write-org-map)"
     trace: docs/onion/federation-orgs.json
     label: "D5 RESOLVIDO: a org orfa do Logto (que a re-verificacao pegou em ato) foi ACOLHIDA — renomeada ao id publico do membro (granaai), casando a regra org.name==id-do-membro do projetor. Logto == SSOT de novo; nome comercial saiu do Logto (doutrina id-nao-comercial). O projetor NUNCA absorve por conta propria (D5); a decisao foi do maestro e a execucao, cirurgica"
@@ -2034,7 +2034,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff) + selo do maestro 2026-08-30: leitura do src vivo e do historico git completo do server.ts"
     label: "REFUTA [D_default_deny_routes]: o default-deny por middleware global + allowlist ancorada NUNCA foi implementado — nem em producao nem em NENHUM ponto do historico git. O codigo sempre praticou o modelo INVERSO que o proprio label nomeia como perigoso: lista fixa de rotas PROTEGIDAS (authGuard/a2aGuard rota-a-rota), com todo o resto aberto por default (incluindo o catch-all estatico). A decisao foi escrita como se descrevesse o sistema, e o sistema nunca a conheceu. A superficie de risco que ela mitigaria segue mapeada por Q_route_inventory (vivo). Selado REFUTED pelo maestro em 2026-08-30."
     trace: "onion-bridge@7e736ba2:src/server.ts (histórico completo)"
@@ -2050,7 +2050,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 10/10 — 1) Lido o nó inteiro (linhas 615-623) e contadas as claims do label (composto, 10 afirmaçõ'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede um PLANO DE CONTINGÊNCIA (A→B1→B2→B3) a ser seguido SE o Plano A falhasse nas provas, com B3 gated por aceite explícito do maestro. O vivo mostra que A não falhou — está em produção com aud-binding real (RFC 8707) — e nenhuma linha de B2/B3 foi escrita. O nó-irmão Q_default_api_resource_b1'
     provenance:
@@ -2065,7 +2065,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — Lido o nó inteiro (linha 226-234) + os 2 nós ligados por CONSTRAINS/TRACES_TO (D_middlewar'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A premissa do claim — um `app.use(''*'', requireIdentity)` GLOBAL cuja ORDEM DE REGISTRO decide bypass-total — não corresponde à arquitetura real. A produção nunca adotou middleware global; foi para guardas POR ROTA (authGuard/adminGuard/a2aGuard), cada uma escrita e verificada linha-a-linha antes d'
     provenance:
@@ -2080,7 +2080,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — 1) `grep -n "Q_p10_mutation_not_run" -A 40 docs/onion/graph/m2-bridge-logto-2026-07.kg.yam'
     label: "MEDIDO 2026-09-01, o vivo superou o nó: a premissa que o bloqueava (exigiria desligar uma guarda no bridge vivo, sem ambiente de teste) mudou — existe um clone de dev do onion-bridge no home do maestro, rodável fora de produção com npm run dev."
     narrative: "label anterior: MEDIDO 2026-09-01, o vivo superou o no: A premissa que mantinha o nó bloqueado (\"exigiria desligar uma guarda no bridge VIVO\" / sem ambiente de teste) mudou: existe hoje um clone local rodável fora de produção ⟨(um clone de dev do onion-bridge no home do maestro, `npm run dev`)⟩ — exatamente o \"quando houver ambiente de teste do bridge\" que o próprio nó defin"
@@ -2096,7 +2096,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'census r2 (wf_102a9bec-52f): REFUTED 3/3 — Lido o nó inteiro (label), contadas 3 claims: (1) access token curto 10-15min + rotação de refresh token; (2) . Selo do maestro: ordem vai-na-ordem 2026-09-01 (etapa 1 da sequencia aprovada)'
     label: 'MEDIDO: As 3 mitigações "baratas" que o nó declara como FIXADAS neste flip não foram implementadas como descrito — e a (1) foi implementada na direção CONTRÁRIA por decisão deliberada de UX (accessTokenTtl=3600s, refresh de 14 dias sem rotação). CSP (2) nunca existiu em lugar nenhum (nem Caddy, nem server.ts). Procedimento de '
     provenance:
@@ -2111,7 +2111,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'etapa 2 da ordem vai-na-ordem (2026-09-01): CSP no ar (curl -sI mediu os 3 headers), rotateRefreshToken aplicado e provado por re-run idempotente (com rotacao), SUSPENSAO.md escrito; accessTokenTtl mantido 3600 por decisao'
     label: 'DECISAO SELADA (substitui a metade TTL do refutado D_pkce_risk_mitigations): accessTokenTtl fica em 3600s — a exigencia de 10-15min do flip original trocava UX por janela curta; a compensacao real e a ROTACAO de refresh (vazado morre no 1o replay) + CSP + procedimento de suspensao. As 3 mitigacoes agora EXISTEM no vivo, na forma ajustada.'
     trace: "ops/caddy/Caddyfile · ops/bridge-auth/logto-provision.sh · ops/bridge-auth/SUSPENSAO.md"
@@ -2128,7 +2128,7 @@ nodes:
     impact: 3
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: "grep -n systemd-run console.sh (onion-logto@a0ce0fd) => linhas 30-37: sudo systemd-run --unit=onion-logto-console-autooff --on-active=60min no case on), com aviso fail-loud se o timer nao armar (onion-logto@master, Onda 8, I_CONSOLE_AUTOOFF em fios-abertos)"
     label: "PAGO (Onda 8, 2026-09-01): o `on` do console.sh arma auto-off de 60min (sudo systemd-run transient, sobrevive ao fim da sessão de shell) e avisa se não armar; o `off` NÃO para o timer. O dogfood achou o console LIGADO por esquecimento. Janela de 60min; o desenho previa 30."
     narrative: "label anterior: PAGO (Onda 8, 2026-09-01): o GAP deixou de existir — console.sh arma auto-off transitorio de 60min via systemd-run em modo SYSTEM no case on) (sobrevive ao fim da sessao SSH), e o case off) para o timer. O dogfood achou o console LIGADO por esquecimento — exatamente o caso que o gap descrevia. Janela escolhida: 60min (nao os 30 do desenho) por pedido de uso real do painel."
@@ -2144,7 +2144,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'gh pr view 65 -R <forge>/onion-bridge => OPEN "fix(identity): piso do JWKS vale na falha (jwksAttemptedAt)"; tsc rc=0 no clone dev (fix/jwks-attempt-floor)'
     label: "O GATILHO 'PR proprio no bridge' DISPAROU (Onda 8, 2026-09-01): PR onion-bridge#65 implementa jwksAttemptedAt (piso de 60s na TENTATIVA, nao so no sucesso). A pergunta NAO fecha aqui: plane PROD segue com o storm ate merge+deploy do bridge — ato do maestro (MOAT: deploy). Fecha em Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA quando o vivo medir 1 fetch por janela durante queda do IdP."
     provenance:
@@ -2159,7 +2159,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: "bancada Hono app.request com gate falso dormindo 5s, no worktree fix/a2a-async-spawn do onion-bridge; gh pr view 66 -R marciocar/onion-bridge = OPEN"
     label: "CURA de Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP proposta (W9, 09-02): o PR #66 do onion-bridge troca spawnSync por spawn assíncrono (mesmo fail-safe); /health durante POST /a2a: 4820ms → 1,1ms. Fecha com merge+deploy (ato do maestro); produção ainda roda spawnSync no src/a2a.ts:51."
     narrative: "label anterior: CURA de Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP proposta (drive W9, 2026-09-02): PR #66 do onion-bridge troca spawnSync por spawn assincrono com o MESMO fail-safe. Medido antes/depois na bancada: /health durante um POST /a2a foi de 4820ms para 1,1ms. Modo-de-falha preservado: gate de 20s => SIGKILL aos 15s => 403 veto; gate exit 1 sem stdout => 403 veto em 40ms; zero orfaos apos o kill. A pergunta FECHA quando o PR for mergeado e deployado (ato do maestro; producao ainda roda spawnSync ⟨no src/a2a.ts:51 de o clone de produção do onion-bridge⟩, medido por sudo -n grep)."
@@ -2177,7 +2177,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: "ops/update-bridge.sh rc=0 (clone 5c40b1cc, bridge 1f7fb3f1, invocacao 75264042); systemctl show onion-vps-bridge: ActiveState=active, NRestarts=0, ActiveEnterTimestamp 02:07:16Z; journal -3min: 0 error/unhandled; /health 3x ~0,25ms; sudo -n git log no clone de produção do onion-bridge = merges #65 e #66 no topo"
     label: "DEPLOY do bridge por ORDEM do maestro (2026-09-02, 'faça deploy do bridge'): PRs onion-bridge#65 (jwksAttemptedAt) e #66 (spawn assincrono) mergeados apos typecheck do merge conjunto no clone dev (tsc rc=0; o bridge nao tem CI nem suite de testes — gate = typecheck + bench do PR). Deploy pelo mecanismo ops/update-bridge.sh (1o update com delta pelo script — o ramo cheio provou-se ponta-a-ponta, fio da memoria onion-bridge-update-state fechado). Falso alarme registrado: systemctl status onion-bridge (unit FANTASMA de 08-05, failed) — a unit real e onion-vps-bridge; medir a unit errada e nao medir."
     trace: "ops/update-bridge.sh"

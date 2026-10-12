@@ -1,8 +1,8 @@
 meta:
   id: nanochat-eixo-d-2026-10
   schema_version: "1"
-  baseline: 2026-10-05
-  review_after: 2027-02-02   # 120d: o tipo DOMINANTE e PAPER/BENCHMARK. 17 das 21 claims ancoradas vem de
+  baseline: "2026-10-05"
+  review_after: "2027-02-02"   # 120d: o tipo DOMINANTE e PAPER/BENCHMARK. 17 das 21 claims ancoradas vem de
                              # cinco papers do arXiv (2603.25158, 2308.08747, 2305.11206, 2404.07503,
                              # 2405.09673), cujo texto nao muda; o que pode mover o eixo e literatura NOVA sobre
                              # esquecimento sob mistura dominada por identidade, replay em modelo <1B e custo de
@@ -53,7 +53,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'rodada /onion-research modo primaries de 2026-10-05: 7 fontes lidas, 21 claims ancoradas por verificador independente, 12 rejeitadas na ancoragem; Elenxo completo recuperado do transcript (21 objecoes, 11 gapsOpen)'
     label: 'EIXO D do estudo Nanochat x Onion — qual o orcamento de dados sinteticos e de identidade para (D) treinar/ajustar modelo com o corpus PUBLICO do Onion e (a) destilar a doutrina em pesos? Cinco sub-perguntas: (1) custo e qualidade do sintetico de corpus pequeno; (2) esquecimento catastrofico com dado de dominio/identidade dominando a mistura e mitigacoes (mistura, replay, LoRA); (3) quanto dado de alinhamento/identidade basta; (4) corpus AGENTICO como fonte; (5) identidade x utilidade e perda de auditabilidade (S7_claim_analogy_breaks). RESPOSTA DA RODADA: so uma ORDEM DE GRANDEZA de dado (~10^3 exemplos, em regimes que nao sao o do Onion), nenhum orcamento em dolares ou GPU-hora; (2) respondido so para LoRA em Llama-2-7B; (4) a fonte nomeada e rota SEM pesos; (5) sem fonte, so argumento estrutural. Eixo LIDO, nao FECHADO.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml'
@@ -65,7 +65,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "Trace2Skill constructs a new skill from evolving-set trajectories without updating θ" — locator: Secao 2.1 (formalizacao, Eq. 1); ancorada por verificador independente; tier nao declarado pelo leitor, herdado da outra claim da mesma fonte (7)'
     valid_from: '2026-03'
     source_tier: 7
@@ -83,7 +83,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "Trace2Skill applies all consolidated patches by default; selecting a higher-quality subset with Bayesian optimization can help (§ 4.3), but it is costly." — locator: secao Limitations (nao numerada; "secao 6" nao confirmada); ancorada por verificador independente'
     valid_from: '2026-03'
     source_tier: 7
@@ -103,7 +103,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "Comparing the decoder-only model BLOOMZ with the encoder-decoder model mT0, BLOOMZ exhibits less forgetting and retains more knowledge." — locator: Abstract; Secao 5.3 (Effect of Model Architecture); ancorada por verificador independente'
     valid_from: '2023-08'
     source_tier: 7
@@ -123,7 +123,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "We select 750 top questions and answers from community forums, such as Stack Exchange and wikiHow, sampling for quality and diversity. In addition, we manually write 250" — locator: Secao 2 (Alignment Data), nao Secao 1; ancorada por verificador independente'
     valid_from: '2023-05'
     source_tier: 7
@@ -141,7 +141,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "for the purpose of alignment, scaling up input diversity and output quality have measurable positive effects, while scaling up quantity alone might not." — locator: Secao 5 (Why is Less More?), paragrafo 1; ancorada por verificador independente'
     valid_from: '2023-05'
     source_tier: 7
@@ -159,7 +159,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "the mental effort in constructing such examples is significant and difficult to scale up. Secondly, LIMA is not as robust as product-grade models; while LIMA typically generates good responses, an unlucky sample during decoding or an adversarial prompt" — locator: Secao 7 (Discussion), paragrafo 1; ancorada por verificador independente'
     valid_from: '2023-05'
     source_tier: 7
@@ -179,7 +179,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.65
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "synthetic data, if not applied correctly, can actually increase hallucina- tions in language models." — locator: Secao 2.5 Alignment, "Mitigating hallucination"; ancorada por verificador independente'
     valid_from: '2024-04'
     source_tier: 7
@@ -197,7 +197,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "we recommend that model developers invest in creating and maintaining in- house and protected evaluation benchmarks." — locator: Secao 4 Limitations and Risks; ancorada por verificador independente; Elenxo objecao 8 NAO sobreviveu (a claim fica de pe no uso que a rodada faz dela)'
     valid_from: '2024-04'
     source_tier: 7
@@ -215,7 +215,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "whether we have similar conclusions on the training with synthetic data is still an open question, as the quality of synthetic data may not be as consistent as real-world data" — locator: Secao 5 Directions for Future Work, "Synthetic data scaling"; ancorada por verificador independente'
     valid_from: '2024-04'
     source_tier: 7
@@ -233,7 +233,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "methods that can incorporate domain-specific knowledge to ensure the generated data adheres to the underlying con- straints and patterns present in the target domain (e.g., via Retrieval Augmented Gener- ation (RAG)" — locator: Secao 5 Directions for Future Work, "Further improving quality and diversity of synthetic data"; ancorada por verificador independente'
     valid_from: '2024-04'
     source_tier: 7
@@ -251,7 +251,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "Synthetic data is also a powerful ap- proach to enable LMs to learn tool-using abilities through simulated trajectories, as collect- ing real-world human tool-using data might be time-consuming" — locator: Secao 2.2 Tool-using and planning, "Learning tool-using through synthetic trajectories"; ancorada por verificador independente'
     valid_from: '2024-04'
     source_tier: 7
@@ -271,9 +271,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "you just specify the behavior of your model in words (in English), and then ask for synthetic conversations from your favorite bigger cousin LLM of nanochat through an API." — locator: Discussao #139, paragrafo que cita dev/gen_synthetic_data.py; ancorada por verificador independente; createdAt da discussao 2025-10-21 medido por gh api graphql na escrita'
-    valid_from: 2025-10-21
+    valid_from: "2025-10-21"
     source_tier: 9
     source_kind: primary
     label: 'O metodo oficial de identidade do Nanochat (autor, "Guide: infusing identity to your nanochat") e SFT SINTETICO: descrever o comportamento em ingles e pedir conversas a um LLM maior via API. Prova que o METODO existe, nao que funciona nem o que custa em utilidade. Para o Onion o "bigger cousin" seria o Claude — o que REABRE E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR: o destilado herda os vieses do gerador.'
@@ -289,9 +289,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "In this case, I generated 1000 multi-turn conversations, which took only a few minutes. We then simply add these conversations to the midtraining and SFT data mixtures." — locator: Discussao #139, mesmo paragrafo do metodo; ancorada por verificador independente'
-    valid_from: 2025-10-21
+    valid_from: "2025-10-21"
     source_tier: 9
     source_kind: primary
     label: 'UNICO numero de orcamento de identidade da rodada: 1.000 conversas multi-turno, geradas em "poucos minutos", adicionadas as misturas de midtraining e SFT. Cobre SO a GERACAO. Nao diz custo de API em dolares, custo de re-rodar midtraining+SFT, se a identidade "pegou", nem o que a mistura fez com CORE/MMLU/GSM8K. Minutos de geracao NAO sao o orcamento total.'
@@ -307,9 +307,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "Re-generate the conversations and then re-run the midtraining and SFT stages. You''ll notice both scripts now use a new `CustomJSON` Task, which serves conversations from simple jsonl file you pass it." — locator: Discussao #139, secao "Your turn"; ancorada por verificador independente; Elenxo objecao 14 NAO sobreviveu'
-    valid_from: 2025-10-21
+    valid_from: "2025-10-21"
     source_tier: 9
     source_kind: primary
     label: 'O mecanismo e uma Task CustomJSON que serve um jsonl; o procedimento e REGENERAR e RE-RODAR os estagios de midtraining e SFT. Identidade nao e patch barato de dado: e retreino de ESTAGIOS a cada mudanca. Para o Onion, cada mudanca de doutrina custaria um ciclo de GPU sem trilha de PR — a forma concreta de S7_claim_analogy_breaks.'
@@ -325,7 +325,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "SmolTalk(split="train"), # 460K rows of general conversations *[MMLU(subset="all", split="auxiliary_train") for _ in range(args.mmlu_epochs)], # 100K rows per epoch" — locator: scripts/chat_sft.py, linhas 163-165 e 65-66 (defaults); ancorada por verificador independente; Elenxo objecao 15 NAO sobreviveu'
     source_tier: 9
     source_kind: primary
@@ -344,7 +344,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "Our results show that, in the standard low-rank settings, LoRA substantially underperforms full finetuning. Nevertheless, LoRA better maintains the base model’s performance on tasks outside the target domain." — locator: Abstract (arXiv v2); ancorada por verificador independente'
     valid_from: '2024-05'
     source_tier: 8
@@ -362,7 +362,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "Full finetuning is more accurate and sample-efficient than LoRA in continued pretraining (CPT) for code and math; in instruction finetuning (IFT), higher ranks can close most of the gaps (Sec.4.1)." — locator: Sec. 1, lista de contribuicoes, 1o item; ancorada por verificador independente; tier nao declarado pelo leitor, herdado das demais claims da mesma fonte (8)'
     valid_from: '2024-05'
     source_tier: 8
@@ -380,7 +380,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "Most importantly, LoRA forgets less than full finetuning, and the extent of forgetting is controlled by rank. In code – for both CPT and IFT – full finetuning forgets substantially more than any LoRA configuration." — locator: Sec. 4.2, paragrafo 1 (Fig. 2; Tabelas S2, S4, S6, S8); ancorada por verificador independente'
     valid_from: '2024-05'
     source_tier: 8
@@ -398,7 +398,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "LoRA, with the common r = 16, learns less and forgets less than all other models. LoRA r = 256, on the other hand, learns as much as the other methods while forgetting less." — locator: Sec. 4.5, "LoRA forgets less than attention dropout and weight decay" (Fig. 4); ancorada por verificador independente; Elenxo objecao 19 NAO sobreviveu'
     valid_from: '2024-05'
     source_tier: 8
@@ -416,7 +416,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "We find that LoRA is very sensitive to hyperparameters, including learning rates, choice of target modules, ranks, and scaling factors; setting these properly is a prerequisite to approach full finetuning performance." — locator: Sec. 1, paragrafo apos a pergunta de pesquisa (detalhado na Sec. 4.7); ancorada por verificador independente; Elenxo objecao 20 NAO sobreviveu'
     valid_from: '2024-05'
     source_tier: 8
@@ -434,7 +434,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE "we leave a rigorous study of these intriguing scaling properties to future work." — locator: Sec. 6, Discussion, "Does the difference between LoRA and full finetuning change with model size?"; ancorada por verificador independente; Elenxo objecao 21 NAO sobreviveu'
     valid_from: '2024-05'
     source_tier: 8
@@ -454,7 +454,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'inventario do que esta rodada leu, ancorou, rejeitou e NAO fechou — ausencia CONTADA; retorno completo do Elenxo recuperado de subagents/workflows/wf_f27dbccf-1e8/agent-aecc7d9e178f948c2.jsonl (gapsClosed 5, gapsOpen 11)'
     source_tier: 10
     source_kind: primary
@@ -473,7 +473,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.65
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'recomendacao do Elenxo desta rodada (transcript completo); E_LIMA_1000_EXAMPLES_COMPOSITION, E_NANOCHAT_IDENTITY_1000_CONVERSATIONS, E_SYNTH_SCALING_OPEN_QUESTION, E_NANOCHAT_IDENTITY_STAGE_RETRAIN, E_LORA_HYPERPARAM_SENSITIVE, E_SYNTH_EVAL_CONTAMINATION_PROTECTED_BENCH'
     label: 'RESPOSTA A DUVIDA DO MAESTRO ("qual o orcamento de dados sinteticos e identidade?"): a rodada sustenta so uma ORDEM DE GRANDEZA DE DADO — ~10^3 exemplos — e NENHUM orcamento. Dois pontos ancorados, de regimes que nao sao o do Onion: LIMA, ~1.000 curados (750 de forum + 250 a mao) para o FORMATO de um 65B, com curadoria cara; Nanochat #139, 1.000 conversas sinteticas geradas em minutos por LLM maior via API, seguidas de RE-RODAR midtraining+SFT. Nenhuma fonte da custo em dolares ou GPU-hora, e o survey declara a escala de sintetico questao em aberto. O custo real tem ao menos QUATRO parcelas, nenhuma medida: geracao por API; retreino de ESTAGIOS a cada mudanca de doutrina; varredura de hiperparametros se for LoRA; e a eval interna protegida que ainda nao existe.'
     trace: 'docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml'
@@ -483,7 +483,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'nanochat-onion-2026-10#C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY (gated: falta consumidor, MOAT W7); E_SYNTH_EVAL_CONTAMINATION_PROTECTED_BENCH; E_NANOCHAT_IDENTITY_SYNTHETIC_SFT_METHOD; nanochat-onion-2026-10#Q_EVAL_DE_DOMINIO_DO_ONION e #E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR'
     label: 'Projecao local de C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY (pai): a opcao D CONTINUA GATED e ganha um SEGUNDO gate alem da falta de consumidor — sem eval de dominio interna e protegida (Q_EVAL_DE_DOMINIO_DO_ONION), sintetico contamina a medicao e nenhum dataset do corpus e mensuravel. E um AGRAVANTE: o metodo de referencia (sintetico pedido ao "bigger cousin", aqui o Claude) herda o erro correlacionado do gerador (E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR). A fonte nomeada para "corpus agentico" (Trace2Skill) e rota SEM pesos e nao sustenta D.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml'
@@ -493,7 +493,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'E_NANOCHAT_IDENTITY_STAGE_RETRAIN (Elenxo objecao 14 nao sobreviveu); E_LIMA_CURATION_COSTLY_FRAGILE; federation-research-2026-06-reconciled#S7_claim_analogy_breaks (open); ARGUMENTO ESTRUTURAL — nenhuma fonte desta rodada trata auditabilidade'
     label: 'Sentido (a) e S7_claim_analogy_breaks, na forma que a rodada consegue dar: identidade em pesos exige RETREINO DE ESTAGIOS por mudanca (nanochat #139: regenerar conversas e re-rodar midtraining+SFT). A doutrina em markdown muda por diff revisavel em PR; a doutrina em pesos mudaria por ciclo de GPU sem diff legivel — e o modelo pequeno alinhado e fragil a prompt adversarial (LIMA), que e o habitat do Elenxo. E argumento POR ESTRUTURA, nao literatura: nenhuma fonte ancorada mede auditabilidade nem o trade-off identidade x utilidade. Reforca a refutacao de C_OPCAO_E_ONION_AS_WEIGHTS (pai) sem acrescentar medida.'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
@@ -505,7 +505,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'recomendacao do Elenxo desta rodada ("EFEITO NO GRAFO"); grafo-pai lido inteiro na escrita (46 nos; D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 status done)'
     label: 'PROPOSTA (o maestro decide; este grafo nao edita o pai nem toca o selo): (1) o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 e REFORCADO, nao reaberto — nenhum achado reduz custo, todos somam custo ou pre-condicao; (2) E_OBJECAO_SYNTHETIC_DATA_AXIS_UNREAD (pai) merece superacao PARCIAL: "julgado no escuro" passa a "julgado com leitura parcial" — esquecimento sob mistura dominada pela identidade, custo e "autoconsciencia honesta" continuam objecao SOBREVIVENTE (clausula 6), porque nao foram fechados por evidencia; (3) C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY (pai) ganha o segundo gate do eval protegido (C_EIXO_D_OPTION_D_SECOND_GATE_EVAL); (4) E_LACUNAS_NANOCHAT_2026_10 (pai) deixa de listar arXiv 2603.25158 como "cortado sem leitura" — foi lido e nao e treino em pesos. A escrita no pai e ato separado, com aresta cross-grafo citada por id.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml'

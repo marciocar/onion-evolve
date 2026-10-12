@@ -5,7 +5,7 @@ meta:
   # kg-backlog-archive: on  # ARQUIVO de pesquisa (2026-06): 319 abertos epistemicos historicos — some do backlog (superficie de controle limpa), segue visivel no radar --open-tsv (decisao do maestro 2026-08-23)
   id: federation-research-2026-06-reconciled
   schema_version: "1"
-  baseline: 2026-07-21
+  baseline: "2026-07-21"
   date: 2026-07-21
 nodes:
   - id: G1_INTERRUPT_STATES
@@ -1464,7 +1464,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/utils/federation-transport/README.md; .claude/utils/federation-transport/factory.md; .claude/utils/federation-transport/adapters/{git-async,local,a2a-live}.md; .claude/utils/federation-transport/detect-transport.sh"
     label: "CONFIRMOU-SE: a abstração federation-transport SDAAL existe com os 3 adapters propostos em junho (git-async default | local | a2a-live gated), factory + interface + types + detect-transport.sh determinístico, com dispensas de anatomia declaradas"
     provenance:
@@ -1479,7 +1479,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/utils/co-evolution/resolve-target.sh"
     label: "CONFIRMOU-SE: o targeting por seletor (policy-as-data sobre mode/tier/specialization, com retrocompat todos|adotantes|<id>) foi implementado como resolve-target.sh (F1.2), reusando as triplas de membro do graph.sh — zero campo novo no SSOT, exatamente o desenho de junho"
     provenance:
@@ -1494,7 +1494,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/graph.sh (linhas 18, 57-92, 158, 226-228); docs/onion/federation-map.md"
     label: "CONFIRMOU-SE e FECHOU: graph.sh passou a ingerir members.yaml (triplas de membro: tier/adopts/mode/pin/specializations/trust/linhagens) e a emitir --map; o mapa de adoções é gerado, não desenhado à mão (docs/onion/federation-map.md, 2026-07-19)"
     provenance:
@@ -1509,7 +1509,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/federation-console.sh (cabeçalho + projeção python); docs/onion/federation-console.html (gerado 2026-07-20)"
     label: "CONFIRMOU-SE em parte / REFUTOU em parte: o console existe como projeção CQRS estática sobre members.yaml + CHANGELOG (sem backend, sem DB, sem Backstage) — mas NÃO é o stack proposto em junho: é HTML self-contained com DADOS INLINE (CSP-safe, abre em file://), sem Alpine.js e sem feed.json/members.json a buscar"
     provenance:
@@ -1523,7 +1523,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/federation-console.sh (comentário da projeção de membros, regra 2026-07-09 + incidente 2026-07-10)"
     label: "REFUTA 'projeção read-only é inócua': o console público vazou verbatim o campo name: de um membro, incluindo o marcador de confidencialidade que ele carrega (incidente 2026-07-10, já corrigido). A projeção precisou virar superfície com regra de sanitização (só o nome curto, parêntese é anotação interna) — read-model não é neutro quando o event-store carrega anotação do maestro"
     provenance:
@@ -1537,7 +1537,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/utils/federation-transport/a2a-verify.sh; .claude/utils/federation-transport/a2a-ssrf-check.sh; .claude/utils/federation-transport/jwks/{metagamify-1,granaai-1}.pem; .claude/utils/federation-transport/adapters/a2a-live.md"
     label: "CONFIRMOU-SE: a verificação-antes-de-agir do receptor existe e é executável — a2a-verify.sh (6 camadas, fail-safe, apply_mode propose-only p/ receptor regulado), a2a-ssrf-check.sh, JWKS com pubkeys PINADAS por kid (metagamify-1, granaai-1), a2a-accept.sh fila→inbox"
     provenance:
@@ -1552,7 +1552,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/federation/members.yaml (bloco a2a: do onion-evolve, status: foundation); .claude/utils/federation-transport/README.md (tabela de adapters); .claude/utils/federation-transport/adapters/a2a-live.md (linha 41)"
     label: "REFUTA a 'metade viva entregue': o SSOT declara a2a.status: foundation ('endpoint vivo em construção, F2.2 fase-1') enquanto o README do transporte diz '✅ vivo (F2.2)' — contradição declarado≠verificado DENTRO do repo; e o adapter é explícito que o socket SSE/webhook é do bridge, FORA do gate. O par SSE+webhook segue não-provado no core"
     provenance:
@@ -1567,7 +1567,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md §4-§6; .claude/utils/federation-transport/factory.md (a2a-live nunca auto)"
     label: "CONFIRMOU-SE e virou doutrina: RFC-0004 ratifica 'só sinais gated, nunca IA-fala-IA autônoma', git-async de invariante absoluto para default-com-exceção-gated, a2a-live NUNCA auto-selecionado, fail-safe (ausência de gate válido = veto). A pergunta de junho sobre 'quando habilitar IA-fala-IA' foi respondida: gated sim, autônoma nunca"
     provenance:
@@ -1582,7 +1582,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/federation/members.yaml; .claude/validation/pin-integrity-check.sh; .claude/validation/a2a-agent-card.sh; .claude/validation/lint-artifacts.sh (REGRA 25, linha 648)"
     label: "CONFIRMOU-SE: manter o registry GATED e curado à mão sustentou 9 membros — members.yaml é o sub-registry com pin verificado (pin-integrity-check.sh, nunca stamp declarado; histórico do pin FORJADO do metagamify), Agent Card em /.well-known/ gerado e guardado por lint HARD (REGRA 25)"
     provenance:
@@ -1597,7 +1597,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/federation/members.yaml (ids dos 9 membros); docs/onion/agent-card.json"
     label: "REFUTA metade da 'ação barata' de junho: o esquema NÃO foi alinhado aos formatos emergentes — ids seguem slugs planos (onion-evolve, granaai, gustavo-pulga), sem namespace reverse-DNS e sem tier trust verified|community. Só o Agent Card em well-known e o pin-como-provenance-de-commit foram adotados"
     provenance:
@@ -1612,7 +1612,7 @@ nodes:
     status: superseded
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "git 83a7830; git 419a390; .claude/validation/lint-artifacts.sh (REGRA 28, linhas 670-741)"
     label: "REFUTA o enquadramento de junho (o gargalo era protocolo/liveness): o que travou de fato foi mundano — 11 anúncios apodreceram em staging até 13 dias (4 arquivados em 83a7830; 6 de marcio-pessoal + 1 órfão de onion-hub em 419a390) porque um membro method-only (onion_version: n/a) NÃO TINHA CAIXA POSTAL. Fix: caixa postal ≠ framework (inbound/ sem vendorizar) + lint REGRA 28 (SOFT, 3 classes) para o repo sozinho decidir 'este membro tem canal?'"
     narrative: "trace anterior incluía também a caixa docs/evolution/inbound/ do clone local de marcio-pessoal (host; o remoto é declarado não publicado no members.yaml)."
@@ -1627,7 +1627,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "git rev-list --count c9eb2c40bc3b..HEAD = 292; git rev-list --count b8208cc1a3da..91d5dbb05a6d = 42; docs/evolution/federation/members.yaml (granaai onion_version, gustavo-pulga onion_version); gustavo-pulga@21ff04f:.claude/.onion-version (clone local; id do members.yaml)"
     label: "REFUTA 'o híbrido subtree+pin é o padrão certo, resolvido': a métrica que doeu em julho foi drift de pin silencioso — gustavo-pulga está 292 commits atrás do core (pin c9eb2c40bc3b, verificado por rev-list) e granaai chegou a 42 atrás antes de a própria sessão do adotante atualizar em 2026-07-19 (b8208cc1a3da→91d5dbb05a6d, 13 atrás hoje). Nenhum dos 9 docs de junho modela envelhecimento de pin"
     provenance:
@@ -1641,7 +1641,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/federation-status-scan.sh (linhas 3-19, 62-94); .claude/validation/federation-radar.sh"
     label: "CONFIRMOU-SE: o corte 'identidade/contratos exigem escritor único e verificação forte' virou script — federation-status-scan.sh classifica contract-drift determinístico (in-sync|drift|unpublished) e federation-radar.sh dá o veredito advisory de saúde-de-verificação (4 checks declarado≠verificado, incl. anúncio-em-staging-não-transportado)"
     provenance:
@@ -1656,7 +1656,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/utils/federation-transport/factory.md (§divergência de default + fallback gracioso); .claude/utils/federation-transport/README.md (§Invariantes)"
     label: "CONFIRMOU-SE: o mesh de comunicação git-async permaneceu o system-of-record e o fallback universal (default unset → git-async; qualquer indisponibilidade degrada p/ git-async; I3 entrega-sem-commit preservado em toda via) — o corte por natureza do dado sobreviveu ao contato com a realidade"
     provenance:
@@ -1670,7 +1670,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/trust-log.md (9 linhas, mtime 2026-07-03); .claude/validation/trust-topology-check.sh (log_attempt/--dry-run)"
     label: "REFUTA a metade operacional da decisão de junho ('acumular histórico no trust-log, depois medir'): o trust-log.md tem 9 linhas e a última entrada é de 2026-07-01 — em 20 dias não acumulou amostra. Reputação-condicionando-veto está gated por AUSÊNCIA DE DADO, não por dogfood"
     narrative: "label anterior: REFUTA a metade operacional da decisão de junho ('instrumentar o trust-log para acumular histórico primeiro, depois medir'): o trust-log.md existe mas tem 9 linhas e não é escrito desde 2026-07-03 — em 17 dias de federação viva não acumulou amostra nenhuma. Reputação-condicionando-veto não está gated por dogfood, está gated por AUSÊNCIA DE DADO"
@@ -1686,7 +1686,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "git 77b701d; docs/knowledge-base/concepts/agent-orchestration.md"
     label: "CONFIRMOU-SE o padrão que a verificação adversarial de junho encontrou: números fabricados/órfãos continuam aparecendo e agora são corrigidos como rotina — commit 77b701d ('sync model tiering and session caps with verified sources; fix fabricated citations') tocou 5 KBs e a skill de orquestração"
     provenance:
@@ -1700,7 +1700,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.3
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/federation/members.yaml (granaai a2a: PREPARADO, não ativado); docs/evolution/federation/CHANGELOG.md (última entrada a2a: 2026-07-10 linha 342)"
     label: "NÃO VERIFIQUEI: se houve tráfego a2a-live REAL além do 1º handshake de 2026-07-09 (metagamify). Não achei no repo fila data/a2a-pending, log de aceitação nem entrada de CHANGELOG posterior atestando sinal recebido pelo canal vivo; granaai está PREPARADO-não-ativado. O canal pode estar vivo-por-declaração e ocioso-de-fato — fica aberto"
     provenance:
@@ -1834,7 +1834,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-06
+    verified_at: "2026-10-06"
     verified_against: "docs/analysis/onion-federation-audit-2026-07-01.md:18-21"
     trace: "docs/analysis/onion-federation-audit-2026-07-01.md#0-sumário"
     label: "Núcleo mecânico da Federação formal está saudável (scripts rodam, fixtures passam, cross-refs resolvem); problemas reais são bug de código + guard vazio + drift de registro/vocabulário"
@@ -2259,7 +2259,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/federation/members.yaml (linha 75, comentário do metagamify; gustavo-pulga updated_at: 2026-07-14); .claude/validation/lint-selftest.sh (modo write-stamp, linhas 1189-1206)"
     label: "RESOLVEU a questão aberta #5 do audit de 01-jul: a semântica de adopted_at foi unificada — --update PRESERVA adopted_at e escreve updated_at separado; há guarda de selftest (write-stamp: fresh sem updated_at / update preserva) e um membro já carrega o par (gustavo-pulga 2026-07-09 + 2026-07-14). O stamp do rhilo ainda carrega o re-carimbo pré-fix, a ser restaurado no próximo --update"
     provenance:
@@ -2273,7 +2273,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/trust-topology-check.sh (id_in_list, linhas 88-105)"
     label: "CONFIRMOU-SE que o fix do bug de regex sobreviveu 20 dias: id_in_list casa indentação livre (^[ ]+field:) e faz sub(/#.*$/) ANTES de comparar — exatamente as duas correções descritas no audit; os campos granulares de trust: voltaram a ser legíveis"
     provenance:
@@ -2288,7 +2288,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/onion-version.sh (linhas 42-49, 56-64)"
     label: "CONFIRMOU-SE: o guard de identidade deixou de ser vazio — onion-version.sh deriva role da presença do stamp .claude/.onion-version, e stamp presente sem campo role cai em 'adopted' (fail-safe). O hardcode role: source foi removido com comentário explicando a regressão original"
     provenance:
@@ -2303,7 +2303,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/concepts/multi-repo-federation.md (linha 95: version: 2)"
     label: "CONFIRMOU-SE: a KB multi-repo-federation.md carrega members.yaml em schema v2 — a fonte que o /meta:federation-register copia ao bootstrapar ledger não propaga mais o schema v1 obsoleto"
     provenance:
@@ -2318,7 +2318,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/concepts/federation-usage-modes.md §1.1 (tabela dos três namespaces, linhas 61-70); docs/evolution/federation/members.yaml (role: source|hub|standalone + tier nos 9 membros)"
     label: "CONFIRMOU-SE em parte / REFUTA 'fix estrutural': os 3 namespaces de role foram NOMEADOS numa tabela da KB (contrato / membro / stamp) — mas não colapsados: members.yaml segue carregando role: (source|hub|standalone|consumer) E tier lado a lado nos 9 membros. Nomear reduziu a confusão, não removeu a duplicidade de eixo"
     provenance:
@@ -2332,7 +2332,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/federation/ (só members.yaml, CHANGELOG.md, outbox/, onboarding-remote-member.md — SEM contracts/); .claude/validation/fixtures/contracts (únicos contratos existentes são fixtures de teste); grep -i 'rollback|federation-check' em docs/evolution/federation/CHANGELOG.md = 0 ocorrências"
     label: "REFUTA a leitura de que a Federação formal está 'entregue e viva': em >5 semanas nenhum contrato real foi registrado — o ledger não tem sequer o diretório contracts/, os únicos contratos no repo são fixtures de validação, e não há registro de nenhum federation-check/rollback exercido. Os 5 comandos e os 3 scripts existem e passam nos fixtures; a capacidade nunca encontrou um caso real"
     provenance:
@@ -2347,7 +2347,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/federation/CHANGELOG.md (53 entradas, formato '## <data> · <assunto> · COMPATÍVEL|BREAKING · alvo: <seletor>'); docs/evolution/federation/outbox/{granaai,gustavo-pulga,marcio-pessoal,metagamify,onion-hub,onion-mini,pulse-mais,rhilo-metagamify}/"
     label: "NUANÇA que junho não previu: a espinha git do design v2 materializou-se, mas o tráfego que ela carrega é ANÚNCIO de co-evolução (doc-bridge, campo alvo:), não bump de contrato. O CHANGELOG virou mailbox do doc-bridge com 53 entradas e 8 outboxes por membro — o inbox de contratos previsto na Fase 2 ficou vazio. A federação que pegou foi a de documentos, não a de contratos"
     provenance:
@@ -2362,7 +2362,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/onion/agent-card.json (protocolVersion 0.3.0, mtime 2026-07-09); .claude/validation/a2a-agent-card.sh; .claude/utils/federation-transport/ (a2a-verify.sh, a2a-ssrf-check.sh, jwks/, adapters/a2a-live.md); docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
     label: "REFUTA 'nada a fazer no eixo A2A agora': a projeção de formato FOI construída ~3 semanas depois do ADR (agent-card.json em /.well-known/, gerador + guarda de lint, JWKS pinado, verificador de 6 camadas) SEM que o gatilho declarado (1º consumidor não-Onion / interop real) tivesse disparado — o gatilho que disparou de fato foi interno (RFC-0004, transporte a2a-live gated entre membros Onion). O ADR estava certo no eixo runtime×formato e errado no gatilho"
     provenance:
@@ -2377,7 +2377,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/trust-log.md (9 linhas, 3 tentativas, todas de 2026-07-01 13:36)"
     label: "NUANÇA ao 'fix do id_in_list destravou a topologia': o trust-log versionado tem só 3 tentativas, todas de 01-jul, e nada até 07-21 — mas o trust-check é a camada 1 do a2a-verify, exercida nos handshakes a2a-live de 07-10 sem linha no log versionado. Bug guardado por 11 selftests"
     narrative: "label anterior: REFUTA a implicação de que consertar o id_in_list destravou a topologia de confiança: o trust-log registra 3 tentativas, todas do próprio dia do dogfood (01-jul), e nada desde então. O bug foi corrigido e guardado por 11 cenários de selftest, mas a maquinaria de trust não é invocada em produção há 20 dias — código verde, uso zero"
@@ -2393,7 +2393,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/diary/ (63 arquivos .md); .claude/validation/diary-index.sh"
     label: "SUPERA o alerta 'maquinaria à frente do gate': o gate de F1 (10 entradas de diário) era 0/10 em 01-jul e hoje há 63 entradas. O desalinhamento de sequenciamento se dissolveu pelo uso — a crítica era de ritmo, não de desenho"
     provenance:
@@ -2408,7 +2408,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "grep -i 'federa' em docs/materials/*.md → 'Federation multi-repo', 'Federation v2 — Coordenação Multi-Repo'; zero ocorrências de 'federação de agentes' fora dos próprios docs/analysis de junho"
     label: "CONFIRMOU o risco como não-materializado: os materiais de divulgação nunca usaram 'federação de agentes' — falam 'Federation multi-repo' / 'coordenação multi-repo sem quebrar nada'. A recomendação de rename foi satisfeita em substância sem ato de rename; o termo enganoso ficou confinado aos próprios documentos de análise que o criticaram"
     provenance:
@@ -2437,7 +2437,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.4
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/federation/ (sem contracts/); .claude/commands/meta/federation-{register,publish,check,status,rollback}.md"
     label: "NÃO VERIFIQUEI: se a Federação formal de contratos está DORMENTE (esperando o 1º caso real de API compartilhada entre membros) ou MORTA (superada pelo doc-bridge, que resolveu a necessidade concreta com menos cerimônia). Não achei no repo nenhum sinal de intenção de registrar contrato, nem decisão de aposentadoria — os 5 comandos seguem no inventário sem uso"
   - id: B2_3_review_verdict
@@ -3506,7 +3506,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.98
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/README.md:9-31"
     label: "A tabela 'Sementes de pesquisa abertas' EXISTE em docs/analysis/README.md (linhas 9-31), com 12 sementes indexadas, status por semente e a própria S10 marcada ENTREGUE"
     provenance:
@@ -3521,7 +3521,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/education/theories/plea-rosario.md · docs/knowledge-base/education/theories/srl-zimmerman.md · docs/knowledge-base/education/applications/onion-srl-bridges.md:24-30 · docs/analysis/onion-adr-education-vertical-2026-07.md"
     label: "A pesquisa SRL/PLEA já virou KB no core: theories/plea-rosario.md + theories/srl-zimmerman.md (camada 1, fiel à fonte) e applications/onion-srl-bridges.md §1 com o mapa PLEA↔loop (Planificação=radar/backlog, Execução=atuadores/dogfood, Avaliação=juiz/re-teste/D10), rotulado PLAUSÍVEL — mais o ADR da vertical educacional"
     provenance:
@@ -3536,7 +3536,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/discussions/onion-pessoal-marcio/proto/theories/hegel-dialectics.md:1-50"
     label: "Catálogo hegeliano camada-1 JÁ ESCRITO (97 linhas, fiel à fonte): momentos EL §§79-82, Aufhebung/negação determinada, Priest×Brandom, e a correção anti-decoração da Q5 já resolvida (tese-antítese-síntese é Fichte/Chalybäus, não Hegel; método real é imanente)"
     provenance:
@@ -3551,7 +3551,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/diary/2026-07-11-hegel-limit-kg-boundary.md:17-40"
     label: "Migalha de diário 2026-07-11 já entrega um achado hegeliano OPERACIONAL e verificado por fonte: Grenze×Schranke define quando usar .kg.yaml (conhecimento deixa de ser monotônico), e 'KG sustenta a inquietude / prosa é a superação que nega+preserva+eleva' confirma a leitura append-mostly↔Aufhebung"
     provenance:
@@ -3575,7 +3575,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.92
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md:1-35 · docs/onion/graph/onion-identity-2026-07.kg.yaml:1-25,167-187,423"
     label: "O dogfood de /meta:kg sobre um subconjunto real do próprio framework ACONTECEU: plano de 2026-07-11 + grafo construído com nós de vertical/SDAAL (inclui 'KG SDAAL já dogfoodado em produção' e a EDGE-Hagel rhilo→core), baseline 2026-07-17"
     provenance:
@@ -3604,7 +3604,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/kg-provenance-coverage.sh:1-40 · .claude/validation/lint-artifacts.sh:1456-1482 · .claude/validation/kg-coverage-baseline.txt"
     label: "O eixo COBERTURA (≠ fidelidade) ganhou mecanismo determinístico: kg-provenance-coverage.sh pergunta 'este relatório existe no grafo?', com catraca de baseline versionado, plugado no lint-artifacts.sh (passivo SOFT, doc novo sem nó HARD)"
     provenance:
@@ -3619,7 +3619,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-parecer-rejection-vs-spinoff-signal-2026-07.md:12,39,44,48,142-145"
     label: "O parecer rejection-vs-spinoff já DECIDIU (D1) a categoria 'bifurcado' e já EXECUTOU (D3) o retrofit das duas sementes: para SLM-federado e multi-IDE a resposta é 'o lugar (core) está errado, não o mérito' — onion-mini já é a resposta fora do core"
     provenance:
@@ -3634,7 +3634,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.93
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-adr-family-repo-topology-2026-07.md:1-60"
     label: "A Q1 da S13 ('gerar repos novos ou classificar os existentes?') foi respondida por ADR ACEITO em 2026-07-19: taxonomia D1 de 4 tipos de repo com mecanismo de nascimento e de sync por tipo, e D2 resolvendo a porta pública via /meta:adopt role-scoped"
     provenance:
@@ -3663,7 +3663,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/utils/de-identification/adapters/local-slm.md · docs/sdaal/sdaal.md:320"
     label: "O adapter local-slm de de-identification existe como spec no core (.claude/utils/de-identification/adapters/local-slm.md) — a âncora da S6 é real, mas é doc de adapter gated; llm-provider segue '📝 Roadmap' na tabela do sdaal.md"
     provenance:
@@ -4075,7 +4075,7 @@ nodes:
     status: done
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
     label: "Cascata nativa oficial do Claude Code: managed → cli → local → project → user, com managed como piso regulado inviolável"
     provenance:
@@ -4090,7 +4090,7 @@ nodes:
     status: done
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
     label: "mise/asdf caminham a árvore de diretórios mesclando mise.toml/.tool-versions hierarquicamente, mais-fundo-vence — mecanismo-referência de cascata N-camadas em produção"
     provenance:
@@ -4132,7 +4132,7 @@ nodes:
     status: done
     impact: 3
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/research/scope-inheritance-2026/H3-monorepo-team-person-versioning.md"
     label: "Verificação adversarial de 2026-07-09 contra as 13 fontes: 13/13 findings confirmed, nenhuma fabricação; ajustes recomendados de URL/citação em H3-06 e H3-11"
     provenance:
@@ -4594,7 +4594,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
     label: "Aposentar os apelidos \"frota\"(PT)/\"fleet\"(EN) em favor do vocabulário canônico orquestração/orchestrator-worker/workers (executado 2026-06-28)"
     provenance:
@@ -4609,7 +4609,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.8
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
     label: "Desambiguar a fronteira no TBox (onion-relation-vocabulary.md) e ABox (actors.yaml): predicado orchestrates-workers corrige o antigo delegates→frota (cujo objeto era o próprio canal)"
     provenance:
@@ -4624,7 +4624,7 @@ nodes:
     status: done
     impact: 4
     confidence: 0.75
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
     label: "Não adotar triple-store/RDF/ontologia formal externa — confirmaria remar contra a maré Gen III e contradiria a decisão já tomada de \"não há store externo\""
     provenance:
@@ -4648,7 +4648,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-ontology-2026-06.md"
     label: "Tabela de correspondência vocabulário Onion ↔ termo canônico da indústria (§5), base da migração de rótulos"
     provenance:
@@ -4672,7 +4672,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
     label: "Decisão central do ADR VALIDADA pela revisão adversarial: distinção locus×forma é sólida"
     provenance:
@@ -4687,7 +4687,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
     label: "Run de 21 agentes (~838K tokens, fan-in determinístico a 0 token): 16 achados brutos, 0 refutados pelo verificador, 0 blocker/0 major (7 minor, 9 nit)"
     provenance:
@@ -4702,7 +4702,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
     label: "Contraponto W/m (heurística de largura de janela) FORTALECE a decisão em vez de miná-la — fecha gap doutrinário mantendo o default plano"
     provenance:
@@ -4717,7 +4717,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
     label: "Critério de aceite CA3 confundia validação estrutural grep-ável (ausência do agente) com garantia comportamental (julgamento LLM via metaspec-validate)"
     provenance:
@@ -4741,7 +4741,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
     label: "Metadados do ADR coexistem contraditórios (status accepted vs título/tipo/filename draft) com 4 referências cruzadas em outros documentos apontando ao nome atual"
     provenance:
@@ -4756,7 +4756,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.8
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
     label: "Doutrina \"vigente\" do eixo forma-do-grafo não existe no texto que o leitor da KB/SKILL realmente consome — só a armadilha de locus está registrada"
     provenance:
@@ -4771,7 +4771,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-topology-review-2026-06-22.md"
     label: "Aplicar ao ADR os fixes de camadas 1-2: citação stale, CA2/CA3 separados em estrutural vs comportamental, b·m≤W reancorada, mecanismo (a) árvore legítima vs (b) nesting de subagentes separado, frase anti-objeção"
     provenance:
@@ -4869,7 +4869,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
     label: "Smoke-test de conectividade 6/6 etapas PASS (mailbox bidirecional lead-teammate)"
     provenance:
@@ -4884,7 +4884,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
     label: "Demo de task list compartilhada com cross-check triplo batendo (49 agentes, 78 comandos)"
     provenance:
@@ -4922,7 +4922,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-agent-teams-evaluation-2026-06.md"
     label: "Seção 'Dois Substratos de Orquestração' sintetizada na KB agent-orchestration (v1.2.0)"
     provenance:
@@ -5066,7 +5066,7 @@ nodes:
     status: done
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
     label: "2026-06-27: apetite sinalizado pelo maestro — camada 1 destravada e iniciada em campo"
     provenance:
@@ -5081,7 +5081,7 @@ nodes:
     status: done
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
     label: "ADR onion-adr-exchange-unit-2026-06: unidade de troca = vertical-skill SDAAL via marketplace + proveniência (monetização gated)"
     provenance:
@@ -5096,7 +5096,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-distribution-strategy-2026-06.md"
     label: "Protótipo da vertical Design como plugin `onion-design` (marketplace.json + script de montagem determinístico), dogfood de instalação provou a separação de camadas"
     provenance:
@@ -5179,7 +5179,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-decision-north-star-2026-07.md"
     label: "Grafo de identidade reconciliado (59 nós, 66 arestas, integridade limpa) + 2 pesquisas de mercado — base empírica que alimenta toda a decisão"
     provenance:
@@ -5203,7 +5203,7 @@ nodes:
     status: refuted
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
     label: "Backlog de co-evolução de 2026-06-18 fecha totalmente resolvido: os 7 itens priorizados foram entregues"
     provenance:
@@ -5218,7 +5218,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
     label: "Branch de integração do PR passa a ser resolvida por helper determinístico (cadeia .onion-version → git config → default), não por git config isolado como a premissa original supunha"
     provenance:
@@ -5256,7 +5256,7 @@ nodes:
     status: superseded
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
     label: "RFC-0002 ratifica catálogo-first como doutrina de meta-estratégia, materializada em 5 playbooks de onion-patterns"
     provenance:
@@ -5271,7 +5271,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
     label: "Diretriz canônica de retenção e payload mínimo para decision snapshot vira KB concept, separando diretriz de implementação local do adotante"
     provenance:
@@ -5286,7 +5286,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
     label: "Comando /meta:co-announce fecha gap de processo do anúncio downstream, gerando staging a partir do CHANGELOG e resolvendo alvo via members.yaml"
     provenance:
@@ -5301,7 +5301,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
     label: "Dogfood do co-announce pegou caso real de parsing do campo alvo com anotação entre parênteses que o caminho feliz escondia"
     provenance:
@@ -5316,7 +5316,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-coevolution-backlog-2026-06-18.md"
     label: "/meta:adopt passa a provisionar proteção never-clobber de .prettierignore para artefatos Onion, cobrindo vendor e SSOT gerada pelo consumidor"
     provenance:
@@ -5340,7 +5340,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md:1-60 (status: accepted 2026-07-09; §2 tabela dos 3 planos; §3 rejeição de branch-para-escopo; §4 matriz escopo×mecanismo; §4.1 adendo forma-de-adoção 2026-07-10)"
     label: "O veredito híbrido de 3 planos (cascata-nativa cognitiva + merge-N-camadas de settings + SUPERSEDES bitemporal) VIROU DOUTRINA RATIFICADA: RFC-0005 accepted, citando H1-H4 achado a achado e rejeitando branch-para-escopo explicitamente"
     provenance:
@@ -5354,7 +5354,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/utils/scope/compose-settings.sh · .claude/utils/scope/resolve-scope-layers.sh:1-60 (cadeia empresa→time→pessoa, merge type-aware) · git log: d20918a (#309) 6db26f4 (#314) 2dab19b (#320)"
     label: "O 'único gap real de engenharia' (settings.json não herda pela árvore) está FECHADO em código: compose-settings.sh compõe N camadas com merge type-aware e resolve-scope-layers.sh descobre a cadeia empresa→time→pessoa automaticamente"
     provenance:
@@ -5369,7 +5369,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/utils/scope/resolve-scope-layers.sh:11-18,60-61 (--show-scope/--provenance, --json, role/form do .onion-version) · docs/evolution/scope-convention-2026.md:44-58 (invariante strip(provtree)==compose, exit 4)"
     label: "O 'requisito transversal' resolver de proveniência estilo git config --show-scope EXISTE e é auditável: proveniência por-chave com vencedor/sombreadas, origem por elemento de array, saída JSON para regulado e invariante declarado≠verificado que falha com exit 4"
     provenance:
@@ -5384,7 +5384,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/scope-convention-2026.md:1-80 (tabela 3 planos × 4 escopos; 'Plano 1 — cavalgar o nativo, zero código'; Plano 3 SUPERSEDES marcado gated)"
     label: "A convenção de escopo virou documento operacional: time = <time-dir>/.claude/ (nativo, zero código), pessoa = .claude/ no home do usuário, plano conhecimento (SUPERSEDES) declarado GATED atrás de dogfood — a divisão de trabalho que os 4 streams propuseram"
     narrative: "label anterior: A convenção de escopo virou documento operacional: time = <time-dir>/.claude/ (nativo, zero código), ⟨pessoa = .claude/ no home do usuário⟩, plano conhecimento (SUPERSEDES) declarado GATED atrás de dogfood — a divisão de trabalho que os 4 streams propuseram"
@@ -5399,7 +5399,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "../../knowledge-base/decisions/onion-adr-capability-update-out-of-git-2026-07.md · docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md §4.1"
     label: "A dimensão 'forma de adoção' (full|docs-only|in-place) — não prevista pelos 4 streams e vinda de ground-truth o membro regulado — ganhou nome e ADR próprio; a implementação do 4º modo de proveniência segue gated"
     provenance:
@@ -5413,7 +5413,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-topology-adr-2026-06-21.md:1-25 (title sem RASCUNHO, type: adr, status: accepted, filename sem -draft-)"
     label: "A dívida de metadados do ADR de topologia (accepted + título RASCUNHO + type adr-draft + filename -draft-) foi RESOLVIDA: frontmatter internamente coerente e promoção draft→adr concluída"
     provenance:
@@ -5428,7 +5428,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-orchestration-topology-adr-2026-06-21.md:133-136 (b·m≤W reancorada como forma compacta, parte observável = k resumos), 203-211 (CA1 default plano · CA2 árvore sob gatilho · CA3 invariante grep-able)"
     label: "Os fixes de camada 1-2 do review adversarial foram aplicados ao ADR: CA1/CA2/CA3 separados (estrutural grep-able vs comportamental), b·m≤W reancorada como heurística e não lei"
     provenance:
@@ -5442,7 +5442,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/concepts/onion-relation-vocabulary.md:96 (nó sumarizador ↔ aggregator/sub-synthesizer) · docs/knowledge-base/concepts/agent-orchestration.md:507 (frase-âncora locus≠forma na KB que o leitor consome)"
     label: "Os dois diferimentos de camada 3 do review viraram realidade: a cunhagem 'nó sumarizador' está ancorada ao termo de mercado numa tabela do TBox, e a doutrina do eixo forma-do-grafo tem frase-âncora dentro da KB (não só no ADR)"
     provenance:
@@ -5457,7 +5457,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/concepts/onion-relation-vocabulary.md:54,69,96 (predicado orchestrates-workers; coluna evolução vs orquestração; tabela Onion↔indústria)"
     label: "A decisão da ontologia foi executada: 'frota/fleet' aposentado, predicado orchestrates-workers no TBox e a fronteira evolução(cross-repo)×orquestração(intra-repo) desambiguada em tabela canônica"
     provenance:
@@ -5471,7 +5471,7 @@ nodes:
     status: refuted
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/concepts/agent-orchestration.md:79-127 (§Dois Substratos: Workflow default vs Agent Teams opt-in; escopo intra-repo; reavaliar ao sair de experimental)"
     label: "A avaliação de Agent Teams virou doutrina viva na KB: fronteira Workflow(default)×Agent Teams(opt-in experimental), regra de bolso 'se dá para escrever o grafo, Workflow vence' e a linha vermelha Agent Teams ≠ co-evolução cross-repo"
     provenance:
@@ -5494,7 +5494,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude-plugin/marketplace.json:1-20 · plugins/{onion-compliance,onion-design,onion-docs,onion-engineering,onion-product,onion-testing,onion-work-tools}/.claude-plugin · .claude/utils/marketplace/{assemble-plugin.sh,generate-marketplace.sh,resolve-role-bundle.sh,roles.yaml}"
     label: "O veredito híbrido de distribuição saiu do papel: camada 1 é NATIVA hoje — 7 plugins montados, marketplace.json gerado por script determinístico (SSOT = plugin.json de cada plugin) e bundle por papel via roles.yaml"
     provenance:
@@ -5509,7 +5509,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/meta/co-announce.md:1-13,140 (staging em federation/outbox/<id>, adotante cego ao core) · comandos irmãos co-deliver/co-relay"
     label: "O gap de processo do anúncio downstream está fechado e ampliado: /meta:co-announce (producer) ganhou par de carteiros locais co-deliver (downstream) e co-relay (upstream), com invariante entrega-sem-commit"
     provenance:
@@ -5523,7 +5523,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/resolve-integration-branch.sh:1-14 (cadeia .onion-version → git config → default; cita o sinal de campo 2026-06-18-adopt-gitflow-develop-branch-config)"
     label: "A branch de integração é resolvida por helper determinístico e portável (SSOT durável no .onion-version, git config só como conveniência local) — exatamente como o backlog decidiu contra a premissa original"
     provenance:
@@ -5537,7 +5537,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/concepts/decision-snapshot-retention.md:1-12 (v1.0.0, 2026-06-22; política de retenção + payload mínimo; nasceu de sinal de campo upstream)"
     label: "A diretriz de retenção/payload mínimo de decision snapshot virou KB concept versionada, separando diretriz canônica de implementação local do adotante"
     provenance:
@@ -5551,7 +5551,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/meta/adopt.md:79,205-210 (never-clobber idempotente, detecta dprint/biome e avisa) · .claude/utils/adopt/durable-commit.sh:45"
     label: "A proteção never-clobber de .prettierignore está provisionada no /meta:adopt com helper testável no lint-selftest — e já evoluiu para detectar formatadores não cobertos (dprint/biome) como follow-up declarado"
     provenance:
@@ -5565,7 +5565,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/skills/onion-patterns/SKILL.md:174-178,247 (§Playbooks recognition-primed, doutrina RFC-0002, resíduo vira playbook novo) · docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md"
     label: "Catálogo-first não é só RFC: virou seção de playbooks recognition-primed dentro da skill onion-patterns, com a regra reconhecer→aplicar→deliberar-só-sem-match e realimentação do catálogo"
     provenance:
@@ -5617,7 +5617,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-experiment-cold-adopter-2026-07.md:1-25 (status: desenhado-para-execucao; resolve Q_COLD_ADOPTER; decide_entre NS1-KG/NS3-Educacao) · docs/materials/cold-adopter-2026-07/{concierge-customer-dev-kit,channel-posts,one-pager-kg-reconciliation}.md"
     label: "Q_COLD_ADOPTER virou EXPERIMENTO desenhado com instrumentos prontos (kit concierge, posts de canal, one-pager de reconciliação) — mas o status é 'desenhado-para-execucao': a pergunta de desempate NS1×NS3 continua sem resposta empírica"
     provenance:
@@ -5631,7 +5631,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-adr-education-vertical-2026-07.md:1-20 (status: provisório — F0 aberto, camada de conhecimento fundada, construção gated; funda-se na pesquisa SRL/PLEA)"
     label: "O hedge NS3 (braço de educação) saiu do papel como ADR de vertical educacional com F0 aberto — camada de conhecimento fundada, construção gated: o hedge avançou sem que a decisão de peso NS1×NS3 tenha sido tomada"
     provenance:
@@ -6643,7 +6643,7 @@ nodes:
     status: done
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
     label: "Publicar o marketplace via `/plugin marketplace add marciocar/onion-evolve` (repo do core como fonte, GitHub syncing)"
     provenance:
@@ -6658,7 +6658,7 @@ nodes:
     status: refuted
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
     label: "Instalar um vertical individual (`/plugin install onion-engineering@onion-evolve`) funciona em qualquer plano"
     provenance:
@@ -6673,7 +6673,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
     label: "Caveat: `${CLAUDE_PLUGIN_ROOT}` pode não resolver em markdown de comando (bug upstream claude-code #9354) — exige teste ao vivo"
     provenance:
@@ -6688,7 +6688,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
     label: "Acesso-por-grupo (role-scoping nativo) só existe em plano Team/Enterprise; o resto do fluxo é plano-agnóstico"
     provenance:
@@ -6703,7 +6703,7 @@ nodes:
     status: done
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
     label: "`resolve-role-bundle.sh` resolve o bundle de verticais por papel a partir de `roles.yaml` — nunca de memória"
     provenance:
@@ -6718,7 +6718,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
     label: "Doutrina: a meta-factory (`/meta:create-*`, `/meta:adopt`, `/meta:federation-*`, `/meta:evolve`, `/meta:graph`, `/meta:inventory`) nunca é vertical/plugin — nenhum grupo a recebe"
     provenance:
@@ -6733,7 +6733,7 @@ nodes:
     status: done
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
     label: "Fallback sem marketplace: `/meta:adopt` entrega sempre Camadas 2+3 e, como fallback, Camada 1 vendorizada por papel via o mesmo resolver"
     provenance:
@@ -6748,7 +6748,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
     label: "Adotantes regulados (ex.: granaai) preferem vendoring pinado/auditável de propósito, não auto-update de plugin"
     provenance:
@@ -6763,7 +6763,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.8
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
     label: "Checklist de verificação ponta-a-ponta (marketplace list, install roda, grupo standalone auto-instala, adopt regulado entrega L2+L3+L1)"
     provenance:
@@ -6855,7 +6855,7 @@ nodes:
     status: done
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
     label: "Porta pública onion-standalone nasceu privada/local via /meta:adopt role-scoped (bundle standalone, sem meta-factory), registrada em members.yaml, pin 514dda8 verificado"
     provenance:
@@ -6912,7 +6912,7 @@ nodes:
     status: done
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-door-birth-findings-2026-07.md"
     label: "G1 resolvido (cf4f5dc): link-guard de _scan_relative_links estendido para pular alvos ausentes sob meta-factory selada em door role-scoped"
     provenance:
@@ -7069,7 +7069,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
     label: "Verificação git refuta o framing do sinal: develop e rhilo/main compartilham base 05f96a05 (01/07), não são 3 linhas disjuntas desde 15/06; main tem 239 arquivos .claude/ (não está sem framework)"
     provenance:
@@ -7084,7 +7084,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-veredito-branch-methodology-2026-07.md"
     label: "rhilo/main hoje carrega duas coisas ao mesmo tempo: é legítima como branch de deploy/release (eixo versão) e antipadrão como 'branch do cliente' (customização-como-divergência-git)"
     provenance:
@@ -7321,7 +7321,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
     label: "Metade produtora+transporte da cadeia (diary export, co-relay, trust-topology-check) construída e dogfoodada"
     provenance:
@@ -7336,7 +7336,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
     label: "Motor kg-radar.sh + gramática de 2 camadas (audit/domain) pronto, mas sem .kg.yaml layer:domain de produção"
     provenance:
@@ -7374,7 +7374,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
     label: "granaai já entregou 4 sinais de doutrina ao core (integridade≠rastreabilidade, fail-open do radar, validador-local, /meta:kg map) sem absorção estrutural"
     provenance:
@@ -7389,7 +7389,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
     label: "onion-pessoal adota o método (não vendoriza .claude/): raiz é o KG com planes DEV×PROD e SUPERSEDES/Aufhebung"
     provenance:
@@ -7653,7 +7653,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/agents/meta/agent-creator-specialist.md:183,239,242,249 · .claude/commands/common/templates/agent-template.md:144,178,181,312"
     label: "PROVA: o vazamento MCP-first foi fechado na FONTE — agent-creator-specialist.md steera explicitamente para adapter SDAAL ('providers de task/forge via adapter SDAAL, não mcp__<provider>__* direto', l.183/239/242/249) e o agent-template.md documenta integração API-first (l.144/178/181/301/312). O achado que 3 diários repetiram morreu."
     provenance:
@@ -7668,7 +7668,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/onion/inventory.md:1 · .claude/validation/inventory.sh · .claude/validation/lint-artifacts.sh:1018,1293"
     label: "PROVA: o drift de contagem virou SSOT gerada + guarda — inventory.md tem header 'GENERATED BY .claude/validation/inventory.sh — NÃO EDITE À MÃO', a REGRA 8 compara a SSOT com o filesystem e a REGRA 16 cobre docs além do CLAUDE.md, mas isenta docs/materials/ (derivado, deferido)"
     narrative: "label anterior: PROVA: o drift de contagem virou SSOT gerada + guarda mecânica — docs/onion/inventory.md tem header 'GENERATED BY .claude/validation/inventory.sh — NÃO EDITE À MÃO' e o lint tem REGRA 16 (inventário-total divergente) + REGRA 8 (SSOT regenerada, nunca editada frase-a-frase) cobrindo derivados, não só CLAUDE.md."
@@ -7693,7 +7693,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/meta/kb-freshness.md · plugins/onion-work-tools/commands/{kb-freshness,context-freshness}.md · .claude/validation/lint-artifacts.sh:994 · docs/analysis/onion-adr-kg-freshness-gate-2026-07.md"
     label: "PROVA: o gate de frescor de KB deixou de ser data no frontmatter e virou executável — /meta:kb-freshness e /meta:context-freshness existem (inclusive empacotados em onion-work-tools), lint REGRA 15 carimba frescor de contexto e há ADR kg-freshness-gate."
     provenance:
@@ -7708,7 +7708,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-evolution-2026-06-{15,16,17}.md"
     label: "DUPLICATA REAL (parcial): os diários 06-15/16/17 repetem achados — MCP-first nos três, categorias fantasma em 06-15 e 06-16, drift de contagem em 06-15 e 06-17 (06-16: inventário limpo) — e o 06-16 diz o MCP-first 'NÃO executado desde 2026-06-15'. é backlog-em-prosa parado"
     narrative: "label anterior: DUPLICATA REAL: os diários 06-15, 06-16 e 06-17 re-decidem os MESMOS 3 achados (varredura MCP-first, drift de contagem, categorias fantasma) em 3 dias consecutivos — o próprio 06-16 registra 'não executado desde o run anterior'. Não é fan-out redundante: é backlog-em-prosa não executando."
@@ -7724,7 +7724,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "contraste .claude/validation/lint-artifacts.sh (fechou) × docs/analysis/onion-evolution-2026-06-*.md (repetiu)"
     label: "Lição destilada da tripla: backlog que mora em prosa datada re-nasce todo dia; só morre quando vira guarda mecânica no lint ou SSOT gerada — foi o que aconteceu com contagem (REGRA 16/8) e não aconteceu com os achados que ficaram só no relatório."
     provenance:
@@ -7739,7 +7739,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "plugins/onion-engineering/commands/ (plan,start,work,pre-pr,pr,pr-update) · plugins/onion-product/commands/ (collect,refine,spec,feature)"
     label: "Invariante confirmada nos 3 runs e ainda no repo: zero fusões de fase — engineer/{plan,start,work,pre-pr,pr,pr-update} e product/{collect,refine,spec,feature} continuam comandos separados hoje."
     provenance:
@@ -7754,7 +7754,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md:5 (re: handoff + 4 docs irmãos)"
     label: "Os 3 docs strategy-layer de 06-17 (blindspots + capability-draft + handoff) NÃO são repetição: são um pacote de uma sessão só (handoff=Doc 3, capability=Doc 2, blindspots=Doc 4/4) — e o próprio RFC-0002 os cita como '+4 docs irmãos' de um único handoff."
     provenance:
@@ -7769,7 +7769,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md §2,§3"
     label: "PROVA: o pacote inteiro já foi JULGADO — RFC-0002 (status accepted, 2026-06-22) aceita catálogo-first como doutrina, ratifica 'sem comando novo' (estender onion-patterns), mede a sobreposição de ~60% contra o .claude/ real e a declara distinção genuína (forma de orquestração × caso de uso), e ratifica o reposicionamento por decomposição em camadas."
     provenance:
@@ -7793,7 +7793,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/utils/adopt/durable-commit.sh:15,19,55"
     label: "PROVA: os Achados 1/3/4 de 07-08 morreram em código — .claude/utils/adopt/durable-commit.sh commita a entrega em branch dedicada com 'git commit --no-verify' (l.15,55), tornando a entrega L2+3 objeto git sem depender de ato humano posterior."
     provenance:
@@ -7808,7 +7808,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/utils/adopt/vendor-branch.sh · .claude/commands/meta/adopt.md:56,221,467-469,554 · ../../knowledge-base/decisions/onion-adr-adopt-vendor-branch-merge-2026-07.md"
     label: "PROVA: o Achado 2 (merge de vendor-branch em vez de copy-over) também virou realidade — vendor-branch.sh + adopt.md descrevendo --update como 'git merge de onion/vendor' 3-way com .gitattributes merge=union, e ADR próprio."
     provenance:
@@ -7822,7 +7822,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude-plugin/marketplace.json · plugins/ (7 dirs)"
     label: "PROVA: o runbook de marketplace saiu do papel — .claude-plugin/marketplace.json existe com pluginRoot ./plugins e 7 plugins publicáveis (compliance, design, docs, engineering, product, testing, work-tools)."
     provenance:
@@ -7837,7 +7837,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "plugins/onion-work-tools/commands/ (14 arquivos, sem create-*/adopt/federation/evolve/graph/inventory)"
     label: "PROVA da doutrina 'meta-factory nunca é plugin': o onion-work-tools empacota só meta cross-cutting (kg, diary, orchestrate, metaspec-validate, kb/context-freshness, co-evolve, co-relay, recover, setup-*) e NENHUM /meta:create-*, adopt, federation-*, evolve, graph ou inventory."
     provenance:
@@ -7852,7 +7852,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "plugins/onion-work-tools/.claude-plugin/plugin.json (description: 'nao meta-fabrica')"
     label: "A pergunta #4 ('empacotar os 30 comandos meta/ tensiona a doutrina, exige RFC') foi dissolvida por DECOMPOSIÇÃO, não por RFC: separou-se meta-ferramenta-de-trabalho (empacotável) de meta-fábrica (nunca empacotável)."
     provenance:
@@ -7867,7 +7867,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "plugins/onion-work-tools/skills/onion-orchestration/ · plugins/onion-design/ (sem skills/) · plugins/onion-design/commands/generate.md:50"
     label: "Patch #2 aconteceu, mas em outro alvo: a skill onion-orchestration foi empacotada em onion-work-tools, não no manifest do onion-design — o onion-design não tem dir skills/ e alcança a orquestração só por referência textual."
     provenance:
@@ -7891,7 +7891,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "find plugins -name 'catch-up*' = vazio · plugins/{onion-product,onion-engineering}/commands/warm-up.md"
     label: "Gap C4 confirmado por inspeção e ainda vivo: nenhum plugin embarca catch-up (só warm-up, em product e engineering) — /catch-up segue exclusivo do caminho adopt."
     provenance:
@@ -7942,7 +7942,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/resolve-production-branch.sh:1-25 · .claude/validation/resolve-integration-branch.sh"
     label: "PROVA parcial do branch-roles SDAAL: nasceu o SEGUNDO resolver de papel — resolve-production-branch.sh, irmão do resolve-integration-branch.sh, criado por sinal de campo da granaai (07-19: origin/HEAD apontando para develop envenenava gitflow.branch.master)."
     provenance:
@@ -7975,7 +7975,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/federation/members.yaml:73-75"
     label: "Movimento 1 (vendorizar o framework na linhagem de produção) está feito-mas-não-selado: members.yaml carrega pin production 8e22352da32f verificado em 07-03 com nota explícita 'commit pendente na sessão do rhilo — entrega-sem-commit I3'."
     provenance:
@@ -7990,7 +7990,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md (status proposed-GATED) · .claude/validation/session-beacon.sh:1-12 · docs/onion/graph/autonomous-thread-runtime-2026-07.kg.yaml"
     label: "O runtime de autonomia virou ADR proposed-GATED com KG próprio, e uma das guardas duras já é código: session-beacon.sh implementa o beacon-check ('um escritor por repo inclui SESSÕES'), nascido do incidente de colisão W1×W2."
     provenance:
@@ -8005,7 +8005,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-adr-doctrine-ingestor-2026-07.md (status accepted) · grep -rl ingestor .claude/ → só .claude/diary/*"
     label: "O ingestor de doutrina virou ADR ACEITO (trust-gate por can_correct_to do members.yaml, KG-backed, human-gated, 1º dogfood granaai), mas o executável não existe: nenhum script/comando 'ingestor' em .claude/ — o termo só aparece em diários e, noutro sentido, no design-source"
     narrative: "label anterior: O ingestor de doutrina virou ADR ACEITO (trust-gate via members.yaml can_correct_to, KG-backed, human-gated, 1º dogfood granaai), mas o executável do ingestor não existe — nenhum script/comando 'ingestor' em .claude/, só ADR e migalhas de diário."
@@ -8021,7 +8021,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-adr-federation-kg-audit-overlay-2026-07.md"
     label: "A pergunta da ontologia de relações de federação no KG deixou de ser abstrata: existe ADR federation-kg-audit-overlay — a decisão 'só o dogfood decide' foi honrada, não contornada."
     provenance:
@@ -8036,7 +8036,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/business-context/04-operations/messaging-framework.md:1-40"
     label: "PROVA: o brand voice virou deliverable definitivo — messaging-framework.md (114 linhas, 2026-07-19) carrega Casa de Marca, léxico de subordinação da plataforma, prova de universalidade (6 ferramentas) e positioning statement; deixou de ser stub."
     provenance:
@@ -8051,7 +8051,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/business-context/04-operations/messaging-framework.md:6-8"
     label: "A única pergunta do brand voice que sobrevive é a mesma que nasceu: a linha leiga P6 segue BLOQUEADA por D3, declarada no topo do próprio deliverable — bloqueio honesto, não esquecimento."
     provenance:
@@ -8084,7 +8084,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/a2a-agent-card.sh · .claude/validation/lint-artifacts.sh:649 · docs/evolution/federation/members.yaml:83-86 · docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
     label: "A projeção export-only Agent Card carregada de 06-15 para 06-16 tem hoje CÓDIGO (a2a-agent-card.sh + REGRA de sync no lint + campo a2a: em members.yaml) — o gate 'só quando houver consumer não-Onion' foi respeitado e depois superado pelo a2a-live da RFC-0004."
     provenance:
@@ -8099,7 +8099,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "síntese desta leva"
     label: "Veredito da leva 5: 17 docs, ~2/3 do passivo já morreu em código sem ninguém marcar; o que sobra concentra-se em 3 fios reais (adopt --profile, guarda de scrub/confidencialidade, absorção do spec-as-run) + 2 pendências de materialização barata (playbooks em onion-patterns, runflow-dev no manifest)."
     provenance:
@@ -8113,7 +8113,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-review-2026-05.md"
     label: "Veredito: sistema substancialmente completo em cobertura mas ainda \"pré-aplicável\" — não pronto para instalação em projeto-alvo sem mantenedor de plantão"
     provenance:
@@ -8128,7 +8128,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-review-2026-05.md"
     label: "Reposicionamento: as três dimensões produto/engenharia/compliance são peer, não hierarquizadas — critério de avaliação passa a ser completude do ciclo, não redução de volume"
     provenance:
@@ -8143,7 +8143,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-review-2026-05.md"
     label: "Workflows faseados retomáveis (engineer/plan→pr-update, product/collect→feature) são valor, não duplicação — decisão de nunca consolidar"
     provenance:
@@ -8158,7 +8158,7 @@ nodes:
     status: done
     impact: 4
     confidence: 1
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-review-2026-05.md"
     label: "Abandono formal de .onion/ agnóstico e plano v4.0 FASES 5-9 (CLI standalone, multi-IDE, aprendizado contínuo) em 2026-05-18"
     provenance:
@@ -8173,7 +8173,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-review-2026-05.md"
     label: "5 meta-specs L0 marcadas \"A CRIAR\" há ~6 meses — @metaspec-gate-keeper sem base normativa, validação arquitetural vira opinião"
     provenance:
@@ -8188,7 +8188,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-review-2026-05.md"
     label: "3 análises críticas de 2025-12-20 permaneciam em knowledge-base/frameworks/ sem marcação histórica, defendendo visões abandonadas (.onion/, CLI, multi-IDE) — risco de mapa mental errado para operador externo"
     provenance:
@@ -8203,7 +8203,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-review-2026-05.md"
     label: "Task Manager Abstraction avaliada como o ponto mais maduro do framework (padrão SDAAL real, 4 adapters, fallback gracioso), mas sem testes automatizados"
     provenance:
@@ -8218,7 +8218,7 @@ nodes:
     status: done
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-review-2026-05.md"
     label: "19 recomendações priorizadas P0 (marcação histórica) → P1 (saneamento estrutural) → P2 (5 meta-specs) → P3 (guias operacionais); plano de execução aprovado e depois 100% executado (PRs #16–#27)"
     provenance:
@@ -8233,7 +8233,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.5
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-review-2026-05.md"
     label: "Qual projeto-alvo será o piloto para validar empiricamente P3 (guias operacionais e comandos /docs:build-*-docs) após o saneamento P0-P2?"
     provenance:
@@ -8431,7 +8431,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
     label: "task-manager/adapters/ (implementação de referência do SDAAL) não tem none.md, violando a própria regra obrigatória do whitepaper (§7/§14.3)"
     provenance:
@@ -8469,7 +8469,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.65
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
     label: "Subsistema de Federação (ledger git + contratos + validação determinística + rollback) identificado como núcleo já prototipado de um control plane hospedável"
     provenance:
@@ -9673,7 +9673,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
     label: "Ferramenta whatsapp-sender (Node standalone, whatsapp-web.js não-oficial)"
     provenance:
@@ -9702,7 +9702,7 @@ nodes:
     status: done
     impact: 5
     confidence: 1
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
     label: "Opção A aprovada e executada: extração para repo privado próprio via git subtree split"
     provenance:
@@ -9744,7 +9744,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
     label: "Achado maior: o Onion-Bridge produziu código real de um celular (não é só leitura)"
     provenance:
@@ -9833,7 +9833,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-product-material-raw-2026-06.md"
     label: "Federation v2: pivot de hub centralizado para topologia peer+ledger git após 24/36 achados críticos em revisão adversarial; ciclo register→publish→check→status→rollback implementado em 4 PRs"
     provenance:
@@ -9848,7 +9848,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-product-material-raw-2026-06.md"
     label: "/meta:evolve executou auto-auditoria com 28 agentes em 8 dimensões (1.27M tokens, 635 tool-uses, ~26min), gerando 30 achados sobreviventes que foram 100% executados (8 PRs)"
     provenance:
@@ -9877,7 +9877,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-product-material-raw-2026-06.md"
     label: "Princípio 'conserta o propagador, não só as folhas': agent-template.md corrigido primeiro, depois 49/49 agentes migrados de nomes de ferramentas Cursor para nomes nativos Claude Code"
     provenance:
@@ -9892,7 +9892,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-product-material-raw-2026-06.md"
     label: "allowed-tools é capability surface real (não documentação) — D8 do evolve levou 82/82 comandos a terem allowed-tools escopado, com revisão humana rejeitando escopos amplos indevidos"
     provenance:
@@ -10032,7 +10032,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/meta-specs/{agents,architecture,code-standards,commands,integrations,index}.md"
     label: "As 5 meta-specs L0 'A CRIAR' existem e estão populadas (agents, architecture, code-standards, commands, integrations + index)"
     provenance:
@@ -10047,7 +10047,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/meta-specs/architecture.md:232-233,310-314"
     label: "A identidade de 2026-05-18 virou NORMA executável: architecture.md §7 'Proibições explícitas' proíbe introduzir .onion/ ou packages/; §5 'Não há CLI standalone / não há produto npm'"
     provenance:
@@ -10062,7 +10062,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/meta/kb-freshness.md:70,82,224 · .claude/commands/meta/evolve.md:74 (D6 resíduo .onion/CLI/npm/multi-IDE)"
     label: "O abandono virou GATE de auditoria: /meta:kb-freshness critério #3 reprova KB que contenha referência positiva a .onion/, CLI standalone, multi-IDE ou v4.0 FASES 5-9"
     provenance:
@@ -10077,7 +10077,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/meta/onion-framework-identity.md:38,44,305"
     label: "Identidade canônica destilada em KB navegável com tabela 'o que foi rejeitado e por quê' (CLI standalone: 'distribuir como produto contradiz a identidade de template instalável')"
     provenance:
@@ -10092,7 +10092,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/utils/task-manager/adapters/none.md · .claude/utils/forge/adapters/none.md"
     label: "task-manager/adapters/none.md existe — as 3 abstrações voltaram a ser simétricas; a violação da própria regra §7/§14.3 do whitepaper foi fechada"
     provenance:
@@ -10107,7 +10107,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/lint-artifacts.sh:259-311"
     label: "Limite de tamanho por TIPO virou lint: R5 agente>1500 HARD, comando>800 HARD, núcleo SDAAL>500 SOFT, adapter SDAAL>900 SOFT — a regra dura de 400 linhas não-enforçada morreu"
     provenance:
@@ -10122,7 +10122,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/skills/onion/SKILL.md:109-112"
     label: "A régua de classificação P0-P3 vive como seção do onion/SKILL.md, com Teste do Eixo para abstração SDAAL (≥2 implementações reais) — extend, não 8º átomo"
     provenance:
@@ -10137,7 +10137,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/common/prompts/inventory-sync-after-create.md"
     label: "Passo pós-criação de re-rodar o inventário virou fragmento compartilhado reusado pelos create-*"
     provenance:
@@ -10152,7 +10152,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-adr-toolbox-lifecycle-2026-06.md"
     label: "ADR de ciclo de vida do toolbox escrito e aceito"
     provenance:
@@ -10167,7 +10167,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/meta/create-agent-express.md:70-71"
     label: "Outlier A fechado: create-agent-express agora exige subpasta de categoria ('agentes vivem em subpasta de categoria, nunca no root')"
     provenance:
@@ -10182,7 +10182,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/product/create-task-structure.md (ausente em .claude/commands/meta/)"
     label: "Outlier B fechado: create-task-structure mudou de /meta/ para /product/"
     provenance:
@@ -10197,7 +10197,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/concepts/worklog-protocol.md §2-§3 · docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento · .claude/hooks/worklog-capture-session.sh"
     label: "Contrato de sessão unificado: SSOT única em gitflow-patterns.md §Contrato de Sessão + KB worklog-protocol.md com worklog×transcript, STATE.md Tier-0 (~300 tokens vs 12-40K), resume frio/quente e hook de captura de session_id"
     provenance:
@@ -10212,7 +10212,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "grep STATE.md → .claude/commands/{catch-up,onion,engineer/start,engineer/plan,engineer/hotfix,engineer/warm-up,design/identity,…}.md"
     label: "STATE.md virou o ponteiro único lido por 10+ comandos (catch-up, onion, engineer:start/plan/work/warm-up…), matando o protocolo 'ler todos os .md da pasta'"
     provenance:
@@ -10227,7 +10227,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "find .claude -type l → vazio"
     label: "Zero symlinks em .claude/; product/help.md não existe mais — os 2 ponteiros mortos para .onion/contexts/ foram removidos"
     provenance:
@@ -10242,7 +10242,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "grep -rl allowed-tools .claude/commands/ → 98"
     label: "allowed-tools passou de 1/93 para 98 arquivos de comando — cobertura dos invocáveis, tratado como capability surface e não documentação"
     provenance:
@@ -10281,7 +10281,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/concepts/onion-working-method.md §0-§6"
     label: "KB integrada onion-working-method.md existe com as 3 camadas recomendadas (Seleção/Execução/Validação) + Disciplina + anti-padrões + mapa de fontes — e uma camada 0 que a pesquisa não previu: KG-first, ler o SSOT antes de selecionar"
     provenance:
@@ -10296,7 +10296,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/concepts/onion-working-method.md:96"
     label: "O modo EQUIPE segue explicitamente gated na KB ('só com dogfood, 1º caso N-devs/1-repo') — 13 meses depois ninguém implementou HANDOFF.md especulativo"
     provenance:
@@ -10311,7 +10311,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/meta/diary.md:78-105,230-261"
     label: "O enabler de migalha condicionada é código vivo: frontmatter conflict_class (dynamic/static/conditional) + valid_when obrigatório + review_after 90d, com protocolo de re-teste DIRIGIDO PELA CLASSE e fallback para entradas pré-1.2.0"
     provenance:
@@ -10326,7 +10326,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/meta/diary.md:234-250"
     label: "'⏰ vencido → RE-TESTAR contra evidência atual, nunca re-carimbar' é regra escrita no comando, com 4 desfechos tipados (válida/inválida/parcial) — antídoto ao erro auto-reforçante"
     provenance:
@@ -10341,7 +10341,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-adr-capability-contract-2026-06.md · .claude/validation/lint-artifacts.sh:57-58,458-466,1589"
     label: "Capability contract saiu da pesquisa para o gate: ADR aceito (2026-06-27) + lint REGRA 20 HARD valida o tier de conformance reivindicado (Bronze campos mínimos, Silver requires resolvem, Gold Silver+loads) — declarar acima do cumprido bloqueia merge"
     provenance:
@@ -10356,7 +10356,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/validation/lint-artifacts.sh:412-424"
     label: "Drift-guard determinístico existe para plugins de vertical (R19 HARD: regenera e compara, edição à mão ou fonte alterada bloqueia) — a ideia de guarda-contra-drift virou real, mas noutro eixo"
     provenance:
@@ -10380,7 +10380,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "LICENSE:1 'MIT License'"
     label: "LICENSE continua MIT — a migração para BSL/dual-license decidida em 2026-06-17 nunca foi executada"
     provenance:
@@ -10395,7 +10395,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/materials/press-kit.md:69"
     label: "press-kit.md ainda afirma 'não é um produto comercial distribuído publicamente… não há licença, assinatura própria ou CLI a vender' — hoje isso NÃO é contradição: é a identidade que prevaleceu"
     provenance:
@@ -10410,7 +10410,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/knowledge-base/concepts/public-door-vs-private-core.md · docs/analysis/onion-adr-family-repo-topology-2026-07.md · docs/analysis/onion-adr-claude-door-topology-2026-07.md · docs/evolution/federation/members.yaml:190-218"
     label: "A distribuição resolveu-se por TOPOLOGIA, não por licença: KB porta-pública≠core-privado + ADRs de family-repo-topology e claude-door-topology + onion-mini como 'produto de ENTRADA' + onion-standalone"
     provenance:
@@ -10434,7 +10434,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/federation/members.yaml:10-218 · .claude/validation/pin-integrity-check.sh"
     label: "A federação deixou de ser 'gravada mas inativa': members.yaml com 7 membros tipados (source/hub/standalone), pins VERIFICADOS por pin-integrity-check.sh, linhagens múltiplas e personality_summary"
     provenance:
@@ -10449,7 +10449,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md §1-§3 · .claude/utils/federation-transport/"
     label: "RFC-0004 aceito (fundamentado em 2 rodadas de pesquisa orquestrada): single-source para identidade/contratos + mesh só de comunicação; utils/federation-transport/ existe com git-async default e a2a-live gated — latência muda, controle humano não"
     provenance:
@@ -10473,7 +10473,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/meta/adopt.md:10,163-165 · .claude/validation/resolve-integration-branch.sh · .claude/validation/resolve-production-branch.sh"
     label: "As 3 decisões de topologia do handoff foram resolvidas de forma GENÉRICA e não caso-a-caso: resolve-integration-branch.sh + resolve-production-branch.sh + adopt --update --integration-branch"
     provenance:
@@ -10488,7 +10488,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "ls / → sem whatsapp-sender · .claude/utils/ → sem messenger (eixo SDAAL segue gated)"
     label: "Raiz do repo (entradas não-ocultas) contém apenas CLAUDE.md, CONTRIBUTING.md, LICENSE, README.md, docs/, plugins/, site/ — zero código de aplicação: a extração via subtree split foi executada"
     narrative: "label anterior: Raiz do repo contém apenas CLAUDE.md, CONTRIBUTING.md, LICENSE, README.md, docs/, plugins/, site/ — zero código de aplicação: a extração via subtree split foi executada"
@@ -10503,7 +10503,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: "docs/analysis/onion-adr-slm-as-tool-de-identification-2026-06.md · .claude/utils/de-identification/"
     label: "A tese 'SLM 10-30x mais barato para tarefa agêntica específica' virou decisão arquitetural concreta: ADR SLM-as-tool para de-identificação + utils/de-identification/"
     provenance:
@@ -10518,7 +10518,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/meta/evolve.md:74 (coluna de modelo por dimensão)"
     label: "O roteamento dinâmico por tarefa (fim do 'modelo herói') é operacional: /meta:evolve define tier por dimensão de auditoria (D1-D10) — modelo fixo (haiku/sonnet) nas dimensões executadas por worker e delegação a comando/rotina nas compostas (D4, D5, D9, D10), tiering como régua"
     narrative: "label anterior: O roteamento dinâmico por tarefa (fim do 'modelo herói') é operacional: /meta:evolve define modelo por dimensão de auditoria (D1-D8), tiering como régua"
@@ -10534,7 +10534,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-07-21"
     trace: ".claude/commands/meta/kg.md · .claude/validation/kg-radar.sh · .claude/validation/kg-provenance-coverage.sh · .claude/validation/lint-artifacts.sh:61-63"
     label: "O próprio ato de modelar este passivo virou infraestrutura: /meta:kg + knowledge-graph-sdaal.md + kg-radar.sh + kg-provenance-coverage.sh + lint REGRA 29 (proveniência INVERTIDA com catraca: documento novo de análise não coberto por .kg.yaml falha)"
     provenance:
@@ -10629,7 +10629,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "piloto kg-freshness 2026-08-29: worker re-mediu as 4 afirmacoes ao vivo; selo do maestro 2026-08-30"
     label: "SUPERSEDE [REC_STAGING_ROT_AND_MISSING_MAILBOX] (2026-07-21) com a verdade de 2026-08-29: TRES das quatro afirmacoes seguem verdadeiras e re-medidas (os 11 anuncios apodrecidos ate 13 dias; a causa membro method-only sem caixa postal; o fix caixa-postal-nao-e-framework, vivo e recebendo correio ate 2026-08-18). A QUARTA driftou: o label citava a REGRA 28 com 3 classes SOFT — em 2026-08 a revisao do double-firing AMPUTOU a classe de outbox orfao (absorvida pela REGRA 46), deixando a 28 com 2 classes. No que cita numero de classes de uma guarda apodrece quando a guarda e refatorada — mesma classe do /admin/stats do m2."
     provenance:

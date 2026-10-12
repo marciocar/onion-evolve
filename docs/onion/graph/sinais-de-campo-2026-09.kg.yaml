@@ -1,7 +1,7 @@
 meta:
   id: sinais-de-campo-2026-09
   schema_version: "1"
-  baseline: 2026-09-07
+  baseline: "2026-09-07"
   # TRIAGEM dos sinais de campo dos adotantes, rodada de 2026-09-07. Existe como grafo proprio porque
   # o fios-abertos tem teto de 20 nos declarado no proprio meta: e "onda nova exige onda COLHIDA" —
   # despejar triagem la seria inflar o backlog para nao pensar, que e o que aquele teto impede.

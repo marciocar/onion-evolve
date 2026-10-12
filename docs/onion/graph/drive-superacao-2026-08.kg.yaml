@@ -14,7 +14,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: superseded
-    verified_at: 2026-08-27
+    verified_at: "2026-08-27"
     verified_against: "grep por comando/skill que encadeia execucao ate um alvo devolvia ZERO (inventario de 3 agentes Explore)"
     trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
   - id: D_DRIVE_MECANIZA_O_RUNTIME
@@ -24,7 +24,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: done
-    verified_at: 2026-08-27
+    verified_at: "2026-08-27"
     verified_against: ".claude/commands/meta/drive.md + .claude/validation/kg-drive-project.sh no main (PR #692) + run_drive_selftests 4/4"
     trace: ".claude/commands/meta/drive.md"
     provenance:
@@ -39,7 +39,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-27
+    verified_at: "2026-08-27"
     verified_against: "execucao do laco na catraca-regra49-2026-08.kg.yaml: radar --integrity --schema rc=0, realign --check ALINHADO"
     trace: "docs/onion/graph/catraca-regra49-2026-08.kg.yaml"
     provenance:

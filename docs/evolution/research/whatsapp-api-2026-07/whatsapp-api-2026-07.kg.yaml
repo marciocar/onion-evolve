@@ -10,10 +10,10 @@ meta:
   # marcaria os outros 47 como envelhecidos numa tacada — o próprio radar documenta (kg-radar.sh:665)
   # que aviso em massa treina o leitor a ignorar. O carimbo da revisita vive em `revisited:` e no
   # `verified_at` de cada nó efetivamente tocado.
-  baseline: 2026-07-17
+  baseline: "2026-07-17"
   revisited: 2026-09-03
   date: 2026-07-17
-  review_after: 2026-10-03   # cadência FERRAMENTA/PREÇO = 30d (cláusula 8 da doutrina de pesquisa): o tipo
+  review_after: "2026-10-03"   # cadência FERRAMENTA/PREÇO = 30d (cláusula 8 da doutrina de pesquisa): o tipo
                              # DOMINANTE deste grafo é preço/limite/política de plataforma comercial (Meta
                              # WhatsApp Business Platform), que remarcou o billing 2x entre nov/2024 e
                              # jan/2026 (C_S5_F4). Não é mercado (90d) nem doutrina (12m) — o eixo de
@@ -38,7 +38,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: done
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md presente no worktree (8163 bytes, mtime 2026-07-17) — conferido na revisita; quem não consegue carimbar não pode declarar feito"
     label: "Relatório de pesquisa WhatsApp programático jul/2026 (49 achados, passe adversarial)"
     trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
@@ -89,7 +89,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Meta migrou o WhatsApp Business Platform de precificação por conversa (conversation-based pricing, janela de 2…"
     trace: "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing"
     provenance:
@@ -104,7 +104,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "WhatsApp Business Platform é viável tecnicamente para fintech regulada (sem bloqueio de setor), mas exige due …"
     trace: "sem-fonte-primaria"
   - id: C_S1_F2
@@ -114,7 +114,7 @@ nodes:
     confidence: 0.6
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Desde 1º de julho de 2026, contas WhatsApp Business (WABAs) com Sold-To country Brasil podem ser criadas em BR…"
     trace: "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing"
     provenance:
@@ -129,7 +129,7 @@ nodes:
     confidence: 0.4
     status: superseded
     verified_against: "revisita-2026-09-03: não sobreviveu ao voto adversarial — supersedido por E_PRICE_BR_MARKETING_REVISITA_20260903"
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     label: "Preço de marketing template no Brasil citado por blog secundário como ~US$ 0,0625/mensagem."
     trace: "https://blueticks.co/blog/whatsapp-business-pricing-change-2026-per-message"
   - id: C_S1_F4
@@ -139,7 +139,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Dentro da janela de atendimento de 24h (aberta quando o usuário envia mensagem), respostas não-template e temp…"
     trace: "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing"
     provenance:
@@ -154,7 +154,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "O limite inicial de mensageria é de 250 contatos únicos por 24h, escalável via 'scaling paths' automáticos par…"
     trace: "https://developers.facebook.com/documentation/business-messaging/whatsapp/messaging-limits"
     provenance:
@@ -169,7 +169,7 @@ nodes:
     confidence: 0.4
     status: superseded
     verified_against: "revisita-2026-09-03: não sobreviveu ao voto adversarial — supersedido por E_QUALITY_RATING_REVISITA_20260903"
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     label: "O quality rating do número (Green/Yellow/Red, ou High/Medium/Low por template) é calculado por Meta com base e…"
     trace: "https://getkanal.com/blog/whatsapp-business-quality-rating-explained"
   - id: C_S1_F7
@@ -179,7 +179,7 @@ nodes:
     confidence: 0.2
     status: superseded
     verified_against: "revisita-2026-09-03: seguia refutada e agora é história — supersedida por E_TEMPLATE_RULES_REVISITA_20260903"
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     label: "Novas regras de template incluem limite de 550 caracteres no corpo, máximo de 10 emojis, e proibição de templa…"
     trace: "https://chatmaxima.com/blog/whatsapp-business-api-pricing-2026-complete-guide/"
   - id: C_S1_F8
@@ -189,7 +189,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Onboarding como Tech Provider exige: app Meta com caso de uso WhatsApp, portfólio de negócio conectado, acesso…"
     trace: "https://developers.facebook.com/documentation/business-messaging/whatsapp/solution-providers/get-started-for-tech-providers"
   - id: C_S1_F9
@@ -199,7 +199,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Não existe uma política do WhatsApp Business Platform dedicada e nomeada especificamente a 'serviços financeir…"
     trace: "https://business.whatsapp.com/policy"
     provenance:
@@ -214,7 +214,7 @@ nodes:
     confidence: 0.4
     status: superseded
     verified_against: "revisita-2026-09-03: não sobreviveu ao voto adversarial — supersedido por E_BSP_BRAZIL_PLAYERS_REVISITA_20260903"
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     label: "Os players relevantes de BSP WhatsApp no Brasil em julho/2026 incluem 360dialog, Twilio, Gupshup, Zenvia, Info…"
     trace: "https://www.messagecentral.com/blog/best-whatsapp-business-api-providers-brazil"
   - id: C_S2_F10
@@ -224,7 +224,7 @@ nodes:
     confidence: 0.65
     status: confirmed
     verified_against: "revisita-2026-09-03: voto adversarial 3-0 SUSTENTOU a claim contra https://www.interakt.shop/pt/blog/the-guide-to-migrate-whatsapp-business-api-number-from-one-provider-to-another/ (tier 4, blog de vendor sobre migração) — único nó de julho a sobreviver à revisita"
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     source_tier: 4
     source_kind: blog
     label: "Lock-in é estrutural: BSPs concorrentes tipicamente não replicam automaticamente histórico de conversas, chatb…"
@@ -241,7 +241,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "O 'Meta Tech Provider Program' é o programa oficial da Meta pelo qual ISVs/SaaS/plataformas empresariais se cr…"
     trace: "https://developers.facebook.com/documentation/business-messaging/whatsapp/solution-providers/get-started-for-tech-providers"
   - id: C_S2_F12
@@ -251,7 +251,7 @@ nodes:
     confidence: 0.2
     status: refuted
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Não foi encontrada, nas buscas realizadas, nenhuma fonte primária (documento oficial, press release, whitepape…"
     trace: "sem-fonte-primaria"
   - id: C_S2_F2
@@ -261,7 +261,7 @@ nodes:
     confidence: 0.6
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Modelo de preço geral do setor em 2026: Meta cobra por mensagem/template entregue (não mais por conversa de 24…"
     trace: "https://www.infobip.com/docs/whatsapp"
     provenance:
@@ -276,7 +276,7 @@ nodes:
     confidence: 0.2
     status: superseded
     verified_against: "revisita-2026-09-03: seguia refutada e agora é história — supersedida por E_360DIALOG_MARKUP_REVISITA_20260903"
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     label: "360dialog anuncia markup 'flat-fee': cerca de US$49 de base + US$0,005 por mensagem, segundo blog agregador (S…"
     trace: "https://setsmart.io/blog/whatsapp-business-api-pricing"
   - id: C_S2_F4
@@ -286,7 +286,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Twilio cobra uma taxa própria de US$0,005 por mensagem (inbound ou outbound) além da tarifa por template da Me…"
     trace: "https://www.twilio.com/en-us/whatsapp/pricing"
   - id: C_S2_F5
@@ -296,7 +296,7 @@ nodes:
     confidence: 0.2
     status: refuted
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Zenvia (Brasil) cobra uma 'taxa de plataforma' de BSP entre R$0,02 e R$0,15 por conversa dependendo do nível d…"
     trace: "https://zenvia.com/en/prices/"
   - id: C_S2_F6
@@ -306,7 +306,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Take Blip (Blip) é apontado como líder de mercado brasileiro para médias/grandes empresas via WhatsApp Busines…"
     trace: "https://chatbotscape.com/reviews/blip-review"
   - id: C_S2_F7
@@ -316,7 +316,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Diferença prática Cloud API direto vs BSP: a Cloud API da Meta é gratuita de acesso (paga-se só por mensagem/c…"
     trace: "https://whatsloop.net/en/blog/whatsapp-cloud-api-vs-bsp-comparison"
   - id: C_S2_F8
@@ -326,7 +326,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Posicionamento fintech: Blip fez parceria com Efí Bank (instituição de pagamento autorizada pelo Banco Central…"
     trace: "https://finsidersbrasil.com.br/reportagem-exclusiva-fintechs/blip-e-efi-bank-lancam-iniciacao-de-pagamento-no-whatsapp/"
   - id: C_S2_F9
@@ -336,7 +336,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Portabilidade de número entre BSPs é suportada oficialmente (o novo BSP inicia solicitação, requer autorização…"
     trace: "https://help.blip.ai/hc/en-us/articles/4474407876247-Number-portability-in-WhatsApp-API"
   - id: C_S3_F1
@@ -346,7 +346,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Evolution API é provavelmente o mais adotado em produtos/automação no-code em 2026 (integra com n8n, hospedage…"
     trace: "https://github.com/evolution-foundation/evolution-api/issues/2534"
   - id: C_S3_F2
@@ -356,7 +356,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "O FAQ oficial da Evolution Foundation afirma que o código permanece Apache-2.0 'sem cláusulas adicionais' e qu…"
     trace: "https://docs.evolutionfoundation.com.br/licensing/faq"
     provenance:
@@ -371,7 +371,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Baileys (WhiskeySockets) é MIT puro, sem cláusulas adicionais encontradas, 10.2k estrelas, release mais recent…"
     trace: "https://github.com/WhiskeySockets/Baileys"
     provenance:
@@ -386,7 +386,7 @@ nodes:
     confidence: 0.2
     status: refuted
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "WAHA (devlikeapro) tem núcleo Apache-2.0 confirmado lendo o LICENSE bruto do branch core, mas opera modelo dua…"
     trace: "https://raw.githubusercontent.com/devlikeapro/waha/core/LICENSE"
   - id: C_S3_F5
@@ -396,7 +396,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "WPPConnect é LGPLv3 (copyleft fraco, não é permissivo puro), 3.4k estrelas, release 15/jul/2026 (v2.2.3), mas …"
     trace: "https://github.com/wppconnect-team/wppconnect"
     provenance:
@@ -411,7 +411,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "whatsapp-web.js é o mais popular por estrelas do conjunto (22.2k), Apache-2.0, release mais recente v1.34.7 (2…"
     trace: "https://github.com/pedroslopez/whatsapp-web.js"
     provenance:
@@ -426,7 +426,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "venom-bot (orkestral) mostra sinal misto: release oficial no npm estagnado em v5.3.0 (nov/2024), mas atividade…"
     trace: "https://github.com/orkestral/venom/commits/master"
     provenance:
@@ -441,7 +441,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Nenhum dos seis projetos é oficialmente suportado pelo WhatsApp/Meta — todos (Evolution API, WPPConnect, WAHA,…"
     trace: "https://github.com/WhiskeySockets/Baileys"
     provenance:
@@ -456,7 +456,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Os Termos de Serviço Business do WhatsApp proíbem explicitamente acesso/automação não autorizados: 'Company mu…"
     trace: "https://www.whatsapp.com/legal/business-terms"
     provenance:
@@ -471,7 +471,7 @@ nodes:
     confidence: 0.6
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Em 2026 a Meta enfrenta escrutínio antitruste (UE, Brasil, Itália) por banir chatbots de IA de terceiros da AP…"
     trace: "https://techcrunch.com/2026/01/13/brazil-orders-meta-to-suspend-policy-banning-third-party-ai-chatbots-from-whatsapp/"
     provenance:
@@ -486,7 +486,7 @@ nodes:
     confidence: 0.6
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "O WhatsApp Terms of Service geral (não-business) também proíbe criar contas por meios automatizados/não autori…"
     trace: "https://www.whatsapp.com/legal/terms-of-service"
     provenance:
@@ -501,7 +501,7 @@ nodes:
     confidence: 0.6
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "A central de ajuda oficial do WhatsApp declara que uso de automação/mensagens em massa não autorizadas é viola…"
     trace: "sem-fonte-primaria"
     provenance:
@@ -515,7 +515,7 @@ nodes:
     confidence: 0.6
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Há evidência documentada e ativa (2024-2025, múltiplas issues abertas) de banimento de números que usam a bibl…"
     trace: "https://github.com/WhiskeySockets/Baileys/issues/1869"
     provenance:
@@ -530,7 +530,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "A Meta já tomou ação legal formal (notificações DMCA) contra projetos que fizeram engenharia reversa do WhatsA…"
     trace: "https://news.ycombinator.com/item?id=7271423"
   - id: C_S4_F6
@@ -540,7 +540,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Não há evidência de ação judicial (lawsuit, distinta de takedown administrativo) movida pela Meta contra desen…"
     trace: "sem-fonte-primaria"
   - id: C_S4_F7
@@ -550,7 +550,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Para fintech regulada no Brasil, usar canal não-oficial cria exposição dupla: risco contratual com a Meta (ban…"
     trace: "https://dimensa.com/blog/resolucao-conjunta-6/"
   - id: C_S4_F8
@@ -560,7 +560,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Rastreabilidade e retenção de comunicação com cliente por atendente/autoria é apontada como relevante para con…"
     trace: "https://www.socialhub.pro/blog/whatsapp-empresa-saber-quem-respondeu-cada-cliente/"
   - id: C_S4_F9
@@ -570,7 +570,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Telemetria de biblioteca não-oficial que envia IP do servidor da fintech a terceiro pode configurar tratamento…"
     trace: "https://confidata.com.br/blog/transferencia-internacional-dados-guia-completo"
   - id: C_S5_F1
@@ -580,7 +580,7 @@ nodes:
     confidence: 0.6
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Baileys (WhiskeySockets/Baileys) segue como a lib não-oficial mais adotada tecnicamente: ~10,1k stars, 3,19k f…"
     trace: "https://github.com/WhiskeySockets/Baileys"
     provenance:
@@ -595,7 +595,7 @@ nodes:
     confidence: 0.6
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Evolution API (fork/wrapper brasileiro sobre Baileys) é hoje o projeto self-hosted não-oficial com maior traçã…"
     trace: "https://github.com/EvolutionAPI/evolution-api"
     provenance:
@@ -610,7 +610,7 @@ nodes:
     confidence: 0.6
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "whatsapp-web.js (pedroslopez/wwebjs) continua ativo em 2026, não foi descontinuado: versão 1.34.7 publicada ~3…"
     trace: "https://github.com/wwebjs/whatsapp-web.js/issues"
     provenance:
@@ -625,7 +625,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "EVENTO 2025→2026: Meta reestruturou o billing do WhatsApp Business API duas vezes entre nov/2024 e jan/2026 (p…"
     trace: "https://developers.facebook.com/documentation/business-messaging/whatsapp/pricing"
     provenance:
@@ -640,7 +640,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "EVENTO 2025→2026: Meta intensificou detecção e banimento de números associados a plataformas WhatsApp não-ofic…"
     trace: "https://wehsoft.com/blog/banimentos-whatsapp-2026"
   - id: C_S5_F6
@@ -650,7 +650,7 @@ nodes:
     confidence: 0.6
     status: confirmed
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Não há evidência de morte/encerramento de nenhum projeto self-hosted grande (Baileys, whatsapp-web.js, Evoluti…"
     trace: "https://github.com/wwebjs/whatsapp-web.js/issues"
     provenance:
@@ -665,7 +665,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "No mercado de BSPs oficiais, players regionais fortes no Brasil/LATAM são Take Blip e Zenvia (CPaaS brasileira…"
     trace: "https://www.messagecentral.com/blog/best-whatsapp-business-api-platform-brazil"
   - id: C_S5_F8
@@ -675,7 +675,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Alternativa/ferramenta brasileira emergente citada em 2026 como 'não-oficial gerenciada' com tração comercial:…"
     trace: "https://blog.zapsterapi.com/post/melhores-api-para-whatsapp-2026-comparativo-completo"
   - id: C_S5_F9
@@ -685,7 +685,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: market-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Tendência de mercado 2026: pressão dupla empurra para a API oficial — (a) Meta aumentando fiscalização/banimen…"
     trace: "https://www.socialhub.pro/blog/regras-politicas-whatsapp-business-api-meta-2026/"
   # ─── REVISITA 2026-09-03 ─────────────────────────────────────────────────────────────────────
@@ -705,7 +705,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: confirmed
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: "voto adversarial 2026-09-03 sobre https://blueticks.co/blog/whatsapp-business-pricing-change-2026-per-message — REPROVADO: blog agregador sem confirmação na página primária de pricing da Meta"
     source_tier: 4
     source_kind: blog
@@ -722,7 +722,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: confirmed
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: "voto adversarial 2026-09-03 sobre https://getkanal.com/blog/whatsapp-business-quality-rating-explained — REPROVADO: mecânica do quality rating descrita só por blog de vendor, sem doc primária da Meta"
     source_tier: 4
     source_kind: blog
@@ -739,7 +739,7 @@ nodes:
     impact: 2
     confidence: 0.6
     status: confirmed
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: "voto adversarial 2026-09-03 sobre https://chatmaxima.com/blog/whatsapp-business-api-pricing-2026-complete-guide/ — REPROVADO de novo: limite de 550 caracteres e máximo de 10 emojis não aparecem em fonte primária"
     source_tier: 4
     source_kind: blog
@@ -756,7 +756,7 @@ nodes:
     impact: 4
     confidence: 0.6
     status: confirmed
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: "voto adversarial 2026-09-03 sobre https://www.messagecentral.com/blog/best-whatsapp-business-api-providers-brazil — REPROVADO: listicle de vendor sobre concorrentes (vendor-on-competitor, sempre suspeito pela cláusula 7)"
     source_tier: 4
     source_kind: vendor-on-competitor
@@ -773,7 +773,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: confirmed
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: "voto adversarial 2026-09-03 sobre https://setsmart.io/blog/whatsapp-business-api-pricing — REPROVADO de novo: markup atribuído à 360dialog não confere com nenhuma página do próprio fornecedor"
     source_tier: 4
     source_kind: blog
@@ -790,7 +790,7 @@ nodes:
     impact: 4
     confidence: 0.6
     status: confirmed
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: "eixo mercado/capital da revisita 2026-09-03 (cláusula 4, invariante): 0 rodadas, 0 M&A, 0 down rounds e 0 movimentos de analista posteriores a 2026-07-17 verificados; a única claim de mercado levada a voto foi REPROVADA"
     source_kind: internal-synthesis
     label: "MERCADO/CAPITAL — SEM SINAL NOVO nesta revisita: nada de rodada, M&A, down round ou reprecificação posterior a 2026-07-17 foi verificado, e a única claim de mercado votada (lista de BSPs no Brasil) caiu, junto do markup da 360dialog. O que o corpus de julho carrega e NÃO foi reconfirmado — Take Blip como líder brasileiro para médias/grandes (C_S5_F7, C_S2_F6) — não deve ser citado como atual."
@@ -806,7 +806,7 @@ nodes:
     impact: 5
     confidence: 0.7
     status: confirmed
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: "contabilidade da própria revisita 2026-09-03: 6 nós revisitados (1 sobreviveu, 5 caíram), 0 fontes lidas, 0 claims deixadas em 'não verificado' por falha de acesso, 39 claims cortadas por orçamento"
     source_kind: internal-synthesis
     label: "Revisita 2026-09-03 (run wf_9487391f-594): 6 nos vencidos re-medidos, 1 reconfirmado e 5 superados, todos sobre blog tier 4 (preco de template BR, quality rating, 550 chars/10 emojis, BSPs no Brasil, markup da 360dialog); nenhum eixo teve mudanca verificada em fonte primaria"

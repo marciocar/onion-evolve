@@ -1,8 +1,8 @@
 meta:
   id: onion-slm-2026-10
   schema_version: "1"
-  baseline: 2026-10-05
-  review_after: 2026-11-19   # cadencia LINEUP DE MODELOS = 45d. Justificativa do tipo dominante: 26 das 58
+  baseline: "2026-10-05"
+  review_after: "2026-11-19"   # cadencia LINEUP DE MODELOS = 45d. Justificativa do tipo dominante: 26 das 58
                              # evidencias ancoradas sao ficha de MODELO (tamanho, licenca, base, data de
                              # release: GLiNER2.5, GLiNER2-PII, OpenAI Privacy Filter, NuExtract3, Qwen3.5/3.6/
                              # 3.8, Gemma 4, ZAYA1, EmbeddingGemma, Qwen3-Embedding) e e essa ficha que muda o
@@ -55,7 +55,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'pedido do maestro relayed verbatim pelo harness deste run: "reforço: o nanochat foi um exemplo, não é nosso moat" — coerente com a memoria quatro-pilares-definidos-pelo-maestro e onion-moat-verifiable-mechanism'
     label: 'ENQUADRAMENTO DO MAESTRO: o Nanochat foi EXEMPLO de uma rodada anterior, nao o moat. O moat do Onion e o mecanismo verificavel (radar deterministico sem LLM, dogfood, KG-SSOT First+Runtime, SDAAL em todas as fases, Elenxo). Consequencia de leitura para esta rodada: modelo nenhum (pequeno ou grande) e diferencial — o SLM entra so como ferramenta de conjunto fechado plugada por SDAAL e julgada por gate deterministico.'
     trace: 'harness do workflow onion-research (2026-10-05)'
@@ -79,7 +79,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'git show origin/docs/research-infra-nanochat-2026-10:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml — no D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 com status: done'
     label: 'ANCORA CROSS-GRAFO (espelho, nao editavel daqui): nanochat-onion-2026-10#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, SELADA done — A operante: nao treinar agora; B/C/D vivas em gatilho nomeado; C so com veiculo que NAO seja o Nanochat (primitiva tipada local sem treino), fine-tune so apos eval de dominio que falhe; E (o Onion como modelo) refutada.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 (branch docs/research-infra-nanochat-2026-10)'
@@ -95,7 +95,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'git show origin/docs/research-infra-nanochat-2026-10 — no C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL com status: open'
     label: 'ANCORA CROSS-GRAFO: nanochat-onion-2026-10#C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL (open) — SLM-ferramenta de dominio estreito via adapter SDAAL: tarefa tipada de CONJUNTO FECHADO e verificavel, nunca orquestrador; caminho de menor risco = decisao tipada local (llama.cpp + gramatica + n_probs) sobre SLM aberto PRE-TREINADO, sem treino; juiz do Elenxo destilado do Claude VETADO; gatilho = 2o caso de uso de SLM alem do de-id.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL (branch docs/research-infra-nanochat-2026-10)'
@@ -111,7 +111,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'git show origin/docs/research-infra-nanochat-2026-10 — no Q_EVAL_DE_DOMINIO_DO_ONION com status: open'
     label: 'ANCORA CROSS-GRAFO: nanochat-onion-2026-10#Q_EVAL_DE_DOMINIO_DO_ONION (open) — o eval de dominio, pre-requisito de B, C e D, que hoje NAO EXISTE: tarefas estreitas com gabarito do proprio corpus (tipo do no, declarado-nao-verificado, orfao, julgar verified_against) + corretor deterministico.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#Q_EVAL_DE_DOMINIO_DO_ONION (branch docs/research-infra-nanochat-2026-10)'
@@ -127,7 +127,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'git show origin/docs/research-infra-nanochat-2026-10 — no E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR com status: confirmed'
     label: 'ANCORA CROSS-GRAFO: nanochat-onion-2026-10#E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR (confirmed) — destilar o juiz do Elenxo a partir do Claude produz ERRO CORRELACIONADO com o gerador das claims e destroi a independencia adversarial; juiz SLM so em decisao de conjunto fechado e verificavel.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR (branch docs/research-infra-nanochat-2026-10)'
@@ -143,7 +143,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml l.140-147 — IN_NONE_FAILSAFE, invariant, status: confirmed'
     label: 'ANCORA CROSS-GRAFO: classification-por-vertical#IN_NONE_FAILSAFE — de-identification none fail-safe: recusa redigir-e-passar (nao degrada), override humano auditavel. E o 1o caso de uso de SLM no corpus (de-id), e o que torna o especialista de PII a peca mais proxima de uso.'
     trace: 'docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml#IN_NONE_FAILSAFE'
@@ -160,7 +160,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "0.3B (multi), 0.2B (base), 74M (small)" — LOCATOR: fastino.ai/models/gliner2-5, tabela de comparacao, linha MODEL SIZE (PARAMETERS); linha OPEN-SOURCE LICENSE; README, tabela GLiNER2.5 (boundary) e badge/rodape de licenca. ancorada por verificador independente'
     source_tier: 8
     source_kind: vendor-on-self
@@ -178,7 +178,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "CPU first: fast local inference on standard hardware — no GPU required" — LOCATOR: github.com/fastino-ai/GLiNER2, README, secao Why GLiNER2? (linha 26). ancorada por verificador independente'
     source_tier: 6
     source_kind: repo
@@ -197,7 +197,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Government / tax identifiers government_id, national_id_number, passport_number, drivers_license_number, license_number, tax_id, tax_number" — LOCATOR: arXiv 2605.09973v1, Table 1 (linha Government / tax identifiers). ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -215,7 +215,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "files, in English, French, Spanish, German, Italian, Portuguese, and Dutch, with occasional mixed-language passages." — LOCATOR: arXiv 2605.09973v1, Secao 3 (fim da descricao do corpus); Secao 6 Discussion and Limitations. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -233,7 +233,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "The evaluation covers only legal and medical documents, and the training data are entirely synthetic and have not been validated by human annotators." — LOCATOR: arXiv 2605.09973v1, Secao 6 (Discussion and Limitations); Secao 4 (Benchmark). ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -252,7 +252,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Small size: Runs in a web browser or on a laptop – 1.5B parameters total and 50M active parameters." — LOCATOR: HF README, Highlights; front-matter license: apache-2.0; README e PDF: sparse mixture-of-experts blocks with 128 experts total and top-4 routing per token. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -269,7 +269,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "PII-Masking-300k (baseline) All labels 0.940 0.980 0.960 0.926 PII-Masking-300k (corrected) All labels 0.968 0.981 0.974 0.942" — LOCATOR: Model Card PDF, Table 1 (§7.4.1); §7.2.1 descreve a correcao. ancorada por verificador independente'
     source_tier: 8
     source_kind: vendor-on-self
@@ -286,7 +286,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "0% 0 0.414 0.795 0.545 1% 13 0.888 0.871 0.879 10% 39 0.963 0.960 0.962" — LOCATOR: Model Card PDF, §7.4.2, Table 2 (tambem 50%: 18 / 0.983 / 0.982 / 0.983). ancorada por verificador independente'
     source_tier: 8
     source_kind: vendor-on-self
@@ -303,11 +303,11 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Privacy Filter is a redaction and data minimization aid, not an anonymization, compliance, or a safety guarantee." — LOCATOR: HF README, Risk: Over-reliance e Recommendations; Model Card PDF capa April 22, 2026 e §4 (evaluate the model in-domain against local policy references). ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
-    valid_from: 2026-04-22
+    valid_from: "2026-04-22"
     label: 'ANCORADA: publicado em 22/04/2026; o proprio card recomenda eval NO DOMINIO LOCAL antes de producao e fine-tune quando a politica diverge, e diz que NAO e garantia de anonimizacao. Elenxo NAO sobreviveu. VETA usar o OPF como garantia de de-id sem eval local — e o fornecedor pedindo exatamente o X_REF_NANOCHAT_Q_EVAL.'
     trace: 'HF README do OpenAI Privacy Filter (Risk: Over-reliance)'
     provenance:
@@ -322,11 +322,11 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "NuExtract3 is based on Qwen3.5-4B, and released under Apache 2.0 license." — LOCATOR: blog NuMind (data May 19, 2026); model card HF (Base Model: Qwen/Qwen3.5-4B-Base). ancorada por verificador independente'
     source_tier: 8
     source_kind: vendor-on-self
-    valid_from: 2026-05-19
+    valid_from: "2026-05-19"
     label: 'ANCORADA: NuExtract3 e um VLM de 4B baseado em Qwen3.5-4B, Apache 2.0, lancado em 2026-05-19. Elenxo NAO sobreviveu. HABILITA: especialista pronto de extracao para JSON tipado — o candidato mais proximo da primitiva tipada SEM treino da opcao C.'
     trace: 'blog NuMind NuExtract3 (2026-05-19) + model card HF'
     provenance:
@@ -340,7 +340,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.4
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "NuExtract3 outperforms generalist models substantially, beating Gemma 4 by more than 10 points." — LOCATOR: blog NuMind (benchmark estruturado); model card HF, tabela do benchmark interno. ancorada por verificador independente'
     source_tier: 4
     source_kind: vendor-on-competitor
@@ -357,7 +357,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.4
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "GitHub Repository](https://github.com/numindai/nuextract) — inference & fine-tuning scripts" — LOCATOR: blog NuMind, links rapidos (Quick Links / Availability). ancorada por verificador independente'
     source_tier: 8
     source_kind: vendor-on-self
@@ -375,7 +375,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "supervised learning via next-token prediction" — LOCATOR: blog NuMind, secao de treino e tipos de campo; model card, lista de tipos de template. ancorada por verificador independente'
     source_tier: 8
     source_kind: vendor-on-self
@@ -393,7 +393,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Qwen3.5 9B (32) scores roughly double the next closest models under 10B." — LOCATOR: artificialanalysis.ai/articles/qwen3-5-small-models, secao de comparacao. ancorada por verificador independente'
     source_tier: 7
     source_kind: analyst
@@ -411,7 +411,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Qwen3.8-27B brings these advances to a compact, deployment-friendly dense model: a native vision-language model that understands images and videos" — LOCATOR: huggingface.co/Qwen/Qwen3.8-27B, model card, introducao. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -429,7 +429,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "There is no Qwen 3.8 at 0.8B, 3B, 9B, 14B, 35B, 70B or 122B." — LOCATOR: codersera.com, secao Why do searches for Qwen 3.8 35B-A3B, 14B and 122B come up empty?. ancorada por verificador independente'
     source_tier: 4
     source_kind: aggregator
@@ -447,7 +447,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.45
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Qwen3.6-35B-A3B is real: 35B total, 3B activated, Apache 2.0, April 2026." — LOCATOR: codersera.com, secao Why do searches for Qwen 3.8 35B-A3B ... come up empty?. ancorada por verificador independente'
     source_tier: 4
     source_kind: aggregator
@@ -466,7 +466,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "By applying the industry-standard Apache 2.0 license terms, we are providing clarity about developers'' rights and responsibilities" — LOCATOR: Google Open Source Blog, corpo do post. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -483,7 +483,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "2.3B effective, 5.1B with embeddings" — LOCATOR: Hugging Face blog gemma4, tabela de modelos. ancorada por verificador independente'
     source_tier: 7
     source_kind: vendor-primary
@@ -501,11 +501,11 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Release of Gemma 4 12B Unified." — LOCATOR: ai.google.dev/gemma/docs/releases, entrada de 3 de junho de 2026. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
-    valid_from: 2026-06-03
+    valid_from: "2026-06-03"
     label: 'ANCORADA: o Gemma 4 12B Unified (11.95B denso, sem encoder) saiu em 2026-06-03 pelas notas oficiais. Elenxo NAO sobreviveu, com ressalva: a data de lancamento da FAMILIA nas release notes e 2026-03-31, nao 04-02 (data do post) — a afirmacao do chat sobre a data erra, mas o claim que a corrigiria foi rejeitado na ancoragem e por isso nao vira no.'
     trace: 'https://ai.google.dev/gemma/docs/releases'
     provenance:
@@ -520,11 +520,11 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Release of Gemma 4 - MTP for E2B, E4B, 31B, and 26B A4B." — LOCATOR: ai.google.dev/gemma/docs/releases, entrada de 16 de abril de 2026. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
-    valid_from: 2026-04-16
+    valid_from: "2026-04-16"
     label: 'ANCORADA: em 2026-04-16 houve release de MTP incluindo E2B e E4B — logo E2B/E4B sem atualizacao (chat) esta esticado. Ambiguidade declarada pelo Elenxo: MTP sao cabecas de inferencia, nao re-treino dos pesos; mas o literal do chat cai.'
     trace: 'https://ai.google.dev/gemma/docs/releases'
     provenance:
@@ -540,7 +540,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "a small mixture of experts language model with 760M active parameters and 8.4B total parameters trained end-to-end by Zyphra." — LOCATOR: Model card HF Zyphra/ZAYA1-8B, abertura. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -558,7 +558,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "excels at detailed long-form reasoning especially for mathematical and coding task" — LOCATOR: Model card HF Zyphra/ZAYA1-8B, descricao de capacidade. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -577,11 +577,11 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "the highest-ranking text-only multilingual embedding model under 500M on the Massive Text Embedding Benchmark (MTEB)" — LOCATOR: HF blog embeddinggemma, introducao. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-primary
-    valid_from: 2025-09-04
+    valid_from: "2025-09-04"
     label: 'ANCORADA: EmbeddingGemma tem 308M parametros, 100+ linguas e era o melhor modelo multilingue so-texto abaixo de 500M no MTEB na publicacao (2025-09-04). HABILITA: embedder local barato para busca semantica sobre o corpus — leaderboard e de 2025, revisitar.'
     trace: 'https://huggingface.co/blog/embeddinggemma'
     provenance:
@@ -596,11 +596,11 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Alibaba''s `Qwen3-Embedding-8B` scored 70.58 on the MTEB Multilingual leaderboard as of mid-2025, ranking first." — LOCATOR: premai.io blog, narrativa; model card 8B. ancorada por verificador independente'
     source_tier: 6
     source_kind: aggregator
-    valid_from: 2025-06-05
+    valid_from: "2025-06-05"
     label: 'ANCORADA: o Qwen3-Embedding-8B fez 70,58 no MTEB multilingual (1o lugar em 2025-06-05), numero coerente com o model card. 8B e grande para embedder local na VPS compartilhada; a familia tem o 0.6B como opcao pequena.'
     trace: 'premai.io blog (embedders) + model card Qwen3-Embedding-8B'
     provenance:
@@ -614,7 +614,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "MTEB score is 63.0. It supports 100+ languages, 8,192 token context, and 1,024-dimensional outputs." — LOCATOR: premai.io blog, secao bge-m3; tabela do model card Qwen3-Embedding-0.6B. ancorada por verificador independente'
     source_tier: 6
     source_kind: aggregator
@@ -632,7 +632,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "reaching a higher score of 74.4 on AIME''24 at one-tenth the cost of RL with on-policy distillation" — LOCATOR: blog Thinking Machines (on-policy distillation), Distillation for reasoning, legenda From Qwen3 Technical Report, Table 21. ancorada por verificador independente'
     source_tier: 8
     source_kind: vendor-on-self
@@ -650,11 +650,11 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Everybody can use Tinker now. The waitlist is over" — LOCATOR: thinkingmachines.ai/news/tinker-general-availability, Dec 12, 2025, secao General availability. ancorada por verificador independente'
     source_tier: 8
     source_kind: vendor-on-self
-    valid_from: 2025-12-12
+    valid_from: "2025-12-12"
     label: 'ANCORADA: o Tinker ficou disponivel para todos em 12/12/2025, com Kimi K2 Thinking, Qwen3-VL e scaffolding compativel com a API OpenAI. Escopo: fine-tuning (SFT e RL) como servico; a pagina NAO menciona destilacao.'
     trace: 'https://thinkingmachines.ai/news/tinker-general-availability'
     provenance:
@@ -669,7 +669,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "We observe an AIME''24 score of ~76.7% using a rank-128 LoRA after 200 steps with 16k-token rollouts." — LOCATOR: tinker-docs cookbook/recipes/distillation, Distillation for reasoning > On-policy distillation. ancorada por verificador independente'
     source_tier: 8
     source_kind: vendor-on-self
@@ -686,7 +686,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "The only training signal is KL divergence against the teacher." — LOCATOR: tinker-docs cookbook/recipes/distillation, Distillation for multi-turn tool use > Architecture (e Additional details > Reward calculation). ancorada por verificador independente'
     source_tier: 8
     source_kind: vendor-on-self
@@ -704,11 +704,11 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Move GKDTrainer to experimental module by @behroozazarkhalili in https://github.com/huggingface/trl/pull/4474" — LOCATOR: huggingface/trl release v0.26.0, secao Experimental. ancorada por verificador independente'
     source_tier: 9
     source_kind: primary
-    valid_from: 2025-12-09
+    valid_from: "2025-12-09"
     label: 'ANCORADA: GKD e Online DPO foram movidos para trl.experimental no TRL v0.26.0 (09/12/2025) — NAO na 0.29 nem em set/2026 como o chat afirma. Para o Onion: a destilacao generalizada esta no modulo experimental ha ~10 meses — API sem garantia de estabilidade.'
     trace: 'https://github.com/huggingface/trl/releases/tag/v0.26.0'
     provenance:
@@ -723,11 +723,11 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Remove deprecated ORPO after moved to experimental by @albertvillanova in https://github.com/huggingface/trl/pull/5050" — LOCATOR: huggingface/trl release v0.29.0, secao Deprecations. ancorada por verificador independente'
     source_tier: 9
     source_kind: primary
-    valid_from: 2026-02-25
+    valid_from: "2026-02-25"
     label: 'ANCORADA: no TRL v0.29.0 (25/02/2026) foram REMOVIDOS os shims deprecados de ORPO, CPO, BCO, PPO, PRM, XPO e Judges, ja movidos antes — e remocao do alias antigo, nao o movimento. Explica de onde o chat (e o PR #12097 do Unsloth) tirou a data errada.'
     trace: 'https://github.com/huggingface/trl/releases/tag/v0.29.0'
     provenance:
@@ -742,11 +742,11 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Neither the student nor the teacher materialises its `(batch, seq, vocab)` logits any more." — LOCATOR: unslothai/unsloth PR #12136, descricao; arquivos unsloth/models/rl_replacements.py e rl.py. ancorada por verificador independente'
     source_tier: 6
     source_kind: repo
-    valid_from: 2026-09-28
+    valid_from: "2026-09-28"
     label: 'ANCORADA: o PR #12136 do Unsloth (mergeado 28/09/2026) NAO trata da mudanca de modulo: roteia a destilacao do GKDTrainer por JSD generalizada em chunks sem materializar logits — pico 65,5 GiB -> 7,6 GiB em gemma-3-270m-it, com fallback para a perda densa do TRL (UNSLOTH_GKD_CHUNKED=0). Para o Onion: destilacao cabe em GPU modesta, mas so importa se o fine-tune abrir.'
     trace: 'https://github.com/unslothai/unsloth/pull/12136'
     provenance:
@@ -762,7 +762,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "across 10 base models and 31 tasks for a total of 310 models. We find that 4-bit LoRA fine-tuned models outperform base models by 34 points and GPT-4 by 10 points on average." — LOCATOR: LoRA Land, Abstract; Tabela 2; Secao 6 (LoRA Land). ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -780,7 +780,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "After fine-tuning, 301/310 models surpass their base model counterpart14 , while 224/310 fine-tuned LLMs surpass the benchmark set by GPT-4 (Table 4)." — LOCATOR: LoRA Land, Secao 4 Results (p.9), Tabelas 3 e 4. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -798,7 +798,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "magicoder humaneval 0.201 0.433 0.829 0.232 -0.396" — LOCATOR: LoRA Land, Secao 4, Tabela 3 (PDF p.10; o claim dizia p.8-9); Apendice C (Mistral-7b). ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -816,7 +816,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "wikisql rouge 0.301 0.898 0.909 0.597 -0.011" — LOCATOR: LoRA Land, Secao 4, Tabela 3; Apendice C (colunas mistral-7b e zephyr-7b-beta); Tabela 1; Secao 3.5. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -834,7 +834,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Our evaluations are limited to the first 1000 examples of datasets with larger evaluation splits to manage costs while maintaining rigor. This may introduce selection bias" — LOCATOR: LoRA Land, Secao 7 Limitations (p.18); tambem Secao 3.5. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -853,7 +853,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Manual review reveals that automatic triple F1 systematically underestimates extraction quality, as a substantial portion of model-predicted triples are textually valid but absent from the incomplete gold annotations." — LOCATOR: KaLLM 2026, Abstract. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -870,7 +870,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "The model extracted 205 entities (151 matched, 54 additional) and 156 triples (60 matched, 96 additional). Additional triples account for 61.5% of model predictions" — LOCATOR: KaLLM 2026, Secao 5.2 Manual Evaluation, Aggregate comparison. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -887,7 +887,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Automatic triple F1 should therefore be interpreted as a lower bound on actual extraction quality." — LOCATOR: KaLLM 2026, Secao 5.2, Implications. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -904,7 +904,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Semantically equivalent relations expressed under different but valid property labels are counted as errors." — LOCATOR: KaLLM 2026, Secao 5.2, Systematic discrepancies, Schema rigidity. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -921,7 +921,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "The repository is publicly accessible via GitHub: https: //github.com/SukSev/kg_benchmarking" — LOCATOR: KaLLM 2026, Secao 7 (Availability / Reproducibility). ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -940,7 +940,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "In the following steps, we outline an algorithm that describes one possible way to carry out the change of the underlying model painlessly." — LOCATOR: NVIDIA, Small Language Models are the Future of Agentic AI, Secao 6, paragrafo introdutorio. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -958,7 +958,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "The initial step involves deploying instrumentation to log all non-HCI agent calls, capturing input prompts, output responses, contents of individual tool calls, and optionally latency metrics" — LOCATOR: NVIDIA, Secao 6, passo S1. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -976,7 +976,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "(10k-100k examples being sufficient for fine-tuning of small models as a rule of thumb [5, 22]), it is necessary to remove any PII, PHI, or any other application-specific sensitive data" — LOCATOR: NVIDIA, Secao 6, passo S2. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -994,7 +994,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Thus, we argue that a SLM appropriately fine-tuned for the selected prompts would suffice while having the above-mentioned benefits of increased efficiency and greater flexibility." — LOCATOR: NVIDIA, Secao 3.4 (A4); abstract. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -1012,7 +1012,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "We acknowledge that alternative view AV2 is a valid view, with the exact economical considerations being highly case-specific. We believe that the jury is still out on alternative view AV2" — LOCATOR: NVIDIA, Secao 4.2 (Acknowledgment); Apendice B. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -1031,7 +1031,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "For each such triplet, we then sample a single corrupted triplet. The parameters are then updated by taking a gradient step with constant learning rate." — LOCATOR: Bordes et al. 2013 (TransE), §2, paragrafo do algoritmo de otimizacao. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -1048,7 +1048,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Regarding error detection by all the methods, there exists a big gap in the performance on synthetic and real datasets. This big gap demonstrates the signiﬁcant diﬀerence between synthetic and real errors." — LOCATOR: Wang, Ma, Gao 2020, Introducao (resultados (1)); construcao do dataset em §4.3.2. ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -1065,7 +1065,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "the Recall of all the methods signiﬁcantly decreases around 30% compared with that on the synthetic dataset. The performance gap between two datasets demonstrates that the real errors are more diﬃcult to be detected than synthetic ones." — LOCATOR: Wang et al. 2020, §4.3.2 General Domain, Real Dataset (Table 3, NELL-314). ancorada por verificador independente'
     source_tier: 7
     source_kind: paper
@@ -1083,7 +1083,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "If your prompt is ballooning in an attempt to capture a growing list of rules or conditions...fine-tuning should be useful." — LOCATOR: workshop_1, secao When Should You Fine Tune?. ancorada por verificador independente'
     source_tier: 7
     source_kind: engineer
@@ -1101,7 +1101,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "don''t start with fine tuning. You can do a lot with prompt engineering. That is much quicker to iterate with." — LOCATOR: workshop_1, secao Philosophy of AI projects (o locator do claim, anti-casos, estava errado). ancorada por verificador independente'
     source_tier: 7
     source_kind: engineer
@@ -1119,7 +1119,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "requirements change often (requiring re-training)" — LOCATOR: workshop_1, secao When Shouldn''t You Fine Tune? (nao Inappropriate Task Scope). ancorada por verificador independente'
     source_tier: 6
     source_kind: engineer
@@ -1137,7 +1137,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "faster, more compliant from a data privacy perspective and was higher quality versus gpt 3.5." — LOCATOR: workshop_1, secao Case Study: Honeycomb - NL to Query. ancorada por verificador independente'
     source_tier: 6
     source_kind: engineer
@@ -1156,11 +1156,11 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "In the next phase, we will use our Series A funding to scale our compute infrastructure, expedite our product readiness on the edge and on-premise, e.g. LFM inference and fine-tuning stacks" — LOCATOR: liquid.ai/blog/we-raised-250m-to-scale-capable-and-efficient-general-purpose-ai, paragrafo da proxima fase. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
-    valid_from: 2024-12-13
+    valid_from: "2024-12-13"
     label: 'ANCORADA: a Liquid AI anunciou Series A de US$250M em 2024-12-13; tese = escalar computacao e levar inferencia/fine-tuning de LFM a edge/on-premise. A pagina nao nomeia o lider (so cita executivo da AMD).'
     trace: 'https://www.liquid.ai/blog/we-raised-250m-to-scale-capable-and-efficient-general-purpose-ai'
     provenance:
@@ -1175,11 +1175,11 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "NVIDIA has also made a significant investment in Thinking Machines Lab to support the company''s long-term growth." — LOCATOR: thinkingmachines.ai/news/nvidia-partnership, paragrafo de abertura (Mar 10, 2026). ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
-    valid_from: 2026-03-10
+    valid_from: "2026-03-10"
     label: 'ANCORADA: a Thinking Machines (Tinker, destilacao on-policy) anunciou parceria de gigawatt com a NVIDIA, que fez investimento significativo de valor NAO divulgado, em 2026-03-10. A primaria nao traz valor de rodada.'
     trace: 'https://thinkingmachines.ai/news/nvidia-partnership'
     provenance:
@@ -1194,11 +1194,11 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Fastino has secured $17.5 million in seed funding led by Khosla Ventures" — LOCATOR: techcrunch.com/2025/05/07/fastino-trains-ai-models-on-cheap-gaming-gpus-and-just-raised-17-5m-led-by-khosla, lead. ancorada por verificador independente'
     source_tier: 5
     source_kind: aggregator
-    valid_from: 2025-05-07
+    valid_from: "2025-05-07"
     label: 'ANCORADA em IMPRENSA (nao primaria): a Fastino (GLiNER2) levantou seed de US$17,5M liderado pela Khosla em 2025-05-07, total ~US$25M; tese de modelos pequenos especificos treinaveis em GPUs de jogo. O texto nao linka anuncio oficial.'
     trace: 'https://techcrunch.com/2025/05/07/fastino-trains-ai-models-on-cheap-gaming-gpus-and-just-raised-17-5m-led-by-khosla'
     provenance:
@@ -1214,7 +1214,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'retorno do workflow onion-research mode primaries de 2026-10-05: listas de claims ANCORADAS (58), REJEITADAS na ancoragem (28), fontes inalcancaveis (nenhuma) e o Elenxo (TRUNCADO na objecao 23)'
     source_kind: internal-audit
     label: 'CONTABILIDADE DA RODADA DE PRIMARIAS (2026-10-05). FONTES: 17 lidas x 0 inalcancaveis (gliner25, gliner2-pii, openai-privacy-filter, nuextract3, qwen35-small, qwen-lineup-38, gemma4, zaya1, embedders, on-policy-distillation, trl-gkd-experimental, lora-land, kallm-2026, nvidia-slm-agentic, kg-corruption-labels, fine-tune-when, market-capital). CLAIMS: 58 ANCORADAS (viraram no) x 28 REJEITADAS na ancoragem (nao viram no): 24 EXAGERADAS, 3 AFIRMADAS-SEM-CITACAO (rebaixadas pelo motor: veredito sem quote/locator), 1 NAO-ENCONTRADA. Rejeitadas e motivo: [gliner25] quatro tarefas (a pagina lista CINCO); Few-NERD 52.37/55.14 (rotulo montado, ha 2o benchmark XNLI); [gliner2-pii] licenca CC BY 4.0 x Apache (CC BY e do DOCUMENTO arXiv, Apache do modelo; 205M reais); placar SPY 0,471 x 0,373 (quote costurada de linhas nao adjacentes, recall medical invertido); [OPF] experimento mede conjunto fechado (inferencia do leitor); linguas/limita pt-BR (o card AVALIA portugues, Tables 7-8); [nuextract3] nao replicado por terceiros (ausencia, nao texto); [qwen35-small] 4 modelos e indice 32/27/16/9, Apache/262K para os quatro, card do 9B Apache/262K->1.010.000 (os tres sem quote/locator); alucinacao 80-82% so no 4B/9B (silencio sobre 0.8B/2B nao e exclusao); [qwen-lineup-38] Flash-Next nao e preview (o card HF diz experimental preview; licenca qwen-community-1.0 tambem na HF); [gemma4] lancado 2026-04-02 (release notes: 2026-03-31); lista dia-zero (lista condensada pelo leitor); [zaya1] HMMT 89.6 (so com Markovian-RSA test-time compute); comparacao so com Qwen3-4B (sao 3 comparadores; Qwen3.5-4B supera o ZAYA1 em GPQA/MMLU-Pro/IFEval); [on-policy-distillation] 70% x 68% como medicoes distintas (o blog nao sustenta); 17.920 x 1.800 GPU-h e 9-30x (NAO-ENCONTRADA: sintese do leitor; numeros sao do relatorio Qwen3); [trl] PR #12097 perda byte a byte e 0.29 moveu (byte-identical so dos arquivos gerados; contradiz release notes); [lora-land] GPT-4 de 2024 obsoleto (juizo do leitor; snapshot 0613 e de fora do doc); [kallm] 4 de fronteira + Mistral e 7B nao sustenta SLM (sao 3+1; extrapolacao de um 7B zero-shot); [nvidia] tarefa-alvo de conjunto fechado e estruturado (o texto nao diz; exemplos incluem sumarizacao e codigo); [kg-corruption] gabarito por construcao (TransE §4.2 admite negativos validos); no real a pista nao existe (mais forte que o texto; secao 4.3.3); Liu 2023/24 ruido semantico (ruido similar tambem e sintetico); [fine-tune-when] consenso Ask HN (opiniao de UM comentarista); custo no dataset (e de outro comentarista); [market-capital] plataformas = Tinker (o corpo nao nomeia Tinker). LACUNAS QUE CONTINUAM ABERTAS: (1) NENHUM especialista (OPF, GLiNER2-PII, GLiNER2.5, NuExtract3) foi medido em pt-BR nem com CPF/CNPJ — o OPF avalia portugues nas Tables 7-8, que esta rodada NAO ancorou; (2) custo de inferencia em CPU na VPS compartilhada NAO medido (GLiNER2.5 CPU-first e declaracao); (3) scripts de fine-tune do NuExtract3 nao rodados; 21 tipos e fase RL sem quote; (4) licenca do Qwen3.8-27B e do Qwen3.5 small sem citacao ancorada; Qwen3.8 <=9B ausente so por agregador; Qwen3.7 proprietario sem primaria; (5) nenhuma primaria mede SLM em EXTRACAO DE KG do dominio do Onion — KaLLM so mede um 7B zero-shot; (6) nenhuma medicao de destilacao fora de raciocinio matematico; (7) o eval de dominio (X_REF_NANOCHAT_Q_EVAL) continua inexistente — e ele, nao esta rodada, que decide C; (8) o Elenxo chegou TRUNCADO na objecao 23: as objecoes 24-58 e o gapsOpen NAO foram lidos por este escritor — re-ler o journal do run antes de citar este no como completo; (9) o diretorio docs/discussions/onion-slm/fontes nao existe nesta arvore — a lista das 45 afirmacoes nao foi conferida uma a uma contra os C_CHAT_* daqui.'

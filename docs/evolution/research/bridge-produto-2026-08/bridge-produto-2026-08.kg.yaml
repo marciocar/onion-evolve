@@ -2,7 +2,7 @@ meta:
   id: bridge-produto-2026-08
   schema_version: "1"
   layer: audit
-  baseline: 2026-08-14
+  baseline: "2026-08-14"
   date: 2026-08-14
   note: >
     KG-SSOT do programa BRIDGE-EVOLVE: evoluir o Onion Bridge de PoC a produto
@@ -19,7 +19,7 @@ nodes:
   - id: C_plano_poc
     node_type: claim
     plane: PROD
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: mapa-completo-do-frontend-2026-08-14-2400-linhas-registry-metade-inerte-zero-persistencia-admin-morto
     status: superseded
     impact: 4
@@ -35,7 +35,7 @@ nodes:
   - id: D_programa_bridge_evolve
     node_type: decision
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: plano-aprovado-pelo-maestro-com-4-decisoes-seladas-e-reforco-de-versoes-latest
     status: confirmed
     impact: 5
@@ -51,7 +51,7 @@ nodes:
   - id: F0_ALICERCE_FIACAO
     node_type: entity
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: deploy-em-producao-health-ok-pwa-true-invocacao-nova-auth-enforce-noop-do-mecanismo-e-estabilidade
     status: done
     impact: 5
@@ -67,7 +67,7 @@ nodes:
   - id: F1_FAROL_PESQUISA
     node_type: entity
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: workflow-wf-f6c09d35-8a7-lancado-15-lentes-5-eixos-com-schema-fechado
     status: open
     impact: 5
@@ -78,7 +78,7 @@ nodes:
   - id: F2_ESPINHA_THREADS
     node_type: entity
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: deploy-em-producao-threads-401-sem-token-spa-fallback-servindo-index-bench-22-testes-gzip-253kib
     status: done
     impact: 4
@@ -95,7 +95,7 @@ nodes:
   - id: F3_ROSTO_REDESIGN
     node_type: entity
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: deploy-pelo-mecanismo-ramo-cheio-limpo-bridge-1d45531-health-ok-38-testes-gzip-no-orcamento
     status: done
     impact: 4
@@ -111,7 +111,7 @@ nodes:
   - id: F4_GOVERNO_ADMIN
     node_type: entity
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: deploy-limpo-3a-vez-invite-anonimo-401-em-producao-usage-guards-ok-spa-admin-200-m2m-no-env
     status: done
     impact: 4
@@ -127,7 +127,7 @@ nodes:
   - id: F5_PRACA_DIVULGACAO
     node_type: entity
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: deploy-28f3ad96-provas-vivas-shared-404-noindex-nostore-share-anonimo-401-s-noindex-hit31-429-selftest-16-16-bench-verde
     status: done
     impact: 4
@@ -143,7 +143,7 @@ nodes:
   - id: E_DEMO_CAMPO_2026_08_14
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: demo-real-do-maestro-desktop-e-mobile-8-achados-com-screenshot-curas-em-29b946da
     status: confirmed
     impact: 4
@@ -159,7 +159,7 @@ nodes:
   - id: E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: sonda-agente-real-cwd-workspace-bypass-respondeu-14-linhas-do-.env-e-16-re-sondas-das-curas
     status: confirmed
     impact: 5
@@ -176,7 +176,7 @@ nodes:
   - id: F_ID_1_ADOCAO_LIMPA
     node_type: entity
     plane: DEV
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: deploy-2e10b497-dogfood-catch-up-LIMPO-comandos-onion-50-vivos-cross-workspace-VIZINHO_BLOQUEADO-vendor-manifest-5-5
     status: done
     impact: 4
@@ -193,7 +193,7 @@ nodes:
   - id: F_ID_2_CONTEXTOS_ORG
     node_type: entity
     plane: DEV
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: deploy-83033b25-org-granaai-povoada-dual-token-7-ataques-fail-closed-conflito-sem-marcadores-realpath-nega-symlink
     status: done
     impact: 4
@@ -209,7 +209,7 @@ nodes:
   - id: F_ID_3_SUPERFICIE
     node_type: entity
     plane: PROD
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: deploy-completo-org-token-switcher-membros-perfil-ALTOs-curados-teste-navegador-do-maestro-6-bugs-curados
     status: done
     impact: 4
@@ -226,7 +226,7 @@ nodes:
   - id: F_ID_4_MGM
     node_type: entity
     plane: PROD
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: deploy-600cd9b-rotas-401-me-referrals-e-admin-referrals-store-atomico
     status: done
     impact: 3
@@ -243,7 +243,7 @@ nodes:
   - id: Q_GESTAO_USUARIOS_E_WORKSPACES
     node_type: question
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: pedido-do-maestro-na-demo-2026-08-14-decisoes-de-desenho-abertas
     status: open
     impact: 4
@@ -254,7 +254,7 @@ nodes:
   - id: E_ROLE_BRIDGE_USER_CARREGAVA_ADMIN
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: management-api-delete-204-role-bridge-admin-criada-201-scopes-finais-listados
     status: confirmed
     impact: 5
@@ -270,7 +270,7 @@ nodes:
   - id: Q_G5_DOGFOOD_GO_LIVE
     node_type: question
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: gate-definido-f5-em-producao-relogio-de-dogfood-correndo
     status: open
     impact: 4
@@ -280,7 +280,7 @@ nodes:
   - id: F6_PONTE_BRAIN_DEFERRED
     node_type: entity
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: explicitamente-fora-do-programa-portas-abertas-a-custo-zero
     status: open
     impact: 3
@@ -291,7 +291,7 @@ nodes:
   - id: Q_G1_CORTE_DO_DEFER_DROP
     node_type: question
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: selado-pelo-maestro-2026-08-14-como-proposto-com-pr03b-na-f0
     status: done
     impact: 5
@@ -301,7 +301,7 @@ nodes:
   - id: E_OPENCLAW_TESE_MENSAGEIRO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.9
     status: confirmed
     impact: 4
@@ -317,7 +317,7 @@ nodes:
   - id: E_MISSION_CONTROL_CONCORRENTE_DIRETO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.88
     status: confirmed
     impact: 4
@@ -333,7 +333,7 @@ nodes:
   - id: E_AUTOMODE_BACKLASH_APROVACAO_BINARIA
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.85
     status: confirmed
     impact: 4
@@ -349,7 +349,7 @@ nodes:
   - id: E_CHAT_MORTO_VS_GENUI_REJEITADA
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.65
     status: confirmed
     impact: 4
@@ -365,7 +365,7 @@ nodes:
   - id: E_MEMORIA_BITEMPORAL_VENCE_MEM0
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.9
     status: confirmed
     impact: 4
@@ -381,7 +381,7 @@ nodes:
   - id: E_PROGRESSO_VISIVEL_3X_RETENCAO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.5
     status: confirmed
     impact: 4
@@ -397,7 +397,7 @@ nodes:
   - id: E_IOS_PWA_TETO_DURO_SYNC
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.75
     status: confirmed
     impact: 4
@@ -413,7 +413,7 @@ nodes:
   - id: E_OPENWEBUI_LICENCA_OPENWASHING
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.85
     status: confirmed
     impact: 4
@@ -429,7 +429,7 @@ nodes:
   - id: E_OIDC_TABLE_STAKE_MAL_RESOLVIDO
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.8
     status: confirmed
     impact: 4
@@ -445,7 +445,7 @@ nodes:
   - id: E_PRICING_PISO_20_SEAT
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lente-do-workflow-wf-f6c09d35-8a7-com-url-primaria-conf-0.55
     status: confirmed
     impact: 4
@@ -461,7 +461,7 @@ nodes:
   - id: E_TETOS_DA_PESQUISA
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: completeness-critic-do-proprio-run-7-lacunas-nomeadas
     status: confirmed
     impact: 3
@@ -477,7 +477,7 @@ nodes:
   - id: D_G1_POSICAO_E_CORTE_SELADOS
     node_type: decision
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: askuserquestion-2026-08-14-selar-como-proposto-e-pr03b-na-f0-ja
     status: confirmed
     impact: 5
@@ -493,7 +493,7 @@ nodes:
   - id: E_MULTICONVERSA_TABLE_STAKE
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: lentes-a1-a2-e-issue-8928-relida-ao-vivo-pelo-10o-elenxo-fechada-2025-01-31
     status: confirmed
     impact: 4
@@ -509,7 +509,7 @@ nodes:
   - id: E_QUOTA_GAP_FECHADO_ABRIL_2026
     node_type: evidence
     plane: DEV
-    verified_at: 2026-08-14
+    verified_at: "2026-08-14"
     verified_against: 10o-elenxo-releu-as-4-issues-na-api-do-github-todas-closed-completed
     status: confirmed
     impact: 4
@@ -525,7 +525,7 @@ nodes:
   - id: Q_G3_DEMO_DO_MAESTRO
     node_type: question
     plane: DEV
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: roteiro-conferido-item-a-item-contra-evidencia-6-de-8-com-rastro
     status: done
     impact: 3
@@ -539,7 +539,7 @@ nodes:
   - id: D_FASE_ID_CONTEINER_DE_IDENTIDADE
     node_type: decision
     plane: PROD
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: fase-f-id-entregue-em-producao-bridge-c91374d
     status: done
     impact: 5
@@ -555,7 +555,7 @@ nodes:
   - id: F_ID_2_DUAL_TOKEN_CONTEXTO
     node_type: decision
     plane: PROD
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: resolveCtx-fail-closed-em-producao-403-sem-vinculo
     status: done
     impact: 4
@@ -570,7 +570,7 @@ nodes:
   - id: F_ID_4_MGM_REFERRALS
     node_type: decision
     plane: PROD
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: elenxo-f-id-4-13-achados-curados-bridge-c91374d
     status: done
     impact: 3
@@ -586,7 +586,7 @@ nodes:
   - id: E_CONVITE_FUNCIONA_EMAIL_LOGIN
     node_type: evidence
     plane: PROD
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: tenant-signInAcceptsEmail-medido-vivo-08-15
     status: confirmed
     impact: 3
@@ -601,7 +601,7 @@ nodes:
   - id: Q_G_ID_PROVA_HUMANA
     node_type: question
     plane: DEV
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: rastros-medidos-no-tenant-e-no-ledger-apos-a-prova-do-maestro
     status: done
     impact: 4
@@ -616,7 +616,7 @@ nodes:
   - id: D_ROUND_INVITE_SIGNUP_PROFILE
     node_type: decision
     plane: PROD
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: rodada-completa-em-producao-bridge-9ba71af0-provas-curl
     status: done
     impact: 4
@@ -631,7 +631,7 @@ nodes:
   - id: Q_ROUND_HUMAN_PROOF
     node_type: question
     plane: DEV
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: 5-de-5-o-ultimo-item-fechado-por-acao-humana-na-tela-revoked-medido-mais-email-atestado
     status: done
     impact: 3
@@ -646,7 +646,7 @@ nodes:
   - id: Q_F3_DECISOES_DE_ACABAMENTO
     node_type: question
     plane: DEV
-    verified_at: 2026-08-16
+    verified_at: "2026-08-16"
     verified_against: extraidas-do-G3-ao-fechar-para-nao-morrerem-com-o-gate
     status: open
     impact: 2
@@ -656,7 +656,7 @@ nodes:
   - id: E_ELENXO_ROUND_CURADO
     node_type: evidence
     plane: PROD
-    verified_at: 2026-08-15
+    verified_at: "2026-08-15"
     verified_against: provas-vivas-5-de-5-bridge-867f95de
     status: confirmed
     impact: 4

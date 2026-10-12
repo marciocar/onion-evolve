@@ -1,8 +1,8 @@
 meta:
   id: slm-frameworks-2026-10
   schema_version: "1"
-  baseline: 2026-10-05
-  review_after: 2027-10-05   # cadência DOUTRINA = 12 meses. Tipo dominante: 31 das 37 evidências ancoradas são
+  baseline: "2026-10-05"
+  review_after: "2027-10-05"   # cadência DOUTRINA = 12 meses. Tipo dominante: 31 das 37 evidências ancoradas são
                              # MÉTODO de avaliação/especialização (Smol Training Playbook, HF Evaluation Guidebook,
                              # HF LLM Course cap. 11, Hamel, Eugene Yan, Google Rules of ML, guia da Anthropic,
                              # paper da NVIDIA) — prosa de método que muda devagar. A metade FERRAMENTA (lighteval,
@@ -58,7 +58,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'pedido do maestro relayed verbatim pelo harness deste run: "criar um espaço separado, fazer esta pesquisa e direcionar a execução, seguindo o padrão do Onion Evolve, ser Gradual, (Ex: spike, PoC, mvp, ...), pesquisa para saber o que entra e o que sai e como, qual é o resultado final possível, exemplos esperados ... tem um framework para seguir do huggingface e outros ... pesquisa completa progressiva, com formulários com sugestões, explicações e recomendações" (grafia normalizada). O mote "modelo = Dogfood + KG-SSOT First + Runtime SDAAL encarnado; o moat é o mecanismo verificável" veio do texto computado do workflow, coerente com as memórias quatro-pilares-definidos-pelo-maestro e onion-moat-verifiable-mechanism.'
     label: 'ENQUADRAMENTO DO MAESTRO: o roteiro do Onion SLM é GRADUAL (spike → PoC → MVP → …), em espaço separado, e cada etapa precisa declarar o que entra, o que sai e como passa; a pesquisa é progressiva e conduzida por FORMULÁRIOS com sugestões, explicações e recomendações. Consequência de leitura: o vocabulário das etapas é do maestro (não das fontes), e onde as fontes calam (limiares) a decisão vira pergunta ao maestro com opções — não número inventado. O moat segue sendo o mecanismo verificável, não o modelo.'
     trace: 'harness do workflow onion-research (2026-10-05)'
@@ -73,7 +73,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.335-338 nesta worktree (branch research/onion-slm-roadmap-2026-10) — D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, node_type decision, status: done'
     label: 'ÂNCORA CROSS-GRAFO (espelho, não editável daqui): nanochat-onion-2026-10#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, SELADA done — A operante: não treinar agora; fine-tune só após eval de domínio que falhe; C (SLM-ferramenta de conjunto fechado via SDAAL) viva em gatilho nomeado. Esta rodada não a revisa.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10'
@@ -89,7 +89,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.548-553 nesta worktree — Q_EVAL_DE_DOMINIO_DO_ONION, node_type question, status: open'
     label: 'ÂNCORA CROSS-GRAFO: nanochat-onion-2026-10#Q_EVAL_DE_DOMINIO_DO_ONION (open) — o eval de domínio, pré-requisito de B, C e D, que hoje NÃO EXISTE. Esta rodada acrescenta-lhe três requisitos de método (ver C_EVAL_SET_PRIVATE_EXCLUDED_FROM_DOOR e C_LLM_JUDGE_VETOED_SINGLE_ANNOTATOR) e nenhum tamanho mínimo ancorado.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#Q_EVAL_DE_DOMINIO_DO_ONION'
@@ -105,7 +105,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.997-1003 nesta worktree — Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF, node_type question, status: open'
     label: 'ÂNCORA CROSS-GRAFO: onion-slm-2026-10#Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF (open) — proposta: o eval de domínio começa medindo ZERO-SHOT os especialistas prontos (OPF e GLiNER2-PII para de-id pt-BR; NuExtract3 e GLiNER2.5 para extração tipada) contra o LLM atual, F1 como piso, holdout de erros reais, custo medido na VPS; base para fine-tune só se todos falharem.'
     trace: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF'
@@ -121,7 +121,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.980-986 nesta worktree — C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS, node_type claim, status: open'
     label: 'ÂNCORA CROSS-GRAFO: onion-slm-2026-10#C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS (open) — F1 automático é PISO, não medida; o gabarito vem de nós SELADOS; o holdout de detecção usa ERROS REAIS do corpus (refuted/superseded/drifted com aresta nomeada); rótulo por corrupção serve a treino, não certifica.'
     trace: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS'
@@ -137,7 +137,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.964-970 nesta worktree — C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT, node_type claim, status: open'
     label: 'ÂNCORA CROSS-GRAFO: onion-slm-2026-10#C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT (open) — SLM ajustado vence em tarefa ESTREITA de conjunto fechado e perde em conhecimento amplo; prompt primeiro, fine-tune só quando o prompt incha.'
     trace: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT'
@@ -153,7 +153,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md l.109-110 nesta worktree: "Smol Training Playbook: OMITIDO — o leitor não produziu claim nem marcou inalcançável. É objeção sobrevivente por omissão (cláusula 6)." (o E_LACUNAS daquele grafo NÃO o menciona; está na síntese e no run-wf_78edad4f-896.json l.1270)'
     label: 'ÂNCORA CROSS-GRAFO: a rodada onion-slm-2026-10 OMITIU o Smol Training Playbook (sem claim e sem inalcançável). Esta rodada o leu e ancorou 5 claims — fecha a omissão no eixo "quando treinar e quando não", mas as ablações são de PRÉ-TREINO, sem transferência ao Onion.'
     trace: 'docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md'
@@ -170,7 +170,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "many failed training projects didn''t fail because of bad hyperparameters or buggy code; they failed because someone decided to train a model they didn''t need." — LOCATOR: Smol Training Playbook, seção Why: The Question Nobody Wants to Answer. Tier 7 propagado (o leitor declarou 7 para outras claims da mesma fonte). ancorada por verificador independente'
     source_tier: 7
     source_kind: primary
@@ -188,7 +188,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Spend a few days building on top of Qwen3, Gemma 3, or another current state-of-the-art (SOTA) model. Can you reach your performance goals through prompting, tool use, or post-training?" — LOCATOR: Smol Training Playbook, seção Production: Why Can''t You Use an Existing Model? Tier 7 propagado. ancorada por verificador independente'
     source_tier: 7
     source_kind: primary
@@ -206,7 +206,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Change one thing at a time. Keep everything else identical between experiments." — LOCATOR: Smol Training Playbook, Rules of Engagement (ablações). ancorada por verificador independente'
     source_tier: 7
     source_kind: primary
@@ -224,7 +224,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Ablations and debugging consumed a total of 161,280 GPU hours, more than half the cost of our main training run (276,480 GPU hours)." — LOCATOR: Smol Training Playbook, Estimating Ablation Cost. ancorada por verificador independente'
     source_tier: 7
     source_kind: primary
@@ -242,7 +242,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "We train for 45B tokens to ensure we get stable signal, though ~35B is Chinchilla-optimal for this model size." — LOCATOR: Smol Training Playbook, Ablation Setup. Tier 7 propagado. ancorada por verificador independente'
     source_tier: 7
     source_kind: primary
@@ -261,7 +261,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Take 50 random samples and manually inspect them:" — LOCATOR: evaluation-guidebook, designing-your-automatic-evaluation.md, Choosing a dataset > Selecting an existing dataset > #### Samples (linhas 23-32). ancorada por verificador independente'
     source_tier: 8
     source_kind: primary
@@ -279,7 +279,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "**your evaluation result will only be as good as your evaluation dataset**." — LOCATOR: evaluation-guidebook, designing-your-automatic-evaluation.md, Choosing a dataset, parágrafo de abertura (linha 4); preferência por especialistas na linha 9. ancorada por verificador independente'
     source_tier: 8
     source_kind: primary
@@ -297,7 +297,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "you should assume that a dataset publicly available on the internet is or will be contaminated." — LOCATOR: evaluation-guidebook, automated-benchmarks/tips-and-tricks.md, Managing contamination (linhas 4-9, 11). ancorada por verificador independente'
     source_tier: 8
     source_kind: primary
@@ -316,7 +316,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "`transformers`: Evaluate models on CPU or one or more GPUs using [🤗 Accelerate](https://github.com/huggingface/transformers)" — LOCATOR: docs/lighteval, Key Features > Multi-Backend Support. Tier 9 propagado (declarado para outras claims da mesma doc). ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -334,7 +334,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "saving and exploring detailed, sample-by-sample results to debug and see how your models stack up." — LOCATOR: docs/lighteval, parágrafo de abertura. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -352,7 +352,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "You need to define a prompt function that will convert a line from your dataset to a document to be used for evaluation." — LOCATOR: docs/lighteval/adding-a-custom-task, Step 2: Define the Prompt Function. Tier 9 propagado. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -370,7 +370,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "lighteval accelerate \ "model_name=openai-community/gpt2" \ "myothertask|3" \ --custom-tasks community_tasks/my_custom_task.py" — LOCATOR: docs/lighteval/adding-a-custom-task, Running Your Custom Task > Example Usage. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -388,7 +388,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "`f1_score`: Average F1 score in terms of word overlap between the model output and gold (normalisation optional)." — LOCATOR: docs/lighteval/metric-list, Automatic metrics for generative tasks > Base. Tier 9 propagado. ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -406,7 +406,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "sample_level_fn=lambda x: x, # How to compute score for one sample corpus_level_fn=np.mean, # How to aggregate the sample metrics" — LOCATOR: docs/lighteval/adding-a-custom-task, Step 3: Creating Custom Metrics (SampleLevelMetric). ancorada por verificador independente'
     source_tier: 9
     source_kind: vendor-on-self
@@ -425,7 +425,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Need additional performance beyond what prompting can achieve" — LOCATOR: huggingface.co/learn/llm-course chapter11/3, When to Use SFT. ancorada por verificador independente'
     source_tier: 7
     source_kind: primary
@@ -443,7 +443,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "the cost of using a large general-purpose model outweighs the cost of fine-tuning a smaller model" — LOCATOR: chapter11/3, When to Use SFT. ancorada por verificador independente'
     source_tier: 7
     source_kind: primary
@@ -461,7 +461,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "a task-specific dataset structured with input-output pairs. Each pair should consist of: An input prompt, The expected model response" — LOCATOR: chapter11/3, seção Dataset Preparation (não "Dataset Requirements"). ancorada por verificador independente'
     source_tier: 7
     source_kind: primary
@@ -479,7 +479,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "start with small rank values (4-8) for LoRA and monitor training loss. Use validation sets to prevent overfitting and compare results with full fine-tuning baselines when possible." — LOCATOR: chapter11/4, bloco de boas práticas do LoRA. ancorada por verificador independente'
     source_tier: 7
     source_kind: primary
@@ -497,7 +497,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Develop custom evaluation datasets that reflect your actual use case" — LOCATOR: chapter11/5, Custom Evaluation (passo 3 de 4); caveat na seção de benchmarks. Tier 7 propagado. ancorada por verificador independente'
     source_tier: 7
     source_kind: primary
@@ -516,7 +516,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Unit tests for LLMs are assertions (like you would write in pytest)." — LOCATOR: hamel.dev/blog/posts/evals/, Level 1: Unit Tests. Tier NÃO declarado pelo leitor (campo ausente). ancorada por verificador independente'
     source_kind: engineer
     label: 'ANCORADA: três níveis — L1 assertions, L2 avaliação humana+modelo sobre traces, L3 A/B; L1 é o degrau barato e inicial e mapeia ao gate determinístico do Onion. Elenxo SOBREVIVEU: os níveis são CAMADAS, não fases com passagem ("There isn''t a strict formula as to when to introduce each level" — a cadência foi rejeitada na ancoragem). Prova menos que spike → PoC → MVP.'
@@ -533,7 +533,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Error analysis is the most important activity in evals. Error analysis helps you decide what evals to write in the first place." — LOCATOR: hamel.dev/blog/posts/evals-faq/, Q: Why is "error analysis" so important in AI evals, and how is it performed? Tier NÃO declarado pelo leitor. ancorada por verificador independente'
     source_kind: engineer
     label: 'ANCORADA: a análise de erros vem PRIMEIRO e decide quais evals escrever. Elenxo NÃO sobreviveu: prova exatamente "erros reais selados antes de qualquer modelo" (C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS) — a âncora mais forte da rodada para a porta 0.'
@@ -550,7 +550,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "99% of the labor involved with fine-tuning is assembling high-quality data that covers your AI product''s surface area." — LOCATOR: hamel.dev/blog/posts/evals/, Eval Systems Unlock Superpowers For Free > Fine-Tuning. Tier NÃO declarado pelo leitor. ancorada por verificador independente'
     source_kind: engineer
     label: 'ANCORADA: fine-tuning vem depois de existir infraestrutura de eval, e quase todo o trabalho é montar dados, não treinar. Elenxo SOBREVIVEU e INVERTEU parte da leitura: o argumento é que, COM evals, o ajuste fica barato — empurra para ajustar DEPOIS, não veta. "Não treinar agora" só se sustenta enquanto o eval não existe.'
@@ -568,7 +568,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Recall, precision, ROC-AUC, PR-AUC, separation of distributions" — LOCATOR: eugeneyan.com/writing/evals, seção Classification/Extraction. ancorada por verificador independente'
     source_tier: 7
     source_kind: engineer
@@ -586,7 +586,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "The similarity distributions of positive and negative instances are too close...not discriminative enough to cut a threshold." — LOCATOR: eugeneyan.com/writing/evals, seção Metrics That Don''t Work. ancorada por verificador independente'
     source_tier: 7
     source_kind: engineer
@@ -604,7 +604,7 @@ nodes:
     status: confirmed
     impact: 1
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "With a thousand samples or more, it becomes a solid factual consistency eval and may be good enough as a hallucination guardrail." — LOCATOR: eugeneyan.com/writing/evals, seção Summarization. ancorada por verificador independente'
     source_tier: 7
     source_kind: engineer
@@ -622,7 +622,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Most folks have human annotators as the baseline. Here, we aim for the LLM-human correlation to match human-human correlation." — LOCATOR: eugeneyan.com/writing/llm-evaluators, seção Human Annotation. ancorada por verificador independente'
     source_tier: 7
     source_kind: engineer
@@ -641,7 +641,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "If machine learning is not absolutely required for your product, don''t use it until you have data." — LOCATOR: developers.google.com/machine-learning/guides/rules-of-ml, Rule #1: Don''t be afraid to launch a product without machine learning. ancorada por verificador independente'
     source_tier: 9
     source_kind: primary
@@ -659,7 +659,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Before formalizing what your machine learning system will do, track as much as possible in your current system." — LOCATOR: rules-of-ml, Rule #2: First, design and implement metrics. ancorada por verificador independente'
     source_tier: 9
     source_kind: primary
@@ -677,7 +677,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Make sure that the infrastructure is testable, and that the learning parts of the system are encapsulated so that you can test everything around it." — LOCATOR: rules-of-ml, Rule #5: Test the infrastructure independently from the machine learning. ancorada por verificador independente'
     source_tier: 9
     source_kind: primary
@@ -695,7 +695,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "After you have a working end to end system with unit and system tests instrumented, Phase II begins." — LOCATOR: rules-of-ml, ML Phase II: Feature Engineering, introdução. ancorada por verificador independente'
     source_tier: 9
     source_kind: primary
@@ -714,7 +714,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Building a successful LLM-based application starts with clearly defining your success criteria and then designing evaluations to measure performance against them." — LOCATOR: platform.claude.com/docs/en/test-and-evaluate/define-success, Define Success Criteria, abertura (parágrafo 1). Tier NÃO declarado pelo leitor. ancorada por verificador independente'
     source_kind: primary
     label: 'ANCORADA: critérios de sucesso específicos, mensuráveis, alcançáveis e relevantes são definidos ANTES de construir os evals. Elenxo NÃO sobreviveu: prova a ordem critério → eval. Só metade do guia fecha: as 4 claims de "develop test cases" (distribuição real, bordas, volume, automatizar correção) foram REJEITADAS por exagero.'
@@ -731,7 +731,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Base your targets on industry benchmarks, prior experiments, AI research, or expert knowledge. Your success metrics should not be unrealistic to current frontier model capabilities." — LOCATOR: define-success, Define Your Success Criteria > Achievable. Tier NÃO declarado pelo leitor. ancorada por verificador independente'
     source_kind: primary
     label: 'ANCORADA: a meta se ancora em benchmark, experimento prévio, pesquisa ou conhecimento de especialista e não pode exceder a capacidade atual. Elenxo SOBREVIVEU: a frase prende a meta a "current frontier model capabilities" (LLMs de fronteira, não SLMs especialistas); ler "prior experiments" como "medir especialista pronto zero-shot" é inferência plausível que o guia não manda.'
@@ -749,7 +749,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "deploying instrumentation to log all non-HCI agent calls, capturing input prompts, output responses, contents of individual tool calls, and optionally latency metrics for a later targeted optimization." — LOCATOR: arXiv 2506.02153, Seção 6, passo S1. Tier NÃO declarado pelo leitor. ancorada por verificador independente'
     source_kind: paper
     label: 'ANCORADA: S1 — entrada: chamadas não-HCI do agente; saída: log seguro e anonimizado de prompts, respostas e tool calls; sem critério numérico (é instrumentação). Elenxo SOBREVIVEU: na NVIDIA a tarefa EMERGE dos logs (S1 → S3); no Onion a tarefa (PII/extração) foi escolhida de cima para baixo, antes de qualquer log — molde INVERTIDO, a declarar.'
@@ -766,7 +766,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Once a satisfactory amount of data has been collected (10k-100k examples being sufficient for fine-tuning of small models as a rule of thumb [5, 22]), it is necessary to remove any PII, PHI" — LOCATOR: arXiv 2506.02153, Seção 6, passo S2. Tier NÃO declarado pelo leitor. ancorada por verificador independente'
     source_kind: paper
     label: 'ANCORADA: S2 — entrada: logs do S1; saída: dataset curado sem PII/PHI; o único limiar é regra de bolso de VOLUME DE TREINO (10k-100k), não critério de qualidade. Elenxo SOBREVIVEU: é CIRCULAR para o Onion — S2 manda remover PII antes de especializar, e a tarefa candidata do Onion É o detector de PII; e 10k-100k não dimensiona eval.'
@@ -783,7 +783,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Employ unsupervised clustering techniques on the collected prompts and agent actions to identify recurring patterns of requests or internal agent operations [35, 42, 21]. These clusters help define candidate tasks" — LOCATOR: arXiv 2506.02153, Seção 6, passo S3. Tier NÃO declarado pelo leitor. ancorada por verificador independente'
     source_kind: paper
     label: 'ANCORADA: S3 — entrada: prompts e ações curados; saída: clusters que definem tarefas candidatas; SEM critério de saída. Elenxo SOBREVIVEU: não fornece gate e não se aplica ao Onion, cuja tarefa já foi escolhida.'
@@ -800,7 +800,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Criteria for selection include the SLM’s inherent capabilities (e.g., instruction following, reasoning, context window size), its performance on relevant benchmarks for the task type, its licensing, and its deployment footprint" — LOCATOR: arXiv 2506.02153, Seção 6, passo S4. Tier NÃO declarado pelo leitor. ancorada por verificador independente'
     source_kind: paper
     label: 'ANCORADA: S4 — entrada: tarefas do S3; saída: SLMs candidatos por tarefa; critérios: capacidade, benchmark do tipo de tarefa, licença e footprint; NÃO manda medir zero-shot antes de treinar. Elenxo SOBREVIVEU: seleciona por benchmark GENÉRICO, que C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS rejeita como suficiente — no Onion o S4 é SUBSTITUÍDO pelo eval selado; licença e footprint se aproveitam como filtro de entrada.'
@@ -817,7 +817,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "fine-tune the chosen SLMs on these specialized datasets. PEFT techniques such as LoRA [34] or QLoRA [20] can be leveraged to reduce computational costs and memory requirements" — LOCATOR: arXiv 2506.02153, Seção 6, passo S5. Tier NÃO declarado pelo leitor. ancorada por verificador independente'
     source_kind: paper
     label: 'ANCORADA: S5 — entrada: dataset de S2/S3; saída: SLM especialista afinado por PEFT (LoRA/QLoRA), ajuste completo ou destilação; NÃO há gate de aceitação medido entre S5 e S6. Elenxo SOBREVIVEU: o molde NVIDIA não tem gate medido em ponto nenhum — serve de ESQUELETO de etapas, não de critério de passagem.'
@@ -835,7 +835,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'retorno do workflow onion-research mode primaries de 2026-10-05 (run wf_e53f21ed-be6): listas de claims ANCORADAS (37), REJEITADAS na ancoragem (17), fontes inalcançáveis (nenhuma) e o Elenxo completo (36 objeções + gapsClosed + gapsOpen + recommendation) lido no journal do run, linha 39'
     source_kind: internal-audit
     label: 'CONTABILIDADE DA RODADA DE PRIMÁRIAS (2026-10-05). FONTES: 9 lidas × 0 inalcançáveis (smol-playbook, hf-evaluation-guidebook, lighteval, hf-llm-course-finetune, hamel-evals, eugene-yan-evals, google-rules-ml, anthropic-evals-guide, nvidia-slm-conversion). CLAIMS: 37 ANCORADAS (viraram nó) × 17 REJEITADAS na ancoragem (NÃO viram nó), TODAS por EXAGERO (zero não-encontradas — rejeitadas por esticar o texto, não por inexistência). Rejeitadas e motivo: [smol] eval por tarefa antes de treinar (a quote trata de ler ablações DEPOIS de lançadas; outras passagens sustentam, não ancoradas); [guidebook] pior caso em domínio sensível com PII e "F1 médio insuficiente" (PII não aparece; F1 só citado como métrica possível); dados sintéticos "alternativa, não certificação" (acréscimo editorial); avaliar o LLM-juiz com 50 exemplos, métrica binária e limiar ANTES (binário não é exigência; "antes" não está no texto); [hf-course] gate pós-treino held-out/template/retenção ("consider", não "manda"; sem critério de passagem); [hamel] cadência L1/L2/L3 com gates (prática pessoal; "There isn''t a strict formula"); olhar os dados como "fundação contínua" do L2 (a fundação do L2 é o L1); dimensionamento do 1º dataset como gate do spike (o critério é SATURAÇÃO — "Continue until new traces stop revealing failure modes" — com 100 traces de mínimo; 100-200 por modo de falha é do Stage 2); [yan] evals de prateleira não correlacionam (quote remontada, seção inexistente); humano padrão-ouro geral (o texto restringe a tarefas complexas e "for now"); [google] heurística dá metade do ganho como baseline (ilustração condicional); Regra 4 "o ganho vem da infraestrutura" (infra é esforço/risco, não fonte do ganho); [anthropic] temas vagos "devem" virar limiar (o texto diz "can be quantified"); privacidade com eval por critério e "não só acurácia" (generalização de exemplos); distribuição real "veta eval só sintético" (contrariado pelo exemplo de consultas simuladas); "volume sobre qualidade do gabarito" (desloca o contraste; omite "when possible"); [nvidia] laço S6 que "veta F1 genérico" (F1 não aparece; o paper não veta nada sobre gates). TIER: hamel, anthropic e nvidia sem tier declarado pelo leitor — campo AUSENTE; valid_from não declarado por nenhum leitor. FECHA PARCIALMENTE uma omissão do corpus: o Smol Training Playbook, OMITIDO na rodada onion-slm-2026-10, foi lido (eixo "quando treinar"; ablações sem transferência). LACUNAS QUE CONTINUAM ABERTAS (gapsOpen do Elenxo): (1) Smol: re-ancorar as passagens que sustentam eval-antes-de-treinar; (2) guidebook: LLM-as-judge (avaliar o avaliador, 50 de baseline, limiar), dados sintéticos e o "~100 amostras mínimo" sem âncora; (3) Anthropic: "develop test cases" com as 4 claims rejeitadas; (4) lighteval: serventia para modelos NÃO generativos (span/token) não provada; dataset local/privado sem âncora (hf_repo) em tensão com contaminação; (5) HF Course: gate pós-treino rejeitado, nenhum critério numérico; (6) NVIDIA: zero gates de aceitação e molde invertido (tarefa escolhida antes dos logs; S2 depende do próprio detector de PII); (7) TRANSVERSAL: nenhuma fonte usa spike → PoC → MVP → produto — cunhagem do Onion a declarar com autoria e data; (8) TRANSVERSAL: "resultado final possível" e "exemplos esperados" por etapa NÃO fechados por fonte nenhuma; (9) TRANSVERSAL: nenhum critério NUMÉRICO de passagem em nenhuma das 9 fontes; o único gate explícito é qualitativo (Google, Fase II); (10) TRANSVERSAL: o eixo invariante de MERCADO/CAPITAL e de trajetória de ferramentas (lighteval × alternativas) está AUSENTE desta rodada — cláusula 4 da doutrina de pesquisa não cumprida; (11) Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF segue open — nenhum especialista foi MEDIDO, a rodada só reuniu método; (12) Q_EVAL_DE_DOMINIO_DO_ONION segue open — sem tamanho mínimo ancorado, sem segundo rotulador, sem política de exclusão da porta onion-core para o eval selado.'

@@ -1,8 +1,8 @@
 meta:
   id: slm-capitalizacao-2026-10
   schema_version: "1"
-  baseline: 2026-10-05
-  review_after: 2027-01-03   # cadencia MERCADO/CAPITAL = 90d. Justificativa do tipo dominante: a pergunta e de
+  baseline: "2026-10-05"
+  review_after: "2027-01-03"   # cadencia MERCADO/CAPITAL = 90d. Justificativa do tipo dominante: a pergunta e de
                              # CAPITALIZACAO e 13 das 25 evidencias ancoradas sao rodada/investidor/tracao/modelo
                              # de negocio declarado (LMArena, Braintrust, Galileo, Arize, Scale, Patronus). As
                              # paginas de PRECO (AA Pro US$417, Braintrust Pro US$249, curso US$4.200 rejeitado)
@@ -66,7 +66,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'grep -n "id: C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT" docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml -> l.988, status open, nesta worktree (branch research/onion-slm-roadmap-2026-10)'
     label: 'ANCORA CROSS-GRAFO (espelho, nao editavel daqui): onion-slm-2026-10#C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT (open) — o dinheiro vai para o MODELO pequeno (Liquid AI US$250M, Fastino seed US$17,5M via imprensa, NVIDIA em Thinking Machines); o escasso vira commodity que o Onion consome via SDAAL; o Onion nao compete ai.'
     trace: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT'
@@ -82,7 +82,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'sed -n 99,109p docs/onion/graph/onion-identity-2026-07.kg.yaml (C_IDENTITY_CANON confirmed: package.json AUSENTE, nao e npm) + D_NORTHSTAR_NS1_KG confirmed (l.929-932: adocao/curso/portabilidade sao VEICULO do KG, nao fim)'
     label: 'ANCORA CROSS-GRAFO (espelho): onion-identity-2026-07#C_IDENTITY_CANON (framework template em .claude, nao e produto npm, sem CLI standalone, plataforma unica Claude Code) + #D_NORTHSTAR_NS1_KG (norte = KG/conhecimento; curso e adocao sao VEICULO do KG, nao fim). Toda via de bilhetagem desta rodada e medida contra essas duas restricoes.'
     trace: 'docs/onion/graph/onion-identity-2026-07.kg.yaml#C_IDENTITY_CANON'
@@ -99,11 +99,11 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "We''ve raised $150M of Series A funding led by Felicis and UC Investments (University of California), with participation from Andreessen Horowitz, The House Fund, LDVP, Kleiner Perkins, Lightspeed Venture Partners, and Laude Ventures." — LOCATOR: post Series A da LMArena, paragrafo de abertura. ancorada por verificador independente. Tier: leitor nao declarou; herdado do mesmo post (9).'
     source_tier: 9
     source_kind: vendor-on-self
-    valid_from: 2026-01-06
+    valid_from: "2026-01-06"
     label: 'ANCORADA: LMArena levantou Serie A de US$150M (2026-01-06), liderada por Felicis e UC Investments, com a16z, The House Fund, LDVP, Kleiner Perkins, Lightspeed e Laude. Elenxo SOBREVIVEU: e captacao, nao receita — quem investe nao e quem paga.'
     trace: 'https://arena.ai/blog/series-a/'
     provenance:
@@ -118,11 +118,11 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "first evaluation product launched in September, which has resulted in a huge demand for: Real-world performance insights; Diverse, fresh, and expert-level data; Rigorous science; Testing environments" — LOCATOR: secao Momentum Driven by the Community, lista de itens. ancorada por verificador independente. Tier herdado do mesmo post (9).'
     source_tier: 9
     source_kind: vendor-on-self
-    valid_from: 2025-09-01
+    valid_from: "2025-09-01"
     label: 'ANCORADA: o 1o produto de avaliacao da LMArena (set/2025) gerou demanda por insights de desempenho real, dados frescos de nivel especialista, ciencia rigorosa de julgamento humano e ambientes de teste. Elenxo SOBREVIVEU: e autodeclaracao de demanda, nao diz quem compra nem a que preco; nao ha pagina de preco da LMArena entre as fontes. SUGERE: o que se vende ao lado do placar e DADO FRESCO + RIGOR + AMBIENTE DE TESTE — vocabulario que casa com eval de dominio com erros reais.'
     trace: 'https://arena.ai/blog/series-a/'
     provenance:
@@ -137,7 +137,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "This momentum has resulted in strong revenue growth, and we are using the opportunity to raise money so that we can move even faster to build new features and improve our product experience" — LOCATOR: secao Momentum Driven by the Community, ultimo paragrafo. ancorada por verificador independente.'
     source_tier: 9
     source_kind: vendor-on-self
@@ -155,11 +155,11 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Since announcing our $100M Seed round last year in May, LMArena has grown far faster than we imagined." — LOCATOR: secao Momentum Driven by the Community, abertura. ancorada por verificador independente.'
     source_tier: 9
     source_kind: vendor-on-self
-    valid_from: 2025-05-01
+    valid_from: "2025-05-01"
     label: 'ANCORADA: seed anterior de US$100M em maio/2025. A valuation (~US$1,7B pos-money na Serie A; US$600M na seed) NAO esta no post oficial — so na imprensa (tier inferior), e por isso NAO entra aqui como fato.'
     trace: 'https://arena.ai/blog/series-a/'
     provenance:
@@ -175,7 +175,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: Targets: "individuals and small organizations" — LOCATOR: artificialanalysis.ai/pricing, plano Pro (US$417/mes, desconto no anual). ancorada por verificador independente. Tier: leitor nao declarou; julgado 8 (fornecedor sobre o proprio preco).'
     source_tier: 8
     source_kind: vendor-on-self
@@ -193,7 +193,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Pro is valid for single seats only" — LOCATOR: artificialanalysis.ai/pricing, FAQ + cartao Enterprise. ancorada por verificador independente. Tier julgado 8.'
     source_tier: 8
     source_kind: vendor-on-self
@@ -211,7 +211,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Compute market model access with forecasts" — LOCATOR: artificialanalysis.ai/pricing, cartao Enterprise. ancorada por verificador independente. Tier julgado 8. ⚠ A QUOTE so sustenta o modelo de mercado de compute; workshops/educacao e AI strategy advisory NAO estao nela.'
     source_tier: 8
     source_kind: vendor-on-self
@@ -229,7 +229,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Export data for local analysis" — LOCATOR: artificialanalysis.ai/pricing, cartao Pro. ancorada por verificador independente. Tier julgado 8.'
     source_tier: 8
     source_kind: vendor-on-self
@@ -248,7 +248,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Scale''s proprietary datasets will remain private and unpublished, ensuring they cannot be exploited or incorporated into model training data." — LOCATOR: scale.com/blog/leaderboard. ancorada por verificador independente. Tier herdado do mesmo par de paginas (9).'
     source_tier: 9
     source_kind: vendor-on-self
@@ -266,7 +266,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "combining private datasets to prevent overfitting and open-source datasets for broad benchmarking and comparability" — LOCATOR: labs.scale.com/leaderboard, secao Robust Datasets for Reliable AI Benchmarks. ancorada por verificador independente.'
     source_tier: 9
     source_kind: vendor-on-self
@@ -284,7 +284,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "a platform to enable AI researchers, developers, enterprises, and public sector organizations to analyze, understand, and iterate on their AI models and production applications" — LOCATOR: scale.com/blog/leaderboard, descricao da Scale Evaluation. ancorada por verificador independente.'
     source_tier: 9
     source_kind: vendor-on-self
@@ -303,11 +303,11 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Braintrust has raised $80M to become the observability layer for production AI." — LOCATOR: blog Braintrust, anuncio Series B, abertura (17 February 2026). ancorada por verificador independente.'
     source_tier: 8
     source_kind: vendor-on-self
-    valid_from: 2026-02-17
+    valid_from: "2026-02-17"
     label: 'ANCORADA: Braintrust levantou US$80M em Series B liderada pela ICONIQ (2026-02-17), posicionando-se como camada de OBSERVABILIDADE para IA em producao. Elenxo SOBREVIVEU: prova menos do que parece para "eval como servico" — o capital paga eval EMBUTIDO numa camada de producao, nao eval avulso.'
     trace: 'https://www.braintrust.dev/blog/announcing-series-b'
     provenance:
@@ -322,11 +322,11 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "I''m also happy to welcome back prior investors Andreessen Horowitz, Greylock, Elad Gil, basecase capital, and others" — LOCATOR: blog Braintrust, anuncio Series B, paragrafo de investidores. ancorada por verificador independente.'
     source_tier: 8
     source_kind: vendor-on-self
-    valid_from: 2026-02-17
+    valid_from: "2026-02-17"
     label: 'ANCORADA: investidores da Braintrust — ICONIQ lidera; retornam a16z, Greylock, Elad Gil e basecase capital. Elenxo SOBREVIVEU: irrelevante para quem paga e quanto; registra so que a16z esta em DOIS ativos de avaliacao desta rodada (LMArena e Braintrust).'
     trace: 'https://www.braintrust.dev/blog/announcing-series-b'
     provenance:
@@ -341,7 +341,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Pro — $249/month - $100 model credits/month (+ token rates) - 5 GB processed data/month (+ $3/GB overage) - 50k scores/month (+ $1.50 per 1k overage)" — LOCATOR: braintrust.dev/pricing, plano Pro. ancorada por verificador independente.'
     source_tier: 8
     source_kind: vendor-on-self
@@ -360,7 +360,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "a single AI powered platform that enables end-to-end evaluation of AI systems" — LOCATOR: patronus.ai/blog/announcing-our-17-million-series-a, paragrafo do produto. ancorada por verificador independente.'
     source_tier: 8
     source_kind: vendor-on-self
@@ -378,7 +378,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "$45 million Series B funding round" — LOCATOR: galileo.ai/blog/announcing-our-series-b, abertura (lead Scale VP; participacao Premji, Databricks, Amex, Citi, ServiceNow, SentinelOne). ancorada por verificador independente.'
     source_tier: 8
     source_kind: vendor-on-self
@@ -396,7 +396,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Since the beginning of 2024, we''ve grown revenue by 834%" — LOCATOR: galileo.ai/blog/announcing-our-series-b, secao de tracao (tambem: "quadrupled our number of enterprise customers, and brought on six Fortune 50 companies"). ancorada por verificador independente.'
     source_tier: 8
     source_kind: vendor-on-self
@@ -414,7 +414,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Arize Phoenix OSS – The open-source AI observability and performance tracing tool launched in 2023, now with over two million monthly downloads and growing." — LOCATOR: anuncio Series C, secao sobre Phoenix OSS e uso dos recursos. ancorada por verificador independente. Tier: leitor nao declarou; julgado 8 (fornecedor sobre si).'
     source_tier: 8
     source_kind: vendor-on-self
@@ -433,7 +433,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Lifetime Access: Recordings, Materials & Every Future Cohort" — LOCATOR: maven.com/parlance-labs/evals, secao O que esta incluido. ancorada por verificador independente.'
     source_tier: 6
     source_kind: vendor-on-self
@@ -451,7 +451,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "Build evaluation systems that identify exactly what''s broken and what to fix next." — LOCATOR: parlance-labs.com, servicos de consultoria (sem preco na pagina). ancorada por verificador independente.'
     source_tier: 6
     source_kind: vendor-on-self
@@ -470,7 +470,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "as model capabilities change (hello reasoning and LM assistants), benchmarks need to follow!" — LOCATOR: discussao #1135, post fixado, secao Why? (conferido no texto cru da API e do HTML). ancorada por verificador independente. Tier: leitor nao declarou; julgado 8 (HF sobre o proprio leaderboard).'
     source_tier: 8
     source_kind: vendor-on-self
@@ -488,7 +488,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "a large-scale, community-driven expansion of MTEB, covering over 500 quality-controlled evaluation tasks across 250+ languages" — LOCATOR: arXiv 2502.13595, abstract. ancorada por verificador independente. Tier herdado do mesmo paper (7).'
     source_tier: 7
     source_kind: paper
@@ -506,7 +506,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "2 points were awarded for implementing the task and 4 points for each new language introduced by the task." — LOCATOR: arXiv 2502.13595, Apendice A, item New dataset. ancorada por verificador independente.'
     source_tier: 7
     source_kind: paper
@@ -524,7 +524,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "The managing group believes the point system successfully defined contribution terms but acknowledges it isn’t perfect." — LOCATOR: arXiv 2502.13595, secao Limitations, Credit Assignment for Large-scale Collaborations. ancorada por verificador independente.'
     source_tier: 7
     source_kind: paper
@@ -542,7 +542,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'QUOTE verbatim: "We actively encouraged participation from industry professionals, low-resource language communities, and academic researchers." — LOCATOR: arXiv 2502.13595, secao 2.1. ancorada por verificador independente.'
     source_tier: 7
     source_kind: paper
@@ -561,7 +561,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'retorno do workflow onion-research mode primaries de 2026-10-05: listas de claims ANCORADAS (25), REJEITADAS na ancoragem (21), fontes inalcancaveis (nenhuma) e o Elenxo (TRUNCADO na objecao 17)'
     source_kind: internal-audit
     label: 'CONTABILIDADE DA RODADA DE PRIMARIAS (2026-10-05). FONTES: 9 lidas x 0 inalcancaveis (lmarena-funding, artificial-analysis-business, scale-seal, braintrust-funding, patronus-galileo, arize-phoenix, hamel-course-consulting, hf-open-llm-leaderboard, mteb-maintenance). CLAIMS: 25 ANCORADAS (viraram no) x 21 REJEITADAS na ancoragem (nao viram no): 18 EXAGERADAS, 3 NAO-ENCONTRADAS. Rejeitadas e motivo: [lmarena] dois pagantes labs+empresas (texto diz que PRECISAM de avaliacao, nao que pagam; locator errado — esta em Why We Raised Now); comunidade de votos gratuitos como ativo do produto (50M votos/400+ avaliacoes/145k pontos corretos, ligacao com receita e do leitor); [AA] sem trial => funcionalidades exigem assinatura paga (a pagina so nega trial; ha leaderboards publicos); independencia e o ativo vendido (autodefinicao fiel, "ativo vendido" e inferencia; a politica esta no FAQ: "Providers cannot pay for results"); [scale] leaderboard como vitrine comercial (so sustenta canal de contato para inclusao); terceiro independente para governos (vem de fala de pessoa, nao da Scale); red teaming sustentado por dados privados (transfere tese de outra pagina; proprietario != privado); [braintrust] Notion/Replit/Cloudflare/Ramp/Dropbox como PAGANTES (o texto diz "using"); [patronus] US$17M com Datadog como "investidor estrategico" (rotulo do leitor); capital financia o juiz e nao o generalista (frase de plano 2024+, contraste inventado); Fortune 500 + erros capturados como prova de pagamento (uso, nao pagamento); [arize] ELv2 + AX com mesma instrumentacao como porta de entrada (interpretacao; "nao OSI" e conhecimento externo); Series C US$70M Adams Street (NAO-ENCONTRADA: fato sustentado, quote reconstruida); escada AX Free/US$50/Enterprise com ilimitados em todos (Experiments/Human annotations ilimitados so no Enterprise; "por volume" e inferencia); [hamel] coorte Out-Nov 2026 US$4.200 e 28 sessoes/11 licoes (NAO-ENCONTRADA: emenda de dois trechos; o preco 4200 USD existe no schema.org); 4.500 alunos como porta de entrada para consultoria (numero correto, funil e inferencia); [hf] 13K modelos/2 anos e sem sucessor unico (NAO-ENCONTRADA: secoes parafraseadas pelo fetcher; parte vem de comentario de 2025-03-19); v1 reconstruida e nao so mantida, 2M visitantes/300k membros (numeros verbatim, "reconstruida" e inferencia); 8 H100 como custo de compute recorrente (a nota so descreve hardware de reprodutibilidade); [mteb] credito de autoria e nao dinheiro (inferencia por silencio); README Apache-2.0 + so aponta o guia (o README nao escreve Apache-2.0; linka, nao hospeda; Contributing tem 4 links). LACUNAS QUE CONTINUAM ABERTAS: (1) NAO HA PAGINA DE PRECO DA LMARENA entre as fontes — o maior ativo de bench aberto desta rodada nao tem quem-paga-quanto ancorado; (2) o cartao Enterprise da AA precisa ser REANCORADO com o texto literal de workshops/educacao e AI strategy advisory — e ele que sustentaria a via treinamento/consultoria empacotada no bench; (3) o preco do curso (US$4.200) e o preco da consultoria Parlance seguem sem quote ancorada; (4) valuations so na imprensa (LMArena ~US$1,7B / US$600M); (5) NENHUMA fonte trata de eval de DOMINIO com erros reais como nicho, nem de corretor deterministico — a via especifica do Onion nao tem precedente medido; (6) a tensao bench ABERTO x valor probatorio (Scale: privado preserva prova) nao foi resolvida por nenhuma fonte; (7) nenhuma fonte mede receita de treinamento/consultoria em avaliacao em reais ou no Brasil; (8) o Elenxo chegou TRUNCADO na objecao 17: as objecoes 17-25 (Galileo tracao, Arize, Hamel, HF, MTEB) e o gapsOpen NAO foram lidos por este escritor — re-ler o journal do run antes de citar este no como completo; (9) as vias "gestao de federacao", "advisor de core/hub" e "membro externo de rede" NAO tem nenhuma primaria nesta rodada.'

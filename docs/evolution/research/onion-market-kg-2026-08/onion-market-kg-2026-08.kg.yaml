@@ -2,7 +2,7 @@ meta:
   id: onion-market-kg-2026-08
   schema_version: "1"
   layer: audit
-  baseline: 2026-08-02
+  baseline: "2026-08-02"
   date: 2026-08-02
   note: >
     Elenxo imersivo de DOIS EIXOS: interno (valor real de KG-SSOT, SDAAL e Elenxo — 5 lentes
@@ -26,7 +26,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: medicao-direta-HEAD-2026-08-02
     label: "A TESE QUE ORGANIZA TUDO: o laco read(KG) esta protegido por TEXTO; o laco write(KG) esta protegido por SCRIPT. write: 6 gates HARD no CI (REGRA 26/29/31/32/43/47) com resultado medivel — 103/103 docs cobertos, 50/50 grafos passando integridade. read: ZERO gates; e prosa nos 3 comandos cabeados e nada mede se foi lido"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -42,7 +42,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: 5-lentes-adversariais-wf_0b0267b9-362
     label: "3 DAS 5 LENTES INTERNAS VOLTARAM COM ZERO VALOR PROVADO. 13 pecas de cerimonia com numero: kg-console.sh (31 KB, a maior peca do motor KG) = 0 call-sites reais, so fixture de teste, 0 no CI, 1 pagina em 34 dias · /meta:kg-freshness = 0 runs em 34 dias · narrate = 2 narracoes para 50 grafos · 459/566 nos 'open' (81%) sem NENHUMA data · 13/50 grafos sem verified_at · camada domain com 6/6 instancias de 1 UNICO commit, e 4/6 PRE-ESCREVEM o veredito do radar no cabecalho (infalseavel por construcao). CONTRA-PESO: o ciclo de trabalho RODA (60 commits/7 dias) — a cerimonia esta na camada de AUTO-OBSERVACAO, nao no trabalho"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -58,7 +58,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: pista-dev-problema-wf_a489acb8-067
     label: "O KG E ARQUIVO DE AUDITORIA, NAO MOTOR DE TRABALHO (medido). O modo 'map' (F0-F4, o UNICO caminho especificado para popular a camada domain) NUNCA rodou dentro do onion-evolve; seu unico dogfood produziu grafo no repo de um ADOTANTE. 29 dos 30 grafos do core nascem NO MESMO COMMIT do doc de analise que sintetizam. engineer/start.md e engineer/plan.md — onde a feature NASCE — tem ZERO mencoes a KG. Fluxo de problema: existe-so-como-spec; o estado de um bug aberto vive em PROSA no diario, sem maquina de estados. PROVA REFLEXIVA: a propria pesquisa sobre por que o KG nao e consultado modelou seus 9 casos como TABELA EM PROSA e manteve o grafo 100% audit"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -74,7 +74,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: pesquisa-externa-itsm-cmdb-aiops
     label: "O CAMPO MADURO JA PAGOU ESSA CONTA: o CMDB fracassou por mais de 30 ANOS precisamente porque dependia de HUMANOS preencherem um repositorio PARALELO ao trabalho real. A correcao historica foi AUTOMATIZAR identificacao e reconciliacao, NAO disciplinar gente — a Forrester ja declarou 'CMDB is dead'. Nossa camada domain apresenta o MESMO sintoma medido: mantida a mao, paralela ao trabalho (plan/start sem mencao a KG), 6/6 com 1 commit, 81% dos nos open sem data. E o CodeSee (mapa visual de codebase para leitura humana passiva) MORREU em 2024-02-22 por ser visualizacao sem acao"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -90,7 +90,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 1.0
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: gh-api-repos-2026-08-02
     label: "NAO E UM PROJETO VIRAL, E UMA CATEGORIA FORMADA: 5 players independentes de 'KG de codebase para agente', ~230k estrelas somadas, TODOS nascidos em 2026 — colbymchenry/codegraph 64.059 (18/jan, o PRIMEIRO), Graphify-Labs/graphify 100.765 (03/abr, YC S26, skill /graphify para Claude Code), DeusData/codebase-memory-mcp 37.080 (24/fev, C puro, SLSA3+provenance+Scorecard), tirth8205/code-review-graph 28.032, harshkedia177/axon 725. AUTENTICIDADE VERIFICADA: razao estrela/fork entre 7 e 17 e forks na casa dos milhares (36.020 no maior) — nao e star-farming. TESE COMUM: grafo LOCAL, DETERMINISTICO, SEM LLM na indexacao, SEM vector store, consultado ANTES de agir"
     trace: "https://github.com/Graphify-Labs/graphify"
@@ -106,7 +106,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: correlacao-aristoteles-wf_eb01875e-962
     label: "ARISTOTELES COM RIGOR: o KG deles NAO e o nosso. (1) CONSTRUCAO — eles DERIVAM automaticamente de artefato objetivo e parseavel (codigo, via tree-sitter); nos ESCREVEMOS a mao um julgamento sobre decisao e evidencia, que nao tem fonte parseavel. (2) CONTEUDO — eles modelam ESTRUTURA (funcao chama funcao); nos modelamos DECISAO/PROVENIENCIA (por que X, o que refuta Y, quando foi verificado). (3) CONSUMO — eles sao consultados a cada acao; o nosso por auditoria pontual. Logo: CATEGORIA DIFERENTE, nao 'transfere' nem 'nao-transfere'. E o nosso lado nao tem ocupante — mas e MOAT NAO-REALIZADO, porque ninguem le o que escrevemos"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -122,7 +122,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.8
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: readme-graphify-2026-08-02
     label: "TRANSFERE, E E BARATO: o Graphify marca CADA ARESTA com confidence tag EXTRACTED (explicito na fonte) vs INFERRED (derivado por resolucao) — e a doutrina declarado!=verificado MECANIZADA DENTRO do grafo. Nosso analogo e derivavel de graca: no COM trace: = EXTRACTED, SEM trace: = INFERRED, computavel no kg-radar.sh SEM mudar o schema .kg.yaml — logo sem disparar a clausula de 'gramatica nova custa a todos os adotantes' que mantem gated o gate de interesse-de-fonte. Sao eixos ORTOGONAIS: interesse (vies) vs metodo (obtencao). Este e o barato"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -133,7 +133,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: replay-corpus-7-casos-wf_eb01875e-962
     label: "PLACAR DO RE-LITIGIO (aceite era pelo menos 5/7): D = .claude/rules/ path-scoped -> 1/7 · E = hook prompt/agent que roda o radar e injeta o veredito -> 3/7 · F = cura de residuo com id de no em artefato duravel -> 1/7. Maximo alcancado: 3/7. Nenhum placar voltou '?'. E o refinamento que importa: a substancia E fez 3x melhor que a cura B (1/9) — A DISTINCAO DO MAESTRO ERA REAL E MENSURAVEL, nao era a mesma cura"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -149,7 +149,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: code.claude.com-docs-hooks
     label: "O FATO EXTERNO QUE FECHA A PORTA — e que NENHUMA introspeccao acharia: hooks do tipo 'prompt' e 'agent' NAO retornam additionalContext. Sao decisores sim/nao, nao injetores. E ha teto de 10.000 chars por saida de hook: a forma completa mede 138.433 bytes (13,8x acima) e a unica versao que cabe (so ids, 8.092 bytes) e LITERALMENTE a condicao de C4-C6, onde ja falhou 3x. A forma que chegou a 3/7 NAO E CONSTRUTIVEL COMO DESCRITA"
     trace: "https://code.claude.com/docs/en/hooks"
@@ -165,7 +165,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: elenxo-w2-wf_eb01875e-962
     label: "VEREDITO: D_build_none_of_three fica RATIFICADO — agora POR EVIDENCIA EXTERNA, nao por introspeccao — e REFINADO. Tres ancoras de fora: (1) a plataforma desqualifica o mecanismo (prompt/agent nao injetam); (2) a Anthropic desqualifica a classe ('quando algo absolutamente nao pode acontecer, uma instrucao e a ferramenta errada — um guardrail real precisa ser DETERMINISTICO'); (3) o mercado nao tem contra-exemplo. FORMULACAO CORRETA, imposta pelo dissent: 'NAO CONSTRUIR POR FALTA DE EVIDENCIA A FAVOR', nunca 'esta provado que nao funciona' — a primeira mantem o gate honesto, a segunda o transforma em decreto"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -189,7 +189,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: corpus-9-casos-C7
     label: "A OBSERVACAO QUE SOBROU SEM RESPOSTA DEPOIS DE 5 INSTRUMENTOS REPROVADOS: o unico disparo que COMPROVADAMENTE funcionou no corpus inteiro (C7) foi SOCIAL — um humano perguntando 'voce esta fazendo SSOT-first?'. Nenhum dos cinco instrumentos testados reproduz isso, e o corpus nao tem candidato barato que reproduza. Nesta propria sessao o padrao se repetiu duas vezes: o maestro perguntou 'o KG-SSOT entrou para a pesquisa tambem?' e 'tem alguma ferramenta de KG com yy no final?' — e as duas perguntas corrigiram a pesquisa"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -209,7 +209,7 @@ nodes:
     status: refuted
     impact: 5
     confidence: 0.85
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: gh-api-e-leitura-do-HEAD
     label: "A OBJECAO DE MERCADO VENCE EM 2 DOS 3 EIXOS: mattpocock/skills (199.551 estrelas) critica publicamente frameworks 'que tomam conta do processo' (cita GSD, BMAD, Spec-Kit) em favor de skills modulares e componiveis. O CLAUDE.md:12 declara que os workflows faseados sao 'invariantes do framework, nao devem ser consolidados' — o oposto literal. Nao ha disanalogia de dominio que nos separe de GSD/BMAD. ONDE NAO VENCE: compliance como dimensao peer, onde o acoplamento E o produto (rastreabilidade e o entregavel, nao overhead). AGRAVANTE: ja comecamos a lhe dar razao sem admitir — plugins/ no HEAD tem 7 verticais empacotadas e instalaveis em separado, enquanto a doutrina diz que e indivisivel"
     trace: "https://github.com/mattpocock/skills"
@@ -234,7 +234,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: dois-runs-identicos-wf_7725217c-e1c-e-wf_9f6d7daf-8f7
     label: "LICAO DE METODO MEDIDA POR ACIDENTE: dois runs IDENTICOS (mesmo script, prompt, modelo e effort) de uma varredura de DESCOBERTA acharam 46 e 41 achados, com uniao de 74 — cada um cobriu so 55-62% do que os dois juntos acharam. E foi na BORDA (nao no nucleo) que apareceram os dois achados decisivos: o Company Brain da YC e o microsoft/agent-governance-toolkit. REGRA: DESCOBERTA em espaco de tamanho desconhecido exige N passadas com uniao (ou loop-until-dry); JULGAMENTO converge e nao precisa. Agravante: loop-until-dry JA E um dos 6 padroes canonicos da skill onion-orchestration e nao foi usado"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -250,7 +250,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: furo-do-graphify
     label: "VIES ESTRUTURAL, NAO DESCUIDO: as 8 pistas de mercado buscaram por NOMES CONHECIDOS (Sourcegraph, Harness, Neo4j, Zep, Mem0, Letta, GraphRAG) e perderam o Graphify (100.765 estrelas em 120 dias, skill para Claude Code — o nosso substrato exato). Buscar por nome so acha o que JA ERA FAMOSO: o emergente nao esta no modelo mental, logo nao entra na consulta. CURA: todo levantamento externo carrega pelo menos 1 eixo por TRAJETORIA (gh api search com created:> ordenado por estrelas; HN via API do Algolia; batches de YC), e o worker devolve campo obrigatorio 'o_que_descartei_por_ja_ser_famoso' — worker que so devolve nome conhecido FALHOU"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -274,7 +274,7 @@ nodes:
     status: refuted
     impact: 4
     confidence: 0.85
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: replay-7-casos-wf_eb01875e-962
     label: "SUBSTANCIA D — .claude/rules/ com frontmatter paths como cura da perna de leitura. PLACAR 1/7 (aceite era 5/7), e o unico caso que pega e o MESMO C7 que as curas A e B ja pegavam: a uniao nao cresce. DISANALOGIA QUE MATA: os gatilhos do corpus sao TOPICOS (oficializar WAHA, pagina de convite, fios abertos) e o glob de paths casa ARQUIVO TOCADO — sao eixos diferentes. Ataque adversarial: 'passivo liquido'"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -285,7 +285,7 @@ nodes:
     status: refuted
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: code.claude.com-docs-hooks
     label: "SUBSTANCIA E — hook tipo prompt/agent que RODA o radar e INJETA o veredito. PLACAR 3/7, o melhor do corpus e 3x a cura B (1/9): a distincao 'roda e injeta o RESULTADO' vs 'injeta prosa pedindo que o modelo rode' e REAL e MENSURAVEL. Mas REPROVADA por fato externo que nenhuma introspeccao acharia: hooks prompt e agent NAO retornam additionalContext (sao decisores sim/nao, nao injetores) e ha teto de 10.000 chars — a forma completa mede 138.433 bytes. NAO E CONSTRUTIVEL COMO DESCRITA"
     trace: "https://code.claude.com/docs/en/hooks"
@@ -296,7 +296,7 @@ nodes:
     status: refuted
     impact: 4
     confidence: 0.85
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: replay-7-casos-wf_eb01875e-962
     label: "SUBSTANCIA F — cura de RESIDUO (id de no citado em artefato duravel: commit/PR/doc). PLACAR 1/7, e de novo o mesmo C7. O replay provou que commit/PR/doc e O PLANO ERRADO: 6 das 7 falhas sao CONVERSACIONAIS e nao produzem commit — em 2026-08-02 o repo tinha 1 commit, a propria pesquisa. Ataque: 0 de 5 portoes. O QUE MORREU FOI A ENCARNACAO, NAO A LENTE: 'residuo material auditado por terceiro, desacoplado do ator' segue de pe e segue sem candidata"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -307,7 +307,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 1.0
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: leitura-verbatim-de-CLAUDE.md-linha-12
     label: "CORRECAO DE LEITURA (mesma sessao, algumas horas depois): esta pesquisa afirmou que 'a doutrina diz indivisivel enquanto o plugins/ divide'. E FALSO. CLAUDE.md:12 diz que product/collect->feature e engineer/plan->pr-update 'nao devem ser CONSOLIDADOS' — isto e, nao devem ser FUNDIDOS UM NO OUTRO. Ler 'consolidados' como 'divididos' INVERTE o sentido: manter os dois fluxos distintos e COMPATIVEL com envia-los como verticais separadas em plugins/. A objecao do mattpocock (framework que toma conta do processo) SEGUE DE PE — o que cai e o agravante 'ja nos contradizemos'. Causa: afirmei contradicao sem reler a frase, a mesma familia declarado!=verificado que a pesquisa investiga, agora dentro da propria pesquisa"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -340,7 +340,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: wf_b516b6a2-b84
     label: "PLACAR W2: 5 posicoes em steelman (T1 derivavel, T2 irredutivel, E1 plataforma, E2 porta, E3 moat), 5 REFUTADAS — todas por medicao, nenhuma por retorica. Correlacao: 44 itens = 18 desenha, 14 nao-transfere, 12 transfere. Que 12 transferem importa mais que o placar: MAGMA (grafo SO vale com politica de travessia), CMDB (mesmo modo de falha da camada domain), Graphify (proveniencia mecanizada por ARESTA), EU AI Act (rastro auditavel exigivel), Graphiti (retrieval deterministico), ICLR-gargalo (retrieval domina 20 pontos, escrita 3-8)"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -356,7 +356,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: contagem-direta-nos-53-grafos
     label: "A TESE-MAE ('os dois eixos sao o mesmo movimento: derivar o derivavel libera esforco para o julgamento, e julgamento e o que o Graphify nao tem') e REFUTADA NA JUNTA — duas afirmacoes verdadeiras que NAO COMPOEM. (a) A premissa 'o repo nunca aplicou derivacao ao .kg.yaml' e FALSA. (b) A ARITMETICA DO PROPONENTE ESTAVA ERRADA E DO LADO QUE SUSTENTAVA A TESE: claim+decision+question = 1.437/2.049 = 70,1%, nao ~90%; so chega a 89% contando os 390 'evidence' — que sao justamente o que PODE ser parcialmente derivado. (c) O ganho declarado nao existe: 8% de 2.049 = 167 nos, escritos UMA VEZ CADA; o gargalo medido e LEITURA, nao escrita. (d) 'julgamento e o que o Graphify nao tem' e verdade de FORMA, falsa de MOTOR: dos 221 alvos de SUPERSEDES/REFUTES, so 11 (5,0%) tem trace resolvivel para superficie executavel"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -372,7 +372,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: wf_b516b6a2-b84
     label: "VEREDITO DO EIXO TECNICO: NAO derivar nada de novo no .kg.yaml; ZERO gate novo nesta rodada. Dos 5 itens de T1 e do gate de T2, nenhum passa o crivo 'item sem gate nao entra' na direcao que importa — ou o gate nasce cego, ou verde-vazio, ou opera sobre conjunto vazio. O que ENTRA e REPARO, nao mecanismo: os 8 numeros errados de docs/technical-context/ corrigidos A MAO, um commit. A FRONTEIRA correta nao e 'derivavel x nao-derivavel', e 'JA LEGIVEL NO DADO x PEDE CAMPO NOVO' — node_type + presenca de trace ja classificam; campo novo custa gramatica a todo adotante"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -388,7 +388,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: taxa-de-defeito-medida
     label: "REFINAMENTO DOUTRINARIO que vale mais que o conserto: taxa de defeito medida = 8 numeros errados em MESES. Custo do gate (gerador + guarda + selftest + manutencao) > custo do conserto manual => MECANIZAR E A CATEDRAL. 'fix-must-become-mechanism' NAO e 'todo fix vira gate' — e 'todo fix vira mecanismo QUANDO O VOLUME JUSTIFICA'. Sem o portao 4 (o volume forca), a propria doutrina anti-catedral fabrica catedral"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -404,7 +404,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: docs/analysis/onion-agent-teams-evaluation-2026-06.md
     label: "E1 — PLATAFORMA UNICA CONFIRMADA, e a 'correcao' proposta foi REFUTADA por evidencia que estava no repo desde junho: smoke-test PASS 6/6 em 2026-06-15 (TeamCreate -> spawn -> SendMessage). A doutrina NAO cita capacidade fantasma; '0 hits' de uso nao e vaporware, e a assinatura de uma decisao registrada FUNCIONANDO. C_POSTURA_ACOPLAMENTO e C_CORE_NAO_E_FAMILIA ficam INTOCADOS — selar leitura refutada seria fabricar historia. Resta SO uma question ao maestro: a decisao e datada 2026-05-18 e nomeia ferramenta validada em 2026-06-15"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -420,7 +420,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: gh-api-repos-marciocar-2026-08-05
     label: "E2 — A PORTA e HIPOTESE, e o motivo e um CONTRA-EXPERIMENTO N=6 DENTRO DA PROPRIA FAMILIA: medidos ao vivo os 7 repos publicos (onion 0 estrelas com description+MIT; onion-cursor 0; onion-antigravity 0 mesmo com +3 topics; onion-copilot 0; ...). A teoria causal 'publique e melhore o metadado' JA RODOU EM CASA e deu ZERO. O mecanismo ausente NAO e copy nem topic-search: e ROTA DE CHEGADA. C_MARKET_COMMODITY ja cravou que comandos/skills/SDD sao commodity — arrumar o rotulo de uma commodity nao muda a commodity"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -436,7 +436,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: contagem-supersedes-refutes-53-grafos
     label: "E3 — A SUBSTANCIA SE SUSTENTA, A PALAVRA NAO. 'Moat' e termo de DEFENSABILIDADE COMPETITIVA — afirmacao de negocio, exatamente o que C_NS1_KG declara NAO PROVADO ('edge mais forte, negocio nao provado'). E o edge e de FORMA: dos 221 alvos de SUPERSEDES/REFUTES, so 11 (5,0%) tem trace casavel com superficie executavel. O experimento que decide e GRATIS e nao pede uma linha de codigo: rodar o gate hipotetico contra os 9 casos do kg-read-leg"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -460,7 +460,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 1.0
-    verified_at: 2026-08-05
+    verified_at: "2026-08-05"
     verified_against: filesystem-HEAD-fb4b672
     label: "CORRECAO DE ESTADO (deriva de 42 commits em 3 dias): .claude/rules/ EXISTE — 1 arquivo (kg-grammar.md), path-scoped via frontmatter paths: ['**/*.kg.yaml']. A afirmacao '.claude/rules/ NAO EXISTE' de 2026-08-02 esta STALE. E sao 9 hooks, nao 7 — todos type=command, o que o W2 julgou ESCOLHA CERTA e nao atraso: command e o unico tipo com exit-code + injecao garantida, e o Onion precisa de decisao DETERMINISTICA"
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -479,7 +479,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'gh search repos + API do GitHub em 2026-08-28: chaitanyagiri/munder-difflin, 5219 estrelas, 629 forks, 185 PRs fechados, criado 2026-05-31; trendshift.io (fonte terceira) para o historico de ranking'
     label: 'HARNESS ADJACENTE REAL, medido na API e no codigo — nao na landing page. Electron+React que EMPACOTA CLIs de agente (cada clone e um pty rodando o CLI que voce ja paga; nao reimplementa agente nenhum). Comunicacao entre clones e ARQUIVO LOCAL: outbox -> rename atomico -> inbox, tudo num repo git local. 12 providers CONTADOS em src/shared/agentProvider.ts — o numero bate. Comunidade real: PRs de externos identificaveis, nao repo de vitrine. 3 meses de idade para 5.2k estrelas'
     provenance:
@@ -493,7 +493,7 @@ nodes:
     impact: 3
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'trendshift.io: #1 em 18/08/2026; em 25/08 ja era #8 de JavaScript e #18 na semana 34'
     label: "BARULHO NOMEADO: o badge 'GitHub Trending: #1 Repository of the Day' do README não traz data nem recorte. O trendshift que ele linka dá #1 só em TypeScript (18 e 19/08/2026); no geral, #2, #3 e #10 (18 a 20/08); nada depois. Vitrine sem data e recorte envelhece mentindo."
     narrative: "label anterior: BARULHO NOMEADO: o badge \"GitHub Trending #1 Repository of the Day\" e um PICO DE UM DIA (18/08) exibido sem data. Uma semana depois ja era #8/#18. Hype nao e retencao — e apresentar o melhor dia como se fosse a regua permanente e a forma mais barata de inflar tracao. Vale como contra-exemplo para a nossa propria comunicacao: numero de vitrine sem carimbo de data envelhece mentindo"
@@ -509,7 +509,7 @@ nodes:
     impact: 4
     confidence: 0.8
     status: open
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'varredura de 55 arquivos de src/main + 33 de src/shared: package.json SEM nenhuma lib de cripto (nem tweetnacl/libsodium/@noble); nenhum relay.ts/sync.ts/network.ts/e2e.ts; integrationBroker.ts so usa randomBytes/timingSafeEqual'
     label: 'O ACHADO MAIS UTIL PARA NOS, e ele e de METODO: a landing declara criptografia clone-a-clone "X25519/AES-256-GCM, publicamente auditavel no GitHub" — e a implementacao NAO FOI ENCONTRADA no repo MIT. Isto NAO prova ausencia (node:crypto nativo faz X25519 sem dependencia, e o recurso e do tier PAGO, cujo relay plausivelmente vive no SaaS fechado). O que cai e a palavra AUDITAVEL: se o codigo que sustenta a claim nao esta na superficie publica, "publicamente auditavel" nao se sustenta. Segue OPEN: nao afirmamos ausencia, afirmamos NAO-VERIFICADO. GATILHO para fechar: alguem apontar o arquivo, ou o proprio projeto declarar que o relay e fechado'
     provenance:
@@ -524,7 +524,7 @@ nodes:
     impact: 3
     confidence: 0.8
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'leitura de HIVE.md + closingTime.ts (roteamento e shutdown sao orquestracao de arquivo, sem chamada de modelo) + PR automatizado #365 "wall: 2 new Founding Supporter(s)" no repo'
     label: 'SEPARADA A LUDICIDADE ENTRE ENFEITE E FUNCAO. Enfeite: o chao de escritorio em Pixi.js e skin sobre um dashboard — a funcao real embutida e observability (quem esta ocioso/trabalhando/esperando aprovacao), que uma tabela entregaria igual. FUNCAO de verdade: (a) nomear o orquestrador ("Michael") da ponto unico de escalonamento, reduzindo carga cognitiva; (b) a "Founders Wall" (US$20 unico) NAO e badge — e LEDGER PUBLICO commitado no git, alimentado por PR automatizado: prova social que qualquer um AUDITA no historico, em vez de numero declarado. ATRAPALHA: "clone" promete fidelidade que um wrapper de LLM nao tem — e a propria engenharia deles contradiz, exigindo escalonamento humano para gasto e destrutivo'
     provenance:
@@ -539,7 +539,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'HIVE.md ("Everything the hive knows is files in one local git repo") + closingTime.ts sem chamada de API; e o GOD orchestrator e um processo Claude Code comum'
     label: 'A CLAIM "deterministico e sem tokens" e VERDADE PELA METADE, e a metade que falta e a que custa. Roteamento de mensagem e animacao sao mesmo deterministicos e gratuitos. Mas o JULGAMENTO do orquestrador (decidir rotina vs escalar) e uma sessao de LLM cobrada como qualquer outra. A comunicacao deles nao separa as duas coisas — e essa e a licao direta para a NOSSA doc: dizer explicitamente ONDE o token e gasto, em vez de deixar o leitor inferir do adjetivo'
     provenance:
@@ -554,7 +554,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     trace: "docs/evolution/research/onion-market-kg-2026-08/onion-market-kg-2026-08.kg.yaml"
     verified_against: 'mapeamento completo de 2026-08-28 (codigo + API + landing), com fato/barulho/nao-verificavel separados por item'
     label: 'O QUE VIRA EXEMPLO NUMA APRESENTACAO DO ONION: (1) ledger publico como prova social AUDITAVEL — ecoa behavior-over-declaration vindo de fora; (2) blog tecnico de 30+ posts sobre bugs reais = dogfood publicado virando canal de aquisicao; (3) linha comercial limpa por ESCOPO (uma maquina gratis para sempre; time distribuido e o produto pago); (4) o contra-exemplo mais forte: declarar "auditavel"/"deterministico" sem apontar o arquivo. O QUE NAO VIRA, porque a comparacao seria DESONESTA: eles sao multi-provider POR DESENHO (12 CLIs, nunca se acoplar) e nos apostamos no ACOPLAMENTO SELETIVO pelo exit 2 de hook — teses OPOSTAS e ambas defensaveis, competir em "quem tem mais providers" e comparar eixos diferentes; e o escopo (eles fazem execucao tecnica, nos cobrimos tres dimensoes peer) e categoria distinta, nao vitoria'

@@ -5,7 +5,7 @@
 meta:
   id: vendor-multi-branch-2026-07
   schema_version: "1"
-  baseline: 2026-07-01
+  baseline: "2026-07-01"
 
 nodes:
   - id: C_field_report
@@ -16,7 +16,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: sinal-do-adotante-lido
     label: "SINAL DE CAMPO (metagamify, 2026-07-27): --update mirando a 2a integration branch (develop) deu exit 10 com ~110 arquivos em conflito, INCLUINDO codigo de aplicacao (apps/api/src/...). Abortou limpo; nada quebrou. Diagnostico do adotante: conflito CONTABIL por base de merge errada — o onion/vendor seguiu a linhagem da chore, nao da develop"
     provenance:
@@ -33,7 +33,7 @@ nodes:
     impact: 4
     confidence: 0.3
     status: refuted
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: reproducao-tentativa-2
     label: "HIPOTESE INICIAL (do sinal e da 1a leitura do core): a causa e o adotante ter DUAS integration branches com um onion/vendor unico. REFUTADA pela tentativa 2 da reproducao: com _clean_baseline achando a baseline limpa, o update funciona nas DUAS branches, 0 conflitos, produto intacto. Duas branches nao sao, por si, o problema"
 
@@ -45,7 +45,7 @@ nodes:
     impact: 3
     confidence: 0.2
     status: refuted
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: merge-base-medido-nas-duas-fixtures
     label: "HIPOTESE DE TESTE (minha, anunciada ao adotante): o discriminador e ANCESTRALIDADE, e o mecanismo seria registrar a origem do vendor em git config na semeadura. REFUTADA por medicao: `merge-base --is-ancestor(vendor, develop)` devolve SIM nos DOIS casos — o seguro e o cruzado. Ancestralidade NAO discrimina. O git config tambem falharia no vendor LEGADO, que e justamente quem tem o problema"
 
@@ -57,7 +57,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: reproducao-tentativa-3
     label: "CAUSA RAIZ: o caminho de FALLBACK do seed. Sem commit na historia da integracao cujo tree do framework seja identico ao pin adotado (o 'legado entrelacado', tipico de quem CUSTOMIZOU framework), _clean_baseline falha e o seed ramifica do HEAD da integracao. Ai o onion/vendor deixa de ser portador de framework e passa a carregar o SNAPSHOT DE PRODUTO daquela branch, ficando casado com ela. Pedi-lo para uma 2a integracao arrasta a divergencia de produto para dentro do 3-way. Reproduzido: exit 10 com conflito em apps/api/src/wrr.service.ts"
     provenance:
@@ -74,7 +74,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: fixtures-executadas-contra-o-helper-real
     label: "REPRODUCAO em 3 tentativas contra o vendor-branch.sh REAL, cada uma estreitando o gatilho: (1) branches divergentes, produto so numa => conflito de 1 arquivo de FRAMEWORK, nao e o caso — eu poderia ter parado aqui e declarado sucesso reproduzindo a coisa errada; (2) produto divergente E baseline limpa disponivel => 0 conflitos, produto intacto (a prova de que 2 branches nao quebram); (3) framework customizado => _clean_baseline falha => exit 10 em codigo de aplicacao, a assinatura do campo"
     provenance:
@@ -91,7 +91,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: md5-das-trees-nas-duas-fixtures
     label: "O DISCRIMINADOR, medido nas duas fixtures: tree(vendor) vs tree(base do merge) FORA do manifesto de framework. Seguro => identicos (vendor e framework-puro). Cruzado => diferentes (vendor carrega produto de outra branch). Vantagem decisiva sobre registrar a origem na semeadura: funciona no vendor LEGADO, que nasceu antes de qualquer registro existir"
     provenance:
@@ -108,7 +108,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: selftest-g-e-g-mut-verdes
     label: "GUARD ESTRUTURAL antes do merge (_vendor_is_framework_pure): recusa com exit 11 quando o vendor difere da base fora do manifesto, NOMEIA os arquivos alheios e entrega o conserto. Criterio de aceite explicito: a integracao fica INTACTA (0 alteracoes, 0 conflitos) — recusar DEPOIS de sujar a arvore seria trocar 110 conflitos por 110 conflitos com mensagem bonita. Convencao onion/vendor-<branch> quando ha mais de uma integracao; vendor de baseline limpa PODE servir duas (proibe-se o contaminado, nao o compartilhamento)"
     provenance:
@@ -124,7 +124,7 @@ nodes:
     impact: 2
     confidence: 0.5
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: '/meta:census 2026-09-01 (wf_102a9bec-52f): 3/3 claims; juiz APROVADO. Lido o nó inteiro (label, sem trace — nó tipo question sem evidência anexada) +  => Nenhum clone no parque local tem 3+ integration branches com onion/vendor por branch. O maior caso r…'
     label: "Tres ou mais integration branches nao foram exercitadas. A convencao por-branch se estende por CONSTRUCAO, mas isso e inferencia, nao medicao. Abrir fixture se um adotante real aparecer com esse shape"
 
@@ -135,7 +135,7 @@ nodes:
     impact: 2
     confidence: 0.6
     status: superseded
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: fixture-vs-repo-do-adotante
     label: "Reproduzimos a CLASSE (conflito contabil em codigo de aplicacao por vendor branch-especifico), NAO os 110 arquivos. O volume depende da divergencia real do repo do adotante e nao foi medido la. Nao afirmar igualdade"
     provenance:
@@ -152,7 +152,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: desfecho-do-adotante-e-fixture-reproduzida
     label: "FALSO-VERMELHO MEU. Eu instrui 'se vier o warn legado-entrelacado, PARE'. O warn disparou CORRETAMENTE (nao havia baseline limpa) e mesmo assim o desfecho certo era SEGUIR: o entrelacamento era so framework VELHO, nao customizacao. Vendor re-semeado do HEAD da MESMA branch da 3-way trivial — o adotante mediu 194 arquivos de framework e ZERO de produto. Transformar 'revise' em 'pare' e o erro SIMETRICO ao falso-verde: trava operacao segura e ensina a ignorar o aviso. REGRA REVISTA: o warn e 'revise o merge'; o sinal de parada e o EXIT 11, nao o aviso"
     provenance:
@@ -169,7 +169,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-27
+    verified_at: "2026-07-27"
     verified_against: fixture-do-caso-do-adotante-executada
     label: "O adotante propos que o criterio fosse 'o merge toca paths FORA do manifesto?' — que e EXATAMENTE o que _vendor_is_framework_pure ja faz, so que ANTES de mergear (eles tiveram que revisar 194 arquivos para concluir framework-only; o guard conclui sem sujar a arvore). REPRODUZIDO em vez de deduzido: fixture sem baseline limpa, vendor do HEAD da propria develop, produto divergente => exit 0, 2 arquivos de framework, 0 de app, produto intacto. Convergencia INDEPENDENTE: eles chegaram pelo uso, o teste chegou pela medicao das duas fixtures"
     provenance:
@@ -184,7 +184,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — Lido o nó inteiro (label/trace) + o edge DEPENDS_ON→C_field_report. CONTADAS as claims do '
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A pergunta "o volume real (110 arquivos) foi medido no repo do adotante?" foi respondida — com "não foi, e não precisou ser". No mesmo dia (2026-07-27), o próprio update na branch develop do <hub-t1> (o cenário exato do incidente) completou com 0 arquivos de app tocados (commit d8434efc), e a mensag'
     provenance:

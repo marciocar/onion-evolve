@@ -1,8 +1,8 @@
 meta:
   id: radar-E3-2026-09-21-r5
   schema_version: "1"
-  baseline: 2026-09-21
-  review_after: 2026-11-05   # radar de mundo: cadencia 45d (REGRA 65/67)
+  baseline: "2026-09-21"
+  review_after: "2026-11-05"   # radar de mundo: cadencia 45d (REGRA 65/67)
 
   x_supersedes_none: >
     Esta rodada nao derrubou no nenhum da BASELINE ANTERIOR do eixo E3, que e a
