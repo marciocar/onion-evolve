@@ -1,7 +1,8 @@
 ---
 branch: fix/decide-seal-local-contract
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4cf5aa85f0f6fdc350bf09e066e8abdfcce827c13b44d18625e8ce04e90aa835
+reviewed_code_sha256: 8286c53e081aa3a25aae1a01052ed78baa43eafffda74ae1da42fe3343be40bc
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
