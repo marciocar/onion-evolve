@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onion: guia fácil</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  CAIXA DO REVISOR (não aparece para o leitor) — RASCUNHO do SAC-51, 2026-10-12
+  ═══════════════════════════════════════════════════════════════════════════
+  Espelho em texto: docs/applying/manual-60-plus.md (mesma substância).
+
+  O QUE FOI VERIFICADO (na documentação oficial, em 2026-10-12):
+  - Plugins de marketplace FUNCIONAM no app do Claude (web, desktop e celular), não só no
+    Claude Code: claude.com/docs/plugins/overview e claude.com/docs/plugins/platform-support.
+  - No chat, só carregam SKILLS e COMANDOS (o comando vira skill). AGENTES e HOOKS são
+    ignorados no chat; carregam no Cowork (desktop) e no Claude Code.
+  - Skills exigem plano Pro, Max, Team ou Enterprise e a opção "Code execution and file
+    creation" ligada em Settings > Capabilities (claude.com/docs/skills/overview).
+  - Caminho de instalação: Customize > Plugins > Add > Add marketplace, com "owner/repo".
+  - O que viaja de fato nos plugins "Onion" e "Onion · Product": lido da árvore publicada
+    do repo público onion-plugins (gh api .../git/trees/HEAD) — collect, create-task-structure
+    e extract-meeting estão em plugins/onion-product/commands/.
+
+  O QUE NÃO FOI VERIFICADO (fica para o teste humano):
+  - Os rótulos da tela foram copiados da documentação EM INGLÊS. Não vi a tela real, nem a
+    tradução em português (se o app estiver em pt-BR). Doutrina de material para cliente,
+    cláusula 3: todo rótulo precisa ser conferido NA TELA antes de virar versão final.
+  - Nenhuma das tarefas 2 a 4 foi RODADA no chat do app. Os três comandos foram escritos para
+    o Claude Code, com arquivos de projeto: o collect quer salvar num gerenciador de tarefas,
+    o extract-meeting espera um caminho de arquivo, e o create-task-structure sugere camadas
+    técnicas (dados, API, telas). No chat, o Claude os recebe como instrução e precisa adaptar.
+    Cláusula 4: exemplo é promessa — cada exemplo daqui só fica depois de rodar com uma
+    pessoa real e anotar "o que você vê" de verdade.
+  - A skill "onion" usa injeção de comando de shell (!`...`) que o chat pode não executar;
+    por isso ela NÃO entrou como tarefa guiada.
+  - Plano gratuito: pela documentação, skills não estão disponíveis nele. O guia assume plano
+    pago, e diz isso no passo 1.
+
+  O QUE FALTA E É HUMANO (fica com o maestro):
+  1. Perfil de público: entrevista ou observação de 2-3 pessoas 60+ (o que já usam no
+     celular/computador, o que as trava, que tarefa real querem resolver).
+  2. Teste de uso com 2+ pessoas: cada uma faz as tarefas sozinha, com o guia impresso;
+     anotar onde travou, o tempo, e tirar as capturas marcadas como [CAPTURA: ...].
+  3. Conferir os rótulos na tela real (inglês e português) e corrigir este texto.
+
+  Contraste (fórmula WCAG 2.x, calculado com script python; todos os pares de texto >= 7:1, AAA):
+  texto #1a1a1a/#ffffff 17.40 · link #0b4a80/#ffffff 9.11 · texto/caixa de passo #eef4fb 15.72 ·
+  link/caixa de passo 8.23 · texto/caixa de atenção #fff4d6 15.88 · texto/captura #f1f1f1 15.41 ·
+  botão #ffffff/#0b4a80 9.11 · foco #b34700/#ffffff 5.50 (não-texto, mínimo 3) ·
+  escuro: texto #f2f2f2/#121212 16.73 · link #9cc8ff/#121212 10.81 · texto/caixa #1d2a38 13.02 ·
+  link/caixa #1d2a38 8.41 · texto/atenção #3a2e10 11.89 · texto/captura #262626 13.52 · foco #ffb070/#121212 10.43 · impressão #000/#fff 21.00.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<style>
+:root {
+  --fundo: #ffffff;
+  --texto: #1a1a1a;
+  --texto-2: #3d3d3d;
+  --destaque: #0b4a80;
+  --passo: #eef4fb;
+  --atencao: #fff4d6;
+  --atencao-borda: #8a5a00;
+  --captura: #f1f1f1;
+  --foco: #b34700;
+  --botao-texto: #ffffff;
+  --tamanho: 20px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fundo: #121212; --texto: #f2f2f2; --texto-2: #dddddd; --destaque: #9cc8ff;
+    --passo: #1d2a38; --atencao: #3a2e10; --atencao-borda: #e0b050; --captura: #262626;
+    --foco: #ffb070; --botao-texto: #121212;
+  }
+}
+:root[data-theme="dark"] {
+  --fundo: #121212; --texto: #f2f2f2; --texto-2: #dddddd; --destaque: #9cc8ff;
+  --passo: #1d2a38; --atencao: #3a2e10; --atencao-borda: #e0b050; --captura: #262626;
+  --foco: #ffb070; --botao-texto: #121212;
+}
+* { box-sizing: border-box; }
+html { font-size: var(--tamanho); }
+body {
+  margin: 0; background: var(--fundo); color: var(--texto);
+  font-family: Verdana, "DejaVu Sans", Arial, sans-serif;
+  font-size: 1rem; line-height: 1.65;
+}
+main { max-width: 46rem; margin: 0 auto; padding: 1rem 16px 4rem; }
+h1 { font-size: 2rem; line-height: 1.25; color: var(--destaque); margin: 1rem 0 .5rem; }
+h2 { font-size: 1.5rem; line-height: 1.3; color: var(--destaque); margin: 3rem 0 1rem;
+     padding-top: 1rem; border-top: 3px solid var(--destaque); }
+h3 { font-size: 1.25rem; line-height: 1.35; margin: 2rem 0 .75rem; }
+p, li { max-width: 40rem; }
+a { color: var(--destaque); text-decoration: underline; text-underline-offset: 3px; }
+a:focus, button:focus { outline: 4px solid var(--foco); outline-offset: 3px; }
+strong { font-weight: 700; }
+.subtitulo { font-size: 1.15rem; color: var(--texto-2); margin-top: 0; }
+.barra { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1rem 0 1.5rem; }
+.barra button {
+  font: inherit; font-size: 1rem; min-height: 48px; padding: .5rem 1rem;
+  background: var(--destaque); color: var(--botao-texto);
+  border: 0; border-radius: 8px; cursor: pointer;
+}
+nav.sumario { background: var(--passo); border-radius: 10px; padding: 1rem 1.25rem; }
+nav.sumario ol { margin: .5rem 0 0; padding-left: 1.5rem; }
+nav.sumario li { margin: .35rem 0; }
+.passo {
+  background: var(--passo); border-radius: 10px; padding: 1rem 1.25rem; margin: 1.25rem 0;
+  break-inside: avoid; page-break-inside: avoid;
+}
+.passo .numero { display: block; font-weight: 700; font-size: 1.1rem; color: var(--destaque); }
+.passo p { margin: .5rem 0; }
+.ver { margin-top: .75rem; }
+.ver strong { display: block; }
+.captura {
+  display: block; margin-top: .75rem; padding: .75rem 1rem; background: var(--captura);
+  border: 2px dashed var(--texto-2); border-radius: 8px; font-size: .9rem;
+}
+.atencao {
+  background: var(--atencao); border-left: 6px solid var(--atencao-borda);
+  border-radius: 8px; padding: 1rem 1.25rem; margin: 1.25rem 0;
+  break-inside: avoid; page-break-inside: avoid;
+}
+.digite {
+  display: block; font-family: "DejaVu Sans Mono", Consolas, monospace; font-size: 1rem;
+  background: var(--fundo); color: var(--texto); border: 2px solid var(--destaque);
+  border-radius: 8px; padding: .6rem .9rem; margin: .5rem 0; word-break: break-word;
+}
+dl.glossario dt { font-weight: 700; margin-top: 1.25rem; font-size: 1.1rem; }
+dl.glossario dd { margin: .25rem 0 0 0; }
+.rodape { margin-top: 3rem; font-size: .9rem; color: var(--texto-2); }
+
+@media (max-width: 600px) {
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.3rem; }
+}
+@media print {
+  :root { --fundo: #ffffff; --texto: #000000; --texto-2: #222222; --destaque: #000000;
+          --passo: #ffffff; --atencao: #ffffff; --captura: #ffffff; }
+  html { font-size: 14pt; }
+  .barra, nav.sumario { display: none; }
+  main { max-width: none; padding: 0; }
+  h2 { page-break-before: always; break-before: page; border-top: 0; }
+  h2.primeiro { page-break-before: avoid; break-before: avoid; }
+  .passo, .atencao { border: 1.5pt solid #000; }
+  a { color: #000; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .85em; }
+}
+</style>
+</head>
+<body>
+<main>
+
+<h1>Onion: guia fácil</h1>
+<p class="subtitulo">Para organizar ideias, projetos e conversas com a ajuda do Claude.
+Sem programação. Um passo de cada vez.</p>
+
+<div class="barra" aria-label="Ajustes de leitura">
+  <button type="button" id="maior">Letra maior</button>
+  <button type="button" id="menor">Letra menor</button>
+  <button type="button" id="imprimir">Imprimir este guia</button>
+</div>
+
+<nav class="sumario" aria-label="Sumário">
+  <strong>Neste guia</strong>
+  <ol>
+    <li><a href="#comecar">Antes de começar: o que você precisa</a></li>
+    <li><a href="#t1">Tarefa 1: preparar o aplicativo e instalar o Onion</a></li>
+    <li><a href="#t2">Tarefa 2: guardar uma ideia sem perder nada</a></li>
+    <li><a href="#t3">Tarefa 3: dividir um projeto grande em passos pequenos</a></li>
+    <li><a href="#t4">Tarefa 4: resumir uma conversa ou reunião</a></li>
+    <li><a href="#t5">Tarefa 5: criar um caderno para um assunto</a></li>
+    <li><a href="#dicas">Dicas para tirar o melhor</a></li>
+    <li><a href="#oque">O que é o Onion, em uma página</a></li>
+    <li><a href="#glossario">Palavras novas, explicadas</a></li>
+    <li><a href="#problemas">Quando algo não funciona</a></li>
+  </ol>
+</nav>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="comecar" class="primeiro">Antes de começar: o que você precisa</h2>
+
+<p>Você vai usar o <strong>aplicativo do Claude</strong>. Ele funciona no navegador
+(o site <strong>claude.ai</strong>) e no computador (o programa <strong>Claude</strong>).</p>
+
+<p>Você precisa de três coisas:</p>
+<ol>
+  <li><strong>Uma conta no Claude.</strong> Com e-mail e senha.</li>
+  <li><strong>Um plano pago</strong> (Pro, Max, Team ou Enterprise).
+    No plano gratuito, o Onion não funciona.</li>
+  <li><strong>Uns 15 minutos</strong> para a primeira vez. Depois fica rápido.</li>
+</ol>
+
+<div class="atencao">
+  <strong>Faça a instalação no computador.</strong>
+  A tela é maior e fica mais fácil. Depois de instalado, o Onion também aparece
+  no celular, na mesma conta.
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="t1">Tarefa 1: preparar o aplicativo e instalar o Onion</h2>
+
+<p>Você faz isto <strong>uma vez só</strong>.</p>
+
+<div class="atencao">
+  <strong>Os nomes dos botões podem estar em inglês.</strong>
+  Neste guia, o nome aparece como está na tela, entre aspas.
+  Se o seu aplicativo estiver em português, o nome pode aparecer traduzido.
+</div>
+
+<h3>Parte A: ligar uma opção</h3>
+
+<div class="passo">
+  <span class="numero">Passo 1</span>
+  <p>Abra o Claude e entre na sua conta.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Uma caixa grande para escrever, no meio da tela. À esquerda, uma barra com opções.</div>
+  <span class="captura">[CAPTURA: tela inicial do Claude, com a caixa de mensagem e a barra lateral]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 2</span>
+  <p>Abra as configurações: <strong>“Settings”</strong>.
+  Depois clique em <strong>“Capabilities”</strong>.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Uma lista de opções, cada uma com um botão de ligar e desligar.</div>
+  <span class="captura">[CAPTURA: página Settings &gt; Capabilities]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 3</span>
+  <p>Ligue a opção <strong>“Code execution and file creation”</strong>.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    O botão dessa opção muda de cor. Isso quer dizer que está ligada.</div>
+  <span class="captura">[CAPTURA: a opção “Code execution and file creation” ligada]</span>
+  <p>Se você usa o Claude pelo trabalho e a opção estiver bloqueada,
+  peça ao responsável pela conta da empresa para ligar.</p>
+</div>
+
+<h3>Parte B: instalar o Onion</h3>
+
+<div class="passo">
+  <span class="numero">Passo 4</span>
+  <p>Na barra da esquerda, clique em <strong>“Customize”</strong>.
+  Depois clique em <strong>“Plugins”</strong>.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    A página de complementos do Claude, com uma aba <strong>“Discover”</strong>
+    e um botão <strong>“Add”</strong>.</div>
+  <span class="captura">[CAPTURA: página Customize &gt; Plugins]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 5</span>
+  <p>Clique em <strong>“Add”</strong>. Depois em <strong>“Add marketplace”</strong>.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Uma janela pequena, pedindo um endereço.</div>
+  <span class="captura">[CAPTURA: janela “Add marketplace” vazia]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 6</span>
+  <p>Escreva exatamente isto na janela, e confirme:</p>
+  <span class="digite">marciocar/onion-plugins</span>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    A janela fecha. Os complementos do Onion passam a aparecer na lista.</div>
+  <span class="captura">[CAPTURA: lista de plugins mostrando “Onion” e “Onion · Product”]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 7</span>
+  <p>Na lista, clique em <strong>“Onion”</strong>. Depois clique em <strong>“Add”</strong>.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    A página do complemento, com abas. Ele passa a aparecer como instalado.</div>
+  <span class="captura">[CAPTURA: página do plugin “Onion” depois de instalado]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 8</span>
+  <p>Volte para a lista. Clique em <strong>“Onion · Product”</strong>.
+  Depois clique em <strong>“Add”</strong>.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    O mesmo de antes. Agora os dois estão instalados.</div>
+  <span class="captura">[CAPTURA: página do plugin “Onion · Product” depois de instalado]</span>
+  <p>A lista mostra outros complementos do Onion (engenharia, design, conformidade).
+  Eles são para equipes técnicas. <strong>Você não precisa deles.</strong></p>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 9</span>
+  <p>Volte para a conversa. Clique na caixa de mensagem e digite só uma barra:</p>
+  <span class="digite">/</span>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Um menu com várias opções. Algumas mostram o nome <strong>onion-product</strong>
+    ou <strong>onion</strong>. Pronto: o Onion está instalado.</div>
+  <span class="captura">[CAPTURA: menu da barra “/” mostrando opções do Onion]</span>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="t2">Tarefa 2: guardar uma ideia sem perder nada</h2>
+
+<p>Para quando você tem uma ideia e quer deixá-la clara, com título e descrição.
+Exemplo: um projeto de horta comunitária no prédio.</p>
+
+<div class="passo">
+  <span class="numero">Passo 1</span>
+  <p>Comece uma conversa nova. Escreva a sua ideia do seu jeito. Por exemplo:</p>
+  <span class="digite">Tenho uma ideia e quero organizar: fazer uma horta comunitária no meu prédio.</span>
+  <p>Se preferir escolher você mesmo: digite <strong>/</strong> e escolha
+  <strong>onion-product:collect</strong>.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    O Claude responde com perguntas. Por exemplo: para quem é, onde fica, o que você espera.</div>
+  <span class="captura">[CAPTURA: primeira resposta do Claude, com perguntas sobre a ideia]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 2</span>
+  <p>Responda às perguntas com calma. Frases curtas bastam.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Um <strong>título</strong> e uma <strong>descrição</strong> da sua ideia, escritos pelo Claude.</div>
+  <span class="captura">[CAPTURA: título e descrição propostos]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 3</span>
+  <p>Leia. Se algo não estiver certo, diga. Por exemplo:</p>
+  <span class="digite">Troque o título. E a horta é no terraço, não no jardim.</span>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    O texto corrigido.</div>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 4</span>
+  <p>O Claude pode perguntar sobre um “gerenciador de tarefas”.
+  Se você não usa um, responda:</p>
+  <span class="digite">Não uso. Deixe o texto final aqui na conversa.</span>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    O texto final da sua ideia, pronto para copiar ou guardar.</div>
+  <span class="captura">[CAPTURA: texto final da ideia]</span>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="t3">Tarefa 3: dividir um projeto grande em passos pequenos</h2>
+
+<p>Para quando algo parece grande demais para começar.
+Exemplo: organizar a festa de 70 anos de alguém da família.</p>
+
+<div class="passo">
+  <span class="numero">Passo 1</span>
+  <p>Comece uma conversa nova. Escreva:</p>
+  <span class="digite">Quero organizar a festa de 70 anos da minha irmã. Divida em etapas e passos pequenos.</span>
+  <p>Se preferir escolher você mesmo: digite <strong>/</strong> e escolha
+  <strong>onion-product:create-task-structure</strong>.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    O Claude pode fazer algumas perguntas primeiro. Por exemplo: a data, o número de convidados.</div>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 2</span>
+  <p>Responda às perguntas.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Uma lista em etapas. Cada etapa tem passos menores dentro.
+    Às vezes, também uma ordem: o que fazer antes e o que fazer depois.</div>
+  <span class="captura">[CAPTURA: lista de etapas e passos]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 3</span>
+  <p>Peça o que quiser mudar. Por exemplo:</p>
+  <span class="digite">Está muito longo. Deixe só o essencial, em no máximo 10 passos.</span>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Uma lista mais curta.</div>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 4</span>
+  <p>Para guardar no papel, peça:</p>
+  <span class="digite">Faça uma lista para eu imprimir, com um quadradinho para marcar cada passo.</span>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    A lista com quadradinhos. Você pode copiar ou imprimir.</div>
+  <span class="captura">[CAPTURA: lista de passos com quadradinhos]</span>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="t4">Tarefa 4: resumir uma conversa ou reunião</h2>
+
+<p>Para quando você tem anotações de uma reunião e quer saber
+o que foi decidido e quem ficou de fazer o quê.
+Exemplo: a reunião de condomínio.</p>
+
+<div class="passo">
+  <span class="numero">Passo 1</span>
+  <p>Tenha as anotações à mão. Pode ser um texto que você digitou,
+  ou um arquivo no computador.</p>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 2</span>
+  <p>Comece uma conversa nova. Cole o texto na caixa de mensagem,
+  ou anexe o arquivo com o clipe ou o botão <strong>“+”</strong>. Antes do texto, escreva:</p>
+  <span class="digite">Estas são as anotações da reunião de condomínio. Quero saber as decisões, as tarefas e o que ficou pendente.</span>
+  <p>Se preferir escolher você mesmo: digite <strong>/</strong> e escolha
+  <strong>onion-product:extract-meeting</strong>.</p>
+  <span class="captura">[CAPTURA: mensagem com as anotações coladas ou o arquivo anexado]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 3</span>
+  <p>Envie e aguarde.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Um resumo separado em partes: o que foi <strong>decidido</strong>,
+    as <strong>tarefas</strong> (com quem ficou responsável, se as anotações dizem)
+    e o que ficou <strong>em aberto</strong>.</div>
+  <span class="captura">[CAPTURA: resumo com decisões, tarefas e pendências]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 4</span>
+  <p>Confira o resumo com as suas anotações.
+  Se faltou algo, diga o que faltou.</p>
+</div>
+
+<div class="atencao">
+  <strong>Confira antes de enviar para outras pessoas.</strong>
+  O resumo é uma ajuda, não a palavra final.
+  O Claude só sabe o que está nas anotações.
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="t5">Tarefa 5: criar um caderno para um assunto</h2>
+
+<p>Uma conversa comum <strong>não lembra</strong> das outras conversas.
+Para guardar tudo de um assunto num lugar só, use um <strong>Projeto</strong>.
+Pense nele como um caderno: cada conversa é uma página,
+e o que você guarda no caderno vale para todas as páginas.</p>
+
+<div class="passo">
+  <span class="numero">Passo 1</span>
+  <p>Na barra da esquerda, clique em <strong>“Projects”</strong>.
+  Depois, no botão para criar um projeto novo.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Um espaço para dar nome e descrição ao projeto.</div>
+  <span class="captura">[CAPTURA: tela de criar projeto]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 2</span>
+  <p>Dê um nome simples. Por exemplo: <strong>Horta do prédio</strong>.</p>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 3</span>
+  <p>Guarde no projeto o que é importante: o texto da ideia (tarefa 2),
+  a lista de passos (tarefa 3), o resumo da reunião (tarefa 4).
+  Use a área de conhecimento do projeto, ou anexe arquivos.</p>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Os textos e arquivos listados dentro do projeto.</div>
+  <span class="captura">[CAPTURA: projeto com textos e arquivos guardados]</span>
+</div>
+
+<div class="passo">
+  <span class="numero">Passo 4</span>
+  <p>Daqui para frente, comece as conversas sobre esse assunto
+  <strong>dentro do projeto</strong>. Pergunte, por exemplo:</p>
+  <span class="digite">O que falta fazer na horta?</span>
+  <div class="ver"><strong>O que você vai ver:</strong>
+    Uma resposta que usa o que você guardou no projeto.</div>
+  <span class="captura">[CAPTURA: resposta dentro do projeto, usando o que foi guardado]</span>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="dicas">Dicas para tirar o melhor</h2>
+<ul>
+  <li><strong>Escreva como você fala.</strong> Não precisa de palavras técnicas.</li>
+  <li><strong>Uma coisa de cada vez.</strong> Uma ideia ou um projeto por conversa.</li>
+  <li><strong>Peça para mudar.</strong> “Mais curto”, “mais simples”, “em tópicos”: o Claude refaz.</li>
+  <li><strong>Peça letra maior para imprimir.</strong> “Faça em letras grandes, para imprimir.”</li>
+  <li><strong>Confira o que importa.</strong> Datas, valores e nomes: sempre leia antes de usar.</li>
+  <li><strong>Não compartilhe senhas</strong> nem dados de banco nas conversas.</li>
+</ul>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="oque">O que é o Onion, em uma página</h2>
+
+<p><strong>O Onion é um jeito de trabalhar com o Claude.</strong>
+Ele ensina ao Claude um método: o passo a passo que pessoas organizadas usam
+para tirar uma ideia da cabeça e levá-la até o fim.</p>
+
+<p><strong>Sem o Onion</strong>, você conversa com o Claude e ele responde.
+Funciona, mas cada vez é de um jeito.</p>
+
+<p><strong>Com o Onion</strong>, o Claude segue sempre o mesmo caminho:</p>
+<ol>
+  <li><strong>Entender</strong> a ideia, fazendo perguntas.</li>
+  <li><strong>Escrever</strong> a ideia de forma clara, com título e descrição.</li>
+  <li><strong>Dividir</strong> em passos pequenos, em ordem.</li>
+  <li><strong>Guardar</strong> o que foi decidido, para não se perder.</li>
+</ol>
+
+<p><strong>O nome vem da cebola</strong> (em inglês, <em>onion</em>): camadas.
+Você começa pelo de fora, a ideia, e vai descendo até o detalhe.</p>
+
+<p><strong>Para quem é.</strong> Para quem quer organizar projetos, ideias e
+conhecimento: um evento, uma reforma, um livro de memórias, a associação do bairro.
+O Onion também tem partes para equipes que fazem programas de computador.
+Este guia mostra só a parte de organizar, que é para todo mundo.</p>
+
+<p><strong>O que ele não é.</strong> Não é um programa separado.
+É um complemento que você instala dentro do Claude.
+E não decide por você: ajuda a pensar, mas a palavra final é sua.</p>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="glossario">Palavras novas, explicadas</h2>
+<dl class="glossario">
+  <dt>Claude</dt>
+  <dd>O assistente com quem você conversa por escrito. É uma inteligência artificial.</dd>
+  <dt>Inteligência artificial (IA)</dt>
+  <dd>Um programa que entende o que você escreve e responde com texto. Pode errar, por isso confira.</dd>
+  <dt>Conversa</dt>
+  <dd>Uma troca de mensagens com o Claude. Cada conversa nova começa do zero.</dd>
+  <dt>Caixa de mensagem</dt>
+  <dd>O espaço onde você escreve, embaixo ou no meio da tela.</dd>
+  <dt>Onion</dt>
+  <dd>Um método de organização que você instala no Claude.</dd>
+  <dt>Plugin (complemento)</dt>
+  <dd>Um pacote que acrescenta habilidades ao Claude. O Onion chega como plugin.</dd>
+  <dt>Marketplace (loja de complementos)</dt>
+  <dd>O lugar de onde o Claude busca os complementos. O do Onion se chama <strong>onion-plugins</strong>.</dd>
+  <dt>Skill (habilidade)</dt>
+  <dd>Uma instrução que ensina ao Claude a fazer uma tarefa de um jeito certo.</dd>
+  <dt>Barra “/”</dt>
+  <dd>Digitar <strong>/</strong> na caixa de mensagem abre o menu das habilidades instaladas.</dd>
+  <dt>Projeto (caderno)</dt>
+  <dd>Um lugar para juntar conversas e arquivos de um mesmo assunto.</dd>
+  <dt>Anexar</dt>
+  <dd>Enviar um arquivo do computador junto com a mensagem.</dd>
+  <dt>Plano pago</dt>
+  <dd>A assinatura do Claude (Pro, Max, Team ou Enterprise). O Onion precisa de um.</dd>
+</dl>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="problemas">Quando algo não funciona</h2>
+
+<h3>Digito “/” e não aparece nada do Onion</h3>
+<ul>
+  <li>Confira se a opção “Code execution and file creation” está ligada (Tarefa 1, passo 3).</li>
+  <li>Confira se “Onion” e “Onion · Product” aparecem como instalados em “Customize” &gt; “Plugins”.</li>
+  <li>Feche e abra o Claude de novo.</li>
+</ul>
+
+<h3>Não encontro “Plugins” nem “Add marketplace”</h3>
+<ul>
+  <li>Confira se o seu plano é pago.</li>
+  <li>Se a conta é da empresa, o responsável pode ter limitado os complementos. Peça ajuda a ele.</li>
+</ul>
+
+<h3>O Claude responde com palavras técnicas</h3>
+<ul>
+  <li>Escreva: <span class="digite">Explique de forma simples, sem palavras técnicas.</span></li>
+</ul>
+
+<h3>O Claude fala de “gerenciador de tarefas”, “arquivos do projeto” ou “repositório”</h3>
+<ul>
+  <li>Partes do Onion foram feitas para equipes técnicas. Escreva:
+    <span class="digite">Não tenho isso. Faça tudo aqui na conversa.</span></li>
+</ul>
+
+<h3>A resposta ficou longa demais</h3>
+<ul>
+  <li>Escreva: <span class="digite">Resuma em 5 linhas.</span></li>
+</ul>
+
+<p class="rodape">Onion: guia fácil. Rascunho de 12 de outubro de 2026.
+Os nomes de botões seguem a documentação oficial do Claude nesta data e podem mudar.</p>
+
+</main>
+<script>
+(function () {
+  var raiz = document.documentElement;
+  var tamanhos = [18, 20, 22, 24, 28];
+  var i = 1;
+  try { var s = parseInt(localStorage.getItem("onion-guia-tamanho"), 10); if (tamanhos.indexOf(s) >= 0) { i = tamanhos.indexOf(s); } } catch (e) {}
+  function aplicar() {
+    raiz.style.setProperty("--tamanho", tamanhos[i] + "px");
+    try { localStorage.setItem("onion-guia-tamanho", String(tamanhos[i])); } catch (e) {}
+  }
+  aplicar();
+  document.getElementById("maior").addEventListener("click", function () { if (i < tamanhos.length - 1) { i++; aplicar(); } });
+  document.getElementById("menor").addEventListener("click", function () { if (i > 0) { i--; aplicar(); } });
+  document.getElementById("imprimir").addEventListener("click", function () { window.print(); });
+})();
+</script>
+</body>
+</html>
