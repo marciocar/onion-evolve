@@ -26,7 +26,7 @@ com PyYAML.
 | Absoluto `/home`, `/etc`, `/var`, `/usr`, `/tmp`, `/opt`, `/boot`… | **55** | O grep ingênuo dá 59. Os outros 4 são **falso-positivo** de `/lib/` dentro de caminho relativo (`.claude/hooks/lib/…`, `.claude/validation/lib/…`): `E_CURA_LIB_INVOCACAO_PARTILHADA`, `E_DOIS_DRIFTED_NAO_RECONCILIADOS`, `C_TETO_MUTANTES_QUE_AS_CAMADAS_ESCONDEM`, `I_P3_KG_VIEW_TRIPLO_PARSE_CURADO` |
 | `~/` (ajuste do coordenador) | **5** só `~/` e 1 com `~/` e absoluto | `E_R3_F11_REGRAS_DE_PERMISSAO` já está entre os 55 |
 | Absoluto **sem barra final** (`/tmp`, `/proc`) | **3** | escapavam de qualquer grep por `/dir/` (M1) |
-| **Total** | **63** | 61 linhas na planilha e 2 deixadas de fora de propósito (D2) |
+| **Soma da triagem** | **63** | 61 linhas na planilha e 2 deixadas de fora de propósito (D2) |
 
 O "cerca de 62" do juiz da O4 bate com isso, a menos dos falso-positivos e das formas sem barra.
 

@@ -17,6 +17,9 @@ achando superação — com o `/meta:realign` como **verificador-por-turno**. É
 ## Degrau e limites (não negociáveis)
 
 - Opera no degrau **AUDIT**: conduz cada fio **até PR-verde sozinho**; **merge no main é 100% humano, em LOTE** num checkpoint.
+- **AUTOMATE (decidido em 2026-10-12, ainda não aberto):** o merge passa a ser POR PADRÃO, só pelo
+  `ops/pr-merge-verified.sh`, com paradas duras nomeadas na doutrina (§0). O degrau abre quando elas
+  forem predicados executáveis com mutante (SAC-114, auto-drive). Até lá, vale a linha acima.
 - **Maestro-invocado.** Nunca auto-inicia, nunca `/loop`/`schedule`/cron sobre si (W7 = MOAT).
 - **Budget-capped, retomável.** Sem budget não há laço. Retomada = re-censo (o status do nó É o progresso) + o checkpoint pendente **no grafo** (`meta.x_drive_checkpoint`).
 - **MOAT (PARA sempre):** deploy · escrever repo alheio (I3) · merge de path vendorizado/outward-facing · agendar por relógio.
