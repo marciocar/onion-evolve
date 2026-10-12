@@ -1,0 +1,56 @@
+meta:
+  id: mcp-kg-writer-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-12"
+  review_after: "2026-11-12"
+  note: "O write(KG) do chat da casa: um MCP de escrita separado do Brain (que segue só leitura), com área por usuário e o gate da maquinaria antes de gravar."
+
+nodes:
+  - id: D_MCP_KG_WRITER_CHAT_DA_CASA
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    label: "O chat da casa gera .kg.yaml por um MCP de ESCRITA separado do Brain: qualquer usuário logado escreve só na própria área, e grafo que reprova no radar ou no contrato é recusado sem gravar nada."
+    narrative: "As três respostas do maestro, em 2026-10-12, dadas por pergunta com opções. (1) QUEM ESCREVE E ONDE: qualquer usuário logado no chat escreve, mas só na sua própria área, derivada do e-mail que o LibreChat declara no header X-User-Email; nenhuma tool aceita área ou caminho como argumento. (2) O QUE ACONTECE COM GRAFO RUIM: grafo que reprova na maquinaria é recusado, nada é gravado, e as linhas do radar (✗) e do contrato (MUST) voltam para o modelo corrigir. (3) ONDE MORA: um MCP de escrita separado do Brain, que continua só leitura. O código fica no core, como no degrau 1 do Brain; a hospedagem (unit, porta, firewall, bloco do LibreChat) é do maestro, depois do merge."
+    trace: "ops/mcp-onion-kg-writer/server.py"
+    provenance:
+      source: "decisão do maestro na sessão de 2026-10-12, pergunta com opções sobre o chat gerar grafos"
+      locator: "as três respostas: área própria, recusa sem gravar, MCP separado do Brain"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      locality: "pessoa"
+
+  - id: A_MCP_KG_WRITER_SERVER
+    node_type: artifact
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: "ops/mcp-onion-kg-writer/server.py: cinco tools (kg_validate, kg_write, kg_my_list, kg_my_get, kg_schema_help), auth X-Api-Key fail-closed e gate kg-radar --integrity --schema + kg_validate.py antes de gravar."
+    narrative: "Fica open até chegar a PROD: o deploy na VPS (unit, porta 3037 no bridge do Docker, ufw e bloco do librechat.yaml) é do maestro. Bancada: família mcp_onion_kg_writer do lint-selftest.sh, 28 casos por HTTP real e 25 mutantes plantados por ops/mutate-and-restore.sh, todos mordendo o caso nomeado."
+    trace: "ops/mcp-onion-kg-writer/selftest.py"
+
+  - id: Q_CADASTRO_ABERTO_E_DISCO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: "Com cadastro aberto no IdP e 'qualquer logado escreve', o teto por área (200 grafos de até 512 KB) limita uma conta, mas não o número de contas: precisa de cota de disco ou de lista de e-mails?"
+    narrative: "Achado da passada adversarial do PR. O Brain resolveu a mesma pergunta com ONION_KG_ALLOWED_EMAILS. A decisão (1) diz que qualquer logado escreve, então a lista não entrou. Fica para o maestro decidir com o uso medido."
+    trace: "ops/mcp-onion-kg-writer/README.md"
+
+edges:
+  - from: A_MCP_KG_WRITER_SERVER
+    to: D_MCP_KG_WRITER_CHAT_DA_CASA
+    edge_type: TRACES_TO
+  - from: Q_CADASTRO_ABERTO_E_DISCO
+    to: D_MCP_KG_WRITER_CHAT_DA_CASA
+    edge_type: CONSTRAINS
+
+external_edges:
+  - from: D_MCP_KG_WRITER_CHAT_DA_CASA
+    to: "docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml#D_ONION_BRAIN_MCP_REMOTO"
+    edge_type: TRACES_TO

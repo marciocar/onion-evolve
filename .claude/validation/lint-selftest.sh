@@ -30265,6 +30265,74 @@ EOF_MUT
 }
 _family run_mcp_onion_kg_selftests
 
+# Modo mcp-onion-kg-writer — o write(KG) do chat da casa (decisão do maestro de 2026-10-12, por pergunta com opções:
+# qualquer usuário logado escreve, SÓ na própria área; grafo que reprova na maquinaria é RECUSADO e nada é gravado).
+# O harness (ops/mcp-onion-kg-writer/selftest.py) sobe o servidor de VERDADE em 127.0.0.1 numa porta efêmera, com a
+# raiz de dados em mktemp DENTRO de um repo git pai e o gate = a maquinaria real deste repo (kg-radar.sh --integrity
+# --schema + vendor/kg-ssot/tools/kg_validate.py). Casos: (a) o harness passa inteiro, com a CONTAGEM travada (caso
+# apagado = falha, não verde menor) · (m) UM MUTANTE POR CASO, plantado por ops/mutate-and-restore.sh numa CÓPIA do
+# servidor em mktemp (o arquivo vivo nunca é mutado; o marcador fica em arquivo não rastreado), e o caso NOMEADO tem
+# de reprovar. TETOS DECLARADOS (mutante sobrevive por defesa DUPLA, por isso fora da lista): o confinamento por
+# realpath do graph_paths e o O_NOFOLLOW do kg_my_get (o lstat que recusa symlink segura cada caso sozinho); o
+# --git-dir explícito e o GIT_CEILING_DIRECTORIES do git da área (cada um sozinho impede o commit de subir ao repo
+# pai); a recusa de âncora e a de alias do loader (a âncora sempre precede o alias); e o corte do caminho temporário
+# na saída do gate (o gate recebe o nome relativo, então o caminho não aparece nem sem o corte).
+run_mcp_onion_kg_writer_selftests() {
+  local h="${REPO_ROOT}/ops/mcp-onion-kg-writer/selftest.py" srv="${REPO_ROOT}/ops/mcp-onion-kg-writer/server.py"
+  local helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
+  if [ ! -f "${h}" ] || [ ! -f "${srv}" ]; then
+    record_skip "mcp-onion-kg-writer: servidor ausente nesta árvore (ops/ não viaja para todo papel)"; return
+  fi
+  command -v python3 >/dev/null 2>&1 && python3 -I -c 'import yaml, jsonschema' >/dev/null 2>&1 \
+    || { record_skip "mcp-onion-kg-writer: python3/PyYAML/jsonschema ausentes (gate do contrato não exercido)"; return; }
+  local want_total=28 o rc
+  if o="$(LC_ALL=C python3 -I -B "${h}" --code-root "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} " <<< "${o}" && ! grep -q '^FAIL ' <<< "${o}"; then
+    record_pass "mcp-onion-kg-writer: (a) servidor real por HTTP — ${want_total} casos (401, e-mail, área, gate, symlink, teto)"
+  else record_fail "mcp-onion-kg-writer: (a) harness" "rc=${rc}: $(grep -E '^(FAIL|TOTAL)' <<< "${o}" | head -4 | tr '\n' '|') ${o:0:200}"; fi
+  [ -f "${helper}" ] || { record_fail "mcp-onion-kg-writer: (m)" "ops/mutate-and-restore.sh ausente: mutante não exercido"; return; }
+  local sb cp old new want mo mrc n
+  sb="$(TMPDIR=/tmp mktemp -d)"; cp="${sb}/server.py"
+  while IFS=$'\x1f' read -r old new want; do
+    [ -n "${old}" ] || continue
+    cat "${srv}" > "${cp}"
+    n="$(grep -cF -- "${old}" "${cp}" || true)"
+    if [ "${n}" != "1" ]; then record_fail "mcp-onion-kg-writer: (m) âncora do mutante ocorre ${n}x (precisa 1)" "${want}"; continue; fi
+    if mo="$(LC_ALL=C bash "${helper}" "${cp}" "${old}|||${new}" python3 -I -B "${h}" --server "${cp}" --code-root "${REPO_ROOT}" 2>&1)"; then mrc=0; else mrc=$?; fi
+    if grep -q 'não consegui plantar\|RECUSADO' <<< "${mo}"; then record_fail "mcp-onion-kg-writer: (m) mutante não aplicou" "${want}"; continue; fi
+    if [ "${mrc}" -ne 0 ] && grep -q "^FAIL ${want} " <<< "${mo}"; then record_pass "mcp-onion-kg-writer: (m) mutante morde → FAIL ${want}"
+    else record_fail "mcp-onion-kg-writer: (m) mutante NÃO morde" "${want} (rc=${mrc}) $(grep -E '^(FAIL|TOTAL)' <<< "${mo}" | head -3 | tr '\n' '|')"; fi
+  done <<EOF_MUT
+    if not TOKEN:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')token-fail-closed
+        return bool(TOKEN) and hmac.compare_digest(self.headers.get('X-Api-Key', '').encode(), TOKEN.encode())$(printf '\x1f')        return True  # ONION_MUTANTE$(printf '\x1f')sem-token-401
+    email = normalize_email(email_raw)$(printf '\x1f')    email = (email_raw or 'anon@x.invalid').strip().lower()  # ONION_MUTANTE$(printf '\x1f')sem-email-recusa
+    if len(e) > 254 or not EMAIL_RE.match(e):$(printf '\x1f')    if len(e) > 254:  # ONION_MUTANTE$(printf '\x1f')email-invalido-recusa
+    return f'{local}-{hashlib.sha256(email.encode()).hexdigest()[:16]}'$(printf '\x1f')    return 'shared'  # ONION_MUTANTE$(printf '\x1f')isolamento-a-b
+    if not isinstance(slug, str) or not slug or len(slug) > SLUG_MAX or not SLUG_RE.match(slug):$(printf '\x1f')    if not isinstance(slug, str) or not slug:  # ONION_MUTANTE$(printf '\x1f')slug-invalido-recusa
+    if perr is None and mid != slug:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')meta-id-diferente-recusa
+        radar_ok = res['radar']['passou']$(printf '\x1f')        radar_ok = True  # ONION_MUTANTE$(printf '\x1f')radar-reprova-nada-gravado
+        contrato_ok = res['contrato']['passou']$(printf '\x1f')        contrato_ok = True  # ONION_MUTANTE$(printf '\x1f')contrato-reprova-nada-gravado
+    if v['veredito'] != 'APROVADO':$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')reprovado-nao-cria-area
+    _, v = judge(slug, yml)$(printf '\x1f')    v = t_kg_write(email, {'slug': slug, 'yaml': yml})  # ONION_MUTANTE$(printf '\x1f')validate-nao-grava
+    if stat.S_ISLNK(st.st_mode):$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')symlink-plantado-recusa
+    if len(data) > MAX_YAML:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')yaml-acima-do-teto-recusa
+        doc = yaml.load(text, Loader=_NoAliasLoader)  # noqa: S506 — SafeLoader derivado, sem tags python$(printf '\x1f')        doc = yaml.safe_load(text)  # ONION_MUTANTE$(printf '\x1f')alias-recusado
+            author = f"{email.split('@', 1)[0]} <{email}>"$(printf '\x1f')            author = 'x <x@x.invalid>'  # ONION_MUTANTE$(printf '\x1f')write-valido-grava-e-commita
+        mudou = bool(st)$(printf '\x1f')        mudou = True  # ONION_MUTANTE$(printf '\x1f')reescrita-identica-sem-commit-novo
+            if len(existing) >= MAX_GRAPHS:$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')area-cheia-recusa
+                    rc, out, err = 124, '', f'timeout do gate ({GATE_TIMEOUT}s)'$(printf '\x1f')                    rc, out, err = 0, '', ''  # ONION_MUTANTE$(printf '\x1f')gate-timeout-reprova
+            raise SystemExit(f'recuso subir: {what} ausente em {CODE_SOURCE} — sem gate nao gravo nada')$(printf '\x1f')            pass  # ONION_MUTANTE$(printf '\x1f')code-root-sem-gate-recusa-boot
+        raise SystemExit('recuso subir: ONION_KG_WRITER_ROOT inexistente ou symlink — crie o diretorio antes')$(printf '\x1f')        pass  # ONION_MUTANTE$(printf '\x1f')data-root-ausente-recusa-boot
+    return {'untrusted_data': True, 'aviso': UNTRUSTED_NOTICE, 'tool': nome, 'usuario': email,$(printf '\x1f')    return {'tool': nome, 'usuario': email,  # ONION_MUTANTE$(printf '\x1f')envelope-nao-confiavel
+            'served_commit': code_commit(), 'code_source': CODE_SOURCE, 'data': data}$(printf '\x1f')            'served_commit': None, 'code_source': CODE_SOURCE, 'data': data}  # ONION_MUTANTE$(printf '\x1f')served-commit-do-gate
+            if n < 0 or n > MAX_BODY:$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')content-length-negativo-400
+        '      method: "leitura: secao 2 do documento"\n'$(printf '\x1f')        '      x_m: "leitura"\n'  # ONION_MUTANTE$(printf '\x1f')schema-help-exemplo-aprova
+    'kg_my_get': (t_kg_my_get, 'Le um grafo da SUA area pelo slug', {'slug': _SLUG}, ['slug'], True),$(printf '\x1f')    # ONION_MUTANTE$(printf '\x1f')tools-list-5
+EOF_MUT
+  rm -rf "${sb}"
+}
+_family run_mcp_onion_kg_writer_selftests
+
 
 
 
