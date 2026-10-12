@@ -2,7 +2,8 @@
 branch: fix/protect-main-default-branch
 pr: pendente
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ca1fd8407a2d2a40537bca8af8ded578152a79decfc0a9ff81a2ea1a3bd1eda1
+reviewed_code_sha256: e3ffa709a469a94b75ea3b965648956be25223ed75be12b1273a4d7cf84b425e
 findings_total: 4
 findings_real: 4
 findings_fixed: 1
