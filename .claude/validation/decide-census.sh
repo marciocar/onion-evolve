@@ -18,7 +18,7 @@
 # ── DESCOBERTA POR REFERÊNCIA (cláusula 1 da forja) ─────────────────────────────────────────
 # O corpus não é varrido por palavra-chave "parece decisão": o nó entra porque o texto CITA o id dele,
 # porque o maestro passou o tema, ou porque o git diz que o bloco dele mudou. Medido na forja
-# (2026-10-12): 159 decision e 300 question abertos em 117 grafos — despejar isso na sessão seria
+# (2026-10-12, antes dos nós da própria forja): 159 decision e 300 question abertos em 117 grafos — despejar isso na sessão seria
 # ruído; nenhum deles tem opções em campo estruturado (vivem em label/narrative).
 #
 # ── O QUE ESTE SCRIPT NÃO FAZ (fronteira declarada) ─────────────────────────────────────────
@@ -40,12 +40,13 @@
 # ===========================================================================
 set -uo pipefail
 REPO=""; FMT="--markdown"; CITE=""; THEME=""; WINDOW="7"; NOGH="0"
+_need() { [ $# -ge 2 ] && [ -n "$2" ] || { echo "decide-census: $1 exige um valor" >&2; exit 2; }; }   # rc 2, nunca o 1 do ${:?}
 while [ $# -gt 0 ]; do
   case "$1" in
     --markdown|--tsv) FMT="$1" ;;
-    --cite) shift; CITE="${1:?--cite exige um arquivo ou -}" ;;
-    --theme) shift; THEME="${1:?--theme exige os termos}" ;;
-    --window) shift; WINDOW="${1:?--window exige o número de dias}" ;;
+    --cite) _need "$@"; shift; CITE="$1" ;;
+    --theme) _need "$@"; shift; THEME="$1" ;;
+    --window) _need "$@"; shift; WINDOW="$1" ;;
     --no-gh) NOGH="1" ;;
     --*) echo "decide-census: opção desconhecida: $1" >&2; exit 2 ;;
     *) REPO="$1" ;;
@@ -110,18 +111,22 @@ graphs.sort()
 
 open_nodes = []          # dicts
 checkpoints = []
+STATUS = {'open', 'confirmed', 'drifted', 'unverifiable', 'refuted', 'superseded', 'done'}
 all_ids = {}             # id → (grafo, node_type, status) de TODO nó rastreado: para nomear o citado que não está na fila
 for g in graphs:
     p = os.path.join(repo, g)
     if not os.path.isfile(p):
         avisos.append(f'grafo rastreado AUSENTE do disco (não medido): {g}'); continue
-    txt = open(p, encoding='utf-8').read()
     try:
+        txt = open(p, encoding='utf-8').read()
         d = yaml.safe_load(txt)
     except Exception as e:
-        print(f'decide-census: grafo rastreado que NÃO PARSEIA: {g}: {one(e)[:200]} — recuso medir o resto como se ele não existisse', file=sys.stderr)
+        print(f'decide-census: grafo rastreado que NÃO PARSEIA (YAML ou UTF-8): {g}: {one(e)[:200]} — recuso medir o resto como se ele não existisse', file=sys.stderr)
         sys.exit(2)
-    if not isinstance(d, dict): continue
+    if not isinstance(d, dict):
+        avisos.append(f'grafo rastreado sem mapa no topo (vazio ou não-dict), NÃO medido: {g}'); continue
+    if not isinstance(d.get('nodes') or [], list):
+        avisos.append(f'grafo com `nodes:` que não é lista, NÃO medido: {g}'); continue
     meta = d.get('meta') or {}
     if isinstance(meta, dict):
         ck = meta.get('x_drive_checkpoint', meta.get('drive_checkpoint'))
@@ -148,9 +153,13 @@ for g in graphs:
     for n in d.get('nodes') or []:
         if not isinstance(n, dict): continue
         all_ids.setdefault(str(n.get('id')), (g, n.get('node_type'), n.get('status')))
+        if n.get('node_type') in ('decision', 'question') and n.get('status') not in STATUS:
+            avisos.append(f"decision/question com status fora do vocabulário (não medido como aberto): {n.get('id')} = {n.get('status')!r} em {g}")
         if n.get('node_type') not in ('decision', 'question') or n.get('status') != 'open': continue
         nid = str(n.get('id'))
         ln, ind = idline.get(nid, (0, 0))
+        if not ln:   # 11: fora da forma de bloco (flow-style, id que não é a 1ª chave, id fora do alfabeto)
+            avisos.append(f'nó aberto fora da forma `- id:` de bloco: {nid} em {g} — entra por cite/tema, mas a JANELA e a linha de origem NÃO são medidas')
         end = len(lines)
         if ln:
             for j in range(ln, len(lines)):
@@ -185,10 +194,11 @@ if cite:
         ctoks = set(re.findall(r'[A-Za-z0-9_]+', open(cite, encoding='utf-8', errors='replace').read()))
     except Exception as e:
         print(f'decide-census: --cite ilegível: {e}', file=sys.stderr); sys.exit(2)
-    cited = {n['id'] for n in open_nodes if n['id'] in ctoks}
+    clow = {t.casefold() for t in ctoks}
+    cited = {n['id'] for n in open_nodes if n['id'].casefold() in clow}   # sem caixa: "d_x" também cita D_X
     # o citado que NÃO entrou é NOMEADO (achado do dogfood da forja: um id citado e inexistente sumia calado,
     # e a sessão leria a ausência como "não há o que decidir sobre ele")
-    for t in sorted(ctoks - cited):
+    for t in sorted(t for t in ctoks if t not in cited and t.upper() not in {c.upper() for c in cited}):
         if not re.fullmatch(r'[A-Z][A-Z0-9]*_[A-Z0-9_]*[A-Z0-9]', t): continue
         if t in all_ids:
             gg, ty, stt = all_ids[t]
@@ -203,6 +213,10 @@ def themed(n):
     return bool(terms) and all(t in hay for t in terms)
 # ── (c) janela: bloco do nó tocado entre o último commit ANTES da janela e a árvore de trabalho ─
 touched = set(); base_desc = 'desligada'
+_rc_sh, _sh = git('rev-parse', '--is-shallow-repository')
+if window > 0 and _sh.strip() == 'true':
+    avisos.append('clone RASO (shallow): o histórico não chega à base da janela — janela NÃO medida (nada entra por window)')
+    window = 0; base_desc = 'NÃO MEDIDA (clone raso)'
 if window > 0:
     cutoff = today_d - datetime.timedelta(days=window)
     rc, base = git('rev-list', '-1', f'--before={cutoff.isoformat()}T00:00:00', 'HEAD')

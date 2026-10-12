@@ -121,7 +121,23 @@ nodes:
       locator: "diretivas de injeção e passos 1 e 2 do Procedimento"
       method: "medição: invocação headless do comando com ferramentas só de leitura"
       locality: "repo"
-  - id: E_BANCADA_17_CASOS_17_MUTANTES
+  - id: E_REFUTADOR_REPROVOU_O_SELADOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: "2026-10-12"
+    verified_against: "passada adversarial por subagente isolado com mandato de refutar, default reprovado: 17 achados, todos executados em cópias fora do repo; veredito REPROVADO"
+    label: "o refutador reprovou a 1ª versão: o selador re-carimbava decisões confirmed com proveniência medida (195 no corpus) e havia seis outros jeitos de sair 0 gravando errado"
+    narrative: "Os achados curados neste PR: só open se sela (lista positiva); proveniência anterior inteira; narrative anterior verbatim em bloco; escolha vazia, data futura, opção com « », escolhida repetida sem caixa e pergunta ausente recusadas; contrato também no passo 0; caminho absoluto antes do gate do contrato; cego aninhado. No medidor: aviso para grafo vazio, nodes que não é lista, status fora do vocabulário, nó fora da forma de bloco e clone raso; citação sem caixa; opção sem valor e grafo não UTF-8 saem rc 2. A bancada ganhou os casos que os mutantes M2, M3 e M4 dele mostraram faltar. Ficou declarado e não curado: id com hífen ou ponto (o radar já reprova id fora do alfabeto) e nós drifted fora da fila (0 hoje)."
+    provenance:
+      source: "relatório do refutador da forja do /meta:decide"
+      locator: "achados 1 a 17 e a seção do que se manteve sob ataque"
+      method: "medição: execução adversarial em cópias descartáveis, re-executada pela bancada depois das curas"
+      locality: "repo"
+  - id: E_BANCADA_22_CASOS_27_MUTANTES
     node_type: evidence
     layer: audit
     plane: DEV
@@ -129,8 +145,8 @@ nodes:
     impact: 4
     confidence: 1.0
     verified_at: "2026-10-12"
-    verified_against: "run_decide_selftests 17/17 sob LC_ALL=C; 17 mutantes por ops/mutate-and-restore.sh, um por caso, e cada um reprovou o caso que vigia"
-    label: "a família run_decide_selftests tem 17 casos (10 do medidor, 7 do selador, o contrato incluso), sem rede, e cada mutante reprova o caso dele"
+    verified_against: "run_decide_selftests 22/22 sob LC_ALL=C; 27 mutantes por ops/mutate-and-restore.sh (ao menos um por caso), e cada um reprovou o caso que vigia"
+    label: "a família run_decide_selftests tem 22 casos (11 do medidor, 11 do selador, o contrato incluso), sem rede, e cada um dos 27 mutantes reprova o caso dele"
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_decide_selftests"
@@ -176,7 +192,10 @@ edges:
   - from: E_JANELA_POR_BLOCO_ERA_RUIDO
     to: D_TOPOLOGIA_DO_DECIDE_SELADA
     edge_type: SUPPORTS
-  - from: E_BANCADA_17_CASOS_17_MUTANTES
+  - from: E_REFUTADOR_REPROVOU_O_SELADOR
+    to: D_TOPOLOGIA_DO_DECIDE_SELADA
+    edge_type: CONSTRAINS
+  - from: E_BANCADA_22_CASOS_27_MUTANTES
     to: D_TOPOLOGIA_DO_DECIDE_SELADA
     edge_type: SUPPORTS
   - from: E_DOGFOOD_ACHOU_TRES_SILENCIOS_DO_MEDIDOR

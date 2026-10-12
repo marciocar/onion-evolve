@@ -4,9 +4,9 @@
 #
 # Uso:
 #   bash .claude/validation/kg-decide-seal.sh <grafo.kg.yaml> <NODE_ID> \
-#        --chosen "<opção escolhida>" --rejected "<a|b|c>" --date AAAA-MM-DD [--question "<pergunta>"] [--other]
+#        --chosen "<opção escolhida>" --rejected "<a|b|c>" --date AAAA-MM-DD --question "<pergunta>" [--other]
 #   bash .claude/validation/kg-decide-seal.sh <grafo.kg.yaml> --new <D_ID> --label "<afirmação ≤280>" \
-#        --link <ID_EXISTENTE> [--edge-type TRACES_TO] [--impact 3] --chosen ... --rejected ... --date ...
+#        --link <ID_EXISTENTE> [--edge-type TRACES_TO] [--impact 3] --chosen ... --rejected ... --date ... --question ...
 #
 # O que escreve (nó existente decision|question `open`):
 #   status: done · verified_at · verified_against · provenance {source, locator, method, locality: pessoa}
@@ -20,11 +20,13 @@
 # Com --new: cria o nó `D_*` com as mesmas marcas e uma aresta <D_ID> --<edge-type>--> <ID_EXISTENTE>
 #   (nó sem aresta reprova no radar como órfão; a ligação é o que diz DE ONDE a decisão veio).
 #
-# O que RECUSA (rc 2, NADA escrito): nó inexistente · nó já done/superseded/refuted · nó que não é
-#   decision|question · nó com campo CEGO (chave com `blind`/`cego`: gate humano às cegas não recebe
+# O que RECUSA (rc 2, NADA escrito): nó inexistente · nó que não está `open` (lista positiva) · nó que não é
+#   decision|question · nó com campo CEGO (chave com `blind`/`cego` em qualquer nível, ou valor aninhado: gate humano às cegas não recebe
 #   voto de ninguém além do humano) · id duplicado ou fora da forma de bloco · data inválida · --rejected
 #   vazio · --new com id existente ou fora de `D_[A-Z0-9_]+`, sem --label/--link, ou link inexistente ·
-#   grafo que JÁ reprova no radar antes do selo (não se sela grafo que o motor não lê).
+#   grafo que JÁ reprova no radar ou JÁ piora o contrato antes do selo (dívida alheia não vira culpa do selo) ·
+#   --question ausente · --chosen vazio · opção com « » · escolhida também em --rejected (sem caixa) · data futura.
+#   A narrative anterior fica VERBATIM num bloco `|-`; a proveniência anterior vai inteira para ela.
 # O gate (rc 3, escrita DESFEITA byte a byte): depois de escrever, `kg-radar.sh --integrity --schema`
 #   tem de sair 0 e, onde o contrato está vendorizado (vendor/kg-ssot), `kg-contract-check.sh` também
 #   (ele cobra a REGRA 99 (Nó de .kg.yaml sem caminho de máquina, julgado pela classe) no texto da opção).
@@ -62,17 +64,36 @@ while [ $# -gt 0 ]; do
 done
 [ -n "${GRAPH}" ] || { sed -n '/^# Uso:/,/^# O que escreve/p' "$0" | sed '$d' >&2; exit 2; }
 [ -f "${GRAPH}" ] || { echo "kg-decide-seal: grafo inexistente: ${GRAPH}" >&2; exit 2; }
+# caminho ABSOLUTO desde já: o gate do contrato roda com `cd` na raiz, e um relativo deixava o contrato
+# "não julgado" e o selo saindo 0 (achado 6 do refutador, 2026-10-12)
+GRAPH="$(realpath -- "${GRAPH}")"
 if [ -n "${NEW}" ] && [ -n "${NODE}" ]; then echo "kg-decide-seal: ou <NODE_ID> ou --new <D_ID>, nunca os dois" >&2; exit 2; fi
 [ -n "${NEW}${NODE}" ] || { echo "kg-decide-seal: falta o nó (<NODE_ID> ou --new <D_ID>)" >&2; exit 2; }
 [ -n "${CHOSEN}" ] || { echo "kg-decide-seal: falta --chosen (a opção que o maestro escolheu, literal)" >&2; exit 2; }
 [ -n "${REJECTED}" ] || { echo "kg-decide-seal: falta --rejected (as opções oferecidas e descartadas, separadas por |) — o selo registra o que foi recusado" >&2; exit 2; }
 [ -n "${DATE}" ] || { echo "kg-decide-seal: falta --date AAAA-MM-DD" >&2; exit 2; }
+# a PERGUNTA é obrigatória: é o único rastro, no selo, de que houve pergunta (achado 8 do refutador)
+[ -n "${QUESTION}" ] || { echo "kg-decide-seal: falta --question (o texto da pergunta feita ao maestro) — selo sem pergunta registrada é testemunho sem rastro" >&2; exit 2; }
 command -v python3 >/dev/null 2>&1 || { echo "kg-decide-seal: python3 ausente" >&2; exit 2; }
 [ -f "${RADAR}" ] || { echo "kg-decide-seal: radar ausente: ${RADAR} — sem gate não selo" >&2; exit 2; }
 
 # Passo 0 — não se sela grafo que o motor já reprova (o selo seria culpado por dívida alheia)
 bash "${RADAR}" "${GRAPH}" --integrity --schema >/dev/null 2>&1 \
   || { echo "kg-decide-seal: ${GRAPH} JÁ reprova no radar --integrity --schema antes do selo — conserte antes; nada escrito" >&2; exit 2; }
+ROOT="$(git -C "$(dirname "${GRAPH}")" rev-parse --show-toplevel 2>/dev/null || true)"
+_contract() {  # COUT/CRC do contrato sobre o grafo; CRC=99 quando não há contrato vendorizado
+  if [ -n "${ROOT}" ] && [ -f "${ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && [ -f "${HERE}/kg-contract-check.sh" ]; then
+    COUT="$(cd "${ROOT}" && bash "${HERE}/kg-contract-check.sh" "${GRAPH}" 2>&1)"; CRC=$?
+  else COUT=""; CRC=99; fi
+}
+# e o CONTRATO também no passo 0 (achado 5 do refutador): dívida que o grafo já tinha na árvore seria
+# atribuída ao selo, que sairia 3 "por culpa própria"
+_contract
+if [ "${CRC}" -eq 1 ]; then
+  echo "kg-decide-seal: ${GRAPH} JÁ piora o contrato antes do selo (dívida pré-existente, não do selo) — conserte antes; nada escrito:" >&2
+  printf '%s\n' "${COUT}" | head -6 >&2
+  exit 2
+fi
 
 BK="$(mktemp)"; trap 'rm -f "${BK}"' EXIT
 cp -p "${GRAPH}" "${BK}"
@@ -90,10 +111,15 @@ except ImportError:
 if not re.fullmatch(r'\d{4}-\d{2}-\d{2}', date): die(f'--date fora de AAAA-MM-DD: {date}')
 try: datetime.date.fromisoformat(date)
 except ValueError: die(f'--date não é data real: {date}')
+import os
+today = os.environ.get('DECIDE_SEAL_TODAY') or datetime.date.today().isoformat()
+if date > today: die(f'--date no futuro ({date} > {today}): o selo registra uma resposta que já foi dada')
 one = lambda s: ' '.join(str(s).split())
 chosen = one(chosen); rej = [one(x) for x in rejected.split('|') if one(x)]
+if not chosen: die('--chosen vazio depois de normalizar espaços: resposta ambígua não sela')
 if not rej: die('--rejected sem nenhuma opção legível')
-if chosen in rej: die('a opção escolhida também está em --rejected')
+if any(c in x for x in [chosen] + rej for c in '«»'): die('opção com « ou »: são o delimitador do selo na narrative — reescreva sem eles')
+if chosen.casefold() in {r.casefold() for r in rej}: die('a opção escolhida também está em --rejected (comparado sem caixa)')
 txt = open(path, encoding='utf-8').read()
 try: d = yaml.safe_load(txt) or {}
 except Exception as e: die(f'YAML ilegível: {one(e)[:160]}')
@@ -110,6 +136,11 @@ vag = f'decisão do maestro em {date}, por pergunta com opções (/meta:decide):
 method = f'testemunho: decisão do maestro por pergunta com opções, {date}'
 locator = f'pergunta com opções de {date}' + (f': «{one(question)}»' if question else '')
 
+def narr_block(fi, old, tail):
+    s = ' ' * (fi + 2)
+    body = (old.split('\n') + [''] if old else []) + tail
+    return [' ' * fi + 'narrative: |-'] + [(s + l) if l.strip() else '' for l in body]
+
 def prov_lines(fi):
     s = ' ' * fi
     return [f'{s}provenance:', f'{s}  source: "maestro, na sessão do /meta:decide"', f'{s}  locator: {q(locator)}',
@@ -121,8 +152,20 @@ if not new:
     n = byid[node][0]
     if n.get('node_type') not in ('decision', 'question'): die(f'{node} é {n.get("node_type")}, não decision|question — não se "decide" um nó desse tipo')
     st = n.get('status')
-    if st in ('done', 'superseded', 'refuted'): die(f'{node} já está {st} — selo não se re-carimba; decisão nova é nó novo (--new) que SUPERSEDES')
-    blind = [k for k in n if re.search(r'blind|cego', str(k), re.I)]
+    # lista POSITIVA (achado 1 do refutador): a negativa deixava re-carimbar `confirmed` em PROD com proveniência
+    # medida — 195 decisões do corpus expostas. Só `open` está em aberto para o maestro.
+    if st != 'open': die(f'{node} está {st}, não open — selo não se re-carimba; decisão nova é nó novo (--new) que SUPERSEDES')
+    def _blind(o, top=True):   # chave cega em qualquer nível; VALOR cego só abaixo do 1º nível (prosa fica fora)
+        out = []
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if re.search(r'blind|cego', str(k), re.I): out.append(str(k))
+                if isinstance(v, (dict, list)): out += _blind(v, False)
+                elif not top and isinstance(v, str) and re.search(r'blind|cego', v, re.I): out.append(f'{k}={v}')
+        elif isinstance(o, list):
+            for v in o: out += _blind(v, False)
+        return out
+    blind = _blind(n)
     if blind: die(f'{node} tem campo CEGO ({", ".join(blind)}): gate humano às cegas não recebe selo de sessão')
     hits = [i for i, l in enumerate(lines) if re.match(r'^(\s*)-\s+id:\s*["\']?' + re.escape(node) + r'["\']?\s*(#.*)?$', l)]
     if len(hits) != 1: die(f'{node}: não achei UMA linha `- id:` em forma de bloco (achei {len(hits)})')
@@ -145,14 +188,19 @@ if not new:
             while k < end and (not lines[k].strip() or len(lines[k]) - len(lines[k].lstrip()) > fi): k += 1
             continue
         body.append(l); k += 1
+    # a narrative anterior é PRESERVADA verbatim num bloco `|-` (achado 3: o achatamento mutilava listas e
+    # parágrafos); a proveniência anterior vai INTEIRA (achado 2: só o source sobrevivia)
+    oldn = n.get('narrative')
+    if isinstance(oldn, list): oldn = '\n'.join(f'- {x}' for x in oldn)
+    oldn = '' if oldn is None else str(oldn).rstrip('\n')
     prev = []
-    if n.get('narrative'): prev.append(one(n['narrative']))
     if n.get('verified_against'): prev.append(f'verified_against anterior: «{one(n["verified_against"])}»')
-    if isinstance(n.get('provenance'), dict) and n['provenance'].get('source'): prev.append(f'proveniência anterior: «{one(n["provenance"]["source"])}»')
+    if isinstance(n.get('provenance'), dict) and n['provenance']:
+        prev.append('proveniência anterior: ' + ' · '.join(f'{k} «{one(v)}»' for k, v in n['provenance'].items()))
     if n.get('plane') == 'PROD': prev.append('plane anterior: PROD, rebaixado a DEV porque a base do selo é testemunho (contrato: integrity.testimony-in-prod)')
     s = ' ' * fi
     add = [f'{s}status: done', f'{s}plane: DEV']
-    add += [f'{s}verified_at: "{date}"', f'{s}verified_against: {q(vag)}', f'{s}narrative: {q(" · ".join(prev + [seal_txt]))}'] + prov_lines(fi)
+    add += [f'{s}verified_at: "{date}"', f'{s}verified_against: {q(vag)}', ] + narr_block(fi, oldn, prev + [seal_txt]) + prov_lines(fi)
     out = '\n'.join(lines[:i + 1] + body + add + lines[end:])
     target = node
 else:
@@ -203,6 +251,8 @@ n2 = m2[0]
 if (n2.get('status') != 'done' or n2.get('plane') != 'DEV' or str(n2.get('verified_at')) != date or (n2.get('provenance') or {}).get('method') != method
         or f'«{chosen}»' not in str(n2.get('narrative')) or any(f'«{r}»' not in str(n2.get('narrative')) for r in rej)):
     die('a escrita não releu como escrita (status/verified_at/method/narrative)')
+if not new and oldn and not str(n2.get('narrative')).startswith(oldn):
+    die('a narrative anterior não sobreviveu verbatim à escrita')
 open(path, 'w', encoding='utf-8').write(out)
 print(f'kg-decide-seal: escrito {target} em {path} — escolhida «{chosen}», descartadas {len(rej)}')
 PY
@@ -218,9 +268,8 @@ if ! ROUT="$(bash "${RADAR}" "${GRAPH}" --integrity --schema 2>&1)"; then
   printf '%s\n' "${ROUT}" | grep -m5 '✗' >&2 || printf '%s\n' "${ROUT}" | tail -5 >&2
   exit 3
 fi
-ROOT="$(git -C "$(dirname "${GRAPH}")" rev-parse --show-toplevel 2>/dev/null || true)"
-if [ -n "${ROOT}" ] && [ -f "${ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && [ -f "${HERE}/kg-contract-check.sh" ]; then
-  COUT="$(cd "${ROOT}" && bash "${HERE}/kg-contract-check.sh" "$(cd "$(dirname "${GRAPH}")" && pwd)/$(basename "${GRAPH}")" 2>&1)"; CRC=$?
+_contract
+if [ "${CRC}" -ne 99 ]; then
   if [ "${CRC}" -eq 1 ]; then
     _undo
     echo "kg-decide-seal: o contrato REPROVOU o grafo selado — escrita DESFEITA:" >&2
@@ -230,7 +279,7 @@ if [ -n "${ROOT}" ] && [ -f "${ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && [ -f 
     echo "kg-decide-seal: ⚠️ contrato NÃO JULGADO (rc ${CRC}) — o radar passou, o contrato não foi verificado: $(printf '%s' "${COUT}" | head -1)" >&2
   fi
 else
-  echo "kg-decide-seal: contrato não vendorizado neste repo — gate = só o radar (declarado)" >&2
+  echo "kg-decide-seal: fora de repo git ou contrato não vendorizado — gate = só o radar (declarado)" >&2
 fi
 echo "kg-decide-seal: ✅ selado — radar --integrity --schema exit 0"
 exit 0
