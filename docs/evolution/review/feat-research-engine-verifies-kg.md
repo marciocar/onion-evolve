@@ -1,7 +1,7 @@
 ---
 branch: feat/research-engine-verifies-kg
 date: 2026-10-11
-reviewed_diff_sha256: 79658196fa57d0cfb5efdd432ba9bede076f102a8dab99eb6cef3287891dc25d
+reviewed_diff_sha256: 886392b0a851b5f104c90ec193ee3216acea4c21c39dbea506c0c24c25400a14
 reviewed_code_sha256: 226e710bf4107ea0d80c7d5d10bb3887ab80c93baf07e195e5f8e6b45df4e4d2
 findings_total: 3
 findings_real: 3

@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**447 itens abertos** em 95 grafo(s) com aberto (de 121 no escopo) · 96 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**450 itens abertos** em 96 grafo(s) com aberto (de 123 no escopo) · 97 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -880,12 +880,6 @@
 |--:|---|---|---|
 | 4.2 | `Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO` | radar-E3-2026-10-05-r7 | A 2.1.289 adiciona agent.spawn para teammates, um id de agente unico atraves dos eventos de hook de plugin, e estados idle/waiting |
 
-## radar-E3-2026-10-08-r8 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.2 | `Q_ENV_GUARD_QUADRATICO_ATINGE_TIMEOUT` | radar-E3-2026-10-08-r8 | curar o custo quadrático do env-guard num token gigante: com onFailure block, um comando de ~520 KB sem espaço passa a ser BARRA |
-
 ## vps-shared-tools-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -897,6 +891,20 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
+
+## task-progress-story-points-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.6 | `Q_ADAPTER_LER_STORY_POINTS` | task-progress-story-points-2026-10 | Qual adapter passa primeiro a ler os pontos (estimate.points_read) e com que medição? ClickUp e Linear têm campo nativo ancorad |
+| 3.2 | `C_TETO_STATUS_BINARIO_POR_SUBTASK` | task-progress-story-points-2026-10 | TETO: o status é binário por subtask (meio feita conta como não feita), e numa task-mãe de task-mãe cada filha entra com os p |
+
+## vetos-fail-closed-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.2 | `C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON` | vetos-fail-closed-2026-10 | o recorte sem python3 dos dois vetos é sombreado no core: o env-guard, registrado no mesmo matcher, barra todo Read, Grep e Bash  |
+| 2.8 | `C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL` | vetos-fail-closed-2026-10 | falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, po |
 
 ## inbox-triage-2026-10-04 — 1 item(ns)
 
