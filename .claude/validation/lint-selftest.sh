@@ -30275,8 +30275,9 @@ _family run_mcp_onion_kg_selftests
 # de reprovar. TETOS DECLARADOS (mutante sobrevive por defesa DUPLA, por isso fora da lista): o confinamento por
 # realpath do graph_paths e o O_NOFOLLOW do kg_my_get (o lstat que recusa symlink segura cada caso sozinho); o
 # --git-dir explícito e o GIT_CEILING_DIRECTORIES do git da área (cada um sozinho impede o commit de subir ao repo
-# pai); a recusa de âncora e a de alias do loader (a âncora sempre precede o alias); e o corte do caminho temporário
-# na saída do gate (o gate recebe o nome relativo, então o caminho não aparece nem sem o corte).
+# pai); a recusa de âncora e a de alias do loader (a âncora sempre precede o alias); o corte do caminho temporário
+# na saída do gate (o gate recebe o nome relativo, então o caminho não aparece nem sem o corte); e o REPROVADO forçado
+# quando o safe_load não confere o meta.id (medido: tag `!x` reprova também no contrato, parse.yaml-error).
 run_mcp_onion_kg_writer_selftests() {
   local h="${REPO_ROOT}/ops/mcp-onion-kg-writer/selftest.py" srv="${REPO_ROOT}/ops/mcp-onion-kg-writer/server.py"
   local helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
