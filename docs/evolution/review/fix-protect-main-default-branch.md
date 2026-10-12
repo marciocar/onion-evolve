@@ -2,14 +2,13 @@
 branch: fix/protect-main-default-branch
 pr: pendente
 date: 2026-10-12
-reviewed_diff_sha256: b690087a2b34cf6ef4a6648976ff8ce67223f7c30a86f1a2355b406c82161408
-reviewed_code_sha256: 09896b3dd0c700278994ea3f1d483f58a320002add88bf1820cd2b11f4358af7
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 4
 findings_fixed: 1
 tokens: 206000
 duration_min: 50
-verdict: CORRIGIDO-E-RE-REVISADO
+verdict: REPROVADO_E_CURADO
 reviewer: passada adversarial curta da própria sessão (opus), refutador com default reprovado
 ---
 
