@@ -338,9 +338,35 @@ fi
 # A cura é a forma, não o cuidado: HEREDOC CITADO (`git commit -F - <<'MSG'`) — as aspas simples no
 # delimitador desligam toda expansão. Aspas simples no `-m` também servem, mas quebram no primeiro
 # apóstrofo, que em pt-BR aparece.
+# ⚠️ A CRASE TEM DE ESTAR DENTRO DO ARGUMENTO ENTRE ASPAS DUPLAS do -m/-F — 2a classe de falso-positivo,
+# medida 3x em 2026-10-12: a 1a versão acusava QUALQUER crase do comando, e um `printf '…`x`…'` entre
+# aspas SIMPLES na mesma linha do commit gritava. Agora a varredura começa em cada -m"/-F" e para na aspa
+# dupla de fecho (barra invertida escapa); só crase nesse trecho conta. Aspa dupla que não fecha = GRITA
+# (indeterminado erra para o lado de falar).
+_crase_na_msg() {
+  awk 'BEGIN { RS = "\001" } {
+    s = $0; n = length(s); i = 1
+    while (i <= n) {
+      if (substr(s, i, 1) == "-" && (substr(s, i + 1, 1) == "m" || substr(s, i + 1, 1) == "F")) {
+        j = i + 2; while (j <= n && (substr(s, j, 1) == " " || substr(s, j, 1) == "\t")) j++
+        if (substr(s, j, 1) == "\"") {
+          k = j + 1; fechou = 0
+          while (k <= n) { c = substr(s, k, 1)
+            if (c == "\\") { k += 2; continue }
+            if (c == "`") { achou = 1; exit }
+            if (c == "\"") { fechou = 1; break }
+            k++ }
+          if (!fechou) { achou = 1; exit }
+          i = k
+        }
+      }
+      i++
+    }
+  } END { exit(achou ? 0 : 1) }' <<< "$1"
+}
 if grep -qE '(^|[[:space:];&|])git[[:space:]]+commit' <<< "${cmd}" \
    && grep -qE '\-(m|F)[[:space:]]*"' <<< "${cmd}" \
-   && grep -q '`' <<< "${cmd}"; then
+   && _crase_na_msg "${cmd}"; then
   add 'CRASE-EM-MENSAGEM-DE-COMMIT: há crase dentro de `-m "…"`/`-F "…"` — em aspas DUPLAS o shell EXECUTA o conteúdo da crase em vez de citá-lo (medido 2026-09-17: `docs/` virou `Is a directory` e a palavra sumiu da história; com um comando destrutivo ali dentro, ele teria RODADO). Use heredoc CITADO: `git commit -F - <<'"'"'MSG'"'"'` … `MSG` — as aspas simples no delimitador desligam toda expansão.'
 fi
 

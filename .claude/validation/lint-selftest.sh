@@ -9470,6 +9470,22 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (c8) heredoc citado → cala (a cura desarma)"
   else record_fail "empty-result-guard: (c8)" "puniu quem usou heredoc citado: ${out:0:140}"; fi
 
+  # (c9..c11) A CRASE CONTA SÓ DENTRO DO ARGUMENTO DO -m/-F (2a classe de falso-positivo, 3x em 2026-10-12):
+  #           crase num printf entre aspas SIMPLES na mesma linha do commit não é executada pelo commit.
+  #           Escape no MESMO molde do (c7): o 1º argumento do _erg é a string JSON do comando.
+  out="$(_erg "\"printf '%s \`x\`' a >> f.md && git commit -q -m \\\"docs: mensagem sem crase\\\"\"" '""' || true)"
+  if ! grep -q 'CRASE-EM-MENSAGEM-DE-COMMIT' <<< "${out}"; then
+    record_pass "empty-result-guard: (c9) crase FORA do -m (printf em aspas simples) → cala"
+  else record_fail "empty-result-guard: (c9)" "acusou crase que não está na mensagem: ${out:0:140}"; fi
+  out="$(_erg "\"printf 'ok' > f && git commit -q -m \\\"cura o \`docs/\` e segue\\\"\"" '""' || true)"
+  if grep -q 'CRASE-EM-MENSAGEM-DE-COMMIT' <<< "${out}"; then
+    record_pass "empty-result-guard: (c10) crase DENTRO do -m depois de outro comando → avisa"
+  else record_fail "empty-result-guard: (c10)" "calou a crase dentro da mensagem: ${out:0:140}"; fi
+  out="$(_erg "\"git commit -m \\\"mensagem que nao fecha\"" '""' || true)"
+  if grep -q 'CRASE-EM-MENSAGEM-DE-COMMIT' <<< "${out}"; then
+    record_pass "empty-result-guard: (c11) aspa dupla sem fecho → avisa (indeterminado fala)"
+  else record_fail "empty-result-guard: (c11)" "calou o indeterminado: ${out:0:140}"; fi
+
   # (b2b) COBERTURA — a 2ª versão exigia que o cluster com `f` fosse o PRIMEIRO token, e escapavam
   #       `pkill -9 -f` (a forma mais comum do mundo real), `-a -f`, `-u root -f` e a longa `--full`.
   #       Promessa maior que cobertura é `declarado != verificado` dentro da própria guarda.
