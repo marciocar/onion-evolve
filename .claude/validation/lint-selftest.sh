@@ -18813,8 +18813,8 @@ run_adopter_gate_selftests() {
   # (b) hooksPath ABSOLUTO — o caso que abortou a adoção real. MESMO diretório, string diferente.
   local rb="${d}/abs"; mkdir -p "${rb}"; _mk_alvo "${rb}" "${rb}/.githooks"
   local out_b; out_b="$(bash "${v}" "${rb}" 2>&1 || true)"
-  if ! grep -q 'que o git IGNORA' <<< "${out_b}"; then
-    record_pass "adopter-gate: (b) hooksPath ABSOLUTO aponta o MESMO diretório e NÃO é acusado de ignorado"
+  if ! grep -q -e 'que o git IGNORA' -e 'byte-idêntico' <<< "${out_b}"; then
+    record_pass "adopter-gate: (b) hooksPath ABSOLUTO aponta o MESMO diretório e NÃO é acusado de ignorado (nem avisado)"
   else record_fail "adopter-gate: (b)" "caminho absoluto para o mesmo diretório reprova — a comparação voltou a ser por STRING, e isso ABORTA adoção legítima (medido num adotante, 2026-09-15)"; fi
 
   # (b-MUT) devolver a comparação para string faz (b) REPROVAR — prova que (b) mede o `-ef`.
@@ -18822,7 +18822,7 @@ run_adopter_gate_selftests() {
   sed 's|! \[ "${ABS}" -ef "${_ONION_HOOKS}" \]|[ "${DIR}" != ".githooks" ]|' "${v}" > "${mut}"
   if ! cmp -s "${v}" "${mut}"; then
     local out_m; out_m="$(bash "${mut}" "${rb}" 2>&1 || true)"
-    if grep -q 'que o git IGNORA' <<< "${out_m}"; then
+    if grep -q -e 'que o git IGNORA' -e 'byte-idêntico' <<< "${out_m}"; then
       record_pass "adopter-gate: (b-MUT) com a comparação por STRING o caso (b) REPROVA — (b) é load-bearing"
     else record_fail "adopter-gate: (b-MUT)" "o mutante passou — (b) não prova que a cura está no -ef"; fi
   else record_fail "adopter-gate: (b-MUT) setup" "a mutação não foi aplicada (a âncora do sed mudou?)"; fi
@@ -18837,6 +18837,33 @@ run_adopter_gate_selftests() {
   if grep -q 'que o git IGNORA' <<< "${out_c}"; then
     record_pass "adopter-gate: (c) hook do Onion IGNORADO de verdade (hooksPath → .husky) AINDA acusa — a cura não virou fail-open"
   else record_fail "adopter-gate: (c)" "o caso real de gate sombreado deixou de ser acusado — a cura do (b) abriu a guarda"; fi
+
+  # (f) OUTRO DIRETÓRIO COM O HOOK BYTE-IDÊNTICO (2026-10-12, onion-kg-ssot): o Claude Code 2.1.296 grava
+  #     `core.hooksPath` ABSOLUTO ao criar worktree de agente, e numa worktree irmã ele aponta para o
+  #     .githooks do checkout principal. Mesmo hook = mesmo gate: AVISA (⚠), não acusa "o git IGNORA".
+  local rp="${d}/principal" re="${d}/irma"; mkdir -p "${rp}" "${re}"
+  _mk_alvo "${rp}" ".githooks"; _mk_alvo "${re}" "${rp}/.githooks"
+  local out_e; out_e="$(bash "${v}" "${re}" 2>&1 || true)"
+  if ! grep -q 'que o git IGNORA' <<< "${out_e}" && grep -q 'byte-idêntico' <<< "${out_e}"; then
+    record_pass "adopter-gate: (f) hooksPath para OUTRO diretório com hook byte-idêntico avisa (⚠) e não acusa"
+  else record_fail "adopter-gate: (f)" "hook idêntico noutro diretório ainda reprova (ou não avisa) — a worktree de agente do Claude Code volta a dar PARCIAL falso"; fi
+  # (f-MUT) sem o ramo do cmp, (f) reprova — prova que (f) mede a cura.
+  local mut_e="${d}/v-mut-e.sh"
+  sed 's|if \[ -f "${ABS}/pre-commit" \] && cmp -s "${ABS}/pre-commit" "${_ONION_HOOKS}/pre-commit"; then|if false; then|' "${v}" > "${mut_e}"
+  if ! cmp -s "${v}" "${mut_e}"; then
+    local out_em; out_em="$(bash "${mut_e}" "${re}" 2>&1 || true)"
+    if grep -q 'que o git IGNORA' <<< "${out_em}"; then
+      record_pass "adopter-gate: (f-MUT) sem o cmp o caso (f) acusa — (f) é load-bearing"
+    else record_fail "adopter-gate: (f-MUT)" "o mutante passou — (f) não prova a cura"; fi
+  else record_fail "adopter-gate: (f-MUT) setup" "a mutação não foi aplicada (a âncora do sed mudou?)"; fi
+  # (f2) OUTRO DIRETÓRIO COM HOOK DIFERENTE continua acusado — o aviso não pode virar fail-open.
+  local rq="${d}/principal-velho" rr="${d}/irma-velha"; mkdir -p "${rq}" "${rr}"
+  _mk_alvo "${rq}" ".githooks"; printf '\n# versao antiga\n' >> "${rq}/.githooks/pre-commit"
+  _mk_alvo "${rr}" "${rq}/.githooks"
+  local out_e2; out_e2="$(bash "${v}" "${rr}" 2>&1 || true)"
+  if grep -q 'que o git IGNORA' <<< "${out_e2}"; then
+    record_pass "adopter-gate: (f2) hook DIFERENTE noutro diretório ainda acusa — o aviso não abriu a guarda"
+  else record_fail "adopter-gate: (f2)" "hook diferente noutro diretório deixou de ser acusado — fail-open"; fi
 
   # (d) EXECUTAR ≠ BARRAR, e o veredito tem de distinguir. Sinal de campo de um adotante, 2026-09-15:
   #     o script imprimia `· lint limpo agora: o BLOQUEIO não foi exercido — declarado, não aprovado`
