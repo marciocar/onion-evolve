@@ -49,6 +49,7 @@ merge	adopt-settings-merge/target-empty.json	-	-
 merge	adopt-settings-merge/target-with-own.json	-	-
 merge	adopt-settings-merge/target-old-adopter-no-onfailure.json	-	-
 merge	adopt-settings-merge/target-with-own-attribution.json	-	-
+merge	adopt-settings-merge/target-onion-hook-wrong-group.json	-	-
 lint	r17-frontmatter-colon/bad-unquoted-colon.md	.claude/agents/development	bad	não-aspado
 lint	r17-frontmatter-colon/good-quoted.md	.claude/agents/development	good	
 lint	r16-count-drift/bad-cmd-categorias.md	docs	bad	divergente da SSOT

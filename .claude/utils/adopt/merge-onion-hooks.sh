@@ -66,25 +66,44 @@ jq -n \
   --slurpfile t "${TGT}" '
   ($s[0]) as $src | ($t[0]) as $tgt |
   reduce (($src.hooks // {}) | keys[]) as $ev ($tgt;
-    # commands Onion já presentes no alvo, para este evento
-    ([ (.hooks[$ev] // [])[].hooks[]?.command ]) as $present
-    # mapa command -> objeto do hook na FONTE, para este evento
-    | ([ ($src.hooks[$ev] // [])[].hooks[]? | {key: .command, value: .} ] | from_entries) as $srcmap
-    # entradas da fonte ainda ausentes no alvo, LEVANDO o matcher do grupo de origem (2026-10-12: sem isto o
-    # veto pretooluse-direct-provider-api chegou ao adotante sem `matcher: "Bash"`)
-    | ([ ($src.hooks[$ev] // [])[] | . as $g | .hooks[]?
-         | select(.command as $c | ($present | index($c)) == null)
-         | if ($g.matcher != null) then {matcher: $g.matcher, hooks: [.]} else {hooks: [.]} end ]) as $missing
+    # mapa command -> objeto do hook na FONTE, e command -> matcher do grupo de origem (null = sem matcher)
+    ([ ($src.hooks[$ev] // [])[].hooks[]? | select((.command | type) == "string") | {key: .command, value: .} ]
+       | from_entries) as $srcmap
+    | ([ ($src.hooks[$ev] // [])[] | . as $g | .hooks[]? | select((.command | type) == "string")
+         | {key: .command, value: ($g.matcher // null)} ] | from_entries) as $srcmt
+    # commands Onion já no alvo NO GRUPO CERTO (o matcher do grupo é o da fonte)
+    | ([ (.hooks[$ev] // [])[] | . as $g | .hooks[]? | select((.command | type) == "string")
+         | select(.command as $c | $srcmt | has($c)) | select(($g.matcher // null) == $srcmt[.command]) | .command ]) as $placed
+    # hook Onion do alvo FORA do grupo certo (2026-10-12, --update do onion-kg-ssot: o veto direct-provider-api
+    # ficou num grupo sem matcher porque o update anterior o anexou assim, e o refresh casava por command sem
+    # mudar de grupo). Sai do grupo onde está e volta no grupo com o matcher da fonte, levando as chaves extras.
+    | ([ (.hooks[$ev] // [])[] | . as $g | .hooks[]? | select((.command | type) == "string")
+         | select(.command as $c | $srcmt | has($c)) | select(($g.matcher // null) != $srcmt[.command]) ]) as $misplaced
     | .hooks = (.hooks // {})
-    # REFRESH do que é do Onion (2026-10-12, medido no --update do onion-kg-ssot): hook do alvo com o MESMO
-    # .command de um hook da fonte é do Onion; as chaves da FONTE sobrepõem as do alvo (onFailure, timeout…),
-    # e chave extra que só o alvo tem fica. Antes, presente = intocado, e o `onFailure: block` dos 4 vetos
-    # nunca chegava a adotante antigo (REGRA 101 reprovava 4 HARD no pós-merge). Hook próprio do alvo
-    # (command que a fonte não tem) não é tocado, nem hook sem .command (type prompt/agent: indexar por null abortava o merge).
     | .hooks[$ev] = ((.hooks[$ev] // []) | map(
-        if (.hooks | type) == "array"
-        then .hooks |= map(. as $h | if (($h.command | type) == "string" and $srcmap[$h.command] != null) then ($h + $srcmap[$h.command]) else $h end)
+        if (.hooks | type) == "array" and (.hooks | length) > 0
+        then . as $g
+          | .hooks |= map(select(
+              ((.command | type) != "string") or ((.command as $c | $srcmt | has($c)) | not)
+              or (($g.matcher // null) == $srcmt[.command])))
+          | if (.hooks | length) == 0 then empty else . end
         else . end))
+    # REFRESH do que é do Onion (2026-10-12): hook do alvo com o MESMO .command de um hook da fonte é do Onion;
+    # as chaves da FONTE sobrepõem as do alvo (onFailure, timeout…), e chave extra que só o alvo tem fica.
+    # Hook próprio do alvo (command que a fonte não tem) não é tocado, nem hook sem .command (type prompt/agent).
+    | .hooks[$ev] = (.hooks[$ev] | map(
+        if (.hooks | type) == "array"
+        then .hooks |= map(. as $h | if (($h.command | type) == "string" and $srcmap[$h.command] != null)
+                                     then ($h + $srcmap[$h.command]) else $h end)
+        else . end))
+    # ausentes (nem no grupo certo) entram como grupo próprio com o matcher de origem; o realocado leva as
+    # chaves extras do alvo e as da fonte por cima. Duplicata realocada de um command já no grupo certo some.
+    | ([ $misplaced[] | select(.command as $c | ($placed | index($c)) == null) ]
+       | group_by(.command) | map({key: .[0].command, value: (reduce .[] as $x ({}; . + $x))}) | from_entries) as $moved
+    | ([ ($src.hooks[$ev] // [])[] | . as $g | .hooks[]? | select((.command | type) == "string")
+         | select(.command as $c | ($placed | index($c)) == null)
+         | (($moved[.command] // {}) + .) as $obj
+         | if ($g.matcher != null) then {matcher: $g.matcher, hooks: [$obj]} else {hooks: [$obj]} end ]) as $missing
     | .hooks[$ev] = (.hooks[$ev] + $missing)
   )
   # attribution (a SSOT da assinatura de commit/PR) viaja NEVER-CLOBBER: só entra se o alvo não tem o
