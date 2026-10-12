@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**450 itens abertos** em 96 grafo(s) com aberto (de 123 no escopo) · 97 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**462 itens abertos** em 98 grafo(s) com aberto (de 125 no escopo) · 99 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -128,6 +128,18 @@
 | 2.4 | `C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA` | ocr-local-sei-2026-09 | OPCAO (4): Surya (datalab-to) — NAO RECOMENDAVEL A PARTIR DESTE DOSSIE, e a razao nao e desempenho: e que o corpo de evidencia s |
 | 1.2 | `C_OPCAO_MINERU_OLMOCR` | ocr-local-sei-2026-09 | OPCAO (6): MinerU 2.5 / olmOCR. Praticamente NAO PESQUISADOS nesta rodada — aparecem so como termo de comparacao dentro de claim |
 
+## onion-brain-mcp-remoto-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 54.0 | `C_OPCAO_B_MCP_PUBLICO_OAUTH_RS_POR_ORG` | onion-brain-mcp-remoto-2026-10 | OPÇÃO B: MCP remoto público por streamable-http stateless, resource server OAuth 2.1 (PRM, RFC 9728) com o Logto como AS e clai |
+| 42.5 | `Q_ONION_BRAIN_MCP_REMOTO_2026_10` | onion-brain-mcp-remoto-2026-10 | SAC-70: o Onion deve oferecer um MCP remoto só leitura (kg_list, kg_radar, kg_node, docs_search) para o time não técnico de um  |
+| 19.2 | `C_OPCAO_A_REATIVAR_PRECEDENTE_VIA_LIBRECHAT` | onion-brain-mcp-remoto-2026-10 | OPÇÃO A: reativar o precedente ops/mcp-onion-kg apontado para o clone do brain-granaai, consumido só pelo LibreChat da VPS (SSO |
+| 4.5 | `C_OPCAO_C_GATEWAY_DE_TERCEIROS` | onion-brain-mcp-remoto-2026-10 | OPÇÃO C: gateway de terceiros (Pomerium, agentgateway, Cloudflare Access) na frente de um servidor MCP sem auth própria, fazend |
+| 3.6 | `C_OPCAO_E_MULTI_TENANT_POR_CLAIM` | onion-brain-mcp-remoto-2026-10 | OPÇÃO E: multi-tenant único com a raiz escolhida por claim do token — adiada até haver mais de um hub. |
+| 1.5 | `C_OPCAO_D_WORKERS_AS_PROXY` | onion-brain-mcp-remoto-2026-10 | OPÇÃO D: padrão Cloudflare Workers com o servidor atuando como AS proxy para o IdP do hub — listada como rejeitada por acopla |
+| 1.2 | `C_OPCAO_F_SEM_MCP_LEITOR_JS` | onion-brain-mcp-remoto-2026-10 | OPÇÃO F: não fazer MCP — manter o segundo leitor JS do corpus (o paliativo atual do hub). |
+
 ## onda-derivada-e-o-lugar-do-onion-2026-10 — 9 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -172,6 +184,17 @@
 | 10.5 | `C_OPCAO_D_NAO_DECIDIR_E_REABRIR_AS_FAIXAS_NAO_LIDAS` | motores-de-regras-deterministicos-2026-10 | OPCAO D — nao decidir agora: reabrir a pesquisa nas faixas nao lidas (Drools, Camunda/DMN e o status ISO/OMG, OpenL Tablets, Eas |
 | 9.6 | `C_OPCAO_C_HIBRIDO_SHELL_EXTRAI_MOTOR_DECIDE` | motores-de-regras-deterministicos-2026-10 | OPCAO C — hibrido: o shell continua EXTRAINDO fatos e devolvendo exit 2, e um motor declarativo decide atras de um handler de ho |
 | 7.5 | `C_OPCAO_B_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO` | motores-de-regras-deterministicos-2026-10 | OPCAO B — migrar o gate determinístico para um motor declarativo (Cedar, OPA/Rego, DMN ou JDM) e expressar as 93 regras como po |
+
+## playbook-sdaal-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 48.0 | `Q_PLAYBOOK_SDAAL_SAC52` | playbook-sdaal-2026-10 | SAC-52: o core deve criar uma abstração SDAAL de playbooks (interface agnóstica + adapters por tipo e por framework em .claude/ |
+| 41.8 | `C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA` | playbook-sdaal-2026-10 | Opção A: NÃO criar agora .claude/utils/playbook/ com adapters por framework; o playbook de domínio é template (skill ou markd |
+| 17.6 | `C_OPCAO_D_GATE_DE_PESQUISA` | playbook-sdaal-2026-10 | Opção D: adiar com gate — rodar antes uma rodada curta de primárias nomeadas (Arazzo 1.0.1, runme, especificação CACAO v2.0 |
+| 8.0 | `C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS` | playbook-sdaal-2026-10 | Opção B: criar a abstração SDAAL completa (interface Playbook + adapters por tipo e por framework) nos 4 domínios, como pede  |
+| 6.0 | `C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER` | playbook-sdaal-2026-10 | Opção C: costurar o CACAO v2.0 (OASIS) por SDAAL como primeiro adapter, na fatia de compliance/segurança. |
+| 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
 
 ## zoho-glpi-adapters-2026-09 — 8 item(ns)
 
@@ -515,14 +538,6 @@
 | 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
 | 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 
-## conductor-2026-10 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 18.0 | `A_PLAN_VERIFICACAO_PELO_MOTOR` | conductor-2026-10 | PLANO N4 — absorver no onion-research o CONCEITO 'quem verifica nao e quem produz, e o teto de correcao e contado pelo motor': p |
-| 9.6 | `Q_CONDUCTOR_ABSORVER_OU_NAO_1011` | conductor-2026-10 | O Onion absorve, costura, parqueia ou rejeita o Conductor (Microsoft) — orquestracao multiagente declarada em YAML que valida a  |
-| 3.0 | `E_N3_SCHEMA_NATIVO_LACUNA` | conductor-2026-10 | LACUNA NOMEADA — a validacao de FORMA o Onion ja recebe do harness (todo agente do onion-research.js leva schema:). Se o harness |
-
 ## guard-forge-2026-10 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -682,6 +697,13 @@
 |--:|---|---|---|
 | 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
 | 8.5 | `Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN` | hub-operacoes-enterprise-update-547-2026-10 | A CURA DE CLASSE DOS VETOS (PR #921) AINDA ASSUME QUE A PRODUCAO SE CHAMA main. Num adotante com GitFlow cuja producao e master  |
+
+## conductor-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 9.6 | `Q_CONDUCTOR_ABSORVER_OU_NAO_1011` | conductor-2026-10 | O Onion absorve, costura, parqueia ou rejeita o Conductor (Microsoft) — orquestracao multiagente declarada em YAML que valida a  |
+| 3.0 | `E_N3_SCHEMA_NATIVO_LACUNA` | conductor-2026-10 | LACUNA NOMEADA — a validacao de FORMA o Onion ja recebe do harness (todo agente do onion-research.js leva schema:). Se o harness |
 
 ## federation-health-2026-07 — 2 item(ns)
 
