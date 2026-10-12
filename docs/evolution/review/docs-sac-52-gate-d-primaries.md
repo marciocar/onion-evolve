@@ -1,7 +1,7 @@
 ---
 branch: docs/sac-52-gate-d-primaries
 date: 2026-10-12
-reviewed_diff_sha256: cf23bf6f81a6d9e600faae2a6a44c1ce5758f44911dca297b7d2846ede90e9cd
+reviewed_diff_sha256: 04ff6ac711a4b13a7ce809dd92903df0694be89b55bc363529344ea6570f1637
 reviewed_code_sha256: 54ea5812ca2474c8352121d1d50408b1cd3202b3286a69da6f2f4b56c0760440
 findings_total: 2
 findings_real: 2
