@@ -42,12 +42,18 @@ nodes:
   - id: "D_PLAYBOOK_SDAAL_SAC52"
     node_type: "decision"
     plane: "DEV"
-    status: "open"
+    status: confirmed
+    verified_at: "2026-10-12"
+    verified_against: "SELADA pelo maestro em 2026-10-12 por pergunta com opções: opção A com o gate da D — sem .claude/utils/playbook/ nem adapter por framework; playbook de domínio = template instanciado em PFR com estado observado; antes, rodada curta em primaries (Arazzo 1.0.1, runme, spec CACAO v2.0); 1ª fatia por incidente real do core. decision fica confirmed em DEV até a execução"
     impact: 5
     confidence: 0.6
     label: "SAC-52: A (template em PFR, sem .claude/utils/playbook/) · B (SDAAL completa) · C (CACAO como 1º adapter) · D (gate de pesquisa antes) · E (unificar no catálogo). Elenxo recomenda A com o gate de D e rejeita B e C agora."
     narrative: "Recomendação do Elenxo, não selo: o maestro sela. Restrições que sobrevivem: (R1) SDAAL fora do lugar — framework (MEDDICC, NIST 800-61, ISO 22301, OST) é CONTEÚDO, não provider com transporte; não há capacidade a declarar nem catraca no molde da REGRA 103 (Adapter do task-manager declara todas as capacidades da interface, com fonte). Um seam SDAAL só entra com DOIS substratos de execução reais e consumidor (ex.: SOAR CACAO de um adotante ao lado da sessão PFR). (R2) A premissa dos '4 domínios peer' promove GTM a 4ª dimensão sem decisão do maestro (o CLAUDE.md diz que permanecem 3). (R3) Não há consumidor medido: o único playbook de domínio de adotante (object-led discovery, metagamify) coube no catálogo existente. (R4) A sub-decisão (3) não fecha sem ler Arazzo 1.0.1, a especificação CACAO v2.0 e runme. (R5) A fatia de dogfood se escolhe por incidente/caso real, não por nome de framework. (R6) O estado da instância mora na sessão PFR em arquivo (.claude/sessions/<feature>/), que sobrevive à queda da conversa; a skill-template lê esse estado na invocação. COMPLEMENTO relido do retorno integral do run wf_790beee5-fa8 (o prompt do write(KG) cortou a recomendação em 1500 de 3107 caracteres — defeito curado no PR #1036): (R4') concorrente no mesmo substrato — plugins de primeira parte já entregam skills de playbook de domínio (engineering:incident-response, operations:runbook) e o capital de AI SRE (Resolve AI, Traversal) ocupa a execução; o Onion não compete no motor, o diferencial é seleção, estado verificável e gate. Sub-decisão (1): a instância é PFR com estado em sessão e decisões/evidência como nós do KG; o task manager é só projeção, nunca SSOT; o estado é OBSERVADO (hook PostToolUse registra a execução), não autodeclarado; efeito colateral sob disable-model-invocation e gate exit 2, com equivalente declarado para o onion-codex. Sub-decisão (2): a 1ª fatia vem de incidente real do PRÓPRIO core (VPS e CI, ex.: o bypass do ufw pelo Docker), com a NIST 800-61r3 só como checklist de fases; nem MEDDICC (proprietário) nem CACAO (exige SOARCA). Sub-decisão (4): um formato e dois catálogos — os recognition-primed da onion-patterns (trabalho do Onion) e os de domínio (do adotante) compartilham o esquema seleção/execução/validação (B6_9) mas vivem separados; os de domínio precisam de gatilho mecânico de frescor no molde dos /meta:*-freshness (a evidência de apodrecimento foi descartada sem refutação e segue de pé)."
     trace: "run /onion-research modo decision de 2026-10-11 (SAC-52, playbook SDAAL)"
+    provenance:
+      source: "decisão do maestro na sessão de 2026-10-12, pergunta com opções sobre D_PLAYBOOK_SDAAL_SAC52"
+      locator: "opção escolhida: A + gate D (Recomendado)"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
 
   - id: "C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA"
     node_type: "claim"
