@@ -1,0 +1,187 @@
+# 5. Ferramentas
+
+[← O contrato](04-contrato.md) · [Índice](README.md) · [Adoção e CI →](06-adocao-e-ci.md)
+
+As quatro ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3 com as versões fixadas em
+[`tools/requirements.txt`](../../tools/requirements.txt) (PyYAML e jsonschema, mais as dependências do jsonschema).
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
+```
+
+Todo `rc` segue a mesma convenção: **0** passou, **1** algo reprovou, **2** a entrada está quebrada (arquivo
+ilegível, base ausente, tag inexistente). Um rc 2 nunca passa por verde.
+
+Os exemplos abaixo rodam num repositório de demonstração com o kit em `vendor/kg-ssot`. Num clone do produto,
+troque `vendor/kg-ssot/tools/` por `tools/`.
+
+## `kg_validate.py`: o leitor de referência
+
+Valida um ou mais arquivos contra o contrato vigente.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/exemplo.kg.yaml docs/quebrado.kg.yaml
+```
+
+```text
+PASSA   docs/exemplo.kg.yaml
+REPROVA docs/quebrado.kg.yaml
+  MUST   form.required.node.provenance ×1 · form.unknown-key.node.prioridade ×1
+  SHOULD form.required.node.verified_against ×1 · integrity.untraced-decision ×1 · yaml.unquoted-date ×1
+· 2 arquivos; 1 passam no MUST; 1 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+rc 1. Para saber **em qual nó** cada código sai, `--where`:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where docs/quebrado.kg.yaml
+```
+
+```text
+REPROVA docs/quebrado.kg.yaml
+  MUST   form.required.node.provenance ×1 · form.unknown-key.node.prioridade ×1
+  SHOULD form.required.node.verified_against ×1 · integrity.untraced-decision ×1 · yaml.unquoted-date ×1
+    MUST   form.required.node.provenance  nó C_RETRY_SAFE
+    MUST   form.unknown-key.node.prioridade  nó C_RETRY_SAFE
+    SHOULD form.required.node.verified_against  nó C_RETRY_SAFE
+    SHOULD integrity.untraced-decision  nó D_RETRY_POLICY
+    SHOULD yaml.unquoted-date  arquivo
+· 1 arquivos; 0 passam no MUST; 1 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+Opções úteis:
+
+| Opção | Efeito |
+|---|---|
+| `--where` | Uma linha por ocorrência, com o nó ou a aresta |
+| `--corpus DIR` | Confere a ponta externa das `external_edges` contra os `.kg.yaml` rastreados pelo git sob `DIR` (fora de um repo git, todos) |
+| `--schema F` | Valida contra outro MUST (o SHOULD vizinho vem junto, se existir) |
+| `--json OUT` | Grava o resultado em JSON, num formato congelado (`{summary, results}`) |
+
+Com `external_edges` e sem `--corpus`, o leitor avisa que não conferiu a ponta externa:
+
+```text
+PASSA   docs/decisao.kg.yaml
+· 1 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+· 1 arquivo(s) com external_edges: a ponta externa NÃO foi conferida (rode com --corpus <raiz do repo>)
+```
+
+## `kg_conformance.py`: a suíte
+
+Roda a suíte de conformidade contra o leitor de referência. Primeiro o metaschema se auto-testa, depois cada
+manifesto é validado, depois cada caso roda.
+
+```bash
+python3 -I tools/kg_conformance.py
+```
+
+As últimas linhas:
+
+```text
+—
+latest: 225/225 (reprova)
+optional: 10/24 (só reporta)
+```
+
+rc 0. `latest/` é o contrato vigente, e um caso que falha ali reprova (rc 1). `optional/` é comportamento que um
+leitor **pode** implementar (hoje, a camada semântica de frescor e domínio, que o leitor de referência não
+implementa) e nunca muda o rc. rc 2 quer dizer que a própria suíte está quebrada: manifesto inválido, arquivo
+fora de manifesto, pasta desconhecida.
+
+## `kg_gate.py`: a catraca por grafo
+
+O gate é para o CI de um repositório que guarda grafos. Ele mede todos os `.kg.yaml` **rastreados pelo git** e
+compara com uma linha de base (`.kg-ssot/gate.json`). A regra: **nada piora**. Um grafo que já reprovava fica
+registrado como dívida herdada; um grafo novo tem de passar.
+
+Sem base, o gate se recusa:
+
+```text
+GATE QUEBRADO  linha de base ausente (.kg-ssot/gate.json): grave a primeira com --update
+```
+
+rc 2. A primeira base:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
+```
+
+```text
+  MUST   docs/quebrado.kg.yaml (herdado): form.required.node.provenance · form.unknown-key.node.prioridade
+  SHOULD form.required.node.verified_against: 1 grafo
+  SHOULD integrity.untraced-decision: 1 grafo
+  SHOULD yaml.unquoted-date: 1 grafo
+linha de base gravada: .kg-ssot/gate.json (2 grafos, 1 na dívida herdada)
+```
+
+Um grafo novo que reprova, depois de `git add`:
+
+```text
+✗ PIOROU  docs/novo.kg.yaml falha no MUST: form.required.node.provenance, form.unknown-key.node.prioridade
+✗ PIOROU  debt.form.required.node.verified_against: 1 → 2
+✗ PIOROU  debt.integrity.untraced-decision: 1 → 2
+✗ PIOROU  debt.yaml.unquoted-date: 1 → 2
+· 3 grafos; 1 passam no MUST; 1 na dívida herdada
+  MUST   docs/novo.kg.yaml (novo): form.required.node.provenance · form.unknown-key.node.prioridade
+  MUST   docs/quebrado.kg.yaml (herdado): form.required.node.provenance · form.unknown-key.node.prioridade
+  SHOULD form.required.node.verified_against: 2 grafos
+  SHOULD integrity.untraced-decision: 2 grafos
+  SHOULD yaml.unquoted-date: 2 grafos
+```
+
+rc 1. E quando a dívida é paga (o grafo herdado consertado):
+
+```text
+↑ melhorou docs/quebrado.kg.yaml: passa no MUST (trave o ganho: kg_gate.py --update)
+↑ melhorou debt.form.required.node.verified_against: 1 → 0 (trave o ganho: kg_gate.py --update)
+↑ melhorou debt.integrity.untraced-decision: 1 → 0 (trave o ganho: kg_gate.py --update)
+↑ melhorou debt.yaml.unquoted-date: 1 → 0 (trave o ganho: kg_gate.py --update)
+· 2 grafos; 2 passam no MUST; 0 na dívida herdada
+```
+
+rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida não voltar.
+
+| Opção | Efeito |
+|---|---|
+| `--update` | Grava a base. Se algo piorou, recusa sem `--accept-regression` |
+| `--accept-regression "<motivo>"` | Aceita uma piora; o motivo fica gravado na base |
+| `--exclude GLOB` | Tira caminhos do corpus (repetível). `*/fixtures/*` e `docs/materials/*` já saem por padrão |
+| `--granularity node` | Com `--update`: conta a dívida SHOULD por ocorrência, não por grafo |
+| `--repo DIR` · `--baseline ARQ` | Outro repositório, outra base |
+
+## `kg_vendor.py`: trazer e conferir a release
+
+O adotante nunca copia o contrato à mão. O vendor lê uma **tag** com `git archive` e grava um carimbo com o
+sha256 de cada arquivo.
+
+Da raiz do adotante, com um clone do produto em `<clone>`. As saídas abaixo são de uma execução real com a tag
+`kg-ssot-v4.3.3`; numa release mais nova, a tag, o commit e a contagem de arquivos mudam:
+
+```bash
+python3 -I -B <clone>/tools/kg_vendor.py update --tag kg-ssot-v4.3.3 --dest vendor/kg-ssot --source <clone>
+```
+
+```text
+vendor atualizado: vendor/kg-ssot ← kg-ssot-v4.3.3 (c32e6496be74), 297 arquivos
+```
+
+O `check` recalcula os sha256 e compara com o carimbo. Um arquivo editado, apagado ou sobrando (inclusive
+bytecode num `__pycache__`) dá rc 1.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
+```
+
+```text
+✓ vendor íntegro: vendor/kg-ssot = kg-ssot-v4.3.3 (c32e6496be74), 297 arquivos
+```
+
+| Opção | Efeito |
+|---|---|
+| `--source REPO` | O repositório (caminho ou URL) que tem a tag. Obrigatório quando roda de dentro de um vendor |
+| `--profile gate` | Traz só o mínimo para rodar o gate e o check (10 arquivos, sem a suíte) |
+| `--force` | Substitui um vendor editado localmente |
+
+**Por que `-B`?** Os scripts do kit não gravam bytecode, mas uma ferramenta sua que **importa** um módulo do kit
+grava o `.pyc` dentro do vendor, e o próximo `check` reprova. Rode tudo com `python3 -I -B`, ou com
+`PYTHONDONTWRITEBYTECODE=1`.
