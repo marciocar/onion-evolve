@@ -2,7 +2,6 @@
 branch: feat/tm-linear-full-read-attachments
 date: 2026-10-12
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 6
 findings_real: 6
 findings_fixed: 4
