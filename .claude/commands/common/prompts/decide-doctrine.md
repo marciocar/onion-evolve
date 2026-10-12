@@ -10,7 +10,7 @@ topologia foi selada na entrevista da forja no mesmo dia (fonte = a sessão e os
 `AskUserQuestion`; destino = selo no grafo e segue); decisão e evidência em
 `docs/evolution/research/forge-decide-2026-10/`.
 
-**Medido na forja:** o corpus tem 159 nós `decision` e 300 `question` abertos, espalhados por 117
+**Medido na forja, antes dos nós da própria forja (que somam 2 perguntas e 1 grafo):** o corpus tinha 159 nós `decision` e 300 `question` abertos, espalhados por 117
 grafos rastreados (50 com decisão aberta), e **nenhum** guarda as opções em campo estruturado — elas
 vivem em `label`/`narrative`, quando vivem. Por isso o corpus entra **por referência** (nó citado por
 id, tema passado, bloco tocado na janela), nunca despejado.
@@ -74,6 +74,11 @@ Cada resposta vira escrita no grafo **antes** da próxima rodada, pelo selador
 (`.claude/validation/kg-decide-seal.sh`), nunca à mão: nó existente → `status: done`, `verified_at`,
 `provenance.method` = `testemunho: decisão do maestro por pergunta com opções, <data>`, a escolhida e
 as descartadas na `narrative`; decisão sem nó → `D_` novo no grafo do tema, ligado ao nó de onde veio.
+Só se sela nó **`open`** (lista positiva: `confirmed` com proveniência medida não é re-carimbado), com
+a **pergunta** registrada (`--question` é obrigatório: é o único rastro de que houve pergunta), data
+que não está no futuro, escolha não vazia e distinta das descartadas; a narrative anterior fica
+**verbatim** e a proveniência anterior vai inteira para ela. O passo 0 roda radar **e** contrato: dívida
+que o grafo já tinha não vira culpa do selo (rc 2, não 3). Curas da passada adversarial da forja.
 O selo fica em **`plane: DEV`** (e rebaixa um PROD, dizendo isso na narrative): a base dele é
 **testemunho**, e o contrato do `.kg.yaml` reprova testemunho em PROD (`integrity.testimony-in-prod`).
 O radar avisa `decision-done-em-DEV` (SOFT, agregado) — os dois discordam, e vence o contrato; a

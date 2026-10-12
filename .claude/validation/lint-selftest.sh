@@ -14637,7 +14637,9 @@ PY
   [ "$(bash "${resolver}" hub --tools --kind adoption 2>/dev/null)" = "$(bash "${resolver}" hub --tools 2>/dev/null)" ] || _p3="${_p3} hub-mudou-com-adoption"
   grep -qx personality-sync <<< "$(bash "${resolver}" source --tools 2>/dev/null)" || _p3="${_p3} source-sem-personality-sync"
   grep -qx personality-sync <<< "$(bash "${resolver}" standalone --tools --kind adoption 2>/dev/null)" && _p3="${_p3} standalone-com-personality-sync"
-  python3 -c "import sys,yaml; d=yaml.safe_load(open(sys.argv[1])); s=d['work_tool_sets']; sys.exit(0 if 'personality-sync' in (s.get('federation') or []) and not (s.get('pending') or []) else 1)" "${roles}" || _p3="${_p3} personality-sync-fora-de-federation"
+  python3 -c "import sys,yaml; d=yaml.safe_load(open(sys.argv[1])); s=d['work_tool_sets']; sys.exit(0 if 'personality-sync' in (s.get('federation') or []) and 'personality-sync' not in (s.get('pending') or []) else 1)" "${roles}" || _p3="${_p3} personality-sync-fora-de-federation"
+  # ⚠️ o predicado era `pending` VAZIO; ele mudou em 2026-10-12, quando `decide` nasceu em `pending` (o lugar
+  #    declarado de quem nasce sem classificação). O que o caso protege é personality-sync ter SAÍDO de pending.
   if [ -z "${_p3}" ]; then
     record_pass "role-bundle: (p3) --tools --kind adoption soma co-relay/co-evolve só ao standalone adotado; porta e hub inalterados; personality-sync em federation"
   else record_fail "role-bundle: (p3)" "divergiu:${_p3}"; fi
@@ -18275,7 +18277,12 @@ run_role_cut_selftests() {
         #     dispara onde há `docs/evolution/federation/members.yaml` — no papel não-source ela é
         #     [papel/SEM-OBJETO] (`_without_object_for_role` em lint-artifacts.sh). Logo o alvo que não
         #     recebe o comando também nunca colhe a violação que o cita. Publicar portas é ato da fonte.
-        adopt|federation-*|co-announce|co-deliver|co-evolve|co-relay|personality-sync|publish) continue ;;  # adoção/federação/pendente
+        # `decide` entrou em 2026-10-12 (forja do /meta:decide): nasceu no conjunto `pending` do roles.yaml —
+        #     core-only até o maestro classificar (nó Q_DECIDE_FICA_EM_PENDING) —, e quem o cita são só os
+        #     DOCSTRINGS das duas peças dele; nenhuma mensagem de violação manda o alvo rodá-lo. O decide-census.sh
+        #     sai com ele (corte por companheiro: zona `*-census.sh`); o kg-decide-seal.sh está FORA da zona e
+        #     viaja com a menção no docstring — teto declarado, não instrução impossível. Quinto comando pego aqui.
+        adopt|federation-*|co-announce|co-deliver|co-evolve|co-relay|personality-sync|publish|decide) continue ;;  # adoção/federação/pendente
         nao|federation-) continue ;;                                            # falsos positivos do grep
       esac
       [ -f "${REPO_ROOT}/.claude/commands/meta/${_c}.md" ] || continue          # comando que não existe
@@ -29570,7 +29577,10 @@ run_decide_selftests() {
   mkdir -p "${r}/docs/a" "${r}/docs/b" "${r}/docs/c" "${r}/x/fixtures" "${r}/vendor/kg" "${r}/docs/evolution/inbox/_processed"
   "${G[@]}" -C "${sb}" init -q r
   _dec_graph a "$(_dec_node D_VELHO decision open 'decidir o velho')" \
-    "$(_dec_node Q_CITADO question open 'qual caminho?' '(a) caminho um com custo baixo; (b) caminho dois que destrava a fase 2.')" > "${r}/docs/a/a.kg.yaml"
+    "$(_dec_node Q_CITADO question open 'qual caminho?' '(a) caminho um com custo baixo; (b) caminho dois que destrava a fase 2.')" \
+    "$(_dec_node D_FECHADO decision done 'decidido antes')" \
+    "$(printf '  - id: D_CONF\n    node_type: decision\n    layer: audit\n    plane: PROD\n    status: confirmed\n    impact: 3\n    confidence: 0.9\n    verified_at: "2026-09-01"\n    verified_against: "medido"\n    label: "decisão já medida"\n    provenance:\n      source: "S0"\n      locator: "L0"\n      method: "medição: M0"\n      locality: "repo"')" \
+    "$(printf '  - id: D_COM_HISTORIA\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n    label: "decidir com história"\n    narrative: |\n      parágrafo um\n      - item da lista\n\n      parágrafo dois\n    provenance:\n      source: "S1"\n      locator: "L1"\n      method: "leitura: M1"')" > "${r}/docs/a/a.kg.yaml"
   { _dec_graph b "$(_dec_node D_B decision open 'decidir b')"; } > "${r}/docs/b/b.kg.yaml"
   sed -i 's/^  baseline: "2026-09-01"$/&\n  x_drive_checkpoint: pending\n  x_drive_checkpoint_note: "lote L1 sem selo"/' "${r}/docs/b/b.kg.yaml"
   { _dec_graph c "$(_dec_node D_C decision open 'decidir c')"; } > "${r}/docs/c/c.kg.yaml"
@@ -29587,6 +29597,8 @@ run_decide_selftests() {
   python3 - "${r}/docs/a/a.kg.yaml" <<'DEC_PY'
 import sys
 p = sys.argv[1]; s = open(p, encoding='utf-8').read()
+s = s.replace('  - id: D_VELHO\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6', '  - id: D_VELHO\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.7', 1)
+assert 'confidence: 0.7' in s
 s = s.replace('edges:\n', '  - id: D_NOVO\n    node_type: decision\n    layer: audit\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.6\n    label: "decidir o novo"\nedges:\n  - from: D_NOVO\n    to: E_ANCORA\n    edge_type: DEPENDS_ON\n  - from: D_NOVO\n    to: Q_CITADO\n    edge_type: SUPPORTS\n', 1)
 open(p, 'w', encoding='utf-8').write(s)
 DEC_PY
@@ -29595,7 +29607,8 @@ DEC_PY
   : > "${r}/docs/evolution/inbox/sinal-novo.md"
   printf '#!/usr/bin/env bash\nprintf %s\n' "'[{\"number\":7,\"title\":\"feat x\",\"headRefName\":\"feat/x\",\"isDraft\":false,\"statusCheckRollup\":[{\"name\":\"lint\",\"status\":\"COMPLETED\",\"conclusion\":\"FAILURE\"},{\"name\":\"ok\",\"status\":\"COMPLETED\",\"conclusion\":\"SUCCESS\"}]}]'" > "${sb}/gh-ok"
   chmod +x "${sb}/gh-ok"
-  printf 'conversa: falamos de Q_CITADO, de D_FIXTURE, de D_VENDOR e de D_INEXISTENTE_X.\n' > "${sb}/cite.txt"
+  # q_citado em minúsculas de propósito: a citação é sem caixa (achado 14 do refutador)
+  printf 'conversa: falamos de q_citado, de D_FIXTURE, de D_VENDOR, de D_FECHADO e de D_INEXISTENTE_X.\n' > "${sb}/cite.txt"
   # uma medição de produção-sandbox, lida por vários casos
   if out="$(DECIDE_TODAY=2026-10-12 DECIDE_GH="${sb}/gh-ok" bash "${sut}" "${r}" --tsv --cite "${sb}/cite.txt" 2>&1)"; then rc=0; else rc=$?; fi
   # (a) checkpoint pendente aparece; o selado não; o de fixture nunca
@@ -29603,7 +29616,9 @@ DEC_PY
      && ! grep -q "^checkpoint$(printf '\t')docs/c/" <<< "${out}" && ! grep -q "^checkpoint$(printf '\t')x/fixtures/" <<< "${out}"; then
     record_pass "decide: (a) checkpoint pendente aparece com origem e nota; o selado e o de fixture não"
   else record_fail "decide: (a)" "rc=${rc} $(_emit "${out}" | grep '^checkpoint' | tr '\t\n' '  ')"; fi
-  # (b) o nó CITADO aparece (via cite) com os trechos de opção copiados literalmente; o não citado fora da janela não
+  # (b) o nó CITADO aparece (via cite, sem caixa) com os trechos de opção copiados literalmente; o não citado fora
+  #     da janela não — nem com uma linha FORA do sentido (confidence) mudada dentro dela (a janela por bloco inteiro
+  #     trazia o corpus quase todo)
   if grep -q "^seal$(printf '\t')Q_CITADO$(printf '\t')docs/a/a.kg.yaml:[0-9]*$(printf '\t').*$(printf '\t')cite$(printf '\t')(a) caminho um com custo baixo ⟂ (b) caminho dois que destrava a fase 2" <<< "${out}" \
      && ! grep -q "$(printf '\t')D_VELHO$(printf '\t')" <<< "${out}"; then
     record_pass "decide: (b) nó citado por id aparece com as opções lidas literalmente; o não citado fora da janela não"
@@ -29621,8 +29636,9 @@ DEC_PY
     record_pass "decide: (d) grafo de fixture e de vendor nunca entra, mesmo citado por id"
   else record_fail "decide: (d)" "$(_emit "${out}" | grep 'D_FIXTURE\|D_VENDOR' | tr '\t\n' '  ')"; fi
   # (i) o id citado que NÃO está na fila é NOMEADO, nunca some calado (achado do dogfood da forja)
-  if grep -q "^warn$(printf '\t')-$(printf '\t')-$(printf '\t')citado e INEXISTENTE no corpus rastreado: D_INEXISTENTE_X" <<< "${out}"; then
-    record_pass "decide: (i) id citado e inexistente vira aviso nomeado"
+  if grep -q "^warn$(printf '\t')-$(printf '\t')-$(printf '\t')citado e INEXISTENTE no corpus rastreado: D_INEXISTENTE_X" <<< "${out}" \
+     && grep -q "^warn$(printf '\t')-$(printf '\t')-$(printf '\t')citado e fora da fila: D_FECHADO é decision done em docs/a/a.kg.yaml" <<< "${out}"; then
+    record_pass "decide: (i) id citado e inexistente, e id citado de nó já fechado, viram aviso nomeado"
   else record_fail "decide: (i)" "$(_emit "${out}" | grep '^warn' | tr '\t\n' '  ')"; fi
   # (e) PR do gh com check vermelho vira linha merge que NOMEIA o check; worktree com commit não empurrado e inbox também
   if grep -q "^merge$(printf '\t')PR#7$(printf '\t')feat/x$(printf '\t')feat x$(printf '\t')checks 1 ok · 1 falha · 0 em curso (falha: lint)" <<< "${out}" \
@@ -29646,10 +29662,31 @@ DEC_PY
   printf 'meta:\n  id: quebrado\nnodes: [\n' > "${r}/docs/c/quebrado.kg.yaml"
   "${G[@]}" -C "${r}" add docs/c/quebrado.kg.yaml
   if out="$(DECIDE_TODAY=2026-10-12 bash "${sut}" "${r}" --no-gh 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 2 ] && grep -q 'grafo rastreado que NÃO PARSEIA: docs/c/quebrado.kg.yaml' <<< "${out}"; then
+  if [ "${rc}" -eq 2 ] && grep -q 'grafo rastreado que NÃO PARSEIA (YAML ou UTF-8): docs/c/quebrado.kg.yaml' <<< "${out}"; then
     record_pass "decide: (h) grafo rastreado que não parseia → rc 2 nomeando o arquivo"
   else record_fail "decide: (h)" "rc=${rc} $(_emit "${out}" | head -2 | tr '\n' ' ')"; fi
   "${G[@]}" -C "${r}" rm -q --cached docs/c/quebrado.kg.yaml; rm -f "${r}/docs/c/quebrado.kg.yaml"
+  # (k) as formas que o medidor NÃO lê viram aviso nomeado, nunca linha a menos calada (achados 11, 12, 13 e 15 do
+  #     refutador): grafo vazio, nó aberto em flow-style (fora da forma `- id:`), clone RASO (a janela inundava como
+  #     "todo o histórico") e opção sem valor (saía rc 1 do `${:?}` em vez do rc 2 do contrato)
+  local r2="${sb}/r2" _kb=""
+  "${G[@]}" -C "${sb}" init -q r2; mkdir -p "${r2}/docs"
+  : > "${r2}/docs/vazio.kg.yaml"
+  printf 'meta:\n  id: fl\nnodes:\n  - {id: D_FLOW, node_type: decision, status: open, label: "x"}\n' > "${r2}/docs/fl.kg.yaml"
+  "${G[@]}" -C "${r2}" add -A; "${G[@]}" -C "${r2}" commit -q -m k1
+  printf 'D_FLOW\n' > "${sb}/cite2.txt"
+  if out="$(DECIDE_TODAY=2026-10-12 bash "${sut}" "${r2}" --tsv --no-gh --cite "${sb}/cite2.txt" 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _kb="${_kb} rc=${rc}"
+  grep -q 'grafo rastreado sem mapa no topo (vazio ou não-dict), NÃO medido: docs/vazio.kg.yaml' <<< "${out}" || _kb="${_kb} vazio-calado"
+  grep -q 'nó aberto fora da forma `- id:` de bloco: D_FLOW em docs/fl.kg.yaml' <<< "${out}" || _kb="${_kb} flow-calado"
+  "${G[@]}" clone -q --depth 1 "file://${r}" "${sb}/raso" 2>/dev/null
+  if out="$(DECIDE_TODAY=2026-10-12 bash "${sut}" "${sb}/raso" --tsv --no-gh 2>&1)"; then rc=0; else rc=$?; fi
+  grep -q 'clone RASO (shallow)' <<< "${out}" && ! grep -q "$(printf '\t')window$(printf '\t')" <<< "${out}" || _kb="${_kb} raso-inundou"
+  if out="$(bash "${sut}" "${r2}" --window 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 2 ] || _kb="${_kb} --window-sem-valor-rc${rc}"
+  if [ -z "${_kb}" ]; then
+    record_pass "decide: (k) grafo vazio, nó em flow-style e clone raso viram aviso nomeado; opção sem valor sai rc 2"
+  else record_fail "decide: (k)" "${_kb}"; fi
 
   # ── o SELADOR, sobre cópia descartável fora de git (o gate é só o radar) ──────────────────
   g="${sb}/s.kg.yaml"; cp "${r}/docs/a/a.kg.yaml" "${g}"
@@ -29671,24 +29708,24 @@ DEC_PY
   else record_fail "decide: (s1)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
   # (s2) nó inexistente → rc 2 e o arquivo intacto
   h0="$(sha256sum "${g}" | cut -d' ' -f1)"
-  if out="$(bash "${seal}" "${g}" D_NAO_EXISTE --chosen a --rejected b --date 2026-10-12 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${g}" D_NAO_EXISTE --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 2 ] && grep -q 'nó inexistente' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
     record_pass "decide: (s2) nó inexistente → rc 2, nada escrito"
   else record_fail "decide: (s2)" "rc=${rc} $(_emit "${out}" | tail -1)"; fi
   # (s3) nó já done (o selado em s1) → rc 2 e intacto: selo não se re-carimba
-  if out="$(bash "${seal}" "${g}" D_VELHO --chosen x --rejected y --date 2026-10-13 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 2 ] && grep -q 'já está done' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
+  if out="$(bash "${seal}" "${g}" D_VELHO --chosen x --rejected y --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'está done, não open' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
     record_pass "decide: (s3) nó já done → rc 2, nada escrito"
   else record_fail "decide: (s3)" "rc=${rc} $(_emit "${out}" | tail -1)"; fi
   # (s4) o gate reprova DEPOIS da escrita → rc 3 e a escrita DESFEITA byte a byte (radar falso que reprova o selado)
   printf '#!/usr/bin/env bash\ngrep -q "meta:decide" "$1" && exit 1\nexit 0\n' > "${sb}/radar-reprova-selo.sh"
   cp "${r}/docs/a/a.kg.yaml" "${sb}/u.kg.yaml"; h0="$(sha256sum "${sb}/u.kg.yaml" | cut -d' ' -f1)"
-  if out="$(DECIDE_SEAL_RADAR="${sb}/radar-reprova-selo.sh" bash "${seal}" "${sb}/u.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(DECIDE_SEAL_RADAR="${sb}/radar-reprova-selo.sh" bash "${seal}" "${sb}/u.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 3 ] && grep -q 'escrita DESFEITA' <<< "${out}" && [ "$(sha256sum "${sb}/u.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
     record_pass "decide: (s4) radar reprovando o selado → rc 3 e o arquivo volta byte a byte"
   else record_fail "decide: (s4)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
   # (s5) decisão sem nó: --new cria D_ ligado ao nó de origem, com as mesmas marcas, e o radar sai 0
-  if out="$(bash "${seal}" "${g}" --new D_NOVA_DA_SESSAO --label "decidiu-se X" --link Q_CITADO --chosen "X" --rejected "Y|Z" --date 2026-10-12 --other 2>&1)"; then rc=0; else rc=$?; fi
+  if out="$(bash "${seal}" "${g}" --new D_NOVA_DA_SESSAO --label "decidiu-se X" --link Q_CITADO --chosen "X" --rejected "Y|Z" --date 2026-10-12 --question q --other 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && python3 - "${g}" <<'DEC_PY'
 import sys, yaml
 d = yaml.safe_load(open(sys.argv[1]))
@@ -29703,24 +29740,72 @@ DEC_PY
   # (s6) nó com campo CEGO → rc 2: gate humano às cegas não recebe selo de sessão
   cp "${r}/docs/a/a.kg.yaml" "${sb}/b.kg.yaml"
   sed -i 's/^    label: "qual caminho?"$/&\n    x_blind_verdict: ""/' "${sb}/b.kg.yaml"; h0="$(sha256sum "${sb}/b.kg.yaml" | cut -d' ' -f1)"
-  if out="$(bash "${seal}" "${sb}/b.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 2 ] && grep -q 'campo CEGO' <<< "${out}" && [ "$(sha256sum "${sb}/b.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
-    record_pass "decide: (s6) nó com campo cego → rc 2, nada escrito"
-  else record_fail "decide: (s6)" "rc=${rc} $(_emit "${out}" | tail -1)"; fi
+  if out="$(bash "${seal}" "${sb}/b.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  local _rc1="${rc}" _o1="${out}"
+  # e o cego ANINHADO (achado 9 do refutador): `x_gate: {kind: blind}` não pode passar por não ser chave de 1º nível
+  cp "${r}/docs/a/a.kg.yaml" "${sb}/b2.kg.yaml"
+  sed -i 's/^    label: "qual caminho?"$/&\n    x_gate:\n      kind: blind/' "${sb}/b2.kg.yaml"
+  if out="$(bash "${seal}" "${sb}/b2.kg.yaml" Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${_rc1}" -eq 2 ] && grep -q 'campo CEGO' <<< "${_o1}" && [ "$(sha256sum "${sb}/b.kg.yaml" | cut -d' ' -f1)" = "${h0}" ] \
+     && [ "${rc}" -eq 2 ] && grep -q 'campo CEGO' <<< "${out}"; then
+    record_pass "decide: (s6) nó com campo cego (chave de 1º nível ou valor aninhado) → rc 2, nada escrito"
+  else record_fail "decide: (s6)" "1º nível rc=${_rc1}; aninhado rc=${rc} $(_emit "${out}" | tail -1)"; fi
+  # (s8) só `open` se sela (achado 1 do refutador, BLOQUEAVA): nó `confirmed` com proveniência MEDIDA não é re-carimbado
+  cp "${r}/docs/a/a.kg.yaml" "${sb}/c.kg.yaml"; h0="$(sha256sum "${sb}/c.kg.yaml" | cut -d' ' -f1)"
+  if out="$(bash "${seal}" "${sb}/c.kg.yaml" D_CONF --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'está confirmed, não open' <<< "${out}" && [ "$(sha256sum "${sb}/c.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
+    record_pass "decide: (s8) nó confirmed (proveniência medida) → rc 2, nada escrito: só open se sela"
+  else record_fail "decide: (s8)" "rc=${rc} $(_emit "${out}" | tail -1)"; fi
+  # (s9) a narrative anterior sobrevive VERBATIM (bloco com lista e parágrafos) e a proveniência anterior vai INTEIRA
+  #      (achados 2 e 3 do refutador: o achatamento mutilava a lista e só o source sobrevivia)
+  if out="$(bash "${seal}" "${sb}/c.kg.yaml" D_COM_HISTORIA --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && python3 - "${sb}/c.kg.yaml" <<'DEC_PY'
+import sys, yaml
+n = [x for x in yaml.safe_load(open(sys.argv[1]))['nodes'] if x['id'] == 'D_COM_HISTORIA'][0]
+t = n['narrative']
+ok = (t.startswith('parágrafo um\n- item da lista\n\nparágrafo dois') and 'source «S1»' in t and 'locator «L1»' in t
+      and 'method «leitura: M1»' in t and '«a»' in t)
+sys.exit(0 if ok else 1)
+DEC_PY
+  then record_pass "decide: (s9) narrative anterior verbatim (lista e parágrafos) e proveniência anterior inteira na narrative"
+  else record_fail "decide: (s9)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  # (s10) entradas que não são resposta do maestro → rc 2, nada escrito: --chosen só de espaços, data FUTURA,
+  #       sem --question (o único rastro de que houve pergunta), opção com « » (o delimitador do selo), e a
+  #       escolhida repetida em --rejected com outra caixa (achados 4, 7, 8 e 10 do refutador)
+  cp "${r}/docs/a/a.kg.yaml" "${sb}/e.kg.yaml"; h0="$(sha256sum "${sb}/e.kg.yaml" | cut -d' ' -f1)"
+  local _bad="" _a
+  for _a in "--chosen|   |--rejected|b|--date|2026-10-12|--question|q" "--chosen|a|--rejected|b|--date|2099-01-01|--question|q" \
+            "--chosen|a|--rejected|b|--date|2026-10-12" "--chosen|a «x»|--rejected|b|--date|2026-10-12|--question|q" \
+            "--chosen|Opção A|--rejected|opção a|--date|2026-10-12|--question|q"; do
+    local -a _args; IFS='|' read -r -a _args <<< "${_a}"
+    if out="$(bash "${seal}" "${sb}/e.kg.yaml" Q_CITADO "${_args[@]}" 2>&1)"; then rc=0; else rc=$?; fi
+    [ "${rc}" -eq 2 ] || _bad="${_bad} [${_a}→rc ${rc}]"
+  done
+  if [ -z "${_bad}" ] && [ "$(sha256sum "${sb}/e.kg.yaml" | cut -d' ' -f1)" = "${h0}" ]; then
+    record_pass "decide: (s10) escolha vazia, data futura, sem pergunta, « » e escolhida em --rejected (sem caixa) → rc 2, nada escrito"
+  else record_fail "decide: (s10)" "aceitou:${_bad}"; fi
   # (s7) onde o contrato está vendorizado, ele é o 2º gate: grafo RASTREADO, selo limpo → rc 0 com o contrato
   #      julgado; opção com caminho de máquina (REGRA 99) → o contrato piora → rc 3 e a escrita DESFEITA.
   #      Achado do dogfood da forja: o selo em PROD passava no radar e reprovava no contrato (testimony-in-prod).
   if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && python3 -c 'import jsonschema' >/dev/null 2>&1; then
     ln -s "${REPO_ROOT}/vendor/kg-ssot" "${r}/vendor/kg-ssot"
     g="${r}/docs/b/b.kg.yaml"; h0="$(sha256sum "${g}" | cut -d' ' -f1)"
-    if out="$(bash "${seal}" "${g}" D_B --chosen "ir de /home/alguem/repo" --rejected "ficar" --date 2026-10-12 2>&1)"; then rc=0; else rc=$?; fi
+    if out="$(bash "${seal}" "${g}" D_B --chosen "ir de /home/alguem/repo" --rejected "ficar" --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
     if [ "${rc}" -eq 3 ] && grep -q 'o contrato REPROVOU' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
-      if out="$(bash "${seal}" "${g}" D_B --chosen "ir pelo caminho curto" --rejected "ficar" --date 2026-10-12 2>&1)"; then rc=0; else rc=$?; fi
+      # caminho RELATIVO, de outro cwd (achado 6 do refutador: o contrato ficava "não julgado" e o selo saía 0)
+      if out="$(cd "${r}/docs" && bash "${seal}" b/b.kg.yaml D_B --chosen "ir pelo caminho curto" --rejected "ficar" --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
       if [ "${rc}" -eq 0 ] && ! grep -q 'NÃO JULGADO\|não vendorizado' <<< "${out}"; then
         record_pass "decide: (s7) o contrato é o 2º gate: caminho de máquina na opção → rc 3 desfeito; selo limpo → rc 0 julgado"
       else record_fail "decide: (s7)" "selo limpo: rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
     else record_fail "decide: (s7)" "caminho de máquina: rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
-  else record_skip "decide: (s7) contrato não vendorizado ou jsonschema ausente (o 2º gate NÃO verificado)"; fi
+    # (s11) dívida de contrato que o grafo JÁ tinha na árvore → rc 2 no passo 0, nunca rc 3 "culpa do selo" (achado 5)
+    g="${r}/docs/c/c.kg.yaml"
+    sed -i 's/^    label: "decidir c"$/&\n    verified_at: 2026-10-01/' "${g}"; h0="$(sha256sum "${g}" | cut -d' ' -f1)"
+    if out="$(bash "${seal}" "${g}" D_C --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+    if [ "${rc}" -eq 2 ] && grep -q 'JÁ piora o contrato antes do selo' <<< "${out}" && [ "$(sha256sum "${g}" | cut -d' ' -f1)" = "${h0}" ]; then
+      record_pass "decide: (s11) dívida de contrato pré-existente → rc 2 no passo 0 (não é culpa do selo), nada escrito"
+    else record_fail "decide: (s11)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
+  else record_skip "decide: (s7)/(s11) contrato não vendorizado ou jsonschema ausente (o 2º gate NÃO verificado)"; fi
   rm -rf "${sb}"
 }
 _family run_decide_selftests
