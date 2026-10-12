@@ -1,7 +1,8 @@
 ---
 branch: fix/merge-hooks-relocate-matcher
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 129d823f58d135d4da64996722d4c9822cc66de45c598c128bcdb28e99dc78c5
+reviewed_code_sha256: 3e4a44197e96c49fc1beefa791b314c5a40164d0105d4921b42118adaea4efc4
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
