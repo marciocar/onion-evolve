@@ -73,9 +73,19 @@ fi
 # COMPORTAMENTO decidindo por DECLARAÇÃO de path.
 # O `ABS` já era calculado 15 linhas acima exatamente para isto; esta checagem é que não o usava.
 _ONION_HOOKS="${REPO}/.githooks"
+# ⚠️ OUTRO DIRETÓRIO COM O MESMO HOOK (2026-10-12, medido no onion-kg-ssot): o Claude Code 2.1.296 regrava
+# `core.hooksPath` em forma ABSOLUTA ao CRIAR uma worktree de agente (`isolation: worktree`) — antes
+# `.githooks`, logo depois `/home/<user>/<repo>/.githooks`, no `.git/config` compartilhado. Numa worktree
+# irmã o git passa a rodar o hook do checkout principal. Se ele é byte-idêntico ao desta árvore, o gate é
+# o MESMO agora: aviso, não reprovação (o ✗ dava "PARCIAL" a um gate que executou e barrou). Diferente →
+# o caso continua sendo o do husky/hook velho, e reprova.
 if [ -f "${_ONION_HOOKS}/pre-commit" ] && ! [ "${ABS}" -ef "${_ONION_HOOKS}" ]; then
-  no "há hook do Onion em .githooks/ que o git IGNORA (hooksPath aponta para '${DIR}')"
-  FAILED=1
+  if [ -f "${ABS}/pre-commit" ] && cmp -s "${ABS}/pre-commit" "${_ONION_HOOKS}/pre-commit"; then
+    printf '  ⚠ %s\n' "hooksPath aponta para '${DIR}', outro diretório com o pre-commit byte-idêntico ao de .githooks/ — o gate é o mesmo agora, mas mudança em .githooks/ desta árvore só vale quando chegar lá. Causa conhecida: o Claude Code grava o caminho absoluto ao criar worktree de agente. Conserto: git config core.hooksPath .githooks"
+  else
+    no "há hook do Onion em .githooks/ que o git IGNORA (hooksPath aponta para '${DIR}')"
+    FAILED=1
+  fi
 fi
 
 # ── 2. EXECUÇÃO (commit-sonda descartável) ──────────────────────────────────────────────
