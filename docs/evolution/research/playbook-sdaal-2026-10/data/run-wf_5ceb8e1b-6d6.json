@@ -1,0 +1,309 @@
+{
+ "mode": "primaries",
+ "question": "SAC-52 gate D (selado pelo maestro em 2026-10-12, D_PLAYBOOK_SDAAL_SAC52): antes de forjar o template de playbook de domínio instanciado em PFR, existe formato aberto e agnóstico de domínio para playbook executável que o Onion deva COSTURAR por SDAAL em vez de inventar? Fechar a sub-decisão (3) lendo as fontes primárias nomeadas: o que cada uma especifica (modelo de passos, entradas/saídas, decisões/condições, aprovação humana, estado de execução, versionamento), se é agnóstica de domínio, maturidade/adoção e licença.",
+ "today": "2026-10-12",
+ "kgPath": "/home/marcio/onion-evolve/.claude/worktrees/sac111/docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml",
+ "radarExit": 0,
+ "summary": "Gravei a rodada de primárias de 2026-10-12 do gate D no grafo. Entraram 16 nós: 14 evidências ancoradas (Arazzo 1.0.1, runme e spec CACAO v2.0), a contabilidade em E_LACUNAS_PLAYBOOK_SDAAL_1012 (3 claims rejeitadas como EXAGERADAS e 4 lacunas abertas) e a proposta não selada Q_SUBDECISAO_3_FECHAMENTO_1012, que pede 3 leituras curtas antes do selo (notas da Arazzo 1.1.0, doc do runme, CACAO §3.1). Entraram também 36 arestas, entre elas 3 SUPERSEDES que reconciliam as objeções de 'primária não lida' para superseded. A rodada sustenta a opção A já selada: nenhum dos três formatos é agnóstico de domínio e cobre ao mesmo tempo aprovação humana e estado de instância. O radar com --integrity --schema saiu com exit 0 (73 nós, 107 arestas) e o kg-contract-check com rc 0. Atenção: a branch docs/drive-automate-merge-default deste worktree não tinha o grafo, então semeei a partir do grafo de origin/main@d6d4848c (57 nós, idêntico ao do worktree sac52) e apendei sobre ele. O arquivo está não rastreado nesta branch e vai dar conflito add/add com main se não for rebaseado ou levado para uma branch nascida de main. D_PLAYBOOK_SDAAL_SAC52 não foi tocado.",
+ "unreachable": [],
+ "anchored": [
+  {
+   "source": "arazzo",
+   "gap": "Arazzo 1.0.1 é formato aberto agnóstico de domínio para workflows executáveis? Modelo de passos, condições, entradas/saídas, estado",
+   "claim": "Arazzo define sequências de chamadas e dependências, num modelo de steps ordenados que chamam operações de API ou outros workflows.",
+   "verdict": "ANCORADA",
+   "why": "A quote aparece verbatim no campo steps. dependsOn existe no mesmo objeto (\"A list of workflows that MUST be completed before this workflow can be processed.\"), o que sustenta 'dependências'. O §2 da spec diz que o objetivo é 'a mechanism that can define sequences of calls'. A numeração exata é §4.6.4.1, e o locator §4.6.4 está certo no nível do objeto.",
+   "corrected": "",
+   "quote": "An ordered list of steps where each step represents a call to an API operation or to another workflow.",
+   "locator": "Spec 1.0.1, §4.6.4.1 (campo steps do Workflow Object)",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "arazzo",
+   "gap": "Arazzo 1.0.1 é formato aberto agnóstico de domínio para workflows executáveis? Modelo de passos, condições, entradas/saídas, estado",
+   "claim": "Entradas são JSON Schema 2020-12; saídas são mapa nome-valor dinâmico; dependsOn exige conclusão prévia de outros workflows.",
+   "verdict": "ANCORADA",
+   "why": "A quote de inputs está verbatim. outputs é 'A map between a friendly name and a dynamic output value.' e dependsOn é 'A list of workflows that MUST be completed before this workflow can be processed.' Os três pontos do claim estão no texto, sem esticar.",
+   "corrected": "",
+   "quote": "A JSON Schema 2020-12 object representing the input parameters used by this workflow.",
+   "locator": "Spec 1.0.1, §4.6.4.1 (inputs; outputs; dependsOn)",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "arazzo",
+   "gap": "Arazzo 1.0.1 é formato aberto agnóstico de domínio para workflows executáveis? Modelo de passos, condições, entradas/saídas, estado",
+   "claim": "successCriteria são asserções que todas devem valer; onSuccess e onFailure têm goto, end e retry, com padrões definidos; a spec não define estado de execução persistido nem aprovação humana.",
+   "verdict": "ANCORADA",
+   "why": "A quote existe (default de onFailure). successCriteria: 'All assertions MUST be satisfied for the step to be deemed successful.' goto, end e retry estão descritos nos objetos de ação (goto e end em Success/Failure Action, retry só na Failure Action, §4.6.8). A parte negativa não tem quote e é ausência de evidência: a leitura não achou nenhuma menção a aprovação humana ou estado persistido, e a spec só diz que segurança fica 'left to the implementer'. Ao reportar, escreva 'a spec não especifica' e não 'não há'. Arazzo descreve o fluxo e não é runtime.",
+   "corrected": "",
+   "quote": "If omitted, the default behavior is to break and return.",
+   "locator": "Spec 1.0.1, §4.6.5.1 (successCriteria/onFailure do Step Object), §4.6.7 e §4.6.8 (Success/Failure Action), §4.6.11 (Criterion)"
+  },
+  {
+   "source": "arazzo",
+   "gap": "Arazzo 1.0.1 é formato aberto agnóstico de domínio para workflows executáveis? Modelo de passos, condições, entradas/saídas, estado",
+   "claim": "O formato não é totalmente acoplado a OpenAPI (sourceDescriptions pode ser 'arazzo'), mas seus steps são chamadas de operação e as expressões de runtime se baseiam em mensagens HTTP.",
+   "verdict": "ANCORADA",
+   "why": "A quote está no §4.7 (a frase foi relatada truncada). O campo type do Source Description Object aceita 'openapi' ou 'arazzo'. Steps são 'a call to an API operation or to another workflow', então o desacoplamento é parcial, como o claim diz. A quote é verbatim, e a ressalva 'não totalmente acoplado' é do leitor e é coerente com os campos.",
+   "corrected": "",
+   "quote": "A runtime expression allows values to be defined based on information that will be available within the HTTP message",
+   "locator": "Spec 1.0.1, §4.7 Runtime Expressions; §4.6.3.1 Source Description Object (type)",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "arazzo",
+   "gap": "Arazzo 1.0.1 é formato aberto agnóstico de domínio para workflows executáveis? Modelo de passos, condições, entradas/saídas, estado",
+   "claim": "A licença é Apache 2.0. O repositório se descreve como mecanismo agnóstico de linguagem, e o README lista ecossistema de editores, validadores, parsers e runners. A versão corrente no README é 1.1.0.",
+   "verdict": "ANCORADA",
+   "why": "A quote está no README do repo, e não na spec 1.0.1. O §1.1 da spec é só a declaração de palavras-chave RFC 2119, e 'programming language-agnostic' não aparece em nenhum lugar do texto da spec. O §2 da spec diz apenas 'a mechanism that can define sequences of calls'. A parte do locator que cita 'spec 1.0.1 §1.1' está errada. O README diz 'Current Version - 1.1.0'. A sidebar mostra Apache-2.0, e a spec §1.1 diz 'licensed under The Apache License, Version 2.0'. O README tem seção Tooling com editores/design/renderers, geradores, validadores e linters, parsers e resolvers, execução e testes de workflow, conversores e mocks. O claim se sustenta no README. Corrija o locator para 'README intro', sem §1.1. Note que a versão corrente (1.1.0) é mais nova que a 1.0.1 lida aqui.",
+   "corrected": "",
+   "quote": "defines a standard, programming language-agnostic mechanism to express sequences of calls",
+   "locator": "github.com/OAI/Arazzo-Specification, README (intro); sidebar de licença Apache-2.0",
+   "sourceTier": 9,
+   "validFrom": "2026-10-12"
+  },
+  {
+   "source": "arazzo",
+   "gap": "Arazzo 1.0.1 é formato aberto agnóstico de domínio para workflows executáveis? Modelo de passos, condições, entradas/saídas, estado",
+   "claim": "Versionamento: o campo arazzo carrega a versão da spec, e o patch não deve ser considerado pelas ferramentas. info.version versiona o documento.",
+   "verdict": "ANCORADA",
+   "why": "A quote existe no §4.1. O campo arazzo 'MUST be the version number of the Arazzo Specification that the Arazzo Description uses.' info.version é 'The version identifier of the Arazzo document (which is distinct from the Arazzo Specification version).' Os três pontos do claim estão no texto.",
+   "corrected": "",
+   "quote": "The patch version SHOULD NOT be considered by tooling",
+   "locator": "Spec 1.0.1, §4.1 Versions; §4.6.1.1 e §4.6.2.1",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "runme",
+   "gap": "runme (markdown executável) serve de substrato para playbook em markdown com estado e aprovação?",
+   "claim": "Runme é substrato de runbook em markdown executável, não um formato de playbook com modelo de passos tipado: executa blocos de código cercados.",
+   "verdict": "ANCORADA",
+   "why": "A frase aparece literal no README. A parte 'não é formato de playbook com modelo de passos tipado' é inferência por ausência: a tabela de atributos por célula (background, cwd, interactive, interpreter, excludeFromRunAll etc.) controla a execução, não declara passos tipados, entradas/saídas ou condições. A leitura é razoável e a citação sustenta o núcleo do claim.",
+   "corrected": "",
+   "quote": "Runme runs your commands (shell, bash, zsh) or code inside your fenced code blocks.",
+   "locator": "github.com/runmedev/runme, README (2º parágrafo)",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "runme",
+   "gap": "runme (markdown executável) serve de substrato para playbook em markdown com estado e aprovação?",
+   "claim": "Metadados por célula existem como atributos na linha da cerca, incluindo nome canônico para referência via CLI.",
+   "verdict": "ANCORADA",
+   "why": "A descrição do atributo `name` na tabela de configuração em nível de célula é literal (default: auto-gerado). A página lista outros atributos por célula (background, cwd, interactive, interpreter, ignore, transform, promptEnv, skipPrompts). A localização 'na linha da cerca' é a sintaxe usual do Runme e não foi lida explicitamente nesta página, mas é consistente com 'cell-level configuration'.",
+   "corrected": "",
+   "quote": "Cell's canonical name useful for referencing the cell via CLI",
+   "locator": "docs.runme.dev/configuration/cell-level, atributo `name`",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "runme",
+   "gap": "runme (markdown executável) serve de substrato para playbook em markdown com estado e aprovação?",
+   "claim": "Runme é agnóstico de domínio (runbooks em shell), é multi-interface e tem licença permissiva Apache-2.0 com adoção moderada.",
+   "verdict": "ANCORADA",
+   "why": "A página inicial diz literalmente 'It is a cloud-native shell kernel with a notebook, editor, terminal, and CLI interface.' (seção 'What is Runme?', com 'It is' à frente). O README mostra Apache-2.0, 2.2k stars e 959 commits em main. O README também diz que o Runme é compatível com as definições de tarefa de qualquer linguagem, o que sustenta o agnosticismo de domínio. 'Adoção moderada' é julgamento do leitor sobre os números, não afirmação do texto, mas os números conferem.",
+   "corrected": "",
+   "quote": "a cloud-native shell kernel with a notebook, editor, terminal, and CLI interface.",
+   "locator": "docs.runme.dev, página inicial; GitHub README: licença Apache-2.0, 2.2k stars, 959 commits",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "cacao-spec",
+   "gap": "A especificação técnica CACAO v2.0 (não a página institucional) é agnóstica de domínio em algum grau? Modelo de execução, workflow steps, playbook vs instância",
+   "claim": "1. O modelo de passos é genérico em forma (start, action, playbook-action, parallel, if-condition, while, switch, end), mas os tipos de playbook são definidos só em termos de segurança.",
+   "verdict": "ANCORADA",
+   "why": "A quote existe literalmente na seção 1.3, na definição de Mitigation Playbook. Os demais tipos (attack, detection, engagement, investigation, prevention e remediation) são todos definidos em termos de segurança. A seção 4.2 enumera start, end, action, playbook-action, parallel, if-condition, while-condition e switch-condition, e 'while' e 'switch' do claim são abreviações aceitáveis. Ressalva: a 'genericidade em forma' é inferência do leitor. O texto escopa o documento a 'cyber security playbooks' e não afirma que o modelo vale fora da segurança. A quote só ilustra um dos tipos, mas o claim sobre todos os tipos se sustenta.",
+   "corrected": "",
+   "quote": "A playbook that is primarily focused on the orchestration steps required to mitigate a security event or incident",
+   "locator": "Seção 1.3 (Playbook Types) e Seção 4.2 (workflow-step-type-enum)"
+  },
+  {
+   "source": "cacao-spec",
+   "gap": "A especificação técnica CACAO v2.0 (não a página institucional) é agnóstica de domínio em algum grau? Modelo de execução, workflow steps, playbook vs instância",
+   "claim": "2. Há composição de playbooks (playbook-action) e lógica condicional if/while/switch, cobrindo decisões e sub-fluxos.",
+   "verdict": "ANCORADA",
+   "why": "A quote está em 4.6, em 'The playbook action step workflow step executes a referenced playbook using the agents and targets defined in the referenced playbook'. As seções 4.8, 4.9 e 4.10 definem if-then-else, while e switch. O claim não estica o texto.",
+   "corrected": "",
+   "quote": "executes a referenced playbook using the agents and targets defined in the referenced playbook.",
+   "locator": "Seção 4.6 (Playbook Action Step); if-condition 4.8, while-condition 4.9, switch-condition 4.10",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "cacao-spec",
+   "gap": "A especificação técnica CACAO v2.0 (não a página institucional) é agnóstica de domínio em algum grau? Modelo de execução, workflow steps, playbook vs instância",
+   "claim": "3. Entradas e estado: constantes e variáveis do playbook valem durante a execução.",
+   "verdict": "ANCORADA",
+   "why": "A quote está em 3.3. A tabela traz a coluna 'Mutable', e há playbook_variables e step_variables (o exemplo 4.8 mostra uma variável de 'User supplied value'). Isso sustenta entradas e estado em tempo de execução. A frase é 'MAY be used', não obrigatória, mas o claim a reproduz fielmente.",
+   "corrected": "",
+   "quote": "Each playbook has a set of constants and variables that MAY be used throughout the execution of a playbook",
+   "locator": "Seção 3.3 (Playbook Constants & Variables)",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "cacao-spec",
+   "gap": "A especificação técnica CACAO v2.0 (não a página institucional) é agnóstica de domínio em algum grau? Modelo de execução, workflow steps, playbook vs instância",
+   "claim": "5. O playbook é um artefato portável definido num sistema e executado em outro; o versionamento é por created/modified, e o modelo de extensões permite propriedades extras.",
+   "verdict": "ANCORADA",
+   "why": "A quote está literalmente em 1.2. A seção 2.3 diz que a versão é identificada por id mais modified, com created, modified e revoked em 3.1. A seção 8 (Extension Definition) permite que workflow steps, agents, data markings e playbooks usem extensões. Menor imprecisão: o versionamento inclui também revoked e id, mas 'por created/modified' não contradiz o texto.",
+   "corrected": "",
+   "quote": "A playbook may be defined in one system by one or more authors, but then executed in a different operational environment",
+   "locator": "Seção 1.2; versionamento em 2.3 e 3.1; extensões na Seção 8",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "cacao-spec",
+   "gap": "A especificação técnica CACAO v2.0 (não a página institucional) é agnóstica de domínio em algum grau? Modelo de execução, workflow steps, playbook vs instância",
+   "claim": "6. Maturidade e licença: Committee Specification 01 (27/11/2023), não OASIS Standard; sob OASIS IPR Policy em Non-Assertion Mode. Notou-se inconsistência cacao-2.0 vs exemplo cacao-2.1.",
+   "verdict": "ANCORADA",
+   "why": "A quote está nos Notices: 'This document is provided under the Non-Assertion Mode of the OASIS IPR Policy, the mode chosen when the Technical Committee was established'. O cabeçalho diz 'Committee Specification 01 / 27 November 2023'. 'OASIS Standard' aparece só em referências a outros documentos (STIX 2.1) e em texto-padrão de avisos, nunca como status deste documento. A seção 3.1 manda spec_version ser 'cacao-2.0', e o Exemplo 4.8 (switch) usa 'cacao-2.1'. A inconsistência existe.",
+   "corrected": "",
+   "quote": "provided under the Non-Assertion Mode of the OASIS IPR Policy",
+   "locator": "Front matter e Notices; spec_version na seção 3.1 vs Exemplo 4.8 (seção 4.10)"
+  }
+ ],
+ "rejected": [
+  {
+   "source": "runme",
+   "gap": "runme (markdown executável) serve de substrato para playbook em markdown com estado e aprovação?",
+   "claim": "O estado de execução é o de uma sessão de terminal (variáveis de ambiente retidas), sem estado de execução persistido/auditável por passo.",
+   "verdict": "EXAGERADA",
+   "why": "A citação aparece, mas a frase do README continua: ', and it is possible to pipe previous cells' output into successive cells.' A citação termina em ponto onde a fonte tem vírgula, e o claim ignora o encadeamento de saída entre células. A segunda metade ('sem estado persistido/auditável por passo') é afirmação de ausência que o trecho não sustenta. O texto só diz que as variáveis de ambiente são retidas e que a saída pode ser encadeada.",
+   "corrected": "O README diz que, como numa sessão de terminal, as variáveis de ambiente são retidas entre as execuções e que a saída de células anteriores pode ser encadeada nas seguintes. Nesse trecho não há menção a log ou estado persistido/auditável por passo. Isso é ausência não verificada, não afirmação do texto.",
+   "quote": "Much like a terminal session, environment variables are retained across execution.",
+   "locator": "github.com/runmedev/runme, README",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "runme",
+   "gap": "runme (markdown executável) serve de substrato para playbook em markdown com estado e aprovação?",
+   "claim": "Interatividade e aprovação humana são limitadas a prompts de entrada de variáveis de ambiente e entrada interativa; não há gate de aprovação por passo.",
+   "verdict": "EXAGERADA",
+   "why": "A citação é literal, mas o texto menciona prompts de variáveis de ambiente E 'authentication confirmations'. Ou seja, há confirmações, não só entrada de variáveis. Também existe o atributo `interactive` ('allow interactive input'). A tabela não prova a ausência de gate de aprovação por passo. Ela só não documenta um. O trecho descreve os prompts que existem e não afirma que sejam os únicos.",
+   "corrected": "A página de configuração por célula documenta prompts para definir variáveis de ambiente exportadas (`promptEnv`), confirmações de autenticação, entrada interativa (`interactive`), e o bypass desses prompts (`skipPrompts`). Não documenta um gate de aprovação humana por passo. A ausência é observação desta página, não declaração do projeto.",
+   "quote": "Bypasses interactive prompts that require inputting environment vars or authentication confirmations.",
+   "locator": "docs.runme.dev/configuration/cell-level, atributo `skipPrompts` (par com `promptEnv`)",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "cacao-spec",
+   "gap": "A especificação técnica CACAO v2.0 (não a página institucional) é agnóstica de domínio em algum grau? Modelo de execução, workflow steps, playbook vs instância",
+   "claim": "4. Passo humano existe só como tipo de comando 'manual'; não há semântica de aprovação, timeout ou gate (nenhuma linguagem de approval nos trechos lidos).",
+   "verdict": "EXAGERADA",
+   "why": "A quote existe em 5.2 e 5.3, e a seção 5.3 é de fato 'Manual Command'. Não encontrei linguagem de aprovação ou gate em todo o texto: 'approv' só ocorre em 'Status' e nos avisos OASIS. A parte do timeout é falsa. Toda step tem 'timeout' e 'delay' opcionais (propriedades comuns, seção 4.1), e existe a constante __ACTION_TIMEOUT__ (3.3). O timeout dispara on_failure, e o Exemplo 4.3 combina um comando manual ('Disconnect the machines from the network') com timeout 60000 e on_failure. 'Só' também é forte demais: um humano pode ser agente (agent type 'individual') e há o flag manual_playbook em 10.18. O comando manual é a forma de expressar o passo humano, mas há timeout, delay e roteamento on_failure.",
+   "corrected": "",
+   "quote": "represents a command that is intended to be processed by a human or a system that acts on behalf of a human",
+   "locator": "Seção 5.3 (Manual Command), com 5.2, 4.1, 3.3 e Exemplo 4.3",
+   "sourceTier": 9,
+   "validFrom": ""
+  }
+ ],
+ "elenxo": {
+  "objections": [
+   {
+    "target": "Claim 1 [arazzo] modelo de passos ordenados que chamam operação de API ou outro workflow (§4.6.4.1)",
+    "survives": true,
+    "evidence": "A citação está correta, mas prova MENOS do que a lacuna pede ('agnóstico de domínio para playbook'). Reli a spec 1.0.1 nesta passada. O Step Object só tem os campos fixos description, stepId, operationId, operationPath, workflowId, parameters, requestBody, successCriteria, onSuccess, onFailure e outputs. Não existe tipo de passo para ação genérica, ação humana ou comando: todo passo é uma operação de API ou um workflow. O modelo de passos de um playbook de domínio em PFR (ler, decidir, aprovar, rodar comando do Claude Code) não cabe nesse modelo sem extensões x-, e usar extensões x- é inventar, não costurar."
+   },
+   {
+    "target": "Claim 2 [arazzo] inputs em JSON Schema 2020-12, outputs como mapa, dependsOn",
+    "survives": true,
+    "evidence": "O que pode ser reaproveitado aqui é o JSON Schema 2020-12, que é um padrão independente do Arazzo e pode ser costurado sem ele. Os outputs são expressões de runtime presas à mensagem HTTP (claim 4, §4.7), e dependsOn liga workflows inteiros, não passos. A claim prova entradas e saídas para chamadas de API. Não prova entradas e saídas para um playbook genérico."
+   },
+   {
+    "target": "Claim 3 [arazzo] successCriteria e onSuccess/onFailure (goto/end/retry); sem estado persistido e sem aprovação humana",
+    "survives": false,
+    "evidence": "A ausência se sustenta. Diferente das ausências rejeitadas em runme e CACAO, esta se apoia num conjunto fechado de campos fixos. Reli o Step Object em 1.0.1 e não há campo de aprovação, pausa, instância de execução nem retomada; as ações de sucesso e falha são só end, goto e retry. A única saída seria uma extensão x-, que a spec permite em Step e Workflow, e isso é invenção. A claim fica de pé e é decisiva: o Arazzo não cobre aprovação humana nem estado de execução, que são dois dos seis eixos pedidos pelo gate D."
+   },
+   {
+    "target": "Claim 4 [arazzo] não é totalmente acoplado a OpenAPI, mas as expressões de runtime se baseiam em HTTP",
+    "survives": false,
+    "evidence": "A objeção natural seria 'sourceDescriptions type arazzo prova agnosticismo', e ela cai pela própria claim: o tipo 'arazzo' só referencia outros documentos Arazzo, que são por sua vez chamadas de API. A §4.7 amarra as expressões ao HTTP. A claim prova exatamente o que diz, que o Arazzo é agnóstico de linguagem mas não de domínio de execução. Isso basta para fechar o item 'agnóstico de domínio? não (domínio = orquestração de APIs)'."
+   },
+   {
+    "target": "Claim 5 [arazzo] Apache-2.0, ecossistema de ferramentas, versão corrente 1.1.0 no README",
+    "survives": true,
+    "evidence": "Reli o README do OAI/Arazzo-Specification nesta passada. Ele marca 'Current Version - 1.1.0' e cita 1.0.0 e 1.0.1 só de passagem. O gate D e o nó D_PLAYBOOK_SDAAL_SAC52 nomeiam 1.0.1, mas a rodada não leu a 1.1.0 e não sabe o que ela acrescenta: o README não diz, e um possível suporte a AsyncAPI ficou sem verificação. A conclusão 'sem passo humano/estado' vale para 1.0.1. Estendê-la à versão corrente é inferência. Além disso, 'ecossistema lista runners' é declaração do próprio README, não adoção medida (sem números de uso)."
+   },
+   {
+    "target": "Claim 6 [arazzo] versionamento: campo arazzo (patch ignorado pelas ferramentas) e info.version",
+    "survives": true,
+    "evidence": "Prova o versionamento do DOCUMENTO e da spec. Não prova o versionamento de INSTÂNCIA de execução, que é o que 'template instanciado em PFR com estado observado' (D_PLAYBOOK_SDAAL_SAC52) precisa. info.version é uma string livre, sem semântica de migração entre template e instância."
+   },
+   {
+    "target": "Claim 7 [runme] substrato de markdown executável que roda blocos cercados, sem modelo de passos tipado",
+    "survives": false,
+    "evidence": "A citação do README ('runs your commands... inside your fenced code blocks') prova o que a claim afirma: o Runme é um executor de células de shell e código, não um formato de playbook. Isso fecha a parte 'é formato?' da lacuna com um não, e não há objeção que reverta isso."
+   },
+   {
+    "target": "Claim 8 [runme] metadados por célula como atributos na cerca, incluindo name canônico",
+    "survives": true,
+    "evidence": "Prova endereçamento de célula, não semântica de playbook. Atributos de cerca são metadados de execução (name, interactive e outros); não há entradas e saídas tipadas, condições nem critério de sucesso por célula. Também prova MENOS sobre portabilidade: os atributos são convenção do Runme, não especificação aberta com governança (nenhuma fonte desta rodada mostra spec separada do produto)."
+   },
+   {
+    "target": "Claim 9 [runme] agnóstico de domínio, multi-interface, Apache-2.0, adoção moderada (2.2k stars, 959 commits)",
+    "survives": true,
+    "evidence": "'Agnóstico de domínio' aqui só quer dizer 'roda shell', a mesma agnosticidade de um script, e isso não serve de critério para costurar um formato. Stars e commits medem atenção, não adoção como formato de playbook. Pesa mais o fato de que as duas claims de runme que respondiam a lacuna (estado de execução e aprovação humana) foram REJEITADAS na ancoragem como EXAGERADAS. O verificador achou 'authentication confirmations', o atributo interactive e o encadeamento de saída entre células. A pergunta da lacuna 'serve com estado e aprovação?' segue sem resposta ancorada nos dois eixos."
+   },
+   {
+    "target": "Claim 10 [cacao-spec] passos genéricos na forma (start, action, playbook-action, parallel, if/while/switch, end), mas tipos de playbook definidos só em segurança (§1.3, §4.2)",
+    "survives": true,
+    "evidence": "A claim prova agnosticidade parcial da FORMA e refuta a do vocabulário. Falta mostrar que um playbook não-segurança é VÁLIDO na spec, isto é, se playbook_types é obrigatório e se o enum é aberto (open vocabulary) ou fechado. Sem isso, 'agnóstico em algum grau' fica entre 'forma reaproveitável' e 'inválido fora de segurança'. O nó anterior (achado de 2026-10-11) dizia 'restrito a cibersegurança', e esta claim só o matiza, não o derruba."
+   },
+   {
+    "target": "Claim 11 [cacao-spec] composição (playbook-action) e lógica if/while/switch",
+    "survives": false,
+    "evidence": "As citações das §4.6 e §4.8 a §4.10 sustentam composição e condicionais, e a claim fecha o eixo 'decisões/condições' para CACAO. Uma objeção possível seria 'a avaliação das condições usa STIX patterning, de domínio de segurança', mas ela não foi ancorada nesta rodada, então não derrubo a claim com ela. Deixo como ponto a verificar."
+   },
+   {
+    "target": "Claim 12 [cacao-spec] constantes e variáveis valem durante a execução (§3.3)",
+    "survives": true,
+    "evidence": "Prova variáveis em tempo de execução, não ESTADO DE EXECUÇÃO observável, persistido ou auditável por passo. A §1.2 (claim 13) diz que a execução acontece em 'a different operational environment'. Combinado com o nó anterior ('execução depende de orquestrador externo (SOARCA)'), isso mostra que o estado de execução fica FORA da spec. O eixo 'estado de execução' segue não especificado pelo CACAO."
+   },
+   {
+    "target": "Claim 13 [cacao-spec] artefato portável definido num sistema e executado noutro; versionamento por created/modified; extensões (§8)",
+    "survives": true,
+    "evidence": "created e modified carimbam o documento e não distinguem template de instância. A pergunta 'playbook vs instância' da lacuna cacao-spec não é respondida por esta claim. A portabilidade declarada na §1.2 é intenção, não adoção medida: não há número de implementações nem de produtores fora de SOARCA nas claims ancoradas. As extensões da §8 permitem propriedades extras, o que repete o problema do Arazzo: estender é inventar."
+   },
+   {
+    "target": "Claim 14 [cacao-spec] Committee Specification 01 (27/11/2023), não OASIS Standard; IPR Non-Assertion Mode; inconsistência cacao-2.0 vs 2.1",
+    "survives": false,
+    "evidence": "A claim prova o que afirma e pesa CONTRA costurar: maturidade abaixo de OASIS Standard há quase 3 anos (2023-11 a 2026-10) e inconsistência interna de spec_version num exemplo normativo. 'Non-Assertion Mode' é regime de patentes, não licença de software do tipo Apache. A licença do TEXTO não foi ancorada, mas isso não reverte a claim."
+   },
+   {
+    "target": "Claim rejeitada [cacao-spec] 'passo humano só como comando manual; sem aprovação, timeout ou gate'",
+    "survives": true,
+    "evidence": "A rejeição mostra que o CACAO tem MAIS de passo humano do que a rodada supôs: timeout e delay em toda step (§4.1), __ACTION_TIMEOUT__ (§3.3), o Exemplo 4.3 com comando manual, timeout 60000 e on_failure, o agent type 'individual' e o manual_playbook (§10). Também confirma que não há linguagem de 'approval'. O eixo 'aprovação humana' do CACAO fica assim: há passo manual com timeout e falha, sem semântica de aprovação. Isso não foi ancorado como claim positiva, então o eixo continua aberto."
+   }
+  ],
+  "gapsClosed": [
+   "[arazzo] FECHADA com evidência ancorada (claims 1, 3, 4, 5, 6, mais releitura dos campos fixos do Step Object 1.0.1 nesta passada). Arazzo 1.0.1 é formato aberto (Apache-2.0, OAI) e agnóstico de LINGUAGEM, mas não de domínio. Os passos são só chamadas de operação de API ou de workflow; as expressões de runtime são presas ao HTTP; há condições (successCriteria, goto/end/retry); as entradas são JSON Schema 2020-12. Não há passo humano, aprovação, estado persistido nem instância de execução. Resposta à lacuna: não serve como formato de playbook de domínio. A ressalva é que vale para 1.0.1; ver gapsOpen sobre 1.1.0."
+  ],
+  "gapsOpen": [
+   "[runme] PARCIAL e aberta. Ficou ancorado que o Runme é um executor de markdown com blocos cercados, sem modelo de passos tipado (claim 7), com Apache-2.0 e atributos por célula (claims 8 e 9). Os dois eixos que a lacuna nomeia, estado e aprovação, ficaram sem claim ancorada: as duas foram REJEITADAS como EXAGERADAS (há encadeamento de saída entre células, 'authentication confirmations' e o atributo interactive). A pergunta 'serve de substrato com estado e aprovação?' segue sem resposta verificada.",
+   "[cacao-spec] PARCIAL e aberta. Estão ancorados os passos genéricos na forma (claim 10), a composição e as condicionais (claim 11), as variáveis em tempo de execução (claim 12), a portabilidade e o versionamento por created/modified (claim 13) e a maturidade CS01 (claim 14). Seguem abertos: (a) 'playbook vs instância', que nenhuma claim distingue; (b) estado de execução, delegado a um ambiente externo e não especificado; (c) aprovação humana, porque a claim foi rejeitada e só se sabe, pela rejeição, que há passo manual com timeout e on_failure, sem semântica de aprovação; (d) se um playbook fora de segurança é válido (obrigatoriedade e abertura do enum playbook_types), ponto que decide o 'em algum grau'.",
+   "[arazzo, sub-lacuna] A versão corrente no README do OAI é 1.1.0 (claim 5, reconfirmado nesta passada) e a rodada leu só a 1.0.1 nomeada pelo gate. O que a 1.1.0 acrescenta não foi verificado, então a conclusão 'sem passo humano/estado' não está provada para a versão vigente.",
+   "[transversal] A adoção medida não foi fechada para nenhuma das três. Para o Arazzo há só a lista de ferramentas do próprio README, para o Runme stars e commits, para o CACAO a menção a SOARCA vinda do nó anterior. Nenhuma métrica de uso como formato de playbook."
+  ],
+  "recommendation": "O QUE A RODADA SUSTENTA: (1) O Arazzo 1.0.1 não deve ser costurado como formato de playbook de domínio. Ele é aberto (Apache-2.0) e tem um bom modelo de condições, mas é um formato de orquestração de APIs: todo passo é operationId/operationPath/workflowId, as expressões são HTTP e não há passo humano, aprovação, estado persistido nem instância (campos fixos do Step Object relidos). O que se pode costurar dele, por SDAAL, é o JSON Schema 2020-12 das entradas, que é padrão independente, e o vocabulário de critério de sucesso e falha (successCriteria, goto/end/retry) como inspiração nomeada. (2) O Runme não é formato de playbook. É um executor de células e pode, no máximo, ser um substrato de EXECUÇÃO plugável por baixo de um template markdown. (3) O CACAO v2.0 tem a forma de passos mais próxima de um playbook genérico (if/while/switch/parallel/playbook-action, timeout por passo, comando manual), mas o vocabulário de tipos é só de segurança, a maturidade é CS01 parada desde 2023-11 com inconsistência interna 2.0/2.1, e o estado de execução fica fora da spec. Juntos, os três reforçam a opção A selada em D_PLAYBOOK_SDAAL_SAC52: nenhum formato aberto cobre os seis eixos, e em todos faltam aprovação humana e estado de instância especificados. Forjar o template em PFR com estado observado é defensável, DESDE QUE o template declare o que pegou emprestado: JSON Schema para entradas, a semântica de sucesso/falha do Arazzo e os tipos de passo do CACAO como referência. O QUE A RODADA NÃO SUSTENTA: (a) selar a sub-decisão (3) como 'nenhum formato serve' para o Arazzo VIGENTE, porque a 1.1.0 é a versão corrente e não foi lida; (b) qualquer afirmação sobre estado e aprovação no Runme, porque as duas claims foram rejeitadas; (c) que o CACAO é inválido fora de segurança, porque a obrigatoriedade e a abertura do enum playbook_types não foram ancoradas; (d) qualquer ranking por adoção, porque não houve métrica de uso. Para fechar a sub-decisão (3) sem descarte por comodismo, faltam três leituras curtas: as notas de versão da Arazzo 1.1.0, a doc do Runme sobre interactive, confirmações e estado de sessão, e o CACAO §3.1 sobre playbook_types (obrigatório? vocabulário aberto?). Se nenhuma reverter o quadro, sela-se a opção A com a lista de costuras parciais acima registrada no nó."
+ },
+ "stats": {
+  "sources": 3,
+  "reached": 3,
+  "anchored": 14,
+  "rejected": 3,
+  "nodesAdded": 16,
+  "edgesAdded": 36,
+  "nodesTotal": 73
+ }
+}

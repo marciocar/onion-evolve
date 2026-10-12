@@ -1,5 +1,7 @@
 # kg-backlog-guard: on
-# ═══ TETO: 57 NÓS ═══
+# ═══ TETO: 73 NÓS ═══
+# RODADA DE PRIMÁRIAS EXECUTADA EM 2026-10-12 (gate D, sub-decisão 3): Arazzo 1.0.1, runme e spec CACAO v2.0 lidos;
+# +16 nós (14 evidências ancoradas, E_LACUNAS_PLAYBOOK_SDAAL_1012, Q_SUBDECISAO_3_FECHAMENTO_1012), 3 objeções 'não lido' superseded.
 # MODO DECISÃO: D_PLAYBOOK_SDAAL_SAC52 nasce OPEN — o maestro sela, esta sessão NUNCA sela.
 # Objeções do Elenxo: 45 sobreviventes, 28 modeladas como nó (CONSTRAINS), 17 nomeadas em E_LACUNAS_PLAYBOOK_SDAAL_1011.
 meta:
@@ -724,7 +726,7 @@ nodes:
   - id: "E_OBJECAO_ESPEC_CACAO_NAO_LIDA"
     node_type: "evidence"
     plane: "DEV"
-    status: "confirmed"
+    status: "superseded"
     impact: 4
     confidence: 0.55
     verified_at: "2026-10-11"
@@ -940,7 +942,7 @@ nodes:
   - id: "E_OBJECAO_ARAZZO_NAO_LIDO"
     node_type: "evidence"
     plane: "DEV"
-    status: "confirmed"
+    status: "superseded"
     impact: 5
     confidence: 0.6
     verified_at: "2026-10-11"
@@ -958,7 +960,7 @@ nodes:
   - id: "E_OBJECAO_RUNME_NAO_LIDO"
     node_type: "evidence"
     plane: "DEV"
-    status: "confirmed"
+    status: "superseded"
     impact: 4
     confidence: 0.55
     verified_at: "2026-10-11"
@@ -1027,6 +1029,308 @@ nodes:
       locator: "contagens do retorno (confirmadas, refutadas, objeções com survives)"
       method: "medição: contagem dos itens do retorno nesta escrita"
       locality: "host"
+
+  # ═══ RODADA DE PRIMÁRIAS 2026-10-12 (gate D de D_PLAYBOOK_SDAAL_SAC52, sub-decisão 3) ═══
+  # run /onion-research wf_5ceb8e1b-6d6: Arazzo 1.0.1, runme, spec CACAO v2.0 lidos; 14 claims ancoradas, 3 rejeitadas.
+
+  - id: "E_ARAZZO_PASSOS_SAO_CHAMADAS_DE_API_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "Arazzo 1.0.1 §4.6.4.1 (campo steps do Workflow Object): 'An ordered list of steps where each step represents a call to an API operation or to another workflow.' — ancorada por verificador independente"
+    source_tier: 9
+    source_kind: "primary"
+    label: "Arazzo 1.0.1 modela workflows como lista ORDENADA de steps, e cada step é uma chamada a operação de API ou a outro workflow; não há tipo de passo para ação genérica, humana ou de comando."
+    narrative: "Elenxo (objeção sobreviveu): a citação prova menos do que a lacuna pede. Os campos fixos do Step Object (description, stepId, operationId, operationPath, workflowId, parameters, requestBody, successCriteria, onSuccess, onFailure, outputs) não acomodam ler, decidir, aprovar ou rodar comando do Claude Code sem extensões x-, e estender com x- é inventar, não costurar."
+    trace: "https://spec.openapis.org/arazzo/v1.0.1.html"
+    provenance:
+      source: "https://spec.openapis.org/arazzo/v1.0.1.html"
+      locator: "§4.6.4.1 Workflow Object, campo steps"
+      method: "leitura: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_ARAZZO_ENTRADAS_JSON_SCHEMA_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "Arazzo 1.0.1 §4.6.4.1 (inputs; outputs; dependsOn): 'A JSON Schema 2020-12 object representing the input parameters used by this workflow.' — ancorada por verificador independente"
+    source_tier: 9
+    source_kind: "primary"
+    label: "No Arazzo 1.0.1 as entradas do workflow são um objeto JSON Schema 2020-12, as saídas são mapa nome-valor dinâmico e dependsOn exige a conclusão prévia de outros workflows."
+    narrative: "Elenxo (objeção sobreviveu): o reaproveitável é o JSON Schema 2020-12, padrão independente que se costura sem o Arazzo. Os outputs são expressões de runtime presas à mensagem HTTP, e dependsOn liga workflows inteiros, não passos. Prova entradas/saídas para chamadas de API, não para playbook genérico."
+    trace: "https://spec.openapis.org/arazzo/v1.0.1.html"
+    provenance:
+      source: "https://spec.openapis.org/arazzo/v1.0.1.html"
+      locator: "§4.6.4.1 Workflow Object, campos inputs, outputs e dependsOn"
+      method: "leitura: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_ARAZZO_SEM_APROVACAO_NEM_ESTADO_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "Arazzo 1.0.1 §4.6.5.1 (successCriteria/onFailure do Step Object), §4.6.7 e §4.6.8 (Success/Failure Action), §4.6.11 (Criterion): 'If omitted, the default behavior is to break and return.' — ancorada por verificador independente"
+    source_kind: "primary"
+    label: "Arazzo 1.0.1: successCriteria são asserções que devem valer todas; onSuccess/onFailure só têm goto, end e retry, com padrão definido. A spec não define estado de execução persistido nem aprovação humana."
+    narrative: "source_tier NÃO declarado pelo leitor nesta claim (a fonte é a mesma spec primária das demais). Elenxo: a objeção NÃO sobreviveu. A ausência se apoia num conjunto FECHADO de campos fixos, relido na 1.0.1: sem campo de aprovação, pausa, instância de execução ou retomada. É a claim decisiva da rodada: o Arazzo não cobre dois dos seis eixos do gate D (aprovação humana e estado de execução). Ressalva: vale para a 1.0.1; a 1.1.0 corrente não foi lida (ver E_ARAZZO_APACHE_VERSAO_CORRENTE_1_1_0_1012)."
+    trace: "https://spec.openapis.org/arazzo/v1.0.1.html"
+    provenance:
+      source: "https://spec.openapis.org/arazzo/v1.0.1.html"
+      locator: "§4.6.5.1 Step Object; §4.6.7 Success Action; §4.6.8 Failure Action; §4.6.11 Criterion"
+      method: "leitura: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_ARAZZO_EXPRESSOES_PRESAS_AO_HTTP_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "Arazzo 1.0.1 §4.7 Runtime Expressions; §4.6.3.1 Source Description Object (type): 'A runtime expression allows values to be defined based on information that will be available within the HTTP message' — ancorada por verificador independente"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O Arazzo não é totalmente acoplado a OpenAPI (sourceDescriptions aceita type 'arazzo'), mas os steps são chamadas de operação e as expressões de runtime se baseiam na mensagem HTTP: agnóstico de linguagem, não de domínio."
+    narrative: "Elenxo: a objeção 'type arazzo prova agnosticismo' NÃO sobreviveu, porque o type 'arazzo' só referencia outros documentos Arazzo, que são por sua vez chamadas de API. Fecha o item 'agnóstico de domínio?' com NÃO: o domínio do Arazzo é a orquestração de APIs."
+    trace: "https://spec.openapis.org/arazzo/v1.0.1.html"
+    provenance:
+      source: "https://spec.openapis.org/arazzo/v1.0.1.html"
+      locator: "§4.7 Runtime Expressions; §4.6.3.1 Source Description Object, campo type"
+      method: "leitura: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_ARAZZO_APACHE_VERSAO_CORRENTE_1_1_0_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "github.com/OAI/Arazzo-Specification, README (intro) e sidebar de licença Apache-2.0: 'defines a standard, programming language-agnostic mechanism to express sequences of calls' — ancorada por verificador independente"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O Arazzo é Apache-2.0 (OAI), se descreve como mecanismo agnóstico de LINGUAGEM, lista no README editores, validadores, parsers e runners, e marca como versão corrente a 1.1.0, não a 1.0.1 que o gate D nomeou."
+    narrative: "Elenxo (objeção sobreviveu): a rodada leu só a 1.0.1; o que a 1.1.0 acrescenta não foi verificado (o README não diz; possível suporte a AsyncAPI sem verificação). A conclusão 'sem passo humano/estado' vale para a 1.0.1; estendê-la à vigente é inferência. A lista de ferramentas é declaração do próprio README, não adoção medida."
+    trace: "https://github.com/OAI/Arazzo-Specification"
+    provenance:
+      source: "https://github.com/OAI/Arazzo-Specification"
+      locator: "README, introdução e linha 'Current Version - 1.1.0'; sidebar de licença"
+      method: "leitura: WebFetch do README no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_ARAZZO_VERSIONAMENTO_DE_DOCUMENTO_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "Arazzo 1.0.1 §4.1 Versions; §4.6.1.1 e §4.6.2.1: 'The patch version SHOULD NOT be considered by tooling' — ancorada por verificador independente"
+    source_tier: 9
+    source_kind: "primary"
+    label: "Versionamento no Arazzo 1.0.1: o campo arazzo carrega a versão da spec (o patch não deve ser considerado pelas ferramentas) e info.version versiona o documento."
+    narrative: "Elenxo (objeção sobreviveu): prova versionamento do DOCUMENTO e da spec, não da INSTÂNCIA de execução que o 'template instanciado em PFR com estado observado' precisa. info.version é string livre, sem semântica de migração entre template e instância."
+    trace: "https://spec.openapis.org/arazzo/v1.0.1.html"
+    provenance:
+      source: "https://spec.openapis.org/arazzo/v1.0.1.html"
+      locator: "§4.1 Versions; §4.6.1.1 Arazzo Object; §4.6.2.1 Info Object"
+      method: "leitura: WebFetch da spec 1.0.1 no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_RUNME_EXECUTA_BLOCOS_CERCADOS_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "github.com/runmedev/runme, README (2º parágrafo): 'Runme runs your commands (shell, bash, zsh) or code inside your fenced code blocks.' — ancorada por verificador independente"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O Runme é substrato de runbook em markdown executável que roda comandos ou código dos blocos cercados; não é formato de playbook com modelo de passos tipado."
+    narrative: "Elenxo: a objeção NÃO sobreviveu; fecha 'é formato?' com NÃO. Serve, no máximo, de substrato de EXECUÇÃO plugável por baixo de um template markdown. Os eixos estado e aprovação ficaram SEM claim ancorada: as duas claims foram rejeitadas como EXAGERADAS (ver E_LACUNAS_PLAYBOOK_SDAAL_1012)."
+    trace: "https://github.com/runmedev/runme"
+    provenance:
+      source: "https://github.com/runmedev/runme"
+      locator: "README, 2º parágrafo"
+      method: "leitura: WebFetch do README no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_RUNME_ATRIBUTOS_POR_CELULA_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "docs.runme.dev/configuration/cell-level, atributo name: 'Cell's canonical name useful for referencing the cell via CLI' — ancorada por verificador independente"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O Runme tem metadados por célula como atributos na linha da cerca, incluindo um nome canônico para referenciar a célula pela CLI."
+    narrative: "Elenxo (objeção sobreviveu): prova endereçamento de célula, não semântica de playbook; não há entradas/saídas tipadas, condições nem critério de sucesso por célula. Os atributos são convenção do produto, sem spec aberta separada com governança nas fontes desta rodada."
+    trace: "https://docs.runme.dev/configuration/cell-level"
+    provenance:
+      source: "https://docs.runme.dev/configuration/cell-level"
+      locator: "tabela de atributos de célula, linha name"
+      method: "leitura: WebFetch da doc no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_RUNME_APACHE_ADOCAO_MODERADA_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "docs.runme.dev, página inicial ('a cloud-native shell kernel with a notebook, editor, terminal, and CLI interface.'); README do GitHub: Apache-2.0, 2.2k stars, 959 commits — ancorada por verificador independente"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O Runme é agnóstico de domínio no sentido de rodar shell, multi-interface (notebook, editor, terminal, CLI), Apache-2.0, com adoção moderada (2,2 mil stars, 959 commits em 2026-10-12)."
+    narrative: "Elenxo (objeção sobreviveu): 'agnóstico de domínio' aqui é a mesma agnosticidade de um script e não serve de critério para costurar formato; stars e commits medem atenção, não adoção como formato de playbook."
+    trace: "https://docs.runme.dev"
+    provenance:
+      source: "https://docs.runme.dev · https://github.com/runmedev/runme"
+      locator: "página inicial da doc; sidebar do repositório (licença, stars, commits)"
+      method: "leitura: WebFetch no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_CACAO_FORMA_GENERICA_VOCABULARIO_CIBER_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-12"
+    verified_against: "spec CACAO v2.0 §1.3 (Playbook Types) e §4.2 (workflow-step-type-enum): 'A playbook that is primarily focused on the orchestration steps required to mitigate a security event or incident' — ancorada por verificador independente"
+    valid_from: "2023-11-27"
+    source_kind: "primary"
+    label: "Spec CACAO v2.0: o modelo de passos é genérico na FORMA (start, action, playbook-action, parallel, if-condition, while, switch, end), mas os tipos de playbook são definidos só em termos de segurança."
+    narrative: "source_tier NÃO declarado pelo leitor nesta claim (fonte primária OASIS). Elenxo (objeção sobreviveu): prova agnosticidade parcial da forma e refuta a do vocabulário; falta saber se playbook_types é obrigatório e se o enum é aberto, isto é, se um playbook fora de segurança é VÁLIDO. Matiza, sem derrubar, E_CACAO_ESCOPO_SO_CIBER."
+    trace: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+    provenance:
+      source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+      locator: "§1.3 Playbook Types; §4.2 workflow-step-type-enum"
+      method: "leitura: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_CACAO_COMPOSICAO_E_CONDICIONAIS_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "spec CACAO v2.0 §4.6 (Playbook Action Step), §4.8 if-condition, §4.9 while-condition, §4.10 switch-condition: 'executes a referenced playbook using the agents and targets defined in the referenced playbook.' — ancorada por verificador independente"
+    valid_from: "2023-11-27"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O CACAO v2.0 tem composição de playbooks (playbook-action) e lógica condicional if/while/switch, cobrindo os eixos de decisões e sub-fluxos."
+    narrative: "Elenxo: a objeção NÃO sobreviveu. Ponto a verificar, não ancorado: se a avaliação das condições usa STIX patterning (domínio de segurança)."
+    trace: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+    provenance:
+      source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+      locator: "§4.6 Playbook Action Step; §4.8; §4.9; §4.10"
+      method: "leitura: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_CACAO_VARIAVEIS_DE_EXECUCAO_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "spec CACAO v2.0 §3.3 (Playbook Constants & Variables): 'Each playbook has a set of constants and variables that MAY be used throughout the execution of a playbook' — ancorada por verificador independente"
+    valid_from: "2023-11-27"
+    source_tier: 9
+    source_kind: "primary"
+    label: "No CACAO v2.0 cada playbook tem constantes e variáveis que valem durante a execução."
+    narrative: "Elenxo (objeção sobreviveu): prova variáveis em tempo de execução, não ESTADO DE EXECUÇÃO observável, persistido ou auditável por passo. Combinado com a §1.2 e com E_CACAO_ROASTER_DELEGA_AO_SOARCA, o estado de execução fica FORA da spec."
+    trace: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+    provenance:
+      source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+      locator: "§3.3 Playbook Constants & Variables"
+      method: "leitura: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_CACAO_PORTAVEL_VERSAO_POR_DATA_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "spec CACAO v2.0 §1.2; versionamento em §2.3 e §3.1; extensões na §8: 'A playbook may be defined in one system by one or more authors, but then executed in a different operational environment' — ancorada por verificador independente"
+    valid_from: "2023-11-27"
+    source_tier: 9
+    source_kind: "primary"
+    label: "O playbook CACAO é artefato portável, definido num sistema e executado noutro; o versionamento é por created/modified e o modelo de extensões (§8) permite propriedades extras."
+    narrative: "Responde a E_OBJECAO_ESPEC_CACAO_NAO_LIDA: a spec separa DEFINIÇÃO de EXECUÇÃO e deixa a execução a outro ambiente. Elenxo (objeção sobreviveu): created/modified carimbam o documento e não distinguem template de instância; a portabilidade da §1.2 é intenção, não adoção medida; estender pela §8 repete o problema do Arazzo (estender é inventar)."
+    trace: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+    provenance:
+      source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+      locator: "§1.2; §2.3; §3.1; §8"
+      method: "leitura: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_CACAO_CS01_NAO_E_STANDARD_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "spec CACAO v2.0, front matter e Notices; spec_version na §3.1 vs Exemplo 4.8 (§4.10): 'provided under the Non-Assertion Mode of the OASIS IPR Policy' — ancorada por verificador independente"
+    valid_from: "2023-11-27"
+    source_kind: "primary"
+    label: "Maturidade do CACAO v2.0: Committee Specification 01 (27/11/2023), não OASIS Standard, sob a OASIS IPR Policy em Non-Assertion Mode; há inconsistência interna entre cacao-2.0 (§3.1) e cacao-2.1 num exemplo."
+    narrative: "source_tier NÃO declarado pelo leitor nesta claim (fonte primária OASIS). Elenxo: a objeção NÃO sobreviveu, e a claim pesa CONTRA costurar: CS01 sem subir a OASIS Standard há quase 3 anos (2023-11 a 2026-10) e spec_version inconsistente num exemplo normativo. Non-Assertion Mode é regime de patentes, não licença de software tipo Apache; a licença do TEXTO não foi ancorada. Qualifica E_CACAO_V2_PADRAO_ABERTO_OASIS (que diz 'padrão aberto OASIS')."
+    trace: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+    provenance:
+      source: "https://docs.oasis-open.org/cacao/security-playbooks/v2.0/security-playbooks-v2.0.html"
+      locator: "front matter; Notices; §3.1 spec_version; Exemplo 4.8 na §4.10"
+      method: "leitura: WebFetch da spec v2.0 (CS01) no run wf_5ceb8e1b-6d6, citação ancorada por verificador independente"
+      locality: "web"
+
+  - id: "E_LACUNAS_PLAYBOOK_SDAAL_1012"
+    node_type: "evidence"
+    plane: "DEV"
+    status: "confirmed"
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    verified_against: "retorno do run /onion-research wf_5ceb8e1b-6d6 (gate D, sub-decisão 3): 6 fontes lidas, 0 inalcançáveis, 17 claims, 14 ancoradas, 3 rejeitadas na ancoragem; Elenxo 15 objeções, 10 sobreviventes, 1 lacuna fechada, 4 abertas"
+    source_tier: 10
+    source_kind: "internal-audit"
+    label: "CONTABILIDADE 2026-10-12: 6 fontes lidas (3 primárias nomeadas), 0 inalcançáveis; 17 claims, 14 ancoradas, 3 REJEITADAS como EXAGERADAS. Elenxo: 15 objeções, 10 sobreviventes; fechada a lacuna Arazzo (1.0.1); 4 abertas."
+    narrative: "FONTES LIDAS (6): spec.openapis.org/arazzo/v1.0.1.html; github.com/OAI/Arazzo-Specification (README); github.com/runmedev/runme (README); docs.runme.dev; docs.runme.dev/configuration/cell-level; docs.oasis-open.org/cacao/security-playbooks/v2.0 (CS01). INALCANÇÁVEIS: nenhuma. REJEITADAS NA ANCORAGEM (3, nenhuma virou nó): (1) runme, 'estado de execução é só o da sessão de terminal, sem estado persistido/auditável por passo': EXAGERADA, a citação corta a frase que continua 'and it is possible to pipe previous cells output into successive cells', e a ausência não é sustentada pelo trecho; (2) runme, 'aprovação humana limitada a prompts de variáveis de ambiente, sem gate por passo': EXAGERADA, o texto também cita 'authentication confirmations' e existe o atributo interactive; a tabela não prova ausência de gate, só não documenta um; (3) CACAO, 'passo humano só como comando manual, sem aprovação, timeout ou gate': EXAGERADA, timeout e delay existem em toda step (§4.1), há a constante __ACTION_TIMEOUT__ (§3.3), o Exemplo 4.3 combina comando manual com timeout 60000 e on_failure, há agent type 'individual' e o flag manual_playbook (§10); só a ausência de linguagem de 'approval' se confirmou. LACUNA FECHADA: Arazzo 1.0.1 é aberto (Apache-2.0) e agnóstico de LINGUAGEM, não de domínio; não serve como formato de playbook de domínio. LACUNAS ABERTAS (gapsOpen do Elenxo): (a) runme, estado e aprovação sem claim ancorada; (b) CACAO, playbook vs instância, estado de execução fora da spec, aprovação humana (há passo manual com timeout e on_failure, sem semântica de aprovação) e validade de playbook fora de segurança (obrigatoriedade e abertura do enum playbook_types); (c) Arazzo 1.1.0, versão corrente, não lida; (d) transversal, adoção medida não fechada para nenhuma das três. OBJEÇÕES QUE NÃO SOBREVIVERAM (5): claims 3, 4, 7, 11 e 14."
+    trace: "docs/evolution/research/playbook-sdaal-2026-10/playbook-sdaal-2026-10.kg.yaml"
+    provenance:
+      source: "retorno do workflow /onion-research wf_5ceb8e1b-6d6 repassado ao write(KG) (claims ancoradas, rejeitadas e Elenxo integral)"
+      locator: "listas de claims ANCORADAS e REJEITADAS; objections, gapsClosed e gapsOpen do Elenxo"
+      method: "medição: contagem dos itens do retorno nesta escrita"
+      locality: "host"
+
+  - id: "Q_SUBDECISAO_3_FECHAMENTO_1012"
+    node_type: "question"
+    plane: "DEV"
+    status: "open"
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-12"
+    verified_against: "recomendação do Elenxo do run wf_5ceb8e1b-6d6: os três formatos reforçam a opção A, mas faltam três leituras curtas para fechar a sub-decisão (3) sem descarte por comodismo"
+    label: "PROPOSTA ao maestro (não selo): fechar a sub-decisão (3) como 'nenhum formato aberto cobre os 6 eixos; o template em PFR declara o que pegou emprestado' depois de 3 leituras curtas: notas da Arazzo 1.1.0, doc do Runme, CACAO §3.1."
+    narrative: "Nenhum dos três cobre aprovação humana e estado de instância especificados, o que reforça a opção A já selada em D_PLAYBOOK_SDAAL_SAC52. Costuras parciais a registrar no template: JSON Schema 2020-12 para entradas, a semântica successCriteria/goto/end/retry do Arazzo como inspiração nomeada, os tipos de passo do CACAO (if/while/switch/parallel/playbook-action, timeout por passo, comando manual) como referência, e o Runme no máximo como substrato de execução plugável. A rodada NÃO sustenta: 'nenhum formato serve' para a Arazzo vigente (1.1.0), qualquer afirmação sobre estado e aprovação no Runme, CACAO inválido fora de segurança, ranking por adoção. Leituras pendentes: notas de versão da Arazzo 1.1.0; doc do Runme sobre interactive, confirmações e estado de sessão; CACAO §3.1 sobre playbook_types (obrigatório? vocabulário aberto?). Se nenhuma reverter o quadro, o maestro sela."
+    trace: "run /onion-research wf_5ceb8e1b-6d6, gate D de D_PLAYBOOK_SDAAL_SAC52 (2026-10-12)"
 
 edges:
   - from: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
@@ -1245,3 +1549,115 @@ edges:
   - from: E_LACUNAS_PLAYBOOK_SDAAL_1011
     to: C_OPCAO_D_GATE_DE_PESQUISA
     edge_type: SUPPORTS
+  # ═══ arestas da rodada de primárias 2026-10-12 ═══
+  # reconciliação: as 3 objeções 'primária não lida' foram respondidas pela leitura
+  - from: E_ARAZZO_EXPRESSOES_PRESAS_AO_HTTP_1012
+    to: E_OBJECAO_ARAZZO_NAO_LIDO
+    edge_type: SUPERSEDES
+  - from: E_RUNME_EXECUTA_BLOCOS_CERCADOS_1012
+    to: E_OBJECAO_RUNME_NAO_LIDO
+    edge_type: SUPERSEDES
+  - from: E_CACAO_PORTAVEL_VERSAO_POR_DATA_1012
+    to: E_OBJECAO_ESPEC_CACAO_NAO_LIDA
+    edge_type: SUPERSEDES
+  # toda evidência nova responde à pergunta-mãe
+  - from: E_ARAZZO_PASSOS_SAO_CHAMADAS_DE_API_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_ENTRADAS_JSON_SCHEMA_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_SEM_APROVACAO_NEM_ESTADO_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_EXPRESSOES_PRESAS_AO_HTTP_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_APACHE_VERSAO_CORRENTE_1_1_0_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_VERSIONAMENTO_DE_DOCUMENTO_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_RUNME_EXECUTA_BLOCOS_CERCADOS_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_RUNME_ATRIBUTOS_POR_CELULA_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_RUNME_APACHE_ADOCAO_MODERADA_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_CACAO_FORMA_GENERICA_VOCABULARIO_CIBER_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_CACAO_COMPOSICAO_E_CONDICIONAIS_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_CACAO_VARIAVEIS_DE_EXECUCAO_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_CACAO_PORTAVEL_VERSAO_POR_DATA_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_CACAO_CS01_NAO_E_STANDARD_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_PLAYBOOK_SDAAL_1012
+    to: Q_PLAYBOOK_SDAAL_SAC52
+    edge_type: SUPPORTS
+  # sustentam a opção A (nenhum formato aberto cobre aprovação humana e estado de instância)
+  - from: E_ARAZZO_PASSOS_SAO_CHAMADAS_DE_API_1012
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_SEM_APROVACAO_NEM_ESTADO_1012
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_EXPRESSOES_PRESAS_AO_HTTP_1012
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_ENTRADAS_JSON_SCHEMA_1012
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_RUNME_EXECUTA_BLOCOS_CERCADOS_1012
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  - from: E_CACAO_VARIAVEIS_DE_EXECUCAO_1012
+    to: C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA
+    edge_type: SUPPORTS
+  # o gate D foi executado: a rodada é a evidência dele
+  - from: E_LACUNAS_PLAYBOOK_SDAAL_1012
+    to: C_OPCAO_D_GATE_DE_PESQUISA
+    edge_type: SUPPORTS
+  # limites: o que a evidência nova restringe sem derrubar
+  - from: E_ARAZZO_APACHE_VERSAO_CORRENTE_1_1_0_1012
+    to: E_ARAZZO_SEM_APROVACAO_NEM_ESTADO_1012
+    edge_type: CONSTRAINS
+  - from: E_CACAO_FORMA_GENERICA_VOCABULARIO_CIBER_1012
+    to: E_CACAO_ESCOPO_SO_CIBER
+    edge_type: CONSTRAINS
+  - from: E_CACAO_CS01_NAO_E_STANDARD_1012
+    to: E_CACAO_V2_PADRAO_ABERTO_OASIS
+    edge_type: CONSTRAINS
+  - from: E_CACAO_CS01_NAO_E_STANDARD_1012
+    to: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    edge_type: CONSTRAINS
+  - from: E_CACAO_VARIAVEIS_DE_EXECUCAO_1012
+    to: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    edge_type: CONSTRAINS
+  - from: E_CACAO_PORTAVEL_VERSAO_POR_DATA_1012
+    to: E_CACAO_ROASTER_DELEGA_AO_SOARCA
+    edge_type: SUPPORTS
+  - from: E_CACAO_COMPOSICAO_E_CONDICIONAIS_1012
+    to: C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER
+    edge_type: SUPPORTS
+  # a proposta ao maestro (o selo é dele)
+  - from: E_LACUNAS_PLAYBOOK_SDAAL_1012
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
+  - from: E_ARAZZO_APACHE_VERSAO_CORRENTE_1_1_0_1012
+    to: Q_SUBDECISAO_3_FECHAMENTO_1012
+    edge_type: SUPPORTS
+  - from: Q_SUBDECISAO_3_FECHAMENTO_1012
+    to: D_PLAYBOOK_SDAAL_SAC52
+    edge_type: TRACES_TO
