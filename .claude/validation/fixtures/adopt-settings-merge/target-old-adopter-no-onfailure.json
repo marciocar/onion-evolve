@@ -1,0 +1,15 @@
+{
+  "permissions": {"allow": ["Bash(ls)"]},
+  "hooks": {
+    "PreToolUse": [
+      {"matcher": "Read|Grep|Bash", "hooks": [{"type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-env-guard.sh\""}]},
+      {"matcher": "Bash", "hooks": [
+        {"type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-protect-main.sh\""},
+        {"type": "command", "command": "bash meu-hook-proprio.sh"}
+      ]}
+    ],
+    "Stop": [
+      {"hooks": [{"type": "prompt", "prompt": "hook proprio sem command (type prompt): o refresh nao pode indexar por null"}]}
+    ]
+  }
+}
