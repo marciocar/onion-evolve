@@ -425,6 +425,8 @@ EOF"
   _c "(xi) código sem idioma de rede (só cita)" 0 "python3 ${d}/fora/so-cita.py"
   _c "(xii) provedor SEM executável (clickup): o curl é o caminho que o adapter prescreve" 0 "curl -s https://${Hc}/api/v2/user" clickup
   _c "(xiii) provedor com executável mas INATIVO" 0 "curl -s https://${H}/graphql" jira
+  Hz="projectsapi.zoho"; Hz="${Hz}.com"   # zoho: o 5º provider — sem executável, o curl é o caminho que o adapter prescreve
+  _c "(xiii-z) provedor SEM executável (zoho): cala" 0 "curl -s https://${Hz}/restapi/portals/" zoho
   _c "(xiv) aspas abertas: não se prova, cala" 0 "curl -s 'https://${H}/graphql"
   # ── os achados do Elenxo (2026-10-12), cada um com mutante na bancada ──
   _c "(xv) heredoc em \$(…) antes do curl não derruba o juiz (E1)" 2 "git commit -m \"\$(cat <<'EOF'

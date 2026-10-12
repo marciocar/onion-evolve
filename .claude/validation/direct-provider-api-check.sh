@@ -159,6 +159,9 @@ run_selftest() {
   local J="atlassian"; J="${J}.net/rest"
   _mk; printf 'const r = await fetch(`https://${site}.%s/api/3/issue`)\n' "${J}" > "${d}/r/ops/j.mjs"; _run
   grep -qP '^HARD\tchamada-direta\tops/j\.mjs:1\t.*jira' <<< "${out}"; _c "(iii) provedor SEM executável (jira) também acusa no arquivo rastreado" $?
+  local Z="projectsapi.zoho"; Z="${Z}.com"     # zoho: o 5º provider (paridade da REGRA dos 5 — o tipo já ficou sem ele uma vez)
+  _mk; printf 'import urllib.request\nurllib.request.urlopen("https://%s/restapi/portals/")\n' "${Z}" > "${d}/r/ops/z.py"; _run
+  grep -qP '^HARD\tchamada-direta\tops/z\.py:2\t.*zoho' <<< "${out}"; _c "(iii-z) provedor SEM executável (zoho) também acusa no arquivo rastreado" $?
   # ── CALA ──
   _mk; printf 'import urllib.request\nENDPOINT = "https://%s/graphql"\nurllib.request.urlopen(ENDPOINT)\n' "${H}" > "${d}/r/.claude/utils/task-manager/adapters/linear.py"; _run
   [ -z "${out}" ]; _c "(iv) o adapter executável cala" $?
