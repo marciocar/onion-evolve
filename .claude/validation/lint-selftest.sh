@@ -13457,6 +13457,16 @@ run_seed_adoption_graph_selftests() {
     record_pass "seed-graph: (r1) o radar avisa decision done em DEV (só D1, agregado) sem reprovar"
   else record_fail "seed-graph: (r1) aviso decision-done-em-DEV" "rc=${_ddrc} saída: $(grep 'decision-done' <<< "${_ddo}" | head -1)"; fi
   rm -rf "${_dd}"
+  # (r2) decisão SELADA PELO MAESTRO (método do kg-decide-seal) em DEV não entra no aviso — decisão do maestro de
+  #      2026-10-12, após o onion-kg-ssot mostrar que DEV avisava e PROD reprovava no contrato (testimony-in-prod).
+  #      Uma decisão done em DEV com OUTRO método continua avisando, na mesma leitura.
+  _dd="$(mktemp -d)"
+  printf 'meta:\n  id: dd2\n  schema_version: "1"\nnodes:\n  - id: DM\n    node_type: decision\n    status: done\n    plane: DEV\n    impact: 2\n    confidence: 0.8\n    label: selada pelo maestro\n    provenance:\n      source: "pergunta"\n      locator: "selo"\n      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"\n  - id: DX\n    node_type: decision\n    status: done\n    plane: DEV\n    impact: 2\n    confidence: 0.8\n    label: outra em dev\n    provenance:\n      source: "s"\n      locator: "l"\n      method: "leitura: x"\nedges:\n  - from: DM\n    to: DX\n    edge_type: DEPENDS_ON\n' > "${_dd}/dd2.kg.yaml"
+  _ddrc=0; _ddo="$(bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${_dd}/dd2.kg.yaml" --reconcile 2>&1)" || _ddrc=$?
+  if grep -q 'decision-done-em-DEV: 1 decisão(ões)' <<< "${_ddo}" && grep -q '(DX)' <<< "${_ddo}" && ! grep -q 'DM' <<< "$(grep 'decision-done' <<< "${_ddo}")" && grep -q '1 decisão(ões) selada(s) pelo maestro em DEV' <<< "${_ddo}" && [ "${_ddrc}" = 0 ]; then
+    record_pass "seed-graph: (r2) decisão selada pelo maestro em DEV é aceita; outra decisão done em DEV segue avisando"
+  else record_fail "seed-graph: (r2) selo do maestro em DEV" "rc=${_ddrc} saída: $(grep -E 'decision-done|selada' <<< "${_ddo}" | tr '\n' ' ')"; fi
+  rm -rf "${_dd}"
 }
 
 run_githook_selftests() {
