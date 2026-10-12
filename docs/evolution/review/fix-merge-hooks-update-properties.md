@@ -1,7 +1,8 @@
 ---
 branch: fix/merge-hooks-update-properties
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0e8801fc53db3ad8123c831eaeb38cc052729c8adf7618bd7c3d870a84213846
+reviewed_code_sha256: b2754e5b32ebdd35e466e46a726f4b310d5c8054191f119d98b55c0af66266ca
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
