@@ -9,8 +9,9 @@ meta:
                                # efetiva do /rest/api/3/search (CHANGE-2046), a v3 do ClickUp sair de
                                # desenvolvimento, ou a 2ª onda (Q_WAVE2_PRIMARIES_CELLS) rodar.
   # kg-backlog-guard: on
-  # ═══ TETO: 56 NÓS ═══ (27 evidências ancoradas + 1 contabilidade + 17 objeções sobreviventes do Elenxo
-  #     + 3 claims de síntese open + 4 perguntas; + 4 da Onda 2 em 2026-10-11: 1 decisão e 3 evidências)
+  # ═══ TETO: 57 NÓS ═══ (27 evidências ancoradas + 1 contabilidade + 17 objeções sobreviventes do Elenxo
+  #     + 3 claims de síntese open + 4 perguntas; + 4 da Onda 2 em 2026-10-11: 1 decisão e 3 evidências;
+  #     + 1 em 2026-10-12, pela via (a): a célula (6) anexo do Linear, primárias + medição ao vivo, SAC-116)
   #     Grafo NASCIDO nesta rodada de primárias nomeadas, EXECUTADA em 2026-10-11 (run wf_8e56d56f-a8b,
   #     Onda 1 da SDAAL do Task Manager, SAC-62): 6 fontes nomeadas, 5 lidas, 1 inalcançável
   #     (zoho-projects-v3); 30 claims à ancoragem, 27 ANCORADAS por verificador independente (cada uma
@@ -972,6 +973,25 @@ nodes:
       method: "leitura: o código do adapter comparado à evidência ancorada da Onda 1"
       locality: "repo"
 
+  - id: E_SAC116_LINEAR_FILES_FULL_READ_1012
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    valid_from: "2026-10-12"
+    verified_at: "2026-10-12"
+    verified_against: "tm.sh ao vivo no workspace Linear (SAC-109, SAC-110, SAC-74, SAC-112): upload PNG 165 B e TXT 120 B, download com sha256 idêntico ao enviado, GET sem Authorization = 401"
+    source_tier: 9
+    source_kind: "measurement"
+    label: "Célula (6) anexo do Linear fechada ao vivo (SAC-116): o arquivo enviado vive como URL de uploads.linear.app no markdown e exige Authorization para baixar; o Attachment do Linear é LINK/integração. Leitura completa paginada medida."
+    narrative: "Primárias lidas em 2026-10-12: linear.app/developers/pagination (Relay first/after, pageInfo.hasNextPage/endCursor, 50 por padrão, teto de first não publicado), /file-storage-authentication ('You must authenticate to access these files'), /how-to-upload-a-file-to-linear (fileUpload → URL pré-assinada + headers em array → PUT) e /attachments ('link external resources to issues'; url idempotente por issue). Medido: fileUpload devolve uploadUrl em storage.googleapis.com e assetUrl em uploads.linear.app; o PUT vai sem a chave; GET da assetUrl sem header = 401, com a chave crua ou Bearer = 200; round-trip por sha256 idêntico (PNG 98b911c8…, TXT 5b18944d…). Issue.history não registrou as transições da SAC-109 feitas segundos depois da criação (causa não ancorada). Consulta com introspecção profunda recusada: complexidade máxima 10000. Abre para ClickUp e Zoho a mesma célula, nas fatias seguintes."
+    provenance:
+      source: ".claude/utils/task-manager/adapters/linear-leitura-completa.md"
+      locator: "seção Medido contra o workspace real (linhas MEDIDO AO VIVO 2026-10-12)"
+      method: "medição: tm.sh contra o workspace real, escrita relida e bytes comparados por sha256; leitura das primárias citadas"
+      locality: "repo"
+
   # ── PERGUNTAS QUE A RODADA ABRE ──────────────────────────────────────────────────────────
   - id: Q_JIRA_SEARCH_REMOVAL_RECONCILE
     node_type: question
@@ -1223,6 +1243,9 @@ edges:
     to: Q_WAVE2_PRIMARIES_CELLS
     edge_type: SUPPORTS
   - from: E_ELENXO_JIRA_DC_VERSION_NOT_PRODUCT
+    to: Q_WAVE2_PRIMARIES_CELLS
+    edge_type: SUPPORTS
+  - from: E_SAC116_LINEAR_FILES_FULL_READ_1012
     to: Q_WAVE2_PRIMARIES_CELLS
     edge_type: SUPPORTS
 

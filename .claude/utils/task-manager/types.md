@@ -195,6 +195,14 @@ interface Page<T> { items: T[]; next: PageCursor | null }
 interface AttachmentInput { filename: string; contentType: string; bytes: Uint8Array }
 interface AttachmentOutput { id: string; filename: string; url?: string }
 
+// ── Leitura completa (SAC-116, 2026-10-12): entradas cronológicas, mãe completa + irmãs, arquivos em quarentena
+interface ActivityEntry { id: string; createdAt: string; actor: string | null; changes: Array<{ field: string; from?: unknown; to?: unknown }> }
+interface SubtaskView { id: string; identifier: string; title: string; status: TaskStatus; storyPoints?: number | null; descriptionSummary: string; subtasks: SubtaskView[] }
+interface HierarchyContext { role: 'parent' | 'subtask' | 'standalone'; parent: TaskOutput | null; siblings: SubtaskView[]; subtasks: SubtaskView[]; truncated: boolean }
+interface InlineRef { n: number; url: string; kind: 'image' | 'file'; alt: string; origin: string /* description | comment:<id> | attachment:<id> */ }
+interface AttachmentListing { files: InlineRef[]; links: Array<{ id: string; title: string; url: string; downloadable: boolean }> }  // links: no Linear, Attachment = LINK
+interface DownloadedAttachment { path: string; mime: string; size: number; sha256: string; origin: { issue: string; url: string; ref: string }; untrusted: true }
+
 /** Sprint (Jira, ClickUp) ou cycle (Linear). */
 interface Iteration { id: string; name: string; startDate?: string; endDate?: string }
 
