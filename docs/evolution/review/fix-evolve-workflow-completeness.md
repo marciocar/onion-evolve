@@ -1,14 +1,14 @@
 ---
 branch: fix/evolve-workflow-completeness
 date: 2026-10-12
-reviewed_diff_sha256: d2966a93710c4f8e4c1f93da06af434e2e92136fabbe6efdcbe0795f69a3f58c
+reviewed_diff_sha256: 09b375ad502dd805b633a834a1755f553c2b44c8e921e6f92c26d146cc3b0645
 reviewed_code_sha256: 8c78dabc2e81f790d64f433db3ce05cbde69a2d10b3ba94ef6b8dbc8a6d2dd0a
 findings_total: 10
 findings_real: 8
 findings_fixed: 7
 tokens: 148694
 duration_min: 4
-verdict: REPROVADO→CURADO
+verdict: REPROVADO_E_CURADO
 reviewer: refutador opus (subagente, default reprovado) sobre o commit da 1ª leva; curas na 2ª leva com caso e mutante
 ---
 
