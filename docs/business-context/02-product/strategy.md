@@ -23,8 +23,8 @@
 
 | Tipo | Concorrentes | Nota |
 |---|---|---|
-| Diretos (framework `.claude/` + specs + comandos) | **Agent OS** ⚠️ (mais próximo estruturalmente), SuperClaude, BMAD-METHOD | monitorar Agent OS de perto |
-| Indiretos — SDD tooling | GitHub Spec Kit (~90k★), Kiro/AWS, Tessl, OpenSpec | plataforma/IDE diferente |
+| Diretos (framework `.claude/` + specs + comandos) | **Agent OS** ⚠️ (mais próximo estruturalmente), SuperClaude, BMAD-METHOD; **Superpowers** candidato (a confirmar pela dissecação) | monitorar Agent OS de perto; dissecar o Superpowers |
+| Indiretos — SDD tooling | GitHub Spec Kit (140,9k★ em 2026-10-12), Kiro/AWS, Tessl, OpenSpec | plataforma/IDE diferente |
 | Indiretos — execução/orquestração | Claude Flow/Ruflo, MetaGPT | infra de agentes, não metodologia |
 
 **🎯 Whitespace (evidência mais forte):** em 10+ buscas, **nenhum** concorrente trata produto + engenharia + **compliance** como três dimensões peer num ciclo só. A indústria trata governança de IA em nível organizacional/regulatório (EU AI Act, ISO 42001, [FINRA](https://zylos.ai/research/2026-05-01-ai-agent-governance-compliance-2026/): autonomia/scope-creep/auditabilidade), **não** como capability integrada a um framework instalável. Os workflows faseados retomáveis + sessions do Onion mitigam exatamente esses 3 riscos FINRA por construção. _É lacuna observada, não categoria confirmada — mas é o ângulo mais defensável._

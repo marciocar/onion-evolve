@@ -1325,14 +1325,18 @@ nodes:
   - id: "Q_SUBDECISAO_3_FECHAMENTO_1012"
     node_type: "question"
     plane: "DEV"
-    status: "open"
+    status: "done"
     impact: 4
     confidence: 0.6
     verified_at: "2026-10-12"
-    verified_against: "recomendação do Elenxo do run wf_5ceb8e1b-6d6: os três formatos reforçam a opção A, mas faltam três leituras curtas para fechar a sub-decisão (3) sem descarte por comodismo"
+    verified_against: "SELADA pelo maestro em 2026-10-12 por pergunta com opções: fechar como proposto — nenhum formato aberto cobre os 6 eixos; o template em PFR declara o que pegou emprestado (JSON Schema 2020-12 nas entradas, semântica successCriteria/goto/end/retry do Arazzo, tipos de passo do CACAO como referência, vocabulário aberto); Runme no máximo como substrato de execução. Sustentado pelas leituras do PR #1045"
     label: "PROPOSTA ao maestro (não selo): fechar a sub-decisão (3) como 'nenhum formato aberto cobre os 6 eixos; o template em PFR declara o que pegou emprestado' depois de 3 leituras curtas: notas da Arazzo 1.1.0, doc do Runme, CACAO §3.1."
     narrative: "Nenhum dos três cobre aprovação humana e estado de instância especificados, o que reforça a opção A já selada em D_PLAYBOOK_SDAAL_SAC52. Costuras parciais a registrar no template: JSON Schema 2020-12 para entradas, a semântica successCriteria/goto/end/retry do Arazzo como inspiração nomeada, os tipos de passo do CACAO (if/while/switch/parallel/playbook-action, timeout por passo, comando manual) como referência, e o Runme no máximo como substrato de execução plugável. A rodada NÃO sustenta: 'nenhum formato serve' para a Arazzo vigente (1.1.0), qualquer afirmação sobre estado e aprovação no Runme, CACAO inválido fora de segurança, ranking por adoção. Leituras pendentes: notas de versão da Arazzo 1.1.0; doc do Runme sobre interactive, confirmações e estado de sessão; CACAO §3.1 sobre playbook_types (obrigatório? vocabulário aberto?). Se nenhuma reverter o quadro, o maestro sela."
     trace: "run /onion-research wf_5ceb8e1b-6d6, gate D de D_PLAYBOOK_SDAAL_SAC52 (2026-10-12)"
+    provenance:
+      source: "decisão do maestro na sessão de 2026-10-12, pergunta com opções sobre Q_SUBDECISAO_3_FECHAMENTO_1012"
+      locator: "opção escolhida: Fechar como proposto (Recomendado)"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
 
   - id: "Q_SDAAL_KIT_REPO_SEPARADO"
     node_type: "question"

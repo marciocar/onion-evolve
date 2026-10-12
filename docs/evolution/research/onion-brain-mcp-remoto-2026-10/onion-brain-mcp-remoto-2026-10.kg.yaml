@@ -10,7 +10,7 @@ meta:
                                # Gatilho extra: release final da spec 2026-07-28, ou o 1º pedido medido
                                # de uso do Brain em Claude.ai/ChatGPT pelo time do brain-granaai.
   # kg-backlog-guard: on
-  # ═══ TETO: 52 NÓS ═══
+  # ═══ TETO: 53 NÓS ═══
   note: "SAC-70. MODO DECISÃO: D_ONION_BRAIN_MCP_REMOTO nasce OPEN, o maestro sela. 11 confirmadas, 14 refutadas por fonte fraca, 0 não verificadas por acesso, 43 fontes e 39 claims cortadas por orçamento; Elenxo 45 objeções, 30 sobreviventes, 30 modeladas."
   #
   # Corpus conferido antes de escrever (cláusula 0): fila-2026-10-06#Q_ONION_BRAIN_MCP (a pergunta
@@ -987,6 +987,25 @@ nodes:
       method: "testemunho: objeção de 1 agente do Elenxo, sem votação adversarial"
       locality: "host"
 
+  - id: E_DEGRAU1_EM_PRODUCAO_1012
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "medido em produção na VPS em 2026-10-12: unit onion-vps-mcp-kg-granaai active em 172.23.0.1:3033 servindo o worktree destacado de develop@2bdc52fe do hub (deploy key read-only; push provado recusado); de dentro do container do LibreChat, e-mail na lista lê com served_commit declarado, e-mail fora da lista e ausência de header recusam sem data, tools/list passa; LibreChat registrou onion-brain (log 'Initialized in 22ms'); só o api foi recriado, o MCP do cliente seguiu de pé"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "DEGRAU 1 EM PRODUÇÃO (2026-10-12): o Brain do hub está servido só leitura ao LibreChat, com autorização POR USUÁRIO no servidor. Falta só o chat real do maestro e a lista de e-mails do time."
+    narrative: "Achado do deploy que mudou o desenho: todo servidor do librechat.yaml aparece a todo usuário do LibreChat, e o Logto tem cadastro aberto, logo 'restringir por papel' (o runbook do PR #1041) não protegia nada. A cura (PR #1044) pôs a autorização no servidor, no molde do MCP do SGE nesta mesma stack: ONION_KG_ALLOWED_EMAILS + header X-User-Email. Também medido: kb_search/kb_get cobrem docs/knowledge-base (380 .md do hub) e deixam de fora business/technical-context e compliance (177 .md) — melhoria do degrau 1.1. O código servido roda de um worktree destacado do core em origin/main, não do checkout de trabalho."
+    trace: "ops/mcp-onion-kg/README.md"
+    provenance:
+      source: "VPS de produção: systemctl, ufw, docker exec no container do LibreChat e journal, 2026-10-12"
+      locator: "unit onion-vps-mcp-kg-granaai; regra ufw 3033; log [MCP][onion-brain]"
+      method: "medição: chamadas reais pela rede da bridge, por comportamento, não declaração"
+      locality: "host"
+
 edges:
 
   # ── evidências sustentam a pergunta; opções são candidatas da decisão ──
@@ -1175,3 +1194,6 @@ edges:
   - from: E_OBJECAO_CONTRARIANO_LIBRECHAT_NAO_PESADO
     to: C_OPCAO_F_SEM_MCP_LEITOR_JS
     edge_type: CONSTRAINS
+  - from: E_DEGRAU1_EM_PRODUCAO_1012
+    to: D_ONION_BRAIN_MCP_REMOTO
+    edge_type: SUPPORTS
