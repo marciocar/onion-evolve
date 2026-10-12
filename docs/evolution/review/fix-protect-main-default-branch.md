@@ -2,11 +2,12 @@
 branch: fix/protect-main-default-branch
 pr: pendente
 date: 2026-10-12
-reviewed_diff_sha256: 91aa9528dac3085783c562a46b996b4ca2204a17d7455d70cd2f4e11b049421b
-reviewed_code_sha256: 09896b3dd0c700278994ea3f1d483f58a320002add88bf1820cd2b11f4358af7
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 4
 findings_fixed: 1
+tokens: 206000
+duration_min: 50
 verdict: CORRIGIDO-E-RE-REVISADO
 reviewer: passada adversarial curta da própria sessão (opus), refutador com default reprovado
 ---
@@ -40,6 +41,9 @@ positivo em branch de feature.
 (`origin/HEAD` → main) · `+master` num repo cujo `origin/HEAD` é main.
 
 ## Evidência
+
+> `tokens` é a diferença do contador de contexto da sessão (medido); `duration_min` é ESTIMADO (a sessão
+> não carimbou o relógio no início).
 
 - Bancada: `LC_ALL=C bash .claude/validation/lint-selftest.sh --families pretooluse_veto` = 236/236.
 - Seis mutantes por `ops/mutate-and-restore.sh`, todos mordendo (9, 6, 4, 2, 1 e 1 casos).
