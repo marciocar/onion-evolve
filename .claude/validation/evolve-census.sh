@@ -97,6 +97,9 @@ if GUARDS="$(_run guardas 0 guard-census.sh . --markdown)"; then
   # A 1ª versão filtrava só linhas que começavam com `(`, que é o contrário — escondia
   # `DISPARA e NAO E EXERCITADO` e `COM --selftest e NÃO REGISTRADO` (achado do Elenxo).
   G_PASSIVE="$(grep -E '^- ' <<< "${GUARDS}" | grep -vE '^- \((nenhum|informativo)' || true)"
+  # ⚠️ MEDIDOR QUE SAI 0 SEM A ÂNCORA não mediu (refutador de 2026-10-12): rc 0 com saída vazia
+  #    imprimia "0 com selftest" e "passivo: nenhuma" — verde sem medição. Sem `massa:` não há censo.
+  if [ -z "${G_FAM}" ]; then G_OK=0; G_N=""; G_PASSIVE=""; _note guardas "NAO-MEDIDO: guard-census.sh saiu 0 sem a linha 'massa:' (formato mudou ou saída vazia)"; fi
 fi
 
 # ── 3. DISSECAÇÕES — contadas pela COLUNA de frescor, nunca pela legenda ──────────────────────
@@ -108,6 +111,8 @@ if DISS="$(_run dissect 0 dissect-census.sh . --markdown)"; then
   #    ("VENCIDO não se cita como se fosse de hoje") e publicava "1 vencida" sobre uma dissecação
   #    `fresco` — número falso que chegou a um nó de grafo antes de o Elenxo pegar.
   D_VENC="$(awk -F' [|] ' 'NF>=6 && $1!="ferramenta" {v=$NF; gsub(/[[:space:]]/,"",v); if (v=="vencido") n++} END {print n+0}' <<< "${DISS}")"
+  # sem a linha de declaradas não há censo: "? declarada(s) · 0 vencida(s)" era zero ao lado de `?`
+  if [ -z "${D_N}" ]; then D_OK=0; D_VENC=""; _note dissect "NAO-MEDIDO: dissect-census.sh saiu 0 sem a linha de declaradas"; fi
 fi
 
 # ── 4. DOUTRINA QUE CARREGA — só arquivo que EXISTE e que CARREGOU ───────────────────────────
@@ -144,6 +149,7 @@ elif PL="$(_run plano 0 kg-drive-project.sh "${PLAN}")"; then
   PL_OK=1
   PL_RDY="$(grep -oE 'pronto=[0-9]+' <<< "${PL}" | grep -oE '[0-9]+' | head -1)"
   PL_BLK="$(grep -oE 'bloqueado=[0-9]+' <<< "${PL}" | grep -oE '[0-9]+' | head -1)"
+  [ -n "${PL_RDY}" ] || _note plano "NAO-MEDIDO: kg-drive-project.sh saiu 0 sem 'pronto=' (formato mudou?)"
 fi
 if [ -f "${REPO}/docs/backlog.md" ]; then
   BL_N="$(grep -oE '\*\*[0-9]+ itens abertos\*\*' "${REPO}/docs/backlog.md" | grep -oE '[0-9]+' | head -1)"
@@ -173,15 +179,19 @@ fi
 #    e não via os três co-* que o command-role-parity-check lista pelo CAMINHO em código. É a classe
 #    "texto citado lido como invocação viva". Elo estrutural = o CAMINHO do arquivo da superfície
 #    numa linha de CÓDIGO: comentário (linha ou cauda ` # …`) sai, e linha de mensagem
-#    (printf/echo/_msg=) sai. TETO: um caminho dentro de outra string de código ainda conta.
+#    (printf/echo/_msg=, e as funções de mensagem fail/die/_warn/_err/violation/record_fail) sai.
+#    TETO (medido pelo refutador de 2026-10-12): linha que mistura código e mensagem sai INTEIRA
+#    (falso negativo), um caminho dentro de heredoc de mensagem ainda conta (falso positivo), e só
+#    `*-check.sh` é lido — guarda que mora no lint-artifacts.sh não aparece aqui.
 _guard_links() {  # $1 = caminho-padrão literal → 0 se algum *-check.sh o cita em código
   local f
+  [ -n "$1" ] || return 1   # padrão vazio casaria tudo: fail-closed, nunca "vigiado"
   for f in "${V}"/*-check.sh; do
     [ -f "${f}" ] || continue
     if awk -v pat="$1" '
         /^[[:space:]]*#/ { next }
         { sub(/[[:space:]]#.*$/, "") }
-        /(^|[[:space:];|&({])(printf|echo)[[:space:]]|_?msg=/ { next }
+        /(^|[[:space:];|&({])(printf|echo|fail|die|_?warn|_?err|violation|record_fail)[[:space:]]|_?msg=/ { next }
         index($0, pat) { hit = 1 }
         END { exit hit ? 0 : 1 }' "${f}"; then return 0; fi
   done
@@ -261,7 +271,7 @@ if [ "${P_OK}" = 1 ]; then
   if [ -n "${C_GUARDED}" ]; then
     printf '  · e destes, já VIGIADOS por guarda (o caminho deles aparece em CÓDIGO de *-check.sh; citação em comentário ou mensagem não conta):\n'
     printf '%s\n' "${C_GUARDED}" | sed 's/^/      /'
-  else printf '  · nenhum deles vigiado por guarda (elo estrutural: caminho em código de *-check.sh)\n'; fi
+  elif [ -n "${P_SURF}" ]; then printf '  · nenhum deles vigiado por guarda (elo estrutural: caminho em código de *-check.sh)\n'; fi
 else printf '  · peças NÃO MEDIDAS — sem alvos de forja nesta rodada\n'; fi
 if [ "${I_OK}" = 1 ] && [ -n "${I_NEVER_LIST}" ]; then
   printf '  · doutrina com `paths:` que NUNCA casou (escrita e nunca lida — ou recém-nascida):\n'

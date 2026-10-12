@@ -36,7 +36,7 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: "2026-10-12"
-    verified_against: "família evolve_workflow 12/12 com LC_ALL=C (casos c, h, i, j, k, l novos ou reescritos); mutantes M6..M12 todos reprovando o caso deles"
+    verified_against: "família evolve_workflow 13/13 com LC_ALL=C (casos c, h a m novos ou reescritos; o m nasceu do refutador: Census rc!=0, seção 7 sem alvo, scan sem findings, dims/chave/maqTargets ruins); 13 mutantes do workflow, todos reprovando o caso deles"
     trace: ".claude/workflows/evolve.js"
     label: "CURADO: o workflow evolve disparado sem args declara o que não mediu, com motivo, e levanta os alvos da MAQ pelo raio-X"
     narrative: "O retorno ganhou complete (true só com as 10, logo nunca do workflow sozinho), measured e not_measured com motivo por dimensão (composição, não pedida, Census recusado, lost, dead). D4/D5/D9/D10 entram sempre, com o motivo de composição. Sem maqTargets, uma fase Census (haiku/low) roda o evolve-census e o script extrai a seção 7 verbatim; exige os dois cabeçalhos (o da seção 7 e o do não-medido) e recusa resumo do agente. O que fica de fora é logado antes do primeiro agente. O whenToUse diz que o atalho cobre 6 de 10."
@@ -248,6 +248,19 @@ nodes:
       method: "medição: comando no vivo do core"
       locality: "repo"
 
+  - id: C_GUARD_LINKS_TETO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-12"
+    verified_against: "sondas do refutador da passada adversarial deste PR contra o _guard_links: linha que mistura código e echo sai inteira (falso negativo), caminho dentro de heredoc de mensagem conta (falso positivo), e só *-check.sh é lido"
+    trace: ".claude/validation/evolve-census.sh"
+    label: "teto do elo estrutural da seção 7: o filtro é por linha, não por argumento — mistura de código e mensagem e heredoc de mensagem ainda erram; guarda que vive no lint-artifacts.sh não é vista"
+    narrative: "Curado na mesma passada: padrão vazio não casa mais (fail-closed) e fail/die/_warn/_err/violation/record_fail entraram como funções de mensagem. O resto pede tirar só o argumento da mensagem, o que exige um parser de shell; o mesmo teto do extrator da REGRA 59 (MAQ-4). Gatilho: o próximo 'vigiado' falso ou ausente medido numa rodada do evolve."
+
 edges:
   - from: E_SINAIS_EVOLVE_KGSSOT_1012
     to: E_EVOLVE_ATALHO_DECLARA_COBERTURA
@@ -303,3 +316,6 @@ edges:
   - from: E_MAQ0_VIGIADO_POR_CITACAO
     to: Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL
     edge_type: SUPPORTS
+  - from: C_GUARD_LINKS_TETO
+    to: E_MAQ0_VIGIADO_POR_CITACAO
+    edge_type: CONSTRAINS
