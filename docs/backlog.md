@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**462 itens abertos** em 98 grafo(s) com aberto (de 125 no escopo) · 99 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**464 itens abertos** em 98 grafo(s) com aberto (de 125 no escopo) · 99 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -67,6 +67,18 @@
 | 17.5 | `C_OPCAO_NENHUMA_COMPLETAR_OS_EIXOS` | company-brain-e-conducao-como-servico-2026-10 | OPCAO NENHUMA AGORA — rodada de COMPLETUDE dos eixos 1 pelo lado da suite, 3 cemiterio, 6 ICP e 7 capital antes de qualquer selo |
 | 13.8 | `C_OPCAO_BD_PACOTE_NO_FORMATO_GURU` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (b mais d) — O PACOTE NA FORMA QUE O MERCADO JA VALIDOU: software de conhecimento VERIFICADO com conducao humana EMBUTIDA, |
 | 13.8 | `C_OPCAO_D_CONDUCAO_COMO_SERVICO` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (d) — CONDUCAO / ADOCAO COMO SERVICO: cobrar pelo metodo (/meta:adopt, gate instalado, federacao) de forma recorrente. A F |
+
+## playbook-sdaal-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 78.0 | `Q_PLAYBOOK_SDAAL_SAC52` | playbook-sdaal-2026-10 | SAC-52: o core deve criar uma abstração SDAAL de playbooks (interface agnóstica + adapters por tipo e por framework em .claude/ |
+| 55.0 | `C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA` | playbook-sdaal-2026-10 | Opção A: NÃO criar agora .claude/utils/playbook/ com adapters por framework; o playbook de domínio é template (skill ou markd |
+| 19.8 | `C_OPCAO_D_GATE_DE_PESQUISA` | playbook-sdaal-2026-10 | Opção D: adiar com gate — rodar antes uma rodada curta de primárias nomeadas (Arazzo 1.0.1, runme, especificação CACAO v2.0 |
+| 9.6 | `Q_SUBDECISAO_3_FECHAMENTO_1012` | playbook-sdaal-2026-10 | PROPOSTA ao maestro (não selo): fechar a sub-decisão (3) como 'nenhum formato aberto cobre os 6 eixos; o template em PFR declara |
+| 8.2 | `C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER` | playbook-sdaal-2026-10 | Opção C: costurar o CACAO v2.0 (OASIS) por SDAAL como primeiro adapter, na fatia de compliance/segurança. |
+| 8.0 | `C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS` | playbook-sdaal-2026-10 | Opção B: criar a abstração SDAAL completa (interface Playbook + adapters por tipo e por framework) nos 4 domínios, como pede  |
+| 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
 
 ## canal-vivo-sessoes-2026-10 — 2 item(ns)
 
@@ -184,17 +196,6 @@
 | 10.5 | `C_OPCAO_D_NAO_DECIDIR_E_REABRIR_AS_FAIXAS_NAO_LIDAS` | motores-de-regras-deterministicos-2026-10 | OPCAO D — nao decidir agora: reabrir a pesquisa nas faixas nao lidas (Drools, Camunda/DMN e o status ISO/OMG, OpenL Tablets, Eas |
 | 9.6 | `C_OPCAO_C_HIBRIDO_SHELL_EXTRAI_MOTOR_DECIDE` | motores-de-regras-deterministicos-2026-10 | OPCAO C — hibrido: o shell continua EXTRAINDO fatos e devolvendo exit 2, e um motor declarativo decide atras de um handler de ho |
 | 7.5 | `C_OPCAO_B_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO` | motores-de-regras-deterministicos-2026-10 | OPCAO B — migrar o gate determinístico para um motor declarativo (Cedar, OPA/Rego, DMN ou JDM) e expressar as 93 regras como po |
-
-## playbook-sdaal-2026-10 — 6 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 48.0 | `Q_PLAYBOOK_SDAAL_SAC52` | playbook-sdaal-2026-10 | SAC-52: o core deve criar uma abstração SDAAL de playbooks (interface agnóstica + adapters por tipo e por framework em .claude/ |
-| 41.8 | `C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA` | playbook-sdaal-2026-10 | Opção A: NÃO criar agora .claude/utils/playbook/ com adapters por framework; o playbook de domínio é template (skill ou markd |
-| 17.6 | `C_OPCAO_D_GATE_DE_PESQUISA` | playbook-sdaal-2026-10 | Opção D: adiar com gate — rodar antes uma rodada curta de primárias nomeadas (Arazzo 1.0.1, runme, especificação CACAO v2.0 |
-| 8.0 | `C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS` | playbook-sdaal-2026-10 | Opção B: criar a abstração SDAAL completa (interface Playbook + adapters por tipo e por framework) nos 4 domínios, como pede  |
-| 6.0 | `C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER` | playbook-sdaal-2026-10 | Opção C: costurar o CACAO v2.0 (OASIS) por SDAAL como primeiro adapter, na fatia de compliance/segurança. |
-| 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
 
 ## zoho-glpi-adapters-2026-09 — 8 item(ns)
 
@@ -798,7 +799,7 @@
 |--:|---|---|---|
 | 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
 
-## fila-2026-10-06 — 12 item(ns)
+## fila-2026-10-06 — 13 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -806,6 +807,7 @@
 | 4.8 | `Q_TASK_MANAGER_SDAAL_COMPLETO` | fila-2026-10-06 | programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, bu |
 | 4.2 | `Q_MERGE_GATE_AVISA_NO_ADOTANTE` | fila-2026-10-06 | a trava de merge deve avisar no adotante em vez de sair calada |
 | 3.6 | `Q_GRANAAI_CLONE_SEM_CARIMBO` | fila-2026-10-06 | aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o valida |
+| 3.6 | `Q_PRECOMMIT_SELECAO_POR_CASO` | fila-2026-10-06 | re-forjar o pre-commit para escolher por caso: família pelo bloco que mudou na bancada, núcleo fixo justificado ou podado, motiv |
 | 3.2 | `Q_MAPA_NOMEAR_MERGE_ONION_HOOKS` | fila-2026-10-06 | nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar |
 | 3.0 | `Q_CANAL_VIVO_ENTRE_SESSOES` | fila-2026-10-06 | o canal vivo entre sessões vira 3ª via da co-evolução (envelope fixo, registro do envio, decisão descendo ao grafo)? aguarda  |
 | 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |

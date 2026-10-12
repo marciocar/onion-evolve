@@ -80,3 +80,25 @@ O run gastou 7.275.424 tokens para 57 nós, cerca de **128k por nó**.
 
 Isso fica abaixo do SAC-70 (154k) e da varredura de decisão de setembro (291k). As lacunas agora têm
 nome, então a revisita do gate D deve rodar no modo `primaries`.
+
+## Gate D — rodada de primárias (2026-10-12, run `wf_5ceb8e1b-6d6`)
+
+Custo: 643.690 tokens, 8 agentes e 7 min. Entraram 16 nós, cerca de **40k por nó** (o modo `primaries` custa ~1/3 da varredura). Retorno completo em `data/run-wf_5ceb8e1b-6d6.json`.
+
+Fontes:
+- **3 fontes, todas alcançadas:** Arazzo 1.0.1 (OAI), Runme e a especificação CACAO v2.0.
+- **14 claims ancoradas** e **3 rejeitadas como EXAGERADAS.** Duas eram do Runme, sobre estado e aprovação; uma era do CACAO, sobre o passo humano.
+
+O que a rodada sustenta, a favor da opção A já selada:
+- **Arazzo:** é aberto (Apache-2.0) e tem bom vocabulário de sucesso e falha (`successCriteria`, `goto`/`end`/`retry`). Mas é **orquestração de API**: todo passo é uma operação, as expressões são HTTP, e não há passo humano nem estado de instância. O que se costura dele é o **JSON Schema 2020-12** das entradas e o vocabulário de critério, como inspiração nomeada.
+- **Runme:** é **executor** de markdown em células, não formato de playbook. Pode ser, no máximo, um substrato de execução plugável.
+- **CACAO:** é a forma de passos mais próxima de um playbook genérico (`if`/`while`/`switch`/`parallel`/`playbook-action`). Pesam contra ele:
+  - o vocabulário de tipos é só de segurança;
+  - está em CS01, parado desde 2023-11, com inconsistência interna 2.0/2.1;
+  - o estado de execução fica fora da spec.
+
+**Nenhum dos três cobre os seis eixos.** Em todos faltam aprovação humana e estado de instância especificados.
+
+Reconciliação: as 3 objeções do Elenxo de 2026-10-11 do tipo "primária citada, não lida" passam a `superseded`, com `SUPERSEDES` a partir das evidências ancoradas. Agora as primárias foram lidas.
+
+**Proposta aberta (não é selo):** `Q_SUBDECISAO_3_FECHAMENTO_1012` fecha a sub-decisão (3) como "nenhum formato aberto cobre os 6 eixos; o template em PFR declara o que pegou emprestado". Antes, faltam 3 leituras curtas: as notas da Arazzo 1.1.0, a doc do Runme sobre estado e aprovação, e o §3.1 do CACAO.
