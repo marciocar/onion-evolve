@@ -135,7 +135,7 @@ onion_protected_branches() {
     v="$(git -C "$d" config --get "$k" 2>/dev/null || true)"
     if [ -n "$v" ]; then echo "${v#refs/heads/}"; found=1; fi
   done
-  # o gitflow nomeia a produção e tem precedência sobre a branch padrão do remoto (que num GitFlow é a develop)
+  # o gitflow nomeia a produção e tem precedência sobre a branch padrão do remoto (que num gitflow é a develop)
   if [ "$found" = 0 ]; then
     heads="$(git -C "$d" for-each-ref --format='%(symref)' 'refs/remotes/*/HEAD' 2>/dev/null \
       | sed -nE 's#^refs/remotes/[^/]+/(.+)$#\1#p' || true)"
@@ -279,7 +279,7 @@ def protected_branches(path):
     """Ramos de PRODUÇÃO do repo onde o comando roda: `main` SEMPRE, mais o resolvido — config do
     gitflow (`gitflow.branch.master`/`.main`) OU, sem ela, a branch padrão de cada remoto
     (`refs/remotes/*/HEAD`). Sem nenhuma das duas fontes, `master` entra por convenção (fechado). A 1ª forma dos vetos só via
-    `main` literal: num adotante GitFlow cuja produção é `master`, `git push origin +master` saía rc=0
+    `main` literal: num adotante gitflow cuja produção é `master`, `git push origin +master` saía rc=0
     (Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN, medido em 2026-10-05). A linha canônica segue
     escrevendo `main` como o NOME do ramo protegido — os hooks julgam esse token. Espelho em bash:
     `onion_protected_branches` (paridade cobrada pela bancada)."""
@@ -292,7 +292,7 @@ def protected_branches(path):
             v = re.sub(r"^refs/heads/", "", _git(["-C", base, "config", "--get", key]))
             if v:
                 s.add(v); resolved = True
-        # o gitflow NOMEIA a produção e tem precedência: a branch padrão do remoto num GitFlow costuma ser a
+        # o gitflow NOMEIA a produção e tem precedência: a branch padrão do remoto num gitflow costuma ser a
         # `develop` (medido num adotante: origin/HEAD→develop, gitflow.branch.master=master) — somá-la
         # vetaria o force-push da integração, que hoje passa e não é a produção
         heads = "" if resolved else _git(["-C", base, "for-each-ref", "--format=%(symref)", "refs/remotes/*/HEAD"])
@@ -945,7 +945,7 @@ def canonical_git(words, where, env=None):
     # o 2º falso positivo de produção (2026-09-01), reaberto pela 1ª reescrita (Elenxo, 2ª passada).
     if "__DYNAMIC__" in dsts and force:
         dsts = ["main" if d == "__DYNAMIC__" else d for d in dsts]
-    # o ramo de PRODUÇÃO resolvido (`master` num GitFlow clássico) vira o token `main` que os hooks julgam;
+    # o ramo de PRODUÇÃO resolvido (`master` num gitflow clássico) vira o token `main` que os hooks julgam;
     # vale também para o destino que veio da config/branch atual (push nu), que não passou pelo laço acima
     prot = {p.lower() for p in protected_branches(where)}   # caixa: o mesmo critério do `main` acima
     dsts = ["main" if d.lower() in prot else d for d in dsts]
