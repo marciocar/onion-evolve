@@ -1,8 +1,8 @@
 ---
 branch: fix/evolve-workflow-completeness
 date: 2026-10-12
-reviewed_diff_sha256: 09b375ad502dd805b633a834a1755f553c2b44c8e921e6f92c26d146cc3b0645
-reviewed_code_sha256: 8c78dabc2e81f790d64f433db3ce05cbde69a2d10b3ba94ef6b8dbc8a6d2dd0a
+reviewed_diff_sha256: 9d8a178344ed1e161ab81d9d42bcd8cf7a0fdb1ba14f33f32fb2380bde1370fd
+reviewed_code_sha256: 322a4142d4e60a1e50ece376fb82f8e76c929fdc697ce31f5f83f41c4df6c5c8
 findings_total: 10
 findings_real: 8
 findings_fixed: 7
@@ -42,3 +42,5 @@ co-deliver/co-evolve/co-relay, reais) e, só leitura, no clone do adotante onion
 adotante`; o README segue lá até o update levar o forge-census novo). **Não exercitado no runtime
 real:** o `evolve.js` pela ferramenta Workflow — a sessão que fez o PR não tinha a ferramenta; o corpo
 roda no stub da bancada, no mesmo embrulho async do runtime.
+
+**3ª leva (CI do #1062, shard 4):** o caso (h) do silent-measurer usava o README de `commands/meta` como vítima, e o README deixou de ser candidato pela cura MAQ-3. O caso foi corrigido, não a cura: a vítima sai agora do `--tsv` do próprio censo. O mutante que apaga o rótulo DESCARTADOS reprova o (h) (vítima `cc-update.md`). Revisado nesta passada própria.
