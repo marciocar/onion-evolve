@@ -1,8 +1,8 @@
 ---
 branch: docs/sac-52-subdecision-3-readings
 date: 2026-10-12
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: 57d4b5675c0967b9817f1fb2e86d948086a76dcf824972102d58944b9fb57f02
+reviewed_diff_sha256: 45f1aeb320d6041f6866b085a4d0c6579e5af7578035ccb27a015130d86390a4
+reviewed_code_sha256: c2423fd688a7618747296f5dc2f7bc84ce156f7801b8176695c30d208a9301a2
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
