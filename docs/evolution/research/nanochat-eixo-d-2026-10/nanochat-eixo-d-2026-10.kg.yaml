@@ -501,14 +501,22 @@ nodes:
   # ═════════════ PROPOSTA DE RECONCILIACAO COM O PAI (nao sela) ═════════════
   - id: Q_EIXO_D_RECONCILE_PARENT_GRAPH
     node_type: question
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.6
-    verified_at: "2026-10-05"
-    verified_against: 'recomendacao do Elenxo desta rodada ("EFEITO NO GRAFO"); grafo-pai lido inteiro na escrita (46 nos; D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 status done)'
     label: 'PROPOSTA (o maestro decide; este grafo nao edita o pai nem toca o selo): (1) o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 e REFORCADO, nao reaberto — nenhum achado reduz custo, todos somam custo ou pre-condicao; (2) E_OBJECAO_SYNTHETIC_DATA_AXIS_UNREAD (pai) merece superacao PARCIAL: "julgado no escuro" passa a "julgado com leitura parcial" — esquecimento sob mistura dominada pela identidade, custo e "autoconsciencia honesta" continuam objecao SOBREVIVENTE (clausula 6), porque nao foram fechados por evidencia; (3) C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY (pai) ganha o segundo gate do eval protegido (C_EIXO_D_OPTION_D_SECOND_GATE_EVAL); (4) E_LACUNAS_NANOCHAT_2026_10 (pai) deixa de listar arXiv 2603.25158 como "cortado sem leitura" — foi lido e nao e treino em pesos. A escrita no pai e ato separado, com aresta cross-grafo citada por id.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml'
+    status: done
+    plane: DEV
+    verified_at: "2026-10-12"
+    verified_against: "decisão do maestro em 2026-10-12, por pergunta com opções (/meta:decide): escolhida «Aplicar as 4»"
+    narrative: |-
+      verified_against anterior: «recomendacao do Elenxo desta rodada ("EFEITO NO GRAFO"); grafo-pai lido inteiro na escrita (46 nos; D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 status done)»
+      Selado por /meta:decide em 2026-10-12: escolhida «Aplicar as 4»; descartadas: «Só as factuais (1) e (4)» · «Não emendar».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-12: «O Elenxo do eixo D propõe 4 emendas ao grafo-pai nanochat-onion; aplicar?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      locality: "pessoa"
 
 edges:
   # ── evidencias -> pergunta da rodada ──

@@ -27,13 +27,23 @@ nodes:
   - id: D_AUTO_DRIVE_DEGRAU_AUTOMATE
     node_type: decision
     layer: audit
-    plane: DEV
-    status: open
     impact: 4
     confidence: 0.55
-    verified_against: "proposta do core em 2026-10-08, aguardando a segunda opinião pedida ao adotante que evolui o KG-SSOT, o Elenxo e o selo do maestro; projeção no Linear: SAC-74, bloqueado por SAC-66 e SAC-67"
     label: "proposta: forjar o degrau AUTOMATE do /meta:drive, que conduz 1..n raízes e a cadeia inteira até o merge, com paradas duras e relatório por item; decisão aberta"
-    narrative: "proposta: forjar o degrau AUTOMATE do /meta:drive — 1..n raízes (issue ou id de nó; sem item drena a fila-pronta até o budget), expansão da cadeia (épico, task, subtask e DEPENDS_ON) em ordem topológica, cada item até o merge (--merge=true por padrão porque o maestro invoca; nunca cron), relatório por item no task manager e no grafo; paradas duras em decisão não-tomada, Elenxo reprovado, CI vermelho inesperado, path vendorizado ou repo alheio e budget; merge serial enquanto não houver merge driver. Depende de SAC-66 e SAC-67 (esteira) e da interface do SAC-63; muda o degrau selado 'merge 100% humano, em lote', logo passa pelo Elenxo"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-12"
+    verified_against: "decisão do maestro em 2026-10-12, por pergunta com opções (/meta:decide): escolhida «Forjar com as objeções»"
+    narrative: |-
+      proposta: forjar o degrau AUTOMATE do /meta:drive — 1..n raízes (issue ou id de nó; sem item drena a fila-pronta até o budget), expansão da cadeia (épico, task, subtask e DEPENDS_ON) em ordem topológica, cada item até o merge (--merge=true por padrão porque o maestro invoca; nunca cron), relatório por item no task manager e no grafo; paradas duras em decisão não-tomada, Elenxo reprovado, CI vermelho inesperado, path vendorizado ou repo alheio e budget; merge serial enquanto não houver merge driver. Depende de SAC-66 e SAC-67 (esteira) e da interface do SAC-63; muda o degrau selado 'merge 100% humano, em lote', logo passa pelo Elenxo
+
+      verified_against anterior: «proposta do core em 2026-10-08, aguardando a segunda opinião pedida ao adotante que evolui o KG-SSOT, o Elenxo e o selo do maestro; projeção no Linear: SAC-74, bloqueado por SAC-66 e SAC-67»
+      Selado por /meta:decide em 2026-10-12: escolhida «Forjar com as objeções»; descartadas: «Forjar como proposto» · «Manter gated» · «Pesquisar antes».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-12: «Forjar agora o degrau AUTOMATE do /meta:drive (SAC-74), com as 4 arestas CONSTRAINS como requisito e --merge desligado por padrão?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      locality: "pessoa"
   - id: Q_SEGUNDA_OPINIAO_KG_SSOT
     node_type: question
     layer: audit

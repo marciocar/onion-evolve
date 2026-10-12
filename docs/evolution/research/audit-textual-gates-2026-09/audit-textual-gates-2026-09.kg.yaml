@@ -338,13 +338,23 @@ nodes:
   # ── Abertos com gatilho nomeado ───────────────────────────────────────────────────
   - id: D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO
     node_type: decision
-    plane: DEV
-    status: open
     impact: 4
     confidence: 0.7
     label: "DECISÃO PROPOSTA: do MOAT do /meta:drive só o merge ganhou veto; deploy fora dos wrappers, push em repo alheio (git -C <clone de adotante>) e relógio (cron/timer) seguem PROSA. Cura: veto por ALVO, não vocabulário. Gatilho: 1º dogfood fora do wrapper ou próxima onda de guardas."
-    narrative: "label anterior: DECISAO PROPOSTA: dos 4 itens do MOAT do /meta:drive (merge · deploy · repo alheio · relogio), o merge ganhou veto neste PR; deploy (rsync/systemctl/sudo cp fora de ops/deploy-site.sh e ops/update-bridge.sh), escrita em repo alheio (⟨git -C <clone de adotante> push⟩) e relogio (crontab/CronCreate/systemd timer) seguem PROSA. Cura na mesma forma (PreToolUse + lib + bancada), mas a assinatura tem de ser por ALVO (path servido, remote alheio, unidade timer), nao por vocabulario — rsync/systemctl sao legitimos fora de deploy. GATILHO: 1o dogfood em que a sessao executa deploy/cron/push-alheio fora do wrapper (o PostToolUse ja avisa; quando avisar, vira veto), OU a proxima onda de guardas."
     trace: '.claude/commands/meta/drive.md · projeção: docs/evolution/research/audit-textual-gates-2026-09/SYNTHESIS.md'
+    status: done
+    plane: DEV
+    verified_at: "2026-10-12"
+    verified_against: "decisão do maestro em 2026-10-12, por pergunta com opções (/meta:decide): escolhida «Forjar na próxima leva»"
+    narrative: |-
+      label anterior: DECISAO PROPOSTA: dos 4 itens do MOAT do /meta:drive (merge · deploy · repo alheio · relogio), o merge ganhou veto neste PR; deploy (rsync/systemctl/sudo cp fora de ops/deploy-site.sh e ops/update-bridge.sh), escrita em repo alheio (⟨git -C <clone de adotante> push⟩) e relogio (crontab/CronCreate/systemd timer) seguem PROSA. Cura na mesma forma (PreToolUse + lib + bancada), mas a assinatura tem de ser por ALVO (path servido, remote alheio, unidade timer), nao por vocabulario — rsync/systemctl sao legitimos fora de deploy. GATILHO: 1o dogfood em que a sessao executa deploy/cron/push-alheio fora do wrapper (o PostToolUse ja avisa; quando avisar, vira veto), OU a proxima onda de guardas.
+
+      Selado por /meta:decide em 2026-10-12: escolhida «Forjar na próxima leva»; descartadas: «Esperar o gatilho (a)».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-12: «Forjar o veto por ALVO do MOAT do /meta:drive (deploy fora dos wrappers, push em repo alheio, relógio) agora?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
+      locality: "pessoa"
 
   - id: Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO
     node_type: question
