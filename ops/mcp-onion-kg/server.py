@@ -41,6 +41,12 @@ ROOT_SOURCE = 'env ONION_KG_ROOT' if _ROOT_ENV else 'default: repo do servidor (
 HOST = os.environ.get('MCP_HOST', '172.23.0.1')
 PORT = int(os.environ.get('MCP_PORT', '3032'))
 TOKEN = os.environ.get('ONION_KG_TOKEN', '')
+# Autorização POR USUÁRIO (molde do SGE nesta mesma stack): com ONION_KG_ALLOWED_EMAILS DEFINIDA, todo
+# tools/call exige o header X-User-Email numa lista (vírgula); a lista VAZIA nega todo mundo. O token prova que
+# quem chama é o LibreChat; a lista prova QUAL usuário dele. Sem ela, todo usuário do LibreChat veria o Brain
+# (o Logto tem cadastro aberto). initialize/tools/list passam: não trazem dado do repo.
+_ALLOW_RAW = os.environ.get('ONION_KG_ALLOWED_EMAILS')
+ALLOWED_EMAILS = None if _ALLOW_RAW is None else {e.strip().lower() for e in _ALLOW_RAW.split(',') if e.strip()}
 
 MAX_OUT = 60_000  # teto de payload por resposta (contexto de agente, nao dump)
 MAX_BODY = 1_000_000  # teto do corpo da requisição (Content-Length negativo ou enorme = 400)
@@ -352,6 +358,15 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({'jsonrpc': '2.0', 'id': rid, 'result': {'tools': FERRAMENTAS}})
         if metodo == 'tools/call':
             nome = params.get('name', '')
+            if ALLOWED_EMAILS is not None:
+                user = (self.headers.get('X-User-Email') or '').strip().lower()
+                if user not in ALLOWED_EMAILS:
+                    return self._json({'jsonrpc': '2.0', 'id': rid, 'result': {
+                        'content': [{'type': 'text', 'text': json.dumps(
+                            {'untrusted_data': True, 'tool': nome, 'served_commit': None,
+                             'recusa': f"usuario '{user or '(sem e-mail)'}' nao autorizado neste Brain — "
+                                       'peca ao maestro para incluir o e-mail'}, ensure_ascii=False)}],
+                        'isError': True}})
             try:
                 r = executa(nome, params.get('arguments') or {})
                 return self._json({'jsonrpc': '2.0', 'id': rid, 'result': {
@@ -377,7 +392,8 @@ def main():
         raise SystemExit(f'recuso subir: {e} — fail-closed, nao sirvo sem declarar o commit')
     srv = ThreadingHTTPServer((HOST, PORT), Handler)
     print(f'onion-kg (MCP) em http://{HOST}:{srv.server_address[1]}/mcp — {len(FERRAMENTAS)} tools '
-          f'read-only · raiz {fr["root_source"]} @ {fr["served_commit"][:12]} · fetched_at {fr["fetched_at"]}',
+          f'read-only · raiz {fr["root_source"]} @ {fr["served_commit"][:12]} · fetched_at {fr["fetched_at"]} · '
+          f'usuarios {"so token (ONION_KG_ALLOWED_EMAILS ausente)" if ALLOWED_EMAILS is None else str(len(ALLOWED_EMAILS)) + " na lista"}',
           flush=True)
     srv.serve_forever()
 

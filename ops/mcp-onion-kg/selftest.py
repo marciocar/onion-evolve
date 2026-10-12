@@ -338,6 +338,45 @@ def main():
                                      capture_output=True, text=True).stdout.strip()
             case('raiz-default-declarada', pl.get('root_source', '').startswith('default')
                  and pl.get('served_commit') == rc_head, pl.get('root_source'))
+
+        # (10) lista de e-mails (molde do SGE): com ONION_KG_ALLOWED_EMAILS definida, tools/call exige o
+        #      X-User-Email na lista; lista vazia nega todos; initialize/tools/list passam; sem a env, só o token.
+        def call_u(port_, tool, user):
+            hdr = {'Content-Type': 'application/json', 'X-Api-Key': TOKEN}
+            if user is not None:
+                hdr['X-User-Email'] = user
+            body = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'tools/call',
+                               'params': {'name': tool, 'arguments': {}}}).encode()
+            req = urllib.request.Request(f'http://127.0.0.1:{port_}/mcp', data=body, method='POST', headers=hdr)
+            with urllib.request.urlopen(req, timeout=60) as r:
+                res = json.loads(r.read()).get('result', {})
+            try:
+                pl_ = json.loads(res['content'][0]['text'])
+            except (KeyError, IndexError, ValueError):
+                pl_ = {}
+            return bool(res.get('isError')), pl_
+        p3 = start({'ONION_KG_ROOT': wt, 'ONION_KG_ALLOWED_EMAILS': 'Ana@Exemplo.com, bia@exemplo.com'})
+        port3, line3 = wait_port(p3)
+        if port3 is None:
+            for c in ('allowlist-email-na-lista-passa', 'allowlist-email-fora-recusa',
+                      'allowlist-sem-header-recusa', 'allowlist-tools-list-passa'):
+                case(c, False, line3)
+        else:
+            e_ok, pl_ok = call_u(port3, 'kg_list', 'ana@exemplo.com ')
+            case('allowlist-email-na-lista-passa', not e_ok and pl_ok.get('served_commit') == head, pl_ok.get('recusa'))
+            e_no, pl_no = call_u(port3, 'kg_list', 'intruso@exemplo.com')
+            case('allowlist-email-fora-recusa', e_no and 'data' not in pl_no and 'nao autorizado' in pl_no.get('recusa', ''), pl_no)
+            e_nh, pl_nh = call_u(port3, 'kg_list', None)
+            case('allowlist-sem-header-recusa', e_nh and 'data' not in pl_nh, pl_nh)
+            code_l, resp_l = rpc(port3, 'tools/list')
+            case('allowlist-tools-list-passa', code_l == 200 and len(resp_l.get('result', {}).get('tools', [])) > 0, code_l)
+        p4 = start({'ONION_KG_ROOT': wt, 'ONION_KG_ALLOWED_EMAILS': ''})
+        port4, line4 = wait_port(p4)
+        if port4 is None:
+            case('allowlist-vazia-nega-todos', False, line4)
+        else:
+            e_v, pl_v = call_u(port4, 'kg_list', 'ana@exemplo.com')
+            case('allowlist-vazia-nega-todos', e_v and 'data' not in pl_v, pl_v)
     finally:
         stop_all()
         shutil.rmtree(base, ignore_errors=True)

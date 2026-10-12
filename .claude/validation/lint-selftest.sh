@@ -29272,7 +29272,7 @@ run_mcp_onion_kg_selftests() {
   if [ ! -f "${h}" ] || [ ! -f "${REPO_ROOT}/ops/mcp-onion-kg/server.py" ]; then
     record_skip "mcp-onion-kg: servidor ausente nesta árvore (ops/ não viaja para todo papel)"; return
   fi
-  local want_total=29 o rc
+  local want_total=34 o rc
   if o="$(LC_ALL=C python3 -I -B "${h}" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} " <<< "${o}" && ! grep -q '^FAIL ' <<< "${o}"; then
     record_pass "mcp-onion-kg: (a) servidor real por HTTP — ${want_total} casos (401, raiz inválida, -efoo, kg_node, frescor)"
@@ -29305,6 +29305,8 @@ if g not in set(_tracked_graphs()) or not$(printf '\x1f')if not$(printf '\x1f')k
 'arvore_limpa': (rc3 == 0 and st == '')$(printf '\x1f')'arvore_limpa': True$(printf '\x1f')arvore-suja-declarada
 if n < 0 or n > MAX_BODY:$(printf '\x1f')if False:$(printf '\x1f')content-length-negativo-400
 if not isinstance(params, dict):$(printf '\x1f')if False:$(printf '\x1f')params-nao-objeto-400
+                if user not in ALLOWED_EMAILS:$(printf '\x1f')                if False:$(printf '\x1f')allowlist-email-fora-recusa
+ALLOWED_EMAILS = None if _ALLOW_RAW is None else$(printf '\x1f')ALLOWED_EMAILS = None if not _ALLOW_RAW else$(printf '\x1f')allowlist-vazia-nega-todos
 EOF_MUT
 }
 _family run_mcp_onion_kg_selftests
