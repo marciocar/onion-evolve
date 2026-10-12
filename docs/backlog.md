@@ -185,6 +185,17 @@
 | 9.6 | `C_OPCAO_C_HIBRIDO_SHELL_EXTRAI_MOTOR_DECIDE` | motores-de-regras-deterministicos-2026-10 | OPCAO C — hibrido: o shell continua EXTRAINDO fatos e devolvendo exit 2, e um motor declarativo decide atras de um handler de ho |
 | 7.5 | `C_OPCAO_B_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO` | motores-de-regras-deterministicos-2026-10 | OPCAO B — migrar o gate determinístico para um motor declarativo (Cedar, OPA/Rego, DMN ou JDM) e expressar as 93 regras como po |
 
+## playbook-sdaal-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 48.0 | `Q_PLAYBOOK_SDAAL_SAC52` | playbook-sdaal-2026-10 | SAC-52: o core deve criar uma abstração SDAAL de playbooks (interface agnóstica + adapters por tipo e por framework em .claude/ |
+| 41.8 | `C_OPCAO_A_TEMPLATE_EM_PFR_SEM_CAMADA` | playbook-sdaal-2026-10 | Opção A: NÃO criar agora .claude/utils/playbook/ com adapters por framework; o playbook de domínio é template (skill ou markd |
+| 17.6 | `C_OPCAO_D_GATE_DE_PESQUISA` | playbook-sdaal-2026-10 | Opção D: adiar com gate — rodar antes uma rodada curta de primárias nomeadas (Arazzo 1.0.1, runme, especificação CACAO v2.0 |
+| 8.0 | `C_OPCAO_B_SDAAL_COMPLETA_QUATRO_DOMINIOS` | playbook-sdaal-2026-10 | Opção B: criar a abstração SDAAL completa (interface Playbook + adapters por tipo e por framework) nos 4 domínios, como pede  |
+| 6.0 | `C_OPCAO_C_CACAO_PRIMEIRO_ADAPTER` | playbook-sdaal-2026-10 | Opção C: costurar o CACAO v2.0 (OASIS) por SDAAL como primeiro adapter, na fatia de compliance/segurança. |
+| 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
+
 ## zoho-glpi-adapters-2026-09 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
