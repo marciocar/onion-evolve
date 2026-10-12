@@ -1,7 +1,7 @@
 ---
 branch: fix/exit-code-pipe-false-positive
 date: 2026-10-11
-reviewed_diff_sha256: ed4b45096912bf8e8c3e06bdb641163ff1397d2054a89569958938b811cbc988
+reviewed_diff_sha256: 37404187dbdcb8d7d6c6fe001cca37dd44f920bfdc4de158d7574b8067675ff3
 reviewed_code_sha256: 3a706d0e2d8085ffa066d9535a0edee7ac65675258173aaf221a6ed112729286
 findings_total: 2
 findings_real: 2
