@@ -119,8 +119,11 @@ work_tool_sets:
     - publish                # /meta:publish (F3 das portas, SAC-92): publicar portas é ato da FONTE, par da skill onion-publish
   # PENDING — comando que a matriz NÃO classificou. Fica com source e hub (o status quo dele) e NÃO viaja
   # para standalone/plugins até o maestro decidir. VAZIO desde 2026-10-11 (personality-sync foi para
-  # `federation`), e fica como o lugar de quem nascer sem classificação.
-  pending: []
+  # `federation`), e fica como o lugar de quem nascer sem classificação. `decide` NASCEU aqui em
+  # 2026-10-12 (forja do /meta:decide): core-only até o maestro classificar — o medidor lê os grafos,
+  # os PRs e as worktrees do repo, e nada disso foi medido do lado de quem consome.
+  pending:
+    - decide
   # MINIMAL (consumer T2) — A DEFINIR quando nascer um consumer real (subconjunto de full).
 
 roles:
