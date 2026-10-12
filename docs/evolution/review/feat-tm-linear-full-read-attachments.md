@@ -1,7 +1,7 @@
 ---
 branch: feat/tm-linear-full-read-attachments
 date: 2026-10-12
-reviewed_diff_sha256: e0340551de9ba42fb55329adddc161c200be4945151d636649761d630041c33c
+reviewed_diff_sha256: a21eb1fb42aabf6b45d1a3b14231609afc38976241a685e546a6c305ec08977d
 reviewed_code_sha256: 8cffeceb0d5238622c7104fda6af8726b22e1897f459cdd8dbb2d3de45c8b2e1
 findings_total: 6
 findings_real: 6
