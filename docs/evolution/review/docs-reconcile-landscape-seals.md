@@ -1,7 +1,8 @@
 ---
 branch: docs/reconcile-landscape-seals
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1189b72fec6f19f05d241e99018b2a14b867452282ad16f5a66dee2ad97ae01b
+reviewed_code_sha256: 7f73bd4bc8409388d4578653ac9ee1dd5ab37fa0370c7956675605b75822a7a7
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
