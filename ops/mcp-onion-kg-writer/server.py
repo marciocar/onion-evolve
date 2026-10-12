@@ -271,8 +271,9 @@ def judge(slug, text):
     if perr is None and mid != slug:
         raise Refused(f'meta.id ({mid!r}) tem de ser igual ao slug ({slug!r})')
     v = run_gate(data, slug)
-    if perr:
+    if perr:  # meta.id não conferível = nunca APROVADO, mesmo que um gate tenha lido o texto (fail-closed)
         v['parse'] = perr
+        v['veredito'] = 'REPROVADO'
     return data, v
 
 
