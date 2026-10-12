@@ -10966,7 +10966,13 @@ run_silent_measurer_selftests() {
     done
     if [ -d "${sd}/.claude/commands/meta" ]; then
       (cd "${sd}" && git init -q . >/dev/null 2>&1 && git add -A >/dev/null 2>&1) || true
-      local _vict; _vict="$(cd "${sd}" && git ls-files '.claude/commands/meta/*.md' 2>/dev/null | head -1)"
+      # ⚠️ A VITIMA SAI DO PROPRIO CENSO, nunca de `git ls-files | head -1`: o 1o .md de
+      #    commands/meta era o README, e desde 2026-10-12 (MAQ-3) o README NAO e candidato — o caso
+      #    removia um nao-candidato e reprovava a cura certa. Derivar do --tsv garante que a vitima
+      #    e candidata HOJE, qualquer que seja a regra de candidatura amanha.
+      local _pre _vict
+      _pre="$(cd "${sd}" && bash .claude/validation/forge-census.sh . --tsv 2>/dev/null || true)"
+      _vict="$(awk -F'\t' 'NR>1 && $9 ~ /^[.]claude\/commands\/meta\// {print $9; exit}' <<< "${_pre}")"
       if [ -n "${_vict}" ] && rm -f "${sd}/${_vict}"; then
         local _do
         _do="$(cd "${sd}" && FORGE_CENSUS_TOP=100000 bash .claude/validation/forge-census.sh . --markdown 2>&1 || true)"
