@@ -1,8 +1,7 @@
 ---
 branch: docs/spike-value-criterion
 date: 2026-10-12
-reviewed_diff_sha256: 4bcb06a59eebbf9847b0143486ade88e10986701742233f8b3f6793149479ff3
-reviewed_code_sha256: 3bfaa8743158fd197a6048571b55c1f8fc0890630c00c02521cf2797c0f59d6a
+reviewed_diff_sha256: pendente
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
