@@ -1,7 +1,8 @@
 ---
 branch: fix/kg-contract-debt-cheap
 date: 2026-10-12
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 32c7a782e9c6b7042045ba30a50254cf8df6df5124ae6a596eba7b19012c90d8
+reviewed_code_sha256: a2fb63ae1945016ba1906c426ddbca5212fd03d07e7034c16ab65d65daa4f2a0
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
