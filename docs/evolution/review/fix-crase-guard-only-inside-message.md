@@ -1,7 +1,7 @@
 ---
 branch: fix/crase-guard-only-inside-message
 date: 2026-10-12
-reviewed_diff_sha256: 178ab7defe75701d6c9634846e6b18c8d6b8051c5d436f328203da58a745514b
+reviewed_diff_sha256: acbbba106e74621543ccceee562c1f918ce1743fc2974007d3fc5b9dd09fc172
 reviewed_code_sha256: 50c218165f52f2941a1ed01e1cc36320742869b8f2f7c53f19fc2f4b042002a5
 findings_total: 1
 findings_real: 1
