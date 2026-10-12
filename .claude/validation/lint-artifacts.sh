@@ -5634,6 +5634,43 @@ check_task_manager_executable() {
 }
 check_task_manager_executable
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 105 — Script rastreado não chama a API do provedor de task manager por fora do adapter [HARD]
+# previne: o cliente do provedor reescrito fora do adapter (o script avulso da sessão promovido a ops/), que contorna o tm.sh e a declaração de capacidades.
+#   DANO MEDIDO (SAC-75, 2026-10-12): 147 comandos Bash únicos das sessões tocaram host de provedor entre
+#   2026-09-23 e 2026-10-12 (~130 com cliente HTTP), e um deles DEPOIS do tm.sh existir (2026-10-12T03:21,
+#   `python3 - <<'EOF'` com urllib direto no Linear). O veto da sessão é o hook pretooluse-direct-provider-api.sh;
+#   esta regra é a metade do ARQUIVO RASTREADO, que o hook não lê (código de fora do adapter com URL `//<host>` de
+#   provider-hosts.tsv + idioma de rede). Markdown não é julgado: documentar ≠ chamar. Passivo medido na forja:
+#   ZERO, por isso nasce HARD e sem catraca. No derivado (IS_DERIVED) não roda: lá o produto do adotante pode
+#   integrar com o provedor. Lógica e teto em direct-provider-api-check.sh.
+check_direct_provider_api() {
+  local helper="${SCRIPT_DIR}/direct-provider-api-check.sh"
+  [ -f "${helper}" ] || return 0
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      */fixtures/*|*.md) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    if [ -n "${ONLY_PATH}" ] && [ "${_code}" = "chamada-direta" ]; then
+      case "${ONLY_PATH}" in "${REPO_ROOT}/${_path%:*}"|"${_path%:*}"|*/"${_path%:*}") : ;; *) continue ;; esac
+    fi
+    violation "${_sev:-HARD}" "${REPO_ROOT}/${_path%:*}" "REGRA 105 (Script rastreado não chama a API do provedor de task manager por fora do adapter): [${_code}] ${_path##*:}: ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${REPO_ROOT}/.claude/validation/direct-provider-api-check.sh" "REGRA 105 (Script rastreado não chama a API do provedor de task manager por fora do adapter): a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_direct_provider_api
+
 # ===========================================================================
 # REGRA 102 — Chave de frontmatter de agente pertence à allowlist (oficiais + as da casa) [HARD + SOFT]
 # previne: typo de chave de agente (`tool:` no lugar de `tools:`, `modle:`) que o Claude Code ignora em silêncio

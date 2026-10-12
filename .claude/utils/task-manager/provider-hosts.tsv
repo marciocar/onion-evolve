@@ -1,0 +1,18 @@
+# provider-hosts.tsv — os hosts de API de cada provedor de task manager (SSOT, SAC-75, 2026-10-12).
+#
+# Quem lê: o veto `.claude/hooks/pretooluse-direct-provider-api.sh` (comando Bash da sessão) e a
+# REGRA 105 (`.claude/validation/direct-provider-api-check.sh`, arquivo rastreado). Os dois julgam
+# "chamada direta à API do provedor FORA do adapter" — o adapter (este diretório) é o único lugar
+# onde ela é legítima.
+#
+# Formato: <provider><TAB><padrão>. O padrão é do `re` do PYTHON (não POSIX: nada de [[:space:]]) e
+# casa o HOST e o começo do caminho, sem o esquema — quem lê acrescenta `//` antes quando julga código.
+# Provider é o mesmo id de TASK_MANAGER_PROVIDER e do nome do executável em adapters/<p>.py|.sh.
+#
+# Teto: lista é vocabulário. Host novo (região, gateway OAuth, versão de API) que não estiver aqui
+# passa calado nas duas guardas — acrescente a linha quando o adapter medir o host.
+linear	api\.linear\.app
+clickup	api\.clickup\.com
+jira	[^/\s'"]+\.atlassian\.net/rest/|api\.atlassian\.com/ex/jira/
+asana	app\.asana\.com/api/
+zoho	projectsapi\.zoho\.[a-z.]+/|(?:www\.)?zohoapis\.[a-z.]+/|projects\.zoho\.[a-z.]+/(?:api|restapi)/

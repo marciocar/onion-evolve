@@ -111,10 +111,16 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
-    confidence: 0.6
-    verified_against: "pedido do maestro 2026-10-08, depois de elevar o dogfood por comando real a fluxo obrigatório; projeção no Linear: SAC-75, bloqueado por SAC-65"
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "pedido do maestro 2026-10-08, depois de elevar o dogfood por comando real a fluxo obrigatório; projeção no Linear: SAC-75, bloqueado por SAC-65. Fechada em 2026-10-12 pela forja (branch feat/guard-direct-provider-api): o veto pretooluse-direct-provider-api.sh e a REGRA 105; a medição e os tetos moram no grafo guard-direct-provider-api-2026-10"
+    provenance:
+      source: "docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml"
+      locator: "D_DOIS_SUBSTRATOS_UMA_FRONTEIRA e E_DEFEITO_SESSAO_CHAMA_O_LINEAR_DIRETO"
+      method: "medição: censo de guardas, varredura dos transcripts e bancada com mutantes (run_direct_provider_api_selftests)"
+      locality: "repo"
     label: "guarda que acusa chamada direta à API de provedor de task manager fora do adapter executável; só nasce depois do SAC-65"
     narrative: "guarda (forjada pelo /meta:forge-guard) que acusa chamada direta à API de provedor de task manager (api.linear.app, zohoapis, api.clickup.com, Jira, Asana) fora do adapter executável; só nasce depois do adapter executável (SAC-65), porque antes dele barraria o único caminho que existe"
 edges:
