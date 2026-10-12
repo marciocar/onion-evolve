@@ -36,8 +36,13 @@
 #    do modelo e arquivos FORA do repo; `bash .claude/utils/task-manager/tm.sh …` não cita host;
 #  · texto que só CITA o host: `git commit -m`, `echo`, `grep`, heredoc lido por `cat` (documentar ≠ chamar);
 #  · arquivo DENTRO do repo (rastreado é da REGRA 105; não rastreado, calado);
-#  · host montado em tempo de execução, variável vinda de fora da string, `cat x | python3 -`, `<<<`,
-#    WebFetch (não leva cabeçalho de auth), cliente que não está na lista;
+#  · host montado em tempo de execução (`f'https://{HOST}/…'`), host sem `//` (`HTTPSConnection('host')`),
+#    variável vinda de fora da string, `cat x | python3 -`, `<<<`, `perl -ne`, `env -S`, `uv run x.py`,
+#    WebFetch (não leva cabeçalho de auth), cliente que não está na lista (medidos pelo Elenxo, 2026-10-12);
+#  · em CÓDIGO (b, c) o host tem de estar a até 3 linhas de um idioma de rede FORA de literal de string, sem
+#    contar comentário nem linha de `import`: texto que cita a chamada cala, chamada com o endpoint numa
+#    constante a mais de 3 linhas passa. Em CLIENTE (a) o host tem de ABRIR o argumento (o destino), nunca
+#    aparecer num `?q=`, num corpo `-d` ou num cabeçalho. Heredoc no stdin de um SCRIPT é dado, não código;
 #  · sem python3 o hook cala: o adapter do Linear também é Python, e vetar o curl sem ele barraria o único
 #    caminho. Erra para CALAR (cláusula 4 da guard-doctrine): string que não parseia (aspas abertas) cala.
 # Escape: não há flag. Verbo que o tm.sh não tem é ACHADO — implemente em adapters/<p>.py (a REGRA 104
@@ -78,8 +83,13 @@ MAP = [(p, rx) for p, rx in load_map(os.environ.get("ONION_MAP", ""))
 if not MAP:
     sys.exit(0)
 URL = [(p, re.compile(r"//(?:" + rx.pattern + r")")) for p, rx in MAP]
+# idioma de rede de BIBLIOTECA: `curl`/`wget` em código Python/Node são palavra, não chamada (Elenxo, achado 1)
 NET = re.compile(r"urllib|urlopen|\brequests\.|http\.client|httpx|aiohttp|\bfetch\s*\(|axios|XMLHttpRequest|"
-                 r"\bcurl\b|\bwget\b|Net::HTTP|LWP::|HTTP::Tiny|Invoke-(?:WebRequest|RestMethod)|undici")
+                 r"Net::HTTP|LWP::|HTTP::Tiny|Invoke-(?:WebRequest|RestMethod)|undici")
+CODE_COMMENT = re.compile(r"^\s*(?:#|//)")
+STRLIT = re.compile(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'|`(?:\\.|[^`\\])*`')
+IMPORT = re.compile(r"^\s*(?:import\s|from\s+\S+\s+import\s|(?:const|let|var)\s+\w+\s*=\s*require\(|use\s)[^;]*;?\s*$")  # import não é chamada
+WINDOW = 3    # o host e o idioma de rede na MESMA instrução, aproximada por janela de linhas
 CLIENTS = {"curl", "wget", "http", "https", "xh", "xhs", "httpie", "aria2c"}
 SHELLS = {"bash", "sh", "zsh", "dash", "ksh"}
 INLINE = {"node": {"-e", "--eval", "-p", "--print"}, "bun": {"-e", "--eval"}, "deno": {"eval"},
@@ -94,22 +104,37 @@ def interp_kind(base):
         return "python"
     return base if base in INLINE else None
 
-def host_in(text, url_only):
+def host_in(text, url_only, anchored=False):
     for p, rx in (URL if url_only else MAP):
-        if rx.search(text):
+        if anchored:
+            # argumento de cliente: o host ABRE a URL (com ou sem esquema, `--url=` aceito). Host num `?q=`, num
+            # corpo `-d` ou num cabeçalho não é o destino da chamada (Elenxo, achado 4)
+            if re.match(r"^['\"]?(?:--?[A-Za-z-]+=)?(?:[A-Za-z][A-Za-z0-9+.-]*:)?(?://)?(?:" + rx.pattern + r")", text):
+                return p
+        elif rx.search(text):
             return p
     return None
 
 def judge_code(text, form):
-    if NET.search(text):
-        p = host_in(text, True)
-        if p:
-            HITS.append((p, form))
+    # Código que só CITA o host (script de medição, heredoc que grava doc ou nó de KG) não é chamada: a linha de
+    # comentário sai, e o host tem de estar a até WINDOW linhas de um idioma de rede (Elenxo, achado 1).
+    lines = ["" if CODE_COMMENT.match(l) else l for l in text.split("\n")]
+    # o idioma de rede conta só FORA de literal de string: `s = 'urllib…https://host'` é texto sobre a chamada,
+    # `urllib.request.Request('https://host')` é a chamada (Elenxo, 2ª rodada: heredoc que grava doc, node -e citando)
+    net = [k for k, l in enumerate(lines) if not IMPORT.match(l) and NET.search(STRLIT.sub('""', l))]
+    if not net:
+        return
+    for k, l in enumerate(lines):
+        p = host_in(l, True)
+        if p and any(abs(k - j) <= WINDOW for j in net):
+            HITS.append((p, form)); return
 
 HD = re.compile(r"(?<!<)<<(?!<)(-?)[ \t]*(?:'([^'\n]+)'|\"([^\"\n]+)\"|\\?([A-Za-z_][A-Za-z0-9_]*))")
 
+BODIES = []   # corpos de heredoc, GLOBAIS: o `$(cat <<EOF …)` é recortado fora e julgado dentro (Elenxo, E1)
+
 def cut_heredocs(text):
-    lines, out, bodies, i = text.split("\n"), [], [], 0
+    lines, out, bodies, i = text.split("\n"), [], BODIES, 0
     while i < len(lines):
         line, pend = lines[i], []
         def rep(m):
@@ -160,6 +185,8 @@ def split_substs(s):
             subs.append(s[i + 1:j]); out.append(" __ONION_SUBST__ "); i = j + 1; continue
         if c == "\n" and q is None:
             out.append(" ; "); i += 1; continue
+        if c == "#" and q is None and (i == 0 or s[i - 1] in " \t;&|("):
+            j = s.find("\n", i); i = n if j < 0 else j; continue     # comentário de shell (Elenxo, achado 3)
         out.append(c); i += 1
     return "".join(out), subs
 
@@ -198,7 +225,7 @@ def judge_shell(text, depth=0, cwd=None):
     if depth > 4:
         return
     cwd = cwd or CWD0
-    text, bodies = cut_heredocs(text)
+    text, bodies = cut_heredocs(text)   # bodies is BODIES
     text, subs = split_substs(text)
     for sub in subs:
         judge_shell(sub, depth + 1, cwd)
@@ -235,7 +262,8 @@ def judge_segment(words, bodies, depth, cwd):
         return cwd
     base = os.path.basename(words[0])
     rest = words[1:]
-    hds = [bodies[int(m.group(1))] for w in rest for m in [re.fullmatch(r"__ONION_HD_(\d+)__", w)] if m]
+    hds = [bodies[int(m.group(1))] for w in rest for m in [re.fullmatch(r"__ONION_HD_(\d+)__", w)]
+           if m and int(m.group(1)) < len(bodies)]
     plain = [w for w in rest if not re.fullmatch(r"__ONION_HD_\d+__", w)]
     if base == "cd":
         a = first_arg(plain)
@@ -245,7 +273,7 @@ def judge_segment(words, bodies, depth, cwd):
         return cwd
     if base in CLIENTS:
         for w in plain:
-            p = host_in(expand(w), False)
+            p = host_in(expand(w), False, anchored=True)
             if p:
                 HITS.append((p, "cliente " + base)); break
         return cwd
@@ -263,12 +291,15 @@ def judge_segment(words, bodies, depth, cwd):
         return cwd
     kind = interp_kind(base)
     if base in SHELLS:
-        if "-c" in plain and plain.index("-c") + 1 < len(plain):
-            judge_shell(plain[plain.index("-c") + 1], depth + 1, cwd)
-        for b in hds:
-            judge_shell(b, depth + 1, cwd)
+        ci = next((k for k, w in enumerate(plain) if re.fullmatch(r"-[A-Za-z]*c[A-Za-z]*", w)), None)
+        if ci is not None and ci + 1 < len(plain):
+            judge_shell(expand(plain[ci + 1]), depth + 1, cwd)
+            return cwd
         a = first_arg(plain)
-        if a and "-c" not in plain:
+        if not a or a == "-":                  # shell: sem arquivo de script, o stdin é CÓDIGO (Elenxo, achado 2)
+            for b in hds:
+                judge_shell(b, depth + 1, cwd)
+        if a and a != "-":
             path = outside_repo_file(a, cwd)
             body = read_outside(path) if path else None
             if body is not None:
@@ -278,10 +309,11 @@ def judge_segment(words, bodies, depth, cwd):
         flags = {"-c"} if kind == "python" else INLINE[kind]
         for k, w in enumerate(plain):
             if w in flags and k + 1 < len(plain):
-                judge_code(plain[k + 1], "codigo embutido " + base); return cwd
-        for b in hds:
-            judge_code(b, "heredoc " + base)
+                judge_code(expand(plain[k + 1]), "codigo embutido " + base); return cwd
         a = first_arg(plain)
+        if not a or a == "-":                  # interpretador: com arquivo de script, o heredoc é DADO (Elenxo, achado 2)
+            for b in hds:
+                judge_code(b, "heredoc " + base)
         if a and a != "-":
             path = outside_repo_file(a, cwd)
             body = read_outside(path) if path else None
@@ -394,6 +426,26 @@ EOF"
   _c "(xii) provedor SEM executável (clickup): o curl é o caminho que o adapter prescreve" 0 "curl -s https://${Hc}/api/v2/user" clickup
   _c "(xiii) provedor com executável mas INATIVO" 0 "curl -s https://${H}/graphql" jira
   _c "(xiv) aspas abertas: não se prova, cala" 0 "curl -s 'https://${H}/graphql"
+  # ── os achados do Elenxo (2026-10-12), cada um com mutante na bancada ──
+  _c "(xv) heredoc em \$(…) antes do curl não derruba o juiz (E1)" 2 "git commit -m \"\$(cat <<'EOF'
+msg
+EOF
+)\" && curl -s https://${H}/graphql -H 'Authorization: x'"
+  _c "(xvi) heredoc é DADO no stdin de um script: cala (achado 2)" 0 "bash .claude/utils/task-manager/tm.sh comment.add SAC-75 - <<'EOF'
+curl -s https://${H}/graphql era o defeito
+EOF"
+  _c "(xvii) comentário de shell com parênteses cala (achado 3)" 0 "# nao chamar direto (curl https://${H}/graphql), usar o adapter
+bash .claude/utils/task-manager/tm.sh item.read SAC-75"
+  _c "(xviii) host fora do DESTINO do cliente (busca, corpo) cala (achado 4)" 0 "curl -s 'https://html.duckduckgo.com/html/?q=${H}+graphql' -d '{\"t\":\"https://${H}\"}'"
+  _c "(xix) heredoc python que grava texto citando a chamada cala (achado 1)" 0 "python3 - <<'EOF'
+s = 'O caso: urllib.request.Request(\"https://${H}/graphql\")'
+open('/dev/null', 'w').write(s)
+EOF"
+  _c "(xx) heredoc de interpretador dentro de \$(…) é julgado (E11)" 2 "x=\$(python3 - <<'EOF'
+import urllib.request
+print(urllib.request.urlopen('https://${H}/graphql').read())
+EOF
+)"
   rm -rf "${d}"
   echo "selftest: ${ok}/${tot} verdes"
   [ "${ok}" -eq "${tot}" ]

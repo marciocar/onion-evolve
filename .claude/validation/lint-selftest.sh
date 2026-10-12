@@ -27587,13 +27587,13 @@ run_direct_provider_api_selftests() {
   local o rc H; H="api.linear"; H="${H}.app"
   # (a) o --selftest do hook: 7 acusa + 7 cala, pelo caminho do runner (JSON no stdin, CLAUDE_PROJECT_DIR)
   if o="$(LC_ALL=C bash "${hook}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 14/14 verdes' <<< "${o}"; then
-    record_pass "direct-provider-api: (a) hook --selftest verde (14: heredoc verbatim, curl, -c, variável, avulso, gravado-e-rodado, bash -c | tm.sh, citação, cat, sem rede, sem executável, inativo, aspas abertas)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 20/20 verdes' <<< "${o}"; then
+    record_pass "direct-provider-api: (a) hook --selftest verde (20: heredoc verbatim, curl, -c, variável, avulso, gravado-e-rodado, bash -c | tm.sh, citação, cat, sem rede, sem executável, inativo, aspas abertas | Elenxo: heredoc em $(…), stdin de script, comentário, destino do cliente, texto citando a chamada, interpretador em $(…))"
   else record_fail "direct-provider-api: (a) hook --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) o --selftest da REGRA 105
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 10/10 verdes' <<< "${o}"; then
-    record_pass "direct-provider-api: (b) REGRA 105 --selftest verde (10: ops/ promovido, variável, jira sem executável, workflow | adapter, markdown, comentário, sem rede, não rastreado, sem mapa)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 11/11 verdes' <<< "${o}"; then
+    record_pass "direct-provider-api: (b) REGRA 105 --selftest verde (11: ops/ promovido, variável, jira sem executável, workflow | adapter, markdown, comentário, sem rede, não rastreado, sem mapa, docstring/mensagem/medição)"
   else record_fail "direct-provider-api: (b) REGRA 105 --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (c) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: passivo zero.
   #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
@@ -27656,13 +27656,18 @@ EOF")"
   done <<'EOF_MUT'
 hook@@@judge_code(b, "heredoc " + base)@@@None@@@(i)
 hook@@@    if base in CLIENTS:@@@    if False:@@@(ii)
-hook@@@p = host_in(expand(w), False)@@@p = host_in(w, False)@@@(iv)
+hook@@@host_in(expand(w), False, anchored=True)@@@host_in(w, False, anchored=True)@@@(iv)
 hook@@@return open(path, encoding="utf-8", errors="replace").read()@@@return None@@@(v)
 hook@@@WRITES[path] = hds[0]@@@pass@@@(vi)
 hook@@@judge_shell(sub, depth + 1, cwd)@@@None@@@(vii)
 hook@@@    if base in CLIENTS:@@@    if base in CLIENTS or base in ("git", "echo", "grep"):@@@(ix)
 hook@@@if base in ("cat", "tee") and hds:@@@if [judge_shell(b, depth + 1, cwd) for b in hds] and False:@@@(x)
-hook@@@    if NET.search(text):@@@    if True:@@@(xi)
+hook@@@NET = re.compile(r"urllib|@@@NET = re.compile(r"|urllib|@@@(xi)
+hook@@@lines, out, bodies, i = text.split("\n"), [], BODIES, 0@@@lines, out, bodies, i = text.split("\n"), [], [], 0@@@(xx)
+hook@@@if not a or a == "-":                  # shell:@@@if True:                  # shell:@@@(xvi)
+hook@@@if c == "#" and q is None and (i == 0 or s[i - 1] in " \t;&|("):@@@if False:@@@(xvii)
+hook@@@host_in(expand(w), False, anchored=True)@@@host_in(expand(w), False)@@@(xviii)
+hook@@@NET.search(STRLIT.sub('""', l))@@@NET.search(l)@@@(xix)
 hook@@@if os.path.isfile(os.path.join(ADAPTERS, p + ".py")) or os.path.isfile(os.path.join(ADAPTERS, p + ".sh"))]@@@if True]@@@(xii)
 hook@@@[ -n "${p}" ] && [ "${p}" = "${active}" ] || continue@@@[ -n "${p}" ] || continue@@@(xiii)
 hook@@@return                               # aspas abertas: não se prova — CALA@@@toks = text.split()@@@(xiv)
@@ -27670,8 +27675,9 @@ check@@@hit = next((p for p, rx in pats if rx.search(ln)), None)@@@hit = None@@@
 check@@@wf = rel.startswith(".github/workflows/") and rel.endswith((".yml", ".yaml"))@@@wf = False@@@(x)
 check@@@ or "utils/task-manager/" in "/" + rel:@@@:@@@(iv)
 check@@@EXT = (".sh",@@@EXT = (".md", ".sh",@@@(v)
-check@@@        if COMMENT.match(ln):@@@        if False:@@@(vi)
-check@@@    if not NET.search(text):@@@    if False:@@@(vii)
+check@@@COMMENT.match(ln) or MSG.match(ln)@@@MSG.match(ln)@@@(vi)
+check@@@net_rx = NET_SHELL if shellish else NET_CODE@@@net_rx = re.compile(r".")@@@(vii)
+check@@@lines.append("" if COMMENT.match(ln) or MSG.match(ln) else ln)@@@lines.append("" if COMMENT.match(ln) else ln)@@@(xi)
 check@@@git -C "${repo}" ls-files -z 2>/dev/null |@@@find "${repo}" -type f -not -path "*/.git/*" -printf "%P\0" 2>/dev/null |@@@(viii)
 check@@@if [ ! -f "${map}" ]; then@@@if false; then@@@(ix)
 EOF_MUT
