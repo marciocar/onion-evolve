@@ -1,7 +1,7 @@
 ---
 branch: docs/sac-52-playbook-decision
 date: 2026-10-11
-reviewed_diff_sha256: 00f6f57b26d91fdf82930bb944b0cc2169ccc607c1b530c245ec16230b75b53e
+reviewed_diff_sha256: 13d175ab03b217541eda5dd7f58397949207ff391aa6699f566ed530c6e33074
 reviewed_code_sha256: 3a0bd0e3019d2dca55ed4d17127928879fa66bc1f187c1b4f064687746d487cf
 findings_total: 3
 findings_real: 3
