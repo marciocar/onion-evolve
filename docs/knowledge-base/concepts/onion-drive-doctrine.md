@@ -20,7 +20,7 @@ O driver opera num **degrau declarado**, nunca acima:
   **Decisão do maestro (2026-10-12, SAC-74): no AUTOMATE o merge é POR PADRÃO.** A sua ordem de
   2026-08-18 ("até o final" = executar → commit → PR → **MERGE**, sem pedir de novo) vira degrau.
   As 3 pré-condições ganham nome concreto nesta casa:
-  - o **enabler** é o `ops/pr-merge-verified.sh`, o único caminho de merge; o hook `merge-gate` veta
+  - o **enabler** é o `ops/pr-merge-verified.sh` (core-only), o único caminho de merge; o hook `merge-gate` veta
     qualquer outro com exit 2;
   - a **path-allowlist** é a parada dura "path vendorizado/outward-facing" (REGRA 36 e REGRA 30);
   - a **política mecânica** são as **paradas duras**, todas PARA:
@@ -86,7 +86,7 @@ P6   PARA             nenhuma passada nova enquanto o checkpoint pende (batch-co
 | **REFUTED/SUPERSEDED de nó NUNCA SELADO** (§4.1) | mesmo ato, mas o par nasce e cai no MESMO PR | **AUTO nas 4 precondições** (`kg-seal-exception.sh`); a 4ª — o flip nomeado na `drive_checkpoint_note` do lote — mecanizada em 2026-10-04 |
 | verification **UNVERIFIABLE** | `blocked_by`, **não carimba** | **AUTO** (não-escrita; 1ª classe) |
 | execution → PR-verde | conduz em worktree | **AUTO até o PR** |
-| **merge no main** | — | **AUDIT: PARA** (100% humano, em lote) · **AUTOMATE: AUTO** pelo `ops/pr-merge-verified.sh`, salvo parada dura (§0; decisão de 2026-10-12, aberta só com o SAC-114) |
+| **merge no main** | — | **AUDIT: PARA** (100% humano, em lote) · **AUTOMATE: AUTO** pelo `ops/pr-merge-verified.sh` (core-only), salvo parada dura (§0; decisão de 2026-10-12, aberta só com o SAC-114) |
 | **decisão não-tomada** | frame + Elenxo + propõe | **PARA** (selo humano) |
 | drift tipo-(c) estrutural | novo nó + `SUPERSEDES` datado | **AUTO** (realign repara determinístico) |
 | **MOAT** | — | **NUNCA / PARA** |
