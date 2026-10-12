@@ -10332,14 +10332,16 @@ run_evolve_workflow_selftests() {
   # STUB: cada scan devolve 3 achados — dois blocker (indices 0 e 1) e um opportunistic (2). O juiz
   # refuta SO o indice 1: assim correlacionar por indice em vez de id, ou nao filtrar nada, REPROVA
   # (a 1a versao refutava o indice 0 e os dois mutantes passavam — o Elenxo provou o caso decorativo).
-  # MODE: '' normal · 'null-verdict' juiz devolve null · 'throw-D2' o scan de D2 lanca.
-  _evw_run() {   # $1 = args JSON, $2 = MODE; imprime {r, calls, logs, schemas_ok}
-    { printf 'const args=%s;const MODE=%s;const CALLS=[];const SCH=[];\n' "$1" "\"$2\""
-      printf '%s\n' 'const agent=async(p,o)=>{CALLS.push(o.label);if(o.schema)SCH.push(o.schema);if(o.label.startsWith("scan:")){if(MODE==="throw-D2"&&o.label==="scan:D2")throw new Error("boom");return{total_seen:3,findings:[0,1,2].map(i=>({severity:i<2?"blocker":"opportunistic",finding:"f"+i,evidence:"e",target_artifact:"t",effort:"S",exec_command:"x"}))}}if(MODE==="null-verdict")return null;return{refuted:/-1$/.test(o.label),vetoed_phase_merge:false,reasoning:"r"}};'
-      printf '%s\n' 'const pipeline=async(items,...st)=>Promise.all(items.map(async(i,ix)=>{try{let r=i;for(const f of st)r=await f(r,i,ix);return r}catch(e){return null}}));const parallel=async(th)=>Promise.all(th.map(async t=>{try{return await t()}catch(e){return null}}));const phase=()=>{};const LOGS=[];const log=(m)=>LOGS.push(m);'
+  # MODE: '' normal · 'null-verdict' juiz devolve null · 'throw-D2' o scan de D2 lanca ·
+  #       'census-ok' o Census devolve o raio-X inteiro · 'census-cut' devolve a secao 7 sem o fecho.
+  #       Fora dos dois census-*, o agente do Census devolve null (morreu).
+  _evw_run() {   # $1 = args JSON, $2 = MODE; imprime {r, calls, logs, schemas_ok, maqp, ev}
+    { printf 'const args=%s;const MODE=%s;const CALLS=[];const SCH=[];const MAQP=[];const EV=[];\n' "$1" "\"$2\""
+      printf '%s\n' 'const agent=async(p,o)=>{CALLS.push(o.label);EV.push("A:"+o.label);if(o.schema)SCH.push(o.schema);if(o.label==="scan:MAQ")MAQP.push(p);if(o.label==="census"){if(MODE==="census-ok")return{stdout:"# raio-X\n## 6. A IDADE\n  x\n## 7. CONFRONTO\n  · alvo-x $& $1\n## O QUE NÃO FOI MEDIDO\n  todos\n",rc:0};if(MODE==="census-cut")return{stdout:"## 7. CONFRONTO\n  · resumo do agente",rc:0};return null}if(o.label.startsWith("scan:")){if(MODE==="throw-D2"&&o.label==="scan:D2")throw new Error("boom");return{total_seen:3,findings:[0,1,2].map(i=>({severity:i<2?"blocker":"opportunistic",finding:"f"+i,evidence:"e",target_artifact:"t",effort:"S",exec_command:"x"}))}}if(MODE==="null-verdict")return null;return{refuted:/-1$/.test(o.label),vetoed_phase_merge:false,reasoning:"r"}};'
+      printf '%s\n' 'const pipeline=async(items,...st)=>Promise.all(items.map(async(i,ix)=>{try{let r=i;for(const f of st)r=await f(r,i,ix);return r}catch(e){return null}}));const parallel=async(th)=>Promise.all(th.map(async t=>{try{return await t()}catch(e){return null}}));const phase=()=>{};const LOGS=[];const log=(m)=>{LOGS.push(m);EV.push("L:"+m)};'
       printf '%s\n' 'const sub=(o)=>!o||typeof o!=="object"?true:((o.required||[]).every(k=>o.properties&&k in o.properties)&&Object.values(o.properties||{}).every(sub)&&sub(o.items));'
       printf '(async()=>{\n'; awk 'f{print} /^}$/ && !f {f=1}' "${wf}"
-      printf '\n})().then(r=>console.log(JSON.stringify({r,calls:CALLS.length,logs:LOGS,schemas_ok:SCH.length>0&&SCH.every(sub)})));\n'; } > "${d}/run.mjs"
+      printf '\n})().then(r=>console.log(JSON.stringify({r,calls:CALLS.length,logs:LOGS,schemas_ok:SCH.length>0&&SCH.every(sub),maqp:MAQP,ev:EV})));\n'; } > "${d}/run.mjs"
     node "${d}/run.mjs" 2>&1
   }
   local _o
@@ -10347,10 +10349,13 @@ run_evolve_workflow_selftests() {
   if grep -q '"error":"dimensão D4 é composição' <<< "${_o}" && grep -q '"calls":0' <<< "${_o}"; then
     record_pass "evolve-workflow: (b) D4 RECUSADO sem gastar agente (composicao e do contexto principal)"
   else record_fail "evolve-workflow: (b) D4" "${_o:0:200}"; fi
+  # (c) sem maqTargets e com o Census MORTO, a MAQ nao roda, sai em skipped E em not_measured com o
+  #     motivo — nunca alvo inventado
   _o="$(_evw_run '{}' '')"
-  if grep -q '"skipped":\["MAQ"\]' <<< "${_o}" && grep -q 'MAQ: sem maqTargets' <<< "${_o}" && ! grep -q '"d":"MAQ"' <<< "${_o}"; then
-    record_pass "evolve-workflow: (c) sem o raio-X a MAQ NAO roda e sai em skipped (nunca alvo inventado)"
-  else record_fail "evolve-workflow: (c) MAQ sem alvos" "${_o:0:240}"; fi
+  if grep -q '"skipped":\["MAQ"\]' <<< "${_o}" && grep -q 'MAQ: Census: o agente não devolveu' <<< "${_o}" \
+     && grep -q '"d":"MAQ","reason":"Census: o agente não devolveu' <<< "${_o}" && ! grep -q '"maqp":\["' <<< "${_o}"; then
+    record_pass "evolve-workflow: (c) sem o raio-X (Census morto) a MAQ NAO roda: skipped + not_measured com motivo (nunca alvo inventado)"
+  else record_fail "evolve-workflow: (c) MAQ sem alvos" "${_o:0:300}"; fi
   # (d) o refutado sai POR ID: D1-1 em refuted e AUSENTE de survived; D1-0 julgado e vivo
   _o="$(_evw_run '{"dims":["D1"]}' '')"
   local _surv; _surv="$(python3 -c 'import json,sys;d=json.load(sys.stdin)["r"];print(" ".join(f["id"] for f in d["survived"]),"|"," ".join(f["id"] for f in d["refuted"]))' <<< "${_o}" 2>&1)"
@@ -10371,11 +10376,66 @@ run_evolve_workflow_selftests() {
   # (g) entrada ruim RECUSA (args string valido e parseado; cap invalido recusa) e schemas tem required ⊆ properties
   _o="$(_evw_run '"{\"dims\":[\"d1\"]}"' '')"
   local _g=0
-  grep -q '"d":"D1"' <<< "${_o}" && grep -q '"schemas_ok":true' <<< "${_o}" && ! grep -q '"d":"D2"' <<< "${_o}" || _g=1
+  # ⚠️ o "D2 nao rodou" e lido DENTRO de `dims`: desde 2026-10-12 o D2 aparece em `not_measured`
+  #    (com o motivo "nao pedida"), e o grep solto passava a reprovar a cobertura declarada.
+  grep -q '"dims":\[{"d":"D1"' <<< "${_o}" && grep -q '"schemas_ok":true' <<< "${_o}" && ! grep -qE '"dims":\[[^]]*"d":"D2"' <<< "${_o}" || _g=1
   _o="$(_evw_run '{"cap":0}' '')"; grep -q '"error":"cap tem de ser inteiro' <<< "${_o}" || _g=1
   grep -qE 'Date\.now|Math\.random|new Date\(\)' "${wf}" && _g=1
   if [ "${_g}" -eq 0 ]; then record_pass "evolve-workflow: (g) args string parseado (d1 normalizado), cap invalido recusa, schemas consistentes, sem relogio"
   else record_fail "evolve-workflow: (g) entrada/schema" "${_o:0:200}"; fi
+
+  # ── A COBERTURA DECLARADA (sinal do adotante onion-kg-ssot, 2026-10-12) ──────────────────────
+  # Disparado pelo NOME, sem args, o workflow cobria 6 de 10 dimensoes em silencio: D4/D5/D9/D10 nem
+  # apareciam, `skipped` misturava "nao pedida" com "sem alvo", e o retorno nao dizia por que.
+  # (h) TODA dimensao das 10 (+MAQ) esta em measured OU em not_measured com motivo, D4/D5/D9/D10
+  #     SEMPRE com o motivo de composicao, e complete=false — daqui sozinho nunca e completo.
+  _o="$(_evw_run '{"dims":["D1"]}' '')"
+  local _h
+  _h="$(python3 -c '
+import json,sys
+r=json.load(sys.stdin)["r"]; nm={x["d"]:x["reason"] for x in r["not_measured"]}
+alld=["D%d"%i for i in range(1,11)]+["MAQ"]
+ok = r["complete"] is False and sorted(r["measured"]+list(nm))==sorted(alld) and not set(r["measured"])&set(nm)
+ok = ok and all("composição" in nm.get(d,"") for d in ["D4","D5","D9","D10"]) and "não pedida" in nm.get("D2","") and r["measured"]==["D1"]
+print("OK" if ok else "BAD "+json.dumps(r.get("not_measured"))[:240]+" measured="+json.dumps(r.get("measured")))' <<< "${_o}" 2>&1)"
+  if [ "${_h}" = "OK" ] && grep -q '"calls":' <<< "${_o}" && ! grep -q '"A:census"' <<< "${_o}"; then
+    record_pass "evolve-workflow: (h) as 10 dimensoes contabilizadas (measured|not_measured com motivo), D4/D5/D9/D10 sempre declaradas, complete=false, sem Census quando MAQ nao foi pedida"
+  else record_fail "evolve-workflow: (h) cobertura" "${_h}"; fi
+
+  # (i) Census OK: os alvos da MAQ sao a secao 7 VERBATIM (inclusive `$&`, que um .replace de string
+  #     corromperia) e a MAQ sai de not_measured
+  _o="$(_evw_run '{}' 'census-ok')"
+  _h="$(python3 -c '
+import json,sys
+d=json.load(sys.stdin); r=d["r"]; p=(d["maqp"] or [""])[0]
+nm=[x["d"] for x in r["not_measured"]]
+ok = "MAQ" in r["measured"] and "MAQ" not in nm and p.endswith("ALVOS DO RAIO-X:\n## 7. CONFRONTO\n  · alvo-x $& $1\n## O QUE NÃO FOI MEDIDO\n  todos") and "## 6. A IDADE" not in p
+print("OK" if ok else "BAD prompt-tail="+repr(p[-160:])+" nm="+repr(nm))' <<< "${_o}" 2>&1)"
+  if [ "${_h}" = "OK" ]; then
+    record_pass "evolve-workflow: (i) sem maqTargets o Census levanta os alvos: a secao 7 entra VERBATIM no prompt da MAQ (sem as secoes anteriores)"
+  else record_fail "evolve-workflow: (i) Census ok" "${_h}"; fi
+
+  # (j) Census CORTADO (secao 7 sem o cabecalho de fecho = resumo do agente) e RECUSADO: MAQ nao roda
+  _o="$(_evw_run '{}' 'census-cut')"
+  if grep -q '"d":"MAQ","reason":"Census: a saída não trouxe a seção 7 inteira' <<< "${_o}" && grep -q '"maqp":\[\]' <<< "${_o}"; then
+    record_pass "evolve-workflow: (j) saida do Census sem o fecho da secao 7 e RECUSADA (MAQ nao roda com resumo do agente)"
+  else record_fail "evolve-workflow: (j) Census cortado" "${_o:0:300}"; fi
+
+  # (k) o que fica de fora e logado ANTES do primeiro agente — nao no meio do run
+  _o="$(_evw_run '{}' '')"
+  _h="$(python3 -c '
+import json,sys
+ev=json.load(sys.stdin)["ev"]
+ok = bool(ev) and ev[0].startswith("L:FORA desta rodada") and "D4 (composição" in ev[0] and "D10 (composição" in ev[0] and "Census" in ev[0]
+print("OK" if ok else "BAD "+repr(ev[:2])[:240])' <<< "${_o}" 2>&1)"
+  if [ "${_h}" = "OK" ]; then
+    record_pass "evolve-workflow: (k) o FORA DESTA RODADA (D4/D5/D9/D10 + dependencia do Census) e o 1o evento, antes de qualquer agente"
+  else record_fail "evolve-workflow: (k) log no inicio" "${_h}"; fi
+
+  # (l) whenToUse diz que o atalho e parcial e aponta o caminho completo
+  if grep -qE "whenToUse: '.*6 das 10.*/meta:evolve" "${wf}"; then
+    record_pass "evolve-workflow: (l) meta.whenToUse declara o atalho parcial (6/10) e o caminho completo /meta:evolve"
+  else record_fail "evolve-workflow: (l) whenToUse" "o meta.whenToUse nao declara a cobertura parcial"; fi
   rm -rf "${d}"
 }
 
@@ -10440,7 +10500,9 @@ run_evolve_census_selftests() {
 
   # (g) VERDE FALSO: medidor de idade QUEBRADO (rc=2) nunca produz ✅. A 1ª versão imprimia
   #     "✅ auto-auditoria fresca" porque a contagem de sinais dava zero sobre saída vazia.
-  d="$(mktemp -d)"; _evc_sandbox "${d}"
+  # ⚠️ A SANDBOX TEM `docs/analysis/` desde 2026-10-12: sem a pasta o raio-X declara OPT-OUT antes de
+  #    chamar o medidor (caso (k)), e este caso deixaria de exercitar o medidor QUEBRADO.
+  d="$(mktemp -d)"; _evc_sandbox "${d}"; mkdir -p "${d}/docs/analysis"
   printf '#!/usr/bin/env bash\nexit 2\n' > "${d}/.claude/validation/evolve-staleness-check.sh"
   local _g; _g="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
   if ! grep -q '✅ auto-auditoria fresca' <<< "${_g}" && grep -q 'NÃO MEDIDA' <<< "${_g}"; then
@@ -10488,6 +10550,61 @@ FAKE
   if grep -q 'NAO-MEDIVEL: 1 skill' <<< "${_j}" && grep -q 'rules/r.md' <<< "${_targets}" && ! grep -q 'skills/s/SKILL.md' <<< "${_targets}"; then
     record_pass "evolve-census: (j) skill NAO-MEDIVEL sai em 'nao medido', nunca como alvo; a rule NUNCA segue alvo"
   else record_fail "evolve-census: (j) skill cega" "$(grep -E 'NAO-MEDIVEL|SKILL|r.md' <<< "${_j}" | tr '\n' '|' | cut -c1-300)"; fi
+  rm -rf "${d}"
+
+  # ── SINAL DO ADOTANTE onion-kg-ssot (2026-10-12): dois verdes falsos e um alvo falso ─────────
+  # (k) OPT-OUT NAO E FRESCOR: sem `docs/analysis/`, a guarda REAL da REGRA 97 sai rc 0 e vazia, e o
+  #     raio-X imprimia "✅ auto-auditoria fresca" num repo que nunca rodou a auditoria. Usa a guarda
+  #     VERDADEIRA (copiada), nao um falso: o defeito era a leitura do silencio dela.
+  d="$(mktemp -d)"; _evc_sandbox "${d}"
+  cp "${REPO_ROOT}/.claude/validation/evolve-staleness-check.sh" "${d}/.claude/validation/"
+  local _k _kt; _k="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
+  _kt="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --tsv 2>&1 || true)"
+  if ! grep -q '✅ auto-auditoria fresca' <<< "${_k}" && grep -q '? NÃO MEDIDA (opt-out: sem docs/analysis/)' <<< "${_k}" \
+     && grep -q 'idade — NAO-MEDIDA (opt-out)' <<< "${_k}" && grep -qE '^autoauditoria	sinais	[?]$' <<< "${_kt}"; then
+    record_pass "evolve-census: (k) sem docs/analysis/ (opt-out da REGRA 97) a idade sai '?' com motivo nos dois modos — nunca ✅"
+  else record_fail "evolve-census: (k) opt-out virou verde" "[$(grep -A1 '## 6' <<< "${_k}" | tr '\n' '|')] tsv=[$(grep autoauditoria <<< "${_kt}")]"; fi
+  rm -rf "${d}"
+
+  # (l) PLANO NO ADOTANTE e n/a, nao AUSENTE (o plano do core nao viaja). E o PAR: no core (sem o
+  #     carimbo) a ausencia continua lacuna nomeada.
+  d="$(mktemp -d)"; _evc_sandbox "${d}"; printf 'x\n' > "${d}/.claude/.onion-version"
+  local _l; _l="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
+  rm -f "${d}/.claude/.onion-version"
+  local _l2; _l2="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
+  if grep -q 'fila-pronta=n/a no adotante' <<< "${_l}" && ! grep -q 'plano — AUSENTE' <<< "${_l}" \
+     && grep -q 'plano — AUSENTE: docs/onion/graph/fios-abertos.kg.yaml' <<< "${_l2}"; then
+    record_pass "evolve-census: (l) plano ausente no ADOTANTE sai n/a; no core segue AUSENTE nomeado (o par)"
+  else record_fail "evolve-census: (l) plano no adotante" "adotante=[$(grep -E 'fila-pronta|plano' <<< "${_l}" | tr '\n' '|')] core=[$(grep 'plano' <<< "${_l2}" | tr '\n' '|')]"; fi
+  rm -rf "${d}"
+
+  # (m) "VIGIADO" EXIGE ELO ESTRUTURAL (MAQ-0, blocker): citacao em COMENTARIO ou em MENSAGEM nao
+  #     conta; o CAMINHO em codigo conta, para comando e para skill. E a secao 7 separa comando de
+  #     skill (MAQ-3) e NOMEIA os 1/7, como a secao 1 promete.
+  d="$(mktemp -d)"; _evc_sandbox "${d}"
+  cat > "${d}/.claude/validation/forge-census.sh" <<'FAKE'
+#!/usr/bin/env bash
+printf 'pecas\tcandidato\tdoutrina\tcontexto\tworkflow\tdestino\tlente\tbancada\tcaminho\n'
+printf '1\tfoo\t0\t0\t0\t0\t0\t0\t.claude/commands/meta/foo.md\n'
+printf '1\tbar\t0\t0\t0\t0\t0\t0\t.claude/commands/meta/bar.md\n'
+printf '1\tbaz\t0\t0\t0\t0\t0\t0\t.claude/skills/baz/SKILL.md\n'
+FAKE
+  cat > "${d}/.claude/validation/a-check.sh" <<'FAKE'
+#!/usr/bin/env bash
+# o /meta:foo rodava assim — .claude/commands/meta/foo.md (comentario: CITACAO, nao elo)
+_msg="dano medido: o /meta:foo em .claude/commands/meta/foo.md"
+printf 'veja .claude/commands/meta/foo.md\n'
+x=1  # cauda: .claude/commands/meta/foo.md
+FAKE
+  printf '#!/usr/bin/env bash\nPAIRS=(\n  ".claude/utils/x.sh|.claude/commands/meta/bar.md"\n)\n' > "${d}/.claude/validation/b-check.sh"
+  printf '#!/usr/bin/env bash\nfor f in .claude/skills/baz/*; do :; done\n' > "${d}/.claude/validation/c-check.sh"
+  local _m _m7; _m="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
+  _m7="$(sed -n '/VIGIADOS por guarda/,/^## O QUE/p' <<< "${_m}")"
+  if grep -qE '^      bar$' <<< "${_m7}" && grep -qE '^      baz$' <<< "${_m7}" && ! grep -qE '^      foo$' <<< "${_m7}" \
+     && grep -q '3 superfícies com SÓ A SUPERFÍCIE (1/7): 2 comando(s) + 1 skill(s)' <<< "${_m}" \
+     && grep -qE '^      comandos: bar foo$' <<< "${_m}" && grep -qE '^      skills:   baz$' <<< "${_m}"; then
+    record_pass "evolve-census: (m) vigiado = CAMINHO em codigo (comentario/mensagem nao contam); 1/7 separados em comando x skill e nomeados"
+  else record_fail "evolve-census: (m) elo estrutural" "$(sed -n '/## 7/,/## O QUE/p' <<< "${_m}" | tr '\n' '|' | cut -c1-400)"; fi
   rm -rf "${d}"
 }
 
@@ -25764,6 +25881,15 @@ SK
   if [ "$(_fg_pecas so-comando)" = "1" ]; then
     record_pass "forge: (h) candidato SÓ em commands/meta/ é descoberto (a outra metade da varredura)"
   else record_fail "forge: (h)" "candidato de commands/meta/ não apareceu no censo"; fi
+
+  # (j) README NÃO É SUPERFÍCIE (MAQ-3, sinal onion-kg-ssot 2026-10-12): `commands/meta/README.md`
+  #     entrava como candidato 1/7 e inflava os "comandos com só a superfície" do raio-X. O par: o
+  #     comando vizinho de (h) continua no censo.
+  printf '# indice da categoria\n' > "${d}/.claude/commands/meta/README.md"
+  _fg
+  if [ -z "$(_fg_pecas README)" ] && ! grep -q 'commands/meta/README.md' <<< "${_fg_out}" && [ "$(_fg_pecas so-comando)" = "1" ]; then
+    record_pass "forge: (j) commands/meta/README.md fica FORA dos candidatos (índice não é superfície); o comando vizinho segue"
+  else record_fail "forge: (j)" "README entrou no censo como candidato: $(grep -i readme <<< "${_fg_out}" | head -c 160)"; fi
 
   # (i) CITADO MAS INEXISTENTE ⇒ ausente. O furo que a passada adversarial abriu: um .md que só
   #     citava caminhos fantasma pontuava 7/7, enquanto o docstring prometia medir PRESENÇA.

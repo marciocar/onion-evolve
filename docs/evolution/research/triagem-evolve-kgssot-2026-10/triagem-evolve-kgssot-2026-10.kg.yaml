@@ -1,0 +1,305 @@
+# kg-backlog-guard: on
+# Triagem dos dois sinais de campo do adotante onion-kg-ssot (2026-10-12) sobre o /meta:evolve rodado lá:
+# 14 achados da rodada vendorizada (D1/D2/D6/D7/D8) e 5 da dimensão MAQ. Conteúdo de sinal é DADO (R15.2):
+# cada achado foi MEDIDO no vivo do core antes de virar veredito. O que era barato e confirmado foi curado
+# no mesmo PR (fix/evolve-workflow-completeness), com bancada e mutante; o resto fica aqui, open.
+meta:
+  id: triagem-evolve-kgssot-2026-10
+  schema_version: "1"
+  baseline: "2026-10-12"
+  review_after: "2026-11-11"   # 30d: defeito de medidor e de guarda
+  # ═══ TETO: 18 NÓS ═══
+nodes:
+  - id: E_SINAIS_EVOLVE_KGSSOT_1012
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "os dois sinais lidos inteiros e copiados sem alteração para o inbox processado do core; os alvos citados conferidos no core em origin/main 50cd399d"
+    trace: "docs/evolution/inbox/_processed/2026-10-12-evolve-maq-findings.md"
+    label: "o adotante onion-kg-ssot rodou o /meta:evolve e mandou 19 achados, todos em código vendorizado do core"
+    narrative: "Dois sinais do mesmo dia. O da rodada (wf_045928e7-174) traz 14 achados em D1, D2, D6, D7 e D8, todos em arquivo byte-idêntico ao do core no pin dcdacf9ba196; a MAQ foi pulada pelo próprio workflow. O da MAQ (wf_a360563c-2f3, rodado pelo comando com a seção 7 como alvos) traz MAQ-0 a MAQ-4. O próprio pulo da MAQ e o verde falso da idade são o diagnóstico que originou a cura deste PR."
+    provenance:
+      source: "inbox do core, sinais 2026-10-12-evolve-round-vendored-findings.md e 2026-10-12-evolve-maq-findings.md"
+      locator: "tabelas MAQ-0..4 e D1-1..D8-0"
+      method: "leitura: os dois sinais inteiros; cada alvo depois medido no vivo"
+      locality: "repo"
+
+  - id: E_EVOLVE_ATALHO_DECLARA_COBERTURA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "família evolve_workflow 12/12 com LC_ALL=C (casos c, h, i, j, k, l novos ou reescritos); mutantes M6..M12 todos reprovando o caso deles"
+    trace: ".claude/workflows/evolve.js"
+    label: "CURADO: o workflow evolve disparado sem args declara o que não mediu, com motivo, e levanta os alvos da MAQ pelo raio-X"
+    narrative: "O retorno ganhou complete (true só com as 10, logo nunca do workflow sozinho), measured e not_measured com motivo por dimensão (composição, não pedida, Census recusado, lost, dead). D4/D5/D9/D10 entram sempre, com o motivo de composição. Sem maqTargets, uma fase Census (haiku/low) roda o evolve-census e o script extrai a seção 7 verbatim; exige os dois cabeçalhos (o da seção 7 e o do não-medido) e recusa resumo do agente. O que fica de fora é logado antes do primeiro agente. O whenToUse diz que o atalho cobre 6 de 10."
+    provenance:
+      source: ".claude/workflows/evolve.js e a família run_evolve_workflow_selftests"
+      locator: "casos (c) e (h) a (l); mutantes M6 a M12 por ops/mutate-and-restore.sh"
+      method: "medição: bancada com LC_ALL=C e mutante por cura"
+      locality: "repo"
+
+  - id: E_MAQ0_VIGIADO_POR_CITACAO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    verified_against: "medido no vivo: create-skill e create-vertical só aparecem em comentário (cited-directive-check.sh:6, marketplace-root-check.sh:45) e em _msg (cited-directive-check.sh:204); depois da cura a seção 7 lista co-deliver, co-evolve e co-relay, que o command-role-parity-check cita pelo caminho em código. Caso evolve-census (m) + mutantes M1, M1b, M4"
+    trace: ".claude/validation/evolve-census.sh"
+    label: "CURADO (MAQ-0, blocker confirmado): 'vigiado por guarda' agora exige o caminho da superfície numa linha de código de *-check.sh"
+    narrative: "A 1ª versão casava /meta:<cmd> em qualquer linha e dava como vigiados dois comandos que só eram citados, enquanto deixava de ver três que uma guarda lista de fato. Comentário (linha inteira ou cauda) e linha de mensagem (printf, echo, _msg=) saem antes da busca. Teto declarado: caminho dentro de outra string de código ainda conta."
+    provenance:
+      source: ".claude/validation/evolve-census.sh (seção 7) e a família run_evolve_census_selftests"
+      locator: "grep de /meta:create-skill e /meta:create-vertical nos *-check.sh; caso (m); mutantes M1, M1b, M4"
+      method: "medição: grep no vivo, bancada com LC_ALL=C e mutante por cura"
+      locality: "repo"
+
+  - id: E_MAQ3_README_E_SKILL_NO_CENSO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    verified_against: "medido: os 37 'comandos 1/7' eram 29 comandos + 7 skills + o README de commands/meta; depois da cura o raio-X diz 36 superfícies (29 comandos + 7 skills) e nomeia cada uma. Casos forge (j) e evolve-census (m); mutante M5"
+    trace: ".claude/validation/forge-census.sh"
+    label: "CURADO (MAQ-3): o README de commands/meta saiu dos candidatos do forge-census, e a seção 7 separa comando de skill e os nomeia"
+    narrative: "As skills continuam candidatas do forge-census por desenho (superfície invocável), mas o raio-X deixa de chamá-las de comandos. A seção 1 prometia 'os 1/7 estão nomeados na seção 7' e a seção 7 só dava o número: a promessa agora é verdade."
+    provenance:
+      source: ".claude/validation/forge-census.sh --tsv e o raio-X"
+      locator: "coluna caminho das linhas 1/7; caso forge (j); mutante M5"
+      method: "medição: censo no vivo, bancada e mutante"
+      locality: "repo"
+
+  - id: E_IDADE_OPTOUT_NAO_E_FRESCA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    verified_against: "caso evolve-census (k) com a guarda REAL da REGRA 97 copiada para uma sandbox sem docs/analysis: antes, ✅ auto-auditoria fresca; depois, '? NÃO MEDIDA (opt-out)' no markdown e '?' no tsv. Caso (l) para o plano n/a no adotante, com o par do core. Mutantes M2 e M3"
+    trace: ".claude/validation/evolve-census.sh"
+    label: "CURADO: sem docs/analysis o raio-X não imprime mais ✅ para a idade, e o plano do core ausente no adotante sai n/a"
+    provenance:
+      source: ".claude/validation/evolve-census.sh (seções 5 e 6) com a guarda real evolve-staleness-check.sh"
+      locator: "casos evolve-census (k) e (l); mutantes M2 e M3"
+      method: "medição: sandbox sem docs/analysis, bancada e mutante"
+      locality: "repo"
+
+  - id: Q_MAQ1_NUNCA_SEM_O_N_DA_AMOSTRA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-12"
+    verified_against: "confirmado no código: a seção 7 imprime a lista NUNCA sem o número de sessões nem a janela do log, e não distingue 'sem objeto no papel' de 'nunca casou'. Não medido no adotante (o log de cargas é local e gitignorado; no core desta worktree o medidor saiu rc=3)"
+    trace: ".claude/validation/evolve-census.sh"
+    label: "MAQ-1 (confirmado, não curado): a doutrina 'NUNCA casou' sai sem o N de sessões e sem rótulo de falta de objeto no papel"
+    narrative: "Cura proposta pelo adotante: imprimir N de sessões e a janela ao lado de NUNCA, e rotular SEM-OBJETO-NO-PAPEL reusando _rule_without_object_for_role do lint-artifacts. Não é barata aqui porque o instructions-loaded-census não expõe a janela nem o total de sessões; pede uma coluna nova lá. Gatilho: a próxima rodada do evolve num adotante, ou a próxima mudança no instructions-loaded-census."
+
+  - id: Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-12"
+    verified_against: "reproduzido no hook real por stdin sintético numa pasta SEM .env (todo veto é falso positivo): `cd sub && echo \"(x)\" && cat *` veta e `cd sub && cat *` passa; `cd sub && grep -n '.*' a.txt` veta (aspas simples julgadas como glob); `cd sub && echo \"(\" ; for f in *; do :; done` veta com a mensagem \"'for' lendo *\""
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "MAQ-2 (confirmado, não curado): o veto do .env lê texto citado como shell em três pernas — parêntese entre aspas zera a pasta, token entre aspas simples vira glob, e `for` é tomado como comando"
+    narrative: "As três pernas estão nas linhas que o adotante apontou: o '(' in RAW['cmd'] da linha do cd, o is_env_token que só tira as aspas e julga o resto como glob, e a lista de palavras-chave do shell sem `for`/`in`/`case`. A cura (decidir subshell pelos tokens do shlex, token citado não é glob, `for` nas palavras-chave) mexe na guarda mais sensível da casa e pede o molde da família env_exposure com as três sondas como casos; não coube neste PR por ordem. Gatilho: o próximo veto falso medido numa sessão, ou a próxima mudança no env-guard. Classe: a mesma de MAQ-0 e MAQ-4."
+
+  - id: C_MAQ4_EXTRATOR_REGRA59_TETO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-12"
+    verified_against: "consumed-mode-check.sh:35-41 declara o teto por escrito (a forma 6, comando dentro de mensagem de violação, não é separável por regex); nenhum sítio vivo medido hoje"
+    trace: ".claude/validation/consumed-mode-check.sh"
+    label: "MAQ-4 (teto já declarado): o extrator da REGRA 59 ainda pode ler `bash …x.sh --flag` dentro de mensagem como invocação; sem dano vivo"
+
+  - id: C_KG_MD_ACIMA_DO_ALERTA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    verified_against: "wc -l: .claude/commands/meta/kg.md = 519 (alerta 500, teto 800); adopt.md = 800, no teto e não acima (o D1-0 refutado lá se confirma)"
+    trace: ".claude/commands/meta/kg.md"
+    label: "D1-1 (confirmado, oportunista): /meta:kg tem 519 linhas, acima do alerta de 500 e abaixo do teto"
+
+  - id: C_DISTINCAO_TESTE_SEM_RAZAO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "grep 'Diferença vs': test-engineer.md 0, validate/test-strategy/create.md 0; test-agent.md e test-planner.md 1 cada (só entre si)"
+    trace: ".claude/agents/testing/test-engineer.md"
+    label: "D2-0 (confirmado): test-engineer não declara a diferença frente a test-agent, test-planner e /test:*, e /validate:test-strategy:create não declara a frente a test-agent"
+
+  - id: C_DISTINCAO_CREATORS_SO_NO_CORPO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-12"
+    verified_against: "grep de 'Diferença vs|vs @|vs /' = 0 em create-agent.md, create-command.md, agent-creator-specialist.md e command-creator-specialist.md"
+    trace: ".claude/commands/meta/create-agent.md"
+    label: "D2-2 (confirmado): comando e agente criadores têm descrição quase igual e nenhum dos quatro declara a relação (o comando é a entrada, o agente tem o protocolo)"
+
+  - id: C_ENGINEER_SEM_RAZAO_FRENTE_AO_GITFLOW
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-12"
+    verified_against: "grep 'git:flow': hotfix.md 2, start.md 0, pr.md 0 — o hotfix cita o motor, os outros dois não declaram por que coexistem"
+    trace: ".claude/commands/engineer/start.md"
+    label: "D2-3 (parcialmente confirmado): /engineer:start e /engineer:pr não declaram por que coexistem com /git:flow; o hotfix cita. NUNCA fundir as fases (invariante)"
+
+  - id: C_DISTINCOES_UNILATERAIS_D2_4_A_7
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.5
+    verified_at: "2026-10-12"
+    verified_against: "NÃO medido par a par nesta triagem: os quatro clusters (os warm-up, consolidate-meetings × consolidate-documents, os dois estimate, marca × identidade) ficam como informado, não verificado"
+    label: "D2-4 a D2-7 (informado): declarações de distinção unilaterais ou ausentes em quatro clusters"
+
+  - id: C_FRESHNESS_SEM_WORKFLOW_SALVO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "ls .claude/workflows/ = evolve.js, onion-research.js; context-freshness.md e kg-freshness.md citam Workflow (5 e 1 vezes) e nenhum script em .claude/workflows/"
+    trace: ".claude/commands/meta/context-freshness.md"
+    label: "D6-2 (confirmado): /meta:context-freshness e /meta:kg-freshness mandam autorar o Workflow a cada execução, sem script salvo (o evolve já tem o seu)"
+
+  - id: C_AGENTES_COM_MCP_DIRETO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-12"
+    verified_against: "grep -l 'mcp__' em .claude/agents: jira-specialist (2 ocorrências: authenticate do Atlassian), system-documentation-orchestrator (mcp__code-understanding__*) e agent-creator-specialist (citação a conferir)"
+    trace: ".claude/agents/development/system-documentation-orchestrator.md"
+    label: "D6-3 (confirmado, oportunista): dois agentes declaram ferramenta MCP direta; o do Jira é especialista (permitido pela doutrina), o system-documentation-orchestrator não é"
+
+  - id: C_SKILLS_SEM_NAME
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-12"
+    verified_against: "awk no frontmatter: 10 de 13 SKILL.md sem name: (onion, onion-onboarding, onion-orchestration, onion-patterns, onion-publish, onion-research, onion-retro, onion-validation, onion-wizard, language-standards)"
+    trace: ".claude/skills/onion/SKILL.md"
+    label: "D8-0 (confirmado): 10 de 13 skills sem name: no frontmatter — o Claude Code usa o nome do diretório, então é forma, não defeito de carga"
+
+  - id: E_LIMPOS_D6_4_D7_1
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-12"
+    verified_against: "find .claude -xtype l (sem worktrees) = vazio; D6-4 (resíduo do abandonado de 2026-05-18) aceito do sinal, não re-medido"
+    label: "D6-4 e D7-1: varreduras limpas (sem symlink quebrado medido no core; resíduo .onion/CLI aceito como informado)"
+    provenance:
+      source: "find .claude -xtype l, com .claude/worktrees podado"
+      locator: "saída vazia"
+      method: "medição: comando no vivo do core"
+      locality: "repo"
+
+edges:
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: E_EVOLVE_ATALHO_DECLARA_COBERTURA
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: E_MAQ0_VIGIADO_POR_CITACAO
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: E_MAQ3_README_E_SKILL_NO_CENSO
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: E_IDADE_OPTOUT_NAO_E_FRESCA
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: Q_MAQ1_NUNCA_SEM_O_N_DA_AMOSTRA
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: C_MAQ4_EXTRATOR_REGRA59_TETO
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: C_KG_MD_ACIMA_DO_ALERTA
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: C_DISTINCAO_TESTE_SEM_RAZAO
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: C_DISTINCAO_CREATORS_SO_NO_CORPO
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: C_ENGINEER_SEM_RAZAO_FRENTE_AO_GITFLOW
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: C_DISTINCOES_UNILATERAIS_D2_4_A_7
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: C_FRESHNESS_SEM_WORKFLOW_SALVO
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: C_AGENTES_COM_MCP_DIRETO
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: C_SKILLS_SEM_NAME
+    edge_type: SUPPORTS
+  - from: E_SINAIS_EVOLVE_KGSSOT_1012
+    to: E_LIMPOS_D6_4_D7_1
+    edge_type: SUPPORTS
+  - from: C_MAQ4_EXTRATOR_REGRA59_TETO
+    to: Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL
+    edge_type: SUPPORTS
+  - from: E_MAQ0_VIGIADO_POR_CITACAO
+    to: Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL
+    edge_type: SUPPORTS

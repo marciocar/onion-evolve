@@ -11,13 +11,22 @@
 //
 // Invocação (pela superfície): Workflow({scriptPath: '.claude/workflows/evolve.js',
 //   args: { dims: ['D1','D2','D3','D6','D7','D8','MAQ'], maqTargets: '<seção 7 do raio-X>', cap: 8 }})
-// `dims` vazio = todas. `maqTargets` é o CONFRONTO que o raio-X nomeou — sem ele a MAQ recusa, em vez
-// de inventar alvos.
+// `dims` vazio = todas. `maqTargets` é o CONFRONTO que o raio-X nomeou. Sem ele, uma fase `Census`
+// (haiku/low) roda o raio-X e extrai a seção 7 VERBATIM, conferindo o cabeçalho; se a seção não vier
+// inteira, a MAQ fica NÃO MEDIDA com o motivo — nunca alvo inventado.
+//
+// ⚠️ DISPARADO PELO NOME, SEM ARGS, ESTE SCRIPT COBRE 6 DE 10 DIMENSÕES (medido 2026-10-12 no adotante
+//    onion-kg-ssot): `args` vazio virava `{}`, a MAQ caía só com um `log()` no meio do run, D4/D5/D9/D10
+//    nem apareciam como puladas, e o retorno não dizia por quê. Agora o retorno carrega
+//    `not_measured: [{d, reason}]` com as DEZ dimensões contabilizadas e `complete` (true só com as 10 —
+//    logo nunca daqui sozinho: D4/D5/D9/D10 são do Passo 2.5 de /meta:evolve), e o que vai ficar de
+//    fora é logado no INÍCIO, antes do primeiro agente.
 export const meta = {
   name: 'evolve',
   description: 'Rodada do /meta:evolve: 6 dimensões de varredura + confronto de maquinaria, com verificação adversarial dos achados graves',
-  whenToUse: 'Auto-auditoria periódica do Sistema Onion, disparada pela REGRA 97',
+  whenToUse: 'Auto-auditoria periódica do Sistema Onion, disparada pela REGRA 97. ATALHO PARCIAL: sozinho cobre no máximo 6 das 10 dimensões (D1 D2 D3 D6 D7 D8, + MAQ com o raio-X); D4/D5/D9/D10 só rodam pelo caminho completo, /meta:evolve (Passo 2.5). O retorno declara o que faltou em not_measured e complete=false.',
   phases: [
+    { title: 'Census', detail: 'só sem maqTargets: roda o raio-X e extrai a seção 7 (os alvos da MAQ), com o cabeçalho conferido' },
     { title: 'Scan', detail: 'D1 D2 D3 D6 D7 D8 + MAQ (confronto) — um worker por dimensão, read-only' },
     { title: 'Verify', detail: 'refutador opus por achado blocker/recommended' },
   ],
@@ -81,15 +90,46 @@ const DIMS = [
 ]
 
 const COMPOSED = ['D4', 'D5', 'D9', 'D10']
+const ALL_DIMS = ['D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'D8', 'D9', 'D10', 'MAQ']
+const COMPOSED_REASON = 'composição — só via /meta:evolve (Passo 2.5, contexto principal); este workflow não a mede'
+// not_measured: o motivo por dimensão, NUNCA uma lista nua (a 1ª versão misturava "não pedida" com
+// "sem alvo" em `skipped`, e o retorno não dizia qual das duas).
+const NOT = new Map(COMPOSED.map(d => [d, COMPOSED_REASON]))
 const unknown = (WANT || []).filter(d => !DIMS.some(x => x.d === d))
 if (unknown.length) return { error: unknown.some(d => COMPOSED.includes(d))
   ? 'dimensão ' + unknown.join(',') + ' é composição: D4/D5/D9/D10 rodam no contexto principal (Passo 2.5), nunca aqui'
   : 'dimensão desconhecida: ' + unknown.join(',') + ' (válidas aqui: ' + DIMS.map(x => x.d).join(' ') + ')' }
-const RUN = DIMS.filter(x => !WANT || WANT.includes(x.d)).filter(x => {
-  if (x.d === 'MAQ' && !MAQ_TARGETS) { log('MAQ: sem maqTargets (seção 7 do raio-X) — NÃO MEDIDA, nunca alvos inventados'); return false }
-  return true
-})
-if (!RUN.length) return { error: 'nada a rodar (dims vazias após filtro)' }
+for (const x of DIMS) if (WANT && !WANT.includes(x.d)) NOT.set(x.d, 'não pedida (dims=' + WANT.join(',') + ')')
+const wantMaq = !WANT || WANT.includes('MAQ')
+// O que fica de fora é declarado AGORA, antes do primeiro agente — e não no meio do run, onde a 1ª
+// versão logava a MAQ caindo e ninguém lia.
+log('FORA desta rodada (antes de rodar): ' + [...NOT.entries()].map(([d, r]) => d + ' (' + r + ')').join('; ') +
+  (wantMaq && !MAQ_TARGETS ? '; MAQ depende da fase Census (sem maqTargets)' : ''))
+
+// ── Census: os alvos da MAQ vêm do raio-X, nunca da cabeça do worker ──────────────────────────
+// O agente só EXECUTA e devolve o stdout; a extração da seção 7 é deste script, determinística, e
+// exige os DOIS cabeçalhos — o da seção 7 e o do não-medido que a fecha — para provar que a saída
+// veio inteira e não um resumo do agente.
+let maqTargets = MAQ_TARGETS
+if (wantMaq && !maqTargets) {
+  phase('Census')
+  const cen = await ag('Rode EXATAMENTE este comando na raiz do repositório e devolva o stdout INTEIRO, verbatim, sem resumir, sem reformatar, sem comentar: `bash .claude/validation/evolve-census.sh . --markdown`. Devolva também o exit code. NÃO modifique nenhum arquivo.', {
+    label: 'census', phase: 'Census', model: 'haiku', effort: 'low',
+    schema: { type: 'object', properties: { stdout: { type: 'string' }, rc: { type: 'integer' } }, required: ['stdout', 'rc'] },
+  }).catch(() => null)
+  const out7 = (cen && typeof cen.stdout === 'string') ? cen.stdout : ''
+  const i7 = out7.indexOf('## 7. CONFRONTO')
+  const iEnd = out7.indexOf('## O QUE NÃO FOI MEDIDO', i7 + 1)
+  if (!cen) NOT.set('MAQ', 'Census: o agente não devolveu (morreu ou lançou) — alvos não levantados')
+  else if (i7 < 0 || iEnd < 0) NOT.set('MAQ', 'Census: a saída não trouxe a seção 7 inteira (cabeçalhos "## 7. CONFRONTO" e "## O QUE NÃO FOI MEDIDO") — recusada, nunca alvo inventado')
+  else if (cen.rc !== 0) NOT.set('MAQ', 'Census: evolve-census.sh saiu rc=' + cen.rc + ' — alvos não levantados')
+  else maqTargets = out7.slice(i7).trim()
+  if (NOT.has('MAQ')) log('MAQ: ' + NOT.get('MAQ') + ' — NÃO MEDIDA')
+}
+const RUN = DIMS.filter(x => !NOT.has(x.d)).map(x => x.d === 'MAQ'
+  // slice, nunca `.replace` com string: `$&`/`$1` dentro dos alvos seriam interpretados como padrão
+  ? { ...x, prompt: x.prompt.slice(0, x.prompt.indexOf('ALVOS DO RAIO-X:\n')) + 'ALVOS DO RAIO-X:\n' + maqTargets } : x)
+if (!RUN.length) return { error: 'nada a rodar (dims vazias após filtro)', not_measured: [...NOT.entries()].map(([d, reason]) => ({ d, reason })), complete: false }
 
 phase('Scan')
 const results = await pipeline(
@@ -134,8 +174,19 @@ const unjudgedIds = new Set(verdicts.filter(v => !v.verdict).map(v => v.id))
 const survived = all.filter(f => !killed.has(f.id) && !unjudgedIds.has(f.id))
 const unjudged = all.filter(f => unjudgedIds.has(f.id))
 log('achados: ' + all.length + ' · julgados: ' + judged.length + ' · SEM JUIZ: ' + unjudged.length + ' · refutados/vetados: ' + killed.size + ' · sobreviventes: ' + survived.length)
-const skipped = DIMS.filter(x => !RUN.includes(x)).map(x => x.d)
+const skipped = DIMS.filter(x => !RUN.some(r => r.d === x.d)).map(x => x.d)
+for (const d of lost) NOT.set(d, 'lost: o worker lançou')
+for (const r of out) if (r.dead) NOT.set(r.d, 'dead: o worker morreu sem devolver')
+// as DEZ dimensões (+ MAQ) contabilizadas: ou mediu, ou está aqui com motivo. Sem terceira via.
+const not_measured = ALL_DIMS.filter(d => NOT.has(d)).map(d => ({ d, reason: NOT.get(d) }))
+const measured = ALL_DIMS.filter(d => !NOT.has(d))
+const complete = ALL_DIMS.filter(d => d !== 'MAQ').every(d => measured.includes(d))
+log('cobertura: ' + measured.filter(d => d !== 'MAQ').length + '/10 dimensões' + (measured.includes('MAQ') ? ' + MAQ' : '') +
+  ' · complete=' + complete + (complete ? '' : ' (o caminho completo é /meta:evolve)'))
 return {
+  complete,
+  measured,
+  not_measured,
   skipped,
   lost,
   unjudged,

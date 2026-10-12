@@ -52,6 +52,12 @@
    **proposta** — o flip é humano. E toda superação passa por refutador adversarial antes de selar:
    nesta casa ele reprovou entregas inteiras que iam ser seladas, com gate mecânico verde.
 
+7. **Num adotante, a MAQ audita a maquinaria VENDORIZADA, e o achado vai upstream.** O que o
+   raio-X nomeia lá é código do core no pin. A cura não se faz no adotante: o achado sobe por
+   `/meta:co-relay` e volta pelo update. O `tools/` do produto adotante (o código dele, não o do
+   framework) **fica fora do escopo** do evolve. Medido em 2026-10-12 no `onion-kg-ssot`: os 19
+   achados sobreviventes eram arquivos byte-idênticos aos do core.
+
 ## O que esta doutrina NÃO promete
 
 - **Não mede qualidade.** O raio-X mede presença, ligação, frescor e carga — o julgamento é do evolve.
