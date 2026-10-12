@@ -62,6 +62,10 @@
 # (`bash x.sh`, `source x`, `curl … | bash`), função/alias definidos FORA da string, variável vinda de
 # FORA da string, subprocess de outra linguagem, git/gh chamado por outro programa, `url.*.pushInsteadOf`
 # e config global/de sistema. Lista completa no nó C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE.
+# RAMO DE PRODUÇÃO (2026-10-12): `main` sempre, mais `gitflow.branch.master` OU a branch padrão LOCAL dos
+# remotos (`refs/remotes/*/HEAD`), ou `master` sem fonte nenhuma. Não vê: `origin/HEAD` defasado do host
+# (`git remote set-head origin -a` o atualiza), produção com outro nome sem nenhuma das fontes, e o padrão
+# de um repo empurrado por URL. Teto no grafo guard-protected-branch-2026-10.
 
 # ── SEM python3: os dois vetos abriam por DENTRO (fix/vetos-fail-closed, 2026-10-11) ────────────
 # Os hooks liam o JSON com python3; sem ele o comando saía VAZIO e o hook dava exit 0 antes de chegar
@@ -118,6 +122,37 @@ onion_nopy_touches() {
       ;;
     *) return 0 ;;
   esac
+}
+
+# onion_protected_branches <dir> — os ramos de PRODUÇÃO do repo, um por linha: `main` sempre, mais
+# `gitflow.branch.master`/`.main` OU, sem ela, a branch padrão de cada remoto (`refs/remotes/*/HEAD`); sem nenhuma
+# fonte, `master` por convenção. Espelho bash de `protected_branches` do tokenizador (Q_VETO_DE_FORCE_
+# PUSH_SO_PROTEGE_O_LITERAL_MAIN, 2026-10-12): os hooks o usam no fallback de push NU sentado no ramo.
+onion_protected_branches() {
+  local d="${1:-.}" k v found=0 heads
+  echo main
+  for k in gitflow.branch.master gitflow.branch.main; do
+    v="$(git -C "$d" config --get "$k" 2>/dev/null || true)"
+    if [ -n "$v" ]; then echo "${v#refs/heads/}"; found=1; fi
+  done
+  # o gitflow nomeia a produção e tem precedência sobre a branch padrão do remoto (que num GitFlow é a develop)
+  if [ "$found" = 0 ]; then
+    heads="$(git -C "$d" for-each-ref --format='%(symref)' 'refs/remotes/*/HEAD' 2>/dev/null \
+      | sed -nE 's#^refs/remotes/[^/]+/(.+)$#\1#p' || true)"
+    if [ -n "$heads" ]; then printf '%s\n' "$heads"; found=1; fi
+  fi
+  [ "$found" = 1 ] || echo master
+}
+
+# onion_on_protected_branch <dir> — rc 0 quando a branch ATUAL do diretório é um ramo de produção.
+onion_on_protected_branch() {
+  # a lista vai para variável ANTES do `grep -q`: no pipe direto, sob pipefail, o grep que fecha cedo
+  # devolveria o SIGPIPE do produtor como rc (a classe pipefail-epipe-early-closer)
+  local cur list
+  cur="$(git -C "${1:-.}" branch --show-current 2>/dev/null || true)"
+  [ -n "$cur" ] || return 1
+  list="$(onion_protected_branches "${1:-.}")"
+  grep -qxiF -- "$cur" <<< "$list"
 }
 
 onion_invocation_lines() {
@@ -235,6 +270,40 @@ def current_branch(path):
     if path == UNKNOWN:
         return "__UNKNOWN__"
     return _git(["-C", path or JCWD, "branch", "--show-current"])
+
+
+_PROT = {}
+
+
+def protected_branches(path):
+    """Ramos de PRODUÇÃO do repo onde o comando roda: `main` SEMPRE, mais o resolvido — config do
+    gitflow (`gitflow.branch.master`/`.main`) OU, sem ela, a branch padrão de cada remoto
+    (`refs/remotes/*/HEAD`). Sem nenhuma das duas fontes, `master` entra por convenção (fechado). A 1ª forma dos vetos só via
+    `main` literal: no brain-granaai, cuja produção é `master`, `git push origin +master` saía rc=0
+    (Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN, medido em 2026-10-05). A linha canônica segue
+    escrevendo `main` como o NOME do ramo protegido — os hooks julgam esse token. Espelho em bash:
+    `onion_protected_branches` (paridade cobrada pela bancada)."""
+    base = path or JCWD
+    if base == UNKNOWN:
+        return frozenset({"main", "master"})
+    if base not in _PROT:
+        s, resolved = {"main"}, False
+        for key in ("gitflow.branch.master", "gitflow.branch.main"):
+            v = re.sub(r"^refs/heads/", "", _git(["-C", base, "config", "--get", key]))
+            if v:
+                s.add(v); resolved = True
+        # o gitflow NOMEIA a produção e tem precedência: a branch padrão do remoto num GitFlow costuma ser a
+        # `develop` (medido no brain-granaai: origin/HEAD→develop, gitflow.branch.master=master) — somá-la
+        # vetaria o force-push da integração, que hoje passa e não é a produção
+        heads = "" if resolved else _git(["-C", base, "for-each-ref", "--format=%(symref)", "refs/remotes/*/HEAD"])
+        for ref in heads.split("\n"):
+            v = re.sub(r"^refs/remotes/[^/]+/", "", ref.strip()) if ref.strip().startswith("refs/remotes/") else ""
+            if v:
+                s.add(v); resolved = True
+        if not resolved:
+            s.add("master")
+        _PROT[base] = frozenset(s)
+    return _PROT[base]
 
 
 _OUR = {}
@@ -876,6 +945,10 @@ def canonical_git(words, where, env=None):
     # o 2º falso positivo de produção (2026-09-01), reaberto pela 1ª reescrita (Elenxo, 2ª passada).
     if "__DYNAMIC__" in dsts and force:
         dsts = ["main" if d == "__DYNAMIC__" else d for d in dsts]
+    # o ramo de PRODUÇÃO resolvido (`master` num GitFlow clássico) vira o token `main` que os hooks julgam;
+    # vale também para o destino que veio da config/branch atual (push nu), que não passou pelo laço acima
+    prot = {p.lower() for p in protected_branches(where)}   # caixa: o mesmo critério do `main` acima
+    dsts = ["main" if d.lower() in prot else d for d in dsts]
     if "--dry-run" in flags or "-n" in flags:
         return "git push --dry-run (inerte)", remote, True
     return "git push" + (" --force" if force else "") + "".join(" " + f for f in flags) + \
@@ -973,7 +1046,10 @@ def touches_main(text, where=None):
         return True
     if any(push_long_opt(w) in ("--mirror", "--all", "--branches") for w in t.split()):
         return True
-    return current_branch(where) == "main"
+    prot = protected_branches(where)
+    if any(re.search(r"(^|[\s:/+])(refs/heads/|heads/)?" + re.escape(p) + r"($|[\s:])", t) for p in prot):
+        return True
+    return current_branch(where) in prot
 
 
 def emit_unanalyzable(words, where=None, unknown_target=False):
@@ -1256,7 +1332,7 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
             emit_unanalyzable(words, CWD[-1], unknown_target=True); return   # o SUBCOMANDO vem do stdin
         if tb == "git" and "push" in tail:
             forced = any(push_long_opt(t).startswith("--force") or push_long_opt(t) == "--mirror" or (t.startswith("-") and not t.startswith("--") and "f" in t) or t.startswith("+") for t in tail)
-            if forced or current_branch(CWD[-1]) == "main":
+            if forced or current_branch(CWD[-1]) in protected_branches(CWD[-1]):
                 emit_unanalyzable(words, CWD[-1], unknown_target=True)
             return                                      # push sem force de destinos do stdin, fora da main
         if tb == "gh" and len(tail) >= 2 and tail[1] == "api" and not any("/" in w for w in tail[2:]):
