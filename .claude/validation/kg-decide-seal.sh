@@ -78,8 +78,27 @@ command -v python3 >/dev/null 2>&1 || { echo "kg-decide-seal: python3 ausente" >
 [ -f "${RADAR}" ] || { echo "kg-decide-seal: radar ausente: ${RADAR} — sem gate não selo" >&2; exit 2; }
 
 # Passo 0 — não se sela grafo que o motor já reprova (o selo seria culpado por dívida alheia)
-bash "${RADAR}" "${GRAPH}" --integrity --schema >/dev/null 2>&1 \
-  || { echo "kg-decide-seal: ${GRAPH} JÁ reprova no radar --integrity --schema antes do selo — conserte antes; nada escrito" >&2; exit 2; }
+# EXCEÇÃO ÚNICA (2026-10-12, dogfood da triagem de um sinal de campo): com --new e --link, o nó de onde a decisão
+# veio pode ter nascido no mesmo movimento — e então está ÓRFÃO até o selo criar a aresta que o liga. O radar
+# recusava antes da aresta existir (a evidência nova e a decisão nova dependiam uma da outra). Tolera-se só
+# isto: TODA linha ✗ do radar é "nó órfão" do próprio alvo do --link. Qualquer outra reprovação segue recusando,
+# e o radar DEPOIS do selo (passo final) julga o grafo inteiro como sempre.
+LINK_ORPHAN_TOLERATED=0
+PRE_OUT="$(bash "${RADAR}" "${GRAPH}" --integrity --schema 2>&1)"; PRE_RC=$?
+if [ "${PRE_RC}" -ne 0 ]; then
+  _only_link_orphan=0
+  if [ -n "${NEW}" ] && [ -n "${LINK}" ]; then
+    _bad="$(printf '%s\n' "${PRE_OUT}" | grep '✗' | grep -v -F "nó órfão (grau 0): ${LINK}" || true)"
+    _orf="$(printf '%s\n' "${PRE_OUT}" | grep -c -F "nó órfão (grau 0): ${LINK}" || true)"
+    [ -z "${_bad}" ] && [ "${_orf}" -ge 1 ] && _only_link_orphan=1
+  fi
+  if [ "${_only_link_orphan}" -eq 1 ]; then
+    LINK_ORPHAN_TOLERATED=1
+    echo "kg-decide-seal: o alvo do --link (${LINK}) está órfão antes do selo — tolerado: a aresta do selo o liga (o radar e o contrato finais julgam)" >&2
+  else
+    echo "kg-decide-seal: ${GRAPH} JÁ reprova no radar --integrity --schema antes do selo — conserte antes; nada escrito" >&2; exit 2
+  fi
+fi
 ROOT="$(git -C "$(dirname "${GRAPH}")" rev-parse --show-toplevel 2>/dev/null || true)"
 # Leitor do contrato, por ordem: (1) o vendor do KG-SSOT (core e adotantes) pelo kg-contract-check, que mede
 # a piora contra o HEAD; (2) o leitor de referência do PRÓPRIO produto (`tools/kg_validate.py`), num repo que
@@ -99,7 +118,9 @@ _contract() {  # COUT/CRC do contrato sobre o grafo; CRC=99 quando não há leit
 }
 # e o CONTRATO também no passo 0 (achado 5 do refutador): dívida que o grafo já tinha na árvore seria
 # atribuída ao selo, que sairia 3 "por culpa própria"
-_contract
+# a mesma exceção do passo 0: o contrato também acusa o órfão do alvo do --link (integrity.orphan-node); ali
+# ele só é julgado DEPOIS do selo, quando a aresta já existe.
+CRC=0; [ "${LINK_ORPHAN_TOLERATED}" -eq 1 ] || _contract
 if [ "${CRC}" -eq 1 ]; then
   echo "kg-decide-seal: ${GRAPH} JÁ piora o contrato antes do selo (dívida pré-existente, não do selo) — conserte antes; nada escrito:" >&2
   printf '%s\n' "${COUT}" | head -6 >&2

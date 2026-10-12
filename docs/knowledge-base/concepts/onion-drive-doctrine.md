@@ -75,6 +75,22 @@ P6   PARA             nenhuma passada nova enquanto o checkpoint pende (batch-co
 | **execution** | `decision` (reversível) | trabalho em worktree até **PR-verde** + dogfood | orquestração de execução (molde de fases do `/engineer:work`, até 1 PR) | branch/PR + evidência |
 | **decision** | `decision` (não-tomada) | enquadrar + Elenxo, **propor** a chamada | `adversarial-verification` | `decision` PROPOSTO (não selado) |
 
+### 3.1 Spike que mede hipótese de produto (KIND research ou verification)
+
+Quando o nó `Q_` conduzido é uma **hipótese de produto** testada por spike ("o adaptador X propõe nós
+que valem a pena?"), o avanço exige, **num commit anterior à amostra**:
+
+1. **critério de morte com denominador fixo** — escrito no próprio nó ou ao lado, com o proponente e o
+   placar. Trocar o denominador depois de medir é mover a régua: num adotante, a 1ª leitura passou de
+   26,6% para 68% trocando "todas as propostas" por "as julgadas", e o Elenxo a derrubou;
+2. **uma medida de VALOR com avaliador cego** — um agente separado, sem acesso à hipótese, marca cada
+   proposta MANTER ou DESCARTAR. Sobrevivência à selagem **não** basta, porque premia a proposta
+   trivial (100% numa cópia, 0 de 8 no valor, na mesma hipótese).
+
+A ordem fica verificável no `git log` (critério antes da amostra). A pergunta que o Elenxo faz a esse
+critério é a da etapa 3 em [`onion-elenxo-doctrine.md`](onion-elenxo-doctrine.md) ("o critério separa a
+proposta útil da trivial?").
+
 ## 4. Tabela de SELAGEM (postura AUDIT — mata o carimbo-automático)
 
 | Evento | Ação | AUTO vs PARA |

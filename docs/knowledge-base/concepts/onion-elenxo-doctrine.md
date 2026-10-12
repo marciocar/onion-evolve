@@ -89,6 +89,23 @@ nenhuma, sozinha, produz.
 | **4** | **Síntese que arbitra por RAZÃO e preserva DISSENT** — a objeção sobrevivente mais forte **contra a própria conclusão** fica no artefato | placar de votos; síntese sem dissent |
 | **5** | **`write(KG)` com `SUPERSEDES`/`REFUTES`** — a ideia nova supera a antiga **sem apagá-la** (*Aufhebung*); genealogia auditável | **refutação narrada em prosa e grafo em 0/0/0/0** |
 
+### A pergunta fixa da etapa 3 quando o artefato é um CRITÉRIO
+
+Quando o que se refuta é um **critério de medição** — o limiar de morte de um spike, a régua de um gate,
+a métrica de uma rodada —, a refutação faz sempre esta pergunta, antes de qualquer outra:
+
+> **"O critério separa a proposta útil da trivial?"**
+
+Ele foi medido num adotante, em 2026-10-12, ao longo de três spikes da mesma hipótese de produto. O
+critério de **sobrevivência** ("quantas propostas o contrato aceita") deu 100% a uma proposta que só
+copiava o arquivo que a selagem relia: a proposta mais vazia era a que mais sobrevivia. Só o critério de
+**valor**, julgado por um agente separado **sem acesso à hipótese**, separou cópia de conhecimento (0 de 8
+propostas mantidas). A leitura própria tinha dado "sobrevive" duas vezes; o Elenxo pegou a régua movida
+e a tautologia.
+
+Critério que a proposta trivial passa mede **fidelidade**, não valor. Quando é esse o caso, o critério
+vira objeção sobrevivente, e a medição pede um juiz cego ao que se quer provar.
+
 ### A etapa 5 é a que mais falha — e isso é medido
 
 Em 2026-08-02, de **6 corridas que declararam Elenxo**, **2 narravam refutação em prosa com o grafo
