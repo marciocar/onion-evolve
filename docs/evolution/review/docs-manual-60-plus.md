@@ -2,7 +2,7 @@
 branch: docs/manual-60-plus
 pr: pendente
 date: 2026-10-12
-reviewed_diff_sha256: f62fb5384eb6e91e275ad141803cd0838f4b694e5847feebcf73977f6c75b050
+reviewed_diff_sha256: a5e648c68bdf6b47ab8fc07107587f1e4f6c260d70fb1f013e5d2c3bf6f4c9fc
 reviewed_code_sha256: 87e51130c464c607ab6a7fa6562a17a95de070845de371cf317cc723004c166e
 findings_total: 3
 findings_real: 3
