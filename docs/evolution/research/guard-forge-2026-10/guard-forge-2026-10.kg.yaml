@@ -9,8 +9,8 @@
 meta:
   id: guard-forge-2026-10
   schema_version: "1"
-  baseline: 2026-10-02
-  review_after: 2026-12-02
+  baseline: "2026-10-02"
+  review_after: "2026-12-02"
   # O DESTINO DA FORJA DE GUARDAS — o primeiro write(KG) que a peça 5 exige, aplicado a ela mesma.
   #
   # POR QUE ESTE ARQUIVO EXISTE: antes dele, o conhecimento de forjar uma guarda vivia só na

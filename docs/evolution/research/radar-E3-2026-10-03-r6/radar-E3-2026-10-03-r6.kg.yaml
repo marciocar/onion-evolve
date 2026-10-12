@@ -4,8 +4,8 @@
 meta:
   id: radar-E3-2026-10-03-r6
   schema_version: "1"
-  baseline: 2026-10-03
-  review_after: 2026-11-17
+  baseline: "2026-10-03"
+  review_after: "2026-11-17"
   x_supersedes_none: >
     DESFECHO DE 1a CLASSE, e a 1a redacao desta linha era um DEFEITO DA MESMA ESPECIE que a
     rodada inteira persegue: ela declarava `supersedes_external` apontando para

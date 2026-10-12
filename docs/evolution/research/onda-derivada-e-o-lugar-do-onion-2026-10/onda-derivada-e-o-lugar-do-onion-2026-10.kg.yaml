@@ -150,7 +150,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-10-01
+    verified_at: "2026-10-12"
     verified_against: 'medição nesta máquina em 2026-10-01 sobre arquivos RASTREADOS (git ls-files, fixtures excluídos): 71.676 linhas de markdown em 408 arquivos `.md` dentro de `.claude/` contra 48.944 linhas de `.sh`. O Elenxo declarou 73.904 e 49.148 — números que NÃO reproduzem aqui com este filtro (provável diferença: arquivos não rastreados). A direção não muda: a metade que ACONSELHA é ~1,46× a que REPROVA. Soma-se o aviso de teto da própria carga desta sessão: MEMORY.md 27,6KB contra limite 24,4KB, 19 de 142 linhas cortadas.'
     valid_from: 2026-10-01
     source_tier: 10
@@ -160,7 +160,7 @@ nodes:
     provenance:
       source: "commit 44ceba79 (pai do 30eecf28, árvore medida) · commit 30eecf28"
       locator: "git ls-tree -r 44ceba79 .claude/ — .md fora de fixtures: 408 arquivos, 71.675 linhas; .sh: 48.757 (sem fixtures) / 48.950 (todos)"
-      method: "testemunho: medição da sessão 2026-10-01 (commit 30eecf28), comando parcialmente registrado ('git ls-files, fixtures excluídos'); aviso de teto do MEMORY.md é evento da sessão"
+      method: "medição: reexecutada em 2026-10-12 sobre o commit 44ceba79 (git ls-tree -r 44ceba79 -- .claude/ + git show por arquivo): .md fora de fixtures = 408 arquivos e 71.675 linhas (reproduz); .sh = 48.950 linhas com fixtures (reproduz) e 48.919 sem fixtures (o registro de 2026-10-01 dizia 48.757 — NÃO reproduz, diferença de filtro não ancorada). O aviso de teto do MEMORY.md segue sendo evento da sessão de 2026-10-01, não reverificável"
       locality: "repo"
 
   - id: E_CORPUS_O_QUE_AS_RODADAS_DE_HOJE_JA_MEDIRAM

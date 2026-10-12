@@ -4,7 +4,7 @@
 meta:
   id: session-2026-07-18-evolve-review-triage
   schema_version: "1"
-  baseline: 2026-07-18
+  baseline: "2026-07-18"
   date: 2026-07-18
 nodes:
   - id: C_DECLARED_VERIFIED
@@ -14,7 +14,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "familia-raiz: mecanismos confiam em estado DECLARADO sem verificar o VIVO — reaparece em adopt-update, KB de identidade, onion-review is_error e KG false-green"
     provenance:
       source: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md"
@@ -28,7 +28,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "adopt --update clobra adotante stale-stampado (3 bugs: pin-canario, fallback HEAD, stamp branch errada) — triado #410"
     trace: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md"
     provenance:
@@ -43,7 +43,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "KB de identidade citava contagens driftadas da SSOT gerada (5 skills vs 8, 82/87 vs 97, 8 vs 10 dims) — resync #412 preservando narrativas historicas"
     trace: "docs/knowledge-base/meta/onion-framework-identity.md"
     provenance:
@@ -58,7 +58,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "soft-pass (#361) e retry (#363) do onion-review dispararam em 07-14..07-18 (action v1.0.172+ sai exit 1 em is_error): check verde com aviso 'não revisado' sobre falha 100% persistente por 4 dias; após o pin v1.0.171 a action sai exit 0 com is_error e nenhum dos dois dispara"
     narrative: "label anterior: soft-pass do onion-review foi desenhado p/ crash transiente mas MASCAROU falha 100% persistente por 4 dias (silence != success) — gap: escalar falha persistente"
     provenance:
@@ -73,7 +73,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "evolve audit 10-D (13 agentes): 6 achados sobreviveram, 2 refutados pelo juiz opus — executados em #411/#412/#413"
     trace: "docs/analysis/onion-evolution-2026-07-17.md"
     provenance:
@@ -133,7 +133,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "crash 100% desde 2026-07-14 (runs 07-13 verdes); naquele dia mudaram DOIS: o bump de modelo E a @v1 saltando p/ v1.0.172/173/174"
     provenance:
       source: "https://github.com/marciocar/onion-evolve/pull/414"
@@ -147,7 +147,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: refuted
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "experimento controlado #414: pinar action em v1.0.171 MANTENDO sonnet-5 → onion-review RECUPEROU (review success, retry skipped) e refez review real em #415/#416"
     narrative: "refutado na onda 2 da O3 (2026-10-09): JUIZ-MESTRE sobrescreve o worker (que propôs corrigir-label): abri os 3 runs; o núcleo 'RECUPEROU' e 'refez review real' cai (is_error, 1 turno, custo 0; no #414 a action nem rodou); 'review success, retry skipped' é o sintoma do silenciamento, não cláusula sobrevivente; reescrever inverteria o nó e suas arestas REFUTES/SUPPORTS → refutar; a fonte passa a ser a medição dos runs"
     trace: "PR #414; .github/workflows/onion-review.yml"
@@ -163,7 +163,7 @@ nodes:
     impact: 5
     confidence: 0.05
     status: superseded
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     label: "ALEGAVA (07-18): a regressao da claude-code-action (v1.0.172+, 07-14) era a causa do crash — REFUTADO em 08-03; era COINCIDENCIA DE DATA"
     trace: "PR #530, #532, #533; .github/workflows/onion-review-diagnose.yml"
     provenance:
@@ -178,7 +178,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     label: "pin testado nas DUAS pontas — v1.0.171 (11/07) e v1.0.183 (25/07): assinatura identica (is_error, num_turns 1, cost 0, ~180s). A versao nunca foi a causa"
     trace: "runs 30845128611/30835633464/30812516128/30782135096 (v1.0.171); 30858672053 (v1.0.183)"
     provenance:
@@ -193,7 +193,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     label: "de dentro do runner: GET /v1/models → 401 authentication_error em 0,07s, rede impecavel (DNS 3,5ms/TCP 5,6ms/TLS 27ms), chave BEM FORMADA (108 chars, sk-ant-, mesma normalizada) — revogada, nao mal-colada"
     trace: ".github/workflows/onion-review-diagnose.yml; run 30861731536"
     provenance:
@@ -208,7 +208,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     label: "CAUSA-RAIZ: o secret ANTHROPIC_API_KEY nao autenticava. A action NAO REPASSA o 401 — pendura ~180s e devolve is_error sem mensagem, entregando erro de auth vestido de timeout"
     trace: "docs/analysis/onion-guardas-mapa-2026-08.md §3.3"
     provenance:
@@ -223,7 +223,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     label: "chave trocada → diagnostico HTTP 200 em 2,2s, e o revisor passou a TRABALHAR (9 turnos, US$ 0,34, 35s), falhando so por error_max_turns com --max-turns 8"
     trace: "run 30862182140 (diagnostico); run 30862852519 (revisor, PR #533)"
     provenance:
@@ -238,7 +238,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     label: "MEDIR CERTO E INFERIR ERRADO e modo de falha distinto de medir errado, e mais perigoso: TRES rodadas descartaram credencial por '401 e instantaneo, isto pendura 180s' — premissas verdadeiras, terceira premissa (a action repassaria o 401) NUNCA testada"
     trace: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
     provenance:
@@ -262,7 +262,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "DECISAO (07-18): pinar claude-code-action em v1.0.171 (e90deca4) mantendo sonnet-5 como experimento de isolamento; trocado por v1.0.183 em 08-03 (#530) porque o pin nao curava"
     narrative: "label anterior: DECISAO: pinar claude-code-action em v1.0.171 (e90deca4) mantendo sonnet-5; des-pinar quando versao nova corrigir o hang"
     provenance:
@@ -277,7 +277,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "drive-to-verify: o 'generator' dos sinais granaai (kg-ssot-sdaal, kg-validate-v2.py) e LOCAL do adotante, nao o core /meta:kg; a gramatica do core suporta TRACES_TO, mas NAO CONTROLLED_BY (ausente do kg-radar.sh e do kg.md em 7de0056d)"
     narrative: "label anterior: drive-to-verify: o 'generator' dos sinais granaai (kg-ssot-sdaal, kg-validate-v2.py) e LOCAL do adotante, nao o core /meta:kg; a gramatica do core JA suporta TRACES_TO/CONTROLLED_BY"
     trace: ".claude/commands/meta/kg.md"
@@ -293,7 +293,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "granaai validou em campo: --update fez a guarda de legibilidade reprovar o .kg.yaml MAPA (exit 1) enquanto o LIST valido passa — fail-open fix funciona"
     provenance:
       source: "docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"

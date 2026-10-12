@@ -1,8 +1,8 @@
 meta:
   id: triagem-inbox-2026-09
   schema_version: "1"
-  baseline: 2026-09-22
-  review_after: 2026-12-22
+  baseline: "2026-09-22"
+  review_after: "2026-12-22"
   # Este grafo NÃO é o backlog. O backlog é `docs/onion/graph/fios-abertos.kg.yaml`, que tem
   # catraca de TETO (19 nós, "onda nova exige onda COLHIDA"). Na triagem de 2026-09-22 o teto já
   # estava EXATAMENTE em 19 antes de eu chegar — ou seja, o backlog estava cheio e a triagem de

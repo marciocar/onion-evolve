@@ -4,7 +4,7 @@
 meta:
   id: coexistence-two-homes-2026-07
   schema_version: "1"
-  baseline: 2026-07-16
+  baseline: "2026-07-16"
   date: 2026-07-16
 nodes:
   - id: E_GROUNDING
@@ -14,7 +14,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     label: "recon 2026-07-16: 33 arquivos em .claude/diary/ e 10 .kg.yaml fora de fixtures no repo (git ls-tree dcb29e96^); 20 memórias fora do repo; VPS = o host do core (hostname omitido)"
     narrative: "label anterior: recon 2026-07-16: 33 migalhas + 10 KGs + 1 sessao IN-REPO; 20 memorias FORA; ⟨VPS=o host do core (hostname omitido)⟩; Avell nao-alcancavel da VPS · label anterior: recon 2026-07-16: 33 arquivos em .claude/diary/ e 10 .kg.yaml fora de fixtures no repo (git ls-tree dcb29e96^); 20 memórias fora do repo; ⟨VPS = o host do core (hostname omitido)⟩"
     provenance:
@@ -29,7 +29,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     label: "tudo in-repo (codigo/diario/KG/sessions/docs) coexiste via git automaticamente — o repo JA e o cerebro compartilhado"
     provenance:
       source: ".claude/diary/2026-07-16-two-homes-origin-and-coexistence.md"
@@ -43,7 +43,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-16
+    verified_at: "2026-07-16"
     label: "memoria (diretório de memória do Claude Code no home do usuário, 20 arqs) e FORA do repo → nao coexiste por git (unica lacuna real)"
     narrative: "label anterior: ⟨memoria (diretório de memória do Claude Code no home do usuário, 20 arqs)⟩ e FORA do repo → nao coexiste por git (unica lacuna real)"
     provenance:
@@ -171,7 +171,7 @@ nodes:
     label: "RESGATE PARCIAL: branch rescue/avell-uncommitted-2026-07 pushada do Avell; o ouro (pesquisa team-mode/federacao, 325 linhas) entrou no main via PR #394 (951dc973); 2 landing pages pre-VPS + .tmp-export ficaram so na rescue branch aguardando decisao"
     narrative: "label anterior: RESGATE CONCLUIDO: branch rescue/avell-uncommitted-2026-07 pushada e reaplicada; o ouro (pesquisa team-mode/federacao de conhecimento, 325 linhas) esta no main via PR #394 — risco de perda extinto"
     trace: "PR #394; docs/analysis/onion-research-team-mode-knowledge-federation-2026-07.md"
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     provenance:
       source: "https://github.com/marciocar/onion-evolve/pull/394"
       locator: "PR #394 corpo (§Resgate, §Ainda na cápsula); 951dc973:docs/analysis/onion-research-team-mode-knowledge-federation-2026-07.md (wc -l = 325)"

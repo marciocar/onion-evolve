@@ -2,8 +2,8 @@ meta:
   id: cedar-2026-10
   schema_version: "1"
   x_dissect_tool: cedar
-  baseline: 2026-10-01
-  review_after: 2026-10-31   # 30d: FERRAMENTA/LICENCA e o tipo dominante (a cadencia da doutrina)
+  baseline: "2026-10-01"
+  review_after: "2026-10-31"   # 30d: FERRAMENTA/LICENCA e o tipo dominante (a cadencia da doutrina)
   # kg-backlog-guard: on
   # ═══ TETO: 10 NÓS ═══
   #
@@ -38,7 +38,7 @@ nodes:
     impact: 3
     confidence: 0.8
     x_dissect_level: 0
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'nivel PAGO pelo corpus: engenharia-de-corpus-de-regras-2026-10 traz o repo cedar-policy/cedar-spec sob Apache 2.0, mantido pela AWS, com Cedar Analysis anunciado no blog de open source do fornecedor'
     source_tier: 8
     source_kind: primary
@@ -57,7 +57,7 @@ nodes:
     impact: 5
     confidence: 0.7
     x_dissect_level: 1
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'nivel PAGO pelo corpus (tier 8, votos 2-1): o Cedar Analysis detecta por analise estatica permits sombreados, condicoes impossiveis, forbid que anula permits e negacao total de acoes; ha CLI que COMPARA dois corpus de politicas'
     source_tier: 8
     source_kind: primary
@@ -76,7 +76,7 @@ nodes:
     impact: 5
     confidence: 0.8
     x_dissect_level: 2
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'nivel PAGO pelo corpus (tier 8, votos 3-0): a analise e correta e completa, com prova formalizada em Lean, usando SMT solver (CVC5) sobre formulas que representam TODAS as requisicoes possiveis'
     source_tier: 8
     source_kind: primary
@@ -105,7 +105,7 @@ nodes:
     impact: 5
     confidence: 0.85
     x_dissect_level: 3
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'regua de transferencia aplicada contra E_N2_MECANISMO, com a objecao do refutador do grafo irmao (E_OBJECAO_5_CEDAR_NAO_E_PORTAVEL) sobrevivendo'
     source_tier: 10
     source_kind: internal-audit
@@ -124,7 +124,7 @@ nodes:
     impact: 4
     confidence: 0.7
     x_dissect_level: 3
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'nivel PAGO pelo corpus (tier 7, votos 3-0): AutoCedar (arXiv 2607.03656, jul/2026) usa laco agentico de LLM com verificador formal SMT como GATE para autoria de politica — a politica gerada e verificada antes de ser aceita'
     source_tier: 7
     source_kind: primary
@@ -143,7 +143,7 @@ nodes:
     impact: 4
     confidence: 0.7
     x_dissect_level: 3
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'nivel PAGO pelo corpus (tier 7, votos 3-0): o Cedar autorizando agentes em cadeia multi-agente avalia em 3 camadas L1 a L3 com halt no primeiro deny, e a ordem e FIXA POR CAMADA, sem derivacao de dependencia entre politicas'
     source_tier: 7
     source_kind: primary
@@ -162,7 +162,7 @@ nodes:
     impact: 4
     confidence: 0.9
     x_dissect_level: 0
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'medido nesta sessao: bash .claude/validation/dissect-census.sh devolveu 148 grafos rastreados e ZERO dissecacao declarada, enquanto o grafo engenharia-de-corpus-de-regras-2026-10 ja continha quatro nos de Cedar com tier 7-8 e votos registrados'
     source_tier: 10
     source_kind: internal-audit
@@ -182,7 +182,7 @@ nodes:
     confidence: 0.6
     x_dissect_level: 3
     x_dissect_verdict: parquear
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'NAO SELADA. O /meta:dissect nunca sela: status open, aguardando o maestro.'
     label: 'VEREDITO PROPOSTO — PARQUEAR, com gatilho nomeado (o maestro sela). Nao e `absorver`: a capacidade e propriedade da linguagem restrita e o corpus do Onion e shell agnostico por desenho. Nao e `costurar`: nao existe adapter possivel — o Cedar nao analisa shell. Nao e `rejeitar`: um PEDACO transfere ja (o padrao "IA autora, verificador determinístico admite", E_N3_O_QUE_TRANSFERE) e uma PERGUNTA fica viva, que e o que se parqueia. ═══ A PERGUNTA PARQUEADA ═══ "vale restringir a LINGUAGEM de um SUBCONJUNTO das guardas — as puramente declarativas, que so casam padrao em texto — para ganhar analise de sombreamento e condicao impossivel?" ═══ O GATILHO, nomeado e verificavel (parque sem gatilho e cemiterio) ═══ reabrir quando QUALQUER um ocorrer: (1) duas regras do corpo de guardas forem medidas como MUTUAMENTE SOMBREADAS em uso real (uma nunca dispara porque outra sempre dispara antes); (2) o corpus passar de 120 regras, onde o custo de nao saber da sobreposicao cresce mais rapido que o de uma DSL parcial; (3) sair ferramenta de analise estatica que aceite SHELL como entrada, o que derrubaria E_N3_NAO_TRANSFERE por completo. ═══ O QUE FAZER AGORA, e e barato ═══ nada de absorcao; so registrar E_N3_ORDEM_NINGUEM_DERIVA como resposta externa a pressao interna de ordenacao.'
     trace: 'docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml'

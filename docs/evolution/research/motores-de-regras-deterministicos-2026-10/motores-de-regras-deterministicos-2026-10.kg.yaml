@@ -1,8 +1,8 @@
 meta:
   id: motores-de-regras-deterministicos-2026-10
   schema_version: "1"
-  baseline: 2026-10-01
-  review_after: 2026-10-31   # 30d: FERRAMENTA/PLATAFORMA e o tipo DOMINANTE — a pergunta 1 pede
+  baseline: "2026-10-01"
+  review_after: "2026-10-31"   # 30d: FERRAMENTA/PLATAFORMA e o tipo DOMINANTE — a pergunta 1 pede
                              # licenca, velocidade de release e sinal de vida real dos motores, e esta
                              # rodada NAO entregou UM dado verificado de release/commit de NENHUM motor
                              # (a unica alegacao de versao 2026 foi REFUTADA). A metade doutrinaria
@@ -43,7 +43,7 @@ nodes:
     confidence: 0.6
     label: 'Quais sao os motores de decisao DETERMINISTICOS vivos em 2026 (substitutos do ZEN Engine e os de politica), para onde vai a superacao do campo (Datalog/Rego, SMT/solver com verificacao formal, computacao incremental, DSL tipada, teste diferencial, cobertura e conflito de regra), quem esta construindo motor COM IA e fazendo o que, e — a pergunta de decisao — o gate determinístico do Onion (motor de regras a mao em bash, 93 regras, severidade HARD/SOFT, catraca por baseline) deveria migrar para um motor declarativo? ABERTA, e a razao e medida: dos 28 achados externos 26 falam de Cedar, o ZEN Engine tem ZERO evidencia, e a pergunta 1 (licenca, linguagem, embarcado vs servico, padrao aberto, velocidade de release, sinal de vida) nao foi respondida para NENHUM motor — nem para o Cedar, cuja unica alegacao de versao 2026 foi refutada.'
     trace: docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'rodada de 2026-10-01: 23 fontes, 61 claims, 29 confirmadas que colapsam em ~8 artefatos distintos; 4 refutadas por fonte fraca; 0 nao-verificadas por 403/truncagem; 2 medicoes locais tier 10 acrescentadas nesta sessao'
 
   # ═══════════════════ O QUE A CASA JA TEM (medicao local, tier 10) ═══════════════════
@@ -54,9 +54,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.98
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'medicao no repo em 2026-10-01: `wc -l .claude/validation/lint-artifacts.sh` = 5282 · `grep -c ''violation "'' lint-artifacts.sh` = 203 · maior numero de regra no lint = REGRA 93, com 92 tokens `REGRA N` distintos · `ls .claude/validation/ | grep -i baseline` = 13 arquivos *-baseline.txt · `wc -l .claude/validation/lint-selftest.sh` = 20619 · `command -v` devolve AUSENTE para cedar, opa, java, cargo, mvn e drools, e presente so para jq, python3 e node'
-    valid_from: 2026-10-01
+    valid_from: "2026-10-01"
     source_tier: 10
     source_kind: internal-audit
     label: 'O gate do Onion MEDIDO hoje, nao citado: o motor de regras a mao tem 5.282 linhas num arquivo (lint-artifacts.sh), 203 chamadas `violation "`, regras numeradas ate 93 (92 tokens distintos no corpo), 13 arquivos de baseline-catraca e um harness de 20.619 linhas (lint-selftest.sh) que JA e metade de um teste diferencial. E o dado que decide a viabilidade de qualquer migracao: nesta maquina cedar, opa, java, cargo, mvn e drools NAO EXISTEM — so jq, python3 e node. Um gate cuja capacidade compradora e vetar com exit 2 sob bypassPermissions nao pode depender de binario ausente.'
@@ -73,9 +73,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'bash .claude/validation/kg-corpus-grep.sh sobre motor de regras / decision engine / DMN / Rego / Cedar / OPA / Drools / ZEN Engine → 109 grafos varridos, 0 no sobre o tema; os 3.276 nos devolvidos casaram por colisao de termo generico (decision, engine)'
-    valid_from: 2026-10-01
+    valid_from: "2026-10-01"
     source_tier: 10
     source_kind: internal-audit
     label: 'AUSENCIA MEDIDA no corpus: em 109 grafos nao existe UM no sobre motor de regras, decision engine, DMN, Rego, Cedar, OPA, Drools ou ZEN Engine. Este grafo e a primeira entrada do tema — nao ha no previo a corroborar nem a contradizer, e por isso nao ha SUPERSEDES cross-grafo. O vizinho relevante existe e e outro objeto: a auditoria audit-textual-gates-2026-09 classificou os gates em VETO-MECANICO, AVISO-TEXTUAL e CONFIANCA-NO-MODELO, com a regua de que gate em prosa nao e gate. No core existe o agente @zen-engine-specialist (JDM/GoRules) servindo um projeto ADOTANTE de gamificacao — nao ha motor ZEN no core.'
@@ -94,9 +94,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2407.01688 (3-0) + https://arxiv.org/html/2407.01688v1 (3-0) + https://arxiv.org/pdf/2403.04651 (3-0) — TRES recortes de DOIS papers; a confianca NAO foi somada por repeticao'
-    valid_from: 2024-07
+    valid_from: "2024-07"
     source_tier: 8
     source_kind: paper
     label: 'CONFIRMADA (tier 8): o Cedar (AWS) e construido por verification-guided development — modelos executaveis em Lean com propriedades provadas mecanicamente (forbid vence permit, default deny, soundness da validacao) MAIS o codigo de producao em Rust checado contra o modelo por teste diferencial aleatorio sobre milhoes de entradas, imposto pelo CI. Para a pergunta 4 o que transfere e o METODO, nao o motor: codigo de producao escrito a mao + oraculo pequeno verificado + teste diferencial no CI. Fonte de 2024-07, pode estar superada em 2026 — e nenhuma fonte desta rodada mediu release ou commit atual.'
@@ -113,9 +113,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2407.01688 (3-0) + https://arxiv.org/html/2407.01688v1 (3-0) + https://arxiv.org/pdf/2403.04651 (3-0) — mesmos dois papers'
-    valid_from: 2024-03
+    valid_from: "2024-03"
     source_tier: 8
     source_kind: paper
     label: 'CONFIRMADA (tier 8): o compilador simbolico do Cedar traduz politicas para SMT-LIB com codificacao solida, completa e DECIDIVEL, o que permite provar equivalencia entre dois conjuntos de politicas, achar um request permitido por um e negado pelo outro, e detectar conflito, redundancia e politica vacua. O paper reporta cerca de 75 ms em media para codificar e resolver. E a capacidade de cobertura/conflito que o gate em bash nao tem — mas o objeto e EQUIVALENCIA DE POLITICA sobre um schema de entidades (principal/action/resource/context), nao conflito entre predicados de shell sobre o filesystem; ver E_OBJECAO_EQUIVALENCIA_NAO_E_CONFLITO_DE_LINT e E_OBJECAO_75MS_NAO_MEDE_HOOK.'
@@ -132,9 +132,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2407.01688 — votacao adversarial 2-1 (maioria apertada)'
-    valid_from: 2024-07
+    valid_from: "2024-07"
     source_tier: 8
     source_kind: paper
     label: 'CONFIRMADA COM RESSALVA (tier 8, 2-1): o VGD achou 25 bugs no Cedar — 4 no validador pelas provas em Lean e 21 por teste diferencial aleatorio e property-based testing — em codigo de PRODUCAO que teste unitario e code review nao pegaram. Confianca travada em 0.7 pelo voto dissidente. O conteudo corta para os dois lados e isso esta modelado: sustenta que oraculo + DRT acham o que revisao nao acha, e ao mesmo tempo mede que a implementacao de um motor declarativo tem defeito proprio (E_OBJECAO_25_BUGS_MEDEM_DEFEITO_DO_MOTOR).'
@@ -151,7 +151,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.amazon.science/publications/symcert-verifying-smt-based-policy-analyses — DOIS recortes da MESMA pagina, ambos 3-0; a pagina e landing de publicacao da Amazon (o vendedor da tecnologia), tier 8 por dominio e nao por independencia'
     valid_from: "2026"
     source_tier: 8
@@ -170,9 +170,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://infoq.com/news/2026/01/cedar-joins-cncf-sandbox/ — 2-1 na claim de ingresso no CNCF, 3-0 na claim de verificacao formal'
-    valid_from: 2026-01
+    valid_from: "2026-01"
     source_tier: 6
     source_kind: analyst
     label: 'CONFIRMADA COM RESSALVA (tier 6, 2-1): o Cedar, linguagem de politica originada na AWS, ingressou no CNCF como projeto Sandbox, noticiado pelo InfoQ em janeiro de 2026, e e descrito como formalmente verificado em Lean com teste diferencial aleatorio. E o unico sinal de GOVERNANCA datado de 2026 da rodada — um hyperscaler doando a linguagem de politica para governanca neutra. Nao e sinal de atividade de codigo: nenhuma fonte desta rodada rodou `gh api repos/cedar-policy/cedar/releases`.'
@@ -191,9 +191,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/ (3-0) + o mesmo post no mirror https://noise.getoto.net/2026/07/06/... (2-1) — primario E mirror foram contados como duas fontes na rodada; aqui sao UMA'
-    valid_from: 2026-07
+    valid_from: "2026-07"
     source_tier: 8
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 2026-07): a AWS publicou padrao de producao em que o Cedar impoe least-privilege em cadeias multi-agente em tres camadas (agente para ferramenta, agente para agente com limite de profundidade de delegacao, e autorizacao do usuario originador), avaliado FORA do laco de raciocinio do agente, numa Lambda separada. E a forma concreta do padrao LLM propoe, motor decide — e e o unico dominio desta rodada com evidencia de producao datada de 2026, o que sustenta a opcao E (alvo cirurgico em autorizacao de agente) e NAO a migracao do gate de lint.'
@@ -210,9 +210,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2606.26649 (3-0, duas claims) + https://icml.cc/virtual/2026/67916 (3-0) + https://www.emergentmind.com/papers/2606.26649 (3-0, duas claims) — CINCO recortes do MESMO paper em tres hosts; confianca travada em 0.7 pela concentracao e pelo tier do agregador'
-    valid_from: 2026-06-25
+    valid_from: "2026-06-25"
     source_tier: 7
     source_kind: paper
     label: 'CONFIRMADA (tier 7, 2026-06-25): Mondl, Maisel e Brock (arXiv 2606.26649, tambem no workshop Agents in the Wild do ICML 2026) apresentam autoformalizacao que traduz prompts de agente, descricoes de ferramentas MCP e politica em linguagem natural para politicas Cedar, por laco gerador-critico: um Hard Critic DETERMINISTICO (parser Cedar, checagem de schema, analise estatica de politica vacua) impede o LLM de confabular entidades, e um Soft Critic LLM julga alinhamento semantico contra a especificacao. E o desenho exato de LLM propoe, motor decide — e o papel do critico duro e o mesmo papel que o gate em bash do Onion ja exerce. A claim de cobertura no MedAgentBench foi REFUTADA (sem numeros na pagina).'
@@ -229,9 +229,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://noise.getoto.net/2026/05/20/why-policy-in-amazon-bedrock-agentcore-chose-cedar-for-securing-agentic-workflows/ — TRES recortes do MESMO post, no MESMO mirror (3-0, 2-1, 3-0); source_kind vendor-on-competitor, que a clausula 7 manda tratar como SEMPRE suspeito'
-    valid_from: 2026-05
+    valid_from: "2026-05"
     source_tier: 5
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA COM RESSALVA (tier 5, vendor): a AWS escolheu Cedar para o Policy do Bedrock AgentCore pela semantica DETERMINISTICA — mesma requisicao devolve sempre a mesma decisao, com default deny, forbid vence e sem ordenacao de regras — e descreve um padrao neurosimbolico em que o LLM traduz linguagem natural em politicas Cedar validadas contra um schema gerado automaticamente das ferramentas MCP, com a Cedar Analysis detectando impossibilidade logica. Capital do incumbente em forma de PRODUTO e o sinal mais pesado do eixo mercado desta rodada; a confianca fica em 0.5 porque e o fornecedor falando do proprio produto e porque os tres achados sao um unico post.'
@@ -248,9 +248,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://chatforest.com/reviews/authorization-policy-engine-mcp-servers/ (agregador, 3-0) + https://blog.sondera.ai/p/hooking-coding-agents-with-the-cedar (blog de engenheiro, 3-0) + https://github.com/vectimus/vectimus (repo, 2-1); confianca travada em 0.5 pela clausula 7 — tier <= 5 com agregador e blog pessoal, sem fonte primaria de fornecedor'
-    valid_from: 2026-03
+    valid_from: "2026-03"
     source_tier: 5
     source_kind: aggregator
     label: 'CONFIRMADA COM RESSALVA (tier 5): autorizacao de agente por policy engine no nivel da TOOL CALL ja e padrao concreto e existem implementacoes nomeadas — ToolHive, ScopeBlind protect-mcp, Permit.io MCP Gateway, Vectimus (governanca determinística de agentes de codigo com Cedar, sem LLM no loop) e Sondera coding-agent-hooks, que normaliza Cedar como policy engine em hooks locais de Claude Code, Cursor, GitHub Copilot CLI e Gemini CLI. E o achado mais perto de casa: alguem ja usa a MESMA superficie de hook do Claude Code que o Onion usa, com politica declarativa em vez de shell. MAS a claim de que o Vectimus veta por exit 2 na camada de tool-calling foi REFUTADA nesta rodada, e a de que o Cedar v0.6.0 saiu em 2026-08-24 tambem — ou seja, o elo que ligaria isto ao veto do Onion e justamente o nao-verificado.'
@@ -269,9 +269,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.youngju.dev/blog/2026-07-17-opa-post-styra-apple-acquihire-reality.en — blog de engenheiro, 3-0; tier 5, e a UNICA fonte da rodada sobre OPA/Rego'
-    valid_from: 2025-08
+    valid_from: "2025-08"
     source_tier: 5
     source_kind: engineer
     label: 'CONFIRMADA COM RESSALVA (tier 5): o OPA segue projeto GRADUADO da CNCF sob Apache-2.0, com governanca e licenca inalteradas depois da saida dos fundadores e da equipe da Styra para a Apple — acquihire de talento, nao aquisicao da empresa. O fato e de 2025-08 e pode estar superado; e tambem o retrato do buraco desta rodada: o concorrente mais usado do campo (Rego/Datalog, o eixo da pergunta 2 sobre revival de logica declarativa) entrou no grafo por UM blog pessoal, sem licenca de release, sem velocidade de commit e sem comparacao de capacidade.'
@@ -288,7 +288,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.45
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://docs.gorules.io/developers/overview/bre-vs-brms.md — DOIS recortes da mesma pagina de documentacao do fornecedor, 3-0 cada; SEM DATA na pagina, logo sem valid_from'
     source_tier: 6
     source_kind: primary
@@ -308,9 +308,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'sintese do eixo mercado desta rodada, sobre tres fontes: youngju.dev 2026-07 (acquihire Styra/Apple, evento de 2025-08), infoq 2026-01 (Cedar no CNCF Sandbox) e o post AgentCore de 2026-05 (Cedar dentro de produto AWS); ZERO fonte de analista de mercado (Gartner/Forrester/Thoughtworks), ZERO rodada de investimento e ZERO numero de receita'
-    valid_from: 2026-07
+    valid_from: "2026-07"
     source_tier: 5
     source_kind: analyst
     label: "EIXO MERCADO (journal wf_fcfb94bc-f30): acquihire da Styra pela Apple (OPA segue Apache-2.0/CNCF); Cedar no CNCF Sandbox (jan/2026) e no Bedrock AgentCore (mai/2026). Síntese: zero rodada/analista; o journal guarda, sem verificar, Cerbos US$7,5M e Kognitos com VC e Gartner."
@@ -330,7 +330,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'contabilidade da propria rodada: 23 fontes varridas, 61 claims produzidas, 29 confirmadas (colapsando em ~8 artefatos distintos), 4 refutadas por fonte fraca, 0 nao-verificadas por 403 ou truncagem, 2 medicoes locais tier 10 acrescentadas; 10 objecoes sobreviventes do Elenxo, 10 modeladas, 0 nao modeladas'
     source_tier: 10
     source_kind: internal-audit
@@ -399,7 +399,7 @@ nodes:
     impact: 5
     confidence: 0.6
     label: 'DECISAO ABERTA (o maestro sela): o gate determinístico do Onion — motor de regras escrito a mao em bash, 5.282 linhas, 203 chamadas violation, regras numeradas ate 93 com severidade HARD/SOFT derivada do CORPO da guarda, catraca por 13 baselines e um gerador que projeta o registro dos docstrings — deve migrar para um motor declarativo, ou a escrita a mao em shell e vantagem deliberada? Opcoes nomeadas: A) manter o shell e importar o METODO do Cedar (verification-guided development): um oraculo independente cerca de 10x menor que o gate mais teste diferencial aleatorio no CI contra as 93 regras; B) migrar o gate para um motor declarativo (Cedar, OPA/Rego, DMN ou JDM) e expressar as 93 regras como politicas; C) hibrido — o shell continua extraindo fatos e devolvendo exit 2, e um motor declarativo decide atras de um handler de hook (MCP/webhook), mantendo o veto; D) nao decidir agora e reabrir a pesquisa nas faixas nao lidas (Drools/DMN/OpenL/Easy Rules, Cerbos/Oso/Casbin, Rego/Datalog e a faixa CONTRARIAN) antes de selar qualquer no; E) alvo cirurgico — nao migrar o gate e adotar motor declarativo SO em autorizacao de agente (tool call / MCP), o unico uso com evidencia. RECOMENDACAO DO ELENXO: REPROVO B (migrar o gate) e REPROVO o selamento desta rodada como esta; recomendo D PRIMEIRO, depois A, com E como item separado, e C so como experimento medido. TRES RAZOES, cada uma com objecao sobrevivente por tras. (1) A RODADA NAO RESPONDE A PERGUNTA QUE DIZ RESPONDER: dos 28 achados externos 26 sao Cedar, 1 e FAQ de fornecedor sem data e 1 e blog pessoal sobre OPA, e os 28 colapsam em cerca de 8 artefatos (arXiv 2407.01688 lido 3x em pdf/html/pagina de publicacao, arXiv 2606.26649 lido 3x via arxiv/ICML/emergentmind, o post AgentCore de maio lido 3x no mesmo mirror, o post AWS de julho contado como primario E mirror); o ZEN Engine, ponto de partida da pergunta, tem ZERO evidencia. (2) A EXIGENCIA DE ATUALIDADE DE OUTUBRO DE 2026 ESTA DESCUMPRIDA: nao existe UM dado verificado de release, commit ou versao corrente de NENHUM motor, a unica alegacao de versao de 2026 foi REFUTADA, e as fontes centrais sao de marco e julho de 2024 — a medicao que faltava custava um comando (`gh api repos/cedar-policy/cedar/releases`). (3) OS ACHADOS QUE SUSTENTARIAM B SUSTENTAM A: o verification-guided development descrito nas fontes E codigo de producao a mao mais oraculo pequeno verificado mais teste diferencial no CI, o que PRESCREVE escrever um oraculo para o gate em bash e nao substituir o gate; o item que diz isso explicitamente (rejeitaram gerar C a partir de Lean, escolheram Rust idiomatico mais modelo Lean cerca de 10x menor) foi CORTADO POR ORCAMENTO — a evidencia contraria a migracao foi a que nao entrou; e o Onion ja tem metade do DRT em lint-selftest.sh. FORMA CONCRETA RECOMENDADA: (a) rodar D como rodada complementar em modo primarias nomeadas, com as faixas da letra (f) do E_LACUNAS como args.sources e `gh api .../releases` como primeira medicao; (b) iniciar A pelo oraculo independente do GERADOR (rules-registry.sh), porque a falha MEDIDA da casa e a REGRA 85 que saiu HARD onde e HARD+SOFT com a projecao byte-a-byte APROVANDO — o problema do Onion e oraculo independente, nao linguagem de regra; (c) tratar E como fio proprio, com dominio proprio (autorizacao de tool call), e nao como etapa da migracao do gate; (d) se C for tentado, medir SMT dentro de git hook ANTES de qualquer doutrina. PRE-REQUISITOS HOJE ABERTOS: (I) velocidade de release e sinal de vida de cada motor, por `gh api`; (II) existe UM caso de lint de artefato expresso em motor declarativo? a rodada nao achou nenhum; (III) o orcamento de tempo de um motor declarativo dentro de pre-commit. Enquanto (I)-(III) nao rodarem, qualquer selo aqui e decisao por ausencia de dado.'
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'NAO SELADA. Esta sessao nunca sela: status open, aguardando o maestro. A recomendacao do Elenxo e afirmacao de UM agente sem votacao — confianca 0.6 pela clausula de dissent.'
     trace: 'docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml'
 
@@ -412,7 +412,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'a propria frase citada no achado 1, da landing de publicacao da Amazon: erros de codificacao nas analises SMT do Cedar podem comprometer a corretude silenciosamente e escapam de testes'
     source_tier: 8
     source_kind: internal-audit
@@ -430,7 +430,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 2 lido contra a medicao local de 2026-10-01: `command -v cedar` devolve NADA nesta maquina, assim como opa, java, cargo, mvn e drools; so jq, python3 e node existem'
     source_tier: 10
     source_kind: internal-audit
@@ -448,7 +448,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 3 lido contra a medicao local: lint-selftest.sh tem 20.619 linhas e .claude/validation/ tem 13 arquivos *-baseline.txt de catraca — o Onion ja tem metade do teste diferencial que o VGD prescreve'
     source_tier: 10
     source_kind: internal-audit
@@ -466,7 +466,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 4 (votacao 2-1) lido contra a medicao local: `grep -c ''violation "'' lint-artifacts.sh` = 203 — o gate do Onion e legivel por grep, um motor declarativo de terceiro nao e legivel assim'
     source_tier: 8
     source_kind: internal-audit
@@ -484,7 +484,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 5 lido contra o que o gate FAZ: 306 das 5.282 linhas de lint-artifacts.sh invocam grep/sed/awk/find/python sobre o filesystem e o git; nenhuma fonte da rodada mostra lint de artefato expresso em Cedar'
     source_tier: 10
     source_kind: internal-audit
@@ -502,7 +502,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 6 contra a contabilidade da rodada: as fontes centrais sao de 2024-03 e 2024-07, a UNICA alegacao de release de 2026 (Cedar v0.6.0 em 2026-08-24) foi REFUTADA, e `gh api repos/cedar-policy/cedar/releases` nao foi rodado por ninguem'
     source_tier: 10
     source_kind: internal-audit
@@ -520,7 +520,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 7 contra o orcamento MEDIDO do Onion: o lint caiu de cerca de 28s para 16s com um pre-filtro (PR #357) e a bancada so fecha em cerca de 8 min em faixas paralelas; nenhuma fonte da rodada mede SMT dentro de git hook'
     source_tier: 10
     source_kind: internal-audit
@@ -538,7 +538,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 8 contra o mecanismo que JA existe: rules-registry.sh deriva a severidade de violation "HARD"/"SOFT" NO CORPO da guarda (nao do comentario) e reprova em 6 catracas de clareza; a falha medida da REGRA 85 (saiu HARD onde e HARD+SOFT, com a projecao byte-a-byte APROVANDO) esta no proprio registro'
     source_tier: 10
     source_kind: internal-audit
@@ -556,7 +556,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'achado 9 confrontado com o achado 3: mesma publicacao (arXiv 2407.01688), mesmo conteudo (modelos Lean com propriedades provadas — forbid trumps permit, default deny, soundness — mais DRT), lido em host diferente (html em vez de pdf)'
     source_tier: 10
     source_kind: internal-audit
@@ -574,7 +574,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'contabilidade das fontes da rodada: 26 dos 28 achados externos sao Cedar, 1 e FAQ de fornecedor sem data (GoRules) e 1 e blog pessoal sobre OPA; os 28 colapsam em cerca de 8 artefatos (arXiv 2407.01688 em 3 hosts, arXiv 2606.26649 em 3 hosts, post AgentCore 3x no mesmo mirror, post AWS de julho como primario E mirror); ZERO evidencia sobre o ZEN Engine'
     source_tier: 10
     source_kind: internal-audit

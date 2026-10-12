@@ -2,7 +2,7 @@ meta:
   id: guardrails-2nd-pr-state-2026-07
   schema_version: "1"
   layer: audit
-  baseline: 2026-07-24
+  baseline: "2026-07-24"
   date: 2026-07-24
   note: >
     Investigação nasce no grafo (REGRA 43 / radar-is-runtime): "atacar o 2º PR de guardrails".
@@ -26,7 +26,7 @@ nodes:
     status: refuted
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "a memoria diz FALTA o 2o PR gated (wire-in R15 + gate anti-drift taxonomia + superficie /meta:guardrails)"
     trace: "memory/discuss-guardrails-nemo-lens-state.md"
 
@@ -36,7 +36,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "o wire-in R15 JA FOI: PR #452 (2026-07-19), 6 fases faseadas — helpers, anti-drift por construcao, dogfood comportamental 3/3 injecao 0%. O '2o PR' aconteceu; a memoria e stale."
     trace: ".claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md"
     provenance:
@@ -51,7 +51,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 1.0
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "VIVO no core (nao quarentena): .claude/utils/guardrails/onion-untrusted-wrap.sh + .claude/validation/guardrails/onion-effect-gate.sh; wired em lint-selftest.sh (run_guardrails_selftests); fragmento SSOT common/prompts/untrusted-content-provenance.md existe"
     narrative: "label anterior: VIVO no core (nao quarentena): .claude/utils/guardrails/onion-untrusted-wrap.sh + .claude/validation/guardrails/onion-effect-gate.sh; wired em lint-artifacts.sh + lint-selftest.sh (run_guardrails_selftests); fragmento SSOT common/prompts/untrusted-content-provenance.md existe"
     trace: ".claude/validation/guardrails/onion-effect-gate.sh"
@@ -66,7 +66,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "o gate anti-drift da taxonomia (memoria: 'falta') foi resolvido POR CONSTRUCAO na F1: numeros de linha rebaixados -> read-path a nivel de arquivo + string de veto greppavel + escopo /meta:kb-freshness. Sem numero perpetuo = nada a driftar (nao violou o proprio ONION-R1)"
     trace: "docs/knowledge-base/concepts/onion-guardrails.md"
     provenance:
@@ -81,7 +81,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "F4 refinou o design: 'estrutural>gated' = impossivel-por-construcao, nao cercar todo transporte. a2a-accept NUNCA inlineia o corpo (R15.1 by-construction); co-relay copia verbatim (protecao migrou p/ read-time R15.2). Consumidores VERIFICADOS (co-evolve+adopt+reverse-consolidate), nao os produtores listados (F5)"
     trace: "docs/knowledge-base/concepts/onion-guardrails.md"
     provenance:
@@ -96,7 +96,7 @@ nodes:
     status: done
     impact: 3
     confidence: 0.9
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O no descreve o fio #4 (/meta:guardrails) como GATED — residuo aberto aguardando decisao do maestro. Mas o PROPRIO arquivo kg registra, 7 dias depois, que a decisao FOI tomada (D_N"
     label: "o UNICO residuo real e a superficie /meta:guardrails — GATED (fio #4 do promotion-plan). Relabel ONION-Rn amplo = docs-pass opcional; fios #2/#5 = pesquisa, nao entrega"
     trace: "docs/discussions/guardrails-nemo-lens/promotion-plan.md:34"
@@ -122,7 +122,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-31
+    verified_at: "2026-07-31"
     verified_against: elenxo-3-steelman-6-refutacao-1-sintese
     label: "VEREDITO: /meta:guardrails = INDICE-DE-LEITURA fortificado (lente-viva, so-leitura), NAO DSL nem hibrido. 3 propriedades nao-negociaveis: (1) lente-viva por grep AO VIVO contra os gates reais (CONFIRMADO/DIVERGENTE), nunca espelho da taxonomia-snapshot; (2) codigo proprio = so a ESTRUTURA que um grep unico nao da (join reverso arquivo->categorias + resolucao canal C1/C2/C3->R15); (3) toda linha RE-PROVADA no call-time, zero veredito PASS/FAIL novo. Restricao: o re-grep de verificacao E o mesmo do gate anti-drift da Fase 1 — UM mecanismo, nao dois. Promocao a comando GANHA por dogfood (senao: helper/companheira-de-KB)"
     trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
@@ -138,7 +138,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-31
+    verified_at: "2026-07-31"
     verified_against: refutacao-adversarial-2-lentes-opus
     label: "DSL REFUTADA nas 2 lentes: inverte estrutural>gated (move logica de decisao do gate — verbos hardcoded no .sh selftestado — p/ dado de config fora da superficie testada); so sobrevive com condicoes que NAO valem hoje (effect-gate em quarentena nao-wired; N=0 demanda de campo; sua evidencia-ancora descreve ERRADO o artefato vivo — e whitelist INTAKE/EXECUTION deny-by-default JA em bash). Deferida, nao proposicao viva"
     trace: "docs/knowledge-base/concepts/onion-guardrails.md"
@@ -154,7 +154,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-31
+    verified_at: "2026-07-31"
     verified_against: refutacao-adversarial-doutrina-conf-alta
     label: "HIBRIDO REFUTADO conf ALTA (doutrina): a Fase B (compilador) repousa em transferencia FALSA — a catraca REGRA 42 NAO e 'declaracao compila p/ gate', e dado TIPADO consumido por runner FIXO escrito a mao (zero codegen). Fase B so sobrevive colapsando ate deixar de ser DSL/compilador — e ai DISSOLVE no indice. Seu custo confessa: compilador exige disciplina de revisor a cada PR (o anti-padrao que a discussao mata)"
     trace: "docs/discussions/guardrails-nemo-lens/promotion-plan.md"
@@ -170,7 +170,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-31
+    verified_at: "2026-07-31"
     verified_against: lint-artifacts-em-REGRA-48-vs-taxonomia-148-vetos-14-cat
     label: "INDICE tambem refutado (espelho-de-snapshot cai): a taxonomy-onion-r.md e snapshot 2026-07-12 de 148 vetos/14 categorias, mas o lint JA esta em REGRA 48 (~20 regras nasceram depois, sem categorizar) — o snapshot JA DRIFTOU. MAS as condicoes de sobrevivencia CONVERGEM e ELEVAM: espelho->lente-viva (grep ao vivo). DSL e hibrido tambem terminam em 'indice agora + autoria deferida'"
     trace: ".claude/validation/lint-rules.md"
@@ -196,7 +196,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-31
+    verified_at: "2026-07-31"
     verified_against: spike-grep-vivo-vs-lente-em-task.md-e-canal-C2
     label: "SPIKE refuta o 'construir': (1) FORWARD categoria->vetos = grep que o maestro JA tem; lente-viva so sobrepoe o lint. (2) CANAL-RESOLUCAO carrega peso MAS a resposta JA vive na KB §4.1/4.2 (tabela curada) — nao precisa de comando. (3) JOIN-REVERSO (arquivo->categorias que governam) responde pergunta real que grep e --only NAO respondem, MAS nao ha escopo machine-readable por guarda (vive espalhado em _find roots/case-globs) -> hand-curar tabela DRIFTA (a ironia que mata a doutrina) ou instrumentar 48 guardas (churn, decisao maior). Nenhuma das 3 pecas ganha um comando /meta: hoje"
     trace: ".claude/validation/lint-artifacts.sh"
@@ -212,7 +212,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-31
+    verified_at: "2026-07-31"
     verified_against: spike-behavior-over-declaration
     label: "VEREDITO PÓS-SPIKE: NAO construir /meta:guardrails como comando — nao se paga hoje. Os guardrails JA rodam (48 gates + selftest) e JA sao navegaveis (grep + taxonomia-KB + tabela-canal §4.1/4.2). Fecha fio #4 como resolvido-sem-comando; reabrir so na demanda de autoria. O unico gap real (join-reverso) fica DEFERIDO atras de uma decisao maior: escopo self-declarado machine-readable pelas guardas. Behavior-over-declaration: a promessa 'ganha por dogfood' rodou o dogfood e nao ganhou"
     trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
@@ -228,7 +228,7 @@ nodes:
     status: open
     impact: 2
     confidence: 1.0
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 3/3 claims; juiz APROVADO. Leitura do nó completo (label+trace) + edges de/para o nó (D_GUARDRAIL_PULL_NOT_ => O nó pede: join-reverso (arquivo→guardrails que o governam) só vira ferramenta barata SE guardas pas…'
     label: "GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar escopo machine-readable (ex.: campo # scope: por guarda, consumido por um resolver). E uma decisao de mecanismo maior, gated na demanda real (hoje: hipotetica, N=0 pediu). NAO pre-cozinhar"
     trace: ".claude/validation/lint-artifacts.sh"
@@ -249,7 +249,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-31
+    verified_at: "2026-07-31"
     verified_against: substrato-verificado-projection-safety+hooks+guia-claude-code
     label: "REGRA: autoria de guardrail se PUXA por caso concreto recorrente, nunca se EMPURRA por hipotese. (1) O primitivo determinístico JA EXISTE e funciona: projection-safety.sh --terms (adotante declara os proprios termos -> gate exit-1, fail-loud P0-P5), dogfoodado no Gustavo P7. NAO construir camada. (2) Caso concreto aparece -> fiar A MAO ~15min (PostToolUse/UserPromptSubmit -> tmp -> projection-safety --terms), fresco e descartavel. (3) O scaffold /meta:create-guardrail so se paga apos o MESMO padrao ser fiado a mao 2-3x (boilerplate vira peso morto). (4) NUNCA construir por padrao: gate de TEMA (determinístico impossivel -> soft-only, invariante #3) nem gate por-agente no INPUT (tool_input carregar o prompt do subagente e NAO-verificado -> Fase-0 teste empirico e o gate). behavior-over-declaration + gated-work-derives-fresh: nao ficar preso em camada que nao funciona/ineficiente/ineficaz"
     trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
@@ -281,7 +281,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-07-31
+    verified_at: "2026-07-31"
     verified_against: guia-claude-code-hooks-oficial
     label: "Substrato de hook verificado (guia Claude Code): UserPromptSubmit ve o prompt e BLOQUEIA (exit 2) = gate de input nivel-sessao; PostToolUse ve/bloqueia OUTPUT = o analogo EXATO do gate-de-artefato do Gustavo; PreToolUse matcher Agent/Skill bloqueia por NOME. INCERTO (nao-documentado): tool_input carregar o texto do prompt que vai ao subagente -> o gate por-agente no input pede teste empirico. TEMA semantico so soft (invariante #3 proibe classificador no caminho critico)"
     trace: ".claude/settings.json"

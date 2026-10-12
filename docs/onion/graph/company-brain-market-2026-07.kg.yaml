@@ -16,7 +16,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Mem0 — líder de facto memory-for-agents. $24M Series A (Basis Set), 41k stars, 14M downloads, API 35M→186M; provider EXCLUSIVO de memória do AWS Agent SDK. FORÇA: adoção dev/ecossistema. FRAQUEZA: infra pura (vetor+extração), não produto brain fim-a-fim. url: mem0.ai/series-a"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -30,7 +30,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Glean — incumbente enterprise mais valioso. $7.2B valuation, ARR ~$200M→$300M (+89% YoY); saiu de busca p/ grafo de conhecimento permission-aware (Agentic Engine 2 + Canvas). FORÇA: dado+permissões corporativas, tração em receita. FRAQUEZA: preço/complexidade enterprise, não serve prosumer. url: valueaddvc.com/blog/glean-valuation-revenue-2026"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -44,7 +44,7 @@ nodes:
     impact: 3
     confidence: 0.75
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "ClickUp Brain² (23/06/2026) — Company Brain via work-graph interno + compound memory + roteamento multi-LLM; compliance SOC2/ISO42001/HIPAA/GDPR nativo. FORÇA: distribuição embutida na suíte. FRAQUEZA: fechado no ClickUp, não agnóstico. url: clickup.com/blog/brain-2-launch"
     narrative: "label anterior: ClickUp Brain² (23/06/2026) — Company Brain via work-graph interno + compound memory + roteamento multi-LLM; compliance SOC2/ISO42001/HIPAA/GDPR nativo. FORÇA: distribuição embutida na suíte. FRAQUEZA: fechado no ClickUp, não agnóstico. Claim de preferência 100% = do vendor. url: clickup.com/blog/brain-2-launch"
     provenance:
@@ -59,7 +59,7 @@ nodes:
     impact: 3
     confidence: 0.8
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Microsoft Copilot Memory + Windows Recall — FORÇA: distribuição Windows/M365 (maior base) + compliance embutido. FRAQUEZA: estigma de segurança persistente do Recall; exfiltração achada 1 ano+ após lançar. url: geekwire.com/2026/one-year-after-windows-recall-security-red-flags"
     narrative: "label anterior: Microsoft Copilot Memory + Windows Recall — FORÇA: distribuição Windows/M365 (maior base do mundo) + compliance embutido (Purview). FRAQUEZA: Recall carrega estigma de segurança persistente — vetores de exfiltração ainda achados 1 ano+ após lançamento. url: geekwire.com/2026/one-year-after-windows-recall-security-red-flags"
     provenance:
@@ -74,7 +74,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Personal brain hardware NÃO sustentou negócio independente: Limitless (pendant) ADQUIRIDA pela Meta dez/2025 (parou de vender, features de captura descontinuadas); Rewind.ai (precursor) ENCERROU 19/12/2025. Sinal duro de mercado no lado pessoal. url: becomefluent.io/what-happened-to-limitless-pendant + rewind.ai/what-happened-to-rewind"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -88,7 +88,7 @@ nodes:
     impact: 2
     confidence: 0.75
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Notas+IA (Reflect, Capacities, Obsidian+IA, Notion AI, Tana, Mem X, <$40/mês) — categoria pessoal VIVA mas fragmentada, sem player dominante nem funding/ARR relevante. Nicho/prosumer, não consolidada. url: iwoszapar.com/best-ai-second-brain-solutions"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -104,7 +104,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Causa-raiz da trend (múltiplas fontes independentes): 'frontier model quality stopped being the bottleneck for enterprise AI; organizational context became the bottleneck'. Ganho individual com memory NÃO escala p/ o time. url: vectorize.io/articles/brain-stack-second-company-single-brain"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -118,7 +118,7 @@ nodes:
     impact: 4
     confidence: 0.8
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Não é 1 trend, são 3 sub-segmentos ('The Brain Stack'): Second Brain (pessoal), Company Brain (empresa, termo 2026-nativo), Single/Shared Brain (multi-agente). Company Brain fragmentado — múltiplos players correndo p/ DEFINIR a categoria (não-verificado que haja líder). url: vectorize.io/articles/second-brain-vs-company-brain"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -132,7 +132,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Critério que separa 'brain de verdade' de índice de busca: CONSOLIDAÇÃO AUTOMÁTICA (reconciliar contradição sem edição manual). Mercado consolida por reconciliação-LLM probabilística em runtime. Ecoa P5/inference-mitigation (SSOT executável vs cerimônia). url: cognee.ai/blog/guides/open-source-memory-frameworks-llm-agents"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -146,7 +146,7 @@ nodes:
     impact: 4
     confidence: 0.75
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Segmento mais quente = Agentic AI Orchestration & Memory: $6,16-6,27bi (2025) → $28,45bi (2030)/$69bi (2033), CAGR ~35,3%. Personal Knowledge Base AI: $1,36bi→$11,87bi, CAGR 27,2%. Confirma trajetória notas→grafo→memória-de-agente. url: skyquestt.com/report/agentic-ai-orchestration-and-memory-systems-market"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -160,7 +160,7 @@ nodes:
     impact: 4
     confidence: 0.75
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "~65% das falhas de agentes enterprise em 2025 = context drift/perda de memória em raciocínio multi-etapa; agentes sem contexto institucional: -38% acurácia. Aponta p/ grafo de memória persistente/versionado/governado (= KG do Onion). url: zylos.ai/research/2026-04-05-ai-agent-memory-architectures"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -174,7 +174,7 @@ nodes:
     impact: 4
     confidence: 0.7
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Dor quantificada: perda de conhecimento institucional custa $1,3tri/ano (EUA, Deloitte); 42% do conhecimento só na cabeça de funcionários; turnover 22-25%/ano. Enquadramento 'Centaur CEO' (Forbes jul/2026): remover 10% da dependência do fundador move valuation M&A 'em milhões'. url: forbes.com/sites/lewisschiff/2026/07/22"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -188,7 +188,7 @@ nodes:
     impact: 3
     confidence: 0.75
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Gartner Top Tech Trends 2026: 40% das apps enterprise com agentes task-specific até 2026 (vs <5% em 2025); 'shakeup' de $58bi em ferramentas de produtividade até 2027. a16z: IA vira ambiente/sistema/agente, assume conectar docs/políticas numa camada NL (confirma direção Company Brain). url: gartner.com/en/articles/top-technology-trends-2026"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -206,7 +206,7 @@ nodes:
     impact: 4
     confidence: 0.8
     status: refuted
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "HONESTIDADE: NÃO há fonte primária (CB Insights/a16z com número) nomeando+dimensionando 'Company Brain' ou 'federação de memória' como categoria. O enquadramento é síntese/aposta de tendência, não número de mercado existente sob esse nome. url: a16z.com/notes-on-ai-apps-in-2026"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -220,7 +220,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: ycombinator.com-rfs-summer-2026
     label: "A CATEGORIA FOI NOMEADA POR FONTE PRIMÁRIA: 'Company Brain' e uma das 15 categorias oficiais do Request for Startups Summer 2026 da Y Combinator, escrita por Tom Blomfield (General Partner, fundador do Monzo e do GoCardless). Verbatim: 'If we want every company to run on AI automation, we need a new primitive: a company brain'. Definicao da categoria: sistema que PUXA conhecimento de fontes fragmentadas, ESTRUTURA, MANTEM ATUAL, e converte num EXECUTABLE SKILLS FILE para IA. Players ja nomeados no espaco: Hyper, GBrain, Engram (US$98M em 2026-06-23), Interloom, Graphon AI, Memory Store (YC Spring 2026), MemPalace, Cognee. RESSALVA QUE NAO PODE SER PERDIDA: um RFS e LISTA DE DESEJOS DE INVESTIDOR — sinal de onde alguem quer alocar capital, NAO prova de demanda paga. Categoria nomeada != mercado provado != cliente. Nao ha um unico pull datado de adotante pedindo 'company brain'."
     trace: "https://www.ycombinator.com/rfs"
@@ -237,7 +237,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-02
+    verified_at: "2026-08-02"
     verified_against: medicao-interna-HEAD-2026-08-02
     label: "A DEFINICAO DA YC VIRA CHECKLIST DE 3 VERBOS, E FALHAMOS NO DO MEIO. (1) ESTRUTURA: OK — 51 agentes, 11 skills, 102 comandos, KB e KG sob 6 gates HARD. (2) CONVERTE EM EXECUTABLE SKILLS FILE: OK PARCIAL — CLAUDE.md + .claude/skills/ sao consumidos a cada sessao, mas como EFEITO COLATERAL, nunca como proposta de valor declarada. (3) MANTEM ATUAL: FALHA — /meta:kg-freshness com 0 runs em 34 dias, 459/566 nos 'open' (81%) sem nenhuma data, 13/50 grafos sem verified_at. O VERBO EM QUE FALHAMOS E EXATAMENTE O QUE SEPARA 'company brain' de 'wiki'."
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
@@ -254,7 +254,7 @@ nodes:
     impact: 5
     confidence: 0.8
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "WHITESPACE: (1) ninguém cobre pessoal+empresa+agente com a MESMA camada; (2) governança-first NÃO amarrada a framework de DESENVOLVIMENTO — todos são camada de conhecimento, não motor de execução; (3) device-first + zero-knowledge sync SEM equivalente direto verificado (majors são cloud/OS-vendor). url: valueaddvc.com/blog/the-ai-memory-problem"
     provenance:
       source: "docs/analysis/company-brain-market-2026-07.md"
@@ -271,7 +271,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Onion JÁ TEM KG local-first como 'cérebro' (.kg.yaml SDAAL): modela audit+SSOT durável, radar determinístico (kg-radar.sh) p/ atenção/reconciliação/integridade/frescor, arestas REFUTES/SUPERSEDES auto-corrigem contradição. 3 dogfoods de campo — não é hipótese"
     provenance:
       source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
@@ -286,7 +286,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Onion JÁ TEM N=1 provado no device (Moto G54): cifra XChaCha20 at-rest + life-KG runtime store + sync zero-knowledge (só ciphertext sobe p/ marciocar/onion-pessoal-kg). Prova funcionando vs. maioria dos personal brain = wrapper de RAG sobre vetor centralizado"
     provenance:
       source: "onion-pessoal-app@7e61e10"
@@ -300,7 +300,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "Onion JÁ TEM a peça que a concorrência NÃO tem: doutrina de mitigação de INFERÊNCIA — risco real = o motor deduzindo o não-declarado (Staab et al. 2024, até 85% top-1), não dado em repouso. Stack L1-L6 + mapa do que já-transfere (query-gate, gerador≠porteiro, de-id fail-safe, R15)"
     provenance:
       source: "docs/knowledge-base/concepts/inference-mitigation.md"
@@ -372,7 +372,7 @@ nodes:
     impact: 4
     confidence: 0.75
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O nó é composto (3 afirmações) e o veredito diverge por afirmação, mas a soma aponta para OBSOLETO, não para 'segue vivo como estava escrito': (1) a tática específica pro"
     label: "MAIS-PRÓXIMO (menor esforço × maior prob.): re-embalar ativos que já existem — nomear o KG como 'Company Brain de projeto' no material P4 + publicar a doutrina de inferência como thought-leadership. Zero código novo, risco doutrinário ~zero, alavanca whitespace. Amarra em D6=MENSAGEM P4"
   - id: D_mais_valor
@@ -383,7 +383,7 @@ nodes:
     impact: 5
     confidence: 0.6
     status: superseded
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_D_mais_valor (SUPERSEDES); label preservado como historia'
     label: "MAIS-VALOR: fechar o gap N-tenant do L1 (schema-masking multi-tenant) — transforma 'Personal Brain N=1' em 'Company Brain provável' (segmento ~35% CAGR, dor $1,3tri). MAS gated: depende do gate D2-ativação; mais-valor NÃO é mais-próximo, são fases do mesmo caminho"
   - id: D_amarra_d3_d6
@@ -394,7 +394,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: done
-    verified_at: 2026-07-25
+    verified_at: "2026-07-25"
     label: "AMARRA GTM (ratificada 2026-07-25): D6=MENSAGEM P4 (regulado, whitespace) — promessa 'workflows faseados + auditabilidade estrutural', SEM prometer 'federação segura de dado regulado' (L1-L6 gated). D3=C: app-consumer/Company Brain N=1 DESACOPLADO e gated (lacuna de GTM, não técnica)"
     provenance:
       source: "docs/business-context/decisions.md"
@@ -410,7 +410,7 @@ nodes:
     impact: 5
     confidence: 0.55
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 4/4 claims; juiz APROVADO. grep -n "schema-masking|fatia-por-propósito|L1-L6" docs/knowledge-base/concepts/ => O nó tem 4 afirmações: (1) o gap N-tenant é o mais crítico p/ virar "Company" (vs pessoal); (2) a pr…'
     label: "Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo grafo, RBAC real). Falta desenho + prova de campo do L1 (schema-masking + fatia-por-propósito) em contexto multi-usuário. Trava D_mais_valor"
   - id: Q_p4_instrument
@@ -420,7 +420,7 @@ nodes:
     impact: 4
     confidence: 0.55
     status: superseded
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_p4_instrument (SUPERSEDES); label preservado como historia'
     label: "Pré-req de D2/mais-valor: instrumentar 1-2 prospects P4 reais + 'valor medido por adotante'. Sem isso, 'Company Brain regulado' é chute educado. Mesma lacuna Q_instrument do brief GTM. Zero adotante P4 provado hoje"
 
@@ -430,7 +430,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 4/4 — 1) Lidas as 4 afirmações do label (fechar gap N-tenant do L1/schema-masking; transforma Pe'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A decisão do nó (fechar N-tenant/schema-masking PORQUE isso destrava ''Company Brain provável'' como segmento de mercado a vender) foi superada por uma correção de GTM datada e já implantada (2026-08-26, commit fae0b529): Company Brain deixou de ser a promessa de venda e virou apenas rótulo de SEO/e'
     provenance:
@@ -445,7 +445,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — Li o nó (1 claim: ''instrumentar 1-2 prospects P4 reais + valor medido por adotante''). Bu'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (aberto desde 07-25) dizia ''Zero adotante P4 provado hoje''. Isso morreu: entre 2026-08-04 e 2026-08-27 rodou uma PoC real com prospect real (HPE Autos, via oferta <cliente-poc>), com material de cliente sob NDA, entrega em reunião confirmada, e o resultado foi PROVADO e CONFIRMADO PELO CLIENT'
     provenance:

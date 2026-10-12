@@ -4,8 +4,8 @@ meta:
   id: evolve-round-2026-10
   schema_version: "1"
   layer: audit
-  baseline: 2026-10-04
-  review_after: 2026-11-18
+  baseline: "2026-10-04"
+  review_after: "2026-11-18"
   x_supersedes_none: >
     Primeira rodada do /meta:evolve desde 2026-07-30 (66 dias) e a primeira com a superficie
     re-forjada (6/7) e o gatilho (REGRA 97). A rodada anterior, `onion-evolution-2026-07-30.md`, nao

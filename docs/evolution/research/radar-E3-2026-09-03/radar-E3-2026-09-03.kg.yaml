@@ -1,8 +1,8 @@
 meta:
   id: radar-E3-2026-09-03
   schema_version: "1"
-  baseline: 2026-09-03
-  review_after: 2026-10-18   # revisita: versao do Claude Code, 45d (= REGRA 65) — REGRA 67
+  baseline: "2026-09-03"
+  review_after: "2026-10-18"   # revisita: versao do Claude Code, 45d (= REGRA 65) — REGRA 67
   # kg-backlog-guard: on
   # ═══ TETO: 20 NÓS. Rodada fechada: cresce só se uma re-medição do mesmo delta emendar um achado. ═══
   # Rodada 2 do /meta:radar, eixo E3 (claude-code-delta): delta 2.1.257 (baseline 2026-09-02,
@@ -30,7 +30,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.17; medicao frontmatter-only (awk entre os dois ---): commands 109 (96 sonnet/10 opus/3 haiku), skills 0, agents 51; juiz EMENDOU (meu grep contava exemplos no corpo: 111/1/163)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -47,7 +47,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.12 (eu citara l.10 = cache OAuth; juiz corrigiu)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -64,7 +64,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.4; .claude/settings.json (3 vetos exit 2: 2 PreToolUse + 1 PreModelSwitch, sem bypass alterado)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -81,7 +81,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.7; contagem "40 processos claude" e da memoria de 2026-09-02 e NAO foi re-medida nesta rodada (juiz)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -100,7 +100,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.9; grep -n deny .claude/settings.json .claude/settings.local.json = vazio; settings.json:12 "Bash(grep * .env)" esta em permissions.ALLOW (juiz REPROVOU minha leitura: li allow como deny)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -120,7 +120,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.6; .claude/skills/onion-publish/SKILL.md:9 (allowed-tools) e :55-56 (passo 5, --strict manual); lint-artifacts.sh:2284 delega validacao YAML ao plugin validate (juiz EMENDOU: nao e novo, ja e usado manualmente)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -137,7 +137,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.3 e l.37 (eu citara l.38 = filtro do VSCode; juiz corrigiu)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -154,7 +154,7 @@ nodes:
     status: confirmed
     impact: 1
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.29 (eu citara l.30 = MCP no navegador); settings.json configura SessionStart/UserPromptSubmit/SessionEnd/PreCompact/PostToolUse/PreToolUse/PreModelSwitch/PostModelSwitch — SEM hook Stop (juiz REPROVOU)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -171,7 +171,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.20, l.27, l.31, l.36 (eu citara l.21/l.32; juiz corrigiu); git worktree list (worktree viva em .claude/worktrees/); .claude/workflows/onion-research.js (36 KB)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -188,7 +188,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.5 e l.35; .claude/utils/forge/adapters/ = github.md + none.md (github.md:9 declara-se o unico implementado; gitlab/bitbucket = costura em factory.md/detector.md)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -205,7 +205,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.25 (eu citara l.24 = identidade do repo; juiz corrigiu); .claude/hooks/premodelswitch-guard.sh (baseline ilegivel = exit 2 nomeando o arquivo)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -222,7 +222,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'CHANGELOG l.26, l.28, l.22, l.16, l.24, l.33, l.39+l.44 (2.1.258), l.13; juiz opus/high verificou CLAUDE_CODE_MAX_CONTEXT_TOKENS ausente no core'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -254,7 +254,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'tentativa: Skill onion-patterns invocada via ferramenta Skill num job em background => 0 eventos em .claude/sessions/model-switch.jsonl; a skill nem declara model: (exemplos no corpo)'
     source_tier: 9
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
@@ -271,7 +271,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'binario 2.1.259 (strings): chave de settings fallbackModel (aceita LISTA — merge especial), flag --fallback-model, classe FallbackTriggeredError(originalModel, fallbackModel, reason="overloaded") apos retries de 529, headers x-cc-fallback-from-model/-trigger/-category; NAO encontrado fallback por COTA do plano'
     source_tier: 10
     source_kind: primary
@@ -288,7 +288,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-03
+    verified_at: "2026-09-03"
     verified_against: 'familia model_ladder 7/7; 6 transicoes testadas a mao na guarda; lint real sem REGRA 70/71; 109 comandos sem model:'
     source_tier: 10
     source_kind: primary

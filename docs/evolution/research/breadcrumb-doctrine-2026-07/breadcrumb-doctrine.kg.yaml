@@ -3,7 +3,7 @@
 meta:
   id: breadcrumb-doctrine-2026-07
   schema_version: "1"
-  baseline: 2026-07-18
+  baseline: "2026-07-18"
   date: 2026-07-18
 nodes:
   - id: E_PRIOR_STIGMERGY
@@ -13,7 +13,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "prior-art 2026: estigmergia (Grasse 1959) reaplicada a agentes LLM — deixar rastro no ambiente compartilhado pro proximo seguir, sem fala direta (alinha com sem-IA-fala-IA + I3)"
     trace: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
     provenance:
@@ -28,7 +28,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "grep de 6 .kg.yaml: o campo de rastreio aponta pra FONTE (SYNTHESIS.md, arquivo-linha, URL) — eh Proveniencia (backward), nao Trilha entre nos; e zero campo forward next_recommended nos .kg.yaml"
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
@@ -42,7 +42,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "verificacao adversarial: CONFIRMADO com 2 correcoes — familia nao pode ser Estigmergia (Proveniencia eh membro nao-estigmergico); locus-slip (Trilha viva no diario, nao no KG)"
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
@@ -56,7 +56,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "familia = breadcrumbs/migalhas; estigmergia eh a PROPRIEDADE que 2 dos 3 generos tem (Absorcao e Trilha), nao o nome da familia"
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
@@ -70,7 +70,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "genero 1 ABSORCAO (presente/espacial): sinal no artefato que forca o modelo a ler certo agora (anti-acomodacao) — CSS vars, data-slot, frontmatter, naming _processed. Estigmergia sematectonica"
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
@@ -84,7 +84,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "genero 2 PROVENIENCIA (aponta pra tras): ancora um claim a fonte/evidencia (o campo de rastreio, aresta TRACES_TO, origin) — auditoria. NAO eh estigmergia (cita passado fixo)"
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
@@ -98,7 +98,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "genero 3 TRILHA (aponta pra frente): marca deixada por uma sessao pra a proxima achar o caminho — next_recommended no diario, o ato write(KG). Estigmergia marker-based"
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
@@ -112,7 +112,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "eixo transversal VALIDADE/FRESCOR (conflict_class, review_after, verified_at, campo de status) — NAO eh 4o genero, eh modificador que qualquer genero carrega (ate quando confio + como re-testo)"
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
@@ -126,7 +126,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "amarra ao SSOT-as-runtime ESCOPADA a Trilha (4 pernas): read=comer, verify=cheirar-antes-de-confiar, act=andar, write=deixar. Generalizar aos 3 generos eh overclaim"
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
@@ -140,7 +140,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "correcao locus: a Trilha VIVA hoje eh no DIARIO (next_recommended; loop do federation-radar); a Trilha no KG eh aspiracao nao-construida (zero campo forward nos .kg.yaml)"
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
@@ -162,7 +162,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "HIPOTESE CRUA superada: sao 2 generos (absorcao vs trilha) e o campo de rastreio do KG eh trilha-entre-nos"
     provenance:
       source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
@@ -176,7 +176,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "DRAFT v1 superado: breadcrumb-patterns.md so cobria Absorcao, status draft, fora do KG, com validade misturada na tabela de canais"
     provenance:
       source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
@@ -190,7 +190,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "DOUTRINA UNIFICADA (KB v2.0.0): 3 generos por direcao + eixo de validade + amarra escopada a Trilha; radar-checkavel por genero (gap honesto: falta gate p/ Trilha e Absorcao)"
     trace: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
     provenance:

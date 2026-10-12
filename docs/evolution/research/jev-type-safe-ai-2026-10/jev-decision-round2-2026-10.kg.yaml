@@ -1,8 +1,8 @@
 meta:
   id: jev-decision-round2-2026-10
   schema_version: "1"
-  baseline: 2026-10-01
-  review_after: 2026-10-31   # 30d: ferramenta/preco e o tipo DOMINANTE do que DECIDE aqui. As opcoes todas
+  baseline: "2026-10-01"
+  review_after: "2026-10-31"   # 30d: ferramenta/preco e o tipo DOMINANTE do que DECIDE aqui. As opcoes todas
                              # pendem do regime do fabricante (modelo hospedado de 16 dias de vida publica,
                              # cadastros PAUSADOS em 2026-09-22, precos e rate limits que a propria doc
                              # declara mutaveis sem aviso). As metades mercado/capital (90d) e papers/
@@ -52,7 +52,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'rodado por mim nesta maquina: `kg-corpus-grep.sh typesafe` → 6 nó(s) em 109 grafos; `kg-corpus-grep.sh "JEV" "type-safe AI"` → 13 nó(s); `grep -ric jev` no grafo de 09-21 → 27 ocorrencias; `wc -c` → 34.832 B de .kg.yaml + 29.299 B de SYNTHESIS.md'
     source_tier: 10
     source_kind: primary
@@ -70,7 +70,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: "rodado por mim: `git ls-files | grep -i llms-full` → vazio; (na raiz do clone) `find . -name \"*llms-full*\" -not -path \"*/.git/*\"` → vazio; `find docs/evolution/research/typesafe-ai-2026-09 -type f` → exatamente 2 arquivos (SYNTHESIS.md, typesafe-ai-2026-09.kg.yaml)"
     source_tier: 10
     source_kind: primary
@@ -88,7 +88,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'leitura integral do no `D_NAO_ADOTAR_AGORA_DOGFOOD_GATED` e dos seus dois vizinhos `E_AUTOCONSISTENCIA_MEDIDA_0921` (plane PROD, tier 10) e `C_JEV_NAO_COBRE_A_PARTE_CARA` em docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml, linhas 327-360'
     source_tier: 10
     source_kind: primary
@@ -108,9 +108,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2410.10414 — votacao adversarial 3-0'
-    valid_from: 2024-10-14
+    valid_from: "2024-10-14"
     source_tier: 8
     source_kind: paper
     label: 'Nove guard models LLM avaliados em doze benchmarks produzem previsoes SUPERCONFIANTES (miscalibradas): calibracao de classificador de moderacao se MEDE, nao se presume. ⚠️ ESCOPO ESTREITO, e e por isso que o impact aqui e 3 e nao 5: o paper mede guard/moderation LLMs, NAO modelo de decisao tipada de conjunto fechado com confidence derivado da distribuicao. Vale como PRIOR metodologico ("calibracao se mede"), nunca como evidencia sobre o jev-1.13.0.'
@@ -127,9 +127,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2501.01818 — votacao adversarial 3-0'
-    valid_from: 2025-01-03
+    valid_from: "2025-01-03"
     source_tier: 8
     source_kind: paper
     label: 'Roteadores de LLM — inclusive o open-source RouteLLM e roteadores comerciais — podem ser MANIPULADOS por sequencias adversariais ("confounder gadgets") anexadas a consulta, forcando o envio ao modelo caro independentemente da complexidade real. O ataque funciona em cenario white-box E black-box. Este e o achado mais caro da rodada para a pergunta de decisao, porque METADE da superficie proposta na pergunta 7 e exatamente roteamento e pre-filtro.'
@@ -146,9 +146,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2501.01818 — votacao adversarial 3-0'
-    valid_from: 2025-01-03
+    valid_from: "2025-01-03"
     source_tier: 8
     source_kind: paper
     label: 'Filtragem por PERPLEXIDADE nao e defesa eficaz contra os confounder gadgets, porque eles mantem perplexidade baixa. Isto FECHA a saida barata do ataque anterior: nao existe defesa de mesmo custo do proprio roteador, logo a unica defesa compativel com a doutrina do core e ESTRUTURAL — ou a decisao barata nao ve texto nao-confiavel, ou a acao consequente passa por algo que REPROVA.'
@@ -165,9 +165,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2504.07113 — votacao adversarial 3-0'
-    valid_from: 2025-03-20
+    valid_from: "2025-03-20"
     source_tier: 7
     source_kind: paper
     label: 'Em roteadores por preferencia (RouteLLM), um router BERT envia TODAS as consultas de codigo e matematica ao LLM mais forte, mesmo as simples: decide por heuristica de CATEGORIA, nao por complexidade intrinseca. Para o Onion isto e o modo de falha previsivel do roteamento de modelo/skill — a economia prometida evapora na categoria em que o core mais trabalha.'
@@ -184,9 +184,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2504.07113 — votacao adversarial 3-0'
-    valid_from: 2025-03-20
+    valid_from: "2025-03-20"
     source_tier: 7
     source_kind: paper
     label: 'Roteadores avaliados no benchmark DSC mandam tentativas de jailbreak (AdvBench) MAJORITARIAMENTE ao modelo fraco, elevando o risco: Mistral-7B tem 100% de ASR em todos os ataques, enquanto GPT-4o tem 0% em texto simples e GCG e 60% sob PAP. Agrava o ataque dos gadgets por simetria invertida: o gadget forca o caro, e o jailbreak cai no fraco — as duas direcoes do roteamento tem modo de falha adversarial publicado.'
@@ -203,7 +203,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2604.02367 — votacao adversarial 3-0'
     source_tier: 7
     source_kind: paper
@@ -223,9 +223,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.dsebastien.net/reinforcement-learning-for-calibrated-decisions-rlcd/ — votacao adversarial 3-0'
-    valid_from: 2026-09-23
+    valid_from: "2026-09-23"
     source_tier: 6
     source_kind: engineer
     label: 'A TypeSafe nao publicou COMO o RLCD funciona: sem paper, sem funcao de recompensa, sem reliability diagram; a arquitetura do jev-1.13.0 permanece nao documentada. Confirmacao independente, de fora do fabricante, do que o corpus de 09-21 ja dizia por dentro. CONSEQUENCIA PARA A PERGUNTA 1: nao se sabe se o jev e LLM com decodificacao restrita ao conjunto de rotulos, encoder classificador multi-tarefa, destilacao ou arquitetura propria — RLCD nomeia o REGIME DE POS-TREINO, nao a arquitetura. A lacuna 1 fica aberta por AUSENCIA DE PUBLICACAO, nao por falta de busca: e a terceira rodada consecutiva a bater nela.'
@@ -242,7 +242,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://docs.typesafe.ai/model-jaggedness/jev-1.13 — votacao adversarial 3-0'
     source_tier: 6
     source_kind: primary
@@ -260,7 +260,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://typesafe.ai — duas claims distintas, ambas por votacao 2-1 (nao 3-0: um juiz dissentiu)'
     source_tier: 5
     source_kind: primary
@@ -278,9 +278,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://opentweet.io/jev/api-access — votacao 2-1'
-    valid_from: 2026-09
+    valid_from: "2026-09"
     source_tier: 5
     source_kind: engineer
     label: 'A pagina de acesso tambem nao publica numero de calibracao algum — e RECOMENDA que o proprio usuario calibre localmente, rodando o Jev em SHADOW. Isto e util e e desconfortavel ao mesmo tempo: a unica rota honesta para obter a propriedade vendida e o comprador produzi-la, o que transforma "calibrado" de atributo do produto em TRABALHO DO ADOTANTE. E e exatamente o desenho que a Opcao C propoe (shadow primeiro) — logo a Opcao C nao e cautela nossa, e o procedimento que o proprio fornecedor indica.'
@@ -297,9 +297,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://www.modemguides.com/blogs/ai-news/jev-typesafe-reality-check-run-locally — votacao 2-1 (um juiz dissentiu; agregador, nao primario)'
-    valid_from: 2026-09-24
+    valid_from: "2026-09-24"
     source_tier: 5
     source_kind: aggregator
     label: 'Nas decisoes dificeis (multi-hop, trade-offs, armadilhas adversariais) o Jev acerta 36,7% e o decider-4b v2 34,7%, contra 95,5% do GPT-6 Luna com raciocinio medio. A mesma fonte diz que a classe e camada BARATA para decisoes RAPIDAS, nao substituta de modelo de raciocinio; que o Jev le datas como TEXTO e e vulneravel a ESTADO INJETADO; e que deve ficar AO LADO de checagens deterministicas, nunca no lugar delas. ⚠️ tier 5 agregador com voto 2-1 e numeros nao reproduzidos por nos: a FORMA do achado (a classe degrada no dificil) e consistente com a pagina de jaggedness do proprio fabricante, mas os PERCENTUAIS sao nao-verificados. O que importa para a decisao e a forma, e ela coincide com a fronteira que o core ja desenhou sozinho.'
@@ -316,9 +316,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://dealroom.co/news/151032-typesafe-exits-stealth-with-40m-seed-to-build-ai-for-software-not-people/ (3-0) cruzado com https://runtimewire.com/article/typesafe-investors-discuss-a-higher-valuation-after-jev-reaches-nearly-13-of-one (3-0); nenhum anuncio primario do fabricante nem registro aberto'
-    valid_from: 2026-09
+    valid_from: "2026-09"
     source_tier: 5
     source_kind: aggregator
     label: 'EIXO MERCADO/CAPITAL — COM SINAL, NAO CONCILIADO (clausula 4). A TypeSafe saiu do stealth em setembro de 2026 com seed liderado pela DCVC, e a cifra NAO FECHA: US$ 40M no titulo e US$ 25,9M no CORPO da mesma materia do Dealroom; uma segunda fonte corrobora os US$ 40M e acrescenta valuation reportada de US$ 200M por cadeia secundaria (Forbes/SiliconANGLE), com o proprio titulo indicando investidores discutindo valuation MAIS ALTA — numero EM MOVIMENTO, nao selado. Posicionamento declarado no anuncio: "AI for software, not people" — modelo para consumo por MAQUINA. Leitura pelo caminho do dinheiro: capital grande e precoce numa categoria de UM exemplar significa que o ESCASSO e a categoria, nao o produto — o que favorece construir a primitiva em casa (B) sobre comprar o unico fornecedor (C), porque o preco de hoje e subsidiado por rodada e o regime de acesso ja mudou uma vez (cadastros pausados em 2026-09-22). NENHUM M&A na categoria foi encontrado nesta rodada. A cobertura tambem nao publica metrica de calibracao alguma: fala de "calibrated confidence scores" sem numeros.'
@@ -337,7 +337,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao do Elenxo contra a premissa "as lacunas 1/2/3/5 estao abertas e se fecham por busca web"; a parte factual foi RE-MEDIDA POR MIM e confirmada (ver E_CORPUS_ALREADY_ANSWERED_MEASURED), e a parte do diagnostico foi medida e CORRIGIDA'
     source_tier: 6
     source_kind: engineer
@@ -355,7 +355,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao do Elenxo contra tratar a pergunta 7 como aberta; a existencia e o conteudo do no selado foram RE-LIDOS POR MIM no arquivo (ver E_SEALED_DECISION_EXISTS_0921)'
     source_tier: 6
     source_kind: engineer
@@ -373,7 +373,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao do Elenxo contra o uso do arxiv 2410.10414; a incoerencia de selecao e verificavel na propria lista da rodada (o resultado negativo ACEITO 3-0 e o positivo do MESMO paper na lista de refutados)'
     source_tier: 6
     source_kind: engineer
@@ -391,7 +391,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao do Elenxo elevando o arxiv 2501.01818 de contexto a CONSTRAINT bloqueante, cruzada com o fragmento canonico .claude/commands/common/prompts/untrusted-content-provenance.md (R15)'
     source_tier: 6
     source_kind: engineer
@@ -409,7 +409,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao do Elenxo sobre o terceiro achado do arxiv 2501.01818 (perplexidade nao defende), lida contra a doutrina do gate deterministico do core'
     source_tier: 6
     source_kind: engineer
@@ -427,7 +427,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'objecao do Elenxo contra contar o arxiv 2604.02367 como achado; verificavel na propria lista da rodada, onde o conteudo substantivo do mesmo paper aparece entre os REFUTADOS'
     source_tier: 6
     source_kind: engineer
@@ -447,7 +447,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'a propria pergunta da rodada ("NUNCA em gate deterministico") cruzada com E_HARD_DECISIONS_JEV_36_PERCENT, E_JAGGEDNESS_NO_ARCHITECTURE e C_ALVOS_CANDIDATOS_NO_ONION do grafo de 09-21'
     label: 'A fronteira nao e negociavel e ja estava desenhada antes desta rodada: a primitiva tipada NUNCA entra no que REPROVA. O kg-radar e deterministico e sem-LLM POR PROJETO; trocar o que reprova por juizo probabilistico de terceiro destruiria a propriedade que o torna util, e nenhum ganho de custo compra isso. Esta rodada ACRESCENTA duas razoes vindas de fora: a fronteira de decisao do fabricante se desloca entre versoes (saidas nao-isomorficas entre primitivos para a MESMA pergunta, na pagina de jaggedness) e a classe degrada no dificil. Medidas as massas do core — 26.596 linhas de shell agnostico que REPROVA contra 52.655 de markdown acoplado que ACONSELHA — a primitiva so pode servir a segunda metade, e isso e um teto estrutural, nao uma fase.'
     trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
@@ -458,7 +458,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'E_CONFOUNDER_GADGETS_ROUTER_ATTACK + E_PERPLEXITY_NOT_A_DEFENSE + E_ROUTERS_SEND_JAILBREAKS_TO_WEAK lidos contra .claude/commands/common/prompts/untrusted-content-provenance.md (R15)'
     label: 'O bloqueio real das camadas que ACONSELHAM nao e calibracao, e PROVENIENCIA DA ENTRADA — e e o achado que esta rodada acrescenta de verdade ao corpus. Das quatro superficies da pergunta 7, tres recebem texto nao-confiavel por desenho: triagem (inbox de co-evolucao), roteamento (pesquisa que le pagina web) e pre-filtro de parecer (PR de terceiro). Com ataque publicado contra roteadores, sem defesa de custo compativel, e sem medicao de transferencia para saida tipada, o desenho adotavel se reduz a dois: (a) a primitiva so ve texto de proveniencia confiavel, ou (b) tudo que ela decide passa por um teto deterministico depois. A quarta superficie — priorizacao por atencao — e a unica que le estado PROPRIO do repo e por isso e a candidata menos contaminada; nao por acaso e vizinha do unico gatilho que 09-21 considerou honesto.'
     trace: '.claude/commands/common/prompts/untrusted-content-provenance.md'
@@ -469,7 +469,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'convergencia de E_VENDOR_PUBLISHES_NO_CALIBRATION, E_SHADOW_CALIBRATION_IS_THE_VENDOR_ADVICE, E_RLCD_UNDOCUMENTED_NO_PAPER e E_JAGGEDNESS_NO_ARCHITECTURE contra o limite que o PROPRIO fabricante publica no corpus de 09-21'
     label: 'A unica propriedade que justifica comprar a primitiva — confidence CALIBRADO, derivado da distribuicao e nao carimbado por quem escreve — segue NAO-VERIFICADA em 2026-10-01, pela terceira rodada consecutiva. Cinco fontes independentes convergem no mesmo negativo: zero ECE, zero Brier, zero reliability diagram, zero dataset do fabricante. Todos os numeros existentes sao de TERCEIROS (ECE 0,031 em MMLU por um autor; ECE 0,107 em tickets sinteticos por outro; JevBench como benchmark "work in progress" de terceiro) e TODOS caem no Verify desta rodada por fonte fraca — a casa nao pode sustentar decisao neles. E o proprio fabricante publica o limite que desarma a leitura ingenua: calibracao e medida sobre GRUPOS e nao garante nada sobre UMA resposta. Portanto a pergunta 2 nao se fecha por busca: fecha por MEDICAO PROPRIA em shadow, em pt-BR, ou nao se fecha.'
     trace: 'docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml'
@@ -480,7 +480,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'contagem da lista de refutados desta rodada: decider-4b v2 (Apache 2.0), Qwen3-4B+LoRA (97,4% / ECE 0,010 em 18 min numa RTX 4070 SUPER), Cygnet, AnyJev e o JevBench inteiro foram TODOS refutados por fonte fraca (tier 5, agregador)'
     label: 'ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao B (alternativas locais/abertas) esta na lista de REFUTADOS POR FONTE FRACA. Os numeros que fariam B parecer barata — 97,4% e ECE 0,010 com ~1k labels e 18 minutos de GPU de consumidor, decider-4b v2 liderando o JevBench a 64,1 contra 63,3 do Jev — vem de tier 5 e nao passaram o Verify. Isso NAO mata B: B nao depende de que esses numeros sejam verdade, depende de uma propriedade ESTRUTURAL que o core pode medir sozinho (um token sob gramatica restrita ao conjunto de rotulos + n_probs no llama.cpp e mecanica publica de decodificacao, nao claim de fornecedor). Mas significa que B hoje e HIPOTESE com caminho de verificacao LOCAL, nao opcao com evidencia — e e precisamente por isso que D precede B em vez de B comecar agora.'
     trace: 'https://www.beri.net/article/typesafe-jev-typed-decision-model-calibration-decomposition-shadow-eval'
@@ -493,7 +493,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'E_SEALED_DECISION_EXISTS_0921 (a decisao vigente) + E_AUTOCONSISTENCIA_MEDIDA_0921 do grafo de 09-21 (25 julgamentos, moda 5/5 sem vendor)'
     label: 'OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de modelos, shell deterministico no que reprova. E reafirmar `D_NAO_ADOTAR_AGORA_DOGFOOD_GATED`, selado em 2026-09-21. A FAVOR: e a unica opcao sustentada por medicao propria (a moda acertou 5/5 sem vendor; a distribuicao nao corrigiu veredito algum) e custa zero. CONTRA: nao fecha a lacuna de calibracao nem mede a transferencia do ataque — mantem o core sem resposta para a pergunta, so sem exposicao a ela. E o ESTADO VIGENTE enquanto o maestro nao selar outra coisa, e nao precisa de decisao para continuar valendo.'
     trace: 'docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml'
@@ -504,7 +504,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'C_OPTION_B_BASIS_IS_WEAK_SOURCED (toda a base factual refutada por fonte fraca) cruzado com C_ATRITO_O_DADO_SAI_DA_MAQUINA e C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO do grafo de 09-21'
     label: 'OPCAO B — ADOTAR A PRIMITIVA EM CASA: decisao tipada de conjunto fechado implementada localmente (1 token sob gramatica restrita as opcoes + n_probs no llama.cpp; ou decider-4b v2 / Qwen3-4B+LoRA, licencas abertas), SEM adapter novo, por uso direto, so em camada que aconselha. A FAVOR, e e o argumento decisivo: dissolve de uma vez os dois atritos estruturais que nenhuma versao da opcao hospedada resolve — o `state` nao sai da maquina (o KG cru e o conteudo dos nos, e a casa ja pagou essa linha no de-identification e no INVARIANTE 0) e nao ha fornecedor unico cujo preco e regime de acesso mudem sob nos. O capital precoce na categoria reforca: o escasso e a CATEGORIA, nao o produto. CONTRA: toda a evidencia numerica que a tornaria atraente esta refutada por fonte fraca (ver C_OPTION_B_BASIS_IS_WEAK_SOURCED), e ela herda INTEIRA a restricao de proveniencia de entrada — rodar local nao defende de confounder gadget nenhum. E HIPOTESE com caminho de verificacao local, nao opcao pronta.'
     trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
@@ -515,7 +515,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.45
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'E_SHADOW_CALIBRATION_IS_THE_VENDOR_ADVICE (shadow e a recomendacao do proprio fornecedor) contra C_ATRITO_O_DADO_SAI_DA_MAQUINA do grafo de 09-21 e E_MERCADO_CAPITAL_DCVC_UNRECONCILED'
     label: 'OPCAO C — ADOTAR O JEV HOSPEDADO nas camadas que aconselham, em modo SHADOW primeiro, por uso direto (nao SDAAL), com `state` redigido e nunca contendo no cru de KG. A FAVOR: shadow e exatamente o que o proprio fornecedor recomenda para obter a calibracao, e e a UNICA rota que produz o numero que falta (pergunta 2) sobre o produto real. CONTRA, e e pesado: (a) o atrito e estrutural, nao de configuracao — o `state` sai da maquina, e "redigido" e promessa de disciplina onde a casa ja decidiu que o provider `none` RECUSA em vez de redigir-e-passar; (b) exige chave de API que esta maquina nao tem, de um fornecedor que PAUSOU cadastros em 2026-09-22; (c) ingles e lingua primaria contra um core inteiro em pt-BR — a lacuna mais cara, declarada desde 09-21 e nunca medida; (d) paga-se para descobrir a propriedade que o vendedor deveria publicar. O Elenxo REPROVA esta opcao. Sobrevive apenas como SUB-PASSO opcional dentro de D, nunca como adocao.'
     trace: 'docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml'
@@ -526,7 +526,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'E_CORPUS_ALREADY_ANSWERED_MEASURED (o corpus responde 4 das 7) + E_VENDOR_PRIMARY_NOT_ON_DISK (o primario de 903 KB NAO esta em disco) + C_CALIBRATION_IS_STILL_UNVERIFIED'
     label: 'OPCAO D — FECHAR AS LACUNAS PRIMEIRO pelo corpus local, pelas fontes nao lidas e por uma medicao propria em pt-BR, e so depois decidir. A FAVOR: e a unica opcao que ataca o defeito REAL desta rodada, que e de CORPUS e nao de qualidade de fonte — quatro das sete perguntas tinham resposta tier 10 a um comando de distancia. E a medicao propria e o unico caminho para a pergunta 2, que nenhuma busca fecha. ⚠️ CORRECAO MEDIDA a esta opcao como ela foi redigida: o "corpus local JA PAGO" inclui o llms-full.txt de 903 KB, e ele NAO ESTA EM DISCO (ver E_VENDOR_PRIMARY_NOT_ON_DISK) — sobraram 64 KB de derivado. Logo D se executa em tres passos HONESTOS, nesta ordem: (1) ler os 27 nos de 09-21 e os 42 da rodada 1 que ja estao versionados, de graca; (2) medir em pt-BR, localmente, sem fornecedor — a mecanica de 1 token sob gramatica restrita + n_probs e publica e e tambem o teste da Opcao B; (3) so se (2) mostrar ganho, discutir acesso ao produto hospedado. D NAO e adiamento: e o degrau que converte B de hipotese em opcao.'
     trace: 'docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml'
@@ -537,7 +537,7 @@ nodes:
     status: refuted
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO (grafo typesafe-ai-2026-09, l.259) e o no selado D_NAO_ADOTAR_AGORA_DOGFOOD_GATED (l.327), que REPROVAM nominalmente escrever adapter; a Abstraction Doctrine e o criterio, nao opiniao desta rodada'
     source_tier: 10
     source_kind: primary
@@ -552,7 +552,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     label: 'DECISAO A SELAR PELO MAESTRO (eu nunca selo): o Onion adota uma primitiva de decisao tipada barata nas camadas que ACONSELHAM? Opcoes na mesa: A — nao adotar, manter o status quo (reafirmar D_NAO_ADOTAR_AGORA_DOGFOOD_GATED) · B — adotar a primitiva EM CASA, local/aberta, por uso direto, so onde aconselha · C — adotar o JEV hospedado em shadow, por uso direto · D — fechar as lacunas primeiro (corpus versionado + medicao propria em pt-BR) e so depois decidir · E — escrever adapter SDAAL agora: REFUTADA, vetada por doutrina medida. RECOMENDACAO DO ELENXO, que eu subscrevo com duas correcoes medidas: **D agora, convergindo para B, mantendo A como estado vigente.** O Elenxo REPROVA a rodada 2 como base de decisao e reprova C e E. As razoes, em ordem de peso: (1) a decisao JA EXISTE e esta rodada nao a viu — o defeito nao e de qualidade de fonte, e de CORPUS, e quatro das sete perguntas tinham resposta tier 10 a um comando de distancia; (2) a propriedade que justificaria comprar — calibracao — segue sem um unico numero do fabricante pela terceira rodada, e so medicao propria a fecha; (3) o bloqueio real das camadas que aconselham e PROVENIENCIA DE ENTRADA, com ataque publicado contra roteadores e sem defesa de custo compativel; (4) B dissolve os dois atritos estruturais (o dado nao sai da maquina; nao ha fornecedor unico), mas sua base numerica esta toda refutada por fonte fraca, logo e hipotese com caminho de verificacao local — e D e esse caminho. MINHAS CORRECOES AO ELENXO, ambas medidas nesta maquina: (a) a cegueira da rodada 1 NAO foi de vocabulario — `kg-corpus-grep.sh "JEV" "type-safe AI"` devolve 13 nos, logo a clausula 0 nao foi rodada ou nao foi lida, e a cura e mecanizar a clausula 0, nao emendar sinonimos; (b) o llms-full.txt de 903 KB NAO esta em disco, logo "corpus ja pago" vale para as conclusoes e nao para o texto. FRONTEIRA INEGOCIAVEL em qualquer opcao que o maestro sele: NUNCA em gate deterministico — a fronteira de decisao se desloca entre versoes, e o que REPROVA fica em shell.'
     trace: 'docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml'
 
@@ -562,7 +562,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'inventario do que esta rodada NAO fez nem modelou — ausencia CONTADA, nao estimada'
     source_tier: 10
     source_kind: primary

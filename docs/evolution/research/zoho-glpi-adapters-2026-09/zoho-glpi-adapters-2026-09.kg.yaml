@@ -1,8 +1,8 @@
 meta:
   id: zoho-glpi-adapters-2026-09
   schema_version: "1"
-  baseline: 2026-09-23
-  review_after: 2026-10-23   # cadência FERRAMENTA/API = 30d. O tipo dominante desta rodada é
+  baseline: "2026-09-23"
+  review_after: "2026-10-23"   # cadência FERRAMENTA/API = 30d. O tipo dominante desta rodada é
                              # SUPERFÍCIE DE API DE TERCEIRO em movimento declarado: a API v2/GraphQL
                              # do GLPI não tem nota "since" e o projeto mantém três linhas vivas em
                              # paralelo (10.0.27 mantido, 11.0.9 GA, 12.0.0-rc2 de 2026-09-16), e a
@@ -60,7 +60,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2 — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
     source_tier: 9
     source_kind: primary
@@ -78,7 +78,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'https://www.zoho.com/projects/help/rest-api/tasks-api.html — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
     source_tier: 9
     source_kind: primary
@@ -96,7 +96,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'https://www.glpi-project.org/en/glpi-network-cloud/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1); pagina de VENDAS do fornecedor'
     valid_from: '2022-06'
     source_tier: 7
@@ -115,7 +115,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'https://help.glpi-project.org/tutorials/my-instance/export_database — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0); citacao verbatim confirmada na pagina'
     source_tier: 9
     source_kind: primary
@@ -133,7 +133,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'https://www.glpi-project.org/en/run-glpi-with-docker/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0); achado NEGATIVO (ausencia de informacao na fonte)'
     source_tier: 9
     source_kind: primary
@@ -152,7 +152,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'medicao nesta sessao: grep dos metodos em .claude/utils/forge/interface.md devolve EXATAMENTE 16 — createPR, updatePR, getPR, getPRStatus, listPRs, mergePR, addReviewComment, getReviewComments, updateReviewComment, requestReviewers, getCIStatus, getCheckRuns, createRelease, getRelease, validateRepo, getProviderFromRemote; e `NoForgeAdapter` existe em .claude/utils/forge/adapters/none.md (tambem citado em README.md e factory.md). Comparacao: .claude/utils/task-manager/ tem interface propria de 14 metodos e 5 adapters (jira 887 linhas, clickup 796, linear 785, asana 546, none 46).'
     source_tier: 10
     source_kind: measurement
@@ -171,7 +171,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.4
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'fan-out desta rodada (16 fontes, 25 claims: 5 confirmadas + 20 refutadas): ZERO claims sobre rodadas, M&A, valuation, analistas (Gartner/Forrester/G2), preco de licenca ou tamanho de mercado — nem de GLPI/Teclib, nem de Zoho Corp, nem da categoria ITSM/ITAM open-source'
     source_tier: 10
     source_kind: measurement
@@ -190,7 +190,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'contagem do proprio handoff desta rodada: 16 fontes colhidas, 25 claims julgadas (5 confirmadas, 20 refutadas), 0 nao-verificadas por falha tecnica, 10 fontes listadas como relevantes e NAO LIDAS, 6 objecoes sobreviventes do Elenxo, 6 modeladas'
     source_tier: 10
     source_kind: measurement
@@ -287,7 +287,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'https://forum.glpi-project.org/viewtopic.php?id=294972 — fonte que a rodada listou como NAO LIDA e que o Elenxo leu, com trechos verbatim; cruzada com a propria pagina v2 do GLPI e com github.com/glpi-project/glpi/releases. Afirmacao de UM agente, sem votacao adversarial.'
     source_tier: 6
     source_kind: community
@@ -305,7 +305,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.55
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'https://www.zoho.com/projects/help/rest-api/tasks-api.html (lida pelo Elenxo: expoe v2 e v3 na MESMA pagina) + https://ascentbusiness.co.uk/zoho-projects-api-deadline-migrate-to-v3-by-31-december-2025/ (consultoria/parceiro, tier 4). A primaria projects.zoho.com/api-docs e PRIMARIO CITADO, NAO LIDO. Afirmacao de UM agente, sem votacao.'
     valid_from: '2025-12-31'
     source_tier: 4
@@ -324,7 +324,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'https://www.glpi-project.org/en/glpi-network-cloud/ (tier 7, pagina de vendas) confrontada com: a fala do maestro ("hoje buscamos as atividades la via API", sem dizer a hospedagem) e com https://help.glpi-project.org/tutorials/my-instance/export_database, lida pelo Elenxo, que instrui "Once connected in CLI on your server hosting your database" e nao tem uma linha sobre cloud->self-hosted. Afirmacao de UM agente, sem votacao.'
     source_tier: 7
     source_kind: vendor
@@ -342,7 +342,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'https://help.glpi-project.org/tutorials/my-instance/export_database — citacao verbatim tier 9 confirmada ("Once connected in CLI on your server hosting your database", mysqldump/tar, alternativa HeidiSQL exigindo conectividade direta ao banco), lida pelo Elenxo, e AUSENCIA verificada de procedimento cloud->self-hosted na pagina. Afirmacao de UM agente, sem votacao.'
     source_tier: 9
     source_kind: primary
@@ -360,7 +360,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'contagem do handoff desta rodada: 5 achados "confirmados", dos quais 2 sao negativos (#5 e o vazio em torno de #3), contra 10 fontes relevantes NAO LIDAS — incluindo duas primarias decisivas (forum 294972 e projects.zoho.com/api-docs) e o Swagger que a propria doc v2 aponta (/api.php/doc). Prova empirica: o Elenxo leu UMA das nao-lidas (forum 294972) e ela produziu o fato mais forte da rodada, apontando CONTRA a metade otimista da hipotese. Afirmacao de UM agente, sem votacao.'
     source_tier: 10
     source_kind: measurement
@@ -378,7 +378,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.55
-    verified_at: 2026-09-23
+    verified_at: "2026-09-23"
     verified_against: 'a claim REFUTADA "a API v2 autentica por OAuth2 Password Grant e nao distingue cloud vs self-hosted, logo basta trocar a base URL" (https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2, tier 9) reaberta pelo Elenxo sob a clausula 6 (descartado por evidencia ou por comodismo?) — veredito: por comodismo. ⚠️ O texto desta objecao chegou TRUNCADO ao handoff desta sessao; modelados os 3 sub-pontos legiveis. Afirmacao de UM agente, sem votacao.'
     source_tier: 9
     source_kind: primary

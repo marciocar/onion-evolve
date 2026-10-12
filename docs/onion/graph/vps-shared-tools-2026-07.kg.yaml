@@ -2,7 +2,7 @@ meta:
   id: vps-shared-tools-2026-07
   schema_version: "1"
   layer: audit
-  baseline: 2026-07-31
+  baseline: "2026-07-31"
   date: 2026-07-31
   note: >
     SEED de investigação (born-in-KG): catálogo de FERRAMENTAS COMPARTILHADAS na VPS,
@@ -19,7 +19,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 1.0
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps
     label: "SUBSTRATO VIVO: Hostinger KVM8 + Caddy + onion-bridge (127.0.0.1:8787) + Logto 1.41.0 (127.0.0.1:3011). Domínios reais, medidos no Caddyfile do host em 2026-08-06: raiz+www, app. (bridge), auth. (Logto) e console. NÃO existe bridge.onionevolve.com (sem vhost, NXDOMAIN)."
     narrative: "label anterior: SUBSTRATO VIVO: ⟨Hostinger KVM8⟩ + Caddy (reverse proxy) + onion-bridge (Node/Agent SDK, reverse_proxy 127.0.0.1:8787) + Logto 1.41.0 (OIDC em 127.0.0.1:3011). DOMINIOS REAIS (⟨medidos no Caddyfile do host 2026-08-06⟩): raiz+www (landing estatica), app. (onion-bridge), auth. (OIDC do Logto) e console. (admin do Logto, bloco opcional em conf.d, respondendo no momento da medicao). NAO EXISTE bridge.onionevolve.com: nao tem vhost no Caddy e da NXDOMAIN no resolver local, no 1.1.1.1 e no 8.8.8.8 (curl 000). O onion-bridge serve sob app., nunca sob bridge. — o rotulo anterior listava auth./bridge./app. e o bridge. era ficcao. Doutrina do roadmap: reuso-nao-invencao"
@@ -37,7 +37,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: m2-bridge-logto-KG+flip-P7+m8-serial-2026-08-reverificado
     label: "AUTH/IDENTIDADE: Logto self-hosted 1.41.0 VIVO (OIDC/JWT+JWKS), flip P7 executado (AUTH_TOKEN->OIDC), gate duplo humano-PKCE/servico-M2M. members.yaml=SSOT, Logto=PROJECAO. Federation-admin spec-now/build-gated. GAP: sign-up default aberto (P3.4)"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
@@ -54,7 +54,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find
     label: "WHATSAPP: o único lado vivo é o WAHA (onion-vps-waha, desde 2026-08-05, 127.0.0.1:3999, 401 sem key). O whatsapp-sender não está vivo: sem processo, container ou unit. Código e sessão existem num workspace de agente do clone de produção do bridge, não no home da conta onion."
     narrative: "label anterior: WHATSAPP: o unico lado VIVO hoje e o WAHA — container onion-vps-waha (devlikeapro/waha:latest), running desde 2026-08-05, bind 127.0.0.1:3999, API responde 401 (exige key). O whatsapp-sender NAO ESTA VIVO: zero processo (ps), zero container (docker ps -a), zero unit systemd, sem pm2 instalado. O CODIGO e a sessao pareada (.wwebjs_auth, mtime 2026-07-05) EXISTEM EM DISCO, mas ⟨num workspace de agente de o clone de produção do onion-bridge (whatsapp-sender)⟩ (workspace de agente do bridge, 234M, sem .git) ⟨e NAO no whatsapp-sender do home da conta onion, que⟩ e o caminho que o parecer de 2026-07-05 e o rotulo anterior afirmavam. RESSALVA SOBRE A PROPRIA MEDICAO: o worker do M8 concluiu que nao havia nem diretorio — a busca dele foi incompleta e o diretorio existe; o que nao existe e o SERVICO. Pesquisa research/whatsapp-api-2026-07 decide eixo oficial x nao-oficial (regulado->Cloud API; dogfood->WAHA>Evolution)"
@@ -71,7 +71,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-08-19
+    verified_at: "2026-08-19"
     verified_against: "PONTA A PONTA em 2026-08-19: caddy validate+reload OK; DNS criado VIA API Hostinger (PUT zones append, verificado por RELEITURA da zona, nao pelo eco do PUT) apos o maestro informar o token no diretório de config do usuário (host); resolucao publica OK; cert Let s Encrypt emitido (valido ate 2026-11-17); https://waha.onionevolve.com/api/sessions devolve 401 JSON do WAHA sem chave E com chave errada — cadeia DNS->TLS->Caddy->auth inteira viva"
     label: "ROTA PÚBLICA aberta por ordem do maestro (2026-08-19): waha.onionevolve.com → 127.0.0.1:3999 pelo vhost waha.caddy no conf.d do Caddy do host, para um app externo (Lovable). O bind segue local; DNS via API Hostinger e cert ACME emitidos. Desligar = remover o .caddy e recarregar."
     narrative: "label anterior: ROTA PUBLICA ABERTA por ordem do maestro (2026-08-19): waha.onionevolve.com -> 127.0.0.1:3999 ⟨via o vhost conf.d/waha.caddy do Caddy do host⟩ (convencao de bloco opcional da casa). Motivo: integracao de app externo (Lovable) — o app na nuvem nao alcanca loopback. O bind do container SEGUE no localhost (o Caddy e o unico expositor; TLS na frente, X-Api-Key do WAHA em toda chamada). PENDENTES RESOLVIDOS em 2026-08-19: registro A criado via API Hostinger ⟨(token no diretório de config do usuário,⟩ informado pelo maestro) e cert ACME emitido. Desligar = rm do .caddy + reload; revogar acesso = trocar WAHA_API_KEY no compose"
@@ -88,7 +88,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "PONTA A PONTA em 2026-10-08: A gmill -> 179.197.65.94 via API Hostinger (PUT append overwrite:false, zona 44->45 conjuntos, 0 perdidos/alterados, relida); cert Let's Encrypt emitido (ssl_verify 0); curl sem credencial 401, /api com Bearer sem cookie 401, cookie errado 401, Bearer+cookie valido 200, pagina so com cookie 401, 401 sem Set-Cookie; install-caddy-config.sh rc 0 e --check sem drift; os 7 conf.d nao geridos intocados (mtime/perm iguais)"
     label: "ROTA PÚBLICA aberta por ordem do maestro (2026-10-08) para a demo de vendas do hub-operacoes-enterprise: gmill.onionevolve.com → 127.0.0.1:39081, 1º vhost de conf.d versionado (ops/caddy/conf.d/gmill.caddy), segredo fora do git; Basic geral, cookie HttpOnly em /api/*."
     narrative: "id anterior (SAC-99, 2026-10-11): E_⟨pasta privada⟩_demo_route_caddy — o id carregava o nome da pasta privada do hub e foi trocado pelo id do members.yaml (selo da O7: labels e ids usam o id). Registros históricos (resíduos R56, mailbox _processed, CHANGELOG da federação) citam a forma antiga e ficam como estão. · label anterior: ROTA PUBLICA ABERTA por ordem do maestro (2026-10-08, pedido da sessao ⟨de vendas do hub-operacoes-enterprise⟩): gmill.onionevolve.com -> 127.0.0.1:39081 (⟨demo de vendas do hub-operacoes-enterprise⟩). PRIMEIRO vhost de conf.d VERSIONADO (ops/caddy/conf.d/gmill.caddy), instalado por ops/install-caddy-config.sh, que agora gere conf.d com segredo fora do git ⟨(marcadores resolvidos de um .env no diretório de segredos do Caddy do host, root 0600;⟩ senha e cookie ⟨no pass, nas entradas da demo⟩). Auth = opcao B do maestro: Basic em tudo; /api/* aceita o cookie HttpOnly emitido apos o Basic, porque a demo manda Authorization: Bearer e o navegador nao mistura o Basic guardado com Authorization explicito (medido: Bearer -> 401 com basic_auth puro). O route e load-bearing: sem ele o 401 levava o Set-Cookie (medido por mutante). Pendente-com-dono: a stack carteira ainda roda SEM o override compose.gmill.yaml (OIDC_ISSUER=localhost), entao tokens emitidos pelo dominio terao iss divergente ate a sessao ⟨de vendas do hub-operacoes-enterprise⟩ subir com o override"
@@ -104,7 +104,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "CAMPO VERIFICADO 2026-08-20 (maestro no navegador): SSO Onion ID login success — ES384 PROVADO em uso real (1o precedente Logto+LibreChat conhecido); troca de conta via end-session OK; chat Claude streaming OK; documento-em-contexto OK (teto default ~34k p/ modelo desconhecido no v0.8.7 — v0.8.8 traz os token maps da familia 5); Meili com primary key explicita e 7 docs (pegadinha 12538 nao mordeu); VIA RAG PROVADA no F6.2 (2026-08-20): agente Onion-KB com 4 bundles/92 KBs, pgvector 0->793 embeddings, teste de aceitacao via Agents API respondeu as 5 etapas do Elenxo COM citacao de arquivo-fonte. UPGRADE v0.8.8-rc1 (2026-08-20, carta branca do maestro; backup pre-upgrade): sonnet-5 pleno de volta ao agente (re-testado com citacao); skillSync segue SEM caller de boot ate no rc1 — a gestao e do Admin Panel (skillsynccredentials por tenant; request-scoped recusa config==server, lido no codigo) — painel onion-vps-librechat-admin no ar, pin 1.0.0, LOOPBACK-ONLY 3027 (superficie admin = tunel, doutrina da casa); FECHADO 2026-08-20: 11/11 skills sincronizadas (run succeeded via POST /api/admin/skills/sync/run; o gate final era github.enabled default-off, ligado pelo painel como override role __base__); periodicidade por MECANISMO — skill-sync-run.sh (JWT cunhado) no cron root 05:15, testado como marcio e root. A INTEGRACAO #1 DO TOP-5 ESTA ENTREGUE: o repo Onion e fonte VIVA das skills do LibreChat. 4 fixes de campo commitados no repo da VPS (secret null->vivo, end-session, LOGIN_MAX 20, conta admin promovida a openid c/ break-glass documentado)"
     label: "LIBRECHAT NO AR (2026-08-20, boot verificado por comportamento): face de chat multiusuario da casa (chat.onionevolve.com), SSO Logto, so-Anthropic v1, escopo completo com RAG. Pesquisa-fonte: docs/evolution/research/librechat-2026-08/ (3 exploracoes, mapa TRANSFERE/DESENHA/NAO-VALE). NAO e adapter SDAAL: e consumidor das ferramentas do catalogo"
     provenance:
@@ -118,7 +118,7 @@ nodes:
     node_type: entity
     plane: DEV
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O label de ENT_email afirma 3 coisas: (1) servico de email NAO EXISTE / gap nomeado; (2) Logto SEM conector de email travou convite por org, forcando o redesenho --enroll; (3) um s"
     impact: 4
     confidence: 0.9
@@ -132,7 +132,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_CENSO0901_ENT_monitoring — o trabalho que pedia (pesquisa+Elenxo de stack) FOI feito em F2 stack-harmonia-2026-08 com veredito sobrevivente; label preservado como historia'
     label: "MONITORAMENTO/OBSERVABILIDADE: candidato, zero desenho. Maestro nomeou P2 (a esclarecer — Prometheus/Posthog/Phoenix?), Langfuse (LLM observability), OpenTelemetry (traces/metrics) e afins. Exige pesquisa documentada (verify-external-for-current) + Elenxo de stack"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
@@ -142,7 +142,7 @@ nodes:
     node_type: entity
     plane: DEV
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): ENT_tunneling pede 'avaliar fit vs Caddy + alternativas (Cloudflare Tunnel, Tailscale Funnel), via pesquisa+Elenxo' como trabalho ABERTO. Esse trabalho JÁ FOI FEITO — e a"
     impact: 2
     confidence: 0.6
@@ -156,7 +156,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 1.0
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: direcao-do-maestro+estado-material-medido-no-host-2026-08-06+m8-serial-2026-08-reverificado
     label: "DIRECAO: MANTER o whatsapp-web.js nao-oficial (whatsapp-sender) E ADICIONAR o adapter do WAHA como PADRAO. Forma SDAAL: dois adapters sob a abstracao de mensageria, WAHA default. (A pesquisa ja lastreia WAHA>Evolution p/ nao-oficial). ESTADO MATERIAL EM 2026-08-06, MEDIDO E NAO PRESUMIDO: o dual tem UM SO LADO — WAHA up (onion-vps-waha), whatsapp-sender sem processo/unit/container (so codigo + sessao pareada em disco, no workspace do bridge). E nenhum dos dois adapters foi construido: .claude/utils/whatsapp NAO existe. A DIRECAO segue de pe porque nao foi revogada pelo maestro; o que falta e EXECUCAO — e o F1 ja a reordenou para DOGFOOD ANTES DE SDAAL (D_f1_whatsapp_dogfood_first)"
     trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
@@ -172,7 +172,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.5
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: direcao-do-maestro+m8-serial-2026-08-reverificado
     label: "DIRECAO: construir o servico de EMAIL E LIGAR o conector de email no LOGTO (destrava convite por org, o gap medido). Um so servico serve duas bocas: ferramenta de membro + connector do Logto"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
@@ -183,7 +183,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: direcao-do-maestro+estado-de-execucao-medido-2026-08-06+m8-serial-2026-08-reverificado
     label: "DIRECAO: trazer TUDO para um PLANO ESTRUTURADO do Onion e DERIVAR dele uma DOUTRINA, usando todo o potencial do Onion — Elenxo, KG-SSOT first+runtime, pesquisas documentadas e mapeadas. CAVEAT (disciplina pull-not-push): derivar doutrina+estrutura AGORA, mas o PLANO e spec-now/build-gated por-ferramenta — nunca uma PLATAFORMA empurrada por hipotese. ESTADO DE EXECUCAO EM 2026-08-06, MEDIDO: a DOUTRINA EXISTE (docs/knowledge-base/concepts/onion-vps-catalog-doctrine.md v1.0.0, 2026-08-05, commit 5a5768f) mas nasceu do F0 DIRETO (D_framing_catalogo), pulando a escada de A_analysis_structure — F1 rodou para UMA tool (whatsapp/WAHA), F2 (arquitetura cross-tool) foi FORMALMENTE REPROVADA como arquitetura (stack-harmonia-2026-08, no D_sintese_reprovada: premissas fabricadas, 9 membros contra 12 reais), F3 e F4 nunca rodaram e A_analysis_structure segue status open. O PLANO ESTRUTURADO — a outra metade da direcao — AINDA NAO EXISTE. A direcao segue valida; o que drifou foi a suposicao de que ela tinha sido cumprida pela escada prevista"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
@@ -207,7 +207,7 @@ nodes:
     node_type: question
     plane: DEV
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): Claim (A) — 'P2' segue literalmente não-nomeado — permanece tecnicamente verdadeiro (zero resolução no repo), mas claim (B) — que essa ambiguidade BLOQUEIA a pesquisa de "
     impact: 2
     confidence: 1.0
@@ -218,7 +218,7 @@ nodes:
     node_type: question
     plane: DEV
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O nó está status:open pedindo pesquisa que já foi EXECUTADA e RESPONDIDA (com Elenxo real: 4 pesquisas orquestradas + crítico adversarial + verificação independente do ma"
     impact: 3
     confidence: 1.0
@@ -229,7 +229,7 @@ nodes:
     node_type: question
     plane: DEV
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó pede uma PESQUISA em aberto (SMTP self-host x transacional, e cruzar com a lista de conectores do Logto). Ambas as afirmações foram RESOLVIDAS e IMPLEMENTADAS no viv"
     impact: 3
     confidence: 1.0
@@ -242,7 +242,7 @@ nodes:
     status: superseded
     impact: 2
     confidence: 1.0
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_CENSO0901_Q_tunneling — pergunta mal-colocada, respondida em F2b stack-harmonia-2026-08 (ingresso autenticado, nao tunneling); label preservado como historia'
     label: "PESQUISA+ELENXO: ngrok × Cloudflare Tunnel × Tailscale Funnel × Caddy-so. Para QUE (dev-preview? webhook inbound? exposicao efemera de adotante sem servidor?) — o caso-de-uso decide; ligar ao downstream-by-pull ja desenhado (adotante sem servidor)"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
@@ -254,7 +254,7 @@ nodes:
     status: superseded
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_A_analysis_structure (SUPERSEDES); label preservado como historia'
     label: "ESTRUTURA DE ANALISE INICIAL (4 fases, antes do plano): F0 frame+invariantes+Elenxo catalogo-vs-plataforma · F1 pesquisa por-tool documentada born-in-KG (verify-external) · F2 arquitetura cross-tool (SDAAL/bridge/Logto-spine) · F3 Elenxo por-decisao-real → F4 sintese que DERIVA a doutrina + o plano faseado gated"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
@@ -266,7 +266,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: elenxo-framing-2-steelman-1-juiz-opus+m8-serial-2026-08-reverificado
     label: "VEREDITO F0: o conjunto e CATALOGO (nao plataforma; HIBRIDO recusado — reservaria vaga pro dead-layer com folha-de-figueira build-gated). E a soma de N adapters individualmente justificados por demanda (pull-not-push): cada tool = 1 SDAAL se passa o Teste-do-Eixo, senao 1 script-gated, atras do bridge, roteado por .env como task-manager/forge. NAO E: zero backend/registry/UI propria; members.yaml=unica fonte de identidade; NENHUMA visao agregada/cross-tool e pre-autorizada (qualquer painel composto e capacidade NOVA sujeita ao proprio pull-not-push). Precedente vivo decisivo: task-manager+forge ja escalam 1->N sem registry central"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
@@ -281,7 +281,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: dissent-do-juiz-elenxo+m8-serial-2026-08-reverificado
     label: "DISSENT (sobrevivente, vigiar): auth NAO e adapter-par — e alicerce TRANSVERSAL que whatsapp/email/monitoramento assumem como dado. O catalogo-puro trata Logto como 'so mais uma entrada' e nao tem lar limpo p/ 'auth e o chao comum'. SE a divida de integracao ponto-a-ponto se acumular, o catalogo pode pagar MAIS que uma fina camada de auth compartilhada. NAO vira o veredito: (a) Logto=projecao de members.yaml ja da lar doutrinario (nao camada nova); (b) a cura, se morder, e UMA composicao de auth-compartilhada PUXADA pela propria demanda — ainda catalogo-nativa, pull-driven, nunca plataforma preemptiva"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
@@ -292,7 +292,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.9
-    verified_at: 2026-07-31
+    verified_at: "2026-07-31"
     verified_against: teste-do-eixo-2-providers-reais
     label: "TESTE-DO-EIXO whatsapp: whatsapp-web.js (shipped) + WAHA (a adicionar) = 2 providers reais intercambiaveis -> SDAAL QUALIFICA (dominio comms/messaging), WAHA default. Unica tool com SDAAL imediato"
     trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
@@ -301,7 +301,7 @@ nodes:
     node_type: claim
     plane: DEV
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): O nó é um TESTE-DO-EIXO com 4 afirmações independentes: (1) decidir entre SMTP self-host (Postfix/maddy) x API transacional (Resend/Postmark/SES); (2) SDAAL-candidato SE "
     impact: 3
     confidence: 0.8
@@ -312,7 +312,7 @@ nodes:
     node_type: claim
     plane: DEV
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): A premissa do nó — que falta um ELENXO-DE-FRAMING para decidir se monitoramento é STACK ou SDAAL-candidato, a ser feito 'na F1' — está MORTA: a pesquisa foi feita (embora"
     impact: 3
     confidence: 0.8
@@ -325,7 +325,7 @@ nodes:
     status: superseded
     impact: 2
     confidence: 0.8
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_CENSO0901_C_axis_tunneling — o eixo SDAAL-vs-script entre 3 providers ficou sem objeto — nenhum dos 3 e necessario (F2b stack-harmonia); label preservado como historia'
     label: "TESTE-DO-EIXO tunneling: ngrok/Cloudflare-Tunnel/Tailscale sao intercambiaveis -> SDAAL-candidato SE o caso-de-uso exigir troca de provider (dev-preview? webhook inbound? adotante-sem-servidor via downstream-by-pull?). Se 1 real intencionado -> script-gated. Caso-de-uso decide na F1"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
@@ -337,7 +337,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: pesquisa-f1-web-verificada-mais-teste-do-gatilho+m8-serial-2026-08-reverificado
     label: "F1 (whatsapp) RESOLVIDO: DOGFOOD PRIMEIRO, SDAAL DEPOIS. O Teste do EIXO passou (2 providers) mas o do GATILHO NAO — 1 real rodando (whatsapp-web.js) + 1 dirigido (WAHA nao deployado) = script. Deployar WAHA + 1 sendText real E o gatilho; medir as 2 degradacoes do wwebjs decide se o contrato tem 2 operacoes ou 1; CRITERIO DE RETRACAO escrito antes de construir. Forma desenhada: dominio 'whatsapp' + prefix WA_ + interface v0.1 de 4 operacoes, WAHA default. Pesquisa completa (web-verificada, radar exit 0): docs/evolution/research/waha-adapter-2026-07/"
     trace: "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml"
@@ -353,7 +353,7 @@ nodes:
     node_type: question
     plane: DEV
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O núcleo mecânico do nó (claim 1: o limiar de 30% DRIFTED gateava o juiz adversarial e por isso ele não rodou no M8 apesar de 44% de drift; claim 4: um contraditório pega"
     impact: 4
     confidence: 0.9
@@ -365,7 +365,7 @@ nodes:
     node_type: question
     plane: DEV
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): A question so existe para segurar viva a leitura UNVERIFIABLE do worker do M8 ('sem estado material medivel'). Essa leitura MORREU: o estado material do conector de email"
     impact: 3
     confidence: 1.0
@@ -383,7 +383,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.0
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find
     label: "SUPERADA (presuncao ate 2026-08-06): que o desenho dual ja tivesse DOIS LADOS materiais. A re-medicao achou UM: WAHA up (container onion-vps-waha) e whatsapp-sender sem processo, unit nem container — so codigo e sessao pareada em disco. E nenhum dos dois ADAPTERS existe: .claude/utils/whatsapp nao esta la. A direcao nao caiu; caiu a suposicao de que ela ja tinha sido executada"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
@@ -399,7 +399,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.0
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: m8-serial-2026-08+estado-de-execucao-medido-2026-08-06
     label: "SUPERADA (presuncao ate 2026-08-06): que a doutrina do catalogo tivesse nascido da escada de A_analysis_structure (F1-F4). A re-medicao achou o contrario: ela veio do F0 DIRETO, F1 rodou para UMA tool, F2 foi FORMALMENTE REPROVADA como arquitetura (premissas fabricadas), F3 e F4 nunca rodaram, e A_analysis_structure segue open. O PLANO ESTRUTURADO — a outra metade da direcao — ainda nao existe"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
@@ -413,7 +413,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.0
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps
     label: "SUPERADA (era a SSOT ate 2026-08-06): 'Dominios: auth./bridge./app.onionevolve.com'. A re-medicao achou que bridge.onionevolve.com RESOLVE por DNS mas NAO tem vhost no Caddy (curl devolve 000) — o onion-bridge serve sob app., nao sob bridge. E esta ficcao de subdominio que explica por que o mapa foi redesenhado"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
@@ -433,7 +433,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.0
-    verified_at: 2026-08-06
+    verified_at: "2026-08-06"
     verified_against: m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find
     label: "SUPERADA (SSOT até 2026-08-06): 'whatsapp-sender VIVO no home da conta onion'. A re-medição não achou processo, container nem unit; o código existe num workspace de agente do clone de produção do bridge. Disse VIVO por 12h; restaurada por ter sido apagada no #552."
     narrative: "label anterior: SUPERADA (era a SSOT ate 2026-08-06): 'WHATSAPP: whatsapp-sender ⟨VIVO (whatsapp-sender no home da conta onion, whatsapp-web.js⟩ nao-oficial, repo privado)'. O parecer de 2026-07-05 registrava reinstalacao. A re-medicao no host vivo NAO achou processo, container nem unit systemd; o CODIGO existe em disco, ⟨mas num workspace de agente de o clone de produção do onion-bridge — NAO no home da conta onion,⟩ que e o caminho que esta afirmacao superada dava — e a SSOT seguiu afirmando VIVO por 12h ate alguem ir procurar. Restaurada aqui porque foi APAGADA (label reescrito no #552), nao rebaixada"
@@ -450,7 +450,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — Leitura do nó completo + das arestas SUPPORTS que apontam para ele (Q_monitoring_stack, C_'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede "pesquisa documentada + Elenxo de stack" como trabalho ABERTO ("zero desenho"). Isso já foi feito e respondido: F2 (stack-harmonia-2026-08, 2026-08-01) rodou o Elenxo (4 pesquisas + crítico adversarial + verificação independente) e o veredito sobrevivente é explícito — Langfuse/OTel/Promet'
     provenance:
@@ -465,7 +465,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 5/5 — Lido o nó inteiro + os nós relacionados (D_structured_plan_and_doctrine, C_escada_analise_'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede uma escada sequencial F0→F4 que segue tecnicamente incompleta (F2 reprovada e nunca refeita; F3/F4 nunca rodaram como fases formais). Mas o OBJETIVO da escada — "síntese que deriva a doutrina + o plano faseado gated" — já foi alcançado por um mecanismo diferente e mais leve, já em produção'
     provenance:
@@ -480,7 +480,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — 1) Leitura do nó (linhas 257-264) e do irmão ENT_tunneling (linhas 94-104, já status:super'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pedia decidir, na F1, se tunneling era SDAAL-candidato ou script-gated entre 3 providers concretos (ngrok/Cloudflare Tunnel/Tailscale). A pesquisa F2b (stack-harmonia-2026-08, 08-01) respondeu de forma que torna a pergunta original mal-colocada: nenhum dos 3 providers é necessário — "tunneling"'
     provenance:
@@ -495,7 +495,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 3/3 — Leitura do nó Q_tunneling (linhas 184-191) + dos nós-irmãos já selados nesta mesma passada'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede pesquisa+Elenxo comparando 4 providers concretos para decidir "para quê" e ligar ao downstream-by-pull. O vivo superou: a pesquisa (F2b-pesquisa-tunneling, 2026-08-01) já rodou e concluiu que a pergunta estava mal-colocada — "tunneling" nem é a capacidade certa (é "ingresso autenticado", j'
     provenance:

@@ -3,7 +3,7 @@
 meta:
   id: perception-instruments-2026-07
   schema_version: "1"
-  baseline: 2026-07-18
+  baseline: "2026-07-18"
   date: 2026-07-18
 nodes:
   - id: E_FABLE_REVIEW
@@ -13,7 +13,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "revisor adversarial fable achou 7 furos (3 ALTA): farol eh breadcrumb nao instrumento; a2a-verify eh gate-ator nao sensor; instrumentos-leem-breadcrumbs eh falso (inventory le filesystem, a2a le relogio NTP)"
     provenance:
       source: ".claude/diary/2026-07-18-perception-instruments-doctrine.md"
@@ -27,7 +27,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "HIPOTESE CRUA superada: o farol eh um instrumento. Na verdade o arquivo .beacon eh BREADCRUMB (o up DEIXA a marca); so o subcomando check eh SENSOR"
   - id: C_HYP_READS_CRUMBS
     node_type: claim
@@ -36,7 +36,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: superseded
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "HIPOTESE CRUA superada: instrumentos leem breadcrumbs. Refutada: inventory le filesystem, graph le spec, a2a le relogio NTP. O certo sao 3 FONTES (marca/estrutura/vivo)"
   - id: C_4_ROLES
     node_type: claim
@@ -45,7 +45,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "4 PAPEIS: SENSOR (percebe e reporta) · GATE (percebe e decide/escreve, ex a2a-verify) · PROJECAO (view derivada, ex console) · BREADCRUMB (a marca deixada, nao eh instrumento)"
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
@@ -59,7 +59,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "3 GENEROS de sensor por OBJETO: PRESENCA-VIVA (farol-check, telescopio) · ESTADO-DURAVEL (radar, grafo, inventario, canary) · MENSAGEM-NA-FRONTEIRA (you-have-mail, inbox-scan)"
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
@@ -73,7 +73,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "3 FONTES que um sensor le (a amarra correta): marca (breadcrumb: beacon, verified_at, stamp) · estrutura (spec-as-code: filesystem, members) · vivo (runtime: relogio NTP, git, tela)"
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
@@ -87,7 +87,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "unidade de classificacao = o CHECK, nao o script (um script empacota varios checks — inbox-check faz inbox E migalha-vencida; kg-radar tem 7 modos)"
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md + .claude/hooks/co-evolution-inbox-check.sh e .claude/validation/kg-radar.sh @8fd6c736"
@@ -101,7 +101,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "eixo transversal (nao genero): veredito advisory vs gate. kg-radar REPROVA (exit 1); federation-radar eh advisory (exit 0 sempre) — contratos opostos sob o mesmo nome radar, declarar por check"
     provenance:
       source: ".claude/validation/kg-radar.sh e .claude/validation/federation-radar.sh @8fd6c736 + docs/knowledge-base/concepts/onion-perception-instruments.md"
@@ -115,7 +115,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "CANARY (pergunta B): pin-integrity-check usa um canario (arquivo vendorizado que muda no core; divergencia byte-a-byte delata pin forjado/stale) — tripwire de declarado-nao-verificado. Sensor de estado, fonte=marca"
     provenance:
       source: ".claude/validation/pin-integrity-check.sh @8fd6c736 + docs/knowledge-base/concepts/onion-perception-instruments.md"
@@ -129,7 +129,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "PRAZOS/CHECAGENS (pergunta C): o instrumento eh o eixo VALIDADE/FRESCOR — review_after + conflict_class + o gatilho lazy-por-sessao (co-evolution-inbox-check emite quando vencido). NAO cron (W7 rejeitado)"
     provenance:
       source: "docs/knowledge-base/concepts/onion-perception-instruments.md + .claude/hooks/co-evolution-inbox-check.sh @8fd6c736"
@@ -143,7 +143,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: done
-    verified_at: 2026-07-18
+    verified_at: "2026-07-18"
     label: "DOUTRINA (KB onion-perception-instruments): instrumentos = pernas read+verify; breadcrumbs = perna write. 3 generos por objeto + 4 papeis + 3 fontes + veredito/frescor transversais + unidade=check"
     trace: "docs/knowledge-base/concepts/onion-perception-instruments.md"
     provenance:

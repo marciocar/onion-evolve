@@ -15,7 +15,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "changelog oficial librechat.ai (v0.8.7 23-24/jun/2026; v0.8.8-rc1 14/ago) + GitHub Releases API; cadencia ~1 minor/4-6 semanas"
     label: "LibreChat v0.8.7 e a stable atual; projeto adquirido pela ClickHouse (nov/2025), segue MIT; sinais enterprise fortes (Prometheus/OTel, Admin Panel, role sync OIDC)"
     provenance:
@@ -30,7 +30,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "docs/features/skills + changelog v0.8.6 + PR #13293 (skillSync.github, config 1.3.13): SKILL.md com name/description/allowed-tools/always-apply; sync por owner/repo/paths/interval"
     label: "O ACHADO QUE MUDA O DESENHO: LibreChat adotou Agent Skills no MESMO formato SKILL.md do Claude Code + GitHub Skill Sync — o repo Onion pode ser LIDO como fonte viva de skills, sem porte"
     provenance:
@@ -45,7 +45,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: ".env.example do main (46 vars OPENID_/ANTHROPIC_) + indice OAuth2-OIDC da doc: guias p/ Auth0/Cognito/Entra/Keycloak/Authelia/Authentik — Logto AUSENTE em doc e comunidade"
     label: "OIDC genérico é 1ª classe (OPENID_* completo, role sync, PKCE), mas a doc oficial NÃO tem guia Logto (índice OIDC: Auth0/Cognito/Entra/Keycloak, Authelia/Authentik) — sem referência pronta; riscos do precedente Vaultwarden: ES384, /oidc no issuer, sem offline_access"
     narrative: "label anterior: OIDC generico e 1a classe (OPENID_* completo, role sync, PKCE) mas NAO existe guia Logto no mundo — a instalacao da casa e pioneira; riscos herdados do precedente Vaultwarden: ES384, /oidc no issuer, sem offline_access"
@@ -61,7 +61,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "docs/development/tools_and_plugins abre com 'This page is deprecated'; recomenda MCP + OpenAPI Actions; Agents e 'the most capable endpoint' (docs/compatibility)"
     label: "A página de Tools/Plugins da doc está DEPRECADA ('plugins will be deprecated in favor of tools'); a doc recomenda MCP (Streamable HTTP p/ produção) ou OpenAPI Actions, e Agents é 'the most capable endpoint'"
     narrative: "label anterior: Endpoint Plugins legado esta DEPRECADO; o caminho atual e Agents + MCP (streamable-http p/ producao) + Actions — qualquer integracao Onion nasce nesses tres, nunca no legado"
@@ -77,7 +77,7 @@ nodes:
     impact: 4
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "blog 2026-02-18 roadmap (Q1: Admin Panel, Dynamic Context, Code Interpreter open-source; Q2: Workflows/approval gates/background agents) + Discussion #11860 (H2 prometido, NAO publicado ate 20/ago)"
     label: "O roadmap oficial 2026 (blog 2026-02-18) traz Admin Panel v1 (GUI de config, perfis por role, grupos/roles), Agent Skills e Code Interpreter API open-source (Q1), approval gates e background agents/subagents (Q2); o H2 seria publicado em meados do ano"
     narrative: "label anterior: O roadmap oficial cobre exatamente o que seria tentador construir: seeder de agentes (Admin Panel), motor de fan-out (Workflows Q2), sandbox (code-interpreter open-source) — ESPERAR e mais barato que construir divida"
@@ -93,7 +93,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "Issue #12538 (meili indexa VAZIO em silencio, primary key ambigua) · Discussion #12884 (1o-usuario-admin NAO funciona com OIDC) · #10684 (latest quebra upgrade) · .env.example (Mongo sem auth por default)"
     label: "As 4 pegadinhas que o plano da casa ja neutraliza: pins em vez de latest; janela de admin LOCAL; verificacao de busca POR COMPORTAMENTO (nao pelo log de sync); Mongo sem-ports em rede isolada com limite declarado"
     provenance:
@@ -108,7 +108,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: superseded
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "free -h no host: swap 8G 100% consumido, 11Gi 'disponiveis' majoritariamente page cache; consumidores reais: 2 VS Code servers ~3.5G + ~7 processos claude ~6G; docker atual ~3.6G"
     label: "O headroom de RAM da VPS é apertado (o swap desta VPS já esteve 100%): o stack entra com mem_limit em TUDO (api 1g, mongo/meili/vectordb 512m, rag 1g)"
     narrative: "label anterior: O headroom REAL de RAM e apertado (swap 100%): o stack entra com mem_limit em TUDO (api 1g, mongo/meili/vectordb 512m, rag 1g) e a higiene de sessoes orfas e decisao do maestro, nao minha"
@@ -142,7 +142,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "lido no CODIGO da imagem v0.8.7 em producao: /app/api/server/services/Skills/sync.js exporta initializeGitHubSkillSync e grep na imagem inteira mostra ZERO callers fora do teste; corroborado pelo comportamento (boot aceita o schema, colecoes skillsync* existem com 0 docs, PAT valido com ZERO trafego, zero logs do servico). PR #13293 mergeou 2026-06-11, ANTES do corte do v0.8.7 (06-24) — codigo embarcou, wiring nao"
     label: "CORRECAO DA PESQUISA em 2 rodadas de dogfood: (1) DORMANT no v0.8.7 — zero callers; (2) upgrade REAL p/ v0.8.8-rc1 mediu que a hipotese liga-sozinho-no-upgrade era FALSA: nem no rc1 ha caller de boot — o desenho pos-ClickHouse gere o sync pelo ADMIN PANEL (skillsynccredentials por tenant; request-scoped recusa config==server, lido no codigo do rc1). Painel subiu (pin 1.0.0, loopback 3027) e FECHOU O CICLO em 2026-08-20: enabled ligado no painel (o gate final — github.enabled default off) + POST /api/admin/skills/sync/run = 11/11 skills sincronizadas; cron diario skill-sync-run.sh como mecanismo de fonte-viva. Correcao em 3 rodadas, todas aresta"
     provenance:
@@ -187,7 +187,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "repo onion-vps-librechat commitado (7338dcb): 5 servicos pinados (api v0.8.7, mongo 8.0.20, meili 1.35.1, pgvector 0.8.0-pg15, rag v0.9.0 — tags conferidas no registry), compose config valida com segredos reais, fail-closed provado por recusa, app OIDC sqov79y2x3s6qawreafga provisionado via Management API e verificado por releitura"
     label: "DECISÕES DO MAESTRO SELADAS (plano 2026-08-20): chat.onionevolve.com · SSO Logto (Onion ID), com admin LOCAL e login local ativo (OIDC liga só se o segredo existir) · só Anthropic na v1 · escopo completo com RAG (5 containers pinados) — stack construído no padrão da casa"
     narrative: "label anterior: DECISOES DO MAESTRO SELADAS: chat.onionevolve.com · SSO Logto obrigatorio (janela do 1o admin local) · so Anthropic server-key · escopo COMPLETO (5 containers com RAG) — e o stack ja esta construido no padrao da casa · trace anterior (só no host): docker-compose.yml do repo local onion-vps-librechat (commit 7338dcb), sem remoto alcançável (host)."
@@ -205,7 +205,7 @@ nodes:
     impact: 5
     confidence: 0.5
     status: confirmed
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "F4b EXECUTADA no gatilho real (agente da PoC alucinou skills/kg-ssot e negou a capacidade): pesquisa propria em docs/evolution/research/librechat-kg-runtime-2026-08/ (radar exit 0) — read-leg=tools MCP+instructions+skill always-apply; map=pipeline do servidor; write=proposta nunca direto (I3); memory nativo descartado como destino"
     label: "RESPONDIDA — era a PESQUISA F4b (+etapa do maestro): como read(KG)->verify->act->write(KG) executa numa conversa LibreChat? Hipoteses: read-first via skill always-apply + tools do MCP onion-kg; map so via Bridge-como-MCP; write(KG) e a perna critica (I3) — write-via-Bridge com gate OU write-como-proposta que o core sela (rima com federacao: adotante sinaliza, core sela). Risco a nomear: memory nativo do LibreChat como fonte paralela ao grafo. Gatilho: stack no ar + MCP onion-kg desenhado"
     provenance:
@@ -220,7 +220,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-20
+    verified_at: "2026-08-20"
     verified_against: "o maestro inseriu as DUAS chaves no pass (anthropic validada com 200 na API; openai-embeddings presente); o rag_api subiu healthy com EMBEDDINGS_PROVIDER=openai"
     label: "FECHADO COMPLETO (2026-08-20): via RAG provada de ponta a ponta — agente Onion-KB com 793 embeddings (pgvector 0→793) e resposta citando arquivo-fonte via Agents API. A integração #2 do top-5 está ENTREGUE; a #1 (skillSync) ficou viva no mesmo dia pelo Admin Panel (11/11)"
     narrative: "label anterior: FECHADO COMPLETO (2026-08-20): chave inserida E a via RAG provada de ponta a ponta — agente Onion-KB (F6.2) com 793 embeddings e resposta citando arquivo-fonte via Agents API. A integracao #2 do top-5 esta ENTREGUE; a #1 (skillSync) fiada e dormant ate v0.8.8"

@@ -19,7 +19,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: fan-out-6-dims-mais-verificacao
     label: "VEREDITO: framework SAUDÁVEL — 0 blocker, 0 dívida estrutural. Nenhum agente acima do limite de peso; nenhum resíduo .onion/CLI/npm/multi-IDE; lint 0 HARD. Os 8 sobreviventes são polimento (notas de diferenciação, consolidação de common/, 1 dep MCP não-declarada)"
     trace: ".claude/validation/lint-artifacts.sh"
@@ -35,7 +35,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 5 (run wf_2349bf29-ea0, 2026-08-30): O nó descreve um gap (MCP não declarado + sem gate + prosa sequencial sem fan-out) que já não existe no vivo: o arquivo `.claude/agents/development/system-documentation-o"
     label: "D6/recommended: system-documentation-orchestrator usa mcp_code-understanding_* (4 chamadas sequenciais em prosa) mas NÃO o declara no frontmatter tools: e não gateia sua ausência. As 4 leituras independentes são candidatas a Workflow fan-out (o próprio arquivo já cita Workflow 2 linhas abaixo). Padrão: declarar+gatear o MCP + prosa-sequencial→fan-out"
     trace: ".claude/agents/development/system-documentation-orchestrator.md:6-13,177-201"
@@ -45,7 +45,7 @@ nodes:
     impact: 2
     confidence: 0.8
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O item pedia consolidar o workflow de story-points duplicado em task/estimate/feature dentro de common/prompts/story-points-gate.md (que já existia 'parcial'). Isso foi e"
     label: "D3/recommended: workflow de story-points duplicado em 3 comandos (task/estimate/feature, ~100 linhas cumulativas). Padrão: consolidar em common/prompts/story-points-gate.md (já existe parcial); comandos só invocam"
     trace: ".claude/commands/product/{task,estimate,feature}.md"
@@ -56,7 +56,7 @@ nodes:
     impact: 2
     confidence: 0.6
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó registrava uma lacuna pontual (description do frontmatter sem a linha de diferenciação self-differentiating vs @test-planner) que já foi ENTREGUE — a linha existe ho"
     label: "D2/opportunistic (ENFRAQUECIDO na verificação): test-agent × test-planner. O corpo do test-agent JÁ TEM '### Com test-planner:'; só falta a linha de diferenciação na DESCRIPTION (frontmatter) — um orquestrador que escolhe por description sozinha não desambigua. Padrão: self-differentiating description"
     trace: ".claude/agents/testing/test-agent.md:1-6"
@@ -66,7 +66,7 @@ nodes:
     impact: 2
     confidence: 0.7
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O nó pedia exatamente uma linha 'Diferença vs analyze-complex-problem: caminho RÁPIDO, sem tipagem, sem gate' na descrição de /quick:analysis, seguindo o molde create-age"
     label: "D2/opportunistic: /quick:analysis × /meta:analyze-complex-problem — mesmo verbo, mesmo destino (docs/analysis/), sem nota de diferenciação. Padrão: linha 'Diferença vs analyze-complex-problem: caminho RÁPIDO, sem tipagem, sem gate' (molde create-agent vs create-agent-express)"
     trace: ".claude/commands/quick/analysis.md:2-8"
@@ -76,7 +76,7 @@ nodes:
     impact: 2
     confidence: 0.7
     status: refuted
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED — ver E_CENSO0901_C_d3_comment_dup (SUPERSEDES); label preservado como historia'
     label: "D3/opportunistic: template de comentário Unicode duplicado entre product/task.md e product/feature.md (~40 linhas). Padrão: common/prompts/ snippet (formatação é implementação, não decisão)"
     trace: ".claude/commands/product/{task,feature}.md"
@@ -111,7 +111,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: grep-e-lint-medidos
     label: "O juiz adversarial só julgou os 'risky' (engineer/product); 2 falso-positivos não-risky escaparam dele e foram pegos na VERIFICAÇÃO do fan-in (rodei grep/lint contra o vivo). Behavior-over-declaration nos próprios achados da auditoria — o backstop de completude"
     trace: "docs/onion/graph/onion-evolution-2026-07-30.kg.yaml"
@@ -126,7 +126,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-30
+    verified_at: "2026-07-30"
     verified_against: verdicts-do-workflow
     label: "O juiz adversarial (opus) refutou 3 achados de D3: duplicações que eram na verdade ADAPTERS finos (engineer/pr.md) ou CITAÇÕES ao fragmento canônico (common:prompts:task-manager-*) — conceito compartilhado, não texto duplicado. Protegeu contra consolidação falsa"
     trace: "wf_7a6ca1e6-064 journal"
@@ -156,7 +156,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.95
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 7 (run wf_05b33768-48c) + selo do maestro 2026-08-30: code-standards.md par.2.5 linha 91 + varredura dos 55 arquivos de .claude/commands/"
     label: "REFUTA [C_d7_discussion_links]: a 'convencao de links absolutos do .claude/' que o no dizia divergida NAO EXISTE — a SSOT (docs/meta-specs/code-standards.md par.2.5) manda exatamente o OPOSTO ('sempre paths relativos, nao absolutos') e a pratica dos 55 arquivos de .claude/commands/ e 100%% relativa. Os docs de discussao estavam CONFORMES; a divergencia era com uma regra imaginada. Selado REFUTED pelo maestro em 2026-08-30."
     trace: "docs/meta-specs/code-standards.md"
@@ -172,7 +172,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 2/2 — Lido o nó (label linha 74, trace linha 75). Medido o trace verbatim: `sed -n ''190,270p'' '
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A claim original ("~40 linhas de template Unicode duplicado entre task.md e feature.md") não sobrevive à medição: task.md foi refatorado (não se sabe por qual PR exato — não é o #504, que tratou de estimativa) para uma nota curta que delega formatação ao adapter; feature.md ficou para trás, ainda em'
     provenance:
@@ -187,7 +187,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total (wf_2944480c-98f): REFUTED 1/1 — grep -n "clickup-patterns\|Unicode\|━━━" .claude/commands/product/task.md .claude/commands/product/feature.md;. Selo do maestro: ordem vai-na-ordem 2026-09-01 (etapa 1)'
     label: 'MEDIDO: '
     provenance:

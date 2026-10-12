@@ -1,8 +1,8 @@
 meta:
   id: plugin-directory-landscape-2026-09
   schema_version: "1"
-  baseline: 2026-09-04
-  review_after: 2026-10-04   # 30d: o tipo DOMINANTE aqui e FERRAMENTA/PLATAFORMA (diretorio oficial, politica de
+  baseline: "2026-09-04"
+  review_after: "2026-10-04"   # 30d: o tipo DOMINANTE aqui e FERRAMENTA/PLATAFORMA (diretorio oficial, politica de
                              # curadoria, contagem de instalacoes do catalogo) — a cadencia de 30d da clausula 8;
                              # a metade "mercado/capital" pediria 90d, mas nesta rodada ela nao produziu sinal.
   # kg-backlog-guard: on
@@ -31,7 +31,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://code.claude.com/docs/en/plugins#submit-your-plugin-to-the-official-marketplace — votos 3-0'
     source_tier: 10
     source_kind: primary
@@ -48,8 +48,8 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-09-04
-    valid_from: 2026-09
+    verified_at: "2026-09-04"
+    valid_from: "2026-09"
     verified_against: 'https://claude.com/docs/plugins/submit — votos 2-1 (um voto adversarial contestou a forca do "explicitamente"; a claim sobreviveu rebaixada)'
     source_tier: 10
     source_kind: primary
@@ -66,8 +66,8 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-09-04
-    valid_from: 2026-09
+    verified_at: "2026-09-04"
+    valid_from: "2026-09"
     verified_against: 'https://claude.com/docs/plugins/submit — votos 3-0'
     source_tier: 10
     source_kind: primary
@@ -84,8 +84,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-09-04
-    valid_from: 2026-09
+    verified_at: "2026-09-04"
+    valid_from: "2026-09"
     verified_against: 'https://code.claude.com/docs/en/discover-plugins — votos 3-0'
     source_tier: 10
     source_kind: primary
@@ -102,8 +102,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-09-04
-    valid_from: 2026-09
+    verified_at: "2026-09-04"
+    valid_from: "2026-09"
     verified_against: 'https://code.claude.com/docs/en/discover-plugins — votos 3-0'
     source_tier: 10
     source_kind: primary
@@ -120,7 +120,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.95
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     valid_from: "2026"
     verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — votos 3-0'
     source_tier: 10
@@ -138,7 +138,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.95
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     valid_from: "2026"
     verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — votos 3-0'
     source_tier: 10
@@ -156,8 +156,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
-    valid_from: 2026-09
+    verified_at: "2026-09-04"
+    valid_from: "2026-09"
     verified_against: 'https://claude.com/docs/connectors/building/review-criteria — votos 3-0'
     source_tier: 9
     source_kind: primary
@@ -174,8 +174,8 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
-    valid_from: 2026-09
+    verified_at: "2026-09-04"
+    valid_from: "2026-09"
     verified_against: 'https://claude.com/plugins — votos 3-0'
     source_tier: 9
     source_kind: primary
@@ -192,8 +192,8 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
-    valid_from: 2026-09
+    verified_at: "2026-09-04"
+    valid_from: "2026-09"
     verified_against: 'https://claude.com/plugins — votos 3-0'
     source_tier: 9
     source_kind: primary
@@ -210,7 +210,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://github.com/anthropics/claude-code/issues/15882 — votos 2-1 (issue aberta por terceiro; o voto contrario notou que e relato de usuario, nao spec)'
     source_tier: 6
     source_kind: forum
@@ -227,8 +227,8 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.75
-    verified_at: 2026-09-04
-    valid_from: 2026-09
+    verified_at: "2026-09-04"
+    valid_from: "2026-09"
     verified_against: 'https://github.com/anthropics/claude-plugins-community — votos 3-0'
     source_tier: 6
     source_kind: primary
@@ -245,8 +245,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    verified_at: 2026-09-04
-    valid_from: 2026-08
+    verified_at: "2026-09-04"
+    valid_from: "2026-08"
     verified_against: 'https://developers.redhat.com/articles/2026/08/18/securing-claude-code-plug-ins-best-practices-repository-security — votos 3-0; source_kind vendor-on-competitor (SEMPRE suspeito, clausula 7) — confianca rebaixada por isso, nao por dissenso'
     source_tier: 4
     source_kind: vendor-on-competitor
@@ -263,8 +263,8 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.65
-    verified_at: 2026-09-04
-    valid_from: 2026-08
+    verified_at: "2026-09-04"
+    valid_from: "2026-08"
     verified_against: 'https://developers.redhat.com/articles/2026/08/18/securing-claude-code-plug-ins-best-practices-repository-security — votos 3-0; source_kind vendor-on-competitor (suspeito por doutrina)'
     source_tier: 4
     source_kind: vendor-on-competitor
@@ -281,7 +281,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'exploracao local no repo do core em 2026-09-04 (contagem por grep sobre .claude/ e sobre os manifestos dos plugins)'
     source_tier: 10
     source_kind: primary
@@ -299,8 +299,8 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
-    valid_from: 2026-09
+    verified_at: "2026-09-04"
+    valid_from: "2026-09"
     verified_against: 'https://claude.com/plugins (primaria, tier 9, votos 3-0); eixo E4 rodado, nenhuma rodada/M&A/down round/nota de analista sobreviveu aos votos'
     source_tier: 9
     source_kind: primary
@@ -317,7 +317,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'contabilidade da propria rodada: 26 fontes, 30 claims, 15 sobreviventes, 11 quedas, 0 nao-verificadas por falha de acesso'
     source_tier: 10
     source_kind: primary

@@ -1,8 +1,8 @@
 meta:
   id: infra-vps-2026-10
   schema_version: "1"
-  baseline: 2026-10-05
-  review_after: 2026-11-04   # 30d: FERRAMENTA e o tipo DOMINANTE. De 17 claims confirmadas, 4 sao
+  baseline: "2026-10-05"
+  review_after: "2026-11-04"   # 30d: FERRAMENTA e o tipo DOMINANTE. De 17 claims confirmadas, 4 sao
                              # comportamento de hook do Claude Code (exit 2, eventos, timeout, padrao
                              # 600s), que muda a cada versao (REGRA 65, cc_version do processo), e 3
                              # sao do instrumento checkrestart/Lynis. As 6 de Docker x UFW sao
@@ -40,7 +40,7 @@ nodes:
     impact: 5
     confidence: 0.55
     label: 'Como o Onion deve tratar INFRA/VPS — sistema operacional, servicos, Docker, firewall, reboot e updates pendentes, sessoes orfas — dado que todo projeto roda sobre infra? Opcoes: (A) nada novo; (B) grafo de dominio da VPS como SSOT viva + censo determinístico ops/vps-census.sh + comando /ops:vps forjado; (B linha) B enxuta, censo shell que compoe sinais nativos e estende vps-exposure-check.sh; (C) vertical de engenharia infra que viaja; (D) 4a dimensao peer. Restricoes duras: core-only primeiro, viaja so com 2o adotante pedindo; nunca encerrar nem propor encerrar ferramenta da VPS; reboot e upgrade sao decisao humana, a ferramenta so propoe; nenhum cron nem auto-start (MOAT W7); acoplar ao Claude Code so onde a capacidade nao existe fora. PERMANECE ABERTA ate o maestro selar D_INFRA_VPS_TREATMENT.'
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: "rodada de 2026-10-05: 33 fontes, 26 claims, 17 confirmadas, 8 refutadas, 0 nao verificadas; 12 objecoes sobreviventes do Elenxo, 12 modeladas; estado vivo re-medido nesta sessao (uname, diretório de boot, reboot-required.pkgs, which, systemctl, docker ps)"
     trace: 'docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml'
 
@@ -52,9 +52,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: "re-medido nesta sessao em 2026-10-05: uname -r = 6.8.0-139-generic; o diretório de boot tem vmlinuz-6.8.0-139 e vmlinuz-6.8.0-142; o marcador reboot-required do sistema existe desde 2026-09-24 com .pkgs = libc6, linux-image-6.8.0-142-generic, linux-base; systemctl is-enabled docker e onion-vps-docker-firewall = enabled; docker ps = 31 containers. NAO re-medidos aqui (vindos do worker de escopo): 45 pacotes atualizaveis, 31 unless-stopped, 16 mosh-server orfaos encerrados a mao, release 26.04.1 disponivel; kernel 146 disponivel NAO reproduzido"
-    valid_from: 2026-09-24
+    valid_from: "2026-09-24"
     source_tier: 10
     source_kind: internal-audit
     label: 'O ESTADO VIVO e a razao da pergunta: reboot pendente desde 2026-09-24 (libc6 e kernel 6.8.0-142 em disco, rodando 139), 31 containers, docker e a contencao onion-vps-docker-firewall habilitados, e uma recorrencia de infra resolvida A MAO com N muito maior que 1 (16 mosh-server orfaos de 11h a 11 dias encerrados manualmente). Recorrencia resolvida a mao pede MECANISMO (fix-must-become-mechanism). A contagem kernel 146 disponivel nao foi reproduzida — so o 142 aparece instalado.'
@@ -71,9 +71,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'leitura do corpus em 2026-10-05: docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml (CL_net_exposure_incident, D_containment_docker_user), docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml (E_CLASSE_DE_EXPOSICAO_VIROU_REGRA_64), .claude/validation/vps-exposure-check.sh presente, ops/ com 20 entradas'
-    valid_from: 2026-08-10
+    valid_from: "2026-08-10"
     source_tier: 10
     source_kind: internal-audit
     label: 'O CORPUS JA COBRE a parte de exposicao: Docker fura o UFW foi incidente medido em 2026-08-10, virou contencao viva (DOCKER-USER default-deny via servico systemd), virou REGRA 64 (compose rastreado com bind publico = HARD no lint) e guarda vps-exposure-check.sh. O que NAO tem mecanismo hoje e o resto da pergunta: reboot pendente, updates, restart policy e sessoes orfas — exatamente a recorrencia resolvida a mao. Esta rodada nao contradiz nenhum no daqueles grafos.'
@@ -90,7 +90,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'CLAUDE.md (CORE diferente de FAMILIA; 3 dimensoes peer selada; design/ e categoria, nao 4a dimensao) + docs/evolution/research/stack-harmonia-2026-08 (D_regra_5_portoes, D_anti_catalogo) + docs/onion/graph/vps-shared-tools-2026-07 (D_framing_catalogo) — lidos no corpus desta rodada'
     source_tier: 10
     source_kind: internal-audit
@@ -110,7 +110,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://code.claude.com/docs/en/hooks — votos 3-0'
     source_tier: 9
     source_kind: primary
@@ -128,7 +128,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://code.claude.com/docs/en/hooks — votos 3-0'
     source_tier: 9
     source_kind: primary
@@ -146,7 +146,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://code.claude.com/docs/en/hooks — votos 3-0'
     source_tier: 9
     source_kind: primary
@@ -164,7 +164,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://code.claude.com/docs/en/hooks — votos 3-0'
     source_tier: 9
     source_kind: primary
@@ -184,7 +184,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 2-1'
     source_tier: 8
     source_kind: primary
@@ -202,7 +202,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 3-0'
     source_tier: 8
     source_kind: primary
@@ -220,7 +220,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.65
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 2-1'
     source_tier: 8
     source_kind: primary
@@ -238,9 +238,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://lists.snapcraft.io/archives/foundations-bugs/2025-June/539876.html — votos 3-0'
-    valid_from: 2025-06
+    valid_from: "2025-06"
     source_tier: 6
     source_kind: primary
     label: "Com Livepatch habilitado, o postinst do kernel deliberadamente NAO cria o marcador reboot-required do sistema: o sinal reboot pendente some mesmo com kernel novo em disco. Lição geral: sinal declarado pode ser suprimido; cruzar uname -r com os vmlinuz-* do diretório de boot."
@@ -258,7 +258,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://manpages.org/lynis/8 — votos 3-0'
     source_tier: 6
     source_kind: primary
@@ -278,7 +278,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.65
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps — votos 3-0'
     source_tier: 5
     source_kind: engineer
@@ -296,7 +296,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps — votos 3-0'
     source_tier: 5
     source_kind: engineer
@@ -315,7 +315,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown — votos 3-0; vendor-on-competitor, suspeito por clausula 7'
     source_tier: 4
     source_kind: vendor-on-competitor
@@ -333,7 +333,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown — votos 3-0; vendor-on-competitor'
     source_tier: 4
     source_kind: vendor-on-competitor
@@ -351,7 +351,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://www.ssdnodes.com/learn/lang/pt/docker-ports-bypass-ufw — votos 3-0; vendor-on-competitor'
     source_tier: 4
     source_kind: vendor-on-competitor
@@ -369,7 +369,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://github.com/SDbyFrankChen/claude-code-server-security-audit — votos 3-0'
     source_tier: 3
     source_kind: engineer
@@ -389,9 +389,9 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/ — votos 3-0'
-    valid_from: 2026-09
+    valid_from: "2026-09"
     source_tier: 4
     source_kind: engineer
     label: 'Exclusao de dados, banco de producao e mudancas de acesso devem sempre voltar para um humano decidir. Repete restricao que ja e DURA no pedido — nao conta como sustentacao independente de B.'
@@ -408,7 +408,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.45
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://github.com/wintermeyer/heinzel — votos 2-1'
     source_tier: 4
     source_kind: engineer
@@ -428,7 +428,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'sintese do eixo mercado/capital da rodada de 2026-10-05; 3 claims de mercado (qovery.com, tier 3) refutadas no voto adversarial'
     source_tier: 3
     source_kind: internal-audit
@@ -446,7 +446,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'contabilidade da rodada de 2026-10-05: 33 fontes, 26 claims, 17 confirmadas, 8 refutadas, 0 nao verificadas; Elenxo 12 sobreviventes, 12 modeladas; payload do workflow truncado em dois pontos'
     source_tier: 10
     source_kind: internal-audit
@@ -530,7 +530,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'objecao do Elenxo ao achado 1 (https://code.claude.com/docs/en/hooks, tier 9) + postura de acoplamento do CLAUDE.md'
     source_tier: 9
     source_kind: primary
@@ -548,7 +548,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: "medido nesta VPS em 2026-10-05: which checkrestart vazio; needrestart instalado no sbin do sistema"
     source_tier: 10
     source_kind: internal-audit
@@ -566,7 +566,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'objecao do Elenxo ao achado 17 (checkrestart sensivel ao kernel, tier 8)'
     source_tier: 8
     source_kind: primary
@@ -584,7 +584,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: "medido nesta VPS em 2026-10-05: canonical-livepatch ausente; o marcador reboot-required do sistema existe com .pkgs libc6, linux-image-6.8.0-142-generic, linux-base; uname -r 139"
     source_tier: 10
     source_kind: internal-audit
@@ -602,7 +602,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'objecao do Elenxo ao achado 5 (https://manpages.org/lynis/8, tier 6); which lynis vazio medido; D_regra_5_portoes e D_anti_catalogo em stack-harmonia-2026-08'
     source_tier: 6
     source_kind: primary
@@ -620,7 +620,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'objecao do Elenxo aos achados 6, 8, 9 e 11; .claude/validation/vps-exposure-check.sh; D_containment_docker_user; iptables -S DOCKER-USER sem root = Permission denied (you must be root), medido pelo Elenxo'
     source_tier: 10
     source_kind: internal-audit
@@ -638,7 +638,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'objecao do Elenxo ao achado 7 (virtua.cloud, tier 5); systemctl is-enabled onion-vps-docker-firewall = enabled, medido'
     source_tier: 5
     source_kind: engineer
@@ -656,7 +656,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'objecao do Elenxo ao achado 10 (mustafa.net, tier 4, blog de opiniao)'
     source_tier: 4
     source_kind: engineer
@@ -674,7 +674,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'objecao do Elenxo ao achado 12 (https://github.com/wintermeyer/heinzel, tier 4, votos 2-1)'
     source_tier: 4
     source_kind: engineer
@@ -692,7 +692,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'objecao do Elenxo ao achado 13 (tier 3); REGRA 64 e vps-exposure-check.sh no core'
     source_tier: 10
     source_kind: internal-audit
@@ -710,7 +710,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'objecao do Elenxo ao achado 14 (https://code.claude.com/docs/en/hooks, tier 9) + MOAT W7 (/meta:radar maestro-invocado, nunca agendado) + padrao REGRA 65'
     source_tier: 9
     source_kind: primary
@@ -728,7 +728,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'objecao do Elenxo aos achados 15 e 16 (https://code.claude.com/docs/en/hooks, tier 9); evidencia TRUNCADA no payload em Se houver qualquer integracao por'
     source_tier: 9
     source_kind: primary

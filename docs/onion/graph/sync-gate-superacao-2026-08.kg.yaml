@@ -14,7 +14,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: superseded
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "incidente medido na sessao: git push inesperado bec436cd->730bc67b em main"
     trace: "ops/pr-merge-verified.sh"
     provenance:
@@ -29,7 +29,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: done
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "ops/pr-merge-verified.sh: o bloco --sync so existe dentro do case MERGED\\|* (pos-prova); os ramos `die` saem antes"
     trace: "ops/pr-merge-verified.sh"
     provenance:
@@ -44,7 +44,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-26
+    verified_at: "2026-08-26"
     verified_against: "execucao do script com PR inexistente 999999 --sync"
     trace: "ops/pr-merge-verified.sh"
     provenance:

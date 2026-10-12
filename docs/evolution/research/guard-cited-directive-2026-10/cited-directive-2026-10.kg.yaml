@@ -4,8 +4,8 @@ meta:
   id: cited-directive-2026-10
   schema_version: "1"
   layer: audit
-  baseline: 2026-10-04
-  review_after: 2026-11-18
+  baseline: "2026-10-04"
+  review_after: "2026-11-18"
   x_supersedes_none: >
     Guarda nova de classe ainda descoberta. Medida contra a REGRA 96, a guarda mais proxima: ela
     cobra CORTE em diretiva viva e isenta como "citado" o que esta guarda acusa. Nada a derrubar

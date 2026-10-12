@@ -14,8 +14,8 @@ meta:
   id: rito-task-manager-2026-09
   schema_version: "1"
   date: 2026-09-30
-  baseline: 2026-09-30
-  review_after: 2026-12-29
+  baseline: "2026-09-30"
+  review_after: "2026-12-29"
 nodes:
   # ── O DIAGNÓSTICO ────────────────────────────────────────────────────────────────────────────
   - id: E_RITO_COMPLETO_CHAVE_QUEBRADA
@@ -25,7 +25,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "medido no repo: 22 comandos em product/ + 13 em engineer/ cobrem o ciclo; story points tem 25 sitios COM gate proprio (common/prompts/story-points-gate.md); 4 validadores de task; e engineer/validate-phase-sync JA faz o mapeamento fase<->subtask do provider. O que quebra e a CHAVE: sessions/<slug> em 8 sitios, sessions/<feature-slug> em 6, mais 5 diretorios fixos, e NENHUM deriva da branch."
     source_kind: repo
     source_tier: 10
@@ -42,7 +42,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "a sessao de 2026-09-30 mergeou tres PRs, criou duas REGRAS, absorveu tres KBs e registrou um membro. Nenhuma linha foi ao provider (TASK_MANAGER_PROVIDER=linear no .env). Causa: engineer/start nunca foi invocado, logo nao houve session, logo validate-phase-sync nao tinha o que sincronizar."
     source_kind: repo
     source_tier: 10
@@ -59,7 +59,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "medido nos 12 STATE.md reais: `resume_command:` aparece em ZERO. A causa e estrutural — o hook worklog-capture-session.sh resolve slug pela branch, e 12 de 12 sessions NAO TEM branch correspondente (num universo de 112 branches). Logo o hook nunca achou nenhuma session. E os dois hooks de worklog DIVERGEM entre si: capture-session:27-31 aceita qualquer prefixo (corrigido em 2026-08-02, quando se mediu que o filtro antigo era no-op em 56 de 58 branches), e precompact-breadcrumb:10-14 ficou com o filtro antigo."
     source_kind: repo
     source_tier: 10
@@ -76,7 +76,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "medido nos 12: `## Objective`, `## Constraints` e `## Map` existem em ZERO; os campos tipados (phase/status/next_action/last_checkpoint) em ZERO; `resume_command:` em ZERO. O esquema canonico vive em worklog-protocol.md:52-90 e nenhum arquivo o segue. Tamanhos: mediana ~34 linhas, maximo 152 (16x o alvo de 1KB)."
     source_kind: repo
     source_tier: 10
@@ -93,7 +93,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "a REGRA 56 (PR aberto carrega RESIDUO da passada adversarial) deriva o nome do residuo de `git branch --show-current | tr / -` ha meses; e na sessao de 2026-09-30 DOIS gates foram perdidos exatamente quando o nome foi digitado em vez de derivado. Ressalva medida: os hooks usam `${branch#*/}`, que NAO e equivalente — em branch de tres niveis ele deixa barra dentro do slug."
     label: "derivar da branch e padrao PROVADO nesta casa; mas ha DUAS derivacoes incompativeis convivendo (`tr / -` no residuo, `${branch#*/}` nos hooks) e so uma serve"
     provenance:
@@ -108,7 +108,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "tres problemas medidos na propria sessao: (1) 'leva' e conceito INTERNO e nao significa nada para quem le o task manager; (2) o escopo da leva so existe DEPOIS de decidir o que entra no PR; (3) uma leva rendeu DOIS PRs (#890 e #891) e outra teve 24 achados."
     source_kind: repo
     source_tier: 10
@@ -124,7 +124,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "docs/backlog.md e PROJECAO GERADA (kg-backlog-project.sh) dos nos status:open, ordenados por atencao, com 'nao editar a mao: feche o item no grafo e ele sai daqui' escrito no topo. O NUMERO nao entra neste no de proposito: a 1a versao cravou '229 em 51' e a projecao do MESMO commit ja dizia 230 em 52 — o no invalidava o proprio numero ao nascer, pela 4a vez nesta classe. O FATO e que o backlog e projecao do grafo; a populacao vive na projecao, que se regenera."
     source_kind: repo
     source_tier: 10
@@ -143,7 +143,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "SELADA pelo maestro em 2026-09-30, opcao A. A verificacao e o ATO DE DECIDIR. Medicao posterior ao selo MELHOROU o custo: as 12 sessions sao 3 adopt- + 9 drive-, ou seja NENHUMA e session de tarefa — a regra nasce SEM PASSIVO, governando uma classe que ainda nao existe no disco."
     label: "SELADO (maestro, 2026-09-30) — OPCAO A: o slug de .claude/sessions/<slug> e DERIVADO da branch (`git branch --show-current | tr / -`, igual ao residuo da REGRA 56), unificando as duas variaveis atuais. Sessions que nao sao de tarefa (drive-, adopt-) sao CLASSE DISTINTA declarada. Sem baseline e sem regra nova: medido que nao ha passivo a cobrar."
     provenance:
@@ -158,7 +158,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "SELADO pelo maestro em 2026-09-30, REVISANDO o selo da mesma tarde ('uma task por leva'). A revisao veio de ele pedir que eu repensasse e EU MEDIR que o backlog do core ja e projecao do grafo."
     label: "SELADO (maestro, 2026-09-30): UMA TASK POR FIO — a unidade e o NO do grafo, nao a leva nem o PR. O fio existe ANTES do trabalho, tem nome que significa algo, aceita 1..N PRs como COMENTARIOS, e o status dele mapeia direto para o estado da task. Consequencia de arquitetura: o task manager vira PROJECAO do grafo, nunca segunda fonte — igual ao docs/backlog.md."
     trace: "docs/backlog.md · .claude/validation/kg-backlog-project.sh"
@@ -174,7 +174,7 @@ nodes:
     impact: 3
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "SELADO pelo maestro em 2026-09-30, escolhendo entre ressuscitar o esquema e seguir a pratica. O slot ja existe em worklog-protocol.md:71 (`task-manager -> main: <id> · provider:`) e em ZERO dos 12 arquivos."
     label: "SELADO (maestro, 2026-09-30): o par fio<->task_id mora no `## Map` CANONICO do STATE.md, ressuscitando o esquema em vez de criar uma segunda gramatica. Honestidade impressa: `## Map` sem `task-manager` faz o comando DIZER que nao ha sincronia, no molde de kg-backlog-project.sh:178-182 (o eixo de agrupamento e IMPRESSO, nunca prometido)."
     provenance:
@@ -199,7 +199,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "KB do adotante (platforms/zoho-projects-api.md v1.2, mais nova que a absorvida) contra sonda no portal real: POST /tasks com {\"parental_info\":{\"parent_task_id\":X}} devolve 201 e a filha nasce depth 1 com parental_info preenchido, e o PAI passa a association_info.has_subtasks true. Conferido no CORPO. Projeto descartavel removido por POST /trash, portal de volta a 1 projeto."
     source_kind: repo
     source_tier: 10
@@ -216,7 +216,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "historico do proprio arquivo num unico dia: 1a redacao afirmou que a V2 entregava subtask (201 sem abrir o corpo, task rasa); 2a afirmou que NAO havia caminho, apos testar parent_task/parent/parent_task_id no TOPO (3x 400); a 3a mediu a forma ANINHADA e funciona. A secao 1 do mesmo arquivo declara em caixa alta que todo vinculo e objeto aninhado."
     source_kind: repo
     source_tier: 10
@@ -234,7 +234,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: open
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "git rev-list --left-right --count origin/main...main no clone do adotante: 3 x 3. O remoto tem o PR #2 da equipe (ADR SAC-59, 219 linhas) que este clone nunca puxou; o local tem 3 updates do Onion nunca pushados. Seis arquivos se sobrepoem, inclusive as 3 KBs absorvidas."
     source_kind: repo
     source_tier: 10
@@ -253,7 +253,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-09-30
+    verified_at: "2026-09-30"
     verified_against: "medido: a KB do adotante estava em v1.2 (com /api/v3.1/, global-statuses, escopo custom_fields.READ) contra a v1.1 que o core absorveu. Aplicar o bundle por cima seria REGRESSAO para ele."
     label: "o update NAO sobrescreve KB de terceiro que o adotante evoluiu: o manifesto transporta docs/knowledge-base, mas never-clobber tem de valer ali tambem — o core absorve o que falta, nunca o contrario"
     x_gatilho: "mecanizar: hoje a exclusao das 3 KBs e MANUAL na entrega. Vira guarda quando um segundo adotante tiver KB propria mais nova que a do core."
@@ -270,7 +270,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: "rodada motores-de-regras-deterministicos-2026-10 (132 agentes, 9,18M tokens): o estado da arte confirmado e de motores de AUTORIZACAO — permit/forbid, decisao pura, ordem-independente POR PROJETO. Medido no proprio repo: o lint SO LE (93 check_* em sequencia, zero geracao no corpo) e quem ESCREVE e o pre-commit (7 git add)."
     label: "o gate do Onion NAO migra para motor declarativo: as guardas produzem artefato, dependem de ordem e precisam do exit 2 de hook — o que transfere e a CAPACIDADE, nunca o substrato"
     provenance:
@@ -285,7 +285,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: "selado pelo maestro: 'nenhuma agora, PRIMEIRO tem que analisar a proposta de cada uma e suas consequencias e o que pode quebrar para ter um plano de implementacao sem falhas'. Plano escrito em docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md"
     label: "nenhuma das tres capacidades (ordem leitor/escritor, diferencial spec-impl, SMT de conflito) se absorve sem plano que diga o que QUEBRA — o plano existe e a execucao e decisao do maestro"
     trace: docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md
@@ -302,7 +302,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: open
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: "a rodada atacou Drools, Camunda/DMN, OpenL, json-rules-engine, Easy Rules, NRules, Clara e GoRules BRMS e NENHUMA claim sobreviveu aos votos adversariais — licenca, cadencia e sinal de vida seguem nao medidos. A unica alegacao de versao 2026 foi REFUTADA."
     label: "nao ha resposta sobre SUBSTITUTO do ZEN Engine: o lado classico voltou vazio, e o maestro selou 'nao agora' em 2026-10-01"
     x_gatilho: "o projeto ADOTANTE de gamificacao sinalizar dor real com o ZEN. A urgencia e dele, nao do core — nao ha motor ZEN no core, so o agente @zen-engine-specialist. Modo recomendado quando reabrir: primarias nomeadas (~42k/no) e nao varredura (~291k/no), porque os motores ja tem nome."
@@ -318,7 +318,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: "medido em 2026-10-01 antes de escrever o plano: lint-artifacts.sh tem 93 chamadas check_* em sequencia literal e ZERO geracao de artefato; .githooks/pre-commit tem 7 git add e a cadeia de auto-fix. E check_scan_sanity ja e PRIMEIRA por desenho, com a razao escrita ('se a varredura esta cega, o veredito de qualquer regra abaixo e vacuidade')."
     source_kind: repo
     source_tier: 10
@@ -335,7 +335,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: open
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: "reforco do maestro em 2026-10-01: 'toda onda principal gera oportunidades derivadas, o que e a automacao de hoje gera novos gargalos e necessidades'. Medido contra a doutrina vigente (common/prompts/research-doctrine.md, 10 clausulas): a clausula 4 (Caminho do dinheiro) pergunta ONDE O CAPITAL ESTA HOJE; esta pergunta e outra — o que a onda CRIA como gargalo derivado, e quem JA PAGA pela onda e por isso tem orcamento para o passo seguinte."
     label: "candidata a CLAUSULA 11 da doutrina de pesquisa: ONDA PRINCIPAL -> GARGALO DERIVADO. Capital mostra o escasso de HOJE; a onda derivada mostra o que fica escasso DEPOIS, como consequencia do que esta sendo automatizado agora"
     x_gatilho: "a rodada que o maestro pediu (Onion como ponto de partida / gargalos derivados da automacao) PROVAR que o eixo rende achado que os outros 10 nao renderiam. Se render, vira clausula com mecanismo (worker proprio no fan-out, como o de mercado). Se nao render, fica como pergunta refutada — e isso tambem e resultado."

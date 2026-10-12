@@ -3,8 +3,8 @@
 meta:
   id: inbox-triage-2026-10
   schema_version: "1"
-  baseline: 2026-10-02
-  review_after: 2026-11-02
+  baseline: "2026-10-02"
+  review_after: "2026-11-02"
   # O QUE A TRIAGEM DO INBOX DE 2026-10 MEDIU — e por que isto NÃO mora no fios-abertos.
   #
   # Eu nasci por violação de fronteira: os 5 nós abaixo foram escritos PRIMEIRO dentro de

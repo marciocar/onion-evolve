@@ -31,7 +31,7 @@ nodes:
     impact: 5
     confidence: 0.7
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 3: worker CONFIRMED e juiz opus/high APROVOU (run wf_5f6d1c0f-ecd)"
     label: "GATILHO objetivo do build: o 1º membro role:consumer (T2) REAL em members.yaml (introduz hub-owner que precisa de visão/ação escopada ao próprio subgrafo) OU o 1º contrato breaking registrado em contracts/. Hoje: 0 T2; o diretório contracts/ AINDA NÃO EXISTE (nasce no 1º /meta:federation-register) → gate FECHADO"
   - id: Q_onprem_tension
@@ -42,7 +42,7 @@ nodes:
     impact: 4
     confidence: 0.6
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 5: worker CONFIRMED e juiz opus/high APROVOU (run wf_1c9263d8-6c9)"
     label: "TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code-only RATIFICADA. Direção do spec: servir auditoria de P4 a partir de artefatos que JÁ existem dentro do Claude Code (sessions/git/CI), não infra on-prem nova"
   - id: Q_auth_decision
@@ -53,7 +53,7 @@ nodes:
     impact: 3
     confidence: 0.55
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O label tem 4 afirmações independentes: (C1) a decisão de plugar Logto no command-side 'ainda NÃO foi tomada'; (C2) 'o bridge hoje usa AUTH_TOKEN próprio, não Logto'; (C3"
     label: "Plugar Logto no command-side é decisão do maestro, ainda NÃO tomada (o bridge hoje usa AUTH_TOKEN próprio, não Logto). Auth backend só entra no gatilho MULTI-OPERADOR (1º role:consumer real) — NÃO é pré-requisito das OP-1..4 (nativas, editam members.yaml + commit, zero backend). Limite operacional a registrar: Logto OSS self-hosted = 1 conta admin no console (multi-admin exige Cloud ou toda gestão de org via Management API pelo control-plane)"
   - id: Q_wake_session
@@ -64,7 +64,7 @@ nodes:
     impact: 2
     confidence: 0.5
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 1/1 claims; juiz APROVADO. Li o nó (label+trace). Conferi docs/evolution/research/federation-2026/GAPS-ADDE => O gap descrito pelo nó (evoluir o receiver git-async para "acordar a sessão" via SSE/webhook, sem qu…'
     label: "GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pull-first/I3. Segue gated — o hook 'you have mail' hoje é SessionStart pull-based"
 
@@ -77,7 +77,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-29
+    verified_at: "2026-08-29"
     verified_against: "DRIFTED pelo OP-1 (PR #697, medido no drive 2026-08-27): a manchete 'NENHUMA mutação tem comando dedicado; /meta:adopt só SUGERE' caiu parcialmente — /meta:federation-member register EXISTE e adopt.md:632 agora INVOCA o comando (não mais 'oferecer registrar' passivo). O gap PERSISTE só para OP-2/3/4 (promote/update/revoke seguem 100% edição manual de YAML): grep em .claude/commands/meta/ = zero comando promote/update/revoke."
     label: "GAP (parcial após OP-1): read-model completo + 1 gate de escrita (trust-topology-check, só LOG). OP-1 REGISTRAR virou comando dedicado (/meta:federation-member register; adopt INVOCA). Restam SEM comando OP-2 PROMOVER / OP-3 ATUALIZAR / OP-4 REVOGAR — mutação por edição manual de YAML + commit"
     provenance:
@@ -93,7 +93,7 @@ nodes:
     impact: 4
     confidence: 0.75
     status: done
-    verified_at: 2026-08-27
+    verified_at: "2026-08-27"
     verified_against: "ENTREGUE: /meta:federation-member register (OP-1) + validador determinístico members-validate.sh (par 6a) + 4 fixtures verdes no lint-selftest + adopt.md:632 agora INVOCA o comando (não só sugere). members-validate valid:true no members.yaml vivo (13 membros); as 3 fixtures bad reprovam com erro nomeado (role/dup-id/pin). Branch feat/federation-member-op1-register. Gate da plataforma segue FECHADO e intocado (Q_gatilho)."
     label: "OP-1 REGISTRAR (create): comando /meta:federation-member register que escreve a entrada do membro no ledger seguindo o template comentado, reusando o pin já VERIFICADO por pin-integrity-check.sh. FECHADO: virou mecanismo — o passo final de /meta:adopt (que só sugeria) agora invoca o comando"
   - id: Q_members_ci_gate
@@ -104,7 +104,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: superseded
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_Q_members_ci_gate (SUPERSEDES); label preservado como historia'
     label: "M2 (revisão adversarial 2026-08-27): members-validate.sh valida na ROTA do comando (Passo 7) e no selftest sobre fixtures, mas NÃO é gate HARD do lint-artifacts.sh sobre o members.yaml VIVO — edição manual com erro semântico-mas-parseável (id dup, trust faltando, pin n/a em adopter) passaria no CI. Header já suavizado p/ não prometer além do que está ligado (behavior-over-declaration). GATILHO p/ ligar HARD: 1a mutação manual que o CI deixou passar OU o nascimento de OP-2/3/4 (aí o validador vira pré-condição compartilhada). Custo: check_members_valid espelhando REGRA 38 (gracioso sem python+yaml) + REGRA nova + catraca REGRA 49"
   - id: C_op_promote
@@ -115,7 +115,7 @@ nodes:
     impact: 4
     confidence: 0.7
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2: worker CONFIRMED e juiz opus/high APROVOU (run wf_8906ab14-786)"
     label: "OP-2 PROMOVER (role: standalone→hub / consumer→T2): atualizar o campo role: no members.yaml do core. Hoje --promote-hub só re-carimba o STAMP local do adotante; federation-radar ③ detecta drift pós-hoc mas não corrige"
   - id: C_op_update
@@ -126,7 +126,7 @@ nodes:
     impact: 4
     confidence: 0.7
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 1/1 claims; juiz APROVADO. 1) Leitura do nó completo (label + trace + edges). 2) grep -n "C_op_update" no k => O nó afirma: OP-3 ATUALIZAR (escrever onion_version pós pin-integrity-check + editar matriz de trust…'
     label: "OP-3 ATUALIZAR (pin/trust/specializations/personality_summary): escrever onion_version novo (pós pin-integrity-check) e editar a matriz de trust (can_correct_to/can_advise_to/...) que trust-topology-check hoje só CONSULTA. Hoje 100% edição manual anotada em comentário"
   - id: C_op_revoke
@@ -137,7 +137,7 @@ nodes:
     impact: 3
     confidence: 0.65
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4: worker CONFIRMED e juiz opus/high APROVOU (run wf_da7d6a16-49e)"
     label: "OP-4 REVOGAR/DESATIVAR (status: retired / remover linhagem obsoleta): nenhum script/comando existe; o padrão observado é anotar status: retired à mão + comentário. Nenhuma das 5 checagens de saúde tem comando companheiro de revogação"
 
@@ -150,7 +150,7 @@ nodes:
     impact: 4
     confidence: 0.65
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 2/2 claims; juiz APROVADO. grep -n "C_p4_audit_trail" -A 40 docs/onion/graph/m3-federation-admin-2026-07.kg => O nó afirma 2 claims medíveis: (1) "trilha de auditoria legível/exportável das sessões e fases execu…'
     label: "REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivada de .claude/sessions/ + visibilidade do resultado do gate mecânico (lint/selftest/inventory) por execução. É 'auditabilidade estrutural' REAL e dogfoodada — não promete L1-L6"
   - id: C_p4_gate_visibility
@@ -161,7 +161,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: open
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'reconciliacao 2026-09-02 (regra do radar): E_CENSO0901 REFINA (CONSTRAINS) — o MECANISMO de gate mudou (ADR hosted-service-identity 2026-08: >=1 federado no Logto consumindo recurso hospedado), o conteudo segue pendente sob o gate novo; gatilho medido = 0 hoje'
     label: "REQ P4 (SHOULD): relatório/export do histórico de decisões (decisions.md-like) por projeto/tenant — P4 valoriza 'evidência e trilha acima de velocidade'. Serve do que existe, sem prometer isolamento/classificação por sensibilidade (D2/L1-L6, gated)"
   - id: C_p3_self_service
@@ -172,7 +172,7 @@ nodes:
     impact: 4
     confidence: 0.65
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 5: worker CONFIRMED e juiz opus/high APROVOU (run wf_1c9263d8-6c9)"
     label: "REQ P3 (SHOULD condicional): self-service de onboarding multi-squad (mata a dor 'cada dev usa IA de um jeito; nenhuma trilha'). O hub JÁ é 'federação como camada de time' (D7) — a plataforma admin é a superfície natural do onboarding org"
   - id: C_p3_agg_view
@@ -183,7 +183,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: open
-    verified_at: 2026-09-02
+    verified_at: "2026-09-02"
     verified_against: 'reconciliacao 2026-09-02 (regra do radar): E_CENSO0901 REFINA (CONSTRAINS) — o MECANISMO de gate mudou (ADR hosted-service-identity 2026-08: >=1 federado no Logto consumindo recurso hospedado), o conteudo segue pendente sob o gate novo; gatilho medido = 0 hoje'
     label: "REQ P3 (SHOULD condicional): visão agregada de adoção/consistência entre N repos/times DA MESMA empresa (multi-tenant no sentido 'uma empresa, N squads', nunca cross-empresa) + métricas de ROI/consistência p/ comprador org. GATED: qualquer flywheel de dado cross-tenant (é D2)"
 
@@ -196,7 +196,7 @@ nodes:
     impact: 4
     confidence: 0.65
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: '/meta:census 2026-09-01 (wf_102a9bec-52f): 6/6 claims; juiz APROVADO. Lido o nó completo (label/trace/edges). Localizada a fonte exata do trace (docs/ => O doc-fonte (onion-m3-federation-admin-spec-2026-07.md §4) segue palavra-por-palavra o que o label r…'
     label: "AUTH = fronteira gated (o BUILD não se pré-cozinha, gated-work-derives-fresh). Comprometido: só a fronteira §4.3 + a invariância. ILUSTRATIVO/não-comprometido (re-derivar no gatilho): forma SDAAL (3ª instância, factory/interface/adapter), protocolo/tipo-de-client, mapa Organization Logto↔tier (source=global/M2M, hub=1 org, consumer=org-member, standalone=SEM org). Read-side segue público; OP-1..4 nativas sem auth p/ operador-único"
   - id: C_commodity_vs_diff
@@ -207,7 +207,7 @@ nodes:
     impact: 4
     confidence: 0.7
     status: confirmed
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'selo Onda 8 (2026-09-01): medicao da revisao-total (README Logto + members.yaml) sem contra-evidencia'
     label: "FRONTEIRA commodity-BUY (Logto) × diferencial-BUILD (Onion): comprar identidade/sessão/token/MFA/CRUD de org/Secret Vault (undifferentiated); construir a tradução papel-grosso→semântica de tier (D7) + matriz de confiança fina de members.yaml (nunca delegável ao Logto sem duplicar a SSOT)"
     provenance:
@@ -223,7 +223,7 @@ nodes:
     impact: 4
     confidence: 0.7
     status: superseded
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED — ver E_CENSO0901_C_trust_matrix_stays_onion (SUPERSEDES); label preservado como historia'
     label: "RBAC do Logto (admin/member por org) é grosso demais p/ a matriz fina (can_receive_from/can_advise_to/can_correct_to/diary_readable_by/exposes_downstream). Essa autorização fica ENFORCED no control-plane Onion lendo members.yaml como dado; Logto Orgs = PROJEÇÃO da topologia hub, nunca a fonte"
   - id: C_not_backstage
@@ -234,7 +234,7 @@ nodes:
     impact: 5
     confidence: 0.85
     status: confirmed
-    verified_at: 2026-08-27
+    verified_at: "2026-08-27"
     verified_against: "CONFIRMED (drive 2026-08-27): a fronteira segue fisicamente amarrada — federation-console.sh:6 ainda declara 'NAO e plataforma (Backstage/Port = over-engineering p/ N pequeno)', read-only/zero-backend; e a premissa N=8 segue de pé: 0 membros role:consumer (T2) em members.yaml. Nada exige plataforma."
     label: "ANTI-plataforma p/ N=8: Backstage/Port custam 3+ engenheiros + US$450k/ano e só compensam a 200-1000+ devs (S3·F1). A fronteira 'NÃO é plataforma' JÁ está fisicamente amarrada ao artefato (federation-console.sh:6-9) e travada por REGRA 24/38 — read-only projeção, zero backend/DB, git como event store"
     provenance:
@@ -250,7 +250,7 @@ nodes:
     impact: 4
     confidence: 0.75
     status: done
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'I_FECHAMENTOS_TRIVIAIS (Onda 8): recomendacao CUMPRIDA — evolucao por extensao (REGRA 66/M2, PR #746) sem redesenho; medido na revisao-total e no censo r1'
     label: "REUSAR o read-model já entregue: console HTML (F1.3), federation-radar (3 checks advisory), pin-integrity-check (gate real), graph.sh --map (Mermaid), seletor fino key:value. Os '4 slices' do SYNTHESIS JÁ foram construídos — tratar como 'entregue, avaliar evolução', não redesenhar"
   - id: C_naive_admin_platform
@@ -354,7 +354,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — grep -n C_trust_matrix_stays_onion docs/onion/graph/m3-federation-admin-2026-07.kg.yaml; s'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó está com status:open pedindo algo que já existe e está em produção: a matriz fina não é "grosso demais" resolvida por Logto — ela nunca dependeu do RBAC Logto para enforcement fino; trust-topology-check.sh já lê members.yaml como dado e já está composto no gate real (a2a-verify.sh Camada 1). O '
     provenance:
@@ -369,7 +369,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — grep -n "members-validate\|check_members" .claude/validation/lint-artifacts.sh; git log --'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pedia ligar HARD o gate de CI sobre members.yaml vivo (estava só na rota do comando + selftest). Isso foi entregue: REGRA 66 faz exatamente isso, com PR(s) 6799c8df/4b749df5 e refinamento 3554f13d. O gatilho nomeado no próprio nó ("nascimento de OP-2/3/4" ou "1a mutação manual que passou") disp'
     provenance:
@@ -384,7 +384,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 4/4 — Lido o nó completo (linhas 161-169) e seu contexto no grafo (D_spec_now_build_gated, Q_gat'
     label: "MEDIDO 09-01: P3 (SHOULD-condicional, gated por D2) segue pendente, mas o gate mudou: o ADR hosted-service-identity §6 da a plataforma admin como ja refutada no m3, nao a reafirma e troca o gatilho tecnico por um de negocio (>=1 federado no Logto c/ recurso hospedado; hoje 0)"
     narrative: "label anterior: MEDIDO 2026-09-01, o vivo superou o no: O conteúdo do claim (P3 SHOULD-condicional, gated por D2) continua factualmente certo hoje, mas o MECANISMO de gate a que ele pertence morreu por substituição: o ADR 2026-08 (onion-adr-hosted-service-identity) refuta formalmente o irmão C_naive_admin_platform desta mesma spec e decreta que a spec in"
@@ -400,7 +400,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 5/5 — Li o nó completo (label linha 13-21) + trace (docs/analysis/onion-m3-federation-admin-spec'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A postura central ("build só liga no gatilho objetivo") foi parcialmente superada pela prática: OP-1 (mutação real de members.yaml) foi construído e endurecido em CI (REGRA 66) sem o gatilho técnico nomeado (1º T2 real OU 1º contrato em contracts/) ter disparado — ambos seguem em zero hoje. O que so'
     provenance:
@@ -415,7 +415,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 2/2 — Lido o nó completo (linhas 149-157) e seu contexto no grafo: edge C_p4_gate_visibility SUP'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó não está errado nem foi entregue — foi SUPERSEDIDO no mecanismo: o gate a que ele pertencia (D_spec_now_build_gated / Q_gatilho técnico de 2026-07) foi substituído pelo ADR de 2026-08 por um gate de negócio explícito e mais barato de checar ("≥1 federado no Logto consumindo recurso hospedado").'
     provenance:

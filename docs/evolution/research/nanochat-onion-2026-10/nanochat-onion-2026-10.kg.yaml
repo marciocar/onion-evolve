@@ -1,8 +1,8 @@
 meta:
   id: nanochat-onion-2026-10
   schema_version: "1"
-  baseline: 2026-10-05
-  review_after: 2026-11-04   # 30d: o tipo DOMINANTE do que MOVE esta decisao e FERRAMENTA/PRECO — o estado do
+  baseline: "2026-10-05"
+  review_after: "2026-11-04"   # 30d: o tipo DOMINANTE do que MOVE esta decisao e FERRAMENTA/PRECO — o estado do
                              # repo karpathy/nanochat (o master se estreitou, o leaderboard parou em 2026-03-14,
                              # o ultimo commit no master e de 2026-07-03) e o preco por hora de GPU alugada, que a
                              # rodada NAO mediu. As metades modelos (45d), mercado/capital (90d) e papers (120d)
@@ -46,7 +46,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'rodada /onion-research modo decision de 2026-10-05: 17 fontes, 32 claims, 14 confirmadas 3/2; Elenxo 33 objecoes, 20 sobreviventes; README, LEADERBOARD.md e arvore do master re-medidos pela API do GitHub na escrita'
     label: 'Como o Nanochat (karpathy/nanochat) e o Onion podem se relacionar no TREINO de um modelo de dominio — o dominio sendo a doutrina e a maquinaria do proprio Onion (Dogfood, KG-SSOT First, Runtime SDAAL, Elenxo)? RESPONDIDO nesta rodada: o que o Nanochat e hoje (harness de pesquisa de PRE-TREINO generico, MIT, US$48 ate o CORE do GPT-2, master estreitado e leaderboard parado desde 2026-03-14); os tres sentidos de "o Onion virar modelo" separados em opcoes; a escala de dados que mata o pre-treino de dominio. ABERTO: forks de dominio (nenhum lido), preco medido de GPU, literatura de classificador tipado <1B e o eval de dominio, que nao existe.'
     trace: 'https://github.com/karpathy/nanochat'
@@ -58,9 +58,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://github.com/karpathy/nanochat README l.6 ("only $48 (~2 hours of 8XH100 GPU node)", "closer to ~$15" em spot) e l.24 ("~$3/GPU/hr ... ~$24/hr"); dev/LEADERBOARD.md ultima entrada 2026-03-14, 1.65 h, CORE 0.262634 (media de 5 runs); votos 3-0; RE-LIDO pela API do GitHub na escrita'
-    valid_from: 2026-03-14
+    valid_from: "2026-03-14"
     source_tier: 9
     source_kind: primary
     label: 'Custo medido de treinar DO ZERO um modelo GENERICO com capacidade GPT-2 (CORE > 0.256525): ~US$48 (~2 h num no 8xH100 a ~US$24/h), ~US$15 em spot; o leaderboard registra 1.65 h em 2026-03-14. O proprio README e inconsistente (l.6 diz ~2 h, l.201 diz ~1.5 h). E custo de PRE-TREINO generico, nunca de modelo de dominio (E_OBJECAO_COST_IS_GENERIC_PRETRAIN).'
@@ -76,7 +76,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://github.com/karpathy/autoresearch; votos 3-0; coerente com dev/LEADERBOARD.md (entradas de 2026-03-09 e 2026-03-14 creditam "autoresearch round 2")'
     source_tier: 8
     source_kind: primary
@@ -93,7 +93,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://github.com/karpathy/autoresearch; votos 3-0 na metade descritiva; a ligacao com a opcao B e INFERENCIA do pesquisador, nao esta na fonte (E_OBJECAO_AUTORESEARCH_PATTERN_ALREADY_OWNED)'
     source_tier: 8
     source_kind: primary
@@ -110,7 +110,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://arxiv.org/pdf/2411.15594 (survey LLM-as-a-Judge); votos 3-0'
     source_tier: 7
     source_kind: paper
@@ -127,9 +127,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://imbue.com/blog/2026-07-20-imbue-catalyst-nanochat; votos 3-0; fonte unica de fornecedor com interesse comercial (produto Catalyst, AGPL-3.0)'
-    valid_from: 2026-07-20
+    valid_from: "2026-07-20"
     source_tier: 6
     source_kind: vendor
     label: 'A Imbue usa o setup nanochat/AutoResearch como bancada PADRONIZADA para avaliar agentes de codigo (Catalyst): um agente melhora o treino de um transformer pequeno com script de exatamente 5 min numa H100. O setup de 5 min e o do AUTORESEARCH, nao o pipeline nanochat completo — evidencia de bancada de pesquisa de PRE-TREINO, nao de treino de dominio.'
@@ -145,9 +145,9 @@ nodes:
     status: superseded
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://www.mintlify.com/karpathy/nanochat/community/leaderboard; votos 3-0; espelho NAO oficial e defasado — a primaria da 2.75 h (nao 2.76 h) para 2026-02-05 e ja registra 2.50/1.80/1.65 h'
-    valid_from: 2026-02-05
+    valid_from: "2026-02-05"
     source_tier: 5
     source_kind: aggregator
     label: 'Espelho do leaderboard: 3.04 h (CORE 0.2585, 2026-01-29), 2.91 h (2026-02-02), 2.76 h (CORE 0.2602, 2026-02-05). Verdade HISTORICA, superada pela primaria (1.65 h em 2026-03-14). Citar so a primaria.'
@@ -158,7 +158,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://github.com/tucan9389/nanochat-jax/discussions/1; votos 3-0; n=1 autodeclarado, sem replica independente'
     source_tier: 5
     source_kind: engineer
@@ -175,7 +175,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://github.com/tucan9389/nanochat-jax/discussions/1; votos 3-0; n=1 autodeclarado'
     source_tier: 5
     source_kind: engineer
@@ -192,9 +192,9 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://pythonlibraries.substack.com/p/replicate-gpt-2-for-73-600-cheaper; votos 3-0; redundante com o README primario ("well below $100")'
-    valid_from: 2026-02-02
+    valid_from: "2026-02-02"
     source_tier: 5
     source_kind: aggregator
     label: 'Fonte secundaria: treinar um LLM nivel GPT-2 com o Nanochat custa menos de US$100. Correto e redundante — nao acrescenta nada a E_NANOCHAT_COST_48_USD e herda a mesma confusao generico x dominio.'
@@ -210,9 +210,9 @@ nodes:
     status: superseded
     impact: 2
     confidence: 0.4
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://www.startuphub.ai/news/figure-andrej-karpathy-nano-series-technical-contribution-2026-07-16; votos 3-0; tier 4; estado de janeiro superado; erra o estagio (CORE mede o modelo BASE, "conversacional" e o SFT)'
-    valid_from: 2026-01-31
+    valid_from: "2026-01-31"
     source_tier: 4
     source_kind: aggregator
     label: 'Em janeiro de 2026 o nanochat reproduziu um modelo classe GPT-2 por ~US$73 em 3 h num no 8xH100. Valor so HISTORICO (superado por 1.65 h / US$48) e com o estagio trocado.'
@@ -223,7 +223,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://github.com/karpathy/nanochat; votos 3-0; RE-MEDIDO pela API do GitHub na escrita: stargazers_count 58422, forks_count 8191, license MIT; README l.82 (GPU unica "8 times longer") e l.112 (CPU "You will not get strong results")'
     source_tier: 9
     source_kind: primary
@@ -240,7 +240,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://code.claude.com/docs/en/changelog; votos 2-1 (a divergencia ja sinalizava o objeto errado, E_OBJECAO_MANAGED_SETTINGS_WRONG_OBJECT)'
     source_tier: 9
     source_kind: primary
@@ -257,7 +257,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://code.claude.com/docs/en/changelog; votos 3-0; Elenxo nao achou objecao material e confirmou coerencia com docs/knowledge-base/concepts/onion-engine-economy.md l.26 e l.63'
     source_tier: 9
     source_kind: primary
@@ -274,7 +274,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'https://github.com/karpathy/autoresearch; votos 3-0'
     source_tier: 8
     source_kind: primary
@@ -293,9 +293,9 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'gh api repos/karpathy/nanochat/contents/scripts -> base_eval, base_train, chat_cli, chat_eval, chat_rl, chat_sft, infer_bench, tok_eval, tok_train (SEM mid_train.py, SEM chat_web.py); contents/tasks -> arc, common, gsm8k, humaneval, mmlu, smoltalk (SEM customjson.py, my_identity.py); ultimo commit no master 2026-07-03T22:54:57Z; pushed_at 2026-09-07 (outra branch); ultima entrada do LEADERBOARD.md 2026-03-14. Medido por mim na escrita, confirmando o Elenxo.'
-    valid_from: 2026-07-03
+    valid_from: "2026-07-03"
     source_tier: 10
     source_kind: primary
     label: 'O master ATUAL do Nanochat se ESTREITOU para pesquisa de pre-treino: sairam o midtraining, a UI web e os loaders de identidade/dominio (customjson, gen_synthetic_data, my_identity, self_knowledge.md) que os agregadores ainda documentam; o README agora diz "talk to it over a simple CLI". SFT de dominio hoje exige ESCREVER a propria Task. E a trajetoria desacelerou: leaderboard parado ha ~7 meses, master sem commit desde 2026-07-03. Refuta a claim "pipeline completo inclusive UI" (tier 9) quanto a midtraining e UI.'
@@ -311,7 +311,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'git ls-files *.kg.yaml (sem fixtures) = 129 grafos, 4.166.816 bytes (~1M tokens a ~4 B/token); git ls-files *.md *.yaml *.sh = 22.354.085 bytes (~5,5M tokens); LEADERBOARD.md: o GPT-2-capability e ~d26 treinado a --target-param-data-ratio 8; ordem de grandeza compute-optimal de um d20 = ~10^10 tokens (estimativa do Elenxo, coerente com a razao parametro:dado do proprio leaderboard). Medido por mim.'
     source_tier: 10
     source_kind: primary
@@ -330,7 +330,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'sintetizador da rodada (sem rodada de investimento, M&A ou analista encontrados); API do GitHub (58.422 estrelas, 8.191 forks); imbue.com blog 2026-07-20 (Catalyst); nanochat-jax discussion 1 (US$2.500 de engenharia)'
     source_tier: 6
     source_kind: aggregator
@@ -347,7 +347,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'inventario do que esta rodada NAO verificou nem modelou — ausencia CONTADA; retorno completo do Elenxo recuperado de subagents/workflows/wf_c8ba4e42-5e6/agent-a967d847b4e1ae04d.jsonl'
     source_tier: 10
     source_kind: primary
@@ -366,7 +366,7 @@ nodes:
     status: open
     impact: 5
     confidence: 0.7
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'E_CORPUS_SCALE_MEASURED + E_NANOCHAT_MASTER_NARROWED + recomendacao do Elenxo (A operante) + S7_claim_onion_mini_proof (federation-research-2026-06-reconciled)'
     label: 'OPCAO A — NAO TREINAR; manter LLM-as-VM. O Onion continua doutrina em markdown + grafo interpretada por Transformer de terceiro, com o que REPROVA em shell. A FAVOR: nada na rodada mostra ganho que pague a perda de auditabilidade; o veiculo (Nanochat) se estreitou para pre-treino generico; o eval de dominio que justificaria treinar nao existe. CONTRA: deixa sem resposta S6_claim_no_doctrine (o Onion nao tem doutrina de ciclo de vida de modelo). E a recomendacao do Elenxo como estado OPERANTE, com B/C/D cada uma em gatilho nomeado.'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
@@ -376,7 +376,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'E_AUTORESEARCH_VAL_BPB_5MIN, E_JAX_PORT_ITERATION_COST, E_NANOCHAT_MIT_TRACTION_HARDWARE; S6_claim_no_doctrine (federation-research-2026-06-reconciled)'
     label: 'OPCAO B — NANOCHAT COMO BANCADA DE ESTUDO/DOGFOOD do ciclo de vida de modelo, sem produto (sentido b). A FAVOR: MIT, minimo e legivel, barato por run; e o unico jeito de o Onion DOGFOODAR o que hoje so descreve (drift, versionamento de pesos, eval continuo, retraining — S6_claim_no_doctrine). CONTRA: o padrao do autoresearch (agente em laco sobre objetivo verificavel) o Onion JA tem sem treinar; otimizar val_bpb nao ensina ciclo de vida; exige GPU alugada (a VPS nao serve) e o orcamento real e de ITERACAO (~40x o run limpo). Admissivel so com caixa de tempo e orcamento declarados e objeto certo. GATILHO (Elenxo): o maestro nomear a lacuna de ciclo de vida de modelo como necessaria a um adotante com runtime (S6_entity_local_slm_adapter).'
     trace: 'https://github.com/karpathy/autoresearch'
@@ -386,7 +386,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.45
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'E_SLM_JUDGE_LITERATURE, E_CC_MCP_HOOKS_NO_SLM_PATTERN, E_NANOCHAT_MASTER_NARROWED; KB docs/knowledge-base/concepts/onion-engine-economy.md (Motor 2); C_OPCAO_B_PRIMITIVE_IN_HOUSE (jev-decision-round2-2026-10)'
     label: 'OPCAO C — SLM-FERRAMENTA DE DOMINIO ESTREITO via adapter SDAAL (Motor 2): tarefa tipada de CONJUNTO FECHADO e verificavel (classificar no, checar schema/forma do KG), nunca orquestrador (S2_claim_rejection_precedent). Fica aberta SO se o veiculo NAO for o Nanochat: o caminho de menor risco ja esta no corpus — decisao tipada local com llama.cpp + gramatica + n_probs sobre SLM aberto PRE-TREINADO, sem treino (C_OPCAO_B_PRIMITIVE_IN_HOUSE). Fine-tune so entra se um eval de dominio (holdout de nos JA SELADOS, baseline = zero-shot do LLM atual) mostrar falha. VETADO: juiz do Elenxo destilado do Claude (erro correlacionado com o gerador destroi a independencia adversarial). GATILHO: o da KB engine-economy — o 2o caso de uso de SLM alem do de-id.'
     trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
@@ -396,7 +396,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.4
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'E_CORPUS_SCALE_MEASURED; classification-por-vertical (PRIVATE nunca sai; DESTILADO so predicado provado); NDA de adotantes; arXiv 2603.25158 citado, NAO lido'
     label: 'OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo e transcripts. GATED. So o corpus PUBLICO e DESTILADO pode entrar — nunca PRIVATE, NDA, material de adotante ou transcript com dado de cliente; isso encolhe ainda mais um corpus que ja e pequeno. A pergunta "quem consome e por que" (MOAT W7, pull-not-push) nao tem resposta, e o eixo que a julgaria (custo de dado sintetico, esquecimento catastrofico, treino com corpus agentico) foi cortado por orcamento.'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
@@ -406,7 +406,7 @@ nodes:
     status: refuted
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'E_CORPUS_SCALE_MEASURED (3 ordens de grandeza de dado faltando); E_JAX_PORT_REPRODUCES_QUALITY (ChatCORE ~0.37); S7_q_onion_as_model refuted, S7_claim_analogy_breaks open, S2_claim_rejection_precedent confirmed (federation-research-2026-06-reconciled)'
     label: 'OPCAO E — O ONION COMO MODELO (pesos), substituindo a doutrina interpretada (sentido a, destilar a doutrina em pesos). REFUTADA, agora com MEDIDA: pre-treino de dominio fora de alcance por 3 ordens de grandeza de dado; SFT sobre base nivel GPT-2 tem teto baixo (ChatCORE ~0.37) e troca fonte != derivacao e declarado != verificado por caixa-preta (S7_claim_analogy_breaks); e um modelo que ORQUESTRA viola "SLM e ferramenta, nunca orquestrador" (S2_claim_rejection_precedent). Reafirma S7_q_onion_as_model.'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
@@ -430,7 +430,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 1: README l.6/l.24/l.201 e LEADERBOARD.md (re-lidos por mim pela API do GitHub — conferem); ultimo commit no master 2026-07-03'
     label: 'OBJECAO (Achado 1): os US$48 sao o custo de PRE-TREINAR DO ZERO um modelo GENERICO ate o CORE do GPT-2 — nao de um modelo de dominio. O README e inconsistente (~2 h na l.6, ~1.5 h na l.201) e a trajetoria desacelerou (leaderboard parado desde 2026-03-14). RESTRICAO: nenhuma opcao pode citar US$48 como custo de modelo de dominio.'
     trace: 'https://github.com/karpathy/nanochat/blob/master/dev/LEADERBOARD.md'
@@ -445,7 +445,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 3: o texto do autoresearch nao liga o padrao a bancada de dominio; S6_claim_no_doctrine (federation-research-2026-06-reconciled)'
     label: 'OBJECAO (Achado 3): o padrao transferivel do autoresearch — agente em laco sobre objetivo verificavel e barato, diff confinado — o Onion JA faz sem treinar modelo (dogfood, catraca, radar). B so ensina algo novo se o objeto do estudo for ciclo de vida de modelo (drift, versionamento de pesos, eval continuo), nao otimizar val_bpb.'
     trace: 'https://github.com/karpathy/autoresearch'
@@ -460,7 +460,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 4: tamanhos dos juizes citados (LLaMA-7B, Vicuna 7-13B) contra nanochat d20/d26 (~0.5-1.6B); arXiv 2411.15594'
     label: 'OBJECAO (Achado 4): os juizes SLM da literatura sao 7B-13B, uma ordem acima de um nanochat. E destilar o juiz do Elenxo a partir do Claude produz ERRO CORRELACIONADO com o mesmo modelo que gera as claims — destroi a independencia adversarial, razao de ser do refutador. RESTRICAO: juiz SLM so em decisao de CONJUNTO FECHADO e verificavel; nunca substituto do Elenxo.'
     trace: 'https://arxiv.org/pdf/2411.15594'
@@ -475,7 +475,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 5: pagina da Imbue relida (1 H100, 5 min, 340 experimentos, Claude Code + Opus 4.8); tier 6, fornecedor com interesse comercial'
     label: 'OBJECAO (Achado 5): o setup de 5 min e o do AUTORESEARCH (reducao de GPU unica), nao o pipeline nanochat completo — o achado funde os dois. Fonte unica de fornecedor com produto (Catalyst, AGPL-3.0). Vale como "nanochat e bancada de pesquisa de PRE-TREINO", nao de treino de dominio.'
     trace: 'https://imbue.com/blog/2026-07-20-imbue-catalyst-nanochat'
@@ -490,7 +490,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 6: dev/LEADERBOARD.md primario (2.75 h em 2026-02-05; 2.50 h 03/03; 1.80 h 09/03; 1.65 h 14/03) — conferido por mim'
     label: 'OBJECAO (Achado 6): o leaderboard via Mintlify e espelho NAO oficial e defasado (2.76 h onde a primaria diz 2.75 h; nao tem as entradas de marco). RESTRICAO: a decisao cita so a primaria.'
     trace: 'https://github.com/karpathy/nanochat/blob/master/dev/LEADERBOARD.md'
@@ -505,7 +505,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 7: discussion autodeclarada, tier 5, sem replica'
     label: 'OBJECAO (Achado 7): o porte JAX e n=1 autodeclarado, sem replica independente. Prova portabilidade da receita, nao serventia a dominio. O ChatCORE ~0.37 de SFT generico confirma o TETO BAIXO de qualidade de um modelo nivel GPT-2.'
     trace: 'https://github.com/tucan9389/nanochat-jax/discussions/1'
@@ -520,7 +520,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 8: US$2.500 de engenharia contra US$60,80 do run limpo (~40x); numero de PORTE, nao de fine-tune'
     label: 'OBJECAO (Achado 8): o numero absoluto e de porte de framework e transfere pouco, mas a LICAO se sustenta — o custo real e iteracao e incidentes (~40x o run limpo). RESTRICAO para B e C: orcar em tempo de engenharia e caixa de iteracao, nunca pelo preco do speedrun.'
     trace: 'https://github.com/tucan9389/nanochat-jax/discussions/1'
@@ -535,7 +535,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 9: o README primario ja da US$48 e "well below $100"'
     label: 'OBJECAO (Achado 9): fonte secundaria tier 5 redundante com a primaria; nao acrescenta nada e herda a confusao generico x dominio do Achado 1.'
     trace: 'https://pythonlibraries.substack.com/p/replicate-gpt-2-for-73-600-cheaper'
@@ -550,7 +550,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 10: tier 4, estado de janeiro (3.04 h) superado por 1.65 h; CORE mede o modelo BASE'
     label: 'OBJECAO (Achado 10): tier 4, estado de janeiro ja superado, e erra o objeto — o CORE mede o modelo BASE, "conversacional" e o estagio SFT. Valor so historico.'
     trace: 'https://www.startuphub.ai/news/figure-andrej-karpathy-nano-series-technical-contribution-2026-07-16'
@@ -565,7 +565,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 11: README l.112 ("You will not get strong results") e l.82 ("8 times longer") — conferidos por mim; a VPS KVM8 nao tem GPU'
     label: 'OBJECAO (Achado 11): a leitura implicita de que "roda em CPU" serve a VPS sem GPU e FALSA — em CPU o modelo e encolhido e nao da resultado forte; GPU unica e 8x mais lenta. RESTRICAO: a VPS KVM8 nao treina nada util; B e C exigem GPU ALUGADA por tempo limitado, com custo e dado declarados.'
     trace: 'https://github.com/karpathy/nanochat'
@@ -580,7 +580,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 12: managed settings governam o modelo PRINCIPAL do harness; voto 2-1; S2_claim_rejection_precedent; C_OPCAO_B_PRIMITIVE_IN_HOUSE (jev-decision-round2-2026-10)'
     label: 'OBJECAO (Achado 12): allowedProviders/deniedModels governam o runtime LLM principal do Claude Code. Um SLM-ferramenta do Motor 2 e chamado por adapter SDAAL (script ou MCP com llama.cpp, gramatica + n_probs), FORA do roteamento de modelo do harness. Usar esses settings como governanca do SLM o empurra para a posicao de RUNTIME — fere "SLM e ferramenta, nunca orquestrador".'
     trace: 'https://code.claude.com/docs/en/changelog'
@@ -595,7 +595,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre Achado 14: val_bpb e perda de modelagem de linguagem generica; o rotulo verdadeiro do dominio sao os nos JA SELADOS do KG'
     label: 'OBJECAO (Achado 14): val_bpb nao mede acuracia de tarefa tipada de dominio. No Motor 2 (classificar no, validar KG) a avaliacao certa e exatidao e CALIBRACAO contra nos ja selados, com o zero-shot do LLM atual como baseline. RESTRICAO: eval de dominio com holdout e PRE-REQUISITO de qualquer treino — sem ele, declarado != verificado.'
     trace: 'https://github.com/karpathy/autoresearch'
@@ -610,7 +610,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre o descarte "changelog sem mencao a Nanochat/SLM" (refutado por comodismo): faltou grep no changelog por nanochat|SLM|fine-tun antes de refutar'
     label: 'OBJECAO (descarte por comodismo): a AUSENCIA de padrao de SLM no changelog do Claude Code e plausivel e e o que os achados 12 e 13 admitem — a refutacao confundiu "irrelevante para o Nanochat" com "irrelevante para o roteamento". Ninguem rodou o grep. Para C: nao ha caminho de primeira classe no harness; o SLM vive atras de adapter.'
     trace: 'https://code.claude.com/docs/en/changelog'
@@ -625,7 +625,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre o descarte "Catalyst val_bpb 0.9361" (refutado por comodismo): o 0.9361 CONSTA na pagina da Imbue; a baseline numerica do AutoResearch nao'
     label: 'OBJECAO (descarte por comodismo): o val_bpb 0.9361 do Catalyst consta na fonte; o que falta e o numero da baseline. O certo era rebaixar para "numero confirmado, superioridade autodeclarada sem baseline", nao refutar. Faltou ler a pagina ate o fim.'
     trace: 'https://imbue.com/blog/2026-07-20-imbue-catalyst-nanochat'
@@ -640,7 +640,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre o descarte "qualidade baixa e variavel" (HN, tier 3, refutado por comodismo): corroborado por ChatCORE 0.3733 (nanochat-jax), README l.112 e l.201 ("micro models", "strong baseline")'
     label: 'OBJECAO (descarte por comodismo): o relato de usuario (tier 3) e anedotico, mas a DIRECAO e corroborada pela primaria. Refuta-lo favorece o hype. A conclusao que fica: modelo nanochat e EDUCACIONAL/baseline de pesquisa, nao pronto para producao.'
     trace: 'https://news.ycombinator.com/item?id=45569350'
@@ -655,7 +655,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre o descarte "tokenizer/pretreino em dados proprios + SFT" (tier 9, refutado por comodismo): tok_train/base_train/chat_sft existem; escala do corpus re-medida por mim em E_CORPUS_SCALE_MEASURED'
     label: 'OBJECAO (descarte por comodismo): a claim estava essencialmente CORRETA pela primaria (tok_train, base_train, chat_sft, baseline 0.256525), e a ressalva "sem garantia de orquestracao" e exatamente a restricao "SLM e ferramenta". Faltou o que a decisao pede: a ESCALA DE DADOS — ~1M tokens de KG, ~6M de texto, contra ~10^10 para um d20. So cabe SFT sobre base generica fraca.'
     trace: 'https://github.com/karpathy/nanochat'
@@ -670,7 +670,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.5
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre o corte por orcamento "custo de dados sinteticos, trade-off identidade x utilidade, autoconsciencia honesta": cortados sem leitura'
     label: 'OBJECAO (corte por comodismo): os tres temas cortados sao o EIXO da opcao D e do sentido (a). Falta medir o esquecimento catastrofico quando a identidade domina a mistura e o custo de gerar SFT so do corpus PUBLICO; "autoconsciencia honesta" toca S7_claim_analogy_breaks (auditabilidade). D e julgada no escuro.'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
@@ -685,7 +685,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre o corte "CORE != desempenho de dominio; exige GPU alugada": README l.24 e l.112 (conferidos por mim); VPS KVM8 sem GPU'
     label: 'OBJECAO (corte por comodismo): "CORE nao mede dominio" e "precisa de GPU alugada, a VPS nao serve" sao VERDADEIROS e DECISIVOS — corta-los por orcamento apagava duas restricoes centrais. Promovidos aqui a restricao de B e C.'
     trace: 'https://github.com/karpathy/nanochat'
@@ -700,7 +700,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.45
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre o corte "arXiv 2604.02621 (RL semi-supervisionado com LLM-judge)": primario citado, NAO lido'
     label: 'OBJECAO (corte por comodismo): arXiv 2604.02621 (primario citado, nao lido) e relevante ao sentido (b) e ao juiz SLM. Mesmo lido, ganho em raciocinio matematico nao transfere a classificacao de nos de KG. A lacuna real e a falta de literatura sobre classificadores tipados de dominio estreito <1B — busca nao feita.'
     trace: 'https://arxiv.org/abs/2604.02621'
@@ -715,7 +715,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.55
-    verified_at: 2026-10-05
+    verified_at: "2026-10-05"
     verified_against: 'Elenxo sobre "fontes nao lidas": discussions/420 e /710, nanochat-jp (tohoku-nlp), autoautoresearch, arXiv 2603.25158, nanochat-mlx, precos de GPU — todos primarios citados, NAO lidos'
     label: 'OBJECAO (fontes nao lidas por comodismo): o eixo "forks de dominio" da pergunta 1 ficou SEM fonte lida. O nanochat-jp (tohoku-nlp) e o unico fork de dominio/idioma nomeado e o caso mais proximo do sentido (a); o arXiv 2603.25158 (treino com corpus agentico) e o eixo da opcao D; o preco de GPU (A100/H100) nao foi medido. Sem eles, C e D sao julgadas no escuro.'
     trace: 'https://github.com/karpathy/nanochat/discussions'

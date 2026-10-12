@@ -1,8 +1,8 @@
 meta:
   id: radar-E3-2026-09-04-r4
   schema_version: "1"
-  baseline: 2026-09-04
-  review_after: 2026-10-04   # revisita 30d: o tipo DOMINANTE desta rodada e FERRAMENTA (delta de changelog de versao — hooks, permissoes, plugins, sessao), nao lineup de modelos (45d) nem mercado (90d); a cadencia curta e a que casa com a REGRA 65 disparando a cada update
+  baseline: "2026-09-04"
+  review_after: "2026-10-04"   # revisita 30d: o tipo DOMINANTE desta rodada e FERRAMENTA (delta de changelog de versao — hooks, permissoes, plugins, sessao), nao lineup de modelos (45d) nem mercado (90d); a cadencia curta e a que casa com a REGRA 65 disparando a cada update
   # kg-backlog-guard: on
   # ═══ TETO: 10 NÓS. Rodada fechada: cresce só se uma re-medição do MESMO delta (2.1.260→2.1.261) emendar um achado. ═══
   # Rodada 4 do /meta:radar, eixo E3 (claude-code-delta): delta 2.1.260 (baseline radar-E3-2026-09-04.kg.yaml)
@@ -29,9 +29,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261 — votos 3-0'
-    valid_from: 2026-01
+    valid_from: "2026-01"
     source_tier: 9
     source_kind: primary
     label: 'EIXO 1 (HOOKS). A 2.1.261 corrigiu PERDA DE SAIDA DE HOOKS (e de outro contexto de tool calls paralelas) ao retomar sessao com `resume`, que antes ALTERAVA a requisicao retomada. Nao ha mudanca de evento (PreToolUse, PostToolUse, Stop, UserPromptSubmit, PreCompact, SessionStart/End, InstructionsLoaded, PreModelSwitch/PostModelSwitch), de matcher, de payload nem de semantica de exit code — a capacidade que COMPRA o acoplamento (exit 2 deterministico barrando acao inclusive sob bypassPermissions) segue intacta. NO ONION: nota — sem acao em .claude/hooks/ nem no CLAUDE.md; e ganho GRATIS para as guardas que falam pelo stderr (a doutrina "so exit 2 entrega stderr"): mensagem de veto que antes se perdia no `--resume` agora chega. CORROBORA E_F7_EXIT2_INTACTO (radar-E3-2026-09-02) por fonte primaria nova.'
@@ -47,7 +47,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://code.claude.com/docs/en/plugin-marketplaces — votos 3-0; a propria pagina NAO documenta delta 260→261 (e referencia arquitetural estavel)'
     source_tier: 9
     source_kind: primary
@@ -64,7 +64,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://code.claude.com/docs/en/permissions — votos 3-0; requer v2.1.210+'
     valid_from: "2026"
     source_tier: 9
@@ -82,9 +82,9 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://ccleaks.com/news/claude-code-2-1-260-sep-2026 — votos 3-0; tier 2 (agregador) trava a confianca em 0.6 pela clausula 7 da doutrina de pesquisa'
-    valid_from: 2026-09-03
+    valid_from: "2026-09-03"
     source_tier: 2
     source_kind: aggregator
     label: 'EIXO 1/5 (corroboracao FRACA, nao achado novo). Agregador tier 2 repete que a 2.1.260 (3 de setembro de 2026) REVERTEU a mudanca da 2.1.259 que aplicava deny de Read aos argumentos do Bash, e reafirma que nao ha mudanca de semantica de exit code nem nos eventos PreToolUse/PostToolUse. A rodada 3 ja fechou isso por fonte tier 9 (E_R3_F1_REVERT_DENY_READ_BASH, radar-E3-2026-09-04); o valor aqui e so confirmacao independente por outra fonte, e fica registrada com o tier baixo a vista. NO ONION: nota — sem acao.'
@@ -100,9 +100,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.95
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://code.claude.com/docs/en/changelog — votos 3-0'
-    valid_from: 2026-09-04
+    valid_from: "2026-09-04"
     source_tier: 10
     source_kind: primary
     label: 'EIXO 6 (SESSAO/HEADLESS). Na 2.1.261, `claude -p --resume <file>` que adotava um session ID MALFORMADO registrado no transcript agora REINICIA sob um session ID novo (fresh). NO ONION: toca as sessoes headless da VPS (o caminho `-p` do cron e dos scripts de ops). Consequencia a medir, nao a assumir: 6 artefatos do core casam por `session_id` (.claude/hooks/worklog-capture-session.sh, session-beacon-hook.sh, instructions-loaded-log.sh, session-degraded-notice.sh, .claude/validation/session-beacon.sh, lint-selftest.sh) — se a retomada troca o ID, a correlacao entre a sessao original e a retomada quebra ali. Nota — sem acao hoje; o gatilho e a primeira retomada headless em processo 2.1.261.'
@@ -118,9 +118,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261 — votos 3-0'
-    valid_from: 2026-01
+    valid_from: "2026-01"
     source_tier: 9
     source_kind: primary
     label: 'EIXO 6 (CONTEXTO). A 2.1.261 adiciona `/skill-doctor`: mostra quais skills CARREGADAS estao sem uso e o custo de contexto de cada uma, para permitir poda-las. NO ONION: e instrumento novo para dois fios ja abertos — a clausula 10 da doutrina de pesquisa ("ferramenta sem uso e custo") e o L2 da PODA, hoje gated no censo (13 skills em .claude/skills/, e o censo L1 ja registra 2 cargas de CLAUDE.md por session_start). ACAO candidata, sem mudanca de arquivo: rodar `/skill-doctor` num processo >=2.1.261 e alimentar o censo com a medicao em vez de estimar. Nao altera hooks, plugins nem permissoes.'
@@ -136,9 +136,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261 — votos 3-0'
-    valid_from: 2026-01
+    valid_from: "2026-01"
     source_tier: 9
     source_kind: primary
     label: 'EIXO 5 (SEGURANCA). A 2.1.261 muda o auto-approve: um link que EMPACOTA CONTEUDO na URL de um renderizador publico de diagramas passa a ser tratado como UPLOAD para aquele site, e nao e mais auto-aprovado a menos que explicitamente solicitado. NO ONION: e a plataforma fechando um caminho de EXFILTRACAO POR URL — a mesma familia que a doutrina R15 de conteudo nao-confiavel trata do lado da entrada. Nada no core gera esses links hoje (nota — sem acao), mas o padrao vale como guarda de projeto para a vertical de design (/design:deck embute diagrama; a regra da casa e artefato self-contained, offline, zero CDN — o que ja evita a classe).'
@@ -154,7 +154,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: 'as 27 fontes desta rodada, todas primarias de produto (GitHub compare, code.claude.com changelog/permissions/plugin-marketplaces) + 1 agregador tier 2; nenhuma do eixo mercado/capital/analistas'
     source_tier: 9
     source_kind: internal-audit
@@ -171,7 +171,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-09-04
+    verified_at: "2026-09-04"
     verified_against: '`claude --version` (disco 2.1.261) x versao do processo desta sessao (2.1.260); contabilidade da rodada: 27 fontes, 18 claims, 7 confirmadas'
     source_tier: 9
     source_kind: internal-audit

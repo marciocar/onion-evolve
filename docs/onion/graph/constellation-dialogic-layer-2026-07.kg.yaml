@@ -107,7 +107,7 @@ nodes:
     impact: 4
     confidence: 0.7
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4 (run wf_058cbded-e55, 2026-08-30): O nó está status:open como se fosse trabalho pendente, mas as 3 afirmações do label já estão TODAS entregues e verificadas contra o vivo: (1) a pesquisa segue guardada co"
     label: "guardar como pesquisa de core design-only/gated, NAO mesclar — julgamento conjunto (nao promovido)"
   - id: D_DOGFOOD_IS_ENGINE
@@ -132,7 +132,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O label tem duas afirmações independentes, ambas medidas e ambas batendo com o vivo — mas isso significa que o TRABALHO do nó já foi ENTREGUE, não que segue aberto. Claim"
     label: "dar casa canonica a Aristoteles e candidato gated, nao promocao agora"
 
@@ -144,7 +144,7 @@ nodes:
     impact: 4
     confidence: 0.75
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): A regra pedia UM mecanismo (não tratar confidence atribuída como medição sem dogfood real). Esse mecanismo FOI construído e amadureceu — só que por um caminho diferente e"
     label: "nao tratar confidence ATRIBUIDA como medicao sem dogfood real (honrar os dois-quantitativos)"
 
@@ -360,7 +360,7 @@ nodes:
     impact: 4
     confidence: 0.5
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 7: worker CONFIRMED e juiz opus/high APROVOU (wf_ad4b2d7a-591)"
     label: "GATED: estender a linha so-metadados (hoje 'frontmatter+Tier-0') p/ incluir o .kg.yaml como superficie publica precisa ratificacao nossa — candidato, nao promocao"
 
@@ -412,7 +412,7 @@ nodes:
     impact: 4
     confidence: 0.65
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 2 (run wf_df073bae-4ba, 2026-08-30): O nó está em status:open como se a recomendação ainda estivesse pendente/gated, mas as 3 afirmações do label já foram TODAS entregues no vivo: a KB foi criada em docs/kno"
     label: "recomendacao: casa = KB focada da regua de transferencia, cross-link SDAAL/adopt (o vivido) + Hegel/Bloom (irmas) — promocao focada; o ATO de escrever no core e gated pela nossa autorizacao"
 
@@ -478,7 +478,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: open
-    verified_at: 2026-09-01
+    verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 5/5 claims; juiz APROVADO. Lidas as ~5 afirmações do label (linha 344). Busquei o mecanismo real: `git log  => O boletim `2026-07-12-boletim-core.md` entregue bate literalmente com as 3 travas do label: frontmat…'
     label: "3o uso: o boletim core->estrela INFORMA a estrela do que virou main (simetrico ao carteiro star->core PUSH) — 3 travas: contexto-nao-tarefa, nao-redirect, ancora-no-SEED (chat=empurrao volatil)"
   - id: D_BOLETIM_CANDIDATE
@@ -489,7 +489,7 @@ nodes:
     impact: 3
     confidence: 0.6
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): O no esta status:open como se 'documentar o boletim como padrao candidato' fosse trabalho pendente, mas as 3 afirmacoes do label ja estao TODAS entregues e conferindo com"
     label: "documentar o boletim como padrao CANDIDATO — emergiu 1x (Rule of Three nao cumprida); vira firme por recorrencia/uso, nao por estetica"
 edges:

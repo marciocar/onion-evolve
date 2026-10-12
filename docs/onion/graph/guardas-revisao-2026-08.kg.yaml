@@ -13,7 +13,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 1: worker CONFIRMED e juiz opus/high APROVOU a medicao (run wf_113a587e-715)"
     label: 'as guardas nascidas reativamente formam um sistema coerente, sem sobreposicao cega nem lacuna?'
 
@@ -24,7 +24,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: 'lint-artifacts.sh + rules-registry.sh + medicao dos 51 grafos'
     label: 'o debito das guardas NAO e formato — e COBERTURA e VISIBILIDADE: guarda que ninguem ve e guarda que ninguem roda falham igual'
     provenance:
@@ -40,7 +40,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'grep de headers # REGRA em lint-artifacts.sh'
     label: 'check_site_inventory_sync era HARD ATIVA com header sem numero — o regex do gerador nao a capturava, invisivel no registro que a rede le'
     provenance:
@@ -55,7 +55,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'grep de headers # REGRA em lint-artifacts.sh'
     label: 'check_branch_agent_distinction era SOFT ativa sem numero E sem o campo previne obrigatorio'
     provenance:
@@ -72,7 +72,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'grep kg-radar em lint-artifacts.sh, workflows e pre-commit'
     label: "kg-radar.sh — unico mecanismo que reprova contradicao estrutural — nao era executado por NENHUMA cadencia; so alcance indireto via R43 (11 de 51 grafos) e R31"
     narrative: "label anterior: kg-radar.sh — unico mecanismo que reprova contradicao estrutural — nao era executado por NENHUMA cadencia; so alcance indireto via R43 (18 de 51 grafos) e R31"
@@ -88,7 +88,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'grep claude/rules em lint-artifacts.sh → zero ocorrencias'
     label: '.claude/rules/ era a UNICA superficie de .claude/ sem guarda nenhuma — frontmatter nao validado, glob nao verificado'
     provenance:
@@ -104,7 +104,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'REGRA 52 no lint + kg-radar-integrity.sh cobrindo 51 grafos'
     trace: ".claude/validation/kg-radar-integrity.sh + .claude/rules/kg-grammar.md:41"
     label: 'promover a convocacao COGNITIVA do radar (rules/kg-grammar.md) a MECANICA (REGRA 52), sem remover a rule — ela ensina antes de escrever, o gate mede depois'
@@ -120,7 +120,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'kg-grammar.md:41 declara exit 0 obrigatorio; nenhum mecanismo o executa'
     label: 'regra path-scoped nao substitui gate: so carrega ao TOCAR o arquivo, depende do ator obedecer, e nao pega degradacao passiva (REFUTES que chega depois)'
     provenance:
@@ -149,7 +149,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'contagem de literais violation HARD/SOFT no corpo de cada guarda'
     label: 'NAO e cosmetica: REGRAS 43 e 44 tem ZERO literal no corpo (delegam com violation ${sev}) — o tag e a UNICA fonte de severidade delas'
     provenance:
@@ -164,7 +164,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'catracas 4 e 5 no rules-registry.sh, provadas por MUT'
     trace: ".claude/validation/rules-registry.sh:catracas-4-e-5"
     label: 'tornar o tag [SEV] obrigatorio nas 53 e gatear severidade indefinida — a regra implicita que valia por disciplina virou mecanica'
@@ -189,7 +189,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'feeders da R16 rodados a mao contra docs/INDEX.md — 3 hits em comandos invocaveis'
     label: 'ambos ESTAO no escopo da R16 e os feeders disparam neles; o que escapou foi FORMA DE FRASE (skills avulso, substantivo antes do numero, tabela), nao arquivo'
     provenance:
@@ -212,7 +212,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'diff do registro gerado apos aplicar o fix — 46 linhas alteradas'
     label: "o fix sugerido pela revisao (parser aceitar previne: multi-linha), implementado e medido, engolia o CORPO do docstring em 23 regras; a cura certa era seguir a convencao"
     narrative: "label anterior: o fix engolia o CORPO do docstring no campo previne de 23 regras (o repo tem 2 convencoes de indentacao); a cura certa foi seguir a convencao de 1 linha"
@@ -229,7 +229,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'contagem de docs com kg: no frontmatter — 18 grafos distintos de 51'
     label: "a R52 sobrepoe a R43 em 11 dos 51 grafos; e superset com ganho real de 40 — sobreposicao aceita e DECLARADA no docstring (a 1a redacao dizia 18/33, numeros nao-reproduziveis)"
     narrative: "label anterior: a R52 sobrepoe a R43 em 18 dos 51 grafos; e superset com ganho real de 33 — sobreposicao aceita e DECLARADA no docstring"
@@ -246,7 +246,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: 'normalizacao e diff dos corpos das REGRAS 21, 38, 24, 25'
     label: "REGRAS 38/24/25 sao clones (regenera p/ temp + diff -q, diferindo so em literais) e a 21 segue o mesmo esqueleto com guarda extra de jq — o mapa estimou que um helper economizaria ~69 linhas e daria UM lugar p/ o 2>/dev/null que engole erro de gerador"
     narrative: "label anterior: REGRAS 21/38/24/25 sao clones byte-identicos apos normalizar literais — helper economizaria ~69 linhas e daria UM lugar p/ o 2>/dev/null que engole erro de gerador"
@@ -262,7 +262,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: 'leitura dos corpos: R28 classe (1) e R46 detectam a mesma condicao'
     label: 'R28 classe (1) e R46 detectam a MESMA condicao — um dir orfao com 3 anuncios emite 4 SOFT para um fato so; cura e amputar a classe (1) da R28'
     provenance:
@@ -277,7 +277,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: 'leitura do lint-selftest.sh — STRICT reprova skip por tooling, nao regra sem fixture'
     label: 'nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca'
     provenance:
@@ -292,7 +292,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: 'varredura de links markdown vivos p/ caminho core-privado fora de docs/knowledge-base'
     label: 'a R45 cobre 1 de 9 raizes vendorizadas — 46 links vivos p/ caminho core-privado em 21 arquivos ficam fora; o baseline em 0 declara vitoria falsa'
     provenance:
@@ -307,7 +307,7 @@ nodes:
     impact: 4
     confidence: 0.2
     status: refuted
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'grep de kg: fora do escopo da R43 + test -e no alvo'
     label: 'um kg: PENDURADO vivo e invisivel — inbox/_processed aponta p/ promocao-main-elenxo.kg.yaml que nao existe; e o MISSING-PATH HARD que a R43 existe p/ emitir'
     provenance:
@@ -322,7 +322,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'frontmatter do sinal (from: arandek) + leitura de extract_kg em kg-born-marker.sh'
     label: 'os 2 "pendurados" nao sao defeito: um e sinal de campo com from: adotante, cujo kg: aponta p/ grafo do repo DELE; o outro e placeholder de template no heredoc do /meta:diary, fora do frontmatter — e extract_kg le SO o frontmatter, entao nunca seria pego'
     provenance:
@@ -337,7 +337,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'git log --diff-filter=D e --diff-filter=R sobre docs/onion/graph/*.kg.yaml'
     label: 'em 51 grafos e toda a historia do repo, NENHUM foi removido ou renomeado — o modo de falha que a ampliacao preveniria tem ZERO ocorrencias'
     provenance:
@@ -352,7 +352,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'medicao dos 8 arquivos com kg: fora do escopo + historico de remocao/renomeacao'
     trace: ".claude/validation/kg-born-marker.sh:extract_kg"
     label: 'NAO ampliar o escopo da R43 — gated-until-trigger: zero achado hoje, zero ocorrencia historica, e ampliar exigiria excluir inbox/inbound sob pena de reprovar sinal de adotante como se fosse defeito nosso'
@@ -368,7 +368,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: done
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: 'contagem real dos baselines vs o que o docstring afirma'
     label: 'R45 diz "nasce com 101" (baseline tem 0) e R44 diz "tudo em HUMAN" (15 classes, 1 MONITORED) — declarado != verificado DENTRO da propria guarda'
     provenance:
@@ -383,7 +383,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'MUT: --only na propria narracao dava silencio antes do fix, acusa id inexistente depois'
     label: 'a R47 comparava ONLY_PATH (absoluto) com caminho relativo — no-op SILENCIOSO no modo que o pre-commit e o selftest usam; fixture dela passaria como good para sempre'
     provenance:
@@ -398,7 +398,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: done
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'lint-artifacts.sh — comparacao agora absoluta, MUT versionado no relato'
     trace: ".claude/validation/lint-artifacts.sh:check_kg_narration_valid"
     label: 'corrigir a comparacao da R47 para absoluto, como as 15 irmas ja faziam — uma palavra'
@@ -414,7 +414,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'contagem de grafos distintos citados em kg: no escopo da R43'
     label: 'a 1a redacao do docstring da R52 dizia 18/33; o medido e 11/40 — regra nascida hoje ja carregava numero nao-reproduzivel, o defeito que ela existe p/ pegar'
     provenance:
@@ -429,7 +429,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-03
+    verified_at: "2026-08-03"
     verified_against: 'arquivo commitado com contagens medidas do filesystem'
     trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
     label: 'o mapa das guardas — vista markdown deste grafo, baseline para a proxima revisao'
@@ -450,7 +450,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-04
+    verified_at: "2026-08-04"
     verified_against: 'execucao do lint-artifacts.sh de dentro de .claude/worktrees/kg-freshness-identity-0804'
     label: 'FURO DE PRUNE: o lint poda */.claude/worktrees/* — exatamente o caminho que worktree-convention-2026.md define como canonico para worktree de HARNESS. Rodando de la, varre 0 agentes (deveria varrer 51) SEM reclamar, e morre em "wc: standard input: Is a directory" (o "(" do grupo find vaza para as raizes em _find, e o -prune imprime o diretorio podado). Como o pre-commit chama o lint, NENHUM commit sai de um worktree de harness'
     provenance:
@@ -465,7 +465,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-04
+    verified_at: "2026-08-04"
     verified_against: 'find docs/evolution -maxdepth 1 -name *.md + grep ^kg: em cada um + saida de kg-provenance-coverage.sh'
     label: 'FURO DE ESCOPO: kg-born-marker.sh e kg-provenance-coverage.sh compartilham o escopo hardcoded "docs/analysis + docs/evolution/research". docs/evolution/*.md na RAIZ fica invisivel para AMBOS: sao 6 arquivos e ZERO tem marcador kg: — entre eles worktree-convention-2026.md, scope-convention-2026.md, federation-roadmap-2026.md e trust-log.md. O provenance reporta "105/105 cobertos" verde, sem nunca olhar a pasta onde vivem as CONVENCOES'
     provenance:
@@ -480,7 +480,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-04
+    verified_at: "2026-08-04"
     verified_against: 'kg-radar.sh --integrity em onion-identity-2026-07.kg.yaml antes da correcao (exit 0 com a contradicao dentro)'
     label: 'FURO SEMANTICO: a INTEGRIDADE do kg-radar so ve contradicao ESTRUTURAL (REFUTES entrando em no que segue confirmed). Nao ve evidencia que SUPPORTS um claim que ela CONTRADIZ TEXTUALMENTE — E_LSTREE_MAIN_0717 ("main segue adotando, NAO parada") sustentou C_TOPO_MAIN_HAS_FW ("nao vazia, apenas PARADA") por 18 dias, com o radar exit 0 o tempo todo'
     provenance:
@@ -495,7 +495,7 @@ nodes:
     impact: 5
     confidence: 0.9
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: 'os 3 nos de evidencia E_FURO*_0804, cada um medido de forma independente em 2026-08-04'
     label: "Ha lacuna nas guardas com TRES FORMAS do mesmo sintoma, verde sem ter olhado: PRUNE (a poda comia a arvore varrida), ESCOPO (pasta que nunca entra na varredura) e SEMANTICA (o radar nao ve evidencia que contradiz o claim que ela sustenta), esta de outra natureza"
     narrative: "label anterior: RESPOSTA PARCIAL A Q_GUARDAS_COERENTES: ha lacuna, e ela tem TRES FORMAS DISTINTAS que produzem o MESMO sintoma (verde sem ter olhado) — (1) PRUNE: a guarda se apaga no lugar onde roda; (2) ESCOPO: a pasta nunca entra na varredura; (3) SEMANTICA: o veredito nao cobre a dimensao em que o erro mora. Corrigir uma NAO corrige as outras, e nenhuma das tres e detectavel pela saida da propria guarda — todas dizem OK. E por isso que o fix pontual foi vetado"
@@ -511,7 +511,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: done
-    verified_at: 2026-08-04
+    verified_at: "2026-08-04"
     verified_against: 'REGRA 54 no lint + 2 casos novos no lint-selftest.sh (um deles MUTATION) + selftest exit 0'
     label: 'DECISAO DO MAESTRO (2026-08-04), em DOIS tempos. Primeiro o VETO: "nao podemos ficar mudando e bagunçando a doutrina" — a correcao de 2 linhas do _find, ja testada, foi REVERTIDA e virou estudo da familia. Depois, revisto o caminho a luz do padrao Onion+Claude Code de agosto/2026 (worktree nativo em .claude/worktrees/ desde a v2.1.49; v2.1.218 de 22/07 endureceu a fronteira do git -C em subagente isolado), veio o GO para F1+F2. O que mudou entre um e outro NAO foi a pressa: foi descobrir que o antidoto ja existia no repo (safe-count.sh, nascido 2026-08-03) e que NENHUMA das 38 guardas o usava — logo a cura certa era o CONTRATO, nao o remendo'
     trace: 'docs/evolution/worktree-convention-2026.md + .claude/utils/safe-count.sh'
@@ -523,7 +523,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: "medicao dos beacons vivos + procfs: 2 faroes anunciados VIVOS, ambos com started_at == refreshed_at e sem processo"
     label: 'o farol definia VIVA como refreshed_at dentro do TTL de 480min — carimbo que a propria sessao escreve. Como refreshed_at so avanca no UserPromptSubmit, toda sessao que some sem SessionEnd (crash, Remote Control, resume abortado) lia VIVA por 8h. Medidos no core: 2 faroes anunciados como vivos NUNCA receberam um prompt e NAO tinham processo — um deles nasceu 150s antes da propria sessao que leu o aviso, mesma branch e worktree'
     provenance:
@@ -571,7 +571,7 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'session-beacon-hook.sh + caso (f2) do selftest: o aviso tem de conter INFORMADO, NAO VERIFICADO e VERIFIQUE QUEM E O QUE FAZ'
     label: 'CURA B (correcao do maestro: informado e diferente de verificado): rotular o veredito nao basta se o aviso segue AFIRMANDO. O motd passa a se declarar nao-verificado e a MANDAR verificar quem e e o que faz — rotulo (VIVA vs DECLARADA), a pista NUNCA refrescou (0 prompts), e a ordem de nao relatar como sessao alheia viva o que nao foi medido. Sinal e instrucao de como le-lo viajam JUNTOS, porque quem recebe nao tem como saber sozinho o que o sinal vale'
     provenance:
@@ -586,7 +586,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'dogfood do hook pelo caminho real: owner_pid gravado = bash transitorio (comm=bash), nao o processo claude'
     label: "O dogfood pegou o bug na direção perigosa: a 1ª sonda casava *claude* no cmdline e elegia o shell transitório do hook, cujo path carrega o shell-snapshots do .claude do usuário; o farol viraria orphan com a sessão viva. Cura: casar pela identidade do executável (comm = claude)."
     narrative: "label anterior: O DOGFOOD PEGOU O BUG NA DIRECAO PERIGOSA: a 1a sonda casava *claude* no CMDLINE e elegia o shell transitorio do proprio hook, cujo path ⟨carrega o shell-snapshots do .claude do usuário.⟩ Esse shell morre em segundos — o farol viraria orphan COM A SESSAO VIVA, exatamente o erro que o desenho proibe. Cura: casar por IDENTIDADE do executavel (comm = claude), com teste de regressao dedicado. Substring de path nao e identidade"
@@ -602,7 +602,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'constellation-map.sh presence_of tinha 2a implementacao do vivo por TTL; passou a chamar session-beacon.sh verdict'
     label: 'o mapa da constelacao carregava uma SEGUNDA implementacao da regra de vivo (TTL copiado). Cura no motor nao alcanca copia: quando o farol aprendeu a medir o dono, a coluna PRESENCA continuaria pintando live para fantasma. A regra de vivo passou a morar num lugar so (subcomando verdict), com fallback ao TTL para worktree irma de motor antigo'
     provenance:
@@ -617,7 +617,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'revisao adversarial em EXECUCAO: beacon com refreshed_at == now saiu orphan e check devolveu 0; + mutacao provando a bancada cega'
     label: "A cura nasceu violando a própria invariante: beacon_verdict curto-circuitava no dono e nunca lia o heartbeat, então sessão que trocou de processo ou outra visão do procfs saía orphan e autorizava escrita por cima. A bancada era cega no ponto; derrubou-a um revisor executando."
     narrative: "label anterior: A CURA NASCEU VIOLANDO A PROPRIA INVARIANTE QUE DECLARAVA. beacon_verdict curto-circuitava no dono e NUNCA consultava o heartbeat: sessao que trocou de processo (resume/restart, mesmo sid) ou lida de ⟨outra visao do procfs⟩ (container, hidepid, outra maquina) saia `orphan` com heartbeat de SEGUNDOS atras — check devolvia 0 e AUTORIZAVA outra sessao a escrever por cima. O incidente W1xW2 reaberto pelo mecanismo feito para impedi-lo. E a bancada era CEGA no ponto: mutando `live` para nao bloquear, a suite passava toda verde (o exit 1 conferido vinha dos beacons do teste vizinho, sandbox compartilhado). Quem derrubou foi revisor adversarial EXECUTANDO, nao lendo"
@@ -633,7 +633,7 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     trace: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
     verified_against: 'casos k/k2/k3/k4/k5 da bancada + mutacao MUT-E (restaurar o curto-circuito reprova 3 casos)'
     label: "CURA DA CURA: orphan passa a exigir conjunção — dono medido morto, heartbeat parado além de 30min (ONION_BEACON_ORPHAN_GRACE_MIN), procfs legível aqui e beacon desta máquina (campo host). Fica impossível declarar morta uma sessão que acabou de agir."
@@ -650,7 +650,7 @@ nodes:
     impact: 3
     confidence: 0.9
     status: open
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'medido: migalha do PR #700 existia no disco e NAO no index.md; lint passou 0 HARD; diary-index.sh regenerou 106->107'
     label: 'LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do inventario (inventory.sh) e dos plugins (REGRA 19). Consequencia observada: escrevi a migalha do farol e nao rodei o diary-index.sh — a entrada ficou INVISIVEL no Tier-0 pointer que as sessoes leem para se orientar, e o lint passou verde. Migalha fora do indice nao orienta ninguem, que e o oposto do proposito dela. Quem pegou foi o MAESTRO perguntando, nao mecanismo — a mesma assinatura de C_LACUNA_E_COBERTURA. GATILHO REFINADO POR MEDICAO (2026-08-28, ao TENTAR implementar a cura): a cura prescrita NAO e diretamente aplicavel ao indice do diario, por DOIS bloqueios medidos. (1) diary-index.sh faz REPO=${1:-...} — o 1o argumento e o CAMINHO DO REPO, nao uma flag: chama-lo com --markdown criaria um diretorio chamado --markdown, e ele nao tem modo stdout, que e o que _gen_into exige. (2) o indice embute `Gerado em: <hoje>` — comparacao por bytes dispararia TODO DIA por mudanca so de data, uma maquina de falso-positivo. A catraca nasceu (REGRA 62) cobrindo SO docs/backlog.md, que e deterministico. Fechar este no agora seria fecha-lo por decreto. GATILHO: dar ao diary-index.sh modo stdout E declarar a linha `Gerado em:` como volatil-ignorada (ha precedente: o plugins-sync ignora provenance pelo mesmo motivo)'
     provenance:
@@ -665,7 +665,7 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     trace: ".claude/validation/lint-artifacts.sh"
     verified_against: 'bancada run_backlog_projection_selftests 8/8 (inclui locale e radar-quebrado, os dois eixos que a revisao adversarial provou descobertos) + 5 mutacoes que reprovam + CI: lint rodou em runner diferente e a regra NAO disparou (render deterministico entre maquinas)'
     label: 'REGRA 62 [HARD]: docs/backlog.md tem de bater com a regeneracao da fonte. Fecha a classe que Q_INDICE_DO_DIARIO_SEM_CATRACA nomeou — projecao GERADA que envelhece calada — no unico artefato onde a comparacao e deterministica hoje. Pendurar a deteccao no LINT (e nao num cron) da o gatilho sem ferir o MOAT de auto-inicio: a maquina DETECTA, o humano ATUA. Pre-requisitos que a entrega exigiu, ambos assimetrias dentro de familia ja curada: modo --markdown (stdout) que o _gen_into exige e que os tres irmaos ja tinham, e `case` de args FECHADO com exit 2 (o MODE=${1:---write} era fail-open num caminho de ESCRITA: --dry-run sobrescrevia em silencio). CORE-ONLY por IS_DERIVED — o core e o pior oraculo do que viaja'
@@ -681,7 +681,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'a propria bancada reprovou no 1o caso; mutacao removendo a guarda devolve `mutou=SIM` — a projecao boa E sobrescrita'
     label: 'A BANCADA ACHOU UM DEFEITO DESTRUTIVO QUE EU IA ENVIAR. O projetor enumera grafos por `git ls-files`; sem indice git (ou com GIT_DIR torto — incidente ja medido em 2026-08-04, 4 falsos de uma vez) isso devolve VAZIO e o render sai com cabecalho e ZERO itens. Nao e vazio o bastante para o _gen_into chamar de QUEBRA, entao viraria DRIFT e a mensagem mandaria REGENERAR POR CIMA — sobrescrevendo a projecao boa por uma quase-vazia. Falha aberta que vira DESTRUTIVA, exatamente a classe que o _gen_into existe para impedir, entrando pelo lado do GERADOR. Cura: enumeracao vazia com docs/onion/graph presente = QUEBRA, recusa com exit 2'
     provenance:
@@ -696,7 +696,7 @@ nodes:
     impact: 3
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'grep de owner: em todo o corpus .kg.yaml = 0 ocorrencias; 3 lugares em prosa afirmavam o agrupamento'
     label: 'MESMA ASSINATURA QUE ORIGINOU A REGRA 58, noutro artefato: o campo `owner:` e LIDO pelo projetor desde a origem e NUNCA foi escrito por ninguem (0 ocorrencias no corpus), enquanto a descricao do comando, o procedimento e o /meta:realign afirmavam agrupamento por owner. Prosa que sobrevive ao mecanismo. Cura escolhida: NAO construir o mecanismo (o gatilho disparou para HONESTIDADE, e `owner` cai do lado VEDADO do invariante de escopo da onda) — a projecao passa a IMPRIMIR que zero nos declaram owner e que o agrupamento efetivo e por grafo'
     provenance:
@@ -711,7 +711,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'revisao adversarial reproduziu com comando: 1 grafo ilegivel => 27 itens somem, --fix grava, REGRA 62 reporta ZERO violacoes; e sem status-factor.awk o backlog vai de 39469 para 785 bytes com exit 0'
     label: 'A 1a VERSAO DA REGRA 62 CERTIFICAVA DE VERDE A PERDA SILENCIOSA QUE ELA EXISTE PARA IMPEDIR. O gerador chamava `kg-radar --open-tsv 2>/dev/null` dentro de process substitution: stderr descartado e RC NUNCA LIDO. Um unico grafo ingramatical fazia dezenas de itens sumirem da projecao, o --fix gravava a perda, e a guarda dizia "em sincronia". Eu havia fechado a porta da falha destrutiva pelo lado do `git ls-files` e a MESMA destruicao entrava intacta pelo lado do radar. `[ -s ]` nao protegia: a saida destrutiva era PLAUSIVEL (cabecalho + "nada aberto"), nao vazia. Cura: rc do radar lido por grafo, grafo enumerado-mas-ausente = QUEBRA, e sanidade enumerados==processados'
     provenance:
@@ -726,7 +726,7 @@ nodes:
     impact: 5
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-08-28
+    verified_at: "2026-08-28"
     verified_against: 'revisao adversarial: diff entre C.UTF-8 e en_US.UTF-8 troca a ordem de dois nos empatados em 7.5; sob pt_BR o printf emite 38,0 no lugar de 38.2 com 190 erros em stderr E exit 0'
     label: 'CATRACA BYTE-A-BYTE COMPRA UM EIXO QUE EU NAO TINHA PINADO. Eu escrevi, ao instalar o pre-requisito do iconv, que "guarda que acusa o ambiente e pior que guarda nenhuma" — e deixei SEIS `sort` sem LC_ALL=C e um `printf %.1f` lendo LC_NUMERIC. Consequencias medidas: em en_US a ordem de nos empatados inverte (a guarda HARD reprova repo CERTO); sob locale de virgula decimal o printf grava `38,0`, sai exit 0, e o lint manda REGENERAR — quem obedece grava lixo. O locale do maestro e pt_BR. Os irmaos (graph.sh, kg-view.sh) ja pinavam; este era o unico fora do padrao. Cura `export LC_ALL=C`, verificada NO-OP no artefato atual'
     provenance:
@@ -741,7 +741,7 @@ nodes:
     impact: 4
     confidence: 1.0
     status: open
-    verified_at: 2026-08-29
+    verified_at: "2026-08-29"
     verified_against: 'python3 -c "yaml.safe_load(...)" sobre os 75 .kg.yaml rastreados (sem fixtures): 71 validos, 4 invalidos. Apos a colheita do fios-abertos restam 3: identidade-onion-vps-2026-08 (l.142), bridge-produto-2026-08 (l.278), scope-inheritance-2026 (l.555)'
     label: 'DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML de verdade — aspas quebradas dentro de `label:` (ex.: um `sha512:$(...)` com aspas embutidas, um `"recuperei a senha"` dentro de string simples, um `\$in` em string dupla). NADA nunca pegou porque o radar e awk LINHA-A-LINHA e tolera; qualquer consumidor com parser real quebra. O fios-abertos era um deles e voltou a ser valido por acidente da colheita — os nos defeituosos sairam. GATILHO para fechar: consertar os 3 restantes E nascer a guarda determinística (um `yaml.safe_load` por arquivo no lint) — mas NESTA ORDEM, porque guarda HARD antes do conserto reprova o repo inteiro'
     provenance:

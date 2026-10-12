@@ -1,8 +1,8 @@
 meta:
   id: engenharia-de-corpus-de-regras-2026-10
   schema_version: "1"
-  baseline: 2026-10-01
-  review_after: 2026-10-31   # cadência FERRAMENTA = 30d. O tipo dominante desta rodada é SUPERFÍCIE DE
+  baseline: "2026-10-01"
+  review_after: "2026-10-31"   # cadência FERRAMENTA = 30d. O tipo dominante desta rodada é SUPERFÍCIE DE
                              # FERRAMENTA EM MOVIMENTO, não doutrina: as fontes que carregam o peso são
                              # páginas de docs que o fornecedor reescreve por release — eslint.org/docs/head
                              # (literalmente a doc do HEAD, muda sem aviso), docs.semgrep.dev, e
@@ -67,7 +67,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Medido nesta sessão, nesta árvore, com comando por medida: (a) `grep -cE "^# REGRA [0-9]+" .claude/validation/lint-artifacts.sh` = 93 cabeçalhos de regra; (b) `wc -l .claude/validation/lint-artifacts.sh` = 5282 linhas; (c) `ls .claude/validation/*baseline*.txt` = 13 baselines de catraca (compose-exposure, doctrine-freshness, door-staleness, identifier-language, kb-applies-to, kb-vendored-link, kg-coverage, kg-verification, kg-yaml-validity, pipe-verdict, plugin-bare-path, radar-aufhebung, vendor-scrub-form); (d) `grep -ril sarif .claude docs` = 1 ocorrência, e ela é o PRÓPRIO pré-registro escrito hoje, logo SARIF é ZERO no motor e na doutrina; (e) `grep -n run_hook_chain_order_selftests .claude/validation/lint-selftest.sh` = linha 4945, e a linha 4946 ancora em `${REPO_ROOT}/.githooks/pre-commit`; (f) hooks por evento no settings.json, contados por python3/json: SessionStart 4, UserPromptSubmit 4, PreToolUse 3, os demais 1; (g) o único par escreve/lê entre hooks é `premodelswitch-guard.sh` (escreve .claude/sessions/model-switch.jsonl, evento PreModelSwitch) e `session-degraded-notice.sh` (lê, evento UserPromptSubmit) — eventos DIFERENTES, logo fora de qualquer corrida paralela.'
     source_tier: 10
     source_kind: primary
@@ -85,7 +85,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/PRE-REGISTRO-aposta.md (escrito ANTES do resultado, anti-HARKing, com R1-R6 como critérios de refutação) confrontado com o resultado desta rodada: R3 SOBREVIVE (a dor é ruído/ordem, não regra morta), R5 SOBREVIVE e é o golpe fatal (a bancada de 200 famílias já prova CAPACIDADE de disparo; o contador provaria só RELEVÂNCIA, e nada na rodada mostra a comunidade tratando relevância como o que importa), R6 SOBREVIVE com custo medido (regra morta custa ZERO porque é inerte; erro de ORDEM custou 4 ciclos de CI em 2026-10-01 — painel da REGRA 81 contando resíduo nascido depois dele, SHA da REGRA 56 carimbado antes de regenerar projeção DUAS vezes, projeções julgadas antes de regeneradas).'
     source_tier: 10
     source_kind: primary
@@ -104,9 +104,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://code.claude.com/docs/en/hooks — verificação adversarial 2 votos a favor, 1 refutação (2-1)'
-    valid_from: 2026-10
+    valid_from: "2026-10"
     source_tier: 10
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 2-1): "No Claude Code, todos os hooks que casam com um evento rodam em paralelo, sem ordem garantida entre eles; portanto dependência regra B depois do gerador A não pode ser expressa entre hooks do mesmo evento e precisa ser resolvida dentro de um único despachante ou fora dos hooks." ⚠️ O fato é verdadeiro e a fonte é definitiva, mas a INFERÊNCIA que a rodada tirou dele está apontada para o lugar errado, e isso foi MEDIDO neste repo — ver E_OBJECAO_1_DOR_E_SCRIPT_SEQUENCIAL_NAO_HOOK. O valor deste nó é como INVARIANTE A PRESERVAR (nunca pôr gerador e verificador no mesmo evento de hook), não como diagnóstico da dor: o custo medido desse perigo hoje é ZERO.'
@@ -123,7 +123,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md — verificação adversarial 2 votos a favor, 1 refutação (2-1)'
     source_tier: 9
     source_kind: primary
@@ -141,7 +141,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://eslint.org/docs/head/use/troubleshooting/circular-fixes — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
     source_tier: 9
     source_kind: primary
@@ -159,7 +159,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.8
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://eslint.org/docs/head/use/troubleshooting/circular-fixes — verificação adversarial 3 votos a favor, 0 refutações (3-0). MESMA URL de E_ESLINT_CIRCULAR_FIX_RUNTIME_SEM_NOMES: são duas proposições distintas da mesma página, e a objeção 4 mediu que isso infla o numerador.'
     source_tier: 9
     source_kind: primary
@@ -177,9 +177,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/ — verificação adversarial 2 votos a favor, 1 refutação (2-1)'
-    valid_from: 2025-06-16
+    valid_from: "2025-06-16"
     source_tier: 8
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 2-1): "Cedar Analysis (Apache 2.0, repo cedar-policy/cedar-spec) detecta automaticamente por análise estática/SMT do corpus de políticas: permits sombreados (shadowed), condições impossíveis, forbid que anula permits e negação total de ações." É a melhor resposta ABSOLUTA ao eixo 2 que existe hoje. ⚠️ Confiança 0.6 por duas razões nomeadas: (a) `valid_from` 2025-06-16 é anterior a out/2026 e o escopo da rodada exigia sinal de 2026 — a atualidade não foi reverificada; (b) a capacidade NÃO é portável para o corpus do Onion, e o achado original não dizia isso — ver E_OBJECAO_5_CEDAR_NAO_E_PORTAVEL.'
@@ -196,9 +196,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.65
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/ — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
-    valid_from: 2025-06-16
+    valid_from: "2025-06-16"
     source_tier: 8
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 3-0): "A CLI compara dois conjuntos de políticas e classifica a relação como Equivalent, More Permissive, Less Permissive ou Incomparable, permitindo verificar que uma refatoração não mudou permissões sem querer." É a peça mais forte da rodada para o eixo 2. ⚠️ Não toca o eixo 3 (prioridade declarada do maestro): comparar dois corpus não diz nada sobre "B só roda depois do gerador A". E o análogo barato DESTA CASA já existe numa forma degenerada e não foi nomeado pela rodada: as 13 baselines de CATRACA QUE SÓ ENCOLHEM são exatamente um teste de "menos permissivo ou igual" entre duas versões do corpus — ver E_OBJECAO_6_CATRACA_JA_E_MENOS_PERMISSIVO.'
@@ -215,9 +215,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/ — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
-    valid_from: 2025-06-16
+    valid_from: "2025-06-16"
     source_tier: 8
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 3-0): "A análise é correta e completa, com prova formalizada em Lean, usando SMT solvers (ex.: CVC5) sobre fórmulas que representam todas as requisições possíveis." Este nó é o que EXPLICA por que a capacidade do Cedar não se transporta: correção e completude vêm de a linguagem ser RESTRITA e decidível, com codificação SMT do espaço de requisições. Shell arbitrário não tem codificação SMT nenhuma — logo "análise estática do corpus" é propriedade da LINGUAGEM, não prática de engenharia a copiar.'
@@ -234,7 +234,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 2 votos a favor, 1 refutação (2-1)'
     source_tier: 8
     source_kind: primary
@@ -252,7 +252,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.75
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
     source_tier: 8
     source_kind: primary
@@ -270,7 +270,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
     source_tier: 8
     source_kind: primary
@@ -288,7 +288,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.7
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
     source_tier: 8
     source_kind: primary
@@ -306,9 +306,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/ — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
-    valid_from: 2026-07-06
+    valid_from: "2026-07-06"
     source_tier: 7
     source_kind: engineer
     label: 'CONFIRMADA (tier 7, 3-0): "Cedar é usado como policy engine para autorizar agentes de IA em cadeias multi-agente em 3 camadas (agente-ferramenta, agente-agente, usuário de origem), com avaliação ordenada L1→L2→L3 e halt no primeiro deny; a ordem é fixa por camada, sem derivação de dependência entre políticas." É o eixo 7 pelo lado inverso (política autorizando AGENTE), com sinal de 2026, e é a confirmação de que mesmo o motor mais analisável do mercado resolve ORDEM por camada FIXA declarada — ninguém deriva. Ver E_OBJECAO_9_TRUNCADA_ORDEM_FIXA_SEM_DERIVACAO.'
@@ -325,9 +325,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://arxiv.org/pdf/2607.03656 — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
-    valid_from: 2026-07
+    valid_from: "2026-07"
     source_tier: 7
     source_kind: paper
     label: 'CONFIRMADA (tier 7, 3-0): "AutoCedar (arXiv 2607.03656, jul/2026) usa um laço agêntico de LLM com verificador formal (SMT, Cedar) como gate para autoria de políticas de controle de acesso, de modo que a política gerada é verificada antes de ser aceita." É a melhor resposta ao eixo 7 (autoria com IA) e é de 2026. O padrão — LLM AUTORA, verificador determinístico ADMITE — é exatamente a forma que esta casa já pratica com outro nome: a bancada admite a guarda, o lint admite o artefato, o radar admite o grafo. Transferível como CONFIRMAÇÃO de desenho, não como ferramenta.'
@@ -344,7 +344,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://lorenzwalthert.r-universe.dev/precommit/doc/hook-order.html — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
     source_tier: 5
     source_kind: engineer
@@ -362,7 +362,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://gitlab.com/gitlab-org/gitlab/-/issues/351399 — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
     source_tier: 5
     source_kind: primary
@@ -380,7 +380,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://semgrep.dev/docs/kb/semgrep-code/reduce-false-positives — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
     source_tier: 5
     source_kind: primary
@@ -398,9 +398,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.4
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://skillsmp.com/creators/dynamik-dev/bully/skills-bully-review — verificação adversarial 2 votos a favor, 1 refutação (2-1); fonte AGREGADORA, não o repo original'
-    valid_from: 2026-04-29
+    valid_from: "2026-04-29"
     source_tier: 4
     source_kind: aggregator
     label: 'CONFIRMADA (tier 4, 2-1): "O skill bully-review (dynamik-dev/bully) detecta regras mortas (zero hits) e ruidosas (violation_rate acima de threshold, padrão 0.5) a partir de telemetria JSONL, via pipeline/analyzer.py." É a ÚNICA implementação encontrada que faz literalmente o eixo 1 (cobertura de regra) — e é num skill do ecossistema Claude Code, não numa ferramenta de SAST. ⚠️ Confiança 0.4 e teto rígido: a fonte é AGREGADOR (skillsmp.com), o repo original não foi lido, e por isso nem o threshold nem a existência do analyzer.py estão verificados na primária. Sustenta a opção A como DESENHO (contador + threshold + duas classes: morta e ruidosa), não como prova de que funciona.'
@@ -417,9 +417,9 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.45
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://natoma.ai/blog/mcp-access-control-opa-vs-cedar-the-definitive-guide — verificação adversarial 3 votos a favor, 0 refutações (3-0); fonte VENDOR-ON-COMPETITOR, sempre suspeita (cláusula 7)'
-    valid_from: 2025-07-28
+    valid_from: "2025-07-28"
     source_tier: 4
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA (tier 4, 3-0): "O artigo (28/07/2025, Katharine Xiao) não cobre autoria de política por LLM, cobertura de regra, SARIF/baseline, dependência/ordem entre regras nem aposentadoria de política; é comparação arquitetural OPA vs Cedar para controle de acesso MCP." Evidência negativa numa fonte que o próprio tier desqualifica para claims positivas, e com `valid_from` de 2025 — 14 meses antes do escopo exigido. Entra no grafo só para que a próxima rodada não a redescubra como promissora.'
@@ -436,9 +436,9 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://github.com/opengrep/opengrep-rules — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
-    valid_from: 2025-11-28
+    valid_from: "2025-11-28"
     source_tier: 3
     source_kind: primary
     label: 'CONFIRMADA (tier 3, 3-0): "O repo opengrep/opengrep-rules é um fork de semgrep-rules (base de 2024-12-13, 3.820 commits) e está ARQUIVADO/somente-leitura desde 2025-11-28, com 6 estrelas e 10 forks: não é fonte viva de convenção de gestão de corpus em outubro de 2026." É o achado de TRAJETÓRIA da rodada, e vale como aviso de adoção: o fork comunitário do corpus de regras do líder MORREU. Quem adota corpus de terceiro herda o risco de o corpus parar — argumento direto contra a opção C na parte que depende de ecossistema, e a favor de mecanismo próprio.'
@@ -455,7 +455,7 @@ nodes:
     status: confirmed
     impact: 1
     confidence: 0.45
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://github.com/semgrep/ai-best-practices — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
     source_tier: 3
     source_kind: primary
@@ -473,7 +473,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.5
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://github.com/talongate/move-test-gen — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
     source_tier: 3
     source_kind: engineer
@@ -491,9 +491,9 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://code.claude.com/docs/en/hooks — verificação adversarial 3 votos a favor, 0 refutações (3-0)'
-    valid_from: 2026-10
+    valid_from: "2026-10"
     source_tier: 10
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "PreToolUse funciona como policy engine para agente: pode negar/permitir/perguntar via permissionDecision e casar ferramentas MCP pelo padrão mcp__<server>__<tool> com sufixo .* para todo o servidor." Resposta do eixo 7 pelo lado da PLATAFORMA, com a fonte definitiva: o Onion JÁ TEM o motor de política para agente que o resto do mercado está montando com Cedar/OPA — e tem 3 hooks de PreToolUse medidos nesta árvore. Argumento forte contra a opção D: adotar Cedar para autorizar agente seria pagar por capacidade que a plataforma entrega nativa e com exit 2.'
@@ -510,7 +510,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md — verificação adversarial 3 votos a favor, 0 refutações (3-0). ⚠️ TENSÃO MEDIDA com E_CHANGELOG_SEM_CONVENCAO_DE_CORPUS: dois achados da MESMA página discordando sobre o que ela cobre é sinal de leitura por trecho, não de medição — registrado, não resolvido.'
     source_tier: 9
     source_kind: primary
@@ -529,7 +529,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'https://sacra.com/research/semgrep — verificação adversarial 3 votos a favor, 0 refutações (3-0), fonte ANALYST tier 5; mais a tentativa pelo Thoughtworks Radar Vol. 34 (https://www.thoughtworks.com/en-gb/radar, tier 6), cuja claim foi REFUTADA: não sobreviveu afirmação de que o Radar traga passagem sobre gerenciar, medir ou aposentar corpus de regras.'
     source_tier: 5
     source_kind: analyst
@@ -548,7 +548,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Contabilidade da própria rodada, conferida item a item contra o handoff recebido: 27 fontes alcançadas, 39 claims levantadas, 24 confirmadas pela votação adversarial, 10 refutadas, 0 não-verificadas por falha técnica (nenhum 403, nenhuma doc truncada por fetch). Esta sessão escreveu 23 nós de evidência web + 1 nó de mercado que carrega a 24ª claim confirmada (Sacra) = 24, sem perda.'
     source_tier: 10
     source_kind: primary
@@ -635,7 +635,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Objeção do Elenxo contra o achado 1 (hooks do mesmo evento rodam em paralelo, code.claude.com/docs/en/hooks, tier 10). ESTA objeção é a única do conjunto cuja evidência esta sessão RE-MEDIU por conta própria, e ela passou: lint-selftest.sh:4945 ancora em ${REPO_ROOT}/.githooks/pre-commit (linha 4946); settings.json tem SessionStart=4 e UserPromptSubmit=4 hooks; o único par escreve→lê é premodelswitch-guard.sh (PreModelSwitch) → session-degraded-notice.sh (UserPromptSubmit), eventos DIFERENTES. Ver E_CASA_MEDIDA_ORDEM_E_CORPUS_1001.'
     source_tier: 10
     source_kind: primary
@@ -653,7 +653,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.55
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Objeção do Elenxo contra o achado 2 (CHANGELOG não traz convenção, tier 9). A parte VERIFICÁVEL nesta sessão é a contradição interna, e ela existe: E_CHANGELOG_SEM_CONVENCAO_DE_CORPUS e E_CHANGELOG_COBRE_HOOKS_E_EXIT_2 são a mesma URL com vereditos divergentes sobre o que a página cobre.'
     source_tier: 5
     source_kind: engineer
@@ -671,7 +671,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Objeção do Elenxo contra o achado 3 (ESLint detecta fixes circulares mas não nomeia as regras, tier 9). A parte desta objeção que esta sessão MEDIU: o pipeline do core tem auto-fix real — `sed -i` e `git add` dentro de `.githooks/pre-commit` —, que é exatamente o que a guarda (b) do hook-chain-order vigia.'
     source_tier: 9
     source_kind: primary
@@ -689,7 +689,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Objeção do Elenxo contra o achado 4 (autofix multipasse, ordem não derivada estaticamente, tier 9). Verificável no grafo: achados 3 e 4 têm a MESMA URL (eslint.org/docs/head/use/troubleshooting/circular-fixes), e as três candidatas que deveriam ter sido promovidas (Nx inferred tasks, Ruff, overcommit) constam como fonte NÃO LIDA em E_LACUNAS_CORPUS_DE_REGRAS_1001.'
     source_tier: 9
     source_kind: primary
@@ -707,7 +707,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Objeção do Elenxo contra o achado 5 (Cedar Analysis detecta permits sombreados, tier 8). Partes MEDIDAS nesta sessão: o corpus do Onion são 93 cabeçalhos de regra em 5.282 linhas de `.claude/validation/lint-artifacts.sh` (shell arbitrário, sem codificação SMT possível); e as três evidências de Cedar Analysis carregam `valid_from` 2025-06-16, anterior a out/2026, sem reverificação de atualidade.'
     source_tier: 8
     source_kind: primary
@@ -725,7 +725,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Objeção do Elenxo contra o achado 6 (CLI do Cedar classifica dois corpus como Equivalent/More/Less Permissive/Incomparable, tier 8). Parte MEDIDA nesta sessão: `ls .claude/validation/*baseline*.txt` devolve 13 baselines de catraca que só encolhem — o análogo degenerado que a rodada não nomeou.'
     source_tier: 8
     source_kind: primary
@@ -743,7 +743,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Objeção do Elenxo contra o achado 7 (Semgrep deduplica findings por match_based_id, tier 8). Verificável no próprio grafo: quatro nós de evidência carregam a mesma URL docs.semgrep.dev/semgrep-code/remove-duplicates — E_SEMGREP_DEDUP_FINDING_NAO_REGRA, E_SEMGREP_FINGERPRINT_INCLUI_NOME_DA_REGRA, E_SEMGREP_FINGERPRINT_CORRELACAO_ENTRE_BRANCHES e E_SEMGREP_API_EXIGE_DEDUP_TRUE.'
     source_tier: 8
     source_kind: primary
@@ -761,7 +761,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.6
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Objeção do Elenxo contra o achado 8 (match_based_id inclui o nome da regra, logo duas regras geram findings distintos, tier 8). A inversão lógica é verificável no próprio enunciado do achado: se o fingerprint é (arquivo, regra, padrão com metavariáveis), remover o componente `regra` deixa (arquivo, trecho).'
     source_tier: 8
     source_kind: primary
@@ -779,7 +779,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.45
-    verified_at: 2026-10-01
+    verified_at: "2026-10-01"
     verified_against: 'Objeção do Elenxo contra o achado 9 (Cedar autoriza agentes em 3 camadas L1→L2→L3 com halt no primeiro deny, ordem fixa sem derivação, tier 7). ⚠️ O TEXTO DESTA OBJEÇÃO CHEGOU TRUNCADO ao handoff desta sessão — corta em "Este achado é evidê" —, e nada depois disso foi reconstruído. Confiança 0.45 (abaixo do teto de 0.6 das demais) justamente por isso: modela-se o alvo e o enunciado do achado atacado, não o argumento, que não chegou.'
     source_tier: 7
     source_kind: engineer

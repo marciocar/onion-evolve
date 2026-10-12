@@ -3,7 +3,7 @@ meta:
   schema_version: "1"
   title: "Elenxo — a superação honesta da Automação Graduada do Onion"
   layer: audit
-  baseline: 2026-07-24
+  baseline: "2026-07-24"
   note: >
     Movimento Elenxo pedido pelo maestro sobre sua tese de automação graduada (quais ações A2A/federação
     automáticas vs gated; gates superados dinamicamente vs humano-no-controle; "melhor dos dois mundos").
@@ -65,7 +65,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "a DOUTRINA existe ~75% mas ESPALHADA em 6 docs sem citar-se como familia: escada Audit->Automate->Moat (ADR), esteira assess->trial->adopt (onion-promotion-ladder), catraca, 3 modos, linha INTAKE!=EXECUCAO — 2 escadas nunca unidas"
     trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
     provenance:
@@ -80,7 +80,7 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.85
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "o MECANISMO e PARCIALMENTE orfao: o runtime de conducao de fios NUNCA virou comando (roda a mao; verificado — sem comando thread-*); AUTOMATE gated por 3 pre-condicoes NUNCA cabeadas (verificado — sem branch auto/*); a UI HITL->HOTL segue design-note nao-construida. [CORRIGIDO 2026-07-24: a alegacao original de que o onion-effect-gate.sh estava orfao era FALSA — ver E_EFFECT_GATE_LIVE]"
     trace: ".claude/commands/meta/adopt.md"
     provenance:
@@ -94,7 +94,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 1.0
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "CORRECAO (Onda 2, declarado!=verificado sobre o proprio grafo): o onion-effect-gate.sh NAO e orfao — esta no CORE (.claude/validation/guardrails/onion-effect-gate.sh, identico ao prototipo) e CABEADO aos canais C3 (adopt.md + reverse-consolidate.md via untrusted-content-provenance) com selftest. A CONTENCAO do intake!=execucao ja e mecanismo vivo — a premissa da Onda 2 ('promover o orfao') estava stale"
     trace: ".claude/validation/guardrails/onion-effect-gate.sh"
     provenance:
@@ -109,7 +109,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "AUTOMATE esta CORRETAMENTE gated: a acao (rodar a escada a mao, monitorada) ainda nao acumulou execucoes provadas — a maxima do maestro em ato. O ADR e 'proposed — TRIAL autorizado', nao ativo"
     provenance:
       source: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md@07397d96 · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
@@ -123,7 +123,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-07-24
+    verified_at: "2026-07-24"
     label: "3 degraus genuinamente NOVOS faltam: (a) o degrau MONITORADO/shadow explicito entre HUMANO e AUTO; (b) ALERTAS PREDITIVOS (o core e reativo por design, CI-safe); (c) CRITERIOS de promocao CONTAVEIS (N execucoes provadas => sobe; hoje e juizo humano)"
     trace: "docs/knowledge-base/concepts/onion-promotion-ladder.md"
     provenance:
@@ -165,7 +165,7 @@ nodes:
     node_type: question
     plane: DEV
     status: superseded
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó é composto (3 afirmações independentes) e o veredito é misto: (a) e (c) seguem vivas/abertas — nada as entregou; (b) está morta E já foi corrigida DENTRO do próprio "
     impact: 4
     confidence: 1.0
@@ -175,7 +175,7 @@ nodes:
     node_type: question
     plane: DEV
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4: worker CONFIRMED e juiz opus/high APROVOU (run wf_da7d6a16-49e)"
     impact: 3
     confidence: 1.0
@@ -185,7 +185,7 @@ nodes:
     node_type: question
     plane: DEV
     status: open
-    verified_at: 2026-08-30
+    verified_at: "2026-08-30"
     verified_against: "censo lote 4: worker CONFIRMED e juiz opus/high APROVOU (run wf_da7d6a16-49e)"
     impact: 3
     confidence: 1.0

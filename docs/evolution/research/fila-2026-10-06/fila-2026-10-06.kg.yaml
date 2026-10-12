@@ -7,8 +7,8 @@ meta:
   x_drive_checkpoint: sealed
   id: fila-2026-10-06
   schema_version: "1"
-  baseline: 2026-10-06
-  review_after: 2026-11-05   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
+  baseline: "2026-10-06"
+  review_after: "2026-11-05"   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
   # ═══ TETO: 30 NÓS ═══
   #   30 em 2026-10-08, NO TETO (+par do Brain MCP; os nós do contrato vivem em contrato-kg-absorcao-2026-10; +E_PR_FINALIZE_ATRITO_MEDIDO, +programa do SDAAL do task manager, +conflito de projeção gerada): colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
   #   história fica no git e nos resíduos); entraram E_/Q_PRECOMMIT_SELECAO. Teto segue 30.
@@ -21,7 +21,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-06
+    verified_at: "2026-10-06"
     verified_against: "gh run list do linter por branch (#932-#936 e #923-#927)"
     trace: "ops/pr-finalize.sh"
     label: "com o pr-finalize, 5 de 5 PRs passaram no lint do CI de primeira; em 10-05, sem ele, 3 de 5 vieram com defeito (amostra pequena)"
@@ -37,7 +37,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-10-06
+    verified_at: "2026-10-06"
     verified_against: "aviso PR-SEM-PASSADA-ADVERSARIAL nos PRs #932-#939, todos com resíduo"
     trace: ".claude/hooks/bash-empty-result-guard.sh"
     label: "o aviso PR-SEM-PASSADA-ADVERSARIAL dispara em PR aberto de worktree com resíduo presente (procura no checkout principal)"
@@ -53,7 +53,7 @@ nodes:
     status: confirmed
     impact: 2
     confidence: 0.9
-    verified_at: 2026-10-06
+    verified_at: "2026-10-06"
     verified_against: "lint-selftest.sh --affected .claude/utils/adopt/merge-onion-hooks.sh --dry-run"
     trace: ".claude/validation/lint-selftest.sh"
     label: "merge-onion-hooks.sh não é citado por nenhuma família da bancada, e mexer nele cai no failsafe das 217 famílias"
@@ -69,7 +69,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-06
+    verified_at: "2026-10-06"
     verified_against: "kg-radar.sh exit 0 e kg-drive-project.sh exit 2 na semente com dois documentos (curado no PR #938)"
     trace: ".claude/validation/kg-radar.sh"
     label: "o radar (awk) e o drive (parser YAML) discordavam sobre o mesmo .kg.yaml; não há contrato formal entre os leitores"
@@ -85,7 +85,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-06
+    verified_at: "2026-10-06"
     verified_against: "eval da Porta 0 do onion-slm: 14 casos com REFUTA no rótulo, mais superou/substitui/ALEGAVA"
     trace: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
     label: "marcadores narrativos dentro do rótulo do nó entregaram o gabarito do eval da Porta 0"
@@ -101,7 +101,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-06
+    verified_at: "2026-10-06"
     verified_against: "fumaça da Porta 0 do onion-slm: MU-07 20/20 passaram no radar; Claude zero-shot pegou 17/20"
     trace: "docs/evolution/inbox/_processed/2026-10-06-radar-cego-mu07-mu18.md"
     label: "o radar não detecta node_type trocado (MU-07); não é checável por regra"
@@ -117,7 +117,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-06
+    verified_at: "2026-10-06"
     verified_against: "trocas SendMessage core↔onion-slm em 2026-10-06; uma mensagem não chegou; escrita em db de página alheia"
     trace: ".claude/commands/meta/co-evolve.md"
     label: "o diálogo entre sessões (SendMessage) foi usado de verdade, contra a doutrina 'sem IA-fala-IA', com perda e fronteira negociadas na hora"
@@ -133,7 +133,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-06
+    verified_at: "2026-10-06"
     verified_against: "adoção do onion-kg-ssot: pretooluse-merge-gate.sh sai 0 sem ops/ no repo"
     trace: ".claude/hooks/pretooluse-merge-gate.sh"
     label: "a trava de merge sai 0 em silêncio no adotante (não há ops/pr-merge-verified.sh lá)"
@@ -244,7 +244,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "PR #949: Elenxo REPROVOU o vocabulário único (carimbo standalone liga o modo porta: 0→16 e 0→14 HARD medidos em clones); maestro selou o desenho do Elenxo com hub→hub; bancada door_role_parity (g2)-(g5) + fixture, 3 mutantes"
     trace: ".claude/validation/door-role-parity-check.sh"
     label: "role do registro é o tier (source|hub|standalone|consumer) e o do carimbo é a relação/corte (adopted|hub|standalone); a REGRA 92 julga o adotante pelo mapa hub→hub, standalone|consumer→adopted"
@@ -269,7 +269,7 @@ nodes:
     status: open
     impact: 3
     confidence: 0.6
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "door-role-parity-check.sh sobre o vivo ([adotante/CARIMBO-AUSENTE] no clone local de granaai) + resposta do maestro 2026-10-07: o projeto granaai foi abandonado, o trabalho vive no brain-granaai"
     label: "aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o validador não tem status de membro aposentado"
   # ── 2026-10-07, noite: seleção do pre-commit (pedido do maestro) ─────────────────────────────
@@ -280,7 +280,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     narrative: "Superado em 2026-10-11 (SAC-72, branch feat/precommit-bench-by-case). Re-medido com a seleção nova: docs/README.md → 1 família (gitattributes_eol, com razão escrita); bloco de decouple_source mudado → 12 (a família + quem lê a bancada como dado), não todas; código fora de família continua → todas, com a linha impressa."
     verified_against: "lint-selftest.sh --affected <arquivo> --dry-run em origin/main 33d4067a: lint-selftest.sh → TODAS (failsafe); docs/README.md → 14; kg-grammar.md → 14; pr-merge-verified.sh → 16; as 14 de docs/README.md estão nas três seleções"
     trace: ".claude/validation/lint-selftest.sh"
@@ -314,7 +314,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.85
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "fechamento do #955 (3 rodadas do ops/pr-finalize.sh --push) e as rodadas do #949-#954 no mesmo dia"
     trace: "ops/pr-finalize.sh"
     label: "pr-finalize em 4 atritos: run que falha deixa o resíduo carimbado (limpeza manual 3x no dia); o commit de projeções religa o pre-commit pulado (lint 2x por rodada); a violação HARD não sai na saída final; não há --check sem escrita"
@@ -330,7 +330,7 @@ nodes:
     status: superseded
     impact: 3
     confidence: 0.9
-    verified_at: 2026-10-07
+    verified_at: "2026-10-07"
     verified_against: "zoho.md:311 (% proporcional à contagem de fases do plan.md, pós-#956); grep story.point em .claude/utils/task-manager/ só acha clickup.md; nenhum % de task-mãe calculado"
     trace: ".claude/utils/task-manager/adapters/zoho.md"
     label: "o % de progresso pesa todas as fases igual e ignora os story points; a task-mãe não tem % calculado em nenhum adapter"
@@ -355,7 +355,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "leva de 2026-10-07/08 com até 6 PRs abertos: #956, #957 (2x), #959 e #960 entraram em CONFLICTING após merges vizinhos; os conflitos relatados nos rebases foram em testing-state.md, testing-inventory.md, backlog.md, kg-read-index.tsv e plugins/ regenerados; conflito de código só 1 (onion-research.js, #957 x #959). PR em CONFLICTING não dispara CI"
     trace: "ops/pr-finalize.sh"
     label: "com PRs em paralelo, cada merge deixa os outros em conflito nas projeções geradas que todo PR commita, e o PR em conflito fica sem CI"
@@ -383,7 +383,7 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "sinal 2026-10-08-onion-brain-mcp do brain-granaai: artefato do claude.ai com chat (sample) não executa o radar; MCP host: só serve ao dono da máquina; o business-context (~570 KB) não cabe num prompt"
     label: "um hub precisa que o time não técnico consulte o Company Brain com o veredito do Onion fora do Claude Code, e hoje o paliativo é um segundo leitor do corpus em JS"
     provenance:

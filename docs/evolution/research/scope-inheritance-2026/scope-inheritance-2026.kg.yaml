@@ -1,7 +1,7 @@
 meta:
   id: scope-inheritance-2026
   schema_version: "1"
-  baseline: 2026-07-17
+  baseline: "2026-07-17"
   date: 2026-07-17
   # Pesquisa de herança/polimorfismo de escopo migrada de prosa p/ KG (dogfood #2 do pipeline pesquisa→KG).
   # Fecha o débito das 3 ressalvas declarado≠verificado do H4 (F2/F8/F10) como arestas REFUTES explícitas.
@@ -81,7 +81,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "git-scm/docs/git-config confirma literalmente os 5 escopos (system→global→local→worktree→command), '…"
     trace: "ver H1"
     provenance:
@@ -96,7 +96,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "code.claude.com/docs/en/settings confirma a precedência managed>CLI>local>project>user e 'Managed (h…"
     trace: "ver H1"
     provenance:
@@ -111,7 +111,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "code.claude.com/docs/en/memory + /large-codebases confirmam upward-traversal com concatenação ('All …"
     trace: "ver H1"
     provenance:
@@ -126,7 +126,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "O comportamento type-aware do strategic-merge (escalares substituem, mapas mergeiam, listas por merg…"
     trace: "ver H1"
     provenance:
@@ -141,7 +141,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "components.md confirma components como blocos opt-in composáveis ('Each opt-in feature gets packaged…"
     trace: "roles.yaml"
     provenance:
@@ -156,7 +156,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "octopus.com sustenta o antipadrão com as três razões: merge propaga mudança indesejada entre ambient…"
     trace: "ver H1"
     provenance:
@@ -171,7 +171,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "typescriptlang.org/tsconfig/extends confirma que // são overwrite (citação literal) e  mergeia por c…"
     trace: "ver H1"
     provenance:
@@ -186,7 +186,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "eslint.org/blog confirma o abandono da cascata por diretório em favor do array ordenado ('The only r…"
     trace: "ver H1"
     provenance:
@@ -201,7 +201,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "helm.sh confirma 'A parent chart can override values for subcharts' (push-down) e globals propagando…"
     trace: "ver H1"
     provenance:
@@ -216,7 +216,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "spec.editorconfig.org confirma busca upward parando em  ou raiz do FS, 'closer file are read last → …"
     trace: "ver H1"
     provenance:
@@ -231,7 +231,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "cosmiconfig README confirma literalmente 'Stops at the first configuration found, instead of finding…"
     trace: "ver H1"
     provenance:
@@ -246,7 +246,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "openpolicyagent.org/docs/management-bundles confirma  como namespace de ownership por prefixo de pat…"
     trace: "ver H1"
     provenance:
@@ -261,7 +261,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "cita verbatim: '1"
     trace: "code.claude.com/docs/en/settings"
     provenance:
@@ -276,7 +276,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Verbatim: 'Later files override earlier ones for scalar values, arrays are concatenated and de-dupli…"
     trace: "ver H2"
     provenance:
@@ -291,7 +291,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "verbatim: load order broad→specific = Managed policy → User → Project → Local; 'All discovered files…"
     trace: "code.claude.com/docs/en/memory"
     provenance:
@@ -306,7 +306,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "verbatim: 'Claude Code loads every CLAUDE.md file from your working directory and every parent direc…"
     trace: "ver H2"
     provenance:
@@ -321,7 +321,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "verbatim: 'maximum depth of four hops', 'Relative paths resolve relative to the file containing the …"
     trace: "ver H2"
     provenance:
@@ -336,7 +336,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "verbatim: 'Project settings in .claude/settings.json load only from your starting directory and are …"
     trace: "ver H2"
     provenance:
@@ -351,7 +351,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "verbatim: ordem de prioridade 1 Managed → 2  CLI (sessão) → 3  (projeto) → 4  (user) → 5 Plugin; 'Pr…"
     trace: "ver H2"
     provenance:
@@ -366,7 +366,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "verbatim:  glob frontmatter; 'User-level rules are loaded before project rules, giving project rules…"
     trace: "ver H2"
     provenance:
@@ -381,7 +381,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "verbatim: 4 modos (Installed by default / Available for install / Not available / Required — 'withou…"
     trace: "support.claude.com/.../13837433"
     provenance:
@@ -396,7 +396,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "verbatim confirma o all-or-nothing: 'if server-managed settings deliver any keys at all, other endpo…"
     trace: "ver H2"
     provenance:
@@ -411,7 +411,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Issue  acessível e vigente: plugins de org managed settings ( + ) 'do not auto-install in the CLI.."
     trace: "ver H2"
     provenance:
@@ -426,7 +426,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "verbatim: , /, , e o  hook que lê o dir de launch e recomenda o plugin daquele caminho"
     trace: "permissions.additionalDirectories"
     provenance:
@@ -440,7 +440,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Fonte oficial nx confirma a cascata 'inferred tasks < targetDefaults (nx.json) < project-level (proj…"
     trace: "ver H3"
     provenance:
@@ -455,7 +455,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Discussion #33761 existe e é feature request aberta (post 2025-12-08, apoio 2026-03-09, sem implemen…"
     trace: "ver H3"
     provenance:
@@ -470,7 +470,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Doc oficial confirma tags () +  +  que falham no lint com mensagem 'A project tagged with 'scope:adm…"
     trace: "ver H3"
     provenance:
@@ -485,7 +485,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Doc oficial: 'The  plugin lets you define code ownership based on projects.."
     trace: "ver H3"
     provenance:
@@ -500,7 +500,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Doc mise confirma recursão para cima ('These files recurse upwards.."
     trace: "ver H3"
     provenance:
@@ -515,7 +515,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Fonte jdsalaro sustenta includeIf  por sub-árvore + last-wins ('the former's user section will be ov…"
     trace: "ver H3"
     provenance:
@@ -530,7 +530,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Doc chezmoi confirma source-dir comum + templates que consomem dados locais + precedência  (built-in…"
     trace: "ver H3"
     provenance:
@@ -545,7 +545,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Fonte confirma symlink farm/overlay reversível ('Unstow and restore original state') e o limite verb…"
     trace: "ver H3"
     provenance:
@@ -560,7 +560,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Doc Renovate confirma  array ordenado + presets aninháveis + auto-extend de  do user/group/org pai (…"
     trace: "ver H3"
     provenance:
@@ -575,7 +575,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Doc oficial confirma cascata managed > cli > local > project > user, locais de  (diretório de config de sistema do claude-code, …"
     narrative: "label anterior: Doc oficial confirma cascata managed > cli > local > project > user, ⟨locais de  (diretório de config de sistema do claude-code, …⟩"
     trace: "ver H3"
@@ -591,7 +591,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Artigo de suporte confirma override de preferência de install por grupo ('override a plugin's organi…"
     trace: "ver H3"
     provenance:
@@ -606,7 +606,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Changelog GitHub confirma required-reviewer rule GA em 2026-02-17, que 'augments CODEOWNERS files bu…"
     trace: "ver H3"
     provenance:
@@ -621,7 +621,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Verbatim na primária (): 'All discovered files are concatenated into context rather than overriding …"
     trace: "code.claude.com/docs/en/memory"
     provenance:
@@ -636,7 +636,7 @@ nodes:
     confidence: 0.6
     status: superseded
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Paper real (, Wallace et al.)"
     trace: "ver H4"
   - id: C_H4_F3
@@ -646,7 +646,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Verbatim no Model Spec (): cadeia Root>System>Developer>User>Guideline; 'Unlike user defaults that c…"
     trace: "ver H4"
     provenance:
@@ -661,7 +661,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Claim e priority-hierarchy sustentados por múltiplas fontes 2026 (Anthropic, BISI, Forbes 22/jan/202…"
     trace: "ver H4"
     provenance:
@@ -676,7 +676,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Verbatim na primária (Graphiti, getzep): 'Each fact … has a validity window: when it became true, an…"
     trace: "ver H4"
     provenance:
@@ -691,7 +691,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Primária () confirma precedência por escopo ('When multiple subagents share the same name, Claude Co…"
     trace: "code.claude.com/docs/en/sub-agents"
     provenance:
@@ -706,7 +706,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Primária (spec MCP 2025-11-25) confirma as primitivas: Resources = 'Context and data, for the user o…"
     trace: "ver H4"
     provenance:
@@ -721,7 +721,7 @@ nodes:
     confidence: 0.6
     status: superseded
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Base→overlay confirmado na primária citada ( + glossário): 'a base has no knowledge of an overlay an…"
     trace: "kubernetes.io/.../kustomization/"
   - id: C_H4_F9
@@ -731,7 +731,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Verbatim na primária (): 'By default, every group inherits that organization-wide setting' + 'When y…"
     trace: "support.claude.com/.../manage-plugins"
     provenance:
@@ -746,7 +746,7 @@ nodes:
     confidence: 0.6
     status: superseded
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Mecanismo confirmado na primária (): namespace = isolamento físico por tenant, invisível cross-names…"
     trace: "docs.pinecone.io/.../implement-multitenancy"
   - id: C_H4_F11
@@ -756,7 +756,7 @@ nodes:
     confidence: 0.4
     status: open
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "Sourcing secundário (índice de papers no GitHub + blog ), e o próprio achado se declara 'frente ativ…"
     trace: "ver H4"
   - id: E_F2_CORR
@@ -766,7 +766,7 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "a cifra ~63% NÃO aparece no abstract público do paper (arXiv:2404.13208) — mecanismo confirmado, número não-verificável"
     trace: "H4 §Verificação adversarial"
     provenance:
@@ -781,7 +781,7 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "a citação 'keep hierarchies shallow' é de BLOG secundário, não da página K8s oficial atribuída — base/overlay confirmado, atribuição errada"
     trace: "H4 §Verificação adversarial"
     provenance:
@@ -796,7 +796,7 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_against: research-2026-07
-    verified_at: 2026-07-17
+    verified_at: "2026-07-17"
     label: "10.000 é o limite de valores do operador metadata $in, NÃO teto de namespaces/índice (doc atual: 'million-scale namespaces') — ESTATÍSTICA ERRADA"
     trace: "H4 §Verificação adversarial"
     provenance:
