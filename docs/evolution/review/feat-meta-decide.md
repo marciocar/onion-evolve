@@ -3,7 +3,8 @@ title: "Revisão — /meta:decide forjado pelo /meta:forge (medidor, selador, do
 date: 2026-10-12
 branch: feat/meta-decide
 reviewer: "refutador isolado (subagente general-purpose, mandato REFUTAR, default reprovado), que executou cada ataque em cópias descartáveis fora do repo; mais o dogfood de carga headless do próprio comando"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 209d44de5e061e6d8ed500e62d0b7ea1f58f99c8adedbacefe50fe4ea134fdcd
+reviewed_code_sha256: 874a8b5e287e66f22fe58be7cf629114c479ad467fbad7327574a7dc8ae70129
 findings_total: 17
 findings_real: 17
 verdict: REPROVADO_E_CURADO

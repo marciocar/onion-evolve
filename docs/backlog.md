@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**463 itens abertos** em 99 grafo(s) com aberto (de 126 no escopo) · 100 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**466 itens abertos** em 100 grafo(s) com aberto (de 127 no escopo) · 101 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -690,6 +690,14 @@
 | 10.8 | `Q_TENANT_WRITE_DESTINATION` | librechat-kg-runtime-2026-08 | QUESTAO DE DESENHO (gated): a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adot |
 | 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
 | 5.4 | `Q_KG_INBOX_FORA_DO_PLUGIN` | librechat-kg-runtime-2026-08 | LACUNA DECLARADA (achado do Elenxo de 2026-09-05, medida): o /meta:kg-inbox NAO esta em plugins/onion/commands/ — o diretorio te |
+
+## forge-decide-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.2 | `C_O_FILTRO_E_JULGAMENTO_DA_SESSAO` | forge-decide-2026-10 | teto declarado: o medidor lista o que está em voo e não decide o que é do maestro; o filtro medível/derivável/de outro dono  |
+| 3.0 | `Q_OPCOES_EM_CAMPO_ESTRUTURADO` | forge-decide-2026-10 | o contrato do .kg.yaml deveria ganhar um campo x_options para decisões abertas? Gatilho: as rodadas do /meta:decide mostrarem que |
+| 2.4 | `Q_DECIDE_FICA_EM_PENDING` | forge-decide-2026-10 | o /meta:decide deve viajar para o standalone e o plugin, ou segue core-only? Gatilho: o maestro classificar, depois de uma rodada  |
 
 ## hub-operacoes-enterprise-update-547-2026-10 — 2 item(ns)
 
