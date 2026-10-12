@@ -1,6 +1,5 @@
 ---
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 3
 findings_real: 3
 tokens: 0
