@@ -1,7 +1,7 @@
 ---
 branch: docs/sac-52-playbook-decision
 date: 2026-10-11
-reviewed_diff_sha256: eb2d83768d3e52a504a7e1f5d391d4ee07446c519641ecae5b4441c98719ce54
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 6e9151ed77630ce4def21857565f4726e4698f7ea9bc6ce835f98d440c355b13
 findings_total: 3
 findings_real: 3
@@ -34,3 +34,7 @@ reviewer: Elenxo do run wf_790beee5-fa8 (refutador opus/high, 52 objeções) + p
 
 - As 39 claims cortadas por orçamento. Nelas estão o Arazzo, o runme e a especificação técnica do
   CACAO, que formam o gate da opção D.
+
+## Passada do selo (2026-10-12)
+
+O maestro selou o nó de decisão na opção recomendada, por pergunta com opções. Diff revisado: só o bloco do `D_` mudou (`status: confirmed`, `verified_at`, `verified_against` com a opção selada, `provenance` de testemunho), radar exit 0 e contrato rc 0. Nenhum outro nó foi tocado.
