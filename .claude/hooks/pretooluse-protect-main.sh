@@ -49,7 +49,7 @@ push_lines=$(printf '%s\n' "$inv" | grep -E '^git[[:space:]]+push([[:space:]]|$)
 printf '%s' "$push_lines" | grep -qE '(--force([^-]|$)|--force-with-lease|[[:space:]]-[a-eg-z]*f[a-z]*([[:space:]]|$))' || exit 0
 main_target=0
 # `main` na linha canônica é o NOME do ramo protegido: a lib já converte nele o ramo de produção
-# resolvido (`master` num GitFlow clássico — Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN, 2026-10-12).
+# resolvido (`master` num gitflow clássico — Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN, 2026-10-12).
 # `HEAD:main` / `x:main` / `refs/heads/main` também são alvo main — a v1 exigia ESPAÇO antes de
 # `main` e deixava passar o refspec com dois-pontos (buraco achado pela bancada da auditoria
 # D_AUDITAR_GATES_TEXTUAIS, 2026-09-02: `git push -f origin HEAD:main` saía rc=0).

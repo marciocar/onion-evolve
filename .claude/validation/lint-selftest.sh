@@ -6919,7 +6919,7 @@ run_pretooluse_veto_selftests() {
   _case "merge-gate: sem caminho verificado → DESARMA (passa)" 0 "${mg}" feat 'gh pr merge 1'
   rm -rf "${d}"
   # ── RAMO DE PRODUÇÃO RESOLVIDO (Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN, 2026-10-12) ─────────
-  # Defeito medido: num adotante GitFlow (produção `master`) `git push origin +master` saía rc=0 — o veto só
+  # Defeito medido: num adotante com gitflow (produção `master`) `git push origin +master` saía rc=0 — o veto só
   # via `main` literal. Quatro repos, um por FONTE de resolução: sem remoto (fallback main+master),
   # origin/HEAD→master, origin/HEAD→main (o `master` NÃO é produção: tem de passar) e gitflow.branch.master.
   local pr_root; pr_root="$(mktemp -d)"
@@ -6956,7 +6956,7 @@ run_pretooluse_veto_selftests() {
   }
   _prmk bm bare-master; _prmk ohm originhead-master; _prmk ohn originhead-main; _prmk oht originhead-trunk; _prmk gft gitflow-trunk
   _prmk gfb gitflow-devhead
-  _prcase "(pr-gfd) forma do adotante GitFlow: +master → VETO"                2 "${pm}" gfb feat 'git push origin +master'
+  _prcase "(pr-gfd) forma do adotante com gitflow: +master → VETO"                2 "${pm}" gfb feat 'git push origin +master'
   _prcase "(pr-gfd-dev) forma do adotante: -f develop (padrão do remoto, não produção) → passa" 0 "${pm}" gfb feat 'git push -f origin develop'
   # (pr-plus) o verbatim do defeito: produção master, refspec com `+`
   _prcase "(pr-plus) master sem remoto: git push origin +master → VETO"      2 "${pm}" bm feat 'git push origin +master'
