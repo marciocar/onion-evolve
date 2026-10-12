@@ -1,7 +1,7 @@
 ---
 branch: feat/mcp-onion-kg-email-allowlist
 date: 2026-10-12
-reviewed_diff_sha256: b3120a97fabc9080d67ebffc3f66133e4723c518d2144a6b2db04ce3cf680d76
+reviewed_diff_sha256: f529dd7e531c8453c8c35146323c4d6c32b725f239ff04d31a4553ba22cbe583
 reviewed_code_sha256: 1e7abf9748607df9bd9cf2a6b030ccb28f09062e086fd3836982e8f64b340c38
 findings_total: 2
 findings_real: 2
