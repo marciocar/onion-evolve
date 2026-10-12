@@ -59,8 +59,8 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 | Achados REAIS | **2305** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **86%** | `bash .claude/validation/review-ledger.sh --env` |
 | Tokens por achado REAL | **122598** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **413** | `bash .claude/validation/review-ledger.sh --env` |
-| — legado (texto livre) | **95** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **414** | `bash .claude/validation/review-ledger.sh --env` |
+| — legado (texto livre) | **94** | `bash .claude/validation/review-ledger.sh --env` |
 
 A média de tokens cobre os **272** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
