@@ -71,11 +71,11 @@ while IFS=$'\t' read -r pr base head; do
   # (2026-10-13); sem eles a regra do BLOCO recusa e devolve a completa. Para medir a regra NOVA sobre o diff
   # antigo, a fronteira é sintetizada onde os marcadores foram postos. Só aqui; no CI marcador ausente = completa.
   out="$(ONION_SELFTEST_REPLAY_SYNTH_BOUNDS=1 bash "${POLICY}" --range "${rng}" 2>/dev/null)"; rc=$?
-  nivel="$(printf '%s\n' "${out}" | sed -n 's/^nivel=//p')"
+  level="$(printf '%s\n' "${out}" | sed -n 's/^nivel=//p')"
   fams="$(printf '%s\n' "${out}" | sed -n 's/^familias=//p')"
-  motivo="$(printf '%s\n' "${out}" | sed -n 's/^motivo=//p' | cut -c1-140)"
-  if [ "${rc}" -ne 0 ] || [ -z "${nivel}" ]; then
-    _noans=$((_noans + 1)); nivel="SEM-RESPOSTA"; n="-"
+  reason="$(printf '%s\n' "${out}" | sed -n 's/^motivo=//p' | cut -c1-140)"
+  if [ "${rc}" -ne 0 ] || [ -z "${level}" ]; then
+    _noans=$((_noans + 1)); level="SEM-RESPOSTA"; n="-"
   elif [ "${fams}" = "ALL" ]; then n="${TOTAL}"
   else n="$(printf '%s' "${fams}" | tr ',' '\n' | grep -c . || true)"; fi
   # SEM A INFRA: o mesmo diff sem os arquivos que compram a completa por POLÍTICA (a bancada, workflows,
@@ -94,7 +94,7 @@ while IFS=$'\t' read -r pr base head; do
   # não parede (o CI fatia em faixas). Família sem tempo medido conta 0 e isso SUBestima; declarado na saída.
   if [ "${fams}" = "ALL" ]; then sec="$(awk -F'\t' '!/^#/ && $2 ~ /^[0-9]+$/ {s+=$2} END{print s+0}' "${TIMES}")"
   else sec="$(awk -F'\t' -v l=",${fams}," '!/^#/ && $2 ~ /^[0-9]+$/ && index(l, "," $1 ",") {s+=$2} END{print s+0}' "${TIMES}")"; fi
-  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${pr}" "${nf}" "${n}" "${nivel}" "${nr}" "${why_r}" "${motivo}" "${sec}" | tee -a "${_work}/rows"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${pr}" "${nf}" "${n}" "${level}" "${nr}" "${why_r}" "${reason}" "${sec}" | tee -a "${_work}/rows"
 done < "${_work}/ranges"
 
 [ -z "${TSV}" ] || cp "${_work}/rows" "${TSV}"

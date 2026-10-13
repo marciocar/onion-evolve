@@ -2,8 +2,7 @@
 title: 'Resíduo — seletor por arquivo, arranque compartilhado e bloco da bancada no nível PR'
 date: 2026-10-13
 branch: perf/bench-selector-per-file
-reviewed_diff_sha256: 81997f4d196f8981d6a8222fc907f6915b61eb53fdb46a86b348178b5b3a76d4
-reviewed_code_sha256: 979645a6f4fb843540da45ee3568730647690efa104ef0c0ff2eb709b23390f3
+reviewed_diff_sha256: pendente
 findings_total: 9
 findings_real: 8
 findings_fixed: 6
@@ -155,6 +154,18 @@ Sobreviventes declarados:
    cobertura fraca pelo corpo das famílias que os varrem. Nenhum foi afrouxado. A lista está no nó de evidência.
 9. **Falso positivo do medidor.** A coluna `segundos_cpu` soma o tempo por família do runner. Família sem tempo
    medido conta 0, então a soma SUBestima. Declarado na saída.
+
+## Os `confirmed` do grafo editado (REGRA 87 (PR que EDITA um `.kg.yaml` enxergou os `confirmed` dele))
+
+Este PR acrescenta dois nós ao `merge-process-onion-2026-10`, o selo e a evidência. Conferi os três `confirmed`
+de maior impacto do arquivo:
+- `E_MEDICAO_PROCESSO_ATUAL_2026_10_13`: a bancada tem mediana de 14,8 min e roda 2 vezes por PR. Este PR
+  CONFIRMA a direção dele: o custo por PR cai porque o nível PR deixa de comprar a completa só por tocar a
+  bancada. Não contradiz.
+- `E_OBJECAO_STRICT_VS_LOOSE_IS_THE_AXIS`: no modo loose, o PR roda as famílias tocadas e o main roda a
+  completa. É o desenho que esta regra aplica à própria bancada, com o main completo como rede. Não contradiz.
+- `E_OBJECAO_ANY_QUEUE_BLOCKED_BY_MAGNET`: trata do ímã de conflito e da fila. Este PR não toca fila nem
+  projeção. Ele só reduz o custo de cada auto-rebase no nível PR. Não responde e não refuta.
 
 ## Limitações
 
