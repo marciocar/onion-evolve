@@ -24687,6 +24687,24 @@ STUB
     record_pass "registry-pins: (f) carimbo de outra adoção (papel incompatível) ⇒ acusa e NÃO carimba"
   else record_fail "registry-pins: (f) carimbou carimbo de outra adoção" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
 
+  # (f2) O CARIMBO DO ADOTANTE STANDALONE (2026-10-13, adoção do bomtexto): registro `standalone` com
+  #      carimbo `role: standalone` (o corte que o /meta:adopt --role standalone grava, sem kind: door) e
+  #      pin em dia ⇒ `ok`, rc=0. Até 2026-10-13 este par saía DIVERGE de papel. E o par antigo
+  #      standalone→adopted segue ok (os adotantes já carimbados). MUTANTE: tirar `standalone:standalone`
+  #      do `case` reprova o primeiro; tirar `standalone:adopted` reprova o segundo.
+  local _f2 _f2b
+  rm -f "${stamps}"/*; _rp_stamp vizinho "${PIN_NEW}"
+  printf 'source_commit: %s\nrole: standalone\n' "${PIN_NEW}" > "${stamps}/dono_alvo_main"
+  _rp_reg "${PIN_NEW}" "${PIN_NEW}" "github.com/dono/alvo"
+  sed -i '/^  - id: alvo$/a\    role: standalone' "${REG}"
+  _rp --check; _f2="${_r}:$(grep -E '^alvo ' <<< "${_o}" || true)"
+  printf 'source_commit: %s\nrole: adopted\n' "${PIN_NEW}" > "${stamps}/dono_alvo_main"
+  _rp --check; _f2b="${_r}:$(grep -E '^alvo ' <<< "${_o}" || true)"
+  if [[ "${_f2}" == 0:*' ok' ]] && [[ "${_f2b}" == 0:*' ok' ]]; then
+    record_pass "registry-pins: (f2) registro standalone × carimbo standalone (o corte) e × adopted (compat) ⇒ ok, sem DIVERGE de papel"
+  else record_fail "registry-pins: (f2) carimbo do adotante standalone" "standalone×standalone=${_f2} · standalone×adopted=${_f2b}"; fi
+  rm -f "${stamps}"/*; _rp_stamp vizinho "${PIN_OLD}"   # devolve o mundo como o (f) o deixou: o (g) parte dele
+
   # (g) membro COM remoto, remoto FALHA, clone parado bate com o registro ⇒ ILEGÍVEL (rc=3), nunca ok.
   #     MUTANTE: tirar o ramo remote_failed reprova este caso (sai ok, rc=0).
   local origin_repo="${d}/origin-alvo"
@@ -25004,6 +25022,72 @@ run_role_vocabulary_selftests() {
   else
     record_pass "papel-vocab: o porteiro IS_DERIVED segue SEM 'standalone' (a porta é julgada, não isenta)"
   fi
+
+  # ⭐ O PORTEIRO POR COMPORTAMENTO (2026-10-13): "sou porta?" é do `kind: door`, o CORTE é do `role:`.
+  # O caso acima prende a LINHA; este roda o BLOCO REAL de resolução de papel do lint (de `_stamp_has()`
+  # até o fecho do ramo do adotante standalone) contra carimbos sintéticos e lê IS_DERIVED/IS_LEAF —
+  # os dois valores que o resto do lint consome. Medido antes da cura: a árvore do sge, trocando SÓ o
+  # carimbo adopted→standalone, ia de 0 a 16 HARD; o bomtexto (adotado com --role standalone) carregava
+  # carimbo que a REGRA 92 reprovava. MUTANTE: apagar o ramo `standalone` sem `kind: door` reprova
+  # (pv-b); fazê-lo ignorar o `kind:` reprova (pv-a).
+  local _pv_blk _pv_d _pv_case _pv_got _pv_bad=0
+  _pv_blk="$(awk '/^_stamp_has\(\) \{/{on=1} on{print} on && /IS_DERIVED=1; IS_LEAF=1/{last=1; next} last && /^fi$/{exit}' "${_gk}")"
+  if ! grep -q 'IS_DERIVED=1; IS_LEAF=1' <<< "${_pv_blk}"; then
+    record_fail "papel-vocab: porteiro por comportamento" "não achei o ramo do adotante standalone no bloco de papel do lint — o caso ficou cego (ou a cura de 2026-10-13 sumiu)"
+    _fails=1
+  else
+    _pv_d="$(mktemp -d)"; mkdir -p "${_pv_d}/.claude"
+    # rótulo | carimbo (\n literal) | IS_DERIVED esperado | IS_LEAF esperado
+    while IFS='|' read -r _pv_case _pv_stamp _pv_wd _pv_wl; do
+      [ -n "${_pv_case}" ] || continue
+      rm -f "${_pv_d}/.claude/.onion-version"
+      [ "${_pv_stamp}" = "-" ] || printf '%b' "${_pv_stamp}" > "${_pv_d}/.claude/.onion-version"
+      _pv_got="$(REPO_ROOT="${_pv_d}" bash -c "${_pv_blk}"$'\n''printf "%s %s" "${IS_DERIVED}" "${IS_LEAF}"' 2>/dev/null || true)"
+      if [ "${_pv_got}" = "${_pv_wd} ${_pv_wl}" ]; then
+        record_pass "papel-vocab: (${_pv_case}) IS_DERIVED/IS_LEAF = ${_pv_got}"
+      else
+        record_fail "papel-vocab: (${_pv_case})" "esperava IS_DERIVED/IS_LEAF='${_pv_wd} ${_pv_wl}', veio '${_pv_got}'"; _pv_bad=1
+      fi
+    done <<'PV'
+pv-a porta standalone (kind: door) segue julgada inteira, modo porta LIGADO|role: standalone\nkind: door\n|0|0
+pv-b adotante standalone sem kind: door é ADOTADO-folha, modo porta DESLIGADO|role: standalone\nmode: greenfield\n|1|1
+pv-c adotante adopted, controle|role: adopted\n|1|1
+pv-d hub segue derivado e NÃO folha|role: hub\n|1|0
+pv-e porta source (onion-core) derivada e não folha|role: source\nkind: door\n|1|0
+pv-f sem carimbo é a FONTE|-|0|0
+pv-g standalone com comentário inline e sem kind continua adotado|role: standalone   # carimbado\n|1|1
+PV
+    rm -rf "${_pv_d}"
+    [ "${_pv_bad}" -eq 0 ] || _fails=1
+  fi
+
+  # ⭐ E PELO LINT INTEIRO, COMO O RUNNER O INVOCA (bancada-espelha-o-runner): o bloco acima prova os
+  # dois valores; este prova o EFEITO. Um sandbox com as guardas reais e um doc de produto, o lint
+  # chamado com --only, e só o carimbo muda. Exige: adotante `standalone` sem `kind: door` produz
+  # EXATAMENTE as mesmas violações que `adopted` (modo porta desligado), e a porta `standalone` com
+  # `kind: door` produz um conjunto DIFERENTE (modo porta ligado — no sandbox medido em 2026-10-13, a
+  # REGRA 63 e a REGRA 36 só julgam a porta). O nome do papel citado em `[papel/SEM-OBJETO]` é
+  # normalizado: é o corte, que difere de propósito. MUTANTE: o lint de origin/main (sem a cura) põe o
+  # adotante standalone no conjunto da porta e reprova (pv-e2e-a).
+  local _e2 _e2_o_ad _e2_o_st _e2_o_dr
+  _e2="$(mktemp -d)"; mkdir -p "${_e2}/.claude/validation" "${_e2}/docs/business-context"
+  cp -a "${SCRIPT_DIR}"/*.sh "${_e2}/.claude/validation/" 2>/dev/null || true
+  printf '# Produto\n\n| Item | Qtde |\n|---|---|\n| **Total** | **987** |\n' > "${_e2}/docs/business-context/prod.md"
+  ( cd "${_e2}" && git init -q ) 2>/dev/null
+  _e2_run() { printf '%b' "$1" > "${_e2}/.claude/.onion-version"
+    ( cd "${_e2}" && git add -A >/dev/null 2>&1 ) 2>/dev/null
+    ( cd "${_e2}" && bash .claude/validation/lint-artifacts.sh --only="${_e2}/docs/business-context/prod.md" 2>&1 ) \
+      | grep -E '^VIOLATION' | sed "s/papel '[a-z-]*'/papel '<P>'/g" | LC_ALL=C sort || true; }
+  _e2_o_ad="$(_e2_run 'role: adopted\n')"
+  _e2_o_st="$(_e2_run 'role: standalone\nmode: greenfield\n')"
+  _e2_o_dr="$(_e2_run 'role: standalone\nkind: door\n')"
+  rm -rf "${_e2}"; unset -f _e2_run
+  if [ -n "${_e2_o_ad}" ] && [ "${_e2_o_st}" = "${_e2_o_ad}" ]; then
+    record_pass "papel-vocab: (pv-e2e-a) lint real: adotante standalone sem kind: door julga IGUAL a adopted ($(grep -c . <<< "${_e2_o_ad}") violações, mesmo conjunto)"
+  else record_fail "papel-vocab: (pv-e2e-a)" "adotante standalone ≠ adopted no lint real — o modo porta ligou pelo role: (diff: $(diff <(printf '%s\n' "${_e2_o_ad}") <(printf '%s\n' "${_e2_o_st}") | grep -E '^[<>]' | cut -c1-120 | head -3 | tr '\n' ' '))"; _fails=1; fi
+  if [ -n "${_e2_o_dr}" ] && [ "${_e2_o_dr}" != "${_e2_o_ad}" ]; then
+    record_pass "papel-vocab: (pv-e2e-b) lint real: a porta standalone (kind: door) segue julgada como porta (conjunto diferente do adotado)"
+  else record_fail "papel-vocab: (pv-e2e-b)" "a porta standalone foi julgada como adotado — o modo porta sumiu da porta"; _fails=1; fi
 
   if [ "${_fails}" -eq 0 ] && [ "${_checked}" -ge 4 ]; then
     record_pass "papel-vocab: os ${_checked} predicados de papel conhecem TODOS os papéis da SSOT (alternação, não a linha)"
@@ -27927,7 +28011,9 @@ run_door_role_parity_selftests() {
   mkdir -p "${d}/docs/evolution/federation" "${d}/porta/.claude"
 
   _drp() { # $1=role no registro  $2=role no carimbo ('' = sem campo)  $3=path ('' = ausente)
-    printf 'role: %s\n' "$2" > "${d}/porta/.claude/.onion-version"
+    # o carimbo de porta leva `kind: door`, como o materializador o escreve (write-stamp.sh --kind door);
+    # sem ele, desde 2026-10-13, a porta standalone|source é acusada (caso (d2))
+    printf 'role: %s\nkind: door\n' "$2" > "${d}/porta/.claude/.onion-version"
     [ -n "$2" ] || printf 'framework: x\n' > "${d}/porta/.claude/.onion-version"
     { echo 'members:'; echo '  - id: porta-de-teste'; echo '    kind: door'
       [ -n "$1" ] && echo "    role: $1"
@@ -27959,6 +28045,15 @@ run_door_role_parity_selftests() {
     record_pass "door-role-parity: (d) carimbo sem campo role ⇒ ACUSA carimbo incompleto"
   else record_fail "door-role-parity: (d)" "carimbo incompleto passou (rc=${_drp_rc})"; fi
 
+  # (d2) PORTA standalone SEM `kind: door` no carimbo (2026-10-13): o modo porta do lint vem desse campo,
+  #      e sem ele a porta pública seria julgada como ADOTADO-folha (guardas caladas). MUTANTE: tirar o
+  #      ramo SEM-KIND-DOOR reprova este caso; o (a) prova que a porta com o campo segue em silêncio.
+  _drp standalone standalone "${d}/porta"; printf 'role: standalone\n' > "${d}/porta/.claude/.onion-version"
+  if _drp_out="$(bash "${sut}" "${d}" 2>&1)"; then _drp_rc=0; else _drp_rc=$?; fi
+  if [ "${_drp_rc}" = "1" ] && grep -q 'porta/SEM-KIND-DOOR' <<< "${_drp_out}"; then
+    record_pass "door-role-parity: (d2) porta standalone sem kind: door no carimbo ⇒ ACUSA (seria julgada como adotado)"
+  else record_fail "door-role-parity: (d2)" "porta sem kind: door passou calada (rc=${_drp_rc}): $(_emit "${_drp_out}" | head -c 200)"; fi
+
   # (e) clone INALCANÇÁVEL (o caso do CI) ⇒ rc=0 e DECLARA não-medido; silêncio aqui seria fail-open
   _drp standalone hub "${d}/nao-existe"
   if [ "${_drp_rc}" = "0" ] && grep -q 'NÃO MEDIDA' <<< "${_drp_out}"; then
@@ -27988,14 +28083,19 @@ run_door_role_parity_selftests() {
   else record_fail "door-role-parity: (g)" "acusou adotante, onde os dois campos respondem perguntas diferentes (rc=${arc}): $(_emit "${aout}" | head -c 200)"; fi
 
   # (g2)…(g5) ADOTANTE POR COMPATIBILIDADE (2026-10-07, sinal de um adotante): o par registro×carimbo
-  # é julgado por um MAPA (hub→hub; standalone|consumer→adopted), não por igualdade. (g2) e (g3) são os
-  # dois pares incompatíveis medidos no vivo (um hub no registro com `adopted` no carimbo; e `standalone` no carimbo, que
-  # liga o modo porta no lint); (g4) o par legítimo de hub em silêncio; (g5) clone sem carimbo nomeado.
-  # MUTANTE: `_compat_ok` devolvendo sempre 0 reprova (g2) e (g3); voltar a pular `kind: adopter`
-  # reprova os quatro.
-  _drpa() { # $1=registro $2=carimbo ('' = sem .onion-version)
+  # é julgado por um MAPA (hub→hub; standalone→standalone|adopted; consumer→adopted), não por igualdade.
+  # (g2) é o par incompatível medido no vivo (um hub no registro com `adopted` no carimbo); (g3) é o par
+  # standalone→standalone, RECUSADO até 2026-10-13 ("liga o modo porta no lint") e aceito desde que o
+  # modo porta passou a vir de `kind: door` — o carimbo que o `/meta:adopt --role standalone` grava
+  # (medido na adoção do bomtexto); (g3b) o inverso: `kind: door` no carimbo de um ADOTANTE é acusado;
+  # (g4) o par legítimo de hub em silêncio; (g5) clone sem carimbo nomeado.
+  # MUTANTES: `_compat_ok` devolvendo sempre 0 reprova (g2); tirar `standalone:standalone` do mapa
+  # reprova (g3); tirar o ramo CARIMBO-DE-PORTA reprova (g3b); voltar a pular `kind: adopter` reprova
+  # (g2)(g3b)(g5).
+  _drpa() { # $1=registro $2=carimbo ('' = sem .onion-version) $3=linha extra no carimbo (opcional)
     rm -f "${d}/porta/.claude/.onion-version"
     [ -n "$2" ] && printf 'role: %s\n' "$2" > "${d}/porta/.claude/.onion-version"
+    [ -n "${3:-}" ] && printf '%s\n' "$3" >> "${d}/porta/.claude/.onion-version"
     { echo 'members:'; echo '  - id: adotante-de-teste'; echo '    kind: adopter'
       echo "    role: $1"; echo "    local_path: \"${d}/porta\"" ; } > "${d}/docs/evolution/federation/members.yaml"
     if _drpa_out="$(bash "${sut}" "${d}" 2>&1)"; then _drpa_rc=0; else _drpa_rc=$?; fi
@@ -28005,9 +28105,17 @@ run_door_role_parity_selftests() {
     record_pass "door-role-parity: (g2) adotante hub×adopted é INCOMPATÍVEL (o caso medido em 2026-10-07)"
   else record_fail "door-role-parity: (g2)" "par incompatível passou calado (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
   _drpa standalone standalone
-  if [ "${_drpa_rc}" = "1" ] && grep -q 'adotante/PAPEL-INCOMPATIVEL' <<< "${_drpa_out}"; then
-    record_pass "door-role-parity: (g3) adotante standalone×standalone é INCOMPATÍVEL (carimbo de porta num adotante)"
-  else record_fail "door-role-parity: (g3)" "carimbo de porta em adotante passou calado (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  if [ "${_drpa_rc}" = "0" ] && ! grep -q 'adotante/' <<< "${_drpa_out}"; then
+    record_pass "door-role-parity: (g3) adotante standalone×standalone é COMPATÍVEL (o corte standalone; o modo porta vem de kind: door)"
+  else record_fail "door-role-parity: (g3)" "acusou o carimbo que o /meta:adopt --role standalone grava (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  _drpa standalone standalone 'kind: door'
+  if [ "${_drpa_rc}" = "1" ] && grep -q 'adotante/CARIMBO-DE-PORTA' <<< "${_drpa_out}"; then
+    record_pass "door-role-parity: (g3b) adotante com kind: door no carimbo é ACUSADO (carimbo de porta num adotante)"
+  else record_fail "door-role-parity: (g3b)" "kind: door num adotante passou calado (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  _drpa standalone adopted
+  if [ "${_drpa_rc}" = "0" ] && ! grep -q 'adotante/' <<< "${_drpa_out}"; then
+    record_pass "door-role-parity: (g3c) adotante standalone×adopted segue COMPATÍVEL (os adotantes antigos)"
+  else record_fail "door-role-parity: (g3c)" "a compatibilidade dos adotantes antigos quebrou (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
   _drpa hub hub
   if [ "${_drpa_rc}" = "0" ] && ! grep -q 'adotante/' <<< "${_drpa_out}"; then
     record_pass "door-role-parity: (g4) adotante hub×hub é compatível → SILENCIOSO"

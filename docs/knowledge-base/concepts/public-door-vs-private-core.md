@@ -94,7 +94,9 @@ identidade/contratos e federa apenas a comunicação) + `fonte≠derivação`) �
 > - **`onion-standalone`** passa a **levar** a meta-fábrica; sai dele só adoção e federação. O corte
 >   novo **entrou na F2 do plano das portas (2026-10-10)**: `roles.yaml` particiona os comandos de
 >   `meta/` em conjuntos e o `vendor-manifest.sh --list standalone` mostra o que a porta leva. Vale a
->   partir da próxima materialização dela.
+>   partir da próxima materialização dela. O que a distingue de um **adotante** com o mesmo corte é
+>   `kind: door` no carimbo: desde 2026-10-13 é esse campo, e não o `role: standalone`, que liga o modo
+>   porta no lint e na REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela).
 > - **`onion-mini`** deixa de ser destilação e passa a porta **gerada do core por allowlist** (vendoriza
 >   um recorte de `.claude/`). O caminho existe desde a F5 (2026-10-10): README, CLAUDE.md e skill onion
 >   próprios, verificação sem lint (allowlist exata, sem ponteiro morto, sem caminho de máquina), e a

@@ -49,8 +49,17 @@
 # registro com `adopted` no carimbo, e `adopted` no registro de um T3). Agora o adotante é julgado por um MAPA de pares
 # permitidos — SOFT, porque a cura pode morar no clone (carimbo) ou aqui (registro):
 #     registro hub        → carimbo hub       (a autoridade de adoção É a maquinaria do carimbo)
-#     registro standalone → carimbo adopted   (carimbo `standalone` liga o MODO PORTA no lint: medido,
-#     registro consumer   → carimbo adopted    dois adotantes medidos: 0→16 e 0→14 HARD)
+#     registro standalone → carimbo standalone (o CORTE standalone: sem adoção nem federação; desde 2026-10-13)
+#     registro standalone → carimbo adopted   (compatibilidade: os adotantes antigos, corte cheio)
+#     registro consumer   → carimbo adopted
+# ⚠️ ATÉ 2026-10-13 o par standalone→standalone era RECUSADO, com a razão "carimbo `standalone` liga o
+# MODO PORTA no lint" (medido: sge 0→16 e onion-arthur 0→14 HARD). A medição era verdadeira e a cura
+# estava no lugar errado: o defeito era o lint ler "sou porta?" no `role:`, que é o campo do CORTE. Com
+# isso o `/meta:adopt --role standalone` gravava um carimbo que esta guarda reprovava (medido na adoção
+# do bomtexto, pin bd769f168411). Desde então o MODO PORTA vem de `kind: door` (lint-artifacts.sh, logo
+# abaixo do IS_LEAF): o sge com `role: standalone` e sem `kind: door` volta a 0 HARD, e o par passa.
+# E o inverso fica cobrado: ADOTANTE cujo carimbo traz `kind: door` é INCOMPATÍVEL — o carimbo diz porta
+# e o registro diz adotante, e quem decide o modo do lint é justamente esse campo.
 # O mapa NÃO é a "terceira fonte" recusada acima: ele não diz que papel cada membro TEM, diz que
 # pares de vocabulário têm sentido juntos — é a tradução entre as duas dimensões, e muda só se o
 # vocabulário mudar.
@@ -114,7 +123,7 @@ _norm_role() { printf '%s' "$1" | sed 's/[[:space:]]*#.*$//; s/^[[:space:]]*//; 
 
 # O mapa de pares permitidos registro→carimbo do ADOTANTE (ver o cabeçalho).
 _compat_ok() {  # $1=registro $2=carimbo
-  case "$1:$2" in hub:hub|standalone:adopted|consumer:adopted) return 0 ;; *) return 1 ;; esac; }
+  case "$1:$2" in hub:hub|standalone:standalone|standalone:adopted|consumer:adopted) return 0 ;; *) return 1 ;; esac; }
 
 found=0; unreadable=0; adopter_unreadable=0; mini_pending=0
 while IFS=$'\x1f' read -r mid role path kind; do
@@ -131,8 +140,12 @@ while IFS=$'\x1f' read -r mid role path kind; do
       found=1; continue
     fi
     astamp="$(_norm_role "$(grep -m1 -E '^[[:space:]]*role:' "${path}/.claude/.onion-version" | sed 's/^[[:space:]]*role:[[:space:]]*//')")"
+    if grep -qE '^[[:space:]]*kind:[[:space:]]*["'"'"']?door' "${path}/.claude/.onion-version"; then
+      echo "REGRA 92: [adotante/CARIMBO-DE-PORTA] adotante '${mid}': o carimbo em ${path} traz \`kind: door\`, e é esse campo que liga o MODO PORTA no lint — o registro diz adotante e o carimbo diz porta. Só o materializador das portas escreve \`kind: door\`; num adotante ele é engano ou fuga, e o re-carimbo é ato da sessão DELE (\`/meta:adopt --update\`)"
+      found=1; continue
+    fi
     if ! _compat_ok "${role}" "${astamp}"; then
-      echo "REGRA 92: [adotante/PAPEL-INCOMPATIVEL] adotante '${mid}': registro \`${role}\` (tier) com carimbo \`${astamp:-<vazio>}\` (relação/corte) não é par permitido — o mapa é hub→hub e standalone|consumer→adopted. Decida qual lado está errado: promover/rebaixar o carimbo é ato da sessão DELE (\`/meta:adopt --update --role …\`); o registro se alinha aqui"
+      echo "REGRA 92: [adotante/PAPEL-INCOMPATIVEL] adotante '${mid}': registro \`${role}\` (tier) com carimbo \`${astamp:-<vazio>}\` (relação/corte) não é par permitido — o mapa é hub→hub, standalone→standalone|adopted e consumer→adopted. Decida qual lado está errado: promover/rebaixar o carimbo é ato da sessão DELE (\`/meta:adopt --update --role …\`); o registro se alinha aqui"
       found=1
     fi
     continue
@@ -190,8 +203,21 @@ while IFS=$'\x1f' read -r mid role path kind; do
 
   if [ "${stamp}" != "${role}" ]; then
     echo "REGRA 92: [porta/PAPEL-DIVERGE] porta '${mid}' DIVERGE — registro diz \`${role}\`, carimbo diz \`${stamp}\` (${path}/.claude/.onion-version). Em 2026-09-30 esta divergência fez a face pública do core perder 85 arquivos de meta-fábrica, porque o operador leu a anotação. Decida QUAL é o certo pela doutrina (public-door-vs-private-core.md) e pelo histórico de carimbos, e alinhe os dois"
-    found=1
+    found=1; continue
   fi
+
+  # (d) PORTA standalone|source SEM `kind: door` no carimbo (2026-10-13). Desde que o MODO PORTA do lint
+  #     vem do `kind:` e não do `role:`, uma porta que perdesse o campo seria julgada como ADOTADO
+  #     (standalone) ou como o CORE (source) — a primeira cala as guardas que a porta pública precisa
+  #     (o painel com a biografia do core passaria). O materializador sempre o escreve
+  #     (`write-stamp.sh --kind door`); medido em 2026-10-13, as três portas com carimbo o carregam.
+  #     Nos outros papéis (hub, mini) o modo do lint não depende do `kind:`, e a guarda não cobra.
+  case "${stamp}" in standalone|source)
+    if ! grep -qE '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)' "${path}/.claude/.onion-version"; then
+      echo "REGRA 92: [porta/SEM-KIND-DOOR] porta '${mid}' (carimbo \`role: ${stamp}\`) não traz \`kind: door\` em ${path}/.claude/.onion-version — é esse campo que liga o MODO PORTA no lint; sem ele a porta é julgada como $( [ "${stamp}" = source ] && echo 'o CORE' || echo 'um ADOTADO' ). Re-materialize a porta a partir do core (core-only), com o papel \`${role}\`"
+      found=1
+    fi ;;
+  esac
 done <<< "${doors}"
 
 # A DECLARAÇÃO do não-medido é impressa SEMPRE que houver — silêncio aqui seria fail-open.
