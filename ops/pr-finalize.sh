@@ -324,7 +324,10 @@ _snap_res
 _regen
 _restamp
 _commit "${SUBJ}"
-# 2. o painel lê produtores que o commit muda: regenera até ficar ESTÁVEL (no máximo 3 voltas)
+# 2. projeção que lê produtores que o commit muda: regenera até ficar ESTÁVEL (no máximo 3 voltas).
+#    Desde 2026-10-13 o testing-state.md não lê mais os contadores do resíduo (passo A de
+#    D_MERGE_PROCESS_ONION_2026_10: eles saem só em testing-state.sh --live); segue na lista e é regenerado
+#    aqui como qualquer projeção, só que não muda mais por PR. A volta continua valendo para as demais.
 for _i in 1 2 3; do
   _regen
   _restamp

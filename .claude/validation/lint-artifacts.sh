@@ -1482,6 +1482,13 @@ check_harness_inventory_drift() {
 # célula sem comando não é impressa · métrica sem produtor imprime ⊘ NÃO MEDIDO · zero produtor
 # vivo derruba o gerador · o painel não imprime "hoje" (artefato catracado com data de hoje
 # produz uma HARD por dia, e guarda que grita sem motivo ensina a ser ignorada).
+#
+# DESDE 2026-10-13 (passo A de D_MERGE_PROCESS_ONION_2026_10): o versionado é a saída de `--markdown`,
+# em que os contadores que todo PR muda (resíduos da REGRA 56, asserções, famílias, regras) saem como
+# `↻ ao vivo` — o número é calculado na hora por `testing-state.sh --live`, nunca commitado. A garantia
+# desta regra NÃO afrouxa: o byte-a-byte segue contra `--markdown`, então gravar a saída de `--live` no
+# arquivo, ou digitar um número numa célula `↻`, reprova igual. O que mudou é que o painel deixou de ser
+# alterado por PR (medido: entrava em 59 de 60 PRs) e dois PRs paralelos não colidem mais nele.
 # ===========================================================================
 check_testing_state_drift() {
   # REGRA DE REPO, NÃO DE ARQUIVO (mesma razão da REGRA 80) — e aqui pesa mais: o painel chama
@@ -1500,7 +1507,10 @@ check_testing_state_drift() {
   local tmp; tmp="$(mktemp)"
   if _gen_into "${tmp}" "${tracked}" "docs/onion/testing-state.md" -- bash "${gen}" --markdown &&
      ! diff -q "${tracked}" "${tmp}" >/dev/null 2>&1; then
-    violation "HARD" "${tracked}" "painel de estado desatualizado vs os produtores — regenere com 'bash .claude/validation/testing-state.sh --markdown > docs/onion/testing-state.md'. O painel anterior deste repo publicava 'Coverage: 85%' sem produtor nenhum; a catraca existe para que um número digitado à mão não sobreviva a um lint."
+    local _why="painel de estado desatualizado vs os produtores"
+    # diagnóstico nomeado do erro provável desde o modo --live: o número vivo foi versionado
+    grep -q 'SAÍDA AO VIVO' "${tracked}" 2>/dev/null && _why="o painel versionado é a saída de --live (números vivos não moram no git)"
+    violation "HARD" "${tracked}" "${_why} — regenere com 'bash .claude/validation/testing-state.sh --markdown > docs/onion/testing-state.md'. O painel anterior deste repo publicava 'Coverage: 85%' sem produtor nenhum; a catraca existe para que um número digitado à mão não sobreviva a um lint."
   fi
   rm -f "${tmp}"
 }

@@ -19926,7 +19926,10 @@ run_testing_state_selftests() {
   ( cd "${sb81}" && git init -q && git add -A >/dev/null 2>&1 ) 2>/dev/null
   # painel gerado e DEPOIS adulterado à mão — o cenário exato que a REGRA 81 existe para pegar
   bash "${SCRIPT_DIR}/testing-state.sh" --markdown > "${sb81}/docs/onion/testing-state.md" 2>/dev/null || true
-  printf 'LINHA INJETADA A MAO\n' >> "${sb81}/docs/onion/testing-state.md"
+  # a adulteração é a de verdade desde 2026-10-13: um NÚMERO digitado numa célula `↻ ao vivo` (o
+  # versionado não carrega mais contadores, então "pôr o número de volta à mão" é o ataque que sobrou)
+  sed -i '0,/↻ ao vivo/s//510/' "${sb81}/docs/onion/testing-state.md"
+  grep -q '| \*\*510\*\* |' "${sb81}/docs/onion/testing-state.md" || printf 'LINHA INJETADA A MAO\n' >> "${sb81}/docs/onion/testing-state.md"
   ( cd "${sb81}" && git add -A >/dev/null 2>&1 ) 2>/dev/null
   out81="$( cd "${sb81}" && bash .claude/validation/lint-artifacts.sh 2>&1 )" || true
   hit81_orig="$(grep -c 'REGRA 81' <<< "${out81}" || true)"
@@ -19935,6 +19938,11 @@ run_testing_state_selftests() {
   if [ "${n81}" -ge 2 ] && [ "${hit81_orig}" -ge 1 ] && [ "${hit81_mut}" -eq 0 ]; then
     record_pass "testing-state: (g) a REGRA 81 é ALCANÇADA no lint completo sem stamp, e some no mutante — guarda load-bearing, não inalcançável"
   else record_fail "testing-state: (g) alcance da REGRA 81" "sítios mutados=${n81} (esperava >=2); original acusou=${hit81_orig} (esperava >=1); mutante acusou=${hit81_mut} (esperava 0). Se orig=0, a regra voltou a ser inalcançável pelo caminho de teste — que foi o defeito achado no PR."; fi
+  # insumo do caso (i): o mesmo sandbox com a saída de --live VERSIONADA no lugar do painel
+  local out81_live
+  bash "${SCRIPT_DIR}/testing-state.sh" --live > "${sb81}/docs/onion/testing-state.md" 2>/dev/null || true
+  ( cd "${sb81}" && git add -A >/dev/null 2>&1 ) 2>/dev/null
+  out81_live="$( cd "${sb81}" && bash .claude/validation/lint-artifacts.sh 2>&1 )" || true
   rm -rf "${mut81}" "${sb81}"
 
   # (f) O PAINEL DECLARA O QUE NÃO MEDE. Sem esta seção, a ausência de uma linha sobre cobertura
@@ -19944,6 +19952,41 @@ run_testing_state_selftests() {
   if grep -q 'NÃO mede' <<< "${out}" && grep -q 'Cobertura de código' <<< "${out}"; then
     record_pass "testing-state: (f) o painel declara o que NÃO mede (ausência nomeada, não silenciosa)"
   else record_fail "testing-state: (f) fronteiras" "sem a seção de não-medidos, a ausência vira 'sem problema'"; fi
+
+  # (h) ⭐ O PAINEL VERSIONADO NÃO MUDA QUANDO OS CONTADORES MUDAM (passo A de
+  #     D_MERGE_PROCESS_ONION_2026_10, 2026-10-13). Medido antes da cura: o painel entrava em 59 de 60
+  #     PRs, porque todo PR acrescenta um resíduo da REGRA 56 e o painel somava os resíduos — dois PRs
+  #     paralelos colidiam nele. Este caso troca os produtores por stubs com contadores DIFERENTES
+  #     (o que um PR faz ao acrescentar resíduo/asserção) e exige as duas polaridades:
+  #       · `--markdown` (o versionado) sai byte-idêntico nos dois estados;
+  #       · `--live` (o número na hora) MUDA — prova que o número existe e que o stub foi lido, para
+  #         que a invariância não seja vacuidade (painel que não muda porque não lê nada).
+  local sbh oh1 oh2 lh1 lh2 _p _v
+  sbh="$(mktemp -d)"; mkdir -p "${sbh}/.claude/validation" "${sbh}/docs/onion/metrics"
+  cp "${sut}" "${sbh}/.claude/validation/testing-state.sh"
+  [ -s "${REPO_ROOT}/docs/onion/metrics/selftest-runs.jsonl" ] && cp "${REPO_ROOT}/docs/onion/metrics/selftest-runs.jsonl" "${sbh}/docs/onion/metrics/"
+  { printf '#!/usr/bin/env bash\n'
+    for _v in FAMILIES ASSERT_SITES RULES_TOTAL RULES_HARD CONSUMED_PAIRS CONSUMED_UNTESTED BASELINES; do
+      printf 'echo HARNESS_%s=${STUB_N}\n' "${_v}"; done; } > "${sbh}/.claude/validation/harness-inventory.sh"
+  { printf '#!/usr/bin/env bash\n'
+    for _v in RESIDUOS ACHADOS ACHADOS_REAIS PRECISAO_PCT TOKENS_POR_ACHADO_REAL VOCAB_OK VOCAB_LEGADO COM_TOKENS; do
+      printf 'echo R56_%s=${STUB_N}\n' "${_v}"; done; } > "${sbh}/.claude/validation/review-ledger.sh"
+  _p="${sbh}/.claude/validation/testing-state.sh"
+  oh1="$(STUB_N=510 bash "${_p}" --markdown 2>&1)"; oh2="$(STUB_N=511 bash "${_p}" --markdown 2>&1)"
+  lh1="$(STUB_N=510 bash "${_p}" --live 2>&1)";     lh2="$(STUB_N=511 bash "${_p}" --live 2>&1)"
+  if [ "${oh1}" = "${oh2}" ] && [ "$(grep -c '↻ ao vivo\*\*' <<< "${oh1}" || true)" -eq 14 ] \
+     && [ "${lh1}" != "${lh2}" ] && grep -q '\*\*511\*\*' <<< "${lh2}" && ! grep -q '\*\*51[01]\*\*' <<< "${oh1}"; then
+    record_pass "testing-state: (h) o versionado é INVARIANTE aos contadores que todo PR muda (14 células ↻) e o --live os mostra — dois PRs paralelos não colidem mais no painel"
+  else record_fail "testing-state: (h) painel-ímã" "versionado igual=$([ "${oh1}" = "${oh2}" ] && echo sim || echo NÃO) · células ↻=$(grep -c '↻ ao vivo\*\*' <<< "${oh1}" || true) (esperava 14) · live mudou=$([ "${lh1}" != "${lh2}" ] && echo sim || echo NÃO). Se o versionado mudou, o painel voltou a ser o arquivo-ímã."; fi
+
+  # (i) a saída de --live NÃO serve como versionado, e a REGRA 81 diz por quê — por COMPORTAMENTO: o
+  #     lint completo do sandbox do caso (g), com o --live gravado no arquivo, reprova pela REGRA 81
+  #     nomeando o motivo. E o marcador que o diagnóstico lê existe no --live e não no --markdown.
+  if grep -q 'SAÍDA AO VIVO' <<< "${lh1}" && ! grep -q 'SAÍDA AO VIVO' <<< "${oh1}" \
+     && grep 'REGRA 81' <<< "${out81_live}" | grep -q 'saída de --live'; then
+    record_pass "testing-state: (i) versionar a saída de --live reprova na REGRA 81 com o motivo nomeado (o número vivo não mora no git)"
+  else record_fail "testing-state: (i) --live versionado" "esperava a REGRA 81 acusando 'saída de --live' no lint completo; veio: $(grep 'REGRA 81' <<< "${out81_live}" | head -c 240)"; fi
+  rm -rf "${sbh}"
 }
 
 # ── ci_evidence — o SUMÁRIO do CI (ONDA 0.4) ─────────────────────────────────────────────────
