@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**479 itens abertos** em 101 grafo(s) com aberto (de 130 no escopo) · 102 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**478 itens abertos** em 101 grafo(s) com aberto (de 130 no escopo) · 102 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -766,13 +766,12 @@
 |--:|---|---|---|
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
 
-## maestro — 5 item(ns)
+## maestro — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
-| 5.1 | `Q_CARIMBO_DO_ADOTADO_STANDALONE` | door-role-parity-2026-09 | o adotado standalone ganha o canal, mas o lint e a REGRA 92 ainda leem role standalone sem kind door como PORTA. Que carimbo ele d |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
 
