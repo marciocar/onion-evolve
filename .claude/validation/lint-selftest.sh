@@ -31009,21 +31009,24 @@ _family run_mcp_onion_kg_selftests
 # Modo mcp-onion-kg-writer — o write(KG) do chat da casa (decisão do maestro de 2026-10-12, por pergunta com opções:
 # qualquer usuário logado escreve, SÓ na própria área; grafo que reprova na maquinaria é RECUSADO e nada é gravado).
 # O harness (ops/mcp-onion-kg-writer/selftest.py) sobe o servidor de VERDADE em 127.0.0.1 numa porta efêmera, com a
-# raiz de dados em mktemp DENTRO de um repo git pai e o gate = a maquinaria real deste repo (kg-radar.sh --integrity
-# --schema + vendor/kg-ssot/tools/kg_validate.py). Casos: (a) o harness passa inteiro, com a CONTAGEM travada (caso
-# apagado = falha, não verde menor) · (m) UM MUTANTE POR CASO, plantado por ops/mutate-and-restore.sh numa CÓPIA do
-# servidor em mktemp (o arquivo vivo nunca é mutado; o marcador fica em arquivo não rastreado), e o caso NOMEADO tem
-# de reprovar. TETOS DECLARADOS (mutante sobrevive por defesa DUPLA, por isso fora da lista): o confinamento por
-# realpath do graph_paths e o O_NOFOLLOW do kg_my_get (o lstat que recusa symlink segura cada caso sozinho); o
-# --git-dir explícito e o GIT_CEILING_DIRECTORIES do git da área (cada um sozinho impede o commit de subir ao repo
-# pai); a recusa de âncora e a de alias do loader (a âncora sempre precede o alias); o corte do caminho temporário
-# na saída do gate (o gate recebe o nome relativo, então o caminho não aparece nem sem o corte); e o REPROVADO forçado
-# quando o safe_load não confere o meta.id (medido: tag `!x` reprova também no contrato, parse.yaml-error).
-# DESDE 2026-10-13 (kg-ssot-v4.5.0) o contrato fala JSON pelo stdin (`--format json -`, kg-ssot.verdict/1): um code
-# root FALSO no selftest prova o fail-closed do relatório (rc 2, JSON malformado, fora do schema, versão desconhecida,
-# rc incoerente, ponta externa não conferida = NÃO JULGADO) e a decisão por `code`, nunca por `message`; cada camada
-# é afirmada pelo MOTIVO nomeado, para o mutante de uma não ser segurado pela seguinte. TETO DECLARADO: stdin × arquivo
-# não é distinguível por caso (o radar ainda grava a cópia temporária e o contrato daria o mesmo veredito lendo-a).
+# raiz de dados em mktemp DENTRO de um repo git pai e o gate = a maquinaria real deste repo: o kg-radar.sh --integrity
+# --schema e, DESDE 2026-10-13 (kg-ssot-v4.7.0), o ARMAZÉM do produto (vendor/kg-ssot/tools/kg_store.py, GitStore por
+# área), que grava, lê, lista e remove julgando o contrato com a ponta externa conferida contra a própria área.
+# Casos: (a) o harness passa inteiro, com a CONTAGEM travada (caso apagado = falha, não verde menor) · (m) UM MUTANTE
+# POR CASO, plantado por ops/mutate-and-restore.sh numa CÓPIA do servidor em mktemp (o arquivo vivo nunca é mutado; o
+# marcador fica em arquivo não rastreado), rodando o harness com --until <caso> (para depois do caso nomeado, que tem
+# de reprovar). Cobrem: o armazém só enxerga o RASTREADO; StoreError vira recusa nomeada; texto igual ao HEAD é
+# unchanged sem commit; not_judged nunca vira gravado; a aresta externa entre grafos da MESMA área é julgada (aceita
+# com a ponta conferida, recusada para fora da área, e o apontado não perde o nó nem é removido); kg_delete; a trava
+# otimista expected_sha256; a migração de área no layout de antes sem reescrever histórico; e a guarda de aninhamento
+# por classe (30.000 `[`, `- - -`, `? ?`, indentação crescente, as 4 quebras de linha do YAML que não são \n, tab no
+# começo, bomba de alias pelo compositor e pelo stream), cada uma com o processo do servidor vivo depois.
+# TETOS DECLARADOS (mutante sobrevive por defesa DUPLA, por isso fora da lista): o --git-dir explícito e o
+# GIT_CEILING_DIRECTORIES do git da área (cada um sozinho impede o commit de subir ao repo pai); o O_NOFOLLOW do
+# armazém nos symlinks DENTRO da área (o lstat do writer só cobre a área em si); a recusa de âncora e a de alias do
+# compositor (a âncora sempre precede o alias); a reconferência do verdict.schema.json pelo writer (o _verdict_ok do
+# armazém já recusa o fora-do-schema como not_judged); e o REPROVADO forçado quando o safe_load não confere o meta.id.
+# O contrato-stub-aprova é o controle de polaridade do code root falso e não leva mutante.
 run_mcp_onion_kg_writer_selftests() {
   local h="${REPO_ROOT}/ops/mcp-onion-kg-writer/selftest.py" srv="${REPO_ROOT}/ops/mcp-onion-kg-writer/server.py"
   local helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
@@ -31032,60 +31035,106 @@ run_mcp_onion_kg_writer_selftests() {
   fi
   command -v python3 >/dev/null 2>&1 && python3 -I -c 'import yaml, jsonschema' >/dev/null 2>&1 \
     || { record_skip "mcp-onion-kg-writer: python3/PyYAML/jsonschema ausentes (gate do contrato não exercido)"; return; }
-  local want_total=39 o rc
+  local want_total=62 o rc
   if o="$(LC_ALL=C python3 -I -B "${h}" --code-root "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} " <<< "${o}" && ! grep -q '^FAIL ' <<< "${o}"; then
-    record_pass "mcp-onion-kg-writer: (a) servidor real por HTTP — ${want_total} casos (401, e-mail, área, gate, symlink, teto, veredito JSON do contrato)"
+    record_pass "mcp-onion-kg-writer: (a) servidor real por HTTP — ${want_total} casos (401, e-mail, área, GitStore, aresta externa, delete, aninhamento, veredito)"
   else record_fail "mcp-onion-kg-writer: (a) harness" "rc=${rc}: $(grep -E '^(FAIL|TOTAL)' <<< "${o}" | head -4 | tr '\n' '|') ${o:0:200}"; fi
   [ -f "${helper}" ] || { record_fail "mcp-onion-kg-writer: (m)" "ops/mutate-and-restore.sh ausente: mutante não exercido"; return; }
-  local sb cp old new want mo mrc n
-  sb="$(TMPDIR=/tmp mktemp -d)"; cp="${sb}/server.py"
+  # Os mutantes rodam em PARALELO (ONION_KG_WRITER_MUTANT_JOBS, default 4): cada um tem a própria cópia do servidor,
+  # a própria porta efêmera e o próprio mktemp, e o servidor passa a maior parte do tempo esperando o radar (subprocesso).
+  # Serial, 58 mutantes levaram 788 s na VPS compartilhada (medido em 2026-10-13). O veredito sai DEPOIS do `wait`,
+  # na ordem da lista; mutante sem arquivo de rc (morto no meio) conta como FALHA, nunca como verde.
+  local sb old new want mo mrc n i=0 d jobs_max="${ONION_KG_WRITER_MUTANT_JOBS:-4}"
+  sb="$(TMPDIR=/tmp mktemp -d)"
   while IFS=$'\x1f' read -r old new want; do
     [ -n "${old}" ] || continue
-    cat "${srv}" > "${cp}"
-    n="$(grep -cF -- "${old}" "${cp}" || true)"
-    if [ "${n}" != "1" ]; then record_fail "mcp-onion-kg-writer: (m) âncora do mutante ocorre ${n}x (precisa 1)" "${want}"; continue; fi
-    if mo="$(LC_ALL=C bash "${helper}" "${cp}" "${old}|||${new}" python3 -I -B "${h}" --server "${cp}" --code-root "${REPO_ROOT}" 2>&1)"; then mrc=0; else mrc=$?; fi
-    if grep -q 'não consegui plantar\|RECUSADO' <<< "${mo}"; then record_fail "mcp-onion-kg-writer: (m) mutante não aplicou" "${want}"; continue; fi
-    if [ "${mrc}" -ne 0 ] && grep -q "^FAIL ${want} " <<< "${mo}"; then record_pass "mcp-onion-kg-writer: (m) mutante morde → FAIL ${want}"
-    else record_fail "mcp-onion-kg-writer: (m) mutante NÃO morde" "${want} (rc=${mrc}) $(grep -E '^(FAIL|TOTAL)' <<< "${mo}" | head -3 | tr '\n' '|')"; fi
+    i=$((i + 1)); d="${sb}/m${i}"; mkdir "${d}"
+    printf '%s' "${want}" > "${d}/want"
+    cat "${srv}" > "${d}/server.py"
+    n="$(grep -cF -- "${old}" "${d}/server.py" || true)"
+    if [ "${n}" != "1" ]; then printf '%s' "${n}" > "${d}/ancora"; continue; fi
+    (
+      if mo="$(LC_ALL=C bash "${helper}" "${d}/server.py" "${old}|||${new}" python3 -I -B "${h}" --server "${d}/server.py" --code-root "${REPO_ROOT}" --until "${want}" 2>&1)"; then mrc=0; else mrc=$?; fi
+      printf '%s' "${mo}" > "${d}/out"; printf '%s' "${mrc}" > "${d}/rc"
+    ) &
+    while [ "$(jobs -rp | wc -l)" -ge "${jobs_max}" ]; do wait -n || true; done
   done <<EOF_MUT
     if not TOKEN:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')token-fail-closed
         return bool(TOKEN) and hmac.compare_digest(self.headers.get('X-Api-Key', '').encode(), TOKEN.encode())$(printf '\x1f')        return True  # ONION_MUTANTE$(printf '\x1f')sem-token-401
     email = normalize_email(email_raw)$(printf '\x1f')    email = (email_raw or 'anon@x.invalid').strip().lower()  # ONION_MUTANTE$(printf '\x1f')sem-email-recusa
     if len(e) > 254 or not EMAIL_RE.match(e):$(printf '\x1f')    if len(e) > 254:  # ONION_MUTANTE$(printf '\x1f')email-invalido-recusa
     return f'{local}-{hashlib.sha256(email.encode()).hexdigest()[:16]}'$(printf '\x1f')    return 'shared'  # ONION_MUTANTE$(printf '\x1f')isolamento-a-b
+    return f'{local}-{hashlib.sha256(email.encode()).hexdigest()[:16]}'$(printf '\x1f')    return 'shared'  # ONION_MUTANTE$(printf '\x1f')delete-inexistente-e-de-outro-recusa
     if not isinstance(slug, str) or not slug or len(slug) > SLUG_MAX or not SLUG_RE.match(slug):$(printf '\x1f')    if not isinstance(slug, str) or not slug:  # ONION_MUTANTE$(printf '\x1f')slug-invalido-recusa
     if perr is None and mid != slug:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')meta-id-diferente-recusa
-        radar_ok = res['radar']['passou']$(printf '\x1f')        radar_ok = True  # ONION_MUTANTE$(printf '\x1f')radar-reprova-nada-gravado
-        contrato_ok = res['contrato']['passou']$(printf '\x1f')        contrato_ok = True  # ONION_MUTANTE$(printf '\x1f')contrato-reprova-nada-gravado
-    if v['veredito'] != 'APROVADO':$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')reprovado-nao-cria-area
-    _, v = judge(slug, yml)$(printf '\x1f')    v = t_kg_write(email, {'slug': slug, 'yaml': yml})  # ONION_MUTANTE$(printf '\x1f')validate-nao-grava
+    elif radar['passou'] and contrato['passou']:$(printf '\x1f')    elif contrato['passou']:  # ONION_MUTANTE$(printf '\x1f')radar-reprova-nada-gravado
+    elif radar['passou'] and contrato['passou']:$(printf '\x1f')    elif radar['passou']:  # ONION_MUTANTE$(printf '\x1f')contrato-reprova-nada-gravado
+        adir, _, exists = area_dir(email)$(printf '\x1f')        adir, _, exists = area_dir(email, create=True)  # ONION_MUTANTE$(printf '\x1f')reprovado-nao-cria-area
+    _, v, _ = judge(email, slug, yml)$(printf '\x1f')    v = t_kg_write(email, {'slug': slug, 'yaml': yml})  # ONION_MUTANTE$(printf '\x1f')validate-nao-grava
     if stat.S_ISLNK(st.st_mode):$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')symlink-plantado-recusa
     if len(data) > MAX_YAML:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')yaml-acima-do-teto-recusa
         doc = yaml.load(text, Loader=_NoAliasLoader)  # noqa: S506 — SafeLoader derivado, sem tags python$(printf '\x1f')        doc = yaml.safe_load(text)  # ONION_MUTANTE$(printf '\x1f')alias-recusado
-            author = f"{email.split('@', 1)[0]} <{email}>"$(printf '\x1f')            author = 'x <x@x.invalid>'  # ONION_MUTANTE$(printf '\x1f')write-valido-grava-e-commita
-        mudou = bool(st)$(printf '\x1f')        mudou = True  # ONION_MUTANTE$(printf '\x1f')reescrita-identica-sem-commit-novo
-            if len(existing) >= MAX_GRAPHS:$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')area-cheia-recusa
-                    rc, out, err = 124, '', f'timeout do gate ({GATE_TIMEOUT}s)'$(printf '\x1f')                    rc, out, err = 0, '', ''  # ONION_MUTANTE$(printf '\x1f')gate-timeout-reprova
+        doc = yaml.load(text, Loader=_NoAliasLoader)  # noqa: S506 — SafeLoader derivado, sem tags python$(printf '\x1f')        doc = yaml.safe_load(text)  # ONION_MUTANTE$(printf '\x1f')bomba-de-alias-recusada
+                if isinstance(ev, yaml.AliasEvent) or getattr(ev, 'anchor', None):$(printf '\x1f')                if False:  # ONION_MUTANTE$(printf '\x1f')bomba-de-alias-recusada-no-stream
+    return f"{email.split('@', 1)[0]} <{email}>"$(printf '\x1f')    return 'x <x@x.invalid>'  # ONION_MUTANTE$(printf '\x1f')write-valido-grava-e-commita
+        out.update({'unchanged': res.get('unchanged') is True, 'commit': res.get('ref'), 'area_commit': _head(adir),$(printf '\x1f')        out.update({'unchanged': False, 'commit': _head(adir), 'area_commit': _head(adir),  # ONION_MUTANTE$(printf '\x1f')reescrita-identica-unchanged
+        if name not in names and len(names) >= MAX_GRAPHS:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')area-cheia-recusa
+                rc, out, err = 124, '', f'timeout do gate ({GATE_TIMEOUT}s)'$(printf '\x1f')                rc, out, err = 0, '', ''  # ONION_MUTANTE$(printf '\x1f')gate-timeout-reprova
             raise SystemExit(f'recuso subir: {what} ausente em {CODE_SOURCE} — sem gate nao gravo nada')$(printf '\x1f')            pass  # ONION_MUTANTE$(printf '\x1f')code-root-sem-gate-recusa-boot
+    for p, what in ((RADAR, 'radar'), (STORE_LIB, 'armazem kg_store.py'),$(printf '\x1f')    for p, what in ((RADAR, 'radar'),  # ONION_MUTANTE$(printf '\x1f')armazem-ausente-recusa-boot
         raise SystemExit('recuso subir: ONION_KG_WRITER_ROOT inexistente ou symlink — crie o diretorio antes')$(printf '\x1f')        pass  # ONION_MUTANTE$(printf '\x1f')data-root-ausente-recusa-boot
     return {'untrusted_data': True, 'aviso': UNTRUSTED_NOTICE, 'tool': nome, 'usuario': email,$(printf '\x1f')    return {'tool': nome, 'usuario': email,  # ONION_MUTANTE$(printf '\x1f')envelope-nao-confiavel
             'served_commit': code_commit(), 'code_source': CODE_SOURCE, 'data': data}$(printf '\x1f')            'served_commit': None, 'code_source': CODE_SOURCE, 'data': data}  # ONION_MUTANTE$(printf '\x1f')served-commit-do-gate
             if n < 0 or n > MAX_BODY:$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')content-length-negativo-400
         '      method: "leitura: secao 2 do documento"\n'$(printf '\x1f')        '      x_m: "leitura"\n'  # ONION_MUTANTE$(printf '\x1f')schema-help-exemplo-aprova
-    'kg_my_get': (t_kg_my_get, 'Le um grafo da SUA area pelo slug', {'slug': _SLUG}, ['slug'], True),$(printf '\x1f')    # ONION_MUTANTE$(printf '\x1f')tools-list-5
-    if rc not in (0, 1):$(printf '\x1f')    if rc not in (0, 1, 2):  # ONION_MUTANTE$(printf '\x1f')contrato-rc2-recusa
-        return _nao_julgado(rc, f'relatorio do contrato nao e JSON ({str(e)[:120]})')$(printf '\x1f')        rep = {}  # ONION_MUTANTE$(printf '\x1f')contrato-json-malformado-recusa
-        jsonschema.Draft202012Validator(schema).validate(rep)$(printf '\x1f')        pass  # ONION_MUTANTE$(printf '\x1f')contrato-fora-do-schema-recusa
-    if rep.get('schema_version') != VERDICT_VERSION:  # o schema carregado pode ter mudado com o vendor$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')contrato-versao-desconhecida-recusa
-    if (r['verdict'] == 'PASS') != (not must) or (r['verdict'] == 'PASS') != (rc == 0):$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')contrato-incoerente-recusa
-    if not r['external_checked']:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')contrato-externo-nao-conferido-recusa
-    passou = r['verdict'] == 'PASS' and rc == 0 and not any(o['level'] == 'MUST' for o in occs)$(printf '\x1f')    passou = all(o['message'].startswith('PASS') for o in occs)  # ONION_MUTANTE$(printf '\x1f')contrato-decide-por-code
+    'kg_my_get': (t_kg_my_get, 'Le um grafo da SUA area pelo slug (com o sha256 para o expected_sha256)', {'slug': _SLUG}, ['slug'], True, False),$(printf '\x1f')    # ONION_MUTANTE$(printf '\x1f')tools-list-6
+    if doc.get('schema_version') != VERDICT_VERSION:  # o schema carregado pode ter mudado com o vendor$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')contrato-versao-desconhecida-recusa
+        if (r['verdict'] == 'PASS') != (not r['summary']['MUST']):$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')contrato-incoerente-recusa
+        if not r['external_checked']:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')contrato-externo-nao-conferido-recusa
+    passou = all(r['verdict'] == 'PASS' for r in results) and not any(o['level'] == 'MUST' for r in results for o in r['occurrences'])$(printf '\x1f')    passou = all(o['message'].startswith('PASS') for r in results for o in r['occurrences'])  # ONION_MUTANTE$(printf '\x1f')contrato-decide-por-code
         if k in idx:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')contrato-duplicata-fundida
-            'ocorrencias': _dedup([o for o in occs if o['level'] == 'MUST']),$(printf '\x1f')            'ocorrencias': [],  # ONION_MUTANTE$(printf '\x1f')contrato-reprova-nada-gravado
-            'codigos_must': sorted(must), 'release': rep['contract'].get('release'),$(printf '\x1f')            'codigos_must': None, 'release': rep['contract'].get('release'),  # ONION_MUTANTE$(printf '\x1f')contrato-pass-estruturado
+                    'ocorrencias': _dedup([o for o in r['occurrences'] if o['level'] == 'MUST']),$(printf '\x1f')                    'ocorrencias': [],  # ONION_MUTANTE$(printf '\x1f')contrato-reprova-nada-gravado
+        out.update({'veredito_contrato': r['verdict'], 'codigos_must': sorted(r['summary']['MUST']),$(printf '\x1f')        out.update({'veredito_contrato': r['verdict'], 'codigos_must': None,  # ONION_MUTANTE$(printf '\x1f')contrato-pass-estruturado
+        return _nao_julgado(f'o armazem nao julgou: {scrub(err or "sem veredito")}')$(printf '\x1f')        return {'julgado': True, 'passou': True, 'dependentes': [], 'ocorrencias': [], 'avisos_should': []}  # ONION_MUTANTE$(printf '\x1f')armazem-nao-julga-recusa
+        for n in _store_call(store.list):  # só o RASTREADO: o que o armazém e o gate enxergam$(printf '\x1f')        for n in sorted(f'{x}/{x}.kg.yaml' for x in os.listdir(adir) if not x.startswith('.')):  # ONION_MUTANTE$(printf '\x1f')store-so-rastreado
+    except kg_store.StoreError as e:$(printf '\x1f')    except ZeroDivisionError as e:  # ONION_MUTANTE$(printf '\x1f')store-error-recusa-nomeada
+    gravado = res.get('written') is True and reason is None$(printf '\x1f')    gravado = reason in (None, 'not_judged')  # ONION_MUTANTE$(printf '\x1f')armazem-not-judged-na-gravacao
+        doc, err = _store_call(store._judge, name, text)$(printf '\x1f')        doc, err = kg_validate.judge([(name, text)]), None  # ONION_MUTANTE$(printf '\x1f')externa-na-area-aprova
+        doc, err = _store_call(store._judge, name, text)$(printf '\x1f')        doc, err = kg_validate.judge([(name, text)]), None  # ONION_MUTANTE$(printf '\x1f')externa-no-inexistente-reprova
+        doc, err = _store_call(store._judge, name, text)$(printf '\x1f')        doc, err = kg_validate.judge([(name, text)]), None  # ONION_MUTANTE$(printf '\x1f')externa-fora-da-area-reprova
+    out = {'julgado': True, 'passou': passou, 'release': doc['contract'].get('release'), 'dependentes': deps}$(printf '\x1f')    out = {'julgado': True, 'passou': passou, 'release': doc['contract'].get('release'), 'dependentes': []}  # ONION_MUTANTE$(printf '\x1f')dependente-rejulgado-na-regravacao
+        removido = res.get('written') is True and reason is None$(printf '\x1f')        removido = reason != 'missing'  # ONION_MUTANTE$(printf '\x1f')delete-bloqueado-por-dependente
+        res = _store_call(store.delete, name, message=f'kg_delete: {slug}', author=_author(email),$(printf '\x1f')        res = _store_call(store.delete, name, message=f'kg_delete: {slug}', author=None,  # ONION_MUTANTE$(printf '\x1f')delete-remove-com-commit
+        if reason == 'missing':$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')delete-inexistente-e-de-outro-recusa
+                          author=_author(email), expected_sha256=expected)$(printf '\x1f')                          author=_author(email), expected_sha256=None)  # ONION_MUTANTE$(printf '\x1f')conflito-expected-sha256
+    return _store_call(kg_store.GitStore, adir, init=True, committer=COMMITTER)$(printf '\x1f')    shutil.rmtree(os.path.join(adir, '.git'), ignore_errors=True); return _store_call(kg_store.GitStore, adir, init=True, committer=COMMITTER)  # ONION_MUTANTE$(printf '\x1f')migracao-area-antiga
+    if text.count('[') + text.count('{') > _HINT:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')profundidade-colchete
+_STACKED = re.compile(r'(?m)^[ \t]*(?:[-?][ \t]+){2,}')$(printf '\x1f')_STACKED = re.compile(r'(?m)^[ \t]*(?:[?][ \t]+){2,}')  # ONION_MUTANTE$(printf '\x1f')profundidade-bloco-traco
+_STACKED = re.compile(r'(?m)^[ \t]*(?:[-?][ \t]+){2,}')$(printf '\x1f')_STACKED = re.compile(r'(?m)^[ \t]*(?:[-][ \t]+){2,}')  # ONION_MUTANTE$(printf '\x1f')profundidade-bloco-interrogacao
+_DEEP_INDENT = re.compile(r'(?m)^[ \t]{%d,}' % _HINT)$(printf '\x1f')_DEEP_INDENT = re.compile(r'(?m)^[ \t]{%d,}' % 100000)  # ONION_MUTANTE$(printf '\x1f')profundidade-indentacao
+_YAML_BREAKS = re.compile('\r\n?|[\x85  ]')$(printf '\x1f')_YAML_BREAKS = re.compile('\n|[\x85  ]')  # ONION_MUTANTE$(printf '\x1f')profundidade-quebra-cr
+_YAML_BREAKS = re.compile('\r\n?|[\x85  ]')$(printf '\x1f')_YAML_BREAKS = re.compile('\r\n?|[  ]')  # ONION_MUTANTE$(printf '\x1f')profundidade-quebra-nel
+_YAML_BREAKS = re.compile('\r\n?|[\x85  ]')$(printf '\x1f')_YAML_BREAKS = re.compile('\r\n?|[\x85 ]')  # ONION_MUTANTE$(printf '\x1f')profundidade-quebra-ls
+_YAML_BREAKS = re.compile('\r\n?|[\x85  ]')$(printf '\x1f')_YAML_BREAKS = re.compile('\r\n?|[\x85 ]')  # ONION_MUTANTE$(printf '\x1f')profundidade-quebra-ps
+    return ([fast] if fast is not None else []) + [yaml.SafeLoader]$(printf '\x1f')    return [yaml.SafeLoader]  # ONION_MUTANTE$(printf '\x1f')profundidade-tab-inicial
+                    if depth > MAX_DEPTH:$(printf '\x1f')                    if depth > 2:  # ONION_MUTANTE$(printf '\x1f')colchete-em-escalar-aprova
+        raise Refused(f'armazem recusou (nada gravado): {scrub(e)[:300]}') from None$(printf '\x1f')        raise Refused(f'armazem recusou (nada gravado): {str(e)[:300]}') from None  # ONION_MUTANTE$(printf '\x1f')store-error-recusa-nomeada
+    except (yaml.YAMLError, ValueError) as e:  # ValueError: inteiro além do int_max_str_digits do Python$(printf '\x1f')    except yaml.YAMLError as e:  # ONION_MUTANTE$(printf '\x1f')inteiro-gigante-nao-derruba
+    if raw == 'new' and not allow_new:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')delete-inexistente-e-de-outro-recusa
 EOF_MUT
+  wait || true
+  local j
+  for ((j = 1; j <= i; j++)); do
+    d="${sb}/m${j}"
+    want="$(cat "${d}/want")"
+    if [ -f "${d}/ancora" ]; then record_fail "mcp-onion-kg-writer: (m) âncora do mutante ocorre $(cat "${d}/ancora")x (precisa 1)" "${want}"; continue; fi
+    if [ ! -f "${d}/rc" ]; then record_fail "mcp-onion-kg-writer: (m) mutante sem resultado (processo morto?)" "${want}"; continue; fi
+    mo="$(cat "${d}/out")"; mrc="$(cat "${d}/rc")"
+    if grep -q 'não consegui plantar\|RECUSADO' <<< "${mo}"; then record_fail "mcp-onion-kg-writer: (m) mutante não aplicou" "${want}"; continue; fi
+    if [ "${mrc}" -ne 0 ] && grep -q "^FAIL ${want} " <<< "${mo}"; then record_pass "mcp-onion-kg-writer: (m) mutante morde → FAIL ${want}"
+    else record_fail "mcp-onion-kg-writer: (m) mutante NÃO morde" "${want} (rc=${mrc}) $(grep -E '^(FAIL|TOTAL)' <<< "${mo}" | head -3 | tr '\n' '|')"; fi
+  done
   rm -rf "${sb}"
 }
 _family run_mcp_onion_kg_writer_selftests
