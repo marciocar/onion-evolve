@@ -363,8 +363,8 @@ gitflow-specialist	related	/git/flow
 gitflow-specialist	related	/git/init	
 gitflow-specialist	related	code-reviewer	
 granaai	adopts	onion-evolve	
-granaai	lineage	instancia-offline	
 granaai	lineage	dev-1	
+granaai	lineage	instancia-offline	
 granaai	mode	regulated	
 granaai	pin	6cc162f32d1c	
 granaai	specialization	canonicalization	
