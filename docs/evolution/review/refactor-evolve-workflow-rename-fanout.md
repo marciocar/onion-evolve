@@ -1,7 +1,8 @@
 ---
 branch: refactor/evolve-workflow-rename-fanout
 date: 2026-10-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0f7dc9f3a973deb9cfca65c6945bbbe1366c68244bc02acd253f93a6f72f1b6b
+reviewed_code_sha256: 3f8af79f36b5b848e95fb44f2e6099571c23859709db32a2a3248f9f12a1d6a9
 findings_total: 4
 findings_real: 3
 findings_fixed: 3
