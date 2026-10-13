@@ -2,7 +2,7 @@
 # =============================================================================
 # merge-serial.sh — merge de uma SÉRIE de PRs do core, em ordem, pelo caminho verificado (core-only).
 #
-# Uso: bash ops/merge-serial.sh [--wait-ci-after-rebase] <PR> [<PR>...]
+# Uso: bash ops/merge-serial.sh <PR> [<PR>...]
 #
 # ── POR QUE EXISTE (D_MERGE_PROCESS_ONION_2026_10, passo C; nó C_OPCAO_C_MERGE_SERIAL_IN_OPS) ──────
 # Duas séries de merge em paralelo mergeiam fora de ordem e derrubam os vizinhos em CONFLICTING (as
@@ -28,24 +28,9 @@
 #    não rejeita non-fast-forward de merge por API, então o lock tem de envolver essa chamada
 #    (E_OBJECAO_FLOCK_MUST_WRAP_API_MERGE). O fd do lock é FECHADO no filho (`9>&-`): um neto que
 #    sobrevivesse (daemon do git, processo órfão) seguraria o lock depois de nós.
-#  · AUTO-REBASE LIMPO ⇒ MERGE SEM O CI DO HEAD NOVO (D_MERGE_SEM_CI_APOS_REBASE_LIMPO, selo do maestro
-#    2026-10-13, "A agora, B se precisar"): medido, cada merge da fila levava 20–25 min, quase tudo
-#    esperando o CI do head NOVO depois do auto-rebase; com 5 PRs prontos juntos o último esperava ~2h.
-#    O verificado agora mergeia NA MESMA chamada, sem esperar, quando: o rebase foi limpo (só projeção
-#    gerada em conflito); os checks exigidos pelo ruleset estavam verdes no head ANTERIOR, e nenhum
-#    outro falho; o que a main trouxe não toca arquivo do PR; nenhum alarme de main quebrado aberto;
-#    a worktree estava no head julgado; e o ruleset não tem regra além dos checks. O merge vai pelo bypass do ruleset (admin, modo
-#    pull_request) com --match-head-commit no head novo — o ruleset exige os checks NO HEAD DO PR, e um
-#    head recém-empurrado não tem nenhum. Tempo esperado por PR: o do rebase (~1–3 min, o pr-finalize
-#    roda o lint) mais o merge, em vez de 20–25 min. Opt-out: --wait-ci-after-rebase (repassado).
-#    Rede: a bancada COMPLETA no push ao main + o alarme e o PR de revert (ops/testing/main-bench-alarm.sh).
-#    JANELA DECLARADA: dois PRs que mudam arquivos DIFERENTES e se quebram semanticamente entram os dois;
-#    só a completa do main pega, e o main fica quebrado até o revert. Se isso acontecer (contado pelas
-#    issues do alarme), é o gatilho do B (lote com bissecção, nó Q_MERGE_LOTE_COM_BISSECCAO, gated).
-#  · AUTO-REBASE QUE NÃO PODE PULAR ⇒ VOLTA À FILA: se qualquer condição acima falha (ou o forge recusa
-#    o merge sem CI), o verificado sai rc 4 — o lock é solto, o CI do head novo é esperado FORA do lock,
-#    e o PR volta ao lock. O limite de rebases (ONION_MERGE_REBASE_MAX, 2) vale para a série inteira
-#    (ONION_MERGE_REBASE_DONE).
+#  · AUTO-REBASE ⇒ VOLTA À FILA: o verificado roda com --no-wait-after-rebase; se rebaseou, sai rc 4,
+#    o lock é solto, o CI do head novo é esperado FORA do lock, e o PR volta ao lock. O limite de
+#    rebases (ONION_MERGE_REBASE_MAX, 2) vale para a série inteira (ONION_MERGE_REBASE_DONE).
 #  · DISPENSA SÓ QUANDO O CHECK FALHA E O REVISOR NÃO REVISOU: `--dispensa onion-review-verdict` só é
 #    passada se `gh pr checks` mostra o check em `fail` no head E a anotação dele diz "NÃO revisou".
 #    Se a anotação diz que ele APONTOU violação, a série PARA: dispensar achado é decisão humana, com
@@ -104,15 +89,13 @@ main() {
     || die "não estou dentro de um repositório git — o lock mora no git-common-dir do repo"
   _lock="${_gcd}/onion-merge-serial.lock"
 
-  # ── argumentos: inteiros, sem repetição, na ordem dada (e o opt-out da decisão de pular o CI) ──
-  local -a PRS=(); local _a _p _wait_flag=""
+  # ── argumentos: inteiros, sem repetição, na ordem dada ──
+  local -a PRS=(); local _a _p
   for _a in "$@"; do
-    [ "${_a}" = --wait-ci-after-rebase ] && { _wait_flag="${_a}"; continue; }
     case "${_a}" in ''|*[!0-9]*) die "argumento '${_a}' não é número de PR (uso: ops/merge-serial.sh <PR> [<PR>...])" ;; esac
     for _p in "${PRS[@]:-}"; do [ "${_p}" = "${_a}" ] && die "PR #${_a} repetido na lista — a ordem ficaria ambígua"; done
     PRS+=("${_a}")
   done
-  [ "${#PRS[@]}" -gt 0 ] || die "nenhum PR na lista (uso: ops/merge-serial.sh [--wait-ci-after-rebase] <PR> [<PR>...])"
 
   # ── PRÉ-VOO: estado e worktree de TODOS, antes de qualquer merge (FIFO) ──
   local -A WT=() SKIP=()
@@ -208,7 +191,7 @@ main() {
       if [ "${_rc}" -eq 1 ]; then
         printf '#%s NÃO mergeou — o CI não terminou em %ss; a série PARA aqui\n' "${_pr}" "${_ci_wait}"; return 1
       fi
-      _ARGS=("${_pr}" --no-wait-after-rebase ${_wait_flag:+"${_wait_flag}"})
+      _ARGS=("${_pr}" --no-wait-after-rebase)
       if [ "${_rc}" -eq 2 ]; then
         say "#${_pr} está CONFLICTING (sem CI) — vai ao lock para o auto-rebase"
       else

@@ -44,21 +44,6 @@
 #           novo. É o modo do `ops/merge-serial.sh` (core-only): ele segura o lock só no rebase e no merge e
 #           espera o CI FORA do lock. ONION_MERGE_REBASE_DONE=<n> diz quantos rebases já houve na série
 #           (o limite ONION_MERGE_REBASE_MAX vale para a série inteira, não por chamada).
-#   MERGE SEM O CI DO HEAD NOVO (sem flag, D_MERGE_SEM_CI_APOS_REBASE_LIMPO, 2026-10-13, "A agora, B se
-#           precisar"): depois de um auto-rebase LIMPO, o merge NÃO espera o CI do head novo quando TODAS
-#           as condições valem — (1) sem --wait-ci-after-rebase; (2) a worktree estava no head que o PR
-#           mostrava (nada de verde de um head que não é o rebaseado: force-push no meio); (3) nenhum
-#           alarme de main quebrado aberto; (4) no head ANTERIOR, os checks exigidos pelo ruleset
-#           (ops/github-ruleset-main.json) verdes e nenhum outro falho não dispensado; (5) o que a main
-#           trouxe entre o merge-base velho e o novo não toca arquivo do PR (projeção gerada fora da
-#           conta: é ela que conflita, e o pr-finalize a regenera); (6) o head novo MERGEABLE; (7) o ruleset sem regra além dos checks (o --admin contorna o ruleset INTEIRO). Os gates
-#           de sempre rodam contra o head ANTERIOR, e o merge vai por `--admin --match-head-commit
-#           <head novo>`: o ruleset exige os checks no head do PR, e o bypass (admin, modo pull_request)
-#           é a única porta para um head sem checks. Forge recusou ⇒ volta a esperar (rc 4 na série).
-#           A decisão é impressa e vai no comentário do auto-rebase. Rede: a bancada completa no push ao
-#           main + o alarme (ops/testing/main-bench-alarm.sh). JANELA DECLARADA: quebra SEMÂNTICA entre
-#           dois PRs que mudam arquivos diferentes passa e só a completa do main pega.
-#   --wait-ci-after-rebase: opt-out — depois do auto-rebase, espera o CI do head novo como antes.
 #   PROVENANCE DA BRANCH (sem flag, SAC-80, 2026-10-09): se o PR ADICIONA em `*.kg.yaml` um `source:`
 #           com `@<sha>` de commit que NÃO é ancestral da base (commit da própria branch), o rebase o
 #           reescreveria e a provenance ficaria fora da main. Sem --merge-commit, RECUSA antes do
@@ -94,7 +79,7 @@ DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ram
 #   de herdado de uma frase que o próprio check deixou de dizer.
 _DISPENSAVEIS=(onion-review-verdict)
 DISPENSA=(); REASON=""; CI_INOPERANTE=0; CI_INOPERANTE_PROVADO=""
-MERGE_COMMIT=0; ASSERT_ANCESTOR=""; NO_WAIT_AFTER_REBASE=0; WAIT_CI_AFTER_REBASE=0
+MERGE_COMMIT=0; ASSERT_ANCESTOR=""; NO_WAIT_AFTER_REBASE=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
@@ -109,7 +94,6 @@ while [ $# -gt 0 ]; do
     --sync) DO_SYNC=1; shift ;;
     --merge-commit) MERGE_COMMIT=1; shift ;;
     --no-wait-after-rebase) NO_WAIT_AFTER_REBASE=1; shift ;;
-    --wait-ci-after-rebase) WAIT_CI_AFTER_REBASE=1; shift ;;
     --assert-ancestor) ASSERT_ANCESTOR="${2:?--assert-ancestor exige a ref (ex.: onion/vendor)}"; shift 2 ;;
     *) shift ;;
   esac
@@ -314,84 +298,6 @@ _rebase_trail() { # $1=head antigo $2=head novo (ou "—") $3=causa $4=N/MAX $5=
     say "⚠️  auto-rebase SEM RASTRO no PR #${PR}: \`gh pr comment\` falhou — head ${1:0:8} → ${2:0:8}, causa: ${3} (${4}). Registre à mão."
   fi
 }
-# ══ PULAR A ESPERA DO CI DO HEAD NOVO? (D_MERGE_SEM_CI_APOS_REBASE_LIMPO, 2026-10-13) ═══════════════════
-# Medido: cada merge da fila levava 20–25 min, quase tudo esperando o CI do head NOVO depois do
-# auto-rebase — e o head novo só difere do verificado pelo que a main trouxe e pelas projeções
-# regeneradas. O ruleset do main é LOOSE (strict_required_status_checks_policy: false), mas exige os
-# checks NO HEAD DO PR: um head recém-empurrado não tem nenhum, e o merge normal é recusado (o `gh pr
-# merge` sem --admin ainda LIGARIA o auto-merge em vez de mergear). A porta que mantém o head verificado
-# é o bypass do ruleset (admin, `bypass_mode: pull_request`, lido ao vivo como current_user_can_bypass =
-# pull_requests_only) com `--match-head-commit`: o forge só mergeia SE o head ainda é o que eu julguei.
-# O GitHub rebasear no merge (sem push de head novo) não serve aqui: o auto-rebase só roda em PR
-# CONFLICTING, e PR em conflito o forge não rebaseia.
-# Cada condição falha para o lado de ESPERAR, nunca para o de pular. Projeção gerada não conta no
-# cruzamento de arquivos porque É ela que conflita (medido no #1071: testing-inventory.md) — sem isso a
-# regra nunca valeria; a regeneração é determinística, e o pr-finalize roda o lint (0 HARD) no head novo.
-SKIP_CI=0; SKIP_DECISION=""; GATE_SHA=""
-# uma linha por nome, a check-run mais recente (ver "UMA LINHA POR NOME" adiante, no gate)
-_LATEST_PER_NAME_JQ='[.check_runs[]] | group_by(.name) | map(max_by(.id)) | .[] | .name + "\t" + .status + "\t" + (.conclusion // "-")'
-_SKIP_HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-_ALARM_TITLE="🚨 main quebrado — a bancada completa reprovou no push ao main"   # o TITLE de ops/testing/main-bench-alarm.sh
-_skip_ci_decide() { # $1=head julgado (antes do rebase) $2=head novo $3=worktree $4=HEAD da worktree antes do rebase
-  local _old="$1" _new="$2" _w="$3" _wb="$4" _slug _req _runs _r _bad _al _omb _nmb _bd _pf _x _hit=""
-  SKIP_DECISION=""
-  [ "${WAIT_CI_AFTER_REBASE}" -eq 1 ] && { SKIP_DECISION="espera: opt-out --wait-ci-after-rebase"; return 1; }
-  [ -n "${_old}" ] && [ "${_wb}" = "${_old}" ] \
-    || { SKIP_DECISION="espera: a worktree estava em ${_wb:0:8} e o PR em ${_old:0:8} — o verde lido não seria do head rebaseado"; return 1; }
-  _slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _slug="${REPO_ARG[1]}"
-  _al="$(gh issue list "${REPO_ARG[@]}" --state open --limit 100 --json number,title \
-         --jq ".[] | select(.title == \"${_ALARM_TITLE}\") | .number" 2>/dev/null)" \
-    || { SKIP_DECISION="espera: não consegui LER as issues de alarme do main — não pulo o CI sem saber se o main está quebrado"; return 1; }
-  [ -z "${_al}" ] || { SKIP_DECISION="espera: alarme de main quebrado ABERTO (issue #${_al%%$'\n'*}) — com o main quebrado só o conserto entra, e nunca sem CI"; return 1; }
-  _req="$(python3 -I -c 'import json,sys
-d=json.load(open(sys.argv[1],encoding="utf-8"))
-for r in d.get("rules",[]):
-    if r.get("type")=="required_status_checks":
-        for c in r["parameters"]["required_status_checks"]: print(c["context"])
-    else: print("__REGRA__ " + str(r.get("type")))' "${_SKIP_HERE}/github-ruleset-main.json" 2>/dev/null)"
-  [ -n "${_req}" ] || { SKIP_DECISION="espera: não li os checks exigidos de ${_SKIP_HERE}/github-ruleset-main.json"; return 1; }
-  # o --admin contorna o ruleset INTEIRO, não só os checks: com outra regra no ruleset (review obrigatório,
-  # histórico linear…) o pulo a contornaria calado. Só pulo enquanto a única regra é a dos checks.
-  if grep -q '^__REGRA__ ' <<< "${_req}"; then
-    SKIP_DECISION="espera: o ruleset tem regra além dos checks ($(grep '^__REGRA__ ' <<< "${_req}" | cut -d' ' -f2 | paste -sd, -)) — o bypass a contornaria junto"; return 1
-  fi
-  _runs="$(gh api "repos/${_slug}/commits/${_old}/check-runs?per_page=100" --jq "${_LATEST_PER_NAME_JQ}" 2>/dev/null)" \
-    || { SKIP_DECISION="espera: não li os check-runs do head anterior ${_old:0:8}"; return 1; }
-  for _r in ${_req}; do
-    awk -F'\t' -v n="${_r}" '$1==n && $2=="completed" && $3=="success"{f=1} END{exit !f}' <<< "${_runs}" \
-      || { SKIP_DECISION="espera: o check exigido '${_r}' não está verde no head anterior ${_old:0:8}"; return 1; }
-  done
-  awk -F'\t' 'NF && $2!="completed"{f=1} END{exit !f}' <<< "${_runs}" \
-    && { SKIP_DECISION="espera: há check-run não completo no head anterior ${_old:0:8}"; return 1; }
-  _bad=""
-  while IFS=$'\t' read -r _x _ _r; do
-    case "${_r}" in failure|cancelled|timed_out|action_required|stale) _dispensado "${_x}" || _bad="${_bad}${_x} " ;; esac
-  done <<< "${_runs}"
-  [ -z "${_bad}" ] || { SKIP_DECISION="espera: check falho não dispensado no head anterior ${_old:0:8}: ${_bad% }"; return 1; }
-  # o que a main trouxe (merge-base velho → novo) × os arquivos do PR (antes e depois do rebase)
-  _nmb="$(git -C "${_w}" merge-base "${_new}" origin/main 2>/dev/null)"
-  _omb="$(git -C "${_w}" merge-base "${_old}" "${_nmb:-x}" 2>/dev/null)"
-  [ -n "${_omb}" ] && [ -n "${_nmb}" ] || { SKIP_DECISION="espera: não calculei os merge-bases velho/novo na worktree"; return 1; }
-  _bd="$(git -C "${_w}" -c core.quotepath=off diff --no-ext-diff --no-textconv --name-only "${_omb}" "${_nmb}" 2>/dev/null)" \
-    || { SKIP_DECISION="espera: não li o diff do rebase (${_omb:0:8}..${_nmb:0:8})"; return 1; }
-  _pf="$( { git -C "${_w}" -c core.quotepath=off diff --no-ext-diff --no-textconv --name-only "${_omb}" "${_old}" \
-           && git -C "${_w}" -c core.quotepath=off diff --no-ext-diff --no-textconv --name-only "${_nmb}" "${_new}"; } 2>/dev/null)" \
-    || { SKIP_DECISION="espera: não li os arquivos do PR na worktree"; return 1; }
-  local _lib="${_SKIP_HERE}/../.claude/validation/onion-regen-lib.sh"
-  [ -r "${_lib}" ] && ( . "${_lib}" >/dev/null 2>&1; declare -F onion_is_generated >/dev/null ) \
-    || { SKIP_DECISION="espera: sem onion-regen-lib.sh não sei o que é projeção gerada"; return 1; }
-  _hit="$(. "${_lib}" >/dev/null 2>&1; while IFS= read -r _x; do
-            [ -n "${_x}" ] || continue
-            grep -qxF -- "${_x}" <<< "${_pf}" || continue
-            onion_is_generated "${_x}" || printf '%s\n' "${_x}"
-          done <<< "${_bd}")"
-  [ -z "${_hit}" ] || { SKIP_DECISION="espera: o rebase trouxe mudança em arquivo(s) do PR: $(printf '%s\n' "${_hit}" | head -5 | paste -sd' ' -)"; return 1; }
-  local _m _k=0; _m="$(pr_mergeable)"
-  while [ "${_m}" = UNKNOWN ] && [ "${_k}" -lt 6 ]; do sleep "${_POLL_SECS}"; _m="$(pr_mergeable)"; _k=$((_k+1)); done
-  [ "${_m}" = MERGEABLE ] || { SKIP_DECISION="espera: o head novo está '${_m:-ilegível}', não MERGEABLE"; return 1; }
-  SKIP_DECISION="SEM esperar o CI do head novo: rebase limpo, checks exigidos ($(printf '%s\n' "${_req}" | paste -sd, -)) verdes no head anterior ${_old:0:8}, o rebase não tocou arquivo do PR, sem alarme de main aberto"
-  return 0
-}
 _mg="$(pr_mergeable)"
 _n=0; while [ "$_mg" = UNKNOWN ] && [ "$_n" -lt 6 ]; do sleep "${_POLL_SECS}"; _mg="$(pr_mergeable)"; _n=$((_n+1)); done
 # ONION_MERGE_REBASE_DONE: rebases que a SÉRIE já fez neste PR (o ops/merge-serial.sh (core-only) chama este
@@ -411,7 +317,6 @@ while [ "$_mg" = CONFLICTING ]; do
     || die "PR #${PR} está CONFLICTING (o GitHub não dispara CI em PR em conflito) e a branch '${HEAD_REF}' não está em nenhuma worktree deste repo — não rebaseio às cegas. Rode na worktree da branch: bash ops/pr-finalize.sh --rebase --push ; depois rode este comando de novo."
   say "PR #${PR} CONFLICTING — auto-rebase ${_rebases}/${_REBASE_MAX} na worktree ${_wt} (pr-finalize --rebase --push)"
   _old_head="${HEAD_SHA}"
-  _wt_before="$(git -C "$_wt" rev-parse HEAD 2>/dev/null)"
   _rb_out="$(cd "$_wt" && bash ops/pr-finalize.sh --rebase --push 2>&1)"; _rb_rc=$?
   if [ "$_rb_rc" -ne 0 ]; then
     _real="$(grep -o 'conflito REAL em [^ ]*' <<< "$_rb_out" | head -1)"
@@ -455,14 +360,7 @@ while [ "$_mg" = CONFLICTING ]; do
   _proj="$(LC_ALL=C grep -o 'conflito de projeção resolvido em [^ ]*' <<< "$_rb_out" | sed 's/^conflito de projeção resolvido em //' | paste -sd, - | sed 's/,/, /g')"
   if [ -n "${_proj}" ]; then _causa="projeção gerada: ${_proj}"
   else _causa="nenhum arquivo em conflito no rebase local (o forge marcou CONFLICTING)"; fi
-  if _skip_ci_decide "${_old_head}" "${HEAD_SHA}" "${_wt}" "${_wt_before}"; then
-    SKIP_CI=1; GATE_SHA="${_old_head}"
-    say "decisão: merge ${SKIP_DECISION}"
-    _rebase_trail "${_old_head}" "${HEAD_SHA}" "${_causa}" "${_rebases}/${_REBASE_MAX}" "rebaseado e enviado; merge ${SKIP_DECISION} (bypass do ruleset com --match-head-commit; rede: bancada completa no push ao main)"
-    break
-  fi
-  say "decisão: ${SKIP_DECISION}"
-  _rebase_trail "${_old_head}" "${HEAD_SHA}" "${_causa}" "${_rebases}/${_REBASE_MAX}" "rebaseado e enviado; o CI do head novo roda antes do merge (${SKIP_DECISION})"
+  _rebase_trail "${_old_head}" "${HEAD_SHA}" "${_causa}" "${_rebases}/${_REBASE_MAX}" "rebaseado e enviado; o CI do head novo roda antes do merge"
   if [ "${NO_WAIT_AFTER_REBASE}" -eq 1 ]; then
     printf '↻ PR #%s rebaseado (%s → %s, %s/%s) — saio rc=4 SEM esperar o CI do head novo (--no-wait-after-rebase)\n' \
       "$PR" "${_old_head:0:8}" "${HEAD_SHA:0:8}" "${_rebases}" "${_REBASE_MAX}"
@@ -471,7 +369,7 @@ while [ "$_mg" = CONFLICTING ]; do
   _mg="$(pr_mergeable)"
   _n=0; while [ "$_mg" = UNKNOWN ] && [ "$_n" -lt 6 ]; do sleep "${_POLL_SECS}"; _mg="$(pr_mergeable)"; _n=$((_n+1)); done
 done
-if [ "$_rebases" -gt 0 ] && [ "${SKIP_CI}" -eq 0 ]; then
+if [ "$_rebases" -gt 0 ]; then
   say "auto-rebase feito — esperando as runs do head ${HEAD_SHA:0:8} NASCEREM e terminarem (prazo ${_WAIT_SECS}s)"
   _t0w="$(date +%s)"
   while :; do
@@ -495,12 +393,9 @@ fi
 # mesmo sem `filter=all` — e o `statusCheckRollup` também. Sem dedupe, um veredito velho em falha bloquearia
 # para sempre o verde novo, e dois verdes viravam "SUCCESS\nSUCCESS" ≠ SUCCESS. O id cresce no tempo, então
 # o maior id do nome é o run vigente (o mesmo que o GitHub mostra no `gh pr checks`).
-# (o _LATEST_PER_NAME_JQ mora lá em cima, junto da decisão de pular o CI, que também o usa)
-# o head JULGADO: o do PR, ou — no merge sem o CI do head novo — o head ANTERIOR, cujo verde foi lido
-GATE_SHA="${GATE_SHA:-${HEAD_SHA}}"
-[ "${SKIP_CI}" -eq 1 ] && say "gates de checks ancorados no head ANTERIOR ${GATE_SHA:0:8} (o merge vai no head ${HEAD_SHA:0:8} por --match-head-commit)"
+_LATEST_PER_NAME_JQ='[.check_runs[]] | group_by(.name) | map(max_by(.id)) | .[] | .name + "\t" + .status + "\t" + (.conclusion // "-")'
 _cr_err="$(mktemp)"
-head_runs="$(gh api "repos/${OWNER_REPO}/commits/${GATE_SHA}/check-runs?per_page=100" \
+head_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
   --jq "${_LATEST_PER_NAME_JQ}" 2>"${_cr_err}")"
 _cr_rc=$?
 if [ "${_cr_rc}" -ne 0 ]; then
@@ -597,7 +492,7 @@ _REVIEW_OFF=""; _REVIEW_PRIOR_REPROVOU=""
 _rm_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/review/review-mode-decide.sh"
 if [ -n "$head_runs" ] && [ -f "${_rm_script}" ]; then
   _rm_marker="$(bash "${_rm_script}" --print-marker)"
-  _rv_runs="$(gh api "repos/${OWNER_REPO}/commits/${GATE_SHA}/check-runs?check_name=onion-review-verdict&filter=all&per_page=100" \
+  _rv_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?check_name=onion-review-verdict&filter=all&per_page=100" \
     --jq '[.check_runs[]] | sort_by(.id) | reverse | .[] | "\(.id)\t\(.conclusion // "-")"' 2>/dev/null)" \
     || die "não consegui LER o histórico do onion-review-verdict no head ${HEAD_SHA:0:8} — sem ele não sei se a revisão foi desligada ou se um achado anterior foi apagado. Tente de novo."
   _rv_first=1
@@ -646,18 +541,11 @@ else
   say "✓ check-runs ancorados no head ${HEAD_SHA:0:8}: todos completos, nenhum falho"
 fi
 
-if [ "${SKIP_CI}" -eq 1 ]; then
-  # `gh pr checks` e o statusCheckRollup leem o head ATUAL do PR — o novo, ainda sem checks. Lê-los aqui
-  # seria julgar o head errado; o ângulo ancorado por SHA (acima) é a leitura deste caminho.
-  say "2º ângulo (gh pr checks) não lido: ele segue o head novo ${HEAD_SHA:0:8}, que não tem CI por desenho deste caminho"
-  checks=""
-else
 checks="$(gh pr checks "$PR" "${REPO_ARG[@]}" 2>&1)"
 GHRC=$?
 [ -z "$checks" ] && die "não consegui ler os checks do PR #${PR} (saída vazia, rc=${GHRC})"
 printf '%s\n' "$checks" | sed 's/^/  /'
 printf '%s\n' "$checks" | awk '{print $2}' | grep -q pending && die "há check PENDENTE — merge recusado (esperar não é opcional)"
-fi
 # mesma leitura pelo 2º ângulo (`gh pr checks`), com a MESMA dispensa nome-a-nome
 _f2="$(printf '%s\n' "$checks" | awk '$2=="fail"{print $1}')"
 _n2=""
@@ -667,12 +555,8 @@ while IFS= read -r _f; do
 done <<< "$_f2"
 [ -n "${_n2// /}" ] && die "há check FALHO não dispensado: ${_n2}— merge recusado"
 
-if [ "${SKIP_CI}" -eq 1 ]; then
-  verdict="$(awk -F'\t' '$1=="onion-review-verdict"{print toupper($3); exit}' <<< "${head_runs}")"
-else
 verdict="$(gh pr view "$PR" "${REPO_ARG[@]}" --json statusCheckRollup \
   --jq '[.statusCheckRollup[] | select(.name=="onion-review-verdict")] | sort_by(.startedAt // .completedAt // "") | last | select(. != null) | (.conclusion // .state)' 2>/dev/null)"
-fi
 if [ -z "$verdict" ]; then
   say "⚠️  sem linha 'onion-review-verdict' neste repo — a revisão adversarial NÃO foi medida aqui."
   say "    (repos sem o gate: o resíduo da REGRA 56 e a passada humana são a única cobertura)"
@@ -746,7 +630,7 @@ if [ "${#DISPENSA[@]}" -gt 0 ]; then
   # ali a frase antiga registraria mentira no rastro de auditoria. Achado por passada adversarial.
   # Deriva-se do `output` do proprio check; se nao der para ler, DECLARA que nao deu — nunca
   # escolhe um dos dois lados por conveniencia.
-  _out_check="$(gh api "repos/${OWNER_REPO}/commits/${GATE_SHA}/check-runs?per_page=100" \
+  _out_check="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
     --jq '.check_runs[] | select(.name=="onion-review-verdict") | ((.output.title // "") + " " + (.output.summary // ""))' 2>/dev/null || true)"
   if [ -n "${_REVIEW_PRIOR_REPROVOU}" ]; then
     _NOTA_DISPENSA="Um run anterior deste check **neste head** (check-run ${_REVIEW_PRIOR_REPROVOU}) **mediu e apontou**, e o mais recente diz revisão **desligada** — a dispensa afirma que o achado **não procede**; desligar não o apagou."
@@ -824,35 +708,17 @@ if [ "${MERGE_COMMIT}" -eq 0 ]; then
 fi
 
 t0="$(date -u +%s)"
-# o merge sem o CI do head novo: o bypass do ruleset (--admin) e o head AMARRADO (--match-head-commit) —
-# se alguém empurrar depois da decisão, o forge recusa em vez de mergear um head que ninguém julgou
-MERGE_EXTRA=()
-[ "${SKIP_CI}" -eq 1 ] && MERGE_EXTRA=(--admin --match-head-commit "${HEAD_SHA}")
 if [ "${MERGE_COMMIT}" -eq 1 ]; then
   say "modo: --merge-commit (gh pr merge --merge) — mesmos gates, só muda como o histórico entra"
-  merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --merge "${MERGE_EXTRA[@]}" "${DEL[@]}" 2>&1)"; rc=$?
+  merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --merge "${DEL[@]}" 2>&1)"; rc=$?
 else
-  merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --rebase "${MERGE_EXTRA[@]}" "${DEL[@]}" 2>&1)"; rc=$?
+  merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --rebase "${DEL[@]}" 2>&1)"; rc=$?
 fi
 if [ "$rc" -ne 0 ] && [ "${MERGE_COMMIT}" -eq 0 ]; then
   if printf '%s' "$merge_out" | grep -qi "can't be rebased\|cannot be rebased"; then
     say "⚠️  --rebase recusado (stack re-apontada); degradando p/ --squash com os mesmos gates"
-    merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --squash "${MERGE_EXTRA[@]}" "${DEL[@]}" 2>&1)"; rc=$?
+    merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --squash "${DEL[@]}" 2>&1)"; rc=$?
   fi
-fi
-# o forge RECUSOU o merge sem o CI do head novo (bypass negado, head andou): não é falha do PR — é voltar
-# a ESPERAR. Na série, rc 4 (o CI do head novo é esperado fora do lock); direto, para dizendo o que fazer.
-if [ "$rc" -ne 0 ] && [ "${SKIP_CI}" -eq 1 ]; then
-  case "$(pr_state)" in
-    MERGED\|*) : ;;   # mergeou e falhou depois (limpeza): o bloco abaixo prova pelo estado
-    *)
-      if [ "${NO_WAIT_AFTER_REBASE}" -eq 1 ]; then
-        printf '↻ PR #%s: o forge RECUSOU o merge sem o CI do head novo (%s) — saio rc=4: o CI do head %s é esperado e o merge volta pelo caminho de sempre\n' \
-          "$PR" "$(printf '%s' "$merge_out" | tail -1 | cut -c1-200)" "${HEAD_SHA:0:8}"
-        exit 4
-      fi
-      die "o forge RECUSOU o merge sem o CI do head novo ($(printf '%s' "$merge_out" | tail -1 | cut -c1-200)) — nada foi mergeado. Espere o CI do head ${HEAD_SHA:0:8} e rode de novo (ou use --wait-ci-after-rebase)." ;;
-  esac
 fi
 # ── rc != 0 NÃO É, SOZINHO, "não mergeou" (defeito medido 2026-09-07, PR #814) ─────────
 # A v1 morria aqui e NUNCA chegava ao passo 4 — a prova pelo ESTADO. Resultado: no merge do
