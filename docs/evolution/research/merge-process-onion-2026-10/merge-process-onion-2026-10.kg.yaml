@@ -1,0 +1,1362 @@
+# kg-backlog-guard: on
+meta:
+  id: merge-process-onion-2026-10
+  schema_version: "1"
+  baseline: "2026-10-13"
+  review_after: "2026-11-12"   # 30d: o tipo DOMINANTE do que move esta decisão é FERRAMENTA/PREÇO —
+                               # disponibilidade da fila nativa por tipo de dono (gated-features do github/docs),
+                               # planos gratuitos de Mergify e Trunk e o estado do funador/claude-code-merge-queue.
+                               # A metade doutrina (ímã, escritor único, catracas) é de 12m, mas o gatilho da Opção 3
+                               # já disparou: a revisita real é o selo do maestro, não a data.
+  # ═══ TETO: 64 NÓS ═══
+  #
+  # Pesquisa /onion-research --mode decision (wf_48596b33-657, 2026-10-13) sobre o processo de PR, CI e merge do core.
+  # Varredura larga: 21 claims confirmadas por votação, 4 refutadas, 30 fontes e 32 claims cortadas por orçamento.
+  # Elenxo: 46 objeções julgadas, 27 SOBREVIVENTES, 27 MODELADAS (nenhuma fora do teto).
+  #
+  # INTEGRIDADE DA ENTRADA: a recomendação repassada ao escritor vinha TRUNCADA no passo 2 ("quase tod"). O texto
+  # INTEIRO foi recuperado do resultado da fase Elenxo no journal do run e é ele que a narrative de D_ carrega.
+  #
+  # CORPUS PRÉVIO: fila-2026-10-06 (E_CONFLITO_DE_PROJECAO_GERADA confirmed, Q_MERGE_DRIVER_PARA_PROJECAO_GERADA done
+  # com gatilho da Opção 3) e fios-abertos (D_BANCADA_FAIXAS_E_MAPA done). A rodada não os REFUTA: confirma o
+  # conflito, mostra o gatilho da Opção 3 disparado e a faixa "PR = famílias tocadas" não implementada — por isso
+  # as arestas externas abaixo são SUPPORTS/CONSTRAINS/TRACES_TO, sem SUPERSEDES. Os grafos antigos não foram editados.
+  #
+  # ESTE GRAFO NÃO SELA NADA. D_ fica OPEN — o maestro sela.
+external_edges:
+  - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
+    to: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml#E_CONFLITO_DE_PROJECAO_GERADA"
+    edge_type: SUPPORTS
+  - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
+    to: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml#Q_MERGE_DRIVER_PARA_PROJECAO_GERADA"
+    edge_type: CONSTRAINS
+  - from: C_OPCAO_B_POSTMERGE_PROJECTION_WRITER
+    to: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml#Q_MERGE_DRIVER_PARA_PROJECAO_GERADA"
+    edge_type: TRACES_TO
+  - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
+    to: "docs/onion/graph/fios-abertos.kg.yaml#D_BANCADA_FAIXAS_E_MAPA"
+    edge_type: CONSTRAINS
+  - from: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    to: "docs/onion/graph/fios-abertos.kg.yaml#D_BANCADA_FAIXAS_E_MAPA"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_MERGE_PROCESS_ONION_2026_10
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    verified_at: "2026-10-13"
+    verified_against: "rodada /onion-research modo decision wf_48596b33-657: 21 claims confirmadas por votação, 4 refutadas; Elenxo 46 objeções, 27 sobreviventes; re-medição do escritor via gh api e github/docs"
+    label: "Qual o melhor processo de PR, CI e merge para o core (repo público de dono User, sem proteção, rebase linear, PRs paralelos de agentes numa sessão), frente ao mercado, e o que adotar em ordem e o que fica gated?"
+    narrative: "Pergunta inteira: merge queue nativa do GitHub (user x org), Bors/bors-ng, Mergify, Graphite, Aviator, Trunk merge queue, stacked PRs; projeções commitadas x geradas no CI ou depois do merge; merge driver de .gitattributes para gerados; bancada só das famílias tocadas no PR e completa na fila/no main; painel agregado global que todo PR altera. Fica OPEN até o maestro selar D_MERGE_PROCESS_ONION_2026_10. Aviator não teve nenhuma claim confirmada nesta rodada (lacuna)."
+    trace: "run wf_48596b33-657 (/onion-research --mode decision, 2026-10-13)"
+  - id: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-13"
+    verified_against: "gh api repos/marciocar/onion-evolve (owner.type=User, public, allow_auto_merge=false), /rulesets = [], /branches/main/protection = 404, grep merge_group .github/workflows = 0 — re-medidos pelo escritor em 2026-10-13; demais números do corpus prévio do run"
+    source_tier: 10
+    source_kind: primary
+    label: "Medido no core: 60 PRs em 2,4 dias, mediana 33 min abertura→merge; testing-state.md em 59/60 PRs; bancada mediana 14,8 min e 2 runs/PR; auto-rebase ≥14 vezes sem registro; 30,7% do main são commits de projeção; dono User, sem proteção."
+    narrative: "MEDIÇÃO DO PROCESSO ATUAL (2026-10-13, gh/git, marciocar/onion-evolve, PRs #1004-#1063): p90 abertura->merge 569 min; 35/60 com push depois de aberto, 28/60 com force-push (39 eventos); 134 commits de projeção dentro dos 60 PRs e 231 de 753 commits do main em 14 dias; 0 merge commits; 11/60 merges fora da ordem de abertura; lint mediana 5,6 min; selftest p90 16,4 em 4 faixas, roda a bancada INTEIRA em todo PR que toca .claude/validation, hooks, utils, ops ou workflows (a faixa de famílias afetadas só existe no pre-commit); revisor LLM sem crédito (49 falhas/60, dispensado com registro); concurrency cancel-in-progress em todos os workflows de PR. ÍMÃS: testing-state.md 59/60, lint-selftest.sh 40/60, testing-inventory.md 38, backlog.md 34, kg-read-index.tsv 28. Projeções versionadas por catraca HARD (REGRAS 39, 62, 80, 81, 84), leitor em runtime (hook kg-read-leg lê kg-read-index.tsv) e portas (materialize-door leva inventory.md e graph.md). Hipóteses sustentadas: H1 painel global commitado, H2 sem serialização no forge, H3 cada rebase custa a bancada completa, H4 gatilho da Opção 3 disparou (#1062-#1065), H5 auto-rebase invisível. NÃO sustentadas: conflito de código real, CI lento em si, run superado, revisor LLM como gargalo. .gitattributes l.26 declara merge=union em .claude/session-lifecycle.jsonl; ops/pr-merge-verified.sh l.143 abre o bloco SAC-80 (--merge-commit)."
+    trace: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml"
+    provenance:
+      source: "gh api repos/marciocar/onion-evolve + git log de origin/main@5621f6ed (PRs #1004-#1063)"
+      locator: "owner.type, rulesets, branches/main/protection, pulls/*/timeline; .gitattributes l.26; ops/pr-merge-verified.sh l.143"
+      method: "medição: corpus prévio do run wf_48596b33-657 + re-medição do escritor em 2026-10-13 (gh api e grep)"
+  - id: E_GH_MQ_INCIDENT_SILENT_REVERT_2026_04
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-13"
+    verified_against: "https://www.githubstatus.com/incidents/zsg1lk7w13cf — votos 2-1 na verificação adversarial do run wf_48596b33-657"
+    valid_from: "2026-04-23"
+    source_tier: 9
+    source_kind: primary
+    label: "Em abril de 2026 a merge queue nativa do GitHub produziu merges incorretos (reversão silenciosa de código) em grupos com vários PRs, porque os testes exercitavam sobretudo grupos de um único PR."
+    trace: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
+    provenance:
+      source: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 2-1 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_GH_MQ_INCIDENT_UNDETECTED_3H33
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-13"
+    verified_against: "https://www.githubstatus.com/incidents/zsg1lk7w13cf — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    valid_from: "2026-04-23"
+    source_tier: 9
+    source_kind: primary
+    label: "O defeito afetou a correção do conteúdo do merge, não a disponibilidade, e o monitoramento automático não o viu: só foi percebido por reclamações de clientes cerca de 3h33 depois do deploy."
+    trace: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
+    provenance:
+      source: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_GH_MQ_FIX_REGRESSION_CHECKS_GATING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-13"
+    verified_against: "https://www.githubstatus.com/incidents/zsg1lk7w13cf — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    valid_from: "2026-04-23"
+    source_tier: 9
+    source_kind: primary
+    label: "Como correção, o GitHub apontou checagens de regressão que validam o conteúdo Git resultante em todas as configurações suportadas, e reconheceu que o gating da funcionalidade estava incompleto."
+    trace: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
+    provenance:
+      source: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_GH_MQ_INCIDENT_REPORT_CONTRADICTS_REBASE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-13"
+    verified_against: "https://www.githubstatus.com/incidents/zsg1lk7w13cf — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    valid_from: "2026-04-23"
+    source_tier: 9
+    source_kind: primary
+    label: "O relatório do incidente se contradiz: o texto final diz que merge e rebase não foram afetados, e atualizações das 19:58 e 21:18 UTC citam squash e rebase. Para um repo de rebase linear, nada garante que o rebase escapou."
+    trace: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
+    provenance:
+      source: "https://www.githubstatus.com/incidents/zsg1lk7w13cf"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_GHES_MQ_RULE_REPO_LEVEL_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-13"
+    verified_against: "https://docs.github.com/en/enterprise-server@3.17/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 8
+    source_kind: primary
+    label: "Na doc do GHES 3.17, a regra de merge queue dos rulesets é de nível de repositório e não existe em rulesets criados no nível da organização."
+    trace: "https://docs.github.com/en/enterprise-server@3.17/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets"
+    provenance:
+      source: "https://docs.github.com/en/enterprise-server@3.17/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_LINEAR_HISTORY_NEEDS_SQUASH_OR_REBASE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-13"
+    verified_against: "https://docs.github.com/en/enterprise-server@3.17/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 8
+    source_kind: primary
+    label: "Exigir histórico linear requer que o repositório permita squash merge ou rebase merge, o que é compatível com o fluxo de merge por rebase do core."
+    trace: "https://docs.github.com/en/enterprise-server@3.17/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets"
+    provenance:
+      source: "https://docs.github.com/en/enterprise-server@3.17/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_GITATTR_DRIVER_ONLY_ON_NONTRIVIAL_CONFLICT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-13"
+    verified_against: "https://docs.gitlab.com/user/project/repository/files/git_attributes — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 6
+    source_kind: primary
+    label: "O merge driver customizado do Git só é invocado em conflito de merge não trivial, então não é meio confiável de impedir que arquivos gerados sejam mesclados."
+    trace: "https://docs.gitlab.com/user/project/repository/files/git_attributes"
+    provenance:
+      source: "https://docs.gitlab.com/user/project/repository/files/git_attributes"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_SEMANTIC_BREAK_WITHOUT_VCS_CONFLICT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-13"
+    verified_against: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/ — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 6
+    source_kind: engineer
+    label: "Dois changes podem auto-mergear sem conflito de VCS e ainda assim se quebrar semanticamente; só o build detecta essa classe, não o algoritmo de merge."
+    trace: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
+    provenance:
+      source: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_KEYORIX_TWO_TIER_CI
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/keyorixhq/keyorix/pull/2052 — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 5
+    source_kind: engineer
+    label: "No keyorix #2052 a matriz completa com -race (18 shards) roda só em merge_group, push, workflow_dispatch ou PR com label ci:full; cada push de PR roda um quick tier com go test -short limitado aos pacotes afetados."
+    trace: "https://github.com/keyorixhq/keyorix/pull/2052"
+    provenance:
+      source: "https://github.com/keyorixhq/keyorix/pull/2052"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_KEYORIX_FULL_MATRIX_DUPLICATES_QUEUE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/keyorixhq/keyorix/pull/2052 — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 5
+    source_kind: engineer
+    label: "A justificativa do keyorix #2052: a matriz completa em todo push de PR duplica a garantia da merge queue, que testa a mesma matriz contra o resultado exato do merge; o custo cai de ~39 para ~23 jobs por push."
+    trace: "https://github.com/keyorixhq/keyorix/pull/2052"
+    provenance:
+      source: "https://github.com/keyorixhq/keyorix/pull/2052"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_SEQUENTIAL_MERGE_REBASE_CI_EACH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-10-13"
+    verified_against: "https://codex.danielvaughan.com/2026/07/28/agent-pr-merge-conflicts-concurrent-coding-agents-codex-cli-worktree-isolation-coordination-defence/ — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    valid_from: "2026-07-28"
+    source_tier: 5
+    source_kind: engineer
+    label: "Para PRs paralelos de agentes, a fonte recomenda merge sequencial com rebase de cada PR sobre o alvo atualizado e CI validando cada merge, porque merge limpo é necessário mas não suficiente."
+    trace: "https://codex.danielvaughan.com/2026/07/28/agent-pr-merge-conflicts-concurrent-coding-agents-codex-cli-worktree-isolation-coordination-defence/"
+    provenance:
+      source: "https://codex.danielvaughan.com/2026/07/28/agent-pr-merge-conflicts-concurrent-coding-agents-codex-cli-worktree-isolation-coordination-defence/"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_CCMQ_LOCAL_SINGLE_MACHINE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-13"
+    verified_against: "https://www.everydev.ai/tools/claude-code-merge-queue — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 4
+    source_kind: aggregator
+    label: "A fila do claude-code-merge-queue vive em armazenamento temporário local de uma só máquina; agentes em máquinas diferentes só são barrados pelo git, que rejeita push non-fast-forward."
+    trace: "https://www.everydev.ai/tools/claude-code-merge-queue"
+    provenance:
+      source: "https://www.everydev.ai/tools/claude-code-merge-queue"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_CCMQ_ONLY_GATE_CHECKCOMMAND
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-13"
+    verified_against: "https://www.everydev.ai/tools/claude-code-merge-queue — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 4
+    source_kind: aggregator
+    label: "No claude-code-merge-queue o único gate de merge é o checkCommand passar; não há revisão humana embutida."
+    trace: "https://www.everydev.ai/tools/claude-code-merge-queue"
+    provenance:
+      source: "https://www.everydev.ai/tools/claude-code-merge-queue"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_FUNADOR_FIFO_PREPUSH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/funador/claude-code-merge-queue — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    valid_from: "2026-07"
+    source_tier: 4
+    source_kind: engineer
+    label: "O funador/claude-code-merge-queue serializa landings de agentes Claude Code paralelos numa só máquina, com fila FIFO local e hook de pre-push que rejeita push direto ao integration branch."
+    trace: "https://github.com/funador/claude-code-merge-queue"
+    provenance:
+      source: "https://github.com/funador/claude-code-merge-queue"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_FUNADOR_LOCK_THROUGHPUT_CAP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/funador/claude-code-merge-queue — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 4
+    source_kind: engineer
+    label: "No funador o lock fica preso durante toda a suíte do checkCommand, e uma suíte lenta limita a vazão: menos de 20 landings por hora com suíte de 3 a 4 min."
+    trace: "https://github.com/funador/claude-code-merge-queue"
+    provenance:
+      source: "https://github.com/funador/claude-code-merge-queue"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_BORS_NG_ARCHIVED_2024
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-13"
+    verified_against: "https://redirect.github.com/bors-ng/bors-ng/issues/1729 — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    valid_from: "2024-04-04"
+    source_tier: 4
+    source_kind: forum
+    label: "O repositório bors-ng/bors-ng foi arquivado pelo dono em 4 de abril de 2024 e está somente leitura; não é opção mantida de merge queue."
+    trace: "https://redirect.github.com/bors-ng/bors-ng/issues/1729"
+    provenance:
+      source: "https://redirect.github.com/bors-ng/bors-ng/issues/1729"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_BORS_NG_PUBLIC_INSTANCE_ENDED_2023
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.5
+    verified_at: "2026-10-13"
+    verified_against: "https://redirect.github.com/bors-ng/bors-ng/issues/1729 — votos 2-1 na verificação adversarial do run wf_48596b33-657"
+    valid_from: "2023-11-13"
+    source_tier: 4
+    source_kind: forum
+    label: "A instância pública hospedada do bors-ng acabou em novembro de 2023; só restava rodar instância própria seguindo o README."
+    trace: "https://redirect.github.com/bors-ng/bors-ng/issues/1729"
+    provenance:
+      source: "https://redirect.github.com/bors-ng/bors-ng/issues/1729"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 2-1 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_GH_MQ_ORG_ONLY_MERGIFY_FAQ
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://articles.mergify.com/github-pull-request-merge-queue-faq/ — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    valid_from: "2023-03"
+    source_tier: 3
+    source_kind: vendor-on-competitor
+    label: "Segundo FAQ da Mergify de 2023 (beta), a merge queue nativa do GitHub só servia a organizações open source e a clientes Enterprise Cloud, logo não a um repo de usuário como o core."
+    trace: "https://articles.mergify.com/github-pull-request-merge-queue-faq/"
+    provenance:
+      source: "https://articles.mergify.com/github-pull-request-merge-queue-faq/"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_GH_MQ_NEEDS_BRANCH_PROTECTION_MERGIFY_FAQ
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-13"
+    verified_against: "https://articles.mergify.com/github-pull-request-merge-queue-faq/ — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    valid_from: "2023-03"
+    source_tier: 3
+    source_kind: vendor-on-competitor
+    label: "Segundo a mesma FAQ da Mergify, a merge queue nativa funciona sobre branch protection, que o core hoje não usa."
+    trace: "https://articles.mergify.com/github-pull-request-merge-queue-faq/"
+    provenance:
+      source: "https://articles.mergify.com/github-pull-request-merge-queue-faq/"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_GRAPHITE_SMALL_TEAMS_NO_QUEUE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.4
+    verified_at: "2026-10-13"
+    verified_against: "https://graphite.com/guides/merge-queue-best-practices — votos 2-1 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 3
+    source_kind: vendor-on-competitor
+    label: "Segundo o guia da Graphite, times pequenos (até cerca de 10 devs) provavelmente não precisam de merge queue, salvo se gerarem alto volume de PRs."
+    trace: "https://graphite.com/guides/merge-queue-best-practices"
+    provenance:
+      source: "https://graphite.com/guides/merge-queue-best-practices"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 2-1 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_GRAPHITE_GUIDE_SCOPE_GAP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://graphite.com/guides/merge-queue-best-practices — votos 3-0 na verificação adversarial do run wf_48596b33-657"
+    source_tier: 3
+    source_kind: vendor-on-competitor
+    label: "O guia da Graphite não cobre fila nativa em repo de usuário, Bors, Mergify, Aviator, Trunk, projeções geradas, merge driver nem painel agregado: não responde a maior parte da pergunta."
+    trace: "https://graphite.com/guides/merge-queue-best-practices"
+    provenance:
+      source: "https://graphite.com/guides/merge-queue-best-practices"
+      locator: "claim confirmada na fase Verify do run wf_48596b33-657"
+      method: "juízes: votação 3-0 do run wf_48596b33-657"
+      locality: "web"
+  - id: E_MERCADO_MERGE_QUEUES_2026_10
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-13"
+    verified_against: "campo market do sintetizador do run wf_48596b33-657; páginas de preço mergify.com/pricing e trunk.io/pricing lidas pelo Elenxo (1 agente, sem votação)"
+    source_tier: 3
+    source_kind: aggregator
+    label: "MERCADO/CAPITAL — sem sinal: nenhuma rodada, M&A ou analista sobre merge queues ou stacked PRs nesta rodada. O sinal disponível é de vendedor (Mergify, Graphite, tier 3) e de preço: Mergify grátis para open source e Trunk Free até 5 committers."
+    narrative: "Leitura follow-the-money: o mercado de filas vende para times com alto volume de PRs humanos; o escasso para o core é outro (o arquivo-ímã e a serialização local). Uma possível aquisição da Graphite em 2025 existe só como lembrança prévia, NÃO verificada nesta rodada — não citar como fato. Aviator: sem claim nem preço lido. Preço de Mergify/Trunk lido por 1 agente; instalação em conta pessoal (dono User) NÃO verificada."
+    trace: "https://mergify.com/pricing"
+    provenance:
+      source: "https://mergify.com/pricing"
+      locator: "\"Mergify is free for open source projects and for private teams of up to 5 active contributors\"; trunk.io/pricing: Merge Queue \"Included\" no Free, \"Up to 5 Repo Committers\""
+      method: "derivado: sintetizador do run wf_48596b33-657 + leitura de 1 agente (Elenxo)"
+      locality: "web"
+  - id: C_OPCAO_A_CURE_MAGNET_FILE
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.65
+    verified_at: "2026-10-13"
+    verified_against: "EXECUTADO no PR feat/merge-process-step-a-magnet (2026-10-13): .claude/validation/testing-state.sh --markdown imprime ↻ ao vivo nas 14 células de contador e --live dá os números; bancada testing_state (h) e (i) com mutantes mortos; simulação de 2 PRs paralelos que acrescentam um resíduo cada: antes CONFLITO em docs/onion/testing-state.md, depois 0 de 2 PRs tocam o painel e o rebase sai limpo"
+    label: "OPÇÃO A — curar o arquivo-ímã: tirar os contadores globais de docs/onion/testing-state.md do caminho do PR; o resíduo fica só em docs/evolution/review/<slug>.md e o painel vira projeção regenerada no main. Elenxo: PASSO 1."
+    narrative: "Elenxo: testing-state.md aparece em 59/60 PRs com contadores globais, então dois PRs quaisquer entram em conflito; é o gargalo medido e NENHUMA fila o resolve (as filas tiram o PR que falha). Restrição: o painel continua existindo, como projeção regenerada no main. Toca a REGRA 56 (resíduo de revisão por branch) e as catracas de projeção. EXECUÇÃO (2026-10-13): o desenho foi mais estreito que o rótulo. O painel CONTINUA no PR e na catraca byte-a-byte da REGRA 81, mas fica INVARIANTE ao PR, porque os contadores globais saíram do versionado para testing-state.sh --live; não precisou do escritor pós-merge, que é o passo B."
+    trace: ".claude/validation/testing-state.sh"
+  - id: C_OPCAO_B_POSTMERGE_PROJECTION_WRITER
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-13"
+    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    label: "OPÇÃO B — Opção 3 de Q_MERGE_DRIVER_PARA_PROJECAO_GERADA (gatilho disparado em #1062-#1065): parar de commitar projeções geradas no PR e regenerar no main depois do merge, por escritor único. Elenxo: PASSO 4, com Elenxo próprio."
+    narrative: "Restrições do Elenxo: as catracas HARD das REGRAS 39, 62, 80, 81 e 84 passam de \"PR em sincronia\" para \"main em sincronia depois da regeneração\" (títulos não verificados pelo Elenxo); o leitor em runtime (hook kg-read-leg lê kg-read-index.tsv) fica defasado entre o merge e a regeneração; as portas materializam de origin/main e só podem rodar depois da regeneração; falta fonte externa sobre escritor único pós-merge (descarte por comodismo). Pergunta aberta do sintetizador: commit separado no main ou amend dentro da faixa serial?"
+    trace: "run wf_48596b33-657 fase Elenxo"
+  - id: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.65
+    verified_at: "2026-10-13"
+    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    label: "OPÇÃO C — levar o helper merge-serial (flock) do scratchpad para ops/, envolvendo ops/pr-merge-verified.sh, com o lock só no rebase e no merge, e registrar cada auto-rebase como comentário no PR (H5). Elenxo: PASSO 2."
+    narrative: "O core é uma máquina e uma sessão e os pares co-ativos são quase todos intra-agente: flock local basta, fila no forge é desnecessária. Restrições: lock só no rebase e no merge, nunca durante a bancada (lock na bancada ≈ 4 merges/h); cada auto-rebase deixa rastro no PR (hoje ≥14 invisíveis), via adapter forge; o veto exit-2 do hook de merge segue como fronteira — é a capacidade que compra o acoplamento ao Claude Code. Memória temporario-evapora-vira-incidente: o provisório vira ops/."
+    trace: "run wf_48596b33-657 fase Elenxo"
+  - id: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    verified_at: "2026-10-13"
+    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    label: "OPÇÃO D — bancada em dois níveis sem fila: no PR, as famílias tocadas (a faixa do pre-commit) mais a label ci:full; bancada completa no push ao main, com alarme e PR de revert. Elenxo: PASSO 3."
+    narrative: "É o que falta de D_BANCADA_FAIXAS_E_MAPA (PR = famílias tocadas foi decidido em 2026-09-03 e o PR ainda roda a bancada inteira). O padrão keyorix depende de merge_group (fila nativa, indisponível; grep merge_group = 0). Restrições: completa no push ao main com alarme e revert automático; a janela de main quebrado é aceita e DECLARADA; ci:full segue disponível; os achados de correção sem detecção e quebra semântica sem conflito justificam verificar no main de qualquer jeito. Alternativa do sintetizador: completa dentro da faixa serial (~4 merges/h)."
+    trace: "run wf_48596b33-657 fase Elenxo"
+  - id: C_OPCAO_E_REQUIRED_CHECKS_RULESET
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-13"
+    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    label: "OPÇÃO E — required status checks via ruleset (de graça em repo público de usuário), SEM a regra de histórico linear enquanto o SAC-80 depender de --merge-commit. Elenxo: opcional."
+    narrative: "protected-branches.md do github/docs: disponível em repo público com GitHub Free de usuário. \"Require linear history\" barraria o --merge-commit do SAC-80 (ops/pr-merge-verified.sh, bloco a partir da l.143). Hoje o gate de merge é o veto exit-2 do hook + o caminho verificado; o ruleset seria uma segunda camada do lado do forge."
+    trace: "run wf_48596b33-657 fase Elenxo"
+  - id: C_OPCAO_F_THIRD_PARTY_FREE_QUEUE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.35
+    verified_at: "2026-10-13"
+    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    label: "OPÇÃO F — fila de terceiro gratuita (Mergify Open Source / Trunk Free até 5 committers). GATED: gatilho = depois de A a D ainda haver disputa de merge medida."
+    narrative: "Saída do gate exige: A já curado; prova de que o merge feito pelo App não contorna o hook exit-2 (merge e push ao main só por ops/pr-merge-verified.sh), ou redesenho explícito dessa fronteira. Instalação em conta pessoal e sub-recursos (batch, parallel checks) do plano Open Source NÃO verificados. Qualquer fila precisa de verificação do conteúdo depois do merge (lição do incidente de 23/04/2026)."
+    trace: "run wf_48596b33-657 fase Elenxo"
+  - id: C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.3
+    verified_at: "2026-10-13"
+    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    label: "OPÇÃO G — transferir o repo para uma organização Free para ter a fila nativa. GATED: custa a URL, o members.yaml, o marketplace.json, os scripts das portas e os pins dos adotantes."
+    narrative: "gated-features/merge-queue.md (github/docs): fila em \"any public repository owned by an organization\". O GitHub redireciona a URL velha, mas members.yaml, marketplace.json da raiz, ops/materialize-door.sh, ops/publish-door.sh e os pins dos adotantes apontam para marciocar/. Herda o incidente de 23/04/2026, cujo relatório se contradiz sobre o rebase. Decisão de identidade, não de CI."
+    trace: "run wf_48596b33-657 fase Elenxo"
+  - id: C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.3
+    verified_at: "2026-10-13"
+    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    label: "OPÇÃO H — merge driver de .gitattributes para projeções. Elenxo: REJEITAR — o merge do servidor do GitHub não executa driver custom e o rebase local já regenera as projeções."
+    narrative: "O driver custom vive em .git/config, que não viaja; só valeria no rebase LOCAL do pr-finalize --rebase, que já regenera as projeções desde o #973. Lacuna aberta: ninguém mediu se o merge do lado do servidor respeita o merge=union embutido que .gitattributes l.26 já declara para .claude/session-lifecycle.jsonl. \"Servidor não executa driver custom\" é conhecimento prévio, não medido nesta rodada."
+    trace: "run wf_48596b33-657 fase Elenxo"
+  - id: C_OPCAO_I_BORS_NG
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 1
+    confidence: 0.1
+    verified_at: "2026-10-13"
+    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    label: "OPÇÃO I — Bors/bors-ng. REFUTADA: repositório arquivado em 04/04/2024 e instância pública encerrada em 11/2023."
+    narrative: "Hospedagem própria de projeto arquivado não é opção mantida."
+    trace: "run wf_48596b33-657 fase Elenxo"
+  - id: C_OPCAO_J_STACKED_PRS_GRAPHITE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.25
+    verified_at: "2026-10-13"
+    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    label: "OPÇÃO J — stacked PRs / Graphite. Elenxo: REJEITAR — a dor medida é de arquivo-ímã, não de dependência entre PRs."
+    narrative: "O core já tem atrito registrado com stacks: o --delete-branch da base FECHA o PR filho (memória stacked-pr-merge-mechanics). Nenhuma claim confirmada cobre Graphite como produto de stacking nem preço."
+    trace: "run wf_48596b33-657 fase Elenxo"
+  - id: C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.2
+    verified_at: "2026-10-13"
+    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    label: "OPÇÃO K — contrarian: trunk direto sem fila e sem projeção commitada. Elenxo: REJEITAR — o core passa no critério time pequeno e reprova no build rápido (bancada de 14,8 min contra a meta de ~1 min, ≈15×)."
+    narrative: "Além disso as portas públicas consomem projeções commitadas (materialize-door leva inventory.md e graph.md). O descarte original apagou o motivo; aqui ele fica registrado como razão do não."
+    trace: "run wf_48596b33-657 fase Elenxo"
+  - id: D_MERGE_PROCESS_ONION_2026_10
+    node_type: decision
+    impact: 5
+    confidence: 0.6
+    label: "DECISÃO A SELAR PELO MAESTRO: PR/CI/merge do core. Opções: A ímã · B projeção pós-merge · C merge-serial em ops/ · D bancada 2 níveis · E required checks · F fila de 3º · G org · H driver · I bors · J stacked · K trunk. Elenxo: A→C→D→B; E opcional; F,G gated; H-K rejeitar."
+    trace: "run wf_48596b33-657 — pergunta do maestro sobre o processo de PR, CI e merge do core (2026-10-13)"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-13"
+    verified_against: "decisão do maestro em 2026-10-13, por pergunta com opções (/meta:decide): escolhida «A → C → D → B, em ordem»"
+    narrative: |-
+      RECOMENDAÇÃO DO ELENXO (INTEIRA): A ordem que recomendo ao maestro é A → C → D → B, com E opcional, F e G gated, e H, I, J e K rejeitados.
+
+      Passo 1, A (curar o ímã). testing-state.md aparece em 59/60 PRs com contadores globais, então dois PRs quaisquer entram em conflito. Esse é o gargalo medido, e NENHUMA fila o resolve: as filas ejetam PR em conflito (merge-queue-removal-reasons.md). Restrição: o painel continua existindo, mas como projeção regenerada no main, e o resíduo de revisão por PR mora só no arquivo do slug.
+
+      Passo 2, C (serializador local em ops/). O core é uma máquina e uma sessão, e os pares co-ativos são quase todos intra-agente. Um flock local basta, e uma fila no forge é desnecessária. Restrições:
+      - o lock vale só no rebase e no merge, nunca durante a bancada (lock na bancada ≈ 4 merges/h);
+      - cada auto-rebase deixa rastro no PR, porque hoje são 14 ou mais rebases invisíveis;
+      - o veto exit-2 do hook de merge continua sendo a fronteira. É a capacidade que compra o acoplamento ao Claude Code, e qualquer fila de terceiro que mergeia pelo próprio App tira o merge do caminho que o hook vigia. Esse é o motivo principal de F ficar gated.
+
+      Passo 3, D (bancada em dois níveis). O padrão keyorix só se transfere com um substituto para o merge_group, e ele não existe aqui: grep merge_group nos workflows dá 0, e a fila nativa é exclusiva de organização. Restrições:
+      - a bancada completa roda no push ao main, com alarme e PR de revert automático;
+      - aceita-se, e se declara, uma janela em que o main pode estar quebrado;
+      - a label ci:full continua disponível;
+      - os achados 2 e 5 (defeito de correção sem detecção automática, quebra semântica sem conflito) justificam verificar no main de qualquer jeito.
+
+      Passo 4, B (Opção 3). O gatilho do nó Q_MERGE_DRIVER_PARA_PROJECAO_GERADA disparou (#1062-#1065), então reabrir a decisão é devido. Mesmo assim ela passa por Elenxo próprio, porque mexe nas catracas HARD das REGRAS 39 (catraca de projeção gerada no lint), 62 (catraca byte-a-byte de projeção gerada), 80, 81 e 84 (catracas HARD de projeções), cujos títulos não verifiquei. Restrições:
+      - essas catracas passam de 'PR em sincronia' para 'main em sincronia depois da regeneração';
+      - há um leitor em runtime (o hook kg-read-leg lê kg-read-index.tsv) que fica defasado entre o merge e a regeneração;
+      - as portas materializam de origin/main e só podem rodar depois da regeneração;
+      - falta fonte externa sobre 'escritor único depois do merge'. Esse descarte foi por comodismo e precisa ser pesquisado antes de selar.
+
+      E (required checks por ruleset) é grátis e viável, mas SEM 'require linear history': essa regra barraria o --merge-commit do SAC-80 (pr-merge-verified l.143-220).
+
+      F fica GATED: Mergify é grátis para open source e Trunk é grátis para até 5 committers (lido nas páginas de preço; a instalação em conta pessoal não foi verificada). Gatilho: depois de A a D, ainda haver disputa de merge medida. Condições para sair do gate:
+      - A já curado;
+      - uma prova de que o merge do App não contorna o hook exit-2, ou um redesenho explícito dessa fronteira.
+
+      G fica GATED: a fila nativa exige uma organização (gated-features/merge-queue.md). Transferir custa a URL, o members.yaml, o marketplace.json, os scripts das portas e os pins dos adotantes, e ainda herda o incidente de 23/04/2026, cujo relatório se contradiz sobre o rebase.
+
+      H, rejeitado: o servidor do GitHub não executa driver custom, e o rebase local já regenera as projeções. Fica uma lacuna a medir: se o 'merge=union' que session-lifecycle.jsonl já declara vale do lado do servidor.
+
+      I, rejeitado: o bors está arquivado.
+
+      J, rejeitado: a dor não é dependência entre PRs, e o core já tem histórico de atrito com stacks (fechar a base fecha o PR filho).
+
+      K, rejeitado: o trunk direto exige um build de ~1 min, e a bancada do core tem mediana de 14,8 min. Além disso as portas públicas consomem projeções commitadas.
+
+      verified_against anterior: «retorno completo do Elenxo do run wf_48596b33-657 (recomendação inteira na narrative, recuperada do journal, não do texto truncado)»
+      Selado por /meta:decide em 2026-10-13: escolhida «A → C → D → B, em ordem»; descartadas: «Só A e C agora» · «A, C e B; D fica» · «Pesquisar antes».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-13: «Qual processo de PR/CI/merge o core adota? (D_MERGE_PROCESS_ONION_2026_10)»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      locality: "pessoa"
+  - id: E_OBJECAO_INCIDENT_WEIGHS_LITTLE_QUEUE_UNAVAILABLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 1 — incidente de abril de 2026 na merge queue (reversão silenciosa em grupos com vários PRs)\""
+    label: "OBJEÇÃO (Achado 1): o incidente de 23/04/2026 confere, mas pesa pouco — a fila nativa nem está disponível para o core (dono User) e é n=1 revertido no mesmo dia. Lição que fica: qualquer fila precisa de verificação do conteúdo no main."
+    narrative: "Alvo: Achado 1 — incidente de abril de 2026 na merge queue (reversão silenciosa em grupos com vários PRs) (kind=finding). Evidência do Elenxo (1 agente, sem votação): O fato confere: githubstatus zsg1lk7w13cf, 23/04/2026, das 16:05 às 20:43 UTC, só em grupos com mais de 1 PR. Mas a objeção de que ele não pesa na decisão fica de pé. A fila nativa NÃO ESTÁ DISPONÍVEL para o core: o texto que o GitHub reaproveita nas páginas de docs (github/docs, data/reusables/gated-features/merge-queue.md) diz 'available in any public repository owned by an organization, or in private repositories owned by organizations using GitHub Enterprise Cloud', e gh api mostra o dono do repo como owner.type=User. Além disso é n=1, revertido no mesmo dia. Usá-lo como argumento contra filas em geral é generalizar a partir de um caso. A lição que dá para levar é outra: qualquer fila, inclusive de terceiros, precisa de uma verificação do conteúdo depois do merge, no main. Re-lido pelo escritor em 2026-10-13: github/docs data/reusables/gated-features/merge-queue.md (último commit 3af796049a, 2025-01-29) diz \"Pull request merge queues are available in any public repository owned by an organization\"."
+    trace: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md"
+    provenance:
+      source: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md"
+      locator: "objeção #0 do retorno do Elenxo (Achado 1 — incidente de abril de 2026 na merge queue (reversão silenciosa em grupos com vários PRs))"
+      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_GHES_WRONG_VERSION_OWNER_IS_BLOCK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 3 — a regra de merge queue não existe em ruleset de organização (GHES 3.17)\""
+    label: "OBJEÇÃO (Achado 3): a fonte é do GHES 3.17 e responde ao NÍVEL do ruleset. O que bloqueia o core é QUEM É O DONO: no github.com a fila só existe em repo de organização; um ruleset de repo não a faz aparecer."
+    narrative: "Alvo: Achado 3 — a regra de merge queue não existe em ruleset de organização (GHES 3.17) (kind=finding). Evidência do Elenxo (1 agente, sem votação): A fonte é da versão errada (GHES 3.17, não github.com) e responde outra pergunta (o NÍVEL do ruleset). O que bloqueia o core é QUEM É O DONO do repo, não o nível do ruleset: no github.com a fila só existe em repo público de organização (gated-features/merge-queue.md, bloco 'fpt or ghec'). Do jeito que está escrito, o achado leva a crer que um ruleset de repo resolveria. Não resolve: num repo de dono User a fila nem aparece. Re-lido pelo escritor em 2026-10-13: github/docs data/reusables/gated-features/merge-queue.md (último commit 3af796049a, 2025-01-29) diz \"Pull request merge queues are available in any public repository owned by an organization\"."
+    trace: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md"
+    provenance:
+      source: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md"
+      locator: "objeção #2 do retorno do Elenxo (Achado 3 — a regra de merge queue não existe em ruleset de organização (GHES 3.17))"
+      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_DRIVER_NOT_RUN_SERVER_SIDE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "ops/pr-merge-verified.sh@5621f6ed — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 4 — o merge driver só é invocado em conflito não trivial\""
+    label: "OBJEÇÃO (Achado 4): a fonte é do GitLab; o driver custom vive em .git/config, não viaja, e o merge do servidor do GitHub não o roda. Só valeria no rebase local, que já regenera projeções desde o #973."
+    narrative: "Alvo: Achado 4 — o merge driver só é invocado em conflito não trivial (kind=finding). Evidência do Elenxo (1 agente, sem votação): A fonte é do GitLab e não diz a parte que mais pesa para o GitHub. O driver custom é definido em .git/config, que não viaja com o repo, então o merge ou rebase feito no servidor do GitHub não o executa. Ele só valeria no rebase LOCAL que o ops/pr-merge-verified.sh já faz via pr-finalize --rebase, e esse caminho já regenera as projeções desde o #973. Conclusão: um driver não acrescenta nada à Opção 2 que já está em produção. Há ainda uma lacuna em aberto: o .gitattributes já declara 'merge=union' em .claude/session-lifecycle.jsonl, e ninguém mediu se o merge do lado do servidor respeita esse atributo."
+    trace: "ops/pr-merge-verified.sh@5621f6ed"
+    provenance:
+      source: "ops/pr-merge-verified.sh@5621f6ed"
+      locator: "objeção #3 do retorno do Elenxo (Achado 4 — o merge driver só é invocado em conflito não trivial)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_KEYORIX_NEEDS_MERGE_GROUP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: ".github/workflows@5621f6ed — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 6 — keyorix #2052: matriz completa só em merge_group/push/label, faixa rápida no PR\""
+    label: "OBJEÇÃO (Achado 6): o padrão keyorix depende de merge_group, que exige a fila nativa (indisponível; grep merge_group nos workflows = 0). Copiado como está, deixa o PR sem bancada completa antes do main; o substituto é completa no push ao main + revert."
+    narrative: "Alvo: Achado 6 — keyorix #2052: matriz completa só em merge_group/push/label, faixa rápida no PR (kind=finding). Evidência do Elenxo (1 agente, sem votação): O padrão depende do evento merge_group, que exige a fila nativa, indisponível num repo de dono User. grep -rn merge_group .github/workflows devolve ZERO. Copiar o padrão como está no keyorix deixa o PR sem nenhuma garantia de bancada completa antes do main. O substituto possível é rodar a bancada completa no push ao main, depois do merge, com alarme ou PR de revert, aceitando uma janela em que o main pode estar quebrado."
+    trace: ".github/workflows@5621f6ed"
+    provenance:
+      source: ".github/workflows@5621f6ed"
+      locator: "objeção #5 do retorno do Elenxo (Achado 6 — keyorix #2052: matriz completa só em merge_group/push/label, faixa rápida no PR)"
+      method: "medição: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_FULL_PR_BENCH_IS_ONLY_GUARANTEE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/keyorixhq/keyorix/pull/2052 — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 7 — a matriz completa no PR duplica a garantia da fila (de 39 para 23 jobs)\""
+    label: "OBJEÇÃO (Achado 7): sem fila, a bancada completa no PR NÃO é duplicação — é a única garantia antes do main. A economia de 39→23 jobs só se transfere com substituto (completa no main com revert)."
+    narrative: "Alvo: Achado 7 — a matriz completa no PR duplica a garantia da fila (de 39 para 23 jobs) (kind=finding). Evidência do Elenxo (1 agente, sem votação): A justificativa pressupõe uma fila que testa o resultado exato do merge, e o core não tem fila. Sem ela, rodar a bancada completa no PR NÃO é duplicação: é a única garantia que existe antes do main. A economia de 39 para 23 jobs só se transfere se ganhar um substituto (bancada completa no main com revert)."
+    trace: "https://github.com/keyorixhq/keyorix/pull/2052"
+    provenance:
+      source: "https://github.com/keyorixhq/keyorix/pull/2052"
+      locator: "objeção #6 do retorno do Elenxo (Achado 7 — a matriz completa no PR duplica a garantia da fila (de 39 para 23 jobs))"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_SEQUENTIAL_MERGE_IS_CURRENT_PRACTICE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "ops/pr-merge-verified.sh@5621f6ed — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 8 — merge sequencial com rebase sobre o alvo atualizado + CI em cada merge\""
+    label: "OBJEÇÃO (Achado 8): merge sequencial com rebase o core JÁ FAZ (auto-rebase do pr-merge-verified, ordem de abertura); o custo é a H3 (≥14 rebases, bancada completa cada). Não é coisa nova: falta tirar o ímã que FORÇA o rebase."
+    narrative: "Alvo: Achado 8 — merge sequencial com rebase sobre o alvo atualizado + CI em cada merge (kind=finding). Evidência do Elenxo (1 agente, sem votação): O core JÁ FAZ isso. O ops/pr-merge-verified.sh tem AUTO-REBASE (l.35-40 e l.240-251), que exige que as runs do head NOVO nasçam e terminem, e a ponte do maestro já fixou o merge serial na ordem de abertura. Esse é o custo da H3: o auto-rebase disparou 14 vezes ou mais, cada rebase custa a bancada completa (mediana 14,8 min) e a mediana é de 2 runs de selftest por PR. Portanto não é algo novo a adotar, é a prática atual. O que falta é tirar o arquivo-ímã que FORÇA o rebase."
+    trace: "ops/pr-merge-verified.sh@5621f6ed"
+    provenance:
+      source: "ops/pr-merge-verified.sh@5621f6ed"
+      locator: "objeção #7 do retorno do Elenxo (Achado 8 — merge sequencial com rebase sobre o alvo atualizado + CI em cada merge)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_FLOCK_MUST_WRAP_API_MERGE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "ops/pr-merge-verified.sh@5621f6ed — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 9 — a fila do claude-code-merge-queue é local de uma só máquina\""
+    label: "OBJEÇÃO (Achado 9): o limite de uma só máquina não pesa (o core é uma VPS e uma sessão), mas o merge sai por gh pr merge via API, não por push: o git não rejeita non-fast-forward e o flock precisa envolver a chamada ao pr-merge-verified."
+    narrative: "Alvo: Achado 9 — a fila do claude-code-merge-queue é local de uma só máquina (kind=finding). Evidência do Elenxo (1 agente, sem votação): Para o core essa limitação não se aplica. O core vive numa máquina só (KVM 8, sessão tmux 'claude'), e os PRs em paralelo saem da mesma sessão. Uma fila local com flock basta. Um detalhe: o merge sai por 'gh pr merge' via API, não por push, então o git não rejeita nada como non-fast-forward. O flock precisa envolver a chamada ao pr-merge-verified, não um push."
+    trace: "ops/pr-merge-verified.sh@5621f6ed"
+    provenance:
+      source: "ops/pr-merge-verified.sh@5621f6ed"
+      locator: "objeção #8 do retorno do Elenxo (Achado 9 — a fila do claude-code-merge-queue é local de uma só máquina)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_ADOPT_SERIALIZATION_NOT_TOOL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://www.everydev.ai/tools/claude-code-merge-queue — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 10 — o único gate da ferramenta é o checkCommand, sem revisão humana\""
+    label: "OBJEÇÃO (Achado 10): o gate do claude-code-merge-queue é só o checkCommand; o Onion adota só a serialização, e o gate segue o CI do forge mais o veto exit-2 do hook de merge. A ferramenta em si não se adota."
+    narrative: "Alvo: Achado 10 — o único gate da ferramenta é o checkCommand, sem revisão humana (kind=finding). Evidência do Elenxo (1 agente, sem votação): Isso não pesa contra o padrão: o Onion adotaria só a serialização. O gate continua sendo o CI do forge mais o veto exit-2 do hook de merge (merge e push ao main só por ops/pr-merge-verified.sh). A ferramenta em si não deve ser adotada."
+    trace: "https://www.everydev.ai/tools/claude-code-merge-queue"
+    provenance:
+      source: "https://www.everydev.ai/tools/claude-code-merge-queue"
+      locator: "objeção #9 do retorno do Elenxo (Achado 10 — o único gate da ferramenta é o checkCommand, sem revisão humana)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_HELPER_LIVES_ONLY_IN_SCRATCHPAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/funador/claude-code-merge-queue — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 11 — funador serializa landings com FIFO local + pre-push\""
+    label: "OBJEÇÃO (Achado 11): o padrão FIFO+lock já existe no core, mas FORA do repo: o helper merge-serial vive só no scratchpad da sessão. O provisório vira ops/ ou volta como incidente; levar o helper ao repo, não adotar ferramenta de terceiro."
+    narrative: "Alvo: Achado 11 — funador serializa landings com FIFO local + pre-push (kind=finding). Evidência do Elenxo (1 agente, sem votação): O padrão já existe no core, mas FORA do repo: o helper merge-serial com flock vive só no scratchpad da sessão (medição do corpus). A memória temporario-evapora-vira-incidente manda: o que é provisório vira ops/ ou volta como incidente. A decisão certa é levar o helper para o repo, como ops/ que envolve o pr-merge-verified, e não adotar a ferramenta de terceiro."
+    trace: "https://github.com/funador/claude-code-merge-queue"
+    provenance:
+      source: "https://github.com/funador/claude-code-merge-queue"
+      locator: "objeção #10 do retorno do Elenxo (Achado 11 — funador serializa landings com FIFO local + pre-push)"
+      method: "testemunho: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_LOCK_ONLY_ON_REBASE_AND_MERGE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/funador/claude-code-merge-queue — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 12 — o lock dura a suíte inteira e a vazão fica abaixo de 20/h\""
+    label: "OBJEÇÃO (Achado 12): com lock preso na bancada de 14,8 min a capacidade é ~4 merges/h contra demanda ~1/h; só aperta em rajada (#1062-#1065 enfileiraria ~1 h). Basta prender o lock só no rebase e no merge."
+    narrative: "Alvo: Achado 12 — o lock dura a suíte inteira e a vazão fica abaixo de 20/h (kind=finding). Evidência do Elenxo (1 agente, sem votação): Os números do core mostram que esse teto não aperta no dia a dia. Com o lock preso durante a bancada completa de 14,8 min, a capacidade é de cerca de 4 merges/h, e a demanda medida é de 60 PRs em 2,4 dias, cerca de 1/h. Ele só aperta em rajada: o incidente #1062-#1065 com 4 PRs enfileiraria cerca de 1h. Basta não prender o lock durante a bancada de PR, só durante o rebase e o merge."
+    trace: "https://github.com/funador/claude-code-merge-queue"
+    provenance:
+      source: "https://github.com/funador/claude-code-merge-queue"
+      locator: "objeção #11 do retorno do Elenxo (Achado 12 — o lock dura a suíte inteira e a vazão fica abaixo de 20/h)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_ORG_TRANSFER_OPTION_OMITTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 15 — a fila nativa só serve a org open source/Enterprise, não a repo de usuário\""
+    label: "OBJEÇÃO (Achado 15): conclusão certa com evidência velha (tier 3, beta, blog de concorrente); a primária atual confirma. E ficou de fora a opção TRANSFERIR para organização Free, com custo alto nomeado — tem de existir como gated."
+    narrative: "Alvo: Achado 15 — a fila nativa só serve a org open source/Enterprise, não a repo de usuário (kind=finding). Evidência do Elenxo (1 agente, sem votação): A conclusão está certa, mas a evidência é velha: tier 3, da época do beta, em blog de concorrente. A fonte primária ATUAL confirma: github/docs data/reusables/gated-features/merge-queue.md diz 'any public repository owned by an organization'. A objeção de fundo é uma opção que ficou de fora: TRANSFERIR o repo para uma organização Free tornaria a fila nativa disponível de graça. O custo é alto: a URL muda (o GitHub redireciona), e o members.yaml, o marketplace.json da raiz, o ops/materialize-door.sh/publish-door.sh e os adotantes com pin apontam para marciocar/. Isso precisa ser nomeado e ficar gated, não fingir que não existe. Re-lido pelo escritor em 2026-10-13: github/docs data/reusables/gated-features/merge-queue.md (último commit 3af796049a, 2025-01-29) diz \"Pull request merge queues are available in any public repository owned by an organization\"."
+    trace: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md"
+    provenance:
+      source: "https://github.com/github/docs/blob/main/data/reusables/gated-features/merge-queue.md"
+      locator: "objeção #14 do retorno do Elenxo (Achado 15 — a fila nativa só serve a org open source/Enterprise, não a repo de usuário)"
+      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_PROTECTION_IS_CHOICE_NOT_LIMIT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/github/docs/blob/main/data/reusables/gated-features/protected-branches.md — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 16 — a fila nativa funciona sobre branch protection, que o core não usa\""
+    label: "OBJEÇÃO (Achado 16): não usar branch protection é ESCOLHA, não limite — protected branches existem em repo público de usuário no Free (protection 404 e rulesets [] hoje). O bloqueio real da fila é o dono do repo."
+    narrative: "Alvo: Achado 16 — a fila nativa funciona sobre branch protection, que o core não usa (kind=finding). Evidência do Elenxo (1 agente, sem votação): 'Não usa' é uma ESCOLHA, não um limite. gated-features/protected-branches.md diz 'available in public repositories with GitHub Free' (de usuário), e hoje o repo dá protection 404 e rulesets []. Do jeito que está escrito, o achado sugere um bloqueio que não existe. O bloqueio real é o dono do repo (achado 15). Re-lido pelo escritor em 2026-10-13: gated-features/protected-branches.md (github/docs@3121c7d386) diz \"Protected branches are available in public repositories with GitHub Free\"."
+    trace: "https://github.com/github/docs/blob/main/data/reusables/gated-features/protected-branches.md"
+    provenance:
+      source: "https://github.com/github/docs/blob/main/data/reusables/gated-features/protected-branches.md"
+      locator: "objeção #15 do retorno do Elenxo (Achado 16 — a fila nativa funciona sobre branch protection, que o core não usa)"
+      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_QUEUE_DOES_NOT_CURE_MAGNET
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://graphite.com/guides/merge-queue-best-practices — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 17 — Graphite: times de até cerca de 10 devs provavelmente não precisam de fila\""
+    label: "OBJEÇÃO (Achado 17): guia de fornecedor (tier 3, 2-1); a exceção de alto volume se aplica ao core (~25 PRs/dia, 11/60 fora da ordem). Mas a dor medida nem passa por fila: é o ímã testing-state.md em 59/60, e uma fila não o resolve."
+    narrative: "Alvo: Achado 17 — Graphite: times de até cerca de 10 devs provavelmente não precisam de fila (kind=finding). Evidência do Elenxo (1 agente, sem votação): Vem de guia de fornecedor, tier 3, votação 2-1. A exceção do próprio guia ('alto volume de PRs') se aplica: o core tem 1 humano e N agentes, com cerca de 25 PRs/dia e 11/60 merges fora da ordem. A dor medida, porém, nem passa por fila: é o arquivo-ímã (testing-state.md em 59/60 PRs). Uma fila ejeta o PR em conflito e não resolve isso."
+    trace: "https://graphite.com/guides/merge-queue-best-practices"
+    provenance:
+      source: "https://graphite.com/guides/merge-queue-best-practices"
+      locator: "objeção #16 do retorno do Elenxo (Achado 17 — Graphite: times de até cerca de 10 devs provavelmente não precisam de fila)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_LINEAR_HISTORY_BLOCKS_SAC80
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "ops/pr-merge-verified.sh@5621f6ed — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Achado 21 — exigir histórico linear requer squash ou rebase permitido\""
+    label: "OBJEÇÃO (Achado 21): \"require linear history\" é compatível com rebase, mas barraria o --merge-commit do SAC-80, obrigatório quando o .kg.yaml cita commit da própria branch. Adotar a regra exige antes redesenhar o SAC-80."
+    narrative: "Alvo: Achado 21 — exigir histórico linear requer squash ou rebase permitido (kind=finding). Evidência do Elenxo (1 agente, sem votação): A regra é compatível com o rebase, mas o achado deixa de fora um conflito de mecanismo. O ops/pr-merge-verified.sh tem a flag --merge-commit, OBRIGATÓRIA quando o .kg.yaml cita commit da própria branch em provenance.source (SAC-80, l.143-220: 'Rode de novo com --merge-commit, que preserva o SHA'). Uma regra de histórico linear no main barraria esse escape, e o script recusaria ou falharia. Adotar a regra exige antes redesenhar o SAC-80."
+    trace: "ops/pr-merge-verified.sh@5621f6ed"
+    provenance:
+      source: "ops/pr-merge-verified.sh@5621f6ed"
+      locator: "objeção #20 do retorno do Elenxo (Achado 21 — exigir histórico linear requer squash ou rebase permitido)"
+      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_RULESETS_FREE_HALF_DISCARDED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/github/docs/blob/main/data/reusables/gated-features/protected-branches.md — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Descartado (refutado) — rulesets disponíveis em repo público Free; sem plano mínimo para a fila\""
+    label: "OBJEÇÃO (descarte): refutar \"rulesets em repo público Free\" jogou fora a metade VERDADEIRA — protected branches e rulesets existem em repo público de usuário; só a FILA é de organização. Required checks são opção real e gratuita."
+    narrative: "Alvo: Descartado (refutado) — rulesets disponíveis em repo público Free; sem plano mínimo para a fila (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): O descarte jogou fora a metade VERDADEIRA. Protected branches e rulesets existem em repo público de usuário no Free (gated-features/protected-branches.md). Só a FILA é exclusiva de organização (gated-features/merge-queue.md). Faltou separar as duas metades: required status checks são uma opção real, de graça, para o core. Re-lido pelo escritor em 2026-10-13: gated-features/protected-branches.md (github/docs@3121c7d386) diz \"Protected branches are available in public repositories with GitHub Free\"."
+    trace: "https://github.com/github/docs/blob/main/data/reusables/gated-features/protected-branches.md"
+    provenance:
+      source: "https://github.com/github/docs/blob/main/data/reusables/gated-features/protected-branches.md"
+      locator: "objeção #21 do retorno do Elenxo (Descartado (refutado) — rulesets disponíveis em repo público Free; sem plano mínimo para a fila)"
+      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_CONTRARIAN_DISCARD_HID_REASON
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/ — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Descartado (refutado) — trunk-based exige o build completo antes do push\""
+    label: "OBJEÇÃO (descarte): refutar \"trunk-based exige build completo antes do push\" apagou o motivo que REPROVA o contrarian no core: bancada mediana de 14,8 min contra a meta de ~1 min do commit direto no trunk."
+    narrative: "Alvo: Descartado (refutado) — trunk-based exige o build completo antes do push (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Essa é a premissa do ângulo contrarian que o Scope pediu: trunk sem fila e sem projeção commitada. O descarte apagou o motivo que o REPROVA no core: uma bancada de 14,8 min de mediana contra a meta de cerca de 1 min do commit direto no trunk (também cortada por orçamento). Faltou registrar essa comparação de números como a razão do 'não' ao contrarian."
+    trace: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
+    provenance:
+      source: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
+      locator: "objeção #23 do retorno do Elenxo (Descartado (refutado) — trunk-based exige o build completo antes do push)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_STRICT_VS_LOOSE_IS_THE_AXIS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Cortado por orçamento — status checks strict x loose\""
+    label: "OBJEÇÃO (corte): status checks strict x loose é o eixo central da bancada e foi cortado. Strict + auto-rebase de hoje custa a bancada completa a cada rebase (≥14, mediana 2 runs/PR); loose = PR com famílias tocadas + main completo."
+    narrative: "Alvo: Cortado por orçamento — status checks strict x loose (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É exatamente o trade-off da H3: o modo strict, com o auto-rebase de hoje, custa a bancada completa a cada rebase (14 rebases ou mais, mediana de 2 runs de selftest por PR). O modo loose seria o PR com as famílias tocadas mais o main completo. Esse é o eixo central da decisão sobre a bancada e foi cortado sem evidência."
+    trace: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+    provenance:
+      source: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      locator: "objeção #26 do retorno do Elenxo (Cortado por orçamento — status checks strict x loose)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_SERVER_SIDE_UNION_UNMEASURED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: ".gitattributes@5621f6ed — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Cortado por orçamento — merge driver não suportado no GitLab.com\""
+    label: "OBJEÇÃO (corte): faltou a pergunta equivalente no GitHub — o merge/rebase do servidor roda driver custom (não: fica em .git/config) ou o merge=union embutido que .gitattributes l.26 já declara? Não medido."
+    narrative: "Alvo: Cortado por orçamento — merge driver não suportado no GitLab.com (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É irrelevante para o GitHub em si, mas faltou fazer a pergunta equivalente para o GitHub: o merge e o rebase do lado do servidor executam um driver custom (não, porque a config fica em .git/config) ou o 'merge=union' embutido que o core já declara em session-lifecycle.jsonl? Isso não foi medido."
+    trace: ".gitattributes@5621f6ed"
+    provenance:
+      source: ".gitattributes@5621f6ed"
+      locator: "objeção #27 do retorno do Elenxo (Cortado por orçamento — merge driver não suportado no GitLab.com)"
+      method: "medição: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_INTRA_AGENT_ANCHORS_LOCAL_SERIALIZER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-13"
+    verified_against: "https://arxiv.org/abs/2607.04697 — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Cortado por orçamento — quase todo par co-ativo é intra-agente (só 0,5% cross-agent)\""
+    label: "OBJEÇÃO (corte): \"quase todo par co-ativo é intra-agente (0,5% cross-agent)\" é exatamente o caso do core (uma sessão, N subagentes, uma máquina) e ancoraria que um serializador LOCAL basta, sem fila no forge."
+    narrative: "Alvo: Cortado por orçamento — quase todo par co-ativo é intra-agente (só 0,5% cross-agent) (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É o caso do core: uma sessão com N subagentes numa máquina. O dado sustenta que um serializador LOCAL basta, sem fila no forge, e foi cortado justo quando ancoraria o passo 3 da recomendação. Fonte primária citada, NÃO lida na rodada (o dado veio de claim cortada por orçamento)."
+    trace: "https://arxiv.org/abs/2607.04697"
+    provenance:
+      source: "https://arxiv.org/abs/2607.04697"
+      locator: "objeção #29 do retorno do Elenxo (Cortado por orçamento — quase todo par co-ativo é intra-agente (só 0,5% cross-agent))"
+      method: "testemunho: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_TRUNK_SMALL_TEAM_FAST_BUILD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/ — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Cortado por orçamento — commit direto no trunk associado a times pequenos e builds rápidos\""
+    label: "OBJEÇÃO (corte): commit direto no trunk se associa a time pequeno E build rápido; o core passa no primeiro e reprova no segundo (bancada 14,8 min, lint 5,6 min). Sem esse registro o contrarian foi descartado sem prova."
+    narrative: "Alvo: Cortado por orçamento — commit direto no trunk associado a times pequenos e builds rápidos (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É a outra metade do critério contrarian. O core passa no primeiro critério (time pequeno) e reprova no segundo (bancada de 14,8 min, lint de 5,6 min). Sem esse registro, o contrarian foi descartado sem prova."
+    trace: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
+    provenance:
+      source: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
+      locator: "objeção #33 do retorno do Elenxo (Cortado por orçamento — commit direto no trunk associado a times pequenos e builds rápidos)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_TRUNK_ONE_MINUTE_BUILD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/ — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Cortado por orçamento — o build completo antes da integração precisa durar cerca de 1 min\""
+    label: "OBJEÇÃO (corte): o build completo antes da integração precisa durar ~1 min; é o número que reprova o trunk direto no core (14,8 min ≈ 15× a meta)."
+    narrative: "Alvo: Cortado por orçamento — o build completo antes da integração precisa durar cerca de 1 min (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Ver acima: é o número que reprova o trunk direto no core (14,8 min ≈ 15× a meta)."
+    trace: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
+    provenance:
+      source: "https://trunkbaseddevelopment.com/committing-straight-to-the-trunk/"
+      locator: "objeção #34 do retorno do Elenxo (Cortado por orçamento — o build completo antes da integração precisa durar cerca de 1 min)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_LOCK_SCOPE_SETS_THROUGHPUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/funador/claude-code-merge-queue — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Cortado por orçamento — o lock FIFO preso durante o checkCommand limita a vazão\""
+    label: "OBJEÇÃO (corte): o escopo do lock DEFINE o desenho do merge-serial em ops/: preso na bancada ≈ 4 merges/h; só no rebase e no merge (com CI já verde no head) ≈ dezenas por hora. Faltou fazer essa conta."
+    narrative: "Alvo: Cortado por orçamento — o lock FIFO preso durante o checkCommand limita a vazão (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Ele decide COMO levar o merge-serial para ops/. Se o lock ficar preso durante a bancada, a capacidade cai para cerca de 4 merges/h. Se ficar só no rebase e no merge (com o CI já verde no head), a capacidade é de dezenas por hora. Faltou fazer essa conta, que define o desenho."
+    trace: "https://github.com/funador/claude-code-merge-queue"
+    provenance:
+      source: "https://github.com/funador/claude-code-merge-queue"
+      locator: "objeção #36 do retorno do Elenxo (Cortado por orçamento — o lock FIFO preso durante o checkCommand limita a vazão)"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_ANY_QUEUE_BLOCKED_BY_MAGNET
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/github/docs/blob/main/data/reusables/pull_requests/merge-queue-removal-reasons.md — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Cortado por orçamento — a fila nativa é FIFO única e ejeta o PR em conflito ou falha\""
+    label: "OBJEÇÃO (corte): enquanto o ímã existir, QUALQUER fila (nativa ou de terceiro) tiraria quase todo PR depois do primeiro; é o argumento para curar o ímã ANTES de cogitar fila. Ressalva do escritor: a lista de remoção do GitHub não cita conflito."
+    narrative: "Alvo: Cortado por orçamento — a fila nativa é FIFO única e ejeta o PR em conflito ou falha (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É o motivo que derruba QUALQUER fila (nativa ou de terceiros) enquanto o ímã existir: testing-state.md em 59/60 PRs faz dois PRs quaisquer entrarem em conflito, então a fila ejetaria quase todo PR depois do primeiro. As razões de remoção estão em data/reusables/pull_requests/merge-queue-removal-reasons.md. Esse é o argumento para curar o ímã ANTES de cogitar fila, e ele foi cortado. RESSALVA DO ESCRITOR (re-leitura em 2026-10-13 de data/reusables/pull_requests/merge-queue-removal-reasons.md, github/docs@0886a399f0): a lista traz falha de CI, timeout, remoção manual e falha de branch protection não resolvida — NÃO lista conflito de merge explicitamente. A ejeção por conflito é inferência do Elenxo, não texto da fonte; o argumento de fundo (o ímã torna quase todo par conflitante) fica de pé pela medição local."
+    trace: "https://github.com/github/docs/blob/main/data/reusables/pull_requests/merge-queue-removal-reasons.md"
+    provenance:
+      source: "https://github.com/github/docs/blob/main/data/reusables/pull_requests/merge-queue-removal-reasons.md"
+      locator: "objeção #39 do retorno do Elenxo (Cortado por orçamento — a fila nativa é FIFO única e ejeta o PR em conflito ou falha)"
+      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_MERGIFY_OSS_FREE_QUEUE_EXISTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://mergify.com/pricing — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Fonte não lida — mergify.com/pricing\""
+    label: "OBJEÇÃO (fonte não lida): mergify.com/pricing, lido pelo Elenxo: grátis para open source, com Merge Queue no FAQ. EXISTE fila gratuita para o core público via GitHub App; instalação em conta pessoal e sub-recursos não verificados."
+    narrative: "Alvo: Fonte não lida — mergify.com/pricing (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Li a página agora: 'Mergify is free for open source projects and for private teams of up to 5 active contributors', com plano Open Source de usuários ilimitados, e o FAQ inclui a Merge Queue. Ou seja, EXISTE fila de graça para o core público, via GitHub App, sem a fila nativa. Continua sem verificar: instalação numa conta pessoal e quais sub-recursos (batch, parallel checks) entram no plano Open Source."
+    trace: "https://mergify.com/pricing"
+    provenance:
+      source: "https://mergify.com/pricing"
+      locator: "objeção #40 do retorno do Elenxo (Fonte não lida — mergify.com/pricing)"
+      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_TRUNK_FREE_QUEUE_EXISTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://trunk.io/pricing — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Fonte não lida — trunk.io/pricing\""
+    label: "OBJEÇÃO (fonte não lida): trunk.io/pricing, lido pelo Elenxo: Merge Queue \"Included\" no Free, até 5 committers, limites soft. Mais uma fila gratuita que o descarte escondeu; funcionamento em repo de dono User não verificado."
+    narrative: "Alvo: Fonte não lida — trunk.io/pricing (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Li a página agora: a Merge Queue aparece como 'Included' no Free ('Free for teams up to 5', 'Up to 5 Repo Committers', limites soft). É mais uma fila gratuita viável que o descarte escondeu. Não está verificado se funciona em repo de dono User."
+    trace: "https://trunk.io/pricing"
+    provenance:
+      source: "https://trunk.io/pricing"
+      locator: "objeção #41 do retorno do Elenxo (Fonte não lida — trunk.io/pricing)"
+      method: "leitura: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_POSTMERGE_WRITER_NO_EXTERNAL_SOURCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Fontes não lidas — lingo.dev, oneuptime, tessl (gerados no merge)\""
+    label: "OBJEÇÃO (fontes não lidas): \"projeção commitada x gerada depois do merge\" ficou SEM fonte externa lida, e é a decisão gated da Opção 3, cujo gatilho disparou. Falta prática documentada de escritor único pós-merge e de leitor em runtime."
+    narrative: "Alvo: Fontes não lidas — lingo.dev, oneuptime, tessl (gerados no merge) (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): A pergunta 'projeção commitada x gerada no CI ou depois do merge' ficou SEM nenhuma fonte externa lida, e é a decisão gated da Opção 3 (Q_MERGE_DRIVER_PARA_PROJECAO_GERADA), cujo gatilho disparou em #1062-#1065. Faltou ao menos uma prática documentada de 'regenerar no main por escritor único' (bot de pós-merge) e como lidar com leitores em runtime de arquivo gerado."
+    trace: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml"
+      locator: "objeção #44 do retorno do Elenxo (Fontes não lidas — lingo.dev, oneuptime, tessl (gerados no merge))"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_TWO_TIER_WITHOUT_QUEUE_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-13"
+    verified_against: "https://github.com/keyorixhq/keyorix/pull/2052 — objeção sobrevivente do Elenxo do run wf_48596b33-657 sobre \"Fontes não lidas — evgunter/cad#1887, hivecommons/hive#10884, bernstein#5793 (CI em dois níveis)\""
+    label: "OBJEÇÃO (fontes não lidas): o único CI em dois níveis lido (keyorix) depende de merge_group; faltou procurar a variante SEM fila (completa no push ao main + revert), a aplicável. evgunter/cad#1887, hive#10884, bernstein#5793 poderiam cobri-la."
+    narrative: "Alvo: Fontes não lidas — evgunter/cad#1887, hivecommons/hive#10884, bernstein#5793 (CI em dois níveis) (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): O único exemplo lido (keyorix) depende de merge_group, que o core não pode ter. Faltou procurar o CI em dois níveis SEM fila (completo no push ao main mais revert), justamente a variante aplicável. Essas fontes poderiam cobri-la."
+    trace: "https://github.com/keyorixhq/keyorix/pull/2052"
+    provenance:
+      source: "https://github.com/keyorixhq/keyorix/pull/2052"
+      locator: "objeção #45 do retorno do Elenxo (Fontes não lidas — evgunter/cad#1887, hivecommons/hive#10884, bernstein#5793 (CI em dois níveis))"
+      method: "derivado: Elenxo do run wf_48596b33-657 (1 agente, sem votação)"
+      locality: "web"
+  - id: E_LACUNAS_MERGE_PROCESS_2026_10
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "contagem do retorno do run wf_48596b33-657 (Elenxo e sintetizador) no journal da fase, e grep -c E_OBJECAO no grafo"
+    source_tier: 10
+    source_kind: primary
+    label: "O QUE A RODADA NÃO COBRIU, contado: objeções 46 julgadas, 27 sobreviventes, 27 modeladas (nenhuma fora do teto); 4 claims refutadas; 0 não verificadas por rede; 30 fontes e 32 claims cortadas por orçamento; Aviator sem nenhuma claim."
+    narrative: "(1) OBJEÇÕES: 46 julgadas, 27 SOBREVIVENTES (14 sobre achados + 13 sobre descartes, cortes e fontes não lidas), 27 MODELADAS como E_OBJECAO_*; contadas no retorno COMPLETO do journal, não no texto repassado ao escritor (a recomendação chegou truncada em \"quase tod\" no passo 2; a narrative de D_ tem o texto inteiro). (2) REFUTADAS na votação (4): rulesets em repo público Free sem plano mínimo para a fila (tier 8, refutada por COMODISMO — a metade verdadeira virou E_OBJECAO_RULESETS_FREE_HALF_DISCARDED); 40,2% dos repos com pares de agentes co-ativos (tier 7, arXiv 2607.04697, não transfere: a medição local basta); trunk-based exige build completo antes do push (tier 6, refutada por COMODISMO — virou E_OBJECAO_CONTRARIAN_DISCARD_HID_REASON); conflito 41,7% x 19,8% e 84,4% código-fonte (tier 5, contradito pelo perfil local de projeções). (3) NÃO COBERTO / NÃO VERIFICADO: (refutada) Rulesets estão disponíveis em repositórios públicos no plano Free, cobrindo repo público de usuário. Merece checagem na doc primária do github.com (não a do GHES) e um teste ao vivo com gh api no próprio repo. · (refutada) Em 40,2% dos repositórios há pares de PRs de agentes co-ativos (53,4% numa janela de uma semana). Merece o paper primário. · (refutada) Trunk-based development exige o build completo local antes do push. · (refutada) Taxa de conflito textual de 41,7% entre agentes diferentes contra 19,8% do mesmo agente; 84,4% dos conflitos em código-fonte. Merece o paper primário. · (não coberto) Disponibilidade atual da merge queue nativa para repo público de dono User no github.com, na doc primária vigente. · (não coberto) Mergify, Graphite, Aviator e Trunk merge queue: disponibilidade para repo de usuário, plano gratuito ou OSS e modo de merge por rebase linear. · (não coberto) Se o merge do servidor do GitHub respeita merge driver customizado do .gitattributes. · (prior não verificado) Aquisição da Graphite em 2025.. (4) CORTADAS POR ORÇAMENTO: 30 fontes e 32 claims, entre elas configs de concorrência da fila, strict x loose (eixo central, virou objeção), pares intra-agente, CI em dois níveis sem fila (evgunter/cad#1887, hivecommons/hive#10884, bernstein#5793), gerados no merge (lingo.dev, oneuptime, tessl), bors.tech tmib-78 e a história da Mergify. (5) RESSALVA DO ESCRITOR: merge-queue-removal-reasons.md não lista conflito de merge (ver E_OBJECAO_ANY_QUEUE_BLOCKED_BY_MAGNET). (6) Os títulos das REGRAS 80, 81 e 84 não foram verificados nesta rodada."
+    trace: "docs/evolution/research/merge-process-onion-2026-10/SYNTHESIS.md"
+    provenance:
+      source: "⟨journal do run wf_48596b33-657: resultado da fase Elenxo (agente a5f4ce932c7591c1d) e da fase Synthesize (agente a8f32f6e1a5e01e0a)⟩"
+      locator: "objections (46; survives=True 27); unverifiedList (8); recommendation"
+      method: "medição: json.load do resultado no journal + contagem por survives/kind"
+      locality: "host"
+  - id: D_REQUIRED_CHECKS_RULESET_MAIN
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "decisão do maestro em 2026-10-13, por pergunta com opções (/meta:decide): escolhida «Sim, sem histórico linear»"
+    label: "required status checks por ruleset no main, sem a regra de histórico linear (o SAC-80 usa --merge-commit)"
+    narrative: "Selado por /meta:decide em 2026-10-13: escolhida «Sim, sem histórico linear»; descartadas: «Não, fica só o veto local»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-13: «Ligo required status checks por ruleset no main (grátis em repo público de usuário)?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      locality: "pessoa"
+edges:
+  - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
+    to: C_OPCAO_A_CURE_MAGNET_FILE
+    edge_type: SUPPORTS
+  - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
+    to: C_OPCAO_B_POSTMERGE_PROJECTION_WRITER
+    edge_type: SUPPORTS
+  - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: SUPPORTS
+  - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: SUPPORTS
+  - from: E_GH_MQ_INCIDENT_SILENT_REVERT_2026_04
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: SUPPORTS
+  - from: E_GH_MQ_INCIDENT_UNDETECTED_3H33
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: SUPPORTS
+  - from: E_GH_MQ_INCIDENT_REPORT_CONTRADICTS_REBASE
+    to: C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE
+    edge_type: SUPPORTS
+  - from: E_LINEAR_HISTORY_NEEDS_SQUASH_OR_REBASE
+    to: C_OPCAO_E_REQUIRED_CHECKS_RULESET
+    edge_type: SUPPORTS
+  - from: E_SEMANTIC_BREAK_WITHOUT_VCS_CONFLICT
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: SUPPORTS
+  - from: E_KEYORIX_TWO_TIER_CI
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: SUPPORTS
+  - from: E_KEYORIX_FULL_MATRIX_DUPLICATES_QUEUE
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: SUPPORTS
+  - from: E_SEQUENTIAL_MERGE_REBASE_CI_EACH
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: SUPPORTS
+  - from: E_CCMQ_LOCAL_SINGLE_MACHINE
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: SUPPORTS
+  - from: E_FUNADOR_FIFO_PREPUSH
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: SUPPORTS
+  - from: E_FUNADOR_LOCK_THROUGHPUT_CAP
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: SUPPORTS
+  - from: E_GH_MQ_ORG_ONLY_MERGIFY_FAQ
+    to: C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE
+    edge_type: SUPPORTS
+  - from: E_BORS_NG_ARCHIVED_2024
+    to: C_OPCAO_I_BORS_NG
+    edge_type: REFUTES
+  - from: E_MERCADO_MERGE_QUEUES_2026_10
+    to: C_OPCAO_F_THIRD_PARTY_FREE_QUEUE
+    edge_type: SUPPORTS
+  - from: C_OPCAO_A_CURE_MAGNET_FILE
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_B_POSTMERGE_PROJECTION_WRITER
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_E_REQUIRED_CHECKS_RULESET
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_F_THIRD_PARTY_FREE_QUEUE
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_I_BORS_NG
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_J_STACKED_PRS_GRAPHITE
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: DEPENDS_ON
+  - from: D_MERGE_PROCESS_ONION_2026_10
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_INCIDENT_WEIGHS_LITTLE_QUEUE_UNAVAILABLE
+    to: C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_INCIDENT_WEIGHS_LITTLE_QUEUE_UNAVAILABLE
+    to: C_OPCAO_F_THIRD_PARTY_FREE_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GHES_WRONG_VERSION_OWNER_IS_BLOCK
+    to: C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DRIVER_NOT_RUN_SERVER_SIDE
+    to: C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_KEYORIX_NEEDS_MERGE_GROUP
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_FULL_PR_BENCH_IS_ONLY_GUARANTEE
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SEQUENTIAL_MERGE_IS_CURRENT_PRACTICE
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SEQUENTIAL_MERGE_IS_CURRENT_PRACTICE
+    to: C_OPCAO_A_CURE_MAGNET_FILE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_FLOCK_MUST_WRAP_API_MERGE
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ADOPT_SERIALIZATION_NOT_TOOL
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HELPER_LIVES_ONLY_IN_SCRATCHPAD
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LOCK_ONLY_ON_REBASE_AND_MERGE
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ORG_TRANSFER_OPTION_OMITTED
+    to: C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PROTECTION_IS_CHOICE_NOT_LIMIT
+    to: C_OPCAO_E_REQUIRED_CHECKS_RULESET
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_QUEUE_DOES_NOT_CURE_MAGNET
+    to: C_OPCAO_F_THIRD_PARTY_FREE_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_QUEUE_DOES_NOT_CURE_MAGNET
+    to: C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LINEAR_HISTORY_BLOCKS_SAC80
+    to: C_OPCAO_E_REQUIRED_CHECKS_RULESET
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RULESETS_FREE_HALF_DISCARDED
+    to: C_OPCAO_E_REQUIRED_CHECKS_RULESET
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CONTRARIAN_DISCARD_HID_REASON
+    to: C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_STRICT_VS_LOOSE_IS_THE_AXIS
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SERVER_SIDE_UNION_UNMEASURED
+    to: C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SERVER_SIDE_UNION_UNMEASURED
+    to: C_OPCAO_B_POSTMERGE_PROJECTION_WRITER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_INTRA_AGENT_ANCHORS_LOCAL_SERIALIZER
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TRUNK_SMALL_TEAM_FAST_BUILD
+    to: C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TRUNK_ONE_MINUTE_BUILD
+    to: C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LOCK_SCOPE_SETS_THROUGHPUT
+    to: C_OPCAO_C_MERGE_SERIAL_IN_OPS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ANY_QUEUE_BLOCKED_BY_MAGNET
+    to: C_OPCAO_F_THIRD_PARTY_FREE_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ANY_QUEUE_BLOCKED_BY_MAGNET
+    to: C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ANY_QUEUE_BLOCKED_BY_MAGNET
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MERGIFY_OSS_FREE_QUEUE_EXISTS
+    to: C_OPCAO_F_THIRD_PARTY_FREE_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TRUNK_FREE_QUEUE_EXISTS
+    to: C_OPCAO_F_THIRD_PARTY_FREE_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_POSTMERGE_WRITER_NO_EXTERNAL_SOURCE
+    to: C_OPCAO_B_POSTMERGE_PROJECTION_WRITER
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TWO_TIER_WITHOUT_QUEUE_UNREAD
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_GH_MQ_INCIDENT_SILENT_REVERT_2026_04
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_GH_MQ_INCIDENT_UNDETECTED_3H33
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_GH_MQ_FIX_REGRESSION_CHECKS_GATING
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_GH_MQ_INCIDENT_REPORT_CONTRADICTS_REBASE
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_GHES_MQ_RULE_REPO_LEVEL_ONLY
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_LINEAR_HISTORY_NEEDS_SQUASH_OR_REBASE
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_GITATTR_DRIVER_ONLY_ON_NONTRIVIAL_CONFLICT
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_SEMANTIC_BREAK_WITHOUT_VCS_CONFLICT
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_KEYORIX_TWO_TIER_CI
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_KEYORIX_FULL_MATRIX_DUPLICATES_QUEUE
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_SEQUENTIAL_MERGE_REBASE_CI_EACH
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_CCMQ_LOCAL_SINGLE_MACHINE
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_CCMQ_ONLY_GATE_CHECKCOMMAND
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_FUNADOR_FIFO_PREPUSH
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_FUNADOR_LOCK_THROUGHPUT_CAP
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_BORS_NG_ARCHIVED_2024
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_BORS_NG_PUBLIC_INSTANCE_ENDED_2023
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_GH_MQ_ORG_ONLY_MERGIFY_FAQ
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_GH_MQ_NEEDS_BRANCH_PROTECTION_MERGIFY_FAQ
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_GRAPHITE_SMALL_TEAMS_NO_QUEUE
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_GRAPHITE_GUIDE_SCOPE_GAP
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_MERCADO_MERGE_QUEUES_2026_10
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_MERGE_PROCESS_2026_10
+    to: Q_MERGE_PROCESS_ONION_2026_10
+    edge_type: SUPPORTS
+  - from: D_REQUIRED_CHECKS_RULESET_MAIN
+    to: C_OPCAO_E_REQUIRED_CHECKS_RULESET
+    edge_type: TRACES_TO
