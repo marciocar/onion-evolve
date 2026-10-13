@@ -6,8 +6,10 @@ reviewed_code_sha256: 3f8af79f36b5b848e95fb44f2e6099571c23859709db32a2a3248f9f12
 findings_total: 4
 findings_real: 3
 findings_fixed: 3
+tokens: 0
+duration_min: 20
 verdict: REPROVADO_E_CURADO
-reviewer: passada adversarial curta no contexto principal (refutador com dois mandatos, sondas executadas em fixture); sem subagentes
+reviewer: passada adversarial curta no contexto principal (refutador com dois mandatos, sondas executadas em fixture); sem subagentes — tokens 0 = nenhum subagente (o custo ficou no contexto principal, não medido à parte); duration_min estimado
 ---
 
 # Passada adversarial: o workflow do evolve vira peça interna `meta-evolve-fanout`
