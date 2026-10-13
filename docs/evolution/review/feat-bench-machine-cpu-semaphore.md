@@ -2,7 +2,8 @@
 title: 'Resíduo — vagas de CPU da máquina para a bancada e nada de bancada completa local'
 date: 2026-10-13
 branch: feat/bench-machine-cpu-semaphore
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d17e86da896c0f313fe9248f581e4e7d03c0ea6800fce6414c6d06d1a03c5022
+reviewed_code_sha256: f5e9bd89eb0cd695e4ad16c71735072544ec667f8650dbe81ebdf1be05c5fcf3
 findings_total: 19
 findings_real: 17
 findings_fixed: 5
