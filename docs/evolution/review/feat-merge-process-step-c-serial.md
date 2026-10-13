@@ -2,7 +2,8 @@
 title: 'Resíduo — passo C do processo de merge: ops/merge-serial.sh com lock só no rebase+merge, e o auto-rebase deixa rastro no PR'
 date: 2026-10-13
 branch: feat/merge-process-step-c-serial
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ff8c7375c80bac9437907aaa6725ce7c41beeb5396bbf9cbb44a79a2b4fe43d2
+reviewed_code_sha256: 97357ec670448f9755bf3df947339b989a9acf1aedfa072beed6060196877a26
 findings_total: 4
 findings_real: 4
 findings_fixed: 3
