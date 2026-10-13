@@ -1,4 +1,9 @@
-// evolve — a rodada do /meta:evolve como WORKFLOW salvo (peça 4 do comando-com-framework).
+// meta-evolve-fanout — o fan-out do /meta:evolve como WORKFLOW salvo (peça 4 do comando-com-framework).
+// ⚠️ NOME (decisão do maestro, 2026-10-13): até aqui o arquivo era `evolve.js` com `meta.name: 'evolve'`,
+//    e o harness o listava como `/evolve` ao lado de `/meta:evolve` — parecia comando ALTERNATIVO, quando
+//    é só a peça 4 que o `/meta:evolve` chama no Passo 3. O nome novo diz o que é: peça interna.
+//    Arquivo e `meta.name` andam JUNTOS (a bancada cobra): não medimos qual dos dois o harness usa
+//    para o nome da lista, então os dois dizem a mesma coisa.
 // NASCEU do script que a rodada de 2026-10-04 autorou inline (run wf_9cba4ab5-0ac: 31 agentes,
 // 0 erros, 2,1M tokens), persistido aqui porque a rodada achou o defeito que ele cura: o
 // `FindingSchema` da superfície NÃO era JSON Schema (`{id:"string"}` como `items:`) — a forma ligada
@@ -9,7 +14,7 @@
 // própria) ou exigem o contexto principal (memória de sessão); invocá-los daqui seria orquestração
 // aninhada. A superfície os roda como Passo 2.5, no contexto principal, ANTES deste workflow.
 //
-// Invocação (pela superfície): Workflow({scriptPath: '.claude/workflows/evolve.js',
+// Invocação (pela superfície): Workflow({scriptPath: '.claude/workflows/meta-evolve-fanout.js',
 //   args: { dims: ['D1','D2','D3','D6','D7','D8','MAQ'], maqTargets: '<seção 7 do raio-X>', cap: 8 }})
 // `dims` vazio = todas. `maqTargets` é o CONFRONTO que o raio-X nomeou. Sem ele, uma fase `Census`
 // (haiku/low) roda o raio-X e extrai a seção 7 VERBATIM, conferindo o cabeçalho; se a seção não vier
@@ -22,9 +27,9 @@
 //    logo nunca daqui sozinho: D4/D5/D9/D10 são do Passo 2.5 de /meta:evolve), e o que vai ficar de
 //    fora é logado no INÍCIO, antes do primeiro agente.
 export const meta = {
-  name: 'evolve',
-  description: 'Rodada do /meta:evolve: 6 dimensões de varredura + confronto de maquinaria, com verificação adversarial dos achados graves',
-  whenToUse: 'Auto-auditoria periódica do Sistema Onion, disparada pela REGRA 97. ATALHO PARCIAL: sozinho cobre no máximo 6 das 10 dimensões (D1 D2 D3 D6 D7 D8, + MAQ com o raio-X); D4/D5/D9/D10 só rodam pelo caminho completo, /meta:evolve (Passo 2.5). O retorno declara o que faltou em not_measured e complete=false.',
+  name: 'meta-evolve-fanout',
+  description: 'Peça interna do /meta:evolve (Passo 3): 6 dimensões de varredura + confronto de maquinaria, com verificação adversarial dos achados graves',
+  whenToUse: 'Peça interna do /meta:evolve (o fan-out do Passo 3) — NÃO invoque à mão: rode /meta:evolve, que a chama com os args certos. ATALHO PARCIAL: sozinho cobre no máximo 6 das 10 dimensões (D1 D2 D3 D6 D7 D8, + MAQ com o raio-X); D4/D5/D9/D10 só rodam pelo caminho completo, /meta:evolve (Passo 2.5). O retorno declara o que faltou em not_measured e complete=false.',
   phases: [
     { title: 'Census', detail: 'só sem maqTargets: roda o raio-X e extrai a seção 7 (os alvos da MAQ), com o cabeçalho conferido' },
     { title: 'Scan', detail: 'D1 D2 D3 D6 D7 D8 + MAQ (confronto) — um worker por dimensão, read-only' },

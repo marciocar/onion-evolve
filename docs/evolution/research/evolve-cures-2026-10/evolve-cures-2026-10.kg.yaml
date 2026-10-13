@@ -106,7 +106,8 @@ nodes:
     status: confirmed
     verified_at: '2026-10-04'
     verified_against: 'forge-census.sh: evolve 6/7 -> 7/7; familia evolve_workflow (a-g) verde com agent() simulado que imita o runtime (stage que lanca vira null); seis mutantes morderam, inclusive os dois com que o Elenxo provou a 1a bancada decorativa (survived=all; correlacao por indice)'
-    trace: '.claude/workflows/evolve.js'
+    trace: '.claude/workflows/meta-evolve-fanout.js'
+    x_trace_renamed_from: '.claude/workflows/evolve.js — renomeado em 2026-10-13 (refactor/evolve-workflow-rename-fanout): o harness o listava como /evolve, ao lado do /meta:evolve; o que este nó afirma vale para o arquivo de nome novo'
     label: 'CURA 5: o script que a rodada autorou inline virou a peca 4 em .claude/workflows/evolve.js, com JSON Schema real (FINDINGS, VERDICT) e a correlacao achado-veredito POR CONSTRUCAO. O Passo 3 da superficie perdeu o bloco de JS que nao rodava (runCommand x3, sweepSessionMemory) e ganhou o Passo 2.5: D4/D5/D9/D10 no contexto principal, antes do fan-out, sem orquestracao aninhada. Workflow e Agent entraram no allowed-tools. O script RECUSA D4 sem gastar agente e NAO roda a MAQ sem os alvos do raio-X — nunca inventa alvo. O evolve passou de 6/7 para 7/7 no censo da forja. O ELENXO REPROVOU A 1a VERSAO com tres blockers, todos fail-open: juiz que devolvia null deixava o achado em survived e ainda contava como verificado; dimensao cujo worker lancava sumia sem log; e o caso (d) da bancada era decorativo (passava com survived=all). Curados: unjudged e lost viraram campos de 1a classe, entrada ruim recusa, e todo achado que toque fusao de fase e julgado qualquer que seja a severidade.'
     provenance:
       source: ".claude/workflows/evolve.js"

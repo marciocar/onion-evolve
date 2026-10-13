@@ -72,5 +72,7 @@
 ## 🔗 Peças
 
 Medidor (peça 3): `.claude/validation/evolve-census.sh` · Gatilho: REGRA 97,
-`.claude/validation/evolve-staleness-check.sh` · Lente (peça 6): `.claude/rules/evolve-lens.md` ·
+`.claude/validation/evolve-staleness-check.sh` · Orquestração (peça 4): `.claude/workflows/meta-evolve-fanout.js`
+— **peça interna** do Passo 3, nunca invocada à mão (até 2026-10-13 chamava-se `evolve` e a lista de
+comandos a mostrava como `/evolve`, ao lado da superfície, como se fosse alternativa) · Lente (peça 6): `.claude/rules/evolve-lens.md` ·
 Bancada (peça 7): `run_evolve_census_selftests` · Superfície: [`/meta:evolve`](../../meta/evolve.md)

@@ -5431,6 +5431,104 @@ run_vendor_pin_selftests() {
 # Modo vendor-pin — o pin entra provando ser commit (achado de campo 2026-07-21). ⚠️ Até 2026-09-03 esta linha estava DENTRO do corpo da função: a família nunca rodou — o --list da faixa a expôs..
 _family run_vendor_pin_selftests
 
+# Modo vendor-core-removed — o que o core PAROU de transportar sai da onion/vendor (2026-10-13).
+# MEDIDO antes da cura: o core renomeou `workflows/evolve.js` → `meta-evolve-fanout.js`, o `--update`
+# saiu rc=0 "merge limpo" e o adotante ficou com OS DOIS (o `tar -x` sobrepõe e nunca apaga).
+#   (a) rename no core: o antigo sai do HEAD e da vendor, o novo chega, rc=0
+#   (b) arquivo PRÓPRIO do adotante sob .claude/ (o core nunca o teve) fica — o critério é o delta do core
+#   (c) adotante que EDITOU o arquivo renomeado: a edição segue para o nome novo (rename do merge, medido)
+#   (c2) adotante que EDITOU o arquivo REMOVIDO recebe CONFLITO (rc=10), nunca deleção calada
+#   (d) sem pin anterior no carimbo: nada sai, e o aviso é DITO em stderr
+#   (MUT) sem o bloco D_CURE-core-removed o antigo volta a ficar — o caso (a) é load-bearing
+_vcr_fixture() {  # $1=dir $2=1 se carimba o pin anterior $3=rm p/ REMOVER (default: renomear) → "core<TAB>alvo<TAB>branch"
+  local core="$1/c" t="$1/a" p1
+  mkdir -p "$core/.claude/commands" "$core/.claude/workflows" "$t/src"
+  git -C "$core" init -q; git -C "$t" init -q
+  printf 'cmd\n' > "$core/.claude/commands/foo.md"
+  printf "export const meta = { name: 'old' }\n" > "$core/.claude/workflows/old.js"
+  # keep.js mantém o diretório vivo no core: o manifesto só lista raiz que EXISTE no HEAD da fonte, e
+  # uma raiz que some inteira não entra no delta (limite declarado no vendor-branch.sh)
+  printf "export const meta = { name: 'keep' }\n" > "$core/.claude/workflows/keep.js"
+  git -C "$core" add -A; git -C "$core" commit -qm core
+  p1="$(git -C "$core" rev-parse --short=12 HEAD)"
+  printf 'produto\n' > "$t/src/app.js"
+  git -C "$core" archive HEAD -- .claude | tar -x -C "$t"
+  printf 'meu\n' > "$t/.claude/commands/mine.md"
+  [ "$2" = 1 ] && printf 'source_commit: %s\n' "$p1" > "$t/.claude/.onion-version"
+  git -C "$t" add -A; git -C "$t" commit -qm adopt
+  if [ "${3:-}" = rm ]; then git -C "$core" rm -q .claude/workflows/old.js
+  else git -C "$core" mv .claude/workflows/old.js .claude/workflows/new.js; fi
+  git -C "$core" commit -qm "rename-or-remove"
+  printf '%s\t%s\t%s\n' "$core" "$t" "$(git -C "$t" rev-parse --abbrev-ref HEAD)"
+}
+run_vendor_core_removed_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh"
+  [ -f "${helper}" ] || { record_skip "vendor-core-removed: vendor-branch.sh ausente"; return 0; }
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
+  local d core t ib pin _rc _err _hd _vd
+  # (a)+(b) rename limpo
+  d="$(mktemp -d)"; IFS=$'\t' read -r core t ib < <(_vcr_fixture "$d" 1)
+  bash "${helper}" seed "$t" "$ib" >/dev/null 2>&1
+  pin="$(git -C "$core" rev-parse --short=12 HEAD)"
+  _rc=0; bash "${helper}" update "$t" "$core" "$pin" "$ib" >/dev/null 2>&1 || _rc=$?
+  _hd="$(git -C "$t" ls-files .claude/workflows | tr '\n' ' ')"
+  _vd="$(git -C "$t" ls-tree -r --name-only onion/vendor -- .claude/workflows | tr '\n' ' ')"
+  if [ "${_rc}" -eq 0 ] && [ "${_hd}" = ".claude/workflows/keep.js .claude/workflows/new.js " ] && [ "${_vd}" = ".claude/workflows/keep.js .claude/workflows/new.js " ]; then
+    record_pass "vendor-core-removed: (a) rename no core: o antigo sai do HEAD e da vendor, o novo chega (rc=0)"
+  else record_fail "vendor-core-removed: (a) rename" "rc=${_rc} HEAD=[${_hd}] vendor=[${_vd}] — o adotante ficaria com os dois"; fi
+  if git -C "$t" cat-file -e HEAD:.claude/commands/mine.md 2>/dev/null; then
+    record_pass "vendor-core-removed: (b) arquivo PROPRIO do adotante sob .claude/ fica (o criterio e o delta do core)"
+  else record_fail "vendor-core-removed: (b) arquivo do adotante" "mine.md sumiu — a cura apagou o que o core nunca transportou"; fi
+  # (MUT) o mesmo cenário com o bloco da cura removido
+  local mutdir; mutdir="$(mktemp -d)"
+  sed '/>>> D_CURE-core-removed/,/<<< D_CURE-core-removed/d' "${helper}" > "${mutdir}/vendor-branch.sh"
+  _adopt_sibs_beside "${mutdir}"
+  if grep -q 'D_CURE-core-removed' "${mutdir}/vendor-branch.sh"; then
+    record_fail "vendor-core-removed: (MUT)" "o sed nao removeu o bloco — mutante nao plantado"
+  else
+    rm -rf "$d"; d="$(mktemp -d)"; IFS=$'\t' read -r core t ib < <(_vcr_fixture "$d" 1)
+    bash "${mutdir}/vendor-branch.sh" seed "$t" "$ib" >/dev/null 2>&1
+    pin="$(git -C "$core" rev-parse --short=12 HEAD)"
+    bash "${mutdir}/vendor-branch.sh" update "$t" "$core" "$pin" "$ib" >/dev/null 2>&1 || true
+    if git -C "$t" cat-file -e HEAD:.claude/workflows/old.js 2>/dev/null; then
+      record_pass "vendor-core-removed: (MUT) sem o bloco D_CURE-core-removed o antigo FICA no adotante — (a) e load-bearing"
+    else record_fail "vendor-core-removed: (MUT)" "sem a cura o antigo saiu mesmo assim — o caso (a) nao prova nada"; fi
+  fi
+  rm -rf "${mutdir}"
+  # (c) adotante editou o arquivo que o core RENOMEOU: a detecção de rename do merge leva a edição ao
+  #     nome novo (medido: rc=0, sem conflito) — nunca perdida
+  rm -rf "$d"; d="$(mktemp -d)"; IFS=$'\t' read -r core t ib < <(_vcr_fixture "$d" 1)
+  bash "${helper}" seed "$t" "$ib" >/dev/null 2>&1
+  printf '// customizado pelo adotante\n' >> "$t/.claude/workflows/old.js"
+  git -C "$t" commit -qam custom
+  pin="$(git -C "$core" rev-parse --short=12 HEAD)"
+  _rc=0; bash "${helper}" update "$t" "$core" "$pin" "$ib" >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" -eq 0 ] && grep -q 'customizado' "$t/.claude/workflows/new.js" 2>/dev/null && [ ! -e "$t/.claude/workflows/old.js" ]; then
+    record_pass "vendor-core-removed: (c) arquivo RENOMEADO no core e editado pelo adotante: a edicao segue para o nome novo (rename do merge)"
+  else record_fail "vendor-core-removed: (c) rename+edicao" "rc=${_rc} — a customizacao nao seguiu para new.js"; fi
+  # (c2) adotante editou o arquivo que o core REMOVEU de vez → conflito modify/delete, nunca deleção calada
+  rm -rf "$d"; d="$(mktemp -d)"; IFS=$'\t' read -r core t ib < <(_vcr_fixture "$d" 1 rm)
+  bash "${helper}" seed "$t" "$ib" >/dev/null 2>&1
+  printf '// customizado pelo adotante\n' >> "$t/.claude/workflows/old.js"
+  git -C "$t" commit -qam custom
+  pin="$(git -C "$core" rev-parse --short=12 HEAD)"
+  _rc=0; bash "${helper}" update "$t" "$core" "$pin" "$ib" >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" -eq 10 ] && grep -q 'customizado' "$t/.claude/workflows/old.js" 2>/dev/null; then
+    record_pass "vendor-core-removed: (c2) arquivo REMOVIDO no core e editado pelo adotante vira conflito (rc=10), customizacao preservada"
+  else record_fail "vendor-core-removed: (c2) modify/delete" "rc=${_rc} (esperava 10) — a customizacao seria apagada em silencio"; fi
+  # (d) sem pin anterior: nada sai, e é DITO
+  rm -rf "$d"; d="$(mktemp -d)"; IFS=$'\t' read -r core t ib < <(_vcr_fixture "$d" 0)
+  bash "${helper}" seed "$t" "$ib" >/dev/null 2>&1
+  pin="$(git -C "$core" rev-parse --short=12 HEAD)"
+  _rc=0; _err="$(bash "${helper}" update "$t" "$core" "$pin" "$ib" 2>&1 >/dev/null)" || _rc=$?
+  if grep -q 'arquivo que o core REMOVEU não sai' <<< "${_err}" && git -C "$t" cat-file -e HEAD:.claude/workflows/old.js 2>/dev/null; then
+    record_pass "vendor-core-removed: (d) sem pin anterior no carimbo nada sai, e o aviso e dito em stderr (rc=${_rc})"
+  else record_fail "vendor-core-removed: (d) sem pin" "rc=${_rc} stderr=[${_err:0:160}]"; fi
+  rm -rf "$d"
+}
+_family run_vendor_core_removed_selftests
+
 # Modo vendor-manifest — a SSOT do que VIAJA do core para o adotante, por papel. Nasceu em 2026-09-13
 # quando a medição mostrou QUATRO cópias da mesma lista (adopt.md, vendor-branch.sh, o `roots=` da
 # REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) e o `VENDORED_ROOTS` da REGRA 45
@@ -10322,8 +10420,26 @@ _evc_sandbox() {   # cria um repo de medidores FALSOS; $1 = dir. Devolve via arq
 # PROMETE do script: recusar D4/D5/D9/D10 (composição do contexto principal), não inventar alvos
 # da MAQ sem o raio-X, e tirar o refutado POR ID.
 run_evolve_workflow_selftests() {
-  local wf="${REPO_ROOT}/.claude/workflows/evolve.js"
-  if [ ! -f "${wf}" ]; then record_fail "evolve-workflow" "ausente: .claude/workflows/evolve.js"; return; fi
+  local wf="${REPO_ROOT}/.claude/workflows/meta-evolve-fanout.js"
+  if [ ! -f "${wf}" ]; then record_fail "evolve-workflow" "ausente: .claude/workflows/meta-evolve-fanout.js"; return; fi
+  # (n) O NOME É DE PEÇA INTERNA, não de comando (decisão do maestro, 2026-10-13). Como `evolve.js` com
+  #     `meta.name: 'evolve'`, o harness o listava como `/evolve` ao lado de `/meta:evolve`, e ele parecia
+  #     alternativa. Reprova: o arquivo antigo de volta (inclusive o adotante que ficou com OS DOIS no
+  #     --update, antes da cura D_CURE-core-removed do vendor-branch), `meta.name` diferente do nome do
+  #     arquivo, o /meta:evolve chamando o nome antigo, e o whenToUse sem dizer na 1ª frase que é interna.
+  #     MUTANTES (ops/mutate-and-restore.sh, 2026-10-13): o scriptPath do Passo 3 de volta a `evolve.js`
+  #     e o `meta.name` de volta a 'evolve' — cada um reprova este caso.
+  local _n="" _ev="${REPO_ROOT}/.claude/commands/meta/evolve.md" _nm
+  [ -e "${REPO_ROOT}/.claude/workflows/evolve.js" ] && _n="${_n} arquivo-antigo-existe"
+  _nm="$(LC_ALL=C sed -n "s/^  name: '\([^']*\)',\$/\1/p" "${wf}" | head -1)"
+  [ "${_nm}" = "$(basename "${wf}" .js)" ] || _n="${_n} meta.name='${_nm}'!=arquivo"
+  grep -q "^  whenToUse: 'Peça interna do /meta:evolve ([^.]*NÃO invoque à mão" "${wf}" || _n="${_n} whenToUse-1a-frase"
+  if [ -f "${_ev}" ]; then   # o papel que corta o /meta:evolve corta o workflow junto; sem a superfície, só o arquivo
+    grep -q "Workflow({ scriptPath: '.claude/workflows/meta-evolve-fanout.js'" "${_ev}" || _n="${_n} passo3-sem-o-nome-novo"
+    grep -qE "workflows/evolve\.js|name: *['\"]evolve['\"]" "${_ev}" && _n="${_n} evolve.md-chama-o-nome-antigo"
+  fi
+  if [ -z "${_n}" ]; then record_pass "evolve-workflow: (n) nome de peca interna: so meta-evolve-fanout.js existe, meta.name = arquivo, /meta:evolve chama o nome novo, whenToUse diz 'interna' na 1a frase"
+  else record_fail "evolve-workflow: (n) nome" "falharam:${_n}"; fi
   if ! command -v node >/dev/null 2>&1; then record_skip "evolve-workflow: node ausente"; return; fi
   local _sc=0; bash "${REPO_ROOT}/.claude/validation/workflow-syntax-check.sh" "${wf}" >/dev/null 2>&1 || _sc=$?
   if [ "${_sc}" -eq 0 ]; then record_pass "evolve-workflow: (a) sintaxe valida no embrulho do runtime"

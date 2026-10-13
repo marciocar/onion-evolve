@@ -265,6 +265,48 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   rm -f "$idx"
   [ -s "$req" ] || { echo "ERRO: a lista do que o core transporta saiu VAZIA (sha ${sha:0:12}) — recuso seguir sem ela." >&2
                      git -C "$T" worktree remove --force "$wt" 2>/dev/null; rm -f "$req"; return 12; }
+  # ── O QUE O CORE PAROU DE TRANSPORTAR SAI DA VENDOR (rename do workflow do evolve, 2026-10-13) ────
+  # O `tar -x` acima SOBREPÕE: escreve o que o core manda e nunca apaga o que ele deixou de mandar.
+  # MEDIDO numa fixture (core renomeia `workflows/evolve.js` → `meta-evolve-fanout.js`, update rc=0
+  # "merge limpo"): o adotante ficava com OS DOIS — o antigo, órfão, seguia na lista de workflows dele
+  # com o nome que o core aposentou. Todo rename e toda remoção do core vazavam assim, em silêncio.
+  # O CRITÉRIO É O DELTA DO PRÓPRIO CORE, nunca "o que a vendor tem e o core não": a vendor nasce da
+  # integração e carrega arquivo do ADOTANTE sob `.claude/` (comandos próprios, por exemplo). Sai só o
+  # que o core TRANSPORTAVA no pin anterior (o `source_commit` do carimbo da integração, ainda não
+  # re-carimbado) e NÃO transporta mais, com o mesmo manifesto dos dois lados. Adotante que editou o
+  # arquivo removido recebe conflito modify/delete (exit 10): never-clobber continua estrutural.
+  # RENAME (o caso que motivou): a vendor ganha delete+add do mesmo conteúdo, e a detecção de rename do
+  # merge leva a edição do adotante para o nome novo, sem conflito (medido, caso (c) da bancada).
+  # Pin anterior ausente ou que não é commit da fonte → NADA sai, e isso é DITO (status quo, declarado).
+  # LIMITE DECLARADO: o manifesto só lista raiz que EXISTE no HEAD da fonte; se o core apagar uma raiz
+  # INTEIRA (ex.: `.claude/workflows/` vazio), os arquivos dela não entram no delta e ficam.
+  # >>> D_CURE-core-removed (run_vendor_core_removed_selftests remove ESTE bloco p/ provar load-bearing) >>>
+  local _prev _pidx _pold _gone
+  _prev="$(awk '/^source_commit:/{print $2; exit}' "$T/.claude/.onion-version" 2>/dev/null)"
+  if [ -n "${_prev}" ] && git -C "$SRC" cat-file -e "${_prev}^{commit}" 2>/dev/null; then
+    _pidx="$(mktemp)"; _pold="$(mktemp)"; rm -f "$_pidx"
+    # shellcheck disable=SC2046
+    GIT_INDEX_FILE="$_pidx" git -C "$SRC" read-tree "$_prev" 2>/dev/null \
+      && GIT_INDEX_FILE="$_pidx" git -C "$SRC" ls-files -z -- $(printf '%s ' $mf) 2>/dev/null \
+         | grep -zvE '^\.claude/validation/[^/]*-baseline\.txt$' | LC_ALL=C sort -zu > "$_pold"
+    rm -f "$_pidx"
+    _gone="$(LC_ALL=C comm -z -23 "$_pold" "$req" | tr '\0' '\n')"
+    rm -f "$_pold"
+    while IFS= read -r _f; do
+      [ -n "${_f}" ] || continue
+      git -C "$wt" cat-file -e "HEAD:${_f}" 2>/dev/null || continue   # a vendor nunca o teve: nada a tirar
+      # (a 1ª redação passava `--literal-pathspecs` ao `rm`, que o recusa: falhou calada e o arquivo
+      #  ficou — por isso a falha agora é DITA, nunca engolida)
+      if git --literal-pathspecs -C "$wt" rm -q -- "${_f}" >/dev/null 2>&1; then
+        echo "Onion: '${_f}' saiu do core (pin ${_prev:0:12} → ${sha:0:12}) — removido da $VENDOR."
+      else
+        echo "⚠️  Onion: '${_f}' saiu do core mas NÃO consegui tirá-lo da $VENDOR — fica no adotante." >&2
+      fi
+    done <<< "${_gone}"
+  else
+    echo "⚠️  Onion: pin anterior '${_prev:-<sem source_commit>}' não é commit da fonte — arquivo que o core REMOVEU não sai da $VENDOR nesta rodada." >&2
+  fi
+  # <<< D_CURE-core-removed <<<
   local _dc=0
   # ONION_DURABLE_VERIFY=0 FIXO: o commit da onion/vendor é framework puro numa worktree temporária; um
   # VERIFY=1 exportado pelo operador para o commit final do --update vazaria até aqui, o hook recusaria

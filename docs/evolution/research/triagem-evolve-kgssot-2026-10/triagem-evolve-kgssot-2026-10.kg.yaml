@@ -37,7 +37,8 @@ nodes:
     confidence: 0.85
     verified_at: "2026-10-12"
     verified_against: "família evolve_workflow 13/13 com LC_ALL=C (casos c, h a m novos ou reescritos; o m nasceu do refutador: Census rc!=0, seção 7 sem alvo, scan sem findings, dims/chave/maqTargets ruins); 13 mutantes do workflow, todos reprovando o caso deles"
-    trace: ".claude/workflows/evolve.js"
+    trace: ".claude/workflows/meta-evolve-fanout.js"
+    x_trace_renamed_from: ".claude/workflows/evolve.js — renomeado em 2026-10-13 (refactor/evolve-workflow-rename-fanout): o harness o listava como /evolve, ao lado do /meta:evolve; o que este nó afirma vale para o arquivo de nome novo"
     label: "CURADO: o workflow evolve disparado sem args declara o que não mediu, com motivo, e levanta os alvos da MAQ pelo raio-X"
     narrative: "O retorno ganhou complete (true só com as 10, logo nunca do workflow sozinho), measured e not_measured com motivo por dimensão (composição, não pedida, Census recusado, lost, dead). D4/D5/D9/D10 entram sempre, com o motivo de composição. Sem maqTargets, uma fase Census (haiku/low) roda o evolve-census e o script extrai a seção 7 verbatim; exige os dois cabeçalhos (o da seção 7 e o do não-medido) e recusa resumo do agente. O que fica de fora é logado antes do primeiro agente. O whenToUse diz que o atalho cobre 6 de 10."
     provenance:

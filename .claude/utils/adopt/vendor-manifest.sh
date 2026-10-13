@@ -262,7 +262,8 @@ _emit_command_excludes() {  # $1=REPO $2=papel → :(exclude) dos comandos de me
 # (98cc49e2), o corte acima tirou `/meta:evolve`, `/meta:forge-guard`, `/meta:dissect`,
 # `/meta:cc-update` e `/meta:forge` — e deixou viajar 14 arquivos que SÓ eles usam: a doutrina
 # (`common/prompts/<x>-doctrine.md`), a lente (`rules/<x>-lens.md`), o censo (`validation/<x>-census.sh`)
-# e o workflow (`workflows/evolve.js`). Dois nasciam com PONTEIRO MORTO na porta pública:
+# e o workflow (`workflows/evolve.js`, hoje `workflows/meta-evolve-fanout.js` — renomeado em 2026-10-13).
+# Dois nasciam com PONTEIRO MORTO na porta pública:
 # `evolve-lens.md` cita `commands/meta/evolve.md` e `guard-lens.md` cita `commands/meta/forge-guard.md`.
 # É a LIÇÃO DE FORMA do bloco acima repetida ao pé da letra: as peças do comando-com-framework
 # nasceram DEPOIS do corte (forja de 2026-09-29 em diante), em diretórios que o corte não olha.
