@@ -24,7 +24,7 @@ abertos, sem resposta e sem teto:
 | `docs/knowledge-base/index.md` do adotante **sobrescrito** pelo `--update` (perdeu frontmatter, quebrou o `docs:check` dele) | pedido **3 de 3** do sinal do pre-commit — os 2 primeiros eu curei no #902 |
 | convergência docs-only no `--update` — **o gatilho já disparou** (`adopt.md:685` diz "gated até o 1º caso real", e o caso chegou) | adendo 1 do mesmo sinal |
 | baseline explícito no stamp (`_clean_baseline` nunca acha base com KB mista) | adendo 2 do mesmo sinal |
-| 3 falsos-positivos de gate relatados pelo hub `gmill` | seção própria do sinal dele |
+| 3 falsos-positivos de gate relatados pelo hub `hub-operacoes-enterprise` | seção própria do sinal dele |
 
 **A classe:** "endereçado" medido pelo título e pelo pedido de cabeça de lista, quando o sinal tem
 seções com pedidos próprios. É `read-full-content-before-triage` reincidindo — agora na direção do
@@ -68,9 +68,9 @@ passou a ser verdadeira. Declarado≠verificado dentro da própria nota que se p
 - Os pedidos 1–4 da réplica do adotante conferidos **no código**, não no CHANGELOG.
 
 ## nota:
-O refutador deixou **um** item sem prova e declarou: o falso-positivo nº 2 do `gmill`
+O refutador deixou **um** item sem prova e declarou: o falso-positivo nº 2 do `hub-operacoes-enterprise`
 (`bash-empty-result-guard` em `git commit -F - <<EOF`) ele não conseguiu sondar — o ambiente da
 worktree recusou heredoc aninhado. **Não descartei por isso**, e há razão: eu mesmo travei um
 `git commit -F -` por **31 minutos** à espera de stdin nesta sessão, por heredoc mal escrito. O nó
-`Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM` carrega essa observação, para que a próxima medição não comece
+`Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM` carrega essa observação, para que a próxima medição não comece
 do zero nem do descarte.

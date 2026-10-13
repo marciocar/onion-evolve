@@ -318,24 +318,24 @@ nodes:
 
   - id: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
     node_type: question
-    trace: docs/analysis/arandek-repo-exposure-2026-08.md
+    trace: arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)
     impact: 4
     confidence: 1.0
-    label: "ACHADO DE ADOTANTE, não comunicado (ação do maestro): o docker-compose.yml rastreado em ArandekBR/arandek tem cinco segredos literais e portas em 0.0.0.0 sem bind; nesta VPS só um overlay local as prende a 127.0.0.1. Recado em docs/analysis/arandek-repo-exposure-2026-08.md."
+    label: "ACHADO DE ADOTANTE, não comunicado (ação do maestro): o compose rastreado no repo de um adotante carrega segredos literais e portas sem bind; aqui só um overlay local as prende a loopback. Detalhe e recado: retirados da árvore pública em 2026-10-13."
     status: done
     plane: DEV
     verified_at: "2026-10-12"
     verified_against: "decisão do maestro em 2026-10-12, por pergunta com opções (/meta:decide): escolhida «Re-medir e enviar»"
     narrative: |-
-      label anterior: ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. ⟨Medido no docker-compose.yml do clone do adotante arandek, arquivo⟩ RASTREADO por git em `ArandekBR/arandek`: (1) cinco segredos LITERAIS — ⟨o `--requirepass` (valor omitido) na linha 60⟩ e `LANGFUSE_INIT_PROJECT_PUBLIC_KEY`/`LANGFUSE_INIT_PROJECT_SECRET_KEY`/`MINIO_ROOT_PASSWORD`/`MINIO_SECRET_ACCESS_KEY` nas linhas 147/148/210/231 (VALORES DELIBERADAMENTE FORA DESTE GRAFO — o core nao guarda segredo de adotante; leia no arquivo dele); (2) as portas publicam em `0.0.0.0` sem prefixo de bind — MinIO 9090/9091, Langfuse 3006, Milvus 19530/19531, Postgres `${POSTGRES_PORT:-5438}` e Redis `${REDIS_PORT:-6379}`. Num host de IP publico isso E internet, e o `ufw` NAO segura: porta publicada por Docker atravessa DNAT/FORWARD e nao ve o `INPUT DROP` — medido nesta VPS, foi assim que dois Redis sem senha ficaram expostos aqui, e e a mesma mecanica que [C_REDE_ISOLADA_POR_CONSTRUCAO] descreve do lado de ca. NESTA VPS os 15 containers dele estao seguros SO por causa do ⟨overlay local do adotante (compose.local.yml)⟩, que prefixa `127.0.0.1:` — sem o overlay nasceriam publicos. O redis vivo responde `NOAUTH`, entao a senha esta ativa: o defeito e ela ser publica no historico, nao ausente. RECADO REDIGIDO E PRONTO em `docs/analysis/arandek-repo-exposure-2026-08.md`. ⚠️ ARMADILHA QUE ME PEGOU: meu primeiro `grep` de portas voltou VAZIO e eu quase conclui 'ele nao publica nada' — o padrao nao cobria ASPAS SIMPLES (`- '9090:9000'`). Terceira vez no dia que o defeito estava no vocabulario do filtro, nao na logica.
+      label anterior: ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. ⟨O detalhe medido — repo, linhas, nomes das variáveis e portas — saiu da árvore pública em 2026-10-13, quando o core ficou público (decisão do maestro); segue no histórico do git.⟩ Em resumo: o compose RASTREADO do adotante carregava segredos literais e publicava portas sem prefixo de bind; num host de IP público isso é internet, e o firewall do host não segura porta publicada por Docker — a mesma mecânica que [C_REDE_ISOLADA_POR_CONSTRUCAO] descreve do lado de cá. Nesta VPS os containers dele estavam seguros SÓ por causa de um overlay local que prefixa loopback. O data store vivo exigia senha: o defeito era ela ser pública no histórico, não ausente. ⚠️ ARMADILHA QUE ME PEGOU: meu primeiro `grep` de portas voltou VAZIO e eu quase conclui 'ele nao publica nada' — o padrao nao cobria ASPAS SIMPLES. Terceira vez no dia que o defeito estava no vocabulario do filtro, nao na logica.
 
-      verified_against anterior: «grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo»
-      proveniência anterior: source «docs/analysis/arandek-repo-exposure-2026-08.md» · locator «grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo» · method «medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado» · locality «repo»
+      verified_against anterior: «grep-no-docker-compose-rastreado-do-adotante-mais-teste-NOAUTH-no-container-vivo»
+      proveniência anterior: source «arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)» · locator «grep-no-docker-compose-rastreado-do-adotante-mais-teste-NOAUTH-no-container-vivo» · method «medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado» · locality «repo»
       plane anterior: PROD, rebaixado a DEV porque a base do selo é testemunho (contrato: integrity.testimony-in-prod)
       Selado por /meta:decide em 2026-10-12: escolhida «Re-medir e enviar»; descartadas: «Enviar já, como está» · «Não enviar e arquivar».
     provenance:
       source: "maestro, na sessão do /meta:decide"
-      locator: "pergunta com opções de 2026-10-12: «O recado sobre os 5 segredos literais e as portas em 0.0.0.0 no docker-compose.yml rastreado de ArandekBR/arandek, redigido em 2026-08-30 e nunca enviado, deve ser enviado agora?»"
+      locator: "pergunta com opções de 2026-10-12: «O recado sobre os segredos literais e as portas sem bind no compose rastreado do adotante, redigido em 2026-08-30 e nunca enviado, deve ser enviado agora?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
       locality: "pessoa"
 
@@ -344,7 +344,7 @@ nodes:
     plane: PROD
     verified_at: "2026-09-01"
     verified_against: vps-exposure-check-varre-docker-ps-e-diretorios-locais-nao-le-compose-de-repo-adotante
-    trace: docs/analysis/arandek-repo-exposure-2026-08.md
+    trace: arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)
     status: superseded
     impact: 3
     confidence: 0.9
@@ -520,10 +520,10 @@ nodes:
     verified_at: "2026-08-30"
     verified_against: "censo lote 5 (run wf_2349bf29-ea0): compose rastreado no git do adotante, portas sem prefixo de bind + segredo literal de fallback; mesma classe do achado arandek (redigido, nao enviado)"
     label: "O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotante ativo com o mesmo defeito de exposicao do achado arandek: docker-compose rastreado no git com portas sem prefixo de bind (Docker publica em todas as interfaces por default — e nesta VPS o Docker FURA o ufw) e segredo literal como fallback. Detalhes especificos (repo, portas, valores) ficam FORA deste no de proposito: e material de comunicacao sensivel, e a decisao de comunicar e do maestro — como no arandek, que segue redigido e nao-enviado por ordem. ACAO PENDENTE (decisao do maestro): (a) comunicar os dois adotantes; (b) decidir a regra de lint de compose para role adotante que o Q_GUARDA propoe — a classe agora tem 2 instancias medidas."
-    trace: "runs wf_2349bf29-ea0 · docs/analysis/granaai-compose-exposure-2026-08.md (material de comunicacao, REDIGIDO-NAO-ENVIADO) · docs/analysis/onion-vps-network-exposure-2026-08.md"
+    trace: "runs wf_2349bf29-ea0 · arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro) (material de comunicacao, REDIGIDO-NAO-ENVIADO) · docs/analysis/onion-vps-network-exposure-2026-08.md"
     provenance:
-      source: "docs/analysis/granaai-compose-exposure-2026-08.md"
-      locator: "docs/analysis/granaai-compose-exposure-2026-08.md l.1-25; 91daebce (corpo, censo lote 5)"
+      source: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)"
+      locator: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro) l.1-25; 91daebce (corpo, censo lote 5)"
       method: "leitura: doc de analise versionado (medicao do censo de 2026-08-30, run wf_2349bf29-ea0) + corpo de 91daebce"
       locality: "repo"
 
@@ -567,10 +567,10 @@ nodes:
     confidence: 1.0
     verified_at: "2026-08-31"
     verified_against: "dogfood 4/4 acusacoes no compose ruim + 0 no curado; bancada 3/3 (acusa, cura passa, untracked fora); registry regenerado com a 64 classificada"
-    label: "A CLASSE VIROU MECANISMO (selo do maestro 2026-08-31, fix-must-become-mechanism): nasceu a REGRA 64 [HARD] no lint — compose RASTREADO com porta sem prefixo de bind ou segredo em fallback literal reprova. Vendoriza para todo adotante via plugin: o 3o caso e pego pelo CI antes de existir, sem depender de comunicacao. E as duas instancias medidas foram tratadas: granaai recebeu branch fix/compose-bind-and-secret-fallback (pushed, commit 1b5afab00 — 2 binds + 1 fallback curados; o time revisa e mergeia); arandek tem pacote mensagem+patch PRONTO-RETIDO (docs/analysis/arandek-compose-fallbacks-message-2026-08.md — 3 fallbacks; portas ja limpas). CONTEXTO DO MAESTRO incorporado: producao de ambos roda na AWS em outras contas — SG cobre porta (nao e furada pelo Docker), NAO cobre fallback de senha, que viaja intacto."
-    trace: ".claude/validation/lint-artifacts.sh (REGRA 64) · docs/analysis/granaai-compose-exposure-2026-08.md · docs/analysis/arandek-compose-fallbacks-message-2026-08.md"
+    label: "A CLASSE VIROU MECANISMO (selo do maestro 2026-08-31, fix-must-become-mechanism): nasceu a REGRA 64 [HARD] no lint — compose RASTREADO com porta sem prefixo de bind ou segredo em fallback literal reprova. Vendoriza para todo adotante via plugin: o 3o caso e pego pelo CI antes de existir, sem depender de comunicacao. E as duas instancias medidas foram tratadas: granaai recebeu branch fix/compose-bind-and-secret-fallback (pushed, commit 1b5afab00 — 2 binds + 1 fallback curados; o time revisa e mergeia); arandek tem pacote mensagem+patch PRONTO-RETIDO (arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro) — 3 fallbacks; portas ja limpas). CONTEXTO DO MAESTRO incorporado: producao de ambos roda na AWS em outras contas — SG cobre porta (nao e furada pelo Docker), NAO cobre fallback de senha, que viaja intacto."
+    trace: ".claude/validation/lint-artifacts.sh (REGRA 64) · arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)"
     provenance:
-      source: ".claude/validation/lint-artifacts.sh (REGRA 64) · docs/analysis/granaai-compose-exposure-2026-08.md · docs/analysis/arandek-compose-fallbacks-message-2026-08.md"
+      source: ".claude/validation/lint-artifacts.sh (REGRA 64) · arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)"
       locator: "dogfood 4/4 acusacoes no compose ruim + 0 no curado; bancada 3/3 (acusa, cura passa, untracked fora); registry regenerado com a 64 classificada"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"

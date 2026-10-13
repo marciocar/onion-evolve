@@ -797,7 +797,7 @@ fi
 # ── (5) VERIFICAR O QUE FOI MONTADO ──────────────────────────────────────────────────────────
 FAIL=0; NOT_MEASURED=""
 # (5a) VAZAMENTO. Três famílias de termo, todas DERIVADAS (nome no script seria o próprio vazamento):
-#   · os da REGRA 36 (nomes comerciais marcados + client-terms.txt + ids de adotante) — substring;
+#   · os da REGRA 36 (nomes comerciais marcados + fonte privada P8, fora da árvore + ids de adotante) — substring;
 #   · os ids de adotante com prefixo `onion-` (onion-<pessoa>), que a REGRA 36 ignora por desenho e
 #     são o ponto cego medido duas vezes ([[vendor-scrub-blind-spot]]) — palavra inteira, para que
 #     `onion-dist` não case dentro de `onion-distribution`;
@@ -814,8 +814,16 @@ if [ "${_ps_rc}" -ne 0 ]; then
 elif [ -z "${_terms_names}" ] && grep -qE 'CONFIDENCIAL|PRIVADO' "${MEMBERS}"; then
   echo "✗ (5a) o registro tem marcador de confidencialidade e nenhum nome comercial foi derivado — varrer assim seria teatro." >&2; FAIL=1
 fi
+# A FONTE PRIVADA DE TERMOS mora FORA da árvore desde 2026-10-13 (o core ficou público): P8 do
+# projection-safety.sh, lida por `--emit-declared`. Publicar porta PÚBLICA sem ela seria varrer sem o
+# vocabulário — "não medi", nunca "limpo": FALHA FECHADA (o motor roda no host, onde a fonte existe).
+_decl_out=""; _decl_rc=0
+_decl_out="$(cd "${CORE}" && bash "${WT}/.claude/validation/projection-safety.sh" --emit-declared 2>/dev/null)" || _decl_rc=$?
+if [ "${_decl_rc}" -ne 0 ]; then
+  echo "✗ (5a) a fonte privada de termos está AUSENTE (rc=${_decl_rc}; ONION_CLIENT_TERMS_FILE ou ~/.config/onion/client-terms.txt) — sem ela a varredura de nome privado não é medição." >&2; FAIL=1
+fi
 _terms_sub="$( { printf '%s\n' "${_terms_names}"
-                 [ -f "${CORE}/docs/evolution/federation/client-terms.txt" ] && grep -vE '^[[:space:]]*(#|$)' "${CORE}/docs/evolution/federation/client-terms.txt"
+                 printf '%s\n' "${_decl_out}"
                  _members_tsv | awk -F'\037' '($2=="adopter"||$2=="method") && $1 !~ /^onion-/ && $1 !~ /^marcio/ && $1 !~ /^selftest-/ && length($1)>=4 {print $1}'
                } 2>/dev/null | grep -v '^[[:space:]]*$' | sort -u || true)"
 _terms_word="$(_members_tsv | awk -F'\037' '($2=="adopter"||$2=="method") && $1 ~ /^onion-/ {print $1}' | sort -u || true)"

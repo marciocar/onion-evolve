@@ -1,7 +1,7 @@
 ---
 title: 'Relay: pipeline spec→vertical→treino provado no campo + retro fechada + 7 produtos deriváveis'
 date: 2026-07-30
-from: gustavo-pulga (consumidor / workspace BetaHauss) — relay pelo maestro (Marcio)
+from: gustavo-pulga (consumidor / workspace ⟨colaborador⟩) — relay pelo maestro (Marcio)
 to: core (onion-evolve)
 type: signal-feedback
 flow: upstream (consumidor → core)
@@ -130,4 +130,4 @@ o framework precisar conhecê-los.
 > **Nota de transporte:** relay individual pelo maestro (o colaborador visitante não relaya — Sinal 8).
 > Os sinais 2026-07-13/14/16 do lado do adotante já estão em `inbox/_processed/` no repo dele. Este relay
 > consolida o 2026-07-16 + a retro fechada 2026-07-29. **Consentimento de case/marketing:** SIM, com o nome
-> do colaborador (Gustavo Pulga / BetaHauss), **condicionado a anonimizar o cliente + revisão antes de publicar.**
+> do colaborador (Gustavo Pulga / ⟨colaborador⟩), **condicionado a anonimizar o cliente + revisão antes de publicar.**

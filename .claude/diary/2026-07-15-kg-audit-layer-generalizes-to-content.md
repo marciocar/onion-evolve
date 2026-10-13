@@ -19,7 +19,7 @@ auditar CONTEÚDO/documentação**, não só código/sistema — e o grafo **reg
 em vez de sobrescrevê-lo (`declarado ≠ verificado`). Evidência de campo, espontânea, sem o core.
 
 ## Evidence
-- **Uso de campo (gustavo, `tornak.kg.yaml` Lote 10):** auditoria de 2 decks (37+17 slides)
+- **Uso de campo (gustavo, `<cliente>.kg.yaml` Lote 10):** auditoria de 2 decks (37+17 slides)
   na gramática canônica — `E_SLIDE_AUDIT →SUPPORTS→ 7 claims →TRACES_TO→ artefatos`;
   `D_FIX_SCOPE →DEPENDS_ON→ claims`; **4 `V2 →SUPERSEDES→ V1`** (deck iterado, V1 vira `superseded`).
 - **Auto-correção humana preservada:** `C_TARDE_NUM_15` (conf **0.4**) foi **REFUTED** por
@@ -37,6 +37,6 @@ content-audit (ver `valid_when`); quando documentado, aposentar esta migalha. Ve
 ## Retest 2026-07-16 — RESOLVIDA (migalha aposentada)
 `valid_when` **satisfeito**: `knowledge-graph-sdaal.md` agora tem a nota de escopo
 "a camada `audit` não é sobre código, é sobre investigação" documentando o uso content-audit
-e citando o Lote 10 do Tornak. Sinal upstream `2026-07-15-sinal-kg-audit-layer-content-audit`
+e citando o Lote 10 do ⟨cliente⟩. Sinal upstream `2026-07-15-sinal-kg-audit-layer-content-audit`
 triado e movido para `_processed/`. A condição não vale mais → esta migalha não orienta mais
 ação futura (fica como registro histórico, não deletada — `superseded ≠ apagado`).

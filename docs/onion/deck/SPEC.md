@@ -93,7 +93,7 @@ atender depois de adotar.
 |---|---|---|
 | **`onion-no-clone`** | **NOVO** | `tutorial`: clona → **abre o Claude Code na pasta** → o `CLAUDE.md` é lido e os **4 hooks de `SessionStart`** avisam provider, inbox e migalhas. **O comando que falta por clone**, porque `core.hooksPath` é config local e não viaja: `git config core.hooksPath .githooks`. Portas: `/onion`, `@onion`, `/catch-up`. **Duas pegadinhas medidas**: husky disputa o `hooksPath` (um `husky install` mata o gate) e o `.env` não viaja |
 | **`o-que-fica-no-repo`** | **NOVO** | `reference`: a superfície que o commit durável staja — `.claude/` inteiro, 5 blocos de `docs/`, `CLAUDE.md`, `.githooks`, `LICENSE-ONION*` (**nome próprio**, porque `LICENSE` na raiz regeria o repo do cliente). E o **`.onion-version`**, 9 linhas, que decide tudo. **A armadilha que muda o resultado**: repo que **ignora `.claude/`** entrega **nada** a quem clona |
-| **`branches-onion`** | **completado** | já descrevia `onion/adopt` + `onion/vendor` (a topologia do 3-way merge) e **omitia** a `chore/onion-update-<pin>`, que é o que toda atualização cria — **medido: 4 delas no gmill em 2026-10-01**. É a branch que o dono de fato vê chegar |
+| **`branches-onion`** | **completado** | já descrevia `onion/adopt` + `onion/vendor` (a topologia do 3-way merge) e **omitia** a `chore/onion-update-<pin>`, que é o que toda atualização cria — **medido: 4 delas no hub-operacoes-enterprise em 2026-10-01**. É a branch que o dono de fato vê chegar |
 
 **O slide `onion-no-clone` fecha um laço que o deck já abria e não fechava:** o slide `comecar` termina
 com *"alguma guarda já te barrou? Se ainda não, a maquinaria está no disco mas não no caminho"* — que é

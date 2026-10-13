@@ -1,11 +1,11 @@
 ---
 title: 'Pipeline spec→vertical→treino validado no campo + produtos deriváveis + pesquisa de colaboração'
 date: 2026-07-16
-from: gustavo-pulga (consumidor / workspace BetaHauss)
+from: gustavo-pulga (consumidor / workspace ⟨colaborador⟩)
 to: core (onion-evolve)
 type: signal-feedback
 flow: upstream (consumidor → core)
-evidencia: sessão 2026-07-15/16 (dogfood de consultoria+treino); docs/tornak/{skills,site,graph,retro}; docs/onion/graph/colaboracao-onion.kg.yaml; docs/knowledge-base/concepts/colaboracao-moderna.md
+evidencia: sessão 2026-07-15/16 (dogfood de consultoria+treino); docs/<cliente>/{skills,site,graph,retro}; docs/onion/graph/colaboracao-onion.kg.yaml; docs/knowledge-base/concepts/colaboracao-moderna.md
 ---
 
 # Sinais ao core (2026-07-16) — pós-treino
@@ -22,7 +22,7 @@ offline premium). Público **não-técnico** aprendeu a *usar* primeiro e *criar
 e mapear o caminho canônico (quais comandos/skills cobrem cada salto do pipeline hoje, e onde há buraco).
 
 ## Sinal 2 — absorção + auditoria de skill de terceiro (design vertical)
-Uma skill de identidade de marca trazida por um colaborador (`betahauss-design`) foi **absorvida, auditada
+Uma skill de identidade de marca trazida por um colaborador (`<colaborador>-design`) foi **absorvida, auditada
 (adherence-lint) e teve a fonte trocada** — CDN de fonte → **fonte embutida (data-URI), HTML self-contained
 offline**. Virou a "face de design" da vertical, sem tocar no conteúdo (book).
 **Proposta ao core:** um **fluxo padrão de absorção+auditoria de skill de terceiro** (importar → auditar
@@ -74,7 +74,7 @@ client-safe** (o `grep`=0 como check versionável) no fluxo que gera artefatos v
 ## Sinal 7 — os DOIS KGs por fronteira de confiança: como foram usados, alimentados e pesquisados
 A partição de visibilidade se materializa em **dois KGs SDAAL distintos, por camada de confiança** —
 esta foi a decisão-chave do período e responde diretamente "como os KGs foram usados":
-- **KG do engajamento** (`docs/tornak/graph/*.kg.yaml`, ~90 nós/140 arestas): modela o domínio do
+- **KG do engajamento** (`docs/<cliente>/graph/*.kg.yaml`, ~90 nós/140 arestas): modela o domínio do
   cliente + as teses da consultoria. **Contém nós 🔒 confidenciais explicitamente marcados** ("nunca
   exibir em artefato voltado ao cliente"). **Fica no repo dev** — nunca sai. *Alimentado* em LOTES
   iterativos (construir→pausar→perguntar→responder) a partir de extrações/consolidação/notas; *gate* =

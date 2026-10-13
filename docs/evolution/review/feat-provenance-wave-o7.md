@@ -40,7 +40,7 @@ Ela também ganhou as isenções seladas pelo maestro em 2026-10-10:
 - **A4:** `/dev/null`, `/dev/stdin`, `/dev/stdout` e `/dev/stderr` ficam literais.
 - **A6:** caminho relativo do repo é legítimo. A guarda nunca o olhou, e a bancada agora prova isso.
 
-A exceção do gmill (o domínio público e os nomes dos arquivos de deploy ficam verbatim) passa, porque a
+A exceção do hub-operacoes-enterprise (o domínio público e os nomes dos arquivos de deploy ficam verbatim) passa, porque a
 ferramenta não tem guarda de nome privado. A bancada também prova isso.
 
 **Aplicado por tipo (linhas):**
@@ -134,8 +134,8 @@ Nenhum dos 10 diverge da planilha.
 
 ## NÃO aplicados (itens do maestro no resumo do juiz)
 
-- **A3:** renomear os 4 ids com o nome privado do gmill (`E_gmill_demo_route_caddy`,
-  `E_GMILL_VEREDITO_DOS_TRES_FALSOS_POSITIVOS`, `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM`, `Q_GMILL_MAIN_DIVERGIU`).
+- **A3:** renomear os 4 ids com o nome privado do hub-operacoes-enterprise (`E_hub_operacoes_enterprise_demo_route_caddy`,
+  `E_HUB_OPERACOES_ENTERPRISE_VEREDITO_DOS_TRES_FALSOS_POSITIVOS`, `Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM`, `Q_HUB_OPERACOES_ENTERPRISE_MAIN_DIVERGIU`).
   Fica para o SAC-99.
 - **A4:** `/dev/null` e `/dev/stdin` nos 7 campos com o idioma de shell. O selo os mantém **literais**: não há
   nada a reescrever, e a guarda os isenta.

@@ -2,7 +2,7 @@
 title: 'KG-first virou MECANISMO — os loops consultam o .kg.yaml primeiro'
 date: 2026-07-16
 from: onion-evolve (core / maestro principal)
-to: gustavo-pulga (workspace BetaHauss — COLABORADOR-VISITANTE, entrega via branch)
+to: gustavo-pulga (workspace ⟨colaborador⟩ — COLABORADOR-VISITANTE, entrega via branch)
 re: CHANGELOG de co-evolução, entrada 2026-07-16 (downstream)
 type: downstream-announce
 classe: COMPATÍVEL
@@ -29,4 +29,4 @@ backlog (`gustavo-omnibus-backlog` #8).
 
 ---
 > **Transporte (maestro):** o Gustavo **recebe pela branch** — entregar committando este arquivo na branch
-> que ele acessa (canal BetaHauss/Tornak) e push; a sessão do core **não** pusha esse repo/branch alheio.
+> que ele acessa (canal ⟨colaborador⟩/⟨cliente⟩) e push; a sessão do core **não** pusha esse repo/branch alheio.

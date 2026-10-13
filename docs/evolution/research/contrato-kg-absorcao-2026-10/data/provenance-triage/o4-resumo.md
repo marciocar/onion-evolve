@@ -61,7 +61,7 @@ exceções seladas (`D_AGREGACAO_CROSS_REPO_E_MOAT`, `E_GIT_DIR_QUEBRA_A_RAIZ_DE
   `onion-adopt-arandek-local` e `arandek` usam `<repo>@<sha>`. Os shas foram conferidos com
   `gh api commits/<sha>`, menos os da org `ArandekBR`.
 - **REGRA 30 (Segurança de PROJEÇÃO: nome comercial de membro privado não sai):** a pasta do host
-  `/home/marcio/gmill` foi trocada pelo id **`hub-operacoes-enterprise`**, e a `rhilo-metagamify` pelo id
+  `<clone do hub-operacoes-enterprise>` foi trocada pelo id **`hub-operacoes-enterprise`**, e a `rhilo-metagamify` pelo id
   **`metagamify`**. Rodei `projection-safety.sh` sobre a planilha: rc=0.
 - **CHANGELOG com "cópia local"** (8 nós): saiu só o trecho da cópia do host; a `source` fica sendo a URL
   pública. A locality vira `web`, ou `repo` quando a source também cita um arquivo versionado.
@@ -99,7 +99,7 @@ ganham locality pelas linhas da regra 2.
    é imutável, mas o estado que a decisão regula não foi conferido hoje. Pela regra de classe, vão a DEV.
 7. **`C_bypass_permissions_exposto` (claim open, segurança).** Para conferir hoje seria preciso ler o `.env` de
    produção, e a ordem é nunca ler `.env`. Vai a DEV, mas o risco que descreve **pode estar vivo**.
-8. **`Q_GMILL_MAIN_DIVERGIU` e o grafo `gmill-update-547-2026-10`** carregam o nome da pasta privada no **id do
+8. **`Q_HUB_OPERACOES_ENTERPRISE_MAIN_DIVERGIU` e o grafo `hub-operacoes-enterprise-update-547-2026-10`** carregam o nome da pasta privada no **id do
    nó e no nome do arquivo**, fora da `source`. O O4 não mexe (fora de escopo), mas a REGRA 30 não olha ids.
 
 ## Propostas ao maestro (regras novas, NÃO aplicadas)

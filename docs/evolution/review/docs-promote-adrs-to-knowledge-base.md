@@ -32,11 +32,11 @@ Medi o **conteúdo** antes de mover, e foi o que salvou:
 | o que | n |
 |---|---|
 | ids do registro (`metagamify`, `granaai`, `arandek`, `gustavo-pulga`) | 22 |
-| nomes **fora** do registro (`rhilo-app`, **`Tornak`**) | 5 |
+| nomes **fora** do registro (`rhilo-app`, **`⟨cliente⟩`**) | 5 |
 | caminhos de máquina (`/home/marcio/...`) | 5 |
 | razão social (**`Grana.Ai`**) — achada só pela REGRA 36 | 1 |
 
-**`Tornak` é cliente de um adotante.** Exposição de segundo grau: o `members.yaml` nunca o conheceu,
+**`⟨cliente⟩` é cliente de um adotante.** Exposição de segundo grau: o `members.yaml` nunca o conheceu,
 e nenhum grep meu por id o acharia. É o ponto cego que a migalha `vendor-scrub-blind-spot` registra —
 a guarda só protege quem está no registro.
 
@@ -87,7 +87,7 @@ contagem de KB              : 93 → 107 (snapshots de inbox/ e review/ preserva
 ```
 
 A busca por ausência achou **seis** ocorrências que a substituição deixou para trás — entre elas
-`tornak` minúsculo, que meu par literal capitalizado não pegou. Sem ela, teriam ido para o bundle.
+`⟨cliente⟩` minúsculo, que meu par literal capitalizado não pegou. Sem ela, teriam ido para o bundle.
 
 ## Gate
 

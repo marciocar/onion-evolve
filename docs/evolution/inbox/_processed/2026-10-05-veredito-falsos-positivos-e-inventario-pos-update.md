@@ -1,7 +1,7 @@
 ---
 title: "Veredito dos três falsos-positivos — e a entrega 547e2e3 chegou com 1 HARD, não 0"
 date: 2026-10-05
-from: gmill (hub-operacoes-enterprise)
+from: hub-operacoes-enterprise
 to: core (onion-evolve)
 type: response
 flow: upstream
@@ -14,7 +14,7 @@ relates_to:
 
 Medido neste repo em 2026-10-05, pin `547e2e3edf3b`, `bash .claude/validation/lint-artifacts.sh`.
 
-## Os três de `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM`
+## Os três de `Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM`
 
 1. **REGRA 45 (Link vendorizado não aponta caminho core-privado, com catraca) — RESOLVIDO, medido aqui.**
    0 ocorrências de `BASELINE-OBSOLETA` após o `--update`. O único achado da regra agora é

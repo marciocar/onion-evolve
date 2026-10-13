@@ -15,8 +15,8 @@ nodes:
     verified_at: "2026-07-19"
     label: "P5: inferencia do motor local sobre o KG do dono e feature (indefesa); a defesa desloca-se p/ a FRONTEIRA DE SAIDA (L1-L6) — nao emitir bruto"
     provenance:
-      source: "docs/discussions/onion-pessoal-marcio/05-mitigacao-inferencia.md"
-      locator: "docs/discussions/onion-pessoal-marcio/05-mitigacao-inferencia.md:26-29, :68-69, :81 @754497e4"
+      source: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)"
+      locator: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro):26-29, :68-69, :81 @754497e4"
       method: "leitura: discussão P5 (mitigação de inferência) do onion-pessoal"
       locality: "repo"
   - id: E_RFC4_SINGLE_SOURCE
@@ -43,8 +43,8 @@ nodes:
     verified_at: "2026-07-19"
     label: "doutrina JA ratificada: de-id 'none'=fail-safe, 'private' inviolavel mesmo p/ o core, declarado!=verificado (VETO sem prova)"
     provenance:
-      source: "docs/discussions/onion-pessoal-marcio/04-privacidade-soberania.md"
-      locator: "docs/discussions/onion-pessoal-marcio/04-privacidade-soberania.md:25, :35, :40-41 @470d1350; docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:23 @9d6fac2c (JÁ ratificada)"
+      source: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)"
+      locator: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro):25, :35, :40-41 @470d1350; docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:23 @9d6fac2c (JÁ ratificada)"
       method: "leitura: discussão P4 (privacidade/soberania) do onion-pessoal"
       locality: "repo"
   - id: E_EU_AI_ACT
@@ -73,7 +73,7 @@ nodes:
     label: "o SSOT unico das 6 camadas (classificacao-por-inferencia + gate-por-proposito + eps-ledger) e SO prototipo .kg.yaml hoje — nao operacional (P5 item 6)"
     provenance:
       source: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md"
-      locator: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:24 @9d6fac2c; docs/discussions/onion-pessoal-marcio/05-mitigacao-inferencia.md:122-123 @754497e4"
+      locator: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:24 @9d6fac2c; arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro):122-123 @754497e4"
       method: "leitura: SYNTHESIS D2 l.24 + item 6 da P5"
       locality: "repo"
   - id: C_A_ELIMINADA

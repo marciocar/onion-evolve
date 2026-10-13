@@ -87,7 +87,7 @@ nodes:
     confidence: 0.6
     status: refuted
     label: "D7/opportunistic (baixo valor): docs de DISCUSSÃO (onion-pessoal-marcio, proto/README, technical-context/contributing) usam links relativos internos que RESOLVEM mas divergem da convenção de links absolutos do .claude/. Fora da superfície de comando/agente — cosmético"
-    trace: "docs/discussions/onion-pessoal-marcio/"
+    trace: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)"
   # ── REFUTADOS (a auto-correção — o que a auditoria pegou de si mesma) ──
   - id: C_refut_frontmatter_skills
     node_type: claim

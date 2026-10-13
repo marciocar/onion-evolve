@@ -29,7 +29,7 @@ core-only** e reprovava. Medido no hub:
 
 ```
 ✗ radar-staleness: (b)…(h) — ERRO: --only: arquivo inexistente:
-    /home/marcio/gmill/docs/onion/radar-baselines.yaml
+    <clone do hub-operacoes-enterprise>/docs/onion/radar-baselines.yaml
 ```
 
 Sete casos cobrando uma SSOT que **só o core tem**, de um repo que nunca a teve. O `members_registry`

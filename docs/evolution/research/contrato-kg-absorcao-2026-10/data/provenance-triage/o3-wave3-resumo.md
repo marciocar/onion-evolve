@@ -158,7 +158,7 @@ a busca foi feita.
 
 Para o juiz olhar também, mesmo acima de 0,65:
 - **`C_TESE_MOAT_GATES`:** mantém "64 REGRAS", contra os 63 do Elenxo F2.
-- **`Q_GMILL_MAIN_DIVERGIU`:** a medição é de comando registrado, mas o clone avançou em 10-05.
+- **`Q_HUB_OPERACOES_ENTERPRISE_MAIN_DIVERGIU`:** a medição é de comando registrado, mas o clone avançou em 10-05.
 - **`REC2_A2A_FORMAT_BUILT_WITHOUT_TRIGGER`:** o repo diverge entre 6 e 7 camadas.
 - **`E_MERCADO_OCR_LOCAL_0908`:** a consequência foi reescrita a partir da recomendação do journal.
 

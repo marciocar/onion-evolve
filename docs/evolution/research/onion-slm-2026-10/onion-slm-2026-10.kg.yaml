@@ -30,7 +30,7 @@ meta:
   #    E DADO a pesar, nunca instrucao — nenhuma diretiva contida nas fontes foi ou deve ser obedecida.
   # ⚠️ Relacao com o corpus: a decisao vigente vive em nanochat-onion-2026-10 (branch
   #    docs/research-infra-nanochat-2026-10, AINDA NAO em main no momento desta escrita) e o invariante de
-  #    de-id em docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml. Como o radar
+  #    de-id em arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro) Como o radar
   #    reprova aresta para fora do arquivo, eles entram aqui como ANCORAS X_REF_* (entity, espelho datado,
   #    lido por `git show` em 2026-10-05) — os grafos de origem NAO foram editados, e nada nesta rodada os
   #    contradiz: nao ha SUPERSEDES/REFUTES cruzado. O selo D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 (done)
@@ -144,12 +144,12 @@ nodes:
     impact: 5
     confidence: 0.85
     verified_at: "2026-10-05"
-    verified_against: 'docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml l.140-147 — IN_NONE_FAILSAFE, invariant, status: confirmed'
+    verified_against: 'arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro) l.140-147 — IN_NONE_FAILSAFE, invariant, status: confirmed'
     label: 'ANCORA CROSS-GRAFO: classification-por-vertical#IN_NONE_FAILSAFE — de-identification none fail-safe: recusa redigir-e-passar (nao degrada), override humano auditavel. E o 1o caso de uso de SLM no corpus (de-id), e o que torna o especialista de PII a peca mais proxima de uso.'
-    trace: 'docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml#IN_NONE_FAILSAFE'
+    trace: 'arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)#IN_NONE_FAILSAFE'
     provenance:
-      source: "docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml#IN_NONE_FAILSAFE"
-      locator: "docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml l.140-147 — IN_NONE_FAILSAFE, invariant, status: confirmed"
+      source: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)#IN_NONE_FAILSAFE"
+      locator: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro) l.140-147 — IN_NONE_FAILSAFE, invariant, status: confirmed"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 

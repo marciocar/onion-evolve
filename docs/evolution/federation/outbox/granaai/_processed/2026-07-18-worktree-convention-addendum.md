@@ -2,7 +2,7 @@
 title: 'Convenção de worktrees — adendo: worktree do harness que vira DURÁVEL vai p/ ~/worktrees/'
 date: 2026-07-18
 from: onion-evolve (core / maestro principal)
-to: granaai (granaai (Grana.Ai — CONFIDENCIAL, ver onion-adr-granaai-consolidation-2026-07.md) — consumidor)
+to: granaai (granaai (empresa do maestro — linhagem histórica; ver onion-adr-granaai-consolidation-2026-07.md) — consumidor)
 re: CHANGELOG de co-evolução, entrada 2026-07-18 (downstream)
 type: downstream-announce
 classe: COMPATÍVEL

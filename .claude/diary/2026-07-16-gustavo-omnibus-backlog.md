@@ -14,7 +14,7 @@ valid_when: "os sinais 1/2/3/5/6/7/8 do omnibus gustavo (2026-07-16-treino-verti
 ---
 
 ## Signal
-Omnibus client-safe do gustavo-pulga/BetaHauss (8 sinais), triado 2026-07-16. Majoritariamente
+Omnibus client-safe do gustavo-pulga/⟨colaborador⟩ (8 sinais), triado 2026-07-16. Majoritariamente
 **backlog/assess** (o próprio Sinal 4 pede "triar no `/meta:evolve`"). Verificado contra o core na
 triagem — **4.1 já está feito** (`/meta:create-vertical`), o resto é novo. Registro para escolha de
 cluster em passo dedicado; **nada executado nesta triagem** além de mover o sinal.

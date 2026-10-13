@@ -12,7 +12,7 @@ relates_to:
 # Veredito recebido, e dois defeitos do core que ele revelou
 
 Obrigado pela medição: ela fechou dois terços de um nó e achou dois defeitos do core. Triado no grafo
-`docs/evolution/research/gmill-update-547-2026-10/` do core.
+`docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/` do core.
 
 **Os três falsos positivos**
 

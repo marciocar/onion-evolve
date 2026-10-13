@@ -1569,7 +1569,28 @@ check_harvest_names_removed_nodes() {
   # continua no grafo (falso positivo medido em 2026-10-07, ao colher uma fila e inserir nós antes
   # das arestas: o último nó "saiu" e "voltou" no diff, e o HARD pedia para nomear um id vivo).
   local _kgdiff added
-  _kgdiff="$(git -C "${REPO_ROOT}" diff --no-ext-diff --no-color "${base}" HEAD -- '*.kg.yaml' 2>/dev/null || true)"
+  # GRAFO RETIRADO DA ÁRVORE (2026-10-13): o grafo INTEIRO apagado, declarado por linha de CAMINHO (sem
+  # `::`) no ledger `docs/evolution/kg-retired-from-tree.tsv`, não é colheita a nomear — nomear os ids no
+  # resíduo republicaria, num repo PÚBLICO, o que a retirada tirou (o caso que a pagou: grafos de dados
+  # pessoais, ids incluídos). Mesmo espírito do `x_renamed_from` abaixo: isenta por DECLARAÇÃO no dado,
+  # nunca por omissão. Duas travas: o arquivo tem de estar AUSENTE da árvore (grafo vivo segue cobrado) e
+  # a isenção é DECLARADA em SOFT no ramo que apaga (nunca silêncio).
+  local _ret_ledger="${REPO_ROOT}/docs/evolution/kg-retired-from-tree.tsv" _ret_excl=() _rp _nret=0
+  if [ -f "${_ret_ledger}" ]; then
+    while IFS= read -r _rp; do
+      [ -n "${_rp}" ] || continue
+      case "${_rp}" in *::*) continue ;; esac
+      [ -e "${REPO_ROOT}/${_rp}" ] && continue
+      _ret_excl+=(":(exclude)${_rp}")
+      if [ -n "$(git -C "${REPO_ROOT}" diff --name-only --diff-filter=D "${base}" HEAD -- "${_rp}" 2>/dev/null || true)" ]; then
+        _nret=$((_nret + 1))
+      fi
+    done < <(grep -vE '^[[:space:]]*(#|$)' "${_ret_ledger}" 2>/dev/null | cut -f1 | sort -u || true)
+  fi
+  if [ "${_nret}" -gt 0 ]; then
+    violation "SOFT" "docs/evolution/kg-retired-from-tree.tsv" "REGRA 63: ${_nret} grafo(s) INTEIRO(s) retirado(s) da árvore neste ramo por decisão registrada no ledger — os ids deles NÃO são cobrados no resíduo (nomeá-los republicaria o que saiu). Declarado, não verificado: confira o ledger no diff"
+  fi
+  _kgdiff="$(git -C "${REPO_ROOT}" diff --no-ext-diff --no-color "${base}" HEAD -- '*.kg.yaml' ${_ret_excl[@]+"${_ret_excl[@]}"} 2>/dev/null || true)"
   removed="$(grep -E '^-[[:space:]]*-[[:space:]]*id:' <<< "${_kgdiff}" \
              | sed -E 's/^-[[:space:]]*-[[:space:]]*id:[[:space:]]*//; s/[[:space:]]*$//' | sort -u || true)"
   added="$(grep -E '^[+][[:space:]]*-[[:space:]]*id:' <<< "${_kgdiff}" \
@@ -4020,7 +4041,8 @@ check_kg_view_sync() {
 #   script seria o próprio vazamento).
 #   Hub de privacidade: as REGRAS 33 e 36 derivam desta (threat models distintos).
 #   P7 (SAC-99, 2026-10-11): também IDS DE NÓ e CAMINHOS DE GRAFO de todo o corpus em docs/, com os
-#   termos do client-terms.txt — o id e o caminho saem para as projeções geradas de qualquer grafo.
+#   termos da fonte privada (P8, fora da árvore desde 2026-10-13) — o id e o caminho saem para as
+#   projeções geradas de qualquer grafo.
 # ===========================================================================
 check_projection_safety() {
   local helper="${SCRIPT_DIR}/projection-safety.sh"
@@ -4028,7 +4050,7 @@ check_projection_safety() {
   # Honra --only com a MESMA semântica do _find (mantém o selftest O(fixtures × 1)).
   if [ -n "${ONLY_PATH}" ]; then
     case "${ONLY_PATH}" in
-      "${REPO_ROOT}"/site/*|"${REPO_ROOT}"/docs/onion/graph/*|*/federation-console.html|*/members.yaml|"${REPO_ROOT}"/docs/*.kg.yaml|*/client-terms.txt) : ;;
+      "${REPO_ROOT}"/site/*|"${REPO_ROOT}"/docs/onion/graph/*|*/federation-console.html|*/members.yaml|"${REPO_ROOT}"/docs/*.kg.yaml) : ;;
       *) return 0 ;;
     esac
   fi
@@ -4237,10 +4259,24 @@ check_vendored_surface_clean() {
   # para o console e o mapa públicos — registrar um cliente sob NDA ali trocaria um vazamento por
   # outro. Aqui o nome entra para ser PROCURADO, nunca exibido. E o arquivo vive em
   # `docs/evolution/`, que NÃO viaja: uma lista de nomes de cliente que viajasse seria o vazamento.
-  local _ct="${REPO_ROOT}/docs/evolution/federation/client-terms.txt"
-  if [ -f "${_ct}" ]; then
+  # ⚠️ DESDE 2026-10-13 A LISTA MORA FORA DA ÁRVORE (o core ficou PÚBLICO, decisão do maestro): o
+  # `client-terms.txt` versionado era, num repo público, o próprio vazamento — "não viaja no adopt" deixou
+  # de bastar quando a própria árvore passou a ser vitrine. A fonte agora é a P8 do projection-safety.sh
+  # (`ONION_CLIENT_TERMS_FILE` ou ~/.config/onion/client-terms.txt; no CI, o secret ONION_CLIENT_TERMS),
+  # lida por `--emit-declared`. SEM a fonte: SOFT NAO-VERIFICADO nomeado (nunca verde mudo, nunca reprovar
+  # tudo). E a lista que VOLTAR à árvore é HARD: é a regressão exata que esta mudança fecha.
+  local _ct_legacy="${REPO_ROOT}/docs/evolution/federation/client-terms.txt" _decl="" _decl_rc=0
+  if [ -z "${ONLY_PATH}" ] && [ -e "${_ct_legacy}" ]; then
+    violation "HARD" "${_ct_legacy}" "[vendor-scrub/LISTA-NA-ARVORE] a lista de nomes privados voltou para a ÁRVORE do core, que é PÚBLICA — ela é o próprio vazamento. Mova o conteúdo para ONION_CLIENT_TERMS_FILE ou ~/.config/onion/client-terms.txt (0600) e tire o arquivo do índice"
+  fi
+  _decl="$(bash "${helper}" --emit-declared 2>/dev/null)" || _decl_rc=$?
+  if [ "${_decl_rc}" -eq 3 ]; then
+    violation "SOFT" "${REPO_ROOT}/docs/evolution/federation/members.yaml" "[vendor-scrub/NAO-VERIFICADO] fonte privada de termos AUSENTE (ONION_CLIENT_TERMS_FILE ou ~/.config/onion/client-terms.txt; no CI, o secret ONION_CLIENT_TERMS) — a superfície vendorizada NÃO foi varrida pelos nomes privados; só pelos ids de adotante"
+  elif [ "${_decl_rc}" -ne 0 ]; then
+    violation "SOFT" "${REPO_ROOT}/docs/evolution/federation/members.yaml" "[vendor-scrub/NAO-VERIFICADO] a fonte privada de termos não respondeu (rc=${_decl_rc}) — varredura por nome privado NÃO feita"
+  else
     terms="${terms}
-$(grep -vE '^[[:space:]]*(#|$)' "${_ct}" || true)"
+${_decl}"
   fi
   # (2) IDS de ADOTANTE — o id também identifica o cliente (um id pode ser nome de pessoa, ou mapear direto na marca).
   #     Derivados do members.yaml, EXCLUINDO os nomes do PRÓPRIO framework (onion-*) e do maestro (marcio*).
@@ -4256,19 +4292,33 @@ $(grep -vE '^[[:space:]]*(#|$)' "${_ct}" || true)"
   # grep -v não casa nada → exit 1 → sob 'set -euo pipefail' abortaria o LINT INTEIRO. O core
   # nunca vê isso (sempre tem termos), mas todo adotante greenfield veria — achado ao rodar o
   # lint DENTRO da cópia de um adotante (a lição de campo: o core é o pior oráculo do que viaja).
-  terms="$(printf '%s\n%s\n' "${terms}" "${ids}" | grep -v '^[[:space:]]*$' | sort -u || true)"
-  [ -n "${terms}" ] || return 0
-  while IFS= read -r term; do
-    [ -n "${term}" ] || continue
-    while IFS= read -r f; do
-      [ -n "${f}" ] || continue
-      # Fixtures NÃO são exceção: um nome real de cliente num fixture VENDORIZA p/ todo adotante
-      # igual a qualquer outro arquivo (achado 2026-07-22: um id de adotante num comentário de
-      # crédito de fixture escapava a guarda e viajava). Os termos derivam de nomes REAIS — nenhum
-      # fixture legítimo precisa deles (os de teste usam nomes inventados: acme-adopter, selftest-*).
-      violation "HARD" "${f#${REPO_ROOT}/}" "[vendor-scrub] identificador de adotante '${term}' na superfície vendorizada — viaja p/ todo adotante (cross-tenant por adoção); generalize (o crédito nominal fica no diário privado)"
-    done < <(grep -rilF -- "${term}" "${targets[@]}" 2>/dev/null | sort -u)
-  done <<< "${terms}"
+  # Duas listas, porque o LOG do lint é público no CI de um repo público: o id de adotante é público
+  # (P2) e pode ser impresso; o nome privado NUNCA — a mensagem diz só "nome da fonte privada".
+  terms="$(printf '%s\n' "${terms}" | grep -v '^[[:space:]]*$' | sort -u || true)"
+  ids="$(printf '%s\n' "${ids}" | grep -v '^[[:space:]]*$' | sort -u || true)"
+  [ -n "${terms}${ids}" ] || return 0
+  local _kind _list
+  for _kind in private id; do
+    if [ "${_kind}" = "private" ]; then _list="${terms}"; else _list="${ids}"; fi
+    [ -n "${_list}" ] || continue
+    while IFS= read -r term; do
+      [ -n "${term}" ] || continue
+      # termo privado que é também id público já é coberto pela volta dos ids (sem duplicar a violação)
+      if [ "${_kind}" = "private" ] && grep -qxiF -- "${term}" <<< "${ids}"; then continue; fi
+      while IFS= read -r f; do
+        [ -n "${f}" ] || continue
+        # Fixtures NÃO são exceção: um nome real de cliente num fixture VENDORIZA p/ todo adotante
+        # igual a qualquer outro arquivo (achado 2026-07-22: um id de adotante num comentário de
+        # crédito de fixture escapava a guarda e viajava). Os termos derivam de nomes REAIS — nenhum
+        # fixture legítimo precisa deles (os de teste usam nomes inventados: acme-adopter, selftest-*).
+        if [ "${_kind}" = "id" ]; then
+          violation "HARD" "${f#${REPO_ROOT}/}" "[vendor-scrub] identificador de adotante '${term}' na superfície vendorizada — viaja p/ todo adotante (cross-tenant por adoção); generalize (o crédito nominal fica no diário privado)"
+        else
+          violation "HARD" "${f#${REPO_ROOT}/}" "[vendor-scrub] nome da fonte privada de termos na superfície vendorizada (o termo não é impresso: o log do CI é público) — viaja p/ todo adotante; generalize. Para achar: a lista sai do modo --emit-declared do projection-safety.sh; case-a com grep -nioF contra ${f#${REPO_ROOT}/}"
+        fi
+      done < <(grep -rilF -- "${term}" "${targets[@]}" 2>/dev/null | sort -u)
+    done <<< "${_list}"
+  done
 
 }
 

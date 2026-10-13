@@ -12,7 +12,7 @@ flow: upstream
 
 ## O que acontece
 
-Primeira sessão da Avansat após a adoção (`role: hub`). Ao rodar `/meta:co-evolve`:
+Primeira sessão da hub-formacao-enterprise após a adoção (`role: hub`). Ao rodar `/meta:co-evolve`:
 
 - **Passo 1** mapeia só dois papéis: `role: source → CORE` e `role: adopted → CONSUMIDOR`
   (`.claude/commands/meta/co-evolve.md`, l. 24–31). Um stamp `role: hub` não cai em nenhum dos dois;
@@ -26,7 +26,7 @@ Enquanto isso, o **script** já foi corrigido: `.claude/utils/co-evolution/co-re
 descreve, não** — e é a prosa que a sessão lê primeiro.
 
 Conferido no core em `06bc547c268c` (HEAD de `main`, 2026-09-25): `grep -i hub` em
-`co-evolve.md` e `co-relay.md` retorna vazio. O drift persiste na fonte, não só no pin da Avansat.
+`co-evolve.md` e `co-relay.md` retorna vazio. O drift persiste na fonte, não só no pin da hub-formacao-enterprise.
 
 ## Por que importa
 

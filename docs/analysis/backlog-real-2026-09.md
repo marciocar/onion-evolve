@@ -77,7 +77,7 @@ verified_at: 2026-09-01
 | `A_analysis_structure` | O nó pede uma escada sequencial F0→F4 que segue tecnicamente incompleta (F2 reprovada e nunca refeita; F3/F4 nunca rodaram como fases formais). Mas o OBJETIVO da escada — |
 | `C_trust_matrix_stays_onion` | O nó está com status:open pedindo algo que já existe e está em produção: a matriz fina não é "grosso demais" resolvida por Logto — ela nunca dependeu do RBAC Logto para e |
 | `Q_ARANDEK_UPDATE` | O nó estava formulado como pergunta em aberto sobre um evento futuro ("quando... rodar"); o evento não só ocorreu como foi superado por múltiplos ciclos adicionais de upd |
-| `Q_p4_instrument` | O nó (aberto desde 07-25) dizia 'Zero adotante P4 provado hoje'. Isso morreu: entre 2026-08-04 e 2026-08-27 rodou uma PoC real com prospect real (HPE Autos, via oferta Be |
+| `Q_p4_instrument` | O nó (aberto desde 07-25) dizia 'Zero adotante P4 provado hoje'. Isso morreu: entre 2026-08-04 e 2026-08-27 rodou uma PoC real com prospect real (⟨cliente⟩, via oferta Be |
 | `D_NO_DISTORT` | O nó está status: open no grafo, mas o trabalho que ele descreve (aplicar a diretriz "não entortar doutrina" ao decidir o papel da develop) foi CONCLUÍDO, RATIFICADO e EN |
 | `C_NS2_PORTABLE` | O nó descreve NS2 como candidata de north-star em aberto com uma ressalva pendente ("família não verificada"). Isso morreu em duas camadas: (a) Q_NORTHSTAR foi decidida e |
 | `Q_members_ci_gate` | O nó pedia ligar HARD o gate de CI sobre members.yaml vivo (estava só na rota do comando + selftest). Isso foi entregue: REGRA 66 faz exatamente isso, com PR(s) 6799c8df/ |

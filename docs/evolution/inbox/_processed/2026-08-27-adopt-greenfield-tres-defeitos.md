@@ -51,7 +51,7 @@ na **Fase 5**. Dois passos dependem do carimbo e degradam em silêncio:
 - **(9) `regen-baselines.sh`** — sem stamp, `onion-version.sh` devolve `role: source` e o
   helper **aborta**: *"é o CORE (role: source) — abortado"*. Numa adoção greenfield ele
   nunca roda. É o passo que existe para impedir o adotante de herdar o passivo do core — e
-  o comentário dele cita justamente a PoC BW&P/HPE, que nasceu com **47 violações HARD**
+  o comentário dele cita justamente a PoC ⟨parceiro⟩/⟨cliente⟩, que nasceu com **47 violações HARD**
   por causa disso. Rodando à mão **depois** do carimbo, funcionou: `kg-verification-baseline.txt`
   foi de **47 chaves para 0**.
 - **(8c) semente do KG** — sem stamp, o grafo nasce com `created/updated/baseline/date` =

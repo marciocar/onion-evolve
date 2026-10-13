@@ -4,7 +4,7 @@
 # /etc/caddy/secrets/<site>.env (root, 0600), que o ops/install-caddy-config.sh lê ao renderizar
 # os marcadores @@<PREFIXO>_BASIC_HASH@@ e @@<PREFIXO>_COOKIE@@ do conf.d versionado.
 #
-# POR QUE EXISTE (2026-10-08, vhost gmill): segredo gerado "à mão, só desta vez" é o que volta como
+# POR QUE EXISTE (2026-10-08, 1º vhost de conf.d versionado): segredo gerado "à mão, só desta vez" é o que volta como
 # incidente (senha 0644 por 1h15 numa máquina de 5 contas). Gerar, guardar e derivar num só processo,
 # sem arquivo temporário e sem eco, é a forma de não depender de disciplina.
 #
@@ -12,9 +12,9 @@
 #
 # Uso:
 #   ops/caddy-site-secrets.sh <site> <prefixo-pass> <PREFIXO_ENV> [--rotate]
-#   ex.: ops/caddy-site-secrets.sh gmill onion/gmill-demo GMILL_DEMO
-#        → pass onion/gmill-demo-basic-auth (senha) · pass onion/gmill-demo-cookie (cookie)
-#        → /etc/caddy/secrets/gmill.env com GMILL_DEMO_BASIC_HASH e GMILL_DEMO_COOKIE
+#   ex.: ops/caddy-site-secrets.sh exemplo onion/exemplo-demo EXEMPLO_DEMO
+#        → pass onion/exemplo-demo-basic-auth (senha) · pass onion/exemplo-demo-cookie (cookie)
+#        → /etc/caddy/secrets/exemplo.env com EXEMPLO_DEMO_BASIC_HASH e EXEMPLO_DEMO_COOKIE
 #   Sem --rotate, RECUSA se as entradas do pass já existirem (nunca sobrescreve um segredo vivo).
 set -euo pipefail
 export LC_ALL=C

@@ -1,7 +1,7 @@
 ---
 title: '3 KBs candidatas à absorção — Zoho Projects API V3, GLPI API V1×V2, e o padrão ticket→task'
 date: 2026-09-30
-from: gmill (hub, pin cff9214c3b9a, main c7d2537, KBs em 6d60149)
+from: hub-operacoes-enterprise (hub, pin cff9214c3b9a, main c7d2537, KBs em 6d60149)
 to: core (onion-evolve)
 type: feature
 severity: medium
@@ -12,12 +12,12 @@ transport_note: 'Colado pelo maestro na sessão do core, não relayado por /meta
 
 # Sinal recebido (corpo do adotante, preservado)
 
-**Origem:** repo `gmill` (papel `hub`, pin `cff9214c3b9a`), `main` @ `c7d2537`, KBs em `6d60149`.
+**Origem:** repo `⟨nome do repo⟩` (papel `hub`, pin `cff9214c3b9a`), `main` @ `c7d2537`, KBs em `6d60149`.
 Gerado via `/meta:create-knowledge-base`.
 
 ## O que o adotante propõe absorver
 
-| Arquivo (no gmill) | O que é | Genérico? |
+| Arquivo (no hub-operacoes-enterprise) | O que é | Genérico? |
 |---|---|---|
 | `docs/knowledge-base/platforms/zoho-projects-api.md` (v1.1, 386 l.) | Zoho Projects **API V3**: OAuth 2.0 (Self Client, fluxo web), refresh/limites de token, multi-DC, escopos, paginação, rate limit, erros, endpoints de tarefa, webhooks + workflow rules | plataforma |
 | `docs/knowledge-base/platforms/glpi-api.md` (v1.1, 316 l.) | GLPI **API V1** (`apirest.php`, App-Token/user_token/Session-Token) × **API V2** (GLPI 11, OAuth2/Bearer); cadastro de OAuth client, webhooks nativos, acompanhamentos | plataforma |

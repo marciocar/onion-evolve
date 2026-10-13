@@ -20,7 +20,7 @@ nodes:
     status: confirmed
     label: "estrela discuss/onion-pessoal-marcio — onde a regua de Aristoteles foi mais trabalhada (par regua/motor)"
     provenance:
-      source: "docs/discussions/onion-pessoal-marcio/ (README.md, 01-verticais-peer.md, 02-reconciliacao.md)"
+      source: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro) (README.md, 01-verticais-peer.md, 02-reconciliacao.md)"
       locator: "01-verticais-peer.md:7 e 25-30; 02-reconciliacao.md:28-34"
       method: "leitura: arquivos da estrela no repo"
       locality: "repo"
@@ -62,7 +62,7 @@ nodes:
     status: confirmed
     label: "par regua/motor: Aristoteles decide O QUE transfere; Hegel (motor, Aufhebung, sem telos) decide COMO a tensao vira combustivel — tratamento rico da estrela"
     provenance:
-      source: "docs/discussions/onion-pessoal-marcio/01-verticais-peer.md"
+      source: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)"
       locator: "l.7 (lente \"Aristóteles (a régua) + Hegel (o motor)\") e l.23-32 (régua; Hegel motor, Aufhebung, \"recusa-se o telos\")"
       method: "leitura: estrela discuss/onion-pessoal-marcio"
       locality: "repo"
@@ -88,7 +88,7 @@ nodes:
     status: confirmed
     label: "prova viva: a estrela aplicou a regua a si mesma e pegou a PROPRIA falsa distincao (belief base/Hansson; argumentacao bipolar Cayrol 2005 ja existiam) — o uso real que ganha o pao"
     provenance:
-      source: "docs/discussions/onion-pessoal-marcio/02-reconciliacao.md"
+      source: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro)"
       locator: "linhas 28-34 (belief base/Hansson; argumentação bipolar desde 2005 Cayrol-Lagasquerie-Schiex; \"A P1 marcou… como novo por otimismo\")"
       method: "leitura: estrela 02-reconciliacao"
       locality: "repo"

@@ -447,7 +447,7 @@ nodes:
     confidence: 0.9
     verified_at: "2026-09-01"
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — Li o nó (1 claim: ''instrumentar 1-2 prospects P4 reais + valor medido por adotante''). Bu'
-    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (aberto desde 07-25) dizia ''Zero adotante P4 provado hoje''. Isso morreu: entre 2026-08-04 e 2026-08-27 rodou uma PoC real com prospect real (HPE Autos, via oferta <cliente-poc>), com material de cliente sob NDA, entrega em reunião confirmada, e o resultado foi PROVADO e CONFIRMADO PELO CLIENT'
+    label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (aberto desde 07-25) dizia ''Zero adotante P4 provado hoje''. Isso morreu: entre 2026-08-04 e 2026-08-27 rodou uma PoC real com prospect real (⟨cliente⟩, via oferta <cliente-poc>), com material de cliente sob NDA, entrega em reunião confirmada, e o resultado foi PROVADO e CONFIRMADO PELO CLIENT'
     provenance:
       source: "poc-venda-direta-pdi@e540954:README.md"
       locator: "README.md l.1-17 (\"ENCERRADA em 2026-08-27\"; \"Confirmado pelo cliente\") + docs/business-context/poc-overview.md l.27-28, l.63 (@7a6aa36)"

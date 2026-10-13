@@ -1,11 +1,11 @@
 ---
 title: 'Branch model two-tier + provisionamento de colaborador + design-vertical'
 date: 2026-07-14
-from: gustavo-pulga (consumidor / workspace Betahauss)
+from: gustavo-pulga (consumidor / workspace ⟨colaborador⟩)
 to: core (onion-evolve)
 type: signal-feedback
 flow: upstream (consumidor → core)
-evidencia: sessão 2026-07-14 (dogfood Tornak); .onion-version; docs/tornak/ONBOARDING-GUSTAVO.md; docs code.claude.com/docs/en/desktop
+evidencia: sessão 2026-07-14 (dogfood ⟨cliente⟩); .onion-version; docs/<cliente>/ONBOARDING-GUSTAVO.md; docs code.claude.com/docs/en/desktop
 ---
 
 # Sinais ao core (2026-07-14)

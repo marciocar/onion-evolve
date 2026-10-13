@@ -15,7 +15,7 @@ flow: upstream
 > "quero que este manual vire um template para manual de projetos como este para o LibreChat, conte tudo isso
 > para o core"
 
-O SGE (Sistema de Gestão de Editais, cliente HPE Automotores) é servido ao cliente por um **agente no LibreChat**
+O SGE (Sistema de Gestão de Editais, cliente ⟨cliente⟩) é servido ao cliente por um **agente no LibreChat**
 (chat.onionevolve.com), ligado a um **servidor MCP próprio** (30 ferramentas) e a **24 atalhos "/"**. O manual do
 usuário foi construído e refinado com o maestro em 2026-09-29, em várias passadas de uso real. Ele serve de molde
 para qualquer projeto no mesmo formato: agente + servidor MCP + atalhos + cliente externo.
@@ -25,10 +25,10 @@ para qualquer projeto no mesmo formato: agente + servidor MCP + atalhos + client
 | Arquivo | O que é |
 |---|---|
 | `docs/templates/librechat-project-manual.html` | **o template**: HTML único com 14 marcadores (`{{PROJETO}}`, `{{AGENTE}}`, `{{SERVIDOR_MCP}}`, `{{PREFIXO}}`, `{{URL_CHAT}}`…), cada seção marcada GENÉRICO, SEMIGENÉRICO ou DOMINIO, e o guia de preenchimento no topo |
-| `docs/business-context/site/manual-sge-hpe.html` | a referência preenchida (o manual do SGE), publicada como Artifact privado |
+| `docs/business-context/site/manual-sge-<cliente>.html` | a referência preenchida (o manual do SGE), publicada como Artifact privado |
 | `docs/business-context/manual-sge-chat.md` | o mesmo manual em texto, lido pelo agente com `read_report` |
-| `mcp/agents/sge-hpe.md` | o agente (fonte versionada; o seed projeta no LibreChat) |
-| `mcp/agents/sge-hpe-prompts.yaml` + `mcp/agents/seed_librechat_agent.py` | os atalhos e o seed que os projeta |
+| `mcp/agents/sge-<cliente>.md` | o agente (fonte versionada; o seed projeta no LibreChat) |
+| `mcp/agents/sge-<cliente>-prompts.yaml` + `mcp/agents/seed_librechat_agent.py` | os atalhos e o seed que os projeta |
 
 PRs do adotante com a história: #72 (manual + página única com acesso passo a passo), #73 (chat, agente e
 ferramentas), #74 (caminho principal em destaque), #75 (atalhos pelo comando completo), #76 (achados sem códigos

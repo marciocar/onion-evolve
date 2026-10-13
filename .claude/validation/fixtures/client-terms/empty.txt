@@ -1,0 +1,4 @@
+# Fonte privada de termos VAZIA (fixture da bancada — P8 do projection-safety.sh).
+# A bancada é hermética: sem isto ela leria a fonte REAL do host (~/.config/onion/client-terms.txt) ou,
+# no CI, nenhuma — e o mesmo caso daria vereditos diferentes conforme a máquina. Vazio = "presente, sem
+# termos": reproduz o comportamento anterior à P8. As famílias que testam a P8 apontam a sua própria fonte.

@@ -21,7 +21,7 @@ nodes:
     confidence: 1.0
     verified_at: "2026-08-05"
     verified_against: iptables-nat-DOCKER+DOCKER-USER-vazio+redis-auth-probe-vivo
-    label: "INCIDENTE MEDIDO (não presumido): o Docker publica portas furando o ufw (DOCKER-FORWARD antes das regras ufw na FORWARD, DOCKER-USER vazio, DNAT incondicional) → data stores alcançáveis da internet (179.197.65.94). 2 Redis SEM SENHA (prodfiel:6390, onionfresh:6391 — ambientes do maestro) + postgres/milvus/minio/attu do arandek (redis do arandek COM senha)."
+    label: "INCIDENTE MEDIDO (não presumido): o Docker publica portas furando o ufw (DOCKER-FORWARD antes das regras ufw na FORWARD, DOCKER-USER vazio, DNAT incondicional) → data stores alcançáveis da internet. 2 Redis SEM SENHA (ambientes do maestro) + data stores de um adotante cliente (o redis dele COM senha). ⟨endereço do host, portas e nomes dos serviços retirados da árvore pública em 2026-10-13 — o core ficou público; o detalhe medido segue no histórico do git⟩"
     trace: "docs/analysis/onion-vps-network-exposure-2026-08.md"
     provenance:
       source: "docs/analysis/onion-vps-network-exposure-2026-08.md"
@@ -37,7 +37,7 @@ nodes:
     confidence: 1.0
     verified_at: "2026-08-05"
     verified_against: iptables-S-DOCKER-USER+systemctl-active
-    label: "CONTENÇÃO aplicada+persistida: regra DOCKER-USER default-deny (-i eth0; RETURN established + DROP novo) em onion-vps-docker-firewall.service (systemd oneshot idempotente, After=docker). Reversível, não toca compose de adotante, zero lockout (não mexe em INPUT). Cura durável na FONTE = rebind ports 0.0.0.0->127.0.0.1 (gated por-tenant; arandek notificado via co-deliver; prodfiel/onionfresh = fix direto do maestro)."
+    label: "CONTENÇÃO aplicada+persistida: regra DOCKER-USER default-deny (-i eth0; RETURN established + DROP novo) em onion-vps-docker-firewall.service (systemd oneshot idempotente, After=docker). Reversível, não toca compose de adotante, zero lockout (não mexe em INPUT). Cura durável na FONTE = rebind ports 0.0.0.0->127.0.0.1 (gated por-tenant; o adotante cliente notificado via co-deliver; os ambientes do maestro = fix direto do maestro)."
     trace: "docs/analysis/onion-vps-network-exposure-2026-08.md"
     provenance:
       source: "docs/analysis/onion-vps-network-exposure-2026-08.md"

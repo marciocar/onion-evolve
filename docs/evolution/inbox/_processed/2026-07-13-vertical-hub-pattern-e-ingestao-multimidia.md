@@ -1,22 +1,22 @@
 ---
 title: 'Sinal: padrão "vertical de projeto" (hub+help+bootstrap) + ingestão multimídia'
 date: 2026-07-13
-from: gustavo-pulga (consumidor / workspace Betahauss)
+from: gustavo-pulga (consumidor / workspace ⟨colaborador⟩)
 to: core (onion-evolve)
 type: signal-feedback
 flow: upstream (consumidor → core)
-evidencia: repo privado marciocar/projeto-betahauss-tornak (docs/tornak/)
+evidencia: repo privado marciocar/⟨repo do adotante⟩ (docs/<cliente>/)
 ---
 
-# Sinal ao core — 2 padrões que emergiram do dogfood da vertical "Tornak"
+# Sinal ao core — 2 padrões que emergiram do dogfood da vertical "⟨cliente⟩"
 
-Contexto: dogfoodei o Onion para produzir uma **vertical de consultoria de cliente** (Betahauss × Tornak)
+Contexto: dogfoodei o Onion para produzir uma **vertical de consultoria de cliente** (⟨colaborador⟩ × ⟨cliente⟩)
 — mapa KG SDAAL, skills de proposta lendo um book (SSOT), plugin Cowork, HTMLs premium. No caminho,
 dois padrões se mostraram **generalizáveis para o core**.
 
 ## Sinal 1 — Padrão "vertical de projeto" = hub homônimo + help contextual + book-resolver + bootstrap
 Repliquei o **próprio padrão `onion`** (skill/agente/comando orquestrador) para um projeto-cliente:
-- uma **skill-hub nomeada como o projeto** (`tornak`) que **roteia** para as outras e **gere/valida o
+- uma **skill-hub nomeada como o projeto** (`⟨cliente⟩`) que **roteia** para as outras e **gere/valida o
   book/SSOT** (criar/editar/atualizar/validar fichas, nunca inventando, mostrando antes de salvar);
 - **help contextual sem parâmetros** em toda skill (sem input → o que faz + campos + exemplo + próximos
   passos lidos do estado ao vivo), espelhando `engineer/help.md`;
@@ -28,7 +28,7 @@ Repliquei o **próprio padrão `onion`** (skill/agente/comando orquestrador) par
 de SSOT + bootstrap**. É o mesmo DNA do `onion`, generalizado; hoje cada adotante reinventa à mão.
 
 ## Sinal 2 — Ingestão multimídia ("conhecer uma documentação") como capacidade SDAAL
-No Tornak, a fonte mais rica era um **deck em PDF** (só a análise slide-a-slide textual foi usada). A
+No ⟨cliente⟩, a fonte mais rica era um **deck em PDF** (só a análise slide-a-slide textual foi usada). A
 "mágica do SDAAL" pede uma técnica de **ingestão de documentação multimídia**: PDF/PPT slide-a-slide,
 imagens, **frames de vídeo/GIF** → **markdown estruturado** que o KG e as skills consomem. É recorrente
 em qualquer engajamento real e deveria ser **ferramenta do core** (dogfoodável), não trabalho manual.

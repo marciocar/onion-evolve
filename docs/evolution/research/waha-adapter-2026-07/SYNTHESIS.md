@@ -73,11 +73,11 @@ retrair para **script + env switch** (WAHA como ferramenta única; `whatsapp-sen
 
 | chatId enviado | Resultado |
 |---|---|
-| `5551997702725@c.us` (com o 9) | ❌ `Error: No LID for user` |
-| `555197702725@c.us` (sem o 9) | ❌ falha |
-| **`84190032855084@lid`** | ✅ **enviou e CHEGOU** (confirmado pelo destinatário) |
+| `55519XXXXXXXX@c.us` (com o 9) | ❌ `Error: No LID for user` |
+| `5551XXXXXXXX@c.us` (sem o 9) | ❌ falha |
+| **`<LID-mascarado>@lid`** | ✅ **enviou e CHEGOU** (confirmado pelo destinatário) |
 
-`GET /api/contacts/check-exists?phone=…` → `{"numberExists":true,"chatId":"84190032855084@lid"}`.
+`GET /api/contacts/check-exists?phone=…` → `{"numberExists":true,"chatId":"<LID-mascarado>@lid"}`.
 **O telefone é chave de busca; o LID é a identidade.**
 
 ### 1. Corrige o contrato (supersede a interface v0.1)
