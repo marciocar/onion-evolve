@@ -1,8 +1,7 @@
 ---
 branch: fix/client-terms-default-core-only
 date: 2026-10-13
-reviewed_diff_sha256: 0cb2848f357c3289086a55d217aab0f90aa7f8721ed5e012a01c92c2588c5302
-reviewed_code_sha256: 0dd36cdc65f56196397b4b5364954903c9107d316e4a21fe3ffb5d8101c25cb5
+reviewed_diff_sha256: pendente
 findings_total: 7
 findings_real: 3
 findings_fixed: 2

@@ -62,8 +62,8 @@
 #       reproduzir o comportamento sem termos). Arquivo AUSENTE = a guarda DECLARA que não verificou
 #       (`SOFT NAO-VERIFICADO`), roda com o que tiver, e nunca vira HARD de NO-OP por isso: nem verde
 #       mudo, nem reprovar tudo.
-#  P9 — O DEFAULT DA FONTE PRIVADA SÓ VALE NA FONTE (2026-10-13, medido no update do adotante
-#       brain-granaai, papel hub, pin bd769f168411): a P8 lia `~/.config/onion/client-terms.txt` em
+#  P9 — O DEFAULT DA FONTE PRIVADA SÓ VALE NA FONTE (2026-10-13, medido no update de um adotante
+#       de campo, papel hub, pin bd769f168411): a P8 lia `~/.config/onion/client-terms.txt` em
 #       QUALQUER repo da máquina, e a lista é a dos clientes DO CORE. No adotante ela acusou HARD da
 #       REGRA 36 (6 no relato do adotante, 5 na cópia medida) em arquivos PRÓPRIOS dele (a KB das
 #       integrações dele), onde o nome do parceiro dele é legítimo. Antes da P8 a lista morava dentro do core e não existia no adotante: a P8 mudou o
