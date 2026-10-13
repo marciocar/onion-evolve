@@ -20001,7 +20001,7 @@ run_testing_state_selftests() {
   #     lint completo do sandbox do caso (g), com o --live gravado no arquivo, reprova pela REGRA 81
   #     nomeando o motivo. E o marcador que o diagnóstico lê existe no --live e não no --markdown.
   if grep -q 'SAÍDA AO VIVO' <<< "${lh1}" && ! grep -q 'SAÍDA AO VIVO' <<< "${oh1}" \
-     && grep 'REGRA 81' <<< "${out81_live}" | grep -q 'saída de --live'; then
+     && grep -q 'REGRA 81.*saída de --live' <<< "${out81_live}"; then
     record_pass "testing-state: (i) versionar a saída de --live reprova na REGRA 81 com o motivo nomeado (o número vivo não mora no git)"
   else record_fail "testing-state: (i) --live versionado" "esperava a REGRA 81 acusando 'saída de --live' no lint completo; veio: $(grep 'REGRA 81' <<< "${out81_live}" | head -c 240)"; fi
   rm -rf "${sbh}"
