@@ -87,8 +87,10 @@ else
 fi
 
 _V="${REPO_ROOT}/.claude/validation"
-# O painel lê review-ledger (CONTA resíduos) E harness-inventory (CONTA famílias): os dois gatilhos.
-[ -n "$(onion_staged 'docs/evolution/review/*.md' '.claude/validation/lint-selftest.sh')" ]   && [ -f "${_V}/testing-state.sh" ]   && onion_regen docs/onion/testing-state.md 81 bash "${_V}/testing-state.sh" --markdown
+# Desde 2026-10-13 (passo A de D_MERGE_PROCESS_ONION_2026_10) o painel versionado NÃO imprime mais os
+# contadores de resíduos e famílias (saem em --live): resíduo e bancada deixaram de ser gatilho. Ele muda
+# com o próprio gerador ou com a série coletada; produtor quebrado por outro diff a REGRA 81 acusa no lint.
+[ -n "$(onion_staged '.claude/validation/testing-state.sh' 'docs/onion/metrics/selftest-runs.jsonl')" ]   && [ -f "${_V}/testing-state.sh" ]   && onion_regen docs/onion/testing-state.md 81 bash "${_V}/testing-state.sh" --markdown
 # A tabela de doutrina é PROJEÇÃO do registro, que deriva dos docstrings do lint.
 [ -n "$(onion_staged '.claude/validation/rules-registry.sh' '.claude/validation/lint-artifacts.sh')" ]   && [ -f "${_V}/rules-registry.sh" ]   && onion_regen .claude/validation/lint-rules.md 39 bash "${_V}/rules-registry.sh"
 # ⚠️ GATILHO AMPLIADO em 2026-10-02: o harness-inventory CONTA FIXTURES tambem, e a 1a versao da

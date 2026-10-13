@@ -1485,7 +1485,7 @@ check_harness_inventory_drift() {
 #
 # DESDE 2026-10-13 (passo A de D_MERGE_PROCESS_ONION_2026_10): o versionado é a saída de `--markdown`,
 # em que os contadores que todo PR muda (resíduos da REGRA 56, asserções, famílias, regras) saem como
-# `↻ ao vivo` — o número é calculado na hora por `testing-state.sh --live`, nunca commitado. A garantia
+# `↻ ao vivo` — o número é calculado na hora por `testing-state.sh --live`, nunca commitado NESTE arquivo. A garantia
 # desta regra NÃO afrouxa: o byte-a-byte segue contra `--markdown`, então gravar a saída de `--live` no
 # arquivo, ou digitar um número numa célula `↻`, reprova igual. O que mudou é que o painel deixou de ser
 # alterado por PR (medido: entrava em 59 de 60 PRs) e dois PRs paralelos não colidem mais nele.

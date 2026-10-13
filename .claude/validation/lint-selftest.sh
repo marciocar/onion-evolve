@@ -19859,6 +19859,13 @@ run_testing_state_selftests() {
   if [ "${sem_produtor}" = "0" ]; then
     record_pass "testing-state: (a) toda célula com número carrega o COMANDO ao lado (defesa 1)"
   else record_fail "testing-state: (a) célula sem produtor" "${sem_produtor} célula(s) com número e SEM comando — é assim que o painel inventado nasce"; fi
+  # (a') a mesma defesa no --live, onde os números de fato aparecem desde 2026-10-13
+  local out_live sem_produtor_live
+  out_live="$(bash "${sut}" --live 2>&1)" || { record_fail "testing-state: (a') --live" "não rodou: $(head -c 200 <<< "${out_live}")"; out_live=""; }
+  sem_produtor_live="$(grep -E '^\| .* \| \*\*[^*]+\*\* \|' <<< "${out_live}" | grep -vc '`' || true)"
+  if [ -n "${out_live}" ] && [ "${sem_produtor_live}" = "0" ] && grep -qE '^\| .* \| \*\*[0-9]+\*\* \|' <<< "${out_live}"; then
+    record_pass "testing-state: (a') no --live toda célula com número também carrega o COMANDO (defesa 1 onde o número mora)"
+  elif [ -n "${out_live}" ]; then record_fail "testing-state: (a') --live sem produtor" "${sem_produtor_live} célula(s) sem comando, ou nenhum número no --live"; fi
 
   # (b) DEFESA 3 — o terceiro desfecho existe no painel real. Hoje há seções genuinamente não
   #     medidas (flaky com poucas execuções, cobertura de código inexistente); se um dia
@@ -19923,24 +19930,35 @@ run_testing_state_selftests() {
   cp -a "${SCRIPT_DIR}"/*.sh "${sb81}/.claude/validation/" 2>/dev/null || true
   cp -a "${SCRIPT_DIR}/fixtures" "${sb81}/.claude/validation/fixtures" 2>/dev/null || true
   cp "${mut81}/m.sh" "${sb81}/.claude/validation/m.sh"
+  # produtores VIVOS no sandbox (série + resíduos): sem eles o painel do sandbox diverge do real por
+  # ⊘, e a REGRA 81 acusaria com ou sem adulteração — o caso provaria alcance, não a catraca (achado
+  # do refutador, 2026-10-13). Por isso há uma LINHA DE BASE: painel intacto ⇒ zero REGRA 81.
+  [ -s "${REPO_ROOT}/docs/onion/metrics/selftest-runs.jsonl" ] && cp "${REPO_ROOT}/docs/onion/metrics/selftest-runs.jsonl" "${sb81}/docs/onion/metrics/"
+  mkdir -p "${sb81}/docs/evolution"; cp -a "${REPO_ROOT}/docs/evolution/review" "${sb81}/docs/evolution/review" 2>/dev/null || true
   ( cd "${sb81}" && git init -q && git add -A >/dev/null 2>&1 ) 2>/dev/null
-  # painel gerado e DEPOIS adulterado à mão — o cenário exato que a REGRA 81 existe para pegar
-  bash "${SCRIPT_DIR}/testing-state.sh" --markdown > "${sb81}/docs/onion/testing-state.md" 2>/dev/null || true
+  # o painel é gerado PELO SANDBOX (o mesmo gerador e os mesmos produtores que o lint dele vai chamar)
+  ( cd "${sb81}" && bash .claude/validation/testing-state.sh --markdown > docs/onion/testing-state.md 2>/dev/null ) || true
+  ( cd "${sb81}" && git add -A >/dev/null 2>&1 ) 2>/dev/null
+  local out81_base hit81_base adult81=0
+  out81_base="$( cd "${sb81}" && bash .claude/validation/lint-artifacts.sh 2>&1 )" || true
+  hit81_base="$(grep -c 'REGRA 81' <<< "${out81_base}" || true)"
   # a adulteração é a de verdade desde 2026-10-13: um NÚMERO digitado numa célula `↻ ao vivo` (o
-  # versionado não carrega mais contadores, então "pôr o número de volta à mão" é o ataque que sobrou)
-  sed -i '0,/↻ ao vivo/s//510/' "${sb81}/docs/onion/testing-state.md"
-  grep -q '| \*\*510\*\* |' "${sb81}/docs/onion/testing-state.md" || printf 'LINHA INJETADA A MAO\n' >> "${sb81}/docs/onion/testing-state.md"
+  # versionado não carrega mais contadores, então "pôr o número de volta à mão" é o ataque que sobrou).
+  # Se o sed não casar, o caso REPROVA — nunca troca em silêncio para outra adulteração.
+  # sentinela improvável: com 510 o caso casava com o nº REAL de resíduos (medido no mutante, 2026-10-13)
+  sed -i '0,/↻ ao vivo/s//987654/' "${sb81}/docs/onion/testing-state.md"
+  grep -q '| \*\*987654\*\* |' "${sb81}/docs/onion/testing-state.md" && adult81=1
   ( cd "${sb81}" && git add -A >/dev/null 2>&1 ) 2>/dev/null
   out81="$( cd "${sb81}" && bash .claude/validation/lint-artifacts.sh 2>&1 )" || true
   hit81_orig="$(grep -c 'REGRA 81' <<< "${out81}" || true)"
   out81="$( cd "${sb81}" && bash .claude/validation/m.sh 2>&1 )" || true
   hit81_mut="$(grep -c 'REGRA 81' <<< "${out81}" || true)"
-  if [ "${n81}" -ge 2 ] && [ "${hit81_orig}" -ge 1 ] && [ "${hit81_mut}" -eq 0 ]; then
-    record_pass "testing-state: (g) a REGRA 81 é ALCANÇADA no lint completo sem stamp, e some no mutante — guarda load-bearing, não inalcançável"
-  else record_fail "testing-state: (g) alcance da REGRA 81" "sítios mutados=${n81} (esperava >=2); original acusou=${hit81_orig} (esperava >=1); mutante acusou=${hit81_mut} (esperava 0). Se orig=0, a regra voltou a ser inalcançável pelo caminho de teste — que foi o defeito achado no PR."; fi
+  if [ "${n81}" -ge 2 ] && [ "${hit81_base}" -eq 0 ] && [ "${adult81}" -eq 1 ] && [ "${hit81_orig}" -ge 1 ] && [ "${hit81_mut}" -eq 0 ]; then
+    record_pass "testing-state: (g) painel intacto = 0 REGRA 81; um número digitado numa célula ↻ = REGRA 81; e ela some no mutante — a catraca barra número à mão"
+  else record_fail "testing-state: (g) catraca da REGRA 81" "sítios mutados=${n81} (>=2) · linha de base acusou=${hit81_base} (esperava 0: senão o sandbox diverge sozinho) · adulteração aplicada=${adult81} (esperava 1) · adulterado acusou=${hit81_orig} (>=1) · mutante acusou=${hit81_mut} (0)."; fi
   # insumo do caso (i): o mesmo sandbox com a saída de --live VERSIONADA no lugar do painel
   local out81_live
-  bash "${SCRIPT_DIR}/testing-state.sh" --live > "${sb81}/docs/onion/testing-state.md" 2>/dev/null || true
+  ( cd "${sb81}" && bash .claude/validation/testing-state.sh --live > docs/onion/testing-state.md 2>/dev/null ) || true
   ( cd "${sb81}" && git add -A >/dev/null 2>&1 ) 2>/dev/null
   out81_live="$( cd "${sb81}" && bash .claude/validation/lint-artifacts.sh 2>&1 )" || true
   rm -rf "${mut81}" "${sb81}"

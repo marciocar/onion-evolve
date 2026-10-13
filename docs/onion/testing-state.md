@@ -20,9 +20,10 @@
 | — sem teste | **↻ ao vivo** | `bash .claude/validation/consumed-mode-check.sh .` |
 | Baselines de catraca | **↻ ao vivo** | `git ls-files '.claude/validation/*-baseline.txt'` |
 
-> `↻ ao vivo`: o número muda a cada PR, então **não mora no git** — versioná-lo punha este
-> painel em quase todo PR e fazia dois PRs paralelos colidirem nele (passo A de
-> `D_MERGE_PROCESS_ONION_2026_10`). Para ler: `bash .claude/validation/testing-state.sh --live`.
+> `↻ ao vivo`: o número muda a cada PR, então **não mora neste painel** (ainda é versionado em
+> `testing-inventory.md`, a projeção do inventário — passo B) — versioná-lo aqui punha este painel em quase todo PR e fazia dois PRs
+> paralelos colidirem nele (passo A de `D_MERGE_PROCESS_ONION_2026_10`). Para ler:
+> `bash .claude/validation/testing-state.sh --live`.
 
 Detalhe completo: [`testing-inventory.md`](testing-inventory.md) (SSOT gerada, catracada).
 
@@ -67,8 +68,9 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 | — legado (texto livre) | **↻ ao vivo** | `bash .claude/validation/review-ledger.sh --env` |
 
 > `↻ ao vivo`: o número muda a cada PR, então **não mora no git** — versioná-lo punha este
-> painel em quase todo PR e fazia dois PRs paralelos colidirem nele (passo A de
-> `D_MERGE_PROCESS_ONION_2026_10`). Para ler: `bash .claude/validation/testing-state.sh --live`.
+> painel em quase todo PR e fazia dois PRs
+> paralelos colidirem nele (passo A de `D_MERGE_PROCESS_ONION_2026_10`). Para ler:
+> `bash .claude/validation/testing-state.sh --live`.
 
 A média de tokens cobre só os resíduos com custo > 0 (a contagem sai em `--live`); os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero

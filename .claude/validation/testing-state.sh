@@ -17,7 +17,8 @@
 #   nenhuma fila de merge cura isso, porque a fila ejeta o PR em conflito.
 #   A cura é tirar do arquivo versionado o que todo PR muda:
 #     --markdown  o painel VERSIONADO. As seções 1 e 4 (contadores das fontes que todo PR toca) imprimem
-#                 a célula `↻ ao vivo` com o COMANDO ao lado; o número não mora no git. O que muda raro
+#                 a célula `↻ ao vivo` com o COMANDO ao lado; o número não mora NESTE arquivo (os da seção 1
+#                 seguem versionados em testing-inventory.md, que é o passo B). O que muda raro
 #                 (a série coletada, flaky, as fronteiras) continua impresso. Produtor que falha continua
 #                 virando `⊘ NÃO MEDIDO` — então a catraca ainda acusa produtor quebrado.
 #     --live      o MESMO painel com os números, calculados na hora por quem lê. Nunca versionado: se
@@ -135,11 +136,17 @@ _cel() {   # $1=rótulo $2=valor $3=comando — DEFESA 1: sem comando, a linha n
 _vol() {   # $1=rótulo $2=valor $3=comando
   if [ "${LIVE}" -eq 1 ]; then _cel "$1" "$2" "$3"; else _cel "$1" "↻ ao vivo" "$3"; fi
 }
-_nota_viva() {   # o que o leitor do versionado precisa saber para obter o número
+_nota_viva() {   # $1 = onde MAIS o número mora no git (vazio = em lugar nenhum). Sem afirmar além do medido.
   [ "${LIVE}" -eq 1 ] && return 0
-  printf '\n> `↻ ao vivo`: o número muda a cada PR, então **não mora no git** — versioná-lo punha este\n'
-  printf '> painel em quase todo PR e fazia dois PRs paralelos colidirem nele (passo A de\n'
-  printf '> `D_MERGE_PROCESS_ONION_2026_10`). Para ler: `bash .claude/validation/testing-state.sh --live`.\n'
+  if [ -n "${1:-}" ]; then
+    printf '\n> `↻ ao vivo`: o número muda a cada PR, então **não mora neste painel** (ainda é versionado em\n'
+    printf '> %s) — versioná-lo aqui punha este painel em quase todo PR e fazia dois PRs\n' "$1"
+  else
+    printf '\n> `↻ ao vivo`: o número muda a cada PR, então **não mora no git** — versioná-lo punha este\n'
+    printf '> painel em quase todo PR e fazia dois PRs\n'
+  fi
+  printf '> paralelos colidirem nele (passo A de `D_MERGE_PROCESS_ONION_2026_10`). Para ler:\n'
+  printf '> `bash .claude/validation/testing-state.sh --live`.\n'
 }
 
 if [ "${LIVE}" -eq 1 ]; then
@@ -174,7 +181,7 @@ if [ "${HARNESS_OK}" -eq 1 ]; then
   _vol "Pares de modo consumido"      "${HARNESS_CONSUMED_PAIRS}"  "bash .claude/validation/consumed-mode-check.sh ."
   _vol "— sem teste"                  "${HARNESS_CONSUMED_UNTESTED}" "bash .claude/validation/consumed-mode-check.sh ."
   _vol "Baselines de catraca"         "${HARNESS_BASELINES}"       "git ls-files '.claude/validation/*-baseline.txt'"
-  _nota_viva
+  _nota_viva '`testing-inventory.md`, a projeção do inventário — passo B'
   printf '\nDetalhe completo: [`testing-inventory.md`](testing-inventory.md) (SSOT gerada, catracada).\n'
 else
   printf '⊘ **NÃO MEDIDO** — `harness-inventory.sh --env` não respondeu.\n'
