@@ -30996,6 +30996,9 @@ if "strategy" in g: err.append("selftest-gate: e matriz (nome movel)")
 a = jobs.get("alarme-main") or {}
 if "github.event_name == '"'"'push'"'"'" not in str(a.get("if", "")) or "always()" not in str(a.get("if", "")): err.append("alarme-main: nao roda sempre no push")
 if "main-bench-alarm.sh" not in json.dumps(a): err.append("alarme-main: nao chama o script do alarme")
+_at = json.dumps(a)
+if "--reports-dir" not in _at or "--expect-reports" not in _at: err.append("alarme-main: o alarme nao recebe os relatorios das faixas (sem assinatura, todo vermelho vira culpado)")
+if "actions/download-artifact" not in _at or "selftest-evidence-" not in _at: err.append("alarme-main: nao baixa os relatorios das faixas")
 for p in (os.environ["WFS"], os.environ["ALARM"]):
     if "gh pr merge" in open(p, encoding="utf-8").read(): err.append("merge automatico em %s" % os.path.basename(p))
 names = set()
@@ -31016,21 +31019,55 @@ print("OK %s" % ",".join(sorted(ctx)) if not err else "FALHA " + " | ".join(err)
     *)   record_fail "two-tier-bench: (h) estrutura do CI" "$(_emit "${_vh}" | head -c 400)" ;;
   esac
 
-  # (i) O ALARME DO MAIN, contra um remoto de verdade (bare) e um `gh` falso que registra cada chamada
+  # (i) O ALARME DO MAIN, contra um remoto de verdade (bare) e um `gh` falso que registra cada chamada.
+  #     O `gh` falso devolve JSON CRU (o filtro por título/autor/branch é do script, e a bancada o exerce):
+  #     open.json/closed.json = issue list · view-<n>.json = issue view (ausente ⇒ gh falha) ·
+  #     prs.json = pr list. Cada caso monta o estado do forge e os relatórios das faixas que quer.
+  #     (2026-10-13: casos (j*) e (i4) nasceram do defeito medido — o revert #1087 contra 825e93f6, que só
+  #     herdou a quebra do ff5abe51; resíduo docs/evolution/review/fix-main-bench-alarm-blames-first-break.md)
   local d; d="$(mktemp -d)"
-  mkdir -p "${d}/bin"
+  mkdir -p "${d}/bin" "${d}/forge"
   cat > "${d}/bin/gh" <<'FAKEGH'
 #!/usr/bin/env bash
 printf '%s\n' "gh $*" >> "${FAKE_GH_LOG}"
+F="${FAKE_FORGE:?}"
+_state() { local s=open; while [ $# -gt 0 ]; do [ "$1" = "--state" ] && s="$2"; shift; done; echo "$s"; }
 case "$1 $2" in
-  "issue list") [ -n "${FAKE_OPEN_ISSUE:-}" ] && echo "${FAKE_OPEN_ISSUE}"; exit 0 ;;
+  "issue list") cat "${F}/$(_state "$@").json" 2>/dev/null || echo '[]'; exit 0 ;;
+  "issue view") [ -f "${F}/view-$3.json" ] || { echo "GraphQL: could not resolve" >&2; exit 1; }; cat "${F}/view-$3.json"; exit 0 ;;
   "pr create") echo "GraphQL: GitHub Actions is not permitted to create or approve pull requests (createPullRequest)" >&2; exit 1 ;;
-  "issue create"|"issue comment")
-    while [ $# -gt 0 ]; do [ "$1" = "--body-file" ] && cat "$2" >> "${FAKE_GH_LOG}"; [ "$1" = "--body" ] && printf '%s\n' "$2" >> "${FAKE_GH_LOG}"; shift; done; exit 0 ;;
+  "pr list") cat "${F}/prs.json" 2>/dev/null || echo '[]'; exit 0 ;;
+  "issue create")
+    while [ $# -gt 0 ]; do [ "$1" = "--body-file" ] && cat "$2" >> "${FAKE_GH_LOG}"; shift; done
+    [ -f "${F}/open-after.json" ] && mv "${F}/open-after.json" "${F}/open.json"   # o outro alarme concorrente
+    echo "https://github.com/o/r/issues/${FAKE_NEW_ISSUE:-50}"; exit 0 ;;
+  "issue comment"|"pr close")
+    while [ $# -gt 0 ]; do [ "$1" = "--body-file" ] && cat "$2" >> "${FAKE_GH_LOG}"; { [ "$1" = "--body" ] || [ "$1" = "--comment" ]; } && printf '%s\n' "$2" >> "${FAKE_GH_LOG}"; shift; done; exit 0 ;;
   *) exit 0 ;;
 esac
 FAKEGH
   chmod +x "${d}/bin/gh"
+  # _ttb_view <n> <corpo> [comentário...] → view-<n>.json
+  #   comentário com prefixo "HUMANO:" sai com autor humano (o resto, com o autor que o forge dá ao Actions)
+  _ttb_view() { local n="$1"; shift; python3 -I -c '
+import json, sys
+def c(b): return {"author": {"login": "terceiro"}, "body": b[7:]} if b.startswith("HUMANO:") else {"author": {"login": "github-actions"}, "body": b}
+print(json.dumps({"author": {"login": "app/github-actions", "is_bot": True}, "body": sys.argv[1], "comments": [c(x) for x in sys.argv[2:]]}))' "$@" > "${d}/forge/view-${n}.json"; }
+  _ttb_issues() { local n s=""; for n in "$@"; do s="${s:+${s},}{\"number\":${n},\"title\":\"🚨 main quebrado — a bancada completa reprovou no push ao main\"}"; done; printf '[%s]\n' "${s}"; }
+  # _ttb_reports <dir> <família:falhas>... — UM relatório de faixa por argumento
+  _ttb_reports() {
+    local dir="$1" i=0 a; shift; rm -rf "${dir}"; mkdir -p "${dir}"
+    for a in "$@"; do i=$((i + 1)); mkdir -p "${dir}/selftest-evidence-1-faixa${i}"
+      printf 'familia\tpass\tfail\tskip\tsegundos\n%s\t5\t%s\t0\t3\nok_fam\t9\t0\t0\t2\nFAIL\t%s: caso que quebrou\nTOTAL\t14\t%s\t0\t5\n' "${a%%:*}" "${a##*:}" "${a%%:*}" "${a##*:}" > "${dir}/selftest-evidence-1-faixa${i}/selftest-report.tsv"
+    done
+  }
+  _ttb_alarm() {  # <args...> — roda o alarme na worktree do remoto falso; saída em ${d}/out, rc em ${d}/rc
+    : > "${d}/gh.log"; local rc=0
+    (cd "${d}/w" && PATH="${d}/bin:${PATH}" FAKE_GH_LOG="${d}/gh.log" FAKE_FORGE="${d}/forge" bash "${alarm}" --repo o/r --run-url https://example.invalid/run/1 "$@") > "${d}/out" 2>&1 || rc=$?
+    echo "${rc}" > "${d}/rc"
+  }
+  _ttb_has_revert() { git -C "${d}/remote.git" rev-parse -q --verify "refs/heads/revert/${1:0:12}" >/dev/null 2>&1; }
+  _ttb_mk() { printf '<!-- onion-alarm v1 mode=%s result=failure sha=%s families=%s revert=%s -->' "$1" "$2" "$3" "$4"; }
   (
     cd "${d}" && git init -q --bare -b main remote.git && git clone -q remote.git w 2>/dev/null && cd w \
       && git config user.email t@t && git config user.name t \
@@ -31040,33 +31077,150 @@ FAKEGH
   ) >/dev/null 2>&1
   local msha; msha="$(git -C "${d}/w" rev-parse HEAD 2>/dev/null)"
   local base_tree; base_tree="$(git -C "${d}/w" rev-parse 'HEAD^1^{tree}' 2>/dev/null)"
-  local rc_i=0
-  out="$(cd "${d}/w" && PATH="${d}/bin:${PATH}" FAKE_GH_LOG="${d}/gh.log" bash "${alarm}" --result failure --sha "${msha}" --repo o/r --run-url https://example.invalid/run/1 2>&1)" || rc_i=$?
+  local R="${d}/reports"
+
+  # (i) 1º VERMELHO (sem issue) ⇒ revert/<sha12> desfaz o merge, issue nomeia culpado, PR e a ASSINATURA
+  echo '[]' > "${d}/forge/open.json"; echo '[]' > "${d}/forge/closed.json"
+  _ttb_reports "${R}" alfa:2
+  _ttb_alarm --result failure --sha "${msha}" --reports-dir "${R}" --expect-reports 1
   local rtree; rtree="$(git -C "${d}/remote.git" rev-parse "refs/heads/revert/${msha:0:12}^{tree}" 2>/dev/null || echo AUSENTE)"
-  if [ "${rc_i}" -eq 0 ] && [ -n "${msha}" ] && [ "${rtree}" = "${base_tree}" ] \
+  if [ "$(cat "${d}/rc")" -eq 0 ] && [ -n "${msha}" ] && [ "${rtree}" = "${base_tree}" ] \
      && grep -q '^gh issue create .*main quebrado' "${d}/gh.log" && grep -q "Commit culpado:.*${msha}" "${d}/gh.log" \
      && grep -q 'PR #4242' "${d}/gh.log" && grep -q 'PR NÃO abriu' "${d}/gh.log" \
+     && grep -qF "mode=first result=failure sha=${msha} families=alfa revert=${msha:0:12}" "${d}/gh.log" \
      && grep -q 'gh workflow run onion-selftest.yml' "${d}/gh.log" && ! grep -q 'pr merge' "${d}/gh.log"; then
-    record_pass "two-tier-bench: (i) main reprovou ⇒ revert/<sha12> no remoto desfaz o merge, issue nomeia o culpado e o PR, PR recusado é declarado, nunca merge"
-  else record_fail "two-tier-bench: (i) alarme" "rc=${rc_i} revert_tree=${rtree:0:12} base=${base_tree:0:12} · out=$(_emit "${out}" | head -c 200) · log=$(head -c 300 "${d}/gh.log" 2>/dev/null)"; fi
+    record_pass "two-tier-bench: (i) 1º vermelho ⇒ revert/<sha12> desfaz o merge, issue nomeia culpado, PR e famílias (marcador), PR recusado é declarado, nunca merge"
+  else record_fail "two-tier-bench: (i) alarme" "rc=$(cat "${d}/rc") revert_tree=${rtree:0:12} base=${base_tree:0:12} · out=$(_emit "$(cat "${d}/out")" | head -c 200) · log=$(head -c 300 "${d}/gh.log" 2>/dev/null)"; fi
 
   # (i2) ALARME JÁ ABERTO ⇒ comenta nele, não abre outro; cancelado ⇒ alarme SEM revert
-  : > "${d}/gh.log"
-  out="$(cd "${d}/w" && PATH="${d}/bin:${PATH}" FAKE_GH_LOG="${d}/gh.log" FAKE_OPEN_ISSUE=7 bash "${alarm}" --result cancelled --sha "${msha}" --repo o/r --run-url u 2>&1)" || true
+  _ttb_issues 7 > "${d}/forge/open.json"; _ttb_view 7 "corpo $(_ttb_mk first "${msha}" alfa "${msha:0:12}")"
+  _ttb_alarm --result cancelled --sha "${msha}"
   if grep -q '^gh issue comment 7 ' "${d}/gh.log" && ! grep -q '^gh issue create' "${d}/gh.log" \
-     && ! grep -q '^gh pr create' "${d}/gh.log" && grep -q 'não tentado' "${d}/gh.log"; then
+     && ! grep -q '^gh pr create' "${d}/gh.log" && grep -q 'não é reprovação de faixa' "${d}/gh.log"; then
     record_pass "two-tier-bench: (i2) alarme aberto ⇒ comenta nele (título fixo, um só); cancelado ⇒ sem revert, motivo dito"
   else record_fail "two-tier-bench: (i2) alarme aberto" "log=$(head -c 300 "${d}/gh.log" 2>/dev/null)"; fi
 
-  # (i3) VERDE com alarme aberto ⇒ comenta e FECHA; verde sem alarme ⇒ nenhuma escrita
-  : > "${d}/gh.log"
-  (cd "${d}/w" && PATH="${d}/bin:${PATH}" FAKE_GH_LOG="${d}/gh.log" FAKE_OPEN_ISSUE=7 bash "${alarm}" --result success --sha "${msha}" --repo o/r --run-url u) >/dev/null 2>&1 || true
-  local _closed=0; grep -q '^gh issue close 7' "${d}/gh.log" && grep -q '^gh issue comment 7' "${d}/gh.log" && _closed=1
-  : > "${d}/gh.log"
-  (cd "${d}/w" && PATH="${d}/bin:${PATH}" FAKE_GH_LOG="${d}/gh.log" bash "${alarm}" --result success --sha "${msha}" --repo o/r --run-url u) >/dev/null 2>&1 || true
-  if [ "${_closed}" = "1" ] && ! grep -qE '^gh (issue (create|comment|close)|pr )' "${d}/gh.log"; then
-    record_pass "two-tier-bench: (i3) main verde ⇒ fecha o alarme aberto; sem alarme, não escreve nada"
-  else record_fail "two-tier-bench: (i3) verde" "fechou=${_closed} · log_sem_alarme=$(head -c 200 "${d}/gh.log" 2>/dev/null)"; fi
+  # o main segue: C2 (projeção regenerada, herda a quebra), C3, C4 (um "revert: …")
+  (cd "${d}/w" && git checkout -q main && echo g > g && git add g && git commit -qm "docs: projeções geradas regeneradas" \
+     && echo h > h && git add h && git commit -qm "feat: outra coisa" \
+     && echo k > k && git add k && git commit -qm "revert: algo (main quebrado em 000000000000)" && git push -q origin main) >/dev/null 2>&1
+  local c2 c3 c4; c2="$(git -C "${d}/w" rev-parse HEAD~2)"; c3="$(git -C "${d}/w" rev-parse HEAD~1)"; c4="$(git -C "${d}/w" rev-parse HEAD)"
+
+  # (j1) 2º VERMELHO COM AS MESMAS FALHAS ⇒ só comentário, SEM revert (o defeito do 825e93f6/#1087)
+  _ttb_reports "${R}" alfa:1 alfa:3
+  _ttb_alarm --result failure --sha "${c2}" --reports-dir "${R}" --expect-reports 2
+  if [ "$(cat "${d}/rc")" -eq 0 ] && grep -q '^gh issue comment 7 ' "${d}/gh.log" && grep -q 'Mesmas famílias' "${d}/gh.log" \
+     && grep -qF "mode=same result=failure sha=${c2} families=alfa revert=-" "${d}/gh.log" \
+     && ! _ttb_has_revert "${c2}" && ! grep -qE '^gh (pr create|workflow run|issue create)' "${d}/gh.log"; then
+    record_pass "two-tier-bench: (j1) 2º vermelho com as MESMAS famílias ⇒ só comenta na issue, sem revert (o commit herdou a quebra)"
+  else record_fail "two-tier-bench: (j1) mesmas falhas" "rc=$(cat "${d}/rc") revert_c2=$(_ttb_has_revert "${c2}" && echo SIM || echo nao) · log=$(head -c 300 "${d}/gh.log")"; fi
+
+  # (j2) 2º VERMELHO COM FAMÍLIA NOVA ⇒ suspeito novo nomeado + revert dele preparado
+  _ttb_reports "${R}" alfa:1 beta:2
+  _ttb_alarm --result failure --sha "${c3}" --reports-dir "${R}" --expect-reports 2
+  if [ "$(cat "${d}/rc")" -eq 0 ] && grep -q '^gh issue comment 7 ' "${d}/gh.log" && grep -q 'Quebra SOBRE a quebra\*\*: família nova (beta)' "${d}/gh.log" \
+     && grep -qF "Suspeito novo:** \`${c3}\`" "${d}/gh.log" && grep -qF "mode=new result=failure sha=${c3} families=alfa,beta revert=${c3:0:12}" "${d}/gh.log" \
+     && _ttb_has_revert "${c3}" && ! grep -q '^gh issue create' "${d}/gh.log"; then
+    record_pass "two-tier-bench: (j2) vermelho com família NOVA ⇒ suspeito novo nomeado e revert/<sha12> dele preparado"
+  else record_fail "two-tier-bench: (j2) família nova" "rc=$(cat "${d}/rc") revert_c3=$(_ttb_has_revert "${c3}" && echo SIM || echo nao) · log=$(head -c 300 "${d}/gh.log")"; fi
+
+  # (j2b) família nova num commit que É um revert ⇒ só nomeia (a máquina não reverte o próprio conserto)
+  _ttb_reports "${R}" gama:1
+  _ttb_alarm --result failure --sha "${c4}" --reports-dir "${R}" --expect-reports 1
+  if grep -q 'família nova (gama)' "${d}/gh.log" && grep -q 'merge de um revert' "${d}/gh.log" && ! _ttb_has_revert "${c4}"; then
+    record_pass "two-tier-bench: (j2b) família nova num commit de revert ⇒ nomeia, não reverte o revert"
+  else record_fail "two-tier-bench: (j2b) revert do revert" "revert_c4=$(_ttb_has_revert "${c4}" && echo SIM || echo nao) · log=$(head -c 300 "${d}/gh.log")"; fi
+
+  # (j2c) MARCADOR FORJADO por terceiro (repo público: qualquer conta comenta) não conta: um comentário humano
+  #       declarando families=alfa,beta,delta não cala o revert da família nova delta
+  _ttb_view 7 "corpo $(_ttb_mk first "${msha}" alfa "${msha:0:12}")" "HUMANO:$(_ttb_mk new "${msha}" alfa,beta,delta -)"
+  _ttb_reports "${R}" delta:1
+  git -C "${d}/remote.git" update-ref -d "refs/heads/revert/${c3:0:12}"
+  _ttb_alarm --result failure --sha "${c3}" --reports-dir "${R}" --expect-reports 1
+  if grep -q 'família nova (delta)' "${d}/gh.log" && _ttb_has_revert "${c3}"; then
+    record_pass "two-tier-bench: (j2c) marcador colado por terceiro na issue não conta: a família nova continua gerando suspeito e revert"
+  else record_fail "two-tier-bench: (j2c) marcador forjado" "revert_c3=$(_ttb_has_revert "${c3}" && echo SIM || echo nao) · log=$(head -c 300 "${d}/gh.log")"; fi
+
+  # (j3) CORRIDA: a bancada do commit MAIS VELHO termina depois ⇒ ele é o culpado, revert dele
+  _ttb_view 7 "corpo $(_ttb_mk first "${c3}" alfa "${c3:0:12}")"
+  _ttb_reports "${R}" alfa:1
+  _ttb_alarm --result failure --sha "${c2}" --reports-dir "${R}" --expect-reports 1
+  if grep -q 'Culpado mais velho' "${d}/gh.log" && grep -qF "mode=older result=failure sha=${c2}" "${d}/gh.log" && _ttb_has_revert "${c2}"; then
+    record_pass "two-tier-bench: (j3) push concorrente: commit ANCESTRAL do culpado com as mesmas famílias ⇒ culpado mais velho, revert dele"
+  else record_fail "two-tier-bench: (j3) culpado mais velho" "revert_c2=$(_ttb_has_revert "${c2}" && echo SIM || echo nao) · log=$(head -c 300 "${d}/gh.log")"; fi
+
+  # (j4) ISSUE ILEGÍVEL ⇒ declara e não abre revert às cegas — gh falha ao ler, issue SEM marcador (a
+  #      #1086, aberta pela versão anterior) e issue já declarada ilegível (a declaração é pegajosa)
+  local _j4=""
+  rm -f "${d}/forge/view-7.json"; _ttb_reports "${R}" zeta:1
+  _ttb_alarm --result failure --sha "${c4}" --reports-dir "${R}" --expect-reports 1
+  grep -q 'Comparação impossível.*não consegui ler a issue #7' "${d}/gh.log" && ! grep -qE '^gh (pr create|workflow run)' "${d}/gh.log" || _j4="${_j4} view-falha"
+  _ttb_view 7 "A bancada completa **não passou**. - **Commit culpado:** \`${msha}\` — corpo da versão anterior, sem marcador"
+  _ttb_alarm --result failure --sha "${c4}" --reports-dir "${R}" --expect-reports 1
+  grep -q 'não tem marcador do alarme' "${d}/gh.log" && grep -qF 'mode=illegible' "${d}/gh.log" && ! grep -qE '^gh (pr create|workflow run)' "${d}/gh.log" || _j4="${_j4} sem-marcador"
+  _ttb_view 7 "A bancada completa **não passou**. sem marcador" "$(_ttb_mk illegible "${c4}" zeta -)"
+  _ttb_alarm --result failure --sha "${c4}" --reports-dir "${R}" --expect-reports 1
+  grep -q 'já foi declarada ilegível' "${d}/gh.log" && ! grep -qE '^gh (pr create|workflow run)' "${d}/gh.log" || _j4="${_j4} ilegivel-nao-pegajosa"
+  if [ -z "${_j4}" ] && ! _ttb_has_revert "${c4}"; then
+    record_pass "two-tier-bench: (j4) issue ilegível (gh falha, sem marcador, ou já declarada ilegível) ⇒ declara e não abre revert às cegas"
+  else record_fail "two-tier-bench: (j4) issue ilegível" "falhou:${_j4} · log=$(head -c 300 "${d}/gh.log")"; fi
+
+  # (j5) ASSINATURA ATUAL ILEGÍVEL (faixa sem relatório) ⇒ declara, sem revert
+  _ttb_view 7 "corpo $(_ttb_mk first "${msha}" alfa "${msha:0:12}")"
+  _ttb_reports "${R}" beta:1
+  _ttb_alarm --result failure --sha "${c4}" --reports-dir "${R}" --expect-reports 3
+  if grep -q '1 relatório(s) para 3 faixa(s)' "${d}/gh.log" && grep -qF 'mode=unreadable-sig' "${d}/gh.log" && ! grep -qE '^gh (pr create|workflow run)' "${d}/gh.log"; then
+    record_pass "two-tier-bench: (j5) faixa sem relatório ⇒ assinatura ilegível declarada, sem revert"
+  else record_fail "two-tier-bench: (j5) assinatura ilegível" "log=$(head -c 300 "${d}/gh.log")"; fi
+
+  # (j6) ISSUE FECHADA À MÃO com o main vermelho ⇒ a nova issue herda as famílias, mesmas falhas sem revert
+  echo '[]' > "${d}/forge/open.json"; _ttb_issues 7 > "${d}/forge/closed.json"
+  _ttb_view 7 "corpo $(_ttb_mk first "${msha}" alfa "${msha:0:12}")"
+  _ttb_reports "${R}" alfa:1
+  git -C "${d}/remote.git" update-ref -d "refs/heads/revert/${c2:0:12}"
+  _ttb_alarm --result failure --sha "${c2}" --reports-dir "${R}" --expect-reports 1
+  if grep -q '^gh issue create' "${d}/gh.log" && grep -q 'FECHADA À MÃO' "${d}/gh.log" && grep -q 'Herdado da #7' "${d}/gh.log" \
+     && grep -qF "mode=same result=failure sha=${c2}" "${d}/gh.log" && ! _ttb_has_revert "${c2}"; then
+    record_pass "two-tier-bench: (j6) issue fechada à mão com o main vermelho ⇒ a nova herda as famílias; mesmas falhas, sem revert"
+  else record_fail "two-tier-bench: (j6) fechada à mão" "revert_c2=$(_ttb_has_revert "${c2}" && echo SIM || echo nao) · log=$(head -c 300 "${d}/gh.log")"; fi
+
+  # (j7) CORRIDA DE DOIS 1ºs VERMELHOS (push ao main tem grupo por sha, sem cancelamento): a outra abriu a #3
+  #      enquanto esta abria a #50 ⇒ a #50 vai como comentário para a #3, se declara duplicata e se fecha
+  echo '[]' > "${d}/forge/open.json"; echo '[]' > "${d}/forge/closed.json"; _ttb_issues 3 50 > "${d}/forge/open-after.json"
+  _ttb_reports "${R}" alfa:1
+  _ttb_alarm --result failure --sha "${c3}" --reports-dir "${R}" --expect-reports 1
+  if grep -q '^gh issue create' "${d}/gh.log" && grep -q '^gh issue comment 3 ' "${d}/gh.log" && grep -q '^gh issue close 50' "${d}/gh.log" \
+     && grep -qF 'mode=dup' "${d}/gh.log" && ! grep -q '^gh issue close 3' "${d}/gh.log"; then
+    record_pass "two-tier-bench: (j7) dois 1ºs vermelhos concorrentes ⇒ a issue de número maior vira comentário na menor e se fecha como duplicata"
+  else record_fail "two-tier-bench: (j7) corrida de issues" "log=$(grep '^gh issue' "${d}/gh.log" | head -c 300)"; fi
+
+  # (i3) VERDE com alarme aberto ⇒ comenta e FECHA, DEPOIS fecha SÓ os reverts superados (branch revert/<12hex>
+  #      + autor app/github-actions + sha12 citado na issue); verde sem alarme ⇒ nenhuma escrita
+  _ttb_issues 7 > "${d}/forge/open.json"; echo '[]' > "${d}/forge/closed.json"
+  _ttb_view 7 "corpo $(_ttb_mk first "${msha}" alfa "${msha:0:12}")" "$(_ttb_mk new "${c3}" alfa,beta "${c3:0:12}")"
+  local m12="${msha:0:12}" c312="${c3:0:12}"
+  printf '[{"number":11,"headRefName":"revert/%s","author":{"login":"app/github-actions","is_bot":true}},{"number":12,"headRefName":"revert/%s","author":{"login":"app/github-actions","is_bot":true}},{"number":13,"headRefName":"revert/%s","author":{"login":"marciocar","is_bot":false}},{"number":14,"headRefName":"revert/%s-x","author":{"login":"app/github-actions","is_bot":true}},{"number":15,"headRefName":"revert/abcdefabcdef","author":{"login":"app/github-actions","is_bot":true}}]\n' \
+    "${m12}" "${c312}" "${m12}" "${m12}" > "${d}/forge/prs.json"
+  _ttb_alarm --result success --sha "${c4}"
+  local _closed=0 _order _prs
+  grep -q '^gh issue close 7' "${d}/gh.log" && grep -q '^gh issue comment 7' "${d}/gh.log" && _closed=1
+  _order="$(grep -E '^gh (issue close 7|pr close)' "${d}/gh.log" | head -n1 | grep -c 'issue close' || true)"
+  _prs="$(sed -n 's/^gh pr close \([0-9]*\) .*/\1/p' "${d}/gh.log" | sort -n | paste -sd, -)"
+  echo '[]' > "${d}/forge/open.json"; rm -f "${d}/forge/prs.json"
+  _ttb_alarm --result success --sha "${c4}"
+  if [ "${_closed}" = "1" ] && [ "${_order}" = "1" ] && [ "${_prs}" = "11,12" ] && ! grep -qE '^gh (issue (create|comment|close)|pr )' "${d}/gh.log"; then
+    record_pass "two-tier-bench: (i3) main verde ⇒ fecha o alarme e DEPOIS só os reverts superados (11,12; autor humano, branch fora do formato e sha não citado ficam); sem alarme, não escreve nada"
+  else record_fail "two-tier-bench: (i3) verde" "fechou=${_closed} ordem_issue_antes=${_order} prs_fechados=${_prs:-nenhum} · log_sem_alarme=$(head -c 200 "${d}/gh.log" 2>/dev/null)"; fi
+
+  # (i4) VERDE depois de issue fechada à mão ⇒ carimba o verde nela UMA vez (não envenena o próximo 1º vermelho)
+  _ttb_issues 7 > "${d}/forge/closed.json"; _ttb_view 7 "corpo $(_ttb_mk first "${msha}" alfa "${msha:0:12}")"
+  _ttb_alarm --result success --sha "${c4}"
+  local _stamp=0; grep -q '^gh issue comment 7' "${d}/gh.log" && grep -qF 'mode=green' "${d}/gh.log" && _stamp=1
+  _ttb_view 7 "corpo $(_ttb_mk first "${msha}" alfa "${msha:0:12}")" "ok <!-- onion-alarm v1 mode=green result=success sha=${c4} families=- revert=- -->"
+  _ttb_alarm --result success --sha "${c4}"
+  if [ "${_stamp}" = "1" ] && ! grep -q '^gh issue comment' "${d}/gh.log"; then
+    record_pass "two-tier-bench: (i4) verde depois de issue fechada à mão ⇒ carimba o verde uma vez; carimbada, não escreve mais"
+  else record_fail "two-tier-bench: (i4) carimbo do verde" "carimbou=${_stamp} · 2a=$(head -c 200 "${d}/gh.log")"; fi
   rm -rf "${d}"
 }
 _family run_two_tier_bench_selftests
