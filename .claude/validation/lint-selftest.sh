@@ -169,8 +169,9 @@ STRICT="${ONION_SELFTEST_STRICT:-0}"
 #   --affected <paths…>        seleciona famílias pelos arquivos dados (failsafe acima)
 #   --affected-staged          idem, com `git diff --cached --name-only`
 #   --affected-range <A...B>   idem, com o diff de um RANGE (o nível PR do CI, passo D de
-#                              D_MERGE_PROCESS_ONION_2026_10); a própria bancada no range ⇒ tudo;
-#                              range ilegível ⇒ tudo (recusa no incerto)
+#                              D_MERGE_PROCESS_ONION_2026_10); a própria bancada MODIFICADA no range vai
+#                              à regra do BLOCO lida do range (bloco ⇒ ela + leitores + núcleo; motor ⇒
+#                              tudo — D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA); range ilegível ⇒ tudo
 #   --jobs N|auto              N workers (auto = nproc); 1 = serial (default). O teto REAL de famílias
 #                              simultâneas é da MÁQUINA, não do processo: ver "VAGAS DA MÁQUINA" abaixo
 #   --local                    faixa LOCAL (pre-commit, pr-finalize): com --affected*, o failsafe "tudo"
@@ -207,7 +208,13 @@ SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_i
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
-unset ONION_SELFTEST_CHILD ONION_SELFTEST_QUEUE ONION_SELFTEST_SHARD ONION_SELFTEST_FAMILIES ONION_SELFTEST_TIMING ONION_SELFTEST_JOBS ONION_SELFTEST_FIXTURES_LANE ONION_SELFTEST_FULL
+# O retrato e o inventário do PAI (arranque compartilhado, 2026-10-13) só valem para o worker (--child) que ele
+# disparou: uma bancada aninhada roda sobre OUTRA árvore e herdar o retrato dela seria testar o repo errado.
+SELFTEST_SNAPSHOT=""; SELFTEST_INVENTORY_ENV=""; _SNAPDIR=""; SELFTEST_STARTUP_WHY=""
+if [ "${SELFTEST_CHILD}" = "1" ]; then
+  SELFTEST_SNAPSHOT="${ONION_SELFTEST_SNAPSHOT:-}"; SELFTEST_INVENTORY_ENV="${ONION_SELFTEST_INVENTORY_ENV:-}"
+fi
+unset ONION_SELFTEST_CHILD ONION_SELFTEST_QUEUE ONION_SELFTEST_SHARD ONION_SELFTEST_FAMILIES ONION_SELFTEST_TIMING ONION_SELFTEST_JOBS ONION_SELFTEST_FIXTURES_LANE ONION_SELFTEST_FULL ONION_SELFTEST_SNAPSHOT ONION_SELFTEST_INVENTORY_ENV
 while [ $# -gt 0 ]; do
   case "$1" in
     --list) SELFTEST_LIST=1 ;;
@@ -434,12 +441,16 @@ _selftest_family_map() {
   command -v python3 >/dev/null 2>&1 || return 1
   python3 - "${BASH_SOURCE[0]}" <<'PYMAP'
 import re, sys
-L = open(sys.argv[1], encoding="utf-8").read().split("\n"); cur = None; fams = {}; weak = {}; always = {}
+L = open(sys.argv[1], encoding="utf-8").read().split("\n"); cur = None; fams = {}; weak = {}; always = {}; liveroot = set(); BODYL = {}
 for ln in L:
     m = re.match(r"^run_([a-z0-9_]+)_selftests\(\) \{", ln)
     if m: cur = m.group(1); fams[cur] = set(); weak[cur] = set(); continue
     if cur and ln.startswith("}"): cur = None; continue
     if not cur: continue
+    # RAIZ VIVA solta (`"${REPO_ROOT}"` sem caminho depois, `cd "$REPO_ROOT"`): a família entrega o repo vivo a
+    # algum script — o glob que ele faz sobre o que recebe (`d="$1"; find "$d" -name '*.md'`) lê o repo inteiro
+    if not ln.lstrip().startswith("#") and re.search(r"\$\{?REPO_ROOT\}?(?![A-Za-z0-9_/}])", ln): liveroot.add(cur)
+    if not ln.lstrip().startswith("#"): BODYL.setdefault(cur, []).append(ln)
     # ANOTAÇÕES DECLARADAS (SAC-72, 2026-10-11) — o núcleo fixo de 14 famílias entrava em QUALQUER commit
     # porque o corpo delas cita o SUT por `${SCRIPT_DIR}/../…`, por alias (`local r="${REPO_ROOT}"`) ou por
     # helper, formas que as regex abaixo não leem. Cura por DECLARAÇÃO no corpo, auditável:
@@ -531,28 +542,97 @@ DIR_RE = re.compile(r"(?<![A-Za-z0-9_.-])((?:\.claude|\.github|docs|ops|site)(?:
 DOMAIN_ROOTS = {".claude/", ".claude/validation/", ".claude/validation/lib/", ".claude/hooks/", ".claude/hooks/lib/",
                 ".claude/utils/", "ops/", "docs/"}
 _data_cache = {}
+_named_cache = {}
+_arg_cache = {}
+TRAV_RE = re.compile(r"\bfind\b|ls-files|os\.walk|\bglob\(|\brglob\b|\biterdir\b|\blistdir\b|\bscandir\b|\bgrep\s+-[A-Za-z]*[rR]|\*\*|/\*|\bls\s")
+VAR_RE = re.compile(r"\$\{?([A-Za-z_][A-Za-z0-9_]*)")
+IGNORED_VARS = {"REPO_ROOT", "ROOT", "SCRIPT_DIR", "HOME", "PWD"}   # raiz: o caminho literal vem depois dela
+ARG_RHS = re.compile(r"""\s*["']?\$\{?(?:[1-9@*]|[1-9]:-)\}?["']?\s*(?:;.*|\|\|.*)?$""")
+def _glob_roots(ln, lines, depth):
+    """(raízes, de_argumento) do glob desta linha. raízes None = o repo inteiro (não sei restringir);
+    de_argumento = alguma variável da linha vem só de PARÂMETRO posicional (`d="$1"`, `for f in "$@"`): o
+    script lê o que quem o chama lhe passa — a família decide, e o chamador trata (ver ARG abaixo)."""
+    roots = {d.rstrip("/.") + "/" for d in DIR_RE.findall(ln)}; arg = False
+    for v in set(VAR_RE.findall(ln)) - IGNORED_VARS:
+        # base de caminho literal (`${tmp}/docs/onion`): o caminho que importa é o literal que vem depois
+        if re.search(r"\$\{?%s\}?/(?:\.claude|\.github|docs|ops|site)\b" % re.escape(v), ln): continue
+        defs = [l for l in lines if re.match(r"\s*(?:local\s+|export\s+|readonly\s+|declare\s+\S+\s+)?%s=" % re.escape(v), l)
+                or re.match(r"\s*for\s+%s\s+in\b" % re.escape(v), l)]
+        sub = set(); only_arg = bool(defs)
+        for l in defs:
+            rhs = l.split("=", 1)[1] if re.match(r"\s*(?:local\s+|export\s+|readonly\s+|declare\s+\S+\s+)?%s=" % re.escape(v), l) \
+                else l.split(" in ", 1)[-1].split(";")[0]
+            if ARG_RHS.match(rhs): continue
+            only_arg = False
+            r = {d.rstrip("/.") + "/" for d in DIR_RE.findall(rhs)}
+            if not r and depth > 0:
+                r2, a2 = _glob_roots(rhs, lines, depth - 1)
+                if r2 is None and not a2: return None, arg
+                arg = arg or a2; r = r2 or set()
+            if not r and not arg: return None, arg
+            sub |= r
+        if only_arg: arg = True; continue
+        if not sub and not arg: return None, arg
+        roots |= sub
+    if roots: return roots, arg
+    return (set(), True) if arg else (None, False)
 def data_inputs(script):
     if script in _data_cache: return _data_cache[script]
     out = set()
     try: txt = open(os.path.join(ROOT, script), encoding="utf-8", errors="replace").read()
     except OSError: _data_cache[script] = out; return out
     # só linha de CÓDIGO: o que a guarda LÊ aparece no código (nome citado em comentário não é leitura)
-    txt = "\n".join(l for l in txt.split("\n") if not l.lstrip().startswith("#"))
-    for tok in set(DATA_RE.findall(txt)):
-        tok = tok.lstrip("./")
-        if "*" not in tok and tok in TRACKED_SET: out.add(tok); continue
-        if "/" not in tok:
-            if "*" in tok:
-                out.update(x for x in TRACKED if fnmatch.fnmatch(os.path.basename(x), tok))
+    lines = [l for l in txt.split("\n") if not l.lstrip().startswith("#")]
+    txt = "\n".join(lines)
+    for ln in lines:
+        for tok in DATA_RE.findall(ln):
+            tok = tok.lstrip("./")
+            if "*" not in tok and tok in TRACKED_SET: out.add(tok); continue
+            if "/" not in tok:
+                if "*" in tok:
+                    # GLOB DE NOME SOLTO (`*.md`, `*.kg.yaml`) — mapa por ARQUIVO, 2026-10-13. Expandia para TODO
+                    # arquivo do repo com esse nome: `inventory.sh` (que conta KBs) ligava 17 famílias a cada
+                    # resíduo de PR. Quando a MESMA LINHA nomeia o diretório varrido (`find docs/x -name '*.md'`),
+                    # o glob vale só debaixo dele; sem diretório na linha (`"$dir"/*.md`, argumento), segue o
+                    # repo inteiro — a variável pode apontar para qualquer lugar e, na dúvida, roda mais.
+                    #   Variável na linha (`find "${KB_DIR}" -name '*.md'`) é resolvida pelas atribuições dela no
+                    #   próprio script (`KB_DIR=…/docs/knowledge-base`, `for d in …`), até 2 níveis; se UMA
+                    #   variável da linha não resolve para diretório nomeado, o glob vale o repo inteiro.
+                    #   Variável que só vem de PARÂMETRO (`d="$1"`): o glob vale o que a família passar. Os arquivos
+                    #   do repo inteiro ficam em ARG e só entram na família que passa a RAIZ VIVA ao script
+                    #   (`"${REPO_ROOT}"` solto no corpo); quem passa fixture já é coberto pelo caminho literal.
+                    roots, from_arg = _glob_roots(ln, lines, 2)
+                    allm = [x for x in TRACKED if fnmatch.fnmatch(os.path.basename(x), tok)]
+                    if roots is None: out.update(allm)
+                    else: out.update(x for x in allm if any(x.startswith(r) for r in roots))
+                    if from_arg: _arg_cache.setdefault(script, set()).update(allm)
+                else:
+                    out.update(BYBASE.get(tok, ()))
             else:
-                out.update(BYBASE.get(tok, ()))
-        else:
-            out.update(x for x in TRACKED if x == tok or fnmatch.fnmatch(x, tok) or fnmatch.fnmatch(x, "*/" + tok))
-    for d in set(DIR_RE.findall(txt)):
-        d = d.rstrip("/.")
-        if d in TRACKED_DIRS and d + "/" not in DOMAIN_ROOTS: out.add(d + "/")
+                out.update(x for x in TRACKED if x == tok or fnmatch.fnmatch(x, tok) or fnmatch.fnmatch(x, "*/" + tok))
+    # DIRETÓRIO DE docs/ NOMEADO × VARRIDO (decisão do maestro 2026-10-13, «1+2 juntos, medido»): medido
+    # sobre os 50 últimos PRs mergeados, o PR seletivo caía em 78–115 famílias porque um script que só
+    # NOMEIA `docs/evolution/` ligava a família a todo arquivo debaixo dele. Nomear não é ler. Cada
+    # ocorrência de diretório de docs/ é lida PELA LINHA onde aparece:
+    #   · padrão de `case` (`docs/evolution/*)`, `…*|`) → é exclusão/roteamento por nome, não leitura: fora;
+    #   · mensagem (`echo`/`printf`/citação `>`) ou teste/criação (`[ -d`, `mkdir`) → NOMEADO: cobre só os
+    #     arquivos que moram DIRETAMENTE nele (`weak-named`, lido assim só pelas classes por arquivo);
+    #   · qualquer outra (atribuição, array, argumento, varredura) → VARRIDO: cobre por prefixo, como antes.
+    # Fora de docs/ nada muda. Na dúvida a ocorrência é VARRIDA (sobre-seleciona: só acrescenta).
+    for ln in lines:
+        s = ln.lstrip()
+        msg = bool(re.match(r"(echo|printf|>|say|log|warn|die|fail|record_)\b|>", s)) or bool(re.search(r"\[\[? -[defs] |\bmkdir\b", ln))
+        for m in DIR_RE.finditer(ln):
+            d = m.group(1).rstrip("/.")
+            if not (d in TRACKED_DIRS and d + "/" not in DOMAIN_ROOTS): continue
+            if not d.startswith("docs/"): out.add(d + "/"); continue
+            cp = re.match(r"^\s*[^\s()$=\"'`]+\)", ln)   # rótulo de `case` no início da linha: `a/*|b/*)`
+            if cp and m.end(1) <= cp.end(): continue
+            if msg and not TRAV_RE.search(ln): _named_cache.setdefault(script, set()).add(d + "/")
+            else: out.add(d + "/")
     _data_cache[script] = out
     return out
+named = {f: set() for f in fams}
 for f in fams:
     # o lint (`lint-artifacts.sh`) fica de fora: ele é infraestrutura da bancada (mudá-lo já compra TUDO) e as
     # famílias que o usam o rodam sobre FIXTURE, não sobre o dado vivo — derivá-lo poria ~100 famílias em todo
@@ -561,18 +641,77 @@ for f in fams:
                and x not in (".claude/validation/lint-selftest.sh", ".claude/validation/lint-artifacts.sh")]
     for sc in scripts:
         weak[f] |= data_inputs(sc)
+        named[f] |= _named_cache.get(sc, set())
+        if f in liveroot: weak[f] |= _arg_cache.get(sc, set())
+# POPULAÇÃO VARRIDA PELO CORPO (falso negativo do #1068, 2026-10-13): a família `kg_fixture_paths` deriva os
+# consumidores do predicado com `grep -rl 'kg-fixture-paths\.sh' .claude/validation .claude/utils` e reprova quem
+# só o MENCIONA; o #1068 mexeu em `migrate-seed-graph.sh` (citado por outra família, então conhecido) e a seleção
+# não a rodou. O mapa lia o corpo só por `${REPO_ROOT}/…`. Agora, de cada linha de CÓDIGO do corpo:
+#   · `grep -r…l PADRÃO dir…` / `git grep -l PADRÃO -- dir…` com diretório LITERAL do repo ⇒ os arquivos
+#     rastreados sob ele (filtrados por --include) cujo conteúdo casa o PADRÃO viram cobertura FRACA; padrão
+#     ilegível ⇒ o diretório inteiro;
+#   · `git ls-files 'dir' …` ⇒ o diretório (ou o glob) inteiro;
+#   · caminho literal de arquivo rastreado citado no corpo (`.claude/utils/adopt/seed-adoption-graph.sh`) ⇒ ele.
+# Só ACRESCENTA (fraco não tira failsafe); sobre-seleciona quando o diretório é de fixture copiada do vivo.
+import shlex
+PATH_LIT = re.compile(r"(?<![A-Za-z0-9_${}/.-])((?:\.claude|docs|ops|plugins|\.github|site|vendor)/[A-Za-z0-9_./*-]+|CLAUDE\.md)")
+def _scan_body(lines):
+    out = set()
+    for ln in lines:
+        for p in PATH_LIT.findall(ln):
+            p = p.rstrip("/.")
+            if p in TRACKED_SET: out.add(p)
+        seg = None
+        m = re.search(r"\bgit\s+(?:-C\s+\S+\s+)?grep\b(.*)|\bgrep\s+(-[A-Za-z]*[rR][A-Za-z]*\b.*)", ln)
+        if m: seg = ("grep", m.group(1) if m.group(1) is not None else m.group(2))
+        m2 = re.search(r"\bls-files\b(.*)", ln)
+        if m2: seg = ("ls", m2.group(1))
+        if not seg: continue
+        kind, rest = seg
+        rest = re.split(r"\s(?:\||2>|>|\)|;|&&)\s?", rest)[0]
+        try: toks = shlex.split(rest)
+        except ValueError: continue
+        inc = [t.split("=", 1)[1] for t in toks if t.startswith("--include=")]
+        flags = "".join(t[1:] for t in toks if t.startswith("-") and not t.startswith("--"))
+        pos = [t for t in toks if not t.startswith("-")]
+        if kind == "grep":
+            if not pos: continue
+            pat, dirs = pos[0], pos[1:]
+        else:
+            pat, dirs = None, pos
+        dirs = [d.rstrip("/") for d in dirs if re.match(r"(?:\.claude|docs|ops|plugins|\.github|site|vendor)(?:/|$)|CLAUDE\.md$", d)]
+        if not dirs: continue
+        pop = [x for x in TRACKED if any(x == d or x.startswith(d + "/") or fnmatch.fnmatch(x, d) for d in dirs)
+               and (not inc or any(fnmatch.fnmatch(os.path.basename(x), g) for g in inc))]
+        if pat is None: out.update(pop); continue
+        try:
+            rx = re.compile(pat if "F" not in flags else re.escape(pat), re.I if "i" in flags else 0)
+        except re.error:
+            out.update(pop); continue
+        for x in pop:
+            try: txt = open(os.path.join(ROOT, x), encoding="utf-8", errors="replace").read()
+            except OSError: continue
+            if rx.search(txt): out.add(x)
+    return out
+for f in fams:
+    weak[f] |= _scan_body(BODYL.get(f, []))
 # compacta: entrada FRACA já coberta por um diretório fraco da mesma família não muda a seleção (o prefixo a
 # casa) — só incha o mapa. Entrada forte nunca sai.
+# ⚠️ docs/ NÃO compacta (mapa por ARQUIVO, 2026-10-13): 3 arquivos lidos num diretório viravam o diretório e
+# ligavam a família aos vizinhos que ela não lê — era metade das ~100 famílias de um PR de docs. Lá a entrada
+# fica arquivo a arquivo; o mapa engorda, a seleção estreita só no que a família não cita.
 for f in fams:
     # 3+ arquivos fracos no mesmo diretório viram o diretório (sobre-seleciona os vizinhos; nunca estreita)
     for _ in range(1):
         par = {}
         for x in weak[f]:
-            if not x.endswith("/") and not x.startswith("@") and "/" in x: par.setdefault(os.path.dirname(x) + "/", []).append(x)
+            if not x.endswith("/") and not x.startswith("@") and "/" in x and not x.startswith("docs/"): par.setdefault(os.path.dirname(x) + "/", []).append(x)
         for d, xs in par.items():
             if len(xs) >= 3 and d not in DOMAIN_ROOTS: weak[f] -= set(xs); weak[f].add(d)
     dirs = sorted(x for x in weak[f] if x.endswith("/"))
-    weak[f] = {x for x in weak[f] if not any(x != d and x.startswith(d) for d in dirs)}
+    # em docs/ a entrada mais funda FICA mesmo sob um ancestral fraco: as classes por arquivo leem o diretório
+    # exato (o resíduo casa `docs/evolution/review/`, não o `docs/evolution/` que o engoliria)
+    weak[f] = {x for x in weak[f] if x.startswith("docs/") or not any(x != d and x.startswith(d) for d in dirs)}
 # @plugin-bundled (achado do PR #1024, 2026-10-11): a família que MONTA ou JULGA plugin a partir das fontes
 # vivas depende de TODO arquivo que algum manifesto empacota — skill, comando, agente, util, KB. O mapa só
 # via o assembler/manifesto, então mudar uma skill empacotada não selecionava `plugin_bundle` e a bancada
@@ -586,6 +725,9 @@ for f in fams:
 for f in sorted(fams):
     for p in sorted(fams[f]): print(f"{f}\t{p}")
     for p in sorted(weak[f] - fams[f]): print(f"{f}\t{p}\tweak")
+    # weak-named: diretório de docs/ só NOMEADO por um script da família (sem varredura) — cobre os arquivos
+    # que moram diretamente nele quando o arquivo é de uma classe por arquivo (prosa, grafo, resíduo)
+    for p in sorted(named[f] - weak[f] - fams[f]): print(f"{f}\t{p}\tweak-named")
     if f in always: print(f"{f}\t*\talways: {always[f]}")
     elif not fams[f] and not weak[f]: print(f"{f}\t*\talways: SEM-RAZAO")
 PYMAP
@@ -625,11 +767,13 @@ _selftest_bundled_paths() {
   printf '%s\n' .claude/settings.json .claude/.onion-version LICENSE .claude-plugin/marketplace.json
 }
 
-# Regra do BLOCO. $1 = staged|worktree. Imprime CSV de famílias ou ALL; motivo no stderr.
+# Regra do BLOCO. $1 = staged|worktree|range:<A...B>. Imprime CSV de famílias ou ALL; motivo no stderr.
 _selftest_block_families() {
   command -v python3 >/dev/null 2>&1 || { echo "ALL"; echo "  failsafe: python3 ausente — não sei ler o bloco que mudou → tudo" >&2; return 0; }
-  python3 - "${REPO_ROOT}" ".claude/validation/lint-selftest.sh" "$1" <<'PYBLOCK'
-import re, subprocess, sys
+  # FAIL-CLOSED (achado da passada de 2026-10-13): o leitor que QUEBRA (SyntaxError, exceção) não imprimia nada, e
+  # saída vazia era lida como "nenhuma família pelo bloco" — estreitava no incerto. Agora rc≠0 ⇒ tudo.
+  python3 - "${REPO_ROOT}" ".claude/validation/lint-selftest.sh" "$1" <<'PYBLOCK' || { echo "ALL"; echo "  failsafe: o leitor do bloco falhou (python rc≠0) — não sei o que mudou → tudo" >&2; }
+import os, re, subprocess, sys
 root, rel, mode = sys.argv[1:4]
 def say(msg): print(msg, file=sys.stderr)
 def all_(why): print("ALL"); say("  failsafe: " + why + " → tudo"); sys.exit(0)
@@ -639,8 +783,18 @@ def git(*a):
     if r.returncode != 0: raise RuntimeError(" ".join(a[:2]))
     return r.stdout
 try:
-    old = git("show", "HEAD:" + rel)
-    if mode == "staged":
+    if mode.startswith("range:"):
+        # NÍVEL PR (decisão do maestro de 2026-10-13, «Blocos mudados + núcleo»): o par é a merge-base e a
+        # ponta do range, que é exatamente o que o `git diff A...B` do PR compara
+        a, b = mode[len("range:"):].split("...", 1)
+        mb = git("merge-base", a, b).strip()
+        old = git("show", mb + ":" + rel)
+        new = git("show", b + ":" + rel)
+        diff = git("diff", "-U0", "--no-color", "--no-ext-diff", "--no-textconv", mb, b, "--", rel)
+    else:
+        old = git("show", "HEAD:" + rel)
+    if mode.startswith("range:"): pass
+    elif mode == "staged":
         new = git("show", ":" + rel)
         diff = git("diff", "--cached", "-U0", "--no-color", "--no-ext-diff", "--no-textconv", "--", rel)
     else:
@@ -782,11 +936,32 @@ def parse(text):
     return R, L, nested
 po, pn = parse(old), parse(new)
 if po is None or pn is None: all_("estrutura de blocos ilegível em %s (bloco ou heredoc sem fim)" % rel)
+# FRONTEIRA DO MOTOR (marcadores ONION-BENCH, 2026-10-13): os dois marcadores, uma vez cada e em ordem, e toda
+# família entre eles — senão não sei onde o motor acaba e a recusa é a completa.
+MK_END = "# ═══ ONION-BENCH: FIM DO MOTOR"; MK_SUM = "# ═══ ONION-BENCH: INÍCIO DO SUMÁRIO"
+def motor_bounds(text, side):
+    L = text.split("\n")
+    e = [k for k, l in enumerate(L, 1) if l.startswith(MK_END)]; s = [k for k, l in enumerate(L, 1) if l.startswith(MK_SUM)]
+    if not e and not s and os.environ.get("ONION_SELFTEST_REPLAY_SYNTH_BOUNDS") == "1":
+        # SÓ PARA MEDIR (ops/testing/selection-replay.sh): versão HISTÓRICA da bancada, anterior aos marcadores. A
+        # fronteira é sintetizada no lugar onde eles foram postos — antes da 1ª família, depois da última
+        # invocação `_family`. Nunca vale fora do replay: lá, marcador ausente é a completa.
+        fl = [k for k, l in enumerate(L, 1) if FAM.match(l)]; il = [k for k, l in enumerate(L, 1) if INV.match(l)]
+        if fl and il: e, s = [fl[0] - 1], [il[-1] + 1]
+    if len(e) != 1 or len(s) != 1 or e[0] >= s[0]:
+        all_("fronteira do motor ausente, duplicada ou fora de ordem em %s (%s: %d×FIM DO MOTOR, %d×INÍCIO DO SUMÁRIO)" % (rel, side, len(e), len(s)))
+    out = [k for k, l in enumerate(L, 1) if FAM.match(l) and not (e[0] < k < s[0])]
+    if out: all_("família fora da região de famílias em %s (%s, linha %d)" % (rel, side, out[0]))
+    return e[0], s[0]
+bounds = {"antes": motor_bounds(old, "antes"), "depois": motor_bounds(new, "depois")}
 sel = set()
 for side, lines, (R, L, _) in (("antes", old_ch, po), ("depois", new_ch, pn)):
+    e0, s0 = bounds[side]
     for i in sorted(lines):
         r = R[i] if i < len(R) else None
         if r is None: all_("linha %d (%s) fora do arquivo medido" % (i, side))
+        if (i <= e0 or i >= s0) and r[0] != "neutral":
+            all_("linha %d (%s) no MOTOR da bancada (fora dos marcadores ONION-BENCH): %s" % (i, side, L[i - 1].strip()[:90]))
         if r[0] in ("fam", "inv"): sel.add(r[1])
         elif r[0] == "neutral": continue
         elif r[0] == "amb": all_("linha %d (%s) na fronteira ambígua do bloco de %s (heredoc × '}' na coluna 0)" % (i, side, r[1]))
@@ -847,8 +1022,18 @@ _selftest_affected_families() {
     # (1) BLOCO — a própria bancada
     if [ "${p}" = ".claude/validation/lint-selftest.sh" ]; then
       local _b
-      _b="$(_selftest_block_families "$( [ "${SELFTEST_AFFECTED_STAGED}" = "2" ] && echo staged || echo worktree )")"
+      local _bm="worktree"
+      [ "${SELFTEST_AFFECTED_STAGED}" = "2" ] && _bm="staged"
+      [ -n "${SELFTEST_AFFECTED_RANGE}" ] && _bm="range:${SELFTEST_AFFECTED_RANGE}"
+      _b="$(_selftest_block_families "${_bm}")"
       if [ "${_b}" = "ALL" ]; then echo "ALL"; return 0; fi
+      # NÍVEL PR (decisão do maestro de 2026-10-13, «Blocos mudados + núcleo»): bloco de família mudado no range
+      # leva o núcleo da bancada junto — quem testa o seletor, a faixa, as vagas e o arranque julga a mudança
+      # no juiz. O motor mudado já voltou ALL acima.
+      if [ -n "${SELFTEST_AFFECTED_RANGE}" ]; then
+        echo "  bloco (nível PR): + núcleo da bancada (${SELFTEST_BENCH_CORE})" >&2
+        _b="${_b:+${_b},}${SELFTEST_BENCH_CORE}"
+      fi
       # + quem lê a bancada como DADO: família que cita lint-selftest.sh ou um diretório que o contém
       #   (shell_pipefail_robustness varre .claude/validation/ — um bloco novo pode trazer o antipadrão)
       hit="$(awk -F'\t' -v p="${p}" '$2==p || ($3!="weak" && $2 ~ /\/$/ && index(p,$2)==1) {print $1}' <<< "${map}" | sort -u | paste -sd, -)"
@@ -860,11 +1045,41 @@ _selftest_affected_families() {
       .claude/validation/lint-artifacts.sh|.claude/validation/rules-registry.sh|.claude/validation/lint-rules.md|.claude/validation/fixtures/manifest.tsv|.claude/hooks/lib/*|.githooks/*|.github/workflows/*)
         echo "ALL"; echo "  failsafe: ${p} é infraestrutura da bancada → tudo" >&2; return 0 ;;
     esac
+    # (4) CLASSE POR ARQUIVO (decisão do maestro 2026-10-13, «1+2 juntos, medido») — prosa (`docs/**/*.md`),
+    #     grafo (`docs/**/*.kg.yaml`) e resíduo (`docs/evolution/review/*.md`) fora do domínio da bancada.
+    #     Antes, qualquer um deles casava por PREFIXO todo diretório de docs/ que algum script da família
+    #     NOMEASSE, e o PR que só trazia resíduo + um grafo caía em ~100 famílias. Agora entra quem:
+    #       · cita o ARQUIVO (forte ou fraco; o `*.md`/`*.kg.yaml` de um script já vira a lista de arquivos);
+    #       · cita um diretório que o CONTÉM e o varre (entrada `weak`/forte terminada em `/`);
+    #       · só nomeia (`weak-named`) o diretório ONDE O ARQUIVO MORA — não um ancestral.
+    #     As classes têm destino fixo e derivado (nenhuma lista à mão): o resíduo vai a quem nomeia
+    #     docs/evolution/review/ (a REGRA 56 e quem lê o resíduo), o grafo a quem lê `.kg.yaml`, a prosa a
+    #     quem varre markdown. Arquivo de docs/ de outro tipo segue a regra antiga (prefixo de diretório).
+    #     Nada disto toca o domínio da bancada (.claude/validation|hooks|utils, ops/): lá o failsafe fica.
+    case "${p}" in
+      .claude/*|ops/*|.githooks/*|.github/*) ;;
+      docs/*.md|docs/*.kg.yaml|docs/*.kg.yml)
+        local _cls="prosa" _par="${p%/*}/"
+        case "${p}" in docs/evolution/review/*.md) _cls="resíduo" ;; *.kg.yaml|*.kg.yml) _cls="grafo" ;; esac
+        if [ "${_cls}" = "resíduo" ]; then
+          # RESÍDUO — destino DECLARADO (decisão do maestro de 2026-10-13): só quem lê resíduo. O nome do
+          # arquivo é o slug da branch, então ninguém o cita literalmente; quem o lê nomeia o DIRETÓRIO
+          # docs/evolution/review/ (a REGRA 56, o ledger, o pr-finalize, o mutant-leftover…). Fica de fora
+          # o glob `*.md` do repo inteiro e o ancestral docs/evolution/ — a varredura de prosa VIVA do
+          # resíduo é do lint (job próprio do CI, sobre a árvore real), não de família da bancada.
+          hit="$(awk -F'\t' -v p="${p}" '($2==p && $3=="") || $2=="docs/evolution/review/" || ($3=="" && $2 ~ /\/$/ && index(p,$2)==1) {print $1}' <<< "${map}" | sort -u | paste -sd, -)"
+        else
+          hit="$(awk -F'\t' -v p="${p}" -v par="${_par}" '$2==p || ($3=="weak-named" && $2==par) || ($3!="weak-named" && $2 ~ /\/$/ && index(p,$2)==1) {print $1}' <<< "${map}" | sort -u | paste -sd, -)"
+        fi
+        echo "  por arquivo (${_cls}): ${p} → $(printf '%s' "${hit}" | tr ',' '\n' | grep -c . || true) família(s) que o leem" >&2
+        [ -z "${hit}" ] || sel="${sel:+${sel},}${hit}"
+        continue ;;
+    esac
     # exato = arquivo citado, ou diretório citado que NÃO é raiz de domínio (fixtures/ conta; .claude/validation/ não)
     hit="$(printf '%s\n' "${map}" | awk -F'\t' -v p="${p}" '$2==p || ($2 ~ /\/$/ && index(p,$2)==1) {print $1}' | sort -u | paste -sd, -)"
-    # `known` IGNORA a cobertura fraca (3ª coluna `weak`): anotação só acrescenta família, nunca tira o
-    # failsafe de um arquivo do domínio. E sem `| head -1` (produtor|head sob pipefail é corrida).
-    known="$(awk -F'\t' -v p="${p}" '!f && $3!="weak" && ($2==p || ($2 ~ /\/$/ && $2 !~ /^(\.claude\/|\.claude\/(validation|hooks|utils)\/|ops\/)$/ && index(p,$2)==1)) {print $1; f=1}' <<< "${map}")"
+    # `known` IGNORA a cobertura fraca (3ª coluna `weak` e `weak-named`): anotação só acrescenta família, nunca
+    # tira o failsafe de um arquivo do domínio. E sem `| head -1` (produtor|head sob pipefail é corrida).
+    known="$(awk -F'\t' -v p="${p}" '!f && $3!~/^weak/ && ($2==p || ($2 ~ /\/$/ && $2 !~ /^(\.claude\/|\.claude\/(validation|hooks|utils)\/|ops\/)$/ && index(p,$2)==1)) {print $1; f=1}' <<< "${map}")"
     if [ -n "${known}" ]; then
       sel="${sel:+${sel},}${hit}"
     else
@@ -926,6 +1141,8 @@ _selftest_affected_families() {
 #   · shell_pipefail_robustness — catraca estática barata (1 s) do antipadrão que só o CI de 2 cores expõe.
 # Mais as famílias `*` do mapa (rodam em todo commit). `--full`/ONION_SELFTEST_FULL=1 anula esta faixa.
 SELFTEST_LOCAL_CORE="selftest_lanes,selftest_selection,two_tier_bench,machine_slots,shell_pipefail_robustness"
+# núcleo da bancada no nível PR quando um BLOCO de família muda (o local + o seletor por arquivo e o arranque)
+SELFTEST_BENCH_CORE="${SELFTEST_LOCAL_CORE},selector_per_file,shared_startup"
 # Donos (famílias) das linhas mudadas da bancada, dos dois lados do diff. $1 = staged|worktree|range.
 _selftest_touched_blocks() {
   command -v python3 >/dev/null 2>&1 || return 0
@@ -1004,8 +1221,9 @@ if [ "${SELFTEST_AFFECTED_STAGED}" = "1" ]; then
 fi
 # NÍVEL PR (passo D de D_MERGE_PROCESS_ONION_2026_10, 2026-10-13): a MESMA seleção do pre-commit, lida do
 # diff de um range (`base...head` do PR) em vez do índice. Duas recusas no incerto que o pre-commit não
-# precisa: (1) range que o git não lê ⇒ tudo, nunca "nada mudou"; (2) a própria bancada no range ⇒ tudo —
-# no PR não há índice para a regra do BLOCO ler, e um bloco lido da árvore errada é seleção inventada.
+# precisa: (1) range que o git não lê ⇒ tudo, nunca "nada mudou"; (2) a própria bancada RENOMEADA/criada/apagada
+# no range ⇒ tudo. MODIFICADA, desde 2026-10-13 vai à regra do BLOCO lida do próprio range (merge-base × ponta,
+# nunca da árvore de trabalho): bloco de família ⇒ ela + quem lê a bancada + o núcleo; motor ⇒ tudo.
 if [ -n "${SELFTEST_AFFECTED_RANGE}" ]; then
   _rng_out=""
   if ! _rng_out="$(git -C "${REPO_ROOT}" -c core.quotepath=off diff --name-status -M --diff-filter=ACMRDT "${SELFTEST_AFFECTED_RANGE}" -- 2>&1)"; then
@@ -1014,9 +1232,12 @@ if [ -n "${SELFTEST_AFFECTED_RANGE}" ]; then
     while IFS=$'\t' read -r _st _p1 _p2; do
       [ -n "${_p1:-}" ] && SELFTEST_AFFECTED+=("${_p1}")
       [ -n "${_p2:-}" ] && SELFTEST_AFFECTED+=("${_p2}")
-      case "${_p1:-}|${_p2:-}" in
-        .claude/validation/lint-selftest.sh\|*|*\|.claude/validation/lint-selftest.sh)
-          SELFTEST_RANGE_FAILSAFE="a própria bancada (.claude/validation/lint-selftest.sh) mudou no range" ;;
+      # «Blocos mudados + núcleo» (maestro, 2026-10-13): a bancada MODIFICADA no range vai à regra do BLOCO, lida
+      # entre a merge-base e a ponta (modo range:). Renomeada, criada ou apagada segue comprando tudo.
+      case "${_st:-}|${_p1:-}|${_p2:-}" in
+        M\|.claude/validation/lint-selftest.sh\|) ;;
+        *\|.claude/validation/lint-selftest.sh\|*|*\|.claude/validation/lint-selftest.sh)
+          SELFTEST_RANGE_FAILSAFE="a própria bancada (.claude/validation/lint-selftest.sh) foi ${_st:-?} no range (não só modificada)" ;;
       esac
     done <<< "${_rng_out}"
     [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ] || [ -n "${SELFTEST_RANGE_FAILSAFE}" ] \
@@ -1083,6 +1304,53 @@ if [ "${SELFTEST_DRY}" = "1" ]; then
   SUMMARY_PRINTED=1; exit 0
 fi
 
+# ── ARRANQUE COMPARTILHADO (decisão do maestro de 2026-10-13, «1+2 juntos, medido») ──────────────────
+# Cada worker da fila dinâmica fazia o tar de .claude+docs e rodava o inventory.sh CINCO vezes ANTES de pegar
+# vaga do semáforo: cinco bancadas de 8 workers = ~40 arranques simultâneos fora de qualquer vaga. Agora:
+#   · RETRATO: o pai grava o tar UMA vez num arquivo; cada worker EXTRAI a sua cópia (sandbox própria, gravável,
+#     de ninguém mais — o isolamento entre famílias é o de antes). O retrato fica read-only depois de feito.
+#   · INVENTÁRIO: um `--env` por bancada, guardado num cache por uid com a sha256 do retrato como chave. O
+#     retrato muda (qualquer byte, mtime incluso) ⇒ a chave muda ⇒ recalcula; nunca um número velho.
+#   · Falha em qualquer passo ⇒ o caminho antigo (tar direto da árvore, inventário calculado), declarado.
+# $1 = raiz, $2 = arquivo .tar. rc 0 = retrato gravado. rc 1 do tar ("mudou durante a leitura") é tolerado.
+_snapshot_create() {
+  local rc=0
+  tar -C "$1" --warning=no-file-changed -cf "$2" --exclude='__*__.*' --exclude='__*__' .claude docs CLAUDE.md 2>/dev/null || rc=$?
+  [ "${rc}" -le 1 ] && [ -s "$2" ] || { rm -f "$2"; return 1; }
+  chmod a-w "$2" 2>/dev/null || true
+}
+_snapshot_key() {  # sha256 do retrato (vazio = sem chave ⇒ sem cache)
+  [ -n "${1:-}" ] && [ -s "$1" ] || return 0
+  command -v sha256sum >/dev/null 2>&1 || return 0
+  sha256sum "$1" 2>/dev/null | awk '{print $1}'
+}
+# diretório do cache por uid, com as MESMAS recusas do semáforo (link, de outro dono, gravável por outros)
+_inventory_cache_dir() {
+  local uid d; uid="$(id -u 2>/dev/null || echo x)"
+  if [ -n "${ONION_SELFTEST_INVENTORY_CACHE_DIR:-}" ]; then d="${ONION_SELFTEST_INVENTORY_CACHE_DIR}"
+  elif [ -d "/run/user/${uid}" ] && [ -O "/run/user/${uid}" ] && [ -w "/run/user/${uid}" ]; then d="/run/user/${uid}/onion-selftest-inventory"
+  else d="/tmp/onion-selftest-inventory-${uid}"; fi
+  [ -d "${d}" ] || ( umask 077; mkdir -p "${d}" ) 2>/dev/null || return 1
+  [ ! -L "${d}" ] && [ -O "${d}" ] || return 1
+  [ -z "$(find "${d}" -maxdepth 0 -perm /022 2>/dev/null)" ] || return 1
+  printf '%s' "${d}"
+}
+# $1 = sandbox extraída do retrato, $2 = chave. Preenche SELFTEST_INVENTORY_ENV e SELFTEST_STARTUP_WHY.
+_inventory_env() {
+  local d="" k="${2:-}" out tmp
+  if [ -n "${k}" ] && d="$(_inventory_cache_dir)" && [ -s "${d}/${k}.env" ] && grep -q '^ONION_COMMANDS_TOTAL=' "${d}/${k}.env"; then
+    SELFTEST_INVENTORY_ENV="$(cat "${d}/${k}.env")"; SELFTEST_STARTUP_WHY="cache ${k:0:12}"; return 0
+  fi
+  out="$(bash "$1/.claude/validation/inventory.sh" --env 2>/dev/null || true)"
+  SELFTEST_INVENTORY_ENV="${out}"; SELFTEST_STARTUP_WHY="calculado${k:+ (chave ${k:0:12})}"
+  if [ -n "${k}" ] && [ -n "${d}" ] && grep -q '^ONION_COMMANDS_TOTAL=' <<< "${out}"; then
+    tmp="$(mktemp "${d}/.${k}.XXXXXX" 2>/dev/null)" && printf '%s\n' "${out}" > "${tmp}" && mv -f "${tmp}" "${d}/${k}.env" 2>/dev/null || rm -f "${tmp:-}" 2>/dev/null
+    # o cache não cresce sem fim: fica com os 32 mais recentes
+    ls -1t "${d}"/*.env 2>/dev/null | tail -n +33 | xargs -r rm -f 2>/dev/null || true
+  fi
+  return 0
+}
+
 # Pai paralelo: lista, particiona, dispara --child por grupo, agrega trailers. Nenhuma família roda no pai.
 if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTEST_LIST}" = "0" ]; then
   _fams=()
@@ -1093,14 +1361,24 @@ if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTES
   done < <(bash "${BASH_SOURCE[0]}" --list)
   _n="${#_fams[@]}"; _j="${SELFTEST_JOBS}"; [ "${_j}" -gt "${_n}" ] && _j="${_n}"
   if [ "${_n}" -gt 0 ] && [ "${_j}" -gt 1 ]; then
-    _tdir="$(mktemp -d)"; _pids=(); _t0="${SECONDS}"
+    _tdir="$(mktemp -d)"; _pids=(); _t0="${SECONDS}"; _startup_shared=0
     mkdir -p "${_tdir}/q/claimed" "${_tdir}/q/done"
     _all_csv="$(printf '%s\n' "${_fams[@]}" | paste -sd, -)"
     echo "=== Onion Lint Selftest — faixa paralela: ${_n} famílias em ${_j} workers ==="
+    # ARRANQUE COMPARTILHADO: o pai tira o retrato e lê o inventário UMA vez; os workers extraem a cópia deles.
+    _SNAPDIR="$(mktemp -d)"; SELFTEST_SNAPSHOT="${_SNAPDIR}/snapshot.tar"
+    if _snapshot_create "${REPO_ROOT}" "${SELFTEST_SNAPSHOT}"; then
+      mkdir -p "${_SNAPDIR}/inv"; tar -C "${_SNAPDIR}/inv" -xf "${SELFTEST_SNAPSHOT}"
+      _inventory_env "${_SNAPDIR}/inv" "$(_snapshot_key "${SELFTEST_SNAPSHOT}")"; rm -rf "${_SNAPDIR}/inv"
+      echo "  arranque: retrato da árvore e inventário feitos 1× pelo pai para ${_j} workers (inventário: ${SELFTEST_STARTUP_WHY})"
+    else
+      SELFTEST_SNAPSHOT=""; echo "  ⚠ arranque: o pai não conseguiu o retrato — cada worker faz o seu (como antes)"
+    fi
     for (( i=0; i<_j; i++ )); do
       ONION_SELFTEST_CHILD=1 ONION_SELFTEST_FAMILIES="${_all_csv}" ONION_SELFTEST_STRICT="${STRICT}" \
         ONION_SELFTEST_QUEUE="${_tdir}/q" ONION_SELFTEST_SHARD="${i}/${_j}" ONION_SELFTEST_TIMING="${SELFTEST_TIMING}" \
         ONION_SELFTEST_FIXTURES_LANE="${SELFTEST_FIXTURES_LANE}" \
+        ONION_SELFTEST_SNAPSHOT="${SELFTEST_SNAPSHOT}" ONION_SELFTEST_INVENTORY_ENV="${SELFTEST_INVENTORY_ENV}" \
         bash "${BASH_SOURCE[0]}" --child > "${_tdir}/${i}.out" 2>&1 &
       _pids[i]=$!
     done
@@ -1117,6 +1395,7 @@ if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTES
         while IFS=$'\t' read -r _tag _case; do FAILED_CASES+=("${_case}"); done < <(grep -E $'^#ONION_SELFTEST_FAILED\t' "${_tdir}/${i}.out" || true)
         while IFS=$'\t' read -r _tag _case; do SKIPPED_CASES+=("${_case}"); done < <(grep -E $'^#ONION_SELFTEST_SKIPPED\t' "${_tdir}/${i}.out" || true)
         while IFS=$'\t' read -r _tag _case; do SLOT_WAITERS+=("${_case}"); done < <(grep -E $'^#ONION_SELFTEST_SLOTWAITER\t' "${_tdir}/${i}.out" || true)
+        grep -qE '^#ONION_SELFTEST_STARTUP retrato=pai inventario=pai$' "${_tdir}/${i}.out" && _startup_shared=$((_startup_shared + 1))
         _sl="$(grep -E '^#ONION_SELFTEST_SLOTS ' "${_tdir}/${i}.out" | tail -1 || true)"
         if [ -n "${_sl}" ]; then
           set -- ${_sl}; SLOT_WAIT_US=$((SLOT_WAIT_US + $2)); SLOT_WAITED=$((SLOT_WAITED + $3))
@@ -1134,6 +1413,7 @@ if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTES
     done
     rm -rf "${_tdir}"
     echo ""; echo "=== faixa paralela: ${_n} famílias / ${_j} workers (fila dinâmica) em $(( SECONDS - _t0 ))s ==="
+    echo "  Arranque : ${_startup_shared}/${_j} worker(s) com retrato e inventário do pai (os demais fizeram o próprio)"
     SELFTEST_FAMILIES="-"   # nenhuma família roda no pai; o sumário abaixo usa a agregação
   fi
 fi
@@ -1155,7 +1435,7 @@ SANDBOX="$(mktemp -d)"
 #    `declarado != verificado`, porque o artefato PARECE protegido.
 #    `_bench_abort_guard` é chamado PRIMEIRO e sua 1ª instrução é `local rc=$?`, então o exit status
 #    real chega intacto; a limpeza vem depois e nunca mascara o veredito.
-_bench_on_exit() { _bench_abort_guard; rm -rf "${SANDBOX:-}"; }
+_bench_on_exit() { _bench_abort_guard; rm -rf "${SANDBOX:-}" "${_SNAPDIR:-}"; }
   rm -f "${_FIXTURE_NODE:-}" 2>/dev/null || true   # nó-fixture do (e) de kg-backlog (mktemp no top-level)
 trap _bench_on_exit EXIT
 # A CÓPIA EXCLUI AS FIXTURES TRANSITÓRIAS DE OUTROS CASOS. Casos como marketplace-bundle e
@@ -1169,9 +1449,27 @@ trap _bench_on_exit EXIT
 #    ⚠️ E O EMPACOTADOR TOLERA ARQUIVO VIVO. `tar` sai 1 com "file changed as we read it" (o `cp -a`
 #    saía 0) e há escritores vivos aqui dentro — beacons, session-lifecycle.jsonl, instructions-loaded.jsonl.
 #    Sob `set -euo pipefail` isso matava a suíte na cópia. rc 1 do tar = "mudou durante a leitura", não erro.
-{ tar -C "${REPO_ROOT}" --warning=no-file-changed -cf - --exclude='__*__.*' --exclude='__*__' .claude docs \
-    || [ "$?" -eq 1 ]; } | tar -C "${SANDBOX}" -xf -
-cp -a "${REPO_ROOT}/CLAUDE.md" "${SANDBOX}/CLAUDE.md"
+#    ⚠️ ARRANQUE COMPARTILHADO (2026-10-13): o retrato vem do PAI quando há um (ver _snapshot_create). Cada
+#    worker EXTRAI a sua cópia — o isolamento entre famílias continua o de antes: sandbox própria por
+#    processo, gravável, que ninguém mais lê. Sem retrato (serial, ou o do pai sumiu) o próprio processo o faz.
+#    `--list` não roda família nenhuma: não precisa de retrato nem de inventário (o pai paralelo o chama
+#    para montar a fila, e pagava um arranque inteiro só para imprimir nomes).
+if [ "${SELFTEST_LIST}" = "1" ]; then
+  SELFTEST_SNAPSHOT=""; SELFTEST_INVENTORY_ENV="ONION_COMMANDS_TOTAL=0"
+elif [ -z "${SELFTEST_SNAPSHOT}" ] || [ ! -s "${SELFTEST_SNAPSHOT}" ]; then
+  [ -z "${SELFTEST_SNAPSHOT}" ] || echo "  ⚠ arranque: o retrato do pai (${SELFTEST_SNAPSHOT}) sumiu — faço o meu" >&2
+  _SNAPDIR="$(mktemp -d)"; SELFTEST_SNAPSHOT="${_SNAPDIR}/snapshot.tar"
+  _snapshot_create "${REPO_ROOT}" "${SELFTEST_SNAPSHOT}" || SELFTEST_SNAPSHOT=""
+fi
+if [ "${SELFTEST_LIST}" = "1" ]; then :
+elif [ -n "${SELFTEST_SNAPSHOT}" ]; then
+  tar -C "${SANDBOX}" -xf "${SELFTEST_SNAPSHOT}"
+else
+  # o retrato em arquivo falhou (disco?): o caminho de sempre, direto da árvore viva
+  { tar -C "${REPO_ROOT}" --warning=no-file-changed -cf - --exclude='__*__.*' --exclude='__*__' .claude docs \
+      || [ "$?" -eq 1 ]; } | tar -C "${SANDBOX}" -xf -
+  cp -a "${REPO_ROOT}/CLAUDE.md" "${SANDBOX}/CLAUDE.md"
+fi
 
 # ---------------------------------------------------------------------------
 # SSOT em tempo de teste — derivada do inventory.sh do PRÓPRIO sandbox (verdade
@@ -1180,26 +1478,33 @@ cp -a "${REPO_ROOT}/CLAUDE.md" "${SANDBOX}/CLAUDE.md"
 #   __ONION_COMMANDS_TOTAL__ → contagem real      (caso GOOD: deve casar a SSOT)
 #   __ONION_COMMANDS_DRIFT__ → contagem + offset   (casos BAD/EXEMPT: diverge garantido)
 # A substituição acontece ao injetar a fixture no sandbox (run_lint_fixture).
-SSOT_CMD_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
-  | grep '^ONION_COMMANDS_TOTAL=' | cut -d= -f2)"
+# ⚠️ UM inventário por bancada (2026-10-13): eram CINCO `inventory.sh --env` por processo, iguais, e cada
+#    worker da fila dinâmica pagava os cinco antes de pegar vaga. Agora o --env é lido uma vez (pelo pai,
+#    que o passa aos workers; ou do cache pela sha256 do retrato) e as cinco linhas saem dele.
+_inv_from="pai"
+if [ -z "${SELFTEST_INVENTORY_ENV}" ]; then
+  _inventory_env "${SANDBOX}" "$(_snapshot_key "${SELFTEST_SNAPSHOT}")"; _inv_from="${SELFTEST_STARTUP_WHY}"
+fi
+# trailer do worker: de onde vieram o retrato e o inventário (o pai conta e declara no sumário)
+if [ "${SELFTEST_CHILD}" = "1" ]; then
+  echo "#ONION_SELFTEST_STARTUP retrato=$( [ -n "${_SNAPDIR}" ] && echo proprio || echo pai ) inventario=${_inv_from// /_}"
+fi
+_inv_get() { local v; v="$(grep "^$1=" <<< "${SELFTEST_INVENTORY_ENV}" || true)"; printf '%s' "${v#*=}"; }
+SSOT_CMD_TOTAL="$(_inv_get ONION_COMMANDS_TOTAL)"
 SSOT_CMD_DRIFT="$(( ${SSOT_CMD_TOTAL:-0} + 7 ))"   # offset != 0 → sempre divergente
 # __ONION_AGENTS_TOTAL__ → contagem real de agentes (usado por fixtures da frase
 # COMBINADA 'N agentes e M comandos', onde só o lado comandos deve divergir).
-SSOT_AGENT_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
-  | grep '^ONION_AGENTS_TOTAL=' | cut -d= -f2)"
+SSOT_AGENT_TOTAL="$(_inv_get ONION_AGENTS_TOTAL)"
 # __ONION_AGENTS_DRIFT__ → total de agentes + offset (fixtures BARE 'N agentes
 # especializados/IA' bad + goods que provam as guardas anti-FP).
 SSOT_AGENT_DRIFT="$(( ${SSOT_AGENT_TOTAL:-0} + 3 ))"
 # __ONION_AGENT_CATEGORIES__ → nº real de categorias de AGENTE (≠ categorias de comando);
 # __ONION_AGENT_CATEGORIES_DRIFT__ → + offset (caso BAD: divergência garantida da SSOT de agent-cats).
-SSOT_AGENT_CATS="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
-  | grep '^ONION_AGENT_CATEGORIES=' | cut -d= -f2)"
+SSOT_AGENT_CATS="$(_inv_get ONION_AGENT_CATEGORIES)"
 SSOT_AGENT_CATS_DRIFT="$(( ${SSOT_AGENT_CATS:-0} + 3 ))"
 # __ONION_SKILLS_TOTAL__ / __ONION_KBS_TOTAL__ → reais (formato COMPOSTO: só comandos diverge; skills/KBs casam).
-SSOT_SKILL_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
-  | grep '^ONION_SKILLS_TOTAL=' | cut -d= -f2)"
-SSOT_KB_TOTAL="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null \
-  | grep '^ONION_KBS_TOTAL=' | cut -d= -f2)"
+SSOT_SKILL_TOTAL="$(_inv_get ONION_SKILLS_TOTAL)"
+SSOT_KB_TOTAL="$(_inv_get ONION_KBS_TOTAL)"
 # __ONION_SKILLS_DRIFT__ / __ONION_KBS_DRIFT__ → total + offset (fixtures BAD dos novos
 # feeders 'N skills' bare-ancorado, tabela invertida e 'Knowledge Bases (N documentos)').
 SSOT_SKILL_DRIFT="$(( ${SSOT_SKILL_TOTAL:-0} + 3 ))"
@@ -1493,6 +1798,13 @@ run_kg_fixture() {
       ;;
   esac
 }
+
+# ═══ ONION-BENCH: FIM DO MOTOR — daqui até o marcador do SUMÁRIO, só famílias e os helpers delas ═══
+# FRONTEIRA DECLARADA (decisão do maestro de 2026-10-13, «Blocos mudados + núcleo»): tudo ACIMA desta linha é o
+# MOTOR da bancada — opções, dispatcher, `_family`, vagas da máquina, seletor e mapa, fila dinâmica, arranque,
+# sandbox e os helpers comuns (record_*, run_*_fixture). Linha de código mudada no motor ⇒ a COMPLETA, inclusive
+# no nível PR do CI. Entre os dois marcadores vale a regra do BLOCO: muda o bloco de uma família ⇒ ela + quem lê
+# a bancada + o núcleo. Marcador ausente, duplicado ou fora de ordem, ou família fora da região ⇒ a completa.
 
 # ---------------------------------------------------------------------------
 # Modo kg-freshness/schema — guardas de frescor + versão de schema do kg-radar.sh
@@ -20989,8 +21301,12 @@ run_selftest_selection_selftests() {
   local d; d="$(mktemp -d)"; mkdir -p "${d}/.claude/validation"
   cp "${sut}" "${d}/.claude/validation/lint-selftest.sh"
   local c="${d}/.claude/validation/lint-selftest.sh"
-  printf '%s\n' 'run_zz_a_selftests() {' '  _zzh() { echo a; }' '  record_pass "zz a"' '}' '_family run_zz_a_selftests' \
-    'run_zz_b_selftests() {' '  _zzh' '}' '_family run_zz_b_selftests' >> "${c}"
+  # as famílias sintéticas entram ANTES do marcador do sumário: depois dele é motor, e família lá é recusada
+  python3 -c 'import sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); mk = "\n# ═══ ONION-BENCH: INÍCIO DO SUMÁRIO"; i = s.index(mk) + 1
+add = "\n".join(sys.argv[2:]) + "\n"
+open(p, "w", encoding="utf-8").write(s[:i] + add + s[i:])' "${c}" 'run_zz_a_selftests() {' '  _zzh() { echo a; }' '  record_pass "zz a"' '}' '_family run_zz_a_selftests' \
+    'run_zz_b_selftests() {' '  _zzh' '}' '_family run_zz_b_selftests'
   git -C "${d}" init -q && git -C "${d}" add -A && git -C "${d}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
   _sel_run() { (cd "${d}" && bash "${c}" "$@" --dry-run 2>&1) || true; }
   _sel_reset() { git -C "${d}" reset -q 2>/dev/null; git -C "${d}" checkout -q -- . 2>/dev/null; }
@@ -21010,12 +21326,15 @@ run_selftest_selection_selftests() {
   # (c2) linha de CÓDIGO fora de família (cabeçalho) ⇒ TODAS, com a linha impressa
   sed -i 's/^SELFTEST_EXPECTED_EXIT=0 /SELFTEST_EXPECTED_EXIT=0  /' "${c}"
   out="$(_sel_run --affected .claude/validation/lint-selftest.sh)"
-  if grep -q 'famílias=<todas>' <<< "${out}" && grep -q 'fora de família — cabeçalho/helper/seletor: SELFTEST_EXPECTED_EXIT' <<< "${out}"; then
+  if grep -q 'famílias=<todas>' <<< "${out}" && grep -qE '(fora de família — cabeçalho/helper/seletor|no MOTOR da bancada \(fora dos marcadores ONION-BENCH\)): SELFTEST_EXPECTED_EXIT' <<< "${out}"; then
     record_pass "selftest-selection: (c2) código fora de família ⇒ todas, com a linha que causou impressa"
   else record_fail "selftest-selection: (c2) cabeçalho" "$(grep -E '^(dry-run|  failsafe)' <<< "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   _sel_reset
   # (c3) família NOVA (bloco + linha _family) ⇒ só ela; (c4) comentário de topo ⇒ não compra tudo
-  printf '%s\n' 'run_zz_new_selftests() {' '  record_pass "zz new"' '}' '_family run_zz_new_selftests' '# nota de topo' >> "${c}"
+  python3 -c 'import sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); i = s.index("\n# ═══ ONION-BENCH: INÍCIO DO SUMÁRIO") + 1
+open(p, "w", encoding="utf-8").write(s[:i] + "\n".join(sys.argv[2:]) + "\n" + s[i:])' "${c}" \
+    'run_zz_new_selftests() {' '  record_pass "zz new"' '}' '_family run_zz_new_selftests' '# nota de topo'
   out="$(_sel_run --affected .claude/validation/lint-selftest.sh)"
   if grep -q '^dry-run: famílias=.*zz_new' <<< "${out}" && ! grep -q 'famílias=<todas>' <<< "${out}"; then
     record_pass "selftest-selection: (c3) família nova + comentário de topo ⇒ a nova, não todas"
@@ -30920,15 +31239,21 @@ run_two_tier_bench_selftests() {
     else record_fail "two-tier-bench: (b) não mapeado" "$(_emit "${out}" | head -c 240)"; fi
   else record_fail "two-tier-bench: (b) não mapeado" "não consegui montar o commit sintético"; fi
 
-  # (c) O DIFF TOCA A BANCADA OU A INFRA DO CI ⇒ completa — três portas, cada uma com o caminho no motivo
+  # (c) O DIFF TOCA A INFRA DO CI ⇒ completa — duas portas, cada uma com o caminho no motivo. A BANCADA saiu desta
+  #     lista em 2026-10-13 (D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA): ela vai à regra do BLOCO; trocada INTEIRA (aqui,
+  #     por um conteúdo sem os marcadores do motor) ela segue comprando a completa, pela fronteira ausente.
   local _p _bad_c=""
-  for _p in .claude/validation/lint-selftest.sh .github/workflows/onion-selftest.yml ops/testing/selftest-shard-plan.sh; do
+  for _p in .github/workflows/onion-selftest.yml ops/testing/selftest-shard-plan.sh; do
     if c="$(_ttb_commit "${_p}")"; then
       out="$(_ttb_sel --range "HEAD...${c}")"
-      grep -qx 'nivel=completo' <<< "${out}" && grep -qF "motivo=${_p} é a bancada ou a infra do CI" <<< "${out}" || _bad_c="${_bad_c} ${_p}"
+      grep -qx 'nivel=completo' <<< "${out}" && grep -qF "motivo=${_p} é a infra do CI" <<< "${out}" || _bad_c="${_bad_c} ${_p}"
     else _bad_c="${_bad_c} ${_p}(commit)"; fi
   done
-  if [ -z "${_bad_c}" ]; then record_pass "two-tier-bench: (c) diff na bancada/infra (lint-selftest.sh, workflow, ops/testing) ⇒ completa"
+  if c="$(_ttb_commit .claude/validation/lint-selftest.sh)"; then
+    out="$(_ttb_sel --range "HEAD...${c}")"
+    grep -qx 'nivel=completo' <<< "${out}" && grep -q '^motivo=failsafe do mapa: fronteira do motor ausente' <<< "${out}" || _bad_c="${_bad_c} lint-selftest.sh(sem-marcadores)"
+  else _bad_c="${_bad_c} lint-selftest.sh(commit)"; fi
+  if [ -z "${_bad_c}" ]; then record_pass "two-tier-bench: (c) diff na infra do CI (workflow, ops/testing) ⇒ completa; bancada trocada sem os marcadores do motor ⇒ completa"
   else record_fail "two-tier-bench: (c) infra sem completa" "${_bad_c}"; fi
 
   # (d) LABEL ci:full ⇒ completa, mesmo num diff que só pediria o núcleo; nome PARECIDO não conta
@@ -30947,11 +31272,12 @@ run_two_tier_bench_selftests() {
     record_pass "two-tier-bench: (e) range ilegível ⇒ completa; range vazio ⇒ exit 2"
   else record_fail "two-tier-bench: (e) range" "$(_emit "${out}" | head -c 200) · rc_vazio=${_rce}"; fi
 
-  # (f) A PRÓPRIA BANCADA, pelo --affected-range da lint-selftest.sh (sem a política do script): tudo
+  # (f) A PRÓPRIA BANCADA, pelo --affected-range da lint-selftest.sh (sem a política do script): trocada inteira,
+  #     sem os marcadores do motor, compra tudo — e diz por quê (a regra do BLOCO, lida do range, recusa)
   if c="$(_ttb_commit .claude/validation/lint-selftest.sh)"; then
     out="$(bash "${REPO_ROOT}/.claude/validation/lint-selftest.sh" --dry-run --affected-range "HEAD...${c}" 2>&1 || true)"
-    if grep -q '^dry-run: famílias=<todas>' <<< "${out}" && grep -q 'failsafe: a própria bancada' <<< "${out}"; then
-      record_pass "two-tier-bench: (f) --affected-range com a bancada no range ⇒ todas, com o motivo"
+    if grep -q '^dry-run: famílias=<todas>' <<< "${out}" && grep -q 'failsafe: fronteira do motor ausente' <<< "${out}"; then
+      record_pass "two-tier-bench: (f) --affected-range com a bancada trocada sem marcadores ⇒ todas, com o motivo"
     else record_fail "two-tier-bench: (f) range com a bancada" "$(grep -E '^(dry-run|  failsafe)' <<< "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   else record_fail "two-tier-bench: (f) range com a bancada" "não consegui montar o commit sintético"; fi
 
@@ -31657,6 +31983,211 @@ for ln in m.group(1).splitlines():
   else record_skip "merge-skip-ci: (l) ops/apply-ruleset-main.sh ausente"; fi
 }
 _family run_merge_skip_ci_selftests || true
+
+# Modo selector-per-file — o MAPA POR ARQUIVO (decisão do maestro de 2026-10-13, «1+2 juntos, medido»). Medido
+# antes da cura com `ops/testing/selection-replay.sh` nos 50 últimos PRs mergeados: o PR seletivo caía em
+# 78–115 famílias porque prosa, grafo e resíduo de docs/ casavam por PREFIXO todo diretório que algum script
+# da família NOMEASSE. Cada classe tem destino fixo e derivado; o failsafe e o nível PR não mudam.
+run_selector_per_file_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
+  command -v python3 >/dev/null 2>&1 || { record_skip "selector-per-file: python3 ausente (sem mapa)"; return; }
+  _spf_sel() {  # imprime ",f1,f2,…," ou ALL
+    local o l; o="$(LC_ALL=C bash "${sut}" --dry-run "$@" 2>&1 || true)"
+    l="$(grep -m1 '^dry-run: famílias=' <<< "${o}" || true)"; l="${l#dry-run: famílias=}"; l="${l%% jobs=*}"
+    if [ "${l}" = "<todas>" ]; then echo ALL; else echo ",${l},"; fi
+  }
+  _spf_n() { local s="${1#,}"; s="${s%,}"; [ "$1" = "ALL" ] && echo 999 || tr ',' '\n' <<< "${s}" | grep -c . || true; }
+  local s n kg="" prose=""
+  # (a) RESÍDUO → poucas: só quem lê resíduo (a REGRA 56, o ledger, o pr-finalize…) + o núcleo. Nada de quem
+  #     só varre `*.md` do repo inteiro (o resíduo nunca é citado pelo nome: o nome é o slug da branch).
+  s="$(_spf_sel --affected docs/evolution/review/zz-spf-residuo.md)"; n="$(_spf_n "${s}")"
+  if [ "${s}" != "ALL" ] && [ "${n}" -le 30 ] && [[ "${s}" == *",review_artifact,"* ]] && [[ "${s}" == *",review_ledger,"* ]] \
+     && [[ "${s}" == *",gitattributes_eol,"* ]] && [[ "${s}" != *",vendor_scrub,"* ]] && [[ "${s}" != *",plugin_bundle,"* ]] \
+     && [[ "${s}" != *",durable_commit,"* ]]; then
+    record_pass "selector-per-file: (a) resíduo ⇒ ${n} famílias, com review_artifact/review_ledger/núcleo, sem varredora de *.md nem quem só varre o ancestral docs/evolution/ (durable_commit)"
+  else record_fail "selector-per-file: (a) resíduo" "n=${n} sel=${s:0:200}"; fi
+  # (b) GRAFO → as famílias de grafo (quem lê .kg.yaml), não as de resíduo, e menos que o prefixo de diretório dava
+  kg="docs/onion/graph/onion-identity-2026-07.kg.yaml"
+  [ -f "${REPO_ROOT}/${kg}" ] || kg="$(git -C "${REPO_ROOT}" ls-files 'docs/onion/graph/*.kg.yaml' | sed -n 1p)"
+  if [ -z "${kg}" ]; then record_skip "selector-per-file: (b) nenhum .kg.yaml rastreado em docs/onion/graph/"
+  else
+    s="$(_spf_sel --affected "${kg}")"; n="$(_spf_n "${s}")"
+    if [ "${s}" != "ALL" ] && [[ "${s}" == *",kg_radar_integrity,"* ]] && [[ "${s}" == *",backlog_projection,"* ]] \
+       && [[ "${s}" != *",review_artifact,"* ]] && [[ "${s}" != *",review_ledger,"* ]]; then
+      record_pass "selector-per-file: (b) grafo ${kg##*/} ⇒ ${n} famílias de grafo (kg_radar_integrity, backlog_projection), sem as de resíduo"
+    else record_fail "selector-per-file: (b) grafo" "n=${n} sel=${s:0:200}"; fi
+  fi
+  # (c) PROSA → núcleo + varredoras: um diretório só NOMEADO num rótulo de `case` (`docs/analysis/*) return 0`)
+  #     não liga a família; quem de fato o lê (evolve_census) entra; a família do resíduo não
+  prose="docs/analysis/bancada-faixas-e-mapa-2026-09.md"
+  s="$(_spf_sel --affected "${prose}")"; n="$(_spf_n "${s}")"
+  if [ "${s}" != "ALL" ] && [[ "${s}" == *",gitattributes_eol,"* ]] && [[ "${s}" == *",evolve_census,"* ]] \
+     && [[ "${s}" != *",review_artifact,"* ]] && [[ "${s}" != *",ladder_integrity,"* ]] && [[ "${s}" != *",doctrine_freshness,"* ]]; then
+    record_pass "selector-per-file: (c) prosa ⇒ ${n} famílias: núcleo + quem lê docs/analysis/ (evolve_census); rótulo de case não liga; glob *.md de outro diretório (doctrine_freshness) não liga"
+  else record_fail "selector-per-file: (c) prosa" "n=${n} sel=${s:0:200}"; fi
+  # (d) DESCONHECIDO → completa (o failsafe fica): arquivo do domínio que nenhuma família cita
+  s="$(_spf_sel --affected .claude/validation/zz-spf-nao-citado.sh)"
+  if [ "${s}" = "ALL" ]; then record_pass "selector-per-file: (d) arquivo do domínio não citado ⇒ completa (failsafe intacto)"
+  else record_fail "selector-per-file: (d) desconhecido" "sel=${s:0:160}"; fi
+  # (e) INFRA → no pre-commit (--local) núcleo local + quem cita; sem --local segue a completa (nível PR)
+  local sl sa; sl="$(_spf_sel --affected .github/workflows/onion-validate.yml --local)"; sa="$(_spf_sel --affected .github/workflows/onion-validate.yml)"
+  if [ "${sa}" = "ALL" ] && [ "${sl}" != "ALL" ] && [[ "${sl}" == *",selftest_lanes,"* ]] && [[ "${sl}" == *",machine_slots,"* ]]; then
+    record_pass "selector-per-file: (e) infra ⇒ completa sem --local; faixa local (núcleo local) com --local"
+  else record_fail "selector-per-file: (e) infra" "local=${sl:0:120} | sem-local=${sa:0:40}"; fi
+  # (f) o MAPA declara a forma: diretório de docs/ só nomeado sai `weak-named`, e o resíduo não herda o ancestral
+  local map; map="$(bash "${sut}" --map 2>/dev/null || true)"
+  if grep -q $'\tweak-named$' <<< "${map}" && [ -z "$(awk -F'\t' '$3=="weak-named" && $2 !~ /^docs\//' <<< "${map}")" ]; then
+    record_pass "selector-per-file: (f) --map: weak-named existe e só em docs/ ($(grep -c $'\tweak-named$' <<< "${map}") entradas)"
+  else record_fail "selector-per-file: (f) --map" "weak-named ausente ou fora de docs/"; fi
+  # (g) arquivo de docs/ de OUTRO tipo segue a regra antiga (prefixo de diretório) — a cura não estreitou o resto
+  s="$(_spf_sel --affected docs/evolution/federation/members.yaml)"
+  if [ "${s}" != "ALL" ] && [[ "${s}" == *",codeliver,"* ]] && [[ "${s}" == *",corelay,"* ]]; then
+    record_pass "selector-per-file: (g) dado de docs/ (members.yaml) segue selecionando quem o lê (codeliver, corelay)"
+  else record_fail "selector-per-file: (g) dado" "sel=${s:0:160}"; fi
+  # (h) FALSO NEGATIVO DO #1068, fechado: a população que o corpo de kg_fixture_paths VARRE (`grep -rl` do
+  #     predicado em .claude/validation e .claude/utils) entra no mapa — mexer em migrate-seed-graph.sh a seleciona
+  s="$(_spf_sel --affected .claude/utils/adopt/migrate-seed-graph.sh)"
+  if [ "${s}" != "ALL" ] && [[ "${s}" == *",kg_fixture_paths,"* ]] && [[ "${s}" == *",migrate_seed_graph,"* ]]; then
+    record_pass "selector-per-file: (h) migrate-seed-graph.sh ⇒ kg_fixture_paths (a que varre os consumidores do predicado) e migrate_seed_graph"
+  else record_fail "selector-per-file: (h) população varrida" "sel=${s:0:200}"; fi
+  # (h2) LEITOR DO BLOCO QUE QUEBRA ⇒ completa (fail-closed). Cópia num repo próprio: o commit-base tem o leitor
+  #      com erro de sintaxe e a árvore muda só um bloco de família — antes desta cura, saída vazia estreitava
+  local dq; dq="$(mktemp -d)"; mkdir -p "${dq}/.claude/validation"
+  cp "${sut}" "${dq}/.claude/validation/lint-selftest.sh"
+  python3 -c 'import sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); k = "\nimport os, re, subprocess, sys\nroot, rel, mode"
+s = s.replace(k, "\nimport os, re, subprocess, sys\ndef zz_quebrado(:\nroot, rel, mode", 1); open(p, "w", encoding="utf-8").write(s)' "${dq}/.claude/validation/lint-selftest.sh"
+  git -C "${dq}" init -q && git -C "${dq}" add -A && git -C "${dq}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  sed -i 's/^run_a2a_accept_selftests() {$/run_a2a_accept_selftests() {\n  : "zz-h2"/' "${dq}/.claude/validation/lint-selftest.sh"
+  out="$( (cd "${dq}" && LC_ALL=C bash .claude/validation/lint-selftest.sh --affected .claude/validation/lint-selftest.sh --dry-run 2>&1) || true)"
+  rm -rf "${dq}"
+  if grep -q '^dry-run: famílias=<todas>' <<< "${out}" && grep -q 'o leitor do bloco falhou' <<< "${out}"; then
+    record_pass "selector-per-file: (h2) leitor do bloco quebrado ⇒ completa, declarado (nunca estreita no incerto)"
+  else record_fail "selector-per-file: (h2) leitor quebrado" "$(grep -E '^(dry-run|  failsafe|  bloco)' <<< "${out}" | tr '\n' ' ' | cut -c1-220)"; fi
+
+  # (i)-(k) NÍVEL PR COM A BANCADA NO DIFF (D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA, 2026-10-13): commits sintéticos filhos de
+  #     HEAD, só no armazém de objetos (índice temporário + commit-tree, sem ref), com a bancada de HEAD transformada
+  local pol="${REPO_ROOT}/ops/testing/selftest-pr-selection.sh" total c
+  git -C "${REPO_ROOT}" rev-parse -q --verify HEAD >/dev/null 2>&1 && [ -f "${pol}" ] \
+    || { record_skip "selector-per-file: (i)-(k) sem HEAD ou sem a política do nível PR"; return; }
+  local _head_bench; _head_bench="$(git -C "${REPO_ROOT}" show HEAD:.claude/validation/lint-selftest.sh 2>/dev/null || true)"
+  grep -q '^# ═══ ONION-BENCH: FIM DO MOTOR' <<< "${_head_bench}" \
+    || { record_skip "selector-per-file: (i)-(k) a bancada de HEAD ainda não tem os marcadores do motor"; return; }
+  total="$(bash "${sut}" --list 2>/dev/null | grep -c . || true)"
+  _spf_commit() {  # $1 = fam|motor|nomarker → sha do commit sintético
+    local tmp idx blob tree
+    tmp="$(mktemp)"; idx="$(mktemp)"; rm -f "${idx}"
+    git -C "${REPO_ROOT}" show HEAD:.claude/validation/lint-selftest.sh > "${tmp}" || { rm -f "${tmp}"; return 1; }
+    python3 -c 'import sys
+p, mode = sys.argv[1], sys.argv[2]; L = open(p, encoding="utf-8").read().split("\n")
+if mode == "fam":
+    i = L.index("run_a2a_accept_selftests() {"); L.insert(i + 1, "  : \"zz-spf-bloco\"")
+elif mode == "motor":
+    i = next(k for k, l in enumerate(L) if l.startswith("SELFTEST_EXPECTED_EXIT=0")); L.insert(i + 1, ": \"zz-spf-motor\"")
+else:
+    L = [l for l in L if not l.startswith("# ═══ ONION-BENCH: FIM DO MOTOR")]
+open(p, "w", encoding="utf-8").write("\n".join(L))' "${tmp}" "$1" || { rm -f "${tmp}"; return 1; }
+    blob="$(git -C "${REPO_ROOT}" hash-object -w "${tmp}")"; rm -f "${tmp}"
+    GIT_INDEX_FILE="${idx}" git -C "${REPO_ROOT}" read-tree HEAD || { rm -f "${idx}"; return 1; }
+    GIT_INDEX_FILE="${idx}" git -C "${REPO_ROOT}" update-index --cacheinfo "100755,${blob},.claude/validation/lint-selftest.sh" || { rm -f "${idx}"; return 1; }
+    tree="$(GIT_INDEX_FILE="${idx}" git -C "${REPO_ROOT}" write-tree)"; rm -f "${idx}"
+    git -C "${REPO_ROOT}" -c user.email=t@t -c user.name=t commit-tree "${tree}" -p HEAD -m selector-per-file
+  }
+  local _f _n
+  # (i) BLOCO de família mudado ⇒ seletivo: ela + quem lê a bancada + o núcleo da bancada, menos que todas
+  if c="$(_spf_commit fam)"; then
+    out="$(LC_ALL=C bash "${pol}" --range "HEAD...${c}" 2>/dev/null || true)"
+    _f="$(sed -n 's/^familias=//p' <<< "${out}")"; _n="$(tr ',' '\n' <<< "${_f}" | grep -c . || true)"
+    if grep -qx 'nivel=seletivo' <<< "${out}" && [[ ",${_f}," == *",a2a_accept,"* ]] && [[ ",${_f}," == *",selftest_lanes,"* ]] \
+       && [[ ",${_f}," == *",machine_slots,"* ]] && [[ ",${_f}," == *",shared_startup,"* ]] && [ "${_n}" -lt "${total:-0}" ]; then
+      record_pass "selector-per-file: (i) nível PR, bloco de a2a_accept mudado ⇒ seletivo: ela + núcleo da bancada (${_n} de ${total})"
+    else record_fail "selector-per-file: (i) bloco no nível PR" "$(head -c 260 <<< "${out}")"; fi
+  else record_fail "selector-per-file: (i) bloco no nível PR" "não montei o commit sintético"; fi
+  # (j) MOTOR mudado (linha de código antes do marcador FIM DO MOTOR) ⇒ completa, e o motivo diz MOTOR
+  if c="$(_spf_commit motor)"; then
+    out="$(LC_ALL=C bash "${pol}" --range "HEAD...${c}" 2>/dev/null || true)"
+    if grep -qx 'nivel=completo' <<< "${out}" && grep -q '^motivo=.*no MOTOR da bancada' <<< "${out}"; then
+      record_pass "selector-per-file: (j) nível PR, motor mudado ⇒ completa (motivo: MOTOR)"
+    else record_fail "selector-per-file: (j) motor" "$(head -c 260 <<< "${out}")"; fi
+  else record_fail "selector-per-file: (j) motor" "não montei o commit sintético"; fi
+  # (k) MARCADOR removido ⇒ completa pela fronteira ausente (o failsafe da fronteira, não a regra do bloco)
+  if c="$(_spf_commit nomarker)"; then
+    out="$(LC_ALL=C bash "${pol}" --range "HEAD...${c}" 2>/dev/null || true)"
+    if grep -qx 'nivel=completo' <<< "${out}" && grep -q '^motivo=.*fronteira do motor ausente' <<< "${out}"; then
+      record_pass "selector-per-file: (k) nível PR, marcador do motor removido ⇒ completa (fronteira ausente)"
+    else record_fail "selector-per-file: (k) marcador" "$(head -c 260 <<< "${out}")"; fi
+  else record_fail "selector-per-file: (k) marcador" "não montei o commit sintético"; fi
+}
+_family run_selector_per_file_selftests
+
+# Modo shared-startup — o ARRANQUE COMPARTILHADO (mesma decisão). Cada worker da fila dinâmica fazia o tar de
+# .claude+docs e cinco `inventory.sh --env` antes de pegar vaga. O pai faz o retrato e o inventário uma vez;
+# o worker extrai a cópia dele. O isolamento tem de continuar: família que escreve no retrato dela não afeta outra.
+run_shared_startup_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/lint-selftest.sh" d out
+  d="$(mktemp -d)"
+  # (a) ISOLAMENTO: duas extrações do mesmo retrato; escrever (e apagar) numa não muda a outra nem o retrato
+  mkdir -p "${d}/root/.claude/validation" "${d}/root/docs"
+  printf 'x\n' > "${d}/root/docs/a.md"; printf 'claude\n' > "${d}/root/CLAUDE.md"
+  printf '#!/usr/bin/env bash\necho run >> "%s/inv.count"\necho ONION_COMMANDS_TOTAL=7\necho ONION_KBS_TOTAL=3\n' "${d}" > "${d}/root/.claude/validation/inventory.sh"
+  local snap="${d}/snap.tar" k0 k1
+  if _snapshot_create "${d}/root" "${snap}"; then
+    k0="$(_snapshot_key "${snap}")"
+    mkdir -p "${d}/w1" "${d}/w2"; tar -C "${d}/w1" -xf "${snap}"; tar -C "${d}/w2" -xf "${snap}"
+    printf 'MUDOU\n' > "${d}/w1/docs/a.md"; rm -f "${d}/w1/CLAUDE.md"; printf 'novo\n' > "${d}/w1/docs/b.md"
+    if [ "$(cat "${d}/w2/docs/a.md")" = "x" ] && [ -f "${d}/w2/CLAUDE.md" ] && [ ! -e "${d}/w2/docs/b.md" ] \
+       && [ "$(_snapshot_key "${snap}")" = "${k0}" ] && [ ! -w "${snap}" ]; then
+      record_pass "shared-startup: (a) isolamento — o worker que escreve/apaga no retrato dele não muda o do outro nem o retrato (read-only)"
+    else record_fail "shared-startup: (a) isolamento" "w2/a.md=[$(cat "${d}/w2/docs/a.md" 2>&1)] chave=$( [ "$(_snapshot_key "${snap}")" = "${k0}" ] && echo igual || echo MUDOU ) w=$( [ -w "${snap}" ] && echo gravavel || echo ro )"; fi
+  else record_fail "shared-startup: (a) retrato" "_snapshot_create falhou na raiz de fixture"; fi
+  # (b) CACHE do inventário pela chave do retrato: 1ª calcula, 2ª lê do cache (o inventário NÃO roda), retrato
+  #     novo (um byte) ⇒ chave nova ⇒ recalcula; cache corrompido ⇒ recalcula; diretório de cache gravável por
+  #     outros ⇒ recusado (calcula, nunca lê de lá)
+  local SELFTEST_INVENTORY_ENV="" SELFTEST_STARTUP_WHY="" c1 c2 c3 w1 w2 w3 w4
+  local ONION_SELFTEST_INVENTORY_CACHE_DIR="${d}/cache"; export ONION_SELFTEST_INVENTORY_CACHE_DIR
+  : > "${d}/inv.count"
+  _inventory_env "${d}/w2" "${k0}"; w1="${SELFTEST_STARTUP_WHY}"; c1="$(grep -c . "${d}/inv.count" || true)"
+  _inventory_env "${d}/w2" "${k0}"; w2="${SELFTEST_STARTUP_WHY}"; c2="$(grep -c . "${d}/inv.count" || true)"
+  local v; v="$(grep '^ONION_KBS_TOTAL=' <<< "${SELFTEST_INVENTORY_ENV}" || true)"
+  printf 'y\n' > "${d}/root/docs/a.md"; chmod u+w "${snap}"; rm -f "${snap}"; _snapshot_create "${d}/root" "${snap}" || true
+  k1="$(_snapshot_key "${snap}")"
+  _inventory_env "${d}/w2" "${k1}"; w3="${SELFTEST_STARTUP_WHY}"; c3="$(grep -c . "${d}/inv.count" || true)"
+  : > "${d}/cache/${k1}.env"   # corrompido (vazio)
+  _inventory_env "${d}/w2" "${k1}"; w4="${SELFTEST_STARTUP_WHY}"
+  if [[ "${w1}" == calculado* ]] && [ "${c1}" = "1" ] && [[ "${w2}" == cache* ]] && [ "${c2}" = "1" ] \
+     && [ "${v}" = "ONION_KBS_TOTAL=3" ] && [ "${k1}" != "${k0}" ] && [[ "${w3}" == calculado* ]] && [ "${c3}" = "2" ] \
+     && [[ "${w4}" == calculado* ]]; then
+    record_pass "shared-startup: (b) cache do inventário — calcula, reusa pela chave (inventário não roda), retrato mudou ⇒ recalcula, cache vazio ⇒ recalcula"
+  else record_fail "shared-startup: (b) cache" "w1=${w1} c1=${c1} w2=${w2} c2=${c2} v=${v} k0=${k0:0:8} k1=${k1:0:8} w3=${w3} c3=${c3} w4=${w4}"; fi
+  chmod 777 "${d}/cache"; : > "${d}/inv.count"
+  _inventory_env "${d}/w2" "${k1}"; w1="${SELFTEST_STARTUP_WHY}"; c1="$(grep -c . "${d}/inv.count" || true)"
+  chmod 700 "${d}/cache"
+  if [[ "${w1}" == calculado* ]] && [ "${c1}" = "1" ]; then
+    record_pass "shared-startup: (c) cache gravável por outros ⇒ recusado (calcula; nunca lê número de diretório alheio)"
+  else record_fail "shared-startup: (c) cache inseguro" "why=${w1} execuções=${c1}"; fi
+  unset ONION_SELFTEST_INVENTORY_CACHE_DIR
+  # (d) PONTA A PONTA: a faixa paralela declara que os workers usaram o retrato e o inventário do pai, e passa
+  out="$(LC_ALL=C bash "${sut}" --jobs 2 --families a2a_accept,adopter_gate 2>&1 || true)"
+  if grep -q '^  Arranque : 2/2 worker' <<< "${out}" && grep -q 'retrato da árvore e inventário feitos 1× pelo pai' <<< "${out}" \
+     && grep -qE '^  Falharam : 0$' <<< "${out}"; then
+    record_pass "shared-startup: (d) --jobs 2: os 2 workers usaram retrato e inventário do pai, e a bancada passa"
+  else record_fail "shared-startup: (d) ponta a ponta" "$(grep -E 'Arranque|arranque|Falharam' <<< "${out}" | tr '\n' '|' | cut -c1-240)"; fi
+  # (e) O RETRATO NÃO VAZA para bancada aninhada nem sobrevive ao sumiço: sem --child a variável é ignorada;
+  #     com --child e o arquivo sumido, o worker diz e faz o próprio
+  out="$(ONION_SELFTEST_SNAPSHOT="${d}/nao-existe.tar" LC_ALL=C bash "${sut}" --families a2a_accept 2>&1 || true)"
+  local out2; out2="$(ONION_SELFTEST_CHILD=1 ONION_SELFTEST_SNAPSHOT="${d}/nao-existe.tar" ONION_SELFTEST_FAMILIES=a2a_accept LC_ALL=C bash "${sut}" 2>&1 || true)"
+  if ! grep -q 'retrato do pai' <<< "${out}" && grep -qE '^  Falharam : 0$' <<< "${out}" \
+     && grep -q 'retrato do pai .* sumiu' <<< "${out2}" && grep -q '^#ONION_SELFTEST_STARTUP retrato=proprio' <<< "${out2}"; then
+    record_pass "shared-startup: (e) fora de --child o retrato herdado é ignorado; worker com retrato sumido declara e faz o próprio"
+  else record_fail "shared-startup: (e) vazamento/sumiço" "fora=$(grep -c 'retrato do pai' <<< "${out}") filho=$(grep -E 'sumiu|STARTUP' <<< "${out2}" | tr '\n' '|' | cut -c1-160)"; fi
+  # (f) PARIDADE: o número que a fixture recebe é o mesmo que o inventory.sh dá rodando direto na sandbox
+  local direct; direct="$(bash "${SANDBOX}/.claude/validation/inventory.sh" --env 2>/dev/null | grep '^ONION_COMMANDS_TOTAL=' || true)"
+  if [ -n "${SSOT_CMD_TOTAL}" ] && [ "ONION_COMMANDS_TOTAL=${SSOT_CMD_TOTAL}" = "${direct}" ]; then
+    record_pass "shared-startup: (f) SSOT_CMD_TOTAL=${SSOT_CMD_TOTAL} = inventory.sh direto na sandbox"
+  else record_fail "shared-startup: (f) paridade" "SSOT_CMD_TOTAL=[${SSOT_CMD_TOTAL}] direto=[${direct}]"; fi
+  rm -rf "${d}"
+}
+_family run_shared_startup_selftests
 
 # ── check-member-registered.sh: o registro é lido como YAML, não por regex de fim de linha ───────
 # POR QUE EXISTE (2026-10-07): a regex ancorada no fim da linha não casava `local_path: "/x"  # nota`,
@@ -32910,10 +33441,7 @@ EOF_MUT
 }
 _family run_mcp_onion_kg_writer_selftests
 
-
-
-
-
+# ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — daqui ao fim é MOTOR outra vez (agregação e veredito) ═══
 
 # ---------------------------------------------------------------------------
 # Sumário

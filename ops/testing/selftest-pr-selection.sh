@@ -13,8 +13,12 @@
 # corpo de cada família, com o mesmo failsafe). Este script só acrescenta a POLÍTICA do nível PR, que o
 # pre-commit não tem:
 #   1. label `ci:full` no PR ⇒ completa (o humano pede a garantia inteira);
-#   2. o diff toca a bancada ou a infra do CI (`lint-selftest.sh`, `.github/workflows/*`, `ops/testing/*`)
-#      ⇒ completa — quem muda o juiz não é julgado só por uma fatia dele;
+#   2. o diff toca a infra do CI (`.github/workflows/*`, `ops/testing/*`) ⇒ completa — quem muda o juiz não é
+#      julgado só por uma fatia dele. A BANCADA (`lint-selftest.sh`) MODIFICADA, desde a decisão do maestro de
+#      2026-10-13 («Blocos mudados + núcleo», D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA), vai à regra do BLOCO do
+#      seletor, lida do range: bloco de família mudado ⇒ ela + quem lê a bancada + o núcleo; MOTOR mudado (fora
+#      dos marcadores ONION-BENCH) ⇒ completa. Renomeada/criada/apagada ⇒ completa. A rede é a completa no push
+#      ao main, com alarme e PR de revert (main-bench-alarm.sh, passo D);
 #   3. o seletor não responde, ou responde fora do formato ⇒ completa (recusa no incerto, nunca vazio).
 #
 # Uso  : bash ops/testing/selftest-pr-selection.sh --range <base>...<head> [--labels "a,b,c"]
@@ -52,16 +56,16 @@ for _l in "${_labels[@]+"${_labels[@]}"}"; do
   [ "${_l}" = "ci:full" ] && _decide completo ALL "label ci:full no PR"
 done
 
-# (2) o diff toca a bancada ou a infra do CI. Lido AQUI, à parte, porque a regra do BLOCO do pre-commit
-#     estreita lint-selftest.sh às famílias do bloco mudado — e no nível PR quem muda o juiz roda tudo.
+# (2) o diff toca a infra do CI. Lido AQUI, à parte. A bancada não está mais nesta lista: ela vai ao seletor (3),
+#     cuja regra do BLOCO em modo range devolve a completa quando o MOTOR muda.
 if ! _diff="$(git -C "${ROOT}" -c core.quotepath=off diff --name-status -M --diff-filter=ACMRDT "${RANGE}" -- 2>&1)"; then
   _decide completo ALL "o diff do range ${RANGE} não pôde ser lido: $(printf '%s' "${_diff}" | head -c 120)"
 fi
 while IFS=$'\t' read -r _st _p1 _p2; do
   for _p in "${_p1:-}" "${_p2:-}"; do
     case "${_p}" in
-      .claude/validation/lint-selftest.sh|.github/workflows/*|ops/testing/*)
-        _decide completo ALL "${_p} é a bancada ou a infra do CI" ;;
+      .github/workflows/*|ops/testing/*)
+        _decide completo ALL "${_p} é a infra do CI" ;;
     esac
   done
 done <<< "${_diff}"

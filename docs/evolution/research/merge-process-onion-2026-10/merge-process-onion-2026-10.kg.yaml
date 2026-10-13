@@ -8,7 +8,11 @@ meta:
                                # planos gratuitos de Mergify e Trunk e o estado do funador/claude-code-merge-queue.
                                # A metade doutrina (ímã, escritor único, catracas) é de 12m, mas o gatilho da Opção 3
                                # já disparou: a revisita real é o selo do maestro, não a data.
-  # ═══ TETO: 74 NÓS ═══
+  # ═══ TETO: 76 NÓS ═══
+  # (2026-10-13, +2: o SELO do maestro D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA («Blocos mudados + núcleo», por
+  #  /meta:decide) e a EVIDÊNCIA E_SELETOR_POR_ARQUIVO_E_ARRANQUE_MEDIDO_2026_10_13, com a medição antes/depois do
+  #  seletor por arquivo, do arranque compartilhado e da regra do bloco no nível PR. Carimbo da execução, não onda
+  #  de pesquisa; o teto sobe DECLARADO.)
   # (2026-10-13, +1: a EVIDÊNCIA do defeito do alarme do main e da cura, E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13
   #  — o revert #1087 contra 825e93f6, que só herdou a quebra do ff5abe51 (#1085, #1086, conserto #1088).
   #  Carimbo de execução, não pesquisa nova; o teto sobe DECLARADO em vez de colher um nó: 73 → 74.)
@@ -1284,6 +1288,41 @@ nodes:
       locator: "run_two_tier_bench_selftests, casos (i) (i2) (j1) (j2) (j2b) (j2c) (j3) (j4) (j5) (j6) (j7) (i3) (i4); resíduo docs/evolution/review/fix-main-bench-alarm-blames-first-break.md"
       method: "medição: bancada two_tier_bench 22/22 sob LC_ALL=C e 18 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso; leitura dos PRs e da issue pela API, 2026-10-13"
       locality: "repo"
+  - id: D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "decisão do maestro em 2026-10-13, por pergunta com opções (/meta:decide): escolhida «Blocos mudados + núcleo»"
+    label: "No nível PR do CI, a bancada modificada vai à regra do BLOCO lida do range: famílias cujo bloco mudou, quem lê a bancada e o núcleo; o MOTOR (fora dos marcadores ONION-BENCH) segue comprando a completa."
+    narrative: "Selado por /meta:decide em 2026-10-13: escolhida «Blocos mudados + núcleo»; descartadas: «Manter a completa» · «Quebrar o arquivo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-13: «36 de 50 PRs vão à bancada completa no CI só porque acrescentam casos no lint-selftest.sh. Como o nível PR do CI trata uma mudança nesse arquivo?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      locality: "pessoa"
+  - id: E_SELETOR_POR_ARQUIVO_E_ARRANQUE_MEDIDO_2026_10_13
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-13"
+    verified_against: "bash ops/testing/selection-replay.sh --ranges <os 50 PRs #1031–#1080> --startup --startup-runs 5, com a bancada da origin/main 5736c019 (antes) e a da branch perf/bench-selector-per-file (depois); famílias selector_per_file e shared_startup sob LC_ALL=C; 17 mutantes por ops/mutate-and-restore.sh"
+    source_tier: 10
+    source_kind: primary
+    label: "Medido nos mesmos 50 PRs: o nível PR do CI caiu de 38 para 23 PRs na completa e de p50 255 para 137 famílias (CPU estimada p50 4908→1785 s); o arranque do worker, de 1,81 para 0,46 s; 0 falso negativo nas 11 reprovações reais."
+    narrative: "ANTES (bancada da origin/main 5736c019): nível PR p50=255, p90=255, máx=255, mín=78, 38/50 na completa. Dos 38, 35 só porque o diff tocava a própria bancada (cada PR acrescenta casos), 2 por workflow, 1 por arquivo não citado. A hipótese de partida — o PR típico cai em ~100 famílias pelo mapa por diretório de docs/ — valia só para os 12 seletivos (p50 113). Sem a infra, a parte que o mapa decide tinha p50 131. DEPOIS (mapa por arquivo em docs/ + população varrida pelo corpo + D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA): p50=137, p90=258, 23/50 na completa (8 infra do CI, 6 infra da bancada, 7 arquivo do domínio não citado, 1 motor da bancada, 1 fronteira ambígua de bloco); seletivos (27) p50=107, p90=135. CPU de bancada estimada pela soma dos tempos por família do runner: p50 4908 s → 1785 s (subestima: família sem tempo medido conta 0). ARRANQUE: o pai faz o retrato (tar read-only) e lê o inventário uma vez, com cache pela sha256 do retrato; o worker extrai a cópia dele. Mediana de 5: worker 1,81 → 0,46 s, serial com cache vazio 1,93 → 0,98 s. A META indicativa de 10–30 famílias NÃO foi atingida: o núcleo da bancada é somado sempre que ela muda, e prosa e grafo seguem com ~50–70 famílias por arquivo, porque o fecho script→script põe ~13 famílias em fechos de ~158 scripts e porque glob com variável não resolvida vale o repo inteiro. FALSO NEGATIVO: das 10 runs da bancada que reprovaram nos 50 PRs (11 eventos de família), a política nova seleciona a família reprovada em 11/11; o kg_fixture_paths do #1068 (pré-existente: a família varre os consumidores por grep -rl e o mapa não lia o corpo) está fechado. Achado da passada: o leitor do bloco que quebrava (python rc≠0) devolvia vazio e ESTREITAVA — agora vai à completa. 40 scripts de .claude/ e ops/ seguem sem citação forte e vão à completa (fail-closed); 14 deles ganharam cobertura fraca pelo corpo."
+    trace: "ops/testing/selection-replay.sh"
+    provenance:
+      source: "ops/testing/selection-replay.sh + .claude/validation/lint-selftest.sh (famílias selector_per_file e shared_startup) + ops/testing/selftest-pr-selection.sh, na branch perf/bench-selector-per-file"
+      locator: "linhas #REPLAY, #REPLAY_SEM_INFRA, #REPLAY_SEGUNDOS_CPU, #STARTUP_WORKER e #STARTUP_SERIAL do medidor; mutantes listados no resíduo docs/evolution/review/perf-bench-selector-per-file.md"
+      method: "medição: replay do seletor antes/depois sobre os mesmos 50 diffs mergeados, arranque medido 5× por forma, e mutantes por ops/mutate-and-restore.sh, 2026-10-13"
+      locality: "repo"
 edges:
   - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
     to: C_OPCAO_A_CURE_MAGNET_FILE
@@ -1588,3 +1627,12 @@ edges:
   - from: E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13
     to: Q_MERGE_LOTE_COM_BISSECCAO
     edge_type: TRACES_TO
+  - from: D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: TRACES_TO
+  - from: E_SELETOR_POR_ARQUIVO_E_ARRANQUE_MEDIDO_2026_10_13
+    to: D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA
+    edge_type: SUPPORTS
+  - from: E_SELETOR_POR_ARQUIVO_E_ARRANQUE_MEDIDO_2026_10_13
+    to: D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL
+    edge_type: SUPPORTS

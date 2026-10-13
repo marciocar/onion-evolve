@@ -46,6 +46,39 @@ dois pre-commits. Ficaram duas regras:
    main a roda. A completa local só roda por opt-in (`ONION_SELFTEST_FULL=1` ou `--full`).
 O desenho do passo (3) acima segue valendo onde ele protege, que é o CI. Na máquina compartilhada, ele virou o custo.
 
+**Adendo de 2026-10-13 (2): seletor por arquivo, arranque compartilhado e bancada por bloco no nível PR.** Duas
+decisões do maestro: «1+2 juntos, medido» e «Blocos mudados + núcleo» (`D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA`). A
+evidência é `E_SELETOR_POR_ARQUIVO_E_ARRANQUE_MEDIDO_2026_10_13`, as duas no grafo
+`docs/evolution/research/merge-process-onion-2026-10/`. O medidor versionado é `ops/testing/selection-replay.sh`.
+Ele roda o seletor de hoje sobre os diffs de PRs já mergeados.
+
+A medição derrubou a hipótese do jeito que ela foi posta. Nos 50 PRs #1031–#1080, o PR típico não caía em ~100
+famílias, caía na COMPLETA. Eram 38 de 50, e 35 deles só porque tocavam a própria bancada: todo PR acrescenta
+casos ao `lint-selftest.sh`. As ~100 famílias pelo mapa de docs/ só valiam para os 12 seletivos (p50 113). Três
+curas:
+1. **O MAPA por arquivo em docs/.**
+   - Diretório só NOMEADO não é leitura: mensagem, teste e `mkdir` viram `weak-named`, que cobre só os arquivos
+     que moram nele; rótulo de `case` é ignorado.
+   - O glob `*.md` vale sob o diretório da linha, com a variável resolvida.
+   - O resíduo vai só a quem lê `docs/evolution/review/`.
+   - O mapa também lê a população que o CORPO da família varre (`grep -rl`, `git ls-files`). Isso fechou o falso
+     negativo do #1068 (`kg_fixture_paths` × `migrate-seed-graph.sh`).
+2. **O ARRANQUE.** O pai faz o retrato e o inventário uma vez, com cache pela sha256 do retrato, e o worker
+   extrai a cópia dele. O worker caiu de 1,81 para 0,46 s.
+3. **A BANCADA no nível PR.** Os marcadores `ONION-BENCH` declaram a fronteira do motor.
+   - Bloco de família mudado ⇒ a família, quem lê a bancada e o núcleo da bancada.
+   - Motor mudado, marcador ausente ou leitor do bloco quebrado ⇒ a completa.
+   - A rede é a completa no push ao main, com alarme e revert. A janela vai do merge ao fim dessa bancada.
+
+Resultado nos mesmos 50 PRs: a completa caiu de 38 para 23 PRs. O p50 caiu de 255 para 137 famílias e a CPU
+estimada de 4908 para 1785 s, com 0 falso negativo nas 11 reprovações reais dos 50 PRs.
+
+A meta de 10–30 famílias NÃO veio: o seletivo típico fica em ~107. Ficam duas classes:
+- o fecho script→script (~13 famílias com fechos de ~158 scripts);
+- o glob com variável não resolvida, que vale o repo inteiro e por isso a prosa ainda seleciona ~50 famílias.
+
+Próximo passo medido: podar o fecho por **chamada** (não por nome citado) e resolver o glob por argumento real.
+
 ---
 
 ## Tabelas da pesquisa (recuperadas do run; tier: 8-9 primária · 7 vendor-on-self · 5 vendor-on-competitor · 3-4 blog)
