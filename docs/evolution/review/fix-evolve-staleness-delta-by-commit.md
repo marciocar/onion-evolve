@@ -1,7 +1,7 @@
 ---
 branch: fix/evolve-staleness-delta-by-commit
 date: 2026-10-13
-reviewed_diff_sha256: 9d272b8f035d66f58f44109de4c8812a0015a8722a6aa4ce481bc9e109a5a603
+reviewed_diff_sha256: 0563326d50a792af018398e3962ead17b045245af3a6cd82a98126d503537a4e
 reviewed_code_sha256: 7e58ab02aed3138c593f0c08ec5f9baf110882d51a7f32b5e3bce557ab320241
 findings_total: 4
 findings_real: 2
