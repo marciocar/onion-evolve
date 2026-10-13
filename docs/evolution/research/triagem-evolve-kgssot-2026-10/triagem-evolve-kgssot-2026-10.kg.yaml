@@ -8,7 +8,8 @@ meta:
   schema_version: "1"
   baseline: "2026-10-12"
   review_after: "2026-11-11"   # 30d: defeito de medidor e de guarda
-  # ═══ TETO: 18 NÓS ═══
+  # ═══ TETO: 22 NÓS ═══  (era 18; +4 em 2026-10-13 pelo 3º sinal do mesmo adotante, a 2ª rodada:
+  #     o sinal, a cura da REGRA 97, a contradição já curada no #1064 e o localizador do MAQ-0)
 nodes:
   - id: E_SINAIS_EVOLVE_KGSSOT_1012
     node_type: evidence
@@ -262,6 +263,78 @@ nodes:
     label: "teto do elo estrutural da seção 7: o filtro é por linha, não por argumento — mistura de código e mensagem e heredoc de mensagem ainda erram; guarda que vive no lint-artifacts.sh não é vista"
     narrative: "Curado na mesma passada: padrão vazio não casa mais (fail-closed) e fail/die/_warn/_err/violation/record_fail entraram como funções de mensagem. O resto pede tirar só o argumento da mensagem, o que exige um parser de shell; o mesmo teto do extrator da REGRA 59 (MAQ-4). Gatilho: o próximo 'vigiado' falso ou ausente medido numa rodada do evolve."
 
+  - id: E_SINAL_ROUND2_KGSSOT_1012
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-13"
+    verified_against: "sinal lido inteiro e copiado sem alteração para o inbox processado do core; os três itens que pedem o core (alarme da REGRA 97, contradição radar/selador/contrato, localizador do MAQ-0) medidos no vivo nos nós ligados a este"
+    trace: "docs/evolution/inbox/_processed/2026-10-12-evolve-round-2-findings.md"
+    label: "3º sinal do onion-kg-ssot (2ª rodada do /meta:evolve, pin dcdacf9ba196): alarme falso da REGRA 97, contradição sobre decisão selada em DEV, localizador do MAQ-0 corrigido, e MAQ-2/3/5/6/7, D7-0, D1/D2/D6"
+    narrative: "Foi o próprio alarme falso da REGRA 97 (A auto-auditoria do framework tem GATILHO) que disparou a 2ª rodada. Esta triagem cura e registra os três itens do core. MAQ-3 (env-guard) é a mesma classe de Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL. MAQ-2, MAQ-5, MAQ-6, MAQ-7, D7-0 e os 13 de D1/D2/D6 ficam como informados, não medidos aqui: o escopo desta leva é o gatilho."
+    provenance:
+      source: "inbox do core, sinal 2026-10-12-evolve-round-2-findings.md (workflows wf_0a338f5a-be0 e wf_751168af-70c do adotante)"
+      locator: "seções Blockers e Contradição achada em dogfood"
+      method: "leitura: o sinal inteiro; cada item do core depois medido no vivo"
+      locality: "repo"
+
+  - id: E_REGRA97_DELTA_POR_COMMIT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "medido no clone local do onion-kg-ssot (HEAD 1fe102a, relatório gravado em b0ec4f9): a guarda de origin/main conta 42 artefatos e acusa EVOLVE-DELTA; a curada conta 0 (b0ec4f9..HEAD) e cala. No core: 134 pela data, 132 pelo commit d688f71d do relatório de 2026-10-04. --selftest 14/14 e família evolve_staleness 7/7 com LC_ALL=C; mutante de volta ao --since reprova (l), (m), (e1) e (e2)"
+    trace: ".claude/validation/evolve-staleness-check.sh"
+    label: "CURADO: a perna do delta da REGRA 97 conta desde o COMMIT que gravou o relatório, não desde a meia-noite da data; sem commit ou em clone raso, cai na data e emite EVOLVE-DELTA-BASE-DATA com o motivo"
+    narrative: "O teto antigo da guarda declarava o erro como 'caso de borda de um dia', e no adotante ele deu 42 artefatos e uma rodada inteira do evolve. A base agora é git log -1 --format=%H -- <relatório>, e o delta conta <commit>..HEAD. O clone raso é detectado pelo arquivo shallow: o commit de fronteira finge criar todo arquivo, e sem a detecção o delta sairia zero em silêncio (o mutante M2 provou isso). Teto declarado: editar o relatório depois move a base para a frente."
+    provenance:
+      source: ".claude/validation/evolve-staleness-check.sh (_population_delta) e as famílias --selftest e run_evolve_staleness_selftests"
+      locator: "evolve-staleness-check.sh casos (j), (l), (m), (n); lint-selftest.sh casos (e1) e (e2); mutantes M1 (base volta ao --since), M2 (sem detecção de raso), M3 (fallback sem emissão)"
+      method: "medição: a guarda antiga e a curada rodadas no adotante e no core, bancada com LC_ALL=C e três mutantes, todos reprovando o caso deles"
+      locality: "repo"
+
+  - id: E_DECISAO_SELADA_DEV_CURADA_1064
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-13"
+    verified_against: "gh pr view 1064: MERGED em 2026-10-13T00:25:58Z, merge 80932bf5, ancestral de origin/main; kg-radar.sh pula decision done em DEV com método 'testemunho: decisão do maestro' (grep -n: linhas 804-814) e kg-grammar.md documenta a exceção"
+    trace: ".claude/validation/kg-radar.sh"
+    label: "CURADO no PR #1064: o radar aceita em DEV a decisão selada pelo maestro, então selar pelo kg-decide-seal.sh não dá mais nem decision-done-em-DEV nem integrity.testimony-in-prod"
+    narrative: "A contradição do sinal era real: o selador grava done em DEV, o radar avisava decision-done-em-DEV, e promover a PROD trocava o aviso por integrity.testimony-in-prod no contrato. A peça que cedeu foi o radar: decisão do maestro é testemunho e fica em DEV por natureza. O adotante, que deixou as 5 decisões do ÉPICO 10 em DEV, acertou e não precisa migrar nada."
+    provenance:
+      source: "PR #1064 (fix(kg): o radar aceita em DEV a decisão selada pelo maestro), merge 80932bf597a6"
+      locator: "kg-radar.sh, a exceção comentada na linha 804 e a contagem ndm; .claude/rules/kg-grammar.md, linha do plane"
+      method: "medição: gh pr view, git merge-base --is-ancestor e grep -n no vivo"
+      locality: "repo"
+
+  - id: E_MAQ0_LOCALIZADOR_E_CURA_1062
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "grep -n no pin dcdacf9ba196 e em 50cd399d: o grep -lqE de /meta:<cmd> está em evolve-census.sh:157, no bloco 153-158, então 155-158 é o localizador certo e 173-180 o errado. Em origin/main o grep -lqE sumiu (grep rc 1) e o elo vem de _guard_links (evolve-census.sh:186-198, chamado na 205)"
+    trace: ".claude/validation/evolve-census.sh"
+    label: "O localizador corrigido do MAQ-0 confere (evolve-census.sh:155-158 no pin), e o achado já está curado em main pelo _guard_links do PR #1062"
+    narrative: "O sinal dizia que o achado 'segue presente no HEAD 50cd399d', o que era verdade nesse commit. A cura entrou depois, no #1062 (b220f5cf), e é a que E_MAQ0_VIGIADO_POR_CITACAO registra. O adotante recebe a cura no próximo pin, e o número errado do sinal anterior não se propagou a nenhum nó deste grafo."
+    provenance:
+      source: "git show dcdacf9ba196, 50cd399d e origin/main do .claude/validation/evolve-census.sh; PR #1062"
+      locator: "linha 157 nos dois commits antigos; _guard_links nas linhas 186-198 de main"
+      method: "medição: grep -n nos três commits"
+      locality: "repo"
+
 edges:
   - from: E_SINAIS_EVOLVE_KGSSOT_1012
     to: E_EVOLVE_ATALHO_DECLARA_COBERTURA
@@ -320,3 +393,18 @@ edges:
   - from: C_GUARD_LINKS_TETO
     to: E_MAQ0_VIGIADO_POR_CITACAO
     edge_type: CONSTRAINS
+  - from: E_SINAL_ROUND2_KGSSOT_1012
+    to: E_REGRA97_DELTA_POR_COMMIT
+    edge_type: SUPPORTS
+  - from: E_SINAL_ROUND2_KGSSOT_1012
+    to: E_DECISAO_SELADA_DEV_CURADA_1064
+    edge_type: SUPPORTS
+  - from: E_SINAL_ROUND2_KGSSOT_1012
+    to: E_MAQ0_LOCALIZADOR_E_CURA_1062
+    edge_type: SUPPORTS
+  - from: E_MAQ0_LOCALIZADOR_E_CURA_1062
+    to: E_MAQ0_VIGIADO_POR_CITACAO
+    edge_type: SUPPORTS
+  - from: E_SINAL_ROUND2_KGSSOT_1012
+    to: Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL
+    edge_type: SUPPORTS

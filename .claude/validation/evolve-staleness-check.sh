@@ -41,12 +41,22 @@
 #    sem delta populacional": UM ARQUIVO CALOU AS DUAS. Um `last_run:` digitado NÃO é forjável
 #    assim. O glob estrito (`onion-evolution-????-??-??.md`) fecha o caso medido, mas a
 #    DEPENDÊNCIA estrutural permanece: a perna (2) é função da (1), e isso fica declarado em vez
-#    de vendido como redundância. Pernas de fato independentes exigiriam a (2) medir contra um
-#    marco próprio (ex.: o commit que tocou o relatório), e isso é leva própria.
-#  · GRANULARIDADE DE DIA: `--since=<data>T00:00:00` não ordena antes/depois DENTRO do dia do
-#    relatório, então um relatório escrito hoje às 11h é acusado pelos artefatos commitados hoje
-#    às 09h, que ele já cobriu. Preferi errar para o lado de AVISAR num caso de borda de um dia a
-#    deixar a perna cega ao dia inteiro, que era o defeito anterior.
+#    de vendido como redundância. Desde 2026-10-13 a (2) mede contra um marco próprio, o COMMIT
+#    que tocou o relatório por último, mas continua escolhendo QUAL relatório pela perna (1).
+#    A dependência diminuiu sem sumir.
+#  · BASE DO DELTA = COMMIT, não DATA (cura de 2026-10-13, sinal de campo do onion-kg-ssot). A
+#    redação anterior contava `--since=<data>T00:00:00` e declarava aqui o erro como "caso de borda
+#    de um dia". No adotante esse caso deu 42 artefatos, alarme falso, e uma 2ª rodada inteira do
+#    /meta:evolve disparada por ele. O dano foi maior do que este teto previa. Agora a base é
+#    `git log -1 --format=%H -- <relatório>`, e o delta conta `<commit>..HEAD`.
+#    Artefato no MESMO commit do relatório conta como coberto por ele.
+#  · FALLBACK DECLARADO, nunca silencioso: com o relatório NÃO RASTREADO (o evolve acabou de
+#    escrevê-lo e ainda não houve commit) ou com o commit dele na FRONTEIRA de um clone raso
+#    (onde o git finge que o arquivo nasceu ali), a base volta à data e a guarda emite
+#    `EVOLVE-DELTA-BASE-DATA` com o motivo. Repo raso não vira silêncio.
+#  · EDIÇÃO TARDIA do relatório (corrigir um typo dias depois) move a base para a frente e esconde
+#    o que mudou entre a auditoria e a edição. Lacuna conhecida e aceita: o comando regenera o
+#    relatório a partir do grafo, então a edição à mão já é desvio de contrato.
 #  · Ela não sabe se o relatório tem QUALIDADE, nem se cobriu todas as dimensões. Mede que houve
 #    entrega e que o mundo andou desde então.
 #  · O delta populacional conta artefato TOCADO, não artefato que PRECISA de auditoria. Um rename
@@ -110,20 +120,47 @@ _epoch_of() {
     || echo 0
 }
 
-# ── perna (2): o DELTA POPULACIONAL desde a data, medido no GIT ────────────────────────────────
-_population_delta() {   # $1 = data ISO; imprime N ou a palavra NAO-MEDIDO
-  local since="$1" n
-  command -v git >/dev/null 2>&1 || { printf 'NAO-MEDIDO'; return 0; }
-  ( cd "${REPO}" && git rev-parse --git-dir >/dev/null 2>&1 ) || { printf 'NAO-MEDIDO'; return 0; }
-  # ⚠️ `T00:00:00` E OBRIGATORIO: `--since=2026-10-04` significa "essa data NA HORA ATUAL DO
-  #    RELOGIO", nao "o inicio do dia" — medido pelo Elenxo: `--since=2026-10-04` devolvia 0 e
-  #    `--since=2026-10-04T00:00:00` devolvia 5, com os 5 confirmados contando `%ct` a mao. Sem
-  #    isto a perna 2 e CEGA ao dia do relatorio, e o numero de manchete que eu publiquei (289)
-  #    estava errado: o correto e 291.
-  n="$( (cd "${REPO}" && git log --since="${since}T00:00:00" --name-only --pretty=format: -- \
+# ── perna (2): o DELTA POPULACIONAL desde o COMMIT do relatório, medido no GIT ───────────────
+# A base preferida é o commit que tocou o relatório por último. A data é o FALLBACK, e vem
+# declarada. A função roda no shell corrente, nunca em `$( )`, para as duas variáveis
+# sobreviverem: `_DELTA` (N ou NAO-MEDIDO) e `_DELTA_BASE` (`commit:<sha>` ou `data:<motivo>`).
+_DELTA=""; _DELTA_BASE=""
+_population_delta() {   # $1 = data ISO do relatório
+  local since="$1" rep sha=""
+  local -a range
+  command -v git >/dev/null 2>&1 || { _DELTA='NAO-MEDIDO'; return 0; }
+  ( cd "${REPO}" && git rev-parse --git-dir >/dev/null 2>&1 ) || { _DELTA='NAO-MEDIDO'; return 0; }
+  rep="${ANALYSIS}/onion-evolution-${since}.md"
+  # relativo quando a pasta mora no repo (o caso de produção); absoluto fora dele, onde o git
+  # recusa, `sha` fica vazio e a base cai no fallback declarado
+  case "${rep}" in "${REPO}/"*) rep="${rep#"${REPO}/"}" ;; esac
+  sha="$( (cd "${REPO}" && git log -1 --format=%H -- "${rep}" 2>/dev/null) || true )"
+  if [ -z "${sha}" ]; then
+    _DELTA_BASE="data:relatorio sem commit no git (nao rastreado ou fora do repo)"
+  else
+    # ⚠️ CLONE RASO: o commit de fronteira aparenta CRIAR todo arquivo da árvore, então o
+    #    `log -1` devolve a fronteira e não o commit real do relatório. A base ficaria adiantada e
+    #    o delta, subcontado. Só vale o commit que NÃO está no arquivo `shallow`.
+    #    `--git-path` sem `--path-format` (que só existe desde o git 2.31): o caminho sai relativo
+    #    ao cwd, por isso o teste roda dentro do REPO. Num worktree ligado ele aponta o dir comum.
+    if ( cd "${REPO}" && shallow_file="$(git rev-parse --git-path shallow 2>/dev/null)" \
+         && [ -f "${shallow_file}" ] && grep -qx "${sha}" "${shallow_file}" ); then
+      _DELTA_BASE="data:repo raso, o commit do relatorio e a fronteira do clone (git fetch --unshallow resolve)"
+    else
+      _DELTA_BASE="commit:${sha}"
+    fi
+  fi
+  case "${_DELTA_BASE}" in
+    commit:*) range=("${sha}..HEAD") ;;
+    # ⚠️ `T00:00:00` E OBRIGATORIO no fallback: `--since=2026-10-04` significa "essa data NA HORA
+    #    ATUAL DO RELOGIO", nao "o inicio do dia" (medido pelo Elenxo: 0 contra 5). No fallback,
+    #    errar para o lado de AVISAR dentro do dia do relatorio e o mal menor, e vem declarado.
+    *)        range=("--since=${since}T00:00:00") ;;
+  esac
+  _DELTA="$( (cd "${REPO}" && git log "${range[@]}" --name-only --pretty=format: -- \
         '.claude/commands' '.claude/agents' '.claude/skills' '.claude/hooks' '.claude/validation' 2>/dev/null \
         | grep -E '\.(md|sh)$' | sort -u | grep -c . ) || true )"
-  printf '%s' "${n:-0}"
+  _DELTA="${_DELTA:-0}"
 }
 
 _emit() {   # $1=sev $2=code $3=msg
@@ -270,8 +307,11 @@ if [ "${SELFTEST}" = "1" ]; then
   else _bad '(i) limiar' "1 artefato disparou com limiar 5: [${_o}]"; fi
   rm -rf "${_d}"
 
-  # (j) `--since` ANCORADO: `--since=<data nua>` significa "essa data NA HORA ATUAL DO RELOGIO",
-  #     entao a perna ficava CEGA aos artefatos commitados no DIA do relatorio. Fixa a cura.
+  # (j) `--since` ANCORADO, agora no FALLBACK: `--since=<data nua>` significa "essa data NA HORA
+  #     ATUAL DO RELOGIO", entao a perna ficava CEGA aos artefatos commitados no DIA do relatorio.
+  #     Desde 2026-10-13 a base e o commit do relatorio, e a data so vale quando ele nao tem
+  #     commit. Por isso o relatorio aqui fica NAO RASTREADO: e o caminho onde a ancora ainda
+  #     decide, e o caso exige tambem que o fallback venha DECLARADO.
   _d="$(mktemp -d)"
   ( cd "${_d}" && git init -q . && git -c user.email=b@b -c user.name=b commit -q --allow-empty -m b ) >/dev/null 2>&1
   mkdir -p "${_d}/docs/analysis" "${_d}/.claude/commands/meta"
@@ -281,13 +321,51 @@ if [ "${SELFTEST}" = "1" ]; then
   # ⚠️ TIMESTAMP EXPLICITO DE MADRUGADA: sem ele o commit nasce "agora", e `--since=<data nua>`
   #    (que significa "essa data NA HORA ATUAL") coincide com `T00:00:00` — o caso nao distingue
   #    as duas formas e o mutante sobrevive. Era CORRIDA disfarcada de caso.
-  ( cd "${_d}" && git add -A && GIT_AUTHOR_DATE="${_hj}T00:30:00" GIT_COMMITTER_DATE="${_hj}T00:30:00" \
+  ( cd "${_d}" && git add .claude && GIT_AUTHOR_DATE="${_hj}T00:30:00" GIT_COMMITTER_DATE="${_hj}T00:30:00" \
     git -c user.email=b@b -c user.name=b commit -q -m hoje ) >/dev/null 2>&1
   _o="$( (cd "${_d}" && EVOLVE_DELTA_MIN=0 EVOLVE_ANALYSIS_DIR="${_d}/docs/analysis" bash "${SELF}" "${_d}" --tsv 2>&1) || true )"
-  if grep -q 'EVOLVE-DELTA	' <<< "${_o}"; then
-    _ok '(j) artefato commitado no DIA do relatorio E VISTO (--since ancorado em T00:00:00)'
-  else _bad '(j) since ancorado' "a perna ficou cega ao dia do relatorio: [${_o}]"; fi
+  if grep -q 'EVOLVE-DELTA	' <<< "${_o}" && grep -q 'EVOLVE-DELTA-BASE-DATA	.*nao rastreado' <<< "${_o}"; then
+    _ok '(j) relatorio sem commit: fallback por data ancorado em T00:00:00 VE o dia, e vem DECLARADO'
+  else _bad '(j) since ancorado / fallback declarado' "saida=[${_o}]"; fi
   rm -rf "${_d}"
+
+  # (l) O ALARME FALSO DO CAMPO, verbatim da forma (onion-kg-ssot, 2026-10-12: 42 artefatos): o
+  #     artefato commitado no MESMO DIA, ANTES do relatorio, NAO conta. A base e o commit do
+  #     relatorio, nao a meia-noite. Mutante medido: voltar ao `--since=<data>T00:00:00` faz
+  #     este caso reprovar, porque o artefato das 09h passa a contar.
+  # (m) O PAR DE (l): o artefato commitado DEPOIS do relatorio, no mesmo dia, CONTA. Sem (m), um
+  #     delta zerado sempre passaria (l).
+  _d="$(mktemp -d)"
+  ( cd "${_d}" && git init -q . && GIT_AUTHOR_DATE=2026-01-01T08:00:00 GIT_COMMITTER_DATE=2026-01-01T08:00:00 \
+    git -c user.email=b@b -c user.name=b commit -q --allow-empty -m b ) >/dev/null 2>&1
+  mkdir -p "${_d}/docs/analysis" "${_d}/.claude/commands/meta"
+  printf '# antes\n' > "${_d}/.claude/commands/meta/antes.md"
+  ( cd "${_d}" && git add -A && GIT_AUTHOR_DATE=2026-01-01T09:00:00 GIT_COMMITTER_DATE=2026-01-01T09:00:00 \
+    git -c user.email=b@b -c user.name=b commit -q -m antes ) >/dev/null 2>&1
+  printf '# r\n' > "${_d}/$(_rel "2026-01-01")"
+  ( cd "${_d}" && git add -A && GIT_AUTHOR_DATE=2026-01-01T11:00:00 GIT_COMMITTER_DATE=2026-01-01T11:00:00 \
+    git -c user.email=b@b -c user.name=b commit -q -m rel ) >/dev/null 2>&1
+  _o="$( (cd "${_d}" && EVOLVE_STALE_DAYS=99999 EVOLVE_DELTA_MIN=0 EVOLVE_ANALYSIS_DIR="${_d}/docs/analysis" bash "${SELF}" "${_d}" --tsv 2>&1) || true )"
+  if [ -z "${_o}" ]; then
+    _ok '(l) artefato commitado no MESMO dia ANTES do relatorio NAO conta (base = commit do relatorio)'
+  else _bad '(l) alarme falso do mesmo dia' "o artefato anterior ao relatorio contou: [${_o}]"; fi
+  printf '# depois\n' > "${_d}/.claude/commands/meta/depois.md"
+  ( cd "${_d}" && git add -A && GIT_AUTHOR_DATE=2026-01-01T12:00:00 GIT_COMMITTER_DATE=2026-01-01T12:00:00 \
+    git -c user.email=b@b -c user.name=b commit -q -m depois ) >/dev/null 2>&1
+  _o="$( (cd "${_d}" && EVOLVE_STALE_DAYS=99999 EVOLVE_DELTA_MIN=0 EVOLVE_ANALYSIS_DIR="${_d}/docs/analysis" bash "${SELF}" "${_d}" --tsv 2>&1) || true )"
+  if grep -q 'EVOLVE-DELTA	.*: 1 artefato(s).*(base: commit)' <<< "${_o}" && ! grep -q 'BASE-DATA' <<< "${_o}"; then
+    _ok '(m) artefato commitado DEPOIS do relatorio CONTA (1, base commit, sem fallback)'
+  else _bad '(m) delta pos-relatorio' "devia contar exatamente 1 com base commit: [${_o}]"; fi
+
+  # (n) REPO RASO nao vira silencio: no clone de profundidade 1 o commit do relatorio e a
+  #     fronteira, que aparenta criar todos os arquivos. A guarda cai na data e DECLARA o motivo.
+  _sh="$(mktemp -d)"; rmdir "${_sh}"
+  git clone -q --depth 1 "file://${_d}" "${_sh}" >/dev/null 2>&1 || true
+  _o="$( (cd "${_sh}" && EVOLVE_STALE_DAYS=99999 EVOLVE_DELTA_MIN=99999 EVOLVE_ANALYSIS_DIR="${_sh}/docs/analysis" bash "${SELF}" "${_sh}" --tsv 2>&1) || true )"
+  if grep -q 'EVOLVE-DELTA-BASE-DATA	.*repo raso' <<< "${_o}"; then
+    _ok '(n) clone raso: a base cai na data e o fallback vem DECLARADO (nunca silencio)'
+  else _bad '(n) repo raso' "o fallback do clone raso nao foi declarado: [${_o}]"; fi
+  rm -rf "${_d}" "${_sh}"
 
   # (k) DATA FUTURA acusa. `_AGE` negativo nunca passa `-gt` e `--since=<futuro>` devolve vazio:
   #     sem este caso, um relatorio datado a frente calava as duas pernas PARA SEMPRE.
@@ -326,9 +404,15 @@ if [ "${_AGE}" -lt 0 ]; then
   _emit SOFT EVOLVE-DATA-FUTURA "a ultima auto-auditoria esta datada no FUTURO (${_LAST}, ${_AGE}d) — carimbo invalido, e enquanto estiver assim as duas pernas desta guarda ficam cegas; corrija a data do relatorio"
   exit 1
 fi
-_DELTA="$(_population_delta "${_LAST}")"
+_population_delta "${_LAST}"
 
 _hits=0
+case "${_DELTA_BASE}" in
+  data:*)
+    _hits=1
+    _emit SOFT EVOLVE-DELTA-BASE-DATA "o delta populacional desde ${_LAST} foi contado pela DATA, nao pelo commit do relatorio. Motivo: ${_DELTA_BASE#data:}. Pela data, artefato commitado no mesmo dia ANTES do relatorio conta como posterior a auditoria, entao o numero pode vir inflado. Commite o relatorio (num clone completo) para a base voltar a ser o commit"
+    ;;
+esac
 if [ "${_AGE}" -gt "${STALE_DAYS}" ]; then
   _hits=1
   _emit SOFT EVOLVE-VENCIDO "a auto-auditoria do framework está VENCIDA (${_AGE}d > ${STALE_DAYS}d desde ${_LAST}) — o Onion mede se GUARDA DISPARA e não mede se DOUTRINA ATERRISSA; rode /meta:evolve. A máquina detecta a idade, o humano dispara (padrão da REGRA 62/65)"
@@ -342,7 +426,7 @@ if [ "${_DELTA}" = "NAO-MEDIDO" ]; then
 # (clausula 4). O default de 40 e ~10% de uma populacao de 429 artefatos vigiados; ajustavel.
 elif [ "${_DELTA}" -gt "${DELTA_MIN}" ]; then
   _hits=1
-  _emit SOFT EVOLVE-DELTA "a população mudou desde a última auto-auditoria (${_LAST}): ${_DELTA} artefato(s) (> ${DELTA_MIN}) de \`.claude/{commands,agents,skills,hooks,validation}\` tocado(s) depois dela — a auditoria está vencida na SUBSTÂNCIA, não só no calendário; rode /meta:evolve. (Conta artefato TOCADO, não artefato que precisa de auditoria: o número manda olhar, não afirma que todos importam)"
+  _emit SOFT EVOLVE-DELTA "a população mudou desde a última auto-auditoria (${_LAST}): ${_DELTA} artefato(s) (> ${DELTA_MIN}) de \`.claude/{commands,agents,skills,hooks,validation}\` tocado(s) depois dela (base: ${_DELTA_BASE%%:*}) — a auditoria está vencida na SUBSTÂNCIA, não só no calendário; rode /meta:evolve. (Conta artefato TOCADO, não artefato que precisa de auditoria: o número manda olhar, não afirma que todos importam)"
 fi
 [ "${_hits}" -eq 0 ] || exit 1
 [ "${FORMAT}" = tsv ] || printf '  ✅ REGRA 97: auto-auditoria fresca (%s, %sd) e sem delta populacional\n' "${_LAST}" "${_AGE}"
