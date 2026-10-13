@@ -2,11 +2,10 @@
 title: 'Resíduo adversarial — o painel de testes deixa de ser o arquivo-ímã, e a catraca ganhou linha de base'
 date: 2026-10-13
 branch: feat/merge-process-step-a-magnet
-reviewed_diff_sha256: 1a3059fc918db55d0e280fb316bc441c919e1ce981928f24d1e6f14ca28c63ca
-reviewed_code_sha256: 4b200facb20bf38b84024592b5701146dc7e19aa9ddfbd526d47b7533db7e387
-findings_total: 8
-findings_real: 8
-findings_fixed: 7
+reviewed_diff_sha256: pendente
+findings_total: 9
+findings_real: 9
+findings_fixed: 8
 tokens: 129902
 duration_min: 4
 verdict: REPROVADO_E_CURADO
@@ -92,3 +91,10 @@ cumpre as promessas do próprio `meta:`). O teto sobe para 65 **declarado** no `
 resposta do maestro, não onda nova de pesquisa. Fica como achado para o selador. Ele deveria conferir
 o teto antes de escrever, ou recusar com rc 2 nomeando a REGRA 58. Não curei aqui porque está fora
 do escopo do passo A.
+
+## 9. (curado, achado pelo CI) O caso (i) usava `produtor | grep -q`
+
+O shard 2 do CI reprovou a catraca da família `shell_pipefail_robustness`: `lint-selftest.sh` passou de
+33 para 34 sítios da classe "veredito por `<produtor> | grep -q`" (sob pipefail, o `grep -q` que
+sai cedo pode dar EPIPE no produtor e virar falso vermelho). O sítio era o veredito do (i), meu. A cura é
+o here-string `grep -q 'REGRA 81.*saída de --live' <<< "${out81_live}"`. A catraca NÃO subiu.
