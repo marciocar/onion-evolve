@@ -6,6 +6,11 @@ mktemp (DENTRO de um repo git pai, para provar que o commit nunca sobe até ele)
 do core como gate (ONION_KG_CODE_ROOT = o repo deste arquivo). Chama cada tool por JSON-RPC MCP e
 encerra SÓ os processos que ele mesmo subiu (pelo handle do Popen, nunca pkill).
 
+O contrato fala JSON (kg-ssot.verdict/1). Além do contrato real, um CONTRATO FALSO (code root falso em
+mktemp, radar que sai 0 e um kg_validate.py que lê o modo de um arquivo vizinho) prova o fail-closed: rc 2,
+JSON malformado, relatório fora do schema, versão desconhecida, rc incoerente com o veredito e ponta externa
+não conferida viram NÃO JULGADO, e o gate decide por `code`, nunca por `message`.
+
 Saída: uma linha por caso, `PASS <caso>` ou `FAIL <caso> :: <detalhe>`, e no fim `TOTAL <n>`.
 rc 0 só se todos passaram.
 Uso: python3 -I -B ops/mcp-onion-kg-writer/selftest.py [--server <server.py>] [--code-root <repo>]
@@ -57,6 +62,61 @@ def graph(gid, extra_meta='', node_extra='', claim_status='open', refutes=False)
             'edges:\n'
             f'  - from: {"Q_PERGUNTA" if refutes else "C_ALVO"}\n    to: {"C_ALVO" if refutes else "Q_PERGUNTA"}\n'
             f'    edge_type: {edge}\n')
+
+
+FAKE_CONTRACT = r"""
+import json, os, sys
+sys.stdin.buffer.read()
+mode = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mode')).read().strip()
+def occ(level, code, message='mensagem da fixture'):
+    return {'level': level, 'code': code, 'place': 'meta', 'path': 'meta.x', 'line': 2, 'message': message}
+def report(verdict='PASS', occs=(), version='kg-ssot.verdict/1', ext=True, extra=None):
+    must = {}
+    for o in occs:
+        if o['level'] == 'MUST':
+            must[o['code']] = must.get(o['code'], 0) + 1
+    res = {'source': '-', 'verdict': verdict, 'summary': {'MUST': must, 'SHOULD': {}}, 'occurrences': list(occs),
+           'total': len(occs), 'truncated': False, 'external_checked': ext}
+    res.update(extra or {})
+    return {'schema_version': version, 'contract': {'must': 'spec/m.json', 'should': None, 'release': 'falso',
+            'sha256': {'must': '0' * 64, 'should': None}}, 'results': [res]}
+if mode == 'pass':
+    print(json.dumps(report())); sys.exit(0)
+if mode == 'rc2':  # leitor que sai 2 MAS imprime um PASS válido: rc 2 nunca é crido
+    print(json.dumps(report())); print('ENTRADA QUEBRADA  fixture', file=sys.stderr); sys.exit(2)
+if mode == 'malformado':
+    print('{"schema_version": "kg-ssot.verdict/1", "results": ['); sys.exit(0)
+if mode == 'fora-do-schema':  # um PASS com uma chave que o schema não conhece
+    print(json.dumps(report(extra={'aprovado': True}))); sys.exit(0)
+if mode == 'versao-2':  # cumpre o schema (que aceita /2 neste code root falso), mas o gate só lê /1
+    print(json.dumps(report(version='kg-ssot.verdict/2'))); sys.exit(0)
+if mode == 'incoerente':  # FAIL com rc 0
+    print(json.dumps(report('FAIL', [occ('MUST', 'form.required.node.label')]))); sys.exit(0)
+if mode == 'externo':
+    print(json.dumps(report(ext=False))); sys.exit(0)
+if mode == 'message':  # FAIL de verdade cuja frase humana diz o contrário: decide-se por code
+    print(json.dumps(report('FAIL', [occ('MUST', 'form.unknown-key.meta.x', 'PASS: tudo certo')]))); sys.exit(1)
+sys.exit(7)
+"""
+
+
+def fake_code_root(base):
+    """Code root falso: radar que aprova tudo, kg_validate.py falso por modo e o verdict.schema.json REAL com a
+    versão aberta a /1 e /2 (para isolar a conferência explícita da versão)."""
+    fr = os.path.join(base, 'code-falso')
+    os.makedirs(os.path.join(fr, '.claude', 'validation'))
+    os.makedirs(os.path.join(fr, 'vendor', 'kg-ssot', 'tools'))
+    os.makedirs(os.path.join(fr, 'vendor', 'kg-ssot', 'spec'))
+    with open(os.path.join(fr, '.claude', 'validation', 'kg-radar.sh'), 'w') as fh:
+        fh.write('#!/usr/bin/env bash\nexit 0\n')
+    with open(os.path.join(fr, 'vendor', 'kg-ssot', 'tools', 'kg_validate.py'), 'w') as fh:
+        fh.write(FAKE_CONTRACT)
+    with open(os.path.join(CODE_ROOT, 'vendor', 'kg-ssot', 'spec', 'verdict.schema.json'), encoding='utf-8') as fh:
+        sch = json.load(fh)
+    sch['properties']['schema_version'] = {'enum': ['kg-ssot.verdict/1', 'kg-ssot.verdict/2']}
+    with open(os.path.join(fr, 'vendor', 'kg-ssot', 'spec', 'verdict.schema.json'), 'w', encoding='utf-8') as fh:
+        json.dump(sch, fh)
+    return fr
 
 
 def start(env_extra, drop=()):
@@ -223,11 +283,36 @@ def main():
         bad_c = graph('demo-contrato', extra_meta='  inventada: 1\n')
         e, pc = call(port, 'kg_write', {'slug': 'demo-contrato', 'yaml': bad_c})
         dc = pc.get('data', {})
-        case('contrato-reprova-nada-gravado', e and dc.get('gravado') is False
+        occ_c = [o for o in dc.get('contrato', {}).get('ocorrencias', []) if o.get('code') == 'form.unknown-key.meta.inventada']
+        case('contrato-reprova-nada-gravado', e and dc.get('gravado') is False and dc.get('veredito') == 'REPROVADO'
              and dc.get('radar', {}).get('passou') is True and dc.get('contrato', {}).get('passou') is False
-             and any('form.unknown-key.meta.inventada' in x for x in dc['contrato'].get('falhas', []))
+             and dc['contrato'].get('julgado') is True and dc['contrato'].get('codigos_must') == ['form.unknown-key.meta.inventada']
+             and len(occ_c) == 1 and occ_c[0].get('level') == 'MUST' and occ_c[0].get('path') == 'meta'
+             and isinstance(occ_c[0].get('line'), int) and occ_c[0].get('place') and occ_c[0].get('message')
              and not os.path.exists(os.path.join(area_a, 'demo-contrato'))
              and 'kgw-gate-' not in json.dumps(pc), dc)  # o caminho do diretório temporário do gate não vaza
+
+        # (8b) PASS estruturado do contrato real; e a ocorrência que o schema acusa 2x (mesmo code+path) sai uma só
+        _, pp = call(port, 'kg_validate', {'yaml': ok_yaml})
+        cp_ = pp.get('data', {}).get('contrato', {})
+        case('contrato-pass-estruturado', cp_.get('julgado') is True and cp_.get('passou') is True
+             and cp_.get('veredito_contrato') == 'PASS' and cp_.get('codigos_must') == [] and cp_.get('ocorrencias') == []
+             and cp_.get('total') == 0 and cp_.get('truncado') is False, cp_)
+        dup = graph('demo-dup').replace('  baseline: "2026-10-12"\n', '  baseline: 2026-1-1\n')
+        _, pd = call(port, 'kg_validate', {'yaml': dup})
+        od = [o for o in pd.get('data', {}).get('contrato', {}).get('ocorrencias', []) if o.get('code') == 'form.pattern.meta.baseline']
+        case('contrato-duplicata-fundida', pd.get('data', {}).get('veredito') == 'REPROVADO' and len(od) == 1
+             and od[0].get('vezes') == 2 and od[0].get('path') == 'meta.baseline', pd.get('data', {}).get('contrato'))
+
+        # (8c) o contrato REAL, sem corpus, devolve PASS com external_checked false para aresta a alvo que nem existe
+        #      (medido 2026-10-13: o gate antigo, pelo rc do modo texto, gravava esse grafo); aqui = NAO JULGADO
+        ext = graph('demo-ext') + ('external_edges:\n  - from: C_ALVO\n    to: "docs/x/y.kg.yaml#C_VELHA"\n'
+                                   '    edge_type: SUPERSEDES\n')
+        e, px = call(port, 'kg_write', {'slug': 'demo-ext', 'yaml': ext})
+        dx = px.get('data', {})
+        case('contrato-externo-real-nao-julgado', e and dx.get('gravado') is False and dx.get('veredito') == 'NAO JULGADO'
+             and dx.get('radar', {}).get('passou') is True and 'external_edges' in dx.get('contrato', {}).get('motivo', '')
+             and not os.path.exists(os.path.join(area_a, 'demo-ext')), dx)
 
         # (9) reprovado de usuário novo não cria nem a área
         before = sorted(os.listdir(root))
@@ -324,6 +409,51 @@ def main():
             dt = pt.get('data', {})
             case('gate-timeout-reprova', e and dt.get('gravado') is False and os.listdir(root3) == []
                  and any('timeout' in x for x in dt.get('radar', {}).get('falhas', [])), dt)
+
+        # (18) contrato FALSO: o fail-closed do relatório (não julgado nunca aprova) e a decisão por code
+        fr = fake_code_root(base)
+        root4 = os.path.join(base, 'data4')
+        os.mkdir(root4)
+        p4 = start({'ONION_KG_WRITER_ROOT': root4, 'ONION_KG_CODE_ROOT': fr})
+        port4, line4 = wait_port(p4)
+        mode_f = os.path.join(fr, 'vendor', 'kg-ssot', 'tools', 'mode')
+
+        def fake(mode):
+            with open(mode_f, 'w') as fh:
+                fh.write(mode)
+            e, pz = call(port4, 'kg_write', {'slug': 'demo-ok', 'yaml': ok_yaml})
+            return e, pz.get('data', {})
+        nomes = ['contrato-stub-aprova', 'contrato-rc2-recusa', 'contrato-json-malformado-recusa',
+                 'contrato-fora-do-schema-recusa', 'contrato-versao-desconhecida-recusa', 'contrato-incoerente-recusa',
+                 'contrato-externo-nao-conferido-recusa', 'contrato-decide-por-code']
+        if port4 is None:
+            for nm in nomes:
+                case(nm, False, line4)
+        else:
+            def recusa(mode, motivo):
+                e, dz = fake(mode)
+                cz = dz.get('contrato', {})
+                return (e and dz.get('gravado') is False and dz.get('veredito') == 'NAO JULGADO'
+                        and cz.get('julgado') is False and motivo in cz.get('motivo', '') and os.listdir(root4) == []), dz
+            # controle de polaridade: o MESMO harness aprova quando o relatório é um PASS válido
+            e, dz = fake('pass')
+            case('contrato-stub-aprova', not e and dz.get('gravado') is True and dz.get('veredito') == 'APROVADO', dz)
+            shutil.rmtree(root4)
+            os.mkdir(root4)
+            for nm, mode, motivo in (('contrato-rc2-recusa', 'rc2', 'contrato saiu rc=2'),
+                                     ('contrato-json-malformado-recusa', 'malformado', 'nao e JSON'),
+                                     ('contrato-fora-do-schema-recusa', 'fora-do-schema', 'fora do verdict.schema.json'),
+                                     ('contrato-versao-desconhecida-recusa', 'versao-2', 'kg-ssot.verdict/2'),
+                                     ('contrato-incoerente-recusa', 'incoerente', 'incoerente'),
+                                     ('contrato-externo-nao-conferido-recusa', 'externo', 'external_edges')):
+                ok, dz = recusa(mode, motivo)
+                case(nm, ok, dz)
+            e, dz = fake('message')
+            cz = dz.get('contrato', {})
+            case('contrato-decide-por-code', e and dz.get('gravado') is False and dz.get('veredito') == 'REPROVADO'
+                 and cz.get('julgado') is True and cz.get('codigos_must') == ['form.unknown-key.meta.x']
+                 and [o.get('message') for o in cz.get('ocorrencias', [])] == ['PASS: tudo certo']
+                 and os.listdir(root4) == [], dz)
     finally:
         stop_all()
         shutil.rmtree(base, ignore_errors=True)

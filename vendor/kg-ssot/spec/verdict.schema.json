@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:verdict.schema.json",
+  "title": "Veredito estruturado de um leitor do .kg.yaml (kg-ssot.verdict/1)",
+  "description": "Saída de `kg_validate.py --format json` (A_VERDICT_API). O veredito é do contrato vigente: PASS sem nenhuma ocorrência MUST, FAIL com qualquer uma. Um arquivo que não parseia reprova com um código parse.*, como na suíte de conformidade. `summary` conta todas as ocorrências; `occurrences` traz até o limite pedido, e `truncated` diz se cortou. `code` é o vocabulário estável da suíte e do gate; `message` e `hint` são texto para pessoas e podem mudar entre versões.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract", "results"],
+  "properties": {
+    "schema_version": {"const": "kg-ssot.verdict/1"},
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["must", "should", "release", "sha256"],
+      "properties": {
+        "must": {"type": ["string", "null"], "description": "o schema MUST que julgou, relativo à raiz do produto"},
+        "should": {"type": ["string", "null"], "description": "o schema SHOULD dos avisos, ou null"},
+        "release": {"type": ["string", "null"], "description": "a tag da release que o leitor carrega (spec/release.json)"},
+        "sha256": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["must", "should"],
+          "properties": {
+            "must": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+            "should": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "verdict", "summary", "occurrences", "total", "truncated", "external_checked"],
+        "properties": {
+          "source": {"type": ["string", "null"], "description": "o arquivo julgado, ou '-' para o stdin"},
+          "verdict": {"enum": ["PASS", "FAIL"]},
+          "summary": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["MUST", "SHOULD"],
+            "properties": {
+              "MUST": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}},
+              "SHOULD": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}}
+            }
+          },
+          "occurrences": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["level", "code", "place", "path", "line", "message"],
+              "properties": {
+                "level": {"enum": ["MUST", "SHOULD"]},
+                "code": {"type": "string", "pattern": "^(parse|form|integrity|yaml)\\.[A-Za-z0-9_.-]+$"},
+                "place": {"type": "string", "description": "o lugar legível: 'nó X', 'aresta #3 (A -> B)', 'meta', 'topo' ou 'arquivo'"},
+                "path": {"type": "string", "description": "o caminho no documento, como nodes[7].provenance.method; vazio quando é o arquivo inteiro"},
+                "line": {"type": ["integer", "null"], "minimum": 1, "description": "a linha do YAML (contando de 1) do ponto mais fundo do caminho que existe; null quando o YAML não compõe"},
+                "message": {"type": "string", "description": "a frase em pt-BR para pessoas; pode mudar entre versões"},
+                "hint": {"type": "string", "description": "a correção canônica, quando o código tem uma"}
+              }
+            }
+          },
+          "total": {"type": "integer", "minimum": 0, "description": "quantas ocorrências existem, antes do corte"},
+          "truncated": {"type": "boolean"},
+          "external_checked": {"type": "boolean", "description": "false quando o grafo tem external_edges e o leitor rodou sem --corpus"}
+        }
+      }
+    }
+  }
+}

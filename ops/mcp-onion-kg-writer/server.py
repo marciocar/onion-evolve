@@ -10,11 +10,16 @@ auth (X-Api-Key fail-closed), com três contratos próprios:
     nome de UM diretório sob ONION_KG_WRITER_ROOT (parte local saneada + sha256 curto). E-mail
     ausente ou inválido = recusa. Nenhuma tool aceita área, usuário ou caminho como argumento:
     só `slug`, kebab-case estrito. Symlink em qualquer ponto da área = recusa.
-  · GATE ANTES DE GRAVAR: o grafo é escrito num diretório temporário e julgado pela maquinaria
-    REAL do core (ONION_KG_CODE_ROOT): `kg-radar.sh --integrity --schema` (exit 0) e o contrato
-    `vendor/kg-ssot/tools/kg_validate.py` (rc 0). Reprovou = NADA é gravado e as linhas ✗/MUST
-    voltam para o modelo corrigir. Passou = grava os MESMOS bytes julgados e commita no repo git
-    da área com autor = o e-mail do header.
+  · GATE ANTES DE GRAVAR: o grafo é julgado pela maquinaria REAL do core (ONION_KG_CODE_ROOT):
+    `kg-radar.sh --integrity --schema` (exit 0), sobre uma cópia num diretório temporário, e o
+    contrato `vendor/kg-ssot/tools/kg_validate.py --format json -`, com os bytes pelo STDIN.
+    O contrato devolve o veredito estruturado `kg-ssot.verdict/1`, conferido contra o
+    `vendor/kg-ssot/spec/verdict.schema.json` antes de ser crido; o gate decide só por `verdict` e
+    `code` (o vocabulário estável), nunca por `message`/`hint`, que são texto para pessoas. rc 2,
+    JSON que não parseia, fora do schema, incoerente com o rc ou sem a ponta externa conferida =
+    NÃO JULGADO, e não julgado nunca aprova (fail-closed). Reprovou = NADA é gravado e as linhas ✗
+    do radar e as ocorrências estruturadas do contrato voltam para o modelo corrigir. Passou =
+    grava os MESMOS bytes julgados e commita no repo git da área com autor = o e-mail do header.
   · CONTEÚDO RECEBIDO É DADO: nunca é executado. Só é lido por yaml.safe_load (com alias/âncora
     recusados, contra bomba de expansão) e passado como ARQUIVO aos gates, nunca como argumento
     de shell. A saída é marcada `untrusted_data: true`.
@@ -41,6 +46,10 @@ try:
     import yaml
 except ImportError:  # sem PyYAML não há como checar meta.id nem recusar alias: não sobe
     yaml = None
+try:
+    import jsonschema
+except ImportError:  # sem jsonschema não há como conferir o relatório do contrato: não sobe
+    jsonschema = None
 
 SERVER_REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 _CODE_ENV = os.environ.get('ONION_KG_CODE_ROOT', '').strip()
@@ -48,6 +57,8 @@ CODE_ROOT = os.path.realpath(_CODE_ENV) if _CODE_ENV else SERVER_REPO
 CODE_SOURCE = 'env ONION_KG_CODE_ROOT' if _CODE_ENV else 'default: repo do servidor (ONION_KG_CODE_ROOT ausente)'
 RADAR = os.path.join(CODE_ROOT, '.claude', 'validation', 'kg-radar.sh')
 CONTRACT = os.path.join(CODE_ROOT, 'vendor', 'kg-ssot', 'tools', 'kg_validate.py')
+VERDICT_SCHEMA = os.path.join(CODE_ROOT, 'vendor', 'kg-ssot', 'spec', 'verdict.schema.json')
+VERDICT_VERSION = 'kg-ssot.verdict/1'  # a forma do relatório que este gate sabe ler; outra = não julgado
 DATA_ROOT = os.path.realpath(os.environ.get('ONION_KG_WRITER_ROOT', '').strip() or '/var/lib/onion-chat-kg')
 HOST = os.environ.get('MCP_HOST', '172.23.0.1')
 PORT = int(os.environ.get('MCP_PORT', '3037'))
@@ -59,6 +70,7 @@ MAX_GRAPHS = int(os.environ.get('ONION_KG_WRITER_MAX_GRAPHS', '200'))  # grafos 
 GATE_TIMEOUT = int(os.environ.get('ONION_KG_WRITER_GATE_TIMEOUT', '60'))  # segundos, por gate
 MAX_FAIL_LINES = 60            # teto de linhas de falha devolvidas por gate (declarado na resposta)
 MAX_LINE = 300                 # teto de caracteres por linha de falha
+CONTRACT_LIMIT = 50            # --limit do contrato: ocorrências por arquivo (o relatório declara total e corte)
 SLUG_RE = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
 SLUG_MAX = 80
 EMAIL_RE = re.compile(r'^[a-z0-9._%+-]{1,64}@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$')
@@ -222,8 +234,71 @@ def _fail_lines(text, pred):
     return out[:MAX_FAIL_LINES], len(out)
 
 
+def _dedup(occs):
+    """Ocorrências iguais em (level, code, path) viram uma, com `vezes`: o schema às vezes acusa o mesmo
+    campo por duas regras com o mesmo código (medido no corpus: form.pattern.meta.baseline 2x)."""
+    out, idx = [], {}
+    for o in occs:
+        k = (o['level'], o['code'], o['path'])
+        if k in idx:
+            out[idx[k]]['vezes'] = out[idx[k]].get('vezes', 1) + 1
+            continue
+        item = {'level': o['level'], 'code': o['code'], 'place': o['place'][:MAX_LINE], 'path': o['path'][:MAX_LINE],
+                'line': o['line'], 'message': o['message'][:MAX_LINE]}
+        if 'hint' in o:
+            item['hint'] = o['hint'][:MAX_LINE]
+        idx[k] = len(out)
+        out.append(item)
+    return out
+
+
+def _nao_julgado(rc, motivo):
+    return {'rc': rc, 'julgado': False, 'passou': False, 'motivo': motivo[:MAX_LINE * 2],
+            'ocorrencias': [], 'avisos_should': []}
+
+
+def read_verdict(rc, out, err):
+    """Lê o relatório do contrato. Só devolve julgado=True com um veredito kg-ssot.verdict/1 que cumpre o
+    verdict.schema.json e é coerente com o rc; todo o resto é NÃO JULGADO (fail-closed, nunca aprova).
+    A decisão sai de `verdict` e `code`; `message`/`hint` só viajam até o usuário."""
+    if rc not in (0, 1):
+        return _nao_julgado(rc, f'contrato saiu rc={rc} (entrada quebrada ou falha do leitor): '
+                                + ((err or out).strip().splitlines() or ['sem saida'])[-1])
+    try:
+        rep = json.loads(out)
+    except ValueError as e:
+        return _nao_julgado(rc, f'relatorio do contrato nao e JSON ({str(e)[:120]})')
+    try:
+        with open(VERDICT_SCHEMA, encoding='utf-8') as fh:
+            schema = json.load(fh)
+        jsonschema.Draft202012Validator(schema).validate(rep)
+    except (OSError, ValueError, jsonschema.SchemaError) as e:
+        return _nao_julgado(rc, f'verdict.schema.json ilegivel ({str(e)[:120]})')
+    except jsonschema.ValidationError as e:
+        return _nao_julgado(rc, f'relatorio fora do verdict.schema.json: {e.message[:200]}')
+    if rep.get('schema_version') != VERDICT_VERSION:  # o schema carregado pode ter mudado com o vendor
+        return _nao_julgado(rc, f'schema_version {rep.get("schema_version")!r}: este gate le so {VERDICT_VERSION}')
+    results = rep['results']
+    if len(results) != 1 or results[0]['source'] != '-':
+        return _nao_julgado(rc, f'relatorio com {len(results)} resultados; esperado 1, do stdin')
+    r = results[0]
+    must = r['summary']['MUST']
+    if (r['verdict'] == 'PASS') != (not must) or (r['verdict'] == 'PASS') != (rc == 0):
+        return _nao_julgado(rc, f'relatorio incoerente: verdict={r["verdict"]}, MUST={sorted(must)}, rc={rc}')
+    if not r['external_checked']:
+        return _nao_julgado(rc, 'external_edges sem a ponta externa conferida: este servidor nao tem o corpus '
+                                'para conferir o alvo; tire as external_edges do grafo da area')
+    occs = r['occurrences']
+    passou = r['verdict'] == 'PASS' and rc == 0 and not any(o['level'] == 'MUST' for o in occs)
+    return {'rc': rc, 'julgado': True, 'passou': passou, 'veredito_contrato': r['verdict'],
+            'codigos_must': sorted(must), 'release': rep['contract'].get('release'),
+            'ocorrencias': _dedup([o for o in occs if o['level'] == 'MUST']),
+            'avisos_should': _dedup([o for o in occs if o['level'] == 'SHOULD']),
+            'total': r['total'], 'truncado': r['truncated']}
+
+
 def run_gate(data, slug):
-    """Julga os bytes num diretório temporário. Devolve o veredito; nunca grava na área."""
+    """Julga os bytes: o radar sobre uma cópia num diretório temporário, o contrato pelo stdin. Nunca grava na área."""
     tmp = tempfile.mkdtemp(prefix='kgw-gate-')
     name = f'{slug}.kg.yaml'
     try:
@@ -233,31 +308,40 @@ def run_gate(data, slug):
                'TMPDIR': tmp}
         res = {}
         with _GATES:
-            for gate, cmd in (('radar', ['bash', RADAR, name, '--integrity', '--schema']),
-                              ('contrato', [sys.executable, '-I', '-B', CONTRACT, '--where', name])):
+            for gate, cmd, stdin in (
+                    ('radar', ['bash', RADAR, name, '--integrity', '--schema'], None),
+                    ('contrato', [sys.executable, '-I', '-B', CONTRACT, '--format', 'json',
+                                  '--limit', str(CONTRACT_LIMIT), '-'], data)):
                 try:
-                    r = subprocess.run(cmd, capture_output=True, text=True, encoding='utf-8',
-                                       errors='replace', timeout=GATE_TIMEOUT, cwd=tmp, env=env,
-                                       stdin=subprocess.DEVNULL)
-                    rc, out, err = r.returncode, r.stdout or '', r.stderr or ''
+                    r = subprocess.run(cmd, capture_output=True, timeout=GATE_TIMEOUT, cwd=tmp, env=env,
+                                       **({'input': stdin} if stdin is not None else {'stdin': subprocess.DEVNULL}))
+                    rc = r.returncode
+                    out = (r.stdout or b'').decode('utf-8', errors='replace')
+                    err = (r.stderr or b'').decode('utf-8', errors='replace')
                 except subprocess.TimeoutExpired:
                     rc, out, err = 124, '', f'timeout do gate ({GATE_TIMEOUT}s)'
                 out = out.replace(tmp + os.sep, '').replace(tmp, '.')
                 err = err.replace(tmp + os.sep, '').replace(tmp, '.')
-                if gate == 'radar':
-                    lines, total = _fail_lines(out, lambda ln: ln.lstrip().startswith('✗'))
-                else:
-                    lines, total = _fail_lines(out, lambda ln: ln.lstrip().startswith(('MUST', 'REPROVA')))
-                    avisos, _ = _fail_lines(out, lambda ln: ln.lstrip().startswith('SHOULD'))
-                    res['avisos_should'] = avisos
-                if rc != 0 and not lines:  # reprovou sem linha ✗/MUST: devolve o stderr cortado
+                if gate == 'contrato':
+                    res[gate] = read_verdict(rc, out, err)
+                    continue
+                lines, total = _fail_lines(out, lambda ln: ln.lstrip().startswith('✗'))
+                if rc != 0 and not lines:  # reprovou sem linha ✗: devolve o stderr cortado
                     lines = [x[:MAX_LINE] for x in (err or out).strip().splitlines()[-10:]] or [f'rc={rc} sem saida']
                     total = len(lines)
                 res[gate] = {'rc': rc, 'passou': rc == 0, 'falhas': lines, 'falhas_total': total}
+        res['avisos_should'] = res['contrato']['avisos_should']
         radar_ok = res['radar']['passou']
         contrato_ok = res['contrato']['passou']
-        res['veredito'] = 'APROVADO' if radar_ok and contrato_ok else 'REPROVADO'
-        res['teto'] = f'ate {MAX_FAIL_LINES} linhas por gate, {MAX_LINE} caracteres por linha'
+        if radar_ok and contrato_ok:
+            res['veredito'] = 'APROVADO'
+        elif not res['contrato']['julgado']:
+            res['veredito'] = 'NAO JULGADO'
+        else:
+            res['veredito'] = 'REPROVADO'
+        res['teto'] = (f'radar: ate {MAX_FAIL_LINES} linhas, {MAX_LINE} caracteres por linha; contrato: ate '
+                       f'{CONTRACT_LIMIT} ocorrencias (total e truncado declarados), repetidas em level+code+path '
+                       f'fundidas com vezes')
         return res
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -296,8 +380,10 @@ def t_kg_write(email, args):
     slug, yml = args.get('slug'), args.get('yaml')
     data, v = judge(slug, yml)
     if v['veredito'] != 'APROVADO':
-        return {'slug': slug, 'gravado': False, **v,
-                'nota': 'REPROVADO pela maquinaria: NADA foi gravado. Corrija as linhas e chame de novo.'}
+        nota = ('NAO JULGADO: o contrato nao produziu veredito confiavel, e sem veredito NADA e gravado '
+                '(veja contrato.motivo).' if v['veredito'] == 'NAO JULGADO' else
+                'REPROVADO pela maquinaria: NADA foi gravado. Corrija as linhas e chame de novo.')
+        return {'slug': slug, 'gravado': False, **v, 'nota': nota}
     with _WRITE_LOCK:
         adir, name, _ = area_dir(email, create=True)
         _ensure_repo(adir)
@@ -377,7 +463,7 @@ def t_kg_my_get(email, args):
 
 
 SCHEMA_HELP = {
-    'formato': 'YAML com tres blocos no topo: meta, nodes, edges (external_edges opcional). Uma chave por linha; '
+    'formato': 'YAML com tres blocos no topo: meta, nodes, edges (external_edges NAO: este servidor nao tem o corpus para conferir a ponta externa, e o contrato devolve NAO JULGADO). Uma chave por linha; '
                'listas com "- id:" e "- from:". O radar le TEXTO (awk) e o contrato le YAML: escreva simples, '
                'sem ancora/alias, sem chave em fluxo {..}.',
     'meta': {'obrigatorio': {'id': 'IGUAL ao slug do kg_write (kebab-case)', 'schema_version': '"1" (string, entre aspas)'},
@@ -557,7 +643,9 @@ def main():
         raise SystemExit('ONION_KG_WRITER_TOKEN ausente — fail-closed, nao subo sem auth')
     if yaml is None:
         raise SystemExit('PyYAML ausente — fail-closed, nao subo sem o parser seguro (use o python do venv)')
-    for p, what in ((RADAR, 'radar'), (CONTRACT, 'contrato')):
+    if jsonschema is None:
+        raise SystemExit('jsonschema ausente — fail-closed, nao subo sem conferir o relatorio do contrato (use o python do venv)')
+    for p, what in ((RADAR, 'radar'), (CONTRACT, 'contrato'), (VERDICT_SCHEMA, 'verdict.schema.json do contrato')):
         if not os.path.isfile(p):
             raise SystemExit(f'recuso subir: {what} ausente em {CODE_SOURCE} — sem gate nao gravo nada')
     if not os.path.isdir(DATA_ROOT) or os.path.islink(os.environ.get('ONION_KG_WRITER_ROOT', '') or DATA_ROOT):
