@@ -2349,6 +2349,8 @@ ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO	docs/onion/graph/p
 ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_EM_REPO_SEM_CI	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/publish-door.sh	C_CHANGELOG_DIZ_NENHUMA_QUEBRA	docs/onion/graph/door-role-parity-2026-09.kg.yaml
 ops/review-gate-health.sh	E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
+ops/testing/selftest-pr-selection.sh	C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
+ops/testing/selftest-pr-selection.sh	E_PASSO_D_EXECUTADO_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/testing/selftest-shard-plan.sh	Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/testing/selftest-summary.sh	E_O_SUMARIO_REPORTA_NAO_JULGA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 ops/update-bridge.sh	E_W9_BRIDGE_DEPLOY_0902	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml

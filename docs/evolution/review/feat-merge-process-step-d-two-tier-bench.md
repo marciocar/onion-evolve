@@ -2,7 +2,8 @@
 title: 'Resíduo — passo D do processo de merge: bancada em dois níveis sem fila, check estável selftest-gate e ruleset preparado'
 date: 2026-10-13
 branch: feat/merge-process-step-d-two-tier-bench
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: cba3bc080fdb353077e2c3584275faf3499dffaa96774495c63468be601d2f53
+reviewed_code_sha256: ef55926aa4da026e97d50bb898c7125e2711cbfeea254291523b73a2459c6795
 findings_total: 13
 findings_real: 12
 findings_fixed: 2
