@@ -12,13 +12,18 @@
 
 | Dimensão | Nº | Produtor |
 |---|---:|---|
-| Famílias na bancada | **250** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **1936** | `bash .claude/validation/harness-inventory.sh --env` |
-| Regras do lint | **97** | `bash .claude/validation/rules-registry.sh --counts` |
-| — HARD | **85** | `bash .claude/validation/rules-registry.sh --counts` |
-| Pares de modo consumido | **62** | `bash .claude/validation/consumed-mode-check.sh .` |
-| — sem teste | **0** | `bash .claude/validation/consumed-mode-check.sh .` |
-| Baselines de catraca | **15** | `git ls-files '.claude/validation/*-baseline.txt'` |
+| Famílias na bancada | **↻ ao vivo** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **↻ ao vivo** | `bash .claude/validation/harness-inventory.sh --env` |
+| Regras do lint | **↻ ao vivo** | `bash .claude/validation/rules-registry.sh --counts` |
+| — HARD | **↻ ao vivo** | `bash .claude/validation/rules-registry.sh --counts` |
+| Pares de modo consumido | **↻ ao vivo** | `bash .claude/validation/consumed-mode-check.sh .` |
+| — sem teste | **↻ ao vivo** | `bash .claude/validation/consumed-mode-check.sh .` |
+| Baselines de catraca | **↻ ao vivo** | `git ls-files '.claude/validation/*-baseline.txt'` |
+
+> `↻ ao vivo`: o número muda a cada PR, então **não mora neste painel** (ainda é versionado em
+> `testing-inventory.md`, a projeção do inventário — passo B) — versioná-lo aqui punha este painel em quase todo PR e fazia dois PRs
+> paralelos colidirem nele (passo A de `D_MERGE_PROCESS_ONION_2026_10`). Para ler:
+> `bash .claude/validation/testing-state.sh --live`.
 
 Detalhe completo: [`testing-inventory.md`](testing-inventory.md) (SSOT gerada, catracada).
 
@@ -54,15 +59,20 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **513** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados totais | **2682** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados REAIS | **2313** | `bash .claude/validation/review-ledger.sh --env` |
-| Precisão (reais/totais) | **86%** | `bash .claude/validation/review-ledger.sh --env` |
-| Tokens por achado REAL | **122238** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **419** | `bash .claude/validation/review-ledger.sh --env` |
-| — legado (texto livre) | **94** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **↻ ao vivo** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados totais | **↻ ao vivo** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados REAIS | **↻ ao vivo** | `bash .claude/validation/review-ledger.sh --env` |
+| Precisão (reais/totais) | **↻ ao vivo** | `bash .claude/validation/review-ledger.sh --env` |
+| Tokens por achado REAL | **↻ ao vivo** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **↻ ao vivo** | `bash .claude/validation/review-ledger.sh --env` |
+| — legado (texto livre) | **↻ ao vivo** | `bash .claude/validation/review-ledger.sh --env` |
 
-A média de tokens cobre os **273** resíduos com custo > 0; os demais declaram `tokens: 0`
+> `↻ ao vivo`: o número muda a cada PR, então **não mora no git** — versioná-lo punha este
+> painel em quase todo PR e fazia dois PRs
+> paralelos colidirem nele (passo A de `D_MERGE_PROCESS_ONION_2026_10`). Para ler:
+> `bash .claude/validation/testing-state.sh --live`.
+
+A média de tokens cobre só os resíduos com custo > 0 (a contagem sai em `--live`); os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
 não é média — mas seus achados continuam contados no total.
 

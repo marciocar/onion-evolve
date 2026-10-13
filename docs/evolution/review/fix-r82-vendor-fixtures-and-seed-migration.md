@@ -3,7 +3,8 @@ title: "Revisão — REGRA 82 já estava curada no core (o ruído é de pin anti
 date: 2026-10-13
 branch: fix/r82-vendor-fixtures-and-seed-migration
 reviewer: "passada adversarial curta do próprio autor, como refutador das duas perguntas do pedido (a exclusão escondeu grafo real? a migração toca grafo do adotante?), com execução: a guarda velha e a nova contra o vendor 4.4.0, a migração contra a semente REAL do adotante (cópia de leitura, antes da conversão à mão dele) e seis mutantes via ops/mutate-and-restore.sh"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d3138eaedf316c7a2d7053d2df3af5b642d67583b7b7227ff87f374333f04078
+reviewed_code_sha256: 8ce97fdfc1ff3caa378d06841b59f1f084ed3c6c30b72c51a03534029824a374
 findings_total: 4
 findings_real: 4
 verdict: APROVADO
