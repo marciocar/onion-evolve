@@ -2,8 +2,7 @@
 title: 'Resíduo — o modo porta vem de kind: door, e o carimbo standalone do adotante volta a passar'
 date: 2026-10-13
 branch: fix/standalone-stamp-cut-vs-door
-reviewed_diff_sha256: f81a59ce5fbf9aaf4298cdb7f9fc971f5eca78a55c11dc108b1aad3cdd860671
-reviewed_code_sha256: ce2d8593466a7f260e9f05aac547fc8792fea744a59af721debecc437818803f
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 4
 findings_fixed: 3
@@ -50,3 +49,8 @@ standalone→adopted (f2).
 Teto: o julgamento do adotante só vale onde o clone está nesta máquina; no CI a REGRA 92 declara NÃO
 MEDIDO. Os itens da mesma família declarados em Q_CARIMBO_DO_ADOTADO_STANDALONE (projeção do wizard,
 skill onion-wizard, links de co-evolve e co-relay) não foram tocados.
+
+Re-revisão depois do rebase: o adotante da adoção greenfield entrou no members.yaml pela main, e a
+REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) acusou o nome dele em três comentários
+que viajam. Os comentários foram generalizados (só texto; nenhuma lógica mudou) e a bancada das
+famílias alcançadas foi re-rodada.
