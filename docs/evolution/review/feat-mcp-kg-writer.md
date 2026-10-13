@@ -1,7 +1,7 @@
 ---
 branch: feat/mcp-kg-writer
 date: 2026-10-12
-reviewed_diff_sha256: f56201bc5a0538ba1cf1dc948b20b8f0c114f4d7c237bb10b325870d4987718f
+reviewed_diff_sha256: 514789641ab20ad9c5939a258e8572622dcaef7f0efe11140aa843fe8ae8a40f
 reviewed_code_sha256: 37d1bfde0c2241c3ce43145cc22eddfe355f80c0447edcad2a8d62ff37fd2aeb
 findings_total: 4
 findings_real: 3
