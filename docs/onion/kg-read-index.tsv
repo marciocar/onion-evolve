@@ -2359,6 +2359,7 @@ ops/publish-door.sh	C_CHANGELOG_DIZ_NENHUMA_QUEBRA	docs/onion/graph/door-role-pa
 ops/review-gate-health.sh	E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 ops/testing/main-bench-alarm.sh	E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/testing/main-bench-alarm.sh	Q_MERGE_LOTE_COM_BISSECCAO	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
+ops/testing/selection-replay.sh	E_SELETOR_POR_ARQUIVO_E_ARRANQUE_MEDIDO_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/testing/selftest-pr-selection.sh	C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/testing/selftest-pr-selection.sh	E_PASSO_D_EXECUTADO_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/testing/selftest-shard-plan.sh	Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
