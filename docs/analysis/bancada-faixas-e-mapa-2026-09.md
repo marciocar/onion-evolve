@@ -31,6 +31,21 @@ pega as mesmas classes em segundos e ficou fora do repo até esta decisão.
 (5) mutation só dirigido a risco nomeado. **Não fazer:** PTS por ML, plataforma paga, `tj-actions/changed-files`
 (CVE-2025-30066), mutation como escore, deletar famílias quietas, trocar harness.
 
+**Adendo de 2026-10-13: vagas da máquina e nada de bancada completa local.** O maestro decidiu isto em
+`D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL`, no grafo `docs/evolution/research/merge-process-onion-2026-10/`.
+A medição desta casa mostrou o que faltava ao desenho acima. Em 8 vCPUs, cinco agentes rodavam `--jobs auto`, com 8
+processos cada. A carga foi a 14–17 e a pressão de CPU a 53%. Uma bancada de ~8 min passou de 34 min, e o runner matou
+dois pre-commits. Ficaram duas regras:
+1. **O `--jobs` respeita a máquina, não só o processo.** Há N = nproc vagas (`ONION_SELFTEST_MACHINE_SLOTS` muda o
+   número), num diretório de vagas por usuário. Cada família pega uma vaga com `flock` antes de rodar. O fd da vaga não
+   desce para os netos, então um órfão não segura vaga. Um worker morto solta a dele. A espera é dita na hora (⏳) e
+   somada no sumário, e ela tem teto. No CI cada runner roda uma bancada com N = nproc, então ninguém espera.
+2. **A faixa local (`--local`) é a do pre-commit e do `ops/pr-finalize.sh` (core-only).** Ali o failsafe "tudo" não
+   compra mais a completa. Rodam as famílias que citam o arquivo tocado, os blocos mudados da bancada e um núcleo fixo
+   pequeno. A saída diz que a completa é do CI: o nível PR a manda quando a infra é tocada ou com `ci:full`, e o push ao
+   main a roda. A completa local só roda por opt-in (`ONION_SELFTEST_FULL=1` ou `--full`).
+O desenho do passo (3) acima segue valendo onde ele protege, que é o CI. Na máquina compartilhada, ele virou o custo.
+
 ---
 
 ## Tabelas da pesquisa (recuperadas do run; tier: 8-9 primária · 7 vendor-on-self · 5 vendor-on-competitor · 3-4 blog)

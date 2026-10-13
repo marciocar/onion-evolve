@@ -146,7 +146,10 @@ STRICT="${ONION_SELFTEST_STRICT:-0}"
 # D_BANCADA_FAIXAS_E_MAPA (selo do maestro 2026-09-03; evidência: docs/analysis/bancada-faixas-e-mapa-2026-09.md).
 # A bancada era O(famílias × lint), single-thread, ~14 min no CI e >25 min na VPS sob carga, e o
 # pre-commit a disparava INTEIRA por qualquer arquivo em .claude/validation/. Três faixas:
-#   pre-commit : famílias AFETADAS pelos arquivos staged (mapa + failsafe), em paralelo
+#   pre-commit : famílias AFETADAS pelos arquivos staged (mapa + failsafe), em paralelo. Desde 2026-10-13
+#                (D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL) o pre-commit passa `--local`: o failsafe
+#                "tudo" vira a faixa LOCAL estreita (quem cita o tocado + núcleo fixo), declarada. A
+#                completa local é opt-in (`--full` / ONION_SELFTEST_FULL=1); a completa é do CI.
 #   PR/CI      : desde 2026-10-13 (passo D), só as famílias do diff do PR (--affected-range, ops/testing/
 #                selftest-pr-selection.sh); a COMPLETA, em paralelo e STRICT, roda no push ao main
 #   cron diário: tudo (a rede debaixo do filtro de paths do CI)
@@ -168,7 +171,12 @@ STRICT="${ONION_SELFTEST_STRICT:-0}"
 #   --affected-range <A...B>   idem, com o diff de um RANGE (o nível PR do CI, passo D de
 #                              D_MERGE_PROCESS_ONION_2026_10); a própria bancada no range ⇒ tudo;
 #                              range ilegível ⇒ tudo (recusa no incerto)
-#   --jobs N|auto              N workers (auto = nproc); 1 = serial (default)
+#   --jobs N|auto              N workers (auto = nproc); 1 = serial (default). O teto REAL de famílias
+#                              simultâneas é da MÁQUINA, não do processo: ver "VAGAS DA MÁQUINA" abaixo
+#   --local                    faixa LOCAL (pre-commit, pr-finalize): com --affected*, o failsafe "tudo"
+#                              NÃO roda a completa — roda quem cita os arquivos tocados (+ os blocos
+#                              mudados da bancada) + o núcleo fixo, e DIZ que a completa é do CI
+#   --full                     anula --local (= ONION_SELFTEST_FULL=1): a completa local, opt-in explícito
 #   --timing                   imprime ⏱ por família (para calibrar a partição)
 #   --dry-run                  imprime a seleção (faixa) e sai sem rodar nada
 #   --checkpoint               = --dry-run + declaração de que NADA foi validado (pre-commit com
@@ -188,6 +196,7 @@ SELFTEST_JOBS="${ONION_SELFTEST_JOBS:-1}"; SELFTEST_FAMILIES="${ONION_SELFTEST_F
 SELFTEST_CHILD="${ONION_SELFTEST_CHILD:-0}"; SELFTEST_AFFECTED=(); SELFTEST_AFFECTED_STAGED=0; SELFTEST_DRY=0
 SELFTEST_AFFECTED_RANGE=""; SELFTEST_RANGE_FAILSAFE=""
 SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHARD:-}"
+SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=""
 # FAIXA DA MATRIZ para a família `fixtures` (2026-10-05): ela é ~1600 s de CPU no runner de 2 núcleos e,
 # presa numa faixa só, estourou o teto de 25 min três vezes no PR #927. i/n = esta faixa roda as linhas
 # do manifest cujo índice % n == i; dentro dela, o SHARD dos workers fatia o que sobrou.
@@ -198,7 +207,7 @@ SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_i
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
-unset ONION_SELFTEST_CHILD ONION_SELFTEST_QUEUE ONION_SELFTEST_SHARD ONION_SELFTEST_FAMILIES ONION_SELFTEST_TIMING ONION_SELFTEST_JOBS ONION_SELFTEST_FIXTURES_LANE
+unset ONION_SELFTEST_CHILD ONION_SELFTEST_QUEUE ONION_SELFTEST_SHARD ONION_SELFTEST_FAMILIES ONION_SELFTEST_TIMING ONION_SELFTEST_JOBS ONION_SELFTEST_FIXTURES_LANE ONION_SELFTEST_FULL
 while [ $# -gt 0 ]; do
   case "$1" in
     --list) SELFTEST_LIST=1 ;;
@@ -208,6 +217,8 @@ while [ $# -gt 0 ]; do
     --report=*) SELFTEST_REPORT="${1#--report=}" ;;
     --child) SELFTEST_CHILD=1 ;;
     --dry-run) SELFTEST_DRY=1 ;;
+    --local) SELFTEST_LOCAL=1 ;;
+    --full) SELFTEST_FULL=1 ;;
     --checkpoint) SELFTEST_DRY=1; SELFTEST_CHECKPOINT=1 ;;
     --jobs) shift; SELFTEST_JOBS="${1:-1}" ;;
     --jobs=*) SELFTEST_JOBS="${1#--jobs=}" ;;
@@ -259,6 +270,105 @@ if [ "${SELFTEST_JOBS}" = "auto" ]; then SELFTEST_JOBS="$(nproc 2>/dev/null || e
 case "${SELFTEST_JOBS}" in ''|*[!0-9]*) SELFTEST_JOBS=1 ;; esac
 [ "${SELFTEST_JOBS}" -ge 1 ] || SELFTEST_JOBS=1
 
+# ── VAGAS DA MÁQUINA — semáforo de CPU entre TODAS as bancadas do usuário (2026-10-13) ─────────
+# D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL. Medido em 8 vCPUs: cinco agentes com `--jobs auto`
+# (8 processos cada) puseram a carga em 14–17 e a pressão de CPU (/proc/pressure/cpu, some avg300) em
+# 53%; uma bancada que leva ~8 min sozinha passou de 34, e dois pre-commits morreram no runner aos 50 e
+# aos 80 min. `--jobs` era vaga do PROCESSO: cada bancada achava que tinha a máquina inteira.
+# O DESENHO: N = nproc (ou ONION_SELFTEST_MACHINE_SLOTS) arquivos de vaga num diretório do USUÁRIO,
+# comum a toda worktree e sessão. Cada família (worker da fila dinâmica, ou a bancada serial) pega uma
+# vaga com `flock -n` antes de rodar e solta depois. O fd da vaga é FECHADO para os netos
+# (`{fd}>&-` na chamada da família, como o merge-serial faz com `9>&-`): o bash guarda a cópia com
+# close-on-exec e não a passa a subshell — medido —, então processo órfão de família não segura vaga, e
+# worker morto (kill -9) solta a vaga com o próprio fd. Sem vaga: espera (sondagem a cada 0,5 s), com
+# teto (ONION_SELFTEST_SLOT_WAIT_MAX, 1800 s) e a espera SOMADA no sumário — fila declarada, nunca
+# silêncio. Teto estourado = a família FALHA com o motivo nomeado (não roda calada, não passa verde).
+#   · DIRETÓRIO fixo por uid, NÃO por ambiente: /run/user/<uid>/onion-selftest-slots se existir e for
+#     meu; senão /tmp/onion-selftest-slots-<uid>. Por variável (XDG_RUNTIME_DIR) dois chamadores do
+#     mesmo usuário — o pré-voo do pr-finalize roda sob `env -i` — usariam diretórios diferentes e não
+#     se excluiriam. Diretório que não é meu, é link ou aceita escrita de outros ⇒ semáforo DESLIGADO e
+#     declarado (degrada para o comportamento anterior; nunca bloqueia a bancada por permissão).
+#   · BANCADA ANINHADA (família que invoca a bancada — selftest_lanes, machine_slots): herda a vaga do
+#     pai. O worker exporta ONION_SELFTEST_SLOT_HELD_DIR enquanto roda a família; a filha que resolve o
+#     MESMO diretório não pega vaga (pegaria uma que o próprio pai pode estar segurando: deadlock com N
+#     vagas tomadas pelos N workers do pai). Quem testa o semáforo aponta OUTRO diretório
+#     (ONION_SELFTEST_SLOT_DIR) e o semáforo dela liga.
+#   · CI: um runner por job e uma bancada por runner, `--jobs auto` = nproc = N ⇒ nunca há mais
+#     famílias que vagas e ninguém espera; o sumário imprime a espera (0 s) como prova.
+SLOT_ON=0; SLOT_WHY=""; SLOT_N=0; SLOT_DIR=""; SLOT_FD=""; SLOT_WAIT_US=0; SLOT_WAITED=0; SLOT_MAX_US=0; SLOT_WAITERS=()
+SLOT_WAIT_MAX="${ONION_SELFTEST_SLOT_WAIT_MAX:-1800}"
+case "${SLOT_WAIT_MAX}" in ''|*[!0-9]*) SLOT_WAIT_MAX=1800 ;; esac
+_slot_setup() {
+  local uid n
+  uid="$(id -u 2>/dev/null || echo x)"
+  if [ -n "${ONION_SELFTEST_SLOT_DIR:-}" ]; then SLOT_DIR="${ONION_SELFTEST_SLOT_DIR}"
+  elif [ -d "/run/user/${uid}" ] && [ -O "/run/user/${uid}" ] && [ -w "/run/user/${uid}" ]; then SLOT_DIR="/run/user/${uid}/onion-selftest-slots"
+  else SLOT_DIR="/tmp/onion-selftest-slots-${uid}"; fi
+  n="${ONION_SELFTEST_MACHINE_SLOTS:-}"
+  case "${n}" in
+    '') n="$(nproc 2>/dev/null || echo 1)" ;;
+    *[!0-9]*|0) [ "${SELFTEST_CHILD}" = "1" ] || echo "  ⚠ ONION_SELFTEST_MACHINE_SLOTS='${n}' não é inteiro ≥1 — uso nproc" >&2; n="$(nproc 2>/dev/null || echo 1)" ;;
+  esac
+  case "${n}" in ''|*[!0-9]*|0) n=1 ;; esac
+  SLOT_N="${n}"
+  if [ -n "${ONION_SELFTEST_SLOT_HELD_DIR:-}" ] && [ "${ONION_SELFTEST_SLOT_HELD_DIR}" = "${SLOT_DIR}" ]; then
+    SLOT_WHY="aninhada: herda a vaga da bancada que a chamou"; return 0; fi
+  command -v flock >/dev/null 2>&1 || { SLOT_WHY="flock ausente (util-linux)"; return 0; }
+  if [ ! -d "${SLOT_DIR}" ]; then ( umask 077; mkdir -p "${SLOT_DIR}" ) 2>/dev/null || { SLOT_WHY="não criei ${SLOT_DIR}"; return 0; }; fi
+  if [ -L "${SLOT_DIR}" ] || [ ! -O "${SLOT_DIR}" ]; then SLOT_WHY="${SLOT_DIR} é link ou não é meu"; return 0; fi
+  if [ -n "$(find "${SLOT_DIR}" -maxdepth 0 -perm /022 2>/dev/null)" ]; then
+    SLOT_WHY="${SLOT_DIR} aceita escrita de outros (modo $(stat -c %a "${SLOT_DIR}" 2>/dev/null))"; return 0; fi
+  SLOT_ON=1
+}
+if [ "${SELFTEST_LIST}" = "0" ] && [ "${SELFTEST_MAP}" = "0" ] && [ "${SELFTEST_DRY}" = "0" ]; then _slot_setup; fi
+_slot_us() { local t="${EPOCHREALTIME:-}"; if [ -n "${t}" ]; then printf '%s' "${t/[.,]/}"; else printf '%s000000' "$(date +%s)"; fi; }
+# pega uma vaga (rc 0) ou estoura o teto (rc 1). Começa numa vaga ditada pelo pid para espalhar a disputa.
+_slot_acquire() {
+  [ "${SLOT_ON}" = "1" ] || return 0
+  local t0 now w k i start=$(( $$ % SLOT_N )) fd _waiting_said=""
+  t0="$(_slot_us)"
+  while :; do
+    for (( k=0; k<SLOT_N; k++ )); do
+      i=$(( (start + k) % SLOT_N ))
+      if [ ! -d "${SLOT_DIR}" ]; then
+        # o diretório SUMIU no meio (limpeza de /tmp, logout que leva /run/user): recria e segue — sem isto
+        # toda família esperaria o teto inteiro por um arquivo que ninguém mais cria. Durante a janela, a
+        # bancada que ainda segura vaga do diretório antigo não exclui as novas (declarado no resíduo).
+        ( umask 077; mkdir -p "${SLOT_DIR}" ) 2>/dev/null || true
+        if [ ! -d "${SLOT_DIR}" ] || [ -L "${SLOT_DIR}" ] || [ ! -O "${SLOT_DIR}" ]; then
+          SLOT_ON=0; SLOT_WHY="${SLOT_DIR} sumiu no meio da bancada e não o recriei como meu — segui sem semáforo"
+          echo "  ⚠ vagas da máquina: ${SLOT_WHY}" >&2; return 0
+        fi
+      fi
+      exec {fd}>>"${SLOT_DIR}/slot.${i}" || continue
+      if flock -n "${fd}"; then
+        SLOT_FD="${fd}"; now="$(_slot_us)"; w=$(( now - t0 ))
+        if [ "${w}" -ge 500000 ]; then
+          SLOT_WAITED=$((SLOT_WAITED + 1)); SLOT_WAIT_US=$((SLOT_WAIT_US + w))
+          if [ "${w}" -gt "${SLOT_MAX_US}" ]; then SLOT_MAX_US="${w}"; fi
+          SLOT_WAITERS+=("${1:-?}:$(( w / 1000000 ))s")
+        fi
+        return 0
+      fi
+      exec {fd}>&-
+    done
+    now="$(_slot_us)"
+    if [ $(( (now - t0) / 1000000 )) -ge "${SLOT_WAIT_MAX}" ]; then return 1; fi
+    # a espera é dita NA HORA (uma vez por família), além de somada no sumário: fila nunca é silêncio
+    if [ "${_waiting_said:-}" != "${1:-?}" ]; then
+      echo "  ⏳ vagas da máquina: ${1:-?} espera vaga (as ${SLOT_N} estão ocupadas; teto ${SLOT_WAIT_MAX}s)" >&2
+      _waiting_said="${1:-?}"
+    fi
+    sleep 0.5
+  done
+}
+_slot_release() {
+  [ -n "${SLOT_FD}" ] || return 0
+  flock -u "${SLOT_FD}" 2>/dev/null || true
+  exec {SLOT_FD}>&-
+  SLOT_FD=""
+}
+
 # Envolve cada invocação top-level: `_family run_x_selftests`. Nome da família = x.
 _family() {
   local fn="$1" name t0
@@ -291,9 +401,21 @@ _family() {
       return 0 ;;
     esac
   fi
+  # VAGA DA MÁQUINA antes do relógio da família: a espera vai para o sumário, não para o ⏱ da família
+  if ! _slot_acquire "${name}"; then
+    record_fail "${name}: SEM VAGA DA MÁQUINA em ${SLOT_WAIT_MAX}s" "as ${SLOT_N} vagas de ${SLOT_DIR} ficaram presas o teto inteiro (outra bancada travada? \`fuser ${SLOT_DIR}/slot.*\`); a família NÃO rodou — teto: ONION_SELFTEST_SLOT_WAIT_MAX"
+    if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then : > "${SELFTEST_QUEUE}/done/${name}"; fi
+    return 0
+  fi
   t0="${SECONDS}"
   local _p0="${PASS}" _f0="${FAIL}" _s0="${SKIP}"
-  "${fn}"
+  if [ -n "${SLOT_FD}" ]; then
+    # o fd da vaga NÃO desce para a família: neto órfão não segura vaga; bancada aninhada sabe que herdou
+    ONION_SELFTEST_SLOT_HELD_DIR="${SLOT_DIR}" "${fn}" {SLOT_FD}>&-
+  else
+    "${fn}"
+  fi
+  _slot_release
   # delta por família — a granularidade é FAMÍLIA e não CASO de propósito: os nomes de quem FALHOU
   # já viajam pelo protocolo, e registrar os ~980 nomes de quem passou engordaria o trailer 6× sem
   # responder nenhuma pergunta que já não esteja respondida.
@@ -787,6 +909,87 @@ _selftest_affected_families() {
   printf '%s\n' "${sel}" | tr ',' '\n' | grep -v '^$' | sort -u | paste -sd, -
 }
 
+# ── FAIXA LOCAL (D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL, 2026-10-13) ───────────────────
+# Com `--local` (o pre-commit e o pr-finalize passam), o failsafe "tudo" NÃO vira a bancada completa: a
+# completa é do CI — o PR que toca a infra da bancada já roda a completa pelo nível PR
+# (ops/testing/selftest-pr-selection.sh, que esta faixa NÃO muda), o PR com `ci:full` também, e o push ao
+# main roda a completa desde o passo D (D_MERGE_PROCESS_ONION_2026_10). Localmente roda o que dá sinal
+# barato e direto: as famílias que CITAM os arquivos tocados (mapa, exato ou diretório que não é raiz de
+# domínio, inclusive cobertura fraca), os blocos mudados da própria bancada (dono de cada linha mudada,
+# dos dois lados do diff; linha fora de família não compra tudo aqui) e o NÚCLEO LOCAL fixo abaixo.
+# NÚCLEO LOCAL, e por quê cada um: a infra da bancada quebra primeiro a própria maquinaria de seleção e
+# de faixas — e se ELA quebra, a completa do CI deixa de ser confiável:
+#   · selftest_lanes      — --list/--map/--jobs/fila/trailers/relatório (as faixas em si);
+#   · selftest_selection  — o seletor por caso (bloco, empacotado, núcleo);
+#   · two_tier_bench      — o nível PR e a completa do main (o que garante que a completa ACONTECE no CI);
+#   · machine_slots       — o semáforo da máquina e esta faixa local;
+#   · shell_pipefail_robustness — catraca estática barata (1 s) do antipadrão que só o CI de 2 cores expõe.
+# Mais as famílias `*` do mapa (rodam em todo commit). `--full`/ONION_SELFTEST_FULL=1 anula esta faixa.
+SELFTEST_LOCAL_CORE="selftest_lanes,selftest_selection,two_tier_bench,machine_slots,shell_pipefail_robustness"
+# Donos (famílias) das linhas mudadas da bancada, dos dois lados do diff. $1 = staged|worktree|range.
+_selftest_touched_blocks() {
+  command -v python3 >/dev/null 2>&1 || return 0
+  python3 - "${REPO_ROOT}" ".claude/validation/lint-selftest.sh" "$1" "${SELFTEST_AFFECTED_RANGE:-}" <<'PYTB'
+import re, subprocess, sys
+root, rel, mode, rng = sys.argv[1:5]
+G = ["git", "-C", root, "-c", "core.quotepath=off"]
+def git(*a):
+    r = subprocess.run(G + list(a), capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return r.stdout if r.returncode == 0 else None
+if mode == "staged":
+    old, new, diff = git("show", "HEAD:" + rel), git("show", ":" + rel), git("diff", "--cached", "-U0", "--no-color", "--", rel)
+elif mode == "range":
+    a, _, b = rng.partition("...") if "..." in rng else rng.partition("..")
+    base = git("merge-base", a or "HEAD", b or "HEAD") if "..." in rng else None
+    old = git("show", ((base or "").strip() or a or "HEAD") + ":" + rel); new = git("show", (b or "HEAD") + ":" + rel)
+    diff = git("diff", "-U0", "--no-color", rng, "--", rel)
+else:
+    old = git("show", "HEAD:" + rel); diff = git("diff", "-U0", "--no-color", "HEAD", "--", rel)
+    try: new = open(root + "/" + rel, encoding="utf-8", errors="replace").read()
+    except OSError: new = None
+def owners(text):
+    own, cur = {}, None
+    for i, l in enumerate((text or "").split("\n"), 1):
+        m = re.match(r"^run_([a-z0-9_]+)_selftests\(\) \{", l)
+        if m: cur = m.group(1)
+        if cur: own[i] = cur
+        m2 = re.match(r"^_family run_([a-z0-9_]+)_selftests", l)
+        if m2: own[i] = m2.group(1)
+        if l.startswith("}") and cur and not m: cur = None
+    return own
+oo, on = owners(old), owners(new)
+out = set(); o = n = 0
+for ln in (diff or "").split("\n"):
+    m = re.match(r"^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@", ln)
+    if m: o, n = int(m.group(1)), int(m.group(2)); continue
+    if ln.startswith("-") and not ln.startswith("---"):
+        if o in oo: out.add(oo[o])
+        o += 1
+    elif ln.startswith("+") and not ln.startswith("+++"):
+        if n in on: out.add(on[n])
+        n += 1
+print(",".join(sorted(out)))
+PYTB
+}
+_selftest_local_families() {
+  local map p hit sel="" blocks mode
+  map="$(_selftest_family_map 2>/dev/null || true)"
+  for p in "$@"; do
+    if [ "${p}" = ".claude/validation/lint-selftest.sh" ]; then
+      if [ "${SELFTEST_AFFECTED_STAGED}" = "2" ]; then mode=staged; elif [ -n "${SELFTEST_AFFECTED_RANGE}" ]; then mode=range; else mode=worktree; fi
+      blocks="$(_selftest_touched_blocks "${mode}")"
+      echo "  local: blocos mudados da bancada → ${blocks:-nenhum}" >&2
+      [ -z "${blocks}" ] || sel="${sel:+${sel},}${blocks}"
+    fi
+    [ -n "${map}" ] || continue
+    hit="$(awk -F'\t' -v p="${p}" '$2==p || ($2 ~ /\/$/ && $2 !~ /^(\.claude\/|\.claude\/(validation|hooks|utils)\/|ops\/|docs\/)$/ && index(p,$2)==1) {print $1}' <<< "${map}" | sort -u | paste -sd, -)"
+    [ -z "${hit}" ] || sel="${sel:+${sel},}${hit}"
+  done
+  local always; always="$(awk -F'\t' '$2=="*"{print $1}' <<< "${map}" | sort -u | paste -sd, -)"
+  sel="${sel:+${sel},}${SELFTEST_LOCAL_CORE}${always:+,${always}}"
+  printf '%s\n' "${sel}" | tr ',' '\n' | grep -v '^$' | sort -u | paste -sd, -
+}
+
 if [ "${SELFTEST_MAP}" = "1" ]; then SELFTEST_EXPECTED_EXIT=1; _selftest_family_map; exit "$?"; fi
 
 if [ "${SELFTEST_AFFECTED_STAGED}" = "1" ]; then
@@ -828,11 +1031,34 @@ if { [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ] || [ "${SELFTEST_AFFECTED_STAGED}" = "
   else
     _sel="$(_selftest_affected_families "${SELFTEST_AFFECTED[@]}")"
   fi
+  # FAIXA LOCAL: o failsafe "tudo" não vira a completa na máquina compartilhada — a completa é do CI
+  if [ "${_sel}" = "ALL" ] && [ "${SELFTEST_LOCAL}" = "1" ]; then
+    if [ "${SELFTEST_FULL}" = "1" ]; then
+      echo "  local: completa PEDIDA (--full / ONION_SELFTEST_FULL=1) — rodo todas as famílias" >&2
+    else
+      _sel="$(_selftest_local_families ${SELFTEST_AFFECTED[@]+"${SELFTEST_AFFECTED[@]}"})"
+      SELFTEST_LOCAL_WHY="o failsafe pediria TODAS; a completa é do CI (PR que toca a infra da bancada ou com a label ci:full; push ao main desde o passo D de D_MERGE_PROCESS_ONION_2026_10). Completa local só por opt-in: --full ou ONION_SELFTEST_FULL=1"
+      echo "  local: ${SELFTEST_LOCAL_WHY}" >&2
+      echo "  local: rodo quem cita os arquivos tocados + núcleo local (${SELFTEST_LOCAL_CORE}) + núcleo do mapa" >&2
+    fi
+  elif [ "${SELFTEST_LOCAL}" = "1" ] && [ "${SELFTEST_FULL}" != "1" ]; then
+    # a INFRA DO CI que o nível PR trata como "completa" (ops/testing/*) pode ter seleção estreita aqui sem
+    # passar pelo failsafe; o núcleo local entra igual — é quem exerce a maquinaria que esse diff mexe
+    for _p in ${SELFTEST_AFFECTED[@]+"${SELFTEST_AFFECTED[@]}"}; do
+      case "${_p}" in
+        .claude/validation/lint-selftest.sh|.github/workflows/*|ops/testing/*)
+          _sel="$(printf '%s\n' "${_sel},${SELFTEST_LOCAL_CORE}" | tr ',' '\n' | grep -v '^$' | sort -u | paste -sd, -)"
+          SELFTEST_LOCAL_WHY="${_p} é infra da bancada/CI: o nível PR roda a completa; aqui, a seleção + o núcleo local"
+          echo "  local: ${SELFTEST_LOCAL_WHY} (${SELFTEST_LOCAL_CORE}); a completa é do CI" >&2
+          break ;;
+      esac
+    done
+  fi
   if [ "${_sel}" = "ALL" ]; then
     echo "faixa: TODAS as famílias (failsafe — motivo acima)"
   else
     SELFTEST_FAMILIES="${_sel}"
-    echo "faixa: $(printf '%s' "${_sel}" | tr ',' '\n' | grep -c .) famílias afetadas por ${#SELFTEST_AFFECTED[@]} arquivo(s): ${_sel}"
+    echo "faixa${SELFTEST_LOCAL_WHY:+ LOCAL (a completa é do CI)}: $(printf '%s' "${_sel}" | tr ',' '\n' | grep -c .) famílias afetadas por ${#SELFTEST_AFFECTED[@]} arquivo(s): ${_sel}"
   fi
 fi
 
@@ -890,6 +1116,12 @@ if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTES
         while IFS= read -r _row; do REPORT_ROWS+=("${_row#*$'\t'}"); done < <(grep -E $'^#ONION_SELFTEST_FAMILY\t' "${_tdir}/${i}.out" || true)
         while IFS=$'\t' read -r _tag _case; do FAILED_CASES+=("${_case}"); done < <(grep -E $'^#ONION_SELFTEST_FAILED\t' "${_tdir}/${i}.out" || true)
         while IFS=$'\t' read -r _tag _case; do SKIPPED_CASES+=("${_case}"); done < <(grep -E $'^#ONION_SELFTEST_SKIPPED\t' "${_tdir}/${i}.out" || true)
+        while IFS=$'\t' read -r _tag _case; do SLOT_WAITERS+=("${_case}"); done < <(grep -E $'^#ONION_SELFTEST_SLOTWAITER\t' "${_tdir}/${i}.out" || true)
+        _sl="$(grep -E '^#ONION_SELFTEST_SLOTS ' "${_tdir}/${i}.out" | tail -1 || true)"
+        if [ -n "${_sl}" ]; then
+          set -- ${_sl}; SLOT_WAIT_US=$((SLOT_WAIT_US + $2)); SLOT_WAITED=$((SLOT_WAITED + $3))
+          if [ "$4" -gt "${SLOT_MAX_US}" ]; then SLOT_MAX_US="$4"; fi
+        fi
       fi
     done
     for _fam in "${_fams[@]}"; do
@@ -30720,6 +30952,215 @@ FAKEGH
 }
 _family run_two_tier_bench_selftests
 
+# ── machine_slots — VAGAS DA MÁQUINA e FAIXA LOCAL (D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL) ──
+# POR QUE EXISTE (2026-10-13): cinco agentes com `--jobs auto` em 8 vCPUs puseram a carga em 14–17, uma
+# bancada de ~8 min passou de 34 e o runner matou dois pre-commits. Duas curas, e cada uma é um lugar onde
+# a bancada pode passar a mentir: o SEMÁFORO (vagas por máquina, com flock) pode não excluir, segurar vaga
+# de processo morto ou esperar calado; a FAIXA LOCAL (o failsafe "tudo" estreitado no pre-commit e no
+# pr-finalize) pode estreitar onde não devia — no nível PR do CI — ou não abrir com o opt-in. Os casos
+# rodam CÓPIAS da bancada com famílias sintéticas, num diretório de vagas PRÓPRIO (ONION_SELFTEST_SLOT_DIR),
+# então o semáforo das cópias liga mesmo dentro desta família (que roda segurando uma vaga do diretório real).
+# MUTANTES provados no PR por ops/mutate-and-restore.sh (lista no resíduo
+# docs/evolution/review/feat-bench-machine-cpu-semaphore.md).
+run_machine_slots_selftests() {
+  # selftest-covers: .githooks/pre-commit ops/pr-finalize.sh
+  local sut="${REPO_ROOT}/.claude/validation/lint-selftest.sh" pf="${REPO_ROOT}/ops/pr-finalize.sh"
+  command -v flock >/dev/null 2>&1 || { record_skip "machine-slots: flock ausente (util-linux) — o semáforo não é exercível aqui"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "machine-slots: python3 ausente"; return; }
+  local d out rc m peak
+  d="$(mktemp -d)"
+  cp -a "${REPO_ROOT}/.claude" "${d}/.claude"; cp -a "${REPO_ROOT}/docs" "${d}/docs"; cp -a "${REPO_ROOT}/CLAUDE.md" "${d}/CLAUDE.md"
+  python3 - "${d}/.claude/validation/lint-selftest.sh" <<'PYMS'
+import sys, textwrap; p=sys.argv[1]; s=open(p).read()
+i=s.rindex('echo "=== Sumário do auto-teste de guardas ==="')
+k=s.rfind('if [ "${SELFTEST_LIST}" = "1" ]; then SUMMARY_PRINTED=1; exit 0; fi', 0, i)
+# as linhas vêm INDENTADAS de propósito: na coluna 0 o --list/--map/harness as leriam como famílias reais
+syn = textwrap.dedent(r'''
+    _zz_slot_probe() {
+      local m="${ZZ_SLOT_MARK:?}"
+      : > "${m}/active.$1.$$"
+      ls "${m}" | grep -c '^active\.' >> "${m}/peaks" || true
+      sleep "${ZZ_SLOT_SLEEP:-1}"
+      rm -f "${m}/active.$1.$$"
+      record_pass "zz slot $1"
+    }
+    run_zz_rmslots_selftests() { rm -rf "${ONION_SELFTEST_SLOT_DIR:?}"; record_pass "zz rmslots"; }
+    _family run_zz_rmslots_selftests
+    run_zz_slot_a_selftests() { _zz_slot_probe a; }
+    _family run_zz_slot_a_selftests
+    run_zz_slot_b_selftests() { _zz_slot_probe b; }
+    _family run_zz_slot_b_selftests
+    run_zz_slot_c_selftests() { _zz_slot_probe c; }
+    _family run_zz_slot_c_selftests
+    run_zz_slot_d_selftests() { _zz_slot_probe d; }
+    _family run_zz_slot_d_selftests
+    run_zz_slot_e_selftests() { _zz_slot_probe e; }
+    _family run_zz_slot_e_selftests
+    run_zz_slot_f_selftests() { _zz_slot_probe f; }
+    _family run_zz_slot_f_selftests
+    run_zz_hold_selftests() {
+      local m="${ZZ_SLOT_MARK:?}"
+      echo "${BASHPID}" > "${m}/holder.pid"
+      sleep 120 & echo "$!" > "${m}/orphan.pid"
+      : > "${m}/holding"
+      # segura até o caso mandar soltar (arquivo release) ou o teto ZZ_HOLD_SECS — o relógio não decide o caso
+      local t=0
+      while [ ! -f "${m}/release" ] && [ "${t}" -lt "$(( ${ZZ_HOLD_SECS:-30} * 5 ))" ]; do sleep 0.2; t=$((t + 1)); done
+      record_pass "zz hold"
+    }
+    _family run_zz_hold_selftests
+''')
+s=s[:k]+syn+s[k:]; open(p,"w").write(s)
+PYMS
+  local copy="${d}/.claude/validation/lint-selftest.sh"
+  _ms_peak() { sort -n "$1/peaks" 2>/dev/null | tail -1; }
+  _ms_wait_file() { local i=0; while [ ! -f "$1" ] && [ "${i}" -lt 240 ]; do sleep 0.25; i=$((i + 1)); done; [ -f "$1" ]; }
+  _ms_kill() { local f; for f in "$@"; do if [ -f "${f}" ]; then kill -9 "$(cat "${f}")" 2>/dev/null || true; fi; done; return 0; }
+  local fams="zz_slot_a,zz_slot_b,zz_slot_c,zz_slot_d,zz_slot_e,zz_slot_f"
+
+  # (a) DUAS BANCADAS CONCORRENTES com N=2 nunca passam de 2 famílias simultâneas — e chegam a 2 (o caso
+  #     não é vácuo: sem a disputa, 2 × 3 workers dariam até 6)
+  m="${d}/ma"; mkdir -p "${m}"
+  local o1="${d}/a1.out" o2="${d}/a2.out" r1=0 r2=0 p1 p2
+  ZZ_SLOT_MARK="${m}" ONION_SELFTEST_SLOT_DIR="${d}/slots-a" ONION_SELFTEST_MACHINE_SLOTS=2 bash "${copy}" --families "${fams}" --jobs 3 > "${o1}" 2>&1 & p1=$!
+  ZZ_SLOT_MARK="${m}" ONION_SELFTEST_SLOT_DIR="${d}/slots-a" ONION_SELFTEST_MACHINE_SLOTS=2 bash "${copy}" --families "${fams}" --jobs 3 > "${o2}" 2>&1 & p2=$!
+  wait "${p1}" || r1=$?; wait "${p2}" || r2=$?
+  peak="$(_ms_peak "${m}")"
+  if [ "${r1}" -eq 0 ] && [ "${r2}" -eq 0 ] && [ "${peak:-0}" -eq 2 ] && grep -q 'Passaram : 6' "${o1}" && grep -q 'Passaram : 6' "${o2}"; then
+    record_pass "machine-slots: (a) 2 bancadas × 3 workers com N=2 ⇒ pico de 2 famílias simultâneas (nunca 3+), ambas verdes"
+  else record_fail "machine-slots: (a) exclusão entre bancadas" "rc=${r1}/${r2} pico=${peak:-?} (esperado 2); $(grep -hE 'Passaram|Vagas|SEM VAGA' "${o1}" "${o2}" | tr '\n' '|' | cut -c1-200)"; fi
+
+  # (c) OVERRIDE de N: N=1 ⇒ uma família por vez, e o sumário diz N=1; valor inválido ⇒ aviso e nproc
+  m="${d}/mc"; mkdir -p "${m}"
+  out="$(ZZ_SLOT_MARK="${m}" ZZ_SLOT_SLEEP=0.3 ONION_SELFTEST_SLOT_DIR="${d}/slots-c" ONION_SELFTEST_MACHINE_SLOTS=1 bash "${copy}" --families zz_slot_a,zz_slot_b,zz_slot_c --jobs 3 2>&1)" && rc=0 || rc=$?
+  peak="$(_ms_peak "${m}")"
+  local outc2; outc2="$(ZZ_SLOT_MARK="${m}" ZZ_SLOT_SLEEP=0 ONION_SELFTEST_SLOT_DIR="${d}/slots-c" ONION_SELFTEST_MACHINE_SLOTS=abc bash "${copy}" --families zz_slot_a 2>&1 || true)"
+  if [ "${rc}" -eq 0 ] && [ "${peak:-0}" -eq 1 ] && grep -q 'Vagas    : 1 da máquina' <<< "${out}" \
+     && grep -q "ONION_SELFTEST_MACHINE_SLOTS='abc' não é inteiro" <<< "${outc2}" && grep -q "Vagas    : $(nproc 2>/dev/null || echo 1) da máquina" <<< "${outc2}"; then
+    record_pass "machine-slots: (c) ONION_SELFTEST_MACHINE_SLOTS=1 ⇒ uma família por vez (pico 1, sumário N=1); 'abc' ⇒ aviso e nproc"
+  else record_fail "machine-slots: (c) override de N" "rc=${rc} pico=${peak:-?}; $(grep -E 'Vagas|MACHINE_SLOTS' <<< "${out}${outc2}" | tr '\n' '|' | cut -c1-200)"; fi
+
+  # (b) VAGA LIBERADA QUANDO O PROCESSO MORRE: kill -9 no worker no meio da família — e a família deixou um
+  #     neto órfão (sleep em background), que NÃO pode segurar a vaga (o fd não desce para os netos)
+  m="${d}/mb"; mkdir -p "${m}"
+  local pb rb=0
+  TMPDIR="${m}" ZZ_SLOT_MARK="${m}" ZZ_HOLD_SECS=60 ONION_SELFTEST_SLOT_DIR="${d}/slots-b" ONION_SELFTEST_MACHINE_SLOTS=1 bash "${copy}" --families zz_hold > "${d}/b.out" 2>&1 & pb=$!
+  if _ms_wait_file "${m}/holding"; then
+    kill -9 "$(cat "${m}/holder.pid")" 2>/dev/null || true
+    wait "${pb}" 2>/dev/null || true
+    out="$(ZZ_SLOT_MARK="${m}" ZZ_SLOT_SLEEP=0 ONION_SELFTEST_SLOT_DIR="${d}/slots-b" ONION_SELFTEST_MACHINE_SLOTS=1 ONION_SELFTEST_SLOT_WAIT_MAX=6 bash "${copy}" --families zz_slot_a 2>&1)" && rb=0 || rb=$?
+    local orphan_alive=0; kill -0 "$(cat "${m}/orphan.pid")" 2>/dev/null && orphan_alive=1
+    if [ "${rb}" -eq 0 ] && [ "${orphan_alive}" -eq 1 ] && ! grep -q 'SEM VAGA' <<< "${out}" && grep -q 'Passaram : 1' <<< "${out}"; then
+      record_pass "machine-slots: (b) kill -9 no worker com a vaga ⇒ a próxima bancada pega a vaga na hora (o neto órfão vivo NÃO a segura)"
+    else record_fail "machine-slots: (b) vaga presa após kill -9" "rc=${rb} órfão_vivo=${orphan_alive}; $(grep -E 'SEM VAGA|Passaram|Vagas' <<< "${out}" | tr '\n' '|' | cut -c1-220)"; fi
+  else
+    kill -9 "${pb}" 2>/dev/null || true
+    record_fail "machine-slots: (b) a bancada que segura a vaga não chegou a segurar" "$(tail -3 "${d}/b.out" | tr '\n' '|' | cut -c1-200)"
+  fi
+  _ms_kill "${m}/orphan.pid"
+
+  # (d) ESPERA DECLARADA no sumário (família e segundos) e TETO de espera com a mensagem nomeada
+  m="${d}/md"; mkdir -p "${m}"
+  local pd
+  TMPDIR="${m}" ZZ_SLOT_MARK="${m}" ZZ_HOLD_SECS=120 ONION_SELFTEST_SLOT_DIR="${d}/slots-d" ONION_SELFTEST_MACHINE_SLOTS=1 bash "${copy}" --families zz_hold > "${d}/d.out" 2>&1 & pd=$!
+  if _ms_wait_file "${m}/holding"; then
+    local ot rt=0 pw
+    ot="$(ZZ_SLOT_MARK="${m}" ZZ_SLOT_SLEEP=0 ONION_SELFTEST_SLOT_DIR="${d}/slots-d" ONION_SELFTEST_MACHINE_SLOTS=1 ONION_SELFTEST_SLOT_WAIT_MAX=1 bash "${copy}" --families zz_slot_b 2>&1)" && rt=0 || rt=$?
+    # a que ESPERA: só se solta o holder depois que ela DISSE que está esperando (⏳), mais 2 s — sob carga o
+    # setup da bancada demora, e um relógio fixo media o setup em vez da espera (flaky medido com load 17)
+    ZZ_SLOT_MARK="${m}" ZZ_SLOT_SLEEP=0 ONION_SELFTEST_SLOT_DIR="${d}/slots-d" ONION_SELFTEST_MACHINE_SLOTS=1 bash "${copy}" --families zz_slot_a > "${d}/dw.out" 2>&1 & pw=$!
+    local i=0; while ! grep -q "⏳ vagas da máquina: zz_slot_a espera vaga" "${d}/dw.out" 2>/dev/null && [ "${i}" -lt 600 ]; do sleep 0.25; i=$((i + 1)); done
+    sleep 2; : > "${m}/release"
+    wait "${pw}" && rc=0 || rc=$?
+    out="$(cat "${d}/dw.out")"
+    wait "${pd}" 2>/dev/null || true
+    local wl ws; wl="$(grep -m1 '^  Vagas    :' <<< "${out}" || true)"
+    ws="$(sed -n 's/.*espera somada \([0-9]*\)\..*/\1/p' <<< "${wl}")"
+    if [ "${rc}" -eq 0 ] && [ "${ws:-0}" -ge 2 ] && grep -q 'em 1 família(s)' <<< "${wl}" && grep -q 'zz_slot_a:' <<< "${wl}" \
+       && grep -q '⏳ vagas da máquina: zz_slot_a espera vaga' <<< "${out}" \
+       && [ "${rt}" -eq 1 ] && grep -q 'zz_slot_b: SEM VAGA DA MÁQUINA em 1s' <<< "${ot}" && ! grep -q '^OK' <<< "${ot}"; then
+      record_pass "machine-slots: (d) espera por vaga dita na hora (⏳) e somada no sumário (${ws}s, família nomeada); teto estourado ⇒ FALHA nomeada, nunca verde calado"
+    else record_fail "machine-slots: (d) espera não declarada / teto mudo" "rc=${rc} linha=[${wl}] · teto rc=${rt}: $(grep -E 'SEM VAGA|^OK|FALHOU' <<< "${ot}" | tr '\n' '|' | cut -c1-160)"; fi
+  else
+    kill -9 "${pd}" 2>/dev/null || true
+    record_fail "machine-slots: (d) a bancada que segura a vaga não chegou a segurar" "$(tail -3 "${d}/d.out" | tr '\n' '|' | cut -c1-200)"
+  fi
+  : > "${m}/release"; _ms_kill "${m}/orphan.pid"
+
+  # (d2) ADVERSARIAL: bancada ANINHADA herda a vaga (não pede outra no mesmo diretório — deadlock com N
+  #      vagas tomadas pelo pai); diretório que aceita escrita de outros ⇒ semáforo DESLIGADO e declarado
+  out="$(ZZ_SLOT_MARK="${d}" ZZ_SLOT_SLEEP=0 ONION_SELFTEST_SLOT_DIR="${d}/slots-n" ONION_SELFTEST_SLOT_HELD_DIR="${d}/slots-n" bash "${copy}" --families zz_slot_a 2>&1 || true)"
+  mkdir -p "${d}/slots-w"; chmod 0777 "${d}/slots-w"
+  local outw; outw="$(ZZ_SLOT_MARK="${d}" ZZ_SLOT_SLEEP=0 ONION_SELFTEST_SLOT_DIR="${d}/slots-w" bash "${copy}" --families zz_slot_a 2>&1 || true)"
+  if grep -q 'semáforo da máquina DESLIGADO — aninhada' <<< "${out}" && grep -q '^OK' <<< "${out}" \
+     && grep -q 'DESLIGADO — .*aceita escrita de outros' <<< "${outw}" && grep -q '^OK' <<< "${outw}"; then
+    record_pass "machine-slots: (d2) aninhada herda a vaga do pai (sem deadlock); diretório gravável por outros ⇒ DESLIGADO declarado, bancada segue"
+  else record_fail "machine-slots: (d2) aninhada/permissão" "$(grep -E 'Vagas|^OK|FALHOU' <<< "${out}${outw}" | tr '\n' '|' | cut -c1-220)"; fi
+
+  # (d3) ADVERSARIAL: o diretório de vagas SOME no meio da bancada (limpeza de /tmp, logout que leva
+  #      /run/user) ⇒ a família seguinte recria e roda; sem a cura, esperaria o teto por um arquivo que
+  #      ninguém mais cria
+  out="$(ZZ_SLOT_MARK="${d}" ZZ_SLOT_SLEEP=0 ONION_SELFTEST_SLOT_DIR="${d}/slots-r" ONION_SELFTEST_MACHINE_SLOTS=1 ONION_SELFTEST_SLOT_WAIT_MAX=3 bash "${copy}" --families zz_rmslots,zz_slot_a 2>&1)" && rc=0 || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'Passaram : 2' <<< "${out}" && ! grep -q 'SEM VAGA' <<< "${out}" && [ -d "${d}/slots-r" ]; then
+    record_pass "machine-slots: (d3) diretório de vagas apagado no meio ⇒ recriado, a família seguinte roda (sem esperar o teto)"
+  else record_fail "machine-slots: (d3) diretório sumido" "rc=${rc}; $(grep -E 'SEM VAGA|Passaram|Vagas|sumiu' <<< "${out}" | tr '\n' '|' | cut -c1-220)"; fi
+
+  # (e) A INFRA DA BANCADA NO DIFF NÃO RODA A COMPLETA LOCAL: o seletor com --local estreita o failsafe
+  #     (declarando que a completa é do CI) e SEM --local segue comprando tudo (o nível PR não muda)
+  local _p _bad_e=""
+  for _p in .github/workflows/onion-selftest.yml .githooks/pre-commit ops/testing/selftest-shard-plan.sh ops/zz-machine-slots-nao-mapeado.sh; do
+    out="$(bash "${sut}" --affected "${_p}" --local --dry-run 2>&1 || true)"
+    local _l; _l="$(grep -m1 '^dry-run: famílias=' <<< "${out}" || true)"
+    if grep -q 'famílias=<todas>' <<< "${_l}" || ! grep -q 'a completa é do CI' <<< "${out}" \
+       || ! grep -q 'machine_slots' <<< "${_l}" || ! grep -q 'selftest_lanes' <<< "${_l}" || ! grep -q 'two_tier_bench' <<< "${_l}"; then _bad_e="${_bad_e} ${_p}"; fi
+  done
+  # polaridade (o nível PR e quem chama sem --local não mudam): sem --local, a infra segue comprando tudo
+  out="$(bash "${sut}" --affected .github/workflows/onion-selftest.yml --dry-run 2>&1 || true)"
+  grep -q '^dry-run: famílias=<todas>' <<< "${out}" || _bad_e="${_bad_e} workflow(sem --local deixou de comprar tudo)"
+  # o hook invoca a bancada SEMPRE com --local (linhas de código, não comentário)
+  local _hk; _hk="$(grep -vE '^[[:space:]]*#' "${REPO_ROOT}/.githooks/pre-commit" | grep -E 'bash "\$\{SELFTEST\}" --affected-staged' || true)"
+  local _hk_bad; _hk_bad="$(grep -v -- '--dry-run' <<< "${_hk}" | grep -v -- '--local' || true)"
+  if [ -z "${_hk}" ] || [ -n "${_hk_bad}" ]; then _bad_e="${_bad_e} hook-sem---local"; fi
+  # o índice: a bancada STAGEADA com linha de cabeçalho mudada (o failsafe mais caro) ⇒ faixa local
+  local g="${d}/git-e"; mkdir -p "${g}/.claude/validation"; cp "${sut}" "${g}/.claude/validation/lint-selftest.sh"
+  git -C "${g}" init -q && git -C "${g}" add -A && git -C "${g}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  sed -i 's/^SELFTEST_EXPECTED_EXIT=0 /SELFTEST_EXPECTED_EXIT=0  /' "${g}/.claude/validation/lint-selftest.sh"; git -C "${g}" add -A
+  out="$( (cd "${g}" && bash .claude/validation/lint-selftest.sh --affected-staged --local --dry-run 2>&1) || true)"
+  local outn; outn="$( (cd "${g}" && bash .claude/validation/lint-selftest.sh --affected-staged --dry-run 2>&1) || true)"
+  if ! grep -q '^faixa LOCAL (a completa é do CI)' <<< "${out}" || grep -q 'famílias=<todas>' <<< "${out}" \
+     || ! grep -q '^dry-run: famílias=<todas>' <<< "${outn}"; then _bad_e="${_bad_e} staged-cabeçalho"; fi
+  if [ -z "${_bad_e}" ]; then
+    record_pass "machine-slots: (e) infra da bancada no diff (workflow, hook, ops/testing, não mapeado, cabeçalho staged) ⇒ faixa LOCAL declarada, nunca a completa; sem --local segue tudo"
+  else record_fail "machine-slots: (e) completa local" "${_bad_e}"; fi
+
+  # (f) OPT-IN EXPLÍCITO: ONION_SELFTEST_FULL=1 e --full devolvem a completa, dizendo que foi pedida
+  local of1 of2
+  of1="$(ONION_SELFTEST_FULL=1 bash "${sut}" --affected .githooks/pre-commit --local --dry-run 2>&1 || true)"
+  of2="$(bash "${sut}" --affected .githooks/pre-commit --local --full --dry-run 2>&1 || true)"
+  if grep -q '^dry-run: famílias=<todas>' <<< "${of1}" && grep -q 'completa PEDIDA' <<< "${of1}" \
+     && grep -q '^dry-run: famílias=<todas>' <<< "${of2}" && grep -q 'completa PEDIDA' <<< "${of2}"; then
+    record_pass "machine-slots: (f) ONION_SELFTEST_FULL=1 e --full ⇒ a completa local, declarada como pedida"
+  else record_fail "machine-slots: (f) opt-in da completa" "$(grep -hE '^dry-run|PEDIDA' <<< "${of1}${of2}" | tr '\n' '|' | cut -c1-200)"; fi
+
+  # (g) PR-FINALIZE: o pré-voo roda as famílias alteradas, nunca a completa; ONION_SELFTEST_FULL=1 a pede
+  #     (o `env -i` do pré-voo apagaria a variável — o motor a traduz). Bancada e helper de mentira, que
+  #     só registram com que argumentos foram chamados.
+  local s="${d}/pf"; mkdir -p "${s}/ops/testing" "${s}/.claude/validation"
+  printf '#!/bin/bash\necho fam_x\n' > "${s}/ops/testing/preflight-families.sh"
+  printf '#!/bin/bash\necho "ARGS:$*" >> "%s/args.log"\necho "  Passaram : 1"\n' "${s}" > "${s}/.claude/validation/lint-selftest.sh"
+  git -C "${s}" init -q -b main && git -C "${s}" add -A && git -C "${s}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1 \
+    && git -C "${s}" switch -q -c feat/x
+  ( cd "${s}" && ONION_FINALIZE_CHECKPOINT=1 GH_CONFIG_DIR="${s}/nogh" bash "${pf}" > "${s}/o1" 2>&1 ) || true
+  ( cd "${s}" && ONION_FINALIZE_CHECKPOINT=1 ONION_SELFTEST_FULL=1 GH_CONFIG_DIR="${s}/nogh" bash "${pf}" > "${s}/o2" 2>&1 ) || true
+  local a1 a2; a1="$(sed -n 1p "${s}/args.log" 2>/dev/null)"; a2="$(sed -n 2p "${s}/args.log" 2>/dev/null)"
+  if [ "${a1}" = "ARGS:--families fam_x" ] && [ "${a2}" = "ARGS:" ] && grep -q 'a completa é do CI' "${s}/o1" && grep -q 'pré-voo COMPLETO pedido' "${s}/o2"; then
+    record_pass "machine-slots: (g) pr-finalize: pré-voo = famílias alteradas (a completa é do CI); ONION_SELFTEST_FULL=1 ⇒ completa, declarada"
+  else record_fail "machine-slots: (g) pr-finalize" "args1=[${a1}] args2=[${a2}]; $(grep -h 'pré-voo' "${s}/o1" "${s}/o2" | tr '\n' '|' | cut -c1-200)"; fi
+
+  rm -rf "${d}"
+}
+_family run_machine_slots_selftests
+
 # ── check-member-registered.sh: o registro é lido como YAML, não por regex de fim de linha ───────
 # POR QUE EXISTE (2026-10-07): a regex ancorada no fim da linha não casava `local_path: "/x"  # nota`,
 # e o ops/audit-adopters-registry.sh dava três membros REGISTRADOS como "FORA DO REGISTRO" — um alarme
@@ -31990,6 +32431,8 @@ if [ "${SELFTEST_CHILD}" = "1" ]; then
   for r in "${REPORT_ROWS[@]}"; do printf '#ONION_SELFTEST_FAMILY\t%s\n' "${r}"; done
   for c in "${FAILED_CASES[@]}"; do printf '#ONION_SELFTEST_FAILED\t%s\n' "${c}"; done
   for c in "${SKIPPED_CASES[@]}"; do printf '#ONION_SELFTEST_SKIPPED\t%s\n' "${c}"; done
+  for c in "${SLOT_WAITERS[@]}"; do printf '#ONION_SELFTEST_SLOTWAITER\t%s\n' "${c}"; done
+  echo "#ONION_SELFTEST_SLOTS ${SLOT_WAIT_US} ${SLOT_WAITED} ${SLOT_MAX_US}"
   echo "#ONION_SELFTEST_COUNTS ${PASS} ${FAIL} ${SKIP}"
   SUMMARY_PRINTED=1; exit 0
 fi
@@ -32010,6 +32453,13 @@ echo "=== Sumário do auto-teste de guardas ==="
 echo "  Passaram : ${PASS}"
 echo "  Pularam  : ${SKIP}   (⊘ NÃO VERIFICADO — o SUT não foi exercido)"
 echo "  Falharam : ${FAIL}"
+# A FILA DA MÁQUINA É DECLARADA (D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL): tempo de parede gasto
+# esperando vaga aparece aqui, somado entre os workers — "demorou" passa a ter causa legível.
+if [ "${SLOT_ON}" = "1" ]; then
+  echo "  Vagas    : ${SLOT_N} da máquina (${SLOT_DIR}) · espera somada $(awk -v u="${SLOT_WAIT_US}" 'BEGIN{printf "%.1f", u/1e6}')s em ${SLOT_WAITED} família(s), máx $(awk -v u="${SLOT_MAX_US}" 'BEGIN{printf "%.1f", u/1e6}')s${SLOT_WAITERS[0]+ — $(printf '%s\n' "${SLOT_WAITERS[@]}" | sort -t: -k2 -rn | sed -n '1,5p' | paste -sd' ' -)}"
+else
+  echo "  Vagas    : semáforo da máquina DESLIGADO — ${SLOT_WHY:-não configurado}"
+fi
 echo ""
 
 # O bloco dos pulados vem ANTES do veredito e é impresso mesmo com FAIL>0: um skip
