@@ -56,7 +56,10 @@ Opções úteis:
 | `--where` | Uma linha por ocorrência, com o nó ou a aresta |
 | `--corpus DIR` | Confere a ponta externa das `external_edges` contra os `.kg.yaml` rastreados pelo git sob `DIR` (fora de um repo git, todos) |
 | `--schema F` | Valida contra outro MUST (o SHOULD vizinho vem junto, se existir) |
-| `--json OUT` | Grava o resultado em JSON, num formato congelado (`{summary, results}`) |
+| `--format json` | O veredito estruturado em stdout (ver abaixo), para ferramentas e servidores MCP |
+| `--limit N` | Com `--format json`, quantas ocorrências por arquivo (default 50); o resumo conta todas |
+| `-` no lugar do arquivo | Lê o grafo do stdin, sem gravar arquivo temporário |
+| `--json OUT` | Grava o resultado no formato do spike (`{summary, results}`), congelado; não é o veredito |
 
 Com `external_edges` e sem `--corpus`, o leitor avisa que não conferiu a ponta externa:
 
@@ -65,6 +68,64 @@ PASSA   docs/decisao.kg.yaml
 · 1 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
 · 1 arquivo(s) com external_edges: a ponta externa NÃO foi conferida (rode com --corpus <raiz do repo>)
 ```
+
+### O veredito estruturado (`--format json`)
+
+Para quem chama o leitor por programa (um CI, um servidor MCP, um chat), o `--format json` devolve o veredito num
+formato versionado, `kg-ssot.verdict/1`, com JSON Schema em `spec/verdict.schema.json`. Saída real de um caso da
+suíte:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
+  vendor/kg-ssot/spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
+```
+
+```text
+{
+ "schema_version": "kg-ssot.verdict/1",
+ "contract": {
+  "must": "spec/kg-contract-v4.schema.json",
+  "should": "spec/kg-contract-v4.should.schema.json",
+  "release": "kg-ssot-v4.5.0",
+  "sha256": { "must": "6277fc83…", "should": "034e3a6e…" }
+ },
+ "results": [
+  {
+   "source": "…/bad-node-missing-label.kg.yaml",
+   "verdict": "FAIL",
+   "summary": { "MUST": { "form.required.node.label": 1 }, "SHOULD": {} },
+   "occurrences": [
+    {
+     "level": "MUST",
+     "code": "form.required.node.label",
+     "place": "nó Q_A",
+     "path": "nodes[0]",
+     "line": 5,
+     "message": "Falta o campo obrigatório «label» no nó."
+    }
+   ],
+   "total": 1,
+   "truncated": false,
+   "external_checked": true
+  }
+ ]
+}
+```
+
+(Os dois sha256 e o caminho estão abreviados aqui.)
+
+- **O que é estável:** `code` é o vocabulário da suíte e do gate, e é por ele que uma ferramenta decide. `message` e
+  `hint` são texto para pessoas e podem mudar.
+- **O lugar da ocorrência:** `path` aponta no documento (`nodes[7].provenance.method`) e `line` é a linha do YAML,
+  para quem edita corrigir o ponto certo sem reescrever o grafo.
+- **O corte:** `summary` conta todas as ocorrências. `occurrences` traz até `--limit`, e `truncated` e `total` dizem
+  se cortou. Assim um grafo grande não enche o contexto de um modelo.
+- **O contrato que julgou:** `contract` traz o caminho, o sha256 de cada schema e a release, para quem precisa provar
+  qual contrato julgou.
+- **O rc:** 0 quando todos passam, 1 quando algum reprova (um arquivo que não parseia reprova com `parse.*`, como na
+  suíte) e 2 quando a entrada está quebrada (arquivo ilegível, opção inválida).
+- **O desempenho:** com a libyaml instalada (o caso comum do PyYAML), o parse usa o parser em C, com o mesmo perfil
+  YAML 1.2. Um grafo de 6.376 nós sai em segundos.
 
 ## `kg_conformance.py`: a suíte
 

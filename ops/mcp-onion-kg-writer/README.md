@@ -1,6 +1,6 @@
 # onion-kg-writer — o write(KG) do chat da casa como servidor MCP
 
-Servidor MCP em Python (stdlib + PyYAML; streamable-http stateless, JSON-RPC). Deixa o chat da casa
+Servidor MCP em Python (stdlib + PyYAML + jsonschema; streamable-http stateless, JSON-RPC). Deixa o chat da casa
 (LibreChat) **gerar `.kg.yaml` completos e válidos pela maquinaria**, cada usuário na **sua própria
 área**. É irmão de escrita do `ops/mcp-onion-kg/` (o Brain), que é só leitura e continua assim.
 
@@ -17,7 +17,7 @@ O registro está em `docs/evolution/research/mcp-kg-writer-2026-10/mcp-kg-writer
 
 | Tool | Argumentos | Contrato |
 |---|---|---|
-| `kg_validate` | `yaml`, `slug` (opcional) | dry-run: roda o gate e devolve `veredito` (`APROVADO`/`REPROVADO`), as linhas `✗` do radar, as `MUST` do contrato e os avisos `SHOULD`. **Nunca grava.** Sem `slug`, julga com o `meta.id`. |
+| `kg_validate` | `yaml`, `slug` (opcional) | dry-run: roda o gate e devolve `veredito` (`APROVADO`/`REPROVADO`/`NAO JULGADO`), as linhas `✗` do radar e, do contrato, as ocorrências estruturadas (`level`, `code`, `place`, `path`, `line`, `message`, às vezes `hint`) em `contrato.ocorrencias` e os avisos `SHOULD` em `avisos_should`. **Nunca grava.** Sem `slug`, julga com o `meta.id`. |
 | `kg_write` | `slug`, `yaml` | grava `<área>/<slug>/<slug>.kg.yaml` **só com `APROVADO`** e commita no repo git da área com autor = o e-mail do header. Devolve `caminho` (relativo à área), `commit`, `autor`, `mudou` e o veredito. Reprovado = `gravado: false`, `isError: true`, nada no disco, nem a área. |
 | `kg_my_list` | — | os grafos da área do usuário (symlink plantado não aparece). |
 | `kg_my_get` | `slug` | o texto de um grafo da área do usuário. |
@@ -38,16 +38,28 @@ HEAD da raiz de código, ou seja, a versão da maquinaria que julgou) e `code_so
 O texto recebido é escrito num diretório temporário e julgado pela maquinaria **real** do core, a
 partir de `ONION_KG_CODE_ROOT`:
 
-1. `.claude/validation/kg-radar.sh <arq> --integrity --schema` — exit 0 obrigatório;
-2. `python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where <arq>` — rc 0 obrigatório.
+1. `.claude/validation/kg-radar.sh <arq> --integrity --schema` — exit 0 obrigatório (sobre a cópia
+   no diretório temporário);
+2. `python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json --limit 50 -` — os bytes chegam
+   pelo **stdin**, e a resposta é o veredito estruturado `kg-ssot.verdict/1` (desde a kg-ssot-v4.5.0).
+
+O relatório do contrato só é crido depois de conferido contra `vendor/kg-ssot/spec/verdict.schema.json`.
+O gate decide por `verdict` e `code`, que são o vocabulário estável; `message` e `hint` vão ao usuário,
+mas **nunca** se decide por eles (podem mudar entre versões). Viram **`NAO JULGADO`**, e nada é gravado:
+rc fora de 0/1 (rc 2 é entrada quebrada), JSON que não parseia, relatório fora do schema, `schema_version`
+diferente de `kg-ssot.verdict/1`, mais de um resultado, `verdict` incoerente com o rc ou com o `summary`,
+e `external_checked: false` (o servidor não tem o corpus para conferir a ponta externa de uma
+`external_edges`). O motivo vem em `contrato.motivo`. Ocorrências repetidas em `level`+`code`+`path` (o
+schema às vezes acusa o mesmo campo por duas regras) saem fundidas, com `vezes`.
 
 Cada gate tem timeout (`ONION_KG_WRITER_GATE_TIMEOUT`, 60 s); estourar conta como reprovação. No
-máximo 4 gates rodam ao mesmo tempo. As linhas de falha voltam cortadas (60 por gate, 300 caracteres
-por linha) e o teto vem declarado na resposta. Passou: são gravados **os mesmos bytes** que foram
-julgados.
+máximo 4 gates rodam ao mesmo tempo. As linhas do radar voltam cortadas (60, 300 caracteres por linha);
+do contrato vêm até 50 ocorrências, com `total` e `truncado`, e o teto vem declarado na resposta.
+Passou: são gravados **os mesmos bytes** que foram julgados.
 
 **Conteúdo recebido é dado.** Ele nunca é executado. Só é lido por um `SafeLoader` que recusa alias,
-e chega aos gates como arquivo, nunca como argumento de shell (o nome do arquivo é o slug validado).
+e chega aos gates como arquivo (radar) e stdin (contrato), nunca como argumento de shell (o nome do
+arquivo é o slug validado).
 
 ## Área por usuário
 
@@ -73,7 +85,7 @@ e chega aos gates como arquivo, nunca como argumento de shell (o nome do arquivo
 | `ONION_KG_WRITER_GATES` | não | gates simultâneos; default 4. |
 | `MCP_HOST` / `MCP_PORT` | não | bind; default `172.23.0.1:3037`. `MCP_PORT=0` = porta efêmera. |
 
-O Python precisa ter PyYAML e jsonschema (o do venv). Sem PyYAML o servidor não sobe.
+O Python precisa ter PyYAML e jsonschema (o do venv). Sem um dos dois o servidor não sobe (fail-closed): sem PyYAML não há parser seguro, sem jsonschema não há como conferir o relatório do contrato.
 
 ## Tetos declarados
 

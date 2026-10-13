@@ -37,6 +37,7 @@ import argparse
 import collections
 import datetime
 import functools
+import hashlib
 import json
 import math
 import pathlib
@@ -127,12 +128,34 @@ Yaml12CoreLoader.add_implicit_resolver(
 
 def _core_int(loader, node):
     v = loader.construct_scalar(node)
-    return int(v[2:], 8) if v.startswith("0o") else int(v[2:], 16) if v.startswith("0x") else int(v)
+    try:
+        return int(v[2:], 8) if v.startswith("0o") else int(v[2:], 16) if v.startswith("0x") else int(v)
+    except ValueError:  # !!int explícito num valor que o 1.2 core não lê como inteiro (0b11): é erro de parse, não crash
+        raise yaml.constructor.ConstructorError(None, None, f"inteiro inválido no YAML 1.2: {v!r}", node.start_mark)
 
 
 Yaml12CoreLoader.add_constructor("tag:yaml.org,2002:int", _core_int)
 Yaml12CoreLoader.add_constructor("tag:yaml.org,2002:timestamp",
                                  lambda loader, node: UnquotedDate(loader.construct_scalar(node)))
+
+
+_CPARSER = getattr(getattr(yaml, "cyaml", None), "CParser", None)
+if _CPARSER is not None:
+    class Yaml12CoreCLoader(_CPARSER, Yaml12CoreLoader):
+        """O mesmo perfil YAML 1.2 com o parser em C da libyaml (cerca de 10x mais rápido num grafo grande).
+
+        Só o scanner e o parser mudam: o resolvedor (booleanos, inteiros e floats do 1.2, data como string) e o
+        construtor (chave repetida, chave na forma JSON) são os do Yaml12CoreLoader. O teste
+        test_parser_em_c_e_igual_ao_puro exige o mesmo resultado nos dois sobre toda a suíte de conformidade."""
+
+        def __init__(self, stream):
+            _CPARSER.__init__(self, stream)
+            yaml.constructor.SafeConstructor.__init__(self)
+            yaml.resolver.Resolver.__init__(self)
+
+    FAST_LOADER = Yaml12CoreCLoader
+else:  # sem libyaml, o perfil é o mesmo, só mais lento
+    FAST_LOADER = Yaml12CoreLoader
 
 
 def _ecma_pattern(validator, pattern, instance, schema):
@@ -464,30 +487,79 @@ def form_codes(error):
     return [f"form.{kind}.{scope}.{'.'.join(names) if names else 'root'}"]
 
 
+# Onde o parser em C (libyaml) e o puro divergem, medido pela revisão de 2026-10-13 em 63 entradas estranhas: tab
+# como separador ou no fim da linha, a diretiva %YAML, escape \u ou \U (surrogate), BOM fora do início e aninhamento
+# muito profundo. O puro é a referência do perfil; o C é só um atalho, usado quando o texto não tem nenhuma dessas
+# construções. Qual dos dois o YAML 1.2 manda para o tab é decisão de contrato, ainda não tomada.
+RISKY = re.compile(r"\t|%YAML|\\[uU]|.\ufeff", re.S)
+SAFE_DEPTH = 200
+
+
+def loader_for(text):
+    return Yaml12CoreLoader if FAST_LOADER is Yaml12CoreLoader or RISKY.search(text) else FAST_LOADER
+
+
+def _depth(value):
+    """A profundidade de aninhamento do documento construído, sem recursão (ela mesma estouraria a pilha)."""
+    best, stack = 0, [(value, 1)]
+    while stack:
+        v, d = stack.pop()
+        best = max(best, d)
+        if best > SAFE_DEPTH:
+            return best
+        if isinstance(v, dict):
+            stack += [(x, d + 1) for x in v.values()]
+        elif isinstance(v, list):
+            stack += [(x, d + 1) for x in v]
+    return best
+
+
+def parse_error_line(text):
+    """A linha (contando de 1) em que o parse falha, pela marca do erro do parser de referência; None sem marca."""
+    try:
+        list(yaml.load_all(text, Loader=Yaml12CoreLoader))
+    except yaml.MarkedYAMLError as exc:
+        mark = exc.problem_mark or exc.context_mark
+        return mark.line + 1 if mark is not None else None
+    except Exception:  # noqa: BLE001 — só a linha interessa aqui; o código já veio do parse_v1
+        return None
+    return None
+
+
+def _parse(text, loader):
+    try:
+        raw = list(yaml.load_all(text, Loader=loader))
+    except DuplicateKeyError:
+        return None, None, "parse.duplicate-key", None
+    except (yaml.YAMLError, UnicodeEncodeError, RecursionError):
+        # UnicodeEncodeError: texto com surrogate que o parser em C recusa; RecursionError: aninhamento além da pilha
+        return None, None, "parse.yaml-error", None
+    docs = [d for d in raw if d is not None]
+    if not docs:
+        return None, None, "parse.empty-document", raw  # vazio, só comentário, `---` ou `~`
+    if len(raw) != 1:
+        return None, None, "parse.not-single-document", raw  # conta os nulos: um `---` a mais é outro documento
+    if not isinstance(docs[0], dict):
+        return None, None, "parse.root-not-mapping", raw
+    try:
+        return docs[0], canonical(docs[0], json_keys=True), None, raw
+    except DuplicateKeyError:
+        return None, None, "parse.duplicate-key", raw
+    except RecursionError:  # âncora recursiva (a: &x [*x]): não há documento finito para validar
+        return None, None, "parse.yaml-error", raw
+
+
 @functools.lru_cache(maxsize=1024)
 def parse_v1(text):
     """O parse do contrato v1, um só para codes(), warnings() e external_info(): (documento cru, canônico, código).
     Guardado por texto (lru_cache): o mesmo arquivo é parseado uma vez por processo, e nenhum chamador altera o
-    documento devolvido, que é compartilhado."""
-    try:
-        raw = list(yaml.load_all(text, Loader=Yaml12CoreLoader))
-    except DuplicateKeyError:
-        return None, None, "parse.duplicate-key"
-    except yaml.YAMLError:
-        return None, None, "parse.yaml-error"
-    docs = [d for d in raw if d is not None]
-    if not docs:
-        return None, None, "parse.empty-document"  # vazio, só comentário, `---` ou `~`
-    if len(raw) != 1:
-        return None, None, "parse.not-single-document"  # conta os nulos: um `---` a mais é outro documento
-    if not isinstance(docs[0], dict):
-        return None, None, "parse.root-not-mapping"
-    try:
-        return docs[0], canonical(docs[0], json_keys=True), None
-    except DuplicateKeyError:
-        return None, None, "parse.duplicate-key"
-    except RecursionError:  # âncora recursiva (a: &x [*x]): não há documento finito para validar
-        return None, None, "parse.yaml-error"
+    documento devolvido, que é compartilhado. O parser em C entra só como atalho (loader_for); quando o documento
+    é fundo demais, refaz com o puro, cujo veredito é o de referência."""
+    loader = loader_for(text)
+    raw_doc, doc, code, raw = _parse(text, loader)
+    if loader is not Yaml12CoreLoader and raw is not None and _depth(raw) > SAFE_DEPTH:
+        raw_doc, doc, code, raw = _parse(text, Yaml12CoreLoader)
+    return raw_doc, doc, code
 
 
 def code_counts(text, validator, corpus=None):
@@ -601,28 +673,8 @@ def where(text, validator, should_validator=None, corpus=None):
 
     Os códigos são exatamente os que code_counts() e warning_counts() contam, ocorrência por ocorrência (o teste
     test_where_tem_os_mesmos_codigos_que_a_contagem guarda isso). O que não tem lugar mais fino sai como 'arquivo':
-    o parse, o .nan/.inf e a data sem aspas.
-    """
-    raw, doc, parse_code = parse_v1(text)
-    if parse_code:
-        return [("MUST", parse_code, "arquivo")]
-    out, must = [], set()
-    for err in validator.iter_errors(doc):
-        place = schema_place(doc, list(err.absolute_path))
-        for code in form_codes(err):
-            out.append(("MUST", code, place))
-            must.add(code)
-    out += [("MUST", code, "arquivo") for code in sorted(non_finite_codes(doc))]
-    out += [("MUST", code, place) for code, place in integrity_located(doc, refs=("trigger", "on"), corpus=corpus)]
-    out += [("MUST", "yaml.forbidden-key-on", place) for e, place in _located(doc, "edges") if "on" in e]
-    if should_validator is not None:
-        for err in should_validator.iter_errors(doc):
-            place = schema_place(doc, list(err.absolute_path))
-            out += [("SHOULD", code, place) for code in form_codes(err) if code not in must]
-        if _has_unquoted_date(raw):
-            out.append(("SHOULD", "yaml.unquoted-date", "arquivo"))
-        out += [("SHOULD", code, place) for code, place in coherence_located(doc)]
-    return out
+    o parse, o .nan/.inf e a data sem aspas. Deriva de occurrences(), que acrescenta o caminho no documento."""
+    return [(level, code, place) for level, code, place, _ in occurrences(text, validator, should_validator, corpus)]
 
 
 def warnings(text, validator, should_validator):
@@ -635,6 +687,195 @@ def warnings(text, validator, should_validator):
     return sorted(warning_counts(text, validator, should_validator))
 
 
+VERDICT_SCHEMA_VERSION = "kg-ssot.verdict/1"
+PLACE_NODE = re.compile(r"^nó (?:#(\d+)|(.+?))(?: \(#(\d+)\))?$")  # 'nó A (#3)': a repetição de um id
+PLACE_ITEM = re.compile(r"^aresta (externa )?#(\d+)")
+
+
+def place_path(doc, place):
+    """O caminho no documento ['nodes', 7] a partir do lugar legível de where() ('nó X', 'aresta #3 (...)', 'meta')."""
+    if place == "meta":
+        return ["meta"]
+    m = PLACE_ITEM.match(place)
+    if m:
+        return ["external_edges" if m.group(1) else "edges", int(m.group(2)) - 1]
+    m = PLACE_NODE.match(place)
+    if m:
+        if m.group(3):  # a posição explícita da repetição vence o id, que é ambíguo
+            return ["nodes", int(m.group(3)) - 1]
+        if m.group(1):
+            return ["nodes", int(m.group(1)) - 1]
+        nodes = doc.get("nodes") if isinstance(doc.get("nodes"), list) else []
+        for i, n in enumerate(nodes):
+            if isinstance(n, dict) and str(n.get("id")) == m.group(2):
+                return ["nodes", i]
+    return []
+
+
+def path_text(path):
+    """['nodes', 7, 'provenance', 'method'] → 'nodes[7].provenance.method' (o índice conta de 0, como no JSON)."""
+    out = ""
+    for p in path:
+        out += f"[{p}]" if isinstance(p, int) else (f".{p}" if out else str(p))
+    return out
+
+
+def yaml_lines(text):
+    """A árvore de nós do YAML (compose, sem construir valores), para achar a linha de um caminho; None se não compõe."""
+    try:
+        return yaml.compose(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+    except yaml.YAMLError:
+        return None
+
+
+def line_of(tree, path):
+    """A linha (contando de 1) do ponto mais fundo do caminho que existe no YAML; None sem árvore."""
+    node, line = tree, (tree.start_mark.line + 1 if tree is not None else None)
+    for p in path:
+        if isinstance(node, yaml.MappingNode):
+            pair = next(((k, v) for k, v in node.value if isinstance(k, yaml.ScalarNode) and k.value == str(p)), None)
+            if pair is None:
+                break
+            line, node = pair[0].start_mark.line + 1, pair[1]  # a linha da CHAVE: um alias divide o nó do valor
+        elif isinstance(node, yaml.SequenceNode) and isinstance(p, int) and 0 <= p < len(node.value):
+            node = node.value[p]
+            line = node.start_mark.line + 1
+        else:
+            break
+    return line
+
+
+MESSAGES = {
+    "parse.yaml-error": "O arquivo não é YAML válido.",
+    "parse.duplicate-key": "Há uma chave repetida no mesmo mapa.",
+    "parse.empty-document": "O arquivo está vazio ou só tem comentário.",
+    "parse.not-single-document": "O arquivo tem mais de um documento YAML; deve ter um só.",
+    "parse.root-not-mapping": "A raiz do arquivo não é um mapa (meta, nodes, edges).",
+    "integrity.duplicate-id": "Dois nós têm o mesmo id.",
+    "integrity.orphan-node": "O nó não tem nenhuma aresta: está solto no grafo.",
+    "integrity.dangling-external": "A ponta externa aponta para um arquivo ou um id que não existe no corpus.",
+    "integrity.dangling-external-local": "A ponta local da aresta externa não existe neste arquivo.",
+    "integrity.testimony-in-prod": "O nó está em PROD, mas a única base dele é testemunho.",
+    "integrity.verified-before-fact": "A data de verificação é anterior à data do fato (valid_from).",
+    "integrity.untraced-decision": "A decisão não diz de onde veio: falta trace, provenance ou aresta TRACES_TO.",
+    "yaml.unquoted-date": "Há uma data sem aspas; leitores YAML diferentes a leem de formas diferentes.",
+    "yaml.forbidden-key-on": "A aresta usa a chave on, proibida (em YAML 1.1 ela vira o booleano True).",
+}
+HINTS = {
+    "yaml.unquoted-date": 'Ponha a data entre aspas, por exemplo verified_at: "2026-10-13".',
+    "yaml.forbidden-key-on": "Troque on: por trigger:.",
+    "integrity.orphan-node": "Ligue o nó a outro com uma aresta, ou remova o nó.",
+    "integrity.duplicate-id": "Dê um id único a cada nó.",
+    "integrity.untraced-decision": "Acrescente trace, provenance ou uma aresta TRACES_TO saindo da decisão.",
+    "integrity.testimony-in-prod": "Deixe o nó em DEV, ou apoie-o numa medição ou leitura conferida.",
+    "form.required.node.provenance": "Acrescente provenance com source, locator e method, ou deixe o nó open.",
+    "form.range.node.label": "Encurte o label até 280 caracteres e leve o resto para narrative.",
+    "form.pattern.node.provenance.method": "Use a forma '<classe>: <detalhe>', com classe medição, leitura, juízes, "
+                                           "derivado ou testemunho.",
+    "form.pattern.node.provenance.source": "Escreva a fonte de verdade (URL, caminho, comando); sem fonte, deixe o nó open.",
+}
+KIND_TEXT = {"required": "Falta o campo obrigatório", "enum": "Valor fora da lista permitida em",
+             "type": "Tipo errado em", "pattern": "Valor fora da forma esperada em", "range": "Valor fora do limite em",
+             "const": "Valor diferente do exigido em", "unknown-key": "Chave fora da gramática (sem prefixo x_):"}
+SCOPE_TEXT = {"node": "no nó", "edge": "na aresta", "meta": "no meta", "top": "no topo"}
+
+
+def message_of(code):
+    """A frase humana em pt-BR de um código: a específica, ou a montada da forma form.<tipo>.<escopo>.<campo>."""
+    if code in MESSAGES:
+        return MESSAGES[code]
+    parts = code.split(".")
+    if parts[0] == "form" and len(parts) >= 4 and parts[1] in KIND_TEXT:
+        field = ".".join(parts[3:])
+        return f"{KIND_TEXT[parts[1]]} «{field}» {SCOPE_TEXT.get(parts[2], parts[2])}."
+    return f"Violação {code}."
+
+
+def hint_of(code):
+    if code in HINTS:
+        return HINTS[code]
+    if code.startswith("form.unknown-key."):
+        return "Renomeie a chave com o prefixo x_ (extensão que os leitores ignoram) ou remova-a."
+    return None
+
+
+def occurrences(text, validator, should_validator=None, corpus=None):
+    """As ocorrências de where() com o caminho no documento e a linha do YAML: [(nível, código, lugar, caminho)].
+
+    O caminho vem do erro do schema quando existe (aponta o campo: nodes[7].provenance.method); senão, do lugar
+    legível ('nó X' → nodes[i]). Os códigos são exatamente os de where()."""
+    raw, doc, parse_code = parse_v1(text)
+    if parse_code:
+        return [("MUST", parse_code, "arquivo", [])]
+    out, must = [], set()
+    for err in validator.iter_errors(doc):
+        path = list(err.absolute_path)
+        for code in form_codes(err):
+            out.append(("MUST", code, schema_place(doc, path), path))
+            must.add(code)
+    out += [("MUST", code, "arquivo", []) for code in sorted(non_finite_codes(doc))]
+    out += [("MUST", code, place, place_path(doc, place))
+            for code, place in integrity_located(doc, refs=("trigger", "on"), corpus=corpus)]
+    out += [("MUST", "yaml.forbidden-key-on", place, place_path(doc, place) + ["on"])
+            for e, place in _located(doc, "edges") if "on" in e]
+    if should_validator is not None:
+        for err in should_validator.iter_errors(doc):
+            path = list(err.absolute_path)
+            out += [("SHOULD", code, schema_place(doc, path), path) for code in form_codes(err) if code not in must]
+        if _has_unquoted_date(raw):
+            out.append(("SHOULD", "yaml.unquoted-date", "arquivo", []))
+        out += [("SHOULD", code, place, place_path(doc, place)) for code, place in coherence_located(doc)]
+    return out
+
+
+def verdict(text, validator, should_validator=None, corpus=None, source=None, limit=50):
+    """O veredito estruturado de um grafo (formato kg-ssot.verdict/1, JSON Schema em spec/verdict.schema.json).
+
+    verdict é PASS sem MUST e FAIL com qualquer MUST (um arquivo que não parseia reprova com parse.*, como na suíte).
+    summary conta TODAS as ocorrências por nível e código; occurrences traz até `limit`, com truncated e total."""
+    occ = occurrences(text, validator, should_validator, corpus)
+    tree = yaml_lines(text) if occ else None
+    parse_line = parse_error_line(text) if occ and occ[0][1].startswith("parse.") else None
+    summary = {"MUST": collections.Counter(), "SHOULD": collections.Counter()}
+    for level, code, _, _ in occ:
+        summary[level][code] += 1
+    items = []
+    for level, code, place, path in occ[:limit]:
+        item = {"level": level, "code": code, "place": place, "path": path_text(path),
+                "line": (parse_line if code.startswith("parse.") else line_of(tree, path) if tree is not None and path
+                         else None),
+                "message": message_of(code)}
+        hint = hint_of(code)
+        if hint:
+            item["hint"] = hint
+        items.append(item)
+    return {"source": source, "verdict": "FAIL" if summary["MUST"] else "PASS",
+            "summary": {k: dict(sorted(v.items())) for k, v in summary.items()},
+            "occurrences": items, "total": len(occ), "truncated": len(occ) > limit}
+
+
+def contract_info(must_path, should_path):
+    """De onde veio o julgamento: os caminhos do contrato, o sha256 de cada um e a release que o leitor carrega."""
+    def sha(p):
+        return hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() if p else None
+    home = pathlib.Path(__file__).resolve().parent.parent
+    release = None
+    try:
+        release = json.loads((home / "spec" / "release.json").read_text(encoding="utf-8")).get("tag")
+    except (OSError, ValueError):
+        pass
+
+    def rel(p):
+        if not p:
+            return None
+        try:
+            return pathlib.Path(p).resolve().relative_to(home).as_posix()
+        except ValueError:
+            return pathlib.Path(p).name
+    return {"must": rel(must_path), "should": rel(should_path), "release": release,
+            "sha256": {"must": sha(must_path), "should": sha(should_path)}}
+
+
 def load_sources(args):
     if args.git:
         names = [l.strip() for l in open(args.list) if l.strip()]
@@ -644,6 +885,10 @@ def load_sources(args):
             yield name, text
     else:
         for name in args.files:
+            if name == "-":
+                stream = getattr(sys.stdin, "buffer", None)  # UTF-8 inválido é UnicodeDecodeError: rc 2
+                yield "-", stream.read().decode("utf-8") if stream is not None else sys.stdin.read()
+                continue
             with open(name, encoding="utf-8") as fh:
                 yield name, fh.read()
 
@@ -720,10 +965,21 @@ def main(argv=None):
     ap.add_argument("--where", action="store_true", help="lista cada ocorrência com o nó ou a aresta em que ela sai")
     ap.add_argument("--corpus", metavar="DIR", help="raiz do repo: confere a ponta externa das external_edges contra os"
                                                      " .kg.yaml sob DIR (sem ela, só a forma e a ponta local)")
-    ap.add_argument("files", nargs="*")
+    ap.add_argument("--format", choices=("human", "json"), default="human",
+                    help="json: o veredito estruturado kg-ssot.verdict/1 (spec/verdict.schema.json) em stdout")
+    ap.add_argument("--limit", type=int, default=50, help="no --format json, ocorrências por arquivo (default 50)")
+    ap.add_argument("files", nargs="*", help="arquivos .kg.yaml; '-' lê o grafo do stdin")
     args = ap.parse_args(argv)
+    # no modo json o stdout é só JSON: a mensagem de entrada quebrada (rc 2) vai para o stderr
+    say = (lambda msg: print(msg, file=sys.stderr)) if args.format == "json" else print
+    if args.format == "json" and (args.spike or args.json or args.where):
+        say("ENTRADA QUEBRADA  --format json não se combina com --spike, --json nem --where")
+        return 2
+    if args.limit < 1:
+        say("ENTRADA QUEBRADA  --limit tem de ser 1 ou mais")
+        return 2
     if args.where and args.spike:
-        print("ENTRADA QUEBRADA  --where não vale com --spike (o spike tem saída própria, congelada)")
+        say("ENTRADA QUEBRADA  --where não vale com --spike (o spike tem saída própria, congelada)")
         return 2
     should_path = args.should_schema or should_for(args.schema)
     try:
@@ -735,13 +991,20 @@ def main(argv=None):
                 should_v = make_validator(json.load(fh))
         sources = list(load_sources(args))
     except (OSError, ValueError, UnicodeDecodeError, subprocess.CalledProcessError) as exc:
-        print(f"ENTRADA QUEBRADA  {exc}")
+        say(f"ENTRADA QUEBRADA  {exc}")
         return 2
     try:
         corpus = corpus_index(args.corpus) if args.corpus else None
     except ValueError as exc:
-        print(f"ENTRADA QUEBRADA  {exc}")
+        say(f"ENTRADA QUEBRADA  {exc}")
         return 2
+    if args.format == "json":
+        reports = [verdict(text, validator, should_v, corpus, source=name, limit=args.limit) for name, text in sources]
+        for r, (name, text) in zip(reports, sources):
+            r["external_checked"] = corpus is not None or not uses_external(text)
+        print(json.dumps({"schema_version": VERDICT_SCHEMA_VERSION, "contract": contract_info(args.schema, should_path),
+                          "results": reports}, ensure_ascii=False, indent=1))
+        return 1 if any(r["verdict"] == "FAIL" for r in reports) else 0
     results, lines, failed, warned, unchecked = [], [], 0, 0, 0
     for name, text in sources:
         r = check(text, validator)

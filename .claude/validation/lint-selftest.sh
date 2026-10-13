@@ -30514,6 +30514,37 @@ DEC_ORF2
   if [ -z "${_ko}" ]; then
     record_pass "decide: (s14) --link para nó nascido no mesmo movimento é tolerado; órfão de OUTRO nó segue recusado (rc 2)"
   else record_fail "decide: (s14)" "${_ko}"; fi
+  # (s15) o TETO do `meta:` (dano de 2026-10-13: o --new criou o 65º nó num grafo de teto 64, rc 0, e só a REGRA 58
+  #       acusou no pr-finalize). No escopo da REGRA 58 (marcador kg-backlog-guard), o --new que não cabe no teto, ou
+  #       num grafo sem teto declarado, é rc 2 sem escrever; e as polaridades: cabe (teto+1) sela; sem o marcador o
+  #       selador cala (não inventa teto); selar nó EXISTENTE no teto sela (a contagem não muda). O fixture tem um
+  #       `done` sem carimbo (DONE-NU, HARD do helper) de propósito: o selador decide pela TAG do teto, não por qualquer HARD.
+  local rt="${sb}/teto.kg.yaml" nn h1 _kt=""
+  nn="$(grep -c '^  - id:' "${r}/docs/a/a.kg.yaml")"
+  _dec_teto() {  # $1=marcador (on|off) $2=teto (vazio = não declara)
+    { [ "$1" = "on" ] && printf '# kg-backlog-guard: on\n'
+      if [ -n "$2" ]; then sed "s/^meta:\$/meta:\n  # ═══ TETO: $2 NÓS ═══/" "${r}/docs/a/a.kg.yaml"; else cat "${r}/docs/a/a.kg.yaml"; fi
+    } > "${rt}"
+  }
+  _dec_teto on "${nn}"; h1="$(sha256sum "${rt}" | cut -d' ' -f1)"
+  if out="$(bash "${seal}" "${rt}" --new D_ESTOURA --label "estoura" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 2 ] && [ "$(sha256sum "${rt}" | cut -d' ' -f1)" = "${h1}" ] && grep -q '\[TETO\]' <<< "${out}" \
+    && grep -q "teto declarado ${nn}" <<< "${out}" && grep -q 'Nada escrito' <<< "${out}"; } || _kt="${_kt} estoura-rc${rc}"
+  _dec_teto on "$((nn + 1))"
+  if out="$(bash "${seal}" "${rt}" --new D_CABE --label "cabe" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 0 ] && [ "$(grep -c '^  - id:' "${rt}")" -eq "$((nn + 1))" ]; } || _kt="${_kt} cabe-rc${rc}"
+  _dec_teto on ""; h1="$(sha256sum "${rt}" | cut -d' ' -f1)"
+  if out="$(bash "${seal}" "${rt}" --new D_SEM_TETO --label "sem teto" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  { [ "${rc}" -eq 2 ] && [ "$(sha256sum "${rt}" | cut -d' ' -f1)" = "${h1}" ] && grep -q '\[SEM-TETO\]' <<< "${out}"; } || _kt="${_kt} sem-teto-rc${rc}"
+  _dec_teto off "${nn}"
+  if out="$(bash "${seal}" "${rt}" --new D_FORA_DO_ESCOPO --label "fora" --link Q_CITADO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _kt="${_kt} sem-marcador-rc${rc}"
+  _dec_teto on "${nn}"
+  if out="$(bash "${seal}" "${rt}" D_VELHO --chosen a --rejected b --date 2026-10-12 --question q 2>&1)"; then rc=0; else rc=$?; fi
+  [ "${rc}" -eq 0 ] || _kt="${_kt} existente-no-teto-rc${rc}"
+  if [ -z "${_kt}" ]; then
+    record_pass "decide: (s15) --new que não cabe no TETO do meta: (ou sem TETO) → rc 2, nada escrito; cabe, sem marcador e nó existente selam"
+  else record_fail "decide: (s15)" "${_kt} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
   # (s13) repo git sem leitor nenhum: a mensagem diz que falta o LEITOR, não "fora de repo git"
   local rn="${sb}/semleitor"; mkdir -p "${rn}"; "${G[@]}" -C "${rn}" init -q . 2>/dev/null
   cp "${r}/docs/a/a.kg.yaml" "${rn}/g.kg.yaml"
@@ -30689,6 +30720,11 @@ _family run_mcp_onion_kg_selftests
 # pai); a recusa de âncora e a de alias do loader (a âncora sempre precede o alias); o corte do caminho temporário
 # na saída do gate (o gate recebe o nome relativo, então o caminho não aparece nem sem o corte); e o REPROVADO forçado
 # quando o safe_load não confere o meta.id (medido: tag `!x` reprova também no contrato, parse.yaml-error).
+# DESDE 2026-10-13 (kg-ssot-v4.5.0) o contrato fala JSON pelo stdin (`--format json -`, kg-ssot.verdict/1): um code
+# root FALSO no selftest prova o fail-closed do relatório (rc 2, JSON malformado, fora do schema, versão desconhecida,
+# rc incoerente, ponta externa não conferida = NÃO JULGADO) e a decisão por `code`, nunca por `message`; cada camada
+# é afirmada pelo MOTIVO nomeado, para o mutante de uma não ser segurado pela seguinte. TETO DECLARADO: stdin × arquivo
+# não é distinguível por caso (o radar ainda grava a cópia temporária e o contrato daria o mesmo veredito lendo-a).
 run_mcp_onion_kg_writer_selftests() {
   local h="${REPO_ROOT}/ops/mcp-onion-kg-writer/selftest.py" srv="${REPO_ROOT}/ops/mcp-onion-kg-writer/server.py"
   local helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
@@ -30697,10 +30733,10 @@ run_mcp_onion_kg_writer_selftests() {
   fi
   command -v python3 >/dev/null 2>&1 && python3 -I -c 'import yaml, jsonschema' >/dev/null 2>&1 \
     || { record_skip "mcp-onion-kg-writer: python3/PyYAML/jsonschema ausentes (gate do contrato não exercido)"; return; }
-  local want_total=28 o rc
+  local want_total=39 o rc
   if o="$(LC_ALL=C python3 -I -B "${h}" --code-root "${REPO_ROOT}" 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && grep -qE "^TOTAL ${want_total} " <<< "${o}" && ! grep -q '^FAIL ' <<< "${o}"; then
-    record_pass "mcp-onion-kg-writer: (a) servidor real por HTTP — ${want_total} casos (401, e-mail, área, gate, symlink, teto)"
+    record_pass "mcp-onion-kg-writer: (a) servidor real por HTTP — ${want_total} casos (401, e-mail, área, gate, symlink, teto, veredito JSON do contrato)"
   else record_fail "mcp-onion-kg-writer: (a) harness" "rc=${rc}: $(grep -E '^(FAIL|TOTAL)' <<< "${o}" | head -4 | tr '\n' '|') ${o:0:200}"; fi
   [ -f "${helper}" ] || { record_fail "mcp-onion-kg-writer: (m)" "ops/mutate-and-restore.sh ausente: mutante não exercido"; return; }
   local sb cp old new want mo mrc n
@@ -30740,6 +30776,16 @@ run_mcp_onion_kg_writer_selftests() {
             if n < 0 or n > MAX_BODY:$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')content-length-negativo-400
         '      method: "leitura: secao 2 do documento"\n'$(printf '\x1f')        '      x_m: "leitura"\n'  # ONION_MUTANTE$(printf '\x1f')schema-help-exemplo-aprova
     'kg_my_get': (t_kg_my_get, 'Le um grafo da SUA area pelo slug', {'slug': _SLUG}, ['slug'], True),$(printf '\x1f')    # ONION_MUTANTE$(printf '\x1f')tools-list-5
+    if rc not in (0, 1):$(printf '\x1f')    if rc not in (0, 1, 2):  # ONION_MUTANTE$(printf '\x1f')contrato-rc2-recusa
+        return _nao_julgado(rc, f'relatorio do contrato nao e JSON ({str(e)[:120]})')$(printf '\x1f')        rep = {}  # ONION_MUTANTE$(printf '\x1f')contrato-json-malformado-recusa
+        jsonschema.Draft202012Validator(schema).validate(rep)$(printf '\x1f')        pass  # ONION_MUTANTE$(printf '\x1f')contrato-fora-do-schema-recusa
+    if rep.get('schema_version') != VERDICT_VERSION:  # o schema carregado pode ter mudado com o vendor$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')contrato-versao-desconhecida-recusa
+    if (r['verdict'] == 'PASS') != (not must) or (r['verdict'] == 'PASS') != (rc == 0):$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')contrato-incoerente-recusa
+    if not r['external_checked']:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')contrato-externo-nao-conferido-recusa
+    passou = r['verdict'] == 'PASS' and rc == 0 and not any(o['level'] == 'MUST' for o in occs)$(printf '\x1f')    passou = all(o['message'].startswith('PASS') for o in occs)  # ONION_MUTANTE$(printf '\x1f')contrato-decide-por-code
+        if k in idx:$(printf '\x1f')        if False:  # ONION_MUTANTE$(printf '\x1f')contrato-duplicata-fundida
+            'ocorrencias': _dedup([o for o in occs if o['level'] == 'MUST']),$(printf '\x1f')            'ocorrencias': [],  # ONION_MUTANTE$(printf '\x1f')contrato-reprova-nada-gravado
+            'codigos_must': sorted(must), 'release': rep['contract'].get('release'),$(printf '\x1f')            'codigos_must': None, 'release': rep['contract'].get('release'),  # ONION_MUTANTE$(printf '\x1f')contrato-pass-estruturado
 EOF_MUT
   rm -rf "${sb}"
 }

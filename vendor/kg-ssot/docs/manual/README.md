@@ -4,7 +4,7 @@ O KG-SSOT é um **grafo de conhecimento verificável** em arquivo texto. Cada af
 em que foi conferida e o que foi conferido, e um contrato formal decide se o arquivo está bem escrito. Este
 manual cobre o formato `.kg.yaml`, o contrato, as ferramentas e a adoção num repositório.
 
-Release descrita aqui: **4.4.0** (tag `kg-ssot-v4.4.0`). O contrato vigente dessa release é o **v4**.
+Release descrita aqui: **4.5.0** (tag `kg-ssot-v4.5.0`). O contrato vigente dessa release é o **v4**.
 
 ## Capítulos
 

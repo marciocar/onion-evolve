@@ -25,7 +25,9 @@
 #   voto de ninguém além do humano) · id duplicado ou fora da forma de bloco · data inválida · --rejected
 #   vazio · --new com id existente ou fora de `D_[A-Z0-9_]+`, sem --label/--link, ou link inexistente ·
 #   grafo que JÁ reprova no radar ou JÁ piora o contrato antes do selo (dívida alheia não vira culpa do selo) ·
-#   --question ausente · --chosen vazio · opção com « » · escolhida também em --rejected (sem caixa) · data futura.
+#   --question ausente · --chosen vazio · opção com « » · escolhida também em --rejected (sem caixa) · data futura ·
+#   --new num grafo no escopo da REGRA 58 (`# kg-backlog-guard: on`) cujo TETO do `meta:` o nó novo estouraria, ou
+#   que não declara TETO (o mesmo kg-backlog-check.sh julga o grafo como ficaria; dano de 2026-10-13: 65º nó, teto 64).
 #   A narrative anterior fica VERBATIM num bloco `|-`; a proveniência anterior vai inteira para ela.
 # O gate (rc 3, escrita DESFEITA byte a byte): depois de escrever, `kg-radar.sh --integrity --schema`
 #   tem de sair 0 e, onde o contrato está vendorizado (vendor/kg-ssot), `kg-contract-check.sh` também
@@ -127,14 +129,15 @@ if [ "${CRC}" -eq 1 ]; then
   exit 2
 fi
 
-BK="$(mktemp)"; trap 'rm -f "${BK}"' EXIT
+BK="$(mktemp)"; STAGE="$(mktemp)"; trap 'rm -f "${BK}" "${STAGE}"' EXIT
 cp -p "${GRAPH}" "${BK}"
 H0="$(sha256sum "${GRAPH}" | cut -d' ' -f1)"
 
-PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${GRAPH}" "${NODE}" "${NEW}" "${CHOSEN}" "${REJECTED}" "${DATE}" \
-  "${QUESTION}" "${OTHER}" "${LABEL}" "${LINK}" "${ETYPE}" "${IMPACT}" <<'PY' || exit 2
+# a escrita vai PRIMEIRO para o STAGE: o teto (abaixo) julga o grafo como ficaria, e só então ele vai ao disco
+PYOUT="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${GRAPH}" "${NODE}" "${NEW}" "${CHOSEN}" "${REJECTED}" "${DATE}" \
+  "${QUESTION}" "${OTHER}" "${LABEL}" "${LINK}" "${ETYPE}" "${IMPACT}" "${STAGE}" <<'PY'
 import sys, re, datetime
-path, node, new, chosen, rejected, date, question, other, label, link, etype, impact = sys.argv[1:13]
+path, node, new, chosen, rejected, date, question, other, label, link, etype, impact, stage = sys.argv[1:14]
 def die(m): print('kg-decide-seal: ' + m + ' — nada escrito', file=sys.stderr); sys.exit(2)
 try:
     import yaml
@@ -285,9 +288,32 @@ if (n2.get('status') != 'done' or n2.get('plane') != 'DEV' or str(n2.get('verifi
     die('a escrita não releu como escrita (status/verified_at/method/narrative)')
 if not new and oldn and not str(n2.get('narrative')).startswith(oldn):
     die('a narrative anterior não sobreviveu verbatim à escrita')
-open(path, 'w', encoding='utf-8').write(out)
+open(stage, 'w', encoding='utf-8').write(out)
 print(f'kg-decide-seal: escrito {target} em {path} — escolhida «{chosen}», descartadas {len(rej)}')
 PY
+)" || exit 2
+
+# O TETO do `meta:` (dano medido, 2026-10-13): o --new criou o 65º nó num grafo que declara TETO de 64 e saiu
+# rc 0; só a REGRA 58 (O backlog cumpre as promessas do próprio `meta:`) acusou, no pr-finalize. O selador cobra o
+# MESMO teto, pela MESMA convenção e pelo MESMO leitor da REGRA 58: no escopo dela (o marcador
+# `# kg-backlog-guard: on`), o kg-backlog-check.sh julga o grafo como ficaria, e o veredito é a TAG (TETO,
+# SEM-TETO), nunca o texto da mensagem. Teto estourado ou não declarado = rc 2, nada escrito. Fora do escopo da
+# REGRA 58 o selador não inventa teto (a guarda erra para o lado de calar). Só o --new muda a contagem.
+if [ -n "${NEW}" ] && grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-guard:[[:space:]]*on\b' "${GRAPH}"; then
+  BACKLOG="${HERE}/kg-backlog-check.sh"
+  [ -f "${BACKLOG}" ] || { echo "kg-decide-seal: ${GRAPH} declara kg-backlog-guard e o leitor do teto (kg-backlog-check.sh) não está ao lado — sem ler o teto não crio nó; nada escrito" >&2; exit 2; }
+  BRC=0; BOUT="$(bash "${BACKLOG}" "${STAGE}" --format tsv 2>&1)" || BRC=$?
+  if [ "${BRC}" -ge 2 ]; then
+    echo "kg-decide-seal: o leitor do teto saiu rc ${BRC} (erro de execução, não veredito) — nada escrito: $(printf '%s' "${BOUT}" | head -1)" >&2; exit 2
+  fi
+  BTETO="$(printf '%s\n' "${BOUT}" | awk -F'\t' '$1 == "HARD" && ($2 == "TETO" || $2 == "SEM-TETO") { print $2 "\t" $4; exit }')"
+  if [ -n "${BTETO}" ]; then
+    echo "kg-decide-seal: --new ${NEW} não cabe no TETO do meta: de ${GRAPH} [${BTETO%%$'\t'*}] — ${BTETO#*$'\t'}. Nada escrito. Suba o TETO no meta: com o motivo (+1 justificado, como as linhas dele), ou reconcilie antes (colha ou funda um nó), e sele de novo." >&2
+    exit 2
+  fi
+fi
+cat "${STAGE}" > "${GRAPH}"
+printf '%s\n' "${PYOUT}"
 
 _undo() {
   cp -p "${BK}" "${GRAPH}"
