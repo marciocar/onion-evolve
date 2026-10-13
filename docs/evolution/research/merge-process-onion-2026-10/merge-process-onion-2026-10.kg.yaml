@@ -8,7 +8,9 @@ meta:
                                # planos gratuitos de Mergify e Trunk e o estado do funador/claude-code-merge-queue.
                                # A metade doutrina (ímã, escritor único, catracas) é de 12m, mas o gatilho da Opção 3
                                # já disparou: a revisita real é o selo do maestro, não a data.
-  # ═══ TETO: 66 NÓS ═══
+  # ═══ TETO: 68 NÓS ═══
+  # (2026-10-13, +2 nós de SELO do maestro por /meta:decide sobre o que o passo D deixou para ele:
+  #  D_RULESET_BYPASS_SO_EM_PR e D_ACTIONS_ABRE_PR_DE_REVERT. Respostas, não pesquisa; o teto sobe DECLARADO.)
   # (2026-10-13, passo D: +1 nó de EVIDÊNCIA da execução, E_PASSO_D_EXECUTADO_2026_10_13, que carrega a
   #  medição do que o passo entregou. Não é onda de pesquisa: é o carimbo da execução da decisão selada,
   #  no mesmo movimento do trabalho. O teto sobe DECLARADO, pela mesma razão do selo abaixo.)
@@ -1135,6 +1137,38 @@ nodes:
       locator: "pergunta com opções de 2026-10-13: «Ligo required status checks por ruleset no main (grátis em repo público de usuário)?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
+  - id: D_RULESET_BYPASS_SO_EM_PR
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "decisão do maestro em 2026-10-13, por pergunta com opções (/meta:decide): escolhida «Só em merge de PR»"
+    label: "o bypass do admin no ruleset do main vale só em merge de PR (bypass_mode pull_request): o push direto ao main fica barrado no forge, inclusive para o dono"
+    narrative: "Selado por /meta:decide em 2026-10-13: escolhida «Só em merge de PR»; descartadas: «Sempre» · «Sem bypass»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-13: «O ruleset do main exige selftest-gate e lint-onion-artifacts. Como fica o bypass do admin (o dono do repo)?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      locality: "pessoa"
+  - id: D_ACTIONS_ABRE_PR_DE_REVERT
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "decisão do maestro em 2026-10-13, por pergunta com opções (/meta:decide): escolhida «Ligar»"
+    label: "o GITHUB_TOKEN do Actions pode abrir PR no core, para o alarme da bancada no main abrir sozinho o PR de revert (nunca mergeia)"
+    narrative: "Selado por /meta:decide em 2026-10-13: escolhida «Ligar»; descartadas: «Manter desligado»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-13: «Quando a bancada completa reprova no main, o alarme empurra revert/<sha>, mas o token do Actions não pode abrir PR. Ligar 'Allow GitHub Actions to create and approve pull requests'?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      locality: "pessoa"
 edges:
   - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
     to: C_OPCAO_A_CURE_MAGNET_FILE
@@ -1406,3 +1440,9 @@ edges:
   - from: E_PASSO_D_EXECUTADO_2026_10_13
     to: C_OPCAO_E_REQUIRED_CHECKS_RULESET
     edge_type: SUPPORTS
+  - from: D_RULESET_BYPASS_SO_EM_PR
+    to: C_OPCAO_E_REQUIRED_CHECKS_RULESET
+    edge_type: TRACES_TO
+  - from: D_ACTIONS_ABRE_PR_DE_REVERT
+    to: E_PASSO_D_EXECUTADO_2026_10_13
+    edge_type: TRACES_TO

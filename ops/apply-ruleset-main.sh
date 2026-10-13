@@ -16,11 +16,14 @@
 #   · strict (`strict_required_status_checks_policy: false`) — o modo LOOSE é o eixo da decisão
 #     (E_OBJECAO_STRICT_VS_LOOSE_IS_THE_AXIS): strict faria cada auto-rebase pagar o CI de novo, e o
 #     verificado já rebaseia e espera o CI do head novo.
-#   · BYPASS do papel admin, `bypass_mode: always` (actor RepositoryRole id 5 = admin, pela doc REST de
-#     rulesets do GitHub; não medido ao vivo). ⚠️ Num repo de dono User o dono É o admin: o ruleset NÃO
-#     prende o dono, que é quem mergeia. Para ele a camada que prende segue sendo o hook exit 2 + o
-#     caminho verificado; o ruleset prende colaborador e App. É o preço de não travar o caminho
-#     verificado numa emergência (CI morto), e é declarado em vez de escondido.
+#   · BYPASS do papel admin, `bypass_mode: pull_request` (actor RepositoryRole id 5 = admin, pela doc
+#     REST de rulesets do GitHub; não medido ao vivo). Decisão do maestro em 2026-10-13
+#     (D_RULESET_BYPASS_SO_EM_PR): o admin passa por cima dos checks SÓ ao mergear um PR (é o caminho
+#     verificado, com a dispensa nomeada quando o revisor do CI está sem crédito), e o push direto ao
+#     main fica barrado também do lado do forge, inclusive para o dono. Medido antes de trocar: nenhum
+#     workflow nem script de ops/ empurra ao main (grep `git push` em .github/workflows e ops/*.sh).
+#     A troca de `always` para `pull_request` soma uma 2ª camada ao hook exit 2 sem travar a emergência
+#     (CI morto): o merge de PR continua passando.
 #
 # Também garante que a label `ci:full` exista (o nível PR a lê para forçar a bancada completa).
 #
