@@ -28,7 +28,7 @@ Fase 1 do KG dos PRs: o INDICE completo (espinha). Grafo-primeiro; as vitrines d
 1. **Orfaos (radar reprova grau 0)** — grafo sem arestas reprovava. Resolvido com o hub + TRACES_TO por PR.
 2. **REGRA 30 (nome comercial de membro privado em superficie) — HARD** — 7 titulos vaziam MetaGamify/
    Grana.Ai/GranaAi. Scrub p/ o id publico (metagamify/granaai) no gerador (reproduzivel) + defensivo p/
-   BetaHauss/Tornak→gustavo-pulga. Re-verificado: 0 nomes comerciais restantes; lint 0 HARD.
+   ⟨colaborador⟩/⟨cliente⟩→gustavo-pulga. Re-verificado: 0 nomes comerciais restantes; lint 0 HARD.
 
 **Limites declarados (fase 2, de proposito):** sem classe (incidente/doutrina/marco/mecanismo/rotina),
 sem flag publicavel, sem arestas semanticas PR↔PR (SUPERSEDES/CAUSES/REFUTES). Essas exigem ler

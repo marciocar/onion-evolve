@@ -20,7 +20,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_at: "2026-10-12"
-    verified_against: "varredura dos transcripts ⟨transcripts .jsonl do Claude Code da conta⟩ em 2026-10-12: 147 comandos Bash únicos com host de provedor (2026-09-23 → 2026-10-12; onion-evolve 125, onion-kg-ssot 9, brain-granaai 7, avansat 5, gmill 1); o merge do tm.sh é c25296f9 (2026-10-11 18:37 UTC) e em 2026-10-12T03:21 a sessão principal rodou python3 - <<'EOF' com urllib.request.Request para o GraphQL do Linear"
+    verified_against: "varredura dos transcripts ⟨transcripts .jsonl do Claude Code da conta⟩ em 2026-10-12: 147 comandos Bash únicos com host de provedor (2026-09-23 → 2026-10-12; onion-evolve 125, onion-kg-ssot 9, brain-granaai 7, hub-formacao-enterprise 5, hub-operacoes-enterprise 1); o merge do tm.sh é c25296f9 (2026-10-11 18:37 UTC) e em 2026-10-12T03:21 a sessão principal rodou python3 - <<'EOF' com urllib.request.Request para o GraphQL do Linear"
     trace: '.claude/hooks/pretooluse-direct-provider-api.sh'
     label: "O DEFEITO, DATADO: a sessão reescreve o cliente do provedor em vez de usar o adapter."
     narrative: "O DEFEITO, DATADO: a sessão reescreve o cliente do provedor em vez de usar o adapter. Em 2026-10-08 (SAC-66) isso moveu uma issue para o estado errado; em 2026-10-11 nasceu o executável (tm.sh + adapters/linear.py) e, nove horas depois, a sessão principal ainda chamou o Linear por python3 heredoc com urllib. Medido nos transcripts: 147 comandos únicos tocaram host de provedor em vinte dias, cinco repos."

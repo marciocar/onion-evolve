@@ -1,5 +1,5 @@
-# Demonstração do MeuGmill Vendas para a GMill (stack `carteira`, web em 127.0.0.1:39081).
-# Aberto por ordem do maestro em 2026-10-08, a pedido da sessão meugmill-vendas-6d.
+# Demonstração do produto de vendas do adotante hub-operacoes-enterprise (stack `carteira`, web em 127.0.0.1:39081).
+# Aberto por ordem do maestro em 2026-10-08, a pedido da sessão do adotante.
 #
 # MODELO SECRETO (fonte versionada, segredo fora do git):
 #   Os marcadores @@...@@ são resolvidos pelo ops/install-caddy-config.sh a partir de /etc/caddy/secrets/gmill.env

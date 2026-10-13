@@ -107,7 +107,7 @@ Nenhum foi aplicado. As regras novas abaixo são **propostas**.
   `E_BINARIO_2_1_258_*` estão em PROD e `E_ESTUDO` vai a DEV. Mantive os dois como estão.
 - **M5.** Endosso a P1 do proponente: hoje `locality: repo` mistura o repo próprio com o alheio. O prefixo
   `<repo>@` obrigatório já desambigua, e pode virar regra.
-- **M6.** Endosso a P6: ids de nó e nomes de grafo com nome de pasta privada (`Q_GMILL_*`, `gmill-update-547-*`)
+- **M6.** Endosso a P6: ids de nó e nomes de grafo com nome de pasta privada (`Q_HUB_OPERACOES_ENTERPRISE_*`, `hub-operacoes-enterprise-update-547-*`)
   ficam fora do alcance da REGRA 30 (Segurança de PROJEÇÃO: nome comercial de membro privado não sai).
 - **M7.** Em `E_floors_effective_measured_20260729`, o `verified_at` é 2026-08-29 e o label diz 07-29.
 - Descarto a **P3** do proponente: a regra 3 selada já responde.

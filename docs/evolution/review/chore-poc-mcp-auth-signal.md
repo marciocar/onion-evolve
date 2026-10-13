@@ -21,7 +21,7 @@ Subagente-terceiro seria desproporcional; a natureza do artefato está declarada
 
 | Eixo | Resultado |
 |---|---|
-| **NDA** — vaza nome de cliente? | ✅ só o slug `poc-venda-direta-pdi`; grep por BW&P/HPE/autos = 0 (a entrada do members.yaml exige slug, cliente vive no CLAUDE.md do adotante) |
+| **NDA** — vaza nome de cliente? | ✅ só o slug `poc-venda-direta-pdi`; grep por ⟨parceiro⟩/⟨cliente⟩/autos = 0 (a entrada do members.yaml exige slug, cliente vive no CLAUDE.md do adotante) |
 | **Reprodutibilidade do achado** | ✅ o `curl` do envelope foi de fato rodado: `:3031` devolveu tools/list completo SEM X-Api-Key (200), medido, não declarado |
 | **Correção técnica do fix** | ✅ o padrão fail-closed (`hmac.compare_digest` + 401) espelha `ops/mcp-onion-kg/server.py` — o precedente vivo do mesmo repo-família; `compare_digest` (não `==`) evita timing-attack |
 | **Fronteira I3** | ✅ escreve só na staging do core (`outbox/`); rodapé instrui o maestro a transportar ao `inbound/` da PoC; a sessão do core não pusha repo alheio |

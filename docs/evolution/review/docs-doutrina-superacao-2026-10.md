@@ -18,7 +18,7 @@ nota: >
   (não S7_claim_llm_as_vm, que é a tese); trace nas duas decisões; bancada = testes dos VERIFICADORES,
   não do bytecode; cunhagens restritas a Elenxo/SDAAL/KG-SSOT; teto do supersedes_external declarado.
   Junto: os 3 anúncios de 2026-10-05 movidos a _processed/ no outbox — entrega CONFERIDA (os três estão
-  em inbound/_processed/ dos adotantes gmill e brain-granaai).
+  em inbound/_processed/ dos adotantes hub-operacoes-enterprise e brain-granaai).
 ---
 
 # Resíduo — `docs/doutrina-superacao-2026-10`

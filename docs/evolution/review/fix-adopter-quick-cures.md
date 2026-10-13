@@ -13,7 +13,7 @@ verdict: CORRIGIDO
 elenxo: nao
 nota: >-
   Fechamento das adoções a pedido do maestro (2026-10-07: "corrigir os problemas que aconteceram com os
-  últimos adotantes, do gmill em diante"). Um levantamento conferido contra o código vivo achou 26
+  últimos adotantes, do hub-operacoes-enterprise em diante"). Um levantamento conferido contra o código vivo achou 26
   defeitos nesses adotantes. Este PR cura os quatro abertos e baratos:
   (1) o --update declarava "0 HARD" sem re-medir e chegou com 1 HARD num hub; agora remeasure-hard.sh
   roda o lint do alvo depois do merge, com rc=3 (NÃO MEDIDO) quando o lint quebra, em vez de "0", e o
@@ -30,8 +30,8 @@ nota: >-
   nomeados: o corte de ferramentas só do core para hub e adopted (é o corte da meta-fábrica, decisão
   separada), a convergência docs-only, e a trava de merge no adotante, que por desenho não tem o caminho
   verificado (depois do merge o PostToolUse já avisa MERGE-SEM-REVISOR). REGRA 87 (PR que EDITA um
-  .kg.yaml enxergou os confirmed dele): confirmed vistos em gmill-update-547-2026-10:
-  E_GMILL_VEREDITO_DOS_TRES_FALSOS_POSITIVOS, E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1,
+  .kg.yaml enxergou os confirmed dele): confirmed vistos em hub-operacoes-enterprise-update-547-2026-10:
+  E_HUB_OPERACOES_ENTERPRISE_VEREDITO_DOS_TRES_FALSOS_POSITIVOS, E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1,
   E_REGEN_POS_MERGE_MUDOU_O_INVENTARIO. Sem Elenxo, declarado: curas pequenas, cada uma com mutante.
 ---
 

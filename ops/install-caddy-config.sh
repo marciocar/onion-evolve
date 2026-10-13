@@ -9,7 +9,7 @@
 # incidente"). Nesta sessão isso já custou um bug de cache invisível. Agora o git é a
 # SSOT e este script é a única porta de /etc/caddy — derivação, não edição à mão.
 #
-# CONF.D GERIDO (2026-10-08, vhost gmill): os vhosts de /etc/caddy/conf.d/ nasceram fora do git
+# CONF.D GERIDO (2026-10-08, 1º vhost de conf.d versionado): os vhosts de /etc/caddy/conf.d/ nasceram fora do git
 # (vault, waha, chat…). A partir daqui, um vhost NOVO nasce versionado em ops/caddy/conf.d/ e é
 # instalado por este script. Os que já estão no vivo sem fonte no repo são NÃO GERIDOS: este script
 # não os lê para escrever, não os altera e não os remove — só os copia para a validação em estágio.

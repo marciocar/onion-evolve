@@ -28,12 +28,11 @@ Isso **não é específico do Onion nem de nenhum stack em particular** — é u
 Docker quando ele gerencia `iptables` numa VPS com `ufw`. Mas, nesta VPS, ele afetou serviços de dados
 de vocês:
 
-- Do stack de vocês, estavam publicados em `0.0.0.0` (alcançáveis pela internet, IP `179.197.65.94`):
-  **postgres** (`5438`), **redis** (`6379`), **milvus** (`19530`/`19531`), **minio** (`9090`/`9091`)
-  e **attu** (`3007`).
-- **Nota boa:** o **redis de vocês estava COM senha** (`requirepass` ativo) — então, mesmo exposto,
-  exigia credencial. O ponto de atenção maior fica em **milvus / minio / attu**, que costumam subir com
-  credenciais default fracas — vale conferir as de vocês.
+- Do stack de vocês, data stores e painéis estavam publicados em `0.0.0.0`, alcançáveis pela internet.
+  ⟨A lista de serviços, portas e endereço do host saiu da árvore pública em 2026-10-13, quando o core
+  ficou público (decisão do maestro); a mensagem entregue segue íntegra no inbound de vocês.⟩
+- **Nota boa:** o data store que tinha senha seguia exigindo credencial mesmo exposto. O ponto de
+  atenção maior fica nos serviços que costumam subir com credenciais default fracas.
 
 Não temos evidência de exploração — isto foi encontrado numa auditoria proativa, não a partir de um
 incidente observado. Mas o risco era real e a janela de exposição precisa ser tratada como tal.
@@ -73,16 +72,8 @@ VPS, mas a configuração exposta continua "por baixo do capô". A cura correta 
 
    Isso faz o Docker nem sequer abrir a porta para fora — independe do firewall, é a correção na raiz.
 
-   **No compose de vocês** (`docker-compose.yml` + `docker-compose.test.yml`), o rebind concreto:
-
-   | serviço | de | para |
-   |---|---|---|
-   | postgres | `0.0.0.0:5438:5432` | `127.0.0.1:5438:5432` |
-   | redis | `0.0.0.0:6379:6379` | `127.0.0.1:6379:6379` |
-   | minio | `9090:9000` / `9091:9001` | `127.0.0.1:9090:9000` / `127.0.0.1:9091:9001` |
-   | milvus | `19530:19530` / `19531:9091` | `127.0.0.1:19530:19530` / `127.0.0.1:19531:9091` |
-   | attu | `3007:3000` | `127.0.0.1:3007:3000` |
-   | test-db | `5439:5432` (`docker-compose.test.yml`) | `127.0.0.1:5439:5432` |
+   **No compose de vocês** (`docker-compose.yml` + `docker-compose.test.yml`): o rebind concreto, serviço
+   a serviço, foi entregue na mensagem original ⟨tabela retirada da árvore pública em 2026-10-13⟩.
 
 2. **Se algum desses serviços é Redis e está sem senha, definir `requirepass`** (ou o equivalente do seu
    setup — env var / `redis.conf` / secret manager) **imediatamente**, mesmo depois do rebind. Defesa em

@@ -159,7 +159,7 @@ Universo reproduzido: `kg_validate.py --where` dá `integrity.testimony-in-prod`
 - **M4.** `C_TOPO_SHARED_BASE` e `E_GIT_MERGEBASE` carregavam, no locator, o nome de uma **branch** do
   metagamify que contém o nome privado. Como o locator já era reescrito, troquei a branch por
   `<branch do fork privado>`, e o sha `f7e4b034` continua identificando o commit. O id do nó, o label e o
-  nome do grafo `gmill-update-547-2026-10` seguem com nome privado, mas estão fora do alcance desta onda (P6
+  nome do grafo `hub-operacoes-enterprise-update-547-2026-10` seguem com nome privado, mas estão fora do alcance desta onda (P6
   da O4). A REGRA 30 (Segurança de PROJEÇÃO: nome comercial de membro privado não sai)
   não olha refs.
 

@@ -148,7 +148,7 @@
     {
      "item": "resolve-production-branch.sh (.claude/validation/)",
      "etiqueta": "vivo",
-     "evidencia": "Wired em .claude/commands/meta/adopt.md; git log -1 = 2026-07-22; múltiplas memórias de adoções reais executadas (arandek, arthur, pedro, BW&P/HPE) via /meta:adopt no período recente confirmam o caminho de produção sendo percorrido, mesmo com 0 refs em lint-artifacts.sh (fora do gate de REGRA, dentro do fluxo de comando).",
+     "evidencia": "Wired em .claude/commands/meta/adopt.md; git log -1 = 2026-07-22; múltiplas memórias de adoções reais executadas (arandek, arthur, pedro, ⟨parceiro⟩/⟨cliente⟩) via /meta:adopt no período recente confirmam o caminho de produção sendo percorrido, mesmo com 0 refs em lint-artifacts.sh (fora do gate de REGRA, dentro do fluxo de comando).",
      "oportunidade": "Nenhuma."
     }
    ],

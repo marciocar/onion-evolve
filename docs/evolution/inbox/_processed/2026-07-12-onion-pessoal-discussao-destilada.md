@@ -20,7 +20,7 @@ status: candidatos (triagem gated — nada promovido)
 5 passadas (P1–P5) fecharam as 4 perguntas do SEED + a fronteira aberta. Método idêntico em toda passada:
 **pesquisa orquestrada citada → derivação `fonte≠derivação` → proto executável (`.kg.yaml` que passa no
 `kg-radar`)**. ~200 fontes; cada síntese passou por verificação adversarial (que derrubou citações fabricadas).
-Índice: [`docs/discussions/onion-pessoal-marcio/README.md`](../../../discussions/onion-pessoal-marcio/README.md).
+Índice: `docs/discussions/onion-pessoal-marcio/README.md`.
 
 ## Candidatos-a-doutrina (o que pode transferir para o core)
 

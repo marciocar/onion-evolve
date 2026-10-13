@@ -13,7 +13,7 @@ verdict: CORRIGIDO
 elenxo: nao
 nota: >-
   Medido ao fechar as adoções (2026-10-07): o ops/audit-adopters-registry.sh dava 11 adotantes fora do
-  registro, e 3 deles (o hub mais antigo, um adotante de cliente e o gmill) estavam REGISTRADOS. A
+  registro, e 3 deles (o hub mais antigo, um adotante de cliente e o hub-operacoes-enterprise) estavam REGISTRADOS. A
   regex do check-member-registered.sh ancorava no fim da linha e não casava `local_path` com
   comentário inline. Agora o leitor é o yaml.safe_load (o mesmo do members-validate.sh), com fallback
   por regex que tira o comentário. Bancada nova member_registered (a)(b)(c) — o checker não tinha

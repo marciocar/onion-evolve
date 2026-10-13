@@ -3537,11 +3537,11 @@ nodes:
     impact: 4
     confidence: 0.9
     verified_at: "2026-07-21"
-    trace: "docs/discussions/onion-pessoal-marcio/proto/theories/hegel-dialectics.md:1-50"
+    trace: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro):1-50"
     label: "Catálogo hegeliano camada-1 JÁ ESCRITO (97 linhas, fiel à fonte): momentos EL §§79-82, Aufhebung/negação determinada, Priest×Brandom, e a correção anti-decoração da Q5 já resolvida (tese-antítese-síntese é Fichte/Chalybäus, não Hegel; método real é imanente)"
     provenance:
-      source: "docs/discussions/onion-pessoal-marcio/proto/theories/hegel-dialectics.md:1-50"
-      locator: "docs/discussions/onion-pessoal-marcio/proto/theories/hegel-dialectics.md:1-50"
+      source: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro):1-50"
+      locator: "arquivo retirado da árvore pública em 2026-10-13 (decisão do maestro):1-50"
       method: "derivado: trace do nó, sem registro de medição"
       locality: "repo"
   - id: SY_evid_hegel_diary_grenze

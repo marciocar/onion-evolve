@@ -385,7 +385,7 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: "2026-09-01"
-    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. 1) `grep -inE "<adotante-a>|<adotante-b>|<adotante-c>|<adotante-d>|bwp|hpe|pedro|arthur|cl => Comando 1 (identificadores conhecidos de cliente/adotante): saída vazia, `grep` retornou exit code 1 (zero mat…'
+    verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. 1) `grep -inE "<adotante-a>|<adotante-b>|<adotante-c>|<adotante-d>|<parceiro>|<cliente>|pedro|arthur|cl => Comando 1 (identificadores conhecidos de cliente/adotante): saída vazia, `grep` retornou exit code 1 (zero mat…'
     label: "KG de colaboracao (este) — meta-Onion, sem dado de cliente; shareable ao core"
     provenance:
       source: "docs/onion/graph/colaboracao-onion-2026-07.kg.yaml"

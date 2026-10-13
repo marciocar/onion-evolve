@@ -42,7 +42,7 @@ terminal não se audita"*. Ele não registrava nada. **O rc do comando é declar
 | 8 | `--motivo " "` torna o 3º elemento vácuo | curado: recusa motivo em branco |
 | 9 | rótulo diz "credencial" para `HTTP 000` e `529` | curado: 6 faixas com ação nomeada + "não classifico" |
 | 10 | "Não bloqueia o merge" é falso desde 2026-09-20 | curado: texto reescrito com o comando de dispensa |
-| 11 | `from: avansat` carrega nome comercial | curado: slug neutro do registro |
+| 11 | `from: ⟨nome comercial⟩` carrega nome comercial | curado: slug neutro do registro |
 | 12 | `edges:` **indentado** escapa da cura | curado: fecha em `edges:`/`meta:` em qualquer indentação |
 | 13 | frente do workflow com **zero** bancada | curado: família que EXTRAI o bloco do YAML e o executa (7 casos) |
 

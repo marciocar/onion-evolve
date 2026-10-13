@@ -120,6 +120,11 @@ unset GITHUB_HEAD_REF GITHUB_REF_NAME GITHUB_EVENT_NAME GITHUB_BASE_REF GITHUB_A
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+# FONTE PRIVADA DE TERMOS (P8 do projection-safety.sh, fora da árvore desde 2026-10-13): mesma hermeticidade
+# dos GITHUB_* acima. Sem fixar, a bancada leria a fonte REAL do host ou, no CI, nenhuma — e o mesmo caso
+# daria vereditos diferentes por máquina. A fixture VAZIA reproduz o comportamento anterior à P8; quem
+# testa a P8 (run_projection_safety_selftests, run_client_terms_selftests) aponta a própria fonte.
+export ONION_CLIENT_TERMS_FILE="${SCRIPT_DIR}/fixtures/client-terms/empty.txt"
 FIX_DIR="${SCRIPT_DIR}/fixtures"
 MANIFEST="${FIX_DIR}/manifest.tsv"
 INJECT_BASE="selftest-fixture-probe"     # kebab-case → não dispara a Regra 6
@@ -3265,6 +3270,8 @@ MEOF
   # só constava do client-terms.txt, que esta guarda não lia. Termos INVENTADOS (Fantasia, Beta Co).
   # Roda como o lint roda: `--kg-identifiers --format tsv <raiz>`, contando as linhas HARD.
   mkdir -p "${tmp}/kg/fantasia-update-547-2026-10" "${tmp}/kg/limpo"
+  # P8 (2026-10-13): a lista declarada é a fonte privada FORA da árvore, apontada por ONION_CLIENT_TERMS_FILE.
+  local -x ONION_CLIENT_TERMS_FILE="${tmp}/client-terms.txt"
   printf '# lista declarada (fixture)\nFantasia\nopenly-public\nBeta Co\n' > "${tmp}/client-terms.txt"
   _p7_graph() {  # $1 = id de um nó · $2 = label (o resto é fixo)
     printf 'meta:\n  id: limpo\n  schema_version: "1"\nnodes:\n  - id: %s\n    node_type: question\n    status: open\n    label: "%s"\n' "$1" "$2"
@@ -3348,17 +3355,79 @@ MEOF
   mkdir -p "${sbx}/.claude/validation" "${sbx}/docs/evolution/federation" "${sbx}/docs/evolution/research/caso"
   cp "${SCRIPT_DIR}/lint-artifacts.sh" "${SCRIPT_DIR}/projection-safety.sh" "${sbx}/.claude/validation/"
   cp "${tmp}/members.yaml" "${sbx}/docs/evolution/federation/members.yaml"
-  printf '# lista (fixture)\nFantasia\n' > "${sbx}/docs/evolution/federation/client-terms.txt"
+  printf '# lista (fixture)\nFantasia\n' > "${sbx}/fonte-privada.txt"
   local kgx="${sbx}/docs/evolution/research/caso/caso.kg.yaml" lo1 lo2
   _p7_graph Q_FANTASIA_MAIN_DIVERGIU "pergunta" > "${kgx}"
-  lo1="$(cd "${sbx}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${kgx}" 2>&1 || true)"
+  lo1="$(cd "${sbx}" && ONION_CLIENT_TERMS_FILE="${sbx}/fonte-privada.txt" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${kgx}" 2>&1 || true)"
   _p7_graph Q_HUB_NEUTRO_MAIN_DIVERGIU "pergunta" > "${kgx}"
-  lo2="$(cd "${sbx}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${kgx}" 2>&1 || true)"
+  lo2="$(cd "${sbx}" && ONION_CLIENT_TERMS_FILE="${sbx}/fonte-privada.txt" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${kgx}" 2>&1 || true)"
   if grep -q 'projeção/ID-NO' <<< "${lo1}" && ! grep -q 'projeção/ID-NO' <<< "${lo2}"; then
     record_pass "projection-safety: (P7f) o lint-artifacts.sh de verdade acusa [projeção/ID-NO] no grafo sujo e cala no limpo"
   else record_fail "projection-safety: (P7f)" "o dispatcher não levou o P7 ao veredito: sujo=[$(grep -c 'projeção/' <<< "${lo1}" || true)] limpo=[$(grep -c 'projeção/ID-NO' <<< "${lo2}" || true)] ${lo1:0:300}"; fi
   rm -rf "${sbx}"
   rm -f "${tmp}/client-terms.txt"
+
+  # ── P8 (2026-10-13) — A FONTE PRIVADA DE TERMOS FORA DA ÁRVORE ─────────────────────────────────
+  # O core ficou PÚBLICO: as anotações CONFIDENCIAL do `name:` e o client-terms.txt versionado eram o
+  # vazamento. A fonte vem de ONION_CLIENT_TERMS_FILE; `<termo>\t<id>` é nome DE MEMBRO (equivale à anotação),
+  # `<termo>` é declarado. Polaridades: com a fonte, o termo plantado REPROVA; sem ela, a guarda DECLARA
+  # NAO-VERIFICADO — nem verde mudo, nem HARD de NO-OP. Nomes INVENTADOS.
+  cat > "${tmp}/members-neutro.yaml" <<'MEOF'
+members:
+  - id: acme-adopter
+    name: acme-adopter (adotante de campo)
+    role: standalone
+  - id: openly-public
+    name: openly-public (Projeto Aberto — materiais educacionais)
+    role: consumer
+MEOF
+  printf '# fonte privada (fixture)\nZetaFicticia\nFantasmaCorp\tacme-adopter\n' > "${tmp}/fonte.txt"
+  local p8o p8rc
+  # (P8a) nome DE MEMBRO só na fonte privada (members.yaml neutro) → HARD na superfície pública
+  # afere a DETECÇÃO, não só o rc: sem o nome de membro da fonte, o P5 reprovaria por NO-OP e o rc
+  # sairia != 0 do mesmo jeito (o mutante que tira o derive_owned sobreviveu à 1ª redação deste caso).
+  printf '<p>parceiro FantasmaCorp lancou</p>' > "${tmp}/surface/index.html"
+  p8o="$(ONION_CLIENT_TERMS_FILE="${tmp}/fonte.txt" bash "${helper}" --format tsv --members "${tmp}/members-neutro.yaml" "${tmp}/surface" 2>/dev/null || true)"
+  if LC_ALL=C grep -q $'^HARD\tNOME\t.*index.html' <<< "${p8o}" && ! LC_ALL=C grep -q $'^HARD\tNO-OP' <<< "${p8o}"; then
+    record_pass "projection-safety: (P8a) nome de membro só na fonte privada (fora da árvore) → HARD na superfície pública"
+  else record_fail "projection-safety: (P8a)" "o nome da fonte privada passou calado — a anotação saiu do members.yaml e levou a proteção junto"; fi
+  # (P8b) a MESMA superfície, sem a fonte → SOFT NAO-VERIFICADO, sem HARD de NO-OP, rc 0 (declara, não reprova tudo)
+  p8rc=0; p8o="$(ONION_CLIENT_TERMS_FILE="${tmp}/nao-existe.txt" bash "${helper}" --format tsv --members "${tmp}/members-neutro.yaml" "${tmp}/surface" 2>/dev/null)" || p8rc=$?
+  if [ "${p8rc}" -eq 0 ] && LC_ALL=C grep -q $'^SOFT\tNAO-VERIFICADO\t' <<< "${p8o}" && ! LC_ALL=C grep -q $'^HARD\tNO-OP' <<< "${p8o}"; then
+    record_pass "projection-safety: (P8b) sem a fonte privada → SOFT NAO-VERIFICADO declarado (nem verde mudo, nem HARD de NO-OP)"
+  else record_fail "projection-safety: (P8b)" "sem a fonte: esperava SOFT NAO-VERIFICADO e nenhum NO-OP (rc=${p8rc}): ${p8o:0:300}"; fi
+  # (P8c) P7 sem a fonte, grafo limpo → declara NAO-VERIFICADO e não inventa HARD
+  _p7_graph Q_NEUTRO "pergunta" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  p8o="$(ONION_CLIENT_TERMS_FILE="${tmp}/nao-existe.txt" bash "${helper}" --kg-identifiers --format tsv --members "${tmp}/members-neutro.yaml" "${tmp}/kg" 2>/dev/null || true)"
+  if LC_ALL=C grep -q $'^SOFT\tNAO-VERIFICADO\t' <<< "${p8o}" && ! LC_ALL=C grep -q '^HARD' <<< "${p8o}"; then
+    record_pass "projection-safety: (P8c) P7 sem a fonte privada → NAO-VERIFICADO declarado, nenhum HARD inventado"
+  else record_fail "projection-safety: (P8c)" "P7 sem fonte: ${p8o:0:300}"; fi
+  # (P8d) P7 COM a fonte: id de nó com o nome declarado → HARD ID-NO (polaridade de (P8c))
+  _p7_graph E_ZETAFICTICIA_X "evidência" > "${tmp}/kg/limpo/limpo.kg.yaml"
+  p8o="$(ONION_CLIENT_TERMS_FILE="${tmp}/fonte.txt" bash "${helper}" --kg-identifiers --format tsv --members "${tmp}/members-neutro.yaml" "${tmp}/kg" 2>/dev/null || true)"
+  if LC_ALL=C grep -q $'^HARD\tID-NO\t' <<< "${p8o}" && ! LC_ALL=C grep -q 'NAO-VERIFICADO' <<< "${p8o}"; then
+    record_pass "projection-safety: (P8d) P7 com a fonte privada: termo declarado num id de nó → HARD ID-NO"
+  else record_fail "projection-safety: (P8d)" "P7 com fonte: ${p8o:0:300}"; fi
+  # (P8e) --federation: o nome DE MEMBRO da fonte privada no mailbox de OUTRO → HARD CRUZADO; sem fonte → NAO-VERIFICADO
+  mkdir -p "${tmp}/fedp8/outbox/openly-public"
+  printf '# msg\nA FantasmaCorp mandou dizer.\n' > "${tmp}/fedp8/outbox/openly-public/m.md"
+  p8o="$(ONION_CLIENT_TERMS_FILE="${tmp}/fonte.txt" bash "${helper}" --federation --format tsv --members "${tmp}/members-neutro.yaml" "${tmp}/fedp8" 2>/dev/null || true)"
+  local p8o2; p8o2="$(ONION_CLIENT_TERMS_FILE="${tmp}/nao-existe.txt" bash "${helper}" --federation --format tsv --members "${tmp}/members-neutro.yaml" "${tmp}/fedp8" 2>/dev/null || true)"
+  if LC_ALL=C grep -q $'^HARD\tCRUZADO\t' <<< "${p8o}" && LC_ALL=C grep -q $'^SOFT\tNAO-VERIFICADO\t' <<< "${p8o2}" && ! LC_ALL=C grep -q '^HARD' <<< "${p8o2}"; then
+    record_pass "projection-safety: (P8e) --federation: nome de membro da fonte privada cruzado → HARD; sem a fonte → NAO-VERIFICADO"
+  else record_fail "projection-safety: (P8e)" "federação: com=[${p8o:0:200}] sem=[${p8o2:0:200}]"; fi
+  # (P8f) --emit-declared: com a fonte imprime os termos (as duas formas, só a coluna do termo); sem ela rc 3
+  # a fonte vai pela variável já exportada (local -x acima), e NÃO como prefixo de env na linha: o
+  # extrator da REGRA 59 lê o 1º `${...}` da linha como o script invocado, e o prefixo o cegava.
+  ONION_CLIENT_TERMS_FILE="${tmp}/fonte.txt"
+  p8o="$(bash "${helper}" --emit-declared 2>/dev/null || true)"
+  ONION_CLIENT_TERMS_FILE="${tmp}/nao-existe.txt"
+  p8rc=0; bash "${helper}" --emit-declared >/dev/null 2>&1 || p8rc=$?
+  ONION_CLIENT_TERMS_FILE="${tmp}/client-terms.txt"
+  if [ "$(printf '%s\n' "${p8o}" | grep -c .)" = "2" ] && grep -qx 'FantasmaCorp' <<< "${p8o}" && [ "${p8rc}" -eq 3 ]; then
+    record_pass "projection-safety: (P8f) --emit-declared imprime os termos da fonte (sem o dono) e sai 3 sem ela"
+  else record_fail "projection-safety: (P8f)" "emit-declared: [${p8o:0:120}] rc_sem_fonte=${p8rc}"; fi
+  rm -rf "${tmp}/fedp8"
 }
 
 # Guardas do modo --state (a fila de abertos) — irmão do --radar.
@@ -12972,6 +13041,30 @@ run_kg_ratchet_direction_selftests() {
     record_pass "kg-catraca: (n) no APAGADO do corpus → HARD REMOVIDO e exit != 0 (apagar nao descarrega a medicao)"
   else record_fail "kg-catraca: (n)" "classificacao/severidade errada (exit=${RC49}): $(_tags49 "${OUT49}")"; fi
 
+  # (n2) RETIRADO (2026-10-13): o GRAFO inteiro saiu da árvore e a chave está no ledger → SOFT RETIRADO
+  #      declarado, zero HARD, exit 0. Polaridade em (n3): a MESMA chave no ledger com o grafo ainda na
+  #      árvore (nó apagado de grafo vivo) segue HARD REMOVIDO — o ledger não é atalho para deletar nó.
+  local _k49
+  d="$(mktemp -d)"; _scene49 "$d" confirmed 5 PROD "" ""
+  _k49="$(grep -v '^#' "$d/.claude/validation/kg-verification-baseline.txt" | head -1)"
+  ( cd "$d" && git rm -qf docs/onion/graph/t.kg.yaml ) >/dev/null 2>&1 || true   # como no corpus real: retirado do ÍNDICE
+  mkdir -p "$d/docs/onion/graph"
+  printf 'meta:\n  id: u\n  schema_version: "1"\nnodes:\n  - id: C_VIVO\n    node_type: claim\n    plane: PROD\n    impact: 5\n    status: confirmed\n    verified_at: 2026-08-08\n    label: "x"\n' > "$d/docs/onion/graph/u.kg.yaml"
+  mkdir -p "$d/docs/evolution"; printf '# ledger\n%s\t2026-10-13\tfixture\n' "${_k49}" > "$d/docs/evolution/kg-retired-from-tree.tsv"
+  _run49 "$d"
+  if printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD"{h=1} $1=="SOFT" && $2=="RETIRADO"{r=1} END{exit !(r && !h)}' \
+     && [ "${RC49}" -eq 0 ] && [ -z "$(_err49)" ]; then
+    record_pass "kg-catraca: (n2) grafo inteiro fora da árvore + chave no ledger → SOFT RETIRADO declarado, zero HARD"
+  else record_fail "kg-catraca: (n2)" "retirada declarada não reconhecida (exit=${RC49}): $(_tags49 "${OUT49}") $(_err49)"; fi
+  # (n3) o grafo SEGUE na árvore e o nó sumiu dele: o ledger não salva → HARD REMOVIDO
+  d="$(mktemp -d)"; _scene49 "$d" confirmed 5 PROD 2026-08-08 "" C_OUTRO
+  _k49="$(grep -v '^#' "$d/.claude/validation/kg-verification-baseline.txt" | head -1)"
+  mkdir -p "$d/docs/evolution"; printf '# ledger\n%s\t2026-10-13\tfixture\n' "${_k49}" > "$d/docs/evolution/kg-retired-from-tree.tsv"
+  _run49 "$d"
+  if printf '%s' "${OUT49}" | awk -F'\t' '$1=="HARD" && $2=="REMOVIDO"{r=1} $2=="RETIRADO"{x=1} END{exit !(r && !x)}' && [ "${RC49}" -ne 0 ]; then
+    record_pass "kg-catraca: (n3) chave no ledger mas o grafo segue na árvore → HARD REMOVIDO (o ledger não é atalho para deletar nó)"
+  else record_fail "kg-catraca: (n3)" "o ledger liberou nó apagado de grafo vivo (exit=${RC49}): $(_tags49 "${OUT49}")"; fi
+
   # (u) MOVER NAO E REMOVER — e mover PARA FORA DO ESCOPO e o esvaziamento em lote.
   #     Porta reproduzida no corpus REAL: um `git mv` de UM grafo para `fixtures/` tirava CINCO
   #     entradas do baseline de uma vez, com `exit 0`, cinco SOFT, e o gate MANDANDO remove-las —
@@ -21834,7 +21927,7 @@ run_compose_exposure_selftests() {
 services:
   db:
     environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres123}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-senha_ficticia}
     ports:
       - 5435:5432
       - 127.0.0.1:8080:80
@@ -21850,7 +21943,7 @@ FIX
   else
     record_fail "compose-exposure: acusação" "esperava 1+1; veio porta=${n_port} fallback=${n_fall}: $(_emit "${out}" | head -2)"
   fi
-  sed -i 's|- 5435:5432|- 127.0.0.1:5435:5432|; s|${DB_PASSWORD:-postgres123}|${DB_PASSWORD:?defina}|' "$d/docker-compose.yml"
+  sed -i 's|- 5435:5432|- 127.0.0.1:5435:5432|; s|${DB_PASSWORD:-senha_ficticia}|${DB_PASSWORD:?defina}|' "$d/docker-compose.yml"
   ( cd "$d" && git add -A )
   out="$(cd "$d" && REPO_ROOT="$d" bash -c 'violation(){ echo "V[$1] $2 :: $3"; }; source f.sh; check_compose_exposure' 2>&1)" || true
   if grep -q 'REGRA 64' <<< "${out}"; then
@@ -22010,6 +22103,25 @@ PY2
   if grep -q 'não há resíduo de revisão' <<< "${out}"; then
     record_pass "harvest-residue: (f2) o mesmo renome SEM x_renamed_from segue cobrado como colheita"
   else record_fail "harvest-residue: (f2) renome sem hash" "renome sem declaração passou calado: ${out:0:300}"; fi
+  # (g) GRAFO INTEIRO retirado da árvore, declarado por CAMINHO no ledger kg-retired-from-tree.tsv →
+  #     não é colheita a nomear (nomear republicaria o que saiu) e a isenção sai DECLARADA em SOFT.
+  #     (g2) o MESMO apagamento sem a linha no ledger segue cobrado. Mutante: tirar o `:(exclude)` reprova (g).
+  ( cd "${sb}" && git checkout -q main && git checkout -q -b test/retire-case
+    git rm -q docs/onion/graph/alvo.kg.yaml
+    mkdir -p docs/evolution
+    printf '# ledger\ndocs/onion/graph/alvo.kg.yaml\t2026-10-13\tfixture\n' > docs/evolution/kg-retired-from-tree.tsv
+    git add -A && git -c user.email=t@t -c user.name=t commit -qm retirada ) >/dev/null 2>&1 || true
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
+  if [ ! -e "${sb}/docs/onion/graph/alvo.kg.yaml" ] && ! grep -q 'colheita sem registro' <<< "${out}" \
+     && ! grep -q 'não há resíduo de revisão' <<< "${out}" && grep -q 'retirado(s) da árvore neste ramo' <<< "${out}"; then
+    record_pass "harvest-residue: (g) grafo inteiro retirado e declarado no ledger → não cobra ids, DECLARA em SOFT"
+  else record_fail "harvest-residue: (g) retirada" "retirada declarada cobrada como colheita ou calada sem declarar: ${out:0:300}"; fi
+  ( cd "${sb}" && printf '# ledger vazio\n' > docs/evolution/kg-retired-from-tree.tsv \
+    && git -c user.email=t@t -c user.name=t commit -qam sem-ledger ) >/dev/null 2>&1 || true
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
+  if grep -q 'não há resíduo de revisão' <<< "${out}"; then
+    record_pass "harvest-residue: (g2) o mesmo apagamento SEM a linha no ledger segue cobrado como colheita"
+  else record_fail "harvest-residue: (g2) sem ledger" "apagamento sem declaração passou calado: ${out:0:300}"; fi
   ( cd "${sb}" && git checkout -q test/harvest-case ) >/dev/null 2>&1 || true
 
   # (d) SEM base resolvível → SOFT que DECLARA, nunca silêncio (o modo que matava a guarda no CI)
@@ -26045,15 +26157,11 @@ run_client_terms_selftests() {
   local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
   [ -f "${lint}" ] || { record_skip "client-terms: lint ausente"; return; }
 
-  # (a) O ARQUIVO NÃO PODE VIAJAR — é a invariante que torna a cura possível em vez de ser o
-  #     vazamento. Se alguém o mover para `.claude/`, a lista de clientes vai junto no bundle.
-  if [ -f "${ct}" ]; then
-    local _travels; _travels="$(bash "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" --repo "${REPO_ROOT}" --emit-scrub-roots 2>/dev/null \
-      | while IFS= read -r _r; do case "docs/evolution/federation/client-terms.txt" in "${_r}"/*) echo HIT ;; esac; done)"
-    if [ -z "${_travels}" ]; then
-      record_pass "client-terms: (a) a lista de nomes NÃO está na superfície que viaja"
-    else record_fail "client-terms: (a)" "a lista de clientes ENTROU no transporte — ela virou o vazamento"; fi
-  else record_skip "client-terms: (a) arquivo ausente neste repo"; fi
+  # (a) DESDE 2026-10-13 A LISTA NÃO PODE ESTAR NA ÁRVORE — o core é PÚBLICO, e "não viaja no adopt"
+  #     deixou de bastar: a árvore inteira virou vitrine. A fonte mora fora (P8 do projection-safety.sh).
+  if [ ! -e "${ct}" ]; then
+    record_pass "client-terms: (a) a lista de nomes privados NÃO está na árvore do core (fonte fora, P8)"
+  else record_fail "client-terms: (a)" "a lista de nomes privados VOLTOU para a árvore do core, que é pública"; fi
 
   # (b) um termo DECLARADO (fora do members.yaml) é pego numa superfície que viaja — era isto que
   #     passava calado, e o custo foi exposição real num repo público.
@@ -26063,20 +26171,27 @@ run_client_terms_selftests() {
   cp "${REPO_ROOT}/.claude/validation/projection-safety.sh" "${sb}/.claude/validation/" 2>/dev/null
   cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${sb}/.claude/utils/adopt/"
   printf 'members:\n  - id: onion-x\n    kind: source\n' > "${sb}/docs/evolution/federation/members.yaml"
-  printf '# lista\nAcmeFicticia\n' > "${sb}/docs/evolution/federation/client-terms.txt"
+  printf '# lista\nAcmeFicticia\n' > "${sb}/fonte-privada.txt"
   printf '# agente\n\nPoC AcmeFicticia Motores em campo\n' > "${sb}/.claude/agents/a.md"
   ( cd "${sb}" && git init -q . && git add -A ) >/dev/null 2>&1
-  local out; out="$( cd "${sb}" && bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/agents/a.md" 2>&1 || true )"
-  if grep -q 'AcmeFicticia' <<< "${out}"; then
-    record_pass "client-terms: (b) termo DECLARADO (fora do members.yaml) é pego na superfície que viaja"
-  else record_fail "client-terms: (b)" "termo declarado passou calado — a rede não está ligada: ${out:0:160}"; fi
+  local out; out="$( cd "${sb}" && ONION_CLIENT_TERMS_FILE="${sb}/fonte-privada.txt" bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/agents/a.md" 2>&1 || true )"
+  # o termo é PEGO e NÃO é impresso: o log do CI de um repo público é público (P8)
+  if grep -q 'agents/a.md: .*\[vendor-scrub\] nome da fonte privada' <<< "${out}" && ! grep -q 'AcmeFicticia' <<< "${out}"; then
+    record_pass "client-terms: (b) termo DECLARADO na fonte privada é pego na superfície que viaja, sem ecoar o termo no log"
+  else record_fail "client-terms: (b)" "termo declarado passou calado ou foi ECOADO no log: ${out:0:200}"; fi
 
-  # (c) sem a lista, o comportamento antigo é idêntico — a cura não pode inventar violação
-  rm -f "${sb}/docs/evolution/federation/client-terms.txt"
-  out="$( cd "${sb}" && bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/agents/a.md" 2>&1 || true )"
-  if ! grep -q 'AcmeFicticia' <<< "${out}"; then
-    record_pass "client-terms: (c) sem a lista, nada muda (a fonte nova é aditiva, não inventiva)"
-  else record_fail "client-terms: (c)" "acusou sem a lista — a fonte nova virou ruído"; fi
+  # (c) sem a fonte, a guarda DECLARA que não verificou (SOFT NAO-VERIFICADO) e não inventa HARD
+  out="$( cd "${sb}" && ONION_CLIENT_TERMS_FILE="${sb}/nao-existe.txt" bash "${sb}/.claude/validation/lint-artifacts.sh" --only="${sb}/.claude/agents/a.md" 2>&1 || true )"
+  if grep -q 'vendor-scrub/NAO-VERIFICADO' <<< "${out}" && ! grep -q 'agents/a.md: .*\[vendor-scrub\]' <<< "${out}"; then
+    record_pass "client-terms: (c) sem a fonte privada → NAO-VERIFICADO declarado, nenhuma acusação inventada"
+  else record_fail "client-terms: (c)" "sem a fonte: esperava NAO-VERIFICADO e nenhum vendor-scrub HARD: ${out:0:200}"; fi
+
+  # (d) a lista que VOLTAR à árvore é HARD (a regressão exata que a P8 fecha) — lint completo, não --only
+  printf '# lista\nAcmeFicticia\n' > "${sb}/docs/evolution/federation/client-terms.txt"
+  out="$( cd "${sb}" && ONION_CLIENT_TERMS_FILE="${sb}/fonte-privada.txt" bash "${sb}/.claude/validation/lint-artifacts.sh" 2>&1 || true )"
+  if grep -q 'vendor-scrub/LISTA-NA-ARVORE' <<< "${out}"; then
+    record_pass "client-terms: (d) a lista de nomes privados de volta na árvore → HARD LISTA-NA-ARVORE"
+  else record_fail "client-terms: (d)" "a lista voltou à árvore e nada acusou: $(grep -c VIOLATION <<< "${out}" || true) violações"; fi
   rm -rf "${sb}"
 }
 

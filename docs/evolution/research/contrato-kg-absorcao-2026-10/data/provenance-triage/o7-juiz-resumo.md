@@ -45,7 +45,7 @@
    editado um texto verbatim. A correção deixa só o par interno; o texto e as descrições estão certos. No
    `E_HISTORICO_DO_REGISTRO_DOS_ADOTANTES` (8931 car.), o diff confirma que **só as 2 regiões de caminho mudam**: o
    resto está preservado, como pede o item 9.
-5. **A recomendação do gmill inventava nomes** (linha 82). O proponente trocou o nome privado também no domínio
+5. **A recomendação do hub-operacoes-enterprise inventava nomes** (linha 82). O proponente trocou o nome privado também no domínio
    público, no vhost versionado, no compose de deploy e na entrada do `pass`. Com isso surgiram
    `hub-operacoes-enterprise.onionevolve.com` e `ops/caddy/conf.d/hub-operacoes-enterprise.caddy`, que não existem.
    Conferi: no repo só existe `ops/caddy/conf.d/gmill.caddy`. O selo diz que o domínio e o arquivo de deploy ficam,
@@ -129,11 +129,11 @@ regex não vê:
   ferramenta aceite label acima de 280 quando ele já era longo. Os dados estão aqui; a decisão é do maestro.
 - **A2. O segredo do arandek.** O valor sai do grafo com esta onda, mas **segue no histórico git do core** (e no do
   adotante). Avisar o adotante, pedir a rotação e decidir se o histórico do core é reescrito são atos do maestro.
-- **A3. Os ids com gmill.** O selo diz que "labels e ids usam o id", e **4 ids de nó** carregam o nome privado:
-  - `E_gmill_demo_route_caddy`;
-  - `E_GMILL_VEREDITO_DOS_TRES_FALSOS_POSITIVOS`;
-  - `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM`;
-  - `Q_GMILL_MAIN_DIVERGIU`.
+- **A3. Os ids com hub-operacoes-enterprise.** O selo diz que "labels e ids usam o id", e **4 ids de nó** carregam o nome privado:
+  - `E_hub_operacoes_enterprise_demo_route_caddy`;
+  - `E_HUB_OPERACOES_ENTERPRISE_VEREDITO_DOS_TRES_FALSOS_POSITIVOS`;
+  - `Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM`;
+  - `Q_HUB_OPERACOES_ENTERPRISE_MAIN_DIVERGIU`.
 
   Renomear id exige reescrever as arestas, e nenhuma ação da ferramenta faz isso hoje. Fica para uma próxima onda.
   Além disso, a guarda de nome privado do gerador recusaria o `valor_final` da linha 82, porque o domínio e o

@@ -14,7 +14,7 @@ conflict_class: static
 
 ## Signal
 **Não projetar uma etapa de ferramenta onde ela não se aplica.** Assumi que o gustavo
-pusharia um "scaffold via `/meta:create-vertical`" no Tornak; mas o Tornak **já é vertical
+pusharia um "scaffold via `/meta:create-vertical`" no ⟨cliente⟩; mas o ⟨cliente⟩ **já é vertical
 construída** — never-clobber tornaria o re-scaffold um **no-op**. Dogfood de campo = iterar
 DENTRO da vertical, não regenerá-la.
 
@@ -29,6 +29,6 @@ DENTRO da vertical, não regenerá-la.
 
 ## Next crumb
 Ao "ficar de olho" num adotante, reportar o conteúdo real do push e **não inferir uma etapa
-de ferramenta prevista pelo roadmap do core** — F3 do create-vertical ≠ regenerar o Tornak;
+de ferramenta prevista pelo roadmap do core** — F3 do create-vertical ≠ regenerar o ⟨cliente⟩;
 é uso de campo. Re-teste = confrontar a regra contra o comportamento real do comando (static).
 Ver `[[2026-07-15-create-vertical-f2-fino-delega]]`.

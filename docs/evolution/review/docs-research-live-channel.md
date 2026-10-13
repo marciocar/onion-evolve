@@ -13,7 +13,7 @@ verdict: CORRIGIDO
 elenxo: sim
 nota: >-
   Pedido do maestro: transformar em grafo a pesquisa sobre comunicação direta entre sessões Claude
-  Code de máquinas diferentes, restrita a membros autorizados (granaai usa Slack, gmill usa Teams).
+  Code de máquinas diferentes, restrita a membros autorizados (granaai usa Slack, hub-operacoes-enterprise usa Teams).
   Rodado o /onion-research no modo primárias (run wf_da77c143-24c, 18 agentes, 1,34M tokens), com
   as 8 fontes nomeadas pela rodada prévia de agente único: leitura com citação verbatim, ancoragem
   por verificador separado e Elenxo. Grafo novo: 42 evidências confirmed (34 ancoradas e as objeções

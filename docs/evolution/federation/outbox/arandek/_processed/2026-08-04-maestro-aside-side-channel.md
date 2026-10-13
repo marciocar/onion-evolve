@@ -2,7 +2,7 @@
 title: "Maestro's Aside — entrada lateral tipada (side-channel)"
 date: 2026-08-04
 from: onion-evolve (core / maestro principal)
-to: arandek (monorepo de plataforma de agentes IA — consumidor)
+to: arandek (monorepo legacy — consumidor)
 re: CHANGELOG de co-evolução, entrada 2026-08-04 (downstream)
 type: downstream-announce
 classe: COMPATÍVEL

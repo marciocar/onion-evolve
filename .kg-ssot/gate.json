@@ -1,7 +1,7 @@
 {
   "contract": "kg-contract-v4.schema.json",
   "contract_sha256": "5d3fec7b48f5ad2af1ce80d8193c50032cdbc7aa14827ce04e4c165de10082e5",
-  "graphs": 151,
+  "graphs": 154,
   "failing": {
     "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml": [
       "form.unknown-key.meta.label",
@@ -68,7 +68,7 @@
     "form.range.node.label": 2161,
     "form.required.node.verified_against": 141,
     "form.required.node.verified_at": 15,
-    "integrity.untraced-decision": 36,
+    "integrity.untraced-decision": 35,
     "yaml.unquoted-date": 58
   },
   "granularity": "node",
@@ -99,7 +99,7 @@
         "✗ PIOROU  docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml falha no MUST: form.required.node.provenance",
         "✗ PIOROU  docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml falha no MUST: form.required.node.provenance",
         "✗ PIOROU  docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml falha no MUST: form.required.node.provenance",
-        "✗ PIOROU  docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml falha no MUST: form.required.node.provenance",
+        "✗ PIOROU  docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml falha no MUST: form.required.node.provenance",
         "✗ PIOROU  docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml falha no MUST: form.required.node.provenance",
         "✗ PIOROU  docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml falha no MUST: form.required.node.provenance",
         "✗ PIOROU  docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml falha no MUST: form.required.node.provenance",

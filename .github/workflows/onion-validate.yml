@@ -88,6 +88,28 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
+      # ── FONTE PRIVADA DE TERMOS (P8 do projection-safety.sh; decisão do maestro de 2026-10-13) ──
+      # O core ficou PÚBLICO e a lista de nomes privados saiu da árvore: era o próprio vazamento. As
+      # REGRAS 30, 33 e 36 a leem de ONION_CLIENT_TERMS_FILE; aqui ela vem do secret de repo
+      # ONION_CLIENT_TERMS, materializado num arquivo 0600 fora do checkout, que morre com o runner.
+      # SEM o secret (ainda não criado, ou PR de fork, que não recebe secret): o arquivo NÃO é criado e
+      # as guardas DECLARAM `NAO-VERIFICADO` (SOFT) — nunca verde mudo, nunca reprovar tudo. O log do lint
+      # não imprime termo privado (o log de repo público é público).
+      - name: Materializar a fonte privada de termos (secret, fora da árvore)
+        env:
+          ONION_CLIENT_TERMS: ${{ secrets.ONION_CLIENT_TERMS }}
+        run: |
+          set -euo pipefail
+          if [ -n "${ONION_CLIENT_TERMS:-}" ]; then
+            f="${RUNNER_TEMP}/onion-client-terms.txt"
+            ( umask 077; printf '%s\n' "${ONION_CLIENT_TERMS}" > "${f}" )
+            echo "ONION_CLIENT_TERMS_FILE=${f}" >> "${GITHUB_ENV}"
+            echo "fonte privada de termos materializada: $(grep -vcE '^[[:space:]]*(#|$)' "${f}" || true) linha(s) útil(eis)"
+          else
+            echo "ONION_CLIENT_TERMS_FILE=${RUNNER_TEMP}/onion-client-terms.AUSENTE" >> "${GITHUB_ENV}"
+            echo "::warning::secret ONION_CLIENT_TERMS ausente — as guardas de nome privado (REGRAS 30, 33 e 36) vão declarar NAO-VERIFICADO"
+          fi
+
       - name: Executar linter determinístico de artefatos Onion
         # `tee` porque o log do job EXPIRA e leva junto a única evidência de por que uma regra
         # reprovou. `pipefail` porque sem ele o rc seria o do `tee` — sempre 0 — e o gate
@@ -145,14 +167,14 @@ jobs:
           python3 -m pip install --quiet -r vendor/kg-ssot/tools/requirements.txt
           python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
           # FORA DO CORPUS, explícito e visível no diff (política selada pelo maestro, 2026-10-08, sobre a
-          # posição do dono do contrato): propostas arquivadas do kg-inbox são história, e os grafos proto
-          # do Onion pessoal não são grafo do produto. O demo fictício foi para fixtures/ (default).
+          # posição do dono do contrato): propostas arquivadas do kg-inbox são história. O demo fictício foi
+          # para fixtures/ (default). Os grafos proto do Onion pessoal, que também ficavam fora, SAÍRAM DA
+          # ÁRVORE em 2026-10-13 (o core ficou público; dados pessoais) — o --exclude deles saiu junto.
           # ⚠️ A base (.kg-ssot/gate.json) tem de ser gravada com os MESMOS --exclude:
           #    python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update <os --exclude abaixo>  (a granularidade vem da base)
           python3 -I vendor/kg-ssot/tools/kg_gate.py \
             --exclude 'docs/evolution/kg-inbox/_rejected/*' \
-            --exclude 'docs/evolution/kg-inbox/_sealed/*' \
-            --exclude 'docs/discussions/onion-pessoal-marcio/proto/*'
+            --exclude 'docs/evolution/kg-inbox/_sealed/*'
 
       - name: Lembrete — checagens semânticas são locais
         run: |

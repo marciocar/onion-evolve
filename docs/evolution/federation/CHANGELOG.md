@@ -25,7 +25,7 @@ Os três sinais do onion-slm entraram no core em #938 e #939, mais o PR desta en
 ## 2026-10-06 · O .env nunca chega ao modelo, o attribution do adotante não é sobrescrito e develop nunca é eleita produção · COMPATÍVEL · alvo: hub-operacoes-enterprise, brain-granaai
 
 Os três sinais de 2026-10-05 viraram mecanismo no core. Os três defeitos do `/meta:setup-integration`
-(gmill, dogfood do Zoho) foram curados no PR #932 e no #934:
+(hub-operacoes-enterprise, dogfood do Zoho) foram curados no PR #932 e no #934:
 - um veto `exit 2` em Read, Grep e Bash barra a leitura do conteúdo de `.env*`;
 - um helper (`task-manager/env-check.sh`) devolve só nomes;
 - o veto julga o corpo de heredoc pelo comando inteiro, e as três passadas adversariais fecharam 36 escapes.
@@ -38,21 +38,21 @@ um texto que cite `.env` passa a ser vetado; nesses casos, use a ferramenta Writ
 
 ## 2026-10-05 · Os dois hubs atualizados para ab08cde, a causa do defeito 1 medida, e o veto que só protege main · COMPATÍVEL · alvo: hub-operacoes-enterprise, brain-granaai
 
-Os updates de gmill e brain-granaai rodaram hoje, sem push, com a regeneração das projeções e o lint
-re-rodados **depois** do merge: 0 HARD medido nos dois. A regeneração pós-merge levou o inventário do gmill
+Os updates de hub-operacoes-enterprise e brain-granaai rodaram hoje, sem push, com a regeneração das projeções e o lint
+re-rodados **depois** do merge: 0 HARD medido nos dois. A regeneração pós-merge levou o inventário do hub-operacoes-enterprise
 de 111 para 113 comandos, o que prova a causa do defeito 1 (`docs/onion/` não viaja na vendor). Dois achados
-novos ficam no grafo `gmill-update-547-2026-10`: os helpers do update commitam sem assinatura, e o veto de
+novos ficam no grafo `hub-operacoes-enterprise-update-547-2026-10`: os helpers do update commitam sem assinatura, e o veto de
 force-push protege só o literal `main` — no brain-granaai, cuja produção é `master`, ele não protege nada.
-O gmill também mandou três defeitos do `/meta:setup-integration`, confirmados no core e na fila.
+O hub-operacoes-enterprise também mandou três defeitos do `/meta:setup-integration`, confirmados no core e na fila.
 
 
 ## 2026-10-05 · Veredito dos três falsos positivos recebido, e dois defeitos do --update que ele revelou · COMPATÍVEL · alvo: hub-operacoes-enterprise (informativo p/ brain-granaai)
 
 **Vocês mediram o que nós não tínhamos medido, e acharam dois defeitos do core.** Triados no grafo
-`docs/evolution/research/gmill-update-547-2026-10/`.
+`docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/`.
 
 - **REGRA 45 (Link vendorizado não aponta caminho core-privado, com catraca): fechada.** Dois terços de
-  `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM` fecham com a medição de vocês; o caso do heredoc no
+  `Q_HUB_OPERACOES_ENTERPRISE_FALSOS_POSITIVOS_SEM_TRIAGEM` fecham com a medição de vocês; o caso do heredoc no
   `bash-empty-result-guard` segue aberto, sem medição dos dois lados.
 - **O relatório de update carimbou "0 HARD" e chegou com 1.** O passo (8) do `--update` regenera o
   inventário, e mesmo assim `meta/forge.md` e `docs/build-project-manual.md` entraram no commit do

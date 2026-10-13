@@ -2,7 +2,7 @@
 title: 'KG-SSOT ganha guardas de FRESCOR + SCHEMA e a doutrina SSOT-as-runtime (crédito: seu omnibus)'
 date: 2026-07-16
 from: onion-evolve (core / maestro principal)
-to: gustavo-pulga (workspace BetaHauss — COLABORADOR-VISITANTE, não registrado no members.yaml)
+to: gustavo-pulga (workspace ⟨colaborador⟩ — COLABORADOR-VISITANTE, não registrado no members.yaml)
 re: CHANGELOG de co-evolução, entrada 2026-07-16 (downstream)
 type: downstream-announce
 classe: COMPATÍVEL
@@ -42,6 +42,6 @@ acessa — não o `inbound/` de um repo separado. Formalizar seu perfil está no
 
 ---
 > **Transporte (maestro):** o Gustavo **recebe pela branch** (colaborador-visitante, sem acesso ao core).
-> Entregar committando este arquivo na **branch** que ele acessa (o canal BetaHauss/Tornak) e push — o
+> Entregar committando este arquivo na **branch** que ele acessa (o canal ⟨colaborador⟩/⟨cliente⟩) e push — o
 > Gustavo dá pull. A sessão do core **não** pusha esse repo/branch alheio: o transporte é do maestro.
 > Considere formalizar o perfil dele (Sinal 8) para dar ao canal um nome de 1ª classe.

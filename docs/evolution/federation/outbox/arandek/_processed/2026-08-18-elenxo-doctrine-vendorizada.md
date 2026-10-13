@@ -2,7 +2,7 @@
 title: 'A doutrina do Elenxo agora VIAJA com você — e três mecanismos novos na maquinaria vendorizada'
 date: 2026-08-18
 from: onion-evolve (core / maestro principal)
-to: arandek (arandek (monorepo de plataforma de agentes IA — PRIVADO) — consumidor)
+to: arandek (arandek (monorepo legacy — PRIVADO) — consumidor)
 re: CHANGELOG de co-evolução, entrada 2026-08-18 (downstream)
 type: downstream-announce
 classe: COMPATÍVEL (com AÇÃO recomendada)

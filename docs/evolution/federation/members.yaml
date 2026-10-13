@@ -138,7 +138,7 @@ members:
       exposes_downstream: []
 
   - id: granaai
-    name: granaai (Grana.Ai — CONFIDENCIAL, ver onion-adr-granaai-consolidation-2026-07.md)
+    name: granaai (empresa do maestro — linhagem histórica; ver onion-adr-granaai-consolidation-2026-07.md)
     role: standalone            # TIER 3 — adota o core direto; NÃO confundir com "origem" (ver ADR — é consolidação, não origem)
     kind: adopter       # projeto regulado que vendoriza o framework
     parent: onion-evolve
@@ -179,11 +179,11 @@ members:
       exposes_downstream: []
 
   - id: gustavo-pulga
-    name: gustavo-pulga (projeto-betahauss-tornak — Tornak/BetaHauss; PRIVADO)
+    name: gustavo-pulga (adotante de campo — projeto privado)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
     kind: adopter       # projeto que vendoriza o framework
     parent: onion-evolve
-    remote: github.com/marciocar/projeto-betahauss-tornak   # PRIVADO
+    remote: github.com/marciocar/projeto-betahauss-tornak   # PRIVADO — campo OPERACIONAL (ops/registry-pins.sh o lê); fica até o repo ser renomeado; não entra nas projeções
     local_path: "/home/marcio/gustavo-pulga"   # dir físico difere do nome do repo (não renomear sem migrar o clone)
     onion_version: 7fd9392cd43b   # carimbado por ops/registry-pins.sh (remoto onion/adopt conferido em 2026-10-09)
     adopted_at: 2026-07-09
@@ -256,11 +256,11 @@ members:
   #    superfícies PROJETADAS. Quem é a empresa vive no CLAUDE.md dela, nunca aqui; o `local_path` não
   #    viaja para projeção. O registro atrasado e o vazamento medido: grafo door-role-parity-2026-09.
   - id: hub-operacoes-enterprise
-    name: hub-operacoes-enterprise (hub de operações — empresa com projetos próprios, nome comercial sob reserva)
+    name: hub-operacoes-enterprise (hub de operações — empresa com projetos próprios)
     role: hub                   # TIER 1 — pode ter sub-adotados; carimbo do clone diz `role: hub`
     kind: adopter               # vendoriza o framework, logo pin real é obrigatório
     parent: onion-evolve
-    remote: github.com/marciocar/gmill   # PRIVADO — o remote É o nome real do repo; não há como neutralizá-lo sem renomear o repo, e ele não entra nas projeções
+    remote: github.com/marciocar/gmill   # PRIVADO — campo OPERACIONAL (ops/registry-pins.sh o lê); fica até o repo ser renomeado; não entra nas projeções
     local_path: "/home/marcio/gmill"     # clonado em 2026-09-30 para validar as KBs do sinal
     onion_version: 8278fee79d1c   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-09)
     adopted_at: 2026-09-16               # do carimbo (`adopted_at`), não de suposição
@@ -306,7 +306,7 @@ members:
     #    comercial entrou numa entrada deste mesmo arquivo e APARECEU no console, e o lint não pegou
     #    porque a guarda reconhece por LISTA e não conhecia o nome — falha por vocabulário. Quem é o
     #    cliente vive no CLAUDE.md do adotante, nunca aqui.
-    name: vendas-pdi-enterprise (adotante de campo — vendas enterprise, cliente sob NDA)
+    name: vendas-pdi-enterprise (adotante de campo — vendas enterprise)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados (carimbo diz `adopted`: par permitido, REGRA 92)
     kind: adopter
     parent: onion-evolve
@@ -315,9 +315,8 @@ members:
     onion_version: 4299290b73d4   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-09)
     adopted_at: 2026-09-17
     mode: greenfield            # repo novo; gate PROVADO por execução: lint 0 HARD / 8 SOFT
-    # ⚠️ CONFIDENCIALIDADE — material do cliente sob NDA vive em `material/`, IGNORADO pelo git
-    #    desde o PRIMEIRO commit, e NUNCA entra em commit/PR/nome de arquivo. Repo privado protege
-    #    contra terceiros; não protege contra o repo ser clonado, espelhado ou aberto por engano.
+    # ⚠️ material do cliente vive em `material/`, IGNORADO pelo git desde o PRIMEIRO commit, e NUNCA
+    #    entra em commit/PR/nome de arquivo.
     personality_summary: "Adotante de campo em vendas enterprise: o repo é a fonte do método e das especificações que alimentam o agente do LibreChat onde o cliente opera. Material bruto não viaja; o que viaja é o que deriva dele."
     specializations: [vendas, spec-as-code, rag-bridge]
     personality_last_sync: 2026-09-17
@@ -490,14 +489,14 @@ members:
     #    publicadas (federation-console.html, federation-map.md). A 1ª versão desta entrada trazia o
     #    nome comercial do cliente e ele APARECEU no console — e o lint não pegou, porque a guarda
     #    projeção/NOME reconhece por LISTA e não conhecia esses nomes (a falha por vocabulário, 4ª
-    #    ocorrência da classe). Cliente sob NDA não vai para superfície projetada nem em repo privado:
-    #    o identificador é o slug. Quem é o cliente vive no CLAUDE.md do próprio adotante.
-    name: poc-venda-direta-pdi (adotante de campo — PoC com cliente sob NDA; comparação documento×especificação)
+    #    ocorrência da classe). Nome de cliente não vai para superfície projetada: o identificador é o
+    #    slug. Quem é o cliente vive no CLAUDE.md do próprio adotante.
+    name: poc-venda-direta-pdi (adotante de campo — comparação documento×especificação)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
     kind: adopter       # projeto que vendoriza o framework
     parent: onion-evolve
     # ── SUCESSÃO (selo do maestro 2026-08-31): o projeto evoluiu de PoC para MVP; o slug PERMANECE
-    #    (identificador de segurança/NDA, não de fase). O VIVO é o MVP, e ele é SÓ LOCAL (medido
+    #    (identificador de segurança, não de fase). O VIVO é o MVP, e ele é SÓ LOCAL (medido
     #    2026-10-09: o clone não tem `origin`). A PoC histórica segue em
     #    github.com/marciocar/poc-venda-direta-pdi (PRIVADO), pin congelado b9580a520e5b — e era esse o
     #    `remote:` daqui, o que fazia toda leitura remota medir a PoC e não o MVP.
@@ -507,13 +506,11 @@ members:
     integration_branch: main      # do carimbo do MVP
     adopted_at: 2026-08-17
     mode: greenfield              # repo novo; gate PROVADO por execução na adoção; lint 0 HARD / 4 SOFT
-    # ⚠️ CONFIDENCIALIDADE — este membro carrega material de TERCEIRO sob NDA em análise no Jurídico
-    #    (desde 2026-07-09). O material do cliente vive em `_material/`, IGNORADO pelo git, e NUNCA
-    #    entra em commit/PR/nome de arquivo. Ao operar sobre este membro (doc-bridge, anúncio,
-    #    co-deliver), trate o conteúdo como não-publicável por padrão: referencie (número de projeto,
-    #    órgão, data), não cole. O registro aqui é, ele próprio, ato de segurança — a REGRA 36
-    #    (vendor-scrub) só protege quem está neste arquivo.
-    personality_summary: "PoC com cliente real (sob NDA): agente que cruza a exigência de um edital de compra pública com a especificação do item entregue e produz o checklist de inspeção, apontando inconsistências."  # seed manual; sem nome de cliente (campo projetado)
+    # ⚠️ material de terceiro vive em `_material/`, IGNORADO pelo git, e NUNCA entra em commit/PR/nome
+    #    de arquivo. Ao operar sobre este membro (doc-bridge, anúncio, co-deliver), trate o conteúdo
+    #    como não-publicável por padrão: referencie, não cole. O nome do cliente NÃO mora aqui: mora na
+    #    fonte privada de termos, fora da árvore (P8 do projection-safety.sh, desde 2026-10-13).
+    personality_summary: "PoC com cliente real: agente que cruza a exigência de um edital de compra pública com a especificação do item entregue e produz o checklist de inspeção, apontando inconsistências."  # seed manual; sem nome de cliente (campo projetado)
     specializations: [greenfield-adoption, document-comparison, compliance-nda, public-procurement]
     personality_last_sync: 2026-08-17   # seed manual (registro; sem /meta:personality-sync no alvo)
     trust:
@@ -521,12 +518,12 @@ members:
       can_advise_to: [onion-evolve]
       can_correct_to: []
       diary_readable_by: [onion-evolve]
-      # ⚠️ NADA compartilhado por padrão: diário deste membro pode citar caso de cliente sob NDA.
+      # ⚠️ NADA compartilhado por padrão: diário deste membro pode citar caso de cliente.
       diary_classifications_shared: []
       exposes_downstream: []
 
   - id: arandek
-    name: arandek (monorepo de plataforma de agentes IA — PRIVADO)
+    name: arandek (adotante de campo — monorepo legacy)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
     kind: adopter       # monorepo legacy que vendoriza o framework
     parent: onion-evolve
@@ -541,7 +538,7 @@ members:
     mode: legacy                  # monorepo existente (NX + Bun + SST); adoção por worktree
     integration_branch: develop   # medido 2026-10-09: o carimbo versionado na develop declara develop; o registro dizia
                                   # onion/adopt, onde o carimbo ficou num pin ANTERIOR (91439b65261d)
-    personality_summary: "Adotante legacy num monorepo de plataforma de agentes IA. É o remetente mais produtivo do canal upstream: o dogfood da adoção rendeu os gaps de durable-commit e approx-count adopter-aware, e a autocorreção do sinal do entrypoint virou o terceiro desfecho do auto-teste e a âncora UNANCHORED do radar."  # seed manual
+    personality_summary: "Adotante legacy num monorepo. É o remetente mais produtivo do canal upstream: o dogfood da adoção rendeu os gaps de durable-commit e approx-count adopter-aware, e a autocorreção do sinal do entrypoint virou o terceiro desfecho do auto-teste e a âncora UNANCHORED do radar."  # seed manual
     specializations: [field-dogfood, legacy-adoption, monorepo, upstream-signal]
     personality_last_sync: 2026-07-26   # seed manual (registro; sem /meta:personality-sync no alvo)
     trust:
@@ -610,8 +607,9 @@ members:
     #    medida: nenhuma projeção imprime `local_path` (ele serve só a transporte e validação),
     #    e renomear o diretório que o maestro criou é ato fora do que foi pedido.
     #    ⚠️ E vale o alerta da própria casa: a REGRA 36 (Superfície VENDORIZADA sem nome comercial
-    #    de cliente) deriva termos DESTE arquivo — logo ela só protege o que está registrado aqui.
-    #    Registrar é ato de segurança, não burocracia.
+    #    de cliente) só protege o que conhece — os ids DESTE arquivo e os nomes da fonte privada de
+    #    termos, fora da árvore (P8 do projection-safety.sh, desde 2026-10-13). Registrar nos dois é
+    #    ato de segurança, não burocracia.
     name: hub-formacao-enterprise (hub de formação — empresa cliente, autoridade de adoção dos próprios projetos)
     role: hub                   # TIER 2 — autoridade de adoção LOCAL: adota e atualiza os projetos dela
                                 # (Camada 2). NÃO recebe autoria do framework (create-*/evolve/graph/
@@ -623,9 +621,8 @@ members:
     onion_version: f32e2f931c73 # conferido no carimbo commitado do clone local (sem remoto) por ops/registry-pins.sh em 2026-10-09
     adopted_at: 2026-09-25
     mode: greenfield            # repo novo; gate PROVADO por execução (commit-sonda barrado), lint 0 HARD / 9 SOFT
-    # ⚠️ CONFIDENCIALIDADE — este repo carrega o MÉTODO e os padrões que a própria equipe do cliente
-    #    escrever. Material do cliente NÃO entra, nem em repo privado: exemplo, quando necessário,
-    #    com dado fictício DECLARADO como fictício.
+    # ⚠️ este repo carrega o MÉTODO e os padrões que a própria equipe do cliente escrever. Material
+    #    do cliente NÃO entra: exemplo, quando necessário, com dado fictício DECLARADO como fictício.
     personality_summary: "Hub de formação: a empresa cliente recebe o framework para conduzir o ciclo Onion nos próprios projetos, com a equipe de engenharia construindo os artefatos durante o treinamento (hands-on, não documentação) e o mesmo método adaptado depois aos times de negócio/produto. Foi o PRIMEIRO adotante a nascer com lint VERDE (0 HARD) — possível só porque a cura da REGRA 84 (Índice de leitura do KG em sincronia com os traces) entrou no core no dia anterior; até então todo adotante nascia com 1 HARD por defeito da fonte."
     specializations: [hub-de-adocao, formacao-hands-on, company-brain, spec-as-code]
     personality_last_sync: 2026-09-25   # seed manual

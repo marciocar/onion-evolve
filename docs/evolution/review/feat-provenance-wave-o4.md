@@ -48,7 +48,7 @@ aplicada); `corrigir-method-locality` 3. Recusadas 0, ausentes 0, REPROVADAS 0 (
 | `E_A_MESMA_CAUSA_VOLTOU_E_AGORA_COM_O_CORPO_DA_API` | passada-adversarial | dev-historia | PROD→DEV, provenance igual |
 | `D_SEM_CREDITO_POR_ORA` | review-gate-saldo | dev-historia | PROD→DEV, confirmed |
 | `Q_SENHA_CHAVE_ESTADO_2026_09` | identidade-onion-vps | dev-historia | PROD→DEV, open intocado |
-| `E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1` | gmill-update-547 | dev-historia | PROD→DEV |
+| `E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1` | hub-operacoes-enterprise-update-547 | dev-historia | PROD→DEV |
 | `E_PRIMITIVE_EXISTS` | guardrails-2nd-pr-state | manter-prod-medido | PROD; verified_at 07-31 → 10-09; method `medição:` |
 | `C_MATERIALIZADOR_LE_O_REGISTRO` | door-role-parity | manter-prod-medido | PROD; refuted intocado; verified_at 09-30 → 10-09 |
 | `Q_ONION_KG_MCP_NEXT` | librechat-kg-runtime | reescrever (CORRIGIDO) | código saiu da source; host |

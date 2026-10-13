@@ -2,7 +2,7 @@
 title: 'A doutrina do Elenxo agora VIAJA com você — e três mecanismos novos na maquinaria vendorizada'
 date: 2026-08-18
 from: onion-evolve (core / maestro principal)
-to: gustavo-pulga (gustavo-pulga (projeto-betahauss-tornak — Tornak/BetaHauss; PRIVADO) — consumidor)
+to: gustavo-pulga (gustavo-pulga (⟨repo do adotante⟩ — ⟨cliente⟩/⟨colaborador⟩; PRIVADO) — consumidor)
 re: CHANGELOG de co-evolução, entrada 2026-08-18 (downstream)
 type: downstream-announce
 classe: COMPATÍVEL (com AÇÃO recomendada)

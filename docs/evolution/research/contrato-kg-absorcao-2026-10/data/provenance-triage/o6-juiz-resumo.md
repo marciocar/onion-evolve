@@ -129,7 +129,7 @@ remover.
 - **J-O6-2.** Confirmo o F-O6-1 do proponente: a premissa do `I_CONSOLE_DO_LOGTO_ESTA_PUBLICO` (open) está
   derivada. É candidato a `/meta:kg-freshness`.
 - **J-O6-3.** A coluna `grafo` segue carregando um nome de arquivo com nome privado de adotante
-  (`gmill-update-547-…`), que é o F5 da O5. Em `valor_final` e `motivo` não há nenhum nome de pasta privada
+  (`hub-operacoes-enterprise-update-547-…`), que é o F5 da O5. Em `valor_final` e `motivo` não há nenhum nome de pasta privada
   (varri com a lista derivada do `members.yaml`).
 - **Acréscimo do coordenador.** Os 5 `method: "derivado na migração…"` sem `: ` estão todos em
   `guard-pre-push-2026-10.kg.yaml`. Classifiquei pela evidência: 2 `juízes` (Elenxo), 2 `leitura` (logs de CI

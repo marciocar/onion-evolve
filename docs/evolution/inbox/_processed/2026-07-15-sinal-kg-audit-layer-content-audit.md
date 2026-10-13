@@ -1,7 +1,7 @@
 ---
 type: co-evolution-signal
 direction: upstream   # sinal → core
-from: observação de campo do Core sobre o grafo do adotante gustavo-pulga/Tornak (docs/tornak/graph/tornak.kg.yaml, Lote 10)
+from: observação de campo do Core sobre o grafo do adotante gustavo-pulga/⟨cliente⟩ (docs/<cliente>/graph/<cliente>.kg.yaml, Lote 10)
 to: Onion core / Mestre
 date: 2026-07-15
 subject: A camada `audit` do KG SDAAL generaliza para auditar CONTEÚDO/documentação — não só código/sistema
@@ -14,7 +14,7 @@ maturity: evidência de campo espontânea (adotante), verificada pelo radar sobe
 > Canal upstream (sinal→core). **Proveniência honesta:** este sinal **não** foi escrito por uma
 > sessão do adotante — foi **observado pelo Core** durante o re-dogfood geral do KG SDAAL
 > (2026-07-15), rodando o `kg-radar.sh` do core sobre o grafo **real e commitado** do
-> gustavo-pulga/Tornak. O adotante não pediu nada; o padrão **apareceu no uso** e o core o
+> gustavo-pulga/⟨cliente⟩. O adotante não pediu nada; o padrão **apareceu no uso** e o core o
 > reconheceu. Registro para triagem via `/meta:co-evolve`.
 
 ## O que apareceu no campo
@@ -27,7 +27,7 @@ sinal [`2026-07-02-sinal-sdaal-knowledge-graph`](2026-07-02-sinal-sdaal-knowledg
 No campo, o gustavo usou **exatamente a mesma gramática** para **auditar dois decks de
 treinamento** (documentação/conteúdo, não código) — e ela segurou **sem nenhuma adaptação**.
 
-## Evidência (Lote 10 do `tornak.kg.yaml`, commit `origin/onion/adopt@4113a55`)
+## Evidência (Lote 10 do `<cliente>.kg.yaml`, commit `origin/onion/adopt@4113a55`)
 
 - **Gramática canônica aplicada a conteúdo:** `E_SLIDE_AUDIT` (evidência = varredura dos 2 decks)
   `→SUPPORTS→` 7 `claims` de achados (contradições/gaps/terminologia) `→TRACES_TO→` os artefatos-deck;
@@ -55,7 +55,7 @@ treinamento** (documentação/conteúdo, não código) — e ela segurou **sem n
 
 Avaliar **documentar na KB [`knowledge-graph-sdaal.md`](../../../knowledge-base/concepts/knowledge-graph-sdaal.md)
 que a camada `audit` se aplica a auditoria de CONTEÚDO/documentação** (não só código/sistema), citando o
-Lote 10 do Tornak como instância de campo. Se aprovado, considerar um exemplo mínimo content-audit ao lado
+Lote 10 do ⟨cliente⟩ como instância de campo. Se aprovado, considerar um exemplo mínimo content-audit ao lado
 do `example-domain.kg.yaml`.
 
 > **Migalha ligada:** diário `[[2026-07-15-kg-audit-layer-generalizes-to-content]]` (migalha `conditional`

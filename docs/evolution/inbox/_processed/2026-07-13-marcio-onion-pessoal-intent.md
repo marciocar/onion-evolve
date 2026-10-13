@@ -18,7 +18,7 @@ status: declaração de intenção — gated (não é adoção executada)
 
 Marcio declara intenção de erguer o **Onion pessoal** (o KG de vida reconciliado, N=1) como uma
 **instância-dogfood / braço de pesquisa** — e de figurar como seu **primeiro adotante**. A discussão
-[`docs/discussions/onion-pessoal-marcio/`](../../../discussions/onion-pessoal-marcio/README.md) (5 passadas,
+`docs/discussions/onion-pessoal-marcio/` (5 passadas,
 mergeada via #343) é o desenho; esta é a intenção de dar-lhe corpo.
 
 ## O rótulo honesto (os guardrails — o que ESTE sinal afirma e o que NÃO afirma)
@@ -41,7 +41,7 @@ mergeada via #343) é o desenho; esta é a intenção de dar-lhe corpo.
   o método KG SDAAL, não a máquina de adoção de repo de código (gap G1 nomeado: adoção de domínio não-software).
 - **Fronteira (P3):** membro **pelo método, soberano no dado** — `role: standalone`, `mode: regulated`, KG bruto
   `private` (inviolável, local-first), só destilado sai por opt-in gated. A entrada `marcio-pessoal` do
-  [proto hipotético](../../../discussions/onion-pessoal-marcio/proto/membership-marcio-pessoal.yaml) deixaria de ser hipótese.
+  proto hipotético deixaria de ser hipótese.
 - **Privacidade (P4/P5):** `de-identification` `none` fail-safe; classificação por vertical (`ipse`/relações/saúde
   = `private`); e o reconhecimento honesto de que a **inferência interna é indefesa por construção** — a defesa é
   a fronteira de saída (as 6 camadas negativas da P5), não uma cifra.

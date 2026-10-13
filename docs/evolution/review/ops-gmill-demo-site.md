@@ -21,8 +21,8 @@ nota: >-
 
 # Resíduo — `ops/gmill-demo-site`
 
-**Origem:** ordem do maestro (2026-10-08), a pedido da sessão `meugmill-vendas-6d`: expor a demo do
-MeuGmill Vendas (`127.0.0.1:39081`) em `gmill.onionevolve.com`, atrás de senha.
+**Origem:** ordem do maestro (2026-10-08), a pedido da sessão `⟨sessão do adotante⟩`: expor a demo do
+⟨produto do cliente⟩ Vendas (`127.0.0.1:39081`) em `gmill.onionevolve.com`, atrás de senha.
 
 ## O que muda
 
@@ -34,7 +34,7 @@ MeuGmill Vendas (`127.0.0.1:39081`) em `gmill.onionevolve.com`, atrás de senha.
   cobrindo o `conf.d`, `# verify:` por vhost com espera de ACME.
 - `ops/caddy-site-secrets.sh` — gera senha e cookie direto para o `pass` (só cifra, funciona com o gpg
   travado) e o hash e o cookie para o env root 0600. Sem eco e sem arquivo temporário.
-- Nó `E_gmill_demo_route_caddy` em `vps-shared-tools-2026-07.kg.yaml` (radar exit 0).
+- Nó `E_hub_operacoes_enterprise_demo_route_caddy` em `vps-shared-tools-2026-07.kg.yaml` (radar exit 0).
 
 ## Achados
 
@@ -80,23 +80,23 @@ segredos rotacionados, que nunca apareceram em saída nenhuma.
 ## Pendente-com-dono
 
 - A stack `carteira` roda **sem** o override `compose.gmill.yaml` (`OIDC_ISSUER=http://localhost:39080/default`).
-  Tokens emitidos pelo domínio terão `iss` divergente até a sessão `meugmill-vendas-6d` subir com o
+  Tokens emitidos pelo domínio terão `iss` divergente até a sessão `⟨sessão do adotante⟩` subir com o
   override. Isso é do repo da demo, não deste.
 
 # Adendo (2026-10-08, depois do primeiro uso real pelo maestro)
 
-- **Redirect com a porta interna.** Ao entrar com o usuário `gmill`, o navegador ia para
+- **Redirect com a porta interna.** Ao entrar com o usuário do Basic, o navegador ia para
   `http://gmill.onionevolve.com:8080/demo/index.html`.
   - **Causa:** o nginx da demo escuta 8080 dentro do container e devolve redirect absoluto com a porta.
   - **Cura no vhost:** `header_down Location "^https?://[^/]+:8080/" "/"` nos dois `reverse_proxy`.
   - **Medido ao vivo com a credencial:** `location: /demo/index.html` e 200 seguindo o redirect.
-  - **Cura de raiz:** `absolute_redirect off` no nginx da demo, a cargo da sessão meugmill-vendas.
+  - **Cura de raiz:** `absolute_redirect off` no nginx da demo, a cargo da sessão ⟨sessão do adotante⟩.
 - **Incidente de exposição de segredo (2º do dia).** Na prova do 200, o `-w '%{url_effective}'` do curl
   imprimiu a URL com a senha do Basic.
   - **Resposta:** a senha e o cookie foram trocados na hora (`caddy-site-secrets.sh --rotate` e reinstalação).
   - **Verificação:** a senha antiga dá 401 e a nova dá 200.
   - **Lição:** prova com credencial imprime só `http_code`, nunca `url_effective` nem `redirect_url`.
 
-- **Demo sem dados.** O Basic do vhost seguia ao upstream, e o IdP de teste o lia no `/default/token` como autenticação do cliente OAuth (`client_secret_basic`, client `gmill` desconhecido). Por isso o token saía como `vendedor-01/filial-01`, perfil sem dados. A cura é `header_up -Authorization` só na rota do Basic, já que a rota do cookie mantém o Bearer. Medido: `/api/v1/me` passou de `vendedor-01` a `demo-admin / DEMO-ES`.
+- **Demo sem dados.** O Basic do vhost seguia ao upstream, e o IdP de teste o lia no `/default/token` como autenticação do cliente OAuth (`client_secret_basic`, client com o nome do usuário do Basic, desconhecido). Por isso o token saía como `vendedor-01/filial-01`, perfil sem dados. A cura é `header_up -Authorization` só na rota do Basic, já que a rota do cookie mantém o Bearer. Medido: `/api/v1/me` passou de `vendedor-01` a `demo-admin / DEMO-ES`.
 
-- **header_down removido.** A meugmill-vendas mergeou `absolute_redirect off` no nginx da web (PR #16 deles, 83d84a7). Conferido no upstream: `Location: /demo/index.html`. Via Caddy, com credencial: 302 para `/demo/index.html`. O `header_up -Authorization` fica, porque é a fronteira do Basic.
+- **header_down removido.** A ⟨sessão do adotante⟩ mergeou `absolute_redirect off` no nginx da web (PR #16 deles, 83d84a7). Conferido no upstream: `Location: /demo/index.html`. Via Caddy, com credencial: 302 para `/demo/index.html`. O `header_up -Authorization` fica, porque é a fronteira do Basic.

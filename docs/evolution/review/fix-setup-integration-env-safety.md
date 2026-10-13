@@ -8,7 +8,7 @@ duration_min: 21
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >
-  Sinal de campo de um hub (gmill, dogfood do Zoho, 2026-10-05): o setup-integration mandava ler o .env com
+  Sinal de campo de um hub (hub-operacoes-enterprise, dogfood do Zoho, 2026-10-05): o setup-integration mandava ler o .env com
   Read "sem expor valores" — e expõe. DUAS passadas do Elenxo (opus), ambas REPROVARAM, todas curadas aqui.
   1ª (9 achados): trocar permissões não proíbe nada (allowed-tools só pré-aprova; Read livre; `Bash(grep * .env)`
   liberado no settings e na skill onion; sob bypass nada é restrito) → VETO exit 2 no PreToolUse

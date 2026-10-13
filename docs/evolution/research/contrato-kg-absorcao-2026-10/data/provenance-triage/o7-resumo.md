@@ -142,7 +142,7 @@ dois nós são paráfrase, não citação, por isso ganham linha própria de ree
   adotante**: o valor do `--requirepass`, apesar de declarar "valores deliberadamente fora deste grafo". A
   convenção "label anterior" o copiaria para a narrative. Na recomendação, o valor fica omitido. Isso está fora
   do mandato (não é caminho), e o valor já está no histórico git do core. Avisar o adotante é ato do maestro.
-- **`E_gmill_demo_route_caddy` (ao-maestro).** O nome da pasta privada (≠ id `hub-operacoes-enterprise`) está em
+- **`E_hub_operacoes_enterprise_demo_route_caddy` (ao-maestro).** O nome da pasta privada (≠ id `hub-operacoes-enterprise`) está em
   três lugares:
   - no **subdomínio público**;
   - no **arquivo versionado** em `ops/caddy/conf.d/`;
@@ -167,7 +167,7 @@ dois nós são paráfrase, não citação, por isso ganham linha própria de ree
   em campos de nó do corpus:
   - `onion-pessoal`: 17 labels e 13 provenances;
   - `rhilo-metagamify`: 11 labels;
-  - `gmill`: 10 labels, além de 4 **ids** de nó;
+  - `hub-operacoes-enterprise`: 10 labels, além de 4 **ids** de nó;
   - `onion-adopt-arandek`: 3 labels.
 
   É a regra "nome de pasta privada não entra em lugar nenhum", ainda não varrida em label. Nas linhas desta

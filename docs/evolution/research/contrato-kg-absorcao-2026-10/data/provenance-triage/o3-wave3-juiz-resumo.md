@@ -60,7 +60,7 @@ mas a atribuição "verify P1-P4" não tem fonte: nenhuma fonte versionada dá v
 Os casos que o proponente pediu para olhar:
 - **`C_TESE_MOAT_GATES`:** passou a corrigir-label. A objeção :343 refuta as "64 REGRAS" (são 63), e a :327
   contradiz "gate em repo SUJO".
-- **`Q_GMILL_MAIN_DIVERGIU`:** o method foi de medição para leitura. O `rev-list` não se reproduz mais, mas o
+- **`Q_HUB_OPERACOES_ENTERPRISE_MAIN_DIVERGIU`:** o method foi de medição para leitura. O `rev-list` não se reproduz mais, mas o
   corpo de `c383df21` sustenta o nó.
 - **`REC2_A2A_FORMAT_BUILT_WITHOUT_TRIGGER`:** a tese "6 camadas = 7" do proponente está **errada**. O
   `a2a-verify.sh` nasceu em `a359f3ed` com 0..6, e o mesmo commit escreve "6 camadas". O clock-trust entrou
@@ -107,7 +107,7 @@ Os casos que o proponente pediu para olhar:
    - Testemunho onde o selo está versionado. As 4 decisões de distribuição têm o selo no corpo de `a74ff166`,
      então a classe certa é leitura.
    - Medição sem reprodução. Em `E_45PCT` e `E_61PCT`, o escopo de 186 não se reconstrói (o juiz deu
-     190/187/86); em `Q_GMILL`, o clone avançou.
+     190/187/86); em `Q_HUB_OPERACOES_ENTERPRISE`, o clone avançou.
    - Medição de sessão em gitignorado, em `E_LACUNAS_E3_0903` (`model-switch.jsonl`).
 7. **Fonte posterior ao nó, ou fonte circular.**
    - `REC_STAGING_ROT_2026_08_REMEASURED` citava `onion-pessoal@d0e9669` (09-03) para um nó de 08-30. Foi
@@ -221,7 +221,7 @@ há wf_* da janela de 07-19 a 07-21 no host.
     e o container vivo dizem `onion-vps-waha`, criado em 08-10 e não em 08-05.
 11. **Arestas e estados pendentes.**
     - Falta SUPERSEDES entre o `E_LACUNAS` do websearch-cap e o `E_BINARIO_2_1_258_TETO_200_E_CONTADOR_DE_SESSAO`.
-    - `Q_GMILL_MAIN_DIVERGIU` provavelmente está resolvido (merges de 10-05).
+    - `Q_HUB_OPERACOES_ENTERPRISE_MAIN_DIVERGIU` provavelmente está resolvido (merges de 10-05).
     - O critério de plano é inconsistente no guard-forge: `E_BANCADA_VERDE` ficou PROD, enquanto os irmãos
       datados foram para DEV.
 

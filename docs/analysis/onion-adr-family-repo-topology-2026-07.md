@@ -121,7 +121,7 @@ drift-guard) é **`gated-until-trigger`** — nasce só quando ≥2 doors provar
 
 ### `onion-personal` = destilação curada do MÉTODO pessoal (tipo destilação, molde Mini)
 Produtiza o método provado na pesquisa `onion-pessoal-marcio` (Company Brain N=1, KG SDAAL para uma
-pessoa). A [P3](../discussions/onion-pessoal-marcio/03-fronteira-core.md) já cravou a fronteira:
+pessoa). A P3 já cravou a fronteira:
 **"membro adotante pelo MÉTODO, soberano no DADO"** — privacidade ≠ sair da federação. Logo:
 `onion-personal` (produto) **destila o método** (como o Mini destila o framework); **nunca vendoriza
 `.claude/`**; o **dado bruto de cada usuário fica soberano/privado** (nunca sobe). Distinto do membro

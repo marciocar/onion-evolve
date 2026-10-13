@@ -145,8 +145,8 @@ Quem não compartilha a precondição não compartilha a função.
 sigla com ampersand e nome em caixa alta mais substantivo. O ampersand pegava a primeira; a âncora **não
 pegava a segunda, na mesma frase**, porque o padrão exigia `[A-Z][a-z]`. Se o cliente se chamasse só pela
 segunda metade, a guarda nasceria **cega para o caso que a criou**. Junto caíam preposição
-(`cliente da X`), dois-pontos (`adotante: X`) e acento (`PoC Itaú` virava a chave `Ita` sob `LC_ALL=C`, e
-tolerar `Ita` passa a tolerar `Itamar`). **Cura medida em duas voltas:** a primeira aceitou caixa alta
+(`cliente da X`), dois-pontos (`adotante: X`) e acento (`PoC <nome com acento>` virava a chave cortada no acento sob `LC_ALL=C`, e
+tolerar a chave cortada passa a tolerar todo nome que começa igual). **Cura medida em duas voltas:** a primeira aceitou caixa alta
 sozinha e o repo saltou de 9 para **36 candidatos**, 27 deles ênfase de prosa (`adotante NÃO registrado`).
 A segunda exige **segundo token em forma de nome** — 17 candidatos, e o teto passou a ser declarado com
 número em vez de suposição.

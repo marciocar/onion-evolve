@@ -1,7 +1,7 @@
 ---
 title: "/meta:setup-integration — três defeitos achados no dogfood do Zoho"
 date: 2026-10-05
-from: gmill (hub)
+from: hub-operacoes-enterprise (hub)
 to: core (onion-evolve)
 type: bug-report
 flow: upstream

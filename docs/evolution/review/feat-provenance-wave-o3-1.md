@@ -60,7 +60,7 @@ aplicação cobriu os 37 grafos da planilha. O selo do maestro de 2026-10-09 cob
 | `E_TREINO_OK` | colaboracao-onion-2026-07 | corrigir | provenance = CSV, 1 chave, fonte existe |
 | `Q_TETO_DE_CONTEXTO` | plugins-en-compliance-2026-09 | corrigir | provenance = CSV, 1 chave (`medição: claude plugin details`) |
 | `E_INDEX_LIVE_LENS` | guardrails-2nd-pr-state-2026-07 | corrigir | provenance = CSV, 1 chave, fonte existe |
-| `Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA` | gmill-update-547-2026-10 | corrigir | provenance = CSV, 1 chave, fonte existe |
+| `Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA` | hub-operacoes-enterprise-update-547-2026-10 | corrigir | provenance = CSV, 1 chave, fonte existe |
 | `E_timeout_is_load_bearing` | m2-bridge-logto-2026-07 | corrigir | provenance = CSV, 1 chave, fonte existe |
 | `C_H2_08` | scope-inheritance-2026 | corrigir | provenance = CSV, 1 chave, fonte existe |
 | `E_PLATAFORMA_ABSORVEU_DISTRIBUICAO_E_ISOLAMENTO` | claude-code-2.1-onion-2026-08 | corrigir | provenance = CSV, 1 chave, fonte = CHANGELOG oficial (URL dentro do texto) |

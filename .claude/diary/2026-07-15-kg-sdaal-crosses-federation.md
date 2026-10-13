@@ -19,7 +19,7 @@ adaptação**. Não tratar o KG SDAAL como core-only: o radar vale sobre grafos 
 
 ## Evidence
 - **Re-dogfood geral, todos os modos:** radar+reconcile+integrity+domain+triples em **11
-  grafos** (10 do core + `tornak.kg.yaml` do gustavo) → **0 defeito**; integridade limpa em todos.
+  grafos** (10 do core + `<cliente>.kg.yaml` do gustavo) → **0 defeito**; integridade limpa em todos.
 - **Cross-federation:** o `kg-radar.sh` do core processou o grafo do gustavo (**107 nós /
   172 arestas**), extraído de `origin/onion/adopt@4113a55` — ranqueou atenção, reconciliou
   `SUPERSEDES`/`REFUTES`, pegou 1 estado-absorvente (`ST_CONTRATO`, terminal legítimo).

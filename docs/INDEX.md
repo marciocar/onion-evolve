@@ -334,7 +334,7 @@ Estudos isolados ("estrelas") sob o padrão [discussion-worktrees](knowledge-bas
 
 - **[README — o padrão](discussions/README.md)** - Como as estrelas nascem, o Tier-0 público e as camadas de autorização
 - **[_template/SEED.md](discussions/_template/SEED.md)** - Ponto de partida para uma estrela nova
-- **Estudos ativos** (SEED.md por slug): `onion-pessoal-marcio` (Company Brain N=1) · `guardrails-nemo-lens` (taxonomia ONION-R) · `interface-state-of-art`
+- **Estudos ativos** (SEED.md por slug): `guardrails-nemo-lens` (taxonomia ONION-R) · `interface-state-of-art` (o estudo do Onion pessoal saiu da árvore pública em 2026-10-13 — dados pessoais; decisão do maestro)
 
 **Localização:** `docs/discussions/`
 

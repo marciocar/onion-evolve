@@ -14,7 +14,7 @@ related:
 
 > **Origem:** plano faseado do Onion pessoal (F0 método → **F1 spike G1** → F2 build → F3 campo). O F0 provou
 > o método num N=1 real; este F1 dimensiona o gap **G1** que a discussão só tinha **nomeado**
-> ([`onion-pessoal-marcio`](../discussions/onion-pessoal-marcio/README.md)): *"o que viaja é o método KG SDAAL,
+> (`onion-pessoal-marcio`): *"o que viaja é o método KG SDAAL,
 > não a máquina de adoção de repo de código."* Spike = **probe, não build**.
 
 ## Método (dogfood)
@@ -52,7 +52,7 @@ O `Procedimento pós-cópia` fia atuadores que **não fazem sentido** num repo d
 
 A camada de **governança** é agnóstica de domínio e serve: `--mode regulated`, o pin `.onion-version`,
 `pin-integrity-check.sh`, e a soberania (private / local-first) — exatamente o que o
-[proto de membership](../discussions/onion-pessoal-marcio/proto/membership-marcio-pessoal.yaml) já previa.
+proto de membership já previa.
 
 ## Conclusão — o fix não é "fazer o adopt funcionar pra KG"
 

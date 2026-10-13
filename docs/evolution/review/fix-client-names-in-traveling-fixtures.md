@@ -21,7 +21,7 @@ nota: >-
 
 ```
 .claude/validation/vendor-scrub-form-check.sh   ← VIAJA
-  HPE Autos · Prodfiel Sistemas · Itau Digital · Zelda
+  ⟨quatro nomes comerciais reais — retirados da árvore pública em 2026-10-13⟩
 ```
 
 Verificado **no remoto público**, não no disco: `gh api repos/marciocar/onion-core/contents/...`
@@ -53,7 +53,7 @@ lista de nomes de cliente dentro de `.claude/` seria, ela mesma, o problema.
 `federation-console.html` e o `federation-map.md` públicos. Trocaria um vazamento por outro. Aqui o
 nome entra para ser **procurado**, nunca exibido.
 
-Provado ao vivo: injetei `PoC HPE Autos` num agente e a REGRA 36 **pegou**. Antes, passava calada.
+Provado ao vivo: injetei `PoC ⟨cliente⟩` num agente e a REGRA 36 **pegou**. Antes, passava calada.
 
 ## Achado 3 — eu escrevi o nome do cliente na fronteira de NDA
 
