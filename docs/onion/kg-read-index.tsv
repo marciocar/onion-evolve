@@ -551,6 +551,7 @@
 .claude/validation/lint-selftest.sh	E_REPLACE_PRIMEIRO_ACERTOU_O_COMENTARIO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_SEIS_CASOS_SEIS_MUTANTES_MORDEM	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_SELFTEST	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
+.claude/validation/lint-selftest.sh	E_SEMAFORO_DA_MAQUINA_MEDIDO_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_VERSIONAMENTO_NA_BANCADA	docs/onion/graph/door-role-parity-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_VINTE_E_SEIS_CASOS_SEIS_MUTANTES_MORDEM	docs/evolution/research/guard-protected-branch-2026-10/protected-branch-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_minha_guarda_deu_fail_open	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
