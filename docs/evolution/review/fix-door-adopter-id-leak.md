@@ -1,7 +1,8 @@
 ---
 branch: fix/door-adopter-id-leak
 date: 2026-10-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e3450a392d3260a539c0d11e5d56f603a9cc23b200871886aa0e153a6bc03933
+reviewed_code_sha256: 2dde910408c5ad1a0dfe3f16cb7b20dde7921afc25bb7b167bfb711af44b2c44
 findings_total: 2
 findings_real: 1
 findings_fixed: 1
