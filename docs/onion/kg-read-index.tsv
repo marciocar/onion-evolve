@@ -634,8 +634,6 @@ docs/INDEX.md	SY5_index_residual_drift	docs/onion/graph/federation-research-2026
 docs/analysis	E_O_GATILHO_DISPAROU_NO_DIA_EM_QUE_NASCEU	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 docs/analysis/README.md	SY_claim_bifurcado_cluster	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/analysis/README.md	SY_evid_seed_index_table	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
-docs/analysis/arandek-repo-exposure-2026-08.md	Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO	docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml
-docs/analysis/arandek-repo-exposure-2026-08.md	Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO	docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml
 docs/analysis/backlog-real-2026-09-01-r1.md	E_CENSUS_RODADA1	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
 docs/analysis/backlog-real-2026-09-01-r2.md	E_CENSUS_RODADA2	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
 docs/analysis/backlog-real-2026-09.md	E_REVISAO_TOTAL_BACKLOG_0901	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
@@ -1333,15 +1331,6 @@ docs/discussions/guardrails-nemo-lens/promotion-plan.md	E_HYBRID_REFUTED	docs/on
 docs/discussions/interface-state-of-art/NOTE-00-sintese.md	C_narrative_beats_ceiling	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 docs/discussions/kg-visualization-dashboards/SEED.md	C_seed_gated	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 docs/discussions/onion-pessoal-app/SEED.md	Q_byok_courtesy_mode	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
-docs/discussions/onion-pessoal-marcio/	C_d7_discussion_links	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
-docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml	X_REF_DEID_NONE_FAILSAFE	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
-docs/discussions/onion-pessoal-marcio/proto/theories/hegel-dialectics.md	SY_evid_hegel_catalog_layer1	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
-docs/discussions/onion-pessoal-marcio/research/SYNTHESIS-P2.md	AR_SYNTHESIS_P2	docs/discussions/onion-pessoal-marcio/proto/reconciliation-engine.kg.yaml
-docs/discussions/onion-pessoal-marcio/research/SYNTHESIS-P3.md	AR_SYNTH_P3	docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml
-docs/discussions/onion-pessoal-marcio/research/SYNTHESIS-P4.md	AR_SYNTH_P4	docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml
-docs/discussions/onion-pessoal-marcio/research/SYNTHESIS-P5.md	AR_SYNTH_P5	docs/discussions/onion-pessoal-marcio/proto/inference-mitigation.kg.yaml
-docs/discussions/onion-pessoal-marcio/research/SYNTHESIS.md	AR_SYNTHESIS	docs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml
-docs/discussions/onion-pessoal-marcio/research/SYNTHESIS.md	RU_PEER_TEST	docs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml
 docs/discussions/vps-shared-tools/SEED.md	A_analysis_structure	docs/onion/graph/vps-shared-tools-2026-07.kg.yaml
 docs/discussions/vps-shared-tools/SEED.md	C_axis_email	docs/onion/graph/vps-shared-tools-2026-07.kg.yaml
 docs/discussions/vps-shared-tools/SEED.md	C_axis_monitoring	docs/onion/graph/vps-shared-tools-2026-07.kg.yaml
@@ -1367,7 +1356,6 @@ docs/evolution/federation-roadmap-2026.md	C_naive_admin_platform	docs/onion/grap
 docs/evolution/federation-roadmap-2026.md	ENT_substrate	docs/onion/graph/vps-shared-tools-2026-07.kg.yaml
 docs/evolution/federation/CHANGELOG.md	C_D7_11	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/evolution/federation/CHANGELOG.md	E_changelog	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
-docs/evolution/federation/client-terms.txt	E_A_GUARDA_CONTRA_NOME_DE_CLIENTE_CONTINHA_NOMES_DE_CLIENTE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 docs/evolution/federation/members.yaml	C_ADOPTER_PERSONALITY_SEEDS_PENDING	docs/onion/graph/federation-health-2026-07.kg.yaml
 docs/evolution/federation/members.yaml	C_GRANAAI_LINEAGES_UNKNOWN	docs/onion/graph/federation-health-2026-07.kg.yaml
 docs/evolution/federation/members.yaml	C_GRANAAI_PIN_UNTRUSTED	docs/onion/graph/federation-health-2026-07.kg.yaml
@@ -1429,8 +1417,6 @@ docs/evolution/inbox/_processed/2026-09-07-design-sink-react-native-segundo-sink
 docs/evolution/inbox/_processed/2026-09-08-agente-expo-react-native.md	I_AGENTE_EXPO_RN	docs/evolution/research/triagem-inbox-2026-09/triagem-inbox-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-09-10-doutrina-versus-codigo-no-motor-do-kg.md	D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA	docs/evolution/research/triagem-inbox-2026-09/triagem-inbox-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-09-13-fronteira-pessoa-empregador-no-company-brain.md	E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
-docs/evolution/inbox/_processed/2026-09-13-fronteira-pessoa-empregador-no-company-brain.md	E_AGREGADO_COM_OPTIN_VAZA_POR_DIFERENCA	docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml
-docs/evolution/inbox/_processed/2026-09-13-fronteira-pessoa-empregador-no-company-brain.md	E_CORPUS_SILENCIOSO_SOBRE_CONTRAPODER	docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml
 docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
