@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 13 NÓS ═══  (era 6; +1 porque o Elenxo REPROVOU e a reprovacao e evidencia; +4 em 2026-10-13: o defeito do alcance da P8, a cura P9, a medição dela e o teto do papel; +2 em 2026-10-13: a decisão dos nomes de pessoas por papel e a contagem da troca)
+# ═══ TETO: 15 NÓS ═══  (era 6; +1 porque o Elenxo REPROVOU e a reprovacao e evidencia; +4 em 2026-10-13: o defeito do alcance da P8, a cura P9, a medição dela e o teto do papel; +2 em 2026-10-13: a decisão dos nomes de pessoas por papel e a contagem da troca; +2 em 2026-10-13: a decisão do fornecedor fictício nos exemplos de compliance e a contagem dessa troca)
 meta:
   id: guard-projection-ids-2026-10
   schema_version: "1"
@@ -200,6 +200,40 @@ nodes:
       locator: "contagem do script de troca, por arquivo e por papel"
       method: "medição: contagem das substituições e busca das formas antigas na árvore rastreada, nesta sessão"
       locality: "repo"
+  - id: D_EXEMPLO_DE_FORNECEDOR_FICTICIO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "decisão do maestro em 2026-10-13, por pergunta com opções (/meta:decide): escolhida «Trocar por fictício»"
+    label: "O exemplo de due diligence dos especialistas de compliance passa a usar um birô de crédito FICTÍCIO (CrediFicta), o mesmo em todos os arquivos, com domínios em .example (RFC 2606); o nome da empresa real sai da árvore que viaja e o conteúdo didático fica."
+    narrative: "Selado por /meta:decide em 2026-10-13: escolhida «Trocar por fictício»; descartadas: «Manter» · «Trocar depois»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-13: «O nome de uma empresa real de birô de crédito ainda aparece em ~70 pontos de 4 arquivos de compliance que viajam (iso-22301, soc2, security-information-master e o template iso22301), como exemplo real de due diligence. O que fazer?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      locality: "pessoa"
+
+  - id: E_TROCA_DO_FORNECEDOR_FICTICIO_CONTADA
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-13"
+    source_tier: 10
+    label: "A troca medida: 64 ocorrências do nome do birô real nos 4 arquivos de compliance que viajam e 25 em 2 guias de docs/onion viraram CrediFicta; a busca pelo nome real na árvore rastreada inteira dá zero, inclusive nas raízes de varredura do manifesto de vendor."
+    narrative: "Antes por arquivo (ocorrências do nome / da marca composta / do domínio empresa.com, busca sem caixa): iso-22301-specialist 21/6/5; soc2-specialist 27/7/3; security-information-master 15/6/0; template compliance_iso22301 1/1/0; docs/onion/agents-reference 23/6/0; docs/onion/commands-guide 2/1/0. Depois: zero em todos, e empresa.com virou empresa.example nesses arquivos. Os dois cabeçalhos 'Exemplo Real' viraram 'Exemplo ilustrativo', porque o exemplo deixou de ser real. Os guias de docs/onion não estão nas raízes de varredura, mas descrevem os próprios agentes e foram trocados para não divergirem deles. Nenhuma superfície core-only (grafo, análise, diário) citava o nome. Nenhuma guarda da bancada lê esses exemplos. Fica fora: empresa.com em outros arquivos (iso-27001, pmbok, jira e afins) e a história do git, que guarda o nome."
+    trace: ".claude/agents/compliance/soc2-specialist.md"
+    verified_against: "busca sem caixa pelo nome real na árvore rastreada e nas raízes de vendor-manifest.sh --emit-scrub-roots = 0, antes do commit"
+    provenance:
+      source: "os 6 arquivos da troca"
+      locator: "contagem por grep -o -i antes e depois, por arquivo"
+      method: "medição: contagem das ocorrências e busca do nome real na árvore rastreada, nesta sessão"
+      locality: "repo"
 
 edges:
   - from: E_ID_E_CAMINHO_FORA_DO_ALCANCE_DA_REGRA_30
@@ -234,4 +268,10 @@ edges:
     edge_type: TRACES_TO
   - from: E_TROCA_DE_NOMES_POR_PAPEL_CONTADA
     to: D_NOMES_DE_PESSOAS_VIRAM_PAPEL
+    edge_type: SUPPORTS
+  - from: D_EXEMPLO_DE_FORNECEDOR_FICTICIO
+    to: D_NOMES_DE_PESSOAS_VIRAM_PAPEL
+    edge_type: TRACES_TO
+  - from: E_TROCA_DO_FORNECEDOR_FICTICIO_CONTADA
+    to: D_EXEMPLO_DE_FORNECEDOR_FICTICIO
     edge_type: SUPPORTS

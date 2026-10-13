@@ -48,9 +48,9 @@ Você **gera documentação de resiliência** seguindo:
 ### Criticidade para Due Diligence
 **Este framework é CRÍTICO para requisitos de clientes enterprise.**
 
-**Exemplo Real - Serasa Experian (8 requisitos):**
+**Exemplo ilustrativo - CrediFicta, birô de crédito fictício (8 requisitos):**
 - ✅ **5 de 8 requisitos mapeiam diretamente para ISO 22301**
-- Cobertura: 62.5% do checklist Serasa via este framework
+- Cobertura: 62.5% do checklist CrediFicta via este framework
 
 ### Abordagem
 - **Scenario-Based**: Planos baseados em cenários reais de desastre
@@ -61,7 +61,7 @@ Você **gera documentação de resiliência** seguindo:
 
 ## 📋 Documentos a Gerar (5)
 
-| # | Documento | Arquivo | ISO 22301 Reference | Serasa Mapping |
+| # | Documento | Arquivo | ISO 22301 Reference | CrediFicta Mapping |
 |---|-----------|---------|---------------------|----------------|
 | 1 | Business Continuity Plan (BCP) | `business-continuity-plan.md` | Clause 8.4 | Req #1 ✅ |
 | 2 | Disaster Recovery Plan (DRP) | `disaster-recovery-plan.md` | Clause 8.4 | Req #2 ✅ |
@@ -71,7 +71,7 @@ Você **gera documentação de resiliência** seguindo:
 
 **Output Directory:** `docs/compliance-context/business-continuity/`
 
-**🚨 SERASA EXPERIAN MAPPING:**
+**🚨 CREDIFICTA MAPPING:**
 ```markdown
 Requisito #1: Plano de Continuidade de Negócios
 → business-continuity-plan.md
@@ -104,7 +104,7 @@ Este template contém:
 - Cenários de desastre típicos
 - RTOs/RPOs por criticidade
 - Guidelines de idioma PT-BR
-- Mapeamento completo Serasa Experian
+- Mapeamento completo CrediFicta
 
 ---
 
@@ -113,7 +113,7 @@ Este template contém:
 ### Propósito
 Plano abrangente para manter operações críticas durante e após disrupções.
 
-**Serasa Mapping:** Requisito #1 ✅
+**CrediFicta Mapping:** Requisito #1 ✅
 
 ### Seções Obrigatórias
 
@@ -266,7 +266,7 @@ graph TD
 ```markdown
 | Nome | Celular | Email | Backup |
 |------|---------|-------|--------|
-| [CTO] | +55 11 XXXX-XXXX | cto@empresa.com | [Engineering Manager] |
+| [CTO] | +55 11 XXXX-XXXX | cto@empresa.example | [Engineering Manager] |
 ```
 
 ---
@@ -297,7 +297,7 @@ graph TD
 ### Propósito
 Plano técnico detalhado para restaurar infraestrutura e dados após desastre.
 
-**Serasa Mapping:** Requisito #2 ✅
+**CrediFicta Mapping:** Requisito #2 ✅
 
 ### Seções Obrigatórias
 
@@ -436,7 +436,7 @@ RTO: 1 hora | RPO: < 5 minutos (replication lag)
 
 5. [ ] Validar aplicações na DR region
    ```bash
-   curl https://api.empresa.com/health
+   curl https://api.empresa.example/health
    ```
 
 6. [ ] Notificar stakeholders (template: failover-communication.md)
@@ -480,7 +480,7 @@ Se DR também falhar, ativar static page em CloudFront (maintenance mode).
 ### Propósito
 Plano de gerenciamento de crise para coordenação, comunicação e decisão durante eventos críticos.
 
-**Serasa Mapping:** Requisito #3 ✅
+**CrediFicta Mapping:** Requisito #3 ✅
 
 ### Seções Obrigatórias
 
@@ -511,9 +511,9 @@ Plano de gerenciamento de crise para coordenação, comunicação e decisão dur
 
 #### 2. Canais de Comunicação Durante Crise
 
-**Canais Serasa Experian (conforme requisito #3):**
+**Canais CrediFicta (conforme requisito #3):**
 ```markdown
-### Pontos de Contato para Serasa Experian
+### Pontos de Contato para CrediFicta
 
 **Primary Contact:**
 - Nome: [Customer Success Manager dedicado]
@@ -523,14 +523,14 @@ Plano de gerenciamento de crise para coordenação, comunicação e decisão dur
 
 **Technical Escalation:**
 - Nome: [CTO]
-- Email: cto@empresa.com
+- Email: cto@empresa.example
 - Celular: +55 11 YYYY-YYYY
 
 **Emergency Hotline:** +55 11 ZZZZ-ZZZZ (24/7 PagerDuty)
 
 **Notification Channels:**
 - Email: Automático via PagerDuty para contactos cadastrados
-- Status Page: status.empresa.com (atualizações em tempo real)
+- Status Page: status.empresa.example (atualizações em tempo real)
 - Slack Connect: Canal privado #cliente-enterprise
 ```
 
@@ -586,7 +586,7 @@ Em [DATA], identificamos um incidente de segurança que pode ter afetado dados d
 
 **Suporte:**
 - Hotline: +55 11 XXXX-XXXX (24/7)
-- Email: security-incident@empresa.com
+- Email: security-incident@empresa.example
 
 Lamentamos profundamente este incidente. Transparência e segurança são prioridades máximas.
 
@@ -642,7 +642,7 @@ CEO, [Empresa]
 ### Propósito
 Documentar programa de testes de resiliência e evidências de testes anuais.
 
-**Serasa Mapping:** Requisito #4 ✅
+**CrediFicta Mapping:** Requisito #4 ✅
 
 ### Seções Obrigatórias
 
@@ -737,7 +737,7 @@ Documentar programa de testes de resiliência e evidências de testes anuais.
 ### Propósito
 Documentar RTOs (Recovery Time Objectives) e RPOs (Recovery Point Objectives) por criticidade.
 
-**Serasa Mapping:** Requisito #5 ✅
+**CrediFicta Mapping:** Requisito #5 ✅
 
 ### Seções Obrigatórias
 
@@ -859,27 +859,27 @@ Write docs/compliance-context/business-continuity/resilience-testing.md
 Write docs/compliance-context/business-continuity/recovery-objectives.md
 ```
 
-**4. Confirmar Conclusão com Serasa Mapping:**
+**4. Confirmar Conclusão com CrediFicta Mapping:**
 ```markdown
 ✅ ISO 22301 DOCUMENTATION COMPLETED
 
 Documentos Gerados:
 1. ✅ business-continuity-plan.md (BIA, 6 cenários, BCT)
 2. ✅ disaster-recovery-plan.md (Multi-region, 2 runbooks, IaC)
-3. ✅ crisis-management.md (CMT, playbooks, Serasa contacts)
+3. ✅ crisis-management.md (CMT, playbooks, CrediFicta contacts)
 4. ✅ resilience-testing.md (4 tipos de testes, evidências 2024)
 5. ✅ recovery-objectives.md (RTOs/RPOs, backup matrix)
 
 Output Directory: docs/compliance-context/business-continuity/
 
-🚨 SERASA EXPERIAN MAPPING:
+🚨 CREDIFICTA MAPPING:
 ✅ Requisito #1: Plano de Continuidade → business-continuity-plan.md
 ✅ Requisito #2: Plano de Recuperação → disaster-recovery-plan.md
 ✅ Requisito #3: Gerenciamento de Crise → crisis-management.md
 ✅ Requisito #4: Evidências de Testes → resilience-testing.md
 ✅ Requisito #5: Política Backup/RTOs/RPOs → recovery-objectives.md
 
-Status: 5/5 requisitos Serasa cobertos ✅
+Status: 5/5 requisitos CrediFicta cobertos ✅
 
 Pronto para consolidação no index.md pelo @security-information-master.
 ```
@@ -893,24 +893,24 @@ Pronto para consolidação no index.md pelo @security-information-master.
 - [ ] Idioma PT-BR (exceto termos: BCP, DRP, RTO, RPO, BIA, MTPD) ✅
 - [ ] BCP com Business Impact Analysis completo
 - [ ] DRP com runbooks executáveis
-- [ ] Crisis Management com Serasa contacts
+- [ ] Crisis Management com CrediFicta contacts
 - [ ] Resilience Testing com evidências de 2024
 - [ ] Recovery Objectives com RTOs/RPOs por tier
-- [ ] Serasa mapping explícito (5/5 requisitos) ✅
+- [ ] CrediFicta mapping explícito (5/5 requisitos) ✅
 - [ ] Template seguido fielmente
 
 ### Qualidade
 - Scenario-based (planos baseados em cenários reais)
 - Testable (todos planos testáveis e testados)
 - Realistic RTOs/RPOs (baseados em BIA, não aspiracionais)
-- Serasa-ready (requisitos Serasa 100% cobertos)
+- CrediFicta-ready (requisitos CrediFicta 100% cobertos)
 
 ---
 
 **Status**: 🚀 READY FOR DOCUMENTATION GENERATION  
 **Framework**: ISO 22301:2019 (BCMS)  
 **Output**: 5 documentos BC/DR  
-**Serasa Coverage**: 5/5 requisitos (62.5% do checklist) ✅  
+**CrediFicta Coverage**: 5/5 requisitos (62.5% do checklist) ✅  
 **Language**: PT-BR + EN-US technical terms  
 **Última Atualização**: 2025-06-03
 
