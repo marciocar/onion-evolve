@@ -1,7 +1,8 @@
 ---
 branch: fix/regen-backlog-after-1081
 date: 2026-10-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: aed6fba83ba72b3f464c7874db93786974e53ce51cafad770d55f097984680d1
+reviewed_code_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
 findings_total: 1
 findings_real: 0
 findings_fixed: 0
