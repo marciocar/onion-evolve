@@ -542,14 +542,18 @@ nodes:
   - id: C_OPCAO_E_REQUIRED_CHECKS_RULESET
     node_type: claim
     plane: DEV
-    status: open
+    status: confirmed
     impact: 3
-    confidence: 0.5
+    confidence: 0.95
     verified_at: "2026-10-13"
-    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    verified_against: "EXECUTADO em 2026-10-13 depois do merge do #1075: bash ops/apply-ruleset-main.sh criou o ruleset onion-main-required-checks (id 25001643) no repo público de dono User; gh api .../rulesets/25001643 devolveu enforcement active, required_status_checks [selftest-gate, lint-onion-artifacts], bypass_actors RepositoryRole 5 com bypass_mode pull_request e current_user_can_bypass pull_requests_only (o admin é o dono e o bypass vale para ele só em merge de PR); sem required_linear_history. Antes: retorno do Elenxo do run wf_48596b33-657 + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
     label: "OPÇÃO E — required status checks via ruleset (de graça em repo público de usuário), SEM a regra de histórico linear enquanto o SAC-80 depender de --merge-commit. Elenxo: opcional."
     narrative: "protected-branches.md do github/docs: disponível em repo público com GitHub Free de usuário. \"Require linear history\" barraria o --merge-commit do SAC-80 (ops/pr-merge-verified.sh, bloco a partir da l.143). Hoje o gate de merge é o veto exit-2 do hook + o caminho verificado; o ruleset seria uma segunda camada do lado do forge."
     trace: "run wf_48596b33-657 fase Elenxo"
+    provenance:
+      source: "API REST do GitHub, repos/marciocar/onion-evolve/rulesets/25001643"
+      locator: "campos enforcement, rules[].parameters.required_status_checks, bypass_actors e current_user_can_bypass"
+      method: "medição: gh api depois de bash ops/apply-ruleset-main.sh, em 2026-10-13"
   - id: C_OPCAO_F_THIRD_PARTY_FREE_QUEUE
     node_type: claim
     plane: DEV
