@@ -2,7 +2,8 @@
 title: 'Resíduo — os nomes de pessoas da árvore pública do core viram papel, e o vínculo mora num mapa privado'
 date: 2026-10-13
 branch: chore/pseudonymize-people-names
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6777bfe4d1f612f679d3d97df0e1af6a3ab96f9235f0d852877c3b4fae3c6f2a
+reviewed_code_sha256: a2e4d0da9d0e60b30bddd16d17a08e251ccc281a2379e3969c572ac510066e6c
 findings_total: 4
 findings_real: 4
 findings_fixed: 2
