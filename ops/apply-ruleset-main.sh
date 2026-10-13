@@ -25,7 +25,9 @@
 #     A troca de `always` para `pull_request` soma uma 2ª camada ao hook exit 2 sem travar a emergência
 #     (CI morto): o merge de PR continua passando.
 #
-# Também garante que a label `ci:full` exista (o nível PR a lê para forçar a bancada completa).
+# Também garante que existam as labels que a maquinaria LÊ: `ci:full` (o nível PR a lê para forçar a
+# bancada completa) e `review:ia` (o interruptor do revisor de IA a lê para forçar a revisão em qualquer
+# modo — ops/review/review-mode-decide.sh). A lista vive em _LABELS_SPEC, abaixo.
 #
 # Uso  : bash ops/apply-ruleset-main.sh [--dry-run] [--repo dono/nome]
 #        --dry-run imprime o JSON e o que FARIA, sem chamar a API de escrita.
@@ -64,10 +66,15 @@ if err: sys.stderr.write("spec inválida: " + "; ".join(err) + "\n"); sys.exit(2
 print(d["name"])
 ')" || exit 2
 
+_LABELS_SPEC="ci:full|B60205|força a bancada COMPLETA no PR (passo D de D_MERGE_PROCESS_ONION_2026_10)
+review:ia|5319E7|força o revisor de IA do CI neste PR, em qualquer ONION_REVIEW_MODE (D_REVIEW_MODE_SWITCH_PADRAO_OFF)"
+
 if [ "${DRY}" = "1" ]; then
   echo "── dry-run: ruleset '${NAME}' em repos/${REPO}/rulesets (cria ou atualiza pelo nome) ──"
   cat "${SPEC}"
-  echo "── dry-run: label 'ci:full' seria criada se ausente (gh label create ci:full --repo ${REPO}) ──"
+  while IFS='|' read -r _ln _lc _ld; do
+    echo "── dry-run: label '${_ln}' seria criada se ausente (gh label create ${_ln} --repo ${REPO}) ──"
+  done <<< "${_LABELS_SPEC}"
   exit 0
 fi
 
@@ -90,10 +97,15 @@ else
   echo "ruleset '${NAME}' CRIADO"
 fi
 _labels="$(gh label list --repo "${REPO}" --limit 200 --json name --jq '.[].name' 2>/dev/null || true)"
-if grep -qxF 'ci:full' <<< "${_labels}"; then
-  echo "label 'ci:full' já existe"
-else
-  gh label create 'ci:full' --repo "${REPO}" --color B60205 \
-    --description "força a bancada COMPLETA no PR (passo D de D_MERGE_PROCESS_ONION_2026_10)" >/dev/null \
-    && echo "label 'ci:full' criada" || { echo "apply-ruleset-main: não consegui criar a label ci:full" >&2; exit 1; }
-fi
+# As labels que a maquinaria LÊ. Uma linha por label: nome|cor|descrição.
+#   ci:full   → o nível PR da bancada força a completa (passo D de D_MERGE_PROCESS_ONION_2026_10)
+#   review:ia → o interruptor do revisor de IA força a revisão em qualquer modo (D_REVIEW_MODE_SWITCH_PADRAO_OFF)
+while IFS='|' read -r _ln _lc _ld; do
+  [ -n "${_ln}" ] || continue
+  if grep -qxF "${_ln}" <<< "${_labels}"; then
+    echo "label '${_ln}' já existe"
+  else
+    gh label create "${_ln}" --repo "${REPO}" --color "${_lc}" --description "${_ld}" >/dev/null \
+      && echo "label '${_ln}' criada" || { echo "apply-ruleset-main: não consegui criar a label ${_ln}" >&2; exit 1; }
+  fi
+done <<< "${_LABELS_SPEC}"

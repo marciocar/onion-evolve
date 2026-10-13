@@ -29,6 +29,13 @@ set -uo pipefail
 #        `GITHUB_STEP_SUMMARY`: sao ESTRUTURALMENTE vazios, e a telemetria nasceria inerte —
 #        dentro do script feito para detectar inercia;
 #      · lia `annotations` → `::notice::`/`::warning::` de step nao viram anotacao de check-run.
+#        ⚠️ REFUTADO por medicao em 2026-10-13: viram, sim — o check-run do onion-review-verdict do
+#        PR #887 traz o `::notice::` do caso benigno como anotacao `notice`, e o do #923 traz o
+#        `::error::` como `failure` (`gh api repos/<r>/check-runs/<id>/annotations`). O interruptor
+#        do revisor (D_REVIEW_MODE_SWITCH_PADRAO_OFF) depende disso: a marca `onion-review-desligado:`
+#        e uma anotacao. O cruzamento abaixo continua certo pelo outro motivo (anotacao diz o que o
+#        job DECLAROU; o parecer diz o que o revisor DISSE). PR com revisao desligada nao tem parecer
+#        e cai em NO-PARECER, que nao entra na sequencia cega — desligar nao e o gate parar de medir.
 #    O desenho que sobrevive nao depende de nenhum campo decorativo: compara o PARECER (o que o
 #    revisor DISSE, no comentario do PR) contra a CONCLUSAO do check (o que o gate FEZ).
 #
