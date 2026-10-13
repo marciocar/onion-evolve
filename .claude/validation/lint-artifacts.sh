@@ -147,7 +147,7 @@ IS_LEAF=0;    _stamp_has "^[[:space:]]*role:[[:space:]]*adopted${_ROLE_TAIL}" &&
 # carimbo responde a DUAS perguntas — o CORTE de transporte (o `--update` lê o papel para não trazer
 # de volta os ~70 arquivos de adoção e federação) e, aqui, "sou porta?". As duas se contradiziam:
 # `/meta:adopt --role standalone` grava `role: standalone` de propósito (o corte), e este porteiro o
-# lia como porta e julgava o adotante como a fonte. Medido em 2026-10-13: a mesma árvore do sge,
+# lia como porta e julgava o adotante como a fonte. Medido em 2026-10-13: a mesma árvore de um adotante,
 # trocando SÓ o carimbo `adopted`→`standalone`, ia de 0 a 16 HARD (REGRAS 16, 19, 22 e 37 cobrando
 # do produto dele contagens e plugins do core). Destino já selado pelo maestro em 2026-10-11:
 # `kind: door` = PORTA; sem ele = ADOTADO. Então `standalone` SEM `kind: door` é adotado-folha com o

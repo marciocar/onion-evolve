@@ -153,7 +153,7 @@ fi
 # meta-fábrica exatamente como antes. Corte que não pode ser carimbado é corte que não acontece.
 # ⚠️ E O CARIMBO SÓ DIZ O CORTE, NÃO "SOU PORTA" (2026-10-13). Até então o lint lia `role: standalone`
 # como porta e a REGRA 92 recusava o par registro standalone × carimbo standalone num adotante — o
-# carimbo que esta linha grava saía reprovado pelo próprio core (adoção do bomtexto, pin bd769f168411).
+# carimbo que esta linha grava saía reprovado pelo próprio core (adoção greenfield de um adotante, pin bd769f168411).
 # Desde então a porta é `kind: door` (só o materializador o escreve) e `standalone` sem ele é adotado.
 # ⚠️ OS PAPÉIS DE PORTA (source, plugins, mini) entraram em 2026-10-10 (F2 das portas, matriz
 # D_MATRIZ_DE_PORTAS_2026_10) e SÓ com `--kind door`: são o que uma PORTA distribui, não o papel de um

@@ -24687,7 +24687,7 @@ STUB
     record_pass "registry-pins: (f) carimbo de outra adoção (papel incompatível) ⇒ acusa e NÃO carimba"
   else record_fail "registry-pins: (f) carimbou carimbo de outra adoção" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
 
-  # (f2) O CARIMBO DO ADOTANTE STANDALONE (2026-10-13, adoção do bomtexto): registro `standalone` com
+  # (f2) O CARIMBO DO ADOTANTE STANDALONE (2026-10-13, adoção greenfield de um adotante): registro `standalone` com
   #      carimbo `role: standalone` (o corte que o /meta:adopt --role standalone grava, sem kind: door) e
   #      pin em dia ⇒ `ok`, rc=0. Até 2026-10-13 este par saía DIVERGE de papel. E o par antigo
   #      standalone→adopted segue ok (os adotantes já carimbados). MUTANTE: tirar `standalone:standalone`
@@ -25026,8 +25026,8 @@ run_role_vocabulary_selftests() {
   # ⭐ O PORTEIRO POR COMPORTAMENTO (2026-10-13): "sou porta?" é do `kind: door`, o CORTE é do `role:`.
   # O caso acima prende a LINHA; este roda o BLOCO REAL de resolução de papel do lint (de `_stamp_has()`
   # até o fecho do ramo do adotante standalone) contra carimbos sintéticos e lê IS_DERIVED/IS_LEAF —
-  # os dois valores que o resto do lint consome. Medido antes da cura: a árvore do sge, trocando SÓ o
-  # carimbo adopted→standalone, ia de 0 a 16 HARD; o bomtexto (adotado com --role standalone) carregava
+  # os dois valores que o resto do lint consome. Medido antes da cura: a árvore de um adotante, trocando SÓ o
+  # carimbo adopted→standalone, ia de 0 a 16 HARD; um adotante greenfield (adotado com --role standalone) carregava
   # carimbo que a REGRA 92 reprovava. MUTANTE: apagar o ramo `standalone` sem `kind: door` reprova
   # (pv-b); fazê-lo ignorar o `kind:` reprova (pv-a).
   local _pv_blk _pv_d _pv_case _pv_got _pv_bad=0
@@ -28087,7 +28087,7 @@ run_door_role_parity_selftests() {
   # (g2) é o par incompatível medido no vivo (um hub no registro com `adopted` no carimbo); (g3) é o par
   # standalone→standalone, RECUSADO até 2026-10-13 ("liga o modo porta no lint") e aceito desde que o
   # modo porta passou a vir de `kind: door` — o carimbo que o `/meta:adopt --role standalone` grava
-  # (medido na adoção do bomtexto); (g3b) o inverso: `kind: door` no carimbo de um ADOTANTE é acusado;
+  # (medido numa adoção greenfield); (g3b) o inverso: `kind: door` no carimbo de um ADOTANTE é acusado;
   # (g4) o par legítimo de hub em silêncio; (g5) clone sem carimbo nomeado.
   # MUTANTES: `_compat_ok` devolvendo sempre 0 reprova (g2); tirar `standalone:standalone` do mapa
   # reprova (g3); tirar o ramo CARIMBO-DE-PORTA reprova (g3b); voltar a pular `kind: adopter` reprova

@@ -53,11 +53,11 @@
 #     registro standalone → carimbo adopted   (compatibilidade: os adotantes antigos, corte cheio)
 #     registro consumer   → carimbo adopted
 # ⚠️ ATÉ 2026-10-13 o par standalone→standalone era RECUSADO, com a razão "carimbo `standalone` liga o
-# MODO PORTA no lint" (medido: sge 0→16 e onion-arthur 0→14 HARD). A medição era verdadeira e a cura
+# MODO PORTA no lint" (medido em dois adotantes: 0→16 e 0→14 HARD). A medição era verdadeira e a cura
 # estava no lugar errado: o defeito era o lint ler "sou porta?" no `role:`, que é o campo do CORTE. Com
 # isso o `/meta:adopt --role standalone` gravava um carimbo que esta guarda reprovava (medido na adoção
-# do bomtexto, pin bd769f168411). Desde então o MODO PORTA vem de `kind: door` (lint-artifacts.sh, logo
-# abaixo do IS_LEAF): o sge com `role: standalone` e sem `kind: door` volta a 0 HARD, e o par passa.
+# de um adotante greenfield, pin bd769f168411). Desde então o MODO PORTA vem de `kind: door` (lint-artifacts.sh, logo
+# abaixo do IS_LEAF): o adotante medido com `role: standalone` e sem `kind: door` volta a 0 HARD, e o par passa.
 # E o inverso fica cobrado: ADOTANTE cujo carimbo traz `kind: door` é INCOMPATÍVEL — o carimbo diz porta
 # e o registro diz adotante, e quem decide o modo do lint é justamente esse campo.
 # O mapa NÃO é a "terceira fonte" recusada acima: ele não diz que papel cada membro TEM, diz que
