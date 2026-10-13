@@ -2,7 +2,8 @@
 title: 'Resíduo — interruptor do revisor de IA do CI: ONION_REVIEW_MODE on|off|auto (padrão off) e a label review:ia'
 date: 2026-10-13
 branch: feat/review-mode-switch
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7b95591ee0ea758805643037d6f1f076379dfef5ac2bd398e861e5725a0e2596
+reviewed_code_sha256: 261651667ac05fab9c867361c800e37801fd22c9904a9f8acc37b94833f3406d
 findings_total: 10
 findings_real: 8
 findings_fixed: 5
