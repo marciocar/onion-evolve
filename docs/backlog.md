@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**478 itens abertos** em 101 grafo(s) com aberto (de 130 no escopo) · 102 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**476 itens abertos** em 101 grafo(s) com aberto (de 130 no escopo) · 102 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -30,11 +30,12 @@
 | 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
 | 1.8 | `C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA` | plugin-mcp-posture-2026-09 | OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (stric |
 
-## merge-process-onion-2026-10 — 7 item(ns)
+## merge-process-onion-2026-10 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 91.0 | `Q_MERGE_PROCESS_ONION_2026_10` | merge-process-onion-2026-10 | Qual o melhor processo de PR, CI e merge para o core (repo público de dono User, sem proteção, rebase linear, PRs paralelos de  |
+| 13.5 | `C_OPCAO_E_REQUIRED_CHECKS_RULESET` | merge-process-onion-2026-10 | OPÇÃO E — required status checks via ruleset (de graça em repo público de usuário), SEM a regra de histórico linear enquan |
 | 12.0 | `C_OPCAO_B_POSTMERGE_PROJECTION_WRITER` | merge-process-onion-2026-10 | OPÇÃO B — Opção 3 de Q_MERGE_DRIVER_PARA_PROJECAO_GERADA (gatilho disparado em #1062-#1065): parar de commitar projeções g |
 | 5.6 | `C_OPCAO_F_THIRD_PARTY_FREE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO F — fila de terceiro gratuita (Mergify Open Source / Trunk Free até 5 committers). GATED: gatilho = depois de A a D ain |
 | 5.4 | `C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO G — transferir o repo para uma organização Free para ter a fila nativa. GATED: custa a URL, o members.yaml, o marketpl |
@@ -650,15 +651,6 @@
 | 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
 | 5.4 | `Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA` | onion-plugin-publication-2026-08 | CANDIDATO A GUARDA, com o dado que EU NAO TINHA quando decidi nao mecanizar (2026-09-06). Eu recusei mecanizar a classe 'no supera |
 
-## projection-ids-2026-10 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 13.6 | `D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE` | projection-ids-2026-10 | Cura P9: o default do HOME só vale no papel source (sem stamp ou role: source) e em porta (kind: door, qualquer papel); fora dele |
-| 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
-| 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
-| 3.6 | `C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP` | projection-ids-2026-10 | TETO declarado: o papel vem do stamp, que é dado editável. Stamp falso de adotante no core desliga o default local (o CI segue p |
-
 ## passada-adversarial-2026-09 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -765,13 +757,12 @@
 |--:|---|---|---|
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
 
-## maestro — 5 item(ns)
+## maestro — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
-| 5.1 | `Q_CARIMBO_DO_ADOTADO_STANDALONE` | door-role-parity-2026-09 | o adotado standalone ganha o canal, mas o lint e a REGRA 92 ainda leem role standalone sem kind door como PORTA. Que carimbo ele d |
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
 
@@ -872,6 +863,13 @@
 |--:|---|---|---|
 | 5.4 | `Q_MERGE_VERIFICADO_EM_REPO_SEM_CI` | guard-pre-push-2026-10 | LACUNA DO CAMINHO VERIFICADO: ele fecha PR com CI vivo e, pelo escape --ci-inoperante, com CI MORTO (rajada de startup_failure). R |
 | 4.2 | `Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO` | guard-pre-push-2026-10 | REVER (nota do maestro, 2026-10-05: "precisamos rever isso em algum momento"). Nasceu no CI DESTE PR: a faixa 4 da bancada estouro |
+
+## projection-ids-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
+| 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
 
 ## kg-id-valid-from-2026-10 — 2 item(ns)
 

@@ -119,6 +119,8 @@ CLAUDE_DIR="${REPO_ROOT}/.claude"
 _stamp_has() { grep -qE "$1" "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; }
 _ROLE_TAIL='[[:space:]]*(#.*)?$'
 # ⚠️ `standalone` NAO ENTRA AQUI, E A TENTATIVA FOI MEDIDA E REVERTIDA NO MESMO PR (2026-09-18).
+# (Isto vale para a PORTA standalone, a que carrega `kind: door`. O ADOTANTE standalone, sem `kind: door`,
+# entra no porteiro desde 2026-10-13 pelo bloco logo abaixo do IS_LEAF — a pergunta "sou porta?" é do `kind:`.)
 # `IS_DERIVED` nao e "que papel e este" — e um PORTEIRO: dezenove sitios o consomem, dezessete deles
 # como `[ "${IS_DERIVED}" -eq 1 ] && return 0`. Acrescentar um papel aqui DESLIGA dezessete guardas
 # de uma vez. Medido: a mesma arvore, trocando SO o carimbo `standalone`→`source`, vai de 0 HARD
@@ -139,6 +141,25 @@ IS_DERIVED=0; _stamp_has "^([[:space:]]*role:[[:space:]]*(adopted|hub)${_ROLE_TA
 # a distingue do core é `kind: door`, escrito só pelo materializador.
 _stamp_has "^[[:space:]]*role:[[:space:]]*source${_ROLE_TAIL}" && _stamp_has '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)' && IS_DERIVED=1
 IS_LEAF=0;    _stamp_has "^[[:space:]]*role:[[:space:]]*adopted${_ROLE_TAIL}" && IS_LEAF=1
+# ── ADOTANTE `standalone` NÃO É PORTA `standalone` (2026-10-13): o MODO PORTA vem de `kind: door` ──
+# O aviso acima continua de pé para a PORTA: `onion-standalone` (carimbo `role: standalone` +
+# `kind: door`) segue IS_DERIVED=0 e é julgada inteira. O que mudou é o ADOTANTE. O `role:` do
+# carimbo responde a DUAS perguntas — o CORTE de transporte (o `--update` lê o papel para não trazer
+# de volta os ~70 arquivos de adoção e federação) e, aqui, "sou porta?". As duas se contradiziam:
+# `/meta:adopt --role standalone` grava `role: standalone` de propósito (o corte), e este porteiro o
+# lia como porta e julgava o adotante como a fonte. Medido em 2026-10-13: a mesma árvore do sge,
+# trocando SÓ o carimbo `adopted`→`standalone`, ia de 0 a 16 HARD (REGRAS 16, 19, 22 e 37 cobrando
+# do produto dele contagens e plugins do core). Destino já selado pelo maestro em 2026-10-11:
+# `kind: door` = PORTA; sem ele = ADOTADO. Então `standalone` SEM `kind: door` é adotado-folha com o
+# corte standalone — o corte segue lendo `role:` (vendor-manifest.sh, load-manifest.sh), a
+# identidade passa a ler `kind:`. Folha também: um standalone não leva a maquinaria de adoção e não
+# vendoriza para ninguém, como o `adopted` (REGRA 36 (Superfície VENDORIZADA sem nome comercial de
+# cliente)). Quem escrever `kind: door` num adotante para fugir de guarda ganha o CONTRÁRIO: volta a
+# ser julgado como porta, mais guardas e não menos.
+if _stamp_has "^[[:space:]]*role:[[:space:]]*standalone${_ROLE_TAIL}" \
+   && ! _stamp_has '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)'; then
+  IS_DERIVED=1; IS_LEAF=1
+fi
 
 # ---------------------------------------------------------------------------
 # Contadores de violações

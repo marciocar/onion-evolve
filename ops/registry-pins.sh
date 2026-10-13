@@ -169,14 +169,15 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole superby; 
     n_ill=$((n_ill + 1)); continue
   fi
   live12="${live:0:12}"
-  # PAPEL do carimbo lido × tier do registro, pelo MESMO mapa da REGRA 92 (hub→hub;
+  # PAPEL do carimbo lido × tier do registro, pelo MESMO mapa da REGRA 92 (hub→hub; standalone→standalone
+  # (o corte standalone, aceito desde 2026-10-13: o modo porta saiu do `role:` para o `kind: door`);
   # standalone|consumer→adopted). Achado da passada adversarial da F1.5: dois membros
   # apontam o MESMO remoto, e o carimbo da develop (role hub, adopted_at 2026-10-01) é a adoção do
   # outro membro (um hub) — a 1ª versão carimbou esse pin no membro standalone. Carimbo de outra adoção não é pin
   # deste membro: acusa e não carimba, nem quando o pin bate.
   stamp_role="$(printf '%s\n' "${_st}" | awk '/^role:/{sub(/^role:[[:space:]]*/,""); sub(/[[:space:]]*#.*$/,""); gsub(/[[:space:]"\047]/,""); print; exit}')"
   if [ -n "${stamp_role}" ] && [ -n "${regrole}" ]; then
-    case "${regrole}:${stamp_role}" in hub:hub|standalone:adopted|consumer:adopted) ;; *)
+    case "${regrole}:${stamp_role}" in hub:hub|standalone:standalone|standalone:adopted|consumer:adopted) ;; *)
       printf '%-26s %-14s %-14s %-24s %-30s %s\n' "${mid}" "${regpin:-—}" "${live12}" "${src}" "${branch} ${bsrc}" "DIVERGE (papel: registro ${regrole} × carimbo ${stamp_role} — carimbo de OUTRA adoção?)"
       n_div=$((n_div + 1)); continue ;;
     esac

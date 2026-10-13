@@ -660,11 +660,50 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.85
-    status: open
+    status: done
     owner: maestro
     label: "o adotado standalone ganha o canal, mas o lint e a REGRA 92 ainda leem role standalone sem kind door como PORTA. Que carimbo ele deve ter? GATILHO: o 1º /meta:adopt --role standalone real"
-    narrative: "Achado 1 da passada adversarial de 2026-10-11, medido no código: door-role-parity-check.sh só permite o par registro standalone com carimbo adopted (o comentário diz que carimbo standalone liga o MODO PORTA no lint, medido em dois adotantes: 0 para 16 e 0 para 14 HARD), e o lint-artifacts.sh liga IS_DERIVED só para adopted e hub. Ao mesmo tempo, /meta:adopt --role standalone produz carimbo role standalone sem kind door. A decisão D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA resolve o TRANSPORTE; o julgamento do repo adotado não mudou. Medido em 2026-10-10 nos clones locais: o único carimbo standalone é a própria porta, então ninguém é afetado hoje. Respostas possíveis: o lint e a REGRA 92 passam a ler kind (standalone sem kind door = derivado), ou a decisão fixa que o adotado standalone carimba adopted com outro campo de corte. Na mesma família, declarados e não curados: a projeção do wizard (topology-projection.sh) corta co-* para todo standalone sem ler o kind (nenhuma transição tem procedimento em co-* hoje, medido), a skill onion-wizard diz que o standalone não leva a federação, e co-evolve.md e co-relay.md linkam co-announce.md e co-deliver.md, que não viajam ao adotado standalone."
+    narrative: "FECHADO em 2026-10-13 por D_MODO_PORTA_VEM_DO_KIND: o gatilho disparou (a adoção do bomtexto, E_ROLE_STANDALONE_RESPONDE_DUAS_PERGUNTAS) e a resposta foi a primeira das duas listadas abaixo, a que deriva da decisão já selada D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA (kind door = porta, sem ele = adotado). Os itens da mesma família declarados abaixo (topology-projection.sh, skill onion-wizard, links de co-evolve.md e co-relay.md) NÃO foram tocados e seguem declarados. Achado 1 da passada adversarial de 2026-10-11, medido no código: door-role-parity-check.sh só permite o par registro standalone com carimbo adopted (o comentário diz que carimbo standalone liga o MODO PORTA no lint, medido em dois adotantes: 0 para 16 e 0 para 14 HARD), e o lint-artifacts.sh liga IS_DERIVED só para adopted e hub. Ao mesmo tempo, /meta:adopt --role standalone produz carimbo role standalone sem kind door. A decisão D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA resolve o TRANSPORTE; o julgamento do repo adotado não mudou. Medido em 2026-10-10 nos clones locais: o único carimbo standalone é a própria porta, então ninguém é afetado hoje. Respostas possíveis: o lint e a REGRA 92 passam a ler kind (standalone sem kind door = derivado), ou a decisão fixa que o adotado standalone carimba adopted com outro campo de corte. Na mesma família, declarados e não curados: a projeção do wizard (topology-projection.sh) corta co-* para todo standalone sem ler o kind (nenhuma transição tem procedimento em co-* hoje, medido), a skill onion-wizard diz que o standalone não leva a federação, e co-evolve.md e co-relay.md linkam co-announce.md e co-deliver.md, que não viajam ao adotado standalone."
     trace: ".claude/validation/door-role-parity-check.sh · .claude/validation/lint-artifacts.sh · .claude/commands/meta/adopt.md · .claude/utils/wizard/topology-projection.sh"
+
+  # ---- o carimbo do adotado standalone (2026-10-13): o modo porta sai do role e vai para o kind ----
+  - id: E_ROLE_STANDALONE_RESPONDE_DUAS_PERGUNTAS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-13"
+    verified_against: "adoção greenfield do bomtexto (pin bd769f168411, papel standalone): carimbo role standalone sem kind door, e ops/registry-pins.sh deu DIVERGE de papel; clone do sge com SÓ o carimbo trocado de adopted para standalone, lint vendorizado com LC_ALL=C: 0 HARD para 16 HARD"
+    source_kind: repo
+    source_tier: 10
+    label: "DEFEITO: o role do carimbo respondia a duas perguntas que se contradiziam, o CORTE e o MODO PORTA; /meta:adopt --role standalone gravava um carimbo que o próprio core reprovava"
+    narrative: "Medido em 2026-10-13. As duas leituras: o corte (write-stamp.sh e adopt.md gravam role standalone de propósito, porque o --update lê o papel para não trazer de volta adoção e federação) e o modo porta (o lint lia role standalone como porta; a REGRA 92 e o registry-pins só aceitavam standalone com carimbo adopted). (1) O bomtexto, adotado com --role standalone, carimbou role standalone, como o write-stamp.sh manda desde 2026-09-15; o registry-pins.sh o deu DIVERGE de papel e a REGRA 92 o daria PAPEL-INCOMPATIVEL, porque o mapa só tinha standalone com adopted. No próprio bomtexto o lint deu 0 HARD: greenfield não tem produto que as guardas da fonte julguem, então o defeito não aparecia ali. (2) A reprodução da regra antiga: clone local do sge, só o carimbo trocado de adopted para standalone, o lint vendorizado dele (pin ba0d2d423c17) foi de 0 a 16 HARD: REGRA 16 nas contagens de tabela dos docs de produto, REGRA 19 cobrando cinco plugins, REGRA 37 o roles.yaml e REGRA 22 links do produto. É o IS_DERIVED igual a 0: o porteiro de dezessete guardas tratava o adotado como a fonte. A medição de 0 a 16 do PR #949 era verdadeira; a cura estava no lugar errado, porque recusava o carimbo em vez de corrigir quem o lia."
+    trace: ".claude/validation/lint-artifacts.sh · .claude/validation/door-role-parity-check.sh · ops/registry-pins.sh · .claude/utils/adopt/write-stamp.sh"
+    provenance:
+      source: "clone local do sge e o carimbo do bomtexto, lidos nesta máquina em 2026-10-13"
+      locator: "sge: lint-artifacts.sh com role adopted e com role standalone, sumário 0 HARD contra 16 HARD; bomtexto: .claude/.onion-version com role standalone e sem kind"
+      method: "medição: lint vendorizado rodado com LC_ALL=C num clone em diretório de rascunho, trocando só o carimbo"
+      locality: "repo"
+
+  - id: D_MODO_PORTA_VEM_DO_KIND
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-13"
+    verified_against: "sge com role standalone e o lint curado: 0 HARD, o MESMO conjunto de 16 violações SOFT do carimbo adopted (diff vazio); onion-standalone (role standalone e kind door) com o lint curado: 0 HARD e 10 SOFT, saída idêntica à de antes; door-role-parity-check.sh no vivo sem achado novo; bancada role_vocabulary, door_role_parity, registry_pins, role_cut e write_stamp verdes com LC_ALL=C e sete mutantes que reprovam"
+    label: "CURA (2026-10-13): o MODO PORTA vem de kind door no carimbo e o CORTE segue lendo role; carimbo standalone sem kind door é adotado-folha, e a REGRA 92 e o registry-pins aceitam standalone com standalone"
+    narrative: "No lint, IS_DERIVED 1 e IS_LEAF 1; a REGRA 92 e o registry-pins mantêm o par standalone com adopted dos adotantes antigos; kind door num ADOTANTE e porta standalone ou source SEM kind door passam a ser acusados. Responde Q_CARIMBO_DO_ADOTADO_STANDALONE pela primeira das respostas listadas lá, derivada de D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA (maestro, 2026-10-11: kind door é porta, sem ele é adotado). No lint, um ramo logo abaixo do IS_LEAF liga IS_DERIVED e IS_LEAF para role standalone quando o carimbo não tem kind door; a porta onion-standalone, que o carrega, segue julgada inteira. Folha porque o standalone não leva a maquinaria de adoção e não vendoriza para ninguém. O corte não mudou: vendor-manifest.sh, load-manifest.sh e vendor-branch.sh leem role e kind como antes (caso u6 da família role_cut: com o env vazio, o update num carimbo standalone sem kind segue cortando adopt.md). Medido nos clones das portas do registro: onion-standalone, onion-core e onion-mini carimbam kind door; onion-plugins não tem árvore .claude e não muda. A passada adversarial pediu as duas guardas inversas, e elas entraram: adotante cujo carimbo traz kind door é CARIMBO-DE-PORTA na REGRA 92 (escrever kind door num adotante não foge de guarda nenhuma, liga mais guardas, mas o registro e o carimbo passariam a contar histórias diferentes), e porta standalone ou source sem kind door é SEM-KIND-DOOR (sem o campo ela seria julgada como adotado ou como o core). Teto declarado: os predicados de kind door do lint não aceitam aspas (kind com aspas não liga o modo porta), como os três que já existiam; o materializador escreve sem aspas. Fora deste nó, declarados e não tocados: a projeção do wizard, a skill onion-wizard e os links de co-evolve e co-relay."
+    trace: ".claude/validation/lint-artifacts.sh · .claude/validation/door-role-parity-check.sh · ops/registry-pins.sh · .claude/validation/lint-selftest.sh"
+    provenance:
+      source: "branch fix/standalone-stamp-cut-vs-door, medições em clones locais do sge e do onion-standalone"
+      locator: "lint-artifacts.sh, bloco do adotante standalone abaixo do IS_LEAF; door-role-parity-check.sh, _compat_ok e os ramos CARIMBO-DE-PORTA e SEM-KIND-DOOR; registry-pins.sh, o case de papel; lint-selftest.sh, casos pv-a a pv-g, pv-e2e-a e pv-e2e-b, g3, g3b, g3c, d2 e f2"
+      method: "medição: lint curado nos clones com LC_ALL=C e bancada com mutantes plantados por ops/mutate-and-restore.sh (core-only)"
+      locality: "repo"
 
   # ---- o versionamento das portas (decisão do maestro de 2026-10-11) ----
   - id: D_VERSIONAR_AS_PORTAS_POR_RELEASE
@@ -985,3 +1024,13 @@ edges:
   - from: D_VERSIONAR_AS_PORTAS_POR_RELEASE
     to: D_MATRIZ_DE_PORTAS_2026_10
     edge_type: CONSTRAINS
+  # o carimbo do adotado standalone: o defeito medido sustenta a cura, e a cura fecha a pergunta
+  - from: E_ROLE_STANDALONE_RESPONDE_DUAS_PERGUNTAS
+    to: D_MODO_PORTA_VEM_DO_KIND
+    edge_type: SUPPORTS
+  - from: D_MODO_PORTA_VEM_DO_KIND
+    to: Q_CARIMBO_DO_ADOTADO_STANDALONE
+    edge_type: SUPERSEDES
+  - from: D_MODO_PORTA_VEM_DO_KIND
+    to: D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA
+    edge_type: DEPENDS_ON

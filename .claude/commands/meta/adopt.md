@@ -481,8 +481,8 @@ if [ -z "$IN_PLACE" ] && [ ! -d "$TARGET/.git" ]; then git -C "$TARGET" init -q;
 #     principal). Carimbar `develop` por default seria errado num greenfield sem branch develop (o campo
 #     presente vence a cadeia → base apontaria p/ branch inexistente). Só vira SSOT versionado (Fase 5)
 #     quando é escolha explícita; o git config local é setado no Procedimento pós-cópia (conveniência).
-# 0f. PAPEL (--role adopted|hub|standalone): CORTA o transporte (Fase 2) e entra no carimbo (Fase 5).
-#     Até 2026-10-09 era parseado e nunca lido (`--role standalone` saía `adopted`). Inválido aborta AQUI.
+# 0f. PAPEL (--role adopted|hub|standalone): CORTA o transporte (Fase 2) e entra no carimbo (Fase 5); até 2026-10-09 era ignorado.
+#     `role: standalone` sem `kind: door` é ADOTADO: desde 2026-10-13 o modo porta do lint e da REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela) é o `kind:`. Inválido aborta AQUI.
 ROLE="${ROLE:-adopted}"   # ROLE = o valor de --role (o orquestrador o substitui); omitido → adopted
 case "$ROLE" in adopted|hub|standalone) : ;; *) echo "Abortar: --role '$ROLE' inválido (adopted|hub|standalone)."; exit 1 ;; esac
 ```

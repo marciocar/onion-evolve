@@ -323,7 +323,10 @@ descoberta convergente que validou o adopt durável, ancorado corretamente na fo
 faltava em `members.yaml`: drift de registro regularizado em 07-19).
 
 ### 6.7 A porta pública Claude — `onion-standalone`
-`role: standalone`, mas é **porta de framework**, não projeto-adotante: distribui o **bundle
+`role: standalone` **com `kind: door`** no carimbo, e é esse campo que a faz **porta de framework**, não
+projeto-adotante (desde 2026-10-13 o lint e a REGRA 92 leem "sou porta?" no `kind:`; um adotante
+`role: standalone` sem `kind: door`, o que o `/meta:adopt --role standalone` grava, é adotado com o
+corte standalone — medido: o mesmo carimbo que levava o sge de 0 a 16 HARD fica em 0). Distribui o **bundle
 standalone** (eng/product/testing/docs), **sem memória privada de evolução** (e, até a F2 das portas de
 2026-10-10, também sem meta-factory: pela matriz `D_MATRIZ_DE_PORTAS_2026_10` ela passa a levar a fábrica e
 perde só adoção e federação). Nasceu
