@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 7 NÓS ═══  (era 6; +1 porque o Elenxo REPROVOU e a reprovacao e evidencia)
+# ═══ TETO: 11 NÓS ═══  (era 6; +1 porque o Elenxo REPROVOU e a reprovacao e evidencia; +4 em 2026-10-13: o defeito do alcance da P8, a cura P9, a medição dela e o teto do papel)
 meta:
   id: guard-projection-ids-2026-10
   schema_version: "1"
@@ -112,6 +112,61 @@ nodes:
       method: "medição: bancada e mutantes rodados nesta sessão depois do parecer do refutador"
       locality: "repo"
 
+  - id: E_P8_DEFAULT_DO_HOME_LIDO_EM_QUALQUER_REPO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-10-13"
+    source_tier: 10
+    label: "O DEFEITO MEDIDO: desde o e2757e56 a fonte privada P8 tinha default no HOME em QUALQUER repo, e no update do adotante brain-granaai (hub, pin bd769f168411) a REGRA 36 acusou HARD em arquivos PRÓPRIOS dele."
+    narrative: "Causa: a linha CLIENT_TERMS_FILE do projection-safety.sh resolvia ONION_CLIENT_TERMS_FILE com default no HOME, sem olhar o papel do repo. A lista é a dos clientes DO CORE; antes do e2757e56 ela morava dentro do core e não existia no adotante, então a P8 mudou o LUGAR da lista e, sem querer, o ALCANCE. No adotante (papel hub, que não sai da REGRA 36 como a folha) os HARD caíram na KB das integrações dele (duas subpastas e o index.md), onde o parceiro dele é legítimo. Medido numa cópia sem histórico da branch de update do adotante: 5 HARD da REGRA 36 com o código de origin/main (o relato da sessão do adotante dizia 6; a cópia sem histórico pode diferir em um arquivo), 0 com a fonte apontada para arquivo inexistente. O recorte por arquivos do manifesto NÃO foi a causa: a REGRA 36 varre as raízes do vendor-manifest.sh por desenho (a KB do hub viaja para os projetos dele), e os ids de adotante seguem varridos ali."
+    trace: ".claude/validation/projection-safety.sh"
+    verified_against: "lint-artifacts.sh rodado em LC_ALL=C na cópia da branch chore/onion-update-bd769f168411 do adotante: 5 HARD, todos [vendor-scrub] nome da fonte privada; sem o default (fonte inexistente) 0 HARD"
+    provenance:
+      source: "brain-granaai@bd769f168411 (branch chore/onion-update-bd769f168411), cópia local sem histórico; projection-safety.sh e lint-artifacts.sh de origin/main bd769f16"
+      locator: "linha CLIENT_TERMS_FILE do projection-safety.sh (P8) e check_vendored_surface_clean do lint-artifacts.sh (bloco --emit-declared)"
+      method: "medição: lint completo antes e depois da troca dos dois scripts, contando as linhas [vendor-scrub] e o sumário HARD"
+      locality: "host"
+
+  - id: D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    label: "Cura P9: o default do HOME só vale no papel source (sem stamp ou role: source) e em porta (kind: door, qualquer papel); fora dele a lista só entra EXPLÍCITA e o lint DECLARA LISTA-EXTERNA. Recorte pela LISTA, não pelos arquivos. Abre no PR, fecha no merge."
+    narrative: "Menor raio: a mudança mora no leitor (projection-safety.sh), que é quem as REGRAS 30, 33 e 36 e o publish-door.sh consultam; o papel é lido do stamp do CWD com a mesma leitura do onion-version.sh. Estados: source-default, explicit, role-off (modo --ct-state). Em role-off o --emit-declared sai rc 4 e o ct_declare_unverified cala: cobrar do adotante a lista de clientes de OUTRO repo como NAO-VERIFICADO seria o mesmo erro com cara de honestidade. Explícita vence o papel em qualquer repo, então o CI do core (secret materializado em ONION_CLIENT_TERMS_FILE) continua protegido mesmo que um stamp falso apareça. A porta segue no default em QUALQUER papel (kind: door, que só o materializador escreve; a passada adversarial pegou que a porta standalone, carimbada standalone, teria saído da lista): o conteúdo dela é o do core, e o publish-door.sh roda o helper do CWD do core de qualquer forma."
+    trace: ".claude/validation/projection-safety.sh"
+
+  - id: E_P9_CASOS_MUTANTES_E_DOGFOOD
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: "2026-10-13"
+    label: "A cura medida: 7 casos novos na família client_terms (hub sem default, hub explícita com LISTA-EXTERNA, source com default, modo --ct-state) com 3 mutantes mordendo; no adotante real a cópia vai de 5 HARD a 0, SOFT inalterado (13)."
+    narrative: "Casos (e) hub + lista no HOME falso + arquivo próprio com o termo = 0 acusação e sem NAO-VERIFICADO; (e-MUT) portão de papel trocado por true = acusa. (f) hub + ONION_CLIENT_TERMS_FILE explícita = acusa, declara LISTA-EXTERNA e não ecoa o termo; (f-MUT) a tag da declaração trocada = a declaração some. (g) papel source + HOME falso = acusa; (g-MUT) o default desligado também na fonte = cala. (h) --ct-state devolve source-default, role-off e explicit, a porta standalone (kind: door) segue em source-default, e o --emit-declared em hub sai rc 4; o caso existe também para a REGRA 59, que acusou MODO-SEM-TESTE no 1º dogfood. Papel hub e não adopted nos casos: a folha sai da REGRA 36 antes de ler lista (IS_LEAF), e o caso passaria por vacuidade. Famílias vizinhas sem regressão: projection_safety, vendor_scrub e vendor_scrub_form 39/39."
+    trace: ".claude/validation/lint-selftest.sh"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families=client_terms = 11/11; --families=projection_safety,vendor_scrub,vendor_scrub_form = 39/39; consumed-mode-check.sh sem MODO-SEM-TESTE; lint na cópia do adotante 0 HARD"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_client_terms_selftests, casos (e) a (h)"
+      method: "medição: bancada por família e lint completo na cópia do adotante, nesta sessão"
+      locality: "repo"
+
+  - id: C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: open
+    label: "TETO declarado: o papel vem do stamp, que é dado editável. Stamp falso de adotante no core desliga o default local (o CI segue protegido pela explícita); fork sem stamp ou com role: source lê a lista do HOME, errando para o lado de acusar."
+    narrative: "Os dois sentidos foram pensados na passada adversarial. Errar para acusar (fork do core numa máquina que tem a lista) é o sentido seguro: o dono vê HARD e passa uma lista vazia explícita. Errar para calar exige escrever .claude/.onion-version no core, que o core não carrega por desenho (onion-version.sh), e mesmo assim o gate do CI usa a explícita. Gatilho para estender: um stamp aparecer na árvore do core, ou o CI do core rodar sem o secret."
+    trace: ".claude/validation/onion-version.sh"
+
 edges:
   - from: E_ID_E_CAMINHO_FORA_DO_ALCANCE_DA_REGRA_30
     to: D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO
@@ -131,3 +186,12 @@ edges:
   - from: E_ELENXO_REPROVOU_E_AS_CURAS
     to: D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO
     edge_type: SUPPORTS
+  - from: E_P8_DEFAULT_DO_HOME_LIDO_EM_QUALQUER_REPO
+    to: D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE
+    edge_type: SUPPORTS
+  - from: E_P9_CASOS_MUTANTES_E_DOGFOOD
+    to: D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE
+    edge_type: SUPPORTS
+  - from: C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP
+    to: D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE
+    edge_type: CONSTRAINS

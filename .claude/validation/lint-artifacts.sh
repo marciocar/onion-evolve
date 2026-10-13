@@ -4269,8 +4269,20 @@ check_vendored_surface_clean() {
   if [ -z "${ONLY_PATH}" ] && [ -e "${_ct_legacy}" ]; then
     violation "HARD" "${_ct_legacy}" "[vendor-scrub/LISTA-NA-ARVORE] a lista de nomes privados voltou para a ÁRVORE do core, que é PÚBLICA — ela é o próprio vazamento. Mova o conteúdo para ONION_CLIENT_TERMS_FILE ou ~/.config/onion/client-terms.txt (0600) e tire o arquivo do índice"
   fi
+  # P9 (2026-10-13, medido no update de um adotante hub): o default `~/.config/...` SÓ vale na FONTE. A
+  # lista é a dos clientes DO CORE; lida em qualquer repo da máquina, acusou 6 HARD em arquivos PRÓPRIOS do
+  # adotante (a KB das integrações dele, onde o parceiro dele é legítimo). Fora da fonte, sem lista explícita,
+  # o helper devolve rc 4 e a varredura por nome privado não se aplica (o recorte é o da LISTA: os ids de
+  # adotante abaixo continuam varridos). Lista EXPLÍCITA fora da fonte é ato deliberado: entra, e é DECLARADA.
+  local _ct_state=""
+  _ct_state="$(bash "${helper}" --ct-state 2>/dev/null || true)"
+  if [ "${_ct_state}" = "explicit" ] && [ "$(_role)" != "source" ]; then
+    violation "SOFT" "${REPO_ROOT}/docs/evolution/federation/members.yaml" "[vendor-scrub/LISTA-EXTERNA] papel '$(_role)': a varredura por nome privado está lendo uma lista EXTERNA passada explicitamente (ONION_CLIENT_TERMS_FILE ou --client-terms) — fora da fonte o default ~/.config/onion/client-terms.txt não vale (P9); acusação aqui é contra a lista que você escolheu passar"
+  fi
   _decl="$(bash "${helper}" --emit-declared 2>/dev/null)" || _decl_rc=$?
-  if [ "${_decl_rc}" -eq 3 ]; then
+  if [ "${_decl_rc}" -eq 4 ]; then
+    :   # P9: papel sem default e sem lista explícita — a lista do core não é objeto deste repo
+  elif [ "${_decl_rc}" -eq 3 ]; then
     violation "SOFT" "${REPO_ROOT}/docs/evolution/federation/members.yaml" "[vendor-scrub/NAO-VERIFICADO] fonte privada de termos AUSENTE (ONION_CLIENT_TERMS_FILE ou ~/.config/onion/client-terms.txt; no CI, o secret ONION_CLIENT_TERMS) — a superfície vendorizada NÃO foi varrida pelos nomes privados; só pelos ids de adotante"
   elif [ "${_decl_rc}" -ne 0 ]; then
     violation "SOFT" "${REPO_ROOT}/docs/evolution/federation/members.yaml" "[vendor-scrub/NAO-VERIFICADO] a fonte privada de termos não respondeu (rc=${_decl_rc}) — varredura por nome privado NÃO feita"

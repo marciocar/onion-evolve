@@ -32,6 +32,7 @@ flowchart TD
   onion_slm["onion-slm<br/>standalone · greenfield"]:::standalone
   onion_curation["onion-curation<br/>standalone · greenfield"]:::standalone
   onion_kg_ssot["onion-kg-ssot<br/>standalone · greenfield"]:::standalone
+  bomtexto["bomtexto<br/>standalone · greenfield"]:::standalone
   metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
@@ -60,6 +61,7 @@ flowchart TD
   onion_slm -->|adopts| onion_evolve
   onion_curation -->|adopts| onion_evolve
   onion_kg_ssot -->|adopts| onion_evolve
+  bomtexto -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
   classDef hub fill:#238636,color:#fff,stroke:#033a16;
   classDef standalone fill:#8957e5,color:#fff,stroke:#3c1e70;
@@ -77,7 +79,7 @@ flowchart TD
 | onion-mini | mini | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `9b5c89318dfc` |
 | onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `9b5c89318dfc` |
 | hub-operacoes-enterprise | hub | greenfield | hub, task-manager-integration, itsm | `8278fee79d1c` |
-| brain-granaai | hub | brownfield | company-brain, clickup, pesquisa-primaria | `6f3ab3a3905c` |
+| brain-granaai | hub | brownfield | company-brain, clickup, pesquisa-primaria | `bd769f168411` |
 | vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `4299290b73d4` |
 | onion-core | source | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `9b5c89318dfc` |
 | onion-plugins | plugins | greenfield | plugin-marketplace, public-distribution, claude-code | `9b5c89318dfc` |
@@ -96,3 +98,4 @@ flowchart TD
 | onion-slm | standalone | greenfield | slm, eval-de-dominio, roteiro-gradual | `9e75a73d0401` |
 | onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `7818b8a25ae6` |
 | onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `dcdacf9ba196` |
+| bomtexto | standalone | greenfield |  | `bd769f168411` |
