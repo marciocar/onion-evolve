@@ -2,11 +2,10 @@
 title: 'Resíduo — interruptor do revisor de IA do CI: ONION_REVIEW_MODE on|off|auto (padrão off) e a label review:ia'
 date: 2026-10-13
 branch: feat/review-mode-switch
-reviewed_diff_sha256: 1d7cc6ecca3607e05ccf603da0e1fa40acf94d903fcda319f729c2a45b135fb9
-reviewed_code_sha256: ffdebce0813c630cc6d1314a89f5d4acfb3132fefcdd2d9d5ae2bc629bb8669e
-findings_total: 9
-findings_real: 7
-findings_fixed: 4
+reviewed_diff_sha256: pendente
+findings_total: 10
+findings_real: 8
+findings_fixed: 5
 tokens: 0
 duration_min: 150
 verdict: CORRIGIDO
@@ -16,8 +15,8 @@ nota: >-
   kg-decide-seal.sh no grafo docs/onion/graph/review-gate-saldo-2026-09.kg.yaml, com a evidência
   E_REVIEW_MODE_SWITCH_FORJADO). A regra mora em ops/review/review-mode-decide.sh, que tem bancada
   (família review_mode, 19 casos, cada um com mutante que reprova). O merge-verified ganhou cinco casos
-  rv-* na família pr_merge_verified (45/45). A passada adversarial partiu do default reprovado: 9
-  achados, 7 reais, 4 curados e 3 declarados como teto; 2 hipóteses foram refutadas por medição.
+  rv-* na família pr_merge_verified (45/45). A passada adversarial partiu do default reprovado: 10
+  achados, 8 reais, 5 curados e 3 declarados como teto; 2 hipóteses foram refutadas por medição.
 ---
 
 # Resíduo — REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)
@@ -78,12 +77,21 @@ nota: >-
    como antes (verdict skipped, que o merge-verified recusa).
 9. **REFUTADO.** "Desligada some da telemetria como gate cego": no `review-gate-health.sh`, PR sem parecer
    é NO-PARECER, que não entra na sequência cega (lido no código).
+10. **REAL, CURADO, achado pela MEDIÇÃO no próprio PR.** Pus e tirei uma label alheia no #1076. O head
+    passou a ter DUAS check-runs `onion-review-verdict`, e a API devolveu as duas mesmo SEM `filter=all`.
+    O `statusCheckRollup` também: saiu `SUCCESS\nSUCCESS`. O `pr-merge-verified` comparava esse valor
+    com `SUCCESS` e recusaria, e um veredito velho em falha bloquearia o verde novo para sempre. Com
+    labels re-disparando o workflow, isso deixa de ser raro. Cura: `_LATEST_PER_NAME_JQ` (uma linha por
+    nome, maior id) e o rollup pelo mais recente, com o caso (t) e um mutante na família `review_mode`.
+    O `review-gate-health.sh` também lê agora pelo maior id, onde antes usava `head -1`.
 
 ## O que NÃO foi medido
 
 - O caminho do CI com a variável `on`/`auto` e a label `review:ia` em PR real. A variável não pode ser
   setada por esta sessão, e a revisão real está sem crédito (D_SEM_CREDITO_POR_ORA).
-- O `filter=all` + `check_name` devolvendo os runs antigos do mesmo head foi lido na doc da API e no
-  esboço da bancada, não no vivo. A medição ao vivo fica para o próprio PR, alternando uma label.
+- MEDIDO no #1076, modo off com a variável ausente: `onion-review-mode` pass (o juiz do bootstrap, com
+  warning), `onion-review` skipping, `onion-review-verdict` pass, com a anotação `notice` "onion-review-desligado:
+  revisão desligada (modo off, motivo: variável ausente ou vazia ⇒ padrão off; sem a label review:ia)".
+  O `check_name` + `filter=all` devolveu os 2 runs do head (achado 10).
 - O comportamento do adotante: `onion-review.yml` não viaja pelo `/meta:adopt`, que só oferta o
   `onion-validate.yml`. Quem copiasse o workflow à mão precisaria de `ops/review/`.

@@ -388,9 +388,15 @@ fi
 # `--ci-inoperante`. A direção (não mergear) estava certa; o diagnóstico mandava esperar a coisa
 # errada e apontava um escape que ali seria o erro. O rc do `gh api` é lido à parte, e o erro dele
 # é dito pelo nome.
+# ⚠️ UMA LINHA POR NOME, A MAIS RECENTE (medido no PR #1076, 2026-10-13): um 2º run do workflow no MESMO
+# head (label posta/tirada, re-disparo) cria OUTRA suíte, e a API devolve as DUAS check-runs de mesmo nome
+# mesmo sem `filter=all` — e o `statusCheckRollup` também. Sem dedupe, um veredito velho em falha bloquearia
+# para sempre o verde novo, e dois verdes viravam "SUCCESS\nSUCCESS" ≠ SUCCESS. O id cresce no tempo, então
+# o maior id do nome é o run vigente (o mesmo que o GitHub mostra no `gh pr checks`).
+_LATEST_PER_NAME_JQ='[.check_runs[]] | group_by(.name) | map(max_by(.id)) | .[] | .name + "\t" + .status + "\t" + (.conclusion // "-")'
 _cr_err="$(mktemp)"
 head_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
-  --jq '.check_runs[] | .name + "\t" + .status + "\t" + (.conclusion // "-")' 2>"${_cr_err}")"
+  --jq "${_LATEST_PER_NAME_JQ}" 2>"${_cr_err}")"
 _cr_rc=$?
 if [ "${_cr_rc}" -ne 0 ]; then
   _cr_http="$(grep -oE 'HTTP [0-9]{3}' "${_cr_err}" | head -1)"
@@ -550,7 +556,7 @@ done <<< "$_f2"
 [ -n "${_n2// /}" ] && die "há check FALHO não dispensado: ${_n2}— merge recusado"
 
 verdict="$(gh pr view "$PR" "${REPO_ARG[@]}" --json statusCheckRollup \
-  --jq '.statusCheckRollup[] | select(.name=="onion-review-verdict") | (.conclusion // .state)' 2>/dev/null)"
+  --jq '[.statusCheckRollup[] | select(.name=="onion-review-verdict")] | sort_by(.startedAt // .completedAt // "") | last | select(. != null) | (.conclusion // .state)' 2>/dev/null)"
 if [ -z "$verdict" ]; then
   say "⚠️  sem linha 'onion-review-verdict' neste repo — a revisão adversarial NÃO foi medida aqui."
   say "    (repos sem o gate: o resíduo da REGRA 56 e a passada humana são a única cobertura)"

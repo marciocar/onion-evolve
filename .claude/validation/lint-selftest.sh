@@ -10560,6 +10560,23 @@ run_review_mode_selftests() {
     'return 10 ;;' 'return 0 ;;' \
     --verdict-gate --mode-result success --run true --mode on --reason "on" --review-result success
 
+  # ── (t) UMA check-run POR NOME, a vigente: o merge-verified lê o head por `_LATEST_PER_NAME_JQ` ──
+  # Medido no PR #1076: a label re-dispara o workflow e o head passa a ter DUAS check-runs de cada nome
+  # (a API devolve as duas sem filter=all). O filtro é exercido aqui sobre o JSON dessa forma, e o mutante
+  # sem o group_by (a leitura antiga) tem de reprovar.
+  local _mvsut="${REPO_ROOT}/ops/pr-merge-verified.sh" _jq _jqm _fx
+  _jq="$(sed -n "s/^_LATEST_PER_NAME_JQ='\(.*\)'$/\1/p" "${_mvsut}" 2>/dev/null)"
+  if [ -z "${_jq}" ]; then record_fail "review-mode: (t) dedupe por nome" "_LATEST_PER_NAME_JQ não encontrado em ops/pr-merge-verified.sh"; else
+    _fx='{"check_runs":[{"id":10,"name":"onion-review-verdict","status":"completed","conclusion":"failure"},{"id":20,"name":"onion-review-verdict","status":"completed","conclusion":"success"},{"id":15,"name":"lint","status":"completed","conclusion":"success"}]}'
+    _p_dd() { local o; o="$(printf '%s' "${_fx}" | jq -r "$1" 2>/dev/null)" || return 1
+              [ "$(grep -c 'onion-review-verdict' <<< "${o}")" = 1 ] && grep -q $'^onion-review-verdict\tcompleted\tsuccess$' <<< "${o}"; }
+    _jqm='.check_runs[] | .name + "\t" + .status + "\t" + (.conclusion // "-")'
+    if ! _p_dd "${_jq}"; then record_fail "review-mode: (t) dedupe por nome" "o filtro não deixou só o run vigente (id 20, success)"
+    elif _p_dd "${_jqm}"; then record_fail "review-mode: (t) dedupe por nome — MUTANTE SOBREVIVEU" "a leitura sem group_by passou"
+    else record_pass "review-mode: (t) duas check-runs do mesmo nome no head ⇒ vale a de maior id (e o mutante sem dedupe reprova)"; fi
+    unset -f _p_dd
+  fi
+
   # ── a FIAÇÃO no workflow (o YAML não tem selftest; aqui se lê a forma que o interruptor exige) ──
   local wf="${REPO_ROOT}/.github/workflows/onion-review.yml"
   if [ ! -f "${wf}" ] || ! command -v python3 >/dev/null 2>&1; then record_skip "review-mode: (s) onion-review.yml ou python3 ausente"; else
