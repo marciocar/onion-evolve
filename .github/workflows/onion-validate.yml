@@ -1,51 +1,60 @@
 name: Onion Artifact Linter
 
 on:
+  # ── SEM FILTRO DE PATH DESDE 2026-10-13 (passo D de D_MERGE_PROCESS_ONION_2026_10) ─────────────
+  # `lint-onion-artifacts` vira required status check do ruleset do main. Check obrigatório de
+  # workflow com `paths:` NUNCA nasce no PR que não casa a lista, e o ruleset o deixa pendurado para
+  # sempre. O lint é barato (~44 s medido) e lê o repo inteiro, então roda em todo PR. A lista
+  # antiga fica COMENTADA abaixo: cada linha dela é a história de um ponto cego que custou caro, e
+  # o que ela ensinava (path novo nasce invisível ao CI) é exatamente o que o fim do filtro cura.
   pull_request:
-    paths:
-      - '.claude/**'
-      - 'docs/meta-specs/**'
-      - 'docs/design-context/**'
-      # .claude-plugin/ = o catálogo da RAIZ, projeção dos manifestos guardada pela REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos).
-      # Até a F4 das portas (2026-10-10) aqui estava 'plugins/**' (artefatos gerados guardados pela
-      # REGRA 19 (Plugins de vertical sincronizados com as fontes); incidente 2026-07-04: fix de drift do #241 mergeou sem o lint rodar). O plugins/
-      # saiu do core; a mesma lição vale para o catálogo: PR que só toca a projeção tem de ser julgado.
-      - '.claude-plugin/**'
-      # .github/workflows/ = o proprio CI. Sem este path, um PR que mexe no
-      # workflow NAO dispara o lint — foi medido no #509: adicionar 'ops/**' aos
-      # paths nao fez o lint rodar, porque o filtro e avaliado contra a definicao
-      # da BASE e a mudanca do workflow nao casava path nenhum. CI que nao se
-      # valida quando muda e a mesma classe de ponto cego, um nivel acima.
-      - '.github/workflows/**'
-      # ops/ = codigo de SERVICO (fora do payload do /meta:adopt, PR #508). Sem
-      # este path, um PR que so toca ops/ nao dispara lint NENHUM — foi o que
-      # aconteceu no #509, que rodou so o onion-review. Terceira ocorrencia da
-      # mesma classe (#241 plugins, #254 docs, agora ops/): path novo nasce
-      # invisivel ao CI ate alguem notar. O lint nao valida .ts, mas valida as
-      # REFERENCIAS (REGRA 48) e a SSOT que um PR de ops/ pode mexer.
-      #
-      # ⚠️ 2026-08-02: este comentario existia desde o #509 e O PATH NAO ESTAVA AQUI.
-      # A cura foi DOCUMENTADA e nao APLICADA — `declarado != verificado` dentro da
-      # configuracao do proprio CI, e invisivel porque ninguem le lista de path.
-      - 'ops/**'
-      # .env.example = QUARTA ocorrencia da mesma classe, medida agora no #513: o PR que
-      # corrigiu o anti-padrao 4 do SDAAL tocava SO este arquivo e rodou apenas o
-      # onion-review — o lint nunca disparou. E ele NAO e irrelevante: a REGRA 20
-      # (Capability Contract, HARD) le o .env.example em lint-artifacts.sh:519 para provar
-      # que a variavel declarada por um adapter existe de fato. Dava para quebrar uma
-      # regra HARD sem o CI ver.
-      - '.env.example'
-      # vendor/kg-ssot/ + .kg-ssot/ = o contrato do .kg.yaml vendorizado por pin e a linha de base do gate
-      # dele (2026-10-08). Sem estes paths, um PR que só troca a tag ou a base não roda o gate que eles
-      # alimentam — a mesma classe de path novo invisível ao CI que este bloco já pagou quatro vezes.
-      - 'vendor/kg-ssot/**'
-      - '.kg-ssot/**'
-      # docs/ + CLAUDE.md são guardados pelas regras de SSOT (R9/R15/R16/R22:
-      # contagens vivas, carimbo de frescor, links da co-evolução). Sem estes
-      # paths, um PR docs-only deriva contagens sem o CI ver (observado no #254:
-      # lint não rodou num PR que tocava CLAUDE.md + docs/onion — o local salvou).
-      - 'docs/**'
-      - 'CLAUDE.md'
+  # workflow_dispatch: o alarme do main (ops/testing/main-bench-alarm.sh) dispara o lint na branch
+  # `revert/<sha12>` — PR aberto por GITHUB_TOKEN não dispara `pull_request`.
+  workflow_dispatch: {}
+#  paths:
+#     - '.claude/**'
+#     - 'docs/meta-specs/**'
+#     - 'docs/design-context/**'
+#     # .claude-plugin/ = o catálogo da RAIZ, projeção dos manifestos guardada pela REGRA 76 (marketplace.json da raiz aponta o repo PÚBLICO e é projeção dos manifestos).
+#     # Até a F4 das portas (2026-10-10) aqui estava 'plugins/**' (artefatos gerados guardados pela
+#     # REGRA 19 (Plugins de vertical sincronizados com as fontes); incidente 2026-07-04: fix de drift do #241 mergeou sem o lint rodar). O plugins/
+#     # saiu do core; a mesma lição vale para o catálogo: PR que só toca a projeção tem de ser julgado.
+#     - '.claude-plugin/**'
+#     # .github/workflows/ = o proprio CI. Sem este path, um PR que mexe no
+#     # workflow NAO dispara o lint — foi medido no #509: adicionar 'ops/**' aos
+#     # paths nao fez o lint rodar, porque o filtro e avaliado contra a definicao
+#     # da BASE e a mudanca do workflow nao casava path nenhum. CI que nao se
+#     # valida quando muda e a mesma classe de ponto cego, um nivel acima.
+#     - '.github/workflows/**'
+#     # ops/ = codigo de SERVICO (fora do payload do /meta:adopt, PR #508). Sem
+#     # este path, um PR que so toca ops/ nao dispara lint NENHUM — foi o que
+#     # aconteceu no #509, que rodou so o onion-review. Terceira ocorrencia da
+#     # mesma classe (#241 plugins, #254 docs, agora ops/): path novo nasce
+#     # invisivel ao CI ate alguem notar. O lint nao valida .ts, mas valida as
+#     # REFERENCIAS (REGRA 48) e a SSOT que um PR de ops/ pode mexer.
+#     #
+#     # ⚠️ 2026-08-02: este comentario existia desde o #509 e O PATH NAO ESTAVA AQUI.
+#     # A cura foi DOCUMENTADA e nao APLICADA — `declarado != verificado` dentro da
+#     # configuracao do proprio CI, e invisivel porque ninguem le lista de path.
+#     - 'ops/**'
+#     # .env.example = QUARTA ocorrencia da mesma classe, medida agora no #513: o PR que
+#     # corrigiu o anti-padrao 4 do SDAAL tocava SO este arquivo e rodou apenas o
+#     # onion-review — o lint nunca disparou. E ele NAO e irrelevante: a REGRA 20
+#     # (Capability Contract, HARD) le o .env.example em lint-artifacts.sh:519 para provar
+#     # que a variavel declarada por um adapter existe de fato. Dava para quebrar uma
+#     # regra HARD sem o CI ver.
+#     - '.env.example'
+#     # vendor/kg-ssot/ + .kg-ssot/ = o contrato do .kg.yaml vendorizado por pin e a linha de base do gate
+#     # dele (2026-10-08). Sem estes paths, um PR que só troca a tag ou a base não roda o gate que eles
+#     # alimentam — a mesma classe de path novo invisível ao CI que este bloco já pagou quatro vezes.
+#     - 'vendor/kg-ssot/**'
+#     - '.kg-ssot/**'
+#     # docs/ + CLAUDE.md são guardados pelas regras de SSOT (R9/R15/R16/R22:
+#     # contagens vivas, carimbo de frescor, links da co-evolução). Sem estes
+#     # paths, um PR docs-only deriva contagens sem o CI ver (observado no #254:
+#     # lint não rodou num PR que tocava CLAUDE.md + docs/onion — o local salvou).
+#     - 'docs/**'
+#     - 'CLAUDE.md'
 
 # ── CANCELA O RUN SUPERADO ────────────────────────────────────────────────────────────────
 # MEDIDO em 2026-09-17: 397 min de CI num dia, 281 deles (71%) na bancada, e pelo menos 53
@@ -86,7 +95,7 @@ jobs:
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       # ── FONTE PRIVADA DE TERMOS (P8 do projection-safety.sh; decisão do maestro de 2026-10-13) ──
       # O core ficou PÚBLICO e a lista de nomes privados saiu da árvore: era o próprio vazamento. As
