@@ -2,7 +2,7 @@
 title: 'Resíduo — o modo porta vem de kind: door, e o carimbo standalone do adotante volta a passar'
 date: 2026-10-13
 branch: fix/standalone-stamp-cut-vs-door
-reviewed_diff_sha256: f81a59ce5fbf9aaf4298cdb7f9fc971f5eca78a55c11dc108b1aad3cdd860671
+reviewed_diff_sha256: dfa649cbbcbea2a657d57f9402d0da0dfcc8b4569f5fadc13d2a5d9e1d8c9792
 reviewed_code_sha256: ce2d8593466a7f260e9f05aac547fc8792fea744a59af721debecc437818803f
 findings_total: 4
 findings_real: 4
