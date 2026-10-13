@@ -22,7 +22,8 @@
 #   efetivamente executadas — 228 vêm de sítios dentro de laços. Imprimir 907 como "o
 #   tamanho da bancada" seria trocar uma defasagem por um erro de categoria.
 #   O que RODOU é resultado de execução e vive na série histórica (`selftest-runs.jsonl`);
-#   o painel (`testing-state.md`) mostra os dois LADO A LADO, cada um com seu produtor.
+#   o painel mostra os dois LADO A LADO, cada um com seu produtor — com os números em
+#   `testing-state.sh --live`; o `testing-state.md` versionado leva o comando e `↻ ao vivo` (2026-10-13).
 #
 # CUSTO É DESENHO, PORQUE A CATRACA CHAMA ISTO A CADA LINT
 #   Cronometrado: `rules-registry --counts` 0,05s · `consumed-mode-check --format tsv` 0,18s
