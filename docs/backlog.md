@@ -591,15 +591,6 @@
 | 5.1 | `C_TETO_FORMA_NAO_SENTIDO` | ops-citation-travel-2026-10 | TETO: a guarda vê a FORMA (ops/<arquivo> sem declaração), não o SENTIDO. Ela acusa igual a frase que descreve o destinatário  |
 | 3.2 | `C_TETO_BANCADA_E_CORE_ONLY_FORA` | ops-citation-travel-2026-10 | TETO: lint-selftest.sh, fixtures/ e baselines ficam fora (a bancada executa o que cita e falha alto); árvore genérica em bloco c |
 
-## projection-ids-2026-10 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 17.0 | `D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE` | projection-ids-2026-10 | Cura P9: o default do HOME só vale no papel source (sem stamp ou role: source) e em porta (kind: door, qualquer papel); fora dele |
-| 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
-| 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
-| 3.6 | `C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP` | projection-ids-2026-10 | TETO declarado: o papel vem do stamp, que é dado editável. Stamp falso de adotante no core desliga o default local (o CI segue p |
-
 ## m3-federation-admin-2026-07 — 11 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -660,6 +651,15 @@
 | 5.7 | `Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA` | onion-plugin-publication-2026-08 | ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEI |
 | 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
 | 5.4 | `Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA` | onion-plugin-publication-2026-08 | CANDIDATO A GUARDA, com o dado que EU NAO TINHA quando decidi nao mecanizar (2026-09-06). Eu recusei mecanizar a classe 'no supera |
+
+## projection-ids-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 13.6 | `D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE` | projection-ids-2026-10 | Cura P9: o default do HOME só vale no papel source (sem stamp ou role: source) e em porta (kind: door, qualquer papel); fora dele |
+| 5.4 | `C_TETO_VOCABULARIO_E_LABEL` | projection-ids-2026-10 | TETO declarado: o P7 só conhece os termos derivados do members.yaml e os do client-terms.txt (falha pelo vocabulário: nome não  |
+| 3.6 | `C_TETO_HISTORICO_CITA_A_FORMA_ANTIGA` | projection-ids-2026-10 | TETO declarado: registros históricos citam os ids e o caminho antigos e não resolvem por busca exata; a ponte é o sufixo preser |
+| 3.6 | `C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP` | projection-ids-2026-10 | TETO declarado: o papel vem do stamp, que é dado editável. Stamp falso de adotante no core desliga o default local (o CI segue p |
 
 ## passada-adversarial-2026-09 — 2 item(ns)
 
@@ -746,7 +746,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 9.6 | `Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA` | federation-health-2026-07 | AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no t |
-| 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens dev-1 (pin nao-verificavel-deste-host) e instancia-offline (pin desconhecido) — estado de verificacao INDETERM |
+| 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens dev-1 (pin nao-verificavel-deste-host) e instancia-offline (pin desconhecido) — estado de verificacao INDETE |
 
 ## session-2026-07-18-evolve-review-triage — 1 item(ns)
 
