@@ -290,8 +290,8 @@ def main():
 
         p = start({'ONION_KG_WRITER_ROOT': root})
         port, line = wait_port(p)
-        case('sobe-em-porta-efemera', port is not None, line)
-        if port is None:
+        case('sobe-em-porta-efemera', bool(port), line)  # a porta REAL do bind, nunca o 0 pedido
+        if not port:
             return
         srv = p
 
@@ -324,7 +324,8 @@ def main():
         case('envelope-nao-confiavel', ph.get('untrusted_data') is True and 'DADO' in ph.get('aviso', '')
              and ph.get('usuario') == A, ph.get('aviso'))
         head = subprocess.run(['git', '-C', CODE_ROOT, 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
-        case('served-commit-do-gate', ph.get('served_commit') == head, f"{ph.get('served_commit')} != {head}")
+        case('served-commit-do-gate', ph.get('served_commit') == head and ph.get('store_commit') == head
+             and 'aviso_codigo' not in ph, f"{ph.get('served_commit')} / {ph.get('store_commit')} != {head}")
 
         # (5) dry-run: valida e NÃO grava (nem cria a área)
         _, pv = call(port, 'kg_validate', {'yaml': ok_yaml})

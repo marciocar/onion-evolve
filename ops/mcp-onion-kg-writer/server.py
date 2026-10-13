@@ -97,6 +97,7 @@ _GIT_C = ['-c', 'core.hooksPath=' + os.devnull, '-c', 'commit.gpgsign=false',
           '-c', 'core.symlinks=false', '-c', 'init.defaultBranch=main']
 kg_store = None     # vendor/kg-ssot/tools/kg_store.py, carregado no boot (sem ele não sobe)
 kg_validate = None  # o leitor que o armazém usa (o mesmo módulo, importado por ele)
+STORE_COMMIT = None  # o HEAD do code root quando o armazém foi importado: o contrato julga com ESTE código
 
 
 class Refused(Exception):
@@ -710,8 +711,13 @@ def executa(nome, email_raw, args):
     if not isinstance(args, dict):
         raise Refused('arguments: objeto JSON')
     data = TOOLS[nome][0](email, args)
-    return {'untrusted_data': True, 'aviso': UNTRUSTED_NOTICE, 'tool': nome, 'usuario': email,
-            'served_commit': code_commit(), 'code_source': CODE_SOURCE, 'data': data}
+    served = code_commit()
+    env = {'untrusted_data': True, 'aviso': UNTRUSTED_NOTICE, 'tool': nome, 'usuario': email,
+           'served_commit': served, 'store_commit': STORE_COMMIT, 'code_source': CODE_SOURCE, 'data': data}
+    if served != STORE_COMMIT:  # o radar é relido a cada chamada; o armazém e o leitor, só no boot
+        env['aviso_codigo'] = ('o radar julgou no served_commit e o contrato no store_commit (importado no boot): '
+                               'o code root mudou depois do boot, reinicie o servidor')
+    return env
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -797,6 +803,7 @@ def load_store():
 
 
 def main():
+    global STORE_COMMIT
     if not TOKEN:
         raise SystemExit('ONION_KG_WRITER_TOKEN ausente — fail-closed, nao subo sem auth')
     if yaml is None:
@@ -809,6 +816,7 @@ def main():
             raise SystemExit(f'recuso subir: {what} ausente em {CODE_SOURCE} — sem gate nao gravo nada')
     try:
         load_store()
+        STORE_COMMIT = code_commit()
     except Exception as e:  # noqa: BLE001
         raise SystemExit(f'recuso subir: o armazem nao carrega ({type(e).__name__}: {str(e)[:200]}) — sem gate nao gravo nada')
     if not os.path.isdir(DATA_ROOT) or os.path.islink(os.environ.get('ONION_KG_WRITER_ROOT', '') or DATA_ROOT):

@@ -31026,7 +31026,8 @@ _family run_mcp_onion_kg_selftests
 # armazém nos symlinks DENTRO da área (o lstat do writer só cobre a área em si); a recusa de âncora e a de alias do
 # compositor (a âncora sempre precede o alias); a reconferência do verdict.schema.json pelo writer (o _verdict_ok do
 # armazém já recusa o fora-do-schema como not_judged); e o REPROVADO forçado quando o safe_load não confere o meta.id.
-# O contrato-stub-aprova é o controle de polaridade do code root falso e não leva mutante.
+# O contrato-stub-aprova é o controle de polaridade do code root falso e não leva mutante; o commit-nao-cai-no-repo-pai
+# é a defesa dupla do git declarada acima. Os outros 60 casos têm ao menos um mutante (64 no total).
 run_mcp_onion_kg_writer_selftests() {
   local h="${REPO_ROOT}/ops/mcp-onion-kg-writer/selftest.py" srv="${REPO_ROOT}/ops/mcp-onion-kg-writer/server.py"
   local helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
@@ -31084,8 +31085,8 @@ run_mcp_onion_kg_writer_selftests() {
             raise SystemExit(f'recuso subir: {what} ausente em {CODE_SOURCE} — sem gate nao gravo nada')$(printf '\x1f')            pass  # ONION_MUTANTE$(printf '\x1f')code-root-sem-gate-recusa-boot
     for p, what in ((RADAR, 'radar'), (STORE_LIB, 'armazem kg_store.py'),$(printf '\x1f')    for p, what in ((RADAR, 'radar'),  # ONION_MUTANTE$(printf '\x1f')armazem-ausente-recusa-boot
         raise SystemExit('recuso subir: ONION_KG_WRITER_ROOT inexistente ou symlink — crie o diretorio antes')$(printf '\x1f')        pass  # ONION_MUTANTE$(printf '\x1f')data-root-ausente-recusa-boot
-    return {'untrusted_data': True, 'aviso': UNTRUSTED_NOTICE, 'tool': nome, 'usuario': email,$(printf '\x1f')    return {'tool': nome, 'usuario': email,  # ONION_MUTANTE$(printf '\x1f')envelope-nao-confiavel
-            'served_commit': code_commit(), 'code_source': CODE_SOURCE, 'data': data}$(printf '\x1f')            'served_commit': None, 'code_source': CODE_SOURCE, 'data': data}  # ONION_MUTANTE$(printf '\x1f')served-commit-do-gate
+    env = {'untrusted_data': True, 'aviso': UNTRUSTED_NOTICE, 'tool': nome, 'usuario': email,$(printf '\x1f')    env = {'tool': nome, 'usuario': email,  # ONION_MUTANTE$(printf '\x1f')envelope-nao-confiavel
+           'served_commit': served, 'store_commit': STORE_COMMIT, 'code_source': CODE_SOURCE, 'data': data}$(printf '\x1f')           'served_commit': None, 'store_commit': STORE_COMMIT, 'code_source': CODE_SOURCE, 'data': data}  # ONION_MUTANTE$(printf '\x1f')served-commit-do-gate
             if n < 0 or n > MAX_BODY:$(printf '\x1f')            if False:  # ONION_MUTANTE$(printf '\x1f')content-length-negativo-400
         '      method: "leitura: secao 2 do documento"\n'$(printf '\x1f')        '      x_m: "leitura"\n'  # ONION_MUTANTE$(printf '\x1f')schema-help-exemplo-aprova
     'kg_my_get': (t_kg_my_get, 'Le um grafo da SUA area pelo slug (com o sha256 para o expected_sha256)', {'slug': _SLUG}, ['slug'], True, False),$(printf '\x1f')    # ONION_MUTANTE$(printf '\x1f')tools-list-6
@@ -31119,6 +31120,8 @@ _YAML_BREAKS = re.compile('\r\n?|[\x85  ]')$(printf '\x1f')_YAML_BREAKS = re
 _YAML_BREAKS = re.compile('\r\n?|[\x85  ]')$(printf '\x1f')_YAML_BREAKS = re.compile('\r\n?|[\x85 ]')  # ONION_MUTANTE$(printf '\x1f')profundidade-quebra-ps
     return ([fast] if fast is not None else []) + [yaml.SafeLoader]$(printf '\x1f')    return [yaml.SafeLoader]  # ONION_MUTANTE$(printf '\x1f')profundidade-tab-inicial
                     if depth > MAX_DEPTH:$(printf '\x1f')                    if depth > 2:  # ONION_MUTANTE$(printf '\x1f')colchete-em-escalar-aprova
+        return bool(TOKEN) and hmac.compare_digest(self.headers.get('X-Api-Key', '').encode(), TOKEN.encode())$(printf '\x1f')        return bool(TOKEN) and bool(self.headers.get('X-Api-Key', ''))  # ONION_MUTANTE$(printf '\x1f')token-errado-401
+    print(f'onion-kg-writer (MCP) em http://{HOST}:{srv.server_address[1]}/mcp$(printf '\x1f')    print(f'onion-kg-writer (MCP) em http://{HOST}:{PORT}/mcp  # ONION_MUTANTE$(printf '\x1f')sobe-em-porta-efemera
         raise Refused(f'armazem recusou (nada gravado): {scrub(e)[:300]}') from None$(printf '\x1f')        raise Refused(f'armazem recusou (nada gravado): {str(e)[:300]}') from None  # ONION_MUTANTE$(printf '\x1f')store-error-recusa-nomeada
     except (yaml.YAMLError, ValueError) as e:  # ValueError: inteiro além do int_max_str_digits do Python$(printf '\x1f')    except yaml.YAMLError as e:  # ONION_MUTANTE$(printf '\x1f')inteiro-gigante-nao-derruba
     if raw == 'new' and not allow_new:$(printf '\x1f')    if False:  # ONION_MUTANTE$(printf '\x1f')delete-inexistente-e-de-outro-recusa
