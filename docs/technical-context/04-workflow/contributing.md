@@ -190,7 +190,8 @@ Categorias de violação: **HARD** (bloqueia CI/merge) vs **SOFT** (aviso, não 
 ### 3.2 Review semântico (Claude — advisory)
 
 `.github/workflows/onion-review.yml` ("Onion Code Review (Claude)"): dispara em
-`pull_request: [opened, synchronize]`, roda `anthropics/claude-code-action` **pinado** em
+`pull_request: [opened, synchronize, labeled, unlabeled]` — **mas só revisa quando o interruptor
+manda** (ver "Interruptor do revisor", abaixo) —, roda `anthropics/claude-code-action` **pinado** em
 `v1.0.171` (commit `e90deca4`) — não a tag móvel `@v1` — porque a `@v1` regrediu para 100% de crash
 em 2026-07-14 (`onion-review.yml:36-41`). O prompt aplica a doutrina do `@metaspec-gate-keeper`
 contra `docs/meta-specs/`.
@@ -219,6 +220,45 @@ revisor **crasha** (não roda) — nunca quando encontra violações.
 bloquearia o PR pelo crash do bot, sem informação sobre o código. O gate de qualidade duro é o
 determinístico (§3.1); o semântico é **advisory-quando-roda** (`onion-review.yml:35-42`). Sem o
 secret `ANTHROPIC_API_KEY`, o step é pulado — degrada gracioso.
+
+#### Interruptor do revisor (`ONION_REVIEW_MODE` + label `review:ia`)
+
+Decisão do maestro de 2026-10-13 (`D_REVIEW_MODE_SWITCH_PADRAO_OFF`, em
+`docs/onion/graph/review-gate-saldo-2026-09.kg.yaml`): o revisor de IA é **opcional por PR**.
+
+| `vars.ONION_REVIEW_MODE` | O que acontece |
+|---|---|
+| ausente ou vazia | **`off`** — o padrão |
+| `off` | nunca revisa |
+| `on` | revisa todo PR (o comportamento de antes) |
+| `auto` | revisa só quando a regra de necessidade casa |
+| qualquer outro valor (`ON`, `" on"`, `off `…) | o job `onion-review-mode` **falha nomeado**, e o `onion-review-verdict` também. O enum é exato e não se normaliza |
+
+A label **`review:ia`** no PR força a revisão em qualquer modo, e quem a cria é o
+`ops/apply-ruleset-main.sh`. A decisão, a lista de caminhos do `auto` e o teto de linhas vivem num
+lugar só: **`ops/review/review-mode-decide.sh`**, no cabeçalho, junto com a medição que justifica o
+teto. A bancada dele é a família `review_mode`, e os casos `(rv-*)` ficam em `pr_merge_verified`.
+O juiz roda a partir da **base** do PR, não do head, para que um PR não consiga se desligar
+reescrevendo o próprio juiz. A exceção é o bootstrap, o PR que cria o script.
+
+**Como o check aparece em cada desfecho:**
+
+- **Desligada** (`run=false`): o job `onion-review` é **pulado** e não comenta no PR. O
+  `onion-review-verdict` sai **verde**, com a anotação `onion-review-desligado: revisão desligada (modo X, motivo: Y)`.
+  É verde e não `skipped` porque o `ops/pr-merge-verified.sh` lê SKIPPED como "não aprovou". Pela
+  anotação, o merge-verified diz *"SUCCESS por revisão DESLIGADA, não por aprovação"*, **sem pedir
+  dispensa e sem comentar**.
+- **Rodou e reprovou**: igual a antes, o check fica vermelho e o merge exige `--dispensa onion-review-verdict --motivo`.
+- **Desligar depois de um achado não o apaga.** Isso vale quando o veredito mais recente diz
+  "desligada" mas um run anterior **no mesmo head** apontou violação (label removida, modo trocado).
+  Nesse caso o merge-verified recusa e exige a mesma dispensa nomeada.
+- **Sem decisão** (modo inválido): `onion-review-mode` e `onion-review-verdict` ficam vermelhos.
+  O `onion-review-mode` não é dispensável.
+
+**Preço declarado:** o `on:` não filtra por nome de label, então uma label alheia também dispara o
+workflow. O run recalcula a mesma decisão, que é função pura de (modo, labels, diff). No modo `on`,
+ou com a `review:ia` posta, isso **re-roda a revisão**. Pular esse run deixaria um veredito SKIPPED
+por cima do real.
 
 **Checagem semântica arquitetural fora do CI**: validações de conformidade com meta-specs e
 invariantes de framework não rodam automaticamente no CI — são locais, via

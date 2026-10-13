@@ -472,6 +472,47 @@ else
 printf '%s\n' "$head_runs" | awk -F'\t' '$2!="completed"{exit 1}' \
   || die "check-run do head ${HEAD_SHA:0:8} ainda não-completo — merge recusado (esperar não é opcional)"
 fi
+# ══ REVISÃO DESLIGADA ≠ REVISÃO APROVADA (2026-10-13, D_REVIEW_MODE_SWITCH_PADRAO_OFF) ══════════
+# Com o interruptor (`vars.ONION_REVIEW_MODE`, padrão off), o `onion-review-verdict` sai VERDE quando
+# a revisão foi desligada — e verde, sozinho, diria "aprovado". A distinção vem da ANOTAÇÃO-marca do
+# check (`review-mode-decide.sh --print-marker`), lida aqui: desligada NÃO pede dispensa nem comenta,
+# mas é DITA como "não medida", nunca como aprovação.
+# ⚠️ E O DESLIGAMENTO NÃO APAGA UM ACHADO: se um run ANTERIOR do veredito NESTE MESMO head revisou e
+# reprovou ("apontou N violação"), e o mais recente diz "desligada" (label review:ia removida depois,
+# modo trocado para off), o achado continua de pé — o merge exige a mesma dispensa nomeada de sempre.
+# Sem isto, tirar a label depois do parecer seria o jeito mudo de virar um vermelho em verde.
+# Leitura que falha = recusa (fail-closed), como a dos check-runs acima.
+_REVIEW_OFF=""; _REVIEW_PRIOR_REPROVOU=""
+_rm_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/review/review-mode-decide.sh"
+if [ -n "$head_runs" ] && [ -f "${_rm_script}" ]; then
+  _rm_marker="$(bash "${_rm_script}" --print-marker)"
+  _rv_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?check_name=onion-review-verdict&filter=all&per_page=100" \
+    --jq '[.check_runs[]] | sort_by(.id) | reverse | .[] | "\(.id)\t\(.conclusion // "-")"' 2>/dev/null)" \
+    || die "não consegui LER o histórico do onion-review-verdict no head ${HEAD_SHA:0:8} — sem ele não sei se a revisão foi desligada ou se um achado anterior foi apagado. Tente de novo."
+  _rv_first=1
+  while IFS=$'\t' read -r _rv_id _rv_concl; do
+    [ -n "${_rv_id}" ] || continue
+    if [ "${_rv_first}" -eq 1 ]; then
+      _rv_first=0
+      [ "${_rv_concl}" = "success" ] || break       # o mais recente não é verde: o caminho de sempre decide
+      _rv_ann="$(gh api "repos/${OWNER_REPO}/check-runs/${_rv_id}/annotations" --jq '.[].message' 2>/dev/null)" \
+        || die "não consegui LER as anotações do onion-review-verdict (check-run ${_rv_id}) — não sei se o verde é aprovação ou desligamento."
+      _REVIEW_OFF="$(LC_ALL=C grep -m1 -F -- "${_rm_marker}" <<< "${_rv_ann}" || true)"
+      [ -n "${_REVIEW_OFF}" ] || break               # verde que não é desligamento: aprovação de verdade
+      continue
+    fi
+    [ "${_rv_concl}" = "failure" ] || continue
+    _rv_ann="$(gh api "repos/${OWNER_REPO}/check-runs/${_rv_id}/annotations" --jq '.[].message' 2>/dev/null)" \
+      || die "não consegui LER as anotações do run anterior ${_rv_id} do onion-review-verdict — não sei se ele apontou violação."
+    if LC_ALL=C grep -qE 'apontou [1-9]' <<< "${_rv_ann}"; then _REVIEW_PRIOR_REPROVOU="${_rv_id}"; break; fi
+  done <<< "${_rv_runs}"
+fi
+if [ -n "${_REVIEW_PRIOR_REPROVOU}" ]; then
+  _dispensado onion-review-verdict \
+    || die "o onion-review-verdict mais recente diz revisão DESLIGADA, mas um run anterior NESTE head (check-run ${_REVIEW_PRIOR_REPROVOU}) REVISOU e APONTOU violação. Desligar depois não apaga o achado: corrija, ponha a label review:ia de volta, ou dispense nomeado (--dispensa onion-review-verdict --motivo \"<por que o achado não procede>\")."
+  # entra na lista de falhos para a dispensa NÃO ser recusada como preventiva: o achado existe
+  head_runs="${head_runs}"$'\n'"onion-review-verdict"$'\t'"completed"$'\t'"failure"
+fi
 # Falhos do head, um por linha — e a dispensa é aplicada NOME A NOME, nunca em bloco.
 _falhos="$(printf '%s\n' "$head_runs" | awk -F'\t' '$3=="failure"||$3=="cancelled"||$3=="timed_out"{print $1}')"
 _not_waived=""
@@ -518,6 +559,11 @@ elif [ "$verdict" != "SUCCESS" ] && _dispensado onion-review-verdict; then
   say "    O gate determinístico (lint + bancada) é a cobertura que sobra; a semântica NÃO foi medida."
 elif [ "$verdict" != "SUCCESS" ]; then
   die "onion-review-verdict = ${verdict} — o revisor NÃO aprovou (o 'pass' do onion-review é soft e não vale)"
+elif [ -n "${_REVIEW_PRIOR_REPROVOU}" ]; then
+  say "⚠️  onion-review-verdict = SUCCESS por DESLIGAMENTO, sobre um achado anterior neste head (check-run ${_REVIEW_PRIOR_REPROVOU}) — DISPENSADO por decisão humana, não aprovado."
+elif [ -n "${_REVIEW_OFF}" ]; then
+  say "⊘ onion-review-verdict = SUCCESS por revisão DESLIGADA, não por aprovação — a semântica NÃO foi medida; sem dispensa, por desenho (D_REVIEW_MODE_SWITCH_PADRAO_OFF)."
+  say "    anotação: ${_REVIEW_OFF}"
 else
   say "✓ onion-review-verdict = SUCCESS (fonte lida, não inferida)"
 fi
@@ -580,7 +626,9 @@ if [ "${#DISPENSA[@]}" -gt 0 ]; then
   # escolhe um dos dois lados por conveniencia.
   _out_check="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
     --jq '.check_runs[] | select(.name=="onion-review-verdict") | ((.output.title // "") + " " + (.output.summary // ""))' 2>/dev/null || true)"
-  if LC_ALL=C grep -qiE 'apontou[^0-9]*[0-9]+|violaç|violac' <<< "${_out_check}"; then
+  if [ -n "${_REVIEW_PRIOR_REPROVOU}" ]; then
+    _NOTA_DISPENSA="Um run anterior deste check **neste head** (check-run ${_REVIEW_PRIOR_REPROVOU}) **mediu e apontou**, e o mais recente diz revisão **desligada** — a dispensa afirma que o achado **não procede**; desligar não o apagou."
+  elif LC_ALL=C grep -qiE 'apontou[^0-9]*[0-9]+|violaç|violac' <<< "${_out_check}"; then
     _NOTA_DISPENSA="Este check **mediu e apontou** — a dispensa afirma que o achado **não procede**, e o parecer está no comentário do PR para quem quiser conferir."
   elif [ -n "${_out_check}" ]; then
     _NOTA_DISPENSA="O que este check mediria **não foi medido**."

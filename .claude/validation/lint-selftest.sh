@@ -10462,6 +10462,142 @@ run_review_verdict_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# O INTERRUPTOR DO REVISOR DE IA (D_REVIEW_MODE_SWITCH_PADRAO_OFF, 2026-10-13) — ops/review/review-mode-decide.sh
+# `vars.ONION_REVIEW_MODE` on|off|auto (vazio = off) + label `review:ia` forçando. A decisão vive no script
+# porque o YAML não tem selftest; aqui cada desfecho é exercido contra um repo git de verdade (o `auto` lê o
+# diff base...head) E contra um MUTANTE do script, que tem de reprovar o mesmo caso — caso que não distingue
+# o juiz do mutante não prova nada. A integração com o ops/pr-merge-verified.sh (desligada ⇒ sem dispensa;
+# reprovada ⇒ dispensa; desligar depois de um achado não o apaga) vive nos casos (rv-*) da família
+# pr_merge_verified, que é onde está o esboço do gh. LC_ALL=C em toda chamada (o locale do CI/hook).
+run_review_mode_selftests() {
+  local sut="${REPO_ROOT}/ops/review/review-mode-decide.sh"
+  [ -f "${sut}" ] || { record_skip "review-mode: ops/review/ ausente (adotante) → pulado"; return; }
+  command -v jq >/dev/null 2>&1 || { record_fail "review-mode" "jq ausente — o juiz lê as labels com jq e a bancada não o exerceria"; return; }
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  local r="${d}/repo"
+  {
+    git init -q -b main "${r}" && git -C "${r}" config user.email t@t && git -C "${r}" config user.name t \
+      && mkdir -p "${r}/.claude/hooks" "${r}/docs" "${r}/src" \
+      && printf 'echo h\n' > "${r}/.claude/hooks/h.sh" && printf 'x\n' > "${r}/docs/x.md" && printf 'a\n' > "${r}/src/a.sh" \
+      && git -C "${r}" add -A && git -C "${r}" commit -qm base \
+      && git -C "${r}" checkout -qb b_hook && printf 'echo h2\n' >> "${r}/.claude/hooks/h.sh" && git -C "${r}" commit -qam hook \
+      && git -C "${r}" checkout -q main && git -C "${r}" checkout -qb b_docs \
+      && seq 1 700 > "${r}/docs/big.md" && seq 1 80 > "${r}/docs/g.kg.yaml" && git -C "${r}" add -A && git -C "${r}" commit -qm docs \
+      && git -C "${r}" checkout -q main && git -C "${r}" checkout -qb b_big \
+      && seq 1 700 > "${r}/src/big.sh" && git -C "${r}" add -A && git -C "${r}" commit -qm big \
+      && git -C "${r}" checkout -q main && git -C "${r}" checkout -qb b_ren \
+      && git -C "${r}" mv .claude/hooks/h.sh docs/h.md && git -C "${r}" commit -qm ren \
+      && git -C "${r}" checkout -q main && git -C "${r}" checkout -qb b_small \
+      && seq 1 10 > "${r}/src/small.sh" && git -C "${r}" add -A && git -C "${r}" commit -qm small \
+      && git -C "${r}" checkout -q main
+  } >/dev/null 2>&1 || { record_fail "review-mode" "não consegui montar o repo git da bancada"; return; }
+
+  local _o _rc
+  _rd() { # $1=script ; resto = args do juiz → _o (stdout+stderr) e _rc
+    local s="$1"; shift
+    _rc=0; _o="$(cd "${r}" && LC_ALL=C bash "${s}" "$@" 2>&1)" || _rc=$?
+  }
+  _rmcase() { # $1=rótulo $2=predicado $3=âncora literal do mutante $4=substituição ; resto = args
+    local lbl="$1" pred="$2" anc="$3" sub="$4"; shift 4
+    _rd "${sut}" "$@"
+    if ! "${pred}"; then record_fail "review-mode: ${lbl}" "rc=${_rc} out=$(printf '%s' "${_o}" | tail -3)"; return; fi
+    local m="${d}/mut.sh"
+    A="${anc}" B="${sub}" awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${sut}" > "${m}"
+    if cmp -s "${sut}" "${m}"; then record_fail "review-mode: ${lbl} — MUTANTE" "a âncora '${anc}' não casou (mutante que não muta declara verde sem medir)"; return; fi
+    _rd "${m}" "$@"
+    if "${pred}"; then record_fail "review-mode: ${lbl} — MUTANTE SOBREVIVEU" "'${anc}' → '${sub}' e o caso não notou"; return; fi
+    record_pass "review-mode: ${lbl} (e o mutante reprova)"
+  }
+  _p_run() { [ "${_rc}" -eq 0 ] && grep -qx 'run=true' <<< "${_o}"; }
+  _p_norun() { [ "${_rc}" -eq 0 ] && grep -qx 'run=false' <<< "${_o}"; }
+  _p_enum() { [ "${_rc}" -eq 2 ] && grep -qF "fora do enum on|off|auto" <<< "${_o}" && ! grep -q '^run=' <<< "${_o}"; }
+
+  _rmcase "(a) off sem label ⇒ não revisa" _p_norun \
+    'off) _decide false off' 'off) _decide true off' --mode off --labels-json '[]'
+  _rmcase "(b) variável VAZIA ⇒ padrão off ⇒ não revisa" _p_norun \
+    '"") MODE=off;' '"") MODE=on;' --mode "" --labels-json '["documentation"]'
+  _rmcase "(c) off COM a label review:ia ⇒ revisa (a label força)" _p_run \
+    'FORCE_LABEL="review:ia"' 'FORCE_LABEL="review:nada"' --mode off --labels-json '["documentation","review:ia"]'
+  _rmcase "(d) label PARECIDA (review:ia-x) não força — pertinência exata" _p_norun \
+    'map(select(.==$l))' 'map(select(contains($l)))' --mode off --labels-json '["review:ia-x"]'
+  _rmcase "(e) on ⇒ revisa" _p_run \
+    'on)  _decide true on' 'on)  _decide false on' --mode on --labels-json '[]'
+  _rmcase "(f) auto tocando .claude/hooks/ ⇒ revisa" _p_run \
+    "'.claude/hooks/*'" "'.claude/hooks-nao/*'" --mode auto --labels-json '[]' --range main...b_hook
+  _rmcase "(g) auto só docs/ + .kg.yaml (780 linhas) ⇒ NÃO revisa" _p_norun \
+    '$3 !~ /^docs\// && ' '' --mode auto --labels-json '[]' --range main...b_docs
+  _rmcase "(h) auto com 700 linhas de código fora da lista ⇒ revisa (passa do teto)" _p_run \
+    'AUTO_MAX_CODE_LINES=600' 'AUTO_MAX_CODE_LINES=600000' --mode auto --labels-json '[]' --range main...b_big
+  _rmcase "(i) auto com 10 linhas de código fora da lista ⇒ NÃO revisa (abaixo do teto)" _p_norun \
+    'AUTO_MAX_CODE_LINES=600' 'AUTO_MAX_CODE_LINES=5' --mode auto --labels-json '[]' --range main...b_small
+  _rmcase "(j) auto: hook RENOMEADO para docs/ ⇒ revisa (o nome antigo conta)" _p_run \
+    '--name-status --no-renames' '--name-only -M' --mode auto --labels-json '[]' --range main...b_ren
+  _rmcase "(k) auto com diff ilegível ⇒ revisa (na dúvida, o lado que mede)" _p_run \
+    '_decide true auto "o diff ${RANGE} não pôde ser lido' '_decide false auto "o diff ${RANGE} não pôde ser lido' \
+    --mode auto --labels-json '[]' --range main...nao-existe
+  _rmcase "(l) valor fora do enum (ON) ⇒ falha NOMEADA rc 2, sem decisão" _p_enum \
+    'on|off|auto) _mode_src' 'on|off|auto|ON|" on"|"off ") _mode_src' --mode ON --labels-json '[]'
+  _rmcase "(m) valor com espaço (' on') ⇒ falha nomeada, não normaliza" _p_enum \
+    'on|off|auto) _mode_src' 'on|off|auto|ON|" on"|"off ") _mode_src' --mode " on" --labels-json '[]'
+  _rmcase "(n) valor inválido com a label ⇒ AINDA falha (a label não salva valor quebrado)" _p_enum \
+    'on|off|auto) _mode_src' 'on|off|auto|ON|" on"|"off ") _mode_src' --mode "off " --labels-json '["review:ia"]'
+
+  # ── o check do veredito (--verdict-gate): desligada ⇒ verde COM a marca; sem decisão ⇒ vermelho ──
+  _p_g_off() { [ "${_rc}" -eq 0 ] && grep -qF "::notice::onion-review-desligado: revisão desligada (modo off" <<< "${_o}"; }
+  _p_g_nomode() { [ "${_rc}" -eq 1 ] && grep -qF "decisão do modo do revisor NÃO concluiu" <<< "${_o}"; }
+  _p_g_skip() { [ "${_rc}" -eq 1 ] && grep -qF "foi PULADO" <<< "${_o}"; }
+  _p_g_go() { [ "${_rc}" -eq 10 ] && [ -z "${_o}" ]; }
+  _rmcase "(o) veredito com revisão desligada ⇒ rc 0 e a ANOTAÇÃO-marca que o merge-verified lê" _p_g_off \
+    'MARKER="onion-review-desligado:"' 'MARKER="desligado-sem-marca:"' \
+    --verdict-gate --mode-result success --run false --mode off --reason "padrão" --review-result skipped
+  _rmcase "(p) veredito sem decisão (job do modo falhou) ⇒ vermelho nomeado, nunca verde" _p_g_nomode \
+    'if [ "${mres}" != "success" ]; then' 'if false; then' \
+    --verdict-gate --mode-result failure --run false --mode "" --reason "" --review-result skipped
+  _rmcase "(q) mandou revisar e o revisor foi PULADO ⇒ vermelho (não é desligamento)" _p_g_skip \
+    'if [ "${rres}" = "skipped" ]; then' 'if false; then' \
+    --verdict-gate --mode-result success --run true --mode on --reason "on" --review-result skipped
+  _rmcase "(r) mandou revisar e o revisor rodou ⇒ rc 10 (segue o veredito de sempre)" _p_g_go \
+    'return 10 ;;' 'return 0 ;;' \
+    --verdict-gate --mode-result success --run true --mode on --reason "on" --review-result success
+
+  # ── a FIAÇÃO no workflow (o YAML não tem selftest; aqui se lê a forma que o interruptor exige) ──
+  local wf="${REPO_ROOT}/.github/workflows/onion-review.yml"
+  if [ ! -f "${wf}" ] || ! command -v python3 >/dev/null 2>&1; then record_skip "review-mode: (s) onion-review.yml ou python3 ausente"; else
+    _wire() { WF="$1" python3 -I - <<'PYW' 2>&1
+import os, yaml
+d = yaml.safe_load(open(os.environ["WF"], encoding="utf-8"))
+on = d.get(True) or d.get("on") or {}
+types = (on.get("pull_request") or {}).get("types") or []
+j = d.get("jobs") or {}
+err = []
+if not {"labeled", "unlabeled"} <= set(types): err.append("types sem labeled/unlabeled")
+m = j.get("onion-review-mode") or {}
+runs = " ".join(str(s.get("run", "")) for s in m.get("steps", []) if isinstance(s, dict))
+envs = " ".join(str(s.get("env", "")) for s in m.get("steps", []) if isinstance(s, dict))
+if "review-mode-decide.sh" not in runs: err.append("job onion-review-mode não chama o juiz")
+if "vars.ONION_REVIEW_MODE" not in envs: err.append("ONION_REVIEW_MODE não entra por env")
+rv = j.get("onion-review") or {}
+if "needs.onion-review-mode.outputs.run == 'true'" not in str(rv.get("if", "")): err.append("onion-review não é gated por run=true")
+v = j.get("onion-review-verdict") or {}
+if "onion-review-mode" not in (v.get("needs") or []): err.append("verdict não depende do job do modo")
+vr = " ".join(str(s.get("run", "")) for s in v.get("steps", []) if isinstance(s, dict))
+if "--verdict-gate" not in vr: err.append("verdict não passa pelo --verdict-gate")
+print("OK" if not err else "; ".join(err))
+PYW
+    }
+    _o="$(_wire "${wf}")"
+    if [ "${_o}" = "OK" ]; then
+      sed 's/types: \[opened, synchronize, labeled, unlabeled\]/types: [opened, synchronize]/' "${wf}" > "${d}/wf-mut.yml"
+      if cmp -s "${wf}" "${d}/wf-mut.yml"; then record_fail "review-mode: (s) fiação — MUTANTE" "a âncora dos types não casou"
+      elif [ "$(_wire "${d}/wf-mut.yml")" = "OK" ]; then record_fail "review-mode: (s) fiação — MUTANTE SOBREVIVEU" "workflow sem labeled/unlabeled passou"
+      else record_pass "review-mode: (s) fiação do workflow (labeled/unlabeled, job do modo, gate do revisor, --verdict-gate) (e o mutante reprova)"; fi
+    else record_fail "review-mode: (s) fiação do workflow" "${_o}"; fi
+    unset -f _wire
+  fi
+  unset -f _rd _rmcase _p_run _p_norun _p_enum _p_g_off _p_g_nomode _p_g_skip _p_g_go
+}
+
+# ---------------------------------------------------------------------------
 # A FORJA DE GUARDAS — o procedimento MAIS REPETIDO desta casa (medido 2026-10-02:
 # 206 familias de bancada, 14 guardas com --selftest proprio) e o unico que estava
 # SEM SUPERFICIE. Esta familia exercita as pecas que podem ser exercitadas: o
@@ -14020,6 +14156,13 @@ case "$args" in
       for a in "$@"; do [ "$prev" = "--body" ] && body="$a"; prev="$a"; done
       printf '%s' "$body" > "${STUB_COMMENT}"
       exit "${GH_COMMENT_RC:-0}" ;;
+  # interruptor do revisor (D_REVIEW_MODE_SWITCH_PADRAO_OFF): o histórico do veredito no head
+  # (`id<TAB>conclusão`, mais recente primeiro) e as anotações de cada check-run, por arquivo
+  *"check_name=onion-review-verdict"*)
+      [ -n "${GH_RV_RUNS:-}" ] && printf '%b' "${GH_RV_RUNS}"; exit "${GH_RV_RC:-0}" ;;
+  *"api "*"check-runs/"*"/annotations"*)
+      _cid="${args#*check-runs/}"; _cid="${_cid%%/annotations*}"
+      [ -f "${STUB_ANN_DIR:-/nonexistent}/${_cid}" ] && cat "${STUB_ANN_DIR}/${_cid}"; exit 0 ;;
   *"api "*check-runs*)
       [ -n "${GH_RUNS_EMPTY:-}" ] && exit 0
       if [ -n "${GH_CHECKS_API_500:-}" ]; then
@@ -14465,7 +14608,65 @@ PFSTUB
   # (kg-g) fail-closed: toca .kg.yaml e o head não existe localmente ⇒ não classifica, não mergeia
   _kcase "(kg-g) .kg.yaml no PR e head ilegível ⇒ para (fail-closed)" _kg "${_m0}" -- nao-existe "${KG}" "" "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
 
-  unset -f _mv _mvd _mvm _mva _mvk _kbr _kcase _ka _kb _kb2 _kc _kd _ke _kf _kg
+  # ── (rv-*) O INTERRUPTOR DO REVISOR (D_REVIEW_MODE_SWITCH_PADRAO_OFF, 2026-10-13) ─────────────
+  # Revisão DESLIGADA sai verde no check, e o SUT tem de dizê-la "não medida" SEM pedir dispensa nem
+  # comentar; revisão que RODOU e reprovou continua exigindo dispensa; e desligar DEPOIS de um achado
+  # no mesmo head não o apaga. Cada caso roda contra o SUT real E contra um mutante que tem de reprovar.
+  mkdir -p "${d}/ann" "${d}/rvm/ops/review"
+  cp "${REPO_ROOT}/ops/review/review-mode-decide.sh" "${d}/rvm/ops/review/" 2>/dev/null || true
+  printf '%s\n' "onion-review-desligado: revisão desligada (modo off, motivo: variável ausente ou vazia ⇒ padrão off)" > "${d}/ann/200"
+  printf '%s\n' "onion-review apontou 2 violação(ões) — corrija, ou dispense com motivo registrado" > "${d}/ann/150"
+  _mvr() { # $1=script $2=GH_RV_RUNS $3=verdict_fail(0|1) $4=rv_rc ; resto = flags do SUT
+    local s="$1" rv="$2" vf="$3" rr="$4"; shift 4
+    echo 0 > "${d}/n"; : > "${d}/comment"
+    local _vfe=(); [ "${vf}" = 1 ] && _vfe=(GH_VERDICT_FAIL=1)
+    _mv_out="$(env PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_COMMENT="${d}/comment" STUB_ANN_DIR="${d}/ann" \
+               GH_RV_RUNS="${rv}" GH_RV_RC="${rr}" "${_vfe[@]}" \
+               GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_MERGE_RC=0 GH_MERGE_OUT=merged \
+               bash "${s}" 999 "$@" 2>&1)"
+    _mv_rc=$?
+  }
+  _rvmut() { # $1=nome $2=âncora literal $3=substituição → caminho do mutante (vazio se a âncora não casou)
+    local m="${d}/rvm/ops/pr-merge-verified-$1.sh"
+    A="$2" B="$3" awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${sut}" > "${m}"
+    cmp -s "${sut}" "${m}" && { echo ""; return; }
+    mv "${m}" "${d}/rvm/ops/pr-merge-verified.sh.$1" && printf '%s' "${d}/rvm/ops/pr-merge-verified.sh.$1"
+  }
+  _rvcase() { # $1=rótulo $2=predicado $3=âncora do mutante $4=substituição $5=GH_RV_RUNS $6=vf $7=rv_rc ; resto = flags
+    local lbl="$1" pred="$2" anc="$3" sub="$4" rv="$5" vf="$6" rr="$7"; shift 7
+    _mvr "${sut}" "${rv}" "${vf}" "${rr}" "$@"
+    if ! "${pred}"; then record_fail "pr-merge-verified: ${lbl}" "rc=${_mv_rc} corpo=[$(cat "${d}/comment")] out=$(tail -5 <<< "${_mv_out}")"; return; fi
+    local mf; mf="$(_rvmut "$(printf '%s' "${lbl}" | tr -cd 'a-z0-9')" "${anc}" "${sub}")"
+    if [ -z "${mf}" ]; then record_fail "pr-merge-verified: ${lbl} — MUTANTE" "a âncora do mutante não casou no SUT (mutante que não muta declara verde sem medir)"; return; fi
+    # o mutante roda AO LADO de uma cópia do juiz (ops/review/), como o SUT real em ops/
+    cp "${mf}" "${d}/rvm/ops/pr-merge-verified.sh"
+    _mvr "${d}/rvm/ops/pr-merge-verified.sh" "${rv}" "${vf}" "${rr}" "$@"
+    if "${pred}"; then record_fail "pr-merge-verified: ${lbl} — MUTANTE SOBREVIVEU" "o caso não distingue o SUT do mutante (${anc} → ${sub})"; return; fi
+    record_pass "pr-merge-verified: ${lbl} (e o mutante reprova)"
+  }
+  M="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  _p_off() { [ "${_mv_rc}" -eq 0 ] && grep -qF "revisão DESLIGADA, não por aprovação" <<< "${_mv_out}" && [ ! -s "${d}/comment" ]; }
+  _p_prior() { [ "${_mv_rc}" -ne 0 ] && grep -qF "Desligar depois não apaga o achado" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; }
+  _p_prior_disp() { [ "${_mv_rc}" -eq 0 ] && grep -qF "desligar não o apagou" "${d}/comment"; }
+  _p_fail() { [ "${_mv_rc}" -ne 0 ] && grep -qF "concluiu em falha e NÃO foi dispensado: onion-review-verdict" <<< "${_mv_out}"; }
+  _p_hist() { [ "${_mv_rc}" -ne 0 ] && grep -qF "LER o histórico do onion-review-verdict" <<< "${_mv_out}"; }
+  _rvcase "(rv-a) revisão DESLIGADA ⇒ mergeia sem dispensa e sem comentar, dita como não medida" _p_off \
+    '_REVIEW_OFF="$(LC_ALL=C grep -m1 -F -- "${_rm_marker}"' '_REVIEW_OFF="$(LC_ALL=C grep -m1 -F -- "MARCA-QUE-NAO-EXISTE"' \
+    '200\tsuccess\n' 0 0
+  _rvcase "(rv-b) desligada por cima de um achado NO MESMO head ⇒ recusa (desligar não apaga)" _p_prior \
+    '_REVIEW_PRIOR_REPROVOU="${_rv_id}"; break;' ':;' \
+    '200\tsuccess\n150\tfailure\n' 0 0
+  _rvcase "(rv-c) o mesmo com --dispensa nomeada ⇒ mergeia e o registro diz que o achado existiu" _p_prior_disp \
+    'head_runs="${head_runs}"$'"'"'\n'"'"'"onion-review-verdict"' 'head_runs="${head_runs}"; : "onion-review-verdict"' \
+    '200\tsuccess\n150\tfailure\n' 0 0 --dispensa onion-review-verdict --motivo "o achado é falso-positivo do revisor"
+  _rvcase "(rv-d) revisão que RODOU e reprovou ⇒ ainda exige dispensa (comportamento de antes)" _p_fail \
+    '$3=="failure"||' '' \
+    '300\tfailure\n' 1 0
+  _rvcase "(rv-e) histórico do veredito ilegível ⇒ recusa nomeada (fail-closed)" _p_hist \
+    '|| die "não consegui LER o histórico' '|| echo "não li o histórico' \
+    '' 0 1
+
+  unset -f _mv _mvd _mvm _mva _mvk _kbr _kcase _ka _kb _kb2 _kc _kd _ke _kf _kg _mvr _rvmut _rvcase _p_off _p_prior _p_prior_disp _p_fail _p_hist
 }
 
 # ═══ ops/merge-serial.sh + o rastro do auto-rebase no ops/pr-merge-verified.sh (passo C de D_MERGE_PROCESS_ONION_2026_10) ═══
@@ -18427,6 +18628,7 @@ _family run_kg_radar_integrity_selftests
 _family run_kg_proposal_mode_selftests
 _family run_kg_census_parity_selftests
 _family run_review_verdict_selftests
+_family run_review_mode_selftests
 _family run_empty_result_guard_selftests
 _family run_review_artifact_selftests
 

@@ -14,7 +14,13 @@ name: Onion Code Review (Claude)
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    # labeled/unlabeled (2026-10-13, D_REVIEW_MODE_SWITCH_PADRAO_OFF): pôr ou tirar a label
+    # `review:ia` tem de refazer a decisão do interruptor. Label ALHEIA também dispara o workflow (o
+    # `on:` não filtra por nome de label), e o run RECALCULA a mesma decisão — ela é função pura de
+    # (modo, labels, diff), e a label alheia não muda nenhum dos três. Pular esse run em vez de
+    # recalcular deixaria um `onion-review-verdict` SKIPPED como o mais recente do head, por cima do
+    # veredito real. Preço declarado: no modo `on` (ou com a label), uma label alheia re-roda a revisão.
+    types: [opened, synchronize, labeled, unlabeled]
 
 # ── CANCELA O RUN SUPERADO ────────────────────────────────────────────────────────────────
 # MEDIDO em 2026-09-17: 397 min de CI num dia, 281 deles (71%) na bancada, e pelo menos 53
@@ -34,7 +40,61 @@ permissions:
   id-token: write   # exigido pela claude-code-action@v1 (token OIDC)
 
 jobs:
+  # ═══ O INTERRUPTOR (decisão do maestro, 2026-10-13 — D_REVIEW_MODE_SWITCH_PADRAO_OFF) ═══
+  # `vars.ONION_REVIEW_MODE` = on (todo PR) | off (nunca — PADRÃO, variável ausente ou vazia) | auto
+  # (só quando a regra de necessidade casa); a label `review:ia` força em qualquer modo. Este job é
+  # LEVE: não chama a API da Anthropic, não lê secret. A regra (inclusive a lista de caminhos do `auto`
+  # e o teto de linhas medido) vive em ops/review/review-mode-decide.sh, que tem bancada — o YAML só
+  # encadeia. Valor fora do enum ⇒ este job FALHA nomeado, e o veredito também (nunca silêncio).
+  onion-review-mode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: ${{ github.event.pull_request.head.repo.fork == false }}
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+      mode: ${{ steps.decide.outputs.mode }}
+      reason: ${{ steps.decide.outputs.reason }}
+    steps:
+      - name: Checkout (a regra do auto lê o diff base...head)
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      # Modo, labels e shas entram por ENV, nunca interpolados no script: nome de label é texto de
+      # quem tem permissão de triagem, e o valor da variável é texto livre.
+      - name: Decidir se este PR é revisado (modo + label + regra do auto)
+        id: decide
+        env:
+          MODE: ${{ vars.ONION_REVIEW_MODE }}
+          LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -uo pipefail
+          # O JUIZ VEM DA BASE, não do PR: um PR que reescrevesse o próprio script para dizer
+          # run=false se desligaria sozinho. Só no bootstrap (a base ainda não tem o script — o PR
+          # que o cria) usa-se o do head, e isso é DITO no log, não escondido.
+          juiz="${RUNNER_TEMP}/review-mode-decide.sh"
+          if git show "${BASE_SHA}:ops/review/review-mode-decide.sh" > "${juiz}" 2>/dev/null; then
+            echo "juiz: ops/review/review-mode-decide.sh da BASE ${BASE_SHA:0:8}"
+          else
+            cp ops/review/review-mode-decide.sh "${juiz}"
+            echo "::warning::bootstrap: a base ${BASE_SHA:0:8} não tem ops/review/review-mode-decide.sh — o juiz deste run é o do PR (só o PR que cria o interruptor passa por aqui)."
+          fi
+          rc=0
+          bash "${juiz}" --mode "${MODE}" --labels-json "${LABELS_JSON}" \
+            --range "${BASE_SHA}...${HEAD_SHA}" > decisao.out || rc=$?
+          if [ "${rc}" -ne 0 ]; then
+            echo "::error title=ONION_REVIEW_MODE::a decisão do revisor falhou (rc=${rc}) — veja a linha 'review-mode-decide:' acima (valor fora de on|off|auto? vazio = off)."
+            { echo "## ❌ Interruptor do revisor sem decisão"; echo; echo "\`review-mode-decide.sh\` saiu rc=${rc}. Confira \`vars.ONION_REVIEW_MODE\` (on|off|auto; vazio = off)."; } >> "${GITHUB_STEP_SUMMARY}"
+            exit 1
+          fi
+          cat decisao.out
+          grep -E '^(run|mode|reason)=' decisao.out >> "${GITHUB_OUTPUT}"
+          { echo "### Interruptor do revisor de IA"; echo; sed 's/^/- /' decisao.out; } >> "${GITHUB_STEP_SUMMARY}"
+
   onion-review:
+    needs: onion-review-mode
     runs-on: ubuntu-latest
     # ⚠️ 15 → 26, e a razão e MEDIDA (PR #871, 2026-09-24): o teto era do JOB e cobria AS DUAS
     # tentativas. A 1a consumiu ~14 min, o retry recebeu 55 SEGUNDOS e foi cancelado — retry sem
@@ -44,8 +104,9 @@ jobs:
     # Agora cada tentativa tem teto PROPRIO (11 min, abaixo) e o job tem folga para os passos de
     # veredito e para o soft-pass rodarem de fato. Classe: guarda que declara caminho que nao existe.
     timeout-minutes: 26
-    # Forks não têm acesso a secrets — pular para evitar check falho.
-    if: ${{ github.event.pull_request.head.repo.fork == false }}
+    # Forks não têm acesso a secrets — pular para evitar check falho. E só roda quando o interruptor
+    # mandou (run=true); desligado, este job é PULADO e não posta comentário nenhum no PR.
+    if: ${{ github.event.pull_request.head.repo.fork == false && needs.onion-review-mode.outputs.run == 'true' }}
     env:
       HAS_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
       # SSOT do modelo do revisor. Estava escrito TRÊS vezes depois desta cura (as duas chamadas
@@ -750,7 +811,7 @@ jobs:
   # ═══════════════════════════════════════════════════════════════════════════════════
   onion-review-verdict:
     runs-on: ubuntu-latest
-    needs: onion-review
+    needs: [onion-review-mode, onion-review]
     # `!cancelled()` e NÃO `always()`: com always(), cancelar a run NÃO cancela este job — o
     # GitHub re-avalia o `if` e always() dá true. Um `gh run cancel` humano virava
     # "❌ NÃO foi revisado semanticamente" no PR: cancelamento deliberado transformado em
@@ -778,7 +839,33 @@ jobs:
         with:
           fetch-depth: 1
 
+      # ═══ O INTERRUPTOR ANTES DO VEREDITO (2026-10-13, D_REVIEW_MODE_SWITCH_PADRAO_OFF) ═══
+      # Desligado (run=false) ⇒ o check sai VERDE com a anotação-marca `onion-review-desligado:`
+      # (é por ela que o ops/pr-merge-verified.sh distingue desligamento de aprovação — anotação de
+      # `::notice::` vira anotação do check-run, MEDIDO no PR #887). Verde e não `skipped`: o
+      # merge-verified lê SKIPPED como "o revisor NÃO aprovou" e pediria dispensa a todo PR.
+      # Sem decisão (job do modo falhou) ⇒ VERMELHO nomeado. Mandou revisar ⇒ segue o veredito normal.
+      - name: O interruptor mandou revisar?
+        id: modo
+        env:
+          MODE_RESULT: ${{ needs.onion-review-mode.result }}
+          RUN: ${{ needs.onion-review-mode.outputs.run }}
+          MODE: ${{ needs.onion-review-mode.outputs.mode }}
+          REASON: ${{ needs.onion-review-mode.outputs.reason }}
+          REVIEW_RESULT: ${{ needs.onion-review.result }}
+        run: |
+          rc=0
+          bash ops/review/review-mode-decide.sh --verdict-gate --mode-result "${MODE_RESULT}" \
+            --run "${RUN}" --mode "${MODE}" --reason "${REASON}" --review-result "${REVIEW_RESULT}" \
+            --summary-file "${GITHUB_STEP_SUMMARY}" || rc=$?
+          case "${rc}" in
+            0)  echo "segue=false" >> "${GITHUB_OUTPUT}" ;;
+            10) echo "segue=true" >> "${GITHUB_OUTPUT}" ;;
+            *)  exit 1 ;;
+          esac
+
       - name: O PR foi revisado semanticamente?
+        if: ${{ steps.modo.outputs.segue == 'true' }}
         env:
           REVISOU: ${{ needs.onion-review.outputs.revisou }}
           ACHADOS: ${{ needs.onion-review.outputs.achados }}
