@@ -79,8 +79,10 @@ Família `machine_slots`, sob `LC_ALL=C`: 9 de 9 verdes, também com a máquina 
 | M9 o diretório gravável por outros é aceito | (d2) |
 | M10 o diretório apagado no meio não é recriado | (d3) |
 
-Também rodei a faixa local do próprio diff, como o pre-commit vai rodar. Foram 17 famílias em 8 workers, verde depois
-das curas 4 e 5 abaixo (selftest_selection, harness_inventory, selftest_lanes, two_tier_bench e machine_slots: 72/0).
+Também rodei a faixa local do diff de código (`lint-selftest.sh`, `.githooks/pre-commit`, `ops/pr-finalize.sh`), como
+o pre-commit a roda: 17 famílias em 8 workers, 177 passaram e 0 falharam, em 945 s com a máquina na carga 21. Antes
+das curas 4 e 5 abaixo, essa mesma faixa reprovava 5 casos. O commit saiu como checkpoint declarado (`--no-verify`):
+a faixa rodou à parte, e o lint do commit é do pr-finalize.
 
 ## Passada adversarial (o default é reprovar)
 
