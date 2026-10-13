@@ -72,7 +72,7 @@ existindo). Pelo histórico das releases:
 | **Z**, patch | Correção ou melhoria do kit, do guia ou dos casos, com o mesmo contrato |
 
 O gate guarda o sha256 dos dois schemas como a identidade do contrato. Uma tag que muda os bytes dos schemas,
-mesmo que só no texto das descrições (como a 4.7.2), pede `kg_gate.py --update` no PR que traz a tag, e o gate mostra
+mesmo que só no texto das descrições (a 4.7.2) ou no `$id` (a 4.7.3), pede `kg_gate.py --update` no PR que traz a tag, e o gate mostra
 que nenhum veredito mudou.
 
 Um aviso SHOULD novo pode subir a dívida medida pelo gate. Isso é intencional: a rampa de um contrato é alertar
