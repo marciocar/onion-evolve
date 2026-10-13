@@ -8,7 +8,11 @@ meta:
                                # planos gratuitos de Mergify e Trunk e o estado do funador/claude-code-merge-queue.
                                # A metade doutrina (ímã, escritor único, catracas) é de 12m, mas o gatilho da Opção 3
                                # já disparou: a revisita real é o selo do maestro, não a data.
-  # ═══ TETO: 68 NÓS ═══
+  # ═══ TETO: 70 NÓS ═══
+  # (2026-10-13, +2: o SELO do maestro D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL — vagas de CPU da
+  #  máquina para a bancada e nada de bancada completa local, a completa é do CI — e a EVIDÊNCIA da execução,
+  #  E_SEMAFORO_DA_MAQUINA_MEDIDO_2026_10_13, com a medição antes/depois. Complemento do passo D, não onda
+  #  nova de pesquisa; o teto sobe DECLARADO.)
   # (2026-10-13, +2 nós de SELO do maestro por /meta:decide sobre o que o passo D deixou para ele:
   #  D_RULESET_BYPASS_SO_EM_PR e D_ACTIONS_ABRE_PR_DE_REVERT. Respostas, não pesquisa; o teto sobe DECLARADO.)
   # (2026-10-13, passo D: +1 nó de EVIDÊNCIA da execução, E_PASSO_D_EXECUTADO_2026_10_13, que carrega a
@@ -1173,6 +1177,41 @@ nodes:
       locator: "pergunta com opções de 2026-10-13: «Quando a bancada completa reprova no main, o alarme empurra revert/<sha>, mas o token do Actions não pode abrir PR. Ligar 'Allow GitHub Actions to create and approve pull requests'?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
       locality: "pessoa"
+  - id: D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "decisão do maestro em 2026-10-13, por pergunta com opções (/meta:decide): escolhida «Itens 1 e 2, sem o nice; até 5 agentes de execução simultâneos, pesquisa e orquestração fora da conta»"
+    label: "Bancada com VAGAS DA MÁQUINA (semáforo flock do usuário, N = nproc) e sem bancada completa local: o pre-commit e o pr-finalize rodam a faixa local estreita e declarada; a completa é do CI (PR que toca a infra ou com ci:full, e o push ao main)."
+    narrative: "Selado por /meta:decide em 2026-10-13: escolhida «Itens 1 e 2, sem o nice; até 5 agentes de execução simultâneos, pesquisa e orquestração fora da conta» (resposta livre do maestro, fora das opções oferecidas); descartadas: «nice/prioridade baixa para a bancada (item 3)»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-13: «Quais melhoras de CPU da VPS aplicar?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      locality: "pessoa"
+  - id: E_SEMAFORO_DA_MAQUINA_MEDIDO_2026_10_13
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-13"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families machine_slots → 9 casos verdes; 12 mutantes por ops/mutate-and-restore.sh, 12 reprovaram o caso esperado; duas bancadas de 27 famílias em paralelo, antes (bancada da origin/main) e depois"
+    source_tier: 10
+    source_kind: primary
+    label: "Executado e medido: semáforo de vagas da máquina e faixa local na bancada. Com a máquina já saturada por outros agentes, duas bancadas paralelas: carga 1 min média 29,8→25,7, pico 36→28; parede 272 s→307/350 s (a fila agora é declarada)."
+    narrative: "Casos da família machine_slots, todos com cópia da bancada e diretório de vagas próprio: (a) duas bancadas × 3 workers com N=2 ⇒ pico de 2 famílias simultâneas, medido por arquivos de marca; (b) kill -9 no worker que segura a vaga, com um neto órfão vivo ⇒ a próxima bancada pega a vaga na hora; (c) ONION_SELFTEST_MACHINE_SLOTS=1 ⇒ pico 1; valor inválido ⇒ aviso e nproc; (d) a espera é dita na hora (⏳) e somada no sumário, e o teto estourado é FALHA nomeada; (d2) bancada aninhada herda a vaga do pai, diretório gravável por outros ⇒ semáforo desligado e declarado; (d3) diretório de vagas apagado no meio ⇒ recriado; (e) diff na infra da bancada (workflow, hook, ops/testing, arquivo não mapeado, cabeçalho da bancada staged) ⇒ faixa local, nunca a completa, e sem --local o seletor segue comprando tudo (o nível PR do CI não muda); (f) ONION_SELFTEST_FULL=1 e --full devolvem a completa; (g) o pré-voo do pr-finalize roda as famílias alteradas, e ONION_SELFTEST_FULL=1 a completa. MEDIÇÃO (2026-10-13, 8 vCPUs, carga de outros agentes no início: 15,8 antes e 22,5 depois, pressão de CPU some avg10 de 57 a 62%): duas bancadas das MESMAS 27 famílias (6 a 25 s cada no runner) com --jobs auto em paralelo. Antes, a bancada da origin/main, sem semáforo, 16 famílias simultâneas: parede 272 s e 271 s, carga 1 min média 29,8 e pico 36,1, pressão avg10 média 91,3% e pico 96,9%, 1 falha sob carga (pre-push, ponto de teste) numa delas. Depois, as 8 vagas da máquina: parede 307 s e 350 s, carga média 25,7 e pico 28,3, pressão média 87,4% e pico 94,0%, 0 falhas, espera declarada de 924 s e 1009 s somados entre os workers. LEITURA: o semáforo tira da máquina a sobreposição das bancadas (carga -4 em média, -8 no pico) e troca por fila declarada; a parede de cada bancada sobe porque as duas dividem 8 vagas em vez de pôr 16 processos em 8 núcleos. A medição NÃO isola o ganho, porque os outros agentes rodavam código da main, sem semáforo, e a carga deles mudou entre as rodadas. O ganho maior da decisão é o item 2 (sem completa local), que esta medição não exercita."
+    trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh (família machine_slots e as vagas da máquina) + .githooks/pre-commit + ops/pr-finalize.sh, na branch feat/bench-machine-cpu-semaphore"
+      locator: "run_machine_slots_selftests, casos (a) a (g); mutantes M1-M10 no resíduo docs/evolution/review/feat-bench-machine-cpu-semaphore.md"
+      method: "medição: família machine_slots sob LC_ALL=C, mutantes por ops/mutate-and-restore.sh e duas bancadas paralelas antes/depois com carga e pressão amostradas a cada 2 s, 2026-10-13"
+      locality: "repo"
 edges:
   - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
     to: C_OPCAO_A_CURE_MAGNET_FILE
@@ -1450,3 +1489,9 @@ edges:
   - from: D_ACTIONS_ABRE_PR_DE_REVERT
     to: E_PASSO_D_EXECUTADO_2026_10_13
     edge_type: TRACES_TO
+  - from: D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: TRACES_TO
+  - from: E_SEMAFORO_DA_MAQUINA_MEDIDO_2026_10_13
+    to: D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL
+    edge_type: SUPPORTS

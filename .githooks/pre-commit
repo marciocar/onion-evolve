@@ -283,10 +283,22 @@ _bench_touched() {
 # pre-commit inteiro calado. O resto do pre-commit (lint, projeções) segue rodando.
 if [ -f "${SELFTEST}" ] && [ "${ONION_PRECOMMIT_CHECKPOINT:-0}" = "1" ] && _bench_touched; then
   echo "🧪 Onion pre-commit — CHECKPOINT declarado: seleção da bancada (não roda):"
-  bash "${SELFTEST}" --affected-staged --checkpoint || true
+  bash "${SELFTEST}" --affected-staged --local --checkpoint || true
 elif [ -f "${SELFTEST}" ] && _bench_touched; then
-  echo "🧪 Onion pre-commit — mudança no domínio da bancada → self-test das guardas AFETADAS (paralelo)…"
-  if ! bash "${SELFTEST}" --affected-staged --jobs auto; then
+  # FAIXA LOCAL (D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL, 2026-10-13): NADA de bancada completa no
+  # pre-commit, nem quando o diff toca a infra da bancada (lint, workflows, ops/testing, a própria bancada) —
+  # aí o failsafe "tudo" vira a faixa estreita declarada (quem cita os arquivos tocados + núcleo local). A
+  # completa é do CI: o nível PR a manda quando a infra é tocada (ou com a label ci:full) e o push ao main a
+  # roda sempre. Medido no dia da decisão: cinco agentes rodando a completa em 8 vCPUs levaram uma bancada
+  # de ~8 min a 34+ e o runner matou dois pre-commits aos 50 e 80 min. Completa local = opt-in explícito:
+  # `ONION_SELFTEST_FULL=1 git commit …`. E o `--jobs auto` respeita as VAGAS DA MÁQUINA (semáforo do
+  # usuário, nproc vagas para todas as bancadas juntas); espera por vaga sai no sumário.
+  if [ "${ONION_SELFTEST_FULL:-0}" = "1" ]; then
+    echo "🧪 Onion pre-commit — ONION_SELFTEST_FULL=1: bancada COMPLETA local pedida (opt-in)…"
+  else
+    echo "🧪 Onion pre-commit — mudança no domínio da bancada → self-test das guardas AFETADAS (faixa local; a completa é do CI)…"
+  fi
+  if ! bash "${SELFTEST}" --affected-staged --local --jobs auto; then
     echo ""
     echo "❌ Commit bloqueado: self-test das guardas falhou acima. Corrija ou use 'git commit --no-verify' para pular."
     exit 1

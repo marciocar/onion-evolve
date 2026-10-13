@@ -49,6 +49,11 @@
 #     recarimbo só acontece se esse hash não mudou. Resíduo novo (`reviewed_diff_sha256: pendente`) é a
 #     declaração de quem revisou: carimba os dois. Código mudado depois da revisão = recusa, "re-revise".
 #   · --push envia a branch atual; nunca a main (o veto de push protege, e este script recusa antes).
+#   · NUNCA RODA A BANCADA COMPLETA (D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL, 2026-10-13): a bancada
+#     só roda em dois pontos, e os dois são estreitos. (1) O hook do commit de conteúdo: o pre-commit roda a
+#     faixa local (`--affected-staged --local`), e o diff na infra da bancada NÃO compra mais a completa. (2) O
+#     pré-voo sob checkpoint: as famílias alteradas. A completa é do CI. Opt-in local: ONION_SELFTEST_FULL=1, que
+#     vale para os dois pontos (o pré-voo a traduz, porque o `env -i` a apagaria).
 set -uo pipefail
 
 die() { echo "PR-FINALIZE: $*" >&2; exit 1; }
@@ -274,9 +279,17 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
 if [ "${ONION_FINALIZE_CHECKPOINT:-0}" = 1 ] && [ "${ONION_FINALIZE_SKIP_PREFLIGHT:-0}" != 1 ] && [ -f ops/testing/preflight-families.sh ]; then
   _pf_fams="$(bash ops/testing/preflight-families.sh)" || die "pré-voo: não descobri as famílias alteradas"
   _pf_home="$(mktemp -d)"; printf '[user]\n\tuseConfigOnly = true\n' > "${_pf_home}/.gitconfig"
-  echo "PR-FINALIZE: pré-voo no ambiente do runner — famílias: ${_pf_fams}"
+  # NADA de bancada completa local (D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL, 2026-10-13): o pré-voo
+  # roda as famílias alteradas, nunca a completa — mesmo com o diff na infra da bancada; a completa é do CI.
+  # Opt-in explícito: ONION_SELFTEST_FULL=1 (o `env -i` abaixo a apagaria; por isso é traduzida aqui).
+  _pf_sel=(--families "${_pf_fams}")
+  if [ "${ONION_SELFTEST_FULL:-0}" = 1 ]; then
+    _pf_sel=(); echo "PR-FINALIZE: pré-voo COMPLETO pedido (ONION_SELFTEST_FULL=1, opt-in) — todas as famílias"
+  else
+    echo "PR-FINALIZE: pré-voo no ambiente do runner — famílias: ${_pf_fams} (a completa é do CI; ONION_SELFTEST_FULL=1 a pede aqui)"
+  fi
   _pf_out="$(env -i PATH="${PATH}" HOME="${_pf_home}" GIT_CONFIG_NOSYSTEM=1 LC_ALL=C TERM=dumb \
-    bash .claude/validation/lint-selftest.sh --families "${_pf_fams}" 2>&1)"; _pf_rc=$?
+    bash .claude/validation/lint-selftest.sh ${_pf_sel[@]+"${_pf_sel[@]}"} 2>&1)"; _pf_rc=$?
   rm -rf "${_pf_home}"
   if [ "${_pf_rc}" != 0 ] || grep -q 'ABORTOU' <<< "${_pf_out}"; then
     grep -E '  ✗ |ABORTOU' <<< "${_pf_out}" | head -12 >&2
