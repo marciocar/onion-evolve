@@ -510,10 +510,13 @@ def form_codes(error):
 
 
 # Onde o parser em C (libyaml) e o puro divergem, medido pela revisão de 2026-10-13 em 63 entradas estranhas: tab
-# como separador ou no fim da linha, a diretiva %YAML, escape \u ou \U (surrogate), BOM fora do início e aninhamento
+# como separador ou no fim da linha, a diretiva %YAML, escape de surrogate, BOM fora do início e aninhamento
 # muito profundo. O puro é a referência do perfil; o C é só um atalho, usado quando o texto não tem nenhuma dessas
 # construções. Qual dos dois o YAML 1.2 manda para o tab é decisão de contrato, ainda não tomada.
-RISKY = re.compile(r"\t|%YAML|\\[uU]|.\ufeff", re.S)
+# O escape \u só diverge na faixa dos surrogates (D800 a DFFF): medido em 2026-10-13 nos 65.536 valores, em 6 contextos
+# de aspas duplas. O \ufeff de texto extraído de PDF caía no puro e custava ao SGE mais que o dobro do tempo. O \U
+# segue arriscado inteiro (é raro, e acima de 10FFFF os dois erram por motivos diferentes).
+RISKY = re.compile(r"\t|%YAML|\\u[dD][89a-fA-F]|\\U|.\ufeff", re.S)
 SAFE_DEPTH = 200
 MAX_DEPTH = 1000  # coleções abertas de uma vez: acima disto o parser estoura a pilha (segfault medido)
 _DEEP_HINT = re.compile(r"(?m)^[ \t]*(?:[-?][ \t]+){2,}|^ {%d,}" % (MAX_DEPTH // 2))
@@ -527,8 +530,9 @@ def _too_deep(text):
     do servidor MCP: 30.000 níveis de [ ou de - derrubavam o processo com segfault."""
     if text.count("[") + text.count("{") <= MAX_DEPTH and not _DEEP_HINT.search(_YAML_BREAK.sub("\n", text)):
         return False
-    # com os DOIS parsers quando eles podem divergir (um tab, um BOM no meio, um escape \u, ou a libyaml que erra antes
-    # do fim): um recusa cedo e o outro segue até o fundo, e quem compõe depois (yaml_lines) pode ser qualquer um.
+    # com os DOIS parsers quando eles podem divergir (um tab, um BOM no meio, um escape de surrogate ou \U, ou a
+    # libyaml que erra antes do fim): um recusa cedo e o outro segue até o fundo, e quem compõe depois (yaml_lines)
+    # pode ser qualquer um.
     # No caso comum, a libyaml lê tudo sem erro e basta: o puro custaria 3 a 4 vezes mais (medido na revisão).
     fast = getattr(yaml, "CSafeLoader", None)
     loaders = ([fast] if fast is not None else []) + [yaml.SafeLoader]
