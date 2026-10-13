@@ -37,6 +37,7 @@ O resultado é um arquivo que uma máquina consegue julgar no CI, como julga có
 | O leitor de referência | `kg_validate.py`, em Python 3 com PyYAML e jsonschema, sem outra dependência |
 | O kit de adoção | `kg_vendor.py`, que traz uma release por tag, e `kg_gate.py`, a catraca por grafo no CI |
 | O armazém com gate | `kg_store.py`, que grava grafos em disco, num repo git ou num armazém versionado, só depois do PASS do contrato |
+| O servidor MCP de referência | `kg_mcp.py`, que dá a um modelo o contrato e o armazém por MCP, por stdio ou HTTP local |
 | O exportador PROV-O | `kg_prov_export.py`, que leva a proveniência de cada nó para o ecossistema W3C PROV, em JSON-LD |
 
 ## Para quem
