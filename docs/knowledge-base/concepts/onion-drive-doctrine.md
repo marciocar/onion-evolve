@@ -43,6 +43,23 @@ O driver opera num **degrau declarado**, nunca acima:
   automático que esta doutrina existe para matar.
 - **MOAT** (nunca): deploy · escrever repo alheio (I3) · merge de path vendorizado/outward-facing · **agendar por relógio (W7)**. O driver é **maestro-invocado**, nunca cron/`/loop` sobre si.
 
+  **O que do MOAT é VETO e o que segue PROSA (2026-10-13).** Até 2026-10-13 só o merge no main tinha veto
+  (`pretooluse-merge-gate.sh`). Desde então o hook `pretooluse-moat-gate.sh` (armado só no core) veta **por ALVO**, nunca por
+  vocabulário (`rsync`, `systemctl` e `git commit` são legítimos fora de deploy). Os alvos são dado versionado:
+  `ops/moat-targets.tsv` (core-only) e o `local_path` de `docs/evolution/federation/members.yaml`. A família de
+  bancada `moat_gate` prova cada linha da coluna "veto" com um caso e um mutante executado.
+
+  | item | veto (exit 2, antes de executar) | segue prosa (fronteira declarada) |
+  |---|---|---|
+  | deploy | `systemctl`/`service`/`docker` que muda unidade `onion-vps-*`, `onion-adopt-*` ou `caddy`; escrita (`cp`, `mv`, `install`, `rsync`, `tee`, `ln`, `rm`, `sed -i`, `dd`, `tar -x`, redirecionamento…) em caminho servido; `git checkout/reset/pull…` numa árvore servida; script FORA do projeto (ou não rastreado) que faça isso, lido e julgado | script versionado do projeto (é assim que o wrapper `ops/…` passa); os 3 serviços que servem do checkout principal do core; `docker compose`; ssh; `systemctl daemon-reload` |
+  | repo alheio (I3) | `git push` num clone de membro registrado; `git push` cujo destino é provadamente outro repositório | commit, branch e config LOCAIS num clone de adotante (é o `/meta:adopt --update`); `gh` escrevendo em repo alheio |
+  | relógio (W7) | `crontab` que instala/edita/remove; `at`/`batch`; `systemd-run` com timer; `systemctl` que liga `.timer`; escrita em `/etc/cron*`, `/var/spool/cron` ou num `.timer` | as ferramentas `CronCreate`/`ScheduleWakeup` do Claude Code (o `/loop` é superfície legítima do maestro, e o hook não sabe quem o pediu) |
+  | merge de path vendorizado | o merge no main (merge-gate) | o resto segue PARA em prosa |
+
+  No adotante o hook **se desarma**: sem `ops/moat-targets.tsv` (core-only) não há alvo, e o MOAT do adotante segue
+  prosa. Escape = o maestro roda fora da sessão (`!` no prompt). Não há variável de bypass: escape que o modelo
+  escreve na própria string seria gate textual com outro nome.
+
 Alinhamento SOTA 2026: GAIE (arXiv 2606.22484) = os mesmos 3 tiers; Loop Engineering = *stopping-conditions + verificador determinístico SEPARADO checando o objetivo a cada turno, nunca o auto-relato* (= `kg-realign --check` / `kg-radar`, `declarado≠verificado`).
 
 ## 1. O Censo — `kg-drive-project.sh` (Fase 0, determinístico, PRONTO)
@@ -112,7 +129,7 @@ proposta útil da trivial?").
 | **merge no main** | — | **AUDIT: PARA** (100% humano, em lote) · **AUTOMATE: AUTO** pelo `ops/pr-merge-verified.sh` (core-only), salvo parada dura (§0; decisão de 2026-10-12, aberta só com o SAC-114) |
 | **decisão não-tomada** | frame + Elenxo + propõe | **PARA** (selo humano) |
 | drift tipo-(c) estrutural | novo nó + `SUPERSEDES` datado | **AUTO** (realign repara determinístico) |
-| **MOAT** | — | **NUNCA / PARA** |
+| **MOAT** | — | **NUNCA / PARA** (parte é veto por alvo desde 2026-10-13; a tabela do §0 diz qual) |
 
 **Invariante que amarra:** *o único caminho para um `verified_at` novo passa por uma medição executada*
 (contrato do `/meta:kg-freshness`). O driver **apenda** evidência; quem **flipa** o status de verdade

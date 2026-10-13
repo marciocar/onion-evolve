@@ -194,7 +194,7 @@ SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHA
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -7185,6 +7185,259 @@ run_pretooluse_veto_selftests() {
     else record_fail "pretooluse-veto: (pr-bash) onion_protected_branches ${_pl%%:*}" "esperava '${_pl#*:}', veio '${_got% }'"; fi
   done
   rm -rf "${pr_root}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo moat-gate (2026-10-13) — o MOAT do /meta:drive vira veto POR ALVO (D_MOAT_DEPLOY_E_RELOGIO_VIRAM_
+# MECANISMO, selada em 2026-10-12). Defeito datado: em 2026-10-13 a sessão principal publicou o MCP
+# onion-kg-writer com um script de scratchpad (`sudo systemctl restart onion-vps-mcp-kg-writer` + `git -C
+# <worktree servida> checkout --detach`) e nada barrou. Cada caso é um payload REAL de PreToolUse rodando o
+# hook COMO O CLAUDE CODE O CHAMA (stdin JSON, CLAUDE_PROJECT_DIR, LC_ALL=C); os alvos são os REAIS desta
+# máquina (cópia do ops/moat-targets.tsv — o dado também é o SUT). E CADA caso tem MUTANTE executado: a
+# linha que faz o caso passar é revertida numa cópia do hook+lib, e _prove_mutation exige que o caso caia.
+# ---------------------------------------------------------------------------
+run_moat_gate_selftests() {
+  local src_hooks="${REPO_ROOT}/.claude/hooks"
+  local tsv_real="${REPO_ROOT}/ops/moat-targets.tsv"
+  if [ ! -f "${src_hooks}/pretooluse-moat-gate.sh" ] || [ ! -f "${src_hooks}/lib/moat-judge.py" ] || [ ! -f "${tsv_real}" ]; then
+    record_fail "moat-gate" "SUT ausente (hook, juiz ou ops/moat-targets.tsv)"; return
+  fi
+  if ! command -v python3 >/dev/null 2>&1; then record_skip "moat-gate: python3 ausente → pulado"; return; fi
+  local d; d="$(mktemp -d)"
+  # o PROJETO: origin de rede (push para outro slug se PROVA estrangeiro), alvos reais, wrapper RASTREADO
+  mkdir -p "${d}/proj/ops" "${d}/proj/docs/evolution/federation" "${d}/scratch" "${d}/h" "${d}/sem-tsv"
+  git -C "${d}/proj" init -q -b feat
+  git -C "${d}/proj" remote add origin https://github.com/onion-bancada/core.git
+  cp "${tsv_real}" "${d}/proj/ops/moat-targets.tsv"
+  cp "${REPO_ROOT}/ops/update-kg-writer.sh" "${d}/proj/ops/update-kg-writer.sh"
+  git init -q -b main "${d}/adotante"
+  git -C "${d}/adotante" remote add origin https://github.com/onion-bancada/adotante.git
+  mkdir -p "${d}/adotante/docs/evolution/inbound"
+  cat > "${d}/proj/docs/evolution/federation/members.yaml" <<EOF
+members:
+  - id: core-bancada
+    kind: source
+    local_path: "${d}/proj"
+  - id: adotante-bancada
+    kind: adopter
+    local_path: "${d}/adotante"
+EOF
+  git -C "${d}/proj" add -A
+  git -C "${d}/proj" -c user.email=t@t -c user.name=t commit -q -m base
+  # o mesmo wrapper NÃO rastreado: o rastreio é o que faz dele fronteira
+  cp "${REPO_ROOT}/ops/update-kg-writer.sh" "${d}/proj/ops/update-kg-writer-copia.sh"
+  # repo de adotante SEM ops/moat-targets.tsv (o /meta:adopt copia .claude/, não ops/)
+  git init -q -b main "${d}/sem-tsv"
+  # o CASO DE CAMPO, literal: o script de scratchpad de 2026-10-13 (fora do projeto)
+  cat > "${d}/scratch/update-kg-writer.sh" <<'FIELD'
+#!/usr/bin/env bash
+# Atualiza o onion-kg-writer para o origin/main (pós-#1072). Backup da raiz de dados antes; nunca imprime token.
+set -euo pipefail
+main() {
+  CORE=/home/marcio/onion-evolve
+  CODE=/home/marcio/mcp-kg/core-writer
+  DATA=/var/lib/onion-chat-kg
+  git -C "$CORE" fetch -q origin
+  SHA="$(git -C "$CORE" rev-parse origin/main)"
+  BK="/home/marcio/backups/onion-chat-kg-$(date +%Y%m%d-%H%M%S).tar.gz"
+  install -d -m 0700 /home/marcio/backups
+  sudo tar -C "$(dirname "$DATA")" -czf "$BK" "$(basename "$DATA")"
+  sudo chown marcio:marcio "$BK"; chmod 600 "$BK"
+  echo "backup: $BK ($(stat -c %s "$BK") bytes)"
+  git -C "$CODE" checkout -q --detach "$SHA"
+  echo "código @ ${SHA:0:12}"
+  sudo systemctl restart onion-vps-mcp-kg-writer
+  sleep 3
+  systemctl is-active onion-vps-mcp-kg-writer
+  curl -s http://172.23.0.1:3037/health; echo
+}
+main "$@"
+FIELD
+  local field_body; field_body="$(sed -n '/^main() {$/,/^}$/p' "${d}/scratch/update-kg-writer.sh" | sed '1d;$d')"
+  ln -s /var/www/onion-landing "${d}/lw"
+  cp -r "${src_hooks}/pretooluse-moat-gate.sh" "${src_hooks}/lib" "${d}/h/"
+  # _mgr <dir-do-hook> <raiz> <cwd> <comando> [PATH] → "rc|stderr"
+  _mgr() {
+    local rc=0 err
+    err="$(printf '%s' "$4" | W="$3" python3 -c 'import json,os,sys;print(json.dumps({"cwd":os.environ["W"],"tool_name":"Bash","tool_input":{"command":sys.stdin.read()}}))' \
+      | (cd "$2" && if [ -n "${5:-}" ]; then env -i HOME="${HOME}" PATH="$5" LC_ALL=C CLAUDE_PROJECT_DIR="$2" "$5/bash" "$1/pretooluse-moat-gate.sh"; \
+                    else LC_ALL=C CLAUDE_PROJECT_DIR="$2" bash "$1/pretooluse-moat-gate.sh"; fi 2>&1 >/dev/null))" || rc=$?
+    printf '%s|%s' "${rc}" "${err}"
+  }
+  # _mgok <esperado "rc" ou "rc:trecho-do-stderr"> <"rc|stderr"> → 0 se satisfaz
+  _mgok() {
+    local want_rc="${1%%:*}" want_txt="" got_rc="${2%%|*}" got_err="${2#*|}"
+    case "$1" in *:*) want_txt="${1#*:}" ;; esac
+    [ "${got_rc}" = "${want_rc}" ] || return 1
+    [ -z "${want_txt}" ] || case "${got_err}" in *"${want_txt}"*) ;; *) return 1 ;; esac
+  }
+  # _mgcase <nome> <esperado> <cwd> <comando> <arquivo-do-hook (rel.)> <ANTIGO> <NOVO> [raiz] [PATH]
+  #   roda o caso no hook INTACTO e no MUTANTE (cópia com ANTIGO→NOVO, 1ª ocorrência) e prova os dois
+  _mgcase() {
+    local name="$1" want="$2" cwd="$3" c="$4" rel="$5" old="$6" new="$7" root="${8:-${d}/proj}" path="${9:-}" r rm rc_i=1 rc_m=1
+    r="$(_mgr "${d}/h" "${root}" "${cwd}" "${c}" "${path}")"
+    if _mgok "${want}" "${r}"; then record_pass "moat-gate: ${name} (${want%%:*})"; rc_i=0
+    else record_fail "moat-gate: ${name}" "esperava ${want}, veio rc=${r%%|*} — ${r#*|} — cmd: ${c:0:160}"; fi
+    rm -rf "${d}/m"; cp -r "${d}/h" "${d}/m"
+    OLD="${old}" NEW="${new}" python3 - "${d}/m/${rel}" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    rm="$(_mgr "${d}/m" "${root}" "${cwd}" "${c}" "${path}")"
+    _mgok "${want}" "${rm}" && rc_m=0
+    _prove_mutation "moat-gate: ${name} (MUT)" "${d}/h/${rel}" "${d}/m/${rel}" "${rc_i}" "${rc_m}"
+  }
+  local P="${d}/proj" J=lib/moat-judge.py L=lib/invocation-lines.sh H=pretooluse-moat-gate.sh
+  # ── deploy ─────────────────────────────────────────────────────────────────────────────────────
+  _mgcase "(d1) sudo systemctl restart de unidade servida → VETO com o wrapper" "2:ops/update-kg-writer.sh" "${P}" \
+    'sudo systemctl restart onion-vps-mcp-kg-writer' "${J}" $'    if verb not in _MOAT_UNIT_MUTATE:\n        return' $'    if True:\n        return'
+  _mgcase "(d2) systemctl status de unidade servida → passa" 0 "${P}" \
+    'systemctl status onion-vps-mcp-kg-writer' "${J}" '_MOAT_UNIT_MUTATE = {"start",' '_MOAT_UNIT_MUTATE = {"status", "start",'
+  _mgcase "(d3) sudo -u root systemctl restart (invólucro com opção) → VETO" "2:MOAT/deploy" "${P}" \
+    'sudo -u root systemctl restart onion-vps-bridge' "${L}" '"sudo": {"-u", ' '"sudo": {'
+  _mgcase "(d4) bash -c \"…restart…\" → VETO" "2:MOAT/deploy" "${P}" \
+    'bash -c "sudo systemctl restart onion-vps-logto"' "${L}" 'scoped(args[k + 1], depth + 1)' 'pass'
+  _mgcase "(d5) rsync para o docroot servido → VETO com ops/deploy-site.sh" "2:ops/deploy-site.sh" "${P}" \
+    'rsync -a dist/ /var/www/onion-landing/' "${J}" '_MOAT_WRITE_DEST = {"cp", "install", "rsync",' '_MOAT_WRITE_DEST = {"cp", "install",'
+  _mgcase "(d6) rsync LENDO do docroot para /tmp → passa (só o destino é escrita)" 0 "${P}" \
+    'rsync -a /var/www/onion-landing/ /tmp/copia-site/' "${J}" '(pos[-1:] if len(pos) >= 2' '(pos if len(pos) >= 2'
+  _mgcase "(d7) git checkout na worktree servida do kg-writer → VETO" "2:git checkout numa árvore servida" "${P}" \
+    'git -C /home/marcio/mcp-kg/core-writer checkout --detach abc123' "${J}" 'hit = _moat_path_match(os.path.normpath(where), ("deploy",))' 'hit = None'
+  _mgcase "(d8) git rev-parse na worktree servida → passa" 0 "${P}" \
+    'git -C /home/marcio/mcp-kg/core-writer rev-parse HEAD' "${J}" '    if sub not in _MOAT_GIT_WRITE and not' '    if False and sub not in _MOAT_GIT_WRITE and not'
+  _mgcase "(d9) cd condicional + caminho relativo no docroot → VETO" "2:MOAT/deploy" "${P}" \
+    'cd /var/www && cd onion-landing && rm -rf velho' "${J}" $'    if base == UNKNOWN and _MOAT_CDS:\n        base = _MOAT_CDS[-1]' $'    if False:\n        base = _MOAT_CDS[-1]'
+  _mgcase "(d10) symlink criado na string e escrita por ele → VETO" "2:MOAT/deploy" "${P}" \
+    'ln -s /var/www/onion-landing /tmp/w-bancada && rsync -a x/ /tmp/w-bancada/' "${J}" '_MOAT_LINKS[lk] = tg' 'pass'
+  _mgcase "(d11) symlink JÁ no disco apontando o docroot → VETO" "2:MOAT/deploy" "${P}" \
+    "rsync -a x/ ${d}/lw/" "${J}" '    for q in {p, os.path.realpath(p)}:
+        c = q' '    for q in {p}:
+        c = q'
+  _mgcase "(d12) sudo tee de unit em /etc/systemd → VETO" "2:MOAT/deploy" "${P}" \
+    'sudo tee /etc/systemd/system/onion-vps-x.service < unit.txt' "${J}" '_MOAT_WRITE_ALL = {"tee", ' '_MOAT_WRITE_ALL = {'
+  _mgcase "(d13) xargs com stdin literal monta o restart → VETO" "2:MOAT/deploy" "${P}" \
+    'echo onion-vps-bridge | xargs sudo systemctl restart' "${J}" 'command(tail + known, depth + 1)' 'pass'
+  _mgcase "(d14) unidade montada por concatenação de variáveis → VETO (pré-filtro dinâmico)" "2:MOAT/deploy" "${P}" \
+    'A=onion-v; B=ps-bridge; systemctl restart $A$B' "${H}" '<<< "$raw_cmd" && grep -qE "$moat_dyn" <<< "$flat" && hit=1' '<<< "$raw_cmd" && false'
+  _mgcase "(d15) unidade só conhecida em runtime → FECHA" "2:NÃO pode ser analisado" "${P}" \
+    'systemctl restart $UNIT' "${J}" '            _moat_emit("inanalisavel", u, "", "systemctl %s de unidade só conhecida em runtime — %s" % (verb, detail))' '            pass'
+  _mgcase "(d16) docker restart de container servido → VETO" "2:MOAT/deploy" "${P}" \
+    'sudo docker restart onion-vps-librechat' "${J}" '_MOAT_DOCKER_MUTATE = {"restart", ' '_MOAT_DOCKER_MUTATE = {'
+  _mgcase "(d17) docker logs de container servido → passa" 0 "${P}" \
+    'docker logs --tail 50 onion-vps-librechat' "${J}" '_MOAT_DOCKER_MUTATE = {"restart", ' '_MOAT_DOCKER_MUTATE = {"logs", "restart", '
+  _mgcase "(d18) restart embutido em python -c → FECHA" "2:NÃO pode ser analisado" "${P}" \
+    "python3 -c \"import subprocess; subprocess.run(['systemctl','restart','onion-vps-bridge'])\"" "${J}" \
+    'moat_unanalyzable(words, "código embutido noutra linguagem/executor")' 'pass'
+  _mgcase "(d19) watch executando o restart → VETO" "2:MOAT/deploy" "${P}" \
+    'watch -n 5 systemctl restart onion-vps-bridge' "${J}" $'                command(words[k:], depth + 1)\n                break' $'                break'
+  # contornos achados pela passada adversarial própria (2026-10-13), cada um curado e travado aqui
+  HOME=/home/marcio _mgcase "(d20) git -C ~/… com til na worktree servida → VETO (HOME da VPS)" "2:git pull numa árvore servida" "${P}" \
+    'git -C ~/mcp-kg/core-writer pull' "${J}" 'gw = [os.path.expanduser(w) if w.startswith("~")' 'gw = [w if w.startswith("~")'
+  _mgcase "(d21) find <docroot> -delete → VETO" "2:MOAT/deploy" "${P}" \
+    "find /var/www/onion-landing -name '*.bak' -delete" "${J}" '        writes = "-delete" in args or any(' '        writes = False and any('
+  _mgcase "(d22) systemctl restart com glob que cobre as unidades → VETO (pré-filtro do glob)" "2:MOAT/deploy" "${P}" \
+    "systemctl restart 'onion-*'" "${H}" "\\\\u00|[*?{]'" "\\\\u00'"
+  _mgcase "(d23) caminho servido montado por concatenação → VETO (pré-filtro da concatenação)" "2:MOAT/deploy" "${P}" \
+    'D=/var/w; rm -rf ${D}ww/index.html' "${H}" '[ "$hit" = 0 ] && grep -qE "$moat_concat"' '[ "$hit" = 0 ] && false && grep -qE "$moat_concat"'
+  _mgcase "(d24) symlink no disco: pré-filtro testa os componentes com [ -L ] → VETO" "2:MOAT/deploy" "${P}" \
+    "cp index.html ${d}/lw/" "${H}" '[ "$hit" = 0 ] && grep -qE "$moat_write" <<< "$flat" && moat_cites_symlink && hit=1' ':'
+  _mgcase "(f7) cat <script> | bash → VETO (o shell lê o arquivo)" "2:MOAT/deploy" "${P}" \
+    "cat ${d}/scratch/update-kg-writer.sh | bash" "${J}" '            elif piped and prev and os.path.basename(prev[0]) == "cat":' '            elif False:'
+  _mgcase "(f8) python3 <arquivo> com argumento que CITA o restart → passa" 0 "${P}" \
+    'python3 -I /tmp/linear_new.py SAC-1 "Bridge: systemctl restart onion-vps-bridge medido"' "${J}" \
+    '            if any(re.match(r"^-[A-Za-z]*[ce]$", a) or a in ("--command", "--eval") for a in args):' '            if True:'
+  # ── o caso de CAMPO (2026-10-13) ───────────────────────────────────────────────────────────────
+  _mgcase "(f1) o script de scratchpad do kg-writer, por arquivo → VETO" "2:MOAT/deploy" "${P}" \
+    "bash ${d}/scratch/update-kg-writer.sh" "${J}" '        scoped(heredocs(body), depth + 1)' '        pass'
+  _mgcase "(f2) o wrapper versionado: bash ops/update-kg-writer.sh → passa" 0 "${P}" \
+    'bash ops/update-kg-writer.sh && echo "publicado em /var/www/onion-landing"' "${J}" '    if _moat_versioned(p):' '    if False:'
+  _mgcase "(f3) o MESMO wrapper não rastreado → VETO (o rastreio é a fronteira)" "2:MOAT/deploy" "${P}" \
+    'bash ops/update-kg-writer-copia.sh' "${J}" '        return bool(_git(["-C", ds[0]' '        return True or bool(_git(["-C", ds[0]'
+  _mgcase "(f4) o corpo do script de campo colado na string → VETO no checkout" "2:git checkout numa árvore servida" "${P}" \
+    "${field_body}" "${J}" 'hit = _moat_path_match(os.path.normpath(where), ("deploy",))' 'hit = None'
+  _mgcase "(f5) script escrito por heredoc na própria string e executado → FECHA" "2:NÃO pode ser analisado" "${P}" \
+    $'cat > /tmp/novo-bancada.sh <<\'E\'\nsudo systemctl restart onion-vps-bridge\nE\nbash /tmp/novo-bancada.sh' "${J}" \
+    '        if p in _MOAT_WRITTEN and moat_relevant(raw):' '        if False:'
+  _mgcase "(f6) script que só não existe AINDA (worktree nova) → passa" 0 "${P}" \
+    "bash ${d}/ainda-nao/ops/x.sh && systemctl status onion-vps-bridge" "${J}" \
+    '        if p in _MOAT_WRITTEN and moat_relevant(raw):' '        if moat_relevant(raw):'
+  # ── menção não é invocação ─────────────────────────────────────────────────────────────────────
+  _mgcase "(m1) echo citando o restart → passa" 0 "${P}" \
+    'echo "nunca rode sudo systemctl restart onion-vps-bridge à mão"' "${J}" \
+    '    detail = " ".join(raw_words)' '    detail = " ".join(raw_words); moat_unanalyzable(raw_words, "mutante")'
+  _mgcase "(m2) heredoc inerte citando o restart → passa" 0 "${P}" \
+    $'cat > /tmp/nota-bancada.md <<\'EOF\'\nsudo systemctl restart onion-vps-bridge\ncrontab -e\nEOF' "${L}" \
+    $'            elif not inert:\n                out.extend(body_substitutions(ln))' $'            else:\n                out.append(ln)'
+  _mgcase "(m3) gh pr create com corpo citando rsync no docroot → passa" 0 "${P}" \
+    'gh pr create --title t --body "o deploy era rsync -a dist/ /var/www/onion-landing/ à mão"' "${J}" \
+    '    detail = " ".join(raw_words)' '    detail = " ".join(raw_words); moat_unanalyzable(raw_words, "mutante")'
+  # ── repo alheio ────────────────────────────────────────────────────────────────────────────────
+  _mgcase "(a1) push do ramo de PRODUÇÃO no clone de adotante registrado → VETO" "2:no clone de adotante-bancada" "${P}" \
+    "git -C ${d}/adotante push origin main" "${J}" '        m = _moat_member(os.path.normpath(where))' '        m = None'
+  _mgcase "(a1b) push de branch de TÓPICO no clone de adotante → passa (vira PR lá)" 0 "${P}" \
+    "git -C ${d}/adotante push -u origin onion/adopt" "${J}" $'            if risky:\n                _moat_emit("alheio", where,' $'            if True:\n                _moat_emit("alheio", where,'
+  _mgcase "(a1c) push --delete no clone de adotante → VETO" "2:no clone de adotante-bancada" "${P}" \
+    "git -C ${d}/adotante push -q origin --delete chore/velha" "${J}" \
+    '    risky = bool(re.search(' $'    risky = False\n    _mut = bool(re.search('
+  _mgcase "(a2) git commit LOCAL no clone de adotante → passa (é o /meta:adopt --update)" 0 "${P}" \
+    "cd ${d}/adotante && git commit --allow-empty -m x" "${J}" $'    if not pushing:\n        return' \
+    $'    if not pushing:\n        if _moat_member(os.path.normpath(where)) and not same_project(where):\n            _moat_emit("alheio", where, "", "mutante")\n        return'
+  _mgcase "(a3) push para o main de OUTRO repositório → VETO" "2:destino de OUTRO repositório" "${P}" \
+    'git push https://github.com/outro-dono/outro-repo.git HEAD:main' "${J}" \
+    '    if risky and not push_dest_ours(where, remote, LAST_CFG[0]):' '    if False:'
+  _mgcase "(a3b) push de tópico para OUTRO repositório → passa (o PR de lá é o gate)" 0 "${P}" \
+    'git push https://github.com/outro-dono/outro-repo.git HEAD:refs/heads/fix/x' "${J}" \
+    '    if risky and not push_dest_ours(where, remote, LAST_CFG[0]):' '    if not push_dest_ours(where, remote, LAST_CFG[0]):'
+  _mgcase "(a4) git push origin feat no PRÓPRIO repo → passa" 0 "${P}" \
+    'git push origin feat' "${J}" '    if risky and not push_dest_ours(where, remote, LAST_CFG[0]):' '    if True:'
+  _mgcase "(a5) cópia para o inbound/ do adotante (co-deliver) → passa" 0 "${P}" \
+    "cp anuncio.md ${d}/adotante/docs/evolution/inbound/" "${J}" \
+    '    hit = _moat_path_match(p)
+    if hit:' '    hit = _moat_path_match(p) or (("deploy", p, "") if _moat_member(p) else None)
+    if hit:'
+  # ── relógio ────────────────────────────────────────────────────────────────────────────────────
+  _mgcase "(r1) crontab - (instala do stdin) → VETO" "2:MOAT/relógio" "${P}" \
+    'printf "0 3 * * * /bin/true\n" | crontab -' "${J}" '        _moat_crontab(args, detail)' '        pass'
+  _mgcase "(r2) crontab -l → passa" 0 "${P}" \
+    'crontab -l' "${J}" $'    if rest and all(x in ("-l",) for x in rest):\n        return' $'    if False:\n        return'
+  _mgcase "(r3) redirecionamento para /etc/cron.d → VETO" "2:MOAT/relógio" "${P}" \
+    "echo '0 * * * * root /bin/true' > /etc/cron.d/onion-bancada" "${J}" '    _moat_redirects(raw_words, detail)' '    pass'
+  _mgcase "(r4) systemd-run --on-calendar → VETO" "2:MOAT/relógio" "${P}" \
+    'systemd-run --on-calendar=daily /bin/true' "${J}" '        if any(a.startswith(_MOAT_TIMER_OPTS) for a in args):' '        if False:'
+  _mgcase "(r5) systemctl enable --now de .timer qualquer → VETO" "2:MOAT/relógio" "${P}" \
+    'sudo systemctl enable --now limpeza.timer' "${J}" '        if u.endswith(".timer") and verb in _MOAT_TIMER_ARM:' '        if False:'
+  _mgcase "(r6) cp de .timer para /etc/systemd → VETO como RELÓGIO (não deploy)" "2:MOAT/relógio" "${P}" \
+    'sudo cp limpeza.timer /etc/systemd/system/limpeza.timer' "${J}" \
+    '    if "relogio" in classes and any(' '    if False and "relogio" in classes and any('
+  _mgcase "(r7) at agenda → VETO" "2:MOAT/relógio" "${P}" \
+    'echo "bash x.sh" | at now + 1 hour' "${J}" '    elif base in ("at", "batch"):' '    elif False:'
+  _mgcase "(r8) at -l (lista) → passa" 0 "${P}" \
+    'at -l' "${J}" 'all(x in ("-l", "-d", "-r", "-c", "-V") or x.isdigit() for x in args)' 'all(False for x in args)'
+  # ── adotante e modo degradado ──────────────────────────────────────────────────────────────────
+  _mgcase "(x1) adotante SEM ops/moat-targets.tsv: crontab - → passa (hook desarmado)" 0 "${d}/sem-tsv" \
+    'crontab -' "${H}" '[ -f "$tsv" ] || exit 0' 'true' "${d}/sem-tsv"
+  local np; np="$(mktemp -d)"; local tl
+  for tl in bash cat grep head dirname git tr cut awk sed sort paste; do ln -s "$(command -v "${tl}")" "${np}/${tl}"; done
+  _mgcase "(x2) SEM python3: restart de unidade servida → FECHA" "2:python3 ausente" "${P}" \
+    'sudo systemctl restart onion-vps-bridge' "${H}" \
+    'grep -qE "$signal" <<< "$flat" && grep -qE "$moat_action" <<< "$flat" || exit 0' 'exit 0' "${P}" "${np}"
+  _mgcase "(x3) SEM python3: ls no docroot (alvo sem verbo de escrita) → passa" 0 "${P}" \
+    'ls -la /var/www/onion-landing' "${H}" \
+    'grep -qE "$signal" <<< "$flat" && grep -qE "$moat_action" <<< "$flat" || exit 0' 'grep -qE "$signal" <<< "$flat" || exit 0' "${P}" "${np}"
+  # ── o analisador não esconde bug interno nos casos acima (modo estrito do lib) ─────────────────
+  local _bug="" _c
+  for _c in 'sudo systemctl restart onion-vps-bridge' 'cd /var/www && cd onion-landing && rm -rf velho' \
+            'echo onion-vps-bridge | xargs sudo systemctl restart' "bash ${d}/scratch/update-kg-writer.sh" "${field_body}" \
+            'ln -s /var/www/onion-landing /tmp/w-bancada && rsync -a x/ /tmp/w-bancada/' 'printf "0 3 * * * x\n" | crontab -'; do
+    _bug+="$(cd "${P}" && . "${d}/h/lib/invocation-lines.sh" && LC_ALL=C CLAUDE_PROJECT_DIR="${P}" ONION_CWD="${P}" ONION_INVOCATION_STRICT=1 \
+      ONION_MOAT_JUDGE="${d}/h/lib/moat-judge.py" ONION_MOAT_TARGETS="${P}/ops/moat-targets.tsv" \
+      ONION_MOAT_MEMBERS="${P}/docs/evolution/federation/members.yaml" onion_invocation_lines "${_c}" | grep '^__ONION_BUG__' || true)"
+  done
+  if [ -z "${_bug}" ]; then record_pass "moat-gate: juiz sem bug interno nos casos de campo (modo estrito)"
+  else record_fail "moat-gate: bug interno do juiz" "${_bug:0:300}"; fi
+  rm -rf "${d}" "${np}"
 }
 
 # ---------------------------------------------------------------------------
@@ -26788,6 +27041,7 @@ _family run_kg_view_selftests
 _family run_kg_status_factor_selftests
 _family run_radar_composable_modes_selftests
 _family run_pretooluse_veto_selftests
+_family run_moat_gate_selftests
 _family run_version_drift_selftests
 _family run_premodelswitch_guard_selftests
 _family run_research_lens_selftests
@@ -28500,14 +28754,15 @@ run_veto_onfailure_selftests() {
   if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 15/15 verdes' <<< "${o}"; then
     record_pass "veto-onfailure: (a) --selftest verde (15 checagens: veto sem/com block, aviso, comentário, função, exit 20, inválido, async, ausente, ilegível, fora dos eventos medidos, aspas, PreModelSwitch)"
   else record_fail "veto-onfailure: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
-  # (b) O MODO QUE A PRODUÇÃO CONSOME, no settings.json real: os 5 vetos declaram block → tsv vazio, rc 0.
+  # (b) O MODO QUE A PRODUÇÃO CONSOME, no settings.json real: os 6 vetos declaram block → tsv vazio, rc 0.
   #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
   if o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/veto-onfailure-check.sh" "${REPO_ROOT}" --format tsv 2>&1)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && [ -z "${o}" ]; then
     record_pass "veto-onfailure: (b) settings.json real → rc 0, nenhum veto sem onFailure"
   else record_fail "veto-onfailure: (b) settings.json real" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
   # (c) O CAMINHO DE PRODUÇÃO: o lint-artifacts real, sobre o settings de ANTES da cura (o campo removido dos
-  #     4 vetos PreToolUse e do PreModelSwitch), emite a REGRA 101 para os 5 — e não para o kg-read-leg (aviso)
+  #     5 vetos PreToolUse e do PreModelSwitch), emite a REGRA 101 para os 6 — e não para o kg-read-leg (aviso)
+  #     (o 6º é o pretooluse-moat-gate.sh, de 2026-10-13: o número sobe junto com o settings.json)
   #     nem para o PostModelSwitch, que roda o mesmo script mas não veta nada.
   local sd; sd="$(TMPDIR=/tmp mktemp -d)"
   python3 -I -B -c 'import json,sys; d=json.load(open(sys.argv[1]))
@@ -28517,9 +28772,10 @@ for ev in ("PreToolUse", "PreModelSwitch"):
 json.dump(d, open(sys.argv[2], "w"), indent=2)' "${REPO_ROOT}/.claude/settings.json" "${sd}/settings.json"
   local l; l="$(cd "${REPO_ROOT}" && ONION_SETTINGS_JSON="${sd}/settings.json" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/settings.json" 2>&1 || true)"
   local n; n="$(grep -c 'REGRA 101 (Veto PreToolUse por exit 2 declara onFailure: block): \[veto-sem-onfailure\]' <<< "${l}" || true)"
-  if [ "${n}" -eq 5 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
+  if [ "${n}" -eq 6 ] && grep -q 'REGRA 101.*PreModelSwitch/premodelswitch-guard.sh' <<< "${l}" \
+     && grep -q 'REGRA 101.*PreToolUse/pretooluse-moat-g' <<< "${l}" \
      && ! grep -q 'REGRA 101.*kg-read-leg' <<< "${l}" && ! grep -q 'REGRA 101.*PostModelSwitch' <<< "${l}"; then
-    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 5 vetos de antes da cura (4 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
+    record_pass "veto-onfailure: (c) o lint de produção (dispatcher) emite a REGRA 101 nos 6 vetos de antes da cura (5 PreToolUse + PreModelSwitch), e cala no aviso e no PostModelSwitch"
   else record_fail "veto-onfailure: (c) dispatcher" "n=${n}; $(grep -E 'REGRA 101' <<< "${l}" | head -4 | cut -c1-160 | tr '\n' '|')"; fi
   rm -rf "${sd}"
   # (m) MUTANTES — revertem cada cura na CÓPIA da guarda e EXIGEM que o caso nomeado reprove

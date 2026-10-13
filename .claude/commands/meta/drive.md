@@ -23,6 +23,11 @@ achando superação — com o `/meta:realign` como **verificador-por-turno**. É
 - **Maestro-invocado.** Nunca auto-inicia, nunca `/loop`/`schedule`/cron sobre si (W7 = MOAT).
 - **Budget-capped, retomável.** Sem budget não há laço. Retomada = re-censo (o status do nó É o progresso) + o checkpoint pendente **no grafo** (`meta.x_drive_checkpoint`).
 - **MOAT (PARA sempre):** deploy · escrever repo alheio (I3) · merge de path vendorizado/outward-facing · agendar por relógio.
+  **Veto por ALVO** (`pretooluse-moat-gate.sh`, desde 2026-10-13, armado só no core): `systemctl`/`docker` que muda
+  unidade servida, escrita em caminho servido e escrita git em árvore servida fora do wrapper de `ops/` (core-only);
+  `git push` em clone de membro ou para outro repositório; crontab, `at`, timer e `/etc/cron*`. Segue PROSA:
+  commit local num clone de adotante, `gh` em repo alheio, `docker compose`, ssh, script versionado e outra
+  linguagem além da forma do texto. A tabela está na KB (§0), e as fronteiras no cabeçalho do hook.
 
 ## Uso
 

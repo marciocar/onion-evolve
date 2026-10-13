@@ -1,0 +1,39 @@
+# ops/moat-targets.tsv — os ALVOS do MOAT desta máquina (Hostinger KVM 8), lidos por
+# .claude/hooks/pretooluse-moat-gate.sh. Core-only: ops/ não viaja, e sem este arquivo o hook se desarma.
+#
+# Colunas (TAB): classe · tipo · padrão · wrapper
+#   classe  deploy | relogio
+#   tipo    unit (nome de unidade systemd/container, glob, sem .service) | path (caminho, glob; vale ele e o
+#           que estiver abaixo dele)
+#   wrapper o ops/<script> que faz este deploy com backup e conferência, ou `-` (não há: é do maestro)
+# O alvo mais ESPECÍFICO vence (padrão mais longo), então a linha do wrapper vem junto da genérica.
+#
+# DE ONDE SAEM (medido em 2026-10-13, nunca de memória):
+#   · prefixo `onion-vps-` — convenção da casa para serviço/container da VPS
+#     (docs/knowledge-base/tools/vps-tool-repo-skeleton.md §1.2); `onion-adopt-` — recurso de adotante
+#     hospedado aqui (mesma seção). Unidades vivas: /etc/systemd/system/onion-vps-*.service|timer.
+#   · os caminhos servidos — o que cada wrapper escreve: deploy-site.sh (WEBROOT=/var/www/onion-landing),
+#     install-caddy-config.sh e caddy-site-secrets.sh (/etc/caddy), update-bridge.sh (/home/onion: o bridge
+#     e o clone do core que ele serve), update-kg-writer.sh (a worktree de código e a raiz de dados do
+#     onion-kg-writer); /home/marcio/mcp-kg/core-served é o WorkingDirectory de onion-vps-mcp-kg-granaai;
+#     /usr/local/sbin/onion-vps-docker-firewall.sh é o ExecStart de onion-vps-docker-firewall.
+#   · FORA DAQUI, de propósito: onion-vps-mcp-exec, onion-vps-mcp-kg e onion-vps-mcp-fw servem DIRETO do
+#     checkout principal do core (/home/marcio/onion-evolve). Escrever lá é trabalho normal da casa; listar o
+#     caminho vetaria todo commit. A unidade deles segue vetada pelo glob onion-vps-*.
+deploy	unit	onion-vps-bridge	ops/update-bridge.sh
+deploy	unit	onion-vps-mcp-kg-writer	ops/update-kg-writer.sh
+deploy	unit	caddy	ops/install-caddy-config.sh
+deploy	unit	onion-vps-*	-
+deploy	unit	onion-adopt-*	-
+deploy	path	/var/www/onion-landing	ops/deploy-site.sh
+deploy	path	/var/www	-
+deploy	path	/etc/caddy	ops/install-caddy-config.sh
+deploy	path	/etc/systemd	-
+deploy	path	/home/onion	ops/update-bridge.sh
+deploy	path	/home/marcio/mcp-kg/core-writer	ops/update-kg-writer.sh
+deploy	path	/var/lib/onion-chat-kg	-
+deploy	path	/home/marcio/mcp-kg	-
+deploy	path	/usr/local/sbin/onion-*	-
+relogio	path	/etc/cron*	-
+relogio	path	/var/spool/cron	-
+relogio	path	/etc/anacrontab	-
