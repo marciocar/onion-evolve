@@ -49,29 +49,29 @@ _pick() {   # o do DEST primeiro (é o que roda lá), depois o da fonte
   if [ -e "${DEST}/$1" ]; then printf '%s\n' "${DEST}/$1"; elif [ -e "${SRC}/$1" ]; then printf '%s\n' "${SRC}/$1"; fi
 }
 RADAR="$(_pick .claude/validation/kg-radar.sh)"
-KFP="$(_pick .claude/validation/kg-fixture-paths.sh)"
+_KFP="$(_pick .claude/validation/kg-fixture-paths.sh)"
 VENDOR="${KG_CONTRACT_VENDOR:-$(_pick vendor/kg-ssot)}"
 # PRÉ-FILTRO TEXTUAL antes de exigir as dependências: sem nenhuma linha `---` nos grafos não há o que migrar,
 # e cobrar PyYAML/vendor aqui faria toda ADOÇÃO nova (que passa por este passo) avisar NAO MEDIDO sobre nada.
 # Só a linha `---` exata vira candidato; o veredito de "quantos documentos" é do parser, abaixo.
 if git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1; then
-  LIST="$(git -C "${DEST}" ls-files '*.kg.yaml' | bash "${KFP:-/dev/null}" --filter 2>/dev/null || true)"
+  LIST="$(git -C "${DEST}" ls-files '*.kg.yaml' | bash "${_KFP:-/dev/null}" --filter 2>/dev/null || true)"
   _cand=""
   while IFS= read -r _g; do
     [ -n "${_g}" ] && [ -f "${DEST}/${_g}" ] && LC_ALL=C grep -qE '^---[[:space:]]*$' "${DEST}/${_g}" && { _cand=1; break; }
   done <<< "${LIST}"
-  [ -n "${KFP}" ] && [ -z "${_cand}" ] && { echo "  ⊘ migrate-seed-graph: nada a migrar (nenhum grafo com separador de documento)"; exit 0; }
+  [ -n "${_KFP}" ] && [ -z "${_cand}" ] && { echo "  ⊘ migrate-seed-graph: nada a migrar (nenhum grafo com separador de documento)"; exit 0; }
 fi
 [ -n "${RADAR}" ] || { echo "migrate-seed-graph: kg-radar.sh ausente no alvo e na fonte — NAO MEDIDO" >&2; exit 2; }
-[ -n "${KFP}" ] || { echo "migrate-seed-graph: kg-fixture-paths.sh ausente — NAO MEDIDO" >&2; exit 2; }
+[ -n "${_KFP}" ] || { echo "migrate-seed-graph: kg-fixture-paths.sh ausente — NAO MEDIDO" >&2; exit 2; }
 [ -n "${VENDOR}" ] && [ -f "${VENDOR}/tools/kg_gate.py" ] || { echo "migrate-seed-graph: vendor do contrato ausente (vendor/kg-ssot no alvo e na fonte) — NAO MEDIDO" >&2; exit 2; }
 python3 -c 'import yaml' 2>/dev/null || { echo "migrate-seed-graph: PyYAML ausente — NAO MEDIDO" >&2; exit 2; }
 
 # A população: rastreados (ou, sem git, os de docs/), sem fixture — o predicado ÚNICO da casa.
 if git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1; then
-  LIST="$(git -C "${DEST}" ls-files '*.kg.yaml' | bash "${KFP}" --filter)"
+  LIST="$(git -C "${DEST}" ls-files '*.kg.yaml' | bash "${_KFP}" --filter)"
 else
-  LIST="$(cd "${DEST}" && find docs -name '*.kg.yaml' 2>/dev/null | bash "${KFP}" --filter)"
+  LIST="$(cd "${DEST}" && find docs -name '*.kg.yaml' 2>/dev/null | bash "${_KFP}" --filter)"
 fi
 
 # A lista vai por VARIÁVEL de ambiente: o heredoc abaixo É o stdin do python (o script), e um pipe

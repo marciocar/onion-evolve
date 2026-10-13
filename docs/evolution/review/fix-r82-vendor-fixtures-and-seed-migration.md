@@ -3,8 +3,7 @@ title: "Revisão — REGRA 82 já estava curada no core (o ruído é de pin anti
 date: 2026-10-13
 branch: fix/r82-vendor-fixtures-and-seed-migration
 reviewer: "passada adversarial curta do próprio autor, como refutador das duas perguntas do pedido (a exclusão escondeu grafo real? a migração toca grafo do adotante?), com execução: a guarda velha e a nova contra o vendor 4.4.0, a migração contra a semente REAL do adotante (cópia de leitura, antes da conversão à mão dele) e seis mutantes via ops/mutate-and-restore.sh"
-reviewed_diff_sha256: c049bffc29d0f26ffc6fea54efc1744cb34114ee680fffcc2bd459e455e90bab
-reviewed_code_sha256: 1429d7bf7a1675833b7e75117870822db1360bbf549f15e8c295d20ad95a73f6
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 4
 verdict: APROVADO
@@ -74,3 +73,10 @@ duration_min: 95
 - A migração não converte grafos do adotante. Os 2 do adotante do sinal seguem com ele.
 - Sem refutador independente nesta rodada. As duas perguntas foram respondidas por execução, não por
   leitura.
+
+## Leva pós-CI (2026-10-13)
+
+O CI reprovou `kg-fixture-paths: (c) consumidores`: o script invocava o predicado pela variável `KFP`, e a
+guarda reconhece o uso só pela forma canônica `bash "${_KFP}"`. Renomeada a variável para `_KFP`. A primeira
+tentativa deixou um `${KFP:-/dev/null}` de fora, e a família `migrate_seed_graph` reprovou 4 casos ("nada a
+migrar" sobre a semente velha); curado na mesma leva. `kg_fixture_paths` + `migrate_seed_graph`: 12/0.
