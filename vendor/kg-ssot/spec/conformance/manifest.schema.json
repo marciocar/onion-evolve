@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://onion-kg-ssot/spec/conformance/manifest.schema.json",
+  "$id": "urn:kg-ssot:spec:conformance:manifest.schema.json",
   "title": "manifest.json de um grupo da suíte de conformidade do .kg.yaml",
   "description": "Cada grupo da suíte é uma pasta com um manifest.json e um .kg.yaml real por caso. O manifesto diz o veredito esperado de cada caso: valid, os códigos MUST (codes, reprovam) e os códigos SHOULD (warnings, só alertam). A regra de pending_on por pasta (vazio em latest/, não vazio em proposals/) é do runner, porque o metaschema não vê a pasta.",
   "type": "object",

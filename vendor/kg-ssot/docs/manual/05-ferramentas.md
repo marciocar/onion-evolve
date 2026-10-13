@@ -90,8 +90,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.7.2",
-  "sha256": { "must": "0b532b0d…", "should": "30498b28…" }
+  "release": "kg-ssot-v4.7.3",
+  "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
   {

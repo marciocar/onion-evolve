@@ -1,4 +1,4 @@
-# KG-SSOT 4.7.2 (tag kg-ssot-v4.7.2): o texto completo para agentes de IA
+# KG-SSOT 4.7.3 (tag kg-ssot-v4.7.3): o texto completo para agentes de IA
 
 Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
 divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
@@ -14,7 +14,7 @@ divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.7.2](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.7.2-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.7.3](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.7.3-6f42c1)](spec/release.json)
 [![Suíte: 225/225](https://img.shields.io/badge/su%C3%ADte-225%2F225-2ea44f)](spec/conformance/README.md)
 [![Python 3](https://img.shields.io/badge/python-3-3776ab)](tools/requirements.txt)
 
@@ -146,7 +146,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.7.2`. O leitor de referência passa em 225 de 225 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.7.3`. O leitor de referência passa em 225 de 225 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.
@@ -240,14 +240,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -483,7 +483,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --source https://github.com/marciocar/kg-ssot`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --source https://github.com/marciocar/kg-ssot`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
@@ -555,7 +555,7 @@ O KG-SSOT é um **grafo de conhecimento verificável** em arquivo texto. Cada af
 em que foi conferida e o que foi conferido, e um contrato formal decide se o arquivo está bem escrito. Este
 manual cobre o formato `.kg.yaml`, o contrato, as ferramentas e a adoção num repositório.
 
-Release descrita aqui: **4.7.2** (tag `kg-ssot-v4.7.2`). O contrato vigente dessa release é o **v4**.
+Release descrita aqui: **4.7.3** (tag `kg-ssot-v4.7.3`). O contrato vigente dessa release é o **v4**.
 
 ## Capítulos
 
@@ -1034,7 +1034,7 @@ existindo). Pelo histórico das releases:
 | **Z**, patch | Correção ou melhoria do kit, do guia ou dos casos, com o mesmo contrato |
 
 O gate guarda o sha256 dos dois schemas como a identidade do contrato. Uma tag que muda os bytes dos schemas,
-mesmo que só no texto das descrições (como a 4.7.2), pede `kg_gate.py --update` no PR que traz a tag, e o gate mostra
+mesmo que só no texto das descrições (a 4.7.2) ou no `$id` (a 4.7.3), pede `kg_gate.py --update` no PR que traz a tag, e o gate mostra
 que nenhum veredito mudou.
 
 Um aviso SHOULD novo pode subir a dívida medida pelo gate. Isso é intencional: a rampa de um contrato é alertar
@@ -1144,8 +1144,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.7.2",
-  "sha256": { "must": "0b532b0d…", "should": "30498b28…" }
+  "release": "kg-ssot-v4.7.3",
+  "sha256": { "must": "0619d353…", "should": "5a7fb74a…" }
  },
  "results": [
   {
@@ -1569,7 +1569,7 @@ Na raiz do seu repo, com Python 3:
 ```bash
 # 1. trazer a release, por tag, do repositório público
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --dest vendor/kg-ssot
 
 # 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
 python3 -m venv .venv && .venv/bin/pip install -r vendor/kg-ssot/tools/requirements.txt
@@ -2291,7 +2291,7 @@ de higiene do mantenedor reprova referência privada em `spec/` e nos arquivos d
 
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://onion-kg-ssot/spec/kg-contract-v4.schema.json",
+  "$id": "urn:kg-ssot:spec:kg-contract-v4.schema.json",
   "title": "kg.yaml — contrato v4, nível MUST",
   "description": "O contrato v4 do .kg.yaml, nível MUST (reprova), o vigente (substitui o v3). É o v3 com três promoções a MUST. (1) Proveniência estruturada: nó confirmed ou PROD exige provenance com source, locator e method (form.required.node.provenance), que no v3 só alertava; status unverifiable não exige, mesmo em PROD, porque é o destino do nó sem fonte recuperável. (2) Fonte que não é placeholder: provenance.source não pode ser placeholder: só espaço, ou um destes sozinho, sem distinguir maiúscula e com pontuação final (. ou :) e espaço em volta (inclusive NBSP, espaço ideográfico, BOM e espaço de largura zero) ignorados: desconhecida, desconhecido, unknown, n/a, n / a, na, n.a., none, null, sem fonte, tbd, um ou mais hífens, travessão, meia-risca, ?. A regra é um not+pattern sem lookahead, portável a leitores RE2: form.pattern.node.provenance.source. O vazio segue form.range.node.provenance.source, como no v3. Origem que é uma pessoa ou sessão recuperável é fonte válida, com method de testemunho. (3) Política de extensão: chave desconhecida sem o prefixo x_ no topo, no meta, no nó e na aresta reprova (form.unknown-key.<escopo>.<chave>), com a mesma lista de chaves conhecidas que o SHOULD v3 usava; nome sem x_ que nem é slug reprova como form.pattern.<escopo>.key. Chave x_ segue livre, e x_ com nome que não é slug só alerta. A chave on da aresta segue na lista porque já reprova como yaml.forbidden-key-on. Dentro de provenance, a chave desconhecida segue SHOULD. O resto é o v3: escrito à mão em JSON Schema 2020-12; PROD sem verified_at é SHOULD e o gatilho de TRANSITIONS é trigger; narrative no nó, note e purpose no meta, data no calendário (format: date é ASSERÇÃO) e .nan ou .inf reprovando como tipo; provenance, quando presente, com os três campos não vazios, e provenance: null reprova. O par SHOULD é kg-contract-v4.should.schema.json; as regras de perfil YAML (chave on proibida, chave duplicada, documento único) são do leitor, porque o JSON não as vê. No v4.3 entra external_edges, opcional, no topo: arestas entre grafos com uma ponta externa <caminho>#<id> e a outra local (ou o grafo inteiro, com from ausente), nos tipos SUPERSEDES, CONSTRAINS, SUPPORTS, REFUTES, TRACES_TO e DEPENDS_ON. A ponta local tem de existir (integrity.dangling-external-local); com o corpus, o arquivo e o id da ponta externa também (integrity.dangling-external). A chave é opcional: um grafo que não a usa tem o mesmo veredito do v4.2.",
   "type": "object",
@@ -2785,7 +2785,7 @@ de higiene do mantenedor reprova referência privada em `spec/` e nos arquivos d
 
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://onion-kg-ssot/spec/kg-contract-v4.should.schema.json",
+  "$id": "urn:kg-ssot:spec:kg-contract-v4.should.schema.json",
   "title": "kg.yaml — contrato v4, nível SHOULD",
   "description": "O contrato v4 do .kg.yaml, nível SHOULD (alerta, não reprova), o vigente. É o SHOULD v3 menos o que o v4 promoveu a MUST: a chave desconhecida sem x_ no topo, no meta, no nó e na aresta e o nó confirmed ou PROD sem provenance. Segue alertando: nome de chave que não é slug ([A-Za-z_][A-Za-z0-9_-]*), como form.pattern.<escopo>.key, que sem x_ também reprova no MUST; nó PROD sem verified_at; label do nó acima de 280 caracteres, form.range.node.label, porque a narrativa vai para narrative; a chave desconhecida dentro de provenance, fechada em source, locator, method e x_; e o grafo sem nós (nodes: []), como form.range.top.nodes: é válido, como o primeiro uso de um app, mas o aviso pega o parse que falhou em silêncio. No v4, provenance.method alerta (form.pattern.node.provenance.method) quando não segue a forma canônica '<classe>: <detalhe>', com a classe em medição, leitura, juízes, derivado, testemunho; reprova no v5. Medição feita por terceiro e lida pelo autor do grafo é testemunho. No v4.1 entram quatro avisos que o próprio arquivo decide. O schema acusa a claim com verified_at e sem verified_against (form.required.node.verified_against): carimbo sem alvo não distingue verificado de declarado. Só a claim: evidence é a própria âncora, artifact nomeia o alvo, question não afirma e a origem da decision é cobrada por integrity.untraced-decision. O leitor acusa três avisos que cruzam campos ou arestas, por isso não cabem no schema: integrity.testimony-in-prod (nó PROD cuja base é testemunho), integrity.verified-before-fact (verified_at anterior a valid_from) e integrity.untraced-decision (decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela). No v4.2 entra provenance.locality, opcional, com o enum repo (arquivo versionado no próprio repo), web (endereço público), host (só existe numa máquina: journal local, caminho fora do repo) ou pessoa (relato de alguém): o valor fora do enum alerta como form.enum.node.provenance.locality. Serve para medir o que é reverificável por terceiros e para barrar host na publicação.",
   "type": "object",

@@ -47,14 +47,14 @@ primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu r
 
 ```bash
 git clone https://github.com/marciocar/kg-ssot ../kg-ssot
-python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --dest vendor/kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --source https://github.com/marciocar/kg-ssot
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --source https://github.com/marciocar/kg-ssot
 ```
 
 As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
@@ -290,7 +290,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --source https://github.com/marciocar/kg-ssot`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.3 --source https://github.com/marciocar/kg-ssot`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
