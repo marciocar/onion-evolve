@@ -267,7 +267,9 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
                      git -C "$T" worktree remove --force "$wt" 2>/dev/null; rm -f "$req"; return 12; }
   # ── O QUE O CORE PAROU DE TRANSPORTAR SAI DA VENDOR (rename do workflow do evolve, 2026-10-13) ────
   # O `tar -x` acima SOBREPÕE: escreve o que o core manda e nunca apaga o que ele deixou de mandar.
-  # MEDIDO numa fixture (core renomeia `workflows/evolve.js` → `meta-evolve-fanout.js`, update rc=0
+  # (Os nomes vão SEM extensão de propósito: este arquivo viaja e ANCORA peças por citação com extensão
+  #  — `vendor-manifest.sh`, "_is_anchor" — e citar o workflow aqui o manteria vivo onde o evolve é cortado.)
+  # MEDIDO numa fixture (core renomeia o workflow `evolve` → `meta-evolve-fanout`, update rc=0
   # "merge limpo"): o adotante ficava com OS DOIS — o antigo, órfão, seguia na lista de workflows dele
   # com o nome que o core aposentou. Todo rename e toda remoção do core vazavam assim, em silêncio.
   # O CRITÉRIO É O DELTA DO PRÓPRIO CORE, nunca "o que a vendor tem e o core não": a vendor nasce da

@@ -5440,28 +5440,29 @@ _family run_vendor_pin_selftests
 #   (c2) adotante que EDITOU o arquivo REMOVIDO recebe CONFLITO (rc=10), nunca deleção calada
 #   (d) sem pin anterior no carimbo: nada sai, e o aviso é DITO em stderr
 #   (MUT) sem o bloco D_CURE-core-removed o antigo volta a ficar — o caso (a) é load-bearing
-_vcr_fixture() {  # $1=dir $2=1 se carimba o pin anterior $3=rm p/ REMOVER (default: renomear) → "core<TAB>alvo<TAB>branch"
-  local core="$1/c" t="$1/a" p1
-  mkdir -p "$core/.claude/commands" "$core/.claude/workflows" "$t/src"
-  git -C "$core" init -q; git -C "$t" init -q
-  printf 'cmd\n' > "$core/.claude/commands/foo.md"
-  printf "export const meta = { name: 'old' }\n" > "$core/.claude/workflows/old.js"
-  # keep.js mantém o diretório vivo no core: o manifesto só lista raiz que EXISTE no HEAD da fonte, e
-  # uma raiz que some inteira não entra no delta (limite declarado no vendor-branch.sh)
-  printf "export const meta = { name: 'keep' }\n" > "$core/.claude/workflows/keep.js"
-  git -C "$core" add -A; git -C "$core" commit -qm core
-  p1="$(git -C "$core" rev-parse --short=12 HEAD)"
-  printf 'produto\n' > "$t/src/app.js"
-  git -C "$core" archive HEAD -- .claude | tar -x -C "$t"
-  printf 'meu\n' > "$t/.claude/commands/mine.md"
-  [ "$2" = 1 ] && printf 'source_commit: %s\n' "$p1" > "$t/.claude/.onion-version"
-  git -C "$t" add -A; git -C "$t" commit -qm adopt
-  if [ "${3:-}" = rm ]; then git -C "$core" rm -q .claude/workflows/old.js
-  else git -C "$core" mv .claude/workflows/old.js .claude/workflows/new.js; fi
-  git -C "$core" commit -qm "rename-or-remove"
-  printf '%s\t%s\t%s\n' "$core" "$t" "$(git -C "$t" rev-parse --abbrev-ref HEAD)"
-}
 run_vendor_core_removed_selftests() {
+  # helper DENTRO da família: fora dela o seletor --affected cai no failsafe e roda as 248
+  _vcr_fixture() {  # $1=dir $2=1 se carimba o pin anterior $3=rm p/ REMOVER (default: renomear) → "core<TAB>alvo<TAB>branch"
+    local core="$1/c" t="$1/a" p1
+    mkdir -p "$core/.claude/commands" "$core/.claude/workflows" "$t/src"
+    git -C "$core" init -q; git -C "$t" init -q
+    printf 'cmd\n' > "$core/.claude/commands/foo.md"
+    printf "export const meta = { name: 'old' }\n" > "$core/.claude/workflows/old.js"
+    # keep.js mantém o diretório vivo no core: o manifesto só lista raiz que EXISTE no HEAD da fonte, e
+    # uma raiz que some inteira não entra no delta (limite declarado no vendor-branch.sh)
+    printf "export const meta = { name: 'keep' }\n" > "$core/.claude/workflows/keep.js"
+    git -C "$core" add -A; git -C "$core" commit -qm core
+    p1="$(git -C "$core" rev-parse --short=12 HEAD)"
+    printf 'produto\n' > "$t/src/app.js"
+    git -C "$core" archive HEAD -- .claude | tar -x -C "$t"
+    printf 'meu\n' > "$t/.claude/commands/mine.md"
+    [ "$2" = 1 ] && printf 'source_commit: %s\n' "$p1" > "$t/.claude/.onion-version"
+    git -C "$t" add -A; git -C "$t" commit -qm adopt
+    if [ "${3:-}" = rm ]; then git -C "$core" rm -q .claude/workflows/old.js
+    else git -C "$core" mv .claude/workflows/old.js .claude/workflows/new.js; fi
+    git -C "$core" commit -qm "rename-or-remove"
+    printf '%s\t%s\t%s\n' "$core" "$t" "$(git -C "$t" rev-parse --abbrev-ref HEAD)"
+  }
   local helper="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh"
   [ -f "${helper}" ] || { record_skip "vendor-core-removed: vendor-branch.sh ausente"; return 0; }
   export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
