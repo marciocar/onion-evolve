@@ -17,7 +17,7 @@ mecanismo de herança de escopo.**
 
 ### O branch-exemplo do maestro NÃO serve (como mecanismo de composição)
 
-O exemplo em branches (`onion/adopt → …/granaai → …/teams/desenvolvimento → …/members/mauricio`)
+O exemplo em branches (`onion/adopt → …/granaai → …/teams/desenvolvimento → …/members/dev-1`)
 **não é o mecanismo** — e essa é a única resposta que os 4 streams dão em uníssono:
 
 - **É antipadrão documentado.** Usar branch git para representar ambiente/escopo é antipadrão GitOps
@@ -81,7 +81,7 @@ cascata mágica. Em regulado (Grana.Ai) isso é requisito de auditoria (H3·F4/F
 | **Framework** (Onion core) | `.onion-version` (stamp) + tag/release do core; upgrade reconciliado por `vendor-branch.sh` 3-way (eixo VERSÃO) — H3·F2/veredito | É a base; ninguém abaixo o conhece (desacoplamento Kustomize — H4·F8) | N/A (é a raiz da cascata) | Entregue como **plugin(s) versionado(s)** no marketplace interno (`onion-engineering`, `onion-compliance`, …) — H2·F10; ou **vendorizado** via `/meta:adopt` quando o CLI não auto-instala — H2·F12 |
 | **Empresa** (Grana.Ai) | `managed-settings.json` versionado + preferência org-wide do plugin (Required) — H2·F10/H3·F12; política também como preset Renovate de org — H3·F9 | Herda o framework por concatenação/`@import` no `CLAUDE.md` raiz — H4·F1/H3·F11 | **Piso inviolável**: `managed` não é sobreponível por nada (nem CLI) — `permissions.deny`, `availableModels`, `strictKnownMarketplaces`, managed `claudeMd` — H2·F1/F3 | **Managed policy** — `managed-settings.json` + managed `CLAUDE.md`; ou **server-managed settings** (sem MDM, push do console) — H2·F11 |
 | **Time** (`desenvolvimento`) | `packages/<time>/CLAUDE.md` + `.claude/` commitados (source control) — H2·F5; capacidade por override-de-grupo no marketplace (Enterprise) — H2·F10/H3·F12 | Concatena o raiz (empresa) por upward-traversal; herda default explícito — H4·F1/F3 | **Cognitivo**: `CLAUDE.md`/rules por diretório sobrepõem por proximidade (walk-up) — H2·F5/F8; `claudeMdExcludes` isola outros times — H2·F9. **Config**: `settings.json` NÃO herda → **merge-N-camadas do Onion** materializa self-contained — H2·F7 | **project** (`.claude/` do subdir do time) + `.claude/rules/` `paths:`-scoped + `.claude/agents/` (walk-up) — H2·F5/F8/F9. *Gap: sem nível nativo "time" para `settings.json`.* |
-| **Pessoa** (`mauricio`) | `~/.claude/` (cross-repo) versionável pela pessoa; `CLAUDE.local.md` gitignored (por-repo) — H2·F11 | `user` lido antes de project (project vence onde colide); auto-memory per-repo — H1·F2/H2·F9 | Array-merge empilha (não apaga a herança); escalar da camada mais próxima vence — H2·F2; polimorfismo por dados (chezmoi template) — H3·F7 | **user** (`~/.claude/CLAUDE.md`, `~/.claude/agents/`, `~/.claude/rules/`) + **local** (`CLAUDE.local.md`) — H2·F1/F4. *Gap: "pessoa-dentro-do-time-dentro-do-repo" versionável/compartilhável é o único nível nativamente fraco — `@import ~/.claude/…` mitiga — H2·F6/F11.* |
+| **Pessoa** (`dev-1`) | `~/.claude/` (cross-repo) versionável pela pessoa; `CLAUDE.local.md` gitignored (por-repo) — H2·F11 | `user` lido antes de project (project vence onde colide); auto-memory per-repo — H1·F2/H2·F9 | Array-merge empilha (não apaga a herança); escalar da camada mais próxima vence — H2·F2; polimorfismo por dados (chezmoi template) — H3·F7 | **user** (`~/.claude/CLAUDE.md`, `~/.claude/agents/`, `~/.claude/rules/`) + **local** (`CLAUDE.local.md`) — H2·F1/F4. *Gap: "pessoa-dentro-do-time-dentro-do-repo" versionável/compartilhável é o único nível nativamente fraco — `@import ~/.claude/…` mitiga — H2·F6/F11.* |
 
 **Leitura da matriz:** as 4 camadas **compõem simultaneamente** em runtime (concatenação amplo→específico
 + precedência tipada), com **compliance inviolável no topo** (managed = Root), **override estrutural**
@@ -93,7 +93,7 @@ pelo vetor, sem manter ninguém em 4 branches (H4·encaixe).
 ## Caso Grana.Ai resolvido
 
 Fintech regulada, **nx monorepo** privado, time de devs + stage/prod; dentro: empresa (Grana.Ai) ⊃ time
-(`desenvolvimento`) ⊃ pessoa (`mauricio`), cada um herdando do pai e podendo sobrepor. `integration_branch:
+(`desenvolvimento`) ⊃ pessoa (`dev-1`), cada um herdando do pai e podendo sobrepor. `integration_branch:
 develop`, nunca live-pull. **Resolução concreta, sem branch de escopo:**
 
 **1. Framework (Onion core)** — baseline entregue como **plugin(s) versionado(s)** no marketplace interno
@@ -119,7 +119,7 @@ gerado em `CODEOWNERS` via `@nx/owners`/`nx sync` (H3·F4). **Gap real:** `setti
 raiz (H2·F7) → o **merge-N-camadas do Onion** materializa `packages/desenvolvimento/.claude/settings.json`
 self-contained, compondo framework+empresa+time — é a peça de engenharia que o Onion acrescenta.
 
-**4. Pessoa (`mauricio`)** — `~/.claude/CLAUDE.md` + `~/.claude/agents/` + `~/.claude/rules/` (preferência
+**4. Pessoa (`dev-1`)** — `~/.claude/CLAUDE.md` + `~/.claude/agents/` + `~/.claude/rules/` (preferência
 cross-repo) e, no repo, `CLAUDE.local.md` gitignored (H2·F4/F11). Lido por último → **vence onde não colide
 com managed/compliance**. Polimorfismo por dados no estilo chezmoi (`.chezmoidata`) para especializar sem
 copiar (H3·F7). Único nível nativamente fraco (compartilhar entre worktrees) — mitigado por `@import

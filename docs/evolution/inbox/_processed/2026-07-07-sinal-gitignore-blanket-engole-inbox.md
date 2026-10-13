@@ -6,7 +6,7 @@ to: onion-evolve (core / "mestre")
 re: PR #1094 (reconciliação, mergeado) + PR #1096 (fix .gitignore, mergeado)
 type: federation-doc-bridge (feedback de adoção — não-solicitado)
 status: corrigido (PR #1096 mergeado em develop, 2026-07-07). Provenance: este sinal foi
-  RECONSTRUÍDO pelo core a partir do comentário verbatim de Mauricio Matos no PR #1094
+  RECONSTRUÍDO pelo core a partir do comentário verbatim de dev-1 no PR #1094
   (2026-07-07T01:40:44Z) — a entrega original pelo canal normal (inbox do adotante +
   /meta:co-relay) NÃO chegou. Verificado 2026-07-07: ausente em todas as branches do
   granaai (pós-fetch) e no inbox do core. Conteúdo técnico é 100% dele; a materialização
@@ -15,7 +15,7 @@ status: corrigido (PR #1096 mergeado em develop, 2026-07-07). Provenance: este s
 
 # Sinal de campo — o bug real do `.gitignore` não era onde parecia (2026-07-07)
 
-## O achado (Mauricio Matos, granaai, comentário no PR #1094)
+## O achado (dev-1, granaai, comentário no PR #1094)
 
 Ao reconciliar o PR #1094, o `.gitignore` do granaai deixou de ignorar `docs/*` na linha 109
 (ajuste já feito antes) — mas continuava ignorando artefatos de `docs/` porque o culpado real

@@ -2,7 +2,7 @@
 title: 'ADR — Grana.Ai: onde o Onion se consolidou como potência (não a origem)'
 date: 2026-07-06
 type: adr
-status: aceito — Fase 0 e Fase 3 EXECUTADAS (2026-07-06); PR #1094 no GranaAi/granaai aguardando review/merge do Mauricio
+status: aceito — Fase 0 e Fase 3 EXECUTADAS (2026-07-06); PR #1094 no GranaAi/granaai aguardando review/merge do dev-1
 decision-scope: meta / federação / confidencialidade / identidade
 supersedes: none
 deciders: maestro
@@ -26,10 +26,10 @@ Linha que permaneceu **separada** da federação até esta semana:
 
 - **`onion-docs`** (branch em `GranaAi/granaai`, autoria **Marcio Carvalho**, 2025-10-03) — o
   próprio maestro já documentava a Grana.Ai com Onion há 9 meses.
-- **`feature/onion-integration`** (Leonardo Melo, 2025-11-06) — "integração com o onion".
+- **`feature/onion-integration`** (dev-2, 2025-11-06) — "integração com o onion".
 - **2026-07-01**: **Marcio Carvalho — CTO da Grana.Ai, criador do Onion e mentor do Onion
-  Evolve — convidou Mauricio Matos a se conectar com o Onion Evolve.** A partir do convite,
-  Mauricio baixou o core, adotou e organizou o repo da Grana.Ai a partir da própria máquina.
+  Evolve — convidou dev-1 a se conectar com o Onion Evolve.** A partir do convite,
+  dev-1 baixou o core, adotou e organizou o repo da Grana.Ai a partir da própria máquina.
 
 ## Fatos verificados (read-only, via `gh api` — nada suposto)
 
@@ -46,8 +46,8 @@ Linha que permaneceu **separada** da federação até esta semana:
   integration_branch: develop
   ```
 - **O "onion delta" real é 13 commits** (não os 342 de divergência bruta do branch — esses
-  incluem trabalho normal de produto de outros membros do time, Leonardo Melo/mauriciogranaai,
-  já mergeado alhures). Os 13, todos de **Mauricio Matos em 2026-07-01, das 17h53 às 21h48
+  incluem trabalho normal de produto de outros membros do time, dev-2/dev-1,
+  já mergeado alhures). Os 13, todos de **dev-1 em 2026-07-01, das 17h53 às 21h48
   (BRT)** — quase 4h contínuas:
   adoção → relatório de adoção → update de framework → lint fix → **sinal upstream** → Fase 0
   (baseline) → Fase 1 (28 dossiês) → Fase 2 (reconciliação técnica 19→45 apps) → Fase 3 (RFT-001
@@ -60,7 +60,7 @@ Linha que permaneceu **separada** da federação até esta semana:
 
 ## O achado que valida a doutrina: descoberta convergente independente
 
-Mauricio reportou um **sinal upstream real**: `lint-artifacts.sh` tinha 13 guardas com `|| return`
+dev-1 reportou um **sinal upstream real**: `lint-artifacts.sh` tinha 13 guardas com `|| return`
 (sem argumento) que, sob `set -e`, abortavam o script inteiro em máquina sem `jq` — o oposto da
 intenção ("pula gracioso"). Ele aplicou o fix localmente (`|| return 0`) às **16h00 BRT**.
 
@@ -83,8 +83,7 @@ no sentido publicar-depois; não no sentido despublicar-depois — por isso o de
 ### D3 — Reconciliação técnica: GATED até alinhamento humano — ✅ CONFIRMADA 2026-07-06
 O branch `onion/adopt`/`onion/granaai-ssot` está **divergido** (342 à frente / 232 atrás do
 `develop` real) e **sem PR aberto** — trabalho de valor real em risco de apodrecer. Fase 0
-concluída: o maestro confirmou levar o trabalho adiante ("vamos refinar juntos"), e **Mauricio
-Matos é o responsável por revisar/mergear no `develop`** real do time. A Fase 3 (cherry-pick,
+concluída: o maestro confirmou levar o trabalho adiante ("vamos refinar juntos"), e **dev-1 é o responsável por revisar/mergear no `develop`** real do time. A Fase 3 (cherry-pick,
 já preparada e verificada sem conflito) aguarda só o sinal de execução — não mais alinhamento.
 
 ### D4 — Grana.Ai NÃO recebe `role: source` próprio
@@ -103,7 +102,7 @@ quando divergirem. O que a Grana.Ai tem, e que endereça a mesma necessidade sem
 ## Próximos passos
 1. ~~**Fase 0**~~ — ✅ CONFIRMADA 2026-07-06 (ver D3).
 2. ~~**Fase 3**~~ — ✅ **EXECUTADA 2026-07-06** (ver detalhamento abaixo). PR aberto contra
-   `develop`, aguardando review/merge do Mauricio.
+   `develop`, aguardando review/merge do dev-1.
 3. Considerar: uma vez reconciliado, criar canal de co-evolução real (inbox/outbox) para que
    sinais como o do lint não dependam de descoberta arqueológica — o próximo "sinal upstream" real
    deveria chegar em horas, não ser achado 5 dias depois numa investigação read-only.
@@ -118,23 +117,23 @@ commits**, todos aplicados.
 **2 conflitos reais, ambos resolvidos com transparência total (documentados no PR, não
 escondidos):**
 1. `.gitignore` — `develop` já tinha ignores próprios para `.claude/`/Onion (de commit anterior,
-   Leonardo Melo). Resolvido preservando as duas intenções. **Achado que fica para o time
+   dev-2). Resolvido preservando as duas intenções. **Achado que fica para o time
    decidir**: a regra pré-existente `#Pastas do Onion` → `/docs/*` ignora tecnicamente tudo sob
    `/docs/` — os arquivos deste PR entraram (git aceita adds explícitos mesmo com ignore ativo),
    mas PRs futuros com novos docs vão precisar de `git add -f` a menos que a regra seja
    revisada/escopada. Sinalizado no PR, não decidido unilateralmente.
 2. `admin-user-realm-routing-guide.md` (modify/delete) — arquivo criado por um commit de
-   **produto** (`e1b633591`, Leonardo Melo) fora do escopo dos 13 commits Onion-específicos.
+   **produto** (`e1b633591`, dev-2) fora do escopo dos 13 commits Onion-específicos.
    Mantido ausente (consistente com a decisão de não trazer commits de produto) — a Fase 5 só
    adicionava 2 linhas de metadado nele.
 
 **Verificado**: lint Onion 0 HARD/0 SOFT, selftest 127/0 (rodado dentro do próprio `~/granaai`
 após a reconciliação). PR: **https://github.com/GranaAi/granaai/pull/1094** (base `develop`,
-reviewer `mauriciogranaai`, mergeable, **NÃO mergeado** — decisão de merge é do Mauricio,
+reviewer `dev-1`, mergeable, **NÃO mergeado** — decisão de merge é do dev-1,
 conforme D3).
 
 ## Histórico
 | Data | Mudança |
 |---|---|
 | 2026-07-06 | ADR aceito; linhagem registrada em `members.yaml`; reconciliação técnica gated |
-| 2026-07-06 | **Fase 0 CONFIRMADA**: maestro decide levar `onion/adopt`+`onion/granaai-ssot` adiante; Mauricio Matos é o revisor/mergeador designado. **D4 nova**: Grana.Ai NÃO recebe `role: source` (doutrina fonte≠derivação) — recebe `integration_branch` explícito + trust elevado (`can_correct_to`) em vez disso. Fase 3 aguarda só o sinal de execução |
+| 2026-07-06 | **Fase 0 CONFIRMADA**: maestro decide levar `onion/adopt`+`onion/granaai-ssot` adiante; dev-1 é o revisor/mergeador designado. **D4 nova**: Grana.Ai NÃO recebe `role: source` (doutrina fonte≠derivação) — recebe `integration_branch` explícito + trust elevado (`can_correct_to`) em vez disso. Fase 3 aguarda só o sinal de execução |

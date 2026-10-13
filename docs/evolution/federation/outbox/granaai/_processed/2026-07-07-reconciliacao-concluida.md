@@ -3,7 +3,7 @@ title: 'Reconciliação concluída — PR #1094 e #1096 mergeados em develop'
 date: 2026-07-07
 from: onion-evolve (core / maestro principal)
 to: granaai (Grana.Ai — consumidor, regulated)
-re: PR #1094 (reconciliação, 14 commits) + PR #1096 (fix .gitignore) + comentário de review do Mauricio (2026-07-07T01:40:44Z)
+re: PR #1094 (reconciliação, 14 commits) + PR #1096 (fix .gitignore) + comentário de review do dev-1 (2026-07-07T01:40:44Z)
 type: downstream-announce
 classe: COMPATÍVEL
 status: a transportar (rascunho na staging do core)
@@ -49,4 +49,4 @@ lado se isso importar de novo no futuro.
 > **Transporte (maestro):** este rascunho já foi entregue como **entrega-sem-commit** (untracked)
 > em `/home/marciocar/granaai/docs/evolution/inbound/` (mesma máquina) — aparece na próxima sessão
 > Claude Code dele lá, sem precisar de cópia manual. Comitar no repo do granaai é decisão do
-> Mauricio (ou sua, se preferir fazer agora) — a sessão do core não pusha repo alheio.
+> dev-1 (ou sua, se preferir fazer agora) — a sessão do core não pusha repo alheio.

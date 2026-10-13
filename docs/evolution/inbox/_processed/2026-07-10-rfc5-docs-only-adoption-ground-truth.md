@@ -11,8 +11,8 @@ severity: SOFT (não é bug — é evidência de campo p/ decisão em voo)
 
 # Sinal — o caso Grana.Ai do RFC-0005 §5 está acontecendo AGORA no repo (ground-truth)
 
-> O RFC-0005 foi aceito 2026-07-09 com §5 escrevendo sobre `granaai → time → mauricio`. No **mesmo dia**,
-> o Mauricio materializou uma escolha de escopo concreta em `master`. Segue o ground-truth — confirma o
+> O RFC-0005 foi aceito 2026-07-09 com §5 escrevendo sobre `granaai → time → dev-1`. No **mesmo dia**,
+> o dev-1 materializou uma escolha de escopo concreta em `master`. Segue o ground-truth — confirma o
 > modelo em pontos e o **tensiona** em outros. Útil enquanto a tinta do §5 ainda está molhada.
 
 ## O fato (verificável no `GranaAi/granaai`)
@@ -22,9 +22,9 @@ severity: SOFT (não é bug — é evidência de campo p/ decisão em voo)
 | Linha | Base | O que é versionado | `.claude/` no git? |
 |-------|------|--------------------|--------------------|
 | `develop` | adoção completa (pin 4332ac8d, mergeada 07-07) | `.claude/` **+** docs | **SIM** |
-| `master` | **docs-only** (PR #1127 `onion/adopt-master`, 07-09, Mauricio) | **só** `docs/{meta-specs,knowledge-base,sdaal,evolution}` | **NÃO** — "*maestro's decision*" |
+| `master` | **docs-only** (PR #1127 `onion/adopt-master`, 07-09, dev-1) | **só** `docs/{meta-specs,knowledge-base,sdaal,evolution}` | **NÃO** — "*maestro's decision*" |
 
-Commit `570a45a1b` (Mauricio, textual): *"`.claude/` (capability layer) and `CLAUDE.md` stay OUT of git"* +
+Commit `570a45a1b` (dev-1, textual): *"`.claude/` (capability layer) and `CLAUDE.md` stay OUT of git"* +
 `.gitignore` ajustado p/ rastrear só os docs. Follow-up aberto `chore/onion-docs-gitignore-scope` (07-09,
 não-mergeado): re-escopa `/docs/*` + negações só p/ as verticais Onion (restaura scratch do time).
 
@@ -57,11 +57,11 @@ não-mergeado): re-escopa `/docs/*` + negações só p/ as verticais Onion (rest
 ## Pedido ao core (RFC-5/RFC-4 em voo)
 
 - Nomear **forma de adoção** (full | docs-only | in-place) como dimensão de 1ª classe no §4 — hoje ela existe
-  de fato (Mauricio) mas só implícita, e por isso vaza p/ branch.
+  de fato (dev-1) mas só implícita, e por isso vaza p/ branch.
 - Definir como o **capability-update** (`.claude/`) chega a um adotante **docs-only/regulado** (entrega-fora-do-git
   vs opt-in de versionar `.claude/`). É o gap que o §5 Grana.Ai vai encontrar assim que o time rodar o 1º `--update`.
 - Considerar `role`/`forma` como eixo de **proveniência-por-chave** no plano config (unifica com o sinal do marketplace).
 
 Contexto: o maestro (Marcio) pediu explicitamente **não mexer em master** — este sinal é observação, não proposta
-de mudança no repo do time. Coordenar com a branch aberta do Mauricio (`chore/onion-docs-gitignore-scope`) antes
+de mudança no repo do time. Coordenar com a branch aberta do dev-1 (`chore/onion-docs-gitignore-scope`) antes
 de qualquer toque em `.gitignore`.

@@ -75,4 +75,4 @@ KG (`/meta:kg`) — ortogonal ao merge de arquivo ("git merge não reconcilia ve
 ## O que fica p/ design/dogfood
 - ~~**Resolver da cadeia** (`resolve-scope-layers.sh`)~~ — ✅ entregue: descobre empresa→time→pessoa, compõe e
   repassa `--show-scope` com rótulos canônicos + role/forma do stamp.
-- **Dogfood no Grana.Ai**: empresa(granaai)+time(desenvolvimento)+pessoa(mauricio) no nx monorepo (próximo passo #3).
+- **Dogfood no Grana.Ai**: empresa(granaai)+time(desenvolvimento)+pessoa(dev-1) no nx monorepo (próximo passo #3).

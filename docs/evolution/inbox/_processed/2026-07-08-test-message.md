@@ -1,7 +1,7 @@
 ---
 title: 'Mensagem de teste — canal upstream (inbox do core)'
 date: 2026-07-08
-from: mauriciomatos (maestro / sessão do core)
+from: dev-1 (maestro / sessão do core)
 to: onion-evolve (core / role:source)
 re: validação do canal upstream inbox/
 type: field-signal

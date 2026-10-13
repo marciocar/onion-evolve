@@ -300,7 +300,7 @@ Mapeamento concreto, cavalgando o nativo e preenchendo os gaps com as bases do O
    Onion** materializa `packages/desenvolvimento/.claude/settings.json` self-contained compondo
    framework+empresa+time.
 
-4. **PESSOA (ex.: `mauricio`):** `~/.claude/CLAUDE.md` + `~/.claude/agents/` + `~/.claude/rules/`
+4. **PESSOA (ex.: `dev-1`):** `~/.claude/CLAUDE.md` + `~/.claude/agents/` + `~/.claude/rules/`
    (camada user, atravessa todos os repos da pessoa) para preferência global; e, **dentro do repo**,
    `CLAUDE.local.md` (gitignored) para preferências pessoais-por-projeto. **Gap do 4º nível:** o
    nativo não tem "pessoa-dentro-do-time-dentro-do-repo" versionável/compartilhável — `CLAUDE.local.md`
