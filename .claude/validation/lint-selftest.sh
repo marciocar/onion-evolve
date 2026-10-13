@@ -7752,7 +7752,9 @@ run_moat_gate_selftests() {
   mkdir -p "${d}/proj/ops" "${d}/proj/docs/evolution/federation" "${d}/scratch" "${d}/h" "${d}/sem-tsv"
   git -C "${d}/proj" init -q -b feat
   git -C "${d}/proj" remote add origin https://github.com/onion-bancada/core.git
-  cp "${tsv_real}" "${d}/proj/ops/moat-targets.tsv"
+  # a raiz de casa da VPS vira FICTÍCIA na fixture (/srv/vps-home): a bancada viaja para as portas
+  # públicas e não pode carregar caminho de máquina (o motor de publicação reprova, passo 5a).
+  sed 's#/home/[^/]*/#/srv/vps-home/#g' "${tsv_real}" > "${d}/proj/ops/moat-targets.tsv"
   cp "${REPO_ROOT}/ops/update-kg-writer.sh" "${d}/proj/ops/update-kg-writer.sh"
   git init -q -b main "${d}/adotante"
   git -C "${d}/adotante" remote add origin https://github.com/onion-bancada/adotante.git
@@ -7778,13 +7780,13 @@ EOF
 # Atualiza o onion-kg-writer para o origin/main (pós-#1072). Backup da raiz de dados antes; nunca imprime token.
 set -euo pipefail
 main() {
-  CORE=/home/marcio/onion-evolve
-  CODE=/home/marcio/mcp-kg/core-writer
+  CORE=/srv/vps-home/onion-evolve
+  CODE=/srv/vps-home/mcp-kg/core-writer
   DATA=/var/lib/onion-chat-kg
   git -C "$CORE" fetch -q origin
   SHA="$(git -C "$CORE" rev-parse origin/main)"
-  BK="/home/marcio/backups/onion-chat-kg-$(date +%Y%m%d-%H%M%S).tar.gz"
-  install -d -m 0700 /home/marcio/backups
+  BK="/srv/vps-home/backups/onion-chat-kg-$(date +%Y%m%d-%H%M%S).tar.gz"
+  install -d -m 0700 /srv/vps-home/backups
   sudo tar -C "$(dirname "$DATA")" -czf "$BK" "$(basename "$DATA")"
   sudo chown marcio:marcio "$BK"; chmod 600 "$BK"
   echo "backup: $BK ($(stat -c %s "$BK") bytes)"
@@ -7848,9 +7850,9 @@ PY
   _mgcase "(d6) rsync LENDO do docroot para /tmp → passa (só o destino é escrita)" 0 "${P}" \
     'rsync -a /var/www/onion-landing/ /tmp/copia-site/' "${J}" '(pos[-1:] if len(pos) >= 2' '(pos if len(pos) >= 2'
   _mgcase "(d7) git checkout na worktree servida do kg-writer → VETO" "2:git checkout numa árvore servida" "${P}" \
-    'git -C /home/marcio/mcp-kg/core-writer checkout --detach abc123' "${J}" 'hit = _moat_path_match(os.path.normpath(where), ("deploy",))' 'hit = None'
+    'git -C /srv/vps-home/mcp-kg/core-writer checkout --detach abc123' "${J}" 'hit = _moat_path_match(os.path.normpath(where), ("deploy",))' 'hit = None'
   _mgcase "(d8) git rev-parse na worktree servida → passa" 0 "${P}" \
-    'git -C /home/marcio/mcp-kg/core-writer rev-parse HEAD' "${J}" '    if sub not in _MOAT_GIT_WRITE and not' '    if False and sub not in _MOAT_GIT_WRITE and not'
+    'git -C /srv/vps-home/mcp-kg/core-writer rev-parse HEAD' "${J}" '    if sub not in _MOAT_GIT_WRITE and not' '    if False and sub not in _MOAT_GIT_WRITE and not'
   _mgcase "(d9) cd condicional + caminho relativo no docroot → VETO" "2:MOAT/deploy" "${P}" \
     'cd /var/www && cd onion-landing && rm -rf velho' "${J}" $'    if base == UNKNOWN and _MOAT_CDS:\n        base = _MOAT_CDS[-1]' $'    if False:\n        base = _MOAT_CDS[-1]'
   _mgcase "(d10) symlink criado na string e escrita por ele → VETO" "2:MOAT/deploy" "${P}" \
@@ -7877,7 +7879,7 @@ PY
   _mgcase "(d19) watch executando o restart → VETO" "2:MOAT/deploy" "${P}" \
     'watch -n 5 systemctl restart onion-vps-bridge' "${J}" $'                command(words[k:], depth + 1)\n                break' $'                break'
   # contornos achados pela passada adversarial própria (2026-10-13), cada um curado e travado aqui
-  HOME=/home/marcio _mgcase "(d20) git -C ~/… com til na worktree servida → VETO (HOME da VPS)" "2:git pull numa árvore servida" "${P}" \
+  HOME=/srv/vps-home _mgcase "(d20) git -C ~/… com til na worktree servida → VETO (HOME da VPS)" "2:git pull numa árvore servida" "${P}" \
     'git -C ~/mcp-kg/core-writer pull' "${J}" 'gw = [os.path.expanduser(w) if w.startswith("~")' 'gw = [w if w.startswith("~")'
   _mgcase "(d21) find <docroot> -delete → VETO" "2:MOAT/deploy" "${P}" \
     "find /var/www/onion-landing -name '*.bak' -delete" "${J}" '        writes = "-delete" in args or any(' '        writes = False and any('

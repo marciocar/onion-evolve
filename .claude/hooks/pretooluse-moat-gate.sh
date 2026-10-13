@@ -6,7 +6,7 @@
 # Dos quatro itens do MOAT (merge no main · deploy · escrever repo alheio · agendar por relógio) só o merge
 # tinha veto (pretooluse-merge-gate.sh). Os outros três eram PROSA no drive.md. Em 2026-10-13 a sessão
 # principal publicou o MCP onion-kg-writer com um script de scratchpad que fazia `sudo systemctl restart
-# onion-vps-mcp-kg-writer` e `git -C /home/marcio/mcp-kg/core-writer checkout --detach <sha>`: deploy fora
+# onion-vps-mcp-kg-writer` e `git -C <worktree-de-produção-do-writer> checkout --detach <sha>`: deploy fora
 # de wrapper, sem backup, sem conferência, e nenhum aviso. É o gatilho (a) da decisão, observado.
 #
 # ── O QUE VETA (exit 2 = antes de executar) ─────────────────────────────────────────────────────────────
