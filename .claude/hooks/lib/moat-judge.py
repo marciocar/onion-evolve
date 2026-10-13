@@ -243,7 +243,7 @@ def _moat_redirects(raw_words, detail):
 
 # ── relevância para o que NÃO se prova (nome dinâmico, eval, código noutra linguagem, script ilegível) ──
 # Dois pares (sinal, ação), julgados NA MESMA LINHA: a 1ª redação casava sinal e ação em qualquer lugar do texto e,
-# no corpus (2026-10-13), um script grande que CITAVA /home/marcio/onion-core numa linha e `cp` noutra fechava.
+# no corpus (2026-10-13), um script grande que CITAVA o caminho de um clone de porta numa linha e `cp` noutra fechava.
 # O membro só pesa junto de `push`: commit local num clone de adotante não é veto (ver _moat_git).
 def _moat_signal_re():
     alts = [r"crontab", r"systemd-run", r"\.timer\b", r"/etc/cron", r"/var/spool/cron"]
