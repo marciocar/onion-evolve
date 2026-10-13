@@ -35,8 +35,8 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 91.0 | `Q_MERGE_PROCESS_ONION_2026_10` | merge-process-onion-2026-10 | Qual o melhor processo de PR, CI e merge para o core (repo público de dono User, sem proteção, rebase linear, PRs paralelos de  |
+| 13.5 | `C_OPCAO_E_REQUIRED_CHECKS_RULESET` | merge-process-onion-2026-10 | OPÇÃO E — required status checks via ruleset (de graça em repo público de usuário), SEM a regra de histórico linear enquan |
 | 12.0 | `C_OPCAO_B_POSTMERGE_PROJECTION_WRITER` | merge-process-onion-2026-10 | OPÇÃO B — Opção 3 de Q_MERGE_DRIVER_PARA_PROJECAO_GERADA (gatilho disparado em #1062-#1065): parar de commitar projeções g |
-| 12.0 | `C_OPCAO_E_REQUIRED_CHECKS_RULESET` | merge-process-onion-2026-10 | OPÇÃO E — required status checks via ruleset (de graça em repo público de usuário), SEM a regra de histórico linear enquan |
 | 5.6 | `C_OPCAO_F_THIRD_PARTY_FREE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO F — fila de terceiro gratuita (Mergify Open Source / Trunk Free até 5 committers). GATED: gatilho = depois de A a D ain |
 | 5.4 | `C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO G — transferir o repo para uma organização Free para ter a fila nativa. GATED: custa a URL, o members.yaml, o marketpl |
 | 2.4 | `C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER` | merge-process-onion-2026-10 | OPÇÃO H — merge driver de .gitattributes para projeções. Elenxo: REJEITAR — o merge do servidor do GitHub não executa dri |

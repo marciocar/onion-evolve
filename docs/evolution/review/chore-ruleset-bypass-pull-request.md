@@ -1,7 +1,8 @@
 ---
 branch: chore/ruleset-bypass-pull-request
 date: 2026-10-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 2651f01b93772959ba3a282e9e211756220bd846b9e281bacd8006a27172a319
+reviewed_code_sha256: 885577c646d7a8582149eb8c4e5b422dc759c5270ede36b06c513bac9e0dd75d
 findings_total: 2
 findings_real: 0
 findings_fixed: 0
