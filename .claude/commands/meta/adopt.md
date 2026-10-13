@@ -297,6 +297,9 @@ done
 # (8) SSOT inventory.md + graph.md — REGENERA do filesystem do alvo. As REGRAS 8 e 21 as exigem e o
 #     hook nativo recém-instalado bloqueia o 1º commit sem elas; sem regenerar, o --update as deixa
 #     STALE quando o framework muda contagens. Helper testável (família ssot_projections).
+#     ⚠️ GREENFIELD: aqui o índice ainda está VAZIO, então testing-inventory.md e testing-state.md (REGRAS
+#     80/81, contam `git ls-files`) saem vazios e são removidos — é esperado. O durable-commit.sh (Fase 5)
+#     re-roda este helper DEPOIS do `git add` e as leva no commit (medido numa adoção de 2026-10-13).
 bash "$SOURCE_ROOT/.claude/utils/adopt/regen-ssot-projections.sh" "$DEST" \
   || { echo "ABORTADO: as projeções SSOT do alvo não foram geradas — ele nasceria com HARD das REGRAS 8/21"; exit 1; }
 
@@ -744,6 +747,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   WORK="$(bash "$SOURCE_ROOT/.claude/utils/adopt/dedicated-branch.sh" "$TARGET" "$UPDATE_BR" "$INTEGRATION_BRANCH")" || exit 1
   # WORK = "$TARGET" (sem farol) ou a worktree irmã (com farol). Daqui em diante, TODO passo usa "$WORK".
   ```
+- **Foto do `settings.json` ANTES** (para o diff de hooks do relatório): `cp "$WORK/.claude/settings.json" "$SOURCE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json" 2>/dev/null || true`.
 - **Aplicar o framework via MERGE de vendor-branch** (Achado #2 — substitui o copy-over), **na branch dedicada**:
   `bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-branch.sh" update "$WORK" "$SOURCE_ROOT" "$NOW" "$UPDATE_BR"`.
   (o 4º argumento é a branch onde o merge cai). O helper aplica o framework novo no
@@ -759,7 +763,11 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   starter `docs/evolution/`. (Fecha `docs/evolution/inbox/2026-06-18-adopt-update-skips-phase3-steps.md`.)
   **O `regen-baselines` filtra em vez de re-emitir aqui, e decide sozinho** (`--auto`): no update o alvo já
   tem história, e re-emitir re-toleraria a dívida acumulada; `--filter` tira só a chave **estrangeira**
-  (passivo do core) e a dívida **local** segue cobrada (o defeito de 47 HARD medido em 2026-08-17). A semente do KG antiga migra no passo (8b).
+  (passivo do core) e o resto segue cobrado (o defeito de 47 HARD medido em 2026-08-17). A semente do KG antiga migra no passo (8b).
+  **O rótulo da chave que fica vem do helper, nunca da prosa:** cada linha traz `{origem: K do core · L do adotante}`.
+  Chave citando arquivo VENDORIZADO idêntico ao do core (no pin) é passivo do CORE — por exemplo o
+  `ops-citation-travel-baseline`, cuja REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse)
+  cobra do core —, e o relatório a chama assim; "dívida local" é só a parcela `do adotante` (medido 2026-10-13: 31 de 31 eram do core).
 - **Re-carimbar** com a identidade NOVA da fonte (re-derivar — não há PASSO 0 aqui). **Sempre via
   helper determinístico** — a semântica (preserve + updated_at) vive no script, não em quem o chama:
   ```bash
@@ -773,7 +781,11 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   ```
 - **Auto-emitir o relatório NO ALVO — ANTES do commit durável, que o leva na branch dedicada** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
   (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`). Reusa o `diff --stat` já computado
-  acima. **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
+  acima. **O diff de hooks do relatório é MEDIDO pela entrada inteira:** cole a saída de
+  `bash "$SOURCE_ROOT/.claude/utils/adopt/merge-onion-hooks.sh" --diff "$SOURCE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json" "$WORK/.claude/settings.json"`
+  (adicionados, removidos, alterados com as chaves que mudaram, idênticos); comparar só evento/matcher/command
+  afirmou "idêntico" sobre 4 hooks que ganharam `onFailure: block` (2026-10-13). rc≠0 = escreva NÃO MEDIDO.
+  **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
   `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-hard.sh" "$WORK"` (o merge muda o que o lint vê; rc=3 = escreva NÃO MEDIDO).
 - **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima,
   já commitado na branch dedicada); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o

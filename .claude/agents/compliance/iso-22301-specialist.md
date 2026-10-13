@@ -517,7 +517,7 @@ Plano de gerenciamento de crise para coordenação, comunicação e decisão dur
 
 **Primary Contact:**
 - Nome: [Customer Success Manager dedicado]
-- Email: csm-serasa@empresa.com
+- Email: csm-cliente@empresa.example
 - Celular: +55 11 XXXX-XXXX (24/7)
 - Backup: [VP Customer Success]
 
@@ -531,7 +531,7 @@ Plano de gerenciamento de crise para coordenação, comunicação e decisão dur
 **Notification Channels:**
 - Email: Automático via PagerDuty para contactos cadastrados
 - Status Page: status.empresa.com (atualizações em tempo real)
-- Slack Connect: Canal privado #serasa-experian
+- Slack Connect: Canal privado #cliente-enterprise
 ```
 
 **Comunicação Externa:**

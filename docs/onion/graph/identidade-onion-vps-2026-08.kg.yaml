@@ -339,6 +339,23 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
       locality: "pessoa"
 
+  - id: E_ARANDEK_AVISO_ENVIADO_E_STACK_LOCAL_PARADA_1013
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "relato do maestro em 2026-10-13: aviso enviado ao adotante e stack local parada"
+    valid_from: "2026-10-13"
+    label: "O aviso ao adotante FOI ENVIADO pelo maestro em 2026-10-13, com o achado de segurança e a notícia de que a stack local dele nesta VPS foi parada: 12 containers removidos, 10 volumes preservados."
+    narrative: "Fecha o lado de AÇÃO que a decisão de 2026-10-12 (re-medir e enviar) deixava em aberto: o label do Q ainda diz 'não comunicado', e é este nó que o supera, sem reescrever o selo. O envio é testemunho do maestro, não medido daqui: o canal é dele. A parada da stack é o que torna o achado inerte NESTE host (nenhum container dele publicado aqui); o defeito no repo do adotante (segredo literal no histórico do compose rastreado) segue sendo dele curar, e só a sessão dele pode afirmar a rotação. Volumes preservados de propósito: parar não é apagar dado alheio, e o comando de subida fica com o maestro."
+    provenance:
+      source: "maestro, na sessão de 2026-10-13"
+      locator: "relato ao core em 2026-10-13: aviso enviado (achado de segurança + stack local parada), 12 containers removidos, 10 volumes preservados"
+      method: "testemunho: relato do maestro em 2026-10-13"
+      locality: "pessoa"
+
   - id: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
     node_type: question
     plane: PROD
@@ -742,6 +759,9 @@ edges:
   - from: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
     to: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
     edge_type: TRACES_TO
+  - from: E_ARANDEK_AVISO_ENVIADO_E_STACK_LOCAL_PARADA_1013
+    to: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
+    edge_type: SUPPORTS
   - from: Q_LACUNA_DECISAO_MAIS_CODIGO
     to: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
     edge_type: SUPPORTS

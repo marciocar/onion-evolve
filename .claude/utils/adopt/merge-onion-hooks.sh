@@ -35,6 +35,44 @@
 # =============================================================================
 set -euo pipefail
 
+# ── MODO --diff <antes.json> <depois.json>: o diff de hooks que o RELATÓRIO do --update cola ─────────
+# Por que existe (2026-10-13, update de um adotante): o relatório comparava só evento, matcher e
+# command, então NÃO via propriedade nova — o `onFailure: block` acrescentado pelo refresh a 4 hooks
+# que já existiam — e afirmou "as outras chaves estão idênticas" em falso. Aqui a identidade do hook é
+# (evento, matcher, command — ou type+prompt para hook sem command) e a comparação é da ENTRADA INTEIRA,
+# por valor: o `==` do jq é estrutural, então ordem de chaves não gera "mudou" falso. Cada hook alterado
+# lista as chaves que mudaram (antes→depois). Chave de topo diferente (permissions, attribution…) é
+# comparada com as listas ORDENADAS (ordem da allowlist não é mudança) e
+# nomeada numa linha à parte. Somente leitura; rc 0 = diff impresso (com ou sem mudança), 2 = uso, 3 = sem jq.
+if [ "${1:-}" = "--diff" ]; then
+  A="${2:-}"; B="${3:-}"
+  [ -f "${A}" ] && [ -f "${B}" ] || { echo "uso: merge-onion-hooks.sh --diff <antes.json> <depois.json>" >&2; exit 2; }
+  command -v jq >/dev/null 2>&1 || { echo "AVISO: jq ausente — diff de hooks NÃO MEDIDO." >&2; exit 3; }
+  jq -nr --slurpfile a "${A}" --slurpfile b "${B}" '
+    def flat($s): [ ($s.hooks // {}) | to_entries[] | .key as $ev | .value[]? | (.matcher // null) as $mt
+                    | .hooks[]? | {k: ([$ev, $mt, (.command // ((.type // "?") + ":" + ((.prompt // "") | tostring)))] | tojson),
+                                   ev: $ev, mt: $mt, h: .} ];
+    def hlabel($x): "\($x.ev)\(if $x.mt == null then "" else " [" + $x.mt + "]" end) \($x.h.command // ($x.h.type // "?"))";
+    def show($v): if $v == null then "ausente" else ($v | tojson) end;
+    ($a[0]) as $A | ($b[0]) as $B | flat($A) as $fa | flat($B) as $fb
+    | ($fa | map({key: .k, value: .}) | from_entries) as $ma
+    | ($fb | map({key: .k, value: .}) | from_entries) as $mb
+    | ([ $fb[] | select($ma[.k] == null) ]) as $add
+    | ([ $fa[] | select($mb[.k] == null) ]) as $del
+    | ([ $fb[] | select($ma[.k] != null and $ma[.k].h != .h) ]) as $chg
+    | ([ $fb[] | select($ma[.k] != null and $ma[.k].h == .h) ] | length) as $same
+    | ([ ($A | keys[]), ($B | keys[]) ] | unique | map(select(. != "hooks" and ($A[.] | walk(if type == "array" then sort else . end)) != ($B[.] | walk(if type == "array" then sort else . end))))) as $top
+    | ( [ $add[] | "+ \(hlabel(.))" ]
+      + [ $del[] | "- \(hlabel(.))" ]
+      + [ $chg[] | . as $x | $ma[$x.k].h as $o
+          | "~ \(hlabel($x)): " + ([ ([($o | keys[]), ($x.h | keys[])] | unique)[] | select($o[.] != $x.h[.])
+                                    | "\(.) \(show($o[.]))→\(show($x.h[.]))" ] | join(", ")) ]
+      + (if ($top | length) > 0 then [ "≠ chaves de topo diferentes: \($top | join(", "))" ] else [] end)
+      + [ "── hooks: \($fa | length) → \($fb | length) · \($add | length) adicionado(s) · \($del | length) removido(s) · \($chg | length) alterado(s) · \($same) idêntico(s) (entrada inteira)" ]
+      )[]' || { echo "ERRO: diff de hooks falhou (JSON inválido?) — NÃO MEDIDO; não escreva 'idêntico' no relatório." >&2; exit 3; }
+  exit 0
+fi
+
 SRC="${1:-}"
 TGT="${2:-}"
 

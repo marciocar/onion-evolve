@@ -26,7 +26,7 @@
 
 ## 🎯 Por que esta doutrina existe
 
-A VPS compartilhada (Hostinger KVM8, `srv1812846`) acumulou, entre julho e agosto de 2026, um auth
+A VPS compartilhada (Hostinger KVM8, `<host-da-vps>`) acumulou, entre julho e agosto de 2026, um auth
 maduro (Logto), um WhatsApp vivo (whatsapp-sender), um gap nomeado (email) e uma lista de candidatos
 (monitoramento, tunneling). O impulso natural — "vamos desenhar a arquitetura que harmoniza tudo isso"
 — **já foi tentado e reprovado** (F2, `stack-harmonia-2026-08`): a síntese citava "9 membros" e "canal
@@ -155,7 +155,7 @@ exposta não pode depender de disciplina, precisa de mecanismo).
 
 Em 2026-08-05, o Docker furou o `ufw`: a chain `DOCKER-FORWARD` roda **antes** do `ufw` no `iptables`, e
 `DOCKER-USER` estava vazia — resultado, data stores de adotantes (`onion-adopt-<nome>-*`: redis,
-postgres, milvus/minio/attu) ficaram **expostos à internet pública** em `179.197.65.94`, apesar do `ufw`
+postgres, milvus/minio/attu) ficaram **expostos à internet pública** em `<ip-da-vps>`, apesar do `ufw`
 "achar" que estava fechando as portas. Contido por uma regra `DOCKER-USER` default-deny (`-i eth0`)
 persistida em `onion-vps-docker-firewall.service` (systemd oneshot, `After=docker.service`, idempotente).
 

@@ -114,6 +114,43 @@ count_keys() {
   printf '%s' "${n:-0}"
 }
 
+# ── ORIGEM DA CHAVE QUE FICA: do CORE (arquivo vendorizado) ou do ADOTANTE (2026-10-13) ───────────
+# O filtro decide por EXISTÊNCIA (o arquivo citado existe no alvo?), e isso separa estrangeira de
+# não-estrangeira — mas não diz DE QUEM é a dívida que fica. Medido em dois adotantes: as 31 chaves do
+# `ops-citation-travel-baseline` eram citações a `ops/` DENTRO de arquivos vendorizados do core (a
+# REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse) cobra do core), e o
+# relatório do update as chamou de "dívida LOCAL". O arquivo existe no alvo PORQUE veio na cópia.
+# Discriminador objetivo: o arquivo citado existe no repo de onde ESTE script roda (a fonte) e é
+# byte-idêntico ao do alvo → a chave é do core. Divergiu ou só existe no alvo → é do adotante.
+# Fonte sem `.claude/validation` (script copiado para um sandbox) → origem NÃO MEDIDA, e é dito.
+CORE_REF="${ONION_CORE_REF:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." 2>/dev/null && pwd)}"
+key_origin() {   # $1 = baseline → imprime o sufixo do relatório
+  [ -f "$1" ] || { printf ''; return 0; }
+  if [ -z "${CORE_REF}" ] || [ ! -d "${CORE_REF}/.claude/validation" ] \
+     || [ "$(cd "${CORE_REF}" && pwd -P)" = "$(cd "${DEST}" && pwd -P)" ]; then
+    printf '   {origem: NÃO MEDIDA — sem a fonte ao lado do script}'; return 0
+  fi
+  # O arquivo do alvo é o do core NO PIN dele, não no HEAD da fonte: arquivo que o core mudou depois
+  # do pin seria contado "do adotante" sem que o adotante o tocasse (medido no dogfood: 1 de 31).
+  local pin; pin="$(awk '/^source_commit:/{print $2; exit}' "${DEST}/.claude/.onion-version" 2>/dev/null)"
+  local line p c=0 a=0 s=0
+  while IFS= read -r line || [ -n "${line}" ]; do
+    case "${line}" in ''|\#*) continue ;; esac
+    p="${line%%::*}"; [ "${p}" = "${line}" ] && p="${line%%|*}"
+    [ "${p}" = "${line}" ] && p="${line%%[[:space:]]*}"
+    case "${p}" in
+      */*) if [ -f "${DEST}/${p}" ] && { { [ -f "${CORE_REF}/${p}" ] && cmp -s "${CORE_REF}/${p}" "${DEST}/${p}"; } \
+              || { [ -n "${pin}" ] && [ "$(git -C "${CORE_REF}" rev-parse -q --verify "${pin}:${p}" 2>/dev/null)" \
+                     = "$(git hash-object -- "${DEST}/${p}" 2>/dev/null)" ]; }; }; then
+             c=$((c + 1)); else a=$((a + 1)); fi ;;
+      *)   s=$((s + 1)) ;;
+    esac
+  done < "$1"
+  printf '   {origem: %s do core (arquivo vendorizado, cobrar do core) · %s do adotante' "${c}" "${a}"
+  [ "${s}" -gt 0 ] && printf ' · %s sem caminho' "${s}"
+  printf '}'
+}
+
 unresolved=0
 regenerated=0
 
@@ -180,13 +217,13 @@ for bpath in "${VDIR}"/*-baseline.txt; do
     done < "${bpath}"
     if [ "${foreign}" -gt 0 ]; then
       mv "${tmpf}" "${bpath}"
-      printf '  ✓ %-38s %s → %s chave(s)   [filtradas %s estrangeira(s)]\n' \
-        "${bname}" "${before}" "$(count_keys "${bpath}")" "${foreign}"
+      printf '  ✓ %-38s %s → %s chave(s)   [filtradas %s estrangeira(s)]%s\n' \
+        "${bname}" "${before}" "$(count_keys "${bpath}")" "${foreign}" "$(key_origin "${bpath}")"
       regenerated=$((regenerated + 1))
     else
       rm -f "${tmpf}"
-      printf '  · %-38s %s chave(s), nenhuma estrangeira — INTACTO (dívida local segue cobrada)\n' \
-        "${bname}" "${before}"
+      printf '  · %-38s %s chave(s), nenhuma estrangeira — INTACTO (segue cobrado)%s\n' \
+        "${bname}" "${before}" "$(key_origin "${bpath}")"
       regenerated=$((regenerated + 1))
     fi
     continue
@@ -241,8 +278,8 @@ for bpath in "${VDIR}"/*-baseline.txt; do
   if ( cd "${DEST}" && bash "${emitter}" --emit-baseline ) > "${tmp}" 2>/dev/null; then
     mv "${tmp}" "${bpath}"
     after="$(count_keys "${bpath}")"
-    printf '  ✓ %-38s %s → %s chave(s)   [%s]\n' \
-      "${bname}" "${before}" "${after}" "$(basename "${emitter}")"
+    printf '  ✓ %-38s %s → %s chave(s)   [%s]%s\n' \
+      "${bname}" "${before}" "${after}" "$(basename "${emitter}")" "$(key_origin "${bpath}")"
     regenerated=$((regenerated + 1))
   else
     rm -f "${tmp}"
@@ -260,7 +297,7 @@ if [ "${regenerated}" -eq 0 ] && [ "${unresolved}" -eq 0 ]; then
 fi
 
 case "${MODE}" in
-  filter) echo "  → ${regenerated} baseline(s) conferido(s) (só chave ESTRANGEIRA cai; dívida local segue cobrada); ${unresolved} não resolvido(s)." ;;
+  filter) echo "  → ${regenerated} baseline(s) conferido(s) (só chave ESTRANGEIRA cai; o resto segue cobrado — a origem de cada chave está na linha do baseline); ${unresolved} não resolvido(s)." ;;
   emit)   echo "  → ${regenerated} baseline(s) regenerado(s) do corpus do ALVO; ${unresolved} não resolvido(s)." ;;
   *)      echo "  → ${regenerated} baseline(s) tratado(s) (modo decidido por baseline: 1ª chegada emite, já-versionado filtra); ${unresolved} não resolvido(s)." ;;
 esac

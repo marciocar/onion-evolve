@@ -14364,6 +14364,47 @@ run_regen_baselines_selftests() {
   else record_fail "regen-baselines: filter" "filtrou a chave local (perdoou dívida do adotante) ou manteve a estrangeira"; fi
   rm -rf "${d}"
 
+  # (e2) ORIGEM da chave que FICA (2026-10-13, update de um adotante): as 31 chaves do
+  #      ops-citation-travel-baseline citavam `ops/` dentro de arquivos VENDORIZADOS do core, e o relatório
+  #      as chamou de "dívida LOCAL". Arquivo byte-idêntico ao da fonte = do core; próprio ou divergente =
+  #      do adotante. (e2-MUT) com o discriminador desligado tudo vira "do adotante": o rótulo falso volta.
+  local _vf=".claude/hooks/pretooluse-env-guard.sh" _e2 _e2m _m2
+  d="$(mktemp -d)"; mkdir -p "${d}/.claude/validation" "${d}/.claude/hooks" "${d}/docs/meu"
+  cp "${REPO_ROOT}/${_vf}" "${d}/${_vf}"; printf 'cita ops/x.sh\n' > "${d}/docs/meu/proprio.md"
+  printf 'role: adopted\n' > "${d}/.claude/.onion-version"
+  printf '# misto\n%s|ops/testing/|1\ndocs/meu/proprio.md|ops/x.sh|1\n' "${_vf}" > "${d}/.claude/validation/ops-citation-travel-baseline.txt"
+  _e2="$(bash "${helper}" "${d}" --filter 2>/dev/null | grep 'ops-citation-travel-baseline' || true)"
+  _m2="$(mktemp -d)"; mkdir -p "${_m2}/.claude/utils/adopt"
+  sed 's|if \[ -f "${DEST}/${p}" \] \&\& {|if false \&\& [ ONION_MUTANTE ] \&\& {|' "${helper}" > "${_m2}/.claude/utils/adopt/regen-baselines.sh"
+  mkdir -p "${_m2}/.claude/validation"
+  _e2m="$(ONION_CORE_REF="${REPO_ROOT}" bash "${_m2}/.claude/utils/adopt/regen-baselines.sh" "${d}" --filter 2>/dev/null | grep 'ops-citation-travel-baseline' || true)"
+  if grep -q '1 do core' <<< "${_e2}" && grep -q '1 do adotante' <<< "${_e2}"; then
+    record_pass "regen-baselines: (e2) a chave que fica diz a ORIGEM — vendorizado idêntico é do core, próprio é do adotante"
+  else record_fail "regen-baselines: (e2) origem" "linha do relatório sem a separação core/adotante: ${_e2}"; fi
+  if cmp -s "${helper}" "${_m2}/.claude/utils/adopt/regen-baselines.sh"; then
+    record_fail "regen-baselines: (e2-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
+  elif grep -q '0 do core' <<< "${_e2m}" && grep -q '2 do adotante' <<< "${_e2m}"; then
+    record_pass "regen-baselines: (e2-MUT) sem o discriminador a chave do core volta a ser 'do adotante' — (e2) é load-bearing"
+  else record_fail "regen-baselines: (e2-MUT)" "o mutante não reproduziu o rótulo falso: ${_e2m}"; fi
+  # (e3) o arquivo do alvo é o do core NO PIN dele: versão antiga do mesmo arquivo, com o pin apontando
+  #      o commit dela, é do core (dogfood no adotante: sem isto, 1 de 31 caía "do adotante" porque o core
+  #      mudou o arquivo depois do pin). (e3-MUT) sem ler o pin, volta a cair "do adotante".
+  local _old _e3 _e3m
+  _old="$(git -C "${REPO_ROOT}" log -2 --format=%H -- "${_vf}" 2>/dev/null | sed -n 2p)"
+  if [ -n "${_old}" ]; then
+    git -C "${REPO_ROOT}" show "${_old}:${_vf}" > "${d}/${_vf}" 2>/dev/null
+    printf 'role: adopted\nsource_commit: %s\n' "${_old:0:12}" > "${d}/.claude/.onion-version"
+    _e3="$(bash "${helper}" "${d}" --filter 2>/dev/null | grep 'ops-citation-travel-baseline' || true)"
+    sed 's|^  local pin; pin="$(awk|  local pin; pin=""; : ONION_MUTANTE; _x="$(awk|' "${helper}" > "${_m2}/.claude/utils/adopt/regen-baselines.sh"
+    _e3m="$(ONION_CORE_REF="${REPO_ROOT}" bash "${_m2}/.claude/utils/adopt/regen-baselines.sh" "${d}" --filter 2>/dev/null | grep 'ops-citation-travel-baseline' || true)"
+    if cmp -s "${REPO_ROOT}/${_vf}" "${d}/${_vf}"; then
+      record_fail "regen-baselines: (e3) setup" "a versão antiga é idêntica à atual — fixture não exerce o pin"
+    elif grep -q '1 do core' <<< "${_e3}" && grep -q '0 do core' <<< "${_e3m}"; then
+      record_pass "regen-baselines: (e3) arquivo na versão do PIN é do core; (e3-MUT) sem o pin cai 'do adotante'"
+    else record_fail "regen-baselines: (e3)" "com pin: ${_e3} · mutante: ${_e3m}"; fi
+  else record_skip "regen-baselines: (e3) (skip: história rasa, sem versão antiga de ${_vf})"; fi
+  rm -rf "${d}" "${_m2}"
+
   # (f) `--auto` DECIDE PELA PRIMEIRA CHEGADA, não por "o alvo tem história" — e a distinção é
   #     load-bearing: adoção de repo LEGADO tem história, e ali emitir é o certo. Aqui o alvo tem
   #     commit próprio mas o baseline NUNCA foi versionado → 1ª chegada → emite (esvazia o passivo).
@@ -19577,6 +19618,43 @@ _family run_session_velocity_selftests
 
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 _family run_githook_selftests
+# Modo hooks-diff — `merge-onion-hooks.sh --diff`, o diff que o relatório do --update cola (2026-10-13:
+# o relatório comparava só evento/matcher/command e afirmou "idêntico" sobre 4 hooks que ganharam
+# `onFailure: block`). (a) propriedade nova num hook existente aparece como alterado, nomeando a chave;
+# (b) só a ORDEM das chaves mudou → idêntico (sem "mudou" falso); (a-MUT) comparando só a identidade, a
+# propriedade nova some — o defeito do campo.
+run_hooks_diff_selftests() {
+  local h="${REPO_ROOT}/.claude/utils/adopt/merge-onion-hooks.sh" d out mout
+  command -v jq >/dev/null 2>&1 || { record_skip "hooks-diff (skip: jq ausente)"; return; }
+  d="$(mktemp -d)"
+  printf '%s\n' '{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"bash .claude/hooks/v.sh","timeout":10}]}],"Stop":[{"hooks":[{"type":"command","command":"bash .claude/hooks/s.sh"}]}]},"permissions":{"allow":["x","y"]}}' > "${d}/a.json"
+  printf '%s\n' '{"permissions":{"allow":["y","x"]},"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"timeout":10,"command":"bash .claude/hooks/v.sh","type":"command","onFailure":"block"}]}],"Stop":[{"hooks":[{"command":"bash .claude/hooks/s.sh","type":"command"}]}]}}' > "${d}/b.json"
+  out="$(bash "${h}" --diff "${d}/a.json" "${d}/b.json" 2>&1 || true)"
+  if grep -q '^~ PreToolUse \[Bash\] bash .claude/hooks/v.sh: onFailure ausente→"block"' <<< "${out}" \
+     && grep -q '1 alterado(s) · 1 idêntico(s)' <<< "${out}"; then
+    record_pass "hooks-diff: (a) propriedade nova em hook existente sai como alterada, nomeando a chave"
+  else record_fail "hooks-diff: (a)" "diff não viu o onFailure novo: $(tr '\n' '|' <<< "${out}")"; fi
+  if ! grep -q '^~ Stop' <<< "${out}" && ! grep -q '^≠' <<< "${out}"; then
+    record_pass "hooks-diff: (b) só a ordem das chaves mudou → idêntico (sem 'mudou' falso)"
+  else record_fail "hooks-diff: (b)" "ordem de chaves virou mudança: $(tr '\n' '|' <<< "${out}")"; fi
+  sed 's/select(\$ma\[\.k\] != null and \$ma\[\.k\]\.h != \.h)/select($ma[.k] != null and false and "ONION_MUTANTE" != "")/' "${h}" > "${d}/m.sh"
+  if cmp -s "${h}" "${d}/m.sh"; then record_fail "hooks-diff: (a-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
+  else
+    mout="$(bash "${d}/m.sh" --diff "${d}/a.json" "${d}/b.json" 2>&1 || true)"
+    if ! grep -q 'onFailure' <<< "${mout}"; then
+      record_pass "hooks-diff: (a-MUT) comparando só a identidade, o onFailure novo some — (a) é load-bearing"
+    else record_fail "hooks-diff: (a-MUT)" "o mutante ainda viu a propriedade: $(tr '\n' '|' <<< "${mout}")"; fi
+  fi
+  # (b-MUT) sem ordenar as listas no topo, a allowlist reordenada vira "chave de topo diferente" — o falso
+  #         "mudou" que (b) diz não haver.
+  sed 's/(\$A\[\.\] | walk(if type == "array" then sort else \. end)) != (\$B\[\.\] | walk(if type == "array" then sort else \. end))/$A[.] != $B[.] and "ONION_MUTANTE" != ""/' "${h}" > "${d}/m2.sh"
+  if cmp -s "${h}" "${d}/m2.sh"; then record_fail "hooks-diff: (b-MUT) setup" "a mutação não foi aplicada (âncora mudou)"
+  elif grep -q '^≠ chaves de topo diferentes: permissions' <<< "$(bash "${d}/m2.sh" --diff "${d}/a.json" "${d}/b.json" 2>&1 || true)"; then
+    record_pass "hooks-diff: (b-MUT) sem ordenar as listas, a allowlist reordenada vira mudança falsa — (b) é load-bearing"
+  else record_fail "hooks-diff: (b-MUT)" "o mutante não acusou a reordenação — a fixture não exerce a ordem das listas"; fi
+  rm -rf "${d}"
+}
+_family run_hooks_diff_selftests
 _family run_regen_baselines_selftests
 # ── LICENÇA QUE VIAJA: o par never-clobber (adopt) + staging (durable-commit) ──────────────────
 # O QUE ESTA FAMÍLIA PROTEGE, e são DUAS METADES que só valem juntas (medido 2026-09-14/15):
@@ -19742,6 +19820,35 @@ run_ssot_projections_selftests() {
   if [ -z "${_dm}" ]; then
     record_pass "ssot-projections: (d) o adopt INVOCA o helper e LÊ o rc (menção em prosa não satisfaz)"
   else record_fail "ssot-projections: (d)" "falhou em:${_dm} — helper órfão, ou falha dele engolida pelo chamador"; fi
+
+  # (g) GREENFIELD — o índice vazio no passo (8) (defeito medido na adoção de 2026-10-13): as projeções
+  #     que contam `git ls-files` (testing-inventory.md, REGRA 80; testing-state.md, REGRA 81) saem
+  #     vazias e são removidas; o alvo nascia com 2 HARD. A cura vive no durable-commit.sh, que
+  #     re-regenera DEPOIS do `git add`. O caso reproduz o defeito (passo 8 sem índice) e exige as
+  #     duas no COMMIT; o (g-MUT) desliga a re-regeneração e tem de ver o defeito voltar.
+  local _dc="${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh" _gf _gok
+  _gf_run() {   # $1 = dir do alvo ; $2 = durable-commit a usar → imprime "ok" se as duas estão no commit
+    mkdir -p "$1"; git -C "$1" init -q
+    _archive_staged "$1" .claude/validation .claude/commands .claude/agents .claude/skills
+    bash "${h}" "$1" >/dev/null 2>&1 || true
+    [ -e "$1/docs/onion/testing-inventory.md" ] && { echo "sem-repro"; return; }
+    GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test GIT_COMMITTER_NAME=onion-selftest \
+      GIT_COMMITTER_EMAIL=ci@onion.test bash "$2" "$1" adopt GF0001 onion/adopt >/dev/null 2>&1 || true
+    if [ -n "$(git -C "$1" show HEAD:docs/onion/testing-inventory.md 2>/dev/null)" ] \
+       && [ -n "$(git -C "$1" show HEAD:docs/onion/testing-state.md 2>/dev/null)" ]; then echo ok; else echo falta; fi
+  }
+  _gf="$(_gf_run "${d}/g" "${_dc}")"
+  if [ "${_gf}" = ok ]; then
+    record_pass "ssot-projections: (g) greenfield — o passo (8) sem índice perde as projeções de git, e o commit durável as traz (REGRAS 80/81)"
+  else record_fail "ssot-projections: (g)" "resultado=${_gf} (sem-repro = o passo 8 já gerou: fixture não reproduz o greenfield; falta = o commit da adoção nasce sem testing-inventory/testing-state)"; fi
+  mkdir -p "${d}/gm"; cp "${h}" "${d}/gm/regen-ssot-projections.sh"
+  sed 's|^if \[ -f "${_regen}" \] && \[ -d "${DEST}/.claude/validation" \]; then|if false; then # ONION_MUTANTE: sem re-regenerar|' "${_dc}" > "${d}/gm/durable-commit.sh"
+  if ! cmp -s "${_dc}" "${d}/gm/durable-commit.sh"; then
+    _gok="$(_gf_run "${d}/g2" "${d}/gm/durable-commit.sh")"
+    if [ "${_gok}" = falta ]; then
+      record_pass "ssot-projections: (g-MUT) sem a re-regeneração o commit greenfield nasce sem as duas projeções — (g) é load-bearing"
+    else record_fail "ssot-projections: (g-MUT)" "o mutante deu '${_gok}' — (g) não prova a cura"; fi
+  else record_fail "ssot-projections: (g-MUT) setup" "a mutação não foi aplicada (âncora do durable-commit mudou)"; fi
   rm -rf "${d}"
 }
 

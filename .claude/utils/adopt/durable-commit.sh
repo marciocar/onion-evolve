@@ -61,6 +61,25 @@ ONION_PATHS=(.claude docs/meta-specs docs/knowledge-base docs/sdaal docs/evoluti
 add=(); for p in "${ONION_PATHS[@]}"; do [ -e "${DEST}/${p}" ] && add+=("${p}"); done
 [ "${#add[@]}" -gt 0 ] && git -C "${DEST}" add -- "${add[@]}" 2>/dev/null
 
+# ── PROJEÇÕES QUE CONTAM O ÍNDICE só existem DEPOIS do add (adoção greenfield, 2026-10-13) ─────────
+# `testing-inventory.md` (REGRA 80) e `testing-state.md` (REGRA 81) contam `git ls-files`. No greenfield
+# o passo (8) do adopt roda com o índice VAZIO: os dois saem vazios, o helper os remove (certo: 0-byte
+# é drift), e o alvo nasce com 2 HARD. A sessão da adoção curou rodando o helper de novo depois do
+# `git add`. Aqui é esse mesmo movimento, no único lugar onde o índice já está populado e o commit
+# ainda não saiu. Idempotente: no --update o índice já tinha tudo e a regeneração não muda nada.
+# rc≠0 do helper NÃO aborta o commit durável (a instalação vale mais que a projeção; o gate do alvo
+# cobra), mas é dito. Helper ausente ao lado deste (sandbox da bancada que copia só este script) = pula.
+_regen="$(dirname "${BASH_SOURCE[0]}")/regen-ssot-projections.sh"
+if [ -f "${_regen}" ] && [ -d "${DEST}/.claude/validation" ]; then
+  if bash "${_regen}" "${DEST}" >/dev/null 2>&1; then
+    for p in docs/onion .claude/validation/lint-rules.md; do
+      [ -e "${DEST}/${p}" ] && git -C "${DEST}" add -- "${p}" 2>/dev/null
+    done
+  else
+    echo "⚠️  regen-ssot-projections.sh saiu rc≠0 após o add — as projeções do índice podem faltar no commit (o gate do alvo cobra REGRAS 80/81)." >&2
+  fi
+fi
+
 # ── ARQUIVO EXIGIDO atravessa o .gitignore (sinal de campo de um hub, 2026-10-04) ──────────────────
 # `git add <dir>` PULA em silêncio todo arquivo NOVO que um .gitignore cubra — sem erro, rc=0. Num
 # alvo cuja branch ignorava `.claude/`, o update reportou "merge limpo" e 17 arquivos novos do core

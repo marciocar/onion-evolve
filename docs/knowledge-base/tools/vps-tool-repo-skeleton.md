@@ -6,7 +6,7 @@
 > [Doutrina do Catálogo VPS](../concepts/onion-vps-catalog-doctrine.md) (a doutrina decide *o que entra*;
 > este esqueleto descreve *como o repo do serviço se estrutura*).
 
-Convenção **existente** para o repo de cada ferramenta compartilhada da VPS do core (`srv1812846`),
+Convenção **existente** para o repo de cada ferramenta compartilhada da VPS do core (`<host-da-vps>`),
 documentada aqui a partir da referência viva. Este documento não inaugura o padrão — ele o registra
 para que o próximo repo-de-ferramenta nasça reto sem reconstruir a decisão do zero.
 
