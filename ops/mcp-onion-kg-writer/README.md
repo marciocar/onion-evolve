@@ -123,7 +123,9 @@ O Python precisa ter PyYAML e jsonschema (o do venv). Sem um dos dois o servidor
 
 1. **Raiz de código.** Um worktree destacado do core num SHA verificado de `origin/main` (o
    `served_commit` de toda resposta o declara). Para atualizar a maquinaria: `checkout --detach` no
-   SHA novo, sem reiniciar.
+   SHA novo **e reiniciar a unidade**: desde o GitStore (2026-10-13) o armazém e o leitor do contrato são
+   importados no boot, dentro do processo, e só o radar é relido a cada chamada. Sem reiniciar, o
+   `served_commit` mostraria o SHA novo julgando com o contrato velho.
 2. **Raiz de dados.** `install -d -m 0700 -o <usuário do serviço> /var/lib/onion-chat-kg`.
 3. **Token.** Novo, só desta instância, guardado no cofre. Não reaproveite o do Brain.
 4. **systemd.** `EnvironmentFile=` (modo 0600) com `ONION_KG_WRITER_TOKEN`; `Environment=` com
