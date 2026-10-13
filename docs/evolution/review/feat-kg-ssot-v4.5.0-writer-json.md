@@ -1,7 +1,7 @@
 ---
 branch: feat/kg-ssot-v4.5.0-writer-json
 date: 2026-10-13
-reviewed_diff_sha256: 08dfdd98b141e5572e94e90b2b80f37c821d29383dd082d825dc88cc7c648c93
+reviewed_diff_sha256: d1e780cd2925a844200488999e575a4eb6c2e952ea86d4c06b40ad1599d825cd
 reviewed_code_sha256: 821802eca27044a0516bd9d1ed084889217721b7c8a78cb90df05fa0f9b0588d
 findings_total: 4
 findings_real: 4
