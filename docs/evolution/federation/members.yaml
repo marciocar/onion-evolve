@@ -284,7 +284,9 @@ members:
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — medido 2026-10-09: o origin do clone é o repo da granaai, na branch onion/develop
     local_path: "/home/marcio/brain-granaai"
-    onion_version: 6f3ab3a3905c # conferido no remoto (onion/develop) por ops/registry-pins.sh em 2026-10-09
+    onion_version: bd769f168411   # carimbado por ops/registry-pins.sh (remoto onion/develop conferido em 2026-10-13)
+                                  # update de 2026-10-13 pela sessão do adotante (branch chore/onion-update-bd769f168411),
+                                  # mergeado lá no PR #1571 (merge dd0ea769a na onion/develop); pin vivo no carimbo do remoto
     integration_branch: onion/develop   # medido: branch do clone e do carimbo vivo (o carimbo não declara o campo)
     adopted_at: 2026-10-01
     mode: brownfield            # repo que já existia (master), adotado como atualização
@@ -764,6 +766,34 @@ members:
     personality_summary: "O grafo de conhecimento verificável como PRODUTO INDEPENDENTE: adota e usa o Onion, e o Onion adota e usa o KG-SSOT (dogfood nos dois sentidos). Tem contextos próprios, feitos de pesquisa profunda e de mercado ali dentro, e lê o core só para entender o encaixe. Primeiro marco: o contrato formal do .kg.yaml (JSON Schema + suíte de conformidade) que o core passará a consumir."
     specializations: [kg-ssot, schema, produto]
     personality_last_sync: 2026-10-06
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: []
+      exposes_downstream: []
+
+  - id: bomtexto
+    # Registro no MESMO dia da adoção (2026-10-13): registrar é ato de segurança — a REGRA 36 só protege
+    # quem está aqui, e o id não começa com `onion-` [[vendor-scrub-blind-spot]].
+    name: bomtexto
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter
+    parent: onion-evolve
+    remote: github.com/marciocar/bomtexto   # PÚBLICO desde 2026-10-13 (visibility PUBLIC, default main — medido pelo agente da adoção)
+    local_path: "/home/marcio/bomtexto"
+    onion_version: bd769f168411   # pin da adoção; o PIN bate no remoto (main), lido por ops/registry-pins.sh em 2026-10-13
+    # ⚠️ o registry-pins.sh acusa DIVERGE de PAPEL (medido 2026-10-13): o carimbo vivo diz `role: standalone`, e
+    #    o par permitido para adotante (REGRA 92, Papel da porta no registro concorda com o CARIMBO dela) é registro
+    #    standalone → carimbo `adopted`; carimbo `standalone` liga o modo porta no lint. A cura é da sessão DELE
+    #    (`/meta:adopt --update --role adopted`, I3); o registro fica no tier certo e não se carimba por cima.
+    integration_branch: main
+    adopted_at: 2026-10-13
+    mode: greenfield
+    personality_summary: "Projeto bomtexto (propósito a descrever pelo dono; a 1ª sessão roda /docs:build-business-docs)."
+    specializations: []
+    personality_last_sync: 2026-10-13
     trust:
       can_receive_from: [onion-evolve]
       can_advise_to: [onion-evolve]

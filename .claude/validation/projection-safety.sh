@@ -62,17 +62,29 @@
 #       reproduzir o comportamento sem termos). Arquivo AUSENTE = a guarda DECLARA que não verificou
 #       (`SOFT NAO-VERIFICADO`), roda com o que tiver, e nunca vira HARD de NO-OP por isso: nem verde
 #       mudo, nem reprovar tudo.
+#  P9 — O DEFAULT DA FONTE PRIVADA SÓ VALE NA FONTE (2026-10-13, medido no update do adotante
+#       brain-granaai, papel hub, pin bd769f168411): a P8 lia `~/.config/onion/client-terms.txt` em
+#       QUALQUER repo da máquina, e a lista é a dos clientes DO CORE. No adotante ela acusou HARD da
+#       REGRA 36 (6 no relato do adotante, 5 na cópia medida) em arquivos PRÓPRIOS dele (a KB das
+#       integrações dele), onde o nome do parceiro dele é legítimo. Antes da P8 a lista morava dentro do core e não existia no adotante: a P8 mudou o
+#       lugar e, sem querer, o ALCANCE. Agora: papel `source` (sem stamp, ou stamp `role: source`) e
+#       PORTA (`kind: door`, em qualquer papel) → default `~/.config/...`; qualquer outro → SEM default.
+#       A lista só entra fora da fonte se for passada EXPLICITAMENTE (ONION_CLIENT_TERMS_FILE ou --client-terms), e
+#       `--ct-state` diz qual dos três estados vigora (source-default | explicit | role-off) para o
+#       chamador DECLARAR. Explícita vence o papel em qualquer repo: o CI do core continua protegido
+#       mesmo que um stamp falso apareça na árvore.
 # ─────────────────────────────────────────────────────────────────────────────
 #
 # Uso:
 #   projection-safety.sh [<superfície>...]     # default: site/
 #   projection-safety.sh --emit-terms          # imprime os termos derivados
-#   projection-safety.sh --emit-declared       # P8: imprime TODOS os termos da fonte privada (rc 3 = fonte ausente)
+#   projection-safety.sh --emit-declared       # P8: imprime TODOS os termos da fonte privada (rc 3 = fonte ausente · rc 4 = papel sem default, P9)
+#   projection-safety.sh --ct-state            # P9: imprime source-default | explicit | role-off (rc 0)
 #   projection-safety.sh --client-terms <path> # P8: fonte privada alternativa (senão ONION_CLIENT_TERMS_FILE / ~/.config)
 #   projection-safety.sh --members <path> ...  # fonte alternativa (fixtures)
 #   projection-safety.sh --kg-identifiers [<raiz>...]  # P7: ids de nó e caminhos de grafo (default: docs/)
 #
-# Saída: 0 = limpo (ou NÃO VERIFICADO declarado) · 1 = violação HARD ou pressuposto quebrado · 3 = --emit-declared sem fonte
+# Saída: 0 = limpo (ou NÃO VERIFICADO declarado) · 1 = violação HARD ou pressuposto quebrado · 3 = --emit-declared sem fonte · 4 = --emit-declared em papel sem default (P9)
 
 set -u
 
@@ -85,7 +97,27 @@ KG_IDS=0
 FORMAT=human
 TERMS_FILE=""                           # #7 do relay: lista de termos DECLARADA (client-safe do adotante)
 EMIT_DECLARED=0
-CLIENT_TERMS_FILE="${ONION_CLIENT_TERMS_FILE:-${HOME:-/nonexistent}/.config/onion/client-terms.txt}"   # P8
+# P8 + P9: a fonte privada. Explícita (env) vale em qualquer papel; o default `~/.config` SÓ na fonte.
+# O papel é lido do stamp do repo onde a guarda roda (o mesmo REPO_DIR do members.yaml), com a mesma
+# leitura do onion-version.sh: sem stamp = source; stamp sem `role:` = adopted; `decoupled_from:` = não-fonte.
+_ps_stamp="${REPO_DIR}/.claude/.onion-version"
+PS_ROLE="source"
+if [ -f "${_ps_stamp}" ]; then
+  PS_ROLE="$(awk '/^role:/{print $2; exit}' "${_ps_stamp}" 2>/dev/null)"
+  [ -n "${PS_ROLE}" ] || PS_ROLE="adopted"
+  grep -qE '^[[:space:]]*decoupled_from:' "${_ps_stamp}" 2>/dev/null && PS_ROLE="decoupled"
+  # PORTA (`kind: door`, só o materializador escreve), em QUALQUER papel: é projeção do core, nenhum
+  # arquivo ali é próprio de outro dono — a lista do core vale nela como na fonte.
+  grep -qE '^[[:space:]]*kind:[[:space:]]*door([[:space:]]|$)' "${_ps_stamp}" 2>/dev/null && PS_ROLE="source"
+fi
+if [ -n "${ONION_CLIENT_TERMS_FILE:-}" ]; then
+  CLIENT_TERMS_FILE="${ONION_CLIENT_TERMS_FILE}"; CT_STATE="explicit"
+elif [ "${PS_ROLE}" = "source" ]; then
+  CLIENT_TERMS_FILE="${HOME:-/nonexistent}/.config/onion/client-terms.txt"; CT_STATE="source-default"
+else
+  CLIENT_TERMS_FILE=""; CT_STATE="role-off"
+fi
+EMIT_CT_STATE=0
 SURFACES=()
 
 while [ $# -gt 0 ]; do
@@ -96,7 +128,8 @@ while [ $# -gt 0 ]; do
     --members)    MEMBERS="$2"; shift 2 ;;
     --terms)      TERMS_FILE="$2"; shift 2 ;;   # gate client-safe genérico: o adotante declara os PRÓPRIOS termos (nomes de cliente)
     --emit-declared) EMIT_DECLARED=1; shift ;;  # P8: os termos da fonte privada (rc 3 sem fonte)
-    --client-terms)  CLIENT_TERMS_FILE="$2"; shift 2 ;;
+    --client-terms)  CLIENT_TERMS_FILE="$2"; CT_STATE="explicit"; shift 2 ;;
+    --ct-state)      EMIT_CT_STATE=1; shift ;;   # P9: qual fonte vigora (o chamador declara)
     --format)     FORMAT="$2"; shift 2 ;;
     -h|--help)    sed -n '1,50p' "$0"; exit 0 ;;
     *)            SURFACES+=("$1"); shift ;;
@@ -120,7 +153,7 @@ fi
 # ct_present: o arquivo é LEGÍVEL (vazio conta como presente — ato deliberado).
 # ct_lines: linhas úteis. ct_declared: a 1ª coluna de toda linha (o termo). ct_owned: `<id>\t<termo>`
 # das linhas com dono. NENHUMA destas imprime o termo em log: quem as chama só varre.
-ct_present() { [ -r "${CLIENT_TERMS_FILE}" ] && [ -f "${CLIENT_TERMS_FILE}" ]; }
+ct_present() { [ -n "${CLIENT_TERMS_FILE}" ] && [ -r "${CLIENT_TERMS_FILE}" ] && [ -f "${CLIENT_TERMS_FILE}" ]; }
 ct_lines() {
   ct_present || return 0
   grep -vE '^[[:space:]]*(#|$)' "${CLIENT_TERMS_FILE}" 2>/dev/null | tr -d '\r' || true
@@ -136,6 +169,10 @@ ct_owned() {
 # `$1` = o que ficou sem verificar. O caminho NÃO é o arquivo (que não existe): é o registro ao lado do qual
 # a fonte morava, para o aviso ter âncora estável.
 ct_declare_unverified() {
+  # P9: fora da fonte, sem lista explícita, a lista do core NÃO É O OBJETO deste repo — não há o que
+  # "não verificar". Declarar NAO-VERIFICADO aqui seria cobrar do adotante a lista de clientes de OUTRO
+  # repo. O estado fica legível por `--ct-state` (e o lint o declara uma vez, na REGRA 36).
+  [ "${CT_STATE}" = "role-off" ] && return 0
   if [ "${FORMAT}" = "tsv" ]; then
     printf 'SOFT\tNAO-VERIFICADO\tdocs/evolution/federation/members.yaml\tfonte privada de termos AUSENTE (ONION_CLIENT_TERMS_FILE ou ~/.config/onion/client-terms.txt; no CI, o secret ONION_CLIENT_TERMS) — %s NÃO foi verificado contra os nomes privados; a guarda declara que não sabe, em vez de verde mudo (P8)\n' "$1"
   else
@@ -143,7 +180,12 @@ ct_declare_unverified() {
     echo "      Defina ONION_CLIENT_TERMS_FILE ou crie ~/.config/onion/client-terms.txt (0600)."
   fi
 }
+if [ "${EMIT_CT_STATE}" = "1" ]; then
+  printf '%s\n' "${CT_STATE}"
+  exit 0
+fi
 if [ "${EMIT_DECLARED}" = "1" ]; then
+  [ "${CT_STATE}" = "role-off" ] && exit 4
   ct_present || exit 3
   ct_declared
   exit 0

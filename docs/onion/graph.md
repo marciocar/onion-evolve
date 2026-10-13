@@ -281,9 +281,14 @@ assistant	executes	onion
 assistant	orchestrates-workers	subagent	orchestration
 assistant	proposes	maestro	conversa-plan-gate
 assistant	reports	maestro	conversa-plan-gate
+bomtexto	adopts	onion-evolve	
+bomtexto	mode	greenfield	
+bomtexto	pin	bd769f168411	
+bomtexto	tier	standalone	
+bomtexto	trust-advises	onion-evolve	
 brain-granaai	adopts	onion-evolve	
 brain-granaai	mode	brownfield	
-brain-granaai	pin	6f3ab3a3905c	
+brain-granaai	pin	bd769f168411	
 brain-granaai	specialization	clickup	
 brain-granaai	specialization	company-brain	
 brain-granaai	specialization	pesquisa-primaria	

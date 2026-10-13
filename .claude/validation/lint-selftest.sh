@@ -27020,6 +27020,94 @@ run_client_terms_selftests() {
   if grep -q 'vendor-scrub/LISTA-NA-ARVORE' <<< "${out}"; then
     record_pass "client-terms: (d) a lista de nomes privados de volta na árvore → HARD LISTA-NA-ARVORE"
   else record_fail "client-terms: (d)" "a lista voltou à árvore e nada acusou: $(grep -c VIOLATION <<< "${out}" || true) violações"; fi
+  rm -f "${sb}/docs/evolution/federation/client-terms.txt"
+
+  # ── P9 (2026-10-13): o default ~/.config SÓ vale na FONTE ──────────────────────────────────────
+  # Medido no update de um adotante hub (pin bd769f168411): a lista de clientes DO CORE, lida do HOME em
+  # qualquer repo, deu 6 HARD da REGRA 36 em arquivos PRÓPRIOS do adotante. HOME FALSO em todos os casos:
+  # a bancada nunca toca a lista real. `env -u` porque a bancada exporta uma fonte vazia no topo — o caso
+  # do DEFAULT só existe sem a variável. Papel `hub` (não `adopted`): a folha sai da REGRA 36 antes de ler
+  # lista qualquer (IS_LEAF), e um caso nela passaria por vacuidade, sem medir a P9.
+  mkdir -p "${sb}/home/.config/onion"
+  printf '# lista (fixture)\nAcmeFicticia\n' > "${sb}/home/.config/onion/client-terms.txt"
+  _p9_run() { # $1=dir do sandbox · $2=env extra (ou vazio) — o lint completa ou o caso não mede
+    ( cd "$1" && if [ -n "$2" ]; then env -u ONION_CLIENT_TERMS_FILE HOME="$1/home" "$2" LC_ALL=C bash "$1/.claude/validation/lint-artifacts.sh" --only="$1/.claude/agents/a.md" 2>&1
+                 else env -u ONION_CLIENT_TERMS_FILE HOME="$1/home" LC_ALL=C bash "$1/.claude/validation/lint-artifacts.sh" --only="$1/.claude/agents/a.md" 2>&1; fi || true )
+  }
+  _p9_hit()  { grep -q 'agents/a.md: .*\[vendor-scrub\] nome da fonte privada' <<< "$1"; }
+  _p9_mut()  { # $1=sandbox de origem · $2=arquivo relativo · $3=sed · $4=grep que prova a mutação → imprime o dir
+    local m; m="$(mktemp -d)"; cp -a "$1/." "${m}/"; sed -i "$3" "${m}/$2"
+    if grep -qE -- "$4" "${m}/$2"; then printf '%s' "${m}"; else rm -rf "${m}"; fi
+  }
+  local p9 mdir
+  # (e) hub + lista no HOME + arquivo PRÓPRIO com o termo → a lista do core NÃO entra, nada acusado, nada a declarar
+  printf 'role: hub\n' > "${sb}/.claude/.onion-version"
+  p9="$(_p9_run "${sb}" "")"
+  if ! grep -q 'Sumário' <<< "${p9}"; then record_fail "client-terms: (e) o lint não completou" "${p9: -200}"
+  elif ! _p9_hit "${p9}" && ! grep -q 'vendor-scrub/NAO-VERIFICADO' <<< "${p9}"; then
+    record_pass "client-terms: (e) papel hub + lista no HOME → o default não vale fora da fonte (0 acusação, sem NAO-VERIFICADO)"
+  else record_fail "client-terms: (e)" "a lista do HOME vazou para o papel hub: ${p9:0:200}"; fi
+  # (e-MUT) o default volta a valer em qualquer papel → o termo é acusado: o portão de papel é load-bearing
+  mdir="$(_p9_mut "${sb}" .claude/validation/projection-safety.sh 's/^elif \[ "\${PS_ROLE}" = "source" \]; then$/elif true; then/' '^elif true; then$')"
+  if [ -z "${mdir}" ]; then record_fail "client-terms: (e-MUT) setup" "a mutação não foi aplicada"
+  else
+    p9="$(_p9_run "${mdir}" "")"
+    if _p9_hit "${p9}"; then record_pass "client-terms: (e-MUT) sem o portão de papel o hub volta a ser acusado — (e) mede o portão"
+    else record_fail "client-terms: (e-MUT)" "o mutante não acusou — (e) não prova nada: ${p9:0:200}"; fi
+    rm -rf "${mdir}"
+  fi
+  # (f) hub + lista EXPLÍCITA → acusa E declara LISTA-EXTERNA (ato deliberado, nunca silencioso)
+  p9="$(_p9_run "${sb}" "ONION_CLIENT_TERMS_FILE=${sb}/home/.config/onion/client-terms.txt")"
+  if _p9_hit "${p9}" && grep -q 'vendor-scrub/LISTA-EXTERNA' <<< "${p9}" && ! grep -q 'AcmeFicticia' <<< "${p9}"; then
+    record_pass "client-terms: (f) papel hub + ONION_CLIENT_TERMS_FILE explícita → acusa e declara LISTA-EXTERNA (sem ecoar o termo)"
+  else record_fail "client-terms: (f)" "explícita fora da fonte: esperava acusação + LISTA-EXTERNA: ${p9:0:200}"; fi
+  # (f-MUT) sem a declaração no lint → a lista externa entraria calada; o caso tem de ver a ausência
+  mdir="$(_p9_mut "${sb}" .claude/validation/lint-artifacts.sh 's/\[vendor-scrub\/LISTA-EXTERNA\]/[vendor-scrub\/MUTANTE]/' 'vendor-scrub/MUTANTE')"
+  if [ -z "${mdir}" ]; then record_fail "client-terms: (f-MUT) setup" "a mutação não foi aplicada"
+  else
+    p9="$(_p9_run "${mdir}" "ONION_CLIENT_TERMS_FILE=${mdir}/home/.config/onion/client-terms.txt")"
+    if ! grep -q 'vendor-scrub/LISTA-EXTERNA' <<< "${p9}"; then record_pass "client-terms: (f-MUT) sem a declaração a lista externa entra calada — (f) mede a declaração"
+    else record_fail "client-terms: (f-MUT)" "a declaração sobreviveu à mutação: ${p9:0:200}"; fi
+    rm -rf "${mdir}"
+  fi
+  # (g) FONTE (sem stamp) + lista no HOME → acusa: o core NÃO regride
+  rm -f "${sb}/.claude/.onion-version"
+  p9="$(_p9_run "${sb}" "")"
+  if _p9_hit "${p9}" && ! grep -q 'vendor-scrub/LISTA-EXTERNA' <<< "${p9}"; then
+    record_pass "client-terms: (g) papel source + lista no HOME → acusa (o core segue protegido pelo default)"
+  else record_fail "client-terms: (g)" "o core perdeu o default do HOME: ${p9:0:200}"; fi
+  # (g-MUT) o default desligado também na fonte → o core calaria: (g) mede o default da fonte
+  mdir="$(_p9_mut "${sb}" .claude/validation/projection-safety.sh 's/^elif \[ "\${PS_ROLE}" = "source" \]; then$/elif [ "${PS_ROLE}" = "mutante" ]; then/' '"mutante" \]; then$')"
+  if [ -z "${mdir}" ]; then record_fail "client-terms: (g-MUT) setup" "a mutação não foi aplicada"
+  else
+    p9="$(_p9_run "${mdir}" "")"
+    if ! _p9_hit "${p9}"; then record_pass "client-terms: (g-MUT) sem o default na fonte o core calaria — (g) mede o default"
+    else record_fail "client-terms: (g-MUT)" "o mutante ainda acusou — (g) não prova nada: ${p9:0:200}"; fi
+    rm -rf "${mdir}"
+  fi
+  # (h) o MODO que o lint consome (--ct-state, REGRA 59) e o rc 4 do --emit-declared, pela borda do helper
+  #     (o helper é o da árvore; o PAPEL vem do CWD do sandbox, que é de onde ele lê o stamp — como no lint)
+  local helper_sb="${REPO_ROOT}/.claude/validation/projection-safety.sh"
+  local st1 st2 st3 rc4=0
+  # (a invocação fica SEM outro `${…}` antes dela na linha: é a forma que o join da REGRA 59 resolve)
+  _p9_state() { # $1=sandbox · demais = atribuições extra para o env
+    local d="$1"; shift
+    ( cd "$d" || exit 9
+      env -u ONION_CLIENT_TERMS_FILE HOME="$d/home" "$@" bash "${helper_sb}" --ct-state 2>/dev/null || true )
+  }
+  st1="$(_p9_state "${sb}")"
+  printf 'role: hub\n' > "${sb}/.claude/.onion-version"
+  st2="$(_p9_state "${sb}")"
+  st3="$(_p9_state "${sb}" "ONION_CLIENT_TERMS_FILE=${sb}/home/.config/onion/client-terms.txt")"
+  # porta (`kind: door`) em papel NÃO-fonte segue lendo a lista: é projeção do core (achado da passada adversarial)
+  local st4; printf 'role: standalone\nkind: door\n' > "${sb}/.claude/.onion-version"
+  st4="$(_p9_state "${sb}")"
+  printf 'role: hub\n' > "${sb}/.claude/.onion-version"
+  ( cd "${sb}" && env -u ONION_CLIENT_TERMS_FILE HOME="${sb}/home" bash "${helper_sb}" --emit-declared >/dev/null 2>&1 ) || rc4=$?
+  if [ "${st1}" = "source-default" ] && [ "${st2}" = "role-off" ] && [ "${st3}" = "explicit" ] && [ "${st4}" = "source-default" ] && [ "${rc4}" -eq 4 ]; then
+    record_pass "client-terms: (h) --ct-state diz source-default/role-off/explicit, porta standalone segue na lista, e --emit-declared fora da fonte sai rc 4"
+  else record_fail "client-terms: (h)" "estados: source=${st1} hub=${st2} explícita=${st3} porta=${st4} rc(emit-declared, hub)=${rc4}"; fi
+  unset -f _p9_run _p9_hit _p9_mut _p9_state
   rm -rf "${sb}"
 }
 
