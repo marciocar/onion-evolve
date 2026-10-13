@@ -36,6 +36,14 @@
 #           pelo `pr-finalize --rebase --push` na worktree local da branch, até ONION_MERGE_REBASE_MAX
 #           (2) vezes; conflito de fonte para nomeado; sem worktree local, diz o comando e para. Depois
 #           espera as runs do head novo nascerem e terminarem (ONION_MERGE_WAIT_SECS, 1800).
+#           RASTRO NO PR (H5 de D_MERGE_PROCESS_ONION_2026_10, 2026-10-13): cada auto-rebase — o que
+#           deu certo e o recusado por conflito de fonte — deixa um COMENTÁRIO no PR com head antigo →
+#           novo, a causa (projeção gerada ou fonte) e a tentativa N/MAX. Antes eram ≥14 rebases
+#           invisíveis. Comentário que falha vira AVISO nomeado (o rebase já aconteceu; calar é o defeito).
+#   --no-wait-after-rebase: depois de UM auto-rebase bem-sucedido, sai rc=4 SEM esperar o CI do head
+#           novo. É o modo do `ops/merge-serial.sh` (core-only): ele segura o lock só no rebase e no merge e
+#           espera o CI FORA do lock. ONION_MERGE_REBASE_DONE=<n> diz quantos rebases já houve na série
+#           (o limite ONION_MERGE_REBASE_MAX vale para a série inteira, não por chamada).
 #   PROVENANCE DA BRANCH (sem flag, SAC-80, 2026-10-09): se o PR ADICIONA em `*.kg.yaml` um `source:`
 #           com `@<sha>` de commit que NÃO é ancestral da base (commit da própria branch), o rebase o
 #           reescreveria e a provenance ficaria fora da main. Sem --merge-commit, RECUSA antes do
@@ -71,7 +79,7 @@ DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ram
 #   de herdado de uma frase que o próprio check deixou de dizer.
 _DISPENSAVEIS=(onion-review-verdict)
 DISPENSA=(); REASON=""; CI_INOPERANTE=0; CI_INOPERANTE_PROVADO=""
-MERGE_COMMIT=0; ASSERT_ANCESTOR=""
+MERGE_COMMIT=0; ASSERT_ANCESTOR=""; NO_WAIT_AFTER_REBASE=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
@@ -85,6 +93,7 @@ while [ $# -gt 0 ]; do
     --keep-branch) DEL=(); shift ;;
     --sync) DO_SYNC=1; shift ;;
     --merge-commit) MERGE_COMMIT=1; shift ;;
+    --no-wait-after-rebase) NO_WAIT_AFTER_REBASE=1; shift ;;
     --assert-ancestor) ASSERT_ANCESTOR="${2:?--assert-ancestor exige a ref (ex.: onion/vendor)}"; shift 2 ;;
     *) shift ;;
   esac
@@ -259,9 +268,42 @@ _wt_of_branch() { # $1=branch → caminho da worktree que a tem em checkout (vaz
 _REBASE_MAX="${ONION_MERGE_REBASE_MAX:-2}"
 _WAIT_SECS="${ONION_MERGE_WAIT_SECS:-1800}"
 _POLL_SECS="${ONION_MERGE_POLL_SECS:-30}"
+# ══ RASTRO DO AUTO-REBASE NO PR (H5, D_MERGE_PROCESS_ONION_2026_10, 2026-10-13) ════════════════
+# Medido: ≥14 auto-rebases sem rastro nenhum no PR — quem lia o PR via um head trocado sem saber por
+# quê. O rebase É um efeito sobre o PR (reescreve a branch), então o registro mora no PR. Diferente da
+# dispensa, aqui o registro NÃO é precondição: quando o comentário é postado o rebase já aconteceu, e
+# morrer depois dele deixaria o PR rebaseado e o merge parado pelo motivo errado. Falha ⇒ AVISO
+# NOMEADO no terminal (nunca falha calada), e o merge segue os gates de sempre.
+_rebase_trail() { # $1=head antigo $2=head novo (ou "—") $3=causa $4=N/MAX $5=desfecho
+  local _body
+  _body="$(printf '%s\n' \
+    "## 🔁 Auto-rebase de \`ops/pr-merge-verified.sh\`" \
+    "" \
+    "| | |" \
+    "|---|---|" \
+    "| head | \`${1:0:12}\` → \`${2:0:12}\` |" \
+    "| causa | ${3} |" \
+    "| tentativa | ${4} |" \
+    "| desfecho | ${5} |" \
+    "" \
+    "O PR estava CONFLICTING (o GitHub não dispara CI em PR em conflito). O rebase rodou na worktree" \
+    "local da branch por \`ops/pr-finalize.sh --rebase --push\`, que resolve só conflito de projeção gerada.")"
+  if ! command -v gh >/dev/null 2>&1; then
+    say "⚠️  auto-rebase SEM RASTRO no PR #${PR}: \`gh\` indisponível — head ${1:0:8} → ${2:0:8}, causa: ${3} (${4})"
+    return 0
+  fi
+  if gh pr comment "$PR" "${REPO_ARG[@]}" --body "${_body}" >/dev/null 2>&1; then
+    say "✓ auto-rebase registrado no PR #${PR} (comentário: ${1:0:8} → ${2:0:8}, ${4})"
+  else
+    say "⚠️  auto-rebase SEM RASTRO no PR #${PR}: \`gh pr comment\` falhou — head ${1:0:8} → ${2:0:8}, causa: ${3} (${4}). Registre à mão."
+  fi
+}
 _mg="$(pr_mergeable)"
 _n=0; while [ "$_mg" = UNKNOWN ] && [ "$_n" -lt 6 ]; do sleep "${_POLL_SECS}"; _mg="$(pr_mergeable)"; _n=$((_n+1)); done
-_rebases=0
+# ONION_MERGE_REBASE_DONE: rebases que a SÉRIE já fez neste PR (o ops/merge-serial.sh (core-only) chama este
+# script uma vez por rodada) — sem ele o limite valeria por chamada e o laço voltaria pela porta da série.
+_rebases="${ONION_MERGE_REBASE_DONE:-0}"
+case "${_rebases}" in ''|*[!0-9]*) die "ONION_MERGE_REBASE_DONE='${_rebases}' não é inteiro — não sei quantos rebases já houve" ;; esac
 while [ "$_mg" = CONFLICTING ]; do
   _rebases=$((_rebases+1))
   [ "$_rebases" -le "$_REBASE_MAX" ] \
@@ -274,9 +316,11 @@ while [ "$_mg" = CONFLICTING ]; do
   [ -n "$_wt" ] \
     || die "PR #${PR} está CONFLICTING (o GitHub não dispara CI em PR em conflito) e a branch '${HEAD_REF}' não está em nenhuma worktree deste repo — não rebaseio às cegas. Rode na worktree da branch: bash ops/pr-finalize.sh --rebase --push ; depois rode este comando de novo."
   say "PR #${PR} CONFLICTING — auto-rebase ${_rebases}/${_REBASE_MAX} na worktree ${_wt} (pr-finalize --rebase --push)"
+  _old_head="${HEAD_SHA}"
   _rb_out="$(cd "$_wt" && bash ops/pr-finalize.sh --rebase --push 2>&1)"; _rb_rc=$?
   if [ "$_rb_rc" -ne 0 ]; then
-    _real="$(printf '%s\n' "$_rb_out" | grep -o 'conflito REAL em [^ ]*' | head -1)"
+    _real="$(grep -o 'conflito REAL em [^ ]*' <<< "$_rb_out" | head -1)"
+    _rebase_trail "${_old_head}" "—" "fonte: ${_real:-pr-finalize rc=${_rb_rc}}" "${_rebases}/${_REBASE_MAX}" "RECUSADO — nada mudou na branch; resolver à mão"
     die "auto-rebase RECUSADO (${_real:-rc=${_rb_rc}}) — conflito de FONTE não se resolve sozinho e não escondo conflito real; resolva à mão na worktree ${_wt}. pr-finalize disse: $(printf '%s\n' "$_rb_out" | tail -2 | tr '\n' ' ')"
   fi
   _new="$(git -C "$_wt" rev-parse HEAD 2>/dev/null)"
@@ -310,6 +354,17 @@ while [ "$_mg" = CONFLICTING ]; do
     done
   else
     HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOid' 2>/dev/null)"
+  fi
+  # a causa vem do que o pr-finalize RESOLVEU (uma linha por projeção em conflito); sem nenhuma, o
+  # rebase local foi limpo e quem disse CONFLICTING foi o forge — e isso também é dito, não inventado.
+  _proj="$(LC_ALL=C grep -o 'conflito de projeção resolvido em [^ ]*' <<< "$_rb_out" | sed 's/^conflito de projeção resolvido em //' | paste -sd, - | sed 's/,/, /g')"
+  if [ -n "${_proj}" ]; then _causa="projeção gerada: ${_proj}"
+  else _causa="nenhum arquivo em conflito no rebase local (o forge marcou CONFLICTING)"; fi
+  _rebase_trail "${_old_head}" "${HEAD_SHA}" "${_causa}" "${_rebases}/${_REBASE_MAX}" "rebaseado e enviado; o CI do head novo roda antes do merge"
+  if [ "${NO_WAIT_AFTER_REBASE}" -eq 1 ]; then
+    printf '↻ PR #%s rebaseado (%s → %s, %s/%s) — saio rc=4 SEM esperar o CI do head novo (--no-wait-after-rebase)\n' \
+      "$PR" "${_old_head:0:8}" "${HEAD_SHA:0:8}" "${_rebases}" "${_REBASE_MAX}"
+    exit 4
   fi
   _mg="$(pr_mergeable)"
   _n=0; while [ "$_mg" = UNKNOWN ] && [ "$_n" -lt 6 ]; do sleep "${_POLL_SECS}"; _mg="$(pr_mergeable)"; _n=$((_n+1)); done

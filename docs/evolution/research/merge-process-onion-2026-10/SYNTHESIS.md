@@ -23,7 +23,7 @@ review_after: 2026-11-12
 | Item | Valor |
 |---|---|
 | Tokens | 7.308.993 (medido pela ferramenta) |
-| Agentes | 105 |
+| Subagentes disparados pelo run | 105 |
 | Parede | 22,4 min |
 | Votação | 21 claims confirmadas, 4 refutadas |
 | Elenxo | 46 objeções julgadas, 27 sobreviventes, 27 modeladas como `E_OBJECAO_*` |

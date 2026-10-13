@@ -14411,6 +14411,304 @@ PFSTUB
   unset -f _mv _mvd _mvm _mva _mvk _kbr _kcase _ka _kb _kb2 _kc _kd _ke _kf _kg
 }
 
+# ═══ ops/merge-serial.sh + o rastro do auto-rebase no ops/pr-merge-verified.sh (passo C de D_MERGE_PROCESS_ONION_2026_10) ═══
+# POR QUE EXISTE (medido em 2026-10-13): o serializador de merge vivia no scratchpad da sessão com o
+# lock na série INTEIRA (a espera de CI de ~15 min dentro dele), quebrava quando editado no meio de
+# uma série (o bash lê o arquivo aos pedaços), passava a dispensa do revisor SEMPRE, e o auto-rebase
+# do verificado não deixava rastro no PR (≥14 vezes invisíveis). Nó: C_OPCAO_C_MERGE_SERIAL_IN_OPS.
+# SANDBOX: repo git DE VERDADE com worktrees (o pré-voo lê `git worktree list --porcelain`, como na
+# produção), o merge-serial copiado para <repo>/ops/ ao lado de um verificado de mentira que registra
+# a chamada (o caminho do verificado é o IRMÃO, sem knob de ambiente — de propósito), e um `gh` de
+# mentira com estado por PR em arquivos. O lock é o DEFAULT (<git-common-dir>/onion-merge-serial.lock).
+# Os casos (r*) exercitam o verificado REAL, com o `gh` e o `pr-finalize` esboçados.
+# MUTANTES (ops/mutate-and-restore.sh, rodados na forja, 2026-10-13) — cada um reprova o caso dele:
+#   (c)  lock tomado na série inteira (flock 9 antes do laço)          → (c) reprova
+#   (s)  sem o flock no trecho de merge                                 → (s) reprova
+#   (fd) sem o `9>&-` na chamada ao verificado                          → (fd) reprova
+#   (q)  sem o `flock -u 9` depois da chamada (CI do head novo no lock)  → (q) reprova
+#   (o)  falha de um PR vira `continue 2` (o seguinte passa à frente)     → (o) reprova
+#   (w)  sem o `die` do pré-voo de worktree                             → (w) reprova
+#   (d1) sem acrescentar a dispensa quando há motivo                    → (d1) reprova
+#   (d2) dispensa sem conferir que o check falha                        → (d2) reprova
+#   (d3) sem o ramo "APONTOU violação"                                  → (d3) reprova
+#   (d4) só a 1ª run do check lida (a re-run com achado fica de fora)    → (d4) reprova
+#   (l)  flock que "passa" mesmo ocupado                                → (l) reprova
+#   (e)  `main "$@"` e `exit` em linhas separadas                       → (e) reprova
+#   (r1) sem o comentário do auto-rebase bem-sucedido                   → (r1) reprova
+#   (r2) sem o aviso quando o comentário falha                          → (r2) reprova
+#   (r3) sem o `exit 4` do --no-wait-after-rebase                       → (r3) reprova
+#   (r4) sem o comentário do rebase recusado (fonte)                    → (r4) reprova
+#   (r5) contador de rebases da série ignorado (ONION_MERGE_REBASE_DONE) → (r5) reprova
+run_merge_serial_selftests() {
+  local sut="${REPO_ROOT}/ops/merge-serial.sh" pmv="${REPO_ROOT}/ops/pr-merge-verified.sh"
+  [ -f "${sut}" ] || { record_skip "merge-serial: ops/ ausente (adotante) → pulado"; return; }
+  command -v flock >/dev/null 2>&1 || { record_skip "merge-serial: flock ausente → pulado"; return; }
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  local repo="${d}/repo" st="${d}/st" ev="${d}/ev"
+  ( mkdir -p "${repo}/ops" && cd "${repo}" && git init -q -b main && git config user.email t@t && git config user.name t \
+    && echo a > a && git add a && git commit -qm base ) >/dev/null 2>&1
+  cp "${sut}" "${repo}/ops/merge-serial.sh"
+  local b; for b in 11 12 21 22 23 31 41 51 61 62 63 64 71; do
+    git -C "${repo}" worktree add -q -b "b${b}" "${d}/wt-${b}" >/dev/null 2>&1
+  done
+  # ── o verificado de mentira: registra a chamada, prova o fd do lock fechado, e obedece ao roteiro do PR ──
+  cat > "${repo}/ops/pr-merge-verified.sh" <<'PMV'
+#!/usr/bin/env bash
+pr="$1"; shift
+echo "merge-start ${pr} done=${ONION_MERGE_REBASE_DONE:-?} args=$*" >> "${MS_EV}"
+[ -e "/proc/$$/fd/9" ] && echo "fd9-open ${pr}" >> "${MS_EV}"
+sleep "${PMV_SLEEP:-0}"
+s="${MS_ST}/${pr}"; mode="$(head -1 "${s}/pmv")"; sed -i 1d "${s}/pmv"
+case "${mode}" in
+  ok)      echo MERGED > "${s}/state"; echo "2026-10-13T12:00:0${pr: -1}Z" > "${s}/mergedAt"; echo "✓ PR #${pr} MERGED — provado pelo ESTADO"; rc=0 ;;
+  rebase)  n="$(cat "${s}/hn")"; n=$((n+1)); echo "${n}" > "${s}/hn"; echo "h${pr}x${n}" > "${s}/head"
+           echo "${CI_AFTER_REBASE:-2}" > "${s}/ci_left"; echo MERGEABLE > "${s}/mergeable"; echo "↻ PR #${pr} rebaseado"; rc=4 ;;
+  pending) echo "✗ há check PENDENTE — merge recusado (esperar não é opcional)"; rc=1 ;;
+  *)       echo "✗ check-run do head concluiu em falha e NÃO foi dispensado: lint — merge recusado"; rc=1 ;;
+esac
+echo "merge-end ${pr}" >> "${MS_EV}"
+exit "${rc}"
+PMV
+  # ── o gh de mentira: estado por PR em ${MS_ST}/<pr>/, e o lock sondado a cada leitura de CI ──
+  mkdir -p "${d}/bin"
+  cat > "${d}/bin/gh" <<'GH'
+#!/usr/bin/env bash
+a="$*"
+pr=""; for x in "$@"; do case "$x" in ''|*[!0-9]*) ;; *) pr="$x"; break ;; esac; done
+f() { cat "${MS_ST}/$1/$2"; }
+case "$a" in
+  *"--json state,headRefName,mergeable,mergedAt"*) printf '%s\t%s\t%s\t%s\n' "$(f "$pr" state)" "$(f "$pr" branch)" "$(f "$pr" mergeable)" "$(f "$pr" mergedAt)"; exit 0 ;;
+  *"--json headRepositoryOwner,headRepository"*)   echo "owner/repo"; exit 0 ;;
+  *"--json headRefOid,mergeable"*)                 echo "$(f "$pr" head) $(f "$pr" mergeable)"; exit 0 ;;
+  *"--json headRefOid"*)                           f "$pr" head; exit 0 ;;
+  *"--json state,mergedAt"*)                       echo "$(f "$pr" state)|$(f "$pr" mergedAt)"; exit 0 ;;
+  *"check-runs/"*"/annotations"*)
+      id="$(sed -E 's|.*check-runs/([0-9]+)/annotations.*|\1|' <<< "$a")"
+      case "$id" in 8*) f "${id#8}" ann2 ;; *) f "${id#9}" ann ;; esac; exit 0 ;;
+  *"commits/"*"check-runs"*"onion-review-verdict"*)
+      # a 2ª run do check (re-run) só existe quando o caso escreve ann2 — e vem DEPOIS da 1ª
+      h="$(sed -E 's|.*commits/h([0-9]+)x.*|\1|' <<< "$a")"; echo "9${h}"; [ -f "${MS_ST}/${h}/ann2" ] && echo "8${h}"; exit 0 ;;
+  *"commits/"*"check-runs"*)
+      h="$(sed -E 's|.*commits/h([0-9]+)x.*|\1|' <<< "$a")"; hd="$(sed -E 's|.*commits/([^/]+)/check-runs.*|\1|' <<< "$a")"
+      if [ -n "${MS_PROBE_LOCK:-}" ]; then
+        if flock -n "${MS_PROBE_LOCK}" true 9>&-; then lk=livre; else lk=preso; fi
+      else lk=-; fi
+      echo "poll ${h} ${hd} lock=${lk}" >> "${MS_EV}"
+      n="$(f "$h" ci_left)"
+      if [ "${n}" -gt 0 ]; then echo $((n-1)) > "${MS_ST}/${h}/ci_left"; echo in_progress; else echo completed; fi
+      exit 0 ;;
+  *"pr checks"*)
+      printf 'selftest\tpass\t1s\turl\n'; printf 'onion-review-verdict\t%s\t2s\turl\n' "$(f "$pr" verdict)"; exit 0 ;;
+esac
+echo "gh-stub: chamada não esperada: $a" >&2; exit 1
+GH
+  chmod +x "${d}/bin/gh"
+  _msp() { # $1=pr $2=branch $3=mergeable $4=ci_left $5=verdict(pass|fail) $6=anotação $7=roteiro do verificado (espaços)
+    mkdir -p "${st}/$1"; echo OPEN > "${st}/$1/state"; echo null > "${st}/$1/mergedAt"; echo "$2" > "${st}/$1/branch"
+    echo "$3" > "${st}/$1/mergeable"; echo "$4" > "${st}/$1/ci_left"; echo "$5" > "${st}/$1/verdict"; printf '%s\n' "$6" > "${st}/$1/ann"
+    echo 0 > "${st}/$1/hn"; echo "h$1x0" > "${st}/$1/head"; printf '%s\n' $7 > "${st}/$1/pmv"
+  }
+  local _ms_out _ms_rc
+  _ms() { # roda o merge-serial do sandbox, do repo principal, como a produção
+    _ms_out="$(cd "${repo}" && PATH="${d}/bin:${PATH}" MS_ST="${st}" MS_EV="${ev}" ONION_MERGE_SERIAL_POLL="${MSPOLL:-0}" \
+               ONION_MERGE_SERIAL_CI_WAIT=30 ONION_MERGE_SERIAL_LOCK_WAIT="${MSLW:-30}" bash ops/merge-serial.sh "$@" 2>&1)"; _ms_rc=$?
+  }
+  _reset() { rm -rf "${st}"; mkdir -p "${st}"; : > "${ev}"; }
+  local lock="${repo}/.git/onion-merge-serial.lock"
+
+  # (c)+(s) DUAS séries concorrentes: a espera de CI corre em PARALELO, e só o merge é exclusivo
+  _reset
+  _msp 11 b11 MERGEABLE 3 pass "" ok; _msp 12 b12 MERGEABLE 3 pass "" ok
+  local _o1 _o2
+  ( cd "${repo}" && PATH="${d}/bin:${PATH}" MS_ST="${st}" MS_EV="${ev}" ONION_MERGE_SERIAL_POLL=1 PMV_SLEEP=2 bash ops/merge-serial.sh 11 > "${d}/o1" 2>&1 ) &
+  _o1=$!
+  ( cd "${repo}" && PATH="${d}/bin:${PATH}" MS_ST="${st}" MS_EV="${ev}" ONION_MERGE_SERIAL_POLL=1 PMV_SLEEP=2 bash ops/merge-serial.sh 12 > "${d}/o2" 2>&1 ) &
+  _o2=$!
+  wait "${_o1}"; local _rc1=$?; wait "${_o2}"; local _rc2=$?
+  local _first_merge _p11 _p12
+  _first_merge="$(grep -n '^merge-start' "${ev}" | head -1 | cut -d: -f1)"
+  _p11="$(grep -n '^poll 11 ' "${ev}" | head -1 | cut -d: -f1)"; _p12="$(grep -n '^poll 12 ' "${ev}" | head -1 | cut -d: -f1)"
+  if [ "${_rc1}" -eq 0 ] && [ "${_rc2}" -eq 0 ] && [ -n "${_first_merge}" ] && [ -n "${_p11}" ] && [ -n "${_p12}" ] \
+     && [ "${_p11}" -lt "${_first_merge}" ] && [ "${_p12}" -lt "${_first_merge}" ]; then
+    record_pass "merge-serial: (c) duas séries concorrentes esperam o CI em PARALELO (o lock não cobre a espera)"
+  else record_fail "merge-serial: (c) espera de CI dentro do lock" "rc=${_rc1}/${_rc2} ev=[$(tr '\n' ';' < "${ev}")]"; fi
+  local _overlap; _overlap="$(awk '/^merge-start/{if(open)o=1; open=1} /^merge-end/{open=0} END{print o+0}' "${ev}")"
+  if [ "${_overlap}" = 0 ] && [ "$(grep -c '^merge-start' "${ev}")" -eq 2 ] && grep -q '^#11 MERGED mergedAt=' "${d}/o1" && grep -q '^#12 MERGED mergedAt=' "${d}/o2"; then
+    record_pass "merge-serial: (s) os dois merges se SERIALIZAM no lock e cada linha final traz o mergedAt do forge"
+  else record_fail "merge-serial: (s) merges sobrepostos" "ev=[$(tr '\n' ';' < "${ev}")] o1=[$(cat "${d}/o1")]"; fi
+
+  # (q)+(fd) auto-rebase ⇒ lock SOLTO, CI do head novo esperado fora dele, e o PR volta à fila com o contador
+  _reset
+  _msp 41 b41 CONFLICTING 0 pass "" "rebase ok"
+  _ms_out="$(cd "${repo}" && PATH="${d}/bin:${PATH}" MS_ST="${st}" MS_EV="${ev}" MS_PROBE_LOCK="${lock}" ONION_MERGE_SERIAL_POLL=0 bash ops/merge-serial.sh 41 2>&1)"; _ms_rc=$?
+  if [ "${_ms_rc}" -eq 0 ] && grep -q '^poll 41 h41x1 lock=livre' "${ev}" && ! grep -q '^poll 41 h41x1 lock=preso' "${ev}" \
+     && grep -q '^merge-start 41 done=0 args=--no-wait-after-rebase' "${ev}" && grep -q '^merge-start 41 done=1 ' "${ev}" \
+     && grep -q '^#41 MERGED mergedAt=' <<< "${_ms_out}"; then
+    record_pass "merge-serial: (q) auto-rebase (rc 4) ⇒ lock solto, CI do head novo FORA do lock, volta à fila com o contador da série"
+  else record_fail "merge-serial: (q) rebase + volta à fila" "rc=${_ms_rc} ev=[$(tr '\n' ';' < "${ev}")] out=${_ms_out}"; fi
+  if grep -q '^merge-start 41' "${ev}" && ! grep -q '^fd9-open' "${ev}"; then
+    record_pass "merge-serial: (fd) o verificado roda com o fd do lock FECHADO (neto órfão não segura o lock)"
+  else record_fail "merge-serial: (fd) fd do lock herdado" "ev=[$(tr '\n' ';' < "${ev}")]"; fi
+
+  # (o) FIFO: o PR que falha PARA a série — o seguinte não passa à frente dele
+  _reset
+  _msp 21 b21 MERGEABLE 0 pass "" ok; _msp 22 b22 MERGEABLE 0 pass "" fail; _msp 23 b23 MERGEABLE 0 pass "" ok
+  _ms 21 22 23
+  if [ "${_ms_rc}" -ne 0 ] && [ "$(grep '^merge-start' "${ev}" | cut -d' ' -f2 | tr '\n' ' ')" = "21 22 " ] \
+     && grep -q '^#21 MERGED' <<< "${_ms_out}" && grep -q '^#22 NÃO mergeou' <<< "${_ms_out}" && ! grep -q '^#23' <<< "${_ms_out}"; then
+    record_pass "merge-serial: (o) ordem dos argumentos; o PR que falha PARA a série (o #23 não passa à frente do #22)"
+  else record_fail "merge-serial: (o) FIFO" "rc=${_ms_rc} ev=[$(tr '\n' ';' < "${ev}")] out=${_ms_out}"; fi
+
+  # (w) PR mais NOVO sem worktree ⇒ a série nem começa (nenhum merge), nomeando o PR e a branch
+  _reset
+  _msp 31 b31 MERGEABLE 0 pass "" ok; _msp 32 b32-sem-worktree CONFLICTING 0 pass "" ok
+  _ms 31 32
+  if [ "${_ms_rc}" -ne 0 ] && grep -qF "PR #32 (branch 'b32-sem-worktree', mergeable=CONFLICTING) não tem worktree local" <<< "${_ms_out}" \
+     && ! grep -q '^merge-start' "${ev}"; then
+    record_pass "merge-serial: (w) worktree ausente ⇒ para no pré-voo nomeando PR e branch, sem mergear nenhum"
+  else record_fail "merge-serial: (w) pré-voo de worktree" "rc=${_ms_rc} ev=[$(tr '\n' ';' < "${ev}")] out=${_ms_out}"; fi
+
+  # (d1) verdict FALHA + "NÃO revisou" ⇒ dispensa nomeada, com a anotação no motivo
+  _reset
+  _msp 61 b61 MERGEABLE 0 fail "onion-review NÃO revisou (1ª: sem-arquivo · 2ª: nao-rodou) — SALDO insuficiente" ok
+  _ms 61
+  if [ "${_ms_rc}" -eq 0 ] && grep -qF 'args=--no-wait-after-rebase --dispensa onion-review-verdict --motivo revisor do CI NÃO revisou o head h61x0 (onion-review NÃO revisou' "${ev}"; then
+    record_pass "merge-serial: (d1) check falhando + revisor NÃO revisou ⇒ dispensa nomeada com a anotação no motivo"
+  else record_fail "merge-serial: (d1) dispensa devida" "rc=${_ms_rc} ev=[$(tr '\n' ';' < "${ev}")] out=${_ms_out}"; fi
+  # (d2) verdict PASSA ⇒ nenhuma dispensa (nunca preventiva)
+  _reset
+  _msp 62 b62 MERGEABLE 0 pass "" ok
+  _ms 62
+  if [ "${_ms_rc}" -eq 0 ] && grep -q '^merge-start 62 done=0 args=--no-wait-after-rebase$' "${ev}"; then
+    record_pass "merge-serial: (d2) revisor aprovou ⇒ o verificado roda SEM --dispensa (nunca preventiva)"
+  else record_fail "merge-serial: (d2) dispensa preventiva" "rc=${_ms_rc} ev=[$(tr '\n' ';' < "${ev}")] out=${_ms_out}"; fi
+  # (d3) verdict FALHA + "apontou N violação" ⇒ PARA (achado é decisão humana), sem chamar o verificado
+  _reset
+  _msp 63 b63 MERGEABLE 0 fail "onion-review apontou 2 violação(ões) — corrija, ou dispense com motivo registrado" ok
+  _ms 63
+  if [ "${_ms_rc}" -ne 0 ] && grep -qF 'APONTOU violação' <<< "${_ms_out}" && ! grep -q '^merge-start' "${ev}"; then
+    record_pass "merge-serial: (d3) revisor APONTOU violação ⇒ a série para; dispensar achado não é automático"
+  else record_fail "merge-serial: (d3) achado dispensado em silêncio" "rc=${_ms_rc} ev=[$(tr '\n' ';' < "${ev}")] out=${_ms_out}"; fi
+
+  # (d4) RE-RUN do check: a 1ª run diz "NÃO revisou", a 2ª APONTOU ⇒ para (ler só a 1ª dispensava o achado)
+  _reset
+  _msp 64 b64 MERGEABLE 0 fail "onion-review NÃO revisou (1ª: sem-arquivo · 2ª: nao-rodou)" ok
+  printf '%s\n' "onion-review apontou 1 violação(ões) — corrija, ou dispense com motivo registrado" > "${st}/64/ann2"
+  _ms 64
+  if [ "${_ms_rc}" -ne 0 ] && grep -qF 'APONTOU violação' <<< "${_ms_out}" && ! grep -q '^merge-start' "${ev}"; then
+    record_pass "merge-serial: (d4) re-run do check com achado na 2ª run ⇒ para; todas as runs do head são lidas"
+  else record_fail "merge-serial: (d4) achado da re-run dispensado" "rc=${_ms_rc} ev=[$(tr '\n' ';' < "${ev}")] out=${_ms_out}"; fi
+
+  # (l) lock ocupado por outro dono além do teto ⇒ para nomeando o lock, sem mergear
+  _reset
+  _msp 71 b71 MERGEABLE 0 pass "" ok
+  ( flock "${lock}" sleep 4 ) &
+  local _hold=$!
+  sleep 0.5
+  MSLW=1 _ms 71
+  kill "${_hold}" 2>/dev/null; wait "${_hold}" 2>/dev/null
+  if [ "${_ms_rc}" -ne 0 ] && grep -qF "o lock ${lock} seguiu ocupado por 1s" <<< "${_ms_out}" && ! grep -q '^merge-start' "${ev}"; then
+    record_pass "merge-serial: (l) lock ocupado além do teto ⇒ para nomeando o lock, nenhum merge sem ele"
+  else record_fail "merge-serial: (l) lock ignorado" "rc=${_ms_rc} ev=[$(tr '\n' ';' < "${ev}")] out=${_ms_out}"; fi
+
+  # (e) o arquivo REESCRITO no meio da série não muda o que a série executa (o bash lê aos pedaços)
+  _reset
+  _msp 51 b51 MERGEABLE 3 pass "" ok
+  cp "${repo}/ops/merge-serial.sh" "${d}/ms.bak"
+  ( cd "${repo}" && PATH="${d}/bin:${PATH}" MS_ST="${st}" MS_EV="${ev}" ONION_MERGE_SERIAL_POLL=1 bash ops/merge-serial.sh 51 > "${d}/o5" 2>&1 ) &
+  local _e=$!
+  sleep 1
+  local _i; for _i in $(seq 1 3000); do echo "exit 77 # reescrito no meio da série"; done > "${repo}/ops/merge-serial.sh"
+  wait "${_e}"; local _rc5=$?
+  cp "${d}/ms.bak" "${repo}/ops/merge-serial.sh"
+  if [ "${_rc5}" -eq 0 ] && grep -q '^#51 MERGED mergedAt=' "${d}/o5"; then
+    record_pass "merge-serial: (e) script reescrito durante a série ⇒ a série roda o que leu no início (corpo numa função)"
+  else record_fail "merge-serial: (e) leitura aos pedaços" "rc=${_rc5} out=[$(cat "${d}/o5")]"; fi
+
+  # ── (r1)-(r5) o VERIFICADO real: rastro do auto-rebase no PR e o modo --no-wait-after-rebase ──
+  if [ -f "${pmv}" ]; then
+    local r="${d}/r" rw="${d}/r-wt"
+    ( mkdir -p "${r}" && cd "${r}" && git init -q -b main && git config user.email t@t && git config user.name t \
+      && echo a > a && git add a && git commit -qm base && git branch feat/x && git worktree add -q "${rw}" feat/x ) >/dev/null 2>&1
+    mkdir -p "${rw}/ops"
+    cat > "${rw}/ops/pr-finalize.sh" <<'PF'
+#!/usr/bin/env bash
+echo "$*" >> "${PF_LOG}"
+if [ "${PF_MODE:-ok}" = fail ]; then echo "PR-FINALIZE: conflito REAL em src/x.sh — rebase abortado, nada mudou; resolva à mão" >&2; exit 1; fi
+echo "PR-FINALIZE: conflito de projeção resolvido em docs/backlog.md (a regeneração refaz)"
+git -c user.email=t@t -c user.name=t commit -q --allow-empty -m rebase
+echo "PR-FINALIZE: enviado feat/x @ $(git rev-parse --short HEAD)"
+PF
+    mkdir -p "${d}/bin2"
+    cat > "${d}/bin2/gh" <<'GH2'
+#!/usr/bin/env bash
+a="$*"
+case "$a" in
+  *"pr view"*"json mergeable"*)
+      k=$(cat "${R_MK}"); k=$((k+1)); echo "$k" > "${R_MK}"
+      v="$(printf '%s\n' ${R_MSEQ} | sed -n "${k}p")"; [ -n "$v" ] || v="$(printf '%s\n' ${R_MSEQ} | tail -1)"; echo "$v"; exit 0 ;;
+  *"pr view"*headRefOid*)          git -C "${R_WT}" rev-parse HEAD; exit 0 ;;
+  *"pr view"*headRepositoryOwner*) echo "owner/repo"; exit 0 ;;
+  *"pr view"*headRefName*)         echo "feat/x"; exit 0 ;;
+  *"pr view"*baseRefName*)         echo "main"; exit 0 ;;
+  *"pr view"*statusCheckRollup*)   echo "SUCCESS"; exit 0 ;;
+  *"pr view"*state,mergedAt*)
+      n=$(cat "${R_N}"); n=$((n+1)); echo "$n" > "${R_N}"
+      if [ "$n" -eq 1 ]; then echo "OPEN|null"; else echo "MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)"; fi; exit 0 ;;
+  *"pr comment"*)
+      prev=""; for x in "$@"; do [ "$prev" = "--body" ] && printf '%s\n===\n' "$x" >> "${R_COMMENTS}"; prev="$x"; done
+      exit "${R_COMMENT_RC:-0}" ;;
+  *"api "*check-runs*) [ -n "${R_RUNS_EMPTY:-}" ] && exit 0; printf 'selftest\tcompleted\tsuccess\n'; exit 0 ;;
+  *"pr checks"*)       printf 'selftest\tpass\t1s\turl\n'; exit 0 ;;
+  *"api "*pulls*commits*) echo 1; exit 0 ;;
+  *"api "*pulls*files*)   echo "ops/x.sh"; exit 0 ;;
+  *"pr merge"*) echo "$a" >> "${R_MARGS}"; echo merged; exit 0 ;;
+esac
+exit 0
+GH2
+    chmod +x "${d}/bin2/gh"
+    local _r_out _r_rc _r_old _r_new
+    _rv() { # $1=sequência de mergeable  $2=PF_MODE ; resto = flags do verificado
+      local _seq="$1" _pm="$2"; shift 2
+      echo 0 > "${d}/rmk"; echo 0 > "${d}/rn"; : > "${d}/rpf"; : > "${d}/rmargs"; : > "${d}/rcom"
+      _r_old="$(git -C "${rw}" rev-parse HEAD)"
+      _r_out="$(cd "${r}" && PATH="${d}/bin2:${PATH}" R_MK="${d}/rmk" R_N="${d}/rn" R_MSEQ="${_seq}" R_WT="${rw}" \
+                PF_MODE="${_pm}" PF_LOG="${d}/rpf" R_MARGS="${d}/rmargs" R_COMMENTS="${d}/rcom" \
+                ONION_MERGE_POLL_SECS=0 ONION_MERGE_WAIT_SECS=3 ONION_MERGE_HEAD_SYNC_TRIES=2 ONION_MERGE_HEAD_SYNC_POLL=0 \
+                bash "${pmv}" 999 "$@" 2>&1)"; _r_rc=$?
+    }
+    # (r1) auto-rebase bem-sucedido ⇒ comentário no PR com head antigo → novo, causa (projeção) e N/MAX
+    _rv "CONFLICTING MERGEABLE" ok
+    _r_new="$(git -C "${rw}" rev-parse HEAD)"
+    if [ "${_r_rc}" -eq 0 ] && grep -qF "\`${_r_old:0:12}\` → \`${_r_new:0:12}\`" "${d}/rcom" \
+       && grep -qF "projeção gerada: docs/backlog.md" "${d}/rcom" && grep -qF "| tentativa | 1/2 |" "${d}/rcom" && [ -s "${d}/rmargs" ]; then
+      record_pass "merge-serial: (r1) auto-rebase do verificado ⇒ comentário no PR (head antigo → novo, causa, 1/2) e merge"
+    else record_fail "merge-serial: (r1) rebase invisível" "rc=${_r_rc} com=[$(cat "${d}/rcom")] out=${_r_out}"; fi
+    # (r2) o comentário FALHA ⇒ aviso nomeado (nunca falha calada) e o merge segue os gates
+    _r_out="$(export R_COMMENT_RC=1; _rv "CONFLICTING MERGEABLE" ok; printf '%s\n__rc=%s' "${_r_out}" "${_r_rc}")"
+    if grep -q '__rc=0' <<< "${_r_out}" && grep -qF 'auto-rebase SEM RASTRO no PR #999' <<< "${_r_out}" && [ -s "${d}/rmargs" ]; then
+      record_pass "merge-serial: (r2) comentário do auto-rebase falhou ⇒ aviso nomeado, merge segue"
+    else record_fail "merge-serial: (r2) falha calada" "out=${_r_out}"; fi
+    # (r3) --no-wait-after-rebase ⇒ rc 4 logo depois do rebase, sem esperar runs (que aqui nunca nascem) e sem merge
+    _r_out="$(export R_RUNS_EMPTY=1; _rv "CONFLICTING MERGEABLE" ok --no-wait-after-rebase; printf '%s\n__rc=%s' "${_r_out}" "${_r_rc}")"
+    if grep -q '__rc=4' <<< "${_r_out}" && grep -qF 'saio rc=4 SEM esperar' <<< "${_r_out}" && [ ! -s "${d}/rmargs" ] && [ -s "${d}/rcom" ]; then
+      record_pass "merge-serial: (r3) --no-wait-after-rebase ⇒ comenta, sai rc 4 sem esperar o CI e sem mergear"
+    else record_fail "merge-serial: (r3) modo da série" "margs=[$(cat "${d}/rmargs")] out=${_r_out}"; fi
+    # (r4) rebase RECUSADO (fonte) ⇒ comentário com a causa "fonte" e o desfecho, sem merge
+    _rv "CONFLICTING MERGEABLE" fail
+    if [ "${_r_rc}" -ne 0 ] && grep -qF "fonte: conflito REAL em src/x.sh" "${d}/rcom" && grep -qF "RECUSADO" "${d}/rcom" && [ ! -s "${d}/rmargs" ]; then
+      record_pass "merge-serial: (r4) auto-rebase recusado por conflito de fonte ⇒ comentário com a causa, sem merge"
+    else record_fail "merge-serial: (r4) recusa sem rastro" "rc=${_r_rc} com=[$(cat "${d}/rcom")] out=${_r_out}"; fi
+    # (r5) a série já fez os 2 rebases ⇒ o 3º é recusado sem rodar o pr-finalize (limite da SÉRIE, não da chamada)
+    _r_out="$(export ONION_MERGE_REBASE_DONE=2; _rv "CONFLICTING MERGEABLE" ok --no-wait-after-rebase; printf '%s\n__rc=%s' "${_r_out}" "${_r_rc}")"
+    if ! grep -q '__rc=0' <<< "${_r_out}" && grep -q 'depois de 2 rebase' <<< "${_r_out}" && [ ! -s "${d}/rpf" ]; then
+      record_pass "merge-serial: (r5) ONION_MERGE_REBASE_DONE=2 ⇒ o limite vale para a série inteira, sem 3º rebase"
+    else record_fail "merge-serial: (r5) laço pela porta da série" "pf=[$(cat "${d}/rpf")] out=${_r_out}"; fi
+  else record_skip "merge-serial: (r*) ops/pr-merge-verified.sh ausente → pulado"; fi
+
+  unset -f _msp _ms _reset _rv
+}
+
 # ═══ REGRA 90 — paridade papel: o SCRIPT aceita, a PROSA menciona ═════════════════════════
 # POR QUE EXISTE: a classe desencontrou DUAS vezes em sentidos opostos (2026-09-17 script estreito +
 # prosa larga; 2026-09-25 script largo + prosa estreita, reportado por um adotante `hub`). O POR QUE
@@ -19560,6 +19858,7 @@ _family run_migrate_seed_graph_selftests
 # um abort imprevisto sob set -e jamais esconde os modos self-contained seguintes (de-id).
 _family run_assemble_plugin_selftests || true
 _family run_pr_merge_verified_selftests || true
+_family run_merge_serial_selftests || true
 _family run_marketplace_generate_selftests || true
 _family run_bootstrap_vertical_selftests || true
 _family run_scaffold_book_selftests || true

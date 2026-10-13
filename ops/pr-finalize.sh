@@ -147,6 +147,8 @@ if [ "${REBASE}" = 1 ]; then
         # (Até a F4 das portas, 2026-10-10, plugins/<vertical> tinha ramo próprio, remontado das fontes
         # mescladas — SAC-67. O `plugins/` saiu do core e o ramo saiu com ele.)
         git checkout --theirs -- "${_f}" && git add -- "${_f}"
+        # o ops/pr-merge-verified.sh (core-only) lê esta linha para dizer no PR a CAUSA do auto-rebase (H5)
+        echo "PR-FINALIZE: conflito de projeção resolvido em ${_f} (a regeneração refaz)"
       done
       GIT_EDITOR=true git rebase --continue >/dev/null 2>&1 && break
     done
