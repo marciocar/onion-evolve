@@ -6,7 +6,7 @@
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.5.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.5.0-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.6.0](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.6.0-6f42c1)](spec/release.json)
 [![Suíte: 225/225](https://img.shields.io/badge/su%C3%ADte-225%2F225-2ea44f)](spec/conformance/README.md)
 [![Python 3](https://img.shields.io/badge/python-3-3776ab)](tools/requirements.txt)
 
@@ -118,6 +118,7 @@ flowchart LR
 | **Arestas entre grafos** | `external_edges` com a ponta externa conferida no corpus |
 | **Códigos estáveis** | Toda violação tem um código como `form.required.node.provenance`, e `--where` diz o nó |
 | **Veredito estruturado** | `kg_validate.py --format json` devolve o veredito com código, caminho no documento, linha, mensagem em pt-BR e dica, num formato versionado (`spec/verdict.schema.json`) para ferramentas e servidores MCP |
+| **Armazém com gate** | `kg_store.py` grava `.kg.yaml` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
 | **Suíte em dados puros** | 225 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
 | **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
 | **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
@@ -135,7 +136,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.5.0`. O leitor de referência passa em 225 de 225 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.6.0`. O leitor de referência passa em 225 de 225 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.

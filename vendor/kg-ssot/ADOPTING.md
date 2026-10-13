@@ -12,6 +12,8 @@ A lista está em [`spec/release.json`](spec/release.json):
 - a suíte (`spec/conformance/`);
 - o leitor de referência (`tools/kg_validate.py`, `tools/kg_conformance.py`);
 - o gate (`tools/kg_gate.py`) e o vendor (`tools/kg_vendor.py`);
+- o armazém com gate (`tools/kg_store.py`), para quem grava grafo por programa: só escreve o que o contrato aprova
+  ([cap. 5 do manual](docs/manual/05-ferramentas.md));
 - as dependências fixadas (`tools/requirements.txt`, Python 3 com PyYAML e jsonschema);
 - este guia e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
 - a licença (`LICENSE`, Apache-2.0) e o `NOTICE`, que dizem o escopo dela.
@@ -38,14 +40,14 @@ O adotante usa só `update` e `check`.
 A primeira vez, a partir de um clone deste repo:
 
 ```bash
-python3 -I -B tools/kg_vendor.py update --tag kg-ssot-v4.5.0 --dest <adotante>/vendor/kg-ssot
+python3 -I -B tools/kg_vendor.py update --tag kg-ssot-v4.6.0 --dest <adotante>/vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.5.0 --source <caminho ou URL deste repo>
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.6.0 --source <caminho ou URL deste repo>
 ```
 
 - **Leitura:** o vendor lê a tag com `git archive`, nunca a árvore de trabalho. Os nomes são literais: um `*`
@@ -257,7 +259,7 @@ O que muda no v4:
   no v5. Ajuste antes os geradores que escrevem `provenance` (no primeiro adotante, seis deles emitiam `method` livre).
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.5.0 --source <caminho ou URL deste repo>`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.6.0 --source <caminho ou URL deste repo>`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
