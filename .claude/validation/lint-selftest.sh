@@ -10493,18 +10493,18 @@ run_review_mode_selftests() {
   } >/dev/null 2>&1 || { record_fail "review-mode" "não consegui montar o repo git da bancada"; return; }
 
   local _o _rc
-  _rd() { # $1=script ; resto = args do juiz → _o (stdout+stderr) e _rc
+  _rmrun() { # $1=script ; resto = args do juiz → _o (stdout+stderr) e _rc
     local s="$1"; shift
     _rc=0; _o="$(cd "${r}" && LC_ALL=C bash "${s}" "$@" 2>&1)" || _rc=$?
   }
   _rmcase() { # $1=rótulo $2=predicado $3=âncora literal do mutante $4=substituição ; resto = args
     local lbl="$1" pred="$2" anc="$3" sub="$4"; shift 4
-    _rd "${sut}" "$@"
+    _rmrun "${sut}" "$@"
     if ! "${pred}"; then record_fail "review-mode: ${lbl}" "rc=${_rc} out=$(printf '%s' "${_o}" | tail -3)"; return; fi
     local m="${d}/mut.sh"
     A="${anc}" B="${sub}" awk 'BEGIN{a=ENVIRON["A"]; b=ENVIRON["B"]} { i=index($0,a); if (i>0) { $0=substr($0,1,i-1) b substr($0,i+length(a)) } print }' "${sut}" > "${m}"
     if cmp -s "${sut}" "${m}"; then record_fail "review-mode: ${lbl} — MUTANTE" "a âncora '${anc}' não casou (mutante que não muta declara verde sem medir)"; return; fi
-    _rd "${m}" "$@"
+    _rmrun "${m}" "$@"
     if "${pred}"; then record_fail "review-mode: ${lbl} — MUTANTE SOBREVIVEU" "'${anc}' → '${sub}' e o caso não notou"; return; fi
     record_pass "review-mode: ${lbl} (e o mutante reprova)"
   }
@@ -10594,7 +10594,7 @@ PYW
     else record_fail "review-mode: (s) fiação do workflow" "${_o}"; fi
     unset -f _wire
   fi
-  unset -f _rd _rmcase _p_run _p_norun _p_enum _p_g_off _p_g_nomode _p_g_skip _p_g_go
+  unset -f _rmrun _rmcase _p_run _p_norun _p_enum _p_g_off _p_g_nomode _p_g_skip _p_g_go
 }
 
 # ---------------------------------------------------------------------------
