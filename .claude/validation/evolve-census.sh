@@ -81,7 +81,7 @@ if PIECES="$(FORGE_CENSUS_TOP=1000 _run pecas 0 forge-census.sh . --tsv)"; then
   P_7="$(awk -F'\t' 'NR>1 && $1==7' <<< "${PIECES}" | grep -c . || true)"
   P_1="$(awk -F'\t' 'NR>1 && $1==1' <<< "${PIECES}" | grep -c . || true)"
   # rótulo<TAB>caminho: o CAMINHO diz se a superfície é comando ou skill (MAQ-3, sinal do adotante
-  # onion-kg-ssot 2026-10-12: a seção 7 dizia "37 comandos" e 7 eram skills e 1 era README).
+  # adotante KG-SSOT 2026-10-12: a seção 7 dizia "37 comandos" e 7 eram skills e 1 era README).
   P_SURF="$(awk -F'\t' 'NR>1 && $1==1 {print $2 "\t" $9}' <<< "${PIECES}" | sort)"
   P_1_CMD="$(awk -F'\t' '$2 !~ /^[.]claude\/skills\//' <<< "${P_SURF}" | grep -c . || true)"
   P_1_SKL="$(awk -F'\t' '$2 ~ /^[.]claude\/skills\//' <<< "${P_SURF}" | grep -c . || true)"
@@ -140,7 +140,7 @@ fi
 PL_OK=0; PL_RDY=""; PL_BLK=""; BL_N=""
 PLAN="${REPO}/docs/onion/graph/fios-abertos.kg.yaml"
 # ⚠️ NO ADOTANTE o plano do core NÃO VIAJA: "AUSENTE" ali é falta de objeto no papel, não medidor
-#    quebrado — e a lista do não-medido o tratava como lacuna (sinal onion-kg-ssot 2026-10-12).
+#    quebrado — e a lista do não-medido o tratava como lacuna (sinal adotante KG-SSOT 2026-10-12).
 #    O papel é lido do carimbo `.claude/.onion-version`, o mesmo que o /meta:co-evolve usa.
 PL_NA=0
 if [ ! -f "${PLAN}" ] && [ -f "${REPO}/.claude/.onion-version" ]; then PL_NA=1
@@ -160,7 +160,7 @@ else _note backlog "AUSENTE: docs/backlog.md"; fi
 S_OK=0; S_N=""; S_TXT=""; S_OPTOUT=0
 # ⚠️ OPT-OUT NÃO É FRESCOR. A guarda da REGRA 97 só opta pela presença de `docs/analysis/` e, sem a
 #    pasta, sai rc 0 com saída VAZIA — que a contagem lia como "0 sinais" e o raio-X imprimia
-#    "✅ fresca" num adotante que NUNCA rodou a auditoria (verde falso medido no onion-kg-ssot,
+#    "✅ fresca" num adotante que NUNCA rodou a auditoria (verde falso medido no adotante KG-SSOT,
 #    2026-10-12). A pasta é resolvida como a guarda a resolve (EVOLVE_ANALYSIS_DIR), senão os dois
 #    discordariam sobre o mesmo repo.
 if [ ! -d "${EVOLVE_ANALYSIS_DIR:-${REPO}/docs/analysis}" ]; then
@@ -172,7 +172,7 @@ elif STALE="$(_run idade 1 evolve-staleness-check.sh "${REPO}" --tsv)"; then
 fi
 
 # ── 7. CONFRONTO — cruzar dimensões, que é o que nenhum órgão isolado entrega ─────────────────
-# ⚠️ "VIGIADO" EXIGE ELO ESTRUTURAL, nunca citação (MAQ-0, blocker, sinal onion-kg-ssot 2026-10-12).
+# ⚠️ "VIGIADO" EXIGE ELO ESTRUTURAL, nunca citação (MAQ-0, blocker, sinal adotante KG-SSOT 2026-10-12).
 #    A 1ª versão casava `/meta:<cmd>` em QUALQUER linha de `*-check.sh` e dava create-skill e
 #    create-vertical como vigiados por causa de um COMENTÁRIO (cited-directive-check.sh:6,
 #    marketplace-root-check.sh:45) e de uma STRING DE MENSAGEM (cited-directive-check.sh:204) —

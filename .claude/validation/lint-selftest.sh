@@ -5475,7 +5475,7 @@ run_merge_fixture() {
   lost="$(jq -nr --argjson ref "$(cat "${tgt}")" --argjson out "${out}" "${diff_jq}")"
   if [ -n "${lost}" ]; then record_fail "${fixture}" "hook próprio do alvo PERDIDO (clobber): ${lost}"; return; fi
 
-  # (4) REFRESH do que é do Onion (2026-10-12, --update do onion-kg-ssot: 4 vetos ficaram sem onFailure e a
+  # (4) REFRESH do que é do Onion (2026-10-12, --update do adotante KG-SSOT: 4 vetos ficaram sem onFailure e a
   #     REGRA 101 reprovou 4 HARD): todo hook do resultado com o MESMO command de um da fonte traz as chaves
   #     da fonte com os valores da fonte. (5) MATCHER: hook da fonte que estava num grupo com matcher aparece
   #     no resultado num grupo com o MESMO matcher (o veto novo chegou sem `matcher: "Bash"`).
@@ -5492,7 +5492,7 @@ run_merge_fixture() {
     | select([ ($o.hooks[$ev] // [])[] | select(.matcher == $mt) | .hooks[]?.command ] | index($c) == null)
     | "\($ev): \($c) sem matcher \($mt)"')"
   if [ -n "${matcher_bad}" ]; then record_fail "${fixture}" "hook da fonte fora do grupo com o matcher: ${matcher_bad}"; return; fi
-  # (6) REALOCAÇÃO (2026-10-12, 2º --update do onion-kg-ssot): nenhum hook Onion fica num grupo cujo matcher difere do
+  # (6) REALOCAÇÃO (2026-10-12, 2º --update do adotante KG-SSOT): nenhum hook Onion fica num grupo cujo matcher difere do
   #     da fonte. O (5) só pedia que existisse uma cópia no grupo certo; o veto que o update anterior anexou SEM
   #     matcher continuava lá, porque o refresh casa por command e não muda o hook de grupo.
   local misplaced_bad
@@ -11553,7 +11553,7 @@ run_evolve_workflow_selftests() {
   if [ "${_g}" -eq 0 ]; then record_pass "evolve-workflow: (g) args string parseado (d1 normalizado), cap invalido recusa, schemas consistentes, sem relogio"
   else record_fail "evolve-workflow: (g) entrada/schema" "${_o:0:200}"; fi
 
-  # ── A COBERTURA DECLARADA (sinal do adotante onion-kg-ssot, 2026-10-12) ──────────────────────
+  # ── A COBERTURA DECLARADA (sinal do adotante adotante KG-SSOT, 2026-10-12) ──────────────────────
   # Disparado pelo NOME, sem args, o workflow cobria 6 de 10 dimensoes em silencio: D4/D5/D9/D10 nem
   # apareciam, `skipped` misturava "nao pedida" com "sem alvo", e o retorno nao dizia por que.
   # (h) TODA dimensao das 10 (+MAQ) esta em measured OU em not_measured com motivo, D4/D5/D9/D10
@@ -11735,7 +11735,7 @@ FAKE
   else record_fail "evolve-census: (j) skill cega" "$(grep -E 'NAO-MEDIVEL|SKILL|r.md' <<< "${_j}" | tr '\n' '|' | cut -c1-300)"; fi
   rm -rf "${d}"
 
-  # ── SINAL DO ADOTANTE onion-kg-ssot (2026-10-12): dois verdes falsos e um alvo falso ─────────
+  # ── SINAL DO ADOTANTE adotante KG-SSOT (2026-10-12): dois verdes falsos e um alvo falso ─────────
   # (k) OPT-OUT NAO E FRESCOR: sem `docs/analysis/`, a guarda REAL da REGRA 97 sai rc 0 e vazia, e o
   #     raio-X imprimia "✅ auto-auditoria fresca" num repo que nunca rodou a auditoria. Usa a guarda
   #     VERDADEIRA (copiada), nao um falso: o defeito era a leitura do silencio dela.
@@ -11880,7 +11880,7 @@ run_evolve_staleness_selftests() {
     record_pass "evolve-staleness: (d) a guarda EMITE SOFT (vencida AVISA; HARD travaria o laco de auto-evolucao)"
   else record_fail "evolve-staleness: (d) severidade" "a guarda emitiu '${_sev}' em vez de SOFT — auto-auditoria vencida passaria a BLOQUEAR merge"; fi
 
-  # (e) O ALARME FALSO DO CAMPO (onion-kg-ssot, 2026-10-12: 42 artefatos), no modo que a producao
+  # (e) O ALARME FALSO DO CAMPO (adotante KG-SSOT, 2026-10-12: 42 artefatos), no modo que a producao
   #     consome: artefato commitado no MESMO DIA, ANTES do relatorio, NAO conta, e o commit
   #     DEPOIS dele conta. A base do delta e o commit do relatorio, nao a meia-noite. Mutante
   #     medido em 2026-10-13: voltar ao `--since=<data>T00:00:00` faz (e1) reprovar.
@@ -14835,7 +14835,7 @@ run_seed_adoption_graph_selftests() {
   else record_fail "seed-graph: (r1) aviso decision-done-em-DEV" "rc=${_ddrc} saída: $(grep 'decision-done' <<< "${_ddo}" | head -1)"; fi
   rm -rf "${_dd}"
   # (r2) decisão SELADA PELO MAESTRO (método do kg-decide-seal) em DEV não entra no aviso — decisão do maestro de
-  #      2026-10-12, após o onion-kg-ssot mostrar que DEV avisava e PROD reprovava no contrato (testimony-in-prod).
+  #      2026-10-12, após o adotante KG-SSOT mostrar que DEV avisava e PROD reprovava no contrato (testimony-in-prod).
   #      Uma decisão done em DEV com OUTRO método continua avisando, na mesma leitura.
   _dd="$(mktemp -d)"
   printf 'meta:\n  id: dd2\n  schema_version: "1"\nnodes:\n  - id: DM\n    node_type: decision\n    status: done\n    plane: DEV\n    impact: 2\n    confidence: 0.8\n    label: selada pelo maestro\n    provenance:\n      source: "pergunta"\n      locator: "selo"\n      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"\n  - id: DX\n    node_type: decision\n    status: done\n    plane: DEV\n    impact: 2\n    confidence: 0.8\n    label: outra em dev\n    provenance:\n      source: "s"\n      locator: "l"\n      method: "leitura: x"\nedges:\n  - from: DM\n    to: DX\n    edge_type: DEPENDS_ON\n' > "${_dd}/dd2.kg.yaml"
@@ -20908,7 +20908,7 @@ run_adopter_gate_selftests() {
     record_pass "adopter-gate: (c) hook do Onion IGNORADO de verdade (hooksPath → .husky) AINDA acusa — a cura não virou fail-open"
   else record_fail "adopter-gate: (c)" "o caso real de gate sombreado deixou de ser acusado — a cura do (b) abriu a guarda"; fi
 
-  # (f) OUTRO DIRETÓRIO COM O HOOK BYTE-IDÊNTICO (2026-10-12, onion-kg-ssot): o Claude Code 2.1.296 grava
+  # (f) OUTRO DIRETÓRIO COM O HOOK BYTE-IDÊNTICO (2026-10-12, adotante KG-SSOT): o Claude Code 2.1.296 grava
   #     `core.hooksPath` ABSOLUTO ao criar worktree de agente, e numa worktree irmã ele aponta para o
   #     .githooks do checkout principal. Mesmo hook = mesmo gate: AVISA (⚠), não acusa "o git IGNORA".
   local rp="${d}/principal" re="${d}/irma"; mkdir -p "${rp}" "${re}"
@@ -28012,7 +28012,7 @@ SK
     record_pass "forge: (h) candidato SÓ em commands/meta/ é descoberto (a outra metade da varredura)"
   else record_fail "forge: (h)" "candidato de commands/meta/ não apareceu no censo"; fi
 
-  # (j) README NÃO É SUPERFÍCIE (MAQ-3, sinal onion-kg-ssot 2026-10-12): `commands/meta/README.md`
+  # (j) README NÃO É SUPERFÍCIE (MAQ-3, sinal adotante KG-SSOT 2026-10-12): `commands/meta/README.md`
   #     entrava como candidato 1/7 e inflava os "comandos com só a superfície" do raio-X. O par: o
   #     comando vizinho de (h) continua no censo.
   printf '# indice da categoria\n' > "${d}/.claude/commands/meta/README.md"
@@ -33179,7 +33179,7 @@ DEC_PY
     else record_fail "decide: (s11)" "rc=${rc} $(_emit "${out}" | tail -2 | tr '\n' ' ')"; fi
   else record_skip "decide: (s7)/(s11) contrato não vendorizado ou jsonschema ausente (o 2º gate NÃO verificado)"; fi
   # (s12) repo que É o produto KG-SSOT (sem vendor/kg-ssot, com tools/kg_validate.py): o leitor local é o 2º
-  #       gate (sinal de campo do onion-kg-ssot, 2026-10-12: lá o selador selava sem conferir o contrato). O
+  #       gate (sinal de campo do adotante KG-SSOT, 2026-10-12: lá o selador selava sem conferir o contrato). O
   #       leitor falso reprova só o grafo JÁ selado (com «), então o passo 0 passa e a reprovação é do selo.
   local rk="${sb}/produto"; mkdir -p "${rk}/tools" "${rk}/docs"
   "${G[@]}" -C "${rk}" init -q . 2>/dev/null

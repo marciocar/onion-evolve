@@ -21,7 +21,7 @@
 // inteira, a MAQ fica NÃO MEDIDA com o motivo — nunca alvo inventado.
 //
 // ⚠️ DISPARADO PELO NOME, SEM ARGS, ESTE SCRIPT COBRE 6 DE 10 DIMENSÕES (medido 2026-10-12 no adotante
-//    onion-kg-ssot): `args` vazio virava `{}`, a MAQ caía só com um `log()` no meio do run, D4/D5/D9/D10
+//    adotante KG-SSOT): `args` vazio virava `{}`, a MAQ caía só com um `log()` no meio do run, D4/D5/D9/D10
 //    nem apareciam como puladas, e o retorno não dizia por quê. Agora o retorno carrega
 //    `not_measured: [{d, reason}]` com as DEZ dimensões contabilizadas e `complete` (true só com as 10 —
 //    logo nunca daqui sozinho: D4/D5/D9/D10 são do Passo 2.5 de /meta:evolve), e o que vai ficar de

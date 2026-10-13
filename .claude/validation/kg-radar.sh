@@ -804,7 +804,7 @@ END {
       # EXCEÇÃO (2026-10-12, decisão do maestro): decisão selada pelo maestro (método "testemunho: decisão do
       # maestro…", o que o kg-decide-seal.sh grava) é conhecimento de ADOTAR, não claim verificada em produção — e
       # em PROD o contrato a acusaria de testimony-in-prod. Ela fica em DEV e não entra no aviso; PROD continua
-      # exigindo medição. Sinal de campo do onion-kg-ssot, que achou a contradição em dogfood.
+      # exigindo medição. Sinal de campo do adotante KG-SSOT, que achou a contradição em dogfood.
       if (ntype[id] == "decision" && nstatus[id] == "done" && plane[id] == "DEV" && pmethod[id] ~ /^["\x27]?testemunho: decisão do maestro/) { ndm++; continue }
       if (ntype[id] == "decision" && nstatus[id] == "done" && plane[id] == "DEV") {
         ndd++
