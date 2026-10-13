@@ -2,7 +2,7 @@
 
 [← O contrato](04-contrato.md) · [Índice](README.md) · [Adoção e CI →](06-adocao-e-ci.md)
 
-As seis ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3 com as versões fixadas em
+As sete ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3 com as versões fixadas em
 [`tools/requirements.txt`](../../tools/requirements.txt) (PyYAML e jsonschema, mais as dependências do jsonschema).
 
 ```bash
@@ -86,7 +86,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.6.0",
+  "release": "kg-ssot-v4.7.0",
   "sha256": { "must": "6277fc83…", "should": "034e3a6e…" }
  },
  "results": [
@@ -335,6 +335,80 @@ python3 -I -B vendor/kg-ssot/tools/kg_store.py --backend git --root areas/ana \
   tamanho máximo, número de grafos, timeout e a trava entre processos onde não há `flock`.
 - **O rc do CLI:** 0 gravou ou leu, 1 recusado (`gate`, `conflict`, `missing`, nome inexistente) e 2 entrada
   quebrada ou `not_judged`.
+
+## `kg_mcp.py`: o servidor MCP de referência
+
+Para dar a um modelo o contrato e o armazém sem escrever um servidor, o `kg_mcp.py` fala o
+[Model Context Protocol](https://modelcontextprotocol.io) por stdio (uma mensagem JSON-RPC por linha) ou por HTTP
+(`POST /mcp`, resposta JSON, sem stream). Ele usa só a biblioteca padrão, o leitor e o armazém, e é um adaptador: o
+produto não depende dele, e ele não depende de um cliente específico.
+
+| Ferramenta | O que faz |
+|---|---|
+| `kg_validate` | julga um texto `.kg.yaml` sem gravar e devolve o `kg-ssot.verdict/1` (com o armazém como corpus, se há armazém) |
+| `kg_write` | grava pelo armazém, só com PASS; devolve o resultado do `kg_store` com o veredito |
+| `kg_delete` | remove pelo armazém, se nenhum grafo que aponta para o nome reprovar sem ele |
+| `kg_get` | lê um grafo, ou uma versão anterior com `ref` |
+| `kg_list` | lista os grafos do armazém |
+| `kg_history` | as operações de um grafo, da mais nova para a mais antiga |
+| `kg_schema_help` | o contrato vigente para um modelo: os schemas MUST e SHOULD inteiros, um exemplo mínimo que passa, as regras de integridade e a correção dos códigos mais comuns |
+
+Sem `--root`, só `kg_validate` e `kg_schema_help` aparecem. Com `--read-only`, `kg_write` e `kg_delete` somem da lista.
+
+Uma configuração de cliente por stdio, com um armazém versionado fora do repo:
+
+```json
+{
+  "mcpServers": {
+    "kg-ssot": {
+      "command": "python3",
+      "args": ["-I", "-B", "vendor/kg-ssot/tools/kg_mcp.py",
+               "--root", "/caminho/do/armazem", "--backend", "versioned", "--init",
+               "--author", "Assistente <assistente@example.org>"]
+    }
+  }
+}
+```
+
+Uma gravação recusada, como o modelo a recebe (o `structuredContent`, abreviado):
+
+```text
+{
+ "written": false,
+ "reason": "gate",
+ "name": "grafos/x.kg.yaml",
+ "verdict": { "results": [ { "verdict": "FAIL",
+   "occurrences": [ { "code": "form.required.node.label", "place": "nó Q_A", "path": "nodes[0]", "line": 5,
+                      "message": "Falta o campo obrigatório «label» no nó.",
+                      "hint": "Acrescente label: a afirmação curta do nó, até 280 caracteres." } ] } ] },
+ ...
+}
+```
+
+A resposta de `tools/call` traz o mesmo objeto em `structuredContent` e, como texto JSON, em `content`. Uma
+gravação recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir e tentar de novo.
+
+- **Quem assina:** o autor das gravações é o `--author` do servidor, nunca um argumento da ferramenta. O modelo não
+  escolhe quem assina.
+- **Os limites:** `--max-bytes` (padrão 2.000.000) limita o texto de um grafo. Os argumentos são conferidos contra o
+  `inputSchema` que o `tools/list` anuncia: tipo errado, campo obrigatório ausente e campo desconhecido voltam como
+  `isError`. Uma falha interna vira o erro JSON-RPC -32603, e o processo segue atendendo.
+- **O leitor por trás:** um documento que abre mais de 1.000 coleções de uma vez (em flow, em bloco ou por
+  indentação), ou cujos aliases expandem para mais que o dobro do tamanho do texto, reprova com `parse.yaml-error`
+  antes de ser construído. Sem esse teto, uma mensagem de 60 KB derrubava o processo. Colchete dentro de texto não
+  conta.
+- **O protocolo:** uma mensagem por vez; lote JSON-RPC é recusado (saiu do MCP em 2025-06-18), e o id tem de ser texto
+  ou inteiro. O stdio lê e escreve UTF-8 como bytes, independente do locale, e a resposta sai em JSON ASCII.
+- **O HTTP:** escuta em `127.0.0.1` por padrão. Recusa `Origin` cujo host não seja de loopback (contra DNS
+  rebinding), `MCP-Protocol-Version` desconhecida (400) e corpo sem `Content-Length`. Não há autenticação nem TLS: o
+  servidor só sai do loopback com `--allow-remote`, para rodar atrás de um proxy que faça os dois.
+- **Num repo:** o armazém de disco e o versionado recusam raiz dentro de um repo git (veja o `kg_store.py`). Dentro
+  do repo, use `--backend git --root .`, que faz um commit por gravação no branch atual, ou rode sem `--root` para
+  só julgar.
+- **O que fica com quem adota, de propósito:** autenticação, TLS, identidade, multiusuário e área por usuário (um
+  processo ou um root por usuário), cota e timeout.
+- **As versões do protocolo:** o servidor negocia `2025-11-25`, `2025-06-18`, `2025-03-26` e `2024-11-05`, e
+  responde com a pedida quando a conhece.
 
 ## `kg_prov_export.py`: a proveniência em PROV-O
 

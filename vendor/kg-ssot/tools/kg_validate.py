@@ -441,10 +441,15 @@ def integrity(doc, refs=("on",), corpus=None):
 
 
 def check(text, validator):
+    if _too_deep(text):  # o mesmo teto do parse_v1: parsear isto derruba o processo
+        return {"parse": "yaml-error: aninhamento além do teto", "schema": [], "integrity": []}
     try:
         docs = [d for d in yaml.load_all(text, Loader=Yaml12BoolLoader) if d is not None]
-    except yaml.YAMLError as exc:
-        return {"parse": f"yaml-error: {str(exc).splitlines()[0]}", "schema": [], "integrity": []}
+        if docs and _expands_beyond(docs, 2 * len(text) + 1000):
+            return {"parse": "yaml-error: aliases além do teto", "schema": [], "integrity": []}
+    except (yaml.YAMLError, RecursionError) as exc:
+        return {"parse": f"yaml-error: {str(exc).splitlines()[0] if str(exc) else type(exc).__name__}",
+                "schema": [], "integrity": []}
     if len(docs) != 1 or not isinstance(docs[0], dict):
         return {"parse": f"documents={len(docs)}", "schema": [], "integrity": []}
     doc = canonical(docs[0])
@@ -510,6 +515,55 @@ def form_codes(error):
 # construções. Qual dos dois o YAML 1.2 manda para o tab é decisão de contrato, ainda não tomada.
 RISKY = re.compile(r"\t|%YAML|\\[uU]|.\ufeff", re.S)
 SAFE_DEPTH = 200
+MAX_DEPTH = 1000  # coleções abertas de uma vez: acima disto o parser estoura a pilha (segfault medido)
+_DEEP_HINT = re.compile(r"(?m)^[ \t]*(?:[-?][ \t]+){2,}|^ {%d,}" % (MAX_DEPTH // 2))
+_YAML_BREAK = re.compile("\r\n?|[\x85\u2028\u2029]")  # as outras quebras de linha do YAML, que o ^ da regex não vê
+
+
+def _too_deep(text):
+    """O documento abre mais de MAX_DEPTH coleções de uma vez? Contado no stream de eventos do YAML (iterativo), que
+    pega flow ([ {), bloco (- - -), chave complexa (? ?) e indentação, e não conta colchete dentro de escalar. O
+    stream só roda quando um indício barato aponta risco: um grafo de verdade fica em 3 ou 4 níveis. Medido na revisão
+    do servidor MCP: 30.000 níveis de [ ou de - derrubavam o processo com segfault."""
+    if text.count("[") + text.count("{") <= MAX_DEPTH and not _DEEP_HINT.search(_YAML_BREAK.sub("\n", text)):
+        return False
+    # com os DOIS parsers quando eles podem divergir (um tab, um BOM no meio, um escape \u, ou a libyaml que erra antes
+    # do fim): um recusa cedo e o outro segue até o fundo, e quem compõe depois (yaml_lines) pode ser qualquer um.
+    # No caso comum, a libyaml lê tudo sem erro e basta: o puro custaria 3 a 4 vezes mais (medido na revisão).
+    fast = getattr(yaml, "CSafeLoader", None)
+    loaders = ([fast] if fast is not None else []) + [yaml.SafeLoader]
+    for loader in loaders:
+        depth, failed = 0, False
+        try:
+            for ev in yaml.parse(text, Loader=loader):
+                if isinstance(ev, (yaml.SequenceStartEvent, yaml.MappingStartEvent)):
+                    depth += 1
+                    if depth > MAX_DEPTH:
+                        return True
+                elif isinstance(ev, (yaml.SequenceEndEvent, yaml.MappingEndEvent)):
+                    depth -= 1
+        except (yaml.YAMLError, UnicodeEncodeError, ValueError):
+            failed = True  # o erro de sintaxe é do parse de verdade, que o reporta com o código dele
+        if loader is fast and not failed and not RISKY.search(text):
+            return False
+    return False
+
+
+def _expands_beyond(value, budget):
+    """O documento construído, contando cada alias pelo que ele repete, passa de `budget` valores? Sem recursão e
+    parando no teto: a bomba de aliases (&a [*a, *a, ...] aninhada) tem tamanho exponencial e travava o leitor."""
+    seen, stack = 0, [value]
+    while stack:
+        v = stack.pop()
+        seen += 1
+        if seen > budget:
+            return True
+        if isinstance(v, dict):
+            stack.extend(v.values())
+            seen += len(v)
+        elif isinstance(v, list):
+            stack.extend(v)
+    return False
 
 
 def loader_for(text):
@@ -533,6 +587,8 @@ def _depth(value):
 
 def parse_error_line(text):
     """A linha (contando de 1) em que o parse falha, pela marca do erro do parser de referência; None sem marca."""
+    if _too_deep(text):  # recusado antes do parser (parse_v1): não há marca, e parsear derruba
+        return None
     try:
         list(yaml.load_all(text, Loader=Yaml12CoreLoader))
     except yaml.MarkedYAMLError as exc:
@@ -550,6 +606,8 @@ def _parse(text, loader):
         return None, None, "parse.duplicate-key", None
     except (yaml.YAMLError, UnicodeEncodeError, RecursionError):
         # UnicodeEncodeError: texto com surrogate que o parser em C recusa; RecursionError: aninhamento além da pilha
+        return None, None, "parse.yaml-error", None
+    if _expands_beyond(raw, 2 * len(text) + 1000):  # antes de canonical(), que percorreria a expansão inteira
         return None, None, "parse.yaml-error", None
     docs = [d for d in raw if d is not None]
     if not docs:
@@ -572,6 +630,8 @@ def parse_v1(text):
     Guardado por texto (lru_cache): o mesmo arquivo é parseado uma vez por processo, e nenhum chamador altera o
     documento devolvido, que é compartilhado. O parser em C entra só como atalho (loader_for); quando o documento
     é fundo demais, refaz com o puro, cujo veredito é o de referência."""
+    if _too_deep(text):
+        return None, None, "parse.yaml-error"
     loader = loader_for(text)
     raw_doc, doc, code, raw = _parse(text, loader)
     if loader is not Yaml12CoreLoader and raw is not None and _depth(raw) > SAFE_DEPTH:
@@ -739,9 +799,11 @@ def path_text(path):
 
 def yaml_lines(text):
     """A árvore de nós do YAML (compose, sem construir valores), para achar a linha de um caminho; None se não compõe."""
+    if _too_deep(text):  # o mesmo teto do parse: compor isto derruba o processo
+        return None
     try:
         return yaml.compose(text, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
-    except yaml.YAMLError:
+    except (yaml.YAMLError, RecursionError, UnicodeEncodeError, ValueError):
         return None
 
 
@@ -786,6 +848,7 @@ HINTS = {
     "integrity.untraced-decision": "Acrescente trace, provenance ou uma aresta TRACES_TO saindo da decisão.",
     "integrity.testimony-in-prod": "Deixe o nó em DEV, ou apoie-o numa medição ou leitura conferida.",
     "form.required.node.provenance": "Acrescente provenance com source, locator e method, ou deixe o nó open.",
+    "form.required.node.label": "Acrescente label: a afirmação curta do nó, até 280 caracteres.",
     "form.range.node.label": "Encurte o label até 280 caracteres e leve o resto para narrative.",
     "form.pattern.node.provenance.method": "Use a forma '<classe>: <detalhe>', com classe medição, leitura, juízes, "
                                            "derivado ou testemunho.",
