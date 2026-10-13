@@ -11679,6 +11679,22 @@ run_kg_census_parity_selftests() {
   else record_fail "kg-paridade: (b2)" "fixture entrou na varredura: rc=${rc} ${out}"; fi
   rm -rf "$d"
 
+  # (b3) O CAMINHO DO SINAL DE 2026-10-13: o contrato VENDORIZADO (vendor/kg-ssot) traz casos de conformidade
+  #      malformados de propósito em spec/conformance/fixtures/. Num adotante com pin anterior à cura de
+  #      2026-10-08 viravam 11 SOFT RADAR-ILEGIVEL (medido: 11 com a guarda do pin dele, 0 com a de agora).
+  #      Polaridade no MESMO repo: o caso (raiz = lista, o radar não extrai nó) sob vendor/.../fixtures → silêncio;
+  #      o MESMO conteúdo fora de fixture → segue julgado (SOFT RADAR-ILEGIVEL). Sem a 2ª metade, (b3) passaria
+  #      com uma guarda que não varre nada.
+  d="$(mktemp -d)"; mkdir -p "$d/vendor/kg-ssot/spec/conformance/fixtures/latest/parse/document" "$d/docs"
+  printf -- '- id: A\n  node_type: claim\n' > "$d/vendor/kg-ssot/spec/conformance/fixtures/latest/parse/document/bad-root-is-list.kg.yaml"
+  printf -- '- id: A\n  node_type: claim\n' > "$d/docs/real.kg.yaml"
+  ( cd "$d" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) >/dev/null 2>&1
+  rc=0; out="$(bash "${helper}" "$d" --format tsv 2>/dev/null)" || rc=$?
+  if ! grep -q 'vendor/kg-ssot' <<< "${out}" && grep -q $'RADAR-ILEGIVEL\tdocs/real.kg.yaml' <<< "${out}"; then
+    record_pass "kg-paridade: (b3) fixture de conformidade do contrato vendorizado → silêncio; o mesmo conteúdo fora de fixture segue julgado"
+  else record_fail "kg-paridade: (b3)" "rc=${rc} — vendor entrou na varredura ou o grafo real saiu dela: ${out}"; fi
+  rm -rf "$d"
+
   # (c) MUT DO REQUISITO NAO-NEGOCIAVEL — e o unico caso desta familia que justifica a familia.
   #     O no forjado a SEIS espacos. Guarda que ancora em dois fixos passa aqui e e decoracao.
   d="$(mktemp -d)"; _mkpar "$d" forjado-fundo
@@ -13441,6 +13457,107 @@ run_regen_ensure_from_selftests() {
     record_pass "regen-ensure-from: (g-MUT) sem a exclusão do lint a ambiguidade volta (${_gcount} baselines) — (g) é load-bearing"
   else record_fail "regen-ensure-from: (g-MUT)" "sem a exclusão nada mudou — o caso (g) não prova nada"; fi
   rm -rf "${_gd}"
+}
+
+# Modo migrate-seed-graph — exercita .claude/utils/adopt/migrate-seed-graph.sh (o passo (8b) do --update).
+#
+# O QUE PROTEGE (sinal de campo 2026-10-13, adotante com contrato kg-ssot 4.4.0): até 2026-10-06 a semente do
+# KG nascia em DOIS documentos YAML e o contrato a reprova com parse.not-single-document. A fixture é a SAÍDA
+# REAL do semeador antigo (dbcf21b1^, forma idêntica nas 5 versões de 370b992c a dbcf21b1^), gerada uma vez e
+# congelada — o caso não depende da história do git, que o CI raso e o adotante não têm.
+# Polaridades: (a) antiga → convertida e passa (documento único, MUST vazio, mesma população no radar);
+# (b) já convertida → no-op byte a byte; (c) grafo do adotante em dois documentos, inclusive uma CÓPIA da
+# forma da semente fora do caminho do semeador → intocado com aviso; (c2) semente editada pelo adotante
+# (pergunta respondida) → não recebe a provenance do semeador, a migração recusa e não toca;
+# (d) sem o vendor do contrato → rc=2 NAO MEDIDO, nunca verde.
+run_migrate_seed_graph_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/migrate-seed-graph.sh"
+  local legacy="${REPO_ROOT}/.claude/validation/fixtures/adopt-seed-legacy/onion-adoption.two-docs.yaml.txt"
+  if [ ! -f "${helper}" ] || [ ! -f "${legacy}" ]; then record_skip "migrate-seed: helper ou fixture ausente (fora do core)"; return; fi
+  if [ ! -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] || ! python3 -c 'import yaml, jsonschema' >/dev/null 2>&1; then
+    record_skip "migrate-seed: vendor do contrato ou PyYAML/jsonschema ausentes (SUT não exercido)"; return
+  fi
+  local d rc out seed=docs/onion/graph/onion-adoption.kg.yaml h0 h1
+  _mig_fixture() {   # $1 = dir; a semente antiga no caminho do semeador, commitada
+    mkdir -p "$1/docs/onion/graph"; cp "${legacy}" "$1/${seed}"
+    ( cd "$1" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) >/dev/null 2>&1
+  }
+  _mig_measure() {   # $1 = arquivo → "<docs> <must> <ids>"
+    python3 -I -B - "${REPO_ROOT}/vendor/kg-ssot/tools" "$1" <<'PYM'
+import sys, yaml
+sys.path.insert(0, sys.argv[1]); import kg_gate
+t = open(sys.argv[2], encoding="utf-8").read()
+docs = list(yaml.safe_load_all(t))
+ids = ",".join(sorted(n["id"] for d in docs if isinstance(d, dict) for n in d.get("nodes") or []))
+m = kg_gate.measure_texts([("x.kg.yaml", t)])["x.kg.yaml"]["must"]
+print(len(docs), "+".join(m) or "-", ids)
+PYM
+  }
+
+  # (a) ANTIGA → CONVERTIDA E PASSA: documento único, contrato sem MUST, a mesma população de nós.
+  d="$(mktemp -d)"; _mig_fixture "$d"
+  local before after
+  before="$(_mig_measure "$d/${seed}")"
+  rc=0; out="$(bash "${helper}" "$d" --source "${REPO_ROOT}" 2>&1)" || rc=$?
+  after="$(_mig_measure "$d/${seed}")"
+  local _irc=0; bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "$d/${seed}" --integrity >/dev/null 2>&1 || _irc=$?
+  if [ "${rc}" -eq 0 ] && [ "${before%% *}" = 2 ] && [ "${after}" = "1 - ${before##* }" ] && [ "${_irc}" -eq 0 ]; then
+    record_pass "migrate-seed: (a) semente antiga (2 documentos) → documento único, MUST vazio, mesmos nós, radar --integrity 0"
+  else record_fail "migrate-seed: (a)" "rc=${rc} antes='${before}' depois='${after}' integrity=${_irc}: ${out}"; fi
+
+  # (b) JÁ CONVERTIDA → NO-OP: re-rodar não muda um byte (idempotência).
+  h0="$(sha256sum "$d/${seed}" | cut -d' ' -f1)"
+  rc=0; out="$(bash "${helper}" "$d" --source "${REPO_ROOT}" 2>&1)" || rc=$?
+  h1="$(sha256sum "$d/${seed}" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 0 ] && [ "${h0}" = "${h1}" ] && grep -q 'nada a migrar' <<< "${out}"; then
+    record_pass "migrate-seed: (b) já convertida → no-op byte a byte (idempotente)"
+  else record_fail "migrate-seed: (b)" "rc=${rc} hash mudou=$([ "${h0}" = "${h1}" ] && echo nao || echo SIM): ${out}"; fi
+  rm -rf "$d"
+
+  # (c) GRAFO DO ADOTANTE com dois documentos — um qualquer E uma CÓPIA da forma da semente fora do caminho
+  #     do semeador (só o caminho a separa da semente: é o caso que morde quem tirar a checagem de caminho).
+  d="$(mktemp -d)"; mkdir -p "$d/docs/onion/graph"
+  printf -- '---\ntitulo: meu\n---\nmeta:\n  id: meu\n  schema_version: "1"\nnodes:\n  - id: A\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: a\nedges: []\n' > "$d/docs/onion/graph/meu.kg.yaml"
+  cp "${legacy}" "$d/docs/onion/graph/copia-da-semente.kg.yaml"
+  ( cd "$d" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) >/dev/null 2>&1
+  h0="$(cat "$d"/docs/onion/graph/*.kg.yaml | sha256sum | cut -d' ' -f1)"
+  rc=0; out="$(bash "${helper}" "$d" --source "${REPO_ROOT}" 2>&1)" || rc=$?
+  h1="$(cat "$d"/docs/onion/graph/*.kg.yaml | sha256sum | cut -d' ' -f1)"
+  if [ "${rc}" -eq 3 ] && [ "${h0}" = "${h1}" ] && grep -q 'meu.kg.yaml.*NÃO é a semente' <<< "${out}" \
+     && grep -q 'copia-da-semente.kg.yaml.*NÃO é a semente' <<< "${out}"; then
+    record_pass "migrate-seed: (c) grafos do adotante em 2 documentos (inclusive cópia da forma da semente) → intocados, com aviso, rc=3"
+  else record_fail "migrate-seed: (c)" "rc=${rc} tocou=$([ "${h0}" = "${h1}" ] && echo nao || echo SIM): ${out}"; fi
+  rm -rf "$d"
+
+  # (c2) SEMENTE EDITADA pelo adotante: a pergunta foi respondida (outro verified_against). Carimbar nela a
+  #      provenance do semeador afirmaria origem falsa; sem ela o contrato reprova — recusa nomeando o nó, intocada.
+  d="$(mktemp -d)"; _mig_fixture "$d"
+  sed -i 's/verified_against: semente-da-adocao-dominio-ainda-nao-mapeado/verified_against: "respondida no grafo de dominio"/' "$d/${seed}"
+  ( cd "$d" && git -c user.email=t@t -c user.name=t commit -qam y ) >/dev/null 2>&1
+  h0="$(sha256sum "$d/${seed}" | cut -d' ' -f1)"
+  rc=0; out="$(bash "${helper}" "$d" --source "${REPO_ROOT}" 2>&1)" || rc=$?
+  h1="$(sha256sum "$d/${seed}" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 3 ] && [ "${h0}" = "${h1}" ] && grep -q 'RECUSADA.*Q_WHAT_IS_THIS_REPO_DOMAIN' <<< "${out}"; then
+    record_pass "migrate-seed: (c2) semente editada pelo adotante → sem provenance do semeador, recusa nomeando o nó, intocada"
+  else record_fail "migrate-seed: (c2)" "rc=${rc} tocou=$([ "${h0}" = "${h1}" ] && echo nao || echo SIM): ${out}"; fi
+
+  # (d) SEM O CONTRATO → rc=2 NAO MEDIDO, e o arquivo intocado (ausência nunca vira verde).
+  rc=0; out="$(KG_CONTRACT_VENDOR=/nonexistent bash "${helper}" "$d" --source "${REPO_ROOT}" 2>&1)" || rc=$?
+  h1="$(sha256sum "$d/${seed}" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 2 ] && [ "${h0}" = "${h1}" ] && grep -q 'NAO MEDIDO' <<< "${out}"; then
+    record_pass "migrate-seed: (d) sem o vendor do contrato → rc=2 NAO MEDIDO, intocado"
+  else record_fail "migrate-seed: (d)" "rc=${rc}: ${out}"; fi
+  rm -rf "$d"
+
+  # (e) NADA A MIGRAR não cobra dependência: a ADOÇÃO nova passa por este passo, e um NAO MEDIDO sobre grafo
+  #     que já nasce em documento único seria ruído em todo adotante (a guarda erra para o lado de calar).
+  d="$(mktemp -d)"; mkdir -p "$d/docs"; printf 'meta:\n  id: x\nnodes: []\n' > "$d/docs/x.kg.yaml"
+  ( cd "$d" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) >/dev/null 2>&1
+  rc=0; out="$(KG_CONTRACT_VENDOR=/nonexistent bash "${helper}" "$d" --source "${REPO_ROOT}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'nada a migrar' <<< "${out}"; then
+    record_pass "migrate-seed: (e) sem grafo em dois documentos → rc=0 sem exigir o contrato (adoção nova não avisa à toa)"
+  else record_fail "migrate-seed: (e)" "rc=${rc}: ${out}"; fi
+  rm -rf "$d"
 }
 
 # Modo seed-adoption-graph — exercita .claude/utils/adopt/seed-adoption-graph.sh.
@@ -19343,6 +19460,7 @@ _family run_adopt_robust_selftests
 _family run_adopter_gate_selftests
 _family run_sweep_fixtures_selftests
 _family run_seed_adoption_graph_selftests
+_family run_migrate_seed_graph_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).
 # Core-only: já pula gracioso sem plugins/ (ver função). O `|| true` é rede de segurança —
