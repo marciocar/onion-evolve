@@ -582,6 +582,7 @@
 .claude/validation/task-manager-capabilities-check.sh	C_TETO_METODO_CITADO_EM_PROSA	docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml
 .claude/validation/task-manager-capabilities-check.sh	C_TETO_SUPERFICIE_DE_CAMPO_E_PRESENCA	docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml
 .claude/validation/task-manager-capabilities-check.sh	D_SUBSTRATO_CHECK_DE_LINT_QUE_VIAJA	docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml
+.claude/validation/testing-state.sh	C_OPCAO_A_CURE_MAGNET_FILE	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 .claude/validation/testing-state.sh	E_ARTEFATO_CATRACADO_NAO_IMPRIME_HOJE	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/trust-topology-check.sh	E_trust_topology_check	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/vendor-scrub-form-check.sh	A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
@@ -1705,6 +1706,8 @@ docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS_SINGLE_SOURCE_MES
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS_TARGETING_SCHEMA_OPEN	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS_TOOL_POISONING_STAT_DOWNGRADED	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS_VPS_SUFFICES	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml	E_MEDICAO_PROCESSO_ATUAL_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
+docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml	E_OBJECAO_POSTMERGE_WRITER_NO_EXTERNAL_SOURCE	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml	E_RENOME_COM_RECONCILIACAO_E_ARESTA_CONFERIDA	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml	C_GUARDA_PARIDADE_CARIMBO_IMPLICA_REGISTRO	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 docs/evolution/research/infra-vps-2026-10/SYNTHESIS.md	D_INFRA_VPS_TREATMENT	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
@@ -1767,6 +1770,7 @@ docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md	E_F1_E5_GATES_DETERMIN
 docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md	E_F1_E6_FRONTEIRA_MODELOS	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
 docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml	C_O_EVOLVE_NAO_E_FRACO_E_SEM_GATILHO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml	Q_E3_DELTA_2_1_257	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
+docs/evolution/research/merge-process-onion-2026-10/SYNTHESIS.md	E_LACUNAS_MERGE_PROCESS_2026_10	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md	C_BITEMPORAL_E_REVISITA_FECHAM_O_ENVELHECIMENTO	docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml
 docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md	C_ESCOLHA_DE_FONTES_E_DADO_MAIS_GUARDA	docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml
 docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md	C_LENTE_E_SPEC_CARREGADA_NAO_COMANDO_NOVO	docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml
