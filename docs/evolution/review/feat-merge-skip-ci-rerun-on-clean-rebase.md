@@ -2,7 +2,8 @@
 title: 'Resíduo — merge da fila sem esperar o CI do head novo depois de auto-rebase limpo (A agora, B se precisar)'
 date: 2026-10-13
 branch: feat/merge-skip-ci-rerun-on-clean-rebase
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 806ff39a838b889e1a20094e98c8f05b42f8ead73070d38cd422bcf13b311294
+reviewed_code_sha256: 48faf483df07279e59448de3956732f1a53fdd0c50dd81a7bc802c8d86e1ca03
 findings_total: 14
 findings_real: 12
 findings_fixed: 3
