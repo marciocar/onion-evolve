@@ -22,6 +22,7 @@ O driver opera num **degrau declarado**, nunca acima:
   As 3 pré-condições ganham nome concreto nesta casa:
   - o **enabler** é o `ops/pr-merge-verified.sh` (core-only), o único caminho de merge; o hook `merge-gate` veta
     qualquer outro com exit 2;
+  - o merge **em série** (o lote) é `bash ops/merge-serial.sh <PR>...` (core-only), na ordem dos argumentos: duas séries não mergeiam ao mesmo tempo (lock só no rebase+merge, CI esperado fora dele) — decisão em `docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml#C_OPCAO_C_MERGE_SERIAL_IN_OPS`;
   - a **path-allowlist** é a parada dura "path vendorizado/outward-facing" (REGRA 36 e REGRA 30);
   - a **política mecânica** são as **paradas duras**, todas PARA:
     - decisão não tomada;

@@ -482,14 +482,29 @@ nodes:
   - id: C_OPCAO_C_MERGE_SERIAL_IN_OPS
     node_type: claim
     plane: DEV
-    status: open
+    status: done
     impact: 5
-    confidence: 0.65
+    confidence: 0.85
     verified_at: "2026-10-13"
-    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    verified_against: "bancada merge_serial 17/17 sob LC_ALL=C e 17 mutantes por ops/mutate-and-restore.sh, 17 reprovados (passo C de D_MERGE_PROCESS_ONION_2026_10)"
     label: "OPÇÃO C — levar o helper merge-serial (flock) do scratchpad para ops/, envolvendo ops/pr-merge-verified.sh, com o lock só no rebase e no merge, e registrar cada auto-rebase como comentário no PR (H5). Elenxo: PASSO 2."
-    narrative: "O core é uma máquina e uma sessão e os pares co-ativos são quase todos intra-agente: flock local basta, fila no forge é desnecessária. Restrições: lock só no rebase e no merge, nunca durante a bancada (lock na bancada ≈ 4 merges/h); cada auto-rebase deixa rastro no PR (hoje ≥14 invisíveis), via adapter forge; o veto exit-2 do hook de merge segue como fronteira — é a capacidade que compra o acoplamento ao Claude Code. Memória temporario-evapora-vira-incidente: o provisório vira ops/."
-    trace: "run wf_48596b33-657 fase Elenxo"
+    narrative: |-
+      O core é uma máquina e uma sessão e os pares co-ativos são quase todos intra-agente: flock local basta, fila no forge é desnecessária. Restrições: lock só no rebase e no merge, nunca durante a bancada (lock na bancada ≈ 4 merges/h); cada auto-rebase deixa rastro no PR (hoje ≥14 invisíveis), via adapter forge; o veto exit-2 do hook de merge segue como fronteira — é a capacidade que compra o acoplamento ao Claude Code. Memória temporario-evapora-vira-incidente: o provisório vira ops/.
+
+      FEITO em 2026-10-13 (passo C). ops/merge-serial.sh (core-only) substitui o helper do scratchpad:
+      - pré-voo FIFO: todo PR da lista precisa de worktree local da branch, ou a série não começa (nenhum PR mais novo passa à frente); o PR que falha PARA a série;
+      - CI esperado FORA do lock (check-runs do head completos e gh pr checks sem pendente, com teto); o flock (git-common-dir/onion-merge-serial.lock, teto de espera) envolve só a chamada ao ops/pr-merge-verified.sh, que rebaseia e mergeia pela API (E_OBJECAO_FLOCK_MUST_WRAP_API_MERGE); o fd do lock é fechado no filho;
+      - auto-rebase ⇒ o verificado sai rc 4 (--no-wait-after-rebase), o lock é solto, o CI do head novo é esperado fora dele e o PR volta à fila; o limite de 2 rebases vale para a série (ONION_MERGE_REBASE_DONE);
+      - dispensa do onion-review-verdict SÓ com o check em fail no head E a anotação dizendo «NÃO revisou»; anotação «apontou N violação» ou ilegível PARA a série (achado não se dispensa por ferramenta);
+      - corpo numa função chamada na última linha: reescrever o arquivo no meio da série não muda o que ela roda.
+      O verificado agora comenta no PR cada auto-rebase (head antigo → novo, causa projeção/fonte, N/MAX); comentário que falha vira aviso nomeado. Só a serialização foi adotada, não ferramenta de terceiro (E_OBJECAO_ADOPT_SERIALIZATION_NOT_TOOL).
+      Teto declarado: entre séries a ordem é a de chegada ao lock; uma chamada direta ao verificado não toma o lock; o helper antigo usava outro arquivo de lock.
+    trace: "run wf_48596b33-657 fase Elenxo; passo C: ops/merge-serial.sh e família merge_serial"
+    provenance:
+      source: "ops/merge-serial.sh + ops/pr-merge-verified.sh + família merge_serial de .claude/validation/lint-selftest.sh"
+      locator: "run_merge_serial_selftests, casos (c) (s) (q) (fd) (o) (w) (d1) (d2) (d3) (d4) (l) (e) (r1)-(r5)"
+      method: "medição: bancada merge_serial 17/17 sob LC_ALL=C e 17 mutantes plantados por ops/mutate-and-restore.sh, cada um reprovando o seu caso, 2026-10-13"
+      locality: "repo"
   - id: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
     node_type: claim
     plane: DEV
