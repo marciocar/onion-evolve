@@ -1,5 +1,5 @@
 {
-  "description": "Rótulo × narrativa (Q_CONTRACT_FACT_NARRATIVE, selada no PR #18): o nó tem narrative opcional, o label curto alerta acima de 280 caracteres e o meta conhece note e purpose.",
+  "description": "Rótulo × narrativa: o nó tem narrative opcional, o label curto alerta acima de 280 caracteres e o meta conhece note e purpose.",
   "layer": "form",
   "pending_on": [],
   "cases": [

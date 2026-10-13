@@ -1,5 +1,5 @@
 {
-  "description": "provenance.locality (v4.2, pedido do core em 2026-10-09, selado pelo maestro): opcional, enum repo, web, host ou pessoa, validado só no SHOULD. Mede o que é reverificável por terceiros e permite barrar host na publicação.",
+  "description": "provenance.locality (v4.2): opcional, enum repo, web, host ou pessoa, validado só no SHOULD. Mede o que é reverificável por terceiros e permite barrar host na publicação.",
   "layer": "form",
   "pending_on": [],
   "cases": [

@@ -59,7 +59,11 @@ Opções úteis:
 | `--format json` | O veredito estruturado em stdout (ver abaixo), para ferramentas e servidores MCP |
 | `--limit N` | Com `--format json`, quantas ocorrências por arquivo (default 50); o resumo conta todas |
 | `-` no lugar do arquivo | Lê o grafo do stdin, sem gravar arquivo temporário |
-| `--json OUT` | Grava o resultado no formato do spike (`{summary, results}`), congelado; não é o veredito |
+| `--should-schema F` | Com `--schema`, o SHOULD que acompanha (no lugar do vizinho) |
+
+As opções `--json OUT`, `--spike`, `--git`, `--rev` e `--list` são do instrumento de medição que deu origem ao
+contrato (o "spike"): gravam e reproduzem um formato legado, congelado, e não fazem parte da interface estável. Para
+ferramentas, use `--format json`.
 
 Com `external_edges` e sem `--corpus`, o leitor avisa que não conferiu a ponta externa:
 
@@ -86,8 +90,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.7.1",
-  "sha256": { "must": "6277fc83…", "should": "034e3a6e…" }
+  "release": "kg-ssot-v4.7.2",
+  "sha256": { "must": "0b532b0d…", "should": "30498b28…" }
  },
  "results": [
   {
@@ -101,7 +105,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
      "place": "nó Q_A",
      "path": "nodes[0]",
      "line": 5,
-     "message": "Falta o campo obrigatório «label» no nó."
+     "message": "Falta o campo obrigatório «label» no nó.",
+     "hint": "Acrescente label: a afirmação curta do nó, até 280 caracteres."
     }
    ],
    "total": 1,
@@ -125,7 +130,8 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
 - **O rc:** 0 quando todos passam, 1 quando algum reprova (um arquivo que não parseia reprova com `parse.*`, como na
   suíte) e 2 quando a entrada está quebrada (arquivo ilegível, opção inválida).
 - **O desempenho:** com a libyaml instalada (o caso comum do PyYAML), o parse usa o parser em C, com o mesmo perfil
-  YAML 1.2. Um grafo de 6.376 nós sai em segundos.
+  YAML 1.2, e só cai no parser puro, mais lento, nos raros textos em que os dois podem divergir (tab, `%YAML`, escape
+  de surrogate ou `\U`, BOM fora do início).
 
 ## `kg_conformance.py`: a suíte
 
@@ -208,6 +214,7 @@ rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida
 | `--accept-regression "<motivo>"` | Aceita uma piora; o motivo fica gravado na base |
 | `--exclude GLOB` | Tira caminhos do corpus (repetível). `*/fixtures/*` e `docs/materials/*` já saem por padrão |
 | `--granularity node` | Com `--update`: conta a dívida SHOULD por ocorrência, não por grafo |
+| `--no-default-excludes` | Desliga os excluídos padrão (e aí as fixtures do vendor entram no corpus) |
 | `--repo DIR` · `--baseline ARQ` | Outro repositório, outra base |
 
 ## `kg_vendor.py`: trazer e conferir a release
@@ -215,15 +222,16 @@ rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida
 O adotante nunca copia o contrato à mão. O vendor lê uma **tag** com `git archive` e grava um carimbo com o
 sha256 de cada arquivo.
 
-Da raiz do adotante, com um clone do produto em `<clone>`. As saídas abaixo são de uma execução real com a tag
-`kg-ssot-v4.3.3`; numa release mais nova, a tag, o commit e a contagem de arquivos mudam:
+Da raiz do adotante, com um clone do repositório público em `../kg-ssot`. As saídas abaixo são de uma execução real
+com a tag `kg-ssot-v4.7.1`; numa release mais nova, a tag, o commit e a contagem de arquivos mudam:
 
 ```bash
-python3 -I -B <clone>/tools/kg_vendor.py update --tag kg-ssot-v4.3.3 --dest vendor/kg-ssot --source <clone>
+git clone https://github.com/marciocar/kg-ssot ../kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.1 --dest vendor/kg-ssot
 ```
 
 ```text
-vendor atualizado: vendor/kg-ssot ← kg-ssot-v4.3.3 (c32e6496be74), 297 arquivos
+vendor atualizado: vendor/kg-ssot ← kg-ssot-v4.7.1 (04d73f2e2f64), 313 arquivos
 ```
 
 O `check` recalcula os sha256 e compara com o carimbo. Um arquivo editado, apagado ou sobrando (inclusive
@@ -234,13 +242,14 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 ```
 
 ```text
-✓ vendor íntegro: vendor/kg-ssot = kg-ssot-v4.3.3 (c32e6496be74), 297 arquivos
+✓ vendor íntegro: vendor/kg-ssot = kg-ssot-v4.7.1 (04d73f2e2f64), 313 arquivos
 ```
 
 | Opção | Efeito |
 |---|---|
-| `--source REPO` | O repositório (caminho ou URL) que tem a tag. Obrigatório quando roda de dentro de um vendor |
-| `--profile gate` | Traz só o mínimo para rodar o gate e o check (10 arquivos, sem a suíte) |
+| `--source REPO` | O repositório (caminho ou URL, como `https://github.com/marciocar/kg-ssot`) que tem a tag. Obrigatório quando roda de dentro de um vendor |
+| `--dest DIR` | Onde fica o vendor (default `vendor/kg-ssot`) |
+| `--profile gate` | Traz só o mínimo para rodar o gate e o check (10 arquivos, sem a suíte); `--profile full` volta à release inteira |
 | `--force` | Substitui um vendor editado localmente |
 
 **Por que `-B`?** Os scripts do kit não gravam bytecode, mas uma ferramenta sua que **importa** um módulo do kit
@@ -258,6 +267,9 @@ armazéns com a mesma interface (`read`, `list`, `write`, `delete`, `history`):
   de fora. O autor vem de quem grava (`author="Nome <email>"`), e o committer é fixo do serviço;
 - `VersionedStore`: a cabeça em disco mais um registro de eventos e as versões no diretório oculto `.kg-store/`,
   sem git.
+
+Para importar do vendor (o kit não é pacote pip), ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem gravar
+bytecode, como no [capítulo 6](06-adocao-e-ci.md#num-app):
 
 ```python
 import kg_store
@@ -278,6 +290,16 @@ disco sem commit não conta, nem na lista, nem no julgamento, nem na trava (para
 o substitui). O `DiskStore` e o `VersionedStore` recusam uma raiz dentro
 de um repo git, onde o gate leria o rastreado e o armazém leria o disco. E a cabeça só fica trocada com o registro
 feito: se o commit ou o evento falha, ela volta ao que era, e a exceção sobe para quem chamou.
+
+O CLI tem um subcomando por operação, com a saída em JSON no stdout:
+
+```text
+kg_store.py --backend disk|git|versioned --root DIR [--init] list
+kg_store.py ... read NOME [--ref REF]
+kg_store.py ... write NOME [ARQUIVO|-] [--message M] [--author "Nome <email>"] [--expected-sha256 S|new]
+kg_store.py ... delete NOME [--message M] [--author A] [--expected-sha256 S]
+kg_store.py ... history NOME
+```
 
 Pelo CLI, um grafo que passa e um que reprova:
 
@@ -370,6 +392,16 @@ Uma configuração de cliente por stdio, com um armazém versionado fora do repo
 }
 ```
 
+| Opção | Efeito |
+|---|---|
+| `--root DIR` | O armazém. Sem ele, só `kg_validate` e `kg_schema_help` |
+| `--backend disk\|git\|versioned` | O tipo de armazém (default `disk`) |
+| `--init` | Cria a raiz se não existir |
+| `--author "Nome <email>"` | Quem assina as gravações |
+| `--read-only` | Tira `kg_write` e `kg_delete` |
+| `--http PORTA` · `--host H` · `--allow-remote` | HTTP no lugar do stdio; fora do loopback, só com `--allow-remote` |
+| `--max-bytes N` | O tamanho máximo de um grafo (default 2.000.000) |
+
 Uma gravação recusada, como o modelo a recebe (o `structuredContent`, abreviado):
 
 ```text
@@ -403,8 +435,8 @@ gravação recusada ou um nome inexistente vem com `isError: true`, para o model
   rebinding), `MCP-Protocol-Version` desconhecida (400) e corpo sem `Content-Length`. Não há autenticação nem TLS: o
   servidor só sai do loopback com `--allow-remote`, para rodar atrás de um proxy que faça os dois.
 - **Num repo:** o armazém de disco e o versionado recusam raiz dentro de um repo git (veja o `kg_store.py`). Dentro
-  do repo, use `--backend git --root .`, que faz um commit por gravação no branch atual, ou rode sem `--root` para
-  só julgar.
+  do repo, use `--backend git --root .`, que faz um commit por gravação no branch atual, fora de qualquer PR (rode-o
+  num branch de trabalho), ou rode sem `--root` para só julgar.
 - **O que fica com quem adota, de propósito:** autenticação, TLS, identidade, multiusuário e área por usuário (um
   processo ou um root por usuário), cota e timeout.
 - **As versões do protocolo:** o servidor negocia `2025-11-25`, `2025-06-18`, `2025-03-26` e `2024-11-05`, e

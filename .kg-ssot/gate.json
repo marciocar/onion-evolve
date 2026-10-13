@@ -1,7 +1,7 @@
 {
   "contract": "kg-contract-v4.schema.json",
-  "contract_sha256": "5d3fec7b48f5ad2af1ce80d8193c50032cdbc7aa14827ce04e4c165de10082e5",
-  "graphs": 154,
+  "contract_sha256": "f7fbce270bf8c9bf737f138dcedf32137c77f922dc3f0c2a650417f9f9a3533c",
+  "graphs": 156,
   "failing": {
     "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml": [
       "form.unknown-key.meta.label",
@@ -53,9 +53,6 @@
     ],
     "docs/onion/graph/pr-decision-history-2026-08.kg.yaml": [
       "form.unknown-key.edge.provenance"
-    ],
-    "docs/onion/graph/review-gate-saldo-2026-09.kg.yaml": [
-      "form.unknown-key.node.gatilho"
     ],
     "docs/onion/graph/testes-evidencia-2026-09.kg.yaml": [
       "form.unknown-key.meta.slug",

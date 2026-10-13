@@ -1,0 +1,38 @@
+# KG-SSOT
+
+> Grafo de conhecimento verificável em arquivo texto (`.kg.yaml`): cada afirmação traz a fonte, a data em que foi conferida e o que foi conferido, e um contrato formal (JSON Schema, níveis MUST e SHOULD) decide no CI se o arquivo está bem escrito. Release 4.7.2, contrato v4, licença Apache-2.0. O leitor de referência é Python 3 e roda sem nenhum harness de agente.
+
+Para um agente que vai escrever ou validar um `.kg.yaml`: leia o formato (capítulo 3) e o contrato (capítulo 4); valide com `python3 -I -B vendor/kg-ssot/tools/kg_validate.py <arquivo>` (num clone do repositório, `tools/kg_validate.py`) e corrija pelos códigos do capítulo 9. Os schemas mandam: quando o manual e um schema divergirem, vale o schema. O texto completo, num arquivo só, está em [llms-full.txt](llms-full.txt).
+
+## Comece aqui
+
+- [README](README.md): o que é, por que, e a primeira validação em 60 segundos
+- [Adotar](ADOPTING.md): trazer a release para um repositório, fixar a versão e rodar o gate no CI
+- [Manual](docs/manual/README.md): o índice dos capítulos
+
+## Escrever um grafo
+
+- [Conceitos](docs/manual/02-conceitos.md): nó, tipos, status, planos, arestas, proveniência, carimbo de verificação
+- [Formato](docs/manual/03-formato.md): todos os campos do `.kg.yaml`, tirados do schema
+- [Contrato](docs/manual/04-contrato.md): MUST × SHOULD, códigos de erro, versões
+- [Problemas](docs/manual/09-problemas.md): o que cada código de erro quer dizer e como resolver
+- [Receitas](docs/manual/08-receitas.md): tarefas comuns, passo a passo
+
+## Ferramentas e integração
+
+- [Ferramentas](docs/manual/05-ferramentas.md): `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_mcp` (servidor MCP de referência), `kg_prov_export`
+- [Adoção e CI](docs/manual/06-adocao-e-ci.md): o caminho curto para levar o contrato a um repositório, e como usar num app (o que vai para o grafo, o import do kit em tempo de execução)
+
+## Contrato (as fontes da verdade)
+
+- [MUST](spec/kg-contract-v4.schema.json): o que reprova
+- [SHOULD](spec/kg-contract-v4.should.schema.json): o que só avisa
+- [Veredito](spec/verdict.schema.json): a forma do veredito JSON (`kg-ssot.verdict/1`)
+- [Release](spec/release.json): a versão, a tag e a lista de arquivos que viajam
+
+## Optional
+
+- [Conformidade e leitores](docs/manual/07-conformidade-e-leitores.md): a suíte de casos e como escrever um leitor em outra linguagem
+- [Suíte de conformidade](spec/conformance/README.md): o formato dos casos e o runner
+- [O que é e para quem](docs/manual/01-o-que-e.md): o problema e a tese
+- [Glossário](docs/manual/10-glossario.md)

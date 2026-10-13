@@ -107,8 +107,8 @@ A chave `on` numa aresta é proibida (`yaml.forbidden-key-on`): um leitor YAML 1
 ### Arestas entre grafos (`external_edges`)
 
 Desde a 4.3, um grafo pode apontar para um nó de outro grafo do mesmo repositório. Cada aresta externa tem
-**exatamente uma** ponta externa, escrita `<caminho relativo à raiz>#<id>`. A outra ponta é um id deste arquivo,
-ou fica ausente, e então vale o grafo inteiro. Só seis tipos cruzam grafos: `SUPERSEDES`, `CONSTRAINS`,
+**exatamente uma** ponta externa, escrita `<caminho relativo à raiz>#<id>`. A outra ponta é um id deste arquivo;
+quando a ponta externa é o `to`, o `from` pode faltar, e então vale o grafo inteiro. Só seis tipos cruzam grafos: `SUPERSEDES`, `CONSTRAINS`,
 `SUPPORTS`, `REFUTES`, `TRACES_TO` e `DEPENDS_ON`.
 
 ```yaml

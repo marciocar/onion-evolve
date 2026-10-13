@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""O armazém de .kg.yaml que só grava o que o contrato aprova (A_STORAGE_ADAPTER, ÉPICO 11).
+"""O armazém de .kg.yaml que só grava o que o contrato aprova.
 
 Biblioteca primeiro, CLI por cima. Três armazéns com a mesma interface (read, list, write, delete, history):
   DiskStore(root)       a cabeça em disco, sem histórico;

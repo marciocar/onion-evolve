@@ -1,5 +1,5 @@
 {
-  "description": "Contrato v4: o SHOULD que fica, o do v3 menos o que subiu a MUST: nó PROD sem verified_at, label acima de 280 caracteres e grafo sem nós alertam (Q_CONTRACT_CONFORMANCE_LEVELS, Q_CONTRACT_FACT_NARRATIVE, Q_CONTRACT_EMPTY_GRAPH).",
+  "description": "Contrato v4: o SHOULD que fica, o do v3 menos o que subiu a MUST: nó PROD sem verified_at, label acima de 280 caracteres e grafo sem nós alertam.",
   "layer": "form",
   "pending_on": [],
   "cases": [

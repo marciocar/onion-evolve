@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kg-ssot:spec:verdict.schema.json",
   "title": "Veredito estruturado de um leitor do .kg.yaml (kg-ssot.verdict/1)",
-  "description": "Saída de `kg_validate.py --format json` (A_VERDICT_API). O veredito é do contrato vigente: PASS sem nenhuma ocorrência MUST, FAIL com qualquer uma. Um arquivo que não parseia reprova com um código parse.*, como na suíte de conformidade. `summary` conta todas as ocorrências; `occurrences` traz até o limite pedido, e `truncated` diz se cortou. `code` é o vocabulário estável da suíte e do gate; `message` e `hint` são texto para pessoas e podem mudar entre versões.",
+  "description": "Saída de `kg_validate.py --format json`. O veredito é do contrato vigente: PASS sem nenhuma ocorrência MUST, FAIL com qualquer uma. Um arquivo que não parseia reprova com um código parse.*, como na suíte de conformidade. `summary` conta todas as ocorrências; `occurrences` traz até o limite pedido, e `truncated` diz se cortou. `code` é o vocabulário estável da suíte e do gate; `message` e `hint` são texto para pessoas e podem mudar entre versões.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "contract", "results"],

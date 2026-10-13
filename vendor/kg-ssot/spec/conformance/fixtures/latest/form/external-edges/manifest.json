@@ -1,5 +1,5 @@
 {
-  "description": "A forma das arestas entre grafos (v4.3, Q_CROSS_GRAPH_REFS): exatamente uma ponta externa <caminho>#<id>, a outra um id deste arquivo (ou o grafo inteiro, sem from), e só os tipos SUPERSEDES, CONSTRAINS, SUPPORTS, REFUTES, TRACES_TO e DEPENDS_ON.",
+  "description": "A forma das arestas entre grafos (v4.3): exatamente uma ponta externa <caminho>#<id>, a outra um id deste arquivo (ou o grafo inteiro, sem from), e só os tipos SUPERSEDES, CONSTRAINS, SUPPORTS, REFUTES, TRACES_TO e DEPENDS_ON.",
   "layer": "form",
   "pending_on": [],
   "cases": [

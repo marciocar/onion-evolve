@@ -1,5 +1,5 @@
 {
-  "description": "O vocabulário de provenance.method no v4 (Q_CONTRACT_METHOD_VOCABULARY): '<classe>: <detalhe>', classe em medição, leitura, juízes, derivado, testemunho. SHOULD no v4, MUST no v5.",
+  "description": "O vocabulário de provenance.method no v4: '<classe>: <detalhe>', classe em medição, leitura, juízes, derivado, testemunho. SHOULD no v4, MUST no v5.",
   "layer": "form",
   "pending_on": [],
   "cases": [

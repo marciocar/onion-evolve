@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""O vendor do KG-SSOT por pin (E6, EPIC_6_CORE_GRADUATION): o adotante traz a release por TAG, nunca à mão.
+"""O vendor do KG-SSOT por pin: o adotante traz a release por TAG, nunca à mão.
 
   update --tag T [--dest DIR] [--source REPO] [--force] [--profile P]
       Lê da TAG (git archive, nunca a árvore de trabalho) os arquivos que o spec/release.json DESSA tag lista,
@@ -7,16 +7,17 @@
       commit, versão, contrato e o sha256 de cada arquivo. Não commita: quem commita é o adotante.
       DIR só é substituído se não existir, ou se tiver o carimbo E estiver íntegro (check rc 0); um vendor
       editado só é substituído com --force, para a edição local não sumir em silêncio.
-      --source é o repo git (caminho ou URL) que tem a tag; o default é o repo deste script, e só vale quando
+      --source é o repo git (caminho ou URL, como o repositório público https://github.com/marciocar/kg-ssot) que
+      tem a tag; o default é o repo deste script, e só vale quando
       ele é a raiz de um clone do KG-SSOT (dentro de um vendor, passe --source).
-      --profile P traz só o perfil P do release.json da tag (Q_RELEASE_MINIMAL_GATE_PROFILE): `gate` é o mínimo para
+      --profile P traz só o perfil P do release.json da tag: `gate` é o mínimo para
       rodar o gate e o check (contrato, leitor, gate, vendor, requirements, guia e licença), sem a suíte. O carimbo
       registra o perfil, o check confere só o que ele trouxe, e o update seguinte HERDA o perfil do carimbo;
       --profile full volta à release inteira.
   check [--dest DIR]
       Recalcula os sha256 e compara com o carimbo: arquivo editado, faltando ou sobrando (inclusive bytecode em
-      __pycache__ e symlink) → rc 1. O contrato não se customiza no adotante; uma mudança necessária volta como
-      sinal ao produto. LIMITE: o carimbo atesta a si mesmo; o check pega edição acidental, não quem edita um
+      __pycache__ e symlink) → rc 1. O contrato não se customiza no adotante; uma mudança necessária volta ao produto
+      como issue no repositório público. LIMITE: o carimbo atesta a si mesmo; o check pega edição acidental, não quem edita um
       arquivo E recalcula o carimbo. Isso o review do PR do adotante pega (o diff do carimbo fica à vista).
 
 rc: 0 ok · 1 vendor divergente do carimbo · 2 entrada quebrada (tag inexistente, release.json ausente ou que

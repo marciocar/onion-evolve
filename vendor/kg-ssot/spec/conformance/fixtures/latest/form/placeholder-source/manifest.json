@@ -1,5 +1,5 @@
 {
-  "description": "Contrato v4: provenance.source placeholder reprova como form.pattern.node.provenance.source (Q_CONTRACT_SOURCELESS_CONFIRMED). Placeholder é desconhecida, desconhecido, unknown, n/a, na, -, ?, tbd, sem distinguir maiúscula e ignorando espaço em volta, ou só espaço; o vazio segue form.range, como no v3.",
+  "description": "Contrato v4: provenance.source placeholder reprova como form.pattern.node.provenance.source. Placeholder é desconhecida, desconhecido, unknown, n/a, na, -, ?, tbd, sem distinguir maiúscula e ignorando espaço em volta, ou só espaço; o vazio segue form.range, como no v3.",
   "layer": "form",
   "pending_on": [],
   "cases": [

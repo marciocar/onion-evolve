@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Leitor de referência NEUTRO do .kg.yaml: valida grafos contra um JSON Schema.
 
-Depende só de Python 3, PyYAML e jsonschema. Não lê nada do harness (nem do Claude Code)
-(D_KG_SSOT_INDEPENDENTE_DE_HARNESS). É o instrumento do spike Q_KG_SCHEMA_FORMAL_SPIKE.
+Depende só de Python 3, PyYAML e jsonschema, e não depende de nenhum harness de agente. Também é o instrumento
+da medição que deu origem ao contrato (o "spike", opções --spike e --json).
 
 Camadas medidas por arquivo:
   1. parse   — YAML válido, um documento só, raiz é mapa;
@@ -15,7 +15,7 @@ códigos MUST estáveis (parse.*, form.*, integrity.*) que tools/kg_conformance.
 Saída humana (o CLI): por arquivo, o veredito e os códigos com o MESMO vocabulário do gate (kg_gate.py) e
 da suíte, os de codes() e warnings() (parse.*, form.*, integrity.*, yaml.*), com a contagem de ocorrências:
   REPROVA <arquivo>   MUST  form.required.node.provenance ×33 · yaml.forbidden-key-on ×7
-                      SHOULD form.required.node.provenance.verified_at ×33
+                      SHOULD form.required.node.verified_at ×33
   PASSA   <arquivo>   (SHOULD só avisa, não reprova)
 Sem --schema, o contrato é o vigente (CONTRACT_MUST) e os avisos são do SHOULD dele (CONTRACT_SHOULD). Com
 --schema S, o SHOULD é --should-schema, ou o vizinho S.should.schema.json quando existe, ou nenhum.
@@ -52,7 +52,7 @@ from jsonschema.exceptions import ValidationError
 
 
 _ROOT = pathlib.Path(__file__).resolve().parent.parent
-# O contrato VIGENTE, num lugar só: a suíte, a matriz, a medição do core e a catraca leem daqui.
+# O contrato VIGENTE, num lugar só: a suíte, o gate e as outras ferramentas leem daqui.
 CONTRACT_MUST = _ROOT / "spec" / "kg-contract-v4.schema.json"
 CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 
@@ -79,7 +79,7 @@ class DuplicateKeyError(yaml.constructor.ConstructorError):
 
 
 class Yaml12CoreLoader(Yaml12BoolLoader):
-    """O perfil do contrato v1 (Q_CONTRACT_CONFORMANCE_LEVELS): YAML 1.2 core.
+    """O perfil YAML do contrato (desde o v1): YAML 1.2 core.
 
     Além dos booleanos, inteiros e floats seguem o core schema do 1.2 (sem sexagesimal 1:30, sem
     octal 017 nem binário do 1.1), data sem aspas é string, `<<` é chave comum (o 1.2 não tem merge)
@@ -264,7 +264,7 @@ def canonical(value, json_keys=False):
         return out
     if json_keys and isinstance(value, float) and not math.isfinite(value):
         # .nan e .inf existem no YAML 1.2 core e não no JSON: viram um valor opaco que nenhum tipo do
-        # schema aceita (nem objeto), e o campo reprova como form.type (Q_CONTRACT_YAML_JSON_GAP).
+        # schema aceita (nem objeto), e o campo reprova como form.type (o vão entre o YAML e o JSON).
         return NonFinite(repr(value))
     if isinstance(value, list):
         return [canonical(v, json_keys) for v in value]
@@ -324,7 +324,7 @@ def _located(doc, key):
 
 
 def index_texts(items):
-    """[(caminho, texto)] → {caminho: {ids}}: o corpus montado de textos já lidos (a catraca lê o core por git show)."""
+    """[(caminho, texto)] → {caminho: {ids}}: o corpus montado de textos já lidos (por exemplo, por git show)."""
     index = {}
     for name, text in items:
         _, doc, _ = parse_v1(text)
@@ -335,8 +335,8 @@ def index_texts(items):
 
 def external_info(text):
     """(usa external_edges?, {caminhos citados}), tirados do documento PARSEADO (o mesmo valor que is_external
-    confere): escape YAML, chave entre aspas e continuação de linha não enganam, ao contrário de ler o texto cru (o
-    achado do refutador do core em 2026-10-10). O parse é o mesmo, guardado, que o gate já faz para medir."""
+    confere): escape YAML, chave entre aspas e continuação de linha não enganam, ao contrário de ler o texto cru
+    (achado de revisão em 2026-10-10). O parse é o mesmo, guardado, que o gate já faz para medir."""
     if "external_edges" not in text and "\\" not in text:  # sem nenhuma das duas, nem a chave escapada existe
         return False, set()
     _, doc, err = parse_v1(text)  # o mesmo parse que codes() e warnings() reaproveitam
@@ -447,7 +447,7 @@ def check(text, validator):
         docs = [d for d in yaml.load_all(text, Loader=Yaml12BoolLoader) if d is not None]
         if docs and _expands_beyond(docs, 2 * len(text) + 1000):
             return {"parse": "yaml-error: aliases além do teto", "schema": [], "integrity": []}
-    except (yaml.YAMLError, RecursionError) as exc:
+    except (yaml.YAMLError, RecursionError, ValueError) as exc:  # ValueError: data sem aspas fora do calendário
         return {"parse": f"yaml-error: {str(exc).splitlines()[0] if str(exc) else type(exc).__name__}",
                 "schema": [], "integrity": []}
     if len(docs) != 1 or not isinstance(docs[0], dict):
@@ -688,7 +688,7 @@ TESTIMONY_METHOD = re.compile(r"^testemunho: ")
 
 
 def coherence_located(doc):
-    """Os avisos SHOULD que o schema não exprime, porque cruzam campos ou arestas (Q_RADAR_WARNINGS_WITHOUT_CASES):
+    """Os avisos SHOULD que o schema não exprime, porque cruzam campos ou arestas:
 
     - integrity.testimony-in-prod: nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe
       testemunho): relato não é artefato vivo, e o plane pede DEV;
@@ -750,7 +750,7 @@ def schema_place(doc, path):
 
 
 def where(text, validator, should_validator=None, corpus=None):
-    """Cada ocorrência com o lugar: lista de (nível, código, lugar), nível MUST ou SHOULD (Q_VALIDATOR_NODE_LOCATIONS).
+    """Cada ocorrência com o lugar: lista de (nível, código, lugar), nível MUST ou SHOULD.
 
     Os códigos são exatamente os que code_counts() e warning_counts() contam, ocorrência por ocorrência (o teste
     test_where_tem_os_mesmos_codigos_que_a_contagem guarda isso). O que não tem lugar mais fino sai como 'arquivo':
@@ -851,12 +851,14 @@ HINTS = {
     "integrity.duplicate-id": "Dê um id único a cada nó.",
     "integrity.untraced-decision": "Acrescente trace, provenance ou uma aresta TRACES_TO saindo da decisão.",
     "integrity.testimony-in-prod": "Deixe o nó em DEV, ou apoie-o numa medição ou leitura conferida.",
-    "form.required.node.provenance": "Acrescente provenance com source, locator e method, ou deixe o nó open.",
+    "form.required.node.provenance": "Acrescente provenance com source, locator e method; sem fonte recuperável, "
+                                     "mude o status para unverifiable.",
     "form.required.node.label": "Acrescente label: a afirmação curta do nó, até 280 caracteres.",
     "form.range.node.label": "Encurte o label até 280 caracteres e leve o resto para narrative.",
     "form.pattern.node.provenance.method": "Use a forma '<classe>: <detalhe>', com classe medição, leitura, juízes, "
                                            "derivado ou testemunho.",
-    "form.pattern.node.provenance.source": "Escreva a fonte de verdade (URL, caminho, comando); sem fonte, deixe o nó open.",
+    "form.pattern.node.provenance.source": "Escreva a fonte de verdade (URL, caminho, comando); sem fonte recuperável, "
+                                           "tire a provenance e mude o status para unverifiable.",
 }
 KIND_TEXT = {"required": "Falta o campo obrigatório", "enum": "Valor fora da lista permitida em",
              "type": "Tipo errado em", "pattern": "Valor fora da forma esperada em", "range": "Valor fora do limite em",

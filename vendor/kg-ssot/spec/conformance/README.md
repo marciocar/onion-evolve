@@ -1,14 +1,12 @@
 # Suíte de conformidade do `.kg.yaml`
 
-> **Projeção do grafo do produto KG-SSOT, nunca fonte paralela** (os ids entre crases são nós dele). O formato
-> é o de `A_CONFORMANCE_SUITE_SEED` (`EPIC_1_SUITE_FORMAT`). Os casos medem o contrato v4
-> (`A_CONTRACT_V4`): `spec/kg-contract-v4.schema.json` (MUST) e `spec/kg-contract-v4.should.schema.json`
-> (SHOULD), com as cinco decisões do E0, a proveniência estruturada e a rampa do v4 (`EPIC_9_CONTRACT_V4_RAMP`).
+> Os casos medem o contrato v4: `spec/kg-contract-v4.schema.json` (MUST) e
+> `spec/kg-contract-v4.should.schema.json` (SHOULD).
 
-Todo leitor de `.kg.yaml` tem de passar nesta suíte: o radar e o drive do Onion, um extrator de grafos,
-o port JS de um adotante e o leitor de referência `tools/kg_validate.py`. Os casos são **dados puros**,
-no molde da JSON-Schema-Test-Suite (`E_JSONSCHEMA_TEST_CASE_AS_PURE_DATA`), e não dependem de Claude
-Code (`D_KG_SSOT_INDEPENDENTE_DE_HARNESS`).
+Todo leitor de `.kg.yaml` tem de passar nesta suíte: o leitor de referência `tools/kg_validate.py`, um
+visualizador, um extrator de grafos ou um port em outra linguagem. Os casos são **dados puros**, no molde da
+[JSON-Schema-Test-Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite), e não dependem de nenhum
+harness de agente.
 
 ## Formato
 
@@ -34,12 +32,13 @@ texto embutido no JSON, para que qualquer CLI receba o caminho e leia como leria
 |---|---|
 | `layer` | `parse`, `form`, `integrity`, `yaml` ou `semantic`: a camada que o grupo exercita. `semantic` só existe em `optional/`. |
 | `pending_on` | Ids das decisões abertas de que o veredito depende. Vazio em `latest/`, não vazio em `proposals/`. |
+| `corpus` | Opcional (v4.3): diretório, relativo ao manifesto, que faz de raiz do repo para conferir a ponta externa das `external_edges`. |
 | `valid` | `true` exige `codes: []`. `false` exige pelo menos um código. |
 | `codes` | Violações de **MUST**: reprovam o arquivo. |
 | `warnings` | Violações de **SHOULD**: só alertam, e o arquivo continua válido. É opcional, e ausente vale `[]`. |
 
 O `manifest.schema.json` (JSON Schema 2020-12) valida todo manifesto. A própria suíte se valida com a
-mesma tecnologia do contrato (`E_JSONSCHEMA_SUITE_SELF_METASCHEMA_CI`, no mesmo grafo de pesquisa). Em `metaschema-tests/` há os
+mesma tecnologia do contrato, como a JSON-Schema-Test-Suite faz no CI dela. Em `metaschema-tests/` há os
 manifestos que ele tem de aceitar (`good/`) e os que tem de recusar (`bad/`).
 
 **Um caso, um defeito.** O leitor passa num caso quando o **conjunto** de códigos que emite é
@@ -125,7 +124,7 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 | Pasta | O que vale |
 |---|---|
 | `fixtures/latest/` | O contrato vigente. O leitor **tem** de passar em todos os casos. |
-| `fixtures/optional/` | Comportamento que um leitor **pode** implementar; hoje, `semantic/`, a camada do radar. Roda e reporta, mas não reprova, e entra na matriz leitor × caso. |
+| `fixtures/optional/` | Comportamento que um leitor **pode** implementar; hoje, `semantic/`, a camada semântica do radar (o leitor do framework onde o formato nasceu). Roda e reporta, mas não reprova. |
 | `fixtures/proposals/` | O veredito depende de decisão aberta (`pending_on`). Roda e reporta, mas não reprova. |
 
 **Regra de promoção.** Um grupo sai de `proposals/` para `latest/` só quando **todas** as decisões em
@@ -133,7 +132,7 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 222 casos contra o v4.3. Os grupos do
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 225 casos contra o contrato v4. Os grupos do
 rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
 `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito
 viraram `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de
@@ -159,10 +158,17 @@ cai num caso conta como falha daquele caso. `optional/` (hoje só a camada `sema
 não implementa) e `proposals/` reportam
 e nunca mudam o rc.
 
-## O contrato de runner
+## Um leitor em outra linguagem
 
-Para ser medido caso a caso (a matriz leitor × caso do produto), um leitor implementa o **contrato de
-runner**: `runner <caso>` imprime, na última linha do stdout, UM objeto JSON, e sai com rc 0:
+O `kg_conformance.py` roda só o leitor de referência. Um leitor em outra linguagem roda a suíte com o próprio
+código: itera os `manifest.json` de `fixtures/latest/`, julga cada caso (com a raiz do repo em
+`<pasta do manifesto>/<corpus>` quando o caso declara `corpus`) e compara os conjuntos de `codes` e de
+`warnings` por igualdade. Quem não expõe códigos compara só o veredito: `valid: true` aceita, `valid: false`
+reprova.
+
+Para comparar leitores lado a lado, o mantenedor usa um **contrato de runner**, e um leitor que o implementa
+pode ser medido da mesma forma: `runner <caso>` imprime, na última linha do stdout, UM objeto JSON, e sai com
+rc 0:
 
 ```json
 {"verdict": "accept" | "reject" | "error", "codes": [...] | null, "warnings": [...] | null, "detail": "..."}
@@ -170,17 +176,16 @@ runner**: `runner <caso>` imprime, na última linha do stdout, UM objeto JSON, e
 
 - `verdict` é o nível 1, e todo leitor o tem: o arquivo é aceito ou reprovado? Um caso com `codes` MUST
   espera `reject`; um caso válido, mesmo com `warnings`, espera `accept`.
-- `codes` é o nível 2, só para quem expõe motivo, comparado por conjunto nas camadas que o registro declara
-  em `layers`. `null` quer dizer que o leitor não diz o porquê.
+- `codes` é o nível 2, só para quem expõe motivo, comparado por conjunto nas camadas
+  que o leitor implementa. `null` quer dizer que o leitor não diz o porquê.
 - **Caso de corpus** (v4.3): o caso que declara `corpus` no manifesto é julgado com a raiz desse diretório como o
   repo, e o runner recebe `runner <caso> --corpus <dir>`. Um leitor que não confere a ponta externa das
   `external_edges` fica `n/a` nesses casos.
 - `error` quer dizer que o leitor caiu. Saída que não é JSON, `verdict` desconhecido, rc diferente de 0 ou
-  tempo estourado também viram `error`. É divergência e nunca some da matriz.
+  tempo estourado também viram `error`. É divergência, não ausência de opinião.
 
 ## Higiene
 
-Os casos são escritos aqui, sem copiar as fixtures do core, e usam ids sintéticos (`Q_A`, `EV_A`...),
-sem caminho de máquina e sem id de nó privado (`EPIC_7_PUBLICATION_HYGIENE`). Este arquivo viaja na release
-(`spec/release.json`): o que é operação do repo do produto (a matriz, a catraca, a paridade) não mora aqui, e o
-a conferência de higiene do mantenedor reprova referência privada em `spec/` e nos arquivos da release.
+Os casos são escritos aqui, sem copiar grafos de terceiros, e usam ids sintéticos (`Q_A`, `EV_A`...), sem
+caminho de máquina e sem id de nó privado. Este arquivo viaja na release (`spec/release.json`), e a conferência
+de higiene do mantenedor reprova referência privada em `spec/` e nos arquivos da release.

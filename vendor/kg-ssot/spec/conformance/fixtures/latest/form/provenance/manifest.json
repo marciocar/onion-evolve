@@ -1,5 +1,5 @@
 {
-  "description": "Proveniência estruturada (Q_CONTRACT_STRUCTURED_PROVENANCE, selada no PR #21): provenance com source, locator e method; nó confirmed ou PROD sem ela alertou no v3 e reprova desde o v4.",
+  "description": "Proveniência estruturada: provenance com source, locator e method; nó confirmed ou PROD sem ela alertou no v3 e reprova desde o v4.",
   "layer": "form",
   "pending_on": [],
   "cases": [

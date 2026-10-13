@@ -1,5 +1,5 @@
 {
-  "description": "Perfil YAML do contrato v1 (Q_CONTRACT_CONFORMANCE_LEVELS, selada no PR #13): YAML 1.2 core, chaves únicas, documento único, chave on proibida, datas como string entre aspas em SHOULD.",
+  "description": "Perfil YAML do contrato v1: YAML 1.2 core, chaves únicas, documento único, chave on proibida, datas como string entre aspas em SHOULD.",
   "layer": "yaml",
   "pending_on": [],
   "cases": [

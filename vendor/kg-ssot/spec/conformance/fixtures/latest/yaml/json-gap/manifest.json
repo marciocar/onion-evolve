@@ -1,5 +1,5 @@
 {
-  "description": "O vão entre o YAML 1.2 core e o modelo JSON (Q_CONTRACT_YAML_JSON_GAP, selada no PR #18): .nan e .inf reprovam como tipo, e data que não existe no calendário reprova como padrão.",
+  "description": "O vão entre o YAML 1.2 core e o modelo JSON: .nan e .inf reprovam como tipo, e data que não existe no calendário reprova como padrão.",
   "layer": "yaml",
   "pending_on": [],
   "cases": [

@@ -1,5 +1,5 @@
 {
-  "description": "Integridade referencial e de grau: o que nenhum JSON Schema expressa (E_SPIKE_FIXTURES_TEST_SEMANTICS).",
+  "description": "Integridade referencial e de grau: o que nenhum JSON Schema expressa.",
   "layer": "integrity",
   "pending_on": [],
   "cases": [

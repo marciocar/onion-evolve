@@ -69,7 +69,7 @@
     },
     {
       "file": "valid-empty-graph.kg.yaml",
-      "description": "o grafo vazio: nodes e edges como listas vazias. Válido, com aviso (Q_CONTRACT_EMPTY_GRAPH): o aviso pega o parse que falhou em silêncio",
+      "description": "o grafo vazio: nodes e edges como listas vazias. Válido, com aviso: o aviso pega o parse que falhou em silêncio",
       "valid": true,
       "codes": [],
       "warnings": [
