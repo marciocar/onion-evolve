@@ -546,6 +546,7 @@
 .claude/validation/lint-selftest.sh	E_MUTANTES_MORDEM	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_OBJECAO_1_DOR_E_SCRIPT_SEQUENCIAL_NAO_HOOK	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
+.claude/validation/lint-selftest.sh	E_P9_CASOS_MUTANTES_E_DOGFOOD	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_PRECOMMIT_SELECAO_GROSSA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/lint-selftest.sh	E_REPLACE_PRIMEIRO_ACERTOU_O_COMENTARIO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_SEIS_CASOS_SEIS_MUTANTES_MORDEM	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
@@ -558,6 +559,7 @@
 .claude/validation/lint-selftest.sh	Q_PRECOMMIT_SELECAO_POR_CASO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/lint-selftest.sh	Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/members-validate.sh	Q_members_ci_gate	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
+.claude/validation/onion-version.sh	C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	C_TETO_BANCADA_E_CORE_ONLY_FORA	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	C_TETO_CLASSE_SEM_O_TOKEN	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	C_TETO_FORMA_NAO_SENTIDO	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
@@ -568,8 +570,10 @@
 .claude/validation/projection-safety.sh	C_TETO_VOCABULARIO_E_LABEL	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/projection-safety.sh	C_soberania_engajamento	docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	D_P7_DENTRO_DA_REGRA_30_ID_E_CAMINHO_SO	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
+.claude/validation/projection-safety.sh	D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/projection-safety.sh	D_p7_terms_extension	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	E_ELENXO_REPROVOU_E_AS_CURAS	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
+.claude/validation/projection-safety.sh	E_P8_DEFAULT_DO_HOME_LIDO_EM_QUALQUER_REPO	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/projection-safety.sh	E_PRIMITIVE_EXISTS	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	E_projection_safety	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/projection-safety.sh	E_projection_safety_exists	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
