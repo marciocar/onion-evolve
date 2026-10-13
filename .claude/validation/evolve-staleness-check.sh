@@ -44,7 +44,7 @@
 #    de vendido como redundância. Desde 2026-10-13 a (2) mede contra um marco próprio, o COMMIT
 #    que tocou o relatório por último, mas continua escolhendo QUAL relatório pela perna (1).
 #    A dependência diminuiu sem sumir.
-#  · BASE DO DELTA = COMMIT, não DATA (cura de 2026-10-13, sinal de campo do onion-kg-ssot). A
+#  · BASE DO DELTA = COMMIT, não DATA (cura de 2026-10-13, sinal de campo do adotante KG-SSOT). A
 #    redação anterior contava `--since=<data>T00:00:00` e declarava aqui o erro como "caso de borda
 #    de um dia". No adotante esse caso deu 42 artefatos, alarme falso, e uma 2ª rodada inteira do
 #    /meta:evolve disparada por ele. O dano foi maior do que este teto previa. Agora a base é
@@ -329,7 +329,7 @@ if [ "${SELFTEST}" = "1" ]; then
   else _bad '(j) since ancorado / fallback declarado' "saida=[${_o}]"; fi
   rm -rf "${_d}"
 
-  # (l) O ALARME FALSO DO CAMPO, verbatim da forma (onion-kg-ssot, 2026-10-12: 42 artefatos): o
+  # (l) O ALARME FALSO DO CAMPO, verbatim da forma (adotante KG-SSOT, 2026-10-12: 42 artefatos): o
   #     artefato commitado no MESMO DIA, ANTES do relatorio, NAO conta. A base e o commit do
   #     relatorio, nao a meia-noite. Mutante medido: voltar ao `--since=<data>T00:00:00` faz
   #     este caso reprovar, porque o artefato das 09h passa a contar.

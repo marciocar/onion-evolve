@@ -203,7 +203,7 @@ achados do Passo 2.5 **não** passam por juiz e o relatório diz isso. (A 1ª ve
 severidade, e um `opportunistic` que propusesse fundir fases escapava do veto — achado do Elenxo.)
 
 > ⚠️ **Disparar o workflow `meta-evolve-fanout` pelo NOME, sem args, é o atalho parcial** (medido
-> 2026-10-12 no adotante `onion-kg-ssot`, quando ele ainda se chamava `evolve` e aparecia na lista como
+> 2026-10-12 no adotante `adotante KG-SSOT`, quando ele ainda se chamava `evolve` e aparecia na lista como
 > `/evolve`, ao lado deste comando — por isso foi renomeado em 2026-10-13: é peça interna, não alternativa): cobre no máximo 6 das 10 dimensões, mais a MAQ. Sem `maqTargets`, uma
 > fase `Census` (haiku/low) roda o raio-X e o script extrai a seção 7 verbatim, conferindo os
 > cabeçalhos; se ela não vier inteira, a MAQ sai em `not_measured` com o motivo. O caminho completo

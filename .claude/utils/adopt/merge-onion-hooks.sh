@@ -112,7 +112,7 @@ jq -n \
     # commands Onion já no alvo NO GRUPO CERTO (o matcher do grupo é o da fonte)
     | ([ (.hooks[$ev] // [])[] | . as $g | .hooks[]? | select((.command | type) == "string")
          | select(.command as $c | $srcmt | has($c)) | select(($g.matcher // null) == $srcmt[.command]) | .command ]) as $placed
-    # hook Onion do alvo FORA do grupo certo (2026-10-12, --update do onion-kg-ssot: o veto direct-provider-api
+    # hook Onion do alvo FORA do grupo certo (2026-10-12, --update do adotante KG-SSOT: o veto direct-provider-api
     # ficou num grupo sem matcher porque o update anterior o anexou assim, e o refresh casava por command sem
     # mudar de grupo). Sai do grupo onde está e volta no grupo com o matcher da fonte, levando as chaves extras.
     | ([ (.hooks[$ev] // [])[] | . as $g | .hooks[]? | select((.command | type) == "string")

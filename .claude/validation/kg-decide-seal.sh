@@ -106,7 +106,7 @@ ROOT="$(git -C "$(dirname "${GRAPH}")" rev-parse --show-toplevel 2>/dev/null || 
 # a piora contra o HEAD; (2) o leitor de referência do PRÓPRIO produto (`tools/kg_validate.py`), num repo que
 # é o KG-SSOT e por isso não o vendoriza — julgamento absoluto do grafo (rc 0 passa, 1 reprova), e o passo 0
 # já recusou o grafo que reprovava antes, então reprovar depois é culpa do selo. Sinal de campo do
-# onion-kg-ssot, 2026-10-12: lá o selador selava sem conferir o contrato. (3) nenhum: CRC=99, e a mensagem
+# adotante KG-SSOT, 2026-10-12: lá o selador selava sem conferir o contrato. (3) nenhum: CRC=99, e a mensagem
 # diz qual falta — repo git ou leitor de contrato.
 CONTRACT_READER=""
 _contract() {  # COUT/CRC do contrato sobre o grafo; CRC=99 quando não há leitor de contrato
