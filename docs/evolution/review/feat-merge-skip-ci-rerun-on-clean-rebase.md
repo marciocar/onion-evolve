@@ -2,8 +2,8 @@
 title: 'Resíduo — merge da fila sem esperar o CI do head novo depois de auto-rebase limpo (A agora, B se precisar)'
 date: 2026-10-13
 branch: feat/merge-skip-ci-rerun-on-clean-rebase
-reviewed_diff_sha256: a82471e268b8cd1035ed1ea1a4af7b5b1883239786b1997b8f55d3ed4a6f2335
-reviewed_code_sha256: 48faf483df07279e59448de3956732f1a53fdd0c50dd81a7bc802c8d86e1ca03
+reviewed_diff_sha256: 9f2524d9dd74febe35248c6f7e0e797aff9289409ba527b48fc602d7ba65481b
+reviewed_code_sha256: 5fd59c3debfcd187f3854d601b232b3399dce0a5fbcdcc2688dc1cb6581b4a6d
 findings_total: 14
 findings_real: 12
 findings_fixed: 3
@@ -138,3 +138,21 @@ o `--map` o liga a ela (antes caía no failsafe da completa, medido no CI do #10
 14. **O scratchpad é compartilhado entre agentes** (real, processo). O driver de mutantes foi
     sobrescrito por outro agente, que apontava para outra worktree. Ele não foi rodado, e o meu foi
     refeito com nome único.
+
+## Re-revisão depois do rebase sobre o #1080 (semáforo de CPU da bancada)
+
+O auto-rebase do merge foi recusado por conflito REAL de fonte em `.claude/validation/lint-selftest.sh`. O
+rebase foi refeito à mão, preservando os dois lados. A conferência foi feita por `git range-diff` do commit
+de conteúdo, antes e depois:
+
+- `lint-selftest.sh`: as duas famílias novas (a `machine_slots` do #1080 e a `merge_skip_ci` deste PR) foram
+  acrescentadas no mesmo ponto. Ficam as duas, a `machine_slots` primeiro. O código da `merge_skip_ci`
+  não mudou; a diferença é só de contexto.
+- O grafo do processo de merge: o #1080 também subiu o teto (68 → 70) e acrescentou nós. O arquivo foi
+  refeito como a versão da main mais os 3 nós e as 4 arestas deste PR, byte a byte, e o teto subiu para
+  73, declarado. Radar `--integrity --schema` exit 0 (73 nós, 98 arestas) e `kg-contract-check` rc 0.
+- As projeções (`testing-inventory.md`, `kg-read-index.tsv`) ficaram com o lado da main; a regeneração as refaz.
+
+As famílias afetadas, sob LC_ALL=C, passaram **145/145**: machine_slots, merge_skip_ci,
+pr_merge_verified, merge_serial, two_tier_bench, selftest_lanes, selftest_selection e
+shell_pipefail_robustness. A bancada completa local é opt-in desde o #1080, e não foi rodada; ela é do CI.
