@@ -138,8 +138,7 @@ fi
 
 Usado pela **Fase 3** (install) e pelo **`--update`** — re-aplica os passos install-only que **não** vêm
 na cópia de arquivos (registro de hooks + starter de co-evolução + proteção de formatador). Idempotente:
-re-rodar não duplica.
-Snippet self-contained (shell novo a cada fase).
+re-rodar não duplica. Snippet self-contained (shell novo a cada fase).
 
 ```bash
 SOURCE_ROOT="$(git rev-parse --show-toplevel)"
@@ -301,6 +300,8 @@ done
 bash "$SOURCE_ROOT/.claude/utils/adopt/regen-ssot-projections.sh" "$DEST" \
   || { echo "ABORTADO: as projeções SSOT do alvo não foram geradas — ele nasceria com HARD das REGRAS 8/21"; exit 1; }
 
+# (8b) SEMENTE DO KG no layout ANTIGO (2 documentos YAML, até 2026-10-06) → documento único, provada antes de gravar; grafo do adotante e semente editada só AVISAM, intactos (porquê: no helper). rc≠0 não aborta: mostre ao maestro.
+bash "$SOURCE_ROOT/.claude/utils/adopt/migrate-seed-graph.sh" "$DEST" --source "$SOURCE_ROOT" || echo "⚠️  migrate-seed-graph rc=$? (3 = aviso, 2 = NÃO MEDIDO) — a semente antiga, se houver, segue reprovada pelo contrato." >&2
 # (8c) SEMENTE DO KG — movida para DEPOIS do carimbo (Fase 5): o seed lê mode/role/source_commit do stamp; rodando antes, os três saíam "(não carimbado)" (medido 2026-09-02, num adotante greenfield).
 
 # (9) BASELINES de catraca — REGENERA **TODOS** do corpus do alvo (mesmo padrão do passo 8, mesma razão).
@@ -715,7 +716,6 @@ fi
 # DELTA do framework desde a adoção (manifesto filtrado, como no Procedimento):
 # A lista é a MESMA do transporte, e vem da SSOT (vendor-manifest.sh) — só o delta olha `.env.example`,
 # que no transporte é never-clobber e por isso não entra no manifesto.
-#
 # ⚠️ O PAPEL VEM DO STAMP DO ALVO (antes de 2026-09-15 esta linha NÃO O PASSAVA): com o `--role` cortando, um
 # `--update` cego republicaria a meta-fábrica num alvo standalone, desfazendo o corte pela porta dos fundos.
 # O papel é do ALVO (`onion-version.sh` hardcoda `role: source`, a identidade da FONTE — não serve aqui).
@@ -759,7 +759,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   starter `docs/evolution/`. (Fecha `docs/evolution/inbox/2026-06-18-adopt-update-skips-phase3-steps.md`.)
   **O `regen-baselines` filtra em vez de re-emitir aqui, e decide sozinho** (`--auto`): no update o alvo já
   tem história, e re-emitir re-toleraria a dívida acumulada; `--filter` tira só a chave **estrangeira**
-  (passivo do core) e a dívida **local** segue cobrada (o defeito de 47 HARD medido em 2026-08-17).
+  (passivo do core) e a dívida **local** segue cobrada (o defeito de 47 HARD medido em 2026-08-17). A semente do KG antiga migra no passo (8b).
 - **Re-carimbar** com a identidade NOVA da fonte (re-derivar — não há PASSO 0 aqui). **Sempre via
   helper determinístico** — a semântica (preserve + updated_at) vive no script, não em quem o chama:
   ```bash

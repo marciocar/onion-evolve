@@ -1,0 +1,111 @@
+---
+graph: onion-adoption
+title: "Adoção do Onion neste repositório — a semente do KG"
+layer: mixed
+created: 2026-09-24
+updated: 2026-09-24
+owner: exemplo-adotante
+purpose: |
+  Este é o PRIMEIRO grafo deste repo, semeado pela adoção do Onion. Ele existe por um motivo
+  operacional: o passo 0 do /warm-up é "se existir um .kg.yaml, consulte-o PRIMEIRO" — e com zero
+  grafos esse passo fica VAZIO, a sessão degrada para ler prosa, e o conhecimento do projeto segue
+  preso ao contexto de uma conversa em vez de morar no repo.
+  Leia com: bash .claude/validation/kg-radar.sh docs/onion/graph/onion-adoption.kg.yaml
+  A seção ESTADO mostra o que segue `open` — é a fila real, ordenada pelo que pesa.
+como_usar: |
+  NÃO trate este arquivo como template a preencher. Ele carrega FATOS verificados da adoção e UMA
+  pergunta aberta: qual é o domínio deste repo. Ao responder, crie o SEU grafo em
+  docs/onion/graph/<seu-tema>.kg.yaml e reconcilie a pergunta daqui para `done`.
+  Gramática antes de escrever: .claude/rules/kg-grammar.md (o campo é `node_type:`/`edge_type:`,
+  nunca `type:`; nó PROD de alto impacto sem `verified_at` é acusado pela catraca).
+---
+
+# O SELO da gramática. Sem ele o radar avisa a cada leitura ("schema_version ausente"), e um aviso
+# na PRIMEIRA leitura de todo adotante é o pior lugar para um aviso: ensina, de saída, que a saída
+# do radar tem ruído tolerável. Medido no core: 59 dos 64 grafos declaram.
+meta:
+  id: onion-adoption-exemplo-adotante
+  schema_version: "1"
+  baseline: 2026-09-24
+  date: 2026-09-24
+
+nodes:
+  - id: THIS_REPO
+    layer: domain
+    node_type: entity
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-09-24
+    verified_against: basename-do-alvo-e-stamp-claude-onion-version
+    label: "`exemplo-adotante` — este repositório, consumidor do framework Onion (papel `adopted`). Ele é a entidade dona dos estados abaixo; o domínio do NEGÓCIO dele ainda não está mapeado (ver a pergunta aberta)."
+
+  - id: ONION_INSTALLED
+    layer: domain
+    node_type: state
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-09-24
+    verified_against: stamp-claude-onion-version-lido-na-adocao
+    label: "Framework instalado: pin `ba0d2d423c17`, modo `greenfield`, papel `adopted`, branch de integração `(não declarado — resolvido por PR)`. Atualizar depois com /meta:adopt --update a partir do core — o merge de `onion/vendor` transforma customização local em conflito git real, resolvível, em vez de sobrescrita silenciosa."
+
+  - id: DETERMINISTIC_GATE
+    layer: domain
+    node_type: state
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-24
+    verified_against: verify-adopter-gate-executado-na-adocao
+    label: "O gate determinístico foi PROVADO POR EXECUÇÃO na adoção (hook nativo via core.hooksPath, commit-sonda barrado com o lint reprovando) — não por existência de arquivo. Isso importa porque a medição de 2026-08-16 achou o gate INERTE em 4 de 6 adotantes (husky sombreando o hooksPath, hooksPath para diretório vazio, hook ausente), e nenhum caso era visível sem executar."
+
+  - id: Q_WHAT_IS_THIS_REPO_DOMAIN
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 5
+    confidence: 1.0
+    verified_at: 2026-09-24
+    verified_against: semente-da-adocao-dominio-ainda-nao-mapeado
+    label: "A PERGUNTA QUE ABRE O HÁBITO, e o radar vai afundá-la a cada leitura até ela ser respondida: qual é o domínio deste repo — as entidades, os estados, as decisões já tomadas e as premissas que ainda são premissa? Responder é criar docs/onion/graph/<tema>.kg.yaml com nós reais e reconciliar esta pergunta para `done`. Enquanto ela estiver aberta, a próxima sessão que abrir este repo tem de reconstruir o entendimento da prosa — que é exatamente o custo que o KG existe para eliminar."
+
+  - id: D_ADOPT_ONION
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 1.0
+    verified_at: 2026-09-24
+    verified_against: superficie-do-framework-presente-e-stamp-carimbado
+    trace: "adoção executada por /meta:adopt a partir do core onion-evolve, pin ba0d2d423c17, em 2026-09-24"
+    label: "DECISÃO: adotar o Onion neste repo (modo `greenfield`). O que se ganha não é o inventário de scripts — é o gate determinístico que REPROVA e o KG como fonte de estado. As duas metades se sustentam: gate sem grafo protege sintaxe sem memória; grafo sem gate é acervo que ninguém é obrigado a manter honesto."
+
+edges:
+  - from: THIS_REPO
+    to: ONION_INSTALLED
+    edge_type: HAS_STATE
+    label: "O pin e o modo são estado deste repo — e o pin é o que torna a atualização um delta verificável em vez de uma cópia por cima."
+
+  - from: THIS_REPO
+    to: DETERMINISTIC_GATE
+    edge_type: HAS_STATE
+    label: "A proteção é estado DESTE repo, não do framework: o mesmo framework instalado pode ter gate vivo aqui e inerte no vizinho, e a diferença só aparece executando."
+
+  - from: D_ADOPT_ONION
+    to: ONION_INSTALLED
+    edge_type: CAUSES
+    label: "A decisão produziu a instalação; o stamp é o registro verificável dela."
+
+  - from: DETERMINISTIC_GATE
+    to: D_ADOPT_ONION
+    edge_type: SUPPORTS
+    label: "É a capacidade que compra a adoção: um hook que barra a ação por código de saída, inclusive sob bypassPermissions — o resto do valor é conselho, e conselho não reprova."
+
+  - from: Q_WHAT_IS_THIS_REPO_DOMAIN
+    to: THIS_REPO
+    edge_type: CONSTRAINS
+    label: "Não derruba nada — LIMITA o que o Onion consegue fazer aqui. Sem domínio mapeado, o /warm-up e o /catch-up leem prosa, e cada sessão nova paga de novo o custo de entender o projeto."
