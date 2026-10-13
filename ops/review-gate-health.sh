@@ -111,7 +111,9 @@ while IFS=$'\t' read -r num sha; do
   fi
   # (b) o que o GATE FEZ.
   concl="$(gh api "repos/${repo}/commits/${sha}/check-runs?per_page=100" \
-    --jq '.check_runs[] | select(.name=="onion-review-verdict") | .conclusion' 2>/dev/null | head -1 || true)"
+    --jq '[.check_runs[] | select(.name=="onion-review-verdict")] | max_by(.id) | select(. != null) | .conclusion' 2>/dev/null || true)"
+  # ↑ o run VIGENTE (maior id): um 2º run no mesmo head cria outra check-run de mesmo nome (medido no
+  #   PR #1076), e `head -1` pegava uma das duas sem critério.
   [ -n "${concl}" ] || continue
   k="$(classify_pr "${ach}" "${concl}")"
   case "${k}" in

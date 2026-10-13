@@ -260,6 +260,10 @@ workflow. O run recalcula a mesma decisão, que é função pura de (modo, label
 ou com a `review:ia` posta, isso **re-roda a revisão**. Pular esse run deixaria um veredito SKIPPED
 por cima do real.
 
+**Duas check-runs de mesmo nome no head** (medido no PR #1076): cada novo disparo cria outra suíte.
+A API de check-runs devolve as duas, e o `statusCheckRollup` também. O `ops/pr-merge-verified.sh` lê
+só a vigente, a de maior id (`_LATEST_PER_NAME_JQ`), e o rollup pelo mais recente.
+
 **Checagem semântica arquitetural fora do CI**: validações de conformidade com meta-specs e
 invariantes de framework não rodam automaticamente no CI — são locais, via
 `/meta:metaspec-validate` orquestrado por `@metaspec-gate-keeper` (`onion-validate.yml`, step
