@@ -30,7 +30,7 @@
 | 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
 | 1.8 | `C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA` | plugin-mcp-posture-2026-09 | OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (stric |
 
-## merge-process-onion-2026-10 — 7 item(ns)
+## merge-process-onion-2026-10 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -38,6 +38,7 @@
 | 12.0 | `C_OPCAO_B_POSTMERGE_PROJECTION_WRITER` | merge-process-onion-2026-10 | OPÇÃO B — Opção 3 de Q_MERGE_DRIVER_PARA_PROJECAO_GERADA (gatilho disparado em #1062-#1065): parar de commitar projeções g |
 | 5.6 | `C_OPCAO_F_THIRD_PARTY_FREE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO F — fila de terceiro gratuita (Mergify Open Source / Trunk Free até 5 committers). GATED: gatilho = depois de A a D ain |
 | 5.4 | `C_OPCAO_G_TRANSFER_TO_ORG_NATIVE_QUEUE` | merge-process-onion-2026-10 | OPÇÃO G — transferir o repo para uma organização Free para ter a fila nativa. GATED: custa a URL, o members.yaml, o marketpl |
+| 3.0 | `Q_MERGE_LOTE_COM_BISSECCAO` | merge-process-onion-2026-10 | B (GATED): mergear em LOTE com bissecção quando o main quebrar? Gatilho medido: o main quebrar por COMBINAÇÃO de PRs que só a |
 | 2.4 | `C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER` | merge-process-onion-2026-10 | OPÇÃO H — merge driver de .gitattributes para projeções. Elenxo: REJEITAR — o merge do servidor do GitHub não executa dri |
 | 2.0 | `C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT` | merge-process-onion-2026-10 | OPÇÃO K — contrarian: trunk direto sem fila e sem projeção commitada. Elenxo: REJEITAR — o core passa no critério time pe |
 | 1.0 | `C_OPCAO_J_STACKED_PRS_GRAPHITE` | merge-process-onion-2026-10 | OPÇÃO J — stacked PRs / Graphite. Elenxo: REJEITAR — a dor medida é de arquivo-ímã, não de dependência entre PRs. |

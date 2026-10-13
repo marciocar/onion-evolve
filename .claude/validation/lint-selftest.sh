@@ -15342,6 +15342,17 @@ GH
   if [ "${_ms_rc}" -eq 0 ] && grep -q '^merge-start 62 done=0 args=--no-wait-after-rebase$' "${ev}"; then
     record_pass "merge-serial: (d2) revisor aprovou ⇒ o verificado roda SEM --dispensa (nunca preventiva)"
   else record_fail "merge-serial: (d2) dispensa preventiva" "rc=${_ms_rc} ev=[$(tr '\n' ';' < "${ev}")] out=${_ms_out}"; fi
+  # (wf) o opt-out --wait-ci-after-rebase é REPASSADO ao verificado, e sozinho (sem PR) não começa nada
+  #      (D_MERGE_SEM_CI_APOS_REBASE_LIMPO). MUTANTE: tirar o repasse do _ARGS reprova (wf).
+  _reset
+  _msp 62 b62 MERGEABLE 0 pass "" ok
+  _ms --wait-ci-after-rebase 62
+  if [ "${_ms_rc}" -eq 0 ] && grep -q '^merge-start 62 done=0 args=--no-wait-after-rebase --wait-ci-after-rebase$' "${ev}"; then
+    _reset; _ms --wait-ci-after-rebase
+    if [ "${_ms_rc}" -ne 0 ] && grep -qF 'nenhum PR na lista' <<< "${_ms_out}" && [ ! -s "${ev}" ]; then
+      record_pass "merge-serial: (wf) --wait-ci-after-rebase é repassado ao verificado; sem PR, a série não começa"
+    else record_fail "merge-serial: (wf) flag sem PR" "rc=${_ms_rc} out=${_ms_out}"; fi
+  else record_fail "merge-serial: (wf) opt-out não repassado" "rc=${_ms_rc} ev=[$(tr '\n' ';' < "${ev}")] out=${_ms_out}"; fi
   # (d3) verdict FALHA + "apontou N violação" ⇒ PARA (achado é decisão humana), sem chamar o verificado
   _reset
   _msp 63 b63 MERGEABLE 0 fail "onion-review apontou 2 violação(ões) — corrija, ou dispense com motivo registrado" ok
@@ -31268,6 +31279,230 @@ PYMS
   rm -rf "${d}"
 }
 _family run_machine_slots_selftests
+
+# ── merge_skip_ci — merge SEM o CI do head novo depois de auto-rebase LIMPO (D_MERGE_SEM_CI_APOS_REBASE_LIMPO) ──
+# POR QUE EXISTE (selo do maestro, 2026-10-13, "A agora, B se precisar"): cada merge da fila
+# (ops/merge-serial.sh → ops/pr-merge-verified.sh) levava 20–25 min, quase tudo esperando o CI do head
+# NOVO depois do auto-rebase. O verificado agora mergeia sem esperar quando TODAS as condições valem, e o
+# merge vai pelo bypass do ruleset (ops/github-ruleset-main.json, aplicado por ops/apply-ruleset-main.sh)
+# com --admin --match-head-commit. Cada condição tem o seu caso, e cada caso o seu mutante.
+# SANDBOX: remoto bare + clone + worktree da branch do PR, um `ops/pr-finalize.sh` de mentira que faz o
+# rebase DE VERDADE sobre origin/main e empurra, e um `gh` de mentira cujo head do PR é o ref remoto da
+# branch (como no forge) e cujos check-runs existem SÓ para o head anterior (o novo não tem CI).
+# O SUT é o verificado REAL; o ruleset e a lib de projeções são os REAIS (irmãos do SUT).
+# Também cobre a label do ops/apply-ruleset-main.sh: descrição > 100 caracteres dá 422 na API.
+# MUTANTES (ops/mutate-and-restore.sh, 2026-10-13; lista no resíduo
+# docs/evolution/review/feat-merge-skip-ci-rerun-on-clean-rebase.md) — cada um reprova o caso dele.
+run_merge_skip_ci_selftests() {
+  local sut="${REPO_ROOT}/ops/pr-merge-verified.sh" ars="${REPO_ROOT}/ops/apply-ruleset-main.sh"
+  [ -f "${sut}" ] || { record_skip "merge-skip-ci: ops/ ausente (adotante) → pulado"; return; }
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  mkdir -p "${d}/bin"
+  cat > "${d}/bin/gh" <<'GH'
+#!/usr/bin/env bash
+a="$*"
+_hd() { git --git-dir="${MSC_ORIGIN}" rev-parse refs/heads/feat/x; }
+case "$a" in
+  *"pr view"*"json mergeable"*)
+      k=$(cat "${MSC_D}/mk" 2>/dev/null || echo 0); k=$((k+1)); echo "$k" > "${MSC_D}/mk"
+      v="$(printf '%s\n' ${MSC_MERGEABLE_SEQ:-CONFLICTING MERGEABLE} | sed -n "${k}p")"
+      [ -n "$v" ] || v="$(printf '%s\n' ${MSC_MERGEABLE_SEQ:-CONFLICTING MERGEABLE} | tail -1)"
+      echo "$v"; exit 0 ;;
+  *"pr view"*headRefOid*)          _hd; exit 0 ;;
+  *"pr view"*headRepositoryOwner*) echo "owner/repo"; exit 0 ;;
+  *"pr view"*headRefName*)         echo "feat/x"; exit 0 ;;
+  *"pr view"*baseRefName*)         echo "main"; exit 0 ;;
+  *"pr view"*statusCheckRollup*)   echo "SUCCESS"; exit 0 ;;
+  *"pr view"*state,mergedAt*)
+      n=$(cat "${MSC_D}/n" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "${MSC_D}/n"
+      if [ "$n" -eq 1 ] || [ -z "${MSC_MERGED:-}" ]; then echo "OPEN|null"; else echo "MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)"; fi
+      exit 0 ;;
+  *"pr comment"*)
+      prev=""; for x in "$@"; do [ "$prev" = "--body" ] && printf '%s\n' "$x" >> "${MSC_D}/comments"; prev="$x"; done; exit 0 ;;
+  *"issue list"*)
+      [ -n "${MSC_ALARM_RC:-}" ] && { echo "gh: HTTP 502" >&2; exit "${MSC_ALARM_RC}"; }
+      [ -n "${MSC_ALARM:-}" ] && echo "${MSC_ALARM}"; exit 0 ;;
+  *"check_name=onion-review-verdict"*)
+      [ "${a#*commits/$(cat "${MSC_D}/old")}" != "$a" ] && printf '901\tsuccess\n'; exit 0 ;;
+  *"check-runs/"*"/annotations"*) exit 0 ;;
+  *"api "*"commits/"*check-runs*)
+      # só o head ANTERIOR tem CI; o head novo (recém-empurrado) não tem nenhum
+      if [ "${a#*commits/$(cat "${MSC_D}/old")}" != "$a" ]; then printf '%b' "${MSC_OLD_RUNS}"; fi
+      exit 0 ;;
+  *"api "*pulls*files*)   echo "src/pr.txt"; exit 0 ;;
+  *"api "*pulls*commits*) echo 1; exit 0 ;;
+  *"pr checks"*)          printf 'selftest-gate\tpending\t0\turl\n'; exit 0 ;;
+  *"pr merge"*)
+      printf '%s\n' "$a" >> "${MSC_D}/margs"
+      [ "${MSC_MERGE_RC:-0}" -eq 0 ] && echo "merged" || echo "X Pull request is not mergeable: base branch policy prohibits the merge"
+      exit "${MSC_MERGE_RC:-0}" ;;
+esac
+echo "gh-stub: chamada não esperada: $a" >&2; exit 1
+GH
+  chmod +x "${d}/bin/gh"
+  local GREEN='selftest-gate\tcompleted\tsuccess\nlint-onion-artifacts\tcompleted\tsuccess\nonion-review-verdict\tcompleted\tsuccess\n'
+  # _msc_setup <base-toca> : remoto + clone + worktree da branch; a main anda tocando <base-toca>
+  #   pr       → a main muda src/pr.txt (arquivo do PR), em linha distante (o rebase fica limpo)
+  #   proj     → a main muda docs/onion/testing-inventory.md, que o PR também muda (projeção gerada)
+  #   outro    → a main muda só src/outro.txt
+  _msc_setup() {
+    local s="${d}/s$1$RANDOM"; rm -rf "${s}"; mkdir -p "${s}"
+    MSC_ORIGIN="${s}/origin.git"; MSC_REPO="${s}/repo"; MSC_WT="${s}/wt"
+    git init -q --bare -b main "${MSC_ORIGIN}"
+    ( git clone -q "${MSC_ORIGIN}" "${MSC_REPO}" 2>/dev/null; cd "${MSC_REPO}" && git config user.email t@t && git config user.name t \
+      && mkdir -p src docs/onion && seq 1 20 > src/pr.txt && echo o > src/outro.txt && echo p0 > docs/onion/testing-inventory.md \
+      && git add -A && git commit -qm base && git push -q origin HEAD:main \
+      && git checkout -qb feat/x && sed -i '1s/.*/pr/' src/pr.txt && echo p-pr > docs/onion/testing-inventory.md \
+      && git commit -qam pr && git push -q origin feat/x && git checkout -q main \
+      && git worktree add -q "${MSC_WT}" feat/x ) >/dev/null 2>&1
+    git -C "${MSC_REPO}" rev-parse feat/x > "${d}/old"
+    ( cd "${MSC_REPO}" && case "$1" in
+        pr)    sed -i '20s/.*/main/' src/pr.txt ;;
+        proj)  echo p-main > docs/onion/testing-inventory.md ;;
+        ren)   git mv src/pr.txt src/pr2.txt ;;
+        *)     echo outro2 > src/outro.txt ;;
+      esac && git commit -qam main-anda && git push -q origin HEAD:main ) >/dev/null 2>&1
+    mkdir -p "${MSC_WT}/ops"
+    cat > "${MSC_WT}/ops/pr-finalize.sh" <<'PF'
+#!/usr/bin/env bash
+echo "$*" >> "${MSC_D}/pflog"
+[ "${MSC_PF_MODE:-ok}" = fail ] && { echo "PR-FINALIZE: conflito REAL em src/pr.txt — rebase abortado, nada mudou; resolva à mão" >&2; exit 1; }
+git fetch -q origin || exit 1
+git -c user.email=t@t -c user.name=t rebase -q -X theirs origin/main >/dev/null 2>&1 || { git rebase --abort; exit 1; }
+[ -n "${MSC_PF_PROJ:-}" ] && echo "PR-FINALIZE: conflito de projeção resolvido em ${MSC_PF_PROJ} (a regeneração refaz)"
+git push -q -f origin HEAD:refs/heads/feat/x || exit 1
+echo "PR-FINALIZE: enviado feat/x @ $(git rev-parse --short HEAD)"
+PF
+  }
+  local _o _rc _sutx
+  _msc() { # roda o verificado (ou o mutante em _sutx) a partir do clone, como a produção; resto = flags
+    : > "${d}/margs"; : > "${d}/comments"; : > "${d}/pflog"; echo 0 > "${d}/n"; echo 0 > "${d}/mk"
+    _o="$(cd "${MSC_REPO}" && PATH="${d}/bin:${PATH}" MSC_D="${d}" MSC_ORIGIN="${MSC_ORIGIN}" \
+          MSC_OLD_RUNS="${MSC_OLD_RUNS:-${GREEN}}" MSC_MERGED="${MSC_MERGED:-}" MSC_PF_MODE="${MSC_PF_MODE:-}" MSC_PF_PROJ="${MSC_PF_PROJ:-}" \
+          MSC_ALARM="${MSC_ALARM:-}" MSC_ALARM_RC="${MSC_ALARM_RC:-}" MSC_MERGE_RC="${MSC_MERGE_RC:-}" MSC_MERGEABLE_SEQ="${MSC_MERGEABLE_SEQ:-}" ONION_MERGE_POLL_SECS=0 ONION_MERGE_WAIT_SECS=2 \
+          ONION_MERGE_HEAD_SYNC_TRIES=3 ONION_MERGE_HEAD_SYNC_POLL=0 LC_ALL=C bash "${_sutx:-${sut}}" 999 "$@" 2>&1)"; _rc=$?
+  }
+  _newhead() { git --git-dir="${MSC_ORIGIN}" rev-parse refs/heads/feat/x; }
+
+  # (a) rebase limpo + checks exigidos verdes no head anterior ⇒ merge IMEDIATO, pelo bypass amarrado ao head
+  _msc_setup outro; MSC_MERGED=1 _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 0 ] && grep -qF -- "--rebase --admin --match-head-commit $(_newhead)" "${d}/margs" \
+     && grep -qF "SEM esperar o CI do head novo" "${d}/comments" && grep -q "MERGED — provado pelo ESTADO" <<< "${_o}" \
+     && grep -q "gates de checks ancorados no head ANTERIOR $(cut -c1-8 "${d}/old")" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (a) rebase limpo + exigidos verdes no head anterior ⇒ merge sem esperar, --admin --match-head-commit no head novo, decisão no comentário"
+  else record_fail "merge-skip-ci: (a) merge imediato" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (b) conflito de FONTE ⇒ nada de merge (e nada de bypass)
+  _msc_setup outro; MSC_PF_MODE=fail _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 1 ] && [ ! -s "${d}/margs" ] && grep -q "conflito REAL em src/pr.txt" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (b) conflito de fonte no rebase ⇒ para sem merge (nunca pula CI)"
+  else record_fail "merge-skip-ci: (b) conflito" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (c) o rebase trouxe mudança em ARQUIVO DO PR ⇒ espera o CI (rc 4 na série), sem merge
+  _msc_setup pr; _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "o rebase trouxe mudança em arquivo(s) do PR: src/pr.txt" "${d}/comments"; then
+    record_pass "merge-skip-ci: (c) o rebase tocou arquivo do PR ⇒ espera o CI do head novo (rc 4), nomeando o arquivo"
+  else record_fail "merge-skip-ci: (c) arquivos do PR" "rc=${_rc} margs=[$(cat "${d}/margs")] com=[$(cat "${d}/comments")] out=${_o}"; fi
+
+  # (c2) a main e o PR só se cruzam em PROJEÇÃO GERADA ⇒ não conta (é o conflito de sempre; o regen refaz)
+  _msc_setup proj; MSC_MERGED=1 MSC_PF_PROJ=docs/onion/testing-inventory.md _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 0 ] && grep -qF -- "--admin --match-head-commit" "${d}/margs" && grep -qF "projeção gerada: docs/onion/testing-inventory.md" "${d}/comments"; then
+    record_pass "merge-skip-ci: (c2) cruzamento só em projeção gerada ⇒ não barra o merge sem CI"
+  else record_fail "merge-skip-ci: (c2) projeção" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (c3) a main RENOMEIA um arquivo que o PR muda (o rebase leva a mudança para o nome novo) ⇒ também espera
+  _msc_setup ren; _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "arquivo(s) do PR: src/pr2.txt" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (c3) a main renomeou arquivo do PR ⇒ espera o CI (o nome novo cruza com o PR)"
+  else record_fail "merge-skip-ci: (c3) rename" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (j) o ruleset tem regra ALÉM dos checks ⇒ espera: o --admin contornaria a regra junto (SUT copiado com
+  #     outro ruleset ao lado — o caminho do ruleset é o irmão do SUT, sem knob de ambiente)
+  local x="${d}/sut-j"; mkdir -p "${x}/ops" "${x}/.claude/validation"
+  cp "${sut}" "${x}/ops/pr-merge-verified.sh"; cp "${REPO_ROOT}/.claude/validation/onion-regen-lib.sh" "${x}/.claude/validation/"
+  python3 -I -c 'import json,sys
+d=json.load(open(sys.argv[1],encoding="utf-8")); d["rules"].append({"type":"pull_request","parameters":{}})
+json.dump(d,open(sys.argv[2],"w",encoding="utf-8"))' "${REPO_ROOT}/ops/github-ruleset-main.json" "${x}/ops/github-ruleset-main.json"
+  _msc_setup outro; _sutx="${x}/ops/pr-merge-verified.sh" _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "o ruleset tem regra além dos checks (pull_request)" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (j) ruleset com regra além dos checks ⇒ espera (o bypass não contorna regra calado)"
+  else record_fail "merge-skip-ci: (j) regra extra" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (d) check EXIGIDO vermelho no head anterior ⇒ espera (rc 4), sem merge
+  _msc_setup outro; MSC_OLD_RUNS='selftest-gate\tcompleted\tfailure\nlint-onion-artifacts\tcompleted\tsuccess\n' _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "o check exigido 'selftest-gate' não está verde" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (d) check exigido vermelho no head anterior ⇒ espera o CI, sem merge"
+  else record_fail "merge-skip-ci: (d) vermelho" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+  # (d2) exigidos verdes mas OUTRO check falho (não dispensado) ⇒ espera
+  _msc_setup outro; MSC_OLD_RUNS="${GREEN}"'outro-check\tcompleted\tfailure\n' _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "check falho não dispensado no head anterior" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (d2) outro check falho no head anterior ⇒ espera, sem merge"
+  else record_fail "merge-skip-ci: (d2) outro falho" "rc=${_rc} out=${_o}"; fi
+
+  # (e) alarme de main quebrado ABERTO ⇒ recusa o pulo (rc 4) nomeando a issue; ilegível também espera
+  _msc_setup outro; MSC_ALARM=77 _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "alarme de main quebrado ABERTO (issue #77)" <<< "${_o}"; then
+    _msc_setup outro; MSC_ALARM_RC=1 _msc --no-wait-after-rebase
+    if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "não consegui LER as issues de alarme" <<< "${_o}"; then
+      record_pass "merge-skip-ci: (e) alarme aberto ⇒ sem pulo, nomeando a issue; alarme ilegível ⇒ também espera"
+    else record_fail "merge-skip-ci: (e) alarme ilegível" "rc=${_rc} out=${_o}"; fi
+  else record_fail "merge-skip-ci: (e) alarme aberto" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (f) opt-out --wait-ci-after-rebase ⇒ espera como antes
+  _msc_setup outro; _msc --no-wait-after-rebase --wait-ci-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "espera: opt-out --wait-ci-after-rebase" "${d}/comments"; then
+    record_pass "merge-skip-ci: (f) --wait-ci-after-rebase ⇒ espera o CI do head novo, e o comentário diz por quê"
+  else record_fail "merge-skip-ci: (f) opt-out" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (g) verde ANTIGO de outro head: a worktree tinha commit que o PR não mostrava (force-push no meio) ⇒ espera
+  _msc_setup outro
+  ( cd "${MSC_WT}" && echo local > src/local.txt && git add src/local.txt && git -c user.email=t@t -c user.name=t commit -qm local ) >/dev/null 2>&1
+  _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "o verde lido não seria do head rebaseado" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (g) a worktree não estava no head julgado (verde de outro head) ⇒ espera, sem merge"
+  else record_fail "merge-skip-ci: (g) verde de outro head" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (h) o forge RECUSA o merge sem CI ⇒ na série volta a esperar (rc 4); direto, para sem declarar merge
+  _msc_setup outro; MSC_MERGE_RC=1 _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && grep -qF "o forge RECUSOU o merge sem o CI do head novo" <<< "${_o}"; then
+    _msc_setup outro; MSC_MERGE_RC=1 _msc
+    if [ "${_rc}" -eq 1 ] && grep -qF "nada foi mergeado" <<< "${_o}" && ! grep -q "MERGED — provado" <<< "${_o}"; then
+      record_pass "merge-skip-ci: (h) forge recusa o bypass ⇒ rc 4 na série (volta a esperar); direto, para sem declarar merge"
+    else record_fail "merge-skip-ci: (h) recusa direta" "rc=${_rc} out=${_o}"; fi
+  else record_fail "merge-skip-ci: (h) recusa na série" "rc=${_rc} out=${_o}"; fi
+
+  # (i) head novo não MERGEABLE ⇒ espera
+  _msc_setup outro; MSC_MERGEABLE_SEQ="CONFLICTING CONFLICTING" _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "o head novo está 'CONFLICTING', não MERGEABLE" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (i) head novo não MERGEABLE ⇒ espera, sem merge"
+  else record_fail "merge-skip-ci: (i) mergeable" "rc=${_rc} out=${_o}"; fi
+
+  # (l) ops/apply-ruleset-main.sh: toda label do script tem descrição ≤ 100 CARACTERES (a API dá 422 acima),
+  #     e o script RECUSA (rc 2, antes de qualquer chamada) uma descrição longa — o mutante é a de 101 de 2026-10-13
+  if [ -f "${ars}" ]; then
+    local _long
+    # o bloco da spec de labels (a atribuição entre aspas do script), lido por python — `sed` com âncora de
+    # símbolo de ops/ seria lido pela selftest_lanes como âncora morta (ela só procura em .claude/validation)
+    _long="$(LC_ALL=C python3 -I -c '
+import re, sys
+s = open(sys.argv[1], encoding="utf-8").read()
+m = re.search(r"^_LABELS_SPEC=\"(.*?)\"$", s, re.M | re.S)
+if not m: print("SPEC-AUSENTE"); sys.exit(0)
+for ln in m.group(1).splitlines():
+    p = ln.split("|", 2)
+    if len(p) == 3 and len(p[2]) > 100: print("%s=%d" % (p[0], len(p[2])))' "${ars}")"
+    local _mu="${d}/ars-mutante.sh"
+    sed 's/^review:ia|5319E7|.*"$/review:ia|5319E7|força o revisor de IA do CI neste PR, em qualquer ONION_REVIEW_MODE (D_REVIEW_MODE_SWITCH_PADRAO_OFF)"/' "${ars}" > "${_mu}"
+    local _mo _mrc _go _grc
+    _mo="$(ONION_RULESET_SPEC="${REPO_ROOT}/ops/github-ruleset-main.json" LC_ALL=C bash "${_mu}" --dry-run 2>&1)"; _mrc=$?
+    _go="$(ONION_RULESET_SPEC="${REPO_ROOT}/ops/github-ruleset-main.json" LC_ALL=C bash "${ars}" --dry-run 2>&1)"; _grc=$?
+    if [ -z "${_long}" ] && [ "${_grc}" -eq 0 ] && ! cmp -s "${_mu}" "${ars}" && [ "${_mrc}" -eq 2 ] \
+       && grep -qF "review:ia (101 caracteres)" <<< "${_mo}"; then
+      record_pass "merge-skip-ci: (l) labels do apply-ruleset-main.sh ≤ 100 caracteres; a de 101 (422 medido) é recusada antes da API"
+    else record_fail "merge-skip-ci: (l) label longa" "longas=[${_long}] rc_real=${_grc} rc_mut=${_mrc} mut=${_mo}"; fi
+  else record_skip "merge-skip-ci: (l) ops/apply-ruleset-main.sh ausente"; fi
+}
+_family run_merge_skip_ci_selftests || true
 
 # ── check-member-registered.sh: o registro é lido como YAML, não por regex de fim de linha ───────
 # POR QUE EXISTE (2026-10-07): a regex ancorada no fim da linha não casava `local_path: "/x"  # nota`,

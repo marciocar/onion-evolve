@@ -67,7 +67,22 @@ print(d["name"])
 ')" || exit 2
 
 _LABELS_SPEC="ci:full|B60205|força a bancada COMPLETA no PR (passo D de D_MERGE_PROCESS_ONION_2026_10)
-review:ia|5319E7|força o revisor de IA do CI neste PR, em qualquer ONION_REVIEW_MODE (D_REVIEW_MODE_SWITCH_PADRAO_OFF)"
+review:ia|5319E7|Força o revisor de IA do CI neste PR, em qualquer ONION_REVIEW_MODE"
+
+# A API de labels recusa descrição com mais de 100 CARACTERES (HTTP 422, medido em 2026-10-13: a de
+# `review:ia` tinha 101 — contados com python3, em LC_ALL=C — e o script morria depois de já ter aplicado o ruleset). A conta é feita aqui,
+# ANTES de qualquer chamada, em caracteres (não bytes: "ç" e "—" são um caractere para a API).
+# O texto de `review:ia` é o que a label já tem no repo (lido com gh label list em 2026-10-13).
+_LABEL_DESC_MAX=100
+_long="$(printf '%s\n' "${_LABELS_SPEC}" | python3 -I -c '
+import sys
+for ln in sys.stdin.read().splitlines():
+    if not ln.strip(): continue
+    p = ln.split("|", 2)
+    d = p[2] if len(p) > 2 else ""
+    if len(d) > int(sys.argv[1]): print("%s (%d caracteres)" % (p[0], len(d)))' "${_LABEL_DESC_MAX}")" \
+  || { echo "apply-ruleset-main: não consegui medir as descrições das labels" >&2; exit 2; }
+[ -z "${_long}" ] || { echo "apply-ruleset-main: descrição de label acima de ${_LABEL_DESC_MAX} caracteres (a API devolve 422): ${_long//$'\n'/; }" >&2; exit 2; }
 
 if [ "${DRY}" = "1" ]; then
   echo "── dry-run: ruleset '${NAME}' em repos/${REPO}/rulesets (cria ou atualiza pelo nome) ──"

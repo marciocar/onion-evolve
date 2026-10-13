@@ -8,7 +8,12 @@ meta:
                                # planos gratuitos de Mergify e Trunk e o estado do funador/claude-code-merge-queue.
                                # A metade doutrina (ímã, escritor único, catracas) é de 12m, mas o gatilho da Opção 3
                                # já disparou: a revisita real é o selo do maestro, não a data.
-  # ═══ TETO: 70 NÓS ═══
+  # ═══ TETO: 73 NÓS ═══
+  # (2026-10-13, +3: o SELO do maestro D_MERGE_SEM_CI_APOS_REBASE_LIMPO ("A agora, B se precisar", criado pelo
+  #  kg-decide-seal.sh --new), o nó OPEN do B (Q_MERGE_LOTE_COM_BISSECCAO, gated, com o gatilho medido nas
+  #  issues do alarme) e a EVIDÊNCIA da execução do A (E_MERGE_SEM_CI_EXECUTADO_2026_10_13). Resposta e
+  #  carimbo de execução, não pesquisa nova; o teto sobe DECLARADO em vez de colher um nó para caber.
+  #  Somado ao +2 do semáforo da máquina, que entrou antes na main: 70 → 73.)
   # (2026-10-13, +2: o SELO do maestro D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL — vagas de CPU da
   #  máquina para a bancada e nada de bancada completa local, a completa é do CI — e a EVIDÊNCIA da execução,
   #  E_SEMAFORO_DA_MAQUINA_MEDIDO_2026_10_13, com a medição antes/depois. Complemento do passo D, não onda
@@ -1212,6 +1217,51 @@ nodes:
       locator: "run_machine_slots_selftests, casos (a) a (g); mutantes M1-M10 no resíduo docs/evolution/review/feat-bench-machine-cpu-semaphore.md"
       method: "medição: família machine_slots sob LC_ALL=C, mutantes por ops/mutate-and-restore.sh e duas bancadas paralelas antes/depois com carga e pressão amostradas a cada 2 s, 2026-10-13"
       locality: "repo"
+  - id: D_MERGE_SEM_CI_APOS_REBASE_LIMPO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "decisão do maestro em 2026-10-13, por pergunta com opções (/meta:decide): escolhida «A agora, B se precisar»"
+    label: "Merge da fila sem esperar o CI do head novo quando o auto-rebase sai limpo, os checks exigidos estavam verdes no head anterior, o rebase não toca arquivo do PR e não há alarme de main aberto (A agora; lote com bissecção só se precisar)"
+    narrative: "Selado por /meta:decide em 2026-10-13: escolhida «A agora, B se precisar»; descartadas: «B direto (lote)» · «Juntar os PRs em 1» · «Manter como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-13: «Como acelerar a fila de merge quando vários PRs ficam prontos juntos?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      locality: "pessoa"
+  - id: Q_MERGE_LOTE_COM_BISSECCAO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "B (GATED): mergear em LOTE com bissecção quando o main quebrar? Gatilho medido: o main quebrar por COMBINAÇÃO de PRs que só a bancada completa pegou, contado pelas issues do alarme."
+    narrative: "Metade gated da decisão D_MERGE_SEM_CI_APOS_REBASE_LIMPO («A agora, B se precisar»). O A deixa entrar sem o CI do head novo dois PRs que mudam arquivos DIFERENTES e se quebram semanticamente: é a janela declarada, e a rede é a bancada completa no push ao main com o alarme de título fixo e o PR de revert (ops/testing/main-bench-alarm.sh). GATILHO, medido e não datado: uma issue do alarme cujo commit culpado é um merge que passou pelo caminho sem CI e cujo PR, sozinho, estava verde — isto é, a quebra veio da combinação. Contagem em 2026-10-13: ZERO issues do alarme no repo (gh issue list --state all, título fixo), logo zero quebras por combinação. Como recontar: gh issue list --state all filtrando o título fixo do alarme e, em cada uma, conferir se o PR culpado tem o comentário de auto-rebase dizendo «SEM esperar o CI do head novo». Não pré-cozinhar o desenho do lote: quando o gatilho disparar, derivar fresco contra o vivo."
+    trace: "ops/testing/main-bench-alarm.sh"
+  - id: E_MERGE_SEM_CI_EXECUTADO_2026_10_13
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-13"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families pr_merge_verified,merge_serial,two_tier_bench,merge_skip_ci → 89 passaram, 0 falharam; 15 mutantes por ops/mutate-and-restore.sh, 15 reprovaram o caso esperado"
+    source_tier: 10
+    source_kind: primary
+    label: "A executado: depois de auto-rebase limpo o verificado mergeia sem esperar o CI do head novo, pelo bypass do ruleset com --match-head-commit, e cada condição que falha volta à espera (rc 4 na série)."
+    narrative: "O QUE O RULESET EXIGE DE FATO (lido ao vivo com gh api repos/marciocar/onion-evolve/rulesets/25001643, 2026-10-13): required_status_checks selftest-gate e lint-onion-artifacts do app 15368, strict_required_status_checks_policy false, bypass_actors RepositoryRole 5 (admin) com bypass_mode pull_request, current_user_can_bypass pull_requests_only. A doc REST de rules diz que pull_request significa que o ator só pode contornar regras em pull requests; a doc de regras disponíveis não diz em QUAL commit os checks são exigidos, e o gh pr merge (v2.96.0) avisa que, com checks pendentes, LIGA o auto-merge em vez de mergear. Logo um head recém-empurrado sem checks não mergeia sem o bypass; o GitHub rebasear no merge não serve porque o auto-rebase só roda em PR CONFLICTING, que o forge não rebaseia. DESENHO: gates contra o head ANTERIOR (verde lido por SHA), merge por gh pr merge --rebase --admin --match-head-commit <head novo>; forge recusou ⇒ rc 4 e espera. Condições (todas, cada uma falhando para a espera): opt-out --wait-ci-after-rebase; worktree no head julgado; nenhum alarme aberto (leitura falha ⇒ espera); exigidos verdes e nenhum outro falho não dispensado no head anterior; o diff da main entre merge-bases não toca arquivo do PR, fora projeção gerada (é ela que conflita; medido no #1071); head novo MERGEABLE; o ruleset sem regra além dos checks (o --admin contorna o ruleset inteiro). Casos (a)-(j) e (l) na família merge_skip_ci, (wf) na merge_serial. Conserto junto: a label review:ia tinha descrição de 101 caracteres (a API devolve 422 acima de 100); agora usa o texto que já vive no repo, e o script recusa descrição longa antes de qualquer chamada. NÃO MEDIDO AO VIVO: o bypass por --admin no forge (nenhum merge real foi feito nesta execução); se o forge recusar, o caminho volta a esperar sozinho. Tempo esperado por PR na fila: o do rebase (pr-finalize, da ordem de 1 a 3 min) mais o merge, em vez de 20 a 25 min."
+    trace: "ops/pr-merge-verified.sh"
+    provenance:
+      source: "ops/pr-merge-verified.sh + ops/merge-serial.sh + ops/apply-ruleset-main.sh + famílias merge_skip_ci e merge_serial de .claude/validation/lint-selftest.sh"
+      locator: "run_merge_skip_ci_selftests, casos (a) (b) (c) (c2) (c3) (j) (d) (d2) (e) (f) (g) (h) (i) (l); run_merge_serial_selftests caso (wf); mutantes no resíduo docs/evolution/review/feat-merge-skip-ci-rerun-on-clean-rebase.md"
+      method: "medição: bancada das quatro famílias 89/89 sob LC_ALL=C e 15 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso; leitura ao vivo do ruleset pela API, 2026-10-13"
+      locality: "repo"
 edges:
   - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
     to: C_OPCAO_A_CURE_MAGNET_FILE
@@ -1495,3 +1545,15 @@ edges:
   - from: E_SEMAFORO_DA_MAQUINA_MEDIDO_2026_10_13
     to: D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL
     edge_type: SUPPORTS
+  - from: D_MERGE_SEM_CI_APOS_REBASE_LIMPO
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: TRACES_TO
+  - from: Q_MERGE_LOTE_COM_BISSECCAO
+    to: D_MERGE_SEM_CI_APOS_REBASE_LIMPO
+    edge_type: DEPENDS_ON
+  - from: E_MERGE_SEM_CI_EXECUTADO_2026_10_13
+    to: D_MERGE_SEM_CI_APOS_REBASE_LIMPO
+    edge_type: SUPPORTS
+  - from: E_MERGE_SEM_CI_EXECUTADO_2026_10_13
+    to: D_RULESET_BYPASS_SO_EM_PR
+    edge_type: TRACES_TO
