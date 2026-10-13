@@ -1,7 +1,7 @@
 ---
 branch: fix/client-terms-default-core-only
 date: 2026-10-13
-reviewed_diff_sha256: 265413917e05d4bac586822a49cb53a08162a3d1e7dc4da69f8bef3ab9c372f3
+reviewed_diff_sha256: ce4d023dd87ec45a3d1389125d35ecad6c38de7e239d06b89ff7923ef260b5e6
 reviewed_code_sha256: b731c0bf5befcccb1b7ff689879adfcf8a9c560667fb46489d940a5ae17f8698
 findings_total: 7
 findings_real: 3
