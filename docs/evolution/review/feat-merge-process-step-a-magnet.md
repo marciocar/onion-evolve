@@ -2,7 +2,7 @@
 title: 'Resíduo adversarial — o painel de testes deixa de ser o arquivo-ímã, e a catraca ganhou linha de base'
 date: 2026-10-13
 branch: feat/merge-process-step-a-magnet
-reviewed_diff_sha256: a7f848764f8df66e7018187827b12255c5e2d30a95ee067a6d347f1b482330e2
+reviewed_diff_sha256: 1a3059fc918db55d0e280fb316bc441c919e1ce981928f24d1e6f14ca28c63ca
 reviewed_code_sha256: 4b200facb20bf38b84024592b5701146dc7e19aa9ddfbd526d47b7533db7e387
 findings_total: 8
 findings_real: 8
