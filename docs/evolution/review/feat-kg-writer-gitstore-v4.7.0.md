@@ -1,7 +1,8 @@
 ---
 branch: feat/kg-writer-gitstore-v4.7.0
 date: 2026-10-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e4a3537d94579a798001f6d38e42aa72dc40a5e84844d42bcbd0e2a3c94efc56
+reviewed_code_sha256: 900182da1a0fb0ff0890e71cb11932cd9f7561f07086cd3d899629993fc530ec
 findings_total: 9
 findings_real: 9
 findings_fixed: 7
