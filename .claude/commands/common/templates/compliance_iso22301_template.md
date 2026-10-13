@@ -10,7 +10,7 @@ Este template orienta a geração da documentação de BCMS conforme ISO 22301:2
 **Use este template para:**
 - Gerar os 5 documentos de continuidade de negócios e disaster recovery
 - Produzir evidências auditáveis para due diligence e certificações
-- Cobrir requisitos de clientes enterprise (ex.: Serasa Experian, bancos, seguradoras)
+- Cobrir requisitos de clientes enterprise (ex.: um birô de crédito como a fictícia CrediFicta, bancos, seguradoras)
 - Instalar o framework em qualquer projeto ou setor
 
 > **Genérico por design.** Este template não assume empresa, setor, infraestrutura nem provedor de cloud. Substitua os placeholders `[NOME DA EMPRESA]`, `[SERVIÇO CRÍTICO]`, `[PRIMÁRIO]`, `[DR SITE]` etc. com os valores reais do projeto-alvo.

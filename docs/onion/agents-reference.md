@@ -48,7 +48,7 @@ Este guia documenta os agentes especializados disponíveis no sistema `.claude/`
 ```bash
 @onion "Como desenvolver uma feature completa do zero?"
 @onion "Qual comando usar para criar uma task no ClickUp?"
-@onion "Preciso gerar documentação de compliance para Serasa"
+@onion "Preciso gerar documentação de compliance para CrediFicta"
 ```
 
 **Capacidades**:
@@ -355,7 +355,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 
 **Quando usar**:
 -  Gerar documentação de compliance multi-framework
--  Analisar requisitos de due diligence (ex: Serasa Experian)
+-  Analisar requisitos de due diligence (ex: CrediFicta)
 -  Coordenar múltiplos specialists de compliance
 -  Preparar documentação para auditorias e certificações
 -  Consolidar outputs de frameworks diferentes
@@ -367,7 +367,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 **Exemplo de uso**:
 ```bash
 # Orquestração automática baseada em checklist
-@security-information-master "Analisar checklist Serasa e gerar documentação necessária"
+@security-information-master "Analisar checklist CrediFicta e gerar documentação necessária"
 
 # Due diligence completo
 @security-information-master "Preparar docs para auditoria ISO 27001 + SOC2"
@@ -442,7 +442,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 -  Business Continuity Plan (BCP) com Business Impact Analysis
 -  Disaster Recovery Plan (DRP) para ambientes tecnológicos
 -  Crisis Management Plan com canais de comunicação
--  **Due Diligence Serasa Experian** (5 de 8 requisitos cobertos) 🔥
+-  **Due Diligence CrediFicta** (5 de 8 requisitos cobertos) 🔥
 -  Documentação de RTOs/RPOs por criticidade de sistema
 
 **Ferramentas disponíveis**: `Read`, `Write`, `Edit`, `Grep`, `Grep`
@@ -452,22 +452,22 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 # BC/DR completo
 @iso-22301-specialist "Gerar BCP + DRP para infraestrutura AWS Multi-AZ"
 
-# Due Diligence Serasa
-@iso-22301-specialist "Documentar 5 requisitos Serasa: BCP, DRP, Crisis, Testing, RTOs/RPOs"
+# Due Diligence CrediFicta
+@iso-22301-specialist "Documentar 5 requisitos CrediFicta: BCP, DRP, Crisis, Testing, RTOs/RPOs"
 
 # Testes de resiliência
 @iso-22301-specialist "Documentar DR Drill 2024 com RTO 30min alcançado"
 ```
 
 **5 Documentos Gerados** (`docs/compliance-context/business-continuity/`):
-1. `business-continuity-plan.md` - BCP com BIA (Serasa Req #1) ✅
-2. `disaster-recovery-plan.md` - DRP com runbooks (Serasa Req #2) ✅
-3. `crisis-management.md` - CMT + Serasa contacts (Serasa Req #3) ✅
-4. `resilience-testing.md` - Evidências 2024 (Serasa Req #4) ✅
-5. `recovery-objectives.md` - RTOs/RPOs por tier (Serasa Req #5) ✅
+1. `business-continuity-plan.md` - BCP com BIA (CrediFicta Req #1) ✅
+2. `disaster-recovery-plan.md` - DRP com runbooks (CrediFicta Req #2) ✅
+3. `crisis-management.md` - CMT + CrediFicta contacts (CrediFicta Req #3) ✅
+4. `resilience-testing.md` - Evidências 2024 (CrediFicta Req #4) ✅
+5. `recovery-objectives.md` - RTOs/RPOs por tier (CrediFicta Req #5) ✅
 
 **Características únicas**:
-- 🚨 **Serasa-Ready**: 5 de 8 requisitos Serasa Experian (62.5%) ✅
+- 🚨 **CrediFicta-Ready**: 5 de 8 requisitos CrediFicta (62.5%) ✅
 - ⏱️ **RTOs/RPOs Realistas**: Baseados em BIA, não aspiracionais
 - 📊 **Scenario-Based**: Planos baseados em cenários reais de desastre
 - 🧪 **Testable**: Todos planos são testáveis (evidências de testes anuais)
@@ -525,7 +525,7 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 **Quando usar**:
 -  Preparação para SOC2 Type II audit
 -  Trust Services Criteria (Security, Availability, Confidentiality)
--  **Due Diligence Serasa Experian** (3 de 8 requisitos cobertos) 🔥
+-  **Due Diligence CrediFicta** (3 de 8 requisitos cobertos) 🔥
 -  Estratégia de coleta de evidências (12 meses)
 -  Integração com ISO 27001 (~70% overlap)
 
@@ -536,30 +536,30 @@ Catálogo completo da categoria `development/` (18 agentes — descrições deri
 # SOC2 Type II completo
 @soc2-specialist "Preparar documentação SOC2 Type II para fintech SaaS"
 
-# Due Diligence Serasa
-@soc2-specialist "Documentar 3 requisitos Serasa: Relatório SOC2 + SLAs + Contratos"
+# Due Diligence CrediFicta
+@soc2-specialist "Documentar 3 requisitos CrediFicta: Relatório SOC2 + SLAs + Contratos"
 
 # Evidence Collection
 @soc2-specialist "Criar estratégia de evidências para 12 meses de audit period"
 ```
 
 **5 Documentos Gerados** (`docs/compliance-context/soc2/`):
-1. `trust-services-criteria.md` - 5 TSC principles, Type II overview (Serasa Req #6) ✅
+1. `trust-services-criteria.md` - 5 TSC principles, Type II overview (CrediFicta Req #6) ✅
 2. `security-controls.md` - CC6/CC7 (auth, encryption, monitoring, incidents)
-3. `availability-controls.md` - A1 (HA, SLAs, DR) (Serasa Req #7, #8) ✅
+3. `availability-controls.md` - A1 (HA, SLAs, DR) (CrediFicta Req #7, #8) ✅
 4. `confidentiality-controls.md` - C1 (classification, NDAs, DLP, disposal)
 5. `evidence-collection.md` - Automation matrix, audit prep checklist
 
 **Características únicas**:
-- 🚨 **Serasa-Ready**: 3 de 8 requisitos Serasa Experian (37.5%) ✅
-- 🎯 **Combined Coverage**: ISO 22301 + SOC2 = 8/8 Serasa (100%) ✅
+- 🚨 **CrediFicta-Ready**: 3 de 8 requisitos CrediFicta (37.5%) ✅
+- 🎯 **Combined Coverage**: ISO 22301 + SOC2 = 8/8 CrediFicta (100%) ✅
 - 🔗 **ISO 27001 Cross-Ref**: ~70% controles sobrepõem (documentado)
 - 📊 **Evidence-First**: Todo controle tem evidência coletável para Type II
 - 🤖 **Automation**: Scripts de coleta automática de evidências (monthly)
 
 ---
 
-**Mapeamento Serasa Experian** (8 requisitos totais):
+**Mapeamento CrediFicta** (8 requisitos totais):
 | Requisito | Framework | Specialist | Documento |
 |-----------|-----------|------------|-----------|
 | #1: BCP | ISO 22301 | `@iso-22301-specialist` | business-continuity-plan.md ✅ |

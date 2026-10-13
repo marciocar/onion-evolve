@@ -48,11 +48,11 @@ Você **gera documentação de controles SOC2** seguindo:
 ### Criticidade para Due Diligence
 **Este framework é CRÍTICO para clientes enterprise.**
 
-**Exemplo Real - Serasa Experian (8 requisitos):**
+**Exemplo ilustrativo - CrediFicta, birô de crédito fictício (8 requisitos):**
 - ✅ **3 de 8 requisitos mapeiam diretamente para SOC2**
-- Cobertura: 37.5% do checklist Serasa via este framework
+- Cobertura: 37.5% do checklist CrediFicta via este framework
 
-**Total com ISO 22301:** 8/8 requisitos Serasa (100%) ✅
+**Total com ISO 22301:** 8/8 requisitos CrediFicta (100%) ✅
 
 ### Abordagem
 - **Evidence-First**: Todo controle tem evidência coletável
@@ -63,7 +63,7 @@ Você **gera documentação de controles SOC2** seguindo:
 
 ## 📋 Documentos a Gerar (5)
 
-| # | Documento | Arquivo | TSC Category | Serasa Mapping |
+| # | Documento | Arquivo | TSC Category | CrediFicta Mapping |
 |---|-----------|---------|--------------|----------------|
 | 1 | Trust Services Criteria (TSC) | `trust-services-criteria.md` | Overview | Req #6 ✅ |
 | 2 | Controles de Segurança | `security-controls.md` | Security (CC) | - |
@@ -73,7 +73,7 @@ Você **gera documentação de controles SOC2** seguindo:
 
 **Output Directory:** `docs/compliance-context/soc2/`
 
-**🚨 SERASA EXPERIAN MAPPING:**
+**🚨 CREDIFICTA MAPPING:**
 ```markdown
 Requisito #6: Certificado ISO 22301 ou relatório SOC2
 → trust-services-criteria.md (overview do SOC2 report)
@@ -85,7 +85,7 @@ Requisito #8: Documentação Contratual SLAs
 → availability-controls.md (A1.2 - SLAs em contratos)
 
 Status: 3/3 requisitos SOC2 cobertos ✅
-Combined with ISO 22301: 8/8 requisitos Serasa (100%) ✅
+Combined with ISO 22301: 8/8 requisitos CrediFicta (100%) ✅
 ```
 
 ---
@@ -99,7 +99,7 @@ Este template contém:
 - 5 Trust Services Principles (Security, Availability, Processing Integrity, Confidentiality, Privacy)
 - Common Criteria (CC) aplicáveis a todos
 - Controles específicos por categoria
-- Mapeamento Serasa Experian
+- Mapeamento CrediFicta
 - Cross-reference com ISO 27001 (~70% overlap)
 - Estratégia de evidências para Type II
 
@@ -110,7 +110,7 @@ Este template contém:
 ### Propósito
 Overview dos Trust Services Criteria (TSC) e preparação para SOC2 Type II audit.
 
-**Serasa Mapping:** Requisito #6 ✅
+**CrediFicta Mapping:** Requisito #6 ✅
 
 ### Seções Obrigatórias
 
@@ -164,7 +164,7 @@ Sistema disponível para operação e uso conforme acordado (SLAs).
 
 **Cross-reference:** ISO 22301 DRP (~60% overlap)
 
-**🚨 SERASA:** Requisitos #7 e #8 mapeiam aqui ✅
+**🚨 CREDIFICTA:** Requisitos #7 e #8 mapeiam aqui ✅
 
 ---
 
@@ -244,7 +244,7 @@ PII coletada, usada, retida, divulgada e descartada conforme privacidade policy 
 - Tooling (evidence collection): R$ 5k-10k/ano
 
 **ROI:**
-- Desbloqueio de contratos enterprise (exemplo: Serasa)
+- Desbloqueio de contratos enterprise (exemplo: CrediFicta)
 - Premium pricing (clientes pagam mais por SOC2-compliant providers)
 - Redução de questionnaires (1 SOC2 report > 50 security questionnaires)
 
@@ -351,7 +351,7 @@ Incidentes de segurança são detectados, reportados e respondidos tempestivamen
 
 **Implementação:**
 - **Detection:** EDR (endpoint), WAF (web), IDS (network)
-- **Reporting:** security@empresa.com, Slack #security-incidents
+- **Reporting:** security@empresa.example, Slack #security-incidents
 - **Response:** Incident Response Plan (ISO 27001 doc)
 - **Post-Mortem:** Retrospectiva obrigatória (lessons learned)
 
@@ -370,7 +370,7 @@ Incidentes de segurança são detectados, reportados e respondidos tempestivamen
 ### Propósito
 Documentar controles de Availability (A) incluindo SLAs, HA, DR.
 
-**Serasa Mapping:** Requisitos #7 e #8 ✅
+**CrediFicta Mapping:** Requisitos #7 e #8 ✅
 
 ### Seções Obrigatórias
 
@@ -410,7 +410,7 @@ Infraestrutura projetada para alta disponibilidade.
 **Controle:**
 SLAs de disponibilidade são documentados, monitorados e reportados.
 
-**🚨 SERASA MAPPING: Requisitos #7 e #8 ✅**
+**🚨 CREDIFICTA MAPPING: Requisitos #7 e #8 ✅**
 
 **SLAs Oferecidos:**
 
@@ -434,28 +434,28 @@ Exemplo (mês de 30 dias):
 **Monitoramento:**
 - **Synthetic Monitoring:** Pingdom/UptimeRobot (external checks a cada 1min)
 - **Real User Monitoring (RUM):** DataDog (browser/mobile metrics)
-- **Status Page:** status.empresa.com (público, transparente)
+- **Status Page:** status.empresa.example (público, transparente)
 - **SLA Dashboard:** Internal dashboard (DataDog/Grafana)
 
 **Evidências:**
-- **Contrato com Serasa:** Seção X.Y.Z - SLAs de Disponibilidade ✅
+- **Contrato com CrediFicta:** Seção X.Y.Z - SLAs de Disponibilidade ✅
 - **Status Page:** Historical uptime reports (mensal) ✅
 - **Monitoring Screenshots:** Pingdom reports (99.95% last 30 days) ✅
 - **Incident Reports:** Downtimes documentados e explicados ✅
 
-**Confirmação para Serasa:**
+**Confirmação para CrediFicta:**
 ```markdown
 ### Confirmação de SLAs (Requisito #7)
 
-Confirmamos que os SLAs oferecidos para Serasa Experian são:
+Confirmamos que os SLAs oferecidos para CrediFicta são:
 
 - **API REST:** 99.9% uptime mensal
 - **Response Time (p95):** < 500ms
 - **Support (P1):** Response < 4h, Resolution < 24h
 
 **Evidências:**
-- Contrato assinado (anexo-serasa-contract.pdf)
-- Status page histórico: https://status.empresa.com
+- Contrato assinado (anexo-credificta-contract.pdf)
+- Status page histórico: https://status.empresa.example
 - Monitoramento externo: Pingdom reports (anexo-pingdom.pdf)
 
 Última revisão: [Data]
@@ -466,7 +466,7 @@ Assinado por: [CTO Nome]
 ```markdown
 ### Documentação Contratual de SLAs
 
-**Referência:** Contrato Serasa Experian - Seção 5.3 (Service Level Agreements)
+**Referência:** Contrato CrediFicta - Seção 5.3 (Service Level Agreements)
 
 **Cláusula 5.3.1 - Uptime:**
 "O Fornecedor garante disponibilidade de 99.9% (nove vírgula nove por cento) mensal para todos os serviços críticos conforme definido no Anexo A."
@@ -477,7 +477,7 @@ Assinado por: [CTO Nome]
 **Cláusula 5.3.3 - Monitoramento:**
 "O Fornecedor disponibilizará status page público e relatórios mensais de uptime."
 
-**Arquivo:** [contrato-serasa-experian-2024.pdf]  
+**Arquivo:** [contrato-credificta-2024.pdf]  
 **Data de Assinatura:** [YYYY-MM-DD]  
 **Vigência:** [Data início] até [Data fim]
 ```
@@ -753,7 +753,7 @@ Write docs/compliance-context/soc2/confidentiality-controls.md
 Write docs/compliance-context/soc2/evidence-collection.md
 ```
 
-**4. Confirmar Conclusão com Serasa Mapping:**
+**4. Confirmar Conclusão com CrediFicta Mapping:**
 ```markdown
 ✅ SOC2 DOCUMENTATION COMPLETED
 
@@ -766,13 +766,13 @@ Documentos Gerados:
 
 Output Directory: docs/compliance-context/soc2/
 
-🚨 SERASA EXPERIAN MAPPING:
+🚨 CREDIFICTA MAPPING:
 ✅ Requisito #6: Certificado/Relatório SOC2 → trust-services-criteria.md
 ✅ Requisito #7: Confirmação SLAs → availability-controls.md (A1.2)
 ✅ Requisito #8: Documentação SLAs → availability-controls.md (contract clause)
 
 Status: 3/3 requisitos SOC2 cobertos ✅
-Combined with ISO 22301: 8/8 requisitos Serasa (100%) ✅
+Combined with ISO 22301: 8/8 requisitos CrediFicta (100%) ✅
 
 **ISO 27001 Cross-Reference:**
 ~70% dos controles SOC2 sobrepõem com ISO 27001:
@@ -791,26 +791,26 @@ Pronto para consolidação no index.md pelo @security-information-master.
 - [ ] 5 documentos criados em `docs/compliance-context/soc2/`
 - [ ] Idioma PT-BR (exceto termos: Trust Services Criteria, Type II, Common Criteria, etc.) ✅
 - [ ] 5 TSC principles documentados (Security, Availability, PI, Confidentiality, Privacy)
-- [ ] SLAs Serasa documentados (Req #7, #8) ✅
+- [ ] SLAs CrediFicta documentados (Req #7, #8) ✅
 - [ ] SOC2 Type II overview (Req #6) ✅
 - [ ] Evidence collection strategy completa
 - [ ] Cross-reference com ISO 27001 explícito (70% overlap)
-- [ ] Serasa mapping validado (3/3 requisitos) ✅
+- [ ] CrediFicta mapping validado (3/3 requisitos) ✅
 - [ ] Template seguido fielmente
 
 ### Qualidade
 - Evidence-first (todo controle tem evidência coletável)
 - Audit-ready (preparado para Type II audit)
 - ISO 27001 aware (referencia docs existentes para overlaps)
-- Serasa-ready (requisitos Serasa 100% cobertos com ISO 22301)
+- CrediFicta-ready (requisitos CrediFicta 100% cobertos com ISO 22301)
 
 ---
 
 **Status**: 🚀 READY FOR DOCUMENTATION GENERATION  
 **Framework**: SOC2 Type II (AICPA TSC)  
 **Output**: 5 documentos TSC  
-**Serasa Coverage**: 3/3 requisitos (37.5% do checklist) ✅  
-**Combined Coverage**: 8/8 requisitos Serasa (100% com ISO 22301) ✅  
+**CrediFicta Coverage**: 3/3 requisitos (37.5% do checklist) ✅  
+**Combined Coverage**: 8/8 requisitos CrediFicta (100% com ISO 22301) ✅  
 **ISO 27001 Overlap**: ~70% ✅  
 **Language**: PT-BR + EN-US technical terms  
 **Última Atualização**: 2025-06-03

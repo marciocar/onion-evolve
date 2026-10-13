@@ -387,7 +387,7 @@ docs/business-context/
 # → Output: docs/compliance-context/security/ + docs/compliance-context/soc2/
 
 # Exemplo de uso - Modo Due Diligence
-/docs/build-compliance due-diligence="docs/serasa-requirements.md"
+/docs/build-compliance due-diligence="docs/credificta-requirements.md"
 # → Analisa checklist automaticamente
 # → Detecta frameworks necessários (ISO 22301 + SOC2)
 # → Gera docs/compliance-context/ com 8/8 requisitos cobertos
@@ -422,7 +422,7 @@ docs/business-context/
 **Idioma**: PT-BR (conteúdo) + EN-US (termos técnicos preservados: "Risk Assessment (Avaliação de Riscos)")
 
 **Mapeamento Due Diligence**:
-- **Serasa Experian**: 8/8 requisitos cobertos (ISO 22301: 5 reqs, SOC2: 3 reqs) ✅
+- **CrediFicta**: 8/8 requisitos cobertos (ISO 22301: 5 reqs, SOC2: 3 reqs) ✅
 - Cross-references automáticos entre frameworks (ISO 27001 ↔ SOC2: ~70% overlap)
 
 ### `/docs/build-index`
