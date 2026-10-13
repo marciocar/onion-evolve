@@ -1,7 +1,8 @@
 ---
 branch: fix/door-machine-paths
 date: 2026-10-13
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 61e0a725f11e03a101bc8d497ad54d34619848ec5ab00f94d1956e7de2722856
+reviewed_code_sha256: 598f54249a836fc933c541baecf416fd31044854e5b6a35dd663326a8cde4d3c
 findings_total: 2
 findings_real: 1
 findings_fixed: 1
