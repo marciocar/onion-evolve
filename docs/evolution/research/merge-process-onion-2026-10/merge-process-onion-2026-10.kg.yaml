@@ -8,7 +8,11 @@ meta:
                                # planos gratuitos de Mergify e Trunk e o estado do funador/claude-code-merge-queue.
                                # A metade doutrina (ímã, escritor único, catracas) é de 12m, mas o gatilho da Opção 3
                                # já disparou: a revisita real é o selo do maestro, não a data.
-  # ═══ TETO: 64 NÓS ═══
+  # ═══ TETO: 65 NÓS ═══
+  # (64 escritos pelo run + 1 nó de SELO do maestro, D_REQUIRED_CHECKS_RULESET_MAIN, criado pelo
+  #  kg-decide-seal.sh --new em 2026-10-13. Não é onda nova de pesquisa: é a resposta à pergunta
+  #  feita sobre C_OPCAO_E. O selador não confere este teto (o gate dele é radar + contrato) e a
+  #  REGRA 58 reprovou no pr-finalize; o teto sobe DECLARADO em vez de colher um nó para caber.)
   #
   # Pesquisa /onion-research --mode decision (wf_48596b33-657, 2026-10-13) sobre o processo de PR, CI e merge do core.
   # Varredura larga: 21 claims confirmadas por votação, 4 refutadas, 30 fontes e 32 claims cortadas por orçamento.

@@ -4,9 +4,9 @@ date: 2026-10-13
 branch: feat/merge-process-step-a-magnet
 reviewed_diff_sha256: 0e1364c80a58f6b1991437ef03bbe9b171eab155847aaf91e0b64a37300ad045
 reviewed_code_sha256: 63facdf57fa757c62c5eca2958b9d08a7532d1856f8659577114a303d59e522f
-findings_total: 7
-findings_real: 7
-findings_fixed: 6
+findings_total: 8
+findings_real: 8
+findings_fixed: 7
 tokens: 129902
 duration_min: 4
 verdict: REPROVADO_E_CURADO
@@ -17,7 +17,7 @@ nota: >-
   versionado ficou invariante ao PR, a REGRA 81 continua barrando número digitado, e nenhum leitor do
   painel quebrou. Achou um defeito ALTO, que era meu e anterior à mudança, mas que o commit passou a
   alegar ter provado. Achou também um MÉDIO, uma nota que afirmava mais do que o medido. O mutante
-  achou um 7º. Um achado fica declarado, sem cura.
+  achou um 7º e o pr-finalize, um 8º (REGRA 58). Um achado fica declarado, sem cura.
 ---
 
 # O painel deixou de mudar por PR. A prova da catraca era vácua.
@@ -83,3 +83,12 @@ falha continua virando `⊘`, o que muda o versionado.
   `docs/onion/testing-state.md`. Com dois resíduos de conteúdo idêntico, o rebase sai limpo, mas o
   painel fica **defasado** (REGRA 81 vermelha), e o commit de regeneração vira o próximo conflito.
 - **Depois**: 0 de 2 PRs tocam o painel, o rebase sai limpo e o painel fica em sincronia.
+
+## 8. (curado, achado pelo pr-finalize) O selo novo estourou o teto do grafo
+
+O `kg-decide-seal.sh --new` criou o 65º nó num grafo que declarava `TETO: 64 NÓS`, e saiu com rc 0,
+porque o gate do selador é só o radar e o contrato. O lint do commit reprovou pela REGRA 58 (O backlog
+cumpre as promessas do próprio `meta:`). O teto sobe para 65 **declarado** no `meta:`: o nó é
+resposta do maestro, não onda nova de pesquisa. Fica como achado para o selador. Ele deveria conferir
+o teto antes de escrever, ou recusar com rc 2 nomeando a REGRA 58. Não curei aqui porque está fora
+do escopo do passo A.
