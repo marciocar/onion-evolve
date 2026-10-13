@@ -1,5 +1,5 @@
 {
-  "description": "Carimbo sem alvo (v4.1, Q_RADAR_WARNINGS_WITHOUT_CASES): claim com verified_at e sem verified_against alerta (os outros tipos já se ancoram por outro campo), porque o carimbo sem alvo não distingue verificado de declarado. É o UNANCHORED do radar.",
+  "description": "Carimbo sem alvo (v4.1): claim com verified_at e sem verified_against alerta (os outros tipos já se ancoram por outro campo), porque o carimbo sem alvo não distingue verificado de declarado. É o UNANCHORED do radar.",
   "layer": "form",
   "pending_on": [],
   "cases": [

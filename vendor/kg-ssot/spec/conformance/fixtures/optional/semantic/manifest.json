@@ -1,11 +1,11 @@
 {
-  "description": "A camada semântica do radar (E3: T14, T15, T16), em optional/: o contrato ainda não a torna MUST, e o leitor de referência não a implementa. Esperado escrito a partir do comportamento documentado do kg-radar.sh: REFUTES sobre nó confirmed é contradição e reprova; só alertam o SUPERSEDES de um nó vivo sobre um alvo que segue valendo (superseder open não cobra, a relação ainda não assentou), a pergunta que recebe SUPERSEDES e segue aberta, decision done em DEV e o nó de frescor rastreado (verified_against ou plane PROD) sem verified_at (STALE-MISSING). Desde o v4.1 (Q_RADAR_WARNINGS_WITHOUT_CASES), também os avisos que ficam só do radar porque dependem de referência fora do nó ou de heurística: STALE-OLD (meta.baseline), revisita vencida (data de hoje; o caso usa uma data fixa no passado), relato sem marca de testemunho (heurística sobre o texto de verified_against) e as cinco checagens de completude da camada domain.",
+  "description": "A camada semântica do radar, em optional/: o contrato ainda não a torna MUST, e o leitor de referência não a implementa. Esperado escrito a partir do comportamento documentado do radar (o leitor do framework onde o formato nasceu): REFUTES sobre nó confirmed é contradição e reprova; só alertam o SUPERSEDES de um nó vivo sobre um alvo que segue valendo (superseder open não cobra, a relação ainda não assentou), a pergunta que recebe SUPERSEDES e segue aberta, decision done em DEV e o nó de frescor rastreado (verified_against ou plane PROD) sem verified_at (STALE-MISSING). Desde o v4.1, também os avisos que ficam só do radar porque dependem de referência fora do nó ou de heurística: STALE-OLD (meta.baseline), revisita vencida (data de hoje; o caso usa uma data fixa no passado), relato sem marca de testemunho (heurística sobre o texto de verified_against) e as cinco checagens de completude da camada domain.",
   "layer": "semantic",
   "pending_on": [],
   "cases": [
     {
       "file": "bad-refutes-confirmed.kg.yaml",
-      "description": "REFUTES sobre um nó que segue confirmed: contradição (T15)",
+      "description": "REFUTES sobre um nó que segue confirmed: contradição",
       "valid": false,
       "codes": [
         "semantic.contradiction"
@@ -25,7 +25,7 @@
     },
     {
       "file": "warn-supersedes-unreconciled.kg.yaml",
-      "description": "SUPERSEDES de um nó confirmed sobre um nó que segue confirmed: o radar só alerta (Aufhebung por reconciliar, T16)",
+      "description": "SUPERSEDES de um nó confirmed sobre um nó que segue confirmed: o radar só alerta (Aufhebung por reconciliar)",
       "valid": true,
       "codes": [],
       "warnings": [
@@ -61,7 +61,7 @@
     },
     {
       "file": "warn-decision-done-in-dev.kg.yaml",
-      "description": "decision done em plane DEV: o radar só alerta (pede verificação em PROD, T16)",
+      "description": "decision done em plane DEV: o radar só alerta (pede verificação em PROD)",
       "valid": true,
       "codes": [],
       "warnings": [

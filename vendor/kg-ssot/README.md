@@ -6,11 +6,11 @@
 dela, e o CI recusa a que não diz.**
 
 [![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
-[![Contrato: v4 · release 4.7.1](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.7.1-6f42c1)](spec/release.json)
+[![Contrato: v4 · release 4.7.2](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.7.2-6f42c1)](spec/release.json)
 [![Suíte: 225/225](https://img.shields.io/badge/su%C3%ADte-225%2F225-2ea44f)](spec/conformance/README.md)
 [![Python 3](https://img.shields.io/badge/python-3-3776ab)](tools/requirements.txt)
 
-[Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md)
+[Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
 
 </div>
 
@@ -26,7 +26,8 @@ apressada.
 O KG-SSOT trata isso como problema de **formato**, não de disciplina. O conhecimento vive num grafo `.kg.yaml`,
 versionado junto do código, e um **contrato formal** decide no CI o que reprova:
 
-- um nó `confirmed` ou de produção **sem proveniência** reprova;
+- um nó `confirmed` ou de produção **sem proveniência** reprova (o que não tem fonte recuperável se declara
+  `unverifiable`);
 - uma fonte que é só um marcador (`unknown`, `n/a`, `tbd`) reprova;
 - uma aresta que aponta para o nada reprova, e um nó solto também;
 - um carimbo de verificação sem alvo, uma decisão sem origem e uma produção apoiada só em relato **alertam**.
@@ -34,7 +35,7 @@ versionado junto do código, e um **contrato formal** decide no CI o que reprova
 ## Comece em 60 segundos
 
 ```bash
-git clone <este repositório> kg-ssot && cd kg-ssot
+git clone https://github.com/marciocar/kg-ssot && cd kg-ssot
 python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
 
 # a suíte de conformidade contra o leitor de referência
@@ -102,7 +103,7 @@ flowchart LR
 
 1. **O contrato** é JSON Schema 2020-12 em dois níveis: **MUST** reprova, **SHOULD** alerta. As regras que o
    schema não alcança (ids únicos, pontas existentes, nó órfão) são parte dele.
-2. **A suíte** é a prova de compatibilidade: cada caso é um `.kg.yaml` real com o veredito e os códigos
+2. **A suíte** é a prova de compatibilidade: cada caso é um arquivo YAML real com o veredito e os códigos
    esperados, e o leitor passa só se emitir **exatamente** os mesmos códigos.
 3. **O kit** leva o contrato a um repositório por tag, com um carimbo que reprova edição local, e roda a
    **catraca por grafo** no CI: o que já reprovava vira dívida nomeada, um grafo novo tem de passar, e a dívida
@@ -137,7 +138,7 @@ flowchart LR
 
 ## Estado e próximos passos
 
-- **Vigente:** contrato v4, release `kg-ssot-v4.7.1`. O leitor de referência passa em 225 de 225 casos de
+- **Vigente:** contrato v4, release `kg-ssot-v4.7.2`. O leitor de referência passa em 225 de 225 casos de
   `latest/`.
 - **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
   dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.
@@ -153,14 +154,16 @@ flowchart LR
 | [Manual](docs/manual/README.md) | Conceitos, formato, contrato, ferramentas, receitas e solução de problemas |
 | [ADOPTING.md](ADOPTING.md) | O guia completo de adoção, com cada caso de borda |
 | [Contrato](docs/manual/04-contrato.md) | O contrato v4: os dois níveis, os códigos e o que muda entre versões |
-| [spec/conformance/](spec/conformance/README.md) | O formato da suíte, os códigos e o contrato de runner |
+| [spec/conformance/](spec/conformance/README.md) | O formato da suíte, os códigos e como medir um leitor em outra linguagem |
+| [llms.txt](llms.txt) · [llms-full.txt](llms-full.txt) | Para agentes de IA: o índice com links, e a documentação inteira num texto só |
 
 ## Contribuir
 
 Uma mudança no contrato começa por um **caso de conformidade**: o `.kg.yaml` que mostra o comportamento e o
 veredito esperado. As releases saem como tags `kg-ssot-vX.Y.Z` do repositório de desenvolvimento, onde todo PR que
 toca `spec/` ou `tools/` roda a suíte e os testes do kit no CI. O espelho das releases guarda só o que cada tag leva,
-um commit por tag, e não recebe PR: uma proposta vai ao mantenedor e entra pelo repositório de desenvolvimento. Um leitor em outra linguagem é bem-vindo: o [capítulo 7 do manual](docs/manual/07-conformidade-e-leitores.md) diz como medi-lo.
+um commit por tag, e não recebe PR: uma proposta ou um defeito entra como
+[issue](https://github.com/marciocar/kg-ssot/issues), de preferência com o caso que o mostra. Um leitor em outra linguagem é bem-vindo: o [capítulo 7 do manual](docs/manual/07-conformidade-e-leitores.md) diz como medi-lo.
 
 ## Licença
 

@@ -1,5 +1,5 @@
 {
-  "description": "Contrato v4: nó confirmed ou PROD sem provenance reprova (Q_CONTRACT_STRUCTURED_PROVENANCE), e status unverifiable segue sem exigir, também em PROD, que é o destino do nó sem fonte recuperável (Q_CONTRACT_SOURCELESS_CONFIRMED). Origem em pessoa ou sessão recuperável vale, com method de testemunho.",
+  "description": "Contrato v4: nó confirmed ou PROD sem provenance reprova, e status unverifiable segue sem exigir, também em PROD, que é o destino do nó sem fonte recuperável. Origem em pessoa ou sessão recuperável vale, com method de testemunho.",
   "layer": "form",
   "pending_on": [],
   "cases": [

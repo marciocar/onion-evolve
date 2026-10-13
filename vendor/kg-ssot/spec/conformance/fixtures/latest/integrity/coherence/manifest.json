@@ -1,5 +1,5 @@
 {
-  "description": "Coerência entre campos e arestas (v4.1, Q_RADAR_WARNINGS_WITHOUT_CASES): avisos SHOULD que o schema não exprime e o leitor computa. Nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe testemunho) alerta integrity.testimony-in-prod; verified_at anterior a valid_from, na granularidade do mais curto, alerta integrity.verified-before-fact; decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela alerta integrity.untraced-decision.",
+  "description": "Coerência entre campos e arestas (v4.1): avisos SHOULD que o schema não exprime e o leitor computa. Nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe testemunho) alerta integrity.testimony-in-prod; verified_at anterior a valid_from, na granularidade do mais curto, alerta integrity.verified-before-fact; decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela alerta integrity.untraced-decision.",
   "layer": "integrity",
   "pending_on": [],
   "cases": [

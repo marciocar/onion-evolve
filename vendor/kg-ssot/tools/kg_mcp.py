@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Servidor MCP de referência do KG-SSOT (A_MCP_SERVER, ÉPICO 11): o contrato e o armazém para um modelo.
+"""Servidor MCP de referência do KG-SSOT: o contrato e o armazém para um modelo.
 
 Só biblioteca padrão, mais o leitor (kg_validate.py) e o armazém (kg_store.py). Fala JSON-RPC 2.0 do Model Context
 Protocol por stdio (uma mensagem por linha) ou por HTTP (POST de uma mensagem no caminho /mcp, resposta JSON, sem
-stream). É um ADAPTADOR (D_KG_SSOT_INDEPENDENTE_DE_HARNESS): o produto não depende dele, e ele não depende de um
+stream). É um ADAPTADOR: o produto não depende dele, e ele não depende de um
 cliente específico.
 
 Ferramentas:
@@ -13,7 +13,7 @@ Ferramentas:
   kg_get          lê um grafo (ou uma versão anterior, com ref)
   kg_list         lista os grafos do armazém
   kg_history      as operações de um grafo, da mais nova para a mais antiga
-  kg_schema_help  o resumo do contrato vigente: campos, listas permitidas e a correção de cada código
+  kg_schema_help  o resumo do contrato vigente: campos, listas permitidas e a correção dos códigos mais comuns
 
 O que fica com quem adota, de propósito: autenticação, TLS, identidade, multiusuário e área por usuário (um processo
 ou um root por usuário), cota e timeout. O HTTP escuta em 127.0.0.1 por padrão, recusa Origin que não seja de loopback

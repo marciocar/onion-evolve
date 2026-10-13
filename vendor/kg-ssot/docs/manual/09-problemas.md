@@ -9,18 +9,24 @@ Rode `kg_validate.py --where <arquivo>` primeiro: ele diz o código e o nó.
 | Código | O que quer dizer | Como resolver |
 |---|---|---|
 | `form.required.node.provenance` | Nó `confirmed` ou PROD sem `provenance` | Acrescente `source`, `locator` e `method`. Sem fonte, mude o status para `unverifiable` |
-| `form.pattern.node.provenance.source` | `source` é um marcador (`unknown`, `n/a`, `tbd`, `?`...) | Ponha a fonte real, ou use `unverifiable` |
+| `form.pattern.node.provenance.source` | `source` é um marcador (`unknown`, `n/a`, `tbd`, `?`...) | Ponha a fonte real; sem fonte recuperável, tire a `provenance` e use `unverifiable` |
 | `form.unknown-key.node.<chave>` | Chave fora da gramática | Prefixe com `x_`, ou use o campo do contrato (por exemplo, `narrative`) |
 | `form.required.node.<campo>` | Falta um dos sete campos obrigatórios | Acrescente o campo |
 | `form.enum.node.<campo>` | Valor fora da lista (`node_type`, `plane`, `status`) | Veja as listas no [capítulo 3](03-formato.md) |
 | `form.pattern.node.verified_at` | Data em formato errado ou que não existe no calendário | `AAAA-MM-DD`, entre aspas |
 | `integrity.orphan-node` | Um nó sem nenhuma aresta | Ligue-o a outro nó, ou tire-o |
-| `integrity.dangling-to` · `-from` | A aresta aponta para um id que não existe | Corrija o id, ou crie o nó |
+| `integrity.dangling-to` · `-from` · `-trigger` · `-on` | A aresta (ou o gatilho dela) aponta para um id que não existe | Corrija o id, ou crie o nó |
 | `integrity.duplicate-id` | Dois nós com o mesmo id | Renomeie um |
+| `integrity.dangling-external-local` | A ponta local de uma `external_edges` não existe neste arquivo | Corrija o id |
 | `integrity.dangling-external` | A ponta externa não existe no corpus | Corrija o caminho ou o id depois de `#`, ou o grafo alvo ainda não foi para o git (`git add`) |
 | `yaml.forbidden-key-on` | Aresta com a chave `on` | Troque por `trigger` |
 | `parse.duplicate-key` | Chave repetida no mesmo mapa | Tire a duplicata |
 | `parse.not-single-document` | Mais de um documento YAML (`---`) | Um grafo por arquivo |
+| `parse.yaml-error` | O YAML não parseia (ou passa do teto de aninhamento ou de aliases) | Corrija a sintaxe na linha que o erro aponta |
+| `parse.empty-document` · `parse.root-not-mapping` | Arquivo vazio, ou a raiz não é um mapa | O grafo começa por `meta:`, `nodes:` e `edges:` |
+
+A lista completa, com a forma de cada código, está em
+[`spec/conformance/README.md`](../../spec/conformance/README.md#códigos).
 
 ## Avisos SHOULD comuns
 
@@ -49,7 +55,7 @@ Rode `kg_validate.py --where <arquivo>` primeiro: ele diz o código e o nó.
 |---|---|---|
 | `check` dá rc 1 sem você ter editado nada | Um `.pyc` foi gravado no vendor por uma ferramenta que importou o kit | Apague o `__pycache__` e rode tudo com `python3 -I -B` |
 | `update` se recusa a substituir | O destino não tem carimbo, ou o vendor diverge dele | Confira o que mudou; `--force` só se a edição local pode sumir |
-| `update` de dentro do vendor falha | Falta `--source` | Passe o caminho ou a URL do repositório do produto |
+| `update` de dentro do vendor falha | Falta `--source` | Passe `--source https://github.com/marciocar/kg-ssot` |
 
 ## Ambiente
 

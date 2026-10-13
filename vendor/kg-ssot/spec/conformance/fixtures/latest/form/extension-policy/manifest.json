@@ -1,5 +1,5 @@
 {
-  "description": "Política de extensão (Q_CONTRACT_EXTENSION_POLICY, selada no PR #13): chave com prefixo x_ é ignorada; chave desconhecida sem prefixo alertou (SHOULD) do v1 ao v3 e reprova desde o v4 (Q_UNKNOWN_KEY_RAMP).",
+  "description": "Política de extensão: chave com prefixo x_ é ignorada; chave desconhecida sem prefixo alertou (SHOULD) do v1 ao v3 e reprova desde o v4.",
   "layer": "form",
   "pending_on": [],
   "cases": [

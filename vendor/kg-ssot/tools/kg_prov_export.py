@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exporta a proveniência de um .kg.yaml para PROV-O em JSON-LD (A_PROV_EXPORT, ÉPICO 10).
+"""Exporta a proveniência de um .kg.yaml para PROV-O em JSON-LD.
 
   kg_prov_export.py <grafo.kg.yaml> [--base IRI]
 
@@ -15,7 +15,7 @@ As IRIs dos nós são <base><meta.id>#<id>, com base urn:kg-ssot:graph: por padr
 urn:kg-ssot:vocab#, fora do espaço dos grafos, para um meta.id não colidir com ele.
 
 As arestas (SUPPORTS, REFUTES, SUPERSEDES…) NÃO são exportadas: derivação em PROV é relação de produção, e não de
-suporte evidencial (C_OBJ_PROV_NO_EDGE_EQUIVALENCE). Exportá-las como wasDerivedFrom diria algo que o grafo não diz.
+suporte evidencial. Exportá-las como wasDerivedFrom diria algo que o grafo não diz.
 
 O exportador lê o grafo com o parse do leitor de referência e não o valida: rode kg_validate.py antes.
 Saída: JSON-LD em stdout. rc: 0 ok · 2 entrada quebrada (arquivo ilegível, que não é um documento YAML único, ou

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Runner da suíte de conformidade do .kg.yaml para o leitor de referência (kg_validate.py).
 
-Depende só de Python 3, PyYAML e jsonschema (D_KG_SSOT_INDEPENDENTE_DE_HARNESS). É o molde que os
-outros leitores imitam no E4: para cada caso, o conjunto de códigos emitidos tem de ser IGUAL ao
+Depende só de Python 3, PyYAML e jsonschema, sem nenhum harness de agente. É o molde que um leitor
+em outra linguagem imita: para cada caso, o conjunto de códigos emitidos tem de ser IGUAL ao
 esperado, em codes (MUST) e em warnings (SHOULD).
 
 Passos:
   1. auto-teste do metaschema: aceita metaschema-tests/good/ e recusa metaschema-tests/bad/;
-  2. cada manifest.json (em fixtures/, a convenção que o lint do Onion isenta) valida contra manifest.schema.json, cumpre a regra de pending_on da pasta
+  2. cada manifest.json (em fixtures/) valida contra manifest.schema.json, cumpre a regra de pending_on da pasta
      (vazio em latest/, não vazio em proposals/) e aponta só para arquivos que existem;
   3. cada caso roda no leitor e é comparado por conjunto.
 

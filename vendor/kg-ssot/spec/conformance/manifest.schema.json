@@ -10,7 +10,7 @@
     "description": { "type": "string", "minLength": 1 },
     "layer": { "enum": ["parse", "form", "integrity", "yaml", "semantic"] },
     "pending_on": {
-      "description": "Ids das decisões abertas de que o veredito depende (ex.: Q_CONTRACT_CONFORMANCE_LEVELS).",
+      "description": "Ids das decisões abertas de que o veredito depende (ex.: Q_UMA_DECISAO_ABERTA).",
       "type": "array",
       "uniqueItems": true,
       "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }

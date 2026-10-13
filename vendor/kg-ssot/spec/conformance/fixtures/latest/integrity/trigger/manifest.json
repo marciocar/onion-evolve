@@ -1,5 +1,5 @@
 {
-  "description": "O gatilho de TRANSITIONS como referência ao evento, com o nome trigger (Q_CONTRACT_CONFORMANCE_LEVELS, selada no PR #13; a chave on fica proibida).",
+  "description": "O gatilho de TRANSITIONS como referência ao evento, com o nome trigger (a chave on fica proibida).",
   "layer": "integrity",
   "pending_on": [],
   "cases": [

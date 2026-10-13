@@ -1,5 +1,5 @@
 {
-  "description": "Contrato v4: chave desconhecida sem o prefixo x_ reprova no topo, no meta, no nó e na aresta (Q_UNKNOWN_KEY_RAMP, Q_CONTRACT_EXTENSION_POLICY), com a mesma lista de chaves conhecidas do SHOULD v3. Nome sem x_ que nem é slug reprova como form.pattern.<escopo>.key; x_ segue livre.",
+  "description": "Contrato v4: chave desconhecida sem o prefixo x_ reprova no topo, no meta, no nó e na aresta, com a mesma lista de chaves conhecidas do SHOULD v3. Nome sem x_ que nem é slug reprova como form.pattern.<escopo>.key; x_ segue livre.",
   "layer": "form",
   "pending_on": [],
   "cases": [

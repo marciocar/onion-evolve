@@ -59,9 +59,16 @@ propósito, para ser lido.
 - **`$` antes de quebra de linha.** Os `pattern` têm a semântica do ECMA-262: `$` não casa antes de uma quebra
   de linha final, ao contrário do `re` do Python.
 
+## Rodar a suíte com o seu leitor
+
+O `kg_conformance.py` roda só o leitor de referência, e o kit não traz um executor para leitores de fora. O seu
+leitor roda a suíte com o próprio código: itera os `manifest.json` de `fixtures/latest/`, julga cada caso (com a raiz
+do repo em `<pasta do manifesto>/<corpus>` quando o caso declara `corpus`) e compara os conjuntos de `codes` e de
+`warnings` por igualdade. Quem não expõe códigos compara só o veredito: `valid: true` aceita, `valid: false` reprova.
+
 ## O contrato de runner
 
-Para ser medido caso a caso, um leitor expõe um **runner**: `runner <caso>` imprime, na última linha do stdout,
+Para o mantenedor medir o seu leitor ao lado do de referência, caso a caso, ele expõe um **runner**: `runner <caso>` imprime, na última linha do stdout,
 um objeto JSON, e sai com rc 0.
 
 ```json

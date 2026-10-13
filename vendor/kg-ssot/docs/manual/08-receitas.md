@@ -39,6 +39,12 @@ edges:
     edge_type: SUPPORTS
 ```
 
+Todo nó precisa de pelo menos uma aresta: um nó solto reprova como `integrity.orphan-node`. Por isso um grafo de
+um nó só não passa, e o primeiro grafo já nasce com uma pergunta e o que a sustenta.
+
+Com o venv da [adoção](06-adocao-e-ci.md) ativo (`. .venv/bin/activate`), ou com `.venv/bin/python3` no lugar de
+`python3`:
+
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/exemplo.kg.yaml
 ```
@@ -164,3 +170,77 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where docs/*.kg.yaml
 ```
 
 Cada linha indentada traz o código e o nó, e dá para filtrar com `grep`.
+
+## Uma regra de negócio ligada ao código
+
+Num app, a regra fica no grafo com a decisão de onde veio e o código que a implementa. Aqui, a regra da sequência
+de um app de hábitos: a decisão de produto, a regra de domínio com o teste que a mede, e o arquivo do código.
+
+```yaml
+meta:
+  schema_version: "1"
+  id: sequencia
+  baseline: "2026-10-13"
+  review_after: "2027-01-13"
+nodes:
+  - id: D_STREAK_RESET
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.9
+    label: A sequência zera depois de um dia inteiro sem registro, no fuso do usuário.
+    trace: docs/decisoes/2026-10-sequencia.md
+    verified_at: "2026-10-13"
+    provenance:
+      source: docs/decisoes/2026-10-sequencia.md
+      locator: seção Decisão
+      method: "leitura: registro da decisão de produto"
+  - id: R_STREAK_RESET
+    node_type: rule
+    layer: domain
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: streak.reset() roda quando o último registro é anterior a ontem no fuso do usuário.
+    verified_at: "2026-10-13"
+    provenance:
+      source: tests/test_streak.py
+      locator: test_zera_depois_de_um_dia_sem_registro
+      method: "medição: pytest tests/test_streak.py, 6 casos passando"
+  - id: A_STREAK_CODE
+    node_type: artifact
+    layer: domain
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: A implementação da sequência mora em app/streak.py.
+    verified_at: "2026-10-13"
+    verified_against: app/streak.py
+    provenance:
+      source: app/streak.py
+      locator: função reset
+      method: "leitura: código no commit da release"
+edges:
+  - from: R_STREAK_RESET
+    to: D_STREAK_RESET
+    edge_type: TRACES_TO
+  - from: R_STREAK_RESET
+    to: A_STREAK_CODE
+    edge_type: TRACES_TO
+```
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/sequencia.kg.yaml
+```
+
+```text
+PASSA   docs/sequencia.kg.yaml
+· 1 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+O contrato confere a forma, as arestas e a proveniência, e não roda o seu teste nem lê o seu código: quem roda
+`tests/test_streak.py` é o CI do app. O grafo registra o que foi medido, quando e como (`method`), e o `verified_at`
+diz há quanto tempo. Quando a regra mudar, o PR que muda o código muda o nó também, e o diff mostra os dois juntos.

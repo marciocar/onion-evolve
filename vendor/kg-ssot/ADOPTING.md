@@ -16,8 +16,11 @@ A lista está em [`spec/release.json`](spec/release.json):
   ([cap. 5 do manual](docs/manual/05-ferramentas.md));
 - o servidor MCP de referência (`tools/kg_mcp.py`), para um modelo julgar e gravar grafos pelo contrato, por stdio ou
   HTTP local;
+- o exportador de proveniência para PROV-O em JSON-LD (`tools/kg_prov_export.py`);
 - as dependências fixadas (`tools/requirements.txt`, Python 3 com PyYAML e jsonschema);
-- este guia e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
+- este guia, o `README.md` e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
+- o `llms.txt` (índice para agentes de IA) e o `llms-full.txt` (a documentação inteira num texto só, gerada dos
+  arquivos da release);
 - a licença (`LICENSE`, Apache-2.0) e o `NOTICE`, que dizem o escopo dela.
 
 Tudo isso é **Apache-2.0**, inclusive os casos `.kg.yaml` da suíte. A Apache-2.0 dá, além do direito autoral,
@@ -39,18 +42,22 @@ O adotante usa só `update` e `check`.
 > no carimbo do adotante. Nada mais muda: as tags antigas seguem existindo, e o próximo update só troca a string do
 > `--tag`.
 
-A primeira vez, a partir de um clone deste repo:
+O repositório público é `https://github.com/marciocar/kg-ssot`: cada commit dele é uma release, com a tag. A
+primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu repo (o adotante):
 
 ```bash
-python3 -I -B tools/kg_vendor.py update --tag kg-ssot-v4.7.1 --dest <adotante>/vendor/kg-ssot
+git clone https://github.com/marciocar/kg-ssot ../kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --dest vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.1 --source <caminho ou URL deste repo>
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --source https://github.com/marciocar/kg-ssot
 ```
+
+As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
 
 - **Leitura:** o vendor lê a tag com `git archive`, nunca a árvore de trabalho. Os nomes são literais: um `*`
   num nome de arquivo não vira glob.
@@ -93,6 +100,7 @@ dele:
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r vendor/kg-ssot/tools/requirements.txt
+echo .venv/ >> .gitignore                                    # o venv não entra no git
 .venv/bin/python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
 ```
 
@@ -117,9 +125,9 @@ ganha uma linha com o lugar:
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where docs/meu-grafo.kg.yaml
-#     MUST   form.required.node.provenance  nó C_MODEL_EXPLAINABLE
+#     MUST   form.required.node.provenance  nó C_RETRY_SAFE
 #     MUST   yaml.forbidden-key-on  aresta #6 (C_X -> Q_A)
-#     SHOULD integrity.testimony-in-prod  nó C_BIAS_AUDIT_QUARTERLY
+#     SHOULD integrity.testimony-in-prod  nó C_SLA_99
 ```
 
 O que não tem lugar mais fino sai como `arquivo`: o erro de parse, o `.nan`/`.inf` e a data sem aspas.
@@ -155,13 +163,32 @@ Commite o `.kg-ssot/gate.json`.
 
 ## 3. O passo de CI
 
+No GitHub Actions, o workflow inteiro, em `.github/workflows/kg-ssot.yml`:
+
 ```yaml
-- name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
-  run: |
-    pip install -r vendor/kg-ssot/tools/requirements.txt
-    python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
-    python3 -I -B vendor/kg-ssot/tools/kg_gate.py
+name: KG-SSOT
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  kg-ssot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
+        run: |
+          pip install -r vendor/kg-ssot/tools/requirements.txt
+          python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
+          python3 -I -B vendor/kg-ssot/tools/kg_gate.py
 ```
+
+Em outro CI, o passo é o mesmo: Python 3, as dependências fixadas e os dois comandos.
 
 **`check`** reprova (rc 1) quando um arquivo do vendor foi editado, apagado ou acrescentado. Isso inclui
 bytecode num `__pycache__`, que trocaria o leitor sem mudar a fonte, e symlink. Os scripts do kit não gravam
@@ -170,8 +197,8 @@ no `__pycache__` do vendor, porque o Python compila antes de executar o módulo,
 Por isso todo comando deste guia usa `python3 -I -B`, e quem importa o kit roda com `-B` ou
 `PYTHONDONTWRITEBYTECODE=1`.
 
-O contrato não se customiza no adotante: uma mudança necessária volta ao produto como sinal e vira caso ou
-decisão de contrato.
+O contrato não se customiza no adotante: uma mudança necessária volta ao produto como issue no repositório público
+e vira caso ou decisão de contrato.
 
 Limite: o carimbo atesta a si mesmo. O `check` pega uma edição acidental, mas não quem edita um arquivo e
 recalcula o carimbo. Isso o review do PR do adotante pega, porque o diff do carimbo fica à vista.
@@ -237,8 +264,10 @@ Se a dívida SHOULD subir (por desenho, quando o corpus tem o que os avisos novo
 
 ## 5. Do v3 para o v4
 
-O v4 é uma versão maior: o que alertava no v3 passa a reprovar. Quem está numa tag `contract-v3.x` sobe pela
-**rampa** do gate, sem truque de data no schema e sem consertar o corpus inteiro de uma vez.
+O v4 é uma versão maior: o que alertava no v3 passa a reprovar. Quem está numa tag `contract-v3.x` (anterior à
+publicação do repositório público, que começa no v4) sobe pela **rampa** do gate, sem truque de data no schema e sem
+consertar o corpus inteiro de uma vez. Quem adota agora começa no v4 e pode pular para a lista do que muda, que vale
+como resumo do contrato.
 
 O que muda no v4:
 - **`provenance` é MUST** em nó `confirmed` ou PROD (`form.required.node.provenance`), com `source`, `locator` e
@@ -256,12 +285,12 @@ O que muda no v4:
   campos, sem evidência própria). Fora disso alerta como `form.pattern.node.provenance.method`.
   Quando uma migração preenche a `provenance` a partir do que o nó já trazia, a classe é a da evidência original, e o
   detalhe diz que a migração não re-verificou, por exemplo `medição: <o que foi medido>; não reverificado na migração`
-  (decisão do mantenedor em 2026-10-09, `D_METHOD_CLASS_IS_EVIDENCE`).
+  (decisão do mantenedor em 2026-10-09).
   **Atenção:** se o seu CI cobra que grafo novo saia limpo também no SHOULD, este alerta já reprova lá no v4, e não só
-  no v5. Ajuste antes os geradores que escrevem `provenance` (no primeiro adotante, seis deles emitiam `method` livre).
+  no v5. Ajuste antes os geradores que escrevem `provenance`.
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.1 --source <caminho ou URL deste repo>`,
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --source https://github.com/marciocar/kg-ssot`,
    e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
@@ -312,11 +341,14 @@ inventado. Uma chave própria sem `x_` se resolve renomeando para `x_<nome>`.
 
 ## Conformidade de outro leitor
 
-Para provar que um leitor próprio concorda com o contrato, rode a suíte com o leitor de referência:
+Para provar que um leitor próprio concorda com o contrato, rode a suíte com o leitor de referência, **depois** do
+`git add vendor/kg-ssot`:
 
 ```bash
 python3 -I -B vendor/kg-ssot/tools/kg_conformance.py
 ```
 
-Depois compare com os códigos que o seu leitor emite. O formato dos casos e o contrato de runner estão em
+A ordem importa: os casos de corpus conferem a ponta externa contra os `.kg.yaml` rastreados quando a suíte mora num
+repo git, e com o vendor ainda fora do git um caso falha (`latest: 224/225`). Depois compare com os códigos que o seu
+leitor emite. O formato dos casos e como rodar a suíte com um leitor em outra linguagem estão em
 `spec/conformance/README.md`.

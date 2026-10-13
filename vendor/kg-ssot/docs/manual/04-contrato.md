@@ -30,6 +30,8 @@ Toda violação tem um código estável, com a forma da camada:
 
 `<tipo>` é um de `required`, `enum`, `type`, `pattern`, `range`, `const` ou `unknown-key`. `<escopo>` é um de
 `top`, `meta`, `node` ou `edge`. Num campo aninhado, o caminho leva ponto: `form.required.node.provenance.locator`.
+Nas `external_edges`, o escopo é `top` e o campo leva o nome da lista (`form.enum.top.external_edges.edge_type`). Uma
+data fora do calendário (`format: date`) reprova como `form.pattern.<escopo>.<campo>`.
 
 A lista completa, com o que cada código pega, está em
 [`spec/conformance/README.md`](../../spec/conformance/README.md#códigos).
@@ -46,13 +48,17 @@ O v4 é uma versão **maior**: o que alertava passou a reprovar.
 | `form.pattern.node.provenance.source` (`source` marcador) | — | **MUST** |
 | `form.pattern.node.provenance.method` (fora de `<classe>: <detalhe>`) | — | SHOULD (MUST no v5) |
 
-As versões menores da linha 4 só acrescentaram, sem mudar veredito:
+As versões menores da linha 4 só acrescentaram, sem mudar o veredito MUST de um grafo bem escrito:
 
 | Release | O que entrou |
 |---|---|
 | 4.1 | Quatro avisos SHOULD: `verified_against` ausente em claim carimbada, testemunho em PROD, verificação antes do fato, decisão sem origem |
 | 4.2 | `provenance.locality`, e a dívida SHOULD do gate contada por ocorrência, como opção |
 | 4.3 | `external_edges`, com a ponta externa conferida no corpus |
+| 4.4 | O exportador de proveniência para PROV-O (`kg_prov_export.py`) |
+| 4.5 | O veredito estruturado `kg-ssot.verdict/1` (`kg_validate.py --format json`) |
+| 4.6 | O armazém que só grava o que o contrato aprova (`kg_store.py`) |
+| 4.7 | O servidor MCP de referência (`kg_mcp.py`) e o teto de aninhamento e de aliases do leitor |
 
 ## Versões e tags
 
@@ -62,14 +68,19 @@ existindo). Pelo histórico das releases:
 | Parte | Quando sobe |
 |---|---|
 | **X**, maior | Um veredito MUST muda: algo que passava reprova |
-| **Y**, menor | Entra um aviso SHOULD ou um campo opcional, e nenhum veredito MUST muda |
+| **Y**, menor | Entra um aviso SHOULD, um campo opcional ou uma ferramenta ou formato novo no kit, e nenhum veredito MUST de grafo bem escrito muda |
 | **Z**, patch | Correção ou melhoria do kit, do guia ou dos casos, com o mesmo contrato |
+
+O gate guarda o sha256 dos dois schemas como a identidade do contrato. Uma tag que muda os bytes dos schemas,
+mesmo que só no texto das descrições (como a 4.7.2), pede `kg_gate.py --update` no PR que traz a tag, e o gate mostra
+que nenhum veredito mudou.
 
 Um aviso SHOULD novo pode subir a dívida medida pelo gate. Isso é intencional: a rampa de um contrato é alertar
 numa versão e reprovar na seguinte, e o adotante vê a dívida antes de ela virar erro.
 
 A superfície que viaja em cada tag está em [`spec/release.json`](../../spec/release.json). O contrato não se
-customiza no adotante: o vendor reprova edição local, e uma mudança necessária volta ao produto como pedido.
+customiza no adotante: o vendor reprova edição local, e uma mudança necessária volta ao produto como issue no
+repositório público.
 
 ## Os contratos antigos
 

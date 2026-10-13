@@ -1,0 +1,2977 @@
+# KG-SSOT 4.7.2 (tag kg-ssot-v4.7.2): o texto completo para agentes de IA
+
+Gerado por kg_llms.py a partir dos arquivos da release; não edite à mão. Quando este texto e um arquivo
+divergirem, vale o arquivo. O índice curto, com links, é o llms.txt.
+
+
+========== README.md ==========
+
+<div align="center">
+
+# KG-SSOT
+
+**O grafo de conhecimento verificável: toda afirmação diz de onde veio, quando foi conferida e o que depende
+dela, e o CI recusa a que não diz.**
+
+[![Licença: Apache-2.0](https://img.shields.io/badge/licen%C3%A7a-Apache--2.0-blue)](LICENSE)
+[![Contrato: v4 · release 4.7.2](https://img.shields.io/badge/contrato-v4%20%C2%B7%204.7.2-6f42c1)](spec/release.json)
+[![Suíte: 225/225](https://img.shields.io/badge/su%C3%ADte-225%2F225-2ea44f)](spec/conformance/README.md)
+[![Python 3](https://img.shields.io/badge/python-3-3776ab)](tools/requirements.txt)
+
+[Manual](docs/manual/README.md) · [Adotar](ADOPTING.md) · [Contrato](docs/manual/04-contrato.md) · [Suíte](spec/conformance/README.md) · [Para agentes de IA](llms.txt)
+
+</div>
+
+---
+
+## Por que
+
+Equipes, de pessoas ou de agentes, acumulam conclusões: "o retry é idempotente", "decidimos três tentativas".
+Elas moram em atas, tickets e memórias de conversa, e perdem três coisas pelo caminho: **a fonte**, **a data da
+conferência** e **o que depende delas**. Um texto convincente sem nenhuma das três passa em qualquer revisão
+apressada.
+
+O KG-SSOT trata isso como problema de **formato**, não de disciplina. O conhecimento vive num grafo `.kg.yaml`,
+versionado junto do código, e um **contrato formal** decide no CI o que reprova:
+
+- um nó `confirmed` ou de produção **sem proveniência** reprova (o que não tem fonte recuperável se declara
+  `unverifiable`);
+- uma fonte que é só um marcador (`unknown`, `n/a`, `tbd`) reprova;
+- uma aresta que aponta para o nada reprova, e um nó solto também;
+- um carimbo de verificação sem alvo, uma decisão sem origem e uma produção apoiada só em relato **alertam**.
+
+## Comece em 60 segundos
+
+```bash
+git clone https://github.com/marciocar/kg-ssot && cd kg-ssot
+python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
+
+# a suíte de conformidade contra o leitor de referência
+.venv/bin/python3 -I tools/kg_conformance.py | tail -2
+
+# um grafo válido e um que reprova
+.venv/bin/python3 -I tools/kg_validate.py \
+  spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml \
+  spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
+```
+
+```text
+latest: 225/225 (reprova)
+optional: 10/24 (só reporta)
+PASSA   spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml
+REPROVA spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
+  MUST   form.required.node.label ×1
+· 2 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+Para levar a um repositório seu, o caminho é o [capítulo 6 do manual](docs/manual/06-adocao-e-ci.md).
+
+## Um nó, por dentro
+
+```yaml
+- id: C_RETRY_SAFE
+  node_type: claim
+  plane: PROD
+  status: confirmed
+  impact: 4
+  confidence: 0.8
+  label: O retry do pagamento é idempotente.
+  verified_at: "2026-10-01"
+  verified_against: tests/payment_retry_test.py
+  provenance:
+    source: tests/payment_retry_test.py
+    locator: test_retry_is_idempotent
+    method: "medição: teste de integração no CI"
+```
+
+O `label` é o fato, curto. A `provenance` diz de onde ele veio e **como**: `medição`, `leitura`, `juízes`,
+`derivado` ou `testemunho`. O carimbo diz quando foi conferido e contra o quê.
+
+## Como funciona
+
+```mermaid
+flowchart LR
+  subgraph produto["Produto (uma tag kg-ssot-vX.Y.Z)"]
+    C["Contrato<br/>JSON Schema MUST + SHOULD<br/>+ regras de integridade"]
+    S["Suíte de conformidade<br/>225 casos em dados puros"]
+    R["Leitor de referência<br/>kg_validate.py"]
+    S -- "todo leitor passa" --> R
+    C --> R
+  end
+  subgraph adotante["Repositório adotante"]
+    V["vendor/kg-ssot<br/>+ carimbo sha256"]
+    G["kg_gate.py no CI<br/>catraca por grafo"]
+    K[".kg.yaml do time"]
+    V --> G
+    K --> G
+  end
+  produto -- "kg_vendor.py update --tag" --> V
+  G -- "nada piora:<br/>grafo novo passa,<br/>dívida só encolhe" --> PR["PR aprovado"]
+```
+
+1. **O contrato** é JSON Schema 2020-12 em dois níveis: **MUST** reprova, **SHOULD** alerta. As regras que o
+   schema não alcança (ids únicos, pontas existentes, nó órfão) são parte dele.
+2. **A suíte** é a prova de compatibilidade: cada caso é um arquivo YAML real com o veredito e os códigos
+   esperados, e o leitor passa só se emitir **exatamente** os mesmos códigos.
+3. **O kit** leva o contrato a um repositório por tag, com um carimbo que reprova edição local, e roda a
+   **catraca por grafo** no CI: o que já reprovava vira dívida nomeada, um grafo novo tem de passar, e a dívida
+   só encolhe.
+
+## Recursos
+
+| | |
+|---|---|
+| **Contrato em dois níveis** | MUST reprova, SHOULD alerta, com uma rampa: o que alerta numa versão pode reprovar na seguinte, e o adotante vê antes |
+| **Proveniência estruturada** | `source`, `locator` e `method`, com cinco classes de evidência e a localidade da fonte (`repo`, `web`, `host`, `pessoa`) |
+| **Carimbo de verificação** | `verified_at` e `verified_against`, com aviso para carimbo sem alvo e verificação anterior ao fato |
+| **Arestas entre grafos** | `external_edges` com a ponta externa conferida no corpus |
+| **Códigos estáveis** | Toda violação tem um código como `form.required.node.provenance`, e `--where` diz o nó |
+| **Veredito estruturado** | `kg_validate.py --format json` devolve o veredito com código, caminho no documento, linha, mensagem em pt-BR e dica, num formato versionado (`spec/verdict.schema.json`) para ferramentas e servidores MCP |
+| **Armazém com gate** | `kg_store.py` grava `.kg.yaml` em disco, num repo git ou num armazém versionado, e só depois do PASS do contrato, com a ponta externa conferida no próprio armazém e trava otimista para dois escritores |
+| **Servidor MCP de referência** | `kg_mcp.py` dá a um modelo o contrato e o armazém por MCP (stdio ou HTTP local): julgar, gravar só o que passa, ler, listar, histórico e o resumo do contrato, só com a biblioteca padrão |
+| **Suíte em dados puros** | 225 casos com metaschema próprio, no molde da JSON-Schema-Test-Suite |
+| **Catraca por grafo** | Adoção sem migração de uma vez: a dívida herdada fica nomeada e só encolhe |
+| **Vendor por tag** | Sem copiar à mão, sem código compartilhado: um carimbo sha256 por arquivo |
+| **Ponte para PROV-O** | `kg_prov_export.py` exporta a proveniência de cada nó como `prov:Entity` e `prov:Derivation` em JSON-LD, para ferramentas do ecossistema W3C PROV |
+| **Sem plataforma** | Python 3, PyYAML e jsonschema. Nenhum servidor, nenhum editor, nenhum assistente obrigatório |
+
+## O que o KG-SSOT não é
+
+| Se você precisa de... | ...use outra coisa | O KG-SSOT oferece |
+|---|---|---|
+| Consultar um grafo grande com uma linguagem de consulta | Um banco de grafos | Um formato de arquivo e um contrato, sem servidor |
+| Interoperar com a web semântica | RDF, OWL, SHACL | Um vocabulário YAML pequeno e fechado, legível no diff |
+| Busca corporativa sobre documentos | Uma plataforma de busca | Nenhum conector nem índice: só o grafo que o time escreve |
+| Garantir que uma afirmação é **verdadeira** | Revisão humana, testes | A garantia de que ela **diz** de onde veio e quando foi conferida |
+
+## Estado e próximos passos
+
+- **Vigente:** contrato v4, release `kg-ssot-v4.7.2`. O leitor de referência passa em 225 de 225 casos de
+  `latest/`.
+- **Em uso:** um adotante de produção valida os grafos dele no CI pela catraca do v4. O critério de "estável" é 30
+  dias de uso contínuo sem mudança que quebre, e esse relógio fecha em 2026-11-08.
+- **Próximo:** o v5 passa a reprovar o `method` fora da forma `<classe>: <detalhe>`, que hoje só alerta.
+- **Aberto:** a camada semântica (frescor, contradição, completude de domínio) está em `optional/`, e o leitor de
+  referência não a implementa: passa só nos 10 casos válidos, e os 14 que esperam um aviso ou uma reprovação
+  semântica falham.
+
+## Documentação
+
+| | |
+|---|---|
+| [Manual](docs/manual/README.md) | Conceitos, formato, contrato, ferramentas, receitas e solução de problemas |
+| [ADOPTING.md](ADOPTING.md) | O guia completo de adoção, com cada caso de borda |
+| [Contrato](docs/manual/04-contrato.md) | O contrato v4: os dois níveis, os códigos e o que muda entre versões |
+| [spec/conformance/](spec/conformance/README.md) | O formato da suíte, os códigos e como medir um leitor em outra linguagem |
+| [llms.txt](llms.txt) · [llms-full.txt](llms-full.txt) | Para agentes de IA: o índice com links, e a documentação inteira num texto só |
+
+## Contribuir
+
+Uma mudança no contrato começa por um **caso de conformidade**: o `.kg.yaml` que mostra o comportamento e o
+veredito esperado. As releases saem como tags `kg-ssot-vX.Y.Z` do repositório de desenvolvimento, onde todo PR que
+toca `spec/` ou `tools/` roda a suíte e os testes do kit no CI. O espelho das releases guarda só o que cada tag leva,
+um commit por tag, e não recebe PR: uma proposta ou um defeito entra como
+[issue](https://github.com/marciocar/kg-ssot/issues), de preferência com o caso que o mostra. Um leitor em outra linguagem é bem-vindo: o [capítulo 7 do manual](docs/manual/07-conformidade-e-leitores.md) diz como medi-lo.
+
+## Licença
+
+O produto (o que a release leva, listado em [`spec/release.json`](spec/release.json): o contrato, a suíte, os
+casos `.kg.yaml`, o kit em `tools/`, o `ADOPTING.md`, este README e o manual) é **Apache-2.0**:
+[`LICENSE`](LICENSE), com o escopo no [`NOTICE`](NOTICE).
+
+Os casos `.kg.yaml` da suíte são parte do contrato e seguem a Apache-2.0.
+
+O repositório de desenvolvimento guarda também o framework Onion vendorizado, com licença própria: o código que
+executa segue MIT e o material de método segue CC BY-NC 4.0, cada um no seu arquivo de licença na raiz daquele
+repositório. Nada disso viaja na release.
+
+<sub>O KG-SSOT nasceu dentro do framework Onion, que hoje o adota por tag, como qualquer outro adotante. O produto
+não depende dele.</sub>
+
+
+========== ADOPTING.md ==========
+
+# Adotar o contrato KG-SSOT
+
+Este guia é para um repo que guarda grafos `.kg.yaml` e quer validá-los contra o contrato formal: o JSON Schema
+2020-12 em dois níveis (MUST e SHOULD), a suíte de conformidade e o leitor de referência. O adotante fixa uma
+**tag** deste repo e traz a superfície da release por script. O contrato nunca é copiado à mão nem é código
+compartilhado.
+
+## O que vem na release
+
+A lista está em [`spec/release.json`](spec/release.json):
+- o contrato v4, o vigente (`spec/kg-contract-v4.schema.json` e `spec/kg-contract-v4.should.schema.json`);
+- a suíte (`spec/conformance/`);
+- o leitor de referência (`tools/kg_validate.py`, `tools/kg_conformance.py`);
+- o gate (`tools/kg_gate.py`) e o vendor (`tools/kg_vendor.py`);
+- o armazém com gate (`tools/kg_store.py`), para quem grava grafo por programa: só escreve o que o contrato aprova
+  ([cap. 5 do manual](docs/manual/05-ferramentas.md));
+- o servidor MCP de referência (`tools/kg_mcp.py`), para um modelo julgar e gravar grafos pelo contrato, por stdio ou
+  HTTP local;
+- o exportador de proveniência para PROV-O em JSON-LD (`tools/kg_prov_export.py`);
+- as dependências fixadas (`tools/requirements.txt`, Python 3 com PyYAML e jsonschema);
+- este guia, o `README.md` e o manual do produto (`docs/manual/`), que explica o formato, o contrato e as ferramentas;
+- o `llms.txt` (índice para agentes de IA) e o `llms-full.txt` (a documentação inteira num texto só, gerada dos
+  arquivos da release);
+- a licença (`LICENSE`, Apache-2.0) e o `NOTICE`, que dizem o escopo dela.
+
+Tudo isso é **Apache-2.0**, inclusive os casos `.kg.yaml` da suíte. A Apache-2.0 dá, além do direito autoral,
+uma licença das patentes do autor e dos contribuidores sobre o que eles contribuíram. Essa licença termina para
+quem processar alegando que o contrato infringe patente. Quem escreve um leitor próprio pode usar o contrato e a
+suíte, inclusive comercialmente, mantendo o `LICENSE` e o `NOTICE`.
+
+Do lado do mantenedor deste repo, uma conferência de higiene que não viaja confere essa lista no CI:
+- toda entrada é coberta por arquivo rastreado;
+- a tag é `kg-ssot-v<version>` (até a 4.3.0, `contract-v<version>`; as tags antigas continuam valendo);
+- o contrato citado é o vigente;
+- nenhum arquivo da release tem referência privada.
+
+O adotante usa só `update` e `check`.
+
+## 1. Trazer a release
+
+> **O nome da tag mudou na 4.3.1:** de `contract-vX.Y.Z` para `kg-ssot-vX.Y.Z`, para a tag dizer o produto também
+> no carimbo do adotante. Nada mais muda: as tags antigas seguem existindo, e o próximo update só troca a string do
+> `--tag`.
+
+O repositório público é `https://github.com/marciocar/kg-ssot`: cada commit dele é uma release, com a tag. A
+primeira vez, clone-o fora do seu repo e rode o vendor a partir da raiz do seu repo (o adotante):
+
+```bash
+git clone https://github.com/marciocar/kg-ssot ../kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --dest vendor/kg-ssot
+```
+
+Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
+vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --source https://github.com/marciocar/kg-ssot
+```
+
+As tags publicadas estão em `git ls-remote --tags https://github.com/marciocar/kg-ssot`.
+
+- **Leitura:** o vendor lê a tag com `git archive`, nunca a árvore de trabalho. Os nomes são literais: um `*`
+  num nome de arquivo não vira glob.
+- **O que a release aceita:** só arquivos regulares. Um symlink na tag é entrada quebrada.
+- **Troca:** o `--dest` padrão é `vendor/kg-ssot`. O diretório é trocado por rename e nunca fica pela metade.
+  Um arquivo que saiu da release some.
+- **O que o vendor recusa substituir:**
+  - um diretório sem carimbo, porque nunca apaga um diretório alheio;
+  - um vendor que diverge do carimbo, a menos que venha `--force`. Isso evita que uma edição local suma em
+    silêncio.
+- **Perfil mínimo:** quem só roda o gate e o check pode trazer o perfil `gate` com `--profile gate`. São 10 arquivos:
+  o contrato (MUST e SHOULD), o `release.json`, o leitor, o gate, o vendor, o `requirements.txt`, este guia, a
+  `LICENSE` e o `NOTICE`. A suíte de conformidade fica de fora, e por isso o `kg_conformance.py` e o
+  `spec/conformance/README.md` que este guia cita não vêm. O carimbo registra o perfil, o `check` confere só o que ele
+  trouxe, e o update seguinte **herda** o perfil do carimbo (`--profile full` volta à release inteira).
+  Quem está numa tag anterior à `contract-v4.1.1` migra em dois passos, porque o vendor antigo não conhece
+  `--profile`: primeiro o update normal para a 4.1.1, depois o update com `--profile gate`.
+- **Carimbo:** `vendor/kg-ssot/.kg-ssot-version` guarda a tag, o commit e o sha256 de cada arquivo.
+- **Commit:** o vendor não commita. Num PR próprio, o adotante commita o diretório inteiro com o carimbo.
+
+## 2. Gravar a linha de base
+
+Na raiz do adotante, **nesta ordem**:
+
+```bash
+pip install -r vendor/kg-ssot/tools/requirements.txt         # ou o venv da nota de ambiente, abaixo
+git add vendor/kg-ssot                                       # antes do gate: ele só mede arquivo rastreado
+python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # grava .kg-ssot/gate.json
+```
+
+O gate mede os `.kg.yaml` rastreados por git (`git ls-files`, lidos da árvore de trabalho). Um arquivo que
+ainda não está no git não entra. Por padrão, `*/fixtures/*` e `docs/materials/*` ficam de fora, e isso já
+exclui as fixtures do próprio vendor: os `.kg.yaml` do vendor moram todos em `*/fixtures/*`. Por isso o
+`git add vendor/kg-ssot` vem antes do `--update`: com o vendor rastreado, a base gravada é a mesma que o CI vai
+medir depois do commit, e um grafo seu ainda não adicionado também precisa de `git add` antes.
+
+**Nota de ambiente.** Num sistema com PEP 668 (Ubuntu 24.04 em diante, entre outros), o `pip install` fora de um
+venv é recusado (`externally-managed-environment`). Instale as dependências num venv e rode o kit com o Python
+dele:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r vendor/kg-ssot/tools/requirements.txt
+echo .venv/ >> .gitignore                                    # o venv não entra no git
+.venv/bin/python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
+```
+
+No GitHub Actions com `actions/setup-python`, o `pip install` do passo de CI funciona sem venv.
+
+### Ler o que reprova
+
+O gate lista, depois da comparação, cada grafo que reprova no MUST com os códigos dele (`novo`, `regredido` ou
+`herdado`) e a dívida SHOULD por código. Para ver as ocorrências de um grafo, rode o leitor de referência sem
+`--schema`: ele usa o mesmo contrato e o mesmo vocabulário do gate (`parse.*`, `form.*`, `integrity.*`, `yaml.*`),
+com a contagem de cada código:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/meu-grafo.kg.yaml
+# REPROVA docs/meu-grafo.kg.yaml
+#   MUST   form.required.node.provenance ×33 · yaml.forbidden-key-on ×7
+#   SHOULD form.required.node.verified_at ×33
+```
+
+Para saber **em qual nó ou aresta** cada código sai, acrescente `--where`. A saída padrão não muda; cada ocorrência
+ganha uma linha com o lugar:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where docs/meu-grafo.kg.yaml
+#     MUST   form.required.node.provenance  nó C_RETRY_SAFE
+#     MUST   yaml.forbidden-key-on  aresta #6 (C_X -> Q_A)
+#     SHOULD integrity.testimony-in-prod  nó C_SLA_99
+```
+
+O que não tem lugar mais fino sai como `arquivo`: o erro de parse, o `.nan`/`.inf` e a data sem aspas.
+
+rc 0 todo arquivo passa no MUST, 1 algum reprova, 2 entrada quebrada.
+
+### A chave `on:` em aresta vira `trigger:`
+
+`yaml.forbidden-key-on` é uma aresta com a chave `on:`. Ela é proibida desde o v1 porque um leitor YAML 1.1 (o
+PyYAML padrão, entre outros) lê `on` como o booleano `true`, e o evento referenciado parece órfão para esse leitor
+enquanto outro o aprova. O gatilho de uma `TRANSITIONS` se escreve `trigger:`, e a integridade aceita `trigger`
+como referência ao evento:
+
+```yaml
+- from: ST_IDLE
+  to: ST_BUSY
+  edge_type: TRANSITIONS
+  trigger: EV_START      # era: on: EV_START
+```
+
+A troca é mecânica (só o nome da chave) e tira o código do grafo. Se ela vier depois da base, o gate mostra o
+ganho e pede para travar com `--update`.
+
+`--exclude GLOB` é repetível e se soma a esses padrões. O glob é `fnmatch` sobre o caminho relativo, e `*`
+atravessa `/`. `--no-default-excludes` desliga os padrões, e aí as fixtures do vendor, quebradas de propósito,
+entram no corpus.
+
+A linha de base guarda o contrato (o nome do schema MUST e o sha256 dos dois schemas) e mais duas coisas:
+- `failing`: os grafos que hoje falham no MUST, por caminho. É a dívida herdada.
+- `debt`: quantos grafos carregam cada aviso SHOULD.
+
+Commite o `.kg-ssot/gate.json`.
+
+## 3. O passo de CI
+
+No GitHub Actions, o workflow inteiro, em `.github/workflows/kg-ssot.yml`:
+
+```yaml
+name: KG-SSOT
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  kg-ssot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
+        run: |
+          pip install -r vendor/kg-ssot/tools/requirements.txt
+          python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
+          python3 -I -B vendor/kg-ssot/tools/kg_gate.py
+```
+
+Em outro CI, o passo é o mesmo: Python 3, as dependências fixadas e os dois comandos.
+
+**`check`** reprova (rc 1) quando um arquivo do vendor foi editado, apagado ou acrescentado. Isso inclui
+bytecode num `__pycache__`, que trocaria o leitor sem mudar a fonte, e symlink. Os scripts do kit não gravam
+bytecode quando rodam como script. Mas uma ferramenta sua que **importa** um módulo do kit grava o `.pyc` dele
+no `__pycache__` do vendor, porque o Python compila antes de executar o módulo, e o próximo `check` reprova.
+Por isso todo comando deste guia usa `python3 -I -B`, e quem importa o kit roda com `-B` ou
+`PYTHONDONTWRITEBYTECODE=1`.
+
+O contrato não se customiza no adotante: uma mudança necessária volta ao produto como issue no repositório público
+e vira caso ou decisão de contrato.
+
+Limite: o carimbo atesta a si mesmo. O `check` pega uma edição acidental, mas não quem edita um arquivo e
+recalcula o carimbo. Isso o review do PR do adotante pega, porque o diff do carimbo fica à vista.
+
+**O gate** reprova (rc 1) quando:
+- um grafo fora de `failing` falha no MUST, inclusive um grafo novo;
+- um grafo de `failing` ganha um código MUST que não tinha;
+- a dívida de um código SHOULD sobe, ou aparece um código novo;
+- o contrato mudou: o nome do schema MUST, ou o sha256 dos schemas por uma tag nova. A comparação continua
+  sendo feita contra a base antiga, e a base nova se grava com `--update` no mesmo PR.
+
+No MUST, a comparação é por grafo: consertar um grafo não compensa quebrar outro. A dívida SHOULD é por código,
+um total de grafos. Tirar um aviso de um grafo e pôr o mesmo em outro empata.
+
+**Dívida por nó.** Por grafo, uma melhora espalhada aparece como piora: consertar 3 ocorrências num grafo e criar 1
+em outro conta como +1 grafo. Desde a `contract-v4.2.0`, `kg_gate.py --update --granularity node` passa a contar e
+travar a dívida SHOULD por ocorrência, somada em todos os grafos. A base guarda a granularidade, e o gate a usa sem
+precisar da opção outra vez; `--granularity graph` volta ao padrão. Trocar não é piora: na passada que troca, a
+dívida é comparada na granularidade da base, e o `--update` só pede motivo se ela piorou de verdade. O MUST segue por
+grafo nas duas granularidades. Ocorrência é por nó ou aresta na maioria dos códigos; os que valem para o arquivo
+inteiro (`yaml.unquoted-date`, `form.range.top.nodes`) contam 1 por grafo.
+
+Um ganho passa e pede para travar: o grafo saiu de `failing` porque foi consertado, ou a dívida caiu. Um grafo
+apagado não conta como conserto: o gate diz que ele saiu do corpus, e diz quando o corpus encolhe, para o PR
+mostrar a remoção. Para
+travar, rode `kg_gate.py --update` no mesmo PR.
+
+Sobre `--update`:
+- sem base ainda, ele grava a primeira (rc 0);
+- com uma piora e sem `--accept-regression "<motivo>"`, ele recusa (rc 1) e não grava nada;
+- com o motivo, ele grava, e o motivo fica na base (`accepted_regressions`, que se acumula).
+
+**rc 0:** nada piorou, ou o vendor está íntegro. **rc 1:** algo piorou, ou o vendor diverge do carimbo.
+**rc 2:** entrada quebrada, que nunca passa como verde:
+- no `kg_gate.py`:
+  - `--repo` não é um repo git;
+  - a base está ausente (sem `--update`), ilegível ou fora do formato. O formato é `contract` como texto,
+    `failing` como caminho → [códigos], `debt` como código → inteiro ≥ 0, `accepted_regressions` como lista e,
+    opcional, `granularity` como `graph` ou `node`;
+  - um `.kg.yaml` não pôde ser lido.
+- no `kg_vendor.py`:
+  - o `--source` não é repo git, a tag não existe, ou o `spec/release.json` dela está ausente, ilegível ou
+    declara outra tag;
+  - uma entrada da release não cobre nenhum arquivo, ou um membro da tag não é arquivo regular;
+  - o carimbo está ausente, ilegível ou fora do formato;
+  - no `update`: o destino não é um vendor, ou é um vendor editado sem `--force`, ou faltou `--source` dentro
+    de um vendor.
+
+## 4. Atualizar a tag
+
+O PR que muda a tag faz três coisas:
+1. roda `kg_vendor.py update` com a tag nova e `git add vendor/kg-ssot` (o gate mede só arquivo rastreado);
+2. roda `kg_gate.py` e explica no PR a diferença que aparecer;
+3. grava a base com `--update`, porque um contrato novo muda a identidade.
+
+Aviso novo no SHOULD sobe a dívida por desenho. As rampas do contrato (SHOULD hoje, MUST depois) chegam assim,
+como compromisso medido.
+
+Da `contract-v4.0.x` para a `contract-v4.1.x`, nenhum veredito muda: entram quatro avisos SHOULD (carimbo sem alvo,
+testemunho em PROD, verificação antes do fato e decisão sem origem; a tabela está em `spec/conformance/README.md`).
+Se a dívida SHOULD subir (por desenho, quando o corpus tem o que os avisos novos acusam), o `--update` desse PR vai com
+`--accept-regression "<motivo>"`; se não subir, o `--update` grava a identidade nova sem motivo.
+
+## 5. Do v3 para o v4
+
+O v4 é uma versão maior: o que alertava no v3 passa a reprovar. Quem está numa tag `contract-v3.x` (anterior à
+publicação do repositório público, que começa no v4) sobe pela **rampa** do gate, sem truque de data no schema e sem
+consertar o corpus inteiro de uma vez. Quem adota agora começa no v4 e pode pular para a lista do que muda, que vale
+como resumo do contrato.
+
+O que muda no v4:
+- **`provenance` é MUST** em nó `confirmed` ou PROD (`form.required.node.provenance`), com `source`, `locator` e
+  `method` não vazios. O nó `unverifiable` não exige, nem em PROD.
+- **`provenance.source` placeholder reprova** (`form.pattern.node.provenance.source`): só espaço, `desconhecida`,
+  `desconhecido`, `unknown`, `n/a`, `na`, `n.a.`, `none`, `null`, `sem fonte`, `tbd`, hífens, travessão ou `?`,
+  sem distinguir maiúscula e ignorando pontuação final e espaço em volta.
+- **Chave desconhecida sem o prefixo `x_` reprova** no topo, no `meta`, no nó e na aresta
+  (`form.unknown-key.<escopo>.<chave>`), e o nome sem `x_` que nem é slug reprova como
+  `form.pattern.<escopo>.key`. Dentro de `provenance`, a chave desconhecida segue só alertando.
+- **`provenance.method` tem vocabulário** (SHOULD no v4, MUST no v5): `'<classe>: <detalhe>'`. A classe diz **de que
+  tipo é a evidência que sustenta a afirmação**: `medição` (quem estabeleceu a afirmação executou e registrou o
+  comando), `leitura` (documento primário), `juízes` (painel de agentes ou juízes), `testemunho` (uma pessoa ou sessão
+  afirmou; inclui a medição de terceiro lida aqui) ou `derivado` (a afirmação é concluída de outras afirmações ou
+  campos, sem evidência própria). Fora disso alerta como `form.pattern.node.provenance.method`.
+  Quando uma migração preenche a `provenance` a partir do que o nó já trazia, a classe é a da evidência original, e o
+  detalhe diz que a migração não re-verificou, por exemplo `medição: <o que foi medido>; não reverificado na migração`
+  (decisão do mantenedor em 2026-10-09).
+  **Atenção:** se o seu CI cobra que grafo novo saia limpo também no SHOULD, este alerta já reprova lá no v4, e não só
+  no v5. Ajuste antes os geradores que escrevem `provenance`.
+
+O caminho, num PR só:
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --source https://github.com/marciocar/kg-ssot`,
+   e `git add vendor/kg-ssot`;
+2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
+   falhar no MUST;
+3. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "<motivo>"` grava esses grafos em
+   `failing`, como **dívida herdada**. Sem o motivo, o `--update` recusa, porque grafo que passava e falha é
+   piora. Daí em diante vale a catraca: grafo novo tem de passar no v4, grafo de `failing` não ganha código MUST
+   novo, e a dívida só encolhe, com `--update` a cada conserto.
+
+**Onde a fonte mora** (`provenance.locality`, opcional, desde a `contract-v4.2.0`): `repo` (arquivo versionado no
+próprio repo), `web` (endereço público), `host` (só existe numa máquina: um journal local, um caminho fora do repo) ou
+`pessoa` (o relato de alguém). Fora desses valores, alerta como `form.enum.node.provenance.locality`. Serve para medir
+o que um terceiro consegue reverificar e para barrar `host` quando o grafo vai a público.
+
+**Referência a nó de outro grafo** (`external_edges`, opcional, desde a `contract-v4.3.0`): uma lista no topo do grafo,
+cada aresta com exatamente uma ponta externa `<caminho relativo à raiz do repo>#<id>` e a outra um id deste arquivo.
+Sem `from`, quem aponta é o grafo inteiro.
+
+```yaml
+external_edges:
+  - to: docs/pesquisa/outra.kg.yaml#C_ANTIGA      # este grafo supera um nó de outro grafo
+    edge_type: SUPERSEDES
+  - from: docs/graph/portas.kg.yaml#D_MATRIZ       # um nó de fora limita um nó daqui
+    to: D_CORTE
+    edge_type: CONSTRAINS
+```
+
+Os tipos são `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO` e `DEPENDS_ON`. O gate confere o alvo contra
+os `.kg.yaml` rastreados do repo, inclusive os que o `--exclude` tira do corpus, e lê só os que alguma referência cita: alvo que não existe, ou grafo-alvo
+apagado, reprova quem aponta (`integrity.dangling-external`). Fora do gate, `kg_validate.py --corpus <raiz do repo>`
+faz a mesma conferência: num repo git, contra os `.kg.yaml` rastreados; fora de um repo, contra todo `.kg.yaml` sob o
+diretório. Sem `--corpus`, o leitor confere só a forma e a ponta local, e diz quantos arquivos ficaram com a ponta externa
+sem conferir. Uma referência ao próprio arquivo passa como externa; use `edges` para isso. Uma chave `x_` própria que fazia esse papel migra para cá; a que só declara algo, sem ser
+aresta, segue como `x_`.
+
+**Label corrigido.** Quando uma revisão troca o label de um nó, o label anterior vai para a `narrative`, começando
+por `label anterior: …`. O git guarda o resto do histórico; o contrato não tem campo próprio para isso.
+
+O que fazer com um nó `confirmed` ou PROD **sem fonte recuperável**:
+- **o padrão é rebaixar** o `status` para `unverifiable`, que não exige `provenance`: o que não se rastreia não
+  está confirmado;
+- **quando a origem é uma pessoa ou sessão recuperável**, a `provenance` aponta essa origem, com `method` de
+  `testemunho`, e o nó segue `confirmed`;
+- **nunca um placeholder** em `source`: ele reprova.
+
+Trocar o `status` de um nó é decisão sobre a verdade do grafo, e fica com quem é dono dele. A migração pode
+propor `provenance` a partir de campos que o nó já tem, mas o `method` é declarado por quem revisa, nunca
+inventado. Uma chave própria sem `x_` se resolve renomeando para `x_<nome>`.
+
+## Conformidade de outro leitor
+
+Para provar que um leitor próprio concorda com o contrato, rode a suíte com o leitor de referência, **depois** do
+`git add vendor/kg-ssot`:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_conformance.py
+```
+
+A ordem importa: os casos de corpus conferem a ponta externa contra os `.kg.yaml` rastreados quando a suíte mora num
+repo git, e com o vendor ainda fora do git um caso falha (`latest: 224/225`). Depois compare com os códigos que o seu
+leitor emite. O formato dos casos e como rodar a suíte com um leitor em outra linguagem estão em
+`spec/conformance/README.md`.
+
+
+========== docs/manual/README.md ==========
+
+# Manual do KG-SSOT
+
+O KG-SSOT é um **grafo de conhecimento verificável** em arquivo texto. Cada afirmação traz a fonte dela, a data
+em que foi conferida e o que foi conferido, e um contrato formal decide se o arquivo está bem escrito. Este
+manual cobre o formato `.kg.yaml`, o contrato, as ferramentas e a adoção num repositório.
+
+Release descrita aqui: **4.7.2** (tag `kg-ssot-v4.7.2`). O contrato vigente dessa release é o **v4**.
+
+## Capítulos
+
+| # | Capítulo | Para quê |
+|---|---|---|
+| 1 | [O que é e para quem](01-o-que-e.md) | O problema, a tese e quem ganha com isso |
+| 2 | [Conceitos](02-conceitos.md) | Grafo, nó, tipos, status, planos, arestas, proveniência, carimbo de verificação |
+| 3 | [Referência do formato](03-formato.md) | Todos os campos do `.kg.yaml`, tirados do schema |
+| 4 | [O contrato](04-contrato.md) | MUST × SHOULD, códigos de erro, versões e tags |
+| 5 | [Ferramentas](05-ferramentas.md) | `kg_validate`, `kg_conformance`, `kg_gate`, `kg_vendor`, `kg_store`, `kg_mcp`, `kg_prov_export`, com saídas reais |
+| 6 | [Adoção e CI](06-adocao-e-ci.md) | O caminho curto para levar o contrato a um repositório |
+| 7 | [Conformidade e leitores](07-conformidade-e-leitores.md) | A suíte de casos e como escrever um leitor próprio |
+| 8 | [Receitas](08-receitas.md) | Tarefas comuns, passo a passo |
+| 9 | [Solução de problemas](09-problemas.md) | O que cada erro quer dizer e como resolver |
+| 10 | [Glossário](10-glossario.md) | Os termos do manual |
+
+## Leitura rápida
+
+- **Vai escrever um grafo?** Leia os capítulos 2 e 3, e use o 9 quando o leitor reprovar.
+- **Vai adotar num repositório?** Comece pelo capítulo 6 e siga para o [`ADOPTING.md`](../../ADOPTING.md).
+- **Vai escrever um leitor em outra linguagem?** O capítulo 7 e o [`spec/conformance/README.md`](../../spec/conformance/README.md).
+
+## Fontes da verdade
+
+Este manual explica, mas não manda. Quando ele e um destes arquivos divergirem, valem os arquivos:
+
+- o contrato: [`spec/kg-contract-v4.schema.json`](../../spec/kg-contract-v4.schema.json) (MUST) e
+  [`spec/kg-contract-v4.should.schema.json`](../../spec/kg-contract-v4.should.schema.json) (SHOULD);
+- a suíte: [`spec/conformance/`](../../spec/conformance/README.md);
+- a superfície da release: [`spec/release.json`](../../spec/release.json).
+
+Todas as saídas de comando deste manual foram coladas de uma execução real, em Python 3.12 com as versões de
+[`tools/requirements.txt`](../../tools/requirements.txt).
+
+
+========== docs/manual/01-o-que-e.md ==========
+
+# 1. O que é e para quem
+
+[← Índice](README.md) · [Conceitos →](02-conceitos.md)
+
+## O problema
+
+Uma equipe, humana ou de agentes, acumula conclusões: "o retry é idempotente", "o cache precisa de TTL",
+"decidimos três tentativas". Elas costumam morar em atas, em tickets e em memórias de conversa. Três coisas se
+perdem nesse caminho:
+
+1. **De onde veio.** A conclusão perde a fonte e vira opinião repetida.
+2. **Quando foi conferida.** Um fato verdadeiro em março pode ser falso em outubro, e nada avisa.
+3. **O que depende do quê.** Quando uma evidência cai, ninguém sabe quais decisões caem junto.
+
+Uma ferramenta que escreve conhecimento, seja pessoa ou modelo, consegue produzir texto convincente sem nenhuma
+das três. O KG-SSOT trata isso como um problema de **formato verificável**, não de boa vontade.
+
+## A tese
+
+Conhecimento operacional cabe num **grafo em arquivo texto**, versionado junto do código, em que:
+
+- cada nó é uma afirmação curta e tipada (pergunta, evidência, decisão, artefato...);
+- todo nó `confirmed` ou de produção diz **de onde veio** (`provenance`), e o carimbo de verificação diz
+  **quando** e **contra o quê** (`verified_at`, `verified_against`);
+- as arestas dizem **o que sustenta, refuta, substitui ou depende** de quê;
+- um **contrato formal** (JSON Schema 2020-12 mais regras de integridade) decide o que reprova e o que só alerta,
+  e qualquer leitor, em qualquer linguagem, prova que segue o contrato passando numa **suíte de conformidade**.
+
+O resultado é um arquivo que uma máquina consegue julgar no CI, como julga código.
+
+## O que vem no produto
+
+| Peça | O que é |
+|---|---|
+| O contrato | Dois JSON Schemas, MUST (reprova) e SHOULD (alerta), mais as regras de integridade que o schema não alcança |
+| A suíte de conformidade | 225 casos em `latest/`, em dados puros, com o veredito e os códigos esperados de cada um |
+| O leitor de referência | `kg_validate.py`, em Python 3 com PyYAML e jsonschema, sem outra dependência |
+| O kit de adoção | `kg_vendor.py`, que traz uma release por tag, e `kg_gate.py`, a catraca por grafo no CI |
+| O armazém com gate | `kg_store.py`, que grava grafos em disco, num repo git ou num armazém versionado, só depois do PASS do contrato |
+| O servidor MCP de referência | `kg_mcp.py`, que dá a um modelo o contrato e o armazém por MCP, por stdio ou HTTP local |
+| O exportador PROV-O | `kg_prov_export.py`, que leva a proveniência de cada nó para o ecossistema W3C PROV, em JSON-LD |
+
+## Para quem
+
+- **Equipes de engenharia** que registram decisões e evidências e querem que o CI recuse uma afirmação sem fonte.
+- **Quem constrói agentes** e precisa de uma memória que o agente lê primeiro e que não aceita escrita sem origem.
+- **Quem escreve ferramentas de grafo** (visualizadores, extratores, ports em outra linguagem) e quer provar
+  compatibilidade com uma suíte, não com um "funciona na minha máquina".
+
+## O que o KG-SSOT não é
+
+- **Não é um banco de grafos.** Não há servidor, consulta nem índice. É um formato de arquivo com um contrato.
+- **Não é um padrão da web semântica.** Não é RDF nem OWL. O formato é YAML com um vocabulário fechado e pequeno.
+- **Não decide se a afirmação é verdadeira.** O contrato confere que a afirmação **diz** de onde veio e quando foi
+  conferida. Conferir a fonte de novo é trabalho de quem revisa.
+- **Não depende de um editor, de um assistente ou de uma plataforma.** O contrato e o leitor de referência rodam
+  com Python e nada mais.
+
+
+========== docs/manual/02-conceitos.md ==========
+
+# 2. Conceitos
+
+[← O que é](01-o-que-e.md) · [Índice](README.md) · [Referência do formato →](03-formato.md)
+
+## O grafo
+
+Um grafo é **um arquivo** `.kg.yaml` com três chaves obrigatórias no topo: `meta` (identidade do grafo), `nodes`
+(as afirmações) e `edges` (as relações entre elas). Uma quarta, `external_edges`, é opcional e liga um nó deste
+arquivo a um nó de outro. Um repositório pode ter quantos grafos quiser.
+
+```yaml
+meta:
+  schema_version: "1"
+  id: exemplo
+nodes:
+  - id: Q_CACHE_TTL
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: O cache de sessão precisa de TTL?
+edges: []
+```
+
+Esse grafo é válido no MUST? Não. Um nó sem nenhuma aresta é **órfão** e reprova (`integrity.orphan-node`):
+todo nó precisa de pelo menos uma aresta. O exemplo completo, com uma evidência ligada à pergunta, está no
+[capítulo 8](08-receitas.md#escrever-o-primeiro-grafo).
+
+## O nó
+
+Cada nó é uma afirmação curta. Os campos obrigatórios são sete:
+
+| Campo | O que diz |
+|---|---|
+| `id` | Identificador único no arquivo: começa por letra, depois letras, dígitos e `_` |
+| `node_type` | Que tipo de afirmação é (tabela abaixo) |
+| `plane` | `DEV` ou `PROD` |
+| `status` | Em que pé a afirmação está (tabela abaixo) |
+| `impact` | Inteiro de 1 a 5: quanto pesa se estiver errada |
+| `confidence` | Número de 0 a 1: quanto se confia nela hoje |
+| `label` | A afirmação em si, em texto curto |
+
+### Tipos de nó (`node_type`)
+
+O contrato fecha a lista em onze tipos, em duas famílias. Os nomes são do contrato; o uso descrito é o convencional.
+
+| Família | Tipo | Uso |
+|---|---|---|
+| Investigação | `question` | Uma pergunta aberta |
+| | `claim` | Uma afirmação que precisa de evidência |
+| | `evidence` | Algo observado ou medido, que sustenta ou refuta outra coisa |
+| | `decision` | Uma escolha, aberta ou selada |
+| | `artifact` | Uma coisa que existe (um arquivo, um serviço, uma release) |
+| | `entity` | Um ente do domínio que outros nós citam |
+| Domínio | `state` | Um estado de uma entidade |
+| | `event` | Um evento que dispara transições |
+| | `rule` | Uma regra de negócio |
+| | `invariant` | Algo que tem de valer sempre |
+| | `policy` | Uma política que governa regras |
+
+O campo opcional `layer` (no `meta` ou no nó) declara a camada: `audit` (investigação) ou `domain` (modelo de
+domínio).
+
+### Status
+
+A lista é do contrato; o uso descrito é o convencional. As exigências marcadas em negrito são do contrato.
+
+| Status | Uso |
+|---|---|
+| `open` | Ainda em aberto |
+| `confirmed` | Conferida, com fonte. **Exige `provenance`** |
+| `drifted` | Era verdade e o vivo mudou desde a conferência |
+| `unverifiable` | Não há fonte recuperável. É o destino honesto de um nó sem origem, e **não exige `provenance`** |
+| `refuted` | A evidência contrária venceu |
+| `superseded` | Outro nó tomou o lugar deste (aresta `SUPERSEDES`) |
+| `done` | Concluída (uma tarefa, um épico) |
+
+### Planos: `DEV` e `PROD`
+
+`PROD` marca uma afirmação sobre o que está **em produção**, ou da qual a produção depende. Pesa mais: todo nó
+PROD exige `provenance` (MUST, salvo `unverifiable`), e o contrato alerta quando ele não tem `verified_at`
+(SHOULD). `DEV` é todo o resto: hipótese, investigação, plano.
+
+## As arestas
+
+Uma aresta tem `from`, `to` e `edge_type`, e opcionalmente `label` e `trigger`. As duas pontas têm de existir no
+arquivo.
+
+| Tipo | Leitura |
+|---|---|
+| `SUPPORTS` | `from` sustenta `to` |
+| `REFUTES` | `from` contradiz `to` |
+| `SUPERSEDES` | `from` substitui `to` |
+| `CAUSES` | `from` causa `to` |
+| `DEPENDS_ON` | `from` depende de `to` |
+| `TRACES_TO` | `from` tem origem em `to` |
+| `CONSTRAINS` | `from` restringe `to` |
+| `HAS_STATE` | a entidade `from` tem o estado `to` |
+| `TRANSITIONS` | o estado `from` passa a `to`; o evento que dispara vai em `trigger` |
+| `EMITS` | `from` emite o evento `to` |
+| `READS` · `WRITES` | `from` lê ou escreve `to` |
+
+A chave `on` numa aresta é proibida (`yaml.forbidden-key-on`): um leitor YAML 1.1 lê `on` como o booleano
+`true`, e a chave some. O gatilho de uma transição vai em `trigger`.
+
+### Arestas entre grafos (`external_edges`)
+
+Desde a 4.3, um grafo pode apontar para um nó de outro grafo do mesmo repositório. Cada aresta externa tem
+**exatamente uma** ponta externa, escrita `<caminho relativo à raiz>#<id>`. A outra ponta é um id deste arquivo;
+quando a ponta externa é o `to`, o `from` pode faltar, e então vale o grafo inteiro. Só seis tipos cruzam grafos: `SUPERSEDES`, `CONSTRAINS`,
+`SUPPORTS`, `REFUTES`, `TRACES_TO` e `DEPENDS_ON`.
+
+```yaml
+external_edges:
+  - from: D_CACHE_TTL_15MIN
+    to: docs/exemplo.kg.yaml#Q_CACHE_TTL
+    edge_type: TRACES_TO
+```
+
+O leitor confere a ponta externa só quando recebe a raiz do repositório (`--corpus`). Num repo git, ele lê só os
+`.kg.yaml` rastreados: um grafo alvo que ainda não teve `git add` não conta. Fora de um repo git, lê todos. Sem ela, confere a forma e a
+ponta local e diz na saída que não conferiu o resto.
+
+## Proveniência
+
+`provenance` diz **de onde veio** a afirmação. São três campos, todos obrigatórios e não vazios quando o objeto
+existe:
+
+| Campo | O que diz | Exemplo |
+|---|---|---|
+| `source` | A fonte: um arquivo, um endereço, uma pessoa | `tests/payment_retry_test.py` |
+| `locator` | Onde, dentro da fonte | `test_retry_is_idempotent` |
+| `method` | Como a afirmação saiu da fonte, na forma `<classe>: <detalhe>` | `medição: teste de integração no CI` |
+
+`source` não pode ser um marcador vazio: `desconhecida`, `unknown`, `n/a`, `none`, `null`, `tbd`, `sem fonte`,
+hífens, travessão ou `?` reprovam (`form.pattern.node.provenance.source`). Se não há fonte, o nó é
+`unverifiable`, não `confirmed`.
+
+### As cinco classes de `method`
+
+| Classe | Quando usar |
+|---|---|
+| `medição` | Você rodou algo e observou o resultado: um teste, um benchmark, uma consulta |
+| `leitura` | Você leu a fonte primária e a afirmação está nela |
+| `juízes` | Mais de um avaliador independente votou |
+| `derivado` | A afirmação foi deduzida de outros nós, sem conferência nova |
+| `testemunho` | Alguém relatou. Inclui a medição feita por terceiro que você só leu |
+
+Fora dessa forma, o contrato v4 **alerta** (`form.pattern.node.provenance.method`). No v5 vai reprovar.
+
+Um quarto campo, opcional, `locality`, diz se a fonte é reverificável por terceiros: `repo` (arquivo versionado
+no mesmo repositório), `web` (endereço público), `host` (só existe numa máquina) ou `pessoa` (relato de alguém).
+
+## O carimbo de verificação
+
+| Campo | O que diz |
+|---|---|
+| `verified_at` | A data da última conferência, `AAAA-MM-DD` |
+| `verified_against` | O que foi conferido: o comando, o arquivo, a versão |
+| `valid_from` | Desde quando o fato vale (`AAAA`, `AAAA-MM` ou `AAAA-MM-DD`) |
+
+Uma `claim` com `verified_at` e sem `verified_against` alerta: carimbo sem alvo não distingue o verificado do
+declarado. Um `verified_at` anterior ao `valid_from` também alerta (`integrity.verified-before-fact`).
+
+Escreva as datas **entre aspas**: `verified_at: "2026-10-12"`. Sem aspas, um leitor YAML pode transformar a data
+num objeto de data, e o contrato alerta (`yaml.unquoted-date`).
+
+## Rótulo e narrativa
+
+`label` é o **fato**, curto. O contrato alerta acima de 280 caracteres (`form.range.node.label`). A história, o
+contexto e o raciocínio vão em `narrative`, um campo livre. Essa separação deixa o rótulo comparável e a
+narrativa livre.
+
+## Extensões: o prefixo `x_`
+
+Uma chave fora da gramática reprova (`form.unknown-key.<escopo>.<chave>`), no topo, no `meta`, no nó e na
+aresta. Para guardar um dado seu, use o prefixo `x_`: `x_prioridade: alta` passa. Dentro de `provenance`, a
+chave desconhecida só alerta.
+
+
+========== docs/manual/03-formato.md ==========
+
+# 3. Referência do formato
+
+[← Conceitos](02-conceitos.md) · [Índice](README.md) · [O contrato →](04-contrato.md)
+
+Tirado de [`spec/kg-contract-v4.schema.json`](../../spec/kg-contract-v4.schema.json) (MUST) e
+[`spec/kg-contract-v4.should.schema.json`](../../spec/kg-contract-v4.should.schema.json) (SHOULD). Se esta
+página e o schema divergirem, vale o schema.
+
+Convenções: **obr.** = obrigatório; *data* = texto `AAAA-MM-DD` que existe no calendário.
+
+## Arquivo
+
+- YAML, **um documento só**, com a raiz sendo um mapa.
+- Booleanos do YAML 1.2: só `true` e `false` (também em `True`, `TRUE`, `False`, `FALSE`). `yes`, `no`, `on` e
+  `off` são texto.
+- Chaves comparadas na forma JSON: `1` e `"1"` colidem (`parse.duplicate-key`).
+- `.nan` e `.inf` reprovam em qualquer posição, porque o JSON não os representa.
+
+## Topo
+
+| Chave | Tipo | Regra |
+|---|---|---|
+| `meta` | mapa | obr. |
+| `nodes` | lista de nós | obr. Lista vazia é válida, mas alerta (`form.range.top.nodes`) |
+| `edges` | lista de arestas | obr. Pode ser vazia |
+| `external_edges` | lista de arestas externas | opcional (desde a 4.3) |
+| `x_*` | qualquer | extensão livre |
+
+## `meta`
+
+| Chave | Tipo | Regra |
+|---|---|---|
+| `schema_version` | texto | obr. Exatamente `"1"` |
+| `id` | texto | obr. Não vazio |
+| `baseline` | *data* | quando o grafo foi medido pela primeira vez |
+| `date` | *data* | |
+| `review_after` | *data* | quando o grafo deve ser revisto |
+| `layer` | `audit` · `domain` | |
+| `note` · `purpose` | texto | narrativa do grafo |
+| `x_*` | qualquer | |
+
+## Nó
+
+| Chave | Tipo | Regra |
+|---|---|---|
+| `id` | texto | obr. `^[A-Za-z][A-Za-z0-9_]*$`, único no arquivo |
+| `node_type` | enum | obr. `entity` `claim` `decision` `question` `evidence` `artifact` `state` `event` `rule` `invariant` `policy` |
+| `plane` | enum | obr. `DEV` · `PROD` |
+| `status` | enum | obr. `open` `confirmed` `drifted` `unverifiable` `refuted` `superseded` `done` |
+| `impact` | inteiro | obr. 1 a 5 |
+| `confidence` | número | obr. 0 a 1 |
+| `label` | texto | obr. Não vazio. SHOULD: até 280 caracteres |
+| `provenance` | mapa | **obr. quando `status: confirmed` ou `plane: PROD`, exceto `status: unverifiable`** |
+| `trace` | texto | onde a afirmação aparece (arquivo, caminho) |
+| `verified_at` | *data* | SHOULD em nó PROD |
+| `verified_against` | texto | SHOULD em `claim` com `verified_at` |
+| `valid_from` | data parcial | `AAAA`, `AAAA-MM` ou `AAAA-MM-DD` |
+| `source_tier` | inteiro | 1 a 10 |
+| `source_kind` | texto | |
+| `owner` | texto | |
+| `drive_kind` · `evidence_class` | texto | |
+| `sealed_by` · `sealed_at` | texto | quem selou a decisão e quando |
+| `narrative` | texto | a história por trás do `label` |
+| `layer` | `audit` · `domain` | |
+| `x_*` | qualquer | |
+
+### `provenance`
+
+| Chave | Tipo | Regra |
+|---|---|---|
+| `source` | texto | obr. Não vazio e não marcador (`unknown`, `n/a`, `tbd`, `?`...) |
+| `locator` | texto | obr. Não vazio |
+| `method` | texto | obr. Não vazio. SHOULD: `<classe>: <detalhe>`, classe em `medição` `leitura` `juízes` `derivado` `testemunho` |
+| `locality` | enum | opcional. `repo` `web` `host` `pessoa` (fora do enum alerta) |
+| `x_*` | qualquer | outra chave alerta, não reprova |
+
+`provenance: null` reprova. Ou o objeto vem inteiro, ou não vem.
+
+## Aresta
+
+| Chave | Tipo | Regra |
+|---|---|---|
+| `from` | id | obr. Tem de existir no arquivo |
+| `to` | id | obr. Tem de existir no arquivo |
+| `edge_type` | enum | obr. `SUPPORTS` `REFUTES` `SUPERSEDES` `CAUSES` `DEPENDS_ON` `TRACES_TO` `CONSTRAINS` `HAS_STATE` `TRANSITIONS` `EMITS` `READS` `WRITES` |
+| `label` | texto | |
+| `trigger` | id | o evento de uma `TRANSITIONS`. Tem de existir no arquivo |
+| `on` | — | **proibida**: use `trigger` |
+| `x_*` | qualquer | |
+
+## Aresta externa
+
+| Chave | Tipo | Regra |
+|---|---|---|
+| `from` | id ou referência | id deste arquivo, ou ausente (o grafo inteiro), ou a ponta externa |
+| `to` | id ou referência | obr. Exatamente uma das duas pontas é externa |
+| `edge_type` | enum | obr. `SUPERSEDES` `CONSTRAINS` `SUPPORTS` `REFUTES` `TRACES_TO` `DEPENDS_ON` |
+| `label` | texto | |
+| `x_*` | qualquer | |
+
+Uma referência externa é `<caminho>.kg.yaml#<id>`, com o caminho relativo à raiz do repositório e escrito com
+`/`. Cada segmento começa por letra, dígito ou `_`. Caminho absoluto, `..`, `\` e `:` reprovam.
+
+## Integridade (fora do schema)
+
+O schema não alcança estas regras, e todo leitor tem de aplicá-las:
+
+| Regra | Nível | Código |
+|---|---|---|
+| ids únicos no arquivo | MUST | `integrity.duplicate-id` |
+| `from`, `to` e `trigger` apontam para nó existente | MUST | `integrity.dangling-from` · `-to` · `-trigger` |
+| nenhum nó sem aresta (grau 0) | MUST | `integrity.orphan-node` |
+| a ponta local de uma aresta externa existe | MUST | `integrity.dangling-external-local` |
+| a ponta externa existe (só com o corpus) | MUST | `integrity.dangling-external` |
+| nó PROD sustentado só por testemunho | SHOULD | `integrity.testimony-in-prod` |
+| `verified_at` anterior a `valid_from` | SHOULD | `integrity.verified-before-fact` |
+| `decision` viva sem `trace`, sem `provenance` e sem `TRACES_TO` saindo dela | SHOULD | `integrity.untraced-decision` |
+
+Uma aresta externa conta como ligação: o nó ligado só por ela não é órfão.
+
+
+========== docs/manual/04-contrato.md ==========
+
+# 4. O contrato
+
+[← Referência do formato](03-formato.md) · [Índice](README.md) · [Ferramentas →](05-ferramentas.md)
+
+## Dois níveis: MUST e SHOULD
+
+| Nível | Arquivo | Efeito |
+|---|---|---|
+| **MUST** | `spec/kg-contract-v4.schema.json` | Reprova o arquivo. O leitor sai com rc 1 |
+| **SHOULD** | `spec/kg-contract-v4.should.schema.json` | Só alerta. O arquivo segue válido |
+
+Os dois são JSON Schema 2020-12 escritos à mão. Além deles, o contrato tem as regras de **perfil YAML** (um
+documento só, chave duplicada, chave `on`) e as de **integridade** (ids, pontas, órfãos), que o JSON Schema não
+vê. Por isso, um validador de JSON Schema sozinho não é um leitor completo: o leitor de referência aplica as três
+camadas, e a suíte cobra as três de todo leitor.
+
+O `format: date` do schema é **asserção**: a data tem de existir no calendário (`2026-02-30` reprova). Muitos
+validadores tratam `format` como anotação por padrão, e por isso a suíte tem casos para isso.
+
+## Códigos
+
+Toda violação tem um código estável, com a forma da camada:
+
+| Camada | Forma | Exemplos |
+|---|---|---|
+| parse | `parse.<motivo>` | `parse.yaml-error`, `parse.duplicate-key`, `parse.not-single-document` |
+| form | `form.<tipo>.<escopo>.<campo>` | `form.required.node.label`, `form.enum.node.status`, `form.unknown-key.node.prioridade` |
+| integrity | `integrity.<regra>` | `integrity.orphan-node`, `integrity.dangling-to` |
+| yaml | `yaml.<regra>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
+
+`<tipo>` é um de `required`, `enum`, `type`, `pattern`, `range`, `const` ou `unknown-key`. `<escopo>` é um de
+`top`, `meta`, `node` ou `edge`. Num campo aninhado, o caminho leva ponto: `form.required.node.provenance.locator`.
+Nas `external_edges`, o escopo é `top` e o campo leva o nome da lista (`form.enum.top.external_edges.edge_type`). Uma
+data fora do calendário (`format: date`) reprova como `form.pattern.<escopo>.<campo>`.
+
+A lista completa, com o que cada código pega, está em
+[`spec/conformance/README.md`](../../spec/conformance/README.md#códigos).
+
+## O que mudou do v3 para o v4
+
+O v4 é uma versão **maior**: o que alertava passou a reprovar.
+
+| Código | v3 | v4 |
+|---|---|---|
+| `form.required.node.provenance` (nó `confirmed` ou PROD sem `provenance`, fora o `unverifiable`) | SHOULD | **MUST** |
+| `form.unknown-key.<escopo>.<chave>` (chave fora da gramática, sem `x_`) | SHOULD | **MUST** |
+| `form.pattern.<escopo>.key` (nome de chave que não é slug, sem `x_`) | SHOULD | **MUST** |
+| `form.pattern.node.provenance.source` (`source` marcador) | — | **MUST** |
+| `form.pattern.node.provenance.method` (fora de `<classe>: <detalhe>`) | — | SHOULD (MUST no v5) |
+
+As versões menores da linha 4 só acrescentaram, sem mudar o veredito MUST de um grafo bem escrito:
+
+| Release | O que entrou |
+|---|---|
+| 4.1 | Quatro avisos SHOULD: `verified_against` ausente em claim carimbada, testemunho em PROD, verificação antes do fato, decisão sem origem |
+| 4.2 | `provenance.locality`, e a dívida SHOULD do gate contada por ocorrência, como opção |
+| 4.3 | `external_edges`, com a ponta externa conferida no corpus |
+| 4.4 | O exportador de proveniência para PROV-O (`kg_prov_export.py`) |
+| 4.5 | O veredito estruturado `kg-ssot.verdict/1` (`kg_validate.py --format json`) |
+| 4.6 | O armazém que só grava o que o contrato aprova (`kg_store.py`) |
+| 4.7 | O servidor MCP de referência (`kg_mcp.py`) e o teto de aninhamento e de aliases do leitor |
+
+## Versões e tags
+
+A release é uma tag `kg-ssot-vX.Y.Z` (até a 4.3.0, o nome era `contract-vX.Y.Z`; as tags antigas seguem
+existindo). Pelo histórico das releases:
+
+| Parte | Quando sobe |
+|---|---|
+| **X**, maior | Um veredito MUST muda: algo que passava reprova |
+| **Y**, menor | Entra um aviso SHOULD, um campo opcional ou uma ferramenta ou formato novo no kit, e nenhum veredito MUST de grafo bem escrito muda |
+| **Z**, patch | Correção ou melhoria do kit, do guia ou dos casos, com o mesmo contrato |
+
+O gate guarda o sha256 dos dois schemas como a identidade do contrato. Uma tag que muda os bytes dos schemas,
+mesmo que só no texto das descrições (como a 4.7.2), pede `kg_gate.py --update` no PR que traz a tag, e o gate mostra
+que nenhum veredito mudou.
+
+Um aviso SHOULD novo pode subir a dívida medida pelo gate. Isso é intencional: a rampa de um contrato é alertar
+numa versão e reprovar na seguinte, e o adotante vê a dívida antes de ela virar erro.
+
+A superfície que viaja em cada tag está em [`spec/release.json`](../../spec/release.json). O contrato não se
+customiza no adotante: o vendor reprova edição local, e uma mudança necessária volta ao produto como issue no
+repositório público.
+
+## Os contratos antigos
+
+O repositório do produto guarda o v1, o v2 e o v3 em `spec/` como histórico; a release leva só o v4, o vigente, que
+é o que o leitor usa sem `--schema`.
+
+
+========== docs/manual/05-ferramentas.md ==========
+
+# 5. Ferramentas
+
+[← O contrato](04-contrato.md) · [Índice](README.md) · [Adoção e CI →](06-adocao-e-ci.md)
+
+As sete ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3 com as versões fixadas em
+[`tools/requirements.txt`](../../tools/requirements.txt) (PyYAML e jsonschema, mais as dependências do jsonschema).
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
+```
+
+Todo `rc` segue a mesma convenção: **0** passou, **1** algo reprovou, **2** a entrada está quebrada (arquivo
+ilegível, base ausente, tag inexistente). Um rc 2 nunca passa por verde.
+
+Os exemplos abaixo rodam num repositório de demonstração com o kit em `vendor/kg-ssot`. Num clone do produto,
+troque `vendor/kg-ssot/tools/` por `tools/`.
+
+## `kg_validate.py`: o leitor de referência
+
+Valida um ou mais arquivos contra o contrato vigente.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/exemplo.kg.yaml docs/quebrado.kg.yaml
+```
+
+```text
+PASSA   docs/exemplo.kg.yaml
+REPROVA docs/quebrado.kg.yaml
+  MUST   form.required.node.provenance ×1 · form.unknown-key.node.prioridade ×1
+  SHOULD form.required.node.verified_against ×1 · integrity.untraced-decision ×1 · yaml.unquoted-date ×1
+· 2 arquivos; 1 passam no MUST; 1 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+rc 1. Para saber **em qual nó** cada código sai, `--where`:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where docs/quebrado.kg.yaml
+```
+
+```text
+REPROVA docs/quebrado.kg.yaml
+  MUST   form.required.node.provenance ×1 · form.unknown-key.node.prioridade ×1
+  SHOULD form.required.node.verified_against ×1 · integrity.untraced-decision ×1 · yaml.unquoted-date ×1
+    MUST   form.required.node.provenance  nó C_RETRY_SAFE
+    MUST   form.unknown-key.node.prioridade  nó C_RETRY_SAFE
+    SHOULD form.required.node.verified_against  nó C_RETRY_SAFE
+    SHOULD integrity.untraced-decision  nó D_RETRY_POLICY
+    SHOULD yaml.unquoted-date  arquivo
+· 1 arquivos; 0 passam no MUST; 1 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+Opções úteis:
+
+| Opção | Efeito |
+|---|---|
+| `--where` | Uma linha por ocorrência, com o nó ou a aresta |
+| `--corpus DIR` | Confere a ponta externa das `external_edges` contra os `.kg.yaml` rastreados pelo git sob `DIR` (fora de um repo git, todos) |
+| `--schema F` | Valida contra outro MUST (o SHOULD vizinho vem junto, se existir) |
+| `--format json` | O veredito estruturado em stdout (ver abaixo), para ferramentas e servidores MCP |
+| `--limit N` | Com `--format json`, quantas ocorrências por arquivo (default 50); o resumo conta todas |
+| `-` no lugar do arquivo | Lê o grafo do stdin, sem gravar arquivo temporário |
+| `--should-schema F` | Com `--schema`, o SHOULD que acompanha (no lugar do vizinho) |
+
+As opções `--json OUT`, `--spike`, `--git`, `--rev` e `--list` são do instrumento de medição que deu origem ao
+contrato (o "spike"): gravam e reproduzem um formato legado, congelado, e não fazem parte da interface estável. Para
+ferramentas, use `--format json`.
+
+Com `external_edges` e sem `--corpus`, o leitor avisa que não conferiu a ponta externa:
+
+```text
+PASSA   docs/decisao.kg.yaml
+· 1 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+· 1 arquivo(s) com external_edges: a ponta externa NÃO foi conferida (rode com --corpus <raiz do repo>)
+```
+
+### O veredito estruturado (`--format json`)
+
+Para quem chama o leitor por programa (um CI, um servidor MCP, um chat), o `--format json` devolve o veredito num
+formato versionado, `kg-ssot.verdict/1`, com JSON Schema em `spec/verdict.schema.json`. Saída real de um caso da
+suíte:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
+  vendor/kg-ssot/spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
+```
+
+```text
+{
+ "schema_version": "kg-ssot.verdict/1",
+ "contract": {
+  "must": "spec/kg-contract-v4.schema.json",
+  "should": "spec/kg-contract-v4.should.schema.json",
+  "release": "kg-ssot-v4.7.2",
+  "sha256": { "must": "0b532b0d…", "should": "30498b28…" }
+ },
+ "results": [
+  {
+   "source": "…/bad-node-missing-label.kg.yaml",
+   "verdict": "FAIL",
+   "summary": { "MUST": { "form.required.node.label": 1 }, "SHOULD": {} },
+   "occurrences": [
+    {
+     "level": "MUST",
+     "code": "form.required.node.label",
+     "place": "nó Q_A",
+     "path": "nodes[0]",
+     "line": 5,
+     "message": "Falta o campo obrigatório «label» no nó.",
+     "hint": "Acrescente label: a afirmação curta do nó, até 280 caracteres."
+    }
+   ],
+   "total": 1,
+   "truncated": false,
+   "external_checked": true
+  }
+ ]
+}
+```
+
+(Os dois sha256 e o caminho estão abreviados aqui.)
+
+- **O que é estável:** `code` é o vocabulário da suíte e do gate, e é por ele que uma ferramenta decide. `message` e
+  `hint` são texto para pessoas e podem mudar.
+- **O lugar da ocorrência:** `path` aponta no documento (`nodes[7].provenance.method`) e `line` é a linha do YAML,
+  para quem edita corrigir o ponto certo sem reescrever o grafo.
+- **O corte:** `summary` conta todas as ocorrências. `occurrences` traz até `--limit`, e `truncated` e `total` dizem
+  se cortou. Assim um grafo grande não enche o contexto de um modelo.
+- **O contrato que julgou:** `contract` traz o caminho, o sha256 de cada schema e a release, para quem precisa provar
+  qual contrato julgou.
+- **O rc:** 0 quando todos passam, 1 quando algum reprova (um arquivo que não parseia reprova com `parse.*`, como na
+  suíte) e 2 quando a entrada está quebrada (arquivo ilegível, opção inválida).
+- **O desempenho:** com a libyaml instalada (o caso comum do PyYAML), o parse usa o parser em C, com o mesmo perfil
+  YAML 1.2, e só cai no parser puro, mais lento, nos raros textos em que os dois podem divergir (tab, `%YAML`, escape
+  de surrogate ou `\U`, BOM fora do início).
+
+## `kg_conformance.py`: a suíte
+
+Roda a suíte de conformidade contra o leitor de referência. Primeiro o metaschema se auto-testa, depois cada
+manifesto é validado, depois cada caso roda.
+
+```bash
+python3 -I tools/kg_conformance.py
+```
+
+As últimas linhas:
+
+```text
+—
+latest: 225/225 (reprova)
+optional: 10/24 (só reporta)
+```
+
+rc 0. `latest/` é o contrato vigente, e um caso que falha ali reprova (rc 1). `optional/` é comportamento que um
+leitor **pode** implementar (hoje, a camada semântica de frescor e domínio, que o leitor de referência não
+implementa) e nunca muda o rc. rc 2 quer dizer que a própria suíte está quebrada: manifesto inválido, arquivo
+fora de manifesto, pasta desconhecida.
+
+## `kg_gate.py`: a catraca por grafo
+
+O gate é para o CI de um repositório que guarda grafos. Ele mede todos os `.kg.yaml` **rastreados pelo git** e
+compara com uma linha de base (`.kg-ssot/gate.json`). A regra: **nada piora**. Um grafo que já reprovava fica
+registrado como dívida herdada; um grafo novo tem de passar.
+
+Sem base, o gate se recusa:
+
+```text
+GATE QUEBRADO  linha de base ausente (.kg-ssot/gate.json): grave a primeira com --update
+```
+
+rc 2. A primeira base:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
+```
+
+```text
+  MUST   docs/quebrado.kg.yaml (herdado): form.required.node.provenance · form.unknown-key.node.prioridade
+  SHOULD form.required.node.verified_against: 1 grafo
+  SHOULD integrity.untraced-decision: 1 grafo
+  SHOULD yaml.unquoted-date: 1 grafo
+linha de base gravada: .kg-ssot/gate.json (2 grafos, 1 na dívida herdada)
+```
+
+Um grafo novo que reprova, depois de `git add`:
+
+```text
+✗ PIOROU  docs/novo.kg.yaml falha no MUST: form.required.node.provenance, form.unknown-key.node.prioridade
+✗ PIOROU  debt.form.required.node.verified_against: 1 → 2
+✗ PIOROU  debt.integrity.untraced-decision: 1 → 2
+✗ PIOROU  debt.yaml.unquoted-date: 1 → 2
+· 3 grafos; 1 passam no MUST; 1 na dívida herdada
+  MUST   docs/novo.kg.yaml (novo): form.required.node.provenance · form.unknown-key.node.prioridade
+  MUST   docs/quebrado.kg.yaml (herdado): form.required.node.provenance · form.unknown-key.node.prioridade
+  SHOULD form.required.node.verified_against: 2 grafos
+  SHOULD integrity.untraced-decision: 2 grafos
+  SHOULD yaml.unquoted-date: 2 grafos
+```
+
+rc 1. E quando a dívida é paga (o grafo herdado consertado):
+
+```text
+↑ melhorou docs/quebrado.kg.yaml: passa no MUST (trave o ganho: kg_gate.py --update)
+↑ melhorou debt.form.required.node.verified_against: 1 → 0 (trave o ganho: kg_gate.py --update)
+↑ melhorou debt.integrity.untraced-decision: 1 → 0 (trave o ganho: kg_gate.py --update)
+↑ melhorou debt.yaml.unquoted-date: 1 → 0 (trave o ganho: kg_gate.py --update)
+· 2 grafos; 2 passam no MUST; 0 na dívida herdada
+```
+
+rc 0, com o pedido de travar o ganho. Rode `--update` no mesmo PR para a dívida não voltar.
+
+| Opção | Efeito |
+|---|---|
+| `--update` | Grava a base. Se algo piorou, recusa sem `--accept-regression` |
+| `--accept-regression "<motivo>"` | Aceita uma piora; o motivo fica gravado na base |
+| `--exclude GLOB` | Tira caminhos do corpus (repetível). `*/fixtures/*` e `docs/materials/*` já saem por padrão |
+| `--granularity node` | Com `--update`: conta a dívida SHOULD por ocorrência, não por grafo |
+| `--no-default-excludes` | Desliga os excluídos padrão (e aí as fixtures do vendor entram no corpus) |
+| `--repo DIR` · `--baseline ARQ` | Outro repositório, outra base |
+
+## `kg_vendor.py`: trazer e conferir a release
+
+O adotante nunca copia o contrato à mão. O vendor lê uma **tag** com `git archive` e grava um carimbo com o
+sha256 de cada arquivo.
+
+Da raiz do adotante, com um clone do repositório público em `../kg-ssot`. As saídas abaixo são de uma execução real
+com a tag `kg-ssot-v4.7.1`; numa release mais nova, a tag, o commit e a contagem de arquivos mudam:
+
+```bash
+git clone https://github.com/marciocar/kg-ssot ../kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.1 --dest vendor/kg-ssot
+```
+
+```text
+vendor atualizado: vendor/kg-ssot ← kg-ssot-v4.7.1 (04d73f2e2f64), 313 arquivos
+```
+
+O `check` recalcula os sha256 e compara com o carimbo. Um arquivo editado, apagado ou sobrando (inclusive
+bytecode num `__pycache__`) dá rc 1.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
+```
+
+```text
+✓ vendor íntegro: vendor/kg-ssot = kg-ssot-v4.7.1 (04d73f2e2f64), 313 arquivos
+```
+
+| Opção | Efeito |
+|---|---|
+| `--source REPO` | O repositório (caminho ou URL, como `https://github.com/marciocar/kg-ssot`) que tem a tag. Obrigatório quando roda de dentro de um vendor |
+| `--dest DIR` | Onde fica o vendor (default `vendor/kg-ssot`) |
+| `--profile gate` | Traz só o mínimo para rodar o gate e o check (10 arquivos, sem a suíte); `--profile full` volta à release inteira |
+| `--force` | Substitui um vendor editado localmente |
+
+**Por que `-B`?** Os scripts do kit não gravam bytecode, mas uma ferramenta sua que **importa** um módulo do kit
+grava o `.pyc` dentro do vendor, e o próximo `check` reprova. Rode tudo com `python3 -I -B`, ou com
+`PYTHONDONTWRITEBYTECODE=1`.
+
+## `kg_store.py`: o armazém que só grava o que passa
+
+Para quem grava grafo por programa (um servidor de escrita, um chat, um pipeline que gera o grafo de um caso), o
+`kg_store.py` é uma biblioteca, com um CLI por cima, que só escreve depois do veredito PASS do contrato. Há três
+armazéns com a mesma interface (`read`, `list`, `write`, `delete`, `history`):
+
+- `DiskStore`: só a cabeça em disco, sem histórico;
+- `GitStore`: um commit por gravação ou remoção. O git roda isolado na raiz do armazém e nunca sobe para um repo
+  de fora. O autor vem de quem grava (`author="Nome <email>"`), e o committer é fixo do serviço;
+- `VersionedStore`: a cabeça em disco mais um registro de eventos e as versões no diretório oculto `.kg-store/`,
+  sem git.
+
+Para importar do vendor (o kit não é pacote pip), ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem gravar
+bytecode, como no [capítulo 6](06-adocao-e-ci.md#num-app):
+
+```python
+import kg_store
+
+store = kg_store.GitStore("areas/ana", init=True)
+r = store.write("grafos/caso.kg.yaml", texto, message="primeiro grafo", author="Ana <ana@example.org>",
+                expected_sha256=kg_store.NEW)
+if not r["written"]:
+    print(r["reason"], r["verdict"])   # "gate", "conflict", "missing" ou "not_judged"
+```
+
+O gate julga mais que o candidato. A ponta das `external_edges` é conferida contra o próprio armazém, já com o
+candidato no lugar. Cada grafo que aponta para o nome gravado é julgado de novo, porque trocar ou apagar um grafo
+pode deixar a aresta externa de outro sem ponta. Só grava com PASS em todos.
+
+O corpus é o mesmo que o gate do repo veria. No `GitStore`, isso quer dizer só o rastreado: um `.kg.yaml` que está no
+disco sem commit não conta, nem na lista, nem no julgamento, nem na trava (para ela, o nome está livre, e a gravação
+o substitui). O `DiskStore` e o `VersionedStore` recusam uma raiz dentro
+de um repo git, onde o gate leria o rastreado e o armazém leria o disco. E a cabeça só fica trocada com o registro
+feito: se o commit ou o evento falha, ela volta ao que era, e a exceção sobe para quem chamou.
+
+O CLI tem um subcomando por operação, com a saída em JSON no stdout:
+
+```text
+kg_store.py --backend disk|git|versioned --root DIR [--init] list
+kg_store.py ... read NOME [--ref REF]
+kg_store.py ... write NOME [ARQUIVO|-] [--message M] [--author "Nome <email>"] [--expected-sha256 S|new]
+kg_store.py ... delete NOME [--message M] [--author A] [--expected-sha256 S]
+kg_store.py ... history NOME
+```
+
+Pelo CLI, um grafo que passa e um que reprova:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_store.py --backend git --root areas/ana --init \
+  write grafos/valid-minimal.kg.yaml vendor/kg-ssot/spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml \
+  --author "Ana <ana@example.org>" --message "primeiro grafo"
+```
+
+```text
+{
+ "written": true,
+ "reason": null,
+ "name": "grafos/valid-minimal.kg.yaml",
+ "sha256": "b725f37669f2e5979ed8c02eaae3c59ba80a490177e2f28c0cb8a580cf51cfd7",
+ "ref": "f47e4737c147d2e4a070bd8d07948075373814e0",
+ "verdict": { … },
+ "error": null,
+ "unchanged": false
+}
+```
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_store.py --backend git --root areas/ana \
+  write grafos/x.kg.yaml vendor/kg-ssot/spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
+```
+
+```text
+{
+ "written": false,
+ "reason": "gate",
+ "name": "grafos/x.kg.yaml",
+ ...
+ "verdict": { "results": [ { "source": "grafos/x.kg.yaml", "verdict": "FAIL",
+              "summary": { "MUST": { "form.required.node.label": 1 }, "SHOULD": {} }, ... } ] }
+}
+```
+
+(O `verdict` está abreviado aqui; ele é o documento `kg-ssot.verdict/1` inteiro.)
+
+- **`reason`:** é `null` quando gravou. `"gate"` quer dizer que o contrato reprovou, e o `verdict` diz onde.
+  `"conflict"` quer dizer que o `expected_sha256` não bate com a cabeça. `"missing"` aparece ao remover o que não
+  existe. `"not_judged"` aparece quando o julgamento falhou ou saiu fora de `spec/verdict.schema.json`: nunca vira
+  PASS nem `"gate"`, para quem chama distinguir "reprovou" de "não deu para julgar".
+- **A trava otimista:** `expected_sha256` é o sha256 da cabeça que quem grava leu, ou `NEW` (no CLI, `new`) para
+  exigir que o nome ainda não exista. Gravar o mesmo texto da cabeça dá `written` com `unchanged` e sem commit.
+- **O caminho:** o nome é relativo, termina em `.kg.yaml` e não tem `..` nem segmento oculto. Raiz, pastas e arquivo
+  não podem ser symlink: tudo se abre com `O_NOFOLLOW`, o que exige POSIX.
+- **O histórico:** `history(nome)` lista as operações, da mais nova para a mais antiga, com `ref`, `op`
+  (`write` ou `delete`), autor, data e mensagem. `read(nome, ref=...)` lê uma versão anterior: o sha do commit no
+  git, o `seq` do evento no versionado.
+- **O git isolado:** o `GitStore` não lê a config do sistema nem a do usuário (sem hooks, sem gpg, sem `autocrlf`, sem
+  arquivo de exclusão), então o que ele guarda é byte a byte o texto aprovado, com o sha256 do resultado.
+- **O que fica com quem adota, de propósito:** autenticação, identidade, área por usuário (um root por usuário),
+  tamanho máximo, número de grafos, timeout e a trava entre processos onde não há `flock`.
+- **O rc do CLI:** 0 gravou ou leu, 1 recusado (`gate`, `conflict`, `missing`, nome inexistente) e 2 entrada
+  quebrada ou `not_judged`.
+
+## `kg_mcp.py`: o servidor MCP de referência
+
+Para dar a um modelo o contrato e o armazém sem escrever um servidor, o `kg_mcp.py` fala o
+[Model Context Protocol](https://modelcontextprotocol.io) por stdio (uma mensagem JSON-RPC por linha) ou por HTTP
+(`POST /mcp`, resposta JSON, sem stream). Ele usa só a biblioteca padrão, o leitor e o armazém, e é um adaptador: o
+produto não depende dele, e ele não depende de um cliente específico.
+
+| Ferramenta | O que faz |
+|---|---|
+| `kg_validate` | julga um texto `.kg.yaml` sem gravar e devolve o `kg-ssot.verdict/1` (com o armazém como corpus, se há armazém) |
+| `kg_write` | grava pelo armazém, só com PASS; devolve o resultado do `kg_store` com o veredito |
+| `kg_delete` | remove pelo armazém, se nenhum grafo que aponta para o nome reprovar sem ele |
+| `kg_get` | lê um grafo, ou uma versão anterior com `ref` |
+| `kg_list` | lista os grafos do armazém |
+| `kg_history` | as operações de um grafo, da mais nova para a mais antiga |
+| `kg_schema_help` | o contrato vigente para um modelo: os schemas MUST e SHOULD inteiros, um exemplo mínimo que passa, as regras de integridade e a correção dos códigos mais comuns |
+
+Sem `--root`, só `kg_validate` e `kg_schema_help` aparecem. Com `--read-only`, `kg_write` e `kg_delete` somem da lista.
+
+Uma configuração de cliente por stdio, com um armazém versionado fora do repo:
+
+```json
+{
+  "mcpServers": {
+    "kg-ssot": {
+      "command": "python3",
+      "args": ["-I", "-B", "vendor/kg-ssot/tools/kg_mcp.py",
+               "--root", "/caminho/do/armazem", "--backend", "versioned", "--init",
+               "--author", "Assistente <assistente@example.org>"]
+    }
+  }
+}
+```
+
+| Opção | Efeito |
+|---|---|
+| `--root DIR` | O armazém. Sem ele, só `kg_validate` e `kg_schema_help` |
+| `--backend disk\|git\|versioned` | O tipo de armazém (default `disk`) |
+| `--init` | Cria a raiz se não existir |
+| `--author "Nome <email>"` | Quem assina as gravações |
+| `--read-only` | Tira `kg_write` e `kg_delete` |
+| `--http PORTA` · `--host H` · `--allow-remote` | HTTP no lugar do stdio; fora do loopback, só com `--allow-remote` |
+| `--max-bytes N` | O tamanho máximo de um grafo (default 2.000.000) |
+
+Uma gravação recusada, como o modelo a recebe (o `structuredContent`, abreviado):
+
+```text
+{
+ "written": false,
+ "reason": "gate",
+ "name": "grafos/x.kg.yaml",
+ "verdict": { "results": [ { "verdict": "FAIL",
+   "occurrences": [ { "code": "form.required.node.label", "place": "nó Q_A", "path": "nodes[0]", "line": 5,
+                      "message": "Falta o campo obrigatório «label» no nó.",
+                      "hint": "Acrescente label: a afirmação curta do nó, até 280 caracteres." } ] } ] },
+ ...
+}
+```
+
+A resposta de `tools/call` traz o mesmo objeto em `structuredContent` e, como texto JSON, em `content`. Uma
+gravação recusada ou um nome inexistente vem com `isError: true`, para o modelo corrigir e tentar de novo.
+
+- **Quem assina:** o autor das gravações é o `--author` do servidor, nunca um argumento da ferramenta. O modelo não
+  escolhe quem assina.
+- **Os limites:** `--max-bytes` (padrão 2.000.000) limita o texto de um grafo. Os argumentos são conferidos contra o
+  `inputSchema` que o `tools/list` anuncia: tipo errado, campo obrigatório ausente e campo desconhecido voltam como
+  `isError`. Uma falha interna vira o erro JSON-RPC -32603, e o processo segue atendendo.
+- **O leitor por trás:** um documento que abre mais de 1.000 coleções de uma vez (em flow, em bloco ou por
+  indentação), ou cujos aliases expandem para mais que o dobro do tamanho do texto, reprova com `parse.yaml-error`
+  antes de ser construído. Sem esse teto, uma mensagem de 60 KB derrubava o processo. Colchete dentro de texto não
+  conta.
+- **O protocolo:** uma mensagem por vez; lote JSON-RPC é recusado (saiu do MCP em 2025-06-18), e o id tem de ser texto
+  ou inteiro. O stdio lê e escreve UTF-8 como bytes, independente do locale, e a resposta sai em JSON ASCII.
+- **O HTTP:** escuta em `127.0.0.1` por padrão. Recusa `Origin` cujo host não seja de loopback (contra DNS
+  rebinding), `MCP-Protocol-Version` desconhecida (400) e corpo sem `Content-Length`. Não há autenticação nem TLS: o
+  servidor só sai do loopback com `--allow-remote`, para rodar atrás de um proxy que faça os dois.
+- **Num repo:** o armazém de disco e o versionado recusam raiz dentro de um repo git (veja o `kg_store.py`). Dentro
+  do repo, use `--backend git --root .`, que faz um commit por gravação no branch atual, fora de qualquer PR (rode-o
+  num branch de trabalho), ou rode sem `--root` para só julgar.
+- **O que fica com quem adota, de propósito:** autenticação, TLS, identidade, multiusuário e área por usuário (um
+  processo ou um root por usuário), cota e timeout.
+- **As versões do protocolo:** o servidor negocia `2025-11-25`, `2025-06-18`, `2025-03-26` e `2024-11-05`, e
+  responde com a pedida quando a conhece.
+
+## `kg_prov_export.py`: a proveniência em PROV-O
+
+Exporta um `.kg.yaml` para [PROV-O](https://www.w3.org/TR/prov-o/) em JSON-LD, para quem já usa ferramentas do
+ecossistema W3C PROV. Cada nó vira uma `prov:Entity`. Um nó com `provenance` ganha `prov:wasDerivedFrom` para a
+fonte e uma `prov:Derivation` cuja atividade carrega o `method`; o `locator` e a `locality` vão como propriedades
+`kg:`. Uma fonte que é inteira uma URL http(s) vira a própria IRI; qualquer outra (um caminho, um comando, duas
+URLs juntas) vira um nó em branco rotulado, um por texto distinto, para que nós com a mesma fonte apontem para a
+mesma entidade.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_prov_export.py \
+  vendor/kg-ssot/spec/conformance/fixtures/latest/form/method-vocabulary/valid-method-leitura.kg.yaml
+```
+
+Trecho da saída, o nó com `provenance`:
+
+```text
+   "@id": "urn:kg-ssot:graph:valid-method-leitura#EV_A",
+   "@type": "prov:Entity",
+   ...
+   "prov:wasDerivedFrom": {
+    "@id": "_:source0"
+   },
+   "prov:qualifiedDerivation": {
+    "@type": "prov:Derivation",
+    "prov:entity": {
+     "@id": "_:source0",
+     "rdfs:label": "Fonte A"
+    },
+    "prov:hadActivity": {
+     "@type": "prov:Activity",
+     "rdfs:label": "leitura: seção 3 do documento A"
+    },
+    "kg:locator": "caso de conformidade"
+   }
+```
+
+O que ele **não** exporta, de propósito:
+
+- **As arestas.** `SUPPORTS`, `REFUTES` e as outras são relações de evidência, e derivação em PROV é relação de
+  produção. Exportá-las como `wasDerivedFrom` diria algo que o grafo não diz.
+- **O carimbo como tempo de geração.** `verified_at` sai como `kg:verifiedAt` (tipado `xsd:date` quando é uma data),
+  não como `prov:generatedAtTime`: em PROV, o tempo de geração marca quando a entidade passou a existir, não quando
+  foi conferida.
+
+O exportador não valida o grafo: rode o `kg_validate.py` antes. `--base IRI` troca o prefixo das IRIs dos nós
+(o default é `urn:kg-ssot:graph:`, e cada nó fica em `<base><meta.id>#<id>`); o vocabulário `kg:` mora em
+`urn:kg-ssot:vocab#`, fora desse espaço. rc 2 quando o arquivo é ilegível, não é um documento YAML único ou tem
+`meta` ou `nodes` fora da forma.
+
+
+========== docs/manual/06-adocao-e-ci.md ==========
+
+# 6. Adoção e CI
+
+[← Ferramentas](05-ferramentas.md) · [Índice](README.md) · [Conformidade e leitores →](07-conformidade-e-leitores.md)
+
+Este capítulo é o mapa. O guia completo, com cada caso de borda, é o [`ADOPTING.md`](../../ADOPTING.md).
+
+## O caminho em quatro passos
+
+```mermaid
+flowchart LR
+  A["1. vendor update<br/>traz a tag"] --> B["2. git add vendor/<br/>+ gate --update"]
+  B --> C["3. commit<br/>vendor + base"]
+  C --> D["4. CI: check + gate<br/>em todo PR"]
+```
+
+Na raiz do seu repo, com Python 3:
+
+```bash
+# 1. trazer a release, por tag, do repositório público
+git clone https://github.com/marciocar/kg-ssot ../kg-ssot
+python3 -I -B ../kg-ssot/tools/kg_vendor.py update --tag kg-ssot-v4.7.2 --dest vendor/kg-ssot
+
+# 2. as dependências num venv, e a linha de base (o gate só mede arquivo rastreado: git add antes)
+python3 -m venv .venv && .venv/bin/pip install -r vendor/kg-ssot/tools/requirements.txt
+echo .venv/ >> .gitignore
+git add vendor/kg-ssot .gitignore docs/          # e os seus .kg.yaml, onde estiverem
+.venv/bin/python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
+
+# 3. commitar o vendor, com o carimbo, e a base
+git add .kg-ssot/gate.json && git commit -m "adota o contrato KG-SSOT"
+```
+
+Os grafos que já reprovam viram dívida herdada, nomeada por caminho. O passo 4 é o CI, em todo PR: o workflow
+completo do GitHub Actions está na seção "O passo de CI" do [`ADOPTING.md`](../../ADOPTING.md), e o passo em si é:
+
+```yaml
+- name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
+  run: |
+    pip install -r vendor/kg-ssot/tools/requirements.txt
+    python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
+    python3 -I -B vendor/kg-ssot/tools/kg_gate.py
+```
+
+## O que o gate garante
+
+- Nenhum grafo **novo** entra reprovando no MUST.
+- Nenhum grafo herdado ganha um código MUST que não tinha.
+- A dívida SHOULD, por código, não sobe.
+- Uma troca de contrato aparece no PR: a base guarda o nome e o sha256 dos schemas.
+
+Consertar um grafo não compensa quebrar outro: a comparação do MUST é por grafo.
+
+## Atualizar a tag
+
+No mesmo PR: `kg_vendor.py update` com a tag nova (de dentro do vendor, com
+`--source https://github.com/marciocar/kg-ssot`), `git add vendor/kg-ssot`,
+`kg_gate.py` para ver a diferença, e `kg_gate.py --update` para gravar a identidade nova. Se uma versão menor
+trouxe um aviso SHOULD que o seu corpus já tinha, a dívida sobe por desenho, e o `--update` vai com
+`--accept-regression "<motivo>"`.
+
+## Subir de uma versão maior (v3 → v4)
+
+O v4 reprova o que o v3 só alertava. A subida é pela **rampa**: os grafos que passam a reprovar entram na base
+como dívida herdada, e a dívida só encolhe dali em diante. Não há truque de data no schema nem conserto do corpus
+inteiro de uma vez. O passo a passo, com os comandos, está na seção "Do v3 para o v4" do
+[`ADOPTING.md`](../../ADOPTING.md).
+
+## Nota de ambiente
+
+Em sistemas com PEP 668 (Ubuntu 24.04 em diante), o `pip install` fora de um venv é recusado. Use um venv e rode
+o kit com o Python dele. No GitHub Actions com `actions/setup-python`, o `pip install` funciona direto.
+
+## Num app
+
+O KG-SSOT guarda **conhecimento sobre o produto**: decisões, regras de negócio, afirmações e a evidência de cada uma.
+Não é banco de dados de runtime: o progresso, os pontos e a sequência de um usuário continuam no banco do app. O que
+vai para o grafo é, por exemplo, "a sequência zera depois de um dia sem registro", com a fonte da decisão, a data em
+que foi conferida e a aresta `TRACES_TO` até o código ou o teste que a implementa (a receita está no
+[capítulo 8](08-receitas.md#uma-regra-de-negócio-ligada-ao-código)).
+
+- **No CI:** o caminho acima vale para qualquer repo, de qualquer linguagem: o gate só precisa de Python no CI.
+- **Em tempo de execução, em Python:** o kit não é pacote pip. Ponha `vendor/kg-ssot/tools` no `sys.path` e rode sem
+  gravar bytecode, para o `check` do vendor seguir íntegro:
+
+  ```python
+  import sys
+  sys.dont_write_bytecode = True                    # ou PYTHONDONTWRITEBYTECODE=1 no ambiente
+  sys.path.insert(0, "vendor/kg-ssot/tools")
+  import kg_store                                    # o armazém que só grava o que o contrato aprova
+  store = kg_store.GitStore("/var/lib/meu-app/grafos", init=True)   # fora do repo do app
+  ```
+
+  A raiz do armazém fica **fora** do repo do app. Dentro de um repo git, o `DiskStore` e o `VersionedStore`
+  recusam a raiz; o `GitStore` com a raiz no próprio repo commita no branch em que ele estiver, fora do PR, e numa
+  subpasta do repo cria um repositório git aninhado.
+- **Em outra linguagem:** não há leitor de referência pronto fora do Python. Valide pelo CLI
+  (`kg_validate.py --format json` devolve o veredito JSON de `spec/verdict.schema.json`) ou por um modelo pelo
+  servidor MCP (`kg_mcp.py`); um leitor próprio prova que concorda com o contrato passando na suíte (capítulo 7).
+
+
+========== docs/manual/07-conformidade-e-leitores.md ==========
+
+# 7. Conformidade e leitores
+
+[← Adoção e CI](06-adocao-e-ci.md) · [Índice](README.md) · [Receitas →](08-receitas.md)
+
+O contrato vale para **todo leitor** de `.kg.yaml`: um visualizador, um extrator, um port em JavaScript, um
+validador em Go. A prova de que um leitor segue o contrato é passar na suíte, não ler a especificação e achar
+que entendeu. A referência completa é [`spec/conformance/README.md`](../../spec/conformance/README.md).
+
+## Como a suíte é feita
+
+- Cada **grupo** é uma pasta com um `manifest.json` e um `.kg.yaml` real por caso. O arquivo é real para que
+  qualquer CLI o leia como leria um grafo de verdade.
+- Cada caso declara `valid`, os `codes` (MUST) e os `warnings` (SHOULD) esperados.
+- **Um caso, um defeito.** O leitor passa quando o **conjunto** de códigos que emite é **igual** ao esperado.
+  Igualdade, não inclusão: um leitor que acusa tudo não passa.
+- A suíte valida a si mesma: o `manifest.schema.json` confere todo manifesto, e `metaschema-tests/` tem
+  manifestos que ele tem de aceitar e outros que tem de recusar.
+
+```json
+{
+  "description": "enums do nó",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    { "file": "bad-node-type.kg.yaml",
+      "description": "node_type fora do enum",
+      "valid": false,
+      "codes": ["form.enum.node.node_type"],
+      "warnings": [] }
+  ]
+}
+```
+
+| Pasta | O que vale |
+|---|---|
+| `fixtures/latest/` | O contrato vigente. Todo leitor **tem** de passar |
+| `fixtures/optional/` | Comportamento que um leitor **pode** implementar. Reporta e não reprova |
+| `fixtures/proposals/` | Casos que dependem de decisão aberta. Hoje está vazia |
+
+## Escrever um leitor
+
+1. **Parse.** YAML com booleanos do YAML 1.2, um documento só, raiz mapa, chave duplicada reprova (`1` e `"1"`
+   colidem). `.nan` e `.inf` reprovam.
+2. **Forma.** Converta para o JSON canônico (datas como texto ISO, chaves como texto) e valide contra
+   `kg-contract-v4.schema.json`, com `format` como **asserção**. Os avisos vêm do `kg-contract-v4.should.schema.json`.
+3. **Integridade.** ids únicos, pontas existentes (`from`, `to`, `trigger`), nenhum nó de grau 0, as pontas das
+   `external_edges`, e os três avisos `integrity.*` que cruzam campos.
+4. **Códigos.** Mapeie cada erro para o código estável. A tabela de códigos e as regras de nomeação estão no
+   [capítulo 4](04-contrato.md#códigos) e na referência da suíte.
+
+O leitor de referência, [`tools/kg_validate.py`](../../tools/kg_validate.py), é o molde. Ele é pequeno de
+propósito, para ser lido.
+
+### Três armadilhas que a suíte pega
+
+- **Tamanho de texto em code points.** O limite de 280 caracteres do `label` conta code points, como o
+  `maxLength` do JSON Schema. Um emoji vale 1. O `str.length` do JavaScript conta 2.
+- **`format: date` como anotação.** Muitos validadores não checam o formato por padrão. Aqui ele reprova.
+- **`$` antes de quebra de linha.** Os `pattern` têm a semântica do ECMA-262: `$` não casa antes de uma quebra
+  de linha final, ao contrário do `re` do Python.
+
+## Rodar a suíte com o seu leitor
+
+O `kg_conformance.py` roda só o leitor de referência, e o kit não traz um executor para leitores de fora. O seu
+leitor roda a suíte com o próprio código: itera os `manifest.json` de `fixtures/latest/`, julga cada caso (com a raiz
+do repo em `<pasta do manifesto>/<corpus>` quando o caso declara `corpus`) e compara os conjuntos de `codes` e de
+`warnings` por igualdade. Quem não expõe códigos compara só o veredito: `valid: true` aceita, `valid: false` reprova.
+
+## O contrato de runner
+
+Para o mantenedor medir o seu leitor ao lado do de referência, caso a caso, ele expõe um **runner**: `runner <caso>` imprime, na última linha do stdout,
+um objeto JSON, e sai com rc 0.
+
+```json
+{"verdict": "accept", "codes": [], "warnings": [], "detail": ""}
+```
+
+- `verdict`: `accept`, `reject` ou `error`. Todo leitor tem este nível.
+- `codes` e `warnings`: as listas de códigos, ou `null` se o leitor não diz o porquê.
+- Um caso que declara `corpus` no manifesto chega como `runner <caso> --corpus <dir>`.
+- Saída que não é JSON, rc diferente de 0 ou tempo estourado contam como `error`.
+
+Um leitor que só dá o veredito já é comparável no nível 1. Expor os códigos é o nível 2, e é o que permite
+diagnosticar divergência.
+
+
+========== docs/manual/08-receitas.md ==========
+
+# 8. Receitas
+
+[← Conformidade e leitores](07-conformidade-e-leitores.md) · [Índice](README.md) · [Solução de problemas →](09-problemas.md)
+
+## Escrever o primeiro grafo
+
+Uma pergunta e a evidência que a sustenta. A evidência é `confirmed`, então leva `provenance`.
+
+```yaml
+meta:
+  schema_version: "1"
+  id: exemplo
+  baseline: "2026-10-12"
+  review_after: "2027-01-12"
+nodes:
+  - id: Q_CACHE_TTL
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: O cache de sessão precisa de TTL?
+  - id: E_CACHE_GROWTH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: Sem TTL, a memória do cache cresce 40 MB por hora no teste de carga.
+    trace: bench/cache-load.md
+    verified_at: "2026-10-12"
+    provenance:
+      source: bench/cache-load.md
+      locator: tabela 2
+      method: "medição: teste de carga de 4 horas"
+edges:
+  - from: E_CACHE_GROWTH
+    to: Q_CACHE_TTL
+    edge_type: SUPPORTS
+```
+
+Todo nó precisa de pelo menos uma aresta: um nó solto reprova como `integrity.orphan-node`. Por isso um grafo de
+um nó só não passa, e o primeiro grafo já nasce com uma pergunta e o que a sustenta.
+
+Com o venv da [adoção](06-adocao-e-ci.md) ativo (`. .venv/bin/activate`), ou com `.venv/bin/python3` no lugar de
+`python3`:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/exemplo.kg.yaml
+```
+
+```text
+PASSA   docs/exemplo.kg.yaml
+· 1 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+## Consertar um nó que reprova
+
+Este nó de produção reprovou com `form.required.node.provenance` e `form.unknown-key.node.prioridade`, e alertou
+com `form.required.node.verified_against`:
+
+```yaml
+  - id: C_RETRY_SAFE
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    label: O retry do pagamento é idempotente.
+    verified_at: "2026-10-01"
+    owner: time-pagamentos
+    prioridade: alta
+```
+
+O conserto: a chave própria ganha o prefixo `x_`, o carimbo ganha alvo, e a proveniência diz de onde veio.
+
+```yaml
+    verified_at: "2026-10-01"
+    owner: time-pagamentos
+    x_prioridade: alta
+    verified_against: tests/payment_retry_test.py
+    provenance:
+      source: tests/payment_retry_test.py
+      locator: test_retry_is_idempotent
+      method: "medição: teste de integração no CI"
+```
+
+## Registrar um relato sem inventar medição
+
+Alguém do time disse que o retry é idempotente, e ninguém rodou nada. A classe é `testemunho`:
+
+```yaml
+    provenance:
+      source: time de pagamentos
+      locator: conversa de 2026-10-01
+      method: "testemunho: relato do time de pagamentos"
+```
+
+Num nó PROD, o contrato alerta (`integrity.testimony-in-prod`): produção apoiada só em relato é um risco que o
+grafo deve mostrar, não esconder.
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where testemunho.kg.yaml
+```
+
+```text
+PASSA   testemunho.kg.yaml
+  SHOULD integrity.testimony-in-prod ×1
+    SHOULD integrity.testimony-in-prod  nó C_RETRY_SAFE
+· 1 arquivos; 1 passam no MUST; 1 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+## Um nó sem fonte nenhuma
+
+Não escreva `source: desconhecida`: isso reprova. Marque o nó como `unverifiable`, e ele fica válido sem
+`provenance`, mesmo em PROD. O grafo passa a dizer a verdade: aquilo não tem origem recuperável.
+
+## Ligar uma decisão a uma pergunta de outro grafo
+
+```yaml
+meta:
+  schema_version: "1"
+  id: decisao
+nodes:
+  - id: D_CACHE_TTL_15MIN
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: TTL de 15 minutos no cache de sessão.
+    trace: docs/adr/0009-cache-ttl.md
+edges: []
+external_edges:
+  - from: D_CACHE_TTL_15MIN
+    to: docs/exemplo.kg.yaml#Q_CACHE_TTL
+    edge_type: TRACES_TO
+```
+
+Confira com o corpus, para a ponta externa ser checada. Num repo git, o corpus são os grafos rastreados, então o
+grafo alvo precisa estar no git:
+
+```bash
+git add docs/exemplo.kg.yaml
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py --corpus . docs/decisao.kg.yaml
+```
+
+Com um id que não existe no outro grafo, o leitor reprova:
+
+```text
+REPROVA docs/errado.kg.yaml
+  MUST   integrity.dangling-external ×1
+```
+
+## Travar o ganho depois de pagar dívida
+
+Consertou um grafo herdado? O gate passa e pede `--update`. Rode no mesmo PR:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
+```
+
+Sem isso, um PR futuro pode voltar a quebrar aquele grafo sem que o gate perceba, porque ele continuaria na
+dívida herdada.
+
+## Achar todos os nós com um código
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py --where docs/*.kg.yaml
+```
+
+Cada linha indentada traz o código e o nó, e dá para filtrar com `grep`.
+
+## Uma regra de negócio ligada ao código
+
+Num app, a regra fica no grafo com a decisão de onde veio e o código que a implementa. Aqui, a regra da sequência
+de um app de hábitos: a decisão de produto, a regra de domínio com o teste que a mede, e o arquivo do código.
+
+```yaml
+meta:
+  schema_version: "1"
+  id: sequencia
+  baseline: "2026-10-13"
+  review_after: "2027-01-13"
+nodes:
+  - id: D_STREAK_RESET
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.9
+    label: A sequência zera depois de um dia inteiro sem registro, no fuso do usuário.
+    trace: docs/decisoes/2026-10-sequencia.md
+    verified_at: "2026-10-13"
+    provenance:
+      source: docs/decisoes/2026-10-sequencia.md
+      locator: seção Decisão
+      method: "leitura: registro da decisão de produto"
+  - id: R_STREAK_RESET
+    node_type: rule
+    layer: domain
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    label: streak.reset() roda quando o último registro é anterior a ontem no fuso do usuário.
+    verified_at: "2026-10-13"
+    provenance:
+      source: tests/test_streak.py
+      locator: test_zera_depois_de_um_dia_sem_registro
+      method: "medição: pytest tests/test_streak.py, 6 casos passando"
+  - id: A_STREAK_CODE
+    node_type: artifact
+    layer: domain
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: A implementação da sequência mora em app/streak.py.
+    verified_at: "2026-10-13"
+    verified_against: app/streak.py
+    provenance:
+      source: app/streak.py
+      locator: função reset
+      method: "leitura: código no commit da release"
+edges:
+  - from: R_STREAK_RESET
+    to: D_STREAK_RESET
+    edge_type: TRACES_TO
+  - from: R_STREAK_RESET
+    to: A_STREAK_CODE
+    edge_type: TRACES_TO
+```
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/sequencia.kg.yaml
+```
+
+```text
+PASSA   docs/sequencia.kg.yaml
+· 1 arquivos; 1 passam no MUST; 0 com aviso SHOULD (kg-contract-v4.schema.json + kg-contract-v4.should.schema.json)
+```
+
+O contrato confere a forma, as arestas e a proveniência, e não roda o seu teste nem lê o seu código: quem roda
+`tests/test_streak.py` é o CI do app. O grafo registra o que foi medido, quando e como (`method`), e o `verified_at`
+diz há quanto tempo. Quando a regra mudar, o PR que muda o código muda o nó também, e o diff mostra os dois juntos.
+
+
+========== docs/manual/09-problemas.md ==========
+
+# 9. Solução de problemas
+
+[← Receitas](08-receitas.md) · [Índice](README.md) · [Glossário →](10-glossario.md)
+
+Rode `kg_validate.py --where <arquivo>` primeiro: ele diz o código e o nó.
+
+## Códigos MUST comuns
+
+| Código | O que quer dizer | Como resolver |
+|---|---|---|
+| `form.required.node.provenance` | Nó `confirmed` ou PROD sem `provenance` | Acrescente `source`, `locator` e `method`. Sem fonte, mude o status para `unverifiable` |
+| `form.pattern.node.provenance.source` | `source` é um marcador (`unknown`, `n/a`, `tbd`, `?`...) | Ponha a fonte real; sem fonte recuperável, tire a `provenance` e use `unverifiable` |
+| `form.unknown-key.node.<chave>` | Chave fora da gramática | Prefixe com `x_`, ou use o campo do contrato (por exemplo, `narrative`) |
+| `form.required.node.<campo>` | Falta um dos sete campos obrigatórios | Acrescente o campo |
+| `form.enum.node.<campo>` | Valor fora da lista (`node_type`, `plane`, `status`) | Veja as listas no [capítulo 3](03-formato.md) |
+| `form.pattern.node.verified_at` | Data em formato errado ou que não existe no calendário | `AAAA-MM-DD`, entre aspas |
+| `integrity.orphan-node` | Um nó sem nenhuma aresta | Ligue-o a outro nó, ou tire-o |
+| `integrity.dangling-to` · `-from` · `-trigger` · `-on` | A aresta (ou o gatilho dela) aponta para um id que não existe | Corrija o id, ou crie o nó |
+| `integrity.duplicate-id` | Dois nós com o mesmo id | Renomeie um |
+| `integrity.dangling-external-local` | A ponta local de uma `external_edges` não existe neste arquivo | Corrija o id |
+| `integrity.dangling-external` | A ponta externa não existe no corpus | Corrija o caminho ou o id depois de `#`, ou o grafo alvo ainda não foi para o git (`git add`) |
+| `yaml.forbidden-key-on` | Aresta com a chave `on` | Troque por `trigger` |
+| `parse.duplicate-key` | Chave repetida no mesmo mapa | Tire a duplicata |
+| `parse.not-single-document` | Mais de um documento YAML (`---`) | Um grafo por arquivo |
+| `parse.yaml-error` | O YAML não parseia (ou passa do teto de aninhamento ou de aliases) | Corrija a sintaxe na linha que o erro aponta |
+| `parse.empty-document` · `parse.root-not-mapping` | Arquivo vazio, ou a raiz não é um mapa | O grafo começa por `meta:`, `nodes:` e `edges:` |
+
+A lista completa, com a forma de cada código, está em
+[`spec/conformance/README.md`](../../spec/conformance/README.md#códigos).
+
+## Avisos SHOULD comuns
+
+| Código | Como resolver |
+|---|---|
+| `yaml.unquoted-date` | Ponha as datas entre aspas: `"2026-10-12"` |
+| `form.range.node.label` | Encurte o `label` para até 280 caracteres e mova o resto para `narrative` |
+| `form.pattern.node.provenance.method` | Use `<classe>: <detalhe>`, com a classe em `medição`, `leitura`, `juízes`, `derivado` ou `testemunho`. Reprova no v5 |
+| `form.required.node.verified_against` | Diga o que foi conferido no `verified_at` |
+| `form.required.node.verified_at` | Nó PROD sem `verified_at`: carimbe a última conferência |
+| `integrity.untraced-decision` | Dê origem à decisão: `trace`, `provenance` ou uma aresta `TRACES_TO` |
+| `integrity.testimony-in-prod` | Meça e troque a classe para `medição`, ou aceite o risco visível |
+
+## O gate
+
+| Sintoma | Causa | O que fazer |
+|---|---|---|
+| `GATE QUEBRADO  linha de base ausente` | Não há `.kg-ssot/gate.json` | `kg_gate.py --update` e commit da base |
+| Um grafo novo não aparece na medição | O gate só mede arquivo rastreado | `git add` no grafo |
+| `✗ PIOROU` num grafo que você não tocou | O contrato mudou de tag e o grafo passou a reprovar | Grave a base nova com `--update`; uma piora pede `--accept-regression "<motivo>"` |
+| As fixtures do vendor entraram no corpus | `--no-default-excludes` foi usado | Tire a opção, ou passe `--exclude` |
+
+## O vendor
+
+| Sintoma | Causa | O que fazer |
+|---|---|---|
+| `check` dá rc 1 sem você ter editado nada | Um `.pyc` foi gravado no vendor por uma ferramenta que importou o kit | Apague o `__pycache__` e rode tudo com `python3 -I -B` |
+| `update` se recusa a substituir | O destino não tem carimbo, ou o vendor diverge dele | Confira o que mudou; `--force` só se a edição local pode sumir |
+| `update` de dentro do vendor falha | Falta `--source` | Passe `--source https://github.com/marciocar/kg-ssot` |
+
+## Ambiente
+
+`pip install` recusado com `externally-managed-environment`: crie um venv (`python3 -m venv .venv`) e use o
+Python dele. Detalhes no [capítulo 6](06-adocao-e-ci.md#nota-de-ambiente).
+
+
+========== docs/manual/10-glossario.md ==========
+
+# 10. Glossário
+
+[← Solução de problemas](09-problemas.md) · [Índice](README.md)
+
+| Termo | Significado |
+|---|---|
+| **Adotante** | Um repositório que traz o contrato por tag e roda o gate no CI |
+| **Aresta externa** | Uma aresta de `external_edges`, com uma ponta noutro grafo do mesmo repositório |
+| **Carimbo (do vendor)** | O arquivo `.kg-ssot-version` com a tag, o commit e o sha256 de cada arquivo trazido |
+| **Carimbo de verificação** | O par `verified_at` e `verified_against` de um nó |
+| **Catraca** | Uma conferência que só deixa a medida melhorar ou ficar igual. O gate é a catraca por grafo |
+| **Classe (de `method`)** | `medição`, `leitura`, `juízes`, `derivado` ou `testemunho` |
+| **Código** | O identificador estável de uma violação, como `form.required.node.label` |
+| **Contrato** | Os schemas MUST e SHOULD mais as regras de perfil YAML e de integridade |
+| **Corpus** | O conjunto de `.kg.yaml` de um repositório |
+| **Dívida herdada** | Os grafos que já reprovavam no MUST quando a base foi gravada |
+| **Dívida SHOULD** | Quantos grafos (ou ocorrências) carregam cada aviso |
+| **Grafo** | Um arquivo `.kg.yaml` |
+| **Leitor** | Qualquer programa que lê `.kg.yaml`. O leitor de referência é o `kg_validate.py` |
+| **Linha de base** | O `.kg-ssot/gate.json` com a dívida que o gate compara |
+| **MUST** | Nível do contrato que reprova |
+| **Nó** | Uma afirmação tipada do grafo |
+| **Órfão** | Um nó sem nenhuma aresta. Reprova |
+| **Perfil `gate`** | A parte mínima da release: o suficiente para rodar o gate e o check |
+| **Plano** | `DEV` ou `PROD` |
+| **Proveniência** | O objeto `provenance` (`source`, `locator`, `method`): de onde veio a afirmação |
+| **Rampa** | Duas acepções: (1) no contrato, alertar numa versão o que vai reprovar na seguinte; (2) na adoção, subir de versão maior registrando o que passou a reprovar como dívida, e pagar aos poucos |
+| **Release** | Uma tag `kg-ssot-vX.Y.Z` com a superfície listada em `spec/release.json` |
+| **Runner** | O comando que expõe um leitor à suíte: `runner <caso>` imprime um JSON com o veredito |
+| **SHOULD** | Nível do contrato que só alerta |
+| **Suíte de conformidade** | Os casos em `spec/conformance/` que todo leitor tem de passar |
+| **Testemunho** | Relato, ou medição de terceiro que você só leu |
+| **Vendor** | A cópia da release dentro do adotante, em `vendor/kg-ssot`, conferida pelo `check` |
+| **`x_`** | O prefixo de extensão: chaves com ele passam livres |
+
+
+========== spec/conformance/README.md ==========
+
+# Suíte de conformidade do `.kg.yaml`
+
+> Os casos medem o contrato v4: `spec/kg-contract-v4.schema.json` (MUST) e
+> `spec/kg-contract-v4.should.schema.json` (SHOULD).
+
+Todo leitor de `.kg.yaml` tem de passar nesta suíte: o leitor de referência `tools/kg_validate.py`, um
+visualizador, um extrator de grafos ou um port em outra linguagem. Os casos são **dados puros**, no molde da
+[JSON-Schema-Test-Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite), e não dependem de nenhum
+harness de agente.
+
+## Formato
+
+Um **grupo** é uma pasta com um `manifest.json` e um `.kg.yaml` real por caso. O arquivo é real, e não
+texto embutido no JSON, para que qualquer CLI receba o caminho e leia como leria um grafo de verdade.
+
+```json
+{
+  "description": "enums do nó",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    { "file": "bad-node-type.kg.yaml",
+      "description": "node_type fora do enum",
+      "valid": false,
+      "codes": ["form.enum.node.node_type"],
+      "warnings": [] }
+  ]
+}
+```
+
+| Campo | Regra |
+|---|---|
+| `layer` | `parse`, `form`, `integrity`, `yaml` ou `semantic`: a camada que o grupo exercita. `semantic` só existe em `optional/`. |
+| `pending_on` | Ids das decisões abertas de que o veredito depende. Vazio em `latest/`, não vazio em `proposals/`. |
+| `corpus` | Opcional (v4.3): diretório, relativo ao manifesto, que faz de raiz do repo para conferir a ponta externa das `external_edges`. |
+| `valid` | `true` exige `codes: []`. `false` exige pelo menos um código. |
+| `codes` | Violações de **MUST**: reprovam o arquivo. |
+| `warnings` | Violações de **SHOULD**: só alertam, e o arquivo continua válido. É opcional, e ausente vale `[]`. |
+
+O `manifest.schema.json` (JSON Schema 2020-12) valida todo manifesto. A própria suíte se valida com a
+mesma tecnologia do contrato, como a JSON-Schema-Test-Suite faz no CI dela. Em `metaschema-tests/` há os
+manifestos que ele tem de aceitar (`good/`) e os que tem de recusar (`bad/`).
+
+**Um caso, um defeito.** O leitor passa num caso quando o **conjunto** de códigos que emite é
+**igual** ao esperado, tanto em `codes` quanto em `warnings`. Igualdade, não inclusão: um leitor que
+acusa tudo não pode passar. Ordem e repetição não contam.
+
+## Códigos
+
+Cada código é um slug estável por camada, e o metaschema confere a forma.
+
+| Camada | Forma | Exemplos |
+|---|---|---|
+| parse | `parse.<motivo>` | `parse.yaml-error`, `parse.duplicate-key`, `parse.empty-document`, `parse.not-single-document`, `parse.root-not-mapping` |
+| form | `form.<tipo>.<escopo>.<campo>` | `form.required.node.label`, `form.enum.node.node_type`, `form.range.node.impact`, `form.pattern.edge.to`, `form.type.node.item` |
+| integrity | `integrity.<regra>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` (MUST); `integrity.testimony-in-prod`, `integrity.verified-before-fact`, `integrity.untraced-decision` (SHOULD) |
+| yaml | `yaml.<regra>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
+| semantic | `semantic.<regra>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.answered-question-open`, `semantic.decision-done-dev`, `semantic.stale-missing`, `semantic.stale-old`, `semantic.review-overdue`, `semantic.testimony-unmarked` e os `semantic.domain-*` da camada domain (SHOULD) — só em `optional/` |
+
+`<tipo>` ∈ `required enum type pattern range const unknown-key`. `<escopo>` ∈ `top meta node edge`.
+Num objeto aninhado, `<campo>` é o caminho com ponto: `form.required.node.provenance.locator`.
+`range` cobre também o tamanho de texto: `label: ""` (MUST) e `label` acima de 280 caracteres
+(SHOULD, a narrativa vai para `narrative`). O tamanho conta code points, como o `maxLength` do JSON
+Schema: um emoji vale 1, não 2 unidades UTF-16 (`str.length` de JS erraria), e não há normalização.
+Data completa tem de existir no calendário, e o código é `form.pattern`: o `format: date` do schema é
+**asserção**, e todo leitor tem de checá-lo. `.nan` e `.inf` reprovam como `form.type` em qualquer
+posição, também em chave `x_` e dentro de lista, porque o JSON não os representa. Um item de lista que não é mapa usa o
+campo `item` (`form.type.node.item`). Nome de chave que não é slug (`<<`, `1.0`, `a.b`) reprova como
+`form.pattern.<escopo>.key` e, com o prefixo `x_`, só alerta. As chaves são comparadas na forma JSON: `1` e `"1"` colidem
+(`parse.duplicate-key`), `true` vira `true`, não `True`. Uma aresta com `on` reprova por
+`yaml.forbidden-key-on`; se o alvo de `on` não existir, sai também `integrity.dangling-on`. Os `pattern` têm a
+semântica do ECMA-262, a do JSON Schema: `$` não casa antes de uma quebra de linha final.
+
+O que o v4 mudou de severidade, e o que entrou:
+
+| Código | No v3 | No v4 |
+|---|---|---|
+| `form.required.node.provenance` (nó `confirmed` ou PROD sem `provenance`; o `unverifiable` não exige) | SHOULD | **MUST** |
+| `form.unknown-key.<escopo>.<chave>` (chave fora da gramática e sem `x_`, no topo, no meta, no nó e na aresta) | SHOULD | **MUST** |
+| `form.pattern.<escopo>.key` (nome que não é slug, sem `x_`) | SHOULD | **MUST** (com `x_`, segue SHOULD) |
+| `form.pattern.node.provenance.source` (`source` placeholder: só espaço, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hífens, travessão, `?`...) | — | **MUST** (o vazio segue `form.range`) |
+| `form.pattern.node.provenance.method` (fora de `'<classe>: <detalhe>'`, classe em `medição`, `leitura`, `juízes`, `derivado`, `testemunho`) | — | SHOULD (MUST no v5) |
+| `form.unknown-key.node.provenance.<chave>` (chave desconhecida dentro de `provenance`) | SHOULD | SHOULD |
+
+O v4.1 acrescenta quatro avisos SHOULD (não muda veredito; `latest/form/unanchored/` e `latest/integrity/coherence/`).
+Os três `integrity.*` cruzam campos ou arestas, por isso o leitor os computa fora do schema:
+
+| Código | Quando alerta |
+|---|---|
+| `form.required.node.verified_against` | `claim` com `verified_at` e sem `verified_against`: carimbo sem alvo (os outros tipos já se ancoram por outro campo) |
+| `integrity.testimony-in-prod` | nó PROD cuja base é testemunho (`evidence_class: testimony` ou `method` da classe `testemunho`) |
+| `integrity.verified-before-fact` | `verified_at` anterior a `valid_from`, comparados na granularidade do mais curto (`AAAA`, `AAAA-MM`, `AAAA-MM-DD`); data fora dessa forma não é comparada |
+| `integrity.untraced-decision` | `decision` que não é `superseded` nem `refuted` sem `trace`, sem `provenance` e sem aresta `TRACES_TO` saindo dela |
+
+O v4.3 acrescenta `external_edges`, opcional, no topo: arestas entre grafos com **exatamente uma** ponta externa
+`<caminho relativo à raiz do repo>#<id>`, e a outra um id deste arquivo ou ausente (`from` ausente vale o grafo inteiro).
+Os tipos são `SUPERSEDES`, `CONSTRAINS`, `SUPPORTS`, `REFUTES`, `TRACES_TO` e `DEPENDS_ON`. Os casos estão em
+`latest/form/external-edges/`, `latest/integrity/external-local/` e `latest/integrity/external-corpus/`.
+
+| Código | Quando reprova |
+|---|---|
+| `form.pattern.top.external_edges.to` (ou `.from`) | as duas pontas externas, as duas locais, ou a referência fora da forma (caminho absoluto, sem `.kg.yaml#`) |
+| `form.enum.top.external_edges.edge_type` | tipo fora dos seis (os da camada domain não cruzam grafos) |
+| `integrity.dangling-external-local` | a ponta local não existe neste arquivo |
+| `integrity.dangling-external` | **com o corpus**: o arquivo ou o id da ponta externa não existe |
+
+A aresta externa conta como ligação: o nó ligado só por ela não é órfão. Sem o corpus, a ponta externa não é conferida, e
+o leitor diz isso na saída. A referência é relativa e com `/`: segmentos começam por letra, dígito ou `_`, sem `.` ou
+`..`, sem `\` e sem `:`.
+
+O v4.2 acrescenta `provenance.locality`, opcional, com o enum `repo`, `web`, `host` ou `pessoa`. O valor fora do enum
+alerta como `form.enum.node.provenance.locality` (`latest/form/provenance-locality/`), e nenhum veredito muda.
+O mesmo código pode aparecer como MUST num caso e como SHOULD em outro, porque a severidade é do
+caso, não do código.
+
+## Pastas
+
+Os casos moram em `fixtures/`, a convenção de diretório de teste que validadores de repositório
+costumam isentar. Sem isso, os grafos quebrados de propósito reprovariam o próprio repo. A exceção
+é `latest/parse/document/bad-yaml-syntax.yaml`: há validador que varre todo `.kg.yaml` rastreado sem
+respeitar a convenção, e o único caso não parseável usa a extensão `.yaml` (o metaschema aceita as
+duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>/<grupo>/`.
+
+| Pasta | O que vale |
+|---|---|
+| `fixtures/latest/` | O contrato vigente. O leitor **tem** de passar em todos os casos. |
+| `fixtures/optional/` | Comportamento que um leitor **pode** implementar; hoje, `semantic/`, a camada semântica do radar (o leitor do framework onde o formato nasceu). Roda e reporta, mas não reprova. |
+| `fixtures/proposals/` | O veredito depende de decisão aberta (`pending_on`). Roda e reporta, mas não reprova. |
+
+**Regra de promoção.** Um grupo sai de `proposals/` para `latest/` só quando **todas** as decisões em
+`pending_on` estiverem seladas, isto é, mergeadas no grafo do produto, **e** o schema de `spec/` já
+aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
+`pending_on` e cita o nó selado. Nada antecipa decisão aberta.
+
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 225 casos contra o contrato v4. Os grupos do
+rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
+`unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito
+viraram `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de
+vocabulário só apareça onde o caso o pede. `proposals/` está vazia.
+
+## Rodar
+
+```bash
+pip install -r tools/requirements.txt          # PyYAML e jsonschema, versões exatas
+python3 -I tools/kg_conformance.py             # --suite DIR, --schema F, --should-schema F, --json OUT
+# proposals/ contra um contrato candidato, quando houver um rascunho de versão futura
+python3 -I tools/kg_conformance.py --proposals-schema <candidato>.schema.json \
+  --proposals-should-schema <candidato>.should.schema.json
+```
+
+As duas opções `--proposals-*` vão juntas e medem só `proposals/` contra um contrato candidato; `latest/` e
+`optional/` seguem no `--schema`, e o rc não muda.
+
+rc `0` se `latest/` passa inteiro, `1` se algum caso de `latest/` falha e `2` se a própria suíte está
+quebrada: metaschema ou manifesto ilegível ou inválido, `pending_on` fora da regra, pasta
+desconhecida, arquivo ausente, repetido ou fora de todo manifesto, ou `latest/` vazia. Um leitor que
+cai num caso conta como falha daquele caso. `optional/` (hoje só a camada `semantic`, que o leitor de referência
+não implementa) e `proposals/` reportam
+e nunca mudam o rc.
+
+## Um leitor em outra linguagem
+
+O `kg_conformance.py` roda só o leitor de referência. Um leitor em outra linguagem roda a suíte com o próprio
+código: itera os `manifest.json` de `fixtures/latest/`, julga cada caso (com a raiz do repo em
+`<pasta do manifesto>/<corpus>` quando o caso declara `corpus`) e compara os conjuntos de `codes` e de
+`warnings` por igualdade. Quem não expõe códigos compara só o veredito: `valid: true` aceita, `valid: false`
+reprova.
+
+Para comparar leitores lado a lado, o mantenedor usa um **contrato de runner**, e um leitor que o implementa
+pode ser medido da mesma forma: `runner <caso>` imprime, na última linha do stdout, UM objeto JSON, e sai com
+rc 0:
+
+```json
+{"verdict": "accept" | "reject" | "error", "codes": [...] | null, "warnings": [...] | null, "detail": "..."}
+```
+
+- `verdict` é o nível 1, e todo leitor o tem: o arquivo é aceito ou reprovado? Um caso com `codes` MUST
+  espera `reject`; um caso válido, mesmo com `warnings`, espera `accept`.
+- `codes` é o nível 2, só para quem expõe motivo, comparado por conjunto nas camadas
+  que o leitor implementa. `null` quer dizer que o leitor não diz o porquê.
+- **Caso de corpus** (v4.3): o caso que declara `corpus` no manifesto é julgado com a raiz desse diretório como o
+  repo, e o runner recebe `runner <caso> --corpus <dir>`. Um leitor que não confere a ponta externa das
+  `external_edges` fica `n/a` nesses casos.
+- `error` quer dizer que o leitor caiu. Saída que não é JSON, `verdict` desconhecido, rc diferente de 0 ou
+  tempo estourado também viram `error`. É divergência, não ausência de opinião.
+
+## Higiene
+
+Os casos são escritos aqui, sem copiar grafos de terceiros, e usam ids sintéticos (`Q_A`, `EV_A`...), sem
+caminho de máquina e sem id de nó privado. Este arquivo viaja na release (`spec/release.json`), e a conferência
+de higiene do mantenedor reprova referência privada em `spec/` e nos arquivos da release.
+
+
+========== spec/kg-contract-v4.schema.json ==========
+
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onion-kg-ssot/spec/kg-contract-v4.schema.json",
+  "title": "kg.yaml — contrato v4, nível MUST",
+  "description": "O contrato v4 do .kg.yaml, nível MUST (reprova), o vigente (substitui o v3). É o v3 com três promoções a MUST. (1) Proveniência estruturada: nó confirmed ou PROD exige provenance com source, locator e method (form.required.node.provenance), que no v3 só alertava; status unverifiable não exige, mesmo em PROD, porque é o destino do nó sem fonte recuperável. (2) Fonte que não é placeholder: provenance.source não pode ser placeholder: só espaço, ou um destes sozinho, sem distinguir maiúscula e com pontuação final (. ou :) e espaço em volta (inclusive NBSP, espaço ideográfico, BOM e espaço de largura zero) ignorados: desconhecida, desconhecido, unknown, n/a, n / a, na, n.a., none, null, sem fonte, tbd, um ou mais hífens, travessão, meia-risca, ?. A regra é um not+pattern sem lookahead, portável a leitores RE2: form.pattern.node.provenance.source. O vazio segue form.range.node.provenance.source, como no v3. Origem que é uma pessoa ou sessão recuperável é fonte válida, com method de testemunho. (3) Política de extensão: chave desconhecida sem o prefixo x_ no topo, no meta, no nó e na aresta reprova (form.unknown-key.<escopo>.<chave>), com a mesma lista de chaves conhecidas que o SHOULD v3 usava; nome sem x_ que nem é slug reprova como form.pattern.<escopo>.key. Chave x_ segue livre, e x_ com nome que não é slug só alerta. A chave on da aresta segue na lista porque já reprova como yaml.forbidden-key-on. Dentro de provenance, a chave desconhecida segue SHOULD. O resto é o v3: escrito à mão em JSON Schema 2020-12; PROD sem verified_at é SHOULD e o gatilho de TRANSITIONS é trigger; narrative no nó, note e purpose no meta, data no calendário (format: date é ASSERÇÃO) e .nan ou .inf reprovando como tipo; provenance, quando presente, com os três campos não vazios, e provenance: null reprova. O par SHOULD é kg-contract-v4.should.schema.json; as regras de perfil YAML (chave on proibida, chave duplicada, documento único) são do leitor, porque o JSON não as vê. No v4.3 entra external_edges, opcional, no topo: arestas entre grafos com uma ponta externa <caminho>#<id> e a outra local (ou o grafo inteiro, com from ausente), nos tipos SUPERSEDES, CONSTRAINS, SUPPORTS, REFUTES, TRACES_TO e DEPENDS_ON. A ponta local tem de existir (integrity.dangling-external-local); com o corpus, o arquivo e o id da ponta externa também (integrity.dangling-external). A chave é opcional: um grafo que não a usa tem o mesmo veredito do v4.2.",
+  "type": "object",
+  "required": [
+    "meta",
+    "nodes",
+    "edges"
+  ],
+  "properties": {
+    "meta": {
+      "$ref": "#/$defs/meta"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    },
+    "external_edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/externalEdge"
+      }
+    }
+  },
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "format": "date"
+    },
+    "partialDate": {
+      "type": "string",
+      "pattern": "^(000[1-9]|00[1-9][0-9]|0[1-9][0-9]{2}|[1-9][0-9]{3})(-(0[1-9]|1[0-2])(-[0-9]{2})?)?$",
+      "if": {
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      },
+      "then": {
+        "format": "date"
+      }
+    },
+    "nodeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "layer": {
+      "enum": [
+        "audit",
+        "domain"
+      ]
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "id"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baseline": {
+          "$ref": "#/$defs/date"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "review_after": {
+          "$ref": "#/$defs/date"
+        },
+        "layer": {
+          "$ref": "#/$defs/layer"
+        },
+        "note": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        }
+      },
+      "propertyNames": {
+        "if": {
+          "pattern": "^x_"
+        },
+        "else": {
+          "allOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+            },
+            {
+              "enum": [
+                "baseline",
+                "date",
+                "id",
+                "layer",
+                "note",
+                "purpose",
+                "review_after",
+                "schema_version"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "id",
+        "node_type",
+        "plane",
+        "status",
+        "impact",
+        "confidence",
+        "label"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nodeId"
+        },
+        "node_type": {
+          "enum": [
+            "entity",
+            "claim",
+            "decision",
+            "question",
+            "evidence",
+            "artifact",
+            "state",
+            "event",
+            "rule",
+            "invariant",
+            "policy"
+          ]
+        },
+        "layer": {
+          "$ref": "#/$defs/layer"
+        },
+        "plane": {
+          "enum": [
+            "DEV",
+            "PROD"
+          ]
+        },
+        "status": {
+          "enum": [
+            "open",
+            "confirmed",
+            "drifted",
+            "unverifiable",
+            "refuted",
+            "superseded",
+            "done"
+          ]
+        },
+        "impact": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trace": {
+          "type": "string"
+        },
+        "verified_at": {
+          "$ref": "#/$defs/date"
+        },
+        "verified_against": {
+          "type": "string"
+        },
+        "valid_from": {
+          "$ref": "#/$defs/partialDate"
+        },
+        "source_tier": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "source_kind": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "drive_kind": {
+          "type": "string"
+        },
+        "evidence_class": {
+          "type": "string"
+        },
+        "sealed_by": {
+          "type": "string"
+        },
+        "sealed_at": {
+          "type": "string"
+        },
+        "narrative": {
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        }
+      },
+      "propertyNames": {
+        "if": {
+          "pattern": "^x_"
+        },
+        "else": {
+          "allOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+            },
+            {
+              "enum": [
+                "confidence",
+                "drive_kind",
+                "evidence_class",
+                "id",
+                "impact",
+                "label",
+                "layer",
+                "narrative",
+                "node_type",
+                "owner",
+                "plane",
+                "provenance",
+                "sealed_at",
+                "sealed_by",
+                "source_kind",
+                "source_tier",
+                "status",
+                "trace",
+                "valid_from",
+                "verified_against",
+                "verified_at"
+              ]
+            }
+          ]
+        }
+      },
+      "if": {
+        "anyOf": [
+          {
+            "properties": {
+              "status": {
+                "const": "confirmed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          {
+            "properties": {
+              "plane": {
+                "const": "PROD"
+              }
+            },
+            "required": [
+              "plane"
+            ]
+          }
+        ],
+        "not": {
+          "properties": {
+            "status": {
+              "const": "unverifiable"
+            }
+          },
+          "required": [
+            "status"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "provenance"
+        ]
+      }
+    },
+    "edge": {
+      "type": "object",
+      "required": [
+        "from",
+        "to",
+        "edge_type"
+      ],
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/nodeId"
+        },
+        "to": {
+          "$ref": "#/$defs/nodeId"
+        },
+        "edge_type": {
+          "enum": [
+            "SUPPORTS",
+            "REFUTES",
+            "SUPERSEDES",
+            "CAUSES",
+            "DEPENDS_ON",
+            "TRACES_TO",
+            "CONSTRAINS",
+            "HAS_STATE",
+            "TRANSITIONS",
+            "EMITS",
+            "READS",
+            "WRITES"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "trigger": {
+          "$ref": "#/$defs/nodeId"
+        }
+      },
+      "propertyNames": {
+        "if": {
+          "pattern": "^x_"
+        },
+        "else": {
+          "allOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+            },
+            {
+              "enum": [
+                "edge_type",
+                "from",
+                "label",
+                "on",
+                "to",
+                "trigger"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "source",
+        "locator",
+        "method"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "not": {
+            "type": "string",
+            "pattern": "^(?:[ \t\n\r 　﻿​]+|[ \t\n\r 　﻿​]*(?:[Dd][Ee][Ss][Cc][Oo][Nn][Hh][Ee][Cc][Ii][Dd][AaOo]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Nn] ?/? ?[Aa]|[Nn]\\.[Aa]\\.?|[Nn][Oo][Nn][Ee]|[Nn][Uu][Ll][Ll]|[Ss][Ee][Mm] [Ff][Oo][Nn][Tt][Ee]|[Tt][Bb][Dd]|-+|—|–|\\?)[.:]?[ \t\n\r 　﻿​]*)$"
+          }
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "externalRef": {
+      "type": "string",
+      "pattern": "^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\\.kg\\.yaml#[A-Za-z][A-Za-z0-9_]*$",
+      "description": "Referência a um nó de outro grafo do mesmo repo: <caminho relativo à raiz do repo>#<id>. Os segmentos do caminho começam por letra, dígito ou _ e só levam [A-Za-z0-9_.-]: sem / inicial, sem . ou .., sem \\, sem :."
+    },
+    "externalEdge": {
+      "description": "Aresta entre grafos (v4.3): exatamente uma ponta externa (<caminho>#<id>), a outra um id deste arquivo; from ausente vale o grafo inteiro. Só os tipos da camada audit.",
+      "type": "object",
+      "required": [
+        "to",
+        "edge_type"
+      ],
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "edge_type": {
+          "enum": [
+            "SUPERSEDES",
+            "CONSTRAINS",
+            "SUPPORTS",
+            "REFUTES",
+            "TRACES_TO",
+            "DEPENDS_ON"
+          ]
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "if": {
+        "required": [
+          "from"
+        ],
+        "properties": {
+          "from": {
+            "pattern": "^(?:[A-Za-z0-9_][A-Za-z0-9_.-]*/)*[A-Za-z0-9_][A-Za-z0-9_.-]*\\.kg\\.yaml#[A-Za-z][A-Za-z0-9_]*$"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "to": {
+            "$ref": "#/$defs/nodeId"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "from": {
+            "$ref": "#/$defs/nodeId"
+          },
+          "to": {
+            "$ref": "#/$defs/externalRef"
+          }
+        }
+      },
+      "propertyNames": {
+        "if": {
+          "pattern": "^x_"
+        },
+        "else": {
+          "allOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+            },
+            {
+              "enum": [
+                "edge_type",
+                "from",
+                "label",
+                "to"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "propertyNames": {
+    "if": {
+      "pattern": "^x_"
+    },
+    "else": {
+      "allOf": [
+        {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+        },
+        {
+          "enum": [
+            "edges",
+            "external_edges",
+            "meta",
+            "nodes"
+          ]
+        }
+      ]
+    }
+  }
+}
+
+
+========== spec/kg-contract-v4.should.schema.json ==========
+
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onion-kg-ssot/spec/kg-contract-v4.should.schema.json",
+  "title": "kg.yaml — contrato v4, nível SHOULD",
+  "description": "O contrato v4 do .kg.yaml, nível SHOULD (alerta, não reprova), o vigente. É o SHOULD v3 menos o que o v4 promoveu a MUST: a chave desconhecida sem x_ no topo, no meta, no nó e na aresta e o nó confirmed ou PROD sem provenance. Segue alertando: nome de chave que não é slug ([A-Za-z_][A-Za-z0-9_-]*), como form.pattern.<escopo>.key, que sem x_ também reprova no MUST; nó PROD sem verified_at; label do nó acima de 280 caracteres, form.range.node.label, porque a narrativa vai para narrative; a chave desconhecida dentro de provenance, fechada em source, locator, method e x_; e o grafo sem nós (nodes: []), como form.range.top.nodes: é válido, como o primeiro uso de um app, mas o aviso pega o parse que falhou em silêncio. No v4, provenance.method alerta (form.pattern.node.provenance.method) quando não segue a forma canônica '<classe>: <detalhe>', com a classe em medição, leitura, juízes, derivado, testemunho; reprova no v5. Medição feita por terceiro e lida pelo autor do grafo é testemunho. No v4.1 entram quatro avisos que o próprio arquivo decide. O schema acusa a claim com verified_at e sem verified_against (form.required.node.verified_against): carimbo sem alvo não distingue verificado de declarado. Só a claim: evidence é a própria âncora, artifact nomeia o alvo, question não afirma e a origem da decision é cobrada por integrity.untraced-decision. O leitor acusa três avisos que cruzam campos ou arestas, por isso não cabem no schema: integrity.testimony-in-prod (nó PROD cuja base é testemunho), integrity.verified-before-fact (verified_at anterior a valid_from) e integrity.untraced-decision (decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela). No v4.2 entra provenance.locality, opcional, com o enum repo (arquivo versionado no próprio repo), web (endereço público), host (só existe numa máquina: journal local, caminho fora do repo) ou pessoa (relato de alguém): o valor fora do enum alerta como form.enum.node.provenance.locality. Serve para medir o que é reverificável por terceiros e para barrar host na publicação.",
+  "type": "object",
+  "propertyNames": {
+    "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+  },
+  "properties": {
+    "meta": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+        },
+        "properties": {
+          "label": {
+            "maxLength": 280
+          },
+          "provenance": {
+            "propertyNames": {
+              "allOf": [
+                {
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "locality",
+                        "locator",
+                        "method",
+                        "source"
+                      ]
+                    },
+                    {
+                      "pattern": "^x_"
+                    }
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "method": {
+                "pattern": "^(?:medição|leitura|juízes|derivado|testemunho): [^ \t\n\r]"
+              },
+              "locality": {
+                "enum": [
+                  "host",
+                  "pessoa",
+                  "repo",
+                  "web"
+                ]
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "plane": {
+                  "const": "PROD"
+                }
+              },
+              "required": [
+                "plane"
+              ]
+            },
+            "then": {
+              "required": [
+                "verified_at"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "node_type": {
+                  "const": "claim"
+                }
+              },
+              "required": [
+                "node_type",
+                "verified_at"
+              ]
+            },
+            "then": {
+              "required": [
+                "verified_against"
+              ]
+            }
+          }
+        ]
+      },
+      "minItems": 1
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+        }
+      }
+    }
+  }
+}
+
+
+========== spec/verdict.schema.json ==========
+
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kg-ssot:spec:verdict.schema.json",
+  "title": "Veredito estruturado de um leitor do .kg.yaml (kg-ssot.verdict/1)",
+  "description": "Saída de `kg_validate.py --format json`. O veredito é do contrato vigente: PASS sem nenhuma ocorrência MUST, FAIL com qualquer uma. Um arquivo que não parseia reprova com um código parse.*, como na suíte de conformidade. `summary` conta todas as ocorrências; `occurrences` traz até o limite pedido, e `truncated` diz se cortou. `code` é o vocabulário estável da suíte e do gate; `message` e `hint` são texto para pessoas e podem mudar entre versões.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract", "results"],
+  "properties": {
+    "schema_version": {"const": "kg-ssot.verdict/1"},
+    "contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["must", "should", "release", "sha256"],
+      "properties": {
+        "must": {"type": ["string", "null"], "description": "o schema MUST que julgou, relativo à raiz do produto"},
+        "should": {"type": ["string", "null"], "description": "o schema SHOULD dos avisos, ou null"},
+        "release": {"type": ["string", "null"], "description": "a tag da release que o leitor carrega (spec/release.json)"},
+        "sha256": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["must", "should"],
+          "properties": {
+            "must": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+            "should": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+          }
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "verdict", "summary", "occurrences", "total", "truncated", "external_checked"],
+        "properties": {
+          "source": {"type": ["string", "null"], "description": "o arquivo julgado, ou '-' para o stdin"},
+          "verdict": {"enum": ["PASS", "FAIL"]},
+          "summary": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["MUST", "SHOULD"],
+            "properties": {
+              "MUST": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}},
+              "SHOULD": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 1}}
+            }
+          },
+          "occurrences": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["level", "code", "place", "path", "line", "message"],
+              "properties": {
+                "level": {"enum": ["MUST", "SHOULD"]},
+                "code": {"type": "string", "pattern": "^(parse|form|integrity|yaml)\\.[A-Za-z0-9_.-]+$"},
+                "place": {"type": "string", "description": "o lugar legível: 'nó X', 'aresta #3 (A -> B)', 'meta', 'topo' ou 'arquivo'"},
+                "path": {"type": "string", "description": "o caminho no documento, como nodes[7].provenance.method; vazio quando é o arquivo inteiro"},
+                "line": {"type": ["integer", "null"], "minimum": 1, "description": "a linha do YAML (contando de 1) do ponto mais fundo do caminho que existe; null quando o YAML não compõe"},
+                "message": {"type": "string", "description": "a frase em pt-BR para pessoas; pode mudar entre versões"},
+                "hint": {"type": "string", "description": "a correção canônica, quando o código tem uma"}
+              }
+            }
+          },
+          "total": {"type": "integer", "minimum": 0, "description": "quantas ocorrências existem, antes do corte"},
+          "truncated": {"type": "boolean"},
+          "external_checked": {"type": "boolean", "description": "false quando o grafo tem external_edges e o leitor rodou sem --corpus"}
+        }
+      }
+    }
+  }
+}

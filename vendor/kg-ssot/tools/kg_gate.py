@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""O gate do adotante (E6, EPIC_6_CORE_GRADUATION): os grafos de um repo contra o contrato, com catraca POR GRAFO.
+"""O gate do adotante: os grafos de um repo contra o contrato, com catraca POR GRAFO.
 
 A ponta externa das external_edges (v4.3) é conferida contra TODOS os .kg.yaml rastreados, inclusive os excluídos do
 corpus: alvo inexistente ou apagado reprova quem aponta (integrity.dangling-external).
 
-Mede os .kg.yaml rastreados por git no repo (árvore de trabalho; fora */fixtures/* e docs/materials/*, como no
-spike, ou o que --exclude disser) contra o MUST e o SHOULD do contrato vigente, e compara com a linha de base:
+Mede os .kg.yaml rastreados por git no repo (árvore de trabalho; fora */fixtures/* e docs/materials/*, os
+excluídos padrão, ou o que --exclude disser) contra o MUST e o SHOULD do contrato vigente, e compara com a linha de base:
   failing — grafo → códigos MUST que ele carrega hoje (a dívida herdada, nomeada por caminho);
   debt    — código SHOULD → quantos grafos o carregam (granularity graph, o padrão) ou quantas ocorrências, somadas
             em todos os grafos (granularity node). A base guarda a granularidade; --granularity a troca num --update.
@@ -14,7 +14,7 @@ Reprova (rc 1): grafo fora de failing que falha no MUST (grafo NOVO inclusive); 
 que não tinha; dívida de um código que sobe ou código de dívida novo; contrato diferente do da base (nome do
 schema MUST ou sha256 dos schemas). Consertar um grafo não compensa quebrar outro no MUST: a comparação é por
 grafo. A dívida SHOULD é por código: por grafo, tirar um aviso de A e pôr o mesmo em B empata; por nó, consertar três
-ocorrências num grafo e criar uma noutro é ganho (o pedido do core: por grafo, uma melhora líquida espalhada aparecia
+ocorrências num grafo e criar uma noutro é ganho (por grafo, uma melhora líquida espalhada aparecia
 como piora). Trocar a granularidade não é piora: na passada que troca, a dívida é comparada na granularidade da base, e
 só uma piora de verdade pede --accept-regression. Ocorrência é por nó ou aresta na maioria dos códigos; os que são do
 arquivo inteiro (yaml.unquoted-date, form.range.top.nodes) contam 1 por grafo.
@@ -63,7 +63,7 @@ def validators():
 def measure_texts(items, corpus=None):
     """[(caminho, texto)] → {caminho: {"must": [códigos], "should": [códigos]}}: a medição de um corpus.
 
-    É a mesma lógica que a catraca daqui (kg_ratchet.core_numbers) usa para medir o core por fora.
+    É a mesma lógica que o mantenedor usa para medir corpora de terceiros.
     """
     must, should = validators()
     out = {}

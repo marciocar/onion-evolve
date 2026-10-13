@@ -1,5 +1,5 @@
 {
-  "description": "Níveis MUST × SHOULD do contrato v1 (Q_CONTRACT_CONFORMANCE_LEVELS, selada no PR #13): nó PROD sem verified_at alerta, não reprova.",
+  "description": "Níveis MUST × SHOULD do contrato v1: nó PROD sem verified_at alerta, não reprova.",
   "layer": "form",
   "pending_on": [],
   "cases": [
