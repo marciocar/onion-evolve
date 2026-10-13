@@ -172,8 +172,25 @@ def _ecma_pattern(validator, pattern, instance, schema):
 
 
 def make_validator(schema):
-    """O validador do leitor de referência: Draft 2020-12 com pattern em semântica ECMA-262."""
-    cls = validators.extend(Draft202012Validator, {"pattern": _ecma_pattern})
+    """O validador do leitor de referência: Draft 2020-12 com pattern em semântica ECMA-262.
+
+    propertyNames guarda os nomes de chave que já passaram por subschema: o resultado depende só do nome e do
+    subschema, e as chaves se repetem em cada nó (medido em 2026-10-13: 4,5 s de 10 s num grafo de 3.123 nós)."""
+    passed = set()
+
+    def property_names(validator, names_schema, instance, schema):
+        if not validator.is_type(instance, "object"):
+            return
+        key = id(names_schema)  # o subschema vive enquanto o validador vive (o schema é dele)
+        for name in instance:
+            if (key, name) in passed:
+                continue
+            errors = list(validator.descend(instance=name, schema=names_schema))
+            if errors:
+                yield from errors
+            else:
+                passed.add((key, name))
+    cls = validators.extend(Draft202012Validator, {"pattern": _ecma_pattern, "propertyNames": property_names})
     return cls(schema, format_checker=FormatChecker(formats=["date"]))
 
 
@@ -876,6 +893,28 @@ def contract_info(must_path, should_path):
             "sha256": {"must": sha(must_path), "should": sha(should_path)}}
 
 
+@functools.lru_cache(maxsize=8)
+def _validator_at(path):
+    with open(path, encoding="utf-8") as fh:
+        return make_validator(json.load(fh))
+
+
+def judge(sources, schema=CONTRACT_MUST, should_schema=None, corpus=None, limit=50):
+    """O documento kg-ssot.verdict/1 inteiro para [(source, text), ...]: o que o CLI imprime com --format json, como
+    biblioteca (o armazém em kg_store.py e quem adota chamam isto em vez de raspar o stdout). corpus é o índice de
+    corpus_index()/index_texts(), ou None. Schema ilegível sobe OSError/ValueError: é entrada quebrada de quem chama."""
+    should_schema = should_schema or should_for(schema)
+    validator = _validator_at(str(schema))
+    should_v = _validator_at(str(should_schema)) if should_schema else None
+    reports = []
+    for name, text in sources:
+        r = verdict(text, validator, should_v, corpus, source=name, limit=limit)
+        r["external_checked"] = corpus is not None or not uses_external(text)
+        reports.append(r)
+    return {"schema_version": VERDICT_SCHEMA_VERSION, "contract": contract_info(schema, should_schema),
+            "results": reports}
+
+
 def load_sources(args):
     if args.git:
         names = [l.strip() for l in open(args.list) if l.strip()]
@@ -999,12 +1038,9 @@ def main(argv=None):
         say(f"ENTRADA QUEBRADA  {exc}")
         return 2
     if args.format == "json":
-        reports = [verdict(text, validator, should_v, corpus, source=name, limit=args.limit) for name, text in sources]
-        for r, (name, text) in zip(reports, sources):
-            r["external_checked"] = corpus is not None or not uses_external(text)
-        print(json.dumps({"schema_version": VERDICT_SCHEMA_VERSION, "contract": contract_info(args.schema, should_path),
-                          "results": reports}, ensure_ascii=False, indent=1))
-        return 1 if any(r["verdict"] == "FAIL" for r in reports) else 0
+        doc = judge(sources, args.schema, should_path, corpus, args.limit)
+        print(json.dumps(doc, ensure_ascii=False, indent=1))
+        return 1 if any(r["verdict"] == "FAIL" for r in doc["results"]) else 0
     results, lines, failed, warned, unchecked = [], [], 0, 0, 0
     for name, text in sources:
         r = check(text, validator)

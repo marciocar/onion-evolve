@@ -1,6 +1,6 @@
 {
-  "version": "4.5.0",
-  "tag": "kg-ssot-v4.5.0",
+  "version": "4.6.0",
+  "tag": "kg-ssot-v4.6.0",
   "contract": {
     "must": "spec/kg-contract-v4.schema.json",
     "should": "spec/kg-contract-v4.should.schema.json"
@@ -24,6 +24,7 @@
     "tools/kg_gate.py",
     "tools/kg_vendor.py",
     "tools/kg_prov_export.py",
+    "tools/kg_store.py",
     "tools/requirements.txt"
   ],
   "profiles": {

@@ -2,7 +2,7 @@
 
 [← O contrato](04-contrato.md) · [Índice](README.md) · [Adoção e CI →](06-adocao-e-ci.md)
 
-As cinco ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3 com as versões fixadas em
+As seis ferramentas que viajam na release ficam em `tools/` e dependem só de Python 3 com as versões fixadas em
 [`tools/requirements.txt`](../../tools/requirements.txt) (PyYAML e jsonschema, mais as dependências do jsonschema).
 
 ```bash
@@ -86,7 +86,7 @@ python3 -I -B vendor/kg-ssot/tools/kg_validate.py --format json \
  "contract": {
   "must": "spec/kg-contract-v4.schema.json",
   "should": "spec/kg-contract-v4.should.schema.json",
-  "release": "kg-ssot-v4.5.0",
+  "release": "kg-ssot-v4.6.0",
   "sha256": { "must": "6277fc83…", "should": "034e3a6e…" }
  },
  "results": [
@@ -246,6 +246,95 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
 **Por que `-B`?** Os scripts do kit não gravam bytecode, mas uma ferramenta sua que **importa** um módulo do kit
 grava o `.pyc` dentro do vendor, e o próximo `check` reprova. Rode tudo com `python3 -I -B`, ou com
 `PYTHONDONTWRITEBYTECODE=1`.
+
+## `kg_store.py`: o armazém que só grava o que passa
+
+Para quem grava grafo por programa (um servidor de escrita, um chat, um pipeline que gera o grafo de um caso), o
+`kg_store.py` é uma biblioteca, com um CLI por cima, que só escreve depois do veredito PASS do contrato. Há três
+armazéns com a mesma interface (`read`, `list`, `write`, `delete`, `history`):
+
+- `DiskStore`: só a cabeça em disco, sem histórico;
+- `GitStore`: um commit por gravação ou remoção. O git roda isolado na raiz do armazém e nunca sobe para um repo
+  de fora. O autor vem de quem grava (`author="Nome <email>"`), e o committer é fixo do serviço;
+- `VersionedStore`: a cabeça em disco mais um registro de eventos e as versões no diretório oculto `.kg-store/`,
+  sem git.
+
+```python
+import kg_store
+
+store = kg_store.GitStore("areas/ana", init=True)
+r = store.write("grafos/caso.kg.yaml", texto, message="primeiro grafo", author="Ana <ana@example.org>",
+                expected_sha256=kg_store.NEW)
+if not r["written"]:
+    print(r["reason"], r["verdict"])   # "gate", "conflict", "missing" ou "not_judged"
+```
+
+O gate julga mais que o candidato. A ponta das `external_edges` é conferida contra o próprio armazém, já com o
+candidato no lugar. Cada grafo que aponta para o nome gravado é julgado de novo, porque trocar ou apagar um grafo
+pode deixar a aresta externa de outro sem ponta. Só grava com PASS em todos.
+
+O corpus é o mesmo que o gate do repo veria. No `GitStore`, isso quer dizer só o rastreado: um `.kg.yaml` que está no
+disco sem commit não conta, nem na lista, nem no julgamento, nem na trava (para ela, o nome está livre, e a gravação
+o substitui). O `DiskStore` e o `VersionedStore` recusam uma raiz dentro
+de um repo git, onde o gate leria o rastreado e o armazém leria o disco. E a cabeça só fica trocada com o registro
+feito: se o commit ou o evento falha, ela volta ao que era, e a exceção sobe para quem chamou.
+
+Pelo CLI, um grafo que passa e um que reprova:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_store.py --backend git --root areas/ana --init \
+  write grafos/valid-minimal.kg.yaml vendor/kg-ssot/spec/conformance/fixtures/latest/form/minimal/valid-minimal.kg.yaml \
+  --author "Ana <ana@example.org>" --message "primeiro grafo"
+```
+
+```text
+{
+ "written": true,
+ "reason": null,
+ "name": "grafos/valid-minimal.kg.yaml",
+ "sha256": "b725f37669f2e5979ed8c02eaae3c59ba80a490177e2f28c0cb8a580cf51cfd7",
+ "ref": "f47e4737c147d2e4a070bd8d07948075373814e0",
+ "verdict": { … },
+ "error": null,
+ "unchanged": false
+}
+```
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_store.py --backend git --root areas/ana \
+  write grafos/x.kg.yaml vendor/kg-ssot/spec/conformance/fixtures/latest/form/minimal/bad-node-missing-label.kg.yaml
+```
+
+```text
+{
+ "written": false,
+ "reason": "gate",
+ "name": "grafos/x.kg.yaml",
+ ...
+ "verdict": { "results": [ { "source": "grafos/x.kg.yaml", "verdict": "FAIL",
+              "summary": { "MUST": { "form.required.node.label": 1 }, "SHOULD": {} }, ... } ] }
+}
+```
+
+(O `verdict` está abreviado aqui; ele é o documento `kg-ssot.verdict/1` inteiro.)
+
+- **`reason`:** é `null` quando gravou. `"gate"` quer dizer que o contrato reprovou, e o `verdict` diz onde.
+  `"conflict"` quer dizer que o `expected_sha256` não bate com a cabeça. `"missing"` aparece ao remover o que não
+  existe. `"not_judged"` aparece quando o julgamento falhou ou saiu fora de `spec/verdict.schema.json`: nunca vira
+  PASS nem `"gate"`, para quem chama distinguir "reprovou" de "não deu para julgar".
+- **A trava otimista:** `expected_sha256` é o sha256 da cabeça que quem grava leu, ou `NEW` (no CLI, `new`) para
+  exigir que o nome ainda não exista. Gravar o mesmo texto da cabeça dá `written` com `unchanged` e sem commit.
+- **O caminho:** o nome é relativo, termina em `.kg.yaml` e não tem `..` nem segmento oculto. Raiz, pastas e arquivo
+  não podem ser symlink: tudo se abre com `O_NOFOLLOW`, o que exige POSIX.
+- **O histórico:** `history(nome)` lista as operações, da mais nova para a mais antiga, com `ref`, `op`
+  (`write` ou `delete`), autor, data e mensagem. `read(nome, ref=...)` lê uma versão anterior: o sha do commit no
+  git, o `seq` do evento no versionado.
+- **O git isolado:** o `GitStore` não lê a config do sistema nem a do usuário (sem hooks, sem gpg, sem `autocrlf`, sem
+  arquivo de exclusão), então o que ele guarda é byte a byte o texto aprovado, com o sha256 do resultado.
+- **O que fica com quem adota, de propósito:** autenticação, identidade, área por usuário (um root por usuário),
+  tamanho máximo, número de grafos, timeout e a trava entre processos onde não há `flock`.
+- **O rc do CLI:** 0 gravou ou leu, 1 recusado (`gate`, `conflict`, `missing`, nome inexistente) e 2 entrada
+  quebrada ou `not_judged`.
 
 ## `kg_prov_export.py`: a proveniência em PROV-O
 

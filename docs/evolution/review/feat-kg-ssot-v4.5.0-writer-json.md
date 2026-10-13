@@ -11,13 +11,16 @@ verdict: APROVADO
 reviewer: passada adversarial própria (refutador com default reprovado, sem subagente) — gate mecânico: kg_vendor check, kg_gate do CI, famílias mcp_onion_kg_writer e decide com LC_ALL=C e mutantes
 ---
 
-# kg-ssot-v4.5.0, o writer lê o veredito em JSON e o selador cobra o TETO
+# kg-ssot-v4.6.0, o writer lê o veredito em JSON e o selador cobra o TETO
 
 ## O que muda
 
-- **Vendor**: de `kg-ssot-v4.4.0` para `kg-ssot-v4.5.0` (6517386f7c13, 311 arquivos). O `kg_validate.py`
-  ganha `--format json` (o veredito `kg-ssot.verdict/1`, com schema em `spec/verdict.schema.json`) e lê o
-  grafo pelo stdin. O sha256 dos schemas MUST e SHOULD e do `kg_gate.py` não mudou. A saída de texto e a
+- **Vendor**: de `kg-ssot-v4.4.0` para `kg-ssot-v4.6.0` (b819a4422ad1, 312 arquivos), passando pela
+  4.5.0 no mesmo PR (a branch guarda o nome da 4.5.0). A 4.5.0 deu ao `kg_validate.py` o `--format json`
+  (o veredito `kg-ssot.verdict/1`, com schema em `spec/verdict.schema.json`) e a leitura do grafo pelo
+  stdin. A 4.6.0 deixa o veredito mais rápido e traz o `tools/kg_store.py` (GitStore), que este PR ainda
+  não usa. No `--format json`, a 4.6.0 dá `results` iguais aos da 4.5.0 nos 447 grafos, e o
+  `verdict.schema.json` tem o mesmo sha256. O sha256 dos schemas MUST e SHOULD e do `kg_gate.py` não mudou. A saída de texto e a
   do `--where` do `kg_validate.py` novo são byte a byte iguais às do leitor da 4.4.0 nos 447 `.kg.yaml`
   rastreados. O `kg_gate` com os `--exclude` do CI dá rc 0 e a saída é byte a byte igual à do main
   (155 grafos, 138 no MUST, 17 na dívida herdada).
@@ -58,6 +61,17 @@ reviewer: passada adversarial própria (refutador com default reprovado, sem sub
   existente no teto sela. Cinco mutantes rodaram por `ops/mutate-and-restore.sh`, todos morderam, e o
   arquivo foi restaurado byte a byte: sem a checagem, decidir pela mensagem, sem SEM-TETO, escopo
   ignorado e escrever antes do teto.
+
+## O que muda ao trocar o armazenamento do writer pelo GitStore (PR seguinte, não este)
+
+- O GitStore só enxerga o que está rastreado. Hoje o `kg_my_list` lista o diretório da área.
+- `StoreError` significa não gravado, e tem de virar recusa nomeada, nunca `gravado: true`.
+- Texto igual ao do HEAD devolve `unchanged` sem commit. Hoje é o `mudou: false` do `git status`, e o
+  caso `reescrita-identica-sem-commit-novo` passa a cobrar o `unchanged`.
+- `init=True` por usuário, ou seja, um repo por área, como o `_ensure_repo` faz hoje.
+- Regravar um nome julga também os grafos que apontam para ele. Numa área com `external_edges` entre os
+  próprios grafos, isso muda o que conta como `external_checked`, e o NAO JULGADO de hoje tem de ser
+  revisto.
 
 ## Deploy (do maestro, depois do merge)
 
