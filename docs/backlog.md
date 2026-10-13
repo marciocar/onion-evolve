@@ -744,7 +744,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 9.6 | `Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA` | federation-health-2026-07 | AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no t |
-| 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
+| 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens dev-1 (pin nao-verificavel-deste-host) e instancia-offline (pin desconhecido) — estado de verificacao INDETE |
 
 ## session-2026-07-18-evolve-review-triage — 1 item(ns)
 

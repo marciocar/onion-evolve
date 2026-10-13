@@ -300,7 +300,7 @@ override de grupo⊃org (F9), e provenance-time do KG (F5) já dizem **qual esco
 ## Encaixe Grana.Ai
 
 **Caso:** fintech regulada, monorepo **nx** privado, time de devs + stage/prod; dentro dela
-empresa (Grana.Ai) ⊃ times (ex.: `desenvolvimento`) ⊃ pessoas (ex.: `mauricio`), cada um querendo sua
+empresa (Grana.Ai) ⊃ times (ex.: `desenvolvimento`) ⊃ pessoas (ex.: `dev-1`), cada um querendo sua
 camada de `.claude`/docs herdando do pai e podendo sobrepor. `integration_branch: develop`, regulado
 (nunca live-pull — ver stream G1).
 
@@ -318,7 +318,7 @@ camada de `.claude`/docs herdando do pai e podendo sobrepor. `integration_branch
    concatenação; **sobrepõe** por default explícito (F3). O `claudeMdExcludes` isola CLAUDE.md de **outros
    times** do monorepo (F1) — é a **sub-repo scoping que o grounding dava como inexistente, e é nativa**.
    Agentes do time em `.claude/agents/` do subdir sobrepõem os do framework por nome (F6).
-4. **Pessoa (`mauricio`)** → **`~/.claude/CLAUDE.md`** (preferências cross-projeto) + **`CLAUDE.local.md`**
+4. **Pessoa (`dev-1`)** → **`~/.claude/CLAUDE.md`** (preferências cross-projeto) + **`CLAUDE.local.md`**
    gitignored no repo (preferências pessoais neste monorepo) + auto-memory per-repo (F1/F11). Lida por
    último → **vence** onde não colide com managed/compliance.
 5. **Conhecimento vivo** (KB/`*-context`/KG do Grana.Ai) → **SUPERSEDES bitemporal** (F5) para verdades de
@@ -326,7 +326,7 @@ camada de `.claude`/docs herdando do pai e podendo sobrepor. `integration_branch
    se escalar além de markdown, **namespaces** por empresa/time/pessoa (F10) com consulta em cascata.
 6. **Polimorfismo SDAAL** (o que faz herdar-sem-atrito): a doutrina do framework/empresa é **guideline
    reason-based** (F3/F4); o **`*-context` local** do time/pessoa **re-resolve o vertical** em runtime
-   cognitivo — o `mauricio` não edita o pai, só adiciona contexto que especializa a base herdada.
+   cognitivo — o `dev-1` não edita o pai, só adiciona contexto que especializa a base herdada.
 
 **Resultado:** a hierarquia framework→empresa→time→pessoa do Grana.Ai é **montada em contexto** a cada
 sessão (concatenação amplo→específico, precedência tipada), com **compliance inviolável no topo** (managed),

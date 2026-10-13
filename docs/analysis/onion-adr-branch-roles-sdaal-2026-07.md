@@ -157,7 +157,7 @@ determinística** (o gate que roda). Paridade `.sh` ↔ adapters vigiada por `li
 
 O `members.yaml lineages:` hoje mistura **duas dimensões** sob o mesmo nome: (a) linhagem-de-branch
 (metagamify: `framework`/`production` = duas branches) e (b) instância-de-máquina (granaai:
-`local-kvm8`/`mauricio`; onion-evolve: `workstation`/`vps-bridge` = hosts). O SDAAL branch-roles é dono **só
+`local-kvm8`/`dev-1`; onion-evolve: `workstation`/`vps-bridge` = hosts). O SDAAL branch-roles é dono **só
 de (a)**. (b) = "clones físicos com pins", outro conceito. **Nomeado aqui; refactor gated** por gatilho de
 federação — não forçar agora.
 

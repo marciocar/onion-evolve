@@ -28,7 +28,7 @@ related:
 ## 1. Contexto e problema
 
 No dia seguinte ao aceite da RFC-0005, o time um adotante materializou em `master` uma adoção
-**docs-only** (PR #1127 do alvo, Mauricio: *"`.claude/` (capability layer) and `CLAUDE.md` stay OUT
+**docs-only** (PR #1127 do alvo, dev-1: *"`.claude/` (capability layer) and `CLAUDE.md` stay OUT
 of git"*), coexistindo com a adoção **full** em `develop`. Evidência verificada no clone local
 read-only (2026-07-10):
 

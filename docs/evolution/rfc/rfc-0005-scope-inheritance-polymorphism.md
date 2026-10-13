@@ -63,7 +63,7 @@ Plano **cognitivo** resolve por concatenação/precedência nativa (grátis). Pl
 
 > Origem: sinal de campo [`2026-07-10-rfc5-docs-only-adoption-ground-truth`](../inbox/_processed/2026-07-10-rfc5-docs-only-adoption-ground-truth.md)
 > — no dia seguinte ao aceite desta RFC, o time Grana.Ai materializou em `master` uma **adoção docs-only**
-> (PR #1127, Mauricio: *"`.claude/` (capability layer) and `CLAUDE.md` stay OUT of git"*), coexistindo com a
+> (PR #1127, dev-1: *"`.claude/` (capability layer) and `CLAUDE.md` stay OUT of git"*), coexistindo com a
 > adoção **full** em `develop`. Escrito do `main` do core com o workstream de pesquisa dormente — a sessão de
 > `docs/scope-inheritance-research` deve **reconciliar** este adendo ao acordar.
 
@@ -88,7 +88,7 @@ Plano **cognitivo** resolve por concatenação/precedência nativa (grátis). Pl
 
 ## 5. Caso Grana.Ai (concreto)
 
-`granaai` (empresa, regulado) → time `desenvolvimento` → pessoa `mauricio`, num **nx monorepo**:
+`granaai` (empresa, regulado) → time `desenvolvimento` → pessoa `dev-1`, num **nx monorepo**:
 - **Cognitivo:** o `CLAUDE.md`/skills do time vivem no **subdiretório** do time (walk-up nativo compõe framework
   + empresa + time + pessoa em runtime); zero engenharia nova.
 - **Config:** `settings.json` do time/pessoa **gerado** pela composição N-camadas com proveniência (o slice).

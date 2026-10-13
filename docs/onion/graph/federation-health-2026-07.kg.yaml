@@ -142,7 +142,7 @@ nodes:
     status: open
     verified_at: "2026-08-30"
     verified_against: "censo lote 4: worker CONFIRMED e juiz opus/high APROVOU (run wf_da7d6a16-49e)"
-    label: "granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETERMINADO por design"
+    label: "granaai linhagens dev-1 (pin nao-verificavel-deste-host) e instancia-offline (pin desconhecido) — estado de verificacao INDETERMINADO por design"
     trace: "docs/evolution/federation/members.yaml:131"
     provenance:
       source: "docs/evolution/federation/members.yaml:131"

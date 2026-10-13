@@ -258,7 +258,7 @@ do subdir da pessoa até a raiz do repo mesclando camadas de `.claude`/contexto*
    projeto/time no monorepo**: `.claude/`, `mise.toml` e `CLAUDE.md` **na pasta do time**, resolvidos por cascata-por-path
    (modelo mise #5 / `includeIf gitdir` #6). Escopo isolado por **nx tags** `scope:desenvolvimento` (#3); ownership do time
    gerado em `CODEOWNERS` via `@nx/owners`/`nx sync` (#4). Capacidade do time = **override-por-grupo** no marketplace (#12).
-4. **Pessoa (ex.: `mauricio`)** — camada mais específica: `user` settings (#10) + `CLAUDE.md`/dados pessoais no estilo
+4. **Pessoa (ex.: `dev-1`)** — camada mais específica: `user` settings (#10) + `CLAUDE.md`/dados pessoais no estilo
    **chezmoi templates + `.chezmoidata`** (#7) herdando o baseline do time e sobrepondo por polimorfismo (não por cópia).
 
 **Resolução em runtime:** um resolver (generalização do `resolve-integration-branch.sh`, #1/#6) caminha

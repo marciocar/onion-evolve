@@ -22,7 +22,7 @@ nodes:
     label: "maestro/mantenedor — dono do core; unico que relaya sinais ao core"
     provenance:
       source: "git:5e511195 (PR #298) docs/evolution/inbox/2026-07-08-test-message.md"
-      locator: "git show --stat 5e511195 (autor mauriciomatos, 2026-07-08, escreve em docs/evolution/inbox/)"
+      locator: "git show --stat 5e511195 (autor dev-1, 2026-07-08, escreve em docs/evolution/inbox/)"
       method: "leitura: commit do core que refuta a exclusividade do relay"
       locality: "repo"
   - id: EN_VISITANTE
@@ -481,7 +481,7 @@ nodes:
     confidence: 0.95
     verified_at: "2026-09-01"
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): REFUTED 2/2 — git log --all --format=''%H %an'' -- docs/evolution/inbox/ | grep -v "Marcio Carvalho". FLIP NAO E NOVO: executa o selo do maestro de 2026-08-31 (PR #724, C_MAESTRO_NAO_E_UNICO_RELAY, mesmo fato: commit 5e511195/PR #298 por terceiro na rota de relay)'
-    label: 'MEDIDO: O nó afirma DUAS coisas: (1) ''só o maestro relaya/tria'' e (2) ''o visitante entrega, não relaya''. O histórico do git mostra 4 commits de um colaborador externo (Mauricio Matos, registrado como membro) escrevendo DIRETO em docs/evolution/inbox/ — o caminho de relay em si, não uma entrega para tria'
+    label: 'MEDIDO: O nó afirma DUAS coisas: (1) ''só o maestro relaya/tria'' e (2) ''o visitante entrega, não relaya''. O histórico do git mostra 4 commits de um colaborador externo (dev-1, registrado como membro) escrevendo DIRETO em docs/evolution/inbox/ — o caminho de relay em si, não uma entrega para tria'
     provenance:
       source: "docs/evolution/inbox"
       locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): REFUTED 2/2 — git log --all --format='%H %an' -- docs/evolution/inbox/ | grep -v \"Marcio Carvalho\". FLIP NAO E NOVO: executa o selo do maestro de 2026-08-31 (PR #724, C_MAESTRO_NAO_E_UNICO_RELAY, mesmo fato: commit 5e511195/PR #298 por terceiro na rota de relay)"

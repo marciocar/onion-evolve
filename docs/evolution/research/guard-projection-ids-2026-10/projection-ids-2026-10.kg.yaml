@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 11 NÓS ═══  (era 6; +1 porque o Elenxo REPROVOU e a reprovacao e evidencia; +4 em 2026-10-13: o defeito do alcance da P8, a cura P9, a medição dela e o teto do papel)
+# ═══ TETO: 13 NÓS ═══  (era 6; +1 porque o Elenxo REPROVOU e a reprovacao e evidencia; +4 em 2026-10-13: o defeito do alcance da P8, a cura P9, a medição dela e o teto do papel; +2 em 2026-10-13: a decisão dos nomes de pessoas por papel e a contagem da troca)
 meta:
   id: guard-projection-ids-2026-10
   schema_version: "1"
@@ -166,6 +166,40 @@ nodes:
     label: "TETO declarado: o papel vem do stamp, que é dado editável. Stamp falso de adotante no core desliga o default local (o CI segue protegido pela explícita); fork sem stamp ou com role: source lê a lista do HOME, errando para o lado de acusar."
     narrative: "Os dois sentidos foram pensados na passada adversarial. Errar para acusar (fork do core numa máquina que tem a lista) é o sentido seguro: o dono vê HARD e passa uma lista vazia explícita. Errar para calar exige escrever .claude/.onion-version no core, que o core não carrega por desenho (onion-version.sh), e mesmo assim o gate do CI usa a explícita. Gatilho para estender: um stamp aparecer na árvore do core, ou o CI do core rodar sem o secret."
     trace: ".claude/validation/onion-version.sh"
+  - id: D_NOMES_DE_PESSOAS_VIRAM_PAPEL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-13"
+    verified_against: "decisão do maestro em 2026-10-13, por pergunta com opções (/meta:decide): escolhida «Por papel + mapa privado»"
+    label: "Nomes de pessoas reais (devs de adotante e de cliente) saem da árvore pública do core e viram PAPEL, inclusive nas chaves YAML de linhagem; o vínculo papel para pessoa fica num mapa privado 0600 fora do repo, ao lado da lista de termos. O histórico fica como está."
+    narrative: "Selado por /meta:decide em 2026-10-13: escolhida «Por papel + mapa privado»; descartadas: «Iniciais» · «Iniciais + guarda»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-13: «Como pseudonimizar os nomes de pessoas na árvore pública do core (members.yaml e onde mais aparecerem)?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-13"
+      locality: "pessoa"
+
+  - id: E_TROCA_DE_NOMES_POR_PAPEL_CONTADA
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-13"
+    source_tier: 10
+    label: "A troca medida: 78 ocorrências de duas pessoas do time granaai viraram papel (dev-1: 65, dev-2: 13) em 25 arquivos, inclusive as duas chaves de linhagem do members.yaml; a busca pelas formas antigas na árvore dá zero. Três pessoas ficaram sem decidir."
+    narrative: "Por arquivo (dev-1/dev-2): ADR granaai-consolidation 11/4; members.yaml 7/2; inbox multi-lineage 4/3; inbox rfc5-docs-only 6/0; scope-inheritance SYNTHESIS 4/0, H4 3/0, H1 2/0, H2 1/0, H3 1/0; provenance-triage o3-wave1-proposta 4/0 e o3-wave1-juiz 3/0; RFC-0005 2/0; research team-mode 2/0; outbox granaai reconciliacao 2/0 e resposta-rfc5 2/0; inbox gitignore-blanket 2/0; KG colaboracao 2/0; KG federation-health 1/1; backlog.md 1/1 e graph.md 1/1 (projeções); census rodada1.json 0/1; ADR branch-roles 1/0; inbox test-message 1/0; scope-convention 1/0; ADR capability-update 1/0. Formas trocadas: nome completo, primeiro nome, dois handles, um e-mail e as chaves de linhagem (a do dev-2 virou instancia-offline). Nenhum script lia as chaves velhas: lineages é lido genericamente (graph.sh, machine_path.py). NÃO DECIDIDO, para o maestro: três pessoas cujo nome é também id de membro, nome do repo remoto, diretório local, pasta de outbox e nome de grafo (o colaborador de campo, o adotante de compliance e o CMO do adotante granaai); trocar a prosa e deixar o id não esconde nada, e renomear o id exige renomear remoto e clone. Também não decididos: titulares de marca citados de registro público do INPI numa pesquisa de nome. Autores publicados, personagens fictícios de exemplo e o maestro ficam."
+    trace: "docs/evolution/federation/members.yaml"
+    verified_against: "members-validate.sh rc 0 (28 membros) e registry-pins.sh --check rc 0 (20 em dia, 0 divergentes) antes e depois; busca case-insensitive na árvore rastreada por cada forma do mapa privado = 0"
+    provenance:
+      source: "docs/evolution/federation/members.yaml e os 24 outros arquivos da troca"
+      locator: "contagem do script de troca, por arquivo e por papel"
+      method: "medição: contagem das substituições e busca das formas antigas na árvore rastreada, nesta sessão"
+      locality: "repo"
 
 edges:
   - from: E_ID_E_CAMINHO_FORA_DO_ALCANCE_DA_REGRA_30
@@ -195,3 +229,9 @@ edges:
   - from: C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP
     to: D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE
     edge_type: CONSTRAINS
+  - from: D_NOMES_DE_PESSOAS_VIRAM_PAPEL
+    to: D_P9_DEFAULT_DA_FONTE_PRIVADA_SO_NA_FONTE
+    edge_type: TRACES_TO
+  - from: E_TROCA_DE_NOMES_POR_PAPEL_CONTADA
+    to: D_NOMES_DE_PESSOAS_VIRAM_PAPEL
+    edge_type: SUPPORTS

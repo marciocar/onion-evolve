@@ -241,7 +241,7 @@ harness-ledger-3-modes já o classificou como gap crítico, e por isso que fica 
 
 **Revisão pós-dogfood (2026-07-01) — o veredito abaixo mudou de leitura ao aplicar a doutrina "dogfood é o
 padrão master" em vez de só a pesquisa de mercado.** A leitura inicial ("não disparou, foi só teste de
-acesso") subestimava o que já aconteceu **ao vivo, nesta própria sessão**: o `mauriciomatos` tem a própria
+acesso") subestimava o que já aconteceu **ao vivo, nesta própria sessão**: o `dev-1` tem a própria
 sessão de Claude Code rodando contra um clone do `onion-evolve`, e essa sessão **considerou ativamente
 commitar direto na `main` compartilhada** (mensagem: "Quer que eu commite este staging na main?"). A sessão
 do core teve que **intervir manualmente** para impedir isso ("quebra um-escritor-por-repo") — não havia
@@ -306,7 +306,7 @@ referência de design).
 - **2026-07-01 (revisão, mesma sessão)** — §0/§4/§5 revisados ao aplicar a doutrina "dogfood é o padrão
   master" em vez de só a pesquisa de mercado. Dois achados de dogfood ao vivo, na própria sessão: (1) um
   incidente real de ambiguidade de autoridade-de-escrita entre a sessão do core e a sessão do
-  `mauriciomatos` no mesmo repo (Eixo A) — corrigido por julgamento manual, sem salvaguarda de sistema;
+  `dev-1` no mesmo repo (Eixo A) — corrigido por julgamento manual, sem salvaguarda de sistema;
   (2) o doc-bridge existente (`CHANGELOG.md`+`outbox/`+`co-deliver`) usado com sucesso para anunciar uma
   decisão de conhecimento, não código (Eixo B). Ambos os vereditos migraram para a leitura mais
   conservadora: Eixo A registra o incidente como evidência mas **não** dispara construção de infra nova;

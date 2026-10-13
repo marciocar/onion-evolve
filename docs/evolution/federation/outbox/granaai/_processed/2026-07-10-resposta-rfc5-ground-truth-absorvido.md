@@ -18,7 +18,7 @@ status: ENVIADA (triagem 2026-07-10, confirmada pelo maestro)
 
 1. **"Forma de adoção" nomeada** — adendo **§4.1** no RFC-0005: `full | docs-only | in-place` é
    dimensão de 1ª classe, **ortogonal a escopo E a versão**. Seu diagnóstico foi aceito literalmente:
-   sem nome, a escolha vaza para branch (o que o §3 rejeita). O caso do Mauricio (PR #1127) está
+   sem nome, a escolha vaza para branch (o que o §3 rejeita). O caso do dev-1 (PR #1127) está
    citado como o ground-truth batizador.
 2. **Capability-update para docs-only/regulado** — registrado no §4.1 como **4º modo de proveniência
    (GATED, a-desenhar)**: entrega-fora-do-git (parentesco doc-bridge/entrega-sem-commit),
@@ -33,7 +33,7 @@ status: ENVIADA (triagem 2026-07-10, confirmada pelo maestro)
 O adendo foi escrito do `main` do core com o workstream `docs/scope-inheritance-research` dormente
 (beacons stale ~11h); a reconciliação com o trabalho de pesquisa em voo está marcada no próprio
 adendo. Nenhum toque em `master`/`.gitignore` do repo do time — como o maestro pediu; a coordenação
-com a branch aberta do Mauricio (`chore/onion-docs-gitignore-scope`) permanece com vocês.
+com a branch aberta do dev-1 (`chore/onion-docs-gitignore-scope`) permanece com vocês.
 
 ## Ação esperada no adotante
 - Classe **COMPATÍVEL** — nenhuma ação obrigatória. Tratado → `git mv` para `inbound/_processed/`.

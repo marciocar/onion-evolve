@@ -115,7 +115,7 @@ exatamente o gap do caso Grana.Ai.
 - **Fonte**: https://octopus.com/blog/stop-using-branches-deploying-different-gitops-environments ·
   https://codefresh.io/blog/applied-gitops-with-kustomize/ (Kapelonis, "Stop Using Branches…")
 - **Materialidade**: ALTA — **é a resposta direta à pergunta-chave do maestro** (o exemplo em branches
-  onion/adopt → granaai → teams/desenvolvimento → members/mauricio).
+  onion/adopt → granaai → teams/desenvolvimento → members/dev-1).
 - **Implicação p/ Onion**: o mecanismo de herança de escopo **não deve ser branches**. Branches não compõem
   (você fica em uma por vez; herança precisa somar 4 camadas simultâneas); a intuição do maestro ("branches talvez
   não seja o mecanismo") está alinhada ao consenso de mercado. Branches permanecem úteis para **uma coisa
@@ -273,7 +273,7 @@ seguindo o vetor:
 | **Framework** | pacote/vendor do core (SSOT), `.onion-version` | `source` | base herdada; upgrade via `vendor-branch.sh` 3-way (eixo VERSÃO) |
 | **Empresa (Grana.Ai)** | `managed-settings.json` + `CLAUDE.md` raiz do monorepo + `docs/compliance-context/` | `standalone` + component `onion-compliance` (opt-in) | política **inviolável** (managed); global push-down estilo Helm `global:`; `roots`-style ownership de `docs/compliance-context/` |
 | **Time (ex.: `packages/desenvolvimento`)** | `packages/<time>/CLAUDE.md` (lazy subtree load) + `.claude/settings.json` do package/projeto | overlay de escopo | herda empresa + delta do time; **override cirúrgico por-chave** (estilo EditorConfig: só o listado sobrepõe) |
-| **Pessoa (ex.: mauricio)** | `~/.claude/settings.json` + `~/.claude/CLAUDE.md` (user) e/ou `settings.local.json` (não-versionado) | camada pessoal | preferências pessoais; array-merge empilha, não apaga a herança |
+| **Pessoa (ex.: dev-1)** | `~/.claude/settings.json` + `~/.claude/CLAUDE.md` (user) e/ou `settings.local.json` (não-versionado) | camada pessoal | preferências pessoais; array-merge empilha, não apaga a herança |
 
 Pontos concretos:
 
