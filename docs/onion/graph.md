@@ -288,7 +288,7 @@ bomtexto	tier	standalone
 bomtexto	trust-advises	onion-evolve	
 brain-granaai	adopts	onion-evolve	
 brain-granaai	mode	brownfield	
-brain-granaai	pin	bd769f168411	
+brain-granaai	pin	10514066fb28	
 brain-granaai	specialization	clickup	
 brain-granaai	specialization	company-brain	
 brain-granaai	specialization	pesquisa-primaria	
@@ -624,7 +624,7 @@ onion-core	tier	source
 onion-core	trust-advises	onion-evolve	
 onion-curation	adopts	onion-evolve	
 onion-curation	mode	greenfield	
-onion-curation	pin	7818b8a25ae6	
+onion-curation	pin	10514066fb28	
 onion-curation	specialization	curadoria	
 onion-curation	specialization	dissecacao	
 onion-curation	specialization	mercado	
