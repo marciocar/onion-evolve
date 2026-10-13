@@ -379,12 +379,14 @@
 .claude/validation/evolve-census.sh	C_GUARD_LINKS_TETO	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
 .claude/validation/evolve-census.sh	D_O_RAIO_X_E_COMPOSICAO_DE_MEDIDORES	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/validation/evolve-census.sh	E_IDADE_OPTOUT_NAO_E_FRESCA	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
+.claude/validation/evolve-census.sh	E_MAQ0_LOCALIZADOR_E_CURA_1062	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
 .claude/validation/evolve-census.sh	E_MAQ0_VIGIADO_POR_CITACAO	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
 .claude/validation/evolve-census.sh	E_O_ELENXO_REPROVOU_O_RAIO_X_POR_NUMERO_FALSO	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/validation/evolve-census.sh	Q_MAQ1_NUNCA_SEM_O_N_DA_AMOSTRA	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
 .claude/validation/evolve-staleness-check.sh	E_DOIS_CASOS_NASCERAM_DE_MUTANTE	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/evolve-staleness-check.sh	E_O_ELENXO_REPROVOU_O_GATILHO_E_A_TESE_CAIU	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/evolve-staleness-check.sh	E_O_EVOLVE_ERA_O_UNICO_ORGAO_SEM_GATILHO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
+.claude/validation/evolve-staleness-check.sh	E_REGRA97_DELTA_POR_COMMIT	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
 .claude/validation/evolve-staleness-check.sh	E_TETO_DECLARADO_DO_GATILHO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/federation-console.sh	C_not_backstage	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/federation-console.sh	E_GIT_DIR_QUEBRA_A_RAIZ_DENTRO_DE_WORKTREE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
@@ -437,6 +439,7 @@
 .claude/validation/kg-radar.sh	D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
 .claude/validation/kg-radar.sh	D_S2_ABSORBED	docs/onion/graph/granaai-doctrine-absorption-2026-07.kg.yaml
 .claude/validation/kg-radar.sh	D_m1_avisa_nao_reprova	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
+.claude/validation/kg-radar.sh	E_DECISAO_SELADA_DEV_CURADA_1064	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
 .claude/validation/kg-radar.sh	E_DOIS_LEITORES_DIVERGIAM	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/kg-radar.sh	E_LABEL_ESCONDE_NO_FANTASMA_DO_CENSO	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
 .claude/validation/kg-radar.sh	E_MODO_PROPOSTA_ENTREGUE	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
@@ -1428,6 +1431,7 @@ docs/evolution/inbox/_processed/2026-10-02-promocao-a-hub.md	Q_PARIDADE_PAPEL_SO
 docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md	E_HUB_OPERACOES_ENTERPRISE_VEREDITO_DOS_TRES_FALSOS_POSITIVOS	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-06-radar-cego-mu07-mu18.md	E_RADAR_CEGO_A_TIPO_TROCADO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 docs/evolution/inbox/_processed/2026-10-12-evolve-maq-findings.md	E_SINAIS_EVOLVE_KGSSOT_1012	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-12-evolve-round-2-findings.md	E_SINAL_ROUND2_KGSSOT_1012	docs/evolution/research/triagem-evolve-kgssot-2026-10/triagem-evolve-kgssot-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-12-spike-value-criterion.md	E_SPIKE_SOBREVIVENCIA_PREMIA_O_TRIVIAL_1012	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml

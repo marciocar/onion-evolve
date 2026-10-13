@@ -10826,7 +10826,7 @@ FAKE
 }
 
 # ── REGRA 97: a auto-auditoria do framework tem GATILHO ──────────────────────────────────────
-# Delega ao `--selftest` do check (7 casos, incluindo as duas polaridades e o par pasta-ausente vs
+# Delega ao `--selftest` do check (14 casos desde 2026-10-13, incluindo as duas polaridades e o par pasta-ausente vs
 # pasta-vazia) e acrescenta o que só daqui se vê: o MODO QUE A PRODUÇÃO CONSOME (`--tsv`) e o
 # REGISTRO. ⚠️ Invoca pelo CAMINHO LITERAL, não por variável: a REGRA 59 (Modo que a produção
 # consome é exercitado pela bancada) extrai o par casando o NOME do arquivo, e `bash "${v}" --tsv`
@@ -10897,6 +10897,33 @@ run_evolve_staleness_selftests() {
   if [ "${_sev}" = "SOFT" ]; then
     record_pass "evolve-staleness: (d) a guarda EMITE SOFT (vencida AVISA; HARD travaria o laco de auto-evolucao)"
   else record_fail "evolve-staleness: (d) severidade" "a guarda emitiu '${_sev}' em vez de SOFT — auto-auditoria vencida passaria a BLOQUEAR merge"; fi
+
+  # (e) O ALARME FALSO DO CAMPO (onion-kg-ssot, 2026-10-12: 42 artefatos), no modo que a producao
+  #     consome: artefato commitado no MESMO DIA, ANTES do relatorio, NAO conta, e o commit
+  #     DEPOIS dele conta. A base do delta e o commit do relatorio, nao a meia-noite. Mutante
+  #     medido em 2026-10-13: voltar ao `--since=<data>T00:00:00` faz (e1) reprovar.
+  local _fx4; _fx4="$(mktemp -d)"
+  ( cd "${_fx4}" && git init -q . && mkdir -p docs/analysis .claude/commands/meta \
+    && printf '# antes\n' > .claude/commands/meta/antes.md && git add -A \
+    && GIT_AUTHOR_DATE=2026-01-01T09:00:00 GIT_COMMITTER_DATE=2026-01-01T09:00:00 \
+       git -c user.email=b@b -c user.name=b commit -q -m antes \
+    && printf '# r\n' > docs/analysis/onion-evolution-2026-01-01.md && git add -A \
+    && GIT_AUTHOR_DATE=2026-01-01T11:00:00 GIT_COMMITTER_DATE=2026-01-01T11:00:00 \
+       git -c user.email=b@b -c user.name=b commit -q -m rel ) >/dev/null 2>&1
+  local _t4 _t4rc=0
+  _t4="$(cd "${REPO_ROOT}" && EVOLVE_STALE_DAYS=99999 EVOLVE_DELTA_MIN=0 EVOLVE_ANALYSIS_DIR="${_fx4}/docs/analysis" bash "${REPO_ROOT}/.claude/validation/evolve-staleness-check.sh" "${_fx4}" --tsv 2>&1)" || _t4rc=$?
+  if [ "${_t4rc}" -eq 0 ] && [ -z "${_t4}" ]; then
+    record_pass "evolve-staleness: (e1) artefato commitado no mesmo dia ANTES do relatorio NAO conta (base = commit, nao data)"
+  else record_fail "evolve-staleness: (e1) alarme falso do mesmo dia" "rc=${_t4rc}; saida=[${_t4}]"; fi
+  ( cd "${_fx4}" && printf '# depois\n' > .claude/commands/meta/depois.md && git add -A \
+    && GIT_AUTHOR_DATE=2026-01-01T12:00:00 GIT_COMMITTER_DATE=2026-01-01T12:00:00 \
+       git -c user.email=b@b -c user.name=b commit -q -m depois ) >/dev/null 2>&1
+  _t4rc=0
+  _t4="$(cd "${REPO_ROOT}" && EVOLVE_STALE_DAYS=99999 EVOLVE_DELTA_MIN=0 EVOLVE_ANALYSIS_DIR="${_fx4}/docs/analysis" bash "${REPO_ROOT}/.claude/validation/evolve-staleness-check.sh" "${_fx4}" --tsv 2>&1)" || _t4rc=$?
+  if [ "${_t4rc}" -eq 1 ] && grep -q '^SOFT	EVOLVE-DELTA	.*: 1 artefato(s)' <<< "${_t4}"; then
+    record_pass "evolve-staleness: (e2) artefato commitado DEPOIS do relatorio CONTA (exatamente 1)"
+  else record_fail "evolve-staleness: (e2) delta pos-relatorio" "rc=${_t4rc}; saida=[${_t4}]"; fi
+  rm -rf "${_fx4}"
 }
 
 run_cited_directive_selftests() {

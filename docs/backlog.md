@@ -666,6 +666,23 @@
 | 12.8 | `O_N1_NAO_E_PADRAO` | forge-comando-framework-2026-09 | OBJEÇÃO SOBREVIVENTE (a ser absorvida no desenho, não removida): N=1 — uma instância não é padrão. Uma forja derivada só |
 | 7.5 | `Q_DESTINO_DIFERENCIAL_OU_LACUNA` | forge-comando-framework-2026-09 | HERDADA de Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART (grafo agent-command-composition-2026-09), cujo VEREDITO foi selado em  |
 
+## triagem-evolve-kgssot-2026-10 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.8 | `Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL` | triagem-evolve-kgssot-2026-10 | MAQ-2 (confirmado, não curado): o veto do .env lê texto citado como shell em três pernas — parêntese entre aspas zera a past |
+| 3.2 | `C_DISTINCAO_TESTE_SEM_RAZAO` | triagem-evolve-kgssot-2026-10 | D2-0 (confirmado): test-engineer não declara a diferença frente a test-agent, test-planner e /test:*, e /validate:test-strategy: |
+| 3.2 | `C_FRESHNESS_SEM_WORKFLOW_SALVO` | triagem-evolve-kgssot-2026-10 | D6-2 (confirmado): /meta:context-freshness e /meta:kg-freshness mandam autorar o Workflow a cada execução, sem script salvo (o e |
+| 3.0 | `C_DISTINCAO_CREATORS_SO_NO_CORPO` | triagem-evolve-kgssot-2026-10 | D2-2 (confirmado): comando e agente criadores têm descrição quase igual e nenhum dos quatro declara a relação (o comando é a |
+| 3.0 | `C_GUARD_LINKS_TETO` | triagem-evolve-kgssot-2026-10 | teto do elo estrutural da seção 7: o filtro é por linha, não por argumento — mistura de código e mensagem e heredoc de mens |
+| 2.8 | `C_ENGINEER_SEM_RAZAO_FRENTE_AO_GITFLOW` | triagem-evolve-kgssot-2026-10 | D2-3 (parcialmente confirmado): /engineer:start e /engineer:pr não declaram por que coexistem com /git:flow; o hotfix cita. NUNCA |
+| 2.8 | `Q_MAQ1_NUNCA_SEM_O_N_DA_AMOSTRA` | triagem-evolve-kgssot-2026-10 | MAQ-1 (confirmado, não curado): a doutrina 'NUNCA casou' sai sem o N de sessões e sem rótulo de falta de objeto no papel |
+| 2.1 | `C_MAQ4_EXTRATOR_REGRA59_TETO` | triagem-evolve-kgssot-2026-10 | MAQ-4 (teto já declarado): o extrator da REGRA 59 ainda pode ler `bash …x.sh --flag` dentro de mensagem como invocação; sem d |
+| 1.8 | `C_KG_MD_ACIMA_DO_ALERTA` | triagem-evolve-kgssot-2026-10 | D1-1 (confirmado, oportunista): /meta:kg tem 519 linhas, acima do alerta de 500 e abaixo do teto |
+| 1.8 | `C_SKILLS_SEM_NAME` | triagem-evolve-kgssot-2026-10 | D8-0 (confirmado): 10 de 13 skills sem name: no frontmatter — o Claude Code usa o nome do diretório, então é forma, não defe |
+| 1.4 | `C_AGENTES_COM_MCP_DIRETO` | triagem-evolve-kgssot-2026-10 | D6-3 (confirmado, oportunista): dois agentes declaram ferramenta MCP direta; o do Jira é especialista (permitido pela doutrina),  |
+| 1.0 | `C_DISTINCOES_UNILATERAIS_D2_4_A_7` | triagem-evolve-kgssot-2026-10 | D2-4 a D2-7 (informado): declarações de distinção unilaterais ou ausentes em quatro clusters |
+
 ## evolve-round-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -707,23 +724,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | hub-operacoes-enterprise-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
-
-## triagem-evolve-kgssot-2026-10 — 12 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 10.2 | `Q_MAQ2_ENV_GUARD_LE_CITACAO_COMO_SHELL` | triagem-evolve-kgssot-2026-10 | MAQ-2 (confirmado, não curado): o veto do .env lê texto citado como shell em três pernas — parêntese entre aspas zera a past |
-| 3.2 | `C_DISTINCAO_TESTE_SEM_RAZAO` | triagem-evolve-kgssot-2026-10 | D2-0 (confirmado): test-engineer não declara a diferença frente a test-agent, test-planner e /test:*, e /validate:test-strategy: |
-| 3.2 | `C_FRESHNESS_SEM_WORKFLOW_SALVO` | triagem-evolve-kgssot-2026-10 | D6-2 (confirmado): /meta:context-freshness e /meta:kg-freshness mandam autorar o Workflow a cada execução, sem script salvo (o e |
-| 3.0 | `C_DISTINCAO_CREATORS_SO_NO_CORPO` | triagem-evolve-kgssot-2026-10 | D2-2 (confirmado): comando e agente criadores têm descrição quase igual e nenhum dos quatro declara a relação (o comando é a |
-| 3.0 | `C_GUARD_LINKS_TETO` | triagem-evolve-kgssot-2026-10 | teto do elo estrutural da seção 7: o filtro é por linha, não por argumento — mistura de código e mensagem e heredoc de mens |
-| 2.8 | `C_ENGINEER_SEM_RAZAO_FRENTE_AO_GITFLOW` | triagem-evolve-kgssot-2026-10 | D2-3 (parcialmente confirmado): /engineer:start e /engineer:pr não declaram por que coexistem com /git:flow; o hotfix cita. NUNCA |
-| 2.8 | `Q_MAQ1_NUNCA_SEM_O_N_DA_AMOSTRA` | triagem-evolve-kgssot-2026-10 | MAQ-1 (confirmado, não curado): a doutrina 'NUNCA casou' sai sem o N de sessões e sem rótulo de falta de objeto no papel |
-| 2.1 | `C_MAQ4_EXTRATOR_REGRA59_TETO` | triagem-evolve-kgssot-2026-10 | MAQ-4 (teto já declarado): o extrator da REGRA 59 ainda pode ler `bash …x.sh --flag` dentro de mensagem como invocação; sem d |
-| 1.8 | `C_KG_MD_ACIMA_DO_ALERTA` | triagem-evolve-kgssot-2026-10 | D1-1 (confirmado, oportunista): /meta:kg tem 519 linhas, acima do alerta de 500 e abaixo do teto |
-| 1.8 | `C_SKILLS_SEM_NAME` | triagem-evolve-kgssot-2026-10 | D8-0 (confirmado): 10 de 13 skills sem name: no frontmatter — o Claude Code usa o nome do diretório, então é forma, não defe |
-| 1.4 | `C_AGENTES_COM_MCP_DIRETO` | triagem-evolve-kgssot-2026-10 | D6-3 (confirmado, oportunista): dois agentes declaram ferramenta MCP direta; o do Jira é especialista (permitido pela doutrina),  |
-| 1.0 | `C_DISTINCOES_UNILATERAIS_D2_4_A_7` | triagem-evolve-kgssot-2026-10 | D2-4 a D2-7 (informado): declarações de distinção unilaterais ou ausentes em quatro clusters |
 
 ## conductor-2026-10 — 2 item(ns)
 
