@@ -183,6 +183,7 @@
 .claude/hooks/pretooluse-merge-gate.sh	E_VETOS_ABRIAM_SEM_PYTHON	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
+.claude/hooks/pretooluse-moat-gate.sh	E_CURA_MOAT_VETO_POR_ALVO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	E_MASTER_PASSAVA_RC0_REPRODUZIDO	docs/evolution/research/guard-protected-branch-2026-10/protected-branch-2026-10.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN	docs/evolution/research/hub-operacoes-enterprise-update-547-2026-10/hub-operacoes-enterprise-update-547-2026-10.kg.yaml

@@ -356,6 +356,42 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-12"
       locality: "pessoa"
 
+  - id: E_CURA_MOAT_VETO_POR_ALVO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-13"
+    verified_against: 'bancada moat_gate 109/109 com LC_ALL=C (54 casos, cada um com mutante executado por _prove_mutation, mais o modo estrito); reexecução do hook sobre os 35.092 comandos Bash únicos dos transcripts do core: 36 vetos (0,10%), 34 deploy/push de produção fora de wrapper e 2 falsos positivos; pré-filtro manda 9.628 (27%) ao tokenizador'
+    label: 'CURA (mecanismo): pretooluse-moat-gate.sh veta por ALVO o deploy fora de wrapper, o push que muda a produção de repo alheio e o agendamento por relógio; alvos em ops/moat-targets.tsv e no members.yaml, ambos core-only'
+    narrative: |-
+      Executa D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO (selada em 2026-10-12, «Forjar na próxima leva»). Gatilho
+      (a) observado no mesmo dia da forja: a sessão principal publicou o onion-kg-writer por um script de
+      scratchpad que reiniciava a unidade e trocava o código da worktree servida, sem backup nem aviso. O script
+      graduou para ops/update-kg-writer.sh (core-only), que é o wrapper que o veto aponta.
+
+      Forma: PreToolUse com exit 2, juiz em lib/moat-judge.py rodando DENTRO do tokenizador de
+      lib/invocation-lines.sh (o lib só o liga com ONION_MOAT_JUDGE; merge-gate e protect-main seguem
+      idênticos). Script fora do projeto ou não rastreado é LIDO e julgado; script versionado é fronteira.
+
+      Duas decisões tomadas por medição no corpus, e que divergem da redação da decisão: (1) commit, branch e
+      config LOCAIS num clone de adotante passam, porque o /meta:adopt --update os faz da sessão do core; (2) push
+      de branch de TÓPICO para repo alheio passa (vira PR lá), e só veta o push que muda o ramo de produção,
+      força, apaga ou espelha. Sem as duas, o veto barrava o fluxo normal da casa.
+
+      Fronteira declarada: gh em repo alheio, docker compose, ssh, outra linguagem além da forma do texto,
+      CronCreate/ScheduleWakeup, os 3 serviços que servem do checkout principal do core. No adotante o hook se
+      desarma (sem ops/moat-targets.tsv). Escape: o maestro fora da sessão; não há variável de bypass.
+      Latência medida sob carga 5 a 16: ~55 a 90 ms no caminho que o pré-filtro pula, ~170 a 470 ms no que vai
+      ao tokenizador.
+    trace: '.claude/hooks/pretooluse-moat-gate.sh'
+    provenance:
+      source: ".claude/hooks/pretooluse-moat-gate.sh"
+      locator: "bancada run_moat_gate_selftests em .claude/validation/lint-selftest.sh; reexecução do corpus de transcripts do core ⟨fora do repo⟩"
+      method: "medição: bancada com mutantes executados e reexecução do hook sobre o corpus de comandos reais, 2026-10-13"
+      locality: "repo"
+
   - id: Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO
     node_type: question
     plane: DEV
@@ -481,6 +517,12 @@ edges:
   - from: D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO
     to: E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA
     edge_type: DEPENDS_ON
+  - from: E_CURA_MOAT_VETO_POR_ALVO
+    to: D_MOAT_DEPLOY_E_RELOGIO_VIRAM_MECANISMO
+    edge_type: SUPPORTS
+  - from: E_CURA_MOAT_VETO_POR_ALVO
+    to: E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA
+    edge_type: SUPPORTS
   - from: Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO
     to: E_PRECOMMIT_CONDICIONAL_A_CONFIG_LOCAL
     edge_type: DEPENDS_ON

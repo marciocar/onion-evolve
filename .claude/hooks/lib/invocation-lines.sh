@@ -182,6 +182,7 @@ LAST_CFG = [{}]                  # config de `-c` do último git analisado (deci
 GH_SETDEFAULT = [False]          # `gh repo set-default` na string: o repositório do gh deixa de ser o do diretório
 DEFAULT_RE = re.compile(r"symbolic-ref|origin/HEAD|defaultBranchRef|default_branch|init\.defaultBranch")
 CWD = [None]                     # pilha do diretório julgado; None = a raiz do projeto
+MOAT = False                     # juiz do MOAT por alvo (moat-judge.py), ligado só pelo pretooluse-moat-gate.sh
 
 KEYWORDS = {"if", "then", "else", "elif", "fi", "do", "done", "while", "until", "!", "{", "}",
             "case", "esac", "coproc"}
@@ -1166,6 +1167,8 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
         # shell/source lendo código de `<(…)`: fecha SÓ se o texto de dentro tem a forma do que os vetos
         # guardam. A 1ª versão disparava com QUALQUER `$(…)` como argumento (`bash x.sh "$(y)"`) e
         # vetou 20 comandos honestos na reexecução do corpus completo.
+        if MOAT:
+            moat_unanalyzable(PSUBST_TEXTS + list(seg), "shell lendo substituição de processo")
         if any(relevant([t]) for t in PSUBST_TEXTS):
             OUT.append("__ONION_UNANALYZABLE__ merge=1 main=1 :: shell/source lendo substituição de processo: " + " ".join(seg))
         return
@@ -1190,6 +1193,8 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
     try:
         words = strip_prefix(words, env)
     except Unanalyzable:
+        if MOAT:
+            moat_unanalyzable(seg, "invólucro com opção só conhecida em runtime")
         if relevant_tokens(seg) or relevant([" ".join(seg)]):
             emit_unanalyzable(seg, CWD[-1])
         return
@@ -1210,6 +1215,8 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
             emit_unanalyzable(seg); return
     name = words[0]
     if DYNAMIC.search(name) or re.search(r"\{[^}]*(,|\.\.)[^}]*\}", name):
+        if MOAT:
+            moat_unanalyzable(seg, "nome de comando só conhecido em runtime")
         if name.endswith("/ops/pr-merge-verified.sh"):
             return                                      # o caminho verificado, chamado por $(…)/ops/…
         if relevant_loose(seg):
@@ -1219,6 +1226,8 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
         emit_unanalyzable(list(words) + list(seg), CWD[-1])   # IFS alterado: o word-splitting não se modela
         return
     base = os.path.basename(name)
+    if MOAT:
+        moat_command(words, raw_words, base, depth, env, piped, stdin_from)
     if base == "function" and len(words) >= 2:
         rest = [w for w in words[2:] if w not in ("{", "}")]
         if rest:
@@ -1362,6 +1371,12 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
         OUT.append(canonical_gh(words))
 
 
+if os.environ.get("ONION_MOAT_JUDGE"):
+    # o juiz do MOAT mora em arquivo próprio e roda NESTE namespace (usa o tokenizador inteiro); só o
+    # pretooluse-moat-gate.sh o liga — os vetos de merge/force-push seguem idênticos sem a variável
+    _mj = os.environ["ONION_MOAT_JUDGE"]
+    exec(compile(open(_mj, encoding="utf-8").read(), _mj, "exec"))
+    MOAT = True
 raw = os.fdopen(3).read()
 if raw.endswith("\n"):
     raw = raw[:-1]
@@ -1375,6 +1390,10 @@ except Exception as e:
              [l for l in OUT if l.startswith("__ONION_UNANALYZABLE__")]
     if relevant([raw]):
         emit_unanalyzable(raw)
+    if MOAT:
+        moat_unanalyzable(raw, "comando que o analisador não conseguiu ler")
+if MOAT:
+    OUT.append("__ONION_MOAT_OK__")                 # o hook só confia na análise que chegou ao fim
 print("\n".join(OUT))
 ONION_TOKENIZER_PY
 }
