@@ -2,7 +2,8 @@
 title: 'Resíduo — seletor por arquivo, arranque compartilhado e bloco da bancada no nível PR'
 date: 2026-10-13
 branch: perf/bench-selector-per-file
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 81997f4d196f8981d6a8222fc907f6915b61eb53fdb46a86b348178b5b3a76d4
+reviewed_code_sha256: 979645a6f4fb843540da45ee3568730647690efa104ef0c0ff2eb709b23390f3
 findings_total: 9
 findings_real: 8
 findings_fixed: 6
