@@ -2,7 +2,8 @@
 title: 'Resíduo — o alarme do main culpa só a primeira quebra: mesmas famílias só comentam, família nova nomeia suspeito'
 date: 2026-10-13
 branch: fix/main-bench-alarm-blames-first-break
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1c90340b6bb95c70c354c9eb5c85859838e09bb3dbca590c88c926df6031f1e0
+reviewed_code_sha256: fda7b51b1f084c0869db7f74c8eb3e4980e5eba6b46e14e2174aaae5cea94416
 findings_total: 9
 findings_real: 8
 findings_fixed: 5
