@@ -2,7 +2,8 @@
 title: 'Resíduo — o core ficou público e a árvore foi limpa: a lista de nomes privados saiu de dentro do repo'
 date: 2026-10-13
 branch: chore/public-core-tree-cleanup
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e6014e140783b89f769e7c573c3184345215ca045cab321b968af57bdd41dcdf
+reviewed_code_sha256: 4dbf10eac8ca7b6837aab896f01ee29f9d343638958b9caffae19d81316a032e
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >-
