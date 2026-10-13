@@ -286,9 +286,9 @@ members:
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — medido 2026-10-09: o origin do clone é o repo da granaai, na branch onion/develop
     local_path: "/home/marcio/brain-granaai"
-    onion_version: bd769f168411   # carimbado por ops/registry-pins.sh (remoto onion/develop conferido em 2026-10-13)
-                                  # update de 2026-10-13 pela sessão do adotante (branch chore/onion-update-bd769f168411),
-                                  # mergeado lá no PR #1571 (merge dd0ea769a na onion/develop); pin vivo no carimbo do remoto
+    onion_version: 10514066fb28   # carimbado por ops/registry-pins.sh (remoto onion/develop conferido em 2026-10-13)
+                                  # 2º update de 2026-10-13 pela sessão do adotante, mergeado lá no PR #1576 (merge e3dda5fbc
+                                  # na onion/develop); o anterior (bd769f168411) foi o PR #1571 (merge dd0ea769a)
     integration_branch: onion/develop   # medido: branch do clone e do carimbo vivo (o carimbo não declara o campo)
     adopted_at: 2026-10-01
     mode: brownfield            # repo que já existia (master), adotado como atualização
@@ -741,7 +741,7 @@ members:
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-curation (privado)
     local_path: /home/marcio/onion-curation
-    onion_version: 7818b8a25ae6
+    onion_version: 10514066fb28   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-13)
     adopted_at: 2026-10-06
     mode: greenfield
     personality_summary: "Nasceu do pedido do maestro por um estudo profundo que disseca plataformas, aplicativos, sites, perfis, ideias, repositórios, ferramentas, arquiteturas, tecnologias, métodos, funcionalidades, concorrentes, modelos e negócios como CURADORIA para o Onion Evolve. Aqui se disseca e se PROPÕE (absorver | costurar | parquear | rejeitar, com evidência); a palavra final é do core, com a lente de Aristóteles, e a proposta sobe pelo inbox."
