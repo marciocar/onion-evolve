@@ -8,7 +8,10 @@ meta:
                                # planos gratuitos de Mergify e Trunk e o estado do funador/claude-code-merge-queue.
                                # A metade doutrina (ímã, escritor único, catracas) é de 12m, mas o gatilho da Opção 3
                                # já disparou: a revisita real é o selo do maestro, não a data.
-  # ═══ TETO: 73 NÓS ═══
+  # ═══ TETO: 74 NÓS ═══
+  # (2026-10-13, +1: a EVIDÊNCIA do defeito do alarme do main e da cura, E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13
+  #  — o revert #1087 contra 825e93f6, que só herdou a quebra do ff5abe51 (#1085, #1086, conserto #1088).
+  #  Carimbo de execução, não pesquisa nova; o teto sobe DECLARADO em vez de colher um nó: 73 → 74.)
   # (2026-10-13, +3: o SELO do maestro D_MERGE_SEM_CI_APOS_REBASE_LIMPO ("A agora, B se precisar", criado pelo
   #  kg-decide-seal.sh --new), o nó OPEN do B (Q_MERGE_LOTE_COM_BISSECCAO, gated, com o gatilho medido nas
   #  issues do alarme) e a EVIDÊNCIA da execução do A (E_MERGE_SEM_CI_EXECUTADO_2026_10_13). Resposta e
@@ -1262,6 +1265,25 @@ nodes:
       locator: "run_merge_skip_ci_selftests, casos (a) (b) (c) (c2) (c3) (j) (d) (d2) (e) (f) (g) (h) (i) (l); run_merge_serial_selftests caso (wf); mutantes no resíduo docs/evolution/review/feat-merge-skip-ci-rerun-on-clean-rebase.md"
       method: "medição: bancada das quatro famílias 89/89 sob LC_ALL=C e 15 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso; leitura ao vivo do ruleset pela API, 2026-10-13"
       locality: "repo"
+  - id: E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-13"
+    verified_against: "gh pr view 1085/1087 e gh issue view 1086 (2026-10-13): os dois reverts com autor app/github-actions e head revert/ff5abe516d5e e revert/825e93f62bdb; a issue #1086 nomeia ff5abe51 no corpo e 825e93f6 no comentário. Cura: LC_ALL=C bash .claude/validation/lint-selftest.sh --families two_tier_bench → 22 passaram, 0 falharam; 18 mutantes por ops/mutate-and-restore.sh, 18 reprovaram o caso esperado"
+    source_tier: 10
+    source_kind: primary
+    label: "O alarme do main culpava TODO commit novo com o main vermelho: abriu o revert #1087 contra 825e93f6, que só herdou a quebra do ff5abe51 (#1085, #1086). Cura: só família NOVA gera suspeito e revert; o resto só comenta."
+    narrative: "INCIDENTE (2026-10-13): a bancada completa reprovou no push de ff5abe51 (merge do #1081); o alarme abriu a issue #1086 e o revert #1085, correto. O commit seguinte, 825e93f6 (só projeções regeneradas, do #1084), herdou o mesmo defeito, reprovou de novo e o alarme abriu um SEGUNDO revert, o #1087, contra um commit inocente. Causa real: docs/backlog.md fora de sincronia depois da combinação dos merges (REGRA 62 (Projeção GERADA em sincronia com a fonte (docs/backlog.md))); o conserto para a frente foi o #1088. Defeito de desenho: o alarme tratava cada vermelho como 1º vermelho. CURA (ops/testing/main-bench-alarm.sh): a assinatura da quebra é o conjunto de famílias com falha nos relatórios TSV das faixas (o job alarme-main baixa os artefatos selftest-evidence e passa --reports-dir e --expect-reports); a issue guarda a assinatura num marcador por post, e só vale marcador de post do Actions (author.login), porque o repo é público e qualquer conta comenta. Com a issue aberta, mesmas famílias ⇒ só comenta; família nova ⇒ suspeito novo e revert preparado; commit ancestral do culpado com as mesmas famílias ⇒ culpado mais velho (pushes concorrentes); issue ou assinatura ilegível ⇒ declara, sem revert. O verde fecha a issue e, depois, os PRs de revert superados (head revert/<12 hex>, autor app/github-actions e sha12 citado na issue). Issue fechada à mão com o main vermelho vale como referência; duas issues de 1º vermelho concorrentes se fundem na menor. Relação com Q_MERGE_LOTE_COM_BISSECCAO: a quebra veio de combinação de merges, mas NÃO conferi se o #1081 passou pelo caminho sem CI; o gatilho do B fica para quem recontar. Medido também: can_approve_pull_request_reviews agora é true (de manhã era false), e os PRs de revert abriram sozinhos."
+    trace: "ops/testing/main-bench-alarm.sh"
+    provenance:
+      source: "ops/testing/main-bench-alarm.sh + .github/workflows/onion-selftest.yml (job alarme-main) + família two_tier_bench de .claude/validation/lint-selftest.sh + gh pr view 1085 1087, gh issue view 1086"
+      locator: "run_two_tier_bench_selftests, casos (i) (i2) (j1) (j2) (j2b) (j2c) (j3) (j4) (j5) (j6) (j7) (i3) (i4); resíduo docs/evolution/review/fix-main-bench-alarm-blames-first-break.md"
+      method: "medição: bancada two_tier_bench 22/22 sob LC_ALL=C e 18 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso; leitura dos PRs e da issue pela API, 2026-10-13"
+      locality: "repo"
 edges:
   - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
     to: C_OPCAO_A_CURE_MAGNET_FILE
@@ -1556,4 +1578,13 @@ edges:
     edge_type: SUPPORTS
   - from: E_MERGE_SEM_CI_EXECUTADO_2026_10_13
     to: D_RULESET_BYPASS_SO_EM_PR
+    edge_type: TRACES_TO
+  - from: E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: CONSTRAINS
+  - from: E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13
+    to: E_PASSO_D_EXECUTADO_2026_10_13
+    edge_type: CONSTRAINS
+  - from: E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13
+    to: Q_MERGE_LOTE_COM_BISSECCAO
     edge_type: TRACES_TO

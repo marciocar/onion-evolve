@@ -264,14 +264,30 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.sha }}
+      # A ASSINATURA DA QUEBRA (2026-10-13): os relatórios das faixas dizem QUAIS famílias reprovaram.
+      # Com eles o alarme separa o commit que HERDOU o main vermelho (mesmas famílias: só comenta) do
+      # que trouxe quebra nova (família nova: suspeito + revert). Medido no dia: sem isso o alarme
+      # abriu o revert #1087 contra 825e93f6, que só herdou a quebra do ff5abe51. Download que falha
+      # não derruba o alarme: o script declara a assinatura ilegível e não abre revert às cegas.
+      - name: Relatórios das faixas (a assinatura da quebra)
+        if: needs.plano.result == 'success'
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: selftest-evidence-${{ github.run_id }}-faixa*
+          path: ${{ runner.temp }}/bench-evidence
       - name: Alarme e revert (nunca merge)
         env:
           GH_TOKEN: ${{ github.token }}
           PLANO: ${{ needs.plano.result }}
           FAIXAS: ${{ needs.selftest.result }}
+          FAIXAS_PLANO: ${{ needs.plano.outputs.faixas }}
+          EVID: ${{ runner.temp }}/bench-evidence
         run: |
           set -uo pipefail
           if [ "${PLANO}" = "success" ]; then r="${FAIXAS}"; else r="plano-${PLANO}"; fi
+          n="$(printf '%s' "${FAIXAS_PLANO:-[]}" | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))' 2>/dev/null || echo 0)"
           bash ops/testing/main-bench-alarm.sh --result "${r}" --sha "${GITHUB_SHA}" \
             --repo "${GITHUB_REPOSITORY}" \
+            --reports-dir "${EVID}" --expect-reports "${n}" \
             --run-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
