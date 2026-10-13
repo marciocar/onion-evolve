@@ -23,6 +23,12 @@ O driver opera num **degrau declarado**, nunca acima:
   - o **enabler** é o `ops/pr-merge-verified.sh` (core-only), o único caminho de merge; o hook `merge-gate` veta
     qualquer outro com exit 2;
   - o merge **em série** (o lote) é `bash ops/merge-serial.sh <PR>...` (core-only), na ordem dos argumentos: duas séries não mergeiam ao mesmo tempo (lock só no rebase+merge, CI esperado fora dele) — decisão em `docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml#C_OPCAO_C_MERGE_SERIAL_IN_OPS`;
+  - a **bancada roda em dois níveis, sem fila** (passo D, `…merge-process-onion-2026-10.kg.yaml#C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE`):
+    - **no PR**, só as famílias que o diff toca (`ops/testing/selftest-pr-selection.sh` (core-only), que usa a seleção do pre-commit pelo range `base...head`);
+    - cai na **completa**, com o porquê no log, quando o mapa não classifica um arquivo tocado, quando o diff toca a bancada ou a infra do CI (`lint-selftest.sh`, `.github/workflows/*`, `ops/testing/*` (core-only)), ou com a label `ci:full`;
+    - **no push ao main**, a completa. Se ela reprova, `ops/testing/main-bench-alarm.sh` (core-only) abre a issue de título fixo com o commit culpado e prepara `revert/<sha12>`, **sem mergear**. O merge do revert passa pelo caminho verificado;
+    - **janela declarada:** entre o merge e o merge do revert, o main pode estar quebrado (a completa leva da ordem de 25 min por faixa, mais o merge verificado). Com o alarme aberto, só se mergeia o conserto;
+    - os checks que o ruleset do main exige são os estáveis: `selftest-gate` e `lint-onion-artifacts`. O ruleset é aplicado por `ops/apply-ruleset-main.sh` (core-only) e **não prende o admin**, que tem bypass declarado: para o dono, quem prende continua sendo o hook exit 2 e o caminho verificado;
   - a **path-allowlist** é a parada dura "path vendorizado/outward-facing" (REGRA 36 e REGRA 30);
   - a **política mecânica** são as **paradas duras**, todas PARA:
     - decisão não tomada;

@@ -19,7 +19,7 @@
 # o bloco escalar do YAML na primeira tentativa, e (b) script em arquivo tem
 # bancada — YAML inline não tem.
 #
-# Uso  : bash ops/testing/selftest-shard-plan.sh [N=4]
+# Uso  : [ONION_SHARD_FAMILIES=a,b,c] bash ops/testing/selftest-shard-plan.sh [N=4]
 # Saída: uma linha JSON `[{"n":1,"familias":"a,b,c"}, …]` para `fromJson` da matriz.
 # Exit : 0 ok · 1 lista vazia (VAZIO NUNCA VIRA OK — matriz vazia = job verde que
 #        não exerceu nada, o fail-open mais caro num gate de gate) · 2 sem SUT.
@@ -38,6 +38,29 @@ mapfile -t FAMS < <(bash "${SUT}" --list)
 if [ "${#FAMS[@]}" -eq 0 ]; then
   echo "selftest-shard-plan: --list devolveu ZERO famílias. A matriz sairia vazia e o verde não significaria nada." >&2
   exit 1
+fi
+
+# SUBCONJUNTO (nível PR da bancada em dois níveis, passo D de D_MERGE_PROCESS_ONION_2026_10, 2026-10-13):
+# `ONION_SHARD_FAMILIES=a,b,c` reparte SÓ estas, na ordem do --list. Vazio ou `ALL` = todas (o push ao
+# main, o cron e o workflow_dispatch). Nome que o --list não conhece REPROVA (exit 2): uma seleção que
+# cita família inexistente é incoerente, e filtrá-la em silêncio faria a matriz exercer menos do que
+# o seletor prometeu.
+SUBSET="${ONION_SHARD_FAMILIES:-}"
+if [ -n "${SUBSET}" ] && [ "${SUBSET}" != "ALL" ]; then
+  _keep=()
+  for _f in ${SUBSET//,/ }; do
+    _hit=0
+    for _g in "${FAMS[@]}"; do [ "${_g}" = "${_f}" ] && { _hit=1; break; }; done
+    [ "${_hit}" = "1" ] || { echo "selftest-shard-plan: família '${_f}' do subconjunto não existe no --list." >&2; exit 2; }
+  done
+  for _g in "${FAMS[@]}"; do
+    case ",${SUBSET}," in *",${_g},"*) _keep+=("${_g}") ;; esac
+  done
+  FAMS=("${_keep[@]}")
+  if [ "${#FAMS[@]}" -eq 0 ]; then
+    echo "selftest-shard-plan: o subconjunto '${SUBSET}' não deixou família nenhuma." >&2
+    exit 1
+  fi
 fi
 
 # TEMPO MEDIDO (2026-10-07): com a tabela `familia<TAB>segundos` (medida no RUNNER pelo coletor

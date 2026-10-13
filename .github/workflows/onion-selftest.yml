@@ -17,20 +17,39 @@ name: Onion Guard Selftest
 # `schedule` noturno roda a bancada INTEIRA na main, independente de path. Logo a cobertura
 # deixa de depender de alguém ter tocado o arquivo certo — que era exatamente a aposta que
 # falhou nas três vezes.
+# (2026-10-13: o filtro de path SAIU — a seleção agora é por família, dentro do run, e o check
+#  obrigatório precisa existir em todo PR. O parágrafo fica como a história do porquê da rede.)
+
+# ── BANCADA EM DOIS NÍVEIS, SEM FILA (passo D de D_MERGE_PROCESS_ONION_2026_10, 2026-10-13) ──────────
+# O repo é de dono User: a fila nativa (merge_group) não existe aqui, então o padrão "fatia no PR,
+# completa na fila" não se transfere. O substituto selado pelo maestro:
+#   • PR (`pull_request`): SÓ as famílias que o diff do PR toca — a seleção do pre-commit pelo range
+#     `base...head` (ops/testing/selftest-pr-selection.sh). Arquivo que o mapa não sabe classificar,
+#     ou diff que toca a bancada/infra (lint-selftest.sh, .github/workflows/*, ops/testing/*), cai na
+#     COMPLETA com o porquê no log. A label `ci:full` força a completa.
+#   • push ao main: a bancada COMPLETA. Reprovou ⇒ alarme (issue de título fixo, commit culpado
+#     nomeado) e branch `revert/<sha12>` com PR de revert, SEM merge automático (o merge do revert é
+#     pelo caminho verificado, ops/pr-merge-verified.sh).
+#   • JANELA DECLARADA: entre o merge de um PR e o merge do revert, o main PODE estar quebrado (a
+#     completa leva da ordem de 25 min por faixa, mais o tempo humano do merge verificado). É o preço
+#     aceito de o PR não pagar a bancada inteira a cada auto-rebase.
+#   • O check que o ruleset exige é `selftest-gate` (nome fixo, job agregado abaixo) — os nomes das
+#     faixas da matriz mudam com o plano e não servem de check obrigatório.
+#
+# ⚠️ POR QUE O `paths:` DO PR SAIU: com required status check, um PR que não dispara este workflow
+# nunca produz o `selftest-gate`, e o ruleset o deixaria pendurado para sempre. O PR que não toca
+# maquinaria agora roda só o núcleo da seleção (1 família, segundos) em vez de rodar nada.
 
 on:
   pull_request:
-    paths:
-      # a maquinaria que a bancada exercita
-      - '.claude/validation/**'
-      - '.claude/hooks/**'
-      - '.claude/utils/**'
-      - 'ops/**'
-      # os próprios workflows: PR que mexe no CI dispara o CI (a 4ª ocorrência da classe)
-      - '.github/workflows/**'
+    # labeled/unlabeled: pôr ou tirar a `ci:full` tem de refazer a decisão do nível
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  push:
+    branches: [main]
   schedule:
-    # 04:17 UTC — a rede debaixo do filtro. Roda a bancada inteira na main todo dia, então
-    # nenhum path fica descoberto por não estar na lista acima.
+    # 04:17 UTC — a rede debaixo do filtro. Roda a bancada inteira na main todo dia, independente
+    # de qualquer seleção. Com a completa no push ao main ela é redundante NO DIA EM QUE HÁ MERGE, e
+    # fica: no dia sem merge é ela que pega a quebra que vem de fora (runner, dependência, data).
     - cron: '17 4 * * *'
   workflow_dispatch: {}
 
@@ -48,8 +67,13 @@ concurrency:
   # isso com todas as letras — três pontos cegos nasceram de filtro SEM rede embaixo). Com
   # grupo compartilhado, um push na main cancelaria a rede — eu teria cortado justamente a
   # cobertura que torna o corte seguro, que é o modo de falha mais idiota possível.
-  group: ${{ github.workflow }}-${{ github.event_name == 'schedule' && 'nightly' || (github.event.pull_request.number || github.ref) }}
-  cancel-in-progress: true
+  # ⚠️ E O PUSH AO MAIN TEM GRUPO POR SHA, SEM CANCELAMENTO (passo D, 2026-10-13): é a bancada
+  # COMPLETA do nível main. Com o grupo `refs/heads/main` e cancel-in-progress, o merge seguinte
+  # cancelaria a bancada do anterior — e o commit que quebrou o main nunca seria alarmado. E grupo
+  # compartilhado sem cancelamento também não serve: o GitHub guarda UM pendente por grupo e descarta
+  # o mais velho. Por sha, cada merge tem a sua completa.
+  group: ${{ github.workflow }}-${{ github.event_name == 'schedule' && 'nightly' || (github.event_name == 'push' && format('push-{0}', github.sha) || (github.event.pull_request.number || github.ref)) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -68,12 +92,36 @@ jobs:
     timeout-minutes: 5
     outputs:
       faixas: ${{ steps.p.outputs.faixas }}
+      nivel: ${{ steps.n.outputs.nivel }}
     steps:
       - uses: actions/checkout@v5
         with:
+          # o diff base...head do PR precisa da história dos dois lados
+          fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      # NÍVEL (passo D): no PR, a seleção pelo diff; fora do PR, sempre a completa. Labels e shas
+      # entram por env, nunca interpolados no script (nome de label é texto de quem abriu o PR).
+      - id: n
+        name: Decidir o nível da bancada (PR = famílias tocadas · main/cron = completa)
+        env:
+          EVENTO: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+        run: |
+          set -euo pipefail
+          if [ "${EVENTO}" = "pull_request" ]; then
+            bash ops/testing/selftest-pr-selection.sh --range "${BASE_SHA}...${HEAD_SHA}" --labels "${LABELS}" > nivel.out
+          else
+            printf 'nivel=completo\nfamilias=ALL\nmotivo=evento %s roda a bancada completa\n' "${EVENTO}" > nivel.out
+          fi
+          cat nivel.out
+          grep -E '^(nivel|familias|motivo)=' nivel.out >> "${GITHUB_OUTPUT}"
+          { echo "### Nível da bancada"; echo; sed 's/^/- /' nivel.out; } >> "${GITHUB_STEP_SUMMARY}"
       - id: p
-        name: Distribuir as familias em faixas (round-robin)
+        name: Distribuir as familias em faixas (por tempo medido)
+        env:
+          ONION_SHARD_FAMILIES: ${{ steps.n.outputs.familias }}
         run: |
           set -euo pipefail
           plano="$(bash ops/testing/selftest-shard-plan.sh 4)"
@@ -171,3 +219,59 @@ jobs:
             selftest-report.tsv
           if-no-files-found: warn
           retention-days: 30
+
+  # ── CHECK ESTÁVEL (passo D, 2026-10-13): é ESTE nome que o ruleset do main exige ─────────────────
+  # As faixas da matriz se chamam `selftest (N, <famílias>…)` — o nome muda com o plano, e no PR a
+  # matriz tem de 1 a 4 faixas conforme a seleção. Check obrigatório com nome móvel ou nunca casa ou
+  # casa com a faixa errada. `selftest-gate` roda SEMPRE (`if: always()`) e reprova se o plano ou
+  # QUALQUER faixa não terminou em `success` — falha, cancelamento, timeout ou matriz que não nasceu.
+  # Faixa que o nível PR legitimamente não criou não é faixa pulada: ela não existe na matriz, e o
+  # resultado agregado da matriz é `success` quando todas as que existem passaram.
+  selftest-gate:
+    name: selftest-gate
+    needs: [plano, selftest]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Agregar o veredito das faixas
+        env:
+          PLANO: ${{ needs.plano.result }}
+          FAIXAS: ${{ needs.selftest.result }}
+          NIVEL: ${{ needs.plano.outputs.nivel }}
+        run: |
+          echo "plano=${PLANO} · faixas=${FAIXAS} · nível=${NIVEL:-?}"
+          if [ "${PLANO}" != "success" ]; then echo "::error::o plano das faixas não terminou em success (${PLANO}) — a bancada não rodou"; exit 1; fi
+          if [ "${FAIXAS}" != "success" ]; then echo "::error::faixa(s) da bancada em '${FAIXAS}' — reprovado"; exit 1; fi
+          echo "OK — todas as faixas do nível ${NIVEL} passaram"
+
+  # ── ALARME DO MAIN (passo D): só no push ao main, e só quando a completa não passou ──────────────
+  # Abre/atualiza a issue de título fixo, prepara `revert/<sha12>` e tenta o PR de revert, SEM
+  # MERGEAR. Quando o main volta a passar, fecha a issue. Lógica em script versionado com bancada
+  # (ops/testing/main-bench-alarm.sh), não inline: YAML inline não tem teste.
+  alarme-main:
+    needs: [plano, selftest, selftest-gate]
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write        # empurrar a branch revert/<sha12>
+      issues: write          # a issue de alarme
+      pull-requests: write   # o PR de revert (ver o limite medido no cabeçalho do script)
+      actions: write         # workflow_dispatch do CI na branch do revert
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+      - name: Alarme e revert (nunca merge)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PLANO: ${{ needs.plano.result }}
+          FAIXAS: ${{ needs.selftest.result }}
+        run: |
+          set -uo pipefail
+          if [ "${PLANO}" = "success" ]; then r="${FAIXAS}"; else r="plano-${PLANO}"; fi
+          bash ops/testing/main-bench-alarm.sh --result "${r}" --sha "${GITHUB_SHA}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --run-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"

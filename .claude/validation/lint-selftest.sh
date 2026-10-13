@@ -147,7 +147,8 @@ STRICT="${ONION_SELFTEST_STRICT:-0}"
 # A bancada era O(famílias × lint), single-thread, ~14 min no CI e >25 min na VPS sob carga, e o
 # pre-commit a disparava INTEIRA por qualquer arquivo em .claude/validation/. Três faixas:
 #   pre-commit : famílias AFETADAS pelos arquivos staged (mapa + failsafe), em paralelo
-#   PR/CI      : tudo, em paralelo, STRICT
+#   PR/CI      : desde 2026-10-13 (passo D), só as famílias do diff do PR (--affected-range, ops/testing/
+#                selftest-pr-selection.sh); a COMPLETA, em paralelo e STRICT, roda no push ao main
 #   cron diário: tudo (a rede debaixo do filtro de paths do CI)
 # Invariantes:
 #   • Sem argumento = comportamento antigo (serial, tudo). Adotante sem nproc/python3 → serial/tudo.
@@ -164,6 +165,9 @@ STRICT="${ONION_SELFTEST_STRICT:-0}"
 #   --families a,b,c           roda só estas famílias
 #   --affected <paths…>        seleciona famílias pelos arquivos dados (failsafe acima)
 #   --affected-staged          idem, com `git diff --cached --name-only`
+#   --affected-range <A...B>   idem, com o diff de um RANGE (o nível PR do CI, passo D de
+#                              D_MERGE_PROCESS_ONION_2026_10); a própria bancada no range ⇒ tudo;
+#                              range ilegível ⇒ tudo (recusa no incerto)
 #   --jobs N|auto              N workers (auto = nproc); 1 = serial (default)
 #   --timing                   imprime ⏱ por família (para calibrar a partição)
 #   --dry-run                  imprime a seleção (faixa) e sai sem rodar nada
@@ -182,6 +186,7 @@ SELFTEST_EXPECTED_EXIT=0   # 1 = o script chegou a uma saida PROJETADA (ajuda, l
 SELFTEST_LIST=0; SELFTEST_MAP=0; SELFTEST_TIMING="${ONION_SELFTEST_TIMING:-0}"
 SELFTEST_JOBS="${ONION_SELFTEST_JOBS:-1}"; SELFTEST_FAMILIES="${ONION_SELFTEST_FAMILIES:-}"
 SELFTEST_CHILD="${ONION_SELFTEST_CHILD:-0}"; SELFTEST_AFFECTED=(); SELFTEST_AFFECTED_STAGED=0; SELFTEST_DRY=0
+SELFTEST_AFFECTED_RANGE=""; SELFTEST_RANGE_FAILSAFE=""
 SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHARD:-}"
 # FAIXA DA MATRIZ para a família `fixtures` (2026-10-05): ela é ~1600 s de CPU no runner de 2 núcleos e,
 # presa numa faixa só, estourou o teto de 25 min três vezes no PR #927. i/n = esta faixa roda as linhas
@@ -209,6 +214,8 @@ while [ $# -gt 0 ]; do
     --families) shift; SELFTEST_FAMILIES="${1:-}" ;;
     --families=*) SELFTEST_FAMILIES="${1#--families=}" ;;
     --affected-staged) SELFTEST_AFFECTED_STAGED=1 ;;
+    --affected-range) shift; SELFTEST_AFFECTED_RANGE="${1:-}"; case "${SELFTEST_AFFECTED_RANGE}" in -*) SELFTEST_AFFECTED_RANGE="" ;; esac; [ -n "${SELFTEST_AFFECTED_RANGE}" ] || { SELFTEST_EXPECTED_EXIT=1; echo "lint-selftest: --affected-range exige <A...B>" >&2; exit 2; } ;;
+    --affected-range=*) SELFTEST_AFFECTED_RANGE="${1#--affected-range=}" ;;
     --affected) shift; while [ $# -gt 0 ]; do case "$1" in --*) break ;; esac; SELFTEST_AFFECTED+=("$1"); shift; done; continue ;;
     -h|--help) SELFTEST_EXPECTED_EXIT=1; sed -n '/^# Uso:/,/^SELFTEST_LIST=/p' "${BASH_SOURCE[0]}" | grep -v '^SELFTEST_LIST='; exit 0 ;;
     *) SELFTEST_EXPECTED_EXIT=1; echo "lint-selftest: argumento desconhecido '$1' (veja --help)" >&2; exit 2 ;;
@@ -792,8 +799,31 @@ if [ "${SELFTEST_AFFECTED_STAGED}" = "1" ]; then
   done < <(git -C "${REPO_ROOT}" -c core.quotepath=off diff --cached --name-status -M --diff-filter=ACMRD 2>/dev/null)
   SELFTEST_AFFECTED_STAGED=2   # marcador: seleção pedida, mesmo que nada esteja staged
 fi
-if { [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ] || [ "${SELFTEST_AFFECTED_STAGED}" = "2" ]; } && [ -z "${SELFTEST_FAMILIES}" ] && [ "${SELFTEST_CHILD}" = "0" ]; then
-  if [ "${#SELFTEST_AFFECTED[@]}" -eq 0 ]; then
+# NÍVEL PR (passo D de D_MERGE_PROCESS_ONION_2026_10, 2026-10-13): a MESMA seleção do pre-commit, lida do
+# diff de um range (`base...head` do PR) em vez do índice. Duas recusas no incerto que o pre-commit não
+# precisa: (1) range que o git não lê ⇒ tudo, nunca "nada mudou"; (2) a própria bancada no range ⇒ tudo —
+# no PR não há índice para a regra do BLOCO ler, e um bloco lido da árvore errada é seleção inventada.
+if [ -n "${SELFTEST_AFFECTED_RANGE}" ]; then
+  _rng_out=""
+  if ! _rng_out="$(git -C "${REPO_ROOT}" -c core.quotepath=off diff --name-status -M --diff-filter=ACMRDT "${SELFTEST_AFFECTED_RANGE}" -- 2>&1)"; then
+    SELFTEST_RANGE_FAILSAFE="o diff do range '${SELFTEST_AFFECTED_RANGE}' não pôde ser lido ($(printf '%s' "${_rng_out}" | head -c 120 | tr '\n' ' '))"
+  else
+    while IFS=$'\t' read -r _st _p1 _p2; do
+      [ -n "${_p1:-}" ] && SELFTEST_AFFECTED+=("${_p1}")
+      [ -n "${_p2:-}" ] && SELFTEST_AFFECTED+=("${_p2}")
+      case "${_p1:-}|${_p2:-}" in
+        .claude/validation/lint-selftest.sh\|*|*\|.claude/validation/lint-selftest.sh)
+          SELFTEST_RANGE_FAILSAFE="a própria bancada (.claude/validation/lint-selftest.sh) mudou no range" ;;
+      esac
+    done <<< "${_rng_out}"
+    [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ] || [ -n "${SELFTEST_RANGE_FAILSAFE}" ] \
+      || SELFTEST_RANGE_FAILSAFE="o range '${SELFTEST_AFFECTED_RANGE}' não tem arquivo mudado (nada a mapear)"
+  fi
+fi
+if { [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ] || [ "${SELFTEST_AFFECTED_STAGED}" = "2" ] || [ -n "${SELFTEST_AFFECTED_RANGE}" ]; } && [ -z "${SELFTEST_FAMILIES}" ] && [ "${SELFTEST_CHILD}" = "0" ]; then
+  if [ -n "${SELFTEST_RANGE_FAILSAFE}" ]; then
+    _sel="ALL"; echo "  failsafe: ${SELFTEST_RANGE_FAILSAFE} → tudo" >&2
+  elif [ "${#SELFTEST_AFFECTED[@]}" -eq 0 ]; then
     _sel="ALL"; echo "  failsafe: nada staged para mapear → tudo" >&2
   else
     _sel="$(_selftest_affected_families "${SELFTEST_AFFECTED[@]}")"
@@ -810,7 +840,7 @@ if [ "${SELFTEST_DRY}" = "1" ]; then
   echo "dry-run: famílias=${SELFTEST_FAMILIES:-<todas>} jobs=${SELFTEST_JOBS}"
   # Linha de MÁQUINA para o gatilho do pre-commit: quantas famílias a seleção pegou ALÉM do núcleo
   # (ALL = failsafe). Só o núcleo (=0) não justifica rodar a bancada num commit — o mesmo de antes.
-  if [ "${SELFTEST_AFFECTED_STAGED}" = "2" ] || [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ]; then
+  if [ "${SELFTEST_AFFECTED_STAGED}" = "2" ] || [ "${#SELFTEST_AFFECTED[@]}" -gt 0 ] || [ -n "${SELFTEST_AFFECTED_RANGE}" ]; then
     if [ -z "${SELFTEST_FAMILIES}" ]; then echo "#ONION_SELFTEST_SELECTION covered=ALL"
     else
       _core=",$(_selftest_family_map 2>/dev/null | awk -F'\t' '$2=="*"{print $1}' | sort -u | paste -sd, -),"
@@ -29916,6 +29946,216 @@ print("OK %d" % ok if ok and not bad else "FALHA ok=%d ruins=%d" % (ok, bad))
   rm -rf "$e"
 }
 _family run_shard_plan_selftests
+
+# ── two_tier_bench — a bancada em DOIS NÍVEIS, sem fila (passo D de D_MERGE_PROCESS_ONION_2026_10) ──
+# POR QUE EXISTE (2026-10-13): o PR passou a rodar só as famílias que o diff toca, e a completa foi para
+# o push ao main, com alarme e PR de revert. Isso move a garantia de lugar — e cada peça que a move é
+# um ponto onde a bancada pode deixar de exercer algo e sair VERDE: o seletor do nível PR
+# (ops/testing/selftest-pr-selection.sh + `lint-selftest.sh --affected-range`), o subconjunto do plano
+# de faixas, o check agregado `selftest-gate` que o ruleset exige e o alarme do main
+# (ops/testing/main-bench-alarm.sh). Os casos exercitam o SELETOR pelo RANGE, como o runner o invoca:
+# os commits são sintéticos, escritos só no armazém de objetos (índice temporário + commit-tree, sem
+# ref, sem tocar a árvore viva). MUTANTES provados em 2026-10-13 por ops/mutate-and-restore.sh (lista
+# no resíduo docs/evolution/review/feat-merge-process-step-d-two-tier-bench.md).
+run_two_tier_bench_selftests() {
+  local sel="${REPO_ROOT}/ops/testing/selftest-pr-selection.sh"
+  local plan="${REPO_ROOT}/ops/testing/selftest-shard-plan.sh"
+  local alarm="${REPO_ROOT}/ops/testing/main-bench-alarm.sh"
+  local wfs="${REPO_ROOT}/.github/workflows/onion-selftest.yml" wfv="${REPO_ROOT}/.github/workflows/onion-validate.yml"
+  local rs="${REPO_ROOT}/ops/github-ruleset-main.json"
+  if [ ! -f "${sel}" ] || [ ! -f "${alarm}" ]; then record_skip "two-tier-bench: SUT ausente (ops/testing/selftest-pr-selection.sh ou main-bench-alarm.sh)"; return; fi
+  if ! git -C "${REPO_ROOT}" rev-parse -q --verify HEAD >/dev/null 2>&1; then record_skip "two-tier-bench: sem HEAD para montar o range"; return; fi
+  # commit sintético filho de HEAD que muda os caminhos dados — só objetos, nenhuma ref, nenhum arquivo
+  _ttb_commit() {
+    local idx p blob tree
+    idx="$(mktemp)"; rm -f "${idx}"
+    GIT_INDEX_FILE="${idx}" git -C "${REPO_ROOT}" read-tree HEAD || { rm -f "${idx}"; return 1; }
+    for p in "$@"; do
+      blob="$(printf 'two-tier-bench %s %s\n' "${p}" "$$" | git -C "${REPO_ROOT}" hash-object -w --stdin)" || { rm -f "${idx}"; return 1; }
+      GIT_INDEX_FILE="${idx}" git -C "${REPO_ROOT}" update-index --add --cacheinfo "100644,${blob},${p}" || { rm -f "${idx}"; return 1; }
+    done
+    tree="$(GIT_INDEX_FILE="${idx}" git -C "${REPO_ROOT}" write-tree)"; rm -f "${idx}"
+    git -C "${REPO_ROOT}" -c user.email=t@t -c user.name=t commit-tree "${tree}" -p HEAD -m two-tier-bench
+  }
+  _ttb_sel() { bash "${sel}" "$@" 2>/dev/null || true; }
+  local c out
+
+  # (a) ARQUIVO MAPEADO ⇒ só as famílias dele. ops/merge-serial.sh é citado pela merge_serial: o nível
+  #     é seletivo, a merge_serial está na lista e a lista é MENOR que o --list (não comprou tudo).
+  local total; total="$(bash "${REPO_ROOT}/.claude/validation/lint-selftest.sh" --list 2>/dev/null | grep -c . || true)"
+  if c="$(_ttb_commit ops/merge-serial.sh)"; then
+    out="$(_ttb_sel --range "HEAD...${c}")"
+    local _fa _na; _fa="$(sed -n 's/^familias=//p' <<< "${out}")"; _na="$(tr ',' '\n' <<< "${_fa}" | grep -c . || true)"
+    if grep -qx 'nivel=seletivo' <<< "${out}" && grep -q ',merge_serial,' <<< ",${_fa}," && [ "${_na}" -lt "${total:-0}" ]; then
+      record_pass "two-tier-bench: (a) arquivo mapeado (ops/merge-serial.sh) ⇒ nível seletivo com merge_serial (${_na} de ${total} famílias)"
+    else record_fail "two-tier-bench: (a) mapeado" "$(_emit "${out}" | head -c 240)"; fi
+  else record_fail "two-tier-bench: (a) mapeado" "não consegui montar o commit sintético"; fi
+  # (a2) arquivo FORA do domínio da bancada (docs/README.md) ⇒ seletivo, só o núcleo
+  if c="$(_ttb_commit docs/README.md)"; then
+    out="$(_ttb_sel --range "HEAD...${c}")"
+    if grep -qx 'nivel=seletivo' <<< "${out}" && grep -qx 'familias=gitattributes_eol' <<< "${out}"; then
+      record_pass "two-tier-bench: (a2) docs/README.md ⇒ seletivo, só o núcleo (o PR de doc não paga a bancada)"
+    else record_fail "two-tier-bench: (a2) núcleo" "$(_emit "${out}" | head -c 240)"; fi
+  else record_fail "two-tier-bench: (a2) núcleo" "não consegui montar o commit sintético"; fi
+
+  # (b) ARQUIVO QUE O MAPA NÃO SABE CLASSIFICAR ⇒ completa, com o porquê
+  if c="$(_ttb_commit ops/zz-two-tier-bench-nao-mapeado.sh)"; then
+    out="$(_ttb_sel --range "HEAD...${c}")"
+    if grep -qx 'nivel=completo' <<< "${out}" && grep -qx 'familias=ALL' <<< "${out}" && grep -q '^motivo=failsafe do mapa: .*não é citado' <<< "${out}"; then
+      record_pass "two-tier-bench: (b) arquivo não mapeado no domínio ⇒ completa, motivo do failsafe declarado"
+    else record_fail "two-tier-bench: (b) não mapeado" "$(_emit "${out}" | head -c 240)"; fi
+  else record_fail "two-tier-bench: (b) não mapeado" "não consegui montar o commit sintético"; fi
+
+  # (c) O DIFF TOCA A BANCADA OU A INFRA DO CI ⇒ completa — três portas, cada uma com o caminho no motivo
+  local _p _bad_c=""
+  for _p in .claude/validation/lint-selftest.sh .github/workflows/onion-selftest.yml ops/testing/selftest-shard-plan.sh; do
+    if c="$(_ttb_commit "${_p}")"; then
+      out="$(_ttb_sel --range "HEAD...${c}")"
+      grep -qx 'nivel=completo' <<< "${out}" && grep -qF "motivo=${_p} é a bancada ou a infra do CI" <<< "${out}" || _bad_c="${_bad_c} ${_p}"
+    else _bad_c="${_bad_c} ${_p}(commit)"; fi
+  done
+  if [ -z "${_bad_c}" ]; then record_pass "two-tier-bench: (c) diff na bancada/infra (lint-selftest.sh, workflow, ops/testing) ⇒ completa"
+  else record_fail "two-tier-bench: (c) infra sem completa" "${_bad_c}"; fi
+
+  # (d) LABEL ci:full ⇒ completa, mesmo num diff que só pediria o núcleo; nome PARECIDO não conta
+  if c="$(_ttb_commit docs/README.md)"; then
+    out="$(_ttb_sel --range "HEAD...${c}" --labels "docs,ci:full")"
+    local out2; out2="$(_ttb_sel --range "HEAD...${c}" --labels "ci:fullish,ci")"
+    if grep -qx 'nivel=completo' <<< "${out}" && grep -qx 'motivo=label ci:full no PR' <<< "${out}" && grep -qx 'nivel=seletivo' <<< "${out2}"; then
+      record_pass "two-tier-bench: (d) label ci:full ⇒ completa; 'ci:fullish' não é a label"
+    else record_fail "two-tier-bench: (d) label" "com=$(_emit "${out}" | head -c 120) · parecida=$(_emit "${out2}" | head -c 120)"; fi
+  else record_fail "two-tier-bench: (d) label" "não consegui montar o commit sintético"; fi
+
+  # (e) RANGE ILEGÍVEL ⇒ completa (recusa no incerto, nunca "nada mudou"); range vazio ⇒ uso inválido
+  out="$(_ttb_sel --range "nao-existe-two-tier...HEAD")"
+  local _rce=0; bash "${sel}" --range "" >/dev/null 2>&1 || _rce=$?
+  if grep -qx 'nivel=completo' <<< "${out}" && grep -q '^motivo=o diff do range' <<< "${out}" && [ "${_rce}" -eq 2 ]; then
+    record_pass "two-tier-bench: (e) range ilegível ⇒ completa; range vazio ⇒ exit 2"
+  else record_fail "two-tier-bench: (e) range" "$(_emit "${out}" | head -c 200) · rc_vazio=${_rce}"; fi
+
+  # (f) A PRÓPRIA BANCADA, pelo --affected-range da lint-selftest.sh (sem a política do script): tudo
+  if c="$(_ttb_commit .claude/validation/lint-selftest.sh)"; then
+    out="$(bash "${REPO_ROOT}/.claude/validation/lint-selftest.sh" --dry-run --affected-range "HEAD...${c}" 2>&1 || true)"
+    if grep -q '^dry-run: famílias=<todas>' <<< "${out}" && grep -q 'failsafe: a própria bancada' <<< "${out}"; then
+      record_pass "two-tier-bench: (f) --affected-range com a bancada no range ⇒ todas, com o motivo"
+    else record_fail "two-tier-bench: (f) range com a bancada" "$(grep -E '^(dry-run|  failsafe)' <<< "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  else record_fail "two-tier-bench: (f) range com a bancada" "não consegui montar o commit sintético"; fi
+
+  # (g) O PLANO RESPEITA O SUBCONJUNTO: cobre EXATAMENTE as famílias pedidas; nome inexistente reprova
+  local _pg _rg=0
+  _pg="$(ONION_SHARD_FAMILIES=merge_serial,gitattributes_eol bash "${plan}" 4 2>/dev/null | python3 -c '
+import json, sys
+sh = json.load(sys.stdin)
+got = sorted({f for s in sh for f in s["familias"].split(",")})
+print("OK" if got == ["gitattributes_eol", "merge_serial"] else "DIVERGE %s" % got)
+' 2>&1)"
+  ONION_SHARD_FAMILIES=zz_nao_existe bash "${plan}" 4 >/dev/null 2>&1 || _rg=$?
+  if [ "${_pg}" = "OK" ] && [ "${_rg}" -eq 2 ]; then
+    record_pass "two-tier-bench: (g) o plano reparte SÓ o subconjunto do nível PR; família inexistente ⇒ exit 2"
+  else record_fail "two-tier-bench: (g) subconjunto" "plano=${_pg} · rc_inexistente=${_rg}"; fi
+
+  # (h) A ESTRUTURA DO CI QUE SUSTENTA OS DOIS NÍVEIS — lida como YAML, como o GitHub a lê
+  local _vh
+  _vh="$(WFS="${wfs}" WFV="${wfv}" RS="${rs}" ALARM="${alarm}" python3 -I -c '
+import json, os, yaml
+err = []
+def load(p):
+    d = yaml.safe_load(open(p, encoding="utf-8"))
+    return d, (d.get("on") or d.get(True) or {})
+s, son = load(os.environ["WFS"]); v, von = load(os.environ["WFV"])
+for nome, on in (("onion-selftest", son), ("onion-validate", von)):
+    pr = on.get("pull_request") if isinstance(on, dict) else None
+    if "pull_request" not in on: err.append(nome + ": sem pull_request")
+    elif isinstance(pr, dict) and ("paths" in pr or "paths-ignore" in pr): err.append(nome + ": pull_request com filtro de path (o check obrigatorio nao nasceria)")
+if (son.get("push") or {}).get("branches") != ["main"]: err.append("onion-selftest: push ao main ausente")
+if "labeled" not in ((son.get("pull_request") or {}).get("types") or []): err.append("onion-selftest: pull_request sem labeled (ci:full nao refaz o nivel)")
+cc = str((s.get("concurrency") or {}).get("cancel-in-progress"))
+if "pull_request" not in cc: err.append("onion-selftest: cancel-in-progress nao restrito ao PR (%s) — o merge seguinte cancelaria a completa do main" % cc)
+jobs = s.get("jobs", {})
+g = jobs.get("selftest-gate") or {}
+if g.get("name") != "selftest-gate": err.append("selftest-gate: nome do check nao e fixo")
+if "always()" not in str(g.get("if", "")): err.append("selftest-gate: sem if: always() (faixa falha = gate pulado = verde)")
+if not {"plano", "selftest"} <= set(g.get("needs") or []): err.append("selftest-gate: nao depende de plano e selftest")
+gtxt = json.dumps(g)
+if "needs.plano.result" not in gtxt or "needs.selftest.result" not in gtxt: err.append("selftest-gate: nao le o resultado de plano e faixas")
+if "strategy" in g: err.append("selftest-gate: e matriz (nome movel)")
+a = jobs.get("alarme-main") or {}
+if "github.event_name == '"'"'push'"'"'" not in str(a.get("if", "")) or "always()" not in str(a.get("if", "")): err.append("alarme-main: nao roda sempre no push")
+if "main-bench-alarm.sh" not in json.dumps(a): err.append("alarme-main: nao chama o script do alarme")
+for p in (os.environ["WFS"], os.environ["ALARM"]):
+    if "gh pr merge" in open(p, encoding="utf-8").read(): err.append("merge automatico em %s" % os.path.basename(p))
+names = set()
+for d in (s, v):
+    for jid, j in d.get("jobs", {}).items():
+        if "strategy" not in j: names.add(j.get("name", jid))
+r = json.load(open(os.environ["RS"], encoding="utf-8"))
+rules = {x["type"]: x for x in r["rules"]}
+ctx = [c["context"] for c in rules["required_status_checks"]["parameters"]["required_status_checks"]]
+for c in ctx:
+    if c not in names: err.append("ruleset exige %r, que nenhum job sem matriz produz" % c)
+if "required_linear_history" in rules: err.append("ruleset com historico linear (barra o --merge-commit do SAC-80)")
+if r["conditions"]["ref_name"]["include"] != ["~DEFAULT_BRANCH"]: err.append("ruleset fora do ~DEFAULT_BRANCH")
+print("OK %s" % ",".join(sorted(ctx)) if not err else "FALHA " + " | ".join(err))
+' 2>&1)"
+  case "${_vh}" in
+    OK*) record_pass "two-tier-bench: (h) CI de dois níveis íntegro: gatilhos sem path, gate agregado sempre, alarme no push, ruleset exige ${_vh#OK }" ;;
+    *)   record_fail "two-tier-bench: (h) estrutura do CI" "$(_emit "${_vh}" | head -c 400)" ;;
+  esac
+
+  # (i) O ALARME DO MAIN, contra um remoto de verdade (bare) e um `gh` falso que registra cada chamada
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/bin"
+  cat > "${d}/bin/gh" <<'FAKEGH'
+#!/usr/bin/env bash
+printf '%s\n' "gh $*" >> "${FAKE_GH_LOG}"
+case "$1 $2" in
+  "issue list") [ -n "${FAKE_OPEN_ISSUE:-}" ] && echo "${FAKE_OPEN_ISSUE}"; exit 0 ;;
+  "pr create") echo "GraphQL: GitHub Actions is not permitted to create or approve pull requests (createPullRequest)" >&2; exit 1 ;;
+  "issue create"|"issue comment")
+    while [ $# -gt 0 ]; do [ "$1" = "--body-file" ] && cat "$2" >> "${FAKE_GH_LOG}"; [ "$1" = "--body" ] && printf '%s\n' "$2" >> "${FAKE_GH_LOG}"; shift; done; exit 0 ;;
+  *) exit 0 ;;
+esac
+FAKEGH
+  chmod +x "${d}/bin/gh"
+  (
+    cd "${d}" && git init -q --bare -b main remote.git && git clone -q remote.git w 2>/dev/null && cd w \
+      && git config user.email t@t && git config user.name t \
+      && echo base > f && git add f && git commit -qm base && git push -q origin HEAD:main \
+      && git checkout -qb feat && echo quebra >> f && git commit -qam quebra \
+      && git checkout -q main && git merge -q --no-ff -m "Merge pull request #4242 from x/feat" feat && git push -q origin main
+  ) >/dev/null 2>&1
+  local msha; msha="$(git -C "${d}/w" rev-parse HEAD 2>/dev/null)"
+  local base_tree; base_tree="$(git -C "${d}/w" rev-parse 'HEAD^1^{tree}' 2>/dev/null)"
+  local rc_i=0
+  out="$(cd "${d}/w" && PATH="${d}/bin:${PATH}" FAKE_GH_LOG="${d}/gh.log" bash "${alarm}" --result failure --sha "${msha}" --repo o/r --run-url https://example.invalid/run/1 2>&1)" || rc_i=$?
+  local rtree; rtree="$(git -C "${d}/remote.git" rev-parse "refs/heads/revert/${msha:0:12}^{tree}" 2>/dev/null || echo AUSENTE)"
+  if [ "${rc_i}" -eq 0 ] && [ -n "${msha}" ] && [ "${rtree}" = "${base_tree}" ] \
+     && grep -q '^gh issue create .*main quebrado' "${d}/gh.log" && grep -q "Commit culpado:.*${msha}" "${d}/gh.log" \
+     && grep -q 'PR #4242' "${d}/gh.log" && grep -q 'PR NÃO abriu' "${d}/gh.log" \
+     && grep -q 'gh workflow run onion-selftest.yml' "${d}/gh.log" && ! grep -q 'pr merge' "${d}/gh.log"; then
+    record_pass "two-tier-bench: (i) main reprovou ⇒ revert/<sha12> no remoto desfaz o merge, issue nomeia o culpado e o PR, PR recusado é declarado, nunca merge"
+  else record_fail "two-tier-bench: (i) alarme" "rc=${rc_i} revert_tree=${rtree:0:12} base=${base_tree:0:12} · out=$(_emit "${out}" | head -c 200) · log=$(head -c 300 "${d}/gh.log" 2>/dev/null)"; fi
+
+  # (i2) ALARME JÁ ABERTO ⇒ comenta nele, não abre outro; cancelado ⇒ alarme SEM revert
+  : > "${d}/gh.log"
+  out="$(cd "${d}/w" && PATH="${d}/bin:${PATH}" FAKE_GH_LOG="${d}/gh.log" FAKE_OPEN_ISSUE=7 bash "${alarm}" --result cancelled --sha "${msha}" --repo o/r --run-url u 2>&1)" || true
+  if grep -q '^gh issue comment 7 ' "${d}/gh.log" && ! grep -q '^gh issue create' "${d}/gh.log" \
+     && ! grep -q '^gh pr create' "${d}/gh.log" && grep -q 'não tentado' "${d}/gh.log"; then
+    record_pass "two-tier-bench: (i2) alarme aberto ⇒ comenta nele (título fixo, um só); cancelado ⇒ sem revert, motivo dito"
+  else record_fail "two-tier-bench: (i2) alarme aberto" "log=$(head -c 300 "${d}/gh.log" 2>/dev/null)"; fi
+
+  # (i3) VERDE com alarme aberto ⇒ comenta e FECHA; verde sem alarme ⇒ nenhuma escrita
+  : > "${d}/gh.log"
+  (cd "${d}/w" && PATH="${d}/bin:${PATH}" FAKE_GH_LOG="${d}/gh.log" FAKE_OPEN_ISSUE=7 bash "${alarm}" --result success --sha "${msha}" --repo o/r --run-url u) >/dev/null 2>&1 || true
+  local _closed=0; grep -q '^gh issue close 7' "${d}/gh.log" && grep -q '^gh issue comment 7' "${d}/gh.log" && _closed=1
+  : > "${d}/gh.log"
+  (cd "${d}/w" && PATH="${d}/bin:${PATH}" FAKE_GH_LOG="${d}/gh.log" bash "${alarm}" --result success --sha "${msha}" --repo o/r --run-url u) >/dev/null 2>&1 || true
+  if [ "${_closed}" = "1" ] && ! grep -qE '^gh (issue (create|comment|close)|pr )' "${d}/gh.log"; then
+    record_pass "two-tier-bench: (i3) main verde ⇒ fecha o alarme aberto; sem alarme, não escreve nada"
+  else record_fail "two-tier-bench: (i3) verde" "fechou=${_closed} · log_sem_alarme=$(head -c 200 "${d}/gh.log" 2>/dev/null)"; fi
+  rm -rf "${d}"
+}
+_family run_two_tier_bench_selftests
 
 # ── check-member-registered.sh: o registro é lido como YAML, não por regex de fim de linha ───────
 # POR QUE EXISTE (2026-10-07): a regex ancorada no fim da linha não casava `local_path: "/x"  # nota`,

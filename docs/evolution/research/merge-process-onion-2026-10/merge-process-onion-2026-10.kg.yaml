@@ -8,7 +8,10 @@ meta:
                                # planos gratuitos de Mergify e Trunk e o estado do funador/claude-code-merge-queue.
                                # A metade doutrina (ímã, escritor único, catracas) é de 12m, mas o gatilho da Opção 3
                                # já disparou: a revisita real é o selo do maestro, não a data.
-  # ═══ TETO: 65 NÓS ═══
+  # ═══ TETO: 66 NÓS ═══
+  # (2026-10-13, passo D: +1 nó de EVIDÊNCIA da execução, E_PASSO_D_EXECUTADO_2026_10_13, que carrega a
+  #  medição do que o passo entregou. Não é onda de pesquisa: é o carimbo da execução da decisão selada,
+  #  no mesmo movimento do trabalho. O teto sobe DECLARADO, pela mesma razão do selo abaixo.)
   # (64 escritos pelo run + 1 nó de SELO do maestro, D_REQUIRED_CHECKS_RULESET_MAIN, criado pelo
   #  kg-decide-seal.sh --new em 2026-10-13. Não é onda nova de pesquisa: é a resposta à pergunta
   #  feita sobre C_OPCAO_E. O selador não confere este teto (o gate dele é radar + contrato) e a
@@ -508,14 +511,32 @@ nodes:
   - id: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
     node_type: claim
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.55
     verified_at: "2026-10-13"
-    verified_against: "retorno do Elenxo do run wf_48596b33-657 (opções e recomendação) + E_MEDICAO_PROCESSO_ATUAL_2026_10_13"
+    verified_against: "EXECUTADO no PR feat/merge-process-step-d-two-tier-bench (2026-10-13): família two_tier_bench 12/12 sob LC_ALL=C e 15 mutantes por ops/mutate-and-restore.sh, 15 reprovados — ver E_PASSO_D_EXECUTADO_2026_10_13"
     label: "OPÇÃO D — bancada em dois níveis sem fila: no PR, as famílias tocadas (a faixa do pre-commit) mais a label ci:full; bancada completa no push ao main, com alarme e PR de revert. Elenxo: PASSO 3."
-    narrative: "É o que falta de D_BANCADA_FAIXAS_E_MAPA (PR = famílias tocadas foi decidido em 2026-09-03 e o PR ainda roda a bancada inteira). O padrão keyorix depende de merge_group (fila nativa, indisponível; grep merge_group = 0). Restrições: completa no push ao main com alarme e revert automático; a janela de main quebrado é aceita e DECLARADA; ci:full segue disponível; os achados de correção sem detecção e quebra semântica sem conflito justificam verificar no main de qualquer jeito. Alternativa do sintetizador: completa dentro da faixa serial (~4 merges/h)."
-    trace: "run wf_48596b33-657 fase Elenxo"
+    narrative: "É o que falta de D_BANCADA_FAIXAS_E_MAPA (PR = famílias tocadas foi decidido em 2026-09-03 e o PR ainda roda a bancada inteira). O padrão keyorix depende de merge_group (fila nativa, indisponível; grep merge_group = 0). Restrições: completa no push ao main com alarme e revert automático; a janela de main quebrado é aceita e DECLARADA; ci:full segue disponível; os achados de correção sem detecção e quebra semântica sem conflito justificam verificar no main de qualquer jeito. Alternativa do sintetizador: completa dentro da faixa serial (~4 merges/h). EXECUÇÃO (2026-10-13): no PR, só as famílias do diff (ops/testing/selftest-pr-selection.sh sobre lint-selftest.sh --affected-range), com a completa quando o mapa não classifica, quando o diff toca a bancada ou a infra do CI, ou com a label ci:full; no push ao main, a completa, com alarme de título fixo e branch revert/<sha12> sem merge automático; check estável selftest-gate; o lint perdeu o filtro de path para virar check obrigatório. Janela de main quebrado aceita e declarada. O ruleset (ops/github-ruleset-main.json + ops/apply-ruleset-main.sh) ficou PREPARADO, não aplicado: é a opção E, que segue aberta até a aplicação."
+    trace: "ops/testing/selftest-pr-selection.sh"
+  - id: E_PASSO_D_EXECUTADO_2026_10_13
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-13"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families two_tier_bench → 12 passaram, 0 falharam; 15 mutantes plantados por ops/mutate-and-restore.sh (seletor, plano, workflows, ruleset, alarme), 15 reprovaram o caso esperado"
+    source_tier: 10
+    source_kind: primary
+    label: "Passo D executado e medido: o PR roda só as famílias do diff (docs/README.md ⇒ 1 família; ops/merge-serial.sh ⇒ 15 de 252), cai na completa no incerto ou na infra, e o main roda a completa com alarme e revert sem merge."
+    narrative: "Medido no seletor real pelo range de commits sintéticos (índice temporário + commit-tree, sem ref): (a) ops/merge-serial.sh ⇒ seletivo, 15 de 252 famílias, com merge_serial; (a2) docs/README.md ⇒ seletivo, só o núcleo gitattributes_eol; (b) arquivo de ops/ não citado ⇒ completa pelo failsafe do mapa; (c) lint-selftest.sh, .github/workflows/onion-selftest.yml e ops/testing/selftest-shard-plan.sh ⇒ completa; (d) label ci:full ⇒ completa, ci:fullish não; (e) range ilegível ⇒ completa; (f) --affected-range com a bancada no range ⇒ todas; (g) o plano de faixas reparte só o subconjunto; (h) estrutura do CI lida como YAML (sem filtro de path nos dois workflows, push ao main, cancelamento só no PR, selftest-gate com if: always() lendo plano e faixas, alarme no push, ruleset exigindo só checks produzidos por job sem matriz); (i) a (i3) o alarme contra remoto bare e gh falso: revert/<sha12> desfaz o merge, issue de título fixo nomeia o culpado e o PR, PR recusado pela permissão do repo é declarado, alarme aberto recebe comentário, verde fecha, nunca merge. Medido também (gh api, 2026-10-13): dono User, rulesets = [], can_approve_pull_request_reviews=false (o GITHUB_TOKEN não abre PR; o script declara e deixa o comando), app id 15368 = github-actions nos check-runs. Limites declarados: o ruleset só foi PREPARADO; o admin tem bypass e é o dono; a quebra no cron noturno não alarma; o CI do PR deste passo roda a completa (toca workflows), que é a confirmação no forge."
+    trace: "ops/testing/selftest-pr-selection.sh"
+    provenance:
+      source: "ops/testing/selftest-pr-selection.sh + ops/testing/main-bench-alarm.sh + .github/workflows/onion-selftest.yml + família two_tier_bench de .claude/validation/lint-selftest.sh"
+      locator: "run_two_tier_bench_selftests, casos (a) (a2) (b) (c) (d) (e) (f) (g) (h) (i) (i2) (i3); mutantes M1-M15 no resíduo docs/evolution/review/feat-merge-process-step-d-two-tier-bench.md"
+      method: "medição: bancada two_tier_bench 12/12 sob LC_ALL=C e 15 mutantes por ops/mutate-and-restore.sh, cada um reprovando o seu caso, 2026-10-13"
+      locality: "repo"
   - id: C_OPCAO_E_REQUIRED_CHECKS_RULESET
     node_type: claim
     plane: DEV
@@ -1379,3 +1400,9 @@ edges:
   - from: D_REQUIRED_CHECKS_RULESET_MAIN
     to: C_OPCAO_E_REQUIRED_CHECKS_RULESET
     edge_type: TRACES_TO
+  - from: E_PASSO_D_EXECUTADO_2026_10_13
+    to: C_OPCAO_D_TWO_TIER_BENCH_NO_QUEUE
+    edge_type: SUPPORTS
+  - from: E_PASSO_D_EXECUTADO_2026_10_13
+    to: C_OPCAO_E_REQUIRED_CHECKS_RULESET
+    edge_type: SUPPORTS
