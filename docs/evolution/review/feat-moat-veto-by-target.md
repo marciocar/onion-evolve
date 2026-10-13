@@ -1,7 +1,7 @@
 ---
 branch: feat/moat-veto-by-target
 date: 2026-10-13
-reviewed_diff_sha256: 43fcd51d358a24fad12d162e382bf0116be5e2ba937f59707efb1b0b262492db
+reviewed_diff_sha256: 0e4bb365ee97d8b708fab797fe4fd25d5e6af4ccff90589a9a8e909ade7edcdd
 reviewed_code_sha256: 9ae3422a79e2b283b2a454c41357078bfac3f5cd3af6cb12753eb05ab345c8f1
 findings_total: 18
 findings_real: 18
