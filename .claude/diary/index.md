@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 128 entradas · **Stale:** 2 · **Compartilháveis:** 116 · **Com significância:** 51
+**Total:** 128 entradas · **Stale:** 0 · **Compartilháveis:** 116 · **Com significância:** 51
 
 Gerado em: 2026-10-14
 
@@ -113,7 +113,7 @@ Gerado em: 2026-10-14
 | 2026-07-16 | learning | public 📤 | avell-rescue-doc-predicted-session | — | 2026-10-14 | static |
 | 2026-07-15 | error | protected | projected-scaffold-step-nonexistent | — | 2027-01-12 | static |
 | 2026-07-15 | learning | protected | kg-sdaal-crosses-federation | — | 2027-01-12 | dynamic |
-| 2026-07-15 | learning | protected ⏰ | kg-audit-layer-generalizes-to-content | — | 2026-10-13 | conditional |
+| 2026-07-15 | learning | protected | kg-audit-layer-generalizes-to-content | — | 2026-10-13 | conditional |
 | 2026-07-15 | innovation | public 📤 | create-vertical-f2-fino-delega | — | 2027-01-12 | dynamic |
 | 2026-07-11 | decision | public 📤 | knowledge-centric-reframe-and-north-star | — | 2027-01-12 | static |
 | 2026-07-11 | reflection | public 📤 | hegel-limit-kg-boundary | — | 2027-01-12 | static |
@@ -129,7 +129,7 @@ Gerado em: 2026-10-14
 | 2026-07-08 | decision | protected | site-consolidation-kvm8 | — | 2027-01-12 | dynamic |
 | 2026-07-08 | innovation | public 📤 | layer1-role-scoped-plugins | — | 2027-01-12 | static |
 | 2026-07-08 | observation | protected | docbridge-gitignore-check-candidate | — | 2027-01-12 | conditional |
-| 2026-07-05 | learning | public ⏰ 📤 | vps-lineage-odyssey | — | 2026-10-06 | conditional |
+| 2026-07-05 | learning | public 📤 | vps-lineage-odyssey | — | 2026-10-06 | conditional |
 | 2026-07-03 | learning | public 📤 | workflow-resume-cache-recovery | — | 2027-01-12 | conditional |
 | 2026-07-03 | learning | public 📤 | sandbox-selftest-exposes-latent-bugs | — | 2027-01-12 | static |
 | 2026-07-03 | innovation | public 📤 | declared-vs-verified-family | — | 2027-01-12 | static |
