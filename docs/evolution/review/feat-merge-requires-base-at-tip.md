@@ -2,8 +2,8 @@
 title: 'Resíduo — strict local no caminho verificado: a base do PR na ponta do main (FASE 0)'
 date: 2026-10-14
 branch: feat/merge-requires-base-at-tip
-reviewed_diff_sha256: d601b3d73fd894f24feb8bca25f9a0e99e2be3a80071dd906539f075405a838e
-reviewed_code_sha256: 036b18823c3820494fed6f7d52bfb7ef9b9bbf0d04ccb6831d8c1d2c0892c78e
+reviewed_diff_sha256: 2d5a63c07062613d75800810010169ab6900b163806838e2c1175438aac242da
+reviewed_code_sha256: 08a66ea897aa54d3a1422d6f389c2d556eeda33f62a40429a9b61d0c87660627
 findings_total: 12
 findings_real: 5
 findings_fixed: 4
@@ -68,6 +68,12 @@ remoto bare, que é o que o compare do GitHub mede.
 
 `LC_ALL=C bash .claude/validation/lint-selftest.sh --families merge_skip_ci,pr_merge_verified,merge_dispensa,merge_serial`
 → **93 passaram, 0 falharam**.
+
+**Re-revisão depois do rebase** (2026-10-14): o main trouxe o commit `d87449b7`. Ele separa, na condição 4 de
+`_skip_ci_decide`, o caso de zero check-runs no head anterior, com o caso (d3), e acrescentou um nó ao mesmo
+grafo. O conflito ficou só no grafo (o teto e os nós) e na projeção `testing-inventory.md`. Resolvi
+mantendo os dois nós, com o teto 77 → 78 declarado. A condição 4 dele vem antes das minhas (8) e (9), e as
+duas não se cruzam. Na árvore combinada: **94 passaram, 0 falharam** (os 93 mais o (d3)).
 
 ## Mutantes (`ops/mutate-and-restore.sh`, cada um com o marcador; restauração conferida por sha256)
 
