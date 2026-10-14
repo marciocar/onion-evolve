@@ -2359,6 +2359,7 @@ ops/pr-merge-verified.sh	E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14	do
 ops/pr-merge-verified.sh	E_CURE_PROVEN_BY_BEHAVIOR	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
 ops/pr-merge-verified.sh	E_MERGE_SEM_CI_EXECUTADO_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/pr-merge-verified.sh	E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+ops/pr-merge-verified.sh	E_STRICT_LOCAL_EXECUTADO_2026_10_14	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_EM_REPO_SEM_CI	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/publish-door.sh	C_CHANGELOG_DIZ_NENHUMA_QUEBRA	docs/onion/graph/door-role-parity-2026-09.kg.yaml
