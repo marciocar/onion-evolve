@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**494 itens abertos** em 104 grafo(s) com aberto (de 133 no escopo) · 105 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**496 itens abertos** em 105 grafo(s) com aberto (de 134 no escopo) · 106 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -301,6 +301,13 @@
 | 6.0 | `C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT` | onion-slm-2026-10 | LEITURA (embedders): EmbeddingGemma (308M, 100+ linguas) e Qwen3-Embedding (0.6B/8B) HABILITAM busca semantica local sobre o corpu |
 | 0.9 | `C_CHAT_BGE_M3_MTEB_63` | onion-slm-2026-10 | AFIRMACAO DO CHAT: bge-m3 = 63,0 no MTEB (via premai.io). NAO VERIFICAVEL como comparacao: a primaria (card Qwen3-Embedding-0.6B)  |
 | 0.6 | `C_CHAT_QWEN37_PROPRIETARY` | onion-slm-2026-10 | AFIRMACAO DO CHAT (8): o Qwen3.7 e proprietario. NAO VERIFICAVEL: nem a listagem HF visivel nem o agregador mostram o 3.7; sem pri |
+
+## a2a-configurator-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 42.0 | `Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL` | a2a-configurator-2026-10 | um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do |
+| 4.8 | `Q_MANUAL_DO_A2A` | a2a-configurator-2026-10 | o configurador A2A ganha um manual para os três leitores (operador do core, operador do hub e membro que entra), escrito a partir |
 
 ## poda-instruction-bloat-2026-09 — 6 item(ns)
 
