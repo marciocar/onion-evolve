@@ -24124,7 +24124,7 @@ run_backlog_projection_selftests() {
   local _err _md
   _err="$(cd "${sb}" && bash .claude/validation/kg-backlog-project.sh --markdown 2>&1 >/dev/null || true)"
   _md="$(cd "${sb}" && bash .claude/validation/kg-backlog-project.sh --markdown 2>/dev/null || true)"
-  if grep -q 'NÃO RASTREADO' <<< "${_err}" && grep -q 'sonda-untracked.kg.yaml' <<< "${_err}" && ! grep -q 'Q_SONDA' <<< "${_md}"; then
+  if grep -q 'NÃO RASTREADO' <<< "${_err}" && grep -q 'sonda-untracked.kg.yaml' <<< "${_err}" && ! grep -qw 'Q_SONDA' <<< "${_md}"; then   # -w: o id da sonda é PALAVRA (2026-10-14, o nó real Q_SONDAR_O_BUNDLE_… casava por substring)
     record_pass "backlog-projection: (c2) grafo novo não rastreado → fora da projeção, mas AVISADO e nomeado"
   else record_fail "backlog-projection: (c2)" "não avisou (ou entrou na projeção): err=${_err}"; fi
   ( cd "${sb}" && git add docs/evolution/research/sonda-untracked ) >/dev/null 2>&1 || true
