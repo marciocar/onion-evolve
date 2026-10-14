@@ -28,6 +28,10 @@
 #   completed, e o lançamento de fundo (tool_result "Command running in background with ID")
 #   QUANDO a prosa relata que aguarda a notificação. Ler `tasks/X.output` deixou de contar.
 #   Lê só a CAUDA do transcript (lib/transcript-tail.py), com teto e fail-safe.
+#   Desde 2026-10-14 (SAC-138) o TÉRMINO também é estado: com lançamento de fundo no turno, afirmar
+#   que ele "terminou/passou/foi mergeado/finished" exige a notificação de término ou observação
+#   DEPOIS do lançamento. O sujeito tem de vir antes do verbo e ser o fundo (palavra do comando
+#   lançado, termo genérico de fundo ou pronome) — senão "o lint passou" de primeiro plano seria veto.
 #
 # TETO DECLARADO — e o teto que importa NÃO é o vocabulário, é O QUE ESTA GUARDA
 #   ASSUME SOBRE A FORMA DO TRANSCRIPT. Correção do Elenxo (F6): a 1ª redação declarava
@@ -65,9 +69,20 @@ _PAT_EVIDENCE='(\bps\s+-|\bps\s+[aux]|pgrep|pkill -0|kill -0|\bjobs\b|gh pr chec
 # junto do LANÇAMENTO de fundo no mesmo turno (o tool_result do harness com o task id) — sem o
 # lançamento, a frase é só uma promessa e a afirmação de estado vivo segue vetada.
 _PAT_AWAIT='((aguard|esper|wait)\w*[^.\n]{0,40}notifica|notificad[oa] (quando|ao)|will be notified|notified when)'
+# A AFIRMAÇÃO DE TÉRMINO (SAC-138, medido 2026-10-14 na passada adversarial do #1127): depois de lançar
+# em fundo, "O merge segue rodando e já terminou com sucesso." passava com rc 0 — o "terminou" EXONERAVA
+# a afirmação de estado vivo (a exoneração DONE abaixo) e nada exigia prova do término. É a mesma
+# mentira com o sinal trocado: afirmar que acabou sem ter visto acabar. Só vale quando houve LANÇAMENTO
+# de fundo no turno (BG_LAUNCH) — "o teste terminou" sobre comando de primeiro plano não é desta guarda.
+# Só verbo FLEXIONADO no passado/particípio: "quando terminar", "aguardo o término", "once it finishes"
+# não casam (são espera, não afirmação). `done` nu ("Done.") não basta: a frase tem de nomear o sujeito.
+_PAT_DONE_CLAIM='(\b(j[áa] )?(terminou|terminaram|conclu(iu|[íi]ram|[íi]d[oa]s?)|finaliz(ou|aram|ad[oa]s?)|acab(ou|aram)|mergead[oa]s?|mergeou|mergearam|passou|passaram|ficou verde|ficaram verdes?)\b|\b(completed|finished|succeeded|merged|is done|was done|went green|is green)\b)'
+# A PROVA do término: chamada DEPOIS do lançamento que observa o estado (o forge, o processo), ou a
+# notificação de término do harness no turno (TASK_DONE). `ps`/`kill -0` provam que MORREU (ausência).
+_PAT_DONE_EVIDENCE='(\bps\s+-|\bps\s+[aux]|pgrep|pkill -0|kill -0|\bjobs\b|gh pr (view|checks|status)|gh run (list|view|watch)|gh api|TaskList|TaskGet|TaskOutput|BashOutput|/proc/[0-9]+)'
 
 _assess() {   # $1 = PROSA · $2 = CHAMADAS do turno · $3 (opcional) = EVENTOS do harness no turno
-  python3 - "$1" "$2" "${_PAT_CLAIM}" "${_PAT_CLAIM_REV}" "${_PAT_EVIDENCE}" "${_PAT_AWAIT}" "${3:-}" <<'PY'
+  python3 - "$1" "$2" "${_PAT_CLAIM}" "${_PAT_CLAIM_REV}" "${_PAT_EVIDENCE}" "${_PAT_AWAIT}" "${3:-}" "${_PAT_DONE_CLAIM}" "${_PAT_DONE_EVIDENCE}" <<'PY'
 import re, sys
 # ⚠️ ERRO DO PYTHON != OFENSA (F9 do Elenxo): a 1a versao usava exit 1 para ofensa, e um traceback
 # tambem sai 1 — logo regex invalida virava VETO com bullet VAZIO, acusando turno honesto na FALHA,
@@ -94,6 +109,42 @@ try:
         return bool(NEG.search(sent) or DONE.search(sent)
                     or sent.lstrip().startswith(">") or sent.rstrip().endswith("?"))
     hits = []
+    # ── TÉRMINO afirmado sobre o fundo DESTE turno (SAC-138) ─────────────────────────────────────
+    done_claim = sys.argv[8] if len(sys.argv) > 8 else ""
+    done_ev = sys.argv[9] if len(sys.argv) > 9 else ""
+    launched = bool(re.search(r"^BG_LAUNCH\b", events, re.M))
+    if done_claim and launched and not re.search(r"^TASK_DONE\b", events, re.M):
+        post = "\n".join(l[len("POST_CALL "):] for l in events.splitlines() if l.startswith("POST_CALL "))
+        if not (done_ev and re.search(done_ev, post, re.I)):
+            # o SUJEITO tem de ser o fundo: palavra do comando lançado (BG_SUBJ, colhida do input
+            # do tool_use com run_in_background), termo genérico de fundo, ou pronome. Sem isso,
+            # "o lint passou" sobre o lint de PRIMEIRO plano no mesmo turno seria falso positivo.
+            subj = set()
+            for l in events.splitlines():
+                if l.startswith("BG_SUBJ "):
+                    subj.update(w.lower() for w in l.split()[1:])
+            generic = r"\b(processo|comando|job|task|shell|fundo|segundo plano|background|PR|it|ele|ela|they)\b"
+            DNEG = re.compile(r"\b(n[ãa]o|nenhum[a]?|nunca|not|never)\b|n't\b", re.I)
+            for m in re.finditer(done_claim, prose, re.I):
+                a = max(prose.rfind(".", 0, m.start()), prose.rfind("\n", 0, m.start()), prose.rfind(";", 0, m.start())) + 1
+                nxt = re.search(r"[.;\n]", prose[m.end():])
+                b = m.end() + nxt.end() if nxt else len(prose)
+                sent = prose[a:b]
+                if DNEG.search(sent) or sent.lstrip().startswith(">") or sent.rstrip().endswith("?"):
+                    continue
+                # o sujeito vem ANTES do verbo (janela de 80): "Os testes passaram e o merge foi lancado"
+                # fala dos testes, nao do merge — falso positivo medido na passada adversarial.
+                pre = prose[max(a, m.start() - 80):m.start()]
+                words = set(re.findall(r"[a-z0-9]{4,}", pre.lower()))
+                if not (re.search(generic, pre, re.I) or (words & subj)):
+                    continue
+                frag = "TÉRMINO sem prova: " + sent.strip()[:120]
+                if frag not in hits:
+                    hits.append(frag)
+            if hits:
+                for h in hits[:3]:
+                    print(h)
+                sys.exit(1)
     for pat in (claim, claim_rev):
         for m in re.finditer(pat, prose, re.I):
             # a SENTENCA do hit, nao a linha: markdown embrulha prosa (licao medida nesta casa)
@@ -280,6 +331,33 @@ elif kind in ("notif-turn", "notif-queued", "notif-quoted"):
         else:   # o MESMO literal citado numa saida de ferramenta NAO e evento do harness
             rows += [A(bash("cat hook.sh")), U(res(n))]
     rows += [A(txt("O merge segue em curso no CI."))]
+elif kind in ("done-noproof", "done-notif", "done-ghview", "done-en", "done-fgonly", "done-await", "done-mixed", "done-subjafter"):
+    # SAC-138: afirmacao de TERMINO sobre o fundo deste turno
+    rows += [U("roda o merge")]
+    if kind == "done-fgonly":
+        rows += [A(bash("bash .claude/validation/lint-selftest.sh --only foo")), U(res("OK"))]
+    else:
+        rows += [A({"type": "tool_use", "name": "Bash", "input": {"command": "bash merge-serial.sh 1127", "run_in_background": True}}),
+                 U(res("Command running in background with ID: b1x2y3. Output is being written to: /tmp/s/tasks/b1x2y3.output. "
+                       "You will be notified when it completes — do not poll that file or sleep while waiting."),
+                   toolUseResult={"backgroundTaskId": "b1x2y3"})]
+    if kind == "done-notif":
+        n = ("<task-notification>\n<task-id>b1x2y3</task-id>\n<output-file>/tmp/s/tasks/b1x2y3.output</output-file>\n"
+             "<status>completed</status>\n<summary>Background command \"merge\" completed (exit code 0)</summary>\n</task-notification>")
+        rows += [dict(meta, type="attachment", attachment={"type": "queued_command", "prompt": n}),
+                 A({"type": "tool_use", "name": "Read", "input": {"file_path": "/tmp/s/tasks/b1x2y3.output"}}), U(res("merged"))]
+    if kind == "done-ghview":
+        rows += [A(bash("gh pr view 1127 --json state -q .state")), U(res("MERGED"))]
+    if kind == "done-mixed":   # lint de PRIMEIRO plano no mesmo turno do lancamento de fundo
+        rows += [A(bash("bash .claude/validation/lint-artifacts.sh")), U(res("0 HARD"))]
+    rows += [A(txt({"done-noproof": "O merge segue rodando e já terminou com sucesso.",
+                    "done-notif": "O merge-serial terminou com sucesso (exit 0).",
+                    "done-ghview": "O PR 1127 foi mergeado.",
+                    "done-en": "The merge job is still being watched; it finished successfully.",
+                    "done-fgonly": "O comando de teste terminou e passou.",
+                    "done-await": "Lancei o merge-serial em segundo plano e aguardo a notificação de término do merge.",
+                    "done-subjafter": "Os testes passaram e o merge-serial foi lançado em segundo plano; aguardo a notificação.",
+                    "done-mixed": "O lint de primeiro plano passou com 0 HARD. O merge-serial segue rodando; aguardo a notificação."}[kind]))]
 with open(out, "w", encoding="utf-8") as fh:
     for r in rows:
         fh.write(json.dumps(r) + "\n")
@@ -356,6 +434,41 @@ for l in open(sys.argv[1], encoding="utf-8", errors="replace"):
   if [ "${_rc}" -eq 0 ] && [ "${_rc2}" -eq 0 ] && [ "${_rc3}" -eq 2 ]; then
     record_pass_or_echo "(q) <task-notification> completed no turno → CALA (row e attachment); citada em tool_result → ACUSA"
   else _fail_e2e "(q) notificacao" "turno rc=${_rc} · queued rc=${_rc2} · citada rc=${_rc3} (esperado 0/0/2)"; fi
+  # ══ SAC-138 (passada adversarial do #1127, 2026-10-14): TERMINO afirmado sobre o fundo do turno ══
+  # (r1) lancou + "ja terminou com sucesso" sem prova → ACUSA (a frase medida, que dava rc 0)
+  _gen done-noproof "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  if [ "${_rc}" -eq 2 ]; then record_pass_or_echo "(r1) lancamento + 'ja terminou com sucesso' sem prova → ACUSA"
+  else _fail_e2e "(r1) termino afirmado sem prova passou" "rc=${_rc} saida=[${_out}]"; fi
+  # (r2) lancou + notificacao de termino (attachment) + leitura do output DEPOIS + "terminou" → CALA
+  _gen done-notif "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  if [ "${_rc}" -eq 0 ]; then record_pass_or_echo "(r2) lancamento + <task-notification> completed + 'terminou' → CALA"
+  else _fail_e2e "(r2) a notificacao de termino nao conta como prova" "rc=${_rc} saida=[${_out}]"; fi
+  # (r3) lancou + `gh pr view` DEPOIS + "foi mergeado" → CALA (passado sobre algo observado)
+  _gen done-ghview "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  if [ "${_rc}" -eq 0 ]; then record_pass_or_echo "(r3) lancamento + gh pr view depois + 'foi mergeado' → CALA"
+  else _fail_e2e "(r3) a observacao pelo forge nao conta" "rc=${_rc} saida=[${_out}]"; fi
+  # (r4) so primeiro plano + "o teste terminou e passou" → CALA (sem lancamento de fundo no turno)
+  _gen done-fgonly "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  if [ "${_rc}" -eq 0 ]; then record_pass_or_echo "(r4) primeiro plano + 'o teste terminou' → CALA (sem fundo no turno)"
+  else _fail_e2e "(r4) falso positivo em comando de primeiro plano" "rc=${_rc} saida=[${_out}]"; fi
+  # (r5) lancou + "aguardo a notificacao de termino" → continua CALANDO (o substantivo nao e afirmacao)
+  _gen done-await "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  if [ "${_rc}" -eq 0 ]; then record_pass_or_echo "(r5) lancamento + 'aguardo a notificacao de termino do merge' → CALA"
+  else _fail_e2e "(r5) a espera honesta virou termino" "rc=${_rc} saida=[${_out}]"; fi
+  # (r6) ingles: lancou + "it finished successfully" sem prova → ACUSA
+  _gen done-en "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  if [ "${_rc}" -eq 2 ]; then record_pass_or_echo "(r6) lancamento + 'it finished successfully' sem prova → ACUSA"
+  else _fail_e2e "(r6) cego ao termino em ingles" "rc=${_rc} saida=[${_out}]"; fi
+  # (r7) FALSO POSITIVO de vocabulario: lancou o merge em fundo E rodou o lint em PRIMEIRO plano; "o lint
+  #      passou" fala do primeiro plano (sujeito fora do comando lancado) → CALA
+  _gen done-mixed "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  if [ "${_rc}" -eq 0 ]; then record_pass_or_echo "(r7) fundo + lint de primeiro plano 'passou' no mesmo turno → CALA (sujeito nao e o fundo)"
+  else _fail_e2e "(r7) termino do primeiro plano acusado como se fosse do fundo" "rc=${_rc} saida=[${_out}]"; fi
+  # (r8) o fundo nomeado DEPOIS do verbo, na mesma sentenca ("Os testes passaram e o merge-serial foi
+  #      lancado") — o verbo fala dos testes. Falso positivo medido na passada adversarial → CALA
+  _gen done-subjafter "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  if [ "${_rc}" -eq 0 ]; then record_pass_or_echo "(r8) sujeito do fundo so DEPOIS do verbo de termino → CALA"
+  else _fail_e2e "(r8) o verbo de outro sujeito acusado pelo fundo citado depois" "rc=${_rc} saida=[${_out}]"; fi
   unset -f _gen _trace_mode
 
   rm -rf "${_d}"; unset -f _run_hook
@@ -422,9 +535,24 @@ else:
 _LAUNCH = re.compile(r"\s*Command running in background with ID:\s*([A-Za-z0-9_-]+)")
 _NOTIF = re.compile(r"\s*<task-notification>.*?<task-id>([^<]*)</task-id>.*?<status>completed</status>", re.S)
 events = []
+# SAC-138: as chamadas DEPOIS do 1o lancamento (POST_CALL — a prova de termino tem de vir depois dele) e
+# as palavras do comando lancado (BG_SUBJ — o sujeito que uma afirmacao de termino tem de nomear).
+_STOP = {"bash", "python", "python3", "true", "null", "home", "marcio", "claude", "with", "from", "into",
+         "then", "tail", "head", "grep", "this", "that", "para", "rodar", "roda", "run", "runs", "sh"}
+_launched = False
 for j in turn:
     t = j.get("type")
-    if t == "user":
+    if t == "assistant":
+        for c in (j.get("message") or {}).get("content") or []:
+            if not (isinstance(c, dict) and c.get("type") == "tool_use"): continue
+            inp = c.get("input") or {}
+            if _launched:
+                events.append("POST_CALL " + (c.get("name") or "") + " " + json.dumps(inp, ensure_ascii=False))
+            if isinstance(inp, dict) and inp.get("run_in_background"):
+                src = " ".join(str(inp.get(k) or "") for k in ("command", "description"))
+                ws = sorted({w for w in re.findall(r"[a-z0-9]{4,}", src.lower()) if w not in _STOP})
+                if ws: events.append("BG_SUBJ " + " ".join(ws[:40]))
+    elif t == "user":
         c = (j.get("message") or {}).get("content")
         if isinstance(c, str):
             m = _NOTIF.match(c)
@@ -439,6 +567,7 @@ for j in turn:
                 m = _LAUNCH.match(body or "") if isinstance(body, str) else None
                 if m or bid:
                     events.append("BG_LAUNCH " + (m.group(1) if m else str(bid)))
+                    _launched = True
     elif t == "attachment":
         a = j.get("attachment") or {}
         if a.get("type") == "queued_command" and isinstance(a.get("prompt"), str):
@@ -474,6 +603,9 @@ rm -f "${_P}" "${_C}" "${_E}"
   printf '     gh pr checks <PR>                                           # estado no forge\n'
   printf '   Se LANÇOU o comando em fundo neste turno, o relato honesto é dizer que aguarda a notificação\n'
   printf '   do harness. Ler tasks/<id>.output NÃO prova que o processo segue vivo.\n'
+  printf '   E TÉRMINO também é estado (SAC-138): afirmar que o fundo deste turno "terminou/passou/foi\n'
+  printf '   mergeado" exige a <task-notification> de término ou uma observação DEPOIS do lançamento\n'
+  printf '   (gh pr view/checks, ps, kill -0). Observe ou espere a notificação antes de afirmar que terminou.\n'
   printf '   Afirmações sem observação nesta resposta:\n'
   printf '%s\n' "${offenders}" | sed 's/^/     · /'
 } >&2
