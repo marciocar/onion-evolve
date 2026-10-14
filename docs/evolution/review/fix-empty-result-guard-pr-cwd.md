@@ -1,7 +1,8 @@
 ---
 branch: fix/empty-result-guard-pr-cwd
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 241807261279eb16ca1887324c3bb9ef34dc4039f01ced8cca045d8ac4cfd03b
+reviewed_code_sha256: f4cf1c4ca141950fb9bc2689db473c29f7931c30b43e456e0ddffcdd91df1f0a
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
