@@ -815,6 +815,47 @@ nodes:
       method: "leitura: o texto escrito nesta leva, no locator citado"
       locality: "repo"
 
+  # ---- o vazamento que só o motor via (2026-10-13) e a varredura que passou a rodar no PR ----
+  - id: E_VAZAMENTO_SO_NO_FIM_DA_PUBLICACAO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-14"
+    verified_against: "door-leak-scan.sh com LC_ALL=C, famílias word e home, sobre as raízes de vendor-manifest.sh --emit-scrub-roots extraídas por git archive de três commits: e5e9a265 (antes do #1096) rc 1 com 23 ids de adotante com prefixo onion- e 8 caminhos de máquina em 13 arquivos; 91dcb25d (depois do #1096, antes do #1097) rc 1 com os 23 ids e 0 caminhos; a cabeça do #1097 rc 0, nenhum achado"
+    source_kind: repo
+    source_tier: 10
+    label: "o vazamento chegava à porta pública por PR verde e só o motor de publicação o barrava, no fim: duas classes, medidas duas vezes na mesma noite"
+    narrative: "Em 2026-10-13 o ensaio de /meta:publish --all reprovou três portas no passo (5a) do motor (VAZAMENTO no bundle — a porta é PÚBLICA), duas vezes na mesma noite. As duas classes entraram por PRs mergeados com o lint verde: caminho de máquina sob a home de uma conta real em comentários e fixtures que viajam (curado no #1096) e o id do repo privado de um adotante (o do produto KG-SSOT), com prefixo onion-, em 23 comentários de sinal de campo (curado no #1097). A REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) ignora o prefixo onion- por desenho, e nenhuma guarda do lint varria caminho de máquina nas raízes que viajam. A varredura do (5a) foi extraída para .claude/validation/door-leak-scan.sh, e o motor e o lint passaram a chamar o mesmo código: a REGRA 106 (Superfície que viaja passa pela varredura de vazamento da publicação), HARD na fonte, com as famílias word e home; a família sub segue com a REGRA 36, que no core varre um superconjunto dela. A medição sobre os três commits reproduz o dano exatamente (23 + 8, depois 23, depois 0). Custo medido: cerca de 0,2 s por passada. Teto: adotante, hub e porta não são julgados (o registro que eles têm é o vendorizado do core); conta de outra máquina fora do registro e id onion- de adotante não registrado não são vistos."
+    trace: ".claude/validation/door-leak-scan.sh · .claude/validation/lint-artifacts.sh · ops/publish-door.sh (core-only)"
+    provenance:
+      source: ".claude/validation/door-leak-scan.sh, rodado sobre git archive de e5e9a265, 91dcb25d e da cabeça do PR #1097"
+      locator: "saída TSV por família (word, home) e rc, nos três commits"
+      method: "medição: a mesma varredura que o (5a) do motor roda, aplicada às raízes que viajam, com LC_ALL=C"
+      locality: "repo"
+
+  - id: D_VARREDURA_DA_PUBLICACAO_RODA_NO_PR
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-14"
+    verified_against: "run_door_leak_scan_selftests com LC_ALL=C: 12 casos e 8 mutantes verdes, entre eles o caso de paridade (tudo que o helper acusa chamado como o motor o chama, o lint acusa pela REGRA 106 ou pela REGRA 36) e o mutante que o quebra; run_publish_selftests (31) e run_publish_release_selftests (27) verdes com o motor refeito sobre o helper"
+    source_kind: repo
+    source_tier: 10
+    label: "a varredura de vazamento da publicação mora num helper só, que o motor e o lint chamam: o PR barra o que antes só a publicação via"
+    narrative: "Decisão de forja, sem duplicar a lógica: o parser do registro, a derivação dos ids e das contas e a varredura saíram do motor para o helper, e o motor ficou com o que é dele (os nomes comerciais e a fonte privada, cuja ausência é falha fechada na publicação). A publicação continua sendo a última rede; o lint vira a primeira. Na fonte sem registro a regra declara NAO-VERIFICADO e a família home ainda roda."
+    trace: ".claude/validation/door-leak-scan.sh · .claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh, função run_door_leak_scan_selftests"
+      locator: "casos (a) a (j) e os 8 mutantes"
+      method: "medição: bancada rodada com LC_ALL=C; cada mutante reverte uma cura na cópia do sandbox e o caso reprova"
+      locality: "repo"
+
 edges:
   # o dano é a evidência de que a lacuna existia
   - from: E_DANO_85_ARQUIVOS
@@ -1033,4 +1074,11 @@ edges:
     edge_type: SUPERSEDES
   - from: D_MODO_PORTA_VEM_DO_KIND
     to: D_PAPEL_DE_ADOCAO_STANDALONE_NAO_E_A_PORTA
+    edge_type: DEPENDS_ON
+  # o vazamento só no fim é a evidência que sustenta mover a varredura para o PR
+  - from: E_VAZAMENTO_SO_NO_FIM_DA_PUBLICACAO
+    to: D_VARREDURA_DA_PUBLICACAO_RODA_NO_PR
+    edge_type: SUPPORTS
+  - from: D_VARREDURA_DA_PUBLICACAO_RODA_NO_PR
+    to: E_PUBLICAR_SOB_DEMANDA_F3
     edge_type: DEPENDS_ON

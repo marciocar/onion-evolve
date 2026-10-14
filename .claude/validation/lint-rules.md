@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**97 regras** no total — **85 HARD**, **37 SOFT**.
+**98 regras** no total — **86 HARD**, **38 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -187,6 +187,7 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 | 61 | Fronteira de MOAT: manifesto de plugin publicável não vaza adoção, federação nem grafo privado | HARD | publicar a ADOÇÃO e a FEDERAÇÃO (adopt/federation-*/co-*/marketplace/decouple) ou o SSOT PRIVADO |
 | 64 | Compose sem bind local ou com segredo em fallback literal | HARD + SOFT | porta publicada em todas as interfaces (o Docker ignora o firewall do HOST — ufw/iptables |
 | 100 | Superfície que viaja não cita ops/ como se o destinatário o tivesse | HARD + SOFT | porta/adotante recebendo instrução que aponta para ops/, que não viaja (com catraca). |
+| 106 | Superfície que viaja passa pela varredura de vazamento da publicação | HARD + SOFT | id de adotante com prefixo onion- ou caminho de máquina entrando por PR verde e só sendo barrado no fim, pelo motor de publicação das portas. |
 
 ## Processo com resíduo
 

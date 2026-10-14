@@ -32,7 +32,11 @@ Antes de qualquer commit no clone da porta, quatro conferências sobre o bundle:
   desenho (o ponto cego já medido duas vezes); e caminho de máquina `/home/<conta>/`, com a conta
   **derivada** dos `local_path` do registro e de quem roda. Lista de exemplos tolerados não entra:
   falharia pelo vocabulário. Todos os termos são derivados, porque nome escrito no script já seria o
-  vazamento;
+  vazamento. A varredura mora em `.claude/validation/door-leak-scan.sh`, e o lint roda o mesmo código
+  em todo PR, nas raízes que viajam: é a REGRA 106 (Superfície que viaja passa pela varredura de
+  vazamento da publicação). Ela existe porque, em 2026-10-13, dois ensaios na mesma noite reprovaram
+  três portas aqui no fim, por vazamento que tinha entrado com o lint verde. Agora o PR barra antes;
+  a varredura da publicação continua sendo a última rede;
 - **paridade de papel:** o carimbo montado diz o papel pedido e o pin de `origin/main`. Nos plugins, todo
   `provenance.json` aponta o pin;
 - **o gate da própria porta:** o lint dela tem de dar 0 HARD (o mini não leva lint, por desenho). Nos
