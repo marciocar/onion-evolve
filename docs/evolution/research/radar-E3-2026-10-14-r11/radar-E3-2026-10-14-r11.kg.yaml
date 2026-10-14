@@ -1,0 +1,221 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.300 a 2.1.300 contra a baseline 2.1.299.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-14-r11
+  schema_version: "1"
+  baseline: "2026-10-14"
+  review_after: "2026-11-13"   # 30d: cadência de ferramenta
+  x_supersedes_none: "nenhum item de 2.1.300 contradiz nó da r10; o agent.spawn com reescrita de prompt e model amplia E_AGENT_SPAWN_RESUME_E_SENDMESSAGE_SEM_USO (SUPPORTS), e as duas perguntas abertas da r10 (o bundle sob 2.1.299 e a deriva da r9) não são tocadas pelo delta"
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-14); 12 depois da rodada e do juiz (2026-10-14).
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
+# external_edges:
+#   - to: "docs/evolution/research/radar-E3-2026-10-14-r10/radar-E3-2026-10-14-r10.kg.yaml#<NO_DERRUBADO>"
+#     edge_type: SUPERSEDES
+#   (b) não derrubou nada → no meta: x_supersedes_none: "<a razão medida>"
+external_edges:
+  - from: E_AGENT_SPAWN_REESCREVE_O_MODELO_DO_WORKFLOW
+    to: "docs/evolution/research/radar-E3-2026-10-14-r10/radar-E3-2026-10-14-r10.kg.yaml#E_AGENT_SPAWN_RESUME_E_SENDMESSAGE_SEM_USO"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    trace: "docs/evolution/research/radar-E3-2026-10-14-r11/SYNTHESIS.md"
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "CHANGELOG oficial: seções 2.1.300 (91 linhas, 88 itens); baseline 2.1.299, disco 2.1.300, processo 2.1.300"
+    label: "o delta desde a baseline 2.1.299 são 1 versão(ões), de 2.1.300 a 2.1.300, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.300 a ## 2.1.300 (cópias em docs/evolution/research/radar-E3-2026-10-14-r11/data/)"
+      method: "medição: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "respondida pela rodada r11 em 2026-10-14: 9 itens ligados a superfície medida no vivo, julgados pelo juiz opus/high (4 sustentam, 5 exagerados e reescritos, 0 reprovados), 1 omissão de impacto 2 incorporada e 2 ações abertas; os demais itens não tocam o core (mods, gerenciado, VSCode, nuvem, Claude Tag, Code Review) ou foram medidos pelo juiz com impacto 1"
+    label: "quais itens de 2.1.300 a 2.1.300 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+  - id: E_UPDATEDINPUT_SEM_USO_NO_CORE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14: grep -rl updatedInput em .claude/hooks/ = 0 arquivos; nenhum hook PreToolUse do core reescreve a entrada, todos só vetam (exit 2) ou ficam calados"
+    label: "a 2.1.300 passou a validar o updatedInput dos hooks PreToolUse e PermissionRequest como a entrada do próprio Claude; nenhum hook do core devolve updatedInput, então nada muda aqui"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.300, item 'Changed hooks: `updatedInput` from PreToolUse and PermissionRequest hooks is now validated like Claude's own input'"
+      method: "medição: grep de updatedInput nos hooks"
+      locality: "web"
+  - id: E_HOOKS_DO_CORE_SAO_TODOS_COMMAND
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14: os 22 hooks de .claude/settings.json têm type command (contagem por python sobre o JSON); nenhum é de tipo agent"
+    label: "a 2.1.300 corrigiu os hooks de tipo agent que ignoravam o model; os 22 hooks do core são de tipo command, então a correção não os alcança"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.300, item 'Fixed agent hooks ignoring their `model`'"
+      method: "medição: contagem dos tipos de hook no settings.json"
+      locality: "web"
+  - id: E_SESSIONEND_DO_FAROL_MAIS_CONFIAVEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14: o único hook SessionEnd do core é o session-beacon-hook.sh (grep em .claude/settings.json), e as sessões do core encerram com frequência com comando de fundo vivo (merge-serial e pr-finalize rodam em background)"
+    label: "a 2.1.300 faz o SessionEnd rodar ao sair com comando de fundo vivo; o farol do core apaga na saída (ledger com o fim real e o arquivo removido) em vez de ficar até 30 min como DECLARADO e só depois órfão"
+    narrative: "Juiz: EXAGERA na 1ª redação, que dizia que o farol ficava vivo falso; sem o SessionEnd ele já caía para declared dentro da graça de 30 min e depois orphan. O ganho é o apagamento imediato e o ended_at real. Uso de fundo medido nos transcripts: 55 merge-serial, 148 pr-finalize, 29 pr-merge-verified."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.300, item 'Fixed SessionEnd hooks sometimes not running when you exit while a background command is still running'"
+      method: "medição: leitura do registro de hooks"
+      locality: "web"
+  - id: E_SAIDA_MATA_O_FUNDO_EM_1_5S
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 pelo juiz: o tui do usuário é fullscreen, modo em que o fundo antes seguia vivo depois da saída; o lock do merge-serial é flock no fd 9 (o kernel solta na morte; reproduzido com cópia mínima e TaskStop); gh pr merge é atômico no forge e a rodada seguinte o reconhece como JÁ MERGED; o pr-finalize tem trap _cleanup EXIT (l.137), que roda sob SIGTERM, mas não aborta o rebase que ele mesmo começa no --rebase"
+    label: "a 2.1.300 mata o fundo 1,5 s após a saída inclusive em fullscreen (o modo do maestro), onde antes ele seguia; um merge-serial ou pr-finalize de fundo para no meio: o lock e o merge do forge se recuperam sozinhos, o rebase em curso numa worktree não"
+    narrative: "Juiz: EXAGERA na 1ª redação (impacto 3, 'não tratam o sinal'): bash sem trap já morre no SIGTERM, o pr-finalize tem trap EXIT, e o delta real é o fullscreen. Medido o caminho do TaskStop, não o da saída da sessão."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.300, item 'Changed exit to force-kill background commands still running 1.5 seconds after being asked to stop'"
+      method: "medição: grep de trap nos dois scripts de merge"
+      locality: "web"
+  - id: Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "reescopada em 2026-10-14 pelo juiz da r11: lock, merge e sync já respondidos pela leitura do código; fecha quando o _cleanup abortar o rebase em curso, com caso de bancada que mate o pr-finalize --rebase no meio e exija a worktree limpa, e o mutante revertendo a cura"
+    label: "o _cleanup do pr-finalize deve abortar o rebase que ele mesmo começou, para a morte no meio do --rebase não deixar a worktree em rebase; as demais fases (espera de CI, lock, merge do forge, sync) já se recuperam sozinhas"
+    narrative: "Issue SAC-136 no Linear, criada pelo tm.sh em 2026-10-14."
+  - id: E_TRANSCRIPT_GRANDE_E_OS_HOOKS_STOP
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 e corrigido pelo juiz: sem tac (a 1ª redação errou); os dois leem com json.loads linha a linha, o background-state-needs-evidence.sh guardando todas as linhas numa lista; re-cronometrado em 3 execuções num transcript de 42,4 MB (25.080 linhas): 1068-1142 ms e 517-569 ms; 26 respostas da 2.1.300 trouxeram 1,64 MB de registros api-request"
+    label: "os 2 hooks Stop do core leem e parseiam o transcript inteiro; num de 42 MB o mais lento leva ~1,1 s por turno, e sob a 2.1.300 os registros de requisição somaram ~63 KB por resposta na amostra medida, contra ~7,5 KB antes"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.300, item 'Changed local session transcripts to also record each API request's system prompt, tools and parameters'"
+      method: "medição: cronometragem dos 2 hooks Stop sobre o transcript real"
+      locality: "web"
+  - id: Q_HOOKS_STOP_LEEM_SO_A_CAUDA_DO_TRANSCRIPT
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "aberta em 2026-10-14 pela r11 e ampliada pelo juiz; fecha numa forja só da mesma guarda: leitura da cauda (cobrindo turno autônomo longo, em que o último user que não é tool_result fica longe do fim), o _PAT_EVIDENCE emendado, caso de bancada para cada um e o tempo medido de novo num transcript grande"
+    label: "os hooks Stop que leem o transcript devem ler só o último turno, e o background-state-needs-evidence passa a aceitar como prova o resultado de lançamento e a notificação, deixando de premiar a leitura de tasks/*.output"
+    narrative: "Issue SAC-137 no Linear, criada pelo tm.sh em 2026-10-14."
+  - id: E_AGENT_SPAWN_REESCREVE_O_MODELO_DO_WORKFLOW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 e corrigido pelo juiz: a skill onion-orchestration (SKILL.md l.114-118) checa o modelo forçado por duas variáveis pelo forced-model-check.sh (CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL e CLAUDE_CODE_SUBAGENT_MODEL_FORCE); a reescrita por mod é uma 3ª forma de falsear o tiering que o helper não enxerga; não há mods em .claude/mods nem no diretório do usuário"
+    label: "a 2.1.300 permite ao hook agent.spawn de mod reescrever o prompt e o modelo de um agente de Workflow; é um ponto onde o tiering do core poderia ser imposto em vez de declarado, mas o core não usa mods hoje"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.300, item 'Added support for rewriting a workflow agent's `prompt` and `model` in the `agent.spawn` mod hook'"
+      method: "medição: leitura da skill onion-orchestration"
+      locality: "web"
+  - id: E_OTEL_E_REFTABLE_SEM_CONSUMIDOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14: grep -rliE otel/opentelemetry em .claude, ops e docs/knowledge-base acha só 3 KBs em prosa, nenhum script; git config extensions.refstorage vazio (o core usa refs em arquivo, não reftable)"
+    label: "os itens de OpenTelemetry (cache_creation por vida, atributos GenAI) e as correções de reftable da 2.1.300 não tocam o core: nenhum script consome OTel e o repo não usa reftable"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.300, item 'Added `cache_creation_5m_tokens` and `cache_creation_1h_tokens` to the OpenTelemetry `api_request` event'"
+      method: "medição: grep de OTel e leitura do refstorage"
+      locality: "web"
+  - id: E_HOOK_STOP_PUNE_O_RELATO_DE_ESPERAR_A_NOTIFICACAO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 pelo juiz com um transcript mínimo: lançamento de fundo + resultado running in background + 'O merge-serial segue rodando em segundo plano; aguardo a notificação de término' → o hook vetou (rc 2); 'serei notificado quando terminar' passa (rc 0); o _PAT_EVIDENCE (l.54) aceita como prova ler tasks/X.output, que o harness agora desestimula, e não aceita o resultado de lançamento nem a notificação"
+    label: "a 2.1.300 parou de fazer o Claude ler o arquivo de saída do fundo enquanto ele roda; o hook Stop do core ainda premia essa leitura como prova e veta o relato honesto de esperar a notificação, então o atrito com o harness cresce"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.300, item 'Fixed Claude polling a background command's output file or sleeping while it runs'"
+      method: "medição: transcript mínimo pelo hook background-state-needs-evidence.sh"
+      locality: "web"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SAIDA_MATA_O_FUNDO_EM_1_5S
+    to: Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO
+    edge_type: SUPPORTS
+  - from: E_TRANSCRIPT_GRANDE_E_OS_HOOKS_STOP
+    to: Q_HOOKS_STOP_LEEM_SO_A_CAUDA_DO_TRANSCRIPT
+    edge_type: SUPPORTS
+  - from: E_UPDATEDINPUT_SEM_USO_NO_CORE
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOOKS_DO_CORE_SAO_TODOS_COMMAND
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SESSIONEND_DO_FAROL_MAIS_CONFIAVEL
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_AGENT_SPAWN_REESCREVE_O_MODELO_DO_WORKFLOW
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_OTEL_E_REFTABLE_SEM_CONSUMIDOR
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOOK_STOP_PUNE_O_RELATO_DE_ESPERAR_A_NOTIFICACAO
+    to: Q_HOOKS_STOP_LEEM_SO_A_CAUDA_DO_TRANSCRIPT
+    edge_type: SUPPORTS
