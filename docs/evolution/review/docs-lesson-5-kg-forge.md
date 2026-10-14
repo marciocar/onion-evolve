@@ -1,7 +1,8 @@
 ---
 branch: docs/lesson-5-kg-forge
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c320b44db8eb3ec3cdc52b4793a9a6598b9bd1d6fa0b36efb16b7d7b62735207
+reviewed_code_sha256: cdee0d40e5b274d00d1e24d7d02b4a7d0d93656faaf2d13eb6ed9d3868d00b07
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
