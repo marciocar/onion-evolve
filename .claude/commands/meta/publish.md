@@ -79,7 +79,9 @@ lido do carimbo remoto (`—` = porta sem release). Numa porta defasada, o estad
    pela varredura de vazamento. rc 1 significa que a verificação reprovou: mostre o achado (vazamento, papel, lint e, nos
    plugins, as guardas de plugin sobre o bundle montado) e
    **pare**. A cura vai para o core por PR, nunca para a porta. rc 2 é precondição ou recusa, e rc 3
-   é fonte irresolúvel.
+   é fonte irresolúvel. Id `onion-*` de adotante e caminho de máquina já são barrados no PR pela
+   REGRA 106 (Superfície que viaja passa pela varredura de vazamento da publicação), que roda a mesma
+   varredura. Se um deles aparecer aqui, a regra foi contornada ou a superfície que viaja mudou.
    - Troca de papel deliberada (a onion-core de `hub` para `source`, decidida na matriz):
      `--role source --force-role-change`.
    - Para ensaiar uma **branch** antes do merge: `--from <ref>` (o `--push` é recusado com ele).

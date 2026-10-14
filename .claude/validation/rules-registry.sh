@@ -238,7 +238,7 @@ CATEGORIES = [
      "O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e "
      "deep-link privado nunca vazam; e o compose commitado nunca publica porta em "
      "0.0.0.0 nem sobe com segredo de fallback.",
-     [30, 33, 34, 35, 36, 45, 61, 64, 100]),
+     [30, 33, 34, 35, 36, 45, 61, 64, 100, 106]),
     ("Processo com resíduo",
      "O trabalho PROPOSTO carrega rastro material de ter sido revisado — o gate cria a cadência, "
      "o worker testa a verdade.",

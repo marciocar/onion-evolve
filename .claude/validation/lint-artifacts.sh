@@ -5764,6 +5764,69 @@ check_direct_provider_api() {
 }
 check_direct_provider_api
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 106 — Superfície que viaja passa pela varredura de vazamento da publicação [HARD + SOFT]
+# previne: id de adotante com prefixo onion- ou caminho de máquina entrando por PR verde e só sendo barrado no fim, pelo motor de publicação das portas.
+#   DANO MEDIDO (2026-10-13, duas vezes na mesma noite): o ensaio de `/meta:publish --all` reprovou três
+#   portas no passo (5a) do motor ("VAZAMENTO no bundle — a porta é PÚBLICA") por duas classes que
+#   entraram por PRs mergeados com o lint verde: caminho de máquina em comentários e fixtures que viajam
+#   (8 ocorrências, curado no #1096) e o id do repo privado de um adotante com prefixo `onion-` em 23
+#   comentários de sinal de campo (curado no #1097). A REGRA 36 (Superfície VENDORIZADA sem nome
+#   comercial de cliente) ignora o prefixo `onion-` por desenho, e nada no lint varria caminho de máquina
+#   nas raízes que viajam. Esta regra roda o MESMO código do (5a), extraído para door-leak-scan.sh, nas
+#   raízes do `vendor-manifest.sh --emit-scrub-roots`, com as famílias que a REGRA 36 não cobre (`word`:
+#   id `onion-*` de adotante; `home`: conta real). A família `sub` do (5a) fica com a REGRA 36, que no
+#   core varre um SUPERCONJUNTO dela (ids de todo kind, mais os nomes); a paridade é caso de bancada.
+#   Só na FONTE: em adotante, hub e porta o registro é o vendorizado do core e acusaria o dono pelo
+#   próprio nome (a mesma circularidade que isenta a folha na REGRA 36); a porta é varrida pelo motor
+#   na publicação. Registro ausente na fonte = SOFT NAO-VERIFICADO (a família `home` ainda roda).
+check_door_leak_scan() {
+  local helper="${SCRIPT_DIR}/door-leak-scan.sh"
+  [ -f "${helper}" ] || return 0
+  { [ "${IS_DERIVED}" -eq 1 ] || [ "$(_role)" != "source" ]; } && return 0   # só a FONTE julga (adotante, hub e porta não)
+  local _R="REGRA 106 (Superfície que viaja passa pela varredura de vazamento da publicação)"
+  local _vm="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" roots=() targets=() r
+  [ -f "${_vm}" ] && while IFS= read -r r; do [ -n "${r}" ] && roots+=("${r}"); done < <(bash "${_vm}" --repo "${REPO_ROOT}" --emit-scrub-roots 2>/dev/null || true)
+  # manifesto mudo: a REGRA 36 já o acusa HARD pelo nome; repetir aqui só dobraria a contagem
+  [ "${#roots[@]}" -gt 0 ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    local under=0
+    for r in "${roots[@]}"; do case "${ONLY_PATH}" in "${REPO_ROOT}/${r}"/*) under=1 ;; esac; done
+    [ "${under}" = "1" ] || return 0
+    targets=("${ONLY_PATH}")
+  else
+    for r in "${roots[@]}"; do [ -e "${REPO_ROOT}/${r}" ] && targets+=("${REPO_ROOT}/${r}"); done   # SÓ o que viaja: docs/evolution e docs/analysis são core-only
+  fi
+  [ "${#targets[@]}" -gt 0 ] || return 0
+  local members="${REPO_ROOT}/docs/evolution/federation/members.yaml" _fam="word,home" _margs=()
+  if [ -r "${members}" ]; then
+    _margs=(--members "${members}")
+  else
+    _fam="home"
+    [ -z "${ONLY_PATH}" ] && violation "SOFT" "${members}" "${_R}: [NAO-VERIFICADO] registro da federação ausente na fonte — os ids onion-* de adotante NÃO foram varridos; só o caminho de máquina"
+  fi
+  local _out _hrc=0 _err _f _n _d _fam_l
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(LC_ALL=C bash "${helper}" "${_margs[@]}" --families "${_fam}" -- "${targets[@]}" 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  # um HARD por (família, arquivo, id), com as linhas: 9 achados num arquivo são UM conserto
+  while IFS=$'\t' read -r _fam_l _f _d _n; do
+    [ -n "${_f:-}" ] || continue
+    if [ "${_fam_l}" = "word" ]; then
+      violation "HARD" "${_f}" "${_R}: [id-onion] linha(s) ${_n}: id de adotante '${_d}' na superfície que viaja — é o nome de um repo de adotante, e a porta pública o barraria no (5a); generalize (\"um adotante de campo\"). Porte e porta (kind port/door) não contam"
+    else
+      violation "HARD" "${_f}" "${_R}: [caminho-de-maquina] linha(s) ${_n}: caminho sob a home de uma conta REAL desta máquina ou do registro (a conta não é impressa: o log do CI é público) — use \$HOME, um caminho relativo ou /home/<user>/ (a linha está acima; a varredura é a do door-leak-scan.sh, família home)"
+    fi
+  done < <(printf '%s\n' "${_out}" | awk -F'\t' 'NF>=4 { k=$1 FS $2 FS ($1=="word" ? $4 : "-"); if (!(k in n)) ord[++c]=k
+                                                         n[k]=(k in n) ? n[k] "," $3 : $3 }
+                                                END { for (i=1;i<=c;i++) print ord[i] "\t" n[ord[i]] }')
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" "${helper}" "${_R}: a varredura NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — a superfície que viaja não foi verificada; isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_door_leak_scan
+
 # ===========================================================================
 # REGRA 102 — Chave de frontmatter de agente pertence à allowlist (oficiais + as da casa) [HARD + SOFT]
 # previne: typo de chave de agente (`tool:` no lugar de `tools:`, `modle:`) que o Claude Code ignora em silêncio

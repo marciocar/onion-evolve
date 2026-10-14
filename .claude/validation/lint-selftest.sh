@@ -26086,6 +26086,7 @@ run_publish_selftests() {
   cp "${sut}" "${core}/ops/publish-door.sh"
   cp "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${core}/.claude/validation/" 2>/dev/null || true
   cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" "${core}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/validation/door-leak-scan.sh" "${core}/.claude/validation/"   # o (5a) mora aqui desde 2026-10-14
   cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${core}/.claude/utils/adopt/"
   printf '# agente\n' > "${core}/.claude/agents/a.md"
   # o materializador ESBOÇADO: mesma interface do real (<dest> --role R [--from X] [--force-role-change])
@@ -26501,6 +26502,7 @@ run_publish_release_selftests() {
   cp "${sut}" "${core}/ops/publish-door.sh"
   cp "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${core}/.claude/validation/" 2>/dev/null || true
   cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" "${core}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/validation/door-leak-scan.sh" "${core}/.claude/validation/"   # o (5a) mora aqui desde 2026-10-14
   cp "${REPO_ROOT}/.claude/validation/projection-safety.sh" "${core}/.claude/validation/"
   cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${core}/.claude/utils/adopt/"
   cp "${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh" "${core}/.claude/utils/adopt/"
@@ -30317,6 +30319,176 @@ EOF_MUT
   rm -rf "${sb}"
 }
 _family run_direct_provider_api_selftests
+
+# Família door_leak_scan — REGRA 106 (Superfície que viaja passa pela varredura de vazamento da publicação).
+# DANO MEDIDO (2026-10-13, dois ensaios de `/meta:publish --all` na mesma noite): três portas reprovadas
+# no (5a) do motor por caminho de máquina (#1096) e por id `onion-*` de adotante (#1097) que entraram com
+# o lint verde. A guarda é o MESMO código do (5a), extraído para door-leak-scan.sh. A bancada roda o
+# lint REAL num sandbox (modo cheio = CI; `--only` = pre-commit), com contas e ids DERIVADOS de um
+# registro falso: nenhum nome real aqui (a família vive em .claude/validation/, que viaja).
+# Casos: (a) id onion-<adotante> num arquivo que viaja → HARD · (b) caminho de máquina num comentário que
+# viaja → HARD · (c) porte/porta (kind port/door) e id maior que contém o id → passa · (d) placeholder
+# /home/<user>/, /home/conta/, $HOME → passa · (e) o mesmo termo em docs/evolution e docs/analysis →
+# passa · (f) adotante sem registro, e porta → passa calado · (g) fonte sem registro → SOFT NAO-VERIFICADO
+# e o caminho de máquina AINDA é HARD · (h) PARIDADE: tudo que o motor acusa, o lint acusa (REGRA 106 ou
+# REGRA 36) · (i) o motor não tem varredura própria. (m) mutantes, um por cura.
+run_door_leak_scan_selftests() {
+  local dls="${REPO_ROOT}/.claude/validation/door-leak-scan.sh"
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  [ -f "${dls}" ] && [ -f "${lint}" ] || { record_fail "door-leak-scan" "helper ou lint ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "door-leak-scan: python3 ausente"; return; }
+  local sd; sd="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${sd}/.claude/utils" "${sd}/.claude/commands/x" "${sd}/docs/evolution/federation" "${sd}/docs/analysis"
+  cp -a "${REPO_ROOT}/.claude/validation" "${sd}/.claude/"
+  cp -a "${REPO_ROOT}/.claude/utils/adopt" "${sd}/.claude/utils/"
+  # a própria bancada cita os nomes inventados desta família: na cópia ela seria um achado legítimo e
+  # embaralharia a contagem exata do caso (e). A bancada não é o objeto aqui; as fixtures plantadas são.
+  rm -f "${sd}/.claude/.onion-version" "${sd}/.claude/validation/lint-selftest.sh"
+  # o registro falso: a conta `fulanox` só existe por ele (local_path) — é assim que o motor deriva contas
+  local M="${sd}/docs/evolution/federation/members.yaml"
+  { printf 'members:\n'
+    printf '  - id: onion-acme\n    kind: adopter\n    local_path: "/home/fulanox/onion-acme"\n'
+    printf '  - id: acmefake\n    kind: adopter\n    local_path: "/home/fulanox/acmefake"\n'
+    printf '  - id: onion-portx\n    kind: port\n'
+    printf '  - id: onion-doorx\n    kind: door\n'
+  } > "${M}"
+  local X="${sd}/.claude/commands/x"
+  printf 'credito: sinal do onion-acme\n' > "${X}/leak-id.md"
+  mkdir -p "${sd}/.claude/validation/fixtures/dls"
+  printf '#!/usr/bin/env bash\n# medido em /home/fulanox/repo/x\n' > "${sd}/.claude/validation/fixtures/dls/leak-home.sh"
+  printf 'o porte onion-portx e a porta onion-doorx, em github.com/dono/onion-portx; e onion-acmexyz\n' > "${X}/public.md"
+  printf 'exemplo /home/<user>/x, /home/conta/x e $HOME/x\n' > "${X}/placeholder.md"
+  printf 'sinal do onion-acme em /home/fulanox/x\n' > "${sd}/docs/evolution/n.md"
+  printf 'sinal do onion-acme em /home/fulanox/x\n' > "${sd}/docs/analysis/n.md"
+  printf 'case da Megafakecorp\n' > "${X}/name.md"
+  printf 'crédito ao acmefake\n' > "${X}/subid.md"
+  local T; T="$(TMPDIR=/tmp mktemp)"; printf 'Megafakecorp\n' > "${T}"
+  ( cd "${sd}" && git init -q . && git add -A ) >/dev/null 2>&1
+  local o rc n
+  _dls_full() { o="$(cd "${sd}" && ONION_CLIENT_TERMS_FILE="${T}" LC_ALL=C bash .claude/validation/lint-artifacts.sh 2>&1)" || true; }
+  _dls_only() { o="$(cd "${sd}" && ONION_CLIENT_TERMS_FILE="${T}" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="$1" 2>&1)" || true; }
+  _r106() { grep -F 'REGRA 106 (Superfície que viaja passa pela varredura de vazamento da publicação)' <<< "${o}" || true; }
+
+  # ── modo CHEIO (o do CI): uma passada julga (a)–(e) de uma vez ─────────────────────────────────
+  _dls_full; local full="${o}" r; r="$(_r106)"
+  if grep -qF '.claude/commands/x/leak-id.md: REGRA 106' <<< "${r}" && grep -qF "[id-onion] linha(s) 1: id de adotante 'onion-acme'" <<< "${r}"; then
+    record_pass "door-leak-scan: (a) id onion-<adotante> num arquivo que viaja ⇒ REGRA 106 HARD (modo cheio)"
+  else record_fail "door-leak-scan: (a) id onion-* passou" "$(head -3 <<< "${r}" | tr '\n' '|')"; fi
+  if grep -qF 'fixtures/dls/leak-home.sh: REGRA 106' <<< "${r}" && grep -qF '[caminho-de-maquina] linha(s) 2:' <<< "${r}" && ! grep -q 'fulanox' <<< "${r}"; then
+    record_pass "door-leak-scan: (b) caminho de máquina num comentário de fixture que viaja ⇒ HARD, sem imprimir a conta"
+  else record_fail "door-leak-scan: (b) caminho de máquina" "$(head -3 <<< "${r}" | tr '\n' '|')"; fi
+  if ! grep -qF 'public.md' <<< "${r}"; then
+    record_pass "door-leak-scan: (c) porte e porta (kind port/door), em URL pública, e id maior que contém o id ⇒ passam"
+  else record_fail "door-leak-scan: (c) público acusado" "$(grep -F public.md <<< "${r}" | head -2 | tr '\n' '|')"; fi
+  if ! grep -qF 'placeholder.md' <<< "${r}"; then
+    record_pass "door-leak-scan: (d) /home/<user>/, /home/conta/ e \$HOME ⇒ passam (conta inventada é dado de teste)"
+  else record_fail "door-leak-scan: (d) placeholder acusado" "$(grep -F placeholder.md <<< "${r}" | head -2 | tr '\n' '|')"; fi
+  if ! grep -qE 'docs/(evolution|analysis)/n.md' <<< "${r}" && [ "$(grep -c . <<< "${r}")" -eq 2 ]; then
+    record_pass "door-leak-scan: (e) o mesmo id e a mesma conta em docs/evolution e docs/analysis (core-only) ⇒ passam; exatamente 2 HARD"
+  else record_fail "door-leak-scan: (e) core-only acusado ou contagem" "n=$(grep -c . <<< "${r}") $(grep -E 'docs/' <<< "${r}" | head -2 | tr '\n' '|')"; fi
+
+  # ── (h) PARIDADE com o motor: o helper chamado COMO O MOTOR o chama (todas as famílias + termos) ──
+  local roots=() rr mo mrc miss=""
+  while IFS= read -r rr; do [ -n "${rr}" ] && [ -e "${sd}/${rr}" ] && roots+=("${sd}/${rr}"); done < <(bash "${sd}/.claude/utils/adopt/vendor-manifest.sh" --repo "${sd}" --emit-scrub-roots 2>/dev/null)
+  if mo="$(LC_ALL=C bash "${dls}" --members "${M}" --terms-file "${T}" -- "${roots[@]}" 2>&1)"; then mrc=0; else mrc=$?; fi
+  _dls_parity() {  # $1 = saída do motor · $2 = saída do lint → arquivos do motor que o lint NÃO acusou
+    local f
+    while IFS= read -r f; do
+      [ -n "${f}" ] || continue
+      grep -qE "^VIOLATION: ${f#${sd}/}: REGRA (106|36)|^VIOLATION: ${f#${sd}/}: .*\[vendor-scrub\]" <<< "$2" || printf '%s ' "${f#${sd}/}"
+    done < <(awk -F'\t' '{print $2}' <<< "$1" | sort -u)
+  }
+  miss="$(_dls_parity "${mo}" "${full}")"
+  if [ "${mrc}" -eq 1 ] && [ "$(awk -F'\t' '{print $1}' <<< "${mo}" | sort -u | tr '\n' ',')" = "home,sub,word," ] && [ -z "${miss}" ]; then
+    record_pass "door-leak-scan: (h) paridade — as 3 famílias que o motor acusa (sub/word/home) o lint acusa (REGRA 106 ou REGRA 36)"
+  else record_fail "door-leak-scan: (h) PARIDADE quebrada" "motor rc=${mrc} famílias=$(awk -F'\t' '{print $1}' <<< "${mo}" | sort -u | tr '\n' ',') lint não acusou: ${miss}"; fi
+
+  # ── (j) o CONTRATO do helper nos modos que a produção consome (lint: --families; motor: --terms-file) ──
+  local j1 j2 j3 jr1=0 jr2=0 jr3=0
+  j1="$(LC_ALL=C bash "${dls}" --members "${M}" --families word,home -- "${roots[@]}" 2>&1)" || jr1=$?
+  j2="$(LC_ALL=C bash "${dls}" --families home -- "${roots[@]}" 2>&1)" || jr2=$?
+  j3="$(LC_ALL=C bash "${dls}" --members "${sd}/nao-existe.yaml" --families word,home -- "${roots[@]}" 2>&1)" || jr3=$?
+  if [ "${jr1}" -eq 1 ] && [ "$(awk -F'\t' '{print $1}' <<< "${j1}" | sort -u | tr '\n' ',')" = "home,word," ] \
+     && [ "${jr2}" -eq 0 ] && [ -z "${j2}" ] \
+     && [ "${jr3}" -eq 2 ] && [ "$(bash "${dls}" --members "${M}" --emit-members-tsv | awk -F'\037' '$1=="onion-portx" {print $2}')" = "port" ]; then
+    record_pass "door-leak-scan: (j) contrato: --families filtra; sem registro a conta que só o registro conhece não é vista (teto) e word não roda; registro ilegível ⇒ rc 2 (não é limpo), --emit-members-tsv lê o kind"
+  else record_fail "door-leak-scan: (j) contrato do helper" "rc=${jr1}/${jr2}/${jr3} j1=$(awk -F'\t' '{print $1}' <<< "${j1}" | sort -u | tr '\n' ',') j2=$(awk -F'\t' '{print $1}' <<< "${j2}" | sort -u | tr '\n' ',')"; fi
+
+  # ── (i) o motor não tem varredura própria: chama o helper e não reescreve o grep ────────────────
+  local motor="${REPO_ROOT}/ops/publish-door.sh"
+  if [ ! -f "${motor}" ]; then record_skip "door-leak-scan: (i) motor de publicação ausente (adotante/porta) → pulado"
+  elif grep -qF 'bash "${LEAK_SCAN}" --members "${MEMBERS}" --terms-file' "${motor}" && grep -qF -- '--emit-members-tsv' "${motor}" \
+       && ! grep -qE 'grep -r[a-zA-Z]*w[a-zA-Z]*F|/home/\(\$\{_accts\}\)' "${motor}"; then
+    record_pass "door-leak-scan: (i) o (5a) do motor chama o helper (registro e varredura), sem grep próprio"
+  else record_fail "door-leak-scan: (i) o motor voltou a varrer por conta própria" "duas lógicas = paridade sem garantia"; fi
+
+  # ── modo --only (o do pre-commit) ──────────────────────────────────────────────────────────────
+  _dls_only "${X}/leak-id.md"
+  if grep -qF "[id-onion]" <<< "$(_r106)"; then record_pass "door-leak-scan: (a2) --only no arquivo que viaja ⇒ HARD"
+  else record_fail "door-leak-scan: (a2) --only" "$(_r106 | head -2 | tr '\n' '|')"; fi
+  _dls_only "${sd}/docs/evolution/n.md"
+  if [ -z "$(_r106)" ]; then record_pass "door-leak-scan: (e2) --only em arquivo core-only ⇒ não julga"
+  else record_fail "door-leak-scan: (e2) --only core-only" "$(_r106 | head -2 | tr '\n' '|')"; fi
+
+  # ── (f) adotante sem registro, e porta: declara pela regra e passa ─────────────────────────────
+  mv "${M}" "${M}.off"
+  printf 'framework: onion\nrole: adopted\n' > "${sd}/.claude/.onion-version"
+  _dls_only "${X}/leak-id.md"; local f1; f1="$(_r106)"
+  _dls_only "${sd}/.claude/validation/fixtures/dls/leak-home.sh"; f1="${f1}$(_r106)"
+  printf 'framework: onion\nrole: standalone\nkind: door\n' > "${sd}/.claude/.onion-version"
+  _dls_only "${sd}/.claude/validation/fixtures/dls/leak-home.sh"; f1="${f1}$(_r106)"
+  if [ -z "${f1}" ]; then record_pass "door-leak-scan: (f) adotante sem registro e porta ⇒ a regra não julga (o registro seria o do core; a porta é varrida na publicação)"
+  else record_fail "door-leak-scan: (f) adotante/porta acusado" "$(head -2 <<< "${f1}" | tr '\n' '|')"; fi
+  # ── (g) FONTE sem registro: declara NAO-VERIFICADO e o caminho de máquina continua HARD ────────
+  rm -f "${sd}/.claude/.onion-version"
+  printf '# medido em /home/%s/repo\n' "$(id -un)" > "${sd}/.claude/validation/fixtures/dls/leak-home.sh"
+  _dls_full; r="$(_r106)"
+  if grep -qF '[NAO-VERIFICADO] registro da federação ausente' <<< "${r}" && grep -qF '[caminho-de-maquina]' <<< "${r}" && ! grep -qF '[id-onion]' <<< "${r}"; then
+    record_pass "door-leak-scan: (g) fonte sem registro ⇒ SOFT NAO-VERIFICADO declarado; conta de quem roda ainda é HARD"
+  else record_fail "door-leak-scan: (g) fonte sem registro" "$(head -3 <<< "${r}" | tr '\n' '|')"; fi
+  printf '#!/usr/bin/env bash\n# medido em /home/fulanox/repo/x\n' > "${sd}/.claude/validation/fixtures/dls/leak-home.sh"
+  mv "${M}.off" "${M}"
+
+  # ── (m) MUTANTES — revertem cada cura na CÓPIA do sandbox e EXIGEM que o caso reprove ───────────
+  # linha: alvo@@@velho@@@novo@@@modo@@@arquivo-ou-caso
+  local line tgt old new mode arg rest dst bak bit
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    tgt="${line%%@@@*}"; rest="${line#*@@@}"; old="${rest%%@@@*}"; rest="${rest#*@@@}"; new="${rest%%@@@*}"; rest="${rest#*@@@}"
+    mode="${rest%%@@@*}"; arg="${rest#*@@@}"
+    if [ "${tgt}" = scan ]; then dst="${sd}/.claude/validation/door-leak-scan.sh"; else dst="${sd}/.claude/validation/lint-artifacts.sh"; fi
+    bak="${dst}.orig"; cp "${dst}" "${bak}"
+    if ! python3 -I -B -c 'import sys; p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read(); sys.exit(3) if s.count(a)!=1 else open(p,"w",encoding="utf-8").write(s.replace(a,b))' "${dst}" "${old}" "${new}"; then
+      record_fail "door-leak-scan: (m) mutante não aplicou" "${tgt}: ${old:0:60}"; mv "${bak}" "${dst}"; continue
+    fi
+    bit=0
+    case "${mode}" in
+      only-hit)    _dls_only "${sd}/${arg}"; [ -z "$(_r106 | grep -F '[')" ] && bit=1 ;;       # o HARD esperado SUMIU
+      only-silent) _dls_only "${sd}/${arg}"; [ -n "$(_r106)" ] && bit=1 ;;                    # o inocente foi acusado
+      adopter)     printf 'framework: onion\nrole: adopted\n' > "${sd}/.claude/.onion-version"
+                   _dls_only "${sd}/${arg}"; [ -n "$(_r106)" ] && bit=1; rm -f "${sd}/.claude/.onion-version" ;;
+      full-silent) _dls_full; grep -qE "${arg}" <<< "$(_r106)" && bit=1 ;;
+      parity)      _dls_full; [ -n "$(_dls_parity "${mo}" "${o}")" ] && bit=1 ;;
+    esac
+    mv "${bak}" "${dst}"
+    # lint que ABORTOU não é mordida: o HARD esperado "sumiria" por morte, não pela cura revertida
+    grep -qF '=== Sumário ===' <<< "${o}" || bit=2
+    if [ "${bit}" -eq 1 ]; then record_pass "door-leak-scan: (m) mutante morde → ${tgt}: ${old:0:50}"
+    elif [ "${bit}" -eq 2 ]; then record_fail "door-leak-scan: (m) mutante ABORTOU o lint (não prova nada)" "${tgt}: ${old:0:60}"
+    else record_fail "door-leak-scan: (m) mutante NÃO morde" "${tgt}: ${old:0:60} (${mode} ${arg})"; fi
+  done <<'EOF_MUT'
+scan@@@($2=="adopter"||$2=="method") && $1 ~ /^onion-/ {print $1}@@@0 {print $1}@@@only-hit@@@.claude/commands/x/leak-id.md
+scan@@@grep -rHnoE --exclude-dir=.git "/home/(${_accts})/"@@@grep -rHnoE --exclude-dir=.git "/home/(nobody-zz)/"@@@only-hit@@@.claude/validation/fixtures/dls/leak-home.sh
+scan@@@($2=="adopter"||$2=="method") && $1 ~ /^onion-/ {print $1}@@@$1 ~ /^onion-/ {print $1}@@@only-silent@@@.claude/commands/x/public.md
+scan@@@grep -rHnoiwF --exclude-dir=.git -f@@@grep -rHnoiF --exclude-dir=.git -f@@@only-silent@@@.claude/commands/x/public.md
+scan@@@"/home/(${_accts})/" -- "${PATHS[@]}"@@@"/home/[^/ ]+/" -- "${PATHS[@]}"@@@only-silent@@@.claude/commands/x/placeholder.md
+lint@@@{ [ "${IS_DERIVED}" -eq 1 ] || [ "$(_role)" != "source" ]; } && return 0   # só a FONTE@@@:   # só a FONTE@@@adopter@@@.claude/commands/x/leak-id.md
+lint@@@&& targets+=("${REPO_ROOT}/${r}"); done   # SÓ o que viaja@@@&& :; done; targets=("${REPO_ROOT}")   # SÓ o que viaja@@@full-silent@@@docs/(evolution|analysis)/n.md
+lint@@@local members="${REPO_ROOT}/docs/evolution/federation/members.yaml" _fam="word,home"@@@local members="${REPO_ROOT}/docs/evolution/federation/members.yaml" _fam="home"@@@parity@@@-
+EOF_MUT
+  rm -rf "${sd}" "${T}"
+}
+_family run_door_leak_scan_selftests
 
 # Modo kg-migrate-v3 — SAC-73 parte 1: a ferramenta de migração do corpus ao contrato v3
 # (.claude/utils/kg/kg-migrate-v3.py) cita datas, deriva provenance SÓ de fonte que o nó já traz,

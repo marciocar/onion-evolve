@@ -149,22 +149,13 @@ _load_members() {  # $1 = ref
 }
 
 # ── O registro: uma linha por membro (id, kind, role, remote, pin, local_path), comentário fora ──
-# Separador \037 (não tab): `IFS=$'\t' read` colapsa campos vazios consecutivos.
-_members_tsv() {
-  awk '
-    function clean(s) { sub(/^[^:]*:[[:space:]]*/,"",s); sub(/[[:space:]]+#.*$/,"",s)
-                        gsub(/"/,"",s); gsub(/\047/,"",s); sub(/[[:space:]].*$/,"",s); return s }
-    function flush() { if (id != "") printf "%s\037%s\037%s\037%s\037%s\037%s\n", id, kind, role, remote, pin, lp }
-    /^[[:space:]]*-[[:space:]]*id:[[:space:]]*/ { flush(); id=clean($0); kind=""; role=""; remote=""; pin=""; lp=""; next }
-    id != "" { l=$0; gsub(/^[[:space:]]+/,"",l)
-      if (l ~ /^kind:/ && kind=="") kind=clean(l)
-      else if (l ~ /^role:/ && role=="") role=clean(l)
-      else if (l ~ /^remote:/ && remote=="") remote=clean(l)
-      else if (l ~ /^onion_version:/ && pin=="") pin=clean(l)
-      else if (l ~ /^local_path:/ && lp=="") lp=clean(l) }
-    END { flush() }
-  ' "${MEMBERS}"
-}
+# Separador \037 (não tab): `IFS=$'\t' read` colapsa campos vazios consecutivos. O PARSER mora no
+# helper da varredura de vazamento desde 2026-10-14: o lint roda o mesmo código em todo PR (REGRA 106),
+# e dois parsers do registro seriam duas verdades sobre quem é adotante. O helper vem do CORE (mesma
+# versão deste motor), não da worktree da ref publicada.
+LEAK_SCAN="${CORE}/.claude/validation/door-leak-scan.sh"
+[ -f "${LEAK_SCAN}" ] || { echo "ERRO: ${LEAK_SCAN} ausente — sem ele o motor não lê o registro nem varre vazamento." >&2; exit 2; }
+_members_tsv() { bash "${LEAK_SCAN}" --members "${MEMBERS}" --emit-members-tsv; }
 
 # url clonável a partir do `remote:` do registro. github.com/x/y → https; caminho absoluto ou url
 # completa ficam como estão; `n/a` e texto livre não têm url.
@@ -822,42 +813,42 @@ _decl_out="$(cd "${CORE}" && bash "${WT}/.claude/validation/projection-safety.sh
 if [ "${_decl_rc}" -ne 0 ]; then
   echo "✗ (5a) a fonte privada de termos está AUSENTE (rc=${_decl_rc}; ONION_CLIENT_TERMS_FILE ou ~/.config/onion/client-terms.txt) — sem ela a varredura de nome privado não é medição." >&2; FAIL=1
 fi
-_terms_sub="$( { printf '%s\n' "${_terms_names}"
-                 printf '%s\n' "${_decl_out}"
-                 _members_tsv | awk -F'\037' '($2=="adopter"||$2=="method") && $1 !~ /^onion-/ && $1 !~ /^marcio/ && $1 !~ /^selftest-/ && length($1)>=4 {print $1}'
-               } 2>/dev/null | grep -v '^[[:space:]]*$' | sort -u || true)"
-_terms_word="$(_members_tsv | awk -F'\037' '($2=="adopter"||$2=="method") && $1 ~ /^onion-/ {print $1}' | sort -u || true)"
+# AS TRÊS FAMÍLIAS são varridas pelo door-leak-scan.sh — o MESMO código que a REGRA 106 (Superfície que
+# viaja passa pela varredura de vazamento da publicação) roda no lint de todo PR, desde 2026-10-14.
+# Medido em 2026-10-13: dois ensaios na mesma noite reprovaram três portas AQUI, no fim, por vazamento
+# que tinha entrado por PR mergeado com o lint verde (curados no #1096 e no #1097). Ficam no motor só
+# os nomes comerciais e a fonte privada (acima), cuja AUSÊNCIA ele trata como falha fechada; ids de
+# adotante, contas reais e a varredura são do helper. As contas são DERIVADAS (local_path do registro,
+# quem roda, passwd uid >= 1000), nunca uma lista de exemplos tolerados — `/home/conta/` em fixture é
+# dado de teste (1º dogfood: a forma larga acusou 3 fixtures inócuas; a passada adversarial achou a 3ª
+# conta real, que só o passwd conhecia). Teto: conta de OUTRA máquina fora do registro não é vista.
+_tf="$(mktemp)"
+{ printf '%s\n' "${_terms_names}"; printf '%s\n' "${_decl_out}"; } | grep -v '^[[:space:]]*$' | sort -u > "${_tf}" || true
 _leaks=""
 # O CHANGELOG DA RELEASE vai a público como mensagem da tag: passa pela MESMA varredura que o bundle
 # (C5 do Elenxo do versionamento). Os assuntos de commit do core são a superfície nova de vazamento.
 _scan=("${DEST}" "${NOTES}")
 _rel_path() { sed "s|^${DEST}/||; s|^${NOTES}\$|‹changelog da release›|"; }
-while IFS= read -r _t; do
-  [ -n "${_t}" ] || continue
-  _hit="$(grep -rilF --exclude-dir=.git -- "${_t}" "${_scan[@]}" 2>/dev/null | _rel_path | sed -n '1,5p' | tr '\n' ' ')"
+_dls_rc=0
+_dls_out="$(bash "${LEAK_SCAN}" --members "${MEMBERS}" --terms-file "${_tf}" -- "${_scan[@]}" 2>&1)" || _dls_rc=$?
+rm -f "${_tf}"
+if [ "${_dls_rc}" -ge 2 ]; then
+  echo "✗ (5a) a varredura de vazamento NÃO rodou (rc=${_dls_rc}): ${_dls_out:0:200}" >&2; FAIL=1
+elif [ "${_dls_rc}" -eq 1 ]; then
+  _hit="$(printf '%s\n' "${_dls_out}" | awk -F'\t' '$1=="sub" {print $2}' | sort -u | _rel_path | sed -n '1,5p' | tr '\n' ' ')"
   [ -n "${_hit}" ] && _leaks="${_leaks}    termo de adotante em: ${_hit}"$'\n'
-done <<< "${_terms_sub}"
-while IFS= read -r _t; do
-  [ -n "${_t}" ] || continue
-  _hit="$(grep -rilwF --exclude-dir=.git -- "${_t}" "${_scan[@]}" 2>/dev/null | _rel_path | sed -n '1,5p' | tr '\n' ' ')"
-  [ -n "${_hit}" ] && _leaks="${_leaks}    id '${_t}' (prefixo onion-) em: ${_hit}"$'\n'
-done <<< "${_terms_word}"
-# As CONTAS reais são DERIVADAS — dos `local_path` do registro, de quem roda e das contas humanas da
-# máquina (passwd, uid >= 1000 com home em /home) —, nunca uma lista de exemplos tolerados: `/home/conta/`
-# e `/home/x/` em fixture são dado de teste, e uma lista de "genéricos permitidos" falharia pelo
-# vocabulário (1º dogfood: a forma larga acusou 3 fixtures inócuas ao lado das 2 contas reais; a
-# passada adversarial achou a 3ª conta real, que só o passwd conhecia). Teto declarado: conta de OUTRA
-# máquina que não esteja no registro não é vista.
-_accts="$( { _members_tsv | awk -F'\037' '{print $6}' | sed -n 's#^/home/\([a-z_][a-z0-9_-]*\)/.*#\1#p'
-             id -un 2>/dev/null
-             getent passwd 2>/dev/null | awk -F: '$3>=1000 && $3<60000 && $6 ~ "^/home/" {print $1}'
-           } | grep -E '^[a-z_][a-z0-9_-]*$' | sort -u | paste -sd'|' -)"
-if [ -n "${_accts}" ]; then
-  _home_real="$(grep -rnoE --exclude-dir=.git "/home/(${_accts})/" "${_scan[@]}" 2>/dev/null | _rel_path || true)"
+  while IFS= read -r _t; do
+    [ -n "${_t}" ] || continue
+    _hit="$(printf '%s\n' "${_dls_out}" | awk -F'\t' -v t="${_t}" '$1=="word" && $4==t {print $2}' | sort -u | _rel_path | sed -n '1,5p' | tr '\n' ' ')"
+    _leaks="${_leaks}    id '${_t}' (prefixo onion-) em: ${_hit}"$'\n'
+  done < <(printf '%s\n' "${_dls_out}" | awk -F'\t' '$1=="word" {print $4}' | sort -u)
+  _home_real="$(printf '%s\n' "${_dls_out}" | awk -F'\t' '$1=="home" {print $2 ":" $3 ":" $4}' | _rel_path)"
   if [ -n "${_home_real}" ]; then
     _nh="$(printf '%s\n' "${_home_real}" | grep -c .)"
     _leaks="${_leaks}    caminho de máquina (conta real), ${_nh} ocorrência(s):"$'\n'"$(printf '%s\n' "${_home_real}" | head -10 | sed 's/^/      /')"$'\n'
   fi
+  # rc 1 sem família reconhecida é achado que o motor não sabe ler: acusa, nunca cala
+  [ -n "${_leaks}" ] || _leaks="    achado sem família reconhecida: ${_dls_out:0:200}"$'\n'
 fi
 if [ -n "${_leaks}" ]; then
   echo "✗ (5a) VAZAMENTO no bundle — a porta é PÚBLICA:" >&2
