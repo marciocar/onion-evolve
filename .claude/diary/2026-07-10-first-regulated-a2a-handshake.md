@@ -8,7 +8,7 @@ affects: [federation, transport, security]
 breadcrumb_for: [meta:co-evolve, meta:evolve]
 share_with: [collective]
 next_recommended: "2026-07-09-first-live-a2a-handshake"
-review_after: 2026-10-08
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -37,8 +37,19 @@ Execução por **cobertura autorizada** da ponta adormecida (commit isolado `cd6
   do bridge — gesto humano) · registro `2026-07-09-metagamify-dedicated-token` segue na fila aguardando
   aceite do maestro · branch `onion/a2a-sender-granaai` aguarda PR na sessão da granaai (não pushada).
 
+- **Estado em 2026-10-14 (re-teste):** a pubkey `granaai-1` segue pinada (`jwks/granaai-1.pem`, com `keys:
+  [granaai-1]` no `members.yaml`). O clock-trust e o propose-only seguem cobertos (`a2a-verify: relógio sem
+  prova de sync → veto clock-untrusted` e `receptor regulado → apply_mode:propose-only` passaram). Os
+  follow-ups de token dedicado foram triados (`inbox/_processed/2026-07-09-metagamify-dedicated-token.md` e
+  `2026-07-10-granaai-dedicated-token-redogfood.md`). Mudança que afeta a reprodução: desde 10-14 o
+  envelope de julho (sem `body_sha256`) é VETADO, e o `exp` é obrigatório. NÃO medido: se a branch
+  `onion/a2a-sender-granaai` foi mergeada no repo da granaai (é repo regulado, e este re-teste não o lê
+  por git).
+
 ## Interpretation
 O gate não mudou de natureza com o 2º remetente — mudou de **prova**: agora há 2 membros com chave
 (o cenário exato que motivou o kid-binding) e um deles é regulado, e o canal continuou gated de ponta a
 ponta. A latência caiu; o controle não. E o padrão fix→re-dogfood segue pagando: a guarda de relógio
 nasceu de uma frase do maestro de manhã e já estava no caminho crítico do handshake à noite.
+
+## Re-testada em 2026-10-14 — PARCIAL: (static, contra o vivo) o evento vale. O Evidence registra os follow-ups triados e o veto do formato de julho desde 10-14. Ficou NÃO medido o estado da branch remetente no repo da granaai.

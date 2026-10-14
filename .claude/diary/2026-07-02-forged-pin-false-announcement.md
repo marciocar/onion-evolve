@@ -8,7 +8,7 @@ affects: [meta, federation, co-evolution]
 breadcrumb_for: [meta:adopt, meta:recover, meta:co-announce, meta:co-evolve]
 share_with: [collective]
 next_recommended: "2026-07-02-work-models-eixo-e-decision"
-review_after: 2026-09-30
+review_after: 2027-01-12
 conflict_class: dynamic
 ---
 
@@ -35,3 +35,5 @@ Antes de qualquer anúncio "você já tem X" ou raciocínio sobre versão de mem
 `pin-integrity-check.sh` — nunca concluir do pin sem canário. Pin de stamp, members.yaml e anúncio
 são declarações; o artefato vendorizado é o fato. Regra irmã do "RODE o artefato" da entrada
 2026-07-01-audit-dogfood-finds-code-bugs.
+
+## Re-testada em 2026-10-14: (dynamic, rodei) `pin-integrity-check.sh` existe e o `/meta:adopt --update` o chama (`adopt.md` l.708); a família `pin_integrity` passou 5/5 (stamp ausente → untrusted). O `members.yaml` mantém a regra "pin só entra VERIFICADO por pin-integrity-check.sh, nunca do stamp declarado" nos comentários de vários membros.

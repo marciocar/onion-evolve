@@ -8,7 +8,7 @@ affects: [meta, federation, engineering]
 breadcrumb_for: [meta:adopt, meta:graph, meta:evolve]
 share_with: [collective]
 next_recommended: "2026-07-03-declared-vs-verified-family"
-review_after: 2026-10-06
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -29,7 +29,12 @@ nativo). Ao evoluir distribuição, pense em 3 camadas: **L1 → plugin/marketpl
 - Achado de campo (jq): o lint LOCAL mascarava o drift do grafo sem jq; o CI (com jq) pegou. Ver [[lint-graph-needs-jq]].
 - Blindagem: lint R22 (role-bundle drift-guard) + selftests (158→165 guardas). CI verde em todos os 5 PRs.
 - Doutrina reafirmada (ADR exchange-unit, não-decisão): **plugin não substitui `/meta:adopt`** — coexistem
-  por camada. Plugin ≠ produto público: marketplace privado é só um repo git → satisfaz "não-público" do Onion.
+  por camada. ~~Plugin ≠ produto público: marketplace privado é só um repo git → satisfaz "não-público" do Onion.~~
+  **SUPERADO (estado em 2026-10-14):** o marketplace é PÚBLICO. `gh repo view marciocar/onion-plugins` →
+  `PUBLIC`, e o `.claude-plugin/marketplace.json` da raiz aponta para ele (`git-subdir`). O core não tem mais
+  `plugins/` montado (F4): o bundle nasce na publicação (`/meta:publish onion-plugins`). Hoje são 5 plugins
+  (`onion-compliance`, `-design`, `-engineering`, `-meta`, `-product`), não os 6 de julho. O mapa de papel
+  vive em `.claude/utils/marketplace/roles.yaml`.
 
 ## Next crumb
 Fase 5 é operacional/interativa (gated Team/Enterprise) — runbook em
@@ -37,3 +42,5 @@ Fase 5 é operacional/interativa (gated Team/Enterprise) — runbook em
 engineering-side com suas doc-deps (`kb:`/`context` no capability contract) p/ o `--closure` incluir os
 docs L2; triar o sinal `inbox/2026-07-08-proposta-branch-onion-vendor` (síntese estratégica + interop A2A
 L3) num `/meta:evolve`. Ao re-testar: a Camada 1-via-plugin ainda é o padrão-comunidade vigente?
+
+## Re-testada em 2026-10-14 — PARCIAL: (static, contra a melhor fonte atual) o Signal das 3 camadas vale (L1 → plugin; L2+L3 → `/meta:adopt`). O Evidence foi corrigido: o marketplace é público, o bundle nasce na publicação e são 5 plugins.

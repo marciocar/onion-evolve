@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: [onion-orchestration, meta:orchestrate]
 share_with: [collective]
 next_recommended: "2026-07-03-sandbox-selftest-exposes-latent-bugs"
-review_after: 2026-10-01
+review_after: 2027-01-12
 conflict_class: conditional
 valid_when: "a ferramenta Workflow mantém resume por runId com cache por (prompt, opts) inalterados"
 ---
@@ -34,3 +34,5 @@ pagando só o delta.
 Em qualquer orquestração longa: guardar (scriptPath, runId, args) assim que o run lança — é o
 bilhete de resgate. Se um run morrer por limite de sessão, retomar após o reset em vez de
 relançar. Candidato a nota permanente na skill onion-orchestration se acontecer de novo.
+
+## Re-testada em 2026-10-14: (conditional, só o `valid_when`) a referência do Workflow tool no harness atual (skill `workflow-authoring`, seção Resume) diz: `Workflow({scriptPath, resumeFromRunId})` devolve do cache o maior prefixo inalterado de `agent()`, e "same script + same args → 100% cache hit"; a dica do `journal.jsonl` também está lá. A condição vale. Refinamento: a chave do cache é o PREFIXO inalterado de chamadas, não cada chamada isolada. O core segue usando o resume (`/meta:census`, `onion-orchestration` l.69 e l.310).

@@ -8,7 +8,7 @@ affects: [meta, process]
 breadcrumb_for: [meta:create-vertical, meta:adopt]
 share_with: []
 next_recommended: "2026-07-15-create-vertical-f2-fino-delega"
-review_after: 2026-10-13
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -32,3 +32,5 @@ Ao "ficar de olho" num adotante, reportar o conteúdo real do push e **não infe
 de ferramenta prevista pelo roadmap do core** — F3 do create-vertical ≠ regenerar o ⟨cliente⟩;
 é uso de campo. Re-teste = confrontar a regra contra o comportamento real do comando (static).
 Ver `[[2026-07-15-create-vertical-f2-fino-delega]]`.
+
+## Re-testada em 2026-10-14: (static, contra o comportamento real) o never-clobber segue estrutural nos helpers que o `/meta:create-vertical` compõe: `bootstrap-vertical: never-clobber` e `scaffold-book: never-clobber` passaram. Re-scaffold de vertical já construída continua um no-op, e a regra vale.

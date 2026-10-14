@@ -8,7 +8,7 @@ affects: [federation, transport, kg, adopt, lint, rfc-0005]
 breadcrumb_for: [meta:co-evolve, meta:evolve, meta:kg, meta:adopt]
 share_with: [collective]
 next_recommended: "2026-07-10-first-regulated-a2a-handshake"
-review_after: 2026-10-08
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -55,3 +55,5 @@ Três aprendizados que ficam:
 3. **As fronteiras desenhadas seguraram sob pressão real**: um-escritor-por-repo (parei de escrever
    na granaai no instante em que o beacon dela acendeu), hard-gate de serviço (token = gesto humano),
    pin-só-verificado (o 74c470e declarado ficou `pin-untrusted` pelo canário — honestidade > conveniência).
+
+## Re-testada em 2026-10-14: (static, contra a melhor fonte atual) as três lições seguem sustentadas pelo vivo: clock-trust no `a2a-verify` (caso `relógio sem prova de sync → veto clock-untrusted` passou); `write-stamp.sh` como regra em código (família `write_stamp` 7/7); o gate continua sendo o moat (a emenda da RFC-0004 de 10-14 só vale depois de spike e selo). É registro histórico, e nada no vivo o refuta.

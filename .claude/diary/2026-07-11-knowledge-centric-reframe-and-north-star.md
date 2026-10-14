@@ -8,7 +8,7 @@ affects: [strategy, identity, kg, north-star]
 breadcrumb_for: [meta:kg, meta:evolve, meta:co-evolve]
 share_with: [collective]
 next_recommended: "onion-decision-north-star-2026-07 (docs/analysis/)"
-review_after: 2026-10-09
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -36,8 +36,16 @@ não código) é a 1ª prova viva disso.
   (demanda é do eixo, não do Onion; zero adotante frio). Decisão reduzida a UMA tensão + o desempate
   `Q_COLD_ADOPTER`.
 
+- **Estado em 2026-10-14 (re-teste):** a tensão FOI DECIDIDA. O nó `D_NORTHSTAR_NS1_KG` (status
+  confirmed, 2026-08-06) registra a north-star = NS1, KG/conhecimento, decidida pelo maestro, com o
+  diferencial "grafo como SSOT-runtime" (`docs/onion/graph/onion-identity-2026-07.kg.yaml`). O
+  `Q_COLD_ADOPTER` segue `open` (re-verificado pelo `/meta:census` em 2026-09-01): o pull externo de um
+  adotante frio continua sem prova.
+
 ## Next crumb
-O desempate de maior alavancagem: **desenhar o experimento Q_COLD_ADOPTER** — o menor teste de "pull externo"
+~~O peso NS1 × NS3 é decisão pendente.~~ DECIDIDO em 08-06 (NS1). O desempate de maior alavancagem que resta: **desenhar o experimento Q_COLD_ADOPTER** — o menor teste de "pull externo"
 (1 adotante frio arms-length). Ele decide o peso NS1 (norte) × NS3 (hedge de caixa). Decisão de peso = do
 maestro (nível Criar). Doutrina registrada: **toda jornada de pesquisa vira `docs/evolution/research/<tema>-2026/`
 + diário + claims no KG** — foi o que consolidou esta rodada.
+
+## Re-testada em 2026-10-14 — PARCIAL: (static, contra o grafo de identidade) o reenquadramento vale. O Evidence registra a NS1 decidida em 08-06 e o `Q_COLD_ADOPTER` ainda aberto.

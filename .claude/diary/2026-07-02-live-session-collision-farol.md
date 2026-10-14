@@ -8,7 +8,7 @@ affects: [meta, federation, co-evolution]
 breadcrumb_for: [meta:adopt, meta:co-deliver, meta:co-relay, meta:co-evolve]
 share_with: [collective]
 next_recommended: "2026-07-02-forged-pin-false-announcement"
-review_after: 2026-09-30
+review_after: 2027-01-12
 conflict_class: conditional
 valid_when: "sessoes cross-repo (W1) continuam operando por path na mesma maquina, sem lock de harness"
 ---
@@ -34,3 +34,5 @@ Antes de checkout/escrita na working tree de repo alheio: `session-beacon.sh che
 = parar e coordenar com o maestro. Entrega em `inbound/` (untracked) dispensa o check. O farol é
 sinal, não trava: stale não bloqueia, o gate é humano. Regra irmã de "pin é hipótese"
 (2026-07-02-forged-pin-false-announcement): estado declarado ≠ posse verificada.
+
+## Re-testada em 2026-10-14: (conditional, só o `valid_when`) a condição vale: os adotantes seguem clonados por path nesta máquina e operados por `co-deliver`/`co-relay` locais, e não existe lock de harness entre repos. O farol segue ligado: `session-beacon-hook.sh` aparece em up/refresh/down no `.claude/settings.json`, e a família `session_beacon` passou 25/25 (agora com dono medido por processo e chave por worktree).
