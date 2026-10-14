@@ -25569,6 +25569,20 @@ role: hub"
   if [ "${_r}" -eq 2 ] && grep -qF "não a reimplemento" <<< "${_o}" && grep -qF "ffffffffffff" "${M}"; then
     record_pass "door-seal-pin: (o) sem ops/door-published-stamp.sh ⇒ rc=2 (não há 2ª leitura escondida)"
   else record_fail "door-seal-pin: (o) lib ausente" "rc=${_r} out=${_o:0:200}"; fi
+
+  # (p) ls-remote LEGÍVEL e clone QUEBRADO ⇒ rc=2 nomeando `clone-failed`, nunca "sem carimbo" (passada
+  #     adversarial de 2026-10-14: um mutante que tratasse clone-failed como no-stamp passava, e no --status
+  #     isso viraria SEM-CARIMBO contado como medido). O `git` esboçado delega tudo, menos o `clone`.
+  local _realgit; _realgit="$(command -v git)"
+  mkdir -p "${d}/gitstub"
+  printf '#!/usr/bin/env bash\nfor a in "$@"; do [ "$a" = clone ] && exit 128; done\nexec "%s" "$@"\n' "${_realgit}" > "${d}/gitstub/git"
+  chmod +x "${d}/gitstub/git"
+  _registry door "ffffffffffff"
+  if _o="$(PATH="${d}/gitstub:${PATH}" bash "${fakecore}/ops/door-seal-pin.sh" doorway-teste 2>&1)"; then _r=0; else _r=$?; fi
+  if [ "${_r}" -eq 2 ] && grep -qF "estado: clone-failed" <<< "${_o}" && ! grep -qF "NÃO traz carimbo" <<< "${_o}" \
+     && grep -qF "ffffffffffff" "${M}"; then
+    record_pass "door-seal-pin: (p) ls-remote legível e clone quebrado ⇒ rc=2 nomeando clone-failed (não vira 'sem carimbo')"
+  else record_fail "door-seal-pin: (p) clone quebrado" "rc=${_r} out=${_o:0:250}"; fi
   unset -f _seal _door_publish _registry
 }
 

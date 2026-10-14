@@ -4,21 +4,23 @@ date: 2026-10-14
 branch: fix/door-seal-pin-reads-remote
 reviewed_diff_sha256: 17f4c5d1b9bef71e2d993467ee5023f54d3ade1f5078a04db76a9a451c0f4809
 reviewed_code_sha256: 1815f5be500aa764572a039741bb34484f200af65b148c762db4ac1eb574a828
-findings_total: 3
-findings_real: 3
-findings_fixed: 3
-tokens: 0
-duration_min: 70
+findings_total: 6
+findings_real: 6
+findings_fixed: 6
+tokens: 75798
+duration_min: 210
 verdict: CORRIGIDO
 elenxo: sim
 nota: >-
   O ops/door-seal-pin.sh lia o carimbo do clone local da porta, que a publicação da F3 não atualiza, e
   recusou as quatro portas no PR #1100. A leitura do carimbo publicado saiu do --status para
-  ops/door-published-stamp.sh, e as duas pontas fazem source dela, sem fallback ao clone local. Três
-  achados, os três curados aqui. Dois vieram do dogfood e da passada própria: o ref de 40 caracteres dos
-  plugins e o prompt de credencial do git. O terceiro veio do lint: a REGRA 100 nas citações novas da
-  doutrina. O refutador independente (subagente code-reviewer) foi disparado sobre o diff e NÃO devolveu
-  veredito em cerca de 25 minutos. A passada que conta aqui é a minha, e isso fica declarado.
+  ops/door-published-stamp.sh, e as duas pontas fazem source dela, sem fallback ao clone local. Seis
+  achados, os seis curados aqui. Três são meus: o ref de 40 caracteres dos plugins (dogfood), o prompt
+  de credencial do git (passada própria) e a REGRA 100 nas citações novas da doutrina (lint). Os outros
+  três são do refutador independente (subagente code-reviewer), que voltou depois do 1º push. Ele não
+  achou nenhum caminho que carimbe pin não publicado ou não mergeado. Os três dele são baixos: guarda
+  do rm -rf mais fraca que antes, catraca do pipe-verdict frouxa e a falta de um caso para
+  clone-failed. Os tokens são só os do refutador.
 ---
 
 # Resíduo — REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)
@@ -64,7 +66,25 @@ O cache acabou carimbado à mão.
    tivesse) pegou como `[NEW]` as duas citações `ops/...` que eu escrevi em `publish-doctrine.md`.
    Reescrevi pelo nome do script, marcado como core-only.
 
-Suspeitas checadas e descartadas:
+Achados do refutador independente (subagente `code-reviewer`), que voltou depois do 1º push. Os três
+são de severidade baixa, e os três foram curados no 2º push:
+
+4. **Guarda do `rm -rf` mais fraca que antes.** O bloco antigo do `--status` protegia `tmp` com
+   `${tmp:?}`. A lib protegia `work`, que nunca chega vazio: com `mktemp -d` falho, `work` virava
+   `/<id>`. Cura: o `mktemp -d` recusa nas duas pontas (rc 3 no `--status`, rc 2 no carimbador), e a
+   lib exige que o pai de `work` exista.
+5. **Catraca do `pipe-verdict` frouxa.** O baseline dizia 2 para `ops/door-seal-pin.sh` e a varredura
+   contava 1. O sítio que sobrou, `printf | grep -qE`, é da classe EPIPE. Cura: here-string, com a
+   linha saindo do baseline, porque a contagem é 0.
+6. **Lacuna da bancada.** Nenhum caso cobria `clone-failed`, e um mutante que o tratasse como
+   `no-stamp` passava. Cura: caso (p), com um `git` esboçado que só quebra o `clone`. O mutante agora
+   reprova o (p).
+
+O refutador também descartou, com evidência: regressão no `--status` linha a linha, colisão dos
+`DPS_*`, `set -u`, pin curto ambíguo, grep das asserções em `LC_ALL=C` e caso verde-vazio nos
+casos (a), (i) e (o).
+
+Suspeitas que eu mesmo chequei e descartei:
 
 - regressão de estado no `--status`: NÃO-MEDIDO, SEM-CARIMBO e a contagem de `measured` foram
   comparados linha a linha com o bloco antigo, e os casos (c), (c2) e (c3) do publish estão verdes;
@@ -74,12 +94,13 @@ Suspeitas checadas e descartadas:
 ## Bancada (LC_ALL=C)
 
 - `door_seal_pin` foi refeita sobre um mundo falso sem rede. O remoto é um bare local, e o clone
-  registrado em `local_path` está no pin velho e sujo. São 13 casos, entre eles:
+  registrado em `local_path` está no pin velho e sujo. São 14 casos, entre eles:
   - (a) remoto com carimbo e clone local defasado: carimba o pin do remoto;
   - (c) remoto ilegível: rc 2, registro intacto, recusa declarada;
   - (j) remoto sem carimbo;
   - (n) marketplace;
-  - (o) lib ausente.
+  - (o) lib ausente;
+  - (p) ls-remote legível e clone quebrado (achado do refutador).
 - `publish` ganhou o caso (b2), que confere a dica do `--push`.
 - Mutantes, todos plantados com `ops/mutate-and-restore.sh`, todos reprovam:
   - voltar a ler o clone local: 8 casos vermelhos;

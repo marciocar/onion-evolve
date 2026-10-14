@@ -59,6 +59,9 @@ door_read_published() {
      || [ -z "${DPS_BRANCH}" ]; then
     DPS_BRANCH=""; DPS_STATE="unreadable"; return 2
   fi
+  # `work` tem de ser filho de um diretório que EXISTE: com `mktemp -d` falho no chamador ele viraria
+  # `/<id>` e o `rm -rf` mirava a raiz (passada adversarial, 2026-10-14)
+  [ -d "$(dirname "${work}")" ] || { DPS_STATE="clone-failed"; return 2; }
   rm -rf "${work:?}"
   if ! GIT_TERMINAL_PROMPT=0 git clone -q --depth 1 --no-checkout --branch "${DPS_BRANCH}" "${url}" "${work}" >/dev/null 2>&1; then
     DPS_STATE="clone-failed"; return 2
