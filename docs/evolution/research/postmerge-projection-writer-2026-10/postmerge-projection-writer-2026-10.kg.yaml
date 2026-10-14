@@ -8,7 +8,8 @@ meta:
                                # de primárias de 2026-10-14, wf_6babcd2c-1d8; a pergunta central segue aberta)
                                # e o comportamento de Actions; a metade doutrina (escritor único) é de 12m,
                                # mas a revisita real é o selo do maestro e o dogfood do B1.
-  # ═══ TETO: 103 NÓS ═══
+  # ═══ TETO: 104 NÓS ═══
+  # +1 em 2026-10-14 (tarde): D_SANDBOX_B1_APAGADO, o selo do maestro sobre o destino do sandbox que os E_DOGFOOD_B1_* mediram.
   # Teto subido de 96 para 103 (+7) em 2026-10-14: o dogfood do B1 rodou no sandbox público (T1–T6), com 6 nós
   # E_DOGFOOD_B1_* medidos, e o selo delegado D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA (kg-decide-seal.sh --new).
   # Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY, Q_B1_NON_FF_RACE_REDISPATCH e Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS viraram
@@ -1754,6 +1755,22 @@ nodes:
       locator: "pergunta com opções de 2026-10-14: «O dogfood refutou o B1 como desenhado e mediu uma variante viável com garantia mais fraca: executar, testar outra variante ou deixar gated?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
+  - id: D_SANDBOX_B1_APAGADO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Apagar»"
+    label: "o sandbox do B1 (repo público marciocar/onion-ruleset-sandbox) é apagado: as medições vivem no grafo, e um B1 futuro re-mede fresco contra o GitHub do dia"
+    narrative: "Selado por /meta:decide em 2026-10-14: escolhida «Apagar»; descartadas: «Arquivar» · «Manter como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «O que fazer com o sandbox do B1, que já cumpriu o papel?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
 edges:
   - from: E_MEDICAO_RULESET_E_PROJECOES_2026_10_14
     to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
@@ -2241,3 +2258,6 @@ edges:
   - from: E_FASE0_STRICT_LOCAL_EXECUTADA_PR_1101
     to: D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA
     edge_type: SUPPORTS
+  - from: D_SANDBOX_B1_APAGADO
+    to: D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA
+    edge_type: TRACES_TO
