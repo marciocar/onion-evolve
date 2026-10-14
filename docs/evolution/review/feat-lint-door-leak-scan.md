@@ -1,7 +1,8 @@
 ---
 branch: feat/lint-door-leak-scan
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 574f8e7db9e47a1d3488b41cc36341c460ba9c0f058014c4015e6c7d5ca4da89
+reviewed_code_sha256: d5dc2b9e183943baaa7f1579666078a61aa8c31584bce1984b2fe61b08f6b646
 findings_total: 4
 findings_real: 2
 findings_fixed: 2
