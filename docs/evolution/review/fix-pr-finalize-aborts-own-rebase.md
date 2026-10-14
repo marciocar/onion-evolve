@@ -1,7 +1,8 @@
 ---
 branch: fix/pr-finalize-aborts-own-rebase
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 77be6c949f2904a3456dfed28177a81bc14d7a8a163c066dbacb1b7a9c73c0bd
+reviewed_code_sha256: 5527b659ac0692bf66fb9bc9d63b3d3618efec7c81fb5c5c1ec02f901e9c68b1
 findings_total: 3
 findings_real: 2
 findings_fixed: 2
