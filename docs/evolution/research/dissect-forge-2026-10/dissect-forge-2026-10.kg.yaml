@@ -77,6 +77,38 @@ nodes:
       locator: "pergunta com opções de 2026-10-14: «O /meta:dissect viaja para quem?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
+  - id: D_DISSECT_REGUA_POR_ALVO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «--against <repo> (padrão = o Onion)»"
+    label: "o /meta:dissect ganha --against <repo>: a régua deixa de ser fixa no Onion, e num hub ou adotado o N1, o N3 e o plano de absorção se medem contra o repo dele"
+    narrative: "Issue SAC-135 no Linear. Selado por /meta:decide em 2026-10-14: escolhida «--against <repo> (padrão = o Onion)»; descartadas: «Dissect separado para o hub» · «Manter só o Onion»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Como generalizar a régua do /meta:dissect, hoje fixa no Onion?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
+  - id: D_DISSECT_MODO_ESTUDO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «--study: para no N2, sem veredito»"
+    label: "o /meta:dissect ganha --study: para no N2 sem veredito de absorção e deixa uma question aberta 'adotar?', e o censo o mostra como estudo"
+    narrative: "Issue SAC-135 no Linear. Selado por /meta:decide em 2026-10-14: escolhida «--study: para no N2, sem veredito»; descartadas: «Usar --level 2 como está»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «E o modo só de estudo, sem cobrar veredito?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
 edges:
   - from: E_DISSECT_QUASE_NAO_USADO
     to: Q_COSTURA_DISSECT_FORGE
@@ -89,6 +121,12 @@ edges:
     edge_type: SUPPORTS
   - from: D_DISSECT_VIAJA_PARA_TODOS_MENOS_MINI
     to: D_PLANO_DE_ABSORCAO_E_NO
+    edge_type: TRACES_TO
+  - from: D_DISSECT_REGUA_POR_ALVO
+    to: D_DISSECT_VIAJA_PARA_TODOS_MENOS_MINI
+    edge_type: TRACES_TO
+  - from: D_DISSECT_MODO_ESTUDO
+    to: D_DISSECT_REGUA_POR_ALVO
     edge_type: TRACES_TO
 
 external_edges:
