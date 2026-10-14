@@ -8612,7 +8612,7 @@ run_pre_push_selftests() {
       # a recusa NOMEIA o rebase alheio (sem ela o motor cairia no "HEAD destacado", que também não aborta,
       # mas diz a coisa errada — mutante medido que sobrevivia ao desfecho sozinho)
       if [ "${g}" = 1 ] && _rbdirty "${sb}/w" && grep -q 'rebase em curso nesta worktree' "${sb}/out" \
-         && git -C "${sb}/w" diff --name-only --diff-filter=U | grep -qx c.txt; then
+         && grep -qx c.txt <<< "$(git -C "${sb}/w" diff --name-only --diff-filter=U)"; then
         record_pass "pr-finalize: SAC-136 (k2) rebase ALHEIO em curso → recusa (rc=1) e NÃO o aborta (o conflito dele continua)"
       else record_fail "pr-finalize: SAC-136 (k2) rebase alheio abortado ou recusa sem nomeá-lo" \
         "rc=${g} rebase=$(_rbdirty "${sb}/w" && echo EM-CURSO || echo ABORTADO): $(tail -1 "${sb}/out")"; fi
