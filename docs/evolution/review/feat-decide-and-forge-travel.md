@@ -1,7 +1,8 @@
 ---
 branch: feat/decide-and-forge-travel
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 06f6d4837f49a9495284e09b6687ce18d40daeacbcfbbff80520e20f8a5ea2be
+reviewed_code_sha256: e7d01a7889fd69a2a79d967ec998ba998a0bacfe878d381cab656c98f16ef2fd
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
