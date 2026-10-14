@@ -11,7 +11,7 @@
 
 | Dimensão | Nº | Produtor |
 |----------|---:|----------|
-| Famílias na bancada | **261** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
+| Famílias na bancada | **262** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
 | Sítios de asserção (**não** asserções executadas) | **2117** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
 | Linhas do manifesto de fixtures | **118** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |

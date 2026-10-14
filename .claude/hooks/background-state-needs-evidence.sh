@@ -23,7 +23,11 @@
 # COMO: lê a última resposta do assistente E as chamadas de ferramenta do MESMO
 #   turno (desde a última mensagem do usuário). Se a prosa AFIRMA estado vivo de
 #   processo de fundo e o turno NÃO tem observação (`ps`/`pgrep`/`kill -0`/
-#   `jobs`/`gh pr checks`/`gh run`), devolve exit 2.
+#   `jobs`/`gh pr checks`/`gh run`), devolve exit 2. Desde 2026-10-14 (SAC-137) também contam
+#   como observação dois EVENTOS do harness no turno: a `<task-notification>` com status
+#   completed, e o lançamento de fundo (tool_result "Command running in background with ID")
+#   QUANDO a prosa relata que aguarda a notificação. Ler `tasks/X.output` deixou de contar.
+#   Lê só a CAUDA do transcript (lib/transcript-tail.py), com teto e fail-safe.
 #
 # TETO DECLARADO — e o teto que importa NÃO é o vocabulário, é O QUE ESTA GUARDA
 #   ASSUME SOBRE A FORMA DO TRANSCRIPT. Correção do Elenxo (F6): a 1ª redação declarava
@@ -51,10 +55,19 @@ _PAT_CLAIM_REV='(ainda (est[áa]|segue)? ?rodando|segue rodando|est[áa] rodando
 # (ele avisa `FutureWarning: Possible nested set`). O caso (b) reprovou porque o padrão não via
 # `ps -eo` — a guarda nasceria CEGA à observação que ela existe para exigir, acusando turno honesto.
 # Mesma classe de `bancada-mede-no-locale-do-hook`: o motor que avalia o padrão decide a sintaxe.
-_PAT_EVIDENCE='(\bps\s+-|\bps\s+[aux]|pgrep|pkill -0|kill -0|\bjobs\b|gh pr checks|gh run (list|view|watch)|TaskList|TaskGet|BashOutput|/proc/[0-9]+|tasks/[A-Za-z0-9]+\.output)'
+# ⚠️ `tasks/X.output` SAIU da lista em 2026-10-14 (SAC-137, rodada r11 do radar E3). Ler o arquivo de
+# saída NÃO prova que o processo SEGUE vivo — é a mesma "saída vazia indistinguível de progresso" que
+# forjou esta guarda — e a 2.1.300 passou a desestimular a leitura ("do not poll that file or sleep
+# while waiting"). A guarda premiava exatamente o hábito que o harness agora pede para largar. Ler o
+# arquivo DEPOIS da notificação continua ok; só não conta como observação de estado vivo.
+_PAT_EVIDENCE='(\bps\s+-|\bps\s+[aux]|pgrep|pkill -0|kill -0|\bjobs\b|gh pr checks|gh run (list|view|watch)|TaskList|TaskGet|BashOutput|/proc/[0-9]+)'
+# O RELATO HONESTO de quem lançou e espera: "aguardo a notificação", "serei notificado". Ele só vale
+# junto do LANÇAMENTO de fundo no mesmo turno (o tool_result do harness com o task id) — sem o
+# lançamento, a frase é só uma promessa e a afirmação de estado vivo segue vetada.
+_PAT_AWAIT='((aguard|esper|wait)\w*[^.\n]{0,40}notifica|notificad[oa] (quando|ao)|will be notified|notified when)'
 
-_assess() {   # $1 = arquivo com a PROSA · $2 = arquivo com as CHAMADAS do turno
-  python3 - "$1" "$2" "${_PAT_CLAIM}" "${_PAT_CLAIM_REV}" "${_PAT_EVIDENCE}" <<'PY'
+_assess() {   # $1 = PROSA · $2 = CHAMADAS do turno · $3 (opcional) = EVENTOS do harness no turno
+  python3 - "$1" "$2" "${_PAT_CLAIM}" "${_PAT_CLAIM_REV}" "${_PAT_EVIDENCE}" "${_PAT_AWAIT}" "${3:-}" <<'PY'
 import re, sys
 # ⚠️ ERRO DO PYTHON != OFENSA (F9 do Elenxo): a 1a versao usava exit 1 para ofensa, e um traceback
 # tambem sai 1 — logo regex invalida virava VETO com bullet VAZIO, acusando turno honesto na FALHA,
@@ -62,7 +75,13 @@ import re, sys
 try:
     prose = open(sys.argv[1], encoding="utf-8", errors="replace").read()
     calls = open(sys.argv[2], encoding="utf-8", errors="replace").read()
-    claim, claim_rev, ev = sys.argv[3], sys.argv[4], sys.argv[5]
+    claim, claim_rev, ev, await_pat = sys.argv[3], sys.argv[4], sys.argv[5], sys.argv[6]
+    # EVENTOS do harness, colhidos de rows que só o harness escreve (nunca de tool_use nem de saída de
+    # ferramenta, onde o literal pode aparecer citado — este próprio hook o cita): BG_LAUNCH <id> e
+    # TASK_DONE <id>, um por linha.
+    events = ""
+    if len(sys.argv) > 7 and sys.argv[7]:
+        events = open(sys.argv[7], encoding="utf-8", errors="replace").read()
     prose = re.sub(r"```.*?```", "", prose, flags=re.S)       # bloco de codigo nao e afirmacao
     prose = re.sub(r"`[^`\n]*`", " ", prose)                  # crase: cita a FORMA, nao afirma
     # ⚠️ EXONERACAO POR SENTENCA (F4/F6 do Elenxo, 6 falsos positivos provados). A 1a versao
@@ -92,6 +111,13 @@ try:
         sys.exit(0)                                            # nada afirmado -> cala
     if re.search(ev, calls, re.I):
         sys.exit(0)                                            # afirmou E observou -> ok
+    # A NOTIFICACAO de termino do harness no turno e observacao: e o harness quem diz o estado.
+    if re.search(r"^TASK_DONE\b", events, re.M):
+        sys.exit(0)
+    # LANCOU no turno e RELATA que espera a notificacao: o relato honesto que a 2.1.300 pede
+    # (medido 2026-10-14: "segue rodando em segundo plano; aguardo a notificacao" dava rc 2).
+    if re.search(r"^BG_LAUNCH\b", events, re.M) and re.search(await_pat, prose, re.I):
+        sys.exit(0)
     for h in hits[:3]:
         print(h)
     sys.exit(1)
@@ -193,6 +219,145 @@ if [ "${1:-}" = "--selftest" ]; then
   if [ "${_rc}" -eq 0 ]; then record_pass_or_echo "(k) stop_hook_active=true → nao veta (anti-loop)"
   else _fail_e2e "(k) anti-loop quebrado" "rc=${_rc}"; fi
 
+  # ══ SAC-137 (rodada r11 do radar E3, 2026-10-14): CAUDA do transcript + eventos do harness ═══════
+  _tr="${_d}/trace"
+  _gen() {   # $1 = cenario · $2 = arquivo  (fixtures sinteticas; nada do transcript real)
+    python3 - "$1" "$2" <<'PY'
+import json, sys
+kind, out = sys.argv[1], sys.argv[2]
+meta = {"k%02d" % i: "v%d" % i for i in range(25)}
+U = lambda c, **kw: dict(meta, type="user", message={"role": "user", "content": c}, **kw)
+A = lambda *c: dict(meta, type="assistant", message={"content": list(c)})
+txt = lambda s: {"type": "text", "text": s}
+bash = lambda s: {"type": "tool_use", "name": "Bash", "input": {"command": s}}
+res = lambda s: [{"type": "tool_result", "content": s}]
+rows = []
+if kind == "big":
+    # MILHARES de linhas antes do turno, com `ps` e afirmacoes em turnos VELHOS: se a janela vazar
+    # para tras do inicio do turno, o `ps` velho exonera e o veredito muda
+    for i in range(30000):
+        rows += [U("pedido %d" % i), A(bash("ps -eo pid,args | grep lint")), A(txt("O gate segue rodando."))]
+    rows += [U("e o gate?"), A(bash("cat /tmp/out")), U(res("")), A(txt("gate ainda rodando (saida vazia)"))]
+elif kind in ("long-lie", "long-honest"):
+    # TURNO AUTONOMO LONGO: o ultimo user que nao e tool_result fica ~2 MB antes do fim (varios blocos)
+    rows += [U("pedido velho"), A(bash("ps -eo pid,args"))]
+    rows += [U("vai ate o fim")]
+    rows += [A(txt("O gate ainda esta rodando."))] if kind == "long-lie" else [A(bash("ps -eo pid,etime,args | grep lint"))]
+    for i in range(3000):
+        rows += [A(bash("true " + "z" * 300)), U(res("w" * 300))]
+    rows += [A(txt("Seguindo." if kind == "long-lie" else "O gate ainda esta rodando (1 processo vivo)."))]
+elif kind == "straddle":
+    # a linha que ABRE o turno cortada pela fronteira do 1o bloco lido (1 MiB do fim, o BLOCK do lib):
+    # se o pedaco cortado se perder, a cauda passa reto pelo inicio do turno e acha o `ps` do turno velho
+    rows += [U("pedido velho"), A(bash("ps -eo pid,args"))]
+    head = [U("vai " + "p" * 3000), A(txt("O gate ainda esta rodando."))]
+    tail, size = [], len(json.dumps(head[1])) + 1
+    while size < (1 << 20) - 1500:
+        f = [A(bash("true " + "z" * 300)), U(res("w" * 300))]
+        tail += f; size += sum(len(json.dumps(r)) + 1 for r in f)
+    rows += head + tail
+elif kind in ("launch-await", "await-only", "launch-only"):
+    rows += [U("roda o merge")]
+    if kind != "await-only":
+        rows += [A({"type": "tool_use", "name": "Bash", "input": {"command": "bash merge-serial.sh", "run_in_background": True}}),
+                 U(res("Command running in background with ID: b1x2y3. Output is being written to: /tmp/s/tasks/b1x2y3.output. "
+                       "You will be notified when it completes — do not poll that file or sleep while waiting."),
+                   toolUseResult={"backgroundTaskId": "b1x2y3"})]
+    rows += [A(txt("O merge-serial segue rodando em segundo plano." if kind == "launch-only" else
+                   "O merge-serial segue rodando em segundo plano; aguardo a notificação de término."))]
+elif kind == "output-only":
+    rows += [U("e o gate?"), A({"type": "tool_use", "name": "Read", "input": {"file_path": "/tmp/s/tasks/b1x2y3.output"}}),
+             U(res("")), A(bash("tail -5 /tmp/s/tasks/b1x2y3.output")), U(res("")), A(txt("O gate ainda esta rodando."))]
+elif kind in ("notif-turn", "notif-queued", "notif-quoted"):
+    n = ("<task-notification>\n<task-id>b1x2y3</task-id>\n<output-file>/tmp/s/tasks/b1x2y3.output</output-file>\n"
+         "<status>completed</status>\n<summary>Background command \"lint\" completed (exit code 0)</summary>\n</task-notification>")
+    if kind == "notif-turn":
+        rows += [U(n, origin={"kind": "task-notification"})]
+    else:
+        rows += [U("e o merge?")]
+        if kind == "notif-queued":
+            rows += [dict(meta, type="attachment", attachment={"type": "queued_command", "prompt": n})]
+        else:   # o MESMO literal citado numa saida de ferramenta NAO e evento do harness
+            rows += [A(bash("cat hook.sh")), U(res(n))]
+    rows += [A(txt("O merge segue em curso no CI."))]
+with open(out, "w", encoding="utf-8") as fh:
+    for r in rows:
+        fh.write(json.dumps(r) + "\n")
+PY
+  }
+  _trace_mode() { sed -n 's/^mode=\([a-z]*\) bytes=\([0-9]*\)$/\1 \2/p' "${_tr}" 2>/dev/null | tail -1; }
+
+  # (l) TRANSCRIPT GRANDE sintetico (90 mil linhas antes do turno): o MESMO veredito (acusa), pelo
+  #     caminho da cauda lendo < 2 MiB, e mais rapido que um parse inteiro do arquivo — que e o custo
+  #     da versao antiga (~1,0 s em 44,7 MB, medido 2026-10-14).
+  _gen big "${_tp}"; : > "${_tr}"
+  _t0="$(date +%s%N)"; _rc=0; ONION_TRANSCRIPT_TAIL_TRACE="${_tr}" _run_hook "${_tp}" || _rc=$?; _t1="$(date +%s%N)"
+  _hook_ms=$(( (_t1 - _t0) / 1000000 ))
+  _f0="$(date +%s%N)"; python3 -c 'import json,sys
+for l in open(sys.argv[1], encoding="utf-8", errors="replace"):
+    try: json.loads(l)
+    except Exception: pass' "${_tp}"; _f1="$(date +%s%N)"
+  _full_ms=$(( (_f1 - _f0) / 1000000 ))
+  read -r _mode _bytes <<< "$(_trace_mode)"
+  if [ "${_rc}" -eq 2 ] && [ "${_mode:-}" = "tail" ] && [ "${_bytes:-9999999999}" -lt 2097152 ] && [ "${_hook_ms}" -lt "${_full_ms}" ]; then
+    record_pass_or_echo "(l) transcript de $(( $(stat -c %s "${_tp}") / 1048576 )) MiB: mesmo veredito pela CAUDA (${_bytes} bytes, ${_hook_ms} ms < parse inteiro ${_full_ms} ms)"
+  else _fail_e2e "(l) cauda em transcript grande" "rc=${_rc} trace=[${_mode:-sem trace} ${_bytes:-}] hook=${_hook_ms}ms parse-inteiro=${_full_ms}ms"; fi
+
+  # (m) TURNO AUTONOMO LONGO — o caso que pode quebrar: o inicio do turno ~2 MB antes do fim.
+  #     (m1) afirmacao falsa no COMECO do turno, sem observacao → acusa, pela cauda em varios blocos;
+  #     (m2) o mesmo com teto de 64 KiB → o fail-safe rele inteiro (mode=full) e AINDA acusa;
+  #     (m3) `ps` no comeco e a afirmacao no fim → cala (a observacao longe do fim continua vista).
+  _gen long-lie "${_tp}"; : > "${_tr}"; _rc=0; ONION_TRANSCRIPT_TAIL_TRACE="${_tr}" _run_hook "${_tp}" || _rc=$?
+  read -r _mode _bytes <<< "$(_trace_mode)"
+  if [ "${_rc}" -eq 2 ] && [ "${_mode:-}" = "tail" ] && [ "${_bytes:-0}" -gt 1048576 ]; then
+    record_pass_or_echo "(m1) turno autonomo longo (${_bytes} bytes, varios blocos): a frase falsa no comeco do turno → ACUSA"
+  else _fail_e2e "(m1) turno longo pela cauda" "rc=${_rc} trace=[${_mode:-sem trace} ${_bytes:-}] saida=[${_out}]"; fi
+  : > "${_tr}"; _rc=0; ONION_STOP_HOOK_TAIL_MAX_BYTES=65536 ONION_TRANSCRIPT_TAIL_TRACE="${_tr}" _run_hook "${_tp}" || _rc=$?
+  read -r _mode _bytes <<< "$(_trace_mode)"
+  if [ "${_rc}" -eq 2 ] && [ "${_mode:-}" = "full" ]; then
+    record_pass_or_echo "(m2) teto de 64 KiB estourado sem achar o inicio do turno → rele inteiro e AINDA acusa (nunca silencio)"
+  else _fail_e2e "(m2) fail-safe do teto" "rc=${_rc} trace=[${_mode:-sem trace} ${_bytes:-}]"; fi
+  _gen long-honest "${_tp}"; : > "${_tr}"; _rc=0; ONION_TRANSCRIPT_TAIL_TRACE="${_tr}" _run_hook "${_tp}" || _rc=$?
+  read -r _mode _bytes <<< "$(_trace_mode)"
+  if [ "${_rc}" -eq 0 ] && [ "${_mode:-}" = "tail" ]; then
+    record_pass_or_echo "(m3) turno longo honesto (ps no comeco, afirmacao no fim) → CALA pela cauda"
+  else _fail_e2e "(m3) turno longo honesto" "rc=${_rc} trace=[${_mode:-sem trace} ${_bytes:-}] saida=[${_out}]"; fi
+
+  # (m4) a linha que ABRE o turno atravessa a fronteira de bloco: o pedaco de linha tem de ser
+  #      emendado ao bloco anterior, senao a cauda passa reto e acha o `ps` do turno velho → acusa
+  _gen straddle "${_tp}"; : > "${_tr}"; _rc=0; ONION_TRANSCRIPT_TAIL_TRACE="${_tr}" _run_hook "${_tp}" || _rc=$?
+  read -r _mode _bytes <<< "$(_trace_mode)"
+  if [ "${_rc}" -eq 2 ] && [ "${_mode:-}" = "tail" ]; then
+    record_pass_or_echo "(m4) inicio do turno cortado pela fronteira do bloco → emendado, e a frase falsa ACUSA"
+  else _fail_e2e "(m4) linha cortada pela fronteira de bloco" "rc=${_rc} trace=[${_mode:-sem trace} ${_bytes:-}]"; fi
+
+  # (n) LANCOU em fundo e relata que AGUARDA A NOTIFICACAO — a frase medida que dava rc 2. Cala.
+  _gen launch-await "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  if [ "${_rc}" -eq 0 ]; then record_pass_or_echo "(n) lancamento de fundo + 'aguardo a notificacao' → CALA"
+  else _fail_e2e "(n) veta o relato honesto de esperar a notificacao" "rc=${_rc} saida=[${_out}]"; fi
+
+  # (o) a frase de espera SEM lancamento nem observacao → continua vetado; e o lancamento sem o
+  #     relato de espera tambem (afirmar 'segue rodando' so porque lancou nao e observacao).
+  _gen await-only "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  _gen launch-only "${_tp}"; _rc2=0; _run_hook "${_tp}" || _rc2=$?
+  if [ "${_rc}" -eq 2 ] && [ "${_rc2}" -eq 2 ]; then record_pass_or_echo "(o) 'segue rodando' sem lancamento (ou lancamento sem relato de espera) → ACUSA"
+  else _fail_e2e "(o) a espera virou licenca" "await-only rc=${_rc} · launch-only rc=${_rc2}"; fi
+
+  # (p) so LER tasks/X.output (Read e tail) ja nao prova estado vivo → acusa
+  _gen output-only "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  if [ "${_rc}" -eq 2 ]; then record_pass_or_echo "(p) ler tasks/X.output nao e observacao de processo vivo → ACUSA"
+  else _fail_e2e "(p) a leitura do arquivo de saida ainda conta como prova" "rc=${_rc}"; fi
+
+  # (q) a NOTIFICACAO de termino do harness no turno e observacao — como row que abre o turno e como
+  #     attachment queued_command; o MESMO literal citado numa saida de ferramenta NAO conta.
+  _gen notif-turn "${_tp}"; _rc=0; _run_hook "${_tp}" || _rc=$?
+  _gen notif-queued "${_tp}"; _rc2=0; _run_hook "${_tp}" || _rc2=$?
+  _gen notif-quoted "${_tp}"; _rc3=0; _run_hook "${_tp}" || _rc3=$?
+  if [ "${_rc}" -eq 0 ] && [ "${_rc2}" -eq 0 ] && [ "${_rc3}" -eq 2 ]; then
+    record_pass_or_echo "(q) <task-notification> completed no turno → CALA (row e attachment); citada em tool_result → ACUSA"
+  else _fail_e2e "(q) notificacao" "turno rc=${_rc} · queued rc=${_rc2} · citada rc=${_rc3} (esperado 0/0/2)"; fi
+  unset -f _gen _trace_mode
+
   rm -rf "${_d}"; unset -f _run_hook
   [ "${fails}" -eq 0 ] && { echo "background-state-needs-evidence selftest: OK"; exit 0; }
   echo "background-state-needs-evidence selftest: ${fails} falha(s)"; exit 1
@@ -205,14 +370,10 @@ active="$(printf '%s' "${input}" | python3 -c 'import json,sys; d=json.load(sys.
 tp="$(printf '%s' "${input}" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("transcript_path",""))' 2>/dev/null || true)"
 [ -n "${tp}" ] && [ -f "${tp}" ] || exit 0
 
-_P="$(mktemp)"; _C="$(mktemp)"
-python3 - "${tp}" "${_P}" "${_C}" <<'PY'
-import json, sys
-tp, pf, cf = sys.argv[1], sys.argv[2], sys.argv[3]
-rows = []
-for line in open(tp, encoding="utf-8", errors="replace"):
-    try: rows.append(json.loads(line))
-    except Exception: continue
+_P="$(mktemp)"; _C="$(mktemp)"; _E="$(mktemp)"
+python3 - "${tp}" "${_P}" "${_C}" "${_E}" "$(dirname "${BASH_SOURCE[0]}")/lib/transcript-tail.py" <<'PY'
+import json, re, sys
+tp, pf, cf, ef, lib = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
 
 # ⚠️ F1 DO ELENXO — O BLOQUEADOR, e ele invalidava a guarda INTEIRA: `type == "user"` NAO e
 # "mensagem humana". No transcript real os `tool_result` TAMBEM sao rows `user` — medido nesta
@@ -226,13 +387,67 @@ def _is_tool_result(j):
     return isinstance(c, list) and any(
         isinstance(x, dict) and x.get("type") == "tool_result" for x in c)
 
-start = 0
-for i, j in enumerate(rows):
-    if j.get("type") == "user" and not _is_tool_result(j):
-        start = i
+def _is_turn_start(j):
+    return j.get("type") == "user" and not _is_tool_result(j)
+
+# A CAUDA (SAC-137, 2026-10-14): so o ultimo turno, lido de tras para frente pelo lib, com teto e
+# fail-safe (estourou o teto sem achar o inicio do turno -> rele o arquivo inteiro, como antes). Antes
+# o arquivo INTEIRO ia para uma lista a cada turno: ~1,0 s em 44,7 MB, sem timeout. Sem o lib (copia
+# parcial do .claude/), cai na leitura inteira de antes — nunca em silencio.
+try:
+    import importlib.util
+    _spec = importlib.util.spec_from_file_location("transcript_tail", lib)
+    _tt = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_tt)
+except Exception:
+    _tt = None
+if _tt is not None:
+    turn = _tt.tail_until(tp, _is_turn_start)
+else:
+    rows = []
+    for line in open(tp, encoding="utf-8", errors="replace"):
+        try: rows.append(json.loads(line))
+        except Exception: continue
+    start = 0
+    for i, j in enumerate(rows):
+        if _is_turn_start(j):
+            start = i
+    turn = rows[start:]
+
+# EVENTOS DO HARNESS no turno — so de rows que o HARNESS escreve, nunca de tool_use nem de saida de
+# ferramenta (la o literal aparece citado: `cat` deste hook o imprime).
+#   BG_LAUNCH: o tool_result de lancamento de fundo ("Command running in background with ID: X",
+#              ou o campo toolUseResult.backgroundTaskId);
+#   TASK_DONE: a <task-notification> com <status>completed</status>, que chega como row `user` de
+#              conteudo string (abre um turno) ou como attachment queued_command (no meio do turno).
+_LAUNCH = re.compile(r"\s*Command running in background with ID:\s*([A-Za-z0-9_-]+)")
+_NOTIF = re.compile(r"\s*<task-notification>.*?<task-id>([^<]*)</task-id>.*?<status>completed</status>", re.S)
+events = []
+for j in turn:
+    t = j.get("type")
+    if t == "user":
+        c = (j.get("message") or {}).get("content")
+        if isinstance(c, str):
+            m = _NOTIF.match(c)
+            if m: events.append("TASK_DONE " + m.group(1))
+        elif isinstance(c, list):
+            bid = (j.get("toolUseResult") or {}).get("backgroundTaskId") if isinstance(j.get("toolUseResult"), dict) else None
+            for x in c:
+                if not (isinstance(x, dict) and x.get("type") == "tool_result"): continue
+                body = x.get("content")
+                if isinstance(body, list):
+                    body = "\n".join(y.get("text", "") for y in body if isinstance(y, dict))
+                m = _LAUNCH.match(body or "") if isinstance(body, str) else None
+                if m or bid:
+                    events.append("BG_LAUNCH " + (m.group(1) if m else str(bid)))
+    elif t == "attachment":
+        a = j.get("attachment") or {}
+        if a.get("type") == "queued_command" and isinstance(a.get("prompt"), str):
+            m = _NOTIF.match(a["prompt"])
+            if m: events.append("TASK_DONE " + m.group(1))
+open(ef, "w", encoding="utf-8").write("\n".join(events))
 
 prose, calls = [], []
-for j in rows[start:]:
+for j in turn:
     if j.get("type") != "assistant": continue
     for c in (j.get("message") or {}).get("content") or []:
         if not isinstance(c, dict): continue
@@ -249,14 +464,16 @@ for j in rows[start:]:
 open(pf, "w", encoding="utf-8").write("\n".join(prose))
 open(cf, "w", encoding="utf-8").write("\n".join(calls))
 PY
-offenders="$(_assess "${_P}" "${_C}")" && { rm -f "${_P}" "${_C}"; exit 0; }
-rm -f "${_P}" "${_C}"
+offenders="$(_assess "${_P}" "${_C}" "${_E}")" && { rm -f "${_P}" "${_C}" "${_E}"; exit 0; }
+rm -f "${_P}" "${_C}" "${_E}"
 {
   printf '🫀 ESTADO DE SHELL DE FUNDO AFIRMADO SEM OBSERVAÇÃO (defeito medido 2026-10-02: um `git commit -F -`\n'
   printf '   travado 31 min foi reportado DUAS VEZES como "gate ainda rodando" — saída vazia é indistinguível\n'
   printf '   de progresso). Antes de encerrar o turno, OBSERVE e reescreva com o que viu:\n'
   printf '     ps -eo pid,etime,args | grep -E <padrão> | grep -v grep     # processo vivo?\n'
   printf '     gh pr checks <PR>                                           # estado no forge\n'
+  printf '   Se LANÇOU o comando em fundo neste turno, o relato honesto é dizer que aguarda a notificação\n'
+  printf '   do harness. Ler tasks/<id>.output NÃO prova que o processo segue vivo.\n'
   printf '   Afirmações sem observação nesta resposta:\n'
   printf '%s\n' "${offenders}" | sed 's/^/     · /'
 } >&2
