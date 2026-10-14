@@ -2,13 +2,13 @@
 title: 'Resíduo — o corpo entra na assinatura do a2a-verify e o exp fica obrigatório'
 date: 2026-10-14
 branch: fix/a2a-body-signed-and-exp-required
-reviewed_diff_sha256: d29251f4a2c3cfd0c0abdc5196ac7c9a37394c43041f68e8fce3965f91bf3916
-reviewed_code_sha256: cc735ae89b3e57cec8553164029eedf9ea53ed57bc40bc9bb6c8362f41b6ec06
-findings_total: 11
-findings_real: 7
-findings_fixed: 5
-tokens: 111997
-duration_min: 8
+reviewed_diff_sha256: fd67e860772212f8bce707e39cbaf621d9ebdd4f3a7e4ffb9997f4e24820f67c
+reviewed_code_sha256: 451d0b569450ffb480187a873d26b31bbc8e3f959cbb312b73a09130bccbce19
+findings_total: 19
+findings_real: 15
+findings_fixed: 12
+tokens: 153344
+duration_min: 13
 verdict: CORRIGIDO
 elenxo: sim
 nota: >-
@@ -61,9 +61,30 @@ nota: >-
 | 7 | `send-a2a.sh --body-file` perdia os `\n` finais | menor | curado: leitura com sentinela |
 | 8–11 | canonicalização, duplicatas, tipos/ordem das camadas, sem regressão | — | confirmações |
 
+## 2ª passada (depois das curas e do rebase sobre o #1109)
+
+O rebase trouxe o #1109, que mudou o ATC (`iat`, vida ≤ 900 s, inteiros JSON, raiz de confiança no clone
+servido) e o §12 do protocolo. O conflito no ATC foi resolvido mantendo o bloco do main e trocando só a
+mensagem do `refuse` de exp. O mesmo refutador passou de novo sobre o gate curado e o delta do conflito: 12
+itens, 8 reais (todos menores), 4 confirmações (SIGF e DUP sem fail-open; forma do hash fechada; o ATC
+preservou o main; chave extra no topo do envelope sem consumidor hoje).
+
+| # | achado | destino |
+|---|---|---|
+| 1 | `jti` objeto/array passava as camadas e sujava o `jti.state` | curado: `jws-bad-claim-type` (jti/iss string, aud string se houver) |
+| 2 | controle só `< 32` (U+0085, U+2028 passavam) | curado: C0, DEL, C1, U+2028/9 |
+| 3 | `signal.from`/`to` com `\n` final passavam (comparação por `$()`) | curado: entram na forma fechada |
+| 4 | `thread`/`body_path` assinados, mas texto livre até o inbox | curado: `thread` na forma fechada; `body_path` 1–256 de `[A-Za-z0-9._/-]` sem `..` |
+| 5 | 3 curas sem mutante | 2 ganharam mutante (chave desconhecida, forma do hash); o envelope de dois documentos tem defesa em profundidade (o python veta `unparseable:envelope`), então um mutante seria "não exercido" — declarado |
+| 6 | a nota do A5d não dizia o offset nem que o teto é inclusivo | curado: `--exp-offset 7200` → 403; 3600 é inclusivo; os 900 s do ATC não contam |
+| 7 | a L8 mudava a condição do bloqueio do §12.7 fora do §12 | curado: marcada como interpretação do §12.7 pelo §12.6 (P5b) |
+| 8 | `send-a2a.sh` não valida a forma de `--thread`/`--kind`/`--jti` | declarado: o gate recusa com motivo nomeado; os valores do protocolo cabem |
+
+Bancada depois das curas: `a2a_verify` + `a2a_accept` 59/59, `accept-to-channel.selftest.sh` 12/12.
+
 ## O que a passada NÃO cobriu (declarado)
 
 - O `a2a-accept.sh` não foi executado pelo refutador (o sandbox recusou); a injeção no inbox foi lida no código.
 - O caminho vivo HTTP → bridge → gate não rodou: o deploy é da sessão principal (`ops/update-bridge.sh`).
 - Os campos `id`/`kind`/`classification` continuam **não assinados**: o gate fecha a forma, não a autoria.
-- Uma passada só, sobre o diff antes das curas; as curas foram medidas pela bancada, não re-refutadas.
+- As curas da 2ª passada foram medidas pela bancada, sem 3ª refutação.

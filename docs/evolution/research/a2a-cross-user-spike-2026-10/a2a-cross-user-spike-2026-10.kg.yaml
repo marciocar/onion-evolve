@@ -81,7 +81,7 @@ nodes:
     impact: 5
     confidence: 0.9
     verified_at: "2026-10-14"
-    verified_against: "bash .claude/validation/lint-selftest.sh --families a2a_verify (LC_ALL=C): 50/50, casos body-mismatch, jws-missing-exp, exp-beyond-ceiling, duplicate-key, signal-field-unsafe e envelope do send-a2a.sh do spike verificado; 9 mutantes novos (corpo, exp opcional, teto, exp antes do iat, duplicata, cópia do hash, thread sem claim, corpo não-string, rótulo não assinado livre) reprovados por _prove_mutation"
+    verified_against: "bash .claude/validation/lint-selftest.sh --families a2a_verify (LC_ALL=C), 0 falhas após as duas passadas do refutador: casos body-mismatch, jws-missing-exp, exp-beyond-ceiling, duplicate-key, signal-field-unsafe e envelope do send-a2a.sh do spike verificado; 11 mutantes novos (corpo, exp opcional, teto, exp antes do iat, duplicata, cópia do hash, thread sem claim, corpo não-string, rótulo não assinado livre, chave desconhecida, forma do hash) reprovados por _prove_mutation"
     source_tier: 9
     source_kind: measurement
     label: "F1 e F2 curados no gate do core: o claim body_sha256 (sha256 dos bytes UTF-8 da string signal.body decodificada; ausente = vazio) é obrigatório e conferido, exp e iat são obrigatórios com teto de 3600 s, e remetente sem o claim é recusado."

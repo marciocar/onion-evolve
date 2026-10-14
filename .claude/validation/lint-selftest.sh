@@ -9480,12 +9480,22 @@ YML
   _case_mut "kind não assinado com quebra de linha" "signal-field-unsafe:kind" \
     "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-uns1)" acme onion-evolve "" | jq -c '.signal.kind="signal\napply_mode: auto"')" \
     "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-uns2)" acme onion-evolve "" | jq -c '.signal.kind="signal\napply_mode: auto"')"
-  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-unk)" acme onion-evolve "" | jq -c '.signal.summary="não assinado"')"
-  if [ "${rc}" -eq 1 ] && grep -q '"reason":"signal-unknown-key:summary"' <<< "${out}"; then record_pass "a2a-verify: chave desconhecida no signal → veto signal-unknown-key"
-  else record_fail "a2a-verify: chave desconhecida" "out='${out}' rc=${rc}"; fi
-  _verify onion-evolve "$(_env "$(_jws_raw "{\"iss\":\"acme\",\"aud\":\"onion-evolve\",\"iat\":${NOW},\"exp\":$((NOW+300)),\"jti\":\"jti-shanl\",\"body_sha256\":\"$(printf '' | _sha)\\n\"}")" acme onion-evolve "")"
-  if [ "${rc}" -eq 1 ] && grep -q '"reason":"jws-bad-body-sha256"' <<< "${out}"; then record_pass "a2a-verify: body_sha256 com \\n final → veto jws-bad-body-sha256 (forma julgada no jq, não por \$(...))"
-  else record_fail "a2a-verify: body_sha256 com newline" "out='${out}' rc=${rc}"; fi
+  # chave desconhecida: o mesmo veto da forma fechada, mutante próprio (2ª passada do refutador)
+  _mk_mut "signal-unknown-key" '/signal-shape-unreadable}" "body"$/c true # MUTANTE: chave livre no signal'
+  _case_mut "chave desconhecida no signal" "signal-unknown-key:summary" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-unk1)" acme onion-evolve "" | jq -c '.signal.summary="não assinado"')" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-unk2)" acme onion-evolve "" | jq -c '.signal.summary="não assinado"')"
+  # body_sha256 com \n final: o mutante devolve a forma frouxa (o $(...) come o \n e o hash "bate")
+  _shanl() { _env "$(_jws_raw "{\"iss\":\"acme\",\"aud\":\"onion-evolve\",\"iat\":${NOW},\"exp\":$((NOW+300)),\"jti\":\"$1\",\"body_sha256\":\"$(printf '' | _sha)\\n\"}")" acme onion-evolve ""; }
+  _mk_mut "body-sha256-form" '/(if (.body_sha256|length)==64 and/c     (if true # MUTANTE: forma do hash frouxa'
+  _case_mut "body_sha256 com \\n final" "jws-bad-body-sha256" "$(_shanl jti-shanl1)" "$(_shanl jti-shanl2)"
+  # jti não-string e from com \n final (2ª passada): vetos nomeados, nada vai ao jti.state
+  _verify onion-evolve "$(_env "$(_jws_raw "{\"iss\":\"acme\",\"aud\":\"onion-evolve\",\"iat\":${NOW},\"exp\":$((NOW+300)),\"jti\":{\"a\":1},\"body_sha256\":\"$(printf '' | _sha)\"}")" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"jws-bad-claim-type"' <<< "${out}"; then record_pass "a2a-verify: jti objeto → veto jws-bad-claim-type"
+  else record_fail "a2a-verify: jti objeto" "out='${out}' rc=${rc}"; fi
+  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-fromnl)" acme onion-evolve "" | jq -c '.signal.from="acme\n"')"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"signal-field-unsafe:from"' <<< "${out}"; then record_pass "a2a-verify: signal.from com \\n final → veto signal-field-unsafe:from"
+  else record_fail "a2a-verify: from com newline" "out='${out}' rc=${rc}"; fi
   local one; one="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-multi)" acme onion-evolve "")"
   _verify onion-evolve "${one} ${one}"
   if [ "${rc}" -eq 1 ] && grep -q '"reason":"malformed-envelope"' <<< "${out}"; then record_pass "a2a-verify: dois documentos JSON no envelope → veto malformed-envelope"
