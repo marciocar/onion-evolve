@@ -127,14 +127,23 @@ nodes:
   - id: Q_COMPACTACAO_OCIOSA_DISPARA_O_PRECOMPACT
     node_type: question
     layer: audit
-    plane: DEV
-    status: open
     impact: 3
     confidence: 0.5
-    verified_at: "2026-10-14"
-    verified_against: "reformulada em 2026-10-14 pelo juiz da r10: a pergunta original (a compactação ociosa dispara o PreCompact?) não serve ao core, onde o hook sai 0 em toda branch; fecha quando (a) o maestro decidir a cobertura do PreCompact e (b) uma sessão de teste medir o trigger da compactação ociosa"
     label: "o PreCompact deve deixar migalha também nas branches feat/, fix/, docs/ e chore/ do core, e a compactação ociosa da 2.1.299 chega a ele como trigger auto? A doc de hooks só lista manual e auto"
-    narrative: "Issue SAC-117 no Linear (projeto Onion — core: próximas levas), criada pelo tm.sh em 2026-10-14."
+    status: done
+    plane: DEV
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Retomar pelo grafo: não estender o PreCompact; a retomada do core é grafo + memória + /catch-up; reabre se uma retomada falhar por compactação ociosa»"
+    narrative: |-
+      Issue SAC-117 no Linear (projeto Onion — core: próximas levas), criada pelo tm.sh em 2026-10-14.
+
+      verified_against anterior: «reformulada em 2026-10-14 pelo juiz da r10: a pergunta original (a compactação ociosa dispara o PreCompact?) não serve ao core, onde o hook sai 0 em toda branch; fecha quando (a) o maestro decidir a cobertura do PreCompact e (b) uma sessão de teste medir o trigger da compactação ociosa»
+      Selado por /meta:decide em 2026-10-14: escolhida «Retomar pelo grafo: não estender o PreCompact; a retomada do core é grafo + memória + /catch-up; reabre se uma retomada falhar por compactação ociosa»; descartadas: «Worklog por branch no core» · «Medir o trigger antes».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «SAC-117: o PreCompact deve cobrir as branches do core?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
   - id: E_AGENT_SPAWN_RESUME_E_SENDMESSAGE_SEM_USO
     node_type: evidence
     layer: audit
