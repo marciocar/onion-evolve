@@ -715,6 +715,13 @@
 | 1.4 | `C_AGENTES_COM_MCP_DIRETO` | triagem-evolve-kgssot-2026-10 | D6-3 (confirmado, oportunista): dois agentes declaram ferramenta MCP direta; o do Jira é especialista (permitido pela doutrina),  |
 | 1.0 | `C_DISTINCOES_UNILATERAIS_D2_4_A_7` | triagem-evolve-kgssot-2026-10 | D2-4 a D2-7 (informado): declarações de distinção unilaterais ou ausentes em quatro clusters |
 
+## dissect-forge-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 11.2 | `D_PLANO_DE_ABSORCAO_E_NO` | dissect-forge-2026-10 | desenho da costura: o N4 do dissect escreve nos x_absorb_* no grafo (KG-SSOT first), o dissect-plans.sh os le, mede as pecas do al |
+| 5.4 | `Q_COSTURA_DISSECT_FORGE` | dissect-forge-2026-10 | costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprend |
+
 ## evolve-round-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -776,13 +783,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 9.0 | `E_ITEM6_VERIFY` | session-2026-07-18-evolve-review-triage | drive-to-verify: os 5 pontos sao o MESMO conceito enquadrado por audiencia/profundidade (index vs normativo vs troubleshooting); e |
-
-## dissect-forge-2026-10 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.4 | `D_PLANO_DE_ABSORCAO_E_NO` | dissect-forge-2026-10 | desenho da costura: o N4 do dissect escreve nos x_absorb_* no grafo (KG-SSOT first), o dissect-plans.sh os le, mede as pecas do al |
-| 5.4 | `Q_COSTURA_DISSECT_FORGE` | dissect-forge-2026-10 | costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprend |
 
 ## company-brain-market-2026-07 — 1 item(ns)
 
