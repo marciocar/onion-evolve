@@ -2,8 +2,7 @@
 title: 'Resíduo — o cache do pin das portas lê o carimbo no remoto, pela leitura do --status'
 date: 2026-10-14
 branch: fix/door-seal-pin-reads-remote
-reviewed_diff_sha256: 17f4c5d1b9bef71e2d993467ee5023f54d3ade1f5078a04db76a9a451c0f4809
-reviewed_code_sha256: 1815f5be500aa764572a039741bb34484f200af65b148c762db4ac1eb574a828
+reviewed_diff_sha256: pendente
 findings_total: 6
 findings_real: 6
 findings_fixed: 6
@@ -20,7 +19,8 @@ nota: >-
   três são do refutador independente (subagente code-reviewer), que voltou depois do 1º push. Ele não
   achou nenhum caminho que carimbe pin não publicado ou não mergeado. Os três dele são baixos: guarda
   do rm -rf mais fraca que antes, catraca do pipe-verdict frouxa e a falta de um caso para
-  clone-failed. Os tokens são só os do refutador.
+  clone-failed. Os tokens são só os do refutador. As curas dos três achados dele NÃO foram revistas
+  por ele: estão cobertas pela bancada e pelo mutante do (p). Por isso o hash do diff fica pendente.
 ---
 
 # Resíduo — REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)
