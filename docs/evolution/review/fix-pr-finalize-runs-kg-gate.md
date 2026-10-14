@@ -3,9 +3,9 @@ branch: fix/pr-finalize-runs-kg-gate
 date: 2026-10-14
 reviewed_diff_sha256: 9be8b487e6a88ea684e96e70a6cd58f6e7e206685d017112bd30279217c9eaa8
 reviewed_code_sha256: 997ad0154eb78c24f972e10a3e741300fc4cc4e3ead9b16ea7850eba43295a5e
-findings_total: 2
-findings_real: 2
-findings_fixed: 2
+findings_total: 4
+findings_real: 4
+findings_fixed: 4
 tokens: 0
 duration_min: 30
 verdict: REPROVADO_E_CURADO
@@ -38,3 +38,11 @@ de um grafo, e a catraca dessa dívida é do `kg_gate.py`, que só o passo "Cont
 3. **O CI mudou de comportamento?** O passo roda o mesmo vendor check e o mesmo `kg_gate.py` com os mesmos
    dois `--exclude`; só saiu do YAML para o script. Sem PyYAML/jsonschema o gate sai rc 2 e o pr-finalize para
    (nunca verde por ausência).
+4. **O CI reprovou 9 casos da família `pre_push` (rodada 1).** O sandbox da família monta stubs do lint e do
+   resíduo, e o motor novo chamava `ops/kg-gate-ci.sh`, que não existia ali (a classe "fail-closed expõe
+   harness incompleto"). Real, curado: o sandbox ganha um stub do gate controlado por `kgverdict`, e um
+   caso novo prova a recusa ("contrato KG-SSOT reprova o commit → rc 1 com a causa nomeada"). Família:
+   49/0. Mutante (o motor sem a chamada ao gate): o caso novo reprova com rc 0.
+5. **Por que a bancada não pegou antes do CI?** O commit foi `--no-verify` (checkpoint) e o `pr-finalize`
+   rodou sem `ONION_FINALIZE_CHECKPOINT=1`, então o pré-voo das famílias tocadas não rodou. Erro de
+   processo da sessão, não do motor; esta rodada fecha com a variável.
