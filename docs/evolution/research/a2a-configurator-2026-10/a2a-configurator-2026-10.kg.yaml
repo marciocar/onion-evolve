@@ -7,7 +7,7 @@ meta:
   baseline: "2026-10-14"
   review_after: "2026-11-13"   # 30d: cadência de ferramenta
   # ═══ TETO: 30 NÓS ═══
-  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133).
+  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho).
   x_linear_epic: "SAC-120"
 nodes:
   - id: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -124,6 +124,111 @@ nodes:
     verified_at: "2026-10-14"
     verified_against: "aberta em 2026-10-14 por pedido do maestro; fecha quando docs/applying/onion-a2a-manual.md existir (com o html do /docs:build-project-manual), cobrir as 6 trilhas com o porquê, o passo a passo e a saída real do doctor em cada erro, e o wizard apontar o manual publicado (docs/ não viaja). Linear SAC-133"
     label: "o configurador A2A ganha um manual para os três leitores (operador do core, operador do hub e membro que entra), escrito a partir dos fluxos e da saída reais do wizard"
+  - id: E_SPIKE_S1_S2_KEYGEN_E_REMETENTE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s1-s2.sh re-executado pela sessão principal em 2026-10-14: 12/12 casos; mutantes perm0644 e token-argv reprovam cada um só o seu caso. Linear SAC-126 e SAC-127"
+    label: "o keygen gera par RS256 3072 com privada 0600 que o gate aceita, sem segredo em argv, e o remetente canônico é aceito e vetado pelo motivo certo nos 4 mutantes (sem body_sha256, exp vencido, jti repetido, kid não pinado)"
+    provenance:
+      source: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s1-s2.sh"
+      locator: "tabela final do roteiro (S1.a-f, S2.0-4)"
+      method: "medição: roteiro do spike executado pelo subagente e re-executado pela sessão principal"
+      locality: "repo"
+  - id: C_DRY_RUN_DO_GATE_CONSOME_O_JTI
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 pelo S2 (docs/evolution/research/a2a-configurator-2026-10/spike/run-s1-s2.sh): o --dry-run do a2a-verify.sh desliga só o trust-log e grava o jti no estado de replay; a 2ª verificação do mesmo envelope sai replay"
+    label: "o --dry-run do gate consome o jti: conferir um envelope real com ele o inutiliza, então o doctor e o wizard só testam com envelope sintético de jti novo"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-verify.sh"
+      locator: "gravação do jti com falha fechada (l.305-315), que não olha o --dry-run"
+      method: "medição: roteiro do spike executado pelo subagente e re-executado pela sessão principal"
+      locality: "repo"
+  - id: E_SPIKE_S3_DOCTOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s3.sh re-executado pela sessão principal: 8/8 estados (saudável rc 0; 6 quebrados rc 1; relógio sem fonte rc 2) e o mutante de permissão morto limpo (só priv_0644 diverge). Linear SAC-128"
+    label: "o doctor diagnostica cada estado quebrado com causa e próximo passo, e separa relógio não sincronizado (rc 1) de relógio sem fonte (rc 2, não pude medir)"
+    provenance:
+      source: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s3.sh"
+      locator: "tabela estado→rc→diagnóstico"
+      method: "medição: roteiro do spike executado pelo subagente e re-executado pela sessão principal"
+      locality: "repo"
+  - id: C_PINO_SO_SE_MEDE_NO_RECEPTOR
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 pelo S3: sem o registro do core, a checagem de pino (d) e o envio sintético (h) do doctor do membro saem nao-medido e o rc é 2"
+    label: "a pergunta 'minha chave está pinada?' só se responde com o registro do receptor: a F1 precisa de um espelho do registro publicado pelo core, ou do doctor rodando no lado receptor"
+    provenance:
+      source: "docs/evolution/research/a2a-configurator-2026-10/spike/a2a-doctor.sh"
+      locator: "checagens (d) e (h)"
+      method: "medição: roteiro do spike executado pelo subagente e re-executado pela sessão principal"
+      locality: "repo"
+  - id: E_SPIKE_S4_S5_BRIDGE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s4-s5.sh re-executado pela sessão principal num clone novo do onion-bridge (94a21ca) com docs/evolution/research/a2a-configurator-2026-10/spike/bridge-invites-receivers.diff aplicado: 18/18 PASS; VPS intocada. Linear SAC-129 e SAC-130"
+    label: "o bridge com convite por membro e receptor múltiplo funciona: convite certo aceito, de outro membro, vencido e revogado recusados, revogação vale sem restart, receptor só source ou hub, aud cruzado vetado"
+    provenance:
+      source: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s4-s5.sh e docs/evolution/research/a2a-configurator-2026-10/spike/bridge-invites-receivers.diff"
+      locator: "tabela S4.1-S5.6 (+185/-11 linhas em 4 arquivos do bridge)"
+      method: "medição: roteiro do spike executado pelo subagente e re-executado pela sessão principal"
+      locality: "repo"
+  - id: C_AMARRACAO_DO_CONVITE_ANTES_DO_GATE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 por mutante no S4: com a amarração bearer↔from só DEPOIS do gate, o gate já grava o jti e o reenvio legítimo cai em replay"
+    label: "o bridge tem de amarrar o convite ao from declarado ANTES do gate e reconferir depois: só depois, quem tem qualquer convite queima a mensagem de outro membro"
+    provenance:
+      source: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s4-s5.out.txt"
+      locator: "seção dos mutantes, no fim da saída"
+      method: "medição: roteiro do spike executado pelo subagente e re-executado pela sessão principal"
+      locality: "repo"
+  - id: C_RECEPTOR_PELO_PAPEL_INCLUI_A_PORTA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 pelo S5.5 e S5.6: o onion-core tem role source com kind door e passa no filtro de papel (só o trust-check barra); e o bridge (yaml) e o trust-check (awk) divergem com comentário na linha do id"
+    label: "aceitar receptor só por role: source deixa entrar a porta, e os dois leitores do registro divergem; o critério do receptor deve olhar kind, e o registro precisa de um leitor só"
+    provenance:
+      source: "docs/evolution/research/a2a-configurator-2026-10/spike/run-s4-s5.sh"
+      locator: "casos S5.5 e S5.6"
+      method: "medição: roteiro do spike executado pelo subagente e re-executado pela sessão principal"
+      locality: "repo"
 edges:
   - from: E_ONZE_PASSOS_MANUAIS_HOJE
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -146,3 +251,36 @@ edges:
   - from: Q_MANUAL_DO_A2A
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
     edge_type: DEPENDS_ON
+  - from: E_SPIKE_S1_S2_KEYGEN_E_REMETENTE
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: SUPPORTS
+  - from: E_SPIKE_S3_DOCTOR
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: SUPPORTS
+  - from: E_SPIKE_S4_S5_BRIDGE
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: SUPPORTS
+  - from: E_SPIKE_S1_S2_KEYGEN_E_REMETENTE
+    to: C_DRY_RUN_DO_GATE_CONSOME_O_JTI
+    edge_type: SUPPORTS
+  - from: C_DRY_RUN_DO_GATE_CONSOME_O_JTI
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: CONSTRAINS
+  - from: E_SPIKE_S3_DOCTOR
+    to: C_PINO_SO_SE_MEDE_NO_RECEPTOR
+    edge_type: SUPPORTS
+  - from: C_PINO_SO_SE_MEDE_NO_RECEPTOR
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: CONSTRAINS
+  - from: E_SPIKE_S4_S5_BRIDGE
+    to: C_AMARRACAO_DO_CONVITE_ANTES_DO_GATE
+    edge_type: SUPPORTS
+  - from: C_AMARRACAO_DO_CONVITE_ANTES_DO_GATE
+    to: D_CONVITE_POR_MEMBRO_COM_VALIDADE
+    edge_type: CONSTRAINS
+  - from: E_SPIKE_S4_S5_BRIDGE
+    to: C_RECEPTOR_PELO_PAPEL_INCLUI_A_PORTA
+    edge_type: SUPPORTS
+  - from: C_RECEPTOR_PELO_PAPEL_INCLUI_A_PORTA
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: CONSTRAINS
