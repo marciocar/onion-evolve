@@ -174,16 +174,10 @@ jobs:
         # gate lê a da base. rc 2 = entrada quebrada, nunca verde.
         run: |
           python3 -m pip install --quiet -r vendor/kg-ssot/tools/requirements.txt
-          python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
-          # FORA DO CORPUS, explícito e visível no diff (política selada pelo maestro, 2026-10-08, sobre a
-          # posição do dono do contrato): propostas arquivadas do kg-inbox são história. O demo fictício foi
-          # para fixtures/ (default). Os grafos proto do Onion pessoal, que também ficavam fora, SAÍRAM DA
-          # ÁRVORE em 2026-10-13 (o core ficou público; dados pessoais) — o --exclude deles saiu junto.
-          # ⚠️ A base (.kg-ssot/gate.json) tem de ser gravada com os MESMOS --exclude:
-          #    python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update <os --exclude abaixo>  (a granularidade vem da base)
-          python3 -I vendor/kg-ssot/tools/kg_gate.py \
-            --exclude 'docs/evolution/kg-inbox/_rejected/*' \
-            --exclude 'docs/evolution/kg-inbox/_sealed/*'
+          # O vendor check, os --exclude (fora do corpus, política selada pelo maestro em 2026-10-08) e o
+          # gate vivem em ops/kg-gate-ci.sh, que o pr-finalize também chama: um lugar só para os --exclude,
+          # que têm de casar com os da base (.kg-ssot/gate.json; regrave com `bash ops/kg-gate-ci.sh --update`).
+          bash ops/kg-gate-ci.sh
 
       - name: Lembrete — checagens semânticas são locais
         run: |
