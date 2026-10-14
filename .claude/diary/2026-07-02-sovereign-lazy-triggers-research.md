@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: [meta:co-evolve, meta:diary, onion-orchestration]
 share_with: [collective]
 next_recommended: "2026-07-02-work-models-eixo-e-decision"
-review_after: 2026-09-30
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -28,3 +28,5 @@ ABSORÇÃO** — migalha vencida se RE-TESTA contra evidência atual, nunca se r
 ## Next crumb
 Ao propor qualquer automação nova no Onion: verificar primeiro se um trigger lazy por sessão (hook) cobre
 o caso antes de considerar daemon/cron; e toda memória persistida precisa de mecanismo de re-teste.
+
+## Re-testada em 2026-10-14: (static, contra a melhor fonte atual) a doutrina do core continua a mesma: o ADR work-models §3 rejeita W7 e o `/meta:radar` se declara "maestro-invocado, nunca agendado (MOAT W7)". O agendamento disponível no harness (`schedule`, rotinas na nuvem) segue cloud. Os números externos (Routines, Jules, LongMemEval-V2) NÃO foram re-medidos nesta passada: valem como registro datado da pesquisa `wf_80c7ae61-76e`.

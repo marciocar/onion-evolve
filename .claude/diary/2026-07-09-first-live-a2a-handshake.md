@@ -8,7 +8,7 @@ affects: [federation, transport, security]
 breadcrumb_for: [meta:co-evolve, meta:evolve]
 share_with: [collective]
 next_recommended: "2026-07-09-security-gate-degrades-to-veto"
-review_after: 2026-10-07
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -33,6 +33,13 @@ padrão canônico Onion (fix → re-dogfood) em ação.
 - **Modelo de confiança:** o remetente **self-gera** o par (priv gitignorada no repo dele); o core **pina a
   pubkey** (`jwks/<kid>.pem`, force-add sobre o `.gitignore *.pem`) sob gate humano; o `members.yaml` amarra
   `kid→membro`. Trust-establishment é ato humano, não automático.
+- **Estado em 2026-10-14 (re-teste, rodei a família `a2a_verify`, 54/54):** o kid-binding segue
+  (`kid de outro dono (impersonação) → veto kid-not-owned-by-from`), e as pubkeys `metagamify-1` e
+  `granaai-1` seguem pinadas em `.claude/utils/federation-transport/jwks/`. MAS o envelope desta migalha
+  NÃO passaria hoje: desde `f9d9f939` (2026-10-14) o corpo entra na assinatura e o `exp` é obrigatório
+  (`remetente sem body_sha256 (formato de julho) → veto jws-missing-body-sha256`). O `send-signal.sh` do
+  remetente precisa assinar `body_sha256` para voltar a verificar, e isso NÃO foi medido no repo do
+  metagamify. O follow-up "token dedicado por membro" foi triado (`inbox/_processed/2026-07-09-metagamify-dedicated-token.md`).
 - **Fronteira operacional:** todo write ao serviço `bypassPermissions` (instalar o endpoint, atualizar o clone
   do bridge, ler o token) foi **gesto humano via `!`** — o classificador do Claude Code hard-gateia writes
   independente de allow-rule. O gate humano do F2.2 acabou **enforçado pelo tooling**, não só pela doutrina.
@@ -44,3 +51,5 @@ dogfood usou o `AUTH_TOKEN` admin). Regra durável: **1 chave = 1 membro** (kid-
 aplicação** — o canal vivo só acelera o aviso; a aceitação segue humana. Ver
 [[2026-07-09-security-gate-degrades-to-veto]] (a fundação do gate) e
 [[2026-07-09-federation-redesign-rfc0004-shipped]] (a RFC que isto destrava).
+
+## Re-testada em 2026-10-14 — PARCIAL: (static, rodei o selftest) o evento e o kid-binding valem. O Evidence registra que o formato de julho é vetado desde 10-14 (corpo assinado + `exp`).

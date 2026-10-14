@@ -8,7 +8,7 @@ affects: [federation, transport, security]
 breadcrumb_for: [meta:co-evolve, meta:evolve]
 share_with: [collective]
 next_recommended: "2026-07-09-federation-redesign-rfc0004-shipped"
-review_after: 2026-10-07
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -43,3 +43,5 @@ humano. Regra durável: **canal vivo nunca dá ao transporte remoto poder de esc
 isolamento `bypassPermissions`); o gate roda **antes** de o sinal virar ação. Ver
 [[2026-07-09-federation-redesign-rfc0004-shipped]] (a RFC que amarra o gate) e
 [[2026-07-09-adopt-vendor-branch-merge]] (mesma família: never-clobber/verify-before-acting).
+
+## Re-testada em 2026-10-14: (static, contra a melhor fonte atual) o cabeçalho do `a2a-verify.sh` (l.9-11) segue declarando FAIL-SAFE = VETO, NUNCA SKIP, e o caso `a2a-verify: FAIL-SAFE — tooling ausente → veto (nunca skip/allow)` passou, junto com o agent-card de CONFIDENCIALIDADE. Drift de contagem, não de doutrina: as camadas cresceram de 6 para mais (clock-trust em 07-10, `body_sha256` e `exp` obrigatório em 10-14), e a família `a2a_verify` tem hoje 54 casos.

@@ -8,7 +8,7 @@ affects: [kg-sdaal, knowledge-construction, verticals, method]
 breadcrumb_for: [meta:kg, meta:co-evolve, meta:evolve]
 share_with: [collective]
 next_recommended: "onion-plan-identity-kg-dogfood-2026-07 (docs/analysis/)"
-review_after: 2026-10-09
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -45,3 +45,5 @@ como método; o **Espírito Absoluto** (auto-conhecimento que retorna a si enriq
 dogfood→KG→SSOT→dogfood; senhor-escravo (quem produz, conhece). Codificado no plano
 `docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md` §2.6. Retomar este fio quando a F3 (veredito de
 priorização) pedir uma teoria de método mais forte que "gated-until-trigger".
+
+## Re-testada em 2026-10-14: (static, contra a melhor fonte atual) o critério virou nó do grafo de identidade (`C_HEGEL_CRITERION`, "KG é a técnica certa quando o conhecimento deixa de ser monotônico", status done, verificado em 2026-08-30) e segue citado como régua irmã na KB `transfer-heuristic-aristotle.md`. O plano `onion-plan-identity-kg-dogfood-2026-07.md` §2.6 existe. Nenhuma fonte o supera.

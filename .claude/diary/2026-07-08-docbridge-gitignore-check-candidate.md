@@ -8,7 +8,7 @@ affects: [meta, federation]
 breadcrumb_for: [meta:adopt, meta:evolve]
 share_with: []
 next_recommended: ""
-review_after: 2026-10-06
+review_after: 2027-01-12
 conflict_class: conditional
 valid_when: "nenhum 2º adotante reportou/reproduziu regra docs/ larga demais engolindo docs/evolution/"
 ---
@@ -34,3 +34,5 @@ adotante novo reproduziu uma regra `docs/` larga que engula `docs/evolution/`. S
 `review_after` +90d. Se SIM → promover a checagem no `/meta:adopt`/lint vendorizado e marcar esta
 entrada `superseded: true`. Sinal-fonte já triado e arquivado em
 `docs/evolution/inbox/_processed/2026-07-07-sinal-gitignore-blanket-engole-inbox.md`.
+
+## Re-testada em 2026-10-14: (conditional, só o `valid_when`) nenhum 2º adotante reproduziu uma regra `docs/` larga engolindo `docs/evolution/`: varri `docs/evolution/inbox/` e `_processed/` por `gitignore`. Os sinais que apareceram são de OUTRA classe: o `.gitignore` da `onion/vendor` ignorando `.claude/` (arandek 07-24 e o sinal de 10-04, já curados no `vendor-branch.sh`, caso e2 do selftest). A checagem segue NÃO construída, como manda a migalha.

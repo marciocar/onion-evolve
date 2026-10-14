@@ -8,7 +8,7 @@ affects: [federation, meta, transport]
 breadcrumb_for: [meta:co-evolve, meta:co-announce, meta:evolve]
 share_with: [collective]
 next_recommended: "2026-07-09-scope-inheritance-rfc0005"
-review_after: 2026-10-07
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -34,9 +34,17 @@ Grana.Ai = **data-plane subordinado** (padrão Argo CD Agent), NÃO `role:source
   F1.4 (#312) `mail-receiver.sh` (avisa via ntfy, git-async intacto).
 - **Fase 2 aberta SEM canal vivo:** F2.1 (#313) `federation-transport` SDAAL (`git-async|local|a2a-live`,
   a2a-live é stub GATED) — enquadra a fase gated antes de escrever endpoint.
+- **Estado em 2026-10-14 (re-teste):** a RFC-0004 segue `accepted (2026-07-09)`, e o texto normativo (§3
+  "só sinais gated") não mudou. A F2.2 FECHOU em 07-09/07-10 (handshakes com metagamify e granaai, ver
+  as migalhas irmãs). Há uma emenda aberta: "só sinais" → "conversa com consentimento por thread com
+  expiração" (nó `D_RFC0004_CONVERSA_POR_THREAD`, selado na opção B por decisão delegada de 2026-10-14). Ela
+  AINDA NÃO VALE: depende do corpo assinado e do `exp` obrigatório no gate (feito em `f9d9f939`) e de o
+  spike vivo passar nos critérios pré-registrados. O console `https://onionevolve.com/federacao/` responde 200.
 
 ## Next crumb
 Revisa RFC-0001 (git-async: de invariante → **default-com-exceção-gated**). Gatilho de revisão da própria
-RFC-0004: **2º hub escrevendo identidade concorrente** desconectado. Restante do roadmap: só **F2.2** (endpoint
-a2a-live no bridge) — o grande/arriscado, exige **gate humano + dogfood** antes de tocar `bypassPermissions`.
+RFC-0004: **2º hub escrevendo identidade concorrente** desconectado. A F2.2 está concluída. O que segue aberto é a emenda "conversa por thread",
+pendente de spike (ver Evidence).
 Ver [[2026-07-09-scope-inheritance-rfc0005]] (RFC-irmã, mesma leva) e [[2026-07-01-federation-usage-modes-decision]].
+
+## Re-testada em 2026-10-14 — PARCIAL: (static, contra a RFC atual) a decisão vale como está. O Evidence registra a F2.2 fechada e a emenda de 10-14, que ainda não vale.

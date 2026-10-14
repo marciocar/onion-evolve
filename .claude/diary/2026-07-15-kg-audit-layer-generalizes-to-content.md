@@ -9,6 +9,7 @@ breadcrumb_for: [meta:kg, meta:co-evolve]
 share_with: []
 next_recommended: ""
 review_after: 2026-10-13
+superseded: true
 conflict_class: conditional
 valid_when: "a KB docs/knowledge-base/concepts/knowledge-graph-sdaal.md ainda NÃO documenta o uso da camada `audit` para auditar conteúdo/documentação (não-código) — quando documentar, aposentar esta migalha"
 ---
@@ -40,3 +41,5 @@ content-audit (ver `valid_when`); quando documentado, aposentar esta migalha. Ve
 e citando o Lote 10 do ⟨cliente⟩. Sinal upstream `2026-07-15-sinal-kg-audit-layer-content-audit`
 triado e movido para `_processed/`. A condição não vale mais → esta migalha não orienta mais
 ação futura (fica como registro histórico, não deletada — `superseded ≠ apagado`).
+
+## Re-testada em 2026-10-14 — INVÁLIDA (superseded): (conditional, só o `valid_when`) a condição CAIU. A própria migalha manda aposentá-la quando a KB documentar o uso content-audit, e a KB documenta: `docs/knowledge-base/concepts/knowledge-graph-sdaal.md` l.140 ("Escopo da camada `audit` — não é sobre código, é sobre investigação"), l.143 (conteúdo/documentação: decks, currículo, contratos, specs) e l.147 (a instância de campo do Lote 10). O re-teste de 2026-07-16 já tinha concluído RESOLVIDA, mas não gravou `superseded: true` no frontmatter. Por isso ela seguia contando como vencida no ⏰.

@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: [onion-validation, meta:evolve]
 share_with: [collective]
 next_recommended: "2026-07-01-audit-dogfood-finds-code-bugs"
-review_after: 2026-10-01
+review_after: 2027-01-12
 conflict_class: static
 ---
 
@@ -32,3 +32,5 @@ Ao revisar scripts de `.claude/validation/` e hooks: procurar pipelines com grep
 intermediário sem proteção `|| true` — candidatos a morte silenciosa no campo (adotante com dados
 diferentes dos nossos). O selftest de cada script novo nasce com fixture mínima, não com cópia
 do estado atual.
+
+## Re-testada em 2026-10-14: (static, contra a melhor fonte atual) a cura do bug 2 está no código (`diary-index.sh` l.45-47, `{ grep -v '\[\]' || true; }`), e a família `diary_crumbs` passou 8/8 em fixture mínima, inclusive "entrada sem conflict_class → passa". A doutrina posterior estende esta, sem contradizê-la: a bancada espelha o runner (locale C, `set -e`) e o pipefail tem uma classe nova (EPIPE de quem fecha cedo).

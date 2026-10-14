@@ -8,7 +8,7 @@ affects: [meta, federation]
 breadcrumb_for: [meta:kg, meta:evolve]
 share_with: []
 next_recommended: "2026-07-15-kg-audit-layer-generalizes-to-content"
-review_after: 2026-10-13
+review_after: 2027-01-12
 conflict_class: dynamic
 ---
 
@@ -32,3 +32,5 @@ Antes de assumir escopo core-only para o KG SDAAL, lembrar que o radar é agnós
 do grafo. Re-teste = re-rodar `bash .claude/validation/kg-radar.sh <grafo>` (dynamic — grafos
 e comportamento mudam com o tempo). Ver `[[2026-07-15-kg-audit-layer-generalizes-to-content]]`
 (o que o grafo do adotante revelou sobre a camada audit).
+
+## Re-testada em 2026-10-14: (dynamic, rodei) `kg-radar.sh <grafo do adotante>` → rc=0; `kg-radar.sh <grafo> --integrity --schema` → rc=0, "sem contradições estruturais (107 nós, 172 arestas)", o mesmo tamanho de julho, lido do clone local do adotante. As famílias `kg_radar_contract` (14/14) e `kg_radar_integrity` (12/12) passaram.

@@ -9,6 +9,7 @@ breadcrumb_for: [members.yaml, meta:co-evolve, onion-bridge]
 share_with: [collective]
 next_recommended: "2026-07-03-declared-vs-verified-family"
 review_after: 2026-10-06
+superseded: true
 conflict_class: conditional
 valid_when: "o VPS Hostinger (srv1475924) hospeda clone do core + onion-bridge + site onionevolve.com, com acesso via ssh onion-vps"
 ---
@@ -75,3 +76,5 @@ Isso disparou o re-teste cedo.
 - **members.yaml atualizado no mesmo dia:** `local_path` do core repathado p/ `/home/marcio/onion-evolve`
   + `host: srv1812846` na linhagem workstation. Os 3 adotantes ausentes foram re-clonados p/ `/home/marcio/`.
 - Verdito: **válida** (coexist confirmado); `review_after` renovado p/ 2026-10-06. Ver [[onion-core-home]].
+
+## Re-testada em 2026-10-14 — INVÁLIDA (superseded): (conditional, só o `valid_when`) a condição CAIU. O `valid_when` exige que a VPS srv1475924 hospede o clone do core, o onion-bridge e o site, e hoje nada disso está lá. `hostname` = srv1812846 (KVM 8); `dig +short onionevolve.com` e `app.onionevolve.com` → 179.197.65.94 (a KVM 8); os dois respondem HTTP/2 200; o bridge roda AQUI como `onion-vps-bridge.service` (User=onion, `~onion/onion-bridge`, atrás de `reverse_proxy 127.0.0.1:8787` no Caddy local); o `members.yaml` marca a linhagem `vps-bridge` como `status: retired`. Quem supera esta migalha é `2026-07-08-site-consolidation-kvm8` (a decisão "Coexistem" foi revertida no mesmo dia). As lições de método (linhagem com escritor é meia-instância; docs de deploy são declaração e o servidor é o verificado) seguem vivas na família declarado ≠ verificado e não dependem desta máquina.

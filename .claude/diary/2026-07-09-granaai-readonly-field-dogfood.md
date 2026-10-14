@@ -8,7 +8,7 @@ affects: [scope, transport, adoption, federation]
 breadcrumb_for: [meta:adopt, meta:evolve]
 share_with: []
 next_recommended: "2026-07-09-adopt-vendor-branch-merge"
-review_after: 2026-10-07
+review_after: 2027-01-12
 conflict_class: conditional
 valid_when: "o granaai segue sem nenhum <app>/.claude/settings.json (camada time inexistente) — quando surgir, re-dogfoodar o resolver com a camada time REAL"
 ---
@@ -37,3 +37,5 @@ que o modelo funciona contra dado regulado sem tocá-lo** + mapear o gap de ado�
 Quando o Grana.Ai quiser escopo por-time: criar `apps/<time>/.claude/settings.json` e rodar o resolver.
 Ver [[2026-07-09-scope-inheritance-rfc0005]] (a convenção validada aqui) e
 [[2026-07-09-adopt-vendor-branch-merge]] (o dogfood-irmão que, esse sim, achou bug).
+
+## Re-testada em 2026-10-14: (conditional, só o `valid_when`) a busca por settings no nível de app no clone do granaai (`find <granaai> -mindepth 2 -maxdepth 4 -path '*/.claude/*' -name settings.json`, sem `node_modules`) achou 0 arquivos, rc=0, com `apps/` populado (admin, api-bigdata, api-billing…). A camada time segue inexistente, e as famílias `compose_settings` (4/4), `resolve_scope_layers` (3/3) e `detect_transport` (5/5) passaram.

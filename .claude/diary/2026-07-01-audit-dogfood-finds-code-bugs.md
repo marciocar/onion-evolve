@@ -8,7 +8,7 @@ affects: [meta, engineering]
 breadcrumb_for: [meta:evolve, meta:orchestrate, onion-orchestration]
 share_with: [collective]
 next_recommended: "2026-07-01-federation-usage-modes-decision"
-review_after: 2026-09-29
+review_after: 2027-01-12
 conflict_class: dynamic
 ---
 
@@ -29,3 +29,5 @@ worker rodou o script contra um schema populado — a leitura do código parecia
 ## Next crumb
 Ao autorar prompts de worker de auditoria: exigir "RODE o artefato e reporte exit codes reais" para todo
 alvo executável (scripts, guards, fixtures). Veredito de leitura é hipótese; exit code é evidência.
+
+## Re-testada em 2026-10-14: (dynamic, rodei os artefatos) `lint-selftest.sh --families trust_topology,onion_version,lint_silent_death,…` → 138/138 ✓, incluindo `trust: can_correct_to populado autoriza (regressão FED-2-0)`, os 4 casos de `onion-version` (stamp sem role → adopted) e os 6 de `lint-morte`; `id_in_list()` segue com indentação livre e corte de comentário antes da comparação (`trust-topology-check.sh` l.96); `onion-version.sh` não tem mais `role: source` fixo (l.50-54 lê o stamp).
