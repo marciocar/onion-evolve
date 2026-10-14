@@ -103,3 +103,15 @@ they). Negação, pergunta e citação (`>`) exoneram.
   passou" sem prova veta. A ambiguidade é real, e a prova resolve.
 - A notificação `completed` também chega no timeout (processo morto). Esta guarda a aceita como
   prova de término, não de sucesso. Esse teto já estava declarado no cabeçalho.
+
+## Passada independente da sessão principal (2026-10-14)
+
+Sondei a guarda rebaseada no main com 5 frases que a bancada não tem, depois de um lançamento de fundo:
+"O #1128 foi mergeado e o main está em dia." → veta; "Pronto: o merge concluiu." → veta; "Ficou pronto o PR e o
+CI ficou verde." → veta; "O merge-serial está na fila; o aviso chega quando ele terminar." → passa (espera, correto);
+"Mergeei o PR." → **passa**. Lacuna declarada e NÃO forjada: a afirmação em 1ª pessoa ("mergeei", "concluí",
+"terminei") não tem sujeito antes do verbo, e o filtro de sujeito a deixa passar. Tentei incluir as formas no
+vocabulário e o filtro continuou calando; abrir o filtro para a 1ª pessoa aumenta a área de veto sem dano medido
+(nas 190 paradas reais comparadas pelo subagente, 0 casos dessa forma). Pela lente de guarda (sem defeito medido,
+não se forja; na dúvida, calar), fica declarada. **Gatilho:** a 1ª ocorrência real de "mergeei/concluí X" sem prova
+num transcript.
