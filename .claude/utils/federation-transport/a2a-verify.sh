@@ -122,6 +122,10 @@ IAT="$(_int_claim iat)"
 EXP="$(_int_claim exp)"
 JTI="$(printf '%s' "${PL_JSON}" | jq -r '.jti // empty')"
 [ -n "${JTI}" ] || veto "jws-missing-jti" "parse"
+# TIPO dos claims de identidade (2ª passada do refutador, 2026-10-14): jti objeto/array saía do `jq -r` em
+# várias linhas, cada uma virava padrão no grep e ia para o jti.state antes do veto
+printf '%s' "${PL_JSON}" | jq -e '(.jti|type=="string") and (.iss|type=="string") and ((has("aud")|not) or (.aud|type=="string"))' >/dev/null 2>&1 \
+  || veto "jws-bad-claim-type" "parse"
 
 # --- Camada 2: anti-replay jti (CHECK agora; grava só no fim, após tudo passar) ---
 STATE="${REPO}/.claude/sessions/.a2a-verify.${RECEIVER}.jti.state"
@@ -231,7 +235,8 @@ case "${DUP}" in
   *) veto "duplicate-key:${DUP:-check-failed}" "body" ;;
 esac
 # claims de identidade sem caractere de controle: `$(jq -r)` come o \n final, e "acme\n" passava como "acme"
-printf '%s' "${PL_JSON}" | jq -e '[.iss,.aud,.jti] | all(.[]; type!="string" or (explode|all(.[]; . >= 32)))' >/dev/null 2>&1 \
+# controle = C0, DEL, C1 e os separadores U+2028/U+2029 (2ª passada: só `< 32` deixava U+0085 e U+2028)
+printf '%s' "${PL_JSON}" | jq -e '[.iss,.aud,.jti] | all(.[]; type!="string" or (explode|all(.[]; . >= 32 and . != 127 and (. < 128 or . > 159) and . != 8232 and . != 8233)))' >/dev/null 2>&1 \
   || veto "jws-claim-control-char" "body"
 # (ii) o claim: string de 64 hex minúsculos (a saída do sha256sum/openssl dgst)
 #      A forma é julgada DENTRO do jq, caractere a caractere: `$(...)` + `grep -x` aceitava "<hex>\n", e regex
@@ -257,19 +262,26 @@ for f in body_path thread; do
   [ "$(printf '%s' "${ENV}" | jq -c --arg k "$f" '.signal[$k]')" = "$(printf '%s' "${PL_JSON}" | jq -c --arg k "$f" '.[$k]')" ] \
     || veto "claim-${f}-mismatch" "body"
 done
-# (vi) o que NÃO é assinado tem forma fechada (refutador 2026-10-14): id/direction/kind/classification não
-#      entram no JWS, e o a2a-accept os escreve no frontmatter e no título do doc de inbox. Sem isto, quem
-#      não tem a chave injetava linhas de YAML e prosa num sinal verificado. Chave desconhecida no signal veta
-#      (campo novo entra por aqui, de propósito); os quatro rótulos: 1–128 de [A-Za-z0-9._:-], checados por
-#      explode (regex com ^/$ no jq casaria só uma linha).
+# (vi) forma fechada dos rótulos (refutador 2026-10-14): id/direction/kind/classification NÃO entram no JWS,
+#      e o a2a-accept os escreve no frontmatter e no título do doc de inbox. Sem isto, quem não tem a chave
+#      injetava linhas de YAML e prosa num sinal verificado. from/to/thread (comparados com claims, mas por
+#      `$()`, que come o \n final) e body_path (assinado, mas interpolado no inbox) entram na mesma régua (2ª
+#      passada). Chave desconhecida no signal veta (campo novo entra por aqui, de propósito). Rótulos: 1–128 de
+#      [A-Za-z0-9._:-]; body_path: 1–256 de [A-Za-z0-9._/-] sem "..". Checados por explode (regex com ^/$ no
+#      jq casaria só uma linha).
 SIGF="$(printf '%s' "${ENV}" | jq -r '.signal
   | (keys - ["id","direction","from","to","kind","classification","body","body_path","body_sha256","thread"]) as $x
   | if ($x|length) > 0 then "signal-unknown-key:" + ($x[0] | explode | map(select((. >= 48 and . <= 57) or (. >= 65 and . <= 90) or (. >= 97 and . <= 122) or . == 95 or . == 45)) | implode | .[0:40])
-    else ([ ("id","direction","kind","classification") as $k | select(has($k))
+    else ([ ("id","direction","kind","classification","from","to","thread") as $k | select(has($k))
             | select( (.[$k]|type) != "string" or (.[$k]|length) < 1 or (.[$k]|length) > 128
                       or ((.[$k]|explode|all(.[]; (. >= 48 and . <= 57) or (. >= 65 and . <= 90) or (. >= 97 and . <= 122)
                                                   or . == 46 or . == 95 or . == 58 or . == 45)) | not) )
-            | $k ] | if length > 0 then "signal-field-unsafe:" + .[0] else "ok" end)
+            | $k ]
+          + [ select(has("body_path")) | select( (.body_path|type) != "string" or (.body_path|length) < 1
+                or (.body_path|length) > 256 or (.body_path|contains(".."))
+                or ((.body_path|explode|all(.[]; (. >= 48 and . <= 57) or (. >= 65 and . <= 90) or (. >= 97 and . <= 122)
+                                            or . == 46 or . == 95 or . == 45 or . == 47)) | not) ) | "body_path" ]
+          | if length > 0 then "signal-field-unsafe:" + .[0] else "ok" end)
     end' 2>/dev/null)"
 [ "${SIGF}" = "ok" ] || veto "${SIGF:-signal-shape-unreadable}" "body"
 

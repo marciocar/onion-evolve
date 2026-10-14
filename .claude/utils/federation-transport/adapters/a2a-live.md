@@ -54,6 +54,8 @@ Até 2026-10-14 a assinatura cobria **só os claims**: trocar `signal.body` depo
 | cópia `signal.body_sha256` | se presente, igual ao claim | `signal-body-sha256-mismatch` |
 | chave JSON duplicada (envelope ou payload) | — | `duplicate-key:<onde>` |
 | `signal.id`, `direction`, `kind`, `classification` | **NÃO assinados**; forma fechada: 1–128 de `[A-Za-z0-9._:-]` | `signal-field-unsafe:<campo>` |
+| `signal.from`, `to`, `thread` / `body_path` | comparados com claims e, além disso, na mesma forma fechada / 1–256 de `[A-Za-z0-9._/-]` sem `..` | `signal-field-unsafe:<campo>` |
+| tipo de `iss`/`aud`/`jti` | string, sem caractere de controle (C0, DEL, C1, U+2028/9) | `jws-bad-claim-type`, `jws-claim-control-char` |
 | qualquer outra chave no `signal` | — | `signal-unknown-key:<chave>` |
 
 - **Canonicalização (declarada):** o corpo é uma **string JSON**; o canônico são os bytes UTF-8 do valor
