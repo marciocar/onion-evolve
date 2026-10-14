@@ -23,7 +23,7 @@
 
 | Tipo | Concorrentes | Nota |
 |---|---|---|
-| Diretos (framework `.claude/` + specs + comandos) | **Agent OS** ⚠️ (mais próximo estruturalmente), SuperClaude, BMAD-METHOD; **Superpowers** candidato (a confirmar pela dissecação) | monitorar Agent OS de perto; dissecar o Superpowers |
+| Diretos (framework `.claude/` + specs + comandos) | **Agent OS** ⚠️ (mais próximo estruturalmente), SuperClaude, BMAD-METHOD; **Superpowers** (mesmo movimento só em parte: persuasão sem gate determinístico; PARQUEADO em 2026-10-14) | monitorar Agent OS de perto; Superpowers reabre pelos gatilhos do grafo da dissecação |
 | Indiretos — SDD tooling | GitHub Spec Kit (140,9k★ em 2026-10-12), Kiro/AWS, Tessl, OpenSpec | plataforma/IDE diferente |
 | Indiretos — execução/orquestração | Claude Flow/Ruflo, MetaGPT | infra de agentes, não metodologia |
 

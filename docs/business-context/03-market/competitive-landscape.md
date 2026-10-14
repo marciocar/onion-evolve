@@ -1,6 +1,6 @@
 # Panorama Competitivo
 
-**Última Atualização:** 2026-10-12 (estrelas re-medidas pela API do GitHub; sinal de campo do adotante de curadoria, 2026-10-09)
+**Última Atualização:** 2026-10-14 (Superpowers fechado pela dissecação do adotante de curadoria: PARQUEAR; antes, 2026-10-12: estrelas re-medidas pela API do GitHub)
 
 > Da pesquisa orquestrada citada (2026-07-12). Categoria: **SDD (spec-driven development) sobre Claude Code**. Complementa [`../02-product/strategy.md`](../02-product/strategy.md) §Posicionamento.
 
@@ -19,9 +19,10 @@
 - **Força:** 30 comandos slash + 9 personas + integração MCP.
 - **Fraqueza:** sem spec-as-code documental como SSOT, sem compliance, sem multi-provider de task manager. **Diferenciação:** o Onion é spec-as-code + governança + federação, não só comandos+personas.
 
-### Superpowers (obra/superpowers) — candidato a DIRETO, a confirmar pela dissecação
-- **Medido (2026-10-12):** 297,9k★ (github.com/obra/superpowers, ativo); 2º bundle vertical mais instalado do catálogo oficial de plugins, 1.009.371 instalações (`docs/evolution/research/plugin-directory-landscape-2026-09/SYNTHESIS.md`; o contador aparecia igual em 2026-10-08, possivelmente congelado).
-- **Por que candidato:** é método em skills e subagentes distribuído por plugin, o mesmo movimento do Onion (caracterização do adotante de curadoria, ainda não dissecada pelo core). **Gatilho para fechar:** a dissecação do Superpowers que o adotante de curadoria vai relayar (`/meta:dissect`); até lá, não afirmar paridade nem diferença de capacidade.
+### Superpowers (obra/superpowers) — mesmo movimento SÓ EM PARTE; PARQUEADO em 2026-10-14
+- **Medido (2026-10-12):** 297,9k★ (github.com/obra/superpowers, ativo). A dissecação mediu 296,6k★ em 2026-10-09: é crescimento, não divergência. É o 2º bundle vertical mais instalado do catálogo oficial de plugins, com 1.009.371 instalações (`docs/evolution/research/plugin-directory-landscape-2026-09/SYNTHESIS.md`; o contador aparecia igual em 2026-10-08, possivelmente congelado).
+- **Desfecho da dissecação (fechado em 2026-10-14):** o movimento se confirma **só em parte**. É método em skills distribuído por plugin, como o Onion, mas o mecanismo é **persuasão injetada no SessionStart, sem gate determinístico**. O determinismo fica em dois scripts que o próprio modelo escolhe chamar. O Onion usa a mesma injeção e soma lint e CI com exit code. A dissecação foi do adotante de curadoria, até o N4, e o core triou o resultado. **Veredito: PARQUEAR** (selado pelo maestro em 2026-10-13, triado pelo core em 2026-10-14), com dois gatilhos de reabertura no grafo [`superpowers-2026-10.kg.yaml`](../../evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml): rodar as 3 skills que o Onion não tem (systematic-debugging, TDD como fluxo, diagnosing-superpowers) em worktree isolada, e o worker do kg-freshness ou do census devolver `probe {argv[], expect_regex}`.
+- **Hipótese de posicionamento (NÃO medida):** o Superpowers chegou a 296,6k★ sem nenhum gate determinístico. Se a tração vem do baixo atrito e do alcance (15 harnesses declarados), o determinismo do Onion pode não ser o que este mercado seleciona. Isso **não prova** que determinismo não vende. Os fatores de confusão não estão controlados: a reputação do fundador e de quem o divulgou, o destaque no catálogo oficial, o fato de estrela não ser adoção e o contador de instalações congelado (nó `E_MERCADO_PERSUASAO_E_DISTRIBUICAO` do grafo da dissecação, confiança 0,4).
 
 ### BMAD-METHOD (54,0k★ em 2026-10-12)
 - **Posicionamento:** "substitui vibe coding por time completo de agentes especializados + quality gates" ([github](https://github.com/bmad-code-org/BMAD-METHOD)).
