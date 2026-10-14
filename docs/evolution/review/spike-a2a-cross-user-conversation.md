@@ -2,7 +2,7 @@
 title: 'Resíduo — spike A2A cross-user: protocolo pré-registrado, cura do anti-replay e membro de teste pinado'
 date: 2026-10-14
 branch: spike/a2a-cross-user-conversation
-reviewed_diff_sha256: b474419845f9d22511389ecd38d51adea39dd09d6fad59f2ef8ff16acc02044a
+reviewed_diff_sha256: a5b3b708cb10ba3ff46cfdcfd87d8473f56cdb9344beb3f4bc18f0788d508b8f
 reviewed_code_sha256: de360a1c96e03640be1b3775abcc384cd9a745492839d8dd307e7452b37f2886
 findings_total: 11
 findings_real: 8
