@@ -10646,7 +10646,7 @@ nodes:
     confidence: 0.65
     verified_at: "2026-10-14"
     verified_against: "estudo C do adotante de curadoria, commit 7625595 do adotante: grafo tessl-2026-10 (nó E_CORE_10K_SPECS_UNCONFIRMED) e linha de base tessl-baseline-2026-10 (nós E_OBJECAO_PIVO_PARA_SKILLS, E_OBJECAO_NARRATIVA_SKILLS_CODIGO e o resumo de lacunas, que registra a refutação do Verify por arXiv 2606.27045)"
-    label: "REFUTA [B5_17_tessl_unico_as_source] (jul/2026) com a medição de 2026-10-14: a afirmação 'a Tessl é a única que mira spec-as-source' foi refutada pelo Verify da rodada (arXiv 2606.27045, tier 6), e o spec-as-source que aparece no registry é plugin de TERCEIRO sobre o OpenSpec, não produto da Tessl. O '10.000+ specs' da mesma fonte não se confirma hoje (não é refutação do número de 2025, que contava specs de bibliotecas e não skills): nenhuma página atual da Tessl declara 10k; o sitemap lista 1.274 páginas de skill (PISO, não total)."
+    label: "REFUTA B5_17_tessl_unico_as_source (2026-10-14): o spec-as-source no registry da Tessl é plugin de terceiro sobre o OpenSpec (arXiv 2606.27045, tier 6); o '10.000+ specs' não se confirma hoje (sitemap: 1.274 skills, PISO, não total)."
     narrative: |-
       O que está medido e o que não está. MEDIDO pelo adotante (curl e WebFetch por agente de pesquisa,
       2026-10-13 e 2026-10-14): o sitemap tessl.io/sitemap.xml com 1.274 páginas /registry/<workspace>/<nome>;

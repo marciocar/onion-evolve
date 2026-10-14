@@ -2,8 +2,7 @@
 title: 'Resíduo — a Tessl re-medida: piso não é total, e ausência não é retirada'
 date: 2026-10-14
 branch: docs/triage-tessl-landscape
-reviewed_diff_sha256: d3b88418c551f60f2ec01def8d00ef968178bbbba072e66069ddcb2066ffc30a
-reviewed_code_sha256: 19a3340dac283b044ead8e163efe2bce463e7ceeaa8ea25b2a36035398de0bda
+reviewed_diff_sha256: pendente
 tokens: 150000
 duration_min: 10
 findings_total: 4
@@ -51,3 +50,7 @@ batem com o grafo do adotante.
 O total do registry da Tessl e a origem do "10k" antigo continuam **NÃO VERIFICADOS**. O veredito
 `B5_17_veredito_trajetoria_campo` não foi tocado: a question que diz que ele perdeu uma premissa está
 aberta. O veredito PARQUEAR do estudo C é do adotante e o core não o selou.
+
+## Correção pós-CI (sessão principal, 2026-10-14)
+
+O gate do contrato no CI acusou `debt.form.range.node.label: 2161 → 2162`: o label de `E_TESSL_UNICO_AS_SOURCE_REFUTADO_2026_10` tinha 538 caracteres, acima do teto de 280. O label foi encurtado para 233; o detalhe já vivia na `narrative`. Gate com os `--exclude` do CI: rc 0.
