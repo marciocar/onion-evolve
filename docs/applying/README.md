@@ -18,6 +18,10 @@ Para quem não conhece o Onion e quer entender o todo antes de entrar no detalhe
 **[Manual de Adoção Completo](./onion-adoption-manual.md)** — história, conceitos, ecossistema atual
 e how-to prático, escrito na voz do framework.
 
+Para formar a equipe de um hub adotante, em aula mão na massa:
+**[Aula 5 — KG e Forja](./lesson-5-kg-forge.md)** ([versão para projetar](./lesson-5-kg-forge.html)) —
+mapear projetos e documentos em grafo e forjar um componente do time.
+
 Cada guia documenta:
 
 - Pré-requisitos
