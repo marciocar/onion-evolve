@@ -1,11 +1,10 @@
 ---
 branch: docs/diary-review-2026-10-14
 date: 2026-10-14
-reviewed_diff_sha256: 2afd5915fcce54b1e0fe3b574e71bfce491a3bcbcf1260b4f162d5ab43b16e2d
-reviewed_code_sha256: a2bf1004286cf69d3b957a30221a9ee7e8b2efce59cd68968b7ba859f5c801be
-findings_total: 15
-findings_real: 15
-findings_fixed: 14
+reviewed_diff_sha256: pendente
+findings_total: 16
+findings_real: 16
+findings_fixed: 15
 tokens: 0
 duration_min: 45
 verdict: REPROVADO_E_CURADO
@@ -85,3 +84,10 @@ O re-teste produziu as duas primeiras `superseded: true` do diário, e nem o `di
 pular a migalha com `superseded: true` no frontmatter. Caso (i) da família `diary_crumbs`: uma superada e
 uma vencida comum → índice "1 stale" e hook 1. Mutante (as duas leituras antigas): o caso reprova com
 "2 stale" e hook 2. Depois da cura, o diário real dá 0 vencidas no índice e no hook.
+
+## Rodada 1 do CI: a guarda de âncora morta só olhava `.claude/validation/`
+
+O caso (i) extrai `count_overdue_diary` do hook SessionStart por `sed -n '/^count_overdue_diary()/…'`, e a guarda
+(0) da família `selftest_lanes` só procurava o símbolo em `.claude/validation/*.sh`: acusou âncora morta de um
+símbolo vivo. Real, curado: o pote inclui `.claude/hooks/*.sh`. As duas famílias passam; mutante (âncora
+inexistente) segue reprovando.

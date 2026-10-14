@@ -21413,7 +21413,9 @@ run_selftest_lanes_selftests() {
     #    da ancora contem o simbolo, entao procura-lo em `*.sh` (que inclui `lint-selftest.sh`)
     #    sempre acha — o mutante aplicou e a guarda passou. Achado pelo mutante, nao por leitura.
     _found=0
-    for _cand in "${SCRIPT_DIR}"/*.sh; do
+    # o pote inclui os hooks (2026-10-14): o caso (i) do diary_crumbs extrai `count_overdue_diary` do hook
+    # SessionStart, e a guarda o acusava de morto por só olhar .claude/validation/
+    for _cand in "${SCRIPT_DIR}"/*.sh "${SCRIPT_DIR}/../hooks"/*.sh; do
       case "${_cand##*/}" in lint-selftest.sh) continue ;; esac
       if LC_ALL=C grep -qw -- "${_anchor}" "${_cand}" 2>/dev/null; then _found=1; break; fi
     done
@@ -21426,7 +21428,7 @@ run_selftest_lanes_selftests() {
     record_fail "selftest-lanes: (0) ancoras" "ZERO ancoras extraidas — o proprio extrator quebrou (nao ha como isto ser conformidade)"
   elif [ -z "${_dead}" ]; then
     record_pass "selftest-lanes: (0) as ${_n} ancoras de sed do harness resolvem em simbolo VIVO do runner"
-  else record_fail "selftest-lanes: (0) ancora morta" "simbolo(s) citado(s) por \`sed -n '/^X/'\` que nao existem em .claude/validation/*.sh:${_dead} — renomeou no runner e esqueceu no harness"; fi
+  else record_fail "selftest-lanes: (0) ancora morta" "simbolo(s) citado(s) por \`sed -n '/^X/'\` que nao existem em .claude/validation/*.sh nem .claude/hooks/*.sh:${_dead} — renomeou no runner e esqueceu no harness"; fi
 
   local sut="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
   if [ ! -f "${sut}" ]; then record_fail "selftest-lanes" "bancada ausente: ${sut}"; return; fi
