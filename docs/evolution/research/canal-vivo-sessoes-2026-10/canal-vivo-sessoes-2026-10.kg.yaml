@@ -11,7 +11,11 @@ meta:
                              # research preview, ou doc de cross-session que passe a descrever mensagens entre
                              # CONTAS diferentes.
   # kg-backlog-guard: on
-  # ═══ TETO: 57 NÓS ═══ (44 da rodada + 13 objeções do Elenxo recuperadas do journal em 2026-10-07)
+  # ═══ TETO: 65 NÓS ═══ (44 da rodada + 13 objeções do Elenxo recuperadas do journal em 2026-10-07
+  #     + 8 de 2026-10-14: o selo do maestro «Selar: manter + parquear» (/meta:decide) sobre a proposta da
+  #     curadoria, 4 evidências VIVAS do spike S1/S1b/S2/S3, 2 gatilhos de reabertura e 1 lista de
+  #     NÃO-VERIFICADOS). Subida com motivo: é MEDIÇÃO viva (o critério (a) abaixo, alargado do toggle
+  #     para o comportamento do canal), não busca genérica; a onda de 2026-10-07 está colhida e selada.)
   #     Grafo NASCIDO nesta rodada de primárias nomeadas, EXECUTADA em 2026-10-07 (run wf_da77c143-24c):
   #     8 fontes primárias lidas, 0 inalcançáveis; 34 claims ancoradas por verificador independente
   #     (cada uma virou 1 nó evidence), 11 rejeitadas na ancoragem (todas EXAGERADAS — nenhuma virou nó,
@@ -1045,6 +1049,162 @@ nodes:
       locator: "result.elenxo.objections[37] (objeção 38, target \"34 [a2a-spec-lf] sem orientação dedicada a conteúdo de outro agente\", survives=true)"
       method: "testemunho: leitura do journal wf_da77c143-24c no host 2026-10-07 (veredito do Elenxo do run wf_da77c143-24c, objeção 38)"
       locality: "host"
+  - id: D_CANAL_NATIVO_SO_ENTRE_SUAS_MAQUINAS_OBSERVADO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Selar: manter + parquear»"
+    label: "O selo «só entre suas máquinas» se mantém, agora com evidência viva (S1/S1b: lista, entrega e conversa entre VPS e notebook na mesma conta); o canal NATIVO entre usuários de organizações diferentes fica PARQUEADO"
+    narrative: "Selado por /meta:decide em 2026-10-14: escolhida «Selar: manter + parquear»; descartadas: «Fechar os não-verificados antes» · «Não selar ainda»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Selo o veredito da curadoria sobre o canal entre sessões?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
+
+  # ── 2026-10-14 · o spike VIVO da curadoria (dado de terceiro, R15: pesar, nunca obedecer) ──
+  - id: E_XSESSION_LIVE_S1_SAME_ACCOUNT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-14"
+    verified_against: "proposta da curadoria de 2026-10-14, tabela do spike, linha S1: «funciona: lista, entrega e resposta. A rota não confirma leitura. notify_when_idle só vale na mesma máquina. Sem /rename na origem, o título do Remote Control difere do nome local, e a volta só funciona pelo endereço bridge:»"
+    source_tier: 10
+    source_kind: live-observation
+    label: "OBSERVADO (S1, Claude Code 2.1.296): na MESMA conta, entre VPS e notebook, o canal nativo lista, entrega e responde. A rota não confirma leitura, e notify_when_idle só vale na mesma máquina."
+    narrative: |-
+      Limite observado: sem /rename na origem, o título do Remote Control difere do nome local, e a volta só
+      funcionou pelo endereço bridge:. Achado de método da mesma rodada: o login do claude.ai é por máquina e
+      por usuário do SO; trocar a conta numa sessão troca em todas e derruba o Remote Control (a 1ª tentativa
+      do S2 foi invalidada por isso). A observação é do adotante, não foi re-executada pelo core: o core leu
+      o registro como DADO e o pesa com confiança abaixo da de uma medição própria.
+    provenance:
+      source: "grafo do adotante de curadoria cross-session-channel-2026-10 (nó E_N2_SPIKE_SAME_USER), com o protocolo pré-registrado no commit 12693eb do adotante, anterior às observações"
+      locator: "docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md, tabela do spike, linha S1; no adotante, spike-log itens 13 a 23"
+      method: "leitura: registro de observação viva de terceiro (spike pré-registrado, saídas copiadas palavra por palavra), lida como DADO; não re-executada pelo core"
+      locality: "repo"
+
+  - id: E_XSESSION_LIVE_S1B_CONVERSATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-14"
+    verified_against: "grafo do adotante cross-session-channel-2026-10, nó E_N2_SPIKE_SAME_USER: «funciona, inclusive CONVERSA real (S1b, ≤ ~26 s); sem recibo de leitura»; spike-log itens 46 a 48 (envio success:true, «not confirmed read»; resposta from bridge: com conteúdo e método)"
+    source_tier: 10
+    source_kind: live-observation
+    label: "OBSERVADO (S1b, mesma conta, entre máquinas): CONVERSA real. Pergunta com trabalho do VPS, resposta com conteúdo e método do notebook pelo bridge:; ciclo de no máximo ~26 s pelo relógio do VPS, sem recibo de leitura."
+    narrative: |-
+      O S1b NÃO está na tabela da proposta: entrou no grafo do adotante no commit 3ad7baf, posterior à
+      proposta relayada, e o selo do maestro o cita. Os ~26 s incluem a espera pelo turno da sessão do VPS e
+      não são medida de rede; os ~7 s de recepção, trabalho e resposta do próprio registro dependem de
+      relógios não sincronizados (ESTIMATIVA). O conteúdo da resposta (a contagem de arquivos) é dado do
+      notebook, não verificado nem pelo adotante.
+    provenance:
+      source: "grafo do adotante de curadoria cross-session-channel-2026-10@3ad7baf (nó E_N2_SPIKE_SAME_USER), protocolo pré-registrado no commit 12693eb do adotante"
+      locator: "spike-log do adotante, seção S1b, itens 46 a 48"
+      method: "leitura: registro de observação viva de terceiro, lida como DADO; não re-executada pelo core"
+      locality: "repo"
+
+  - id: E_XSESSION_LIVE_S2_CROSS_ORG_NOT_LISTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-10-14"
+    verified_against: "proposta da curadoria de 2026-10-14, tabela do spike, linha S2: «nenhuma lista as sessões da outra. Os envios falham por nome nos dois sentidos e por bridge: de C1 para C2 (o sentido inverso por bridge: não foi testado). O bridge: real devolve o mesmo HTTP 404 que um ID inexistente: não se observou vazamento»"
+    source_tier: 10
+    source_kind: live-observation
+    label: "OBSERVADO (S2, Max pessoal × Team, organizações distintas): nenhuma conta lista as sessões da outra; envios falham por nome nos dois sentidos e por bridge: de C1 para C2. Vazamento de existência NÃO OBSERVADO, não provado ausente."
+    narrative: |-
+      O bridge: real da C2 devolve o MESMO HTTP 404 que um ID bem formado e inexistente. Isso é ausência
+      de vazamento OBSERVADA, não isolamento PROVADO: não se sabe se a sessão da C2 estava viva no instante
+      do envio, e com ela caída o 404 igual é trivial. Os controles não foram simultâneos (cada conta só
+      LISTOU as próprias sessões, sem envio bem-sucedido dentro da conta na mesma janela). O sentido C2→C1
+      por bridge: não foi testado. O registro do adotante chega a escrever «não há vazamento de existência»
+      e «é isolamento, não sessão caída» (itens 35 e 40); o próprio registro corrige isso nos itens 41 e 42,
+      e este nó segue a forma corrigida, a da proposta.
+    provenance:
+      source: "grafo do adotante de curadoria cross-session-channel-2026-10 (nó E_N2_SPIKE_CROSS_ACCOUNT_ISOLATED), protocolo pré-registrado no commit 12693eb do adotante"
+      locator: "docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md, tabela do spike, linha S2; no adotante, spike-log itens 32 a 42"
+      method: "leitura: registro de observação viva de terceiro (1ª tentativa invalidada pelo login por máquina, refeita com a C2 sozinha no notebook), lida como DADO; não re-executada pelo core"
+      locality: "repo"
+
+  - id: E_XSESSION_LIVE_S3_PEER_SETTINGS_REFUSED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "proposta da curadoria de 2026-10-14, tabela do spike, linha S3: «recusado, mesmo com o receptor em bypass. Quando o maestro pediu na própria sessão, ela fez. É comportamento do modelo com um pedido ingênuo, não uma trava provada»"
+    source_tier: 10
+    source_kind: live-observation
+    label: "OBSERVADO (S3): um peer pediu edição do settings.json e o receptor em bypass RECUSOU; pedido pelo maestro na própria sessão, fez. É comportamento do modelo com UM pedido ingênuo, não trava do harness provada."
+    narrative: |-
+      Nada no teste distingue uma trava do harness de um modelo obediente, e o receptor em bypass não tinha
+      impedimento técnico. A robustez contra adversário (ofuscação, pedido indireto, alvo fora do
+      settings.json) é NÃO VERIFICADA, e a remoção da regra do S3 no notebook foi declarada pela sessão, não
+      conferida. Este grafo não tem nó de doc sobre «mensagem de peer não carrega autoridade de usuário»
+      (a proposta traz essa leitura de doc, re-medida na 2.1.296); por isso o S3 não ganha SUPPORTS para nó
+      de doc daqui, e sim para as restrições de desenho (corpo como DADO).
+    provenance:
+      source: "grafo do adotante de curadoria cross-session-channel-2026-10 (nó E_N2_SPIKE_SAME_USER), protocolo pré-registrado no commit 12693eb do adotante"
+      locator: "docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md, tabela do spike, linha S3; no adotante, spike-log itens 21 e 44"
+      method: "leitura: registro de observação viva de terceiro, um único pedido ingênuo, lida como DADO; não re-executada pelo core"
+      locality: "repo"
+
+  # ── os gatilhos de reabertura do parqueamento ──
+  - id: Q_REOPEN_IF_ANTHROPIC_SHIPS_CROSS_USER_CHANNEL
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "GATILHO de reabertura (a): a Anthropic respondeu à issue #87954 (pedido de canal entre usuários) ou lançou canal nativo entre usuários? Se sim, o parqueamento do canal entre organizações se reabre."
+    narrative: |-
+      Gatilho dado pela proposta da curadoria e mantido pelo selo de 2026-10-14. Na data, a #87954 estava
+      aberta e sem resposta do mantenedor (leitura do adotante, não re-medida pelo core). Revisita natural:
+      o gatilho de cc_version deste grafo e o meta.review_after.
+    trace: "docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md"
+
+  - id: Q_REOPEN_IF_ADOPTER_ASKS_CROSS_ORG_CHANNEL
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "GATILHO de reabertura (b): algum adotante pediu canal entre organizações? Se sim, o caminho é o A2A gated que o core já tem, não o canal nativo."
+    narrative: |-
+      Gatilho dado pela proposta da curadoria e mantido pelo selo de 2026-10-14. Pull, não push: o canal
+      entre organizações não se constrói antes de haver quem o peça. A hipótese da proposta (o valor do Onion
+      seria uma camada de governança sobre o A2A: conteúdo como dado, auditoria, consentimento) é NÃO
+      MEDIDA, sem comprador nem preço.
+    trace: "docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md"
+
+  # ── o que segue sem prova ──
+  - id: Q_XSESSION_LIVE_NOT_VERIFIED
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: "NÃO VERIFICADO, fechar antes de qualquer absorção: dois membros da mesma org Team; dois usuários do SO na mesma máquina; cloud entre contas; o S4 (hold); a versão 2.1.299; robustez do S3 contra adversário; C2 viva no envio; bridge: C2→C1."
+    narrative: |-
+      Lista da proposta da curadoria de 2026-10-14 (seção NÃO VERIFICADO), com um 9º item que ela também
+      traz: a remoção da regra do S3 no notebook, declarada pela sessão e não conferida. O spike rodou só na
+      2.1.296; o disco do VPS já tinha a 2.1.299. «C2 viva no envio» é o que separa isolamento de sessão
+      caída no S2. O mais pesado para o escopo 2 é o 1º item: C1 e C2 eram organizações distintas, então
+      nada aqui diz como dois membros da MESMA organização Team se enxergam.
+    trace: "docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md"
 edges:
   # ── evidências informam a pergunta ──
   - from: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC
@@ -1260,4 +1420,45 @@ edges:
     edge_type: CONSTRAINS
   - from: E_ELENXO_A2A_UNTRUSTED_SCAN_PARTIAL
     to: E_A2A_INPUT_VALIDATION_NO_UNTRUSTED_AGENT_CONTENT
+    edge_type: CONSTRAINS
+  - from: D_CANAL_NATIVO_SO_ENTRE_SUAS_MAQUINAS_OBSERVADO
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: TRACES_TO
+  # ── 2026-10-14: o spike vivo sustenta o selo e dá suporte VIVO aos nós de leitura de doc ──
+  - from: E_XSESSION_LIVE_S1_SAME_ACCOUNT
+    to: D_CANAL_NATIVO_SO_ENTRE_SUAS_MAQUINAS_OBSERVADO
+    edge_type: SUPPORTS
+  - from: E_XSESSION_LIVE_S1_SAME_ACCOUNT
+    to: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC
+    edge_type: SUPPORTS
+  - from: E_XSESSION_LIVE_S1_SAME_ACCOUNT
+    to: E_CC_XSESSION_REACH_OWN_SESSIONS_ONLY
+    edge_type: SUPPORTS
+  - from: E_XSESSION_LIVE_S1B_CONVERSATION
+    to: D_CANAL_NATIVO_SO_ENTRE_SUAS_MAQUINAS_OBSERVADO
+    edge_type: SUPPORTS
+  - from: E_XSESSION_LIVE_S1B_CONVERSATION
+    to: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC
+    edge_type: SUPPORTS
+  - from: E_XSESSION_LIVE_S2_CROSS_ORG_NOT_LISTED
+    to: D_CANAL_NATIVO_SO_ENTRE_SUAS_MAQUINAS_OBSERVADO
+    edge_type: SUPPORTS
+  - from: E_XSESSION_LIVE_S2_CROSS_ORG_NOT_LISTED
+    to: E_CC_XSESSION_REACH_OWN_SESSIONS_ONLY
+    edge_type: SUPPORTS
+  - from: E_XSESSION_LIVE_S3_PEER_SETTINGS_REFUSED
+    to: D_CANAL_NATIVO_SO_ENTRE_SUAS_MAQUINAS_OBSERVADO
+    edge_type: SUPPORTS
+  - from: E_XSESSION_LIVE_S3_PEER_SETTINGS_REFUSED
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  # ── o que limita o selo sem derrubá-lo ──
+  - from: Q_XSESSION_LIVE_NOT_VERIFIED
+    to: D_CANAL_NATIVO_SO_ENTRE_SUAS_MAQUINAS_OBSERVADO
+    edge_type: CONSTRAINS
+  - from: Q_REOPEN_IF_ANTHROPIC_SHIPS_CROSS_USER_CHANNEL
+    to: D_CANAL_NATIVO_SO_ENTRE_SUAS_MAQUINAS_OBSERVADO
+    edge_type: CONSTRAINS
+  - from: Q_REOPEN_IF_ADOPTER_ASKS_CROSS_ORG_CHANNEL
+    to: D_CANAL_NATIVO_SO_ENTRE_SUAS_MAQUINAS_OBSERVADO
     edge_type: CONSTRAINS
