@@ -94,9 +94,12 @@ while IFS= read -r f; do
     fi
   fi
 
-  # Marcar stale
+  # Marcar stale. Migalha SUPERADA (`superseded: true` no frontmatter, veredito "inválida" do review)
+  # não vence mais: ela é história, não reflexão pendente. Sem isto o ⏰ a contava para sempre (2026-10-14,
+  # as 2 primeiras superadas do diário; o contador do hook SessionStart lê o mesmo campo).
+  SUPERSEDED=$(awk '/^---/{c++; next} c==1 && /^superseded:[[:space:]]*true/{print "y"; exit}' "$f" 2>/dev/null || true)
   STALE_MARKER=""
-  if [ -n "$REVIEW" ] && [ "$REVIEW" != '""' ] && [ "$REVIEW" \< "$TODAY" ] 2>/dev/null; then
+  if [ -z "$SUPERSEDED" ] && [ -n "$REVIEW" ] && [ "$REVIEW" != '""' ] && [ "$REVIEW" \< "$TODAY" ] 2>/dev/null; then
     STALE_MARKER=" ⏰"
     STALE=$((STALE + 1))
   fi

@@ -4,10 +4,10 @@ date: 2026-10-14
 reviewed_diff_sha256: pendente
 findings_total: 15
 findings_real: 15
-findings_fixed: 13
+findings_fixed: 14
 tokens: 0
 duration_min: 45
-verdict: CORRIGIDO
+verdict: REPROVADO_E_CURADO
 reviewer: protocolo review do /meta:diary (subagente do core, re-teste por conflict_class contra o vivo)
 ---
 
@@ -71,3 +71,16 @@ Todas as 29 tiveram re-teste. Três têm um item que ficou NÃO medido, e cada m
 
 Os vereditos acima são **propostas**. O protocolo exige confirmação do maestro na absorção, e esta
 passada rodou como subagente, sem esse gate.
+
+## Vereditos confirmados pelo maestro (2026-10-14)
+
+O protocolo exige a confirmação na absorção (passo 3 do `review`). A sessão principal perguntou pelo
+`AskUserQuestion` e o maestro escolheu **absorver os 29** (16 válidas, 11 parciais, 2 superadas).
+
+## Cura: a migalha superada não vence mais
+
+O re-teste produziu as duas primeiras `superseded: true` do diário, e nem o `diary-index.sh` nem o
+`count_overdue_diary()` do hook SessionStart liam o campo: o ⏰ as contaria para sempre. Os dois passam a
+pular a migalha com `superseded: true` no frontmatter. Caso (i) da família `diary_crumbs`: uma superada e
+uma vencida comum → índice "1 stale" e hook 1. Mutante (as duas leituras antigas): o caso reprova com
+"2 stale" e hook 2. Depois da cura, o diário real dá 0 vencidas no índice e no hook.

@@ -26,6 +26,8 @@ count_overdue_diary() {
   for f in "$dir"/*.md; do
     [ -f "$f" ] || continue
     case "$(basename "$f")" in index.md|readme.md) continue ;; esac
+    # superada (`superseded: true` no frontmatter) não vence mais — o mesmo critério do diary-index.sh
+    awk '/^---/{c++; next} c==1 && /^superseded:[[:space:]]*true/{f=1; exit} END{exit !f}' "$f" 2>/dev/null && continue
     ra="$(awk -F': *' '/^review_after:/{gsub(/["'"'"']/,"",$2); print $2; exit}' "$f" 2>/dev/null)"
     [ -n "$ra" ] && [ "$ra" \< "$today" ] && n=$((n+1))
   done

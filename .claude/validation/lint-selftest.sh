@@ -18867,6 +18867,21 @@ run_diary_crumbs_selftests() {
     record_pass "diary-crumbs: (h) marcador 📤 no frontmatter → exit 1 (projeção não entra na fonte)"
   else record_fail "diary-crumbs: (h) marcador na fonte" "esperava exit 1 + erro nomeado; rc=${rc} out='$(_emit "${out}" | head -2)'"; fi
 
+  # (i) migalha SUPERADA (`superseded: true`) com review_after vencido NÃO conta como ⏰, nem no índice
+  #     nem no contador do hook SessionStart; a vencida comum ao lado conta. Antes da cura (2026-10-14)
+  #     as duas contavam, e as 2 primeiras superadas do diário ficariam vencidas para sempre.
+  rm -f "${d}/.claude/diary/2026-01-10-marker-in-source.md"
+  printf -- '---\ndate: 2026-01-11\ntype: learning\nclassification: public\nreview_after: 2000-01-01\nconflict_class: static\nsuperseded: true\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-11-superseded-entry.md"
+  printf -- '---\ndate: 2026-01-12\ntype: learning\nclassification: public\nreview_after: 2000-01-01\nconflict_class: static\n---\n## Signal\nx\n' \
+    > "${d}/.claude/diary/2026-01-12-overdue-entry.md"
+  rc=0; out="$(bash "${di}" "${d}" 2>&1)" || rc=$?
+  local _hk="${REPO_ROOT}/.claude/hooks/co-evolution-inbox-check.sh" _hn
+  _hn="$(cd "${d}" && bash -c "$(sed -n '/^count_overdue_diary()/,/^}/p' "${_hk}"); count_overdue_diary" 2>/dev/null)"
+  if [ "${rc}" -eq 0 ] && grep -q '(1 stale' <<< "${out}" && [ "${_hn}" = 1 ]; then
+    record_pass "diary-crumbs: (i) superada não vence (índice 1 stale, hook 1) — só a vencida comum conta"
+  else record_fail "diary-crumbs: (i) superada" "esperava rc 0, '(1 stale' e hook 1; rc=${rc} hook=${_hn} out='$(_emit "${out}" | tail -2)'"; fi
+
   rm -rf "${d}"
 }
 
