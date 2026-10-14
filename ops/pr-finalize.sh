@@ -72,6 +72,10 @@ done
 [ "${CHECK}" = 1 ] && { [ "${PUSH}" = 1 ] || [ "${REBASE}" = 1 ]; } && die "--check não escreve nada: não combina com --push nem --rebase"
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || die "fora de um repositório git"
 cd "${ROOT}" || die "não entrei em ${ROOT}"
+# rebase de OUTRA MÃO em curso (SAC-136, 2026-10-14): não é nosso, e o motor não toca nele — nem para
+# abortar. A recusa vem ANTES do trap da limpeza, então o abort do _cleanup nunca o alcança.
+{ [ -d "$(git rev-parse --git-path rebase-merge)" ] || [ -d "$(git rev-parse --git-path rebase-apply)" ]; } \
+  && die "há um rebase em curso nesta worktree, começado antes de mim — não mexo nele; termine-o (--continue) ou aborte-o à mão"
 BR="$(git branch --show-current)"
 [ -n "${BR}" ] || die "HEAD destacado — finalize numa branch de PR"
 case "${BR}" in main|master|develop) die "branch '${BR}' é de integração — PR nasce em branch de trabalho" ;; esac
@@ -112,7 +116,7 @@ _field() {  # lê o campo como a guarda lê (só o frontmatter, sem aspas), e se
 
 # ── LIMPEZA ÚNICA E O CARIMBO TRANSACIONAL (SAC-66, 2026-10-08) ─────────────────────────────
 # Um trap só: antes havia um `trap … EXIT` no passo 3, e qualquer outro trap o sobrescreveria em silêncio.
-_WTS=(); _DIRS=(); _DONE=0; _RES_SNAP=""; _RES_IDX=""; _RES_HAD_IDX=0
+_WTS=(); _DIRS=(); _DONE=0; _RES_SNAP=""; _RES_IDX=""; _RES_HAD_IDX=0; _OWN_REBASE=0
 _snap_res() {  # o estado do resíduo ANTES de a rodada mexer nele: arquivo e entrada do índice
   [ -f "${ROOT}/${RES}" ] || return 0
   _RES_SNAP="$(mktemp)"; _DIRS+=("${_RES_SNAP}")
@@ -129,7 +133,24 @@ _restore_res() {  # rodada que NÃO terminou não deixa carimbo: devolve arquivo
   else git -C "${ROOT}" reset -q -- "${RES}" >/dev/null 2>&1 || true; fi
   echo "PR-FINALIZE: a rodada não terminou — o resíduo voltou ao estado em que foi encontrado (o carimbo só fica em rodada que termina)" >&2
 }
+_abort_own_rebase() {  # SAC-136: morto no MEIO do rebase que ELE começou, o motor desfaz o rebase
+  # A 2.1.300 do Claude Code mata o comando de fundo 1,5 s depois da saída da sessão (medido pelo juiz do
+  # radar E3 r11). O SIGTERM roda este trap, mas antes ele não abortava o `git rebase` do --rebase: a
+  # worktree ficava em rebase e a rodada seguinte morria no pré-check do índice. Só o rebase PRÓPRIO
+  # (_OWN_REBASE, ligado ao começar e desligado quando ele termina); o alheio é recusado lá em cima.
+  [ "${_OWN_REBASE}" = 1 ] || return 0
+  _OWN_REBASE=0
+  # --path-format=absolute: o --git-path sai relativo ao -C, e o `[ -d ]` o leria contra o cwd do trap
+  { [ -d "$(git -C "${ROOT}" rev-parse --path-format=absolute --git-path rebase-merge)" ] \
+    || [ -d "$(git -C "${ROOT}" rev-parse --path-format=absolute --git-path rebase-apply)" ]; } || return 0
+  if git -C "${ROOT}" rebase --abort >/dev/null 2>&1; then
+    echo "PR-FINALIZE: a rodada morreu no meio do rebase — rebase abortado, a branch voltou ao HEAD de antes" >&2
+  else
+    echo "PR-FINALIZE: a rodada morreu no meio do rebase e o abort FALHOU — rode 'git rebase --abort' à mão" >&2
+  fi
+}
 _cleanup() {
+  _abort_own_rebase
   _restore_res
   local w; for w in "${_WTS[@]}"; do git -C "${ROOT}" worktree remove --force "${w}" >/dev/null 2>&1; done
   local x; for x in "${_DIRS[@]}"; do rm -rf "${x}"; done
@@ -140,6 +161,7 @@ if [ "${REBASE}" = 1 ]; then
   # o --autostash devolveria o conteúdo stageado FORA do índice, e ele sumiria do commit em silêncio
   git diff --cached --quiet || die "--rebase exige índice limpo: commite o conteúdo do PR antes"
   git fetch -q origin || die "fetch falhou"
+  _OWN_REBASE=1   # daqui até o fim do bloco o rebase é NOSSO: morte no meio = o _cleanup o aborta
   if ! git rebase --autostash origin/main >/dev/null 2>&1; then
     for _r in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
       _c="$(git diff --name-only --diff-filter=U)"
@@ -162,6 +184,7 @@ if [ "${REBASE}" = 1 ]; then
   fi
   # o rebase pode falhar SEM deixar estado (ex.: arquivo não rastreado que a main traz) — e a 1ª versão
   # declarava "rebaseado" assim mesmo (maior M2 do Elenxo). A prova é a ancestralidade, não a mensagem.
+  _OWN_REBASE=0   # o rebase terminou (ou não deixou estado): nada mais a abortar
   git merge-base --is-ancestor origin/main HEAD || die "o rebase NÃO trouxe a origin/main para baixo do HEAD — nada a enviar"
   echo "PR-FINALIZE: rebaseado sobre origin/main @ $(git rev-parse --short origin/main)"
 fi

@@ -8563,6 +8563,61 @@ run_pre_push_selftests() {
       record_pass "pr-finalize: SAC-67 (x2) conflito em FONTE continua recusa (rebase abortado, HEAD intacto)"
     else record_fail "pr-finalize: SAC-67 (x2) conflito de fonte escondido" "rc=${g}: $(tail -2 "${sb}/out" | tr '\n' ' ')"; fi
   fi
+  # ── SAC-136 (2026-10-14, radar E3 r11): a 2.1.300 do Claude Code mata o comando de fundo 1,5 s depois da
+  # saída da sessão. Morto no MEIO do rebase que o --rebase começou, o motor deixava a worktree em rebase e a
+  # rodada seguinte morria no pré-check do índice. O sinal é REAL: um `git` de mentira no PATH manda SIGTERM
+  # ao motor no instante em que ele vai resolver o conflito de projeção (o rebase está PARADO ali), e o
+  # trap EXIT do motor roda como rodaria sob o kill da sessão.
+  local _rg; _rg="$(command -v git)"
+  mkdir -p "${d}/gitkill"
+  printf '%s\n' '#!/usr/bin/env bash' \
+    'if [ "$1" = checkout ] && [ "$2" = --theirs ]; then kill -TERM "$PPID"; exit 1; fi' \
+    "exec '${_rg}' \"\$@\"" > "${d}/gitkill/git"
+  chmod +x "${d}/gitkill/git"
+  _rbdirty() {  # <w> → rc 0 se a worktree está em rebase (merge ou apply)
+    # --path-format=absolute: o --git-path sai RELATIVO ao -C, e o `[ -d ]` daqui o lia contra o cwd da
+    # bancada — o (k1) passou assim, no vazio, na 1ª forma (medido)
+    [ -d "$(git -C "$1" rev-parse --path-format=absolute --git-path rebase-merge)" ] \
+      || [ -d "$(git -C "$1" rev-parse --path-format=absolute --git-path rebase-apply)" ]
+  }
+  # (k1) o rebase é DO MOTOR e para no conflito (de projeção: docs/backlog.md dos dois lados) → SIGTERM ali →
+  #      a worktree sai SEM rebase em curso, na branch, no HEAD de antes, árvore limpa
+  if _new rbkill; then
+    g="$(_pf "${sb}" -m t1)"
+    ( cd "${sb}/w" && echo PR-backlog >> docs/backlog.md && git commit -qam pr-backlog ) >/dev/null 2>&1
+    _h0="$(git -C "${sb}/w" rev-parse HEAD)"
+    git clone -q "${sb}/remote.git" "${sb}/o" 2>/dev/null
+    ( cd "${sb}/o" && git config user.email o@o && git config user.name o && echo MAIN-backlog >> docs/backlog.md \
+      && git commit -qam main-backlog && git push -q origin main ) >/dev/null 2>&1
+    g=0; (cd "${sb}/w" && PATH="${d}/gitkill:${PATH}" ONION_FINALIZE_CHECKPOINT=1 bash "${pf}" --rebase > "${sb}/out" 2>&1) 2>/dev/null || g=$?
+    if [ "${g}" != 0 ] && ! _rbdirty "${sb}/w" && [ "$(git -C "${sb}/w" rev-parse HEAD)" = "${_h0}" ] \
+       && [ "$(git -C "${sb}/w" branch --show-current)" = feat/x ] && [ -z "$(git -C "${sb}/w" status --porcelain)" ]; then
+      record_pass "pr-finalize: SAC-136 (k1) morto no meio do PRÓPRIO rebase → rebase abortado, branch no HEAD de antes, árvore limpa"
+    else record_fail "pr-finalize: SAC-136 (k1) morto no meio do rebase deixou a worktree suja" \
+      "rc=${g} rebase=$(_rbdirty "${sb}/w" && echo EM-CURSO || echo nao) br=$(git -C "${sb}/w" branch --show-current) status=$(git -C "${sb}/w" status --porcelain | head -3 | tr '\n' ' ')"; fi
+    # e a rodada seguinte, sem limpeza à mão, rebaseia e fecha (antes morria no pré-check do índice)
+    g="$(_pf "${sb}" --rebase)"; _pfc "SAC-136 (k1) a rodada seguinte, sem limpeza à mão, rebaseia e fecha" 0 "${g}" "${sb}"
+  fi
+  # (k2) rebase ALHEIO já em curso antes do motor (parado em conflito REAL de c.txt) → o motor RECUSA e NÃO
+  #      o aborta: o rebase de outra mão continua, com o conflito dele
+  if _new rbforeign; then
+    g="$(_pf "${sb}" -m t1)"
+    git clone -q "${sb}/remote.git" "${sb}/o" 2>/dev/null
+    ( cd "${sb}/o" && git config user.email o@o && git config user.name o && sed -i 50s/.*/MAIN/ c.txt \
+      && git commit -qam main-c50 && git push -q origin main ) >/dev/null 2>&1
+    ( cd "${sb}/w" && git fetch -q origin && git rebase origin/main ) > "${sb}/rbout" 2>&1 || true   # PARA no conflito: rc 1 é o esperado
+    if ! _rbdirty "${sb}/w"; then record_fail "pr-finalize: SAC-136 (k2) sandbox" "o rebase alheio não parou no conflito: $(tail -2 "${sb}/rbout" | tr '\n' ' ')"
+    else
+      g=0; (cd "${sb}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "${pf}" --rebase > "${sb}/out" 2>&1) || g=$?
+      # a recusa NOMEIA o rebase alheio (sem ela o motor cairia no "HEAD destacado", que também não aborta,
+      # mas diz a coisa errada — mutante medido que sobrevivia ao desfecho sozinho)
+      if [ "${g}" = 1 ] && _rbdirty "${sb}/w" && grep -q 'rebase em curso nesta worktree' "${sb}/out" \
+         && git -C "${sb}/w" diff --name-only --diff-filter=U | grep -qx c.txt; then
+        record_pass "pr-finalize: SAC-136 (k2) rebase ALHEIO em curso → recusa (rc=1) e NÃO o aborta (o conflito dele continua)"
+      else record_fail "pr-finalize: SAC-136 (k2) rebase alheio abortado ou recusa sem nomeá-lo" \
+        "rc=${g} rebase=$(_rbdirty "${sb}/w" && echo EM-CURSO || echo ABORTADO): $(tail -1 "${sb}/out")"; fi
+    fi
+  fi
   # o hook julga o COMMIT EMPURRADO, não a árvore: commit com HARD, árvore limpa por cima
   if _new hookwt; then
     ( cd "${sb}/w" && printf 'v-v1\n' > .claude/validation/lint-rules.md && echo 1 > verdict && git add -A && git commit -qm bad && echo 0 > verdict ) >/dev/null 2>&1
