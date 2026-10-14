@@ -14,13 +14,13 @@ axes:
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
     last_run: 2026-10-14
-    cc_version: "2.1.299"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "2/7 reprovados no juiz (grep cego por construção sem -z; migalha do PreCompact que não existe no core) + 3 exagerados corrigidos + 3 omissões incorporadas"
-                            # rodada 10 (2.1.296->2.1.299, uma versão, 190 itens). O achado: o delta quase não toca a
-                            # maquinaria do core; os pontos vivos são o hook de plugin que fecha no handoff (o bundle onion
-                            # leva 3 hooks, SAC-118), o PreCompact que não cobre as branches do core (SAC-117) e a deriva da
-                            # r9 (SAC-119). Histórico da r9 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-10-14-r10/radar-E3-2026-10-14-r10.kg.yaml
+    cc_version: "2.1.300"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "0/9 reprovados no juiz; 5 exagerados reescritos (a causa do risco de merge era o fullscreen, não a falta de trap; o tac que não existe) + 1 omissão incorporada"
+                            # rodada 11 (2.1.299->2.1.300, uma versão, 88 itens). O achado: a saída da sessão passa a
+                            # matar o fundo em 1,5 s também em fullscreen, e o rebase do pr-finalize fica pela metade
+                            # (SAC-136); e os hooks Stop parseiam o transcript inteiro, que passa a crescer ~63 KB por
+                            # resposta (SAC-137). Histórico da r10 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-10-14-r11/radar-E3-2026-10-14-r11.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
