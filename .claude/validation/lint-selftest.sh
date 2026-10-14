@@ -34092,6 +34092,26 @@ run_door_staleness_severity_selftests() {
 }
 _family run_door_staleness_severity_selftests
 _family run_guard_forge_selftests
+
+# Modo rule-title-in-prose — o hook Stop que exige "REGRA N (Título)" na prosa. Ate 2026-10-14 a bancada
+# NAO o exercitava (so o citava como nome plantado no sandbox do censo, em guard_forge (c2)); a SAC-137
+# (rodada r11 do radar E3) mudou a leitura dele para a CAUDA do transcript, e mudanca no harvester sem
+# caso ponta-a-ponta e o defeito que quase matou o background-state ([[bancada-espelha-o-runner]]).
+# Delega ao --selftest do proprio hook: os casos de texto e os dois de cauda (transcript grande e teto
+# estourado com fail-safe), pelo stdin JSON + transcript, como o harness o invoca.
+run_rule_title_in_prose_selftests() {
+  local hok="${REPO_ROOT}/.claude/hooks/rule-title-in-prose.sh" _ho _hrc=0 line
+  if [ ! -f "${hok}" ]; then record_fail "rule-title-in-prose" "hook ausente: ${hok}"; return; fi
+  _ho="$(LC_ALL=C bash "${hok}" --selftest 2>&1)" || _hrc=$?
+  while IFS= read -r line; do
+    case "${line}" in
+      *"  ✅ "*) record_pass "rule-title-in-prose: ${line#*✅ }" ;;
+      *"  ✗ "*)  record_fail "rule-title-in-prose" "${line#*✗ }" ;;
+    esac
+  done <<< "${_ho}"
+  [ "${_hrc}" -eq 0 ] || record_fail "rule-title-in-prose" "o selftest do hook saiu ${_hrc}"
+}
+_family run_rule_title_in_prose_selftests
 _family run_role_promotion_selftests
 _family run_r84_pathspec_selftests
 _family run_silent_measurer_selftests
