@@ -282,6 +282,7 @@
 .claude/utils/federation-transport/	C_no_sender_exists	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/utils/federation-transport/a2a-ssrf-check.sh	E_F11_CONTAINMENT_ESCAPE_CONVERGE_COM_SSRF	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/utils/federation-transport/a2a-verify.sh	E_F1_CORPO_FORA_DA_ASSINATURA	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
+.claude/utils/federation-transport/a2a-verify.sh	E_F1_F2_CURADOS_NO_GATE_2026_10_14	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 .claude/utils/federation-transport/a2a-verify.sh	E_F2_EXP_OPCIONAL	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 .claude/utils/federation-transport/a2a-verify.sh	E_a2a_is_not_vaporware	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/utils/forge/adapters/github.md	E_F10_GITLAB_NA_PLATAFORMA	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml

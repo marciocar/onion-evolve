@@ -8,7 +8,8 @@
 #   1. recusa se verdict.verified != true                       (defesa em profundidade, como o a2a-accept)
 #   2. RE-VERIFICA a assinatura com a pubkey pinada e AMARRA O CORPO: claim body_sha256 do JWS ==
 #      sha256(signal.body) == signal.body_sha256; iss == from; aud == onion-evolve; thread do claim == signal.
-#      O gate do core NÃO faz isto (achado F1 do protocolo): sem esta camada, o corpo que chega à sessão
+#      Desde 2026-10-14 o gate do core também confere body_sha256 (F1 curado); esta camada fica como 2ª
+#      verificação. Antes da cura, sem ela, o corpo que chega à sessão
 #      não é o que o remetente assinou — o envelope fora do JWS é texto livre.
 #   3. registra a aceitação com o a2a-accept.sh do core, num inbox DO SPIKE (não no inbox de co-evolução:
 #      conversa não é sinal de triagem, e misturar sujaria a fila do /meta:co-evolve)
@@ -137,7 +138,7 @@ keys = next(((m.get('a2a') or {}).get('keys') or [] for m in ms if m.get('id') =
 sys.exit(0 if sys.argv[3] in keys else 1)
 PY
 EXP="$(printf '%s' "${PL}" | jq -r '.exp // empty')"
-case "${EXP}" in ''|*[!0-9]*) refuse "JWS sem exp numérico (achado F2: o gate do core aceita; o spike não)" ;; esac
+case "${EXP}" in ''|*[!0-9]*) refuse "JWS sem exp numérico (achado F2, curado no gate do core em 2026-10-14)" ;; esac
 NOW_S="$(date +%s)"
 [ "${EXP}" -ge "${NOW_S}" ] || refuse "expirado (exp ${EXP})"
 # Emenda 7 (2026-10-14): a curadoria apontou que só o exp era conferido. iat no futuro e vida longa demais

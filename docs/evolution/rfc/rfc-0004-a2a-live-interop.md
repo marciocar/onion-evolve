@@ -55,6 +55,11 @@ autônomo" como anti-padrão de custo/fragilidade (`S4·F1/F2`). O handshake gat
   o "pausa esperando humano" no lifecycle (`S1·F3`, `G1`).
 - **`pin-integrity-check` = a "verificação-antes-de-agir"** que a spec A2A já **exige** do receptor
   (JWS/`jti`/anti-SSRF) — o Onion já a implementa (`G1`, `S1·F5/F6`).
+  **O que a assinatura cobre (desde 2026-10-14):** os claims `iss/aud/iat/exp/jti` **e o corpo**, pelo claim
+  obrigatório `body_sha256` (sha256 dos bytes UTF-8 da string `signal.body` já decodificada; ausente = vazio),
+  mais `body_path`/`thread` quando o signal os traz. `exp` é obrigatório, com teto de vida de 3600 s. Remetente
+  sem `body_sha256` é recusado. Antes disso o corpo ficava fora do JWS (achado F1 do spike A2A cross-user) e o
+  `exp` era opcional (F2). A tabela do que é e do que NÃO é assinado está em `adapters/a2a-live.md`.
 - **`never-live-pull` compatível por construção**: o adotante regulado recebe sinal, mas só aplica pelo
   mesmo gate (proposta → confirmação do maestro), nunca puxa framework ao vivo.
 
@@ -110,3 +115,8 @@ reputação como condicionante) ficam **gated atrás de dogfood**.
   expiração" — nó `D_RFC0004_CONVERSA_POR_THREAD` em
   `docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml` (opções A/B/C,
   recomendação B condicionada ao spike). Até o maestro selar, esta RFC vale como está.
+- **Emenda PENDENTE (2026-10-14, selada por delegação):** o nó `D_RFC0004_CONVERSA_POR_THREAD` foi selado
+  na opção (B) pelo `/meta:decide`, por decisão delegada do maestro (autorização noturna de 2026-10-14). A
+  emenda **ainda não vale**: só passa a valer depois de (1) o corpo assinado e o `exp` obrigatório estarem no
+  gate (PR `fix/a2a-body-signed-and-exp-required`) e (2) o spike vivo passar nos critérios pré-registrados. O
+  texto normativo acima (§3 "só sinais gated") não muda enquanto a emenda não vale.
