@@ -1,0 +1,40 @@
+# bridge local em 127.0.0.1:60639 (pid 1728557)
+
+| caso | esperado (http motivo) | obtido (http motivo) | veredito |
+|---|---|---|---|
+| S4.1 convite certo (alice→/a2a) | 200 input_required | 200 input_required | PASS |
+| S4.2 convite de OUTRO membro (bob) + from alice | 403 from-nao-e-o-membro-do-convite | 403 from-nao-e-o-membro-do-convite | PASS |
+| S4.2b mesmo envelope, convite certo (jti não queimado) | 200 input_required | 200 input_required | PASS |
+| S4.3 convite vencido | 401 convite-vencido | 401 convite-vencido | PASS |
+| S4.4 convite revogado | 401 convite-revogado | 401 convite-revogado | PASS |
+| S4.5a convite R válido (antes de revogar) | 200 input_required | 200 input_required | PASS |
+| S4.5b R revogado no arquivo, sem restart | 401 convite-revogado | 401 convite-revogado | PASS |
+| S4.5c servidor é o MESMO processo (sem restart) | pid 1728557 vivo | pid 1728557 vivo | PASS |
+| S4.6 bearer desconhecido | 401 bearer-desconhecido | 401 bearer-desconhecido | PASS |
+| S4.7 pool legado em /a2a (compat) | 200 input_required | 200 input_required | PASS |
+| S4.8 pool legado em /a2a/hub-teste | 403 pool-fora-do-receptor-padrao | 403 pool-fora-do-receptor-padrao | PASS |
+| S4.9 convite p/ onion-evolve usado em /a2a/hub-teste | 403 convite-de-outro-receptor | 403 convite-de-outro-receptor | PASS |
+| S5.1 /a2a/hub-teste (role: hub) | 200 input_required | 200 input_required | PASS |
+| S5.2 /a2a/adotado-teste (role: adopted) | 400 receptor-nao-recebe:role=adopted | 400 receptor-nao-recebe:role=adopted | PASS |
+| S5.3 rota hub-teste, aud=onion-evolve | 403 claim-aud-mismatch | 403 claim-aud-mismatch | PASS |
+| S5.4 /a2a/fantasma (fora do members.yaml) | 404 receptor-desconhecido | 404 receptor-desconhecido | PASS |
+| S5.5 /a2a/porta-teste (role: source, kind: door) | 403 trust-denied | 403 trust-denied | PASS |
+| S5.6 /a2a/hub-comentado (id com # inline) | 403 trust-denied | 403 trust-denied | PASS |
+
+# fila (receptor gravado por registro):
+      1   hub-teste	from=alice	auth=invite:alice
+      3   onion-evolve	from=alice	auth=invite:alice
+      1   onion-evolve	from=alice	auth=pool
+# trust-log do sandbox (linhas gravadas pelo gate, inclusive de pedidos recusados):
+      2    alice -> hub-teste   AUTORIZADO 
+      4    alice -> onion-evolve   AUTORIZADO 
+      1    alice -> porta-teste   BLOQUEADO 
+# FAILS=0
+
+# MUTANTES (medidos à parte em 2026-10-14, na mesma cópia, revertidos depois; só as linhas S4.2*):
+# M1 — sem amarração nenhuma (pré e pós-gate desligados): o F4 volta, o bearer de bob entrega o envelope de alice
+| S4.2 convite de OUTRO membro (bob) + from alice | 403 from-nao-e-o-membro-do-convite | 200 input_required | FAIL |
+| S4.2b mesmo envelope, convite certo (jti não queimado) | 200 input_required | 403 replay | FAIL |
+# M2 — amarração SÓ depois do gate (como o pedido descrevia): recusa, mas o gate já gravou o jti
+| S4.2 convite de OUTRO membro (bob) + from alice | 403 from-nao-e-o-membro-do-convite | 403 from-verificado-nao-e-o-membro-do-convite | FAIL |
+| S4.2b mesmo envelope, convite certo (jti não queimado) | 200 input_required | 403 replay | FAIL |

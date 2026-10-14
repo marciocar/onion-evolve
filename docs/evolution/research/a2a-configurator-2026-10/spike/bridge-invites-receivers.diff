@@ -1,0 +1,307 @@
+SPIKE F0 do configurador A2A (SAC-121; S4=SAC-129, S5=SAC-130) - NAO E PRODUCAO, nao foi aplicado no repo do bridge.
+Base: marciocar/onion-bridge @ 94a21ca (src/a2a.ts, src/config.ts, src/server.ts; src/a2a-invites.ts e novo).
+Aplicar numa COPIA com `patch -p1 < bridge-invites-receivers.diff`. Medicao: run-s4-s5.sh <copia> (saida em run-s4-s5.out.txt).
+
+--- a/src/a2a-invites.ts
++++ b/src/a2a-invites.ts
+@@ -0,0 +1,105 @@
++// src/a2a-invites.ts — SPIKE F0 do configurador A2A (SAC-121; testes S4=SAC-129, S5=SAC-130).
++// NÃO É PRODUÇÃO. Duas peças:
++//   1. CONVITE POR MEMBRO: arquivo JSON (A2A_INVITES_FILE) com [{token_sha256, member, receiver,
++//      expires_at, revoked}], RELIDO a cada POST (revogar = editar o arquivo, sem restart). O arquivo
++//      guarda só o sha256 do bearer — vazar o arquivo não vaza credencial.
++//   2. RECEPTOR MÚLTIPLO: o receptor vem da rota (/a2a/:receiver); só é aceito se, no members.yaml do
++//      core (ONION_CWD), tiver role: source ou role: hub.
++// Fail-closed nas duas: arquivo ilegível/forma errada ⇒ nenhum convite vale; members.yaml ilegível ⇒
++// nenhum receptor vale. Ausência nunca é aprovação.
++import { readFileSync, existsSync } from "node:fs";
++import { createHash, timingSafeEqual } from "node:crypto";
++import { spawn } from "node:child_process";
++import { join } from "node:path";
++import { config } from "./config.ts";
++
++export type Invite = {
++  token_sha256: string;
++  member: string;
++  receiver: string;
++  expires_at: string; // ISO-8601
++  revoked: boolean;
++};
++
++export type InviteMatch =
++  | { status: "ok"; invite: Invite }
++  | { status: "expired" | "revoked" | "unknown" | "no-file" };
++
++const ID_RE = /^[A-Za-z0-9._-]{1,128}$/;
++export const DEFAULT_RECEIVER = "onion-evolve";
++
++export function isSafeId(s: unknown): s is string {
++  return typeof s === "string" && ID_RE.test(s) && !s.startsWith("-") && s !== "." && s !== "..";
++}
++
++function wellFormed(x: any): x is Invite {
++  return (
++    x &&
++    typeof x.token_sha256 === "string" &&
++    /^[0-9a-f]{64}$/.test(x.token_sha256) &&
++    isSafeId(x.member) &&
++    isSafeId(x.receiver) &&
++    typeof x.expires_at === "string" &&
++    !Number.isNaN(Date.parse(x.expires_at)) &&
++    typeof x.revoked === "boolean"
++  );
++}
++
++// Relido A CADA chamada (o requisito do S4: revogar sem restart). Custo: um readFileSync de
++// poucos KB por POST — irrelevante perto do spawn do gate (~centenas de ms).
++function loadInvites(): Invite[] | null {
++  const f = config.a2aInvitesFile;
++  if (!f || !existsSync(f)) return null;
++  try {
++    const raw = JSON.parse(readFileSync(f, "utf8"));
++    const list = Array.isArray(raw) ? raw : raw?.invites;
++    if (!Array.isArray(list)) return [];
++    // linha malformada é IGNORADA (não derruba as outras) — e nunca vale como convite
++    return list.filter(wellFormed);
++  } catch {
++    return []; // JSON quebrado no meio de uma edição ⇒ fail-closed (ninguém entra), não fail-open
++  }
++}
++
++export function matchInvite(bearer: string, now = Date.now()): InviteMatch {
++  const invites = loadInvites();
++  if (invites === null) return { status: "no-file" };
++  const h = Buffer.from(createHash("sha256").update(bearer, "utf8").digest("hex"), "utf8");
++  // varre TODOS (sem early-return) para o tempo não revelar a posição do convite
++  let hit: Invite | undefined;
++  for (const inv of invites) {
++    const b = Buffer.from(inv.token_sha256, "utf8");
++    if (b.length === h.length && timingSafeEqual(b, h) && !hit) hit = inv;
++  }
++  if (!hit) return { status: "unknown" };
++  if (hit.revoked) return { status: "revoked" };
++  if (Date.parse(hit.expires_at) <= now) return { status: "expired" };
++  return { status: "ok", invite: hit };
++}
++
++// role do receptor no members.yaml do core. Lê com python3+yaml — o MESMO parser que o a2a-verify usa
++// para kid/mode (o trust-topology-check usa awk: são dois parsers do mesmo arquivo — risco anotado).
++export function receiverRole(receiver: string): Promise<string | null> {
++  const members = join(config.onionCwd, "docs/evolution/federation/members.yaml");
++  const py = [
++    "import sys, yaml",
++    "try: ms=(yaml.safe_load(open(sys.argv[1])) or {}).get('members') or []",
++    "except Exception: sys.exit(3)",
++    "for m in ms:",
++    "    if isinstance(m, dict) and m.get('id')==sys.argv[2]: print(m.get('role','') or ''); sys.exit(0)",
++    "sys.exit(4)",
++  ].join("\n");
++  return new Promise((resolve) => {
++    let out = "";
++    let done = false;
++    const fin = (v: string | null) => { if (!done) { done = true; clearTimeout(t); resolve(v); } };
++    const child = spawn("python3", ["-I", "-c", py, members, receiver], { stdio: ["ignore", "pipe", "ignore"] });
++    const t = setTimeout(() => { child.kill("SIGKILL"); fin(null); }, 5_000);
++    child.stdout.setEncoding("utf8");
++    child.stdout.on("data", (d: string) => (out += d));
++    child.on("error", () => fin(null));
++    child.on("close", (code) => fin(code === 0 ? out.trim() : null));
++  });
++}
++
++export const RECEIVER_ROLES = new Set(["source", "hub"]);
+--- a/src/a2a.ts
++++ b/src/a2a.ts
+@@ -13,6 +13,10 @@
+ import { join, resolve } from "node:path";
+ import { randomUUID } from "node:crypto";
+ import { config } from "./config.ts";
++import { DEFAULT_RECEIVER, RECEIVER_ROLES, isSafeId, receiverRole } from "./a2a-invites.ts";
++
++// SPIKE SAC-121: como o portador autenticou (setado pelo a2aGuard do server.ts).
++export type A2AAuth = { kind: "pool" } | { kind: "invite"; member: string; receiver: string };
+ 
+ const CORE = config.onionCwd;
+ const AGENT_CARD = join(CORE, "docs/onion/agent-card.json");
+@@ -38,7 +42,7 @@
+ 
+ // Roda o gate do core sem bloquear o event loop. Resolve com o stdout (string) ou null em
+ // timeout/erro — NUNCA rejeita a Promise: ausência de veredito é veto, não exceção (fail-safe).
+-function runGate(input: string): Promise<string | null> {
++function runGate(input: string, receiver: string): Promise<string | null> {
+   return new Promise((resolve) => {
+     let out = "";
+     let settled = false;
+@@ -50,7 +54,7 @@
+     };
+     let child: ReturnType<typeof spawn>;
+     try {
+-      child = spawn("bash", [VERIFY, "--receiver", "onion-evolve", "--envelope", "-"], {
++      child = spawn("bash", [VERIFY, "--receiver", receiver, "--envelope", "-"], {
+         stdio: ["pipe", "pipe", "ignore"],
+       });
+     } catch {
+@@ -79,6 +83,34 @@
+   } catch {
+     return c.json({ a2a: { state: "rejected" }, verified: false, reason: "corpo-json-invalido" }, 400);
+   }
++  // SPIKE SAC-121 — receptor da ROTA (padrão onion-evolve). Forma fechada ANTES de virar argv do gate
++  // (um "--repo" aqui seria injeção de OPÇÃO, não de shell) e papel conferido no members.yaml do core.
++  const receiver = c.req.param("receiver") ?? DEFAULT_RECEIVER;
++  if (!isSafeId(receiver)) {
++    return c.json({ a2a: { state: "rejected" }, verified: false, reason: "receptor-malformado" }, 400);
++  }
++  const role = await receiverRole(receiver);
++  if (role === null) {
++    return c.json({ a2a: { state: "rejected" }, verified: false, reason: "receptor-desconhecido", receiver }, 404);
++  }
++  if (!RECEIVER_ROLES.has(role)) {
++    return c.json({ a2a: { state: "rejected" }, verified: false, reason: `receptor-nao-recebe:role=${role}`, receiver }, 400);
++  }
++  // AMARRAÇÃO bearer↔membro (cura do achado F4 do spike cross-user): o from DECLARADO tem de ser o membro
++  // do convite. Checado ANTES do gate de propósito — o gate grava o jti e o trust-log mesmo quando o
++  // bridge recusa depois; recusar antes não queima o jti do remetente nem suja o log. O gate prova em
++  // seguida que esse from é autêntico (iss==from, kid de from), então o pré-check basta; o pós-check
++  // abaixo é a 2ª camada declarada.
++  const auth = c.get("a2aAuth") as A2AAuth | undefined;
++  if (!auth) {
++    return c.json({ a2a: { state: "rejected" }, verified: false, reason: "sem-autenticacao" }, 401);
++  }
++  if (auth.kind === "invite" && envelope?.signal?.from !== auth.member) {
++    return c.json(
++      { a2a: { state: "rejected" }, verified: false, reason: "from-nao-e-o-membro-do-convite", layer_failed: "invite-binding" },
++      403,
++    );
++  }
+   if (!existsSync(VERIFY)) {
+     // fail-safe: sem o gate do core não há como estabelecer confiança → rejeita (nunca aceita por ausência).
+     return c.json({ a2a: { state: "rejected" }, verified: false, reason: "gate-indisponivel" }, 503);
+@@ -88,7 +120,7 @@
+   // ASSÍNCRONO por exigência medida (6º Elenxo, Q_A2A_SPAWNSYNC_BLOQUEIA_O_EVENT_LOOP): spawnSync
+   // segurava o event loop inteiro — /health foi de 9,6ms a 3,99s e todo SSE de /chat congelava durante
+   // UM único POST /a2a. O fail-safe é o mesmo: timeout, erro de spawn ou stdout não-JSON ⇒ verdict null ⇒ REJEITA.
+-  const stdout = await runGate(JSON.stringify(envelope));
++  const stdout = await runGate(JSON.stringify(envelope), receiver);
+   let verdict: any = null;
+   try {
+     verdict = JSON.parse((stdout ?? "").trim());
+@@ -110,6 +142,14 @@
+     );
+   }
+ 
++  // pós-gate: o from VERIFICADO (iss==signal.from, kid de from) tem de ser o membro do convite.
++  if (auth.kind === "invite" && envelope?.signal?.from !== auth.member) {
++    return c.json(
++      { a2a: { state: "rejected" }, verified: false, reason: "from-verificado-nao-e-o-membro-do-convite", layer_failed: "invite-binding" },
++      403,
++    );
++  }
++
+   // VERIFICADO → enfileira como PROPOSTA GATED (input_required). Não aplica, não toca o repo do core.
+   mkdirSync(PENDING_DIR, { recursive: true });
+   const taskId = randomUUID();
+@@ -118,6 +158,8 @@
+     taskId,
+     receivedAt: new Date().toISOString(),
+     from: envelope?.signal?.from ?? null,
++    receiver, // SPIKE: a fila é UMA para todos os receptores — o registro diz para quem era
++    auth: auth.kind === "invite" ? { kind: "invite", member: auth.member } : { kind: "pool" },
+     signal: envelope?.signal ?? null,
+     verdict, // inclui gated:true, committed:false, apply_mode, regulated
+     envelope, // preserva o envelope assinado p/ auditoria
+@@ -133,6 +175,7 @@
+       message: "sinal verificado; enfileirado para o gate humano do maestro (nada aplicado)",
+     },
+     verified: true,
++    receiver,
+     gated: true,
+     committed: false,
+     apply_mode: verdict.apply_mode ?? "gated",
+--- a/src/config.ts
++++ b/src/config.ts
+@@ -48,6 +48,9 @@
+   a2aTokens: new Set(
+     (process.env.INVITE_TOKENS_A2A ?? "").split(",").map((t) => t.trim()).filter(Boolean),
+   ),
++  // SPIKE (SAC-121): convites por membro, arquivo JSON RELIDO a cada POST /a2a (ver a2a-invites.ts).
++  // Só o CAMINHO é lido na subida; o conteúdo, nunca — revogar não exige restart.
++  a2aInvitesFile: process.env.A2A_INVITES_FILE ?? "",
+ 
+   // Upload de arquivos
+   maxUploadSizeMB: Number(process.env.MAX_UPLOAD_SIZE_MB ?? 10),
+--- a/src/server.ts
++++ b/src/server.ts
+@@ -8,7 +8,8 @@
+ import { handleChat } from "./chat.ts";
+ import { handleCommands } from "./commands.ts";
+ import { handleFederationInbox } from "./federation.ts";
+-import { handleAgentCard, handleA2A } from "./a2a.ts";
++import { handleAgentCard, handleA2A, type A2AAuth } from "./a2a.ts";
++import { matchInvite, DEFAULT_RECEIVER } from "./a2a-invites.ts";
+ import { verifyAccessToken, jwksSelfCheck, type Identity } from "./identity.ts";
+ import { healthBody } from "./health.ts";
+ import { resolvePermission } from "./permissions.ts";
+@@ -29,6 +30,7 @@
+   tokenType: "oidc" | "pat";   // F4: "pat" = autenticou por token de API pessoal (trocado)
+   identity?: Identity;   // presente só quando o portador provou identidade (OIDC)
+   ctx?: Ctx;             // F-ID.2: contexto (pessoal/org) resolvido pelo withCtx
++  a2aAuth?: A2AAuth;     // SPIKE SAC-121: como o portador do /a2a autenticou (pool | convite de membro)
+ };
+ 
+ const app = new Hono<{ Variables: Variables }>();
+@@ -42,13 +44,32 @@
+   // é canal entre cores, não superfície humana; aceitar o token de admin por cima anulava o
+   // isolamento que o pool existe para dar (achado 2026-07-26, quando o pool estava vazio e o
+   // admin era o ÚNICO caminho). Zero tráfego em 30 dias — fechar aqui não interrompe ninguém.
+-  const ok = !!bearer && config.a2aTokens.has(bearer);
+-  if (!ok) // A mensagem dizia "(ou admin)" — texto sobrevivente do bypass que o P9 REMOVEU. Medido
+-    // 2026-07-28: o segredo de admin devolve 401 aqui. Mensagem que promete caminho inexistente
+-    // manda o operador depurar a credencial errada, e e a mesma doenca de declarado!=verificado
+-    // — so que na superficie que o humano le primeiro.
+-    return c.json({ error: "não autorizado — /a2a requer token do pool a2a dedicado" }, 401);
+-  return next();
++  const receiver = c.req.param("receiver") ?? DEFAULT_RECEIVER;
++  // SPIKE (SAC-121): o pool antigo segue aceito por compatibilidade, mas SÓ no receptor padrão —
++  // um token de pool não tem membro nem receptor amarrados, e estendê-lo a /a2a/:receiver abriria
++  // os receptores novos para credencial que nasceu antes deles.
++  if (bearer && config.a2aTokens.has(bearer)) {
++    if (receiver !== DEFAULT_RECEIVER)
++      return c.json({ error: "token do pool legado só vale em /a2a (receptor padrão)", reason: "pool-fora-do-receptor-padrao" }, 403);
++    c.set("a2aAuth", { kind: "pool" });
++    return next();
++  }
++  if (bearer) {
++    const m = matchInvite(bearer);
++    if (m.status === "ok") {
++      if (m.invite.receiver !== receiver)
++        return c.json({ error: "convite emitido para outro receptor", reason: "convite-de-outro-receptor" }, 403);
++      c.set("a2aAuth", { kind: "invite", member: m.invite.member, receiver: m.invite.receiver });
++      return next();
++    }
++    if (m.status === "expired" || m.status === "revoked")
++      return c.json({ error: `convite ${m.status === "expired" ? "vencido" : "revogado"}`, reason: `convite-${m.status === "expired" ? "vencido" : "revogado"}` }, 401);
++  }
++  // A mensagem dizia "(ou admin)" — texto sobrevivente do bypass que o P9 REMOVEU. Medido
++  // 2026-07-28: o segredo de admin devolve 401 aqui. Mensagem que promete caminho inexistente
++  // manda o operador depurar a credencial errada, e e a mesma doenca de declarado!=verificado
++  // — so que na superficie que o humano le primeiro.
++  return c.json({ error: "não autorizado — /a2a requer convite a2a válido (ou token do pool dedicado)", reason: "bearer-desconhecido" }, 401);
+ }
+ 
+ // Auth obrigatório em /chat, /commands, /a2a e /admin.
+@@ -59,6 +80,7 @@
+ app.use("/chat/permission", authGuard);
+ app.use("/commands", authGuard);
+ app.use("/a2a", a2aGuard);
++app.use("/a2a/:receiver", a2aGuard); // SPIKE SAC-121: receptor múltiplo — o guard roda ANTES do gate
+ // PR-01: /admin saiu junto com o token-store (administrava convites mortos pós-P11).
+ // O admin novo nasce na F4 sobre Logto Management API + meter reader.
+ 
+@@ -688,6 +710,7 @@
+ app.get("/commands", (c) => handleCommands(c as Context));
+ // Endpoint a2a-live (RFC-0004 F2.2): recebe SINAIS gated, verifica no core, enfileira input_required.
+ app.post("/a2a", (c) => handleA2A(c as Context));
++app.post("/a2a/:receiver", (c) => handleA2A(c as Context)); // SPIKE SAC-121
+ // Downstream por PULL (ADR transport-pull D1). Auth PROPRIA: exige token de ORGANIZACAO,
+ // nao o authGuard — sao publicos diferentes (adotante puxando o proprio inbox, nao humano
+ // conversando). Por isso NAO entra na lista de app.use(authGuard) acima.
