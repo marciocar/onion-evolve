@@ -327,7 +327,12 @@ if [ "${CHECK}" = 1 ]; then
   else echo "  resíduo: carimbaria —"; git -C "${_ck}/wt" diff --cached -- "${RES}" | grep -E '^\+reviewed_' | sed 's/^+/    /'; fi
   git -C "${_ck}/wt" -c user.name=pr-finalize -c user.email=check@pr-finalize commit -q --no-verify -m "pr-finalize --check" >/dev/null 2>&1 || true
   if _lint_in "${_ck}/wt" "${_ck}/hard.txt"; then
-    echo "  lint do commit resultante: 0 HARD — a rodada real passaria"; exit 0
+    if (cd "${_ck}/wt" && bash ops/kg-gate-ci.sh) > "${_ck}/kggate.txt" 2>&1; then
+      echo "  lint do commit resultante: 0 HARD · contrato KG-SSOT verde — a rodada real passaria"; exit 0
+    fi
+    echo "  lint 0 HARD, mas o contrato KG-SSOT reprovaria o commit (o mesmo passo do CI):"
+    grep -E '^✗|ausente|Error|erro' "${_ck}/kggate.txt" | grep -v '(herdado)' | head -20 | sed 's/^/    /'
+    exit 1
   fi
   echo "  lint do commit resultante: rc=${_rc}, HARD=${_hard:-?} — a rodada real recusaria:"
   [ -s "${_ck}/hard.txt" ] && sed 's/^/    /' "${_ck}/hard.txt"
@@ -360,10 +365,18 @@ if ! _lint_in "${_tmp}/wt" "${_tmp}/hard.txt"; then
   if [ -s "${_tmp}/hard.txt" ]; then echo "PR-FINALIZE: as violações HARD do commit:" >&2; sed 's/^/  /' "${_tmp}/hard.txt" >&2; fi
   die "lint do COMMIT rc=${_rc}, HARD=${_hard:-?} — nada enviado (os commits locais ficam; o resíduo volta como estava)."
 fi
-_DONE=1   # daqui em diante o carimbo é legítimo: o commit que o carrega passou no lint
+# 4. o contrato KG-SSOT sobre o MESMO commit, pela MESMA invocação do CI (ops/kg-gate-ci.sh): a catraca
+#    da dívida SHOULD por grafo é do kg_gate.py, não do lint, e o #1106 passou aqui e reprovou no CI por
+#    ela (label de 538 caracteres, 2026-10-14). ~5 s. Sem PyYAML/jsonschema o gate sai rc 2 e o envio para.
+if ! (cd "${_tmp}/wt" && bash ops/kg-gate-ci.sh) > "${_tmp}/kggate.txt" 2>&1; then
+  echo "PR-FINALIZE: o contrato KG-SSOT reprovou o commit (o mesmo passo do CI):" >&2
+  grep -E '^✗|ausente|Error|erro' "${_tmp}/kggate.txt" | grep -v '(herdado)' | head -20 | sed 's/^/  /' >&2
+  die "contrato KG-SSOT do COMMIT reprovou — nada enviado (os commits locais ficam; o resíduo volta como estava)."
+fi
+_DONE=1   # daqui em diante o carimbo é legítimo: o commit que o carrega passou no lint e no contrato
 # marcador para o pre-push não relintar o MESMO commit (maior M6: ~11 min por fechamento com lint duplicado)
 printf '%s\n' "$(git rev-parse HEAD)" > "$(git rev-parse --git-common-dir)/onion-prefinalize-ok"
-echo "PR-FINALIZE: ${BR} pronto — 0 HARD, resíduo casando, projeções estáveis."
+echo "PR-FINALIZE: ${BR} pronto — 0 HARD, contrato KG-SSOT verde, resíduo casando, projeções estáveis."
 # 5. push só por pedido explícito
 if [ "${PUSH}" = 1 ]; then
   # --force-with-lease: depois de --rebase o push é reescrita da PRÓPRIA branch; o lease recusa se o
