@@ -22,8 +22,14 @@
 #
 # Uso : accept-to-channel.sh <registro.json|-> [--no-push] [--channel-url URL]
 #       accept-to-channel.sh --lease --thread T --from ID --ttl S [--pending-dir D]
-# Env : A2A_SPIKE_JWKS (default: jwks/ do core desta árvore) · A2A_SPIKE_STATE (~/.local/state/onion/a2a-spike)
-#       A2A_SPIKE_CHANNEL_TOKEN (default ~/.config/onion/a2a/channel-token)
+# Env : A2A_SPIKE_SERVED_ROOT (default /home/onion/onion-evolve: o clone que o BRIDGE serve)
+#       A2A_SPIKE_JWKS (default: jwks/ do clone servido) · A2A_SPIKE_MEMBERS (default: members.yaml do servido)
+#       A2A_SPIKE_STATE (~/.local/state/onion/a2a-spike) · A2A_SPIKE_CHANNEL_TOKEN (~/.config/onion/a2a/channel-token)
+#       A2A_SPIKE_MAX_SKEW (default 60 s: iat no futuro tolerado) · A2A_SPIKE_MAX_LIFE (default 900 s: exp − iat)
+# Raiz de confiança (Emenda 7, 2026-10-14): a curadoria apontou que o default era o checkout ~/onion-evolve,
+#   que NÃO é o que o gate leu. O default agora é o clone SERVIDO; a leitura cai para `sudo -n cat` quando a
+#   conta do maestro não lê direto, e cada aceitação grava uma linha TRUST com o sha256 do members.yaml e
+#   do .pem usados (override por env continua possível e aparece na linha TRUST).
 # Exit: 0 entregue (ou já entregue) · 1 recusado · 2 uso/tooling
 # =============================================================================
 set -euo pipefail
@@ -31,14 +37,17 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "${HERE}/../../../../.." && pwd)"
 ACCEPT="${ROOT}/.claude/utils/federation-transport/a2a-accept.sh"
-JWKS="${A2A_SPIKE_JWKS:-${ROOT}/.claude/utils/federation-transport/jwks}"
+SERVED="${A2A_SPIKE_SERVED_ROOT:-/home/onion/onion-evolve}"
+JWKS="${A2A_SPIKE_JWKS:-${SERVED}/.claude/utils/federation-transport/jwks}"
+MAX_SKEW="${A2A_SPIKE_MAX_SKEW:-60}"; MAX_LIFE="${A2A_SPIKE_MAX_LIFE:-900}"
+case "${MAX_SKEW}${MAX_LIFE}" in *[!0-9]*|'') echo "ERRO: A2A_SPIKE_MAX_SKEW/MAX_LIFE não numéricos" >&2; exit 2 ;; esac
 STATE="${A2A_SPIKE_STATE:-${HOME}/.local/state/onion/a2a-spike}"
 CHAN_TOKEN="${A2A_SPIKE_CHANNEL_TOKEN:-${HOME}/.config/onion/a2a/channel-token}"
 CHAN_URL="http://127.0.0.1:8790/deliver"
 RECEIVER="onion-evolve"
 REC=""; NOPUSH=""; LEASE=""; L_THREAD=""; L_FROM=""; L_TTL=""; PENDING="/home/onion/onion-bridge/data/a2a-pending"
 X_FROM=""; X_THREAD=""
-MEMBERS="${A2A_SPIKE_MEMBERS:-${ROOT}/docs/evolution/federation/members.yaml}"
+MEMBERS="${A2A_SPIKE_MEMBERS:-${SERVED}/docs/evolution/federation/members.yaml}"
 
 die() { echo "ERRO: $*" >&2; exit 2; }
 refuse() { echo "RECUSADO: $*" >&2; exit 1; }
@@ -95,7 +104,9 @@ T_ACC="$(now_ms)"
 # arquivos POR INVOCAÇÃO (refutador 2026-10-14: com caminho fixo, um lease e um C1 simultâneos podiam
 # entregar o corpo de B com o meta de A) + lock em volta do dedupe/entrega
 LOCAL="$(mktemp "${STATE}/records/rec.XXXXXX")"; BODYF="$(mktemp "${STATE}/records/body.XXXXXX")"
-TMPS="$(mktemp)"; trap 'rm -f "${TMPS}" "${BODYF}"' EXIT
+TMPS="$(mktemp)"; TRUSTD="$(mktemp -d)"; trap 'rm -f "${TMPS}" "${BODYF}"; rm -rf "${TRUSTD}"' EXIT
+# lê um arquivo da raiz de confiança (o clone servido é da conta onion): direto, ou por sudo -n cat
+trust_read() { if [ -r "$1" ]; then cat "$1" > "$2"; else sudo -n cat "$1" > "$2" 2>/dev/null; fi; [ -s "$2" ]; }
 if [ "${REC}" = "-" ]; then cat > "${LOCAL}"
 elif [ -r "${REC}" ]; then cp "${REC}" "${LOCAL}"
 else sudo -n cat "${REC}" > "${LOCAL}" 2>/dev/null || die "registro ilegível (fila do bridge é da conta onion): ${REC}"; fi
@@ -108,14 +119,18 @@ HDR="$(b64url_decode "${H}")"; PL="$(b64url_decode "${P}")"
 KID="$(printf '%s' "${HDR}" | jq -r '.kid // empty')"; ALG="$(printf '%s' "${HDR}" | jq -r '.alg // empty')"
 [ "${ALG}" = "RS256" ] || refuse "alg ${ALG}"
 case "${KID}" in ""|*/*|..*|.) refuse "kid inválido" ;; esac
-[ -f "${JWKS}/${KID}.pem" ] || refuse "kid ${KID} não pinado em ${JWKS}"
+PEM="${TRUSTD}/kid.pem"; MEMF="${TRUSTD}/members.yaml"
+trust_read "${JWKS}/${KID}.pem" "${PEM}" || refuse "kid ${KID} não pinado em ${JWKS} (ou ilegível mesmo por sudo -n)"
+trust_read "${MEMBERS}" "${MEMF}" || refuse "members.yaml da raiz de confiança ilegível: ${MEMBERS}"
+printf '%s\tTRUST\t%s\t%s\t%s\t%s\n' "$(now_ms)" "${MEMBERS}" "$(openssl dgst -sha256 < "${MEMF}" | awk '{print $NF}')" \
+  "${JWKS}/${KID}.pem" "$(openssl dgst -sha256 < "${PEM}" | awk '{print $NF}')" >> "${STATE}/accept.tsv"
 b64url_decode "${SIGB}" > "${TMPS}"
-printf '%s' "${H}.${P}" | openssl dgst -sha256 -verify "${JWKS}/${KID}.pem" -signature "${TMPS}" >/dev/null 2>&1 || refuse "assinatura não confere"
+printf '%s' "${H}.${P}" | openssl dgst -sha256 -verify "${PEM}" -signature "${TMPS}" >/dev/null 2>&1 || refuse "assinatura não confere"
 
 FROM="$(jq -r '.envelope.signal.from // empty' "${LOCAL}")"
 # kid-binding (o mesmo do a2a-verify): a chave pinada tem de ser DO from. Sem isto a re-verificação só
 # provaria "alguma chave pinada assinou" — e um registro montado à mão passaria com a chave de outro dono.
-python3 - "${MEMBERS}" "${FROM}" "${KID}" <<'PY' || refuse "kid ${KID} não pertence a keys[${FROM}] no members.yaml"
+python3 - "${MEMF}" "${FROM}" "${KID}" <<'PY' || refuse "kid ${KID} não pertence a keys[${FROM}] no members.yaml"
 import sys, yaml
 ms = (yaml.safe_load(open(sys.argv[1])) or {}).get('members') or []
 keys = next(((m.get('a2a') or {}).get('keys') or [] for m in ms if m.get('id') == sys.argv[2]), [])
@@ -123,7 +138,21 @@ sys.exit(0 if sys.argv[3] in keys else 1)
 PY
 EXP="$(printf '%s' "${PL}" | jq -r '.exp // empty')"
 case "${EXP}" in ''|*[!0-9]*) refuse "JWS sem exp numérico (achado F2: o gate do core aceita; o spike não)" ;; esac
-[ "${EXP}" -ge "$(date +%s)" ] || refuse "expirado (exp ${EXP})"
+NOW_S="$(date +%s)"
+[ "${EXP}" -ge "${NOW_S}" ] || refuse "expirado (exp ${EXP})"
+# Emenda 7 (2026-10-14): a curadoria apontou que só o exp era conferido. iat no futuro e vida longa demais
+# passavam: um envelope com exp em 10 anos valia 10 anos.
+IAT="$(printf '%s' "${PL}" | jq -r '.iat // empty')"
+case "${IAT}" in ''|*[!0-9]*) refuse "JWS sem iat numérico" ;; esac
+# TIPO, não só dígitos (passada adversarial 2026-10-14): `"exp":"013000000000"` (string com zero à esquerda)
+# passava no filtro de dígitos, o `[ -gt ]` lia em decimal (ano 2381) e o `$(( ))` lia em OCTAL (vida negativa
+# ≤ teto). exp e iat têm de ser NÚMEROS JSON inteiros, e a aritmética força base 10.
+printf '%s' "${PL}" | jq -e '(.exp|type=="number" and . == floor) and (.iat|type=="number" and . == floor)' >/dev/null 2>&1 \
+  || refuse "exp/iat não são inteiros JSON (string numérica recusada)"
+EXP=$(( 10#${EXP} )); IAT=$(( 10#${IAT} ))
+[ "${IAT}" -le $(( NOW_S + MAX_SKEW )) ] || refuse "iat no futuro (iat ${IAT} > agora + ${MAX_SKEW} s)"
+[ "${EXP}" -gt "${IAT}" ] || refuse "exp ≤ iat (exp ${EXP}, iat ${IAT})"
+[ $(( EXP - IAT )) -le "${MAX_LIFE}" ] || refuse "vida longa demais: exp − iat = $(( EXP - IAT )) s > ${MAX_LIFE} s"
 [ "$(jq -r '.from // empty' "${LOCAL}")" = "${FROM}" ] || refuse "from do registro ≠ from do envelope"
 [ "$(printf '%s' "${PL}" | jq -r '.iss // empty')" = "${FROM}" ] || refuse "iss ≠ from"
 [ "$(printf '%s' "${PL}" | jq -r '.aud // empty')" = "${RECEIVER}" ] || refuse "aud ≠ ${RECEIVER}"
@@ -155,10 +184,18 @@ if [ -z "${NOPUSH}" ]; then
     --arg thread "${THREAD}" --arg task "${TASK}" --arg sha "${CL_SHA}" \
     '{body:$body, meta:{from:$from, kid:$kid, jti:$jti, thread:$thread, task_id:$task, body_sha256:$sha}}')"
   T_PUSH="$(now_ms)"
-  CODE="$(printf '%s' "${PAYLOAD}" | curl -sS -m 10 -o /dev/null -w '%{http_code}' -H @"${HF}" \
+  RESPF="$(mktemp)"
+  CODE="$(printf '%s' "${PAYLOAD}" | curl -sS -m 10 -o "${RESPF}" -w '%{http_code}' -H @"${HF}" \
           -H 'Content-Type: application/json' --data-binary @- "${CHAN_URL}" || true)"
-  rm -f "${HF}"
+  RESP="$(head -c 200 "${RESPF}" 2>/dev/null)"; rm -f "${HF}" "${RESPF}"
   [ "${CODE}" = "200" ] || refuse "channel não aceitou (http ${CODE}) — a sessão receptora está aberta com a flag de dev?"
+  # o channel diz "já entregue" de um jti que ESTE accept nunca registrou (o delivered.jti acima não o tinha):
+  # não é entrega, é suspeita — uma entrega anterior pode ter falhado depois de o channel marcá-la. Não vira
+  # ACCEPT 200 (passada adversarial 2026-10-14: assim uma perda contaria como entregue).
+  if [ "${RESP}" = "já entregue" ]; then
+    printf '%s\tSUSPECT-ALREADY-DELIVERED\t%s\t%s\t%s\n' "$(now_ms)" "${FROM}" "${THREAD}" "${JTI}" >> "${STATE}/accept.tsv"
+    refuse "o channel já tinha o jti ${JTI} sem ACCEPT deste lado: registrado como SUSPECT, confira o receipts.jsonl"
+  fi
 else
   T_PUSH="$(now_ms)"; CODE="no-push"
 fi

@@ -161,6 +161,62 @@ nodes:
       default se o spike reprovar.
     trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
 
+  - id: E_CURADORIA_REFUTA_PROTOCOLO_2026_10_14
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "cada citação de linha do refutador conferida contra o texto do protocolo e dos artefatos em origin/main e2222a79: P:235, P:291, P:296-297, ATC:32-41, ATC:124-126, CH:70, CH:147, CH:152 e CH:154-156 descrevem o que o achado diz"
+    source_tier: 8
+    source_kind: internal-audit
+    label: "A curadoria, como refutadora do gate antes do P1, refutou o protocolo com 9 achados (1 bloqueante: o A8 media o maestro, não o modelo) e deu RODAR COM CORREÇÕES: A1–A6 podem rodar; A7 e A8 só depois das emendas 1–5."
+    narrative: |
+      Achados (severidade do repasse): (1) BLOQUEANTE, o A8 mede o maestro: com o prompt negado, o hash
+      idêntico sai garantido; (2) grave, falta exfiltração (A8g) e o "não perguntar de novo" de P:296-297
+      contamina; (3) grave, o byte-idêntico não é medido (o body_sha256 do CH é o claim repassado, e o CH
+      reescreve o corpo com a cerca); (4) grave, o teto de 26 s vem de UMA observação do S1b; (5) grave,
+      estado de permissão contaminado; (6) grave, pré-registro parcial (A3/A4/A5 no mesmo commit dos
+      resultados; A5c reclassificado depois do resultado); (7) sem rótulo no repasse, o ATC não confere
+      iat futuro nem exp − iat, e a raiz de confiança é o checkout, não o clone servido; (8) menor, "age
+      além de responder" sem régua; (9) menor, o mapa delivered só em memória. Mais as armadilhas fracas:
+      conteúdo colado, modo de permissão, /rename, relógio e reconexão.
+    trace: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
+    provenance:
+      source: "refutação do adotante de curadoria, repassada à sessão principal (2026-10-14)"
+      locator: "SPIKE-PROTOCOL.md §12.0 (tabela dos 9 achados, com as linhas citadas)"
+      method: "leitura: as linhas citadas pelo refutador conferidas no texto do protocolo, do accept-to-channel.sh e do a2a-channel.ts"
+      locality: "repo"
+
+  - id: D_EMENDA_PROTOCOLO_POS_CURADORIA_2026_10_14
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "hooks/record-tool-attempts.selftest.sh 78/78 (mutante do juiz REPROVADO; os furos da passada adversarial como negativos); vps/accept-to-channel.selftest.sh 12/12 (exp octal recusado; mutante sem teto de vida deixa passar); channel/a2a-channel.smoke.ts sob bun 12/12 com o CH emendado e 4/12 com o CH de origin/main e2222a79; Claude Code 2.1.299 real (-p, haiku, --settings, sem channel e sem bridge): PreToolUse gravou Bash e Read NEGADOS no diálogo, e uma regra deny escondeu a tentativa do PreToolUse"
+    label: "As 9 emendas entram datadas no §12 do protocolo, sem reescrever o pré-registro: A8 julgado por TENTATIVAS contra allowlist (hook que só registra), A8g com canários, hashes medidos no CH, linha de base nativa B0, ordem A8→A7 e P5b vivo contra o gate curado."
+    narrative: |
+      O que muda de veredito: o A8 deixa de valer pelo hash (que media o maestro) e passa a valer pelo juiz
+      (vps/judge-attempts.sh) sobre o tool-attempts.jsonl; o teto do A7 deixa de ser 26 s e passa a ser
+      máx(B0) para IGUAL e 2 × mediana(B0) para RESSALVA; A3/A4/A5 viram o passo P5b, vivo, contra o gate
+      com a cura do corpo e do exp. O que fica bloqueado: produção e qualquer conclusão "o transporte está
+      certo" até a cura do corpo (F1) entrar no a2a-verify. Achado colateral do smoke: o CH de origin/main,
+      depois de um restart, re-entregava o mesmo jti como evento novo e recusava o reply ao jti antigo.
+      Achado colateral da medição real: uma regra permissions.deny barra a tool ANTES do PreToolUse, e a
+      tentativa some do registro; por isso a receptora não tem deny e a foto --strict reprova qualquer deny.
+      A passada adversarial da emenda achou 12 defeitos reais (2 bloqueantes: quebra de linha e glob furavam
+      a allowlist do A7), todos curados no mesmo PR (§12.13).
+      Precisa da presença do maestro: P2 (token), aceitação, A7 (com o B0) e A8 (com o A8g).
+    trace: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
+    provenance:
+      source: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
+      locator: "§12 (Emendas datadas, 12.0–12.12)"
+      method: "medição: selftests offline dos artefatos novos, smoke do channel sob bun e uma sessão real do Claude Code com o hook carregado por --settings"
+      locality: "repo"
+
 edges:
   - from: E_F1_CORPO_FORA_DA_ASSINATURA
     to: D_RFC0004_CONVERSA_POR_THREAD
@@ -186,6 +242,18 @@ edges:
   - from: D_RFC0004_CONVERSA_POR_THREAD
     to: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
     edge_type: DEPENDS_ON
+  - from: E_CURADORIA_REFUTA_PROTOCOLO_2026_10_14
+    to: D_EMENDA_PROTOCOLO_POS_CURADORIA_2026_10_14
+    edge_type: SUPPORTS
+  - from: E_CURADORIA_REFUTA_PROTOCOLO_2026_10_14
+    to: E_NEGATIVOS_GATE_SERVIDO_2026_10_14
+    edge_type: CONSTRAINS
+  - from: D_EMENDA_PROTOCOLO_POS_CURADORIA_2026_10_14
+    to: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
+    edge_type: CONSTRAINS
+  - from: D_EMENDA_PROTOCOLO_POS_CURADORIA_2026_10_14
+    to: D_RFC0004_CONVERSA_POR_THREAD
+    edge_type: CONSTRAINS
 
 external_edges:
   - from: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY"

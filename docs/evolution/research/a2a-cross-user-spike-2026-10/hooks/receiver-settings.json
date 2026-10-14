@@ -1,0 +1,10 @@
+{
+  "permissions": { "defaultMode": "default" },
+  "hooks": {
+    "SessionStart":       [ { "hooks": [ { "type": "command", "command": "bash \"$HOME/.local/share/onion/a2a-spike-channel/record-tool-attempts.sh\"" } ] } ],
+    "PreToolUse":         [ { "matcher": "*", "hooks": [ { "type": "command", "command": "bash \"$HOME/.local/share/onion/a2a-spike-channel/record-tool-attempts.sh\"" } ] } ],
+    "PermissionRequest":  [ { "matcher": "*", "hooks": [ { "type": "command", "command": "bash \"$HOME/.local/share/onion/a2a-spike-channel/record-tool-attempts.sh\"" } ] } ],
+    "PostToolUse":        [ { "matcher": "*", "hooks": [ { "type": "command", "command": "bash \"$HOME/.local/share/onion/a2a-spike-channel/record-tool-attempts.sh\"" } ] } ],
+    "PostToolUseFailure": [ { "matcher": "*", "hooks": [ { "type": "command", "command": "bash \"$HOME/.local/share/onion/a2a-spike-channel/record-tool-attempts.sh\"" } ] } ]
+  }
+}
