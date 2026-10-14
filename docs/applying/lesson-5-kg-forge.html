@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aula 5 — KG e Forja: o grafo dos seus projetos e os componentes do seu time</title>
+<!--
+  GERADO de lesson-5-kg-forge.md (mesma substância). Edite o .md e regenere; não edite este arquivo à mão.
+  Self-contained: zero CDN, zero fetch, fonte do sistema. Abre em file://.
+  Modo projetor: botão "Projetor", depois setas ← → (ou PageUp/PageDown) entre os blocos.
+-->
+<style>
+:root{--fundo:#ffffff;--texto:#1a1a1a;--texto-2:#3d3d3d;--destaque:#0b4a80;--caixa:#eef4fb;
+--atencao:#fff4d6;--atencao-borda:#8a5a00;--codigo:#f4f4f4;--foco:#b34700;--botao-texto:#ffffff;--tamanho:18px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--fundo:#121212;--texto:#f2f2f2;--texto-2:#dddddd;
+--destaque:#9cc8ff;--caixa:#1d2a38;--atencao:#3a2e10;--atencao-borda:#e0b050;--codigo:#1e1e1e;--foco:#ffb070;--botao-texto:#121212}}
+:root[data-theme="dark"]{--fundo:#121212;--texto:#f2f2f2;--texto-2:#dddddd;--destaque:#9cc8ff;--caixa:#1d2a38;
+--atencao:#3a2e10;--atencao-borda:#e0b050;--codigo:#1e1e1e;--foco:#ffb070;--botao-texto:#121212}
+*{box-sizing:border-box}html{font-size:var(--tamanho)}
+body{margin:0;background:var(--fundo);color:var(--texto);font-family:Verdana,"DejaVu Sans",Arial,sans-serif;line-height:1.6}
+main{max-width:58rem;margin:0 auto;padding:1rem 16px 4rem}
+h1{font-size:1.9rem;line-height:1.25;color:var(--destaque);margin:1rem 0 .5rem}
+h2{font-size:1.45rem;color:var(--destaque);margin:2.5rem 0 1rem;padding-top:1rem;border-top:3px solid var(--destaque)}
+h3{font-size:1.15rem;margin:1.75rem 0 .6rem}
+a{color:var(--destaque);text-underline-offset:3px}
+a:focus,button:focus{outline:4px solid var(--foco);outline-offset:3px}
+code{font-family:"DejaVu Sans Mono",Consolas,monospace;font-size:.88em;background:var(--codigo);padding:.05em .3em;border-radius:4px}
+.code{position:relative;margin:1rem 0}
+.code pre{background:var(--codigo);border:1px solid var(--texto-2);border-radius:8px;padding:1rem;overflow-x:auto;margin:0}
+.code pre code{background:none;padding:0;font-size:.82rem;line-height:1.45}
+.copy{position:absolute;top:.4rem;right:.4rem;font:inherit;font-size:.75rem;padding:.3rem .7rem;background:var(--destaque);
+color:var(--botao-texto);border:0;border-radius:6px;cursor:pointer}
+.atencao{background:var(--atencao);border-left:6px solid var(--atencao-borda);border-radius:6px;padding:.75rem 1rem;margin:1rem 0}
+.tabela{overflow-x:auto}table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:.9rem}
+th,td{border:1px solid var(--texto-2);padding:.4rem .6rem;text-align:left;vertical-align:top}th{background:var(--caixa)}
+.barra{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:.5rem;padding:.5rem 16px;background:var(--fundo);
+border-bottom:1px solid var(--texto-2)}
+.barra button{font:inherit;font-size:.85rem;min-height:40px;padding:.35rem .8rem;background:var(--destaque);color:var(--botao-texto);
+border:0;border-radius:8px;cursor:pointer}
+.barra .pos{align-self:center;font-size:.85rem;color:var(--texto-2)}
+nav.sumario{background:var(--caixa);border-radius:10px;padding:.75rem 1.25rem}
+body.projetor{--tamanho:24px}
+body.projetor .bloco{display:none}body.projetor .bloco.ativo{display:block}
+body.projetor nav.sumario{display:none}
+@media print{.barra,.copy{display:none}body{--tamanho:12pt}}
+</style>
+</head>
+<body>
+<div class="barra" role="toolbar" aria-label="Controles">
+<button id="proj" type="button">Projetor</button>
+<button id="tema" type="button">Claro / escuro</button>
+<button id="menos" type="button">A−</button>
+<button id="mais" type="button">A+</button>
+<span class="pos" id="pos" aria-live="polite"></span>
+</div>
+<main>
+<nav class="sumario" aria-label="Sumário"><strong>Nesta aula</strong><ol><li><a href="#objetivo">Objetivo</a></li><li><a href="#antes-da-aula-instrutor-medir-a-turma">Antes da aula (instrutor): medir a turma</a></li><li><a href="#pré-requisitos-participantes">Pré-requisitos (participantes)</a></li><li><a href="#mapa-da-aula">Mapa da aula</a></li><li><a href="#bloco-0-abertura-10-min">Bloco 0 — Abertura (10 min)</a></li><li><a href="#bloco-a-o-grafo-como-fonte-única-e-a-gramática-25-min">Bloco A — O grafo como fonte única, e a gramática (25 min)</a></li><li><a href="#bloco-b-mapear-um-projeto-real-contra-o-código-35-min">Bloco B — Mapear um projeto real contra o código (35 min)</a></li><li><a href="#bloco-c-mapear-um-documento-de-negócio-e-ligar-ao-projeto-30">Bloco C — Mapear um documento de negócio e ligar ao projeto (30 min)</a></li><li><a href="#intervalo-10-min">Intervalo (10 min)</a></li><li><a href="#bloco-d-o-grafo-como-runtime-25-min">Bloco D — O grafo como runtime (25 min)</a></li><li><a href="#bloco-e-a-forja-forjar-um-componente-do-time-40-min">Bloco E — A forja: forjar um componente do time (40 min)</a></li><li><a href="#bloco-f-fechamento-e-ponte-para-a-aula-6-5-min">Bloco F — Fechamento e ponte para a aula 6 (5 min)</a></li><li><a href="#gabarito-da-forja-a-skill-domain-anchor">Gabarito da forja: a skill <code>domain-anchor</code></a></li><li><a href="#roteiro-do-instrutor">Roteiro do instrutor</a></li><li><a href="#cartão-resumo-de-comandos">Cartão-resumo de comandos</a></li><li><a href="#nota-para-o-revisor">Nota para o revisor</a></li></ol></nav>
+<section class="bloco capa"><h1>Aula 5 — KG e Forja: o grafo dos seus projetos e os componentes do seu time</h1>
+<div class="atencao">Espelho em texto de [<code>lesson-5-kg-forge.html</code>](lesson-5-kg-forge.html), com a mesma substância. A versão para projetar é a HTML: abre offline, tem botão de copiar em cada comando e modo projetor. <strong>Rascunho de 2026-10-14.</strong> A nota para o revisor fica no fim deste arquivo.</div>
+<p><strong>Série:</strong> formação de equipe de um hub adotante, em 6 aulas. <strong>Esta é a 5ª.</strong> Antes dela: (1) o "Há vagas", o perfil dos agentes que vocês querem; (2) os documentos de negócio; (3) a adoção dos projetos e a maquinaria; (4) um projeto real com task manager. Depois dela: (6) comunicação e federação, o Company Brain.</p>
+<p><strong>Duração:</strong> 3 horas, com um intervalo de 10 minutos. <strong>Formato:</strong> mão na massa. Cada bloco tem um conceito curto, uma demonstração com o comando exato e um exercício no repositório de vocês, com um critério de "pronto" que se confere por comando.</p>
+</section><section class="bloco" id="objetivo"><h2>Objetivo</h2>
+<p>No fim da aula, cada dupla sai com quatro coisas <strong>no repositório</strong>, todas conferíveis:</p>
+<ol><li><strong>Um grafo que o motor lê.</strong> Os grafos do hub passam no <code>kg-radar</code> sem aviso e o <code>/meta:drive</code> os aceita.</li><li><strong>Um projeto mapeado contra o código.</strong> As regras de domínio de um projeto real apontam para o arquivo e a linha que as executam, e não só para o documento que as descreve.</li><li><strong>Um documento de negócio ligado ao projeto.</strong> Um documento das aulas 2 a 4 que ainda não estava em grafo nenhum vira nós, com a confiança certa, ligados às regras que ele afeta.</li><li><strong>Um componente do time forjado.</strong> Uma skill com doutrina, medidor e bancada, nascida de uma dor que vocês mediram, e que o censo da forja enxerga.</li></ol>
+<p>E uma ideia: <strong>o grafo é o estado do trabalho, não um desenho dele.</strong> A sessão lê o grafo antes de ler a prosa, o backlog é projeção do grafo, e uma decisão só existe quando está selada nele.</p>
+</section><section class="bloco" id="antes-da-aula-instrutor-medir-a-turma"><h2>Antes da aula (instrutor): medir a turma</h2>
+<p>A aula usa os artefatos reais da equipe como matéria-prima. Meça no dia, porque o repositório anda. Rode <strong>na raiz do hub</strong> e, depois, <strong>na raiz do projeto adotado</strong> que a equipe trouxe na aula 4:</p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">cat .claude/.onion-version                                  # pin e papel (hub / adopted)
+git ls-files &#x27;*.kg.yaml&#x27; | grep -v &#x27;/fixtures/&#x27;             # os grafos de verdade
+ls .claude/commands/meta/ | grep -iE &#x27;kg|forge|backlog|realign|drive|dissect|graph&#x27;
+ls docs/business-context docs/technical-context              # o que as aulas 2 e 3 geraram
+for g in $(git ls-files &#x27;*.kg.yaml&#x27; | grep -v &#x27;/fixtures/&#x27;); do
+  echo &quot;== $g&quot;; bash .claude/validation/kg-radar.sh &quot;$g&quot; --integrity --schema
+done</code></pre></div>
+<p>Anote na ficha da turma (fica com vocês, não entra neste material):</p>
+<div class="tabela"><table><thead><tr><th>Medida</th><th>Hub</th><th>Projeto</th></tr></thead><tbody><tr><td>grafos rastreados (sem fixtures)</td><td></td><td></td></tr><tr><td>grafos com aviso <code>multi-documento</code></td><td></td><td></td></tr><tr><td>nós <code>rule</code>/<code>invariant</code>/<code>policy</code> com <code>trace:</code> em <code>docs/</code> × em código</td><td></td><td></td></tr><tr><td>documentos de negócio que nenhum grafo cita</td><td></td><td></td></tr><tr><td>itens abertos no <code>/meta:backlog --markdown</code></td><td></td><td></td></tr><tr><td>candidatos e "6+ peças" no censo da forja</td><td></td><td></td></tr></tbody></table></div>
+<div class="atencao"><strong>Se um número sair zero, confira o porquê antes de usá-lo.</strong> Zero de "não existe" e zero de "o comando falhou" têm a mesma cara. Os medidores desta casa recusam com <code>exit 3</code> quando não conseguem medir, justamente para não confundir as duas coisas.</div>
+</section><section class="bloco" id="pré-requisitos-participantes"><h2>Pré-requisitos (participantes)</h2>
+<p>Confira em 2 minutos, no começo da aula:</p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">git status --short                       # árvore limpa (ou um commit WIP antes de começar)
+git switch -c lesson-5/&lt;seu-nome&gt;        # cada dupla numa branch própria
+cat .claude/.onion-version               # o pin precisa ser o mesmo da turma
+ls .claude/validation/kg-radar.sh .claude/validation/forge-census.sh .claude/rules/kg-grammar.md
+python3 -c &quot;import yaml&quot; &amp;&amp; echo &quot;PyYAML ok&quot;   # o /meta:drive e o kg-realign leem YAML</code></pre></div>
+<p>Se o <code>ls</code> reclamar de arquivo ausente, o pin está velho: atualizem pelo <code>/meta:adopt --update</code> antes da aula, não durante.</p>
+</section><section class="bloco" id="mapa-da-aula"><h2>Mapa da aula</h2>
+<div class="tabela"><table><thead><tr><th>Bloco</th><th>Tema</th><th>Tempo</th></tr></thead><tbody><tr><td>0</td><td>Abertura: o que a sessão sabe antes de você falar</td><td>10 min</td></tr><tr><td>A</td><td>O grafo como fonte única, e a gramática</td><td>25 min</td></tr><tr><td>B</td><td>Mapear um projeto real contra o código</td><td>35 min</td></tr><tr><td>C</td><td>Mapear um documento de negócio e ligar ao projeto</td><td>30 min</td></tr><tr><td>—</td><td>Intervalo</td><td>10 min</td></tr><tr><td>D</td><td>O grafo como runtime: warm-up, backlog, realign, drive, decisão</td><td>25 min</td></tr><tr><td>E</td><td>A forja: forjar um componente do time</td><td>40 min</td></tr><tr><td>F</td><td>Fechamento e ponte para a aula 6</td><td>5 min</td></tr><tr><td></td><td><strong>Total</strong></td><td><strong>3 h</strong></td></tr></tbody></table></div>
+</section><section class="bloco" id="bloco-0-abertura-10-min"><h2>Bloco 0 — Abertura (10 min)</h2>
+<p><strong>Conceito.</strong> Na aula 3 vocês geraram documentos e maquinaria. A pergunta desta aula é: quando uma sessão nova abre o repositório, <strong>o que ela sabe antes de vocês digitarem?</strong> O passo 0 do <code>/warm-up</code> responde: se existe <code>.kg.yaml</code>, ele é lido <strong>primeiro</strong>, antes da prosa. Um repositório sem grafo faz a sessão adivinhar a partir de texto solto.</p>
+<p><strong>Demo.</strong></p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">/warm-up</code></pre></div>
+<p>Mostre o passo 0 encontrando os grafos e rodando o radar. Depois abra o grafo de adoção do hub, <code>docs/onion/graph/onion-adoption.kg.yaml</code>, e leia em voz alta a pergunta aberta que a adoção deixou: <strong>qual é o domínio deste repositório?</strong> Ela está lá desde o dia da adoção, esperando resposta. Hoje ela é respondida.</p>
+</section><section class="bloco" id="bloco-a-o-grafo-como-fonte-única-e-a-gramática-25-min"><h2>Bloco A — O grafo como fonte única, e a gramática (25 min)</h2>
+<p><strong>Conceito.</strong> Um <code>.kg.yaml</code> é um grafo tipado: <strong>nós</strong> com <code>node_type:</code> (o que a coisa é) e <strong>arestas</strong> com <code>edge_type:</code> (como as coisas se relacionam). Há duas camadas. A <code>audit</code> registra conhecimento: <code>claim</code>, <code>evidence</code>, <code>decision</code>, <code>question</code>. A <code>domain</code> registra o negócio: <code>entity</code>, <code>state</code>, <code>event</code>, <code>rule</code>, <code>invariant</code>, <code>policy</code>. O radar (<code>kg-radar.sh</code>) é <code>awk</code>, não um parser de YAML: ele exige uma chave por linha e reprova contradição estrutural. A gramática inteira, curta, está em <code>.claude/rules/kg-grammar.md</code>, e carrega sozinha quando a sessão toca um <code>.kg.yaml</code>.</p>
+<p><strong>Os cinco erros clássicos</strong> (todos da gramática da casa):</p>
+<div class="tabela"><table><thead><tr><th>Erro</th><th>Por que dói</th></tr></thead><tbody><tr><td>escrever <code>type:</code> no lugar de <code>node_type:</code>/<code>edge_type:</code></td><td>o radar não lê; um grep por <code>type: REFUTES</code> devolve zero e a guarda nasce verde e vazia</td></tr><tr><td>nó recebe <code>REFUTES</code> e continua <code>confirmed</code></td><td>contradição estrutural: o radar sai 1. Reconcilie para <code>refuted</code>/<code>superseded</code></td></tr><tr><td>objeção que sobrevive modelada como <code>REFUTES</code></td><td>objeção que <strong>mata</strong> é <code>REFUTES</code>; objeção que <strong>limita</strong> é <code>CONSTRAINS</code></td></tr><tr><td>data sem aspas (<code>verified_at: 2026-10-14</code>)</td><td>leitor YAML tipado a lê como data, outro como texto; escreva <code>&quot;2026-10-14&quot;</code></td></tr><tr><td><code>---</code> separando um cabeçalho do resto</td><td>o arquivo vira <strong>dois documentos</strong> YAML; o radar avisa e o <code>/meta:drive</code> e o <code>kg-realign</code> <strong>recusam</strong></td></tr></tbody></table></div>
+<p><strong>Demo.</strong></p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">bash .claude/validation/kg-radar.sh docs/onion/graph/onion-adoption.kg.yaml --integrity --schema
+bash .claude/validation/kg-drive-project.sh docs/onion/graph/&lt;um-grafo-com-aviso&gt;.kg.yaml</code></pre></div>
+<p>Mostre o aviso <code>⚠ multi-documento: 2 separadores ---</code> no radar e, logo depois, o <code>/meta:drive</code> recusando o mesmo arquivo com <code>YAML ilegivel … expected a single document</code>. É o mesmo defeito visto por dois leitores: um avisa, o outro trava.</p>
+<p><strong>Exercício.</strong> Consertem todos os grafos do hub que o radar acusa de multi-documento. A cura que o próprio radar sugere: tirar as linhas <code>---</code>. Os campos do cabeçalho viram chaves de topo; nenhum dado muda.</p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">for g in $(git ls-files &#x27;*.kg.yaml&#x27; | grep -v &#x27;/fixtures/&#x27;); do
+  grep -q &#x27;^---$&#x27; &quot;$g&quot; &amp;&amp; echo &quot;multi-documento: $g&quot;
+done
+# para cada um: apague as linhas que são exatamente &#x27;---&#x27; (no editor, ou peça à sessão)</code></pre></div>
+<p><strong>Pronto quando:</strong></p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">bash .claude/validation/kg-radar.sh &lt;grafo&gt; --integrity --schema   # exit 0 e sem &#x27;⚠ multi-documento&#x27;
+bash .claude/validation/kg-drive-project.sh &lt;grafo&gt;                # imprime &#x27;veredito:&#x27; em vez de ERRO
+git diff --stat                                                    # só linhas &#x27;---&#x27; removidas</code></pre></div>
+<p><strong>Erros comuns e saída.</strong></p>
+<ul><li>*Apagou um <code>---</code> que estava dentro de um texto <code>|</code>.* O <code>grep &#x27;^---$&#x27;</code> só casa a linha inteira; confira no <code>git diff</code> que só saíram linhas de separador.</li><li><em>O drive agora mostra "bloqueado".</em> Não é erro: <code>DEPENDS_ON</code> é guarda. Leia a aresta: ela sai do nó que depende.</li></ul>
+</section><section class="bloco" id="bloco-b-mapear-um-projeto-real-contra-o-código-35-min"><h2>Bloco B — Mapear um projeto real contra o código (35 min)</h2>
+<p><strong>Conceito.</strong> Um grafo de domínio feito a partir de um documento diz o que alguém <strong>escreveu</strong> que o sistema faz. Quando o código chega, cada <code>rule</code>, <code>invariant</code> e <code>policy</code> precisa ser conferido nele, e a âncora (<code>trace:</code>) troca do documento para o <code>arquivo:linha</code> que executa a regra. Até lá, a confiança fica abaixo de 1. Re-verificar contra o vivo é o trabalho do <code>/meta:kg-freshness</code>: ele pega a fila do radar e, para cada nó, mede e <strong>propõe</strong> um veredito (<code>CONFIRMED</code>, <code>DRIFTED</code>, <code>REFUTED</code>, <code>UNVERIFIABLE</code>). Quem sela é a pessoa.</p>
+<p><strong>Duas trilhas, conforme o que o projeto já tem:</strong></p>
+<ul><li><strong>Trilha 1, o projeto já tem grafo de domínio</strong> (feito a partir do documento da feature): re-ancorar.</li><li><strong>Trilha 2, o projeto não tem grafo:</strong> criar o primeiro, com <code>/meta:kg map &lt;área&gt;</code>.</li></ul>
+<p><strong>Demo (trilha 1).</strong> No projeto adotado:</p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">bash .claude/validation/kg-view.sh docs/onion/graph/&lt;dominio&gt;.kg.yaml --markdown | head -30
+grep -nE &#x27;^\s+trace:&#x27; docs/onion/graph/&lt;dominio&gt;.kg.yaml        # para onde as âncoras apontam
+bash .claude/validation/kg-radar.sh docs/onion/graph/&lt;dominio&gt;.kg.yaml --domain</code></pre></div>
+<p>Mostre a composição (quantas <code>rule</code>, quantas <code>question</code>), as âncoras todas em <code>docs/</code> e o radar-de-domínio apontando lacunas, como um estado absorvente (um estado em que se entra e de onde não se sai: é fim legítimo ou limbo?). Depois procure uma regra no código, ao vivo:</p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">grep -rn &#x27;&lt;termo da regra&gt;&#x27; apps/ packages/ | head</code></pre></div>
+<p><strong>Demo (trilha 2).</strong></p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">/meta:kg map &lt;área do sistema&gt;</code></pre></div>
+<p>O modo <code>map</code> faz inventário, fatias de domínio e grafo, e fecha com o radar.</p>
+<p><strong>Exercício.</strong> Cada dupla pega <strong>três</strong> nós <code>rule</code>/<code>invariant</code>/<code>policy</code> e, para cada um:</p>
+<ol><li>acha o código que executa a regra (<code>grep -rn</code>; o número da linha sai do <code>grep -n</code>, nunca de contar na tela);</li><li>troca o <code>trace:</code> para <code>apps/&lt;…&gt;/&lt;arquivo&gt;:&lt;linha&gt;</code>;</li><li>atualiza <code>verified_at: &quot;&lt;data de hoje&gt;&quot;</code> e <code>verified_against:</code> com o que foi lido;</li><li>se o código <strong>não</strong> faz o que o rótulo diz: muda o <code>status</code> para <code>drifted</code> e escreve o porquê; se não achou o código: deixa a regra como está e cria um nó <code>question</code> ligado a ela.</li></ol>
+<p>Se o grafo tem uma pergunta do tipo "onde fica o código?", respondam-na e reconciliem para <code>done</code>.</p>
+<p><strong>Pronto quando:</strong></p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">bash .claude/validation/kg-radar.sh docs/onion/graph/&lt;dominio&gt;.kg.yaml --integrity --schema   # exit 0
+grep -cE &#x27;trace: (apps|packages)/&#x27; docs/onion/graph/&lt;dominio&gt;.kg.yaml                         # &gt;= 3
+bash .claude/validation/kg-trace-resolve.sh .                                                 # toda âncora resolve</code></pre></div>
+<p><strong>Erros comuns e saída.</strong></p>
+<ul><li><em>Linha citada de cabeça.</em> Ela erra por uma ou duas e a âncora aponta para outra coisa. Copie o <code>arquivo:linha</code> da saída do <code>grep -n</code>.</li><li>*Subir a <code>confidence</code> para 1 só porque achou o arquivo.* Achar o arquivo não é ler a regra. Suba só depois de conferir que o código faz o que o rótulo diz.</li><li>*<code>REFUTES</code> num nó que segue <code>confirmed</code>.* O radar sai 1. Mude o status junto com a aresta.</li></ul>
+</section><section class="bloco" id="bloco-c-mapear-um-documento-de-negócio-e-ligar-ao-projeto-30"><h2>Bloco C — Mapear um documento de negócio e ligar ao projeto (30 min)</h2>
+<p><strong>Conceito.</strong> Os documentos das aulas 2 a 4 (personas, estratégia, features, decisões de trabalho) são prosa. Prosa não tem confiança, não tem dono e não avisa quando caduca. Levá-los ao grafo dá a cada afirmação um tipo, uma confiança e uma ligação com o que ela afeta. Uma regra boa para a confiança: <strong>o que o cliente confirmou</strong> pode ser <code>confirmed</code>; <strong>decisão de trabalho da equipe</strong> ("inferimos isto") é <code>decision</code> <code>open</code> com <code>confidence</code> menor; <strong>palpite</strong> é ainda menor; <strong>o que depende de informação que só o cliente tem</strong> é <code>question</code>.</p>
+<p><strong>Demo.</strong> Achar o documento que nenhum grafo cita:</p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">for d in $(git ls-files &#x27;docs/business-context/*.md&#x27;); do
+  n=$(grep -l &quot;$(basename &quot;$d&quot;)&quot; $(git ls-files &#x27;*.kg.yaml&#x27; | grep -v &#x27;/fixtures/&#x27;) | wc -l)
+  [ &quot;$n&quot; -eq 0 ] &amp;&amp; echo &quot;sem grafo: $d&quot;
+done</code></pre></div>
+<p>Mostre um nó de decisão de trabalho bem escrito (com <code>narrative:</code> para o porquê, porque o <code>label</code> tem teto de 280 caracteres):</p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-yaml">  - id: D_LOGIN_OIDC_ANY_IDP
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: &quot;2026-10-14&quot;
+    verified_against: doc-de-decisoes-da-feature-secao-1-marca-INFERIDO
+    trace: apps/&lt;servico&gt;/src/auth.ts
+    label: &quot;Decisão de trabalho: login por qualquer IdP OIDC; o serviço não guarda senha.&quot;
+    narrative: &quot;Marcada [INFERIDO] no documento: a equipe decidiu, o cliente não confirmou.&quot;
+
+edges:
+  - from: D_LOGIN_OIDC_ANY_IDP
+    to: PO_ACCESS_BY_PROFILE
+    edge_type: CONSTRAINS</code></pre></div>
+<p><strong>Exercício.</strong> Duas trilhas, a dupla escolhe:</p>
+<ul><li><strong>No projeto:</strong> mapear o documento de decisões ou hipóteses da feature (se existir) no grafo de domínio do projeto. Uma decisão por nó; confiança pela marca do documento; <code>trace:</code> para o código quando o documento diz onde está; arestas <code>CONSTRAINS</code>/<code>SUPPORTS</code>/<code>DEPENDS_ON</code> para as regras que ela afeta.</li><li><strong>No hub:</strong> responder a pergunta do grafo de adoção ("qual é o domínio deste repositório?"). Criem <code>docs/onion/graph/&lt;tema&gt;.kg.yaml</code> a partir de um documento de negócio da aula 2 (estratégia ou personas são bons pontos de partida) e reconciliem a pergunta do grafo de adoção para <code>done</code>, com <code>verified_against</code> apontando o grafo novo.</li></ul>
+<p><strong>Pronto quando:</strong></p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">bash .claude/validation/kg-radar.sh &lt;grafo&gt; --integrity --schema      # exit 0
+grep -c &#x27;&lt;nome-do-documento&gt;&#x27; &lt;grafo&gt;                                 # &gt;= 1: o documento está no grafo
+bash .claude/validation/kg-backlog-project.sh --markdown | head -20  # as perguntas novas aparecem</code></pre></div>
+<p><strong>Erros comuns e saída.</strong></p>
+<ul><li>*Tudo vira <code>confirmed</code>.* Decisão de trabalho não confirmada pelo cliente não é fato. O backlog existe para mostrar o que espera confirmação: se tudo for <code>confirmed</code>, a fila mente.</li><li><em>Label-parágrafo.</em> Passou de 280 caracteres, o porquê vai para <code>narrative:</code>.</li><li><em>Id com ponto ou hífen.</em> Só <code>[A-Za-z0-9_]</code>; o radar reprova o resto.</li><li><em>Ligar ao grafo de outro repositório.</em> <code>external_edges:</code> liga grafos <strong>do mesmo repositório</strong>. Ligar o hub ao projeto é assunto da aula 6.</li></ul>
+</section><section class="bloco" id="intervalo-10-min"><h2>Intervalo (10 min)</h2>
+</section><section class="bloco" id="bloco-d-o-grafo-como-runtime-25-min"><h2>Bloco D — O grafo como runtime (25 min)</h2>
+<p><strong>Conceito.</strong> Um grafo que só se lê na hora de escrever é documentação. Aqui ele <strong>dirige</strong> o trabalho: o <code>/warm-up</code> e o <code>/catch-up</code> o leem para abrir a sessão; o <code>/meta:backlog</code> projeta os nós <code>open</code> numa fila única, ordenada por atenção (impacto × incerteza × status); o <code>/meta:realign</code> confere se o plano ainda coere com o vivo, em três camadas (passado, presente, futuro); o <code>/meta:drive</code> conduz o plano nó a nó, a partir da fila pronta. A <strong>decisão</strong> também mora no grafo: um nó <code>decision</code> só fecha quando alguém com autoridade o sela.</p>
+<p><strong>Demo.</strong></p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">bash .claude/validation/kg-backlog-project.sh --markdown | head -40     # a fila inteira, sem escrever arquivo
+bash .claude/validation/kg-realign-project.sh docs/onion/graph/&lt;grafo&gt;.kg.yaml
+bash .claude/validation/kg-drive-project.sh docs/onion/graph/&lt;grafo&gt;.kg.yaml
+bash .claude/validation/kg-console.sh docs/onion/graph/&lt;grafo&gt;.kg.yaml &gt; kg-console.html   # abra no navegador; não commite</code></pre></div>
+<p>No realign, mostre o <strong>commitment-drift</strong>: pergunta aberta de alto impacto sem nada que a apoie, com o radar perguntando "abandonado?". No drive, mostre a fila pronta e os bloqueados.</p>
+<p><strong>Como se sela uma decisão aqui.</strong> O <code>/meta:decide</code> é do core e não vem no bundle do hub. No hub, selar é editar o nó e rodar o radar no fim:</p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-yaml">  - id: D_&lt;DECISAO&gt;
+    node_type: decision
+    plane: DEV
+    status: done
+    verified_at: &quot;2026-10-14&quot;
+    verified_against: &quot;selo-na-aula-5&quot;
+    trace: docs/&lt;onde a decisão foi registrada&gt;.md
+    provenance:
+      source: &quot;aula 5, decisão de &lt;papel de quem decidiu&gt;&quot;
+      locator: &quot;bloco D&quot;
+      method: &quot;testemunho: decisão do maestro em 2026-10-14&quot;
+    label: &quot;&lt;a decisão, curta&gt;&quot;</code></pre></div>
+<p>O texto do <code>method:</code> começa <strong>exatamente</strong> com <code>testemunho: decisão do maestro</code>: é por ele que o motor reconhece um selo humano (troque "maestro" só no <code>source:</code>). Decisão selada é relato, não medição, por isso fica em <code>DEV</code>. No pin de 2026-10-07 o radar ainda avisa <code>decision-done-em-DEV</code> (aviso, não reprova); a exceção para o selo chega com a próxima atualização. Não passem para <code>PROD</code> para calar o aviso: o motor novo acusa testemunho em <code>PROD</code> como <code>MISPLANED</code>.</p>
+<p><strong>Exercício.</strong></p>
+<ol><li>Rodem o backlog e escolham <strong>um</strong> item que vocês podem decidir hoje.</li><li>Selem-no no grafo como acima (ou, se a decisão não é de vocês, escrevam no <code>narrative:</code> de quem ela depende e deixem <code>open</code>).</li><li>Rodem o realign e o drive no grafo que mudou.</li></ol>
+<p><strong>Pronto quando:</strong></p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">bash .claude/validation/kg-radar.sh &lt;grafo&gt; --integrity --schema                  # exit 0
+bash .claude/validation/kg-backlog-project.sh --markdown | grep -c &#x27;&lt;ID_DO_NO&gt;&#x27;   # 0: saiu da fila
+bash .claude/validation/kg-realign-project.sh &lt;grafo&gt; --check                     # exit 0</code></pre></div>
+<p><strong>Erros comuns e saída.</strong></p>
+<ul><li>*Editar <code>docs/backlog.md</code> à mão.* É projeção: feche o nó no grafo e regenere. Se vocês commitarem <code>docs/backlog.md</code>, a REGRA 62 (Projeção GERADA em sincronia com a fonte (docs/backlog.md)) passa a cobrar que ele bata com a fonte; regenerem com <code>/meta:backlog</code>.</li><li><em>Selar a decisão de outra pessoa.</em> O selo diz quem decidiu. Se não foi vocês, não selem.</li><li>*O drive para em <code>CHECKPOINT-PENDENTE</code>.* É de propósito: um lote anterior espera selo. Leia a <code>drive_checkpoint_note</code> no <code>meta:</code> do grafo.</li></ul>
+</section><section class="bloco" id="bloco-e-a-forja-forjar-um-componente-do-time-40-min"><h2>Bloco E — A forja: forjar um componente do time (40 min)</h2>
+<p><strong>Conceito.</strong> Um comando que só tem o arquivo <code>.md</code> é uma instrução solta. Um <strong>comando-com-framework</strong> tem o conjunto inteiro, as <strong>7 peças</strong> da doutrina da forja (<code>.claude/commands/common/prompts/forge-doctrine.md</code>):</p>
+<div class="tabela"><table><thead><tr><th>#</th><th>Peça</th><th>Onde vive</th><th>Se faltar</th></tr></thead><tbody><tr><td>1</td><td>superfície invocável</td><td><code>.claude/skills/&lt;n&gt;/SKILL.md</code></td><td>o poder existe e ninguém alcança</td></tr><tr><td>2</td><td>doutrina reutilizável</td><td><code>.claude/commands/common/prompts/&lt;n&gt;-doctrine.md</code></td><td>a doutrina se duplica e diverge</td></tr><tr><td>3</td><td>contexto medido injetado</td><td>`<code> !</code>bash &lt;medidor&gt;<code> </code>` na superfície</td><td>o modelo responde de memória o que um <code>ls</code> responde</td></tr><tr><td>4</td><td>orquestração faseada</td><td><code>.claude/workflows/&lt;n&gt;.js</code></td><td>a coordenação vira prosa e não retoma</td></tr><tr><td>5</td><td>destino do que se produz</td><td>fase final no grafo + <code>kg-radar</code></td><td>a síntese evapora entre sessões</td></tr><tr><td>6</td><td>lente/guarda</td><td><code>.claude/rules/&lt;n&gt;-lens.md</code> com <code>paths:</code></td><td>a doutrina fica escrita e nunca é lida</td></tr><tr><td>7</td><td>bancada</td><td>casos que reprovam a versão defeituosa</td><td>a guarda apodrece verde</td></tr></tbody></table></div>
+<p>Três cláusulas que importam hoje: <strong>a peça 3 é medida por script</strong>, nunca escrita à mão; <strong>antes de forjar, meça se já existe</strong> (a cláusula que mais custou à casa); e <strong>todo caso da bancada tem de reprovar contra o mutante</strong> (caso que passa nas duas versões é decorativo).</p>
+<div class="atencao"><strong>Por que forjamos à mão.</strong> O <code>/meta:forge</code> se declara core-only, e o grafo de adoção do hub registra "não usar aqui". O que viaja e roda no hub é a <strong>doutrina</strong> e o <strong>medidor</strong> (<code>forge-census.sh</code>). A aula usa os dois e emite as peças à mão, uma por uma. É o mesmo procedimento do comando, sem o atalho.</div>
+<p><strong>Demo 1: o censo.</strong></p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown | head -15</code></pre></div>
+<p>Leia o cabeçalho (quantos candidatos, quantos com 6+ peças) e o topo (os que têm 7/7). Diga como o censo mede: <strong>presença e referência</strong>, nunca qualidade. Peça que existe e a superfície não cita conta como ausente.</p>
+<p><strong>Demo 2: medir antes de forjar.</strong> Uma dor que o hub já sentiu: conferir o <code>.env</code> sem ler os segredos. Antes de forjar um verificador, procure:</p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">grep -rlni &#x27;nunca ler&#x27; .claude/utils .claude/validation | head</code></pre></div>
+<p>Ele já existe (<code>.claude/utils/task-manager/env-check.sh</code>), e nasceu de um sinal do campo. <strong>Forjar de novo seria duplicar.</strong> É a cláusula 3 acontecendo na frente da turma.</p>
+<p><strong>Exercício: escolher a dor.</strong> Cada dupla escolhe uma dor que <strong>mediu</strong> hoje, não uma que imagina. Candidatas típicas, todas saídas dos blocos anteriores:</p>
+<ul><li>regras de domínio ancoradas só em documento (bloco B) — o gabarito abaixo é esta;</li><li>documentos de negócio que nenhum grafo cita (bloco C);</li><li>perguntas abertas que esperam alguém de fora e não dizem quem (bloco D: o campo <code>owner:</code> existe e o backlog já agrupa por ele, então talvez a cura seja <strong>declarar</strong> <code>owner:</code>, não forjar nada).</li></ul>
+<p>Para a dor escolhida, rodem a pergunta da cláusula 3: <code>grep -rln &#x27;&lt;palavra-chave&gt;&#x27; .claude/</code>. Se já existe, a entrega da dupla é usar o que existe e registrar isso no grafo.</p>
+<p><strong>Exercício: forjar.</strong> Emitam as peças nesta ordem (uma habilita a outra). O gabarito completo da skill <code>domain-anchor</code> está na próxima seção; usem-no como molde.</p>
+<ol><li><strong>Peça 2, doutrina:</strong> <code>.claude/commands/common/prompts/&lt;n&gt;-doctrine.md</code>, com as cláusulas <strong>e o que ela não promete</strong>.</li><li><strong>Peça 3, medidor:</strong> <code>.claude/validation/&lt;n&gt;-census.sh</code>, determinístico, com saídas declaradas (<code>0</code> medido, <code>1</code> reprova no <code>--strict</code>, <code>2</code> uso inválido, <code>3</code> nada a medir).</li><li><strong>Peça 7, bancada:</strong> <code>.claude/validation/&lt;n&gt;-selftest.sh</code>, um caso por saída.</li><li><strong>Peça 6, lente:</strong> <code>.claude/rules/&lt;n&gt;-lens.md</code>, com <code>paths:</code> que casa arquivo rastreado.</li><li><strong>Peça 1, superfície:</strong> <code>.claude/skills/&lt;n&gt;/SKILL.md</code>, com `<code> !</code>bash .claude/validation/&lt;n&gt;-census.sh …<code> </code><code> e citando a doutrina, a lente e o </code>kg-radar` pelo caminho.</li><li><strong>Ligar e conferir:</strong> <code>git add</code> das cinco peças (o censo só enxerga o que está no índice), depois <code>/meta:inventory</code> e o lint.</li></ol>
+<p><strong>O mutante.</strong> Copiem o medidor, estraguem <strong>uma</strong> linha que importa e rodem a bancada contra a cópia:</p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">sed &#x27;s/? &quot;codigo&quot; : &quot;documento&quot;)/? &quot;codigo&quot; : &quot;codigo&quot;)/&#x27; \
+  .claude/validation/domain-anchor-census.sh &gt; mutant.sh
+diff .claude/validation/domain-anchor-census.sh mutant.sh   # TEM de mostrar 1 linha; vazio = mutante igual
+bash .claude/validation/domain-anchor-selftest.sh ./mutant.sh   # TEM de reprovar
+rm mutant.sh</code></pre></div>
+<p><strong>Pronto quando:</strong></p>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">bash .claude/validation/&lt;n&gt;-selftest.sh                         # todos ✅
+bash .claude/validation/&lt;n&gt;-selftest.sh ./mutant.sh             # pelo menos 1 ❌ (e exit 1)
+FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown | grep &#x27;&lt;n&gt;&#x27;   # 5/7 ou mais
+bash .claude/validation/lint-artifacts.sh                       # 0 HARD</code></pre></div>
+<p><strong>Erros comuns e saída.</strong></p>
+<ul><li><em>O censo não mostra a skill.</em> Ela não está no índice: <code>git add</code> antes de medir. O censo lê <code>git ls-files</code>, como a sessão de outra pessoa leria.</li><li><em>O censo mostra a peça 7 como "—" mesmo com a bancada pronta.</em> É esperado e honesto: o censo só reconhece bancada registrada como família <code>run_&lt;n&gt;_selftests</code> dentro de <code>lint-selftest.sh</code>, que é arquivo do framework. Editá-lo no hub vira conflito na próxima atualização. Deixem a bancada no script próprio e aceitem o 5/7. Levar isso ao core é a aula 6.</li><li><em>O medidor sai 1 no caso bom.</em> Sob <code>set -e</code> e <code>pipefail</code>, um <code>grep -v</code> sem saída devolve 1 e mata o script. Proteja com <code>{ grep -v … || true; }</code>. (Foi o que a bancada do gabarito pegou no primeiro ensaio.)</li><li><em>O mutante passa.</em> Ou o <code>sed</code> não casou (o <code>diff</code> sai vazio e a cópia é idêntica), ou a bancada não testa a linha que vocês estragaram. Os dois aconteceram no ensaio deste gabarito.</li><li><em>Lint acusa inventário.</em> A REGRA 8 (Inventário canônico sincronizado com o filesystem) cobra a contagem nova de skills: rodem <code>/meta:inventory</code> e commitem junto.</li><li><em>Lint acusa a lente.</em> A REGRA 53 (Regra path-scoped declara <code>paths:</code> que casa algo real) exige <code>paths:</code> com um glob que case arquivo rastreado.</li></ul>
+</section><section class="bloco" id="bloco-f-fechamento-e-ponte-para-a-aula-6-5-min"><h2>Bloco F — Fechamento e ponte para a aula 6 (5 min)</h2>
+<p>Cada dupla mostra, em um minuto: o grafo consertado, as três âncoras no código, o documento ligado e a skill forjada com o censo.</p>
+<p><strong>A ponte.</strong> Tudo o que fizemos hoje mora <strong>num repositório só</strong>. O hub tem grafo, o projeto tem grafo, e eles ainda não se falam: <code>external_edges:</code> liga grafos do mesmo repositório, e a skill forjada no projeto ainda não chega aos outros projetos. A aula 6 junta as pontas: o hub como Company Brain, os projetos ligados a ele, o caminho de um componente que nasceu num projeto subir para o hub e descer para os outros, e o caminho de um achado do time (como o "peça 7 invisível" acima) chegar ao core.</p>
+<p>Para casa: <code>/onion-retro</code> para registrar a aula, e cada dupla deixa o seu PR aberto com os quatro "prontos" no corpo.</p>
+</section><section class="bloco" id="gabarito-da-forja-a-skill-domain-anchor"><h2>Gabarito da forja: a skill <code>domain-anchor</code></h2>
+<p>A dor: num projeto real, as regras de domínio do grafo apontavam todas para o documento da feature, e nenhuma para o código, que já estava no repositório. A skill mede isso e conduz a re-ancoragem. Ensaiada em 2026-10-14 contra uma cópia de um grafo real e contra uma cópia do framework: bancada 6 ✅, mutante reprovado, censo 5/7.</p>
+<h3>Peça 3 — <code>.claude/validation/domain-anchor-census.sh</code></h3>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">#!/usr/bin/env bash
+# domain-anchor-census.sh — regra de domínio ancorada em DOCUMENTO é promessa; em CÓDIGO, é fato.
+#
+# Mede, nos nós rule/invariant/policy de um ou mais .kg.yaml, para onde o `trace:` aponta:
+#   codigo    — caminho que casa DOMAIN_ANCHOR_CODE_RE (default: apps/ packages/ src/ lib/ services/)
+#   documento — qualquer outro caminho (docs/…)
+#   sem-trace — o nó não declara âncora
+# Uso : domain-anchor-census.sh &lt;grafo.kg.yaml&gt;... [--strict] [--tsv]
+# Exit: 0 medido · 1 (--strict) há regra ancorada só em documento ou sem âncora
+#       2 uso inválido / arquivo ausente · 3 nada a medir (zero regras NÃO é resultado)
+set -euo pipefail
+export LC_ALL=C
+
+strict=0; tsv=0; files=()
+for a in &quot;$@&quot;; do
+  case &quot;$a&quot; in
+    --strict) strict=1 ;;
+    --tsv)    tsv=1 ;;
+    -*) echo &quot;uso: domain-anchor-census.sh &lt;grafo.kg.yaml&gt;... [--strict] [--tsv]&quot; &gt;&amp;2; exit 2 ;;
+    *)  files+=(&quot;$a&quot;) ;;
+  esac
+done
+[ &quot;${#files[@]}&quot; -gt 0 ] || { echo &quot;uso: domain-anchor-census.sh &lt;grafo.kg.yaml&gt;... [--strict] [--tsv]&quot; &gt;&amp;2; exit 2; }
+
+CODE_RE=&quot;${DOMAIN_ANCHOR_CODE_RE:-^(apps|packages|src|lib|services)/}&quot;
+rows=&quot;&quot;
+for f in &quot;${files[@]}&quot;; do
+  [ -f &quot;$f&quot; ] || { echo &quot;arquivo ausente: $f&quot; &gt;&amp;2; exit 2; }
+  rows+=&quot;$(awk -v code_re=&quot;$CODE_RE&quot; -v src=&quot;$f&quot; &#x27;
+    function flush() {
+      if (id != &quot;&quot; &amp;&amp; (nt == &quot;rule&quot; || nt == &quot;invariant&quot; || nt == &quot;policy&quot;)) {
+        k = (tr == &quot;&quot;) ? &quot;sem-trace&quot; : ((tr ~ code_re) ? &quot;codigo&quot; : &quot;documento&quot;)
+        printf &quot;%s\t%s\t%s\t%s\t%s\n&quot;, k, nt, id, tr, src
+      }
+      id = &quot;&quot;; nt = &quot;&quot;; tr = &quot;&quot;
+    }
+    /^  - id:/    { flush(); id = $3; next }
+    /^  - from:/  { flush(); next }
+    /^[a-z_]+:/   { flush(); next }
+    id != &quot;&quot; &amp;&amp; /^    node_type:/ { nt = $2 }
+    id != &quot;&quot; &amp;&amp; /^    trace:/     { tr = $2; gsub(/[&quot;\047]/, &quot;&quot;, tr) }
+    END { flush() }&#x27; &quot;$f&quot;)&quot;$&#x27;\n&#x27;
+done
+rows=&quot;$(printf &#x27;%s&#x27; &quot;$rows&quot; | grep -v &#x27;^$&#x27; || true)&quot;
+
+[ -n &quot;$rows&quot; ] || { echo &quot;domain-anchor: nenhum nó rule/invariant/policy nos grafos dados — nada a medir. Recusa.&quot; &gt;&amp;2; exit 3; }
+
+if [ &quot;$tsv&quot; -eq 1 ]; then printf &#x27;%s\n&#x27; &quot;$rows&quot;; else
+  n_code=$(printf &#x27;%s\n&#x27; &quot;$rows&quot; | grep -c &#x27;^codigo&#x27;    || true)
+  n_doc=$(printf &#x27;%s\n&#x27; &quot;$rows&quot;  | grep -c &#x27;^documento&#x27; || true)
+  n_none=$(printf &#x27;%s\n&#x27; &quot;$rows&quot; | grep -c &#x27;^sem-trace&#x27; || true)
+  echo &quot;# âncora das regras de domínio · codigo=${n_code} · documento=${n_doc} · sem-trace=${n_none}&quot;
+  # `|| true`: sem nenhuma pendência o grep -v sai 1, e sob pipefail + set -e isso MATAVA o medidor
+  # com rc=1 no caso bom (achado pela bancada no 1º ensaio).
+  printf &#x27;%s\n&#x27; &quot;$rows&quot; | { grep -v &#x27;^codigo&#x27; || true; } | awk -F&#x27;\t&#x27; &#x27;{printf &quot;  - [%s] %s `%s` → %s\n&quot;, $1, $2, $3, ($4 == &quot;&quot; ? &quot;(sem trace)&quot; : $4)}&#x27;
+fi
+
+if [ &quot;$strict&quot; -eq 1 ] &amp;&amp; printf &#x27;%s\n&#x27; &quot;$rows&quot; | grep -qv &#x27;^codigo&#x27;; then exit 1; fi
+exit 0</code></pre></div>
+<h3>Peça 7 — <code>.claude/validation/domain-anchor-selftest.sh</code></h3>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-bash">#!/usr/bin/env bash
+# domain-anchor-selftest.sh — bancada do domain-anchor-census.sh.
+# Todo caso tem de REPROVAR contra a versão defeituosa (o mutante). Caso que passa nos dois é decorativo.
+# Uso: domain-anchor-selftest.sh [&lt;medidor&gt;]   (default: o medidor ao lado deste arquivo)
+set -uo pipefail
+export LC_ALL=C
+M=&quot;${1:-$(dirname &quot;$0&quot;)/domain-anchor-census.sh}&quot;
+[ -f &quot;$M&quot; ] || { echo &quot;medidor ausente: $M&quot; &gt;&amp;2; exit 2; }
+T=&quot;$(mktemp -d)&quot;; trap &#x27;rm -rf &quot;$T&quot;&#x27; EXIT
+pass=0; fail=0
+check() {  # $1=nome  $2=rc esperado  $3=rc obtido
+  if [ &quot;$2&quot; = &quot;$3&quot; ]; then pass=$((pass+1)); echo &quot;  ✅ $1&quot;; else fail=$((fail+1)); echo &quot;  ❌ $1 (esperado rc=$2, veio rc=$3)&quot;; fi
+}
+node() {  # $1=id $2=node_type $3=trace (vazio = sem trace)
+  printf &#x27;  - id: %s\n    node_type: %s\n    status: open\n&#x27; &quot;$1&quot; &quot;$2&quot;
+  [ -n &quot;$3&quot; ] &amp;&amp; printf &#x27;    trace: %s\n&#x27; &quot;$3&quot;
+  return 0
+}
+{ echo &quot;nodes:&quot;; node RU_A rule &quot;apps/api/src/x.ts:10&quot;; echo &quot;edges:&quot;; echo &quot;  - from: RU_A&quot;; } &gt; &quot;$T/code.kg.yaml&quot;
+{ echo &quot;nodes:&quot;; node RU_A rule &quot;apps/api/src/x.ts:10&quot;; node RU_B rule &quot;docs/business-context/f.md:3&quot;; } &gt; &quot;$T/doc.kg.yaml&quot;
+{ echo &quot;nodes:&quot;; node PO_A policy &quot;&quot;; } &gt; &quot;$T/none.kg.yaml&quot;
+{ echo &quot;nodes:&quot;; node EN_A entity &quot;docs/x.md&quot;; } &gt; &quot;$T/empty.kg.yaml&quot;
+
+bash &quot;$M&quot; &quot;$T/code.kg.yaml&quot; --strict &gt;/dev/null 2&gt;&amp;1;  check &quot;regra ancorada em código passa no --strict&quot; 0 $?
+bash &quot;$M&quot; &quot;$T/doc.kg.yaml&quot;  --strict &gt;/dev/null 2&gt;&amp;1;  check &quot;regra ancorada só em documento reprova no --strict&quot; 1 $?
+bash &quot;$M&quot; &quot;$T/none.kg.yaml&quot; --strict &gt;/dev/null 2&gt;&amp;1;  check &quot;política sem trace reprova no --strict&quot; 1 $?
+bash &quot;$M&quot; &quot;$T/empty.kg.yaml&quot;         &gt;/dev/null 2&gt;&amp;1;  check &quot;grafo sem regra recusa (exit 3, nunca zero silencioso)&quot; 3 $?
+bash &quot;$M&quot; --bogus                    &gt;/dev/null 2&gt;&amp;1;  check &quot;argumento desconhecido recusa (exit 2)&quot; 2 $?
+bash &quot;$M&quot; &quot;$T/nao-existe.kg.yaml&quot;    &gt;/dev/null 2&gt;&amp;1;  check &quot;arquivo ausente recusa (exit 2)&quot; 2 $?
+echo &quot;# bancada domain-anchor: ${pass} ✅ · ${fail} ❌&quot;
+[ &quot;$fail&quot; -eq 0 ]</code></pre></div>
+<h3>Peça 2 — <code>.claude/commands/common/prompts/domain-anchor-doctrine.md</code></h3>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-markdown"># Doutrina da âncora de domínio
+
+Fragmento canônico. A skill `domain-anchor` referencia este arquivo; ninguém o copia.
+
+## As três cláusulas
+
+1. **Regra ancorada em documento é promessa.** Um nó `rule`, `invariant` ou `policy` cujo `trace:`
+   aponta para `docs/` diz o que alguém escreveu que o sistema faz. Só a âncora no código diz o que
+   ele faz. Enquanto a âncora for documento, a `confidence` fica abaixo de 1.
+2. **A âncora se mede, não se lembra.** O estado entra na sessão pelo medidor
+   (`.claude/validation/domain-anchor-census.sh`), e a linha do código sai de `grep -n`.
+3. **Não achar o código é resultado.** Regra sem código vira pergunta aberta. Âncora inventada
+   para o medidor passar é pior que âncora ausente, porque mente para quem volta ao porquê.
+
+## O que esta doutrina NÃO promete
+
+O medidor confere para ONDE a âncora aponta, não se o código faz o que a regra diz, nem se o
+arquivo existe (isso é do `kg-trace-resolve.sh`). Ler o código e julgar continua sendo trabalho
+de gente.</code></pre></div>
+<h3>Peça 6 — <code>.claude/rules/domain-anchor-lens.md</code></h3>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-markdown">---
+paths:
+  - &quot;docs/onion/graph/*.kg.yaml&quot;
+---
+
+# Lente da âncora de domínio — carrega quando você toca um grafo
+
+Ao escrever ou mudar um nó `rule`, `invariant` ou `policy`, a âncora (`trace:`) aponta para o
+código que executa a regra, como `arquivo:linha` tirado de `grep -n`. Se só existe o documento,
+deixe a `confidence` abaixo de 1 e diga isso no `verified_against`.
+
+Doutrina: `.claude/commands/common/prompts/domain-anchor-doctrine.md`.
+Medir: `bash .claude/validation/domain-anchor-census.sh &lt;grafo&gt;`.</code></pre></div>
+<h3>Peça 1 — <code>.claude/skills/domain-anchor/SKILL.md</code></h3>
+<div class="code"><button class="copy" type="button">Copiar</button><pre><code class="lang-markdown">---
+name: domain-anchor
+description: &gt;
+  Mede para onde apontam as âncoras das regras de domínio do grafo (rule, invariant, policy):
+  código, documento ou nada. Use ao revisar um grafo de domínio, antes de implementar uma regra,
+  ou quando alguém perguntar &quot;essa regra já está no código?&quot;, &quot;o grafo bate com o sistema?&quot;.
+  Ative mesmo sem a palavra &quot;âncora&quot;.
+---
+
+# domain-anchor — regra ancorada em documento é promessa; em código, é fato
+
+Doutrina: [`domain-anchor-doctrine.md`](../../commands/common/prompts/domain-anchor-doctrine.md).
+Lente que carrega ao tocar um grafo: `.claude/rules/domain-anchor-lens.md`.
+
+## Estado medido agora (o medidor roda antes de você pensar)
+
+!`bash .claude/validation/domain-anchor-census.sh docs/onion/graph/*.kg.yaml || true`
+
+## Procedimento
+
+1. Leia o estado acima. Cada linha `[documento]` ou `[sem-trace]` é uma regra que ninguém conferiu
+   no sistema.
+2. Para cada uma, ache o código que a executa por `grep -rn &#x27;&lt;termo da regra&gt;&#x27; apps/ packages/`.
+   O número da linha sai do `grep -n`, nunca da contagem visual.
+3. Achou: troque o `trace:` para `arquivo:linha`, atualize `verified_at` e `verified_against`,
+   e suba a `confidence` só se o código faz o que o rótulo diz.
+4. Não achou: a regra continua `open`, ou vira `question` (&quot;onde isso é aplicado?&quot;). Nunca invente
+   a âncora para o medidor ficar verde.
+5. Feche com `bash .claude/validation/kg-radar.sh &lt;grafo&gt; --integrity --schema` (exit 0) e com o
+   medidor de novo. Bancada: `bash .claude/validation/domain-anchor-selftest.sh`.</code></pre></div>
+<p>A peça 5 (destino) é o próprio grafo de domínio: a skill não produz um relatório à parte, ela muda as âncoras no grafo e fecha com o radar. A peça 4 (workflow) não entra: a re-ancoragem cabe numa sessão, e um workflow faseado só se paga quando houver dezenas de regras por grafo.</p>
+</section><section class="bloco" id="roteiro-do-instrutor"><h2>Roteiro do instrutor</h2>
+<p><strong>Antes (30 min, no dia).</strong> Rode a medição da turma no hub e no projeto e preencha a ficha. Ensaie o bloco A num grafo com aviso de multi-documento (se não houver nenhum, use o bloco A só como leitura da gramática e ganhe 10 minutos para o bloco E). Confira que o PyYAML está instalado nas máquinas.</p>
+<p><strong>O que dizer, bloco a bloco.</strong></p>
+<ul><li><strong>0.</strong> "Quando uma sessão nova abre este repositório, o que ela sabe antes de vocês falarem?" Mostre a pergunta aberta do grafo de adoção. É o gancho da aula inteira.</li><li><strong>A.</strong> "O radar é <code>awk</code>, não um leitor de YAML. Ele é rígido de propósito: o que ele não lê, ninguém lê do mesmo jeito." Mostre o aviso e a recusa do drive lado a lado.</li><li><strong>B.</strong> "Documento diz o que alguém escreveu que o sistema faz. Código diz o que ele faz." O momento forte é achar, ao vivo, uma regra no código que <strong>não</strong> bate com o documento.</li><li><strong>C.</strong> "Decisão de trabalho não é fato." Mostre como a confiança muda com a marca do documento.</li><li><strong>D.</strong> "O backlog não é uma lista: é uma projeção do grafo. Feche o nó e o item some sozinho."</li><li><strong>E.</strong> "Antes de forjar, procure." A demo do <code>env-check.sh</code> é o centro do bloco: a dor era real, e a cura já existia.</li><li><strong>F.</strong> "Hoje cada repositório tem o seu grafo. Na próxima aula eles passam a conversar."</li></ul>
+<p><strong>Onde costuma travar.</strong></p>
+<div class="tabela"><table><thead><tr><th>Ponto</th><th>Sintoma</th><th>Saída</th></tr></thead><tbody><tr><td>bloco A</td><td>apagaram um <code>---</code> dentro de texto</td><td><code>git diff</code> e restaurar a linha</td></tr><tr><td>bloco B</td><td>não acham a regra no código</td><td>é resultado: vira <code>question</code>, não âncora inventada</td></tr><tr><td>bloco B</td><td><code>kg-trace-resolve.sh</code> reprova</td><td>a âncora aponta para arquivo que não existe; confiram o caminho relativo à raiz</td></tr><tr><td>bloco C</td><td>nós longos demais</td><td><code>label</code> curto, o resto em <code>narrative:</code></td></tr><tr><td>bloco D</td><td>querem selar decisão do cliente</td><td>não selem; escrevam de quem depende</td></tr><tr><td>bloco E</td><td>censo sem a skill</td><td>faltou <code>git add</code></td></tr><tr><td>bloco E</td><td>mutante passa</td><td><code>diff</code> vazio ou bancada sem o caso daquela linha</td></tr><tr><td>bloco E</td><td>lint com HARD de inventário</td><td><code>/meta:inventory</code> e commitar junto</td></tr></tbody></table></div>
+<p><strong>Se o tempo apertar.</strong> Corte o bloco C para a trilha do projeto só, e no bloco E entreguem o medidor e a bancada (peças 3 e 7); a superfície e a lente ficam de lição de casa.</p>
+</section><section class="bloco" id="cartão-resumo-de-comandos"><h2>Cartão-resumo de comandos</h2>
+<div class="tabela"><table><thead><tr><th>Para quê</th><th>Comando</th></tr></thead><tbody><tr><td>achar os grafos</td><td><code>git ls-files &#x27;*.kg.yaml&#x27; | grep -v &#x27;/fixtures/&#x27;</code></td></tr><tr><td>validar um grafo</td><td><code>bash .claude/validation/kg-radar.sh &lt;g&gt; --integrity --schema</code></td></tr><tr><td>lacunas do domínio</td><td><code>bash .claude/validation/kg-radar.sh &lt;g&gt; --domain</code></td></tr><tr><td>frescor</td><td><code>bash .claude/validation/kg-radar.sh &lt;g&gt; --freshness</code></td></tr><tr><td>âncoras que não resolvem</td><td><code>bash .claude/validation/kg-trace-resolve.sh .</code> (o repositório inteiro)</td></tr><tr><td>ver o grafo</td><td><code>bash .claude/validation/kg-view.sh &lt;g&gt; --markdown</code></td></tr><tr><td>console visual</td><td><code>bash .claude/validation/kg-console.sh &lt;g&gt; &gt; kg-console.html</code></td></tr><tr><td>mapear uma área</td><td><code>/meta:kg map &lt;área&gt;</code></td></tr><tr><td>re-verificar contra o vivo</td><td><code>/meta:kg-freshness &lt;g&gt;</code></td></tr><tr><td>abrir a sessão pelo grafo</td><td><code>/warm-up</code> · <code>/catch-up</code></td></tr><tr><td>fila de trabalho aberto</td><td><code>/meta:backlog</code> · <code>bash .claude/validation/kg-backlog-project.sh --markdown</code></td></tr><tr><td>o plano ainda coere?</td><td><code>/meta:realign &lt;g&gt;</code> · <code>bash .claude/validation/kg-realign-project.sh &lt;g&gt; --check</code></td></tr><tr><td>conduzir o plano</td><td><code>/meta:drive &lt;g&gt;</code> · <code>bash .claude/validation/kg-drive-project.sh &lt;g&gt;</code></td></tr><tr><td>censo da forja</td><td><code>FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown</code></td></tr><tr><td>criar a superfície</td><td><code>/meta:create-command</code> · <code>/meta:create-skill</code></td></tr><tr><td>gate</td><td><code>/meta:inventory</code> · <code>bash .claude/validation/lint-artifacts.sh</code></td></tr><tr><td>fechar a aula</td><td><code>/onion-retro</code></td></tr></tbody></table></div>
+</section><section class="bloco" id="nota-para-o-revisor"><h2>Nota para o revisor</h2>
+<p><strong>Verificado em 2026-10-14</strong>, no pin <code>8278fee79d1c</code> do hub e do projeto que ele adotou:</p>
+<ul><li>todos os comandos do cartão existem no bundle do hub (<code>ls .claude/commands/meta/</code> e <code>ls .claude/validation/</code>);</li><li>o radar avisa <code>multi-documento</code> em grafos com cabeçalho <code>---</code>, e o <code>kg-drive-project.sh</code> recusa o mesmo arquivo; sem os <code>---</code>, o radar passa limpo e o drive imprime o veredito;</li><li>o <code>forge-census.sh</code> roda no hub e mede 59 candidatos;</li><li>o gabarito <code>domain-anchor</code>: bancada 6 ✅; mutante (uma linha trocada) reprovado em 1 caso; contra uma cópia de um grafo de domínio real mediu <code>codigo=0 · documento=9</code>; com as cinco peças no índice de uma cópia do framework, o censo deu <strong>5/7</strong> (peças 4 e 7 ausentes, pelo motivo dito no bloco E).</li></ul>
+<p><strong>Não verificado (fica para o ensaio humano):</strong></p>
+<ul><li>a skill <code>domain-anchor</code> <strong>não</strong> foi instalada no repositório da equipe nem invocada como <code>/domain-anchor</code> numa sessão real; a diretiva `<code> !</code>…<code> </code>` foi conferida só pelo censo, não pela carga;</li><li>o lint do hub com as cinco peças novas não rodou; o bloco E prevê o HARD de inventário pela REGRA 8, mas o número exato de avisos é do dia;</li><li>se uma skill nova do hub desce para os projetos no <code>/meta:adopt --update</code> (o manifesto inclui <code>.claude/skills</code> inteiro, mas a descida não foi ensaiada) — assunto da aula 6;</li><li>o selo manual de decisão do bloco D foi conferido no radar dos dois pins (o do hub avisa <code>decision-done-em-DEV</code>; o do core aceita o selo em DEV e acusa <code>MISPLANED</code> em PROD), mas não passou pelas demais guardas de selo do hub.</li></ul>
+<p><strong>Comandos que esta aula quis usar e não estão no bundle do hub:</strong> <code>/meta:decide</code> (core-only; o bloco D ensina o selo à mão) e <code>kg-contract-check.sh</code> (o contrato formal do <code>.kg.yaml</code> não está vendorizado no hub). O <code>/meta:forge</code> está no bundle, mas se declara core-only.</p></section>
+</main>
+<script>
+(function(){
+ document.querySelectorAll('.copy').forEach(function(b){b.addEventListener('click',function(){
+  var t=b.parentNode.querySelector('code').innerText;
+  function ok(){b.textContent='Copiado';setTimeout(function(){b.textContent='Copiar'},1500)}
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(t).then(ok)}
+  else{var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();
+   try{document.execCommand('copy');ok()}catch(e){}document.body.removeChild(a)}
+ })});
+ var root=document.documentElement,body=document.body,sec=[].slice.call(document.querySelectorAll('.bloco')),cur=0,
+ pos=document.getElementById('pos');
+ function show(k){cur=Math.max(0,Math.min(sec.length-1,k));sec.forEach(function(s,j){s.classList.toggle('ativo',j===cur)});
+  pos.textContent=(cur+1)+' / '+sec.length;window.scrollTo(0,0)}
+ document.getElementById('proj').addEventListener('click',function(){body.classList.toggle('projetor');
+  if(body.classList.contains('projetor')){show(cur)}else{pos.textContent=''}});
+ document.getElementById('tema').addEventListener('click',function(){
+  var d=root.getAttribute('data-theme')==='dark'||(!root.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme: dark)').matches);
+  root.setAttribute('data-theme',d?'light':'dark')});
+ var tam=18;function fs(d){tam=Math.max(14,Math.min(30,tam+d));root.style.setProperty('--tamanho',tam+'px')}
+ document.getElementById('mais').addEventListener('click',function(){fs(2)});
+ document.getElementById('menos').addEventListener('click',function(){fs(-2)});
+ document.addEventListener('keydown',function(e){if(!body.classList.contains('projetor'))return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'){show(cur+1);e.preventDefault()}
+  if(e.key==='ArrowLeft'||e.key==='PageUp'){show(cur-1);e.preventDefault()}});
+ sec.forEach(function(s,j){if(location.hash&&('#'+s.id)===location.hash)cur=j});
+})();
+</script>
+</body>
+</html>
