@@ -139,11 +139,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
     confidence: 0.5
     verified_at: "2026-10-14"
-    verified_against: "aberta em 2026-10-14 pela r11 e ampliada pelo juiz; fecha numa forja só da mesma guarda: leitura da cauda (cobrindo turno autônomo longo, em que o último user que não é tool_result fica longe do fim), o _PAT_EVIDENCE emendado, caso de bancada para cada um e o tempo medido de novo num transcript grande"
+    verified_against: "fechada em 2026-10-14 pela SAC-137 (branch fix/stop-hooks-tail-and-notification-evidence): o lib .claude/hooks/lib/transcript-tail.py lê a cauda em blocos de 1 MiB com teto de 16 MiB e releitura inteira quando estoura; os 2 hooks Stop caíram de ~1 s e ~0,55 s para ~0,15-0,4 s no transcript real; o _PAT_EVIDENCE aceita a notificação e o lançamento com relato de espera, e deixou de premiar tasks/*.output; 9 mutantes reprovados"
     label: "os hooks Stop que leem o transcript devem ler só o último turno, e o background-state-needs-evidence passa a aceitar como prova o resultado de lançamento e a notificação, deixando de premiar a leitura de tasks/*.output"
     narrative: "Issue SAC-137 no Linear, criada pelo tm.sh em 2026-10-14."
   - id: E_AGENT_SPAWN_REESCREVE_O_MODELO_DO_WORKFLOW
