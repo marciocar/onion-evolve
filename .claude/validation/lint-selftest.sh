@@ -1580,7 +1580,7 @@ _lib_beside() {  # $1 = diretorio onde o motor copiado vai rodar
 # vendor-baseline-removido (RED/MUT)) — por isso é UM helper, não dois remendos.
 _adopt_sibs_beside() {  # $1 = diretório onde o motor copiado vai rodar
   local f
-  for f in vendor-manifest.sh durable-commit.sh regen-baselines.sh; do
+  for f in vendor-manifest.sh durable-commit.sh regen-baselines.sh regen-ssot-projections.sh; do
     cp "${REPO_ROOT}/.claude/utils/adopt/${f}" "$1/" 2>/dev/null || true
   done
 }
@@ -6553,6 +6553,35 @@ run_vendor_branch_selftests() {
     record_fail "vendor-branch: (g-MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
   fi
   rm -rf "$mutd" 2>/dev/null
+
+  # (g2) a PROJEÇÃO GERADA não é produto alheio (2026-10-14, --update de um hub): o commit da
+  #      onion/vendor regenera docs/onion/inventory.md e companhia, que ficam fora do manifesto; o teste
+  #      de pureza as lia como produto de outra integration branch e recusava com BASE CRUZADA (rc=11).
+  #      Aceite: a vendor que difere da base SÓ numa projeção gerada mergeia. MUTANTE: sem o filtro das
+  #      projeções (a lista do gerador), o MESMO caso volta a dar rc=11.
+  local c6 t6 ib6 rcp=0 rcpm=0 mutp
+  c6="$(mktemp -d)/c6"; t6="$(mktemp -d)/a6"; _vb_core "$c6" 1; _vb_adopter "$t6" "$c6"
+  ib6="$(git -C "$t6" rev-parse --abbrev-ref HEAD)"; bash "${helper}" seed "$t6" "$ib6" >/dev/null 2>&1
+  _g2_vendor_projection() {  # $1 = adotante: o commit da vendor regenera uma projeção gerada
+    git -C "$1" checkout -q onion/vendor; mkdir -p "$1/docs/onion"; printf 'inventario regenerado\n' > "$1/docs/onion/inventory.md"
+    git -C "$1" add -A; git -C "$1" commit -qm "vendor regenera projecao"; git -C "$1" checkout -q "$2"; }
+  _g2_vendor_projection "$t6" "$ib6"
+  _vb_core "$c6" 2
+  LC_ALL=C bash "${helper}" update "$t6" "$c6" "$(git -C "$c6" rev-parse --short=12 HEAD)" "$ib6" >/dev/null 2>&1 || rcp=$?
+  if [ "$rcp" -eq 0 ]; then
+    record_pass "vendor-branch: (g2) vendor que difere da base só numa projeção gerada mergeia (não é BASE CRUZADA)"
+  else record_fail "vendor-branch: (g2) projeção gerada" "esperava rc 0, veio rc=$rcp (BASE CRUZADA falsa?)"; fi
+  mutp="$(mktemp -d)"
+  sed 's/^  \[ -n "\$gen_out" \] && keep=.*$/  : # ONION_MUTANTE sem o filtro das projeções/' "${helper}" > "${mutp}/mut.sh"
+  _adopt_sibs_beside "${mutp}"
+  if grep -q 'ONION_MUTANTE sem o filtro' "${mutp}/mut.sh"; then
+    _vb_core "$c6" 1; _vb_adopter "$t6" "$c6"; ib6="$(git -C "$t6" rev-parse --abbrev-ref HEAD)"
+    bash "${mutp}/mut.sh" seed "$t6" "$ib6" >/dev/null 2>&1; _g2_vendor_projection "$t6" "$ib6"; _vb_core "$c6" 2
+    LC_ALL=C bash "${mutp}/mut.sh" update "$t6" "$c6" "$(git -C "$c6" rev-parse --short=12 HEAD)" "$ib6" >/dev/null 2>&1 || rcpm=$?
+    if [ "$rcpm" -eq 11 ]; then record_pass "vendor-branch: (g2-MUT) sem o filtro das projeções o mesmo caso volta a BASE CRUZADA — o filtro é load-bearing"
+    else record_fail "vendor-branch: (g2-MUT)" "o mutante não mudou o desfecho (rc=$rcpm) — o caso não prova a cura"; fi
+  else record_fail "vendor-branch: (g2-MUT)" "a mutação NÃO foi aplicada — âncora do sed não casou"; fi
+  rm -rf "$mutp" "$c6" "$t6" 2>/dev/null
 
   rm -rf "$core" "$t" "$c2" "$t2" "$c3" "$t3" "$c4" "$t4" "$c5" "$t5" 2>/dev/null
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL

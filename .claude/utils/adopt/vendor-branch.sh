@@ -112,6 +112,14 @@ _vendor_is_framework_pure() {  # <TARGET> <SOURCE_ROOT> <INTEGRATION_BRANCH> →
   done <<< "$mf"
   # .claude/.onion-version é carimbo do framework, não produto.
   keep="$(printf '%s\n' "$keep" | grep -vE '^\.claude/\.onion-version$|^$' || true)"
+  # As PROJEÇÕES GERADAS (docs/onion/inventory.md, graph.md, testing-*.md, kg-read-index.tsv) também são
+  # framework: o próprio commit da onion/vendor as regenera, e fora do manifesto elas viravam "produto
+  # alheio" → BASE CRUZADA falsa (rc=11), medida no --update de um hub em 2026-10-14. A lista vem do
+  # GERADOR (--list-outputs), nunca copiada aqui. Gerador ausente ou mudo = nada a tirar: falha
+  # fechada, a recusa segue como antes.
+  local gen_out
+  gen_out="$(bash "${HERE}/regen-ssot-projections.sh" --list-outputs 2>/dev/null)" || gen_out=""
+  [ -n "$gen_out" ] && keep="$(printf '%s\n' "$keep" | grep -vxF -f <(printf '%s\n' "$gen_out") || true)"
   [ -z "$keep" ] && return 0
   printf '%s\n' "$keep" | head -8
   return 1

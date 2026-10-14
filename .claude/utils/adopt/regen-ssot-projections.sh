@@ -21,7 +21,21 @@
 # mudou é que agora a falha não é MANUFATURADA por diretório ausente.
 set -uo pipefail
 
-DEST="${1:?uso: regen-ssot-projections.sh <DEST>}"
+# As projeções em docs/onion/ (gerador:saída). UMA lista, lida pelo laço abaixo E pelo `--list-outputs`.
+_PAIRS=("inventory.sh:inventory.md" "graph.sh:graph.md" "testing-state.sh:testing-state.md" "harness-inventory.sh:testing-inventory.md")
+
+# `--list-outputs`: imprime, um por linha e relativo à raiz, TODO arquivo que este script gera. Quem
+# precisa saber "isto é projeção do framework, não produto" pergunta aqui em vez de copiar a lista
+# (2026-10-14: o teste de pureza do vendor-branch.sh não as conhecia e acusou BASE CRUZADA falsa,
+# rc=11, no --update de um hub, porque o próprio commit da onion/vendor as regenera).
+if [ "${1:-}" = "--list-outputs" ]; then
+  printf '%s\n' docs/onion/kg-read-index.tsv
+  for _pair in "${_PAIRS[@]}"; do printf 'docs/onion/%s\n' "${_pair##*:}"; done
+  printf '%s\n' .claude/validation/lint-rules.md
+  exit 0
+fi
+
+DEST="${1:?uso: regen-ssot-projections.sh <DEST> | --list-outputs}"
 [ -d "${DEST}" ] || { echo "ERRO: alvo inexistente: '${DEST}'" >&2; exit 2; }
 
 # ⚠️ FAIL-LOUD, e ele entrou porque a 1ª versão MENTIA VERDE — medido 2026-09-15 na passada
@@ -64,7 +78,7 @@ _n=0 _vazias=""
 # por máquina, nunca por quem lembrou.
 # CRITÉRIO: TODA projeção gerada com catraca no lint pertence a esta lista.
 # Hoje são cinco (REGRAS 8, 21, 39, 80, 81) mais o índice de leitura (REGRA 84, fora do laço por ser TSV).
-for _pair in "inventory.sh:inventory.md" "graph.sh:graph.md" "testing-state.sh:testing-state.md" "harness-inventory.sh:testing-inventory.md"; do
+for _pair in "${_PAIRS[@]}"; do
   _gen="${_pair%%:*}"; _out="${_pair##*:}"
   [ -f "${DEST}/.claude/validation/${_gen}" ] || continue
   bash "${DEST}/.claude/validation/${_gen}" --markdown > "${DEST}/docs/onion/${_out}" 2>/dev/null || true
