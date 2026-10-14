@@ -68,16 +68,21 @@ Anote na ficha da turma (fica com vocês, não entra neste material):
 
 Confira em 2 minutos, no começo da aula:
 
+Antes da aula, quem cuida do hub roda o **`/meta:adopt --update` do hub** e mergeia a
+atualização: os blocos D e E pedem um pin que já traga o `/meta:decide` e o `/meta:forge` abertos
+(pin **≥ <a definir>**). Depois, os projetos adotados pelo hub se atualizam do mesmo jeito.
+
 ```bash
 git status --short                       # árvore limpa (ou um commit WIP antes de começar)
 git switch -c lesson-5/<seu-nome>        # cada dupla numa branch própria
 cat .claude/.onion-version               # o pin precisa ser o mesmo da turma
 ls .claude/validation/kg-radar.sh .claude/validation/forge-census.sh .claude/rules/kg-grammar.md
+ls .claude/commands/meta/decide.md .claude/commands/meta/forge.md .claude/validation/kg-decide-seal.sh
 python3 -c "import yaml" && echo "PyYAML ok"   # o /meta:drive e o kg-realign leem YAML
 ```
 
-Se o `ls` reclamar de arquivo ausente, o pin está velho: atualizem pelo `/meta:adopt --update`
-antes da aula, não durante.
+Se o `ls` reclamar de arquivo ausente, o pin está velho: o `/meta:adopt --update` não rodou.
+Resolva antes da aula, não durante.
 
 ---
 
@@ -90,8 +95,8 @@ antes da aula, não durante.
 | B | Mapear um projeto real contra o código | 35 min |
 | C | Mapear um documento de negócio e ligar ao projeto | 30 min |
 | — | Intervalo | 10 min |
-| D | O grafo como runtime: warm-up, backlog, realign, drive, decisão | 25 min |
-| E | A forja: forjar um componente do time | 40 min |
+| D | O grafo como runtime: warm-up, backlog, realign, drive e `/meta:decide` | 25 min |
+| E | A forja: forjar um componente do time com o `/meta:forge` | 40 min |
 | F | Fechamento e ponte para a aula 6 | 5 min |
 | | **Total** | **3 h** |
 
@@ -315,14 +320,19 @@ bash .claude/validation/kg-backlog-project.sh --markdown | head -20  # as pergun
 
 ## Bloco D — O grafo como runtime (25 min)
 
+> **Pré-requisito deste bloco e do E:** o hub num pin **≥ <a definir>**, que já traz o `/meta:decide`
+> e o `/meta:forge` abertos para o papel hub. Confira com `cat .claude/.onion-version` e
+> `ls .claude/commands/meta/decide.md .claude/validation/kg-decide-seal.sh`.
+
 **Conceito.** Um grafo que só se lê na hora de escrever é documentação. Aqui ele **dirige** o
 trabalho: o `/warm-up` e o `/catch-up` o leem para abrir a sessão; o `/meta:backlog` projeta os nós
 `open` numa fila única, ordenada por atenção (impacto × incerteza × status); o `/meta:realign`
 confere se o plano ainda coere com o vivo, em três camadas (passado, presente, futuro); o
-`/meta:drive` conduz o plano nó a nó, a partir da fila pronta. A **decisão** também mora no grafo:
-um nó `decision` só fecha quando alguém com autoridade o sela.
+`/meta:drive` conduz o plano nó a nó, a partir da fila pronta. A **decisão** também mora no grafo, e
+quem a fecha é o `/meta:decide`: ele mede o que está em voo, tira o que a sessão pode medir sozinha,
+pergunta o resto com opções e sela cada resposta no nó. Ninguém edita o selo à mão.
 
-**Demo.**
+**Demo 1: a fila e o plano.**
 
 ```bash
 bash .claude/validation/kg-backlog-project.sh --markdown | head -40     # a fila inteira, sem escrever arquivo
@@ -334,52 +344,64 @@ bash .claude/validation/kg-console.sh docs/onion/graph/<grafo>.kg.yaml > kg-cons
 No realign, mostre o **commitment-drift**: pergunta aberta de alto impacto sem nada que a apoie,
 com o radar perguntando "abandonado?". No drive, mostre a fila pronta e os bloqueados.
 
-**Como se sela uma decisão aqui.** O `/meta:decide` é do core e não vem no bundle do hub. No hub,
-selar é editar o nó e rodar o radar no fim:
+**Demo 2: decidir com o `/meta:decide`.** O comando tem quatro movimentos, e vale mostrá-los um a um:
 
-```yaml
-  - id: D_<DECISAO>
-    node_type: decision
-    plane: DEV
-    status: done
-    verified_at: "2026-10-14"
-    verified_against: "selo-na-aula-5"
-    trace: docs/<onde a decisão foi registrada>.md
-    provenance:
-      source: "aula 5, decisão de <papel de quem decidiu>"
-      locator: "bloco D"
-      method: "testemunho: decisão do maestro em 2026-10-14"
-    label: "<a decisão, curta>"
-```
+1. **Medir.** Na carga ele roda o censo do que está em voo (checkpoints, PRs e CI, worktrees,
+   inbox, nós citados). Para ver o mesmo censo fora do comando:
 
-O texto do `method:` começa **exatamente** com `testemunho: decisão do maestro`: é por ele que o
-motor reconhece um selo humano (troque "maestro" só no `source:`). Decisão selada é relato, não
-medição, por isso fica em `DEV`. No pin de 2026-10-07 o radar ainda avisa `decision-done-em-DEV`
-(aviso, não reprova); a exceção para o selo chega com a próxima atualização. Não passem para
-`PROD` para calar o aviso: o motor novo acusa testemunho em `PROD` como `MISPLANED`.
+   ```bash
+   bash .claude/validation/decide-census.sh . --markdown
+   printf '%s' "<texto que cita os ids>" | bash .claude/validation/decide-census.sh . --markdown --cite -
+   ```
+
+   Os avisos (sem `gh`, teto atingido) vêm antes das linhas: ausência de linha com aviso não é zero.
+2. **Filtrar.** O que é medível, a sessão mede; o que deriva de decisão já selada, ela aplica; o que
+   é de outro dono (outro repositório, merge, deploy), ela encaminha. Só sobra o que é de quem decide.
+3. **Perguntar com opções.** Até 4 perguntas por rodada, 2 a 4 opções cada, a recomendada primeiro
+   com o porquê, e cada opção dizendo o custo e o que destrava. Faltou base: uma opção é "pesquisar
+   antes".
+4. **Selar.** Cada resposta vira selo no nó **antes** da rodada seguinte, sempre pelo selador:
+
+   ```bash
+   bash .claude/validation/kg-decide-seal.sh <grafo> <NODE_ID> \
+     --chosen "<opção escolhida>" --rejected "<a|b>" --date <AAAA-MM-DD> --question "<a pergunta>"
+   ```
+
+   Ele grava `status: done`, `plane: DEV`, a proveniência de testemunho e, na `narrative`, a opção
+   escolhida e as descartadas. Sai **0** só com o radar `--integrity --schema` em 0; **2** quando
+   recusou sem escrever nada (nó inexistente, já `done`, campo cego); **3** quando o radar reprovou e
+   a escrita foi **desfeita**.
 
 **Exercício.**
 
-1. Rodem o backlog e escolham **um** item que vocês podem decidir hoje.
-2. Selem-no no grafo como acima (ou, se a decisão não é de vocês, escrevam no `narrative:` de quem
-   ela depende e deixem `open`).
-3. Rodem o realign e o drive no grafo que mudou.
+1. Rodem o `/meta:backlog` e escolham **um** item que vocês podem decidir hoje.
+2. Rodem `/meta:decide` citando esse item. Respondam a rodada de perguntas.
+3. Confiram no `git diff` o que o selador escreveu no nó (status, proveniência, opções na narrative).
+4. Rodem o realign e o drive no grafo que mudou.
 
 **Pronto quando:**
 
 ```bash
+git diff --stat                                                                   # só o grafo do item mudou
 bash .claude/validation/kg-radar.sh <grafo> --integrity --schema                  # exit 0
 bash .claude/validation/kg-backlog-project.sh --markdown | grep -c '<ID_DO_NO>'   # 0: saiu da fila
 bash .claude/validation/kg-realign-project.sh <grafo> --check                     # exit 0
 ```
 
 **Erros comuns e saída.**
+- *Editar o nó à mão para "adiantar".* O selo diz quem decidiu, quando, e o que foi descartado. Use
+  o selador; se ele recusou (rc 2) ou desfez (rc 3), leia a mensagem e conserte a causa.
+- *Responder pela pessoa que decide.* O `/meta:decide` não decide por ninguém e não sela o que não
+  foi perguntado. Se a decisão é de outra pessoa (do cliente, por exemplo), ela fica `open` e a
+  rodada registra de quem depende.
+- *O radar avisa `decision-done-em-DEV`.* Depende do pin: o selo fica em `DEV` de propósito, porque
+  é testemunho e não medição. Não passem o nó para `PROD` para calar o aviso: o motor acusa
+  testemunho em `PROD` como `MISPLANED`.
 - *Editar `docs/backlog.md` à mão.* É projeção: feche o nó no grafo e regenere. Se vocês
   commitarem `docs/backlog.md`, a REGRA 62 (Projeção GERADA em sincronia com a fonte
   (docs/backlog.md)) passa a cobrar que ele bata com a fonte; regenerem com `/meta:backlog`.
-- *Selar a decisão de outra pessoa.* O selo diz quem decidiu. Se não foi vocês, não selem.
-- *O drive para em `CHECKPOINT-PENDENTE`.* É de propósito: um lote anterior espera selo. Leia a
-  `drive_checkpoint_note` no `meta:` do grafo.
+- *O drive para em `CHECKPOINT-PENDENTE`.* É de propósito: um lote anterior espera selo. O selo de
+  checkpoint é do drive (`kg-drive-project.sh <grafo> --seal`), não do selador do decide.
 
 ---
 
@@ -393,30 +415,28 @@ tem o conjunto inteiro, as **7 peças** da doutrina da forja
 |---|---|---|---|
 | 1 | superfície invocável | `.claude/skills/<n>/SKILL.md` | o poder existe e ninguém alcança |
 | 2 | doutrina reutilizável | `.claude/commands/common/prompts/<n>-doctrine.md` | a doutrina se duplica e diverge |
-| 3 | contexto medido injetado | `` !`bash <medidor>` `` na superfície | o modelo responde de memória o que um `ls` responde |
+| 3 | contexto medido injetado | diretiva de injeção com o medidor, na superfície | o modelo responde de memória o que um `ls` responde |
 | 4 | orquestração faseada | `.claude/workflows/<n>.js` | a coordenação vira prosa e não retoma |
 | 5 | destino do que se produz | fase final no grafo + `kg-radar` | a síntese evapora entre sessões |
 | 6 | lente/guarda | `.claude/rules/<n>-lens.md` com `paths:` | a doutrina fica escrita e nunca é lida |
-| 7 | bancada | casos que reprovam a versão defeituosa | a guarda apodrece verde |
+| 7 | bancada | família `run_<n>_selftests`, casos que reprovam a versão defeituosa | a guarda apodrece verde |
 
-Três cláusulas que importam hoje: **a peça 3 é medida por script**, nunca escrita à mão; **antes de
-forjar, meça se já existe** (a cláusula que mais custou à casa); e **todo caso da bancada tem de
-reprovar contra o mutante** (caso que passa nas duas versões é decorativo).
+O `/meta:forge` é o comando que conduz isso. Ele **emite** as peças 2, 3 e 7, **especifica** as 5 e 6
+(com a guarda e o contrato que cada uma exige) e deixa a 1 e a 4 para os moldes próprios
+(`/meta:create-skill` ou `/meta:create-command`, e o molde de fases da `onion-orchestration`). Três
+cláusulas da doutrina importam hoje: **a peça 3 é medida por script**, nunca escrita à mão; **antes de
+forjar, meça se já existe**; e **todo caso da bancada tem de reprovar contra o mutante**.
 
-> **Por que forjamos à mão.** O `/meta:forge` se declara core-only, e o grafo de adoção do hub
-> registra "não usar aqui". O que viaja e roda no hub é a **doutrina** e o **medidor**
-> (`forge-census.sh`). A aula usa os dois e emite as peças à mão, uma por uma. É o mesmo
-> procedimento do comando, sem o atalho.
-
-**Demo 1: o censo.**
+**Demo 1: o censo, o passo 1 do comando.**
 
 ```bash
 FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown | head -15
 ```
 
-Leia o cabeçalho (quantos candidatos, quantos com 6+ peças) e o topo (os que têm 7/7). Diga como o
-censo mede: **presença e referência**, nunca qualidade. Peça que existe e a superfície não cita conta
-como ausente.
+O `/meta:forge` roda este censo na carga, antes de qualquer pergunta. Leia o cabeçalho (quantos
+candidatos, quantos com 6+ peças) e o topo (os que têm 7/7). Diga como o censo mede: **presença e
+referência**, nunca qualidade. Peça que existe e a superfície não cita conta como ausente. Se o censo
+sair `3`, ele está dizendo que **não pôde medir**: conserte o ambiente antes de seguir.
 
 **Demo 2: medir antes de forjar.** Uma dor que o hub já sentiu: conferir o `.env` sem ler os
 segredos. Antes de forjar um verificador, procure:
@@ -431,59 +451,76 @@ de novo seria duplicar.** É a cláusula 3 acontecendo na frente da turma.
 **Exercício: escolher a dor.** Cada dupla escolhe uma dor que **mediu** hoje, não uma que imagina.
 Candidatas típicas, todas saídas dos blocos anteriores:
 
-- regras de domínio ancoradas só em documento (bloco B) — o gabarito abaixo é esta;
+- regras de domínio ancoradas só em documento (bloco B) — o exemplo do que sai, mais abaixo, é esta;
 - documentos de negócio que nenhum grafo cita (bloco C);
 - perguntas abertas que esperam alguém de fora e não dizem quem (bloco D: o campo `owner:` existe e
   o backlog já agrupa por ele, então talvez a cura seja **declarar** `owner:`, não forjar nada).
 
-Para a dor escolhida, rodem a pergunta da cláusula 3: `grep -rln '<palavra-chave>' .claude/`. Se já
+Para a dor escolhida, façam a pergunta da cláusula 3: `grep -rln '<palavra-chave>' .claude/`. Se já
 existe, a entrega da dupla é usar o que existe e registrar isso no grafo.
 
-**Exercício: forjar.** Emitam as peças nesta ordem (uma habilita a outra). O gabarito completo da
-skill `domain-anchor` está na próxima seção; usem-no como molde.
+**Exercício: forjar com o `/meta:forge`.** Rodem o comando e sigam os seis passos dele:
 
-1. **Peça 2, doutrina:** `.claude/commands/common/prompts/<n>-doctrine.md`, com as cláusulas **e o
-   que ela não promete**.
-2. **Peça 3, medidor:** `.claude/validation/<n>-census.sh`, determinístico, com saídas declaradas
-   (`0` medido, `1` reprova no `--strict`, `2` uso inválido, `3` nada a medir).
-3. **Peça 7, bancada:** `.claude/validation/<n>-selftest.sh`, um caso por saída.
-4. **Peça 6, lente:** `.claude/rules/<n>-lens.md`, com `paths:` que casa arquivo rastreado.
-5. **Peça 1, superfície:** `.claude/skills/<n>/SKILL.md`, com `` !`bash .claude/validation/<n>-census.sh …` ``
-   e citando a doutrina, a lente e o `kg-radar` pelo caminho.
-6. **Ligar e conferir:** `git add` das cinco peças (o censo só enxerga o que está no índice), depois
-   `/meta:inventory` e o lint.
+1. **Medir.** O censo roda na carga. Anotem a linha do candidato antes de forjar (ele ainda não
+   existe, então não aparece: esse é o "antes").
+2. **Entrevista da topologia.** O comando pergunta, não assume: qual o gênero (varredura, decisão,
+   auditoria, migração), quais fases, o que se produz e para onde vai, de quanto em quanto tempo se
+   revisita. Respondam com a dor medida, não com a forma do exemplo. A peça 5 (destino) é exigida de
+   todo comando-com-framework; o exemplo abaixo responde "o próprio grafo de domínio".
+3. **Emitir** as peças 2, 3 e 7, na ordem em que uma habilita a outra:
+   - **2 doutrina** em `.claude/commands/common/prompts/<n>-doctrine.md`, com as cláusulas e **o que
+     ela não promete**;
+   - **3 medidor** em `.claude/validation/<n>-census.sh`, determinístico, que descobre por
+     referência e declara as saídas (`0` medido, `1` reprova no `--strict`, `2` uso inválido, `3`
+     nada a medir);
+   - **7 bancada** como família `run_<n>_selftests`, um caso por saída.
 
-**O mutante.** Copiem o medidor, estraguem **uma** linha que importa e rodem a bancada contra a cópia:
+   As peças 5 e 6 saem **especificadas**: a dupla escreve a lente (`.claude/rules/<n>-lens.md`, com
+   `paths:` que casa arquivo rastreado) e a fase de destino seguindo a especificação que o comando
+   imprime. A superfície (peça 1) sai do `/meta:create-skill`.
+4. **Ligar.** A superfície cita **todas** as peças pelo caminho, e as peças entram no índice
+   (`git add`). O censo lê `git ls-files`: o que não está no índice não existe para ele, nem para a
+   sessão de outra pessoa.
+5. **Dogfood.** Rodem o artefato de verdade: invoquem a skill numa sessão e rodem o medidor contra o
+   grafo real, **e** o modo de falha (grafo sem regras, argumento errado). Lint verde não é dogfood.
+6. **Gate com mutante.** Lint com 0 HARD, a família nova verde, e o mutante de cada caso provado:
+   copiem o medidor, estraguem **uma** linha que importa e rodem a bancada contra a cópia.
 
-```bash
-sed 's/? "codigo" : "documento")/? "codigo" : "codigo")/' \
-  .claude/validation/domain-anchor-census.sh > mutant.sh
-diff .claude/validation/domain-anchor-census.sh mutant.sh   # TEM de mostrar 1 linha; vazio = mutante igual
-bash .claude/validation/domain-anchor-selftest.sh ./mutant.sh   # TEM de reprovar
-rm mutant.sh
-```
+   ```bash
+   sed 's/? "codigo" : "documento")/? "codigo" : "codigo")/' \
+     .claude/validation/domain-anchor-census.sh > mutant.sh
+   diff .claude/validation/domain-anchor-census.sh mutant.sh   # TEM de mostrar 1 linha; vazio = mutante igual
+   bash .claude/validation/domain-anchor-selftest.sh ./mutant.sh   # TEM de reprovar
+   rm mutant.sh
+   ```
 
 **Pronto quando:**
 
 ```bash
-bash .claude/validation/<n>-selftest.sh                         # todos ✅
-bash .claude/validation/<n>-selftest.sh ./mutant.sh             # pelo menos 1 ❌ (e exit 1)
-FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown | grep '<n>'   # 5/7 ou mais
-bash .claude/validation/lint-artifacts.sh                       # 0 HARD
+bash .claude/validation/lint-selftest.sh --families <n_com_underscore>   # a família nova, toda verde
+bash .claude/validation/<n>-selftest.sh ./mutant.sh              # pelo menos 1 ❌ (e exit 1)
+FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown | grep '<n>'   # 6/7 (só a peça 4 ausente)
+bash .claude/validation/lint-artifacts.sh                        # 0 HARD
 ```
 
+> **6/7, não 5/7.** No ensaio deste material, feito sem o comando, a bancada ficou num script
+> próprio e o censo a contou como ausente: ele só reconhece bancada registrada como família
+> `run_<n>_selftests` dentro do `lint-selftest.sh`. Com o `/meta:forge`, a peça 7 já nasce como
+> família, e o esperado é **6/7**, com a peça 4 (workflow) ausente por desenho. O custo fica
+> declarado: o `lint-selftest.sh` é arquivo do framework, e a família nova é uma customização local
+> dele. Na próxima atualização ela vira conflito de merge, real e resolvível, e não sobrescrita
+> silenciosa. Se a versão do comando que vocês têm emitir a bancada de outro jeito, o censo é quem
+> diz: confiem nele, não neste parágrafo.
+
 **Erros comuns e saída.**
-- *O censo não mostra a skill.* Ela não está no índice: `git add` antes de medir. O censo lê
-  `git ls-files`, como a sessão de outra pessoa leria.
-- *O censo mostra a peça 7 como "—" mesmo com a bancada pronta.* É esperado e honesto: o censo só
-  reconhece bancada registrada como família `run_<n>_selftests` dentro de `lint-selftest.sh`, que é
-  arquivo do framework. Editá-lo no hub vira conflito na próxima atualização. Deixem a bancada no
-  script próprio e aceitem o 5/7. Levar isso ao core é a aula 6.
+- *Responder a entrevista com a forma do exemplo.* A forja pergunta a topologia porque cada dor tem
+  a sua. Copiar o `domain-anchor` para uma dor diferente petrifica a forma de um caso só.
+- *O censo não mostra a skill.* Ela não está no índice: `git add` antes de medir.
 - *O medidor sai 1 no caso bom.* Sob `set -e` e `pipefail`, um `grep -v` sem saída devolve 1 e mata
-  o script. Proteja com `{ grep -v … || true; }`. (Foi o que a bancada do gabarito pegou no
-  primeiro ensaio.)
+  o script. Proteja com `{ grep -v … || true; }`. (Foi o que a bancada do exemplo pegou no primeiro
+  ensaio.)
 - *O mutante passa.* Ou o `sed` não casou (o `diff` sai vazio e a cópia é idêntica), ou a bancada
-  não testa a linha que vocês estragaram. Os dois aconteceram no ensaio deste gabarito.
+  não testa a linha que vocês estragaram. Os dois aconteceram no ensaio do exemplo.
 - *Lint acusa inventário.* A REGRA 8 (Inventário canônico sincronizado com o filesystem) cobra a
   contagem nova de skills: rodem `/meta:inventory` e commitem junto.
 - *Lint acusa a lente.* A REGRA 53 (Regra path-scoped declara `paths:` que casa algo real) exige
@@ -500,7 +537,7 @@ a skill forjada com o censo.
 grafo, e eles ainda não se falam: `external_edges:` liga grafos do mesmo repositório, e a skill
 forjada no projeto ainda não chega aos outros projetos. A aula 6 junta as pontas: o hub como Company
 Brain, os projetos ligados a ele, o caminho de um componente que nasceu num projeto subir para o hub
-e descer para os outros, e o caminho de um achado do time (como o "peça 7 invisível" acima) chegar ao
+e descer para os outros, e o caminho de um achado do time (como o custo de a bancada viver num arquivo do framework, acima) chegar ao
 core.
 
 Para casa: `/onion-retro` para registrar a aula, e cada dupla deixa o seu PR aberto com os quatro
@@ -510,10 +547,12 @@ Para casa: `/onion-retro` para registrar a aula, e cada dupla deixa o seu PR abe
 
 ## Gabarito da forja: a skill `domain-anchor`
 
+É o exemplo do que sai de uma forja, não um molde para copiar: a dor de cada dupla decide a forma.
 A dor: num projeto real, as regras de domínio do grafo apontavam todas para o documento da feature,
 e nenhuma para o código, que já estava no repositório. A skill mede isso e conduz a re-ancoragem.
-Ensaiada em 2026-10-14 contra uma cópia de um grafo real e contra uma cópia do framework: bancada
-6 ✅, mutante reprovado, censo 5/7.
+Ensaiada em 2026-10-14, à mão e antes de o `/meta:forge` viajar para o hub, contra uma cópia de um
+grafo real e contra uma cópia do framework: bancada 6 ✅, mutante reprovado, censo 5/7 (a bancada
+estava fora do `lint-selftest.sh`; com o comando, ela nasce como família e o esperado é 6/7).
 
 ### Peça 3 — `.claude/validation/domain-anchor-census.sh`
 
@@ -580,6 +619,9 @@ exit 0
 ```
 
 ### Peça 7 — `.claude/validation/domain-anchor-selftest.sh`
+
+Com o `/meta:forge`, a bancada entra como a família `run_domain_anchor_selftests` no
+`lint-selftest.sh`; o script abaixo é o corpo dos casos, e a família pode simplesmente chamá-lo.
 
 ```bash
 #!/usr/bin/env bash
@@ -714,7 +756,7 @@ da gramática e ganhe 10 minutos para o bloco E). Confira que o PyYAML está ins
   momento forte é achar, ao vivo, uma regra no código que **não** bate com o documento.
 - **C.** "Decisão de trabalho não é fato." Mostre como a confiança muda com a marca do documento.
 - **D.** "O backlog não é uma lista: é uma projeção do grafo. Feche o nó e o item some sozinho."
-- **E.** "Antes de forjar, procure." A demo do `env-check.sh` é o centro do bloco: a dor era real,
+- **E.** "Antes de forjar, procure." A demo do `env-check.sh` abre o bloco: a dor era real,
   e a cura já existia.
 - **F.** "Hoje cada repositório tem o seu grafo. Na próxima aula eles passam a conversar."
 
@@ -753,7 +795,8 @@ medidor e a bancada (peças 3 e 7); a superfície e a lente ficam de lição de 
 | fila de trabalho aberto | `/meta:backlog` · `bash .claude/validation/kg-backlog-project.sh --markdown` |
 | o plano ainda coere? | `/meta:realign <g>` · `bash .claude/validation/kg-realign-project.sh <g> --check` |
 | conduzir o plano | `/meta:drive <g>` · `bash .claude/validation/kg-drive-project.sh <g>` |
-| censo da forja | `FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown` |
+| decidir e selar | `/meta:decide` · `bash .claude/validation/decide-census.sh . --markdown` |
+| forjar | `/meta:forge` · censo: `FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown` |
 | criar a superfície | `/meta:create-command` · `/meta:create-skill` |
 | gate | `/meta:inventory` · `bash .claude/validation/lint-artifacts.sh` |
 | fechar a aula | `/onion-retro` |
@@ -764,14 +807,15 @@ medidor e a bancada (peças 3 e 7); a superfície e a lente ficam de lição de 
 
 **Verificado em 2026-10-14**, no pin `8278fee79d1c` do hub e do projeto que ele adotou:
 
-- todos os comandos do cartão existem no bundle do hub (`ls .claude/commands/meta/` e
-  `ls .claude/validation/`);
+- os comandos do cartão existem no bundle do hub (`ls .claude/commands/meta/` e
+  `ls .claude/validation/`), exceto o `/meta:decide` e o `decide-census.sh`, que chegam com o pin novo;
 - o radar avisa `multi-documento` em grafos com cabeçalho `---`, e o `kg-drive-project.sh` recusa o
   mesmo arquivo; sem os `---`, o radar passa limpo e o drive imprime o veredito;
 - o `forge-census.sh` roda no hub e mede 59 candidatos;
-- o gabarito `domain-anchor`: bancada 6 ✅; mutante (uma linha trocada) reprovado em 1 caso; contra
-  uma cópia de um grafo de domínio real mediu `codigo=0 · documento=9`; com as cinco peças no índice
-  de uma cópia do framework, o censo deu **5/7** (peças 4 e 7 ausentes, pelo motivo dito no bloco E).
+- o gabarito `domain-anchor` (forjado à mão, sem o comando): bancada 6 ✅; mutante (uma linha
+  trocada) reprovado em 1 caso; contra uma cópia de um grafo de domínio real mediu
+  `codigo=0 · documento=9`; com as cinco peças no índice de uma cópia do framework, o censo deu
+  **5/7** (peças 4 e 7 ausentes, a 7 porque a bancada estava fora do `lint-selftest.sh`).
 
 **Não verificado (fica para o ensaio humano):**
 
@@ -781,10 +825,14 @@ medidor e a bancada (peças 3 e 7); a superfície e a lente ficam de lição de 
   REGRA 8, mas o número exato de avisos é do dia;
 - se uma skill nova do hub desce para os projetos no `/meta:adopt --update` (o manifesto inclui
   `.claude/skills` inteiro, mas a descida não foi ensaiada) — assunto da aula 6;
-- o selo manual de decisão do bloco D foi conferido no radar dos dois pins (o do hub avisa
-  `decision-done-em-DEV`; o do core aceita o selo em DEV e acusa `MISPLANED` em PROD), mas não
-  passou pelas demais guardas de selo do hub.
+- os blocos D e E dependem de um pin que ainda não existe (o que abre o `/meta:decide` e o
+  `/meta:forge` para o hub): o fluxo descrito é o dos comandos no core em 2026-10-14, e nenhum dos
+  dois foi rodado no hub. O 6/7 esperado no bloco E é dedução (a bancada nasce como família), não
+  medição;
+- o selo em DEV foi conferido no radar dos dois pins (o do hub avisa `decision-done-em-DEV`; o do
+  core aceita o selo de testemunho em DEV e acusa `MISPLANED` em PROD).
 
-**Comandos que esta aula quis usar e não estão no bundle do hub:** `/meta:decide` (core-only; o
-bloco D ensina o selo à mão) e `kg-contract-check.sh` (o contrato formal do `.kg.yaml` não está
-vendorizado no hub). O `/meta:forge` está no bundle, mas se declara core-only.
+**Comandos que dependem do pin novo:** `/meta:decide` (com `decide-census.sh` e
+`kg-decide-seal.sh`) e a face do `/meta:forge` aberta ao hub, ambos no pin **≥ <a definir>**. Fora
+do bundle do hub, sem previsão: `kg-contract-check.sh` (o contrato formal do `.kg.yaml` não está
+vendorizado no hub).
