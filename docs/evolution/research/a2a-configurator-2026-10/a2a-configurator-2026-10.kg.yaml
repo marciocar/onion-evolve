@@ -1,0 +1,135 @@
+# kg-backlog-guard: on
+# Configurador A2A em wizard (/meta:federation-a2a): o core, os membros e os hubs montam a rede A2A sem passo
+# manual de shell. Grafo do plano aprovado pelo maestro em 2026-10-14; tarefas no Linear (épico SAC-120).
+meta:
+  id: a2a-configurator-2026-10
+  schema_version: "1"
+  baseline: "2026-10-14"
+  review_after: "2026-11-13"   # 30d: cadência de ferramenta
+  # ═══ TETO: 30 NÓS ═══
+  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro.
+  x_linear_epic: "SAC-120"
+nodes:
+  - id: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "aberta em 2026-10-14 pelo plano aprovado; fecha quando o S6 do spike (SAC-131) medir 0 passo manual de shell num ponta a ponta core↔membro, e a F3 repetir para hub↔filho"
+    label: "um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do maestro além das respostas?"
+  - id: E_ONZE_PASSOS_MANUAIS_HOJE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 por leitura de .claude/utils/federation-transport/ (a2a-verify.sh, a2a-accept.sh, jwks/), ops/update-bridge.sh e do bridge servido (src/a2a.ts l.53 com --receiver onion-evolve fixo; src/config.ts l.46-50 lendo o pool de bearers só na subida)"
+    label: "montar uma conexão A2A hoje são 11 passos manuais: keygen à mão, .pem por git add -f, kid no registro, merge, update-bridge, bearer no ambiente do bridge com restart, entrega fora de banda, remetente próprio, aceite com sudo e revogação à mão"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-verify.sh e o bridge marciocar/onion-bridge@94a21ca"
+      locator: "a2a-verify.sh l.184-195 (kid pinado no registro); onion-bridge src/a2a.ts l.53; src/config.ts l.46-50"
+      method: "medição: leitura dos scripts e do clone servido do bridge"
+      locality: "repo"
+  - id: E_LACUNAS_DO_A2A_MEDIDAS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14: nenhum keygen no core; federation-member register sem campos a2a; members-validate.sh l.20 declara a2a opcional e não checado; o único remetente conforme está em docs/evolution/research/a2a-cross-user-spike-2026-10/notebook/send-a2a.sh; 2 registros na fila do bridge nunca aceitos"
+    label: "faltam keygen, registro A2A no federation-member, validação do bloco a2a, remetente canônico fora da pesquisa, aviso de fila pendente e receptor que não seja fixo; o convite é um bearer sem dono nem validade (F4)"
+    provenance:
+      source: ".claude/validation/members-validate.sh e .claude/commands/meta/federation-member.md"
+      locator: "members-validate.sh l.20; federation-member.md, passo de coleta dos campos"
+      method: "medição: leitura e grep no core"
+      locality: "repo"
+  - id: D_REDE_DO_HUB_EM_FASES
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Em fases: junto, depois separada»"
+    label: "a rede A2A do hub nasce junto com a do core (filhos com parent: <hub>) e só depois, gated, vira rede separada"
+    narrative: "Selado por /meta:decide em 2026-10-14: escolhida «Em fases: junto, depois separada»; descartadas: «Só junto com o core» · «Separada desde já»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Como o hub põe os adotantes dele na rede A2A?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
+  - id: D_CONVITE_POR_MEMBRO_COM_VALIDADE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Convite por membro, com validade»"
+    label: "o convite A2A passa a ser amarrado a um membro, com validade e revogação, relido sem restart do bridge"
+    narrative: "Selado por /meta:decide em 2026-10-14: escolhida «Convite por membro, com validade»; descartadas: «Manter o pool anônimo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Como fica o convite A2A, hoje um bearer anônimo no ambiente do bridge?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
+  - id: D_WIZARD_UM_COMANDO_COM_TRILHAS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Um comando com trilhas»"
+    label: "o configurador é um comando só, /meta:federation-a2a, com trilhas por papel, e as tarefas ficam no Linear"
+    narrative: "Selado por /meta:decide em 2026-10-14: escolhida «Um comando com trilhas»; descartadas: «Comandos separados»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Qual a forma do wizard?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
+  - id: D_ENDPOINT_BRIDGE_MULTI_E_SERVIDOR_DO_HUB
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «pode ser Opção 1 e Opção 2 (bridge do core multi-receptor e servidor próprio do hub)»"
+    label: "o endpoint tem as duas formas: o bridge do core aceita vários receptores (padrão) e o hub pode ter servidor próprio na fase da rede separada"
+    narrative: "Selado por /meta:decide em 2026-10-14: escolhida «pode ser Opção 1 e Opção 2 (bridge do core multi-receptor e servidor próprio do hub)» (resposta livre do maestro, fora das opções oferecidas); descartadas: «Só git-async (sem ao vivo)»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Quem hospeda o endpoint que recebe os sinais da rede de um hub?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
+edges:
+  - from: E_ONZE_PASSOS_MANUAIS_HOJE
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_DO_A2A_MEDIDAS
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: SUPPORTS
+  - from: D_REDE_DO_HUB_EM_FASES
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: TRACES_TO
+  - from: D_CONVITE_POR_MEMBRO_COM_VALIDADE
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: TRACES_TO
+  - from: D_WIZARD_UM_COMANDO_COM_TRILHAS
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: TRACES_TO
+  - from: D_ENDPOINT_BRIDGE_MULTI_E_SERVIDOR_DO_HUB
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: TRACES_TO
