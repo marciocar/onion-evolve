@@ -56,6 +56,9 @@ COMMANDS=(
   ".claude/commands/meta/kg-inbox.md"
   ".claude/commands/meta/radar.md"
   ".claude/commands/meta/census.md"
+  # 2026-10-14: o maestro classificou o /meta:decide em `full` (todos os papéis menos o mini); a REGRA 37
+  # (Mapa role→bundle (roles.yaml) consistente com os verticais) o cobrou aqui na mesma hora.
+  ".claude/commands/meta/decide.md"
 )
 AGENTS=(
   ".claude/agents/meta/metaspec-gate-keeper.md"
@@ -126,6 +129,12 @@ VALIDATION=(
   ".claude/validation/inventory.sh"
   ".claude/validation/graph.sh"
   ".claude/validation/kg-census-extract.sh"
+  # Motores do /meta:decide (2026-10-14): o medidor que a carga injeta e o selador que grava a resposta.
+  ".claude/validation/decide-census.sh"
+  ".claude/validation/kg-decide-seal.sh"
+  # o selador chama o checador do contrato quando o repo tem o vendor kg-ssot (sem ele, só o radar julga);
+  # o assemble-plugin recusou o bundle sem ele: "o plugin nasceria morto no adotante".
+  ".claude/validation/kg-contract-check.sh"
 )
 TEMPLATES=()
 DOCS=(

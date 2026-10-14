@@ -2,7 +2,7 @@
 name: decide
 description: |
   Mede o que está em voo (checkpoints, PRs e CI, worktrees, inbox, nós citados), filtra o que é do
-  maestro, pergunta em rodadas com opções e recomendação, e sela cada resposta no grafo. Core-only.
+  maestro, pergunta em rodadas com opções e recomendação, e sela cada resposta no grafo.
 category: meta
 tags:
   - decision
@@ -31,7 +31,9 @@ de topologia e evidência em `docs/evolution/research/forge-decide-2026-10/`.
 
 ## Degrau e limites
 
-- **Core-only.** Maestro-invocado; sem cron, sem agendamento (MOAT).
+- **Viaja para todo papel com KG** (core, onion-core, hub, adotado, standalone, plugins), por decisão do
+  maestro em 2026-10-14; **não** vai para o onion-mini, que nasce sem KG por desenho. Maestro-invocado;
+  sem cron, sem agendamento (MOAT).
 - **Não decide pelo maestro** e **não sela o que não foi perguntado**.
 - Merge, deploy e escrita em repo alheio **continuam do maestro / do fluxo verificado**: no
   questionário eles aparecem como pergunta (*se*, *quando*), nunca como ato desta sessão.
@@ -126,10 +128,10 @@ registro de decisões por sessão), e aí a lente se deriva do caminho medido.
 - Não re-pesquisa: sem embasamento, a opção é "pesquisar antes" (`/onion-research`, modo `decision`).
 - Não faz merge, deploy nem escreve em repo alheio (MOAT); não muda hook, guarda ou regra.
 - Não lê o transcript: o que foi dito na conversa entra pelo `--cite`.
-- **Não viaja para as portas** (standalone, plugins, mini): ele e o medidor estão no conjunto `pending`
-  do `roles.yaml` até o maestro classificar. O adotante de corte completo (carimbo `adopted`) recebe tudo e
-  o recebe também — o adotante KG-SSOT rodou o 1º dogfood dele lá em 2026-10-12. Esta superfície não cita `ops/` (REGRA 100 (Superfície que viaja não cita ops/
-  como se o destinatário o tivesse) não se aplica a quem não viaja, e mesmo assim não há citação).
+- **Não vai para o onion-mini.** Desde 2026-10-14 ele está no conjunto `full` do `roles.yaml` e viaja
+  para todo papel que tem KG (o medidor, o selador e o radar viajam junto, em `.claude/validation/`). O mini
+  nasce sem KG por desenho, e um selo lá não teria onde gravar. Esta superfície não cita `ops/` (REGRA 100
+  (Superfície que viaja não cita ops/ como se o destinatário o tivesse)).
 
 ## 🔗 Referências
 

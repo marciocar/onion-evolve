@@ -1,5 +1,5 @@
 ---
-description: Forja as peças que o comando novo pede (das 7 do conjunto), medindo antes o que já existe. Core-only.
+description: Forja as peças que o comando novo pede (das 7 do conjunto), medindo antes o que já existe.
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, TodoWrite
 ---
 
@@ -16,8 +16,10 @@ confirmado — achado ancorado em `docs/evolution/research/agent-command-composi
 
 ## Degrau e limites
 
-- **Core-only** (Camada 1 = autoria do framework). A face que viaja é **gated**: gatilho nomeado na
-  cláusula 4 da doutrina.
+- **Viaja para quem tem o framework instalado** (core, onion-core, hub, adotado, standalone): a face que
+  viaja foi aberta pelo maestro em 2026-10-14, para o time forjar os próprios componentes internos. Na
+  superfície de **plugin** o caminho `.claude/` nu segue sob a REGRA 74 (Caminho .claude/ NU dentro de
+  plugin só resolve no core, com catraca); a cláusula 4 da doutrina diz o que continua medido.
 - **Maestro-invocado.** Não auto-inicia.
 - **Entrevista, não assume.** A topologia do comando novo é perguntada; só a peça 5 é invariante.
   Assumir é petrificar a forma da 1ª instância — a objeção `N=1`, que sobreviveu a refutação real.

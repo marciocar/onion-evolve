@@ -75,6 +75,7 @@ work_tool_sets:
     - radar                  # radar de mundo com baseline datada (REGRA 65)
     - drive                  # conduzir um plano-grafo até o fim
     - census                 # censo do backlog medido, não lembrado
+    - decide                 # o que está em voo vira questionário com recomendação, e a resposta vira selo (maestro, 2026-10-14: viaja para todos menos o mini)
   # META_FACTORY — a AUTORIA do framework (Camada 1): forjar comandos, agentes, skills, guardas e verticais,
   # auditar e absorver. Pela matriz ela VIAJA para todo papel menos o mini (antes era core-only).
   meta_factory:
@@ -118,12 +119,10 @@ work_tool_sets:
     - federation-status
     - publish                # /meta:publish (F3 das portas, SAC-92): publicar portas é ato da FONTE, par da skill onion-publish
   # PENDING — comando que a matriz NÃO classificou. Fica com source e hub (o status quo dele) e NÃO viaja
-  # para standalone/plugins até o maestro decidir. VAZIO desde 2026-10-11 (personality-sync foi para
-  # `federation`), e fica como o lugar de quem nascer sem classificação. `decide` NASCEU aqui em
-  # 2026-10-12 (forja do /meta:decide): core-only até o maestro classificar — o medidor lê os grafos,
-  # os PRs e as worktrees do repo, e nada disso foi medido do lado de quem consome.
-  pending:
-    - decide
+  # para standalone/plugins até o maestro decidir. VAZIO de novo desde 2026-10-14: `decide` nasceu aqui em
+  # 2026-10-12 e o maestro o classificou em `full` (viaja para todo papel com KG, menos o mini), e fica
+  # como o lugar de quem nascer sem classificação.
+  pending: []
   # MINIMAL (consumer T2) — A DEFINIR quando nascer um consumer real (subconjunto de full).
 
 roles:

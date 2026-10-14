@@ -1,5 +1,5 @@
 ---
-description: Disseca uma ferramenta de terceiro em niveis selecionaveis (identidade, capacidade, mecanismo, transferibilidade, absorcao) e propoe absorver, costurar, parquear ou rejeitar. Core-only.
+description: Disseca uma ferramenta de terceiro em niveis selecionaveis (identidade, capacidade, mecanismo, transferibilidade, absorcao) e propoe absorver, costurar, parquear ou rejeitar.
 allowed-tools: Read, Write, Edit, Grep, Glob, Bash, WebSearch, WebFetch, TodoWrite
 ---
 
@@ -15,6 +15,8 @@ promete — vive em [`common:prompts:dissect-doctrine`](../common/prompts/dissec
 
 ## Degrau e limites
 
+- **Viaja para todo papel menos o onion-mini** (decisão do maestro, 2026-10-14): o time de um hub disseca
+  as ferramentas de terceiro que pensa adotar, com o mesmo método do core.
 - **Maestro-invocado.** Não auto-inicia, sem cron, sem `/loop` sobre si (MOAT W7).
 - **Não sela.** Produz o plano e **1 nó `decision` OPEN** por ferramenta; quem sela é o maestro.
 - **Executar é ato isolado.** Ferramenta de terceiro roda em worktree/container — nunca na árvore
