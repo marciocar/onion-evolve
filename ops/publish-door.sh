@@ -182,7 +182,7 @@ _status() {
   _load_members "${tip}" || return $?
   doors="$(_members_tsv | awk -F'\037' '$2=="door"')"
   [ -n "${doors}" ] || { echo "ERRO: nenhuma porta (kind: door) no registro de ${tip} — isto não é 'tudo em dia'." >&2; return 3; }
-  local tmp; tmp="$(mktemp -d)"
+  local tmp; tmp="$(mktemp -d)" || { echo "ERRO: mktemp -d falhou — sem diretório descartável não clono os remotos." >&2; return 3; }
   printf '══ /meta:publish --status — carimbo PUBLICADO × %s (%s)\n' "${tip}" "$(git -C "${CORE}" rev-parse --short=12 "${tip}")"
   printf '%-18s %-10s %-14s %-14s %-9s %-11s %s\n' "porta" "papel" "pin publicado" "pin registro" "versão" "defasagem" "estado"
   local id kind role remote pin lp url rpin rrole rrel n state nall tip12

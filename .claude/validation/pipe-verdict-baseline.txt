@@ -36,7 +36,6 @@
 .claude/validation/review-verdict.sh	10
 .claude/validation/vendor-scrub-form-check.sh	1
 ops/bridge-auth/logto-provision.sh	1
-ops/door-seal-pin.sh	2
 ops/install-caddy-config.sh	2
 ops/model-lineup-probe.sh	1
 ops/pr-merge-verified.sh	6

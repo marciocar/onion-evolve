@@ -80,7 +80,7 @@ KIND="$(_field kind)"; REMOTE="$(_field remote)"; REGPIN="$(_field onion_version
 # ── (1) O pin que a porta PUBLICOU — lido do REMOTO, pela mesma leitura do --status ───────────
 URL="$(_url_of "${REMOTE}")"
 [ -n "${URL}" ] || { echo "ERRO: o registro não dá url clonável para '${MEMBER}' (remote='${REMOTE:-vazio}') — sem remoto não sei o que foi publicado." >&2; exit 2; }
-WORK="$(mktemp -d)"; TMP=""
+WORK="$(mktemp -d)" || { echo "ERRO: mktemp -d falhou — sem diretório descartável não clono o remoto." >&2; exit 2; }; TMP=""
 trap 'rm -rf "${WORK}"; [ -n "${TMP}" ] && rm -f "${TMP}"' EXIT
 door_read_published "${URL}" "${WORK}/door"
 case "${DPS_STATE}" in
@@ -89,7 +89,7 @@ case "${DPS_STATE}" in
   *) echo "ERRO: não li o carimbo publicado em ${URL} (estado: ${DPS_STATE}). Sem o remoto eu NÃO carimbo — e não caio para o clone local, porque clone local não prova publicação (PR #1100)." >&2; exit 2 ;;
 esac
 DOORPIN="${DPS_PIN}"
-printf '%s' "${DOORPIN}" | grep -qE '^[0-9a-f]{7,40}$' \
+grep -qE '^[0-9a-f]{7,40}$' <<< "${DOORPIN}" \
   || { echo "ERRO: pin ilegível no carimbo publicado: '${DOORPIN}' — não carimbo o que não consigo ler." >&2; exit 2; }
 
 # ── (2) O pin é commit REAL no core, e está na INTEGRAÇÃO mergeada ──────────────────────────
