@@ -2,7 +2,7 @@
 title: 'Resíduo — o cache do pin das portas lê o carimbo no remoto, pela leitura do --status'
 date: 2026-10-14
 branch: fix/door-seal-pin-reads-remote
-reviewed_diff_sha256: 779b648d6d43010f45449e623aaa8db9b01240c682469f50eb86469822e9243d
+reviewed_diff_sha256: 777f97811c69d892fdc8e6572ce375c83b3a0b862b5a085e40cb942804c531c0
 reviewed_code_sha256: 92b30c8f2918c6209213d35234d8924b350c4cb7261d1db5a5f2f0ce5a2d5ac9
 findings_total: 6
 findings_real: 6
