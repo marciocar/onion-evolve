@@ -1,7 +1,8 @@
 # kg-backlog-guard: on
 # O degrau AUTOMATE do /meta:drive ("auto-drive"): conduzir 1..n raízes e a cadeia inteira até o merge.
 # Nasceu da pergunta do maestro em 2026-10-08. A doutrina do drive já o previa como Fase 2 gated
-# (topológica dirigida + AUTOMATE); este grafo é o gatilho dela, ainda NÃO selado.
+# (topológica dirigida + AUTOMATE); este grafo foi o gatilho dela. Selado em 2026-10-12 («Forjar com as
+# objeções», merge desligado por padrão) e FORJADO em 2026-10-14 (E_FORJA_AUTOMATE_COM_AS_OBJECOES).
 meta:
   id: auto-drive-2026-10
   schema_version: "1"
@@ -9,6 +10,7 @@ meta:
   review_after: "2026-11-07"   # 30d: decisão em aberto
   # ═══ TETO: 12 NÓS ═══
   #   8 em 2026-10-08 (+ a segunda opinião do KG-SSOT, em 3 restrições, + dogfood por comando real, + a guarda de API direta).
+  #   9 em 2026-10-14 (+ a evidência da forja do degrau, que registra a execução do D por aresta).
 nodes:
   - id: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
     node_type: evidence
@@ -133,6 +135,28 @@ nodes:
       locality: "repo"
     label: "guarda que acusa chamada direta à API de provedor de task manager fora do adapter executável; só nasce depois do SAC-65"
     narrative: "guarda (forjada pelo /meta:forge-guard) que acusa chamada direta à API de provedor de task manager (api.linear.app, zohoapis, api.clickup.com, Jira, Asana) fora do adapter executável; só nasce depois do adapter executável (SAC-65), porque antes dele barraria o único caminho que existe"
+  - id: E_FORJA_AUTOMATE_COM_AS_OBJECOES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "bancada run_drive_automate_selftests 79/79 com LC_ALL=C; 71 mutantes do executor, 70 mortos (o vivo é a checagem de gasto negativo, coberta pelo selo da passada); dogfood contra o Linear real por tm.sh (SAC-74 e as 4 subtarefas) e contra o forge real (PR #1101)"
+    label: "o degrau AUTOMATE foi forjado com as quatro objeções como predicado executável e o merge desligado por padrão; a 1ª passada adversarial o reprovou e as curas entraram no mesmo PR"
+    narrative: |-
+      Execução do D_AUTO_DRIVE_DEGRAU_AUTOMATE (selo de 2026-10-12, «Forjar com as objeções»). O executor é .claude/validation/drive-automate.sh (plan, begin, next, track, charge, gate, merge, stamp, end, --status), o contrato é o fragmento common:prompts:drive-doctrine, e o /meta:drive o injeta na carga. Census da forja: drive 2/7 antes, 5/7 depois (peças 2, 3 e 7).
+      Objeção 1 (expansão): a cadeia sai do grafo (x_drive_parent + DEPENDS_ON) em ordem topológica e para em CICLO, ITEM-SEM-NO (inclusive subtarefa do task manager), NO-SEM-ITEM, PAI-FILHO-DIVERGENTE e TM-ILEGIVEL; dogfood: o grafo com só SAC-74 e SAC-114 parou nomeando SAC-111, SAC-112 e SAC-113 lidos do Linear.
+      Objeção 2 (carimbo pelo que foi lido): o stamp exige state MERGED, mergedAt, SHA do merge e o run de CI de cada check exigido, grava verified_at = data do mergedAt e provenance com a URL do PR; nunca fecha decision nem pai com filho aberto, e PR que fecha decision em outro grafo para (PR-MEXE-EM-DECISAO).
+      Objeção 3 (riscos): CI-VAZIO, CI-SEM-CHECK-EXIGIDO, ELENXO-UMA-VOZ (elenxo_isolado), INSUMO-VENCIDO, retomada pela passada no grafo, status do provedor nunca fecha nó, merge desligado por padrão (rc 3, AUDIT).
+      Objeção 4 (maquinaria): task manager só por tm.sh, merge só por ops/merge-serial.sh, checkpoint só por kg-drive-project.sh --close-lot; a bancada lista as invocações do script.
+      O Elenxo, por agente separado, reprovou a 1ª versão com 15 achados, dois bloqueadores: o merge ligava editando o grafo (curado com o selo da passada) e o head julgado não era o mergeado (curado com a política relida depois do merge, sem carimbo se divergir). Ficaram declarados: quem digita --merge, o budget em tokens declarado pela sessão, o selo forjável por quem lê o segredo, e a janela entre o gate e o merge, que só o --match-head-commit dentro do caminho verificado fecharia.
+    provenance:
+      source: ".claude/validation/drive-automate.sh e a família run_drive_automate_selftests de .claude/validation/lint-selftest.sh (branch feat/drive-automate-rung)"
+      locator: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families drive_automate; resíduo docs/evolution/review/feat-drive-automate-rung.md (a tabela de mutantes)"
+      method: "medição: bancada com um mutante por parada nomeada, cada um numa cópia descartável da árvore, mais dogfood dos comandos reais contra o Linear e o forge"
+      locality: "repo"
 edges:
   - from: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
     to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
@@ -158,3 +182,18 @@ edges:
   - from: E_DOGFOOD_POR_COMANDO_REAL
     to: Q_GUARDA_API_DIRETA_DE_PROVEDOR
     edge_type: SUPPORTS
+  - from: E_FORJA_AUTOMATE_COM_AS_OBJECOES
+    to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
+    edge_type: SUPPORTS
+  - from: E_FORJA_AUTOMATE_COM_AS_OBJECOES
+    to: E_OPINIAO_EXPANSAO_AINDA_NAO_CONFIAVEL
+    edge_type: TRACES_TO
+  - from: E_FORJA_AUTOMATE_COM_AS_OBJECOES
+    to: E_OPINIAO_CARIMBO_PELO_QUE_FOI_LIDO
+    edge_type: TRACES_TO
+  - from: E_FORJA_AUTOMATE_COM_AS_OBJECOES
+    to: E_OPINIAO_RISCOS_QUE_FALTAVAM
+    edge_type: TRACES_TO
+  - from: E_FORJA_AUTOMATE_COM_AS_OBJECOES
+    to: E_DOGFOOD_POR_COMANDO_REAL
+    edge_type: TRACES_TO

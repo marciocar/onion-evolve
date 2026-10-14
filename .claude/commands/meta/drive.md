@@ -1,5 +1,5 @@
 ---
-description: Conduz um plano-grafo até o fim com rigor Onion — censo→avança→Elenxo→dogfood→realign→checkpoint (degrau AUDIT)
+description: Conduz um plano-grafo até o fim com rigor Onion — censo→avança→Elenxo→dogfood→realign→checkpoint (degrau AUDIT; AUTOMATE com merge desligado por padrão)
 allowed-tools: Bash, Read, Edit, Write, Task
 ---
 
@@ -17,9 +17,11 @@ achando superação — com o `/meta:realign` como **verificador-por-turno**. É
 ## Degrau e limites (não negociáveis)
 
 - Opera no degrau **AUDIT**: conduz cada fio **até PR-verde sozinho**; **merge no main é 100% humano, em LOTE** num checkpoint.
-- **AUTOMATE (decidido em 2026-10-12, ainda não aberto):** o merge passa a ser POR PADRÃO, só pelo
-  `ops/pr-merge-verified.sh` (core-only), com paradas duras nomeadas na doutrina (§0). O degrau abre quando elas
-  forem predicados executáveis com mutante (SAC-114, auto-drive). Até lá, vale a linha acima.
+- **AUTOMATE (forjado em 2026-10-14, `--automate`):** conduz 1..n raízes e a cadeia inteira pela ordem do grafo,
+  com as paradas duras como PREDICADO (`drive-automate.sh`, seção abaixo). O **merge é DESLIGADO por padrão**
+  (selo do maestro de 2026-10-12 sobre `D_AUTO_DRIVE_DEGRAU_AUTOMATE`, «Forjar com as objeções»): sem `--merge`,
+  o AUTOMATE para em PR verde e o PR vai ao lote humano, como no AUDIT. Com `--merge` explícito na invocação,
+  o merge vai só pelo `ops/merge-serial.sh` → `ops/pr-merge-verified.sh` (core-only), e nunca para item `decision`.
 - **Maestro-invocado.** Nunca auto-inicia, nunca `/loop`/`schedule`/cron sobre si (W7 = MOAT).
 - **Budget-capped, retomável.** Sem budget não há laço. Retomada = re-censo (o status do nó É o progresso) + o checkpoint pendente **no grafo** (`meta.x_drive_checkpoint`).
 - **MOAT (PARA sempre):** deploy · escrever repo alheio (I3) · merge de path vendorizado/outward-facing · agendar por relógio.
@@ -33,7 +35,38 @@ achando superação — com o `/meta:realign` como **verificador-por-turno**. É
 
 ```
 /meta:drive [<grafo.kg.yaml>=fios-abertos] [--max-nodes N=4] [--node <id>] [--budget <tokens>]
+/meta:drive <grafo.kg.yaml> --automate --max-nodes N --budget <tokens> [--root <NODE|ITEM>]... [--merge]
 ```
+
+## Degrau AUTOMATE — as paradas duras são predicado, não prosa
+
+Contrato do degrau: [`drive-doctrine.md`](../common/prompts/drive-doctrine.md) (as 4 objeções viradas
+predicado, os invariantes e o que ele NÃO promete). Bancada: `run_drive_automate_selftests`, com um caso
+e um mutante por objeção e por invariante. Estado medido agora (passadas abertas, checkpoint pendente,
+caminho de merge e veto do MOAT):
+
+!`bash .claude/validation/drive-automate.sh --status`
+
+O laço P0-P6 continua valendo; o AUTOMATE troca o P2 e o P5 por chamadas ao executor, e a sessão
+**executa o veredito**, nunca o contorna (rc 1 = PARE e reporte; rc 3 = AUDIT, o PR vai ao lote):
+
+```bash
+DA=.claude/validation/drive-automate.sh
+bash $DA plan  <grafo> --root <NODE|ITEM>        # cadeia em ordem topológica; PARA em ciclo, item sem nó,
+                                                  # nó sem item, pai/filho divergente, decision aberta, nó MOAT
+bash $DA begin <grafo> --max-nodes N --budget T [--merge] [--root …]   # abre a passada NO GRAFO, ou RETOMA
+bash $DA next  <grafo>                            # RETOMAR o item em voo, ou o PROXIMO pronto, dentro do teto
+#   … por item: /engineer:start → /engineer:work → /engineer:pr (a maquinaria, nunca à mão), resíduo da
+#   REGRA 56 com Elenxo por agente SEPARADO (elenxo: sim + elenxo_isolado: sim), ops/pr-finalize.sh --push (core-only)
+bash $DA track <grafo> <NODE> --pr N              # vincula o PR ao nó (estado retomável por item)
+bash $DA charge <grafo> --tokens N                # declara o gasto; no teto, PARA
+bash $DA gate  <grafo> <NODE> [--merge]           # 0 MERGE-OK · 1 PARA · 3 AUDIT (merge desligado)
+bash $DA merge <grafo> <NODE> --merge             # gate + ops/merge-serial.sh (core-only) + carimbo do forge
+bash $DA end   <grafo> "<nota>"                   # fecha a passada e escreve o checkpoint (--close-lot)
+```
+
+A passada (`meta.x_drive_pass`) e o checkpoint (`meta.x_drive_checkpoint`) moram no grafo: a sessão que
+cai retoma do grafo, sem zerar gasto nem teto, e o lote fechado espera o selo do maestro como no AUDIT.
 
 ## O laço (P0-P6)
 
@@ -145,11 +178,17 @@ dizer "selado": o selo é o merge.
   escrita da edição à mão; nada obriga a sessão a chamá-lo no P5, e grafo sem o campo conta como
   selado (é o estado de todo grafo antes do 1º lote). Se a sessão esquecer, o P0.5 passa por ausência —
   o mesmo modo de falha, agora com um comando a menos de distância. O selo (`--seal`) é do maestro.
-- **Ordenação é GUARDA, não topológica** (Fase 1): `DEPENDS_ON` segura o dependente, não reordena. Topológica dirigida + degrau AUTOMATE + ponte prosa→grafo são **Fase 2 (gated)**.
+- **Ordenação é GUARDA, não topológica** no AUDIT: `DEPENDS_ON` segura o dependente, não reordena. No AUTOMATE a
+  ordem é topológica dirigida (filho antes do pai, predecessor antes do dependente), e é o grafo que a dá, nunca o
+  task manager. A ponte prosa→grafo segue **gated**.
+- **O AUTOMATE não sabe quem digitou `--merge`.** O que é mecânico: o merge não liga por omissão, por variável ou
+  por retomada, e a passada que o ligou fica no grafo e na nota do checkpoint. O budget em tokens é declarado
+  pela sessão (`charge`); o teto de itens é contado pelo executor.
 
 ## 🔗 Referências
 - Contrato/doutrina: [`onion-drive-doctrine.md`](../../../docs/knowledge-base/concepts/onion-drive-doctrine.md)
 - Censo: `.claude/validation/kg-drive-project.sh` · Verificador-por-turno: [`/meta:realign`](realign.md)
 - Predicado da exceção de selo: `.claude/validation/kg-seal-exception.sh` (doutrina §4.1)
+- Degrau AUTOMATE: `.claude/validation/drive-automate.sh` · contrato [`drive-doctrine.md`](../common/prompts/drive-doctrine.md) · bancada `run_drive_automate_selftests`
 - Motores adapter: [`/meta:kg-freshness`](kg-freshness.md) · skill `onion-orchestration` · [`/meta:backlog`](backlog.md)
 - Escada/precedente (**core-only**, não viaja): ADR `onion-adr-autonomous-thread-runtime-2026-07`
