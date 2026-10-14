@@ -1,0 +1,91 @@
+meta:
+  id: superpowers-2026-10
+  schema_version: "1"
+  x_dissect_tool: superpowers
+  baseline: "2026-10-09"
+  review_after: "2026-11-08"   # 30d: ferramenta/licenca (cadencia da doutrina), o MESMO prazo da dissecacao de origem
+  # kg-backlog-guard: on
+  # ═══ TETO: 4 NÓS. Triagem fechada: cresce só quando um dos dois gatilhos disparar e reabrir a dissecação. ═══
+  #
+  # TRIAGEM DO CORE de uma dissecação feita FORA dele: o 1º estudo do adotante de curadoria levou o
+  # Superpowers (obra/superpowers, MIT, HEAD 8ca22dba, v6.4.2) até o N4 e propôs PARQUEAR, com o
+  # veredito selado pelo maestro do lado de lá (nó D_SUPERPOWERS_2610 do grafo da dissecação, no repo do
+  # adotante, no mesmo caminho relativo deste arquivo). Este grafo NÃO re-mede a ferramenta: registra a
+  # triagem e os dois gatilhos de reabertura, e existe para o dissect-census.sh DO CORE responder
+  # "já dissecamos o Superpowers?" sem depender do clone do adotante. Por isso baseline e review_after
+  # repetem os da medição de origem (2026-10-09 → 2026-11-08), não a data da triagem.
+  # Proposta triada: docs/evolution/inbox/_processed/2026-10-13-proposal-superpowers-parquear.md
+
+nodes:
+
+  - id: D_SUPERPOWERS_TRIAGEM_1014
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.8
+    x_dissect_level: 3
+    x_dissect_verdict: parquear
+    verified_at: "2026-10-14"
+    verified_against: "veredito PARQUEAR selado pelo maestro em 2026-10-13 no grafo da dissecação do adotante de curadoria (nó D_SUPERPOWERS_2610, status done, por pergunta com opções); a triagem do core é derivável e não abre pergunta nova ao maestro"
+    label: "TRIAGEM DO CORE: PARQUEAR o Superpowers, com dois gatilhos nomeados. O mesmo movimento do Onion se confirma SÓ EM PARTE: método em skills por plugin, mas o mecanismo é persuasão injetada no SessionStart, sem gate determinístico."
+    narrative: "Os gatilhos são Q_REABRIR_TRES_SKILLS e Q_REABRIR_CARIMBO_POR_PROBE. Esta triagem fecha a entrada do Superpowers no panorama competitivo. O veredito da ferramenta é de N3; o N4 que o censo lê vem do plano do carimbo por reexecução, REPROVADO pelo Elenxo do lado do adotante. Fora do veredito, a hipótese de posicionamento (296,6k estrelas sem nenhum gate determinístico) vai ao panorama como hipótese NÃO medida, com os fatores de confusão do nó E_MERCADO_PERSUASAO_E_DISTRIBUICAO do adotante."
+    trace: "docs/business-context/03-market/competitive-landscape.md"
+
+  - id: Q_REABRIR_TRES_SKILLS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 3
+    verified_at: "2026-10-14"
+    verified_against: "N1 e N2 da dissecação do adotante: 15 skills, 1 hook SessionStart, nenhum comando; código LIDO e não rodado (lacuna E_N2_LACUNA_EXECUCAO, open)"
+    label: "As 3 skills que o Onion não tem (systematic-debugging, test-driven-development como fluxo, diagnosing-superpowers) valem absorção? Hoje não se sabe: o código foi lido, não rodado."
+    x_gatilho: "reabrir quando as 3 skills forem rodadas em worktree isolada contra uma tarefa de bancada, com disparo e efeito observados. Só então propor /meta:absorb-skill. Antes disso, nenhuma absorção."
+    trace: "docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml"
+
+  - id: Q_REABRIR_CARIMBO_POR_PROBE
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 4
+    verified_at: "2026-10-14"
+    verified_against: "nó P_N4_STAMP_REEXECUTED do adotante (N4 REPROVADO pelo Elenxo); def stamp em .claude/utils/census/census-seal.py:54 e o juiz que manda re-rodar o barato em .claude/utils/census/census-workflow.mjs:102, conferidos em origin/main em 2026-10-14"
+    label: "Vale um carimbador determinístico de verified_at por reexecução da medição? O plano v1 caiu por 3 objeções fatais: inviável, injeção de comando e guarda forjável."
+    narrative: "Inviável: 24 de 30 methods amostrados em census-2026-09-01 são prosa (3 usam sudo, 2 dependem de web). Injeção: reexecutaria string vinda de LLM. Guarda forjável: a REGRA 57 (O veredito do run está SELADO no grafo que ele julgou) só dispara com ledger:, e um recibo textual é forjável. O core já tem metade do conceito: o juiz do census manda re-rodar o barato. O alvo certo de uma futura absorção é o stamp() do census-seal.py, não o kg-freshness."
+    x_gatilho: "reabrir quando o worker do /meta:kg-freshness ou do /meta:census devolver um campo estruturado probe {argv[], expect_regex}. Com ele, o carimbador age só onde há probe; o resto segue pelo juiz."
+    trace: ".claude/utils/census/census-seal.py"
+
+  - id: E_TRIAGEM_SUPERPOWERS_1014
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    x_dissect_level: 4
+    verified_at: "2026-10-14"
+    verified_against: "dissect-census.sh contra o repo do adotante: superpowers, nível 4, parquear, baseline 2026-10-09, review_after 2026-11-08, fresco. Grafo de origem lido inteiro (285 linhas): 296.605 estrelas medidas em 2026-10-09 (E_N0_IDENTIDADE), contra 297,9k no panorama do core em 2026-10-12, que é crescimento e não erro."
+    source_tier: 10
+    source_kind: internal-audit
+    label: "A proposta do adotante bate com o grafo dele: veredito PARQUEAR selado em 2026-10-13, N4 reprovado, os 24 de 30 methods em prosa, as 3 skills ausentes no Onion e a hipótese de mercado rebaixada a open com confiança 0.4. Nenhum número da proposta diverge da fonte."
+    trace: "docs/evolution/inbox/_processed/2026-10-13-proposal-superpowers-parquear.md"
+    provenance:
+      source: "grafo da dissecação do Superpowers no repo do adotante de curadoria; proposta upstream de 2026-10-13"
+      locator: "nós E_N0_IDENTIDADE (l.32-50; estrelas na l.46), E_MERCADO_PERSUASAO_E_DISTRIBUICAO (l.149-158), D_SUPERPOWERS_2610 (l.159-180), P_N4_STAMP_REEXECUTED (l.220-229); grafo de 14 nós, no teto declarado"
+      method: "medição: bash .claude/validation/dissect-census.sh <repo-do-adotante> --tsv; leitura integral do grafo com grep -n nos números citados"
+      locality: "repo"
+
+edges:
+
+  - from: E_TRIAGEM_SUPERPOWERS_1014
+    to: D_SUPERPOWERS_TRIAGEM_1014
+    edge_type: SUPPORTS
+  - from: Q_REABRIR_TRES_SKILLS
+    to: D_SUPERPOWERS_TRIAGEM_1014
+    edge_type: CONSTRAINS
+  - from: Q_REABRIR_CARIMBO_POR_PROBE
+    to: D_SUPERPOWERS_TRIAGEM_1014
+    edge_type: CONSTRAINS
