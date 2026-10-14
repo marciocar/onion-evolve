@@ -1,7 +1,8 @@
 ---
 branch: fix/vendor-purity-generated-projections
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: eb445c0b9d37fe96d9521eade2496c0f3c2a3a822a661d6b819da02654612c30
+reviewed_code_sha256: 9396173057d8a7032e87bed68333f01a0d9a0df5869f9f8d9e01799e09bea574
 findings_total: 2
 findings_real: 2
 findings_fixed: 1
