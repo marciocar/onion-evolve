@@ -2,8 +2,8 @@
 title: 'Resíduo — o degrau AUTOMATE do /meta:drive nasce com as objeções e o merge desligado'
 date: 2026-10-14
 branch: feat/drive-automate-rung
-reviewed_diff_sha256: 5dbb2499c335e13fbbea9647e1ebb901109b1827b6952a4cbed47ddf7d8615b1
-reviewed_code_sha256: fb3a998f734561276b5e1a5e096f2a06f64868e3b4350b33e3dc27fd4baf0065
+reviewed_diff_sha256: 598c59f94c49c4f656f8fdab980715ae9628e1f33f5ee03b73513762b47d2f7d
+reviewed_code_sha256: 38f3b7e6434da1f453ecad5a2b5b51150ed8704a307925767f546c8e85b8c821
 findings_total: 15
 findings_real: 14
 findings_fixed: 11
