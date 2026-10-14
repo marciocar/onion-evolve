@@ -11075,6 +11075,14 @@ run_empty_result_guard_selftests() {
   if ! grep -q 'PR-SEM-PASSADA' <<< "${out}"; then
     record_pass "empty-result-guard: (u) create de outro checkout (\`cd <worktree> &&\`) olha o resíduo DALI"
   else record_fail "empty-result-guard: (u)" "olhou o projeto em vez do worktree do cd: ${out}"; fi
+  # (u2) o harness TIRA o `cd` que leva ao cwd da sessão: o comando chega sem `cd`, e o diretório real só
+  #      vem no `cwd` do payload. Sem lê-lo, o hook olhava o projeto (na main) e avisava falso para todo PR
+  #      aberto de dentro de uma worktree (#1110 e #1112, 2026-10-14). MUTANTE: ignorar o `.cwd` reprova.
+  out="$(printf '{"tool_input":{"command":"gh pr create --fill"},"cwd":"%s","tool_response":{"stdout":"ok"}}' "${_ok}" \
+    | CLAUDE_PROJECT_DIR="${_pj}" bash "${hook}" 2>&1 || true)"
+  if ! grep -q 'PR-SEM-PASSADA' <<< "${out}"; then
+    record_pass "empty-result-guard: (u2) create SEM cd, com o cwd do payload na worktree → olha o resíduo DALI"
+  else record_fail "empty-result-guard: (u2)" "olhou o projeto em vez do cwd do payload: ${out}"; fi
   rm -rf "${_pj}" "${_ok}" "${_ad}"
 
   # (e) exit 2 quando dispara — é a ÚNICA via medida em que o stderr de PostToolUse chega ao modelo.
