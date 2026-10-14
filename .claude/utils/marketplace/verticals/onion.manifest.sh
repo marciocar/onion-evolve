@@ -80,6 +80,9 @@ HOOKS=(
   ".claude/hooks/pretooluse-env-guard.sh"
 )
 UTILS=(
+  # A classe do caminho de máquina (machine_path.py), que o kg-contract-check.sh do /meta:decide importa de
+  # `validation/../utils/kg` (2026-10-14). Sem ela o checador sai 2 ("não dá para julgar") onde o vendor existe.
+  ".claude/utils/kg"
   ".claude/utils/diagnose"
   ".claude/utils/task-manager"
   ".claude/utils/forge"
