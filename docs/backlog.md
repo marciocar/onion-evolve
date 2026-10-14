@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**492 itens abertos** em 103 grafo(s) com aberto (de 132 no escopo) · 104 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**495 itens abertos** em 104 grafo(s) com aberto (de 133 no escopo) · 105 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -969,6 +969,14 @@
 |--:|---|---|---|
 | 3.2 | `C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON` | vetos-fail-closed-2026-10 | o recorte sem python3 dos dois vetos é sombreado no core: o env-guard, registrado no mesmo matcher, barra todo Read, Grep e Bash  |
 | 2.8 | `C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL` | vetos-fail-closed-2026-10 | falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, po |
+
+## radar-E3-2026-10-14-r10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.0 | `Q_COMPACTACAO_OCIOSA_DISPARA_O_PRECOMPACT` | radar-E3-2026-10-14-r10 | o PreCompact deve deixar migalha também nas branches feat/, fix/, docs/ e chore/ do core, e a compactação ociosa da 2.1.299 che |
+| 2.4 | `Q_DERIVA_DA_R9_VAI_AO_KG_FRESHNESS` | radar-E3-2026-10-14-r10 | selar a deriva da r9 (contagem de hooks, timeout e onFailure) pelo /meta:kg-freshness e medir a latência dos 2 vetos PreToolUse n |
+| 2.0 | `Q_SONDAR_O_BUNDLE_ONION_SOB_2_1_299` | radar-E3-2026-10-14-r10 | sondar o plugin onion publicado sob 2.1.299: o bash-empty-result-guard empacotado (PostToolUse com exit 2) e o env-guard mudam de  |
 
 ## superpowers-2026-10 — 2 item(ns)
 
