@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**489 itens abertos** em 103 grafo(s) com aberto (de 132 no escopo) · 104 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**492 itens abertos** em 103 grafo(s) com aberto (de 132 no escopo) · 104 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -106,11 +106,14 @@
 | 4.8 | `Q_SDAAL_KIT_REPO_SEPARADO` | playbook-sdaal-2026-10 | GATED: extrair um KIT DE CONTRATO SDAAL para repo próprio versionado por pin, no molde do kg-ssot. Gatilho (os 2 juntos): execut |
 | 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
 
-## canal-vivo-sessoes-2026-10 — 1 item(ns)
+## canal-vivo-sessoes-2026-10 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 74.4 | `C_LIVE_CLASS_DESIGN_CONSTRAINTS` | canal-vivo-sessoes-2026-10 | Restrições que a evidência ancorada impõe ao desenho da classe 'live' (NÃO é decisão): (1) cc-peer só vale DENTRO da mesma |
+| 76.8 | `C_LIVE_CLASS_DESIGN_CONSTRAINTS` | canal-vivo-sessoes-2026-10 | Restrições que a evidência ancorada impõe ao desenho da classe 'live' (NÃO é decisão): (1) cc-peer só vale DENTRO da mesma |
+| 3.2 | `Q_XSESSION_LIVE_NOT_VERIFIED` | canal-vivo-sessoes-2026-10 | NÃO VERIFICADO, fechar antes de qualquer absorção: dois membros da mesma org Team; dois usuários do SO na mesma máquina; clou |
+| 3.0 | `Q_REOPEN_IF_ADOPTER_ASKS_CROSS_ORG_CHANNEL` | canal-vivo-sessoes-2026-10 | GATILHO de reabertura (b): algum adotante pediu canal entre organizações? Se sim, o caminho é o A2A gated que o core já tem, n |
+| 3.0 | `Q_REOPEN_IF_ANTHROPIC_SHIPS_CROSS_USER_CHANNEL` | canal-vivo-sessoes-2026-10 | GATILHO de reabertura (a): a Anthropic respondeu à issue #87954 (pedido de canal entre usuários) ou lançou canal nativo entre u |
 
 ## jev-decision-round2-2026-10 — 10 item(ns)
 
