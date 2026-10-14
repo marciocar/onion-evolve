@@ -1,7 +1,8 @@
 ---
 branch: chore/registry-pins-2026-10-14
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 60645b0d81378d61d2728324952185da2e8265a441315afede90d4b8df27fff8
+reviewed_code_sha256: 7b48d0e3c8225dce4db0876e16d8248a88d7be9c86cae9fec9185cddc0fa97f9
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
