@@ -2,7 +2,8 @@
 branch: fix/stop-hooks-tail-and-notification-evidence
 pr: pendente
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 79a42360dc79d0854830294ea6fa321c3f896a10b6c87e717b00170c0ef9e45b
+reviewed_code_sha256: 7fee0f8f1b7cf3e9afa40a8af8f0b5c3b62e02dec5dc6f29a28a1e891bcea650
 findings_total: 3
 findings_real: 3
 findings_fixed: 2
