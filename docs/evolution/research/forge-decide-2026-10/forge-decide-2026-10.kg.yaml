@@ -190,6 +190,22 @@ nodes:
     verified_at: "2026-10-12"
     verified_against: "E_CORPUS_SEM_OPCOES_ESTRUTURADAS: zero nós com opções em campo; o medidor depende de padrão fixo sobre a prosa"
     label: "o contrato do .kg.yaml deveria ganhar um campo x_options para decisões abertas? Gatilho: as rodadas do /meta:decide mostrarem que o padrão fixo erra opção que o autor do nó tinha escrito"
+  - id: D_DECIDE_VIAJA_PARA_TODOS_MENOS_MINI
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «todos menos o mini»"
+    label: "o /meta:decide sai do conjunto pending e viaja para todo papel com KG (source, hub, adotado, standalone, plugins), menos o onion-mini"
+    narrative: "Selado por /meta:decide em 2026-10-14: escolhida «todos menos o mini»; descartadas: «Todos, inclusive o mini» · «Mini com decide sem selo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «O /meta:decide viaja para todos? E o mini, que nasce sem KG?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
 edges:
   - from: E_PEDIDO_DO_MAESTRO_QUESTIONARIO
     to: D_TOPOLOGIA_DO_DECIDE_SELADA
@@ -224,3 +240,6 @@ edges:
   - from: Q_OPCOES_EM_CAMPO_ESTRUTURADO
     to: E_CORPUS_SEM_OPCOES_ESTRUTURADAS
     edge_type: DEPENDS_ON
+  - from: D_DECIDE_VIAJA_PARA_TODOS_MENOS_MINI
+    to: Q_DECIDE_FICA_EM_PENDING
+    edge_type: SUPERSEDES

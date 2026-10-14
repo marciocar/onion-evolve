@@ -20,7 +20,7 @@ meta:
   # ancorado da rodada de pesquisa. Não é termo de terceiro adotado; é palavra desta casa.
   #
   # kg-backlog-guard: on
-  # ═══ TETO: 7 NÓS = 1 decisão + 3 claims + 1 evidência + 1 objeção sobrevivente + 1 pergunta
+  # ═══ TETO: 8 NÓS = 1 decisão + 3 claims + 1 evidência + 1 objeção sobrevivente + 1 pergunta + 1 selo (2026-10-14: a face que viaja aberta pelo maestro)
   #     HERDADA da rodada de pesquisa (ver Q_DESTINO_DIFERENCIAL_OU_LACUNA: ela veio de
   #     Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART, cujo grafo está em 27/27 e cujas cláusulas
   #     de crescimento não a cobrem — e ela decide o VALOR da peça 5, então esta é a casa certa).
@@ -131,6 +131,22 @@ nodes:
     status: open
     label: 'HERDADA de Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART (grafo agent-command-composition-2026-09), cujo VEREDITO foi selado em 2026-09-28 e esta derivada NÃO: se a arte externa cobre ENTREGA GOVERNADA e não cobre DESTINO obrigatório do que se PRODUZ, então o destino-em-grafo com gate determinístico é DIFERENCIAL real do Onion ou LACUNA do campo inteiro (ninguém faz porque não vale a pena)? É a pergunta que decide o VALOR DA PEÇA 5 da forja — e portanto se a forja compra fosso ou só ergue scaffolding. NÃO É RESPONDÍVEL com a base atual: exige as duas lacunas que a rodada declarou e não mediu — evidência de CAPITAL (nenhum worker foi a base de rodada/M&A/valuation, contrariando o invariante de mercado desta casa) e evidência PRIMÁRIA DE FRACASSO (a única fonte tier 7 de fracasso foi refutada na votação). GATILHOS NOMEADOS para fechar, preservados da origem: (a) aparecer paper ou produto com write path governado E critério de aceitação NO DESTINO; (b) o R7 do Context Kubernetes sair de Design para implementado numa v4 do preprint; (c) rodada de investimento ou M&A que mostre dinheiro em orquestração-com-destino em vez de contexto-para-entrega. MÉTODO quando abrir: varredura por TRAJETÓRIA (created:> com sort=stars, HN Algolia, bases de capital), nunca modo primaries — não há documento nomeado a ler.'
     trace: docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
+  - id: D_FORGE_FACE_QUE_VIAJA_ABERTA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «usar o /meta:forge na aula e nos adotantes (abrir a face que viaja)»"
+    label: "a face que viaja do /meta:forge está aberta: o time de um hub ou de um adotado forja os próprios componentes internos com o comando, e o plugin segue sob a REGRA 74"
+    narrative: "Selado por /meta:decide em 2026-10-14: escolhida «usar o /meta:forge na aula e nos adotantes (abrir a face que viaja)»; descartadas: «forja à mão com a doutrina e o censo» · «manter core-only»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Na aula 5, a turma usa o /meta:forge ou forja à mão?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
 
 edges:
   - from: C_DESTINO_SEM_DONO
@@ -157,3 +173,6 @@ edges:
   - from: C_DESTINO_SEM_DONO
     to: Q_DESTINO_DIFERENCIAL_OU_LACUNA
     edge_type: SUPPORTS
+  - from: D_FORGE_FACE_QUE_VIAJA_ABERTA
+    to: D_FORGE_META_COMANDO
+    edge_type: TRACES_TO

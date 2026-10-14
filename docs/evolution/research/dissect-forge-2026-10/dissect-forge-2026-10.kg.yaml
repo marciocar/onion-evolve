@@ -61,6 +61,22 @@ nodes:
     label: "desenho da costura: o N4 do dissect escreve nos x_absorb_* no grafo (KG-SSOT first), o dissect-plans.sh os le, mede as pecas do alvo no forge-census e recusa plano sem origem com pin, licenca, paridade ou forma; o /meta:forge injeta essa leitura"
     narrative: "Sem comando novo e sem REGRA nova: o defeito medido nao era um plano sem licenca passando (nao havia plano nenhum), era a ausencia de forma e de leitor. Por isso o mecanismo e o medidor do proprio dissect, com bancada de polaridade e sete mutantes mortos (um deles a regressao do plugin onion-meta, que levou o leitor para dissect-plans.sh, do lado do forge), e nao uma guarda de lint. Proxima onda, com gatilho = selo do maestro em D_CONDUCTOR_1011: o /meta:forge executa A_PLAN_VERIFICACAO_PELO_MOTOR no onion-research.js. A prova de generalizacao (ferramenta nova, fora dos tres exemplos) segue no Q."
     trace: ".claude/validation/dissect-census.sh"
+  - id: D_DISSECT_VIAJA_PARA_TODOS_MENOS_MINI
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «todos menos o mini, e na aula»"
+    label: "o /meta:dissect viaja para todo papel menos o onion-mini e entra na aula de KG e forja como o passo antes da forja"
+    narrative: "Selado por /meta:decide em 2026-10-14: escolhida «todos menos o mini, e na aula» (resposta livre do maestro, fora das opções oferecidas); descartadas: «manter core-only»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «O /meta:dissect viaja para quem?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
 edges:
   - from: E_DISSECT_QUASE_NAO_USADO
     to: Q_COSTURA_DISSECT_FORGE
@@ -71,6 +87,9 @@ edges:
   - from: D_PLANO_DE_ABSORCAO_E_NO
     to: Q_COSTURA_DISSECT_FORGE
     edge_type: SUPPORTS
+  - from: D_DISSECT_VIAJA_PARA_TODOS_MENOS_MINI
+    to: D_PLANO_DE_ABSORCAO_E_NO
+    edge_type: TRACES_TO
 
 external_edges:
   - from: E_DOGFOOD_CONDUCTOR_ATE_N4
