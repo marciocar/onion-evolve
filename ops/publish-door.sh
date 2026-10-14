@@ -157,25 +157,13 @@ LEAK_SCAN="${CORE}/.claude/validation/door-leak-scan.sh"
 [ -f "${LEAK_SCAN}" ] || { echo "ERRO: ${LEAK_SCAN} ausente — sem ele o motor não lê o registro nem varre vazamento." >&2; exit 2; }
 _members_tsv() { bash "${LEAK_SCAN}" --members "${MEMBERS}" --emit-members-tsv; }
 
-# url clonável a partir do `remote:` do registro. github.com/x/y → https; caminho absoluto ou url
-# completa ficam como estão; `n/a` e texto livre não têm url.
-_url_of() {
-  local r="$1"
-  case "${r}" in
-    ""|n/a|"("*) printf '' ;;
-    http://*|https://*|git@*|file://*|/*) printf '%s' "${r}" ;;
-    github.com/*) printf 'https://%s.git' "${r%.git}" ;;
-    *) printf '' ;;
-  esac
-}
-
-# Lê um campo do carimbo de porta (`write-stamp.sh --kind door`), com o dialeto antigo como fallback.
-_stamp_field() { printf '%s\n' "$1" | grep -m1 "^$2:" | sed "s/^$2:[[:space:]]*//; s/[[:space:]]*#.*\$//; s/[[:space:]]*\$//"; }
-_stamp_pin() {
-  local p; p="$(_stamp_field "$1" source_commit)"
-  [ -n "${p}" ] || p="$(_stamp_field "$1" onion_version)"
-  printf '%s' "${p}"
-}
+# A leitura do carimbo PUBLICADO (`_url_of`, `_stamp_field`, `_stamp_pin`, `door_read_published`) mora
+# numa lib desde 2026-10-14: o `door-seal-pin.sh` lia o mesmo fato do CLONE LOCAL e apodreceu (PR #1100).
+# Uma leitura, um lugar. Vem do CORE (ao lado deste motor), como o door-leak-scan.sh acima.
+DOOR_STAMP_LIB="${CORE}/ops/door-published-stamp.sh"
+[ -f "${DOOR_STAMP_LIB}" ] || { echo "ERRO: ${DOOR_STAMP_LIB} ausente — sem ela o motor não lê carimbo de porta." >&2; exit 2; }
+# shellcheck source=door-published-stamp.sh
+. "${DOOR_STAMP_LIB}"
 
 # =============================================================================
 # --status — a defasagem de cada porta, lida do REMOTO
@@ -197,7 +185,7 @@ _status() {
   local tmp; tmp="$(mktemp -d)"
   printf '══ /meta:publish --status — carimbo PUBLICADO × %s (%s)\n' "${tip}" "$(git -C "${CORE}" rev-parse --short=12 "${tip}")"
   printf '%-18s %-10s %-14s %-14s %-9s %-11s %s\n' "porta" "papel" "pin publicado" "pin registro" "versão" "defasagem" "estado"
-  local id kind role remote pin lp url br stamp rpin rrole rrel n state prov nall tip12
+  local id kind role remote pin lp url rpin rrole rrel n state nall tip12
   tip12="$(git -C "${CORE}" rev-parse --short=12 "${tip}")"
   while IFS=$'\037' read -r id kind role remote pin lp; do
     [ -n "${id}" ] || continue
@@ -206,26 +194,14 @@ _status() {
     rpin=""; rrole=""; rrel=""; n="—"; state=""
     if [ -z "${url}" ]; then
       state="NÃO-MEDIDO (sem remoto no registro)"
-    elif ! br="$(git ls-remote --symref "${url}" HEAD 2>/dev/null | awk '/^ref:/{sub("refs/heads/","",$2); print $2; exit}')" || [ -z "${br}" ]; then
-      state="NÃO-MEDIDO (remoto ilegível: ${url})"
     else
-      rm -rf "${tmp:?}/${id}"
-      if ! git clone -q --depth 1 --no-checkout --branch "${br}" "${url}" "${tmp}/${id}" >/dev/null 2>&1; then
+      door_read_published "${url}" "${tmp}/${id}"
+      rpin="${DPS_PIN}"; rrole="${DPS_ROLE}"; rrel="${DPS_RELEASE}"
+      if [ "${DPS_STATE}" = "unreadable" ]; then
+        state="NÃO-MEDIDO (remoto ilegível: ${url})"
+      elif [ "${DPS_STATE}" = "clone-failed" ]; then
         state="NÃO-MEDIDO (clone raso falhou)"
       else
-        stamp="$(git -C "${tmp}/${id}" show "HEAD:.claude/.onion-version" 2>/dev/null || true)"
-        if [ -n "${stamp}" ]; then
-          rpin="$(_stamp_pin "${stamp}")"; rrole="$(_stamp_field "${stamp}" role)"
-          rrel="$(_stamp_field "${stamp}" release)"
-        else
-          # porta de MARKETPLACE: o carimbo é o provenance.json do plugin (campo `ref`), sem `role:`
-          prov="$(git -C "${tmp}/${id}" ls-tree -r --name-only HEAD -- plugins 2>/dev/null | grep -m1 '/\.claude-plugin/provenance\.json$' || true)"
-          if [ -n "${prov}" ]; then
-            rpin="$(git -C "${tmp}/${id}" show "HEAD:${prov}" 2>/dev/null | sed -n 's/.*"ref"[[:space:]]*:[[:space:]]*"\([0-9a-f]*\)".*/\1/p' | head -1)"
-            rrole="plugins*"
-            rrel="$(git -C "${tmp}/${id}" show "HEAD:${prov}" 2>/dev/null | sed -n 's/.*"onion_release"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | sed -n '1p')"
-          fi
-        fi
         if [ -z "${rpin}" ]; then
           state="SEM-CARIMBO (porta nunca materializada pelo motor$([ "${pin}" = "n/a" ] && printf ' — 1ª publicação: /meta:publish %s --replace-foreign' "${id}"))"
           measured=$((measured + 1))
@@ -1100,6 +1076,9 @@ elif [ "${COMMITTED}" -eq 1 ]; then
   else
     echo "  (7) publicado e CONFERIDO no remoto: ${BRANCH} = ${_local:0:12} · carimbo pin ${PIN}"
     echo "      O selo é o carimbo da porta: /meta:publish --status o lê do remoto. Nenhum PR no core."
+    # Só a DICA do cache, nunca o PR: o cache `onion_version` do registro é opcional, e um PR de registro
+    # aberto em paralelo a PR de execução derruba os vizinhos (regra da ponte). O comando lê o REMOTO.
+    echo "      Cache do registro (opcional, numa leva própria): bash ops/door-seal-pin.sh ${DOOR} --dry-run"
     _push_release_tag || POST_FAIL=1
   fi
   if [ "${ROLE}" != "${REG_ROLE}" ]; then

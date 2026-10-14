@@ -856,6 +856,46 @@ nodes:
       method: "medição: bancada rodada com LC_ALL=C; cada mutante reverte uma cura na cópia do sandbox e o caso reprova"
       locality: "repo"
 
+  - id: E_CARIMBADOR_DO_CACHE_LIA_O_CLONE_LOCAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-14"
+    verified_against: "ops/door-seal-pin.sh --dry-run nas quatro portas, antes e depois da cura: antes recusava as quatro (onion-mini com arquivo não commitado no clone, onion-standalone e onion-core com o clone atrás do remoto, onion-plugins sem carimbo no clone) enquanto publish-door.sh --status dava as quatro em dia; depois as quatro rc 0 com o pin 668cac66a12b lido do remoto"
+    source_kind: repo
+    source_tier: 10
+    label: "o carimbador do cache do pin lia o clone local da porta, que a publicação da F3 não atualiza: recusou as quatro portas com o --status dizendo em dia"
+    narrative: "O door-seal-pin.sh nasceu quando a publicação acontecia no clone local da porta, e por isso exigia árvore limpa e clone igual ao remoto. A F3 passou a publicar de um clone descartável sem tocar o local, e o local fica para trás sozinho. No PR #1100 o cache das quatro portas foi carimbado à mão com o pin que o --status leu do remoto. O primeiro dogfood da cura achou um segundo defeito, latente: o provenance.json dos plugins carrega o ref de 40 caracteres, o cache tem 12, e a comparação literal reescreveria um cache que o --status já dá como em dia."
+    trace: "ops/door-seal-pin.sh · ops/publish-door.sh (core-only)"
+    provenance:
+      source: "ops/door-seal-pin.sh e ops/publish-door.sh --status, rodados contra os remotos públicos das quatro portas"
+      locator: "saída do --dry-run por porta e a tabela do --status"
+      method: "medição: execução real em --dry-run, sem escrita no registro"
+      locality: "repo"
+
+  - id: D_CACHE_DO_PIN_LE_O_REMOTO_PELA_LEITURA_DO_STATUS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-14"
+    verified_against: "run_door_seal_pin_selftests com LC_ALL=C: 13 casos verdes, entre eles remoto carimbado com clone local defasado e sujo, remoto ilegível com recusa declarada e lib ausente; o mutante que volta a ler o clone local reprova 8 casos; run_publish_selftests (32) verde, com o caso da dica do --push e os mutantes da dica e da leitura do --status reprovando"
+    source_kind: repo
+    source_tier: 10
+    label: "o cache do pin das portas lê o carimbo no remoto pela mesma leitura do --status, numa lib só, sem fallback ao clone local; o --push imprime o comando, não abre o PR"
+    narrative: "A leitura do carimbo publicado (url do registro, ramo padrão por ls-remote, clone raso sem checkout, .onion-version ou provenance.json) saiu do --status para ops/door-published-stamp.sh, e o door-seal-pin.sh faz source dela. As guardas de árvore limpa e de clone igual ao remoto perderam o objeto, porque o que vem do remoto já é o publicado. Ficam as do core: pin é commit dele e está em origin/main. Fallback ao clone local foi recusado: traria a leitura errada de volta justamente com o remoto fora do ar. O pin é normalizado a 12 caracteres. O --push só imprime o comando do cache: o PR de registro é de quem roda, numa leva própria."
+    trace: "ops/door-published-stamp.sh · ops/door-seal-pin.sh · ops/publish-door.sh · .claude/validation/lint-selftest.sh (core-only)"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh, funções run_door_seal_pin_selftests e run_publish_selftests"
+      locator: "casos (a) a (o) do door-seal-pin e (b2), (c) do publish, com os mutantes"
+      method: "medição: bancada com LC_ALL=C; cada mutante plantado por ops/mutate-and-restore.sh e o caso reprova"
+      locality: "repo"
+
 edges:
   # o dano é a evidência de que a lacuna existia
   - from: E_DANO_85_ARQUIVOS
@@ -1080,5 +1120,12 @@ edges:
     to: D_VARREDURA_DA_PUBLICACAO_RODA_NO_PR
     edge_type: SUPPORTS
   - from: D_VARREDURA_DA_PUBLICACAO_RODA_NO_PR
+    to: E_PUBLICAR_SOB_DEMANDA_F3
+    edge_type: DEPENDS_ON
+  # o carimbador que lia o clone local é a evidência da decisão de ler o remoto pela lib do --status
+  - from: E_CARIMBADOR_DO_CACHE_LIA_O_CLONE_LOCAL
+    to: D_CACHE_DO_PIN_LE_O_REMOTO_PELA_LEITURA_DO_STATUS
+    edge_type: SUPPORTS
+  - from: D_CACHE_DO_PIN_LE_O_REMOTO_PELA_LEITURA_DO_STATUS
     to: E_PUBLICAR_SOB_DEMANDA_F3
     edge_type: DEPENDS_ON
