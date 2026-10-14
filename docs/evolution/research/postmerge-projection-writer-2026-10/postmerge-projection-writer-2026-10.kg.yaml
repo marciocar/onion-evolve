@@ -8,7 +8,11 @@ meta:
                                # de primárias de 2026-10-14, wf_6babcd2c-1d8; a pergunta central segue aberta)
                                # e o comportamento de Actions; a metade doutrina (escritor único) é de 12m,
                                # mas a revisita real é o selo do maestro e o dogfood do B1.
-  # ═══ TETO: 96 NÓS ═══
+  # ═══ TETO: 103 NÓS ═══
+  # Teto subido de 96 para 103 (+7) em 2026-10-14: o dogfood do B1 rodou no sandbox público (T1–T6), com 6 nós
+  # E_DOGFOOD_B1_* medidos, e o selo delegado D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA (kg-decide-seal.sh --new).
+  # Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY, Q_B1_NON_FF_RACE_REDISPATCH e Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS viraram
+  # superseded por aresta SUPERSEDES das medições (Aufhebung: nada apagado).
   # Teto subido de 93 para 96 (+3) em 2026-10-14 no empacotamento do Passo B: E_FASE0_STRICT_LOCAL_EXECUTADA_PR_1101
   # (a FASE 0 selada foi executada no #1101), E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN (o dogfood que o maestro
   # escolheu para Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD não rodou na sessão) e Q_GUARDA_DE_MAIN_CASA_PELO_NOME (a pergunta que
@@ -1549,7 +1553,7 @@ nodes:
   - id: Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.6
     verified_at: "2026-10-14"
@@ -1560,7 +1564,7 @@ nodes:
   - id: Q_B1_NON_FF_RACE_REDISPATCH
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.6
     verified_at: "2026-10-14"
@@ -1571,7 +1575,7 @@ nodes:
   - id: Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS
     node_type: question
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.6
     verified_at: "2026-10-14"
@@ -1608,13 +1612,121 @@ nodes:
     source_tier: 10
     source_kind: primary
     label: "O dogfood do B1 num repo descartável PRIVADO não rodou na sessão: ruleset em repo privado na conta Free devolve HTTP 403, e a guarda pretooluse-merge-gate.sh veta escrita no main de QUALQUER repo, porque casa pelo nome e não pelo repositório. Seed e T1 ficam com o maestro."
-    narrative: "BLOQUEIO 1 (forge): criar o ruleset no sandbox, mesmo com enforcement: disabled, devolveu verbatim {\"message\":\"Upgrade to GitHub Pro or make this repository public to enable this feature.\",\"documentation_url\":\"https://docs.github.com/rest/repos/rules#create-a-repository-ruleset\",\"status\":\"403\"}. Com o repo privado, como foi autorizado, a cópia do ruleset 25001643 é impossível nesta conta; o core só tem ruleset porque é público. BLOQUEIO 2 (guarda da casa): o seed do main do sandbox e o T1 (push direto do admin) caíram no veto, verbatim: «GUARDA-PRETOOLUSE: 'git push' com alvo MAIN negado (git push -u origin main) — merge/push em MAIN só pelo caminho verificado: bash ops/pr-merge-verified.sh <PR> --sync (...). Se for deliberado, o maestro roda fora da sessão.» e «GUARDA-PRETOOLUSE: 'gh api …/merge-upstream|contents' escrevendo na main negado — (...)». O agente não contornou o veto (seria contornar um controle) e não trocou o default branch. CONSEQUÊNCIA: a pergunta central do B1 segue sem resposta; o seed do sandbox e o T1 são do maestro, fora da sessão, e o sandbox precisa ser público (ou a conta ter Pro) para o ruleset existir. Q_GUARDA_DE_MAIN_CASA_PELO_NOME pergunta se o casamento por nome é intencional. O nome do repo sandbox foi omitido de propósito (REGRA 106 (Superfície que viaja passa pela varredura de vazamento da publicação))."
+    narrative: "BLOQUEIO 1 (forge): criar o ruleset no sandbox, mesmo com enforcement: disabled, devolveu verbatim {\"message\":\"Upgrade to GitHub Pro or make this repository public to enable this feature.\",\"documentation_url\":\"https://docs.github.com/rest/repos/rules#create-a-repository-ruleset\",\"status\":\"403\"}. Com o repo privado, como foi autorizado, a cópia do ruleset 25001643 é impossível nesta conta; o core só tem ruleset porque é público. BLOQUEIO 2 (guarda da casa): o seed do main do sandbox e o T1 (push direto do admin) caíram no veto, verbatim: «GUARDA-PRETOOLUSE: 'git push' com alvo MAIN negado (git push -u origin main) — merge/push em MAIN só pelo caminho verificado: bash ops/pr-merge-verified.sh <PR> --sync (...). Se for deliberado, o maestro roda fora da sessão.» e «GUARDA-PRETOOLUSE: 'gh api …/merge-upstream|contents' escrevendo na main negado — (...)». O agente não contornou o veto (seria contornar um controle) e não trocou o default branch. CONSEQUÊNCIA: a pergunta central do B1 segue sem resposta; o seed do sandbox e o T1 são do maestro, fora da sessão, e o sandbox precisa ser público (ou a conta ter Pro) para o ruleset existir. Q_GUARDA_DE_MAIN_CASA_PELO_NOME pergunta se o casamento por nome é intencional. DESBLOQUEIO (mesmo dia): o sandbox virou PÚBLICO e passou a usar a branch padrão trunk, porque a guarda de main do core segue barrando main de dentro da sessão e não foi desligada; T1–T6 foram medidos (E_DOGFOOD_B1_*). Este nó fica como histórico do bloqueio. O nome do repo sandbox foi omitido de propósito (REGRA 106 (Superfície que viaja passa pela varredura de vazamento da publicação))."
     trace: "⟨log do subagente ac649ccbb407392d8 da sessão do maestro de 2026-10-14 (dogfood do B1)⟩"
     provenance:
       source: "⟨log do subagente ac649ccbb407392d8 da sessão do maestro de 2026-10-14 (dogfood do B1)⟩"
       locator: "tool_result do POST de ruleset (timestamp 2026-10-14T01:51:59Z, HTTP 403) e os dois tool_result de PreToolUse:Bash hook error do pretooluse-merge-gate.sh"
       method: "leitura: mensagens verbatim do forge e da guarda no log do agente"
       locality: "host"
+  - id: E_DOGFOOD_B1_DISPATCH_CHECKS_DO_NOT_SATISFY_RULESET
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "sandbox, ruleset 25048413 (cópia do 25001643): fa03d33 com selftest-gate e lint-onion-artifacts completed:success app 15368 vindos de workflow_dispatch RECUSADO com GH013 '2 of 2 required status checks are expected' pelo GITHUB_TOKEN (run 38506294705, rule-suite 4511927226) e pelo admin (rule-suite 4511931585); 4ab5627, verde só por dispatch do admin, recusado 2x (4511952179, 4511956409); SHAs verdes por evento push noutra branch aceitos (d783de4, 0a53811, c5c782e)"
+    source_tier: 10
+    source_kind: primary
+    label: "REFUTA a premissa do B1 como desenhado: check run que nasce de workflow_dispatch NÃO satisfaz required_status_checks do ruleset, nem para o admin. Checks de evento push e o check run publicado pela API satisfazem."
+    narrative: "T2 com prova por workflow_dispatch: os 2 checks estavam completed:success no SHA com app 15368 e o push foi recusado mesmo assim. Dois controles (o admin empurrando o mesmo SHA; um SHA verde só por dispatch disparado pelo admin, recusado duas vezes com minutos de intervalo) e uma contraprova (SHAs verdes por push entram). A CAUSA não foi explicada; a medição é robusta (2 atores, 2 momentos). Isto derruba o passo 'dispara selftest+validate por workflow_dispatch' de C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS, não o B1 inteiro (ver E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS)."
+    trace: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38506294705"
+    provenance:
+      source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38506294705"
+      locator: "run 38506294705; rule-suites 4511927226, 4511931585, 4511952179, 4511956409"
+      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      locality: "web"
+  - id: E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "run 38506709399: escritor com GITHUB_TOKEN (checks: write) publica selftest-gate e lint-onion-artifacts via POST /check-runs (app 15368) e empurra 63e8d4f por fast-forward (c5c782e..63e8d4f), rc 0, ator github-actions[bot]; rule-suite 4511975684 required_status_checks pass; rule-suites?rule_suite_result=bypass = 0"
+    source_tier: 10
+    source_kind: primary
+    label: "O escritor entra no main por fast-forward SEM bypass se ele mesmo rodar os checks no job e publicar os check runs pela API. A garantia do ruleset vira 'um job do Actions publicou sucesso com esse nome', não 'o workflow selftest rodou'."
+    narrative: "Fecha Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD (a pergunta central) e Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY (T6: nenhum push aceito saiu por bypass; a avaliação da regra deu pass). Consequência declarada pelo agente: qualquer workflow com checks: write pode publicar selftest-gate; o escritor precisa rodar os comandos reais e publicar o rc lido, nunca um sucesso fixo. Variante NÃO testada: o próprio workflow selftest despachado publicar ao final um check run extra com o nome exigido."
+    trace: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38506709399"
+    provenance:
+      source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38506709399"
+      locator: "run 38506709399; rule-suite 4511975684; GET rule-suites?rule_suite_result=bypass"
+      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      locality: "web"
+  - id: E_DOGFOOD_B1_NOCHECKS_REJECTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-14"
+    verified_against: "run 38507118410: SHA 7a386f5 sem checks empurrado pelo GITHUB_TOKEN → rc 1, GH013 '2 of 2 required status checks are expected' (rule-suite 4512026189, github-actions[bot], fail); admin sem checks também recusado (T1, rule-suite 4511883675, fail)"
+    source_tier: 10
+    source_kind: primary
+    label: "O caminho de falha segura vale: SHA sem checks é recusado para o escritor e para o admin direto (o bypass do admin é só em PR)."
+    narrative: "T3 e T1 do dogfood. É o modo de falha que o Elenxo exigiu antes de confiar no caminho feliz."
+    trace: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507118410"
+    provenance:
+      source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507118410"
+      locator: "run 38507118410; rule-suites 4512026189 e 4511883675"
+      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      locality: "web"
+  - id: E_DOGFOOD_B1_PR_BY_GITHUB_TOKEN_NEEDS_APPROVAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "run 38506834350 / PR #1 do sandbox: o PR aberto pelo GITHUB_TOKEN gera runs pull_request com conclusão action_required; só ficaram verdes ~145 s depois da aprovação do admin; então o push por fast-forward foi aceito e o PR virou MERGED"
+    source_tier: 10
+    source_kind: primary
+    label: "A prova por PR aberto pelo GITHUB_TOKEN não é autônoma: os runs nascem action_required e exigem aprovação humana a cada run."
+    narrative: "Fecha a via 'PR do bot' como forma de obter os checks sem humano; reforça a escolha da variante check run e mantém o B2 (PR rolante) dependente de token de App."
+    trace: "https://github.com/marciocar/onion-ruleset-sandbox/pull/1"
+    provenance:
+      source: "https://github.com/marciocar/onion-ruleset-sandbox/pull/1"
+      locator: "run 38506834350; PR #1"
+      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      locality: "web"
+  - id: E_DOGFOOD_B1_ON_PUSH_SILENCED_AND_CURED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "actions/runs?head_sha=63e8d4f → total_count 0 (alarme-probe on:push não rodou no push do escritor); run 38507152179 com cure=both: probe 38507169010 (workflow_dispatch, sha=be8c14c) e 38507172687 (repository_dispatch, payload_sha=be8c14c) rodaram"
+    source_tier: 10
+    source_kind: primary
+    label: "CONFIRMA Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS: o push do escritor não dispara on:push. A cura testada é o escritor redisparar os workflows do main por workflow_dispatch ou repository_dispatch."
+    narrative: "Os workflows atingidos precisam aceitar esses eventos, e o inventário de quem fica mudo no core continua obrigatório (não feito no dogfood)."
+    trace: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507152179"
+    provenance:
+      source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507152179"
+      locator: "GET actions/runs?head_sha=63e8d4f; run 38507152179; probes 38507169010 e 38507172687"
+      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      locality: "web"
+  - id: E_DOGFOOD_B1_NON_FF_RACE_CONVERGES_WITH_CAP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "run 38507262580: 2 intrusos → 2 pushes '! [rejected] … (non-fast-forward)', convergiu na tentativa 3 (RESULT=accepted attempts=3); run 38507319397: 3 intrusos com teto 2 → RESULT=gave-up attempts=2, conclusão failure; a recusa por não-fast-forward não gera rule-suite"
+    source_tier: 10
+    source_kind: primary
+    label: "RESPONDE Q_B1_NON_FF_RACE_REDISPATCH: o retry (regenerar da ponta nova, novo SHA, nova prova) converge em intrusos+1 ciclos e o teto PARA de verdade. Cada ciclo paga a prova inteira; no core, a bancada de ~14,8 min."
+    narrative: "O custo por ciclo empurra para coalescer (concurrency group serial). O writer.yml do sandbox morria em silêncio no push recusado (bash -eo pipefail do Actions) até ganhar set +e: armadilha a levar para o core."
+    trace: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507262580"
+    provenance:
+      source: "https://github.com/marciocar/onion-ruleset-sandbox/actions/runs/38507262580"
+      locator: "runs 38507262580 e 38507319397"
+      method: "medição: dogfood do B1 no sandbox público (ruleset 25048413, cópia do 25001643, branch padrão trunk), relatado pelo subagente ac649ccbb407392d8 com runs e rule-suites"
+      locality: "web"
   - id: Q_GUARDA_DE_MAIN_CASA_PELO_NOME
     node_type: question
     plane: DEV
@@ -1626,6 +1738,22 @@ nodes:
     label: "A guarda pretooluse-merge-gate.sh casar o main pelo NOME, em qualquer repo, é intencional (protege também o main de adotante e o I3) ou deveria isentar um sandbox descartável do próprio maestro?"
     narrative: "A favor de manter: a sessão do core não escreve no main de repo alheio (I3), e o adotante não protege o main pelo host; uma isenção por repositório seria uma lista que erra pelo vocabulário. A favor de isentar: o dogfood do B1 exige escrever no main de um sandbox, e hoje só o maestro, fora da sessão, consegue. Opção intermediária a medir: isenção por marcador explícito no próprio sandbox, não por nome. O maestro decide."
     trace: "docs/evolution/research/postmerge-projection-writer-2026-10/SYNTHESIS.md"
+  - id: D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão delegada pelo maestro (autorização noturna de 2026-10-14), escolhida a recomendação; log em docs/evolution/decisions-delegated-2026-10-14.md — /meta:decide, escolhida «B1 gated, variante check run registrada»"
+    label: "B1 GATED: a Fase 0 (strict local, #1101) cura a causa do 478/479; a variante medida (escritor roda bancada+lint e publica os check runs, fast-forward sem bypass) fica registrada como caminho. Gatilho: main quebrar por combinação OU projeção >25% do main em 2 semanas."
+    narrative: "DECISÃO COMPLETA: o B1 fica GATED. A Fase 0 (strict local, #1101) cura a causa do 478/479. A variante viável medida no dogfood (o escritor roda bancada+lint no job e publica os check runs, fast-forward sem bypass, com redisparo dos workflows do main e teto de retry) fica registrada como o caminho, ao custo de enfraquecer a garantia do ruleset (E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS) e de pagar a bancada por ciclo (E_DOGFOOD_B1_NON_FF_RACE_CONVERGES_WITH_CAP). GATILHO: depois da Fase 0, o main quebrar por combinação de merges OU os commits de projeção seguirem acima de 25% do main em 2 semanas (medido). DELEGAÇÃO: o maestro autorizou, no período noturno de 2026-10-14, selar pelo /meta:decide escolhendo a recomendação; esta é a recomendada, e o histórico fica em docs/evolution/decisions-delegated-2026-10-14.md. Selado por /meta:decide em 2026-10-14: escolhida «B1 gated, variante check run registrada»; descartadas: «Executar a variante check run já» · «Testar antes a variante do check run publicado pelo próprio workflow selftest despachado»."
+    provenance:
+      source: "maestro, por delegação noturna de 2026-10-14 (docs/evolution/decisions-delegated-2026-10-14.md), aplicada na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «O dogfood refutou o B1 como desenhado e mediu uma variante viável com garantia mais fraca: executar, testar outra variante ou deixar gated?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
 edges:
   - from: E_MEDICAO_RULESET_E_PROJECOES_2026_10_14
     to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
@@ -2068,3 +2196,48 @@ edges:
   - from: Q_GUARDA_DE_MAIN_CASA_PELO_NOME
     to: E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN
     edge_type: TRACES_TO
+  - from: E_DOGFOOD_B1_DISPATCH_CHECKS_DO_NOT_SATISFY_RULESET
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_DOGFOOD_B1_DISPATCH_CHECKS_DO_NOT_SATISFY_RULESET
+    to: E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN
+    edge_type: TRACES_TO
+  - from: E_DOGFOOD_B1_DISPATCH_CHECKS_DO_NOT_SATISFY_RULESET
+    to: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS
+    to: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS
+    to: Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY
+    edge_type: SUPERSEDES
+  - from: E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_DOGFOOD_B1_NOCHECKS_REJECTED
+    to: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_B1_PR_BY_GITHUB_TOKEN_NEEDS_APPROVAL
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: CONSTRAINS
+  - from: E_DOGFOOD_B1_ON_PUSH_SILENCED_AND_CURED
+    to: Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS
+    edge_type: SUPERSEDES
+  - from: E_DOGFOOD_B1_NON_FF_RACE_CONVERGES_WITH_CAP
+    to: Q_B1_NON_FF_RACE_REDISPATCH
+    edge_type: SUPERSEDES
+  - from: D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: TRACES_TO
+  - from: E_DOGFOOD_B1_DISPATCH_CHECKS_DO_NOT_SATISFY_RULESET
+    to: D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS
+    to: D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_B1_NON_FF_RACE_CONVERGES_WITH_CAP
+    to: D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA
+    edge_type: SUPPORTS
+  - from: E_FASE0_STRICT_LOCAL_EXECUTADA_PR_1101
+    to: D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA
+    edge_type: SUPPORTS

@@ -1,5 +1,5 @@
 ---
-title: "Passo B — escritor único das projeções pós-merge: Fase 0 já (executada), B1 só depois de dogfood"
+title: "Passo B — escritor único das projeções pós-merge: Fase 0 executada, B1 gated depois do dogfood"
 date: 2026-10-14
 kg: docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 run_id: wf_e26bb266-4aa (decision) + wf_6babcd2c-1d8 (primaries)
@@ -13,8 +13,8 @@ review_after: 2026-11-13
 
 # Passo B — escritor único das projeções pós-merge
 
-> **Projeção** do grafo `postmerge-projection-writer-2026-10.kg.yaml` (96 nós: 93 escritos pelas duas
-> rodadas, mais 3 do empacotamento; radar `--integrity --schema` exit 0, `kg-contract-check.sh` rc 0).
+> **Projeção** do grafo `postmerge-projection-writer-2026-10.kg.yaml` (103 nós: 93 escritos pelas duas
+> rodadas, mais 10 do empacotamento, do dogfood e do selo delegado; radar `--integrity --schema` exit 0, `kg-contract-check.sh` rc 0).
 > Se esta prosa divergir do grafo, vale o grafo.
 > Pergunta: `Q_POSTMERGE_PROJECTION_WRITER_2026_10`, que é o Passo B de `D_MERGE_PROCESS_ONION_2026_10`.
 > Em vez de cada PR commitar as projeções geradas, um escritor único as regenera no main depois do
@@ -30,8 +30,8 @@ primárias antes do B1»**. Foram descartadas «Selar Fase 0 + B1 agora», «Só
 |---|---|---|
 | **0** | A cura contrarian C (`C_OPCAO_C_CONTRARIAN_STRICT_LOCAL`): o caminho verificado exige que a base do PR seja a ponta do main (strict local) e regenera as projeções na árvore combinada. O merge-sem-CI do #1081 fica condicionado a isso. | **EXECUTADA** no PR #1101, mergeado (`E_FASE0_STRICT_LOCAL_EXECUTADA_PR_1101`) |
 | **primárias** | Ler as docs de rulesets, bypass e status checks e as fontes contrarian antes de selar o B1 | **FEITA** em `wf_6babcd2c-1d8`: 8 fontes lidas e 24 claims ancoradas (`E_LACUNAS_PRIMARIES_POSTMERGE_WRITER_2026_10_14`) |
-| **1 (B1)** | Escritor único sem bypass (`C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS`): um job regenera, confere com `porcelain`, dispara os checks por `workflow_dispatch` e faz fast-forward do SHA verde no main | **NÃO selada.** A pergunta central foi para o dogfood, ver §4 |
-| reserva | B2, um PR rolante único com token de App | só entra se o B1 falhar no dogfood |
+| **1 (B1)** | Escritor único sem bypass (`C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS`): um job regenera, confere com `porcelain`, dispara os checks por `workflow_dispatch` e faz fast-forward do SHA verde no main | **GATED** (`D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA`, selo delegado). O dogfood refutou o desenho e mediu uma variante viável, ver §5 |
+| reserva | B2, um PR rolante único com token de App | segue reserva. O dogfood mediu que um PR aberto pelo `GITHUB_TOKEN` exige aprovação humana a cada run |
 | rejeitadas | B3 (App com bypass `always`), B4 (PAT do maestro no CI), U (não versionar) | Elenxo: rejeitar |
 
 **O que a Fase 0 mediu** no #1101. A bancada passou 93/93 e depois 94/94, com 9 casos novos (s1–s8 e
@@ -88,34 +88,67 @@ lida" passaram a `superseded`** com as leituras, e nada foi apagado. As que rest
 
 | Nó | Estado | O que pergunta |
 |---|---|---|
-| `Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD` | **selada** em 2026-10-14: «Dogfood num repo descartável» (descartadas «Só Fase 0, B1 gated» e «Selar B1 e provar no dogfood do próprio core») | Um SHA verde por `workflow_dispatch` entra por fast-forward com `GITHUB_TOKEN`? E um SHA sem checks é **recusado**? |
-| `Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY` | open | `bypass_actors` não está vazio (admin, `pull_request`). "Sem bypass" vale para o escritor, não para o ruleset |
-| `Q_B1_NON_FF_RACE_REDISPATCH` | open | Se o main anda entre a regeneração e o push, é preciso novo SHA e novo disparo. Qual o custo e a convergência da retentativa? |
-| `Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS` | open | O push com `GITHUB_TOKEN` silencia **todo** workflow `on:push` do main. Quem fica mudo? |
+| `Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD` | **selada** em 2026-10-14: «Dogfood num repo descartável» (descartadas «Só Fase 0, B1 gated» e «Selar B1 e provar no dogfood do próprio core»). **Respondida** pelo dogfood (§5) | Um SHA verde por `workflow_dispatch` entra por fast-forward com `GITHUB_TOKEN`? E um SHA sem checks é **recusado**? |
+| `Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY` | **superseded** por `E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS` (T6: bypass = 0) | `bypass_actors` não está vazio (admin, `pull_request`). "Sem bypass" vale para o escritor, não para o ruleset |
+| `Q_B1_NON_FF_RACE_REDISPATCH` | **superseded** por `E_DOGFOOD_B1_NON_FF_RACE_CONVERGES_WITH_CAP` (T5) | Se o main anda entre a regeneração e o push, é preciso novo SHA e novo disparo. Qual o custo e a convergência da retentativa? |
+| `Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS` | **superseded** por `E_DOGFOOD_B1_ON_PUSH_SILENCED_AND_CURED` (T4: confirmada, e a cura foi testada) | O push com `GITHUB_TOKEN` silencia **todo** workflow `on:push` do main. Quem fica mudo? |
 
-**O dogfood escolhido não rodou na sessão** (`E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN`).
-Houve dois bloqueios:
+As perguntas respondidas viraram `superseded` por aresta `SUPERSEDES`. Nada foi apagado.
 
-1. Um ruleset em repo **privado** na conta Free devolve HTTP 403, *"Upgrade to GitHub Pro or make
-   this repository public"*.
-2. A guarda `pretooluse-merge-gate.sh` veta a escrita no main de **qualquer** repo, porque casa pelo
-   nome e não pelo repositório.
+**Primeiro o dogfood ficou bloqueado** (`E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN`, mantido
+como histórico). Um ruleset em repo **privado** na conta Free devolve HTTP 403, *"Upgrade to GitHub
+Pro or make this repository public"*. E a guarda `pretooluse-merge-gate.sh` veta a escrita no main de
+**qualquer** repo, porque casa pelo nome e não pelo repositório. O desbloqueio foi tornar o sandbox
+**público** e usar como branch padrão a `trunk`. O ruleset vale para `~DEFAULT_BRANCH`, então o teste
+é equivalente, e a guarda não foi desligada. A pergunta **`Q_GUARDA_DE_MAIN_CASA_PELO_NOME`** segue
+open: casar pelo nome é intencional, porque protege também o main de adotante e o I3? Ou a guarda
+deveria isentar um sandbox descartável do próprio maestro?
 
-O seed e o T1 ficam com o maestro, fora da sessão, e o bloqueio abriu
-**`Q_GUARDA_DE_MAIN_CASA_PELO_NOME`** (open). Esse casamento é intencional, porque protege também o
-main de adotante e o I3? Ou a guarda deveria isentar um sandbox descartável do próprio maestro?
+## 5. O dogfood do B1 (T1–T6) e a decisão delegada
 
-## 5. NÃO-VERIFICADOS
+Foi medido no sandbox público com o ruleset 25048413, uma cópia do 25001643. Os runs e as rule-suites
+estão nos nós `E_DOGFOOD_B1_*`.
 
-- **A pergunta central do B1**: o fast-forward de um SHA verde num ruleset só com
-  `required_status_checks` (`strict=false`, integration 15368). Nenhuma primária a decide e o dogfood
-  está bloqueado.
+| T | Esperado | Observado | Nó |
+|---|---|---|---|
+| T1 | Push direto do admin sem checks: recusado | **Recusado** (GH013, rule-suite 4511883675) | `E_DOGFOOD_B1_NOCHECKS_REJECTED` |
+| T2, prova por `workflow_dispatch` (o B1 como desenhado) | SHA verde entra por fast-forward | **Recusado**, com os 2 checks `completed:success` (app 15368). Recusado também para o admin, e um SHA verde só por dispatch foi recusado 2× | `E_DOGFOOD_B1_DISPATCH_CHECKS_DO_NOT_SATISFY_RULESET` |
+| T2, check run publicado pelo escritor | — | **Aceito**, rc 0, fast-forward pelo `github-actions[bot]` (run 38506709399) | `E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS` |
+| T2, PR aberto pelo `GITHUB_TOKEN` | — | Os runs nascem `action_required` e só ficam verdes depois da aprovação do admin. **Não é autônomo** | `E_DOGFOOD_B1_PR_BY_GITHUB_TOKEN_NEEDS_APPROVAL` |
+| T3 | SHA sem checks: recusado | **Recusado** para o bot (rule-suite 4512026189) | `E_DOGFOOD_B1_NOCHECKS_REJECTED` |
+| T4 | O push do escritor não dispara `on:push`, e a cura dispara | **0 runs** `on:push`. A cura por `workflow_dispatch` e por `repository_dispatch` rodou no SHA certo | `E_DOGFOOD_B1_ON_PUSH_SILENCED_AND_CURED` |
+| T5 | A corrida de não-fast-forward converge | 2 intrusos: **3 ciclos**. 3 intrusos com teto 2: **gave-up**, ou seja, o teto para | `E_DOGFOOD_B1_NON_FF_RACE_CONVERGES_WITH_CAP` |
+| T6 | Sem bypass | `rule_suite_result=bypass` → **0** | `E_DOGFOOD_B1_WRITER_CHECKRUN_FF_ACCEPTED_NO_BYPASS` |
+
+**A leitura.** O B1 **como foi desenhado está refutado**: check run que nasce de `workflow_dispatch`
+não satisfaz o ruleset, e a causa não foi explicada. A variante viável é o escritor rodar a bancada e
+o lint no próprio job e publicar os check runs por `POST /check-runs`. Ela tem dois custos:
+
+- **a garantia enfraquece**: passa a ser "um job do Actions publicou sucesso com esse nome";
+- **cada ciclo da corrida paga a prova inteira**: no core, a bancada de ~14,8 min.
+
+**Decisão: `D_B1_GATED_VARIANTE_CHECKRUN_REGISTRADA`**, um selo **delegado**. O maestro autorizou, no
+período noturno de 2026-10-14, selar pelo `/meta:decide` escolhendo a recomendação. O histórico está
+em `docs/evolution/decisions-delegated-2026-10-14.md`. A escolha foi **«B1 gated, variante check run
+registrada»**. Foram descartadas «Executar a variante check run já» e «Testar antes a variante do check
+run publicado pelo próprio workflow selftest despachado».
+
+- **Por que gated:** a Fase 0 já cura a causa do 478/479.
+- **Gatilho:** depois da Fase 0, o main quebrar por combinação de merges **OU** os commits de projeção
+  seguirem acima de 25% do main em 2 semanas, medido.
+
+## 6. NÃO-VERIFICADOS
+
+- **Por que** o check run de `workflow_dispatch` não satisfaz o ruleset. Medido com 2 atores em 2
+  momentos, mas sem explicação, nem primária, nem diagnóstico.
+- A variante em que o próprio workflow `selftest` despachado publica um check run extra: não foi
+  testada, e foi descartada no selo.
+- O inventário dos workflows `on:push` do main do core que ficariam mudos: não foi feito.
+- O custo real da variante check run **no core**: o sandbox usou checks de `echo`, não a bancada.
 - Em conta User, se Integration, `github-actions[bot]` e DeployKey podem ser bypass actor. Só o admin
-  foi medido.
-- Se o bot pode ser bypass actor (as discussions 25305 e 43460 não decidem).
+  foi medido, e o T6 mostra apenas que o escritor não precisou de bypass.
 - A equivalência entre o compare do GitHub e o `merge-base` no #1101. A bancada usou remoto bare e um
   `gh` falso, sem merge real.
-- O comportamento sob rajada de merges (convergência do escritor e janela de defasagem do hook).
 - Eixos sem claim: Bazel, Nx e Turborepo "generated files", `linguist-generated` e o leitor em
   runtime de índice defasado.
 - Fontes cortadas por orçamento na 1ª rodada: 22 fontes e 25 claims. Ficaram de pé como objeção
@@ -123,7 +156,7 @@ main de adotante e o I3? Ou a guarda deveria isentar um sandbox descartável do 
 - Os títulos de quatro REGRAS de projeção citadas pelo Elenxo não foram verificados nas rodadas, e
   por isso esta síntese não as cita.
 
-## 6. Valeu a pena?
+## 7. Valeu a pena?
 
 | Run | Modo | Agentes | Tokens | Duração |
 |---|---|---|---|---|
@@ -131,14 +164,16 @@ main de adotante e o I3? Ou a guarda deveria isentar um sandbox descartável do 
 | `wf_6babcd2c-1d8` | primaries | 19 | 1.126.300 | ~9 min |
 | **total** | | **124** | **6.813.879** | **~29,5 min** |
 
-- **Tokens ÷ nós: 6.813.879 ÷ 93 nós escritos pelas rodadas ≈ 73.300 tokens por nó.** Contando os 96
-  nós do grafo, que incluem os 3 do empacotamento (escrita determinística e selos de 0 tokens de
-  workflow), são ≈ 71.000.
+- **Tokens ÷ nós: 6.813.879 ÷ 93 nós escritos pelas rodadas ≈ 73.300 tokens por nó.** Contando os 103
+  nós do grafo, são ≈ 66.200. Os 10 a mais vêm do empacotamento, do dogfood e dos selos. Eles são
+  escrita determinística, fora do contrato de custo dos workflows, e o custo do subagente do sandbox
+  não está somado.
 - **Por rodada** (o teto do `meta:` registra 64 nós da 1ª e +29 da 2ª):
   - decision: 5.687.579 ÷ 64 ≈ **88.900** tokens por nó;
   - primaries: 1.126.300 ÷ 29 ≈ **38.800** tokens por nó, porque ler fontes já nomeadas custa menos
     da metade de descobri-las.
 - **Sim, valeu.** A 1ª rodada achou a cura barata, a Fase 0, que já está no main, e mediu que ela
-  custa 10% de rebases a mais. A 2ª rodada fechou 5 lacunas e trocou 7 objeções "fonte não lida" por
-  leitura. E impediu um selo errado: a pergunta central do B1 **não** tem primária, e selar o B1 na
-  1ª rodada teria sido selar sobre fórum. O custo que sobra é o dogfood, que é do maestro.
+  custa 10% de rebases a mais. A 2ª rodada fechou 5 lacunas e, sobretudo, **recusou selar o B1 sobre
+  fórum**: a pergunta central não tinha primária. O dogfood que ela exigiu **refutou** o desenho
+  (check de `workflow_dispatch` não conta). Selar o B1 na 1ª rodada teria posto em produção um
+  escritor que nunca entraria no main.
