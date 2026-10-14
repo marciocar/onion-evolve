@@ -1,7 +1,8 @@
 ---
 branch: feat/dissect-against-and-study
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 61e18bef4304731a34cda45211576a696d97c080a213875246eea385dd36755a
+reviewed_code_sha256: e615064be83f3a8cbaf39fcfa4f03d904b1349cc2e62a210eefbef3c9592f25a
 findings_total: 7
 findings_real: 3
 findings_fixed: 3
