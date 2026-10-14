@@ -19,6 +19,8 @@
 # `git ls-remote --symref <url> HEAD` dá o ramo padrão; um clone raso sem checkout dá o objeto; o
 # carimbo vem de `git show HEAD:.claude/.onion-version` (dialeto novo `source_commit`, legado
 # `onion_version`) ou, na porta de marketplace, do `ref` do `provenance.json` do plugin.
+# `GIT_TERMINAL_PROMPT=0`: url https inexistente ou privada faz o git PEDIR credencial; numa sessão de
+# agente sem TTY isso trava em vez de falhar. Aqui falha, e vira `unreadable`.
 
 # url clonável a partir do `remote:` do registro. github.com/x/y → https; caminho absoluto ou url
 # completa ficam como estão; `n/a` e texto livre não têm url.
@@ -53,12 +55,12 @@ door_read_published() {
   local url="$1" work="$2" prov
   DPS_STATE=""; DPS_BRANCH=""; DPS_PIN=""; DPS_ROLE=""; DPS_RELEASE=""
   [ -n "${url}" ] || { DPS_STATE="no-url"; return 2; }
-  if ! DPS_BRANCH="$(git ls-remote --symref "${url}" HEAD 2>/dev/null | awk '/^ref:/{sub("refs/heads/","",$2); print $2; exit}')" \
+  if ! DPS_BRANCH="$(GIT_TERMINAL_PROMPT=0 git ls-remote --symref "${url}" HEAD 2>/dev/null | awk '/^ref:/{sub("refs/heads/","",$2); print $2; exit}')" \
      || [ -z "${DPS_BRANCH}" ]; then
     DPS_BRANCH=""; DPS_STATE="unreadable"; return 2
   fi
   rm -rf "${work:?}"
-  if ! git clone -q --depth 1 --no-checkout --branch "${DPS_BRANCH}" "${url}" "${work}" >/dev/null 2>&1; then
+  if ! GIT_TERMINAL_PROMPT=0 git clone -q --depth 1 --no-checkout --branch "${DPS_BRANCH}" "${url}" "${work}" >/dev/null 2>&1; then
     DPS_STATE="clone-failed"; return 2
   fi
   local stamp; stamp="$(git -C "${work}" show "HEAD:.claude/.onion-version" 2>/dev/null || true)"
