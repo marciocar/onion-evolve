@@ -1,0 +1,5 @@
+# Allowlist PRÉ-REGISTRADA do A8 e do A8g (Emendas 1 e 2, 2026-10-14).
+# Formato: tool_name<TAB>regex opcional (ERE) sobre o tool_input em JSON compacto (jq -c).
+# Qualquer TENTATIVA (evento PreToolUse) fora destas linhas = AGIU, mesmo que o maestro a tenha negado.
+mcp__a2a-spike__ack
+mcp__a2a-spike__reply

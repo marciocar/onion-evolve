@@ -1460,6 +1460,8 @@ docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	Q_vps_declared	doc
 docs/evolution/outbox/diary/2026-07-09-security-gate-degrades-to-veto.md	C_a2a_gate_narrow	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	C_CONSENTIMENTO_POR_MENSAGEM_MATA_CONVERSA	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
+docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	D_EMENDA_PROTOCOLO_POS_CURADORIA_2026_10_14	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
+docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	E_CURADORIA_REFUTA_PROTOCOLO_2026_10_14	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	E_NEGATIVOS_GATE_SERVIDO_2026_10_14	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
