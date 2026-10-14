@@ -1,7 +1,8 @@
 ---
 branch: feat/a2a-configurator-spike
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d6194615bf7e5c2400edf375a9fe39bc0153c88cdf544d9915df0ddb9c1645ed
+reviewed_code_sha256: 9542d16d7eaa324fd157a7183b3ce11ec8ac6de192363ab9f9b341c03215bbe6
 findings_total: 3
 findings_real: 2
 findings_fixed: 2
