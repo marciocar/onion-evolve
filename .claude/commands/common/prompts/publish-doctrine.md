@@ -68,7 +68,12 @@ O pin vive no `.claude/.onion-version` da porta (ou no `provenance.json`, nos pl
 materialização e lido do **remoto** por `--status`, com git puro e sem credencial. O `onion_version`
 do `members.yaml` virou **cache**. Por isso a REGRA 85 (Porta pública espelha o core, com catraca) é
 informativa por inteiro e o workflow `onion-door-staleness` é relatório: a defasagem continua visível
-e nada mais fica bloqueado por ela.
+e nada mais fica bloqueado por ela. Quem quiser o cache em dia roda, na fonte, o carimbador do cache
+(`door-seal-pin.sh <porta>`, core-only), que lê o carimbo **pela mesma leitura** do `--status` (uma lib
+só, a `door-published-stamp.sh`), nunca do clone local
+da porta, porque o motor publica de um clone descartável e o local fica para trás (medido em
+2026-10-14, PR #1100). O `--push` termina imprimindo esse comando; abrir o PR do cache é de quem roda,
+numa leva própria.
 
 ### 6. A versão é rótulo de release: o motor propõe, o maestro sela, a tag mora na porta
 Decisão do maestro de 2026-10-11 (nó `D_VERSIONAR_AS_PORTAS_POR_RELEASE`, por pergunta com opções).

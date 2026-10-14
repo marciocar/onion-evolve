@@ -25405,176 +25405,171 @@ run_model_ssot_selftests() {
 # As duas curas desta família nasceram da PRIMEIRA materialização real (2026-09-17), e as duas são
 # do tipo que só aparece publicando: o bundle levava chave nomeada por cliente (salva de subir por
 # um `.gitignore` do destino — acidente, não desenho) e a porta subiu sem README/LICENSE/CLAUDE.md.
-# ═══ ops/door-seal-pin.sh — o registro só é carimbado com o REMOTO conferido ══════════════
-# POR QUE EXISTE: o `onion_version` de um membro `kind: door` é LIDO pela REGRA 85 (Porta publica
-# espelha o core, com catraca) para decidir defasagem, e era mantido A MAO. Apodreceu DUAS VEZES em
-# 2026-09-25/26 — a segunda em duas horas, depois de eu escrever no proprio members.yaml que
-# "numero mantido a mao apodrece". O script fecha isso, e esta familia prende as SEIS portas de
-# saida fail-closed dele, porque um carimbo que erra afirma PUBLICO o que pode nao ser.
-# ⚠️ O `gh` e esbocado: o SUT fala com a rede, e o esboco ESPELHA a consulta real
-# (`gh api repos/<owner>/<repo>/commits/<branch> --jq .sha`).
+# ═══ ops/door-seal-pin.sh — o cache do registro só recebe o carimbo PUBLICADO, lido do REMOTO ═══
+# POR QUE EXISTE: o `onion_version` de um membro `kind: door` era mantido A MAO e apodreceu DUAS VEZES em
+# 2026-09-25/26. Desde a F3 ele e CACHE do carimbo publicado, e o script o alinha ao fato.
+# ⚠️ A CURA DE 2026-10-14 (PR #1100): a v2 lia o carimbo do CLONE LOCAL da porta, e a F3 publica de um
+# clone descartavel que nao toca o local — as 4 portas recusaram em --dry-run com o `--status` dizendo
+# "em dia". Agora a leitura e a do `--status` (`ops/door-published-stamp.sh`, `door_read_published`).
+# MUNDO FALSO SEM REDE: o remoto da porta e um bare local (o `remote:` aceita caminho absoluto), e um
+# CLONE LOCAL defasado/sujo fica registrado em `local_path` com um pin DIFERENTE — se o SUT o ler, os
+# casos (a)/(n) reprovam. MUTANTE do cabeçalho (rodado com ops/mutate-and-restore.sh): trocar a leitura
+# do remoto pela do clone local reprova (a), (c) e (n).
 run_door_seal_pin_selftests() {
-  local sut="${REPO_ROOT}/ops/door-seal-pin.sh"
+  local sut="${REPO_ROOT}/ops/door-seal-pin.sh" lib="${REPO_ROOT}/ops/door-published-stamp.sh"
   if [ ! -f "${sut}" ]; then record_skip "door-seal-pin: ops/ ausente (adotante) → pulado"; return; fi
   local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  local G=(-c user.email=t@t -c user.name=t)
 
-  # ── fakecore falso: repo git com origin/main de verdade (clone local), ops/ e o resolver ────────
-  local upstream="${d}/upstream" fakecore="${d}/fakecore" doorway="${d}/doorway"
+  # ── core falso: repo git com origin/main de verdade, ops/ (SUT + lib) e o resolver ──────────
+  local upstream="${d}/upstream" fakecore="${d}/fakecore" doorbare="${d}/door.git" seed="${d}/seed" stale="${d}/stale"
   mkdir -p "${upstream}"; git -C "${upstream}" init -q -b main
-  git -C "${upstream}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m base
+  git -C "${upstream}" "${G[@]}" commit -q --allow-empty -m base
+  local PIN_OLD; PIN_OLD="$(git -C "${upstream}" rev-parse --short=12 HEAD)"
+  git -C "${upstream}" "${G[@]}" commit -q --allow-empty -m publicado
   local PIN_OK; PIN_OK="$(git -C "${upstream}" rev-parse --short=12 HEAD)"
+  local PIN_OK40; PIN_OK40="$(git -C "${upstream}" rev-parse HEAD)"
   git clone -q "${upstream}" "${fakecore}" 2>/dev/null
   mkdir -p "${fakecore}/ops" "${fakecore}/.claude/validation" "${fakecore}/docs/evolution/federation"
-  cp "${sut}" "${fakecore}/ops/"
+  cp "${sut}" "${lib}" "${fakecore}/ops/"
   cp "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${fakecore}/.claude/validation/" 2>/dev/null || true
   # commit SÓ no core falso (não empurrado) → serve de "pin fora da integração"
-  git -C "${fakecore}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m "fora da integracao"
+  git -C "${fakecore}" "${G[@]}" commit -q --allow-empty -m "fora da integracao"
   local PIN_FORA; PIN_FORA="$(git -C "${fakecore}" rev-parse --short=12 HEAD)"
 
-  # ── doorway falsa: clone git com stamp declarando um pin ────────────────────────────────────
-  mkdir -p "${doorway}/.claude"; git -C "${doorway}" init -q -b main
-  _doorway_stamp() {  # $1 = pin declarado
-    printf 'role: hub\nadopted_from: onion-fakecore\nonion_version: %s\nmaterialized_at: 2026-09-26\n' "$1" > "${doorway}/.claude/.onion-version"
-    git -C "${doorway}" add -A >/dev/null 2>&1
-    # `|| true`: chamar o helper duas vezes com o MESMO pin não tem o que commitar, e `git commit`
-    # sai não-zero aí — que sob `set -e` mata a suíte inteira, sem registrar nenhum ✗. Terceira vez
-    # nesta leva que essa armadilha aparece; o helper passa a tolerá-la em vez de cada caso lembrar.
-    git -C "${doorway}" -c user.email=t@t -c user.name=t commit -q -m "stamp $1" 2>/dev/null || true
+  # ── a porta: REMOTO bare + seed que empurra; o clone LOCAL fica no pin velho e sujo ─────────
+  git init -q --bare -b main "${doorbare}" >/dev/null 2>&1
+  git clone -q "${doorbare}" "${seed}" 2>/dev/null; mkdir -p "${seed}/.claude"
+  _door_publish() {  # $1 = conteúdo do carimbo (vazio = porta sem carimbo) ; empurra ao remoto
+    rm -rf "${seed}/.claude/.onion-version" "${seed}/plugins"
+    [ -n "$1" ] && printf '%s\n' "$1" > "${seed}/.claude/.onion-version"
+    printf '%s\n' "$RANDOM$RANDOM" > "${seed}/README.md"
+    git -C "${seed}" add -A >/dev/null 2>&1
+    git -C "${seed}" "${G[@]}" commit -q -m publica 2>/dev/null || true
+    git -C "${seed}" push -q origin HEAD:main >/dev/null 2>&1 || true
   }
-  _registry() {  # $1 = kind ; $2 = pin no registro
+  _door_publish "role: hub
+onion_version: ${PIN_OLD}"
+  git clone -q "${doorbare}" "${stale}" 2>/dev/null   # o clone local NASCE aqui, no pin velho
+  printf 'materializado, nao commitado\n' > "${stale}/sujeira.txt"   # e fica sujo, como o onion-mini medido
+  _registry() {  # $1 = kind ; $2 = pin no registro ; $3 = remote (default: o bare)
     { printf 'members:\n'
-      printf '  - id: doorway-teste\n    kind: %s\n    remote: github.com/dono/doorway-teste\n' "$1"
-      printf '    local_path: "%s"\n    onion_version: %s   # comentário inline preservado?\n' "${doorway}" "$2"
+      printf '  - id: doorway-teste\n    kind: %s\n    remote: %s\n' "$1" "${3:-${doorbare}}"
+      printf '    local_path: "%s"\n    onion_version: %s   # comentário inline preservado?\n' "${stale}" "$2"
       printf '  - id: outro\n    kind: adopter\n    onion_version: aaaaaaaaaaaa\n'
     } > "${fakecore}/docs/evolution/federation/members.yaml"
   }
-  # esboço do `gh`: devolve o sha que GH_REMOTE_SHA mandar (vazio = remoto ilegível)
-  cat > "${d}/gh" <<'STUB'
-#!/usr/bin/env bash
-case "$*" in
-  *"api repos/"*commits*) [ -n "${GH_REMOTE_SHA:-}" ] && echo "${GH_REMOTE_SHA}"; exit 0 ;;
-esac
-exit 0
-STUB
-  chmod +x "${d}/gh"
-  local _o _r
-  _seal() {  # $@ = flags extra ; usa GH_REMOTE_SHA do ambiente
-    if _o="$(PATH="${d}:${PATH}" bash "${fakecore}/ops/door-seal-pin.sh" doorway-teste "$@" 2>&1)"; then _r=0; else _r=$?; fi
-  }
+  local M="${fakecore}/docs/evolution/federation/members.yaml" _o _r
+  _seal() { if _o="$(bash "${fakecore}/ops/door-seal-pin.sh" doorway-teste "$@" 2>&1)"; then _r=0; else _r=$?; fi; }
 
-  # (a) tudo conferido + registro DEFASADO ⇒ carimba, e o comentário do resto do arquivo sobrevive
-  _doorway_stamp "${PIN_OK}"; _registry door "ffffffffffff"
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
-  if [ "${_r}" -eq 0 ] && grep -qF "onion_version: ${PIN_OK}" "${fakecore}/docs/evolution/federation/members.yaml" \
-     && grep -qF "onion_version: aaaaaaaaaaaa" "${fakecore}/docs/evolution/federation/members.yaml"; then
-    record_pass "door-seal-pin: (a) remoto conferido + registro defasado ⇒ carimba SÓ o membro certo"
-  else record_fail "door-seal-pin: (a)" "rc=${_r} out=${_o:0:250}"; fi
+  # (a) O CASO MEDIDO: remoto com carimbo novo, clone local ATRÁS e SUJO ⇒ carimba o pin do REMOTO,
+  #     só no membro certo. A v2 recusava aqui (árvore suja) — e, limpa, carimbaria o pin VELHO do clone.
+  _door_publish "framework: x
+source_commit: ${PIN_OK}
+role: hub
+kind: door
+release: 1.1.0"
+  _registry door "ffffffffffff"; _seal
+  if [ "${_r}" -eq 0 ] && grep -qF "onion_version: ${PIN_OK}" "${M}" && grep -qF "onion_version: aaaaaaaaaaaa" "${M}" \
+     && ! grep -qF "onion_version: ${PIN_OLD}" "${M}"; then
+    record_pass "door-seal-pin: (a) remoto carimbado + clone local defasado e sujo ⇒ carimba o pin do REMOTO, só no membro certo"
+  else record_fail "door-seal-pin: (a) não carimbou o pin do remoto" "rc=${_r} out=${_o:0:300}"; fi
 
-  # (b) registro JÁ em dia ⇒ no-op explícito (não reescreve, não mente que carimbou)
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  # (b) registro JÁ em dia ⇒ no-op explícito
+  _seal
   if [ "${_r}" -eq 0 ] && grep -qF "já em dia" <<< "${_o}"; then
     record_pass "door-seal-pin: (b) registro em dia ⇒ no-op declarado"
   else record_fail "door-seal-pin: (b)" "rc=${_r} out=${_o:0:200}"; fi
 
-  # (c) PUSH NÃO ACONTECEU (clone ≠ remoto) ⇒ recusa. É a doorway que mais imdoorway: carimbar aqui
-  #     afirmaria PÚBLICO um commit que só existe no disco.
-  _registry door "ffffffffffff"
-  GH_REMOTE_SHA="0000000000000000000000000000000000000000" _seal
-  if [ "${_r}" -eq 1 ] && grep -qiE 'nao bate|NÃO bate' <<< "${_o}"; then
-    record_pass "door-seal-pin: (c) clone ≠ remoto ⇒ recusa (não afirma público o que é local)"
-  else record_fail "door-seal-pin: (c) carimbou sem push" "rc=${_r} out=${_o:0:200}"; fi
+  # (c) REMOTO ILEGÍVEL ⇒ rc=2, registro INTACTO, e a recusa DECLARA que não cai para o clone local.
+  #     O clone local está lá, com carimbo legível: um fallback silencioso carimbaria o pin dele.
+  _registry door "ffffffffffff" "${d}/nao-existe.git"; _seal
+  if [ "${_r}" -eq 2 ] && grep -qF "ffffffffffff" "${M}" && grep -qF "clone local não prova publicação" <<< "${_o}"; then
+    record_pass "door-seal-pin: (c) remoto ilegível ⇒ rc=2, registro INTACTO e recusa declarada (sem cair no clone)"
+  else record_fail "door-seal-pin: (c) remoto ilegível" "rc=${_r} out=${_o:0:250}"; fi
 
-  # (d) REMOTO ILEGÍVEL ⇒ rc=2 e NÃO carimba. "Não pude conferir" nunca vira "está certo".
-  GH_REMOTE_SHA="" _seal
-  if [ "${_r}" -eq 2 ] && grep -qF "ffffffffffff" "${fakecore}/docs/evolution/federation/members.yaml"; then
-    record_pass "door-seal-pin: (d) remoto ilegível ⇒ rc=2 e registro INTACTO"
+  # (d) remoto sem url clonável no registro ⇒ rc=2
+  _registry door "ffffffffffff" "n/a"; _seal
+  if [ "${_r}" -eq 2 ] && grep -qF "ffffffffffff" "${M}" && grep -qF "url clonável" <<< "${_o}"; then
+    record_pass "door-seal-pin: (d) registro sem url clonável ⇒ rc=2"
   else record_fail "door-seal-pin: (d)" "rc=${_r} out=${_o:0:200}"; fi
 
-  # (e) pin FORA da integração (doorway materializada de branch — o defeito de 2026-09-25) ⇒ recusa
-  _doorway_stamp "${PIN_FORA}"; _registry door "ffffffffffff"
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
-  if [ "${_r}" -eq 1 ] && grep -qiE 'nao esta em origin|NÃO está em origin' <<< "${_o}"; then
-    record_pass "door-seal-pin: (e) pin fora de origin/main ⇒ recusa (não legitima doorway de branch)"
+  # (e) pin FORA da integração (porta materializada de branch — o defeito de 2026-09-25) ⇒ recusa
+  _door_publish "source_commit: ${PIN_FORA}
+role: hub"
+  _registry door "ffffffffffff"; _seal
+  if [ "${_r}" -eq 1 ] && grep -qF "NÃO está em origin" <<< "${_o}" && grep -qF "ffffffffffff" "${M}"; then
+    record_pass "door-seal-pin: (e) pin fora de origin/main ⇒ recusa (não legitima porta de branch)"
   else record_fail "door-seal-pin: (e)" "rc=${_r} out=${_o:0:250}"; fi
 
   # (f) pin que NÃO é commit deste core (forjado/truncado) ⇒ recusa
-  _doorway_stamp "deadbeefcafe"; _registry door "ffffffffffff"
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
-  if [ "${_r}" -eq 1 ] && grep -qiE 'nao e commit|NÃO é commit' <<< "${_o}"; then
+  _door_publish "source_commit: deadbeefcafe
+role: hub"
+  _seal
+  if [ "${_r}" -eq 1 ] && grep -qF "NÃO é commit" <<< "${_o}"; then
     record_pass "door-seal-pin: (f) pin forjado ⇒ recusa"
   else record_fail "door-seal-pin: (f)" "rc=${_r} out=${_o:0:200}"; fi
 
-  # (g) kind ≠ door ⇒ rc=2. O objeto desta guarda é PORTA; adotante comum não é espelho do core falso.
-  _doorway_stamp "${PIN_OK}"; _registry adopter "ffffffffffff"
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
-  if [ "${_r}" -eq 2 ] && grep -qiE "nao 'door'|não 'door'" <<< "${_o}"; then
+  # (g) kind ≠ door ⇒ rc=2
+  _door_publish "source_commit: ${PIN_OK}
+role: hub"
+  _registry adopter "ffffffffffff"; _seal
+  if [ "${_r}" -eq 2 ] && grep -qF "não 'door'" <<< "${_o}"; then
     record_pass "door-seal-pin: (g) kind ≠ door ⇒ rc=2 (fora do objeto da guarda)"
   else record_fail "door-seal-pin: (g)" "rc=${_r} out=${_o:0:200}"; fi
 
-  # (h) --dry-run NÃO escreve — a diferença entre ver e fazer é medida, não prometida
-  _registry door "ffffffffffff"
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal --dry-run
-  if [ "${_r}" -eq 0 ] && grep -qF "ffffffffffff" "${fakecore}/docs/evolution/federation/members.yaml"; then
+  # (h) --dry-run NÃO escreve
+  _registry door "ffffffffffff"; _seal --dry-run
+  if [ "${_r}" -eq 0 ] && grep -qF "ffffffffffff" "${M}" && grep -qF "eu carimbaria" <<< "${_o}"; then
     record_pass "door-seal-pin: (h) --dry-run mostra e NÃO escreve"
   else record_fail "door-seal-pin: (h) dry-run escreveu" "rc=${_r} out=${_o:0:200}"; fi
 
-  # (i) stamp com pin ILEGÍVEL ⇒ rc=2. Não se carimba o que não se consegue ler.
-  # ── (j)(k) O DEFEITO QUE O PRÓPRIO DOGFOOD ACHOU, na 1ª execução real (2026-09-26) ──────────
-  # A v1 lia o pin do stamp da ÁRVORE DE TRABALHO. Rodado depois de materializar e ANTES de commitar,
-  # ele lia o pin NOVO (só no disco) e comparava `HEAD` do clone com o remoto — e `HEAD` ainda era o
-  # commit antigo, IGUAL ao remoto. As duas conferências passavam, e ele carimbou como PUBLICADO um pin
-  # que não existia além do disco: exatamente o que este script existe para impedir.
-  # ⚠️ E o caso (c) NÃO pegava isso: ele esboça um remoto DIFERENTE, cenário que o fluxo real não
-  # produz. Caso que testa um mundo que não acontece não é cobertura.
-  _doorway_stamp "${PIN_OK}"; _registry door "ffffffffffff"
-  printf 'materializado, nao commitado\n' > "${doorway}/sujeira.txt"
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
-  rm -f "${doorway}/sujeira.txt"
-  if [ "${_r}" -eq 1 ] && grep -qiE 'nao-commitado|não-commitado' <<< "${_o}" \
-     && grep -qF "ffffffffffff" "${fakecore}/docs/evolution/federation/members.yaml"; then
-    record_pass "door-seal-pin: (j) árvore da porta SUJA ⇒ recusa e registro INTACTO (disco ≠ publicação)"
-  else record_fail "door-seal-pin: (j) carimbou materialização não-commitada" "rc=${_r} out=${_o:0:250}"; fi
-
-  # (k) o pin vem do stamp COMMITADO (`git show HEAD:`), não do disco — a fonte da leitura É a defesa.
-  _doorway_stamp "${PIN_OK}"; _registry door "ffffffffffff"
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
-  if [ "${_r}" -eq 0 ] && grep -qF "onion_version: ${PIN_OK}" "${fakecore}/docs/evolution/federation/members.yaml"; then
-    record_pass "door-seal-pin: (k) pin lido do stamp COMMITADO, não da árvore"
-  else record_fail "door-seal-pin: (k)" "rc=${_r} out=${_o:0:200}"; fi
-
-  # ⚠️ COMMITADO de propósito: desde a cura de 2026-09-26 o pin é lido de `git show HEAD:`, e árvore
-  #    suja recusa ANTES. Escrever só no disco faria este caso medir a guarda ERRADA — foi o que
-  #    aconteceu na 1ª volta, e o ✗ apontou para a guarda nova em vez do defeito que (i) persegue.
-  printf 'role: hub\nonion_version: nao-e-um-sha\n' > "${doorway}/.claude/.onion-version"
-  git -C "${doorway}" add -A >/dev/null 2>&1
-  git -C "${doorway}" -c user.email=t@t -c user.name=t commit -q -m 'stamp ilegivel' 2>/dev/null || true
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
-  if [ "${_r}" -eq 2 ] && grep -qiE 'ilegivel|ilegível' <<< "${_o}"; then
-    record_pass "door-seal-pin: (i) pin ilegível no stamp ⇒ rc=2"
+  # (i) carimbo publicado com pin ILEGÍVEL ⇒ rc=2
+  _door_publish "role: hub
+onion_version: nao-e-um-sha"
+  _seal
+  if [ "${_r}" -eq 2 ] && grep -qF "ilegível" <<< "${_o}"; then
+    record_pass "door-seal-pin: (i) pin ilegível no carimbo publicado ⇒ rc=2"
   else record_fail "door-seal-pin: (i)" "rc=${_r} out=${_o:0:200}"; fi
 
-  # (l)(m) STAMP ÚNICO (F1 das portas, 2026-10-09): a porta passou a ser carimbada pelo `write-stamp.sh
-  #     --kind door`, que escreve `source_commit` — o dialeto velho (`onion_version`) segue lido como
-  #     fallback para as portas já publicadas. (l) o dialeto NOVO é lido; (m) com os DOIS campos, o novo
-  #     vence (o velho carrega um pin forjado: se ele vencesse, o caso (f) recusaria). MUTANTES: tirar a
-  #     leitura de `source_commit` reprova (l) e (m); tirar o fallback reprova (a)/(k).
-  printf 'framework: x\nsource_commit: %s\nsource_commit_date: 2026-10-09\nrole: hub\nkind: door\nmaterialized_at: 2026-10-09\n' "${PIN_OK}" > "${doorway}/.claude/.onion-version"
-  git -C "${doorway}" add -A >/dev/null 2>&1
-  git -C "${doorway}" -c user.email=t@t -c user.name=t commit -q -m 'stamp dialeto novo' 2>/dev/null || true
-  _registry door "ffffffffffff"
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
-  if [ "${_r}" -eq 0 ] && grep -qF "onion_version: ${PIN_OK}" "${fakecore}/docs/evolution/federation/members.yaml"; then
-    record_pass "door-seal-pin: (l) stamp do write-stamp --kind door (source_commit) é lido e carimbado"
-  else record_fail "door-seal-pin: (l) dialeto novo não lido" "rc=${_r} out=${_o:0:200}"; fi
-  printf 'source_commit: %s\nonion_version: deadbeefcafe\nrole: hub\nkind: door\n' "${PIN_OK}" > "${doorway}/.claude/.onion-version"
-  git -C "${doorway}" add -A >/dev/null 2>&1
-  git -C "${doorway}" -c user.email=t@t -c user.name=t commit -q -m 'stamp com os dois campos' 2>/dev/null || true
-  _registry door "ffffffffffff"
-  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
-  if [ "${_r}" -eq 0 ] && grep -qF "onion_version: ${PIN_OK}" "${fakecore}/docs/evolution/federation/members.yaml"; then
+  # (j) remoto lido e SEM carimbo ⇒ rc=2 (porta nunca materializada pelo motor)
+  _door_publish ""
+  _seal
+  if [ "${_r}" -eq 2 ] && grep -qF "NÃO traz carimbo" <<< "${_o}" && grep -qF "ffffffffffff" "${M}"; then
+    record_pass "door-seal-pin: (j) remoto sem carimbo ⇒ rc=2 e registro INTACTO"
+  else record_fail "door-seal-pin: (j)" "rc=${_r} out=${_o:0:200}"; fi
+
+  # (m) com source_commit E onion_version, o campo NOVO vence (o velho é forjado: se vencesse, (f) recusaria)
+  _door_publish "source_commit: ${PIN_OK}
+onion_version: deadbeefcafe
+role: hub"
+  _registry door "ffffffffffff"; _seal
+  if [ "${_r}" -eq 0 ] && grep -qF "onion_version: ${PIN_OK}" "${M}"; then
     record_pass "door-seal-pin: (m) com source_commit E onion_version, o campo NOVO vence"
   else record_fail "door-seal-pin: (m) o campo legado venceu" "rc=${_r} out=${_o:0:200}"; fi
-  unset -f _seal _doorway_stamp _registry
+
+  # (n) porta de MARKETPLACE: carimbo no provenance.json com `ref` de 40 ⇒ lido e normalizado a 12;
+  #     com o cache já nos 12, é no-op (achado do 1º dogfood: a comparação literal reescrevia o cache).
+  _door_publish ""
+  mkdir -p "${seed}/plugins/onion/.claude-plugin"
+  printf '{\n  "ref": "%s",\n  "onion_release": "1.1.0"\n}\n' "${PIN_OK40}" > "${seed}/plugins/onion/.claude-plugin/provenance.json"
+  git -C "${seed}" add -A >/dev/null 2>&1; git -C "${seed}" "${G[@]}" commit -q -m plugins 2>/dev/null || true
+  git -C "${seed}" push -q origin HEAD:main >/dev/null 2>&1 || true
+  _registry door "ffffffffffff"; _seal
+  local _n1="${_r}" _n1o="${_o}"; _seal
+  if [ "${_n1}" -eq 0 ] && grep -qE "onion_version: ${PIN_OK}( |$)" "${M}" && ! grep -qF "${PIN_OK40}" "${M}" \
+     && [ "${_r}" -eq 0 ] && grep -qF "já em dia" <<< "${_o}"; then
+    record_pass "door-seal-pin: (n) plugins: ref de 40 no provenance.json ⇒ carimba 12 e a 2ª rodada é no-op"
+  else record_fail "door-seal-pin: (n) marketplace" "rc1=${_n1} out1=${_n1o:0:200} rc2=${_r} out2=${_o:0:150}"; fi
+
+  # (o) a LIB ausente ⇒ rc=2: o SUT não reimplementa a leitura (uma leitura, um lugar)
+  mv "${fakecore}/ops/door-published-stamp.sh" "${d}/lib.bak"
+  _registry door "ffffffffffff"; _seal
+  mv "${d}/lib.bak" "${fakecore}/ops/door-published-stamp.sh"
+  if [ "${_r}" -eq 2 ] && grep -qF "não a reimplemento" <<< "${_o}" && grep -qF "ffffffffffff" "${M}"; then
+    record_pass "door-seal-pin: (o) sem ops/door-published-stamp.sh ⇒ rc=2 (não há 2ª leitura escondida)"
+  else record_fail "door-seal-pin: (o) lib ausente" "rc=${_r} out=${_o:0:200}"; fi
+  unset -f _seal _door_publish _registry
 }
 
 # ── ops/registry-pins.sh — o pin do ADOTANTE conferido contra o carimbo VIVO (F1.5, SAC-90) ─────
@@ -26638,6 +26633,7 @@ run_publish_selftests() {
   mkdir -p "${core}/ops" "${core}/.claude/validation" "${core}/.claude/utils/adopt" "${core}/.claude/agents" \
            "${core}/docs/evolution/federation" "${core}/payload/.claude/validation"
   cp "${sut}" "${core}/ops/publish-door.sh"
+  cp "${REPO_ROOT}/ops/door-published-stamp.sh" "${core}/ops/"   # a leitura do carimbo publicado (lib, 2026-10-14)
   cp "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${core}/.claude/validation/" 2>/dev/null || true
   cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" "${core}/.claude/validation/"
   cp "${REPO_ROOT}/.claude/validation/door-leak-scan.sh" "${core}/.claude/validation/"   # o (5a) mora aqui desde 2026-10-14
@@ -26767,6 +26763,11 @@ STUB
      && grep -q 'CONFERIDO no remoto' <<< "${_o}" && [ "$(_snap)" = "${snap0}" ]; then
     record_pass "publish: (b) --push publica, confere o remoto, carimba ${NEWPIN} e não toca o core"
   else record_fail "publish: (b)" "rc=${_r} pin=$(_door_pin) esperado=${NEWPIN} out=${_o:0:300}"; fi
+  # (b2) depois do push, a DICA do cache do registro (comando exato, pela porta publicada) — só a dica:
+  #      o motor não escreve no members.yaml nem abre PR (regra da ponte; PR #1100 de 2026-10-14)
+  if grep -qF "bash ops/door-seal-pin.sh porta-a --dry-run" <<< "${_o}" && [ "$(_snap)" = "${snap0}" ]; then
+    record_pass "publish: (b2) --push termina com o comando exato do cache do registro, sem tocar o core"
+  else record_fail "publish: (b2) sem a dica do cache" "out=${_o:0:300}"; fi
 
   # (c) --status lê o carimbo do REMOTO, não o cache do registro (que aqui mente: diz OLDPIN)
   _pub_members standalone "${OLDPIN}"
@@ -27054,6 +27055,7 @@ run_publish_release_selftests() {
   mkdir -p "${core}/ops" "${core}/.claude/validation" "${core}/.claude/utils/adopt" "${core}/.claude/agents" \
            "${core}/.claude/commands/x" "${core}/.claude/utils/marketplace" "${core}/docs/evolution/federation"
   cp "${sut}" "${core}/ops/publish-door.sh"
+  cp "${REPO_ROOT}/ops/door-published-stamp.sh" "${core}/ops/"   # a leitura do carimbo publicado (lib, 2026-10-14)
   cp "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${core}/.claude/validation/" 2>/dev/null || true
   cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" "${core}/.claude/validation/"
   cp "${REPO_ROOT}/.claude/validation/door-leak-scan.sh" "${core}/.claude/validation/"   # o (5a) mora aqui desde 2026-10-14
