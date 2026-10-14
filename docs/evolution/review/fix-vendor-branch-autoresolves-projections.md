@@ -1,7 +1,8 @@
 ---
 branch: fix/vendor-branch-autoresolves-projections
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 167ac49bf12a0512cc05eeb557fe42cfe4ce5cd024672983018466f63f182a7f
+reviewed_code_sha256: e9cdb35e87136f4f9cd8be5603edfd3b41d083fdb384b8cf6b43a7430ada2712
 findings_total: 3
 findings_real: 2
 findings_fixed: 2
