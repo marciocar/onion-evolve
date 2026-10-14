@@ -17,15 +17,17 @@ critério de "pronto" que se confere por comando.
 
 ## Objetivo
 
-No fim da aula, cada dupla sai com quatro coisas **no repositório**, todas conferíveis:
+No fim da aula, cada dupla sai com cinco coisas **no repositório**, todas conferíveis:
 
 1. **Um grafo que o motor lê.** Os grafos do hub passam no `kg-radar` sem aviso e o `/meta:drive` os aceita.
 2. **Um projeto mapeado contra o código.** As regras de domínio de um projeto real apontam para o
    arquivo e a linha que as executam, e não só para o documento que as descreve.
 3. **Um documento de negócio ligado ao projeto.** Um documento das aulas 2 a 4 que ainda não estava
    em grafo nenhum vira nós, com a confiança certa, ligados às regras que ele afeta.
-4. **Um componente do time forjado.** Uma skill com doutrina, medidor e bancada, nascida de uma dor
-   que vocês mediram, e que o censo da forja enxerga.
+4. **Uma ferramenta de terceiro dissecada e decidida.** Um grafo de dissecação com veredito e o nó
+   de decisão selado, antes de qualquer adoção.
+5. **Um componente do time forjado.** Uma skill com doutrina, medidor e bancada, nascida de uma dor
+   que vocês mediram (ou do plano de absorção da dissecação), e que o censo da forja enxerga.
 
 E uma ideia: **o grafo é o estado do trabalho, não um desenho dele.** A sessão lê o grafo antes de
 ler a prosa, o backlog é projeção do grafo, e uma decisão só existe quando está selada nele.
@@ -69,7 +71,8 @@ Anote na ficha da turma (fica com vocês, não entra neste material):
 Confira em 2 minutos, no começo da aula:
 
 Antes da aula, quem cuida do hub roda o **`/meta:adopt --update` do hub** e mergeia a
-atualização: os blocos D e E pedem um pin que já traga o `/meta:decide` e o `/meta:forge` abertos
+atualização: os blocos D, E e F pedem um pin que já traga o `/meta:decide`, o `/meta:dissect` e o
+`/meta:forge` abertos
 (pin **≥ <a definir>**). Depois, os projetos adotados pelo hub se atualizam do mesmo jeito.
 
 ```bash
@@ -78,6 +81,8 @@ git switch -c lesson-5/<seu-nome>        # cada dupla numa branch própria
 cat .claude/.onion-version               # o pin precisa ser o mesmo da turma
 ls .claude/validation/kg-radar.sh .claude/validation/forge-census.sh .claude/rules/kg-grammar.md
 ls .claude/commands/meta/decide.md .claude/commands/meta/forge.md .claude/validation/kg-decide-seal.sh
+ls .claude/commands/meta/dissect.md .claude/validation/dissect-census.sh
+docker --version || echo "sem Docker: o bloco E usa worktree descartável"
 python3 -c "import yaml" && echo "PyYAML ok"   # o /meta:drive e o kg-realign leem YAML
 ```
 
@@ -91,13 +96,14 @@ Resolva antes da aula, não durante.
 | Bloco | Tema | Tempo |
 |---|---|---|
 | 0 | Abertura: o que a sessão sabe antes de você falar | 10 min |
-| A | O grafo como fonte única, e a gramática | 25 min |
-| B | Mapear um projeto real contra o código | 35 min |
-| C | Mapear um documento de negócio e ligar ao projeto | 30 min |
+| A | O grafo como fonte única, e a gramática | 20 min |
+| B | Mapear um projeto real contra o código | 30 min |
+| C | Mapear um documento de negócio e ligar ao projeto | 25 min |
 | — | Intervalo | 10 min |
-| D | O grafo como runtime: warm-up, backlog, realign, drive e `/meta:decide` | 25 min |
-| E | A forja: forjar um componente do time com o `/meta:forge` | 40 min |
-| F | Fechamento e ponte para a aula 6 | 5 min |
+| D | O grafo como runtime: warm-up, backlog, realign, drive e `/meta:decide` | 20 min |
+| E | Dissecar antes de adotar: o `/meta:dissect` | 25 min |
+| F | A forja: forjar um componente do time com o `/meta:forge` | 35 min |
+| G | Fechamento e ponte para a aula 6 | 5 min |
 | | **Total** | **3 h** |
 
 ---
@@ -122,7 +128,7 @@ ela é respondida.
 
 ---
 
-## Bloco A — O grafo como fonte única, e a gramática (25 min)
+## Bloco A — O grafo como fonte única, e a gramática (20 min)
 
 **Conceito.** Um `.kg.yaml` é um grafo tipado: **nós** com `node_type:` (o que a coisa é) e
 **arestas** com `edge_type:` (como as coisas se relacionam). Há duas camadas. A `audit` registra
@@ -179,7 +185,7 @@ git diff --stat                                                    # só linhas 
 
 ---
 
-## Bloco B — Mapear um projeto real contra o código (35 min)
+## Bloco B — Mapear um projeto real contra o código (30 min)
 
 **Conceito.** Um grafo de domínio feito a partir de um documento diz o que alguém **escreveu** que
 o sistema faz. Quando o código chega, cada `rule`, `invariant` e `policy` precisa ser conferido
@@ -245,7 +251,7 @@ bash .claude/validation/kg-trace-resolve.sh .                                   
 
 ---
 
-## Bloco C — Mapear um documento de negócio e ligar ao projeto (30 min)
+## Bloco C — Mapear um documento de negócio e ligar ao projeto (25 min)
 
 **Conceito.** Os documentos das aulas 2 a 4 (personas, estratégia, features, decisões de trabalho)
 são prosa. Prosa não tem confiança, não tem dono e não avisa quando caduca. Levá-los ao grafo dá a
@@ -318,9 +324,9 @@ bash .claude/validation/kg-backlog-project.sh --markdown | head -20  # as pergun
 
 ---
 
-## Bloco D — O grafo como runtime (25 min)
+## Bloco D — O grafo como runtime (20 min)
 
-> **Pré-requisito deste bloco e do E:** o hub num pin **≥ <a definir>**, que já traz o `/meta:decide`
+> **Pré-requisito deste bloco, do E e do F:** o hub num pin **≥ <a definir>**, que já traz o `/meta:decide`
 > e o `/meta:forge` abertos para o papel hub. Confira com `cat .claude/.onion-version` e
 > `ls .claude/commands/meta/decide.md .claude/validation/kg-decide-seal.sh`.
 
@@ -405,7 +411,108 @@ bash .claude/validation/kg-realign-project.sh <grafo> --check                   
 
 ---
 
-## Bloco E — A forja: forjar um componente do time (40 min)
+## Bloco E — Dissecar antes de adotar: o `/meta:dissect` (25 min)
+
+> **Pré-requisito:** o mesmo pin dos blocos D e F (**≥ <a definir>**), que traz o `/meta:dissect`
+> aberto para o papel hub. Confira com `ls .claude/commands/meta/dissect.md .claude/validation/dissect-census.sh .claude/validation/dissect-plans.sh`.
+
+**Conceito.** Antes de forjar, a pergunta é se alguém lá fora já resolveu a dor. O `/meta:dissect`
+mapeia uma ferramenta de terceiro numa **escada de cinco níveis**, e **nível reprovado não sobe**:
+
+| Nível | Pergunta | O que prova a passagem |
+|---|---|---|
+| **N0 identidade** | o que é, quem mantém, licença, está vivo? | trajetória **datada** (commits, releases), não "é popular" |
+| **N1 capacidade** | o que ela faz que o Onion não faz? | os **verbos** da superfície executável (`--help`, API), nunca do marketing |
+| **N2 mecanismo** | como faz, e onde mora o determinismo | **comportamento**: rodou, ou leu o código-fonte |
+| **N3 transferibilidade** | igual → transfere; diferente → desenha | a régua de transferência aplicada com evidência e refutador |
+| **N4 absorção** | o plano: artefato, costura, guarda, bancada | nós `x_absorb_*` no grafo, que o `/meta:forge` lê |
+
+Toda dissecação que chega ao N3 fecha num de **quatro vereditos**, com razão escrita: **absorver**
+(o conceito entra no Onion, reescrito na gramática da casa), **costurar** (a ferramenta fica de fora
+e entra por adapter), **parquear** (técnica a investigar, **com gatilho nomeado**) ou **rejeitar**
+(com a razão datada, para ninguém reabrir). "Interessante" e "vale acompanhar" não são veredito. O
+comando **não sela**: ele grava o grafo da dissecação e deixa **1 nó `decision` aberto** por
+ferramenta. Quem fecha é o `/meta:decide`, do bloco D.
+
+> **A fronteira.** Ferramenta de terceiro **roda em worktree ou container, nunca na árvore de
+> trabalho**. É mecanismo, não disciplina: um refutador com instrução escrita para não escrever
+> escreveu em seis arquivos (medido pela casa em 2026-09-20).
+
+**A ferramenta do exercício: `yq`** (o processador de YAML de linha de comando escrito em Go; o repositório e a imagem oficial de container saem do próprio N0, da fonte primária). É plausível para este time: os grafos são YAML, e alguém sempre propõe
+"por que não lemos o `.kg.yaml` com `yq` em vez de `awk`?". É pública e roda num container.
+
+**Demo 1: o censo vem primeiro.**
+
+```bash
+bash .claude/validation/dissect-census.sh . --markdown
+```
+
+Ele lista as dissecações que o corpus já pagou e o nível de cada uma. Ferramenta já dissecada com
+carimbo fresco entra no nível **seguinte**, sem repagar. Saída `3` quer dizer "não pude medir".
+
+**Demo 2: dissecar até o N3.**
+
+```bash
+/meta:dissect yq --level 3
+```
+
+Mostre o N0 (licença e trajetória datadas, da fonte primária), o N1 (os verbos lidos do
+`yq --help`) e a parada do N2 para rodar a ferramenta **isolada**:
+
+```bash
+docker run --rm -v "$PWD":/workdir:ro <imagem-oficial-do-yq> '.nodes | length' docs/onion/graph/<grafo>.kg.yaml
+bash .claude/validation/kg-radar.sh docs/onion/graph/<grafo>.kg.yaml --integrity --schema
+```
+
+Montagem `:ro`: o container lê o repositório e não escreve nele. Sem Docker, a alternativa é uma
+worktree descartável (`git worktree add ../dissect-yq` e rodar lá dentro).
+
+**Exercício.**
+
+1. Rodem o censo e confiram se o `yq` (ou a ferramenta que a dupla escolher) já foi dissecado.
+2. Rodem `/meta:dissect yq --level 3`. No N2, meçam o **comportamento**, sem confiar no que a
+   documentação diz:
+   - a contagem de nós que o `yq` devolve bate com a do `kg-view.sh`?
+   - como o `yq` lê uma chave `on:` e uma data sem aspas? A gramática da casa explica por que isso
+     importa: dois leitores discordando do mesmo byte foi o que fez a chave `on:` virar `trigger:`.
+3. Leiam o veredito e o nó `decision` aberto no grafo que o comando gravou.
+4. Fechem a decisão com `/meta:decide`, citando o id desse nó.
+5. **Só se o veredito for absorver ou costurar:** rodem de novo com `--level 4` para gerar o plano
+   de absorção (os nós `x_absorb_*`) e confiram o plano com o leitor da forja.
+
+**Pronto quando:**
+
+```bash
+bash .claude/validation/dissect-census.sh . --markdown | grep -i yq             # a dissecação aparece, com o nível
+bash .claude/validation/kg-radar.sh docs/evolution/dissect/<ferramenta>-<AAAA-MM>/<ferramenta>-<AAAA-MM>.kg.yaml --integrity --schema   # exit 0
+grep -c 'x_dissect_verdict:' docs/evolution/dissect/<ferramenta>-<AAAA-MM>/<ferramenta>-<AAAA-MM>.kg.yaml   # >= 1
+git status --short                                                              # nada fora do grafo da dissecação e do selo
+# só com absorver/costurar, depois do --level 4:
+bash .claude/validation/dissect-plans.sh . yq                                   # rc 0 = plano completo
+```
+
+**Erros comuns e saída.**
+- *Rodar a ferramenta na árvore de trabalho "só para ver".* É exatamente o que a fronteira proíbe.
+  Container com montagem `:ro` ou worktree descartável; depois, `git status` limpo.
+- *N2 tirado da página do produto.* Página é fonte de N0 e N1. Sem rodar nem ler o código, o nó
+  fica `open` com a lacuna nomeada: "não pude medir" é resultado.
+- *Parquear sem gatilho.* Parque sem gatilho é cemitério. Escrevam o que reabre a questão.
+- *Pular para o N4 com uma ferramenta que vai ser rejeitada.* O default `--level 3` existe para não
+  gastar o plano de absorção à toa.
+- *`dissect-plans.sh` sai 1.* O plano está INCOMPLETO, e a mensagem diz o motivo: falta origem
+  **com pin** (sha ou tag), licença, forma (`reescrita`, `adapter-sdaal`, `vendor-pin`) ou a família
+  de paridade. Plano incompleto não se forja; volte ao dissect.
+- *Vendorizar código proprietário.* `x_absorb_form: vendor-pin` só para licença que o permita;
+  proprietário nunca.
+
+**A ponte para a forja.** Se o veredito foi absorver ou costurar, o `/meta:forge` do bloco F **não
+começa pela entrevista**: ele lê os planos `x_absorb_*` na carga, mede no censo as peças que o alvo
+já tem e forja só as que faltam. Se foi parquear ou rejeitar, a dupla forja a partir de uma dor
+medida, como no bloco F.
+
+---
+
+## Bloco F — A forja: forjar um componente do time (35 min)
 
 **Conceito.** Um comando que só tem o arquivo `.md` é uma instrução solta. Um **comando-com-framework**
 tem o conjunto inteiro, as **7 peças** da doutrina da forja
@@ -447,6 +554,12 @@ grep -rlni 'nunca ler' .claude/utils .claude/validation | head
 
 Ele já existe (`.claude/utils/task-manager/env-check.sh`), e nasceu de um sinal do campo. **Forjar
 de novo seria duplicar.** É a cláusula 3 acontecendo na frente da turma.
+
+**Se a dupla chegou do bloco E com absorver ou costurar:** a entrada da forja não é a entrevista,
+é o plano. O `/meta:forge` lê os nós `x_absorb_*` na carga (pelo `dissect-plans.sh`), mede no censo
+as peças que o alvo já tem e emite só as marcadas como faltando. Plano INCOMPLETO não se forja.
+A origem e a licença vão no cabeçalho do artefato forjado, e o caso de paridade entra na família
+que o plano nomeia. `costurar` vira adapter, nunca cópia. As outras duplas seguem abaixo.
 
 **Exercício: escolher a dor.** Cada dupla escolhe uma dor que **mediu** hoje, não uma que imagina.
 Candidatas típicas, todas saídas dos blocos anteriores:
@@ -528,10 +641,10 @@ bash .claude/validation/lint-artifacts.sh                        # 0 HARD
 
 ---
 
-## Bloco F — Fechamento e ponte para a aula 6 (5 min)
+## Bloco G — Fechamento e ponte para a aula 6 (5 min)
 
-Cada dupla mostra, em um minuto: o grafo consertado, as três âncoras no código, o documento ligado e
-a skill forjada com o censo.
+Cada dupla mostra, em um minuto: o grafo consertado, as três âncoras no código, o documento ligado,
+a dissecação com o veredito selado e a skill forjada com o censo.
 
 **A ponte.** Tudo o que fizemos hoje mora **num repositório só**. O hub tem grafo, o projeto tem
 grafo, e eles ainda não se falam: `external_edges:` liga grafos do mesmo repositório, e a skill
@@ -540,7 +653,7 @@ Brain, os projetos ligados a ele, o caminho de um componente que nasceu num proj
 e descer para os outros, e o caminho de um achado do time (como o custo de a bancada viver num arquivo do framework, acima) chegar ao
 core.
 
-Para casa: `/onion-retro` para registrar a aula, e cada dupla deixa o seu PR aberto com os quatro
+Para casa: `/onion-retro` para registrar a aula, e cada dupla deixa o seu PR aberto com os cinco
 "prontos" no corpo.
 
 ---
@@ -744,7 +857,7 @@ sessão, e um workflow faseado só se paga quando houver dezenas de regras por g
 
 **Antes (30 min, no dia).** Rode a medição da turma no hub e no projeto e preencha a ficha. Ensaie o
 bloco A num grafo com aviso de multi-documento (se não houver nenhum, use o bloco A só como leitura
-da gramática e ganhe 10 minutos para o bloco E). Confira que o PyYAML está instalado nas máquinas.
+da gramática e ganhe 10 minutos para o bloco F). Confira que o PyYAML está instalado nas máquinas.
 
 **O que dizer, bloco a bloco.**
 
@@ -756,9 +869,12 @@ da gramática e ganhe 10 minutos para o bloco E). Confira que o PyYAML está ins
   momento forte é achar, ao vivo, uma regra no código que **não** bate com o documento.
 - **C.** "Decisão de trabalho não é fato." Mostre como a confiança muda com a marca do documento.
 - **D.** "O backlog não é uma lista: é uma projeção do grafo. Feche o nó e o item some sozinho."
-- **E.** "Antes de forjar, procure." A demo do `env-check.sh` abre o bloco: a dor era real,
+- **E.** "Antes de construir, veja se alguém já resolveu, e prove pelo comportamento." O momento
+  forte é o N2: a ferramenta rodando num container somente-leitura, e a medição discordando (ou não)
+  do que a documentação dela promete.
+- **F.** "Antes de forjar, procure." A demo do `env-check.sh` abre o bloco: a dor era real,
   e a cura já existia.
-- **F.** "Hoje cada repositório tem o seu grafo. Na próxima aula eles passam a conversar."
+- **G.** "Hoje cada repositório tem o seu grafo. Na próxima aula eles passam a conversar."
 
 **Onde costuma travar.**
 
@@ -769,11 +885,15 @@ da gramática e ganhe 10 minutos para o bloco E). Confira que o PyYAML está ins
 | bloco B | `kg-trace-resolve.sh` reprova | a âncora aponta para arquivo que não existe; confiram o caminho relativo à raiz |
 | bloco C | nós longos demais | `label` curto, o resto em `narrative:` |
 | bloco D | querem selar decisão do cliente | não selem; escrevam de quem depende |
-| bloco E | censo sem a skill | faltou `git add` |
-| bloco E | mutante passa | `diff` vazio ou bancada sem o caso daquela linha |
-| bloco E | lint com HARD de inventário | `/meta:inventory` e commitar junto |
+| bloco E | sem Docker na máquina | worktree descartável; nunca rodar na árvore de trabalho |
+| bloco E | veredito "interessante" | não é veredito: escolham um dos quatro, com razão escrita |
+| bloco E | `dissect-plans.sh` sai 1 | falta pin na origem, licença, forma ou família de paridade |
+| bloco F | censo sem a skill | faltou `git add` |
+| bloco F | mutante passa | `diff` vazio ou bancada sem o caso daquela linha |
+| bloco F | lint com HARD de inventário | `/meta:inventory` e commitar junto |
 
-**Se o tempo apertar.** Corte o bloco C para a trilha do projeto só, e no bloco E entreguem o
+**Se o tempo apertar.** Corte o bloco C para a trilha do projeto só; no bloco E, parem no N1 e
+deixem o N2 em container de lição de casa; no bloco F entreguem o
 medidor e a bancada (peças 3 e 7); a superfície e a lente ficam de lição de casa.
 
 ---
@@ -796,6 +916,7 @@ medidor e a bancada (peças 3 e 7); a superfície e a lente ficam de lição de 
 | o plano ainda coere? | `/meta:realign <g>` · `bash .claude/validation/kg-realign-project.sh <g> --check` |
 | conduzir o plano | `/meta:drive <g>` · `bash .claude/validation/kg-drive-project.sh <g>` |
 | decidir e selar | `/meta:decide` · `bash .claude/validation/decide-census.sh . --markdown` |
+| dissecar uma ferramenta | `/meta:dissect <ferramenta> --level 3` · censo: `bash .claude/validation/dissect-census.sh . --markdown` · plano: `bash .claude/validation/dissect-plans.sh . <ferramenta>` |
 | forjar | `/meta:forge` · censo: `FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown` |
 | criar a superfície | `/meta:create-command` · `/meta:create-skill` |
 | gate | `/meta:inventory` · `bash .claude/validation/lint-artifacts.sh` |
@@ -821,18 +942,22 @@ medidor e a bancada (peças 3 e 7); a superfície e a lente ficam de lição de 
 
 - a skill `domain-anchor` **não** foi instalada no repositório da equipe nem invocada como `/domain-anchor`
   numa sessão real; a diretiva `` !`…` `` foi conferida só pelo censo, não pela carga;
-- o lint do hub com as cinco peças novas não rodou; o bloco E prevê o HARD de inventário pela
+- o lint do hub com as cinco peças novas não rodou; o bloco F prevê o HARD de inventário pela
   REGRA 8, mas o número exato de avisos é do dia;
 - se uma skill nova do hub desce para os projetos no `/meta:adopt --update` (o manifesto inclui
   `.claude/skills` inteiro, mas a descida não foi ensaiada) — assunto da aula 6;
-- os blocos D e E dependem de um pin que ainda não existe (o que abre o `/meta:decide` e o
-  `/meta:forge` para o hub): o fluxo descrito é o dos comandos no core em 2026-10-14, e nenhum dos
-  dois foi rodado no hub. O 6/7 esperado no bloco E é dedução (a bancada nasce como família), não
-  medição;
+- os blocos D, E e F dependem de um pin que ainda não existe (o que abre o `/meta:decide`, o
+  `/meta:dissect` e o `/meta:forge` para o hub): o fluxo descrito é o dos comandos no core em
+  2026-10-14, e nenhum dos três foi rodado no hub. O 6/7 esperado no bloco F é dedução (a bancada
+  nasce como família), não medição;
+- o `/meta:dissect` não rodou no hub, e o `yq` não foi dissecado nem executado em container neste
+  ensaio: a licença, a trajetória e o comportamento do `yq` são o que o N0 e o N2 do exercício vão
+  medir, e o material não antecipa o resultado. O `dissect-plans.sh` não está no pin atual do hub;
 - o selo em DEV foi conferido no radar dos dois pins (o do hub avisa `decision-done-em-DEV`; o do
   core aceita o selo de testemunho em DEV e acusa `MISPLANED` em PROD).
 
 **Comandos que dependem do pin novo:** `/meta:decide` (com `decide-census.sh` e
-`kg-decide-seal.sh`) e a face do `/meta:forge` aberta ao hub, ambos no pin **≥ <a definir>**. Fora
+`kg-decide-seal.sh`), o `/meta:dissect` aberto ao hub (com o `dissect-plans.sh`) e a face do
+`/meta:forge` aberta ao hub, ambos no pin **≥ <a definir>**. Fora
 do bundle do hub, sem previsão: `kg-contract-check.sh` (o contrato formal do `.kg.yaml` não está
 vendorizado no hub).
