@@ -3,7 +3,7 @@
 
 # Lente do grafo — `federation-research-2026-06-reconciled`
 
-**882 nós · 1087 arestas · 0 órfãos**
+**884 nós · 1090 arestas · 0 órfãos**
 
 > Projeção DERIVADA. O veredito (integridade, reconciliação, frescor) é do
 > `kg-radar.sh` — esta lente não julga, só mostra.
@@ -14,22 +14,22 @@
 |---|---|
 | claim | 413 |
 | decision | 174 |
-| evidence | 126 |
-| question | 107 |
+| evidence | 127 |
+| question | 108 |
 | entity | 34 |
 | artifact | 28 |
 
 | Status | n |
 |---|---|
 | confirmed | 412 |
-| open | 319 |
+| open | 320 |
 | superseded | 61 |
-| refuted | 52 |
+| refuted | 53 |
 | done | 38 |
 
 | Plano | n |
 |---|---|
-| DEV | 707 |
+| DEV | 709 |
 | PROD | 175 |
 
 ## Radar — 25 focos de atenção (peso × centralidade)
@@ -52,15 +52,15 @@
 | 14 | 25.5 | `B2_4_ledger_git_spine` | decision | DEV/confirmed | 5 |
 | 15 | 25.2 | `SY5_rfc0002_judged_trio` | claim | PROD/open | 11 |
 | 16 | 25.2 | `SY4_prod_rfc0005_ratificada` | evidence | PROD/confirmed | 11 |
-| 17 | 24.3 | `S3_decision_catalog_hegel_system` | decision | DEV/open | 8 |
-| 18 | 22.5 | `REC_SIGNALS_ONLY_RATIFIED` | evidence | PROD/confirmed | 4 |
-| 19 | 22.5 | `B6_3_claim_sdaal_sem_ci_drift` | claim | DEV/open | 5 |
-| 20 | 22.5 | `B6_1_veredicto_pre_aplicavel` | claim | PROD/confirmed | 4 |
-| 21 | 22.5 | `B6_10_decisao_descentralizado` | decision | DEV/confirmed | 5 |
-| 22 | 22.5 | `B5_3_alert_b_mcp_leak` | claim | DEV/confirmed | 4 |
-| 23 | 22.5 | `B5_2_mcp_first_leakage` | claim | DEV/confirmed | 4 |
-| 24 | 22.5 | `B5_15_ingestor_gap` | claim | DEV/open | 4 |
-| 25 | 22.5 | `B4_8_veredito_validado` | claim | PROD/confirmed | 4 |
+| 17 | 24.5 | `B5_17_veredito_trajetoria_campo` | decision | DEV/confirmed | 6 |
+| 18 | 24.3 | `S3_decision_catalog_hegel_system` | decision | DEV/open | 8 |
+| 19 | 22.5 | `REC_SIGNALS_ONLY_RATIFIED` | evidence | PROD/confirmed | 4 |
+| 20 | 22.5 | `B6_3_claim_sdaal_sem_ci_drift` | claim | DEV/open | 5 |
+| 21 | 22.5 | `B6_1_veredicto_pre_aplicavel` | claim | PROD/confirmed | 4 |
+| 22 | 22.5 | `B6_10_decisao_descentralizado` | decision | DEV/confirmed | 5 |
+| 23 | 22.5 | `B5_3_alert_b_mcp_leak` | claim | DEV/confirmed | 4 |
+| 24 | 22.5 | `B5_2_mcp_first_leakage` | claim | DEV/confirmed | 4 |
+| 25 | 22.5 | `B5_15_ingestor_gap` | claim | DEV/open | 4 |
 
 ### O que esses focos dizem
 
