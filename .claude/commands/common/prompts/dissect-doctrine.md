@@ -35,6 +35,36 @@ aparência de análise.
 
 ---
 
+## 1b. A régua e o estudo (decisões do maestro de 2026-10-14, SAC-135)
+
+**A régua não é fixa no Onion.** "O que ela faz que o Onion não faz" é a pergunta do core. Num hub
+ou num adotado, a pergunta certa é contra o **alvo** — o repo que vai receber a peça. Por isso:
+
+- `--against <repo>` grava `meta.x_dissect_against: <repo>`. **Sem ele, a régua é o Onion** e o
+  comportamento do core não muda.
+- Com outra régua, **N1** mede o delta contra o alvo, **N3** julga transferir para o alvo e **N4**
+  escreve o plano (`x_absorb_*`) para o repo do alvo. **N0 e N2 independem da régua** (descrevem a
+  ferramenta); **N1, N3 e N4 dependem**, então nível pago só se reusa na mesma régua.
+- O leitor de planos mede as peças **no repo do alvo**, pela raiz que lhe é **passada**. Construir
+  o caminho a partir do nome do alvo é a classe que a cláusula 1 do censo da forja proíbe; sem a
+  raiz o plano sai NAO-MEDIDO, nunca medido contra o repo errado.
+
+**O estudo é uma parada declarada no N2.** `--study` grava `meta.x_dissect_mode: study`, sobe
+N0 → N1 → N2 com o N2 medido **rodando a ferramenta isolada**, e para. No lugar do nó `decision`
+fica um nó `question` **aberto** ("adotar?"). É aprendizado com mecanismo medido, sem pressa de
+veredito. Ler o código-fonte não substitui rodar no estudo; se não der para rodar, o nó do N2
+nasce `open` com a lacuna nomeada (§3), como em qualquer dissecação.
+
+- **O que o estudo NÃO promete:** não julga (não há N3), não recomenda e não emite plano. Um nó
+  `x_absorb_*` dentro de estudo é recusado pelo leitor de planos; um estudo que passe do N2, traga
+  veredito ou feche a `question` sai **INCOERENTE** no censo.
+- **Estudo ≠ interrompida.** O censo separa os dois pela coluna `estado`. Dissecação parada no N2
+  **sem** o marcador continua sendo **interrompida**: a parada só é intencional quando declarada.
+- Modo que o censo não conhece (ex.: `estudo` em vez de `study`) sai **modo-DESCONHECIDO**, nunca
+  lido como dissecação normal.
+
+---
+
 ## 2. Os quatro vereditos, e nenhum deles é "não sei"
 
 Toda dissecação que chega ao N3 fecha num destes, **com razão escrita**:

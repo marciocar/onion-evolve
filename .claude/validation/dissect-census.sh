@@ -24,6 +24,15 @@
 # da dissecação, e não confere se a medição do nível de fato ocorreu (o marcador é
 # auto-atestado — mesmo teto honesto do kg-seal-exception.sh).
 #
+# ── RÉGUA E MODO (SAC-135, decisões do maestro de 2026-10-14) ──────────────────────────────
+# A régua da dissecação deixou de ser fixa no Onion: `meta.x_dissect_against: <repo>` declara
+# CONTRA QUEM o N1/N3/N4 foram medidos (ausente = `onion`, o comportamento de sempre). E o modo
+# estudo (`meta.x_dissect_mode: study`) para no N2 SEM veredito, deixando um nó `question` aberto
+# ("adotar?"). O censo mostra a régua e separa ESTUDO de INTERROMPIDA pela COLUNA `estado`:
+#   veredito · estudo · interrompida (sem veredito e SEM marcador de estudo — parar no N2 sem o
+#   marcador continua sendo interrompida) · estudo-INCOERENTE(<motivos>) · modo-DESCONHECIDO(<v>).
+# Modo que o censo não conhece NUNCA cai no caminho normal em silêncio (fail-closed, P0).
+#
 # Uso:  bash .claude/validation/dissect-census.sh [<repo>] [--markdown|--tsv]
 # Exit: 0 = censo emitido (inclusive "zero dissecação", que é resposta) · 3 = NÃO PUDE MEDIR.
 #       Os PLANOS de absorção (N4) têm leitor próprio, do lado do forge: dissect-plans.sh — este
@@ -71,6 +80,11 @@ for rel in "${GRAPHS[@]}"; do
     [ "${lv}" -gt "${level}" ] && level="${lv}"
   done < <(sed -n 's/^[[:space:]]*\(x_\)\{0,1\}dissect_level:[[:space:]]*\([0-9]\+\).*/\2/p' "${f}")
 
+  # RÉGUA: contra quem N1/N3/N4 foram julgados. Ausente = o Onion (o comportamento de sempre).
+  against="$(sed -n 's/^[[:space:]]*x_dissect_against:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#]*\).*/\1/p' "${f}" | head -1 | sed 's/[[:space:]]*$//')"
+  [ -n "${against}" ] || against="onion"
+  mode="$(sed -n 's/^[[:space:]]*x_dissect_mode:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#[:space:]]*\).*/\1/p' "${f}" | head -1)"
+
   verdict="$(sed -n 's/^[[:space:]]*\(x_\)\{0,1\}dissect_verdict:[[:space:]]*["'"'"']\{0,1\}\([a-z]*\).*/\2/p' "${f}" | head -1)"
   [ -n "${verdict}" ] || verdict="-"
   # ⚠️ DATA ENTRE ASPAS é a forma que a gramática EXIGE desde o contrato v3 (`yaml.unquoted-date`),
@@ -88,7 +102,27 @@ for rel in "${GRAPHS[@]}"; do
   elif [ "${review}" \< "${TODAY}" ]; then fresh="VENCIDO"
   else fresh="fresco"; fi
 
-  rows="${rows}${tool}	${level}	${verdict}	${baseline}	${review}	${fresh}	${rel}
+  # ESTADO: estudo é parada DECLARADA no N2; sem o marcador, a mesma parada é interrompida.
+  # Estudo que passa do N2, que traz veredito ou que não deixa a `question` aberta contradiz o
+  # próprio modo — sai INCOERENTE com o motivo, nunca "estudo" por omissão.
+  if [ "${mode}" = "study" ]; then
+    incoh=""
+    [ "${level}" -le 2 ] || incoh="${incoh},nivel-acima-de-N2"
+    [ "${verdict}" = "-" ] || incoh="${incoh},com-veredito"
+    open_q="$(awk '
+      function flush() { if (q && o) f = 1; q = 0; o = 0 }
+      /^[[:space:]]*- id:/                                   { flush(); next }
+      /^edges:/                                              { flush(); next }
+      /^[[:space:]]*node_type:[[:space:]]*["\047]?question/  { q = 1 }
+      /^[[:space:]]*status:[[:space:]]*["\047]?open/         { o = 1 }
+      END { flush(); print f + 0 }' "${f}")"
+    [ "${open_q}" = "1" ] || incoh="${incoh},sem-question-aberta"
+    if [ -n "${incoh}" ]; then state="estudo-INCOERENTE(${incoh#,})"; else state="estudo"; fi
+  elif [ -n "${mode}" ]; then state="modo-DESCONHECIDO(${mode})"
+  elif [ "${verdict}" != "-" ]; then state="veredito"
+  else state="interrompida"; fi
+
+  rows="${rows}${tool}	${level}	${verdict}	${baseline}	${review}	${fresh}	${rel}	${against}	${state}
 "
   [ "${verdict}" = "parquear" ] && parked="${parked}${tool}	${rel}
 "
@@ -97,7 +131,8 @@ done
 sorted_rows="$(printf '%s' "${rows}" | sort -t'	' -k2,2nr -k1,1)"
 
 if [ "${FMT}" = "--tsv" ]; then
-  printf 'ferramenta\tnivel\tveredito\tbaseline\treview_after\tfrescor\tgrafo\n'
+  # régua e estado entram no FIM: as colunas 1-7 seguem onde estavam para quem já as lê.
+  printf 'ferramenta\tnivel\tveredito\tbaseline\treview_after\tfrescor\tgrafo\tregua\testado\n'
   [ "${found}" -gt 0 ] && printf '%s\n' "${sorted_rows}"
   exit 0
 fi
@@ -109,16 +144,26 @@ if [ "${found}" -eq 0 ]; then
   printf '\nNenhum grafo do corpus se declara dissecação (marcador `x_dissect_tool:` no `meta:`).\n'
   printf 'Toda ferramenta entra pelo N0 — não há nível pago a reusar.\n'
 else
-  printf 'ferramenta | nível | veredito | baseline | review_after | frescor\n'
-  printf '%s\n' "${sorted_rows}" | awk -F'\t' 'NF>=6 && $1!=""{
-    printf "%s | N%s | %s | %s | %s | %s\n", $1, $2, $3, $4, $5, $6 }'
+  # frescor fica na ÚLTIMA coluna de propósito: o evolve-census conta vencidas por `$NF`.
+  printf 'ferramenta | nível | veredito | régua | estado | baseline | review_after | frescor\n'
+  printf '%s\n' "${sorted_rows}" | awk -F'\t' 'NF>=9 && $1!=""{
+    printf "%s | N%s | %s | %s | %s | %s | %s | %s\n", $1, $2, $3, $8, $9, $4, $5, $6 }'
   if [ -n "${parked}" ]; then
     printf '\n## parqueadas (técnica a investigar — exigem gatilho nomeado)\n'
     printf '%s' "${parked}" | awk -F'\t' '$1!=""{ printf "- %s  (%s)\n", $1, $2 }'
   fi
+  _section() {  # $1=título $2=regex do estado (awk)
+    local body; body="$(printf '%s\n' "${sorted_rows}" | awk -F'\t' -v re="$2" '$1!="" && $9 ~ re { printf "- %s · N%s · régua %s · %s  (%s)\n", $1, $2, $8, $9, $7 }')"
+    [ -z "${body}" ] || printf '\n## %s\n%s\n' "$1" "${body}"
+  }
+  _section 'estudos (pararam no N2 DE PROPÓSITO, sem veredito — a question "adotar?" segue aberta; decidir é dissecar de novo sem --study, entrando no N3)' '^estudo$'
+  _section 'interrompidas (sem veredito e SEM marcador de estudo — retomar do nível alcançado ou fechar com veredito)' '^interrompida$'
+  _section 'a corrigir (o grafo contradiz o próprio modo, ou declara modo que este censo não conhece)' '^(estudo-INCOERENTE|modo-DESCONHECIDO)'
 fi
 printf '\n(ferramenta com nível fresco ENTRA no nível seguinte — re-derivar nível pago é o\n'
 printf 'desperdício que este censo corta. VENCIDO não se cita como se fosse de hoje: licença,\n'
 printf 'mantenedor e preço mudam em semanas. TETO DECLARADO: o censo mede o que o corpus\n'
 printf 'DECLARA, não sabe de ferramenta que ninguém anotou, e não confere se a medição do nível\n'
-printf 'de fato ocorreu — o marcador é auto-atestado.)\n'
+printf 'de fato ocorreu — o marcador é auto-atestado. RÉGUA: nível pago só se reusa na MESMA\n'
+printf 'régua — N0 e N2 descrevem a ferramenta, mas N1, N3 e N4 foram julgados contra a régua da\n'
+printf 'coluna, e contra outro alvo são outra pergunta.)\n'

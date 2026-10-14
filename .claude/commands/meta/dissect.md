@@ -18,7 +18,8 @@ promete — vive em [`common:prompts:dissect-doctrine`](../common/prompts/dissec
 - **Viaja para todo papel menos o onion-mini** (decisão do maestro, 2026-10-14): o time de um hub disseca
   as ferramentas de terceiro que pensa adotar, com o mesmo método do core.
 - **Maestro-invocado.** Não auto-inicia, sem cron, sem `/loop` sobre si (MOAT W7).
-- **Não sela.** Produz o plano e **1 nó `decision` OPEN** por ferramenta; quem sela é o maestro.
+- **Não sela.** Produz o plano e **1 nó `decision` OPEN** por ferramenta (no modo estudo, **1 nó
+  `question` OPEN** "adotar?" no lugar dele); quem sela é o maestro.
 - **Executar é ato isolado.** Ferramenta de terceiro roda em worktree/container — nunca na árvore
   de trabalho. Fronteira é mecanismo; instrução em prosa não segura escritor (medido 2026-09-20).
 - **MOAT (PARA sempre):** instalar dependência global, deploy, escrever em repo alheio.
@@ -50,11 +51,29 @@ ao N4 é insano.
 ## Uso
 
 ```
-/meta:dissect <ferramenta|lista> [--level N=3] [--budget <tokens>]
+/meta:dissect <ferramenta|lista> [--level N=3] [--budget <tokens>] [--against <repo>] [--study]
 ```
 
 `--level` **para** no nível pedido. Sem argumento, o default é **N3** (julga transferibilidade e
 não gasta o plano de absorção em algo que ainda vai ser rejeitado).
+
+## A régua e o modo estudo (decisões do maestro de 2026-10-14)
+
+- **`--against <repo>` — a régua.** Sem ele, a régua é o **Onion** e nada muda. Com ele (num hub
+  ou num adotado), o **N1** pergunta "o que ela faz que o **alvo** não faz", o **N3** julga
+  transferir **para o alvo**, e o **N4** escreve os nós `x_absorb_*` para o **repo do alvo**, não
+  para o framework. N0 e N2 descrevem a ferramenta e não mudam com a régua; N1, N3 e N4 mudam, e
+  por isso nível pago só se reusa **na mesma régua** (o censo mostra a coluna). Grave
+  `meta.x_dissect_against: <repo>`. A costura com o forge segue: o `/meta:forge` roda no hub e lê
+  os planos, medindo as peças no repo do alvo pela raiz que você passa ao leitor (passo 4b).
+- **`--study` — estudo.** Para no **N2** (identidade, capacidade, mecanismo) e o N2 é medido
+  **rodando a ferramenta isolada**, sem veredito de absorção. No lugar do nó `decision` fica um nó
+  `question` **aberto** "adotar?". Grave `meta.x_dissect_mode: study`. O censo o mostra como
+  **estudo**, separado da dissecação **interrompida**: parar no N2 **sem** o marcador continua
+  sendo interrompida. `--study` com `--level` diferente de 2 é recusa.
+- **O que o estudo NÃO promete:** não decide, não recomenda e não escreve plano. O leitor de
+  planos recusa nó `x_absorb_*` em grafo de estudo. Para decidir, disseque de novo **sem**
+  `--study`: o N2 fresco entra pago e a escada segue no N3.
 
 ## Procedimento
 
@@ -79,13 +98,16 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
    caso que prova que a peça faz o que a original fazia, **nomeando** a família
    `run_<n>_selftests`). **Não escreva quais peças já existem** — o leitor as mede ao vivo:
    `bash .claude/validation/dissect-plans.sh . <ferramenta>` (rc 1 = plano INCOMPLETO,
-   com o motivo). Rode-o antes do passo 5 e só siga com rc 0. O leitor mora do lado do forge
+   com o motivo). Com `--against`, passe a raiz do alvo, que o leitor **nunca adivinha**:
+   `... dissect-plans.sh . <ferramenta> --against-root <repo>=<caminho>` (sem ela, rc 3 =
+   NAO-MEDIDO, porque medir no repo errado é medir outra régua). Rode-o antes do passo 5 e só
+   siga com rc 0. O leitor mora do lado do forge
    (core e standalone): no plugin `onion-meta` o forge não viaja, o leitor também não, e o plano
    fica no grafo esperando quem o forje.
 5. **DESTINO (peça 5)** — `write(KG)` em
    `docs/evolution/dissect/<ferramenta>-<AAAA-MM>/<ferramenta>-<AAAA-MM>.kg.yaml` com os
    marcadores que o censo lê (`meta.x_dissect_tool:`, `x_dissect_level:` por nó, `x_dissect_verdict:` no
-   nó de decisão), `meta.review_after` pela cadência (ferramenta/preço 30d), `# kg-backlog-guard:
+   nó de decisão; e, quando houver, `meta.x_dissect_against:` e `meta.x_dissect_mode: study`), `meta.review_after` pela cadência (ferramenta/preço 30d), `# kg-backlog-guard:
    on` e `# ═══ TETO: N NÓS ═══`. **`kg-radar` exit 0 é obrigatório** antes de qualquer prosa.
    O `SYNTHESIS.md` é **projeção**, com o **contrato de custo** no frontmatter: `kg:` · `run_id` ·
    `tokens` · `agents` · `duration_min`.

@@ -15,7 +15,9 @@ O mínimo que não se negocia aqui:
 - **N2 exige comportamento**: rodou, ou leu o código-fonte. Não deu? o nó nasce `open` com a
   lacuna nomeada — nunca `confirmed` por folheto.
 - **Marcadores que o censo lê** (sem eles a dissecação é invisível):
-  `meta.x_dissect_tool:` · `x_dissect_level:` por nó · `x_dissect_verdict:` no nó de decisão.
+  `meta.x_dissect_tool:` · `x_dissect_level:` por nó · `x_dissect_verdict:` no nó de decisão ·
+  e, quando houver, `meta.x_dissect_against:` (a régua; ausente = Onion) e
+  `meta.x_dissect_mode: study` (estudo: para no N2, sem veredito).
 - **Corpus primeiro**: `bash .claude/validation/dissect-census.sh` antes de abrir fonte externa.
 
 Nenhuma dissecação selada ainda — este README é a semente que a lente ancora.
