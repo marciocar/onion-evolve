@@ -1,7 +1,8 @@
 ---
 branch: docs/decide-sandbox-and-precompact
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: fa590ff562e5aa6775988621e59ea473b7bef641c2ff904bfdc43dd6977dcbe4
+reviewed_code_sha256: f4e0b2bf5e1e4cfa26d41a8218509475d7726fcd426876ea24c77d333dc8ee99
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
