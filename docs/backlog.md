@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**484 itens abertos** em 102 grafo(s) com aberto (de 131 no escopo) · 103 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**492 itens abertos** em 103 grafo(s) com aberto (de 132 no escopo) · 104 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -42,6 +42,22 @@
 | 2.4 | `C_OPCAO_H_GITATTRIBUTES_MERGE_DRIVER` | merge-process-onion-2026-10 | OPÇÃO H — merge driver de .gitattributes para projeções. Elenxo: REJEITAR — o merge do servidor do GitHub não executa dri |
 | 2.0 | `C_OPCAO_K_CONTRARIAN_TRUNK_DIRECT` | merge-process-onion-2026-10 | OPÇÃO K — contrarian: trunk direto sem fila e sem projeção commitada. Elenxo: REJEITAR — o core passa no critério time pe |
 | 1.0 | `C_OPCAO_J_STACKED_PRS_GRAPHITE` | merge-process-onion-2026-10 | OPÇÃO J — stacked PRs / Graphite. Elenxo: REJEITAR — a dor medida é de arquivo-ímã, não de dependência entre PRs. |
+
+## postmerge-projection-writer-2026-10 — 11 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 90.0 | `C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS` | postmerge-projection-writer-2026-10 | OPÇÃO B1 — escritor único sem bypass: job no push ao main (concurrency, sem cancelar) regenera, confere com porcelain, empurr |
+| 84.0 | `Q_POSTMERGE_PROJECTION_WRITER_2026_10` | postmerge-projection-writer-2026-10 | Passo B de D_MERGE_PROCESS_ONION_2026_10: parar de commitar as projeções geradas em cada PR e regenerá-las no main depois do me |
+| 69.0 | `C_OPCAO_C_CONTRARIAN_STRICT_LOCAL` | postmerge-projection-writer-2026-10 | OPÇÃO C (contrarian) — manter commitado e curar a combinação: o caminho verificado exige base == ponta do main (strict local |
+| 23.4 | `C_OPCAO_B2_ROLLING_REGEN_PR` | postmerge-projection-writer-2026-10 | OPÇÃO B2 — PR rolante de regeneração (um só, reescrito por force-push), com token de GitHub App para os required checks rod |
+| 14.4 | `Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY` | postmerge-projection-writer-2026-10 | O ruleset 25001643 NÃO tem bypass_actors vazio (admin, modo pull_request): 'sem bypass' vale para o ESCRITOR, não para o ruleset |
+| 7.8 | `C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH` | postmerge-projection-writer-2026-10 | OPÇÃO B3 — GitHub App na bypass list (always) empurrando direto ao main. Elenxo: REJEITAR (bypass do ruleset inteiro, chave pr |
+| 7.2 | `Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS` | postmerge-projection-writer-2026-10 | OBJEÇÃO ABERTA (efeito colateral): o mesmo silêncio que dá ausência de loop faz o push do escritor com GITHUB_TOKEN não disp |
+| 4.8 | `Q_B1_NON_FF_RACE_REDISPATCH` | postmerge-projection-writer-2026-10 | OBJEÇÃO ABERTA (corrida de não-fast-forward): se o main avança entre a regeneração e o push, o SHA verde fica obsoleto e exi |
+| 3.0 | `Q_GUARDA_DE_MAIN_CASA_PELO_NOME` | postmerge-projection-writer-2026-10 | A guarda pretooluse-merge-gate.sh casar o main pelo NOME, em qualquer repo, é intencional (protege também o main de adotante e o |
+| 2.1 | `C_OPCAO_B4_MAESTRO_PAT_IN_CI` | postmerge-projection-writer-2026-10 | OPÇÃO B4 — PAT do maestro no CI como escritor do main. Elenxo: REJEITAR (push de bot parece humano, perde auditoria, herda o p |
+| 1.8 | `C_OPCAO_U_UNVERSIONED_RUNTIME` | postmerge-projection-writer-2026-10 | OPÇÃO U — não versionar as projeções e ler em runtime. Elenxo: REJEITAR (o hook custaria 7,7 s por consulta; portas e adota |
 
 ## engenharia-de-corpus-de-regras-2026-10 — 8 item(ns)
 
@@ -93,14 +109,11 @@
 | 4.8 | `Q_SDAAL_KIT_REPO_SEPARADO` | playbook-sdaal-2026-10 | GATED: extrair um KIT DE CONTRATO SDAAL para repo próprio versionado por pin, no molde do kg-ssot. Gatilho (os 2 juntos): execut |
 | 3.0 | `C_OPCAO_E_UNIFICAR_NO_CATALOGO` | playbook-sdaal-2026-10 | Opção E: unificar tudo no catálogo recognition-primed da onion-patterns, com playbooks do core e de domínio no mesmo catálogo |
 
-## canal-vivo-sessoes-2026-10 — 4 item(ns)
+## canal-vivo-sessoes-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 76.8 | `C_LIVE_CLASS_DESIGN_CONSTRAINTS` | canal-vivo-sessoes-2026-10 | Restrições que a evidência ancorada impõe ao desenho da classe 'live' (NÃO é decisão): (1) cc-peer só vale DENTRO da mesma |
-| 3.2 | `Q_XSESSION_LIVE_NOT_VERIFIED` | canal-vivo-sessoes-2026-10 | NÃO VERIFICADO, fechar antes de qualquer absorção: dois membros da mesma org Team; dois usuários do SO na mesma máquina; clou |
-| 3.0 | `Q_REOPEN_IF_ADOPTER_ASKS_CROSS_ORG_CHANNEL` | canal-vivo-sessoes-2026-10 | GATILHO de reabertura (b): algum adotante pediu canal entre organizações? Se sim, o caminho é o A2A gated que o core já tem, n |
-| 3.0 | `Q_REOPEN_IF_ANTHROPIC_SHIPS_CROSS_USER_CHANNEL` | canal-vivo-sessoes-2026-10 | GATILHO de reabertura (a): a Anthropic respondeu à issue #87954 (pedido de canal entre usuários) ou lançou canal nativo entre u |
+| 74.4 | `C_LIVE_CLASS_DESIGN_CONSTRAINTS` | canal-vivo-sessoes-2026-10 | Restrições que a evidência ancorada impõe ao desenho da classe 'live' (NÃO é decisão): (1) cc-peer só vale DENTRO da mesma |
 
 ## jev-decision-round2-2026-10 — 10 item(ns)
 

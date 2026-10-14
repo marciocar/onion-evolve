@@ -1,0 +1,2070 @@
+# kg-backlog-guard: on
+meta:
+  id: postmerge-projection-writer-2026-10
+  schema_version: "1"
+  baseline: "2026-10-14"
+  review_after: "2026-11-13"   # 30d: o tipo DOMINANTE do que move esta decisão é FERRAMENTA —
+                               # semântica de rulesets/bypass/GITHUB_TOKEN do GitHub (docs primárias LIDAS na rodada
+                               # de primárias de 2026-10-14, wf_6babcd2c-1d8; a pergunta central segue aberta)
+                               # e o comportamento de Actions; a metade doutrina (escritor único) é de 12m,
+                               # mas a revisita real é o selo do maestro e o dogfood do B1.
+  # ═══ TETO: 96 NÓS ═══
+  # Teto subido de 93 para 96 (+3) em 2026-10-14 no empacotamento do Passo B: E_FASE0_STRICT_LOCAL_EXECUTADA_PR_1101
+  # (a FASE 0 selada foi executada no #1101), E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN (o dogfood que o maestro
+  # escolheu para Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD não rodou na sessão) e Q_GUARDA_DE_MAIN_CASA_PELO_NOME (a pergunta que
+  # o bloqueio abriu). Selos do /meta:decide em D_ e em Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD não criam nó.
+  # Teto subido de 64 para 93 (+29) porque a RODADA DE PRIMÁRIAS exigida pelo Elenxo antes de selar o B1 foi
+  # EXECUTADA em 2026-10-14 (/onion-research --mode primaries, wf_6babcd2c-1d8): 8 fontes lidas, 0 inalcançáveis,
+  # 24 claims ancoradas por verificador independente (24 nós E_), 9 rejeitadas na ancoragem (só na contabilidade
+  # E_LACUNAS_PRIMARIES_POSTMERGE_WRITER_2026_10_14), e 4 perguntas Q_B1_* das lacunas que o Elenxo deixou abertas.
+  # Aufhebung: 7 objeções 'fonte não lida' viraram superseded pelas leituras; nada foi apagado.
+  # A pergunta central (fast-forward de SHA verde num ruleset sem bypass) NÃO foi decidida por primária:
+  # Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD propõe dogfood antes do selo. D_ segue OPEN.
+  # Pesquisa /onion-research --mode decision (wf_e26bb266-4aa, 2026-10-14): Passo B de D_MERGE_PROCESS_ONION_2026_10.
+  # 19 claims confirmadas por votação, 6 refutadas, 22 fontes e 25 claims cortadas por orçamento.
+  # Elenxo: 52 objeções julgadas, 34 SOBREVIVENTES, 34 MODELADAS (nenhuma fora do teto).
+  # INTEGRIDADE DA ENTRADA: a recomendação repassada ao escritor vinha cortada; o texto INTEIRO foi
+  # recuperado do resultado da fase Elenxo no journal do run e é ele que a narrative de D_ carrega.
+  # CORPUS PRÉVIO: merge-process-onion-2026-10 (D_ selado A→C→D→B, C_OPCAO_B open, objeção de falta de
+  # fonte externa) e fila-2026-10-06 (E_CONFLITO_DE_PROJECAO_GERADA). A rodada não os REFUTA: dá a fonte
+  # externa que faltava e detalha o passo B — por isso external_edges só TRACES_TO/SUPPORTS/CONSTRAINS.
+  # ESTE GRAFO NÃO SELA NADA. D_ fica OPEN — o maestro sela.
+  # SELADO depois (2026-10-14, /meta:decide, kg-decide-seal.sh): D_ = «Fase 0 já + ler primárias antes do B1» (a
+  # FASE 0 foi executada no #1101) e Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD = «Dogfood num repo descartável» (bloqueado na
+  # sessão: E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN). Projeção humana: SYNTHESIS.md.
+external_edges:
+  - from: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    to: "docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml#D_MERGE_PROCESS_ONION_2026_10"
+    edge_type: TRACES_TO
+  - from: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    to: "docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml#C_OPCAO_B_POSTMERGE_PROJECTION_WRITER"
+    edge_type: TRACES_TO
+  - from: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    to: "docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml#E_OBJECAO_POSTMERGE_WRITER_NO_EXTERNAL_SOURCE"
+    edge_type: TRACES_TO
+  - from: E_GITLAB_GENERATED_NOT_COMPOSABLE
+    to: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml#E_CONFLITO_DE_PROJECAO_GERADA"
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_INCIDENT_ACCUSES_MERGE_WITHOUT_CI
+    to: "docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml#E_MERGE_SEM_CI_EXECUTADO_2026_10_13"
+    edge_type: CONSTRAINS
+  - from: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    to: "docs/evolution/research/triagem-inbox-2026-09/triagem-inbox-2026-09.kg.yaml#E_REGRA_85_E_INSATISFAZIVEL_ANTES_DO_MERGE"
+    edge_type: TRACES_TO
+  - from: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    to: "docs/onion/graph/guardas-revisao-2026-08.kg.yaml#D_REGRA62_CATRACA_DE_PROJECAO"
+    edge_type: TRACES_TO
+nodes:
+  - id: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "rodada /onion-research modo decision wf_e26bb266-4aa: 19 claims confirmadas por votação, 6 refutadas; Elenxo 52 objeções, 34 sobreviventes; ruleset 25001643 e contagem de commits de projeção re-medidos pelo escritor"
+    label: "Passo B de D_MERGE_PROCESS_ONION_2026_10: parar de commitar as projeções geradas em cada PR e regenerá-las no main depois do merge por um ESCRITOR ÚNICO — vale a pena, e como?"
+    narrative: "Pontos que a decisão precisa cobrir: (1) catracas HARD de projeção (REGRAS 39, 62, 80, 81 e 84) passam de 'PR em sincronia' para 'main em sincronia depois da regeneração' sem perder o dente; (2) o hook kg-read-leg lê kg-read-index.tsv em runtime; (3) as portas materializam de origin/main e só rodam depois da regeneração; (4) quem é o escritor único (job de Actions, PR automático, bot) frente ao ruleset do main e à concorrência de pushes; (5) incidente de 2026-10-13: bancada completa no push ao main reprovou em ff5abe51 por docs/backlog.md desatualizado (478 x 479), alarme #1086, reverts #1085/#1087, conserto #1088; (6) 30,7% dos commits do main eram projeção (re-medido em 2026-10-14: 149 dos últimos 300). Restrições: repo público de dono User (sem merge queue nativa), merge só por ops/pr-merge-verified.sh (hook exit-2), ruleset com required checks selftest-gate e lint-onion-artifacts, bypass do admin só em PR. Fica OPEN até o maestro selar D_POSTMERGE_PROJECTION_WRITER_2026_10."
+    trace: "run wf_e26bb266-4aa (/onion-research --mode decision, 2026-10-14)"
+  - id: E_MEDICAO_RULESET_E_PROJECOES_2026_10_14
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: "2026-10-14"
+    verified_against: "gh api repos/marciocar/onion-evolve/rulesets/25001643 e git log origin/main@0e84ddf8 -300, re-medidos pelo escritor em 2026-10-14"
+    source_tier: 10
+    source_kind: primary
+    label: "Medido em 2026-10-14: o ruleset 25001643 do main só tem required_status_checks (selftest-gate, lint-onion-artifacts, integration 15368, strict=false), bypass só do admin em modo pull_request, sem regra pull_request; 149 dos últimos 300 commits do main são de projeção."
+    narrative: "Dono User, repo público (gh api .owner.type/.visibility). Consequência medida: o push direto é barrado pela falta dos checks exigidos no commit novo (GH013), não por exigência de PR; strict=false deixa um PR atrás do main ser mergeado sem o CI ver a árvore combinada. Contagem: git log origin/main -300 --format=%s com assunto 'docs: projeções geradas regeneradas' = 149 (~50%, acima dos 30,7% de 2026-10-13). Hook kg-read-leg: l.23-25 registram gerar 7.722 ms contra consultar 8 ms; l.28 resolve o índice pela pasta do próprio script (a árvore local), não por origin/main. ops/pr-merge-verified.sh l.35-36 (auto-rebase pelo pr-finalize --rebase) e l.266 (25 PRs, 33 commits de projeções regeneradas). ff5abe51 é o #1081 (merge da fila sem esperar o CI do head novo depois de auto-rebase limpo)."
+    trace: "ops/pr-merge-verified.sh"
+    provenance:
+      source: "gh api repos/marciocar/onion-evolve/rulesets/25001643 + git log de origin/main@0e84ddf8"
+      locator: "rules[].type, parameters.strict_required_status_checks_policy, bypass_actors; .claude/hooks/kg-read-leg.sh l.23-28; ops/pr-merge-verified.sh l.35-36 e l.266"
+      method: "medição: gh api, git log e grep -n rodados pelo escritor em 2026-10-14"
+      locality: "repo"
+  - id: E_TEMPL_CI_REGEN_DIFF_EXIT_CODE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-14"
+    verified_against: "https://templ.guide/developer-tools/cicd — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 7
+    source_kind: primary
+    label: "O templ (doc oficial) faz a catraca de sincronia no CI regenerando e rodando git diff --exit-code: falha se algum gerado mudar. É a catraca 'PR em sincronia', o oposto do Passo B."
+    trace: "https://templ.guide/developer-tools/cicd"
+    provenance:
+      source: "https://templ.guide/developer-tools/cicd"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_TREZOR_COMMITS_GENERATED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-14"
+    verified_against: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 6
+    source_kind: primary
+    label: "O firmware da Trezor mantém os arquivos gerados commitados no Git (modelo commitar), em vez de gerá-los depois do merge."
+    trace: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
+    provenance:
+      source: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_TREZOR_GEN_CHECK_PER_PR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-14"
+    verified_against: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 6
+    source_kind: primary
+    label: "A Trezor verifica no CI, a cada PR, que o gerado coincide com as fontes (make gen_check): catraca de sincronia por PR."
+    trace: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
+    provenance:
+      source: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_GITLAB_GENERATED_NOT_COMPOSABLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.65
+    verified_at: "2026-10-14"
+    verified_against: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290 — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 5
+    source_kind: engineer
+    label: "Mudanças geradas em MRs simultâneos não são composáveis: conflitam entre si e exigem regeneração completa, não só rebase (GitLab issue 26290)."
+    trace: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_GITLAB_ONE_MR_AT_A_TIME
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-10-14"
+    verified_against: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290 — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 5
+    source_kind: engineer
+    label: "Com vários MRs prontos, só um entra por vez e o resto volta para rebase e regeneração: o custo do modelo de projeção commitada no PR."
+    trace: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_OPENTITAN_PORCELAIN_NOT_DIFF
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-10-14"
+    verified_against: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21 — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    valid_from: "2021"
+    source_tier: 5
+    source_kind: engineer
+    label: "Gate de frescor com git diff --exit-code não vê arquivo novo não rastreado criado pelo gerador; git status --porcelain é o teste correto de árvore limpa."
+    trace: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21"
+    provenance:
+      source: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_BOT_BRANCH_PR_INSTEAD_OF_BYPASS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-14"
+    verified_against: "https://zff.dev/Conduction/.github/issues/27 — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 4
+    source_kind: engineer
+    label: "A alternativa ao bypass de GitHub App é o bot abrir branch e PR com a mudança gerada, ao custo de algum churn de PRs."
+    trace: "https://zff.dev/Conduction/.github/issues/27"
+    provenance:
+      source: "https://zff.dev/Conduction/.github/issues/27"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_GITHUB_TOKEN_PUSH_TO_PROTECTED_FAILS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-10-14"
+    verified_against: "https://github.com/orgs/community/discussions/136531 — votos 2-1 na verificação adversarial do run wf_e26bb266-4aa"
+    valid_from: "2024-08-22"
+    source_tier: 4
+    source_kind: forum
+    label: "Push de workflow ao main protegido com o GITHUB_TOKEN falha com 'Changes must be made through a pull request'; o App na bypass list só funciona com o token dele passado ao actions/checkout."
+    trace: "https://github.com/orgs/community/discussions/136531"
+    provenance:
+      source: "https://github.com/orgs/community/discussions/136531"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 2-1 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_APP_AS_RULESET_BYPASS_ACTOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-14"
+    verified_against: "https://github.com/orgs/community/discussions/136531 — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    valid_from: "2026-07"
+    source_tier: 4
+    source_kind: forum
+    label: "Um GitHub App pode entrar em bypass_actors do ruleset (tipo Integration), com bypass_mode always ou pull_request."
+    trace: "https://github.com/orgs/community/discussions/136531"
+    provenance:
+      source: "https://github.com/orgs/community/discussions/136531"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_CPYTHON_VERSIONS_FOR_BOOTSTRAP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: "2026-10-14"
+    verified_against: "https://discuss.python.org/t/reducing-merge-conflicts-in-generated-code/68537 — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    valid_from: "2024-10-30"
+    source_tier: 4
+    source_kind: forum
+    label: "No CPython os gerados ficam versionados porque o build do interpretador bootstrap depende deles no repo; gerar no build exigiria um Python já instalado."
+    trace: "https://discuss.python.org/t/reducing-merge-conflicts-in-generated-code/68537"
+    provenance:
+      source: "https://discuss.python.org/t/reducing-merge-conflicts-in-generated-code/68537"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_PAT_WORKAROUND_2020
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.45
+    verified_at: "2026-10-14"
+    verified_against: "https://github.community/t/how-to-let-actions-user-to-push-to-the-repo/147740 — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    valid_from: "2020-12-08"
+    source_tier: 3
+    source_kind: forum
+    label: "Em 2020 o bot do Actions não podia ser escolhido em 'Restrict who can push' (só usuários); o contorno da comunidade era um PAT de usuário com escrita no lugar do GITHUB_TOKEN."
+    trace: "https://github.community/t/how-to-let-actions-user-to-push-to-the-repo/147740"
+    provenance:
+      source: "https://github.community/t/how-to-let-actions-user-to-push-to-the-repo/147740"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_RENOVATE_TWO_WRITERS_COLLIDE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: "2026-10-14"
+    verified_against: "https://hackernoon.com/what-you-need-to-know-about-github-agentic-workflows-and-renovate — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 3
+    source_kind: engineer
+    label: "Bot que edita o gerado colide com a recompilação: a regeneração sobrescreveu a edição do Renovate (dois escritores no mesmo gerado)."
+    trace: "https://hackernoon.com/what-you-need-to-know-about-github-agentic-workflows-and-renovate"
+    provenance:
+      source: "https://hackernoon.com/what-you-need-to-know-about-github-agentic-workflows-and-renovate"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_TEMPL_RECOMMENDS_COMMITTING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://templ.guide/developer-tools/cicd — votos 2-1 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 7
+    source_kind: primary
+    label: "A doc oficial do templ recomenda commitar os *_templ.go no repositório, em vez de gerá-los só no build ou depois do merge."
+    trace: "https://templ.guide/developer-tools/cicd"
+    provenance:
+      source: "https://templ.guide/developer-tools/cicd"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 2-1 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_TREZOR_NEVER_RESOLVE_BY_HAND
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-14"
+    verified_against: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 6
+    source_kind: primary
+    label: "A Trezor orienta nunca resolver conflito à mão em arquivo gerado: regenerar e commitar o resultado."
+    trace: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
+    provenance:
+      source: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_TREZOR_GENERATED_INCOMPATIBLE_ACROSS_BRANCHES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-14"
+    verified_against: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 6
+    source_kind: primary
+    label: "A Trezor reconhece que gerado commitado não é compatível entre branches e exige regenerar depois de rebase ou merge: o mesmo custo de combinação do core."
+    trace: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
+    provenance:
+      source: "https://docs.trezor.io/trezor-firmware/misc/generated-files.html"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_RELEASE_PLEASE_APP_TOKEN_PR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-14"
+    verified_against: "https://github.com/adcontextprotocol/adcp-client-python/pull/896/ — votos 2-1 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 5
+    source_kind: engineer
+    label: "Bot que abre e atualiza PR (release-please) com token de App é prática real: a alternativa ao push direto ao main protegido, com token de App para os required checks rodarem."
+    trace: "https://github.com/adcontextprotocol/adcp-client-python/pull/896/"
+    provenance:
+      source: "https://github.com/adcontextprotocol/adcp-client-python/pull/896/"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 2-1 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_GITLAB_PROPOSAL_NEEDS_MERGE_TRAIN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: "2026-10-14"
+    verified_against: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290 — votos 2-1 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 5
+    source_kind: engineer
+    label: "A proposta do GitLab depende de merge train (médio prazo) e não trata de branch protegido nem de push de bot: repo sem merge queue nativa fica sem resposta."
+    trace: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 2-1 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_GITLAB_MANUAL_REGEN_FAILS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: "2026-10-14"
+    verified_against: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290 — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    source_tier: 5
+    source_kind: engineer
+    label: "A disciplina manual de regenerar no PR falha na prática (esquecida ou feita errada), o que respalda trocar disciplina por mecanismo."
+    trace: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_OPENTITAN_CHECK_GENERATED_GATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-10-14"
+    verified_against: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21 — votos 3-0 na verificação adversarial do run wf_e26bb266-4aa"
+    valid_from: "2021"
+    source_tier: 5
+    source_kind: engineer
+    label: "O OpenTitan versiona os gerados e o CI os regenera e falha se a árvore não estiver limpa (gate check-generated), em vez de deixar de versionar o artefato."
+    trace: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21"
+    provenance:
+      source: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21"
+      locator: "claim confirmada na fase Verify do run wf_e26bb266-4aa"
+      method: "juízes: votação 3-0 do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: E_MERCADO_POSTMERGE_WRITER_2026_10
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "campo market do sintetizador do run wf_e26bb266-4aa; GitLab issue 26290 (tier 5) como único sinal de fornecedor"
+    source_tier: 5
+    source_kind: engineer
+    label: "MERCADO/CAPITAL — sem sinal: nenhuma rodada, M&A ou analista sobre arquivos gerados e escritor pós-merge. O fornecedor (GitLab 26290) trata a composição do gerado como recurso de FILA; a prática de bot que abre PR é release-please/Renovate/changesets."
+    narrative: "Nenhum sinal de capital, rodada ou M&A encontrado sobre este tema (arquivos gerados e escritor pós-merge). O eixo de analistas e engenharia ficou na GitLab issue 26290 (engenharia de produto do GitLab, tier 5). Ela reconhece o problema da composição do gerado em MRs concorrentes e propõe resolver no merge train, ou seja, o fornecedor trata isso como recurso de fila, não de bot. No ecossistema, a prática real de 'bot que abre e atualiza PR' é a do release-please/Renovate/changesets com token de App. O sinal indireto de produto é que GitHub, GitLab e afins resolvem com fila nativa, que o core (dono User) não tem. Monorepos Bazel/Nx/Turborepo e linguist-generated não renderam claim confirmada nesta rodada. Leitura follow-the-money: o mercado resolve isto vendendo fila nativa (org/Enterprise), o que o core de dono User não tem; o escasso para o core é o escritor único sem fila. Bazel/Nx/Turborepo e linguist-generated não renderam claim confirmada."
+    trace: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+      locator: "campo market do sintetizador do run wf_e26bb266-4aa"
+      method: "derivado: sintetizador do run wf_e26bb266-4aa"
+      locality: "web"
+  - id: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "retorno do Elenxo do run wf_e26bb266-4aa (opções e recomendação) + E_MEDICAO_RULESET_E_PROJECOES_2026_10_14"
+    label: "OPÇÃO B1 — escritor único sem bypass: job no push ao main (concurrency, sem cancelar) regenera, confere com porcelain, empurra para auto/projections, dispara selftest+validate por workflow_dispatch e faz fast-forward do SHA verde no main; retry se o main andou. Elenxo: FASE 1."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+  - id: C_OPCAO_B2_ROLLING_REGEN_PR
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.45
+    verified_at: "2026-10-14"
+    verified_against: "retorno do Elenxo do run wf_e26bb266-4aa (opções e recomendação) + E_MEDICAO_RULESET_E_PROJECOES_2026_10_14"
+    label: "OPÇÃO B2 — PR rolante de regeneração (um só, reescrito por force-push), com token de GitHub App para os required checks rodarem, mergeado pelo ops/pr-merge-verified.sh. Elenxo: só reserva se B1 falhar no dogfood."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+  - id: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.2
+    verified_at: "2026-10-14"
+    verified_against: "retorno do Elenxo do run wf_e26bb266-4aa (opções e recomendação) + E_MEDICAO_RULESET_E_PROJECOES_2026_10_14"
+    label: "OPÇÃO B3 — GitHub App na bypass list (always) empurrando direto ao main. Elenxo: REJEITAR (bypass do ruleset inteiro, chave privada em repo público, fura o caminho verificado)."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+  - id: C_OPCAO_B4_MAESTRO_PAT_IN_CI
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.1
+    verified_at: "2026-10-14"
+    verified_against: "retorno do Elenxo do run wf_e26bb266-4aa (opções e recomendação) + E_MEDICAO_RULESET_E_PROJECOES_2026_10_14"
+    label: "OPÇÃO B4 — PAT do maestro no CI como escritor do main. Elenxo: REJEITAR (push de bot parece humano, perde auditoria, herda o papel de admin, segredo em repo público)."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+  - id: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "retorno do Elenxo do run wf_e26bb266-4aa (opções e recomendação) + E_MEDICAO_RULESET_E_PROJECOES_2026_10_14"
+    label: "OPÇÃO C (contrarian) — manter commitado e curar a combinação: o caminho verificado exige base == ponta do main (strict local), regenera sempre na árvore combinada e condiciona o merge-sem-CI do #1081. Elenxo: FASE 0, já."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+  - id: C_OPCAO_U_UNVERSIONED_RUNTIME
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.1
+    verified_at: "2026-10-14"
+    verified_against: "retorno do Elenxo do run wf_e26bb266-4aa (opções e recomendação) + E_MEDICAO_RULESET_E_PROJECOES_2026_10_14"
+    label: "OPÇÃO U — não versionar as projeções e ler em runtime. Elenxo: REJEITAR (o hook custaria 7,7 s por consulta; portas e adotantes não têm o gerador)."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+  - id: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    node_type: decision
+    impact: 5
+    confidence: 0.6
+    label: "DECISÃO A SELAR PELO MAESTRO (Passo B): B1 escritor sem bypass · B2 PR rolante · B3 App com bypass · B4 PAT · C contrarian strict local · U não versionar. Elenxo: C já (FASE 0), depois B1 (FASE 1); B2 reserva; B3, B4 e U rejeitar."
+    trace: "run wf_e26bb266-4aa — Passo B de D_MERGE_PROCESS_ONION_2026_10 (pergunta do maestro, 2026-10-14)"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Fase 0 já + ler primárias antes do B1»"
+    narrative: |-
+      RECOMENDAÇÃO DO ELENXO (INTEIRA, recuperada do journal do run; o texto repassado ao escritor vinha cortado em 'required_status_ch'): Recomendo duas fases, nesta ordem. FASE 0 (já, barata, independente do Passo B): a cura contrarian C. O ops/pr-merge-verified.sh passa a recusar merge quando a base do PR não é a ponta do main (o ruleset tem strict=false, medido) e regenera as projeções na árvore combinada antes do merge. A condição de merge-sem-CI do #1081 (ff5abe51, o próprio commit em que a bancada reprovou) fica condicionada a essa regeneração. Isso ataca a causa provável do 478/479 sem migrar nada. FASE 1: o Passo B na variante B1, escritor único sem bypass. Ela é viável porque o ruleset 25001643 só tem required_status_checks (nenhuma regra pull_request), então um SHA com os checks verdes entra no main por fast-forward. RESTRIÇÕES (as objeções que ficaram de pé): (a) o main continua VERSIONANDO as projeções, nada de gitignore (hook, portas e adotantes sem gerador). (b) Guarda nova reprova PR que toque projeção, a inversão da REGRA 62, para eliminar o segundo escritor. As REGRAS 39/62/80/81/84 passam a julgar o main com porcelain e rc do gerador, e no PR viram só-informa, como o precedente da REGRA 85. (c) O kg-read-leg ganha regeneração local preguiçosa com cache pelo hash dos .kg.yaml, fora do commit, porque a defasagem real é a da branch, não a do main. (d) O materialize/publish-door recusa materializar quando o main não está em sincronia (marcador do job), ou regenera ele mesmo. (e) A doutrina do caminho verificado é emendada para nomear o job como 2º escritor do main, só para os caminhos de projeção, e o job aborta se o diff tocar qualquer outro caminho. (f) Concorrência: concurrency group serial, coalescendo vários merges numa regeneração, e retry no ff rejeitado. O push por GITHUB_TOKEN não redispara push, o que dá ausência de loop por construção, e precisa ser declarada e testada. (g) O escritor nasce com dogfood de modo de falha: dois merges seguidos, ff rejeitado, gerador com rc≠0. ANTES DE SELAR (lacunas por comodismo): ler a doc primária de rulesets e bypass em repo pessoal, a doc de 'status checks then push directly' e as fontes contrarian (aspect-build, gettext). Três refutações (GITHUB_TOKEN não dispara workflow, github-actions como bypass, App com bypass) contradizem doc oficial ou ficaram sem evidência. B2 só como plano de reserva se B1 falhar no dogfood, e com PR rolante único. B3, B4 e U ficam rejeitados. ESTE NÓ NÃO ESTÁ SELADO: o maestro sela.
+
+      verified_against anterior: «retorno completo do Elenxo do run wf_e26bb266-4aa (recomendação inteira recuperada do journal, não do texto truncado repassado ao escritor)»
+      Selado por /meta:decide em 2026-10-14: escolhida «Fase 0 já + ler primárias antes do B1»; descartadas: «Selar Fase 0 + B1 agora» · «Só a Fase 0» · «Não mexer».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Como selar o Passo B (D_POSTMERGE_PROJECTION_WRITER_2026_10)?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
+  - id: E_OBJECAO_TEMPL_PER_PR_GATE_MISSES_COMBINATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://templ.guide/developer-tools/cicd — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 1 (templ: git diff --exit-code no CI = catraca 'PR em sincronia')»"
+    label: "OBJEÇÃO (achado 1, templ): a catraca por PR já existe no core (REGRA 62) e passou PR a PR, e a combinação reprovou mesmo assim (478 x 479). Serve ao contrarian, não contra o Passo B, e não responde ao ponto (5)."
+    narrative: "Alvo: Achado 1 (templ: git diff --exit-code no CI = catraca 'PR em sincronia') (kind=finding). Evidência do Elenxo (1 agente, sem votação): O fato procede, mas não decide nada no caso do Onion. A catraca por PR já existe no core (REGRA 62) e passou PR a PR, e mesmo assim a combinação reprovou em 2026-10-13 (478 contra 479). O templ é um gerador de .go para um projeto só e não trata de PRs paralelos nem de merge serial. Serve de evidência a favor do modelo contrarian, não contra o Passo B, e não responde ao ponto (5)."
+    trace: "https://templ.guide/developer-tools/cicd"
+    provenance:
+      source: "https://templ.guide/developer-tools/cicd"
+      locator: "objeção #0 do retorno do Elenxo (Achado 1 (templ: git diff --exit-code no CI = catraca 'PR em sincronia'))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_TREZOR_LOW_PR_CONCURRENCY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "git log origin/main@0e84ddf8 -300 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 2 (Trezor commita os gerados)»"
+    label: "OBJEÇÃO (achado 2, Trezor): o motivo não se transfere — lá o gerado alimenta o build e a concorrência de PRs é baixa; aqui 149 dos últimos 300 commits do main são de projeção, e o mesmo modelo custa muito mais."
+    narrative: "Alvo: Achado 2 (Trezor commita os gerados) (kind=finding). Evidência do Elenxo (1 agente, sem votação): O motivo não se transfere. Na Trezor o gerado é consumido pelo build do firmware e a concorrência de PRs é baixa. No Onion as projeções (backlog.md, testing-state, kg-read-index.tsv) são vistas de um grafo e mudam em quase todo PR: medido agora, 149 dos últimos 300 commits de origin/main são 'docs: projeções geradas regeneradas', cerca de 50%, acima dos 30,7% da medição de 10-13. Por isso o mesmo modelo custa muito mais aqui."
+    trace: "git log origin/main@0e84ddf8 -300"
+    provenance:
+      source: "git log origin/main@0e84ddf8 -300"
+      locator: "objeção #1 do retorno do Elenxo (Achado 2 (Trezor commita os gerados))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_PER_PR_GATE_BLIND_STRICT_FALSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "gh api repos/marciocar/onion-evolve/rulesets/25001643 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 3 (Trezor make gen_check por PR)»"
+    label: "OBJEÇÃO (achado 3, gen_check): gate de sincronia por PR não enxerga a combinação de dois PRs, e o ruleset 25001643 tem strict=false (medido): PR atrás do main é mergeado sem o CI ver a árvore combinada."
+    narrative: "Alvo: Achado 3 (Trezor make gen_check por PR) (kind=finding). Evidência do Elenxo (1 agente, sem votação): É a mesma objeção do achado 1. Um gate de sincronia por PR não enxerga a combinação de dois PRs, e o ruleset 25001643 do core usa strict_required_status_checks_policy=false (lido via gh api), então um PR atrás do main é mergeado sem que o CI veja a árvore combinada."
+    trace: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
+    provenance:
+      source: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
+      locator: "objeção #2 do retorno do Elenxo (Achado 3 (Trezor make gen_check por PR))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_REGEN_PR_PER_MERGE_DOUBLES_QUEUE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 7 (bot abre branch+PR, 'algum churn')»"
+    label: "OBJEÇÃO (achado 7, churn): 60 PRs em 2,4 dias; um PR de regeneração por merge dobra a fila, paga a bancada (mediana 14,8 min) e fica CONFLICTING no merge seguinte. Só serve PR rolante coalescido com concurrency group."
+    narrative: "Alvo: Achado 7 (bot abre branch+PR, 'algum churn') (kind=finding). Evidência do Elenxo (1 agente, sem votação): Aqui o churn não seria pequeno. A cadência medida é de 60 PRs em 2,4 dias, e um PR de regeneração por merge dobraria a fila. Cada um ainda passaria pela bancada (mediana de 14,8 min) e pelo lock do merge-serial, e o próximo merge humano deixaria o próprio PR de regeneração CONFLICTING, o que faz o problema recursar. Só funciona com um PR rolante coalescido (um PR único reescrito por force-push, como o release-please faz) e com concurrency group no workflow."
+    trace: "docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml"
+      locator: "objeção #6 do retorno do Elenxo (Achado 7 (bot abre branch+PR, 'algum churn'))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_RULESET_HAS_NO_PR_RULE_FF_VIABLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "gh api repos/marciocar/onion-evolve/rulesets/25001643 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 8 ('Changes must be made through a pull request' com GITHUB_TOKEN)»"
+    label: "OBJEÇÃO (achado 8): o ruleset do core NÃO tem regra pull_request (medido); o push direto cai por falta de checks (GH013). Commit que já passou os checks numa branch entra por fast-forward sem bypass (doc de branch protection: primário citado, não lido)."
+    narrative: "Alvo: Achado 8 ('Changes must be made through a pull request' com GITHUB_TOKEN) (kind=finding). Evidência do Elenxo (1 agente, sem votação): Medido: o ruleset 25001643 NÃO tem regra pull_request. As únicas regras são required_status_checks (selftest-gate e lint-onion-artifacts, integration_id 15368, strict=false), e o bypass é RepositoryRole 5 (admin) com bypass_mode=pull_request. O push direto é barrado porque o commit novo não tem os checks exigidos (GH013), não por exigência de PR. A mensagem e o remédio da discussão #136531 descrevem outra configuração. Consequência: um commit que JÁ passou os checks numa branch pode ir ao main por fast-forward, sem bypass nenhum (doc oficial de branch protection: 'pushed directly to the protected branch after status checks have passed')."
+    trace: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
+    provenance:
+      source: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
+      locator: "objeção #7 do retorno do Elenxo (Achado 8 ('Changes must be made through a pull request' com GITHUB_TOKEN))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_APP_BYPASS_BREAKS_INVARIANT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "gh api repos/marciocar/onion-evolve/rulesets/25001643 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 9 (GitHub App como bypass_actor always|pull_request)»"
+    label: "OBJEÇÃO (achado 9): App com bypass_mode=always e chave em secret de repo público empurra qualquer coisa ao main sem selftest-gate, sem lint e fora do ops/pr-merge-verified.sh (o hook exit-2 não vale no runner). Repo de dono User aceitar Integration: não verificado."
+    narrative: "Alvo: Achado 9 (GitHub App como bypass_actor always|pull_request) (kind=finding). Evidência do Elenxo (1 agente, sem votação): Mesmo sendo verdade, o custo é de invariante. O bypass é por ator e vale para o ruleset inteiro (descartado por orçamento: 'tudo-ou-nada, sem granularidade por caminho'). Um App com bypass_mode=always, com a chave privada como secret de Actions num repo PÚBLICO, empurra qualquer coisa ao main sem selftest-gate nem lint e fora do ops/pr-merge-verified.sh, já que o hook exit-2 só vale nas sessões locais, não no runner. Também não verifiquei se ruleset de repo de dono User aceita Integration na bypass list com a mesma semântica de org."
+    trace: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
+    provenance:
+      source: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
+      locator: "objeção #8 do retorno do Elenxo (Achado 9 (GitHub App como bypass_actor always|pull_request))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_MAIN_MUST_KEEP_VERSIONING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: ".claude/hooks/kg-read-leg.sh — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 10 (CPython versiona porque o bootstrap precisa dos arquivos)»"
+    label: "OBJEÇÃO (achado 10, CPython): o motivo do CPython existe no Onion — o hook precisa do índice no disco (gerar 7.722 ms x consultar 8 ms), portas materializam de origin/main e adotantes já ficaram sem PyYAML. O Passo B troca o ESCRITOR, não o versionamento: proibido gitignorar."
+    narrative: "Alvo: Achado 10 (CPython versiona porque o bootstrap precisa dos arquivos) (kind=finding). Evidência do Elenxo (1 agente, sem votação): Usar este achado como argumento contra o Passo B é aplicá-lo errado. O motivo do CPython (o consumidor não tem o gerador) existe no Onion: o hook kg-read-leg precisa do índice no disco, porque gerá-lo custa 7.722 ms contra 8 ms da consulta (kg-read-leg.sh l.23-25), as portas materializam de origin/main e adotantes já ficaram sem PyYAML (memória pyyaml-missing). Isso exige que o main CONTINUE versionando as projeções. O Passo B troca o ESCRITOR, não o versionamento. Restrição: proibido gitignorar as projeções."
+    trace: ".claude/hooks/kg-read-leg.sh"
+    provenance:
+      source: ".claude/hooks/kg-read-leg.sh"
+      locator: "objeção #9 do retorno do Elenxo (Achado 10 (CPython versiona porque o bootstrap precisa dos arquivos))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_MAESTRO_PAT_LOSES_AUDIT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://github.community/t/how-to-let-actions-user-to-push-to-the-repo/147740 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 11 (PAT de usuário no lugar do GITHUB_TOKEN, 2020)»"
+    label: "OBJEÇÃO (achado 11): o contorno por PAT é de 2020 (proteção clássica, não rulesets) e perigoso — PAT do maestro em secret de repo público faz o bot parecer humano, perde a auditoria e herda o papel de admin."
+    narrative: "Alvo: Achado 11 (PAT de usuário no lugar do GITHUB_TOKEN, 2020) (kind=finding). Evidência do Elenxo (1 agente, sem votação): Está datado (proteção clássica, não rulesets) e é perigoso. Um PAT do maestro guardado em secret de repo público faz o push do bot parecer humano, perde a auditoria e herda o bypass de admin. Deve ser rejeitado como escritor único."
+    trace: "https://github.community/t/how-to-let-actions-user-to-push-to-the-repo/147740"
+    provenance:
+      source: "https://github.community/t/how-to-let-actions-user-to-push-to-the-repo/147740"
+      locator: "objeção #10 do retorno do Elenxo (Achado 11 (PAT de usuário no lugar do GITHUB_TOKEN, 2020))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_TEMPL_COMMIT_IS_CONSUMER_REASON
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://templ.guide/developer-tools/cicd — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 13 (templ recomenda commitar *_templ.go, voto 2-1)»"
+    label: "OBJEÇÃO (achado 13): o voto do templ foi 2-1 e o motivo é o consumidor via go install precisar do arquivo — a mesma razão do CPython, compatível com o Passo B (main versionado). Não sustenta 'commitar no PR' como cura da fila."
+    narrative: "Alvo: Achado 13 (templ recomenda commitar *_templ.go, voto 2-1) (kind=finding). Evidência do Elenxo (1 agente, sem votação): O voto foi dividido, e o motivo da recomendação é que um consumidor via go install/go get precisa do arquivo no repo. É a mesma razão do achado 10, compatível com o Passo B, que mantém o main versionado. Não sustenta 'commitar no PR' como solução para a fila."
+    trace: "https://templ.guide/developer-tools/cicd"
+    provenance:
+      source: "https://templ.guide/developer-tools/cicd"
+      locator: "objeção #12 do retorno do Elenxo (Achado 13 (templ recomenda commitar *_templ.go, voto 2-1))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_REGEN_ON_REBASE_ALREADY_EXISTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "ops/pr-merge-verified.sh — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 14 (Trezor: nunca resolver conflito à mão, regenerar)»"
+    label: "OBJEÇÃO (achado 14): 'regenerar, nunca resolver à mão' não distingue as opções — o core já regenera no auto-rebase (pr-merge-verified.sh l.35-36) e os 30-50% de commits de projeção e os CONFLICTING continuaram."
+    narrative: "Alvo: Achado 14 (Trezor: nunca resolver conflito à mão, regenerar) (kind=finding). Evidência do Elenxo (1 agente, sem votação): Não distingue entre as opções. O core já faz isso: o pr-finalize --rebase regenera no auto-rebase (pr-merge-verified.sh l.35-36), e o problema dos 30-50% de commits e dos CONFLICTING continuou."
+    trace: "ops/pr-merge-verified.sh"
+    provenance:
+      source: "ops/pr-merge-verified.sh"
+      locator: "objeção #13 do retorno do Elenxo (Achado 14 (Trezor: nunca resolver conflito à mão, regenerar))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_REGEN_PR_NEEDS_APP_AND_SECOND_MERGE_PATH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://docs.github.com/actions/using-workflows/triggering-a-workflow — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 16 (release-please com token de App para os required checks rodarem)»"
+    label: "OBJEÇÃO (achado 16): PR aberto com GITHUB_TOKEN não dispara pull_request (doc 'Triggering a workflow': primário citado, não lido) e o PR ficaria sem checks; mergeá-lo por automação cria 2º caminho de merge fora do pr-merge-verified, exigindo emenda explícita."
+    narrative: "Alvo: Achado 16 (release-please com token de App para os required checks rodarem) (kind=finding). Evidência do Elenxo (1 agente, sem votação): Vale como RESTRIÇÃO, e o voto foi 2-1. Os checks exigidos têm integration_id 15368 (GitHub Actions). PR aberto ou atualizado com GITHUB_TOKEN não dispara pull_request (doc oficial 'Triggering a workflow from a workflow'), então o PR de regeneração ficaria parado sem checks. Além disso, mergear esse PR por automação no CI cria um segundo caminho de merge fora do ops/pr-merge-verified.sh, o que fere a doutrina do caminho verificado e exige que ela seja emendada explicitamente."
+    trace: "https://docs.github.com/actions/using-workflows/triggering-a-workflow"
+    provenance:
+      source: "https://docs.github.com/actions/using-workflows/triggering-a-workflow"
+      locator: "objeção #15 do retorno do Elenxo (Achado 16 (release-please com token de App para os required checks rodarem))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_OPENTITAN_GATE_IS_POST_REGEN_DESIGN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Achado 19 (OpenTitan versiona e o CI falha se a árvore não estiver limpa)»"
+    label: "OBJEÇÃO (achado 19, OpenTitan): o gate por PR não pega a combinação; mas check-generated + porcelain é o desenho certo para a catraca PÓS-regeneração no main."
+    narrative: "Alvo: Achado 19 (OpenTitan versiona e o CI falha se a árvore não estiver limpa) (kind=finding). Evidência do Elenxo (1 agente, sem votação): É a mesma objeção dos achados 1 e 3: o gate por PR não pega a combinação. Ainda assim, é o desenho certo para a catraca PÓS-regeneração no main (gate check-generated + porcelain)."
+    trace: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21"
+    provenance:
+      source: "https://opensecura.googlesource.com/3p/lowrisc/opentitan/+/ff1f5170bdbafa8ab03e44e41705a749421688c3%5E%21"
+      locator: "objeção #18 do retorno do Elenxo (Achado 19 (OpenTitan versiona e o CI falha se a árvore não estiver limpa))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_INCIDENT_ACCUSES_MERGE_WITHOUT_CI
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "ops/pr-merge-verified.sh — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Premissa (5): 'a projeção commitada no PR já falha na combinação' como prova para o Passo B»"
+    label: "OBJEÇÃO (premissa 5): ff5abe51, onde a bancada reprovou, é o próprio #1081 (merge sem o CI do head novo); com strict=false, o 478/479 acusa tanto o merge sem CI na árvore combinada quanto a projeção commitada. Mecanismo do hunk somado: plausível, NÃO verificado."
+    narrative: "Alvo: Premissa (5): 'a projeção commitada no PR já falha na combinação' como prova para o Passo B (kind=finding). Evidência do Elenxo (1 agente, sem votação): O commit ff5abe51 onde a bancada reprovou é o próprio #1081 (D_MERGE_SEM_CI_APOS_REBASE_LIMPO, merge por --admin sem o CI do head novo). Some-se strict=false no ruleset. Mecanismo plausível, NÃO verificado no diff: dois PRs fazem o mesmo 477→478 no cabeçalho, o merge textual aceita o hunk idêntico e soma os itens (479). O incidente acusa tanto 'mergear sem CI na árvore combinada' quanto 'commitar a projeção'. A cura contrarian barata existe: o caminho verificado exigir base == ponta do main (strict local) e regenerar sempre."
+    trace: "ops/pr-merge-verified.sh"
+    provenance:
+      source: "ops/pr-merge-verified.sh"
+      locator: "objeção #19 do retorno do Elenxo (Premissa (5): 'a projeção commitada no PR já falha na combinação' como prova para o Passo B)"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_HOOK_STALENESS_IS_THE_BRANCH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: ".claude/hooks/kg-read-leg.sh — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Ponto (2): o hook kg-read-leg fica defasado entre o merge e a regeneração»"
+    label: "OBJEÇÃO (ponto 2): o hook lê o índice da ÁRVORE LOCAL (kg-read-leg.sh l.28), não o origin/main; a defasagem que importa é a dos nós novos da branch, e piora no Passo B. Exige regeneração local preguiçosa com cache pelo hash dos .kg.yaml, fora do commit."
+    narrative: "Alvo: Ponto (2): o hook kg-read-leg fica defasado entre o merge e a regeneração (kind=finding). Evidência do Elenxo (1 agente, sem votação): O hook lê o índice da ÁRVORE LOCAL ($CLAUDE_PROJECT_DIR/docs/onion/kg-read-index.tsv, l.28), não o origin/main. A defasagem que importa é a dos nós novos da própria branch, e no Passo B ela piora, porque a branch deixa de regenerar e commitar o índice. Exige regeneração local preguiçosa, com cache pelo hash dos .kg.yaml (os 7,7 s só quando o grafo muda), FORA do commit. A defasagem entre merge e regeneração no main é secundária e some a cada fetch."
+    trace: ".claude/hooks/kg-read-leg.sh"
+    provenance:
+      source: ".claude/hooks/kg-read-leg.sh"
+      locator: "objeção #20 do retorno do Elenxo (Ponto (2): o hook kg-read-leg fica defasado entre o merge e a regeneração)"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_GITHUB_TOKEN_NO_PR_TRIGGER_IS_DOCUMENTED
+    node_type: evidence
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://docs.github.com/actions/using-workflows/triggering-a-workflow — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Descartado: PR com GITHUB_TOKEN não dispara workflows pull_request (refutada)»"
+    label: "OBJEÇÃO (refutação descartada): 'PR com GITHUB_TOKEN não dispara pull_request' é comportamento documentado (exceto workflow_dispatch e repository_dispatch); decide o desenho do escritor. Primário citado, não lido."
+    narrative: "Alvo: Descartado: PR com GITHUB_TOKEN não dispara workflows pull_request (refutada) (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): A refutação contradiz a doc oficial do GitHub ('events triggered by the GITHUB_TOKEN will not create a new workflow run', com exceção de workflow_dispatch e repository_dispatch). É comportamento documentado, e decide o desenho do escritor único. Faltou ler docs.github.com/actions/using-workflows/triggering-a-workflow."
+    trace: "https://docs.github.com/actions/using-workflows/triggering-a-workflow"
+    provenance:
+      source: "https://docs.github.com/actions/using-workflows/triggering-a-workflow"
+      locator: "objeção #21 do retorno do Elenxo (Descartado: PR com GITHUB_TOKEN não dispara workflows pull_request (refutada))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_BOT_AS_BYPASS_ACTOR_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Descartado: github-actions[bot] não pode ser bypass actor (refutada)»"
+    label: "OBJEÇÃO (refutação descartada): 'github-actions[bot] não pode ser bypass actor' foi refutada sem a fonte primária (docs de rulesets, não lida); na dúvida fica de pé. Falta ler creating-rulesets e testar na API do ruleset 25001643."
+    narrative: "Alvo: Descartado: github-actions[bot] não pode ser bypass actor (refutada) (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): A fonte primária (docs de rulesets) ficou na lista de não lidas, e a refutação foi feita sem ela. Na dúvida a objeção fica de pé. Faltou ler creating-rulesets-for-a-repository (bypass list) e testar na API do ruleset 25001643."
+    trace: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
+    provenance:
+      source: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
+      locator: "objeção #22 do retorno do Elenxo (Descartado: github-actions[bot] não pode ser bypass actor (refutada))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_APP_TOKEN_PUSH_PATTERN_DOCUMENTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://github.com/orgs/community/discussions/136531 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Descartado: App com bypass empurra ao protegido via workflow com o token do App (refutada)»"
+    label: "OBJEÇÃO (refutação descartada): App com bypass empurrando via workflow com o token dele é o padrão de actions/create-github-app-token (primário citado, não lido), e o achado 8 o confirma. Rejeitar B3 é por invariante, não por impossibilidade."
+    narrative: "Alvo: Descartado: App com bypass empurra ao protegido via workflow com o token do App (refutada) (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É o padrão documentado de actions/create-github-app-token + bypass, e o próprio achado 8 o confirma ('só funciona se o token for passado ao checkout'). A refutação não cita evidência. Faltou conferir se ruleset de repo pessoal aceita Integration."
+    trace: "https://github.com/orgs/community/discussions/136531"
+    provenance:
+      source: "https://github.com/orgs/community/discussions/136531"
+      locator: "objeção #23 do retorno do Elenxo (Descartado: App com bypass empurra ao protegido via workflow com o token do App (refutada))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_GITLAB_SINGLE_WRITER_AT_MERGE
+    node_type: evidence
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Descartado: a proposta do GitLab é um escritor único no merge (refutada)»"
+    label: "OBJEÇÃO (refutação descartada): a proposta do GitLab 26290 é o precedente externo mais próximo do escritor único; 'depende de merge train' não é 'não é escritor único'. Falta reler a issue nesse ponto."
+    narrative: "Alvo: Descartado: a proposta do GitLab é um escritor único no merge (refutada) (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É o precedente externo mais próximo do Passo B, e o achado 17 só diz que ele DEPENDE de merge train, não que a leitura esteja errada. A refutação parece confundir 'depende de fila' com 'não é escritor único'. Faltou reler a issue #26290 nesse ponto."
+    trace: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+      locator: "objeção #26 do retorno do Elenxo (Descartado: a proposta do GitLab é um escritor único no merge (refutada))"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_GH013_IS_BOUNDARY_CONDITION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "gh api repos/marciocar/onion-evolve/rulesets/25001643 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Cortada por orçamento: push de bot com gerado ao protegido falha com GH013»"
+    label: "OBJEÇÃO (corte por orçamento): 'push de bot com gerado ao protegido falha com GH013' bate com o ruleset medido (commit sem checks → GH013) e é a condição de contorno do escritor: o SHA tem de ter os checks antes do fast-forward."
+    narrative: "Alvo: Cortada por orçamento: push de bot com gerado ao protegido falha com GH013 (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Bate com o ruleset medido (required_status_checks: commit sem checks → GH013). Foi cortada sem motivo e é a condição de contorno do escritor único."
+    trace: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
+    provenance:
+      source: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
+      locator: "objeção #27 do retorno do Elenxo (Cortada por orçamento: push de bot com gerado ao protegido falha com GH013)"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_BYPASS_ALL_OR_NOTHING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩ — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Cortada por orçamento: bypass tudo-ou-nada por ator, sem granularidade por caminho»"
+    label: "OBJEÇÃO (corte por orçamento): bypass é por ator e vale para o ruleset inteiro, sem granularidade por caminho; com always, derruba selftest-gate e lint para tudo. Central ao risco de B3."
+    narrative: "Alvo: Cortada por orçamento: bypass tudo-ou-nada por ator, sem granularidade por caminho (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Central para o risco de segurança do achado 9 (bypass=always derruba selftest-gate e lint para tudo). Não pode ser cortada por orçamento."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
+      locator: "objeção #28 do retorno do Elenxo (Cortada por orçamento: bypass tudo-ou-nada por ator, sem granularidade por caminho)"
+      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      locality: "host"
+  - id: E_OBJECAO_GREEN_SHA_FAST_FORWARD_IS_KEY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Cortada por orçamento: commit com o check exigido já aprovado satisfaz a proteção»"
+    label: "OBJEÇÃO (corte por orçamento): 'commit com o check exigido já aprovado satisfaz a proteção' é a afirmação de maior valor da rodada e funda o B1 (workflow_dispatch + fast-forward do SHA verde, retry, sem loop). Doc 'require status checks': primário citado, não lido."
+    narrative: "Alvo: Cortada por orçamento: commit com o check exigido já aprovado satisfaz a proteção (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É a afirmação de maior valor da rodada, e foi cortada. Com só required_status_checks, um escritor único SEM bypass fica viável: regenera numa branch auto/projections, dispara selftest+validate por workflow_dispatch (que o GITHUB_TOKEN PODE disparar), e com os checks verdes faz fast-forward push do mesmo SHA ao main. Se o main andou, o ff falha e o job tenta de novo. Push por GITHUB_TOKEN não redispara push, o que evita loop. Faltou ler a doc oficial de 'require status checks before merging'."
+    trace: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+    provenance:
+      source: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches"
+      locator: "objeção #30 do retorno do Elenxo (Cortada por orçamento: commit com o check exigido já aprovado satisfaz a proteção)"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_ADMIN_BYPASS_ONLY_IN_PR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "gh api repos/marciocar/onion-evolve/rulesets/25001643 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Cortada por orçamento: bypass de branch ruleset só via PR, push rules agnósticas de ref»"
+    label: "OBJEÇÃO (corte por orçamento): bypass de ruleset de branch só via PR, confirmado no core (admin com bypass_mode=pull_request, medido): o escritor único não pode ser 'o maestro com --admin' nem credencial que herde esse papel."
+    narrative: "Alvo: Cortada por orçamento: bypass de branch ruleset só via PR, push rules agnósticas de ref (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É relevante e foi confirmado na medição local (admin com bypass_mode=pull_request): o admin não empurra direto. Prova que o escritor único não pode ser 'o maestro com --admin'. Foi cortada sem motivo."
+    trace: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
+    provenance:
+      source: "gh api repos/marciocar/onion-evolve/rulesets/25001643"
+      locator: "objeção #35 do retorno do Elenxo (Cortada por orçamento: bypass de branch ruleset só via PR, push rules agnósticas de ref)"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "repo"
+  - id: E_OBJECAO_EXEMPTION_IS_SILENT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩ — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Cortada por orçamento: exemption pula a aplicação em silêncio, ao contrário do bypass»"
+    label: "OBJEÇÃO (corte por orçamento): exemption pula a aplicação sem rastro, bypass deixa rastro; se o caminho for App, a escolha do modo decide a auditabilidade e é parte do desenho."
+    narrative: "Alvo: Cortada por orçamento: exemption pula a aplicação em silêncio, ao contrário do bypass (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Se o caminho for App, decide auditabilidade: exempt não deixa rastro, bypass deixa. A escolha do modo é parte do desenho."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
+      locator: "objeção #37 do retorno do Elenxo (Cortada por orçamento: exemption pula a aplicação em silêncio, ao contrário do bypass)"
+      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      locality: "host"
+  - id: E_OBJECAO_ADMIN_DIRECT_PUSH_AUDIT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩ — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Cortada por orçamento: bypass de admin faz push direto sem prompt»"
+    label: "OBJEÇÃO (corte por orçamento): 'bypass de admin faz push direto sem prompt' toca auditoria e nada foi lido para contrapor; credencial com papel de admin como escritor herda isso."
+    narrative: "Alvo: Cortada por orçamento: bypass de admin faz push direto sem prompt (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Toca auditoria. Nada foi lido para contrapor."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
+      locator: "objeção #38 do retorno do Elenxo (Cortada por orçamento: bypass de admin faz push direto sem prompt)"
+      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      locality: "host"
+  - id: E_OBJECAO_AUTOMERGE_IGNORES_APP_BYPASS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩ — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Cortada por orçamento: bypass do App vale no endpoint síncrono de merge e não no gh pr merge --auto»"
+    label: "OBJEÇÃO (corte por orçamento): o bypass do App vale no endpoint síncrono de merge e não no gh pr merge --auto; a variante 'PR de regeneração automergeado' falharia em silêncio. Cortada sem medir."
+    narrative: "Alvo: Cortada por orçamento: bypass do App vale no endpoint síncrono de merge e não no gh pr merge --auto (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Decide a variante 'PR de regeneração automergeado': o auto-merge do gh falharia em silêncio. Foi cortada sem medir."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
+      locator: "objeção #41 do retorno do Elenxo (Cortada por orçamento: bypass do App vale no endpoint síncrono de merge e não no gh pr merge --auto)"
+      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      locality: "host"
+  - id: E_OBJECAO_RULESETS_PRIMARY_DOC_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Fonte não lida: docs.github.com creating-rulesets-for-a-repository»"
+    label: "OBJEÇÃO (fonte não lida): creating-rulesets-for-a-repository é a fonte PRIMÁRIA para bypass_actors, modos e repo pessoal; sem ela os achados 8, 9 e 16 e três refutações ficam em fórum. Era a primeira a ler, antes de selar."
+    narrative: "Alvo: Fonte não lida: docs.github.com creating-rulesets-for-a-repository (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É a fonte PRIMÁRIA (tier alto) para bypass_actors, modos e repo pessoal. Sem ela, os achados 8, 9 e 16 e três refutações ficam em fórum. Era a primeira a ler."
+    trace: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
+    provenance:
+      source: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
+      locator: "objeção #42 do retorno do Elenxo (Fonte não lida: docs.github.com creating-rulesets-for-a-repository)"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_DISCUSSION_43460_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://github.com/orgs/community/discussions/43460 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Fonte não lida: community discussions 43460»"
+    label: "OBJEÇÃO (fonte não lida): community discussion 43460 toca bot e ruleset, eixo central do escritor; não lida."
+    narrative: "Alvo: Fonte não lida: community discussions 43460 (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Toca bot e ruleset, eixo central. Não foi lida."
+    trace: "https://github.com/orgs/community/discussions/43460"
+    provenance:
+      source: "https://github.com/orgs/community/discussions/43460"
+      locator: "objeção #43 do retorno do Elenxo (Fonte não lida: community discussions 43460)"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_DISCUSSION_25305_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "https://github.com/orgs/community/discussions/25305 — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Fonte não lida: community discussions 25305»"
+    label: "OBJEÇÃO (fonte não lida): community discussion 25305, eixo bot-push-ruleset; não lida."
+    narrative: "Alvo: Fonte não lida: community discussions 25305 (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Mesmo eixo, bot-push-ruleset. Não foi lida."
+    trace: "https://github.com/orgs/community/discussions/25305"
+    provenance:
+      source: "https://github.com/orgs/community/discussions/25305"
+      locator: "objeção #44 do retorno do Elenxo (Fonte não lida: community discussions 25305)"
+      method: "leitura: Elenxo do run wf_e26bb266-4aa (1 agente, sem votação)"
+      locality: "web"
+  - id: E_OBJECAO_TENKI_RELEASE_AUTOMATION_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩ — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Fonte não lida: tenki.cloud release-automation»"
+    label: "OBJEÇÃO (fonte não lida): tenki.cloud release-automation cobre o PR de bot (coalescência e concorrência) e ficou sem substituto lido."
+    narrative: "Alvo: Fonte não lida: tenki.cloud release-automation (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Cobre o eixo do PR de bot (coalescência e concorrência), sem substituto lido."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
+      locator: "objeção #45 do retorno do Elenxo (Fonte não lida: tenki.cloud release-automation)"
+      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      locality: "host"
+  - id: E_OBJECAO_EDENAI_FRESHNESS_GATE_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩ — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Fonte não lida: edenai/docs PR 50»"
+    label: "OBJEÇÃO (fonte não lida): edenai/docs PR 50 toca a catraca de frescor no main, a lacuna do ponto (1); na dúvida, sobrevive."
+    narrative: "Alvo: Fonte não lida: edenai/docs PR 50 (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Toca o eixo da catraca de frescor no main, a lacuna do ponto (1). Na dúvida, sobrevive."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
+      locator: "objeção #46 do retorno do Elenxo (Fonte não lida: edenai/docs PR 50)"
+      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      locality: "host"
+  - id: E_OBJECAO_OPAM_RUNTIME_READER_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩ — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Fonte não lida: opam-monorepo manage-duniverse»"
+    label: "OBJEÇÃO (fonte não lida): opam-monorepo manage-duniverse, eixo 'não versionar e ler em runtime', o mais fraco da rodada, ficou sem nenhuma fonte."
+    narrative: "Alvo: Fonte não lida: opam-monorepo manage-duniverse (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Eixo 'não versionar e ler em runtime', o mais fraco da rodada, sem nenhum achado. Ficou sem fonte."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
+      locator: "objeção #48 do retorno do Elenxo (Fonte não lida: opam-monorepo manage-duniverse)"
+      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      locality: "host"
+  - id: E_OBJECAO_TESSL_MERGE_CONFLICT_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩ — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Fonte não lida: tessl frb-fix-merge-conflict»"
+    label: "OBJEÇÃO (fonte não lida): tessl frb-fix-merge-conflict, eixo leitor em runtime e conflito de gerado; não lida."
+    narrative: "Alvo: Fonte não lida: tessl frb-fix-merge-conflict (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Mesmo eixo de leitor em runtime e conflito de gerado. Não lida."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
+      locator: "objeção #49 do retorno do Elenxo (Fonte não lida: tessl frb-fix-merge-conflict)"
+      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      locality: "host"
+  - id: E_OBJECAO_ASPECT_LOCKFILE_CONTRARIAN_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩ — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Fonte não lida: aspect-build easier merges on lockfiles»"
+    label: "OBJEÇÃO (fonte não lida): aspect-build 'easier merges on lockfiles' é o ângulo CONTRARIAN pedido (manter commitado e curar o conflito) e foi cortado; o contrarian ficou só com fontes que não tratam da combinação."
+    narrative: "Alvo: Fonte não lida: aspect-build easier merges on lockfiles (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): É o ângulo CONTRARIAN pedido no Scope (manter commitado e curar o conflito), e foi cortado. Sem ele o contrarian ficou só com templ/Trezor/OpenTitan, que não tratam da combinação."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
+      locator: "objeção #50 do retorno do Elenxo (Fonte não lida: aspect-build easier merges on lockfiles)"
+      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      locality: "host"
+  - id: E_OBJECAO_GETTEXT_VCS_DOC_UNREAD
+    node_type: evidence
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩ — objeção sobrevivente do Elenxo do run wf_e26bb266-4aa sobre «Fonte não lida: GNU gettext 'Files under Version Control'»"
+    label: "OBJEÇÃO (fonte não lida): GNU gettext 'Files under Version Control', doc canônica sobre o que versionar entre gerados, também contrarian; não lida."
+    narrative: "Alvo: Fonte não lida: GNU gettext 'Files under Version Control' (kind=discarded-by-comodismo). Evidência do Elenxo (1 agente, sem votação): Doc canônica e antiga sobre o que versionar entre gerados. Também é o contrarian, e não foi lida."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c)⟩"
+      locator: "objeção #51 do retorno do Elenxo (Fonte não lida: GNU gettext 'Files under Version Control')"
+      method: "derivado: objeção do Elenxo do run wf_e26bb266-4aa (1 agente, sem votação), registrada no journal"
+      locality: "host"
+  - id: E_LACUNAS_POSTMERGE_WRITER_2026_10
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "contagem do retorno do run wf_e26bb266-4aa (Elenxo e sintetizador) no journal, e contagem de E_OBJECAO no grafo"
+    source_tier: 10
+    source_kind: primary
+    label: "O QUE A RODADA NÃO COBRIU, contado: objeções 52 julgadas, 34 sobreviventes, 34 modeladas (nenhuma fora do teto); 6 claims refutadas por fonte fraca; 0 não verificadas por rede; 22 fontes e 25 claims cortadas por orçamento."
+    narrative: "(1) OBJEÇÕES: 52 julgadas, 34 SOBREVIVENTES (14 sobre achados + 20 sobre descartes, cortes e fontes não lidas), 34 MODELADAS como E_OBJECAO_*; 18 não sobreviveram (7 achados confirmados sem objeção de pé + 11 descartes por evidência). Contadas no retorno COMPLETO do journal; a recomendação chegou ao escritor cortada em 'required_status_ch' e a narrative de D_ tem o texto inteiro. (2) REFUTADAS na votação (6): REFUTADA no voto, mas pede fonte primária (docs.github.com): branches atualizados com o GITHUB_TOKEN padrão não disparam workflows pull_request, e o PR automático fica preso esperando required checks. Se for verdade, o token de App deixa de ser opcional e vira obrigatório. · REFUTADA no voto: github-actions[bot] não pode ser bypass actor de ruleset, só roles, Teams, Deploy keys ou Apps. Conferir na doc primária de rulesets. · REFUTADA no voto: um App com bypass de 'required pull requests' empurra ao main protegido a partir de um workflow disparado por push. Isso decide se o push direto é viável. · REFUTADA no voto: a divisão 'fonte dona dos pins, gerador dono das saídas' (escritor único da saída gerada). · REFUTADA no voto: trocar github-actions[bot] por App falha fechado se 'Restrict who can push' citar só a identidade antiga. · REFUTADA no voto: a proposta do GitLab 26290 seria um job que regenera no momento do merge (escritor único no merge). A leitura confirmada é que ela depende de merge train. (3) NÃO VERIFICADAS por rede: 0. (4) CORTADAS POR ORÇAMENTO: 22 fontes e 25 claims — entre elas as docs primárias de rulesets e de status checks, as discussions 43460 e 25305, tenki.cloud, edenai/docs PR 50, opam-monorepo, tessl, aspect-build e GNU gettext (as sobreviventes viraram objeção). (5) EIXOS SEM CLAIM: Bazel/Nx/Turborepo 'generated files', linguist-generated, leitor em runtime de índice defasado, comportamento sob rajada de merges. (6) PERGUNTAS ABERTAS do sintetizador: O PR de regeneração do escritor único pode ser mergeado sem humano e ainda pelo caminho verificado ops/pr-merge-verified.sh? O hook exit-2 cobre a sessão do agente, não um job do Actions. Auto-merge do GitHub com required checks seria a mesma garantia ou uma segunda porta de merge? · Criar um GitHub App próprio (com chave privada em secret) num repo público de dono User é aceitável frente à postura de acoplamento e à rotação de chaves parada por ordem? · Na janela entre o merge e a regeneração, o kg-read-leg deve recomputar o índice em runtime (custo) ou avisar a defasagem (declaração)? Qual o tamanho medido da janela? · As REGRAS 39, 80, 81 e 84 julgam todas projeções do mesmo tipo, ou alguma (inventário, painéis) tem consumidor em runtime que exige sincronia no PR e deve ficar fora do Passo B? · Com uma rajada de N merges, um PR rolante único com concurrency e cancel-in-progress converge sempre para o main mais recente, ou pode deixar o main em sincronia com um SHA intermediário? Isso pede dogfood de modo de falha. · Vale um piloto só com docs/backlog.md (o arquivo do incidente 478 vs 479) antes de migrar todas as projeções? (7) RESSALVA DO ESCRITOR: o Elenxo escreveu que o hook lê $CLAUDE_PROJECT_DIR/docs/onion/kg-read-index.tsv; o código (kg-read-leg.sh l.28) resolve pela pasta do próprio script — o efeito é o mesmo (árvore local). O sintetizador propôs B2 com cancel-in-progress; o Elenxo pede concurrency SEM cancelar no B1. Os títulos das REGRAS 39, 80, 81 e 84 não foram verificados nesta rodada."
+    trace: "run wf_e26bb266-4aa fase Elenxo"
+    provenance:
+      source: "⟨journal do run wf_e26bb266-4aa: resultado da fase Elenxo (agente a67eb85997600422c) e da fase Synthesize (agente a7a7af783e905c7a0)⟩"
+      locator: "objections (52; survives=True 34); unverifiedList (6); openQuestions (6); recommendation"
+      method: "medição: json.load do resultado no journal + contagem por survives/kind"
+      locality: "host"
+  - id: E_RULESETS_BYPASS_MODE_PR_ONLY_NO_DIRECT_PUSH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"to grant bypass to an actor without allowing them to push directly to a repository\" — Creating rulesets for a repository > Granting bypass permissions (menu ao lado de 'Always allow' > 'For pull requests only') — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "Doc primária de rulesets: há dois modos de bypass, 'Always allow' e 'For pull requests only'; o segundo concede bypass sem permitir push direto ao repositório."
+    narrative: "Sustenta, por fonte primária, o que o grafo já mediu no ruleset 25001643 (admin com bypass_mode=pull_request): o bypass do admin não empurra direto. A ancoragem rejeitou duas extensões do leitor: 'Always allow' ser o PADRÃO (inferido do 'Optionally') e o modo 'obrigar a abrir PR' (o texto só diz 'sem push direto'). A doc não diz se App ou bot em repo PESSOAL vê essas opções."
+    trace: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
+    provenance:
+      source: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
+      locator: "Creating rulesets for a repository > Granting bypass permissions (menu ao lado de 'Always allow' > 'For pull requests only')"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_RULESETS_STRICT_REQUIRES_CHECK_DEFINED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"If you select **Require branches to be up to date before merging**, you must define a check for the protection to take effect.\" — Creating rulesets for a repository > Require status checks before merging (Additional settings) — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "Doc de rulesets: o modo strict ('Require branches to be up to date') exige um check definido; nada no texto condiciona required_status_checks a uma regra de pull request."
+    narrative: "A segunda metade é argumento por SILÊNCIO, e o leitor a declarou como leitura do texto, não afirmação verbatim. O Elenxo manteve a objeção: não prova que push direto seja aceito quando não há regra pull_request. O ruleset vivo tem strict=false."
+    trace: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
+    provenance:
+      source: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/creating-rulesets-for-a-repository"
+      locator: "Creating rulesets for a repository > Require status checks before merging (Additional settings)"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_ABOUT_RULESETS_BYPASS_NO_PERSONAL_VS_ORG
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"This can be users with a certain role, such as repository administrator\" — About rulesets > seção sobre bypass permissions — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "About rulesets fala de bypass por papel (ex.: admin), times ou GitHub Apps e NÃO distingue repositório pessoal de organização: a lacuna 'repo pessoal × org' não é respondida pela doc."
+    narrative: "Lacuna confessada pela própria claim. Em conta User não há org owner, times nem papel maintain; a medição viva (RepositoryRole id 5 = admin) só confirma o papel admin. Integration, github-actions[bot] e DeployKey como bypass actor em repo pessoal seguem sem evidência."
+    trace: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets"
+    provenance:
+      source: "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets"
+      locator: "About rulesets > seção sobre bypass permissions"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_PROTECTED_BRANCH_PUSH_DIRECT_AFTER_CHECKS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"After all required status checks pass, any commits must either be pushed to another branch and then merged or pushed directly to the protected branch.\" — about-protected-branches.md l.99 (Require status checks before merging) — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "Doc de branch protection CLÁSSICA: depois de os checks exigidos passarem, commits vão por outra branch + merge OU direto à branch protegida. Não decide o caso de fast-forward de SHA verde num RULESET."
+    narrative: "É a frase que E_OBJECAO_GREEN_SHA_FAST_FORWARD_IS_KEY citava sem ler; agora lida e ancorada. O Elenxo: o locator é branch protection clássica, não ruleset, e a frase não diz que checks verdes obtidos a partir de OUTRA ref valem para o push. Prova menos do que a pergunta (1) exige — a lacuna central segue aberta."
+    trace: "https://raw.githubusercontent.com/github/docs/main/content/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/github/docs/main/content/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches.md"
+      locator: "about-protected-branches.md l.99 (Require status checks before merging)"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_RULESET_STATUS_CHECKS_BEFORE_CHANGES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"Required status checks ensure that all required CI tests are passing before collaborators can make changes to a branch or tag targeted by your ruleset.\" — available-rules-for-rulesets.md l.173 (Require status checks to pass before merging) — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "Em rulesets, required status checks exigem CI verde antes de colaboradores alterarem a branch ou tag alvo."
+    narrative: "Sustenta 'requer verde' (a condição de contorno GH013). Não diz por qual via a mudança entra (push ou merge), se o token do Actions conta como 'collaborator', nem como o ruleset casa o check com integration_id 15368 quando o run veio de workflow_dispatch noutra branch."
+    trace: "https://raw.githubusercontent.com/github/docs/main/content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/github/docs/main/content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md"
+      locator: "available-rules-for-rulesets.md l.173 (Require status checks to pass before merging)"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_RULESET_LOOSE_NOT_UP_TO_DATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"The branch **does not** have to be up to date with the base branch before merging.\" — available-rules-for-rulesets.md l.194 (tabela Loose) — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "Em rulesets, o modo loose (strict desmarcado) não exige que a branch esteja atualizada com a base antes do merge — o regime do ruleset 25001643 (strict=false, medido)."
+    narrative: "Única claim que o Elenxo julgou sem objeção sobrevivente entre as de status checks: verbatim e casa com o vivo. Sustenta a premissa da Fase 0 (strict local no caminho verificado), porque o ruleset não vê a árvore combinada."
+    trace: "https://raw.githubusercontent.com/github/docs/main/content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/github/docs/main/content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md"
+      locator: "available-rules-for-rulesets.md l.194 (tabela Loose)"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_GITHUB_TOKEN_EVENTS_DISPATCH_EXCEPTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"With the exception of `workflow_dispatch` and `repository_dispatch`, other `GITHUB_TOKEN`-triggered events do not create workflow runs at all.\" — events-that-trigger-workflows.md l.468 (nota da seção pull_request) — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "Doc de eventos: fora workflow_dispatch e repository_dispatch, eventos disparados por GITHUB_TOKEN não criam runs; um push do escritor com esse token não dispara workflows."
+    narrative: "A ancoragem rejeitou a EXAUSTIVIDADE da lista na claim irmã: a doc atual traz uma terceira exceção, pull_request opened/synchronize/reopened criado ou atualizado com GITHUB_TOKEN, que gera runs em estado 'approval-required'. Para PUSH vale 'sem run, sem loop'. 'Obriga a disparar por workflow_dispatch' é inferência: um escritor que abrisse PR teria runs, presas em aprovação humana. workflow_dispatch é o caminho que roda sem aprovação."
+    trace: "https://raw.githubusercontent.com/github/docs/main/content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/github/docs/main/content/actions/reference/workflows-and-actions/events-that-trigger-workflows.md"
+      locator: "events-that-trigger-workflows.md l.468 (nota da seção pull_request)"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_RULESETS_BYPASS_ELIGIBLE_LIST
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"* Repository admins, organization owners, and enterprise owners * The maintain or write role, or custom repository roles based on the write role\" — data/reusables/repositories/rulesets-bypass-step.md (lista 'The following are eligible for bypass access') — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "Elegíveis a bypass de ruleset: admin/maintain/write (e papéis custom de write), times, GitHub Apps e Dependabot; github-actions[bot] não aparece nominalmente e a doc não separa repo pessoal de org."
+    narrative: "Ausência na lista não é proibição. A ancoragem rejeitou a frase do leitor 'o caminho documentado é um GitHub App' (inferência: a doc não indica caminho nenhum para o GITHUB_TOKEN). Sustenta E_APP_AS_RULESET_BYPASS_ACTOR por fonte primária, sem responder se vale em conta User."
+    trace: "https://raw.githubusercontent.com/github/docs/main/data/reusables/repositories/rulesets-bypass-step.md"
+    provenance:
+      source: "https://raw.githubusercontent.com/github/docs/main/data/reusables/repositories/rulesets-bypass-step.md"
+      locator: "data/reusables/repositories/rulesets-bypass-step.md (lista 'The following are eligible for bypass access')"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_GITHUB_TOKEN_NO_NEW_RUN_NO_LOOP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"events triggered by the `GITHUB_TOKEN` will not create a new workflow run, with the following exceptions:\" — triggering-a-workflow, 'Triggering a workflow from a workflow'; mesmo texto em github_token, 'When GITHUB_TOKEN triggers workflow runs' — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "Eventos disparados com o GITHUB_TOKEN não criam nova execução de workflow: um escritor que faz push com esse token não entra em loop, por construção."
+    narrative: "O Elenxo fecha o caso PUSH e levanta o efeito colateral: o mesmo silêncio faz o push do escritor em main não disparar NENHUM outro workflow on:push de main (staleness de porta, relatórios, deploy) — ver Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS. A lista 'with the following exceptions:' tem ao menos três itens (dispatch e pull_request opened/synchronize/reopened com approval-required)."
+    trace: "https://docs.github.com/en/actions/using-workflows/triggering-a-workflow"
+    provenance:
+      source: "https://docs.github.com/en/actions/using-workflows/triggering-a-workflow"
+      locator: "triggering-a-workflow, 'Triggering a workflow from a workflow'; mesmo texto em github_token, 'When GITHUB_TOKEN triggers workflow runs'"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_GITHUB_TOKEN_SCOPE_OWN_REPO_APP_OUTSIDE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"the `GITHUB_TOKEN` can only access resources within the workflow's repository.\" — Making authenticated API requests with a GitHub App in a GitHub Actions workflow, seção 'About GitHub Actions authentication' — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "A doc põe o GITHUB_TOKEN como padrão para o repo do próprio workflow e reserva o GitHub App para recursos fora dele; o token de App não é apresentado como contorno de bypass."
+    narrative: "Coerente com o B1 sem bypass: o escritor escreve no próprio repo e dispensa App. Sem objeção sobrevivente no Elenxo."
+    trace: "https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/making-authenticated-api-requests-with-a-github-app-in-a-github-actions-workflow"
+    provenance:
+      source: "https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/making-authenticated-api-requests-with-a-github-app-in-a-github-actions-workflow"
+      locator: "Making authenticated API requests with a GitHub App in a GitHub Actions workflow, seção 'About GitHub Actions authentication'"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_APP_TOKEN_BOT_USER_GIT_PUSH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"# Git commands like commit and push work using the bot user\" — README actions/create-github-app-token, seção 'Configure Git CLI for an app's bot user', comentário no YAML (linha 119) — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 8
+    source_kind: primary
+    label: "O README da action create-github-app-token mostra git commit e push com o usuário bot do App; não afirma que isso dispare workflows nem que burle rulesets."
+    narrative: "Documenta o padrão alternativo (B2/B3), e só isso. Não sustenta a parte 'App com bypass empurra ao protegido' de E_OBJECAO_APP_TOKEN_PUSH_PATTERN_DOCUMENTED."
+    trace: "https://github.com/actions/create-github-app-token"
+    provenance:
+      source: "https://github.com/actions/create-github-app-token"
+      locator: "README actions/create-github-app-token, seção 'Configure Git CLI for an app's bot user', comentário no YAML (linha 119)"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_APP_TOKEN_REVOKED_POST_STEP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"the token is revoked in the `post` step of the action, which means it cannot be passed to another job.\" — README actions/create-github-app-token, lista numerada sobre o token (item 3, linha 436), relativa ao input skip-token-revoke — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 8
+    source_kind: primary
+    label: "O token de instalação do App é revogado no post step da action e não passa entre jobs: quem usar App precisa criar o token no mesmo job que faz o push."
+    narrative: "Consequência de desenho só se o B1 trocar o GITHUB_TOKEN por App (variante B2/B3). Sem objeção sobrevivente."
+    trace: "https://github.com/actions/create-github-app-token"
+    provenance:
+      source: "https://github.com/actions/create-github-app-token"
+      locator: "README actions/create-github-app-token, lista numerada sobre o token (item 3, linha 436), relativa ao input skip-token-revoke"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_DISCUSSION_25305_ACTIONS_NO_PROTECTED_PUSH_2019
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"If we enabled GitHub Actions to push to a protected branch then any collaborator in your repo could push any code to any branch they wanted\" — Discussion 25305, resposta aceita de chrispat, 11 out 2019 — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    valid_from: "2019-10-11"
+    source_tier: 6
+    source_kind: forum
+    label: "Staff do GitHub (2019, resposta aceita): github-actions[bot] não empurra para branch protegida porque qualquer colaborador poderia empurrar qualquer código; o fluxo recomendado é a API de merge do PR."
+    narrative: "Branch protection CLÁSSICA, anterior aos rulesets. A razão é sobre CONCEDER bypass ao bot; não decide se um push do GITHUB_TOKEN de um SHA com checks verdes passa num ruleset que só exige status checks. Para o B1 prova menos."
+    trace: "https://github.com/orgs/community/discussions/25305"
+    provenance:
+      source: "https://github.com/orgs/community/discussions/25305"
+      locator: "Discussion 25305, resposta aceita de chrispat, 11 out 2019"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_DISCUSSION_25305_ACTIONS_USER_NOT_BRANCH_SCOPED_2022
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"This still wouldn't be secure as the GitHub Actions user isn't branch specific.\" — Discussion 25305, comentário de chrispat, 6 jan 2022 — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    valid_from: "2022-01-06"
+    source_tier: 6
+    source_kind: forum
+    label: "Staff reitera em 2022 que o usuário do GitHub Actions não é escopado por branch, logo permitir que ele empurre ao protegido seria inseguro."
+    narrative: "Mesmo limite da resposta de 2019: argumento contra dar bypass ao bot (reforça a rejeição de B3), não sobre o fast-forward de SHA verde sem bypass."
+    trace: "https://github.com/orgs/community/discussions/25305"
+    provenance:
+      source: "https://github.com/orgs/community/discussions/25305"
+      locator: "Discussion 25305, comentário de chrispat, 6 jan 2022"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_DISCUSSION_43460_STATUS_BYPASS_ONLY_RULESETS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.4
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"the only way to let a user bypass status checks is to use rulesets (this has always been the case)\" — Discussion 43460, comentário de wheelerlaw, 20 nov 2024 — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    valid_from: "2024-11-20"
+    source_tier: 2
+    source_kind: forum
+    label: "Comunidade (não staff): bypass de required status checks só existe via rulesets, nunca existiu em branch protection clássica."
+    narrative: "Anedótico (tier 2). A afirmação de staff sobre Apps e usuários nomeados nesta discussão foi REJEITADA na ancoragem (comentários de 2023 e 2024 misturados; o 'apenas' era síntese do leitor). Nada aqui decide se o bot pode ser bypass actor."
+    trace: "https://github.com/orgs/community/discussions/43460"
+    provenance:
+      source: "https://github.com/orgs/community/discussions/43460"
+      locator: "Discussion 43460, comentário de wheelerlaw, 20 nov 2024"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_ASPECT_LOCKFILE_STRANGE_CASE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"Lockfiles are a strange case of code which is checked into your repository, but not really editable.\" — Parágrafo 1 (logo após a imagem de capa) — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 3
+    source_kind: engineer
+    label: "O post da Aspect enquadra o gerado commitado como caso estranho (versionado mas não editável), e o rebase com atualização concorrente gera conflito — o contrarian lido."
+    narrative: "É o ângulo contrarian que o run anterior cortou por orçamento, agora lido. O post é sobre LOCKFILES, onde o gerenciador sabe re-resolver; não trata de projeções de grafo."
+    trace: "https://aspect.build/blog/easier-merges-on-lockfiles"
+    provenance:
+      source: "https://aspect.build/blog/easier-merges-on-lockfiles"
+      locator: "Parágrafo 1 (logo após a imagem de capa)"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_ASPECT_AUTORESOLVE_DEPENDS_ON_MANAGER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"But not all engineers know that this works, and not all package managers know to do the resolution.\" — Parágrafo 2 — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 3
+    source_kind: engineer
+    label: "A Aspect admite que a autorresolução de conflito no gerado depende do gerenciador (pnpm sim, bzlmod não) e de o engenheiro lembrar dela: é disciplina, não mecanismo."
+    narrative: "Reforça E_GITLAB_MANUAL_REGEN_FAILS (disciplina manual falha) e limita o contrarian C: a cura depende de quem lembra."
+    trace: "https://aspect.build/blog/easier-merges-on-lockfiles"
+    provenance:
+      source: "https://aspect.build/blog/easier-merges-on-lockfiles"
+      locator: "Parágrafo 2"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_ASPECT_OURS_MERGE_DRIVER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"there's a trivial way to define one that always takes \"our\" file as the merge result:\" — Seção do merge driver, imediatamente antes do bloco `git config --global merge.ours.driver true` — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 3
+    source_kind: engineer
+    label: "A cura da Aspect é um merge driver 'ours' que sai com zero e mantém a versão local: silencia o conflito, sem regenerar o arquivo."
+    narrative: "O driver é configurado por git config --global (configuração pessoal, fora do repo; só o .gitattributes viaja). A ancoragem rejeitou a extensão do leitor sobre bot/CI/determinismo (o post não fala disso). Para as projeções do Onion faltaria o passo 'ours + regenerar', que o post não dá."
+    trace: "https://aspect.build/blog/easier-merges-on-lockfiles"
+    provenance:
+      source: "https://aspect.build/blog/easier-merges-on-lockfiles"
+      locator: "Seção do merge driver, imediatamente antes do bloco `git config --global merge.ours.driver true`"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_GETTEXT_THREE_POLICIES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"All generated files are always committed into the repository. All generated files are committed into the repository occasionally, for example each time a release is made. Generated files are never committed into the repository.\" — 14.7.2, parágrafo introdutório e lista de três itens — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "O manual do GNU gettext enumera três políticas para gerados — sempre commitar, commitar ocasionalmente, nunca commitar — cada uma com custos, sem prescrever uma única."
+    narrative: "Doc canônica que o run anterior não leu. O manual não prescreve escritor único; não serve nem para selar o B1 nem para descartá-lo."
+    trace: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
+    provenance:
+      source: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
+      locator: "14.7.2, parágrafo introdutório e lista de três itens"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_GETTEXT_ALWAYS_COMMIT_COSTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"The advantage is that anyone can check out the source at any moment and gets a working build. The drawbacks are: 1a. It requires some frequent \"push\" actions by the maintainers. 1b. The repository grows in size quite fast.\" — 14.7.2, abordagem 1 (sempre commitar) — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "Commitar sempre o gerado dá build funcional em qualquer checkout, ao custo de pushes frequentes dos mantenedores e de crescimento rápido do repositório."
+    narrative: "O regime atual do Onion (e o que o B1 preserva no main): o consumidor sem gerador ganha; o custo 1a é exatamente os ~50% de commits de projeção medidos."
+    trace: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
+    provenance:
+      source: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
+      locator: "14.7.2, abordagem 1 (sempre commitar)"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_GETTEXT_OCCASIONAL_COMMIT_CONFLICTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"When a release is made and a commit is made on the generated files, the other developers get conflicts on the generated files when merging the local work back to the repository. Although these conflicts are easy to resolve, they are annoying.\" — 14.7.2, abordagem 2, drawback 2b — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "No commit ocasional (a cada release) os outros desenvolvedores ganham conflitos nos gerados ao mergear; o manual os chama de fáceis de resolver, mas incômodos: custo conhecido e tratável."
+    narrative: "É o contrarian mais forte da rodada. Objeção do Elenxo: no gettext o conflito aparece a cada RELEASE; no Onion a projeção regenera a cada PR, então frequência e raio de colisão não transferem."
+    trace: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
+    provenance:
+      source: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
+      locator: "14.7.2, abordagem 2, drawback 2b"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_GETTEXT_NEVER_COMMIT_NEEDS_TOOLS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"The advantage is less work for the maintainers. The drawback is that anyone who checks out the source not only needs tools like GNU automake, GNU autoconf, GNU m4 installed in his PATH, but also that he needs to perform a package specific pre-build step\" — 14.7.2, abordagem 3 (nunca commitar) — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: primary
+    label: "Nunca commitar o gerado poupa os mantenedores, mas exige de quem faz checkout as ferramentas instaladas e um passo de pré-build — o regime oposto, que o B1 evita."
+    narrative: "Sustenta por fonte canônica a rejeição da opção U e a restrição de E_OBJECAO_MAIN_MUST_KEEP_VERSIONING (hook, portas e adotantes sem gerador)."
+    trace: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
+    provenance:
+      source: "https://www.gnu.org/software/gettext/manual/html_node/Files-under-Version-Control.html"
+      locator: "14.7.2, abordagem 3 (nunca commitar)"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_GITLAB_26290_PROPOSAL_MERGE_TRAIN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"In conjunction with the merge train (choo choo!), we can use this job to remove the burden from the contributor\" — issue 26290, seção '### Proposal' — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: engineer
+    label: "A proposta da issue GitLab 26290 liga a regeneração dos gerados ao merge train para tirar o fardo do contribuidor: é a ideia de escritor único no merge, mas só como proposta."
+    narrative: "Relida no ponto que E_OBJECAO_GITLAB_SINGLE_WRITER_AT_MERGE pedia: 'depende de merge train' e 'é escritor único no merge' são compatíveis. Precedente de IDEIA, não de desenho validado. Estado da API: opened (criada 2019-01-22, atualizada 2025-08-26); os comentários não foram lidos."
+    trace: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+      locator: "issue 26290, seção '### Proposal'"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_GITLAB_26290_PROPOSAL_ADMITS_VAGUE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-14"
+    verified_against: "citação verbatim: \"This proposal is a little vague, as I don't have a great understanding about exactly how all the moving parts would fit together\" — issue 26290, seção '### Proposal', 2º parágrafo — ancorada por verificador independente (run wf_6babcd2c-1d8, modo primaries)"
+    source_tier: 9
+    source_kind: engineer
+    label: "A própria proposta do GitLab 26290 admite ser vaga sobre como as peças se encaixam: não é desenho validado nem objeção refutada ao B1."
+    narrative: "Limita o uso do precedente: o B1 não pode se apoiar no GitLab como prova de viabilidade, só como precedente de direção."
+    trace: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/issues/26290"
+      locator: "issue 26290, seção '### Proposal', 2º parágrafo"
+      method: "leitura: ancoragem verbatim do run wf_6babcd2c-1d8 (leitor + verificador independente que reabriu o documento)"
+      locality: "web"
+  - id: E_LACUNAS_PRIMARIES_POSTMERGE_WRITER_2026_10_14
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "contagem do retorno do run wf_6babcd2c-1d8 (modo primaries): 8 fontes lidas, 0 inalcançáveis, 24 claims ancoradas, 9 rejeitadas na ancoragem, Elenxo com 17 objeções (13 sobreviventes), 5 lacunas fechadas e 6 abertas"
+    source_tier: 10
+    source_kind: primary
+    label: "CONTABILIDADE da rodada de primárias (2026-10-14): 8 fontes lidas, 0 inalcançáveis; 24 claims ancoradas, 9 rejeitadas (todas EXAGERADA); a pergunta central (1), fast-forward de SHA verde num ruleset, segue SEM primária que a decida."
+    narrative: "(1) FONTES: 8 lidas (gh-rulesets-creating, gh-required-status-checks, gh-github-token-trigger, gh-app-token-action, gh-discussions-bot-ruleset, aspect-lockfile-merges, gettext-vcs, gitlab-26290), 0 inalcançáveis. (2) ANCORADAS 24: rulesets-creating 3, required-status-checks 5, github-token-trigger 1, app-token-action 3, discussions 3, aspect 3, gettext 4, gitlab 2 — cada uma virou um nó E_ desta rodada. (3) REJEITADAS NA ANCORAGEM 9, todas EXAGERADA, nenhuma virou nó: [rulesets-creating] 'o caminho documentado é um GitHub App' é inferência, a doc não indica caminho para o GITHUB_TOKEN · [required-status-checks] quote verbatim mas noutro arquivo (rulesets-branch-tag-bypass-optional-step.md); 'Always allow é o padrão' e 'obriga a abrir PR' são inferência · [github-token-trigger] a lista de exceções NÃO é só dispatch: a doc atual traz pull_request opened/synchronize/reopened criando runs 'approval-required' · [app-token-action] mesma exaustividade falsa das exceções · [discussions] 'PAT de conta bot ou App na bypass list do ruleset': o texto fala de PAT e branch protection clássica, não de ruleset nem App, e a citação vinha elidida · [discussions] staff patrick-knight: o 'apenas equipes, papéis e Apps' mistura comentários de 2023-06-29 e 2024-06-13 · [discussions] 'github-actions não pôde ser bypass actor' (fev 2024) é paráfrase de relato único, sem política · [aspect] a parte sobre bot/CI/determinismo não está no post · [gitlab-26290] 'quase 7 anos sem implementação': são ~7,7 anos até hoje e estado aberto não prova ausência de implementação; comentários não lidos. (4) ELENXO: 17 objeções julgadas, 13 sobreviventes, 4 não (loose=não atualizada; GITHUB_TOKEN para o próprio repo; bot do App; token revogado no post step). (5) LACUNAS FECHADAS 5: GITHUB_TOKEN só para PUSH (sem run, sem loop); padrão App-token; três políticas do gettext; GitLab 26290 como PROPOSTA vaga e aberta; contrarian da Aspect lido. (6) LACUNAS QUE CONTINUAM ABERTAS 6: (a) a pergunta central (1): nenhuma fonte ancorada diz que um RULESET só com required_status_checks (strict=false, integration_id 15368) aceita push direto por fast-forward com GITHUB_TOKEN de um SHA cujos checks rodaram por workflow_dispatch noutra ref — a claim de push direto é da branch protection clássica (Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD); (b) em conta User, Integration, github-actions[bot] e DeployKey como bypass actor seguem sem evidência, só o admin (RepositoryRole 5) foi medido; (c) a discussion 25305 é anterior aos rulesets e na 43460 o trecho de staff foi rejeitado: nada decide se o bot pode ser bypass actor; (d) NÃO NOMEADA: bypass_actors do ruleset 25001643 NÃO está vazio (admin, pull_request) — o B1 'sem bypass' precisa provar que não depende dele (Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY); (e) NÃO NOMEADA: corrida de não-fast-forward — main que anda entre a regeneração e o push obriga rebase, novo SHA e novo disparo (Q_B1_NON_FF_RACE_REDISPATCH); (f) NÃO NOMEADA: o push do escritor com GITHUB_TOKEN silencia TODOS os workflows on:push de main, não só o do escritor (Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS). (7) RECONCILIAÇÃO: 7 objeções 'fonte não lida'/'primário citado, não lido' do run wf_e26bb266-4aa passaram a superseded pelas leituras desta rodada; E_OBJECAO_GREEN_SHA_FAST_FORWARD_IS_KEY e E_OBJECAO_BOT_AS_BYPASS_ACTOR_UNREAD ficaram de pé, porque a leitura não as decidiu. (8) DESCARTAR o dogfood da pergunta (1) por orçamento volta como objeção sobrevivente (cláusula 6)."
+    trace: "run wf_6babcd2c-1d8 (/onion-research --mode primaries, 2026-10-14)"
+    provenance:
+      source: "⟨journal do run wf_6babcd2c-1d8: resultado das fases Leitura, Ancoragem e Elenxo⟩"
+      locator: "claims ancoradas (24) e rejeitadas (9); objections (17; survives=true 13); gapsClosed (5); gapsOpen (6); recommendation"
+      method: "medição: contagem das claims e objeções no retorno do run, repassado ao escritor"
+      locality: "host"
+  - id: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    node_type: question
+    impact: 5
+    confidence: 0.5
+    label: "PROPOSTA (não selo): NÃO selar o B1 com esta rodada. Fechar a pergunta (1) por dogfood num repo pessoal descartável com cópia exata do ruleset 25001643: SHA verde por workflow_dispatch é aceito por fast-forward com GITHUB_TOKEN? E SHA sem checks é RECUSADO?"
+    trace: "run wf_6babcd2c-1d8 fase Elenxo (recommendation)"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Dogfood num repo descartável»"
+    narrative: |-
+      Nenhuma primária ancorada decide se um ruleset só com required_status_checks (selftest-gate e lint-onion-artifacts, integration_id 15368, strict=false) aceita push direto por fast-forward de um SHA cujos checks passaram noutra ref. Proposta do Elenxo: caso positivo — job com GITHUB_TOKEN e contents:write regenera numa branch, dispara os checks por workflow_dispatch, espera o verde e empurra o SHA em main; observar aceite ou recusa. Caso de falha — o mesmo push com um SHA sem checks precisa ser RECUSADO (GH013). Medir também se o check run do workflow_dispatch fica no SHA com app id 15368. Descartar este dogfood por orçamento volta como objeção sobrevivente. O maestro sela D_POSTMERGE_PROJECTION_WRITER_2026_10; esta pergunta só propõe.
+
+      verified_against anterior: «recomendação do Elenxo do run wf_6babcd2c-1d8 + E_LACUNAS_PRIMARIES_POSTMERGE_WRITER_2026_10_14»
+      Selado por /meta:decide em 2026-10-14: escolhida «Dogfood num repo descartável»; descartadas: «Só Fase 0, B1 gated» · «Selar B1 e provar no dogfood do próprio core».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Como fechar a pergunta central do B1 (Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD)?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
+  - id: Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "E_MEDICAO_RULESET_E_PROJECOES_2026_10_14 (bypass_actors=[RepositoryRole 5, pull_request]) + gapsOpen do Elenxo do run wf_6babcd2c-1d8"
+    label: "O ruleset 25001643 NÃO tem bypass_actors vazio (admin, modo pull_request): 'sem bypass' vale para o ESCRITOR, não para o ruleset. O B1 precisa declarar isso e provar que o job não herda o papel admin."
+    narrative: "A narrative de D_ e o label de C_OPCAO_B1 dizem que o ruleset 'só tem required_status_checks'; isso é verdade para as REGRAS, mas a lista de bypass tem o admin em modo pull_request (medido em E_MEDICAO_RULESET_E_PROJECOES_2026_10_14). Em conta User a doc não diz quais outros atores são elegíveis além do admin (E_ABOUT_RULESETS_BYPASS_NO_PERSONAL_VS_ORG)."
+    trace: "run wf_6babcd2c-1d8 fase Elenxo (gapsOpen)"
+  - id: Q_B1_NON_FF_RACE_REDISPATCH
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "gapsOpen do Elenxo do run wf_6babcd2c-1d8 (lacuna não nomeada)"
+    label: "OBJEÇÃO ABERTA (corrida de não-fast-forward): se o main avança entre a regeneração e o push, o SHA verde fica obsoleto e exige rebase, novo SHA e NOVO disparo dos checks; o B1 diz 'retry', mas não especifica custo nem convergência dessa retentativa."
+    narrative: "Cada retentativa paga a bancada de novo (mediana 14,8 min, do grafo merge-process). Sob rajada de merges a convergência do escritor é a mesma pergunta aberta do sintetizador do run anterior. Pede dogfood de modo de falha (dois merges seguidos, ff rejeitado)."
+    trace: "run wf_6babcd2c-1d8 fase Elenxo (gapsOpen)"
+  - id: Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "E_GITHUB_TOKEN_NO_NEW_RUN_NO_LOOP + gapsOpen do Elenxo do run wf_6babcd2c-1d8 (lacuna não nomeada)"
+    label: "OBJEÇÃO ABERTA (efeito colateral): o mesmo silêncio que dá ausência de loop faz o push do escritor com GITHUB_TOKEN não disparar NENHUM workflow on:push de main (staleness de porta, relatórios, deploy). O B1 precisa inventariar e declarar quem fica mudo."
+    narrative: "A doc garante que eventos do GITHUB_TOKEN não criam runs (exceto dispatch e pull_request opened/synchronize/reopened com aprovação). Logo o commit de projeção no main é invisível aos workflows on:push; quem dependia de 'todo commit do main roda X' passa a rodar só nos commits humanos."
+    trace: "run wf_6babcd2c-1d8 fase Elenxo (gapsOpen)"
+  - id: E_FASE0_STRICT_LOCAL_EXECUTADA_PR_1101
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "gh pr view 1101 (state MERGED, mergedAt 2026-10-14T02:11:34Z, merge commit 0139fe2d) — corpo do PR, seções 'Medido' e 'NÃO medido'"
+    source_tier: 10
+    source_kind: primary
+    label: "A FASE 0 do selo (cura contrarian C, strict local no ops/pr-merge-verified.sh) foi EXECUTADA no PR #1101, mergeado: bancada com os casos s1–s8 (+s7b); nos 50 últimos merges, 5 estavam atrás do main e 3 desses esperariam o CI."
+    narrative: "O PR #1101 (feat(merge): o caminho verificado exige a base do PR na ponta do main) cumpre a FASE 0 escolhida pelo maestro em D_POSTMERGE_PROJECTION_WRITER_2026_10. O que muda: a distância head↔base é lida no forge (compare, behind_by) e leitura ilegível não mergeia; PR atrás sem conflito passa pelo auto-rebase do pr-finalize, que regenera as projeções na árvore combinada; o caminho rápido do #1081 ganha a condição (8), projeções byte-idênticas às do head anterior, senão o head novo espera o CI; a condição (9) e uma última leitura antes do merge recusam se o main andou; --merge-commit com PR atrás é recusado. BANCADA: famílias merge_skip_ci, pr_merge_verified, merge_dispensa e merge_serial com 93/93 na branch e 94/94 depois do rebase; 9 casos novos, s1–s8 e s7b; o s5 reproduz o 478/479 (merge-tree da combinação limpo e errado). 6 mutantes, os 6 reprovaram o caso esperado. CUSTO NO RITMO medido nos 50 últimos merges (#1045–#1099): 5 estavam atrás do main (#1057, #1059, #1084, #1091, #1098), 10% de rebases a mais; em 3 desses 5 o PR esperaria o CI do head novo (~15–25 min cada). NÃO MEDIDO, declarado no próprio PR: nenhum merge real (remoto bare e gh falso) e o compare do GitHub não foi chamado ao vivo. A FASE 1 (B1) segue não selada: a escolha do maestro foi ler primárias antes, e a pergunta central virou dogfood (Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD)."
+    trace: "https://github.com/marciocar/onion-evolve/pull/1101"
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/pull/1101"
+      locator: "corpo do PR, seções '## Medido' e '## NÃO medido'; merge commit 0139fe2db257ded4fbc232405e2022b0813cf3e0"
+      method: "leitura: gh pr view 1101 --json state,mergedAt,mergeCommit,body (2026-10-14)"
+      locality: "web"
+  - id: E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-14"
+    verified_against: "gh api -X POST repos/<conta>/<sandbox-privado>/rulesets → HTTP 403 verbatim «Upgrade to GitHub Pro or make this repository public to enable this feature.»; pretooluse-merge-gate.sh vetou com exit 2 o git push e o gh api contents na main do sandbox"
+    source_tier: 10
+    source_kind: primary
+    label: "O dogfood do B1 num repo descartável PRIVADO não rodou na sessão: ruleset em repo privado na conta Free devolve HTTP 403, e a guarda pretooluse-merge-gate.sh veta escrita no main de QUALQUER repo, porque casa pelo nome e não pelo repositório. Seed e T1 ficam com o maestro."
+    narrative: "BLOQUEIO 1 (forge): criar o ruleset no sandbox, mesmo com enforcement: disabled, devolveu verbatim {\"message\":\"Upgrade to GitHub Pro or make this repository public to enable this feature.\",\"documentation_url\":\"https://docs.github.com/rest/repos/rules#create-a-repository-ruleset\",\"status\":\"403\"}. Com o repo privado, como foi autorizado, a cópia do ruleset 25001643 é impossível nesta conta; o core só tem ruleset porque é público. BLOQUEIO 2 (guarda da casa): o seed do main do sandbox e o T1 (push direto do admin) caíram no veto, verbatim: «GUARDA-PRETOOLUSE: 'git push' com alvo MAIN negado (git push -u origin main) — merge/push em MAIN só pelo caminho verificado: bash ops/pr-merge-verified.sh <PR> --sync (...). Se for deliberado, o maestro roda fora da sessão.» e «GUARDA-PRETOOLUSE: 'gh api …/merge-upstream|contents' escrevendo na main negado — (...)». O agente não contornou o veto (seria contornar um controle) e não trocou o default branch. CONSEQUÊNCIA: a pergunta central do B1 segue sem resposta; o seed do sandbox e o T1 são do maestro, fora da sessão, e o sandbox precisa ser público (ou a conta ter Pro) para o ruleset existir. Q_GUARDA_DE_MAIN_CASA_PELO_NOME pergunta se o casamento por nome é intencional. O nome do repo sandbox foi omitido de propósito (REGRA 106 (Superfície que viaja passa pela varredura de vazamento da publicação))."
+    trace: "⟨log do subagente ac649ccbb407392d8 da sessão do maestro de 2026-10-14 (dogfood do B1)⟩"
+    provenance:
+      source: "⟨log do subagente ac649ccbb407392d8 da sessão do maestro de 2026-10-14 (dogfood do B1)⟩"
+      locator: "tool_result do POST de ruleset (timestamp 2026-10-14T01:51:59Z, HTTP 403) e os dois tool_result de PreToolUse:Bash hook error do pretooluse-merge-gate.sh"
+      method: "leitura: mensagens verbatim do forge e da guarda no log do agente"
+      locality: "host"
+  - id: Q_GUARDA_DE_MAIN_CASA_PELO_NOME
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN + .claude/hooks/pretooluse-merge-gate.sh (deny por alvo main no refspec, sem olhar o repositório)"
+    label: "A guarda pretooluse-merge-gate.sh casar o main pelo NOME, em qualquer repo, é intencional (protege também o main de adotante e o I3) ou deveria isentar um sandbox descartável do próprio maestro?"
+    narrative: "A favor de manter: a sessão do core não escreve no main de repo alheio (I3), e o adotante não protege o main pelo host; uma isenção por repositório seria uma lista que erra pelo vocabulário. A favor de isentar: o dogfood do B1 exige escrever no main de um sandbox, e hoje só o maestro, fora da sessão, consegue. Opção intermediária a medir: isenção por marcador explícito no próprio sandbox, não por nome. O maestro decide."
+    trace: "docs/evolution/research/postmerge-projection-writer-2026-10/SYNTHESIS.md"
+edges:
+  - from: E_MEDICAO_RULESET_E_PROJECOES_2026_10_14
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_TEMPL_CI_REGEN_DIFF_EXIT_CODE
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_TREZOR_COMMITS_GENERATED
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_TREZOR_GEN_CHECK_PER_PR
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_GITLAB_GENERATED_NOT_COMPOSABLE
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_GITLAB_ONE_MR_AT_A_TIME
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_OPENTITAN_PORCELAIN_NOT_DIFF
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_BOT_BRANCH_PR_INSTEAD_OF_BYPASS
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_GITHUB_TOKEN_PUSH_TO_PROTECTED_FAILS
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_APP_AS_RULESET_BYPASS_ACTOR
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_CPYTHON_VERSIONS_FOR_BOOTSTRAP
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_PAT_WORKAROUND_2020
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_RENOVATE_TWO_WRITERS_COLLIDE
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_TEMPL_RECOMMENDS_COMMITTING
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_TREZOR_NEVER_RESOLVE_BY_HAND
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_TREZOR_GENERATED_INCOMPATIBLE_ACROSS_BRANCHES
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_RELEASE_PLEASE_APP_TOKEN_PR
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_GITLAB_PROPOSAL_NEEDS_MERGE_TRAIN
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_GITLAB_MANUAL_REGEN_FAILS
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_OPENTITAN_CHECK_GENERATED_GATE
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_MERCADO_POSTMERGE_WRITER_2026_10
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_B2_ROLLING_REGEN_PR
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_B4_MAESTRO_PAT_IN_CI
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: DEPENDS_ON
+  - from: C_OPCAO_U_UNVERSIONED_RUNTIME
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: DEPENDS_ON
+  - from: E_GITLAB_GENERATED_NOT_COMPOSABLE
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_GITLAB_MANUAL_REGEN_FAILS
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_TREZOR_GENERATED_INCOMPATIBLE_ACROSS_BRANCHES
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_OPENTITAN_PORCELAIN_NOT_DIFF
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_OPENTITAN_CHECK_GENERATED_GATE
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_TEMPL_CI_REGEN_DIFF_EXIT_CODE
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_TREZOR_COMMITS_GENERATED
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_TREZOR_GEN_CHECK_PER_PR
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_TEMPL_RECOMMENDS_COMMITTING
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_TREZOR_NEVER_RESOLVE_BY_HAND
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_RELEASE_PLEASE_APP_TOKEN_PR
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: SUPPORTS
+  - from: E_BOT_BRANCH_PR_INSTEAD_OF_BYPASS
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: SUPPORTS
+  - from: E_APP_AS_RULESET_BYPASS_ACTOR
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: SUPPORTS
+  - from: E_PAT_WORKAROUND_2020
+    to: C_OPCAO_B4_MAESTRO_PAT_IN_CI
+    edge_type: SUPPORTS
+  - from: E_RENOVATE_TWO_WRITERS_COLLIDE
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_MEDICAO_RULESET_E_PROJECOES_2026_10_14
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_MEDICAO_RULESET_E_PROJECOES_2026_10_14
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_TEMPL_PER_PR_GATE_MISSES_COMBINATION
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TREZOR_LOW_PR_CONCURRENCY
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PER_PR_GATE_BLIND_STRICT_FALSE
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REGEN_PR_PER_MERGE_DOUBLES_QUEUE
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RULESET_HAS_NO_PR_RULE_FF_VIABLE
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RULESET_HAS_NO_PR_RULE_FF_VIABLE
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_APP_BYPASS_BREAKS_INVARIANT
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MAIN_MUST_KEEP_VERSIONING
+    to: C_OPCAO_U_UNVERSIONED_RUNTIME
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MAIN_MUST_KEEP_VERSIONING
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MAESTRO_PAT_LOSES_AUDIT
+    to: C_OPCAO_B4_MAESTRO_PAT_IN_CI
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TEMPL_COMMIT_IS_CONSUMER_REASON
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REGEN_ON_REBASE_ALREADY_EXISTS
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REGEN_PR_NEEDS_APP_AND_SECOND_MERGE_PATH
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPENTITAN_GATE_IS_POST_REGEN_DESIGN
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPENTITAN_GATE_IS_POST_REGEN_DESIGN
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_INCIDENT_ACCUSES_MERGE_WITHOUT_CI
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HOOK_STALENESS_IS_THE_BRANCH
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HOOK_STALENESS_IS_THE_BRANCH
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GITHUB_TOKEN_NO_PR_TRIGGER_IS_DOCUMENTED
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GITHUB_TOKEN_NO_PR_TRIGGER_IS_DOCUMENTED
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_BOT_AS_BYPASS_ACTOR_UNREAD
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_APP_TOKEN_PUSH_PATTERN_DOCUMENTED
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GITLAB_SINGLE_WRITER_AT_MERGE
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GH013_IS_BOUNDARY_CONDITION
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_BYPASS_ALL_OR_NOTHING
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GREEN_SHA_FAST_FORWARD_IS_KEY
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ADMIN_BYPASS_ONLY_IN_PR
+    to: C_OPCAO_B4_MAESTRO_PAT_IN_CI
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EXEMPTION_IS_SILENT
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ADMIN_DIRECT_PUSH_AUDIT
+    to: C_OPCAO_B4_MAESTRO_PAT_IN_CI
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_AUTOMERGE_IGNORES_APP_BYPASS
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_RULESETS_PRIMARY_DOC_UNREAD
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DISCUSSION_43460_UNREAD
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DISCUSSION_25305_UNREAD
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TENKI_RELEASE_AUTOMATION_UNREAD
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EDENAI_FRESHNESS_GATE_UNREAD
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_OPAM_RUNTIME_READER_UNREAD
+    to: C_OPCAO_U_UNVERSIONED_RUNTIME
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TESSL_MERGE_CONFLICT_UNREAD
+    to: C_OPCAO_U_UNVERSIONED_RUNTIME
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ASPECT_LOCKFILE_CONTRARIAN_UNREAD
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_GETTEXT_VCS_DOC_UNREAD
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_POSTMERGE_WRITER_2026_10
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_RULESETS_BYPASS_MODE_PR_ONLY_NO_DIRECT_PUSH
+    to: E_OBJECAO_RULESETS_PRIMARY_DOC_UNREAD
+    edge_type: SUPERSEDES
+  - from: E_RULESETS_BYPASS_MODE_PR_ONLY_NO_DIRECT_PUSH
+    to: E_OBJECAO_ADMIN_BYPASS_ONLY_IN_PR
+    edge_type: SUPPORTS
+  - from: E_RULESETS_BYPASS_MODE_PR_ONLY_NO_DIRECT_PUSH
+    to: C_OPCAO_B4_MAESTRO_PAT_IN_CI
+    edge_type: CONSTRAINS
+  - from: E_RULESETS_STRICT_REQUIRES_CHECK_DEFINED
+    to: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    edge_type: SUPPORTS
+  - from: E_ABOUT_RULESETS_BYPASS_NO_PERSONAL_VS_ORG
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: CONSTRAINS
+  - from: E_ABOUT_RULESETS_BYPASS_NO_PERSONAL_VS_ORG
+    to: Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY
+    edge_type: SUPPORTS
+  - from: E_PROTECTED_BRANCH_PUSH_DIRECT_AFTER_CHECKS
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_PROTECTED_BRANCH_PUSH_DIRECT_AFTER_CHECKS
+    to: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    edge_type: SUPPORTS
+  - from: E_RULESET_STATUS_CHECKS_BEFORE_CHANGES
+    to: E_OBJECAO_GH013_IS_BOUNDARY_CONDITION
+    edge_type: SUPPORTS
+  - from: E_RULESET_STATUS_CHECKS_BEFORE_CHANGES
+    to: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    edge_type: SUPPORTS
+  - from: E_RULESET_LOOSE_NOT_UP_TO_DATE
+    to: E_OBJECAO_PER_PR_GATE_BLIND_STRICT_FALSE
+    edge_type: SUPPORTS
+  - from: E_RULESET_LOOSE_NOT_UP_TO_DATE
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_GITHUB_TOKEN_EVENTS_DISPATCH_EXCEPTION
+    to: E_OBJECAO_GITHUB_TOKEN_NO_PR_TRIGGER_IS_DOCUMENTED
+    edge_type: SUPERSEDES
+  - from: E_GITHUB_TOKEN_EVENTS_DISPATCH_EXCEPTION
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_GITHUB_TOKEN_EVENTS_DISPATCH_EXCEPTION
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: CONSTRAINS
+  - from: E_RULESETS_BYPASS_ELIGIBLE_LIST
+    to: E_APP_AS_RULESET_BYPASS_ACTOR
+    edge_type: SUPPORTS
+  - from: E_RULESETS_BYPASS_ELIGIBLE_LIST
+    to: Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY
+    edge_type: SUPPORTS
+  - from: E_GITHUB_TOKEN_NO_NEW_RUN_NO_LOOP
+    to: E_OBJECAO_GITHUB_TOKEN_NO_PR_TRIGGER_IS_DOCUMENTED
+    edge_type: SUPERSEDES
+  - from: E_GITHUB_TOKEN_NO_NEW_RUN_NO_LOOP
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_GITHUB_TOKEN_NO_NEW_RUN_NO_LOOP
+    to: E_OBJECAO_REGEN_PR_NEEDS_APP_AND_SECOND_MERGE_PATH
+    edge_type: SUPPORTS
+  - from: E_GITHUB_TOKEN_NO_NEW_RUN_NO_LOOP
+    to: Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS
+    edge_type: SUPPORTS
+  - from: E_GITHUB_TOKEN_SCOPE_OWN_REPO_APP_OUTSIDE
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_GITHUB_TOKEN_SCOPE_OWN_REPO_APP_OUTSIDE
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: CONSTRAINS
+  - from: E_APP_TOKEN_BOT_USER_GIT_PUSH
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: SUPPORTS
+  - from: E_APP_TOKEN_BOT_USER_GIT_PUSH
+    to: E_OBJECAO_APP_TOKEN_PUSH_PATTERN_DOCUMENTED
+    edge_type: CONSTRAINS
+  - from: E_APP_TOKEN_REVOKED_POST_STEP
+    to: C_OPCAO_B2_ROLLING_REGEN_PR
+    edge_type: CONSTRAINS
+  - from: E_DISCUSSION_25305_ACTIONS_NO_PROTECTED_PUSH_2019
+    to: E_OBJECAO_DISCUSSION_25305_UNREAD
+    edge_type: SUPERSEDES
+  - from: E_DISCUSSION_25305_ACTIONS_NO_PROTECTED_PUSH_2019
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: CONSTRAINS
+  - from: E_DISCUSSION_25305_ACTIONS_USER_NOT_BRANCH_SCOPED_2022
+    to: C_OPCAO_B3_APP_BYPASS_DIRECT_PUSH
+    edge_type: CONSTRAINS
+  - from: E_DISCUSSION_25305_ACTIONS_USER_NOT_BRANCH_SCOPED_2022
+    to: E_DISCUSSION_25305_ACTIONS_NO_PROTECTED_PUSH_2019
+    edge_type: SUPPORTS
+  - from: E_DISCUSSION_43460_STATUS_BYPASS_ONLY_RULESETS
+    to: E_OBJECAO_DISCUSSION_43460_UNREAD
+    edge_type: SUPERSEDES
+  - from: E_DISCUSSION_43460_STATUS_BYPASS_ONLY_RULESETS
+    to: Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY
+    edge_type: SUPPORTS
+  - from: E_ASPECT_LOCKFILE_STRANGE_CASE
+    to: E_OBJECAO_ASPECT_LOCKFILE_CONTRARIAN_UNREAD
+    edge_type: SUPERSEDES
+  - from: E_ASPECT_LOCKFILE_STRANGE_CASE
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_ASPECT_AUTORESOLVE_DEPENDS_ON_MANAGER
+    to: E_GITLAB_MANUAL_REGEN_FAILS
+    edge_type: SUPPORTS
+  - from: E_ASPECT_AUTORESOLVE_DEPENDS_ON_MANAGER
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: CONSTRAINS
+  - from: E_ASPECT_OURS_MERGE_DRIVER
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: CONSTRAINS
+  - from: E_GETTEXT_THREE_POLICIES
+    to: E_OBJECAO_GETTEXT_VCS_DOC_UNREAD
+    edge_type: SUPERSEDES
+  - from: E_GETTEXT_THREE_POLICIES
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_GETTEXT_ALWAYS_COMMIT_COSTS
+    to: E_OBJECAO_MAIN_MUST_KEEP_VERSIONING
+    edge_type: SUPPORTS
+  - from: E_GETTEXT_ALWAYS_COMMIT_COSTS
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_GETTEXT_OCCASIONAL_COMMIT_CONFLICTS
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_GETTEXT_OCCASIONAL_COMMIT_CONFLICTS
+    to: E_OBJECAO_TREZOR_LOW_PR_CONCURRENCY
+    edge_type: SUPPORTS
+  - from: E_GETTEXT_NEVER_COMMIT_NEEDS_TOOLS
+    to: E_OBJECAO_MAIN_MUST_KEEP_VERSIONING
+    edge_type: SUPPORTS
+  - from: E_GETTEXT_NEVER_COMMIT_NEEDS_TOOLS
+    to: C_OPCAO_U_UNVERSIONED_RUNTIME
+    edge_type: CONSTRAINS
+  - from: E_GITLAB_26290_PROPOSAL_MERGE_TRAIN
+    to: E_OBJECAO_GITLAB_SINGLE_WRITER_AT_MERGE
+    edge_type: SUPERSEDES
+  - from: E_GITLAB_26290_PROPOSAL_MERGE_TRAIN
+    to: E_GITLAB_PROPOSAL_NEEDS_MERGE_TRAIN
+    edge_type: SUPPORTS
+  - from: E_GITLAB_26290_PROPOSAL_MERGE_TRAIN
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: SUPPORTS
+  - from: E_GITLAB_26290_PROPOSAL_ADMITS_VAGUE
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_PRIMARIES_POSTMERGE_WRITER_2026_10_14
+    to: Q_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_PRIMARIES_POSTMERGE_WRITER_2026_10_14
+    to: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    edge_type: SUPPORTS
+  - from: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: CONSTRAINS
+  - from: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    to: E_OBJECAO_GREEN_SHA_FAST_FORWARD_IS_KEY
+    edge_type: TRACES_TO
+  - from: Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: Q_B1_RULESET_BYPASS_ACTORS_NOT_EMPTY
+    to: E_MEDICAO_RULESET_E_PROJECOES_2026_10_14
+    edge_type: TRACES_TO
+  - from: Q_B1_NON_FF_RACE_REDISPATCH
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: Q_B1_SILENCES_MAIN_ON_PUSH_WORKFLOWS
+    to: C_OPCAO_B1_SINGLE_WRITER_NO_BYPASS
+    edge_type: CONSTRAINS
+  - from: E_FASE0_STRICT_LOCAL_EXECUTADA_PR_1101
+    to: D_POSTMERGE_PROJECTION_WRITER_2026_10
+    edge_type: SUPPORTS
+  - from: E_FASE0_STRICT_LOCAL_EXECUTADA_PR_1101
+    to: C_OPCAO_C_CONTRARIAN_STRICT_LOCAL
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN
+    to: Q_B1_GREEN_SHA_FF_NEEDS_DOGFOOD
+    edge_type: CONSTRAINS
+  - from: Q_GUARDA_DE_MAIN_CASA_PELO_NOME
+    to: E_DOGFOOD_B1_BLOQUEADO_PRIVADO_E_GUARDA_DE_MAIN
+    edge_type: TRACES_TO
