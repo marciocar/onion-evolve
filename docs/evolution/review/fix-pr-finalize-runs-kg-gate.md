@@ -1,8 +1,8 @@
 ---
 branch: fix/pr-finalize-runs-kg-gate
 date: 2026-10-14
-reviewed_diff_sha256: 9be8b487e6a88ea684e96e70a6cd58f6e7e206685d017112bd30279217c9eaa8
-reviewed_code_sha256: 997ad0154eb78c24f972e10a3e741300fc4cc4e3ead9b16ea7850eba43295a5e
+reviewed_diff_sha256: 6976c1b8cf83e99b7e4f4476acb3eb3139147d3c9bf89318a2730eaa8752942d
+reviewed_code_sha256: 624930af847f7349a60ff0de1ffd2b81a3bcd824517681240e31a06abe0eb003
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
