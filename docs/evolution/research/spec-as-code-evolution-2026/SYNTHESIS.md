@@ -34,6 +34,15 @@ O termo "SDD" na sua forma atual, centrada em IA, coalesceu em 2025.
 | **BMAD-METHOD** | comunidade, 2025 | Personas de time ágil (Analyst, PM, Architect, PO, SM, Dev, QA) em markdown+YAML; artefatos = PRDs, arquitetura, stories | **Simulação de time ágil primeiro**, spec-driven "aparafusado". Doc (não código) é a fonte. |
 | **Tessl** | Framework + Registry (Série A); private beta | Specs mapeiam p/ arquivos de código com tags `@generate`/`@test`; "vibe-specs"; + Registry de **10.000+ specs** de libs OSS (anti-alucinação de API) | **Único mirando explicitamente spec-anchored E spec-as-source**. Código = "GENERATED FROM SPEC – DO NOT EDIT". |
 
+> **Superado em 2026-10-14 (a linha da Tessl acima fica como estava em jul/2026).** Re-medição do estudo C
+> do adotante de curadoria, lida pelo core como DADO: nenhuma página atual da Tessl declara "10.000+"; o
+> sitemap lista **1.274 páginas de skill** (piso, não total; o total do registry fica NÃO VERIFICADO). O
+> "único mirando spec-as-source" foi refutado pelo Verify da rodada (arXiv 2606.27045): o spec-as-source
+> do registry é plugin de terceiro, sobre o OpenSpec. O pivô para "skills are software" é indício, não
+> fato selado. No grafo: `E_TESSL_UNICO_AS_SOURCE_REFUTADO_2026_10` refuta `B5_17_tessl_unico_as_source`
+> (`docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml`); o panorama corrigido está em
+> `docs/business-context/03-market/competitive-landscape.md`.
+
 Definição de consenso emergente (thebcms, IBM): *"SDD = metodologia em que especificações versionadas e estruturadas —
 não o código — são a fonte da verdade, e o código é gerado/mantido contra essas specs por humanos e agentes."*
 Bordão de 2025–26: **"the spec is the prompt."**

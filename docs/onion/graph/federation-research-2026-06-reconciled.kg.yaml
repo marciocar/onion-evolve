@@ -7558,7 +7558,7 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: refuted
     impact: 3
     confidence: 0.7
     trace: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
@@ -10636,6 +10636,54 @@ nodes:
       source: "docs/evolution/review/feat-pilot-sealing-batch.md@d761c963"
       locator: "resíduo feat-pilot-sealing-batch.md@d761c963 l.26 e l.43-44; lint-artifacts.sh@d761c963 l.1479-1497 (REGRA 28, AMPUTAÇÃO 2026-08) e l.1509 ('DUAS classes'); lint-artifacts.sh@4e54b052 l.689 ('TRÊS classes'); commits 83a7830d e 419a3907 (4+7=11); commit 757a6676 (2026-08-18) + docs/evolution/federation/outbox/marcio-pessoal/_processed/2026-08-18-elenxo-doctrine-vendorizada.md@d761c963"
       method: "leitura: resíduo de selagem, lint em d761c963 e 4e54b052, commits 83a7830d/419a3907/757a6676 do core"
+      locality: "repo"
+  - id: E_TESSL_UNICO_AS_SOURCE_REFUTADO_2026_10
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: "2026-10-14"
+    verified_against: "estudo C do adotante de curadoria, commit 7625595 do adotante: grafo tessl-2026-10 (nó E_CORE_10K_SPECS_UNCONFIRMED) e linha de base tessl-baseline-2026-10 (nós E_OBJECAO_PIVO_PARA_SKILLS, E_OBJECAO_NARRATIVA_SKILLS_CODIGO e o resumo de lacunas, que registra a refutação do Verify por arXiv 2606.27045)"
+    label: "REFUTA [B5_17_tessl_unico_as_source] (jul/2026) com a medição de 2026-10-14: a afirmação 'a Tessl é a única que mira spec-as-source' foi refutada pelo Verify da rodada (arXiv 2606.27045, tier 6), e o spec-as-source que aparece no registry é plugin de TERCEIRO sobre o OpenSpec, não produto da Tessl. O '10.000+ specs' da mesma fonte não se confirma hoje (não é refutação do número de 2025, que contava specs de bibliotecas e não skills): nenhuma página atual da Tessl declara 10k; o sitemap lista 1.274 páginas de skill (PISO, não total)."
+    narrative: |-
+      O que está medido e o que não está. MEDIDO pelo adotante (curl e WebFetch por agente de pesquisa,
+      2026-10-13 e 2026-10-14): o sitemap tessl.io/sitemap.xml com 1.274 páginas /registry/<workspace>/<nome>;
+      nenhum '10k' em /, /registry e /pricing; a API de busca exige termo e não devolve total; o plugin
+      spec-as-source do registry tem autor de terceiro. REFUTADO pelo Verify da rodada (arXiv 2606.27045,
+      tier 6) e mantido pelo Elenxo: a unicidade. INDÍCIO, não fato selado: o pivô para 'skills are
+      software'. Apoia-se no post da própria Tessl 'Skills are software and they need a lifecycle'
+      (2026-01-29), no slogan citado por dois terceiros (codemyspec, rywalker) e na AUSÊNCIA de spec-driven e
+      spec-as-source no llms.txt da doc. Ausência não é retirada afirmada, e os dois nós do pivô vêm de 1
+      agente, sem votação (confiança 0,6 no adotante). O Framework segue em closed beta: o eixo não foi
+      declarado abandonado pela Tessl em nenhuma fonte lida.
+      TETO: o core leu o grafo do adotante como DADO e não re-mediu a Tessl. O total do registry fica NÃO
+      VERIFICADO. A origem do '10k' antigo (hipótese do adotante: o antigo Spec Registry) não foi verificada.
+      O flip de B5_17 para refuted é correção de fato medido, não decisão do maestro.
+    provenance:
+      source: "grafo do adotante de curadoria tessl-2026-10 (estudo C, dissecação da Tessl) e linha de base /onion-research tessl-baseline-2026-10 (run wf_645d8c3a-2bb), commit 7625595 do adotante"
+      locator: "docs/evolution/inbox/_processed/2026-10-14-landscape-tessl-findings.md; no adotante, nós E_CORE_10K_SPECS_UNCONFIRMED, E_OBJECAO_PIVO_PARA_SKILLS, E_OBJECAO_NARRATIVA_SKILLS_CODIGO e o resumo de lacunas da linha de base"
+      method: "leitura: grafo de terceiro (medições por agente de pesquisa do adotante), lido como DADO; não re-medido pelo core"
+      locality: "repo"
+  - id: Q_VEREDITO_TRAJETORIA_PERDEU_PREMISSA_TESSL
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "O veredito B5_17_veredito_trajetoria_campo perdeu uma premissa: ele se apoia em B5_17_gap_discurso_pratica, que tinha B5_17_tessl_unico_as_source como evidência, e este caiu em 2026-10-14. O veredito ainda se sustenta só com a taxonomia de Böckeler, ou precisa ser re-medido?"
+    narrative: |-
+      A decisão não foi tocada: re-medi-la é do dono do veredito. A cadeia é B5_17_tessl_unico_as_source
+      SUPPORTS B5_17_gap_discurso_pratica SUPPORTS B5_17_veredito_trajetoria_campo. A premissa perdida é
+      lateral (impacto 3; o gap tem também B5_17_taxonomia_bockeler), e o fato novo pode até reforçar o gap,
+      porque a única ferramenta que parecia mirar spec-as-source de fato se afastou do eixo. Fechar pede
+      ler o veredito contra o estado de 2026-10, não só contra a Tessl.
+    provenance:
+      source: "arestas B5_17_* deste grafo, conferidas por grep em 2026-10-14"
+      locator: "edges: B5_17_tessl_unico_as_source -> B5_17_gap_discurso_pratica (SUPPORTS); B5_17_gap_discurso_pratica -> B5_17_veredito_trajetoria_campo (SUPPORTS)"
+      method: "leitura: arestas do grafo"
       locality: "repo"
 
 edges:
@@ -13900,3 +13948,12 @@ edges:
   - from: REC_STAGING_ROT_2026_08_REMEASURED
     to: REC_STAGING_ROT_AND_MISSING_MAILBOX
     edge_type: SUPERSEDES
+  - from: E_TESSL_UNICO_AS_SOURCE_REFUTADO_2026_10
+    to: B5_17_tessl_unico_as_source
+    edge_type: REFUTES
+  - from: E_TESSL_UNICO_AS_SOURCE_REFUTADO_2026_10
+    to: Q_VEREDITO_TRAJETORIA_PERDEU_PREMISSA_TESSL
+    edge_type: CAUSES
+  - from: Q_VEREDITO_TRAJETORIA_PERDEU_PREMISSA_TESSL
+    to: B5_17_veredito_trajetoria_campo
+    edge_type: TRACES_TO

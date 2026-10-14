@@ -1,6 +1,6 @@
 # Panorama Competitivo
 
-**Última Atualização:** 2026-10-14 (Superpowers fechado pela dissecação do adotante de curadoria: PARQUEAR; antes, 2026-10-12: estrelas re-medidas pela API do GitHub)
+**Última Atualização:** 2026-10-14 (Tessl re-medida: o "10k+ specs" não se confirma hoje e o "único spec-as-source" foi refutado, pelo estudo C do adotante de curadoria; Superpowers fechado pela dissecação do mesmo adotante: PARQUEAR; antes, 2026-10-12: estrelas re-medidas pela API do GitHub)
 
 > Da pesquisa orquestrada citada (2026-07-12). Categoria: **SDD (spec-driven development) sobre Claude Code**. Complementa [`../02-product/strategy.md`](../02-product/strategy.md) §Posicionamento.
 
@@ -35,8 +35,29 @@
 |---|---|---|
 | **GitHub Spec Kit** (140,9k★ em 2026-10-12; era ~90k em 07-13) | toolkit CLI agnóstico, fluxo Spec→Plan→Tasks→Implement | plataforma/CLI diferente; sem compliance/produto integrado |
 | **Kiro (AWS)** | IDE agentic, "spec é a unidade de trabalho" | IDE completo (concorre com Cursor), não framework sobre agente existente |
-| **Tessl** | spec-as-source + registry de 10k+ specs | vende confiabilidade anti-alucinação; framework privado/beta |
+| **Tessl** | registry de skills e plugins, com o produto se apresentando como "skills are software" (re-medido em 2026-10-14; ver abaixo) | núcleo fechado, Framework ainda em closed beta; a disputa com o Onion deixou de ser o eixo spec-as-source e passou a ser a narrativa "skills como código" |
 | **OpenSpec** | leve, sem phase-gates rígidos | filosofia próxima, escopo menor (só engenharia) |
+
+> **Tessl: re-medição de 2026-10-14 (supera a linha de 2026-07-12).** A linha antiga dizia
+> *"spec-as-source + registry de 10k+ specs"*. Nenhuma das duas partes se sustenta hoje, pelo estudo
+> C do adotante de curadoria (dissecação da Tessl, grafo `tessl-2026-10`, e linha de base `/onion-research`
+> `tessl-baseline-2026-10`), lido pelo core como DADO:
+> - **O número.** Nenhuma página atual da Tessl (`/`, `/registry`, `/pricing`) declara "10k". O sitemap
+>   `tessl.io/sitemap.xml` lista **1.274 páginas de skill** em 2026-10-14. Isso é **piso**, não total: o
+>   sitemap pode omitir páginas e a API de busca não devolve total. O total do registry fica **NÃO
+>   VERIFICADO**. A linha de base do mesmo estudo registra "mais de 3.000 skills públicas" sem dizer de
+>   qual fonte veio; o número é compatível com o piso e também não foi verificado. Isto não refuta o
+>   número de 2025: aquele contava specs de bibliotecas OSS, objeto diferente das skills de hoje.
+> - **O eixo.** A afirmação "a Tessl é a única que mira spec-as-source" foi refutada pelo Verify da
+>   rodada (arXiv 2606.27045, tier 6). O spec-as-source que aparece no registry é plugin de terceiro,
+>   sobre o OpenSpec, e não produto da Tessl. O **pivô** para "skills are software" é **indício**, não
+>   fato selado: apoia-se no post da própria Tessl *"Skills are software and they need a lifecycle"*
+>   (2026-01-29), no slogan citado por dois terceiros e na **ausência** de spec-driven e spec-as-source
+>   no `llms.txt` da doc. Os dois nós que sustentam o pivô vêm de 1 agente, sem votação. No grafo do
+>   core: `E_TESSL_UNICO_AS_SOURCE_REFUTADO_2026_10` refuta `B5_17_tessl_unico_as_source`.
+> - **Também medido no estudo C:** US$ 124,5M em dois Form D de 2024 e nenhum em 2025 ou 2026; núcleo
+>   fechado; preço estável desde 2026-07-18. Veredito da curadoria: PARQUEAR, com gatilho em 2026-11-15.
+>   O veredito é do adotante; o core não o selou.
 
 ## Concorrentes indiretos — execução/orquestração
 
