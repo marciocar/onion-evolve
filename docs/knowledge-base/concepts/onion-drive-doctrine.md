@@ -4,7 +4,8 @@
 > AVANÇAR por KIND de nó, a **tabela de selagem** (onde o driver auto-avança e onde PARA), as 6 regras
 > de doutrina que ele encarna, e os anti-padrões. A **Fase 0** (o Censo determinístico) já existe como
 > mecanismo: `.claude/validation/kg-drive-project.sh`. A **Fase 1** (o laço em si, `/meta:drive`) é
-> construída sobre este contrato. **Fase 2** (o degrau AUTOMATE) é gated.
+> construída sobre este contrato. **Fase 2** (o degrau AUTOMATE) foi forjada em 2026-10-14, com o merge
+> desligado por padrão: `.claude/validation/drive-automate.sh`, contrato no fragmento `drive-doctrine.md`.
 >
 > **Por que existe.** O reforço-prosa do maestro (*"siga com execução até o final… nada parado sem
 > controle"*) é **disciplina, não mecanismo**. O `/meta:realign` já mecanizou o *alinhamento*; este
@@ -16,9 +17,13 @@
 O driver opera num **degrau declarado**, nunca acima:
 - **Nível 0** (auto sempre): atos reversíveis em worktree própria (branch/commit/PR/dogfood), `write(KG)` de append, **propor** ato-3.
 - **AUDIT** (o degrau da Fase 1): conduz um fio **até PR-verde sozinho**; **merge no main é 100% humano, em LOTE** num checkpoint.
-- **AUTOMATE** (Fase 2, gated): auto-merge só sob 3 pré-condições duras (enabler git-nativo · path-allowlist `git diff ∩ vendor = ∅` · política 100% mecânica, LLM veto-only).
-  **Decisão do maestro (2026-10-12, SAC-74): no AUTOMATE o merge é POR PADRÃO.** A sua ordem de
-  2026-08-18 ("até o final" = executar → commit → PR → **MERGE**, sem pedir de novo) vira degrau.
+- **AUTOMATE** (Fase 2, forjada em 2026-10-14): auto-merge só sob 3 pré-condições duras (enabler git-nativo · path-allowlist `git diff ∩ vendor = ∅` · política 100% mecânica, LLM veto-only).
+  **Decisão do maestro (2026-10-12, SAC-74, `/meta:decide` sobre `D_AUTO_DRIVE_DEGRAU_AUTOMATE`): «Forjar com as
+  objeções», com `--merge` DESLIGADO por padrão.** A proposta pedia merge por padrão; a pergunta selada o
+  inverteu, e as quatro objeções do grafo (`CONSTRAINS`) viraram requisito. A ordem de 2026-08-18 ("até o final"
+  = executar → commit → PR → **MERGE**) vira degrau **com mecanismo de controle**: o merge acontece quando o
+  maestro passa `--merge`, e nunca por omissão. O contrato do degrau é o fragmento
+  `common:prompts:drive-doctrine` (citado pelo `/meta:drive`), e o executor, `.claude/validation/drive-automate.sh`.
   As 3 pré-condições ganham nome concreto nesta casa:
   - o **enabler** é o `ops/pr-merge-verified.sh` (core-only), o único caminho de merge; o hook `merge-gate` veta
     qualquer outro com exit 2;
@@ -65,8 +70,11 @@ O driver opera num **degrau declarado**, nunca acima:
     - ciclo na cadeia.
 
   ⚠️ **O degrau só abre quando as paradas duras forem predicados executáveis com mutante (SAC-114).**
-  Antes disso o `/meta:drive` segue em AUDIT. Merge por padrão sobre parada em prosa é o carimbo
-  automático que esta doutrina existe para matar.
+  Merge por padrão sobre parada em prosa é o carimbo automático que esta doutrina existe para matar.
+  **Aberto em 2026-10-14:** cada parada acima é um veredito nomeado do `drive-automate.sh` (`DECISAO-NAO-TOMADA`,
+  `ELENXO-REPROVADO`/`ELENXO-UMA-VOZ`, `CI-VERMELHO`/`CI-VAZIO`, `REPO-ALHEIO`, `BUDGET-ESGOTADO`/`TETO-DE-NOS`,
+  `CICLO`, `PATH-VENDORIZADO`), com caso e mutante na família `run_drive_automate_selftests`. Sem `--merge`
+  o degrau para em PR verde (rc 3, AUDIT).
 - **MOAT** (nunca): deploy · escrever repo alheio (I3) · merge de path vendorizado/outward-facing · **agendar por relógio (W7)**. O driver é **maestro-invocado**, nunca cron/`/loop` sobre si.
 
   **O que do MOAT é VETO e o que segue PROSA (2026-10-13).** Até 2026-10-13 só o merge no main tinha veto
@@ -152,7 +160,7 @@ proposta útil da trivial?").
 | **REFUTED/SUPERSEDED de nó NUNCA SELADO** (§4.1) | mesmo ato, mas o par nasce e cai no MESMO PR | **AUTO nas 4 precondições** (`kg-seal-exception.sh`); a 4ª — o flip nomeado na `drive_checkpoint_note` do lote — mecanizada em 2026-10-04 |
 | verification **UNVERIFIABLE** | `blocked_by`, **não carimba** | **AUTO** (não-escrita; 1ª classe) |
 | execution → PR-verde | conduz em worktree | **AUTO até o PR** |
-| **merge no main** | — | **AUDIT: PARA** (100% humano, em lote) · **AUTOMATE: AUTO** pelo `ops/pr-merge-verified.sh` (core-only), salvo parada dura (§0; decisão de 2026-10-12, aberta só com o SAC-114) |
+| **merge no main** | — | **AUDIT: PARA** (100% humano, em lote) · **AUTOMATE: PARA por padrão**; com `--merge` explícito, AUTO pelo `ops/merge-serial.sh` → `ops/pr-merge-verified.sh` (core-only), salvo parada dura (§0; decisão de 2026-10-12, aberta em 2026-10-14) |
 | **decisão não-tomada** | frame + Elenxo + propõe | **PARA** (selo humano) |
 | drift tipo-(c) estrutural | novo nó + `SUPERSEDES` datado | **AUTO** (realign repara determinístico) |
 | **MOAT** | — | **NUNCA / PARA** (parte é veto por alvo desde 2026-10-13; a tabela do §0 diz qual) |

@@ -104,6 +104,10 @@ VALIDATION=(
   ".claude/validation/kg-drive-project.sh"
   ".claude/validation/kg-realign-project.sh"
   ".claude/validation/kg-seal-exception.sh"
+  # O executor do degrau AUTOMATE (2026-10-14): o /meta:drive o injeta na carga (`--status`) e o manda rodar
+  # em cada passo do laço. Ele acha o radar, o censo e o tm.sh PELO PRÓPRIO ARQUIVO; ops/ é core-only, e sem
+  # ops/merge-serial.sh (core-only) o merge é recusado — no consumidor do plugin o degrau para em PR verde.
+  ".claude/validation/drive-automate.sh"
   ".claude/validation/lib/status-factor.awk"
   ".claude/validation/kg-console.sh"
   ".claude/validation/kg-view.sh"

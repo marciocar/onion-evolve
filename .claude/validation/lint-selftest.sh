@@ -24576,6 +24576,498 @@ EOF_K3
   rm -rf "${sb}" "${sbh}" "${sbj}" "${sbp}"
 }
 
+# AUTOMATE do /meta:drive (drive-automate.sh) — as PARADAS DURAS como predicado, uma bancada por objeção.
+#
+# POR QUE EXISTE. A decisão D_AUTO_DRIVE_DEGRAU_AUTOMATE (selo do maestro, 2026-10-12) forjou o degrau
+# «com as objeções»: as quatro arestas CONSTRAINS do grafo auto-drive-2026-10 são REQUISITO, e o merge
+# nasce DESLIGADO. A doutrina do drive (§0) diz que o degrau só abre quando as paradas forem predicados
+# com mutante; esta família é a prova. Cada caso nomeia a objeção (o1..o4) ou o invariante (i*) que
+# defende, e cada um foi conferido contra um MUTANTE do script (registro no resíduo da REGRA 56 do PR).
+#
+# O SUBSTRATO é um repo git de verdade, com STUBS só nas bordas que custam rede ou mudam o mundo:
+#   · `gh` (bin/ no PATH) devolve o JSON do PR de forge/pr-N.json e LOGA cada chamada;
+#   · `tm.sh` (no lugar do dispatcher) devolve tm/<ID>.json e tm/<ID>.kids.json e LOGA;
+#   · `ops/merge-serial.sh` LOGA e vira o PR para MERGED no forge falso — o caminho verificado de verdade
+#     não roda aqui (ele tem a família dele); o que se prova é que o AUTOMATE SÓ mergeia por ele.
+# O radar, o kg-drive-project.sh e o próprio drive-automate.sh são os REAIS.
+run_drive_automate_selftests() {
+  local da="${REPO_ROOT}/.claude/validation/drive-automate.sh"
+  if [ ! -f "${da}" ]; then record_skip "drive-automate: script ausente"; return; fi
+  if ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import yaml' >/dev/null 2>&1; then
+    record_skip "drive-automate: python3+PyYAML ausentes (o predicado lê o grafo por YAML)"; return; fi
+  local base; base="$(mktemp -d)"
+  mkdir -p "${base}/.claude/validation/lib" "${base}/.claude/utils/task-manager" "${base}/ops" "${base}/bin" \
+           "${base}/forge" "${base}/tm" "${base}/docs/evolution/research/p" "${base}/docs/evolution/review" "${base}/docs/analysis"
+  cp "${da}" "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${REPO_ROOT}/.claude/validation/kg-drive-project.sh" "${base}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/validation/lib/"* "${base}/.claude/validation/lib/"
+  cp "${REPO_ROOT}/ops/github-ruleset-main.json" "${base}/ops/" 2>/dev/null \
+    || printf '{"rules":[{"type":"required_status_checks","parameters":{"required_status_checks":[{"context":"selftest-gate"},{"context":"lint-onion-artifacts"}]}}]}\n' > "${base}/ops/github-ruleset-main.json"
+  cat > "${base}/bin/gh" <<'EOF_GH'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "${DA_SB}/gh.log"
+case "$1 $2" in
+  "pr view") f="${DA_SB}/forge/pr-$3.json"; [ -f "$f" ] || { echo "PR inexistente" >&2; exit 1; }; cat "$f" ;;
+  *) echo "gh falso: verbo nao simulado: $*" >&2; exit 9 ;;
+esac
+EOF_GH
+  cat > "${base}/.claude/utils/task-manager/tm.sh" <<'EOF_TM'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "${DA_SB}/tm.log"
+case "$1" in
+  item.read) cat "${DA_SB}/tm/$2.json" 2>/dev/null || { echo "item nao achado: $2" >&2; exit 1; } ;;
+  hierarchy.subtask_list) cat "${DA_SB}/tm/$2.kids.json" 2>/dev/null || printf '{"parent":"%s","count":0,"subtasks":[]}\n' "$2" ;;
+  *) exit 2 ;;
+esac
+EOF_TM
+  cat > "${base}/ops/merge-serial.sh" <<'EOF_MS'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "${DA_SB}/merge.log"
+mode="$(cat "${DA_SB}/ms-mode" 2>/dev/null || true)"
+python3 - "${DA_SB}/forge/pr-$1.json" "${mode}" <<'EOF_FLIP'
+import json, sys
+p, mode = sys.argv[1], sys.argv[2]; d = json.load(open(p))
+d.update(state="MERGED", mergedAt="2026-10-03T03:04:05Z", mergeCommit={"oid": "abcdef0123456789abcdef0123456789abcdef01"})
+if mode == "addfile":
+    d["files"].append({"path": ".claude/hooks/pretooluse-moat-gate.sh"})
+if mode == "nochecks":
+    d["statusCheckRollup"] = []; d["headRefOid"] = "f" * 40
+json.dump(d, open(p, "w"))
+EOF_FLIP
+echo "MERGED $1"
+[ "${mode}" = fail-merged ] && exit 4
+exit 0
+EOF_MS
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${base}/ops/pr-merge-verified.sh"
+  chmod +x "${base}/bin/gh" "${base}/.claude/utils/task-manager/tm.sh" "${base}/ops/"*.sh
+  # gerador do PR falso: mkpr <N> <oid> <arquivos,separados,por,virgula> [checks=ok|vazio|so-lint|vermelho|pendente] [url-repo]
+  cat > "${base}/mkpr.py" <<'EOF_MK'
+import json, sys
+n, oid, files = sys.argv[1], sys.argv[2], sys.argv[3]
+mode = sys.argv[4] if len(sys.argv) > 4 else "ok"
+repo = sys.argv[5] if len(sys.argv) > 5 else "acme/core"
+run = lambda r: "https://github.com/%s/actions/runs/%s/job/1" % (repo, r)
+ok = [{"__typename": "CheckRun", "name": "selftest-gate", "status": "COMPLETED", "conclusion": "SUCCESS", "detailsUrl": run(111)},
+      {"__typename": "CheckRun", "name": "lint-onion-artifacts", "status": "COMPLETED", "conclusion": "SUCCESS", "detailsUrl": run(222)},
+      {"__typename": "CheckRun", "name": "onion-review", "status": "COMPLETED", "conclusion": "SKIPPED", "detailsUrl": run(333)}]
+roll = {"ok": ok, "vazio": [], "so-lint": ok[1:], "vermelho": ok + [{"name": "plano", "status": "COMPLETED", "conclusion": "FAILURE", "detailsUrl": run(444)}],
+        "pendente": ok + [{"name": "plano", "status": "IN_PROGRESS", "conclusion": "", "detailsUrl": run(555)}],
+        "revisor": ok + [{"name": "onion-review-verdict", "status": "COMPLETED", "conclusion": "FAILURE", "detailsUrl": run(666)}]}[mode]
+json.dump({"number": int(n), "url": "https://github.com/%s/pull/%s" % (repo, n), "state": "OPEN", "isDraft": False,
+           "baseRefName": "main", "headRefName": "feat/item-a", "headRefOid": oid, "mergedAt": None, "mergeCommit": None,
+           "isCrossRepository": False, "statusCheckRollup": roll,
+           "files": [{"path": f} for f in files.split(",") if f]}, open(sys.argv[0].rsplit("/", 1)[0] + "/forge/pr-%s.json" % n, "w"))
+EOF_MK
+  cat > "${base}/docs/evolution/research/p/plan.kg.yaml" <<'EOF_PLAN'
+meta:
+  id: plan
+  schema_version: "1"
+  baseline: "2026-10-14"
+  review_after: "2026-11-14"
+nodes:
+  - id: C_EPIC
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    x_tm_item: "SAC-1"
+    label: "o epico entrega a cadeia inteira"
+  - id: C_TASK_A
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    x_tm_item: "SAC-2"
+    x_drive_parent: C_EPIC
+    label: "a tarefa A muda a doc da analise"
+  - id: C_TASK_B
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    x_tm_item: "SAC-3"
+    x_drive_parent: C_EPIC
+    label: "a tarefa B depende da A"
+  - id: E_INPUT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "medido na bancada"
+    label: "o insumo da tarefa A"
+    provenance:
+      source: "bancada"
+      locator: "caso a"
+      method: "medicao"
+edges:
+  - from: C_TASK_B
+    to: C_TASK_A
+    edge_type: DEPENDS_ON
+  - from: E_INPUT
+    to: C_TASK_A
+    edge_type: SUPPORTS
+  - from: C_TASK_A
+    to: C_EPIC
+    edge_type: SUPPORTS
+EOF_PLAN
+  printf '{"identifier":"SAC-1","parent":null,"state":{"type":"started"}}\n' > "${base}/tm/SAC-1.json"
+  printf '{"parent":"SAC-1","count":2,"subtasks":[{"identifier":"SAC-2"},{"identifier":"SAC-3"}]}\n' > "${base}/tm/SAC-1.kids.json"
+  printf '{"identifier":"SAC-2","parent":{"identifier":"SAC-1"},"state":{"type":"unstarted"}}\n' > "${base}/tm/SAC-2.json"
+  printf '{"identifier":"SAC-3","parent":{"identifier":"SAC-1"},"state":{"type":"unstarted"}}\n' > "${base}/tm/SAC-3.json"
+  local _git=(git -c user.name=bancada -c user.email=bancada@example.invalid -c commit.gpgsign=false -c core.hooksPath=/dev/null)
+  ( cd "${base}" && git init -q -b main . && git remote add origin https://github.com/acme/core.git \
+      && "${_git[@]}" add -A && "${_git[@]}" commit -qm base \
+      && git checkout -q -b feat/item-a \
+      && printf -- '---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: CORRIGIDO\nelenxo: sim\nelenxo_isolado: sim\n---\n' > docs/evolution/review/feat-item-a.md \
+      && printf 'a\n' > docs/analysis/a.md && "${_git[@]}" add -A && "${_git[@]}" commit -qm item-a \
+      && printf -- '---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: CORRIGIDO\nelenxo: sim\n---\n' > docs/evolution/review/feat-item-a.md \
+      && "${_git[@]}" commit -qam uma-voz \
+      && printf -- '---\ntitle: residuo\nreviewed_diff_sha256: 0123abcd\nverdict: REPROVADO\nelenxo: sim\nelenxo_isolado: sim\n---\n' > docs/evolution/review/feat-item-a.md \
+      && "${_git[@]}" commit -qam reprovado \
+      && git checkout -q main && git update-ref refs/remotes/origin/main main \
+      && git checkout -q -b feat/dec main && mkdir -p docs/evolution/research/q \
+      && printf 'meta:\n  id: q\n  schema_version: "1"\nnodes:\n  - id: D_Q\n    node_type: decision\n    plane: DEV\n    status: done\n    impact: 2\n    confidence: 0.5\n    label: "fechada por PR"\nedges: []\n' > docs/evolution/research/q/q.kg.yaml \
+      && "${_git[@]}" add -A && "${_git[@]}" commit -qm fecha-decisao \
+      && git checkout -q main ) >/dev/null 2>&1 \
+    || { record_fail "drive-automate: montagem" "não montei o repo da bancada"; rm -rf "${base}"; return; }
+  local OID_OK OID_ONEVOICE OID_REPROV
+  OID_REPROV="$(git -C "${base}" rev-parse feat/item-a)"; OID_ONEVOICE="$(git -C "${base}" rev-parse feat/item-a~1)"
+  OID_OK="$(git -C "${base}" rev-parse feat/item-a~2)"
+  local OID_DEC; OID_DEC="$(git -C "${base}" rev-parse feat/dec)"
+  local G="docs/evolution/research/p/plan.kg.yaml" FILES_OK="docs/analysis/a.md,docs/evolution/review/feat-item-a.md"
+
+  local sb rc out
+  _da_new() { sb="$(mktemp -d)"; cp -a "${base}/." "${sb}/"; : > "${sb}/gh.log"; : > "${sb}/tm.log"; : > "${sb}/merge.log"; }
+  _da() { rc=0; out="$( cd "${sb}" && DA_SB="${sb}" PATH="${sb}/bin:${PATH}" bash .claude/validation/drive-automate.sh "$@" 2>&1 )" || rc=$?; }
+  _da_pr() { python3 "${sb}/mkpr.py" "$@"; }
+  _da_ok() { [ "${rc}" = "$1" ] && grep -qF -- "$2" <<< "${out}"; }
+  _da_case() {  # nome · rc esperado · token esperado
+    if _da_ok "$2" "$3"; then record_pass "drive-automate: $1"; else record_fail "drive-automate: $1" "esperava rc=$2 e '$3'; veio rc=${rc}: $(head -c 400 <<< "${out}")"; fi
+  }
+  _da_ready() {  # passada aberta + C_TASK_A vinculado ao PR 7, forge verde
+    _da begin "${G}" --max-nodes 3 --budget 1000 "$@" >/dev/null; _da track "${G}" C_TASK_A --pr 7 >/dev/null
+    _da_pr 7 "${OID_OK}" "${FILES_OK}"
+  }
+
+  # ── OBJEÇÃO 1 — o grafo é a SSOT da ordem; a expansão para em voz alta ─────────────────────────
+  _da_new; _da plan "${G}"
+  if [ "${rc}" = 0 ] && [ "$(grep '^ITEM' <<< "${out}" | cut -f3 | paste -sd, -)" = "C_TASK_A,C_TASK_B,C_EPIC" ]; then
+    record_pass "drive-automate: (o1a) a cadeia sai em ordem topológica — predecessor antes do dependente, filho antes do pai"
+  else record_fail "drive-automate: (o1a) ordem" "rc=${rc}: ${out}"; fi
+  rm -rf "${sb}"
+  _da_new; printf '  - from: C_TASK_A\n    to: C_TASK_B\n    edge_type: DEPENDS_ON\n' >> "${sb}/${G}"; _da plan "${G}"
+  _da_case "(o1b) ciclo em DEPENDS_ON PARA (CICLO)" 1 "CICLO:"; rm -rf "${sb}"
+  _da_new; _da plan "${G}" --root SAC-99
+  _da_case "(o1c) item do task manager sem nó PARA (ITEM-SEM-NO)" 1 "ITEM-SEM-NO: SAC-99"; rm -rf "${sb}"
+  _da_new; printf '{"parent":"SAC-1","count":3,"subtasks":[{"identifier":"SAC-2"},{"identifier":"SAC-3"},{"identifier":"SAC-4"}]}\n' > "${sb}/tm/SAC-1.kids.json"
+  _da plan "${G}"; _da_case "(o1d) subtarefa do task manager sem nó PARA (ITEM-SEM-NO)" 1 "subtarefa SAC-4"; rm -rf "${sb}"
+  _da_new; sed -i '/x_tm_item: "SAC-3"/d' "${sb}/${G}"; _da plan "${G}"
+  _da_case "(o1e) nó da cadeia sem item PARA (NO-SEM-ITEM)" 1 "NO-SEM-ITEM: C_TASK_B"; rm -rf "${sb}"
+  _da_new; printf '{"identifier":"SAC-3","parent":{"identifier":"SAC-9"}}\n' > "${sb}/tm/SAC-3.json"; _da plan "${G}"
+  _da_case "(o1f) pai no grafo ≠ pai no task manager PARA (PAI-FILHO-DIVERGENTE)" 1 "PAI-FILHO-DIVERGENTE: C_TASK_B"; rm -rf "${sb}"
+  _da_new; rm -f "${sb}/tm/SAC-2.json"; _da plan "${G}"
+  _da_case "(o1g) task manager ilegível PARA (TM-ILEGIVEL), nunca segue sem conferir" 1 "TM-ILEGIVEL"; rm -rf "${sb}"
+
+  # ── OBJEÇÃO 2 — o carimbo vem do que foi LIDO no forge ─────────────────────────────────────────
+  _da_new; _da_ready; _da stamp "${G}" C_TASK_A
+  _da_case "(o2b) carimbo com PR ainda aberto PARA (PR-NAO-MERGEADO)" 1 "PR-NAO-MERGEADO"
+  if grep -q '^    status: open' <<< "$(awk '/- id: C_TASK_A/{f=1} f&&/- id: C_TASK_B/{f=0} f' "${sb}/${G}")"; then record_pass "drive-automate: (o2b') o nó segue open quando o forge não diz MERGED"
+  else record_fail "drive-automate: (o2b')" "o nó mudou sem merge lido"; fi
+  python3 - "${sb}/forge/pr-7.json" <<'EOF_INC'
+import json, sys
+p = sys.argv[1]; d = json.load(open(p))
+d.update(mergedAt="2026-10-03T03:04:05Z", mergeCommit={"oid": "abcdef0123456789abcdef0123456789abcdef01"})
+json.dump(d, open(p, "w"))
+EOF_INC
+  _da stamp "${G}" C_TASK_A
+  _da_case "(o2b'') forge incoerente (state OPEN com mergedAt e SHA) não carimba: o estado MERGED é exigido" 1 "PR-NAO-MERGEADO"
+  DA_SB="${sb}" bash "${sb}/ops/merge-serial.sh" 7 >/dev/null 2>&1
+  : > "${sb}/merge.log"; _da stamp "${G}" C_TASK_A
+  local blk; blk="$(awk '/- id: C_TASK_A/{f=1} f&&/- id: C_TASK_B/{f=0} f' "${sb}/${G}")"
+  if [ "${rc}" = 0 ] && grep -q 'status: done' <<< "${blk}" && grep -q 'verified_at: "2026-10-03"' <<< "${blk}" \
+     && grep -q 'locator: "https://github.com/acme/core/pull/7 · merge abcdef0123456789abcdef0123456789abcdef01 · selftest-gate run 111, lint-onion-artifacts run 222"' <<< "${blk}" \
+     && grep -q 'method: "leitura: drive-automate.sh stamp' <<< "${blk}" && bash "${sb}/.claude/validation/kg-radar.sh" "${sb}/${G}" --integrity --schema >/dev/null 2>&1; then
+    record_pass "drive-automate: (o2a) o carimbo cita o que LEU: URL do PR, SHA do merge, run de CI de cada check exigido; verified_at = mergedAt; radar exit 0"
+  else record_fail "drive-automate: (o2a) carimbo" "rc=${rc}: ${out} :: ${blk}"; fi
+  rm -rf "${sb}"
+  _da_new
+  python3 - "${sb}/${G}" <<'EOF_DEC'
+import sys; p = sys.argv[1]; t = open(p).read()
+t = t.replace("  - id: C_TASK_A\n    node_type: claim", "  - id: C_TASK_A\n    node_type: decision", 1); open(p, "w").write(t)
+EOF_DEC
+  _da begin "${G}" --max-nodes 3 --budget 1000 --merge; _da_case "(o2c') decision aberta na cadeia PARA já na expansão (DECISAO-NAO-TOMADA)" 1 "DECISAO-NAO-TOMADA: C_TASK_A"
+  _da stamp "${G}" C_TASK_A; _da_case "(o2c) o carimbo nunca fecha decision (ITEM-E-DECISION)" 1 "ITEM-E-DECISION"
+  rm -rf "${sb}"
+  _da_new; _da_ready; DA_SB="${sb}" bash "${sb}/ops/merge-serial.sh" 7 >/dev/null 2>&1
+  python3 - "${sb}/${G}" <<'EOF_EP'
+import sys; p = sys.argv[1]; t = open(p).read()
+t = t.replace('    x_tm_item: "SAC-1"\n', '    x_tm_item: "SAC-1"\n    x_drive_pr: "7"\n', 1); open(p, "w").write(t)
+EOF_EP
+  _da stamp "${G}" C_EPIC; _da_case "(o2d) épico com filho aberto não fecha (PAI-COM-FILHO-ABERTO)" 1 "PAI-COM-FILHO-ABERTO: C_EPIC"
+  rm -rf "${sb}"
+  _da_new; _da_ready; _da_pr 7 "${OID_OK}" "${FILES_OK}" so-lint; DA_SB="${sb}" bash "${sb}/ops/merge-serial.sh" 7 >/dev/null 2>&1
+  _da stamp "${G}" C_TASK_A; _da_case "(o2e) sem run de CI SUCCESS de todo check exigido, não carimba (CI-SEM-RUN)" 1 "CI-SEM-RUN"
+  rm -rf "${sb}"
+
+  # ── OBJEÇÃO 3 — os riscos que faltavam ──────────────────────────────────────────────────────────
+  _da_new; _da_ready; _da gate "${G}" C_TASK_A
+  _da_case "(o3f) tudo verde e SEM --merge → AUDIT (rc 3): o merge nasce desligado" 3 "AUDIT:"
+  rm -rf "${sb}"
+  _da_new; _da_ready --merge; _da_pr 7 "${OID_OK}" "${FILES_OK}" vazio; _da gate "${G}" C_TASK_A --merge
+  _da_case "(o3a) CI verde VAZIO (nenhum check) PARA (CI-VAZIO)" 1 "CI-VAZIO"
+  _da_pr 7 "${OID_OK}" "${FILES_OK}" so-lint; _da gate "${G}" C_TASK_A --merge
+  _da_case "(o3a') check exigido ausente PARA (CI-SEM-CHECK-EXIGIDO)" 1 "CI-SEM-CHECK-EXIGIDO: o check selftest-gate"
+  _da_pr 7 "${OID_OK}" "${FILES_OK}" vermelho; _da gate "${G}" C_TASK_A --merge
+  _da_case "(o3j) check vermelho inesperado PARA (CI-VERMELHO, abort-on-anomaly)" 1 "CI-VERMELHO: o check plano"
+  _da_pr 7 "${OID_OK}" "${FILES_OK}" pendente; _da gate "${G}" C_TASK_A --merge
+  _da_case "(o3j') check pendente PARA (CI-PENDENTE)" 1 "CI-PENDENTE"
+  _da_pr 7 "${OID_ONEVOICE}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(o3c) Elenxo sem agente separado PARA (ELENXO-UMA-VOZ)" 1 "ELENXO-UMA-VOZ"
+  _da_pr 7 "${OID_REPROV}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(o3d) Elenxo reprovado PARA (ELENXO-REPROVADO)" 1 "ELENXO-REPROVADO"
+  sed -i 's/verified_at: "2026-10-14"/verified_at: "2026-09-01"/' "${sb}/${G}"; _da_pr 7 "${OID_OK}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(o3e) insumo STALE de impacto alto PARA (INSUMO-VENCIDO)" 1 "INSUMO-VENCIDO: E_INPUT"
+  rm -rf "${sb}"
+  _da_new; printf '{"identifier":"SAC-2","parent":{"identifier":"SAC-1"},"state":{"type":"completed","name":"Done"}}\n' > "${sb}/tm/SAC-2.json"
+  _da plan "${G}"
+  if [ "${rc}" = 0 ] && grep -q $'^ITEM\t1\tC_TASK_A\tclaim\tTODO' <<< "${out}"; then
+    record_pass "drive-automate: (o3i) status 'Done' no task manager não fecha o nó (o grafo é a SSOT; o status do provedor pode mentir)"
+  else record_fail "drive-automate: (o3i) status do provedor" "rc=${rc}: ${out}"; fi
+  rm -rf "${sb}"
+  # retomada depois da queda: a passada mora no grafo; reabrir não zera o gasto nem o teto
+  _da_new; _da begin "${G}" --max-nodes 2 --budget 1000 --merge >/dev/null; _da charge "${G}" --tokens 400 >/dev/null
+  _da track "${G}" C_TASK_A --pr 7 >/dev/null; _da begin "${G}" --max-nodes 9 --budget 99999 --merge
+  if [ "${rc}" = 0 ] && grep -q 'RETOMADA:.*gasto 400/1000, iniciados 1/2' <<< "${out}"; then
+    record_pass "drive-automate: (o3h) begin depois da queda RETOMA a passada do grafo (gasto e teto não zeram)"
+  else record_fail "drive-automate: (o3h) retomada" "rc=${rc}: ${out}"; fi
+  _da next "${G}"; _da_case "(o3h') next retoma o item em voo antes de qualquer novo (RETOMAR)" 0 $'RETOMAR\tC_TASK_A\tPR #7'
+  rm -rf "${sb}"
+
+  # ── OBJEÇÃO 4 — usa a maquinaria, não a reinterpreta ───────────────────────────────────────────
+  _da_new; _da plan "${G}"
+  if grep -qx 'item.read SAC-2 --lean' "${sb}/tm.log" && grep -qx 'hierarchy.subtask_list SAC-1' "${sb}/tm.log" \
+     && ! grep -qiE 'api\.linear\.app|zohoapis|api\.clickup\.com|atlassian\.net|app\.asana\.com|urllib|requests\.' "${da}"; then
+    record_pass "drive-automate: (o4a) o task manager é lido SÓ pelo tm.sh (nenhum host de provedor no script)"
+  else record_fail "drive-automate: (o4a) tm.sh" "tm.log=$(paste -sd' ' "${sb}/tm.log")"; fi
+  rm -rf "${sb}"
+  _da_new; _da_ready --merge; _da merge "${G}" C_TASK_A --merge
+  if [ "${rc}" = 0 ] && grep -qx '7' "${sb}/merge.log" && ! grep -qE '^pr merge|pulls/.*/merge' "${sb}/gh.log" \
+     && grep -q '^    status: done' <<< "$(awk '/- id: C_TASK_A/{f=1} f&&/- id: C_TASK_B/{f=0} f' "${sb}/${G}")"; then
+    record_pass "drive-automate: (o4b/i-merge) com --merge na passada E na chamada, o merge vai SÓ pelo ops/merge-serial.sh, e o carimbo lê o forge depois"
+  else record_fail "drive-automate: (o4b) caminho do merge" "rc=${rc}: ${out} :: merge.log=$(cat "${sb}/merge.log") gh.log=$(paste -sd' ' "${sb}/gh.log")"; fi
+  _da next "${G}"; _da_case "(o4b') depois do merge a cadeia anda para o dependente (PROXIMO C_TASK_B)" 0 $'PROXIMO\tC_TASK_B'
+  _da end "${G}" "lote de teste"
+  if [ "${rc}" = 0 ] && grep -q '^  x_drive_checkpoint: pending' "${sb}/${G}" \
+     && grep -q 'x_drive_checkpoint_note: .*mergeados e carimbados pelo forge: C_TASK_A' "${sb}/${G}" && ! grep -q 'x_drive_pass:' "${sb}/${G}"; then
+    record_pass "drive-automate: (o4c) end escreve o checkpoint pelo kg-drive-project.sh --close-lot, nomeando o que mergeou"
+  else record_fail "drive-automate: (o4c) checkpoint" "rc=${rc}: ${out}"; fi
+  _da begin "${G}" --max-nodes 1 --budget 10; _da_case "(i-ckpt) checkpoint pendente PARA a próxima passada" 1 "CHECKPOINT-PENDENTE"
+  rm -rf "${sb}"
+
+  # ── INVARIANTES ──────────────────────────────────────────────────────────────────────────────────
+  _da_new; _da_ready; _da merge "${G}" C_TASK_A --merge
+  if [ "${rc}" = 1 ] && grep -q 'MERGE-NAO-AUTORIZADO-NA-PASSADA' <<< "${out}" && [ ! -s "${sb}/merge.log" ]; then
+    record_pass "drive-automate: (i-merge1) passada aberta sem --merge não mergeia nem com --merge na chamada"
+  else record_fail "drive-automate: (i-merge1)" "rc=${rc}: ${out}"; fi
+  _da begin "${G}" --max-nodes 3 --budget 1000 --merge
+  _da_case "(i-merge2) retomada não liga o merge no meio do laço" 1 "não se liga merge numa retomada"
+  rm -rf "${sb}"
+  _da_new; _da_ready --merge; rc=0; out="$( cd "${sb}" && ONION_DRIVE_MERGE=1 ONION_AUTOMATE_MERGE=1 DA_SB="${sb}" PATH="${sb}/bin:${PATH}" bash .claude/validation/drive-automate.sh merge "${G}" C_TASK_A 2>&1 )" || rc=$?
+  if [ "${rc}" = 3 ] && [ ! -s "${sb}/merge.log" ]; then
+    record_pass "drive-automate: (i-merge3) sem --merge na chamada não há merge (o script não lê ambiente: a variável não abre nada)"
+  else record_fail "drive-automate: (i-merge3)" "rc=${rc}: ${out}"; fi
+  _da_pr 7 "${OID_OK}" "${FILES_OK},.claude/commands/meta/x.md"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(i-moat1) diff que viaja ao adotante PARA (PATH-VENDORIZADO)" 1 "PATH-VENDORIZADO"
+  _da_pr 7 "${OID_OK}" "${FILES_OK},site/index.html"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(i-moat1') diff do site público PARA (allowlist, nunca denylist)" 1 "PATH-VENDORIZADO"
+  _da_pr 7 "${OID_OK}" "${FILES_OK},${G}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(i-moat2) PR que toca o grafo de controle PARA (PR-DO-CONTROLE)" 1 "PR-DO-CONTROLE"
+  _da_pr 7 "${OID_OK}" "${FILES_OK}" ok other/repo; _da gate "${G}" C_TASK_A --merge
+  _da_case "(i-moat3) PR de outro repositório PARA (REPO-ALHEIO, I3)" 1 "REPO-ALHEIO"
+  _da_pr 7 "${OID_OK}" "$(seq -s, -f 'docs/analysis/f%g.md' 1 60)"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(i-cap) diff grande PARA (DIFF-GRANDE)" 1 "DIFF-GRANDE"
+  _da_pr 7 "${OID_OK}" "${FILES_OK}"; mv "${sb}/ops/merge-serial.sh" "${sb}/ops/merge-serial.off"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(i-path) sem ops/merge-serial.sh (adotante) o merge é recusado (SEM-CAMINHO-VERIFICADO)" 1 "SEM-CAMINHO-VERIFICADO"
+  mv "${sb}/ops/merge-serial.off" "${sb}/ops/merge-serial.sh"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(i-ok) com tudo verde e --merge, o gate libera (MERGE-OK)" 0 "MERGE-OK"
+  python3 - "${sb}/${G}" <<'EOF_DEC2'
+import sys; p = sys.argv[1]; t = open(p).read()
+t = t.replace("  - id: C_TASK_A\n    x_drive_pr: \"7\"\n    node_type: claim", "  - id: C_TASK_A\n    x_drive_pr: \"7\"\n    node_type: decision", 1); open(p, "w").write(t)
+EOF_DEC2
+  _da gate "${G}" C_TASK_A --merge
+  _da_case "(o3g) item que virou decision depois de vinculado não mergeia nem com --merge (ITEM-E-DECISION)" 1 "ITEM-E-DECISION: C_TASK_A"
+  rm -rf "${sb}"
+  _da_new; sed -i 's/label: "a tarefa B depende da A"/label: "a tarefa B faz o deploy do site"/' "${sb}/${G}"; _da plan "${G}"
+  _da_case "(i-moat4) nó com trabalho de deploy/publicação PARA (NO-MOAT)" 1 "NO-MOAT: C_TASK_B"
+  rm -rf "${sb}"
+  _da_new; sed -i 's/    x_tm_item: "SAC-3"/    x_tm_item: "SAC-3"\n    x_drive_moat: "publica a porta"/' "${sb}/${G}"; _da plan "${G}"
+  _da_case "(i-moat4') nó marcado x_drive_moat PARA (NO-MOAT)" 1 "NO-MOAT: C_TASK_B está marcado"
+  rm -rf "${sb}"
+  _da_new; _da gate "${G}" C_TASK_A --merge; _da_case "(i-pass) sem passada aberta não há laço (SEM-PASSADA)" 1 "SEM-PASSADA"
+  _da begin "${G}" --max-nodes 1 --budget 0; _da_case "(i-teto0) teto zero é recusado (sem teto não há laço)" 2 "têm de ser >= 1"
+  _da begin "${G}" --max-nodes 1 --budget 500 --merge >/dev/null; _da track "${G}" C_TASK_A --pr 7 >/dev/null
+  _da track "${G}" C_TASK_B --pr 8; _da_case "(i-nos) o teto de nós por passada PARA o item seguinte (TETO-DE-NOS)" 1 "TETO-DE-NOS"
+  _da charge "${G}" --tokens 500; _da_case "(i-budget1) o gasto que alcança o budget PARA na hora (BUDGET-ESGOTADO)" 1 "BUDGET-ESGOTADO"
+  _da next "${G}"; _da_case "(i-budget2) budget esgotado PARA o next" 1 "BUDGET-ESGOTADO"
+  _da_pr 7 "${OID_OK}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge; _da_case "(i-budget3) budget esgotado PARA o merge" 1 "BUDGET-ESGOTADO"
+  _da charge "${G}" --tokens -5; _da_case "(i-budget4) gasto não inteiro é recusado (rc 2)" 2 "inteiro"
+  rm -rf "${sb}"
+
+  # ── CURAS DO ELENXO (2026-10-14): cada achado reproduzido virou caso ────────────────────────────
+  # (e1) a passada editada à mão PARA: o merge não liga trocando "desligado" por "ligado" no YAML
+  _da_new; _da_ready; sed -i 's/merge: "desligado"/merge: "ligado"/' "${sb}/${G}"; _da merge "${G}" C_TASK_A --merge
+  if [ "${rc}" = 1 ] && grep -q 'PASSADA-ADULTERADA' <<< "${out}" && [ ! -s "${sb}/merge.log" ]; then
+    record_pass "drive-automate: (e1) merge ligado à mão no grafo quebra o selo da passada (PASSADA-ADULTERADA), sem merge"
+  else record_fail "drive-automate: (e1) selo da passada" "rc=${rc}: ${out}"; fi
+  rm -rf "${sb}"
+  _da_new; _da_ready --merge; sed -i 's/spent: 0/spent: -100000/' "${sb}/${G}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(e1') gasto negativo escrito à mão PARA (PASSADA-ADULTERADA)" 1 "PASSADA-ADULTERADA"
+  rm -rf "${sb}"
+  _da_new; _da_ready --merge; rm -rf "${sb}/.git/onion-drive-pass"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(e1'') passada sem o segredo do begin (escrita à mão) PARA (PASSADA-ADULTERADA)" 1 "PASSADA-ADULTERADA"
+  rm -rf "${sb}"
+  # (e2) o head mergeado muda depois do gate: a política é relida no estado final e o nó não é carimbado
+  _da_new; _da_ready --merge; echo addfile > "${sb}/ms-mode"; _da merge "${G}" C_TASK_A --merge
+  if [ "${rc}" = 1 ] && grep -q 'POS-MERGE-FORA-DA-POLITICA' <<< "${out}" \
+     && grep -q '^    status: open' <<< "$(awk '/- id: C_TASK_A/{f=1} f&&/- id: C_TASK_B/{f=0} f' "${sb}/${G}")" \
+     && grep -q 'merged: "C_TASK_A"' "${sb}/${G}"; then
+    record_pass "drive-automate: (e2) head mergeado fora da política PARA sem carimbo, e o merge fica registrado na passada"
+  else record_fail "drive-automate: (e2) head divergente" "rc=${rc}: ${out}"; fi
+  rm -rf "${sb}"
+  # (e3) a ordem vale em todo passo: o dependente não se vincula nem mergeia antes do predecessor
+  _da_new; _da begin "${G}" --max-nodes 3 --budget 1000 --merge >/dev/null; _da track "${G}" C_TASK_B --pr 8
+  _da_case "(e3) track do dependente com predecessor aberto PARA (PREDECESSOR-ABERTO)" 1 "PREDECESSOR-ABERTO: C_TASK_B"
+  rm -rf "${sb}"
+  _da_new; _da_ready --merge
+  python3 - "${sb}/${G}" <<'EOF_KID'
+import sys; p = sys.argv[1]; t = open(p).read()
+t = t.replace('    x_tm_item: "SAC-3"\n    x_drive_parent: C_EPIC\n', '    x_tm_item: "SAC-3"\n    x_drive_parent: C_TASK_A\n', 1); open(p, "w").write(t)
+EOF_KID
+  _da gate "${G}" C_TASK_A --merge
+  _da_case "(e3') o gate não mergeia pai com filho aberto (PAI-COM-FILHO-ABERTO)" 1 "PAI-COM-FILHO-ABERTO: C_TASK_A"
+  rm -rf "${sb}"
+  # (e4) x_drive_pr escrito à mão (ou herdado de outra passada) não fura o teto
+  _da_new; _da begin "${G}" --max-nodes 1 --budget 1000 --merge >/dev/null
+  sed -i 's/    x_tm_item: "SAC-2"/    x_tm_item: "SAC-2"\n    x_drive_pr: "7"/' "${sb}/${G}"; _da_pr 7 "${OID_OK}" "${FILES_OK}"
+  _da gate "${G}" C_TASK_A --merge
+  _da_case "(e4) PR no nó sem vínculo NESTA passada não é julgado (ITEM-FORA-DA-PASSADA)" 1 "ITEM-FORA-DA-PASSADA"
+  _da next "${G}"; _da_case "(e4') item em voo de outra passada é retomado só pelo track, que conta no teto" 0 "de outra passada"
+  rm -rf "${sb}"
+  # (e5) superfície sensível dentro da allowlist
+  _da_new; _da_ready --merge; _da_pr 7 "${OID_DEC}" "docs/evolution/research/q/q.kg.yaml"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(e5) PR que fecha uma decision num grafo da allowlist PARA (PR-MEXE-EM-DECISAO)" 1 "PR-MEXE-EM-DECISAO: o PR #7 muda a decision D_Q"
+  _da_pr 7 "${OID_OK}" "${FILES_OK},docs/evolution/federation/members.yaml"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(e5') o registro da federação sai da allowlist (PATH-VENDORIZADO)" 1 "PATH-VENDORIZADO"
+  _da_pr 7 "${OID_OK}" "${FILES_OK}"
+  python3 - "${sb}/forge/pr-7.json" <<'EOF_X'
+import json, sys; p = sys.argv[1]; d = json.load(open(p)); d["isCrossRepository"] = True; json.dump(d, open(p, "w"))
+EOF_X
+  _da gate "${G}" C_TASK_A --merge; _da_case "(e5'') PR de fork com a URL do próprio repo PARA (REPO-ALHEIO)" 1 "vem de um fork"
+  rm -rf "${sb}"
+  # (e6) grafo de controle fora do projeto é recusado (o PR-DO-CONTROLE dependia do caminho relativo)
+  _da_new; local _out_g; _out_g="$(mktemp -d)"; cp "${sb}/${G}" "${_out_g}/fora.kg.yaml"; _da plan "${_out_g}/fora.kg.yaml"
+  _da_case "(e6) grafo de controle fora do projeto é recusado (rc 2)" 2 "fora deste projeto"
+  rm -rf "${sb}" "${_out_g}"
+  # (e7) o carimbo reaplica as paradas: base, passada, checkpoint
+  _da_new; _da_ready --merge; DA_SB="${sb}" bash "${sb}/ops/merge-serial.sh" 7 >/dev/null 2>&1
+  python3 - "${sb}/forge/pr-7.json" <<'EOF_B'
+import json, sys; p = sys.argv[1]; d = json.load(open(p)); d["baseRefName"] = "feat/rascunho"; json.dump(d, open(p, "w"))
+EOF_B
+  _da stamp "${G}" C_TASK_A; _da_case "(e7) carimbo de PR mergeado em outra base PARA (BASE-NAO-MAIN)" 1 "BASE-NAO-MAIN"
+  rm -rf "${sb}"
+  _da_new; _da_pr 7 "${OID_OK}" "${FILES_OK}"; DA_SB="${sb}" bash "${sb}/ops/merge-serial.sh" 7 >/dev/null 2>&1
+  sed -i 's/    x_tm_item: "SAC-2"/    x_tm_item: "SAC-2"\n    x_drive_pr: "7"/' "${sb}/${G}"; _da stamp "${G}" C_TASK_A
+  _da_case "(e7') carimbo sem passada aberta PARA (SEM-PASSADA)" 1 "SEM-PASSADA"
+  rm -rf "${sb}"
+  # (e8) merge sem CI depois de auto-rebase limpo: o carimbo usa os runs do head JULGADO, e o lote não mente
+  _da_new; _da_ready --merge; echo nochecks > "${sb}/ms-mode"; _da merge "${G}" C_TASK_A --merge
+  if [ "${rc}" = 0 ] && grep -q 'CARIMBADO' <<< "${out}" && grep -q "no head julgado ${OID_OK:0:12}" "${sb}/${G}"; then
+    record_pass "drive-automate: (e8) merge sem CI no head novo carimba com os runs do head julgado (nomeado no verified_against)"
+  else record_fail "drive-automate: (e8) head sem checks" "rc=${rc}: ${out}"; fi
+  rm -rf "${sb}"
+  # (e9) o forge decide se houve merge, nunca o rc do merge-serial
+  _da_new; _da_ready --merge; echo fail-merged > "${sb}/ms-mode"; _da merge "${G}" C_TASK_A --merge
+  _da_case "(e9) merge-serial sai ≠0 mas o forge diz MERGED: registra e carimba (o rc não é a verificação)" 0 "CARIMBADO"
+  rm -rf "${sb}"
+  # (e11) gasto concorrente não se perde (trava + escrita atômica)
+  _da_new; _da begin "${G}" --max-nodes 3 --budget 100000 >/dev/null
+  local _k; for _k in 1 2 3 4 5 6 7 8; do ( cd "${sb}" && DA_SB="${sb}" PATH="${sb}/bin:${PATH}" bash .claude/validation/drive-automate.sh charge "${G}" --tokens 100 >/dev/null 2>&1 ) & done; wait
+  if grep -q '^    spent: 800$' "${sb}/${G}"; then record_pass "drive-automate: (e11) 8 charges concorrentes somam 800 (nenhum gasto se perde)"
+  else record_fail "drive-automate: (e11) concorrência" "$(grep 'spent:' "${sb}/${G}")"; fi
+  rm -rf "${sb}"
+  # (e12) StatusContext legado pendente é pendente
+  _da_new; _da_ready --merge
+  python3 - "${sb}/forge/pr-7.json" <<'EOF_SC'
+import json, sys; p = sys.argv[1]; d = json.load(open(p))
+d["statusCheckRollup"].append({"__typename": "StatusContext", "context": "ci/legado", "state": "PENDING"}); json.dump(d, open(p, "w"))
+EOF_SC
+  _da gate "${G}" C_TASK_A --merge; _da_case "(e12) StatusContext legado PENDING PARA (CI-PENDENTE)" 1 "CI-PENDENTE: o check ci/legado"
+  rm -rf "${sb}"
+  # (e13) uma parada por nome — as que a 1ª bancada não exercitava
+  _da_new; _da_ready --merge
+  python3 - "${sb}/forge/pr-7.json" <<'EOF_DR'
+import json, sys; p = sys.argv[1]; d = json.load(open(p)); d["isDraft"] = True; json.dump(d, open(p, "w"))
+EOF_DR
+  _da gate "${G}" C_TASK_A --merge; _da_case "(e13a) PR em draft PARA (PR-NAO-ABERTO)" 1 "(draft)"
+  _da_pr 7 "${OID_OK}" "${FILES_OK}"
+  python3 - "${sb}/forge/pr-7.json" <<'EOF_BS'
+import json, sys; p = sys.argv[1]; d = json.load(open(p)); d["baseRefName"] = "develop"; json.dump(d, open(p, "w"))
+EOF_BS
+  _da gate "${G}" C_TASK_A --merge; _da_case "(e13b) PR que não mira main PARA (BASE-NAO-MAIN)" 1 "BASE-NAO-MAIN"
+  rm -rf "${sb}"
+  _da_new; ( cd "${sb}" && git checkout -q feat/item-a~2 2>/dev/null && sed -i 's/reviewed_diff_sha256: 0123abcd/reviewed_diff_sha256: pendente/' docs/evolution/review/feat-item-a.md \
+      && "${_git[@]}" commit -qam pendente && git rev-parse HEAD > ../oid-pend.$$ && git checkout -q main ) >/dev/null 2>&1
+  local OID_PEND; OID_PEND="$(cat "${sb}/../oid-pend.$$" 2>/dev/null)"; rm -f "${sb}/../oid-pend.$$"
+  _da_ready --merge; _da_pr 7 "${OID_PEND:-x}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(e13c) resíduo com reviewed_diff_sha256 pendente PARA (RESIDUO-PENDENTE)" 1 "RESIDUO-PENDENTE"
+  rm -rf "${sb}"
+  _da_new; ( cd "${sb}" && git checkout -q feat/item-a~2 2>/dev/null && sed -i 's/^elenxo: sim$/elenxo: nao/' docs/evolution/review/feat-item-a.md \
+      && "${_git[@]}" commit -qam sem-elenxo && git rev-parse HEAD > ../oid-ne.$$ && git checkout -q main ) >/dev/null 2>&1
+  local OID_NE; OID_NE="$(cat "${sb}/../oid-ne.$$" 2>/dev/null)"; rm -f "${sb}/../oid-ne.$$"
+  _da_ready --merge; _da_pr 7 "${OID_NE:-x}" "${FILES_OK}"; _da gate "${G}" C_TASK_A --merge
+  _da_case "(e13d) resíduo sem Elenxo PARA (ELENXO-AUSENTE)" 1 "ELENXO-AUSENTE"
+  rm -rf "${sb}"
+  _da_new; _da begin "${G}" --max-nodes 3 --budget 1000 >/dev/null; sed -i 's/verified_at: "2026-10-14"/verified_at: "2026-09-01"/' "${sb}/${G}"; _da next "${G}"
+  _da_case "(e13e) o next não entrega item com insumo vencido (INSUMO-VENCIDO)" 1 "INSUMO-VENCIDO: E_INPUT"
+  rm -rf "${sb}"
+  _da_new; _da begin "${G}" --max-nodes 1 --budget 1000 --merge >/dev/null; _da track "${G}" C_TASK_A --pr 7 >/dev/null
+  _da_pr 7 "${OID_OK}" "${FILES_OK}"; _da merge "${G}" C_TASK_A --merge >/dev/null; _da next "${G}"
+  _da_case "(e13f) com o teto alcançado, o next não entrega o item seguinte (TETO-DE-NOS)" 1 "TETO-DE-NOS"
+  rm -rf "${sb}"
+  _da_new; _da begin "${G}" --max-nodes 3 --budget 1000 >/dev/null
+  python3 - "${sb}/${G}" <<'EOF_TD'
+import sys; p = sys.argv[1]; t = open(p).read()
+t = t.replace("  - id: C_TASK_A\n    node_type: claim", "  - id: C_TASK_A\n    node_type: decision", 1); open(p, "w").write(t)
+EOF_TD
+  _da track "${G}" C_TASK_A --pr 7; _da_case "(e13g) decision não se vincula à passada (ITEM-E-DECISION)" 1 "ITEM-E-DECISION"
+  rm -rf "${sb}"
+  _da_new; _da_ready --merge; DA_SB="${sb}" bash "${sb}/ops/merge-serial.sh" 7 >/dev/null 2>&1
+  python3 - "${sb}/forge/pr-7.json" <<'EOF_NS'
+import json, sys; p = sys.argv[1]; d = json.load(open(p)); d["mergeCommit"] = None; json.dump(d, open(p, "w"))
+EOF_NS
+  _da stamp "${G}" C_TASK_A; _da_case "(e13h) MERGED sem SHA do merge não carimba (PR-NAO-MERGEADO)" 1 "PR-NAO-MERGEADO"
+  rm -rf "${sb}"
+  # nunca auto-iniciar, nunca agendar: o script só invoca bash (radar, censo, tm.sh, merge-serial), git e gh
+  local _inv; _inv="$(grep -oE 'run\(\["[^"]+"(, *[A-Z_]+)?' "${da}" | sed -E 's/run\(\["//; s/", */ /; s/"$//' | sort -u | paste -sd'|' -)"
+  if [ "${_inv}" = "bash DRIVE|bash MERGE_SERIAL|bash RADAR|bash TM|gh|git" ] \
+     && ! grep -qE '^[^#]*\b(while true|sleep [0-9]|time\.sleep|crontab -|systemd-run|ScheduleWakeup|CronCreate)' "${da}"; then
+    record_pass "drive-automate: (i-relogio) o script só invoca radar/censo/tm.sh/merge-serial, git e gh — sem laço, sono, cron ou agenda"
+  else record_fail "drive-automate: (i-relogio) invocações" "${_inv}"; fi
+  if grep -q 'pretooluse-moat-gate.sh' "${REPO_ROOT}/.claude/settings.json" && grep -q 'pretooluse-merge-gate.sh' "${REPO_ROOT}/.claude/settings.json"; then
+    record_pass "drive-automate: (i-moat5) os hooks de veto do MOAT e do merge seguem registrados no settings.json (prova do repo, não do script)"
+  else record_fail "drive-automate: (i-moat5)" "veto do MOAT ou do merge saiu do settings.json"; fi
+  rm -rf "${base}"
+  unset -f _da_new _da _da_pr _da_ok _da_case _da_ready
+}
+
 # RUNTIME DO PLUGIN — a bancada roda a cópia EMPACOTADA, num host que NÃO é o core.
 #
 # POR QUE EXISTE (medido 2026-09-06, achado de revisor adversarial). Toda família desta bancada
@@ -27475,6 +27967,7 @@ _family run_census_seal_selftests
 _family run_sdaal_workflows_selftests
 _family run_drive_selftests
 _family run_seal_exception_selftests
+_family run_drive_automate_selftests
 _family run_plugin_runtime_selftests
 _family run_kg_yaml_validity_selftests
 _family run_site_derivation_selftests
