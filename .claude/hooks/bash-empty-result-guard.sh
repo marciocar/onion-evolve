@@ -31,6 +31,9 @@ input=$(cat 2>/dev/null) || exit 0
 
 if command -v jq >/dev/null 2>&1; then
   cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null)
+  # o diretório em que o comando RODOU: o harness tira o `cd <dir> &&` que leva ao cwd da sessão, então
+  # um `gh pr create` de dentro de uma worktree chega aqui SEM `cd` (medido 2026-10-14, PRs #1110 e #1112)
+  hook_cwd=$(printf '%s' "$input" | jq -r '.cwd // empty' 2>/dev/null)
   out=$(printf '%s' "$input" | jq -r '(.tool_response.stdout // .tool_response.output // "")' 2>/dev/null)
 else
   # Sem jq a guarda se cala — declarar que NÃO SABE é o comportamento correto (certeza é campo, não tom).
@@ -440,8 +443,10 @@ _pr_dir() {
   local d
   d="$(printf '%s\n' "$cmd" | sed -n 's/.*\bcd[[:space:]]\{1,\}\([^;&|[:space:]]\{1,\}\).*/\1/p' | tail -1)"
   d="${d%\"}"; d="${d#\"}"; d="${d%\'}"; d="${d#\'}"
-  case "$d" in ''|*'$'*) d="${CLAUDE_PROJECT_DIR:-.}" ;; esac
-  [ -d "$d" ] || d="${CLAUDE_PROJECT_DIR:-.}"
+  # sem `cd` explícito, o cwd do payload (onde o comando rodou) vem antes do projeto: o checkout principal
+  # está na main e não tem o resíduo de branch nenhuma, e o aviso saía falso para todo PR de worktree.
+  case "$d" in ''|*'$'*) d="${hook_cwd:-${CLAUDE_PROJECT_DIR:-.}}" ;; esac
+  [ -d "$d" ] || d="${hook_cwd:-${CLAUDE_PROJECT_DIR:-.}}"
   printf '%s' "$d"; }
 _pr_branch() {  # $1=dir
   local b
