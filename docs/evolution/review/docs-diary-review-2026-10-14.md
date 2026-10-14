@@ -1,7 +1,8 @@
 ---
 branch: docs/diary-review-2026-10-14
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 15c751c313c5d9caafaa8b0321cc1d75e58a08322880ef29b9d8a44859553a4e
+reviewed_code_sha256: d38dde541e39171ea38f14adc8a695f8936bf45fa36da5bb26f827419e9d7542
 findings_total: 16
 findings_real: 16
 findings_fixed: 15
