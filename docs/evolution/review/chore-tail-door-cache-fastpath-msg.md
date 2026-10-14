@@ -2,7 +2,7 @@
 title: 'Resíduo — cache do pin das portas em 668cac66a12b e mensagem própria para head sem check-run no caminho rápido do merge'
 date: 2026-10-14
 branch: chore/tail-door-cache-fastpath-msg
-reviewed_diff_sha256: a3c514725c99eed7f3ff7b929d4577e3511d44cd338ead6d2ce480c136976c20
+reviewed_diff_sha256: 806604fa1bc286e2fe93fd266a255a4457ac4ca72b135c81e36fecde09a0d7da
 reviewed_code_sha256: 2e2de201d0dfa187aca5e0ff25f5845953d7fcfb8afd8e62bf06598297a343c9
 findings_total: 4
 findings_real: 2
