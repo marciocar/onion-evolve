@@ -615,7 +615,7 @@ onion-compliance	requires	template:compliance_pmbok_template.md
 onion-compliance	requires	template:compliance_soc2_template.md	
 onion-core	adopts	onion-evolve	
 onion-core	mode	greenfield	
-onion-core	pin	9b5c89318dfc	
+onion-core	pin	668cac66a12b	
 onion-core	specialization	deterministic-guards	
 onion-core	specialization	full-machinery	
 onion-core	specialization	hub-role	
@@ -696,7 +696,7 @@ onion-meta	requires	plugin:onion
 onion-meta	requires	skill:onion-patterns	
 onion-mini	adopts	onion-evolve	
 onion-mini	mode	distilled	
-onion-mini	pin	9b5c89318dfc	
+onion-mini	pin	668cac66a12b	
 onion-mini	specialization	distilled-methodology	
 onion-mini	specialization	entry-level	
 onion-mini	specialization	multi-platform	
@@ -714,7 +714,7 @@ onion-pedro	tier	standalone
 onion-pedro	trust-advises	onion-evolve	
 onion-plugins	adopts	onion-evolve	
 onion-plugins	mode	greenfield	
-onion-plugins	pin	9b5c89318dfc	
+onion-plugins	pin	668cac66a12b	
 onion-plugins	specialization	claude-code	
 onion-plugins	specialization	plugin-marketplace	
 onion-plugins	specialization	public-distribution	
@@ -753,7 +753,7 @@ onion-slm	tier	standalone
 onion-slm	trust-advises	onion-evolve	
 onion-standalone	adopts	onion-evolve	
 onion-standalone	mode	greenfield	
-onion-standalone	pin	9b5c89318dfc	
+onion-standalone	pin	668cac66a12b	
 onion-standalone	specialization	claude-code	
 onion-standalone	specialization	framework-door	
 onion-standalone	specialization	public-distribution	

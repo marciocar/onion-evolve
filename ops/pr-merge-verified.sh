@@ -357,6 +357,13 @@ for r in d.get("rules",[]):
   fi
   _runs="$(gh api "repos/${_slug}/commits/${_old}/check-runs?per_page=100" --jq "${_LATEST_PER_NAME_JQ}" 2>/dev/null)" \
     || { SKIP_DECISION="espera: não li os check-runs do head anterior ${_old:0:8}"; return 1; }
+  # ZERO check-runs (total_count: 0) não é "vermelho": é o PR que nasceu ou foi empurrado JÁ em conflito, e
+  # o GitHub não roda CI de pull_request em PR em conflito (medido no #1092, 2026-10-13). A decisão é a
+  # mesma (espera), mas a mensagem antiga dizia "não está verde" para os dois casos e mandava procurar
+  # um check vermelho que não existe. A mensagem diz "caso típico", não "a causa": zero check-runs é o
+  # SINAL, e outro motivo (workflow filtrado, CI ainda não criado) dá o mesmo zero.
+  grep -q . <<< "${_runs}" \
+    || { SKIP_DECISION="espera: o head anterior ${_old:0:8} não tem check-run nenhum — o caso típico é o PR aberto/empurrado já em conflito (o GitHub não roda CI de pull_request em PR em conflito), então nunca houve verde para ler; espera o CI do head novo"; return 1; }
   for _r in ${_req}; do
     awk -F'\t' -v n="${_r}" '$1==n && $2=="completed" && $3=="success"{f=1} END{exit !f}' <<< "${_runs}" \
       || { SKIP_DECISION="espera: o check exigido '${_r}' não está verde no head anterior ${_old:0:8}"; return 1; }
