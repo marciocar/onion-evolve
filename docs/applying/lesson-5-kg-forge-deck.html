@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aula 5 — KG e Forja</title>
+<!-- Slides da aula 5 para os alunos. Derivado de lesson-5-kg-forge.md (a substância vive lá).
+     Autocontido: sem rede, sem fonte externa. Teclas: ← → espaço PageUp/PageDown Home End · T tema · F tela cheia · O visão geral. -->
+<style>
+:root{
+  --bg:#0d1014; --surface:#151a21; --surface-2:#1c222b; --code-bg:#0a0c10;
+  --text:#e9ebee; --muted:#98a2b0; --line:#2a313b;
+  --accent:#f0a83a; --accent-soft:rgba(240,168,58,.14); --accent-ink:#1b1204;
+  --sans:"Inter","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;
+  --fs:clamp(14px, min(1.12vw, 2vh), 30px);
+  color-scheme:dark;
+}
+[data-theme="light"]{
+  --bg:#f8f7f3; --surface:#ffffff; --surface-2:#efede6; --code-bg:#f3f1ea;
+  --text:#15171c; --muted:#5a6170; --line:#dcd9cf;
+  --accent:#a85f00; --accent-soft:rgba(168,95,0,.10); --accent-ink:#ffffff;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:hidden}
+body{font-family:var(--sans);font-size:var(--fs);line-height:1.45;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.deck{position:fixed;inset:0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;
+  padding:3.6em 5.5em 3.4em;overflow-y:auto;overflow-x:hidden;font-size:1em}
+.slide.active{display:flex;animation:in .32s ease both}
+.slide>*{max-width:76em;width:100%;margin-left:auto;margin-right:auto}
+.slide.dense-slide{font-size:.9em}
+@keyframes in{from{opacity:0;transform:translateY(.6em)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.active{animation:none}}
+h1{font-size:3.6em;line-height:1.05;letter-spacing:-.025em;margin:.15em 0 .25em;font-weight:750}
+h2{font-size:2.05em;line-height:1.15;letter-spacing:-.018em;margin:.1em 0 .7em;font-weight:700}
+h3{font-size:1.05em;margin:0 0 .35em;font-weight:650}
+h2 em,h1 em,blockquote em{font-style:normal;color:var(--accent)}
+p{margin:.35em 0 .7em}
+strong{font-weight:650}
+.kicker{font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:650;margin-bottom:.9em}
+.sub{font-size:1.45em;color:var(--muted);margin:0 0 1.6em;max-width:32em}
+.note{color:var(--muted);font-size:.9em}
+.lbl{font-size:.82em;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:1em 0 .3em}
+.mono{font-family:var(--mono);font-size:.88em}
+code{font-family:var(--mono);font-size:.86em;background:var(--surface-2);padding:.08em .32em;border-radius:.3em;white-space:nowrap}
+h2 code{font-size:.85em}
+kbd{font-family:var(--mono);font-size:.8em;border:1px solid var(--line);border-bottom-width:2px;border-radius:.3em;padding:.05em .4em;margin:0 .1em;color:var(--text)}
+blockquote.big{font-size:2.3em;line-height:1.2;letter-spacing:-.018em;font-weight:650;margin:.2em 0 1em;padding-left:.8em;border-left:.12em solid var(--accent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:.8em;padding:1em 1.2em}
+.card p{margin:.2em 0}
+.card.muted{opacity:.78}
+.card.accent{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent-soft)}
+.two,.three,.four{display:grid;gap:1em;margin:.8em auto}
+.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}.four{grid-template-columns:repeat(4,1fr)}
+.two.top{align-items:start}
+.callout{border-left:.22em solid var(--accent);background:var(--accent-soft);padding:.8em 1.1em;border-radius:0 .6em .6em 0;margin:1em auto 0}
+.callout.small{font-size:.85em}
+/* código */
+.code{position:relative;background:var(--code-bg);border:1px solid var(--line);border-radius:.7em;margin:.6em auto .9em;overflow:hidden}
+.code-bar{display:flex;justify-content:space-between;align-items:center;padding:.35em .9em;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.62em;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.code pre{margin:0;padding:.8em 1em;overflow-x:auto;font-family:var(--mono);font-size:.8em;line-height:1.55}
+.code pre code{background:none;padding:0;font-size:1em;white-space:pre}
+.code.dense pre{font-size:.7em}
+.code.hero pre{font-size:1.5em;padding:.6em 1em}
+.copy{font:inherit;font-family:var(--mono);font-size:.95em;text-transform:lowercase;letter-spacing:.04em;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:.4em;padding:.15em .6em;cursor:pointer}
+.copy:hover,.copy:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+.copy.ok{color:var(--accent-ink);background:var(--accent);border-color:var(--accent)}
+.code.mini{margin:.3em 0 0;border-radius:.5em;display:flex;align-items:stretch}
+.code.mini pre{flex:1;padding:.45em .7em;font-size:.72em}
+.code.mini .copy{order:2;border:0;border-left:1px solid var(--line);border-radius:0;font-size:.6em;padding:0 .8em}
+/* capa */
+.cover-slide .cover>*{max-width:none}
+.series{list-style:none;padding:0;margin:0 0 1.8em;display:grid;grid-template-columns:repeat(6,1fr);gap:.6em}
+.series li{border:1px solid var(--line);border-radius:.6em;padding:.7em .8em;font-size:.72em;color:var(--muted);display:flex;flex-direction:column;gap:.35em;min-height:6.5em}
+.series li b{font-size:1.9em;line-height:1;color:var(--text);font-weight:700}
+.series li.on{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+.series li.on b{color:var(--accent)}
+.meta-line{font-size:1em;color:var(--text)}
+.keys-hint{color:var(--muted);font-size:.8em;margin-top:1.4em}
+/* objetivos */
+.goals{display:grid;grid-template-columns:repeat(5,1fr);gap:.9em}
+.goal{background:var(--surface);border:1px solid var(--line);border-radius:.8em;padding:1em;font-size:.9em}
+.goal b{display:block;font-size:2em;color:var(--accent);line-height:1;margin-bottom:.4em}
+.goal p{color:var(--muted);margin:0}
+/* passos */
+.steps{display:flex;flex-direction:column;gap:.7em;margin:.4em auto}
+.step{display:flex;gap:1em;align-items:flex-start}
+.step>b{flex:none;width:1.9em;height:1.9em;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:.9em}
+.step p{margin:.2em 0}
+ol.num{padding-left:1.4em;margin:.4em 0}
+ol.num>li{margin:.35em 0;padding-left:.3em}
+ol.num>li::marker{color:var(--accent);font-weight:700}
+ol.num.tight>li{margin:.2em 0}
+ol.num ul{margin:.25em 0;padding-left:1.1em}
+ul.bul{padding-left:1.1em;margin:.3em 0}
+ul.bul li{margin:.3em 0}
+ul.bul li::marker{color:var(--accent)}
+/* mapa */
+.timebar{display:flex;height:2.4em;border-radius:.6em;overflow:hidden;gap:2px;margin:0 auto 1.2em}
+.seg{background:var(--accent-soft);display:grid;place-items:center;color:var(--accent);font-weight:700;font-size:.85em;min-width:1.6em}
+.seg.pause{background:var(--surface-2);color:var(--muted)}
+.agenda{list-style:none;padding:0;margin:0}
+.agenda li{display:grid;grid-template-columns:2.2em 1fr 5em;gap:.8em;padding:.42em 0;border-bottom:1px solid var(--line);align-items:baseline}
+.agenda li b{color:var(--accent);font-weight:700}
+.agenda li i{font-style:normal;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.agenda li.pause span{color:var(--muted)}
+.agenda li.total{border-bottom:0;font-weight:650}.agenda li.total i{color:var(--text)}
+/* tabelas */
+.tw{overflow-x:auto;margin:.4em auto;border:1px solid var(--line);border-radius:.7em}
+table{border-collapse:collapse;width:100%;font-size:.88em}
+th,td{text-align:left;padding:.6em .9em;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.78em;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;background:var(--surface)}
+tr:last-child td{border-bottom:0}
+td code{white-space:normal;word-break:break-word}
+.pieces-t td:first-child{color:var(--accent);font-weight:700}
+/* exercício */
+.ex{display:grid;grid-template-columns:1.15fr 1fr;gap:2em;align-items:start}
+.ex.wide-left{grid-template-columns:1.6fr 1fr}
+.ex .card{margin-bottom:.8em}
+.side{display:flex;flex-direction:column;gap:.7em;padding-top:3.2em}
+.side .card{margin:0}
+.done{background:var(--surface);border:1px solid var(--accent);border-radius:.8em;padding:1em 1.1em}
+.done-h{font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.6em}
+.checks{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.85em}
+.checks label{display:flex;gap:.6em;align-items:flex-start;cursor:pointer}
+.checks input{position:absolute;opacity:0;pointer-events:none}
+.checks .box{flex:none;width:1.1em;height:1.1em;margin-top:.15em;border:2px solid var(--accent);border-radius:.25em;display:grid;place-items:center}
+.checks input:checked+.box{background:var(--accent)}
+.checks input:checked+.box::after{content:"";width:.32em;height:.6em;border:solid var(--accent-ink);border-width:0 .14em .14em 0;transform:rotate(45deg) translate(-.04em,-.06em)}
+.checks input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
+.checks input:checked~.crit{color:var(--muted);text-decoration:line-through}
+.crit{font-weight:600;font-size:.92em}
+/* erros */
+.errs{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.75em}
+.errs li{display:grid;grid-template-columns:minmax(12em,.9fr) 2fr;gap:1.4em;padding:.8em 1em;border:1px solid var(--line);border-radius:.7em;background:var(--surface)}
+.err-k{font-weight:650}
+.err-k::before{content:"✗";color:var(--accent);margin-right:.5em;font-weight:800}
+.err-v{color:var(--muted)}
+/* âncora */
+.anchor{display:grid;grid-template-columns:1fr auto 1fr;gap:1em;align-items:center;margin:.2em auto .8em}
+.anchor .arrow{font-size:2em;color:var(--accent)}
+/* confiança */
+.conf{display:flex;flex-direction:column;gap:.5em;margin-top:.6em}
+.cf{display:grid;grid-template-columns:1fr auto;gap:1em;align-items:center;padding:.75em 1.1em;border-radius:.6em;border:1px solid var(--line);background:var(--surface);position:relative;overflow:hidden}
+.cf::before{content:"";position:absolute;left:0;top:0;bottom:0;background:var(--accent);opacity:.9;width:.3em}
+.cf.c4::after,.cf.c3::after,.cf.c2::after{content:"";position:absolute;left:0;top:0;bottom:0;background:var(--accent-soft);z-index:0}
+.cf.c4::after{width:100%}.cf.c3::after{width:66%}.cf.c2::after{width:38%}
+.cf>*{position:relative;z-index:1}
+.cf b{font-weight:600;text-align:right}
+/* decide */
+.moves{list-style:none;padding:0;margin:0 auto 1.1em;display:grid;grid-template-columns:repeat(4,1fr);gap:.5em}
+.moves.five{grid-template-columns:repeat(5,1fr)}
+.moves li{border:1px solid var(--line);border-radius:.6em;padding:.55em .8em;color:var(--muted);font-weight:600;font-size:.88em;display:flex;gap:.6em;align-items:center}
+.moves li b{color:inherit;opacity:.7}
+.moves li.on{border-color:var(--accent);color:var(--text);background:var(--accent-soft)}
+.moves li.on b{color:var(--accent);opacity:1}
+.rc{display:flex;flex-direction:column;gap:.35em;font-size:.86em}
+.rc span{display:flex;gap:.6em;align-items:baseline}
+.rc b{flex:none;font-family:var(--mono);color:var(--accent-ink);background:var(--accent);border-radius:.3em;padding:0 .45em}
+/* escada */
+.ladder{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.45em}
+.ladder li{display:grid;grid-template-columns:3.2em 1fr;gap:.9em;align-items:center;margin-left:calc(var(--i) * 2.2em);padding:.5em .9em;border:1px solid var(--line);border-radius:.6em;background:var(--surface)}
+.ladder li>b{font-family:var(--mono);color:var(--accent);font-size:1.15em}
+.ladder h3{display:inline;margin-right:.5em}
+.ladder p{display:inline;margin:0;color:var(--muted)}
+/* cartão */
+.cardx{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:.8em;overflow:hidden}
+.cx-row{display:grid;grid-template-columns:14em 1fr;gap:1em;padding:.45em 1em;border-bottom:1px solid var(--line);align-items:center}
+.cx-row:last-child{border-bottom:0}
+.cx-row:nth-child(odd){background:var(--surface)}
+.cx-k{font-weight:600;font-size:.9em}
+.cx-v{display:flex;flex-wrap:wrap;gap:.4em}
+.cx-v .code.mini{margin:0;flex:1 1 auto;max-width:100%}
+/* intervalo */
+.center{align-items:center;text-align:center}
+.pause-slide h1{font-size:6em;color:var(--accent)}
+.pause-slide .sub{margin:0 auto}
+/* svg */
+svg.dia{display:block;width:100%;max-height:15em;margin:.4em auto 1em}
+svg.pieces{max-height:16em}
+.sv-box{fill:var(--surface-2);stroke:var(--line);stroke-width:2}
+.sv-acc{stroke:var(--accent);stroke-width:2.5}
+.sv-acc-fill{fill:var(--accent)}
+.sv-edge{stroke:var(--accent);stroke-width:3}
+.sv-dash{stroke-dasharray:8 7;stroke:var(--muted)}
+.sv-spoke{stroke:var(--line);stroke-width:2}
+.sv-k{fill:var(--accent);font:700 17px var(--sans);letter-spacing:.14em}
+.sv-t{fill:var(--text);font:600 21px var(--mono)}
+.sv-m{fill:var(--muted);font:500 19px var(--sans)}
+.sv-s{fill:var(--text);font:600 18px var(--sans)}
+.sv-n{fill:var(--text);font:700 22px var(--mono)}
+.sv-p-emit{fill:var(--accent);stroke:var(--accent);stroke-width:2}
+.sv-p-emit+.sv-n{fill:var(--accent-ink)}
+.sv-p-spec{fill:var(--surface);stroke:var(--accent);stroke-width:3}
+.sv-p-mold{fill:var(--surface);stroke:var(--muted);stroke-width:2;stroke-dasharray:5 5}
+/* cromo */
+.chrome-top{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:1.1em 1.6em;font-size:.68em;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);pointer-events:none;z-index:5}
+.chrome-top .t{color:var(--accent);font-variant-numeric:tabular-nums}
+.chrome-bot{position:fixed;left:0;right:0;bottom:0;z-index:5;pointer-events:none}
+.progress{height:3px;background:var(--line)}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease}
+.num-ind{position:absolute;right:1.6em;bottom:.9em;font-size:.68em;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.navbtns{position:fixed;right:1.2em;bottom:2.2em;display:none;gap:.4em;z-index:6}
+.navbtns button{font:inherit;font-size:.9em;width:2.4em;height:2.4em;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--text)}
+/* visão geral */
+body.overview{overflow:auto}
+body.overview .deck{position:static;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;padding:64px 24px 40px}
+body.overview .slide{position:relative;display:flex;inset:auto;aspect-ratio:16/9;font-size:4.1px;padding:3.6em 5.5em 3.4em;overflow:hidden;border:1px solid var(--line);border-radius:10px;cursor:pointer;animation:none;background:var(--bg)}
+body.overview .slide.dense-slide{font-size:3.7px}
+body.overview .slide.cur{outline:3px solid var(--accent);outline-offset:2px}
+body.overview .slide::after{content:attr(data-n);position:absolute;top:6px;left:8px;font:600 12px var(--sans);color:var(--muted)}
+body.overview .slide *{pointer-events:none}
+body.overview .chrome-top,body.overview .chrome-bot,body.overview .navbtns{display:none}
+.ov-title{display:none}
+body.overview .ov-title{display:block;position:fixed;top:0;left:0;right:0;padding:18px 24px;background:var(--bg);z-index:4;font-size:14px;color:var(--muted);border-bottom:1px solid var(--line)}
+/* celular e telas estreitas */
+@media (max-width:820px),(max-aspect-ratio:1/1){
+  :root{--fs:15.5px}
+  .slide{justify-content:flex-start;padding:3.4em 1.15em 4.6em}
+  .slide.dense-slide{font-size:.95em}
+  h1{font-size:2.5em}h2{font-size:1.5em}blockquote.big{font-size:1.5em}
+  .two,.three,.four,.goals,.ex,.ex.wide-left,.anchor{grid-template-columns:1fr}
+  .anchor .arrow{transform:rotate(90deg);justify-self:center}
+  .series{grid-template-columns:repeat(2,1fr)}
+  .side{padding-top:0}
+  .errs li{grid-template-columns:1fr;gap:.3em}
+  .moves,.moves.five{grid-template-columns:1fr 1fr}
+  .cx-row{grid-template-columns:1fr;gap:.3em}
+  .ladder li{margin-left:calc(var(--i) * .5em)}
+  .code pre{font-size:.78em}.code.dense pre{font-size:.72em}.code.hero pre{font-size:1.15em}
+  .code pre code{white-space:pre-wrap;word-break:break-word}
+  .chrome-top{font-size:.62em;padding:.9em 1em;background:var(--bg)}
+  .chrome-top .b{max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .navbtns{display:flex}
+  .agenda li{grid-template-columns:1.6em 1fr 4em}
+  body.overview .deck{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:56px 10px 30px}
+  body.overview .slide{font-size:2px}body.overview .slide.dense-slide{font-size:1.85px}
+}
+@media print{.chrome-top,.chrome-bot,.navbtns{display:none}}
+
+svg.dia.tall{max-height:19em}
+.moves.six{grid-template-columns:repeat(6,1fr)}
+.tw.compact table{font-size:.8em}.tw.compact td,.tw.compact th{padding:.35em .8em}
+.agenda.hands li{grid-template-columns:2.2em 1fr 4.5em;padding:.75em 0;font-size:1.1em}
+@media (max-width:820px),(max-aspect-ratio:1/1){.moves.six{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="ov-title">Visão geral · clique num slide ou use as setas e Enter · <kbd>O</kbd> ou <kbd>Esc</kbd> fecha</div>
+<header class="chrome-top"><span class="b"></span><span class="t"></span></header>
+<main class="deck">
+<section class="slide cover-slide" data-block="" data-time="" aria-label="Slide 1">
+<div class="cover">
+  <div class="kicker">Formação de equipe de um hub adotante · série de 6 aulas</div>
+  <h1>Aula 5 — KG e Forja</h1>
+  <p class="sub">mapear projetos e documentos em grafo e forjar componentes do time</p>
+  <ol class="series">
+    <li><b>1</b><span>"Há vagas": o perfil dos agentes que vocês querem</span></li>
+    <li><b>2</b><span>Os documentos de negócio</span></li>
+    <li><b>3</b><span>A adoção dos projetos e a maquinaria</span></li>
+    <li><b>4</b><span>Um projeto real com task manager</span></li>
+    <li class="on"><b>5</b><span>KG e Forja</span></li>
+    <li><b>6</b><span>Comunicação e federação, o Company Brain</span></li>
+  </ol>
+  <p class="keys-hint"><kbd>←</kbd><kbd>→</kbd> navegar · <kbd>T</kbd> tema · <kbd>F</kbd> tela cheia · <kbd>O</kbd> visão geral</p>
+</div></section>
+<section class="slide " data-block="Por que esta aula" data-time="" aria-label="Slide 2">
+<div class="kicker">Por que esta aula</div>
+<blockquote class="big">O grafo é o <em>estado</em> do trabalho, não um desenho dele.</blockquote>
+<div class="two">
+  <div class="card accent"><h3>O grafo como fonte única e runtime</h3><p>A sessão lê o grafo antes de ler a prosa, o backlog é projeção do grafo, e uma decisão só existe quando está selada nele.</p></div>
+  <div class="card accent"><h3>A forja: o time constrói as próprias peças</h3><p>Uma dor medida vira um componente do time, com doutrina, medidor e bancada, que o censo da forja enxerga.</p></div>
+</div>
+<p class="note">A pergunta da aula: quando uma sessão nova abre o repositório, <strong>o que ela sabe antes de vocês digitarem?</strong></p></section>
+<section class="slide dense-slide" data-block="O grafo" data-time="" aria-label="Slide 3">
+<div class="kicker">O grafo · nó e aresta</div>
+<h2>Um <code>.kg.yaml</code> é um grafo tipado</h2>
+
+<svg class="dia" viewBox="0 0 900 250" role="img" aria-label="nó, aresta, nó">
+  <defs><marker id="arN" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sv-acc-fill"/></marker></defs>
+  <rect x="10" y="20" width="290" height="190" rx="16" class="sv-box"/>
+  <text x="155" y="56" class="sv-k" text-anchor="middle">NÓ</text>
+  <text x="155" y="96" class="sv-t" text-anchor="middle">id: D_LOGIN_OIDC_ANY_IDP</text>
+  <text x="155" y="132" class="sv-m" text-anchor="middle">node_type: decision</text>
+  <text x="155" y="162" class="sv-m" text-anchor="middle">status: open</text>
+  <text x="155" y="192" class="sv-m" text-anchor="middle">confidence: 0.6</text>
+  <line x1="305" y1="115" x2="588" y2="115" class="sv-edge" marker-end="url(#arN)"/>
+  <text x="447" y="90" class="sv-k" text-anchor="middle">ARESTA</text>
+  <text x="447" y="148" class="sv-m" text-anchor="middle">edge_type: CONSTRAINS</text>
+  <text x="447" y="178" class="sv-s" text-anchor="middle">from: → to:</text>
+  <rect x="600" y="20" width="290" height="190" rx="16" class="sv-box"/>
+  <text x="745" y="56" class="sv-k" text-anchor="middle">NÓ</text>
+  <text x="745" y="96" class="sv-t" text-anchor="middle">id: PO_ACCESS_BY_PROFILE</text>
+  <text x="745" y="132" class="sv-m" text-anchor="middle">node_type: policy</text>
+  <text x="745" y="162" class="sv-m" text-anchor="middle">a decisão limita a política</text>
+</svg>
+<div class="three">
+  <div class="card"><h3><code>node_type:</code></h3><p>o que a coisa é</p></div>
+  <div class="card"><h3><code>edge_type:</code></h3><p>como as coisas se relacionam: <code>SUPPORTS</code> <code>REFUTES</code> <code>CONSTRAINS</code> <code>DEPENDS_ON</code></p></div>
+  <div class="card"><h3><code>status</code></h3><p><code>open</code> · <code>confirmed</code> · <code>drifted</code> · <code>refuted</code>/<code>superseded</code> · <code>done</code></p></div>
+</div>
+<div class="two">
+  <div class="card"><h3>Camada <code>audit</code> · conhecimento</h3><p><code>claim</code> <code>evidence</code> <code>decision</code> <code>question</code></p></div>
+  <div class="card"><h3>Camada <code>domain</code> · o negócio</h3><p><code>entity</code> <code>state</code> <code>event</code> <code>rule</code> <code>invariant</code> <code>policy</code></p></div>
+</div></section>
+<section class="slide " data-block="O grafo" data-time="" aria-label="Slide 4">
+<div class="kicker">O grafo como fonte única de estado</div>
+<h2>O radar lê <em>antes</em> de você pensar</h2>
+<div class="two top">
+  <div>
+    <div class="steps">
+      <div class="step"><b>1</b><p>O passo 0 do <code>/warm-up</code>: se existe <code>.kg.yaml</code>, ele é lido <strong>primeiro</strong>, antes da prosa, e o radar roda.</p></div>
+      <div class="step"><b>2</b><p>O radar (<code>kg-radar.sh</code>) é <code>awk</code>, não um parser de YAML: exige uma chave por linha e <strong>reprova contradição estrutural</strong>.</p></div>
+      <div class="step"><b>3</b><p>A gramática inteira, curta, está em <code>.claude/rules/kg-grammar.md</code> e carrega sozinha quando a sessão toca um <code>.kg.yaml</code>.</p></div>
+    </div>
+  </div>
+  <div>
+    <div class="card muted"><h3>Repositório sem grafo</h3><p>A sessão adivinha a partir de texto solto.</p></div>
+    <div class="card accent" style="margin-top:1em"><h3>Acima do git</h3><p>O git guarda os arquivos; o grafo diz em que estado o trabalho está: o que está aberto, o que foi decidido, com que confiança.</p></div>
+  </div>
+</div>
+<p class="note">Exemplo do dia da adoção: o grafo de adoção do hub guarda uma pergunta aberta, <strong>qual é o domínio deste repositório?</strong>, esperando resposta.</p></section>
+<section class="slide " data-block="Ciclo de vida do conhecimento" data-time="" aria-label="Slide 5">
+<div class="kicker">O ciclo de vida do conhecimento</div>
+<h2>Da prosa ao trabalho dirigido</h2>
+
+<svg class="dia tall" viewBox="0 0 900 340" role="img" aria-label="ciclo de vida do conhecimento">
+  <defs><marker id="arL" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sv-acc-fill"/></marker></defs>
+  <rect x="10" y="40" width="170" height="160" rx="14" class="sv-box"/>
+  <text x="95" y="76" class="sv-k" text-anchor="middle">FONTE</text>
+  <text x="95" y="118" class="sv-t" text-anchor="middle">documento</text>
+  <text x="95" y="146" class="sv-m" text-anchor="middle">ou</text>
+  <text x="95" y="176" class="sv-t" text-anchor="middle">código</text>
+  <line x1="185" y1="120" x2="225" y2="120" class="sv-edge" marker-end="url(#arL)"/>
+  <rect x="235" y="40" width="210" height="160" rx="14" class="sv-box sv-acc"/>
+  <text x="340" y="76" class="sv-k" text-anchor="middle">NÓ</text>
+  <text x="340" y="104" class="sv-m" text-anchor="middle">com proveniência</text>
+  <text x="340" y="134" class="sv-t" text-anchor="middle">trace:</text>
+  <text x="340" y="160" class="sv-t" text-anchor="middle">verified_at:</text>
+  <text x="340" y="186" class="sv-t" text-anchor="middle">confidence:</text>
+  <line x1="450" y1="120" x2="490" y2="120" class="sv-edge" marker-end="url(#arL)"/>
+  <rect x="500" y="40" width="170" height="160" rx="14" class="sv-box"/>
+  <text x="585" y="76" class="sv-k" text-anchor="middle">RADAR</text>
+  <text x="585" y="112" class="sv-m" text-anchor="middle">--integrity</text>
+  <text x="585" y="138" class="sv-m" text-anchor="middle">--schema</text>
+  <text x="585" y="164" class="sv-m" text-anchor="middle">--domain</text>
+  <text x="585" y="190" class="sv-m" text-anchor="middle">--freshness</text>
+  <line x1="675" y1="90" x2="715" y2="58" class="sv-edge" marker-end="url(#arL)"/>
+  <line x1="675" y1="120" x2="715" y2="120" class="sv-edge" marker-end="url(#arL)"/>
+  <line x1="675" y1="150" x2="715" y2="182" class="sv-edge" marker-end="url(#arL)"/>
+  <rect x="725" y="30" width="165" height="56" rx="12" class="sv-box"/>
+  <text x="807" y="56" class="sv-t" text-anchor="middle">backlog</text>
+  <text x="807" y="77" class="sv-m" text-anchor="middle">a fila</text>
+  <rect x="725" y="94" width="165" height="56" rx="12" class="sv-box"/>
+  <text x="807" y="120" class="sv-t" text-anchor="middle">realign</text>
+  <text x="807" y="141" class="sv-m" text-anchor="middle">plano alinhado?</text>
+  <rect x="725" y="158" width="165" height="56" rx="12" class="sv-box"/>
+  <text x="807" y="184" class="sv-t" text-anchor="middle">drive</text>
+  <text x="807" y="205" class="sv-m" text-anchor="middle">conduz nó a nó</text>
+  <path d="M585,205 L585,290 L340,290 L340,205" class="sv-edge sv-dash" fill="none" marker-end="url(#arL)"/>
+  <text x="462" y="276" class="sv-s" text-anchor="middle">/meta:kg-freshness</text>
+  <text x="462" y="318" class="sv-m" text-anchor="middle">re-verifica contra o vivo e propõe; quem sela é a pessoa</text>
+</svg>
+<p class="note">O <code>/meta:backlog</code> projeta os nós <code>open</code> numa fila única, ordenada por atenção (impacto × incerteza × status); o <code>/meta:realign</code> confere em três camadas (passado, presente, futuro); o <code>/meta:drive</code> conduz o plano a partir da fila pronta. <strong>Feche o nó e o item some sozinho.</strong></p></section>
+<section class="slide " data-block="O grafo como runtime" data-time="" aria-label="Slide 6">
+<div class="kicker">O grafo como runtime</div>
+<h2>Um grafo que só se lê na hora de escrever é documentação. Aqui ele <em>dirige</em>.</h2>
+
+<svg class="dia" viewBox="0 0 900 300" role="img" aria-label="o grafo no centro do runtime">
+  <defs><marker id="arD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sv-acc-fill"/></marker></defs>
+  <rect x="345" y="110" width="210" height="80" rx="40" class="sv-box sv-acc"/>
+  <text x="450" y="146" class="sv-t" text-anchor="middle">.kg.yaml</text>
+  <text x="450" y="172" class="sv-m" text-anchor="middle">o estado do trabalho</text>
+  <g>
+    <rect x="20" y="20" width="230" height="70" rx="12" class="sv-box"/>
+    <text x="135" y="50" class="sv-t" text-anchor="middle">/warm-up · /catch-up</text>
+    <text x="135" y="74" class="sv-m" text-anchor="middle">abrem a sessão</text>
+    <rect x="20" y="210" width="230" height="70" rx="12" class="sv-box"/>
+    <text x="135" y="240" class="sv-t" text-anchor="middle">/meta:backlog</text>
+    <text x="135" y="264" class="sv-m" text-anchor="middle">fila dos nós open</text>
+    <rect x="650" y="20" width="230" height="70" rx="12" class="sv-box"/>
+    <text x="765" y="50" class="sv-t" text-anchor="middle">/meta:realign</text>
+    <text x="765" y="74" class="sv-m" text-anchor="middle">plano alinhado ao vivo?</text>
+    <rect x="650" y="210" width="230" height="70" rx="12" class="sv-box"/>
+    <text x="765" y="240" class="sv-t" text-anchor="middle">/meta:drive</text>
+    <text x="765" y="264" class="sv-m" text-anchor="middle">conduz nó a nó</text>
+    <rect x="335" y="230" width="230" height="60" rx="12" class="sv-box sv-acc"/>
+    <text x="450" y="258" class="sv-t" text-anchor="middle">/meta:decide</text>
+    <text x="450" y="280" class="sv-m" text-anchor="middle">sela a decisão no nó</text>
+  </g>
+  <line x1="250" y1="65" x2="345" y2="128" class="sv-edge" marker-end="url(#arD)"/>
+  <line x1="250" y1="235" x2="345" y2="172" class="sv-edge" marker-start="url(#arD)"/>
+  <line x1="650" y1="65" x2="555" y2="128" class="sv-edge" marker-end="url(#arD)"/>
+  <line x1="650" y1="235" x2="555" y2="172" class="sv-edge" marker-end="url(#arD)"/>
+  <line x1="450" y1="230" x2="450" y2="192" class="sv-edge" marker-end="url(#arD)"/>
+</svg>
+<p class="note">O <code>/warm-up</code> e o <code>/catch-up</code> o leem para abrir a sessão. A decisão também mora no grafo, e quem a fecha é o <code>/meta:decide</code>. <strong>Ninguém edita o selo à mão.</strong></p></section>
+<section class="slide " data-block="Documento no grafo" data-time="" aria-label="Slide 7">
+<div class="kicker">Documento de negócio no grafo</div>
+<h2>Prosa não tem confiança, não tem dono e não avisa quando caduca</h2>
+<p>Levar os documentos das aulas 2 a 4 ao grafo dá a cada afirmação <strong>um tipo, uma confiança e uma ligação</strong> com o que ela afeta.</p>
+<div class="conf">
+  <div class="cf c4"><span>o que o cliente confirmou</span><b><code>confirmed</code></b></div>
+  <div class="cf c3"><span>decisão de trabalho da equipe ("inferimos isto")</span><b><code>decision</code> <code>open</code>, <code>confidence</code> menor</b></div>
+  <div class="cf c2"><span>palpite</span><b>ainda menor</b></div>
+  <div class="cf c1"><span>o que depende de informação que só o cliente tem</span><b><code>question</code></b></div>
+</div>
+<p class="note">Se tudo for <code>confirmed</code>, a fila mente: o backlog existe para mostrar o que espera confirmação.</p></section>
+<section class="slide dense-slide" data-block="Mapear um projeto" data-time="" aria-label="Slide 8">
+<div class="kicker">Mapear um projeto contra o código</div>
+<h2>Documento diz o que alguém <em>escreveu</em>. Código diz o que o sistema <em>faz</em>.</h2>
+
+<svg class="dia tall" viewBox="0 0 900 330" role="img" aria-label="regra ancorada no documento e no código">
+  <defs><marker id="arM" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sv-acc-fill"/></marker></defs>
+  <text x="220" y="26" class="sv-k" text-anchor="middle">ANTES</text>
+  <text x="680" y="26" class="sv-k" text-anchor="middle">DEPOIS</text>
+  <rect x="20" y="44" width="400" height="110" rx="14" class="sv-box"/>
+  <text x="40" y="80" class="sv-t">node_type: rule</text>
+  <text x="40" y="112" class="sv-t">trace: docs/business-context/f.md:3</text>
+  <text x="40" y="140" class="sv-m">confidence abaixo de 1</text>
+  <line x1="220" y1="158" x2="220" y2="204" class="sv-edge sv-dash" marker-end="url(#arM)"/>
+  <rect x="80" y="210" width="280" height="80" rx="14" class="sv-box"/>
+  <text x="220" y="244" class="sv-t" text-anchor="middle">documento</text>
+  <text x="220" y="272" class="sv-m" text-anchor="middle">o que alguém escreveu: promessa</text>
+  <line x1="430" y1="100" x2="468" y2="100" class="sv-edge" marker-end="url(#arM)"/>
+  <text x="449" y="84" class="sv-s" text-anchor="middle">grep -n</text>
+  <rect x="480" y="44" width="400" height="110" rx="14" class="sv-box sv-acc"/>
+  <text x="500" y="80" class="sv-t">node_type: rule</text>
+  <text x="500" y="112" class="sv-t">trace: apps/api/src/x.ts:10</text>
+  <text x="500" y="140" class="sv-m">verified_at · verified_against</text>
+  <line x1="680" y1="158" x2="680" y2="204" class="sv-edge" marker-end="url(#arM)"/>
+  <rect x="540" y="210" width="280" height="80" rx="14" class="sv-box sv-acc"/>
+  <text x="680" y="244" class="sv-t" text-anchor="middle">código</text>
+  <text x="680" y="272" class="sv-m" text-anchor="middle">o que o sistema faz: fato</text>
+</svg>
+<div class="three">
+  <div class="card"><h3>A linha sai do <code>grep -n</code></h3><p>Nunca de contar na tela.</p></div>
+  <div class="card"><h3>Não bate com o rótulo?</h3><p><code>status</code> vira <code>drifted</code>, com o porquê.</p></div>
+  <div class="card"><h3>Não achou o código?</h3><p>É resultado: vira <code>question</code>, não âncora inventada.</p></div>
+</div></section>
+<section class="slide dense-slide" data-block="Decidir com o grafo" data-time="" aria-label="Slide 9">
+<div class="kicker">Decidir com o grafo · o /meta:decide</div>
+<h2>Só sobra para perguntar o que é de quem decide</h2>
+
+<svg class="dia tall" viewBox="0 0 900 300" role="img" aria-label="fluxo do /meta:decide">
+  <defs><marker id="arC" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sv-acc-fill"/></marker></defs>
+  <rect x="10" y="40" width="195" height="150" rx="14" class="sv-box"/>
+  <text x="107" y="76" class="sv-k" text-anchor="middle">1 MEDIR</text>
+  <text x="107" y="110" class="sv-m" text-anchor="middle">censo do que</text>
+  <text x="107" y="134" class="sv-m" text-anchor="middle">está em voo</text>
+  <text x="107" y="166" class="sv-s" text-anchor="middle">decide-census.sh</text>
+  <line x1="208" y1="115" x2="232" y2="115" class="sv-edge" marker-end="url(#arC)"/>
+  <rect x="240" y="40" width="195" height="150" rx="14" class="sv-box"/>
+  <text x="337" y="76" class="sv-k" text-anchor="middle">2 FILTRAR</text>
+  <text x="337" y="110" class="sv-m" text-anchor="middle">medível → mede</text>
+  <text x="337" y="134" class="sv-m" text-anchor="middle">selado → aplica</text>
+  <text x="337" y="158" class="sv-m" text-anchor="middle">outro dono → encaminha</text>
+  <line x1="438" y1="115" x2="462" y2="115" class="sv-edge" marker-end="url(#arC)"/>
+  <rect x="470" y="40" width="195" height="150" rx="14" class="sv-box"/>
+  <text x="567" y="76" class="sv-k" text-anchor="middle">3 PERGUNTAR</text>
+  <text x="567" y="110" class="sv-m" text-anchor="middle">até 4 perguntas</text>
+  <text x="567" y="134" class="sv-m" text-anchor="middle">2 a 4 opções cada</text>
+  <text x="567" y="158" class="sv-m" text-anchor="middle">a recomendada primeiro</text>
+  <line x1="668" y1="115" x2="692" y2="115" class="sv-edge" marker-end="url(#arC)"/>
+  <rect x="700" y="40" width="190" height="150" rx="14" class="sv-box sv-acc"/>
+  <text x="795" y="76" class="sv-k" text-anchor="middle">4 SELAR</text>
+  <text x="795" y="110" class="sv-m" text-anchor="middle">status: done</text>
+  <text x="795" y="134" class="sv-m" text-anchor="middle">plane: DEV</text>
+  <text x="795" y="166" class="sv-s" text-anchor="middle">kg-decide-seal.sh</text>
+  <path d="M795,194 L795,250 L567,250 L567,194" class="sv-edge sv-dash" fill="none" marker-end="url(#arC)"/>
+  <text x="681" y="278" class="sv-m" text-anchor="middle">selo no nó antes da rodada seguinte</text>
+</svg>
+<div class="two">
+  <div class="card"><h3>O selador grava</h3><p><code>status: done</code>, <code>plane: DEV</code>, a proveniência de testemunho e, na <code>narrative</code>, a opção escolhida e as descartadas.</p></div>
+  <div class="card"><div class="rc"><span><b>0</b> só com o radar <code>--integrity --schema</code> em 0</span><span><b>2</b> recusou sem escrever nada</span><span><b>3</b> o radar reprovou e a escrita foi <strong>desfeita</strong></span></div></div>
+</div>
+<p class="note">O <code>/meta:decide</code> não decide por ninguém e não sela o que não foi perguntado. Decisão de outra pessoa fica <code>open</code>, com registro de quem depende.</p></section>
+<section class="slide " data-block="Dissecar antes de adotar" data-time="" aria-label="Slide 10">
+<div class="kicker">Dissecar antes de adotar · o /meta:dissect</div>
+<h2>Alguém lá fora já resolveu a dor? Uma escada de cinco níveis.</h2>
+<ol class="ladder">
+  <li style="--i:0"><b>N0</b><div><h3>identidade</h3><p>O que é, quem mantém, licença, está vivo? Trajetória <strong>datada</strong>, não "é popular".</p></div></li>
+  <li style="--i:1"><b>N1</b><div><h3>capacidade</h3><p>O que ela faz que o Onion não faz? Os <strong>verbos</strong> da superfície executável, nunca do marketing.</p></div></li>
+  <li style="--i:2"><b>N2</b><div><h3>mecanismo</h3><p>Como faz, e onde mora o determinismo. <strong>Comportamento</strong>: rodou, ou leu o código-fonte.</p></div></li>
+  <li style="--i:3"><b>N3</b><div><h3>transferibilidade</h3><p>Igual → transfere; diferente → desenha.</p></div></li>
+  <li style="--i:4"><b>N4</b><div><h3>absorção</h3><p>O plano: artefato, costura, guarda, bancada, em nós <code>x_absorb_*</code> que o <code>/meta:forge</code> lê.</p></div></li>
+</ol>
+<p class="note"><strong>Nível reprovado não sobe.</strong> O default <code>--level 3</code> existe para não gastar o plano de absorção à toa.</p></section>
+<section class="slide dense-slide" data-block="Dissecar antes de adotar" data-time="" aria-label="Slide 11">
+<div class="kicker">Dissecar antes de adotar · veredito e fronteira</div>
+<h2>Quatro vereditos, com razão escrita</h2>
+<div class="four">
+  <div class="card accent"><h3>absorver</h3><p>O conceito entra, reescrito na gramática da casa.</p></div>
+  <div class="card accent"><h3>costurar</h3><p>A ferramenta fica de fora e entra por adapter.</p></div>
+  <div class="card"><h3>parquear</h3><p>Técnica a investigar, <strong>com gatilho nomeado</strong>.</p></div>
+  <div class="card"><h3>rejeitar</h3><p>Com a razão datada, para ninguém reabrir.</p></div>
+</div>
+
+<svg class="dia" viewBox="0 0 900 200" role="img" aria-label="a fronteira">
+  <defs><marker id="arF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sv-acc-fill"/></marker></defs>
+  <rect x="20" y="30" width="360" height="140" rx="16" class="sv-box sv-acc"/>
+  <text x="200" y="70" class="sv-k" text-anchor="middle">ÁRVORE DE TRABALHO</text>
+  <text x="200" y="110" class="sv-t" text-anchor="middle">o repositório</text>
+  <text x="200" y="142" class="sv-m" text-anchor="middle">nada de terceiro roda aqui</text>
+  <line x1="520" y1="100" x2="388" y2="100" class="sv-edge" marker-end="url(#arF)"/>
+  <text x="454" y="86" class="sv-s" text-anchor="middle">só lê</text>
+  <text x="454" y="126" class="sv-m" text-anchor="middle">:ro</text>
+  <rect x="530" y="30" width="350" height="140" rx="16" class="sv-box sv-dash"/>
+  <text x="705" y="70" class="sv-k" text-anchor="middle">ISOLADO</text>
+  <text x="705" y="110" class="sv-t" text-anchor="middle">container · worktree</text>
+  <text x="705" y="142" class="sv-m" text-anchor="middle">a ferramenta de terceiro roda aqui</text>
+</svg>
+<p class="note">"Interessante" não é veredito. A fronteira é <strong>mecanismo, não disciplina</strong>: um refutador com instrução escrita para não escrever escreveu em seis arquivos (medido pela casa em 2026-09-20).</p></section>
+<section class="slide " data-block="Dissect → decide → forge" data-time="" aria-label="Slide 12">
+<div class="kicker">O fluxo dissect → decide → forge</div>
+<h2>Do veredito à peça forjada</h2>
+
+<svg class="dia" viewBox="0 0 900 290" role="img" aria-label="dissect, decide, forge">
+  <defs><marker id="arE" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sv-acc-fill"/></marker></defs>
+  <rect x="10" y="30" width="240" height="120" rx="16" class="sv-box"/>
+  <text x="130" y="72" class="sv-t" text-anchor="middle">/meta:dissect</text>
+  <text x="130" y="102" class="sv-m" text-anchor="middle">grava o grafo da dissecação</text>
+  <text x="130" y="126" class="sv-m" text-anchor="middle">+ 1 decision aberto</text>
+  <line x1="255" y1="90" x2="320" y2="90" class="sv-edge" marker-end="url(#arE)"/>
+  <rect x="330" y="30" width="240" height="120" rx="16" class="sv-box sv-acc"/>
+  <text x="450" y="72" class="sv-t" text-anchor="middle">/meta:decide</text>
+  <text x="450" y="102" class="sv-m" text-anchor="middle">sela o veredito</text>
+  <text x="450" y="126" class="sv-m" text-anchor="middle">no nó decision</text>
+  <line x1="575" y1="90" x2="640" y2="90" class="sv-edge" marker-end="url(#arE)"/>
+  <text x="607" y="76" class="sv-s" text-anchor="middle">absorver</text>
+  <text x="607" y="114" class="sv-s" text-anchor="middle">costurar</text>
+  <rect x="650" y="30" width="240" height="120" rx="16" class="sv-box"/>
+  <text x="770" y="72" class="sv-t" text-anchor="middle">/meta:forge</text>
+  <text x="770" y="102" class="sv-m" text-anchor="middle">lê os planos x_absorb_*</text>
+  <text x="770" y="126" class="sv-m" text-anchor="middle">forja só o que falta</text>
+  <path d="M450,152 L450,220 L640,220" class="sv-edge sv-dash" marker-end="url(#arE)" fill="none"/>
+  <text x="545" y="208" class="sv-s" text-anchor="middle">parquear · rejeitar</text>
+  <rect x="650" y="185" width="240" height="70" rx="16" class="sv-box"/>
+  <text x="770" y="214" class="sv-t" text-anchor="middle">forja de uma dor</text>
+  <text x="770" y="240" class="sv-m" text-anchor="middle">medida, como no bloco F</text>
+</svg>
+<p>O <code>/meta:dissect</code> <strong>não sela</strong>: grava o grafo da dissecação e deixa <strong>1 nó <code>decision</code> aberto</strong> por ferramenta. Quem fecha é o <code>/meta:decide</code>. Com absorver ou costurar, o <code>/meta:forge</code> não começa pela entrevista: lê os planos <code>x_absorb_*</code> e forja só as peças que faltam.</p></section>
+<section class="slide dense-slide" data-block="A forja" data-time="" aria-label="Slide 13">
+<div class="kicker">A forja · comando-com-framework</div>
+<h2>Um <code>.md</code> sozinho é instrução solta. Um comando-com-framework tem as <em>7 peças</em>.</h2>
+
+<svg class="dia pieces" viewBox="0 0 900 340" role="img" aria-label="as 7 peças da forja">
+  <line x1="300" y1="165" x2="300.0" y2="45.0" class="sv-spoke"/><line x1="300" y1="165" x2="393.8" y2="90.2" class="sv-spoke"/><line x1="300" y1="165" x2="417.0" y2="191.7" class="sv-spoke"/><line x1="300" y1="165" x2="352.1" y2="273.1" class="sv-spoke"/><line x1="300" y1="165" x2="247.9" y2="273.1" class="sv-spoke"/><line x1="300" y1="165" x2="183.0" y2="191.7" class="sv-spoke"/><line x1="300" y1="165" x2="206.2" y2="90.2" class="sv-spoke"/><circle cx="300.0" cy="45.0" r="27" class="sv-p-mold"/><text x="300.0" y="53.0" class="sv-n" text-anchor="middle">1</text><text x="300.0" y="11.0" class="sv-m" text-anchor="middle">superfície</text><circle cx="393.8" cy="90.2" r="27" class="sv-p-emit"/><text x="393.8" y="98.2" class="sv-n" text-anchor="middle">2</text><text x="420.4" y="71.2" class="sv-m" text-anchor="start">doutrina</text><circle cx="417.0" cy="191.7" r="27" class="sv-p-emit"/><text x="417.0" y="199.7" class="sv-n" text-anchor="middle">3</text><text x="450.1" y="206.6" class="sv-m" text-anchor="start">contexto medido</text><circle cx="352.1" cy="273.1" r="27" class="sv-p-mold"/><text x="352.1" y="281.1" class="sv-n" text-anchor="middle">4</text><text x="366.8" y="315.2" class="sv-m" text-anchor="start">orquestração</text><circle cx="247.9" cy="273.1" r="27" class="sv-p-spec"/><text x="247.9" y="281.1" class="sv-n" text-anchor="middle">5</text><text x="233.2" y="315.2" class="sv-m" text-anchor="end">destino</text><circle cx="183.0" cy="191.7" r="27" class="sv-p-spec"/><text x="183.0" y="199.7" class="sv-n" text-anchor="middle">6</text><text x="149.9" y="206.6" class="sv-m" text-anchor="end">lente/guarda</text><circle cx="206.2" cy="90.2" r="27" class="sv-p-emit"/><text x="206.2" y="98.2" class="sv-n" text-anchor="middle">7</text><text x="179.6" y="71.2" class="sv-m" text-anchor="end">bancada</text>
+  <circle cx="300" cy="165" r="58" class="sv-box sv-acc"/>
+  <text x="300" y="161" class="sv-s" text-anchor="middle">comando-com-</text>
+  <text x="300" y="183" class="sv-s" text-anchor="middle">framework</text>
+  <circle cx="640" cy="90" r="16" class="sv-p-emit"/><text x="668" y="97" class="sv-m">emite: 2, 3, 7</text>
+  <circle cx="640" cy="160" r="16" class="sv-p-spec"/><text x="668" y="167" class="sv-m">especifica: 5, 6</text>
+  <circle cx="640" cy="230" r="16" class="sv-p-mold"/><text x="668" y="237" class="sv-m">moldes próprios: 1, 4</text>
+  <text x="620" y="40" class="sv-k">O /meta:forge</text>
+</svg>
+<div class="tw pieces-t compact"><table><thead><tr><th>#</th><th>Peça</th><th>Se faltar</th></tr></thead><tbody><tr><td>1</td><td>superfície invocável</td><td>o poder existe e ninguém alcança</td></tr><tr><td>2</td><td>doutrina reutilizável</td><td>a doutrina se duplica e diverge</td></tr><tr><td>3</td><td>contexto medido injetado</td><td>o modelo responde de memória o que um <code>ls</code> responde</td></tr><tr><td>4</td><td>orquestração faseada</td><td>a coordenação vira prosa e não retoma</td></tr><tr><td>5</td><td>destino do que se produz</td><td>a síntese evapora entre sessões</td></tr><tr><td>6</td><td>lente/guarda</td><td>a doutrina fica escrita e nunca é lida</td></tr><tr><td>7</td><td>bancada</td><td>a guarda apodrece verde</td></tr></tbody></table></div></section>
+<section class="slide " data-block="A forja" data-time="" aria-label="Slide 14">
+<div class="kicker">A forja · medir antes de forjar</div>
+<h2>O censo roda na carga, antes de qualquer pergunta</h2>
+<div class="code "><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown | head -15</code></pre></div>
+<div class="three">
+  <div class="card"><h3>Mede presença e referência</h3><p>Nunca qualidade. Peça que existe e a superfície não cita conta como ausente.</p></div>
+  <div class="card"><h3>Lê o índice</h3><p>O censo lê <code>git ls-files</code>: o que não está no índice não existe para ele.</p></div>
+  <div class="card"><h3>Sai <code>3</code>?</h3><p>Não pôde medir. Zero de "não existe" e zero de "o comando falhou" têm a mesma cara.</p></div>
+</div>
+<div class="callout"><strong>Antes de forjar, procure.</strong> A dor "conferir o <code>.env</code> sem ler os segredos" já tinha cura: <code>.claude/utils/task-manager/env-check.sh</code>. Forjar de novo seria duplicar.</div></section>
+<section class="slide " data-block="A forja" data-time="" aria-label="Slide 15">
+<div class="kicker">A forja · o /meta:forge</div>
+<h2>Emite, especifica, deixa para os moldes</h2>
+<div class="three">
+  <div class="card accent"><h3>Emite · 2, 3, 7</h3><p>A doutrina, o medidor (determinístico, com as saídas declaradas) e a bancada como família <code>run_&lt;n&gt;_selftests</code>.</p></div>
+  <div class="card"><h3>Especifica · 5, 6</h3><p>O destino e a lente, com a guarda e o contrato que cada uma exige.</p></div>
+  <div class="card muted"><h3>Deixa para os moldes · 1, 4</h3><p>A superfície (<code>/meta:create-skill</code> ou <code>/meta:create-command</code>) e o molde de fases da <code>onion-orchestration</code>.</p></div>
+</div>
+<p class="lbl">Os seis passos</p>
+<ol class="moves six">
+  <li class="on"><b>1</b>Medir</li><li class="on"><b>2</b>Entrevista da topologia</li><li class="on"><b>3</b>Emitir</li>
+  <li class="on"><b>4</b>Ligar</li><li class="on"><b>5</b>Dogfood</li><li class="on"><b>6</b>Gate com mutante</li>
+</ol>
+<p class="note">Três cláusulas: <strong>a peça 3 é medida por script</strong>, nunca escrita à mão; <strong>antes de forjar, meça se já existe</strong>; <strong>todo caso da bancada tem de reprovar contra o mutante</strong>. Lint verde não é dogfood.</p></section>
+<section class="slide " data-block="Mão na massa" data-time="" aria-label="Slide 16">
+<div class="kicker">Mapa do mão na massa</div>
+<h2>Cinco passos, no repositório de vocês</h2>
+<ul class="agenda hands">
+  <li><b>1</b><span>Consertar os grafos que o radar acusa de multi-documento</span><i>A</i></li>
+  <li><b>2</b><span>Re-ancorar três regras de domínio no <code>arquivo:linha</code> do código</span><i>B</i></li>
+  <li><b>3</b><span>Levar um documento de negócio ao grafo, ligado às regras que afeta</span><i>C</i></li>
+  <li><b>4</b><span>Decidir um item do backlog com o <code>/meta:decide</code></span><i>D</i></li>
+  <li><b>5</b><span>Dissecar o <code>yq</code> e forjar um componente do time</span><i>E · F</i></li>
+</ul>
+<p class="note">Cada passo fecha com um "pronto" que se confere por comando, e o radar em exit 0.</p></section>
+<section class="slide " data-block="Cartão mínimo" data-time="" aria-label="Slide 17">
+<div class="kicker">Cartão mínimo de comandos</div>
+<h2>Oito comandos para levar</h2>
+<div class="cardx"><div class="cx-row"><div class="cx-k">validar um grafo</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-radar.sh &lt;g&gt; --integrity --schema</code></pre></div></div></div><div class="cx-row"><div class="cx-k">mapear uma área</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:kg map &lt;área&gt;</code></pre></div></div></div><div class="cx-row"><div class="cx-k">fila de trabalho aberto</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:backlog</code></pre></div></div></div><div class="cx-row"><div class="cx-k">o plano ainda está alinhado (aligned)?</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:realign &lt;g&gt;</code></pre></div></div></div><div class="cx-row"><div class="cx-k">conduzir o plano</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:drive &lt;g&gt;</code></pre></div></div></div><div class="cx-row"><div class="cx-k">decidir e selar</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:decide</code></pre></div></div></div><div class="cx-row"><div class="cx-k">dissecar uma ferramenta</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:dissect &lt;ferramenta&gt; --level 3</code></pre></div></div></div><div class="cx-row"><div class="cx-k">forjar</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:forge</code></pre></div></div></div></div></section>
+<section class="slide " data-block="Ponte para a aula 6" data-time="" aria-label="Slide 18">
+<div class="kicker">A ponte para a aula 6</div>
+<h2>Hoje cada repositório tem o seu grafo. Na próxima aula eles passam a <em>conversar</em>.</h2>
+<div class="two top">
+  <div class="card"><h3>Onde paramos</h3><p>Tudo mora <strong>num repositório só</strong>. O hub tem grafo, o projeto tem grafo, e eles ainda não se falam: <code>external_edges:</code> liga grafos do mesmo repositório, e a skill forjada no projeto ainda não chega aos outros.</p></div>
+  <div class="card accent"><h3>Aula 6 · comunicação e federação</h3><p>O hub como Company Brain, os projetos ligados a ele, o caminho de um componente subir para o hub e descer para os outros, e o caminho de um achado do time chegar ao core.</p></div>
+</div>
+<p class="note">Para casa: <code>/onion-retro</code> para registrar a aula.</p></section>
+</main>
+<footer class="chrome-bot"><div class="progress"><i></i></div><span class="num-ind"></span></footer>
+<div class="navbtns"><button class="prev" type="button" aria-label="anterior">←</button><button class="next" type="button" aria-label="próximo">→</button></div>
+<script>
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var N = slides.length, cur = 0;
+  var elB = document.querySelector('.chrome-top .b');
+  var elT = document.querySelector('.chrome-top .t');
+  var elBar = document.querySelector('.progress i');
+  var elNum = document.querySelector('.num-ind');
+  slides.forEach(function (s, i) { s.setAttribute('data-n', String(i + 1)); });
+
+  try { var saved = localStorage.getItem('lesson5-theme'); if (saved) root.setAttribute('data-theme', saved); } catch (e) {}
+
+  function setHash(i) {
+    var h = '#' + (i + 1);
+    if (location.hash === h) return;
+    try { history.replaceState(null, '', h); } catch (e) { location.hash = h; }
+  }
+  function render() {
+    slides.forEach(function (s, i) {
+      s.classList.toggle('active', i === cur);
+      s.classList.toggle('cur', i === cur);
+    });
+    var s = slides[cur];
+    elB.textContent = s.getAttribute('data-block') || '';
+    elT.textContent = s.getAttribute('data-time') || '';
+    elBar.style.width = (N > 1 ? (cur / (N - 1)) * 100 : 100) + '%';
+    elNum.textContent = (cur + 1) + ' / ' + N;
+    document.title = 'Aula 5 — KG e Forja · ' + (cur + 1) + '/' + N;
+  }
+  function go(i) {
+    i = Math.max(0, Math.min(N - 1, i));
+    if (i !== cur) slides[i].scrollTop = 0;
+    cur = i; render(); setHash(cur);
+    if (document.body.classList.contains('overview')) slides[cur].scrollIntoView({ block: 'nearest' });
+  }
+  function fromHash() {
+    var m = /^#(\d+)$/.exec(location.hash || '');
+    return m ? parseInt(m[1], 10) - 1 : 0;
+  }
+  function toggleOverview(force) {
+    var on = typeof force === 'boolean' ? force : !document.body.classList.contains('overview');
+    document.body.classList.toggle('overview', on);
+    if (on) slides[cur].scrollIntoView({ block: 'center' });
+    else window.scrollTo(0, 0);
+  }
+  function toggleTheme() {
+    var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('lesson5-theme', next); } catch (e) {}
+  }
+  function toggleFull() {
+    var d = document;
+    if (!d.fullscreenElement && !d.webkitFullscreenElement) {
+      var r = root.requestFullscreen || root.webkitRequestFullscreen;
+      if (r) { var p = r.call(root); if (p && p.catch) p.catch(function () {}); }
+    } else {
+      var x = d.exitFullscreen || d.webkitExitFullscreen;
+      if (x) { var q = x.call(d); if (q && q.catch) q.catch(function () {}); }
+    }
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' && e.key === ' ') return;
+    var ov = document.body.classList.contains('overview');
+    switch (e.key) {
+      case 'ArrowRight': case 'PageDown': case ' ': case 'Spacebar':
+        e.preventDefault(); go(cur + 1); break;
+      case 'ArrowLeft': case 'PageUp':
+        e.preventDefault(); go(cur - 1); break;
+      case 'ArrowDown': if (ov) { e.preventDefault(); go(cur + 3); } break;
+      case 'ArrowUp': if (ov) { e.preventDefault(); go(cur - 3); } break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End': e.preventDefault(); go(N - 1); break;
+      case 'Enter': if (ov) { e.preventDefault(); toggleOverview(false); } break;
+      case 'Escape': if (ov) toggleOverview(false); break;
+      case 't': case 'T': toggleTheme(); break;
+      case 'f': case 'F': toggleFull(); break;
+      case 'o': case 'O': toggleOverview(); break;
+    }
+  });
+
+  slides.forEach(function (s, i) {
+    s.addEventListener('click', function () {
+      if (document.body.classList.contains('overview')) { go(i); toggleOverview(false); }
+    });
+  });
+
+  var tx = null, ty = null;
+  document.addEventListener('touchstart', function (e) {
+    if (e.touches.length !== 1) { tx = null; return; }
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (tx === null || document.body.classList.contains('overview')) return;
+    var t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty;
+    tx = null;
+    if (e.target.closest && e.target.closest('pre')) return;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) go(cur + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  document.querySelector('.navbtns .prev').addEventListener('click', function () { go(cur - 1); });
+  document.querySelector('.navbtns .next').addEventListener('click', function () { go(cur + 1); });
+
+  function copyText(txt, btn) {
+    function done() {
+      btn.classList.add('ok'); btn.textContent = 'copiado';
+      setTimeout(function () { btn.classList.remove('ok'); btn.textContent = 'copiar'; }, 1400);
+    }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta); done();
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(done, fallback);
+    else fallback();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.copy'), function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var box = btn.closest('.code');
+      var c = box && box.querySelector('pre code');
+      if (c) copyText(c.textContent, btn);
+      btn.blur();
+    });
+  });
+
+  window.addEventListener('hashchange', function () { go(fromHash()); });
+  cur = Math.max(0, Math.min(N - 1, fromHash()));
+  render(); setHash(cur);
+})();
+</script>
+</body>
+</html>

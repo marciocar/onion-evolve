@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aula 5 — KG e Forja</title>
+<!-- Slides da aula 5 para os alunos. Derivado de lesson-5-kg-forge.md (a substância vive lá).
+     Autocontido: sem rede, sem fonte externa. Teclas: ← → espaço PageUp/PageDown Home End · T tema · F tela cheia · O visão geral. -->
+<style>
+:root{
+  --bg:#0d1014; --surface:#151a21; --surface-2:#1c222b; --code-bg:#0a0c10;
+  --text:#e9ebee; --muted:#98a2b0; --line:#2a313b;
+  --accent:#f0a83a; --accent-soft:rgba(240,168,58,.14); --accent-ink:#1b1204;
+  --sans:"Inter","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono","SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;
+  --fs:clamp(14px, min(1.12vw, 2vh), 30px);
+  color-scheme:dark;
+}
+[data-theme="light"]{
+  --bg:#f8f7f3; --surface:#ffffff; --surface-2:#efede6; --code-bg:#f3f1ea;
+  --text:#15171c; --muted:#5a6170; --line:#dcd9cf;
+  --accent:#a85f00; --accent-soft:rgba(168,95,0,.10); --accent-ink:#ffffff;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--text);overflow:hidden}
+body{font-family:var(--sans);font-size:var(--fs);line-height:1.45;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.deck{position:fixed;inset:0}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;justify-content:center;
+  padding:3.6em 5.5em 3.4em;overflow-y:auto;overflow-x:hidden;font-size:1em}
+.slide.active{display:flex;animation:in .32s ease both}
+.slide>*{max-width:76em;width:100%;margin-left:auto;margin-right:auto}
+.slide.dense-slide{font-size:.9em}
+@keyframes in{from{opacity:0;transform:translateY(.6em)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.active{animation:none}}
+h1{font-size:3.6em;line-height:1.05;letter-spacing:-.025em;margin:.15em 0 .25em;font-weight:750}
+h2{font-size:2.05em;line-height:1.15;letter-spacing:-.018em;margin:.1em 0 .7em;font-weight:700}
+h3{font-size:1.05em;margin:0 0 .35em;font-weight:650}
+h2 em,h1 em,blockquote em{font-style:normal;color:var(--accent)}
+p{margin:.35em 0 .7em}
+strong{font-weight:650}
+.kicker{font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:650;margin-bottom:.9em}
+.sub{font-size:1.45em;color:var(--muted);margin:0 0 1.6em;max-width:32em}
+.note{color:var(--muted);font-size:.9em}
+.lbl{font-size:.82em;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:1em 0 .3em}
+.mono{font-family:var(--mono);font-size:.88em}
+code{font-family:var(--mono);font-size:.86em;background:var(--surface-2);padding:.08em .32em;border-radius:.3em;white-space:nowrap}
+h2 code{font-size:.85em}
+kbd{font-family:var(--mono);font-size:.8em;border:1px solid var(--line);border-bottom-width:2px;border-radius:.3em;padding:.05em .4em;margin:0 .1em;color:var(--text)}
+blockquote.big{font-size:2.3em;line-height:1.2;letter-spacing:-.018em;font-weight:650;margin:.2em 0 1em;padding-left:.8em;border-left:.12em solid var(--accent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:.8em;padding:1em 1.2em}
+.card p{margin:.2em 0}
+.card.muted{opacity:.78}
+.card.accent{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent-soft)}
+.two,.three,.four{display:grid;gap:1em;margin:.8em auto}
+.two{grid-template-columns:1fr 1fr}.three{grid-template-columns:repeat(3,1fr)}.four{grid-template-columns:repeat(4,1fr)}
+.two.top{align-items:start}
+.callout{border-left:.22em solid var(--accent);background:var(--accent-soft);padding:.8em 1.1em;border-radius:0 .6em .6em 0;margin:1em auto 0}
+.callout.small{font-size:.85em}
+/* código */
+.code{position:relative;background:var(--code-bg);border:1px solid var(--line);border-radius:.7em;margin:.6em auto .9em;overflow:hidden}
+.code-bar{display:flex;justify-content:space-between;align-items:center;padding:.35em .9em;border-bottom:1px solid var(--line);font-family:var(--mono);font-size:.62em;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.code pre{margin:0;padding:.8em 1em;overflow-x:auto;font-family:var(--mono);font-size:.8em;line-height:1.55}
+.code pre code{background:none;padding:0;font-size:1em;white-space:pre}
+.code.dense pre{font-size:.7em}
+.code.hero pre{font-size:1.5em;padding:.6em 1em}
+.copy{font:inherit;font-family:var(--mono);font-size:.95em;text-transform:lowercase;letter-spacing:.04em;color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:.4em;padding:.15em .6em;cursor:pointer}
+.copy:hover,.copy:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+.copy.ok{color:var(--accent-ink);background:var(--accent);border-color:var(--accent)}
+.code.mini{margin:.3em 0 0;border-radius:.5em;display:flex;align-items:stretch}
+.code.mini pre{flex:1;padding:.45em .7em;font-size:.72em}
+.code.mini .copy{order:2;border:0;border-left:1px solid var(--line);border-radius:0;font-size:.6em;padding:0 .8em}
+/* capa */
+.cover-slide .cover>*{max-width:none}
+.series{list-style:none;padding:0;margin:0 0 1.8em;display:grid;grid-template-columns:repeat(6,1fr);gap:.6em}
+.series li{border:1px solid var(--line);border-radius:.6em;padding:.7em .8em;font-size:.72em;color:var(--muted);display:flex;flex-direction:column;gap:.35em;min-height:6.5em}
+.series li b{font-size:1.9em;line-height:1;color:var(--text);font-weight:700}
+.series li.on{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+.series li.on b{color:var(--accent)}
+.meta-line{font-size:1em;color:var(--text)}
+.keys-hint{color:var(--muted);font-size:.8em;margin-top:1.4em}
+/* objetivos */
+.goals{display:grid;grid-template-columns:repeat(5,1fr);gap:.9em}
+.goal{background:var(--surface);border:1px solid var(--line);border-radius:.8em;padding:1em;font-size:.9em}
+.goal b{display:block;font-size:2em;color:var(--accent);line-height:1;margin-bottom:.4em}
+.goal p{color:var(--muted);margin:0}
+/* passos */
+.steps{display:flex;flex-direction:column;gap:.7em;margin:.4em auto}
+.step{display:flex;gap:1em;align-items:flex-start}
+.step>b{flex:none;width:1.9em;height:1.9em;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:.9em}
+.step p{margin:.2em 0}
+ol.num{padding-left:1.4em;margin:.4em 0}
+ol.num>li{margin:.35em 0;padding-left:.3em}
+ol.num>li::marker{color:var(--accent);font-weight:700}
+ol.num.tight>li{margin:.2em 0}
+ol.num ul{margin:.25em 0;padding-left:1.1em}
+ul.bul{padding-left:1.1em;margin:.3em 0}
+ul.bul li{margin:.3em 0}
+ul.bul li::marker{color:var(--accent)}
+/* mapa */
+.timebar{display:flex;height:2.4em;border-radius:.6em;overflow:hidden;gap:2px;margin:0 auto 1.2em}
+.seg{background:var(--accent-soft);display:grid;place-items:center;color:var(--accent);font-weight:700;font-size:.85em;min-width:1.6em}
+.seg.pause{background:var(--surface-2);color:var(--muted)}
+.agenda{list-style:none;padding:0;margin:0}
+.agenda li{display:grid;grid-template-columns:2.2em 1fr 5em;gap:.8em;padding:.42em 0;border-bottom:1px solid var(--line);align-items:baseline}
+.agenda li b{color:var(--accent);font-weight:700}
+.agenda li i{font-style:normal;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.agenda li.pause span{color:var(--muted)}
+.agenda li.total{border-bottom:0;font-weight:650}.agenda li.total i{color:var(--text)}
+/* tabelas */
+.tw{overflow-x:auto;margin:.4em auto;border:1px solid var(--line);border-radius:.7em}
+table{border-collapse:collapse;width:100%;font-size:.88em}
+th,td{text-align:left;padding:.6em .9em;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.78em;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;background:var(--surface)}
+tr:last-child td{border-bottom:0}
+td code{white-space:normal;word-break:break-word}
+.pieces-t td:first-child{color:var(--accent);font-weight:700}
+/* exercício */
+.ex{display:grid;grid-template-columns:1.15fr 1fr;gap:2em;align-items:start}
+.ex.wide-left{grid-template-columns:1.6fr 1fr}
+.ex .card{margin-bottom:.8em}
+.side{display:flex;flex-direction:column;gap:.7em;padding-top:3.2em}
+.side .card{margin:0}
+.done{background:var(--surface);border:1px solid var(--accent);border-radius:.8em;padding:1em 1.1em}
+.done-h{font-size:.72em;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:.6em}
+.checks{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.85em}
+.checks label{display:flex;gap:.6em;align-items:flex-start;cursor:pointer}
+.checks input{position:absolute;opacity:0;pointer-events:none}
+.checks .box{flex:none;width:1.1em;height:1.1em;margin-top:.15em;border:2px solid var(--accent);border-radius:.25em;display:grid;place-items:center}
+.checks input:checked+.box{background:var(--accent)}
+.checks input:checked+.box::after{content:"";width:.32em;height:.6em;border:solid var(--accent-ink);border-width:0 .14em .14em 0;transform:rotate(45deg) translate(-.04em,-.06em)}
+.checks input:focus-visible+.box{outline:2px solid var(--accent);outline-offset:2px}
+.checks input:checked~.crit{color:var(--muted);text-decoration:line-through}
+.crit{font-weight:600;font-size:.92em}
+/* erros */
+.errs{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.75em}
+.errs li{display:grid;grid-template-columns:minmax(12em,.9fr) 2fr;gap:1.4em;padding:.8em 1em;border:1px solid var(--line);border-radius:.7em;background:var(--surface)}
+.err-k{font-weight:650}
+.err-k::before{content:"✗";color:var(--accent);margin-right:.5em;font-weight:800}
+.err-v{color:var(--muted)}
+/* âncora */
+.anchor{display:grid;grid-template-columns:1fr auto 1fr;gap:1em;align-items:center;margin:.2em auto .8em}
+.anchor .arrow{font-size:2em;color:var(--accent)}
+/* confiança */
+.conf{display:flex;flex-direction:column;gap:.5em;margin-top:.6em}
+.cf{display:grid;grid-template-columns:1fr auto;gap:1em;align-items:center;padding:.75em 1.1em;border-radius:.6em;border:1px solid var(--line);background:var(--surface);position:relative;overflow:hidden}
+.cf::before{content:"";position:absolute;left:0;top:0;bottom:0;background:var(--accent);opacity:.9;width:.3em}
+.cf.c4::after,.cf.c3::after,.cf.c2::after{content:"";position:absolute;left:0;top:0;bottom:0;background:var(--accent-soft);z-index:0}
+.cf.c4::after{width:100%}.cf.c3::after{width:66%}.cf.c2::after{width:38%}
+.cf>*{position:relative;z-index:1}
+.cf b{font-weight:600;text-align:right}
+/* decide */
+.moves{list-style:none;padding:0;margin:0 auto 1.1em;display:grid;grid-template-columns:repeat(4,1fr);gap:.5em}
+.moves.five{grid-template-columns:repeat(5,1fr)}
+.moves li{border:1px solid var(--line);border-radius:.6em;padding:.55em .8em;color:var(--muted);font-weight:600;font-size:.88em;display:flex;gap:.6em;align-items:center}
+.moves li b{color:inherit;opacity:.7}
+.moves li.on{border-color:var(--accent);color:var(--text);background:var(--accent-soft)}
+.moves li.on b{color:var(--accent);opacity:1}
+.rc{display:flex;flex-direction:column;gap:.35em;font-size:.86em}
+.rc span{display:flex;gap:.6em;align-items:baseline}
+.rc b{flex:none;font-family:var(--mono);color:var(--accent-ink);background:var(--accent);border-radius:.3em;padding:0 .45em}
+/* escada */
+.ladder{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:.45em}
+.ladder li{display:grid;grid-template-columns:3.2em 1fr;gap:.9em;align-items:center;margin-left:calc(var(--i) * 2.2em);padding:.5em .9em;border:1px solid var(--line);border-radius:.6em;background:var(--surface)}
+.ladder li>b{font-family:var(--mono);color:var(--accent);font-size:1.15em}
+.ladder h3{display:inline;margin-right:.5em}
+.ladder p{display:inline;margin:0;color:var(--muted)}
+/* cartão */
+.cardx{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:.8em;overflow:hidden}
+.cx-row{display:grid;grid-template-columns:14em 1fr;gap:1em;padding:.45em 1em;border-bottom:1px solid var(--line);align-items:center}
+.cx-row:last-child{border-bottom:0}
+.cx-row:nth-child(odd){background:var(--surface)}
+.cx-k{font-weight:600;font-size:.9em}
+.cx-v{display:flex;flex-wrap:wrap;gap:.4em}
+.cx-v .code.mini{margin:0;flex:1 1 auto;max-width:100%}
+/* intervalo */
+.center{align-items:center;text-align:center}
+.pause-slide h1{font-size:6em;color:var(--accent)}
+.pause-slide .sub{margin:0 auto}
+/* svg */
+svg.dia{display:block;width:100%;max-height:15em;margin:.4em auto 1em}
+svg.pieces{max-height:16em}
+.sv-box{fill:var(--surface-2);stroke:var(--line);stroke-width:2}
+.sv-acc{stroke:var(--accent);stroke-width:2.5}
+.sv-acc-fill{fill:var(--accent)}
+.sv-edge{stroke:var(--accent);stroke-width:3}
+.sv-dash{stroke-dasharray:8 7;stroke:var(--muted)}
+.sv-spoke{stroke:var(--line);stroke-width:2}
+.sv-k{fill:var(--accent);font:700 17px var(--sans);letter-spacing:.14em}
+.sv-t{fill:var(--text);font:600 21px var(--mono)}
+.sv-m{fill:var(--muted);font:500 19px var(--sans)}
+.sv-s{fill:var(--text);font:600 18px var(--sans)}
+.sv-n{fill:var(--text);font:700 22px var(--mono)}
+.sv-p-emit{fill:var(--accent);stroke:var(--accent);stroke-width:2}
+.sv-p-emit+.sv-n{fill:var(--accent-ink)}
+.sv-p-spec{fill:var(--surface);stroke:var(--accent);stroke-width:3}
+.sv-p-mold{fill:var(--surface);stroke:var(--muted);stroke-width:2;stroke-dasharray:5 5}
+/* cromo */
+.chrome-top{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:1.1em 1.6em;font-size:.68em;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);pointer-events:none;z-index:5}
+.chrome-top .t{color:var(--accent);font-variant-numeric:tabular-nums}
+.chrome-bot{position:fixed;left:0;right:0;bottom:0;z-index:5;pointer-events:none}
+.progress{height:3px;background:var(--line)}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s ease}
+.num-ind{position:absolute;right:1.6em;bottom:.9em;font-size:.68em;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.navbtns{position:fixed;right:1.2em;bottom:2.2em;display:none;gap:.4em;z-index:6}
+.navbtns button{font:inherit;font-size:.9em;width:2.4em;height:2.4em;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--text)}
+/* visão geral */
+body.overview{overflow:auto}
+body.overview .deck{position:static;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;padding:64px 24px 40px}
+body.overview .slide{position:relative;display:flex;inset:auto;aspect-ratio:16/9;font-size:4.1px;padding:3.6em 5.5em 3.4em;overflow:hidden;border:1px solid var(--line);border-radius:10px;cursor:pointer;animation:none;background:var(--bg)}
+body.overview .slide.dense-slide{font-size:3.7px}
+body.overview .slide.cur{outline:3px solid var(--accent);outline-offset:2px}
+body.overview .slide::after{content:attr(data-n);position:absolute;top:6px;left:8px;font:600 12px var(--sans);color:var(--muted)}
+body.overview .slide *{pointer-events:none}
+body.overview .chrome-top,body.overview .chrome-bot,body.overview .navbtns{display:none}
+.ov-title{display:none}
+body.overview .ov-title{display:block;position:fixed;top:0;left:0;right:0;padding:18px 24px;background:var(--bg);z-index:4;font-size:14px;color:var(--muted);border-bottom:1px solid var(--line)}
+/* celular e telas estreitas */
+@media (max-width:820px),(max-aspect-ratio:1/1){
+  :root{--fs:15.5px}
+  .slide{justify-content:flex-start;padding:3.4em 1.15em 4.6em}
+  .slide.dense-slide{font-size:.95em}
+  h1{font-size:2.5em}h2{font-size:1.5em}blockquote.big{font-size:1.5em}
+  .two,.three,.four,.goals,.ex,.ex.wide-left,.anchor{grid-template-columns:1fr}
+  .anchor .arrow{transform:rotate(90deg);justify-self:center}
+  .series{grid-template-columns:repeat(2,1fr)}
+  .side{padding-top:0}
+  .errs li{grid-template-columns:1fr;gap:.3em}
+  .moves,.moves.five{grid-template-columns:1fr 1fr}
+  .cx-row{grid-template-columns:1fr;gap:.3em}
+  .ladder li{margin-left:calc(var(--i) * .5em)}
+  .code pre{font-size:.78em}.code.dense pre{font-size:.72em}.code.hero pre{font-size:1.15em}
+  .code pre code{white-space:pre-wrap;word-break:break-word}
+  .chrome-top{font-size:.62em;padding:.9em 1em;background:var(--bg)}
+  .chrome-top .b{max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .navbtns{display:flex}
+  .agenda li{grid-template-columns:1.6em 1fr 4em}
+  body.overview .deck{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;padding:56px 10px 30px}
+  body.overview .slide{font-size:2px}body.overview .slide.dense-slide{font-size:1.85px}
+}
+@media print{.chrome-top,.chrome-bot,.navbtns{display:none}}
+</style>
+</head>
+<body>
+<div class="ov-title">Visão geral · clique num slide ou use as setas e Enter · <kbd>O</kbd> ou <kbd>Esc</kbd> fecha</div>
+<header class="chrome-top"><span class="b"></span><span class="t"></span></header>
+<main class="deck">
+<section class="slide cover-slide" data-block="" data-time="" aria-label="Slide 1">
+<div class="cover">
+  <div class="kicker">Formação de equipe de um hub adotante · série de 6 aulas</div>
+  <h1>Aula 5 — KG e Forja</h1>
+  <p class="sub">mapear projetos e documentos em grafo e forjar componentes do time</p>
+  <ol class="series">
+    <li><b>1</b><span>"Há vagas": o perfil dos agentes que vocês querem</span></li>
+    <li><b>2</b><span>Os documentos de negócio</span></li>
+    <li><b>3</b><span>A adoção dos projetos e a maquinaria</span></li>
+    <li><b>4</b><span>Um projeto real com task manager</span></li>
+    <li class="on"><b>5</b><span>KG e Forja</span></li>
+    <li><b>6</b><span>Comunicação e federação, o Company Brain</span></li>
+  </ol>
+  <p class="meta-line">3 horas · um intervalo de 10 minutos · mão na massa</p>
+  <p class="keys-hint"><kbd>←</kbd><kbd>→</kbd> navegar · <kbd>T</kbd> tema · <kbd>F</kbd> tela cheia · <kbd>O</kbd> visão geral</p>
+</div></section>
+<section class="slide " data-block="Objetivo" data-time="" aria-label="Slide 2">
+<div class="kicker">Objetivo</div>
+<h2>Cinco entregas, <em>no repositório</em>, todas conferíveis</h2>
+<div class="goals">
+  <div class="goal"><b>1</b><h3>Um grafo que o motor lê</h3><p>Os grafos do hub passam no <code>kg-radar</code> sem aviso e o <code>/meta:drive</code> os aceita.</p></div>
+  <div class="goal"><b>2</b><h3>Um projeto mapeado contra o código</h3><p>As regras de domínio apontam para o arquivo e a linha que as executam, não só para o documento.</p></div>
+  <div class="goal"><b>3</b><h3>Um documento de negócio ligado ao projeto</h3><p>Um documento das aulas 2 a 4 vira nós, com a confiança certa, ligados às regras que afeta.</p></div>
+  <div class="goal"><b>4</b><h3>Uma ferramenta de terceiro dissecada e decidida</h3><p>Um grafo de dissecação com veredito e o nó de decisão selado, antes de qualquer adoção.</p></div>
+  <div class="goal"><b>5</b><h3>Um componente do time forjado</h3><p>Uma skill com doutrina, medidor e bancada, nascida de uma dor medida, que o censo da forja enxerga.</p></div>
+</div></section>
+<section class="slide " data-block="A ideia da aula" data-time="" aria-label="Slide 3">
+<div class="kicker">A ideia da aula</div>
+<blockquote class="big">O grafo é o <em>estado</em> do trabalho, não um desenho dele.</blockquote>
+<div class="three">
+  <div class="card"><h3>Lido primeiro</h3><p>A sessão lê o grafo antes de ler a prosa.</p></div>
+  <div class="card"><h3>Projetado</h3><p>O backlog é projeção do grafo.</p></div>
+  <div class="card"><h3>Selado</h3><p>Uma decisão só existe quando está selada nele.</p></div>
+</div>
+<p class="note">Cada bloco: um conceito curto, uma demonstração com o comando exato e um exercício no repositório de vocês, com um critério de "pronto" que se confere por comando.</p></section>
+<section class="slide " data-block="Pré-requisitos" data-time="2 min" aria-label="Slide 4">
+<div class="kicker">Pré-requisitos</div>
+<h2>Antes da aula: atualizar o hub</h2>
+<div class="steps">
+  <div class="step"><b>1</b><p>Quem cuida do hub roda o <strong><code>/meta:adopt --update</code> do hub</strong> e mergeia a atualização.</p></div>
+  <div class="step"><b>2</b><p>Os blocos D, E e F pedem um pin que já traga o <code>/meta:decide</code>, o <code>/meta:dissect</code> e o <code>/meta:forge</code> abertos: <strong>pin ≥ 6e6deab1c443 (onion-v1.2.0)</strong>.</p></div>
+  <div class="step"><b>3</b><p>Depois, os projetos adotados pelo hub se atualizam do mesmo jeito.</p></div>
+</div>
+<div class="callout">Se o <code>ls</code> do próximo slide reclamar de arquivo ausente, o pin está velho: o <code>/meta:adopt --update</code> não rodou. <strong>Resolva antes da aula, não durante.</strong></div></section>
+<section class="slide " data-block="Pré-requisitos" data-time="2 min" aria-label="Slide 5">
+<div class="kicker">Pré-requisitos · confira em 2 minutos</div>
+<h2>No começo da aula</h2>
+<div class="code dense"><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>git status --short                       # árvore limpa (ou um commit WIP antes de começar)
+git switch -c lesson-5/&lt;seu-nome&gt;        # cada dupla numa branch própria
+cat .claude/.onion-version               # o pin precisa ser o mesmo da turma
+ls .claude/validation/kg-radar.sh .claude/validation/forge-census.sh .claude/rules/kg-grammar.md
+ls .claude/commands/meta/decide.md .claude/commands/meta/forge.md .claude/validation/kg-decide-seal.sh
+ls .claude/commands/meta/dissect.md .claude/validation/dissect-census.sh
+docker --version || echo "sem Docker: o bloco E usa worktree descartável"
+python3 -c "import yaml" &amp;&amp; echo "PyYAML ok"   # o /meta:drive e o kg-realign leem YAML</code></pre></div></section>
+<section class="slide " data-block="Mapa da aula" data-time="3 h" aria-label="Slide 6">
+<div class="kicker">Mapa da aula</div>
+<h2>Três horas, nove blocos</h2>
+<div class="timebar"><div class="seg" style="flex:10"><span>0</span></div><div class="seg" style="flex:20"><span>A</span></div><div class="seg" style="flex:30"><span>B</span></div><div class="seg" style="flex:25"><span>C</span></div><div class="seg pause" style="flex:10"><span>—</span></div><div class="seg" style="flex:20"><span>D</span></div><div class="seg" style="flex:25"><span>E</span></div><div class="seg" style="flex:35"><span>F</span></div><div class="seg" style="flex:5"><span>G</span></div></div>
+<ul class="agenda"><li><b>0</b><span>Abertura: o que a sessão sabe antes de você falar</span><i>10 min</i></li><li><b>A</b><span>O grafo como fonte única, e a gramática</span><i>20 min</i></li><li><b>B</b><span>Mapear um projeto real contra o código</span><i>30 min</i></li><li><b>C</b><span>Mapear um documento de negócio e ligar ao projeto</span><i>25 min</i></li><li class=pause><b>—</b><span>Intervalo</span><i>10 min</i></li><li><b>D</b><span>O grafo como runtime: warm-up, backlog, realign, drive e /meta:decide</span><i>20 min</i></li><li><b>E</b><span>Dissecar antes de adotar: o /meta:dissect</span><i>25 min</i></li><li><b>F</b><span>A forja: forjar um componente do time com o /meta:forge</span><i>35 min</i></li><li><b>G</b><span>Fechamento e ponte para a aula 6</span><i>5 min</i></li><li class="total"><b></b><span>Total</span><i>3 h</i></li></ul></section>
+<section class="slide " data-block="Bloco 0 · Abertura" data-time="10 min" aria-label="Slide 7">
+<div class="kicker">Bloco 0 · Conceito</div>
+<blockquote class="big">Quando uma sessão nova abre o repositório, <em>o que ela sabe antes de vocês digitarem?</em></blockquote>
+<div class="two">
+  <div class="card"><h3>Com grafo</h3><p>O passo 0 do <code>/warm-up</code> responde: se existe <code>.kg.yaml</code>, ele é lido <strong>primeiro</strong>, antes da prosa.</p></div>
+  <div class="card muted"><h3>Sem grafo</h3><p>A sessão adivinha a partir de texto solto.</p></div>
+</div>
+<p class="note">Na aula 3 vocês geraram documentos e maquinaria. Esta aula dá a eles um estado que a sessão lê.</p></section>
+<section class="slide " data-block="Bloco 0 · Abertura" data-time="10 min" aria-label="Slide 8">
+<div class="kicker">Bloco 0 · Demo</div>
+<h2>O passo 0 encontrando os grafos</h2>
+<div class="code hero"><div class="code-bar"><span>claude code</span><button class="copy" type="button">copiar</button></div><pre><code>/warm-up</code></pre></div>
+<div class="steps">
+  <div class="step"><b>1</b><p>O passo 0 encontra os grafos e roda o radar.</p></div>
+  <div class="step"><b>2</b><p>Abra o grafo de adoção do hub: <code>docs/onion/graph/onion-adoption.kg.yaml</code></p></div>
+  <div class="step"><b>3</b><p>Leia a pergunta aberta que a adoção deixou: <strong>qual é o domínio deste repositório?</strong> Ela está lá desde o dia da adoção, esperando resposta. <em>Hoje ela é respondida.</em></p></div>
+</div></section>
+<section class="slide " data-block="Bloco A · O grafo como fonte única" data-time="20 min" aria-label="Slide 9">
+<div class="kicker">Bloco A · Conceito</div>
+<h2>Um <code>.kg.yaml</code> é um grafo tipado</h2>
+
+<svg class="dia" viewBox="0 0 900 230" role="img" aria-label="nó, aresta, nó">
+  <defs><marker id="arA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sv-acc-fill"/></marker></defs>
+  <rect x="10" y="40" width="270" height="150" rx="16" class="sv-box"/>
+  <text x="145" y="82" class="sv-k" text-anchor="middle">NÓ</text>
+  <text x="145" y="122" class="sv-t" text-anchor="middle">id: D_LOGIN_OIDC_ANY_IDP</text>
+  <text x="145" y="158" class="sv-m" text-anchor="middle">node_type: decision</text>
+  <line x1="290" y1="115" x2="608" y2="115" class="sv-edge" marker-end="url(#arA)"/>
+  <text x="450" y="92" class="sv-k" text-anchor="middle">ARESTA</text>
+  <text x="450" y="148" class="sv-m" text-anchor="middle">edge_type: CONSTRAINS</text>
+  <rect x="620" y="40" width="270" height="150" rx="16" class="sv-box"/>
+  <text x="755" y="82" class="sv-k" text-anchor="middle">NÓ</text>
+  <text x="755" y="122" class="sv-t" text-anchor="middle">id: PO_ACCESS_BY_PROFILE</text>
+  <text x="755" y="158" class="sv-m" text-anchor="middle">o que a coisa é</text>
+  <text x="145" y="222" class="sv-s" text-anchor="middle">from:</text>
+  <text x="755" y="222" class="sv-s" text-anchor="middle">to:</text>
+</svg>
+<div class="two">
+  <div class="card"><h3>Camada <code>audit</code> · conhecimento</h3><p><code>claim</code> <code>evidence</code> <code>decision</code> <code>question</code></p></div>
+  <div class="card"><h3>Camada <code>domain</code> · o negócio</h3><p><code>entity</code> <code>state</code> <code>event</code> <code>rule</code> <code>invariant</code> <code>policy</code></p></div>
+</div>
+<p class="note">Nós com <code>node_type:</code> (o que a coisa é), arestas com <code>edge_type:</code> (como as coisas se relacionam). O radar (<code>kg-radar.sh</code>) é <strong><code>awk</code>, não um parser de YAML</strong>: exige uma chave por linha e reprova contradição estrutural. A gramática inteira, curta, está em <code>.claude/rules/kg-grammar.md</code> e carrega sozinha quando a sessão toca um <code>.kg.yaml</code>.</p></section>
+<section class="slide " data-block="Bloco A · O grafo como fonte única" data-time="20 min" aria-label="Slide 10">
+<div class="kicker">Bloco A · A gramática da casa</div>
+<h2>Os cinco erros clássicos</h2>
+<div class="tw "><table><thead><tr><th>Erro</th><th>Por que dói</th></tr></thead><tbody><tr><td>escrever <code>type:</code> no lugar de <code>node_type:</code>/<code>edge_type:</code></td><td>o radar não lê; um grep por <code>type: REFUTES</code> devolve zero e a guarda nasce verde e vazia</td></tr><tr><td>nó recebe <code>REFUTES</code> e continua <code>confirmed</code></td><td>contradição estrutural: o radar sai 1. Reconcilie para <code>refuted</code>/<code>superseded</code></td></tr><tr><td>objeção que sobrevive modelada como <code>REFUTES</code></td><td>objeção que <strong>mata</strong> é <code>REFUTES</code>; objeção que <strong>limita</strong> é <code>CONSTRAINS</code></td></tr><tr><td>data sem aspas (<code>verified_at: 2026-10-14</code>)</td><td>leitor YAML tipado a lê como data, outro como texto; escreva <code>"2026-10-14"</code></td></tr><tr><td><code>---</code> separando um cabeçalho do resto</td><td>o arquivo vira <strong>dois documentos</strong> YAML; o radar avisa e o <code>/meta:drive</code> e o <code>kg-realign</code> <strong>recusam</strong></td></tr></tbody></table></div></section>
+<section class="slide " data-block="Bloco A · O grafo como fonte única" data-time="20 min" aria-label="Slide 11">
+<div class="kicker">Bloco A · Demo</div>
+<h2>O mesmo defeito, dois leitores</h2>
+<div class="code dense"><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>bash .claude/validation/kg-radar.sh docs/onion/graph/onion-adoption.kg.yaml --integrity --schema
+bash .claude/validation/kg-drive-project.sh docs/onion/graph/&lt;um-grafo-com-aviso&gt;.kg.yaml</code></pre></div>
+<div class="two">
+  <div class="card"><h3>O radar avisa</h3><p class="mono">⚠ multi-documento: 2 separadores ---</p></div>
+  <div class="card"><h3>O drive trava</h3><p class="mono">YAML ilegivel … expected a single document</p></div>
+</div>
+<p class="note">É o mesmo defeito visto por dois leitores: um avisa, o outro trava.</p></section>
+<section class="slide " data-block="Bloco A · O grafo como fonte única" data-time="20 min" aria-label="Slide 12">
+<div class="kicker">Bloco A · Exercício</div>
+<div class="ex">
+  <div>
+    <h2>Consertem os grafos multi-documento</h2>
+    <p>Consertem todos os grafos do hub que o radar acusa de multi-documento. A cura que o próprio radar sugere: <strong>tirar as linhas <code>---</code></strong>. Os campos do cabeçalho viram chaves de topo; nenhum dado muda.</p>
+    <div class="code dense"><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>for g in $(git ls-files '*.kg.yaml' | grep -v '/fixtures/'); do
+  grep -q '^---$' "$g" &amp;&amp; echo "multi-documento: $g"
+done
+# para cada um: apague as linhas que são exatamente '---' (no editor, ou peça à sessão)</code></pre></div>
+  </div>
+  <div class="done"><div class="done-h">Pronto quando</div><ul class="checks"><li><label><input type="checkbox"><span class="box"></span><span class="crit">exit 0 e sem <code>⚠ multi-documento</code></span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-radar.sh &lt;grafo&gt; --integrity --schema</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">imprime <code>veredito:</code> em vez de ERRO</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-drive-project.sh &lt;grafo&gt;</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">só linhas <code>---</code> removidas</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>git diff --stat</code></pre></div></li></ul></div>
+</div></section>
+<section class="slide " data-block="Bloco A · O grafo como fonte única" data-time="20 min" aria-label="Slide 13">
+<div class="kicker">Bloco A · Erros comuns e saída</div>
+<h2>Onde costuma dar errado</h2>
+<ul class="errs"><li><span class="err-k">Apagou um <code>---</code> que estava dentro de um texto <code>|</code>.</span><span class="err-v">O <code>grep '^---$'</code> só casa a linha inteira; confira no <code>git diff</code> que só saíram linhas de separador.</span></li><li><span class="err-k">O drive agora mostra "bloqueado".</span><span class="err-v">Não é erro: <code>DEPENDS_ON</code> é guarda. Leia a aresta: ela sai do nó que depende.</span></li></ul></section>
+<section class="slide " data-block="Bloco B · Mapear um projeto contra o código" data-time="30 min" aria-label="Slide 14">
+<div class="kicker">Bloco B · Conceito</div>
+<h2>Documento diz o que alguém <em>escreveu</em>. Código diz o que o sistema <em>faz</em>.</h2>
+<div class="anchor">
+  <div class="card muted"><h3>Antes</h3><p class="mono">trace: docs/…</p><p>promessa · <code>confidence</code> abaixo de 1</p></div>
+  <div class="arrow">→</div>
+  <div class="card accent"><h3>Depois</h3><p class="mono">trace: apps/&lt;…&gt;/&lt;arquivo&gt;:&lt;linha&gt;</p><p>o que executa a regra</p></div>
+</div>
+<p>Cada <code>rule</code>, <code>invariant</code> e <code>policy</code> precisa ser conferido no código. Re-verificar contra o vivo é o trabalho do <code>/meta:kg-freshness</code>: ele pega a fila do radar e, para cada nó, mede e <strong>propõe</strong> um veredito (<code>CONFIRMED</code>, <code>DRIFTED</code>, <code>REFUTED</code>, <code>UNVERIFIABLE</code>). <strong>Quem sela é a pessoa.</strong></p>
+<div class="two">
+  <div class="card"><h3>Trilha 1 · já tem grafo de domínio</h3><p>Feito a partir do documento da feature: <strong>re-ancorar</strong>.</p></div>
+  <div class="card"><h3>Trilha 2 · não tem grafo</h3><p>Criar o primeiro, com <code>/meta:kg map &lt;área&gt;</code>.</p></div>
+</div></section>
+<section class="slide " data-block="Bloco B · Mapear um projeto contra o código" data-time="30 min" aria-label="Slide 15">
+<div class="kicker">Bloco B · Demo · trilha 1</div>
+<h2>No projeto adotado</h2>
+<div class="code dense"><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>bash .claude/validation/kg-view.sh docs/onion/graph/&lt;dominio&gt;.kg.yaml --markdown | head -30
+grep -nE '^\s+trace:' docs/onion/graph/&lt;dominio&gt;.kg.yaml        # para onde as âncoras apontam
+bash .claude/validation/kg-radar.sh docs/onion/graph/&lt;dominio&gt;.kg.yaml --domain</code></pre></div>
+<ul class="bul">
+  <li>A composição: quantas <code>rule</code>, quantas <code>question</code>.</li>
+  <li>As âncoras todas em <code>docs/</code>.</li>
+  <li>O radar-de-domínio apontando lacunas, como um <strong>estado absorvente</strong>: um estado em que se entra e de onde não se sai. É fim legítimo ou limbo?</li>
+</ul></section>
+<section class="slide " data-block="Bloco B · Mapear um projeto contra o código" data-time="30 min" aria-label="Slide 16">
+<div class="kicker">Bloco B · Demo</div>
+<h2>Uma regra no código, ao vivo</h2>
+<p class="lbl">Trilha 1 · procure a regra:</p>
+<div class="code "><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>grep -rn '&lt;termo da regra&gt;' apps/ packages/ | head</code></pre></div>
+<p class="lbl">Trilha 2 · crie o primeiro grafo:</p>
+<div class="code "><div class="code-bar"><span>claude code</span><button class="copy" type="button">copiar</button></div><pre><code>/meta:kg map &lt;área do sistema&gt;</code></pre></div>
+<p class="note">O modo <code>map</code> faz inventário, fatias de domínio e grafo, e fecha com o radar.</p></section>
+<section class="slide " data-block="Bloco B · Mapear um projeto contra o código" data-time="30 min" aria-label="Slide 17">
+<div class="kicker">Bloco B · Exercício</div>
+<div class="ex">
+  <div>
+    <h2>Três regras, re-ancoradas</h2>
+    <p>Cada dupla pega <strong>três</strong> nós <code>rule</code>/<code>invariant</code>/<code>policy</code> e, para cada um:</p>
+    <ol class="num">
+      <li>acha o código que executa a regra (<code>grep -rn</code>; o número da linha sai do <code>grep -n</code>, nunca de contar na tela);</li>
+      <li>troca o <code>trace:</code> para <code>apps/&lt;…&gt;/&lt;arquivo&gt;:&lt;linha&gt;</code>;</li>
+      <li>atualiza <code>verified_at: "&lt;data de hoje&gt;"</code> e <code>verified_against:</code> com o que foi lido;</li>
+      <li>se o código <strong>não</strong> faz o que o rótulo diz: <code>status</code> vira <code>drifted</code>, com o porquê; se não achou o código: deixa a regra como está e cria um nó <code>question</code> ligado a ela.</li>
+    </ol>
+    <p class="note">Se o grafo tem uma pergunta do tipo "onde fica o código?", respondam-na e reconciliem para <code>done</code>.</p>
+  </div>
+  <div class="done"><div class="done-h">Pronto quando</div><ul class="checks"><li><label><input type="checkbox"><span class="box"></span><span class="crit">exit 0</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-radar.sh docs/onion/graph/&lt;dominio&gt;.kg.yaml --integrity --schema</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">&ge; 3</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>grep -cE 'trace: (apps|packages)/' docs/onion/graph/&lt;dominio&gt;.kg.yaml</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">toda âncora resolve</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-trace-resolve.sh .</code></pre></div></li></ul></div>
+</div></section>
+<section class="slide " data-block="Bloco B · Mapear um projeto contra o código" data-time="30 min" aria-label="Slide 18">
+<div class="kicker">Bloco B · Erros comuns e saída</div>
+<h2>Onde costuma dar errado</h2>
+<ul class="errs"><li><span class="err-k">Linha citada de cabeça.</span><span class="err-v">Ela erra por uma ou duas e a âncora aponta para outra coisa. Copie o <code>arquivo:linha</code> da saída do <code>grep -n</code>.</span></li><li><span class="err-k">Subir a <code>confidence</code> para 1 só porque achou o arquivo.</span><span class="err-v">Achar o arquivo não é ler a regra. Suba só depois de conferir que o código faz o que o rótulo diz.</span></li><li><span class="err-k"><code>REFUTES</code> num nó que segue <code>confirmed</code>.</span><span class="err-v">O radar sai 1. Mude o status junto com a aresta.</span></li></ul></section>
+<section class="slide " data-block="Bloco C · Documento de negócio no grafo" data-time="25 min" aria-label="Slide 19">
+<div class="kicker">Bloco C · Conceito</div>
+<h2>Prosa não tem confiança, não tem dono e não avisa quando caduca</h2>
+<p>Os documentos das aulas 2 a 4 (personas, estratégia, features, decisões de trabalho) são prosa. Levá-los ao grafo dá a cada afirmação <strong>um tipo, uma confiança e uma ligação</strong> com o que ela afeta.</p>
+<div class="conf">
+  <div class="cf c4"><span>o que o cliente confirmou</span><b><code>confirmed</code></b></div>
+  <div class="cf c3"><span>decisão de trabalho da equipe ("inferimos isto")</span><b><code>decision</code> <code>open</code>, <code>confidence</code> menor</b></div>
+  <div class="cf c2"><span>palpite</span><b>ainda menor</b></div>
+  <div class="cf c1"><span>o que depende de informação que só o cliente tem</span><b><code>question</code></b></div>
+</div></section>
+<section class="slide " data-block="Bloco C · Documento de negócio no grafo" data-time="25 min" aria-label="Slide 20">
+<div class="kicker">Bloco C · Demo</div>
+<h2>Achar o documento que nenhum grafo cita</h2>
+<div class="code "><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>for d in $(git ls-files 'docs/business-context/*.md'); do
+  n=$(grep -l "$(basename "$d")" $(git ls-files '*.kg.yaml' | grep -v '/fixtures/') | wc -l)
+  [ "$n" -eq 0 ] &amp;&amp; echo "sem grafo: $d"
+done</code></pre></div></section>
+<section class="slide " data-block="Bloco C · Documento de negócio no grafo" data-time="25 min" aria-label="Slide 21">
+<div class="kicker">Bloco C · Demo</div>
+<div class="ex wide-left">
+  <div>
+    <h2>Um nó de decisão de trabalho bem escrito</h2>
+    <div class="code dense"><div class="code-bar"><span>yaml</span><button class="copy" type="button">copiar</button></div><pre><code>  - id: D_LOGIN_OIDC_ANY_IDP
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: doc-de-decisoes-da-feature-secao-1-marca-INFERIDO
+    trace: apps/&lt;servico&gt;/src/auth.ts
+    label: "Decisão de trabalho: login por qualquer IdP OIDC; o serviço não guarda senha."
+    narrative: "Marcada [INFERIDO] no documento: a equipe decidiu, o cliente não confirmou."
+
+edges:
+  - from: D_LOGIN_OIDC_ANY_IDP
+    to: PO_ACCESS_BY_PROFILE
+    edge_type: CONSTRAINS</code></pre></div>
+  </div>
+  <div class="side">
+    <div class="card"><h3><code>status: open</code> + <code>confidence: 0.6</code></h3><p>A equipe decidiu, o cliente não confirmou.</p></div>
+    <div class="card"><h3><code>narrative:</code></h3><p>Para o porquê: o <code>label</code> tem teto de 280 caracteres.</p></div>
+    <div class="card"><h3><code>CONSTRAINS</code></h3><p>A decisão limita a política que ela afeta.</p></div>
+  </div>
+</div></section>
+<section class="slide " data-block="Bloco C · Documento de negócio no grafo" data-time="25 min" aria-label="Slide 22">
+<div class="kicker">Bloco C · Exercício · a dupla escolhe a trilha</div>
+<div class="ex">
+  <div>
+    <h2>Documento → nós ligados</h2>
+    <div class="card"><h3>No projeto</h3><p>Mapear o documento de decisões ou hipóteses da feature (se existir) no grafo de domínio do projeto. Uma decisão por nó; confiança pela marca do documento; <code>trace:</code> para o código quando o documento diz onde está; arestas <code>CONSTRAINS</code>/<code>SUPPORTS</code>/<code>DEPENDS_ON</code> para as regras que ela afeta.</p></div>
+    <div class="card"><h3>No hub</h3><p>Responder a pergunta do grafo de adoção ("qual é o domínio deste repositório?"). Criem <code>docs/onion/graph/&lt;tema&gt;.kg.yaml</code> a partir de um documento de negócio da aula 2 (estratégia ou personas) e reconciliem a pergunta para <code>done</code>, com <code>verified_against</code> apontando o grafo novo.</p></div>
+  </div>
+  <div class="done"><div class="done-h">Pronto quando</div><ul class="checks"><li><label><input type="checkbox"><span class="box"></span><span class="crit">exit 0</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-radar.sh &lt;grafo&gt; --integrity --schema</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">&ge; 1: o documento está no grafo</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>grep -c '&lt;nome-do-documento&gt;' &lt;grafo&gt;</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">as perguntas novas aparecem</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-backlog-project.sh --markdown | head -20</code></pre></div></li></ul></div>
+</div></section>
+<section class="slide " data-block="Bloco C · Documento de negócio no grafo" data-time="25 min" aria-label="Slide 23">
+<div class="kicker">Bloco C · Erros comuns e saída</div>
+<h2>Onde costuma dar errado</h2>
+<ul class="errs"><li><span class="err-k">Tudo vira <code>confirmed</code>.</span><span class="err-v">Decisão de trabalho não confirmada pelo cliente não é fato. O backlog existe para mostrar o que espera confirmação: se tudo for <code>confirmed</code>, a fila mente.</span></li><li><span class="err-k">Label-parágrafo.</span><span class="err-v">Passou de 280 caracteres, o porquê vai para <code>narrative:</code>.</span></li><li><span class="err-k">Id com ponto ou hífen.</span><span class="err-v">Só <code>[A-Za-z0-9_]</code>; o radar reprova o resto.</span></li><li><span class="err-k">Ligar ao grafo de outro repositório.</span><span class="err-v"><code>external_edges:</code> liga grafos <strong>do mesmo repositório</strong>. Ligar o hub ao projeto é assunto da aula 6.</span></li></ul></section>
+<section class="slide center" data-block="Intervalo" data-time="10 min" aria-label="Slide 24">
+<div class="pause-slide">
+  <div class="kicker">Intervalo</div>
+  <h1>10 minutos</h1>
+  <p class="sub">Na volta: o grafo deixa de ser lido e passa a dirigir o trabalho.</p>
+</div></section>
+<section class="slide " data-block="Bloco D · O grafo como runtime" data-time="20 min" aria-label="Slide 25">
+<div class="kicker">Bloco D · Conceito</div>
+<h2>Um grafo que só se lê na hora de escrever é documentação. Aqui ele <em>dirige</em>.</h2>
+
+<svg class="dia" viewBox="0 0 900 300" role="img" aria-label="o grafo no centro do runtime">
+  <defs><marker id="arD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sv-acc-fill"/></marker></defs>
+  <rect x="345" y="110" width="210" height="80" rx="40" class="sv-box sv-acc"/>
+  <text x="450" y="146" class="sv-t" text-anchor="middle">.kg.yaml</text>
+  <text x="450" y="172" class="sv-m" text-anchor="middle">o estado do trabalho</text>
+  <g>
+    <rect x="20" y="20" width="230" height="70" rx="12" class="sv-box"/>
+    <text x="135" y="50" class="sv-t" text-anchor="middle">/warm-up · /catch-up</text>
+    <text x="135" y="74" class="sv-m" text-anchor="middle">abrem a sessão</text>
+    <rect x="20" y="210" width="230" height="70" rx="12" class="sv-box"/>
+    <text x="135" y="240" class="sv-t" text-anchor="middle">/meta:backlog</text>
+    <text x="135" y="264" class="sv-m" text-anchor="middle">fila dos nós open</text>
+    <rect x="650" y="20" width="230" height="70" rx="12" class="sv-box"/>
+    <text x="765" y="50" class="sv-t" text-anchor="middle">/meta:realign</text>
+    <text x="765" y="74" class="sv-m" text-anchor="middle">plano alinhado ao vivo?</text>
+    <rect x="650" y="210" width="230" height="70" rx="12" class="sv-box"/>
+    <text x="765" y="240" class="sv-t" text-anchor="middle">/meta:drive</text>
+    <text x="765" y="264" class="sv-m" text-anchor="middle">conduz nó a nó</text>
+    <rect x="335" y="230" width="230" height="60" rx="12" class="sv-box sv-acc"/>
+    <text x="450" y="258" class="sv-t" text-anchor="middle">/meta:decide</text>
+    <text x="450" y="280" class="sv-m" text-anchor="middle">sela a decisão no nó</text>
+  </g>
+  <line x1="250" y1="65" x2="345" y2="128" class="sv-edge" marker-end="url(#arD)"/>
+  <line x1="250" y1="235" x2="345" y2="172" class="sv-edge" marker-start="url(#arD)"/>
+  <line x1="650" y1="65" x2="555" y2="128" class="sv-edge" marker-end="url(#arD)"/>
+  <line x1="650" y1="235" x2="555" y2="172" class="sv-edge" marker-end="url(#arD)"/>
+  <line x1="450" y1="230" x2="450" y2="192" class="sv-edge" marker-end="url(#arD)"/>
+</svg>
+<p class="note">O <code>/meta:backlog</code> ordena por atenção (impacto × incerteza × status); o <code>/meta:realign</code> confere em três camadas (passado, presente, futuro). Quem fecha a decisão é o <code>/meta:decide</code>. <strong>Ninguém edita o selo à mão.</strong></p>
+<div class="callout small">Pré-requisito dos blocos D, E e F: o hub num pin <strong>≥ 6e6deab1c443 (onion-v1.2.0)</strong>. Confira com <code>cat .claude/.onion-version</code> e <code>ls .claude/commands/meta/decide.md .claude/validation/kg-decide-seal.sh</code>.</div></section>
+<section class="slide " data-block="Bloco D · O grafo como runtime" data-time="20 min" aria-label="Slide 26">
+<div class="kicker">Bloco D · Demo 1</div>
+<h2>A fila e o plano</h2>
+<div class="code dense"><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>bash .claude/validation/kg-backlog-project.sh --markdown | head -40     # a fila inteira, sem escrever arquivo
+bash .claude/validation/kg-realign-project.sh docs/onion/graph/&lt;grafo&gt;.kg.yaml
+bash .claude/validation/kg-drive-project.sh docs/onion/graph/&lt;grafo&gt;.kg.yaml
+bash .claude/validation/kg-console.sh docs/onion/graph/&lt;grafo&gt;.kg.yaml &gt; kg-console.html   # abra no navegador; não commite</code></pre></div>
+<div class="two">
+  <div class="card"><h3>No realign: commitment-drift</h3><p>Pergunta aberta de alto impacto sem nada que a apoie, com o radar perguntando "abandonado?".</p></div>
+  <div class="card"><h3>No drive</h3><p>A fila pronta e os bloqueados.</p></div>
+</div></section>
+<section class="slide " data-block="Bloco D · O grafo como runtime" data-time="20 min" aria-label="Slide 27">
+<div class="kicker">Bloco D · Demo 2 · o /meta:decide</div>
+<ol class="moves"><li class="on"><b>1</b>Medir</li><li class="on"><b>2</b>Filtrar</li><li class=""><b>3</b>Perguntar com opções</li><li class=""><b>4</b>Selar</li></ol>
+<div class="two top">
+  <div>
+    <h3>1 · Medir</h3>
+    <p>Na carga ele roda o censo do que está em voo (checkpoints, PRs e CI, worktrees, inbox, nós citados). Para ver o mesmo censo fora do comando:</p>
+    <div class="code dense"><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>bash .claude/validation/decide-census.sh . --markdown
+printf '%s' "&lt;texto que cita os ids&gt;" | bash .claude/validation/decide-census.sh . --markdown --cite -</code></pre></div>
+    <p class="note">Os avisos (sem <code>gh</code>, teto atingido) vêm antes das linhas: <strong>ausência de linha com aviso não é zero.</strong></p>
+  </div>
+  <div>
+    <h3>2 · Filtrar</h3>
+    <ul class="bul">
+      <li>O que é medível, a sessão mede.</li>
+      <li>O que deriva de decisão já selada, ela aplica.</li>
+      <li>O que é de outro dono (outro repositório, merge, deploy), ela encaminha.</li>
+      <li><strong>Só sobra o que é de quem decide.</strong></li>
+    </ul>
+  </div>
+</div></section>
+<section class="slide " data-block="Bloco D · O grafo como runtime" data-time="20 min" aria-label="Slide 28">
+<div class="kicker">Bloco D · Demo 2 · o /meta:decide</div>
+<ol class="moves"><li class=""><b>1</b>Medir</li><li class=""><b>2</b>Filtrar</li><li class="on"><b>3</b>Perguntar com opções</li><li class="on"><b>4</b>Selar</li></ol>
+<div class="two top">
+  <div>
+    <h3>3 · Perguntar com opções</h3>
+    <ul class="bul">
+      <li>Até 4 perguntas por rodada, 2 a 4 opções cada.</li>
+      <li>A recomendada primeiro, com o porquê.</li>
+      <li>Cada opção diz o custo e o que destrava.</li>
+      <li>Faltou base: uma opção é "pesquisar antes".</li>
+    </ul>
+  </div>
+  <div>
+    <h3>4 · Selar, antes da rodada seguinte</h3>
+    <div class="code dense"><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>bash .claude/validation/kg-decide-seal.sh &lt;grafo&gt; &lt;NODE_ID&gt; \
+  --chosen "&lt;opção escolhida&gt;" --rejected "&lt;a|b&gt;" --date &lt;AAAA-MM-DD&gt; --question "&lt;a pergunta&gt;"</code></pre></div>
+    <p>Grava <code>status: done</code>, <code>plane: DEV</code>, a proveniência de testemunho e, na <code>narrative</code>, a opção escolhida e as descartadas.</p>
+    <div class="rc"><span><b>0</b> só com o radar <code>--integrity --schema</code> em 0</span><span><b>2</b> recusou sem escrever nada (nó inexistente, já <code>done</code>, campo cego)</span><span><b>3</b> o radar reprovou e a escrita foi <strong>desfeita</strong></span></div>
+  </div>
+</div></section>
+<section class="slide " data-block="Bloco D · O grafo como runtime" data-time="20 min" aria-label="Slide 29">
+<div class="kicker">Bloco D · Exercício</div>
+<div class="ex">
+  <div>
+    <h2>Decidir um item de verdade</h2>
+    <ol class="num">
+      <li>Rodem o <code>/meta:backlog</code> e escolham <strong>um</strong> item que vocês podem decidir hoje.</li>
+      <li>Rodem <code>/meta:decide</code> citando esse item. Respondam a rodada de perguntas.</li>
+      <li>Confiram no <code>git diff</code> o que o selador escreveu no nó (status, proveniência, opções na narrative).</li>
+      <li>Rodem o realign e o drive no grafo que mudou.</li>
+    </ol>
+  </div>
+  <div class="done"><div class="done-h">Pronto quando</div><ul class="checks"><li><label><input type="checkbox"><span class="box"></span><span class="crit">só o grafo do item mudou</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>git diff --stat</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">exit 0</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-radar.sh &lt;grafo&gt; --integrity --schema</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">0: saiu da fila</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-backlog-project.sh --markdown | grep -c '&lt;ID_DO_NO&gt;'</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">exit 0</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-realign-project.sh &lt;grafo&gt; --check</code></pre></div></li></ul></div>
+</div></section>
+<section class="slide dense-slide" data-block="Bloco D · O grafo como runtime" data-time="20 min" aria-label="Slide 30">
+<div class="kicker">Bloco D · Erros comuns e saída</div>
+<h2>Onde costuma dar errado</h2>
+<ul class="errs"><li><span class="err-k">Editar o nó à mão para "adiantar".</span><span class="err-v">O selo diz quem decidiu, quando, e o que foi descartado. Use o selador; se ele recusou (rc 2) ou desfez (rc 3), leia a mensagem e conserte a causa.</span></li><li><span class="err-k">Responder pela pessoa que decide.</span><span class="err-v">O <code>/meta:decide</code> não decide por ninguém e não sela o que não foi perguntado. Se a decisão é de outra pessoa (do cliente, por exemplo), ela fica <code>open</code> e a rodada registra de quem depende.</span></li><li><span class="err-k">O radar avisa <code>decision-done-em-DEV</code>.</span><span class="err-v">Depende do pin: o selo fica em <code>DEV</code> de propósito, porque é testemunho e não medição. Não passem o nó para <code>PROD</code> para calar o aviso: o motor acusa testemunho em <code>PROD</code> como <code>MISPLANED</code>.</span></li><li><span class="err-k">Editar <code>docs/backlog.md</code> à mão.</span><span class="err-v">É projeção: feche o nó no grafo e regenere com <code>/meta:backlog</code>. Se commitarem o arquivo, a REGRA 62 (Projeção GERADA em sincronia com a fonte (docs/backlog.md)) passa a cobrar que ele bata com a fonte.</span></li><li><span class="err-k">O drive para em <code>CHECKPOINT-PENDENTE</code>.</span><span class="err-v">É de propósito: um lote anterior espera selo. O selo de checkpoint é do drive (<code>kg-drive-project.sh &lt;grafo&gt; --seal</code>), não do selador do decide.</span></li></ul></section>
+<section class="slide dense-slide" data-block="Bloco E · Dissecar antes de adotar" data-time="25 min" aria-label="Slide 31">
+<div class="kicker">Bloco E · Conceito</div>
+<h2>Alguém lá fora já resolveu a dor? Uma escada de cinco níveis.</h2>
+<ol class="ladder">
+  <li style="--i:0"><b>N0</b><div><h3>identidade</h3><p>O que é, quem mantém, licença, está vivo? Prova: trajetória <strong>datada</strong> (commits, releases), não "é popular".</p></div></li>
+  <li style="--i:1"><b>N1</b><div><h3>capacidade</h3><p>O que ela faz que o Onion não faz? Prova: os <strong>verbos</strong> da superfície executável (<code>--help</code>, API), nunca do marketing.</p></div></li>
+  <li style="--i:2"><b>N2</b><div><h3>mecanismo</h3><p>Como faz, e onde mora o determinismo. Prova: <strong>comportamento</strong>: rodou, ou leu o código-fonte.</p></div></li>
+  <li style="--i:3"><b>N3</b><div><h3>transferibilidade</h3><p>Igual → transfere; diferente → desenha. Prova: a régua de transferência aplicada com evidência e refutador.</p></div></li>
+  <li style="--i:4"><b>N4</b><div><h3>absorção</h3><p>O plano: artefato, costura, guarda, bancada. Prova: nós <code>x_absorb_*</code> no grafo, que o <code>/meta:forge</code> lê.</p></div></li>
+</ol>
+<p class="note"><strong>Nível reprovado não sobe.</strong> Pré-requisito: o mesmo pin dos blocos D e F (≥ 6e6deab1c443 (onion-v1.2.0)). Confira com <code>ls .claude/commands/meta/dissect.md .claude/validation/dissect-census.sh .claude/validation/dissect-plans.sh</code>.</p></section>
+<section class="slide " data-block="Bloco E · Dissecar antes de adotar" data-time="25 min" aria-label="Slide 32">
+<div class="kicker">Bloco E · Conceito</div>
+<h2>Quatro vereditos, com razão escrita</h2>
+<div class="four">
+  <div class="card accent"><h3>absorver</h3><p>O conceito entra no Onion, reescrito na gramática da casa.</p></div>
+  <div class="card accent"><h3>costurar</h3><p>A ferramenta fica de fora e entra por adapter.</p></div>
+  <div class="card"><h3>parquear</h3><p>Técnica a investigar, <strong>com gatilho nomeado</strong>.</p></div>
+  <div class="card"><h3>rejeitar</h3><p>Com a razão datada, para ninguém reabrir.</p></div>
+</div>
+<p>"Interessante" e "vale acompanhar" não são veredito. O comando <strong>não sela</strong>: grava o grafo da dissecação e deixa <strong>1 nó <code>decision</code> aberto</strong> por ferramenta. Quem fecha é o <code>/meta:decide</code>, do bloco D.</p>
+<div class="callout"><strong>A fronteira.</strong> Ferramenta de terceiro <strong>roda em worktree ou container, nunca na árvore de trabalho</strong>. É mecanismo, não disciplina: um refutador com instrução escrita para não escrever escreveu em seis arquivos (medido pela casa em 2026-09-20).</div></section>
+<section class="slide " data-block="Bloco E · Dissecar antes de adotar" data-time="25 min" aria-label="Slide 33">
+<div class="kicker">Bloco E · Demo 1 e 2</div>
+<h2>A ferramenta do exercício: <code>yq</code></h2>
+<p>O processador de YAML de linha de comando escrito em Go; o repositório e a imagem oficial de container saem do próprio N0, da fonte primária. É plausível para este time: os grafos são YAML, e alguém sempre propõe "por que não lemos o <code>.kg.yaml</code> com <code>yq</code> em vez de <code>awk</code>?".</p>
+<p class="lbl">Demo 1 · o censo vem primeiro</p>
+<div class="code "><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>bash .claude/validation/dissect-census.sh . --markdown</code></pre></div>
+<p class="note">Lista as dissecações que o corpus já pagou e o nível de cada uma. Ferramenta já dissecada com carimbo fresco entra no nível <strong>seguinte</strong>, sem repagar. Saída <code>3</code> quer dizer "não pude medir".</p>
+<p class="lbl">Demo 2 · dissecar até o N3</p>
+<div class="code "><div class="code-bar"><span>claude code</span><button class="copy" type="button">copiar</button></div><pre><code>/meta:dissect yq --level 3</code></pre></div></section>
+<section class="slide " data-block="Bloco E · Dissecar antes de adotar" data-time="25 min" aria-label="Slide 34">
+<div class="kicker">Bloco E · Demo 2 · o N2 isolado</div>
+<h2>Rodar a ferramenta sem deixar ela escrever</h2>
+<p>Mostre o N0 (licença e trajetória datadas, da fonte primária), o N1 (os verbos lidos do <code>yq --help</code>) e a parada do N2 para rodar a ferramenta <strong>isolada</strong>:</p>
+<div class="code dense"><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>docker run --rm -v "$PWD":/workdir:ro &lt;imagem-oficial-do-yq&gt; '.nodes | length' docs/onion/graph/&lt;grafo&gt;.kg.yaml
+bash .claude/validation/kg-radar.sh docs/onion/graph/&lt;grafo&gt;.kg.yaml --integrity --schema</code></pre></div>
+<div class="two">
+  <div class="card accent"><h3>Montagem <code>:ro</code></h3><p>O container lê o repositório e não escreve nele.</p></div>
+  <div class="card"><h3>Sem Docker</h3><p>Uma worktree descartável (<code>git worktree add ../dissect-yq</code> e rodar lá dentro).</p></div>
+</div></section>
+<section class="slide dense-slide" data-block="Bloco E · Dissecar antes de adotar" data-time="25 min" aria-label="Slide 35">
+<div class="kicker">Bloco E · Exercício</div>
+<div class="ex">
+  <div>
+    <h2>Dissecar e decidir</h2>
+    <ol class="num tight">
+      <li>Rodem o censo e confiram se o <code>yq</code> (ou a ferramenta que a dupla escolher) já foi dissecado.</li>
+      <li>Rodem <code>/meta:dissect yq --level 3</code>. No N2, meçam o <strong>comportamento</strong>, sem confiar na documentação:
+        <ul><li>a contagem de nós que o <code>yq</code> devolve bate com a do <code>kg-view.sh</code>?</li>
+        <li>como o <code>yq</code> lê uma chave <code>on:</code> e uma data sem aspas? Dois leitores discordando do mesmo byte foi o que fez a chave <code>on:</code> virar <code>trigger:</code>.</li></ul></li>
+      <li>Leiam o veredito e o nó <code>decision</code> aberto no grafo que o comando gravou.</li>
+      <li>Fechem a decisão com <code>/meta:decide</code>, citando o id desse nó.</li>
+      <li><strong>Só se o veredito for absorver ou costurar:</strong> rodem de novo com <code>--level 4</code> para gerar o plano de absorção (os nós <code>x_absorb_*</code>) e confiram o plano com o leitor da forja.</li>
+    </ol>
+  </div>
+  <div class="done"><div class="done-h">Pronto quando</div><ul class="checks"><li><label><input type="checkbox"><span class="box"></span><span class="crit">a dissecação aparece, com o nível</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/dissect-census.sh . --markdown | grep -i yq</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">exit 0</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-radar.sh docs/evolution/dissect/&lt;ferramenta&gt;-&lt;AAAA-MM&gt;/&lt;ferramenta&gt;-&lt;AAAA-MM&gt;.kg.yaml --integrity --schema</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">&ge; 1</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>grep -c 'x_dissect_verdict:' docs/evolution/dissect/&lt;ferramenta&gt;-&lt;AAAA-MM&gt;/&lt;ferramenta&gt;-&lt;AAAA-MM&gt;.kg.yaml</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">nada fora do grafo da dissecação e do selo</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>git status --short</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">só com absorver/costurar, depois do <code>--level 4</code>: rc 0 = plano completo</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/dissect-plans.sh . yq</code></pre></div></li></ul></div>
+</div></section>
+<section class="slide dense-slide" data-block="Bloco E · Dissecar antes de adotar" data-time="25 min" aria-label="Slide 36">
+<div class="kicker">Bloco E · Erros comuns e saída</div>
+<h2>Onde costuma dar errado</h2>
+<ul class="errs"><li><span class="err-k">Rodar a ferramenta na árvore de trabalho "só para ver".</span><span class="err-v">É exatamente o que a fronteira proíbe. Container com montagem <code>:ro</code> ou worktree descartável; depois, <code>git status</code> limpo.</span></li><li><span class="err-k">N2 tirado da página do produto.</span><span class="err-v">Página é fonte de N0 e N1. Sem rodar nem ler o código, o nó fica <code>open</code> com a lacuna nomeada: "não pude medir" é resultado.</span></li><li><span class="err-k">Parquear sem gatilho.</span><span class="err-v">Parque sem gatilho é cemitério. Escrevam o que reabre a questão.</span></li><li><span class="err-k">Pular para o N4 com uma ferramenta que vai ser rejeitada.</span><span class="err-v">O default <code>--level 3</code> existe para não gastar o plano de absorção à toa.</span></li><li><span class="err-k"><code>dissect-plans.sh</code> sai 1.</span><span class="err-v">O plano está INCOMPLETO, e a mensagem diz o motivo: falta origem <strong>com pin</strong> (sha ou tag), licença, forma (<code>reescrita</code>, <code>adapter-sdaal</code>, <code>vendor-pin</code>) ou a família de paridade. Plano incompleto não se forja; volte ao dissect.</span></li><li><span class="err-k">Vendorizar código proprietário.</span><span class="err-v"><code>x_absorb_form: vendor-pin</code> só para licença que o permita; proprietário nunca.</span></li></ul></section>
+<section class="slide " data-block="Bloco E · Dissecar antes de adotar" data-time="25 min" aria-label="Slide 37">
+<div class="kicker">Bloco E · A ponte para a forja</div>
+<h2>Do veredito à peça forjada</h2>
+
+<svg class="dia" viewBox="0 0 900 290" role="img" aria-label="dissect, decide, forge">
+  <defs><marker id="arE" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="sv-acc-fill"/></marker></defs>
+  <rect x="10" y="30" width="240" height="120" rx="16" class="sv-box"/>
+  <text x="130" y="72" class="sv-t" text-anchor="middle">/meta:dissect</text>
+  <text x="130" y="102" class="sv-m" text-anchor="middle">grava o grafo da dissecação</text>
+  <text x="130" y="126" class="sv-m" text-anchor="middle">+ 1 decision aberto</text>
+  <line x1="255" y1="90" x2="320" y2="90" class="sv-edge" marker-end="url(#arE)"/>
+  <rect x="330" y="30" width="240" height="120" rx="16" class="sv-box sv-acc"/>
+  <text x="450" y="72" class="sv-t" text-anchor="middle">/meta:decide</text>
+  <text x="450" y="102" class="sv-m" text-anchor="middle">sela o veredito</text>
+  <text x="450" y="126" class="sv-m" text-anchor="middle">no nó decision</text>
+  <line x1="575" y1="90" x2="640" y2="90" class="sv-edge" marker-end="url(#arE)"/>
+  <text x="607" y="76" class="sv-s" text-anchor="middle">absorver</text>
+  <text x="607" y="114" class="sv-s" text-anchor="middle">costurar</text>
+  <rect x="650" y="30" width="240" height="120" rx="16" class="sv-box"/>
+  <text x="770" y="72" class="sv-t" text-anchor="middle">/meta:forge</text>
+  <text x="770" y="102" class="sv-m" text-anchor="middle">lê os planos x_absorb_*</text>
+  <text x="770" y="126" class="sv-m" text-anchor="middle">forja só o que falta</text>
+  <path d="M450,152 L450,220 L640,220" class="sv-edge sv-dash" marker-end="url(#arE)" fill="none"/>
+  <text x="545" y="208" class="sv-s" text-anchor="middle">parquear · rejeitar</text>
+  <rect x="650" y="185" width="240" height="70" rx="16" class="sv-box"/>
+  <text x="770" y="214" class="sv-t" text-anchor="middle">forja de uma dor</text>
+  <text x="770" y="240" class="sv-m" text-anchor="middle">medida, como no bloco F</text>
+</svg>
+<p>Se o veredito foi absorver ou costurar, o <code>/meta:forge</code> do bloco F <strong>não começa pela entrevista</strong>: lê os planos <code>x_absorb_*</code> na carga, mede no censo as peças que o alvo já tem e forja só as que faltam. Se foi parquear ou rejeitar, a dupla forja a partir de uma dor medida.</p></section>
+<section class="slide dense-slide" data-block="Bloco F · A forja" data-time="35 min" aria-label="Slide 38">
+<div class="kicker">Bloco F · Conceito</div>
+<h2>Um <code>.md</code> sozinho é instrução solta. Um <em>comando-com-framework</em> tem as 7 peças.</h2>
+
+<svg class="dia pieces" viewBox="0 0 900 340" role="img" aria-label="as 7 peças da forja">
+  <line x1="300" y1="165" x2="300.0" y2="45.0" class="sv-spoke"/><line x1="300" y1="165" x2="393.8" y2="90.2" class="sv-spoke"/><line x1="300" y1="165" x2="417.0" y2="191.7" class="sv-spoke"/><line x1="300" y1="165" x2="352.1" y2="273.1" class="sv-spoke"/><line x1="300" y1="165" x2="247.9" y2="273.1" class="sv-spoke"/><line x1="300" y1="165" x2="183.0" y2="191.7" class="sv-spoke"/><line x1="300" y1="165" x2="206.2" y2="90.2" class="sv-spoke"/><circle cx="300.0" cy="45.0" r="27" class="sv-p-mold"/><text x="300.0" y="53.0" class="sv-n" text-anchor="middle">1</text><text x="300.0" y="11.0" class="sv-m" text-anchor="middle">superfície</text><circle cx="393.8" cy="90.2" r="27" class="sv-p-emit"/><text x="393.8" y="98.2" class="sv-n" text-anchor="middle">2</text><text x="420.4" y="71.2" class="sv-m" text-anchor="start">doutrina</text><circle cx="417.0" cy="191.7" r="27" class="sv-p-emit"/><text x="417.0" y="199.7" class="sv-n" text-anchor="middle">3</text><text x="450.1" y="206.6" class="sv-m" text-anchor="start">contexto medido</text><circle cx="352.1" cy="273.1" r="27" class="sv-p-mold"/><text x="352.1" y="281.1" class="sv-n" text-anchor="middle">4</text><text x="366.8" y="315.2" class="sv-m" text-anchor="start">orquestração</text><circle cx="247.9" cy="273.1" r="27" class="sv-p-spec"/><text x="247.9" y="281.1" class="sv-n" text-anchor="middle">5</text><text x="233.2" y="315.2" class="sv-m" text-anchor="end">destino</text><circle cx="183.0" cy="191.7" r="27" class="sv-p-spec"/><text x="183.0" y="199.7" class="sv-n" text-anchor="middle">6</text><text x="149.9" y="206.6" class="sv-m" text-anchor="end">lente/guarda</text><circle cx="206.2" cy="90.2" r="27" class="sv-p-emit"/><text x="206.2" y="98.2" class="sv-n" text-anchor="middle">7</text><text x="179.6" y="71.2" class="sv-m" text-anchor="end">bancada</text>
+  <circle cx="300" cy="165" r="58" class="sv-box sv-acc"/>
+  <text x="300" y="161" class="sv-s" text-anchor="middle">comando-com-</text>
+  <text x="300" y="183" class="sv-s" text-anchor="middle">framework</text>
+  <circle cx="640" cy="90" r="16" class="sv-p-emit"/><text x="668" y="97" class="sv-m">emite: 2, 3, 7</text>
+  <circle cx="640" cy="160" r="16" class="sv-p-spec"/><text x="668" y="167" class="sv-m">especifica: 5, 6</text>
+  <circle cx="640" cy="230" r="16" class="sv-p-mold"/><text x="668" y="237" class="sv-m">moldes próprios: 1, 4</text>
+  <text x="620" y="40" class="sv-k">O /meta:forge</text>
+</svg>
+<div class="three">
+  <div class="card"><h3>A peça 3 é medida por script</h3><p>Nunca escrita à mão.</p></div>
+  <div class="card"><h3>Antes de forjar, meça se já existe</h3><p>Forjar de novo é duplicar.</p></div>
+  <div class="card"><h3>Todo caso da bancada reprova contra o mutante</h3><p>Caso que passa nos dois é decorativo.</p></div>
+</div>
+<p class="note">A doutrina da forja: <code>.claude/commands/common/prompts/forge-doctrine.md</code>. A 1 e a 4 saem dos moldes próprios (<code>/meta:create-skill</code> ou <code>/meta:create-command</code>, e o molde de fases da <code>onion-orchestration</code>).</p></section>
+<section class="slide dense-slide" data-block="Bloco F · A forja" data-time="35 min" aria-label="Slide 39">
+<div class="kicker">Bloco F · As 7 peças</div>
+<h2>Onde cada peça vive, e o que acontece se faltar</h2>
+<div class="tw pieces-t"><table><thead><tr><th>#</th><th>Peça</th><th>Onde vive</th><th>Se faltar</th></tr></thead><tbody><tr><td>1</td><td>superfície invocável</td><td><code>.claude/skills/&lt;n&gt;/SKILL.md</code></td><td>o poder existe e ninguém alcança</td></tr><tr><td>2</td><td>doutrina reutilizável</td><td><code>.claude/commands/common/prompts/&lt;n&gt;-doctrine.md</code></td><td>a doutrina se duplica e diverge</td></tr><tr><td>3</td><td>contexto medido injetado</td><td>diretiva de injeção com o medidor, na superfície</td><td>o modelo responde de memória o que um <code>ls</code> responde</td></tr><tr><td>4</td><td>orquestração faseada</td><td><code>.claude/workflows/&lt;n&gt;.js</code></td><td>a coordenação vira prosa e não retoma</td></tr><tr><td>5</td><td>destino do que se produz</td><td>fase final no grafo + <code>kg-radar</code></td><td>a síntese evapora entre sessões</td></tr><tr><td>6</td><td>lente/guarda</td><td><code>.claude/rules/&lt;n&gt;-lens.md</code> com <code>paths:</code></td><td>a doutrina fica escrita e nunca é lida</td></tr><tr><td>7</td><td>bancada</td><td>família <code>run_&lt;n&gt;_selftests</code>, casos que reprovam a versão defeituosa</td><td>a guarda apodrece verde</td></tr></tbody></table></div></section>
+<section class="slide " data-block="Bloco F · A forja" data-time="35 min" aria-label="Slide 40">
+<div class="kicker">Bloco F · Demo 1 · o passo 1 do comando</div>
+<h2>O censo da forja</h2>
+<div class="code "><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown | head -15</code></pre></div>
+<div class="two">
+  <div class="card"><h3>Leia</h3><p>O cabeçalho (quantos candidatos, quantos com 6+ peças) e o topo (os que têm 7/7). O <code>/meta:forge</code> roda este censo na carga, antes de qualquer pergunta.</p></div>
+  <div class="card"><h3>Como ele mede</h3><p><strong>Presença e referência</strong>, nunca qualidade. Peça que existe e a superfície não cita conta como ausente.</p></div>
+</div>
+<div class="callout">Se o censo sair <code>3</code>, ele está dizendo que <strong>não pôde medir</strong>: conserte o ambiente antes de seguir.</div></section>
+<section class="slide " data-block="Bloco F · A forja" data-time="35 min" aria-label="Slide 41">
+<div class="kicker">Bloco F · Demo 2 · medir antes de forjar</div>
+<h2>Uma dor que o hub já sentiu: conferir o <code>.env</code> sem ler os segredos</h2>
+<div class="code "><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>grep -rlni 'nunca ler' .claude/utils .claude/validation | head</code></pre></div>
+<p>Ele já existe (<code>.claude/utils/task-manager/env-check.sh</code>), e nasceu de um sinal do campo. <strong>Forjar de novo seria duplicar.</strong> É a cláusula "antes de forjar, meça se já existe" acontecendo na frente da turma.</p>
+<div class="callout"><strong>Chegou do bloco E com absorver ou costurar?</strong> A entrada da forja não é a entrevista, é o plano: o <code>/meta:forge</code> lê os nós <code>x_absorb_*</code> na carga (pelo <code>dissect-plans.sh</code>), mede no censo as peças que o alvo já tem e emite só as marcadas como faltando. Plano INCOMPLETO não se forja. Origem e licença vão no cabeçalho do artefato forjado; o caso de paridade entra na família que o plano nomeia. <code>costurar</code> vira adapter, nunca cópia.</div></section>
+<section class="slide " data-block="Bloco F · A forja" data-time="35 min" aria-label="Slide 42">
+<div class="kicker">Bloco F · Exercício 1</div>
+<h2>Escolher a dor: uma que vocês <em>mediram</em> hoje, não uma que imaginam</h2>
+<div class="three">
+  <div class="card"><h3>Bloco B</h3><p>Regras de domínio ancoradas só em documento. (O gabarito da forja, a skill <code>domain-anchor</code>, é esta.)</p></div>
+  <div class="card"><h3>Bloco C</h3><p>Documentos de negócio que nenhum grafo cita.</p></div>
+  <div class="card"><h3>Bloco D</h3><p>Perguntas abertas que esperam alguém de fora e não dizem quem: o campo <code>owner:</code> existe e o backlog já agrupa por ele, então talvez a cura seja <strong>declarar</strong> <code>owner:</code>, não forjar nada.</p></div>
+</div>
+<p class="lbl">Para a dor escolhida, a pergunta "já existe?":</p>
+<div class="code "><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>grep -rln '&lt;palavra-chave&gt;' .claude/</code></pre></div>
+<p class="note">Se já existe, a entrega da dupla é usar o que existe e registrar isso no grafo.</p></section>
+<section class="slide dense-slide" data-block="Bloco F · A forja" data-time="35 min" aria-label="Slide 43">
+<div class="kicker">Bloco F · Exercício 2 · forjar com o /meta:forge · passos 1 a 3</div>
+<div class="two top">
+  <div>
+    <h3>1 · Medir</h3>
+    <p>O censo roda na carga. Anotem a linha do candidato antes de forjar (ele ainda não existe, então não aparece: esse é o "antes").</p>
+    <h3>2 · Entrevista da topologia</h3>
+    <p>O comando pergunta, não assume: qual o gênero (varredura, decisão, auditoria, migração), quais fases, o que se produz e para onde vai, de quanto em quanto tempo se revisita. <strong>Respondam com a dor medida, não com a forma do exemplo.</strong> A peça 5 (destino) é exigida de todo comando-com-framework.</p>
+  </div>
+  <div>
+    <h3>3 · Emitir 2, 3 e 7, nessa ordem</h3>
+    <ul class="bul">
+      <li><b>2 doutrina</b> em <code>.claude/commands/common/prompts/&lt;n&gt;-doctrine.md</code>, com as cláusulas e <strong>o que ela não promete</strong>;</li>
+      <li><b>3 medidor</b> em <code>.claude/validation/&lt;n&gt;-census.sh</code>, determinístico, que descobre por referência e declara as saídas (<code>0</code> medido, <code>1</code> reprova no <code>--strict</code>, <code>2</code> uso inválido, <code>3</code> nada a medir);</li>
+      <li><b>7 bancada</b> como família <code>run_&lt;n&gt;_selftests</code>, um caso por saída.</li>
+    </ul>
+    <p class="note">As peças 5 e 6 saem <strong>especificadas</strong>: a dupla escreve a lente (<code>.claude/rules/&lt;n&gt;-lens.md</code>, com <code>paths:</code> que casa arquivo rastreado) e a fase de destino. A superfície (peça 1) sai do <code>/meta:create-skill</code>.</p>
+  </div>
+</div></section>
+<section class="slide dense-slide" data-block="Bloco F · A forja" data-time="35 min" aria-label="Slide 44">
+<div class="kicker">Bloco F · Exercício 2 · passos 4 a 6</div>
+<div class="two top">
+  <div>
+    <h3>4 · Ligar</h3>
+    <p>A superfície cita <strong>todas</strong> as peças pelo caminho, e as peças entram no índice (<code>git add</code>). O censo lê <code>git ls-files</code>: o que não está no índice não existe para ele, nem para a sessão de outra pessoa.</p>
+    <h3>5 · Dogfood</h3>
+    <p>Rodem o artefato de verdade: invoquem a skill numa sessão e rodem o medidor contra o grafo real, <strong>e</strong> o modo de falha (grafo sem regras, argumento errado). <strong>Lint verde não é dogfood.</strong></p>
+  </div>
+  <div>
+    <h3>6 · Gate com mutante</h3>
+    <p>Lint com 0 HARD, a família nova verde, e o mutante de cada caso provado: copiem o medidor, estraguem <strong>uma</strong> linha que importa e rodem a bancada contra a cópia.</p>
+    <div class="code dense"><div class="code-bar"><span>bash</span><button class="copy" type="button">copiar</button></div><pre><code>sed 's/? "codigo" : "documento")/? "codigo" : "codigo")/' \
+  .claude/validation/domain-anchor-census.sh &gt; mutant.sh
+diff .claude/validation/domain-anchor-census.sh mutant.sh   # TEM de mostrar 1 linha; vazio = mutante igual
+bash .claude/validation/domain-anchor-selftest.sh ./mutant.sh   # TEM de reprovar
+rm mutant.sh</code></pre></div>
+  </div>
+</div></section>
+<section class="slide dense-slide" data-block="Bloco F · A forja" data-time="35 min" aria-label="Slide 45">
+<div class="kicker">Bloco F · Pronto quando</div>
+<div class="ex">
+  <div class="done"><div class="done-h">Pronto quando</div><ul class="checks"><li><label><input type="checkbox"><span class="box"></span><span class="crit">a família nova, toda verde</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/lint-selftest.sh --families &lt;n_com_underscore&gt;</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">pelo menos 1 ❌ (e exit 1)</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/&lt;n&gt;-selftest.sh ./mutant.sh</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">6/7 (só a peça 4 ausente)</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown | grep '&lt;n&gt;'</code></pre></div></li><li><label><input type="checkbox"><span class="box"></span><span class="crit">0 HARD</span></label><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/lint-artifacts.sh</code></pre></div></li></ul></div>
+  <div class="card">
+    <h3>6/7, não 5/7</h3>
+    <p>No ensaio deste material, feito sem o comando, a bancada ficou num script próprio e o censo a contou como ausente: ele só reconhece bancada registrada como família <code>run_&lt;n&gt;_selftests</code> dentro do <code>lint-selftest.sh</code>. Com o <code>/meta:forge</code>, a peça 7 já nasce como família, e o esperado é <strong>6/7</strong>, com a peça 4 (workflow) ausente por desenho.</p>
+    <p>O custo fica declarado: o <code>lint-selftest.sh</code> é arquivo do framework, e a família nova é uma customização local dele. Na próxima atualização ela vira conflito de merge, real e resolvível, e não sobrescrita silenciosa.</p>
+    <p class="note">Se a versão do comando que vocês têm emitir a bancada de outro jeito, o censo é quem diz: confiem nele, não neste slide.</p>
+  </div>
+</div></section>
+<section class="slide dense-slide" data-block="Bloco F · A forja" data-time="35 min" aria-label="Slide 46">
+<div class="kicker">Bloco F · Erros comuns e saída</div>
+<h2>Onde costuma dar errado</h2>
+<ul class="errs"><li><span class="err-k">Responder a entrevista com a forma do exemplo.</span><span class="err-v">A forja pergunta a topologia porque cada dor tem a sua. Copiar o <code>domain-anchor</code> para uma dor diferente petrifica a forma de um caso só.</span></li><li><span class="err-k">O censo não mostra a skill.</span><span class="err-v">Ela não está no índice: <code>git add</code> antes de medir.</span></li><li><span class="err-k">O medidor sai 1 no caso bom.</span><span class="err-v">Sob <code>set -e</code> e <code>pipefail</code>, um <code>grep -v</code> sem saída devolve 1 e mata o script. Proteja com <code>{ grep -v … || true; }</code>.</span></li><li><span class="err-k">O mutante passa.</span><span class="err-v">Ou o <code>sed</code> não casou (o <code>diff</code> sai vazio e a cópia é idêntica), ou a bancada não testa a linha que vocês estragaram.</span></li><li><span class="err-k">Lint acusa inventário.</span><span class="err-v">A REGRA 8 (Inventário canônico sincronizado com o filesystem) cobra a contagem nova de skills: rodem <code>/meta:inventory</code> e commitem junto.</span></li><li><span class="err-k">Lint acusa a lente.</span><span class="err-v">A REGRA 53 (Regra path-scoped declara <code>paths:</code> que casa algo real) exige <code>paths:</code> com um glob que case arquivo rastreado.</span></li></ul></section>
+<section class="slide " data-block="Bloco G · Fechamento" data-time="5 min" aria-label="Slide 47">
+<div class="kicker">Bloco G · Fechamento e ponte para a aula 6</div>
+<h2>Cada dupla mostra, em um minuto</h2>
+<ol class="moves five">
+  <li class="on"><b>1</b>o grafo consertado</li>
+  <li class="on"><b>2</b>as três âncoras no código</li>
+  <li class="on"><b>3</b>o documento ligado</li>
+  <li class="on"><b>4</b>a dissecação com o veredito selado</li>
+  <li class="on"><b>5</b>a skill forjada com o censo</li>
+</ol>
+<div class="two top">
+  <div class="card"><h3>A ponte</h3><p>Tudo o que fizemos hoje mora <strong>num repositório só</strong>. O hub tem grafo, o projeto tem grafo, e eles ainda não se falam: <code>external_edges:</code> liga grafos do mesmo repositório, e a skill forjada no projeto ainda não chega aos outros. A aula 6 junta as pontas: o hub como Company Brain, os projetos ligados a ele, o caminho de um componente subir para o hub e descer para os outros, e o caminho de um achado do time chegar ao core.</p></div>
+  <div class="card accent"><h3>Para casa</h3><p><code>/onion-retro</code> para registrar a aula, e cada dupla deixa o seu PR aberto com os cinco "prontos" no corpo.</p></div>
+</div></section>
+<section class="slide dense-slide" data-block="Cartão-resumo de comandos" data-time="" aria-label="Slide 48">
+<div class="kicker">Cartão-resumo de comandos · 1/2 · o grafo</div>
+<div class="cardx"><div class="cx-row"><div class="cx-k">achar os grafos</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>git ls-files '*.kg.yaml' | grep -v '/fixtures/'</code></pre></div></div></div><div class="cx-row"><div class="cx-k">validar um grafo</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-radar.sh &lt;g&gt; --integrity --schema</code></pre></div></div></div><div class="cx-row"><div class="cx-k">lacunas do domínio</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-radar.sh &lt;g&gt; --domain</code></pre></div></div></div><div class="cx-row"><div class="cx-k">frescor</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-radar.sh &lt;g&gt; --freshness</code></pre></div></div></div><div class="cx-row"><div class="cx-k">âncoras que não resolvem</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-trace-resolve.sh .</code></pre></div></div></div><div class="cx-row"><div class="cx-k">ver o grafo</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-view.sh &lt;g&gt; --markdown</code></pre></div></div></div><div class="cx-row"><div class="cx-k">console visual</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-console.sh &lt;g&gt; &gt; kg-console.html</code></pre></div></div></div><div class="cx-row"><div class="cx-k">mapear uma área</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:kg map &lt;área&gt;</code></pre></div></div></div><div class="cx-row"><div class="cx-k">re-verificar contra o vivo</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:kg-freshness &lt;g&gt;</code></pre></div></div></div><div class="cx-row"><div class="cx-k">abrir a sessão pelo grafo</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/warm-up</code></pre></div><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/catch-up</code></pre></div></div></div></div></section>
+<section class="slide dense-slide" data-block="Cartão-resumo de comandos" data-time="" aria-label="Slide 49">
+<div class="kicker">Cartão-resumo de comandos · 2/2 · runtime, dissecação e forja</div>
+<div class="cardx"><div class="cx-row"><div class="cx-k">fila de trabalho aberto</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:backlog</code></pre></div><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-backlog-project.sh --markdown</code></pre></div></div></div><div class="cx-row"><div class="cx-k">o plano ainda está alinhado (aligned)?</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:realign &lt;g&gt;</code></pre></div><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-realign-project.sh &lt;g&gt; --check</code></pre></div></div></div><div class="cx-row"><div class="cx-k">conduzir o plano</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:drive &lt;g&gt;</code></pre></div><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/kg-drive-project.sh &lt;g&gt;</code></pre></div></div></div><div class="cx-row"><div class="cx-k">decidir e selar</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:decide</code></pre></div><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/decide-census.sh . --markdown</code></pre></div></div></div><div class="cx-row"><div class="cx-k">dissecar uma ferramenta</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:dissect &lt;ferramenta&gt; --level 3</code></pre></div><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/dissect-census.sh . --markdown</code></pre></div><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/dissect-plans.sh . &lt;ferramenta&gt;</code></pre></div></div></div><div class="cx-row"><div class="cx-k">forjar</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:forge</code></pre></div><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown</code></pre></div></div></div><div class="cx-row"><div class="cx-k">criar a superfície</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:create-command</code></pre></div><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:create-skill</code></pre></div></div></div><div class="cx-row"><div class="cx-k">gate</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/meta:inventory</code></pre></div><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>bash .claude/validation/lint-artifacts.sh</code></pre></div></div></div><div class="cx-row"><div class="cx-k">fechar a aula</div><div class="cx-v"><div class="code mini"><button class="copy" type="button">copiar</button><pre><code>/onion-retro</code></pre></div></div></div></div></section>
+</main>
+<footer class="chrome-bot"><div class="progress"><i></i></div><span class="num-ind"></span></footer>
+<div class="navbtns"><button class="prev" type="button" aria-label="anterior">←</button><button class="next" type="button" aria-label="próximo">→</button></div>
+<script>
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var N = slides.length, cur = 0;
+  var elB = document.querySelector('.chrome-top .b');
+  var elT = document.querySelector('.chrome-top .t');
+  var elBar = document.querySelector('.progress i');
+  var elNum = document.querySelector('.num-ind');
+  slides.forEach(function (s, i) { s.setAttribute('data-n', String(i + 1)); });
+
+  try { var saved = localStorage.getItem('lesson5-theme'); if (saved) root.setAttribute('data-theme', saved); } catch (e) {}
+
+  function setHash(i) {
+    var h = '#' + (i + 1);
+    if (location.hash === h) return;
+    try { history.replaceState(null, '', h); } catch (e) { location.hash = h; }
+  }
+  function render() {
+    slides.forEach(function (s, i) {
+      s.classList.toggle('active', i === cur);
+      s.classList.toggle('cur', i === cur);
+    });
+    var s = slides[cur];
+    elB.textContent = s.getAttribute('data-block') || '';
+    elT.textContent = s.getAttribute('data-time') || '';
+    elBar.style.width = (N > 1 ? (cur / (N - 1)) * 100 : 100) + '%';
+    elNum.textContent = (cur + 1) + ' / ' + N;
+    document.title = 'Aula 5 — KG e Forja · ' + (cur + 1) + '/' + N;
+  }
+  function go(i) {
+    i = Math.max(0, Math.min(N - 1, i));
+    if (i !== cur) slides[i].scrollTop = 0;
+    cur = i; render(); setHash(cur);
+    if (document.body.classList.contains('overview')) slides[cur].scrollIntoView({ block: 'nearest' });
+  }
+  function fromHash() {
+    var m = /^#(\d+)$/.exec(location.hash || '');
+    return m ? parseInt(m[1], 10) - 1 : 0;
+  }
+  function toggleOverview(force) {
+    var on = typeof force === 'boolean' ? force : !document.body.classList.contains('overview');
+    document.body.classList.toggle('overview', on);
+    if (on) slides[cur].scrollIntoView({ block: 'center' });
+    else window.scrollTo(0, 0);
+  }
+  function toggleTheme() {
+    var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('lesson5-theme', next); } catch (e) {}
+  }
+  function toggleFull() {
+    var d = document;
+    if (!d.fullscreenElement && !d.webkitFullscreenElement) {
+      var r = root.requestFullscreen || root.webkitRequestFullscreen;
+      if (r) { var p = r.call(root); if (p && p.catch) p.catch(function () {}); }
+    } else {
+      var x = d.exitFullscreen || d.webkitExitFullscreen;
+      if (x) { var q = x.call(d); if (q && q.catch) q.catch(function () {}); }
+    }
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' && e.key === ' ') return;
+    var ov = document.body.classList.contains('overview');
+    switch (e.key) {
+      case 'ArrowRight': case 'PageDown': case ' ': case 'Spacebar':
+        e.preventDefault(); go(cur + 1); break;
+      case 'ArrowLeft': case 'PageUp':
+        e.preventDefault(); go(cur - 1); break;
+      case 'ArrowDown': if (ov) { e.preventDefault(); go(cur + 3); } break;
+      case 'ArrowUp': if (ov) { e.preventDefault(); go(cur - 3); } break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End': e.preventDefault(); go(N - 1); break;
+      case 'Enter': if (ov) { e.preventDefault(); toggleOverview(false); } break;
+      case 'Escape': if (ov) toggleOverview(false); break;
+      case 't': case 'T': toggleTheme(); break;
+      case 'f': case 'F': toggleFull(); break;
+      case 'o': case 'O': toggleOverview(); break;
+    }
+  });
+
+  slides.forEach(function (s, i) {
+    s.addEventListener('click', function () {
+      if (document.body.classList.contains('overview')) { go(i); toggleOverview(false); }
+    });
+  });
+
+  var tx = null, ty = null;
+  document.addEventListener('touchstart', function (e) {
+    if (e.touches.length !== 1) { tx = null; return; }
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+  }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if (tx === null || document.body.classList.contains('overview')) return;
+    var t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty;
+    tx = null;
+    if (e.target.closest && e.target.closest('pre')) return;
+    if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.4) go(cur + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  document.querySelector('.navbtns .prev').addEventListener('click', function () { go(cur - 1); });
+  document.querySelector('.navbtns .next').addEventListener('click', function () { go(cur + 1); });
+
+  function copyText(txt, btn) {
+    function done() {
+      btn.classList.add('ok'); btn.textContent = 'copiado';
+      setTimeout(function () { btn.classList.remove('ok'); btn.textContent = 'copiar'; }, 1400);
+    }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta); done();
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(done, fallback);
+    else fallback();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.copy'), function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var box = btn.closest('.code');
+      var c = box && box.querySelector('pre code');
+      if (c) copyText(c.textContent, btn);
+      btn.blur();
+    });
+  });
+
+  window.addEventListener('hashchange', function () { go(fromHash()); });
+  cur = Math.max(0, Math.min(N - 1, fromHash()));
+  render(); setHash(cur);
+})();
+</script>
+</body>
+</html>
