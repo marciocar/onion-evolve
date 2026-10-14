@@ -2,7 +2,8 @@
 title: 'Resíduo — a Tessl re-medida: piso não é total, e ausência não é retirada'
 date: 2026-10-14
 branch: docs/triage-tessl-landscape
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d5aa2d15f4c97690f5c6dda2c96df295c0104160ca15c620a73d16f2ce7ab458
+reviewed_code_sha256: 06b5d84c6f7d6ea1eb6e2413081c60d0c3cd630987772828fdba1c2a61997d28
 tokens: 150000
 duration_min: 10
 findings_total: 4
