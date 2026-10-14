@@ -29048,6 +29048,92 @@ KG
     record_pass "dissect: (q) baseline/review_after ENTRE ASPAS sao lidos (delta ⇒ fresco)"
   else record_fail "dissect: (q)" "data entre aspas nao lida: baseline='$(_col delta 4)' frescor='$(_col delta 6)'"; fi
 
+  # ── (s*/r*) RÉGUA POR ALVO e MODO ESTUDO (SAC-135, decisões do maestro de 2026-10-14) ──────
+  #     O estudo para no N2 SEM veredito e deixa a question "adotar?" aberta; parar no N2 SEM o
+  #     marcador continua sendo INTERROMPIDA. A régua (x_dissect_against) sai na coluna 8; ausente
+  #     = onion. Contra a versão antiga do censo, as colunas 8 e 9 nem existem: todos reprovam.
+  mkdir -p "${d}/docs/evolution/dissect/epsilon-2026-10"
+  cat > "${d}/docs/evolution/dissect/epsilon-2026-10/epsilon-2026-10.kg.yaml" <<'KG'
+meta:
+  id: epsilon-2026-10
+  x_dissect_tool: epsilon
+  x_dissect_mode: study
+  x_dissect_against: projeto-x
+  baseline: "2026-10-14"
+  review_after: "2099-01-01"
+nodes:
+  - id: Q_EPSILON_ADOTAR
+    node_type: question
+    status: open
+    x_dissect_level: 0
+  - id: E_EPSILON_N2
+    node_type: evidence
+    status: confirmed
+    x_dissect_level: 2
+KG
+  # zeta: parou no N2, sem veredito e SEM marcador de estudo ⇒ interrompida.
+  mkdir -p "${d}/docs/evolution/dissect/zeta-2026-10"
+  printf 'meta:\n  id: zeta\n  x_dissect_tool: zeta\nnodes:\n  - id: Q_Z\n    node_type: question\n    status: open\n    x_dissect_level: 2\n' \
+    > "${d}/docs/evolution/dissect/zeta-2026-10/zeta-2026-10.kg.yaml"
+  # eta: estudo COM veredito; theta: estudo cuja question foi fechada; iota: modo que o censo não conhece.
+  mkdir -p "${d}/docs/evolution/dissect/eta-2026-10" "${d}/docs/evolution/dissect/theta-2026-10" "${d}/docs/evolution/dissect/iota-2026-10"
+  printf 'meta:\n  id: eta\n  x_dissect_tool: eta\n  x_dissect_mode: study\nnodes:\n  - id: Q_E\n    node_type: question\n    status: open\n    x_dissect_level: 2\n  - id: D_E\n    node_type: decision\n    status: open\n    x_dissect_verdict: absorver\n' \
+    > "${d}/docs/evolution/dissect/eta-2026-10/eta-2026-10.kg.yaml"
+  printf 'meta:\n  id: theta\n  x_dissect_tool: theta\n  x_dissect_mode: study\nnodes:\n  - id: Q_T\n    node_type: question\n    status: resolved\n    x_dissect_level: 2\n  - id: E_T\n    node_type: evidence\n    status: open\n    x_dissect_level: 1\n' \
+    > "${d}/docs/evolution/dissect/theta-2026-10/theta-2026-10.kg.yaml"
+  printf 'meta:\n  id: iota\n  x_dissect_tool: iota\n  x_dissect_mode: estudo\nnodes:\n  - id: Q_I\n    node_type: question\n    status: open\n    x_dissect_level: 2\n' \
+    > "${d}/docs/evolution/dissect/iota-2026-10/iota-2026-10.kg.yaml"
+  _dc --tsv
+
+  # (s1) estudo declarado, no N2, sem veredito e com a question aberta ⇒ estado `estudo`.
+  #      MUTANTE: o ramo `study` desligado faz o epsilon cair em modo-DESCONHECIDO.
+  if [ "$(_col epsilon 9)" = "estudo" ]; then
+    record_pass "dissect: (s1) x_dissect_mode: study no N2 sem veredito e com question aberta ⇒ estado estudo"
+  else record_fail "dissect: (s1)" "esperado estudo p/ epsilon, veio '$(_col epsilon 9)'"; fi
+
+  # (s2) a MESMA parada no N2 SEM o marcador ⇒ interrompida, nunca estudo. MUTANTE: o default do
+  #      estado virar `estudo` daria a qualquer dissecação largada o selo de parada intencional.
+  if [ "$(_col zeta 9)" = "interrompida" ]; then
+    record_pass "dissect: (s2) parada no N2 SEM marcador de estudo ⇒ interrompida (nao estudo)"
+  else record_fail "dissect: (s2)" "esperado interrompida p/ zeta, veio '$(_col zeta 9)'"; fi
+
+  # (s3a) estudo COM veredito contradiz o modo ⇒ estudo-INCOERENTE(com-veredito).
+  case "$(_col eta 9)" in
+    estudo-INCOERENTE*com-veredito*) record_pass "dissect: (s3a) estudo com veredito ⇒ estudo-INCOERENTE(com-veredito)" ;;
+    *) record_fail "dissect: (s3a)" "esperado estudo-INCOERENTE(com-veredito) p/ eta, veio '$(_col eta 9)'" ;;
+  esac
+
+  # (s3b) estudo SEM question aberta (a "adotar?" foi fechada) ⇒ INCOERENTE(sem-question-aberta).
+  #       O nó evidence `open` do theta não conta: a question tem de ser `node_type: question`.
+  case "$(_col theta 9)" in
+    estudo-INCOERENTE*sem-question-aberta*) record_pass "dissect: (s3b) estudo sem question aberta ⇒ estudo-INCOERENTE(sem-question-aberta)" ;;
+    *) record_fail "dissect: (s3b)" "esperado sem-question-aberta p/ theta, veio '$(_col theta 9)'" ;;
+  esac
+
+  # (s4) modo que o censo NAO conhece (`estudo` em pt, em vez de `study`) ⇒ modo-DESCONHECIDO,
+  #      jamais lido como dissecação normal em silêncio. MUTANTE: sem o ramo, iota sai interrompida.
+  if [ "$(_col iota 9)" = "modo-DESCONHECIDO(estudo)" ]; then
+    record_pass "dissect: (s4) x_dissect_mode desconhecido ⇒ modo-DESCONHECIDO (fail-closed)"
+  else record_fail "dissect: (s4)" "esperado modo-DESCONHECIDO(estudo) p/ iota, veio '$(_col iota 9)'"; fi
+
+  # (r1) RÉGUA: x_dissect_against sai na coluna 8, e a ausência é `onion` (o comportamento de
+  #      sempre). MUTANTE: régua fixa no onion apaga o projeto-x.
+  if [ "$(_col epsilon 8)" = "projeto-x" ] && [ "$(_col alpha 8)" = "onion" ]; then
+    record_pass "dissect: (r1) regua = x_dissect_against (projeto-x); ausente ⇒ onion"
+  else record_fail "dissect: (r1)" "esperado projeto-x/onion, veio '$(_col epsilon 8)'/'$(_col alpha 8)'"; fi
+
+  # (m) CAMINHO DE PRODUÇÃO: o --markdown separa estudos de interrompidas em seções próprias, e o
+  #     frescor segue na ÚLTIMA coluna da tabela (o evolve-census conta vencidas por $NF).
+  _dc --markdown
+  local _sec_est _sec_int _last
+  _sec_est="$(printf '%s\n' "${_dc_out}" | awk '/^## /{on=($0 ~ /^## estudos/)} on' )"
+  _sec_int="$(printf '%s\n' "${_dc_out}" | awk '/^## /{on=($0 ~ /^## interrompidas/)} on' )"
+  _last="$(printf '%s\n' "${_dc_out}" | awk -F' [|] ' '$1=="alpha"{v=$NF; gsub(/[[:space:]]/,"",v); print v; exit}')"
+  if grep -q 'epsilon' <<< "${_sec_est}" && ! grep -q 'zeta' <<< "${_sec_est}" \
+     && grep -q 'zeta' <<< "${_sec_int}" && ! grep -q 'epsilon' <<< "${_sec_int}" && [ "${_last}" = "fresco" ]; then
+    record_pass "dissect: (m) --markdown separa estudos de interrompidas e mantem frescor na ultima coluna"
+  else record_fail "dissect: (m)" "secoes/coluna erradas (ultima de alpha='${_last}'): $(_emit "${_dc_out}" | head -c 400)"; fi
+
   # ── (p*) dissect-plans.sh: a COSTURA dissect→forge (SAC-77). As pecas do alvo saem do forge-census
   #     REAL copiado para a sandbox, nunca do plano; e proveniencia/licenca/paridade/forma sao
   #     obrigatorias. Cada caso isola a sua ferramenta pelo argumento <ferramenta> do dissect-plans.sh.
@@ -29136,6 +29222,48 @@ KG
   if [ "${prc}" = "1" ] && grep -q 'alvo-fora-do-forge-census' <<< "${po}"; then
     record_pass "dissect: (p5) alvo inexistente no forge-census ⇒ INCOMPLETO(alvo-fora-do-forge-census)"
   else record_fail "dissect: (p5)" "alvo fantasma passou (rc=${prc}): $(_emit "${po}" | head -c 300)"; fi
+
+  # (p7) ESTUDO NÃO É PLANO: nó x_absorb_* num grafo de estudo ⇒ rc=1 INCOMPLETO(estudo-nao-tem-plano).
+  #      Contra a versão antiga, o plano saía COMPLETO (rc=0): o estudo emitia plano sem veredito.
+  _plan pstudy alvo "5" "${pin}" MIT reescrita "${par}"
+  sed -i 's/^  x_dissect_tool: pstudy$/&\n  x_dissect_mode: study/' "${d}/docs/evolution/dissect/pstudy-2026-10/pstudy-2026-10.kg.yaml"
+  git -C "${d}" add -A >/dev/null 2>&1
+  if po="$(bash "${plans_sut}" "${d}" pstudy 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "1" ] && grep -q 'INCOMPLETO(estudo-nao-tem-plano)' <<< "${po}"; then
+    record_pass "dissect: (p7) plano dentro de grafo de ESTUDO ⇒ rc=1 INCOMPLETO(estudo-nao-tem-plano)"
+  else record_fail "dissect: (p7)" "estudo virou plano (rc=${prc}): $(_emit "${po}" | head -c 300)"; fi
+
+  # (p8) RÉGUA POR ALVO sem a raiz do alvo ⇒ rc=3 NAO-MEDIDO(repo-do-alvo-sem-raiz). O alvo
+  #      `alvo` EXISTE neste repo — contra a versão antiga o plano saía COMPLETO medido no repo
+  #      errado (a régua do framework), que é exatamente o defeito.
+  _plan pagainst alvo "5" "${pin}" MIT reescrita "${par}"
+  sed -i 's/^  x_dissect_tool: pagainst$/&\n  x_dissect_against: projeto-y/' "${d}/docs/evolution/dissect/pagainst-2026-10/pagainst-2026-10.kg.yaml"
+  git -C "${d}" add -A >/dev/null 2>&1
+  if po="$(bash "${plans_sut}" "${d}" pagainst 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "3" ] && grep -q 'NAO-MEDIDO(repo-do-alvo-sem-raiz' <<< "${po}" && grep -q 'no repo `projeto-y`' <<< "${po}"; then
+    record_pass "dissect: (p8) plano com regua projeto-y SEM --against-root ⇒ rc=3 NAO-MEDIDO (nunca medido neste repo)"
+  else record_fail "dissect: (p8)" "regua por alvo medida no repo errado (rc=${prc}): $(_emit "${po}" | head -c 300)"; fi
+
+  # (p9) com --against-root, as peças se medem NO REPO DO ALVO: lá o `alvo` NÃO tem a peça 5 (aqui
+  #      tem) ⇒ 5:falta. MUTANTE: o forge-census apontado para este repo devolveria 5:existe.
+  local tgt_repo; tgt_repo="$(mktemp -d)"
+  git -C "${tgt_repo}" init -q -b main 2>/dev/null
+  mkdir -p "${tgt_repo}/.claude/commands/meta"
+  printf -- '---\ndescription: alvo no repo do alvo\n---\nSem destino declarado.\n' > "${tgt_repo}/.claude/commands/meta/alvo.md"
+  git -C "${tgt_repo}" add -A >/dev/null 2>&1
+  if po="$(bash "${plans_sut}" "${d}" pagainst --against-root "projeto-y=${tgt_repo}" 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "0" ] && grep -q 'COMPLETO' <<< "${po}" && grep -q '5:falta' <<< "${po}"; then
+    record_pass "dissect: (p9) --against-root mede as pecas no repo do ALVO (5:falta la, embora exista aqui)"
+  else record_fail "dissect: (p9)" "esperado rc=0 + 5:falta medido no alvo, veio rc=${prc}: $(_emit "${po}" | head -c 300)"; fi
+
+  # (p10) raiz do alvo que o forge-census NAO mede (sem indice git) ⇒ rc=3 NAO-MEDIDO, nunca
+  #       "alvo-fora-do-forge-census" (que culparia o plano por uma medição que não houve).
+  local tgt_nogit; tgt_nogit="$(mktemp -d)"
+  if po="$(bash "${plans_sut}" "${d}" pagainst --against-root "projeto-y=${tgt_nogit}" 2>&1)"; then prc=0; else prc=$?; fi
+  if [ "${prc}" = "3" ] && grep -q 'forge-census-nao-mediu-o-repo-do-alvo' <<< "${po}"; then
+    record_pass "dissect: (p10) repo do alvo que o forge-census nao mede ⇒ rc=3 NAO-MEDIDO (nao culpa o plano)"
+  else record_fail "dissect: (p10)" "esperado rc=3 forge-census-nao-mediu, veio rc=${prc}: $(_emit "${po}" | head -c 300)"; fi
+  rm -rf "${tgt_repo}" "${tgt_nogit}"
 
   # (p6) sem forge-census.sh ⇒ rc=3: pecas que nao podem ser MEDIDAS nao viram plano julgado.
   rm -f "${d}/.claude/validation/forge-census.sh"
