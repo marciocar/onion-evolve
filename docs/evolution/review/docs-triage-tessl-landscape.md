@@ -2,8 +2,8 @@
 title: 'Resíduo — a Tessl re-medida: piso não é total, e ausência não é retirada'
 date: 2026-10-14
 branch: docs/triage-tessl-landscape
-reviewed_diff_sha256: d3b88418c551f60f2ec01def8d00ef968178bbbba072e66069ddcb2066ffc30a
-reviewed_code_sha256: 19a3340dac283b044ead8e163efe2bce463e7ceeaa8ea25b2a36035398de0bda
+reviewed_diff_sha256: pendente
+tokens: 150000
 duration_min: 10
 findings_total: 4
 findings_real: 4
@@ -14,7 +14,7 @@ nota: >-
   Passada adversarial curta, feita pelo próprio autor da triagem e não por um refutador
   independente. Ela olhou duas perguntas: o piso de 1.274 está escrito como piso, e o pivô da Tessl
   está afirmado com citação da doc pública? Saíram 4 achados reais; 3 foram curados no diff e 1 fica
-  declarado.
+  declarado. O campo tokens é o total da sessão do agente que triou (contador de contexto), não só da passada.
 ---
 
 # A Tessl re-medida: o que o sinal sustenta e o que não sustenta
