@@ -21867,11 +21867,24 @@ open(p, "w", encoding="utf-8").write(s[:i] + "\n".join(sys.argv[2:]) + "\n" + s[
   if [ "$(grep -c 'famílias=<todas>' <<< "${out}")" -eq 1 ]; then
     record_pass "selftest-selection: (d) arquivo do domínio citado só por '# selftest-covers:' continua comprando todas (fraca só acrescenta)"
   else record_fail "selftest-selection: (d) fraca estreitou" "$(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
-  # (d2) o failsafe seguro FICA: hook que ninguém cita ⇒ todas, motivo impresso
-  out="$(bash "${sut}" --affected .claude/hooks/rule-title-in-prose.sh --dry-run 2>&1 || true)"
-  if grep -q 'famílias=<todas>' <<< "${out}" && grep -q 'não é citado por nenhuma família' <<< "${out}"; then
-    record_pass "selftest-selection: (d2) hook sem família ⇒ todas, com o motivo (o failsafe ficou)"
-  else record_fail "selftest-selection: (d2) failsafe" "$(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
+  # (d2) o failsafe seguro FICA: hook que ninguém cita ⇒ todas, motivo impresso.
+  #      O hook é ESCOLHIDO na hora, entre os que o seletor diz que nenhuma família cita. Até 2026-10-14 o
+  #      exemplo era fixo (rule-title-in-prose.sh) e o caso quebrou no dia em que esse hook ganhou família
+  #      (SAC-137): exemplo fixo envelhece com o que ele exemplifica. Sem hook nenhum nessa condição, o caso
+  #      é PULADO declarado, nunca passa por ausência.
+  local _d2h="" _d2c
+  for _d2c in "${REPO_ROOT}"/.claude/hooks/*.sh; do
+    out="$(bash "${sut}" --affected ".claude/hooks/${_d2c##*/}" --dry-run 2>&1 || true)"
+    if grep -q 'não é citado por nenhuma família' <<< "${out}"; then _d2h=".claude/hooks/${_d2c##*/}"; break; fi
+  done
+  if [ -z "${_d2h}" ]; then
+    record_skip "selftest-selection: (d2) nenhum hook sem família hoje — o failsafe não tem exemplo vivo"
+  else
+    out="$(bash "${sut}" --affected "${_d2h}" --dry-run 2>&1 || true)"
+    if grep -q 'famílias=<todas>' <<< "${out}" && grep -q 'não é citado por nenhuma família' <<< "${out}"; then
+      record_pass "selftest-selection: (d2) hook sem família (${_d2h##*/}) ⇒ todas, com o motivo (o failsafe ficou)"
+    else record_fail "selftest-selection: (d2) failsafe" "${_d2h}: $(grep '^dry-run' <<< "${out}" | cut -c1-200)"; fi
+  fi
 
   # (e) CHECKPOINT declarado: mostra a seleção, a linha de máquina e diz que não validou
   out="$(bash "${sut}" --affected .claude/skills/onion/SKILL.md --checkpoint 2>&1 || true)"

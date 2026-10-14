@@ -2,11 +2,10 @@
 branch: fix/stop-hooks-tail-and-notification-evidence
 pr: pendente
 date: 2026-10-14
-reviewed_diff_sha256: 79a42360dc79d0854830294ea6fa321c3f896a10b6c87e717b00170c0ef9e45b
-reviewed_code_sha256: 7fee0f8f1b7cf3e9afa40a8af8f0b5c3b62e02dec5dc6f29a28a1e891bcea650
-findings_total: 3
-findings_real: 3
-findings_fixed: 2
+reviewed_diff_sha256: pendente
+findings_total: 4
+findings_real: 4
+findings_fixed: 3
 tokens: 0
 duration_min: 0
 verdict: REPROVADO_E_CURADO
@@ -43,3 +42,7 @@ O que a passada deve atacar:
    de vocabulário anterior a esta mudança (o hook não reconhece afirmação de TÉRMINO sem notificação nem
    observação). Fica declarada, para a próxima forja da guarda.
 3. **O fail-safe vira silêncio?** Não: estourado o teto, o lib relê o arquivo inteiro (casos m2 e f, mutante M2).
+4. **Rodada 1 do CI: o exemplo fixo do failsafe envelheceu.** O caso (d2) da `selftest_selection` usava o
+   `rule-title-in-prose.sh` como "hook que nenhuma família cita", e este PR criou a família dele. Real, curado:
+   o caso escolhe na hora, pelo próprio seletor, um hook que nenhuma família cita, e sem nenhum é pulado
+   declarado. Família 22/0.
