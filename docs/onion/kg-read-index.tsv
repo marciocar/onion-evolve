@@ -147,6 +147,8 @@
 .claude/hooks/co-evolution-inbox-check.sh	E_session_hook_pulls	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_timeout_is_load_bearing	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_MEDICAO_READ_VS_BASH_NO_CORPUS_DE_TRANSCRICOES	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/hooks/kg-read-leg.sh	E_OBJECAO_HOOK_STALENESS_IS_THE_BRANCH	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
+.claude/hooks/kg-read-leg.sh	E_OBJECAO_MAIN_MUST_KEEP_VERSIONING	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_PERNA_DE_LEITURA_E_CEGA_A_BASH	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/kg-read-leg.sh	Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE	docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml
@@ -1776,6 +1778,7 @@ docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md	E_F1_E6_FRONTEIRA_MODE
 docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml	C_O_EVOLVE_NAO_E_FRACO_E_SEM_GATILHO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml	Q_E3_DELTA_2_1_257	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 docs/evolution/research/merge-process-onion-2026-10/SYNTHESIS.md	E_LACUNAS_MERGE_PROCESS_2026_10	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
+docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml	E_OBJECAO_REGEN_PR_PER_MERGE_DOUBLES_QUEUE	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md	C_BITEMPORAL_E_REVISITA_FECHAM_O_ENVELHECIMENTO	docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml
 docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md	C_ESCOLHA_DE_FONTES_E_DADO_MAIS_GUARDA	docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml
 docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md	C_LENTE_E_SPEC_CARREGADA_NAO_COMANDO_NOVO	docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml
@@ -1959,6 +1962,7 @@ docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-20
 docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml	C_OPCAO_D_NAO_PODAR	docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml
 docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml	D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS	docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml
 docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml	E_LACUNAS_DECLARADAS_PODA_0903	docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml
+docs/evolution/research/postmerge-projection-writer-2026-10/SYNTHESIS.md	Q_GUARDA_DE_MAIN_CASA_PELO_NOME	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md	E_FABLE_5_1_CONFIRMADO_NA_CONTA	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md	E_LACUNAS_DECLARADAS_E3_0902	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md	E_F7_EXIT2_INTACTO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
@@ -2360,7 +2364,10 @@ ops/pr-merge-verified.sh	C_CHAINED_SYNC_IS_FLAWED	docs/onion/graph/sync-gate-sup
 ops/pr-merge-verified.sh	D_SYNC_GATED_IN_MERGE_PROOF	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
 ops/pr-merge-verified.sh	E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/pr-merge-verified.sh	E_CURE_PROVEN_BY_BEHAVIOR	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
+ops/pr-merge-verified.sh	E_MEDICAO_RULESET_E_PROJECOES_2026_10_14	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 ops/pr-merge-verified.sh	E_MERGE_SEM_CI_EXECUTADO_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
+ops/pr-merge-verified.sh	E_OBJECAO_INCIDENT_ACCUSES_MERGE_WITHOUT_CI	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
+ops/pr-merge-verified.sh	E_OBJECAO_REGEN_ON_REBASE_ALREADY_EXISTS	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 ops/pr-merge-verified.sh	E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 ops/pr-merge-verified.sh	E_STRICT_LOCAL_EXECUTADO_2026_10_14	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
 ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
