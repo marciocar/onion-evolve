@@ -1,11 +1,10 @@
 ---
 branch: feat/decide-and-forge-travel
 date: 2026-10-14
-reviewed_diff_sha256: fe4a5743cfe137c9ec7cd9b4030fd207ef065abd083e7e47d8df4fd5f71d04cf
-reviewed_code_sha256: 59f4eed3d7bbb5fa24acdaf9f1f517087a5b81ef08e73fd6ca624abdd92066fd
-findings_total: 3
-findings_real: 3
-findings_fixed: 3
+reviewed_diff_sha256: pendente
+findings_total: 4
+findings_real: 4
+findings_fixed: 4
 tokens: 0
 duration_min: 40
 verdict: REPROVADO_E_CURADO
@@ -36,3 +35,8 @@ Os selos estão nos grafos: `D_DECIDE_VIAJA_PARA_TODOS_MENOS_MINI` (supera `Q_DE
    medição do lado de quem consome". A medição existe (o censo rodou num hub, no ensaio da aula: 59 candidatos), e
    a cláusula agora declara a fronteira que continua: o censo só reconhece a bancada (peça 7) dentro do
    `lint-selftest.sh`, que no adotante vira conflito de update.
+4. **O checador viaja vivo no plugin?** Real, curado na rodada 1 do CI: a família `plugin_bundle` reprovou pela REGRA 74
+   (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca), porque o `kg-contract-check.sh` cita a biblioteca
+   `utils/kg` com o caminho nu num comentário, e a catraca do baseline cresceu. O comentário cita sem o prefixo, e o
+   manifesto leva `.claude/utils/kg` (o checador a importa de `validation/../utils/kg`). `plugin_bundle` e
+   `assemble_plugin` deram 21/0.

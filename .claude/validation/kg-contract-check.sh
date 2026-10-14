@@ -18,7 +18,7 @@
 #   · arquivo FORA do índice do git (grafo novo) → MUST e SHOULD vazios;
 #   · arquivo RASTREADO → MUST vazio, e nenhum código SHOULD que a versão de HEAD não tinha
 #     (a dívida herdada do arquivo não é cobrada aqui; a migração do corpus é outro trabalho).
-#   · CAMINHO DE MÁQUINA (REGRA 99, SAC-103, 2026-10-10), pela CLASSE de .claude/utils/kg/machine_path.py — a
+#   · CAMINHO DE MÁQUINA (REGRA 99, SAC-103, 2026-10-10), pela CLASSE de utils/kg/machine_path.py — a
 #     mesma do migrador e da catraca do lint: grafo NOVO nasce sem nenhum; RASTREADO não ganha nenhum que a
 #     versão de HEAD não tinha. Nó marcado `x_path_is_content` (selo P4) isenta, com a condição do selo.
 #
