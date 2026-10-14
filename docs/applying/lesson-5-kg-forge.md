@@ -73,7 +73,7 @@ Confira em 2 minutos, no começo da aula:
 Antes da aula, quem cuida do hub roda o **`/meta:adopt --update` do hub** e mergeia a
 atualização: os blocos D, E e F pedem um pin que já traga o `/meta:decide`, o `/meta:dissect` e o
 `/meta:forge` abertos
-(pin **≥ <a definir>**). Depois, os projetos adotados pelo hub se atualizam do mesmo jeito.
+(pin **≥ 6e6deab1c443 (onion-v1.2.0)**). Depois, os projetos adotados pelo hub se atualizam do mesmo jeito.
 
 ```bash
 git status --short                       # árvore limpa (ou um commit WIP antes de começar)
@@ -326,14 +326,14 @@ bash .claude/validation/kg-backlog-project.sh --markdown | head -20  # as pergun
 
 ## Bloco D — O grafo como runtime (20 min)
 
-> **Pré-requisito deste bloco, do E e do F:** o hub num pin **≥ <a definir>**, que já traz o `/meta:decide`
+> **Pré-requisito deste bloco, do E e do F:** o hub num pin **≥ 6e6deab1c443 (onion-v1.2.0)**, que já traz o `/meta:decide`
 > e o `/meta:forge` abertos para o papel hub. Confira com `cat .claude/.onion-version` e
 > `ls .claude/commands/meta/decide.md .claude/validation/kg-decide-seal.sh`.
 
 **Conceito.** Um grafo que só se lê na hora de escrever é documentação. Aqui ele **dirige** o
 trabalho: o `/warm-up` e o `/catch-up` o leem para abrir a sessão; o `/meta:backlog` projeta os nós
 `open` numa fila única, ordenada por atenção (impacto × incerteza × status); o `/meta:realign`
-confere se o plano ainda coere com o vivo, em três camadas (passado, presente, futuro); o
+confere se o plano ainda está alinhado (aligned) com o vivo, em três camadas (passado, presente, futuro); o
 `/meta:drive` conduz o plano nó a nó, a partir da fila pronta. A **decisão** também mora no grafo, e
 quem a fecha é o `/meta:decide`: ele mede o que está em voo, tira o que a sessão pode medir sozinha,
 pergunta o resto com opções e sela cada resposta no nó. Ninguém edita o selo à mão.
@@ -413,7 +413,7 @@ bash .claude/validation/kg-realign-project.sh <grafo> --check                   
 
 ## Bloco E — Dissecar antes de adotar: o `/meta:dissect` (25 min)
 
-> **Pré-requisito:** o mesmo pin dos blocos D e F (**≥ <a definir>**), que traz o `/meta:dissect`
+> **Pré-requisito:** o mesmo pin dos blocos D e F (**≥ 6e6deab1c443 (onion-v1.2.0)**), que traz o `/meta:dissect`
 > aberto para o papel hub. Confira com `ls .claude/commands/meta/dissect.md .claude/validation/dissect-census.sh .claude/validation/dissect-plans.sh`.
 
 **Conceito.** Antes de forjar, a pergunta é se alguém lá fora já resolveu a dor. O `/meta:dissect`
@@ -913,7 +913,7 @@ medidor e a bancada (peças 3 e 7); a superfície e a lente ficam de lição de 
 | re-verificar contra o vivo | `/meta:kg-freshness <g>` |
 | abrir a sessão pelo grafo | `/warm-up` · `/catch-up` |
 | fila de trabalho aberto | `/meta:backlog` · `bash .claude/validation/kg-backlog-project.sh --markdown` |
-| o plano ainda coere? | `/meta:realign <g>` · `bash .claude/validation/kg-realign-project.sh <g> --check` |
+| o plano ainda está alinhado (aligned)? | `/meta:realign <g>` · `bash .claude/validation/kg-realign-project.sh <g> --check` |
 | conduzir o plano | `/meta:drive <g>` · `bash .claude/validation/kg-drive-project.sh <g>` |
 | decidir e selar | `/meta:decide` · `bash .claude/validation/decide-census.sh . --markdown` |
 | dissecar uma ferramenta | `/meta:dissect <ferramenta> --level 3` · censo: `bash .claude/validation/dissect-census.sh . --markdown` · plano: `bash .claude/validation/dissect-plans.sh . <ferramenta>` |
@@ -958,6 +958,6 @@ medidor e a bancada (peças 3 e 7); a superfície e a lente ficam de lição de 
 
 **Comandos que dependem do pin novo:** `/meta:decide` (com `decide-census.sh` e
 `kg-decide-seal.sh`), o `/meta:dissect` aberto ao hub (com o `dissect-plans.sh`) e a face do
-`/meta:forge` aberta ao hub, ambos no pin **≥ <a definir>**. Fora
+`/meta:forge` aberta ao hub, ambos no pin **≥ 6e6deab1c443 (onion-v1.2.0)**. Fora
 do bundle do hub, sem previsão: `kg-contract-check.sh` (o contrato formal do `.kg.yaml` não está
 vendorizado no hub).
