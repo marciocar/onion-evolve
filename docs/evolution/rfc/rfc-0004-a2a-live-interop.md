@@ -106,3 +106,7 @@ reputação como condicionante) ficam **gated atrás de dogfood**.
 - RFC-0001 (git-async — revisado por esta) · RFC-0003 (tiers/trust — base da aceitação) · `/meta:federation-*`
   (control-plane: veto fail-safe + rollback) · `members.yaml` (policy-as-data) · Achado #2 vendor-branch
   (never-clobber estrutural do mesh) · SDAAL `task-manager/factory.md` (precedente do `federation-transport`).
+- **Emenda EM ABERTO (2026-10-14, não selada):** "só sinais" → "conversa com consentimento por thread com
+  expiração" — nó `D_RFC0004_CONVERSA_POR_THREAD` em
+  `docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml` (opções A/B/C,
+  recomendação B condicionada ao spike). Até o maestro selar, esta RFC vale como está.

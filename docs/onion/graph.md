@@ -423,6 +423,12 @@ maestro	approves	assistant	conversa-plan-gate
 maestro	gates	assistant	conversa-plan-gate
 maestro	orchestrates	assistant	
 maestro	requests	assistant	conversa-plan-gate
+maestro-notebook-test	adopts	onion-evolve	
+maestro-notebook-test	mode	greenfield	
+maestro-notebook-test	pin	n/a	
+maestro-notebook-test	specialization	a2a-spike	
+maestro-notebook-test	tier	standalone	
+maestro-notebook-test	trust-advises	onion-evolve	
 marcio-pessoal	adopts	onion-evolve	
 marcio-pessoal	mode	regulated	
 marcio-pessoal	pin	n/a	

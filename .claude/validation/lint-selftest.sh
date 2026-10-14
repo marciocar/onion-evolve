@@ -9298,7 +9298,9 @@ YML
   # CLOCK-TRUST (carimbo de tempo só vale com fonte verificada): PATH stubado com TODAS as
   # ferramentas + timedatectl fake dizendo NTPSynchronized=no e sem chronyc/ntpstat → veto.
   local clkbin; clkbin="$(mktemp -d)"
-  for t in jq date mktemp python3 grep cat dirname git tr sed sort find awk head cut wc bash sha256sum openssl; do
+  # `mkdir` entrou em 2026-10-14: o anti-replay virou fail-closed (gravar o jti É verificar), e o
+  # PATH stubado sem mkdir só passava porque a gravação antiga engolia o erro com `|| true`.
+  for t in jq date mktemp mkdir python3 grep cat dirname git tr sed sort find awk head cut wc bash sha256sum openssl; do
     p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && ln -s "$p" "${clkbin}/$t"
   done
   printf '#!/usr/bin/env bash\necho no\n' > "${clkbin}/timedatectl"; chmod +x "${clkbin}/timedatectl"
@@ -9311,7 +9313,64 @@ YML
   rc=0; out="$(PATH="${clkbin}" A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"${ce}" 2>/dev/null)" || rc=$?
   if [ "${rc}" -eq 0 ] && grep -q '"verified":true' <<< "${out}"; then record_pass "a2a-verify: A2A_CLOCK_TRUST=attested → atestado explícito destrava a camada"
   else record_fail "a2a-verify: clock-attested" "out='${out}' rc=${rc}"; fi
-  rm -rf "${bin}" "${clkbin}" "${sb}"
+
+  # ANTI-REPLAY FAIL-CLOSED (2026-10-14): estado de jti NÃO-GRAVÁVEL → veto, nunca verified.
+  # A versão antiga gravava com `|| true` e emitia verified:true — o anti-replay sumia em silêncio.
+  # Fixture: `.claude/sessions` é um ARQUIVO no sandbox, então o mkdir -p falha mesmo sob root
+  # (chmod não barra root; um arquivo no lugar do diretório barra qualquer um).
+  local sbw; sbw="$(mktemp -d)"; mkdir -p "${sbw}/docs/evolution/federation" "${sbw}/.claude"
+  cp "${sb}/docs/evolution/federation/members.yaml" "${sbw}/docs/evolution/federation/members.yaml"
+  : > "${sbw}/.claude/sessions"
+  _verify_w() { rc=0; out="$(A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "$1" --receiver onion-evolve --repo "${sbw}" --dry-run --envelope - <<<"$2" 2>/dev/null)" || rc=$?; }
+  local we; we="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-unw)" acme onion-evolve "")"
+  _verify_w "${helper}" "${we}"
+  local rc_int=1
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"replay-state-unwritable"' <<< "${out}" && ! grep -q '"verified":true' <<< "${out}"; then
+    rc_int=0; record_pass "a2a-verify: estado de jti não-gravável → veto replay-state-unwritable (fail-closed)"
+  else record_fail "a2a-verify: replay-state-unwritable" "out='${out}' rc=${rc}"; fi
+  # (MUT) o mutante devolve o `|| true` antigo: grava-ou-ignora e emite verified. O caso tem de reprová-lo.
+  local mutd; mutd="$(mktemp -d)"
+  # As DUAS barreiras saem: a contagem pós-append (cura da corrida) também veta estado não-gravável,
+  # então um mutante que só tirasse o veto explícito seria morto pela outra e não provaria a primeira.
+  sed -e 's|^  veto "replay-state-unwritable" "replay"$|  true # MUTANTE: fail-open|' \
+      -e 's|^\[ "\$(grep -cxF "\${JTI}" "\${STATE}" 2>/dev/null)" = "1" \] \|\| veto "replay" "replay"$|true # MUTANTE: sem contagem|' \
+      "${helper}" > "${mutd}/a2a-verify.sh"
+  [ "$(grep -c '# MUTANTE' "${mutd}/a2a-verify.sh")" = "2" ] \
+    || record_fail "a2a-verify: (MUT) âncora" "o sed não aplicou as DUAS mutações (a linha da cura mudou?)"
+  cp "${REPO_ROOT}/.claude/utils/federation-transport/a2a-ssrf-check.sh" "${mutd}/" 2>/dev/null || true
+  # o mutante roda FORA da árvore: o REAL_ROOT dele cai em ${mutd}/../../.. — o trust-check precisa existir lá
+  local mroot; mroot="$(mktemp -d)"; mkdir -p "${mroot}/.claude/validation" "${mroot}/.claude/utils/federation-transport"
+  cp "${REPO_ROOT}/.claude/validation/trust-topology-check.sh" "${mroot}/.claude/validation/"
+  cp "${mutd}/a2a-verify.sh" "${mutd}/a2a-ssrf-check.sh" "${mroot}/.claude/utils/federation-transport/" 2>/dev/null
+  we="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-unw-mut)" acme onion-evolve "")"
+  _verify_w "${mroot}/.claude/utils/federation-transport/a2a-verify.sh" "${we}"
+  # O mutante só prova algo se ele RODOU até o fim: o desfecho esperado dele é verified:true (o
+  # fail-open de volta). Veto por OUTRO motivo (trust-check ausente, tooling) é mutante não exercido —
+  # e contá-lo como "mutante morto" seria falso-verde por vacuidade.
+  local rc_mut=0
+  if grep -q '"verified":true' <<< "${out}"; then rc_mut=1
+  elif ! grep -q '"reason":"replay-state-unwritable"' <<< "${out}"; then
+    record_fail "a2a-verify: (MUT) mutante não exercido" "vetou por outro motivo: out='${out}'"
+  fi
+  _prove_mutation "a2a-verify: (MUT) devolver o '|| true' faz o estado não-gravável voltar a verificar" \
+    "${helper}" "${mroot}/.claude/utils/federation-transport/a2a-verify.sh" "${rc_int}" "${rc_mut}"
+  # CORRIDA DE REPLAY (2026-10-14): 8 verificações SIMULTÂNEAS do mesmo jti → no máximo 1 verified.
+  # Com a cura (contagem == 1 depois do append) o teto vale sempre; o mutante sem a contagem só viola
+  # o teto quando a corrida acontece, então NÃO há mutante aqui — matá-lo seria sorte, não prova.
+  local sbr; sbr="$(mktemp -d)"; mkdir -p "${sbr}/docs/evolution/federation"
+  cp "${sb}/docs/evolution/federation/members.yaml" "${sbr}/docs/evolution/federation/members.yaml"
+  local re i; re="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-race)" acme onion-evolve "")"
+  for i in 1 2 3 4 5 6 7 8; do
+    ( A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sbr}" --dry-run --envelope - <<<"${re}" > "${sbr}/out.${i}" 2>/dev/null ) &
+  done
+  wait
+  # `grep -c` sai 1 quando conta zero: sob errexit+pipefail isso abortaria a bancada inteira
+  local nver nall; nver="$(cat "${sbr}"/out.* | grep -c '"verified":true' || true)"
+  nall="$(cat "${sbr}"/out.* | grep -c '"verified":' || true)"
+  if [ "${nver:-9}" -le 1 ] && [ "${nall:-0}" -eq 8 ]; then
+    record_pass "a2a-verify: 8 envios simultâneos do mesmo jti → no máximo 1 verified (deu ${nver})"
+  else record_fail "a2a-verify: corrida de replay" "verified=${nver} de 8 (esperava ≤1, e 8 vereditos)"; fi
+  rm -rf "${bin}" "${clkbin}" "${sb}" "${sbw}" "${mutd}" "${mroot}" "${sbr}"
 }
 
 # ---------------------------------------------------------------------------
