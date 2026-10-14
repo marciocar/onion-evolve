@@ -15,8 +15,8 @@
 #       Ramifica onion/vendor do HEAD da integração (framework LIMPO recém-instalado). Idempotente.
 #   vendor-branch.sh update <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
 #       Aplica o framework NOVO do core no onion/vendor (worktree) + durable-commit, depois mergeia na
-#       integração. Bootstrapa o vendor se ausente (legado). Exit: 0 merge limpo · 10 CONFLITO (humano
-#       resolve) · 11 BASE CRUZADA · 12 arquivo do core não chegou à vendor (nada mergeado) · 2 precondição.
+#       integração. Bootstrapa o vendor se ausente (legado). Exit: 0 merge limpo (ou conflito SÓ em
+#       projeção gerada, resolvido por regeneração e declarado) · 10 CONFLITO (humano resolve) · 11 BASE CRUZADA · 12 arquivo do core não chegou à vendor (nada mergeado) · 2 precondição.
 #
 # Reusa: durable-commit.sh (commit no vendor) · o manifest L1+L2 (mesma superfície do adopt).
 # Determinístico, sem jq. Exercitado por lint-selftest.sh (run_vendor_branch_selftests).
@@ -123,6 +123,59 @@ _vendor_is_framework_pure() {  # <TARGET> <SOURCE_ROOT> <INTEGRATION_BRANCH> →
   [ -z "$keep" ] && return 0
   printf '%s\n' "$keep" | head -8
   return 1
+}
+
+# ── CONFLITO SÓ EM PROJEÇÃO GERADA SE RESOLVE POR REGENERAÇÃO (SAC-139, 2026-10-14) ──────────────
+# Medido nos dois `--update` reais do dia (um hub com integração onion/develop, outro com main): o merge
+# deu rc=10 SÓ em `docs/onion/{inventory,testing-inventory,testing-state}.md` e `kg-read-index.tsv`,
+# porque as DUAS pontas as regeneram. Nenhuma das duas versões é a certa (a certa é a que o gerador
+# escreve sobre a árvore mergeada), e a resolução manual era sempre a mesma: `checkout --theirs`,
+# regenerar, `git add`, commitar. Aqui ela vira mecanismo, com três travas:
+#   1. TODO arquivo em conflito tem de estar na lista do GERADOR (`--list-outputs`), por linha inteira
+#      (`grep -vxF`). Um único arquivo fora dela (customização de framework) → nada é tocado, rc=10.
+#   2. Gerador ausente/mudo ou que falha → rc=10, e os marcadores VOLTAM (`checkout -m`): falha fechada.
+#   3. A resolução é DECLARADA no stdout (quantos e quais), nunca calada.
+_autoresolve_projections() {  # <TARGET> <CONFLITOS, um por linha> <args -m do merge...> → 0 resolvido · 1 não
+  local T="$1" conf="$2" gen_out outside n f; shift 2
+  gen_out="$(bash "${HERE}/regen-ssot-projections.sh" --list-outputs 2>/dev/null)" || gen_out=""
+  [ -n "${gen_out}" ] || return 1
+  outside="$(grep -vxF -f <(printf '%s\n' "${gen_out}") <<< "${conf}" || true)"
+  [ -z "${outside}" ] || return 1
+  n="$(grep -c . <<< "${conf}")"
+  local -a files=(); while IFS= read -r f; do [ -n "$f" ] && files+=("$f"); done <<< "${conf}"
+  # (modify/delete: o lado deles não existe e o `--theirs` recusa — os marcadores voltam, rc=10)
+  if ! git --literal-pathspecs -C "$T" checkout --theirs -- "${files[@]}" 2>/dev/null; then
+    git --literal-pathspecs -C "$T" checkout -m -- "${files[@]}" 2>/dev/null || true; return 1
+  fi
+  if ! bash "${HERE}/regen-ssot-projections.sh" "$T" >/dev/null 2>&1; then
+    git --literal-pathspecs -C "$T" checkout -m -- "${files[@]}" 2>/dev/null || true   # os marcadores voltam
+    echo "⚠️  Onion: ${n} conflito(s) só de projeção gerada, mas o gerador FALHOU no alvo — não resolvo às cegas." >&2
+    return 1
+  fi
+  # Stageia os arquivos em conflito (agora regenerados) e as projeções que o gerador reescreveu ao lado.
+  # (É a trava 1 que protege a customização: daqui em diante, o que estava em conflito é dado por resolvido.)
+  git --literal-pathspecs -C "$T" add -A -- "${files[@]}" 2>/dev/null || true
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    if [ -e "$T/$f" ] || git --literal-pathspecs -C "$T" ls-files --error-unmatch -- "$f" >/dev/null 2>&1; then
+      git --literal-pathspecs -C "$T" add -A -- "$f" 2>/dev/null || true
+    fi
+  done <<< "${gen_out}"
+  if [ -n "$(git -C "$T" diff --name-only --diff-filter=U 2>/dev/null)" ]; then
+    echo "⚠️  Onion: regenerei as projeções, mas ainda há conflito no índice — não concluo o merge." >&2
+    return 1
+  fi
+  local -a msg=("$@"); [ "${#msg[@]}" -ge 2 ] || msg=(-m "chore(onion): atualizar o Onion")
+  # A nota entra ANTES da assinatura (o último -m), para o trailer do adotante seguir no fim.
+  local -a full=("${msg[@]:0:2}" -m "Conflito só em projeção gerada (${n}), resolvido por regeneração: $(tr '\n' ' ' <<< "${conf}")" "${msg[@]:2}")
+  if ! git -C "$T" commit -q "${full[@]}" >/dev/null 2>&1; then
+    echo "⚠️  Onion: projeções regeneradas e stageadas, mas o commit do merge foi RECUSADO em $T — conclua com 'git commit'." >&2
+    return 1
+  fi
+  echo "Onion: resolvi ${n} conflito(s) de projeção gerada por regeneração (checkout --theirs + regen-ssot-projections.sh):"
+  printf '%s\n' "${conf}" | sed 's/^/    /'
+  echo "Onion: framework atualizado via merge de $VENDOR (pin ${PIN:-?})."
+  return 0
 }
 
 _seed() {  # <TARGET> <INTEGRATION_BRANCH>
@@ -372,10 +425,14 @@ except Exception: print("")' "$T/.claude/settings.json")"
     return 0
   fi
   # Merge deixou conflito (ou nada a fazer). Distinga:
-  if git -C "$T" diff --name-only --diff-filter=U 2>/dev/null | grep -q .; then
+  local _conf; _conf="$(git -c core.quotePath=false -C "$T" diff --name-only --diff-filter=U 2>/dev/null)"
+  if [ -n "${_conf}" ]; then
+    # >>> D_CURE-projection-autoresolve (run_vendor_branch_selftests (g3-MUT) remove ESTE bloco) >>>
+    _autoresolve_projections "$T" "${_conf}" "${_mmsg[@]}" && return 0
+    # <<< D_CURE-projection-autoresolve <<<
     echo "Onion: CONFLITO no merge de $VENDOR — customização local vs framework novo (never-clobber estrutural)." >&2
     echo "  Resolva em $T: 'git mergetool' ou edite os marcadores; depois 'git commit'. Arquivos:" >&2
-    git -C "$T" diff --name-only --diff-filter=U 2>/dev/null | sed 's/^/    /' >&2
+    printf '%s\n' "${_conf}" | sed 's/^/    /' >&2
     return 10
   fi
   # Sem conflito e merge não-zero → provavelmente nada a mergear (já atualizado).

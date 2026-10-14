@@ -6583,6 +6583,71 @@ run_vendor_branch_selftests() {
   else record_fail "vendor-branch: (g2-MUT)" "a mutação NÃO foi aplicada — âncora do sed não casou"; fi
   rm -rf "$mutp" "$c6" "$t6" 2>/dev/null
 
+  # (g3) CONFLITO SÓ EM PROJEÇÃO GERADA se resolve por regeneração (SAC-139, 2026-10-14: os dois
+  #      --update reais do dia deram rc=10 só em docs/onion/*, que as duas pontas regeneram). A fixture
+  #      põe as duas pontas escrevendo docs/onion/inventory.md (add/add) e o core com um gerador
+  #      vendorizado. Três modos: a = só projeção (rc 0, merge concluído, regenerada); b = projeção +
+  #      framework customizado (rc 10, nada tocado); c = sem gerador no alvo (rc 10, marcadores de volta).
+  _g3_case() {  # $1=motor $2=modo(a|b|c) $3=core $4=adotante → imprime "rc<TAB>saída"
+    local m="$1" md="$2" cc="$3" tt="$4" ib rc=0 out
+    _g3_core() { _vb_core "$1" "$2"; [ "$3" = c ] && return 0; mkdir -p "$1/.claude/validation"
+      printf '#!/usr/bin/env bash\nprintf "inventario gerado v%s\\n"\n' "$2" > "$1/.claude/validation/inventory.sh"
+      git -C "$1" add -A; git -C "$1" commit -qm "gerador v$2"; }
+    _g3_core "$cc" 1 "$md"; _vb_adopter "$tt" "$cc"; ib="$(git -C "$tt" rev-parse --abbrev-ref HEAD)"
+    bash "$m" seed "$tt" "$ib" >/dev/null 2>&1
+    mkdir -p "$tt/docs/onion"; printf 'inventario do lado da integracao\n' > "$tt/docs/onion/inventory.md"
+    [ "$md" = b ] && printf 'cmd v1 CUSTOMIZADO\n' > "$tt/.claude/commands/foo.md"
+    git -C "$tt" add -A; git -C "$tt" commit -qm "integracao regenera projecao"
+    _g2_vendor_projection "$tt" "$ib"
+    _g3_core "$cc" 2 "$md"
+    out="$(LC_ALL=C bash "$m" update "$tt" "$cc" "$(git -C "$cc" rev-parse --short=12 HEAD)" "$ib" 2>&1)" || rc=$?
+    printf '%s\t%s' "$rc" "$(tr '\n' ' ' <<< "$out")"
+  }
+  local c7 t7 r7 rc7 u7
+  c7="$(mktemp -d)/c7"; t7="$(mktemp -d)/a7"
+  r7="$(_g3_case "${helper}" a "$c7" "$t7")"; rc7="${r7%%$'\t'*}"
+  u7="$(git -C "$t7" diff --name-only --diff-filter=U 2>/dev/null)"
+  if [ "$rc7" -eq 0 ] && [ -z "$u7" ] && [ ! -e "$t7/.git/MERGE_HEAD" ] \
+     && [ "$(git -C "$t7" rev-list --parents -n1 HEAD | wc -w)" = "3" ] \
+     && [ "$(cat "$t7/docs/onion/inventory.md")" = "inventario gerado v2" ] \
+     && [ "$(git -C "$t7" show HEAD:docs/onion/inventory.md)" = "inventario gerado v2" ] \
+     && grep -q 'resolvi 1 conflito(s) de projeção gerada' <<< "${r7#*$'\t'}"; then
+    record_pass "vendor-branch: (g3a) conflito SÓ em projeção gerada → regenera, conclui o merge (rc 0, nenhum U) e DECLARA"
+  else record_fail "vendor-branch: (g3a) projeção gerada" "rc=$rc7 U=[$u7] inventory=[$(cat "$t7/docs/onion/inventory.md" 2>/dev/null | head -1)] out=${r7#*$'\t'}"; fi
+  r7="$(_g3_case "${helper}" b "$c7" "$t7")"; rc7="${r7%%$'\t'*}"
+  u7="$(git -C "$t7" diff --name-only --diff-filter=U 2>/dev/null)"
+  if [ "$rc7" -eq 10 ] && grep -qxF '.claude/commands/foo.md' <<< "$u7" && grep -qxF 'docs/onion/inventory.md' <<< "$u7" \
+     && grep -q '^<<<<<<<' "$t7/docs/onion/inventory.md"; then
+    record_pass "vendor-branch: (g3b) projeção + framework customizado em conflito → rc 10 e NADA resolvido (os dois seguem U)"
+  else record_fail "vendor-branch: (g3b) projeção + framework" "rc=$rc7 U=[$(tr '\n' ' ' <<< "$u7")]"; fi
+  git -C "$t7" merge --abort 2>/dev/null || true
+  r7="$(_g3_case "${helper}" c "$c7" "$t7")"; rc7="${r7%%$'\t'*}"
+  u7="$(git -C "$t7" diff --name-only --diff-filter=U 2>/dev/null)"
+  if [ "$rc7" -eq 10 ] && grep -qxF 'docs/onion/inventory.md' <<< "$u7" && grep -q '^<<<<<<<' "$t7/docs/onion/inventory.md"; then
+    record_pass "vendor-branch: (g3c) conflito só de projeção SEM gerador no alvo → rc 10, marcadores de volta (falha fechada)"
+  else record_fail "vendor-branch: (g3c) gerador ausente" "rc=$rc7 U=[$(tr '\n' ' ' <<< "$u7")] out=${r7#*$'\t'}"; fi
+  git -C "$t7" merge --abort 2>/dev/null || true
+  # (g3-MUT) dois mutantes, cada um contra o caso que ele deve derrubar: sem o bloco da cura, (a) volta
+  # a rc 10; resolvendo mesmo com arquivo FORA da lista, (b) passa a rc 0 e clobra a customização.
+  local mut7; mut7="$(mktemp -d)"; _adopt_sibs_beside "${mut7}"
+  awk '/^    # >>> D_CURE-projection-autoresolve/{skip=1} !skip{print} /^    # <<< D_CURE-projection-autoresolve/{skip=0}' \
+    "${helper}" > "${mut7}/mut-a.sh"
+  sed 's/^  \[ -z "\${outside}" \] || return 1$/  : # ONION_MUTANTE resolve mesmo com arquivo fora da lista/' "${helper}" > "${mut7}/mut-b.sh"
+  if grep -q 'D_CURE-projection-autoresolve' "${mut7}/mut-a.sh" || ! grep -q 'ONION_MUTANTE resolve mesmo' "${mut7}/mut-b.sh"; then
+    record_fail "vendor-branch: (g3-MUT)" "a mutação NÃO foi aplicada — âncora do awk/sed não casou"
+  else
+    r7="$(_g3_case "${mut7}/mut-a.sh" a "$c7" "$t7")"; rc7="${r7%%$'\t'*}"
+    if [ "$rc7" -eq 10 ]; then record_pass "vendor-branch: (g3-MUT a) sem a cura o conflito de projeção volta a rc 10 — a cura é load-bearing"
+    else record_fail "vendor-branch: (g3-MUT a)" "o mutante não mudou o desfecho (rc=$rc7)"; fi
+    git -C "$t7" merge --abort 2>/dev/null || true
+    r7="$(_g3_case "${mut7}/mut-b.sh" b "$c7" "$t7")"; rc7="${r7%%$'\t'*}"
+    if [ "$rc7" -ne 10 ]; then record_pass "vendor-branch: (g3-MUT b) sem a trava da lista o arquivo de framework é resolvido às cegas (rc=$rc7) — a trava é load-bearing"
+    else record_fail "vendor-branch: (g3-MUT b)" "o mutante não mudou o desfecho (rc=$rc7) — o caso (b) não prova a trava"; fi
+    git -C "$t7" merge --abort 2>/dev/null || true
+  fi
+  rm -rf "$mut7" "$c7" "$t7" 2>/dev/null
+  unset -f _g3_case _g3_core _g2_vendor_projection
+
   rm -rf "$core" "$t" "$c2" "$t2" "$c3" "$t3" "$c4" "$t4" "$c5" "$t5" 2>/dev/null
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
 }
