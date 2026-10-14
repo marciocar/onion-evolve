@@ -58,6 +58,18 @@
 #           A decisão é impressa e vai no comentário do auto-rebase. Rede: a bancada completa no push ao
 #           main + o alarme (ops/testing/main-bench-alarm.sh). JANELA DECLARADA: quebra SEMÂNTICA entre
 #           dois PRs que mudam arquivos diferentes passa e só a completa do main pega.
+#           CONDIÇÃO (8), FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10 (2026-10-14): as projeções geradas do
+#           head novo (regeneradas na árvore COMBINADA pelo pr-finalize) têm de ser BYTE-IDÊNTICAS às que o
+#           head anterior trazia. Mudou alguma ⇒ o CI nunca viu aquela projeção, e não há caminho rápido.
+#   STRICT LOCAL (sem flag, FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10, 2026-10-14): o ruleset do main
+#           tem strict_required_status_checks_policy: false (medido), então o forge aceita PR ATRÁS do main
+#           e mergeia uma árvore combinada que o CI nunca viu (o 478/479 do backlog: dois PRs fazem o mesmo
+#           477→478 no cabeçalho, o merge textual soma os itens). Aqui a base do PR tem de ser a PONTA da
+#           base: lido no forge (compare <base>...<head>, behind_by), que é o merge-base do head com a base
+#           ≠ ponta da base. Atrás ⇒ o MESMO auto-rebase do CONFLICTING (pr-finalize --rebase --push, que
+#           regenera as projeções na árvore combinada e as commita no head), com o MESMO teto de tentativas,
+#           e o head novo espera o CI salvo a condição (8). Ilegível ⇒ não mergeio (fail-closed). Com
+#           --merge-commit, PR atrás é RECUSADO: o rebase linearizaria o merge que é o conteúdo.
 #   --wait-ci-after-rebase: opt-out — depois do auto-rebase, espera o CI do head novo como antes.
 #   PROVENANCE DA BRANCH (sem flag, SAC-80, 2026-10-09): se o PR ADICIONA em `*.kg.yaml` um `source:`
 #           com `@<sha>` de commit que NÃO é ancestral da base (commit da própria branch), o rebase o
@@ -302,8 +314,9 @@ _rebase_trail() { # $1=head antigo $2=head novo (ou "—") $3=causa $4=N/MAX $5=
     "| tentativa | ${4} |" \
     "| desfecho | ${5} |" \
     "" \
-    "O PR estava CONFLICTING (o GitHub não dispara CI em PR em conflito). O rebase rodou na worktree" \
-    "local da branch por \`ops/pr-finalize.sh --rebase --push\`, que resolve só conflito de projeção gerada.")"
+    "${_RB_REASON_TEXT}" \
+    "O rebase rodou na worktree local da branch por \`ops/pr-finalize.sh --rebase --push\`, que resolve só" \
+    "conflito de projeção gerada e regenera as projeções na árvore combinada.")"
   if ! command -v gh >/dev/null 2>&1; then
     say "⚠️  auto-rebase SEM RASTRO no PR #${PR}: \`gh\` indisponível — head ${1:0:8} → ${2:0:8}, causa: ${3} (${4})"
     return 0
@@ -322,8 +335,9 @@ _rebase_trail() { # $1=head antigo $2=head novo (ou "—") $3=causa $4=N/MAX $5=
 # merge` sem --admin ainda LIGARIA o auto-merge em vez de mergear). A porta que mantém o head verificado
 # é o bypass do ruleset (admin, `bypass_mode: pull_request`, lido ao vivo como current_user_can_bypass =
 # pull_requests_only) com `--match-head-commit`: o forge só mergeia SE o head ainda é o que eu julguei.
-# O GitHub rebasear no merge (sem push de head novo) não serve aqui: o auto-rebase só roda em PR
-# CONFLICTING, e PR em conflito o forge não rebaseia.
+# O GitHub rebasear no merge (sem push de head novo) não serve aqui: o auto-rebase roda em PR
+# CONFLICTING (que o forge não rebaseia) e, desde a FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10, em PR
+# ATRÁS da base — e o rebase do forge no merge é justamente a árvore combinada que o CI nunca viu.
 # Cada condição falha para o lado de ESPERAR, nunca para o de pular. Projeção gerada não conta no
 # cruzamento de arquivos porque É ela que conflita (medido no #1071: testing-inventory.md) — sem isso a
 # regra nunca valeria; a regeneração é determinística, e o pr-finalize roda o lint (0 HARD) no head novo.
@@ -393,10 +407,26 @@ for r in d.get("rules",[]):
             onion_is_generated "${_x}" || printf '%s\n' "${_x}"
           done <<< "${_bd}")"
   [ -z "${_hit}" ] || { SKIP_DECISION="espera: o rebase trouxe mudança em arquivo(s) do PR: $(printf '%s\n' "${_hit}" | head -5 | paste -sd' ' -)"; return 1; }
+  # (8) FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10: o pr-finalize regenerou as projeções na árvore
+  # COMBINADA e as commitou no head novo. Se alguma ficou diferente do que o head anterior (o que o CI julgou)
+  # trazia, o CI nunca viu essa projeção — e foi exatamente assim que o 478/479 entrou no main. Byte a byte,
+  # pelo git; a lista é a da FONTE ÚNICA (onion-regen-lib.sh). Ler falhou ⇒ espera.
+  local _gen _pd
+  _gen="$(. "${_lib}" >/dev/null 2>&1; printf '%s %s' "${ONION_GENERATED:-}" "${ONION_GENERATED_DIRS:-}")"
+  [ -n "${_gen// /}" ] || { SKIP_DECISION="espera: a lista de projeções geradas saiu vazia — não sei comparar as projeções"; return 1; }
+  # shellcheck disable=SC2086  # a lista é de caminhos sem espaço, separados por espaço (a forma da lib)
+  _pd="$(git -C "${_w}" -c core.quotepath=off diff --no-ext-diff --no-textconv --name-only "${_old}" "${_new}" -- ${_gen} 2>/dev/null)" \
+    || { SKIP_DECISION="espera: não comparei as projeções do head anterior com as do head novo"; return 1; }
+  [ -z "${_pd}" ] || { SKIP_DECISION="espera: a regeneração na árvore combinada mudou projeção(ões) que o head anterior trazia: $(printf '%s\n' "${_pd}" | head -5 | paste -sd' ' -) — o CI nunca viu essa projeção"; return 1; }
+  # (9) o head novo AINDA na ponta: o main pode ter andado entre o rebase e esta decisão, e aí o forge
+  # rebasearia no merge — a combinação que o CI não viu, de novo. (A última leitura antes do merge cobre o
+  # resto da janela; esta existe para o rastro no PR não anunciar um merge sem CI que não vai acontecer.)
+  local _bh; _bh="$(_behind_base)" || { SKIP_DECISION="espera: não li a distância do head novo até a ponta de '${_BASE_REF}'"; return 1; }
+  [ "${_bh}" -eq 0 ] || { SKIP_DECISION="espera: o main andou ${_bh} commit(s) depois do rebase — o head novo não está mais na ponta de '${_BASE_REF}'"; return 1; }
   local _m _k=0; _m="$(pr_mergeable)"
   while [ "${_m}" = UNKNOWN ] && [ "${_k}" -lt 6 ]; do sleep "${_POLL_SECS}"; _m="$(pr_mergeable)"; _k=$((_k+1)); done
   [ "${_m}" = MERGEABLE ] || { SKIP_DECISION="espera: o head novo está '${_m:-ilegível}', não MERGEABLE"; return 1; }
-  SKIP_DECISION="SEM esperar o CI do head novo: rebase limpo, checks exigidos ($(printf '%s\n' "${_req}" | paste -sd, -)) verdes no head anterior ${_old:0:8}, o rebase não tocou arquivo do PR, sem alarme de main aberto"
+  SKIP_DECISION="SEM esperar o CI do head novo: rebase limpo, checks exigidos ($(printf '%s\n' "${_req}" | paste -sd, -)) verdes no head anterior ${_old:0:8}, o rebase não tocou arquivo do PR, projeções regeneradas na árvore combinada idênticas às do head anterior, sem alarme de main aberto"
   return 0
 }
 _mg="$(pr_mergeable)"
@@ -405,18 +435,54 @@ _n=0; while [ "$_mg" = UNKNOWN ] && [ "$_n" -lt 6 ]; do sleep "${_POLL_SECS}"; _
 # script uma vez por rodada) — sem ele o limite valeria por chamada e o laço voltaria pela porta da série.
 _rebases="${ONION_MERGE_REBASE_DONE:-0}"
 case "${_rebases}" in ''|*[!0-9]*) die "ONION_MERGE_REBASE_DONE='${_rebases}' não é inteiro — não sei quantos rebases já houve" ;; esac
-while [ "$_mg" = CONFLICTING ]; do
+# ══ STRICT LOCAL: a base do PR tem de ser a PONTA da base (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10) ══
+# O ruleset do main tem strict_required_status_checks_policy: false (medido, ops/github-ruleset-main.json):
+# o forge mergeia PR ATRÁS do main, e a árvore que entra é a COMBINADA, que o CI nunca viu. Foi assim que o
+# backlog entrou com 479 itens e o cabeçalho de 478 (E_OBJECAO_PER_PR_GATE_BLIND_STRICT_FALSE,
+# E_OBJECAO_INCIDENT_ACCUSES_MERGE_WITHOUT_CI). Ligar o strict no ruleset curaria o mesmo no forge, mas ele
+# barra o PR atrás sem rebaseá-lo; aqui o PR atrás é REBASEADO pelo mesmo auto-rebase do CONFLICTING (o
+# pr-finalize regenera as projeções na árvore combinada e as commita no head), e o head novo espera o CI,
+# salvo a condição (8) do caminho rápido (projeções byte-idênticas às do head anterior).
+# A leitura é do FORGE (compare <base>...<head>: behind_by = commits da base que o head não tem, isto é,
+# merge-base(head, base) ≠ ponta da base): é a base que o forge vai usar no merge, não a minha cópia local.
+# Ilegível ⇒ não mergeio: sem saber se a base é a ponta, o merge pode ser exatamente o do 478/479.
+# a base é lida UMA vez, aqui fora: _behind_base roda em $(…), e o que ela atribuísse morreria no subshell
+_BASE_REF="$(gh pr view "$PR" "${REPO_ARG[@]}" --json baseRefName --jq '.baseRefName' 2>/dev/null)"
+_behind_base() { # imprime quantos commits a base tem que o head não tem; rc≠0 = não consegui medir
+  local _slug="${OWNER_REPO:-}" _b; [ "${#REPO_ARG[@]}" -ge 2 ] && _slug="${REPO_ARG[1]}"
+  [ -n "${_BASE_REF}" ] || return 1
+  _b="$(gh api "repos/${_slug}/compare/${_BASE_REF}...${HEAD_SHA}" --jq '.behind_by' 2>/dev/null)" || return 1
+  case "${_b}" in ''|*[!0-9]*) return 1 ;; esac
+  printf '%s' "${_b}"
+}
+_behind="$(_behind_base)" \
+  || die "não consegui medir se a base do PR #${PR} é a ponta de '${_BASE_REF:-?}' (compare do forge ilegível) — não mergeio sem saber: o ruleset tem strict=false, e um PR atrás entraria com a árvore combinada que o CI nunca viu"
+[ "${_behind}" -gt 0 ] && say "PR #${PR} está ${_behind} commit(s) atrás de '${_BASE_REF}' — strict local: o merge exige a base na ponta (rebase antes)"
+# PR atrás com --merge-commit: o rebase linearizaria o merge que É o conteúdo (o PR de update de adotante
+# com onion/vendor). Recusa e diz o caminho; o CONFLICTING com --merge-commit segue como antes (declarado).
+if [ "${_behind}" -gt 0 ] && [ "$_mg" != CONFLICTING ] && [ "${MERGE_COMMIT}" -eq 1 ]; then
+  die "PR #${PR} está ${_behind} commit(s) atrás de '${_BASE_REF}' e o modo é --merge-commit — o auto-rebase linearizaria o merge da branch. Mergeie a base na branch à mão (git merge origin/${_BASE_REF}), espere o CI e rode de novo. Nada foi mergeado."
+fi
+_RB_REASON_TEXT=""
+while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
   _rebases=$((_rebases+1))
+  if [ "$_mg" = CONFLICTING ]; then
+    _rb_state="CONFLICTING"
+    _RB_REASON_TEXT="O PR estava CONFLICTING (o GitHub não dispara CI em PR em conflito)."
+  else
+    _rb_state="atrás de '${_BASE_REF}' (${_behind} commit(s), sem conflito)"
+    _RB_REASON_TEXT="O PR estava ATRÁS de \`${_BASE_REF}\` (${_behind} commit(s)) sem conflito. O ruleset não exige branch atualizada (strict=false), então o merge entraria com uma árvore combinada que o CI nunca viu: strict local (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10)."
+  fi
   [ "$_rebases" -le "$_REBASE_MAX" ] \
-    || die "PR #${PR} segue CONFLICTING depois de ${_REBASE_MAX} rebase(s) automático(s) — algo volta a conflitar a cada vez; não entro em laço. Investigue a branch '${HEAD_REF}'."
+    || die "PR #${PR} segue ${_rb_state} depois de ${_REBASE_MAX} rebase(s) automático(s) — algo volta a conflitar (ou o main não para de andar) a cada vez; não entro em laço. Investigue a branch '${HEAD_REF}' ou rode de novo com o main parado."
   # SAC-80: o rebase da branch reescreveria os commits que o .kg.yaml cita — e aí nem o --merge-commit
   # os salva (a citação passa a apontar para o commit velho, órfão). Conflito assim se resolve à mão.
   [ -z "${KG_BRANCH_SHAS}" ] \
-    || die "PR #${PR} está CONFLICTING e o .kg.yaml cita commit da própria branch ($(printf '%s' "${KG_BRANCH_SHAS}" | awk -F'\t' 'NF{printf "%s%s", (n++?" ":""), $1}')) — o auto-rebase reescreveria esses SHAs e a citação ficaria órfã (SAC-80). Resolva o conflito mergeando a base na branch, à mão, e rode de novo."
+    || die "PR #${PR} está ${_rb_state} e o .kg.yaml cita commit da própria branch ($(printf '%s' "${KG_BRANCH_SHAS}" | awk -F'\t' 'NF{printf "%s%s", (n++?" ":""), $1}')) — o auto-rebase reescreveria esses SHAs e a citação ficaria órfã (SAC-80). Resolva o conflito mergeando a base na branch, à mão, e rode de novo."
   _wt="$(_wt_of_branch "${HEAD_REF}")"
   [ -n "$_wt" ] \
-    || die "PR #${PR} está CONFLICTING (o GitHub não dispara CI em PR em conflito) e a branch '${HEAD_REF}' não está em nenhuma worktree deste repo — não rebaseio às cegas. Rode na worktree da branch: bash ops/pr-finalize.sh --rebase --push ; depois rode este comando de novo."
-  say "PR #${PR} CONFLICTING — auto-rebase ${_rebases}/${_REBASE_MAX} na worktree ${_wt} (pr-finalize --rebase --push)"
+    || die "PR #${PR} está ${_rb_state} (o GitHub não dispara CI em PR em conflito, e não testa a árvore combinada de PR atrás) e a branch '${HEAD_REF}' não está em nenhuma worktree deste repo — não rebaseio às cegas. Rode na worktree da branch: bash ops/pr-finalize.sh --rebase --push ; depois rode este comando de novo."
+  say "PR #${PR} ${_rb_state} — auto-rebase ${_rebases}/${_REBASE_MAX} na worktree ${_wt} (pr-finalize --rebase --push)"
   _old_head="${HEAD_SHA}"
   _wt_before="$(git -C "$_wt" rev-parse HEAD 2>/dev/null)"
   _rb_out="$(cd "$_wt" && bash ops/pr-finalize.sh --rebase --push 2>&1)"; _rb_rc=$?
@@ -461,7 +527,8 @@ while [ "$_mg" = CONFLICTING ]; do
   # rebase local foi limpo e quem disse CONFLICTING foi o forge — e isso também é dito, não inventado.
   _proj="$(LC_ALL=C grep -o 'conflito de projeção resolvido em [^ ]*' <<< "$_rb_out" | sed 's/^conflito de projeção resolvido em //' | paste -sd, - | sed 's/,/, /g')"
   if [ -n "${_proj}" ]; then _causa="projeção gerada: ${_proj}"
-  else _causa="nenhum arquivo em conflito no rebase local (o forge marcou CONFLICTING)"; fi
+  elif [ "${_rb_state}" = CONFLICTING ]; then _causa="nenhum arquivo em conflito no rebase local (o forge marcou CONFLICTING)"
+  else _causa="base atrás da ponta: ${_rb_state} — strict local"; fi
   if _skip_ci_decide "${_old_head}" "${HEAD_SHA}" "${_wt}" "${_wt_before}"; then
     SKIP_CI=1; GATE_SHA="${_old_head}"
     say "decisão: merge ${SKIP_DECISION}"
@@ -477,6 +544,9 @@ while [ "$_mg" = CONFLICTING ]; do
   fi
   _mg="$(pr_mergeable)"
   _n=0; while [ "$_mg" = UNKNOWN ] && [ "$_n" -lt 6 ]; do sleep "${_POLL_SECS}"; _mg="$(pr_mergeable)"; _n=$((_n+1)); done
+  # o main pode ter andado DURANTE o rebase: relê a distância do head novo; ilegível ⇒ não mergeio
+  _behind="$(_behind_base)" \
+    || die "depois do auto-rebase não consegui medir se o head ${HEAD_SHA:0:8} está na ponta de '${_BASE_REF}' — não mergeio sem saber"
 done
 if [ "$_rebases" -gt 0 ] && [ "${SKIP_CI}" -eq 0 ]; then
   say "auto-rebase feito — esperando as runs do head ${HEAD_SHA:0:8} NASCEREM e terminarem (prazo ${_WAIT_SECS}s)"
@@ -695,6 +765,21 @@ elif [ -n "${_REVIEW_OFF}" ]; then
   say "    anotação: ${_REVIEW_OFF}"
 else
   say "✓ onion-review-verdict = SUCCESS (fonte lida, não inferida)"
+fi
+
+# STRICT LOCAL, ÚLTIMA LEITURA (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10): entre o auto-rebase (ou a
+# 1ª leitura) e este ponto pode ter passado a espera inteira do CI — e o main anda nesse meio-tempo. O
+# --match-head-commit amarra o HEAD, não a BASE: se a base andou, o forge rebasearia no merge e a árvore
+# combinada seria de novo uma que o CI não viu. Relê ANTES de qualquer registro no PR (dispensa, CI morto).
+_behind="$(_behind_base)" \
+  || die "não consegui medir, logo antes do merge, se o head ${HEAD_SHA:0:8} está na ponta de '${_BASE_REF}' — não mergeio sem saber. Nada foi mergeado."
+if [ "${_behind}" -gt 0 ]; then
+  if [ "${NO_WAIT_AFTER_REBASE}" -eq 1 ]; then
+    printf '↻ PR #%s: o main andou %s commit(s) depois da leitura (head %s) — saio rc=4 sem mergear: a série o traz de novo e o auto-rebase o põe na ponta\n' \
+      "$PR" "${_behind}" "${HEAD_SHA:0:8}"
+    exit 4
+  fi
+  die "o main andou ${_behind} commit(s) desde a leitura, e o head ${HEAD_SHA:0:8} não está mais na ponta de '${_BASE_REF}' — o merge entraria com a árvore combinada que o CI não viu (strict local). Nada foi mergeado; rode de novo (o auto-rebase o traz para a ponta)."
 fi
 
 # 3 — o RC do merge, que é o defeito de origem

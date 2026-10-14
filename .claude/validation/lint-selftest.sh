@@ -15038,6 +15038,8 @@ case "$args" in
   *"api "*pulls*commits*)
       # os pais de cada commit do PR, um número por linha (1 = commit comum, 2 = commit de merge)
       printf '%s\n' ${GH_PR_PARENTS:-1}; exit "${GH_PR_COMMITS_RC:-0}" ;;
+  # strict local (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10): quantos commits da base o head NÃO tem
+  *"api "*"/compare/"*) echo "${GH_BEHIND_BY:-0}"; exit 0 ;;
   *"api "*pulls*files*)
       # os arquivos do PR, um por linha (SAC-80: só PR que toca .kg.yaml faz a guarda ler git)
       [ -n "${GH_PR_FILES:-}" ] && printf '%s\n' ${GH_PR_FILES}; exit 0 ;;
@@ -15788,6 +15790,7 @@ case "$a" in
   *"pr checks"*)       printf 'selftest\tpass\t1s\turl\n'; exit 0 ;;
   *"api "*pulls*commits*) echo 1; exit 0 ;;
   *"api "*pulls*files*)   echo "ops/x.sh"; exit 0 ;;
+  *"api "*"/compare/"*)   echo 0; exit 0 ;;   # strict local: o head na ponta da base
   *"pr merge"*) echo "$a" >> "${R_MARGS}"; echo merged; exit 0 ;;
 esac
 exit 0
@@ -27508,6 +27511,9 @@ case "${_args}" in
   # SAC-80: o SUT lê os arquivos do PR antes de tudo (fail-closed se não ler). Aqui o PR não toca
   # .kg.yaml, então a guarda de provenance cala e esta família segue medindo só a dispensa.
   *"pulls/"*"/files"*)          echo "ops/pr-merge-verified.sh" ;;
+  # strict local (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10): a base e a distância do head até a ponta
+  *"--json baseRefName"*)       echo "main" ;;
+  *"/compare/"*)                echo 0 ;;
   *check-runs*)                 printf '%s\n' "${STUB_RUNS}" ;;
   "pr checks"*)                 printf '%s\n' "${STUB_CHECKS}" ;;
   *statusCheckRollup*)          printf '%s\n' "${STUB_VERDICT}" ;;
@@ -32073,7 +32079,13 @@ case "$a" in
   *"pr view"*headRepositoryOwner*) echo "owner/repo"; exit 0 ;;
   *"pr view"*headRefName*)         echo "feat/x"; exit 0 ;;
   *"pr view"*baseRefName*)         echo "main"; exit 0 ;;
-  *"pr view"*statusCheckRollup*)   echo "SUCCESS"; exit 0 ;;
+  *"pr view"*statusCheckRollup*)
+      # MSC_MOVE_ON_ROLLUP: o main anda DURANTE os gates (outro merge entra enquanto o verificado lê o veredito)
+      if [ -n "${MSC_MOVE_ON_ROLLUP:-}" ]; then
+        t="$(git --git-dir="${MSC_ORIGIN}" -c user.email=t@t -c user.name=t commit-tree "refs/heads/main^{tree}" -p refs/heads/main -m "outro merge")" \
+          && git --git-dir="${MSC_ORIGIN}" update-ref refs/heads/main "${t}"
+      fi
+      echo "SUCCESS"; exit 0 ;;
   *"pr view"*state,mergedAt*)
       n=$(cat "${MSC_D}/n" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "${MSC_D}/n"
       if [ "$n" -eq 1 ] || [ -z "${MSC_MERGED:-}" ]; then echo "OPEN|null"; else echo "MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)"; fi
@@ -32087,12 +32099,18 @@ case "$a" in
       [ "${a#*commits/$(cat "${MSC_D}/old")}" != "$a" ] && printf '901\tsuccess\n'; exit 0 ;;
   *"check-runs/"*"/annotations"*) exit 0 ;;
   *"api "*"commits/"*check-runs*)
-      # só o head ANTERIOR tem CI; o head novo (recém-empurrado) não tem nenhum
-      if [ "${a#*commits/$(cat "${MSC_D}/old")}" != "$a" ]; then printf '%b' "${MSC_OLD_RUNS}"; fi
+      # só o head ANTERIOR tem CI; o head novo (recém-empurrado) não tem nenhum — salvo MSC_NEW_GREEN=1,
+      # que simula o CI do head novo tendo nascido e terminado verde
+      if [ "${a#*commits/$(cat "${MSC_D}/old")}" != "$a" ]; then printf '%b' "${MSC_OLD_RUNS}"
+      elif [ -n "${MSC_NEW_GREEN:-}" ]; then printf 'selftest-gate\tcompleted\tsuccess\nlint-onion-artifacts\tcompleted\tsuccess\n'; fi
       exit 0 ;;
+  # strict local (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10): o forge diz quantos commits da base o
+  # head NÃO tem — aqui medido de verdade no remoto bare, como o compare do GitHub mede
+  *"api "*"compare/main..."*)
+      git --git-dir="${MSC_ORIGIN}" rev-list --count refs/heads/feat/x..refs/heads/main; exit 0 ;;
   *"api "*pulls*files*)   echo "src/pr.txt"; exit 0 ;;
   *"api "*pulls*commits*) echo 1; exit 0 ;;
-  *"pr checks"*)          printf 'selftest-gate\tpending\t0\turl\n'; exit 0 ;;
+  *"pr checks"*)          printf '%b' "${MSC_PR_CHECKS:-selftest-gate\tpending\t0\turl\n}"; exit 0 ;;
   *"pr merge"*)
       printf '%s\n' "$a" >> "${MSC_D}/margs"
       [ "${MSC_MERGE_RC:-0}" -eq 0 ] && echo "merged" || echo "X Pull request is not mergeable: base branch policy prohibits the merge"
@@ -32112,15 +32130,24 @@ GH
     git init -q --bare -b main "${MSC_ORIGIN}"
     ( git clone -q "${MSC_ORIGIN}" "${MSC_REPO}" 2>/dev/null; cd "${MSC_REPO}" && git config user.email t@t && git config user.name t \
       && mkdir -p src docs/onion && seq 1 20 > src/pr.txt && echo o > src/outro.txt && echo p0 > docs/onion/testing-inventory.md \
+      && printf 'count: 2\n- a0\n#\n#\n#\n#\n- b0\n' > docs/backlog.md \
       && git add -A && git commit -qm base && git push -q origin HEAD:main \
       && git checkout -qb feat/x && sed -i '1s/.*/pr/' src/pr.txt && echo p-pr > docs/onion/testing-inventory.md \
+      && { [ "$1" != two ] || printf 'count: 3\n- a0\n#\n#\n#\n#\n- b0\n- b\n' > docs/backlog.md; } \
       && git commit -qam pr && git push -q origin feat/x && git checkout -q main \
       && git worktree add -q "${MSC_WT}" feat/x ) >/dev/null 2>&1
     git -C "${MSC_REPO}" rev-parse feat/x > "${d}/old"
+    #   bl  → a main acrescenta um item ao backlog (projeção que o PR NÃO toca): sem conflito, PR atrás
+    #   two → o 478/479: o PR (B) e a main (A, já mergeado) fazem o MESMO "count: 2→3" no cabeçalho e cada um
+    #         acrescenta um item em ponto distante — o merge textual é LIMPO e dá 4 itens com "count: 3"
+    #   tip → a main não anda: o PR está na ponta
     ( cd "${MSC_REPO}" && case "$1" in
         pr)    sed -i '20s/.*/main/' src/pr.txt ;;
         proj)  echo p-main > docs/onion/testing-inventory.md ;;
         ren)   git mv src/pr.txt src/pr2.txt ;;
+        bl)    printf 'count: 3\n- a0\n#\n#\n#\n#\n- b0\n- m\n' > docs/backlog.md ;;
+        two)   printf 'count: 3\n- a0\n- a\n#\n#\n#\n#\n- b0\n' > docs/backlog.md ;;
+        tip)   exit 0 ;;
         *)     echo outro2 > src/outro.txt ;;
       esac && git commit -qam main-anda && git push -q origin HEAD:main ) >/dev/null 2>&1
     mkdir -p "${MSC_WT}/ops"
@@ -32131,7 +32158,18 @@ echo "$*" >> "${MSC_D}/pflog"
 git fetch -q origin || exit 1
 git -c user.email=t@t -c user.name=t rebase -q -X theirs origin/main >/dev/null 2>&1 || { git rebase --abort; exit 1; }
 [ -n "${MSC_PF_PROJ:-}" ] && echo "PR-FINALIZE: conflito de projeção resolvido em ${MSC_PF_PROJ} (a regeneração refaz)"
+# a REGENERAÇÃO na árvore combinada, como o _regen do motor: count = gerador de verdade do cabeçalho do
+# backlog (conta os itens); bump = um gerador que muda a projeção do PR na combinação
+case "${MSC_PF_REGEN:-}" in
+  count) n="$(grep -c '^- ' docs/backlog.md)"; sed -i "1s/.*/count: ${n}/" docs/backlog.md ;;
+  bump)  echo regen >> docs/onion/testing-inventory.md ;;
+esac
+git diff --quiet || git -c user.email=t@t -c user.name=t commit -qam "docs: projeções geradas regeneradas"
 git push -q -f origin HEAD:refs/heads/feat/x || exit 1
+# o main que NÃO PARA de andar: outro merge entra logo depois de cada rebase
+if [ -n "${MSC_PF_MAIN_MOVES:-}" ]; then
+  t="$(git -c user.email=t@t -c user.name=t commit-tree "origin/main^{tree}" -p origin/main -m "outro merge")" && git push -q origin "${t}:refs/heads/main"
+fi
 echo "PR-FINALIZE: enviado feat/x @ $(git rev-parse --short HEAD)"
 PF
   }
@@ -32140,7 +32178,9 @@ PF
     : > "${d}/margs"; : > "${d}/comments"; : > "${d}/pflog"; echo 0 > "${d}/n"; echo 0 > "${d}/mk"
     _o="$(cd "${MSC_REPO}" && PATH="${d}/bin:${PATH}" MSC_D="${d}" MSC_ORIGIN="${MSC_ORIGIN}" \
           MSC_OLD_RUNS="${MSC_OLD_RUNS:-${GREEN}}" MSC_MERGED="${MSC_MERGED:-}" MSC_PF_MODE="${MSC_PF_MODE:-}" MSC_PF_PROJ="${MSC_PF_PROJ:-}" \
-          MSC_ALARM="${MSC_ALARM:-}" MSC_ALARM_RC="${MSC_ALARM_RC:-}" MSC_MERGE_RC="${MSC_MERGE_RC:-}" MSC_MERGEABLE_SEQ="${MSC_MERGEABLE_SEQ:-}" ONION_MERGE_POLL_SECS=0 ONION_MERGE_WAIT_SECS=2 \
+          MSC_ALARM="${MSC_ALARM:-}" MSC_ALARM_RC="${MSC_ALARM_RC:-}" MSC_MERGE_RC="${MSC_MERGE_RC:-}" MSC_MERGEABLE_SEQ="${MSC_MERGEABLE_SEQ:-}" \
+          MSC_PF_REGEN="${MSC_PF_REGEN:-}" MSC_PF_MAIN_MOVES="${MSC_PF_MAIN_MOVES:-}" MSC_NEW_GREEN="${MSC_NEW_GREEN:-}" MSC_PR_CHECKS="${MSC_PR_CHECKS:-}" MSC_MOVE_ON_ROLLUP="${MSC_MOVE_ON_ROLLUP:-}" \
+          ONION_MERGE_POLL_SECS=0 ONION_MERGE_WAIT_SECS=2 \
           ONION_MERGE_HEAD_SYNC_TRIES=3 ONION_MERGE_HEAD_SYNC_POLL=0 LC_ALL=C bash "${_sutx:-${sut}}" 999 "$@" 2>&1)"; _rc=$?
   }
   _newhead() { git --git-dir="${MSC_ORIGIN}" rev-parse refs/heads/feat/x; }
@@ -32246,6 +32286,104 @@ json.dump(d,open(sys.argv[2],"w",encoding="utf-8"))' "${REPO_ROOT}/ops/github-ru
   if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "o head novo está 'CONFLICTING', não MERGEABLE" <<< "${_o}"; then
     record_pass "merge-skip-ci: (i) head novo não MERGEABLE ⇒ espera, sem merge"
   else record_fail "merge-skip-ci: (i) mergeable" "rc=${_rc} out=${_o}"; fi
+
+  # ── STRICT LOCAL (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10, 2026-10-14) ─────────────────────
+  # O ruleset tem strict=false: o forge mergeia PR ATRÁS do main com a árvore combinada que o CI nunca viu.
+  # O verificado passa a exigir a base na PONTA (compare do forge → behind_by), rebaseando o PR atrás sem
+  # conflito pelo mesmo auto-rebase, e o caminho rápido fica condicionado às projeções regeneradas na
+  # árvore combinada serem byte-idênticas às do head anterior. Mutantes no resíduo
+  # docs/evolution/review/feat-merge-requires-base-at-tip.md — cada um reprova o(s) caso(s) dele.
+  local _ok_pass='selftest-gate\tpass\t1s\turl\nlint-onion-artifacts\tpass\t1s\turl\n'
+  # (s1) PR ATRÁS do main, SEM conflito (MERGEABLE), e a combinação muda uma projeção ⇒ rebase, regenera, espera
+  _msc_setup bl; MSC_MERGEABLE_SEQ=MERGEABLE MSC_PF_REGEN=count _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF -- "--rebase --push" "${d}/pflog" \
+     && grep -qF "O PR estava ATRÁS de \`main\` (1 commit(s)) sem conflito" "${d}/comments" \
+     && grep -qF "a regeneração na árvore combinada mudou projeção(ões) que o head anterior trazia: docs/backlog.md" "${d}/comments" \
+     && git --git-dir="${MSC_ORIGIN}" merge-base --is-ancestor refs/heads/main refs/heads/feat/x; then
+    record_pass "merge-skip-ci: (s1) PR atrás do main sem conflito ⇒ auto-rebase para a ponta, regenera, espera o CI do head novo (rc 4), nomeando a projeção"
+  else record_fail "merge-skip-ci: (s1) atrás sem conflito" "rc=${_rc} pf=[$(cat "${d}/pflog")] margs=[$(cat "${d}/margs")] com=[$(cat "${d}/comments")] out=${_o}"; fi
+
+  # (s2) PR NA PONTA ⇒ segue como hoje: nenhum rebase, nenhum rastro, merge normal (sem bypass)
+  _msc_setup tip; MSC_MERGEABLE_SEQ=MERGEABLE MSC_MERGED=1 MSC_PR_CHECKS="${_ok_pass}" _msc
+  if [ "${_rc}" -eq 0 ] && [ ! -s "${d}/pflog" ] && [ ! -s "${d}/comments" ] && grep -qF -- "--rebase" "${d}/margs" \
+     && ! grep -qF -- "--admin" "${d}/margs" && ! grep -q "atrás de" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (s2) PR na ponta do main ⇒ sem rebase nem rastro, merge pelos gates de sempre (sem --admin)"
+  else record_fail "merge-skip-ci: (s2) na ponta" "rc=${_rc} pf=[$(cat "${d}/pflog")] margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (s3) a regeneração na árvore combinada MUDA a projeção do PR ⇒ sem caminho rápido (todas as outras valem)
+  _msc_setup outro; MSC_MERGED=1 MSC_PF_REGEN=bump _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] \
+     && grep -qF "mudou projeção(ões) que o head anterior trazia: docs/onion/testing-inventory.md" "${d}/comments"; then
+    record_pass "merge-skip-ci: (s3) regeneração mudou projeção ⇒ sem merge sem CI (rc 4), nomeando a projeção"
+  else record_fail "merge-skip-ci: (s3) regen muda" "rc=${_rc} margs=[$(cat "${d}/margs")] com=[$(cat "${d}/comments")] out=${_o}"; fi
+
+  # (s4) PR atrás sem conflito e a regeneração IDÊNTICA ⇒ o caminho rápido continua permitido
+  _msc_setup outro; MSC_MERGEABLE_SEQ=MERGEABLE MSC_MERGED=1 _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 0 ] && grep -qF -- "--rebase --admin --match-head-commit $(_newhead)" "${d}/margs" \
+     && grep -qF "projeções regeneradas na árvore combinada idênticas às do head anterior" "${d}/comments" \
+     && grep -qF "O PR estava ATRÁS de" "${d}/comments"; then
+    record_pass "merge-skip-ci: (s4) atrás sem conflito + regeneração idêntica ⇒ rebase e caminho rápido (--admin --match-head-commit no head novo)"
+  else record_fail "merge-skip-ci: (s4) regen idêntica" "rc=${_rc} margs=[$(cat "${d}/margs")] com=[$(cat "${d}/comments")] out=${_o}"; fi
+
+  # (s5) O 478/479 REPRODUZIDO: dois PRs (A já no main, B = este) fazem o MESMO "count: 2→3" no cabeçalho do
+  #      backlog e cada um acrescenta um item. O merge TEXTUAL é limpo e sai velho (4 itens, "count: 3") — a
+  #      prova de que a reprodução é real vem do próprio git. B está MERGEABLE e com o CI verde: antes da cura
+  #      ele entrava assim. Agora: rebase, regenera ("count: 4"), e o merge NÃO acontece sem o CI do head novo;
+  #      quando o CI do head novo chega verde, entra o head REGENERADO, nunca a projeção velha.
+  _msc_setup two
+  local _mt _mtrc _mtbl
+  _mt="$(git --git-dir="${MSC_ORIGIN}" merge-tree --write-tree refs/heads/main refs/heads/feat/x 2>/dev/null)"; _mtrc=$?
+  _mtbl="$(git --git-dir="${MSC_ORIGIN}" show "$(head -1 <<< "${_mt}"):docs/backlog.md" 2>/dev/null)"
+  MSC_MERGEABLE_SEQ=MERGEABLE MSC_PF_REGEN=count MSC_PR_CHECKS="${_ok_pass}" _msc
+  local _bl; _bl="$(git --git-dir="${MSC_ORIGIN}" show refs/heads/feat/x:docs/backlog.md 2>/dev/null)"
+  if [ "${_mtrc}" -eq 0 ] && [ "$(head -1 <<< "${_mtbl}")" = "count: 3" ] && [ "$(grep -c '^- ' <<< "${_mtbl}")" -eq 4 ] \
+     && [ "${_rc}" -ne 0 ] && [ ! -s "${d}/margs" ] && [ "$(head -1 <<< "${_bl}")" = "count: 4" ] \
+     && grep -qF "não nasceram/terminaram" <<< "${_o}"; then
+    _msc_setup two; MSC_MERGEABLE_SEQ=MERGEABLE MSC_PF_REGEN=count MSC_PR_CHECKS="${_ok_pass}" MSC_NEW_GREEN=1 MSC_MERGED=1 _msc
+    _bl="$(git --git-dir="${MSC_ORIGIN}" show refs/heads/feat/x:docs/backlog.md 2>/dev/null)"
+    if [ "${_rc}" -eq 0 ] && grep -qF -- "--rebase" "${d}/margs" && ! grep -qF -- "--admin" "${d}/margs" \
+       && [ "$(head -1 <<< "${_bl}")" = "count: 4" ] && [ "$(grep -c '^- ' <<< "${_bl}")" -eq 4 ]; then
+      record_pass "merge-skip-ci: (s5) 478/479 reproduzido (merge textual limpo e velho: 4 itens, count 3) ⇒ o merge NÃO sai com a projeção velha; com o CI do head novo verde, entra o head regenerado (count 4)"
+    else record_fail "merge-skip-ci: (s5) 478/479 com CI do head novo" "rc=${_rc} margs=[$(cat "${d}/margs")] bl=[${_bl}] out=${_o}"; fi
+  else record_fail "merge-skip-ci: (s5) 478/479" "mt_rc=${_mtrc} mt=[${_mtbl}] rc=${_rc} margs=[$(cat "${d}/margs")] bl=[${_bl}] out=${_o}"; fi
+
+  # (s6) TETO: o main NÃO PARA de andar (outro merge entra depois de cada rebase) ⇒ para em ONION_MERGE_REBASE_MAX
+  #      (2) rebases, nomeando o estado, sem merge — o laço infinito de rebase é o modo de falha
+  _msc_setup outro; MSC_MERGEABLE_SEQ=MERGEABLE MSC_PF_REGEN=bump MSC_PF_MAIN_MOVES=1 _msc
+  if [ "${_rc}" -eq 1 ] && [ ! -s "${d}/margs" ] && [ "$(grep -c -- '--rebase --push' "${d}/pflog")" -eq 2 ] \
+     && grep -qF "segue atrás de 'main' (1 commit(s), sem conflito) depois de 2 rebase(s)" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (s6) main que não para de andar ⇒ para em 2 rebases, sem merge (teto do laço)"
+  else record_fail "merge-skip-ci: (s6) teto" "rc=${_rc} pf=$(grep -c -- '--rebase' "${d}/pflog") margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (s7) o main anda logo DEPOIS do rebase e o caminho rápido valeria ⇒ a condição (9) manda esperar, e o
+  #      rastro no PR diz isso (não anuncia um merge sem CI que não vai acontecer); série: rc 4, sem merge
+  _msc_setup outro; MSC_MERGEABLE_SEQ=MERGEABLE MSC_MERGED=1 MSC_PF_MAIN_MOVES=1 _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "espera: o main andou 1 commit(s) depois do rebase" "${d}/comments" \
+     && ! grep -qF "SEM esperar o CI" "${d}/comments"; then
+    record_pass "merge-skip-ci: (s7) main andou depois do rebase ⇒ sem caminho rápido (condição 9), o rastro diz que espera, rc 4 sem merge"
+  else record_fail "merge-skip-ci: (s7) condição 9" "rc=${_rc} margs=[$(cat "${d}/margs")] com=[$(cat "${d}/comments")] out=${_o}"; fi
+
+  # (s7b) PR na ponta, e o main anda DURANTE os gates (outro merge entra enquanto o verificado lê o veredito) ⇒ a
+  #       última leitura antes do merge recusa: direto para sem merge (rc 1); na série, rc 4 (volta à fila)
+  _msc_setup tip; MSC_MERGEABLE_SEQ=MERGEABLE MSC_MERGED=1 MSC_PR_CHECKS="${_ok_pass}" MSC_MOVE_ON_ROLLUP=1 _msc
+  if [ "${_rc}" -eq 1 ] && [ ! -s "${d}/margs" ] && grep -qF "o main andou 1 commit(s) desde a leitura" <<< "${_o}"; then
+    _msc_setup tip; MSC_MERGEABLE_SEQ=MERGEABLE MSC_MERGED=1 MSC_PR_CHECKS="${_ok_pass}" MSC_MOVE_ON_ROLLUP=1 _msc --no-wait-after-rebase
+    if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "o main andou 1 commit(s) depois da leitura" <<< "${_o}"; then
+      record_pass "merge-skip-ci: (s7b) main andou durante os gates ⇒ a leitura logo antes do merge recusa (direto rc 1, série rc 4), sem merge"
+    else record_fail "merge-skip-ci: (s7b) série" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+  else record_fail "merge-skip-ci: (s7b) direto" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
+
+  # (s8) compare ILEGÍVEL ⇒ não mergeia (fail-closed), e --merge-commit com PR atrás ⇒ recusa sem rebasear
+  local x8="${d}/bin8"; mkdir -p "${x8}"
+  printf '#!/usr/bin/env bash\ncase "$*" in *compare/*) echo "gh: HTTP 502" >&2; exit 1 ;; esac\nexec %q "$@"\n' "${d}/bin/gh" > "${x8}/gh"; chmod +x "${x8}/gh"
+  _msc_setup tip; _o="$(cd "${MSC_REPO}" && PATH="${x8}:${d}/bin:${PATH}" MSC_D="${d}" MSC_ORIGIN="${MSC_ORIGIN}" MSC_OLD_RUNS="${GREEN}" \
+       MSC_MERGEABLE_SEQ=MERGEABLE LC_ALL=C bash "${sut}" 999 2>&1)"; _rc=$?
+  if [ "${_rc}" -eq 1 ] && grep -qF "compare do forge ilegível" <<< "${_o}"; then
+    _msc_setup outro; MSC_MERGEABLE_SEQ=MERGEABLE _msc --merge-commit
+    if [ "${_rc}" -eq 1 ] && [ ! -s "${d}/pflog" ] && [ ! -s "${d}/margs" ] && grep -qF "o modo é --merge-commit" <<< "${_o}"; then
+      record_pass "merge-skip-ci: (s8) compare ilegível ⇒ não mergeia; --merge-commit com PR atrás ⇒ recusa sem rebasear (linearizaria o merge)"
+    else record_fail "merge-skip-ci: (s8) --merge-commit" "rc=${_rc} pf=[$(cat "${d}/pflog")] out=${_o}"; fi
+  else record_fail "merge-skip-ci: (s8) compare ilegível" "rc=${_rc} out=${_o}"; fi
 
   # (l) ops/apply-ruleset-main.sh: toda label do script tem descrição ≤ 100 CARACTERES (a API dá 422 acima),
   #     e o script RECUSA (rc 2, antes de qualquer chamada) uma descrição longa — o mutante é a de 101 de 2026-10-13

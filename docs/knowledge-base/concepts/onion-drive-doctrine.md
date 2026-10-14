@@ -46,8 +46,15 @@ O driver opera num **degrau declarado**, nunca acima:
     - o que a main trouxe entre o merge-base velho e o novo não toca arquivo do PR, fora as projeções geradas;
     - nenhum alarme de main quebrado está aberto (com o alarme aberto, só o conserto entra, e nunca sem CI);
     - o ruleset não tem regra além dos checks (o bypass contorna o ruleset inteiro; com outra regra, espera);
-    - não foi passado `--wait-ci-after-rebase` (o opt-out, também aceito pelo `merge-serial.sh`).
+    - não foi passado `--wait-ci-after-rebase` (o opt-out, também aceito pelo `merge-serial.sh`);
+    - as projeções geradas do head novo, regeneradas na árvore combinada, são **byte-idênticas** às do head anterior (FASE 0, abaixo). Mudou alguma, o CI nunca viu aquela projeção e o head novo espera.
     Os gates rodam contra o head anterior. O ruleset exige os checks **no head do PR**, e um head recém-empurrado não tem nenhum, então o merge vai pelo bypass de admin em PR, com `--match-head-commit` no head novo: se alguém empurrar depois da decisão, o forge recusa. A decisão sai no log e no comentário de auto-rebase do PR. **Janela declarada:** dois PRs que mudam arquivos diferentes e se quebram semanticamente entram os dois, e só a completa do main pega. O lote com bissecção (B) fica gated em `#Q_MERGE_LOTE_COM_BISSECCAO`, e o gatilho é o main quebrar por combinação de PRs, contado pelas issues do alarme;
+  - **a base do PR tem de ser a ponta do main** (strict local, FASE 0 da decisão do maestro de 2026-10-14 sobre `D_POSTMERGE_PROJECTION_WRITER_2026_10`, «Fase 0 já + ler primárias antes do B1»; evidência em `…merge-process-onion-2026-10.kg.yaml#E_STRICT_LOCAL_EXECUTADO_2026_10_14`). O ruleset tem `strict_required_status_checks_policy: false`, então o forge aceita PR atrás do main e mergeia a árvore combinada, que o CI nunca viu. Foi assim que o `docs/backlog.md` entrou com 479 itens e o cabeçalho de 478: dois PRs faziam o mesmo `477→478`, e o merge textual somou os itens sem conflito. Agora:
+    - a distância é lida no forge (`compare <base>...<head>`, `behind_by`); leitura ilegível não mergeia;
+    - PR atrás **sem conflito** passa pelo mesmo auto-rebase do CONFLICTING (`pr-finalize --rebase --push`, que regenera as projeções na árvore combinada e as commita no head), com o mesmo teto de 2 rebases na série; o main que não para de andar para no teto, sem merge;
+    - uma última leitura logo antes do merge: o `--match-head-commit` amarra o head, não a base, e o main pode ter andado durante a espera do CI (direto: para; na série: rc 4, volta à fila);
+    - com `--merge-commit`, PR atrás é recusado com o caminho (mergear a base na branch), porque o rebase linearizaria o merge que é o conteúdo;
+    - **preço medido** nos 50 últimos merges (#1045–#1099): 5 estavam atrás, ou seja, 5 rebases a mais (10%), e 3 deles esperariam o CI do head novo (~15–25 min cada) porque o main tinha trazido projeção. Como 43 de 50 PRs commitam projeção, o caminho rápido depois de um rebase fica raro;
   - a **path-allowlist** é a parada dura "path vendorizado/outward-facing" (REGRA 36 e REGRA 30);
   - a **política mecânica** são as **paradas duras**, todas PARA:
     - decisão não tomada;

@@ -42,6 +42,13 @@
 #    JANELA DECLARADA: dois PRs que mudam arquivos DIFERENTES e se quebram semanticamente entram os dois;
 #    só a completa do main pega, e o main fica quebrado até o revert. Se isso acontecer (contado pelas
 #    issues do alarme), é o gatilho do B (lote com bissecção, nó Q_MERGE_LOTE_COM_BISSECCAO, gated).
+#  · STRICT LOCAL (FASE 0 de D_POSTMERGE_PROJECTION_WRITER_2026_10, decisão do maestro de 2026-10-14): o ruleset
+#    tem strict=false, e o forge mergearia PR ATRÁS do main com a árvore combinada que o CI nunca viu (o 478/479
+#    do backlog). O verificado lê a distância do head até a ponta (compare do forge) e rebaseia o PR atrás SEM
+#    conflito pelo mesmo auto-rebase do CONFLICTING; o merge sem o CI do head novo passa a exigir também as
+#    projeções regeneradas na árvore combinada byte-idênticas às do head anterior. Uma última leitura logo antes
+#    do merge pega o main que andou durante a espera: rc 4, e o PR volta à fila (conta como rodada de rebase).
+#    Preço medido nos 50 últimos merges: 5 estavam atrás (10% de rebases a mais), 3 deles com espera de CI.
 #  · AUTO-REBASE QUE NÃO PODE PULAR ⇒ VOLTA À FILA: se qualquer condição acima falha (ou o forge recusa
 #    o merge sem CI), o verificado sai rc 4 — o lock é solto, o CI do head novo é esperado FORA do lock,
 #    e o PR volta ao lock. O limite de rebases (ONION_MERGE_REBASE_MAX, 2) vale para a série inteira

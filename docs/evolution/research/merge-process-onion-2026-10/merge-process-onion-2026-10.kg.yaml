@@ -8,7 +8,11 @@ meta:
                                # planos gratuitos de Mergify e Trunk e o estado do funador/claude-code-merge-queue.
                                # A metade doutrina (ímã, escritor único, catracas) é de 12m, mas o gatilho da Opção 3
                                # já disparou: a revisita real é o selo do maestro, não a data.
-  # ═══ TETO: 77 NÓS ═══
+  # ═══ TETO: 78 NÓS ═══
+  # (2026-10-14, +1: a EVIDÊNCIA da execução da FASE 0, E_STRICT_LOCAL_EXECUTADO_2026_10_14 — o caminho
+  #  verificado exige a base na ponta do main e condiciona o merge sem CI às projeções regeneradas idênticas.
+  #  A origem é D_POSTMERGE_PROJECTION_WRITER_2026_10, de um grafo ainda não rastreado: citada pelo nome, sem
+  #  aresta. Carimbo de execução, não pesquisa nova; o teto sobe DECLARADO: 77 → 78.)
   # (2026-10-14, +1: a EVIDÊNCIA E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14 — o caminho sem CI do head
   #  novo é alcançável, não teve oportunidade ao vivo até 2026-10-14, e o #1092 nasceu em conflito com zero
   #  check-runs, o que a mensagem antiga chamava de «não está verde». Diagnóstico e carimbo da cura da
@@ -1346,6 +1350,25 @@ nodes:
       locator: "comentário de auto-rebase do #1092 (2026-10-13T22:22:57Z); caso (d3) de run_merge_skip_ci_selftests; resíduo docs/evolution/review/chore-tail-door-cache-fastpath-msg.md"
       method: "medição: leitura do PR e dos check-runs pela API, contagem dos PRs mergeados e dos comentários de auto-rebase desde o #1081, bancada merge_skip_ci e pr_merge_verified sob LC_ALL=C e mutantes por ops/mutate-and-restore.sh, 2026-10-14"
       locality: "repo"
+  - id: E_STRICT_LOCAL_EXECUTADO_2026_10_14
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "LC_ALL=C bash .claude/validation/lint-selftest.sh --families merge_skip_ci,pr_merge_verified,merge_dispensa,merge_serial → 93 passaram, 0 falharam; 6 mutantes por ops/mutate-and-restore.sh, 6 reprovaram o(s) caso(s) esperado(s); 50 últimos PRs mergeados (#1045–#1099) medidos por ancestralidade git"
+    source_tier: 10
+    source_kind: primary
+    label: "FASE 0 executada: o caminho verificado exige a base do PR na ponta do main (strict local), rebaseia o PR atrás sem conflito pelo auto-rebase e só pula o CI do head novo se as projeções regeneradas na árvore combinada forem byte-idênticas às do head anterior."
+    narrative: "ORIGEM: decisão do maestro de 2026-10-14 («Fase 0 já + ler primárias antes do B1») sobre D_POSTMERGE_PROJECTION_WRITER_2026_10, nó de um grafo de pesquisa ainda não rastreado (por isso citado pelo nome, sem aresta); a cura é a opção contrarian C_OPCAO_C_CONTRARIAN_STRICT_LOCAL de lá, que responde às objeções E_OBJECAO_PER_PR_GATE_BLIND_STRICT_FALSE e E_OBJECAO_INCIDENT_ACCUSES_MERGE_WITHOUT_CI. O QUE MUDOU em ops/pr-merge-verified.sh: (1) a distância do head até a ponta da base é lida no forge (compare <base>...<head>, behind_by, que é merge-base ≠ ponta); leitura ilegível ⇒ não mergeia; (2) o auto-rebase passa a rodar também em PR ATRÁS sem conflito, com o mesmo teto ONION_MERGE_REBASE_MAX (2) da série; (3) a regeneração na árvore combinada já era do pr-finalize --rebase (o _regen depois do rebase vira commit no head que é empurrado) e vale igual no caso novo, porque o passo roda sempre depois do rebase; (4) o caminho rápido do #1081 ganha a condição (8): as projeções da lista única (onion-regen-lib.sh) iguais byte a byte entre o head anterior e o novo; (5) a condição (9), o head novo ainda na ponta na hora da decisão (sem ela o rastro anunciava merge sem CI que não ia acontecer), e uma ÚLTIMA leitura da distância logo antes do merge, porque o --match-head-commit amarra o head e não a base (achado da passada: sem ela, o main que anda durante a espera do CI reabria o buraco); (6) com --merge-commit, PR atrás é recusado com o caminho (mergear a base na branch), porque o rebase linearizaria o merge que é o conteúdo. REPRODUÇÃO DO 478/479 na bancada: dois PRs fazem o mesmo 'count: 2→3' no cabeçalho e cada um acrescenta um item; o git merge-tree da combinação é LIMPO e sai com 4 itens e 'count: 3', e é assim que entrava. Agora o head é rebaseado, regenerado para 'count: 4' e só entra depois do CI do head novo. EFEITO NO RITMO (medido nos 50 últimos PRs mergeados, #1045–#1099, pela ancestralidade do head com o main imediatamente antes do merge): 5 de 50 estavam ATRÁS no merge (#1057, #1059, #1084, #1091, #1098; 2 a 4 commits), ou seja, 5 rebases a mais em 50 merges (10%). Desses 5, em 3 a main tinha trazido projeção (#1057, #1059, #1084), e a condição (8) os mandaria esperar o CI do head novo (~15 a 25 min cada); 2 (#1091, #1098) ficariam no caminho rápido se as demais condições valessem. Nos rastros de auto-rebase dos PRs #1045–#1099 (7 PRs com o comentário), nenhum registrou o caminho rápido: todos esperaram o CI. Como 43 dos 50 PRs commitam projeção, depois de um rebase o caminho rápido fica raro: é o preço declarado da cura. NÃO MEDIDO AO VIVO: nenhum merge real (remoto bare e gh falso na bancada); o compare do GitHub foi assumido equivalente ao rev-list da bancada pela doc da API, não por chamada nesta execução."
+    trace: "ops/pr-merge-verified.sh"
+    provenance:
+      source: "ops/pr-merge-verified.sh + ops/merge-serial.sh (cabeçalho) + famílias merge_skip_ci, pr_merge_verified, merge_dispensa e merge_serial de .claude/validation/lint-selftest.sh + gh pr list --state merged --limit 50"
+      locator: "run_merge_skip_ci_selftests, casos (s1) a (s8) e (s7b); mutantes M1 a M6 no resíduo docs/evolution/review/feat-merge-requires-base-at-tip.md"
+      method: "medição: bancada das quatro famílias 93/93 sob LC_ALL=C, 6 mutantes por ops/mutate-and-restore.sh, e ancestralidade git dos 50 últimos merges contra o main de antes de cada um, 2026-10-14"
+      locality: "repo"
 edges:
   - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
     to: C_OPCAO_A_CURE_MAGNET_FILE
@@ -1665,3 +1688,15 @@ edges:
   - from: E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14
     to: E_MERGE_SEM_CI_EXECUTADO_2026_10_13
     edge_type: CONSTRAINS
+  - from: E_STRICT_LOCAL_EXECUTADO_2026_10_14
+    to: D_MERGE_SEM_CI_APOS_REBASE_LIMPO
+    edge_type: CONSTRAINS
+  - from: E_STRICT_LOCAL_EXECUTADO_2026_10_14
+    to: E_MERGE_SEM_CI_EXECUTADO_2026_10_13
+    edge_type: CONSTRAINS
+  - from: E_STRICT_LOCAL_EXECUTADO_2026_10_14
+    to: E_ALARME_CULPA_SO_A_PRIMEIRA_QUEBRA_2026_10_13
+    edge_type: TRACES_TO
+  - from: E_STRICT_LOCAL_EXECUTADO_2026_10_14
+    to: D_MERGE_PROCESS_ONION_2026_10
+    edge_type: TRACES_TO
