@@ -8,7 +8,11 @@ meta:
                                # planos gratuitos de Mergify e Trunk e o estado do funador/claude-code-merge-queue.
                                # A metade doutrina (ímã, escritor único, catracas) é de 12m, mas o gatilho da Opção 3
                                # já disparou: a revisita real é o selo do maestro, não a data.
-  # ═══ TETO: 76 NÓS ═══
+  # ═══ TETO: 77 NÓS ═══
+  # (2026-10-14, +1: a EVIDÊNCIA E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14 — o caminho sem CI do head
+  #  novo é alcançável, não teve oportunidade ao vivo até 2026-10-14, e o #1092 nasceu em conflito com zero
+  #  check-runs, o que a mensagem antiga chamava de «não está verde». Diagnóstico e carimbo da cura da
+  #  mensagem, não pesquisa nova; o teto sobe DECLARADO: 76 → 77.)
   # (2026-10-13, +2: o SELO do maestro D_CI_PR_BLOCOS_MUDADOS_DA_BANCADA («Blocos mudados + núcleo», por
   #  /meta:decide) e a EVIDÊNCIA E_SELETOR_POR_ARQUIVO_E_ARRANQUE_MEDIDO_2026_10_13, com a medição antes/depois do
   #  seletor por arquivo, do arranque compartilhado e da regra do bloco no nível PR. Carimbo da execução, não onda
@@ -1323,6 +1327,25 @@ nodes:
       locator: "linhas #REPLAY, #REPLAY_SEM_INFRA, #REPLAY_SEGUNDOS_CPU, #STARTUP_WORKER e #STARTUP_SERIAL do medidor; mutantes listados no resíduo docs/evolution/review/perf-bench-selector-per-file.md"
       method: "medição: replay do seletor antes/depois sobre os mesmos 50 diffs mergeados, arranque medido 5× por forma, e mutantes por ops/mutate-and-restore.sh, 2026-10-13"
       locality: "repo"
+  - id: E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "gh pr view 1092 (comentário de auto-rebase de 2026-10-13T22:22:57Z) + gh api repos/marciocar/onion-evolve/commits/1cddfb8092bc/check-runs → total_count 0; gh search prs «Auto-rebase de» e gh pr list --state merged --search merged:>=2026-10-13T18:38:00Z → 11 PRs, 1 auto-rebase (o #1092); família merge_skip_ci sob LC_ALL=C, caso (d3) e 2 mutantes por ops/mutate-and-restore.sh"
+    source_tier: 10
+    source_kind: primary
+    label: "O caminho sem CI do head novo é alcançável (caso (a) da bancada), mas não teve oportunidade ao vivo até 2026-10-14: o único auto-rebase desde o merge do #1081 foi o #1092, que nasceu em conflito e cujo head anterior tinha ZERO check-runs."
+    narrative: "DIAGNÓSTICO (2026-10-13/14). O A de D_MERGE_SEM_CI_APOS_REBASE_LIMPO entrou na main com o #1081 (2026-10-13T18:38Z). Dos 11 PRs mergeados desde então, um só passou por auto-rebase: o #1092, aberto às 22:16:52Z com head 1cddfb80, rebaseado às 22:22:57Z (causa: projeção gerada docs/onion/testing-inventory.md). O desfecho foi esperar o CI do head novo, com a mensagem «o check exigido 'selftest-gate' não está verde no head anterior 1cddfb80». A mensagem enganava: o head 1cddfb80 tem total_count 0 de check-runs, não um check vermelho. O PR nasceu em conflito (inferido: zero check-runs no head de abertura e o auto-rebase só roda em PR CONFLICTING), e o GitHub não roda CI de pull_request em PR em conflito, logo nunca houve verde para ler. A ESPERA ERA A DECISÃO CERTA; o defeito era só de diagnóstico. CURA: a condição 4 de _skip_ci_decide (ops/pr-merge-verified.sh) separa o caso zero check-runs, com mensagem própria, e o comportamento não muda (espera). Caso (d3) na família merge_skip_ci; os dois mutantes que fundem as mensagens (em qualquer direção) reprovam (d3) ou (d). LIMITE: a contagem de oportunidades depende do índice de busca do forge (gh search prs), não de leitura PR a PR; e o bypass por --admin no forge segue NÃO MEDIDO AO VIVO, como em E_MERGE_SEM_CI_EXECUTADO_2026_10_13."
+    trace: "ops/pr-merge-verified.sh"
+    provenance:
+      source: "ops/pr-merge-verified.sh (_skip_ci_decide) + família merge_skip_ci de .claude/validation/lint-selftest.sh + gh pr view 1092 + gh api commits/1cddfb8092bc/check-runs"
+      locator: "comentário de auto-rebase do #1092 (2026-10-13T22:22:57Z); caso (d3) de run_merge_skip_ci_selftests; resíduo docs/evolution/review/chore-tail-door-cache-fastpath-msg.md"
+      method: "medição: leitura do PR e dos check-runs pela API, contagem dos PRs mergeados e dos comentários de auto-rebase desde o #1081, bancada merge_skip_ci e pr_merge_verified sob LC_ALL=C e mutantes por ops/mutate-and-restore.sh, 2026-10-14"
+      locality: "repo"
 edges:
   - from: E_MEDICAO_PROCESSO_ATUAL_2026_10_13
     to: C_OPCAO_A_CURE_MAGNET_FILE
@@ -1636,3 +1659,9 @@ edges:
   - from: E_SELETOR_POR_ARQUIVO_E_ARRANQUE_MEDIDO_2026_10_13
     to: D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL
     edge_type: SUPPORTS
+  - from: E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14
+    to: D_MERGE_SEM_CI_APOS_REBASE_LIMPO
+    edge_type: TRACES_TO
+  - from: E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14
+    to: E_MERGE_SEM_CI_EXECUTADO_2026_10_13
+    edge_type: CONSTRAINS

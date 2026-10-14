@@ -32191,7 +32191,8 @@ json.dump(d,open(sys.argv[2],"w",encoding="utf-8"))' "${REPO_ROOT}/ops/github-ru
 
   # (d) check EXIGIDO vermelho no head anterior ⇒ espera (rc 4), sem merge
   _msc_setup outro; MSC_OLD_RUNS='selftest-gate\tcompleted\tfailure\nlint-onion-artifacts\tcompleted\tsuccess\n' _msc --no-wait-after-rebase
-  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "o check exigido 'selftest-gate' não está verde" <<< "${_o}"; then
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "o check exigido 'selftest-gate' não está verde" <<< "${_o}" \
+     && ! grep -qF "não tem check-run nenhum" <<< "${_o}"; then
     record_pass "merge-skip-ci: (d) check exigido vermelho no head anterior ⇒ espera o CI, sem merge"
   else record_fail "merge-skip-ci: (d) vermelho" "rc=${_rc} margs=[$(cat "${d}/margs")] out=${_o}"; fi
   # (d2) exigidos verdes mas OUTRO check falho (não dispensado) ⇒ espera
@@ -32199,6 +32200,14 @@ json.dump(d,open(sys.argv[2],"w",encoding="utf-8"))' "${REPO_ROOT}/ops/github-ru
   if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "check falho não dispensado no head anterior" <<< "${_o}"; then
     record_pass "merge-skip-ci: (d2) outro check falho no head anterior ⇒ espera, sem merge"
   else record_fail "merge-skip-ci: (d2) outro falho" "rc=${_rc} out=${_o}"; fi
+  # (d3) head anterior com ZERO check-runs (total_count: 0 — o PR nasceu/foi empurrado já em conflito, o #1092
+  #      de 2026-10-13) ⇒ espera, com mensagem PRÓPRIA, nunca a do vermelho. '\n' = stub sem nenhuma linha
+  #      (vazio cairia no default GREEN). Mutante: fundir as duas mensagens (qualquer direção) reprova (d) ou (d3).
+  _msc_setup outro; MSC_OLD_RUNS='\n' _msc --no-wait-after-rebase
+  if [ "${_rc}" -eq 4 ] && [ ! -s "${d}/margs" ] && grep -qF "não tem check-run nenhum — o caso típico é o PR aberto/empurrado já em conflito" "${d}/comments" \
+     && ! grep -qF "não está verde" <<< "${_o}"; then
+    record_pass "merge-skip-ci: (d3) head anterior sem check-run nenhum ⇒ espera o CI, com mensagem própria (não a do vermelho)"
+  else record_fail "merge-skip-ci: (d3) zero check-runs" "rc=${_rc} margs=[$(cat "${d}/margs")] com=[$(cat "${d}/comments")] out=${_o}"; fi
 
   # (e) alarme de main quebrado ABERTO ⇒ recusa o pulo (rc 4) nomeando a issue; ilegível também espera
   _msc_setup outro; MSC_ALARM=77 _msc --no-wait-after-rebase
