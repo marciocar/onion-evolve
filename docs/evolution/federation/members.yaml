@@ -804,6 +804,30 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  # Membro de TESTE do spike a2a cross-user (2026-10-14) — revogar ao fim do spike (SPIKE-PROTOCOL.md §11).
+  # Protocolo: docs/evolution/research/a2a-cross-user-spike-2026-10/. kind:method é provisório (lacuna L7).
+  - id: maestro-notebook-test
+    name: maestro-notebook-test (membro de TESTE do spike a2a cross-user, 2026-10)
+    role: standalone            # tier 3: fala só com o core (trust-topology-check: "inbox do core é aberto p/ relay")
+    kind: method                # provisório: o registro não tem natureza para "dispositivo que só assina" (L7)
+    parent: onion-evolve
+    onion_version: n/a          # não vendoriza o framework; só assina sinais
+    adopted_at: 2026-10-14
+    mode: greenfield            # não regulado
+    personality_summary: "Dispositivo de teste do maestro (notebook) para o spike de conversa A2A entre usuários; sem repo, sem adoção; revogado ao fim do spike."
+    specializations: [a2a-spike]
+    personality_last_sync: 2026-10-14
+    a2a:
+      sends_to: onion-evolve
+      keys: [maestro-notebook-test-1]   # pinado em jwks/maestro-notebook-test-1.pem; a privada fica fora do git (0600)
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>

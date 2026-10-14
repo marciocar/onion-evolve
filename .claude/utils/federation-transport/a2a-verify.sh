@@ -180,6 +180,20 @@ PY
 if [ "${MODE}" = "regulated" ]; then REG="true"; APPLY="propose-only"; else REG="false"; APPLY="gated"; fi
 
 # --- Sucesso: grava o jti (single-use) e emite o veredito --------------------
-mkdir -p "$(dirname "${STATE}")" 2>/dev/null && printf '%s\n' "${JTI}" >> "${STATE}" 2>/dev/null || true
+# FAIL-CLOSED (2026-10-14, achado da sessão principal no preparo do spike a2a cross-user): a linha antiga
+# terminava em `|| true` — estado não-gravável fazia o anti-replay sumir EM SILÊNCIO e o veredito saía
+# `verified:true` mesmo assim, então o mesmo envelope passaria de novo. Se o jti não fica GRAVADO e
+# RELIDO, o sinal não é verificado: gravar é parte da verificação, não efeito colateral dela.
+if ! { mkdir -p "$(dirname "${STATE}")" 2>/dev/null \
+       && printf '%s\n' "${JTI}" >> "${STATE}" 2>/dev/null \
+       && grep -qxF "${JTI}" "${STATE}" 2>/dev/null; }; then
+  veto "replay-state-unwritable" "replay"
+fi
+# CORRIDA (pré-existente, apontada pelo refutador do spike em 2026-10-14): o CHECK da camada 2 e esta
+# GRAVAÇÃO são separados por python/openssl/trust-check, então dois POST simultâneos com o mesmo jti
+# passavam ambos pelo check. Append pequeno é atômico: depois de gravar, o jti tem de aparecer UMA vez.
+# Duas linhas = outro processo gravou o mesmo jti → replay. (Na corrida exata os dois podem ver 2 e
+# vetar: fail-closed, o remetente reenvia com jti novo.)
+[ "$(grep -cxF "${JTI}" "${STATE}" 2>/dev/null)" = "1" ] || veto "replay" "replay"
 printf '{"verified":true,"reason":"ok","layer_failed":null,"gated":true,"committed":false,"regulated":%s,"apply_mode":"%s"}\n' "${REG}" "${APPLY}"
 exit 0

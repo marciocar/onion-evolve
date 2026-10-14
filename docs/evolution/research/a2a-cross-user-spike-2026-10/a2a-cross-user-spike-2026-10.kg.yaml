@@ -1,0 +1,196 @@
+meta:
+  id: a2a-cross-user-spike-2026-10
+  schema_version: "1"
+  baseline: "2026-10-14"
+  review_after: "2026-11-13"   # cadência FERRAMENTA = 30d: Channels é research preview e muda por release
+  # Grafo do spike A2A cross-user (decisão do maestro, 2026-10-14). Protocolo pré-registrado em
+  # SPIKE-PROTOCOL.md, no mesmo diretório. O grafo guarda o que foi MEDIDO no preparo (ensaio offline e
+  # negativos contra o gate servido) e a EMENDA à RFC-0004 como decisão ABERTA. Quem sela é o maestro.
+  # Cresce só por resultado de cenário do protocolo (A1–A8) ou por refutação do adotante de curadoria.
+
+nodes:
+  - id: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
+    node_type: question
+    plane: DEV
+    impact: 5
+    confidence: 0.5
+    status: open
+    label: "O caminho A2A gated entre usuários consegue fazer uma CONVERSA (pergunta com trabalho → resposta) com fidelidade e ciclo comparáveis ao nativo da mesma conta (≤ ~26 s, S1b do onion-curation)?"
+    trace: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
+
+  - id: E_F1_CORPO_FORA_DA_ASSINATURA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: "2026-10-14"
+    verified_against: "ensaio offline: signal.body trocado DEPOIS de assinar; a2a-verify.sh devolveu verified:true; accept-to-channel.sh do spike RECUSOU por body_sha256"
+    source_tier: 9
+    source_kind: measurement
+    label: "O a2a-verify assina e confere só os claims (iss/aud/iat/exp/jti); o signal do envelope fica fora do JWS. Para sinal com body_path era tolerável; para conversa, o remetente autenticado não autentica a mensagem."
+    narrative: "Cura do spike: claim body_sha256 conferido no receptor (vps/accept-to-channel.sh). Cura de produção pendente: o a2a-verify conferir body_sha256 quando houver signal.body, ou recusar corpo sem o claim."
+    trace: ".claude/utils/federation-transport/a2a-verify.sh"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-verify.sh@0139fe2db257"
+      locator: "camada 5 (jws): openssl dgst -verify sobre HDR_B64.PL_B64; nenhuma leitura de .signal.body"
+      method: "medição: envelope gerado por notebook/send-a2a.sh --dry-run, corpo alterado com jq, gate rodado em sandbox com --repo"
+      locality: "repo"
+
+  - id: E_F2_EXP_OPCIONAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-10-14"
+    verified_against: "ensaio offline: JWS sem exp (send-a2a.sh --no-exp) → verified:true"
+    source_tier: 9
+    source_kind: measurement
+    label: "O a2a-verify não exige exp: um envelope sem exp fica válido para sempre e só o jti o segura. Falta exigir exp e um teto de vida (exp − iat)."
+    trace: ".claude/utils/federation-transport/a2a-verify.sh"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-verify.sh@0139fe2db257"
+      locator: "camada 3: '[ -n \"${EXP}\" ] && [ \"${EXP}\" -lt \"${NOW}\" ]' — exp vazio pula a checagem"
+      method: "medição: sandbox com o gate real"
+      locality: "repo"
+
+  - id: E_F3_JTI_FAIL_OPEN_CURADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-14"
+    verified_against: "run_a2a_verify_selftests 19/19: caso replay-state-unwritable + mutante (reverte as duas barreiras) reprovado por _prove_mutation; caso de corrida 8 em paralelo ≤1 verified; gate de origin/main medido com 8/8 verified em 5 rodadas"
+    source_tier: 9
+    source_kind: measurement
+    label: "Dois furos no anti-replay, curados: (1) a gravação do jti terminava em '|| true' (estado não-gravável → verified:true sem jti); (2) corrida check→gravação: 8 envios simultâneos do mesmo jti davam 8 verified (40/40 em 5 rodadas), agora ≤1."
+    narrative: "Defeito apontado pela sessão principal no preparo do spike. A cura expôs um harness incompleto (PATH stubado do caso clock-attested sem mkdir), consertado no mesmo PR. Em produção o estado é gravável (ReadWritePaths cobre a home da conta do bridge no drop-in de hardening) e ignorado pelo git."
+    trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh (família a2a_verify)"
+      locator: "bloco 'ANTI-REPLAY FAIL-CLOSED (2026-10-14)' em run_a2a_verify_selftests"
+      method: "medição: bash .claude/validation/lint-selftest.sh --families a2a_verify"
+      locality: "repo"
+
+  - id: E_NEGATIVOS_GATE_SERVIDO_2026_10_14
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "réplica byte-idêntica do gate servido (a2a-verify.sh sha 2c5ae15a… = origin/main): A3 replay, A4 unknown-kid/kid-not-owned/bad-signature/trust-denied, A5 expired/future — todos rc 1; jti.state servido com sha igual antes e depois"
+    source_tier: 9
+    source_kind: measurement
+    label: "O gate que o bridge executa veta A3, A4 e A5 com os motivos pré-registrados. O caminho HTTP → gate → fila com o membro de teste NÃO foi exercido (sem token do pool)."
+    trace: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
+    provenance:
+      source: "SPIKE-PROTOCOL.md §8b (tabela verbatim)"
+      locator: "§8b, tabelas de negativos e de sondas HTTP"
+      method: "medição: bytes servidos copiados por leitura privilegiada, sha conferido, gate rodado com --dry-run fora da árvore servida"
+      locality: "host"
+
+  - id: E_TOKEN_POOL_LIDO_NA_SUBIDA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "código do bridge (leitura): a2aGuard compara o bearer com config.a2aTokens, montado do INVITE_TOKENS_A2A na subida; o gate é spawn por POST. Sonda viva sem token e com token inválido: HTTP 401, fila inalterada (2 registros anteriores)"
+    source_tier: 9
+    source_kind: measurement
+    label: "O bridge relê members.yaml/jwks a cada POST (pinar não pede restart), mas o pool de bearer só na subida, e o update-bridge.sh não edita o .env. Sem token do pool nada chega ao gate."
+    trace: "https://app.onionevolve.com/a2a"
+    provenance:
+      source: "repo privado onion-bridge: src/server.ts (a2aGuard), src/config.ts (a2aTokens), src/a2a.ts (runGate)"
+      locator: "a2aGuard: config.a2aTokens.has(bearer); runGate: spawn bash a2a-verify.sh por requisição"
+      method: "leitura: código do bridge sem tocar, mais sonda HTTP sem credencial"
+      locality: "host"
+
+  - id: C_CONSENTIMENTO_POR_MENSAGEM_MATA_CONVERSA
+    node_type: claim
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: open
+    label: "Com aceitação humana a cada mensagem (C1), o humano fica dentro do ciclo e o 'igual ao nativo' é impossível por construção; conversar exige consentimento por THREAD com expiração (C2)."
+    trace: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
+
+  - id: C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: open
+    label: "O notebook (NAT) não tem endpoint e o webhook seria vetado pelo anti-SSRF; a volta A2A entre usuários é o remetente consultar a Task (tasks/get ou SSE) no /a2a, mais a chave do core em a2a.keys. O ssh do A6a só vale entre máquinas do mesmo dono."
+    trace: "docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md"
+
+  - id: D_RFC0004_CONVERSA_POR_THREAD
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.6
+    status: open
+    label: "EMENDA à RFC-0004 (aberta, do maestro): de 'só sinais, nunca conversa autônoma' para 'conversa com consentimento por thread com expiração', com relay desligado entre orgs, corpo como dado (assinado) e regulado = never-live-pull."
+    narrative: |
+      Eixo: RFC-0004 §3 ("o a2a-live transporta só SINAIS GATED, nunca conversas autônomas") e §4 ("nenhuma
+      mensagem ao vivo é auto-aplicada; entra pelo mesmo gate tipado"). Referência de escopos: issue #87954
+      (notify / suggest / act com token expirável).
+
+      OPÇÕES
+      (A) Manter a RFC como está. Conversa só em C1 (uma aceitação humana por mensagem). Zero risco novo;
+          a conversa não acontece (o humano no ciclo). O spike vira prova de transporte, não de conversa.
+      (B) Emenda mínima: conversa GATED por thread. O maestro abre um lease (um membro, uma thread, TTL
+          ≤ 30 min, revogável) de escopo `suggest` (o receptor RESPONDE sob as permissões dele, sem agir no
+          repo por causa do corpo); `notify` = sinal de hoje; `act` FORA da emenda. Invariantes escritas na
+          emenda: (1) permission relay nunca declarado entre organizações; (2) corpo como dado E assinado
+          (body_sha256 conferido no gate — cura de F1 vira pré-condição); (3) receptor regulado =
+          never-live-pull: o evento chega como proposta, sem trabalho (propose-only também no channel);
+          (4) exp obrigatório com teto de vida (cura de F2); (5) 'autônoma' passa a ser definida pela
+          AUSÊNCIA de gate, não pela presença de resposta.
+      (C) Emenda ampla: (B) + escopo `act` com lease (o receptor pode agir no repo dentro do TTL). Encurta
+          mais o ciclo, mas devolve ao remetente autoridade sobre a sessão alheia, que é exatamente o que a
+          regra do relay desligado existe para impedir.
+
+      RECOMENDAÇÃO: (B), condicionada ao resultado do spike. Só selar se o A7-C2 der PASSOU-IGUAL ou
+      PASSOU-COM-RESSALVA, se o A8 passar nas seis variantes, e com F1 e F2 curados no gate ANTES da
+      emenda valer. (C) rejeitada pelo mesmo motivo de E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY. (A) é o
+      default se o spike reprovar.
+    trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
+
+edges:
+  - from: E_F1_CORPO_FORA_DA_ASSINATURA
+    to: D_RFC0004_CONVERSA_POR_THREAD
+    edge_type: CONSTRAINS
+  - from: E_F2_EXP_OPCIONAL
+    to: D_RFC0004_CONVERSA_POR_THREAD
+    edge_type: CONSTRAINS
+  - from: E_F3_JTI_FAIL_OPEN_CURADO
+    to: E_NEGATIVOS_GATE_SERVIDO_2026_10_14
+    edge_type: DEPENDS_ON
+  - from: E_NEGATIVOS_GATE_SERVIDO_2026_10_14
+    to: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
+    edge_type: SUPPORTS
+  - from: E_TOKEN_POOL_LIDO_NA_SUBIDA
+    to: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
+    edge_type: CONSTRAINS
+  - from: C_CONSENTIMENTO_POR_MENSAGEM_MATA_CONVERSA
+    to: D_RFC0004_CONVERSA_POR_THREAD
+    edge_type: SUPPORTS
+  - from: C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET
+    to: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
+    edge_type: CONSTRAINS
+  - from: D_RFC0004_CONVERSA_POR_THREAD
+    to: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
+    edge_type: DEPENDS_ON
+
+external_edges:
+  - from: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY"
+    to: D_RFC0004_CONVERSA_POR_THREAD
+    edge_type: CONSTRAINS
+  - from: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml#E_CC_CHANNELS_DEV_FLAG_INTERACTIVE_ONLY"
+    to: Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO
+    edge_type: CONSTRAINS

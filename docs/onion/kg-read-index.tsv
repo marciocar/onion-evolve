@@ -281,6 +281,8 @@
 .claude/utils/diagnose/scaffold-diagnose-store.sh	E_gap_scaffold	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
 .claude/utils/federation-transport/	C_no_sender_exists	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/utils/federation-transport/a2a-ssrf-check.sh	E_F11_CONTAINMENT_ESCAPE_CONVERGE_COM_SSRF	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
+.claude/utils/federation-transport/a2a-verify.sh	E_F1_CORPO_FORA_DA_ASSINATURA	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
+.claude/utils/federation-transport/a2a-verify.sh	E_F2_EXP_OPCIONAL	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 .claude/utils/federation-transport/a2a-verify.sh	E_a2a_is_not_vaporware	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/utils/forge/adapters/github.md	E_F10_GITLAB_NA_PLATAFORMA	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/utils/forge/detector.md	E_R3_F12_GITLAB_SUBGRUPOS_TAMBEM_NO_FORGE_DO_CORE	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
@@ -543,6 +545,7 @@
 .claude/validation/lint-selftest.sh	E_CURE_REPRODUCED_AND_FIXED	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_DOZE_MUTANTES_DEPOIS_DO_ELENXO	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_EPIPE_ACUSOU_O_TRANSPORTE_DE_NAO_CARREGAR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/validation/lint-selftest.sh	E_F3_JTI_FAIL_OPEN_CURADO	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_F6_DETACHED_MORRE_NO_STOP	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/validation/lint-selftest.sh	E_FAILSAFE_AFROUXADO_REPROVOU_POR_MEDICAO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_FIXTURE_NA_ARVORE_VIVA_CORRE_COM_AS_FAIXAS	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
@@ -1455,6 +1458,10 @@ docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.propos
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	Q_vps_declared	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/evolution/outbox/diary/2026-07-09-security-gate-degrades-to-veto.md	C_a2a_gate_narrow	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	C_CONSENTIMENTO_POR_MENSAGEM_MATA_CONVERSA	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
+docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
+docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	E_NEGATIVOS_GATE_SERVIDO_2026_10_14	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
+docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	Q_CONVERSA_CROSS_USER_IGUAL_AO_NATIVO	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_LACUNAS_PRIMARIES_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_MERCADO_AGENT_COMMAND_COMPOSITION_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
@@ -2141,6 +2148,7 @@ docs/evolution/review/fix-revisor-invisivel.md	E_JSON_SCHEMA_NAO_PASSA	docs/onio
 docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md	SY5_strategy_trio_is_one_package	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md	E_DOCTRINE_TERRAIN	docs/evolution/research/doctrine-sync-ingestor-2026-07/doctrine-sync-ingestor.kg.yaml
 docs/evolution/rfc/rfc-0004-a2a-live-interop.md	C_RFC4_INTER_INSTANCE	docs/onion/graph/onion-identity-2026-07.kg.yaml
+docs/evolution/rfc/rfc-0004-a2a-live-interop.md	D_RFC0004_CONVERSA_POR_THREAD	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md	C_RFC5_SCOPE_NOT_BRANCH	docs/onion/graph/onion-identity-2026-07.kg.yaml
 docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md	E_RFC5_TEXT	docs/onion/graph/onion-identity-2026-07.kg.yaml
 docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md	SY4_prod_rfc0005_ratificada	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml

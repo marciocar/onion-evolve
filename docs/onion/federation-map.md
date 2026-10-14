@@ -33,6 +33,7 @@ flowchart TD
   onion_curation["onion-curation<br/>standalone · greenfield"]:::standalone
   onion_kg_ssot["onion-kg-ssot<br/>standalone · greenfield"]:::standalone
   bomtexto["bomtexto<br/>standalone · greenfield"]:::standalone
+  maestro_notebook_test["maestro-notebook-test<br/>standalone · greenfield"]:::standalone
   metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
@@ -62,6 +63,7 @@ flowchart TD
   onion_curation -->|adopts| onion_evolve
   onion_kg_ssot -->|adopts| onion_evolve
   bomtexto -->|adopts| onion_evolve
+  maestro_notebook_test -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
   classDef hub fill:#238636,color:#fff,stroke:#033a16;
   classDef standalone fill:#8957e5,color:#fff,stroke:#3c1e70;
@@ -99,3 +101,4 @@ flowchart TD
 | onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `10514066fb28` |
 | onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `dcdacf9ba196` |
 | bomtexto | standalone | greenfield |  | `bd769f168411` |
+| maestro-notebook-test | standalone | greenfield | a2a-spike | `n/a` |
