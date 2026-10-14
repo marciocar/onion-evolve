@@ -1,11 +1,10 @@
 ---
 branch: docs/radar-e3-cc-2-1-299
 date: 2026-10-14
-reviewed_diff_sha256: 1c0a55d6293b0f1ddbbca51bdfa5bca4d8f1714ce7778b0957ef90d0f6f98099
-reviewed_code_sha256: c251018c6286c41a43bd31ee33a823693b658fdec763e0d01bccd8a987b16343
-findings_total: 10
-findings_real: 7
-findings_fixed: 7
+reviewed_diff_sha256: pendente
+findings_total: 11
+findings_real: 8
+findings_fixed: 8
 tokens: 157956
 duration_min: 35
 verdict: REPROVADO_E_CURADO
@@ -23,3 +22,11 @@ Os 5 foram reescritos com a medição dele, conferida aqui (o `case` do hook l.1
 do GitFlow; o manifesto do bundle l.74-78). Das omissões, 3 de impacto 2 viraram nós; as de impacto 1
 estão na seção NÃO-VERIFICADOS da SYNTHESIS. Aufhebung por `x_supersedes_none`, com a deriva da r9 enviada
 ao `/meta:kg-freshness` (SAC-119).
+
+## Rodada 1 do CI: a sonda da bancada casava o id real por substring
+
+O caso (c2) da família `backlog_projection` reprovou de forma determinística: ele garante que o grafo-sonda não
+rastreado fica fora da projeção procurando `Q_SONDA` por substring, e o nó novo desta rodada,
+`Q_SONDAR_O_BUNDLE_ONION_SOB_2_1_299`, entrou no `docs/backlog.md` e casou. Real, curado na bancada (não no
+id): o grep passa a `-w`. A família passa; se a sonda entrar na projeção, o id aparece como palavra e o caso
+reprova como antes. É a classe "guarda por lista falha pelo vocabulário".
