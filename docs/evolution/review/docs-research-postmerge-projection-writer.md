@@ -2,7 +2,7 @@
 title: 'Resíduo — o Passo B empacotado: grafo de 103 nós, o dogfood T1–T6 do B1, dois selos do maestro e um delegado'
 date: 2026-10-14
 branch: docs/research-postmerge-projection-writer
-reviewed_diff_sha256: f92898f1661b92047e0a1bd9fb8b484d10416780d4966fc81f9e63105b12efed
+reviewed_diff_sha256: 6d21914edad1e915cce15c6a78ad353a1a11646e67c6fcf6502122eff7988404
 reviewed_code_sha256: 4adb049f7661fb82ffacd69b01ec8fdd2364fc8353d42022cc837d79b9bc4ca5
 findings_total: 6
 findings_real: 4
