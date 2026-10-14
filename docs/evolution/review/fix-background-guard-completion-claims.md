@@ -2,7 +2,8 @@
 branch: fix/background-guard-completion-claims
 pr: pendente
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: fac162a60ed9616d35c2d0e6a1c57eede16822f596a3ad288938dc2c0c22bd88
+reviewed_code_sha256: 481450b6bfec6325720723a651a4a4b03a9cff22ee42b3ed0ba16d973114195d
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
