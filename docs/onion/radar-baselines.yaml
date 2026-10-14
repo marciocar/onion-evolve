@@ -13,14 +13,14 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-10-11
-    cc_version: "2.1.296"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "1/7 reprovado no juiz (contagem de hooks sem timeout invertida) + 4 exagerados corrigidos + 1 omissão incorporada (eol=lf)"
-                            # rodada 9 (2.1.295->2.1.296, uma versão, 79 itens), a 1ª pelo /meta:cc-update forjado.
-                            # O achado principal: a checagem de modelo forçado da onion-orchestration é cega à variável
-                            # nova CLAUDE_CODE_WORKFLOW_SUBAGENT_MODEL, e os 51 agentes usam 11 chaves de frontmatter
-                            # fora da tabela oficial (o --debug novo vai acusar todos). Histórico da r8 no kg dela.
-    kg: docs/evolution/research/radar-E3-2026-10-11-r9/radar-E3-2026-10-11-r9.kg.yaml
+    last_run: 2026-10-14
+    cc_version: "2.1.299"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "2/7 reprovados no juiz (grep cego por construção sem -z; migalha do PreCompact que não existe no core) + 3 exagerados corrigidos + 3 omissões incorporadas"
+                            # rodada 10 (2.1.296->2.1.299, uma versão, 190 itens). O achado: o delta quase não toca a
+                            # maquinaria do core; os pontos vivos são o hook de plugin que fecha no handoff (o bundle onion
+                            # leva 3 hooks, SAC-118), o PreCompact que não cobre as branches do core (SAC-117) e a deriva da
+                            # r9 (SAC-119). Histórico da r9 no kg dela.
+    kg: docs/evolution/research/radar-E3-2026-10-14-r10/radar-E3-2026-10-14-r10.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml

@@ -1,0 +1,271 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.299 a 2.1.299 contra a baseline 2.1.296.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-14-r10
+  schema_version: "1"
+  baseline: "2026-10-14"
+  review_after: "2026-11-13"   # 30d: cadência de ferramenta
+  x_supersedes_none: "nenhum item de 2.1.299 contradiz nó da r9 (E_USERPROMPTSUBMIT_DO_CORE_NAO_VETA reforçado; hooksPath segue como E_WORKTREE_DE_AGENTE_REGRAVA_HOOKSPATH_ABSOLUTO); a deriva de E_DEBUG_DE_HOOK_MEDE_DURACAO (20 para 22 hooks) e do onFailure vem do core, não do delta, e vai ao /meta:kg-freshness (Q_DERIVA_DA_R9_VAI_AO_KG_FRESHNESS)"
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-14); 15 depois da rodada e do juiz (2026-10-14).
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
+# external_edges:
+#   - to: "docs/evolution/research/radar-E3-2026-10-11-r9/radar-E3-2026-10-11-r9.kg.yaml#<NO_DERRUBADO>"
+#     edge_type: SUPERSEDES
+#   (b) não derrubou nada → no meta: x_supersedes_none: "<a razão medida>"
+external_edges:
+  - from: E_UPS_ANTES_DA_EXPANSAO_NAO_MUDA_O_CORE
+    to: "docs/evolution/research/radar-E3-2026-10-11-r9/radar-E3-2026-10-11-r9.kg.yaml#E_USERPROMPTSUBMIT_DO_CORE_NAO_VETA"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    trace: "docs/evolution/research/radar-E3-2026-10-14-r10/SYNTHESIS.md"
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "CHANGELOG oficial: seções 2.1.299 (193 linhas, 190 itens); baseline 2.1.296, disco 2.1.299, processo 2.1.299"
+    label: "o delta desde a baseline 2.1.296 são 1 versão(ões), de 2.1.299 a 2.1.299, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.299 a ## 2.1.299 (cópias em docs/evolution/research/radar-E3-2026-10-14-r10/data/)"
+      method: "medição: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "respondida pela rodada r10 em 2026-10-14: 7 itens ligados a superfície medida no vivo, julgados pelo juiz opus/high (2 sustentam, 3 exagerados e reescritos, 2 reprovados e remedidos), 3 omissões de impacto 2 incorporadas como nós e 2 ações abertas; os demais itens não tocam o core (gerenciado, mods, Windows, VSCode, nuvem, Claude Tag) ou foram medidos pelo juiz com impacto 1"
+    label: "quais itens de 2.1.299 a 2.1.299 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+  - id: E_UPS_ANTES_DA_EXPANSAO_NAO_MUDA_O_CORE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14: grep 'exit 2' e '\"block\"' nos 4 hooks UserPromptSubmit de .claude/settings.json (session-beacon-hook, aside-router-hook, session-version-drift, session-degraded-notice): a única ocorrência é o comentário do aside-router-hook.sh l.8 ('NUNCA bloqueia (sem exit 2'); nenhum bloqueia"
+    label: "a 2.1.299 roda os hooks UserPromptSubmit antes de a skill ou o comando expandir, para que um bloqueio pare também o shell embutido; nenhum hook UserPromptSubmit do core bloqueia, então a injeção dos 8 comandos e 2 skills com shell embutido segue rodando como antes"
+    narrative: "Juiz: SUSTENTA, com o label corrigido; a injeção por linha de shell embutida existe em 8 comandos (decide, drive, publish, dissect, forge, forge-guard, cc-update, evolve) e 2 skills (onion, onion-research), não só nos 3 que a 1ª redação citava."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.299, item 'Changed `UserPromptSubmit` hooks to run before a skill or custom slash command expands'"
+      method: "medição: grep nos 4 hooks UserPromptSubmit"
+      locality: "web"
+  - id: E_PLAN_MODE_E_VETOS_SEM_ALLOW
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 e recontado pelo juiz: grep de permissionDecision / allow nos 6 hooks PreToolUse de .claude/settings.json (pretooluse-env-guard, pretooluse-protect-main, pretooluse-merge-gate, kg-read-leg, pretooluse-moat-gate e pretooluse-direct-provider-api, este esquecido na 1ª conta): 0 ocorrências; o kg-read-leg só emite additionalContext"
+    label: "a 2.1.299 corrigiu o plan mode executando uma escrita que um PreToolUse permitiu; os vetos do core nunca emitem allow, então a correção não muda o comportamento deles"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.299, item 'Fixed plan mode running a write (an MCP tool's, a file's, a shell command's) that a `PreToolUse` hook or a mod's `tool.check` hook allowed'"
+      method: "medição: grep nos 5 hooks PreToolUse"
+      locality: "web"
+  - id: E_MCP_ALLOW_ESTREITADO_SEM_EFEITO_NO_CORE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 e corrigido pelo juiz: grep -c mcp em .claude/settings.json = 0 (não há regra MCP); no frontmatter tools: só jira-specialist.md (2 entradas) e system-documentation-orchestrator.md (5), todas com o nome inteiro do servidor; as formas mcp__clickup__* do agent-creator-specialist.md l.905 e mcp__code-understanding__* do system-documentation-orchestrator.md l.130 são prosa"
+    label: "a 2.1.299 estreitou as regras de allow de MCP (mcp__a não cobre mais a__b) e o tools: dos agentes; o settings.json do core não tem regra MCP e os 2 agentes com MCP no tools: usam o nome inteiro de servidores sem '__', então nada perde acesso"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.299, item 'Changed MCP allow rules to reach only the server they name; Changed agent `tools:` lists to take only the named MCP server's tools'"
+      method: "medição: grep das formas mcp__ em settings.json e agentes"
+      locality: "web"
+  - id: E_NOME_DE_SKILL_COM_CARACTERE_INVALIDO_ZERO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "remedido em 2026-10-14 depois de o juiz REPROVAR o método: git ls-files sem -z escapa não-ASCII em octal e o grep da 1ª medição dava zero por construção (provado com U+200B num repo temporário); com git ls-files -z .claude/commands .claude/skills | tr NUL LF | LC_ALL=C grep -P: 0 de 176 caminhos, e 0 nos campos name:"
+    label: "a 2.1.299 deixa de oferecer skill ou comando com caractere invisível, de direção, '<' ou '>' no nome; nenhum caminho de comando ou skill do core tem esses caracteres"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.299, item 'Changed skill and command loading: one whose file or folder name has hidden, direction-changing or blank-like characters, `<` or `>` is no longer offered'"
+      method: "medição: git ls-files com grep -P"
+      locality: "web"
+  - id: E_COMPACTACAO_OCIOSA_E_A_SESSAO_DO_MAESTRO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 pelo juiz e conferido: worklog-precompact-breadcrumb.sh l.12-13 (case feature/*|hotfix/*|release/* ... *) exit 0); git for-each-ref refs/heads refs/remotes com esses prefixos = 0 de 312; as branches do core são feat/, fix/, chore/, docs/"
+    narrative: "Juiz: REPROVOU a 1ª redação, que supunha a migalha do PreCompact viva nas sessões do core e inferia de 10 min de espera uma parada de 54 min. Reescrita com a medição dele: o hook é do worklog formal do GitFlow (feature/hotfix/release) e o core não usa esses prefixos, então a compactação ociosa não muda nada que já não fosse zero aqui."
+    label: "a 2.1.299 compacta sozinha a conversa de 200K+ tokens parada ~54 min; o hook PreCompact do core não deixa migalha nas sessões do core, porque sai 0 fora de branch feature/, hotfix/ ou release/, e nenhuma das 312 refs locais e remotas usa esses prefixos"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.299, item 'Added idle compaction in the terminal: a 200K+ token conversation left idle for about 54 minutes is compacted'"
+      method: "medição: leitura do settings.json e da sessão da rodada"
+      locality: "web"
+  - id: Q_COMPACTACAO_OCIOSA_DISPARA_O_PRECOMPACT
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "reformulada em 2026-10-14 pelo juiz da r10: a pergunta original (a compactação ociosa dispara o PreCompact?) não serve ao core, onde o hook sai 0 em toda branch; fecha quando (a) o maestro decidir a cobertura do PreCompact e (b) uma sessão de teste medir o trigger da compactação ociosa"
+    label: "o PreCompact deve deixar migalha também nas branches feat/, fix/, docs/ e chore/ do core, e a compactação ociosa da 2.1.299 chega a ele como trigger auto? A doc de hooks só lista manual e auto"
+    narrative: "Issue SAC-117 no Linear (projeto Onion — core: próximas levas), criada pelo tm.sh em 2026-10-14."
+  - id: E_AGENT_SPAWN_RESUME_E_SENDMESSAGE_SEM_USO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14: grep -rn SendMessage em .claude (*.sh, *.js, *.mjs): 0; o core não tem mod nem hook agent.spawn"
+    label: "a 2.1.299 fez o hook agent.spawn de mod rodar também ao retomar subagente e corrigiu o SendMessage por nome depois de reiniciar; a maquinaria do core não usa nenhum dos dois, o mesmo zero que o CLAUDE.md registra para o SendMessage"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.299, item 'Fixed the `agent.spawn` mod hook not running when a finished subagent or a killed teammate is resumed; Fixed `SendMessage` not finding a subagent by name after the CLI restarted'"
+      method: "medição: grep de SendMessage em .claude"
+      locality: "web"
+  - id: E_REVISOR_DO_CI_NAO_CHAMA_CLAUDE_P
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 e corrigido pelo juiz: onion-review.yml l.260 e l.374 pinam anthropics/claude-code-action em be7b93b1; a action roda por query() do @anthropic-ai/claude-agent-sdk (run-claude-sdk.ts l.4 e l.160) e a base-action pina a CLI 2.1.220 (base-action/action.yml l.148); os únicos claude -p do core são comentários"
+    label: "a 2.1.299 fez o claude -p de saída de texto listar no stderr o settings inválido; o revisor do CI roda a CLI pela Agent SDK dentro da claude-code-action pinada, não por claude -p de texto, então a correção não o alcança"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.299, item 'Fixed `claude -p` saying nothing when a settings file fails validation'"
+      method: "medição: leitura do onion-review.yml"
+      locality: "web"
+  - id: E_HOOK_DE_PLUGIN_FECHA_E_O_BUNDLE_LEVA_3
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 (omissão apontada pelo juiz): .claude/utils/marketplace/verticals/onion.manifest.sh l.74-78 leva ao bundle bash-empty-result-guard.sh (PostToolUse, exit 2), aside-router-hook.sh e pretooluse-env-guard.sh; não sondado ao vivo sob 2.1.299"
+    label: "a 2.1.299 passa a recusar a ação que um hook de plugin não consegue receber ou responder, e a reter o resultado de tool já executada; o plugin onion publicado leva 3 hooks, um deles PostToolUse com exit 2, e o comportamento deles no adotante pode mudar numa falha de handoff"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.299, item 'Changed actions a plugin hook can block to be refused, not let through, when the hook cannot be handed them or cannot hand back its answer'"
+      method: "medição: leitura do manifesto do bundle onion"
+      locality: "web"
+  - id: E_WEBFETCH_DA_PESQUISA_HERDA_O_ESFORCO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 (omissão apontada pelo juiz): .claude/workflows/onion-research.js tem 7 ocorrências de WebFetch e a fase Fetch roda em TIER.collect = sonnet/medium; o custo e a qualidade da leitura não foram medidos antes/depois"
+    label: "a 2.1.299 faz a leitura de página do WebFetch seguir o esforço de quem chama; a fase Fetch do /onion-research roda em sonnet/medium, então a base de custo e qualidade das rodadas de pesquisa muda e as comparações por nó com rodadas antigas deixam de ser diretas"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.299, item 'Changed WebFetch page reads to pick their effort as web searches do'"
+      method: "medição: grep no onion-research.js"
+      locality: "web"
+  - id: E_RELATORIO_DE_SUBAGENTE_EM_DOBRO_CURADO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: "2026-10-14"
+    verified_against: "medido em 2026-10-14 (omissão apontada pelo juiz): o modo padrão do usuário é auto e o radar, o juiz e o fan-out do core usam subagentes de fundo; não medido se algum selo do core foi gravado em dobro antes da correção"
+    label: "a 2.1.299 corrigiu o subagente de fundo em auto mode que às vezes mandava o relatório final duas vezes; o core usa subagentes de fundo em auto mode para juiz e fan-out, então um relatório duplicado podia ser lido como duas rodadas"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.299, item 'Fixed background subagents in auto mode sometimes sending their final report twice, once as the result and once as a message'"
+      method: "medição: leitura do modo padrão e dos usos de subagente de fundo"
+      locality: "web"
+  - id: Q_SONDAR_O_BUNDLE_ONION_SOB_2_1_299
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_at: "2026-10-14"
+    verified_against: "aberta em 2026-10-14 pelo juiz da r10; fecha quando uma sessão de teste com claude -p --plugin-dir sobre o bundle onion, num sandbox, medir o bash-empty-result-guard (PostToolUse exit 2) e o env-guard empacotados sob 2.1.299, incluindo a retenção de resultado"
+    label: "sondar o plugin onion publicado sob 2.1.299: o bash-empty-result-guard empacotado (PostToolUse com exit 2) e o env-guard mudam de comportamento quando o hook de plugin falha no handoff?"
+    narrative: "Issue SAC-118 no Linear (projeto Onion — core: próximas levas), criada pelo tm.sh em 2026-10-14."
+  - id: Q_DERIVA_DA_R9_VAI_AO_KG_FRESHNESS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-14"
+    verified_against: "aberta em 2026-10-14 pelo juiz da r10: E_DEBUG_DE_HOOK_MEDE_DURACAO da r9 dizia 20 hooks e 9 sem timeout, hoje são 22 e 11 (entraram pretooluse-direct-provider-api, 1871eef9, e pretooluse-moat-gate, 41510d7c); o x_supersedes_none da r9 dizia 0 com onFailure e hoje são 6 (dd6acd42); fecha pelo /meta:kg-freshness, com a latência dos 2 vetos novos medida"
+    label: "selar a deriva da r9 (contagem de hooks, timeout e onFailure) pelo /meta:kg-freshness e medir a latência dos 2 vetos PreToolUse novos, que rodam sem timeout"
+    narrative: "Issue SAC-119 no Linear (projeto Onion — core: próximas levas), criada pelo tm.sh em 2026-10-14."
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_COMPACTACAO_OCIOSA_E_A_SESSAO_DO_MAESTRO
+    to: Q_COMPACTACAO_OCIOSA_DISPARA_O_PRECOMPACT
+    edge_type: SUPPORTS
+  - from: E_UPS_ANTES_DA_EXPANSAO_NAO_MUDA_O_CORE
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_PLAN_MODE_E_VETOS_SEM_ALLOW
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_MCP_ALLOW_ESTREITADO_SEM_EFEITO_NO_CORE
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_NOME_DE_SKILL_COM_CARACTERE_INVALIDO_ZERO
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_AGENT_SPAWN_RESUME_E_SENDMESSAGE_SEM_USO
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_REVISOR_DO_CI_NAO_CHAMA_CLAUDE_P
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_HOOK_DE_PLUGIN_FECHA_E_O_BUNDLE_LEVA_3
+    to: Q_SONDAR_O_BUNDLE_ONION_SOB_2_1_299
+    edge_type: SUPPORTS
+  - from: E_WEBFETCH_DA_PESQUISA_HERDA_O_ESFORCO
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_RELATORIO_DE_SUBAGENTE_EM_DOBRO_CURADO
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_DELTA_DA_RODADA
+    to: Q_DERIVA_DA_R9_VAI_AO_KG_FRESHNESS
+    edge_type: SUPPORTS
