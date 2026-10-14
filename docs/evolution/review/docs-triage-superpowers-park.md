@@ -1,7 +1,8 @@
 ---
 branch: docs/triage-superpowers-park
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6a967b1607ab840c742c69155d078db70e2eb543859d8399e5f984cc202ea798
+reviewed_code_sha256: d35f8bf203293ca04feb06c51e16dae40eeec049f90b37fae9891611db412745
 findings_total: 3
 findings_real: 3
 findings_fixed: 3

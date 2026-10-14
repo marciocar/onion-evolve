@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**479 itens abertos** em 101 grafo(s) com aberto (de 130 no escopo) · 102 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**481 itens abertos** em 102 grafo(s) com aberto (de 131 no escopo) · 103 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -953,6 +953,13 @@
 |--:|---|---|---|
 | 3.2 | `C_ENV_GUARD_FECHA_TUDO_SEM_PYTHON` | vetos-fail-closed-2026-10 | o recorte sem python3 dos dois vetos é sombreado no core: o env-guard, registrado no mesmo matcher, barra todo Read, Grep e Bash  |
 | 2.8 | `C_ENV_GUARD_GLOB_ABSOLUTO_APOS_CD_VARIAVEL` | vetos-fail-closed-2026-10 | falso positivo do env-guard achado ao medir: depois de um cd com variável, um glob ABSOLUTO sem relação com .env é barrado, po |
+
+## superpowers-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.0 | `Q_REABRIR_CARIMBO_POR_PROBE` | superpowers-2026-10 | Vale um carimbador determinístico de verified_at por reexecução da medição? O plano v1 caiu por 3 objeções fatais: inviáve |
+| 3.0 | `Q_REABRIR_TRES_SKILLS` | superpowers-2026-10 | As 3 skills que o Onion não tem (systematic-debugging, test-driven-development como fluxo, diagnosing-superpowers) valem absorç |
 
 ## direct-provider-api-2026-10 — 1 item(ns)
 
