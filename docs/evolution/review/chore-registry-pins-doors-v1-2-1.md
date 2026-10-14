@@ -1,7 +1,8 @@
 ---
 branch: chore/registry-pins-doors-v1-2-1
 date: 2026-10-14
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e4c06a3f2094f521acb245cf661ff2ebd11c53a3318d07e637093ee795e4875d
+reviewed_code_sha256: caff162b9a37c747e011c9a6bc2efb70fde387c8ca16aa16aac241bd98d03aa3
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
