@@ -2,7 +2,7 @@
 title: 'Resíduo — o corpo entra na assinatura do a2a-verify e o exp fica obrigatório'
 date: 2026-10-14
 branch: fix/a2a-body-signed-and-exp-required
-reviewed_diff_sha256: b1540e8a7a03e825ce5bb5b0f85dc828812985bce9aaccfa54688735c6fab879
+reviewed_diff_sha256: d29251f4a2c3cfd0c0abdc5196ac7c9a37394c43041f68e8fce3965f91bf3916
 reviewed_code_sha256: cc735ae89b3e57cec8553164029eedf9ea53ed57bc40bc9bb6c8362f41b6ec06
 findings_total: 11
 findings_real: 7
