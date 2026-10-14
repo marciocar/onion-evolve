@@ -8418,7 +8418,11 @@ run_pre_push_selftests() {
            'else S="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color --cached "$BASE" -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64)"; fi' \
            'D="$(awk '"'"'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1'"'"' "$R" 2>/dev/null | sed -n "s/^reviewed_diff_sha256:[[:space:]]*//p" | head -1 | tr -d "\"")"' \
            '[ "$D" = "$S" ] && echo "  ✅ casa" || echo "  ✗ ARTEFATO-CADUCO atual $S"' > .claude/validation/review-artifact-check.sh \
-      && chmod +x .claude/utils/adopt/*.sh .claude/validation/*.sh \
+      && mkdir -p ops && printf '%s\n' '#!/bin/bash' \
+           '# stub do gate do contrato KG-SSOT (ops/kg-gate-ci.sh): reprova quando o arquivo kgverdict diz "piorou"' \
+           'if [ "$(cat kgverdict 2>/dev/null)" = piorou ]; then echo "✗ PIOROU  debt.form.range.node.label: 1 → 2"; exit 1; fi' \
+           'echo "✓ gate"; exit 0' > ops/kg-gate-ci.sh \
+      && chmod +x .claude/utils/adopt/*.sh .claude/validation/*.sh ops/kg-gate-ci.sh \
       && echo base > docs/backlog.md && echo v0 > a.txt && echo 0 > verdict && seq 1 60 > c.txt \
       && printf 'v-v0\n' > .claude/validation/lint-rules.md \
       && git add -A && git commit -qm base && git push -q origin main && git switch -q -c feat/x ) >/dev/null 2>&1
@@ -8446,6 +8450,15 @@ run_pre_push_selftests() {
     g="$(_pf "${sb}" -m t2)"; _pfc "CÓDIGO mudou depois da revisão → RECUSA" 1 "${g}" "${sb}"
     ( cd "${sb}/w" && git reset -q a.txt && git checkout -q a.txt && echo mudou >> docs/backlog.md && git add docs/backlog.md ) >/dev/null 2>&1
     g="$(_pf "${sb}" -m t3)"; _pfc "só projeção mudou → recarimba" 0 "${g}" "${sb}"
+  fi
+  # o contrato KG-SSOT reprova o COMMIT (a catraca da dívida SHOULD, que o lint não vê: o #1106) → nada
+  # enviado, com a causa nomeada. Antes de 2026-10-14 o motor nem chamava o gate e saía rc 0 aqui.
+  if _new kg_gate_reprova; then
+    ( cd "${sb}/w" && echo piorou > kgverdict && git add kgverdict ) >/dev/null 2>&1
+    g="$(_pf "${sb}" -m t1)"
+    if [ "${g}" = 1 ] && grep -q 'contrato KG-SSOT' "${sb}/out" && grep -q 'PIOROU' "${sb}/out"; then
+      record_pass "pr-finalize: contrato KG-SSOT reprova o commit → rc 1 com a causa nomeada"
+    else record_fail "pr-finalize: contrato KG-SSOT reprova" "esperava rc 1 + 'contrato KG-SSOT' + 'PIOROU'; rc=${g}: $(tail -2 "${sb}/out" 2>/dev/null)"; fi
   fi
   # B1 reaberto pelo Elenxo 2: hash entre aspas / com espaço no fim NÃO é "pendente"
   local form
