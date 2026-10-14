@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 11 NÓS ═══
+# ═══ TETO: 12 NÓS ═══ (+1 em 2026-10-14: D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA, o selo do maestro que aposenta o veto sobre a prosa)
 # ⚠️ SUBIDO DE 8 PARA 11 em 2026-10-02, e a razão importa porque ontem eu quase subi um teto pelo
 # motivo ERRADO: no `fios-abertos` o teto acusou uma violação de FRONTEIRA (fato no lugar do
 # compromisso) e subi-lo teria consertado o número mantendo a doença. AQUI é diferente e verificável:
@@ -172,6 +172,22 @@ nodes:
     label: 'CANDIDATO 3 A GUARDA, selado pelo maestro em 2026-10-02, e o de MAIOR impacto porque e a classe mais caruna da sessao: QUATRO ocorrencias no mesmo dia de caso de bancada que exercita uma COPIA em vez do SUT. As duas formas medidas: (1) o caso COPIA o predicado para dentro de si — o `(d)` do r84_pathspec replicava o `case` do lint e testava a replica, e o mutante que tirava `*/index.lock` da isencao (fail-open REAL: `git commit -a` deixaria de ser julgado) passava 8/8 VERDE, com o rotulo dizendo "por EXECUCAO"; (2) o sandbox nasce de `git archive HEAD`, logo o caso testa o artefato COMMITADO e o mutante aplicado na ARVORE nunca chega la — cura do artefato CERTO, da REVISAO errada. O pior caso da classe: a guarda `background-state-needs-evidence` nasceu vetando TODO TURNO HONESTO em producao (212 vetos em 12.456 pontos de parada) com a bancada 6/6 VERDE, porque os 6 casos alimentavam uma funcao PURA e QUATRO dos cinco bloqueadores viviam no harvester. E o proprio `lint-selftest.sh` JA AVISA desta classe na l.514. CANDIDATO A PREDICADO (grepavel): familia que declara exercitar um SUT e nao o invoca pelo caminho do runner — nem por stdin/transcript quando o runner e hook, nem com o artefato da ARVORE quando monta sandbox de `git archive`. TETO declarado de antemao: ela vai pegar a FORMA (ausencia da invocacao), nao a semantica de "o caso mede o que diz medir".'
     trace: '.claude/validation/lint-selftest.sh'
     verified_against: 'quatro ocorrencias medidas em 2026-10-02 por mutante: (d) do r84_pathspec verde sobre fail-open; (a) do role_promotion verde com o defeito em outra sintaxe; sandbox de git archive cego a mutante da arvore; e os 6 casos puros do hook verdes sobre 212 vetos em producao'
+  - id: D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Aposentar o veto e pôr a sonda»"
+    label: "o veto sobre a prosa do background-state-needs-evidence é aposentado e entra uma sonda UserPromptSubmit que mede o processo de cada tarefa de fundo viva e injeta o estado, sem vetar; a SAC-138 não entra"
+    narrative: "Selado por /meta:decide em 2026-10-14: escolhida «Aposentar o veto e pôr a sonda»; descartadas: «Só aposentar o veto» · «Pôr a sonda e manter o veto» · «Mergear a SAC-138»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Guarda de estado de fundo: 17 de 20 vetos reais sobre afirmação certa, 0 no defeito de origem, SAC-138 com 6 de 6 falsos; o que fazer?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
 
 edges:
   - from: E_BANCADA_VERDE_COM_ARTEFATO_INUTIL
@@ -207,3 +223,6 @@ edges:
   - from: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
     to: D_A_FORJA_E_REUSAVEL_PORQUE_O_PROCEDIMENTO_E_O_MAIS_REPETIDO
     edge_type: SUPPORTS
+  - from: D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA
+    to: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
+    edge_type: SUPERSEDES
