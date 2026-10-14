@@ -9229,10 +9229,17 @@ YML
   local NOW out rc
   NOW="$(date +%s)"
   _b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
-  _jws() { local h p; h="$(printf '{"alg":"RS256","kid":"%s"}' "${6:-k1}" | _b64url)"
-    p="$(printf '{"iss":"%s","aud":"%s","iat":%s,"exp":%s,"jti":"%s"}' "$1" "$2" "$3" "$4" "$5" | _b64url)"
+  _sha() { openssl dgst -sha256 | awk '{print $NF}'; }
+  # Desde 2026-10-14 o corpo entra na assinatura: o _jws assina body_sha256 de ${_BODY} (vazio por default,
+  # o caso dos sinais de julho sem corpo) e o _env embarca signal.body quando ${_BODY} não é vazio.
+  _BODY=""
+  _jws_raw() { local h p; h="$(printf '{"alg":"RS256","kid":"%s"}' "${2:-k1}" | _b64url)"   # $1 = payload JSON literal
+    p="$(printf '%s' "$1" | _b64url)"
     printf '%s.%s.%s' "$h" "$p" "$(printf '%s' "$h.$p" | openssl dgst -sha256 -sign "${sb}/priv.pem" | _b64url)"; }
-  _env() { printf '{"jws":"%s","signal":{"from":"%s","to":"%s","kind":"signal"}%s}' "$1" "$2" "$3" "$4"; }
+  _jws() { _jws_raw "$(printf '{"iss":"%s","aud":"%s","iat":%s,"exp":%s,"jti":"%s","body_sha256":"%s"}' \
+    "$1" "$2" "$3" "$4" "$5" "$(printf '%s' "${_BODY}" | _sha)")" "${6:-k1}"; }
+  _env() { local b=""; [ -z "${_BODY}" ] || b=",\"body\":$(printf '%s' "${_BODY}" | jq -Rs .)"
+    printf '{"jws":"%s","signal":{"from":"%s","to":"%s","kind":"signal"%s}%s}' "$1" "$2" "$3" "${b}" "$4"; }
   # A2A_CLOCK_TRUST=attested: o relógio do HOST de teste não é o SUT destes casos (a guarda
   # clock-untrusted tem casos dedicados abaixo, com PATH stubado — determinístico em qualquer CI).
   _verify() { rc=0; out="$(A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver "$1" --repo "${sb}" --dry-run --envelope - <<<"$2" 2>/dev/null)" || rc=$?; }
@@ -9370,7 +9377,142 @@ YML
   if [ "${nver:-9}" -le 1 ] && [ "${nall:-0}" -eq 8 ]; then
     record_pass "a2a-verify: 8 envios simultâneos do mesmo jti → no máximo 1 verified (deu ${nver})"
   else record_fail "a2a-verify: corrida de replay" "verified=${nver} de 8 (esperava ≤1, e 8 vereditos)"; fi
-  rm -rf "${bin}" "${clkbin}" "${sb}" "${sbw}" "${mutd}" "${mroot}" "${sbr}"
+
+  # CORPO ASSINADO + EXP OBRIGATÓRIO (2026-10-14, achados F1/F2 do spike a2a cross-user). Cada cura tem
+  # caso e MUTANTE; o mutante devolve o comportamento antigo e o caso tem de reprová-lo. Mutante que veta
+  # por OUTRO motivo é "não exercido" (falso-verde por vacuidade) e reprova.
+  _verify_h() { rc=0; out="$(A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "$1" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"$2" 2>/dev/null)" || rc=$?; }
+  local _MUT="" mroots=()
+  _mk_mut() {  # $1 = rótulo; $2 = script sed (UMA linha trocada por `c`); deixa o caminho em _MUT
+    local d; d="$(mktemp -d)"; mroots+=("${d}")
+    mkdir -p "${d}/.claude/validation" "${d}/.claude/utils/federation-transport"
+    cp "${REPO_ROOT}/.claude/validation/trust-topology-check.sh" "${d}/.claude/validation/"
+    cp "${REPO_ROOT}/.claude/utils/federation-transport/a2a-ssrf-check.sh" "${d}/.claude/utils/federation-transport/"
+    _MUT="${d}/.claude/utils/federation-transport/a2a-verify.sh"
+    sed -e "$2" "${helper}" > "${_MUT}"
+    [ "$(grep -c '# MUTANTE' "${_MUT}")" = "1" ] \
+      || record_fail "a2a-verify: (MUT) âncora ${1}" "o sed não trocou EXATAMENTE uma linha (a linha da cura mudou?)"
+  }
+  _case_mut() {  # $1 rótulo · $2 motivo esperado no intacto · $3 envelope p/ o intacto · $4 envelope p/ o mutante
+    local ri=1 rmu=0
+    _verify "onion-evolve" "$3"
+    if [ "${rc}" -eq 1 ] && grep -q "\"reason\":\"$2\"" <<< "${out}"; then ri=0; record_pass "a2a-verify: $1 → veto $2"
+    else record_fail "a2a-verify: $1" "out='${out}' rc=${rc}"; fi
+    _verify_h "${_MUT}" "$4"
+    if grep -q '"verified":true' <<< "${out}"; then rmu=1
+    elif ! grep -q "\"reason\":\"$2\"" <<< "${out}"; then record_fail "a2a-verify: (MUT) $1 não exercido" "vetou por outro motivo: out='${out}'"; fi
+    _prove_mutation "a2a-verify: (MUT) sem a cura, '$1' volta a verificar" "${helper}" "${_MUT}" "${ri}" "${rmu}"
+  }
+
+  # (a) envelope bem formado COM corpo (Unicode, aspas, \n final) → verified
+  _BODY=$'pergunta com corpo: "é" ou não?\n'
+  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-body-ok)" acme onion-evolve "")"
+  if [ "${rc}" -eq 0 ] && grep -q '"verified":true' <<< "${out}"; then record_pass "a2a-verify: corpo assinado (body_sha256) e íntegro → verified"
+  else record_fail "a2a-verify: corpo íntegro" "out='${out}' rc=${rc}"; fi
+  # (b) corpo trocado DEPOIS de assinar → body-mismatch  (+MUTANTE: tirar a comparação)
+  _mk_mut "body-mismatch" '/veto "body-mismatch" "body"$/c true # MUTANTE: corpo fora da assinatura'
+  local tb1 tb2
+  tb1="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-body-x1)" acme onion-evolve "" | jq -c '.signal.body="corpo trocado"')"
+  tb2="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-body-x2)" acme onion-evolve "" | jq -c '.signal.body="corpo trocado"')"
+  _case_mut "corpo trocado depois de assinar" "body-mismatch" "${tb1}" "${tb2}"
+  # (c) corpo ACRESCENTADO a um sinal assinado sem corpo (claim = sha256 do vazio) → body-mismatch
+  _BODY=""
+  tb1="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-body-add)" acme onion-evolve "" | jq -c '.signal.body="injetado"')"
+  _verify onion-evolve "${tb1}"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"body-mismatch"' <<< "${out}"; then record_pass "a2a-verify: corpo acrescentado a sinal assinado sem corpo → veto body-mismatch"
+  else record_fail "a2a-verify: corpo acrescentado" "out='${out}' rc=${rc}"; fi
+  # (d) corpo vazio ASSINADO (body:"" e claim = sha256 do vazio) → verified: vazio é corpo, não ausência de prova
+  tb1="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-body-empty)" acme onion-evolve "" | jq -c '.signal.body=""')"
+  _verify onion-evolve "${tb1}"
+  if [ "${rc}" -eq 0 ] && grep -q '"verified":true' <<< "${out}"; then record_pass "a2a-verify: corpo vazio assinado como vazio → verified (o hash do vazio é o que amarra)"
+  else record_fail "a2a-verify: corpo vazio" "out='${out}' rc=${rc}"; fi
+  # (e) remetente ANTIGO (payload de julho, sem body_sha256) → recusado, nunca aceito em silêncio
+  _verify onion-evolve "$(_env "$(_jws_raw "{\"iss\":\"acme\",\"aud\":\"onion-evolve\",\"iat\":${NOW},\"exp\":$((NOW+3600)),\"jti\":\"jti-legacy\"}")" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"jws-missing-body-sha256"' <<< "${out}"; then record_pass "a2a-verify: remetente sem body_sha256 (formato de julho) → veto jws-missing-body-sha256"
+  else record_fail "a2a-verify: remetente antigo" "out='${out}' rc=${rc}"; fi
+  # (f) body_sha256 DUPLICADO no payload assinado: o 1º (o que um parser first-wins leria) é de outro corpo,
+  #     o último (o que o jq lê) é o do corpo que viaja → duplicate-key  (+MUTANTE: aceitar duplicata)
+  _BODY="corpo real"
+  local hreal hevil; hreal="$(printf '%s' "${_BODY}" | _sha)"; hevil="$(printf 'outro corpo' | _sha)"
+  _dup() { _env "$(_jws_raw "{\"iss\":\"acme\",\"aud\":\"onion-evolve\",\"iat\":${NOW},\"exp\":$((NOW+300)),\"jti\":\"$1\",\"body_sha256\":\"${hevil}\",\"body_sha256\":\"${hreal}\"}")" acme onion-evolve ""; }
+  _mk_mut "duplicate-key" '/veto "duplicate-key:/c *) true ;; # MUTANTE: duplicata aceita'
+  _case_mut "body_sha256 duplicado no payload" "duplicate-key:jws-payload" "$(_dup jti-dup1)" "$(_dup jti-dup2)"
+  _BODY=""
+  # (g) SEM exp → jws-missing-exp  (+MUTANTE: exp ausente volta a ser tolerado)
+  _noexp() { _env "$(_jws_raw "{\"iss\":\"acme\",\"aud\":\"onion-evolve\",\"iat\":${NOW},\"jti\":\"$1\",\"body_sha256\":\"$(printf '' | _sha)\"}")" acme onion-evolve ""; }
+  _mk_mut "missing-exp" '/veto "jws-missing-exp" "timestamp"$/c [ -n "${EXP}" ] || EXP="$(( NOW + 60 ))" # MUTANTE: exp opcional'
+  _case_mut "JWS sem exp" "jws-missing-exp" "$(_noexp jti-noexp1)" "$(_noexp jti-noexp2)"
+  # (h) exp ACIMA do teto (vida 7200 s > 3600) → exp-beyond-ceiling  (+MUTANTE: sem teto)
+  _mk_mut "exp-ceiling" '/veto "exp-beyond-ceiling" "timestamp"$/c true # MUTANTE: sem teto'
+  _case_mut "exp acima do teto de vida" "exp-beyond-ceiling" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+7200))" jti-ceil1)" acme onion-evolve "")" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+7200))" jti-ceil2)" acme onion-evolve "")"
+  # (i) a 2ª forma do teto: vida declarada cabe (exp−iat = 3500) mas o iat futuro (dentro do skew) estica o exp além de now+teto
+  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "$((NOW+200))" "$((NOW+3700))" jti-ceil3)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"exp-beyond-ceiling"' <<< "${out}"; then record_pass "a2a-verify: iat futuro no skew não estica o exp além do teto → veto exp-beyond-ceiling"
+  else record_fail "a2a-verify: teto pelo now" "out='${out}' rc=${rc}"; fi
+  # (j) exp não-inteiro (string) → jws-bad-exp: a leitura antiga deixava passar em silêncio
+  _verify onion-evolve "$(_env "$(_jws_raw "{\"iss\":\"acme\",\"aud\":\"onion-evolve\",\"iat\":${NOW},\"exp\":\"amanhã\",\"jti\":\"jti-badexp\",\"body_sha256\":\"$(printf '' | _sha)\"}")" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"jws-bad-exp"' <<< "${out}"; then record_pass "a2a-verify: exp não-inteiro → veto jws-bad-exp"
+  else record_fail "a2a-verify: exp não-inteiro" "out='${out}' rc=${rc}"; fi
+  # (j2) as linhas que o refutador provou load-bearing sem caso (2026-10-14): cada uma ganha caso + MUTANTE
+  _mk_mut "exp-not-after-iat" '/veto "exp-not-after-iat" "timestamp"$/c true # MUTANTE: exp antes do iat'
+  _case_mut "exp anterior ao iat" "exp-not-after-iat" \
+    "$(_env "$(_jws acme onion-evolve "$((NOW+200))" "$((NOW+100))" jti-eai1)" acme onion-evolve "")" \
+    "$(_env "$(_jws acme onion-evolve "$((NOW+200))" "$((NOW+100))" jti-eai2)" acme onion-evolve "")"
+  _mk_mut "signal-body-sha256" '/veto "signal-body-sha256-mismatch" "body"$/c true # MUTANTE: cópia do hash ignorada'
+  _case_mut "signal.body_sha256 diferente do claim" "signal-body-sha256-mismatch" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-ssh1)" acme onion-evolve "" | jq -c '.signal.body_sha256="00"')" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-ssh2)" acme onion-evolve "" | jq -c '.signal.body_sha256="00"')"
+  _mk_mut "claim-thread" '/veto "claim-\${f}-mismatch" "body"$/c || true # MUTANTE: thread/body_path sem claim'
+  _case_mut "signal.thread sem claim assinado" "claim-thread-mismatch" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-thr1)" acme onion-evolve "" | jq -c '.signal.thread="th-x"')" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-thr2)" acme onion-evolve "" | jq -c '.signal.thread="th-x"')"
+  # corpo não-string: o claim é sha256("[]") porque, sem a checagem de tipo, o jq -j serializaria o array
+  _BODY='[]'
+  _mk_mut "body-not-string" '/veto "body-not-string" "body" ;; esac$/c true # MUTANTE: corpo de qualquer tipo'
+  _case_mut "corpo não-string (array)" "body-not-string" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-bns1)" acme onion-evolve "" | jq -c '.signal.body=[]')" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-bns2)" acme onion-evolve "" | jq -c '.signal.body=[]')"
+  _BODY=""
+  # rótulo NÃO assinado com quebra de linha (injeção no frontmatter do inbox pelo a2a-accept) → veto
+  _mk_mut "signal-field-unsafe" '/signal-shape-unreadable}" "body"$/c true # MUTANTE: forma dos rótulos livre'
+  _case_mut "kind não assinado com quebra de linha" "signal-field-unsafe:kind" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-uns1)" acme onion-evolve "" | jq -c '.signal.kind="signal\napply_mode: auto"')" \
+    "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-uns2)" acme onion-evolve "" | jq -c '.signal.kind="signal\napply_mode: auto"')"
+  _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-unk)" acme onion-evolve "" | jq -c '.signal.summary="não assinado"')"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"signal-unknown-key:summary"' <<< "${out}"; then record_pass "a2a-verify: chave desconhecida no signal → veto signal-unknown-key"
+  else record_fail "a2a-verify: chave desconhecida" "out='${out}' rc=${rc}"; fi
+  _verify onion-evolve "$(_env "$(_jws_raw "{\"iss\":\"acme\",\"aud\":\"onion-evolve\",\"iat\":${NOW},\"exp\":$((NOW+300)),\"jti\":\"jti-shanl\",\"body_sha256\":\"$(printf '' | _sha)\\n\"}")" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"jws-bad-body-sha256"' <<< "${out}"; then record_pass "a2a-verify: body_sha256 com \\n final → veto jws-bad-body-sha256 (forma julgada no jq, não por \$(...))"
+  else record_fail "a2a-verify: body_sha256 com newline" "out='${out}' rc=${rc}"; fi
+  local one; one="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+300))" jti-multi)" acme onion-evolve "")"
+  _verify onion-evolve "${one} ${one}"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"malformed-envelope"' <<< "${out}"; then record_pass "a2a-verify: dois documentos JSON no envelope → veto malformed-envelope"
+  else record_fail "a2a-verify: envelope multi-documento" "out='${out}' rc=${rc}"; fi
+
+  # (k) o REMETENTE DO SPIKE (notebook/send-a2a.sh), sem rede (--dry-run): o envelope dele é aceito; o
+  #     mesmo envelope re-serializado com OUTRO escape (é, como o bridge ou outro parser faria) também
+  #     — canonicalização divergente não gera falso body-mismatch; e o --no-exp dele (cenário A5c) é recusado.
+  local snd="${REPO_ROOT}/docs/evolution/research/a2a-cross-user-spike-2026-10/notebook/send-a2a.sh"
+  if [ ! -f "${snd}" ]; then record_fail "a2a-verify: remetente do spike" "ausente: ${snd}"
+  elif ! command -v curl >/dev/null 2>&1; then record_skip "a2a-verify: remetente do spike exige curl no PATH → skip (não-SUT)"
+  else
+    _spk() { HOME="${sb}/home" bash "${snd}" --dry-run --key "${sb}/priv.pem" --kid k1 --from acme --to onion-evolve "$@" 2>/dev/null; }
+    _verify onion-evolve "$(_spk --body $'conversa do spike: "olá", é?\n')"
+    if [ "${rc}" -eq 0 ] && grep -q '"verified":true' <<< "${out}"; then record_pass "a2a-verify: envelope do send-a2a.sh do spike → verified"
+    else record_fail "a2a-verify: remetente do spike" "out='${out}' rc=${rc}"; fi
+    _verify onion-evolve "$(_spk --body $'conversa do spike: "olá", é?\n' | python3 -c 'import sys,json;print(json.dumps(json.load(sys.stdin),ensure_ascii=True,indent=1))')"
+    if [ "${rc}" -eq 0 ] && grep -q '"verified":true' <<< "${out}"; then record_pass "a2a-verify: mesmo corpo com outro escape JSON (\\u00e9) → verified (canônico = string decodificada)"
+    else record_fail "a2a-verify: escape divergente" "out='${out}' rc=${rc}"; fi
+    _verify onion-evolve "$(_spk --body 'original' | jq -c '.signal.body="adulterado"')"
+    if [ "${rc}" -eq 1 ] && grep -q '"reason":"body-mismatch"' <<< "${out}"; then record_pass "a2a-verify: envelope do spike com corpo adulterado → veto body-mismatch"
+    else record_fail "a2a-verify: spike adulterado" "out='${out}' rc=${rc}"; fi
+    _verify onion-evolve "$(_spk --body 'sem validade' --no-exp)"
+    if [ "${rc}" -eq 1 ] && grep -q '"reason":"jws-missing-exp"' <<< "${out}"; then record_pass "a2a-verify: send-a2a.sh --no-exp (A5c) → veto jws-missing-exp"
+    else record_fail "a2a-verify: spike sem exp" "out='${out}' rc=${rc}"; fi
+  fi
+  rm -rf "${bin}" "${clkbin}" "${sb}" "${sbw}" "${mutd}" "${mroot}" "${sbr}" "${mroots[@]}"
 }
 
 # ---------------------------------------------------------------------------

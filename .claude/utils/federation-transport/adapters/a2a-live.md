@@ -36,8 +36,46 @@ Antes de QUALQUER sinal virar ação, delega ao gate obrigatório **`a2a-verify.
 (verificação-antes-de-agir; a spec A2A a exige do receptor):
 1. **trust policy** (compõe `trust-topology-check.sh`: origem ∈ policy-as-data do `members.yaml`) ·
 2. **anti-replay** (`jti` single-use) · 3. **janela de timestamp** · 4. **anti-SSRF** (`a2a-ssrf-check.sh` na
-URL do webhook) · 5. **assinatura JWS** (RS256, pubkey pinada por `kid` no JWKS fixture) · 6. **never-live-pull**
-(receptor `mode:regulated` → `apply_mode:propose-only`).
+URL do webhook) · 5. **assinatura JWS** (RS256, pubkey pinada por `kid` no JWKS fixture) · 5b. **corpo
+assinado** (`body_sha256`, abaixo) · 6. **never-live-pull** (receptor `mode:regulated` → `apply_mode:propose-only`).
+
+### O que é assinado (desde 2026-10-14)
+
+Até 2026-10-14 a assinatura cobria **só os claims**: trocar `signal.body` depois de assinar devolvia
+`verified:true`, e um JWS sem `exp` valia para sempre (achados F1 e F2 do spike A2A cross-user,
+`docs/evolution/research/a2a-cross-user-spike-2026-10/`). Agora:
+
+| o quê | como entra na assinatura | sem isso |
+|---|---|---|
+| `iss`, `aud`, `jti` | claims do payload JWS | veto (`claim-iss-mismatch`, `claim-aud-mismatch`, `jws-missing-jti`) |
+| `iat`, `exp` | claims **obrigatórios**, inteiros; `exp − iat ≤ teto` e `exp ≤ now + teto` (teto = `A2A_EXP_MAX_TTL`, default **3600 s**) | `jws-missing-exp`, `jws-missing-iat`, `jws-bad-exp`, `exp-not-after-iat`, `exp-beyond-ceiling` |
+| o **corpo** `signal.body` | claim **obrigatório** `body_sha256` = sha256 (hex minúsculo) dos **bytes UTF-8 da string já decodificada** | `jws-missing-body-sha256` (remetente antigo) · `body-mismatch` (corpo trocado) · `body-not-string` |
+| `signal.body_path`, `signal.thread` | se presentes no signal, têm de estar **iguais** como claim | `claim-body_path-mismatch`, `claim-thread-mismatch` |
+| cópia `signal.body_sha256` | se presente, igual ao claim | `signal-body-sha256-mismatch` |
+| chave JSON duplicada (envelope ou payload) | — | `duplicate-key:<onde>` |
+| `signal.id`, `direction`, `kind`, `classification` | **NÃO assinados**; forma fechada: 1–128 de `[A-Za-z0-9._:-]` | `signal-field-unsafe:<campo>` |
+| qualquer outra chave no `signal` | — | `signal-unknown-key:<chave>` |
+
+- **Canonicalização (declarada):** o corpo é uma **string JSON**; o canônico são os bytes UTF-8 do valor
+  decodificado, sem aspas e **sem normalização Unicode**. A forma de escape no transporte (`é` ou `é`)
+  não entra no hash, que é o efeito que a JCS (RFC 8785) busca. Hash sobre os bytes crus do envelope não
+  serviria: o bridge faz `JSON.parse` e re-serializa antes de chamar o gate. NFC e NFD do mesmo texto são
+  bytes diferentes e dão `body-mismatch` (fail-closed: quem assina escolhe a forma).
+- **Corpo ausente = corpo vazio:** o remetente assina `body_sha256` do vazio
+  (`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`). Acrescentar um corpo depois quebra
+  o hash. Um sinal sem corpo (ping, ou `body_path` de julho) continua possível, mas assinado como vazio.
+- **NÃO assinados (declarado):** `signal.id`, `direction`, `kind`, `classification` e `pushNotificationConfig`.
+  São metadados de roteamento, e quem os troca sem a chave muda a ETIQUETA, não o conteúdo. Como o
+  `a2a-accept` os escreve no frontmatter e no título do doc de inbox, o gate fecha a forma deles (sem quebra de
+  linha e sem espaço, então nada vira chave YAML nova) e recusa chave desconhecida no `signal`: uma injeção de linhas
+  de YAML ou prosa num sinal verificado era possível antes disso (achado do refutador, 2026-10-14). Se um
+  consumidor passar a DECIDIR por eles, o claim entra antes.
+- **Sem modo legado:** remetente sem `body_sha256` é recusado, nunca aceito em silêncio. Os remetentes
+  conhecidos são os membros com `a2a.keys` no `members.yaml`. Os dois de julho usam um
+  `.onion-a2a/send-signal.sh` próprio, que **precisa** acrescentar ao payload `"body_sha256"` (sha256 do
+  corpo, ou do vazio) e, se mandar `body_path`, o claim `"body_path"` igual; o `exp = now + 3600` deles já
+  cabe no teto. O membro de teste do spike usa o `send-a2a.sh` do spike, que já está conforme. A mudança é no
+  repo de cada remetente, pela sessão dele: o core não escreve lá.
 - **Veredito `verified:false` → REJEITA** (fail-safe: ausência/erro nunca é aprovação; payload remoto =
   supply-chain não-confiável até verificado). Toda camada não-avaliável (ferramenta ausente) → VETO, nunca skip.
 - **Veredito `verified:true` → ainda `gated:true`**: o sinal entra para triagem sob **gate humano** (consumo

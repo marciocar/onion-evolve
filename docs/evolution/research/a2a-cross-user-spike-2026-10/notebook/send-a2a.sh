@@ -5,8 +5,9 @@
 # Monta o envelope que o `/a2a` do bridge entende ({jws, signal}), assina RS256 com a chave PRIVADA do
 # membro de teste (que fica só em ~/.config/onion/a2a/, modo 0600, fora de qualquer git) e faz o POST.
 # Diferença para o send-signal.sh dos handshakes de julho: o CORPO viaja (signal.body) e fica AMARRADO à
-# assinatura pelo claim `body_sha256` — o gate do core hoje NÃO amarra o corpo (ver SPIKE-PROTOCOL.md §6,
-# achado F1), então quem amarra é o receptor do spike (vps/accept-to-channel.sh), que confere o hash.
+# assinatura pelo claim `body_sha256`. Desde 2026-10-14 (PR fix/a2a-body-signed-and-exp-required) o gate
+# do core também amarra (achado F1 curado): body_sha256 = sha256 dos bytes UTF-8 do corpo, e exp obrigatório
+# com teto de 3600 s. O receptor do spike (vps/accept-to-channel.sh) segue conferindo, como 2ª camada.
 #
 # Protocolo: docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md (cenários A1–A8).
 # Portável: bash 3.2+ (macOS), openssl OU LibreSSL, jq, curl. Sem python obrigatório.
@@ -24,7 +25,7 @@
 #   --jti J            fixa o jti (A3: reenvie com o MESMO jti)
 #   --iat-offset S     soma S segundos ao iat   (A5b: +3600 → future)
 #   --exp-offset S     exp = now + S (default 300; A5a: -60 → expired)
-#   --no-exp           omite exp (A5c: mede se o gate exige exp — hoje NÃO exige)
+#   --no-exp           omite exp (A5c: desde 2026-10-14 o gate recusa com jws-missing-exp)
 #   --resend F         reenvia BYTE A BYTE o envelope salvo em F (A3 puro: replay de verdade)
 #   --dry-run          monta e imprime o envelope, sem rede
 #   --out F            salva o envelope enviado em F (default: no log de estado)
@@ -91,7 +92,8 @@ if [ -n "${RESEND}" ]; then
   THREAD="$(jq -r '.signal.thread // ""' "${ENVFILE}")"
 else
   [ -f "${KEY}" ] || die "chave privada ausente: ${KEY} (ver SPIKE-PROTOCOL.md passo P1)"
-  if [ -n "${BODY_FILE}" ]; then [ -f "${BODY_FILE}" ] || die "body-file inexistente"; BODY="$(cat "${BODY_FILE}")"; fi
+  # sentinela: `$(cat F)` comeria os \n finais e o corpo assinado deixaria de ser o arquivo (refutador 2026-10-14)
+  if [ -n "${BODY_FILE}" ]; then [ -f "${BODY_FILE}" ] || die "body-file inexistente"; BODY="$(cat "${BODY_FILE}"; printf x)"; BODY="${BODY%x}"; fi
   [ -n "${BODY}" ] || die "corpo vazio: passe --body ou --body-file"
   [ "${#BODY}" -le 8192 ] || die "corpo > 8192 caracteres: o spike mede conversa, não transferência de arquivo"
   [ -n "${JTI}" ] || JTI="nb-$(rand_hex 12)"

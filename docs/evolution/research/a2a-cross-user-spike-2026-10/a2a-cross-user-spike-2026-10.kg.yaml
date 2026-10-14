@@ -74,6 +74,25 @@ nodes:
       method: "medição: bash .claude/validation/lint-selftest.sh --families a2a_verify"
       locality: "repo"
 
+  - id: E_F1_F2_CURADOS_NO_GATE_2026_10_14
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-14"
+    verified_against: "bash .claude/validation/lint-selftest.sh --families a2a_verify (LC_ALL=C): 50/50, casos body-mismatch, jws-missing-exp, exp-beyond-ceiling, duplicate-key, signal-field-unsafe e envelope do send-a2a.sh do spike verificado; 9 mutantes novos (corpo, exp opcional, teto, exp antes do iat, duplicata, cópia do hash, thread sem claim, corpo não-string, rótulo não assinado livre) reprovados por _prove_mutation"
+    source_tier: 9
+    source_kind: measurement
+    label: "F1 e F2 curados no gate do core: o claim body_sha256 (sha256 dos bytes UTF-8 da string signal.body decodificada; ausente = vazio) é obrigatório e conferido, exp e iat são obrigatórios com teto de 3600 s, e remetente sem o claim é recusado."
+    narrative: "Pré-condição (1) da emenda D_RFC0004_CONVERSA_POR_THREAD, cumprida no PR fix/a2a-body-signed-and-exp-required (vale em produção depois do merge e do update-bridge, que é da sessão principal). Os remetentes de julho (metagamify-1, granaai-1) passam a ser recusados até acrescentarem body_sha256 ao payload; o do spike já está conforme."
+    trace: ".claude/utils/federation-transport/a2a-verify.sh"
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-verify.sh (camadas 3 e 5b)"
+      locator: "camada 3: veto jws-missing-exp / exp-beyond-ceiling; camada 5b: veto body-mismatch / duplicate-key"
+      method: "medição: bancada da família a2a_verify com mutantes, gate rodado em sandbox com --repo"
+      locality: "repo"
+
   - id: E_NEGATIVOS_GATE_SERVIDO_2026_10_14
     node_type: evidence
     plane: PROD
@@ -130,12 +149,15 @@ nodes:
 
   - id: D_RFC0004_CONVERSA_POR_THREAD
     node_type: decision
-    plane: DEV
     impact: 5
     confidence: 0.6
-    status: open
-    label: "EMENDA à RFC-0004 (aberta, do maestro): de 'só sinais, nunca conversa autônoma' para 'conversa com consentimento por thread com expiração', com relay desligado entre orgs, corpo como dado (assinado) e regulado = never-live-pull."
-    narrative: |
+    label: "EMENDA à RFC-0004 (selada por delegação, PENDENTE até o gate curado e o spike vivo): de 'só sinais, nunca conversa autônoma' para 'conversa com consentimento por thread com expiração', com relay desligado entre orgs, corpo como dado (assinado) e regulado = never-live-pull."
+    trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-14"
+    verified_against: "decisão delegada pelo maestro (autorização noturna de 2026-10-14), escolhida a recomendação; a emenda só VALE depois de (1) o corpo assinado e o exp obrigatório estarem no gate (este PR) e (2) o spike vivo passar nos critérios pré-registrados; log em docs/evolution/decisions-delegated-2026-10-14.md"
+    narrative: |-
       Eixo: RFC-0004 §3 ("o a2a-live transporta só SINAIS GATED, nunca conversas autônomas") e §4 ("nenhuma
       mensagem ao vivo é auto-aplicada; entra pelo mesmo gate tipado"). Referência de escopos: issue #87954
       (notify / suggest / act com token expirável).
@@ -159,7 +181,13 @@ nodes:
       PASSOU-COM-RESSALVA, se o A8 passar nas seis variantes, e com F1 e F2 curados no gate ANTES da
       emenda valer. (C) rejeitada pelo mesmo motivo de E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY. (A) é o
       default se o spike reprovar.
-    trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
+
+      Selado por /meta:decide em 2026-10-14: escolhida «(B) Emenda mínima: conversa GATED por thread»; descartadas: «(A) Manter a RFC como está» · «(C) Emenda ampla: (B) + escopo act com lease».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-14: «Emendar a RFC-0004 de 'só sinais, nunca conversa autônoma' para 'conversa com consentimento por thread com expiração'?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
+      locality: "pessoa"
 
   - id: E_CURADORIA_REFUTA_PROTOCOLO_2026_10_14
     node_type: evidence
@@ -218,6 +246,15 @@ nodes:
       locality: "repo"
 
 edges:
+  - from: E_F1_F2_CURADOS_NO_GATE_2026_10_14
+    to: E_F1_CORPO_FORA_DA_ASSINATURA
+    edge_type: SUPERSEDES
+  - from: E_F1_F2_CURADOS_NO_GATE_2026_10_14
+    to: E_F2_EXP_OPCIONAL
+    edge_type: SUPERSEDES
+  - from: E_F1_F2_CURADOS_NO_GATE_2026_10_14
+    to: D_RFC0004_CONVERSA_POR_THREAD
+    edge_type: SUPPORTS
   - from: E_F1_CORPO_FORA_DA_ASSINATURA
     to: D_RFC0004_CONVERSA_POR_THREAD
     edge_type: CONSTRAINS

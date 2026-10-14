@@ -265,6 +265,11 @@ com `sudo ls`). Antes de **cada** cenário, rode no N `export A2A_SPIKE_SCENARIO
 - **A5c:** `--no-exp`. **Resultado esperado hoje: 200**, porque o gate não exige `exp` (F2). Esse
   resultado é registrado como **ACHADO CONFIRMADO**, e não como PASSOU. Ele não reprova o spike, mas
   entra na lista de curas.
+  > **Nota datada (2026-10-14, PR `fix/a2a-body-signed-and-exp-required`):** o critério vigente do A5c é
+  > o do P5b (§12.6): qualquer não-200, e 200 = NÃO PASSOU. Com a cura de F2 no gate, o `reason` que se
+  > espera registrar é `jws-missing-exp`. O teto de vida que o A5d pede está fixado no código curado em
+  > **3600 s** (`A2A_EXP_MAX_TTL`, nas formas `exp − iat` e `exp − now`; veto `exp-beyond-ceiling`), e o
+  > A5e (corpo trocado) deve dar `body-mismatch` no gate. O texto acima fica como estava.
 - **NÃO PASSOU (A5a/A5b):** qualquer 200.
 - O relógio do host não é adulterado (MOAT). A camada `clock-untrusted` é coberta pela bancada com
   PATH stubado.
@@ -521,6 +526,10 @@ depois do merge e do P2, e a sequência está no §3.
 - **L7:** o registro não tem natureza para "dispositivo que só assina": o `kind: method` é provisório
   (ver o comentário do membro no `members.yaml`).
 - **L8:** F1 e F2 seguem abertos no gate do core; o spike os contorna no receptor, mas não os cura.
+  **Superado em 2026-10-14** pelo PR `fix/a2a-body-signed-and-exp-required`: o gate exige `body_sha256`
+  (corpo = bytes UTF-8 da string decodificada) e `exp` com teto de 3600 s; o receptor do spike fica como 2ª
+  camada, com o teto dele mais curto (900 s, §12.7). O bloqueio da §12.7 só se levanta quando essa cura
+  estiver no **clone servido** (`ops/update-bridge.sh`, ato da sessão principal), não no merge.
 - **L9:** o never-live-pull no channel (receptor regulado) não está implementado nem é exercitado.
 - **L10:** o lado A **não** é uma sessão do Claude Code. Uma conversa "sessão ↔ sessão" pediria um
   channel também no N, para a resposta entrar na sessão de lá, e isso depende de L1.
