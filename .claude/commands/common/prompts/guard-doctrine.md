@@ -72,7 +72,7 @@ que estava sendo forjada **naquele instante** na segunda categoria.
 > não sem tentar superação em uma pesquisa pode restringir possibilidades de crescimento e
 > inovação; é preciso ter medição e critérios claros"). O subagente que REFUTA a guarda devolve, para
 > cada reprovação, o critério pré-registrado com o comando que a checa e a superação
-> `{achada, o_que, medida}`. Ou seja, o padrão, o substrato ou a guarda existente que cobriria a classe sem o defeito apontado. A sessão confere com
+> `{classe, achada, o_que, medida}`. Ou seja, o padrão, o substrato ou a guarda existente que cobriria a classe sem o defeito apontado. A sessão confere com
 > `bash .claude/validation/judge-verdict-check.sh <vereditos.json>` (rc 1 = reprovação recusada e
 > contada), e a superação achada vira nó.
 

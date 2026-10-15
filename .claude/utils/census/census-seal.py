@@ -84,9 +84,11 @@ def seal(consol):
         for x in v['reprovados']:
             rep[x['node_id']] = x['motivo']
             # SAC-151: reprovação que ACHOU o que supera vira NÓ (não comentário) — só a que o motor
-            # não recusou (`recusada` = sem critério pré-registrado ou sem superação: fica só listada)
+            # não recusou (`recusada` = sem critério pré-registrado ou sem superação: fica só listada).
+            # 2ª leva: e só a de `classe: entrega` — `nenhuma` (ou classe ausente, de motor antigo) não vira
+            # nó de superação, porque consolo preenchido para passar não é o que supera (PR #30 de um adotante).
             s_ = x.get('superacao') or {}
-            if s_.get('achada') is True and not x.get('recusada'): sups[x['node_id']] = x
+            if s_.get('achada') is True and s_.get('classe') == 'entrega' and not x.get('recusada'): sups[x['node_id']] = x
     terms = derived_terms()
     RUN = f"/meta:census {HOJE}" + (f" ({d.get('run_id','')})" if d.get('run_id') else '')
     files, stamped, sup, skip, overc = {}, 0, 0, [], 0

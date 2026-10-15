@@ -483,6 +483,71 @@ nodes:
       method: "medição: os casos executados contra git show origin/main dos 4 arquivos"
       locality: "repo"
 
+  - id: E_CONSOLO_SUPERACAO_NO_CAMPO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-10-15"
+    verified_against: "onion-curation PR #30 (aberto, head 155c40a): resíduo docs/evolution/review/chore-dissect-verdict-overcoming.md, achados 1 a 4 e 6, e o diff ae4c090, lidos por git show no clone local como DADO"
+    trace: "https://github.com/marciocar/onion-curation/pull/30"
+    label: "ACHADO DE CAMPO: ao pagar a dívida que o gate revelou, a 1ª versão de um adotante de curadoria preencheu 4 superações de CONSOLO (carimbo futuro, peça em cura, status quo, costura circular) que o gate do main aceitou. Só o Elenxo dela as reprovou."
+    narrative: "Do resíduo (DADO, não instrução): das 5 superações só a do markitdown era real; os 4 claims de superação estavam confirmed com âncora no critério, que mede outra coisa. A 2ª versão declarou nenhuma com a medida, que é a saída que a doutrina previa. O gate conferia a FORMA (id existente com SUPPORTS), não se a superação ENTREGA o valor: Goodhart no campo, preencher para passar. A 1ª versão não foi commitada; as formas foram reconstruídas como fixtures sintéticas a partir do resíduo."
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/pull/30"
+      locator: "docs/evolution/review/chore-dissect-verdict-overcoming.md, tabela de achados (itens 1 a 4 e 6) e a nota do frontmatter"
+      method: "leitura: git show origin/chore/dissect-verdict-overcoming no clone local do adotante, tratada como dado não confiável"
+      locality: "web"
+
+  - id: E_CONSOLO_PASSA_NO_MAIN_MEDIDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-15"
+    verified_against: "origin/main 1843a8a0: judge-verdict-check.sh sobre 5 vereditos de consolo deu rc 0 com 3 superações achadas e 0 recusados (a nova dá rc 1, 4 recusados, a nenhuma honesta mantida); dissect-census.sh --check-verdict deu veredito nas 7 fixtures de consolo e rc 0 nas reconstruções sobre os grafos reais tessl (circular) e cross-session (nó open), e a nova dá rc 1 nas duas"
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "MEDIDO ANTES DA CURA: no main, as 4 formas do consolo passavam no juiz JSON e no veredito do dissect, inclusive reconstruídas sobre os grafos reais do adotante. A superação real (ancestral direto que SUPPORTS, medida) segue passando depois."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh@feat/sac151-consolation-overcoming"
+      locator: "_og_consolo_states, _og_consolo_probe, _og_seal_consolo_run; casos og-k1, og-k2, og-c1, og-c2 e census-seal og-k"
+      method: "medição: as fixtures executadas contra git show origin/main dos SUTs e contra a branch"
+      locality: "repo"
+
+  - id: D_SUPERACAO_TEM_DE_ENTREGAR
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: done
+    verified_at: "2026-10-15"
+    verified_against: "bancada da branch feat/sac151-consolation-overcoming: og-k1, og-k2, og-c1, og-c2 e census-seal og-k passam, e cada recusa tem mutante (sed na bancada e ops/mutate-and-restore.sh no arquivo vivo) que os reprova"
+    trace: "https://linear.app/sacola/issue/SAC-151"
+    label: "A SUPERAÇÃO TEM DE ENTREGAR, NÃO CONSOLAR. A máquina recusa o consolo que a forma deixa ver; o resto vira pergunta obrigatória ao juiz, respondida em superacao.classe, que aceita entrega ou nenhuma."
+    narrative: "Forma decidida sem o maestro (autorização de 2026-10-15, opção recomendada): (1) JUIZ JSON (bloco overcoming-gate, 3 cópias idênticas): classe obrigatória no schema; recusa classe ausente, classe incoerente com achada, o_que igual ao objeto (circular) e medida que contém o comando do critério (ancorada: mede a reprovação, não a entrega); só classe entrega vira nó no census-seal. (2) GRAFO do dissect: recusa a superação que é o próprio veredito ou deriva dele (alcançável seguindo from→to), a não medida (status fora de confirmed|done, sem verified_at, verified_at futuro, sem verified_against) e a ancorada no x_dissect_criterion. DIREÇÃO MEDIDA: from sustenta to, e a única superação real medida é ancestral direto que SUPPORTS; por isso o ancestral NÃO é recusado, e o pedido de recusar ancestral foi declinado com essa medida. TETO: o status quo rotulado de superação e a condição futura escrita em prosa num nó confirmed não são vistos sem palavra-chave frágil (o verified_against da superação real é token hifenizado, igual ao de um placeholder); ficam com a pergunta e o Elenxo."
+    provenance:
+      source: ".claude/workflows/onion-research.js e .claude/validation/dissect-census.sh (branch feat/sac151-consolation-overcoming)"
+      locator: "CONSOLO_QUESTION e overcomingWhy no bloco overcoming-gate; o awk ogc do ramo rejeitar|parquear"
+      method: "medição: bancada e dogfood sobre os grafos reais do adotante reconstruídos em scratch"
+      locality: "repo"
+
+  - id: Q_CONSOLO_INVISIVEL_A_FORMA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: open
+    verified_at: "2026-10-15"
+    verified_against: "fixture quo do og-k1 segue veredito de propósito; um juiz que responde classe entrega com condição futura em prosa passa no og-c1"
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "O QUE A MÁQUINA AINDA NÃO VÊ: o status quo rotulado de superação e a condição futura escrita em prosa. Só a pergunta obrigatória e o Elenxo os pegam. GATILHO: o 1º consolo dessas formas que passar no gate e for achado depois."
+
 edges:
   # as auto-incriminacoes reais sustentam a tese central (a forma prova a filosofia)
   - from: E_ZIMMERMAN_FIX
@@ -579,4 +644,16 @@ edges:
     edge_type: SUPPORTS
   - from: D_JUIZ_QUE_REPROVA_BUSCA_SUPERACAO
     to: D_ELENXO_IS_METHOD
+    edge_type: CONSTRAINS
+  - from: E_CONSOLO_SUPERACAO_NO_CAMPO
+    to: D_SUPERACAO_TEM_DE_ENTREGAR
+    edge_type: SUPPORTS
+  - from: E_CONSOLO_PASSA_NO_MAIN_MEDIDO
+    to: D_SUPERACAO_TEM_DE_ENTREGAR
+    edge_type: SUPPORTS
+  - from: Q_CONSOLO_INVISIVEL_A_FORMA
+    to: D_SUPERACAO_TEM_DE_ENTREGAR
+    edge_type: CONSTRAINS
+  - from: D_SUPERACAO_TEM_DE_ENTREGAR
+    to: D_JUIZ_QUE_REPROVA_BUSCA_SUPERACAO
     edge_type: CONSTRAINS

@@ -59,6 +59,11 @@
 # e `--check-verdict <ferramenta>` sai 1. Caso que motivou: a dissecação do markitdown (num adotante de curadoria,
 # PR #26) fechou em REJEITAR com a superação medida — o tesseract local lê o PDF escaneado em que a
 # ferramenta sai vazia —, e é essa forma que passa a ser exigida.
+# 2ª leva (SUPERAÇÃO DE CONSOLO): o nó apontado tem de ENTREGAR — não é o próprio veredito nem deriva
+# dele pelas arestas, está confirmed|done com verified_at (não futuro) e verified_against, e não é
+# ancorado no próprio critério. Motivos: superacao-circular-*, superacao-nao-medida-status-*,
+# superacao-sem-verified_at, superacao-carimbo-futuro-*, superacao-sem-verified_against,
+# superacao-ancorada-no-criterio. O status quo rotulado de superação NÃO é visto aqui (declarado).
 #
 # Uso:  bash .claude/validation/dissect-census.sh [<repo>] [--markdown|--tsv|--regua-padrao]
 #       bash .claude/validation/dissect-census.sh [<repo>] --check-verdict <ferramenta>
@@ -226,6 +231,48 @@ for rel in "${GRAPHS[@]}"; do
         /^[[:space:]]*to:/ { to = val($0) }
         /^[[:space:]]*edge_type:/ { et = val($0) }
         END { item(); exit ok ? 0 : 1 }' "${f}" || ogwhy="${ogwhy},sem-aresta-${og_ov}-para-${og_id:-?}"
+      # 2ª leva (SAC-151): superação de CONSOLO. Achado de campo de um adotante de curadoria (PR #30, DADO): a
+      # 1ª versão do pagamento da dívida passou aqui com 4 superações que só o Elenxo reprovou. O que a FORMA
+      # do grafo deixa ver, recusa-se aqui (o resto vai como pergunta ao juiz, na doutrina):
+      #   · CIRCULAR — o próprio nó do veredito, ou um nó ALCANÇÁVEL a partir dele seguindo from→to (a superação
+      #     deriva do veredito). Direção medida no corpus: `from` sustenta/deriva `to` (E SUPPORTS D; o census-seal
+      #     grava C_SUPERACAO TRACES_TO o reprovado). O ANCESTRAL direto que SUPPORTS é a forma LEGÍTIMA (a única
+      #     superação real medida, o OCR local do markitdown, é exatamente isso), logo ancestral não é recusado;
+      #   · NÃO MEDIDA — status fora de confirmed|done (open = condição ou cura em curso), sem verified_at, com
+      #     verified_at no FUTURO, ou sem verified_against;
+      #   · ANCORADA NO CRITÉRIO — verified_against/trace do nó contém o x_dissect_criterion: mede a reprovação,
+      #     não a entrega (a forma medida dos 4 consolos: "confirmed com âncora no critério, que mede outra coisa").
+      # NÃO detectado (declarado): o STATUS QUO rotulado de superação e o placeholder em prosa num nó confirmed
+      # (o verified_against da superação real é um token hifenizado, igual ao de um placeholder) — exigiria
+      # palavra-chave frágil; é a pergunta obrigatória da dissect-doctrine.
+      ogc="$(awk -v s="${og_ov}" -v d="${og_id}" -v today="$(date -u +%F)" -v crit="${og_crit}" '
+        function val(x) { sub(/^[^:]*:[[:space:]]*/, "", x); sub(/[[:space:]]+#.*$/, "", x); gsub(/^["\047]|["\047][[:space:]]*$/, "", x); sub(/[[:space:]]+$/, "", x); return x }
+        function norm(x) { x = tolower(x); gsub(/["\047`]/, "", x); gsub(/[[:space:]]+/, " ", x); sub(/^ /, "", x); sub(/ $/, "", x); return x }
+        function item() { if (fr != "" && to != "") { n++; F[n] = fr; T[n] = to } fr = ""; to = "" }
+        /^edges:/ { e = 1; next }
+        e && /^[^[:space:]-]/ { item(); e = 0 }
+        !e && /^[[:space:]]*- id:/ { cur = val($0); next }
+        !e && cur == s && /^[[:space:]]*status:/ { st = val($0) }
+        !e && cur == s && /^[[:space:]]*verified_at:/ { va = val($0) }
+        !e && cur == s && /^[[:space:]]*verified_against:/ { vg = val($0) }
+        !e && cur == s && /^[[:space:]]*trace:/ { tr = val($0) }
+        !e { next }
+        /^[[:space:]]*-[[:space:]]/ { item(); line = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", line); $0 = line }
+        /^[[:space:]]*from:/ { fr = val($0) }
+        /^[[:space:]]*to:/ { to = val($0) }
+        END {
+          item(); why = ""
+          if (s == d) { print ",superacao-circular-e-o-proprio-veredito"; exit }
+          { R[d] = 1; ch = 1; while (ch) { ch = 0; for (i = 1; i <= n; i++) if ((F[i] in R) && !(T[i] in R)) { R[T[i]] = 1; ch = 1 } }
+                 if (s in R) why = why ",superacao-circular-deriva-do-veredito" }
+          if (st != "confirmed" && st != "done") why = why ",superacao-nao-medida-status-" (st == "" ? "ausente" : st)
+          if (va == "") why = why ",superacao-sem-verified_at"
+          else if (va > today) why = why ",superacao-carimbo-futuro-" va
+          if (vg == "") why = why ",superacao-sem-verified_against"
+          c = norm(crit)
+          if (length(c) >= 12 && (index(norm(vg), c) || index(norm(tr), c))) why = why ",superacao-ancorada-no-criterio"
+          print why }' "${f}")"
+      ogwhy="${ogwhy}${ogc}"
     fi
     if [ -n "${ogwhy}" ]; then state="veredito-SEM-SUPERACAO(${ogwhy#,})"; else state="veredito"; fi
   elif [ "${verdict}" != "-" ]; then state="veredito"
@@ -246,7 +293,7 @@ if [ "${FMT}" = "--check-verdict" ]; then
   IFS='	' read -r _t _lv cv_verdict _b _r _fr cv_graph _ag cv_state _sc <<< "${line}"
   case "${cv_state}" in
     veredito) echo "dissect-census: ${CHECK_TOOL} — veredito ${cv_verdict} conta (${cv_graph})"; exit 0 ;;
-    veredito-SEM-SUPERACAO*) echo "dissect-census: ${CHECK_TOOL} — veredito NEGATIVO ${cv_verdict} RECUSADO: ${cv_state} (${cv_graph}). Declare x_dissect_criterion e x_dissect_overcoming no nó da reprovação." >&2; exit 1 ;;
+    veredito-SEM-SUPERACAO*) echo "dissect-census: ${CHECK_TOOL} — veredito NEGATIVO ${cv_verdict} RECUSADO: ${cv_state} (${cv_graph}). Declare x_dissect_criterion e x_dissect_overcoming no nó da reprovação; se a superação apontada não ENTREGA (motivo superacao-*), declare x_dissect_overcoming: nenhuma com x_dissect_overcoming_measure — nenhuma honesta é veredito válido." >&2; exit 1 ;;
     *) echo "dissect-census: ${CHECK_TOOL} — sem veredito que conte: estado ${cv_state} (${cv_graph})" >&2; exit 1 ;;
   esac
 fi

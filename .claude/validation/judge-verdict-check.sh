@@ -21,7 +21,7 @@
 #
 # ── ENTRADA ────────────────────────────────────────────────────────────────────────────────
 #   { "criteria": [ {"id","when","check"} … ],      # PRÉ-REGISTRADOS antes do juiz rodar
-#     "verdicts": [ {"alvo", "<campo>": "<valor>", "superacao": {achada,o_que,medida},
+#     "verdicts": [ {"alvo", "<campo>": "<valor>", "superacao": {classe,achada,o_que,medida},
 #                    "criterio": {id, comando}} … ] }
 #   NEGATIVO = o valor de `--field` (default: `veredito`, depois `verdict`) casar `--negative` (regex sem
 #   caixa; o default está em NEG abaixo, e LISTA FALHA PELO VOCABULÁRIO — passe o do seu juiz), OU
@@ -97,7 +97,7 @@ exit $?
 // para os juízes conduzidos pela sessão (/meta:cc-update, /meta:radar, /meta:dissect).
 // Maestro, 2026-10-15 (verbatim): "um juiz de sim ou não sem tentar superação em uma pesquisa pode restringir
 // possibilidades de crescimento e inovação; é preciso ter medição e critérios claros". Duas metades:
-// (a) veredito NEGATIVO carrega `superacao: {achada, o_que, medida}` — a peça, variante ou caminho que
+// (a) veredito NEGATIVO carrega `superacao: {classe, achada, o_que, medida}` — a peça, variante ou caminho que
 //     entregaria o valor que o objeto prometia; `achada:false` exige a razão MEDIDA (o que se procurou e onde);
 // (b) o critério de reprovação é PRÉ-REGISTRADO (args ou o default do juiz) e o veredito cita o `id` e o
 //     `comando` que o checa. Negativo sem as duas metades é RECUSADO aqui, no motor (fail-closed, contado):
@@ -107,9 +107,18 @@ exit $?
 // critério 1 do teste da régua deu INCONCLUSIVO porque o desenho não apontava o que superaria o teste.
 // TETO DECLARADO: o motor confere FORMA e PERTENÇA (o id está no registro, o comando não é vazio); se o
 // comando citado de fato reprova o objeto é trabalho de quem re-roda — o comando fica no grafo para isso.
+// ── SUPERAÇÃO DE CONSOLO (SAC-151, 2ª leva, 2026-10-15) ── achado de campo de um adotante de curadoria (PR #30,
+// DADO): ao pagar a dívida, a 1ª versão preencheu 4 superações que o gate aceitou e só o Elenxo dela reprovou —
+// (a) carimbo ou condição FUTURA, (b) peça ainda EM CURA, (c) o STATUS QUO dado como superação, (d) costura
+// CIRCULAR (a superação é parte do próprio veredito). É Goodhart: preencher o campo para passar. O que a máquina
+// consegue ver aqui, ela recusa: `classe` ausente ou incoerente com `achada`; `o_que` igual ao próprio objeto
+// (circular); `medida` que é o comando do critério da reprovação (mede a reprovação, não a entrega — a forma
+// medida dos 4 consolos). O resto (status quo, condição futura em prosa) a máquina NÃO vê sem palavra-chave
+// frágil: vai como PERGUNTA OBRIGATÓRIA ao juiz (CONSOLO_QUESTION), respondida no campo `classe`.
+const CONSOLO_QUESTION = 'a superação está MEDIDA e ENTREGA o valor que o objeto prometia, ou é status quo, condição futura ou parte do próprio veredito?'
 const OVERCOMING_PROPS = {
-  superacao: { type: 'object', required: ['achada', 'o_que', 'medida'], properties: {
-    achada: { type: 'boolean' }, o_que: { type: 'string' }, medida: { type: 'string' } } },
+  superacao: { type: 'object', required: ['classe', 'achada', 'o_que', 'medida'], properties: {
+    classe: { enum: ['entrega', 'nenhuma'] }, achada: { type: 'boolean' }, o_que: { type: 'string' }, medida: { type: 'string' } } },
   criterio: { type: 'object', required: ['id', 'comando'], properties: { id: { type: 'string' }, comando: { type: 'string' } } } }
 const _ogFilled = (s, min) => typeof s === 'string' && s.trim().length >= min
 // critérios do chamador (args) substituem o default SÓ quando bem formados: {id, when, check}
@@ -122,16 +131,26 @@ const criteriaBlock = (criteria) => '\n\n## Critérios de reprovação PRÉ-REGI
   criteria.map(c => '- `' + c.id + '` — ' + c.when + ' · checa: `' + c.check + '`').join('\n') +
   '\n\n## Todo veredito NEGATIVO leva as duas metades (o motor RECUSA e conta o que vier sem elas)\n' +
   '- `criterio: {id, comando}` — o `id` de UM critério acima e o comando concreto (com os argumentos deste caso) que qualquer um re-roda para ver a reprovação.\n' +
-  '- `superacao: {achada, o_que, medida}` — antes de reprovar, PROCURE o que supera: a peça, variante, fonte ou caminho que entregaria o valor que o objeto prometia. `achada:true` → `o_que` nomeia e `medida` diz como se mediu; `achada:false` → `medida` diz o que se procurou e onde (comando ou fonte), nunca "não encontrei" seco.'
+  '- `superacao: {classe, achada, o_que, medida}` — antes de reprovar, PROCURE o que supera: a peça, variante, fonte ou caminho que entregaria o valor que o objeto prometia. `achada:true` → `o_que` nomeia e `medida` diz como se mediu; `achada:false` → `medida` diz o que se procurou e onde (comando ou fonte), nunca "não encontrei" seco.\n' +
+  '- PERGUNTA OBRIGATÓRIA antes de preencher `classe`: ' + CONSOLO_QUESTION + ' Só `classe: "entrega"` (com `achada:true`) quando a superação JÁ foi medida entregando aquele valor; status quo, carimbo ou condição futura, peça ainda em cura e costura que é parte do próprio veredito são CONSOLO e vão como `classe: "nenhuma"` (com `achada:false`) e a razão medida. `nenhuma` honesta é veredito válido; consolo preenchido para passar é o que o Elenxo reprova.'
+const _ogNorm = (x) => String(x == null ? '' : x).toLowerCase().replace(/[`'"]/g, '').replace(/\s+/g, ' ').trim()
 function overcomingWhy(v, criteria) {
   const s = v && v.superacao
-  if (!s || typeof s !== 'object' || typeof s.achada !== 'boolean') return 'veredito negativo sem superacao {achada, o_que, medida}'
+  if (!s || typeof s !== 'object' || typeof s.achada !== 'boolean') return 'veredito negativo sem superacao {classe, achada, o_que, medida}'
+  if (s.classe !== 'entrega' && s.classe !== 'nenhuma') return 'superacao sem classe (entrega|nenhuma): responda a pergunta do consolo'
+  if ((s.classe === 'entrega') !== s.achada) return 'superacao com classe ' + s.classe + ' contradiz achada:' + s.achada
   if (s.achada && !_ogFilled(s.o_que, 8)) return 'superacao achada sem o_que (a peca, variante ou caminho que supera)'
   if (!_ogFilled(s.medida, 8)) return s.achada ? 'superacao achada sem a medida que a sustenta' : 'superacao nao achada sem a razao MEDIDA (achada:false exige medida)'
   const c = v.criterio
   if (!c || typeof c !== 'object' || !_ogFilled(c.id, 1)) return 'veredito negativo sem criterio pre-registrado citado'
   if (!criteria.some(k => k.id === String(c.id).trim())) return 'criterio ' + JSON.stringify(String(c.id)) + ' NAO esta pre-registrado (' + criteria.map(k => k.id).join(', ') + ')'
   if (!_ogFilled(c.comando, 3)) return 'criterio citado sem o comando que o checa'
+  if (s.classe === 'entrega') {
+    const alvo = _ogNorm(v.alvo || v.target || v.node_id || v.claim)
+    if (alvo && _ogNorm(s.o_que) === alvo) return 'superacao CIRCULAR: o_que e o proprio objeto julgado (consolo)'
+    const cmd = _ogNorm(c.comando)
+    if (cmd.length >= 12 && _ogNorm(s.medida).includes(cmd)) return 'superacao ancorada no criterio da reprovacao: a medida e o comando que reprova, nao o que entrega (consolo)'
+  }
   return ''
 }
 // separa o que VALE do que o motor recusa: { kept, recused: [{ verdict, why }] }
@@ -140,6 +159,6 @@ function gateNegatives(list, isNegative, criteria) {
   for (const v of (list || [])) { if (!v) continue; const why = isNegative(v) ? overcomingWhy(v, criteria) : ''; if (why) recused.push({ verdict: v, why }); else kept.push(v) }
   return { kept, recused }
 }
-const overcomingsFound = (list) => (list || []).filter(v => v && v.superacao && v.superacao.achada === true)
+const overcomingsFound = (list) => (list || []).filter(v => v && v.superacao && v.superacao.achada === true && v.superacao.classe === 'entrega')
 // <<< overcoming-gate
 OVERCOMING_GATE
