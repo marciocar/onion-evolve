@@ -72,6 +72,16 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/background-task-probe.sh\"",
+            "timeout": 5,
+            "statusMessage": "Medindo tarefas de fundo (Onion)"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-version-drift.sh\"",
             "timeout": 5,
             "statusMessage": "Conferindo versão do processo vs disco (Onion)"
@@ -209,14 +219,6 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/rule-title-in-prose.sh\""
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/background-state-needs-evidence.sh\""
           }
         ]
       }

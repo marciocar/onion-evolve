@@ -12805,7 +12805,6 @@ run_guard_forge_selftests() {
   local cen="${REPO_ROOT}/.claude/validation/guard-census.sh"
   local doc="${REPO_ROOT}/.claude/commands/common/prompts/guard-doctrine.md"
   local srf="${REPO_ROOT}/.claude/commands/meta/forge-guard.md"
-  local hok="${REPO_ROOT}/.claude/hooks/background-state-needs-evidence.sh"
 
   # (a) o MEDIDOR roda e emite a secao de moldes. Censo que nao mede e contexto que caduca.
   if [ ! -f "${cen}" ]; then record_fail "guard-forge" "medidor ausente: guard-census.sh"; else
@@ -12904,18 +12903,10 @@ exit 0
     else record_fail "guard-forge: (e) superficie" "a superficie nao aponta para a doutrina"; fi
   fi
 
-  # (f) DELEGACAO: a guarda que nasceu desta forja tem de passar o proprio selftest.
-  if [ ! -f "${hok}" ]; then record_skip "guard-forge: hook background-state ausente (SUT nao exercido)"; else
-    local _ho _hrc=0
-    _ho="$(LC_ALL=C bash "${hok}" --selftest 2>&1)" || _hrc=$?
-    while IFS= read -r line; do
-      case "${line}" in
-        *"  ✅ "*) record_pass "background-state: ${line#*✅ }" ;;
-        *"  ✗ "*)  record_fail "background-state" "${line#*✗ }" ;;
-      esac
-    done <<< "${_ho}"
-    [ "${_hrc}" -eq 0 ] || record_fail "background-state" "o selftest da guarda saiu ${_hrc}"
-  fi
+  # (f) a guarda que nasceu desta forja (o veto de prosa background-state-needs-evidence) foi
+  #     APOSENTADA em 2026-10-14 (D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA): 17 de 20 vetos reais sobre
+  #     afirmacao certa, 0 sobre o defeito de origem. Quem a substitui e a sonda
+  #     background-task-probe.sh, exercitada pela familia background_task_probe.
 }
 
 run_kg_radar_integrity_selftests() {
@@ -34171,10 +34162,99 @@ run_door_staleness_severity_selftests() {
 _family run_door_staleness_severity_selftests
 _family run_guard_forge_selftests
 
+# Modo background-task-probe — a SONDA UserPromptSubmit que substituiu o veto de prosa do
+# background-state-needs-evidence (D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA, 2026-10-14). Exercitada COMO O
+# HARNESS A INVOCA: stdin JSON com transcript_path de um transcript sintetico (linhas de lancamento e
+# notificacao na forma real do harness) e PROCESSOS REAIS segurando o fd do .output — o mapeamento por
+# /proc/*/fd e a metade que nenhum caso de texto tocaria ([[bancada-espelha-o-runner]]).
+run_background_task_probe_selftests() {
+  local sut="${REPO_ROOT}/.claude/hooks/background-task-probe.sh"
+  if [ ! -f "${sut}" ]; then record_fail "bg-probe" "sonda ausente: ${sut}"; return; fi
+  local d sid tk tp fifo pa pb pc out rc ctx i
+  d="$(mktemp -d)"; sid="aaaabbbb-0000-4000-8000-ccccddddeeee"
+  tk="${d}/run/${sid}/tasks"; tp="${d}/proj/${sid}.jsonl"; fifo="${d}/fifo"
+  mkdir -p "${tk}" "${d}/proj"
+  _bgp_launch() { printf '{"type":"user","message":{"role":"user","content":[{"type":"tool_result","content":"Command running in background with ID: %s. Output is being written to: %s/%s.output. You will be notified when it completes."}]},"toolUseResult":{"stdout":"","backgroundTaskId":"%s"}}\n' "$1" "${tk}" "$1" "$1"; }
+  _bgp_notify() { printf '{"type":"user","message":{"role":"user","content":"<task-notification>\\n<task-id>%s</task-id>\\n<tool-use-id>toolu_x</tool-use-id>\\n<output-file>%s/%s.output</output-file>\\n<status>completed</status>\\n<summary>Background command done</summary>\\n</task-notification>"}}\n' "$1" "${tk}" "$1"; }
+  # sob `set -e` da bancada: rc capturado por `|| rc=$?`, nunca `cmd; rc=$?` (aborta a suite)
+  _bgp_run() { rc=0; out="$(printf '{"transcript_path":"%s","hook_event_name":"UserPromptSubmit","prompt":"x"}' "$1" | LC_ALL=C bash "${sut}" 2>&1)" || rc=$?
+    ctx="$(jq -r '.hookSpecificOutput.additionalContext // empty' <<< "${out}" 2>/dev/null)" || ctx=""; }
+  _bgp_line() { awk -v id="tarefa $1:" 'index($0, id) {print; f=1} END {exit !f}' <<< "${ctx}"; }
+
+  # (e) nenhuma tarefa lancada → silencio, exit 0 (o custo-zero do motd)
+  printf '{"type":"user","message":{"role":"user","content":"oi"}}\n' > "${tp}"
+  _bgp_run "${tp}"
+  if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then record_pass "bg-probe: (e) sem tarefa, saida vazia e exit 0"
+  else record_fail "bg-probe: (e) silencio" "rc=${rc} saida=[${out}]"; fi
+
+  # processos reais: (a) sleep vivo; (b) cat preso num FIFO com escritor aberto (pipe_read);
+  # (c) sleep vivo MAS notificado; (d) .output sem ninguem; (f) .output de tarefa parada por TaskStop
+  sleep 300 > "${tk}/bgpaaaa.output" 2>&1 & pa=$!
+  mkfifo "${fifo}"; exec 8<>"${fifo}"
+  cat "${fifo}" > "${tk}/bgpbbbb.output" 2>&1 & pb=$!
+  sleep 300 > "${tk}/bgpcccc.output" 2>&1 & pc=$!
+  : > "${tk}/bgpdddd.output"; : > "${tk}/bgpffff.output"; : > "${tk}/bgphhhh.output"
+  for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+    [ "$(cat "/proc/${pb}/wchan" 2>/dev/null)" = "pipe_read" ] && break; sleep 0.1
+  done
+  touch -d '30 minutes ago' "${tk}/bgpbbbb.output" "${tk}/bgpdddd.output"
+  { for i in bgpaaaa bgpbbbb bgpcccc bgpdddd bgpffff; do _bgp_launch "${i}"; done
+    _bgp_notify bgpcccc
+    printf '{"type":"user","message":{"role":"user","content":[{"type":"tool_result","content":"{\\"message\\":\\"Successfully stopped task: bgpffff (sleep 1)\\"}"}]}}\n'
+    # (h) lancamento CITADO numa saida de ferramenta (um grep sobre outro transcript): a chave
+    #     harness-only sai escapada e nao pode virar tarefa (fantasma medido no 2o dogfood)
+    printf '{"type":"user","message":{"role":"user","content":[{"type":"tool_result","content":"Output is being written to: %s/bgphhhh.output. {\\"backgroundTaskId\\":\\"bgphhhh\\"}"}]}}\n' "${tk}"
+  } > "${tp}"
+  _bgp_run "${tp}"
+  local la lb
+  la="$(_bgp_line bgpaaaa)" || la=""; lb="$(_bgp_line bgpbbbb)" || lb=""
+  if [ "${rc}" -eq 0 ] && [[ "${la}" == *"PID ${pa} "* ]] && [[ "${la}" != *SUSPEITO* ]]; then
+    record_pass "bg-probe: (a) sleep vivo: linha com o PID de quem escreve o .output e sem SUSPEITO"
+  else record_fail "bg-probe: (a) PID" "rc=${rc} esperado PID ${pa}; linha=[${la}] ctx=[${ctx}]"; fi
+  if [[ "${lb}" == *"PID ${pb} "* ]] && [[ "${lb}" == *pipe_read* ]] && [[ "${lb}" == *SUSPEITO* ]]; then
+    record_pass "bg-probe: (b) leitor de FIFO parado ha 30 min, CPU ~0 → SUSPEITO"
+  else record_fail "bg-probe: (b) SUSPEITO" "linha=[${lb}]"; fi
+  if [ -n "${ctx}" ] && ! _bgp_line bgpcccc >/dev/null; then
+    record_pass "bg-probe: (c) tarefa com notificacao de termino nao aparece (mesmo com processo vivo)"
+  else record_fail "bg-probe: (c) notificada" "ctx=[${ctx}]"; fi
+  local ld; ld="$(_bgp_line bgpdddd)" || ld=""
+  if [[ "${ld}" == *"sem processo nem notificação"* ]]; then
+    record_pass "bg-probe: (d) .output sem processo e sem notificacao → 'sem processo nem notificação'"
+  else record_fail "bg-probe: (d) orfa" "ctx=[${ctx}]"; fi
+  if [ -n "${ctx}" ] && ! _bgp_line bgpffff >/dev/null; then
+    record_pass "bg-probe: (f) tarefa parada por TaskStop nao aparece (o harness nao notifica; achado do 1o dogfood)"
+  else record_fail "bg-probe: (f) TaskStop" "ctx=[${ctx}]"; fi
+
+  if [ -n "${ctx}" ] && ! _bgp_line bgphhhh >/dev/null; then
+    record_pass "bg-probe: (h) lancamento so CITADO em saida de ferramenta nao vira tarefa"
+  else record_fail "bg-probe: (h) fantasma" "ctx=[${ctx}]"; fi
+
+  # (i) varrimento que FALHA (find ausente: rc 127) nao pode virar "sem processo" de tarefa viva
+  mkdir -p "${d}/bin"; printf '#!/bin/sh\nexit 127\n' > "${d}/bin/find"; chmod +x "${d}/bin/find"
+  local li
+  out="$(printf '{"transcript_path":"%s"}' "${tp}" | PATH="${d}/bin:${PATH}" LC_ALL=C bash "${sut}" 2>&1)" || true
+  li="$(jq -r '.hookSpecificOutput.additionalContext // empty' <<< "${out}" 2>/dev/null | awk 'index($0, "tarefa bgpaaaa:")')" || li=""
+  if [[ "${li}" == *"NÃO MEDIDO"* ]] && [[ "${li}" != *"sem processo"* ]]; then
+    record_pass "bg-probe: (i) find que falha vira NAO MEDIDO, nunca 'sem processo' (achado do 2o dogfood)"
+  else record_fail "bg-probe: (i) nao-medido" "linha=[${li}]"; fi
+
+  # (g) nunca veta e nunca le .env (contrato declarado, conferido no texto do SUT)
+  if ! LC_ALL=C grep -qE '(^|[^#])\<exit[[:space:]]+[1-9]' "${sut}" && ! LC_ALL=C grep -qE '(source|\.)[[:space:]]+[^[:space:]]*\.env\>' "${sut}"; then
+    record_pass "bg-probe: (g) sem exit nao-zero nem leitura de .env no SUT"
+  else record_fail "bg-probe: (g) contrato" "a sonda tem exit nao-zero ou le .env"; fi
+
+  kill "${pa}" "${pb}" "${pc}" 2>/dev/null || true; wait "${pa}" "${pb}" "${pc}" 2>/dev/null || true
+  exec 8>&-
+  unset -f _bgp_launch _bgp_notify _bgp_run _bgp_line
+  rm -rf "${d}"
+}
+_family run_background_task_probe_selftests
+
 # Modo rule-title-in-prose — o hook Stop que exige "REGRA N (Título)" na prosa. Ate 2026-10-14 a bancada
 # NAO o exercitava (so o citava como nome plantado no sandbox do censo, em guard_forge (c2)); a SAC-137
 # (rodada r11 do radar E3) mudou a leitura dele para a CAUDA do transcript, e mudanca no harvester sem
-# caso ponta-a-ponta e o defeito que quase matou o background-state ([[bancada-espelha-o-runner]]).
+# caso ponta-a-ponta e o defeito que quase matou o background-state (veto de prosa aposentado em
+# 2026-10-14) ([[bancada-espelha-o-runner]]).
 # Delega ao --selftest do proprio hook: os casos de texto e os dois de cauda (transcript grande e teto
 # estourado com fail-safe), pelo stdin JSON + transcript, como o harness o invoca.
 run_rule_title_in_prose_selftests() {

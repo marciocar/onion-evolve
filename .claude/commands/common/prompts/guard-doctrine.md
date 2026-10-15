@@ -39,8 +39,9 @@ cobertura **dá licença**. O censo de guardas **não** vê isto — por isso a 
 Medido 3× num dia: em guarda de lista, o que falha é a **lista de formas**, não o algoritmo. Três
 consequências práticas:
 - **o motor do padrão decide a sintaxe**: `[[:space:]]` é POSIX do `grep` e o `re` do Python o trata
-  como *nested set* — a 1ª redação do `background-state-needs-evidence` ficou **cega ao `ps`** que ela
-  existe para exigir;
+  como *nested set* — a 1ª redação do `background-state-needs-evidence` (veto de prosa
+  aposentado em 2026-10-14 pela sonda `background-task-probe.sh`) ficou **cega ao `ps`** que ela
+  existia para exigir;
 - **o locale do hook não é o seu**: `Viola..es` casa em UTF-8 e **não** em locale `C`, que é o do
   hook. Rode a bancada com `LC_ALL=C`. **E meça com o BINÁRIO do script, nunca com a ferramenta da
   shell** — medido em 2026-10-02 ao forjar este próprio conjunto: um caso reprovou por `n[ãa]o` em

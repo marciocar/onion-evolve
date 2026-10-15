@@ -159,7 +159,7 @@ nodes:
     status: open
     verified_at: '2026-10-02'
     label: 'CANDIDATO 2 A GUARDA, selado pelo maestro em 2026-10-02. DEFEITO DATADO: eu descrevi os passos do /meta:forge-guard como se os estivesse seguindo — "Passo 1 (medir)", "seguindo o procedimento" — SEM INVOCAR o comando, e o maestro me pegou ("dogfood e usar, nao?"). O passo 1 manda consultar o censo para saber se a classe ja esta coberta, e foi exatamente isso que refutou a minha proposta — mas eu descobri LENDO O ARQUIVO, nao pelo mecanismo. Por sorte de rota o resultado ficou certo. ⚠️ O AGRAVANTE QUE JUSTIFICA GUARDA E NAO PROSA: a doutrina de dogfood ESTAVA CARREGADA no CLAUDE.md:290-292, dizendo literalmente "invoque o artefato e observe", quando eu errei vinte minutos depois. E a prova de que placement em CLAUDE.md NAO e mecanismo — e `gatilho social e cura nula` um nivel acima: doutrina carregada e cura fraca. SUBSTRATO: hook Stop, MESMO do `background-state-needs-evidence` — cruzar a prosa do turno com as chamadas do turno, trocando `ps` por `Skill`. A diferenca entre "estou seguindo o /meta:forge-guard" COM e SEM o Skill no turno e o que o harvester daquele hook ja sabe ler. TETO: a forma da afirmacao e lista (vocabulario), e ela erra para o lado de CALAR.'
-    trace: '.claude/hooks/background-state-needs-evidence.sh'
+    trace: '.claude/hooks/lib/transcript-tail.py'
     verified_against: 'medido na sessao de 2026-10-02: a doutrina esta em CLAUDE.md:290-292 e estava no contexto; o forge-census devolveu peca 3 AUSENTE porque o censo era instruido num bloco bash em vez de injetado'
 
   - id: C_GUARDA_CASO_TESTA_COPIA_NAO_O_SUT
@@ -182,6 +182,7 @@ nodes:
     verified_at: "2026-10-14"
     verified_against: "decisão do maestro em 2026-10-14, por pergunta com opções (/meta:decide): escolhida «Aposentar o veto e pôr a sonda»"
     label: "o veto sobre a prosa do background-state-needs-evidence é aposentado e entra uma sonda UserPromptSubmit que mede o processo de cada tarefa de fundo viva e injeta o estado, sem vetar; a SAC-138 não entra"
+    trace: '.claude/hooks/background-task-probe.sh'
     narrative: "Selado por /meta:decide em 2026-10-14: escolhida «Aposentar o veto e pôr a sonda»; descartadas: «Só aposentar o veto» · «Pôr a sonda e manter o veto» · «Mergear a SAC-138»."
     provenance:
       source: "maestro, na sessão do /meta:decide"
