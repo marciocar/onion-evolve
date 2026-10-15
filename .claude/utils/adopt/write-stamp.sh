@@ -212,5 +212,6 @@ if [ "${KIND}" = door ]; then echo "stamp escrito: ${STAMP} (porta — role: ${R
 echo "stamp escrito: ${STAMP} ($([ -n "${OLD_EXISTS}" ] && echo "update — adopted_at preservado: ${ADOPTED_AT:-<ausente>}" || echo "adoção — adopted_at: ${ADOPTED_AT}"))"
 # O PIN DO GRAFO DE ADOÇÃO tem o MESMO escritor do carimbo (SAC-149, 2026-10-15): o --update re-carimbava aqui e
 # o nó ONION_INSTALLED seguia dizendo o pin antigo até alguém editá-lo à mão. Sem a semente, o helper diz e sai 0.
-_pin_helper="$(cd "$(dirname "${BASH_SOURCE[0]}")/../kg" && pwd)/stamp-adoption-graph-pin.sh"
+# (cópia do write-stamp FORA da árvore — a bancada roda mutantes assim — não tem ../kg: o cd falho não pode matar o carimbo)
+_pin_helper="$(cd "$(dirname "${BASH_SOURCE[0]}")/../kg" 2>/dev/null && pwd || true)/stamp-adoption-graph-pin.sh"
 if [ -f "${_pin_helper}" ]; then bash "${_pin_helper}" "${TARGET}" || echo "AVISO: o carimbo do pin no grafo de adoção saiu rc=$? (3 = só o x_pin, label editado pelo dono; outro = não carimbado e a REGRA 108 (Pin do grafo de adoção concorda com o carimbo) vai cobrar)." >&2; fi
