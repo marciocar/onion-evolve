@@ -1,0 +1,135 @@
+meta:
+  id: selftest-family-merge-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-15"
+  review_after: "2026-11-15"
+  note: "SAC-146: PRs em paralelo que acrescentam família nova na bancada colidem na mesma âncora do lint-selftest.sh. Medição, opções pesadas e a cura (driver de merge das famílias)."
+
+nodes:
+  - id: E_FAMILIAS_NA_MESMA_ANCORA_2026_10_15
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "Os PRs #1133, #1134 e #1135 acrescentaram cada um uma família depois da MESMA linha da bancada; o #1134 e o #1135 foram resolvidos à mão (os dois blocos mantidos) e re-revisados. Já tinha ocorrido em 2026-10-07 (#951)."
+    narrative: "O registro de família é posicional: a função `run_<x>_selftests` e a invocação `_family run_<x>_selftests` entram no ponto em que o autor escolhe, em geral logo depois da família mais nova. `--list`, `--map` e o seletor derivam do próprio arquivo; a única outra lista é SELFTEST_CORE_ONLY_FAMILIES, no motor, editada por 9 commits desde 2026-09-01 contra 119 que mexem em `_family run_` (medição do refutador). A âncora é, portanto, o fim da família mais recente, e todo PR que nasce da mesma main a escolhe. Dois PRs que acrescentam família core-only colidem também naquela linha, e aí o driver (tudo-ou-nada) devolve o conflito inteiro, como deve."
+    verified_at: "2026-10-15"
+    verified_against: "git show -U0 de97d324, f1724eaf e 56e2e001 -- .claude/validation/lint-selftest.sh (hunks depois de residue_schema, merge_hooks_prune e sync_main_worktree); commits b1b65025 e dc32597b (re-revisão da resolução do conflito); 17c32516 (2026-10-07)"
+    provenance:
+      source: "git log do core e gh pr view 1133/1134/1135"
+      locator: "commits de97d324, f1724eaf, 56e2e001, b1b65025, dc32597b, 17c32516"
+      method: "medição: hunks e mensagens de commit no histórico"
+      locality: "repo"
+
+  - id: E_REPLAY_HISTORICO_COM_O_DRIVER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    label: "Reaplicando os três blocos REAIS (#1133, #1134, #1135) sobre a mesma base: sem o driver os dois rebases conflitam; com o driver os dois saem limpos e o arquivo final é o da main pós-#1135 a menos de uma linha em branco trocada de lugar."
+    narrative: "Replay num repositório de rascunho: base = de97d324^, cada bloco extraído do seu commit e inserido na âncora original. A diferença única (32533a32534 / 32633d32633) é a linha em branco entre blocos, que a mão pôs de outro jeito. A prova com duas branches de fixture sobre o lint-selftest.sh atual também saiu limpa, com a bancada verde nas famílias acrescentadas."
+    verified_at: "2026-10-15"
+    verified_against: "replay em scratchpad (rebase prB e prC sobre main, com e sem -c merge.onion-selftest-families.driver) e diff contra git show 56e2e001:.claude/validation/lint-selftest.sh"
+    provenance:
+      source: "replay local do histórico"
+      locator: "base de97d324^; blocos de de97d324, f1724eaf, 56e2e001"
+      method: "medição: rebase reproduzido"
+      locality: "repo"
+
+  - id: E_UNION_APAGA_EDICAO_DA_MESMA_LINHA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    label: "Com `merge=union` no lint-selftest.sh, duas edições da mesma linha (a lista SELFTEST_CORE_ONLY_FAMILIES) saem num rebase LIMPO e com duas atribuições: a segunda vence e a família da primeira some da lista sem conflito."
+    narrative: "O union vale para o arquivo inteiro, não por trecho; num arquivo de 36 mil linhas de código, todo conflito real viraria concatenação. É o caso (c) da família selftest_family_merge, que o reproduz a cada rodada da bancada."
+    verified_at: "2026-10-15"
+    verified_against: "lint-selftest.sh --families selftest_family_merge, caso (c)"
+    trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: "bancada do core"
+      locator: "família selftest_family_merge, caso (c)"
+      method: "medição: rebase de fixture com merge=union"
+      locality: "repo"
+
+  - id: E_PATCH_ID_MUDA_PELO_CONTEXTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    label: "Resolvido pelo driver, o hash de código do resíduo (patch-id --stable sobre diff -U3) MUDA, porque o contexto do bloco do PR passa a ser o bloco vizinho; as linhas acrescentadas (-U0) são idênticas antes e depois."
+    narrative: "Medido na prova: patch-id 8e3555321907 antes e 141e5db2dee0 depois do rebase; o sha das linhas +/- com -U0 é 3c75d1f29eb0 nos dois. A re-revisão continua pelo caminho de sempre (reviewed_diff_sha256: pendente), e o pr-finalize declara a resolução numa linha PR-FINALIZE antes de parar no carimbo."
+    verified_at: "2026-10-15"
+    verified_against: "git diff <commit>~1 <commit> | git patch-id --stable, antes e depois do rebase da branch de fixture"
+    trace: ".claude/validation/onion-regen-lib.sh"
+    provenance:
+      source: "prova local"
+      locator: "branch famY antes (famY@{1}) e depois do rebase"
+      method: "medição: patch-id e sha das linhas -U0, antes e depois do rebase"
+      locality: "repo"
+
+  - id: D_DRIVER_DE_MERGE_DAS_FAMILIAS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.8
+    label: "A bancada ganha um merge driver próprio, ligado pelo .gitattributes e passado pelo pr-finalize --rebase, que resolve SÓ o conflito de famílias inteiras acrescentadas lado a lado; em qualquer outro caso, o merge de texto padrão."
+    narrative: "Opções pesadas: (union) descartada pela perda silenciosa medida; (família por arquivo, descoberta por glob) adiada: elimina o conflito e o contexto do patch-id, mas pelo menos cinco leitores estáticos do arquivo (harness-inventory, lint-artifacts, preflight-families/run/shadow) e o seletor interno teriam de aprender o diretório, num PR grande; (convenção: no fim, ou em ordem alfabética) não é mecanismo e o fim é justamente a âncora comum; (nada) custa uma volta à mão por colisão. O driver é tudo-ou-nada: base vazia, região de famílias, ponto no topo depois de uma invocação, cada lado bloco inteiro (termina em _family e passa no bash -n sozinho), nenhum nome de topo repetido, resultado no bash -n. Sem a config, o git cai no merge de texto. Decisão tomada pelo agente sob a autorização do maestro de 2026-10-15 (opção recomendada), não por pergunta."
+    verified_at: "2026-10-15"
+    verified_against: "lint-selftest.sh --families selftest_family_merge (12 casos verdes) e 11 mutantes por ops/mutate-and-restore.sh, todos mordendo (um deles achado pelo refutador, que antes passava)"
+    trace: "ops/merge-drivers/selftest-families.py"
+    provenance:
+      source: "agente de execução do SAC-146, autorização delegada do maestro (2026-10-15)"
+      locator: "SAC-146; PR deste grafo"
+      method: "derivado: opção recomendada pelo agente sob autorização delegada, declarada no resíduo"
+      locality: "repo"
+
+  - id: Q_REREVISAO_SO_PELO_CONTEXTO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: "Vale dispensar a re-revisão quando o hash de código mudou SÓ pelo contexto (as linhas +/- com -U0 iguais às revisadas e a resolução declarada pelo driver)? Hoje o resíduo não guarda o hash -U0, então não há como provar."
+    narrative: "Gatilho: a próxima colisão resolvida pelo driver em que a re-revisão custar uma volta de CI. Pré-condição: o resíduo ganha um segundo hash (-U0) carimbado pelo pr-finalize, e a dispensa passa pelo Elenxo, porque mexe na REGRA 56."
+    trace: "ops/pr-finalize.sh"
+
+  - id: Q_FAMILIA_POR_ARQUIVO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.4
+    label: "Família nova num arquivo próprio, descoberto por glob, se paga? Elimina o conflito e mantém o patch-id estável no rebase, ao preço de ensinar o diretório a todos os leitores estáticos da bancada."
+    narrative: "Gatilho: colisão que o driver devolve como conflito (fora do caso que ele resolve) mais de duas vezes num mês, ou a re-revisão pelo contexto (Q_REREVISAO_SO_PELO_CONTEXTO) virar o custo dominante."
+    trace: ".claude/validation/lint-selftest.sh"
+
+edges:
+  - from: E_FAMILIAS_NA_MESMA_ANCORA_2026_10_15
+    to: D_DRIVER_DE_MERGE_DAS_FAMILIAS
+    edge_type: SUPPORTS
+  - from: E_REPLAY_HISTORICO_COM_O_DRIVER
+    to: D_DRIVER_DE_MERGE_DAS_FAMILIAS
+    edge_type: SUPPORTS
+  - from: E_UNION_APAGA_EDICAO_DA_MESMA_LINHA
+    to: D_DRIVER_DE_MERGE_DAS_FAMILIAS
+    edge_type: SUPPORTS
+  - from: E_PATCH_ID_MUDA_PELO_CONTEXTO
+    to: Q_REREVISAO_SO_PELO_CONTEXTO
+    edge_type: SUPPORTS
+  - from: E_PATCH_ID_MUDA_PELO_CONTEXTO
+    to: Q_FAMILIA_POR_ARQUIVO
+    edge_type: SUPPORTS
+  - from: Q_REREVISAO_SO_PELO_CONTEXTO
+    to: D_DRIVER_DE_MERGE_DAS_FAMILIAS
+    edge_type: CONSTRAINS
+  - from: Q_FAMILIA_POR_ARQUIVO
+    to: D_DRIVER_DE_MERGE_DAS_FAMILIAS
+    edge_type: CONSTRAINS

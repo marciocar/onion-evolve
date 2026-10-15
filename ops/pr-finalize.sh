@@ -162,12 +162,23 @@ if [ "${REBASE}" = 1 ]; then
   git diff --cached --quiet || die "--rebase exige índice limpo: commite o conteúdo do PR antes"
   git fetch -q origin || die "fetch falhou"
   _OWN_REBASE=1   # daqui até o fim do bloco o rebase é NOSSO: morte no meio = o _cleanup o aborta
-  if ! git rebase --autostash origin/main >/dev/null 2>&1; then
+  # DRIVER DAS FAMÍLIAS (SAC-146, 2026-10-15): o .gitattributes liga a bancada a `merge=onion-selftest-families`,
+  # e a config do driver vai por `git -c` (nada persiste na config do repo). Ele resolve SÓ o conflito de
+  # famílias acrescentadas lado a lado (base vazia, blocos inteiros, sem nome repetido, bash -n); qualquer
+  # outro conflito do arquivo continua conflito e cai na recusa abaixo. Sem o driver no disco, merge de texto.
+  _RB_CFG=(); _RB_LOG="$(mktemp)"; _DIRS+=("${_RB_LOG}")
+  # Driver que não consegue rodar (python3 ausente) deixa o arquivo como o da main, SEM marcadores: só liga
+  # com o interpretador presente, e o caminho vai entre aspas simples (raiz com espaço).
+  [ -f "${ROOT}/ops/merge-drivers/selftest-families.py" ] && command -v python3 >/dev/null 2>&1 \
+    && _RB_CFG=(-c merge.onion-selftest-families.name=onion-selftest-families \
+    -c "merge.onion-selftest-families.driver=python3 -I '${ROOT}/ops/merge-drivers/selftest-families.py' %O %A %B %L %P")
+  if ! git "${_RB_CFG[@]}" rebase --autostash origin/main >/dev/null 2>"${_RB_LOG}"; then
     for _r in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
       _c="$(git diff --name-only --diff-filter=U)"
       [ -n "${_c}" ] || break
       for _f in ${_c}; do
         if ! onion_is_generated "${_f}"; then
+          sed -n 's/^.*SELFTEST-FAMILIES: /PR-FINALIZE: /p' "${_RB_LOG}" >&2   # o PORQUÊ do driver não resolver
           git rebase --abort >/dev/null 2>&1; die "conflito REAL em ${_f} — rebase abortado, nada mudou; resolva à mão"
         fi
         # projeção gerada em conflito: o lado da main vence aqui e a regeneração adiante a refaz.
@@ -177,13 +188,16 @@ if [ "${REBASE}" = 1 ]; then
         # o ops/pr-merge-verified.sh (core-only) lê esta linha para dizer no PR a CAUSA do auto-rebase (H5)
         echo "PR-FINALIZE: conflito de projeção resolvido em ${_f} (a regeneração refaz)"
       done
-      GIT_EDITOR=true git rebase --continue >/dev/null 2>&1 && break
+      GIT_EDITOR=true git "${_RB_CFG[@]}" rebase --continue >/dev/null 2>>"${_RB_LOG}" && break
     done
     [ -d "$(git rev-parse --git-path rebase-merge)" ] || [ -d "$(git rev-parse --git-path rebase-apply)" ] \
       && { git rebase --abort >/dev/null 2>&1; die "rebase não terminou — abortado, nada mudou"; }
   fi
   # o rebase pode falhar SEM deixar estado (ex.: arquivo não rastreado que a main traz) — e a 1ª versão
   # declarava "rebaseado" assim mesmo (maior M2 do Elenxo). A prova é a ancestralidade, não a mensagem.
+  # o que o driver resolveu é DITO (uma linha por conflito): o código combinado é novo, e o hash de código
+  # do resíduo muda pelo contexto — a re-revisão declarada é a do caminho de sempre (o _restamp abaixo para)
+  sed -n 's/^.*SELFTEST-FAMILIES: /PR-FINALIZE: /p' "${_RB_LOG}"
   _OWN_REBASE=0   # o rebase terminou (ou não deixou estado): nada mais a abortar
   git merge-base --is-ancestor origin/main HEAD || die "o rebase NÃO trouxe a origin/main para baixo do HEAD — nada a enviar"
   echo "PR-FINALIZE: rebaseado sobre origin/main @ $(git rev-parse --short origin/main)"
