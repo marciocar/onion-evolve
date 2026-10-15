@@ -2,7 +2,8 @@
 branch: fix/merge-hooks-prune-retired
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 23028c09d395ea0a1722f37159e0a88977dffa8b37c50231b3fc7817a010b074
+reviewed_code_sha256: b178237ce7235efefbb106555c622bebf25871c39b8c2da2d10d064069a0c14c
 findings_total: 1
 findings_real: 1
 tokens: 0
