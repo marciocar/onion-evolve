@@ -93,14 +93,14 @@ case "${GATE}" in
             GATE_VERIF="verify-adopter-gate-executado-na-adocao" ;;
   unproven) GATE_STATUS="open"
             GATE_LABEL="O gate está INSTALADO mas NÃO foi provado por execução nesta adoção"
-            GATE_NARRATIVE="Alvo sem commits, ou lint indisponível no momento. Instalar não é sinônimo de proteger: rode 'bash ops/verify-adopter-gate.sh <este-repo>' a partir do core, ou faça um commit que viole o lint de propósito e confirme que ele é BARRADO. Enquanto isto for open, a proteção deste repo é declarada, não verificada."
+            GATE_NARRATIVE="Alvo sem commits, ou lint indisponível no momento. Instalar não é sinônimo de proteger: rode no core o ops/verify-adopter-gate.sh (core-only) contra este repo, ou faça um commit que viole o lint de propósito e confirme que ele é BARRADO. Enquanto isto for open, a proteção deste repo é declarada, não verificada."
             GATE_SOURCE="install-onion-githook.sh rodado na adoção (prova adiada)"
             GATE_METHOD="derivado: instalação sem execução de prova"
             GATE_LOCALITY="host"
             GATE_VERIF="nao-verificado-gate-declarado-e-nao-provado" ;;
   *)        GATE_STATUS="open"
             GATE_LABEL="O gate foi instalado; se ele BARRA de fato, ninguém mediu nesta adoção"
-            GATE_NARRATIVE="O semeador não recebeu --gate-proven nem --gate-unproven. Prove antes de confiar: 'bash ops/verify-adopter-gate.sh <este-repo>' do core."
+            GATE_NARRATIVE="O semeador não recebeu --gate-proven nem --gate-unproven. Prove antes de confiar: rode no core o ops/verify-adopter-gate.sh (core-only) contra este repo."
             GATE_SOURCE="semeador da adoção, sem informação do instalador do gate"
             GATE_METHOD="derivado: nenhuma medição"
             GATE_LOCALITY="repo"   # a fonte é o próprio semeador, versionado no repo
@@ -160,6 +160,7 @@ nodes:
     confidence: 1.0
     verified_at: "${TODAY}"
     verified_against: stamp-claude-onion-version-lido-na-adocao
+    x_pin: "${PIN}"
     label: "Framework instalado: pin \`${PIN}\`, modo \`${MODE}\`, papel \`${ROLE}\`, branch de integração \`${IB}\`"
     narrative: "Atualizar depois com /meta:adopt --update a partir do core — o merge de onion/vendor transforma customização local em conflito git real, resolvível, em vez de sobrescrita silenciosa."
     provenance:

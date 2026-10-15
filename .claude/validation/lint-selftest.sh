@@ -2941,6 +2941,20 @@ run_rules_registry_selftests() {
     record_pass "rules-registry: (d) REGRA sem categoria → gerador falha (exit 2)"
   else record_fail "rules-registry: (d)" "regra órfã não detectada (rc=${rc}, esperado 2)"; fi
 
+  # (ap) APLICABILIDADE POR PAPEL (SAC-149): `# aplica-se:` válido entra na seção projetada; papel fora do
+  #      vocabulário (o typo que calaria a regra em todo papel) e lista sem `source` (regra que nunca roda onde
+  #      a bancada a exercita) fazem o gerador falhar (exit 2).
+  printf '# REGRA 85 — porta [SOFT]\n# previne: z\n# aplica-se: source\ncheck_ap() {\n  violation "SOFT" "x" "y"\n}\n' > "${tmp}/ap.sh"
+  printf '# REGRA 85 — porta [SOFT]\n# previne: z\n# aplica-se: source, adoptd\ncheck_ap() {\n  violation "SOFT" "x" "y"\n}\n' > "${tmp}/ap-typo.sh"
+  printf '# REGRA 85 — porta [SOFT]\n# previne: z\n# aplica-se: adopted\ncheck_ap() {\n  violation "SOFT" "x" "y"\n}\n' > "${tmp}/ap-nosrc.sh"
+  local _ap_ok _ap_t=0 _ap_n=0
+  _ap_ok="$(RULES_LINT_SRC="${tmp}/ap.sh" bash "${gen}" 2>/dev/null | grep -cE '^\| 85 \| porta \| source \|$' || true)"
+  RULES_LINT_SRC="${tmp}/ap-typo.sh" bash "${gen}" >/dev/null 2>&1 || _ap_t=$?
+  RULES_LINT_SRC="${tmp}/ap-nosrc.sh" bash "${gen}" >/dev/null 2>&1 || _ap_n=$?
+  if [ "${_ap_ok}" = 1 ] && [ "${_ap_t}" -eq 2 ] && [ "${_ap_n}" -eq 2 ]; then
+    record_pass "rules-registry: (ap) '# aplica-se:' válido é projetado; typo de papel e lista sem source → exit 2"
+  else record_fail "rules-registry: (ap)" "projetado=${_ap_ok} (esperado 1) · typo rc=${_ap_t} · sem-source rc=${_ap_n} (esperados 2)"; fi
+
   # (e) SEVERIDADE = corpo ∪ tag — guarda de severidade dinâmica + tag declarada → HARD + SOFT
   printf '# REGRA 29 — dinamica [HARD + SOFT]\n# previne: z\ncheck_d() {\n  violation "${sev}" "x" "y"\n  violation "SOFT" "b" "c"\n}\n' > "${tmp}/sev.sh"
   if RULES_LINT_SRC="${tmp}/sev.sh" bash "${gen}" 2>/dev/null | grep -qE '^\| 29 \|.*HARD \+ SOFT'; then
@@ -9314,6 +9328,35 @@ run_env_exposure_selftests() {
     [ "$(_eg '{"tool_name":"Grep","tool_input":{"pattern":"T","path":".env"}}')" = 2 ] || { bad=1; record_fail "env-exposure: (h) veto" "Grep em .env passou"; }
     [ "$(_eg '{"tool_name":"Read","tool_input":{"file_path":"/x/.env.example"}}')" = 0 ] || { bad=1; record_fail "env-exposure: (h) veto" "Read de .env.example barrado"; }
     [ "${bad}" = 0 ] && record_pass "env-exposure: (h) o veto barra 13 leituras do .env e deixa passar 14 caminhos honestos"
+  fi
+  # (r) SAC-149 (2026-10-15, os 2 falsos positivos medidos no --update de um adotante): (r1) o PADRÃO do grep
+  #     (`\.claude/hooks/[A-Za-z0-9_.-]*`) era julgado como glob que alcança `.env` quando a linha citava um
+  #     .env literal; (r2) um `*.env` sem segredo que a sessão gravou no scratchpad dela era vetado na leitura.
+  #     As duas polaridades: os honestos passam, e o veto real do .env (inclusive a cópia dele no scratchpad,
+  #     que `cp .env <scratch>/x.env` permite) segue barrado.
+  if [ -f "${guard}" ]; then
+    local _rsd; _rsd="/tmp/claude-$(id -u)/selftest-envguard-$$/scratchpad"
+    mkdir -p "${_rsd}"
+    printf 'PIN=abc\nROLE=adopted\n' > "${_rsd}/update.env"
+    printf 'LINEAR_API_KEY=lin_api_xxxxxxxxxxxxxxxxxxxxxxxx\n' > "${_rsd}/copia.env"
+    printf 'X=AbCdEfGhIjKlMnOpQrStUvWxYz0123\n' > "${_rsd}/valor.env"
+    _egb() { _eg "$(python3 -c 'import json,sys;print(json.dumps({"tool_name":"Bash","tool_input":{"command":sys.argv[1]}}))' "$1")"; }
+    local _rbad="" c
+    for c in "grep -oE '\\.claude/hooks/[A-Za-z0-9_.-]*' .claude/settings.json; test -f .env" \
+             "grep -oE \"\\.claude/hooks/[A-Za-z0-9_.-]*\" .claude/settings.json && grep -c x .env.example" \
+             "cat ${_rsd}/update.env"; do
+      [ "$(_egb "${c}")" = 0 ] || _rbad="${_rbad} [barrou honesto: ${c}]"
+    done
+    [ "$(_eg "{\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"${_rsd}/update.env\"}}")" = 0 ] || _rbad="${_rbad} [Read do scratchpad sem segredo barrado]"
+    for c in 'grep -q KEY .env' 'grep -e KEY .env' 'grep -f pats .env' 'grep -- KEY .env' "grep -oE '\\.claude/hooks/[A-Za-z0-9_.-]*' .env" \
+             'rg KEY .env' "cat ${_rsd}/copia.env" "cat ${_rsd}/valor.env" "cat ${_rsd}/../scratchpad/copia.env" "cat ${_rsd}/nao-existe.env"; do
+      [ "$(_egb "${c}")" = 2 ] || _rbad="${_rbad} [deixou passar: ${c}]"
+    done
+    [ "$(_eg "{\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"${_rsd}/copia.env\"}}")" = 2 ] || _rbad="${_rbad} [Read da cópia com segredo passou]"
+    rm -rf "/tmp/claude-$(id -u)/selftest-envguard-$$"
+    if [ -z "${_rbad}" ]; then
+      record_pass "env-exposure: (r) o padrão do grep não é arquivo lido e o *.env sem segredo do scratchpad passa; 11 leituras reais do .env (cópia no scratchpad inclusa) seguem barradas"
+    else record_fail "env-exposure: (r)" "${_rbad}"; fi
   fi
   # (q) CUSTO LINEAR (fix/vetos-fail-closed, 2026-10-11): token único de 2 MB. Antes, o regex de cites_env e
   #     o acumulador do shlex eram quadráticos (208 s a 300 KB; com onFailure block, barrar após 600 s).
@@ -17261,6 +17304,31 @@ PYM
   if [ "${rc}" -eq 0 ] && [ "${h0}" = "${h1}" ] && grep -q 'nada a migrar' <<< "${out}"; then
     record_pass "migrate-seed: (b) já convertida → no-op byte a byte (idempotente)"
   else record_fail "migrate-seed: (b)" "rc=${rc} hash mudou=$([ "${h0}" = "${h1}" ] && echo nao || echo SIM): ${out}"; fi
+  rm -rf "$d"
+
+  # (v2) SEMENTE v2 (SAC-149, 2026-10-15, medida no --update de um adotante): documento ÚNICO com o cabeçalho
+  #      do semeador no TOPO — o contrato v3 reprovava 8 MUST de chave desconhecida e o helper dizia "nada a
+  #      migrar" (só procurava o separador). A forma v2 é a v1 sem os dois separadores.
+  d="$(mktemp -d)"; mkdir -p "$d/docs/onion/graph"
+  grep -vxE -- '---[[:space:]]*' "${legacy}" > "$d/${seed}"
+  printf 'graph: meu-dominio\ntitle: "meu"\nmeta:\n  id: meu\n  schema_version: "1"\nnodes:\n  - id: A\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: a\nedges: []\n' > "$d/docs/onion/graph/meu.kg.yaml"
+  ( cd "$d" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) >/dev/null 2>&1
+  before="$(_mig_measure "$d/${seed}")"
+  local _hm0 _hm1; _hm0="$(sha256sum "$d/docs/onion/graph/meu.kg.yaml" | cut -d' ' -f1)"
+  rc=0; out="$(bash "${helper}" "$d" --source "${REPO_ROOT}" 2>&1)" || rc=$?
+  after="$(_mig_measure "$d/${seed}")"
+  _hm1="$(sha256sum "$d/docs/onion/graph/meu.kg.yaml" | cut -d' ' -f1)"
+  _irc=0; bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "$d/${seed}" --integrity >/dev/null 2>&1 || _irc=$?
+  if [ "${rc}" -eq 3 ] && [ "${before%% *}" = 1 ] && [ "${before}" != "1 - ${before##* }" ] && [ "${after}" = "1 - ${before##* }" ] \
+     && [ "${_irc}" -eq 0 ] && [ "${_hm0}" = "${_hm1}" ] && grep -q 'meu.kg.yaml.*cabeçalho no TOPO.*NÃO é a semente' <<< "${out}"; then
+    record_pass "migrate-seed: (v2) semente com o cabeçalho no topo → meta, MUST vazio, mesmos nós; o grafo PRÓPRIO com a mesma forma fica intocado e avisado"
+  else record_fail "migrate-seed: (v2)" "rc=${rc} antes='${before}' depois='${after}' integrity=${_irc} grafo-proprio-tocado=$([ "${_hm0}" = "${_hm1}" ] && echo nao || echo SIM): ${out}"; fi
+  h0="$(sha256sum "$d/${seed}" | cut -d' ' -f1)"
+  rc=0; out="$(bash "${helper}" "$d" --source "${REPO_ROOT}" 2>&1)" || rc=$?
+  h1="$(sha256sum "$d/${seed}" | cut -d' ' -f1)"
+  if [ "${h0}" = "${h1}" ] && ! grep -q 'onion-adoption.kg.yaml' <<< "${out}"; then
+    record_pass "migrate-seed: (v2b) a semente v2 já migrada → no-op byte a byte"
+  else record_fail "migrate-seed: (v2b)" "rc=${rc} hash mudou=$([ "${h0}" = "${h1}" ] && echo nao || echo SIM): ${out}"; fi
   rm -rf "$d"
 
   # (c) GRAFO DO ADOTANTE com dois documentos — um qualquer E uma CÓPIA da forma da semente fora do caminho
@@ -30343,11 +30411,12 @@ _as_ops() {
     done < <(grep -oE '(^|[^A-Za-z0-9_./-])(\./)?ops/[A-Za-z0-9_.-]+\.[A-Za-z]+' <<< "${_line}" | sed -E 's/^[^o.]//; s|^\./||' | LC_ALL=C sort -u || true)
   done < <(grep -E '^VIOLATION' "${_out}" || true)
 }
-# O PASSIVO MEDIDO que o PR 2 da SAC-149 cura (aplicabilidade por papel no rules-registry; REGRA 100 nas
-# mensagens). CATRACA NOS DOIS SENTIDOS: regra NOVA fora da lista reprova, e entrada que PAROU de disparar
-# também reprova (a lista só encolhe, e encolhe junto com a cura — nunca fica tolerando o que já sumiu).
-_AS_PENDING_UNJUDGED="REGRA 85|members.yaml,REGRA 85|ops/publish-door.sh,REGRA 92|members.yaml"
-_AS_PENDING_OPS="REGRA 85|ops/publish-door.sh"
+# O PASSIVO MEDIDO no PR 1 da SAC-149 (REGRAS 85 e 92 "não pôde julgar", e a 85 mandando rodar ops/) foi
+# CURADO no PR 2: as duas declaram `# aplica-se: source` e saem "NÃO SE APLICA" fora do core, e a REGRA 100
+# passou a julgar o ops/ que uma `violation` imprime. As listas ficam VAZIAS, e a catraca segue nos dois
+# sentidos: regra nova aqui reprova, e não há entrada a tolerar.
+_AS_PENDING_UNJUDGED=""
+_AS_PENDING_OPS=""
 # A catraca é por PAR regra|dependência (passada adversarial, 2026-10-15): por regra só, uma dependência NOVA sob
 # uma regra já tolerada passava calada.
 _as_ratchet() {  # $1=rótulo do caso $2=achados (regra<TAB>token por linha) $3=lista pendente (regra|token, vírgulas)
@@ -30423,7 +30492,9 @@ run_adopter_shape_selftests() {
 
   # (a) o adotante nasce pelo corte do --update e o CLONE recebe o que ele cita
   local al="${d}/alvo" cl="${d}/clone"
-  if ! _o="$(bash "${mat}" "${al}" --role adopted 2>&1)"; then
+  # ONION_ADOPTER_FROM=WORKTREE monta a fixture do DISCO (o mutante do mutate-and-restore.sh vive lá); o default
+  # é o ÍNDICE, o que o pre-commit vai commitar.
+  if ! _o="$(bash "${mat}" "${al}" --role adopted --from "${ONION_ADOPTER_FROM:-INDEX}" 2>&1)"; then
     record_fail "adopter-shape: (a) setup" "o materializador recusou: $(printf '%s' "${_o}" | tail -3 | tr '\n' ' ' | cut -c1-300)"
     rm -rf "${d}"; return
   fi
@@ -30468,6 +30539,43 @@ run_adopter_shape_selftests() {
 
   # (f) mensagem que o lint IMPRIME no adotante não manda rodar ops/ (catraca do passivo do PR 2)
   _as_ratchet "(f) mensagem do lint que cita ops/ ausente no adotante" "$(_as_ops "${lo}" "${cl}")" "${_AS_PENDING_OPS}"
+
+  # (g) as regras sem objeto no papel saem "NÃO SE APLICA" — contadas à parte, nunca como SOFT
+  if grep -q '^NÃO SE APLICA: REGRA 85 ' "${lo}" && grep -q '^NÃO SE APLICA: REGRA 92 ' "${lo}" \
+     && grep -qE '^  Não se aplica  : 2 ' "${lo}" && ! grep -qE '^VIOLATION: .*REGRA (85|92) ' "${lo}"; then
+    record_pass "adopter-shape: (g) as REGRAS 85 e 92 saem 'NÃO SE APLICA' no adotante (2, fora do total), sem VIOLATION"
+  else record_fail "adopter-shape: (g)" "$(grep -E 'SE APLICA|REGRA (85|92) |Não se aplica' "${lo}" | head -4 | cut -c1-200 | tr '\n' ' ')"; fi
+
+  # (h) o que a ADOÇÃO escreve no adotante (não vendorizado: a semente do KG, os starters de docs/evolution,
+  #     o .githooks) não manda rodar ops/ sem o marcador (core-only) — a REGRA 100 só varre o que viaja
+  local _gw
+  _gw="$(cd "${cl}" && git ls-files -- docs/onion docs/evolution .githooks CLAUDE.md 2>/dev/null \
+         | while IFS= read -r _f; do grep -nE '(^|[^A-Za-z0-9_./-])ops/[A-Za-z0-9_.-]+\.[A-Za-z]+' "${_f}" 2>/dev/null \
+             | grep -vE '\([Cc]ore[- ]only[),;[:space:]]' | sed "s|^|${_f}:|" || true; done | sed -n '1,5p' || true)"
+  if [ -z "${_gw}" ]; then record_pass "adopter-shape: (h) o que a adoção escreve no adotante não cita ops/ sem (core-only)"
+  else record_fail "adopter-shape: (h)" "$(tr '\n' ' ' <<< "${_gw}" | cut -c1-300)"; fi
+
+  # (i) PIN COM ESCRITOR ÚNICO: a semente nasce com o x_pin do carimbo, e um RE-CARIMBO (o que o --update faz)
+  #     leva o grafo junto — sem passo à mão. A REGRA 108 é a catraca; aqui se prova o escritor.
+  local _pk="${REPO_ROOT}/.claude/utils/kg/stamp-adoption-graph-pin.sh" _ws="${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh"
+  local _p0 _p1 _r0=0 _r1=0
+  bash "${_pk}" "${al}" --check >/dev/null 2>&1 || _r0=$?
+  bash "${_pk}" "${al}" >/dev/null 2>&1 || _r0=9   # o modo SEM flag (o do write-stamp), direto e ANTES do re-carimbo: idempotente aqui
+  bash "${_ws}" "${al}" --framework onion-evolve --commit 0123456789ab --commit-date 2026-10-16 --role adopted --mode greenfield >/dev/null 2>&1
+  bash "${_pk}" "${al}" --check >/dev/null 2>&1 || _r1=$?
+  _p1="$(grep -m1 -E '^    x_pin:' "${al}/docs/onion/graph/onion-adoption.kg.yaml" | tr -d ' "' )"
+  if [ "${_r0}" -eq 0 ] && [ "${_r1}" -eq 0 ] && [ "${_p1}" = "x_pin:0123456789ab" ] \
+     && grep -q 'pin `0123456789ab`' "${al}/docs/onion/graph/onion-adoption.kg.yaml"; then
+    record_pass "adopter-shape: (i) a semente nasce com o pin do carimbo e o re-carimbo leva x_pin e label juntos (escritor único)"
+  else record_fail "adopter-shape: (i)" "check antes rc=${_r0} · depois do re-carimbo rc=${_r1} · ${_p1:-sem x_pin}"; fi
+  # (i2) A CATRACA: o grafo dizendo outro pin que o carimbo é HARD da REGRA 108 no lint do adotante
+  sed -i 's/^    x_pin: .*/    x_pin: "fedcba987654"/' "${al}/docs/onion/graph/onion-adoption.kg.yaml"
+  : > "${d}/hard108.lst"
+  local _l108; _l108="$(cd "${al}" && ONION_LINT_HARD_FILE="${d}/hard108.lst" LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${al}/docs/onion/graph/onion-adoption.kg.yaml" 2>&1 || true)"
+  # a SEVERIDADE se lê na lista das HARD (a linha VIOLATION não a traz): outro HARD qualquer não pode aprovar o caso
+  if grep -q 'REGRA 108 (Pin do grafo de adoção concorda com o carimbo): o grafo diz pin fedcba987654, o carimbo diz 0123456789ab' "${d}/hard108.lst"; then
+    record_pass "adopter-shape: (i2) pin do grafo divergente do carimbo → HARD da REGRA 108 no lint do adotante"
+  else record_fail "adopter-shape: (i2)" "$(grep -E 'REGRA 108|Violações HARD' <<< "${_l108}" | head -3 | tr '\n' ' ' | cut -c1-300)"; fi
 
   rm -rf "${d}"
 }
@@ -33429,8 +33537,8 @@ run_ops_citation_travel_selftests() {
   local o rc
   # (a) o --selftest próprio: acusa o defeito verbatim e cala nas três declarações + fora do escopo
   if o="$(LC_ALL=C bash "${chk}" --selftest 2>&1)"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 17/17 verdes' <<< "${o}"; then
-    record_pass "ops-citation-travel: (a) --selftest verde (17 casos: o defeito verbatim, as três declarações, fora do escopo, catraca por contagem e os achados da passada adversarial)"
+  if [ "${rc}" -eq 0 ] && grep -qF 'selftest: 19/19 verdes' <<< "${o}"; then
+    record_pass "ops-citation-travel: (a) --selftest verde (19 casos, os 2 últimos da SAC-149: a mensagem de violation e a regra source-only: o defeito verbatim, as três declarações, fora do escopo, catraca por contagem e os achados da passada adversarial)"
   else record_fail "ops-citation-travel: (a) --selftest" "rc=${rc}; $(grep '✗' <<< "${o}" | head -3 | tr '\n' '|')"; fi
   # (b) O MODO QUE A PRODUÇÃO CONSOME, no corpus real: --format tsv sai 0, sem HARD, e com o passivo à vista.
   #     CAMINHO LITERAL: a REGRA 59 casa o nome do arquivo para achar o par.
@@ -33462,7 +33570,9 @@ run_ops_citation_travel_selftests() {
     if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "ops-citation-travel: (m) mutante morde → ✗ ${want}"
     else record_fail "ops-citation-travel: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
   done <<EOF_MUT
-if (!(cand[i] in gtok)) print rel "|" cand[i]$(printf '\x1f')if (0) print rel "|" cand[i]$(printf '\x1f')(i)
+if (!(cand[i] in gtok) || (i in cmsg)) print rel "|" cand[i]$(printf '\x1f')if (0) print rel "|" cand[i]$(printf '\x1f')(i)
+if (!(cand[i] in gtok) || (i in cmsg)) print$(printf '\x1f')if (!(cand[i] in gtok)) print$(printf '\x1f')(xviii)
+/violation[[:space:]]+"/ && srconly { next }$(printf '\x1f')/violation[[:space:]]+"/ && 0 { next }$(printf '\x1f')(xix)
 l ~ /\([Cc]ore[- ]only[),;[:space:]]/ { next }$(printf '\x1f')l ~ /\(XCore[- ]only[),;[:space:]]/ { next }$(printf '\x1f')(ii)
   [ "\${#bases[@]}" -gt 0 ] || return 0$(printf '\x1f')  bases+=("\${repo}/docs"); [ "\${#bases[@]}" -gt 0 ] || return 0$(printf '\x1f')(iii)
 else if (c + 0 > b[k] + 0)$(printf '\x1f')else if (c + 0 >= b[k] + 0)$(printf '\x1f')(iv)

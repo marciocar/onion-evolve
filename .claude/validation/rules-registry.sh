@@ -47,6 +47,8 @@ fnrx  = re.compile(r'^([a-z_][a-z0-9_]*)\(\)\s*\{')          # 'check_xxx() {'
 sevrx = re.compile(r'violation "(HARD|SOFT)"')
 tagrx = re.compile(r'\[([^\]]*)\]\s*$')                       # '… [HARD]'
 prevrx = re.compile(r'^#\s*previne:\s*(.+?)\s*$')            # '# previne: <modo-de-falha>'
+apprx  = re.compile(r'^#\s*aplica-se:\s*(.+?)\s*$')          # '# aplica-se: source[, hub]' (SAC-149)
+ROLES  = {'source', 'hub', 'adopted', 'standalone', 'plugins', 'mini', 'source-door'}
 
 rules, order, dups = {}, [], []
 i, n = 0, len(lines)
@@ -62,12 +64,16 @@ while i < n:
     # da guarda até o próximo docstring: acha a função, as severidades que ela emite,
     # e o campo '# previne:' (o modo-de-falha, no bloco de docstring antes da função).
     j = i + 1
-    fname, sev, previne = None, set(), None
+    fname, sev, previne, applies = None, set(), None, None
     while j < n and not rx.match(lines[j]):
         if previne is None:
             pm = prevrx.match(lines[j])
             if pm:
                 previne = pm.group(1)
+        if applies is None and fname is None:
+            am = apprx.match(lines[j])
+            if am:
+                applies = [r for r in re.split(r'[\s,]+', am.group(1)) if r]
         fm = fnrx.match(lines[j])
         if fm:
             fname = fm.group(1)
@@ -81,7 +87,7 @@ while i < n:
         j += 1
     if num in rules:
         dups.append(num)
-    rules[num] = dict(title=title, declared=declared, sev=sev, fn=fname, previne=previne)
+    rules[num] = dict(title=title, declared=declared, sev=sev, fn=fname, previne=previne, applies=applies)
     order.append(num)
     i += 1
 
@@ -206,6 +212,17 @@ if orphans:
         "  em ORPHAN_ALLOWED (rules-registry.sh) com a razao escrita.\n" % orphans)
     sys.exit(2)
 
+# Catraca de CLAREZA nº8 — APLICABILIDADE POR PAPEL (SAC-149, 2026-10-15). `# aplica-se:` tira a regra dos
+# papéis em que ela não tem objeto (o lint a conta como "não se aplica", nunca SOFT). Duas recusas: papel fora
+# do vocabulário (typo cala a regra em silêncio em TODO papel), e lista sem `source` (a regra nunca rodaria no
+# core, onde a bancada a exercita — guarda que não roda onde é testada é guarda sem teste).
+bad_app = {x: r['applies'] for x, r in rules.items() if r.get('applies') is not None
+           and (not r['applies'] or 'source' not in r['applies'] or set(r['applies']) - ROLES)}
+if bad_app:
+    sys.stderr.write("ERRO rules-registry: '# aplica-se:' inválido em %s — papéis válidos: %s, e `source` é obrigatório\n"
+                     % (bad_app, sorted(ROLES)))
+    sys.exit(2)
+
 # --- classificação (SSOT da categoria; a cobertura é guardada abaixo) --------
 CATEGORIES = [
     ("Frontmatter & conformidade de artefato",
@@ -222,7 +239,7 @@ CATEGORIES = [
      [10, 11, 103, 104, 105, 107]),
     ("SSOT anti-drift",
      "Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, catálogo, topologia.",
-     [8, 9, 16, 21, 27, 37, 39, 41, 50, 59, 62, 63, 70, 76, 80, 81, 83, 84, 85, 90, 92, 96]),
+     [8, 9, 16, 21, 27, 37, 39, 41, 50, 59, 62, 63, 70, 76, 80, 81, 83, 84, 85, 90, 92, 96, 108]),
     ("KG & proveniência",
      "Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca "
      "(por citação e por marcador autodeclarado); e frescor doutrinário — afirmação "
@@ -330,6 +347,20 @@ for title, desc, nums in CATEGORIES:
     out.append("|---:|-------|:----------:|---------------|")
     for x in present:
         out.append("| %d | %s | %s | %s |" % (x, esc(rules[x]['title']), labels[x], esc(rules[x]['previne'])))
+    out.append("")
+
+scoped = [x for x in sorted(rules) if rules[x].get('applies')]
+if scoped:
+    out.append("## Aplicabilidade por papel")
+    out.append("")
+    out.append("Regras cujo objeto só existe em alguns papéis, declaradas por `# aplica-se:` no docstring. Fora desses")
+    out.append("papéis o lint **não as roda** e as conta à parte (`Não se aplica`), fora de HARD e SOFT: ausência")
+    out.append("legítima de objeto não é aviso. Toda lista contém `source`, então no core todas rodam.")
+    out.append("")
+    out.append("| Nº | Regra | Aplica-se a |")
+    out.append("|---:|-------|-------------|")
+    for x in scoped:
+        out.append("| %d | %s | %s |" % (x, esc(rules[x]['title']), ', '.join(rules[x]['applies'])))
     out.append("")
 
 if len(sys.argv) > 2 and sys.argv[2] == '--counts':
