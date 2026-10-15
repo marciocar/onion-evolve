@@ -63,9 +63,12 @@
 # FORA da string, subprocess de outra linguagem, git/gh chamado por outro programa, `url.*.pushInsteadOf`
 # e config global/de sistema. Lista completa no nó C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE.
 # FUNÇÃO DA STRING (SAC-148, 2026-10-15): a chamada é EMULADA (corpo re-julgado com `$1`/`$@`/`$*` trocados pelos
-# argumentos literais), e `bash -c '<texto>' a0 a1` dá os posicionais ao texto. Não emula: `shift`/`set --` (fecha
-# se o texto tem a forma guardada), `$(…)` dentro do corpo (julgado só na definição), `getopts` e laço sobre
-# os argumentos (`for a in "$@"`), e o ESCOPO de função (definida num subshell, a chamada de fora ainda a vê: erra para vetar).
+# argumentos literais e com o stdin da chamada), `bash -c '<texto>' a0 a1` dá os posicionais ao texto, e `alias`
+# da própria string vira o texto dele. A ordem e o escopo NÃO se modelam, e por isso erram para vetar: toda
+# definição do nome conta (redefinição, `if`, subshell), e a função não esconde o programa homônimo (`gh(){ :; }`
+# depois de `gh pr merge` segue vetando). Teto de 256 chamadas emuladas por comando. Não emula: `shift`/`set --`
+# (fecha se o texto tem a forma guardada), `$(…)` dentro do corpo (julgado só na definição), `getopts`, e laço
+# sobre os argumentos fora de função.
 # RAMO DE PRODUÇÃO (2026-10-12): `main` sempre, mais `gitflow.branch.master` OU a branch padrão LOCAL dos
 # remotos (`refs/remotes/*/HEAD`), ou `master` sem fonte nenhuma. Não vê: `origin/HEAD` defasado do host
 # (`git remote set-head origin -a` o atualiza), produção com outro nome sem nenhuma das fontes, e o padrão
@@ -192,8 +195,12 @@ MOAT = False                     # juiz do MOAT por alvo (moat-judge.py), ligado
 # com texto inerte como argumento. Agora o corpo é guardado e, a cada chamada, re-julgado com os parâmetros
 # posicionais substituídos pelos argumentos LITERAIS da chamada — a mesma emulação que `bash -c` já tinha para o
 # texto, estendida ao `$1`/`$@`/`$*`. Nome → tokens do corpo, ou None quando o corpo não se lê (`f() ( … )`).
-FUNCS = {}
+FUNCS = {}                       # nome → LISTA de corpos (toda redefinição conta: a chamada emula todas)
 CALLS = []                       # pilha das chamadas de função em emulação: o texto que ENTROU pelos argumentos
+CALL_BUDGET = [256]              # teto de chamadas emuladas por comando (fan-out exponencial é negação de serviço)
+ALIASES = {}                     # `alias nome='texto'` visto na própria string: o nome vira o texto
+# só em posição de COMANDO a chave abre/fecha grupo e a definição de função começa (o `}` de `echo "}"` é palavra)
+CMD_START = {"then", "do", "else", "elif", "{", "}", "!", "time"}
 POSITIONAL = re.compile(r"\$\{([0-9]+|[@*#])\}|\$([0-9@*#])")
 
 KEYWORDS = {"if", "then", "else", "elif", "fi", "do", "done", "while", "until", "!", "{", "}",
@@ -1103,14 +1110,14 @@ def is_punct(t):
 
 
 def collect_functions(tokens):
-    """Guarda em FUNCS o corpo de `nome() { … }` e `function nome [()] { … }`; devolve os tokens sem o
-    `nome ()` da definição (o grupo `{ … }` segue julgado como antes, com `$1` dinâmico)."""
+    """Guarda em FUNCS os corpos de `nome() { … }` e `function nome [()] { … }`; devolve os tokens sem o
+    `nome ()` da definição (o grupo `{ … }` segue julgado no lugar, com os posicionais vazios)."""
     out, k = [], 0
     while k < len(tokens):
         t = tokens[k]
         name, j = None, None
         if not is_punct(t) and k + 1 < len(tokens) and tokens[k + 1].replace("\n", "") == "()" \
-                and re.match(r"^[A-Za-z_][A-Za-z0-9_:.-]*$", t) and (not out or is_punct(out[-1])):
+                and re.match(r"^[A-Za-z_][A-Za-z0-9_:.-]*$", t) and (not out or is_punct(out[-1]) or out[-1] in CMD_START):
             name, j = t, k + 2
         elif t == "function" and k + 1 < len(tokens) and not is_punct(tokens[k + 1]):
             name, j = tokens[k + 1], k + 2
@@ -1121,28 +1128,32 @@ def collect_functions(tokens):
         while j < len(tokens) and tokens[j] == "\n":
             j += 1
         if j < len(tokens) and tokens[j] == "{":
+            # a chave só conta em POSIÇÃO DE COMANDO (depois de separador ou palavra-chave): `echo "}"` chega aqui
+            # sem as aspas, e fechar o corpo nele escondia o resto (refutador, medido)
             level, e = 0, j
             while e < len(tokens):
-                if tokens[e] == "{":
+                at_cmd = e == j or is_punct(tokens[e - 1]) or tokens[e - 1] in CMD_START
+                if tokens[e] == "{" and at_cmd:
                     level += 1
-                elif tokens[e] == "}":
+                elif tokens[e] == "}" and at_cmd:
                     level -= 1
                     if level == 0:
                         break
                 e += 1
             if e < len(tokens):
-                FUNCS[name] = tokens[j + 1:e]
+                body = tokens[j + 1:e]
+                FUNCS.setdefault(name, []).append(body)
                 # o corpo segue julgado NA DEFINIÇÃO (o literal dele veta como antes), mas com os posicionais
                 # VAZIOS: `$1` dinâmico ali é ruído — a chamada é que os conhece, e é emulada. Sem isto, o ponto
                 # opaco (`bash -c "$1"`) julgaria a string inteira e fecharia toda leitura feita por função
                 out.extend(tokens[k:j + 1] if t == "function" else [";", "{"])
-                out.extend(substitute_positional(FUNCS[name], [name]))
+                out.extend(substitute_positional(body, [name]))
                 out.append("}")
                 k = e + 1
                 continue
-            FUNCS[name] = None                          # `{` sem fechar: o corpo não se lê
+            FUNCS.setdefault(name, []).append(None)     # `{` sem fechar: o corpo não se lê
         else:
-            FUNCS[name] = None                          # `f() ( … )`, `f() if …`: corpo que não se lê
+            FUNCS.setdefault(name, []).append(None)     # `f() ( … )`, `f() if …`: corpo que não se lê
         if t == "function":
             out.append(t); k += 1                       # o ramo `function` de command() segue julgando o corpo
         else:
@@ -1171,27 +1182,34 @@ def substitute_positional(tokens, pos):
     return out
 
 
-def call_function(name, words, seg, depth):
-    """Chamada de função da própria string: o corpo re-julgado com os argumentos da chamada."""
-    body = FUNCS.get(name)
-    shifts = body is not None and any(t == "shift" for t in body) or \
-        body is not None and any(t == "set" and k + 1 < len(body) and body[k + 1] == "--" for k, t in enumerate(body))
-    if body is None or shifts:
-        # corpo ilegível, ou que DESLOCA os posicionais (`shift`, `set --`): a substituição não se prova
-        why = "função da própria string com corpo que não se lê" if body is None else "função que desloca os argumentos (shift/set --)"
-        if MOAT:
-            moat_unanalyzable(list(seg) + list(body or []), why)
-        if relevant_tokens(seg) or relevant([" ".join(seg)]):
-            emit_unanalyzable(seg, CWD[-1])
-        if body is None:
-            return
-    if depth + 1 > 4:
-        raise Unanalyzable("função chamada além do teto de aninhamento")
-    CALLS.append(" ".join(words))
-    try:
-        run_tokens(substitute_positional(body, [name] + list(words[1:])), depth + 1)
-    finally:
-        CALLS.pop()
+def call_function(name, words, seg, depth, piped=False, stdin_from=None):
+    """Chamada de função da própria string: CADA corpo definido com o nome (redefinição, `if`, subshell — a ordem
+    e o escopo não se modelam, então erra para vetar) re-julgado com os argumentos da chamada e o stdin dela."""
+    CALL_BUDGET[0] -= 1
+    if CALL_BUDGET[0] < 0:
+        raise Unanalyzable("chamadas de função além do teto")
+    # o stdin da chamada (`echo '<cmd>' | run`) também é texto que ENTRA na função
+    entered = " ".join(words) + ("\n" + " ".join(stdin_from) if piped and stdin_from else "")
+    for body in FUNCS.get(name) or [None]:
+        shifts = body is not None and (any(t == "shift" for t in body) or
+                                       any(t == "set" and k + 1 < len(body) and body[k + 1] == "--" for k, t in enumerate(body)))
+        if body is None or shifts:
+            # corpo ilegível, ou que DESLOCA os posicionais (`shift`, `set --`): a substituição não se prova
+            why = "função da própria string com corpo que não se lê" if body is None else "função que desloca os argumentos (shift/set --)"
+            if MOAT:
+                moat_unanalyzable(entered.split("\n") + list(body or []), why)
+            if relevant_tokens(seg) or relevant([entered]):
+                emit_unanalyzable(seg, CWD[-1])
+            if body is None:
+                continue
+        if depth + 1 > 4:
+            raise Unanalyzable("função chamada além do teto de aninhamento")
+        CALLS.append(entered)
+        try:
+            run_tokens(substitute_positional(body, [name] + list(words[1:])), depth + 1,
+                       stdin_from if piped else None)
+        finally:
+            CALLS.pop()
 
 
 def analyze(text, depth=0, pos=None):
@@ -1213,10 +1231,12 @@ def analyze(text, depth=0, pos=None):
     run_tokens(tokens, depth)
 
 
-def run_tokens(tokens, depth):
+def run_tokens(tokens, depth, stdin_from=None):
     if depth > 4:
         raise Unanalyzable("aninhamento além do teto")
     seg, opened, prev_sep, prev_seg, compound = [], 0, ";", None, 0
+    if stdin_from:                                      # corpo de função chamada num pipe: o 1º comando lê o stdin dela
+        prev_sep, prev_seg = "|", list(stdin_from)
     for t in tokens + [";"]:
         if t and set(t) <= set(";&|()\n"):
             if seg:
@@ -1301,11 +1321,28 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
                 (TAINTED.add if SUBST_DEFAULT in m.group(2) else TAINTED.discard)(m.group(1))
         return
     if words[:2] == ["printf", "-v"] and len(words) >= 4:
-        if DYNAMIC.search(words[3]):
+        # `printf -v c "%s" "$1"`: o valor é o ARGUMENTO formatado, não o formato (a 1ª redação gravava "%s")
+        val = words[4] if words[3] == "%s" and len(words) == 5 else (words[3] if "%" not in words[3] and len(words) == 4 else None)
+        if val is None or DYNAMIC.search(val):
             ASSIGN.pop(words[2], None)
         else:
-            ASSIGN[words[2]] = words[3]
+            ASSIGN[words[2]] = val
         return
+    if words and words[0] == "alias":
+        for w in words[1:]:
+            m = re.match(r"^([^=\s]+)=(.*)$", w, re.S)
+            if m:
+                ALIASES[m.group(1)] = m.group(2)
+        return
+    if words and words[0] in ALIASES and words[0] not in FUNCS:
+        # `alias r='bash -c'; r '<cmd>'`: o nome vira o texto (expand_aliases não se prova daqui: erra para vetar)
+        text = ALIASES.pop(words[0])                    # tirado durante a expansão: `alias r='r x'` não recursa
+        try:
+            command(shlex.split(text) + list(words[1:]), depth + 1, cond, piped, stdin_from)
+        except ValueError:
+            raise Unanalyzable("alias ilegível")
+        finally:
+            ALIASES[words[0]] = text
     env = {}
     try:
         words = strip_prefix(words, env)
@@ -1346,8 +1383,10 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
     if MOAT:
         moat_command(words, raw_words, base, depth, env, piped, stdin_from)
     if name in FUNCS:
-        call_function(name, words, seg, depth)          # a função da string vence o programa homônimo, como no bash
-        return
+        # emula a função E segue julgando o programa homônimo: a definição pode vir depois da chamada, num subshell
+        # ou ser desfeita por `unset -f` — `gh pr merge 5; gh(){ :; }` saía rc 0 quando a função escondia o
+        # programa (refutador, medido). Errar para vetar: `git(){ :; }; git push -f origin main` veta
+        call_function(name, words, seg, depth, piped, stdin_from)
     if base == "function" and len(words) >= 2:
         rest = [w for w in words[2:] if w not in ("{", "}")]
         if rest:

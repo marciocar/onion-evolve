@@ -325,7 +325,11 @@ _MOAT_WRAPPER_COPIES = ("a2a-queue-live",)
 # o NOME do motor escritor também é AÇÃO para a relevância (SAC-148, 2026-10-15): nas formas que o juiz não segue
 # (`python3 -c`, `xargs -I`, função que faz `shift`), a linha que cita o motor e um alvo do MOAT fechava só se
 # trouxesse um verbo da lista — e `a2a-invite.sh revoke --file <servido>` não traz nenhum. Medido: rc 0 nas três.
-_MOAT_ACTION = re.compile(_MOAT_ACTION.pattern + "|" + "|".join(r"(?<![\w.-])" + re.escape(n) for n in _MOAT_ARG_WRITERS))
+# Só o nome SEGUIDO, na mesma linha, de um subcomando que escreve: `# a2a-invite.sh` num comentário de um
+# `python3 -c` que só LÊ o arquivo fechava (refutador, medido).
+_MOAT_ACTION = re.compile(_MOAT_ACTION.pattern + "|" + "|".join(
+    r"(?<![\w.-])" + re.escape(n) + r"\b[^\n]*\b(" + "|".join(sorted(subs)) + r")\b"
+    for n, (subs, _opts) in _MOAT_ARG_WRITERS.items()))
 
 
 def _moat_arg_writer(p, args, detail):

@@ -7449,6 +7449,39 @@ run_pretooluse_veto_selftests() {
   _case "merge-gate: heredoc citando gh pr merge → passa"  0 "${mg}" feat $'cat <<EOF\ngh pr merge is dangerous\nEOF'
   _case "merge-gate: heredoc + invocação real depois → VETO" 2 "${mg}" feat $'cat > f <<\'MD\'\ngit push origin main\nMD\ngh pr merge 1'
   _case "merge-gate: echo citando → passa"                 0 "${mg}" feat 'echo "gh pr merge"'
+  # FUNÇÃO DA STRING (SAC-148, 2026-10-15): a chamada é emulada; cada caso prova o mutante da cura numa CÓPIA dos hooks
+  # _pvmut <nome> <esperado> <hook (nome do arquivo)> <branch> <comando> <arquivo rel. a hooks/> <ANTIGO> <NOVO>
+  _pvmut() {
+    local got gotm rc_i=1 rc_m=1 mh; mh="$(mktemp -d)"
+    cp -r "${REPO_ROOT}/.claude/hooks/." "${mh}/"
+    OLD="$7" NEW="$8" python3 - "${mh}/$6" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    got="$(_pv "${REPO_ROOT}/.claude/hooks/$3" "$4" "$5")"
+    if [ "${got}" = "$2" ]; then record_pass "pretooluse-veto: $1 (rc=$2)"; rc_i=0
+    else record_fail "pretooluse-veto: $1" "esperava rc=$2, veio rc=${got} — cmd: $5"; fi
+    gotm="$(_pv "${mh}/$3" "$4" "$5")"; [ "${gotm}" = "$2" ] && rc_m=0
+    _prove_mutation "pretooluse-veto: $1 (MUT)" "${REPO_ROOT}/.claude/hooks/$6" "${mh}/$6" "${rc_i}" "${rc_m}"
+    rm -rf "${mh}"
+  }
+  local _IL=lib/invocation-lines.sh
+  _pvmut "(fn1) merge-gate: função com bash -c \"\$1\" e gh pr merge na chamada → VETO" 2 pretooluse-merge-gate.sh feat \
+    'run(){ bash -c "$1"; }; run "gh pr merge 5"' "${_IL}" $'    if name in FUNCS:\n        # emula' $'    if False:\n        # emula'
+  _pvmut "(fn2) merge-gate: função homônima definida DEPOIS da chamada não esconde o gh → VETO" 2 pretooluse-merge-gate.sh feat \
+    'gh pr merge 5; gh(){ :; }' "${_IL}" $'        call_function(name, words, seg, depth, piped, stdin_from)\n' $'        call_function(name, words, seg, depth, piped, stdin_from)\n        return\n'
+  _pvmut "(fn3) protect-main: função homônima num subshell não esconde o git → VETO" 2 pretooluse-protect-main.sh feat \
+    '( git(){ :; } ); git push --force origin main' "${_IL}" $'        call_function(name, words, seg, depth, piped, stdin_from)\n' $'        call_function(name, words, seg, depth, piped, stdin_from)\n        return\n'
+  _pvmut "(fn4) merge-gate: função definida depois de then → VETO" 2 pretooluse-merge-gate.sh feat \
+    'if true; then run(){ bash -c "$1"; }; fi; run "gh pr merge 5"' "${_IL}" ' or is_punct(out[-1]) or out[-1] in CMD_START):' ' or is_punct(out[-1])):'
+  _pvmut "(fn5) merge-gate: \"}\" entre aspas no corpo não fecha a função → VETO" 2 pretooluse-merge-gate.sh feat \
+    'f(){ echo "}"; bash -c "$1"; }; f "gh pr merge 5"' "${_IL}" 'at_cmd = e == j or is_punct(tokens[e - 1]) or tokens[e - 1] in CMD_START' 'at_cmd = True'
+  _pvmut "(fn6) merge-gate: função redefinida depois da chamada → VETO (toda definição conta)" 2 pretooluse-merge-gate.sh feat \
+    'run(){ bash -c "$1"; }; run "gh pr merge 5"; run(){ echo "$1"; }' "${_IL}" 'FUNCS.setdefault(name, []).append(body)' 'FUNCS[name] = [body]'
+  _pvmut "(fn7) merge-gate: função que só IMPRIME o texto com gh pr merge → passa (fechar toda chamada que o cita reprova)" 0 pretooluse-merge-gate.sh feat \
+    'note(){ echo "$1"; }; note "nunca rode gh pr merge 5 aqui"' "${_IL}" '        if body is None or shifts:' '        if True:'
   # invólucros — a classe medida pela auditoria de 2026-09-02 (todos passavam rc=0 nos DOIS vetos)
   _case "protect-main: command git push -f main → VETO"    2 "${pm}" feat 'command git push -f origin main'
   # escopo (2026-09-02): alvo em OUTRO repo não é assunto destes vetos; `-C .` e `-C <raiz>` continuam sendo
@@ -8143,7 +8176,7 @@ PY
     # (`docker exec <container servido> sh -c 'grep …'`, `sudo cat`, `journalctl`). Os casos (i24)-(i27) são esses.
     _mgcase "(i17) função com bash -c \"\$1\" escrevendo o arquivo de convites → VETO (a chamada é emulada)" "2:ops/a2a-invite-live.sh" "${P}" \
       "run(){ bash -c \"\$1\"; }; run \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
-      $'    if name in FUNCS:\n        call_function' $'    if False:\n        call_function'
+      $'    if name in FUNCS:\n        # emula' $'    if False:\n        # emula'
     _mgcase "(i18) caminho em variável + função com \$* → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
       "D=${INV%/*}; run(){ bash -c \"\$*\"; }; run bash ${MOT} revoke m --file \"\$D/${INV##*/}\"" "${L}" \
       $'        if key in ("@", "*"):\n            return " ".join(pos[1:])' $'        if key in ("@", "*"):\n            return ""'
@@ -8180,6 +8213,22 @@ PY
     _mgcase "(i29) função que LÊ o arquivo por nome de comando em variável → passa (os argumentos da chamada ainda exigem ação)" 0 "${P}" \
       "r(){ c=\$(printf cat); sudo -u svc \$c \"\$1\"; }; r ${INV}" "${J}" \
       '(whole and CALLS and moat_relevant("\n".join(CALLS)))' '(whole and CALLS and _MOAT_SIGNAL.search("\n".join(CALLS)))'
+    # curas do refutador da SAC-148 (2026-10-15), cada contorno MEDIDO como caso
+    _mgcase "(i30) stdin literal entrando na função (run(){ bash; }) → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "run(){ bash; }; echo 'bash ${MOT} revoke m --file ${INV}' | run" "${L}" \
+      '        prev_sep, prev_seg = "|", list(stdin_from)' '        pass'
+    _mgcase "(i31) printf -v c \"%s\" \"\$1\" dentro da função → VETO (o valor é o argumento, não o formato)" "2:ops/a2a-invite-live.sh" "${P}" \
+      "r(){ printf -v c \"%s\" \"\$1\"; bash -c \"\$c\"; }; r \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
+      'val = words[4] if words[3] == "%s" and len(words) == 5 else' 'val = words[3] if False else'
+    _mgcase "(i32) alias da própria string que vira bash -c → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "alias r=\"bash -c\"; r \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
+      '    if words and words[0] in ALIASES and words[0] not in FUNCS:' '    if False:'
+    _mgcase "(i33) python3 -c que só LÊ o arquivo, com o nome do motor num comentário → passa" 0 "${P}" \
+      "python3 -c \"import json; print(len(json.load(open('${INV}'))))  # a2a-invite.sh\"" "${J}" \
+      'r"\b[^\n]*\b("' 'r"(|"'
+    _mgcase "(i34) fan-out de chamadas além do teto → FECHA (negação de serviço vira inanalisável)" "2:NÃO pode ser analisado" "${P}" \
+      "c(){ :; }; b(){ c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; }; a(){ b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; }; a; a; bash ${MOT} revoke m --file ${INV}" "${L}" \
+      'CALL_BUDGET = [256]' 'CALL_BUDGET = [10 ** 9]'
     fi
   else
     record_skip "moat-gate: (i*) sem ops/a2a-invite-live.sh ou sem o motor de convites — casos do arquivo de convites pulados"
@@ -8230,7 +8279,9 @@ PY
             'echo onion-vps-bridge | xargs sudo systemctl restart' "bash ${d}/scratch/update-kg-writer.sh" "${field_body}" \
             'ln -s /var/www/onion-landing /tmp/w-bancada && rsync -a x/ /tmp/w-bancada/' 'printf "0 3 * * * x\n" | crontab -' \
             'run(){ bash -c "$1"; }; run "sudo systemctl restart onion-vps-bridge"' 'f(){ shift; "$@"; }; f x systemctl status onion-vps-bridge' \
-            'g() ( echo x ); function h { g "$@"; h; }; h a' "bash -c 'echo \"\$0 \$9 \${10} \$#\"' a b"; do
+            'g() ( echo x ); function h { g "$@"; h; }; h a' "bash -c 'echo \"\$0 \$9 \${10} \$#\"' a b" \
+            'gh pr view 1; gh(){ :; }; ( git(){ :; } ); if true; then r(){ echo "}"; }; fi; r; r(){ :; }' \
+            'alias q="bash -c"; q "echo x"; r(){ printf -v c "%s" "$1"; bash; }; echo ls | r x'; do
     _bug+="$(cd "${P}" && . "${d}/h/lib/invocation-lines.sh" && LC_ALL=C CLAUDE_PROJECT_DIR="${P}" ONION_CWD="${P}" ONION_INVOCATION_STRICT=1 \
       ONION_MOAT_JUDGE="${d}/h/lib/moat-judge.py" ONION_MOAT_TARGETS="${P}/ops/moat-targets.tsv" \
       ONION_MOAT_MEMBERS="${P}/docs/evolution/federation/members.yaml" onion_invocation_lines "${_c}" | grep '^__ONION_BUG__' || true)"
