@@ -34,6 +34,8 @@ mkdir -p "${DEST}/_processed"
 new_items=0; ja=0
 while IFS=$'\t' read -r name sha; do
   [ -n "${name}" ] || continue
+  # o nome vem do manifesto REMOTO e vira caminho local e query: só nome de arquivo simples (R1 do SAC-150, refutador)
+  case "${name}" in .*|*/*|*[!A-Za-z0-9._-]*) echo "  ✗ nome fora da forma no manifesto — ignorado" >&2; continue ;; esac
   # Já tenho? Conta o _processed/ também — senão o puxador re-entrega o que já foi lido.
   for p in "${DEST}/${name}" "${DEST}/_processed/${name}"; do
     if [ -f "$p" ] && [ "$(sha256sum "$p" | cut -d' ' -f1)" = "${sha}" ]; then ja=$((ja+1)); continue 2; fi

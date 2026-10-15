@@ -6,8 +6,8 @@ meta:
   schema_version: "1"
   baseline: "2026-10-14"
   review_after: "2026-11-13"   # 30d: cadência de ferramenta
-  # ═══ TETO: 50 NÓS ═══
-  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão); +4 a F2 do lado do core (2026-10-15: a evidência, 2 achados e 1 decisão da sessão); +2 o wrapper de produção do convite (2026-10-15: o achado do MOAT e a evidência); +1 a decisão do maestro de esvaziar o pool legado (2026-10-15, /meta:decide); +1 o S6 vivo em produção (2026-10-15); +2 a F5 (2026-10-15: a evidência do manual escrito da saída real e o achado de que o /docs:build-project-manual não cobre docs/applying). +5 a F3 (2026-10-15, SAC-124: a evidência, 3 achados medidos (2 do refutador) e 1 decisão da sessão). +3 o wrapper da fila de produção (2026-10-15: a evidência, o achado de que a cópia do wrapper da fila passava o MOAT e 1 decisão da sessão sobre o que conta como aceite). +8 a 2ª passada de refutação (2026-10-15, SAC-150: a evidência da conferência, 2 achados curados, a medição do N2 e a decisão OPEN dele para o maestro, a pergunta da poda do jti com gatilho, o que rodou do A8 e 1 decisão da sessão).
+  # ═══ TETO: 52 NÓS ═══ (subiu de 50 em 2026-10-15: a R1 da 3ª passada do SAC-150 é regressão de segurança medida e não cabe em nó existente)
+  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão); +4 a F2 do lado do core (2026-10-15: a evidência, 2 achados e 1 decisão da sessão); +2 o wrapper de produção do convite (2026-10-15: o achado do MOAT e a evidência); +1 a decisão do maestro de esvaziar o pool legado (2026-10-15, /meta:decide); +1 o S6 vivo em produção (2026-10-15); +2 a F5 (2026-10-15: a evidência do manual escrito da saída real e o achado de que o /docs:build-project-manual não cobre docs/applying). +5 a F3 (2026-10-15, SAC-124: a evidência, 3 achados medidos (2 do refutador) e 1 decisão da sessão). +3 o wrapper da fila de produção (2026-10-15: a evidência, o achado de que a cópia do wrapper da fila passava o MOAT e 1 decisão da sessão sobre o que conta como aceite). +8 a 2ª passada de refutação (2026-10-15, SAC-150: a evidência da conferência, 2 achados curados, a medição do N2 e a decisão OPEN dele para o maestro, a pergunta da poda do jti com gatilho, o que rodou do A8 e 1 decisão da sessão). +2 a R1 da 3ª passada de refutação (2026-10-15, SAC-150: o achado medido da injeção no veredito e 1 decisão da sessão).
   x_linear_epic: "SAC-120"
 nodes:
   - id: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -791,6 +791,37 @@ nodes:
       locator: "os PRs do core e do bridge do SAC-150"
       method: "derivado: decisão da sessão pela opção recomendada, sob autorização do maestro"
       locality: "repo"
+  - id: C_VETO_INTERPOLAVA_O_REMETENTE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 com os envelopes e9 (kid com aspas) e e10 (alg com aspas) das fixtures da curadoria, num sandbox com remetente convidado: o a2a-verify.sh de origin/main c333532b saiu rc 1 imprimindo `verified` DUPLICADO (o último true), e o handler do bridge de origin/main 3934847 respondeu HTTP 200 verified:true e ENFILEIROU os dois (fila=2) sem chave válida. Curado nos dois lados, cada um sozinho fecha o ataque (as 4 combinações main/cura medidas): o gate saneia todo valor do veto e julga alg e kid pela forma, com reason fixo; o bridge só aceita exit 0 e um veredito canônico (round-trip JSON), senão 403"
+    label: "o veto do gate interpolava kid e alg do remetente cru no JSON, e o bridge, que ignorava o exit code e parseava last-wins, enfileirava o sinal sem assinatura como verificado"
+    provenance:
+      source: "a2a-verify.sh (core) e src/a2a.ts (onion-bridge); R1 da 3ª passada de refutação da curadoria"
+      locator: "origin/main a2a-verify.sh l.110, l.284 e l.288; onion-bridge src/a2a.ts l.80 e l.118"
+      method: "medição: e2e handler do bridge + gate real em sandbox, nas 4 combinações main/cura; casos e9–e13 da bancada reprovam contra main"
+      locality: "repo"
+  - id: D_R1_VEREDITO_ESTRITO_NOS_DOIS_LADOS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-15"
+    verified_against: "decisões da sessão da R1 pela opção recomendada (autorização do maestro de 2026-10-15), declaradas no resíduo dos dois PRs"
+    label: "a R1 cura nos DOIS lados (gate saneia na saída e julga a forma na entrada; bridge exige exit 0 e veredito canônico), porque um lado só deixaria o outro voltar a mentir"
+    narrative: "Bifurcações e escolha: (1) sanear no veto() (defesa em profundidade, vale para todo chamador) E julgar alg/kid pela forma antes do uso, com reason fixo para alg e bad-kid para kid fora da forma (o unknown-kid:<kid> segue ecoando o kid, que agora só tem [A-Za-z0-9._-]); (2) a forma do kid é julgada dentro do jq por explode, como os outros campos do remetente, porque `$(jq -r)` come o \\n final; (3) o header do JWS também tem de ser UM objeto e entra na checagem de chave duplicada; (4) no bridge, a duplicata é detectada pelo round-trip canônico (JSON.stringify(JSON.parse(t)) === t), que vale porque o gate só emite JSON compacto, em vez de um parser JSON próprio; (5) o motivo do veto do gate só é ecoado ao remetente quando o veredito passou no parse estrito; (6) o a2a-doctor monta o header sintético por jq."
+    provenance:
+      source: "sessão da R1 (SAC-150, 3ª passada)"
+      locator: "os PRs do core e do bridge da R1"
+      method: "derivado: decisão da sessão pela opção recomendada, sob autorização do maestro"
+      locality: "repo"
 edges:
   - from: E_ONZE_PASSOS_MANUAIS_HOJE
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -965,4 +996,7 @@ edges:
     edge_type: SUPPORTS
   - from: D_SAC150_CURAS_DA_SESSAO
     to: D_POOL_LEGADO_SAI_JA
+    edge_type: TRACES_TO
+  - from: D_R1_VEREDITO_ESTRITO_NOS_DOIS_LADOS
+    to: C_VETO_INTERPOLAVA_O_REMETENTE
     edge_type: TRACES_TO

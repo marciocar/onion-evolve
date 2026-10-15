@@ -52,8 +52,8 @@ evidencia: 148 vetos categorizados nas 14 categorias (soma das linhas da tabela-
 |---|---|---|---|
 | envelope inexistente / não-JSON / campos ausentes | `envelope-absent` · `malformed-envelope` · `envelope-missing-fields` | a2a-verify.sh:69,70,76 | conf. |
 | JWS malformado / payload não-JSON | `malformed-jws` · `malformed-jws-payload` | a2a-verify.sh:86-87,97 | conf. |
-| `alg` ≠ RS256 | `unsupported-alg:${ALG:-none}` | a2a-verify.sh:140 | conf. |
-| `kid` ausente / com path-traversal / desconhecido | `jws-missing-kid` · `bad-kid` · `unknown-kid:${KID}` | a2a-verify.sh:141,142,144 | conf. |
+| `alg` ≠ RS256 (ou header com `crit`/`b64`) | `unsupported-alg` · `unsupported-jws-crit` (reason fixo, sem eco do valor) | a2a-verify.sh:140 | conf. |
+| `kid` ausente / fora da forma (1–160 de `[A-Za-z0-9._-]`, sem `.` inicial) / desconhecido | `jws-missing-kid` · `bad-kid` · `unknown-kid:${KID}` | a2a-verify.sh:141,142,144 | conf. |
 | `kid` não pertence ao `from` em members.yaml | `kid-not-owned-by-from:${KID}` | a2a-verify.sh:158 | conf. (gated) |
 | assinatura RS256 inválida | `bad-signature` | a2a-verify.sh:163 | conf. |
 | `iss`/`aud`/`to` divergem do declarado | `claim-iss-mismatch` · `claim-aud-mismatch` · `signal-to-mismatch` | a2a-verify.sh:166,167,168 | conf. |
