@@ -19,7 +19,8 @@
 # USO
 #   a2a-doctor.sh --member <id> [--side member|receiver] [--dir <dir de chaves>] [--kid <kid>]
 #                 [--members <members.yaml>] [--jwks <dir>] [--receiver <id>] [--token-file <f>]
-#                 [--invite <convite.json>] [--fingerprint sha256:<hex>] [--endpoint <url>] [--json]
+#                 [--invite <descritor>] [--invites <arquivo de convites>] [--fingerprint sha256:<hex>]
+#                 [--endpoint <url>] [--json]
 #   a2a-doctor.sh --selftest      # só a classificação pura (sem chave, sem rede)
 #
 #   --dir         default ${XDG_CONFIG_HOME:-~/.config}/onion/a2a (o layout do a2a-keygen.sh:
@@ -29,14 +30,20 @@
 #   --jwks        default ${A2A_JWKS_DIR:-<este dir>/jwks}
 #   --receiver    default members.yaml[member].a2a.sends_to; senão, o membro kind: source
 #   --token-file  default <dir>/bridge-token (o bearer; o conteúdo NUNCA é lido para a saída)
-#   --invite      JSON {member, expires_at (epoch ou ISO-8601), revoked} (o convite por membro da F2)
+#   --invite      o descritor do convite por membro (F2), sem segredo, que o a2a-invite.sh create gera ao
+#                 lado do token: {member, receiver, expires_at (ISO 8601 com hora e fuso), revoked,
+#                 token_sha256}. Julgado pelas regras do bridge (revoked só vale como false literal)
+#   --invites     lado receptor: o arquivo de convites do seu bridge (A2A_INVITES_FILE). Rode como a
+#                 conta do serviço do bridge (o arquivo é 0600 dela). O token NUNCA é lido: a sonda usa
+#                 o hash do descritor (--invite) ou as entradas do membro
 #   --fingerprint a impressão que o membro mandou por canal fora de banda (lado receptor)
 #
 # CHECAGENS (cada uma: ok | falha | nao-medido, com causa em pt-BR e próximo passo)
 #   membro:   a chave · b permissão · c impressão · d pino no registro · e credencial do canal ·
 #             f relógio · g endpoint · h envio sintético
-#   receptor: r registro · d pino · c impressão conferida · t topologia · f relógio · g endpoint
-#   Críticas: todas, exceto g sem --endpoint e, no receptor, c sem --fingerprint (saem não medidas e
+#   receptor: r registro · d pino · c impressão conferida · t topologia · i convite por membro ·
+#             f relógio · g endpoint
+#   Críticas: todas, exceto g sem --endpoint e, no receptor, c sem --fingerprint e i sem --invites (saem não medidas e
 #   NÃO críticas, declarado na saída: não informado não é saudável, é não perguntado).
 #
 # EXIT: 0 tudo ok · 1 alguma falha · 2 alguma crítica não medida (e nenhuma falha) · 3 uso inválido
@@ -79,7 +86,7 @@ if [ "${1:-}" = "--selftest" ]; then
 fi
 
 SIDE="member"; MEMBER=""; DIR=""; KID=""; MEMBERS=""; JWKS=""; RECEIVER=""; TOKEN_FILE=""
-INVITE=""; EXPECT_FP=""; ENDPOINT=""; JSON=""
+INVITE=""; INVITES=""; EXPECT_FP=""; ENDPOINT=""; JSON=""
 usage() { sed -n '/^# USO/,/^# EXIT/p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 3; }
 need() { [ $# -ge 2 ] && [ -n "$2" ] && [ "${2#--}" = "$2" ] || { printf 'a2a-doctor: %s exige valor\n' "$1" >&2; exit 3; }; }
 while [ $# -gt 0 ]; do
@@ -93,6 +100,7 @@ while [ $# -gt 0 ]; do
     --receiver)    need "$@"; RECEIVER="$2"; shift 2 ;;
     --token-file)  need "$@"; TOKEN_FILE="$2"; shift 2 ;;
     --invite)      need "$@"; INVITE="$2"; shift 2 ;;
+    --invites)     need "$@"; INVITES="$2"; shift 2 ;;
     --fingerprint) need "$@"; EXPECT_FP="$2"; shift 2 ;;
     --endpoint)    need "$@"; ENDPOINT="$2"; shift 2 ;;
     --json)        JSON=1; shift ;;
@@ -116,6 +124,7 @@ fi
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(env -u GIT_DIR -u GIT_WORK_TREE git -C "${HERE}" rev-parse --show-toplevel 2>/dev/null || (cd "${HERE}/../../.." && pwd))"
 GATE="${A2A_VERIFY:-${HERE}/a2a-verify.sh}"
+INVITE_MOTOR="${A2A_INVITE:-${HERE}/a2a-invite.sh}"
 TRUST_CHECK="${A2A_TRUST_CHECK:-${ROOT}/.claude/validation/trust-topology-check.sh}"
 VALIDATOR="${A2A_MEMBERS_VALIDATE:-${ROOT}/.claude/validation/members-validate.sh}"
 [ -n "${DIR}" ] || DIR="${XDG_CONFIG_HOME:-${HOME}/.config}/onion/a2a"
@@ -210,6 +219,39 @@ check_endpoint() {
     000) put g falha 1 "endpoint inalcançável (conexão recusada, DNS ou timeout de 4 s)" "confira URL, DNS, firewall e se o serviço do receptor está de pé" ;;
     5*)  put g falha 1 "endpoint respondeu HTTP ${code} (servidor de pé, mas quebrado)" "o receptor precisa olhar o log do serviço" ;;
     *)   put g ok 1 "endpoint alcançável (HTTP ${code}: alcance, não autorização)" "—" ;;
+  esac
+}
+
+# ── (i) convite por membro no arquivo do bridge: o guard dele aceitaria o bearer deste membro? ──────
+# Sonda pelo a2a-invite.sh list (as regras do bridge, sem ler token): pelo hash do descritor, quando há
+# --invite; senão, por todas as entradas do membro. Sem --invites: não medida e NÃO crítica, declarado.
+check_invites() {
+  if [ -z "${INVITES}" ]; then
+    put i nao-medido 0 "arquivo de convites não informado: o convite por membro não foi conferido (ou o membro ainda usa o pool legado)" \
+      "passe --invites <o arquivo de convites do seu bridge (A2A_INVITES_FILE)>, rodando como a conta do serviço do bridge"; return
+  fi
+  [ -f "${INVITE_MOTOR}" ] || { put i nao-medido 1 "a2a-invite.sh ausente: não sei julgar o arquivo de convites" "rode de uma instalação com o motor"; return; }
+  command -v jq >/dev/null 2>&1 || { put i nao-medido 1 "jq ausente" "instale jq"; return; }
+  if [ -n "${INVITE}" ] && [ ! -f "${INVITE}" ]; then put i falha 1 "o descritor do convite não é um arquivo regular no caminho informado" "passe --invite com o <token>.invite.json que o create gerou"; return; fi
+  local out lrc=0 st det oks bad
+  out="$(bash "${INVITE_MOTOR}" list --file "${INVITES}" --member "${MEMBER}" ${RECEIVER:+--receiver "${RECEIVER}"} \
+        ${INVITE:+--invite "${INVITE}"} --json 2>/dev/null)" || lrc=$?
+  st="$(jq -r '.state // empty' <<< "${out}" 2>/dev/null)"; det="$(jq -r '.detail // empty' <<< "${out}" 2>/dev/null)"
+  case "${st}" in
+    unreadable) put i nao-medido 1 "esta conta não lê o arquivo de convites (ele é 0600 da conta do serviço)" "rode o doctor como a conta do serviço do bridge (sudo -u <conta>)" ;;
+    unmeasured) put i nao-medido 1 "não consegui interpretar o arquivo de convites (${det}); o bridge pode estar lendo, não sei" "confira o arquivo à mão" ;;
+    absent) put i falha 1 "o arquivo de convites não existe: o bridge vê ZERO convites de membro" "crie o convite (/meta:federation-a2a, trilha 2): a2a-invite.sh create ${MEMBER} …" ;;
+    error) put i falha 1 "o bridge recusa o arquivo de convites INTEIRO (${det}): nenhum convite de membro autentica (convites-indisponiveis)" "rode a2a-invite.sh check --file <arquivo> e conserte dono, modo, diretório ou JSON" ;;
+    ok)
+      oks="$(jq -r '[.probe[]? | select(.bridge=="ok") | .id] | join(", ")' <<< "${out}" 2>/dev/null)"
+      bad="$(jq -r '[.probe[]? | select(.bridge!="ok") | "\(.id) \(.bridge)"] | join("; ")' <<< "${out}" 2>/dev/null)"
+      if [ -n "${oks}" ]; then put i ok 1 "o guard do bridge aceitaria o convite de ${MEMBER} para ${RECEIVER:-o receptor} (${oks})" "—"
+      elif [ -n "${bad}" ]; then
+        local nx="crie um convite novo (a2a-invite.sh create ${MEMBER} …) e entregue o token fora de banda"
+        case "${bad}" in *convite-de-outro-membro*|*convite-de-outro-receptor*) nx="o token deste descritor é de outro membro ou receptor: confira o descritor, e crie o convite certo" ;; *credencial-desconhecida*) nx="o convite do descritor não está neste arquivo: confira se é o arquivo que o bridge lê (A2A_INVITES_FILE)" ;; esac
+        put i falha 1 "nenhum convite de ${MEMBER} passaria no guard do bridge: ${bad}" "${nx}"
+      else put i falha 1 "nenhum convite de ${MEMBER} no arquivo" "crie o convite (/meta:federation-a2a, trilha 2): a2a-invite.sh create ${MEMBER} …"; fi ;;
+    *) put i nao-medido 1 "o a2a-invite.sh não devolveu veredito legível (rc ${lrc})" "rode a2a-invite.sh check à mão e leia a saída" ;;
   esac
 }
 
@@ -313,27 +355,20 @@ side_member() {
     else eok="token do canal presente, modo ${tm}"; fi
   fi
   if [ -z "${ebad}" ] && [ -n "${INVITE}" ]; then
+    # o descritor se julga pelo a2a-invite.sh inspect, com as MESMAS regras do bridge (forma ISO com
+    # fuso medida contra o Date.parse do V8; revoked só como false literal). Sem `date -d` (GNU-only).
     if [ ! -f "${INVITE}" ]; then ebad="convite não encontrado no caminho informado"
-    elif ! command -v jq >/dev/null 2>&1; then put e nao-medido 1 "jq ausente: não sei ler o convite" "instale jq"; eok=""; ebad="-"
-    elif ! jq -e 'type=="object"' "${INVITE}" >/dev/null 2>&1; then ebad="convite ilegível (não é objeto JSON)"
+    elif [ ! -f "${INVITE_MOTOR}" ]; then put e nao-medido 1 "a2a-invite.sh ausente: não sei julgar o convite" "use o pacote de entrada com os quatro motores"; eok=""; ebad="-"
+    elif ! command -v jq >/dev/null 2>&1; then put e nao-medido 1 "jq ausente: não sei ler o veredito do convite" "instale jq"; eok=""; ebad="-"
     else
-      local im ie ir iep now
-      im="$(jq -r '.member // empty' "${INVITE}")"; ie="$(jq -r '.expires_at // empty' "${INVITE}")"
-      ir="$(jq -r 'if .revoked == true then "true" elif (.revoked == false or .revoked == null) then "false" else "BAD" end' "${INVITE}")"
-      # forma ESTRITA (achado do refutador): epoch de até 11 dígitos, ou ISO-8601 com data, hora e fuso.
-      # O `date -d` do GNU aceita "tomorrow" (que nunca vence) e um epoch de 20 dígitos estourava o `[ -le ]`.
-      iep=""
-      if grep -Eq '^[0-9]{1,11}$' <<< "${ie}"; then iep="${ie}"
-      elif grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$' <<< "${ie}"; then
-        iep="$(date -d "${ie}" +%s 2>/dev/null)"; case "${iep}" in ''|*[!0-9]*) iep="" ;; esac
-      fi
-      now="$(date +%s)"
-      if [ "${im}" != "${MEMBER}" ]; then ebad="convite é de '${im:-ninguém}', não de '${MEMBER}'"
-      elif [ "${ir}" = BAD ]; then ebad="campo revoked com tipo inválido (nem true nem false)"
-      elif [ "${ir}" = true ]; then ebad="convite REVOGADO pelo receptor"
-      elif [ -z "${iep}" ]; then ebad="expires_at ausente ou fora da forma (epoch ou ISO-8601 com fuso; veio '${ie:-vazio}')"
-      elif [ "${iep}" -le "${now}" ]; then ebad="convite VENCIDO em $(date -u -d "@${iep}" +%FT%TZ)"
-      else eok="${eok}; convite de '${MEMBER}' válido até $(date -u -d "@${iep}" +%FT%TZ)"; fi
+      local iout irc=0 ist iwhy
+      # --token-file: o motor confere, no processo dele, que o sha256 do token é o do descritor (só a
+      # comparação sai; o doctor não lê o token). Sem isso, um token qualquer com um descritor válido era "ok".
+      iout="$(bash "${INVITE_MOTOR}" inspect --invite "${INVITE}" --member "${MEMBER}" ${RECEIVER:+--receiver "${RECEIVER}"} --token-file "${TOKEN_FILE}" --json 2>/dev/null)" || irc=$?
+      ist="$(jq -r '.state // empty' <<< "${iout}" 2>/dev/null)"; iwhy="$(jq -r '.why // empty' <<< "${iout}" 2>/dev/null)"
+      if [ "${irc}" -eq 0 ] && [ "${ist}" = ativo ]; then eok="${eok}; ${iwhy} (a revogação só se mede no receptor)"
+      elif [ "${irc}" -eq 1 ] && [ -n "${ist}" ]; then ebad="${iwhy}"
+      else put e nao-medido 1 "o a2a-invite.sh não devolveu veredito legível do convite (rc ${irc})" "rode a2a-invite.sh inspect à mão"; eok=""; ebad="-"; fi
     fi
   fi
   if [ "${ebad}" = "-" ]; then :
@@ -450,6 +485,7 @@ side_receiver() {
     esac
   fi
 
+  check_invites
   check_clock
   check_endpoint
 }
@@ -460,7 +496,7 @@ if [ "${SIDE}" = member ]; then side_member; else side_receiver; fi
 RC="$(classify "${RES}")"
 label() { case "$1" in a) echo "chave privada" ;; b) echo "permissão" ;; c) echo "impressão SHA-256" ;; d) echo "pino no registro" ;;
   e) echo "credencial do canal" ;; f) echo "relógio" ;; g) echo "endpoint" ;; h) echo "envio sintético" ;;
-  r) echo "registro" ;; t) echo "topologia de confiança" ;; *) echo "$1" ;; esac; }
+  r) echo "registro" ;; t) echo "topologia de confiança" ;; i) echo "convite por membro" ;; *) echo "$1" ;; esac; }
 
 if [ -n "${JSON}" ]; then
   command -v jq >/dev/null 2>&1 || { printf 'a2a-doctor: --json exige jq\n' >&2; exit 2; }

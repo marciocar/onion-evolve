@@ -71,6 +71,7 @@ git-async e local **documentam/apontam** o fluxo que já existe (`co-*`), não r
 | [`a2a-keygen.sh`](a2a-keygen.sh) | gera o par RS256 do membro (privada 0600 que nunca sai da máquina; `kid` `<membro>-<N>`) |
 | [`a2a-send.sh`](a2a-send.sh) | o remetente canônico: envelope assinado com `body_sha256`, bearer só por arquivo |
 | [`a2a-doctor.sh`](a2a-doctor.sh) | diagnóstico dos dois lados, rc 0/1/2/3; "não pude medir" nunca é saudável |
+| [`a2a-invite.sh`](a2a-invite.sh) | o convite por membro (F2): cria, revoga, lista e confere o arquivo de convites do bridge pelas regras dele; token só em arquivo 0600 |
 | [`a2a-verify.sh`](a2a-verify.sh) | o gate do receptor (verificação antes de agir) |
 | [`a2a-accept.sh`](a2a-accept.sh) | o ato humano fila → inbox |
 

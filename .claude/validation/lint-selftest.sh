@@ -9957,7 +9957,9 @@ STUB
 
   # ───────────────────────────────────────── DOCTOR ─────────────────────────────────────────
   ( umask 077; cp "${sb}/token" "${cfg}/bridge-token" )
-  printf '{"member":"acme","expires_at":"%s","revoked":false}\n' "$(date -u -d '+1 day' +%FT%TZ)" > "${sb}/invite.json"
+  # o descritor traz o receptor e o sha256 do token do canal: o doctor confere a ligação pelo a2a-invite.sh
+  local th; th="$(tr -d '\r\n' < "${cfg}/bridge-token" | openssl dgst -sha256 | awk '{print $NF}')"
+  printf '{"member":"acme","receiver":"core-x","token_sha256":"%s","expires_at":"%s","revoked":false}\n' "${th}" "$(date -u -d '+1 day' +%FT%TZ)" > "${sb}/invite.json"
   _fa_doc() {  # args extra do doctor; env por variável _FA_ENV (relógio) · lado membro
     rc=0; out="$(env ${_FA_ENV:-A2A_CLOCK_TRUST=attested} HOME="${sb}/home" XDG_CONFIG_HOME= bash "${doctor}" --member acme \
       --members "${reg}" --jwks "${jwks}" --json "$@" 2>/dev/null)" || rc=$?
@@ -9995,11 +9997,11 @@ STUB
   rm -f "${jwks}/acme-2.pem"; _fa_reg "${_fa_pinned}"
   chmod 0644 "${cfg}/acme-1.key.pem"; _fa_doc --kid acme-1; _fa_state "privada 0644" 1 b falha "grupo/outros leem a chave"; chmod 0600 "${cfg}/acme-1.key.pem"
   _fa_doc --kid acme-2; _fa_state "kid fora do registro" 1 d falha "NÃO está pinado"
-  printf '{"member":"acme","expires_at":"%s","revoked":false}\n' "$(date -u -d '-1 hour' +%FT%TZ)" > "${sb}/inv-old.json"
+  printf '{"member":"acme","receiver":"core-x","token_sha256":"%s","expires_at":"%s","revoked":false}\n' "${th}" "$(date -u -d '-1 hour' +%FT%TZ)" > "${sb}/inv-old.json"
   _fa_doc --kid acme-1 --invite "${sb}/inv-old.json"; _fa_state "convite vencido" 1 e falha "convite VENCIDO"
-  printf '{"member":"acme","expires_at":"tomorrow","revoked":false}\n' > "${sb}/inv-rel.json"
+  printf '{"member":"acme","receiver":"core-x","token_sha256":"%s","expires_at":"tomorrow","revoked":false}\n' "${th}" > "${sb}/inv-rel.json"
   _fa_doc --kid acme-1 --invite "${sb}/inv-rel.json"; _fa_state "convite com data relativa (nunca venceria)" 1 e falha "fora da forma"
-  printf '{"member":"acme","expires_at":99999999999999999999,"revoked":false}\n' > "${sb}/inv-big.json"
+  printf '{"member":"acme","receiver":"core-x","token_sha256":"%s","expires_at":99999999999999999999,"revoked":false}\n' "${th}" > "${sb}/inv-big.json"
   _fa_doc --kid acme-1 --invite "${sb}/inv-big.json"; _fa_state "convite com epoch gigante" 1 e falha "fora da forma"
   mv "${cfg}/bridge-token" "${sb}/bt.bak"; _fa_doc --kid acme-1; _fa_state "sem token do canal" 1 e falha "token do canal ausente"; mv "${sb}/bt.bak" "${cfg}/bridge-token"
   # relógio sem fonte: PATH só com as ferramentas que o doctor usa, e SEM timedatectl/chronyc/ntpstat
@@ -10029,7 +10031,8 @@ STUB
   local fp1; fp1="$(openssl pkey -pubin -in "${jwks}/acme-1.pem" -outform DER 2>/dev/null | openssl dgst -sha256 | awk '{print $NF}')"
   _fa_rcv() { rc=0; out="$(A2A_CLOCK_TRUST=attested bash "${doctor}" --side receiver --member acme --members "${reg}" --jwks "${jwks}" --json "$@" 2>/dev/null)" || rc=$?; }
   _fa_rcv --fingerprint "sha256:${fp1}"
-  if [ "${rc}" -eq 0 ] && [ "$(jq '[.checks[]|select(.status!="ok")]|length' <<< "${out}" 2>/dev/null)" = 1 ] && [ "$(_fa_chk c | cut -d'|' -f1)" = ok ]; then
+  # 2 não-ok, ambas NÃO críticas: (g) sem --endpoint e (i) sem --invites
+  if [ "${rc}" -eq 0 ] && [ "$(jq '[.checks[]|select(.status!="ok")]|length' <<< "${out}" 2>/dev/null)" = 2 ] && [ "$(_fa_chk c | cut -d'|' -f1)" = ok ]; then
     record_pass "federation-a2a: doctor do receptor saudável com a impressão conferida → rc 0"
   else record_fail "federation-a2a: doctor receptor saudável" "rc=${rc} out='${out}'"; fi
   rc=0; out="$(A2A_CLOCK_TRUST=attested bash "${doctor}" --side receiver --member acme --members "${reg}" --jwks "${jwks}" 2>/dev/null)" || rc=$?
@@ -10041,6 +10044,164 @@ STUB
   if [ "$(_fa_chk r | cut -d'|' -f1)" = falha ]; then record_pass "federation-a2a: doctor do receptor reusa o members-validate (registro inválido sem a pública)"
   else record_fail "federation-a2a: doctor receptor r" "r=$(_fa_chk r)"; fi
   mv "${sb}/acme-1.pem.bak" "${jwks}/acme-1.pem"
+
+  # ──────────────────────────── CONVITE POR MEMBRO (F2, a2a-invite.sh) ────────────────────────────
+  # O arquivo de convites é julgado pelas regras do guard do bridge (onion-bridge#69, a2a-invites.ts):
+  # a paridade de forma e de veredito foi medida contra o módulo real em node (22 fixtures e 5000 datas
+  # aleatórias, 0 divergência, 2026-10-15); aqui a bancada fixa o comportamento sem depender do bridge.
+  local inv_m="${ft}/a2a-invite.sh"
+  if [ ! -f "${inv_m}" ]; then record_fail "federation-a2a" "motor ausente: ${inv_m}"; rm -rf "${sb}"; return; fi
+  local bd="${sb}/bridge-data" iv="${sb}/bridge-data/a2a-invites.json" tko="${sb}/tok" tk1 h1 ierr
+  mkdir -p "${bd}" "${tko}"; chmod 700 "${bd}" "${tko}"
+  _fa_inv() { rc=0; out="$(bash "${inv_m}" "$@" --members "${reg}" 2>"${sb}/inv.err")" || rc=$?; ierr="$(cat "${sb}/inv.err")"; }
+  _fa_ls() { rc=0; out="$(bash "${inv_m}" "$@" 2>"${sb}/inv.err")" || rc=$?; ierr="$(cat "${sb}/inv.err")"; }
+  _fa_probe() { jq -r '[.probe[]?.bridge] | join(",")' <<< "${out}" 2>/dev/null; }
+  # argv de toda ferramenta que o motor chama passa por um registrador (o token não pode estar em nenhum)
+  local argvd="${sb}/argv-stub" tl rp; mkdir -p "${argvd}"
+  for tl in python3 sh git openssl; do
+    rp="$(command -v "${tl}" 2>/dev/null)" || continue
+    printf '#!/bin/bash\nprintf "%%s\\n" "$*" >> "%s/argv.log"\nexec "%s" "$@"\n' "${sb}" "${rp}" > "${argvd}/${tl}"; chmod +x "${argvd}/${tl}"
+  done
+  _fa_inv create acme --days 3 --file "${iv}" --token-out "${tko}/acme.tok" --dry-run
+  if [ "${rc}" -eq 0 ] && [ ! -e "${iv}" ] && [ ! -e "${tko}/acme.tok" ] && _fa_has "${out}" '"member": "acme"'; then
+    record_pass "federation-a2a: invite create --dry-run mostra a entrada e não escreve nada (nem arquivo, nem token)"
+  else record_fail "federation-a2a: invite dry-run" "rc=${rc} arquivo=$([ -e "${iv}" ] && echo CRIADO || echo nao) token=$([ -e "${tko}/acme.tok" ] && echo CRIADO || echo nao)"; fi
+  rm -f "${sb}/argv.log"
+  rc=0; out="$( (umask 000; PATH="${argvd}:${PATH}" bash "${inv_m}" create acme --days 3 --file "${iv}" --token-out "${tko}/acme.tok" --members "${reg}") 2>"${sb}/inv.err")" || rc=$?
+  ierr="$(cat "${sb}/inv.err")"
+  tk1="$(tr -d '\r\n' < "${tko}/acme.tok" 2>/dev/null)"; h1="$(printf '%s' "${tk1}" | openssl dgst -sha256 | awk '{print $NF}')"
+  if [ "${rc}" -eq 0 ] && [ "${#tk1}" -ge 32 ] && [ "$(stat -c %a "${tko}/acme.tok")" = 600 ] && [ "$(stat -c %a "${tko}/acme.tok.invite.json")" = 600 ] \
+     && [ "$(stat -c %a "${iv}")" = 600 ] && [ "$(jq -r '.invites[0] | "\(.token_sha256)|\(.member)|\(.receiver)|\(.revoked)"' "${iv}")" = "${h1}|acme|core-x|false" ] \
+     && [ "$(jq -r '.token_sha256' "${tko}/acme.tok.invite.json")" = "${h1}" ]; then
+    record_pass "federation-a2a: invite create gera o token 0600 (≥ 32), o descritor 0600 e a entrada 0600 com sha256(token) e o receptor do registro, mesmo com umask 000"
+  else record_fail "federation-a2a: invite create" "rc=${rc} err='${ierr}' modos=$(stat -c %a "${tko}/acme.tok" "${iv}" 2>/dev/null | tr '\n' /)"; fi
+  if [ -n "${tk1}" ] && ! grep -qF -- "${tk1}" <<< "${out}${ierr}" && ! grep -qF -- "${tk1}" "${sb}/argv.log" 2>/dev/null && [ -s "${sb}/argv.log" ]; then
+    record_pass "federation-a2a: invite create nunca põe o token em stdout, stderr ou argv (registrador de argv nas ferramentas chamadas)"
+  else record_fail "federation-a2a: invite token vazou" "stdout/err=$(grep -cF -- "${tk1:-x}" <<< "${out}${ierr}") argv=$(grep -cF -- "${tk1:-x}" "${sb}/argv.log" 2>/dev/null) log=$([ -s "${sb}/argv.log" ] && echo sim || echo VAZIO)"; fi
+  _fa_ls list --file "${iv}" --invite "${tko}/acme.tok.invite.json" --member acme --receiver core-x --json
+  if [ "$(_fa_probe)" = ok ]; then record_pass "federation-a2a: invite list sonda o convite recém-criado: o guard do bridge responderia ok"
+  else record_fail "federation-a2a: invite sonda ok" "probe=$(_fa_probe) rc=${rc} err='${ierr}'"; fi
+  _fa_ls list --file "${iv}" --invite "${tko}/acme.tok.invite.json" --member solo-x --receiver core-x --json
+  if [ "$(_fa_probe)" = convite-de-outro-membro ]; then record_pass "federation-a2a: invite sonda o bearer de acme apresentado por solo-x → convite-de-outro-membro"
+  else record_fail "federation-a2a: invite outro membro" "probe=$(_fa_probe)"; fi
+  # atômico: rename de temporário (inode novo), sem sobra de temporário no diretório
+  local ino0 ino1; ino0="$(stat -c %i "${iv}")"
+  _fa_inv create acme --days 9 --file "${iv}" --token-out "${tko}/acme2.tok"
+  _fa_inv create solo-x --days 9 --file "${iv}" --token-out "${tko}/solo.tok"
+  ino1="$(stat -c %i "${iv}")"
+  if [ "${rc}" -eq 0 ] && [ "${ino0}" != "${ino1}" ] && [ "$(find "${bd}" -mindepth 1 | wc -l)" -eq 1 ] && [ "$(jq '.invites|length' "${iv}")" = 3 ]; then
+    record_pass "federation-a2a: invite escreve por temporário no mesmo diretório + rename (inode novo, sem sobra, entradas acumuladas)"
+  else record_fail "federation-a2a: invite atomicidade" "rc=${rc} ino ${ino0}→${ino1} arquivos=$(find "${bd}" -mindepth 1 | wc -l) n=$(jq '.invites|length' "${iv}" 2>/dev/null)"; fi
+  chmod 0600 "${iv}"
+  _fa_ls revoke acme --file "${iv}" --dry-run
+  local hpre; hpre="$(sha256sum "${iv}" | cut -d' ' -f1)"
+  _fa_ls revoke acme --file "${iv}"
+  if [ "${rc}" -eq 0 ] && [ "$(jq -r '[.invites[]|select(.member=="acme")|.revoked]|join(",")' "${iv}")" = "true,true" ] \
+     && [ "$(jq -r '.invites[]|select(.member=="solo-x")|.revoked' "${iv}")" = false ]; then
+    record_pass "federation-a2a: invite revoke marca revoked: true em TODAS as entradas do membro e preserva as dos outros"
+  else record_fail "federation-a2a: invite revoke" "rc=${rc} acme=$(jq -c '[.invites[]|select(.member=="acme")|.revoked]' "${iv}") solo=$(jq -c '[.invites[]|select(.member=="solo-x")|.revoked]' "${iv}")"; fi
+  _fa_ls list --file "${iv}" --invite "${tko}/acme.tok.invite.json" --member acme --receiver core-x --json
+  if [ "$(_fa_probe)" = convite-revogado ]; then record_pass "federation-a2a: depois do revoke, a sonda do convite responde convite-revogado (sem restart)"
+  else record_fail "federation-a2a: invite sonda revogado" "probe=$(_fa_probe)"; fi
+  # fixtures na forma do bridge: entrada a entrada, o veredito que o guard daria (paridade medida com o V8)
+  local fut; fut="$(python3 -c 'import datetime as d;print((d.datetime.now(d.timezone.utc)+d.timedelta(days=2)).strftime("%Y-%m-%dT%H:%M:%SZ"))')"
+  _fa_ivx() {  # nome · json dos campos extras da entrada (expires_at/revoked) · veredito esperado da sonda
+    printf '{"version":1,"invites":[{"token_sha256":"%s","member":"acme","receiver":"core-x",%s}]}\n' "${h1}" "$2" > "${iv}"; chmod 600 "${iv}"
+    _fa_ls list --file "${iv}" --invite "${tko}/acme.tok.invite.json" --member acme --receiver core-x --json
+    if [ "$(_fa_probe)" = "$3" ]; then record_pass "federation-a2a: invite $1 → o bridge responderia $3"
+    else record_fail "federation-a2a: invite $1" "probe=$(_fa_probe) (esperado $3)"; fi
+  }
+  _fa_ivx "revoked null (só false literal vale)" "\"expires_at\":\"${fut}\",\"revoked\":null" convite-revogado
+  _fa_ivx "validade em epoch (o bridge só aceita ISO)" '"expires_at":4102444800,"revoked":false' convite-invalido
+  _fa_ivx "validade sem fuso" '"expires_at":"2099-01-01T00:00:00","revoked":false' convite-invalido
+  _fa_ivx "02-30 (o Date.parse rola para 03-02)" '"expires_at":"2099-02-30T00:00:00Z","revoked":false' ok
+  _fa_ivx "24:30 (o Date.parse recusa)" '"expires_at":"2099-01-01T24:30:00Z","revoked":false' convite-invalido
+  _fa_ivx "vencida" '"expires_at":"2020-01-01T00:00:00Z","revoked":false' convite-vencido
+  printf '{"version":1,"invites":[{"token_sha256":"%s","member":"acme","receiver":"core-x","expires_at":"%s","revoked":false},{"token_sha256":"%s","member":"acme","receiver":"core-x","expires_at":"%s","revoked":true}]}\n' "${h1}" "${fut}" "${h1^^}" "${fut}" > "${iv}"
+  _fa_ls list --file "${iv}" --invite "${tko}/acme.tok.invite.json" --member acme --receiver core-x --json
+  if [ "$(_fa_probe)" = convite-revogado ]; then record_pass "federation-a2a: invite hash repetido (até em maiúsculas) com uma entrada revogada derruba o token"
+  else record_fail "federation-a2a: invite hash repetido" "probe=$(_fa_probe)"; fi
+  # o arquivo como o bridge o recusa INTEIRO (convites-indisponiveis)
+  printf '{"version":true,"invites":[]}\n' > "${iv}"; _fa_ls check --file "${iv}" --json
+  if [ "${rc}" -eq 1 ] && [ "$(jq -r .detail <<< "${out}")" = versao-desconhecida ]; then record_pass "federation-a2a: invite check reprova version: true (no JavaScript, true !== 1)"
+  else record_fail "federation-a2a: invite version true" "rc=${rc} out='${out}'"; fi
+  printf '{"version":1,"invites":[]}\n' > "${iv}"; chmod 0664 "${iv}"; _fa_ls check --file "${iv}" --json
+  if [ "${rc}" -eq 1 ] && [ "$(jq -r .detail <<< "${out}")" = gravavel-por-grupo-ou-outros ]; then record_pass "federation-a2a: invite check reprova arquivo gravável por grupo (o bridge o recusa inteiro)"
+  else record_fail "federation-a2a: invite gravável" "rc=${rc} out='${out}'"; fi
+  chmod 0600 "${iv}"; chmod 0770 "${bd}"; _fa_ls check --file "${iv}" --json; chmod 0700 "${bd}"
+  if [ "${rc}" -eq 1 ] && [ "$(jq -r .detail <<< "${out}")" = diretorio-inseguro ]; then record_pass "federation-a2a: invite check reprova diretório gravável por grupo (quem escreve nele troca o arquivo por rename)"
+  else record_fail "federation-a2a: invite diretório" "rc=${rc} out='${out}'"; fi
+  _fa_ls check --file "${iv}" --owner 0 --json
+  if [ "${rc}" -eq 1 ] && [ "$(jq -r .detail <<< "${out}")" = dono-diferente-do-processo ]; then record_pass "federation-a2a: invite check reprova arquivo de outro dono (--owner = a conta do serviço)"
+  else record_fail "federation-a2a: invite dono" "rc=${rc} out='${out}'"; fi
+  ln -s "${iv}" "${bd}/link.json"; _fa_ls check --file "${bd}/link.json" --json; rm -f "${bd}/link.json"
+  if [ "${rc}" -eq 1 ] && [ "$(jq -r .detail <<< "${out}")" = symlink-recusado ]; then record_pass "federation-a2a: invite check reprova symlink (o bridge abre com O_NOFOLLOW)"
+  else record_fail "federation-a2a: invite symlink" "rc=${rc} out='${out}'"; fi
+  printf '{"version":1,"invites":[' > "${iv}"; hpre="$(sha256sum "${iv}" | cut -d' ' -f1)"
+  _fa_inv create acme --days 3 --file "${iv}" --token-out "${tko}/acme3.tok"
+  if [ "${rc}" -eq 1 ] && [ "$(sha256sum "${iv}" | cut -d' ' -f1)" = "${hpre}" ] && [ ! -e "${tko}/acme3.tok" ] && _fa_has "${ierr}" 'convites-indisponiveis'; then
+    record_pass "federation-a2a: invite create recusa escrever sobre arquivo quebrado (rc 1, arquivo intacto, nenhum token)"
+  else record_fail "federation-a2a: invite sobre quebrado" "rc=${rc} err='${ierr}' token=$([ -e "${tko}/acme3.tok" ] && echo CRIADO || echo nao)"; fi
+  printf '{"version":1,"invites":[]}\n' > "${iv}"; chmod 600 "${iv}"
+  _fa_inv create fantasma --days 3 --file "${iv}" --token-out "${tko}/f.tok"
+  if [ "${rc}" -eq 1 ] && [ ! -e "${tko}/f.tok" ] && _fa_has "${ierr}" 'não está no registro'; then record_pass "federation-a2a: invite create recusa membro fora do registro"
+  else record_fail "federation-a2a: invite membro fora" "rc=${rc} err='${ierr}'"; fi
+  printf 'curto\n' > "${sb}/curto.tok"
+  rc=0; ierr="$(bash "${inv_m}" create acme --days 3 --file "${iv}" --token-stdin --members "${reg}" < "${sb}/curto.tok" 2>&1 >/dev/null)" || rc=$?
+  if [ "${rc}" -eq 1 ] && [ "$(jq '.invites|length' "${iv}")" = 0 ]; then record_pass "federation-a2a: invite --token-stdin recusa token abaixo de 32 caracteres (o bridge não o aceitaria)"
+  else record_fail "federation-a2a: invite token curto" "rc=${rc} n=$(jq '.invites|length' "${iv}")"; fi
+  ( umask 077; printf '%s\r\n' "$(openssl rand -hex 20)" > "${sb}/stdin.tok" )
+  rc=0; bash "${inv_m}" create acme --days 3 --file "${iv}" --token-stdin --members "${reg}" < "${sb}/stdin.tok" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(jq -r '.invites[0].token_sha256' "${iv}")" = "$(tr -d '\r\n' < "${sb}/stdin.tok" | openssl dgst -sha256 | awk '{print $NF}')" ]; then
+    record_pass "federation-a2a: invite --token-stdin grava sha256 do token sem CR/LF (o que o a2a-send.sh envia)"
+  else record_fail "federation-a2a: invite token-stdin" "rc=${rc}"; fi
+  # trava: outro escritor segura o diretório → rc 2, nada escrito (sem a trava, duas escritas perderiam uma)
+  python3 -c 'import fcntl,os,sys,time; fd=os.open(sys.argv[1],os.O_RDONLY); fcntl.flock(fd,fcntl.LOCK_EX); open(sys.argv[2],"w").close(); time.sleep(8)' "${bd}" "${sb}/locked" &
+  local lpid=$!; local w=0; while [ ! -e "${sb}/locked" ] && [ "${w}" -lt 50 ]; do sleep 0.1; w=$((w+1)); done
+  _fa_inv create solo-x --days 3 --file "${iv}" --token-out "${tko}/solo2.tok"
+  kill "${lpid}" 2>/dev/null; wait "${lpid}" 2>/dev/null
+  if [ "${rc}" -eq 2 ] && [ ! -e "${tko}/solo2.tok" ] && [ "$(jq '.invites|length' "${iv}")" = 1 ]; then record_pass "federation-a2a: invite com a trava do diretório ocupada → rc 2 e nada escrito"
+  else record_fail "federation-a2a: invite trava" "rc=${rc} n=$(jq '.invites|length' "${iv}") err='${ierr}'"; fi
+  # doctor do RECEPTOR com o arquivo de convites (a sonda, sem ler token)
+  _fa_inv create acme --days 3 --file "${iv}" --token-out "${tko}/acme4.tok"
+  _fa_rcv --fingerprint "sha256:${fp1}" --invites "${iv}" --invite "${tko}/acme4.tok.invite.json"
+  if [ "${rc}" -eq 0 ] && [ "$(_fa_chk i | cut -d'|' -f1)" = ok ]; then record_pass "federation-a2a: doctor do receptor com --invites: convite ativo de acme → (i) ok"
+  else record_fail "federation-a2a: doctor i ok" "rc=${rc} i=$(_fa_chk i)"; fi
+  bash "${inv_m}" revoke acme --file "${iv}" >/dev/null 2>&1
+  _fa_rcv --fingerprint "sha256:${fp1}" --invites "${iv}" --invite "${tko}/acme4.tok.invite.json"; _fa_state "receptor com o convite revogado" 1 i falha "convite-revogado"
+  _fa_inv create solo-x --days 3 --file "${iv}" --token-out "${tko}/solo3.tok"
+  _fa_rcv --fingerprint "sha256:${fp1}" --invites "${iv}" --invite "${tko}/solo3.tok.invite.json"; _fa_state "receptor com o descritor de outro membro" 1 i falha "convite-de-outro-membro"
+  _fa_rcv --fingerprint "sha256:${fp1}" --invites "${iv}" --invite "${tko}/solo.tok.invite.json"; _fa_state "receptor com descritor que não está no arquivo" 1 i falha "credencial-desconhecida"
+  printf 'nao-json' > "${iv}"; _fa_rcv --fingerprint "sha256:${fp1}" --invites "${iv}"; _fa_state "receptor com o arquivo de convites quebrado" 1 i falha "convites-indisponiveis"
+  _fa_rcv --fingerprint "sha256:${fp1}"
+  if [ "${rc}" -eq 0 ] && [ "$(_fa_chk i | cut -d'|' -f1)" = nao-medido ] && [ "$(jq -r '.checks[]|select(.id=="i")|.critical' <<< "${out}")" = false ]; then
+    record_pass "federation-a2a: doctor do receptor sem --invites → (i) não medida e NÃO crítica, declarada"
+  else record_fail "federation-a2a: doctor i sem arquivo" "rc=${rc} i=$(_fa_chk i)"; fi
+  # doctor do MEMBRO com o descritor: revoked só vale como false literal (o bridge trata o resto como revogado)
+  printf '{"member":"acme","receiver":"core-x","token_sha256":"%s","expires_at":"%s","revoked":null}\n' "${th}" "${fut}" > "${sb}/inv-null.json"
+  _fa_doc --kid acme-1 --invite "${sb}/inv-null.json"; _fa_state "descritor com revoked null" 1 e falha "não é false literal"
+  printf '{"member":"acme","receiver":"outro-core","token_sha256":"%s","expires_at":"%s","revoked":false}\n' "${th}" "${fut}" > "${sb}/inv-rcv.json"
+  _fa_doc --kid acme-1 --invite "${sb}/inv-rcv.json"; _fa_state "descritor para outro receptor" 1 e falha "não para 'core-x'"
+  # o descritor só vale com o token dele (refutador: token qualquer + descritor válido dava saudável)
+  printf '{"member":"acme","receiver":"core-x","token_sha256":"%s","expires_at":"%s","revoked":false}\n' "$(printf '%064d' 0 | tr 0 a)" "${fut}" > "${sb}/inv-tok.json"
+  _fa_doc --kid acme-1 --invite "${sb}/inv-tok.json"; _fa_state "descritor de outro token" 1 e falha "NÃO é o deste descritor"
+  # curas do refutador, medidas contra o guard real do bridge (o $ do Python, a fração de 24:00, surrogate,
+  # JSON fundo, FIFO no descritor, escritor que devolve o mtime)
+  _fa_ivx "validade com \\n final (o \$ do JavaScript não casa)" "\"expires_at\":\"2099-01-01T00:00Z\\n\",\"revoked\":false" convite-invalido
+  _fa_ivx "24:00 com fração abaixo de 1 ms" '"expires_at":"2099-01-01T24:00:00.0009Z","revoked":false' convite-invalido
+  printf '{"version":1,"note":"\\ud800","invites":[{"token_sha256":"%s","member":"acme","receiver":"core-x","expires_at":"%s","revoked":false}]}\n' "${h1}" "${fut}" > "${iv}"; chmod 600 "${iv}"
+  _fa_ls revoke acme --file "${iv}"
+  if [ "${rc}" -eq 0 ] && [ "$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["invites"][0]["revoked"])' "${iv}")" = True ]; then record_pass "federation-a2a: invite revoke escreve arquivo com surrogate sozinha (que o bridge aceita)"
+  else record_fail "federation-a2a: invite surrogate" "rc=${rc} err='${ierr}'"; fi
+  python3 -c 'import sys; open(sys.argv[1],"w").write("{\"version\":1,\"x\":" + "["*100000 + "]"*100000 + ",\"invites\":[]}")' "${iv}"; chmod 600 "${iv}"
+  _fa_ls check --file "${iv}" --json
+  if [ "${rc}" -eq 2 ] && [ "$(jq -r .state <<< "${out}")" = unmeasured ]; then record_pass "federation-a2a: invite JSON fundo demais para o leitor → não medido (rc 2), nunca 'o bridge recusa'"
+  else record_fail "federation-a2a: invite JSON fundo" "rc=${rc} state=$(jq -r .state <<< "${out}" 2>/dev/null)"; fi
+  printf '{"version":1,"invites":[]}\n' > "${iv}"; chmod 600 "${iv}"; mkfifo "${sb}/desc.fifo"
+  rc=0; out="$(timeout 10 bash "${inv_m}" inspect --invite "${sb}/desc.fifo" --member acme --json 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && _fa_has "${out}" 'não é arquivo regular'; then record_pass "federation-a2a: invite inspect com FIFO no descritor → recusa sem travar"
+  else record_fail "federation-a2a: invite FIFO" "rc=${rc} out='${out}'"; fi
+  rm -f "${sb}/desc.fifo"
 
   # ─────────────────────────────────── VALIDADOR (bloco a2a) ────────────────────────────────
   _fa_val() {  # $1 = bloco a2a do acme · $2 = trecho esperado ('' = válido)
