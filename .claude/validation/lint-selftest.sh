@@ -11894,7 +11894,8 @@ run_prettierignore_selftests() {
 
   # (e) complete-no-header → 5 paths soltos (espelha um caso real de campo): no-op, NÃO injeta cabeçalho órfão
   d="$(mktemp -d)"
-  printf '.claude/\ndocs/meta-specs/\ndocs/sdaal/\ndocs/knowledge-base/\ndocs/onion/inventory.md\n' > "${d}/.prettierignore"
+  # (vendor/kg-ssot/ entrou no template em 2026-10-15, SAC-149: o alvo "completo" passou a ter os 6 caminhos)
+  printf '.claude/\ndocs/meta-specs/\ndocs/sdaal/\ndocs/knowledge-base/\nvendor/kg-ssot/\ndocs/onion/inventory.md\n' > "${d}/.prettierignore"
   before="$(cat "${d}/.prettierignore")"; bash "${helper}" "${d}" >/dev/null 2>&1
   after="$(cat "${d}/.prettierignore")"
   if [ "${before}" = "${after}" ]; then record_pass "prettierignore: complete-no-header não injeta cabeçalho"
