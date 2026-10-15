@@ -17,7 +17,9 @@
 #     coisa não commitada e mentir para os dois lados;
 #   · com as variáveis do CI (GITHUB_EVENT_NAME=pull_request, GITHUB_REF_NAME, GITHUB_HEAD_REF): o lint
 #     roda como o runner roda, e o resíduo da REGRA 56 entra no veredito porque é HARD dentro dele;
-#   · o NÚMERO de HARD lido (e o rc), nunca a presença da linha.
+#   · o NÚMERO de HARD lido (e o rc), nunca a presença da linha;
+#   · desde 2026-10-15 (SAC-141), com o lint verde, também o PRÉ-VOO da bancada (ops/testing/preflight-run.sh,
+#     o mesmo corpo do pr-finalize, com cache pela árvore): o push feito à mão pulava a bancada local inteira.
 #
 # ── FRONTEIRA DECLARADA ─────────────────────────────────────────────────────────────────
 #   · sem `gh` INSTALADO ele não sabe se há PR: avisa e deixa passar (o CI é o gate final). Com `gh` instalado
@@ -89,12 +91,24 @@ while read -r _lref lsha rref _rsha; do
   fi
   out="$(cd "${wt}" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME="${num}/merge" GITHUB_HEAD_REF="${br}" \
          LC_ALL=C bash "${lint}" 2>&1 </dev/null)"; rc=$?
+  hard="$(printf '%s\n' "${out}" | grep -oE 'Violações HARD : [0-9]+' | grep -oE '[0-9]+$' | tail -1)"
+  # o PRÉ-VOO da bancada sobre o MESMO commit (SAC-141, 2026-10-15): o push que não passou pelo pr-finalize
+  # pulava a bancada local inteira. Só depois do lint verde, e só onde o corpo existe (core).
+  pfo="" pfrc=0
+  if [ "${rc}" = 0 ] && [ "${hard}" = 0 ] && [ -f "${wt}/ops/testing/preflight-run.sh" ]; then
+    pfo="$(cd "${wt}" && bash ops/testing/preflight-run.sh 2>&1 </dev/null)" || pfrc=$?
+  fi
   if [ -n "${tmp}" ]; then git -C "${ROOT}" worktree remove --force "${wt}" >/dev/null 2>&1; rm -rf "${tmp}"; fi
 
-  hard="$(printf '%s\n' "${out}" | grep -oE 'Violações HARD : [0-9]+' | grep -oE '[0-9]+$' | tail -1)"
-  if [ "${rc}" = 0 ] && [ "${hard}" = 0 ]; then
-    echo "pre-push: '${br}' (PR #${num}) @ ${lsha:0:12} — lint 0 HARD, como o CI vai ver." >&2
+  if [ "${rc}" = 0 ] && [ "${hard}" = 0 ] && [ "${pfrc}" = 0 ]; then
+    echo "pre-push: '${br}' (PR #${num}) @ ${lsha:0:12} — lint 0 HARD, como o CI vai ver.${pfo:+ $(tail -n 1 <<< "${pfo}")}" >&2
     continue
+  fi
+  if [ "${pfrc}" != 0 ]; then
+    echo "pre-push: RECUSADO '${br}' (PR #${num}) @ ${lsha:0:12} — o pré-voo da bancada reprovou (rc=${pfrc}):" >&2
+    printf '%s\n' "${pfo}" | tail -n 14 >&2
+    echo "pre-push: feche o PR com 'bash ops/pr-finalize.sh --push' (projeções, resíduo, pré-voo e lint na ordem certa)." >&2
+    fail=1; continue
   fi
   echo "pre-push: RECUSADO '${br}' (PR #${num}) @ ${lsha:0:12} — lint rc=${rc}, HARD=${hard:-?}." >&2
   # sem filtro por palavra: o filtro anterior escondia o HARD real atrás de 5 SOFT (maior M4 do Elenxo)
