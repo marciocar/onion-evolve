@@ -42,6 +42,9 @@ jobs:
           missing=""
           for t in jq git awk python3; do command -v "$t" >/dev/null 2>&1 || missing="${missing} $t"; done
           [ -z "${missing}" ] || { echo "ERRO: falta no runner —${missing}"; exit 1; }
+          # o leitor do contrato do .kg.yaml (vendor/kg-ssot, que viaja com o Onion) precisa de PyYAML e
+          # jsonschema; sem eles o kg-contract-check sai rc 2, "não julgado" (SAC-149)
+          if [ -f vendor/kg-ssot/tools/requirements.txt ]; then python3 -m pip install --quiet -r vendor/kg-ssot/tools/requirements.txt; fi
 
       - name: Lint determinístico de artefatos Onion
         run: bash .claude/validation/lint-artifacts.sh

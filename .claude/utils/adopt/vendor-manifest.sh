@@ -624,6 +624,23 @@ fi
 # este é sobre QUEM o bundle nomeia, e a resposta é a mesma nos três papéis.
 _IDENTITY_EXCLUDES=(':(exclude).claude/utils/federation-transport/jwks/*.pem')
 
+# ── O CONTRATO DO .kg.yaml É DO ALVO QUANDO O ALVO JÁ TEM O SEU (SAC-149, passada adversarial de 2026-10-15) ──
+# `vendor/kg-ssot` viaja como fechamento de dependência do kg-contract-check.sh. Mas há adotante que vendoriza o
+# KG-SSOT POR CONTA PRÓPRIA, num pin dele (medido: um adotante em 4.7.2, 316 arquivos, contra o 4.7.3 do core): o
+# merge de três vias do --update dava 13 conflitos, e cada update passaria a sobrescrever a escolha do dono. E o
+# próprio PRODUTO KG-SSOT (tools/kg_validate.py na raiz) receberia uma cópia vendorizada de si mesmo, que o
+# selador do /meta:decide preferiria ao leitor dele. Com ONION_TARGET apontando o alvo, o vendor NÃO viaja quando
+# o alvo é o produto ou já tem vendor/kg-ssot que NÃO veio pelo Onion (a branch onion/vendor dele não o tem).
+# O kg-contract-check.sh lê o vendor do alvo do mesmo jeito: o fechamento continua valendo.
+_target_owns_contract() {
+  local _t="${ONION_TARGET:-}"
+  [ -n "${_t}" ] && [ -d "${_t}" ] || return 1
+  [ -f "${_t}/tools/kg_validate.py" ] && return 0
+  [ -e "${_t}/vendor/kg-ssot" ] || return 1
+  git -C "${_t}" cat-file -e "onion/vendor:vendor/kg-ssot/.kg-ssot-version" 2>/dev/null && return 1
+  return 0
+}
+
 if [ "${MODE}" = "manifest" ]; then
   git -C "${REPO}" rev-parse HEAD >/dev/null 2>&1 || {
     echo "ERRO: '${REPO}' não é repositório git com HEAD — o manifesto de transporte é declarado ∩ HEAD; use --emit-scrub-roots para a superfície declarada" >&2; exit 2; }
@@ -674,6 +691,10 @@ if [ "${MODE}" = "manifest" ]; then
   # Só AGORA a exclusão de identidade entra: ela subtrai superfície, e subtrair de um conjunto
   # vazio de positivos é o que produzia o "copia tudo".
   _spec+=("${_IDENTITY_EXCLUDES[@]}")
+  if _target_owns_contract; then
+    _spec+=(':(exclude)vendor/kg-ssot')
+    echo "AVISO: o alvo (${ONION_TARGET}) já tem o próprio contrato do .kg.yaml (vendor/kg-ssot fora da linha do Onion, ou o produto KG-SSOT) — o do core NÃO viaja; o kg-contract-check.sh lê o do alvo." >&2
+  fi
 
   # `git ls-tree` recusa magia de pathspec; `git diff-tree` (comando de diff) a aceita — contra a
   # ÁRVORE VAZIA ele lista exatamente os arquivos que o `git archive` copiaria.

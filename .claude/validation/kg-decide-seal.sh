@@ -343,5 +343,10 @@ else
     echo "kg-decide-seal: repo git sem leitor de contrato (nem vendor/kg-ssot nem tools/kg_validate.py) — gate = só o radar (declarado)" >&2
   fi
 fi
-echo "kg-decide-seal: ✅ selado — radar --integrity --schema exit 0${CONTRACT_READER:+ · contrato rc 0 por ${CONTRACT_READER}}"
+# "contrato rc 0" só quando o contrato JULGOU e passou (passada adversarial de 2026-10-15): com o vendor agora
+# viajando, um adotante sem PyYAML/jsonschema tem leitor e CRC=2 — o sufixo afirmava rc 0 logo depois do aviso
+# "contrato NÃO JULGADO".
+_csuf=""; [ -n "${CONTRACT_READER}" ] && [ "${CRC}" -eq 0 ] && _csuf=" · contrato rc 0 por ${CONTRACT_READER}"
+[ -n "${CONTRACT_READER}" ] && [ "${CRC}" -ne 0 ] && [ "${CRC}" -ne 99 ] && _csuf=" · contrato NÃO julgado (rc ${CRC})"
+echo "kg-decide-seal: ✅ selado — radar --integrity --schema exit 0${_csuf}"
 exit 0
