@@ -2,7 +2,8 @@
 branch: feat/background-probe-replaces-prose-veto
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6fb7f34d21992176f24d94f0fc6f4e4b1bb315d32f4bc1f24f5b0d1810629dc4
+reviewed_code_sha256: 60c50c3a875c6941cd28bd5022fa91e78c5be84ec8b55cbb9d0dac07b8b63eee
 findings_total: 5
 findings_real: 5
 findings_fixed: 5
