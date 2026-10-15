@@ -151,6 +151,7 @@
 .claude/hooks/kg-read-leg.sh	E_OBJECAO_MAIN_MUST_KEEP_VERSIONING	docs/evolution/research/postmerge-projection-writer-2026-10/postmerge-projection-writer-2026-10.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_PERNA_DE_LEITURA_E_CEGA_A_BASH	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/kg-read-leg.sh	Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/hooks/lib/invocation-lines.sh	C_FUNCAO_DA_STRING_SO_ERA_JULGADA_NA_DEFINICAO	docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE	docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	C_TETO_RESOLUCAO_LOCAL_E_FONTES	docs/evolution/research/guard-protected-branch-2026-10/protected-branch-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	D_RAMO_DE_PRODUCAO_RESOLVIDO_NA_LIB	docs/evolution/research/guard-protected-branch-2026-10/protected-branch-2026-10.kg.yaml
