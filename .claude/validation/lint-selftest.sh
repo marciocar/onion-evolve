@@ -10086,9 +10086,11 @@ STUB
   else record_fail "federation-a2a: invite outro membro" "probe=$(_fa_probe)"; fi
   # atômico: rename de temporário (inode novo), sem sobra de temporário no diretório
   local ino0 ino1; ino0="$(stat -c %i "${iv}")"
+  # o inode se mede depois de UMA escrita: o temporário nasce com o original vivo, então o inode difere;
+  # depois de duas, o kernel pode reusar o inode liberado (medido: falso ✗ intermitente)
   _fa_inv create acme --days 9 --file "${iv}" --token-out "${tko}/acme2.tok"
-  _fa_inv create solo-x --days 9 --file "${iv}" --token-out "${tko}/solo.tok"
   ino1="$(stat -c %i "${iv}")"
+  _fa_inv create solo-x --days 9 --file "${iv}" --token-out "${tko}/solo.tok"
   if [ "${rc}" -eq 0 ] && [ "${ino0}" != "${ino1}" ] && [ "$(find "${bd}" -mindepth 1 | wc -l)" -eq 1 ] && [ "$(jq '.invites|length' "${iv}")" = 3 ]; then
     record_pass "federation-a2a: invite escreve por temporário no mesmo diretório + rename (inode novo, sem sobra, entradas acumuladas)"
   else record_fail "federation-a2a: invite atomicidade" "rc=${rc} ino ${ino0}→${ino1} arquivos=$(find "${bd}" -mindepth 1 | wc -l) n=$(jq '.invites|length' "${iv}" 2>/dev/null)"; fi
