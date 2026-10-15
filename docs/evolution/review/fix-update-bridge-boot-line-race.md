@@ -2,7 +2,8 @@
 branch: fix/update-bridge-boot-line-race
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 251a628f4231548645f430d8e69161da45b5acc11b03e6e13b8e86bfa1fbda91
+reviewed_code_sha256: f81e9c9778406b4f34674c978bec7c02a1292c2c718b564d6615ad22e2dccc34
 findings_total: 1
 findings_real: 1
 tokens: 0
