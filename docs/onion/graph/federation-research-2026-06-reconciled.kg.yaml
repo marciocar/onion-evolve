@@ -10685,6 +10685,22 @@ nodes:
       locator: "edges: B5_17_tessl_unico_as_source -> B5_17_gap_discurso_pratica (SUPPORTS); B5_17_gap_discurso_pratica -> B5_17_veredito_trajetoria_campo (SUPPORTS)"
       method: "leitura: arestas do grafo"
       locality: "repo"
+  - id: D_TESSL_PARQUEADA_2026_10
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "decisão do maestro em 2026-10-15, por pergunta com opções (/meta:decide): escolhida «Parquear e enviar»"
+    label: "A Tessl fica PARQUEADA (estudo C da curadoria, até o N3), com a costura mínima e reversível de distribuição; reabre em 2026-11-15 (contas da subsidiária) ou antes por Form D novo, registry aberto ou M&A"
+    narrative: "Selado por /meta:decide em 2026-10-15: escolhida «Parquear e enviar»; descartadas: «Parquear sem enviar» · «Costurar e esperar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-15: «Proposta da curadoria (inbox 2026-10-15-proposal-tessl-parquear): qual o veredito da Tessl? Decidido pelo maestro na sessão da curadoria (onion-curation D_TESSL_STUDY_C, PR #22)»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-15"
+      locality: "pessoa"
 
 edges:
   - from: G1_INTERRUPT_STATES
@@ -13956,4 +13972,7 @@ edges:
     edge_type: CAUSES
   - from: Q_VEREDITO_TRAJETORIA_PERDEU_PREMISSA_TESSL
     to: B5_17_veredito_trajetoria_campo
+    edge_type: TRACES_TO
+  - from: D_TESSL_PARQUEADA_2026_10
+    to: E_TESSL_UNICO_AS_SOURCE_REFUTADO_2026_10
     edge_type: TRACES_TO
