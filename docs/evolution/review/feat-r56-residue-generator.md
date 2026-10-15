@@ -2,7 +2,8 @@
 branch: feat/r56-residue-generator
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3294375aad6796b9b2cf719c0d9937153393bf7a7ce92402b21c195017979670
+reviewed_code_sha256: 5ecf898ddb3593614d50bb948e595949c743fdbf63a6b4e59fab66d431621529
 findings_total: 4
 findings_real: 4
 tokens: 0
