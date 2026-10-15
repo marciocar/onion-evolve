@@ -214,11 +214,39 @@ check_endpoint() {
   if [ -z "${ENDPOINT}" ]; then put g nao-medido 0 "endpoint não informado" "passe --endpoint <url do receptor>"; return; fi
   command -v curl >/dev/null 2>&1 || { put g nao-medido 1 "curl ausente: não sei medir o alcance" "instale curl"; return; }
   case "${ENDPOINT}" in *://*@*) put g falha 1 "a URL do endpoint carrega credencial embutida (user:token@)" "tire a credencial da URL: ela vaza em /proc e no histórico"; return ;; esac
-  local code; code="$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 2 --max-time 4 --proto '=http,https' "${ENDPOINT}" 2>/dev/null)"; code="${code:-000}"
+  # ROTA DO RECEPTOR (F3): o bridge do core atende `/a2a` (o core) e `/a2a/<receptor>` (um hub). A rota
+  # decide o receptor, e o convite e o aud têm de casar com ela: endpoint de outro receptor sai
+  # convite-de-outro-receptor (401) ou claim-aud-mismatch, com a chave e o convite certos.
+  local upath="${ENDPOINT#*://}"; upath="/${upath#*/}"; [ "${upath}" = "/${ENDPOINT#*://}" ] && upath="/"
+  # a barra final NÃO se tira, nem a caixa se normaliza: o bridge (Hono, estrito) responde 404 a
+  # `/a2a/<hub>/` e a `/A2A/<hub>` (medido pelo refutador da F3), e o doctor julga a rota que o bridge vê
+  upath="${upath%%[?#]*}"
+  local route_note=""
+  if [ -n "${RECEIVER}" ]; then
+    case "${upath}" in
+      */a2a/"${RECEIVER}") ;;
+      */a2a)
+        if [ -n "${SRC}" ] && [ "${RECEIVER}" != "${SRC}" ]; then
+          put g falha 1 "o endpoint é a rota do receptor padrão (/a2a = ${SRC}), mas o receptor é ${RECEIVER}: o bridge recusaria o convite (convite-de-outro-receptor)" "use a rota do receptor: .../a2a/${RECEIVER}"; return
+        fi
+        [ -n "${SRC}" ] || route_note="; /a2a é o receptor padrão do bridge (o core): se ${RECEIVER} é um hub, use .../a2a/${RECEIVER}" ;;
+      */a2a/|*/a2a/*[!A-Za-z0-9._-]*)
+        put g falha 1 "rota malformada (${upath}): o bridge só atende /a2a e /a2a/<receptor>, sem barra final nem segmento a mais, e responde 404" "use a rota do receptor: .../a2a/${RECEIVER}"; return ;;
+      */a2a/*)
+        put g falha 1 "o endpoint é a rota de outro receptor (${upath##*/}), não de ${RECEIVER}" "use a rota do receptor: .../a2a/${RECEIVER}"; return ;;
+      *)
+        put g falha 1 "o caminho (${upath}) não é uma rota do /a2a do bridge (só /a2a e /a2a/<receptor>, em minúsculas): o bridge responde 404" "use a rota do receptor: .../a2a/${RECEIVER}"; return ;;
+    esac
+  fi
+  # Sonda por POST sem credencial e corpo vazio: numa rota que existe o guard do bridge responde 401 (o
+  # alcance), e numa que não existe o roteador responde 404. GET não separa os dois (o /a2a não tem GET).
+  local code; code="$(curl -s -o /dev/null -w '%{http_code}' --connect-timeout 2 --max-time 4 --proto '=http,https' \
+    -X POST -H 'Content-Type: application/json' --data '{}' "${ENDPOINT}" 2>/dev/null)"; code="${code:-000}"
   case "${code}" in
     000) put g falha 1 "endpoint inalcançável (conexão recusada, DNS ou timeout de 4 s)" "confira URL, DNS, firewall e se o serviço do receptor está de pé" ;;
+    404) put g falha 1 "o servidor respondeu 404: esta rota não existe nele (o bridge do core atende POST em /a2a e /a2a/<receptor>)" "confira o caminho do endpoint e se o bridge servido já tem o receptor múltiplo" ;;
     5*)  put g falha 1 "endpoint respondeu HTTP ${code} (servidor de pé, mas quebrado)" "o receptor precisa olhar o log do serviço" ;;
-    *)   put g ok 1 "endpoint alcançável (HTTP ${code}: alcance, não autorização)" "—" ;;
+    *)   put g ok 1 "endpoint alcançável (HTTP ${code}: alcance, não autorização)${route_note}" "—" ;;
   esac
 }
 
@@ -413,6 +441,8 @@ side_member() {
         kid-not-owned-by-from:*|unknown-kid:*) nx="o pino do kid está errado: ver (d)" ;;
         bad-signature) nx="a privada local não é a pinada: ver (c) e (d)" ;;
         tooling-absent:*) nx="instale ${reason#tooling-absent:}" ;;
+        receiver-unknown) nx="${RECEIVER} não está no registro: confira o --receiver (ou o a2a.sends_to)" ;;
+        receiver-not-a-receiver:*) nx="${RECEIVER} não recebe sinais (só role source ou hub, nunca porta): mande para o seu hub ou para o core" ;;
         *) nx="leia a camada '${layer}' do gate a2a-verify.sh" ;;
       esac
       put h falha 1 "o gate local VETOU: ${reason} (camada ${layer})" "${nx}"

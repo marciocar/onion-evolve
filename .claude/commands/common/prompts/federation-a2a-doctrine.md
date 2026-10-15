@@ -92,6 +92,25 @@ e um JSON fundo demais era dado como quebrado (agora sai "não medido"). Revogar
 próximo envio, sem restart e sem deploy. É o contrário da revogação do `kid` (cláusula 3), que só vale
 quando o clone servido recebe o merge. Por isso a trilha 6 revoga o convite **primeiro**.
 
+### 10. O hub recebe pelo bridge do core, e a rota É o receptor (F3)
+Na F3 a rede do hub nasce **junto** com a do core: os filhos do hub se registram no registro do core com
+`role: consumer` e `parent: <hub>`, e mandam sinais para `/a2a/<hub>` no **mesmo** bridge. Cinco regras,
+todas medidas no dogfood da F3 com um bridge local de dois receptores:
+- **A rota decide o receptor.** `/a2a` sem sufixo é o core; `/a2a/<hub>` é o hub. O bridge só atende id
+  que o registro do clone servido diz que recebe (`role: source` ou `hub`, nunca porta), e o gate do core
+  repete a checagem na camada `receiver`. Receptor fora do registro sai 404; que não recebe, 400.
+- **O convite é por receptor.** O convite de um filho para o hub não vale em `/a2a` (o core), e o do core
+  não vale em `/a2a/<hub>`: `convite-de-outro-receptor` (401). O pool legado só vale no core.
+- **`aud` é obrigatório.** O jti é guardado por receptor, então um envelope sem `aud` aceito num receptor
+  seria reenviável no outro. Com `aud`, o reenvio sai `claim-aud-mismatch`.
+- **O consumer só fala com o próprio hub** (ou com o core). Para outro hub, o gate veta `trust-denied`:
+  a topologia confere o `parent`. O convite para um hub só nasce para filho dele.
+- **A fila é por receptor.** O bridge grava a fila do hub num subdiretório com o id dele, e o aceite do
+  hub (`a2a-accept.sh --receiver <hub>`) recusa registro de outro receptor; registro antigo, sem receptor,
+  só entra no core. Listar a fila e entregá-la ao hub é do maestro, na conta do serviço.
+O hub **não tem o registro do core** (o `docs/` não viaja): registrar o filho e criar o convite dele são
+atos do operador do core, a pedido do hub. O hub monta o pacote de entrada e aceita a própria fila.
+
 ## O que este comando NÃO promete
 
 - **Não faz deploy** do bridge, não edita o ambiente do serviço e não reinicia nada. O convite por
@@ -101,7 +120,7 @@ quando o clone servido recebe o merge. Por isso a trilha 6 revoga o convite **pr
 - **Não roda na máquina do membro por conta própria:** a trilha 3 é executada pelo membro, no
   computador dele. O core prepara o pacote; o membro instala.
 - **Não aceita sinal sozinho** nem em lote (cláusula 4), e não rotaciona chave sem pedido.
-- **Hub como receptor** (rotas `/a2a/<hub>`, filhos com `parent: <hub>`) é a F3; hub com servidor
-  próprio é a F4, gated até o primeiro hub pedir.
+- **Rede do hub separada da do core:** hub com registro e servidor próprios é a F4, gated até o primeiro
+  hub pedir. Na F3 o hub recebe pelo bridge do core (cláusula 10), e o registro dos filhos dele é o do core.
 - **Não garante entrega:** o canal ao vivo acelera; o `git-async` continua o sistema de registro e o
   fallback.

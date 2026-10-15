@@ -14,6 +14,14 @@
 #
 # Camadas (fail-fast, barato→caro; toda camada não-avaliável → VETO):
 #   0. parse       — jq presente + envelope JSON válido? (senão veto tooling-absent:jq / malformed-envelope)
+#   0b. receiver   — (F3 do configurador A2A, 2026-10-15) o --receiver tem forma fechada (1º caractere letra
+#                    ou dígito, depois [A-Za-z0-9._-], até 128) e é RECEPTOR no registro: existe, role source
+#                    ou hub, e kind NÃO door (a porta onion-core publica role source). Senão veto
+#                    receiver-malformed / receiver-unknown / receiver-not-a-receiver:<motivo> / receiver-
+#                    registry-unreadable. O bridge serve vários receptores (/a2a/<receptor>) e o id vira
+#                    nome do arquivo de jti. Um id inventado já morria no trust-check (rc 2, sem estado); o
+#                    ganho é o membro que EXISTE e não recebe (standalone, porta), que sem esta camada passava
+#                    a ter fila e estado de jti próprios. Receber ao vivo é só da fonte e dos hubs.
 #   1. trust       — COMPÕE trust-topology-check.sh (--from signal.from --to receiver --action relay): policy-as-data
 #   2. replay      — jti já visto? (state file por-receptor) → veto replay  (jti só é GRAVADO no fim, após tudo passar)
 #   3. timestamp   — RELÓGIO CONFIÁVEL primeiro (janela de tempo só vale com fonte verificada: NTP sincronizado
@@ -24,6 +32,8 @@
 #                    (teto = A2A_EXP_MAX_TTL, default 3600 s)
 #   4. ssrf        — a2a-ssrf-check.sh na URL do PushNotificationConfig (se houver)
 #   5. jws         — assinatura RS256 verificada com a pubkey do kid (JWKS fixture) + claims iss==from, aud==receiver
+#                    (aud OBRIGATÓRIO desde a F3: com vários receptores no mesmo bridge e o jti guardado por
+#                    receptor, um envelope sem aud aceito num receptor era reenviável no outro → jws-missing-aud)
 #   5b. body       — o CORPO entra na assinatura (desde 2026-10-14): claim body_sha256 OBRIGATÓRIO e igual a
 #                    sha256(bytes UTF-8 do valor decodificado de signal.body; ausente = corpo vazio) → senão
 #                    body-mismatch; signal.body_path/thread, quando presentes, têm de ser claims iguais;
@@ -32,7 +42,8 @@
 #   6. never-live-pull — receptor mode:regulated → apply_mode:propose-only (aceita p/ o gate, nunca pull ao vivo)
 #
 # Invariantes hardcoded no veredito: gated SEMPRE true (sinal verificado ainda pende gate humano);
-#   committed SEMPRE false (I3, entrega-sem-commit). O consumidor NUNCA auto-aplica.
+#   committed SEMPRE false (I3, entrega-sem-commit). O consumidor NUNCA auto-aplica. O veredito verificado
+#   ecoa o "receiver" julgado (F3): o bridge e o aceite conferem que é o receptor da rota e da fila.
 #
 # Uso : a2a-verify.sh --receiver <member-id> [--envelope <file>|-] [--repo <path>] [--dry-run]
 #   envelope (stdin se '-' ou omitido). --dry-run: repassa ao trust-check (não grava trust-log).
@@ -78,6 +89,12 @@ veto() {  # <reason> <layer>
   exit 1
 }
 
+# --- Camada 0b (forma): o receptor vira nome de arquivo (estado de jti) e é ecoado no veredito ---------
+# Forma fechada ANTES de qualquer uso, casada em LC_ALL=C (faixa de caractere em outro locale casaria letra
+# acentuada). Sem "/" nem "..", o id nunca sai de .claude/sessions/.
+_rcv_ok() { local LC_ALL=C; case "$1" in ''|[!A-Za-z0-9]*|*[!A-Za-z0-9._-]*) return 1 ;; esac; [ "${#1}" -le 128 ]; }
+_rcv_ok "${RECEIVER}" || veto "receiver-malformed" "receiver"
+
 # --- Camada 0: parse (jq + openssl são necessários p/ TODO o gate → ausência = VETO, não skip) ---
 command -v jq >/dev/null 2>&1 || veto "tooling-absent:jq" "parse"
 command -v openssl >/dev/null 2>&1 || veto "tooling-absent:openssl" "parse"   # b64url decode + assinatura
@@ -101,6 +118,41 @@ b64url_decode() {  # <b64url> → bytes em stdout
 HDR_B64="${JWS%%.*}"; REST="${JWS#*.}"; PL_B64="${REST%%.*}"; SIG_B64="${REST#*.}"
 [ -n "${HDR_B64}" ] && [ -n "${PL_B64}" ] && [ -n "${SIG_B64}" ] && [ "${SIG_B64}" != "${JWS}" ] \
   || veto "malformed-jws" "parse"
+
+# --- Camada 0b (registro): o receptor RECEBE? -----------------------------------
+# Mesmo leitor do kid e do mode (python3 + yaml.safe_load): o spike mediu que o awk e o yaml divergem com
+# comentário na linha do id (C_RECEPTOR_PELO_PAPEL_INCLUI_A_PORTA). Registro ilegível = VETO.
+command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 || veto "tooling-absent:python-yaml" "receiver"
+RCV_STATE="$(python3 - "${MEMBERS}" "${RECEIVER}" <<'PY'
+import sys, yaml
+try:
+    doc = yaml.safe_load(open(sys.argv[1], encoding="utf-8")) or {}
+except Exception:
+    print("unreadable"); sys.exit(0)
+ms = doc.get("members") if isinstance(doc, dict) else None
+if not isinstance(ms, list):
+    print("unreadable"); sys.exit(0)
+for m in ms:
+    if isinstance(m, dict) and m.get("id") == sys.argv[2]:
+        role, kind = m.get("role"), m.get("kind")
+        if role not in ("source", "hub"):
+            print("role-" + (role if isinstance(role, str) and role.isascii() and role.isalpha() and len(role) <= 32 else "invalid"))
+        elif kind == "door":
+            print("door")
+        else:
+            print("ok")
+        break
+else:
+    print("unknown")
+PY
+)"
+case "${RCV_STATE}" in
+  ok) ;;
+  unknown) veto "receiver-unknown" "receiver" ;;
+  door) veto "receiver-not-a-receiver:kind-door" "receiver" ;;
+  role-*) veto "receiver-not-a-receiver:${RCV_STATE}" "receiver" ;;
+  *) veto "receiver-registry-unreadable" "receiver" ;;
+esac
 
 # --- Camada 1: trust policy (compõe trust-topology-check.sh) ------------------
 [ -f "${TRUST_CHECK}" ] || veto "trust-check-absent" "trust"
@@ -201,7 +253,10 @@ if ! printf '%s' "${HDR_B64}.${PL_B64}" | openssl dgst -sha256 -verify "${PUB}" 
 fi
 # claims coerentes com o envelope (defesa contra confusão): iss==from, aud==receiver
 [ "${ISS}" = "${FROM}" ] || veto "claim-iss-mismatch" "jws"
-[ -z "${AUD}" ] || [ "${AUD}" = "${RECEIVER}" ] || veto "claim-aud-mismatch" "jws"
+# aud OBRIGATÓRIO (F3): o jti é guardado POR receptor, então um envelope sem aud aceito no core seria
+# reenviável, com o mesmo jti, em /a2a/<hub>. O remetente canônico (a2a-send.sh) sempre assinou aud.
+[ -n "${AUD}" ] || veto "jws-missing-aud" "jws"
+[ "${AUD}" = "${RECEIVER}" ] || veto "claim-aud-mismatch" "jws"
 [ -z "${TO}" ] || [ "${TO}" = "${RECEIVER}" ] || veto "signal-to-mismatch" "jws"
 
 # --- Camada 5b: o CORPO entra na assinatura (2026-10-14, achado F1 do spike a2a cross-user) ---------
@@ -313,5 +368,5 @@ fi
 # Duas linhas = outro processo gravou o mesmo jti → replay. (Na corrida exata os dois podem ver 2 e
 # vetar: fail-closed, o remetente reenvia com jti novo.)
 [ "$(grep -cxF "${JTI}" "${STATE}" 2>/dev/null)" = "1" ] || veto "replay" "replay"
-printf '{"verified":true,"reason":"ok","layer_failed":null,"gated":true,"committed":false,"regulated":%s,"apply_mode":"%s"}\n' "${REG}" "${APPLY}"
+printf '{"verified":true,"reason":"ok","layer_failed":null,"gated":true,"committed":false,"regulated":%s,"apply_mode":"%s","receiver":"%s"}\n' "${REG}" "${APPLY}" "${RECEIVER}"
 exit 0

@@ -37,6 +37,17 @@
 #               receptor: role source ou hub, e NÃO porta (kind door). Medido no spike
 #               (C_RECEPTOR_PELO_PAPEL_INCLUI_A_PORTA): olhar só o role deixava entrar a porta.
 #
+# PARENT (desde 2026-10-15, F3 do configurador A2A, SAC-124): a rede do hub nasce junto com a do
+#             core, com os filhos do hub registrados AQUI com `parent: <hub>`. Por isso o parent
+#             deixou de ser só "presente":
+#             · aponta um membro do registro, e nunca o próprio membro;
+#             · `role: consumer` (T2) ⇔ parent é um hub (role hub, NÃO porta). Consumer pendurado
+#               no core, ou standalone/hub pendurado num hub, é tier contraditório: o trust-check
+#               julga o consumer pelo parent, e o co-deliver recusa entregar a quem adota um hub;
+#             · quem não é consumer tem como parent a FONTE (kind source);
+#             · consumer com a2a.sends_to manda para o PRÓPRIO hub ou para a fonte (é o que o
+#               trust-check autoriza: consumer→outro hub é BLOQUEADO lá).
+#
 # Uso       : bash .claude/validation/members-validate.sh [<path-do-members.yaml>] [--json] [--jwks <dir>]
 #               <path> : caminho PASSADO COMO ARGUMENTO; default = o members.yaml
 #                        do próprio repo (resolvido por BASH_SOURCE, nunca embutido).
@@ -98,10 +109,36 @@ errors = []
 def err(msg):
     errors.append(msg)
 
+# UM LEITOR SÓ NA PRÁTICA (F3, achado do refutador): o trust-topology-check.sh lê o registro por awk, e o
+# resto (este validador, o gate, o bridge, o motor de convite) por PyYAML. Os dois divergem em três formas,
+# medidas, e a divergência caía no lado que AUTORIZA: chave repetida no mesmo mapa (o yaml fica com a
+# última, o awk com a primeira: um `parent:` duplicado deixava o filho falar com o hub errado), comentário
+# na linha do `- id:` (o awk lê o comentário como id) e id com espaço (`id: evil hub-real` casava como
+# `hub-real` no awk). As três reprovam aqui, no gate, antes de qualquer leitor divergir.
+class _DupKey(Exception):
+    pass
 try:
     import yaml
+    class _NoDupLoader(yaml.SafeLoader):
+        pass
+    def _construct_mapping(loader, node, deep=False):
+        seen = set()
+        for k_node, _ in node.value:
+            k = loader.construct_object(k_node, deep=deep)
+            if k in seen:
+                raise _DupKey(f"chave '{k}' repetida no mesmo mapa (linha {k_node.start_mark.line + 1}): o yaml fica com a última e o awk do trust-check com a primeira")
+            seen.add(k)
+        return yaml.SafeLoader.construct_mapping(loader, node, deep=deep)
+    _NoDupLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _construct_mapping)
     with open(path) as fh:
-        doc = yaml.safe_load(fh) or {}
+        raw = fh.read()
+    for n, ln in enumerate(raw.splitlines(), 1):
+        if re.match(r"^\s*-\s*id:", ln) and "#" in ln:
+            err(f"linha {n}: comentário na linha do '- id:' — o trust-check (awk) lê o comentário como id; mova-o para a linha de baixo")
+    doc = yaml.load(raw, Loader=_NoDupLoader) or {}
+except _DupKey as e:
+    err(f"registro: {e}")
+    doc = None
 except Exception as e:
     err(f"YAML não parseável: {e}")
     doc = None
@@ -164,6 +201,8 @@ if isinstance(doc, dict):
         tag = f"membro '{mid}'" if mid else tag
         if not mid or not isinstance(mid, str):
             err(f"{tag}: 'id' ausente ou vazio")
+        elif not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]*", mid):
+            err(f"{tag}: 'id' fora de [A-Za-z0-9._-] (1º caractere letra ou dígito): o id vira argumento, nome de arquivo e rota /a2a/<id>, e o awk do trust-check o lê pela última palavra")
         else:
             if mid in seen:
                 err(f"{tag}: 'id' duplicado (já em membro[{seen[mid]}])")
@@ -332,6 +371,35 @@ if isinstance(doc, dict):
                 err(f"{tag}: a2a.sends_to aponta '{st}', que não está no registro")
             elif rcv.get("role") not in ("source", "hub") or rcv.get("kind") == "door":
                 err(f"{tag}: a2a.sends_to aponta '{st}' (role '{rcv.get('role')}', kind '{rcv.get('kind')}'), que não é receptor: só role source ou hub, e nunca porta")
+    # PARENT (F3 do configurador A2A) — ver o cabeçalho.
+    def is_hub(x):
+        return isinstance(x, dict) and x.get("role") == "hub" and x.get("kind") != "door"
+    for m in members:
+        if not isinstance(m, dict) or m.get("kind") == "source":
+            continue
+        mid, par, role = m.get("id"), m.get("parent"), m.get("role")
+        if par in (None, ""):
+            continue   # a ausência já é erro acima (obrigatório salvo a fonte)
+        tag = f"membro '{mid}'"
+        if not isinstance(par, str):
+            err(f"{tag}: 'parent' tem de ser o id (texto) de um membro, veio {type(par).__name__}")
+            continue
+        if par == mid:
+            err(f"{tag}: 'parent' aponta para o próprio membro")
+            continue
+        pm = by_id.get(par)
+        if pm is None:
+            err(f"{tag}: 'parent' aponta '{par}', que não está no registro")
+            continue
+        if role == "consumer":
+            if not is_hub(pm):
+                err(f"{tag}: role consumer (T2) exige parent hub; '{par}' tem role '{pm.get('role')}' e kind '{pm.get('kind')}' (consumer adota um hub, nunca o core nem uma porta)")
+        elif pm.get("kind") != "source":
+            err(f"{tag}: role '{role}' adota o core direto, e o parent tem de ser a fonte; '{par}' tem kind '{pm.get('kind')}' (só role consumer pendura num hub)")
+        a = m.get("a2a")
+        st = a.get("sends_to") if isinstance(a, dict) else None
+        if role == "consumer" and isinstance(st, str) and st and st != par and (by_id.get(st) or {}).get("kind") != "source":
+            err(f"{tag}: consumer manda sinais para o próprio hub ('{par}') ou para a fonte; a2a.sends_to aponta '{st}' (a topologia bloqueia consumer→outro hub)")
 elif doc is not None:
     err("documento raiz não é um mapa (esperado: chaves version/trust_policy_version/members)")
 

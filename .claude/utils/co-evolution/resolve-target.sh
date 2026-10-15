@@ -16,8 +16,10 @@
 #                                       fica fora por desenho — recebe pelo hub (RFC-0003 §2.1).
 #     <id>                              → esse membro, se existir
 #     <key>:<value>[,<key>:<value>...]  → AND (interseção) sobre atributos:
-#         key ∈ { mode | tier (alias role) | specialization (alias spec) }
+#         key ∈ { mode | tier (alias role) | specialization (alias spec) | parent (alias hub) }
 #         ex.: mode:regulated · tier:hub · specialization:nx-monorepo · mode:regulated,tier:standalone
+#         parent:<hub> (F3 do configurador A2A, 2026-10-15) = os filhos registrados de um hub (T2, a tripla
+#         `adopts`): é o seletor que o HUB usa para endereçar a própria rede, já que `todos` exclui T2.
 #
 # Reusa graph.sh --triples (members.yaml). Gracioso: sem triplas de membro (sem python+yaml) → vazio.
 # Determinístico. Exercitado por lint-selftest.sh (run_resolve_target_selftests).
@@ -50,7 +52,8 @@ _match_one() {  # <key> <value> → ids com o atributo
     mode)                 pred=mode ;;
     tier|role)            pred=tier ;;
     specialization|spec)  pred=specialization ;;
-    *) echo "ERRO: chave de seletor desconhecida: '${k}' (use mode|tier|specialization)." >&2; return 3 ;;
+    parent|hub)           pred=adopts ;;
+    *) echo "ERRO: chave de seletor desconhecida: '${k}' (use mode|tier|specialization|parent)." >&2; return 3 ;;
   esac
   _by_pred "${pred}" "${v}"
 }
