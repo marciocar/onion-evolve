@@ -30009,6 +30009,8 @@ KG
   if [ ! -f "${plans_sut}" ]; then record_fail "dissect" "SUT ausente: ${plans_sut}"; return; fi
   mkdir -p "${d}/.claude/validation" "${d}/.claude/commands/meta"
   cp "${REPO_ROOT}/.claude/validation/forge-census.sh" "${d}/.claude/validation/"
+  # o leitor deriva a régua padrão pelo dissect-census.sh DESTE repo (SAC-147): a sandbox o carrega.
+  cp "${sut}" "${d}/.claude/validation/"
   # alvo com a peca 5 (destino) e SEM a 6 (lente): o plano pede "5,6" e nao diz qual existe.
   printf -- '---\ndescription: alvo de bancada\n---\nFase final: write(KG) e radar exit 0.\n' \
     > "${d}/.claude/commands/meta/alvo.md"
@@ -30132,6 +30134,173 @@ KG
     record_pass "dissect: (p10) repo do alvo que o forge-census nao mede ⇒ rc=3 NAO-MEDIDO (nao culpa o plano)"
   else record_fail "dissect: (p10)" "esperado rc=3 forge-census-nao-mediu, veio rc=${prc}: $(_emit "${po}" | head -c 300)"; fi
   rm -rf "${tgt_repo}" "${tgt_nogit}"
+
+  # ── (g*/k*) RÉGUA PADRÃO = O PRÓPRIO REPO e ESCOPO por componente (SAC-147, 2026-10-15) ─────
+  #     Sandbox própria de ADOTADO (carimbo role: adopted + remote origin), para não mudar a régua
+  #     padrão da sandbox do core acima. O carimbo traz `framework: onion-evolve` DE PROPÓSITO: é a
+  #     forma medida num adotado real, e a régua tem de sair o id do repo, nunca o nome da fonte.
+  local ad; ad="$(mktemp -d)"
+  git -C "${ad}" init -q -b main 2>/dev/null
+  git -C "${ad}" remote add origin "https://example.org/acme/produto-z.git" 2>/dev/null
+  mkdir -p "${ad}/.claude/validation" "${ad}/.claude/commands/meta" "${ad}/docs/evolution/dissect" "${ad}/services/auth"
+  printf 'framework: onion-evolve\nrole: adopted\nadopted_from: https://example.org/onion-evolve.git\n' > "${ad}/.claude/.onion-version"
+  cp "${REPO_ROOT}/.claude/validation/forge-census.sh" "${sut}" "${ad}/.claude/validation/"
+  printf -- '---\ndescription: alvo de bancada\n---\nFase final: write(KG) e radar exit 0.\n' > "${ad}/.claude/commands/meta/alvo.md"
+  printf 'provider: velho\n' > "${ad}/services/auth/provider.yaml"
+  local ado adrc=0
+  _adplan() {  # $1=ferramenta $2=régua $3=escopo ("" = sem)
+    mkdir -p "${ad}/docs/evolution/dissect/$1-2026-10"
+    { printf 'meta:\n  id: %s-2026-10\n  x_dissect_tool: %s\n  x_dissect_against: %s\n' "$1" "$1" "$2"
+      [ -z "$3" ] || printf '  x_dissect_scope: "%s"\n' "$3"
+      printf '  baseline: "2026-10-15"\n  review_after: "2099-01-01"\nnodes:\n'
+      printf '  - id: A_PLAN_%s\n    x_dissect_level: 4\n    x_absorb_target: alvo\n    x_absorb_pieces: "5"\n' "$1"
+      printf '    x_absorb_origin: "%s"\n    x_absorb_license: MIT\n    x_absorb_form: reescrita\n    x_absorb_parity: "%s"\n' "${pin}" "${par}"
+      printf '  - id: D_%s\n    x_dissect_verdict: absorver\nedges:\n  - from: A_PLAN_%s\n    to: D_%s\n' "$1" "$1" "$1"
+    } > "${ad}/docs/evolution/dissect/$1-2026-10/$1-2026-10.kg.yaml"
+    git -C "${ad}" add -A >/dev/null 2>&1
+  }
+
+  # (g1) CORE: sem carimbo, a régua padrão é `onion` (o comportamento do core não muda).
+  #      MUTANTE: derivar sempre do remote/pasta daria o nome da sandbox no lugar de onion.
+  #      Roda a CÓPIA que mora na sandbox: "sem carimbo ⇒ core" só vale com o script no repo medido (g7).
+  local rp; rp="$(bash "${d}/.claude/validation/dissect-census.sh" "${d}" --regua-padrao 2>&1 | cut -f1)" || rp="(rc!=0)"
+  if [ "${rp}" = "onion" ]; then
+    record_pass "dissect: (g1) core sem carimbo ⇒ regua padrao onion"
+  else record_fail "dissect: (g1)" "esperado onion na sandbox do core, veio '${rp}'"; fi
+
+  # (g2) ADOTADO: a régua padrão é o id do repo (remote origin), NUNCA o `framework:` do carimbo.
+  #      MUTANTE: ler `framework:` daria onion-evolve — a régua do adotado viraria a da fonte.
+  rp="$(bash "${sut}" "${ad}" --regua-padrao 2>&1 | cut -f1)" || rp="(rc!=0)"
+  if [ "${rp}" = "produto-z" ]; then
+    record_pass "dissect: (g2) adotado ⇒ regua padrao = id do repo (produto-z), nao o framework: do carimbo"
+  else record_fail "dissect: (g2)" "esperado produto-z, veio '${rp}'"; fi
+
+  # (g3) PORTA (kind: door) é projeção do core ⇒ onion, mesmo com papel diferente de source.
+  #      MUTANTE: sem o ramo kind:door, a porta teria régua = o nome do repo dela.
+  local dr; dr="$(mktemp -d)"; git -C "${dr}" init -q -b main 2>/dev/null
+  mkdir -p "${dr}/.claude"; printf 'framework: onion-evolve\nrole: standalone\nkind: door\n' > "${dr}/.claude/.onion-version"
+  rp="$(bash "${sut}" "${dr}" --regua-padrao 2>&1 | cut -f1)" || rp="(rc!=0)"; rm -rf "${dr}"
+  if [ "${rp}" = "onion" ]; then
+    record_pass "dissect: (g3) porta (kind: door) ⇒ regua padrao onion"
+  else record_fail "dissect: (g3)" "esperado onion na porta, veio '${rp}'"; fi
+
+  # (g4) CAMINHO DE PRODUÇÃO: o --markdown (o que a superfície injeta) DIZ a régua padrão.
+  _adplan pself produto-z ""
+  if ado="$(bash "${sut}" "${ad}" --markdown 2>&1)"; then adrc=0; else adrc=$?; fi
+  if [ "${adrc}" = "0" ] && grep -q 'régua padrão deste repo: \*\*produto-z\*\*' <<< "${ado}"; then
+    record_pass "dissect: (g4) --markdown injeta a linha 'regua padrao deste repo' com o id do adotado"
+  else record_fail "dissect: (g4)" "linha da regua padrao ausente (rc=${adrc}): $(_emit "${ado}" | head -c 300)"; fi
+
+  # (k1) ESCOPO na coluna 10 do --tsv; ausente = `-`. MUTANTE: escopo ignorado deixa a coluna `-`
+  #      e o reuso juntaria um N3 do componente com um N3 do repo inteiro.
+  _adplan pscope produto-z "services/auth/**"
+  if ado="$(bash "${sut}" "${ad}" --tsv 2>&1)"; then adrc=0; else adrc=$?; fi
+  local sc_s sc_n
+  sc_s="$(printf '%s\n' "${ado}" | awk -F'\t' '$1=="pscope"{print $10; exit}')"
+  sc_n="$(printf '%s\n' "${ado}" | awk -F'\t' '$1=="pself"{print $10; exit}')"
+  if [ "${sc_s}" = "services/auth/**" ] && [ "${sc_n}" = "-" ]; then
+    record_pass "dissect: (k1) x_dissect_scope sai na coluna escopo; ausente ⇒ '-' (o repo inteiro)"
+  else record_fail "dissect: (k1)" "esperado services/auth/** e '-', veio '${sc_s}' e '${sc_n}'"; fi
+
+  # (g5) LEITOR, `=.` IMPLÍCITO: plano com a régua = o próprio repo (produto-z) mede AQUI sem
+  #      --against-root ⇒ rc 0 COMPLETO com 5:existe. MUTANTE: sem o `=.` implícito o plano sai
+  #      rc 3 NAO-MEDIDO(repo-do-alvo-sem-raiz), como se o próprio repo fosse um repo alheio.
+  if ado="$(bash "${plans_sut}" "${ad}" pself 2>&1)"; then adrc=0; else adrc=$?; fi
+  if [ "${adrc}" = "0" ] && grep -q 'COMPLETO' <<< "${ado}" && grep -q '5:existe' <<< "${ado}"; then
+    record_pass "dissect: (g5) regua = o proprio repo ⇒ dissect-plans mede aqui sem --against-root (=. implicito)"
+  else record_fail "dissect: (g5)" "esperado rc=0 COMPLETO 5:existe, veio rc=${adrc}: $(_emit "${ado}" | head -c 300)"; fi
+
+  # (k2) ESCOPO RESPEITADO no leitor: escopo que casa arquivo rastreado ⇒ COMPLETO; escopo que não
+  #      casa nada no repo da régua ⇒ rc 1 INCOMPLETO(escopo-sem-arquivo). MUTANTE: sem a conferência
+  #      do escopo, o plano para um componente inexistente sai COMPLETO.
+  local k2a k2b
+  if ado="$(bash "${plans_sut}" "${ad}" pscope 2>&1)"; then adrc=0; else adrc=$?; fi
+  k2a="${adrc}:$(grep -c 'COMPLETO' <<< "${ado}")"
+  _adplan pghostscope produto-z "services/billing/**"
+  if ado="$(bash "${plans_sut}" "${ad}" pghostscope 2>&1)"; then adrc=0; else adrc=$?; fi
+  k2b="${adrc}"
+  if [ "${k2a}" = "0:1" ] && [ "${k2b}" = "1" ] && grep -q 'INCOMPLETO(escopo-sem-arquivo)' <<< "${ado}"; then
+    record_pass "dissect: (k2) escopo que casa arquivo ⇒ COMPLETO; escopo sem arquivo no repo da regua ⇒ INCOMPLETO(escopo-sem-arquivo)"
+  else record_fail "dissect: (k2)" "esperado 0:1 e rc=1 escopo-sem-arquivo, veio '${k2a}' e rc=${k2b}: $(_emit "${ado}" | head -c 300)"; fi
+
+  # ── casos da passada adversarial de 2026-10-15 (cada um mata um mutante que sobrevivia) ──
+  # (g7) PLUGIN: o census mora FORA do repo medido e o projeto não tem carimbo ⇒ a régua é o id dele,
+  #      nunca `onion`. MUTANTE: "sem carimbo ⇒ core" sem conferir onde o script mora daria onion.
+  local pl; pl="$(mktemp -d)"; git -C "${pl}" init -q -b main 2>/dev/null
+  git -C "${pl}" remote add origin "git@example.org:acme/plugin-user.git" 2>/dev/null
+  rp="$(bash "${sut}" "${pl}" --regua-padrao 2>&1 | cut -f1)" || rp="(rc!=0)"; rm -rf "${pl}"
+  if [ "${rp}" = "plugin-user" ]; then
+    record_pass "dissect: (g7) census fora do repo medido (plugin) e sem carimbo ⇒ regua = id do projeto, nao onion"
+  else record_fail "dissect: (g7)" "esperado plugin-user, veio '${rp}'"; fi
+
+  # (g8) `role: source` SEM kind: door ⇒ onion. MUTANTE: sem o ramo source, cairia no id do remote.
+  # (g9) fonte DESACOPLADA (`role: source` + `decoupled_from:`) é soberana ⇒ o id dela, não onion.
+  local sr; sr="$(mktemp -d)"; git -C "${sr}" init -q -b main 2>/dev/null
+  git -C "${sr}" remote add origin "https://example.org/acme/soberano.git" 2>/dev/null
+  mkdir -p "${sr}/.claude"; printf 'framework: x\r\nrole: source\r\n' > "${sr}/.claude/.onion-version"
+  rp="$(bash "${sut}" "${sr}" --regua-padrao 2>&1 | cut -f1)" || rp="(rc!=0)"
+  if [ "${rp}" = "onion" ]; then
+    record_pass "dissect: (g8) carimbo role: source (com CRLF) sem kind: door ⇒ onion"
+  else record_fail "dissect: (g8)" "esperado onion, veio '${rp}'"; fi
+  printf 'framework: x\nrole: source\ndecoupled_from: onion-evolve\n' > "${sr}/.claude/.onion-version"
+  rp="$(bash "${sut}" "${sr}" --regua-padrao 2>&1 | cut -f1)" || rp="(rc!=0)"; rm -rf "${sr}"
+  if [ "${rp}" = "soberano" ]; then
+    record_pass "dissect: (g9) fonte desacoplada (decoupled_from) ⇒ regua = o id dela, nao onion"
+  else record_fail "dissect: (g9)" "esperado soberano, veio '${rp}'"; fi
+
+  # (k3) escopo com VÍRGULA: só o 2º pathspec casa ⇒ COMPLETO. MUTANTE: o escopo lido como um
+  #      pathspec único não casaria nada e reprovaria um componente que existe.
+  _adplan pcomma produto-z "services/billing/**, services/auth/**"
+  if ado="$(bash "${plans_sut}" "${ad}" pcomma 2>&1)"; then adrc=0; else adrc=$?; fi
+  if [ "${adrc}" = "0" ] && grep -q 'COMPLETO' <<< "${ado}"; then
+    record_pass "dissect: (k3) escopo com virgula: basta um pathspec casar ⇒ COMPLETO"
+  else record_fail "dissect: (k3)" "esperado rc=0 COMPLETO, veio rc=${adrc}: $(_emit "${ado}" | head -c 300)"; fi
+
+  # (k6) escopo SÓ de exclusão casaria o repo inteiro ⇒ INCOMPLETO(escopo-sem-pathspec-positivo).
+  _adplan pexcl produto-z ":(exclude)services/auth/**"
+  if ado="$(bash "${plans_sut}" "${ad}" pexcl 2>&1)"; then adrc=0; else adrc=$?; fi
+  if [ "${adrc}" = "1" ] && grep -q 'escopo-sem-pathspec-positivo' <<< "${ado}"; then
+    record_pass "dissect: (k6) escopo so de exclusao ⇒ INCOMPLETO(escopo-sem-pathspec-positivo)"
+  else record_fail "dissect: (k6)" "esperado rc=1 escopo-sem-pathspec-positivo, veio rc=${adrc}: $(_emit "${ado}" | head -c 300)"; fi
+
+  # Repo de OUTRA régua, onde o `alvo` existe SEM a peça 5 e NÃO há services/auth/.
+  local otr; otr="$(mktemp -d)"; git -C "${otr}" init -q -b main 2>/dev/null
+  mkdir -p "${otr}/.claude/commands/meta"
+  printf -- '---\ndescription: alvo no outro repo\n---\nSem destino declarado.\n' > "${otr}/.claude/commands/meta/alvo.md"
+  git -C "${otr}" add -A >/dev/null 2>&1
+  # (k4) escopo de régua ALHEIA se confere no repo DELA: services/auth existe aqui, não lá ⇒
+  #      escopo-sem-arquivo. MUTANTE: conferir o escopo neste repo daria COMPLETO.
+  _adplan palien outro "services/auth/**"
+  if ado="$(bash "${plans_sut}" "${ad}" palien --against-root "outro=${otr}" 2>&1)"; then adrc=0; else adrc=$?; fi
+  if [ "${adrc}" = "1" ] && grep -q 'escopo-sem-arquivo' <<< "${ado}"; then
+    record_pass "dissect: (k4) escopo de regua alheia conferido no repo DELA (existe aqui, nao la) ⇒ escopo-sem-arquivo"
+  else record_fail "dissect: (k4)" "esperado rc=1 escopo-sem-arquivo, veio rc=${adrc}: $(_emit "${ado}" | head -c 300)"; fi
+  # (k5) --against-root EXPLÍCITO para a própria régua VENCE o `=.` implícito: mede no outro repo
+  #      (5:falta lá). MUTANTE: o ramo "este repo" sem conferir a raiz mediria aqui (5:existe).
+  if ado="$(bash "${plans_sut}" "${ad}" pself --against-root "produto-z=${otr}" 2>&1)"; then adrc=0; else adrc=$?; fi
+  if [ "${adrc}" = "0" ] && grep -q '5:falta' <<< "${ado}" && ! grep -q '(este repo)' <<< "${ado}"; then
+    record_pass "dissect: (k5) --against-root explicito da propria regua vence o =. implicito"
+  else record_fail "dissect: (k5)" "esperado rc=0 5:falta fora deste repo, veio rc=${adrc}: $(_emit "${ado}" | head -c 300)"; fi
+  rm -rf "${otr}"
+
+  # (g10) census de PIN ANTIGO (ignora --regua-padrao e imprime markdown) ⇒ o leitor recusa rc 3,
+  #       nunca toma o cabeçalho do markdown como régua. MUTANTE: `cut -f1` sem conferir a forma.
+  cp "${ad}/.claude/validation/dissect-census.sh" "${ad}/census.real"
+  printf '#!/usr/bin/env bash\necho "# censo de dissecações · 1 grafo(s) rastreado(s) · 1 dissecação(ões) declarada(s)"\n' \
+    > "${ad}/.claude/validation/dissect-census.sh"
+  if ado="$(bash "${plans_sut}" "${ad}" pself 2>&1)"; then adrc=0; else adrc=$?; fi
+  mv "${ad}/census.real" "${ad}/.claude/validation/dissect-census.sh"
+  if [ "${adrc}" = "3" ] && grep -q 'não derivou a régua' <<< "${ado}"; then
+    record_pass "dissect: (g10) census antigo sem --regua-padrao ⇒ dissect-plans recusa rc=3 (forma conferida)"
+  else record_fail "dissect: (g10)" "esperado rc=3 nao derivou, veio rc=${adrc}: $(_emit "${ado}" | head -c 300)"; fi
+
+  # (g6) LEITOR SEM O CENSO (que deriva a régua padrão) ⇒ rc 3: adivinhar a régua seria medir outra.
+  rm -f "${ad}/.claude/validation/dissect-census.sh"
+  if ado="$(bash "${plans_sut}" "${ad}" pself 2>&1)"; then adrc=0; else adrc=$?; fi
+  if [ "${adrc}" = "3" ] && grep -q 'deriva a régua padrão' <<< "${ado}"; then
+    record_pass "dissect: (g6) dissect-plans sem dissect-census.sh ⇒ rc=3 (nao adivinha a regua padrao)"
+  else record_fail "dissect: (g6)" "esperado rc=3, veio rc=${adrc}: $(_emit "${ado}" | head -c 200)"; fi
+  rm -rf "${ad}"
 
   # (p6) sem forge-census.sh ⇒ rc=3: pecas que nao podem ser MEDIDAS nao viram plano julgado.
   rm -f "${d}/.claude/validation/forge-census.sh"

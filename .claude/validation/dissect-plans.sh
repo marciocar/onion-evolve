@@ -34,6 +34,14 @@
 # (b) ESTUDO NÃO É PLANO: grafo com `meta.x_dissect_mode: study` para no N2 sem veredito; nó
 #     `x_absorb_*` dentro dele contradiz o modo e sai INCOMPLETO(estudo-nao-tem-plano). Modo que
 #     este leitor não conhece sai INCOMPLETO(modo-desconhecido) — nunca lido como modo normal.
+# (c) RÉGUA PADRÃO = O PRÓPRIO REPO, e ESCOPO (SAC-147, decisão de 2026-10-15): num adotado o
+#     dissect sem `--against` grava a régua = o id DESTE repo, derivado pelo dissect-census.sh
+#     `--regua-padrao` (a SSOT da derivação — este leitor a chama, não a repete). Plano dessa régua
+#     se mede AQUI, com `=.` implícito: o operador não passa `--against-root` para medir o próprio
+#     repo (passar continua valendo e vence). Grafo com `meta.x_dissect_scope: <pathspec[,…]>`
+#     escreveu o plano para um COMPONENTE do repo; o escopo tem de casar arquivo RASTREADO no repo
+#     da régua, ou o plano sai INCOMPLETO(escopo-sem-arquivo): plano para um componente que não
+#     existe lá é plano para outro repo. Escopo de régua sem raiz não é medido (já é NAO-MEDIDO).
 #
 # Uso:  bash .claude/validation/dissect-plans.sh [<repo>] [<ferramenta>] [--against-root <repo>=<caminho>]...
 # Exit: 0 = todo plano listado COMPLETO (ou não há plano) · 1 = há plano INCOMPLETO ·
@@ -77,7 +85,8 @@ for rel in "${GRAPHS[@]}"; do
   [ -n "${tool}" ] || continue
   against="$(sed -n 's/^[[:space:]]*x_dissect_against:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#]*\).*/\1/p' "${f}" | head -1 | sed 's/[[:space:]]*$//')"
   mode="$(sed -n 's/^[[:space:]]*x_dissect_mode:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#[:space:]]*\).*/\1/p' "${f}" | head -1)"
-  graphs_by_tool="${graphs_by_tool}$(printf '%s\t%s\t%s\t%s' "${tool}" "${rel}" "${against:-onion}" "${mode:--}")
+  scope="$(sed -n 's/^[[:space:]]*x_dissect_scope:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#]*\).*/\1/p' "${f}" | head -1 | sed 's/[[:space:]]*$//')"
+  graphs_by_tool="${graphs_by_tool}$(printf '%s\t%s\t%s\t%s\t%s' "${tool}" "${rel}" "${against:-onion}" "${mode:--}" "${scope:--}")
 "
 done
 
@@ -90,6 +99,22 @@ FORGE_CENSUS="${REPO}/.claude/validation/forge-census.sh"
 if ! fc_tsv="$(bash "${FORGE_CENSUS}" "${REPO}" --tsv 2>/dev/null)"; then
   echo "dissect-plans: forge-census.sh não pôde medir — sem peças medidas não há plano a julgar. Recusa." >&2; exit 3
 fi
+
+# RÉGUA PADRÃO deste repo: lida do dissect-census.sh (SSOT da derivação). Sem ele não se sabe
+# qual régua é "o próprio repo", e adivinhar seria medir outra régua — recusa, como sem forge-census.
+DISSECT_CENSUS="${REPO}/.claude/validation/dissect-census.sh"
+[ -f "${DISSECT_CENSUS}" ] \
+  || { echo "dissect-plans: precisa do dissect-census.sh (deriva a régua padrão deste repo) e ele não está em ${REPO}. Recusa." >&2; exit 3; }
+# FORMA conferida: um dissect-census de pin ANTIGO ignora `--regua-padrao` e imprime o markdown, cujo
+# cabeçalho viraria "régua" (achado da passada adversarial). Só vale `<régua>\t<origem>` de id limpo.
+_rp_line="$(bash "${DISSECT_CENSUS}" "${REPO}" --regua-padrao 2>/dev/null | head -1)" || _rp_line=""
+SELF_REGUA=""
+if [[ "${_rp_line}" == *$'\t'* ]] && [[ "${_rp_line%%$'\t'*}" =~ ^[A-Za-z0-9._-]+$ ]]; then SELF_REGUA="${_rp_line%%$'\t'*}"; fi
+[ -n "${SELF_REGUA}" ] \
+  || { echo "dissect-plans: dissect-census.sh --regua-padrao não derivou a régua deste repo. Recusa." >&2; exit 3; }
+# `=.` IMPLÍCITO: a régua = o próprio repo mede aqui, sem o operador passar. Explícito vence (vem antes).
+AGAINST_ROOTS="${AGAINST_ROOTS}${SELF_REGUA}	.
+"
 
 # forge-census do REPO DO ALVO (régua != onion), medido uma vez por alvo e guardado em arquivo.
 _fc_cache="$(mktemp -d)"; trap 'rm -rf "${_fc_cache}"' EXIT
@@ -104,18 +129,26 @@ _fc_of() {  # $1=régua → imprime o tsv do alvo; rc 4 = sem raiz, rc 5 = o cen
   [ ! -f "${_fc_cache}/${key}.fail" ] || return 5
   cat "${_fc_cache}/${key}.tsv"
 }
+_root_of() {  # $1=régua → imprime a raiz absoluta do repo da régua (onion = este repo); rc 4 = sem raiz
+  local root
+  if [ "$1" = "onion" ]; then printf '%s' "${REPO}"; return 0; fi
+  root="$(printf '%s' "${AGAINST_ROOTS}" | awk -F'\t' -v a="$1" '$1==a {print $2; exit}')"
+  [ -n "${root}" ] || return 4
+  case "${root}" in /*) ;; *) root="${REPO}/${root}" ;; esac
+  printf '%s' "${root}"
+}
 
 plans=""
-while IFS=$'\t' read -r tool rel against mode; do
+while IFS=$'\t' read -r tool rel against mode scope; do
   [ -n "${tool}" ] || continue
   [ -z "${TOOL_FILTER}" ] || [ "${tool}" = "${TOOL_FILTER}" ] || continue
   # Um registro por nó que declara `x_absorb_target:`. Campos em ordem fixa; vazio vira "-".
-  plans="${plans}$(awk -v tool="${tool}" -v rel="${rel}" -v against="${against}" -v mode="${mode}" '
+  plans="${plans}$(awk -v tool="${tool}" -v rel="${rel}" -v against="${against}" -v mode="${mode}" -v scope="${scope}" '
     function flush() {
       if (id != "" && tgt != "")
-        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", tool, id, tgt,
+        printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", tool, id, tgt,
           (pcs==""?"-":pcs), (org==""?"-":org), (lic==""?"-":lic), (par==""?"-":par), (frm==""?"-":frm), rel,
-          against, mode
+          against, mode, scope
       id=""; tgt=""; pcs=""; org=""; lic=""; par=""; frm=""
     }
     function val(line) {
@@ -135,7 +168,7 @@ while IFS=$'\t' read -r tool rel against mode; do
 done <<< "${graphs_by_tool}"
 
 n_plans=0; n_incomplete=0; n_unmeasured=0; out=""
-while IFS=$'\t' read -r tool id tgt pcs org lic par frm rel against mode; do
+while IFS=$'\t' read -r tool id tgt pcs org lic par frm rel against mode scope; do
   [ -n "${id}" ] || continue
   n_plans=$((n_plans + 1)); why=""; unmeasured=""
   # ESTUDO NÃO É PLANO — e o modo desconhecido não vira modo normal por omissão.
@@ -180,7 +213,10 @@ while IFS=$'\t' read -r tool id tgt pcs org lic par frm rel against mode; do
   row=""; measured=""
   # RÉGUA: `onion` mede neste repo (o de sempre); outro alvo mede no repo DELE.
   target_tsv="${fc_tsv}"; target_repo="este repo"
-  if [ "${against}" != "onion" ]; then
+  if [ "${against}" = "${SELF_REGUA}" ] && [ "$(_root_of "${against}")" = "${REPO}/." ]; then
+    # régua = o próprio repo, sem raiz explícita: mede AQUI (o `=.` implícito), com o censo já feito.
+    target_repo="${against} (este repo)"
+  elif [ "${against}" != "onion" ]; then
     target_repo="${against}"
     if target_tsv="$(_fc_of "${against}")"; then :; else
       case "$?" in
@@ -188,6 +224,24 @@ while IFS=$'\t' read -r tool id tgt pcs org lic par frm rel against mode; do
         *) unmeasured="forge-census-nao-mediu-o-repo-do-alvo ${against}" ;;
       esac
       target_tsv=""
+    fi
+  fi
+  # ESCOPO: o componente tem de existir (arquivo RASTREADO) no repo da régua. Sem raiz, não se mede.
+  if [ "${scope}" != "-" ] && [ -z "${unmeasured}" ] && scope_root="$(_root_of "${against}")"; then
+    # Os pathspecs vão JUNTOS ao ls-files (as exclusões valem sobre os positivos); escopo só de
+    # exclusão (`:(exclude)…`, `:!…`, `:^…`) casaria o repo inteiro e não nomeia componente nenhum.
+    _sc_list=(); _sc_pos=0
+    IFS=',' read -r -a _sc_specs <<< "${scope}"
+    for _sc in "${_sc_specs[@]}"; do
+      _sc="$(printf '%s' "${_sc}" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//')"
+      [ -n "${_sc}" ] || continue
+      _sc_list+=("${_sc}")
+      case "${_sc}" in ':(exclude)'*|':!'*|':^'*) ;; *) _sc_pos=$((_sc_pos + 1)) ;; esac
+    done
+    if [ "${_sc_pos}" -eq 0 ]; then why="${why} escopo-sem-pathspec-positivo"
+    else
+      _sc_n="$(git -C "${scope_root}" ls-files -- "${_sc_list[@]}" 2>/dev/null | wc -l)"
+      [ "${_sc_n}" -gt 0 ] || why="${why} escopo-sem-arquivo"
     fi
   fi
   case "${tgt}" in
@@ -209,7 +263,7 @@ while IFS=$'\t' read -r tool id tgt pcs org lic par frm rel against mode; do
   if [ -n "${why}" ]; then status="INCOMPLETO(${why# })"; n_incomplete=$((n_incomplete + 1))
   elif [ -n "${unmeasured}" ]; then status="NAO-MEDIDO(${unmeasured})"; n_unmeasured=$((n_unmeasured + 1))
   else status="COMPLETO"; fi
-  out="${out}- **${tool}** · \`${id}\` → alvo \`${tgt}\` no repo \`${target_repo}\` (régua ${against}) · ${status}
+  out="${out}- **${tool}** · \`${id}\` → alvo \`${tgt}\` no repo \`${target_repo}\` (régua ${against} · escopo ${scope}) · ${status}
   peças pedidas (medidas agora pelo forge-census): ${measured:-—}
   forma: ${frm} · licença: ${lic} · origem: ${org}
   paridade: ${par}

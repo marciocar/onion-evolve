@@ -7,7 +7,8 @@ meta:
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: programa de trabalho
   # ═══ TETO: 10 NÓS ═══
-  #   2 em 2026-10-08; 4 em 2026-10-11 (dogfood do Conductor + desenho da costura).
+  #   2 em 2026-10-08; 4 em 2026-10-11 (dogfood do Conductor + desenho da costura);
+  #   3 em 2026-10-14 (selos do /meta:decide); 2 em 2026-10-15 (régua = o próprio repo, SAC-147).
 nodes:
   - id: E_DISSECT_QUASE_NAO_USADO
     node_type: evidence
@@ -109,6 +110,39 @@ nodes:
       locator: "pergunta com opções de 2026-10-14: «E o modo só de estudo, sem cobrar veredito?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
+  - id: D_DISSECT_REGUA_PADRAO_E_O_PROPRIO_REPO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "decisão do maestro em 2026-10-15, por pergunta com opções (/meta:decide): escolhida «Sobre o dissect, realmente o padrão deve ser o próprio repo, assim se for aqui no Onion Evolve ele vai fazer sobre o Onion, se for de um produto vai ser sobre o produto. Uma observação, mesmo dentro do onion ou de um produto pode não ser sobre o repo inteiro e sim somente sobre uma ferramenta, funcionalidade ou biblioteca. Como por exemplo quando a Grana.Ai que trocou o KeyCloack pelo Logto.»"
+    label: "a régua padrão do /meta:dissect é o próprio repo onde ele roda (no core, o Onion; num produto, o produto), e ela pode ser estreitada a um componente do repo (ferramenta, funcionalidade ou biblioteca); issue SAC-147"
+    narrative: "Selado por /meta:decide em 2026-10-15: escolhida «Sobre o dissect, realmente o padrão deve ser o próprio repo, assim se for aqui no Onion Evolve ele vai fazer sobre o Onion, se for de um produto vai ser sobre o produto. Uma observação, mesmo dentro do onion ou de um produto pode não ser sobre o repo inteiro e sim somente sobre uma ferramenta, funcionalidade ou biblioteca. Como por exemplo quando a Grana.Ai que trocou o KeyCloack pelo Logto.» (resposta livre do maestro, fora das opções oferecidas); descartadas: «régua padrão fixa no Onion em qualquer repo (o padrão de --against selado em 2026-10-14)» · «régua sempre sobre o repo inteiro»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-15: «Qual é a régua padrão do dissect fora do core, e ela pode ser só uma parte do repo?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-15"
+      locality: "pessoa"
+  - id: E_REGUA_PADRAO_DERIVADA_NAO_PELO_FRAMEWORK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-15"
+    verified_against: "cat .claude/.onion-version de 4 adotados locais em 2026-10-15: 3 carregam framework igual ao nome do repo e 1 carrega framework: onion-evolve (o nome da fonte); bash .claude/validation/dissect-census.sh . --regua-padrao no core devolve onion e num adotado de fixture devolve o nome do remote origin"
+    label: "a régua padrão sai do carimbo e do remote origin, não do campo framework: — um adotado medido carrega o nome da fonte nele, e a régua dele sairia o Onion"
+    narrative: "Implementação do SAC-147: o dissect-census.sh --regua-padrao é a SSOT da derivação (sem carimbo, role source ou kind door dá onion; outro papel dá o nome do remote origin, com a pasta raiz como fallback) e o dissect-plans.sh a chama em vez de repetir a regra, medindo a régua = o próprio repo com raiz implícita. O escopo (--scope) é pathspec do git porque o forge-census só mede candidatos do framework (skills e comandos meta), não um componente de produto; caminho é o que o leitor confere em git ls-files. A passada adversarial pegou três furos, curados com caso e mutante: sem carimbo só é o core quando o medidor mora no repo medido (no plugin, a régua de um produto saía onion); a fonte desacoplada é soberana; e um census de pin antigo, que ignora --regua-padrao, fazia o leitor tomar o cabeçalho do markdown como régua."
+    trace: ".claude/validation/dissect-census.sh"
+    provenance:
+      source: ".claude/validation/dissect-census.sh e os carimbos .claude/.onion-version dos adotados locais"
+      locator: "função _self_regua e casos g1-g6, k1-k2 de run_dissect_selftests"
+      method: "medição: carimbos lidos e censo rodado no core e num adotado de fixture em 2026-10-15"
+      locality: "repo"
 edges:
   - from: E_DISSECT_QUASE_NAO_USADO
     to: Q_COSTURA_DISSECT_FORGE
@@ -128,6 +162,12 @@ edges:
   - from: D_DISSECT_MODO_ESTUDO
     to: D_DISSECT_REGUA_POR_ALVO
     edge_type: TRACES_TO
+  - from: D_DISSECT_REGUA_PADRAO_E_O_PROPRIO_REPO
+    to: D_DISSECT_REGUA_POR_ALVO
+    edge_type: TRACES_TO
+  - from: E_REGUA_PADRAO_DERIVADA_NAO_PELO_FRAMEWORK
+    to: D_DISSECT_REGUA_PADRAO_E_O_PROPRIO_REPO
+    edge_type: SUPPORTS
 
 external_edges:
   - from: E_DOGFOOD_CONDUCTOR_ATE_N4

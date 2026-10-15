@@ -51,7 +51,7 @@ ao N4 é insano.
 ## Uso
 
 ```
-/meta:dissect <ferramenta|lista> [--level N=3] [--budget <tokens>] [--against <repo>] [--study]
+/meta:dissect <ferramenta|lista> [--level N=3] [--budget <tokens>] [--against <repo>] [--scope <pathspec[,pathspec]>] [--study]
 ```
 
 `--level` **para** no nível pedido. Sem argumento, o default é **N3** (julga transferibilidade e
@@ -59,13 +59,26 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
 
 ## A régua e o modo estudo (decisões do maestro de 2026-10-14)
 
-- **`--against <repo>` — a régua.** Sem ele, a régua é o **Onion** e nada muda. Com ele (num hub
-  ou num adotado), o **N1** pergunta "o que ela faz que o **alvo** não faz", o **N3** julga
+- **A régua padrão é o PRÓPRIO repo** (decisão do maestro de 2026-10-15, SAC-147). Sem
+  `--against`, a régua é o repo onde o dissect roda, e ela é **derivada pelo censo, não digitada**:
+  a linha "régua padrão deste repo" do censo injetado acima. No core (sem carimbo, `role: source`)
+  e nas portas ela é o **Onion**, como sempre; num adotado ou hub é o **id do repo** (o nome do
+  remote `origin`). Grave **sempre** `meta.x_dissect_against:` com ela, mesmo quando é o padrão.
+- **`--against <repo>` — outra régua.** Com ele (num hub, medindo para outro repo), o **N1** pergunta "o que ela faz que o **alvo** não faz", o **N3** julga
   transferir **para o alvo**, e o **N4** escreve os nós `x_absorb_*` para o **repo do alvo**, não
   para o framework. N0 e N2 descrevem a ferramenta e não mudam com a régua; N1, N3 e N4 mudam, e
   por isso nível pago só se reusa **na mesma régua** (o censo mostra a coluna). Grave
   `meta.x_dissect_against: <repo>`. A costura com o forge segue: o `/meta:forge` roda no hub e lê
   os planos, medindo as peças no repo do alvo pela raiz que você passa ao leitor (passo 4b).
+- **`--scope <pathspec[,pathspec]>` — um componente do repo.** A régua pode ser só uma ferramenta,
+  funcionalidade ou biblioteca do repo, não ele inteiro (ex.: **trocar o provedor de identidade de
+  um produto**). O escopo é **pathspec do git** relativo à raiz do repo da régua (`services/auth/**`,
+  vários separados por vírgula), não um nome: caminho é o que o N1 lê, o N3 compara e o leitor de
+  planos confere (arquivo rastreado que casa), e um nome solto ninguém mede. Com ele, o **N1**
+  pergunta "o que ela faz que **este componente** não faz", o **N3** julga substituir ou transferir
+  **para o componente**, e o **N4** escreve o plano para ele. Grave `meta.x_dissect_scope:`. Nível
+  pago só se reusa na **mesma régua E no mesmo escopo** (o censo mostra as duas colunas; `-` = o
+  repo inteiro).
 - **`--study` — estudo.** Para no **N2** (identidade, capacidade, mecanismo) e o N2 é medido
   **rodando a ferramenta isolada**, sem veredito de absorção. No lugar do nó `decision` fica um nó
   `question` **aberto** "adotar?". Grave `meta.x_dissect_mode: study`. O censo o mostra como
@@ -100,14 +113,18 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
    `bash .claude/validation/dissect-plans.sh . <ferramenta>` (rc 1 = plano INCOMPLETO,
    com o motivo). Com `--against`, passe a raiz do alvo, que o leitor **nunca adivinha**:
    `... dissect-plans.sh . <ferramenta> --against-root <repo>=<caminho>` (sem ela, rc 3 =
-   NAO-MEDIDO, porque medir no repo errado é medir outra régua). Rode-o antes do passo 5 e só
+   NAO-MEDIDO, porque medir no repo errado é medir outra régua). Para a régua = o **próprio
+   repo** (o padrão, num adotado), a raiz é `.` **implícita**: não passe nada. Grafo com
+   `x_dissect_scope` cujo escopo não casa arquivo rastreado no repo da régua sai
+   INCOMPLETO(escopo-sem-arquivo). Rode-o antes do passo 5 e só
    siga com rc 0. O leitor mora do lado do forge
    (core e standalone): no plugin `onion-meta` o forge não viaja, o leitor também não, e o plano
    fica no grafo esperando quem o forje.
 5. **DESTINO (peça 5)** — `write(KG)` em
    `docs/evolution/dissect/<ferramenta>-<AAAA-MM>/<ferramenta>-<AAAA-MM>.kg.yaml` com os
    marcadores que o censo lê (`meta.x_dissect_tool:`, `x_dissect_level:` por nó, `x_dissect_verdict:` no
-   nó de decisão; e, quando houver, `meta.x_dissect_against:` e `meta.x_dissect_mode: study`), `meta.review_after` pela cadência (ferramenta/preço 30d), `# kg-backlog-guard:
+   nó de decisão; `meta.x_dissect_against:` sempre; e, quando houver, `meta.x_dissect_scope:` e
+   `meta.x_dissect_mode: study`), `meta.review_after` pela cadência (ferramenta/preço 30d), `# kg-backlog-guard:
    on` e `# ═══ TETO: N NÓS ═══`. **`kg-radar` exit 0 é obrigatório** antes de qualquer prosa.
    O `SYNTHESIS.md` é **projeção**, com o **contrato de custo** no frontmatter: `kg:` · `run_id` ·
    `tokens` · `agents` · `duration_min`.

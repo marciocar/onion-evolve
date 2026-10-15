@@ -63,7 +63,8 @@ O leitor roda na carga e mede as peças do alvo no `forge-census.sh`:
 - `costurar` = adapter SDAAL; nunca cópia. `vendor-pin` só para licença que o permita.
 - Plano com **régua de outro repo** (`x_dissect_against`, decisão de 2026-10-14) sai NAO-MEDIDO na
   carga acima: as peças se medem no repo do alvo, e a raiz dele é passada, nunca adivinhada —
-  `bash .claude/validation/dissect-plans.sh . <ferramenta> --against-root <repo>=<caminho>`. Plano
+  `bash .claude/validation/dissect-plans.sh . <ferramenta> --against-root <repo>=<caminho>` (a régua
+  = o próprio repo, padrão num adotado, mede aqui sem raiz passada). Plano
   dentro de grafo de **estudo** é recusado: estudo não decide, então não emite plano.
 
 ## Procedimento
