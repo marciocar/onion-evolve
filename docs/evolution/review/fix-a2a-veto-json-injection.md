@@ -2,7 +2,8 @@
 branch: fix/a2a-veto-json-injection
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8d2e962a4743cc39bf72565768269d4d8cecb72ceefec9719e293cf1198bcb3d
+reviewed_code_sha256: 426051da7a1200473a1c114840475cfd75390512905d0610453fbca955ceffc5
 findings_total: 8
 findings_real: 5
 tokens: 152253
