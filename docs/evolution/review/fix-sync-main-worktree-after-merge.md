@@ -2,7 +2,8 @@
 branch: fix/sync-main-worktree-after-merge
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 752d215d32e5d400b55afc8dc94e7feee23d55259bb46681cd7efc306e9333e7
+reviewed_code_sha256: a9e907bd761418b18d614ff91d8afac17d7aa5ae2b78dc374433eb1dde02dd77
 findings_total: 2
 findings_real: 2
 tokens: 0
