@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**497 itens abertos** em 106 grafo(s) com aberto (de 135 no escopo) · 107 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**498 itens abertos** em 106 grafo(s) com aberto (de 135 no escopo) · 107 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -194,6 +194,14 @@
 | 3.6 | `C_OPCAO_C_DURANTE_GATE_E_POLITICA` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO C — DURANTE, GATE/POLÍTICA: vender o veredito reprovador determinístico (exit 2 de hook, 91 regras, catracas por basel |
 | 1.8 | `C_OPCAO_F_NENHUMA_AGORA_COM_GATILHO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO F — NENHUMA AGORA, e só vale com GATILHO, DATA e ORÇAMENTO nomeados (sem os três é adiamento com outro nome). A FAVO |
 
+## a2a-configurator-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 51.0 | `Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL` | a2a-configurator-2026-10 | um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do |
+| 4.8 | `D_PISO_2048_NO_REGISTRO_3072_NO_KEYGEN` | a2a-configurator-2026-10 | o validador do registro aceita pública RSA a partir de 2048 bits, e o keygen gera 3072: subir o piso do registro para 3072 reprov |
+| 4.8 | `Q_MANUAL_DO_A2A` | a2a-configurator-2026-10 | o configurador A2A ganha um manual para os três leitores (operador do core, operador do hub e membro que entra), escrito a partir |
+
 ## slm-frameworks-2026-10 — 14 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -301,13 +309,6 @@
 | 6.0 | `C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT` | onion-slm-2026-10 | LEITURA (embedders): EmbeddingGemma (308M, 100+ linguas) e Qwen3-Embedding (0.6B/8B) HABILITAM busca semantica local sobre o corpu |
 | 0.9 | `C_CHAT_BGE_M3_MTEB_63` | onion-slm-2026-10 | AFIRMACAO DO CHAT: bge-m3 = 63,0 no MTEB (via premai.io). NAO VERIFICAVEL como comparacao: a primaria (card Qwen3-Embedding-0.6B)  |
 | 0.6 | `C_CHAT_QWEN37_PROPRIETARY` | onion-slm-2026-10 | AFIRMACAO DO CHAT (8): o Qwen3.7 e proprietario. NAO VERIFICAVEL: nem a listagem HF visivel nem o agregador mostram o 3.7; sem pri |
-
-## a2a-configurator-2026-10 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 42.0 | `Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL` | a2a-configurator-2026-10 | um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do |
-| 4.8 | `Q_MANUAL_DO_A2A` | a2a-configurator-2026-10 | o configurador A2A ganha um manual para os três leitores (operador do core, operador do hub e membro que entra), escrito a partir |
 
 ## poda-instruction-bloat-2026-09 — 6 item(ns)
 
