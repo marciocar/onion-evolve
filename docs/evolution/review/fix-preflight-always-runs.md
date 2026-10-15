@@ -2,7 +2,8 @@
 branch: fix/preflight-always-runs
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3a54936486cc11b9c6ac17faa23b5035a95f3a1e8516c65ace7045157180c9aa
+reviewed_code_sha256: 3b0040b49d12e6446dc16cd7ea302e47cdb52ec62b3d619ef139581f5d59dc2d
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
