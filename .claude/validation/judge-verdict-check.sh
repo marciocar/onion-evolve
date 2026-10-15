@@ -13,17 +13,21 @@
 # o juiz-fixo por eixo do /meta:radar, o veredito do /meta:dissect): a sessão grava o veredito do juiz
 # num JSON e roda isto antes de aplicar qualquer reprovação.
 #
-# ── SSOT: o bloco `// >>> overcoming-gate` do onion-research.js, EXECUTADO, nunca copiado ──────
-# Duas cópias da mesma regra divergem (a classe do vocabulário duplicado). Aqui o bloco é extraído
-# do workflow e rodado por `node`; a bancada confere que a cópia do census-workflow.mjs é idêntica.
+# ── SSOT: o bloco `// >>> overcoming-gate` do onion-research.js, CARREGADO aqui byte a byte ────────
+# Duas cópias da mesma regra divergem (a classe do vocabulário duplicado), e por isso a bancada confere
+# que a cópia deste script (no fim, entre os marcadores) e a do census-workflow.mjs são IDÊNTICAS à do
+# workflow. A cópia mora aqui porque este script viaja no plugin `onion` (o /meta:radar o cita) e o
+# workflow não viaja: lendo o workflow, o plugin sairia rc 3 sempre (achado do refutador, 2026-10-15).
 #
 # ── ENTRADA ────────────────────────────────────────────────────────────────────────────────
 #   { "criteria": [ {"id","when","check"} … ],      # PRÉ-REGISTRADOS antes do juiz rodar
 #     "verdicts": [ {"alvo", "<campo>": "<valor>", "superacao": {achada,o_que,medida},
 #                    "criterio": {id, comando}} … ] }
-#   NEGATIVO = o valor de `--field` (default: `veredito`, depois `verdict`) casar `--negative`
-#   (regex, default `^(REPROV|REFUT|REJEIT|PARQUE|INCONCLUS|NAO|NÃO|FALH|DRIFTED)`, sem caixa), OU
-#   `refuted: true`. INCONCLUSIVO entra de propósito: o critério 1 do teste da régua do markitdown
+#   NEGATIVO = o valor de `--field` (default: `veredito`, depois `verdict`) casar `--negative` (regex sem
+#   caixa; o default está em NEG abaixo, e LISTA FALHA PELO VOCABULÁRIO — passe o do seu juiz), OU
+#   `refuted: true` (booleano ou "true"), OU `survives: true` (objeção que fica de pé), exceto
+#   `kind: discarded-by-comodismo` — que é pedido de REABRIR, não reprovação. Veredito sem campo legível
+#   e lista vazia saem rc 3 (não pude medir), nunca rc 0. INCONCLUSIVO entra de propósito: o critério 1 do teste da régua do markitdown
 #   deu INCONCLUSIVO porque o desenho não apontava o que superaria o teste.
 #
 # Uso:  bash .claude/validation/judge-verdict-check.sh <verdicts.json> [--field F] [--negative RE]
@@ -37,18 +41,18 @@
 # ===========================================================================
 set -uo pipefail
 IN="${1:-}"; shift || true
-FIELD=""; NEG='^(REPROV|REFUT|REJEIT|PARQUE|INCONCLUS|NAO|NÃO|FALH|DRIFTED)'
+FIELD=""; NEG='^(REPROV|REFUT|REJEIT|REJECT|PARQUE|PARK|INCONCLUS|NAO|NÃO|FALH|FAIL|DRIFTED|EXAGER|UNVERIF)'
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --field) FIELD="${2:-}"; shift 2 ;;
-    --negative) NEG="${2:-}"; shift 2 ;;
+    --field|--negative)
+      [ "$#" -ge 2 ] && [ -n "$2" ] || { echo "judge-verdict-check: $1 exige um valor" >&2; exit 3; }
+      if [ "$1" = "--field" ]; then FIELD="$2"; else NEG="$2"; fi; shift 2 ;;
     *) echo "judge-verdict-check: opção desconhecida: $1" >&2; exit 3 ;;
   esac
 done
 [ -f "${IN}" ] || { echo "judge-verdict-check: entrada inexistente: '${IN}'" >&2; exit 3; }
 command -v node >/dev/null 2>&1 || { echo "judge-verdict-check: node ausente — NÃO PUDE MEDIR (o gate é o bloco JS do motor)" >&2; exit 3; }
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
-WF="${ONION_OVERCOMING_GATE_SRC:-${ROOT}/.claude/workflows/onion-research.js}"
+WF="${ONION_OVERCOMING_GATE_SRC:-${BASH_SOURCE[0]}}"
 [ -f "${WF}" ] || { echo "judge-verdict-check: SSOT do gate ausente: ${WF}" >&2; exit 3; }
 BLOCK="$(awk '/^\/\/ >>> overcoming-gate/{f=1} f{print} /^\/\/ <<< overcoming-gate/{f=0}' "${WF}")"
 case "${BLOCK}" in *'function overcomingWhy'*'<<< overcoming-gate'*) : ;; *)
@@ -65,9 +69,15 @@ const criteria = criteriaFrom(doc && doc.criteria, [])
 if (!criteria.length) { console.error('judge-verdict-check: sem `criteria` PRÉ-REGISTRADOS ({id, when, check}) — reprovação sem critério é preferência; NÃO PUDE MEDIR'); process.exit(3) }
 const verdicts = Array.isArray(doc.verdicts) ? doc.verdicts : null
 if (!verdicts) { console.error('judge-verdict-check: sem lista `verdicts`'); process.exit(3) }
-const re = new RegExp(negRe, 'i')
-const valueOf = v => String((field ? v[field] : (v.veredito !== undefined ? v.veredito : v.verdict)) ?? '')
-const isNeg = v => v.refuted === true || re.test(valueOf(v).trim())
+if (!verdicts.length) { console.error('judge-verdict-check: lista `verdicts` VAZIA — zero vereditos não é zero reprovação; NÃO PUDE MEDIR'); process.exit(3) }
+let re
+try { re = new RegExp(negRe, 'i') } catch (e) { console.error('judge-verdict-check: --negative inválido: ' + e.message); process.exit(3) }
+const valueOf = v => String((field ? v[field] : (v.veredito !== undefined ? v.veredito : v.verdict)) ?? '').trim()
+const isTrue = x => x === true || String(x).toLowerCase() === 'true'
+const readable = v => v && typeof v === 'object' && (valueOf(v) !== '' || v.refuted !== undefined || v.survives !== undefined)
+const unreadable = verdicts.filter(v => !readable(v))
+if (unreadable.length) { console.error('judge-verdict-check: ' + unreadable.length + ' veredito(s) sem campo legível (' + (field || 'veredito/verdict') + ', refuted ou survives) — NÃO PUDE MEDIR'); process.exit(3) }
+const isNeg = v => v.kind !== 'discarded-by-comodismo' && (isTrue(v.refuted) || isTrue(v.survives) || re.test(valueOf(v)))
 const g = gateNegatives(verdicts, isNeg, criteria)
 const alvo = v => String(v.alvo || v.target || v.node_id || v.id || '?').replace(/\s+/g, ' ').slice(0, 160)
 for (const v of overcomingsFound(g.kept.filter(isNeg))) console.log('SUPERACAO\t' + alvo(v) + '\t' + String(v.superacao.o_que).replace(/\s+/g, ' ').slice(0, 280))
@@ -78,3 +88,58 @@ process.exit(g.recused.length ? 1 : 0)
 JS
 } > "${D}/gate.cjs"
 node "${D}/gate.cjs" "${IN}" "${FIELD}" "${NEG}"
+exit $?
+
+# ── a cópia do gate (NÃO edite à mão: copie do onion-research.js; a bancada reprova divergência) ──
+: <<'OVERCOMING_GATE'
+// >>> overcoming-gate — O JUIZ QUE REPROVA BUSCA O QUE SUPERA (SAC-151). SSOT: este bloco; o
+// census-workflow.mjs carrega cópia BYTE A BYTE (a bancada confere) e o judge-verdict-check.sh o EXECUTA
+// para os juízes conduzidos pela sessão (/meta:cc-update, /meta:radar, /meta:dissect).
+// Maestro, 2026-10-15 (verbatim): "um juiz de sim ou não sem tentar superação em uma pesquisa pode restringir
+// possibilidades de crescimento e inovação; é preciso ter medição e critérios claros". Duas metades:
+// (a) veredito NEGATIVO carrega `superacao: {achada, o_que, medida}` — a peça, variante ou caminho que
+//     entregaria o valor que o objeto prometia; `achada:false` exige a razão MEDIDA (o que se procurou e onde);
+// (b) o critério de reprovação é PRÉ-REGISTRADO (args ou o default do juiz) e o veredito cita o `id` e o
+//     `comando` que o checa. Negativo sem as duas metades é RECUSADO aqui, no motor (fail-closed, contado):
+//     não vale como reprovação NEM como aprovação — o objeto fica não-julgado, nunca liberado.
+// Evidência que motivou: a dissecação do markitdown num adotante de curadoria (PR #26, merge a2f8a5aef524) fechou em
+// REJEITAR COM superação medida (o tesseract local lê o PDF escaneado em que a ferramenta sai vazia), e o
+// critério 1 do teste da régua deu INCONCLUSIVO porque o desenho não apontava o que superaria o teste.
+// TETO DECLARADO: o motor confere FORMA e PERTENÇA (o id está no registro, o comando não é vazio); se o
+// comando citado de fato reprova o objeto é trabalho de quem re-roda — o comando fica no grafo para isso.
+const OVERCOMING_PROPS = {
+  superacao: { type: 'object', required: ['achada', 'o_que', 'medida'], properties: {
+    achada: { type: 'boolean' }, o_que: { type: 'string' }, medida: { type: 'string' } } },
+  criterio: { type: 'object', required: ['id', 'comando'], properties: { id: { type: 'string' }, comando: { type: 'string' } } } }
+const _ogFilled = (s, min) => typeof s === 'string' && s.trim().length >= min
+// critérios do chamador (args) substituem o default SÓ quando bem formados: {id, when, check}
+function criteriaFrom(override, defaults) {
+  const list = Array.isArray(override) ? override.filter(c => c && _ogFilled(String(c.id || ''), 1) && _ogFilled(String(c.check || ''), 3))
+    .map(c => ({ id: String(c.id).trim(), when: String(c.when || '').trim(), check: String(c.check).trim() })) : []
+  return list.length ? list : defaults
+}
+const criteriaBlock = (criteria) => '\n\n## Critérios de reprovação PRÉ-REGISTRADOS (reprovar fora deles é preferência, não medida)\n' +
+  criteria.map(c => '- `' + c.id + '` — ' + c.when + ' · checa: `' + c.check + '`').join('\n') +
+  '\n\n## Todo veredito NEGATIVO leva as duas metades (o motor RECUSA e conta o que vier sem elas)\n' +
+  '- `criterio: {id, comando}` — o `id` de UM critério acima e o comando concreto (com os argumentos deste caso) que qualquer um re-roda para ver a reprovação.\n' +
+  '- `superacao: {achada, o_que, medida}` — antes de reprovar, PROCURE o que supera: a peça, variante, fonte ou caminho que entregaria o valor que o objeto prometia. `achada:true` → `o_que` nomeia e `medida` diz como se mediu; `achada:false` → `medida` diz o que se procurou e onde (comando ou fonte), nunca "não encontrei" seco.'
+function overcomingWhy(v, criteria) {
+  const s = v && v.superacao
+  if (!s || typeof s !== 'object' || typeof s.achada !== 'boolean') return 'veredito negativo sem superacao {achada, o_que, medida}'
+  if (s.achada && !_ogFilled(s.o_que, 8)) return 'superacao achada sem o_que (a peca, variante ou caminho que supera)'
+  if (!_ogFilled(s.medida, 8)) return s.achada ? 'superacao achada sem a medida que a sustenta' : 'superacao nao achada sem a razao MEDIDA (achada:false exige medida)'
+  const c = v.criterio
+  if (!c || typeof c !== 'object' || !_ogFilled(c.id, 1)) return 'veredito negativo sem criterio pre-registrado citado'
+  if (!criteria.some(k => k.id === String(c.id).trim())) return 'criterio ' + JSON.stringify(String(c.id)) + ' NAO esta pre-registrado (' + criteria.map(k => k.id).join(', ') + ')'
+  if (!_ogFilled(c.comando, 3)) return 'criterio citado sem o comando que o checa'
+  return ''
+}
+// separa o que VALE do que o motor recusa: { kept, recused: [{ verdict, why }] }
+function gateNegatives(list, isNegative, criteria) {
+  const kept = [], recused = []
+  for (const v of (list || [])) { if (!v) continue; const why = isNegative(v) ? overcomingWhy(v, criteria) : ''; if (why) recused.push({ verdict: v, why }); else kept.push(v) }
+  return { kept, recused }
+}
+const overcomingsFound = (list) => (list || []).filter(v => v && v.superacao && v.superacao.achada === true)
+// <<< overcoming-gate
+OVERCOMING_GATE

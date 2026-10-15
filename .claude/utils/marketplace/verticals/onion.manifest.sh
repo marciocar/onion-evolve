@@ -103,6 +103,9 @@ VALIDATION=(
   # gate pegava: a REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core) cobre caminho
   # NU, e este fora reescrito; e o plugin-dead-link-check.sh exclui `${…}` por desenho.
   ".claude/validation/workflow-syntax-check.sh"
+  # SAC-151 (2026-10-15): o /meta:radar manda o juiz-fixo passar pelo gate de superação; o script carrega
+  # a própria cópia do bloco (o workflow não viaja), e a bancada confere que ela é idêntica à do workflow.
+  ".claude/validation/judge-verdict-check.sh"
   ".claude/validation/kg-radar.sh"
   ".claude/validation/kg-backlog-project.sh"
   ".claude/validation/kg-fixture-paths.sh"

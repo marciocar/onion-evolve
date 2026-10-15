@@ -189,28 +189,43 @@ for rel in "${GRAPHS[@]}"; do
   elif [ -n "${mode}" ]; then state="modo-DESCONHECIDO(${mode})"
   elif [ "${verdict}" = "rejeitar" ] || [ "${verdict}" = "parquear" ]; then
     # SAC-151: o nó da reprovação é o que carrega x_dissect_verdict; os marcadores moram NELE.
+    # Leitura tolerante à forma (achados do refutador, 2026-10-15): aspas e comentário `# …` saem do valor;
+    # o id da superação tem de ser do alfabeto do radar; a aresta é lida por ITEM do bloco `edges:` (from,
+    # to e edge_type do MESMO item) e só TRACES_TO (a superação nasce da reprovação) ou SUPPORTS (evidência
+    # que já existia e sustenta a decisão) contam — REFUTES/CONSTRAINS não são superação.
     ogm="$(awk '
+      function val(s) { sub(/^[^:]*:[[:space:]]*/, "", s); sub(/[[:space:]]+#.*$/, "", s); gsub(/^["\047]|["\047][[:space:]]*$/, "", s); sub(/[[:space:]]+$/, "", s); return s }
       function flush() { if (isv) { printf "%s\t%s\t%s\t%s\n", id, crit, ov, meas; done = 1 } isv = 0; crit = ""; ov = ""; meas = ""; id = "" }
-      function val(s) { sub(/^[^:]*:[[:space:]]*/, "", s); gsub(/^["\047]|["\047][[:space:]]*$/, "", s); return s }
       done { next }
-      /^[[:space:]]*- id:/ { flush(); if (done) next; id = $0; sub(/^[[:space:]]*- id:[[:space:]]*/, "", id); next }
+      /^[[:space:]]*- id:/ { flush(); if (done) next; id = val($0); next }
       /^edges:/ { flush(); next }
-      /^[[:space:]]*x_dissect_verdict:/ { isv = 1 }
+      /^[[:space:]]*(x_)?dissect_verdict:/ { isv = 1 }
       /^[[:space:]]*x_dissect_criterion:/ { crit = val($0) }
       /^[[:space:]]*x_dissect_overcoming:/ { ov = val($0) }
       /^[[:space:]]*x_dissect_overcoming_measure:/ { meas = val($0) }
       END { if (!done) flush() }' "${f}")"
     IFS='	' read -r og_id og_crit og_ov og_meas <<< "${ogm}"
     ogwhy=""
-    [ "${#og_crit}" -ge 3 ] || ogwhy="${ogwhy},sem-x_dissect_criterion"
+    # critério = um COMANDO com argumento (≥ 8 caracteres e um espaço), nunca "sim"
+    { [ "${#og_crit}" -ge 8 ] && [[ "${og_crit}" == *" "* ]]; } || ogwhy="${ogwhy},sem-x_dissect_criterion"
     if [ -z "${og_ov}" ]; then ogwhy="${ogwhy},sem-x_dissect_overcoming"
-    elif [ "${og_ov}" = "nenhuma" ]; then [ "${#og_meas}" -ge 8 ] || ogwhy="${ogwhy},nenhuma-sem-medida"
+    elif [ "${og_ov}" = "nenhuma" ]; then
+      # a razão MEDIDA tem palavras (duas com letra), não pontuação de enchimento
+      [ "$(printf '%s' "${og_meas}" | LC_ALL=C tr -s '[:space:]' '\n' | LC_ALL=C grep -c '[A-Za-z]')" -ge 2 ] || ogwhy="${ogwhy},nenhuma-sem-medida"
+    elif ! [[ "${og_ov}" =~ ^[A-Za-z0-9_]+$ ]]; then ogwhy="${ogwhy},superacao-id-invalido"
     else
-      grep -qE "^[[:space:]]*- id:[[:space:]]*${og_ov}[[:space:]]*\$" "${f}" || ogwhy="${ogwhy},superacao-${og_ov}-inexistente"
+      grep -qE "^[[:space:]]*- id:[[:space:]]*[\"']?${og_ov}[\"']?[[:space:]]*(#.*)?\$" "${f}" || ogwhy="${ogwhy},superacao-${og_ov}-inexistente"
       awk -v s="${og_ov}" -v d="${og_id}" '
-        /^[[:space:]]*- from:/ { fr = $0; sub(/^[[:space:]]*- from:[[:space:]]*/, "", fr); to = "" ; next }
-        /^[[:space:]]*to:/ { to = $0; sub(/^[[:space:]]*to:[[:space:]]*/, "", to); if (fr == s && to == d) ok = 1 }
-        END { exit ok ? 0 : 1 }' "${f}" || ogwhy="${ogwhy},sem-aresta-${og_ov}-para-${og_id:-?}"
+        function val(x) { sub(/^[^:]*:[[:space:]]*/, "", x); sub(/[[:space:]]+#.*$/, "", x); gsub(/^["\047]|["\047][[:space:]]*$/, "", x); sub(/[[:space:]]+$/, "", x); return x }
+        function item() { if (fr == s && to == d && (et == "TRACES_TO" || et == "SUPPORTS")) ok = 1; fr = ""; to = ""; et = "" }
+        /^edges:/ { e = 1; next }
+        e && /^[^[:space:]-]/ { item(); e = 0 }
+        !e { next }
+        /^[[:space:]]*-[[:space:]]/ { item(); line = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", line); $0 = line }
+        /^[[:space:]]*from:/ { fr = val($0) }
+        /^[[:space:]]*to:/ { to = val($0) }
+        /^[[:space:]]*edge_type:/ { et = val($0) }
+        END { item(); exit ok ? 0 : 1 }' "${f}" || ogwhy="${ogwhy},sem-aresta-${og_ov}-para-${og_id:-?}"
     fi
     if [ -n "${ogwhy}" ]; then state="veredito-SEM-SUPERACAO(${ogwhy#,})"; else state="veredito"; fi
   elif [ "${verdict}" != "-" ]; then state="veredito"
@@ -218,7 +233,8 @@ for rel in "${GRAPHS[@]}"; do
 
   rows="${rows}${tool}	${level}	${verdict}	${baseline}	${review}	${fresh}	${rel}	${against}	${state}	${scope}
 "
-  [ "${verdict}" = "parquear" ] && parked="${parked}${tool}	${rel}
+  # parqueada que o gate RECUSOU não é parque (achado do refutador): sai só na seção dos recusados
+  [ "${verdict}" = "parquear" ] && [ "${state}" = "veredito" ] && parked="${parked}${tool}	${rel}
 "
 done
 
