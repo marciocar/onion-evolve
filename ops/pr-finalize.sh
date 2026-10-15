@@ -52,7 +52,7 @@
 #   · NUNCA RODA A BANCADA COMPLETA (D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL, 2026-10-13): a bancada
 #     só roda em dois pontos, e os dois são estreitos. (1) O hook do commit de conteúdo: o pre-commit roda a
 #     faixa local (`--affected-staged --local`), e o diff na infra da bancada NÃO compra mais a completa. (2) O
-#     pré-voo sob checkpoint: as famílias alteradas. A completa é do CI. Opt-in local: ONION_SELFTEST_FULL=1, que
+#     pré-voo (sempre, desde 2026-10-15): as famílias alteradas. A completa é do CI. Opt-in local: ONION_SELFTEST_FULL=1, que
 #     vale para os dois pontos (o pré-voo a traduz, porque o `env -i` a apagaria).
 set -uo pipefail
 
@@ -294,31 +294,27 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
   git add -- "${RES}"
 }
 
-# 0. PRÉ-VOO sob checkpoint (2026-10-07): o checkpoint deixava a bancada inteira para o CI, e três PRs num dia
-#    quebraram lá por casos NOVOS que passavam local. Roda as famílias que o diff ALTEROU por dentro (+ a catraca
-#    estática `| grep -q`) num ambiente que IMITA o runner: git sem identidade adivinhada (user.useConfigOnly —
-#    o "empty ident name" do CI que a máquina local mascarava com o nome do usuário do sistema), HOME limpo,
-#    LC_ALL=C e sem as variáveis ONION_*. Não substitui o CI: corta as quebras baratas antes de pagar 17 min.
-if [ "${ONION_FINALIZE_CHECKPOINT:-0}" = 1 ] && [ "${ONION_FINALIZE_SKIP_PREFLIGHT:-0}" != 1 ] && [ -f ops/testing/preflight-families.sh ]; then
-  _pf_fams="$(bash ops/testing/preflight-families.sh)" || die "pré-voo: não descobri as famílias alteradas"
-  _pf_home="$(mktemp -d)"; printf '[user]\n\tuseConfigOnly = true\n' > "${_pf_home}/.gitconfig"
-  # NADA de bancada completa local (D_BANCADA_SEMAFORO_DA_MAQUINA_SEM_COMPLETA_LOCAL, 2026-10-13): o pré-voo
-  # roda as famílias alteradas, nunca a completa — mesmo com o diff na infra da bancada; a completa é do CI.
-  # Opt-in explícito: ONION_SELFTEST_FULL=1 (o `env -i` abaixo a apagaria; por isso é traduzida aqui).
-  _pf_sel=(--families "${_pf_fams}")
-  if [ "${ONION_SELFTEST_FULL:-0}" = 1 ]; then
-    _pf_sel=(); echo "PR-FINALIZE: pré-voo COMPLETO pedido (ONION_SELFTEST_FULL=1, opt-in) — todas as famílias"
-  else
-    echo "PR-FINALIZE: pré-voo no ambiente do runner — famílias: ${_pf_fams} (a completa é do CI; ONION_SELFTEST_FULL=1 a pede aqui)"
+# 0. PRÉ-VOO (2026-10-07; SEMPRE desde 2026-10-15, SAC-141, D_PRE_VOO_SEMPRE_E_SOMBRA): roda as famílias que o
+#    diff ALTEROU por dentro (+ a catraca estática `| grep -q`) num ambiente que IMITA o runner — o corpo vive em
+#    ops/testing/preflight-run.sh, que o pre-push também chama. Até 2026-10-15 ele só rodava sob
+#    ONION_FINALIZE_CHECKPOINT=1, e a sessão passou a variável em 21% dos fechamentos (89 de 431, medido): 9 de 29
+#    reprovações do CI de 10-07 a 10-14 eram casos que ele pegaria. Cache pela árvore do índice: a re-rodada com o
+#    mesmo conteúdo pula e diz. Não substitui o CI: corta as quebras baratas antes de pagar o run.
+#    A SOMBRA (ops/testing/preflight-shadow.sh) roda em paralelo e grava, fora do índice, quantas famílias o CI vai
+#    rodar além das do pré-voo; nunca muda o rc. Escape declarado: ONION_FINALIZE_SKIP_PREFLIGHT=1 (diz que pulou).
+if [ "${ONION_FINALIZE_SKIP_PREFLIGHT:-0}" = 1 ]; then
+  echo "PR-FINALIZE: pré-voo PULADO por ONION_FINALIZE_SKIP_PREFLIGHT=1 (escape declarado; o CI é o único juiz da bancada)"
+elif [ -f ops/testing/preflight-run.sh ]; then
+  _pf_fams="$(bash ops/testing/preflight-run.sh --families-only)" || die "pré-voo: não descobri as famílias alteradas"
+  _pf_shadow=""
+  if [ "${CHECK}" != 1 ] && [ -f ops/testing/preflight-shadow.sh ]; then
+    _pf_shadow="$(mktemp)"; bash ops/testing/preflight-shadow.sh record "${_pf_fams}" > "${_pf_shadow}" 2>&1 & _pf_spid=$!
   fi
-  _pf_out="$(env -i PATH="${PATH}" HOME="${_pf_home}" GIT_CONFIG_NOSYSTEM=1 LC_ALL=C TERM=dumb \
-    bash .claude/validation/lint-selftest.sh ${_pf_sel[@]+"${_pf_sel[@]}"} 2>&1)"; _pf_rc=$?
-  rm -rf "${_pf_home}"
-  if [ "${_pf_rc}" != 0 ] || grep -q 'ABORTOU' <<< "${_pf_out}"; then
-    grep -E '  ✗ |ABORTOU' <<< "${_pf_out}" | head -12 >&2
-    die "pré-voo reprovou no ambiente do runner (rc=${_pf_rc}) — nada commitado; o CI quebraria igual"
+  bash ops/testing/preflight-run.sh 2>&1 | sed 's/^/PR-FINALIZE: /'; _pf_rc="${PIPESTATUS[0]}"
+  if [ -n "${_pf_shadow}" ]; then
+    wait "${_pf_spid}" 2>/dev/null; sed 's/^/PR-FINALIZE: /' "${_pf_shadow}"; rm -f "${_pf_shadow}"
   fi
-  echo "PR-FINALIZE: pré-voo verde ($(grep -oE 'Passaram : [0-9]+' <<< "${_pf_out}" | tail -1))"
+  [ "${_pf_rc}" = 0 ] || die "pré-voo reprovou no ambiente do runner (rc=${_pf_rc}) — nada commitado; o CI quebraria igual"
 fi
 
 _lint_in() {  # <worktree com o commit a julgar> <arquivo de HARD> → _rc e _hard; o env do CI, como o runner

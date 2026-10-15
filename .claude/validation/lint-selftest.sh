@@ -32368,11 +32368,59 @@ run_preflight_families_selftests() {
   else record_fail "preflight-families: (a)" "saída: ${out}"; fi
   rm -rf "${d}"
   # (b) o motor chama o pré-voo no ambiente do runner (useConfigOnly), sob checkpoint
-  if grep -q 'preflight-families.sh' "${REPO_ROOT}/ops/pr-finalize.sh" && grep -q 'useConfigOnly = true' "${REPO_ROOT}/ops/pr-finalize.sh"; then
+  # desde 2026-10-15 (SAC-141) o corpo do pré-voo mora em ops/testing/preflight-run.sh, chamado pelo pr-finalize
+  if grep -q 'preflight-families.sh' "${REPO_ROOT}/ops/testing/preflight-run.sh" && grep -q 'useConfigOnly = true' "${REPO_ROOT}/ops/testing/preflight-run.sh" \
+     && grep -q 'ops/testing/preflight-run.sh' "${REPO_ROOT}/ops/pr-finalize.sh"; then
     record_pass "preflight-families: (b) o pr-finalize roda o pré-voo com git sem identidade adivinhada"
   else record_fail "preflight-families: (b)" "o motor não chama o pré-voo no ambiente do runner"; fi
 }
 _family run_preflight_families_selftests
+
+# Modo preflight-shadow — a SOMBRA do pré-voo (SAC-141, D_PRE_VOO_SEMPRE_E_SOMBRA, 2026-10-15): grava, fora do
+# índice, as famílias que o CI vai rodar além das do pré-voo, e NUNCA muda o rc de quem chama. Sandbox git com
+# origin/main e um seletor do CI de mentira (o real precisa da bancada inteira); o SUT é o real.
+run_preflight_shadow_selftests() {
+  local sut="${REPO_ROOT}/ops/testing/preflight-shadow.sh"
+  [ -f "${sut}" ] || { record_skip "preflight-shadow: ops/ ausente (adotante) → pulado"; return; }
+  local s; s="$(mktemp -d)"
+  mkdir -p "${s}/ops/testing"
+  git -C "${s}" init -q -b main && git -C "${s}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m base \
+    && git -C "${s}" update-ref refs/remotes/origin/main HEAD && git -C "${s}" switch -q -c feat/x \
+    && git -C "${s}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m x
+  local log="${s}/.git/onion-preflight-shadow.tsv" out rc
+  # (a) seletivo: a lacuna é exatamente o que o CI roda e o pré-voo não
+  printf '#!/bin/bash\necho nivel=seletivo\necho familias=a,b,c,d\necho motivo=x\n' > "${s}/ops/testing/selftest-pr-selection.sh"
+  rc=0; out="$(cd "${s}" && bash "${sut}" record "b,shell_pipefail_robustness" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(cut -f2,4,5,6,7 "${log}" 2>/dev/null | tail -1)" = "$(printf 'feat/x\tseletivo\t4\t2\ta,c,d')" ] && grep -q 'fora do pré-voo: 3' <<< "${out}"; then
+    record_pass "preflight-shadow: (a) grava a lacuna (famílias do CI fora do pré-voo) e a anuncia"
+  else record_fail "preflight-shadow: (a) lacuna" "rc=${rc} linha=[$(tail -1 "${log}" 2>/dev/null)] out=[${out}]"; fi
+  # (b) completa no CI: a lacuna é ALL, sem contar famílias
+  printf '#!/bin/bash\necho nivel=completo\necho familias=ALL\necho motivo=infra\n' > "${s}/ops/testing/selftest-pr-selection.sh"
+  rc=0; out="$(cd "${s}" && bash "${sut}" record "b" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(cut -f4,7 "${log}" | tail -1)" = "$(printf 'completo\tALL')" ]; then
+    record_pass "preflight-shadow: (b) CI completo vira lacuna ALL"
+  else record_fail "preflight-shadow: (b) completo" "rc=${rc} linha=[$(tail -1 "${log}")]"; fi
+  # (c) seletor quebrado: rc 0, 'sombra indisponível', nada gravado (nunca muda o rc de quem chama)
+  printf '#!/bin/bash\nexit 3\n' > "${s}/ops/testing/selftest-pr-selection.sh"
+  local n0; n0="$(grep -c . "${log}")"
+  rc=0; out="$(cd "${s}" && bash "${sut}" record "b" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'sombra indisponível' <<< "${out}" && [ "$(grep -c . "${log}")" = "${n0}" ]; then
+    record_pass "preflight-shadow: (c) seletor que falha: rc 0, 'sombra indisponível', nada gravado"
+  else record_fail "preflight-shadow: (c) falha calada" "rc=${rc} out=[${out}]"; fi
+  # (d) o consumidor lê o que a sombra gravou (sem gh no PATH: 'não lido', nunca inventado)
+  rc=0; out="$(cd "${s}" && PATH="/usr/bin:/bin" GH_CONFIG_DIR="${s}/nogh" bash "${sut}" report 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q '2 fechamento(s)' <<< "${out}" && grep -q 'completa no CI: 1' <<< "${out}" && grep -q '^| feat/x | 2 |' <<< "${out}"; then
+    record_pass "preflight-shadow: (d) o report resume os fechamentos gravados por branch"
+  else record_fail "preflight-shadow: (d) report" "rc=${rc} out=[$(tr '\n' '|' <<< "${out}" | cut -c1-300)]"; fi
+  # (e) o pr-finalize e o pre-push chamam o MESMO corpo do pré-voo, e o pr-finalize não o condiciona ao checkpoint
+  local pf="${REPO_ROOT}/ops/pr-finalize.sh" pp="${REPO_ROOT}/.githooks/pre-push"
+  if grep -q 'ops/testing/preflight-run.sh' "${pf}" && grep -q 'ops/testing/preflight-run.sh' "${pp}" \
+     && ! grep -vE '^[[:space:]]*#' "${pf}" | grep -E 'CHECKPOINT' | grep -q 'preflight'; then
+    record_pass "preflight-shadow: (e) pr-finalize e pre-push chamam o mesmo pré-voo, sem depender do checkpoint"
+  else record_fail "preflight-shadow: (e) ligação" "o pré-voo não está ligado nos dois pontos, ou voltou a depender do checkpoint"; fi
+  rm -rf "${s}"
+}
+_family run_preflight_shadow_selftests
 
 run_shard_plan_selftests() {
   local sut="${REPO_ROOT}/ops/testing/selftest-shard-plan.sh"
@@ -33072,15 +33120,25 @@ PYMS
   #     só registram com que argumentos foram chamados.
   local s="${d}/pf"; mkdir -p "${s}/ops/testing" "${s}/.claude/validation"
   printf '#!/bin/bash\necho fam_x\n' > "${s}/ops/testing/preflight-families.sh"
+  cp "${REPO_ROOT}/ops/testing/preflight-run.sh" "${s}/ops/testing/preflight-run.sh"
   printf '#!/bin/bash\necho "ARGS:$*" >> "%s/args.log"\necho "  Passaram : 1"\n' "${s}" > "${s}/.claude/validation/lint-selftest.sh"
   git -C "${s}" init -q -b main && git -C "${s}" add -A && git -C "${s}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1 \
     && git -C "${s}" switch -q -c feat/x
-  ( cd "${s}" && ONION_FINALIZE_CHECKPOINT=1 GH_CONFIG_DIR="${s}/nogh" bash "${pf}" > "${s}/o1" 2>&1 ) || true
-  ( cd "${s}" && ONION_FINALIZE_CHECKPOINT=1 ONION_SELFTEST_FULL=1 GH_CONFIG_DIR="${s}/nogh" bash "${pf}" > "${s}/o2" 2>&1 ) || true
-  local a1 a2; a1="$(sed -n 1p "${s}/args.log" 2>/dev/null)"; a2="$(sed -n 2p "${s}/args.log" 2>/dev/null)"
+  # SEM ONION_FINALIZE_CHECKPOINT: desde 2026-10-15 (SAC-141) o pré-voo roda sempre — a variável era lembrada
+  # em 21% dos fechamentos. A 3ª rodada, com a mesma árvore, tem de pular pelo cache e dizer.
+  ( cd "${s}" && GH_CONFIG_DIR="${s}/nogh" bash "${pf}" > "${s}/o1" 2>&1 ) || true
+  ( cd "${s}" && ONION_SELFTEST_FULL=1 GH_CONFIG_DIR="${s}/nogh" bash "${pf}" > "${s}/o2" 2>&1 ) || true
+  ( cd "${s}" && GH_CONFIG_DIR="${s}/nogh" bash "${pf}" > "${s}/o3" 2>&1 ) || true
+  # sob `set -e`: sem args.log (o pré-voo nem rodou) o sed sai 2 e a atribuição abortaria a suíte — o `|| true`
+  # deixa o caso REPROVAR em vez de matar a bancada (achado do mutante "checkpoint de volta", 2026-10-15)
+  local a1 a2 a3; a1="$(sed -n 1p "${s}/args.log" 2>/dev/null)" || true; a2="$(sed -n 2p "${s}/args.log" 2>/dev/null)" || true
+  a3="$(sed -n 3p "${s}/args.log" 2>/dev/null)" || true
   if [ "${a1}" = "ARGS:--families fam_x" ] && [ "${a2}" = "ARGS:" ] && grep -q 'a completa é do CI' "${s}/o1" && grep -q 'pré-voo COMPLETO pedido' "${s}/o2"; then
-    record_pass "machine-slots: (g) pr-finalize: pré-voo = famílias alteradas (a completa é do CI); ONION_SELFTEST_FULL=1 ⇒ completa, declarada"
-  else record_fail "machine-slots: (g) pr-finalize" "args1=[${a1}] args2=[${a2}]; $(grep -h 'pré-voo' "${s}/o1" "${s}/o2" | tr '\n' '|' | cut -c1-200)"; fi
+    record_pass "machine-slots: (g) pr-finalize SEM checkpoint: pré-voo = famílias alteradas (a completa é do CI); ONION_SELFTEST_FULL=1 ⇒ completa, declarada"
+  else record_fail "machine-slots: (g) pr-finalize" "args1=[${a1}] args2=[${a2}]; $( { grep -h 'pré-voo' "${s}/o1" "${s}/o2" || true; } | tr '\n' '|' | cut -c1-200)"; fi
+  if [ -z "${a3}" ] && grep -q 'PULADO pelo cache' "${s}/o3"; then
+    record_pass "machine-slots: (g2) pr-finalize: a re-rodada com a mesma árvore pula o pré-voo pelo cache e diz"
+  else record_fail "machine-slots: (g2) cache do pré-voo" "args3=[${a3}]; $( { grep -h 'pré-voo' "${s}/o3" || true; } | tr '\n' '|' | cut -c1-200)"; fi
 
   rm -rf "${d}"
 }

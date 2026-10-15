@@ -1,0 +1,99 @@
+meta:
+  id: preflight-gap-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-15"
+  review_after: "2026-10-29"
+  note: "SAC-141: por que o pré-voo do pr-finalize deixava reprovações irem ao CI, medido de 2026-10-07 a 2026-10-14, e a cura escolhida pelo maestro."
+
+nodes:
+  - id: E_PRE_VOO_RODOU_EM_21_POR_CENTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    label: "O pré-voo só rodava com ONION_FINALIZE_CHECKPOINT=1, e a sessão passou a variável em 89 de 431 chamadas do pr-finalize --push (21%) desde 2026-10-07; 9 das 29 reprovações do CI no período eram casos que ele pegaria."
+    narrative: "Medido por um analista (subagente opus, só leitura) nas transcrições locais das sessões do core e nos logs do workflow onion-selftest no forge. As 9 são classe E: 8 sítios novos de `| grep -q` (catraca shell_pipefail_robustness, sempre no pré-voo) e o selftest_selection (d) do #1030; 4 delas foram reproduzidas na cabeça do PR. Que o pré-voo não rodou nesses PRs é inferência pelo padrão de uso da variável por dia; só 6 PRs da classe A têm a rodada confirmada na transcrição."
+    verified_at: "2026-10-15"
+    verified_against: "logs de 67 runs vermelhos do onion-selftest desde 2026-10-07 e 431 chamadas do pr-finalize --push nas transcrições"
+    provenance:
+      source: "gh run list/view --workflow onion-selftest.yml (marciocar/onion-evolve) e transcrições das sessões do core"
+      locator: "29 runs vermelhos em PRs mergeados de 2026-10-07 a 2026-10-14; 89/431 chamadas com a variável"
+      method: "medição: contagem nos logs do forge e nas transcrições; 11 de 29 reproduzidas localmente"
+      locality: "web"
+
+  - id: E_FAMILIAS_FORA_DO_PRE_VOO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    label: "20 das 29 reprovações (18 PRs) foram de famílias que o pré-voo não seleciona: ele lê só os blocos mudados da bancada, e o mapa família→arquivo do seletor de hoje cobre as 20 num replay."
+    narrative: "A seleção do pré-voo está intacta desde que nasceu (73d19e9a, 2026-10-07); #1080 e #1091 melhoraram o pre-commit e o CI, que o checkpoint pula. Classes de dependência que faltaram: SUT mudado direto, corpus de grafos, varredura grep -r, comandos/papéis/portas, bundle de plugin, a lista de famílias, arquivo de dado. Custo de 252 min de runs vermelhos, mediana de 39 min até o verde."
+    verified_at: "2026-10-15"
+    verified_against: "replay do seletor atual com --affected-range base...head --local sobre os 20 runs: 20/20 cobertos"
+    provenance:
+      source: "lint-selftest.sh --affected-range (seletor vivo) sobre as cabeças dos 18 PRs"
+      locator: "PRs #957 a #1127 listados no comentário da SAC-141"
+      method: "medição: replay do seletor por worktree em cada cabeça"
+      locality: "repo"
+
+  - id: E_MAPA_INTEIRO_NO_FECHAMENTO_E_CARO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    label: "Rodar no fechamento todas as famílias do mapa custou 7,5 min (109 famílias, #1112) e pode passar de 30 min, mais que o nível PR do CI (mediana de 5,8 min); só as de até 10 s cada pegariam 8 das 20 em cerca de 40 s."
+    narrative: "Uma amostra por medição, sob o semáforo de 8 vagas da bancada e com outros agentes ativos. A tabela de tempos ops/testing/selftest-family-times.tsv está defasada (faltam 41 de 261 famílias, entre elas fixtures, de cerca de 2190 s), e família ausente vale 0 s nela: escolher as baratas por ela puxaria a mais cara."
+    verified_at: "2026-10-15"
+    verified_against: "tempos medidos localmente nas cabeças do #1112 e do #1118 e num run completo da main (38649919883)"
+    provenance:
+      source: "lint-selftest.sh --families nas cabeças do #1112 e #1118; gh run view 38649919883"
+      locator: "450 s (109 famílias), 40 s (90 famílias ≤10 s), 219 s (118 famílias ≤60 s)"
+      method: "medição: uma amostra por configuração"
+      locality: "repo"
+
+  - id: Q_FAMILIAS_BARATAS_DO_MAPA_NO_PRE_VOO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "Pôr no pré-voo as famílias baratas do mapa (≤10 s cada) se paga? Decidir com ~2 semanas de dados da sombra (ops/testing/preflight-shadow.sh report), não com a simulação."
+    narrative: "Gatilho nomeado: o report da sombra com pelo menos 2 semanas de fechamentos. Pré-condição se a resposta for sim: família ausente da tabela de tempos fica FORA e declarada, e a tabela ganha catraca de frescor."
+    trace: "ops/testing/preflight-shadow.sh"
+  - id: D_PRE_VOO_SEMPRE_E_SOMBRA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "decisão do maestro em 2026-10-15, por pergunta com opções (/meta:decide): escolhida «Pré-voo sempre + sombra»"
+    label: "O pré-voo da bancada roda SEMPRE no pr-finalize e no pre-push, com cache pela árvore, e uma sombra grava a lacuna entre ele e o CI; as famílias baratas do mapa esperam os dados da sombra"
+    narrative: "Selado por /meta:decide em 2026-10-15: escolhida «Pré-voo sempre + sombra»; descartadas: «Só o pré-voo sempre» · «Pré-voo pelo mapa inteiro» · «Não mudar»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-15: «SAC-141: 29 reprovações de CI em 8 dias; 9 de o pré-voo não ter rodado, 20 de famílias que ele não seleciona. O que eu faço?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-15"
+      locality: "pessoa"
+
+edges:
+  - from: Q_FAMILIAS_BARATAS_DO_MAPA_NO_PRE_VOO
+    to: D_PRE_VOO_SEMPRE_E_SOMBRA
+    edge_type: CONSTRAINS
+  - from: E_FAMILIAS_FORA_DO_PRE_VOO
+    to: Q_FAMILIAS_BARATAS_DO_MAPA_NO_PRE_VOO
+    edge_type: SUPPORTS
+  - from: E_MAPA_INTEIRO_NO_FECHAMENTO_E_CARO
+    to: Q_FAMILIAS_BARATAS_DO_MAPA_NO_PRE_VOO
+    edge_type: SUPPORTS
+  - from: E_PRE_VOO_RODOU_EM_21_POR_CENTO
+    to: E_FAMILIAS_FORA_DO_PRE_VOO
+    edge_type: SUPPORTS
+  - from: D_PRE_VOO_SEMPRE_E_SOMBRA
+    to: E_PRE_VOO_RODOU_EM_21_POR_CENTO
+    edge_type: TRACES_TO
