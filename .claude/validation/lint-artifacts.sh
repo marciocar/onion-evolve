@@ -360,7 +360,9 @@ _rule_map_build() {
       "# aplica-se:"*)
         # APLICABILIDADE POR PAPEL (SAC-149): os papéis em que a regra tem OBJETO, declarados no docstring
         # (o rules-registry.sh os valida e projeta). Fora deles a regra sai como "não se aplica", nunca SOFT.
-        [ -n "${cur}" ] && { t="${line#\# aplica-se:}"; t="${t//,/ }"; RULE_APPLIES["${cur}"]="$(printf '%s' "${t}" | tr -s ' ')"; } ;;
+        # só no DOCSTRING (antes do 1º `nome() {` da regra), como o rules-registry.sh lê: aceitar a linha dentro
+        # da função deixava uma 2ª declaração calar a regra no core com o registro verde (passada adversarial)
+        [ -n "${pend}" ] && { t="${line#\# aplica-se:}"; t="${t//,/ }"; RULE_APPLIES["${pend}"]="$(printf '%s' "${t}" | tr -s ' ')"; } ;;
       [a-z_]*"() {"*)
         if [ -n "${pend}" ]; then fn="${line%%(*}"; RULE_OF_FUNC["${fn}"]="${pend}"; pend=""; fi ;;
     esac

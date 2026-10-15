@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 24 NÓS ═══
+# ═══ TETO: 28 NÓS ═══
 meta:
   id: adopter-shape-bench-2026-10
   schema_version: "1"
@@ -234,8 +234,8 @@ nodes:
     confidence: 0.85
     verified_at: "2026-10-15"
     verified_against: "sondas do veto do .env com JSON de PreToolUse, migrate-seed-graph.sh numa cópia do adotante, e leitura do door-role-parity-check.sh"
-    label: "Pontuais medidos (2026-10-15): semente v2 migrada (8 MUST → 0) e grafo próprio só avisado; os 2 falsos positivos do veto do .env reproduzidos e curados sem abrir a cópia do .env; o par standalone/adopted do registro é COMPATÍVEL pela doutrina."
-    narrative: "Veto do .env: o 1º posicional do grep é o PADRÃO, e o `.env` literal da linha ligava o modo estrito que julgava o padrão como glob; e um *.env do scratchpad da sessão só passa quando o CONTEÚDO não tem chave nem valor de cara de segredo, porque cp .env <scratch>/x.env é permitido. Registro: o door-role-parity-check.sh declara standalone no registro com adopted no carimbo como par correto (tier na rede versus relação com o framework), então nada mudou nele. O githook impresso 3 vezes com aspas escapadas NÃO reproduziu: o instalador e o verificador imprimem o bloco uma vez, e o adopt.md o captura uma vez."
+    label: "Pontuais medidos (2026-10-15): semente v2 migrada (8 MUST → 0) e grafo próprio só avisado; o falso positivo do padrão do grep curado; o do *.env do scratchpad NÃO, por desenho; o par standalone/adopted do registro é COMPATÍVEL pela doutrina."
+    narrative: "Veto do .env: o 1º posicional do grep é o PADRÃO, e o `.env` literal da linha ligava o modo estrito que julgava o padrão como glob. A isenção do *.env do scratchpad por conteúdo foi furada pelo Elenxo e saiu; o veto fica, e a mensagem diz a saída honesta (outra extensão). Registro: o door-role-parity-check.sh declara standalone no registro com adopted no carimbo como par correto, então nada mudou nele. O githook impresso 3 vezes NÃO reproduziu: o instalador e o verificador imprimem o bloco uma vez."
     provenance:
       source: ".claude/hooks/pretooluse-env-guard.sh, .claude/utils/adopt/migrate-seed-graph.sh e .claude/validation/door-role-parity-check.sh"
       locator: "casos (r) da env_exposure, (v2) e (v2b) da migrate_seed_graph; o cabeçalho ADOTANTE do door-role-parity-check.sh"
@@ -258,13 +258,37 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-15"
     verified_against: "ops/mutate-and-restore.sh com LC_ALL=C, cada mutante seguido da família nomeada; os que vivem DENTRO da fixture com ONION_ADOPTER_FROM=WORKTREE"
-    label: "Onze mutantes do PR 2 mordem: aplicabilidade (c, g), três no veto do .env (r), semente v2 (v2), escritor do pin (i), REGRA 108 rebaixada (i2), ops/ na semente (h), registro sem source (ap), mensagem e source-only da REGRA 100 (xviii, xix)."
+    label: "Dezesseis mutantes do PR 2 mordem: aplicabilidade (c, g), cinco no veto do .env (r), semente v2, escritor do pin (i, i3), REGRA 108 (i2), ops/ na semente (h), registro (ap, dois) e a REGRA 100 nas mensagens (xviii, xix)."
     narrative: "O dogfood dos mutantes pegou três defeitos da própria família, curados no laço: (1) o SUT que roda DENTRO da fixture (o lint) vinha do índice, e o mutante, plantado no disco, não chegava lá: três mutantes passaram verdes até o materializador ganhar --from WORKTREE; (2) a chamada direta do helper do pin, posta para a REGRA 59, rodava DEPOIS do re-carimbo e mascarava o escritor; (3) o caso da REGRA 108 aceitava QUALQUER HARD, e o marcador do mutante no lint da fixture era um HARD: agora lê a lista das HARD pela linha da 108."
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "famílias adopter_shape, env_exposure, migrate_seed_graph, rules_registry e ops_citation_travel"
       method: "medição: mutantes plantados e restaurados com hash conferido"
       locality: "repo"
+
+  - id: E_ELENXO_PR2_TRES_BLOQUEADORES_CURADOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "refutador em worktree isolada sobre 27f09cd0, com o hook rodado por JSON de PreToolUse contra um .env sintético e a base 48a94d7d como controle"
+    label: "Elenxo (2026-10-15) REPROVOU o PR 2 com três bloqueadores, os três no veto do .env e regressões do diff: TOCTOU cp+cat no scratchpad, 'cara de segredo' fraca (DB_PW, URL com credencial) e abreviação de opção longa do grep (--reg=.). Curados."
+    narrative: "Curas: a isenção do scratchpad saiu (o falso positivo dela segue, declarado, com mensagem); toda opção longa que é prefixo de --regexp ou --file devolve o veto, o rg saiu da isenção (config injeta --regexp) e GREP_* no segmento também devolve. De quebra, o dd if=.env, falha ANTERIOR ao diff (o if= saía da linha como atribuição). Menores curados: o lint só lê o aplica-se do docstring e o registro recusa um 2º; a REGRA 100 também; o escritor do pin não reescreve label nem verified_against do dono, aceita id entre aspas, casa pin de 7 hex e é idempotente (o promote-hub sujava o grafo); --path-format=absolute no materializador. A REGRA 108 achou 3 adotantes locais com pin divergente real, sem falso positivo. Cinco mutantes novos mordem."
+    provenance:
+      source: "relatório do refutador (subagente opus, worktree isolada)"
+      locator: "achados 1 a 13 da passada sobre 27f09cd0"
+      method: "juízes: refutador adversarial com sondas executadas, e as curas re-medidas pela bancada e por mutantes"
+      locality: "repo"
+
+  - id: C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.85
+    label: "TETO declarado: o *.env de trabalho que a sessão grava no scratchpad segue VETADO na leitura. A cura segura precisaria saber que o arquivo veio da ferramenta Write, o que o hook não vê; até lá, a mensagem pede outra extensão."
 
 edges:
   - from: E_CONTRATO_VIAJA_SEM_LEITOR
@@ -333,3 +357,9 @@ edges:
   - from: E_MUTANTES_PR2_MORDEM
     to: D_PIN_COM_ESCRITOR_UNICO
     edge_type: SUPPORTS
+  - from: E_ELENXO_PR2_TRES_BLOQUEADORES_CURADOS
+    to: D_APLICABILIDADE_POR_PAPEL_DECLARADA
+    edge_type: SUPPORTS
+  - from: C_TETO_SCRATCHPAD_ENV_SEGUE_VETADO
+    to: E_PONTUAIS_DO_PR2_MEDIDOS
+    edge_type: CONSTRAINS

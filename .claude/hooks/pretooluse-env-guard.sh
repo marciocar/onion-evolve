@@ -188,15 +188,22 @@ HELPER = 'env-check.sh'
 # era vetado. O `.env` literal da linha liga o modo estrito, e o veto julgava o PADRÃO do grep como um glob que
 # alcança `.env` (`[A-Za-z0-9_.-]*` casa `.env` no fnmatch). O padrão não é arquivo: o grep o lê como regex.
 # Sem -e/-f (nem cluster curto que os contenha, que erra para o veto), o 1º posicional sai da lista de lidos.
-GREPS = {'grep', 'egrep', 'fgrep', 'zgrep', 'rg', 'ugrep'}
+# PASSADA ADVERSARIAL (2026-10-15): o GNU getopt aceita ABREVIAÇÃO de opção longa (`--reg=.` é `--regexp=.`, medido
+# no grep 3.11 lendo o arquivo), então toda opção longa que é prefixo de --regexp ou --file conta como "padrão por
+# flag" e o veto volta; e o `rg` saiu da lista: um RIPGREP_CONFIG_PATH injeta --regexp sem aparecer na linha.
+# Variável GREP_* no segmento também devolve o veto. Na dúvida, o padrão é tratado como arquivo — erra para o veto.
+GREPS = {'grep', 'egrep', 'fgrep'}
 
 def grep_pattern_index(args):
     """índice do posicional que é o PADRÃO do grep, ou None se o padrão vem por -e/-f (ou não dá para saber)."""
     for a in args[1:]:
         if a == '--':
             break
-        if a in ('-e', '-f', '--regexp', '--file') or a.startswith(('--regexp=', '--file=')):
-            return None
+        if a.startswith('--') and len(a) > 2:
+            _ln = a[2:].split('=', 1)[0]
+            if 'regexp'.startswith(_ln) or 'file'.startswith(_ln):
+                return None
+            continue
         if a.startswith('-') and not a.startswith('--') and ('e' in a[1:] or 'f' in a[1:]):
             return None
     dd = False
@@ -207,31 +214,14 @@ def grep_pattern_index(args):
             return i
     return None
 
-# SAC-149: um `*.env` que a PRÓPRIA sessão escreveu no scratchpad dela (`/tmp/claude-<uid>/…/scratchpad/…`) foi
-# vetado ao ser lido — ali não mora o .env do projeto. Mas `cp .env <scratch>/x.env` é permitido (cópia entre
-# .env), então isentar pelo CAMINHO abriria a porta: a isenção exige o CONTEÚDO sem forma de segredo, lido aqui
-# pelo hook (nunca pelo modelo). Arquivo ilegível, grande ou com chave/valor de cara de segredo: veto, como antes.
+# SAC-149, falso positivo 1 (um `*.env` de trabalho que a sessão gravou no scratchpad, vetado na leitura): a cura
+# por CONTEÚDO foi tentada e REPROVADA na passada adversarial de 2026-10-15 — `cp .env <scratch>/x.env; cat …` num
+# comando só lia o segredo (o hook julga antes de o cp rodar), e "sem cara de segredo" deixava passar DB_PW=… e
+# URL com credencial. Fica o veto, e a mensagem diz a saída honesta: o arquivo de trabalho não se chama *.env.
 SCRATCH_RE = re.compile(r'^/tmp/claude-[0-9]+/.+/scratchpad/')
-SECRET_KEY = re.compile(r'(TOKEN|SECRET|PASS|PWD|KEY|CREDENTIAL|AUTH|PRIVATE|COOKIE|SESSION)', re.I)
 
-def scratch_env_without_secret(tok):
-    t = tok.strip().strip('"\'')
-    if not SCRATCH_RE.match(t) or '..' in t.split('/') or not os.path.isfile(t):
-        return False
-    try:
-        if os.path.getsize(t) > 65536:
-            return False
-        text = open(t, encoding='utf-8', errors='replace').read()
-    except OSError:
-        return False
-    for line in text.splitlines():
-        m = re.match(r'^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$', line)
-        if not m:
-            continue
-        val = m.group(2).strip().strip('"\'')
-        if SECRET_KEY.search(m.group(1)) or re.fullmatch(r'[A-Za-z0-9_+/=.-]{24,}', val):
-            return False
-    return True
+def scratch_hint(tok):
+    return SCRATCH_RE.match(tok.strip().strip('"\'')) is not None
 
 def strip_comments(cmd):
     """`#` que ABRE palavra fora de aspas comenta até o fim da linha (como no bash)."""
@@ -408,11 +398,15 @@ def judge(cmd, depth=0):
                  if not (args[i - 1] in VALUE_FLAGS) and not re.match(r'^--(exclude|exclude-dir|env-file)=', a)]
         inc = [a.split('=', 1)[1] for a in args if a.startswith('--include=')] + \
               [args[i + 1] for i, a in enumerate(args[:-1]) if a == '--include']
-        if name in GREPS:
+        # `dd if=.env` (passada adversarial, 2026-10-15; falha ANTERIOR a este diff): `if=…` tem forma de atribuição
+        # VAR=valor e saía da linha junto com as atribuições — o dd lia o .env para o stdout sem veto. Lê-se do `seg`.
+        if name == 'dd' and any(is_env_token(t[3:]) for t in seg if t.startswith('if=')):
+            return "'dd' lendo um arquivo .env (if=)"
+        if name in GREPS and not any(re.match(r'^GREP_[A-Z_]*=', t) for t in seg):
             _pi = grep_pattern_index(args)
             if _pi is not None:
                 files = [a for a in files if a is not args[_pi]]
-        envs = [a for a in files if is_env_token(a) and not scratch_env_without_secret(a)] + [g for g in inc if is_env_token(g)]
+        envs = [a for a in files if is_env_token(a)] + [g for g in inc if is_env_token(g)]
         if name in SHELLS and len(args) > 1:
             if args[1] == '-c' and len(args) > 2:
                 r = judge(args[2], depth + 1)
@@ -454,7 +448,7 @@ def judge(cmd, depth=0):
             rest = [a for a in files if not a.startswith('-')]
             if rest and (is_env_token(rest[-1]) and not any(is_env_token(a) for a in rest[:-1]) or all(is_env_token(a) for a in rest)):
                 continue                  # .env só como DESTINO, ou cópia/rename entre arquivos .env
-        return "'%s' lendo %s" % (name, envs[0])
+        return "'%s' lendo %s" % (name, envs[0]) + (" (arquivo de trabalho no scratchpad? o veto não isenta *.env nem ali: grave-o com outra extensão, .vars ou .txt)" if scratch_hint(envs[0]) else "")
     return None
 
 try:
@@ -466,8 +460,8 @@ tool = d.get('tool_name') or ''
 ti = d.get('tool_input') or {}
 reason = None
 if tool == 'Read':
-    if is_env_token(str(ti.get('file_path') or '')) and not scratch_env_without_secret(str(ti.get('file_path') or '')):
-        reason = 'Read de um arquivo .env'
+    if is_env_token(str(ti.get('file_path') or '')):
+        reason = 'Read de um arquivo .env' + (" (arquivo de trabalho no scratchpad? o veto não isenta *.env nem ali: grave-o com outra extensão, .vars ou .txt)" if scratch_hint(str(ti.get('file_path') or '')) else "")
 elif tool == 'Grep':
     if is_env_token(str(ti.get('path') or '')) or (ti.get('glob') and is_env_token(str(ti.get('glob')))):
         reason = 'Grep sobre um arquivo .env (caminho ou glob)'

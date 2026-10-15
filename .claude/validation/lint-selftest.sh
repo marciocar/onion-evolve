@@ -2951,9 +2951,12 @@ run_rules_registry_selftests() {
   _ap_ok="$(RULES_LINT_SRC="${tmp}/ap.sh" bash "${gen}" 2>/dev/null | grep -cE '^\| 85 \| porta \| source \|$' || true)"
   RULES_LINT_SRC="${tmp}/ap-typo.sh" bash "${gen}" >/dev/null 2>&1 || _ap_t=$?
   RULES_LINT_SRC="${tmp}/ap-nosrc.sh" bash "${gen}" >/dev/null 2>&1 || _ap_n=$?
-  if [ "${_ap_ok}" = 1 ] && [ "${_ap_t}" -eq 2 ] && [ "${_ap_n}" -eq 2 ]; then
+  # a 2ª declaração DENTRO da função (que o lint antes lia e o registro não via) também recusa
+  printf '# REGRA 85 — porta [SOFT]\n# previne: z\n# aplica-se: source\ncheck_ap() {\n# aplica-se: mini\n  violation "SOFT" "x" "y"\n}\n' > "${tmp}/ap-dup.sh"
+  local _ap_d=0; RULES_LINT_SRC="${tmp}/ap-dup.sh" bash "${gen}" >/dev/null 2>&1 || _ap_d=$?
+  if [ "${_ap_ok}" = 1 ] && [ "${_ap_t}" -eq 2 ] && [ "${_ap_n}" -eq 2 ] && [ "${_ap_d}" -eq 2 ]; then
     record_pass "rules-registry: (ap) '# aplica-se:' válido é projetado; typo de papel e lista sem source → exit 2"
-  else record_fail "rules-registry: (ap)" "projetado=${_ap_ok} (esperado 1) · typo rc=${_ap_t} · sem-source rc=${_ap_n} (esperados 2)"; fi
+  else record_fail "rules-registry: (ap)" "projetado=${_ap_ok} (esperado 1) · typo rc=${_ap_t} · sem-source rc=${_ap_n} · repetido rc=${_ap_d} (esperados 2)"; fi
 
   # (e) SEVERIDADE = corpo ∪ tag — guarda de severidade dinâmica + tag declarada → HARD + SOFT
   printf '# REGRA 29 — dinamica [HARD + SOFT]\n# previne: z\ncheck_d() {\n  violation "${sev}" "x" "y"\n  violation "SOFT" "b" "c"\n}\n' > "${tmp}/sev.sh"
@@ -9329,33 +9332,34 @@ run_env_exposure_selftests() {
     [ "$(_eg '{"tool_name":"Read","tool_input":{"file_path":"/x/.env.example"}}')" = 0 ] || { bad=1; record_fail "env-exposure: (h) veto" "Read de .env.example barrado"; }
     [ "${bad}" = 0 ] && record_pass "env-exposure: (h) o veto barra 13 leituras do .env e deixa passar 14 caminhos honestos"
   fi
-  # (r) SAC-149 (2026-10-15, os 2 falsos positivos medidos no --update de um adotante): (r1) o PADRÃO do grep
-  #     (`\.claude/hooks/[A-Za-z0-9_.-]*`) era julgado como glob que alcança `.env` quando a linha citava um
-  #     .env literal; (r2) um `*.env` sem segredo que a sessão gravou no scratchpad dela era vetado na leitura.
-  #     As duas polaridades: os honestos passam, e o veto real do .env (inclusive a cópia dele no scratchpad,
-  #     que `cp .env <scratch>/x.env` permite) segue barrado.
+  # (r) SAC-149 (2026-10-15, falsos positivos medidos no --update de um adotante). (r1) CURADO: o PADRÃO do grep
+  #     (`\.claude/hooks/[A-Za-z0-9_.-]*`) era julgado como glob que alcança `.env` quando a linha citava um .env
+  #     literal. (r2) NÃO curado, por desenho: o `*.env` de trabalho do scratchpad segue vetado — a isenção por
+  #     conteúdo foi furada pela passada adversarial (cp .env + cat num comando só; DB_PW e URL com credencial) —,
+  #     e a mensagem passa a dizer a saída honesta (outra extensão). As duas polaridades, com os escapes medidos:
+  #     abreviação de opção longa do GNU getopt, GREP_* no segmento, rg com config, e `dd if=.env` (anterior).
   if [ -f "${guard}" ]; then
     local _rsd; _rsd="/tmp/claude-$(id -u)/selftest-envguard-$$/scratchpad"
     mkdir -p "${_rsd}"
     printf 'PIN=abc\nROLE=adopted\n' > "${_rsd}/update.env"
-    printf 'LINEAR_API_KEY=lin_api_xxxxxxxxxxxxxxxxxxxxxxxx\n' > "${_rsd}/copia.env"
-    printf 'X=AbCdEfGhIjKlMnOpQrStUvWxYz0123\n' > "${_rsd}/valor.env"
     _egb() { _eg "$(python3 -c 'import json,sys;print(json.dumps({"tool_name":"Bash","tool_input":{"command":sys.argv[1]}}))' "$1")"; }
-    local _rbad="" c
+    local _rbad="" c _rmsg
     for c in "grep -oE '\\.claude/hooks/[A-Za-z0-9_.-]*' .claude/settings.json; test -f .env" \
              "grep -oE \"\\.claude/hooks/[A-Za-z0-9_.-]*\" .claude/settings.json && grep -c x .env.example" \
-             "cat ${_rsd}/update.env"; do
+             "grep .env .gitignore"; do
       [ "$(_egb "${c}")" = 0 ] || _rbad="${_rbad} [barrou honesto: ${c}]"
     done
-    [ "$(_eg "{\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"${_rsd}/update.env\"}}")" = 0 ] || _rbad="${_rbad} [Read do scratchpad sem segredo barrado]"
     for c in 'grep -q KEY .env' 'grep -e KEY .env' 'grep -f pats .env' 'grep -- KEY .env' "grep -oE '\\.claude/hooks/[A-Za-z0-9_.-]*' .env" \
-             'rg KEY .env' "cat ${_rsd}/copia.env" "cat ${_rsd}/valor.env" "cat ${_rsd}/../scratchpad/copia.env" "cat ${_rsd}/nao-existe.env"; do
+             'grep --regex=. .env' 'grep --reg=. .env' 'grep --fi=p .env' 'GREP_OPTIONS=-e. grep x .env' 'rg KEY .env' \
+             'dd if=.env' 'dd if=.env status=none' "cp .env ${_rsd}/x.env; cat ${_rsd}/x.env" "cat ${_rsd}/update.env"; do
       [ "$(_egb "${c}")" = 2 ] || _rbad="${_rbad} [deixou passar: ${c}]"
     done
-    [ "$(_eg "{\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"${_rsd}/copia.env\"}}")" = 2 ] || _rbad="${_rbad} [Read da cópia com segredo passou]"
+    [ "$(_eg "{\"tool_name\":\"Read\",\"tool_input\":{\"file_path\":\"${_rsd}/update.env\"}}")" = 2 ] || _rbad="${_rbad} [Read do *.env do scratchpad passou]"
+    _rmsg="$(python3 -c 'import json,sys;print(json.dumps({"tool_name":"Bash","tool_input":{"command":sys.argv[1]}}))' "cat ${_rsd}/update.env" | bash "${guard}" 2>&1 >/dev/null || true)"
+    grep -q 'grave-o com outra extensão' <<< "${_rmsg}" || _rbad="${_rbad} [a mensagem do scratchpad não diz a saída honesta]"
     rm -rf "/tmp/claude-$(id -u)/selftest-envguard-$$"
     if [ -z "${_rbad}" ]; then
-      record_pass "env-exposure: (r) o padrão do grep não é arquivo lido e o *.env sem segredo do scratchpad passa; 11 leituras reais do .env (cópia no scratchpad inclusa) seguem barradas"
+      record_pass "env-exposure: (r) o padrão do grep não é arquivo lido; 14 leituras do .env seguem barradas (abreviação, GREP_*, rg, dd if=, cp+cat no scratchpad) e o *.env do scratchpad diz a saída"
     else record_fail "env-exposure: (r)" "${_rbad}"; fi
   fi
   # (q) CUSTO LINEAR (fix/vetos-fail-closed, 2026-10-11): token único de 2 MB. Antes, o regex de cites_env e
@@ -30576,6 +30580,29 @@ run_adopter_shape_selftests() {
   if grep -q 'REGRA 108 (Pin do grafo de adoção concorda com o carimbo): o grafo diz pin fedcba987654, o carimbo diz 0123456789ab' "${d}/hard108.lst"; then
     record_pass "adopter-shape: (i2) pin do grafo divergente do carimbo → HARD da REGRA 108 no lint do adotante"
   else record_fail "adopter-shape: (i2)" "$(grep -E 'REGRA 108|Violações HARD' <<< "${_l108}" | head -3 | tr '\n' ' ' | cut -c1-300)"; fi
+  # (i3) o escritor do pin NÃO reescreve o label que o DONO editou (passada adversarial: trocar só o hash deixava o
+  #      resto da frase velho e cortava a cadeia dele), aceita id entre aspas, casa pin de 7 hex no label e é
+  #      idempotente (mesmo pin → nada muda, nem o verified_at: o --promote-hub sujava o grafo fora do commit).
+  local _ie="${d}/i3"; mkdir -p "${_ie}/.claude" "${_ie}/docs/onion/graph"
+  printf 'source_commit: 0123456789ab\nrole: adopted\n' > "${_ie}/.claude/.onion-version"
+  printf 'nodes:\n  - id: "ONION_INSTALLED"\n    verified_at: "2026-01-01"\n    verified_against: leitura-minha-do-carimbo\n    label: "Framework instalado: pin `0123456`, cadeia minha: antes `aaaaaaa`"\n' > "${_ie}/docs/onion/graph/onion-adoption.kg.yaml"
+  local _i3="" _ic=0 _iw=0 _ih0 _ih1
+  bash "${_pk}" "${_ie}" --check >/dev/null 2>&1 || _ic=$?
+  [ "${_ic}" -eq 0 ] || _i3="${_i3} pin-de-7-hex-no-label-deu-rc${_ic}"
+  printf 'source_commit: fedcba987654\nrole: adopted\n' > "${_ie}/.claude/.onion-version"
+  bash "${_pk}" "${_ie}" >/dev/null 2>&1 || _iw=$?
+  grep -qF 'label: "Framework instalado: pin `0123456`, cadeia minha: antes `aaaaaaa`"' "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" || _i3="${_i3} label-do-dono-reescrito"
+  grep -qx '    verified_against: leitura-minha-do-carimbo' "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" || _i3="${_i3} verified_against-do-dono-reescrito"
+  grep -qx '    x_pin: "fedcba987654"' "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" || _i3="${_i3} x_pin-nao-gravado-em-id-com-aspas"
+  [ "${_iw}" -eq 3 ] || _i3="${_i3} rc-do-label-editado=${_iw}(esperado-3)"
+  sed -i 's/^    verified_at: .*/    verified_at: "2026-01-01"/' "${_ie}/docs/onion/graph/onion-adoption.kg.yaml"   # o re-carimbo do MESMO pin não pode tocá-lo
+  _ih0="$(sha256sum "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" | cut -d' ' -f1)"
+  bash "${_pk}" "${_ie}" >/dev/null 2>&1 || true
+  _ih1="$(sha256sum "${_ie}/docs/onion/graph/onion-adoption.kg.yaml" | cut -d' ' -f1)"
+  [ "${_ih0}" = "${_ih1}" ] || _i3="${_i3} mesmo-pin-mudou-o-grafo"
+  if [ -z "${_i3}" ]; then
+    record_pass "adopter-shape: (i3) label e verified_against do dono intactos, id com aspas, pin de 7 hex, mesmo pin = nada muda"
+  else record_fail "adopter-shape: (i3)" "${_i3}"; fi
 
   rm -rf "${d}"
 }
