@@ -562,14 +562,17 @@
 .claude/validation/lint-selftest.sh	E_SEIS_CASOS_SEIS_MUTANTES_MORDEM	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_SELFTEST	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_SEMAFORO_DA_MAQUINA_MEDIDO_2026_10_13	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
+.claude/validation/lint-selftest.sh	E_UNION_APAGA_EDICAO_DA_MESMA_LINHA	docs/evolution/research/selftest-family-merge-2026-10/selftest-family-merge-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_VERSIONAMENTO_NA_BANCADA	docs/onion/graph/door-role-parity-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_VINTE_E_SEIS_CASOS_SEIS_MUTANTES_MORDEM	docs/evolution/research/guard-protected-branch-2026-10/protected-branch-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_minha_guarda_deu_fail_open	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_reproduction_3_tries	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_skeleton_vazio_reprova	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
+.claude/validation/lint-selftest.sh	Q_FAMILIA_POR_ARQUIVO	docs/evolution/research/selftest-family-merge-2026-10/selftest-family-merge-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	Q_PRECOMMIT_SELECAO_POR_CASO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/lint-selftest.sh	Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/members-validate.sh	Q_members_ci_gate	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
+.claude/validation/onion-regen-lib.sh	E_PATCH_ID_MUDA_PELO_CONTEXTO	docs/evolution/research/selftest-family-merge-2026-10/selftest-family-merge-2026-10.kg.yaml
 .claude/validation/onion-version.sh	C_TETO_P9_PAPEL_DECLARADO_PELO_STAMP	docs/evolution/research/guard-projection-ids-2026-10/projection-ids-2026-10.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	C_TETO_BANCADA_E_CORE_ONLY_FORA	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
 .claude/validation/ops-citation-travel-check.sh	C_TETO_CLASSE_SEM_O_TOKEN	docs/evolution/research/guard-ops-citation-travel-2026-10/ops-citation-travel-2026-10.kg.yaml
@@ -2369,6 +2372,7 @@ ops/mcp-onion-kg/server.py	E_OBJECAO_KB_SEARCH_GREP_SEM_DUPLO_HIFEN	docs/evoluti
 ops/mcp-onion-kg/server.py	E_OBJECAO_PRECEDENTE_SEM_FRESCOR_POR_COMMIT	docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_PRECEDENTE_USA_X_API_KEY	docs/evolution/research/onion-brain-mcp-remoto-2026-10/onion-brain-mcp-remoto-2026-10.kg.yaml
 ops/mcp-onion-kg/server.py	Q_ONION_KG_MCP_NEXT	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
+ops/merge-drivers/selftest-families.py	D_DRIVER_DE_MERGE_DAS_FAMILIAS	docs/evolution/research/selftest-family-merge-2026-10/selftest-family-merge-2026-10.kg.yaml
 ops/pr-finalize.sh	E_CONFLITO_DE_PROJECAO_GERADA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 ops/pr-finalize.sh	E_ELENXO_2_REABRIU_B1_PELA_FORMA_DO_HASH	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/pr-finalize.sh	E_ELENXO_REPROVOU_O_MOTOR_QUE_LAVAVA_RESIDUO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
@@ -2376,6 +2380,7 @@ ops/pr-finalize.sh	E_O_DOGFOOD_ACHOU_DOIS_DEFEITOS_NO_PROPRIO_MOTOR	docs/evoluti
 ops/pr-finalize.sh	E_PR_FINALIZE_ATRITO_MEDIDO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 ops/pr-finalize.sh	E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 ops/pr-finalize.sh	E_TRES_PRS_AO_CI_COM_LINT_VERMELHO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
+ops/pr-finalize.sh	Q_REREVISAO_SO_PELO_CONTEXTO	docs/evolution/research/selftest-family-merge-2026-10/selftest-family-merge-2026-10.kg.yaml
 ops/pr-merge-verified.sh	C_CHAINED_SYNC_IS_FLAWED	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
 ops/pr-merge-verified.sh	D_SYNC_GATED_IN_MERGE_PROOF	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
 ops/pr-merge-verified.sh	E_CAMINHO_RAPIDO_SEM_OPORTUNIDADE_AO_VIVO_2026_10_14	docs/evolution/research/merge-process-onion-2026-10/merge-process-onion-2026-10.kg.yaml
