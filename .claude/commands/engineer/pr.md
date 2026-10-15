@@ -122,8 +122,9 @@ Siga estes passos para criar o PR:
    `findings_total`/`real`/`fixed`, `tokens`, `duration_min`, e o `elenxo: sim` que **passa a ser
    verdadeiro por construção** — antes deste passo ele era declarado antes de a passada existir.
 
-   **O resíduo nasce do gerador, nunca à mão** (SAC-142, 2026-10-15: 12 resíduos escritos à mão em 10 dias
-   nasceram fora do esquema). Execute, preencha os campos e confira:
+   **No core, onde a REGRA 56 vale, o resíduo nasce do gerador, nunca à mão** (SAC-142, 2026-10-15: 12
+   resíduos escritos à mão em 10 dias nasceram fora do esquema). Em repo derivado o validador se declara fora
+   de escopo e este passo não se aplica. Execute, preencha os campos e confira:
 
    ```bash
    R="docs/evolution/review/$(git branch --show-current | tr / -).md"
