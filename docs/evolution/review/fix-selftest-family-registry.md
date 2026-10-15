@@ -1,6 +1,6 @@
 ---
 branch: fix/selftest-family-registry
-pr: pendente
+pr: 1146
 date: 2026-10-15
 reviewed_diff_sha256: pendente
 findings_total: 7
