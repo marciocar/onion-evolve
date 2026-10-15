@@ -97,6 +97,15 @@ Toda dissecação que chega ao N3 fecha num destes, **com razão escrita**:
 
 **O que NÃO é veredito:** "interessante", "promissor", "vale acompanhar". São parque sem gatilho.
 
+**REJEITAR e PARQUEAR são vereditos NEGATIVOS, e negativo leva superação e critério** (SAC-151). O
+maestro, em 2026-10-15: "um juiz de sim ou não sem tentar superação em uma pesquisa pode restringir possibilidades de crescimento e inovação; é preciso ter medição e critérios claros". O nó do veredito declara
+`x_dissect_criterion: "<comando que checa a reprovação>"` e `x_dissect_overcoming: <id>`, que aponta o nó
+deste grafo com o que supera (aresta dele para a decisão), ou `nenhuma` mais
+`x_dissect_overcoming_measure: "<o que se procurou e onde>"`. Sem isso o censo marca
+`veredito-SEM-SUPERACAO` e `dissect-census.sh . --check-verdict <ferramenta>` sai 1. Caso-modelo: a
+rejeição do markitdown num adotante de curadoria, cuja superação medida foi o `tesseract` local lendo o
+PDF escaneado em que a ferramenta saía vazia.
+
 ---
 
 ## 3. Evidência: executar quando der, ler quando não der, e DECLARAR qual foi

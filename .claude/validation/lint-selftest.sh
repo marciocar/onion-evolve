@@ -7036,6 +7036,227 @@ run_corpus_grep_selftests() {
   else record_skip "corpus-grep: (f) skill onion-research ausente"; fi
 }
 
+# ── SAC-151: O JUIZ QUE REPROVA BUSCA O QUE SUPERA, POR CRITÉRIO PRÉ-REGISTRADO ─────────────────────
+# POR QUE EXISTE (maestro, 2026-10-15, verbatim): "um juiz de sim ou não sem tentar superação em uma
+# pesquisa pode restringir possibilidades de crescimento e inovação; é preciso ter medição e critérios
+# claros". Medido no mesmo dia: `grep -c supera .claude/workflows/onion-research.js` = 0 — veredito negativo
+# sem superação e sem critério checável PASSAVA em todos os juízes. Estes casos REPROVAM no main de antes
+# (o bloco overcoming-gate não existe) e cada um tem MUTANTE que reverte a cura e exige o vermelho.
+#
+# _og_probe <arquivo-com-o-bloco> → JSON {kept:[alvos], recused:[[alvo, why]]} dos 6 vereditos-fixture.
+_og_probe() {
+  local src="$1" d out
+  d="$(mktemp -d)"
+  { awk '/^\/\/ >>> overcoming-gate/{f=1} f{print} /^\/\/ <<< overcoming-gate/{f=0}' "${src}"
+    cat <<'JS'
+const C = criteriaFrom([{ id: 'K1', when: 'w', check: 'grep -c x y' }], [])
+const ok = { achada: true, o_que: 'a variante que supera', medida: 'medido com grep -c x y = 3' }
+const V = [
+  { alvo: 'neg-sem-superacao', neg: true, criterio: { id: 'K1', comando: 'grep -c x y' } },
+  { alvo: 'neg-completo', neg: true, criterio: { id: 'K1', comando: 'grep -c x y' }, superacao: ok },
+  { alvo: 'neg-criterio-fora', neg: true, criterio: { id: 'K9', comando: 'grep -c x y' }, superacao: ok },
+  { alvo: 'neg-nao-achada-sem-medida', neg: true, criterio: { id: 'K1', comando: 'grep -c x y' }, superacao: { achada: false, o_que: '', medida: '' } },
+  { alvo: 'pos-sem-nada', neg: false },
+  { alvo: 'neg-achada-sem-o-que', neg: true, criterio: { id: 'K1', comando: 'grep -c x y' }, superacao: { achada: true, o_que: '', medida: 'medido com grep' } }]
+const g = gateNegatives(V, v => v.neg, C)
+console.log(JSON.stringify({ kept: g.kept.map(v => v.alvo), recused: g.recused.map(r => [r.verdict.alvo, r.why]), found: overcomingsFound(g.kept).map(v => v.alvo) }))
+JS
+  } > "${d}/p.cjs"
+  out="$(node "${d}/p.cjs" 2>&1 || true)"; rm -rf "${d}"; printf '%s\n' "${out}"
+}
+# _og_mutate <arquivo> a|b → o arquivo com UMA metade do gate revertida (sem quebrar a execução):
+#   a = negativo sem superação passa a valer · b = critério fora do registro passa a valer
+_og_mutate() {
+  case "$2" in
+    a) sed "s/  const s = v \&\& v.superacao\$/  const s = (v \&\& v.superacao) || { achada: false, o_que: '', medida: 'ONION_MUTANTE preenchido' }/" "$1" ;;
+    b) sed "s/if (!criteria.some(k => k.id === String(c.id).trim()))/if (false \&\& !criteria.some(k => k.id === String(c.id).trim())) \/\/ ONION_MUTANTE/" "$1" ;;
+  esac
+}
+_og_probe_ok() {  # o predicado do caso (og1): 2 mantidos, 4 recusados, cada um pelo motivo certo
+  local o="$1"
+  grep -qF '"kept":["neg-completo","pos-sem-nada"]' <<< "${o}" \
+    && grep -qF '["neg-sem-superacao","veredito negativo sem superacao' <<< "${o}" \
+    && grep -qF '["neg-criterio-fora","criterio \"K9\" NAO esta pre-registrado' <<< "${o}" \
+    && grep -qF '["neg-nao-achada-sem-medida","superacao nao achada sem a razao MEDIDA' <<< "${o}" \
+    && grep -qF '["neg-achada-sem-o-que","superacao achada sem o_que' <<< "${o}" \
+    && grep -qF '"found":["neg-completo"]' <<< "${o}"
+}
+# _og_wiring_why <workflow> → '' se o gate está LIGADO nos 4 juízes e nos 2 write(KG); senão o que falta
+_og_wiring_why() {
+  local wf="$1" n
+  grep -qF "gateNegatives(verdicts.filter(Boolean), x => x.refuted === true, VERIFY_CRITERIA)" "${wf}" || { echo "Verify sem gate"; return; }
+  grep -qF "gateNegatives(elenxo.objections, o => o.survives === true, ELENXO_CRITERIA)" "${wf}" || { echo "Elenxo de decisão sem gate"; return; }
+  grep -qF "gateNegatives(pElenxo ? pElenxo.objections : [], o => o.survives === true, ELENXO_CRITERIA)" "${wf}" || { echo "Elenxo de primárias sem gate"; return; }
+  grep -qF "overcomingWhy(v, ANCHOR_CRITERIA)" "${wf}" || { echo "ancoragem sem gate"; return; }
+  n="$(grep -c "criteriaBlock(\(VERIFY\|ELENXO\|ANCHOR\)_CRITERIA)" "${wf}" || true)"; [ "${n:-0}" -ge 4 ] || { echo "critérios pré-registrados fora do prompt (${n:-0} de 4 juízes)"; return; }
+  n="$(grep -c "then: { required: \['superacao', 'criterio'\] }" "${wf}" || true)"; [ "${n:-0}" -ge 4 ] || { echo "schema não exige superação no negativo (${n:-0} de 4)"; return; }
+  grep -qF "sup: supNeed })" "${wf}" && grep -qF "engineOk(kgW.ver, supNeed)" "${wf}" || { echo "write(KG) principal não conta as superações"; return; }
+  grep -qF "sup: pSup })" "${wf}" && grep -qF "engineOk(pW.ver, pSup)" "${wf}" || { echo "write(KG) de primárias não conta as superações"; return; }
+  echo ""
+}
+_judge_overcoming_research_cases() {
+  local wf="$1" cwf="$2" jvc="$3" o why m
+  command -v node >/dev/null 2>&1 || { record_skip "research-workflow: (og) node ausente → gate de superação NÃO VERIFICADO"; return; }
+  # (og1) o gate EXECUTADO sobre o bloco REAL: negativo sem superação / com critério fora do registro /
+  #       achada:false sem medida / achada sem o_que ⇒ RECUSADOS; negativo completo e positivo ⇒ mantidos.
+  o="$(_og_probe "${wf}")"
+  if _og_probe_ok "${o}"; then record_pass "research-workflow: (og1) veredito negativo sem superação ou sem critério pré-registrado é RECUSADO pelo motor (4 de 6 fixtures, cada um pelo motivo)"
+  else record_fail "research-workflow: (og1)" "o gate de superação não recusou o que devia: ${o:0:300}"; fi
+  # (og1m) MUTANTES: sem a exigência de superação, ou sem a pertença ao registro, o (og1) REPROVA
+  m="$(mktemp -d)"
+  _og_mutate "${wf}" a > "${m}/a.js"; _og_mutate "${wf}" b > "${m}/b.js"
+  if _og_probe_ok "$(_og_probe "${m}/a.js")"; then record_fail "research-workflow: (og1m-a)" "MUTANTE sem a exigência de superação PASSOU no (og1)"
+  else record_pass "research-workflow: (og1m-a) mutante que aceita negativo SEM superação reprova no (og1)"; fi
+  if _og_probe_ok "$(_og_probe "${m}/b.js")"; then record_fail "research-workflow: (og1m-b)" "MUTANTE sem a pertença ao registro de critérios PASSOU no (og1)"
+  else record_pass "research-workflow: (og1m-b) mutante que aceita critério NÃO pré-registrado reprova no (og1)"; fi
+  # (og2) o gate está LIGADO onde o veredito nasce (Verify, Elenxo×2, ancoragem), os critérios vão no prompt,
+  #       o schema exige as duas metades no negativo e os dois write(KG) contam os nós de superação.
+  why="$(_og_wiring_why "${wf}")"
+  if [ -z "${why}" ]; then record_pass "research-workflow: (og2) gate ligado nos 4 juízes, critérios no prompt, schema if/then e contagem nos 2 write(KG)"
+  else record_fail "research-workflow: (og2)" "${why}"; fi
+  sed "s/const g = gateNegatives(verdicts.filter(Boolean), x => x.refuted === true, VERIFY_CRITERIA)/const g = { kept: verdicts.filter(Boolean), recused: [] } \/\/ mutante/" "${wf}" > "${m}/c.js"
+  if [ -z "$(_og_wiring_why "${m}/c.js")" ]; then record_fail "research-workflow: (og2m)" "MUTANTE com o Verify sem gate PASSOU no (og2)"
+  else record_pass "research-workflow: (og2m) mutante que desliga o gate do Verify reprova no (og2): $(_og_wiring_why "${m}/c.js")"; fi
+  # (og3) superação ACHADA que não virou nó REPROVA o grafo no motor: o verificador conta 0 de 1 exigido ⇒
+  #       3 tentativas e reprovado; contando 1 ⇒ aprovado na 1ª. Mutante: engineOk sem a cláusula da superação.
+  local ogd r0 r1 rm_
+  ogd="$(mktemp -d)"
+  for nodes in 0 1; do
+    { printf '%s\n' "const TASK_ANCHOR='';const KG_PATH='d/x.kg.yaml';const kgPathOk=p=>'';const N=${nodes};" \
+        "const agent=async(p,o)=> String(o.label).startsWith('verify-kg-') ? {radarExit:0,contractExit:0,output:'',overcomingNodes:N} : {kgPath:'/r/d/x.kg.yaml',radarExit:0,nodes:1,edges:0,summary:'s'};const ag=(p,o)=>agent(p,o);"
+      awk '/^\/\/ >>> engine-verify/{f=1} f{print} /^\/\/ <<< engine-verify/{f=0}' "${wf}"
+      printf '%s\n' "(async()=>{const s={need:1,prefix:'C_SUPERACAO_X_'};const r=await writeAndVerify('p',{label:'write-kg',sup:s});console.log(JSON.stringify({n:r.attempts.length,ok:engineOk(r.ver,s)}))})().catch(e=>console.log(JSON.stringify({thrown:String(e)})))"
+    } > "${ogd}/e${nodes}.mjs"
+  done
+  r0="$(node "${ogd}/e0.mjs" 2>&1 || true)"; r1="$(node "${ogd}/e1.mjs" 2>&1 || true)"
+  if grep -qF '"n":3,"ok":false' <<< "${r0}" && grep -qF '"n":1,"ok":true' <<< "${r1}"; then
+    record_pass "research-workflow: (og3) superação achada sem nó REPROVA o grafo no motor (3 tentativas); com o nó, aprova na 1ª"
+  else record_fail "research-workflow: (og3)" "esperava 0 nós ⇒ n3/false e 1 nó ⇒ n1/true, veio: ${r0:0:160} | ${r1:0:160}"; fi
+  sed "s/  \&\& (!sup || !(sup.need > 0) || Number(v.overcomingNodes || 0) >= sup.need)/  \&\& true \/\/ ONION_MUTANTE/" "${ogd}/e0.mjs" > "${ogd}/m0.mjs"
+  rm_="$(node "${ogd}/m0.mjs" 2>&1 || true)"
+  if grep -qF '"ok":false' <<< "${rm_}"; then record_fail "research-workflow: (og3m)" "MUTANTE sem a contagem de superação ainda reprovou — o caso não mede a cláusula: ${rm_:0:160}"
+  else record_pass "research-workflow: (og3m) mutante sem a contagem de superação APROVA o grafo sem o nó (o (og3) o pegaria)"; fi
+  rm -rf "${ogd}"
+  # (og4) a cópia do gate no motor do censo é BYTE A BYTE a do workflow (duas cópias divergem: vocabulário duplicado)
+  local b1 b2
+  b1="$(awk '/^\/\/ >>> overcoming-gate/{f=1} f{print} /^\/\/ <<< overcoming-gate/{f=0}' "${wf}")"
+  b2="$(awk '/^\/\/ >>> overcoming-gate/{f=1} f{print} /^\/\/ <<< overcoming-gate/{f=0}' "${cwf}")"
+  if [ -n "${b1}" ] && [ "${b1}" = "${b2}" ]; then record_pass "research-workflow: (og4) census-workflow.mjs carrega o gate de superação idêntico ao do workflow (SSOT)"
+  else record_fail "research-workflow: (og4)" "gate do censo ausente ou divergente do workflow ($(printf '%s' "${b1}" | wc -l) × $(printf '%s' "${b2}" | wc -l) linhas)"; fi
+  # (og5) o JUIZ DO CENSO, executado com stubs: reprovação sem superação ⇒ RECUSADA e contada, mas SEGUE
+  #       em `reprovados` (fail-closed: o census-seal carimbaria como N/A o que saísse da lista).
+  local cd5 c5 cm5
+  cd5="$(mktemp -d)"
+  { printf '%s\n' "const args={targets:[{id:'N1',path:'p.kg.yaml',atencao:9,label:'l'}]};" \
+      "const agent=async(p,o)=> String(o.label).startsWith('juiz:') ? {aprovados:[],reprovados:[{node_id:'N1',motivo:'preguiçoso'}]} : {node_id:'N1',kg_file:'p.kg.yaml',method:'m',observed:'o',verdict:'CONFIRMED',divergence:'',blocked_by:'',claims_total:1,claims_measured:1,coverage:'TOTAL',realidade:'REAL-ACIONAVEL',proximo_passo:'x',gatilho:'',gatilho_disparou:'N/A'};" \
+      "const parallel=async(th)=>Promise.all(th.map(t=>t()));" '(async()=>{'
+    awk 'f{print} /^}$/ && !f {f=1}' "${cwf}"
+    printf '%s\n' '})().then(r=>console.log(JSON.stringify({rec:r.reprovacoes_recusadas,rep:r.juizo[0].reprovados}))).catch(e=>console.log(JSON.stringify({thrown:String(e)})));'
+  } > "${cd5}/c.mjs"
+  c5="$(node "${cd5}/c.mjs" 2>&1 || true)"
+  if grep -qF '"rec":1' <<< "${c5}" && grep -qF '"node_id":"N1","motivo":"RECUSADA-SEM-SUPERACAO' <<< "${c5}" && grep -qF '"recusada":true' <<< "${c5}"; then
+    record_pass "research-workflow: (og5) juiz do censo: reprovação sem superação RECUSADA, contada e mantida em reprovados (nunca carimbada por omissão)"
+  else record_fail "research-workflow: (og5)" "o motor do censo não recusou a reprovação sem superação: ${c5:0:300}"; fi
+  grep -vF "for (const r of g.recused) { r.verdict.motivo" "${cd5}/c.mjs" > "${cd5}/m.mjs"
+  cm5="$(node "${cd5}/m.mjs" 2>&1 || true)"
+  if grep -qF '"rec":1' <<< "${cm5}"; then record_fail "research-workflow: (og5m)" "MUTANTE sem a recusa no censo PASSOU no (og5)"
+  else record_pass "research-workflow: (og5m) mutante sem a recusa no motor do censo reprova no (og5)"; fi
+  rm -rf "${cd5}"
+  # (og6) o MESMO gate para os juízes conduzidos pela sessão: judge-verdict-check.sh executa o bloco do
+  #       workflow (SSOT). Ruim ⇒ rc 1 com 2 RECUSADO e 1 SUPERACAO; bom ⇒ rc 0; sem critérios ⇒ rc 3.
+  #       Mutante: apontar o SSOT para a cópia sem a exigência de superação faz o ruim passar.
+  local j6 jo jr jg jgr js jsr jm jmr
+  j6="$(mktemp -d)"
+  printf '%s' '{"criteria":[{"id":"C1","when":"x","check":"grep -c foo bar"}],"verdicts":[{"alvo":"a","veredito":"REJEITAR","criterio":{"id":"C1","comando":"grep -c foo bar"},"superacao":{"achada":true,"o_que":"tesseract local lê o escaneado","medida":"pdftoppm+tesseract acham 2,711,633"}},{"alvo":"b","veredito":"INCONCLUSIVO"},{"alvo":"c","veredito":"APROVADO"},{"alvo":"d","veredito":"REPROVADO","criterio":{"id":"C9","comando":"x y z"},"superacao":{"achada":false,"o_que":"","medida":"procurei em X com grep"}}]}' > "${j6}/bad.json"
+  printf '%s' '{"criteria":[{"id":"C1","when":"x","check":"grep -c foo bar"}],"verdicts":[{"alvo":"a","veredito":"REPROVADO","criterio":{"id":"C1","comando":"grep -c foo bar"},"superacao":{"achada":false,"o_que":"","medida":"grep -rn foo docs/ = 0 e WebSearch foo = 0"}},{"alvo":"c","veredito":"APROVADO"}]}' > "${j6}/good.json"
+  printf '%s' '{"verdicts":[{"alvo":"a","veredito":"REPROVADO"}]}' > "${j6}/nocrit.json"
+  if jo="$(bash "${jvc}" "${j6}/bad.json" 2>&1)"; then jr=0; else jr=$?; fi
+  if jg="$(bash "${jvc}" "${j6}/good.json" 2>&1)"; then jgr=0; else jgr=$?; fi
+  if js="$(bash "${jvc}" "${j6}/nocrit.json" 2>&1)"; then jsr=0; else jsr=$?; fi
+  if [ "${jr}" = 1 ] && [ "$(grep -c '^RECUSADO' <<< "${jo}")" = 2 ] && [ "$(awk -F'\t' '$1=="SUPERACAO" && $2=="a"' <<< "${jo}" | grep -c .)" = 1 ] && [ "${jgr}" = 0 ] && [ "${jsr}" = 3 ]; then
+    record_pass "research-workflow: (og6) judge-verdict-check.sh: INCONCLUSIVO sem superação e critério fora do registro ⇒ rc 1 (2 recusados); completo ⇒ rc 0; sem critérios ⇒ rc 3"
+  else record_fail "research-workflow: (og6)" "rc ruim=${jr} bom=${jgr} sem-critério=${jsr}: ${jo:0:200}"; fi
+  _og_mutate "${wf}" a | _og_mutate /dev/stdin b > "${j6}/mut.js"
+  if jm="$(ONION_OVERCOMING_GATE_SRC="${j6}/mut.js" bash "${jvc}" "${j6}/bad.json" 2>&1)"; then jmr=0; else jmr=$?; fi
+  if [ "${jmr}" = 1 ] && [ "$(grep -c '^RECUSADO' <<< "${jm}")" = 2 ]; then record_fail "research-workflow: (og6m)" "MUTANTE do SSOT não mudou o veredito do checker — ele não executa o bloco"
+  else record_pass "research-workflow: (og6m) com o SSOT mutado o checker deixa passar (prova que ele EXECUTA o bloco do workflow, não uma cópia)"; fi
+  rm -rf "${j6}" "${m}"
+}
+# _og_dissect_states <dissect-census.sh> → "<estado-sem>|<rc-sem>|<estado-ok>|<rc-ok>|<estado-nenhuma>|<estado-sem-aresta>"
+_og_dissect_states() {
+  local sut="$1" d out
+  d="$(mktemp -d)"; git -C "${d}" init -q -b main 2>/dev/null; mkdir -p "${d}/docs/evolution/dissect"
+  _og_kg() {  # $1=ferramenta $2=marcadores extras do nó D (já indentados) $3=arestas extras
+    printf 'meta:\n  id: %s\n  x_dissect_tool: %s\n  baseline: "2026-10-15"\n  review_after: "2099-01-01"\nnodes:\n  - id: E_SUP\n    node_type: evidence\n    x_dissect_level: 3\n    label: "o tesseract local le o escaneado"\n  - id: D_X\n    node_type: decision\n    x_dissect_level: 3\n    x_dissect_verdict: rejeitar\n%b    label: "rejeitar"\n\nedges:\n%b' "$1" "$1" "$2" "$3" > "${d}/docs/evolution/dissect/$1.kg.yaml"
+  }
+  _og_kg semmarca '' '  - from: E_SUP\n    to: D_X\n    edge_type: SUPPORTS\n'
+  _og_kg completa '    x_dissect_criterion: "pdftotext a.pdf - | wc -c = 0"\n    x_dissect_overcoming: E_SUP\n' '  - from: E_SUP\n    to: D_X\n    edge_type: SUPPORTS\n'
+  _og_kg nenhuma '    x_dissect_criterion: "pdftotext a.pdf - | wc -c = 0"\n    x_dissect_overcoming: nenhuma\n    x_dissect_overcoming_measure: "procurei OCR offline: apt-cache search ocr e o README"\n' '  - from: E_SUP\n    to: D_X\n    edge_type: SUPPORTS\n'
+  _og_kg semaresta '    x_dissect_criterion: "pdftotext a.pdf - | wc -c = 0"\n    x_dissect_overcoming: E_SUP\n' '  - from: D_X\n    to: E_SUP\n    edge_type: SUPPORTS\n'
+  git -C "${d}" add -A >/dev/null 2>&1
+  local tsv r1 r2
+  tsv="$(bash "${sut}" "${d}" --tsv 2>&1)"
+  bash "${sut}" "${d}" --check-verdict semmarca >/dev/null 2>&1; r1=$?
+  bash "${sut}" "${d}" --check-verdict completa >/dev/null 2>&1; r2=$?
+  _st() { printf '%s\n' "${tsv}" | awk -F'\t' -v t="$1" '$1==t{print $9; exit}'; }
+  printf '%s|%s|%s|%s|%s|%s\n' "$(_st semmarca)" "${r1}" "$(_st completa)" "${r2}" "$(_st nenhuma)" "$(_st semaresta)"
+  rm -rf "${d}"
+}
+_judge_overcoming_dissect_cases() {
+  local sut="$1" o m
+  # (og-d1) REJEITAR sem critério nem superação NÃO conta como veredito (estado veredito-SEM-SUPERACAO,
+  #         --check-verdict rc 1); com x_dissect_criterion + x_dissect_overcoming (nó com aresta para a
+  #         decisão) conta (rc 0); `nenhuma` com a medida conta; superação SEM aresta para a decisão não conta.
+  o="$(_og_dissect_states "${sut}")"
+  case "${o}" in
+    'veredito-SEM-SUPERACAO(sem-x_dissect_criterion,sem-x_dissect_overcoming)|1|veredito|0|veredito|veredito-SEM-SUPERACAO(sem-aresta-E_SUP-para-D_X)')
+      record_pass "dissect: (og-d1) rejeitar sem critério/superação é RECUSADO (rc 1); com os dois marcadores conta (rc 0); 'nenhuma' medida conta; superação sem aresta não conta" ;;
+    *) record_fail "dissect: (og-d1)" "estados inesperados: ${o}" ;;
+  esac
+  # (og-d1m) MUTANTE: sem o ramo do veredito negativo, o rejeitar nu volta a contar ⇒ (og-d1) reprova
+  m="$(mktemp -d)"
+  sed 's/  elif \[ "${verdict}" = "rejeitar" \] || \[ "${verdict}" = "parquear" \]; then/  elif false; then # ONION_MUTANTE/' "${sut}" > "${m}/dc.sh"
+  case "$(_og_dissect_states "${m}/dc.sh")" in
+    veredito\|*) record_pass "dissect: (og-d1m) mutante sem o ramo do negativo deixa o rejeitar nu contar como veredito (o (og-d1) o pega)" ;;
+    *) record_fail "dissect: (og-d1m)" "o mutante não mudou o estado — o caso não mede o ramo: $(_og_dissect_states "${m}/dc.sh")" ;;
+  esac
+  rm -rf "${m}"
+}
+# _judge_overcoming_seal_case <census-seal.py>: reprovação com superação ACHADA vira nó C_SUPERACAO_ com
+# TRACES_TO ao nó; reprovação RECUSADA (recusada:true) não vira nó. Mutante: sem o filtro da recusa.
+_og_seal_run() {
+  local seal="$1" d g out
+  d="$(mktemp -d)"; mkdir -p "$d/docs/onion/graph"; g="docs/onion/graph/fx.kg.yaml"
+  printf 'meta:\n  id: fx\nnodes:\n  - id: N_REP\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    label: "a"\n  - id: N_REC\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    label: "b"\n\nedges:\n  - from: N_REP\n    to: N_REC\n    edge_type: SUPPORTS\n' > "$d/$g"
+  python3 - "$d/c.json" "$g" <<'PY'
+import json,sys
+m=lambda n: {"node_id":n,"kg_file":sys.argv[2],"verdict":"CONFIRMED","realidade":"REAL-ACIONAVEL","gatilho_disparou":"N/A","claims_total":1,"claims_measured":1,"method":"m","observed":"o","divergence":""}
+sup={"achada":True,"o_que":"o nó já foi entregue pelo comando X","medida":"git log -S X devolve o commit abc"}
+crit={"id":"J4_SEM_PROCURA_DA_MORTE","comando":"git log -S X --oneline"}
+json.dump({"run_id":"wf_fx","medidos":[m("N_REP"),m("N_REC")],"juizo":[{"aprovados":[],"reprovados":[{"node_id":"N_REP","motivo":"m","superacao":sup,"criterio":crit},{"node_id":"N_REC","motivo":"RECUSADA-SEM-SUPERACAO","recusada":True,"superacao":sup,"criterio":crit}]}],"reprovacoes_recusadas":1,"nao_medidos_por_teto":[],"parametros":{}},open(sys.argv[1],'w'))
+PY
+  out="$(ONION_CENSUS_ROOT="$d" python3 "${seal}" seal "$d/c.json" 2>&1)"; local rc=$?
+  printf 'rc=%s rep=%s rec=%s edge=%s out=%s\n' "${rc}" "$(grep -c '^  - id: C_SUPERACAO_[0-9]*_N_REP$' "$d/$g")" "$(grep -c '^  - id: C_SUPERACAO_[0-9]*_N_REC$' "$d/$g")" \
+    "$(awk '/- from: C_SUPERACAO_[0-9]*_N_REP$/{getline a; getline b; print a b}' "$d/$g" | tr -s ' ')" "$(printf '%s' "${out}" | tail -1)"
+  rm -rf "$d"
+}
+_judge_overcoming_seal_case() {
+  local seal="$1" o m
+  o="$(_og_seal_run "${seal}")"
+  if grep -qF 'rc=0 rep=1 rec=0 edge= to: N_REP edge_type: TRACES_TO' <<< "${o}" && grep -qF 'superacoes=1 recusadas=1' <<< "${o}"; then
+    record_pass "census-seal: (og) reprovação com superação ACHADA vira nó C_SUPERACAO_ com TRACES_TO (radar 0); a RECUSADA não vira nó"
+  else record_fail "census-seal: (og)" "superação não virou nó como devia: ${o:0:300}"; fi
+  m="$(mktemp -d)"
+  sed "s/ and not x.get('recusada'): sups\[x\['node_id'\]\] = x/: sups[x['node_id']] = x  # ONION_MUTANTE/" "${seal}" > "${m}/s.py"
+  # o mutante mora fora da árvore: SCRIPTS (radar/projection-safety) vem do diretório do script — copia a forma
+  mkdir -p "${m}/r/.claude/utils/census" && cp "${m}/s.py" "${m}/r/.claude/utils/census/census-seal.py" \
+    && ln -s "${REPO_ROOT}/.claude/validation" "${m}/r/.claude/validation" && mkdir -p "${m}/r/docs" && ln -s "${REPO_ROOT}/docs/evolution" "${m}/r/docs/evolution"
+  if grep -qF 'rec=0' <<< "$(_og_seal_run "${m}/r/.claude/utils/census/census-seal.py")"; then
+    record_fail "census-seal: (og-m)" "MUTANTE sem o filtro da recusa não escreveu o nó da recusada — o caso não mede o filtro"
+  else record_pass "census-seal: (og-m) mutante sem o filtro da recusa escreve nó para a reprovação RECUSADA (o (og) o pega)"; fi
+  rm -rf "${m}"
+}
+
 run_research_workflow_selftests() {
   local wf="${REPO_ROOT}/.claude/workflows/onion-research.js" sk="${REPO_ROOT}/.claude/skills/onion-research/SKILL.md" rs="${REPO_ROOT}/docs/onion/radar-sources.yaml"
   local rd="${REPO_ROOT}/.claude/commands/common/prompts/research-doctrine.md"
@@ -7203,6 +7424,8 @@ run_research_workflow_selftests() {
      && grep -qF 'na dúvida, omita a chave' <<< "${_v42}"; then
     record_pass "research-workflow: (r) o contrato do write(KG) ensina a locality do v4.2 (4 classes, o código do aviso, omitir na dúvida)"
   else record_fail "research-workflow: (r)" "CONTRACT_V3 sem a linha da locality do v4.2: ${_v42:-<ausente>}"; fi
+  # (og*) SAC-151 — juiz que reprova busca o que supera, por critério pré-registrado (casos e mutantes acima)
+  _judge_overcoming_research_cases "${wf}" "${REPO_ROOT}/.claude/utils/census/census-workflow.mjs" "${REPO_ROOT}/.claude/validation/judge-verdict-check.sh"
 }
 
 run_research_lens_selftests() {
@@ -25706,6 +25929,8 @@ PY
     else record_fail "census-seal: (v3)" "o censo sujou o grafo (rc=${v3rc}): ${v3o}"; fi
   else record_skip "census-seal: (v3) vendor do contrato ou PyYAML/jsonschema ausentes (SUT não exercido)"; fi
   rm -rf "$d"
+  # (og) SAC-151 — a superação achada pelo juiz do censo vira nó; a recusada não
+  _judge_overcoming_seal_case "${seal}"
 }
 
 run_members_registry_selftests() {
@@ -31144,6 +31369,8 @@ KG
     record_pass "dissect: (e) zero .kg.yaml rastreado ⇒ rc=3 DECLARANDO (≠ o zero medido do caso f)"
   else record_fail "dissect: (e)" "repo sem corpus nao recusou (rc=${vrc}): $(_emit "${oev}" | head -c 200)"; fi
   rm -rf "${er}"
+  # (og-d*) SAC-151 — rejeitar/parquear exigem critério checável e superação
+  _judge_overcoming_dissect_cases "${sut}"
 }
 
 _family run_dissect_selftests

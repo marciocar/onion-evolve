@@ -30,7 +30,10 @@ allowed-tools: Bash, Read, Write, Edit, Task, Workflow
   `--all` (window 0) é decisão explícita, nunca default.
 - **Re-testar, nunca re-carimbar**: só medição executada gera `verified_at` novo. Juiz fixo
   (opus/high, calibração 2026-08-29) audita CONFIRMED e GATED-não-disparado; reprovado fica
-  SEM carimbo, com o motivo listado.
+  SEM carimbo, com o motivo listado. Reprovar exige critério pré-registrado (`J1`…`J5`, ou
+  `args.rejectionCriteria`) com o comando que o checa, e superação `{achada, o_que, medida}`;
+  reprovação sem as duas é RECUSADA pelo motor (segue sem carimbo, contada em
+  `reprovacoes_recusadas`), e a superação achada vira nó `C_SUPERACAO_…` no grafo do nó (SAC-151).
 - **Flips de status = PROPOSTOS** (tabela de selagem do /meta:drive); maestro sela.
 - **Maestro-invocado** (W7 = MOAT). O relógio é a REGRA 65/62 — a máquina detecta, você roda.
 

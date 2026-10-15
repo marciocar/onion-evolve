@@ -92,6 +92,14 @@ cobrando. E uma fronteira medida: o censo só reconhece a bancada (peça 7) dent
 ter lugar próprio, o censo de um componente forjado fora do core marca a peça 7 como ausente, e isso é
 declaração do censo, não defeito do componente.
 
+> **O refutador que reprova aponta o que supera** (SAC-151, maestro 2026-10-15: "um juiz de sim ou
+> não sem tentar superação em uma pesquisa pode restringir possibilidades de crescimento e
+> inovação; é preciso ter medição e critérios claros"). O subagente que REFUTA a forja devolve, para
+> cada reprovação, o critério pré-registrado com o comando que a checa e a superação
+> `{achada, o_que, medida}`. Ou seja, a peça que já existe, o molde ou a variante que entregaria o que o comando prometia. A sessão confere com
+> `bash .claude/validation/judge-verdict-check.sh <vereditos.json>` (rc 1 = reprovação recusada e
+> contada), e a superação achada vira nó.
+
 ## O que esta doutrina NÃO promete
 
 Ela mede **presença e referência**, nunca qualidade: não diz se a doutrina emitida é boa, se o
