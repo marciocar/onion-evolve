@@ -32531,6 +32531,50 @@ JSON
   rm -rf "${d}"
 }
 _family run_merge_hooks_prune_selftests
+# Modo sync-main-worktree — depois do merge PROVADO, a worktree com `main` em uso (o checkout principal, de onde o
+# harness lê os hooks) sobe por fast-forward (SAC-143, 2026-10-15: 36 commits atrás e o hook aposentado no #1129
+# ainda disparando). Repositórios REAIS: remoto bare, a worktree em main atrás, e uma worktree de trabalho.
+run_sync_main_worktree_selftests() {
+  local sut="${REPO_ROOT}/ops/sync-main-worktree.sh" pmv="${REPO_ROOT}/ops/pr-merge-verified.sh"
+  [ -f "${sut}" ] || { record_skip "sync-main: ops/ ausente (adotante) → pulado"; return; }
+  local d out g; d="$(mktemp -d)"; g=(-c user.email=t@t -c user.name=t)
+  git init -q --bare -b main "${d}/origin.git"
+  git clone -q "${d}/origin.git" "${d}/main" 2>/dev/null
+  ( cd "${d}/main" && printf 'v1\n' > a.txt && printf 'x\n' > b.txt && git add -A && git "${g[@]}" commit -qm base && git push -q origin main ) >/dev/null 2>&1
+  git -C "${d}/main" worktree add -q -b feat/w "${d}/w" origin/main 2>/dev/null
+  # outro merge chega ao origin/main (pelo clone de outra mão)
+  git clone -q "${d}/origin.git" "${d}/other" 2>/dev/null
+  ( cd "${d}/other" && printf 'v2\n' > a.txt && git "${g[@]}" commit -qam merged && git push -q origin main ) >/dev/null 2>&1
+  # (a) da worktree de trabalho, a worktree com main sobe para o origin/main
+  out="$(cd "${d}/w" && bash "${sut}" 2>&1)" || true
+  if [ "$(git -C "${d}/main" rev-parse HEAD)" = "$(git -C "${d}/origin.git" rev-parse main)" ] && [[ "${out}" == *"1 commit(s)"* ]]; then
+    record_pass "sync-main: (a) chamado de outra worktree, a worktree com main sobe por fast-forward"
+  else record_fail "sync-main: (a) ff" "out=[${out}]"; fi
+  # (b) já em dia: diz e não mexe
+  out="$(cd "${d}/w" && bash "${sut}" 2>&1)" || true
+  if [[ "${out}" == *"já em dia"* ]]; then record_pass "sync-main: (b) em dia, diz que está em dia"
+  else record_fail "sync-main: (b) em dia" "out=[${out}]"; fi
+  # (c) sujeira que NÃO conflita (b.txt) fica intacta; (d) sujeira que conflita (a.txt): recusa, aviso, nada perdido, rc 0
+  ( cd "${d}/other" && printf 'v3\n' > a.txt && git "${g[@]}" commit -qam again && git push -q origin main ) >/dev/null 2>&1
+  printf 'meu\n' > "${d}/main/b.txt"
+  local rc=0; out="$(cd "${d}/w" && bash "${sut}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(cat "${d}/main/b.txt")" = meu ] && [ "$(cat "${d}/main/a.txt")" = v3 ]; then
+    record_pass "sync-main: (c) arquivo sujo que o merge não toca fica intacto, e o resto sobe"
+  else record_fail "sync-main: (c) sujeira alheia" "rc=${rc} b=[$(cat "${d}/main/b.txt")] a=[$(cat "${d}/main/a.txt")] out=[${out}]"; fi
+  ( cd "${d}/other" && printf 'v4\n' > a.txt && git "${g[@]}" commit -qam more && git push -q origin main ) >/dev/null 2>&1
+  printf 'local\n' > "${d}/main/a.txt"
+  rc=0; out="$(cd "${d}/w" && bash "${sut}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(cat "${d}/main/a.txt")" = local ] && [[ "${out}" == *"ff-only recusou"* ]]; then
+    record_pass "sync-main: (d) arquivo sujo que conflita: recusa com aviso, nada perdido, rc 0"
+  else record_fail "sync-main: (d) conflito" "rc=${rc} a=[$(cat "${d}/main/a.txt")] out=[${out}]"; fi
+  # (e) o merge verificado o chama no ramo do merge PROVADO, sem condicionar ao --sync
+  if [ -f "${pmv}" ] && grep -q 'sync-main-worktree.sh' "${pmv}" \
+     && awk '/sync-main-worktree.sh/{f=NR} /if \[ "\$\{DO_SYNC:-0\}" = 1 \]; then/{s=NR} END{exit !(f && s && f < s)}' "${pmv}"; then
+    record_pass "sync-main: (e) o pr-merge-verified o chama antes (e fora) do ramo --sync"
+  else record_fail "sync-main: (e) ligação" "o merge verificado não chama a sincronização, ou só sob --sync"; fi
+  rm -rf "${d}"
+}
+_family run_sync_main_worktree_selftests
 
 run_shard_plan_selftests() {
   local sut="${REPO_ROOT}/ops/testing/selftest-shard-plan.sh"
