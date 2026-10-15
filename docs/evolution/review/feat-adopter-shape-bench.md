@@ -2,7 +2,8 @@
 branch: feat/adopter-shape-bench
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: eda07b5b71373f59b0b4f1d66b0ae0dc49ed81d3183385e7b0352809f7c47546
+reviewed_code_sha256: 47c21d0bddcd09ed573bb5d535315cd5806010549bfe54adda14d79e5ff901ac
 findings_total: 11
 findings_real: 9
 tokens: 189594
