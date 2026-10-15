@@ -103,7 +103,15 @@ esac
 # ── A LISTA, por papel ────────────────────────────────────────────────────────────────────────
 # BASE: o que TODO papel recebe. Framework + doutrina; nada de biografia.
 _base=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks
-       .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal)
+       .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal vendor/kg-ssot)
+# ⚠️ `vendor/kg-ssot` É FECHAMENTO DE DEPENDÊNCIA, não doutrina nova (SAC-149, medido em 2026-10-15 no
+#    `--update` de um adotante para 7a50fc14): o `kg-contract-check.sh` viajava e o leitor do contrato
+#    que ele importa (vendor/kg-ssot/tools/kg_gate.py) NÃO — lá ele saía SEMPRE rc 2 ("vendor do contrato
+#    ausente"), e a lente kg-grammar, o /meta:decide e o /meta:cc-update mandam rodá-lo com rc 0. O que
+#    viaja leva o que cita. Viaja a RELEASE inteira, e não um recorte de tools/ + spec/: o
+#    `.kg-ssot-version` lista o sha256 de cada arquivo dela, e um recorte faria o carimbo do vendor mentir
+#    sobre o que o adotante tem. LICENSE e NOTICE (Apache-2.0) vão dentro dela, como a licença exige.
+#    A prova é a família `adopter_shape` da bancada: monta um adotante com ESTE corte e roda o contrato.
 # ⚠️ A LICENÇA NÃO ESTÁ AQUI, E AGORA ISSO É DESENHO — não mais um defeito aberto (curado 2026-09-15).
 #
 # Ela chega ao alvo pelo `emit-licenses.sh`, com NOME PRÓPRIO: `LICENSE-ONION` e `LICENSE-ONION-DOCS`.

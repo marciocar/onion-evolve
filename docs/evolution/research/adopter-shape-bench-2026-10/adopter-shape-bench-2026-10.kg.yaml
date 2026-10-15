@@ -1,0 +1,178 @@
+# kg-backlog-guard: on
+# ═══ TETO: 16 NÓS ═══
+meta:
+  id: adopter-shape-bench-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-15"
+  review_after: "2026-12-15"
+  note: "Forja (/meta:forge-guard) da família de bancada adopter_shape e do fechamento de dependências do transporte (SAC-149, PR 1 de 2). A raiz: o core testava a maquinaria no formato do CORE, nunca no do adotante que a recebe. O fato mora aqui; o backlog só cita estes ids."
+nodes:
+  - id: E_CONTRATO_VIAJA_SEM_LEITOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-15"
+    verified_against: "cópia do adotante atualizado para 7a50fc14 (clone do repo dele em diretório temporário da sessão) e kg-contract-check.sh rodado nos dois grafos rastreados dele"
+    label: "O DEFEITO 1, DATADO (2026-10-15): o kg-contract-check.sh viajava para o adotante sem vendor/kg-ssot, e lá saía rc 2 ('vendor do contrato ausente') nos dois grafos dele. A lente kg-grammar, o /meta:decide e o /meta:cc-update mandam rodá-lo com rc 0."
+    narrative: "O vendor-manifest.sh levava .claude/validation inteiro, e o leitor do contrato mora fora dele, em vendor/kg-ssot/tools/kg_gate.py. Com KG_CONTRACT_VENDOR apontado à mão para o vendor do core, os mesmos dois grafos passaram a ser JULGADOS e reprovaram (8 e 7 MUST de chave de topo desconhecida), o que é o achado 2 da SAC-149, escondido pelo achado 1."
+    provenance:
+      source: ".claude/validation/kg-contract-check.sh@7a50fc14"
+      locator: "o teste do vendor no início do script ('vendor do contrato ausente em … — não dá para julgar', exit 2)"
+      method: "medição: o script rodado no clone do adotante, com e sem KG_CONTRACT_VENDOR"
+      locality: "repo"
+
+  - id: E_R85_R92_SOFT_NAO_PODE_JULGAR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: "2026-10-15"
+    verified_against: "lint-artifacts.sh com LC_ALL=C no clone do adotante atualizado (rc 0, 0 HARD, 7 SOFT) e no adotante de fixture (0 HARD, 9 SOFT)"
+    label: "O DEFEITO 3, DATADO: num adotante comum as REGRAS 85 e 92 saem SOFT 'não pôde julgar' por falta do members.yaml, que é registro do core e não viaja; e a mensagem da 85 manda rodar bash ops/publish-door.sh --status, que o adotante não tem."
+    narrative: "A REGRA 100 (Superfície que viaja não cita ops/ como se o destinatário o tivesse) não a pega: o lint-artifacts.sh cita o ops/ dentro de código com teste de presença, que a regra isenta no arquivo inteiro, e a mensagem só existe IMPRESSA. A ausência do members.yaml não é dependência a levar (é biografia do core); a cura é a aplicabilidade por papel, PR 2."
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh@7a50fc14"
+      locator: "check_door_staleness (ramo ERRO, [porta/NAO-MEDIDO]) e check_door_role_parity (rc=3)"
+      method: "medição: o lint rodado nos dois clones e as linhas VIOLATION lidas"
+      locality: "repo"
+
+  - id: E_ADOCAO_DEIXAVA_FORA_DO_COMMIT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "ops/materialize-adopter.sh rodado com o corte novo antes da cura do durable-commit.sh, e git status --porcelain no adotante de fixture"
+    label: "A FORJA REVELOU (2026-10-15): o commit durável da adoção deixava UNTRACKED o vendor/kg-ssot recém-transportado e o .gitignore de segredo que a adoção cria num greenfield. O disco do maestro tinha os dois; o clone do time, nenhum."
+    narrative: "O durable-commit.sh staja uma lista própria de caminhos (ONION_PATHS), superset da SSOT do transporte para o .claude/, e ela não tinha vendor/ nem .gitignore. No --update o vendor-branch.sh passa a lista exigida com -f, então lá o vendor chegaria; na adoção nova, não. A cura do .gitignore só o staja quando ele nasceu na adoção (ausente no HEAD): o .gitignore que já é do alvo segue fora, porque pode ter edição dele não commitada."
+    provenance:
+      source: ".claude/utils/adopt/durable-commit.sh@7a50fc14"
+      locator: "o array ONION_PATHS e o git add que o segue"
+      method: "medição: o materializador avisando 'sobrou arquivo FORA do commit durável' com a lista, antes e depois da cura"
+      locality: "repo"
+
+  - id: E_CENSO_SEM_FAMILIA_DE_ADOTANTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-15"
+    verified_against: "GUARD_CENSUS_QUERY='adopt vendor door_mini materializ ' bash .claude/validation/guard-census.sh . --markdown, e grep das famílias de lint-selftest.sh por door, adopt, vendor e role"
+    label: "O censo (2026-10-15) não achou guarda da classe e contou 272 famílias; nenhuma monta um adotante e roda nele o lint: a door_mini monta a porta didática, as vendor_* e role_cut medem a LISTA do transporte, e a adopter_gate usa um lint falso."
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "seções 'já existe guarda' e 'massa' da saída de 2026-10-15"
+      method: "medição: o censo injetado na carga do /meta:forge-guard e a busca focada"
+      locality: "repo"
+
+  - id: D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "Substrato: família de bancada (adopter_shape) com um materializador core-only (ops/materialize-adopter.sh). Molde: door_mini com ops/materialize-door.sh. Ela roda no CLONE do adotante de fixture o lint, o contrato e o radar."
+    narrative: "Check de lint descartado: a pergunta é do formato de outro repo, que só existe montando-o. Hook descartado: nada a vetar na hora do comando. O materializador chama os helpers REAIS da adoção na ordem do adopt.md e lê o manifesto pelo vendor-branch.sh --print-manifest, o mesmo caminho do --update; a árvore é a do índice, como o _archive_staged, para o pre-commit não testar o já commitado. O clone é o ponto: arquivo fora do commit durável não chega ao time nem ao CI do adotante. A família custa um lint inteiro (cerca de 90 s com a materialização); a polaridade do detector é provada antes, em linhas sintéticas."
+
+  - id: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    trace: ".claude/utils/adopt/vendor-manifest.sh"
+    label: "O fechamento leva vendor/kg-ssot INTEIRO (316 arquivos, 1,9 MB) para todo papel menos o mini, e não um recorte de tools/ e spec/: o .kg-ssot-version lista o sha256 de cada arquivo da release, e um recorte faria o carimbo do vendor mentir."
+    narrative: "Entra no _base do vendor-manifest.sh, logo também nas raízes que a REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) e a REGRA 100 varrem, e na lista do commit durável. A licença é Apache-2.0 e LICENSE e NOTICE vão dentro da release. Os casos .kg.yaml da suíte de conformidade ficam sob fixtures/ e o kg-fixture-paths.sh já os isenta, como no core."
+
+  - id: E_MUTANTES_PR1_MORDEM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "ops/mutate-and-restore.sh com LC_ALL=C, cada mutante seguido de lint-selftest.sh --families adopter_shape"
+    label: "Seis mutantes plantados pelo ops/mutate-and-restore.sh mordem, cada um derrubando o caso nomeado: o vendor fora do manifesto e fora do commit durável (a, d), o .gitignore fora do commit (a), a catraca sem a 85 (c) e sem o ops/ (f), e o detector sem o filtro do que viajou (p, c)."
+    narrative: "O mutante do detector revelou o que a catraca protege: sem o filtro, as isenções das REGRAS 56 e 57 (que citam o próprio script da guarda, presente no clone) virariam achado. O dogfood pegou um defeito do harness no mesmo laço: a regra repetida por dois caminhos saía duas vezes na mensagem da catraca, curado por dedupe."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_adopter_shape_selftests, casos p, p2, a até f"
+      method: "medição: seis mutantes plantados e restaurados com hash conferido"
+      locality: "repo"
+
+  - id: C_TETO_PASSOS_COPIADOS_DO_ADOPT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "TETO: o materializador copia os passos DETERMINÍSTICOS do adopt.md, numa lista dele. Passo novo no procedimento (que é markdown) não entra sozinho; e Fase 1, CLAUDE.md fundido, oferta de CI e o gate (fora do default) não são exercidos."
+
+  - id: C_TETO_SO_O_PAPEL_ADOPTED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    label: "TETO: a família mede o papel adopted, o mais comum. hub e standalone cortam diferente (o standalone perde adoção e federação) e o materializador aceita os dois por --role, mas nenhum caso os roda: cada um custaria mais um lint inteiro."
+
+  - id: C_TETO_BUNDLE_DE_PLUGIN
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    label: "TETO: o bundle de plugin (onion.manifest.sh) também leva o kg-contract-check.sh e não leva vendor/kg-ssot. Lá o selador do /meta:decide só chama o checador quando o vendor existe, mas a lente manda rodar o checador e ele sai rc 2. Não medido nesta forja."
+
+  - id: C_TETO_DETECTOR_E_LEXICAL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "TETO: o detector de 'não pude julgar' é LEXICAL (uma lista de frases) e só vê dependência citada pelo CAMINHO ou pelo nome do arquivo. Guarda que se cala sem dizer, ou que diz por outra frase, ou que cita a dependência sem nome de arquivo, passa."
+
+  - id: Q_CURAS_DO_PR2
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: "Aberto para o PR 2 da SAC-149: aplicabilidade por papel declarada no rules-registry (as REGRAS 85 e 92 saem 'não se aplica'); a REGRA 100 estendida às mensagens impressas; pin com escritor único no --update; semente v2; role do registro; githook; falsos positivos do veto do .env."
+    narrative: "A família carrega o passivo como catraca nos dois sentidos (_AS_PENDING_UNJUDGED e _AS_PENDING_OPS): o PR 2 só fecha se as listas zerarem junto com a cura."
+
+edges:
+  - from: E_CONTRATO_VIAJA_SEM_LEITOR
+    to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
+    edge_type: SUPPORTS
+  - from: E_CENSO_SEM_FAMILIA_DE_ADOTANTE
+    to: D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR
+    edge_type: SUPPORTS
+  - from: E_ADOCAO_DEIXAVA_FORA_DO_COMMIT
+    to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
+    edge_type: SUPPORTS
+  - from: E_MUTANTES_PR1_MORDEM
+    to: D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR
+    edge_type: SUPPORTS
+  - from: C_TETO_PASSOS_COPIADOS_DO_ADOPT
+    to: D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR
+    edge_type: CONSTRAINS
+  - from: C_TETO_SO_O_PAPEL_ADOPTED
+    to: D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR
+    edge_type: CONSTRAINS
+  - from: C_TETO_DETECTOR_E_LEXICAL
+    to: D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR
+    edge_type: CONSTRAINS
+  - from: C_TETO_BUNDLE_DE_PLUGIN
+    to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
+    edge_type: CONSTRAINS
+  - from: E_R85_R92_SOFT_NAO_PODE_JULGAR
+    to: Q_CURAS_DO_PR2
+    edge_type: SUPPORTS
