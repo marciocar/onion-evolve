@@ -2,7 +2,8 @@
 branch: feat/dissect-default-own-repo-scope
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 2fd900bf21b5c6588583f63d87b0393f3067040bc26a5c6f487bc990d8ef1a51
+reviewed_code_sha256: bf2c4651496b3d01fe1f3ac7747a5c85416a168f5644bac26562914207bb851c
 findings_total: 8
 findings_real: 7
 tokens: 128192

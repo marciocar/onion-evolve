@@ -382,6 +382,7 @@
 .claude/validation/direct-provider-api-check.sh	C_TETO_O_QUE_A_REGRA_105_NAO_VE	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/validation/direct-provider-api-check.sh	E_PASSIVO_ZERO_NO_ARQUIVO_RASTREADO	docs/evolution/research/guard-direct-provider-api-2026-10/direct-provider-api-2026-10.kg.yaml
 .claude/validation/dissect-census.sh	D_PLANO_DE_ABSORCAO_E_NO	docs/evolution/research/dissect-forge-2026-10/dissect-forge-2026-10.kg.yaml
+.claude/validation/dissect-census.sh	E_REGUA_PADRAO_DERIVADA_NAO_PELO_FRAMEWORK	docs/evolution/research/dissect-forge-2026-10/dissect-forge-2026-10.kg.yaml
 .claude/validation/door-role-parity-check.sh	D_PAPEL_DUAS_DIMENSOES	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/door-staleness-baseline.txt	E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/door-staleness-baseline.txt	Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA	docs/onion/graph/federation-health-2026-07.kg.yaml
