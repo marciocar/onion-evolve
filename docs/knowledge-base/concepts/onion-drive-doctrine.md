@@ -92,9 +92,12 @@ O driver opera num **degrau declarado**, nunca acima:
 
   **Motor que escreve por argumento (2026-10-15).** O motor de convites A2A (`a2a-invite.sh`) escreve o arquivo que
   recebe em `--file`, e o juiz só via escrita no verbo: medido, o motor chamado direto com `--file` no arquivo de
-  convites do bridge passava com rc 0. Desde então o valor de `--file` de `create`/`revoke` (sem `--dry-run`) é julgado
-  como destino de escrita, versionado ou não, e o motor é reconhecido pelo nome ou pelo marcador `MOAT-ARG-WRITER:` no
-  corpo (cópia renomeada). Script não versionado que chama o motor e cita um alvo fecha. A única escrita no arquivo
+  convites do bridge passava com rc 0. Desde então todo valor de `--file`, `--invite-out` e `--token-out` de
+  `create`/`revoke` (sem `--dry-run`) é julgado como destino de escrita, versionado ou não, e o motor é reconhecido pelo
+  nome (também pelo alvo do symlink) ou pelo marcador `MOAT-ARG-WRITER:` no corpo (cópia renomeada). Script não
+  versionado que chama o motor e cita um alvo fecha; cópia de script versionado não herda a fronteira; o modo de teste
+  do wrapper (`ONION_A2A_LIVE_TEST`) na linha de comando fecha. Teto: motor renomeado sem o marcador, `xargs -I` e
+  `python3 -c` chamando o motor. A única escrita no arquivo
   de convites de produção é o wrapper `ops/a2a-invite-live.sh` (core-only): trava do update do bridge, ensaio por
   padrão (`--apply` escreve), backup cifrado antes, `check` e prova por contagem depois, rollback impresso.
 

@@ -310,42 +310,52 @@ def _moat_versioned(path):
 # Agora o VALOR de `--file` de um subcomando que escreve é julgado como destino de escrita, VERSIONADO OU NÃO: a
 # fronteira do script versionado vale para o que ele faz por dentro, não para o alvo que o comando lhe entrega.
 # Reconhecido pelo NOME do arquivo (o clone servido não se lê) OU pelo marcador no corpo (cópia renomeada).
-_MOAT_ARG_WRITERS = {"a2a-invite.sh": ({"create", "revoke"}, ("--file",))}
+_MOAT_ARG_WRITERS = {"a2a-invite.sh": ({"create", "revoke"}, ("--file", "--invite-out", "--token-out"))}
 _MOAT_ARG_WRITER_MARK = "MOAT-ARG-WRITER:"
 
 
 def _moat_arg_writer(p, args, detail):
-    spec = _MOAT_ARG_WRITERS.get(os.path.basename(p))
+    # o nome vale pelo caminho E pelo alvo do symlink: `ln -s <motor servido> /tmp/q.sh` (refutador, medido)
+    spec = (_MOAT_ARG_WRITERS.get(os.path.basename(p)) or _MOAT_ARG_WRITERS.get(os.path.basename(os.path.realpath(p)))
+            or _MOAT_ARG_WRITERS.get(os.path.basename(_MOAT_LINKS.get(p, ""))))   # link criado na própria string
     if spec is None and os.path.isfile(p):
         try:
             with open(p, encoding="utf-8", errors="replace") as fh:
                 head = fh.read(8192)
         except OSError:
             head = ""
-        m = re.search(re.escape(_MOAT_ARG_WRITER_MARK) + r"[ \t]*([a-z,-]+)[ \t]+(--[a-z-]+)", head)
+        m = re.search(re.escape(_MOAT_ARG_WRITER_MARK) + r"[ \t]*([a-z,-]+)[ \t]+(--[a-z-]+(?:,--[a-z-]+)*)", head)
         if m:
-            spec = (set(m.group(1).split(",")), (m.group(2),))
+            spec = (set(m.group(1).split(",")), tuple(m.group(2).split(",")))
     if spec is None:
         return
     subs, opts = spec
     pos = [a for a in args if not a.startswith("-")]
     if not pos or pos[0] not in subs or "--dry-run" in args:
         return
-    for o in opts:
-        v = _moat_opt_value(args, {o}, (o,))
-        if v is None:
-            continue
-        if DYNAMIC.search(v):
-            _moat_emit("inanalisavel", v, "", "%s %s %s só conhecido em runtime — %s" % (os.path.basename(p), pos[0], o, detail))
-        else:
-            _moat_write_path(_moat_abspath(v), detail, "%s %s %s" % (os.path.basename(p), pos[0], o), creates=False)
+    # TODA ocorrência: o motor fica com a ÚLTIMA (dict sobrescrito), e julgar só a 1ª deixava
+    # `--file /tmp/a.json --file <servido>` passar (refutador, medido)
+    for k, a in enumerate(args):
+        for o in opts:
+            if a == o and k + 1 < len(args):
+                v = args[k + 1]
+            elif a.startswith(o + "="):
+                v = a.split("=", 1)[1]
+            else:
+                continue
+            if DYNAMIC.search(v):
+                _moat_emit("inanalisavel", v, "", "%s %s %s só conhecido em runtime — %s" % (os.path.basename(p), pos[0], o, detail))
+            else:
+                _moat_write_path(_moat_abspath(v), detail, "%s %s %s" % (os.path.basename(p), pos[0], o), creates=False)
 
 
 def _moat_script_args(p, words):
     """os argumentos que vêm DEPOIS do script na linha (`bash x.sh a b` → [a, b])."""
     for k, w in enumerate(words):
-        if w and (os.path.basename(w) == os.path.basename(p)) and _moat_abspath(w) == p:
+        if w and not w.startswith("-") and _moat_abspath(w) == p:   # o abspath já segue o link da string
             return words[k + 1:]
+    if "-s" in words:                                   # `bash -s <args> < motor`: os argumentos vêm depois do -s
+        return words[words.index("-s") + 1:]
     return []
 
 
@@ -354,8 +364,10 @@ def _moat_script(path, depth, words):
     if not p:
         return                                          # caminho só conhecido em runtime: a fronteira do `bash x.sh`
     _moat_arg_writer(p, _moat_script_args(p, words), " ".join(words))
+    copied = False
     if not os.path.isfile(p) and p in _MOAT_COPIED and os.path.isfile(_MOAT_COPIED[p]):
         p = _MOAT_COPIED[p]                             # `cp a.sh b.sh && bash b.sh`: julga-se a.sh
+        copied = True                                   # …pelo CORPO: a cópia pode ser mutada na mesma string
     if not os.path.isfile(p):
         # script criado na PRÓPRIA string (`cat > x.sh <<'E' … E; bash x.sh`): o disco ainda não o tem, e o
         # corpo sumiu da análise como heredoc inerte — julga-se o texto inteiro pela forma. Script que só
@@ -364,8 +376,10 @@ def _moat_script(path, depth, words):
         if p in _MOAT_WRITTEN and moat_relevant(raw):
             _moat_emit("inanalisavel", p, "", "script que ainda não existe no disco, com alvo do MOAT no comando")
         return
-    if _moat_versioned(p):
+    if _moat_versioned(p) and not copied:
         return                                          # código versionado do projeto: fronteira declarada
+    # (a cópia NÃO herda a fronteira: `cp ops/<wrapper>.sh /tmp/w.sh && sed -i … /tmp/w.sh && bash /tmp/w.sh`
+    #  passava, com o backup arrancado — refutador, 2026-10-15)
     try:
         if os.path.getsize(p) > _MOAT_MAX_SCRIPT:
             return
@@ -378,7 +392,9 @@ def _moat_script(path, depth, words):
     # script NÃO versionado que chama um motor escritor e cita um alvo do MOAT: a escrita sai por variável,
     # função ou array (`motor create "${args[@]}"`), que o juiz não segue. Medido em 2026-10-15: uma cópia do
     # wrapper de convites fora do projeto, que podia ter o backup e o check arrancados, passava com rc 0
-    if (_MOAT_ARG_WRITER_MARK in body or any(n in body for n in _MOAT_ARG_WRITERS)) and _MOAT_SIGNAL.search(body):
+    code = "\n".join(ln for ln in body.split("\n") if not ln.lstrip().startswith("#"))   # comentário não é chamada
+    if (any(n in code for n in _MOAT_ARG_WRITERS) and re.search(r"\b(create|revoke)\b", code)
+            and _MOAT_SIGNAL.search(code)):
         _moat_emit("inanalisavel", p, "", "script não versionado que chama um motor escritor, com alvo do MOAT no corpo")
         return
     try:
@@ -485,6 +501,13 @@ def _moat_crontab(args, detail):
 def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
     detail = " ".join(raw_words)
     args = words[1:]
+    # o MODO DE TESTE do wrapper de convites roda o motor e o backup que o ambiente nomear, como o operador: pela
+    # sessão ele lavaria um script não versionado através do wrapper versionado (refutador, medido). Ele só existe
+    # para a bancada, que o liga por dentro de um script versionado — na linha de comando, fecha.
+    if any(re.match(r"^(export\s+)?ONION_A2A_LIVE_TEST=", w) for w in list(raw_words) + list(words)) \
+            or (isinstance(env, dict) and "ONION_A2A_LIVE_TEST" in env) \
+            or "ONION_A2A_LIVE_TEST" in globals().get("ASSIGN", {}):   # `export X=1; …` e `X=1; …` caem no ASSIGN do lib
+        _moat_emit("inanalisavel", "ONION_A2A_LIVE_TEST", "", "modo de teste do wrapper de convites fora da bancada — %s" % detail)
     if base == "cd" and len(words) > 1 and not DYNAMIC.search(words[1]) and words[1] != "-":
         prev = _MOAT_CDS[-1] if _MOAT_CDS else (CWD[-1] if CWD[-1] not in (None, UNKNOWN) else JCWD)
         _MOAT_CDS.append(os.path.normpath(os.path.join(prev, os.path.expanduser(words[1]))))
@@ -606,7 +629,7 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
         if not any(re.match(r"^-[A-Za-z]*c[A-Za-z]*$", a) for a in args) and "<<<" not in args:
             pos = _moat_positionals(args, {"-o", "-O", "--rcfile", "--init-file"})
             prev = [resolve(x) for x in (stdin_from or [])]
-            if pos:
+            if pos and "-s" not in args:                    # `bash -s <args> < x.sh`: os posicionais são argumentos
                 _moat_script(pos[0], depth, words)
             elif piped and prev and os.path.basename(prev[0]) == "cat":
                 for f in _moat_positionals(prev[1:]):         # `cat x.sh | bash`: o shell lê o arquivo
