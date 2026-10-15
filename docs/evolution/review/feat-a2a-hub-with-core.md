@@ -2,7 +2,8 @@
 branch: feat/a2a-hub-with-core
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a3a29ee5ff1c2ed49c8b76d51058c6fedb0b4c66707e5aa83b90446d04271e87
+reviewed_code_sha256: dede96aaef832fdd9c1a8c7123674aea244d48941daea4549440a08625b14b92
 findings_total: 7
 findings_real: 6
 tokens: 224870
