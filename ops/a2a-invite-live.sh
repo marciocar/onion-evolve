@@ -80,15 +80,25 @@ else
     die 3 "variável ONION_A2A_LIVE_* sem ONION_A2A_LIVE_TEST=1: produção não se redireciona por ambiente"
   fi
   FILE="${PROD_FILE}"; MOTOR="${PROD_MOTOR}"; MEMBERS=""; BACKUP=""; LOCK="${PROD_LOCK}"
+  # o wrapper e o backup que ele chama por sudo (como root) têm de ser os RASTREADOS e limpos de um checkout:
+  # uma cópia em /tmp chamaria `sudo <diretório dela>/bridge-backup.sh`, que outra conta pode plantar, e uma
+  # cópia mutada perderia o backup e o check (refutador, 2026-10-15)
+  for _f in "${SELF_DIR}/$(basename "${BASH_SOURCE[0]}")" "${SELF_DIR}/bridge-backup.sh"; do
+    git -C "${SELF_DIR}" ls-files --error-unmatch -- "${_f}" >/dev/null 2>&1 \
+      || die 3 "${_f} não é arquivo rastreado de um checkout: rode o wrapper do repositório, não uma cópia"
+    git -C "${SELF_DIR}" diff --quiet HEAD -- "${_f}" 2>/dev/null \
+      || die 3 "${_f} tem mudança não commitada: rode o wrapper como está no commit"
+  done
 fi
 
 [ "$(id -u)" -eq 0 ] && die 3 "rodando como root: rode como o operador (o wrapper chama sudo -u ${SVC_USER} onde precisa; o descritor nasceria de root)"
 
 # as_svc <args…>: roda como a conta do serviço (produção) ou como quem roda (teste), sempre a partir de /
-# (o cwd do operador pode ser ilegível para a conta do serviço)
+# (o cwd do operador pode ser ilegível para a conta do serviço). O fd 3 (o token aberto) NÃO desce: só a
+# entrada do create o carrega, redirecionada como fd 0 antes da chamada
 as_svc() {
-  if [ "${TEST}" = 1 ]; then (cd / && "$@")
-  else (cd / && sudo -n -u "${SVC_USER}" "$@"); fi
+  if [ "${TEST}" = 1 ]; then (cd / && "$@") 3<&-
+  else (cd / && sudo -n -u "${SVC_USER}" "$@") 3<&-; fi
 }
 motor() { as_svc bash "${MOTOR}" "$@"; }
 
@@ -176,14 +186,14 @@ if [ "${APPLY}" = 0 ]; then
 fi
 
 # ── contagem ANTES (a prova é por contagem, não pelo rc da escrita) ────────────────────────────────────
-count() {  # count <filtro python sobre a lista de entradas> → número
+count() {  # count all|active → número; active = do membro, ativas, e do --receiver quando ele foi passado
   motor list --file "${FILE}" --json </dev/null 2>/dev/null \
     | python3 -I -c 'import json,sys
-d=json.load(sys.stdin); m=sys.argv[1]; k=sys.argv[2]
+d=json.load(sys.stdin); m=sys.argv[1]; k=sys.argv[2]; r=sys.argv[3]
 es=d.get("entries") or []
 if d.get("state") == "absent": print(0); raise SystemExit
 if d.get("state") != "ok": print("x"); raise SystemExit
-print(sum(1 for e in es if (k == "all") or (e.get("member") == m and e.get("state") == "ativo")))' "${MEMBER}" "$1"
+print(sum(1 for e in es if (k == "all") or (e.get("member") == m and e.get("state") == "ativo" and (not r or e.get("receiver") == r))))' "${MEMBER}" "$1" "${RECEIVER}"
 }
 before_all="$(count all)"; before_act="$(count active)"
 [[ "${before_all}" =~ ^[0-9]+$ ]] || die 2 "não medi o arquivo antes da escrita (estado não-ok); rode: ops/a2a-invite-live.sh check"
@@ -191,7 +201,7 @@ existed=1; [ "$(motor list --file "${FILE}" --json </dev/null 2>/dev/null | pyth
 
 # ── backup rotulado do estado do bridge (cifrado), artefato NOMEADO ────────────────────────────────────
 label="pre-invite-${SUB}-${MEMBER}"
-if [ "${TEST}" = 1 ]; then BK_OUT="$("${BACKUP}" "${label}")"; else BK_OUT="$(sudo -n "${SELF_DIR}/bridge-backup.sh" "${label}")"; fi
+if [ "${TEST}" = 1 ]; then BK_OUT="$("${BACKUP}" "${label}" 3<&-)"; else BK_OUT="$(sudo -n "${SELF_DIR}/bridge-backup.sh" "${label}" 3<&-)"; fi
 [ $? -eq 0 ] || die 2 "backup falhou: sem rede de segurança não se escreve"
 BK="$(printf '%s\n' "${BK_OUT}" | sed -n 's/^ok: \([^ ]*\).*/\1/p' | tail -1)"
 [ -n "${BK}" ] || die 2 "o backup não nomeou o artefato: ${BK_OUT}"
@@ -211,7 +221,9 @@ EOF
     cat >&2 <<EOF
   # restaura o arquivo do backup rotulado (o .gpg pede a chave do pass):
   gpg -d ${BK} | tar -xzO ${rel} \\
-    | sudo -u ${SVC_USER} sh -c 'umask 077; cat > ${FILE}.restore && mv -f ${FILE}.restore ${FILE}'
+    | sudo -u ${SVC_USER} sh -c 'umask 077; cat > ${FILE}.restore && [ -s ${FILE}.restore ] \
+        && python3 -c "import json,sys; json.load(open(sys.argv[1]))" ${FILE}.restore && mv -f ${FILE}.restore ${FILE}'
+  # (o [ -s ] e o json.load seguram o mv: sem pipefail, um tar que falha trocaria o arquivo por um vazio)
 EOF
   fi
   cat >&2 <<EOF
@@ -225,9 +237,8 @@ fail_after_write() { printf '[%s] ERRO: %s\n' "${NAME}" "$1" >&2; rollback; exit
 if [ "${SUB}" = create ]; then
   tmpd="$(as_svc mktemp -d /tmp/onion-a2a-invite.XXXXXXXX)" || die 2 "não criei o temporário da conta do serviço"
   trap 'as_svc rm -rf -- "${tmpd}" 2>/dev/null' EXIT
-  exec 3<"/proc/self/fd/3" || die 2 "não reabri o --token-file"   # o ensaio leu até o fim: volta ao início
-  read -r t2 < <(stat -L -c '%d:%i' /proc/self/fd/3)
-  [ "${t2}" = "${t_lino}" ] || die 1 "o --token-file mudou durante a execução: recusado (nada foi escrito)"
+  # o ensaio leu até o fim: reabre o MESMO arquivo pelo descritor (não pelo caminho, que podia ter sido trocado)
+  exec 3<"/proc/self/fd/3" || die 2 "não reabri o --token-file"
   motor create "${MEMBER}" "${common[@]}" "${rcv[@]}" --days "${DAYS}" --token-stdin --invite-out "${tmpd}/invite.json" 0<&3
   rc=$?
   exec 3<&-

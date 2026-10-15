@@ -7,7 +7,7 @@ meta:
   baseline: "2026-10-14"
   review_after: "2026-11-13"   # 30d: cadência de ferramenta
   # ═══ TETO: 30 NÓS ═══
-  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão); +4 a F2 do lado do core (2026-10-15: a evidência, 2 achados e 1 decisão da sessão).
+  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão); +4 a F2 do lado do core (2026-10-15: a evidência, 2 achados e 1 decisão da sessão); +2 o wrapper de produção do convite (2026-10-15: o achado do MOAT e a evidência).
   x_linear_epic: "SAC-120"
 nodes:
   - id: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -417,6 +417,38 @@ nodes:
     verified_against: "decidido pela sessão da F2 em 2026-10-15 sob a autorização do maestro para decidir sem ele (opção recomendada); medido: o bridge recusa o arquivo inteiro quando o dono não é o do processo, então quem escreve tem de ser a conta do serviço, que não escreve no diretório do operador"
     label: "o create aceita o token por --token-out (nasce no arquivo 0600) ou por --token-stdin (o operador gera o token como ele mesmo e o entrega por redirecionamento ao sudo -u da conta do serviço), e gera um descritor sem segredo que alimenta o doctor dos dois lados"
     narrative: "Decisão da sessão, aberta para o maestro ratificar ou trocar. Alternativas descartadas: imprimir o token para o operador copiar (viola a cláusula 2) e escrever o arquivo de convites como o operador (o bridge o recusaria por dono). Gatilho para rever: o primeiro convite de produção pedir outro caminho."
+  - id: C_MOTOR_POR_ARGUMENTO_PASSAVA_O_MOAT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 alimentando o pretooluse-moat-gate.sh com o JSON de PreToolUse (sem executar): sudo -u <conta do serviço> mkdir na home dela saía rc 2, e o a2a-invite.sh create com --file no arquivo de convites de produção saía rc 0, tanto do clone servido (ilegível para o operador) quanto da worktree (versionado); depois da cura, rc 2 nos dois e nos 3 mutantes plantados por ops/mutate-and-restore.sh volta a rc 0"
+    label: "o veto do MOAT barrava a escrita direta na home da conta do serviço, mas deixava passar o motor de convites chamado com --file no arquivo servido: o juiz só via escrita no verbo, e o alvo vinha num argumento"
+    narrative: "Cura: o juiz julga o valor de --file de create/revoke (sem --dry-run) como destino de escrita, versionado ou não, reconhecendo o motor pelo nome ou pelo marcador MOAT-ARG-WRITER no corpo; script não versionado que chama o motor e cita um alvo fecha. Sem isto, o wrapper de produção existiria e o caminho direto continuaria aberto. O refutador mediu cinco contornos da 1ª redação, todos curados com caso: --file repetido (o motor fica com o último), symlink para o motor, --invite-out/--token-out no caminho servido, o modo de teste do wrapper lavando um script não versionado, e a cópia mutada do wrapper herdando a fronteira do original. Teto declarado: motor renomeado sem o marcador, xargs -I e python -c chamando o motor seguem fora (os dois últimos são classe pré-existente do juiz)."
+    provenance:
+      source: ".claude/hooks/lib/moat-judge.py"
+      locator: "_moat_arg_writer e a checagem do corpo em _moat_script; casos (i1)-(i10) de run_moat_gate_selftests"
+      method: "medição: payload real de PreToolUse e mutantes pela sessão"
+      locality: "repo"
+  - id: E_WRAPPER_DO_CONVITE_DE_PRODUCAO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 em sandbox (modo de teste declarado, sudo stub): LC_ALL=C bash .claude/validation/lint-selftest.sh --families moat_gate,a2a_invite_live sai 167/167 (16 casos novos no moat_gate e 13 na família nova, cada um com mutante provado); o refutador (opus) achou 3 defeitos ALTA, 4 MÉDIA e 5 BAIXA medidos, e os que fecham contorno do veto ou dão rollback falso foram curados na branch com caso"
+    label: "o convite de produção tem um caminho de escrita só: o wrapper core-only a2a-invite-live.sh roda o motor do clone servido como a conta do serviço, com a trava do update do bridge, ensaio por padrão, backup cifrado antes, check e prova por contagem depois e rollback impresso"
+    narrative: "Decisão do maestro em 2026-10-15 (opção recomendada). O token chega por --token-file do operador, aberto uma vez e conferido no descritor, e vai ao motor como entrada; o descritor sem segredo nasce num temporário da conta do serviço fora da home dela e chega ao operador com dono dele. NÃO MEDIDO: a escrita no arquivo de produção, que é a prova viva da sessão principal depois do merge."
+    provenance:
+      source: "ops/a2a-invite-live.sh"
+      locator: "run_a2a_invite_live_selftests (w1)-(w11)"
+      method: "medição: bancada e mutantes pela sessão"
+      locality: "repo"
 edges:
   - from: E_ONZE_PASSOS_MANUAIS_HOJE
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -514,3 +546,9 @@ edges:
   - from: D_TOKEN_STDIN_PARA_A_CONTA_DO_SERVICO
     to: D_CONVITE_POR_MEMBRO_COM_VALIDADE
     edge_type: TRACES_TO
+  - from: C_MOTOR_POR_ARGUMENTO_PASSAVA_O_MOAT
+    to: E_WRAPPER_DO_CONVITE_DE_PRODUCAO
+    edge_type: SUPPORTS
+  - from: E_WRAPPER_DO_CONVITE_DE_PRODUCAO
+    to: D_CONVITE_POR_MEMBRO_COM_VALIDADE
+    edge_type: SUPPORTS

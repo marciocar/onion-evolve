@@ -7886,6 +7886,7 @@ EOF
   if [ "${_live_ok}" = 1 ]; then
     cp "${d}/proj/ops/a2a-invite-live.sh" "${d}/scratch/live-copia.sh"
     cp "${d}/proj/.claude/utils/federation-transport/a2a-invite.sh" "${d}/scratch/renomeado.sh"
+    printf '#!/usr/bin/env bash\n# lembrete: o a2a-invite.sh create só pelo wrapper\nls -la /var/www/onion-landing\n' > "${d}/scratch/so-leitura.sh"
   fi
   # o CASO DE CAMPO, literal: o script de scratchpad de 2026-10-13 (fora do projeto)
   cat > "${d}/scratch/update-kg-writer.sh" <<'FIELD'
@@ -8011,7 +8012,7 @@ PY
   _mgcase "(f1) o script de scratchpad do kg-writer, por arquivo → VETO" "2:MOAT/deploy" "${P}" \
     "bash ${d}/scratch/update-kg-writer.sh" "${J}" '        scoped(heredocs(body), depth + 1)' '        pass'
   _mgcase "(f2) o wrapper versionado: bash ops/update-kg-writer.sh → passa" 0 "${P}" \
-    'bash ops/update-kg-writer.sh && echo "publicado em /var/www/onion-landing"' "${J}" '    if _moat_versioned(p):' '    if False:'
+    'bash ops/update-kg-writer.sh && echo "publicado em /var/www/onion-landing"' "${J}" '    if _moat_versioned(p) and not copied:' '    if False:'
   _mgcase "(f3) o MESMO wrapper não rastreado → VETO (o rastreio é a fronteira)" "2:MOAT/deploy" "${P}" \
     'bash ops/update-kg-writer-copia.sh' "${J}" '        return bool(_git(["-C", ds[0]' '        return True or bool(_git(["-C", ds[0]'
   _mgcase "(f4) o corpo do script de campo colado na string → VETO no checkout" "2:git checkout numa árvore servida" "${P}" \
@@ -8087,8 +8088,8 @@ PY
     _mgcase "(i3) motor do clone servido (ilegível) por bash, create --file no arquivo → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
       "sudo -n -u svc bash /srv/vps-svc/core/${MOT} create m --days 3 --token-stdin --file ${INV} < t" "${J}" \
       '    _moat_arg_writer(p, _moat_script_args(p, words), " ".join(words))' '    pass'
-    _mgcase "(i4) motor do clone servido executado por caminho, --file= → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
-      "sudo -u svc /srv/vps-svc/core/${MOT} revoke m --file=${INV}" "${J}" \
+    _mgcase "(i4) motor do clone servido executado por caminho → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "sudo -u svc /srv/vps-svc/core/${MOT} revoke m --file ${INV}" "${J}" \
       '            _moat_arg_writer(p, args, detail)   # antes do isfile' '            pass   # antes do isfile'
     _mgcase "(i5) motor VERSIONADO deste projeto, revoke --file no arquivo → VETO (o alvo do argumento não é fronteira)" "2:ops/a2a-invite-live.sh" "${P}" \
       "bash ${MOT} revoke m --file ${INV}" "${J}" '_MOAT_ARG_WRITERS = {"a2a-invite.sh": ({"create", "revoke"}' '_MOAT_ARG_WRITERS = {"a2a-invite.sh": ({"create"}'
@@ -8103,10 +8104,29 @@ PY
       '    if not pos or pos[0] not in subs or "--dry-run" in args:' '    if not pos or "--dry-run" in args:'
     _mgcase "(i9) o wrapper VERSIONADO (com o alvo citado na linha, que leva ao juiz) → passa" 0 "${P}" \
       "bash ops/a2a-invite-live.sh create m --days 30 --token-file ~/m.token --invite-out ~/m.json --apply && echo \"convite em ${INV}\"" "${J}" \
-      '    if _moat_versioned(p):' '    if False:'
+      '    if _moat_versioned(p) and not copied:' '    if False:'
     _mgcase "(i10) CÓPIA do wrapper fora do projeto → FECHA (o corpo chama o motor e cita o alvo)" "2:motor escritor" "${P}" \
       "bash ${d}/scratch/live-copia.sh create m --days 30 --token-file ~/m.token --invite-out ~/m.json --apply" "${J}" \
-      '    if (_MOAT_ARG_WRITER_MARK in body or any(n in body for n in _MOAT_ARG_WRITERS)) and _MOAT_SIGNAL.search(body):' '    if False:'
+      '    if (any(n in code for n in _MOAT_ARG_WRITERS) and re.search(' '    if False and (any(n in code for n in _MOAT_ARG_WRITERS) and re.search('
+    # curas do refutador (2026-10-15), cada uma com o contorno MEDIDO como caso
+    _mgcase "(i11) --file repetido (o motor fica com o último) → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "sudo -u svc bash /srv/vps-svc/core/${MOT} revoke m --file /tmp/a.json --file ${INV}" "${J}" \
+      $'    for k, a in enumerate(args):\n        for o in opts:' $'    for k, a in enumerate(args[:4]):\n        for o in opts:'
+    _mgcase "(i12) symlink para o motor criado na própria string → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "ln -s /srv/vps-svc/core/${MOT} /tmp/q-bancada.sh && sudo -u svc bash /tmp/q-bancada.sh create m --days 1 --token-stdin --file ${INV} < t" "${J}" \
+      '        if w and not w.startswith("-") and _moat_abspath(w) == p:' '        if False:'
+    _mgcase "(i13) --invite-out do motor dentro do caminho servido → VETO" "2:MOAT/deploy" "${P}" \
+      "sudo -u svc bash /srv/vps-svc/core/${MOT} create m --days 1 --token-stdin --file /tmp/x.json --invite-out /srv/vps-svc/d.json < t" "${J}" \
+      '({"create", "revoke"}, ("--file", "--invite-out", "--token-out"))' '({"create", "revoke"}, ("--file", "--token-out"))'
+    _mgcase "(i14) modo de teste do wrapper na linha de comando → FECHA" "2:modo de teste do wrapper" "${P}" \
+      "export ONION_A2A_LIVE_TEST=1; ONION_A2A_LIVE_MOTOR=/tmp/x.sh bash ops/a2a-invite-live.sh check" "${J}" \
+      '_moat_emit("inanalisavel", "ONION_A2A_LIVE_TEST",' '(lambda *a: None)("inanalisavel", "ONION_A2A_LIVE_TEST",'
+    _mgcase "(i15) cópia do wrapper MUTADA na mesma string → FECHA (cópia não herda a fronteira)" "2:motor escritor" "${P}" \
+      "cp ops/a2a-invite-live.sh /tmp/w-bancada.sh && sed -i s/bridge-backup.sh/true/ /tmp/w-bancada.sh && bash /tmp/w-bancada.sh check" "${J}" \
+      '    if _moat_versioned(p) and not copied:' '    if _moat_versioned(p):'
+    _mgcase "(i16) script só de leitura que CITA o motor num comentário → passa" 0 "${P}" \
+      "bash ${d}/scratch/so-leitura.sh" "${J}" \
+      '    code = "\n".join(ln for ln in body.split("\n") if not ln.lstrip().startswith("#"))' '    code = body'
     fi
   else
     record_skip "moat-gate: (i*) sem ops/a2a-invite-live.sh ou sem o motor de convites — casos do arquivo de convites pulados"
@@ -8189,10 +8209,11 @@ EOF
   # devolve 0 se o caso é satisfeito; roda no intacto e no mutante (cópia com OLD→NEW, 1ª ocorrência)
   _ilcase() {
     local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
-    cp "${wr}" "${d}/w.sh"
+    # a trava de PRODUÇÃO nunca é aberta pela bancada, nem por um mutante que caia no ramo de produção
+    sed "s#^PROD_LOCK=.*#PROD_LOCK=${d}/lock#" "${wr}" > "${d}/w.sh"
     _ilreset; "${fn}" "${d}/w.sh" && rc_i=0
     if [ "${rc_i}" = 0 ]; then record_pass "a2a-invite-live: ${name}"; else record_fail "a2a-invite-live: ${name}" "${IL_WHY:-caso não satisfeito}"; fi
-    cp "${wr}" "${d}/m.sh"
+    cp "${d}/w.sh" "${d}/m.sh"
     OLD="${old}" NEW="${new}" python3 - "${d}/m.sh" <<'PY'
 import os, sys
 p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
@@ -8218,7 +8239,7 @@ PY
   _c_link() { local r; r="$(_ilr "$1" create membro-bancada --days 30 --token-file "${d}/op/link.token" --invite-out "${d}/op/m.json" --apply)"
     IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 1 ] && case "${r#*|}" in *"--token-file é symlink"*) true ;; *) false ;; esac; }
   _c_env() { local r rc=0; r="$(cd "${d}" && env PATH="${d}/stub:${PATH}" ONION_A2A_LIVE_FILE="${d}/data/a2a-invites.json" bash "$1" check 2>&1)" || rc=$?
-    IL_WHY="rc=${rc} ${r}"; [ "${rc}" = 3 ]; }
+    IL_WHY="rc=${rc} ${r}"; [ "${rc}" = 3 ] && case "${r}" in *"produção não se redireciona"*) true ;; *) false ;; esac; }
   _c_svc() { local r; r="$(ILR_ENV="ONION_A2A_LIVE_FILE=${svc_home}/x/a2a-invites.json" _ilr "$1" check)"
     IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 3 ]; }
   _c_opt() { local r; r="$(_ilr "$1" check --file "${d}/outro.json")"; IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 3 ]; }
@@ -8231,6 +8252,17 @@ PY
     [ "${r%%|*}" = 0 ] || { IL_WHY="setup: create rc=${r%%|*}"; return 1; }
     r="$(_ilr "$1" revoke membro-bancada --apply)"; IL_WHY="rc=${r%%|*} ${r#*|}"
     [ "${r%%|*}" = 0 ] && [ "$(python3 -c 'import json,sys; print(sum(1 for e in json.load(open(sys.argv[1]))["invites"] if e.get("revoked") is True))' "${d}/data/a2a-invites.json")" = 1 ]; }
+  _c_rcv() { local r
+    ( umask 077; python3 -c 'import secrets; print(secrets.token_hex(32))' > "${d}/op/r2.token" )
+    r="$(_ilr "${d}/w.sh" create membro-bancada --days 30 --token-file "${d}/op/m.token" --invite-out "${d}/op/m.json" --apply)"
+    [ "${r%%|*}" = 0 ] || { IL_WHY="setup 1: rc=${r%%|*} ${r#*|}"; return 1; }
+    r="$(_ilr "${d}/w.sh" create membro-bancada --days 30 --receiver r2-bancada --token-file "${d}/op/r2.token" --invite-out "${d}/op/r2.json" --apply)"
+    [ "${r%%|*}" = 0 ] || { IL_WHY="setup 2: rc=${r%%|*} ${r#*|}"; return 1; }
+    r="$(_ilr "$1" revoke membro-bancada --receiver r2-bancada --apply)"; IL_WHY="rc=${r%%|*} ${r#*|}"
+    rm -f "${d}/op/r2.token"
+    [ "${r%%|*}" = 0 ] && [ "$(python3 -c 'import json,sys; print(sorted((e["receiver"], e["revoked"]) for e in json.load(open(sys.argv[1]))["invites"]))' "${d}/data/a2a-invites.json")" = "[('core-bancada', False), ('r2-bancada', True)]" ]; }
+  _c_copy() { local r rc=0; r="$(cd "${d}" && env PATH="${d}/stub:${PATH}" bash "$1" check 2>&1)" || rc=$?
+    IL_WHY="rc=${rc} ${r}"; [ "${rc}" = 3 ] && case "${r}" in *"não é arquivo rastreado"*) true ;; *) false ;; esac; }
   _c_lock() { local r; rm -f "${d}/held"
     ( flock -x 8; : > "${d}/held"; sleep 4 ) 8>"${d}/lock" &
     local _n=0; while [ ! -f "${d}/held" ] && [ "${_n}" -lt 50 ]; do sleep 0.1; _n=$((_n + 1)); done
@@ -8248,6 +8280,10 @@ PY
     '  motor check --file "${FILE}" </dev/null || fail_after_write "check depois da escrita reprovou"' '  true || fail_after_write "check depois da escrita reprovou"' _c_check
   _ilcase "(w10) revoke --apply → a entrada fica revoked: true" '  motor revoke "${MEMBER}" "${common[@]}" "${rcv[@]}" </dev/null' '  true' _c_revoke
   _ilcase "(w11) trava ocupada (update-bridge rodando) → rc 2" 'flock -n 9 || die 2' 'true || die 2' _c_lock
+  _ilcase "(w12) revoke --receiver revoga SÓ aquele receptor e sai 0 (sem rollback falso)" \
+    'and (not r or e.get("receiver") == r)' '' _c_rcv
+  _ilcase "(w13) cópia do wrapper fora de um checkout, em produção → rc 3 antes de qualquer sudo" \
+    '      || die 3 "${_f} não é arquivo rastreado' '      || true "${_f} não é arquivo rastreado' _c_copy
   rm -rf "${d}"
 }
 

@@ -48,8 +48,8 @@
 # EXIT (molde do a2a-doctor.sh): 0 ok · 1 problema medido ou escrita recusada · 2 não pude medir
 #   (arquivo ilegível para esta conta, trava ocupada, ferramenta ausente) · 3 uso inválido
 # Exercitado por lint-selftest.sh (run_federation_a2a_selftests).
-# MOAT-ARG-WRITER: create,revoke --file
-#   (o veto do MOAT lê esta linha: o valor de --file destes subcomandos é julgado como destino de escrita)
+# MOAT-ARG-WRITER: create,revoke --file,--invite-out,--token-out
+#   (o veto do MOAT lê esta linha: o valor destas opções nestes subcomandos é julgado como destino de escrita)
 # =============================================================================
 set -uo pipefail
 case "${1:-}" in -h|--help|'') sed -n '/^# USO/,/^# EXIT/p' "$0" | sed 's/^# \{0,1\}//' >&2; [ -n "${1:-}" ] && exit 0; exit 3 ;; esac
