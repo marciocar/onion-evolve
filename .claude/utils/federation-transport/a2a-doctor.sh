@@ -167,7 +167,7 @@ PY
 fi
 REG_OK=""; [ -n "${MEMBERS}" ] && [ -f "${MEMBERS}" ] && have_yaml && [ -z "${REG_ERR}" ] && REG_OK=1
 [ -n "${RECEIVER}" ] || RECEIVER="${SENDS:-${SRC}}"
-key_pinned() { tr ',' '\n' <<< "${KEYS}" | grep -qxF "$1"; }
+key_pinned() { case ",${KEYS}," in *",$1,"*) return 0 ;; esac; return 1; }   # sem pipe (pipefail + grep -q é corrida)
 
 # ── (f) relógio confiável: os MESMOS sinais do gate, separando "disse não" (rc 1) de "sem sinal" (rc 2)
 # O gate colapsa os dois em clock-untrusted (veto: certo para um gate). O doctor os separa porque o
@@ -323,8 +323,8 @@ side_member() {
       # forma ESTRITA (achado do refutador): epoch de até 11 dígitos, ou ISO-8601 com data, hora e fuso.
       # O `date -d` do GNU aceita "tomorrow" (que nunca vence) e um epoch de 20 dígitos estourava o `[ -le ]`.
       iep=""
-      if printf '%s' "${ie}" | grep -Eq '^[0-9]{1,11}$'; then iep="${ie}"
-      elif printf '%s' "${ie}" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$'; then
+      if grep -Eq '^[0-9]{1,11}$' <<< "${ie}"; then iep="${ie}"
+      elif grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$' <<< "${ie}"; then
         iep="$(date -d "${ie}" +%s 2>/dev/null)"; case "${iep}" in ''|*[!0-9]*) iep="" ;; esac
       fi
       now="$(date +%s)"
