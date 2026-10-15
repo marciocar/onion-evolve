@@ -34,6 +34,10 @@ Nunca commita cross-repo; nunca dá ao transporte remoto poder de escrita (isola
 ## receive(memberId)
 Antes de QUALQUER sinal virar ação, delega ao gate obrigatório **`a2a-verify.sh --receiver <self>`**
 (verificação-antes-de-agir; a spec A2A a exige do receptor):
+0. **receptor** (desde a F3 do configurador A2A, 2026-10-15): `<self>` tem de RECEBER no registro — `role:
+source` ou `hub`, nunca porta. **Receber pelo canal vivo é só da fonte e dos hubs** (decisão declarada da
+F3): um standalone, regulado ou não, recebe pelo `git-async`, e o `--receiver <standalone>` veta
+`receiver-not-a-receiver`. O never-live-pull (camada 6) vale para o hub regulado. `aud` é obrigatório. ·
 1. **trust policy** (compõe `trust-topology-check.sh`: origem ∈ policy-as-data do `members.yaml`) ·
 2. **anti-replay** (`jti` single-use) · 3. **janela de timestamp** · 4. **anti-SSRF** (`a2a-ssrf-check.sh` na
 URL do webhook) · 5. **assinatura JWS** (RS256, pubkey pinada por `kid` no JWKS fixture) · 5b. **corpo
@@ -47,7 +51,7 @@ Até 2026-10-14 a assinatura cobria **só os claims**: trocar `signal.body` depo
 
 | o quê | como entra na assinatura | sem isso |
 |---|---|---|
-| `iss`, `aud`, `jti` | claims do payload JWS | veto (`claim-iss-mismatch`, `claim-aud-mismatch`, `jws-missing-jti`) |
+| `iss`, `aud`, `jti` | claims do payload JWS | veto (`claim-iss-mismatch`, `claim-aud-mismatch` ou, sem `aud`, `jws-missing-aud` desde a F3, `jws-missing-jti`) |
 | `iat`, `exp` | claims **obrigatórios**, inteiros; `exp − iat ≤ teto` e `exp ≤ now + teto` (teto = `A2A_EXP_MAX_TTL`, default **3600 s**) | `jws-missing-exp`, `jws-missing-iat`, `jws-bad-exp`, `exp-not-after-iat`, `exp-beyond-ceiling` |
 | o **corpo** `signal.body` | claim **obrigatório** `body_sha256` = sha256 (hex minúsculo) dos **bytes UTF-8 da string já decodificada** | `jws-missing-body-sha256` (remetente antigo) · `body-mismatch` (corpo trocado) · `body-not-string` |
 | `signal.body_path`, `signal.thread` | se presentes no signal, têm de estar **iguais** como claim | `claim-body_path-mismatch`, `claim-thread-mismatch` |

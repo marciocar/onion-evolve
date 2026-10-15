@@ -39,8 +39,8 @@ core-only: `docs/evolution/research/a2a-configurator-2026-10/` (no adotante não
 ## Degrau e limites
 
 - **Roda na fonte e no hub** (conjunto `adoption` do `roles.yaml`, ao lado do `/meta:federation-member`):
-  não viaja para standalone, plugins nem mini. Na F1 o receptor é o **core**; o hub como receptor dos
-  próprios filhos é a F3.
+  não viaja para standalone, plugins nem mini. O receptor é o **core** e, desde a F3, também o **hub**,
+  que recebe os filhos dele pelo bridge do core em `/a2a/<hub>` (doutrina, cláusula 10).
 - **O membro não precisa ter este comando:** a trilha 2 prepara um **pacote de entrada** com os quatro
   motores (keygen, remetente, doctor e o `a2a-invite.sh`, que o doctor usa para julgar o descritor do
   convite) e o roteiro da trilha 3, porque o membro adotado como standalone não recebe
@@ -69,9 +69,9 @@ core-only: `docs/evolution/research/a2a-configurator-2026-10/` (no adotante não
 > medidor sai rc ≠ 0: a mensagem dele chega no texto injetado, e isso **é** a medição. O doctor
 > completo de um membro roda no passo 1, com o `--member` que só a conversa conhece.
 
-Leia o papel antes de oferecer trilha: `source` → trilhas 1 a 6 (o core é o receptor); `hub` → na F1,
-só a 3 (entrar na rede do core) e a 4; as trilhas de receptor do hub chegam na F3. Outro papel → diga
-que o comando não é deste papel e pare.
+Leia o papel antes de oferecer trilha: `source` → trilhas 1 a 6 (o core é o receptor, dele e dos hubs);
+`hub` → a 2 e a 5 no papel de receptor dos próprios filhos (**trilhas 2 e 5 no hub**, abaixo), mais a 3
+(entrar na rede do core) e a 4. Outro papel → diga que o comando não é deste papel e pare.
 
 ## Procedimento
 
@@ -149,6 +149,33 @@ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <
    ```bash
    bash .claude/validation/members-validate.sh
    bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <id> --fingerprint sha256:<hex>
+   ```
+
+### Trilhas 2 e 5 no hub — o hub recebe os filhos dele (F3)
+O hub vive **junto** com o core: os filhos dele entram no registro do core e mandam sinais para
+`/a2a/<id do hub>` no bridge do core. O hub não tem o registro do core nem a conta do serviço do bridge,
+então o que é do registro e do arquivo de convites ele **pede ao operador do core**; o resto ele faz.
+1. **Registrar o filho** (pedido ao core): o operador do core roda `/meta:federation-member register` com
+   `role: consumer` e `parent: <id do hub>`, e o bloco `a2a` com `sends_to: <id do hub>`. O validador do
+   registro recusa consumer sem parent hub, parent que é porta e `sends_to` para outro hub.
+2. **Pacote de entrada** (no hub): os quatro motores e um `a2a.conf` com `receiver=<id do hub>` e
+   `endpoint=<url do bridge do core>/a2a/<id do hub>`. A rota é o receptor: o filho que mandar para `/a2a`
+   sem sufixo cai no core, e o convite dele sai `convite-de-outro-receptor`.
+3. **Convite** (pedido ao core): o operador do core cria o convite **para o receptor do hub**, como na
+   trilha 2 do core, com `--receiver <id do hub>`. O motor recusa o convite para um hub quando o membro
+   não é filho dele. O token e o descritor voltam ao hub fora de banda, e o hub os entrega ao filho.
+4. **Pino** (pedido ao core): a pública do filho é pinada no JWKS do core, como na trilha 2, passo 4.
+5. **Conferir**: o doctor do filho com `--receiver <id do hub> --endpoint .../a2a/<id do hub>` reprova
+   endpoint de outra rota antes de qualquer envio.
+   ```bash
+   bash a2a-doctor.sh --member <filho> --receiver <id do hub> --endpoint <url do bridge do core>/a2a/<id do hub>
+   ```
+6. **Aceitar a fila do hub** (trilha 5 no hub): o bridge grava a fila do hub à parte, num subdiretório com
+   o id dele; o maestro a lista na conta do serviço e entrega os registros ao hub. No hub, um por vez, com
+   confirmação, e sempre com o receptor do hub (sem o registro do core não há receptor padrão, e o motor
+   recusa a fila de outro receptor):
+   ```bash
+   bash .claude/utils/federation-transport/a2a-accept.sh <registro.json> --receiver <id do hub>
    ```
 
 ### Trilha 3 — Entrar na rede (o membro, na própria máquina)
@@ -237,7 +264,7 @@ que casa algo real).
 - Não aceita sinal em lote nem sem confirmação.
 - Não edita o arquivo de convites à mão nem fora do motor (a trava e a conferência de forma são dele),
   e não cria convite em lote.
-- Não é o hub como receptor (F3), nem o servidor do hub (F4).
+- Não monta o servidor próprio do hub nem a rede do hub separada da do core (F4, gated).
 
 ## 🔗 Referências
 

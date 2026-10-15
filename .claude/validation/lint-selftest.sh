@@ -8177,9 +8177,15 @@ run_a2a_invite_live_selftests() {
   cat > "${d}/members.yaml" <<'EOF'
 members:
   - id: core-bancada
+    role: source
     kind: source
+  # F3: o 2º receptor do (w12) é um hub, e o convite para um hub é só para filho dele (parent)
+  - id: r2-bancada
+    role: hub
+    kind: adopter
   - id: membro-bancada
     kind: adopter
+    parent: r2-bancada
 EOF
   cat > "${d}/bk.sh" <<EOF
 #!/usr/bin/env bash
@@ -9041,6 +9047,11 @@ run_resolve_target_selftests() {
     else
       record_fail "resolve-target: T2 entrou em \`todos\`" "recebe do core em vez de pelo hub: $(printf '%s' "${_intruso}" | tr '\n' ' ')"
     fi
+    # (F3.t1) parent:<core> é EXATAMENTE `todos` (a mesma tripla adopts), e parent:<x> devolve só quem adota x
+    local _pc; _pc="$(bash "${helper}" "parent:${_core}" 2>/dev/null | grep -v '^$' | LC_ALL=C sort || true)"
+    if [ -n "${_pc}" ] && [ "${_pc}" = "${todos}" ] && [ -z "$(bash "${helper}" 'parent:ninguem-adota-isto' 2>/dev/null)" ]; then
+      record_pass "resolve-target: (F3.t1) parent:<core> = todos, e parent:<id sem filhos> = vazio (o seletor do hub)"
+    else record_fail "resolve-target: (F3.t1) seletor parent" "parent:${_core}='$(printf '%s' "${_pc}" | tr '\n' ' ')'"; fi
   fi
 }
 
@@ -9606,7 +9617,8 @@ members:
     a2a: { keys: [k1] }
     trust: { can_receive_from: [onion-evolve] }
   - id: fin
-    role: standalone
+    role: hub              # F3: receptor regulado tem de RECEBER (role source|hub); era standalone até 2026-10-15
+    kind: adopter
     mode: regulated
     remote: github.com/fin/app
     trust: { can_receive_from: [onion-evolve] }
@@ -9907,6 +9919,74 @@ YML
     if [ "${rc}" -eq 1 ] && grep -q '"reason":"jws-missing-exp"' <<< "${out}"; then record_pass "a2a-verify: send-a2a.sh --no-exp (A5c) → veto jws-missing-exp"
     else record_fail "a2a-verify: spike sem exp" "out='${out}' rc=${rc}"; fi
   fi
+
+  # ── F3 do configurador A2A (SAC-124): o RECEPTOR MÚLTIPLO (/a2a/<receptor> no bridge do core) ─────────
+  # O receptor tem forma fechada e RECEBE no registro (role source|hub, nunca porta); aud é OBRIGATÓRIO
+  # (o jti é guardado por receptor); o consumer só fala com o PRÓPRIO hub; e o veredito ecoa o receptor.
+  local sbh; sbh="$(mktemp -d)"; mkdir -p "${sbh}/docs/evolution/federation"
+  cat > "${sbh}/docs/evolution/federation/members.yaml" <<'YML'
+members:
+  - id: onion-evolve
+    role: source
+    kind: source
+  - id: hub-a
+    role: hub
+    kind: adopter
+    parent: onion-evolve
+  - id: hub-b
+    role: hub
+    kind: adopter
+    parent: onion-evolve
+  - id: porta-x
+    role: source
+    kind: door
+    parent: onion-evolve
+  - id: solo-x
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+  - id: kid-a
+    role: consumer
+    kind: adopter
+    parent: hub-a
+    a2a: { keys: [k1], sends_to: hub-a }
+YML
+  _verify_h() { rc=0; out="$(A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver "$1" --repo "${sbh}" --dry-run --envelope - <<<"$2" 2>/dev/null)" || rc=$?; }
+  _verify_h hub-a "$(_env "$(_jws kid-a hub-a "${NOW}" "$((NOW+300))" jti-f3-ok)" kid-a hub-a "")"
+  if [ "${rc}" -eq 0 ] && grep -q '"verified":true' <<< "${out}" && grep -q '"receiver":"hub-a"' <<< "${out}"; then record_pass "a2a-verify: (F3.1) consumer → o PRÓPRIO hub (aud=hub) → verified, e o veredito ecoa receiver:hub-a"
+  else record_fail "a2a-verify: (F3.1) receptor hub" "out='${out}' rc=${rc}"; fi
+  _verify_h hub-b "$(_env "$(_jws kid-a hub-b "${NOW}" "$((NOW+300))" jti-f3-other)" kid-a hub-b "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"trust-denied"' <<< "${out}"; then record_pass "a2a-verify: (F3.2) consumer → hub que NÃO é o pai dele → veto trust-denied"
+  else record_fail "a2a-verify: (F3.2) consumer de outro hub" "out='${out}' rc=${rc}"; fi
+  _verify_h hub-a "$(_env "$(_jws kid-a onion-evolve "${NOW}" "$((NOW+300))" jti-f3-aud)" kid-a hub-a "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"claim-aud-mismatch"' <<< "${out}"; then record_pass "a2a-verify: (F3.3) rota do hub com aud de OUTRO receptor (o core) → veto claim-aud-mismatch"
+  else record_fail "a2a-verify: (F3.3) aud cruzado" "out='${out}' rc=${rc}"; fi
+  _verify_h hub-a "$(_env "$(_jws_raw "{\"iss\":\"kid-a\",\"iat\":${NOW},\"exp\":$((NOW+300)),\"jti\":\"jti-f3-noaud\",\"body_sha256\":\"$(printf '' | _sha)\"}")" kid-a hub-a "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"jws-missing-aud"' <<< "${out}"; then record_pass "a2a-verify: (F3.4) JWS sem aud → veto jws-missing-aud (sem ele o envelope seria reenviável em outro receptor)"
+  else record_fail "a2a-verify: (F3.4) aud obrigatório" "out='${out}' rc=${rc}"; fi
+  _verify_h solo-x "$(_env "$(_jws onion-evolve solo-x "${NOW}" "$((NOW+300))" jti-f3-solo)" onion-evolve solo-x "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-not-a-receiver:role-standalone"' <<< "${out}" && grep -q '"layer_failed":"receiver"' <<< "${out}"; then record_pass "a2a-verify: (F3.5) receptor standalone → veto receiver-not-a-receiver:role-standalone (camada receiver)"
+  else record_fail "a2a-verify: (F3.5) receptor standalone" "out='${out}' rc=${rc}"; fi
+  _verify_h porta-x "$(_env "$(_jws onion-evolve porta-x "${NOW}" "$((NOW+300))" jti-f3-door)" onion-evolve porta-x "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-not-a-receiver:kind-door"' <<< "${out}"; then record_pass "a2a-verify: (F3.6) receptor porta (role source, kind door) → veto receiver-not-a-receiver:kind-door"
+  else record_fail "a2a-verify: (F3.6) receptor porta" "out='${out}' rc=${rc}"; fi
+  _verify_h fantasma "$(_env "$(_jws kid-a fantasma "${NOW}" "$((NOW+300))" jti-f3-ghost)" kid-a fantasma "")"
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-unknown"' <<< "${out}" && [ ! -e "${sbh}/.claude/sessions/.a2a-verify.fantasma.jti.state" ]; then record_pass "a2a-verify: (F3.7) receptor fora do registro → veto receiver-unknown, sem estado de jti criado para ele"
+  else record_fail "a2a-verify: (F3.7) receptor desconhecido" "out='${out}' rc=${rc}"; fi
+  local badr okbad=1
+  for badr in "../fora" "-x" "a/b" ".oculto" "hub a"; do
+    _verify_h "${badr}" "$(_env "$(_jws kid-a hub-a "${NOW}" "$((NOW+300))" "jti-f3-bad-${RANDOM}")" kid-a hub-a "")"
+    { [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-malformed"' <<< "${out}"; } || okbad=0
+  done
+  if [ "${okbad}" -eq 1 ] && [ ! -e "${sbh}/.claude/fora.jti.state" ] && [ -z "$(find "${sbh}" -name '*fora*' 2>/dev/null)" ]; then record_pass "a2a-verify: (F3.8) receptor fora da forma (../, -x, a/b, .oculto, espaço) → veto receiver-malformed, nada gravado fora da fila"
+  else record_fail "a2a-verify: (F3.8) forma do receptor" "out='${out}' rc=${rc}"; fi
+  local sbh2; sbh2="$(mktemp -d)"; mkdir -p "${sbh2}/docs/evolution/federation"
+  printf 'members: { isto não fecha\n' > "${sbh2}/docs/evolution/federation/members.yaml"
+  rc=0; out="$(A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver hub-a --repo "${sbh2}" --dry-run --envelope - \
+    <<<"$(_env "$(_jws kid-a hub-a "${NOW}" "$((NOW+300))" jti-f3-broken)" kid-a hub-a "")" 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q '"reason":"receiver-registry-unreadable"' <<< "${out}"; then record_pass "a2a-verify: (F3.9) registro ilegível → veto receiver-registry-unreadable (fail-closed)"
+  else record_fail "a2a-verify: (F3.9) registro ilegível" "out='${out}' rc=${rc}"; fi
+  rm -rf "${sbh}" "${sbh2}"
   rm -rf "${bin}" "${clkbin}" "${sb}" "${sbw}" "${mutd}" "${mroot}" "${sbr}" "${mroots[@]}"
 }
 
@@ -10483,6 +10563,126 @@ PY
   if [ "${rc}" -eq 1 ] && _fa_has "${out}" "kid 'acme-1' já pertence a"; then record_pass "federation-a2a: validador reprova kid de um membro pinado em outro"
   else record_fail "federation-a2a: validador kid de dois donos" "rc=${rc} out='${out}'"; fi
 
+  # ─────────────── F3 (SAC-124): o hub junto com o core — parent, convite e rota do receptor ───────────────
+  # Registro com um hub e um filho dele (consumer com parent: hub-x). _fa_reg3 escreve o registro mínimo
+  # válido e acrescenta os membros extras ($1, YAML de membros já indentado em 2).
+  _fa_reg3() {
+    _fa_reg "${_fa_pinned}"
+    cat >> "${reg}" <<YML
+  - id: hub-x
+    name: hub-x
+    role: hub
+    kind: adopter
+    parent: core-x
+    onion_version: abcdef1
+    adopted_at: 2026-10-15
+    mode: greenfield
+    personality_summary: "hub de teste"
+    specializations: []
+    personality_last_sync: 2026-10-15
+    trust: { can_receive_from: [core-x], can_advise_to: [core-x], can_correct_to: [], diary_readable_by: [], exposes_downstream: [kid-x] }
+  - id: hub-y
+    name: hub-y
+    role: hub
+    kind: adopter
+    parent: core-x
+    onion_version: abcdef1
+    adopted_at: 2026-10-15
+    mode: greenfield
+    personality_summary: "outro hub"
+    specializations: []
+    personality_last_sync: 2026-10-15
+    trust: { can_receive_from: [core-x], can_advise_to: [core-x], can_correct_to: [], diary_readable_by: [], exposes_downstream: [] }
+  - id: hubporta-x
+    name: hubporta-x
+    role: hub
+    kind: door
+    parent: core-x
+    onion_version: abcdef1
+    adopted_at: 2026-10-15
+    mode: greenfield
+    personality_summary: "porta com papel de hub"
+    specializations: []
+    personality_last_sync: 2026-10-15
+    trust: { can_receive_from: [core-x], can_advise_to: [core-x], can_correct_to: [], diary_readable_by: [], exposes_downstream: [] }
+${1}
+YML
+  }
+  _fa_kid() {  # $1 = parent · $2 = role · $3 = linha a2a extra (ou vazio) → bloco YAML do kid-x
+    printf '  - id: kid-x\n    name: kid-x\n    role: %s\n    kind: adopter\n    parent: %s\n    onion_version: abcdef1\n    adopted_at: 2026-10-15\n    mode: greenfield\n    personality_summary: "filho do hub"\n    specializations: []\n    personality_last_sync: 2026-10-15\n    trust: { can_receive_from: [%s], can_advise_to: [%s], can_correct_to: [], diary_readable_by: [], exposes_downstream: [] }\n%s' \
+      "$2" "$1" "$1" "$1" "${3:+    $3
+}"
+  }
+  _fa_pv() {  # rótulo · parent · role · a2a extra · trecho esperado ('' = válido)
+    _fa_reg3 "$(_fa_kid "$2" "$3" "$4")"; rc=0; out="$(bash "${mv}" "${reg}" 2>&1)" || rc=$?
+    if [ -z "$5" ]; then
+      if [ "${rc}" -eq 0 ]; then record_pass "federation-a2a: (F3.$1) validador aceita o filho do hub"
+      else record_fail "federation-a2a: (F3.$1) validador filho do hub" "rc=${rc} out='${out}'"; fi
+    elif [ "${rc}" -eq 1 ] && _fa_has "${out}" "$5"; then record_pass "federation-a2a: (F3.$1) validador reprova: $5"
+    else record_fail "federation-a2a: (F3.$1) validador parent" "rc=${rc} out='${out}'"; fi
+  }
+  _fa_pv p1 hub-x consumer 'a2a: { sends_to: hub-x }' ''
+  _fa_pv p2 core-x consumer '' "exige parent hub"
+  _fa_pv p3 door-x consumer '' "exige parent hub"
+  _fa_pv p4 hub-x standalone '' "o parent tem de ser a fonte"
+  _fa_pv p5 fantasma consumer '' "'parent' aponta 'fantasma', que não está no registro"
+  _fa_pv p6 kid-x consumer '' "aponta para o próprio membro"
+  _fa_pv p7 hub-x consumer 'a2a: { sends_to: hub-y }' "manda sinais para o próprio hub"
+  _fa_pv p8 hub-x consumer 'a2a: { sends_to: core-x }' ''
+  _fa_pv p9 hubporta-x consumer '' "exige parent hub"
+  _fa_pv p10 hub-x consumer 'parent: hub-y' "repetida no mesmo mapa"
+  _fa_reg3 "$(_fa_kid hub-x consumer '')"; sed -i 's/^  - id: hub-y$/  - id: hub-y   # comentário na linha do id/' "${reg}"
+  rc=0; out="$(bash "${mv}" "${reg}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && _fa_has "${out}" "comentário na linha do '- id:'"; then record_pass "federation-a2a: (F3.p11) validador reprova comentário na linha do id (o awk o leria como id)"
+  else record_fail "federation-a2a: (F3.p11) comentário no id" "rc=${rc} out='${out}'"; fi
+  _fa_reg3 "$(_fa_kid hub-x consumer '')"; sed -i 's/^  - id: hub-y$/  - id: evil hub-y/' "${reg}"
+  rc=0; out="$(bash "${mv}" "${reg}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && _fa_has "${out}" "'id' fora de [A-Za-z0-9._-]"; then record_pass "federation-a2a: (F3.p12) validador reprova id com espaço (o awk casaria a última palavra)"
+  else record_fail "federation-a2a: (F3.p12) id com espaço" "rc=${rc} out='${out}'"; fi
+
+  # convite (a2a-invite.sh create, em ensaio): o receptor tem de RECEBER, e convite para o hub é só do filho dele
+  _fa_reg3 "$(_fa_kid hub-x consumer 'a2a: { sends_to: hub-x }')"
+  local f3iv="${sb}/f3-invites.json"; printf '{"version":1,"invites":[]}\n' > "${f3iv}"; chmod 600 "${f3iv}"
+  _fa_pi() {  # rótulo · membro · receptor · rc esperado · trecho
+    rc=0; out="$(bash "${inv_m}" create "$2" --days 3 --file "${f3iv}" --token-out "${sb}/f3-$1.tok" --receiver "$3" --members "${reg}" --dry-run 2>&1)" || rc=$?
+    if [ "${rc}" -eq "$4" ] && _fa_has "${out}" "$5" && [ ! -e "${sb}/f3-$1.tok" ]; then record_pass "federation-a2a: (F3.$1) convite $2 → $3: rc $4 ($5)"
+    else record_fail "federation-a2a: (F3.$1) convite $2 → $3" "rc=${rc} (esperado $4) out='${out}'"; fi
+  }
+  _fa_pi i1 kid-x hub-x 0 "\"receiver\": \"hub-x\""
+  _fa_pi i2 acme hub-x 1 "só para filho dele"
+  _fa_pi i3 kid-x door-x 1 "não é receptor"
+  _fa_pi i4 kid-x solo-x 1 "não é receptor"
+  _fa_pi i5 kid-x fantasma 1 "receptor 'fantasma' não está no registro"
+  _fa_pi i6 kid-x core-x 0 "\"receiver\": \"core-x\""
+
+  # doctor do membro: o endpoint tem de ser a ROTA do receptor (/a2a = o core; /a2a/<hub> = o hub)
+  _FA_ENV=""; _fa_doc --receiver hub-x --endpoint "http://127.0.0.1:9/a2a"
+  _fa_state "(F3.d1) receptor hub com endpoint /a2a" 1 g falha "rota do receptor padrão"
+  _fa_doc --receiver hub-x --endpoint "http://127.0.0.1:9/a2a/hub-y"
+  _fa_state "(F3.d2) receptor hub com endpoint /a2a/<outro hub>" 1 g falha "rota de outro receptor (hub-y)"
+  _fa_doc --receiver hub-x --endpoint "http://127.0.0.1:9/a2a/hub-x/"
+  _fa_state "(F3.d3) rota do hub com barra final (o bridge responde 404)" 1 g falha "rota malformada"
+  _fa_doc --receiver hub-x --endpoint "http://127.0.0.1:9/A2A/hub-x"
+  _fa_state "(F3.d5) rota em maiúsculas (o bridge responde 404)" 1 g falha "não é uma rota do /a2a"
+  _fa_doc --receiver hub-x --endpoint "http://127.0.0.1:9/a2a/hub-x"
+  _fa_state "(F3.d6) a rota exata do hub chega à sonda de alcance" 1 g falha "inalcançável"
+  # (F3.d7) bridge servido ANTERIOR à F3 (sem /a2a/<receptor>): a rota responde 404 ao POST, e o doctor tem de
+  # dizer que a rota não existe, não "alcançável". Stub HTTP local que responde 404 a todo POST.
+  local p404 spid; p404="$(python3 -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1]);s.close()')"
+  python3 -c 'import sys,http.server
+class H(http.server.BaseHTTPRequestHandler):
+    def do_POST(self):
+        self.send_response(404); self.end_headers()
+    def log_message(self,*a): pass
+http.server.HTTPServer(("127.0.0.1",int(sys.argv[1])),H).serve_forever()' "${p404}" >/dev/null 2>&1 &
+  spid=$!
+  local _w; for _w in 1 2 3 4 5 6 7 8 9 10; do (exec 3<>"/dev/tcp/127.0.0.1/${p404}") 2>/dev/null && break; sleep 0.3; done
+  _fa_doc --receiver hub-x --endpoint "http://127.0.0.1:${p404}/a2a/hub-x"
+  kill "${spid}" 2>/dev/null; wait "${spid}" 2>/dev/null
+  _fa_state "(F3.d7) rota certa num bridge sem o receptor múltiplo (POST → 404)" 1 g falha "respondeu 404"
+  _fa_doc --receiver hub-x --endpoint "http://127.0.0.1:9/a2a/hub-x?x=1"
+  _fa_state "(F3.d4) receptor hub com a rota dele (query ignorada) chega ao alcance" 1 g falha "inalcançável"
+
   rm -rf "${sb}"
 }
 
@@ -10517,6 +10717,31 @@ JSON
   rc=0; bash "${helper}" "${d}/bad.json" --inbox "${ib}" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 1 ]; then record_pass "a2a-accept: registro malformado → erro"
   else record_fail "a2a-accept: malformed" "rc=${rc}"; fi
+
+  # ── F3 (SAC-124): o aceite é POR RECEPTOR — o hub aceita só a fila dele, o core só a dele ──────────
+  local ibh="${d}/inbox-hub" rh="${d}/rec-hub.json" rx="${d}/rec-x.json"
+  mkdir -p "${ibh}"
+  printf '%s' '{"taskId":"t2","receivedAt":"2026-10-15T10:00:00Z","from":"kid-a","receiver":"hub-a","signal":{"id":"2026-10-15-kid-a-hello","from":"kid-a","to":"hub-a","kind":"signal"},"verdict":{"verified":true,"regulated":false,"apply_mode":"gated","receiver":"hub-a"}}' > "${rh}"
+  rc=0; out="$(bash "${helper}" "${rh}" --inbox "${ibh}" --receiver hub-a 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q '^para: hub-a ' "${ibh}/2026-10-15-kid-a-hello.md" 2>/dev/null; then record_pass "a2a-accept: (F3.a1) registro do hub aceito no hub (--receiver hub-a) e endereçado a ele"
+  else record_fail "a2a-accept: (F3.a1) aceite no hub" "rc=${rc} out='${out}'"; fi
+  rc=0; out="$(bash "${helper}" "${rh}" --inbox "${ib}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q "do receptor 'hub-a'" <<< "${out}" && [ ! -f "${ib}/2026-10-15-kid-a-hello.md" ]; then record_pass "a2a-accept: (F3.a2) registro do hub recusado no aceite do core (fila de outro receptor)"
+  else record_fail "a2a-accept: (F3.a2) fila do hub no core" "rc=${rc} out='${out}'"; fi
+  printf '%s' '{"taskId":"t3","receivedAt":"2026-10-15T10:00:00Z","from":"kid-a","receiver":"onion-evolve","signal":{"id":"2026-10-15-kid-a-x","from":"kid-a","kind":"signal"},"verdict":{"verified":true,"receiver":"hub-a"}}' > "${rx}"
+  rc=0; out="$(bash "${helper}" "${rx}" --inbox "${ib}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q "do receptor 'hub-a'" <<< "${out}"; then record_pass "a2a-accept: (F3.a3) campo do bridge diz core mas o eco do gate diz hub → recusado (os dois têm de ser o receptor)"
+  else record_fail "a2a-accept: (F3.a3) eco do gate divergente" "rc=${rc} out='${out}'"; fi
+  rc=0; out="$(bash "${helper}" "${rec}" --inbox "${ibh}" --receiver hub-a 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'registro sem receptor' <<< "${out}"; then record_pass "a2a-accept: (F3.a4) registro antigo (sem receptor) recusado no hub: antes da F3 a fila toda era do core"
+  else record_fail "a2a-accept: (F3.a4) registro antigo no hub" "rc=${rc} out='${out}'"; fi
+  rc=0; bash "${helper}" "${rh}" --inbox "${ibh}" --receiver -x >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "a2a-accept: (F3.a5) --receiver fora da forma → uso inválido (rc 2)"
+  else record_fail "a2a-accept: (F3.a5) forma do receptor" "rc=${rc}"; fi
+  local lone="${d}/lone"; mkdir -p "${lone}/.claude/utils/federation-transport"; cp "${helper}" "${lone}/.claude/utils/federation-transport/"
+  rc=0; out="$(bash "${lone}/.claude/utils/federation-transport/a2a-accept.sh" "${rh}" --inbox "${ibh}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -q 'não sei o receptor' <<< "${out}"; then record_pass "a2a-accept: (F3.a6) instalação sem registro (o hub) e sem --receiver → rc 2, nunca aceita a fila de qualquer um"
+  else record_fail "a2a-accept: (F3.a6) sem registro e sem --receiver" "rc=${rc} out='${out}'"; fi
 
   rm -rf "${d}"
 }
@@ -18434,6 +18659,53 @@ run_corelay_selftests() {
     record_pass "co-relay: mesmo nome, conteúdo novo → entrega (sinal atualizado ≠ duplicata)"
   else record_fail "co-relay: sinal atualizado" "exit ${rc} — dedup bloqueou uma atualização legítima?"; fi
   rm -rf "${d}" "${core}"
+
+  # ── F3 (SAC-124): o destino se prova — o core (sem carimbo) ou um hub (carimbo role: hub) ─────────────
+  local hubd peer
+  # (F3.r1) filho do hub (carimbo adopted, adopted_from = o caminho do hub) → o hub (carimbo hub) → relaya
+  _mk_hub() { git -C "$1" init -q; mkdir -p "$1/.claude" "$1/docs/evolution/inbox"; printf 'role: hub\n' > "$1/.claude/.onion-version"; }
+  d="$(mktemp -d)"; hubd="$(mktemp -d)"; mk_adopter "${d}" adopted; _mk_hub "${hubd}"
+  printf 'adopted_from: %s\n' "${hubd}" >> "${d}/.claude/.onion-version"
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${hubd}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${hubd}/${SIG}" ]; then record_pass "co-relay: (F3.r1) filho do hub (adopted, adopted_from = o hub) → o hub (carimbo hub) → relaya"
+  else record_fail "co-relay: (F3.r1) relay ao hub" "exit ${rc} ou o sinal não chegou ao hub"; fi
+  rm -rf "${d}" "${hubd}"
+  # (F3.r4) standalone do CORE também carimba adopted (achado do refutador): adopted_from = o core → hub → exit 2
+  d="$(mktemp -d)"; hubd="$(mktemp -d)"; mk_adopter "${d}" adopted; _mk_hub "${hubd}"
+  git -C "${hubd}" remote add origin https://github.com/acme/hub-z.git
+  printf 'adopted_from: https://github.com/acme/core.git\n' >> "${d}/.claude/.onion-version"
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${hubd}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ] && [ ! -f "${hubd}/${SIG}" ]; then record_pass "co-relay: (F3.r4) adotado do core (carimbo adopted, adopted_from = o core) → um hub → exit 2, nada entregue"
+  else record_fail "co-relay: (F3.r4) standalone do core relayou ao hub" "rc=${rc}"; fi
+  # (F3.r5) o mesmo hub pelo remote em outra grafia (ssh x https, com .git) → relaya
+  : > "${d}/.claude/.onion-version"; printf 'role: adopted\nadopted_from: git@github.com:acme/hub-z.git\n' > "${d}/.claude/.onion-version"
+  rc=0; ( cd "${d}" && bash "${helper}" --target "${hubd}" ) >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${hubd}/${SIG}" ]; then record_pass "co-relay: (F3.r5) adopted_from = o remote do hub em outra grafia (ssh × https) → relaya"
+  else record_fail "co-relay: (F3.r5) remote normalizado" "rc=${rc}"; fi
+  rm -rf "${d}" "${hubd}"
+  # (F3.r2) destino que é OUTRO adotante (carimbo adopted/standalone) → exit 2, nada entregue (canal lateral)
+  local okr2=1 prole
+  for prole in adopted standalone; do
+    d="$(mktemp -d)"; peer="$(mktemp -d)"; mk_adopter "${d}" adopted; mk_adopter "${peer}" "${prole}"; rm -f "${peer}/${SIG}"
+    printf 'adopted_from: %s\n' "${peer}" >> "${d}/.claude/.onion-version"   # só o carimbo do destino pode barrar
+    rc=0; ( cd "${d}" && bash "${helper}" --target "${peer}" ) >/dev/null 2>&1 || rc=$?
+    { [ "${rc}" -eq 2 ] && [ ! -f "${peer}/${SIG}" ]; } || okr2=0
+    rm -rf "${d}" "${peer}"
+  done
+  if [ "${okr2}" -eq 1 ]; then record_pass "co-relay: (F3.r2) destino que é outro adotante (adopted, standalone) → exit 2, nada entregue (canal lateral)"
+  else record_fail "co-relay: (F3.r2) canal lateral" "relayou para um par (rc=${rc})"; fi
+  # (F3.r3) um standalone (ou um hub) relayando para um hub → exit 2: só o filho de hub fala com o hub
+  local okr3=1 srole
+  for srole in standalone hub; do
+    d="$(mktemp -d)"; hubd="$(mktemp -d)"; mk_adopter "${d}" "${srole}"; git -C "${hubd}" init -q
+    mkdir -p "${hubd}/.claude" "${hubd}/docs/evolution/inbox"; printf 'role: hub\n' > "${hubd}/.claude/.onion-version"
+    printf 'adopted_from: %s\n' "${hubd}" >> "${d}/.claude/.onion-version"   # só o carimbo do remetente pode barrar
+    rc=0; ( cd "${d}" && bash "${helper}" --target "${hubd}" ) >/dev/null 2>&1 || rc=$?
+    { [ "${rc}" -eq 2 ] && [ ! -f "${hubd}/${SIG}" ]; } || okr3=0
+    rm -rf "${d}" "${hubd}"
+  done
+  if [ "${okr3}" -eq 1 ]; then record_pass "co-relay: (F3.r3) standalone ou hub → um hub → exit 2 (só o filho do hub relaya para ele)"
+  else record_fail "co-relay: (F3.r3) não-filho relayou ao hub" "rc=${rc}"; fi
 }
 
 # ---------------------------------------------------------------------------
@@ -18558,6 +18830,29 @@ run_codeliver_selftests() {
   if [ "${rc2}" -ne 0 ] && grep -qF "parent:" <<< "${out2}"; then
     record_pass "co-deliver: (h) adopted SEM parent ⇒ recusa PEDINDO o campo (não escolhe um lado)"
   else record_fail "co-deliver: (h) decidiu sem saber" "rc=${rc2} out=${out2:0:200}"; fi
+  rm -rf "${c2}" "${t2}"
+
+  # ── F3 (SAC-124): o filho do hub se registra no core com parent: <hub> ─────────────────────────────
+  # O carteiro do core segue não entregando ao T2 (o hub propaga), mas confere que o parent É um hub do
+  # registro, e recusa consumer pendurado no core (tier contraditório).
+  _cd_hubs() { printf '  - id: hub-z\n    role: hub\n    kind: adopter\n  - id: porta-z\n    role: source\n    kind: door\n' >> "$1/docs/evolution/federation/members.yaml"; }
+  c2="$(mktemp -d)"; t2="$(mktemp -d)"; mk_deliver_adopter "${t2}"; mk_deliver_core "${c2}" "${t2}" consumer hub-z; _cd_hubs "${c2}"
+  if out2="$( ( cd "${c2}" && bash "${helper}" alvo ) 2>&1 )"; then rc2=0; else rc2=$?; fi
+  if [ "${rc2}" -eq 2 ] && grep -qF "recebe PELO hub" <<< "${out2}" && grep -qF "hub-z" <<< "${out2}" && ! ls "${t2}/docs/evolution/inbound/"*.md >/dev/null 2>&1; then
+    record_pass "co-deliver: (F3.c1) consumer com parent hub registrado ⇒ recusa nomeando o hub, nada entregue"
+  else record_fail "co-deliver: (F3.c1) filho do hub" "rc=${rc2} out=${out2:0:200}"; fi
+  rm -rf "${c2}" "${t2}"
+  c2="$(mktemp -d)"; t2="$(mktemp -d)"; mk_deliver_adopter "${t2}"; mk_deliver_core "${c2}" "${t2}" consumer porta-z; _cd_hubs "${c2}"
+  if out2="$( ( cd "${c2}" && bash "${helper}" alvo ) 2>&1 )"; then rc2=0; else rc2=$?; fi
+  if [ "${rc2}" -eq 2 ] && grep -qF "não é um hub do registro" <<< "${out2}"; then
+    record_pass "co-deliver: (F3.c2) parent que é porta (não hub) ⇒ recusa dizendo que o parent não é hub"
+  else record_fail "co-deliver: (F3.c2) parent porta" "rc=${rc2} out=${out2:0:200}"; fi
+  rm -rf "${c2}" "${t2}"
+  c2="$(mktemp -d)"; t2="$(mktemp -d)"; mk_deliver_adopter "${t2}"; mk_deliver_core "${c2}" "${t2}" consumer onion-evolve; _cd_hubs "${c2}"
+  if out2="$( ( cd "${c2}" && bash "${helper}" alvo ) 2>&1 )"; then rc2=0; else rc2=$?; fi
+  if [ "${rc2}" -eq 2 ] && grep -qF "Tier contraditório" <<< "${out2}" && ! ls "${t2}/docs/evolution/inbound/"*.md >/dev/null 2>&1; then
+    record_pass "co-deliver: (F3.c3) consumer com parent = core ⇒ recusa (tier contraditório), nada entregue"
+  else record_fail "co-deliver: (F3.c3) consumer no core" "rc=${rc2} out=${out2:0:200}"; fi
   rm -rf "${c2}" "${t2}"
 }
 

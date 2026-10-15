@@ -89,6 +89,15 @@ get_kind() {
   ' "$MEMBERS"
 }
 
+# Obter parent de um membro (o hub que o T2 adota). Mesmo leitor do role e do kind; comentário inline cai.
+get_parent() {
+  local ID="$1"
+  awk -v id="$ID" '
+    /^  - id:/ { found = ($NF == id) }
+    found && /^    parent:/ { v = $0; sub(/#.*$/, "", v); sub(/^    parent:[[:space:]]*/, "", v); gsub(/[[:space:]"\047]/, "", v); print v; exit }
+  ' "$MEMBERS"
+}
+
 # Verificar se ID está em uma lista YAML (campo: [a, b, c])
 # Indentação LIVRE (os campos de trust vivem a 6 espaços, aninhados sob `trust:`)
 # e comentário inline removido ANTES da comparação — sem isso o match é sempre-falso
@@ -213,10 +222,19 @@ if [ "$FROM_ROLE" = "hub" ] && [ "$TO_ROLE" = "consumer" ]; then
   fi
 fi
 
-# consumer → seu parent hub (feedback upward): sempre autorizado
+# consumer → SEU parent hub (feedback upward). Até a F3 do configurador A2A (2026-10-15) a regra dizia "seu
+# parent" e checava só os papéis: qualquer consumer falava com QUALQUER hub. Com o hub virando receptor vivo
+# (/a2a/<hub> no bridge do core), isso deixava o filho de um hub escrever na fila de outro. Agora o parent
+# do consumer tem de ser o hub de destino; consumer de outro hub fala com ele pelo core, não de lado.
 if [ "$FROM_ROLE" = "consumer" ] && [ "$TO_ROLE" = "hub" ] && [ "$ACTION" != "correct" ]; then
-  # Verificar que FROM tem TO como referência em can_receive_from (o inverso: que hub está em can_receive_from do consumer)
-  # Simplificação: T2 pode sempre enviar para seu parent T1 via relay/advise
+  FROM_PARENT="$(get_parent "$FROM_ID")"
+  if [ "$FROM_PARENT" != "$TO_ID" ]; then
+    REASON="$FROM_ID (consumer) tem parent '${FROM_PARENT:-ausente}', não '$TO_ID': consumer só fala com o PRÓPRIO hub."
+    log_attempt "BLOQUEADO" "$REASON"
+    echo "🚫 BLOQUEADO: $FROM_ID → $TO_ID [$ACTION]" >&2
+    echo "   $REASON" >&2
+    exit 1
+  fi
   log_attempt "AUTORIZADO" "consumer→parent hub (feedback upward)"
   echo "✅ AUTORIZADO: $FROM_ID (consumer) → $TO_ID (hub) [$ACTION]"
   echo "   Razão: consumer sempre pode enviar feedback ao seu parent hub."

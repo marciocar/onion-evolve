@@ -102,6 +102,43 @@ esac
 [ -e "${TARGET}/.git" ] || { echo "ERRO: --target não parece um repo git: ${TARGET}" >&2; exit 2; }
 TARGET="$(cd "${TARGET}" && pwd)"   # normaliza para path absoluto
 
+# --- Guarda do DESTINO (F3 do configurador A2A, 2026-10-15): upstream é o core OU o hub do adotante ------
+# A rede do hub nasce junto com a do core: o filho de um hub (T2, carimbo `adopted`) manda sinal ao PRÓPRIO
+# hub, que vive na mesma máquina. Até aqui o destino só precisava ser um repo git, e o carteiro relayava
+# para qualquer checkout, inclusive o de outro adotante: um canal lateral que a topologia proíbe
+# (standalone não tem canal lateral; consumer só fala com o seu hub). O destino agora se prova:
+#   · sem carimbo .claude/.onion-version = o core (a fonte não tem carimbo; o onion-version.sh o hardcoda);
+#   · carimbo role: hub = um hub, e só o carimbo `adopted` (quem pode ser filho de hub) relaya para ele;
+#   · qualquer outro carimbo (adopted, standalone, porta) = par lateral → recusa.
+# QUAL hub é o pai: o carimbo `adopted` não distingue o filho de um hub do standalone do core (os dois
+# carimbam `adopted`; achado do refutador da F3, medido em adotantes reais desta máquina). Sem o registro, a
+# prova que o carteiro tem é o `adopted_from` do carimbo do remetente: tem de ser o remote `origin` do hub ou
+# o caminho dele. Quem adotou o core (adopted_from = o core) não relaya para hub nenhum.
+T_STAMP="${TARGET}/.claude/.onion-version"
+if [ -f "${T_STAMP}" ]; then
+  T_ROLE="$(role_field "${T_STAMP}")"
+  if [ "${T_ROLE}" != "hub" ]; then
+    echo "ERRO: o destino '${TARGET}' tem carimbo role='${T_ROLE:-vazio}' — não é o core nem um hub. Upstream é o core ou o seu hub; relayar para outro adotante é canal lateral." >&2
+    exit 2
+  fi
+  if [ "${ROLE}" != "adopted" ]; then
+    echo "ERRO: o destino é um hub, e este repo tem carimbo role='${ROLE}'. Só o filho de um hub (carimbo adopted) relaya para o hub; ${ROLE} fala com o core." >&2
+    exit 2
+  fi
+  _norm_remote() {  # https://h/o/r(.git) · git@h:o/r(.git) · ssh://git@h/o/r → h/o/r
+    printf '%s' "$1" | sed -E 's#^[a-zA-Z+]+://##; s#^[^@/]+@##; s#:#/#; s#\.git/?$##; s#/+$##'
+  }
+  SRC_FROM="$(grep -E '^[[:space:]]*adopted_from:' "${STAMP}" 2>/dev/null | head -1 | sed -E 's/^[[:space:]]*adopted_from:[[:space:]]*//; s/[[:space:]]*#.*$//; s/[[:space:]]*$//; s/"//g; s/'\''//g')"
+  HUB_REMOTE="$(git -C "${TARGET}" remote get-url origin 2>/dev/null || true)"
+  if [ -z "${SRC_FROM}" ] || { [ "${SRC_FROM%/}" != "${TARGET}" ] && { [ -z "${HUB_REMOTE}" ] || [ "$(_norm_remote "${SRC_FROM}")" != "$(_norm_remote "${HUB_REMOTE}")" ]; }; }; then
+    echo "ERRO: o destino é um hub, mas este repo não o adota: adopted_from='${SRC_FROM:-ausente}' não é o remote nem o caminho do hub (${HUB_REMOTE:-sem origin}). Quem adota o core relaya para o core; relayar para um hub que não é o seu é canal lateral." >&2
+    exit 2
+  fi
+  T_LABEL="HUB"
+else
+  T_LABEL="CORE"
+fi
+
 # --- Resolve a fonte do(s) sinal(is) ---
 [ -n "${FROM_DIR}" ] || FROM_DIR="${REPO_ROOT}/docs/evolution/inbox"
 
@@ -128,7 +165,7 @@ fi
 if [ "${DRY}" -eq 1 ]; then
   echo "── DRY-RUN — Carteiro-local upstream (nada escrito) ──"
   echo "  fonte    : ${FROM_DIR}/"
-  echo "  alvo     : ${TARGET}  (CORE)"
+  echo "  alvo     : ${TARGET}  (${T_LABEL})"
   echo "  destino  : ${DEST_DIR}/"
   for f in "${FILES[@]}"; do echo "  relayar  : $(basename "$f")"; done
   exit 0

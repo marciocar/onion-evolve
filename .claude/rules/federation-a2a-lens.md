@@ -25,5 +25,8 @@ Superfície: [`/meta:federation-a2a`](../commands/meta/federation-a2a.md). Doutr
    bridge: o bridge o recusa inteiro se tiver outro dono, symlink, escrita de grupo/outros ou
    diretório inseguro, e `revoked` só vale como `false` literal. A validade é ISO 8601 com hora e
    fuso, com paridade medida contra o `Date.parse` do V8: sem `date -d`, que só existe no GNU.
+8. **O receptor é a rota, e é id do registro** (F3): `--receiver` tem forma fechada (1º caractere letra
+   ou dígito, sem `/` nem `..`, porque vira nome do arquivo de jti) e só recebe quem é `role: source` ou
+   `hub` e não é porta. `aud` é obrigatório: sem ele, o envelope de um receptor valeria no outro.
 7. **Estes motores não viajam para standalone, plugins nem mini** (corte por prefixo no transporte):
    texto que manda o membro rodá-los aponta o pacote de entrada da trilha 2, não o caminho do core.

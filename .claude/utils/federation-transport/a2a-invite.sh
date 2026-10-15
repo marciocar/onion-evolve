@@ -39,7 +39,9 @@
 #                 ou pipe, nunca terminal
 #   --invite-out  descritor sem segredo {member, receiver, expires_at, revoked, token_sha256} que viaja
 #                 com o token e alimenta o doctor; default <token-out>.invite.json com --token-out
-#   --receiver    default: o membro kind: source do registro (o core); sem registro, obrigatório
+#   --receiver    default: o membro kind: source do registro (o core); sem registro, obrigatório. Com registro
+#                 (F3), o receptor tem de receber (role source ou hub, nunca porta), e convite para um hub
+#                 é só para filho dele (parent: <hub>): o gate e a topologia recusariam o resto
 #   --members     default <raiz>/docs/evolution/federation/members.yaml; o membro tem de estar nele
 #   --owner       list/check: o dono que o bridge exige (default: quem roda). Rode como a conta do
 #                 serviço do bridge (sudo -u <conta>): o arquivo é 0600 dela
@@ -237,6 +239,29 @@ def registry(path):
     src = [m.get('id') for m in ms if isinstance(m, dict) and m.get('kind') == 'source']
     return ids, (src[0] if src else None), ''
 
+def registry_by_id(path):
+    """→ {id: entrada} do registro, ou None quando indisponível (o mesmo julgamento de registry())."""
+    try:
+        import yaml
+        ms = (yaml.safe_load(open(path)) or {}).get('members') or []
+    except Exception:
+        return None
+    return {m.get('id'): m for m in ms if isinstance(m, dict) and isinstance(m.get('id'), str)}
+
+def receiver_problem(bym, member, receiver):
+    """F3: o receptor do convite tem de RECEBER (role source|hub, nunca porta), e convite para um hub é só
+    para filho dele (parent: <hub>) — é o que o gate do core e a topologia aceitam. None = ok."""
+    r = bym.get(receiver)
+    if r is None: return f"receptor '{receiver}' não está no registro"
+    # o MESMO critério do gate (camada receiver) e do bridge: role source ou hub, nunca porta
+    if r.get('role') not in ('source', 'hub') or r.get('kind') == 'door':
+        return f"'{receiver}' (role '{r.get('role')}', kind '{r.get('kind')}') não é receptor: só role source ou hub, e nunca porta"
+    if r.get('role') == 'hub':
+        par = (bym.get(member) or {}).get('parent')
+        if par != receiver:
+            return f"convite para o hub '{receiver}' é só para filho dele (parent: {receiver}); '{member}' tem parent '{par}'"
+    return None
+
 def git_unignored(path):
     """True quando `path` cai numa árvore git sem ser ignorado (um `git add -A` o levaria ao commit)."""
     d = os.path.dirname(os.path.abspath(path))
@@ -404,6 +429,10 @@ def cmd_create(pos, opt, root):
         print(f"{NAME}: aviso: {why}: o membro '{member}' NÃO foi conferido no registro", file=sys.stderr)
     elif member not in ids:
         stop(1, f"membro '{member}' não está no registro ({reg}): registre-o antes (/meta:federation-member register)")
+    else:
+        bym = registry_by_id(reg)
+        why_r = receiver_problem(bym or {}, member, receiver)
+        if why_r: stop(1, why_r)
     for p in (tout, iout):
         if p and (os.path.lexists(p)): stop(1, f"{p} já existe, recuso sobrescrever")
         if p and git_unignored(p): stop(1, f"{p} cairia numa árvore git sem estar no .gitignore: gere fora do repo")

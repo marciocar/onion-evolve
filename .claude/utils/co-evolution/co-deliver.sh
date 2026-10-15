@@ -109,9 +109,21 @@ NAME="$(member_field "${MEMBER}" name)"
 #  passou a julgar por um registro diferente do que recebia e quatro casos caíram de uma vez, dois
 #  deles sem relação com papel. Um dado, um acessor.)
 PARENT="$(member_field "${MEMBER}" parent)"
+# F3 do configurador A2A (2026-10-15): com a rede do hub junto da do core, o T2 se registra AQUI com
+# `parent: <hub>`. O carteiro continua não entregando a ele (o hub propaga), mas agora confere que o parent É
+# um hub: antes, um parent qualquer (porta, standalone, id inexistente) saía na mesma mensagem "entregue a
+# <parent>", mandando o operador a um destino que não propaga nada. E `role: consumer` pendurado no core é
+# tier contraditório (o members-validate.sh o recusa): sem parent hub não há quem propague.
 if [ -n "${PARENT}" ]; then
   if [ "${PARENT}" != "${CORE_MEMBER_ID}" ]; then
+    P_ROLE="$(member_field "${PARENT}" role)"; P_KIND="$(member_field "${PARENT}" kind)"
+    if [ "${P_ROLE}" != "hub" ] || [ "${P_KIND}" = "door" ]; then
+      echo "ERRO: '${MEMBER}' tem parent '${PARENT}', que não é um hub do registro (role='${P_ROLE:-ausente}', kind='${P_KIND:-ausente}'). Só hub propaga a T2: corrija o registro (o members-validate.sh reprova este parent)." >&2; exit 2
+    fi
     echo "ERRO: '${MEMBER}' adota '${PARENT}', não o core — é T2 (via-hub) e recebe PELO hub, não pelo carteiro do core (RFC-0003 §2.1). Entregue a '${PARENT}' e deixe o hub propagar." >&2; exit 2
+  fi
+  if [ "${ROLE}" = "consumer" ]; then
+    echo "ERRO: '${MEMBER}' tem role='consumer' (T2, adota um hub) mas parent é o core. Tier contraditório: declare o parent hub, ou o role certo (standalone/hub), no registro." >&2; exit 2
   fi
 elif [ "${ROLE}" = "adopted" ]; then   # LEGADO: desde 2026-10-07 o members-validate.sh recusa `adopted` no registro
                                        # (é vocabulário do CARIMBO). O ramo fica para registro antigo/sandbox.

@@ -45,6 +45,9 @@ S2 ("commit cross-repo na branch errada") é **estruturalmente impossível**.
 `$ARGUMENTS` = `[<signal-file>] --target <path-do-core> [--from <dir>] [--dry-run]`.
 - `--target <path>` é o **path local do repo core** — **obrigatório** (o adotante não tem `members.yaml`
   para resolver o alvo; o stamp traz `adopted_from` = remote, não path local).
+  **Desde a F3 do configurador A2A** o destino se prova: sem carimbo `.claude/.onion-version` é o core;
+  com carimbo `role: hub` é um hub, e só o filho dele (carimbo `adopted`) relaya para lá; qualquer outro
+  carimbo é outro adotante (canal lateral) e o helper recusa com exit 2.
 - `<signal-file>` opcional: basename ou path de UM sinal. Omitido = **todos** os `.md` de 1º nível de
   `docs/evolution/inbox/` (cuidado: pode re-relayar sinais antigos não-arquivados).
 - `--from <dir>` opcional: fonte alternativa (default = o `inbox/` do adotante).
