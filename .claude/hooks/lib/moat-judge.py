@@ -312,6 +312,8 @@ def _moat_versioned(path):
 # Reconhecido pelo NOME do arquivo (o clone servido não se lê) OU pelo marcador no corpo (cópia renomeada).
 _MOAT_ARG_WRITERS = {"a2a-invite.sh": ({"create", "revoke"}, ("--file", "--invite-out", "--token-out"))}
 _MOAT_ARG_WRITER_MARK = "MOAT-ARG-WRITER:"
+# os wrappers que escrevem por função (a cópia deles fora do projeto fecha, ver _moat_script) (core-only)
+_MOAT_WRAPPER_COPIES = ("a2a-queue-live",)
 
 
 def _moat_arg_writer(p, args, detail):
@@ -403,15 +405,15 @@ def _moat_script(path, depth, words):
     except Unanalyzable:
         if moat_relevant(body):
             _moat_emit("inanalisavel", p, "", "script fundo demais para analisar, com alvo do MOAT no corpo")
-    # script NÃO versionado com uma FUNÇÃO que embrulha sudo e um alvo do MOAT no corpo, que a análise acima não
-    # julgou: a escrita sai por `sv mv "$Q/x" …`, que o juiz não segue (ele lê a função, não a chamada). Medido em
-    # 2026-10-15: uma cópia do wrapper da fila A2A fora do projeto passava com rc 0, e um script de 4 linhas com
-    # `sv(){ sudo -u <conta> "$@"; }` e `sv mv` na fila também. Vem DEPOIS da análise para não trocar um veto
-    # preciso (MOAT/deploy com o alvo) por este genérico. O wrapper versionado segue fronteira; a cópia, não
+    # CÓPIA não versionada de um wrapper de ops/ que escreve por função (`as_svc mv "${SRC}" …`), com um alvo do MOAT
+    # no corpo, que a análise acima não julgou: o juiz lê a função, não a chamada. Medido em 2026-10-15: a cópia do
+    # wrapper da fila A2A fora do projeto passava com rc 0. Reconhecida pelo NOME do wrapper no código, como o motor
+    # de convites é reconhecido pelo nome. A 1ª redação fechava toda função que embrulha sudo e vetava diagnóstico
+    # só de leitura vendorizado (`_dk(){ docker … || sudo -n docker …; }`), sem fechar array, alias ou `s\udo`:
+    # guarda por vocabulário. A classe geral (função, array, alias ou interpretador que escreve) segue como teto
     if not any(o.startswith("__ONION_MOAT__") for o in OUT[n_out:]) \
-            and re.search(r"^[ \t]*(?:function[ \t]+)?[A-Za-z_][A-Za-z0-9_]*[ \t]*\(\)[ \t]*\{(?:(?!\n\}).){0,600}?\bsudo\b", code, re.S | re.M) \
-            and _MOAT_SIGNAL.search(code):
-        _moat_emit("inanalisavel", p, "", "script não versionado com função que embrulha sudo, com alvo do MOAT no corpo")
+            and any(n in code for n in _MOAT_WRAPPER_COPIES) and _MOAT_SIGNAL.search(code):
+        _moat_emit("inanalisavel", p, "", "cópia não versionada de um wrapper de ops/ que escreve por função, com alvo do MOAT no corpo")
 
 
 def _moat_systemctl(args, detail):
@@ -518,7 +520,7 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
             or (isinstance(env, dict) and "ONION_A2A_LIVE_TEST" in env) \
             or "ONION_A2A_LIVE_TEST" in globals().get("ASSIGN", {}):   # `export X=1; …` e `X=1; …` caem no ASSIGN do lib
         _moat_emit("inanalisavel", "ONION_A2A_LIVE_TEST", "", "modo de teste do wrapper de convites fora da bancada — %s" % detail)
-    # o MESMO fecho para o wrapper da fila A2A (ops/a2a-queue-live.sh, 2026-10-15): o modo de teste dele roda o
+    # o MESMO fecho para o wrapper da fila A2A (ops/a2a-queue-live.sh) (core-only), de 2026-10-15: o modo de teste dele roda o
     # backup que o ambiente nomear e move arquivos como o operador — pela sessão, lavaria um script não versionado
     if any(re.match(r"^(export\s+)?ONION_A2A_QUEUE_TEST=", w) for w in list(raw_words) + list(words)) \
             or (isinstance(env, dict) and "ONION_A2A_QUEUE_TEST" in env) \
