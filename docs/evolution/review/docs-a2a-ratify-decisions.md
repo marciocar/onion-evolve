@@ -2,7 +2,8 @@
 branch: docs/a2a-ratify-decisions
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0940107a4a80c19db4f321f610e556949ba55e512ceca809f6c258a2ba241f30
+reviewed_code_sha256: 96e75a2bd478b82cf1b4e51a5ea37ab5a6e325f22eac848a3ef51f64cb504933
 findings_total: 1
 findings_real: 1
 tokens: 0
