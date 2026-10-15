@@ -6,8 +6,8 @@ meta:
   schema_version: "1"
   baseline: "2026-10-14"
   review_after: "2026-11-13"   # 30d: cadência de ferramenta
-  # ═══ TETO: 32 NÓS ═══
-  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão); +4 a F2 do lado do core (2026-10-15: a evidência, 2 achados e 1 decisão da sessão); +2 o wrapper de produção do convite (2026-10-15: o achado do MOAT e a evidência); +1 a decisão do maestro de esvaziar o pool legado (2026-10-15, /meta:decide); +1 o S6 vivo em produção (2026-10-15).
+  # ═══ TETO: 34 NÓS ═══
+  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão); +4 a F2 do lado do core (2026-10-15: a evidência, 2 achados e 1 decisão da sessão); +2 o wrapper de produção do convite (2026-10-15: o achado do MOAT e a evidência); +1 a decisão do maestro de esvaziar o pool legado (2026-10-15, /meta:decide); +1 o S6 vivo em produção (2026-10-15); +2 a F5 (2026-10-15: a evidência do manual escrito da saída real e o achado de que o /docs:build-project-manual não cobre docs/applying).
   x_linear_epic: "SAC-120"
 nodes:
   - id: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -118,11 +118,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.6
     verified_at: "2026-10-14"
-    verified_against: "aberta em 2026-10-14 por pedido do maestro; fecha quando docs/applying/onion-a2a-manual.md existir (com o html do /docs:build-project-manual), cobrir as 6 trilhas com o porquê, o passo a passo e a saída real do doctor em cada erro, e o wizard apontar o manual publicado (docs/ não viaja). Linear SAC-133"
+    verified_against: "aberta em 2026-10-14 por pedido do maestro; fechada em 2026-10-15 pela F5 (branch docs/a2a-manual-f5): docs/applying/onion-a2a-manual.md cobre as 6 trilhas com o porquê, o passo a passo e a saída real do doctor e dos motores em cada erro, e o /meta:federation-a2a aponta o manual publicado no repositório público do core. A metade «html do /docs:build-project-manual» não se cumpre por medição: ver C_BUILD_PROJECT_MANUAL_NAO_COBRE_APPLYING. Linear SAC-133"
     label: "o configurador A2A ganha um manual para os três leitores (operador do core, operador do hub e membro que entra), escrito a partir dos fluxos e da saída reais do wizard"
   - id: E_SPIKE_S1_S2_KEYGEN_E_REMETENTE
     node_type: evidence
@@ -507,6 +507,37 @@ nodes:
       source: "ops/a2a-invite-live.sh + .claude/utils/federation-transport/{a2a-doctor,a2a-send,a2a-accept}.sh"
       locator: "bridge de produção /a2a, 2026-10-15"
       method: "medição: execução ao vivo pela sessão principal"
+  - id: E_F5_MANUAL_DA_SAIDA_REAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 por dois roteiros de sandbox fora do repo (78 execuções de motor gravadas com o rc): core de fixture em git temporário, HOME temporária do membro, arquivo de convites de fixture e o bridge local (origin/main do onion-bridge, F2) em 127.0.0.1 sem .env, mais o wrapper ops/a2a-invite-live.sh em modo de teste declarado; caminhos, hashes e ids trocados por marcadores antes de entrar no texto"
+    label: "o manual do A2A (docs/applying/onion-a2a-manual.md) foi escrito da saída real dos motores e do bridge em cada trilha e em cada erro, para o operador do core, o do hub (a F3 marcada como «chega na F3») e o membro"
+    narrative: "O que a medição mostrou além do manual, declarado para quem vier depois: (1) antes do pino o doctor do receptor diz que o envio veta kid-not-owned-by-from, mas o gate real responde unknown-kid quando nem o .pem existe; os dois apontam o mesmo buraco, e o manual explica os dois. (2) O registro da fila do bridge F2 não grava receiver nem auth (o protótipo do spike gravava); o manual mostra só os campos que existem. (3) O --help do wrapper de produção corta a frase do EXIT no meio (o sed para na linha # EXIT). (4) O doctor do membro segue dizendo «válido» depois da revogação, por desenho (a revogação só se mede no receptor), e o manual o diz. NÃO MEDIDO: os dois estados quebrados do relógio (a máquina tem NTP) e qualquer escrita em produção; o convite vencido foi forjado na fixture porque o motor não aceita validade no passado."
+    provenance:
+      source: "docs/applying/onion-a2a-manual.md"
+      locator: "Apêndice C (como as saídas foram geradas) e as saídas das Partes II a IV"
+      method: "medição: motores e bridge local executados pela sessão em sandbox"
+      locality: "repo"
+  - id: C_BUILD_PROJECT_MANUAL_NAO_COBRE_APPLYING
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "lido em 2026-10-15: .claude/commands/docs/build-project-manual.md declara «Não é o manual deste framework», monta o manual de UM projeto servido por agente + servidor MCP + atalhos, a partir do esqueleto agent-project-manual-template.html, com output_path docs/business-context/site/; e o site do core (site/src) não publica nenhum manual de docs/applying"
+    label: "o /docs:build-project-manual não cobre docs/applying: é o manual client-facing de um projeto servido por agente e MCP, e por isso o manual do A2A não ganhou html por ele; o manual publicado é o .md no repositório público do core"
+    narrative: "Decisão da sessão (sem o maestro, declarada no resíduo): não forçar o comando a um uso que ele recusa no próprio texto, nem gerar um html à mão que viraria segunda verdade. O repositório do core é público desde 2026-10-13 e renderiza o Markdown; o wizard aponta essa URL. Se o maestro quiser uma página no site, o gatilho é dele."
+    provenance:
+      source: ".claude/commands/docs/build-project-manual.md"
+      locator: "frontmatter (output_path) e o aviso «Não é o manual deste framework»"
+      method: "leitura: o artefato do comando e a varredura de site/src por applying|manual"
       locality: "repo"
 edges:
   - from: E_ONZE_PASSOS_MANUAIS_HOJE
@@ -620,3 +651,9 @@ edges:
   - from: E_S6_PONTA_A_PONTA_EM_PRODUCAO
     to: E_WRAPPER_DO_CONVITE_DE_PRODUCAO
     edge_type: SUPPORTS
+  - from: E_F5_MANUAL_DA_SAIDA_REAL
+    to: Q_MANUAL_DO_A2A
+    edge_type: SUPPORTS
+  - from: C_BUILD_PROJECT_MANUAL_NAO_COBRE_APPLYING
+    to: Q_MANUAL_DO_A2A
+    edge_type: CONSTRAINS
