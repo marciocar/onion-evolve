@@ -99,8 +99,8 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-15"
     verified_against: "ops/mutate-and-restore.sh com LC_ALL=C, cada mutante seguido de lint-selftest.sh --families adopter_shape"
-    label: "Nove mutantes plantados pelo ops/mutate-and-restore.sh mordem, cada um derrubando o caso nomeado: vendor fora do manifesto e do commit (a, d), .gitignore fora (a), catraca sem a 85 e sem o ops/ (c, f), detector sem filtro e sem tirar pontuação (p), contrato próprio do alvo (j), vendor ignorado (durable-commit)."
-    narrative: "O mutante do detector revelou o que a catraca protege: sem o filtro, as isenções das REGRAS 56 e 57 (que citam o próprio script da guarda, presente no clone) virariam achado. O dogfood pegou um defeito do harness no mesmo laço: a regra repetida por dois caminhos saía duas vezes na mensagem da catraca, curado por dedupe."
+    label: "Nove mutantes plantados pelo ops/mutate-and-restore.sh mordem, cada um derrubando o caso nomeado da família adopter_shape ou da durable_commit."
+    narrative: "Vendor fora do manifesto e do commit (a, d); .gitignore fora (a); catraca sem a 85 e sem o ops/ (c, f); detector sem o filtro do que viajou e sem tirar a pontuação (p); contrato próprio do alvo (j); vendor ignorado (durable-commit sac149). O mutante do detector revelou o que a catraca protege: sem o filtro, as isenções das REGRAS 56 e 57 virariam achado."
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_adopter_shape_selftests, casos p, p2, a até f"
