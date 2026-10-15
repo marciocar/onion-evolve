@@ -2,7 +2,8 @@
 branch: feat/a2a-member-invites-core
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f1c8b9d92587a3a9a2fbf5c6e0c16626051b6f7223982ec0b6f610670a642ad9
+reviewed_code_sha256: 33e2e996913a696934fe0c9f54de7d81f15b7d826be2cfd84693893cd0802f59
 findings_total: 15
 findings_real: 12
 tokens: 157767
