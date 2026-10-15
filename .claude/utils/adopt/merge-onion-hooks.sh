@@ -20,7 +20,9 @@
 #             hooks/X.sh / detector inline). Ausentes são ANEXADOS como grupo
 #             próprio ({matcher?, hooks:[obj]}, com o matcher do grupo de origem); e os PRESENTES
 #             recebem as chaves da fonte por cima (refresh do que é do Onion: onFailure, timeout…).
-#             Hook próprio do alvo (command que a fonte não tem) e chave extra do alvo ficam.
+#             Hook próprio do alvo (command que a fonte não tem) e chave extra do alvo ficam — EXCETO o
+#             hook que o core APOSENTOU (forma do Onion + script ausente na fonte e no alvo), que é
+#             podado e anunciado no stderr (SAC-145, 2026-10-15; ver o bloco antes do jq).
 #             IDEMPOTENTE: rodar 2× = no-op na 2ª.
 #
 # Uso       : merge-onion-hooks.sh <source-settings.json> <target-settings.json>
@@ -99,7 +101,29 @@ _div="$(jq -nr --slurpfile s "${SRC}" --slurpfile t "${TGT}" \
    then "diverge" else "" end' 2>/dev/null || true)"
 [ "${_div}" = diverge ] && echo "AVISO: o attribution do alvo difere do da fonte — preservado o do alvo; confira se o padrão de assinatura da família mudou." >&2
 
+# HOOK APOSENTADO PELO CORE (SAC-145, 2026-10-15): o refresh trata "command que a fonte não tem" como hook PRÓPRIO
+# do alvo, e um hook que o core retirou tem exatamente essa forma. Medido no 1º update depois do #1129 (que
+# aposentou o Stop background-state-needs-evidence.sh): o vendor apagou o script, a entrada ficou, e o adotante
+# passou a ter rc 127 em TODO Stop, com o relatório dizendo "0 removidos". Poda só o que é do Onion e está
+# morto: forma canônica do Onion (bash [aspas]$CLAUDE_PROJECT_DIR/.claude/hooks/X ou bash .claude/hooks/X) E
+# script ausente na fonte E no alvo. Entrada morta em outra forma é do alvo: só aviso, nunca poda.
+_sdir="$(cd "$(dirname "${SRC}")" && pwd)/hooks"; _tdir="$(cd "$(dirname "${TGT}")" && pwd)/hooks"
+_dead='[]'
+while IFS= read -r _c; do
+  [ -n "${_c}" ] || continue
+  _f="$(sed -n 's|.*\.claude/hooks/\([A-Za-z0-9._-]*\).*|\1|p' <<< "${_c}")"
+  [ -n "${_f}" ] || continue
+  { [ -e "${_sdir}/${_f}" ] || [ -e "${_tdir}/${_f}" ]; } && continue
+  if grep -qE '^bash ("\$CLAUDE_PROJECT_DIR/|\$CLAUDE_PROJECT_DIR/)?\.claude/hooks/[A-Za-z0-9._-]+"?$' <<< "${_c}"; then
+    _dead="$(jq -c --arg c "${_c}" '. + [$c]' <<< "${_dead}")"
+    echo "PODADO: hook aposentado pelo core (script ${_f} ausente na fonte e no alvo): ${_c}" >&2
+  else
+    echo "AVISO: hook do alvo aponta para script ausente (${_f}) — não é da forma do Onion, NÃO podei: ${_c}" >&2
+  fi
+done < <(jq -r '[.hooks // {} | .[][]? | .hooks[]? | .command? | select(type == "string")] | unique[]' "${TGT}" 2>/dev/null)
+
 jq -n \
+  --argjson dead "${_dead}" \
   --slurpfile s "${SRC}" \
   --slurpfile t "${TGT}" '
   ($s[0]) as $src | ($t[0]) as $tgt |
@@ -148,4 +172,12 @@ jq -n \
   # campo. Até 2026-10-05 este merge levava só hooks, e o pr.md do adotante dizia que a assinatura vinha de
   # um campo que o settings.json dele nunca recebia (sinal de campo de um hub).
   | if ($src.attribution != null) and (.attribution == null) then .attribution = $src.attribution else . end
+  # poda do aposentado, em TODO evento do alvo (o evento pode nem existir mais na fonte); grupo que esvazia sai
+  | if ($dead | length) > 0 and (.hooks | type) == "object" then
+      .hooks |= with_entries(.value |= map(
+        if (.hooks | type) == "array"
+        then (.hooks |= map(select(((.command | type) == "string" and (.command as $c | $dead | index($c))) | not)))
+             | if (.hooks | length) == 0 then empty else . end
+        else . end))
+    else . end
 '
