@@ -2,7 +2,8 @@
 branch: fix/selftest-family-registry
 pr: 1146
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 57ded5e28fdb681b8b6819b80ed440a1c52abdf0cda136c6443e4ca6473a153c
+reviewed_code_sha256: d37859c36d53633a8c71ee004514a218083e8d63bec4453623d0ad80995ad7da
 findings_total: 7
 findings_real: 7
 tokens: 160206
