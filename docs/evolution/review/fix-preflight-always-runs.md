@@ -1,8 +1,17 @@
 ---
-title: "Passada adversarial — o pré-voo roda sempre, com cache e sombra (SAC-141)"
+branch: fix/preflight-always-runs
+pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: 3a54936486cc11b9c6ac17faa23b5035a95f3a1e8516c65ace7045157180c9aa
-reviewed_code_sha256: 3b0040b49d12e6446dc16cd7ea302e47cdb52ec62b3d619ef139581f5d59dc2d
+reviewed_diff_sha256: pendente
+findings_total: 1
+findings_real: 1
+findings_fixed: 1
+tokens: 0
+duration_min: 0
+verdict: REPROVADO_E_CURADO
+elenxo: sim
+reviewer: a própria sessão executora (SAC-141), sem revisor independente; ataques por 3 mutantes e dogfood do pr-finalize real sem a variável de checkpoint
+nota: "passada feita pelo executor, não por um revisor independente. tokens e duration_min ficam em 0 porque não foram medidos (não é custo zero). O hash do diff é carimbado no pr-finalize."
 ---
 
 # Passada adversarial — `fix/preflight-always-runs`
