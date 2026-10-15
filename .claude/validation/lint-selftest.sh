@@ -7968,7 +7968,7 @@ PY
   _mgcase "(d3) sudo -u root systemctl restart (invólucro com opção) → VETO" "2:MOAT/deploy" "${P}" \
     'sudo -u root systemctl restart onion-vps-bridge' "${L}" '"sudo": {"-u", ' '"sudo": {'
   _mgcase "(d4) bash -c \"…restart…\" → VETO" "2:MOAT/deploy" "${P}" \
-    'bash -c "sudo systemctl restart onion-vps-logto"' "${L}" 'scoped(args[k + 1], depth + 1)' 'pass'
+    'bash -c "sudo systemctl restart onion-vps-logto"' "${L}" 'scoped(args[k + 1], depth + 1, args[k + 2:] if len(args) > k + 2 else None)' 'pass'
   _mgcase "(d5) rsync para o docroot servido → VETO com ops/deploy-site.sh" "2:ops/deploy-site.sh" "${P}" \
     'rsync -a dist/ /var/www/onion-landing/' "${J}" '_MOAT_WRITE_DEST = {"cp", "install", "rsync",' '_MOAT_WRITE_DEST = {"cp", "install",'
   _mgcase "(d6) rsync LENDO do docroot para /tmp → passa (só o destino é escrita)" 0 "${P}" \
@@ -8137,6 +8137,49 @@ PY
     _mgcase "(i16) script só de leitura que CITA o motor num comentário → passa" 0 "${P}" \
       "bash ${d}/scratch/so-leitura.sh" "${J}" \
       '    code = "\n".join(ln for ln in body.split("\n") if not ln.lstrip().startswith("#"))' '    code = body'
+    # INDIREÇÃO (SAC-148, 2026-10-15): a escrita no arquivo de convites embrulhada em função/posicional passava com
+    # rc 0. A cura EMULA a chamada (corpo re-julgado com os argumentos literais) em vez de fechar toda indireção que
+    # cita um alvo: no corpus desta máquina (58.209 comandos), 233 têm indireção + alvo, quase todos LEITURA
+    # (`docker exec <container servido> sh -c 'grep …'`, `sudo cat`, `journalctl`). Os casos (i24)-(i27) são esses.
+    _mgcase "(i17) função com bash -c \"\$1\" escrevendo o arquivo de convites → VETO (a chamada é emulada)" "2:ops/a2a-invite-live.sh" "${P}" \
+      "run(){ bash -c \"\$1\"; }; run \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
+      $'    if name in FUNCS:\n        call_function' $'    if False:\n        call_function'
+    _mgcase "(i18) caminho em variável + função com \$* → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "D=${INV%/*}; run(){ bash -c \"\$*\"; }; run bash ${MOT} revoke m --file \"\$D/${INV##*/}\"" "${L}" \
+      $'        if key in ("@", "*"):\n            return " ".join(pos[1:])' $'        if key in ("@", "*"):\n            return ""'
+    _mgcase "(i19) bash -c '<texto>' com os posicionais depois do texto → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "bash -c 'bash \"\$1\" revoke m --file \"\$2\"' _ ${MOT} ${INV}" "${L}" \
+      'scoped(args[k + 1], depth + 1, args[k + 2:] if len(args) > k + 2 else None)' 'scoped(args[k + 1], depth + 1, None)'
+    _mgcase "(i20) function com \"\$@\" (uma palavra por argumento) → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "function run { \"\$@\"; }; run sudo -u svc bash ${MOT} revoke m --file ${INV}" "${L}" \
+      $'        elif t in ("$@", "${@}"):\n            out.extend(pos[1:])' $'        elif t in ("$@", "${@}"):\n            out.append(t)'
+    _mgcase "(i21) motor + alvo em python3 -c → FECHA (o nome do motor é ação para a relevância)" "2:NÃO pode ser analisado" "${P}" \
+      "python3 -c 'import subprocess; subprocess.run([\"bash\", \"${MOT}\", \"revoke\", \"m\", \"--file\", \"${INV}\"])'" "${J}" \
+      '_MOAT_ACTION = re.compile(_MOAT_ACTION.pattern + "|"' '_MOAT_ACTION = re.compile(_MOAT_ACTION.pattern or "|"'
+    _mgcase "(i22) xargs -I{} colado com bash -c → FECHA" "2:NÃO pode ser analisado" "${P}" \
+      "echo 'bash ${MOT} revoke m --file ${INV}' | xargs -I{} bash -c '{}'" "${J}" \
+      'replaces = any(a.startswith(("-I", "-i", "--replace")) for a in args)' 'replaces = "-I" in args'
+    _mgcase "(i23) função que faz shift antes do bash -c → FECHA (a substituição não se prova)" "2:NÃO pode ser analisado" "${P}" \
+      "f(){ shift; bash -c \"\$1\"; }; f x \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
+      '    if body is None or shifts:' '    if body is None:'
+    _mgcase "(i24) função com bash -c que só LÊ o arquivo (sudo cat) → passa" 0 "${P}" \
+      "run(){ bash -c \"\$1\"; }; run \"sudo -u svc cat ${INV}\"" "${J}" \
+      '_MOAT_WRITE_ALL = {"tee", ' '_MOAT_WRITE_ALL = {"cat", "tee", '
+    _mgcase "(i25) docker exec <container servido> sh -c 'grep …' (a forma mais comum do corpus) → passa" 0 "${P}" \
+      "docker exec onion-vps-librechat sh -c 'grep -c MAX /app/index.js'" "${J}" \
+      '_MOAT_DOCKER_MUTATE = {"restart", ' '_MOAT_DOCKER_MUTATE = {"exec", "restart", '
+    _mgcase "(i26) função de teste que só IMPRIME o comando do motor → passa (fechar toda chamada que cita alvo reprova)" 0 "${P}" \
+      "t(){ printf '%s\\n' \"\$1\" | wc -c; }; t \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
+      '    if body is None or shifts:' '    if True:'
+    _mgcase "(i27) função com journalctl e systemctl status da unidade servida → passa (o texto emulado chega ao juiz exato)" 0 "${P}" \
+      "run(){ bash -c \"\$1\"; }; run \"sudo journalctl -u onion-vps-bridge -n 20; systemctl status onion-vps-bridge\"" "${J}" \
+      '_MOAT_UNIT_MUTATE = {"start",' '_MOAT_UNIT_MUTATE = {"status", "start",'
+    _mgcase "(i28) laço sobre \"\$@\" executando cada argumento → FECHA (o ponto opaco julga os argumentos da chamada)" "2:NÃO pode ser analisado" "${P}" \
+      "run(){ for a in \"\$@\"; do bash -c \"\$a\"; done; }; run \"bash ${MOT} revoke m --file ${INV}\"" "${J}" \
+      '    if moat_relevant(t) or (whole and CALLS and moat_relevant("\n".join(CALLS))):' '    if moat_relevant(t):'
+    _mgcase "(i29) função que LÊ o arquivo por nome de comando em variável → passa (os argumentos da chamada ainda exigem ação)" 0 "${P}" \
+      "r(){ c=\$(printf cat); sudo -u svc \$c \"\$1\"; }; r ${INV}" "${J}" \
+      '(whole and CALLS and moat_relevant("\n".join(CALLS)))' '(whole and CALLS and _MOAT_SIGNAL.search("\n".join(CALLS)))'
     fi
   else
     record_skip "moat-gate: (i*) sem ops/a2a-invite-live.sh ou sem o motor de convites — casos do arquivo de convites pulados"
@@ -8185,7 +8228,9 @@ PY
   local _bug="" _c
   for _c in 'sudo systemctl restart onion-vps-bridge' 'cd /var/www && cd onion-landing && rm -rf velho' \
             'echo onion-vps-bridge | xargs sudo systemctl restart' "bash ${d}/scratch/update-kg-writer.sh" "${field_body}" \
-            'ln -s /var/www/onion-landing /tmp/w-bancada && rsync -a x/ /tmp/w-bancada/' 'printf "0 3 * * * x\n" | crontab -'; do
+            'ln -s /var/www/onion-landing /tmp/w-bancada && rsync -a x/ /tmp/w-bancada/' 'printf "0 3 * * * x\n" | crontab -' \
+            'run(){ bash -c "$1"; }; run "sudo systemctl restart onion-vps-bridge"' 'f(){ shift; "$@"; }; f x systemctl status onion-vps-bridge' \
+            'g() ( echo x ); function h { g "$@"; h; }; h a' "bash -c 'echo \"\$0 \$9 \${10} \$#\"' a b"; do
     _bug+="$(cd "${P}" && . "${d}/h/lib/invocation-lines.sh" && LC_ALL=C CLAUDE_PROJECT_DIR="${P}" ONION_CWD="${P}" ONION_INVOCATION_STRICT=1 \
       ONION_MOAT_JUDGE="${d}/h/lib/moat-judge.py" ONION_MOAT_TARGETS="${P}/ops/moat-targets.tsv" \
       ONION_MOAT_MEMBERS="${P}/docs/evolution/federation/members.yaml" onion_invocation_lines "${_c}" | grep '^__ONION_BUG__' || true)"

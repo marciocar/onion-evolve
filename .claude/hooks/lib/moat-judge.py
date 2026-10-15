@@ -25,7 +25,10 @@
 #  · script VERSIONADO deste projeto (rastreado pelo git) é fronteira: é assim que `bash ops/<wrapper>.sh`
 #    passa. Script FORA do projeto, ou não rastreado, é LIDO e julgado (≤ 512 KiB) — o caso de campo de
 #    2026-10-13 foi exatamente um script de scratchpad que reiniciava a unidade sem wrapper;
-#  · outra linguagem (python/perl/node) só é julgada pela FORMA do texto (alvo + ação no mesmo código);
+#  · outra linguagem (python/perl/node) só é julgada pela FORMA do texto (alvo + ação no mesmo código; o NOME
+#    do motor escritor conta como ação desde a SAC-148). Motor renomeado sem o marcador, e o alvo que chega à
+#    string por fora dela (arquivo lido, stdin opaco, `$(…)` calculado), seguem fora — análise estática não fecha
+#    indireção arbitrária, e a defesa que resta é a permissão do arquivo (0600 da conta do serviço);
 #  · ssh para outra máquina, docker compose, `gh` escrevendo em repo alheio, daemon-reload sem unidade;
 #  · os três serviços que servem DIRETO do checkout principal do core (mcp-exec, mcp-kg, mcp-fw) — escrever
 #    lá é trabalho normal da casa, e o hook não separa deploy de desenvolvimento nesse caminho.
@@ -275,9 +278,14 @@ def moat_relevant(text):
     return False
 
 
-def moat_unanalyzable(seg, why):
+def moat_unanalyzable(seg, why, whole=False):
     t = " ".join(str(x) for x in seg) if isinstance(seg, (list, tuple)) else str(seg)
-    if moat_relevant(t):
+    # `whole`: o ponto opaco EXECUTA texto (nome de comando ou `eval` só conhecidos em runtime) DENTRO de uma função
+    # da string em emulação, e o texto pode ter vindo dos argumentos dela — `for a in "$@"; do bash -c "$a"; done`.
+    # A relevância do segmento sozinho (`$a`) nunca o via (SAC-148, medido). Julgam-se então os argumentos das
+    # chamadas em curso. A 1ª redação julgava a string INTEIRA e fechou 13 comandos honestos do corpus (heredoc
+    # inerte, `$PSQL -c` num script que citava um container servido noutra linha).
+    if moat_relevant(t) or (whole and CALLS and moat_relevant("\n".join(CALLS))):
         _moat_emit("inanalisavel", t, "", why)
 
 
@@ -314,6 +322,10 @@ _MOAT_ARG_WRITERS = {"a2a-invite.sh": ({"create", "revoke"}, ("--file", "--invit
 _MOAT_ARG_WRITER_MARK = "MOAT-ARG-WRITER:"
 # os wrappers que escrevem por função (a cópia deles fora do projeto fecha, ver _moat_script) (core-only)
 _MOAT_WRAPPER_COPIES = ("a2a-queue-live",)
+# o NOME do motor escritor também é AÇÃO para a relevância (SAC-148, 2026-10-15): nas formas que o juiz não segue
+# (`python3 -c`, `xargs -I`, função que faz `shift`), a linha que cita o motor e um alvo do MOAT fechava só se
+# trouxesse um verbo da lista — e `a2a-invite.sh revoke --file <servido>` não traz nenhum. Medido: rc 0 nas três.
+_MOAT_ACTION = re.compile(_MOAT_ACTION.pattern + "|" + "|".join(r"(?<![\w.-])" + re.escape(n) for n in _MOAT_ARG_WRITERS))
 
 
 def _moat_arg_writer(p, args, detail):
@@ -636,7 +648,7 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
     elif base == "eval":
         txt = " ".join(args)
         if DYNAMIC.search(txt):
-            moat_unanalyzable(words, "eval de texto só conhecido em runtime")
+            moat_unanalyzable(words, "eval de texto só conhecido em runtime", whole=True)
         else:
             try:
                 scoped(txt, depth + 1)
@@ -705,7 +717,10 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
             if opt in ("-I", "-n", "-P", "-d", "-a", "-E", "-L", "-s") and tail:
                 tail.pop(0)
         known = literal_stdin(stdin_from)
-        if tail and known is not None and "-I" not in args:
+        # `-I{}` colado (e `-i`/`--replace`) também é substituição: a 1ª redação só via `-I` solto, e
+        # `echo '<cmd>' | xargs -I{} bash -c '{}'` montava `bash -c {} <cmd>` e passava (SAC-148, medido)
+        replaces = any(a.startswith(("-I", "-i", "--replace")) for a in args)
+        if tail and known is not None and not replaces:
             command(tail + known, depth + 1)
         elif tail and moat_relevant(list(stdin_from or []) + list(words)):
             moat_unanalyzable(list(stdin_from or []) + list(words), "xargs com argumentos do stdin")
