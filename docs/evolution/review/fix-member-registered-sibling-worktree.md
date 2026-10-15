@@ -2,7 +2,8 @@
 branch: fix/member-registered-sibling-worktree
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7d53527b9b7a1045636ad6171f95eeaaba2031fa04b2fa8b043c2843d7e6e5dc
+reviewed_code_sha256: b8746fbeb80ac2e88c5b2578713f95f2525bd86adfe7c69d8040a90f7ce971eb
 findings_total: 1
 findings_real: 1
 tokens: 0
