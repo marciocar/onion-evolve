@@ -15,7 +15,7 @@ related_commands:
   - /meta:federation-member
   - /meta:co-relay
   - /meta:co-evolve
-allowed-tools: Read, Grep, Glob, Bash, AskUserQuestion, TodoWrite
+allowed-tools: Read, Grep, Glob, Edit, Write, Bash, AskUserQuestion, TodoWrite
 argument-hint: "[preparar|convidar|entrar|conferir|aceitar|revogar] [--member <id>]  (guiado se faltar argumento)"
 ---
 
@@ -105,7 +105,10 @@ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <
 4. **Pino**, quando a pública e a impressão chegarem (trilha 3, passo 2): confira a impressão por
    outro canal, grave a pública em `.claude/utils/federation-transport/jwks/<kid>.pem` (adição
    deliberada, `git add -f`), acrescente o `kid` em `a2a.keys`, rode o validador e o doctor do receptor
-   com `--fingerprint`, e abra o PR. A confiança vale **depois do merge**.
+   com `--fingerprint`, e abra o PR. A confiança vale **quando o clone que o bridge serve recebe o
+   merge**, pelo caminho de deploy do bridge do core (maestro): o bridge lê o registro e o JWKS desse
+   clone, não do repo de trabalho, e o doctor daqui mede o repo onde roda. Merge sem deploy = pino que o
+   bridge ainda não conhece.
    ```bash
    bash .claude/validation/members-validate.sh
    bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <id> --fingerprint sha256:<hex>
@@ -114,7 +117,8 @@ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <
 ### Trilha 3 — Entrar na rede (o membro, na própria máquina)
 1. Gere o par: `bash a2a-keygen.sh --member <id>`. Anote o `kid` e a impressão; a privada fica em
    `~/.config/onion/a2a/` (0700/0600) e não sai dali.
-2. Mande ao core **só** a pública (`<kid>.pem`) e diga a impressão por outro canal. Se o membro é
+2. Mande ao core **só** a pública (`<kid>.pem`) e diga a impressão por outro canal. O `a2a.conf` do
+   pacote é um **lembrete legível** (id, receptor, endpoint): nenhum motor o lê, os valores vão nas flags. Se o membro é
    adotante com o carteiro upstream, a pública vai pelo `/meta:co-relay` (inbox do core, sem commit).
 3. Grave o bearer que recebeu com `umask 077` em `~/.config/onion/a2a/bridge-token`.
 4. Rode o doctor do membro. Sem o registro do core, (d) e (h) saem não medidos (rc 2): é esperado, e a
@@ -125,6 +129,8 @@ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <
    bash a2a-send.sh --from <id> --to <receptor> --endpoint <url> --body "olá do <id>"
    ```
    Quem tinha remetente próprio troca pelo canônico: o envelope antigo sem `body_sha256` é vetado pelo gate.
+   Depois de uma rotação, passe `--kid <id>-<N>` (o default é `<id>-1`). O envelope do `--dry-run` é um JWS
+   assinado e válido por 300 s: confira e descarte, não o cole em canal compartilhado.
 
 ### Trilha 4 — Conferir e diagnosticar (qualquer lado)
 O doctor do lado certo, com os insumos que a conversa tiver (`--endpoint`, `--invite`,
@@ -142,8 +148,13 @@ força.
 ### Trilha 6 — Revogar (core)
 Tire o `kid` de `a2a.keys` e a pública do JWKS no mesmo PR (o validador reprova `kid` sem `.pem`, e
 `.pem` sem `kid` não autoriza nada); tire o bearer do pool pelo caminho de deploy do bridge; e peça ao
-membro que destrua a privada (`shred -u ~/.config/onion/a2a/<kid>.key.pem`). Confira com o doctor do
-receptor: o `kid` revogado tem de sair `falha` em (d).
+membro que destrua a privada (`shred -u ~/.config/onion/a2a/<kid>.key.pem`). A revogação vale no
+bridge **quando o clone que ele serve recebe o merge** (caminho de deploy do bridge, maestro): até lá o
+`kid` revogado segue aceito lá. Confira com o doctor do receptor nomeando o `kid` revogado, que tem de
+sair `falha` em (d) (sem `--kid` o doctor confere só os kids que restam):
+```bash
+bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <id> --kid <kid-revogado>
+```
 
 ## Destino (peça 5)
 

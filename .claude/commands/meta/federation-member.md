@@ -5,7 +5,7 @@ category: meta
 tags: [federation, members, ledger, register, sdaal, spec-as-code]
 version: "1.0.0"
 updated: "2026-10-15"
-allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/validation/*) Bash(git *)
+allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/validation/*) Bash(bash .claude/utils/federation-transport/a2a-doctor.sh*) Bash(git *)
 argument-hint: "register [--id <slug>] [--target <path-do-clone>]  (guiado se faltar argumento)"
 ---
 

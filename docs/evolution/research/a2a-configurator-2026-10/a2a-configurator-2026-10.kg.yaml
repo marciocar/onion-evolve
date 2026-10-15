@@ -7,7 +7,7 @@ meta:
   baseline: "2026-10-14"
   review_after: "2026-11-13"   # 30d: cadência de ferramenta
   # ═══ TETO: 30 NÓS ═══
-  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +3 a F1b (o selo da F1 com o dogfood, o passo manual restante e 1 decisão da sessão).
+  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão).
   x_linear_epic: "SAC-120"
 nodes:
   - id: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -341,8 +341,24 @@ nodes:
     confidence: 0.8
     verified_at: "2026-10-15"
     verified_against: "decidido pela sessão da F1 em 2026-10-15 sob a autorização do maestro para decidir sem ele (opção recomendada), a partir de C_MEMBRO_STANDALONE_NAO_RECEBE_OS_MOTORES; dogfood: o membro gerou o par, gravou o token e rodou o doctor só com o pacote"
-    label: "a trilha 2 entrega ao membro um pacote com os três motores e um a2a.conf sem segredo, em vez de fazer o transporte levar federation-transport ao adotado standalone"
+    label: "a trilha 2 entrega ao membro um pacote com os três motores e um a2a.conf sem segredo (lembrete legível que nenhum motor lê), em vez de fazer o transporte levar federation-transport ao adotado standalone"
     narrative: "Decisão da sessão, aberta para o maestro ratificar ou trocar. Alternativa descartada: mudar o corte por papel para o adotado standalone levar os motores, que abriria a federação cross-repo onde a matriz das portas a tirou. Gatilho para rever: o primeiro membro adotado pedir os motores pelo /meta:adopt --update em vez do pacote."
+  - id: C_CONFIANCA_VALE_NO_CLONE_SERVIDO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    verified_at: "2026-10-15"
+    verified_against: "achado do refutador da F1b em 2026-10-15, medido pela leitura do cabeçalho de ops/update-bridge.sh (o bridge serve um clone próprio do core, que já chegou a 108 commits de atraso) e do bloco a2a da fonte em docs/evolution/federation/members.yaml (o bridge lê o core ao vivo); o código do bridge não foi lido (MOAT)"
+    label: "o pino e a revogação valem no bridge quando o clone que ele serve recebe o merge, não no merge: o doctor do core mede o repo de trabalho, e a trilha de revogação só fecha com o deploy do bridge"
+    narrative: "O comando e a doutrina diziam que a confiança nascia no merge. Corrigidos na F1b. NÃO MEDIDO: se o bridge lê também o JWKS (e não só o registro) desse clone; a confirmação é do maestro, no bridge."
+    provenance:
+      source: "ops/update-bridge.sh e docs/evolution/federation/members.yaml"
+      locator: "cabeçalho do update-bridge (CLONE servido); bloco a2a de onion-evolve"
+      method: "leitura: refutador da F1b, re-lida pela sessão"
+      locality: "repo"
 edges:
   - from: E_ONZE_PASSOS_MANUAIS_HOJE
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -425,3 +441,6 @@ edges:
   - from: D_PACOTE_DE_ENTRADA_LEVA_OS_MOTORES
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
     edge_type: TRACES_TO
+  - from: C_CONFIANCA_VALE_NO_CLONE_SERVIDO
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: CONSTRAINS
