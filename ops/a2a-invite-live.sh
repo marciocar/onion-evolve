@@ -57,7 +57,8 @@ say()  { printf '[%s] %s\n' "${NAME}" "$*"; }
 die()  { local rc="$1"; shift; printf '[%s] ERRO: %s\n' "${NAME}" "$*" >&2; exit "${rc}"; }
 usage() { sed -n '/^# USO/,/^# O QUE ELE FAZ/p' "$0" | sed '$d; s/^# \{0,1\}//' >&2; exit 3; }
 
-case "${1:-}" in -h|--help) sed -n '/^# USO/,/^# EXIT/p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 0 ;; '') usage ;; esac
+# o --help vai até o EXIT inteiro: a 1ª forma parava NA linha do # EXIT e cortava a frase (F5, 2026-10-15)
+case "${1:-}" in -h|--help) sed -n '/^# USO/,/^# MODO DE TESTE/p' "$0" | sed '$d; s/^# \{0,1\}//' >&2; exit 0 ;; '') usage ;; esac
 
 # ── modo: produção ou teste declarado ──────────────────────────────────────────────────────────────────
 TEST=0

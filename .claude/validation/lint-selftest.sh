@@ -8286,6 +8286,11 @@ PY
     'and (not r or e.get("receiver") == r)' '' _c_rcv
   _ilcase "(w13) cópia do wrapper fora de um checkout, em produção → rc 3 antes de qualquer sudo" \
     '      || die 3 "${_f} não é arquivo rastreado' '      || true "${_f} não é arquivo rastreado' _c_copy
+  # (w14) o --help mostra o EXIT inteiro: a 1ª forma parava NA linha do # EXIT e cortava a frase no meio
+  # ("2 não pude medir (trava, sudo,"), medido pelo manual do A2A (F5, 2026-10-15)
+  _c_help() { local r rc=0; r="$(bash "$1" --help 2>&1)" || rc=$?
+    IL_WHY="rc=${rc} fim='$(tail -1 <<< "${r}")'"; [ "${rc}" = 0 ] && case "${r}" in *"3 uso inválido"*) true ;; *) false ;; esac; }
+  _ilcase "(w14) --help mostra o EXIT inteiro (até '3 uso inválido')" "'/^# USO/,/^# MODO DE TESTE/p'" "'/^# USO/,/^# EXIT/p'" _c_help
   rm -rf "${d}"
 }
 
@@ -10205,7 +10210,11 @@ STUB
   _fa_doc; _fa_state "duas chaves pinadas no dir" 2 a nao-medido "não sei qual é a vigente"
   rm -f "${jwks}/acme-2.pem"; _fa_reg "${_fa_pinned}"
   chmod 0644 "${cfg}/acme-1.key.pem"; _fa_doc --kid acme-1; _fa_state "privada 0644" 1 b falha "grupo/outros leem a chave"; chmod 0600 "${cfg}/acme-1.key.pem"
-  _fa_doc --kid acme-2; _fa_state "kid fora do registro" 1 d falha "NÃO está pinado"
+  # o gate julga o .pem antes do dono: o doctor nomeia o veto que o gate daria em cada caso (F5, 2026-10-15)
+  _fa_doc --kid acme-2; _fa_state "kid fora do registro e sem .pem (o gate veta unknown-kid)" 1 d falha "NÃO está pinado em a2a.keys de acme (acme-1); o gate veta unknown-kid"
+  cp "${cfg}/acme-2.pem" "${jwks}/acme-2.pem"
+  _fa_doc --kid acme-2; _fa_state "kid fora do registro com .pem (o gate veta kid-not-owned-by-from)" 1 d falha "o gate veta kid-not-owned-by-from"
+  rm -f "${jwks}/acme-2.pem"
   printf '{"member":"acme","receiver":"core-x","token_sha256":"%s","expires_at":"%s","revoked":false}\n' "${th}" "$(date -u -d '-1 hour' +%FT%TZ)" > "${sb}/inv-old.json"
   _fa_doc --kid acme-1 --invite "${sb}/inv-old.json"; _fa_state "convite vencido" 1 e falha "convite VENCIDO"
   printf '{"member":"acme","receiver":"core-x","token_sha256":"%s","expires_at":"tomorrow","revoked":false}\n' "${th}" > "${sb}/inv-rel.json"
@@ -10253,6 +10262,11 @@ STUB
   if [ "$(_fa_chk r | cut -d'|' -f1)" = falha ]; then record_pass "federation-a2a: doctor do receptor reusa o members-validate (registro inválido sem a pública)"
   else record_fail "federation-a2a: doctor receptor r" "r=$(_fa_chk r)"; fi
   mv "${sb}/acme-1.pem.bak" "${jwks}/acme-1.pem"
+  _fa_reg '    a2a:
+      sends_to: core-x
+      keys: []'
+  _fa_rcv; _fa_state "receptor sem kid pinado nomeia os dois vetos do gate" 1 d falha "veta unknown-kid (sem o .pem no JWKS) ou kid-not-owned-by-from (com o .pem)"
+  _fa_reg "${_fa_pinned}"
 
   # ──────────────────────────── CONVITE POR MEMBRO (F2, a2a-invite.sh) ────────────────────────────
   # O arquivo de convites é julgado pelas regras do guard do bridge (onion-bridge#69, a2a-invites.ts):
