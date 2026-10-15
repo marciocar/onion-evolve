@@ -82,10 +82,14 @@ const WSchema = {
 // DADO): ao pagar a dívida, a 1ª versão preencheu 4 superações que o gate aceitou e só o Elenxo dela reprovou —
 // (a) carimbo ou condição FUTURA, (b) peça ainda EM CURA, (c) o STATUS QUO dado como superação, (d) costura
 // CIRCULAR (a superação é parte do próprio veredito). É Goodhart: preencher o campo para passar. O que a máquina
-// consegue ver aqui, ela recusa: `classe` ausente ou incoerente com `achada`; `o_que` igual ao próprio objeto
-// (circular); `medida` que é o comando do critério da reprovação (mede a reprovação, não a entrega — a forma
-// medida dos 4 consolos). O resto (status quo, condição futura em prosa) a máquina NÃO vê sem palavra-chave
-// frágil: vai como PERGUNTA OBRIGATÓRIA ao juiz (CONSOLO_QUESTION), respondida no campo `classe`.
+// consegue ver aqui, ela recusa: `classe` ausente ou incoerente com `achada`; `o_que` IGUAL ao próprio objeto
+// (circular); `medida` que É o comando do critério da reprovação, sem mais nada (mede a reprovação, não a
+// entrega — a forma medida dos 4 consolos). Só IGUALDADE, de propósito (refutador, 2026-10-15): a variante do
+// objeto ("o markitdown com OCR") e o critério aplicado à variante são as formas mais fortes de superação, e a
+// inclusão as recusaria. O resto (status quo, condição futura em prosa, `o_que` que só parafraseia o objeto)
+// a máquina NÃO vê sem palavra-chave frágil: vai como PERGUNTA OBRIGATÓRIA ao juiz (CONSOLO_QUESTION),
+// respondida no campo `classe`. TETO: o voto do Verify não carrega alvo no schema, então lá a recusa circular
+// não roda (só a da âncora e a da classe).
 const CONSOLO_QUESTION = 'a superação está MEDIDA e ENTREGA o valor que o objeto prometia, ou é status quo, condição futura ou parte do próprio veredito?'
 const OVERCOMING_PROPS = {
   superacao: { type: 'object', required: ['classe', 'achada', 'o_que', 'medida'], properties: {
@@ -105,6 +109,7 @@ const criteriaBlock = (criteria) => '\n\n## Critérios de reprovação PRÉ-REGI
   '- `superacao: {classe, achada, o_que, medida}` — antes de reprovar, PROCURE o que supera: a peça, variante, fonte ou caminho que entregaria o valor que o objeto prometia. `achada:true` → `o_que` nomeia e `medida` diz como se mediu; `achada:false` → `medida` diz o que se procurou e onde (comando ou fonte), nunca "não encontrei" seco.\n' +
   '- PERGUNTA OBRIGATÓRIA antes de preencher `classe`: ' + CONSOLO_QUESTION + ' Só `classe: "entrega"` (com `achada:true`) quando a superação JÁ foi medida entregando aquele valor; status quo, carimbo ou condição futura, peça ainda em cura e costura que é parte do próprio veredito são CONSOLO e vão como `classe: "nenhuma"` (com `achada:false`) e a razão medida. `nenhuma` honesta é veredito válido; consolo preenchido para passar é o que o Elenxo reprova.'
 const _ogNorm = (x) => String(x == null ? '' : x).toLowerCase().replace(/[`'"]/g, '').replace(/\s+/g, ' ').trim()
+const _ogSquash = (x) => _ogNorm(x).replace(/\s+/g, '')
 function overcomingWhy(v, criteria) {
   const s = v && v.superacao
   if (!s || typeof s !== 'object' || typeof s.achada !== 'boolean') return 'veredito negativo sem superacao {classe, achada, o_que, medida}'
@@ -117,10 +122,10 @@ function overcomingWhy(v, criteria) {
   if (!criteria.some(k => k.id === String(c.id).trim())) return 'criterio ' + JSON.stringify(String(c.id)) + ' NAO esta pre-registrado (' + criteria.map(k => k.id).join(', ') + ')'
   if (!_ogFilled(c.comando, 3)) return 'criterio citado sem o comando que o checa'
   if (s.classe === 'entrega') {
-    const alvo = _ogNorm(v.alvo || v.target || v.node_id || v.claim)
-    if (alvo && _ogNorm(s.o_que) === alvo) return 'superacao CIRCULAR: o_que e o proprio objeto julgado (consolo)'
-    const cmd = _ogNorm(c.comando)
-    if (cmd.length >= 12 && _ogNorm(s.medida).includes(cmd)) return 'superacao ancorada no criterio da reprovacao: a medida e o comando que reprova, nao o que entrega (consolo)'
+    const objTarget = _ogNorm(v.alvo || v.target || v.node_id || v.id || v.claim)
+    if (objTarget && _ogNorm(s.o_que) === objTarget) return 'superacao CIRCULAR: o_que e o proprio objeto julgado (consolo)'
+    const cmd = _ogSquash(c.comando)
+    if (cmd.length >= 8 && _ogSquash(s.medida) === cmd) return 'superacao ancorada no criterio da reprovacao: a medida e o comando que reprova, nao o que entrega (consolo)'
   }
   return ''
 }
@@ -178,7 +183,7 @@ const verdicts = await parallel(lotes.map((lote,ix) => () => ag(
 `JUIZ FIXO do censo (mandato REFUTAR, default REPROVADO na dúvida; calibração 2026-08-29: FP 20%, subserviência 0/7). READ-ONLY no repo.
 Audite os desfechos PREGUIÇOSOS (CONFIRMED e GATED-não-disparado): method foi EXECUTADO (re-rode o barato)? mediu no arquivo que o trace aponta? contagem de claims honesta contra o label? CONFIRMED procurou a morte? gatilho MEDIDO ou só declarado?
 Devolva aprovados (node_ids) e reprovados (node_id+motivo específico).
-Reprovar NÃO basta: cada reprovado leva o critério e a superação — a medida certa que o worker devia ter feito, ou o que de fato superou o nó.${criteriaBlock(JUDGE_CRITERIA)}
+Reprovar NÃO basta: cada reprovado leva o critério e a superação. Se você MEDIU o que de fato superou o nó (a entrega já existe, com a medida), é "classe: entrega"; se só sabe qual seria a medida certa que o worker devia ter feito, ainda não medida, é "classe: nenhuma", com essa medida como a razão.${criteriaBlock(JUDGE_CRITERIA)}
 
 LOTE ${ix+1}:
 ${JSON.stringify(lote.map(r=>({node_id:r.node_id,kg_file:r.kg_file,method:r.method.slice(0,300),observed:r.observed.slice(0,300),verdict:r.verdict,claims:r.claims_measured+'/'+r.claims_total,realidade:r.realidade,gatilho:r.gatilho,gatilho_disparou:r.gatilho_disparou})))}`,

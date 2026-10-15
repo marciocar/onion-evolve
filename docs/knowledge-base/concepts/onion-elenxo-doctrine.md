@@ -155,14 +155,17 @@ superação, a pergunta obrigatória:
 A resposta vai no campo `superacao.classe`, que aceita `entrega` ou `nenhuma`. `entrega` exige
 `achada:true` e a medida da entrega. `nenhuma` exige a razão medida. O motor recusa e conta a classe
 ausente, a classe que contradiz `achada`, o `o_que` que é o próprio objeto e a `medida` que é o
-comando do critério da reprovação, porque isso mede a reprovação e não a entrega. No grafo do
-`/meta:dissect`, o `dissect-census.sh --check-verdict` recusa a superação circular, a não medida e a
-ancorada no critério.
+comando do critério da reprovação e nada mais, porque isso mede a reprovação e não a entrega. A
+recusa é só por igualdade: o critério aplicado à variante é a medida mais forte de uma superação.
+No grafo do `/meta:dissect`, o `dissect-census.sh --check-verdict` recusa a superação circular, a
+não medida e a ancorada no critério.
 
 Uma leitura de direção, medida no corpus: a aresta vai de quem sustenta para quem é sustentado
 (`E SUPPORTS D`), e o nó da superação que já existia e sustenta a decisão (o OCR local do markitdown)
 é **ancestral direto** dela. Por isso o ancestral não é recusado. Recusar o ancestral derrubaria a
-única superação real medida. Recusa-se o que **deriva** do veredito.
+única superação real medida. Recusa-se o que **deriva** do veredito, e a derivação se lê pelo tipo:
+`A SUPPORTS B` faz B derivar de A, e `A TRACES_TO B` faz A derivar de B (a decisão aponta a origem
+com `TRACES_TO`).
 
 ### A etapa 5 é a que mais falha — e isso é medido
 

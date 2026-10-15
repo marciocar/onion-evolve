@@ -234,43 +234,57 @@ for rel in "${GRAPHS[@]}"; do
       # 2ª leva (SAC-151): superação de CONSOLO. Achado de campo de um adotante de curadoria (PR #30, DADO): a
       # 1ª versão do pagamento da dívida passou aqui com 4 superações que só o Elenxo reprovou. O que a FORMA
       # do grafo deixa ver, recusa-se aqui (o resto vai como pergunta ao juiz, na doutrina):
-      #   · CIRCULAR — o próprio nó do veredito, ou um nó ALCANÇÁVEL a partir dele seguindo from→to (a superação
-      #     deriva do veredito). Direção medida no corpus: `from` sustenta/deriva `to` (E SUPPORTS D; o census-seal
-      #     grava C_SUPERACAO TRACES_TO o reprovado). O ANCESTRAL direto que SUPPORTS é a forma LEGÍTIMA (a única
-      #     superação real medida, o OCR local do markitdown, é exatamente isso), logo ancestral não é recusado;
-      #   · NÃO MEDIDA — status fora de confirmed|done (open = condição ou cura em curso), sem verified_at, com
-      #     verified_at no FUTURO, ou sem verified_against;
-      #   · ANCORADA NO CRITÉRIO — verified_against/trace do nó contém o x_dissect_criterion: mede a reprovação,
-      #     não a entrega (a forma medida dos 4 consolos: "confirmed com âncora no critério, que mede outra coisa").
-      # NÃO detectado (declarado): o STATUS QUO rotulado de superação e o placeholder em prosa num nó confirmed
-      # (o verified_against da superação real é um token hifenizado, igual ao de um placeholder) — exigiria
-      # palavra-chave frágil; é a pergunta obrigatória da dissect-doctrine.
-      ogc="$(awk -v s="${og_ov}" -v d="${og_id}" -v today="$(date -u +%F)" -v crit="${og_crit}" '
+      #   · CIRCULAR — o próprio nó do veredito, ou um nó que DERIVA dele por OUTRO caminho que não a aresta
+      #     declarada da superação. Derivação POR TIPO de aresta (medida no contrato: a decisão aponta a origem
+      #     com TRACES_TO): `A SUPPORTS B` e `A CAUSES B` ⇒ B deriva de A; `A TRACES_TO B` e `A DEPENDS_ON B` ⇒
+      #     A deriva de B. REFUTES/CONSTRAINS/SUPERSEDES não derivam. A aresta S→D que liga a superação ao
+      #     veredito fica FORA da busca: é a forma que a doutrina pede (S TRACES_TO D = nasceu da reprovação;
+      #     S SUPPORTS D = já existia e sustenta) — distinguir as duas por estrutura é impossível (declarado).
+      #     O ANCESTRAL que sustenta é a forma LEGÍTIMA (a única superação real medida, o OCR local do
+      #     markitdown, é `E SUPPORTS D`), logo não é recusado; `D TRACES_TO S` (D cita S como fonte) também não;
+      #   · NÃO MEDIDA — status fora de confirmed|done (open = condição ou cura em curso), sem verified_at ou
+      #     fora de AAAA-MM-DD, verified_at (10 primeiros caracteres) DEPOIS de hoje, verified_against vazio
+      #     ou sem 3 caracteres alfanuméricos (`-`, `?`, `0`) ou n/a|null|none|tbd|todo;
+      #   · ANCORADA NO CRITÉRIO — verified_against/trace do nó É o x_dissect_criterion (igualdade sem espaços):
+      #     mede a reprovação, não a entrega. Só a igualdade: citar o critério aplicado à variante é a forma
+      #     mais forte de medir (achado do refutador, 2026-10-15), e a inclusão a recusaria.
+      # Campos lidos só na indentação do próprio nó (id + 2), não em sub-blocos. Critério via ENVIRON (o -v do
+      # awk interpreta barra invertida). NÃO detectado (declarado): o STATUS QUO rotulado de superação e o
+      # placeholder em prosa num nó confirmed (o verified_against da superação real é um token hifenizado,
+      # igual ao de um placeholder) — exigiria palavra-chave frágil; é a pergunta obrigatória da doutrina.
+      ogc="$(OG_CRIT="${og_crit}" awk -v s="${og_ov}" -v d="${og_id}" -v today="${TODAY}" '
         function val(x) { sub(/^[^:]*:[[:space:]]*/, "", x); sub(/[[:space:]]+#.*$/, "", x); gsub(/^["\047]|["\047][[:space:]]*$/, "", x); sub(/[[:space:]]+$/, "", x); return x }
-        function norm(x) { x = tolower(x); gsub(/["\047`]/, "", x); gsub(/[[:space:]]+/, " ", x); sub(/^ /, "", x); sub(/ $/, "", x); return x }
-        function item() { if (fr != "" && to != "") { n++; F[n] = fr; T[n] = to } fr = ""; to = "" }
+        function squash(x) { x = tolower(x); gsub(/["\047`[:space:]]/, "", x); return x }
+        function ind(x) { match(x, /^[[:space:]]*/); return RLENGTH }
+        function item() { if (fr != "" && to != "" && !(fr == s && to == d)) {
+            if (et == "SUPPORTS" || et == "CAUSES") { n++; P[n] = fr; C[n] = to }
+            else if (et == "TRACES_TO" || et == "DEPENDS_ON") { n++; P[n] = to; C[n] = fr } }
+          fr = ""; to = ""; et = "" }
         /^edges:/ { e = 1; next }
         e && /^[^[:space:]-]/ { item(); e = 0 }
-        !e && /^[[:space:]]*- id:/ { cur = val($0); next }
-        !e && cur == s && /^[[:space:]]*status:/ { st = val($0) }
-        !e && cur == s && /^[[:space:]]*verified_at:/ { va = val($0) }
-        !e && cur == s && /^[[:space:]]*verified_against:/ { vg = val($0) }
-        !e && cur == s && /^[[:space:]]*trace:/ { tr = val($0) }
+        !e && /^[[:space:]]*- id:/ { cur = val($0); fi = ind($0) + 2; next }
+        !e && cur == s && ind($0) == fi && /^[[:space:]]*status:/ { st = val($0) }
+        !e && cur == s && ind($0) == fi && /^[[:space:]]*verified_at:/ { va = val($0) }
+        !e && cur == s && ind($0) == fi && /^[[:space:]]*verified_against:/ { vg = val($0) }
+        !e && cur == s && ind($0) == fi && /^[[:space:]]*trace:/ { tr = val($0) }
         !e { next }
         /^[[:space:]]*-[[:space:]]/ { item(); line = $0; sub(/^[[:space:]]*-[[:space:]]*/, "", line); $0 = line }
         /^[[:space:]]*from:/ { fr = val($0) }
         /^[[:space:]]*to:/ { to = val($0) }
+        /^[[:space:]]*edge_type:/ { et = val($0) }
         END {
           item(); why = ""
           if (s == d) { print ",superacao-circular-e-o-proprio-veredito"; exit }
-          { R[d] = 1; ch = 1; while (ch) { ch = 0; for (i = 1; i <= n; i++) if ((F[i] in R) && !(T[i] in R)) { R[T[i]] = 1; ch = 1 } }
-                 if (s in R) why = why ",superacao-circular-deriva-do-veredito" }
+          R[d] = 1; ch = 1; while (ch) { ch = 0; for (i = 1; i <= n; i++) if ((P[i] in R) && !(C[i] in R)) { R[C[i]] = 1; ch = 1 } }
+          if (s in R) why = why ",superacao-circular-deriva-do-veredito"
           if (st != "confirmed" && st != "done") why = why ",superacao-nao-medida-status-" (st == "" ? "ausente" : st)
           if (va == "") why = why ",superacao-sem-verified_at"
-          else if (va > today) why = why ",superacao-carimbo-futuro-" va
-          if (vg == "") why = why ",superacao-sem-verified_against"
-          c = norm(crit)
-          if (length(c) >= 12 && (index(norm(vg), c) || index(norm(tr), c))) why = why ",superacao-ancorada-no-criterio"
+          else if (va !~ /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/) why = why ",superacao-verified_at-ilegivel"
+          else if (substr(va, 1, 10) > today) why = why ",superacao-carimbo-futuro-" substr(va, 1, 10)
+          lv = tolower(vg); al = vg; gsub(/[^A-Za-z0-9]/, "", al)
+          if (vg == "" || length(al) < 3 || lv ~ /^(n\/a|null|none|tbd|todo)$/) why = why ",superacao-sem-verified_against"
+          c = squash(ENVIRON["OG_CRIT"])
+          if (length(c) >= 8 && (squash(vg) == c || squash(tr) == c)) why = why ",superacao-ancorada-no-criterio"
           print why }' "${f}")"
       ogwhy="${ogwhy}${ogc}"
     fi
