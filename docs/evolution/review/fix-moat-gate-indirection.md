@@ -2,7 +2,8 @@
 branch: fix/moat-gate-indirection
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 09d1118e810237faf804eebc31d562e07488501a45fcf5354fcff4e09b0188fb
+reviewed_code_sha256: 6809e51e3bc48f34ef21759dd126cf46787cb071d8fdf27bf40dc30cdf663e66
 findings_total: 14
 findings_real: 14
 tokens: 230996
