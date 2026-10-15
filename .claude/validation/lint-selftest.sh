@@ -34247,6 +34247,13 @@ run_background_task_probe_selftests() {
   exec 8>&-
   unset -f _bgp_launch _bgp_notify _bgp_run _bgp_line
   rm -rf "${d}"
+  # (j) o wchan da espera em pipe muda com o kernel: `pipe_read` (6.8) e `anon_pipe_read` (o runner do CI, medido no
+  #     1º CI do #1129). Os dois têm de contar como espera em LEITURA, sem depender de qual kernel roda a bancada.
+  local _rw
+  _rw="$(sed -n "s/^READ_WCHAN='\(.*\)'$/\1/p" "${REPO_ROOT}/.claude/hooks/background-task-probe.sh")"
+  if [ -n "${_rw}" ] && [[ "pipe_read" =~ ${_rw} ]] && [[ "anon_pipe_read" =~ ${_rw} ]] && ! [[ "do_wait" =~ ${_rw} ]]; then
+    record_pass "bg-probe: (j) espera em pipe conta nos dois kernels (pipe_read e anon_pipe_read), do_wait não"
+  else record_fail "bg-probe: (j) wchan por kernel" "READ_WCHAN=[${_rw}] não casa pipe_read e anon_pipe_read, ou casa do_wait"; fi
 }
 _family run_background_task_probe_selftests
 
