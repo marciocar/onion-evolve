@@ -52,13 +52,13 @@ Até 2026-10-14 a assinatura cobria **só os claims**: trocar `signal.body` depo
 | o quê | como entra na assinatura | sem isso |
 |---|---|---|
 | `iss`, `aud`, `jti` | claims do payload JWS | veto (`claim-iss-mismatch`, `claim-aud-mismatch` ou, sem `aud`, `jws-missing-aud` desde a F3, `jws-missing-jti`) |
-| `iat`, `exp` | claims **obrigatórios**, inteiros; `exp − iat ≤ teto` e `exp ≤ now + teto` (teto = `A2A_EXP_MAX_TTL`, default **3600 s**) | `jws-missing-exp`, `jws-missing-iat`, `jws-bad-exp`, `exp-not-after-iat`, `exp-beyond-ceiling` |
-| o **corpo** `signal.body` | claim **obrigatório** `body_sha256` = sha256 (hex minúsculo) dos **bytes UTF-8 da string já decodificada** | `jws-missing-body-sha256` (remetente antigo) · `body-mismatch` (corpo trocado) · `body-not-string` |
+| `iat`, `exp` | claims **obrigatórios**, inteiros; `exp − iat ≤ teto` e `exp ≤ now + teto` (teto = `A2A_EXP_MAX_TTL`, default e **teto duro 3600 s**; skew `A2A_CLOCK_SKEW`, default e teto 300 s: o ambiente só APERTA, desde a SAC-150) | `jws-missing-exp`, `jws-missing-iat`, `jws-bad-exp`, `exp-not-after-iat`, `exp-beyond-ceiling`, `bad-config:<var>` (acima do teto) |
+| o **corpo** `signal.body` | claim **obrigatório** `body_sha256` = sha256 (hex minúsculo) dos **bytes UTF-8 da string já decodificada**; no máximo **8192 bytes** (o teto do remetente canônico, no gate desde a SAC-150) | `jws-missing-body-sha256` (remetente antigo) · `body-mismatch` (corpo trocado) · `body-not-string` · `body-too-large` |
 | `signal.body_path`, `signal.thread` | se presentes no signal, têm de estar **iguais** como claim | `claim-body_path-mismatch`, `claim-thread-mismatch` |
 | cópia `signal.body_sha256` | se presente, igual ao claim | `signal-body-sha256-mismatch` |
 | chave JSON duplicada (envelope ou payload) | — | `duplicate-key:<onde>` |
 | `signal.id`, `direction`, `kind`, `classification` | **NÃO assinados**; forma fechada: 1–128 de `[A-Za-z0-9._:-]` | `signal-field-unsafe:<campo>` |
-| `signal.from`, `to`, `thread` / `body_path` | comparados com claims e, além disso, na mesma forma fechada / 1–256 de `[A-Za-z0-9._/-]` sem `..` | `signal-field-unsafe:<campo>` |
+| `signal.from`, `to`, `thread` / `body_path` | comparados com claims e, além disso, na mesma forma fechada / 1–256 de `[A-Za-z0-9._/-]` sem `..`; o `from` tem a forma do id de membro **antes** da camada 1 (o trust-check o recebia cru e o gravava no trust-log) | `from-malformed` · `signal-field-unsafe:<campo>` |
 | tipo de `iss`/`aud`/`jti` | string, sem caractere de controle (C0, DEL, C1, U+2028/9) | `jws-bad-claim-type`, `jws-claim-control-char` |
 | qualquer outra chave no `signal` | — | `signal-unknown-key:<chave>` |
 
@@ -82,6 +82,16 @@ Até 2026-10-14 a assinatura cobria **só os claims**: trocar `signal.body` depo
   corpo, ou do vazio) e, se mandar `body_path`, o claim `"body_path"` igual; o `exp = now + 3600` deles já
   cabe no teto. O membro de teste do spike usa o `send-a2a.sh` do spike, que já está conforme. A mudança é no
   repo de cada remetente, pela sessão dele: o core não escreve lá.
+- **O trust-log recebe a linha DEPOIS da assinatura** (SAC-150 N4): a camada 1 decide em `--dry-run`, e só o
+  envelope que passou em tudo grava a linha, com o `from` já provado. Veto antes da assinatura não vira fato no log.
+- **O relógio:** a medição vence o atestado. `A2A_CLOCK_TRUST=attested` vale só onde nenhuma fonte mediu
+  dessincronia (timedatectl `NTPSynchronized=no`, chronyc sem `Leap Normal`, ntpstat rc 1 vencem o atestado).
+- **A reverificação do aceite** (`--reverify-at <epoch>`, SAC-150 N1): o `a2a-accept.sh` passa o envelope
+  preservado na fila de novo pelo gate, com a janela julgada no instante do recebimento, sem ler nem gravar o
+  estado de jti e sem trust-log; o veredito ecoa `reverified_at`, `from` e `jti`. O `verified` do JSON da fila
+  não é prova: quem escreve na fila escreve `true`. O aceite materializa o corpo como DADO (moldura R15.2) no
+  doc do inbox, e a sessão lê o doc, nunca o JSON. Como o `receivedAt` não é assinado, o aceite recusa envelope
+  com `iat` de mais de 7 dias e deduplica o `jti` por um razão de aceites no repo de quem aceita.
 - **Veredito `verified:false` → REJEITA** (fail-safe: ausência/erro nunca é aprovação; payload remoto =
   supply-chain não-confiável até verificado). Toda camada não-avaliável (ferramenta ausente) → VETO, nunca skip.
 - **Veredito `verified:true` → ainda `gated:true`**: o sinal entra para triagem sob **gate humano** (consumo
@@ -98,7 +108,9 @@ projeção do SSOT **filtrada ao próprio core** (confidencialidade — zero dad
 ## Pré-condições p/ sair do stub (F2.2)
 - **Fundação de segurança no core: ✅** (`a2a-verify.sh` + `a2a-ssrf-check.sh` + Agent Card + selftests +
   drift-guard REGRA 25) — de-risca o endpoint sem abrir canal.
-- **Endpoint vivo (VPS): pendente, GATED** — RFC-0004 aceita ✅ · Fase 1 completa ✅ · falta **gate humano do
-  maestro** + **dogfood do handshake com um adotante regulado**. Vive no repo privado `~/onion-bridge` (Hono/
-  SSE/webhook), que serve o Agent Card e chama o `a2a-verify` do core na fronteira transport→ação.
+- **Endpoint vivo (VPS): ✅ VIVO** desde 2026-07-09 (o cabeçalho deste arquivo; esta linha dizia "pendente,
+  GATED" até a 2ª passada de refutação, SAC-150 N10). Vive no repo privado `~/onion-bridge` (Hono), que serve o
+  Agent Card e chama o `a2a-verify` do core na fronteira transport→ação; desde a F3 atende também `/a2a/<hub>`.
+  O bridge exige o eco do receptor no veredito, tem teto de corpo (64 KiB) e taxa por membro no `/a2a`, e o pool
+  legado `INVITE_TOKENS_A2A` saiu do código (SAC-150). O que segue GATED é a **aceitação** (humana, reverificada).
 - Fallback: sempre degrada p/ `git-async` (system-of-record).

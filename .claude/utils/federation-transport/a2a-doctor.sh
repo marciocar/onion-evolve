@@ -181,27 +181,31 @@ key_pinned() { case ",${KEYS}," in *",$1,"*) return 0 ;; esac; return 1; }   # s
 # ── (f) relógio confiável: os MESMOS sinais do gate, separando "disse não" (rc 1) de "sem sinal" (rc 2)
 # O gate colapsa os dois em clock-untrusted (veto: certo para um gate). O doctor os separa porque o
 # próximo passo é diferente: ligar o NTP não é instalar ou atestar uma fonte.
+# SAC-150 N8: a MEDIÇÃO vem antes do atestado, como no gate — um A2A_CLOCK_TRUST=attested não cala uma fonte
+# que disse "não sincronizado" (o env só aperta). O atestado vale só onde nada mediu.
 check_clock() {
   local ok="" sig="" no="" v t r
-  if [ "${A2A_CLOCK_TRUST:-}" = "attested" ]; then ok=1; sig="A2A_CLOCK_TRUST=attested (atestado do operador: declaração, não medição)"
-  else
+  if :; then
     if command -v timedatectl >/dev/null 2>&1; then
       v="$(timedatectl show -p NTPSynchronized --value 2>/dev/null)"
       case "${v}" in yes) ok=1; sig="timedatectl NTPSynchronized=yes" ;; no) no="timedatectl NTPSynchronized=no" ;; esac
     fi
     if [ -z "${ok}" ] && command -v chronyc >/dev/null 2>&1; then
       t="$(chronyc tracking 2>/dev/null)"
-      if grep -q '^Leap status.*Normal' <<< "${t}"; then ok=1; sig="chronyc Leap status Normal"
-      elif [ -n "${t}" ]; then no="${no:+${no}; }chronyc sem Leap Normal"; fi
+      if grep -qE '^Leap status.*(Normal|Insert second|Delete second)' <<< "${t}"; then ok=1; sig="chronyc Leap status sincronizado"
+      elif grep -q '^Leap status.*Not synchronised' <<< "${t}"; then no="${no:+${no}; }chronyc Leap status Not synchronised"; fi
     fi
     if [ -z "${ok}" ] && command -v ntpstat >/dev/null 2>&1; then
       ntpstat >/dev/null 2>&1; r=$?
       if [ "${r}" -eq 0 ]; then ok=1; sig="ntpstat sincronizado"; elif [ "${r}" -eq 1 ]; then no="${no:+${no}; }ntpstat não sincronizado"; fi
     fi
   fi
+  if [ -z "${ok}" ] && [ -z "${no}" ] && [ "${A2A_CLOCK_TRUST:-}" = "attested" ]; then
+    ok=1; sig="A2A_CLOCK_TRUST=attested (atestado do operador: declaração, não medição; nenhuma fonte mediu dessincronia)"
+  fi
   if [ -n "${ok}" ]; then CLOCK=ok; put f ok 1 "${sig}" "—"
   elif [ -n "${no}" ]; then CLOCK=no
-    put f falha 1 "a fonte de tempo DISSE que não está sincronizada (${no}); o gate veta clock-untrusted" \
+    put f falha 1 "a fonte de tempo DISSE que não está sincronizada (${no}); o gate veta clock-untrusted, e o atestado A2A_CLOCK_TRUST não vence a medição" \
       "ligue o NTP (timedatectl set-ntp true, ou chronyd) e espere sincronizar"
   else CLOCK=unk
     put f nao-medido 1 "nenhum sinal de relógio (timedatectl, chronyc e ntpstat ausentes ou mudos, e sem A2A_CLOCK_TRUST); o gate veta clock-untrusted" \
@@ -255,7 +259,7 @@ check_endpoint() {
 # --invite; senão, por todas as entradas do membro. Sem --invites: não medida e NÃO crítica, declarado.
 check_invites() {
   if [ -z "${INVITES}" ]; then
-    put i nao-medido 0 "arquivo de convites não informado: o convite por membro não foi conferido (ou o membro ainda usa o pool legado)" \
+    put i nao-medido 0 "arquivo de convites não informado: o convite por membro não foi conferido" \
       "passe --invites <o arquivo de convites do seu bridge (A2A_INVITES_FILE)>, rodando como a conta do serviço do bridge"; return
   fi
   [ -f "${INVITE_MOTOR}" ] || { put i nao-medido 1 "a2a-invite.sh ausente: não sei julgar o arquivo de convites" "rode de uma instalação com o motor"; return; }

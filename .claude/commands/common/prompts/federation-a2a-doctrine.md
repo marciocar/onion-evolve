@@ -43,10 +43,19 @@ do refutador da F1b, 2026-10-15). Antes do pino, a impressão que o membro leu d
 canal** (voz, mensagem assinada, presença) contra a do arquivo recebido — o doctor do lado receptor
 faz essa conta com `--fingerprint`. Pública que chegou por um canal só e não foi conferida não é pinada.
 
-### 4. O aceite da fila é ATO HUMANO
+### 4. O aceite da fila é ATO HUMANO, e REVERIFICA
 O endpoint só enfileira; nada é aplicado. Promover um registro da fila para o inbox é `a2a-accept.sh`,
-um registro de cada vez, depois de o operador ler o sinal. O wizard lista e prepara; não aceita em lote
-e não aceita sem a confirmação explícita de cada um. Membro regulado continua `propose-only`.
+um registro de cada vez, com a confirmação explícita do maestro. O wizard lista e prepara; não aceita em
+lote. Membro regulado continua `propose-only`. Três regras da 2ª passada de refutação (SAC-150,
+2026-10-15), todas medidas:
+- **O JSON da fila não é prova.** Quem escreve na fila escreve `"verified": true`. O aceite passa o
+  envelope preservado de novo pelo gate (`--reverify-at` no instante do recebimento) e recusa o registro
+  que diverge dele; o frontmatter sai do veredito reverificado, nunca do registro cru (antes, um `from`
+  com quebra de linha injetava chaves no YAML do doc).
+- **O corpo chega à sessão só como DADO.** Materializado no doc do inbox dentro da moldura R15.2, com o
+  hash e `verified_semantic: false`. A sessão lê o doc, nunca o JSON cru.
+- **A revogação alcança a fila.** A chave revogada derruba a reverificação; o convite revogado depois do
+  recebimento é conferido com `--invites`, e sem ele o doc declara `nao-medido`.
 
 ### 5. I3: cada repo tem um escritor
 O core nunca commita no repo do membro, e o membro nunca commita no do core. A pública do membro chega
@@ -100,7 +109,7 @@ todas medidas no dogfood da F3 com um bridge local de dois receptores:
   que o registro do clone servido diz que recebe (`role: source` ou `hub`, nunca porta), e o gate do core
   repete a checagem na camada `receiver`. Receptor fora do registro sai 404; que não recebe, 400.
 - **O convite é por receptor.** O convite de um filho para o hub não vale em `/a2a` (o core), e o do core
-  não vale em `/a2a/<hub>`: `convite-de-outro-receptor` (401). O pool legado só vale no core.
+  não vale em `/a2a/<hub>`: `convite-de-outro-receptor` (401). O pool legado saiu do código do bridge (SAC-150 N4).
 - **`aud` é obrigatório.** O jti é guardado por receptor, então um envelope sem `aud` aceito num receptor
   seria reenviável no outro. Com `aud`, o reenvio sai `claim-aud-mismatch`.
 - **O consumer só fala com o próprio hub** (ou com o core). Para outro hub, o gate veta `trust-denied`:
@@ -114,8 +123,9 @@ atos do operador do core, a pedido do hub. O hub monta o pacote de entrada e ace
 ## O que este comando NÃO promete
 
 - **Não faz deploy** do bridge, não edita o ambiente do serviço e não reinicia nada. O convite por
-  membro (F2) dispensa restart. O pool anônimo do ambiente do bridge (`INVITE_TOKENS_A2A`) é o caminho
-  legado, depreciado, e tirar um bearer dele continua sendo do caminho de deploy do bridge. Um bridge
+  membro (F2) dispensa restart. O pool anônimo do ambiente do bridge (`INVITE_TOKENS_A2A`) saiu do
+  código do bridge (SAC-150): a env preenchida é ignorada com aviso no boot, e apagá-la é do caminho de
+  deploy do bridge. Um bridge
   anterior à F2 ignora o arquivo de convites, e o sintoma é o 401 `credencial-desconhecida`.
 - **Não roda na máquina do membro por conta própria:** a trilha 3 é executada pelo membro, no
   computador dele. O core prepara o pacote; o membro instala.
