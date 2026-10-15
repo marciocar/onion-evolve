@@ -2,7 +2,7 @@
 branch: fix/adopt-update-source-resolver
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: 4628738c4d2750a82d901677e1889596814b0905825e4b1ad07dae5023118972
+reviewed_diff_sha256: 8895f17d1ab10b50016ee545b886a0d0f8061d20f2588309807e2ad17dd80a21
 reviewed_code_sha256: 17d0d924c381d569981579446c48a189c75a3d4d5bdd317690670d2b6f9aa78a
 findings_total: 12
 findings_real: 11
