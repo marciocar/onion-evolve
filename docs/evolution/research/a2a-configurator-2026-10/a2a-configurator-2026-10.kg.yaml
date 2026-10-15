@@ -7,7 +7,7 @@ meta:
   baseline: "2026-10-14"
   review_after: "2026-11-13"   # 30d: cadência de ferramenta
   # ═══ TETO: 30 NÓS ═══
-  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho).
+  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão).
   x_linear_epic: "SAC-120"
 nodes:
   - id: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -229,6 +229,78 @@ nodes:
       locator: "casos S5.5 e S5.6"
       method: "medição: roteiro do spike executado pelo subagente e re-executado pela sessão principal"
       locality: "repo"
+  - id: C_HARD_DO_REGISTRO_JA_EXISTIA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 na F1 (SAC-122): check_members_registry em .claude/validation/lint-artifacts.sh já roda o members-validate.sh como HARD (REGRA 66) desde 2026-09-01, e o nó Q_members_ci_gate do grafo m3-federation-admin-2026-07 está superseded por isso; o cabeçalho do validador ainda dizia que o HARD não existia"
+    label: "o plano pedia ligar o members-validate como HARD no gate, mas a REGRA 66 já o fazia; o que faltava era o validador conhecer o bloco a2a, e o cabeçalho dele afirmava o contrário do mecanismo"
+    narrative: "Declaração defasada: o cabeçalho do members-validate.sh (escrito em 2026-08-27) dizia que o validador não era gate HARD do lint, e o plano do configurador herdou a frase. A F1 corrigiu o cabeçalho e estendeu o validador, que passa a reprovar no gate o bloco a2a quebrado (kid fora da forma, kid de dois donos, pública ausente, não RSA ou curta, sends_to que não é receptor)."
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh e docs/onion/graph/m3-federation-admin-2026-07.kg.yaml"
+      locator: "check_members_registry (REGRA 66); nós Q_members_ci_gate e E_CENSO0901_Q_members_ci_gate"
+      method: "medição: grep e leitura no core"
+      locality: "repo"
+  - id: C_MEMBRO_STANDALONE_NAO_RECEBE_OS_MOTORES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15: o _role_cut de .claude/utils/adopt/vendor-manifest.sh corta o prefixo .claude/utils/federation-transport/ para standalone e plugins, mesmo para o adotado com --kind adoption (que só mantém utils/co-evolution e o hook do inbox)"
+    label: "o membro adotado como standalone não recebe keygen, remetente nem doctor: a trilha 3 só funciona se o core lhe entregar os motores num pacote de entrada"
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "_role_cut, ramo standalone|plugins"
+      method: "medição: leitura do corte por papel"
+      locality: "repo"
+  - id: C_ATRIBUICAO_SOB_SET_E_ABORTA_A_BANCADA
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 pelo mutante K2 da família federation_a2a: com a privada 0644, a atribuição env=\"$(a2a-send.sh ...)\" saiu rc 2 sob o set -euo pipefail do lint-selftest.sh e a bancada abortou antes da soma (BANCADA ABORTOU), deixando de rodar 30 casos"
+    label: "numa família da bancada, toda atribuição de $(...) que pode falhar aborta a suíte sob o set -e do runner; a família do A2A passou a rodar com local - e set +e, e o mutante que a abortava agora só reprova o seu caso"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_federation_a2a_selftests; log do mutante K2"
+      method: "medição: mutante plantado por ops/mutate-and-restore.sh"
+      locality: "repo"
+  - id: E_F1A_MOTORES_E_BANCADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 na F1a (SAC-122): LC_ALL=C bash .claude/validation/lint-selftest.sh --families federation_a2a sai 42/42, e os 42 mutantes plantados por ops/mutate-and-restore.sh (um por caso) morreram cada um no caso nomeado, com restauração conferida por hash"
+    label: "o keygen, o remetente canônico, o doctor dos dois lados e o bloco a2a do registro estão graduados em .claude/utils/federation-transport/, com a família federation_a2a de 42 casos e um mutante morto por caso"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_federation_a2a_selftests; tabela de mutantes no resíduo da REGRA 56 da branch feat/a2a-configurator-f1"
+      method: "medição: bancada e mutantes executados pela sessão"
+      locality: "repo"
+  - id: D_PISO_2048_NO_REGISTRO_3072_NO_KEYGEN
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-15"
+    verified_against: "decidido pela sessão da F1 em 2026-10-15 sob a autorização do maestro para decidir sem ele (opção recomendada); medido: jwks/metagamify-1.pem e jwks/granaai-1.pem têm 2048 bits, e o gate a2a-verify.sh não confere tamanho"
+    label: "o validador do registro aceita pública RSA a partir de 2048 bits, e o keygen gera 3072: subir o piso do registro para 3072 reprovaria hoje os dois pinos vivos de 2048"
+    narrative: "Decisão da sessão, aberta para o maestro ratificar ou trocar. Alternativa descartada: piso 3072 no registro já, que exigiria rotacionar metagamify-1 e granaai-1 antes do merge (rotação está parada por ordem do maestro). Gatilho para subir o piso: a rotação dos dois pinos de 2048."
 edges:
   - from: E_ONZE_PASSOS_MANUAIS_HOJE
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -284,3 +356,18 @@ edges:
   - from: C_RECEPTOR_PELO_PAPEL_INCLUI_A_PORTA
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
     edge_type: CONSTRAINS
+  - from: E_F1A_MOTORES_E_BANCADA
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: SUPPORTS
+  - from: C_HARD_DO_REGISTRO_JA_EXISTIA
+    to: E_LACUNAS_DO_A2A_MEDIDAS
+    edge_type: CONSTRAINS
+  - from: C_MEMBRO_STANDALONE_NAO_RECEBE_OS_MOTORES
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: CONSTRAINS
+  - from: C_ATRIBUICAO_SOB_SET_E_ABORTA_A_BANCADA
+    to: E_F1A_MOTORES_E_BANCADA
+    edge_type: SUPPORTS
+  - from: D_PISO_2048_NO_REGISTRO_3072_NO_KEYGEN
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: TRACES_TO

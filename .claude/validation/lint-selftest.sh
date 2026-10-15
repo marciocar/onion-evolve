@@ -9360,6 +9360,17 @@ YML
 # (gated:true / committed:false SEMPRE) + o FAIL-SAFE (tooling ausente → VETO, nunca skip).
 # Precisa openssl+jq+python3+yaml p/ forjar fixtures — ausente → skip (não é o SUT).
 # ---------------------------------------------------------------------------
+# Ajudantes JWS COMPARTILHADOS pelas famílias A2A (a2a_verify e federation_a2a): extraídos da a2a_verify em
+# 2026-10-15 (F1 do configurador A2A, SAC-122) para que as duas forjem o MESMO envelope, em vez de duas
+# cópias que divergem em silêncio. Header sem `typ`, como o da a2a_verify sempre foi.
+_a2a_fx_b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
+_a2a_fx_sha() { openssl dgst -sha256 | awk '{print $NF}'; }
+_a2a_fx_jws_raw() {  # $1 = payload JSON literal · $2 = kid · $3 = chave privada
+  local h p; h="$(printf '{"alg":"RS256","kid":"%s"}' "$2" | _a2a_fx_b64url)"
+  p="$(printf '%s' "$1" | _a2a_fx_b64url)"
+  printf '%s.%s.%s' "$h" "$p" "$(printf '%s' "$h.$p" | openssl dgst -sha256 -sign "$3" | _a2a_fx_b64url)"
+}
+
 run_a2a_verify_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/federation-transport/a2a-verify.sh"
   if [ ! -f "${helper}" ]; then record_fail "a2a-verify" "helper ausente: ${helper}"; return; fi
@@ -9390,14 +9401,12 @@ YML
   openssl pkey -in "${sb}/priv.pem" -pubout -out "${sb}/jwks/k1.pem" 2>/dev/null
   local NOW out rc
   NOW="$(date +%s)"
-  _b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
-  _sha() { openssl dgst -sha256 | awk '{print $NF}'; }
+  _b64url() { _a2a_fx_b64url; }
+  _sha() { _a2a_fx_sha; }
   # Desde 2026-10-14 o corpo entra na assinatura: o _jws assina body_sha256 de ${_BODY} (vazio por default,
   # o caso dos sinais de julho sem corpo) e o _env embarca signal.body quando ${_BODY} não é vazio.
   _BODY=""
-  _jws_raw() { local h p; h="$(printf '{"alg":"RS256","kid":"%s"}' "${2:-k1}" | _b64url)"   # $1 = payload JSON literal
-    p="$(printf '%s' "$1" | _b64url)"
-    printf '%s.%s.%s' "$h" "$p" "$(printf '%s' "$h.$p" | openssl dgst -sha256 -sign "${sb}/priv.pem" | _b64url)"; }
+  _jws_raw() { _a2a_fx_jws_raw "$1" "${2:-k1}" "${sb}/priv.pem"; }   # $1 = payload JSON literal
   _jws() { _jws_raw "$(printf '{"iss":"%s","aud":"%s","iat":%s,"exp":%s,"jti":"%s","body_sha256":"%s"}' \
     "$1" "$2" "$3" "$4" "$5" "$(printf '%s' "${_BODY}" | _sha)")" "${6:-k1}"; }
   _env() { local b=""; [ -z "${_BODY}" ] || b=",\"body\":$(printf '%s' "${_BODY}" | jq -Rs .)"
@@ -9748,6 +9757,299 @@ YML
 # doc de inbox (F2.2). Cobre: cria doc + marca transporte, idempotência, recusa
 # de não-verificado (fail-safe) e registro malformado. Self-contained em mktemp.
 # ---------------------------------------------------------------------------
+# Modo federation-a2a — os motores do configurador A2A (/meta:federation-a2a, F1 = SAC-122): keygen,
+# remetente canônico, doctor (lado do membro e do receptor) e o bloco a2a do members-validate.sh.
+# Graduados do spike F0 (docs/evolution/research/a2a-configurator-2026-10/spike/run-s1-s2.sh e run-s3.sh).
+# REUSA os ajudantes JWS da a2a_verify (_a2a_fx_b64url, _a2a_fx_sha, _a2a_fx_jws_raw) e julga com o
+# GATE REAL (a2a-verify.sh), nunca com um verificador próprio. Todo caso tem mutante provado com
+# ops/mutate-and-restore.sh (a lista está no resíduo da REGRA 56 do PR da F1a).
+# Determinismo: relógio por A2A_CLOCK_TRUST=attested ou PATH stubado; o curl do remetente é um STUB que
+# grava o argv e o cabeçalho que recebeu (sem rede e sem amostrar `ps`, que é corrida em CI de 2 cores).
+run_federation_a2a_selftests() {
+  # `local -` + `set +e`: as opções de shell voltam ao retorno da família. Sem isto, sob o `set -euo pipefail`
+  # do runner, uma atribuição `x="$(motor ...)"` que falha ABORTA a suíte em vez de reprovar o caso — medido
+  # pelo mutante K2 (privada 0644): a bancada saiu "BANCADA ABORTOU" e 30 casos não rodaram.
+  local -; set +e
+  local ft="${REPO_ROOT}/.claude/utils/federation-transport"
+  # o corte por papel tira o diretório INTEIRO de standalone/plugins/mini: aí a família não tem SUT (⊘ visível);
+  # diretório presente com um motor faltando é defeito, e reprova
+  if [ ! -d "${ft}" ]; then record_skip "federation-a2a: .claude/utils/federation-transport/ ausente (cortado pelo papel) → sem SUT"; return; fi
+  local keygen="${ft}/a2a-keygen.sh" send="${ft}/a2a-send.sh" doctor="${ft}/a2a-doctor.sh"
+  local gate="${ft}/a2a-verify.sh" mv="${REPO_ROOT}/.claude/validation/members-validate.sh"
+  local f; for f in "${keygen}" "${send}" "${doctor}" "${gate}" "${mv}"; do
+    [ -f "${f}" ] || { record_fail "federation-a2a" "motor ausente: ${f}"; return; }
+  done
+  if ! command -v openssl >/dev/null 2>&1 || ! command -v jq >/dev/null 2>&1 \
+     || ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import yaml' >/dev/null 2>&1; then
+    record_skip "federation-a2a: openssl/jq/python3+yaml ausente → skip (não-SUT)"; return
+  fi
+  local sb; sb="$(mktemp -d)"
+  local cfg="${sb}/home/.config/onion/a2a" out="" rc=0 err=""
+  mkdir -p "${sb}/home" "${sb}/repo/docs/evolution/federation" "${sb}/repo/.claude/utils/federation-transport/jwks"
+  local jwks="${sb}/repo/.claude/utils/federation-transport/jwks" reg="${sb}/repo/docs/evolution/federation/members.yaml"
+  _fa_reg() {  # $1 = bloco a2a extra do acme (YAML já indentado em 4) · registro mínimo VÁLIDO no resto
+    cat > "${reg}" <<YML
+version: 1
+trust_policy_version: 1
+members:
+  - id: core-x
+    name: core-x
+    role: source
+    kind: source
+  - id: door-x
+    name: door-x
+    role: source
+    kind: door
+    parent: core-x
+    onion_version: abcdef1
+    adopted_at: 2026-10-15
+    mode: greenfield
+    personality_summary: "porta de teste"
+    specializations: []
+    personality_last_sync: 2026-10-15
+    trust: { can_receive_from: [core-x], can_advise_to: [core-x], can_correct_to: [], diary_readable_by: [], exposes_downstream: [] }
+  - id: solo-x
+    name: solo-x
+    role: standalone
+    kind: method
+    parent: core-x
+    onion_version: n/a
+    adopted_at: 2026-10-15
+    mode: greenfield
+    personality_summary: "outro membro"
+    specializations: []
+    personality_last_sync: 2026-10-15
+    trust: { can_receive_from: [core-x], can_advise_to: [core-x], can_correct_to: [], diary_readable_by: [], exposes_downstream: [] }
+  - id: acme
+    name: acme
+    role: standalone
+    kind: method
+    parent: core-x
+    onion_version: n/a
+    adopted_at: 2026-10-15
+    mode: greenfield
+    personality_summary: "membro de teste"
+    specializations: []
+    personality_last_sync: 2026-10-15
+    trust: { can_receive_from: [core-x], can_advise_to: [core-x], can_correct_to: [], diary_readable_by: [], exposes_downstream: [] }
+${1}
+YML
+  }
+  _fa_pinned='    a2a:
+      sends_to: core-x
+      keys: [acme-1]'
+  _fa_has() { grep -qF -- "$2" <<< "$1"; }   # here-string, nunca `| grep -q` sob pipefail
+
+  # ───────────────────────────────────────── KEYGEN ─────────────────────────────────────────
+  rc=0; out="$(HOME="${sb}/home" XDG_CONFIG_HOME= bash "${keygen}" --member acme 2>"${sb}/kg.err")" || rc=$?
+  err="$(cat "${sb}/kg.err")"
+  if [ "${rc}" -eq 0 ] && _fa_has "${out}" 'kid=acme-1' && /usr/bin/grep -qE '^fingerprint=sha256:[0-9a-f]{64}$' <<< "${out}" \
+     && ! _fa_has "${out}${err}" 'PRIVATE KEY'; then
+    record_pass "federation-a2a: keygen imprime kid, pública e impressão, nunca a privada"
+  else record_fail "federation-a2a: keygen saída" "rc=${rc} out='${out}' err='${err}'"; fi
+  local mp mq md; mp="$(stat -c %a "${cfg}/acme-1.key.pem" 2>/dev/null)"; mq="$(stat -c %a "${cfg}/acme-1.pem" 2>/dev/null)"; md="$(stat -c %a "${cfg}" 2>/dev/null)"
+  if [ "${mp}/${mq}/${md}" = "600/644/700" ]; then record_pass "federation-a2a: keygen privada 0600, pública 0644, diretório 0700 (default XDG)"
+  else record_fail "federation-a2a: keygen modos" "obtido ${mp}/${mq}/${md}"; fi
+  local bits fpo fpr
+  bits="$(openssl pkey -pubin -in "${cfg}/acme-1.pem" -noout -text 2>/dev/null | sed -n 's/.*Public-Key: (\([0-9]*\) bit).*/\1/p')"
+  fpo="$(sed -n 's/^fingerprint=sha256://p' <<< "${out}")"
+  fpr="$(openssl pkey -pubin -in "${cfg}/acme-1.pem" -outform DER 2>/dev/null | openssl dgst -sha256 | awk '{print $NF}')"
+  if [ "${bits:-0}" -ge 3072 ] && [ -n "${fpo}" ] && [ "${fpo}" = "${fpr}" ]; then record_pass "federation-a2a: keygen RSA ≥3072 e impressão = sha256(DER SPKI)"
+  else record_fail "federation-a2a: keygen bits/impressão" "bits=${bits} fpo=${fpo} fpr=${fpr}"; fi
+  local h0 h1; h0="$(sha256sum "${cfg}/acme-1.key.pem" | cut -d' ' -f1)"
+  rc=0; HOME="${sb}/home" XDG_CONFIG_HOME= bash "${keygen}" --member acme >/dev/null 2>&1 || rc=$?
+  h1="$(sha256sum "${cfg}/acme-1.key.pem" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 2 ] && [ "${h0}" = "${h1}" ]; then record_pass "federation-a2a: keygen recusa sobrescrever (rc 2, privada intacta)"
+  else record_fail "federation-a2a: keygen sobrescrita" "rc=${rc} hash $([ "${h0}" = "${h1}" ] && echo igual || echo MUDOU)"; fi
+  rc=0; bash "${keygen}" --member acme --dir "${sb}/k2048" --bits 2048 >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ] && [ ! -e "${sb}/k2048/acme-1.key.pem" ]; then record_pass "federation-a2a: keygen recusa módulo abaixo de 3072"
+  else record_fail "federation-a2a: keygen piso" "rc=${rc}"; fi
+  rc=0; bash "${keygen}" --member '../x' --dir "${sb}/kbad" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ] && [ ! -d "${sb}/kbad" ]; then record_pass "federation-a2a: keygen recusa member que viraria caminho (../)"
+  else record_fail "federation-a2a: keygen member" "rc=${rc}"; fi
+  cp "${cfg}/acme-1.pem" "${jwks}/acme-1.pem"
+
+  # ───────────────────────────────────────── REMETENTE ──────────────────────────────────────
+  _fa_reg "${_fa_pinned}"
+  _fa_gate() { rc=0; out="$(A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${jwks}" bash "${gate}" --receiver core-x --repo "${sb}/repo" --dry-run --envelope - <<<"$1" 2>/dev/null)" || rc=$?; }
+  local env; env="$(HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --dry-run --from acme --to core-x --body $'F1: olá, "é"?\n' 2>/dev/null)"
+  _fa_gate "${env}"
+  if [ "${rc}" -eq 0 ] && _fa_has "${out}" '"verified":true'; then record_pass "federation-a2a: o gate REAL aceita o envelope do remetente assinado pela chave do keygen"
+  else record_fail "federation-a2a: send→gate" "rc=${rc} out='${out}'"; fi
+  printf 'linha 1\nlinha 2\n\n' > "${sb}/body.txt"
+  env="$(HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --dry-run --from acme --to core-x --body-file "${sb}/body.txt" 2>/dev/null)"
+  local bsh; bsh="$(sha256sum "${sb}/body.txt" | cut -d' ' -f1)"
+  _fa_gate "${env}"
+  if [ "$(jq -r '.signal.body_sha256' <<< "${env}" 2>/dev/null)" = "${bsh}" ] && [ "${rc}" -eq 0 ]; then
+    record_pass "federation-a2a: --body-file assina os bytes exatos do arquivo (\\n finais inclusos) e o gate aceita"
+  else record_fail "federation-a2a: body-file" "rc=${rc} sha=$(jq -r '.signal.body_sha256' <<< "${env}" 2>/dev/null) esperado=${bsh}"; fi
+  # envelope de julho, SEM body_sha256, assinado pela chave do keygen com o ajudante JWS da a2a_verify
+  local now; now="$(date +%s)"
+  local jraw; jraw="$(_a2a_fx_jws_raw "{\"iss\":\"acme\",\"aud\":\"core-x\",\"iat\":${now},\"exp\":$((now+300)),\"jti\":\"fa-nosha\"}" acme-1 "${cfg}/acme-1.key.pem")"
+  _fa_gate "$(jq -cn --arg j "${jraw}" '{jws:$j,signal:{from:"acme",to:"core-x",kind:"signal"}}')"
+  if [ "${rc}" -eq 1 ] && _fa_has "${out}" 'jws-missing-body-sha256'; then record_pass "federation-a2a: envelope sem body_sha256 (o remetente de julho) → o gate veta"
+  else record_fail "federation-a2a: sem body_sha256" "rc=${rc} out='${out}'"; fi
+  HOME="${sb}/home" XDG_CONFIG_HOME= bash "${keygen}" --member acme --n 2 >/dev/null 2>&1 || true
+  cp "${cfg}/acme-2.pem" "${jwks}/acme-2.pem" 2>/dev/null || true
+  _fa_gate "$(HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --dry-run --from acme --to core-x --kid acme-2 --body 'kid novo' 2>/dev/null)"
+  if [ "${rc}" -eq 1 ] && _fa_has "${out}" 'kid-not-owned-by-from:acme-2'; then record_pass "federation-a2a: kid gerado e não pinado no registro → o gate veta kid-not-owned-by-from"
+  else record_fail "federation-a2a: kid não pinado" "rc=${rc} out='${out}'"; fi
+  rm -f "${jwks}/acme-2.pem"
+  # curl STUB: grava o argv e o cabeçalho que recebeu por -H @arquivo; responde 200
+  mkdir -p "${sb}/stub"
+  cat > "${sb}/stub/curl" <<STUB
+#!/usr/bin/env bash
+printf '%s\n' "\$@" > "${sb}/curl.argv"
+prev=""; for a in "\$@"; do [ "\${prev}" = "-H" ] && case "\$a" in @*) cat "\${a#@}" > "${sb}/curl.hdr" ;; esac; prev="\$a"; done
+printf '{"ok":true}\n200'
+STUB
+  chmod +x "${sb}/stub/curl"
+  ( umask 077; openssl rand -hex 24 > "${sb}/token" )
+  local tok; tok="$(cat "${sb}/token")"
+  rc=0; PATH="${sb}/stub:${PATH}" HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --from acme --to core-x --body 'ao vivo' \
+    --endpoint "http://127.0.0.1:9/a2a" --token-file "${sb}/token" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${sb}/curl.argv" ] && ! grep -qF -- "${tok}" "${sb}/curl.argv" \
+     && grep -qxF "Authorization: Bearer ${tok}" "${sb}/curl.hdr" 2>/dev/null; then
+    record_pass "federation-a2a: o bearer chega ao curl só pelo arquivo de cabeçalho, nunca em argv"
+  else record_fail "federation-a2a: bearer fora de argv" "rc=${rc} argv_tem_token=$(grep -cF -- "${tok}" "${sb}/curl.argv" 2>/dev/null) hdr=$([ -f "${sb}/curl.hdr" ] && echo sim || echo nao)"; fi
+  chmod 0644 "${sb}/token"; rm -f "${sb}/curl.argv"
+  rc=0; err="$(PATH="${sb}/stub:${PATH}" HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --from acme --to core-x --body x \
+    --endpoint "http://127.0.0.1:9/a2a" --token-file "${sb}/token" 2>&1 >/dev/null)" || rc=$?
+  if [ "${rc}" -eq 2 ] && _fa_has "${err}" 'o token do canal está com modo 644' && [ ! -f "${sb}/curl.argv" ]; then
+    record_pass "federation-a2a: token legível por outros → recusa (rc 2) sem chamar o curl"
+  else record_fail "federation-a2a: token 0644" "rc=${rc} err='${err}'"; fi
+  chmod 0600 "${sb}/token"
+  chmod 0644 "${cfg}/acme-1.key.pem"
+  rc=0; err="$(HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --dry-run --from acme --to core-x --body x 2>&1 >/dev/null)" || rc=$?
+  if [ "${rc}" -eq 2 ] && _fa_has "${err}" 'a chave privada está com modo 644'; then record_pass "federation-a2a: chave privada legível por outros → o remetente recusa assinar (rc 2)"
+  else record_fail "federation-a2a: chave 0644" "rc=${rc} err='${err}'"; fi
+  chmod 0600 "${cfg}/acme-1.key.pem"
+  rc=0; err="$(PATH="${sb}/stub:${PATH}" HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --from acme --to core-x --body x \
+    --endpoint "https://u:${tok}@127.0.0.1:9/a2a" --token-file "${sb}/token" 2>&1 >/dev/null)" || rc=$?
+  if [ "${rc}" -eq 2 ] && _fa_has "${err}" 'credencial embutida'; then record_pass "federation-a2a: URL com credencial embutida → recusa (rc 2)"
+  else record_fail "federation-a2a: URL com credencial" "rc=${rc} err='${err}'"; fi
+
+  # ───────────────────────────────────────── DOCTOR ─────────────────────────────────────────
+  ( umask 077; cp "${sb}/token" "${cfg}/bridge-token" )
+  printf '{"member":"acme","expires_at":"%s","revoked":false}\n' "$(date -u -d '+1 day' +%FT%TZ)" > "${sb}/invite.json"
+  _fa_doc() {  # args extra do doctor; env por variável _FA_ENV (relógio) · lado membro
+    rc=0; out="$(env ${_FA_ENV:-A2A_CLOCK_TRUST=attested} HOME="${sb}/home" XDG_CONFIG_HOME= bash "${doctor}" --member acme \
+      --members "${reg}" --jwks "${jwks}" --json "$@" 2>/dev/null)" || rc=$?
+  }
+  _fa_chk() { jq -r --arg c "$1" '.checks[] | select(.id==$c) | "\(.status)|\(.next)"' <<< "${out}" 2>/dev/null; }
+  _FA_ENV=""; _fa_doc --invite "${sb}/invite.json"
+  if [ "${rc}" -eq 0 ] && [ "$(jq -r '.verdict' <<< "${out}" 2>/dev/null)" = ok ] && [ "$(jq '[.checks[]|select(.status!="ok")]|length' <<< "${out}" 2>/dev/null)" = 1 ] \
+     && [ "$(_fa_chk g)" = "nao-medido|passe --endpoint <url do receptor>" ]; then
+    record_pass "federation-a2a: doctor do membro saudável → rc 0 (só o endpoint não informado fica não medido, não crítico)"
+  else record_fail "federation-a2a: doctor saudável" "rc=${rc} out='${out}'"; fi
+  _fa_state() {  # nome · rc esperado · checagem · status esperado · trecho da CAUSA (o motivo, não só o status)
+    local got cause; got="$(_fa_chk "$3")"
+    cause="$(jq -r --arg c "$3" '.checks[] | select(.id==$c) | .cause' <<< "${out}" 2>/dev/null)"
+    if [ "${rc}" -eq "$2" ] && [ "${got%%|*}" = "$4" ] && [ -n "${got#*|}" ] && [ "${got#*|}" != "—" ] && _fa_has "${cause}" "$5"; then
+      record_pass "federation-a2a: doctor $1 → rc $2, ($3) $4 com próximo passo"
+    else record_fail "federation-a2a: doctor $1" "rc=${rc} (esperado $2) ($3)=${got}"; fi
+  }
+  mv "${cfg}/acme-1.key.pem" "${sb}/acme-1.key.pem.bak"; mv "${cfg}/acme-2.key.pem" "${sb}/acme-2.key.pem.bak"
+  _fa_doc --invite "${sb}/invite.json"; _fa_state "sem chave" 1 a falha "chave privada ausente"
+  mv "${sb}/acme-1.key.pem.bak" "${cfg}/acme-1.key.pem"; mv "${sb}/acme-2.key.pem.bak" "${cfg}/acme-2.key.pem"
+  _fa_doc --invite "${sb}/invite.json"
+  if [ "${rc}" -eq 0 ] && [ "$(_fa_chk a)" != "" ] && _fa_has "${out}" 'kid acme-1'; then
+    record_pass "federation-a2a: doctor com duas chaves no dir escolhe a única pinada (acme-1)"
+  else record_fail "federation-a2a: doctor escolha do kid" "rc=${rc} out='${out}'"; fi
+  chmod 0644 "${cfg}/acme-1.key.pem"; _fa_doc --kid acme-1; _fa_state "privada 0644" 1 b falha "grupo/outros leem a chave"; chmod 0600 "${cfg}/acme-1.key.pem"
+  _fa_doc --kid acme-2; _fa_state "kid fora do registro" 1 d falha "NÃO está pinado"
+  printf '{"member":"acme","expires_at":"%s","revoked":false}\n' "$(date -u -d '-1 hour' +%FT%TZ)" > "${sb}/inv-old.json"
+  _fa_doc --kid acme-1 --invite "${sb}/inv-old.json"; _fa_state "convite vencido" 1 e falha "convite VENCIDO"
+  mv "${cfg}/bridge-token" "${sb}/bt.bak"; _fa_doc --kid acme-1; _fa_state "sem token do canal" 1 e falha "token do canal ausente"; mv "${sb}/bt.bak" "${cfg}/bridge-token"
+  # relógio sem fonte: PATH só com as ferramentas que o doctor usa, e SEM timedatectl/chronyc/ntpstat
+  local nocl="${sb}/bin-noclock" t p; mkdir -p "${nocl}"
+  for t in bash env openssl jq python3 stat awk sed grep date mktemp find sort tr cut cat cp mkdir rm git dirname basename wc head curl sha256sum; do
+    p="$(command -v "$t" 2>/dev/null)"; [ -n "$p" ] && ln -sf "$p" "${nocl}/$t"
+  done
+  rc=0; out="$(env -u A2A_CLOCK_TRUST PATH="${nocl}" HOME="${sb}/home" XDG_CONFIG_HOME= bash "${doctor}" --member acme --kid acme-1 \
+    --members "${reg}" --jwks "${jwks}" --json 2>/dev/null)" || rc=$?
+  _fa_state "sem fonte de relógio" 2 f nao-medido "nenhum sinal de relógio"
+  printf '#!/bin/sh\necho no\n' > "${sb}/stub/timedatectl"; chmod +x "${sb}/stub/timedatectl"
+  rc=0; out="$(env -u A2A_CLOCK_TRUST PATH="${sb}/stub:${nocl}" HOME="${sb}/home" XDG_CONFIG_HOME= bash "${doctor}" --member acme --kid acme-1 \
+    --members "${reg}" --jwks "${jwks}" --json 2>/dev/null)" || rc=$?
+  _fa_state "relógio que diz não sincronizado" 1 f falha "DISSE que não"
+  local closed; closed="$(python3 -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1]);s.close()')"
+  _fa_doc --kid acme-1 --endpoint "http://127.0.0.1:${closed}/a2a"; _fa_state "endpoint fora" 1 g falha "inalcançável"
+  _fa_doc --kid acme-1 --members "${sb}/sem-registro.yaml"; _fa_state "sem o registro do receptor" 2 d nao-medido "não está nesta máquina"
+  if [ "$(_fa_chk h)" != "" ] && [ "$(_fa_chk h | cut -d'|' -f1)" = nao-medido ]; then record_pass "federation-a2a: doctor sem registro → envio sintético não medido (nunca ok de memória)"
+  else record_fail "federation-a2a: doctor h sem registro" "h=$(_fa_chk h)"; fi
+  rc=0; bash "${doctor}" --selftest >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "federation-a2a: doctor --selftest (classificação pura) verde"
+  else record_fail "federation-a2a: doctor --selftest" "rc=${rc}"; fi
+  rc=0; bash "${doctor}" --member acme --side lado-errado >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ]; then record_pass "federation-a2a: doctor com uso inválido → rc 3"
+  else record_fail "federation-a2a: doctor uso" "rc=${rc}"; fi
+  # lado do RECEPTOR (o pino só se mede no receptor: C_PINO_SO_SE_MEDE_NO_RECEPTOR)
+  local fp1; fp1="$(openssl pkey -pubin -in "${jwks}/acme-1.pem" -outform DER 2>/dev/null | openssl dgst -sha256 | awk '{print $NF}')"
+  _fa_rcv() { rc=0; out="$(A2A_CLOCK_TRUST=attested bash "${doctor}" --side receiver --member acme --members "${reg}" --jwks "${jwks}" --json "$@" 2>/dev/null)" || rc=$?; }
+  _fa_rcv --fingerprint "sha256:${fp1}"
+  if [ "${rc}" -eq 0 ] && [ "$(jq '[.checks[]|select(.status!="ok")]|length' <<< "${out}" 2>/dev/null)" = 1 ] && [ "$(_fa_chk c | cut -d'|' -f1)" = ok ]; then
+    record_pass "federation-a2a: doctor do receptor saudável com a impressão conferida → rc 0"
+  else record_fail "federation-a2a: doctor receptor saudável" "rc=${rc} out='${out}'"; fi
+  _fa_rcv --fingerprint "sha256:$(printf '0%.0s' $(seq 1 64))"; _fa_state "receptor com impressão divergente" 1 c falha "que o membro mandou"
+  _fa_rcv --receiver solo-x; _fa_state "receptor com topologia que não autoriza" 1 t falha "NÃO autoriza"
+  mv "${jwks}/acme-1.pem" "${sb}/acme-1.pem.bak"; _fa_rcv; _fa_state "receptor com a pública pinada ausente" 1 d falha "jwks/acme-1.pem ausente"
+  if [ "$(_fa_chk r | cut -d'|' -f1)" = falha ]; then record_pass "federation-a2a: doctor do receptor reusa o members-validate (registro inválido sem a pública)"
+  else record_fail "federation-a2a: doctor receptor r" "r=$(_fa_chk r)"; fi
+  mv "${sb}/acme-1.pem.bak" "${jwks}/acme-1.pem"
+
+  # ─────────────────────────────────── VALIDADOR (bloco a2a) ────────────────────────────────
+  _fa_val() {  # $1 = bloco a2a do acme · $2 = trecho esperado ('' = válido)
+    _fa_reg "$1"; rc=0; out="$(bash "${mv}" "${reg}" 2>&1)" || rc=$?
+  }
+  _fa_val "${_fa_pinned}"
+  if [ "${rc}" -eq 0 ]; then record_pass "federation-a2a: validador aceita bloco a2a pinado (kid <id>-N, pública RSA ≥2048, sends_to fonte)"
+  else record_fail "federation-a2a: validador válido" "rc=${rc} out='${out}'"; fi
+  _fa_vbad() {  # nome · bloco · trecho
+    _fa_val "$2"
+    if [ "${rc}" -eq 1 ] && _fa_has "${out}" "$3"; then record_pass "federation-a2a: validador reprova $1"
+    else record_fail "federation-a2a: validador $1" "rc=${rc} out='${out}'"; fi
+  }
+  cp "${jwks}/acme-1.pem" "${jwks}/chave-x.pem"
+  _fa_vbad "kid fora da forma <id>-<N>" '    a2a:
+      sends_to: core-x
+      keys: [chave-x]' "fora da forma <id>-<N>"
+  rm -f "${jwks}/chave-x.pem"
+  _fa_vbad "kid pinado sem a pública no JWKS" '    a2a:
+      sends_to: core-x
+      keys: [acme-9]' "jwks/acme-9.pem ausente"
+  openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -out "${sb}/ec.pem" 2>/dev/null
+  openssl pkey -in "${sb}/ec.pem" -pubout -out "${jwks}/acme-7.pem" 2>/dev/null
+  _fa_vbad "pública não-RSA" '    a2a:
+      sends_to: core-x
+      keys: [acme-7]' "não é RSA"
+  openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:1024 -out "${sb}/r1024.pem" 2>/dev/null
+  openssl pkey -in "${sb}/r1024.pem" -pubout -out "${jwks}/acme-8.pem" 2>/dev/null
+  _fa_vbad "pública RSA abaixo de 2048" '    a2a:
+      sends_to: core-x
+      keys: [acme-8]' "mínimo 2048"
+  _fa_vbad "keys sem sends_to" '    a2a:
+      keys: [acme-1]' "exige a2a.sends_to"
+  _fa_vbad "sends_to que é porta" '    a2a:
+      sends_to: door-x
+      keys: [acme-1]' "não é receptor"
+  _fa_vbad "sends_to fora do registro" '    a2a:
+      sends_to: fantasma
+      keys: [acme-1]' "não está no registro"
+  _fa_reg "${_fa_pinned}"
+  python3 - "${reg}" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p).read()
+s = s.replace("  - id: solo-x\n", "  - id: solo-x\n    a2a: { sends_to: core-x, keys: [acme-1] }\n", 1)
+open(p, "w").write(s)
+PY
+  rc=0; out="$(bash "${mv}" "${reg}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && _fa_has "${out}" "kid 'acme-1' já pertence a"; then record_pass "federation-a2a: validador reprova kid de um membro pinado em outro"
+  else record_fail "federation-a2a: validador kid de dois donos" "rc=${rc} out='${out}'"; fi
+
+  rm -rf "${sb}"
+}
+
 run_a2a_accept_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/federation-transport/a2a-accept.sh"
   if [ ! -f "${helper}" ]; then record_fail "a2a-accept" "helper ausente: ${helper}"; return; fi
@@ -19865,6 +20167,9 @@ _family run_agent_card_selftests
 
 # Modo a2a-accept — o ato humano fila→inbox que fecha o gate (F2.2; recusa não-verificado).
 _family run_a2a_accept_selftests
+
+# Modo federation-a2a — os motores do configurador A2A (keygen, remetente, doctor, bloco a2a do registro; F1 = SAC-122).
+_family run_federation_a2a_selftests
 
 # Modo prettierignore — idem (cenários self-contained, sem fixture-file).
 _family run_prettierignore_selftests

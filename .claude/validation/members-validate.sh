@@ -10,20 +10,35 @@
 #
 # Onde RODA hoje (behavior-over-declaration — o alcance exato, sem prometer mais):
 #             (1) Passo 7 de /meta:federation-member (barra o membro ANTES do commit
-#             na rota do comando) e (2) lint-selftest sobre as fixtures. NÃO é ainda
-#             gate HARD do lint sobre o members.yaml VIVO — uma edição MANUAL com erro
-#             semântico-mas-parseável passaria no CI. Ligar isto ao lint-artifacts.sh
-#             é fio nomeado no grafo (m3-federation-admin: D_members_ci_gate).
+#             na rota do comando); (2) lint-selftest sobre as fixtures; e (3) o gate HARD
+#             do lint sobre o members.yaml VIVO, pela REGRA 66 (Registro da federação
+#             validado no gate), em lint-artifacts.sh. ⚠️ Até 2026-10-15 este cabeçalho
+#             dizia que (3) não existia: a REGRA 66 nasceu em 2026-09-01 e ninguém voltou
+#             aqui, e o plano do configurador A2A chegou a pedir "ligar o HARD" que já
+#             estava ligado (medido na F1, SAC-122).
 #
 # Obrigatórios por membro derivado: id(único) name role kind parent onion_version
 #             adopted_at mode personality_summary specializations personality_last_sync
-#             trust(5 listas). OPCIONAIS (não checados): remote, local_path, a2a,
-#             lineages, exposes, etc. A fonte (kind:source ⇔ role:source) é isenta.
+#             trust(5 listas). OPCIONAIS: remote, local_path, lineages, exposes, etc.
+#             A fonte (kind:source ⇔ role:source) é isenta dos obrigatórios.
 #
-# Uso       : bash .claude/validation/members-validate.sh [<path-do-members.yaml>] [--json]
+# BLOCO a2a (opcional; validado desde 2026-10-15, F1 do configurador A2A, SAC-122), em
+#             TODO membro que o declarar, inclusive a fonte:
+#             · a2a é mapa; keys, se presente, é lista de kids na forma <id>-<N> (o que o
+#               a2a-keygen.sh gera), e nenhum kid pertence a dois membros (jwks/<kid>.pem é
+#               um espaço de nomes só: kid repetido seria a mesma pública para dois donos);
+#             · cada kid tem jwks/<kid>.pem com pública RSA de pelo menos 2048 bits (o piso que
+#               o gate aceita; o keygen gera 3072). JWKS = --jwks, senão A2A_JWKS_DIR, senão o
+#               .claude/utils/federation-transport/jwks da raiz do repo do registro;
+#             · keys não vazio exige sends_to, e sends_to aponta um membro do registro que é
+#               receptor: role source ou hub, e NÃO porta (kind door). Medido no spike
+#               (C_RECEPTOR_PELO_PAPEL_INCLUI_A_PORTA): olhar só o role deixava entrar a porta.
+#
+# Uso       : bash .claude/validation/members-validate.sh [<path-do-members.yaml>] [--json] [--jwks <dir>]
 #               <path> : caminho PASSADO COMO ARGUMENTO; default = o members.yaml
 #                        do próprio repo (resolvido por BASH_SOURCE, nunca embutido).
 #               --json : saída JSON {valid, path, errors[]} para o comando consumir.
+#               --jwks : diretório das públicas pinadas (default acima).
 #
 # Saída     : exit 0 = válido · 1 = inválido (erros listados) · 2 = uso incorreto
 #             · 3 = python3+yaml ausente (degrada gracioso, não reprova)
@@ -42,14 +57,29 @@ ROOT="$(env -u GIT_DIR -u GIT_WORK_TREE git -C "${HERE}" rev-parse --show-toplev
 
 JSON=0
 MEMBERS=""
-for arg in "$@"; do
-  case "$arg" in
-    --json) JSON=1 ;;
-    -*) echo "uso: $0 [<path-do-members.yaml>] [--json]" >&2; exit 2 ;;
-    *) MEMBERS="$arg" ;;
+JWKS=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --json) JSON=1; shift ;;
+    --jwks) [[ -n "${2:-}" ]] || { echo "uso: $0 [<path-do-members.yaml>] [--json] [--jwks <dir>]" >&2; exit 2; }
+            JWKS="$2"; shift 2 ;;
+    -*) echo "uso: $0 [<path-do-members.yaml>] [--json] [--jwks <dir>]" >&2; exit 2 ;;
+    *) MEMBERS="$1"; shift ;;
   esac
 done
 [[ -z "$MEMBERS" ]] && MEMBERS="${ROOT}/docs/evolution/federation/members.yaml"
+# JWKS: a raiz do repo do REGISTRO (não a deste script) quando o caminho tem a forma canônica, para
+# que validar o registro de outra árvore confira as públicas daquela árvore.
+if [[ -z "$JWKS" ]]; then
+  if [[ -n "${A2A_JWKS_DIR:-}" ]]; then JWKS="${A2A_JWKS_DIR}"
+  else
+    _mabs="$(cd "$(dirname "$MEMBERS")" 2>/dev/null && pwd)/$(basename "$MEMBERS")"
+    case "${_mabs}" in
+      */docs/evolution/federation/members.yaml) JWKS="${_mabs%/docs/evolution/federation/members.yaml}/.claude/utils/federation-transport/jwks" ;;
+      *) JWKS="${ROOT}/.claude/utils/federation-transport/jwks" ;;
+    esac
+  fi
+fi
 
 if [[ ! -f "$MEMBERS" ]]; then
   echo "uso: $0 [<path-do-members.yaml>] [--json]  — arquivo não encontrado: $MEMBERS" >&2
@@ -59,10 +89,10 @@ fi
 command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 \
   || { echo "members-validate: python3+yaml ausente (exit 3, gracioso)." >&2; exit 3; }
 
-python3 - "$MEMBERS" "$JSON" <<'PY'
-import sys, json, re
+python3 - "$MEMBERS" "$JSON" "$JWKS" <<'PY'
+import sys, json, re, os, subprocess, shutil
 
-path, json_mode = sys.argv[1], sys.argv[2] == "1"
+path, json_mode, jwks_dir = sys.argv[1], sys.argv[2] == "1", sys.argv[3]
 errors = []
 
 def err(msg):
@@ -229,6 +259,70 @@ if isinstance(doc, dict):
             err(f"membro '{mid}': 'superseded_by' aponta para '{sup}', que não está no registro")
         elif by_id[sup].get("superseded_by"):
             err(f"membro '{mid}': 'superseded_by' aponta para '{sup}', que também é linhagem histórica (cadeia não permitida)")
+    # BLOCO a2a (F1 do configurador A2A, SAC-122) — ver o cabeçalho. Vale para todo membro que o declara.
+    def rsa_bits(pem):
+        """bits do módulo RSA da pública em `pem`; 'nao-rsa' | 'ilegivel' | 'sem-openssl'."""
+        if not shutil.which("openssl"):
+            return "sem-openssl"
+        try:
+            out = subprocess.run(["openssl", "pkey", "-pubin", "-in", pem, "-noout", "-text"],
+                                 capture_output=True, text=True, timeout=20).stdout
+        except Exception:
+            return "ilegivel"
+        if not out:
+            return "ilegivel"
+        if not re.search(r"^modulus:", out, re.I | re.M):
+            return "nao-rsa"
+        mm = re.search(r"\((\d+) bit", out)
+        return int(mm.group(1)) if mm else "ilegivel"
+
+    kid_owner = {}
+    for m in members:
+        if not isinstance(m, dict) or "a2a" not in m:
+            continue
+        mid = m.get("id"); tag = f"membro '{mid}'"
+        a = m.get("a2a")
+        if not isinstance(a, dict):
+            err(f"{tag}: bloco 'a2a:' não é um mapa")
+            continue
+        keys = a.get("keys", [])
+        if keys is None:
+            keys = []
+        if not isinstance(keys, list):
+            err(f"{tag}: a2a.keys não é lista")
+            keys = []
+        for k in keys:
+            if not isinstance(k, str) or not re.fullmatch(r"[A-Za-z0-9._-]+", k) or k.startswith("."):
+                err(f"{tag}: a2a.keys tem kid fora de [A-Za-z0-9._-] ('{k}'); o kid vira nome de arquivo no JWKS")
+                continue
+            if not (isinstance(mid, str) and re.fullmatch(re.escape(mid) + r"-[1-9][0-9]*", k)):
+                err(f"{tag}: kid '{k}' fora da forma <id>-<N> ('{mid}-1', '{mid}-2'...), a que o a2a-keygen.sh gera")
+            if k in kid_owner and kid_owner[k] != mid:
+                err(f"{tag}: kid '{k}' já pertence a '{kid_owner[k]}' (o JWKS é um espaço de nomes só: mesma pública para dois donos)")
+                continue
+            kid_owner[k] = mid
+            pem = os.path.join(jwks_dir, k + ".pem")
+            if not os.path.isfile(pem):
+                err(f"{tag}: kid '{k}' pinado em a2a.keys mas jwks/{k}.pem ausente (o gate vetaria unknown-kid)")
+                continue
+            bits = rsa_bits(pem)
+            if bits == "sem-openssl":
+                err(f"{tag}: openssl ausente, não sei conferir jwks/{k}.pem (fail-closed: não sei ≠ válido)")
+            elif bits == "ilegivel":
+                err(f"{tag}: jwks/{k}.pem não é pública legível")
+            elif bits == "nao-rsa":
+                err(f"{tag}: jwks/{k}.pem não é RSA (o gate só aceita RS256)")
+            elif bits < 2048:
+                err(f"{tag}: jwks/{k}.pem tem {bits} bits (mínimo 2048)")
+        st = a.get("sends_to")
+        if keys and not st:
+            err(f"{tag}: a2a.keys não vazio exige a2a.sends_to (o receptor dos sinais dele)")
+        if st:
+            rcv = by_id.get(st)
+            if rcv is None:
+                err(f"{tag}: a2a.sends_to aponta '{st}', que não está no registro")
+            elif rcv.get("role") not in ("source", "hub") or rcv.get("kind") == "door":
+                err(f"{tag}: a2a.sends_to aponta '{st}' (role '{rcv.get('role')}', kind '{rcv.get('kind')}'), que não é receptor: só role source ou hub, e nunca porta")
 elif doc is not None:
     err("documento raiz não é um mapa (esperado: chaves version/trust_policy_version/members)")
 
