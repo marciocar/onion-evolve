@@ -16,7 +16,7 @@ A *spec* (interface) define **o quê**; o *adapter* define **o como**; `FEDERATI
 |-----|-------|--------|---------|
 | **`git-async`** (default) | doc-bridge: `CHANGELOG` + `outbox/` + entrega-sem-commit; assíncrono, maestro transporta | ✅ em uso | [`adapters/git-async.md`](adapters/git-async.md) |
 | **`local`** | carteiro same-machine: `co-deliver.sh`/`co-relay.sh` entregam untracked no repo vizinho | ✅ em uso | [`adapters/local.md`](adapters/local.md) |
-| **`a2a-live`** | endpoint A2A sobre o `onion-bridge` — só **sinais gated**, verificados pelo `a2a-verify` | 🔒 **fundação viva, endpoint stub gated** — o gate de recepção (`a2a-verify`, 6 camadas) roda no core + 1º handshake regulado provado (2026-07-09); o endpoint/canal vivo é **stub** no `~/onion-bridge` (privado, gated) | [`adapters/a2a-live.md`](adapters/a2a-live.md) |
+| **`a2a-live`** | endpoint A2A sobre o `onion-bridge` — só **sinais gated**, verificados pelo `a2a-verify` | 🔒 **endpoint vivo, aceite humano** — o endpoint no `onion-bridge` está vivo desde 2026-07-09 e chama o gate de recepção (`a2a-verify`) na fronteira; todo sinal entra na fila e só vira inbox pelo `a2a-accept.sh`. Montar a conexão é o [`/meta:federation-a2a`](../../commands/meta/federation-a2a.md) (keygen, remetente e doctor abaixo) | [`adapters/a2a-live.md`](adapters/a2a-live.md) |
 
 ## Nomenclatura canônica — ATO vs VIA (fecha o sinal 2026-07-09)
 
@@ -62,4 +62,17 @@ declaradas, não silenciosas — precedente: divergência `cli`-default do forge
 ## Reuso (não reinventa)
 
 git-async e local **documentam/apontam** o fluxo que já existe (`co-*`), não reimplementam. O `a2a-live` é o
-**único novo** — e fica stub gated até o F2.2. Precedente do padrão: `forge/factory.md` (abstrai `cli|api`).
+**único novo**, e o aceite dele segue humano. Precedente do padrão: `forge/factory.md` (abstrai `cli|api`).
+
+## Os motores do a2a-live (desde 2026-10-15, F1 do configurador A2A)
+
+| motor | papel |
+|---|---|
+| [`a2a-keygen.sh`](a2a-keygen.sh) | gera o par RS256 do membro (privada 0600 que nunca sai da máquina; `kid` `<membro>-<N>`) |
+| [`a2a-send.sh`](a2a-send.sh) | o remetente canônico: envelope assinado com `body_sha256`, bearer só por arquivo |
+| [`a2a-doctor.sh`](a2a-doctor.sh) | diagnóstico dos dois lados, rc 0/1/2/3; "não pude medir" nunca é saudável |
+| [`a2a-verify.sh`](a2a-verify.sh) | o gate do receptor (verificação antes de agir) |
+| [`a2a-accept.sh`](a2a-accept.sh) | o ato humano fila → inbox |
+
+Superfície: [`/meta:federation-a2a`](../../commands/meta/federation-a2a.md). Bancada:
+`run_federation_a2a_selftests` (com a `a2a_verify`, a `a2a_accept` e a `a2a_ssrf`).
