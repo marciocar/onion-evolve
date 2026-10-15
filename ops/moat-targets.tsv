@@ -17,6 +17,9 @@
 #     e o clone do core que ele serve), update-kg-writer.sh (a worktree de código e a raiz de dados do
 #     onion-kg-writer); /home/marcio/mcp-kg/core-served é o WorkingDirectory de onion-vps-mcp-kg-granaai;
 #     /usr/local/sbin/onion-vps-docker-firewall.sh é o ExecStart de onion-vps-docker-firewall.
+#   · o arquivo de convites A2A do bridge (A2A_INVITES_FILE, default medido em 2026-10-15; o .env do bridge não o
+#     sobrescreve) tem wrapper próprio: a2a-invite-live.sh roda o motor de convites do clone servido como a conta
+#     do serviço, com backup cifrado antes e check depois. O resto de /home/onion segue com update-bridge.sh.
 #   · FORA DAQUI, de propósito: onion-vps-mcp-exec, onion-vps-mcp-kg e onion-vps-mcp-fw servem DIRETO do
 #     checkout principal do core (/home/marcio/onion-evolve). Escrever lá é trabalho normal da casa; listar o
 #     caminho vetaria todo commit. A unidade deles segue vetada pelo glob onion-vps-*.
@@ -30,6 +33,7 @@ deploy	path	/var/www	-
 deploy	path	/etc/caddy	ops/install-caddy-config.sh
 deploy	path	/etc/systemd	-
 deploy	path	/home/onion	ops/update-bridge.sh
+deploy	path	/home/onion/onion-bridge/data/a2a-invites.json	ops/a2a-invite-live.sh
 deploy	path	/home/marcio/mcp-kg/core-writer	ops/update-kg-writer.sh
 deploy	path	/var/lib/onion-chat-kg	-
 deploy	path	/home/marcio/mcp-kg	-

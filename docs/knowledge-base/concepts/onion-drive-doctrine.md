@@ -90,6 +90,14 @@ O driver opera num **degrau declarado**, nunca acima:
   | relógio (W7) | `crontab` que instala/edita/remove; `at`/`batch`; `systemd-run` com timer; `systemctl` que liga `.timer`; escrita em `/etc/cron*`, `/var/spool/cron` ou num `.timer` | as ferramentas `CronCreate`/`ScheduleWakeup` do Claude Code (o `/loop` é superfície legítima do maestro, e o hook não sabe quem o pediu) |
   | merge de path vendorizado | o merge no main (merge-gate) | o resto segue PARA em prosa |
 
+  **Motor que escreve por argumento (2026-10-15).** O motor de convites A2A (`a2a-invite.sh`) escreve o arquivo que
+  recebe em `--file`, e o juiz só via escrita no verbo: medido, o motor chamado direto com `--file` no arquivo de
+  convites do bridge passava com rc 0. Desde então o valor de `--file` de `create`/`revoke` (sem `--dry-run`) é julgado
+  como destino de escrita, versionado ou não, e o motor é reconhecido pelo nome ou pelo marcador `MOAT-ARG-WRITER:` no
+  corpo (cópia renomeada). Script não versionado que chama o motor e cita um alvo fecha. A única escrita no arquivo
+  de convites de produção é o wrapper `ops/a2a-invite-live.sh` (core-only): trava do update do bridge, ensaio por
+  padrão (`--apply` escreve), backup cifrado antes, `check` e prova por contagem depois, rollback impresso.
+
   No adotante o hook **se desarma**: sem `ops/moat-targets.tsv` (core-only) não há alvo, e o MOAT do adotante segue
   prosa. Escape = o maestro roda fora da sessão (`!` no prompt). Não há variável de bypass: escape que o modelo
   escreve na própria string seria gate textual com outro nome.
