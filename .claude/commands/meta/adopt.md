@@ -6,10 +6,10 @@ description: |
   retomável. Greenfield-first. NÃO é CLI — roda dentro do Claude Code.
   Relacionado: /docs:reverse-consolidate, /meta:setup-integration, /docs:build-tech-docs.
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(rm -rf "$TMP") Bash(mktemp *) Bash(cat > *) Bash(mkdir *) Bash(printf *)
-argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--role adopted|hub|standalone] [--integration-branch <nome>] [--in-place] [--update] [--promote-hub] [--dry-run]"
+argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--role adopted|hub|standalone] [--integration-branch <nome>] [--in-place] [--update [--source auto|origin|head|<commit>] [--worktree]] [--promote-hub] [--dry-run]"
 category: meta
-version: "1.10.0"
-updated: "2026-07-23"
+version: "1.11.0"
+updated: "2026-10-15"
 ---
 
 # 🧅 /meta:adopt — Adoção de Repositório
@@ -141,8 +141,8 @@ na cópia de arquivos (registro de hooks + starter de co-evolução + proteção
 re-rodar não duplica. Snippet self-contained (shell novo a cada fase).
 
 ```bash
-SOURCE_ROOT="$(git rev-parse --show-toplevel)"
-DEST="<INSTALL_DIR (Fase 3) | TARGET (--update)>"
+SOURCE_ROOT="<checkout (Fase 3) | UPDATE_SOURCE_ROOT (--update: re-resolva com --source <pin> num shell novo)>"
+DEST="<INSTALL_DIR (Fase 3) | WORK (--update)>"
 
 # (0) .gitignore — ESCOPA um ignore CEGO de .claude/ (never-clobber, idempotente). CRÍTICO e PRIMEIRO:
 #     um adotante que ignora `.claude/` INTEIRO (comum se já usava Cursor/Claude) faz o durable-commit
@@ -371,8 +371,8 @@ Delega ao helper **testável e idempotente** `.claude/utils/adopt/durable-commit
 `lint-selftest.sh` — `run_durable_commit_selftests`), no mesmo espírito do `merge-onion-hooks.sh`:
 
 ```bash
-SOURCE_ROOT="$(git rev-parse --show-toplevel)"
-DEST="<INSTALL_DIR (adoção) | TARGET (--update)>"
+SOURCE_ROOT="<checkout (adoção) | UPDATE_SOURCE_ROOT (--update: re-resolva com --source <pin> num shell novo)>"
+DEST="<INSTALL_DIR (adoção) | WORK (--update)>"
 OP="<adopt | update>"; PIN="<source_commit aplicado (curto)>"
 # BR: a ADOÇÃO passa `onion/adopt` (branch que a Fase 2 já criou — sem branch redundante); o --update
 # dedica `chore/onion-update-<pin>` (framework não polui a branch de produto nem a integração — vai a PR).
@@ -404,8 +404,8 @@ mail" o detecta e a sessão do alvo o "recebe e age". Fecha o gap reportado em
 > consumidor estivesse sinalizando o core. Downstream tem o **próprio** canal (`inbound/`).
 
 ```bash
-SOURCE_ROOT="$(git rev-parse --show-toplevel)"
-DEST="<INSTALL_DIR (adoção) | TARGET (--update)>"
+SOURCE_ROOT="<checkout (adoção) | UPDATE_SOURCE_ROOT (--update: re-resolva com --source <pin> num shell novo)>"
+DEST="<INSTALL_DIR (adoção) | WORK (--update)>"
 OP="<adopt | update>"            # operação que gerou o relatório
 PIN="<source_commit aplicado>"   # commit curto da fonte (o pin NOVO)
 PREV="<pin anterior | vazio na 1ª adoção>"
@@ -690,14 +690,14 @@ já faz tmp→diff→aplicar (o diff mostra o que muda), e re-carimba `.onion-ve
 > **não siga cego o conserto do helper** — num dos casos ele daria base SEM framework. Fio:
 > `E_VENDOR_PRODUTO_REFUTADO_EM_SANDBOX`.
 
-Repo já adotado → trazer atualizações do framework. **Reusa o stamp** (self-contained):
+Repo já adotado → trazer atualizações do framework. **Reusa o stamp** (self-contained). A **fonte** é o `--source` do operador, resolvido e recusado pelo `resolve-update-source.sh` (regras no cabeçalho dele):
 
 ```bash
-SOURCE_ROOT="$(git rev-parse --show-toplevel)"; TARGET="<path do alvo>"
-# GUARD: precisa de stamp (senão não foi adotado).
-[ -f "$TARGET/.claude/.onion-version" ] || { echo "Repo não adotado: rode a adoção primeiro."; exit 1; }
+CORE_ROOT="$(git rev-parse --show-toplevel)"; TARGET="<path do alvo>"; UPDATE_SOURCE="${UPDATE_SOURCE:-auto}"   # --source: auto|origin|head|<commit>
+[ -f "$TARGET/.claude/.onion-version" ] || { echo "Repo não adotado: rode a adoção primeiro."; exit 1; }   # GUARD: precisa de stamp
 ADOPTED_COMMIT="$(awk '/^source_commit:/{print $2}' "$TARGET/.claude/.onion-version")"
-NOW="$(git -C "$SOURCE_ROOT" rev-parse --short=12 HEAD)"
+SRC_OUT="$(bash "$CORE_ROOT/.claude/utils/adopt/resolve-update-source.sh" "$CORE_ROOT" "$TARGET" --source "$UPDATE_SOURCE")" || exit 1   # 2 tempos: o rc é o do resolvedor (`eval "$(…)"` o engoliria)
+eval "$SRC_OUT"; SOURCE_ROOT="$UPDATE_SOURCE_ROOT"; NOW="$UPDATE_SOURCE_SHA"   # todo HEAD e helper abaixo = a FONTE
 
 # GUARD pin-integrity — o pin do stamp é HIPÓTESE, não fato (incidente 2026-06-30 num adotante: um restore
 # manual carimbou o HEAD do core sem copiar arquivos → anúncio "você já tem X" saiu falso; sinal
@@ -711,7 +711,7 @@ else
   echo "⚠️  ${PIN_MSG} — pin não confiável (forjado, update parcial ou customização local no canário);"
   echo "    delta/early-exit desativados; seguindo com cópia segura completa + re-carimbo."
 fi
-[ -n "$PIN_OK" ] && [ "$ADOPTED_COMMIT" = "$NOW" ] && { echo "Já atualizado ($NOW)."; exit 0; }
+[ -n "$PIN_OK" ] && [ "$ADOPTED_COMMIT" = "$NOW" ] && { echo "Já atualizado ($NOW)."; [ -z "$UPDATE_SOURCE_WORKTREE" ] || git -C "$CORE_ROOT" worktree remove "$UPDATE_SOURCE_WORKTREE"; exit 0; }
 
 # DELTA do framework desde a adoção (manifesto filtrado, como no Procedimento):
 # A lista é a MESMA do transporte, e vem da SSOT (vendor-manifest.sh) — só o delta olha `.env.example`,
@@ -741,10 +741,10 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   ```bash
   INTEGRATION_BRANCH="$(bash "$SOURCE_ROOT/.claude/validation/resolve-integration-branch.sh" "$TARGET")"
   UPDATE_BR="chore/onion-update-$NOW"
-  WORK="$(bash "$SOURCE_ROOT/.claude/utils/adopt/dedicated-branch.sh" "$TARGET" "$UPDATE_BR" "$INTEGRATION_BRANCH")" || exit 1
-  # WORK = "$TARGET" (sem farol) ou a worktree irmã (com farol). Daqui em diante, TODO passo usa "$WORK".
+  WORK="$(bash "$SOURCE_ROOT/.claude/utils/adopt/dedicated-branch.sh" "$TARGET" "$UPDATE_BR" "$INTEGRATION_BRANCH" $([ "${UPDATE_WORKTREE:-0}" = 1 ] && echo --worktree))" || exit 1
+  # WORK = "$TARGET" (sem farol) ou a worktree irmã (com farol, ou UPDATE_WORKTREE=1 — o --worktree do operador). Daqui em diante, TODO passo usa "$WORK".
   ```
-- **Aplicar o framework via MERGE de vendor-branch** (Achado #2 — substitui o copy-over), **na branch dedicada** (antes, a foto para o diff de hooks do relatório: `cp "$WORK/.claude/settings.json" "$SOURCE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json"`):
+- **Aplicar o framework via MERGE de vendor-branch** (Achado #2 — substitui o copy-over), **na branch dedicada** (antes, a foto para o diff de hooks do relatório: `cp "$WORK/.claude/settings.json" "$CORE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json"` — a sessão mora no checkout, nunca na worktree da fonte):
   `bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-branch.sh" update "$WORK" "$SOURCE_ROOT" "$NOW" "$UPDATE_BR"`.
   (o 4º argumento é a branch onde o merge cai). O helper aplica o framework novo no
   `onion/vendor` (fonte-de-merge, base comum) e faz `git merge` na branch dedicada → a customização local vira
@@ -767,13 +767,13 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
     '/^framework/{print "SRC_FRAMEWORK="$2} /^commit:/{print "SRC_COMMIT="$2} /^commit_date/{print "SRC_COMMIT_DATE="$2}')"
   bash "$SOURCE_ROOT/.claude/utils/adopt/write-stamp.sh" "$WORK" \
     --framework "${SRC_FRAMEWORK}" --commit "${SRC_COMMIT}" --commit-date "${SRC_COMMIT_DATE}" \
-    --members "$SOURCE_ROOT/docs/evolution/federation/members.yaml" --member-id "<id-no-members-se-registrado>"
+    --members "$CORE_ROOT/docs/evolution/federation/members.yaml" --member-id "<id-no-members-se-registrado>"
   # No UPDATE o helper PRESERVA adopted_from/mode/integration_branch/adopted_at (adopted_at NUNCA re-carimba),
   # atualiza source_commit/date e escreve updated_at; adopted_at perdido → members.yaml, ou omitido com AVISO.
   ```
 - **Auto-emitir o relatório NO ALVO — ANTES do commit durável, que o leva na branch dedicada** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
   (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`). Reusa o `diff --stat` já computado
-  acima. **O diff de hooks é a saída de** `bash "$SOURCE_ROOT/.claude/utils/adopt/merge-onion-hooks.sh" --diff "$SOURCE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json" "$WORK/.claude/settings.json"` (entrada inteira; rc≠0 = NÃO MEDIDO). **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
+  acima. **O diff de hooks é a saída de** `bash "$SOURCE_ROOT/.claude/utils/adopt/merge-onion-hooks.sh" --diff "$CORE_ROOT/.claude/sessions/adopt-<slug>/settings-before.json" "$WORK/.claude/settings.json"` (entrada inteira; rc≠0 = NÃO MEDIDO). **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
   `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-hard.sh" "$WORK"` (o merge muda o que o lint vê; rc=3 = escreva NÃO MEDIDO).
 - **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima,
   já commitado na branch dedicada); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o
@@ -785,7 +785,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   medido no dogfood da F1, cura na F2): recusa só por HARD pré-existente (compare `remeasure-hard.sh`
   na integração e no `$WORK`) admite `--no-verify` **declarado no corpo do PR** — calado, nunca. Em caso de conflito de merge (exit 10 acima), este passo roda **após** o maestro resolver e commitar o merge.
 - **Integrar por PR:** push de `$UPDATE_BR` e PR para `$INTEGRATION_BRANCH` com **merge commit** (nunca
-  rebase/squash: tira a `onion/vendor` da ancestralidade); com worktree irmã, `git -C "$TARGET" worktree remove "$WORK"` depois.
+  rebase/squash: tira a `onion/vendor` da ancestralidade); com worktree irmã, `git -C "$TARGET" worktree remove "$WORK"` depois; e a da fonte, se houver (`$UPDATE_SOURCE_WORKTREE`, no `$CORE_ROOT`). Fonte fora de `equal`: declare-a no relatório.
 - **Tie com a federação:** o `source_commit` do stamp **é** a versão de cada membro (member-version
   awareness — [multi-repo-federation.md](../../../docs/knowledge-base/concepts/multi-repo-federation.md)).
 

@@ -22170,10 +22170,172 @@ run_sweep_fixtures_selftests() {
   rm -rf "${d}"
 }
 
+# ── /meta:adopt --update: a FONTE resolvida por mecanismo (SAC-144, item 3, 2026-10-15) ─────────────
+# O --update usava sempre o HEAD do checkout, sem dizer nem deixar escolher; medido nos carimbos de 22
+# adotantes locais, 6 de 126 pins saíram de um HEAD fora da linha de main do core (3 nunca chegaram a
+# ela). Cada caso abaixo reprova sob o mutante citado nele (plantado pelo mutate-and-restore).
+run_adopt_update_source_selftests() {
+  local rs="${REPO_ROOT}/.claude/utils/adopt/resolve-update-source.sh"
+  local db="${REPO_ROOT}/.claude/utils/adopt/dedicated-branch.sh"
+  local vb="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh"
+  local md="${REPO_ROOT}/.claude/commands/meta/adopt.md"
+  if [ ! -f "${rs}" ]; then record_fail "adopt-update-source" "resolvedor ausente: ${rs}"; return; fi
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
+  local d; d="$(mktemp -d)"
+  local core="${d}/core" ta="${d}/alvo" door="${d}/porta" out rc tip
+  # core falso com remoto (bare) na integração main; alvo adotado e alvo PORTA só com o carimbo.
+  git init -q --bare -b main "${d}/origin.git"
+  mkdir -p "${core}/.claude/commands" "${core}/docs/meta-specs"; git -C "${core}" init -q -b main
+  printf 'spec v1\n' > "${core}/docs/meta-specs/spec.md"; printf 'cmd\n' > "${core}/.claude/commands/foo.md"
+  git -C "${core}" add -A; git -C "${core}" commit -qm v1
+  git -C "${core}" remote add origin "${d}/origin.git"; git -C "${core}" push -q origin main 2>/dev/null
+  tip="$(git -C "${core}" rev-parse HEAD)"
+  mkdir -p "${ta}/.claude" "${door}/.claude"
+  printf 'framework: f\nsource_commit: %s\nrole: adopted\n' "${tip:0:12}" > "${ta}/.claude/.onion-version"
+  # porta com role adopted: o core falso não tem o corte de papel do standalone, e o caso tem de chegar ao bloco da porta
+  printf 'framework: f\nsource_commit: %s\nrole: adopted\nkind: door\n' "${tip:0:12}" > "${door}/.claude/.onion-version"
+  _us() { if out="$(bash "${rs}" "$@" 2>&1)"; then rc=0; else rc=$?; fi; }
+  _kv() { sed -n "s/^$1=//p" <<< "${out}" | tail -1; }
+
+  # (s1) auto, HEAD na ponta e manifesto limpo ⇒ o próprio checkout, sem worktree.
+  _us "${core}" "${ta}"
+  if [ "${rc}" -eq 0 ] && [ "$(_kv UPDATE_SOURCE_ROOT)" = "${core}" ] && [ "$(_kv UPDATE_SOURCE_RELATION)" = equal ] && [ "$(_kv UPDATE_SOURCE_MODE)" = head ] && [ "$(_kv UPDATE_SOURCE_WORKTREE)" = "''" ]; then
+    record_pass "adopt-update-source: (s1) auto com HEAD na ponta de origin ⇒ fonte = o checkout, sem worktree"
+  else record_fail "adopt-update-source: (s1)" "rc=${rc} · ${out:0:200}"; fi
+
+  # (s2) auto com HEAD NÃO MERGEADO ⇒ rc=4 e próximo passo. MUTANTE: o ramo `unmerged)` do auto deixa de sair.
+  git -C "${core}" checkout -q -b feat/x; printf 'spec v2\n' > "${core}/docs/meta-specs/spec.md"; git -C "${core}" commit -qam v2
+  _us "${core}" "${ta}"
+  if [ "${rc}" -eq 4 ] && grep -q 'fora de origin/main' <<< "${out}" && grep -q -- '--source origin' <<< "${out}"; then
+    record_pass "adopt-update-source: (s2) auto com HEAD fora de origin/main ⇒ RECUSA (rc=4) com o próximo passo"
+  else record_fail "adopt-update-source: (s2)" "rc=${rc} — a fonte não mergeada passou calada: ${out:0:200}"; fi
+
+  # (s3) origin com HEAD não mergeado ⇒ worktree destacada NA PONTA, dentro do git-dir; a 2ª chamada reusa.
+  _us "${core}" "${ta}" --source origin
+  local wt; wt="$(_kv UPDATE_SOURCE_WORKTREE)"
+  local _i3=""
+  [ "${rc}" -eq 0 ] || _i3="${_i3} rc=${rc}"
+  [ -n "${wt}" ] && [ "$(git -C "${wt}" rev-parse HEAD 2>/dev/null)" = "${tip}" ] || _i3="${_i3} worktree-fora-da-ponta"
+  case "${wt}" in "$(git -C "${core}" rev-parse --path-format=absolute --git-common-dir)"/*) ;; *) _i3="${_i3} worktree-fora-do-git-dir" ;; esac
+  [ "$(_kv UPDATE_SOURCE_SHA)" = "${tip:0:12}" ] || _i3="${_i3} sha≠ponta"
+  [ "$(git -C "${core}" rev-parse --abbrev-ref HEAD)" = feat/x ] || _i3="${_i3} checkout-trocou"
+  _us "${core}" "${ta}" --source origin; [ "${rc}" -eq 0 ] && [ "$(_kv UPDATE_SOURCE_WORKTREE)" = "${wt}" ] || _i3="${_i3} retomada-rc=${rc}"
+  if [ -z "${_i3}" ]; then record_pass "adopt-update-source: (s3) --source origin ⇒ worktree destacada na ponta (git-dir), checkout intocado, retomada reusa"
+  else record_fail "adopt-update-source: (s3)" "${_i3} · ${out:0:200}"; fi
+  [ -n "${wt}" ] && git -C "${core}" worktree remove --force "${wt}" >/dev/null 2>&1
+
+  # (s4) PORTA: head fora da ponta ⇒ rc=4; origin ⇒ rc=0. MUTANTE: tirar o bloco da porta.
+  _us "${core}" "${door}" --source head; local _rd="${rc}" _od="${out}"
+  _us "${core}" "${door}" --source origin; wt="$(_kv UPDATE_SOURCE_WORKTREE)"
+  if [ "${_rd}" -eq 4 ] && grep -q 'PORTA' <<< "${_od}" && [ "${rc}" -eq 0 ]; then
+    record_pass "adopt-update-source: (s4) alvo PORTA aceita só a ponta de origin (head não mergeado ⇒ rc=4)"
+  else record_fail "adopt-update-source: (s4)" "head rc=${_rd} (esp. 4) · origin rc=${rc} (esp. 0) · ${_od:0:160}"; fi
+  [ -n "${wt}" ] && git -C "${core}" worktree remove --force "${wt}" >/dev/null 2>&1
+
+  # (s5) head escolhido e não mergeado ⇒ segue com AVISO (escolha declarada), relação unmerged.
+  _us "${core}" "${ta}" --source head
+  if [ "${rc}" -eq 0 ] && [ "$(_kv UPDATE_SOURCE_RELATION)" = unmerged ] && grep -q 'escolha explícita' <<< "${out}"; then
+    record_pass "adopt-update-source: (s5) --source head não mergeado num adotado ⇒ segue, com aviso e relação unmerged"
+  else record_fail "adopt-update-source: (s5)" "rc=${rc} · ${out:0:200}"; fi
+
+  # (s6) head com o manifesto SUJO ⇒ rc=4. MUTANTE: o `if [ -n "${_dirty}" ]` nunca dispara.
+  printf 'sujo\n' >> "${core}/.claude/commands/foo.md"
+  _us "${core}" "${ta}" --source head
+  if [ "${rc}" -eq 4 ] && grep -q 'SUJO' <<< "${out}"; then
+    record_pass "adopt-update-source: (s6) --source head com manifesto sujo ⇒ RECUSA (duas fontes num update)"
+  else record_fail "adopt-update-source: (s6)" "rc=${rc} — árvore suja virou fonte: ${out:0:200}"; fi
+  git -C "${core}" checkout -q -- .claude/commands/foo.md
+
+  # (s7) auto ATRÁS da ponta ⇒ rc=4; fetch quebrado com origin ⇒ rc=3 (NÃO MEDIDO).
+  git -C "${core}" checkout -q main; git -C "${core}" checkout -q -b mais; printf 'v3\n' > "${core}/docs/meta-specs/spec.md"
+  git -C "${core}" commit -qam v3; git -C "${core}" push -q origin mais:main 2>/dev/null; git -C "${core}" checkout -q main
+  _us "${core}" "${ta}"; local _rb="${rc}"
+  _us "${core}" "${door}" --source head; local _rdb="${rc}"
+  git -C "${core}" remote set-url origin "${d}/inexistente.git"
+  _us "${core}" "${ta}" --source origin; local _rf="${rc}"
+  _us "${core}" "${ta}"; local _rfa="${rc}"
+  git -C "${core}" remote set-url origin "${d}/origin.git"
+  if [ "${_rb}" -eq 4 ] && [ "${_rdb}" -eq 4 ] && [ "${_rf}" -eq 3 ] && [ "${_rfa}" -eq 3 ]; then
+    record_pass "adopt-update-source: (s7) ATRÁS da ponta ⇒ rc=4 (auto e porta); fetch quebrado ⇒ rc=3 com origin e com auto (NÃO MEDIDO)"
+  else record_fail "adopt-update-source: (s7)" "atrás auto rc=${_rb} · porta rc=${_rdb} (esp. 4) · fetch quebrado origin rc=${_rf} · auto rc=${_rfa} (esp. 3)"; fi
+
+  # (s11) origin no MESMO sha do HEAD, com o manifesto sujo ⇒ worktree limpa (a árvore suja não vira fonte);
+  #       e a retomada com a worktree SUJA ⇒ rc=2. MUTANTES: tirar o `ROOT=""` · tirar a conferência da retomada.
+  git -C "${core}" checkout -q mais; printf 'sujo\n' >> "${core}/.claude/commands/foo.md"
+  _us "${core}" "${ta}" --source origin; wt="$(_kv UPDATE_SOURCE_WORKTREE)"; local _r11="${rc}" _r11b=9
+  if [ -n "${wt}" ] && [ "${wt}" != "''" ] && [ -d "${wt}" ]; then
+    printf 'mexido\n' >> "${wt}/docs/meta-specs/spec.md"
+    _us "${core}" "${ta}" --source origin; _r11b="${rc}"
+    git -C "${core}" worktree remove --force "${wt}" >/dev/null 2>&1
+  fi
+  git -C "${core}" checkout -q -- .claude/commands/foo.md
+  if [ "${_r11}" -eq 0 ] && [ -n "${wt}" ] && [ "${wt}" != "''" ] && [ "${_r11b}" -eq 2 ]; then
+    record_pass "adopt-update-source: (s11) origin no sha do HEAD com árvore suja ⇒ worktree limpa; retomada com a worktree suja ⇒ rc=2"
+  else record_fail "adopt-update-source: (s11)" "rc=${_r11} worktree='${wt}' · retomada suja rc=${_r11b} (esp. 2)"; fi
+
+  # (s12) settings.json SUJO com head ⇒ rc=4: o merge de hooks lê o settings.json da fonte, fora do manifesto.
+  printf '{}\n' > "${core}/.claude/settings.json"; git -C "${core}" add .claude/settings.json; git -C "${core}" commit -qm settings
+  git -C "${core}" push -q origin mais:main 2>/dev/null
+  printf '{"hooks":"SUJO"}\n' > "${core}/.claude/settings.json"
+  _us "${core}" "${ta}" --source head; local _r12="${rc}"
+  git -C "${core}" checkout -q -- .claude/settings.json
+  # (s13) auto SEM remoto ⇒ rc=4 (não há ponta para provar a fonte); head explícito segue.
+  git -C "${core}" remote rename origin outro
+  _us "${core}" "${ta}"; local _r13="${rc}"; _us "${core}" "${ta}" --source head; local _r13h="${rc}"
+  git -C "${core}" remote rename outro origin
+  if [ "${_r12}" -eq 4 ] && [ "${_r13}" -eq 4 ] && [ "${_r13h}" -eq 0 ]; then
+    record_pass "adopt-update-source: (s12/s13) settings.json sujo ⇒ rc=4; auto sem remoto ⇒ rc=4, head explícito segue"
+  else record_fail "adopt-update-source: (s12/s13)" "settings sujo rc=${_r12} (esp. 4) · sem remoto auto rc=${_r13} (esp. 4) head rc=${_r13h} (esp. 0)"; fi
+  git -C "${core}" checkout -q main
+
+  # (s8) A PROSA DO adopt.md, EXECUTADA: o bloco do --update até o `SOURCE_ROOT=` resolvido, com o HEAD
+  #      atrás da ponta ⇒ o bloco PARA antes de NOW. MUTANTE: `eval "$(bash …)"` numa linha só (o rc some).
+  local blk; blk="$(awk '/^## Atualizar um repo adotado/{f=1} f==1 && /^```bash/{f=2; next} f==2 && /^```/{exit} f==2{print}' "${md}" \
+    | awk '{print} /SOURCE_ROOT="\$UPDATE_SOURCE_ROOT"/{exit}')"
+  if ! grep -q 'resolve-update-source.sh' <<< "${blk}" || ! grep -q 'SOURCE_ROOT="\$UPDATE_SOURCE_ROOT"' <<< "${blk}"; then
+    record_fail "adopt-update-source: (s8) setup" "não extraí do adopt.md o bloco do --update com o resolvedor"
+  else
+    { printf 'cd %q\n' "${core}"; printf '%s\n' "${blk}" | sed -E "s#^(CORE_ROOT=).*#\1$(printf %q "${core}"); TARGET=$(printf %q "${ta}"); UPDATE_SOURCE=auto#; s#\"\\\$CORE_ROOT/\\.claude/utils/adopt/#\"$(printf %q "${REPO_ROOT}")/.claude/utils/adopt/#"
+      printf 'echo "REACHED NOW=$NOW"\n'; } > "${d}/upd.sh"
+    local _o8 _r8=0; _o8="$(bash "${d}/upd.sh" 2>&1)" || _r8=$?
+    git -C "${core}" checkout -q mais 2>/dev/null
+    local _o9 _r9=0; _o9="$(bash "${d}/upd.sh" 2>&1)" || _r9=$?
+    if [ "${_r8}" -ne 0 ] && ! grep -q REACHED <<< "${_o8}" && [ "${_r9}" -eq 0 ] && grep -q "REACHED NOW=$(git -C "${core}" rev-parse --short=12 HEAD)" <<< "${_o9}"; then
+      record_pass "adopt-update-source: (s8) a prosa do --update, executada: fonte recusada PARA antes do pin; na ponta, NOW = o sha resolvido"
+    else record_fail "adopt-update-source: (s8)" "atrás rc=${_r8} (${_o8:0:120}) · ponta rc=${_r9} (${_o9:0:120})"; fi
+  fi
+
+  # (s9) vendor-branch: pin ≠ HEAD da fonte ⇒ rc=2 antes de tocar o alvo. MUTANTE: tirar a guarda do pin=HEAD.
+  local t9="${d}/t9"; mkdir -p "${t9}/.claude"; git -C "${t9}" init -q -b main
+  printf 'framework: f\nsource_commit: %s\nrole: adopted\n' "${tip:0:12}" > "${t9}/.claude/.onion-version"
+  git -C "${t9}" add -f -A; git -C "${t9}" commit -qm adopt
+  local _r9v=0 _o9v; _o9v="$(bash "${vb}" update "${t9}" "${core}" "${tip:0:12}" main 2>&1)" || _r9v=$?
+  if [ "${_r9v}" -eq 2 ] && grep -q 'não é o HEAD da fonte' <<< "${_o9v}" && ! git -C "${t9}" rev-parse -q --verify onion/vendor >/dev/null; then
+    record_pass "adopt-update-source: (s9) vendor-branch recusa pin ≠ HEAD da fonte (transportaria um commit e carimbaria outro)"
+  else record_fail "adopt-update-source: (s9)" "rc=${_r9v} (esp. 2) · ${_o9v:0:200}"; fi
+
+  # (s10) dedicated-branch --worktree SEM farol ⇒ worktree irmã; o checkout do alvo segue em main.
+  #       MUTANTE: o `case "${4:-}" in --worktree) FORCE_WT=1` deixa de ligar a flag.
+  local t10="${d}/t10"; mkdir -p "${t10}"; git -C "${t10}" init -q -b main; printf 'x\n' > "${t10}/a.txt"
+  git -C "${t10}" add -A; git -C "${t10}" commit -qm base
+  local _w10 _r10=0; _w10="$(bash "${db}" "${t10}" chore/onion-update-abc main --worktree 2>/dev/null)" || _r10=$?
+  local _r10b=0; bash "${db}" "${t10}" chore/onion-update-def main --bogus >/dev/null 2>&1 || _r10b=$?
+  if [ "${_r10}" -eq 0 ] && [ -n "${_w10}" ] && [ "${_w10}" != "$(cd "${t10}" && pwd -P)" ] \
+     && [ "$(git -C "${t10}" rev-parse --abbrev-ref HEAD)" = main ] && [ "${_r10b}" -eq 2 ]; then
+    record_pass "adopt-update-source: (s10) --worktree força a worktree irmã sem farol; argumento desconhecido ⇒ rc=2"
+  else record_fail "adopt-update-source: (s10)" "rc=${_r10} out=${_w10:0:120} HEAD(alvo)=$(git -C "${t10}" rev-parse --abbrev-ref HEAD) · bogus rc=${_r10b}"; fi
+  [ -n "${_w10}" ] && [ -d "${_w10}" ] && { git -C "${t10}" worktree remove --force "${_w10}" >/dev/null 2>&1 || true; }
+
+  unset -f _us _kv
+  rm -rf "${d}" "${d%/*}/t10-chore-onion-update-abc" 2>/dev/null || true
+}
+
 _family run_license_travels_selftests
 _family run_ssot_projections_selftests
 _family run_role_cut_selftests
 _family run_adopt_robust_selftests
+_family run_adopt_update_source_selftests
 _family run_adopter_gate_selftests
 _family run_sweep_fixtures_selftests
 _family run_seed_adoption_graph_selftests
