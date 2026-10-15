@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**507 itens abertos** em 107 grafo(s) com aberto (de 136 no escopo) · 108 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**510 itens abertos** em 107 grafo(s) com aberto (de 136 no escopo) · 108 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -130,11 +130,14 @@
 | 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
 | 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
 
-## a2a-configurator-2026-10 — 1 item(ns)
+## a2a-configurator-2026-10 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 66.0 | `Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL` | a2a-configurator-2026-10 | um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do |
+| 9.0 | `D_N2_SEPARAR_A_ESCRITA_DO_CHAT_DA_CONFIANCA_DO_A2A` | a2a-configurator-2026-10 | como separar o agente do /chat dos insumos de confiança do A2A no clone servido (JWKS, members.yaml, estado de jti, fila)? Mudan |
+| 4.8 | `C_A8_SO_A_PARTE_DETERMINISTICA_RODOU` | a2a-configurator-2026-10 | do A8 e do A8g, rodou em sandbox o caminho de produção (fila → aceite → doc do inbox → sessão headless): 0 canário vazad |
+| 2.8 | `Q_ESTADO_DE_JTI_SO_CRESCE` | a2a-configurator-2026-10 | o estado de jti precisa de poda? Gatilho: o arquivo de estado de um receptor passar de 1 MiB ou 10 mil linhas (hoje 220 bytes) |
 
 ## infra-vps-2026-10 — 7 item(ns)
 
