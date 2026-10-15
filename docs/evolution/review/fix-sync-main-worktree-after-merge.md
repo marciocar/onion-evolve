@@ -2,8 +2,7 @@
 branch: fix/sync-main-worktree-after-merge
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: 752d215d32e5d400b55afc8dc94e7feee23d55259bb46681cd7efc306e9333e7
-reviewed_code_sha256: a9e907bd761418b18d614ff91d8afac17d7aa5ae2b78dc374433eb1dde02dd77
+reviewed_diff_sha256: pendente
 findings_total: 2
 findings_real: 2
 tokens: 0
@@ -50,3 +49,10 @@ Depois do merge PROVADO, o `ops/pr-merge-verified.sh` chama o `ops/sync-main-wor
   hoje.
 - Uma sessão já aberta pode ter carregado o `settings.json` antes: a sincronização põe o arquivo novo em disco, e
   quando o harness o relê é com ele.
+
+## Rebase com conflito (re-revisão)
+
+O merge do #1133 (SAC-145) pôs a família `merge_hooks_prune` na mesma âncora do `lint-selftest.sh` que este PR usa. O
+auto-rebase do `merge-serial` recusou, como devia, porque era conflito de fonte. Resolvi à mão mantendo as DUAS
+famílias, uma depois da outra, e rodei as duas juntas: 9 casos verdes. O hash de código mudou pela resolução, e esta
+seção é a re-revisão.
