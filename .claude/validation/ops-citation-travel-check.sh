@@ -109,8 +109,8 @@ collect_violations() { # <repo_dir>
        ! -path '*/fixtures/*' -print0 2>/dev/null \
   | xargs -0 -r awk -v prefix="${repo}/" '
       function flush(   i) {
-        if (rel != "" && !(fmcore && fmclosed)) for (i = 1; i <= nc; i++) if (!(cand[i] in gtok)) print rel "|" cand[i]
-        nc = 0; split("", cand); split("", gtok); split("", vtok)
+        if (rel != "" && !(fmcore && fmclosed)) for (i = 1; i <= nc; i++) if (!(cand[i] in gtok) || (i in cmsg)) print rel "|" cand[i]
+        nc = 0; split("", cand); split("", cmsg); split("", gtok); split("", vtok)
       }
       # a variável que precede `/ops/` é de RAIZ? (lista fechada: na dúvida a guarda CALA)
       function rootvar(s) {
@@ -130,7 +130,7 @@ collect_violations() { # <repo_dir>
       }
       FNR == 1 { flush(); rel = FILENAME; if (index(rel, prefix) == 1) rel = substr(rel, length(prefix) + 1)
                  fm = 0; isfm = 0; fmclosed = 0; fmcore = 0; indesc = 0; inpaths = 0
-                 code = (FILENAME ~ /\.(sh|py|js|mjs|ts)$/) }
+                 code = (FILENAME ~ /\.(sh|py|js|mjs|ts)$/); srconly = 0 }
       { l = $0; sub(/\r$/, "", l); if (FNR == 1) sub(/^\357\273\277/, "", l) }
       FNR == 1 && l == "---" && FILENAME ~ /\.md$/ { fm = 1; isfm = 1; next }
       fm == 1  { if (l == "---") { fm = 0; fmclosed = 1; next }
@@ -141,6 +141,13 @@ collect_violations() { # <repo_dir>
       # (as linhas do frontmatter também são varridas: citação ali, num arquivo que não se declara, acusa;
       #  e frontmatter que nunca fecha não isenta nada — a isenção só vale com o `---` de fechamento)
       l ~ /\([Cc]ore[- ]only[),;[:space:]]/ { next }
+      # MENSAGEM DE GUARDA (SAC-149, 2026-10-15): o teste de presença NO ARQUIVO não isenta o ops/ que uma
+      # `violation "…"` IMPRIME — a mensagem chega ao adotante sem o teste que a protegia (a da REGRA 85
+      # mandava rodar ops/publish-door.sh num adotante comum). Isenta só a regra declarada `# aplica-se: source`:
+      # ela não roda fora do core, então a mensagem dela só é lida onde o ops/ existe.
+      code && l ~ /^# REGRA [0-9]+ / { srconly = 0 }
+      code && l ~ /^# aplica-se:[[:space:]]*source[[:space:]]*$/ { srconly = 1 }
+      code && l ~ /violation[[:space:]]+"/ && srconly { next }
       { n = tokens(l)
         # atribuição a variável: P="$R/ops/a.sh" → vtok[P]
         if (n > 0 && match(l, /^[[:space:]]*(local[[:space:]]+|export[[:space:]]+|readonly[[:space:]]+)?[A-Za-z_][A-Za-z0-9_]*=/)) {
@@ -159,7 +166,8 @@ collect_violations() { # <repo_dir>
         }
         for (t in lg) if (code) gtok[t] = 1
         n = tokens(l)
-        for (i = 1; i <= n; i++) if (!(toks[i] in lg)) cand[++nc] = toks[i]
+        msg = (code && l ~ /violation[[:space:]]+"/)
+        for (i = 1; i <= n; i++) if (!(toks[i] in lg)) { cand[++nc] = toks[i]; if (msg) cmsg[nc] = 1 }
       }
       END { flush() }' 2>/dev/null | LC_ALL=C sort
 }
@@ -168,7 +176,7 @@ collect_violations() { # <repo_dir>
 # SELFTEST (self-contido, à la kb-vendored-link-check.sh) — as polaridades
 # ---------------------------------------------------------------------------
 run_selftest() {
-  local tmp; tmp="$(mktemp -d)"; local fails=0 out total=17
+  local tmp; tmp="$(mktemp -d)"; local fails=0 out total=19
   mkdir -p "${tmp}/.claude/rules" "${tmp}/.claude/hooks" "${tmp}/.claude/validation/fixtures" \
            "${tmp}/.claude/commands/meta" "${tmp}/docs/sdaal" "${tmp}/ops" "${tmp}/docs/evolution/notas"
   local BL="${tmp}/.claude/validation/ops-citation-travel-baseline.txt"
@@ -291,6 +299,19 @@ run_selftest() {
   printf '[ -r "$R/ops/j.sh" ] && . "$R/ops/j.sh"\n' > "${tmp}/.claude/hooks/j.sh"
   _run
   if _has 'hooks/j.sh'; then echo "  ✗ (xvii) -r deveria calar"; fails=$((fails+1)); else echo "  ✅ (xvii) [ -r …ops/… ] cala"; fi
+
+  # (xviii) SAC-149: o ops/ que uma `violation "…"` IMPRIME acusa mesmo com teste de presença em OUTRA linha do
+  #         arquivo — a mensagem chega ao adotante sem o teste (a da REGRA 85 mandava rodar ops/publish-door.sh)
+  _reset
+  printf '[ -f "${R}/ops/publish-door.sh" ] && bash "${R}/ops/publish-door.sh"\nviolation "SOFT" "x" "rode bash ops/publish-door.sh --status"\n' > "${tmp}/.claude/hooks/m.sh"
+  _run
+  if _has 'hooks/m.sh'; then echo "  ✅ (xviii) mensagem de violation com ops/ acusa apesar do teste de presença no arquivo"; else echo "  ✗ (xviii) a mensagem impressa deveria acusar"; fails=$((fails+1)); fi
+
+  # (xix) ... mas na regra declarada `# aplica-se: source` cala: ela não roda fora do core
+  _reset
+  printf '# REGRA 85 — porta [SOFT]\n# aplica-se: source\ncheck_p() {\n  [ -f "${R}/ops/publish-door.sh" ] || return 0\n  violation "SOFT" "x" "rode bash ops/publish-door.sh --status"\n}\n' > "${tmp}/.claude/hooks/n.sh"
+  _run
+  if _has 'hooks/n.sh'; then echo "  ✗ (xix) regra source-only deveria calar"; fails=$((fails+1)); else echo "  ✅ (xix) mensagem de regra '# aplica-se: source' cala"; fi
 
   rm -rf "${tmp}"; echo "  selftest: $((total-fails))/${total} verdes"
   [ "${fails}" -eq 0 ] && return 0 || return 1

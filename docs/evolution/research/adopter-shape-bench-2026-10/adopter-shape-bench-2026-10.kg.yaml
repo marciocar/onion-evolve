@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 20 NÓS ═══
+# ═══ TETO: 24 NÓS ═══
 meta:
   id: adopter-shape-bench-2026-10
   schema_version: "1"
@@ -196,6 +196,76 @@ nodes:
     confidence: 0.5
     label: "NÃO MEDIDO: num projeto Go, um vendor/kg-ssot pode ativar o -mod=vendor e quebrar o build, e o go mod vendor pode apagá-lo. Sem go nesta máquina, a hipótese do refutador fica aberta."
 
+  - id: D_APLICABILIDADE_POR_PAPEL_DECLARADA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/validation/lint-artifacts.sh"
+    label: "PR 2: a regra sem objeto num papel DECLARA '# aplica-se:' no docstring; fora dele o lint não a roda e a conta como 'NÃO SE APLICA', fora de HARD e SOFT. As REGRAS 85 e 92 declaram source."
+    narrative: "O rules-registry.sh valida o vocabulário (typo calaria a regra em todo papel) e exige source na lista (regra que nunca roda no core fica sem a bancada), e projeta a seção 'Aplicabilidade por papel' no lint-rules.md. A 92 ficou source-only também no hub: o hub sem registro próprio saía 'não pôde julgar'; hub com members.yaml próprio perde a paridade de porta, teto nomeado. O recorte por mensagem antigo (_without_object_for_role) segue para o resto, rebaixando HARD a SOFT."
+
+  - id: D_REGRA_100_NAS_MENSAGENS
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    trace: ".claude/validation/ops-citation-travel-check.sh"
+    label: "PR 2: a REGRA 100 passa a julgar o ops/ que uma violation IMPRIME: o teste de presença em OUTRA linha do arquivo não a isenta mais, só a regra declarada '# aplica-se: source', que não roda fora do core."
+    narrative: "Estática no core (casos xviii e xix do --selftest da guarda, com mutantes) e dinâmica no adotante (caso f da adopter_shape, catraca vazia). O baseline só encolheu: as 3 citações das mensagens das 85 e 92 saíram por serem source-only, e as 2 da semente do KG ganharam o marcador (core-only)."
+
+  - id: D_PIN_COM_ESCRITOR_UNICO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    trace: ".claude/utils/kg/stamp-adoption-graph-pin.sh"
+    label: "PR 2: o pin do grafo de adoção tem o escritor do carimbo. O write-stamp.sh chama utils/kg/stamp-adoption-graph-pin.sh ao fim de todo carimbo de adoção, a semente nasce com x_pin, e a REGRA 108 cobra a paridade (HARD)."
+    narrative: "O helper mora em utils/kg, que viaja para todo papel com KG, e não em utils/adopt, que o standalone corta: senão a REGRA 108 diria 'não pôde julgar' no standalone, a classe que este PR cura. Pin ilegível (label editado pelo dono, sem x_pin) sai SOFT nomeado."
+
+  - id: E_PONTUAIS_DO_PR2_MEDIDOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-15"
+    verified_against: "sondas do veto do .env com JSON de PreToolUse, migrate-seed-graph.sh numa cópia do adotante, e leitura do door-role-parity-check.sh"
+    label: "Pontuais medidos (2026-10-15): semente v2 migrada (8 MUST → 0) e grafo próprio só avisado; os 2 falsos positivos do veto do .env reproduzidos e curados sem abrir a cópia do .env; o par standalone/adopted do registro é COMPATÍVEL pela doutrina."
+    narrative: "Veto do .env: o 1º posicional do grep é o PADRÃO, e o `.env` literal da linha ligava o modo estrito que julgava o padrão como glob; e um *.env do scratchpad da sessão só passa quando o CONTEÚDO não tem chave nem valor de cara de segredo, porque cp .env <scratch>/x.env é permitido. Registro: o door-role-parity-check.sh declara standalone no registro com adopted no carimbo como par correto (tier na rede versus relação com o framework), então nada mudou nele. O githook impresso 3 vezes com aspas escapadas NÃO reproduziu: o instalador e o verificador imprimem o bloco uma vez, e o adopt.md o captura uma vez."
+    provenance:
+      source: ".claude/hooks/pretooluse-env-guard.sh, .claude/utils/adopt/migrate-seed-graph.sh e .claude/validation/door-role-parity-check.sh"
+      locator: "casos (r) da env_exposure, (v2) e (v2b) da migrate_seed_graph; o cabeçalho ADOTANTE do door-role-parity-check.sh"
+      method: "medição: sondas executadas e as famílias da bancada"
+      locality: "repo"
+
+  - id: Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: "Aberto: de onde veio o bloco da prova do gate impresso 3 vezes e com aspas escapadas no update do adotante? Os scripts o imprimem uma vez. Gatilho: a próxima saída verbatim de um --update que o mostre."
+
+  - id: E_MUTANTES_PR2_MORDEM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "ops/mutate-and-restore.sh com LC_ALL=C, cada mutante seguido da família nomeada; os que vivem DENTRO da fixture com ONION_ADOPTER_FROM=WORKTREE"
+    label: "Onze mutantes do PR 2 mordem: aplicabilidade (c, g), três no veto do .env (r), semente v2 (v2), escritor do pin (i), REGRA 108 rebaixada (i2), ops/ na semente (h), registro sem source (ap), mensagem e source-only da REGRA 100 (xviii, xix)."
+    narrative: "O dogfood dos mutantes pegou três defeitos da própria família, curados no laço: (1) o SUT que roda DENTRO da fixture (o lint) vinha do índice, e o mutante, plantado no disco, não chegava lá: três mutantes passaram verdes até o materializador ganhar --from WORKTREE; (2) a chamada direta do helper do pin, posta para a REGRA 59, rodava DEPOIS do re-carimbo e mascarava o escritor; (3) o caso da REGRA 108 aceitava QUALQUER HARD, e o marcador do mutante no lint da fixture era um HARD: agora lê a lista das HARD pela linha da 108."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "famílias adopter_shape, env_exposure, migrate_seed_graph, rules_registry e ops_citation_travel"
+      method: "medição: mutantes plantados e restaurados com hash conferido"
+      locality: "repo"
+
 edges:
   - from: E_CONTRATO_VIAJA_SEM_LEITOR
     to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
@@ -239,3 +309,27 @@ edges:
   - from: C_TETO_GO_VENDOR_NAO_MEDIDO
     to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
     edge_type: CONSTRAINS
+  - from: D_APLICABILIDADE_POR_PAPEL_DECLARADA
+    to: Q_CURAS_DO_PR2
+    edge_type: SUPPORTS
+  - from: D_REGRA_100_NAS_MENSAGENS
+    to: Q_CURAS_DO_PR2
+    edge_type: SUPPORTS
+  - from: D_PIN_COM_ESCRITOR_UNICO
+    to: Q_CURAS_DO_PR2
+    edge_type: SUPPORTS
+  - from: E_PONTUAIS_DO_PR2_MEDIDOS
+    to: Q_CURAS_DO_PR2
+    edge_type: SUPPORTS
+  - from: E_R85_R92_SOFT_NAO_PODE_JULGAR
+    to: D_APLICABILIDADE_POR_PAPEL_DECLARADA
+    edge_type: SUPPORTS
+  - from: Q_GITHOOK_TRES_VEZES_NAO_REPRODUZIDO
+    to: E_PONTUAIS_DO_PR2_MEDIDOS
+    edge_type: DEPENDS_ON
+  - from: E_MUTANTES_PR2_MORDEM
+    to: D_APLICABILIDADE_POR_PAPEL_DECLARADA
+    edge_type: SUPPORTS
+  - from: E_MUTANTES_PR2_MORDEM
+    to: D_PIN_COM_ESCRITOR_UNICO
+    edge_type: SUPPORTS

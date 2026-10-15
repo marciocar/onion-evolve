@@ -184,6 +184,54 @@ INTERP = {'python', 'python3', 'node', 'ruby', 'perl', 'php', 'deno', 'bun'}
 DUMPERS = {'env', 'printenv'}
 VALUE_FLAGS = {'--exclude', '--exclude-dir', '--env-file', '-e', '--regexp', '-f'}   # o valor seguinte não é arquivo lido
 HELPER = 'env-check.sh'
+# SAC-149 (2026-10-15, medido no --update de um adotante): `grep -oE '\.claude/hooks/[A-Za-z0-9_.-]*' arq; test -f .env`
+# era vetado. O `.env` literal da linha liga o modo estrito, e o veto julgava o PADRÃO do grep como um glob que
+# alcança `.env` (`[A-Za-z0-9_.-]*` casa `.env` no fnmatch). O padrão não é arquivo: o grep o lê como regex.
+# Sem -e/-f (nem cluster curto que os contenha, que erra para o veto), o 1º posicional sai da lista de lidos.
+GREPS = {'grep', 'egrep', 'fgrep', 'zgrep', 'rg', 'ugrep'}
+
+def grep_pattern_index(args):
+    """índice do posicional que é o PADRÃO do grep, ou None se o padrão vem por -e/-f (ou não dá para saber)."""
+    for a in args[1:]:
+        if a == '--':
+            break
+        if a in ('-e', '-f', '--regexp', '--file') or a.startswith(('--regexp=', '--file=')):
+            return None
+        if a.startswith('-') and not a.startswith('--') and ('e' in a[1:] or 'f' in a[1:]):
+            return None
+    dd = False
+    for i, a in enumerate(args[1:], 1):
+        if not dd and a == '--':
+            dd = True; continue
+        if dd or not a.startswith('-'):
+            return i
+    return None
+
+# SAC-149: um `*.env` que a PRÓPRIA sessão escreveu no scratchpad dela (`/tmp/claude-<uid>/…/scratchpad/…`) foi
+# vetado ao ser lido — ali não mora o .env do projeto. Mas `cp .env <scratch>/x.env` é permitido (cópia entre
+# .env), então isentar pelo CAMINHO abriria a porta: a isenção exige o CONTEÚDO sem forma de segredo, lido aqui
+# pelo hook (nunca pelo modelo). Arquivo ilegível, grande ou com chave/valor de cara de segredo: veto, como antes.
+SCRATCH_RE = re.compile(r'^/tmp/claude-[0-9]+/.+/scratchpad/')
+SECRET_KEY = re.compile(r'(TOKEN|SECRET|PASS|PWD|KEY|CREDENTIAL|AUTH|PRIVATE|COOKIE|SESSION)', re.I)
+
+def scratch_env_without_secret(tok):
+    t = tok.strip().strip('"\'')
+    if not SCRATCH_RE.match(t) or '..' in t.split('/') or not os.path.isfile(t):
+        return False
+    try:
+        if os.path.getsize(t) > 65536:
+            return False
+        text = open(t, encoding='utf-8', errors='replace').read()
+    except OSError:
+        return False
+    for line in text.splitlines():
+        m = re.match(r'^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$', line)
+        if not m:
+            continue
+        val = m.group(2).strip().strip('"\'')
+        if SECRET_KEY.search(m.group(1)) or re.fullmatch(r'[A-Za-z0-9_+/=.-]{24,}', val):
+            return False
+    return True
 
 def strip_comments(cmd):
     """`#` que ABRE palavra fora de aspas comenta até o fim da linha (como no bash)."""
@@ -360,7 +408,11 @@ def judge(cmd, depth=0):
                  if not (args[i - 1] in VALUE_FLAGS) and not re.match(r'^--(exclude|exclude-dir|env-file)=', a)]
         inc = [a.split('=', 1)[1] for a in args if a.startswith('--include=')] + \
               [args[i + 1] for i, a in enumerate(args[:-1]) if a == '--include']
-        envs = [a for a in files if is_env_token(a)] + [g for g in inc if is_env_token(g)]
+        if name in GREPS:
+            _pi = grep_pattern_index(args)
+            if _pi is not None:
+                files = [a for a in files if a is not args[_pi]]
+        envs = [a for a in files if is_env_token(a) and not scratch_env_without_secret(a)] + [g for g in inc if is_env_token(g)]
         if name in SHELLS and len(args) > 1:
             if args[1] == '-c' and len(args) > 2:
                 r = judge(args[2], depth + 1)
@@ -414,7 +466,7 @@ tool = d.get('tool_name') or ''
 ti = d.get('tool_input') or {}
 reason = None
 if tool == 'Read':
-    if is_env_token(str(ti.get('file_path') or '')):
+    if is_env_token(str(ti.get('file_path') or '')) and not scratch_env_without_secret(str(ti.get('file_path') or '')):
         reason = 'Read de um arquivo .env'
 elif tool == 'Grep':
     if is_env_token(str(ti.get('path') or '')) or (ti.get('glob') and is_env_token(str(ti.get('glob')))):

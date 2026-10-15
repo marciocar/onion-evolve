@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**99 regras** no total — **87 HARD**, **39 SOFT**.
+**100 regras** no total — **88 HARD**, **40 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -120,6 +120,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 90 | Prosa de comando conhece os papéis que o script aceita | SOFT | o par script×prosa dos comandos de co-evolução desencontrar — e ele JÁ desencontrou duas |
 | 92 | Papel da porta no registro concorda com o CARIMBO dela | HARD + SOFT | o materializador ler o papel ERRADO e cortar maquinaria da porta pública |
 | 96 | Diretiva de contexto INJETADO não corta listagem em silêncio | HARD | a projeção que o harness injeta é lida pela sessão COMO SE FOSSE o conjunto — não há |
+| 108 | Pin do grafo de adoção concorda com o carimbo | HARD + SOFT | o grafo que o warm-up manda ler PRIMEIRO mentir sobre a versão do Onion instalada |
 
 ## KG & proveniência
 
@@ -208,3 +209,14 @@ As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a 
 | 86 | Workflow de CI PARSEIA como YAML | HARD | workflow inexecutável passando por existente, e guarda morta por sintaxe |
 | 88 | Job de workflow que EXECUTA arquivo do repo faz checkout | HARD + SOFT | job sem `actions/checkout` invocando script versionado; o bash sai 127 e o `rc != 0` |
 | 101 | Veto PreToolUse por exit 2 declara onFailure: block | HARD + SOFT | veto que falha ABERTO quando o hook nem roda (script ausente sai 127 e a ação passa). |
+
+## Aplicabilidade por papel
+
+Regras cujo objeto só existe em alguns papéis, declaradas por `# aplica-se:` no docstring. Fora desses
+papéis o lint **não as roda** e as conta à parte (`Não se aplica`), fora de HARD e SOFT: ausência
+legítima de objeto não é aviso. Toda lista contém `source`, então no core todas rodam.
+
+| Nº | Regra | Aplica-se a |
+|---:|-------|-------------|
+| 85 | Porta pública espelha o core, com catraca | source |
+| 92 | Papel da porta no registro concorda com o CARIMBO dela | source |

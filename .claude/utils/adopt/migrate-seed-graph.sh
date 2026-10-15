@@ -59,8 +59,11 @@ if git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1; then
   _cand=""
   while IFS= read -r _g; do
     [ -n "${_g}" ] && [ -f "${DEST}/${_g}" ] && LC_ALL=C grep -qE '^---[[:space:]]*$' "${DEST}/${_g}" && { _cand=1; break; }
+    # semente v2 (SAC-149): documento ÚNICO, mas com o cabeçalho do semeador antigo no TOPO (`graph:` na 1ª linha)
+    [ "${_g}" = docs/onion/graph/onion-adoption.kg.yaml ] && [ -f "${DEST}/${_g}" ] \
+      && [ "$(head -1 "${DEST}/${_g}")" = "graph: onion-adoption" ] && { _cand=1; break; }
   done <<< "${LIST}"
-  [ -n "${_KFP}" ] && [ -z "${_cand}" ] && { echo "  ⊘ migrate-seed-graph: nada a migrar (nenhum grafo com separador de documento)"; exit 0; }
+  [ -n "${_KFP}" ] && [ -z "${_cand}" ] && { echo "  ⊘ migrate-seed-graph: nada a migrar (nenhum grafo com separador de documento nem semente com cabeçalho no topo)"; exit 0; }
 fi
 [ -n "${RADAR}" ] || { echo "migrate-seed-graph: kg-radar.sh ausente no alvo e na fonte — NAO MEDIDO" >&2; exit 2; }
 [ -n "${_KFP}" ] || { echo "migrate-seed-graph: kg-fixture-paths.sh ausente — NAO MEDIDO" >&2; exit 2; }
@@ -151,12 +154,28 @@ def convert(text):
     """devolve (novo_texto, motivo_da_recusa). Recusa = forma que o semeador antigo não escrevia."""
     lines = text.split("\n")
     seps = [i for i, l in enumerate(lines) if SEP.match(l)]
+    if not seps and lines[:1] == ["graph: onion-adoption"]:
+        # FORMA v2 (SAC-149, 2026-10-15, medida no --update de um adotante): o semeador de dbcf21b1 até o
+        # contrato v3 escrevia UM documento, com o mesmo cabeçalho de 8 chaves no TOPO. O contrato v3 reprova
+        # cada chave com form.unknown-key.top.* (8 MUST no adotante). O cabeçalho vai até a 1ª linha de topo
+        # que não é chave dele (o comentário do selo ou o `meta:`); o resto da conversão é a mesma da v1.
+        k = 0
+        while k < len(lines) and (re.match(r"^([a-z_]+):", lines[k]) and lines[k].split(":", 1)[0] in HEADER_KEYS
+                                  or lines[k].startswith("  ") or not lines[k].strip()):
+            k += 1
+        header, body = lines[:k], lines[k:]
+        while header and not header[-1].strip():
+            body.insert(0, header.pop())
+        return _convert_parts(header, body, "v2")
     if len(lines) < 3 or seps[:1] != [0] or lines[1] != "graph: onion-adoption":
         return None, "não começa com `---` + `graph: onion-adoption` (marcador do semeador antigo)"
     if len(seps) != 2:
         return None, f"{len(seps)} separadores `---` (o semeador antigo escrevia exatamente 2)"
     k = seps[1]
     header, body = lines[1:k], lines[k + 1:]
+    return _convert_parts(header, body, "v1")
+
+def _convert_parts(header, body, form):
     # o cabeçalho: só chaves de topo do semeador, cada uma com as suas linhas de continuação
     blocks, cur = {}, None
     for l in header:
@@ -203,8 +222,8 @@ def convert(text):
         if i == meta_i:
             new_body.extend(moved)
     new_body = add_provenance(new_body)
-    out = ["# Adoção do Onion neste repositório — a semente do KG, migrada para DOCUMENTO ÚNICO pelo",
-           "# /meta:adopt --update (migrate-seed-graph.sh): o cabeçalho do layout antigo de dois documentos",
+    out = ["# Adoção do Onion neste repositório — a semente do KG, migrada" + (" para DOCUMENTO ÚNICO" if form == "v1" else " para o contrato") + " pelo",
+           "# /meta:adopt --update (migrate-seed-graph.sh): o cabeçalho do layout antigo" + (" de dois documentos" if form == "v1" else " (chaves no topo)"),
            "# foi para meta (graph/title/layer/created/updated/owner → x_*, como_usar → note), as datas ganharam",
            "# aspas e os nós do semeador ganharam a provenance que o semeador atual declara; nenhum dado existente mudou."]
     return "\n".join(out + new_body), None
@@ -241,7 +260,12 @@ def prove(old, new, path_rel):
     """as quatro provas; devolve (ok, motivo, should_codes)."""
     if ndocs(new) != 1:
         return False, "o resultado não é um documento único", []
-    d1, d2 = [norm(d) for d in yaml.safe_load_all(old)]
+    _docs = [norm(d) for d in yaml.safe_load_all(old)]
+    if len(_docs) == 1:                      # v2: o cabeçalho mora no topo do mesmo documento
+        d1 = {h: _docs[0][h] for h in HEADER_KEYS if h in _docs[0]}
+        d2 = {k: v for k, v in _docs[0].items() if k not in HEADER_KEYS}
+    else:
+        d1, d2 = _docs
     n = norm(yaml.safe_load(new))
     expect_meta = dict(d2.get("meta") or {})
     for h in HEADER_KEYS:
@@ -283,7 +307,11 @@ for rel in (l.strip() for l in os.environ.get("MIGRATE_LIST", "").splitlines()):
         continue
     text = open(p, encoding="utf-8").read()
     nd = ndocs(text)
-    if nd <= 1:
+    v2 = nd == 1 and text.split("\n", 1)[0] == "graph: onion-adoption"
+    if nd == 1 and not v2 and re.match(r"^graph:[ \t]", text):
+        warns.append(f"{rel}: documento único com cabeçalho no TOPO (graph/title/…), que o contrato reprova, mas NÃO é a semente do Onion — intocado (o dono decide; o mesmo cabeçalho vai para meta como x_*)")
+        continue
+    if nd <= 1 and not v2:
         continue                     # documento único (ou YAML quebrado: é da REGRA 78, não daqui)
     if rel != SEED:
         warns.append(f"{rel}: {nd} documentos YAML, mas NÃO é a semente do Onion — intocado (o dono decide; o contrato o reprova com parse.not-single-document)")
@@ -301,8 +329,8 @@ for rel in (l.strip() for l in os.environ.get("MIGRATE_LIST", "").splitlines()):
         open(tmp, "w", encoding="utf-8").write(new)
         os.replace(tmp, p)
     migrated.append(rel)
-    print(f"  ✓ {'(dry-run) ' if dry else ''}migrado para documento único: {rel}"
-          + (f" — dívida que o 2º documento escondia (SHOULD, não MUST): {', '.join(should)}" if should else ""))
+    print(f"  ✓ {'(dry-run) ' if dry else ''}{'cabeçalho do topo movido para meta' if v2 else 'migrado para documento único'}: {rel}"
+          + (f" — dívida {'SHOULD herdada' if v2 else 'que o 2º documento escondia'} (SHOULD, não MUST): {', '.join(should)}" if should else ""))
 
 for w in warns:
     print(f"  ⚠ migrate-seed-graph: {w}")

@@ -27,7 +27,8 @@
 #   · a existência das raízes do manifesto é lida do HEAD (vendor-manifest.sh), e o conteúdo do --from:
 #     uma raiz NOVA só no índice não entra até ser commitada.
 #
-# Uso : ops/materialize-adopter.sh <DEST> [--role adopted|hub|standalone] [--from INDEX|<ref>] [--with-gate]
+# Uso : ops/materialize-adopter.sh <DEST> [--role adopted|hub|standalone] [--from INDEX|WORKTREE|<ref>] [--with-gate]
+#         --from WORKTREE = os rastreados como estão no DISCO (para rodar mutante sobre SUT que roda na fixture)
 #         --from INDEX (default) = a árvore do ÍNDICE (o que o pre-commit vai commitar), pelo mesmo motivo
 #         do `_archive_staged` da bancada: fixture do HEAD testa o já commitado e esconde o staged.
 # Saída: rc 0 montado (última linha `materialize-adopter: OK <DEST> pin=<sha12> arquivos=<n>`) ·
@@ -62,7 +63,16 @@ _host="$(git -C "$(dirname "${DEST}")" rev-parse --show-toplevel 2>/dev/null || 
 [ -z "${_host}" ] || _die destino "${DEST} está DENTRO do repo ${_host}; monte a fixture fora dele"
 
 # (1) a árvore-fonte
-if [ "${FROM}" = INDEX ]; then
+if [ "${FROM}" = WORKTREE ]; then
+  # A ÁRVORE DE TRABALHO (os rastreados, com as edições não stajadas), num índice TEMPORÁRIO — o do repo não é
+  # tocado. Existe para o MUTANTE (PR 2 da SAC-149, 2026-10-15): o ops/mutate-and-restore.sh muda o arquivo no
+  # disco, e um SUT que roda DENTRO da fixture (o lint, por exemplo) vinha do índice, sem o mutante — o caso
+  # passava verde com a cura revertida, e parecia que o mutante não mordia.
+  _ti="$(mktemp)"; cp "$(git -C "${REPO_ROOT}" rev-parse --git-path index)" "${_ti}" 2>/dev/null || : > "${_ti}"
+  GIT_INDEX_FILE="${_ti}" git -C "${REPO_ROOT}" add -u >/dev/null 2>&1 || _die fonte "não consegui montar o índice temporário da árvore de trabalho"
+  TREE="$(GIT_INDEX_FILE="${_ti}" git -C "${REPO_ROOT}" write-tree 2>/dev/null || true)"; rm -f "${_ti}"
+  [ -n "${TREE}" ] || _die fonte "write-tree do índice temporário falhou"
+elif [ "${FROM}" = INDEX ]; then
   TREE=""
   for _t in 1 2 3 4 5; do TREE="$(git -C "${REPO_ROOT}" write-tree 2>/dev/null || true)"; [ -n "${TREE}" ] && break; sleep 0.2; done
   [ -n "${TREE}" ] || _die fonte "git write-tree não respondeu (disputa de .git/index.lock ou índice ilegível) — não caio para HEAD calado"

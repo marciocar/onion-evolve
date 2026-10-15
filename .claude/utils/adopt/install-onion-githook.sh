@@ -121,7 +121,7 @@ fi
 # bloquear ainda (o próprio template do hook degrada gracioso nesse caso); (ii) repo sem
 # nenhum commit (greenfield recém-iniciado) — não há HEAD de onde partir o commit-sonda.
 if [ ! -f "${DEST}/.claude/validation/lint-artifacts.sh" ]; then
-  echo "Onion: alvo ainda sem lint — gate instalado, prova ADIADA (rode ops/verify-adopter-gate.sh após instalar o framework)." >&2
+  echo "Onion: alvo ainda sem lint — gate instalado, prova ADIADA (depois de instalar o framework, rode no core o ops/verify-adopter-gate.sh (core-only) contra este repo)." >&2
   exit 0
 fi
 if ! git -C "${DEST}" rev-parse HEAD >/dev/null 2>&1; then

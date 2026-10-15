@@ -1,7 +1,7 @@
 # Baseline de citações de ops/<arquivo> em superfície que VIAJA — PASSIVO TOLERADO (REGRA 100).
 # Gerado por: bash .claude/validation/ops-citation-travel-check.sh --emit-baseline > .claude/validation/ops-citation-travel-baseline.txt
 # formato: <rel>|<ops/token>|<ocorrências>. SÓ PODE ENCOLHER: reescreva para o que o destinatário tem, ou marque (core-only), e remova a linha.
-# scope: .claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal plugins
+# scope: .claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal vendor/kg-ssot plugins
 .claude/commands/common/prompts/publish-doctrine.md|ops/materialize-door.sh|1
 .claude/commands/common/prompts/publish-doctrine.md|ops/publish-door.sh|1
 .claude/commands/meta/adopt.md|ops/audit-adopters-registry.sh|1
@@ -11,7 +11,6 @@
 .claude/rules/publish-lens.md|ops/mutate-and-restore.sh|1
 .claude/skills/onion-publish/SKILL.md|ops/publish-door.sh|6
 .claude/utils/adopt/check-member-registered.sh|ops/audit-adopters-registry.sh|1
-.claude/utils/adopt/seed-adoption-graph.sh|ops/verify-adopter-gate.sh|2
 .claude/utils/adopt/vendor-manifest.sh|ops/publish-door.sh|1
 .claude/utils/adopt/write-stamp.sh|ops/materialize-door.sh|1
 .claude/utils/marketplace/roles.yaml|ops/door-templates/mini|4
@@ -21,9 +20,9 @@
 .claude/validation/evolve-staleness-check.sh|ops/materialize-door.sh|1
 .claude/validation/identifier-language-check.sh|ops/pr-merge-verified.sh|1
 .claude/validation/lint-artifacts.sh|ops/deploy-site.sh|3
-.claude/validation/lint-artifacts.sh|ops/materialize-door.sh|2
+.claude/validation/lint-artifacts.sh|ops/materialize-door.sh|1
 .claude/validation/lint-artifacts.sh|ops/mutate-and-restore.sh|1
-.claude/validation/lint-artifacts.sh|ops/publish-door.sh|4
+.claude/validation/lint-artifacts.sh|ops/publish-door.sh|1
 .claude/validation/members-validate.sh|ops/registry-pins.sh|1
 .claude/validation/mutant-leftover-check.sh|ops/mutate-and-restore.sh|2
 .claude/validation/onion-regen-lib.sh|ops/pr-finalize.sh|1
