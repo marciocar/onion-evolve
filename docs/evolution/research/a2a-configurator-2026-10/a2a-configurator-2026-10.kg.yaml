@@ -7,7 +7,7 @@ meta:
   baseline: "2026-10-14"
   review_after: "2026-11-13"   # 30d: cadência de ferramenta
   # ═══ TETO: 30 NÓS ═══
-  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão).
+  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +3 a F1b (o selo da F1 com o dogfood, o passo manual restante e 1 decisão da sessão).
   x_linear_epic: "SAC-120"
 nodes:
   - id: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -301,6 +301,48 @@ nodes:
     verified_against: "decidido pela sessão da F1 em 2026-10-15 sob a autorização do maestro para decidir sem ele (opção recomendada); medido: jwks/metagamify-1.pem e jwks/granaai-1.pem têm 2048 bits, e o gate a2a-verify.sh não confere tamanho"
     label: "o validador do registro aceita pública RSA a partir de 2048 bits, e o keygen gera 3072: subir o piso do registro para 3072 reprovaria hoje os dois pinos vivos de 2048"
     narrative: "Decisão da sessão, aberta para o maestro ratificar ou trocar. Alternativa descartada: piso 3072 no registro já, que exigiria rotacionar metagamify-1 e granaai-1 antes do merge (rotação está parada por ordem do maestro). Gatilho para subir o piso: a rotação dos dois pinos de 2048."
+  - id: E_F1_ENTREGUE_COM_DOGFOOD
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 pela sessão da F1 (SAC-122): F1a mergeada no PR #1137 (181a7708); na F1b, o /meta:federation-a2a rodou as diretivas de injeção e as trilhas 1 e 4 contra o registro vivo (só leitura: metagamify, granaai e maestro-notebook-test saem rc 0 sem conferir impressão, pulse-mais sai rc 1 por não ter kid); os 6 estados quebrados do S3 saem rc 1 com causa e próximo passo; e o ponta a ponta em sandbox (dois HOMEs, bridge local de teste com o gate real) levou registro, pacote, keygen, pino com impressão conferida, envio 200, aceite, bearer errado 401 e revogação em 6 s"
+    label: "a F1 do configurador A2A está entregue: comando com trilhas 1 a 6, motores, doctor dos dois lados, bloco a2a validado no gate e corte por papel medido (só fonte e hub levam o comando e os motores)"
+    narrative: "O dogfood não usou duas contas de sistema (criá-las mexeria na VPS) nem o bridge vivo (MOAT): o S6 de verdade segue aberto. A Skill do harness não carregou o comando novo (ele nasceu depois da carga da sessão), então o procedimento foi executado como o harness o executaria: as diretivas injetadas, literalmente, e os blocos das trilhas."
+    provenance:
+      source: ".claude/commands/meta/federation-a2a.md e .claude/utils/federation-transport/a2a-doctor.sh"
+      locator: "trilhas 1 a 6; resíduo da REGRA 56 da branch feat/a2a-configurator-f1b"
+      method: "medição: execução do comando e dos motores pela sessão"
+      locality: "repo"
+  - id: C_PASSO_MANUAL_RESTANTE_E_DO_BRIDGE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 no dogfood da F1: no par core↔membro, o que o operador ainda faz fora do wizard é pôr o bearer no pool do bridge com restart e listar a fila na conta do serviço; os dois moram no bridge e no deploy dele, fora do core"
+    label: "depois da F1, os passos manuais que sobram no par core↔membro são do bridge: o bearer no pool com restart (a F2 cura com o convite por membro) e a listagem da fila na conta do serviço"
+    provenance:
+      source: ".claude/commands/meta/federation-a2a.md"
+      locator: "trilha 2, passo 3, e trilha 5"
+      method: "medição: dogfood da F1"
+      locality: "repo"
+  - id: D_PACOTE_DE_ENTRADA_LEVA_OS_MOTORES
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-15"
+    verified_against: "decidido pela sessão da F1 em 2026-10-15 sob a autorização do maestro para decidir sem ele (opção recomendada), a partir de C_MEMBRO_STANDALONE_NAO_RECEBE_OS_MOTORES; dogfood: o membro gerou o par, gravou o token e rodou o doctor só com o pacote"
+    label: "a trilha 2 entrega ao membro um pacote com os três motores e um a2a.conf sem segredo, em vez de fazer o transporte levar federation-transport ao adotado standalone"
+    narrative: "Decisão da sessão, aberta para o maestro ratificar ou trocar. Alternativa descartada: mudar o corte por papel para o adotado standalone levar os motores, que abriria a federação cross-repo onde a matriz das portas a tirou. Gatilho para rever: o primeiro membro adotado pedir os motores pelo /meta:adopt --update em vez do pacote."
 edges:
   - from: E_ONZE_PASSOS_MANUAIS_HOJE
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -369,5 +411,17 @@ edges:
     to: E_F1A_MOTORES_E_BANCADA
     edge_type: SUPPORTS
   - from: D_PISO_2048_NO_REGISTRO_3072_NO_KEYGEN
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: TRACES_TO
+  - from: E_F1_ENTREGUE_COM_DOGFOOD
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: SUPPORTS
+  - from: C_PASSO_MANUAL_RESTANTE_E_DO_BRIDGE
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: CONSTRAINS
+  - from: C_MEMBRO_STANDALONE_NAO_RECEBE_OS_MOTORES
+    to: D_PACOTE_DE_ENTRADA_LEVA_OS_MOTORES
+    edge_type: SUPPORTS
+  - from: D_PACOTE_DE_ENTRADA_LEVA_OS_MOTORES
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
     edge_type: TRACES_TO
