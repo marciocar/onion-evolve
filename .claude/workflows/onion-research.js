@@ -167,6 +167,10 @@ const ANCHOR_CRITERIA = criteriaFrom(RC.anchor, [
   { id: 'A2_CLAIM_ESTICA', when: 'o claim diz mais do que o trecho', check: 'citar o trecho do documento e a palavra do claim que ele não sustenta' }])
 // a reprovação que nasce JÁ COM SUPERAÇÃO vira nó: prefixo datado para o motor contar SÓ os desta rodada
 const SUP_PREFIX = 'C_SUPERACAO_' + TODAY.replace(/-/g, '') + '_'
+// objeção RECUSADA não some (some = o alvo fica liberado, fail-OPEN — achado do refutador, 2026-10-15): segue na
+// lista, marcada `naoJulgada`, e o escritor a modela como restrição fraca, nunca como liberação do alvo.
+const keepRecused = g => [...g.kept, ...g.recused.map(r => ({ ...r.verdict, naoJulgada: true, recusa: r.why }))]
+const RECUSA_NOTE = '\n- Objeção com `naoJulgada: true` foi RECUSADA pelo motor (sem critério pré-registrado ou sem superação): modele-a como `E_OBJECAO_…` com status open, confidence ≤ 0.3, o motivo da recusa (`recusa`) no narrative e aresta CONSTRAINS para o alvo — o alvo fica NÃO-JULGADO, nunca liberado por ela ter sido recusada.'
 const SUP_NODES = '\n\n## SUPERAÇÕES (SAC-151 — reprovação que achou o que supera vira NÓ, não comentário)\n' +
   'Para CADA superação listada como achada abaixo, escreva 1 nó `claim` com id `' + SUP_PREFIX + '<SLUG>` (plane DEV, status open, impact 3, confidence ≤ 0.6 — afirmação de UM juiz —, label = o `o_que` em pt-BR, narrative = a `medida` + o critério citado + o alvo reprovado, `trace` = o comando do critério) e 1 aresta `TRACES_TO` dele para o nó que REGISTRA a reprovação (o `E_OBJECAO_…`, o `E_LACUNAS_…` ou o `D_…`). O motor CONTA esses nós pelo prefixo e reprova o grafo que tiver menos que as achadas.'
 
@@ -229,18 +233,29 @@ const KG_SCHEMA_DECISION = { ...KG_SCHEMA, required: [...KG_SCHEMA.required, 'de
 // O script não tem shell: o verificador é o braço executor do motor, e o veredito que vale é o dele.
 const MAX_WRITE_ATTEMPTS = 3
 const VERIFY_SCHEMA = { type: 'object', required: ['radarExit', 'contractExit', 'output'], properties: {
-  radarExit: { type: 'integer' }, contractExit: { type: 'integer' }, output: { type: 'string' }, overcomingNodes: { type: 'integer' } } }
+  radarExit: { type: 'integer' }, contractExit: { type: 'integer' }, output: { type: 'string' }, overcomingNodes: { type: 'integer' }, overcomingEdges: { type: 'integer' } } }
+// conta nós do prefixo e arestas TRACES_TO que saem deles — o MESMO comando antes (baseline) e depois do write:
+// um grafo que APENDA (primárias, revisita, re-rodada no mesmo dia) não se satisfaz com nós de rodada anterior
+const supCountCmds = (absPath, prefix, n) => n + '. grep -c \'^[[:space:]]*- id: ' + prefix + '\' "' + absPath + '" — devolva overcomingNodes = o NÚMERO impresso (0 se nenhum ou arquivo ausente).\n' +
+  (n + 1) + '. awk -v p=\'' + prefix + '\' \'/^[[:space:]]*- from:/{f=index($0,p)>0} /^[[:space:]]*edge_type:[[:space:]]*TRACES_TO/{if(f)c++; f=0} END{print c+0}\' "' + absPath + '" — devolve overcomingEdges = o NÚMERO impresso (0 se arquivo ausente).\n'
+async function supBaseline(path, sup) {
+  if (!sup || !(sup.need > 0)) return sup
+  const r = await agent('## Contador do motor — NÃO escreva nada. A partir da raiz do repositório rode e copie os números:\n' + supCountCmds(path, sup.prefix, 1) + 'Somente saída estruturada.',
+    { label: 'count-sup', phase: 'write(KG)', schema: { type: 'object', required: ['overcomingNodes', 'overcomingEdges'], properties: { overcomingNodes: { type: 'integer' }, overcomingEdges: { type: 'integer' } } }, model: 'sonnet', effort: 'low' })
+  return { ...sup, baseNodes: r ? Number(r.overcomingNodes || 0) : 0, baseEdges: r ? Number(r.overcomingEdges || 0) : 0, baseMeasured: !!r }
+}
 // SAC-151: com `need` > 0 o verificador também CONTA os nós de superação desta rodada pelo prefixo datado
 const engineVerify = (absPath, attempt, sup) => agent(
   '## Verificador do motor — você NÃO escreveu este grafo e NÃO o edita (nem Write nem Edit).\n' +
   'A partir da raiz do repositório, rode EXATAMENTE os dois comandos e copie o RC que cada um imprimir:\n' +
   '1. bash .claude/validation/kg-radar.sh "' + absPath + '" --integrity --schema; echo "RC=$?"\n' +
   '2. bash .claude/validation/kg-contract-check.sh "' + absPath + '"; echo "RC=$?"\n' +
-  (sup && sup.need > 0 ? '3. grep -c \'^[[:space:]]*- id: ' + sup.prefix + '\' "' + absPath + '" — devolva overcomingNodes = o NÚMERO impresso (0 se nenhum).\n' : '') +
+  (sup && sup.need > 0 ? supCountCmds(absPath, sup.prefix, 3) : '') +
   'Devolva radarExit e contractExit = os RC LITERAIS impressos (arquivo ausente ou comando que não rodou = 99), e output = as linhas de erro das falhas (até 60 linhas; vazio se os dois deram 0). Não conserte, não interprete.',
   { label: 'verify-kg-' + attempt, phase: 'write(KG)', schema: VERIFY_SCHEMA, model: 'sonnet', effort: 'low' })
 const engineOk = (v, sup) => !!v && v.radarExit === 0 && v.contractExit !== 1   // contrato rc 2 = não vendorizado aqui (declarado)
-  && (!sup || !(sup.need > 0) || Number(v.overcomingNodes || 0) >= sup.need)   // SAC-151: superação achada que não virou nó reprova
+  && (!sup || !(sup.need > 0) || (Number(v.overcomingNodes || 0) >= Number(sup.baseNodes || 0) + sup.need
+    && Number(v.overcomingEdges || 0) >= Number(sup.baseEdges || 0) + sup.need))   // SAC-151: superação achada sem nó+aresta NOVOS reprova
 async function writeAndVerify(firstPrompt, opts) {
   const attempts = []
   let res = null, ver = null
@@ -248,7 +263,7 @@ async function writeAndVerify(firstPrompt, opts) {
     const prompt = i === 1 ? firstPrompt
       : '## Correção do write(KG) — tentativa ' + i + ' de ' + MAX_WRITE_ATTEMPTS + '\nO verificador INDEPENDENTE do motor reprovou o grafo em ' + res.kgPath +
         ': kg-radar rc ' + (ver ? ver.radarExit : '?') + ', kg-contract-check rc ' + (ver ? ver.contractExit : '?') +
-        (opts.sup && opts.sup.need > 0 ? ', nós de superação ' + (ver ? Number(ver.overcomingNodes || 0) : '?') + ' de ' + opts.sup.need + ' exigidos (prefixo ' + opts.sup.prefix + ')' : '') + '.\nSaída do motor:\n' + (ver ? ver.output : '(o verificador não devolveu)') +
+        (opts.sup && opts.sup.need > 0 ? ', superação: ' + (ver ? Number(ver.overcomingNodes || 0) : '?') + ' nós e ' + (ver ? Number(ver.overcomingEdges || 0) : '?') + ' arestas TRACES_TO com o prefixo ' + opts.sup.prefix + ', exigidos ' + (Number(opts.sup.baseNodes || 0) + opts.sup.need) + ' de cada (' + (opts.sup.baseNodes || 0) + ' já existiam antes desta rodada)' : '') + '.\nSaída do motor:\n' + (ver ? ver.output : '(o verificador não devolveu)') +
         '\n\nEdite SÓ o que a saída acusa (não reescreva o que está certo) e devolva o mesmo schema, com os números reais do grafo ao fim.\n\nSomente saída estruturada.'
     const { sup: _sup, ...agOpts } = opts
     res = await ag(prompt, { ...agOpts, label: opts.label + (i > 1 ? '-fix' + i : '') })
@@ -412,10 +427,10 @@ if (MODE === 'primaries') {
     { label: 'elenxo-primarias', phase: 'Elenxo', schema: PRIMARIES_ELENXO_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
   // SAC-151: objeção sobrevivente sem critério/superação é RECUSADA (o alvo fica não-julgado, nunca liberado)
   const pGate = gateNegatives(pElenxo ? pElenxo.objections : [], o => o.survives === true, ELENXO_CRITERIA)
-  if (pElenxo) pElenxo.objections = pGate.kept
+  if (pElenxo) pElenxo.objections = keepRecused(pGate)
   const pOvercomings = [...overcomingsFound(rejected.filter(r => r.verdict === 'EXAGERADA' || r.verdict === 'NAO-ENCONTRADA')).map(r => ({ alvo: '[' + r.source + '] ' + webText(r.claim), registro: 'E_LACUNAS_…', superacao: r.superacao, criterio: r.criterio })),
     ...overcomingsFound(pGate.kept).map(o => ({ alvo: webText(o.target), registro: 'o nó que a objeção limita (ou o E_LACUNAS_…)', superacao: o.superacao, criterio: o.criterio }))]
-  const pSup = { need: pOvercomings.length, prefix: SUP_PREFIX }
+  const pSup = await supBaseline(KG_PATH, { need: pOvercomings.length, prefix: SUP_PREFIX })
   if (pElenxo) log('Elenxo: ' + pElenxo.objections.length + ' objeções (' + pElenxo.objections.filter(o => o.survives).length + ' sobrevivem) · ' + pGate.recused.length + ' RECUSADA(S) pelo motor sem critério/superação · lacunas fechadas: ' + pElenxo.gapsClosed.length + ' · abertas: ' + pElenxo.gapsOpen.length)
   log('Superação: ' + pOvercomings.length + ' achada(s) → nó obrigatório (' + SUP_PREFIX + '…)')
 
@@ -440,7 +455,7 @@ if (MODE === 'primaries') {
     (rejected.length ? rejected.map(c => '- [' + c.source + '] ' + webText(c.claim) + ' → ' + c.verdict + ': ' + webText(c.why)).join('\n') : '(nenhuma)') +
     '\n\n### Fontes inalcançáveis\n' + (unreachable.length ? unreachable.join(', ') : '(nenhuma)') +
     '\n\n### Corpus prévio\n' + (CORPUS || '(vazio)') +
-    '\n\n### Elenxo (inteiro — NÃO corte: em 2026-10-07 um .slice(0, 7000) jogou fora 22 de 38 objeções, e 13 sobreviventes nunca viraram nó)\n' + JSON.stringify(pElenxo || {}) +
+    '\n\n### Elenxo (inteiro — NÃO corte: em 2026-10-07 um .slice(0, 7000) jogou fora 22 de 38 objeções, e 13 sobreviventes nunca viraram nó)\n' + JSON.stringify(pElenxo || {}) + RECUSA_NOTE +
     '\n\n### Objeções RECUSADAS pelo motor (sobreviveram sem critério pré-registrado ou sem superação — o alvo fica NÃO-JULGADO; entram no E_LACUNAS_… com a contagem EXATA: ' + pGate.recused.length + ')\n' + (pGate.recused.length ? pGate.recused.map(r => '- ' + webText(r.verdict.target) + ' → ' + r.why).join('\n') : '(nenhuma)') +
     (pSup.need > 0 ? SUP_NODES + '\n' + pOvercomings.map(o => '- alvo: ' + o.alvo + ' | registro: ' + o.registro + ' | supera: ' + webText(o.superacao.o_que) + ' | medida: ' + webText(o.superacao.medida) + ' | critério: ' + webText(o.criterio && o.criterio.id) + ' `' + webText(o.criterio && o.criterio.comando) + '`').join('\n') : '') +
     KG_ANCHOR + CONTRACT_V3 +
@@ -460,7 +475,7 @@ if (MODE === 'primaries') {
     elenxo: pElenxo ? { objections: pElenxo.objections, gapsClosed: pElenxo.gapsClosed, gapsOpen: pElenxo.gapsOpen, recommendation: pElenxo.recommendation } : null,
     stats: { sources: SOURCES.length, reached: SOURCES.length - unreachable.length, anchored: anchored.length, rejected: rejected.length,
       nodesAdded: pKg.nodes, edgesAdded: pKg.edges, nodesTotal: pKg.nodesTotal },
-    overcoming: { found: pOvercomings.length, nodesCounted: pW.ver ? Number(pW.ver.overcomingNodes || 0) : null, recusedAnchor: anchorRecused.length, recusedElenxo: pGate.recused.length,
+    overcoming: { found: pOvercomings.length, nodesCounted: pW.ver ? Number(pW.ver.overcomingNodes || 0) : null, edgesCounted: pW.ver ? Number(pW.ver.overcomingEdges || 0) : null, base: pSup && pSup.need > 0 ? { nodes: pSup.baseNodes, edges: pSup.baseEdges, measured: pSup.baseMeasured } : null, recusedAnchor: anchorRecused.length, recusedElenxo: pGate.recused.length,
       recused: [...anchorRecused.map(r => ({ judge: 'ancoragem', alvo: webText(r.claim), why: webText(r.why) })), ...pGate.recused.map(r => ({ judge: 'elenxo', alvo: webText(r.verdict.target), why: r.why }))] },
   }
 }
@@ -585,8 +600,11 @@ const voted = (await parallel(rankedClaims.map(claim => () =>
       // SAC-151: refutação sem critério pré-registrado/superação é RECUSADA — o voto sai de `valid`
       // (conta como não-contado): a claim pode cair em não-verificada, nunca em confirmada por isso.
       const g = gateNegatives(verdicts.filter(Boolean), x => x.refuted === true, VERIFY_CRITERIA)
+      // FAIL-CLOSED de verdade: tirar o voto recusado de `valid` e deixar a conta seguir CONVERTERIA uma
+      // refutação 2-1 em confirmação 1-1 (medido no dogfood com stubs, 2026-10-15: 6 de 6 claims saíram
+      // CONFIRMADAS com 6 refutações recusadas). Voto recusado não confirma: a claim fica não-verificada.
       const valid = g.kept; const refuted = valid.filter(x => x.refuted).length
-      const survives = valid.length >= REFUTATIONS_REQUIRED && refuted < REFUTATIONS_REQUIRED
+      const survives = g.recused.length === 0 && valid.length >= REFUTATIONS_REQUIRED && refuted < REFUTATIONS_REQUIRED
       const isRefuted = refuted >= REFUTATIONS_REQUIRED
       log(quotedLabel(claim.claim) + ': ' + (valid.length - refuted) + '-' + refuted + (survives ? ' ✓' : isRefuted ? ' ✗' : ' ?'))
       return { ...claim, verdicts: valid, refutedVotes: refuted, erroredVotes: VOTES_PER_CLAIM - valid.length, recusedVotes: g.recused.map(r => r.why), survives, isRefuted }
@@ -625,8 +643,10 @@ if (MODE === 'decision') {
     criteriaBlock(ELENXO_CRITERIA) + '\n- Objeção que SOBREVIVE é veredito negativo: leva as duas metades. A superação de uma opção reprovada é a VARIANTE ou o caminho que entregaria o valor dela sem o defeito apontado.\n\nSomente saída estruturada. Evidência específica.',
     { label: 'elenxo', phase: 'Elenxo', schema: ELENXO_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
   if (elenxo) {
-    elenxoGate = gateNegatives(elenxo.objections, o => o.survives === true, ELENXO_CRITERIA)
-    elenxo.objections = elenxoGate.kept
+    // `discarded-by-comodismo` que sobrevive é o juiz pedindo para REABRIR um descarte — voto pró-possibilidade,
+    // não reprovação: fica fora do gate (achado do refutador, 2026-10-15: o gate o recusava e o descarte preguiçoso ficava)
+    elenxoGate = gateNegatives(elenxo.objections, o => o.survives === true && o.kind !== 'discarded-by-comodismo', ELENXO_CRITERIA)
+    elenxo.objections = keepRecused(elenxoGate)
     log('Elenxo: ' + elenxo.objections.length + ' objeções, ' + elenxo.objections.filter(o => o.survives).length + ' sobreviventes (' + elenxo.objections.filter(o => o.kind === 'discarded-by-comodismo' && o.survives).length + ' descartes por comodismo reabertos) · ' + elenxoGate.recused.length + ' RECUSADA(S) pelo motor sem critério/superação')
   }
 }
@@ -634,7 +654,7 @@ if (MODE === 'decision') {
 const overcomings = [
   ...killed.map(c => { const v = overcomingsFound(c.verdicts.filter(x => x.refuted))[0]; return v ? { alvo: webText(c.claim), registro: 'E_LACUNAS_…', superacao: v.superacao, criterio: v.criterio } : null }).filter(Boolean),
   ...overcomingsFound(elenxo ? elenxo.objections : []).map(o => ({ alvo: webText(o.target), registro: 'o E_OBJECAO_… desta objeção', superacao: o.superacao, criterio: o.criterio }))]
-const supNeed = { need: overcomings.length, prefix: SUP_PREFIX }
+const supNeed = await supBaseline(KG_PATH, { need: overcomings.length, prefix: SUP_PREFIX })
 log('Superação: ' + overcomings.length + ' achada(s) → nó obrigatório (' + SUP_PREFIX + '…)')
 
 // ─── write(KG): um agente ESCREVE o grafo, roda o radar, devolve o exit ───
@@ -643,7 +663,7 @@ const kgW = await writeAndVerify(
   KG_ANCHOR +
   '## write(KG) — escreva o grafo da pesquisa e prove que o radar o lê\n\nPergunta: "' + QUESTION + '"\nData de hoje (verified_at): ' + TODAY + '\nCaminho do grafo: ' + KG_PATH + '\n\n' +
   'Leia ANTES: .claude/rules/kg-grammar.md e .claude/commands/common/prompts/research-doctrine.md (cláusulas 7-8). Formato estrito: uma chave por linha; arestas em bloco (- from:/to:/edge_type:); id em inglês, label em pt-BR; meta com id, schema_version "1", baseline ' + TODAY + ', review_after (cadência: ferramenta/preço 30d · modelos 45d · mercado 90d · benchmark 120d · doutrina 12m — escolha pelo tipo dominante e justifique em comentário), `# kg-backlog-guard: on` e `# ═══ TETO: N NÓS ═══`.\n\n' +
-  (MODE === 'decision' && elenxo ? '## MODO DECISÃO — LEIA PRIMEIRO. Este grafo é de DECISÃO. OBRIGATÓRIO (o schema de retorno exige; sem isto o run falha): (1) 1 nó decision `D_…` com status OPEN (o maestro sela — você NUNCA sela), label = a decisão + as opções nomeadas + a recomendação do Elenxo; (2) 1 nó claim por OPÇÃO (`C_OPCAO_…`, status open) — opções: ' + JSON.stringify(elenxo.options || []) + '; (3) para cada objeção SOBREVIVENTE do Elenxo, 1 nó evidence `E_OBJECAO_…` (plane DEV, confirmed, verified_at hoje, verified_against = a evidência da objeção) com aresta CONSTRAINS para a opção/decisão que ela limita (dissent que LIMITA é CONSTRAINS; REFUTES só para opção morta por evidência, e aí o status da opção vira refuted); (4) devolva decisionNodeId, optionNodeIds e constrainsEdges (contagem REAL das arestas escritas); (5) se o TETO de nós impedir modelar TODAS as objeções sobreviventes, o nó E_LACUNAS_… declara a contagem EXATA (N sobreviventes, M modeladas) e NOMEIA o alvo de cada uma não modelada — nunca um número menor que o real (1º dogfood 2026-09-13: 40 sobreviventes, 10 nós, e o grafo dizia "3 reabertos"); (6) objeção do Elenxo é afirmação de UM agente sem votação: confidence ≤ 0.6, e fonte primária que ele CITA sem ter sido lida na rodada entra no label como "primário citado, não lido" — nunca como tier alto confirmado. Objeções do Elenxo: ' + JSON.stringify(elenxo.objections) + ' Recomendação (INTEIRA — em 2026-10-11 um .slice(0, 1500) cortou o degrau 2 do SAC-70 e o escritor o completou de memória): ' + webText(elenxo.recommendation) + '\n\n' : '') +
+  (MODE === 'decision' && elenxo ? '## MODO DECISÃO — LEIA PRIMEIRO. Este grafo é de DECISÃO. OBRIGATÓRIO (o schema de retorno exige; sem isto o run falha): (1) 1 nó decision `D_…` com status OPEN (o maestro sela — você NUNCA sela), label = a decisão + as opções nomeadas + a recomendação do Elenxo; (2) 1 nó claim por OPÇÃO (`C_OPCAO_…`, status open) — opções: ' + JSON.stringify(elenxo.options || []) + '; (3) para cada objeção SOBREVIVENTE do Elenxo, 1 nó evidence `E_OBJECAO_…` (plane DEV, confirmed, verified_at hoje, verified_against = a evidência da objeção) com aresta CONSTRAINS para a opção/decisão que ela limita (dissent que LIMITA é CONSTRAINS; REFUTES só para opção morta por evidência, e aí o status da opção vira refuted); (4) devolva decisionNodeId, optionNodeIds e constrainsEdges (contagem REAL das arestas escritas); (5) se o TETO de nós impedir modelar TODAS as objeções sobreviventes, o nó E_LACUNAS_… declara a contagem EXATA (N sobreviventes, M modeladas) e NOMEIA o alvo de cada uma não modelada — nunca um número menor que o real (1º dogfood 2026-09-13: 40 sobreviventes, 10 nós, e o grafo dizia "3 reabertos"); (6) objeção do Elenxo é afirmação de UM agente sem votação: confidence ≤ 0.6, e fonte primária que ele CITA sem ter sido lida na rodada entra no label como "primário citado, não lido" — nunca como tier alto confirmado. Objeções do Elenxo: ' + JSON.stringify(elenxo.objections) + RECUSA_NOTE + ' Recomendação (INTEIRA — em 2026-10-11 um .slice(0, 1500) cortou o degrau 2 do SAC-70 e o escritor o completou de memória): ' + webText(elenxo.recommendation) + '\n\n' : '') +
   '## Conteúdo\n- 1 nó question (Q_…, status open ou done se respondida) para a pergunta.\n- 1 nó evidence por claim CONFIRMADA (E_…, plane DEV, status confirmed, impact 2-5 pelo peso, confidence pelo tier+votos (tier ≤3 nunca acima de 0.7), verified_at ' + TODAY + ', verified_against = URL + votos, valid_from quando houver e SEMPRE entre aspas ("2026", "2026-10-01" — sem aspas o ano vira inteiro), source_tier, source_kind, label = a claim em pt-BR, trace = URL).\n- 1 nó evidence E_MERCADO_… com o eixo mercado/capital (mesmo que "sem sinal").\n- 1 nó evidence E_LACUNAS_… listando refutadas por fonte fraca, não verificadas (' + unverified.length + ') e cortadas por orçamento (' + budgetDropped.length + ' fontes, ' + notVerifiedByBudget.length + ' claims).\n- Se o corpus já tinha nós sobre o tema e a pesquisa os CONTRADIZ, NÃO edite o grafo antigo: modele a aresta em `external_edges` no topo deste grafo (contrato v4.3), um item por nó, `- from: <id daqui>` / `to: "<caminho do grafo antigo>#<id>"` / `edge_type: SUPERSEDES` (ou REFUTES). O gate confere que o grafo e o id existem: copie o caminho e o id do corpus, nunca invente.\n- Arestas SUPPORTS de cada evidência para a question.\n\n' +
   '## Dados\n### Confirmadas\n' + confirmed.map(c => '- ' + WEB_NOTE + '"' + webText(c.claim) + '" | ' + webText(c.sourceUrl) + ' | kind=' + webText(c.sourceKind) + ' tier=' + c.sourceTier + ' validFrom=' + webText(c.validFrom || '') + ' votos=' + (c.verdicts.length - c.refutedVotes) + '-' + c.refutedVotes).join('\n') +
   '\n### Mercado (do sintetizador)\n' + (report ? webText(report.market) : '(sem síntese: 0 confirmadas)') +
@@ -656,7 +676,7 @@ const kgW = await writeAndVerify(
   { label: 'write-kg', phase: 'write(KG)', schema: (MODE === 'decision' && elenxo) ? KG_SCHEMA_DECISION : KG_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort, sup: supNeed })
 const kg = kgW.res
 if (!kg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, findings: report ? report.findings : [] }
-if (MODE === 'decision' && elenxo && (!kg.decisionNodeId || !(kg.constrainsEdges >= 1))) return { error: 'modo decisão sem nó D_/CONSTRAINS no grafo — o write(KG) não cumpriu o contrato de decisão; nada selado.', question: QUESTION, kgPath: kg.kgPath, radarExit: kg.radarExit }
+if (MODE === 'decision' && elenxo && (!kg.decisionNodeId || !(kg.constrainsEdges >= 1))) return { error: 'modo decisão sem nó D_/CONSTRAINS no grafo — o write(KG) não cumpriu o contrato de decisão; nada selado.' + (elenxoGate.recused.length ? ' (' + elenxoGate.recused.length + ' objeção(ões) sobrevivente(s) RECUSADA(S) pelo motor sem critério/superação: se todas foram, a decisão ficou sem CONSTRAINS válido — re-rode o Elenxo com os critérios pré-registrados)' : ''), question: QUESTION, kgPath: kg.kgPath, radarExit: kg.radarExit }
 if (kgW.pathErr) return { error: 'write(KG): ' + kgW.pathErr, question: QUESTION, kgPath: kg.kgPath }
 if (!engineOk(kgW.ver, supNeed)) return { error: 'o MOTOR reprovou o grafo em ' + kg.kgPath + ' depois de ' + kgW.attempts.length + ' tentativa(s): radar rc ' + (kgW.ver ? kgW.ver.radarExit : 'sem veredito') + ', contrato rc ' + (kgW.ver ? kgW.ver.contractExit : 'sem veredito') + ' (o escritor declarou ' + kg.radarExit + '); não conte a pesquisa como feita.', question: QUESTION, kgPath: kg.kgPath, writeAttempts: kgW.attempts }
 kg.radarExit = kgW.ver.radarExit
@@ -672,5 +692,5 @@ return {
   notVerifiedByBudget, budgetDropped,
   decision: elenxo ? { options: elenxo.options || [], objections: elenxo.objections, recommendation: elenxo.recommendation, sealedBy: 'maestro (nó D_ open no grafo; tabela de selagem do /meta:drive)' } : null,
   stats: { anglesTopic: scope.angles.length, anglesFixed: FIXED_AXES.length, sources: allSources.length, claims: allClaims.length, verified: rankedClaims.length, confirmed: confirmed.length, refuted: killed.length, unverified: unverified.length, dupes: dupes.length, maxFetch: MAX_FETCH, maxVerify: MAX_VERIFY_CLAIMS },
-  overcoming: { found: overcomings.length, nodesCounted: kgW.ver ? Number(kgW.ver.overcomingNodes || 0) : null, recusedVerifyVotes: verifyRecused, recusedElenxo: elenxoGate.recused.length },
+  overcoming: { found: overcomings.length, nodesCounted: kgW.ver ? Number(kgW.ver.overcomingNodes || 0) : null, edgesCounted: kgW.ver ? Number(kgW.ver.overcomingEdges || 0) : null, base: supNeed && supNeed.need > 0 ? { nodes: supNeed.baseNodes, edges: supNeed.baseEdges, measured: supNeed.baseMeasured } : null, recusedVerifyVotes: verifyRecused, recusedElenxo: elenxoGate.recused.length },
 }

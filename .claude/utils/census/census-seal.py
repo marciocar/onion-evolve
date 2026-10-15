@@ -99,9 +99,14 @@ def seal(consol):
             p = m['kg_file'].lstrip('/')
             if x:
                 t = load(p)
-                nid_sup = f"C_SUPERACAO_{HOJE.replace('-','')}_{re.sub(r'[^A-Za-z0-9_]', '_', m['node_id'])[:30]}"
-                if nid_sup not in t and '\nedges:' in t:
-                    _sq = lambda v, n: sanitize(v, terms)[:n]
+                # id COMPLETO (não cortado: dois nós com o mesmo prefixo colidiam e um sumia calado) e
+                # conferência EXATA da linha do id, não substring (achados do refutador, 2026-10-15)
+                nid_sup = f"C_SUPERACAO_{HOJE.replace('-','')}_{re.sub(r'[^A-Za-z0-9_]', '_', m['node_id'])}"
+                if f"- id: {nid_sup}\n" in t: skip.append(m['node_id'] + ':superacao-ja-existe')
+                elif '\nedges:' not in t: skip.append(m['node_id'] + ':superacao-sem-edges')
+                else:
+                    # CORTA ANTES DE ESCAPAR: cortar depois partia o `''` ao meio e o YAML saía inválido
+                    _sq = lambda v, n: sanitize(' '.join(str(v).split())[:n], terms)
                     crit = x.get('criterio') or {}
                     node = (f"  - id: {nid_sup}\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n"
                             f"    label: '{_sq(x['superacao'].get('o_que',''), 280)}'\n"
@@ -149,6 +154,17 @@ def seal(consol):
             t, ok2 = stamp(t, m['node_id'], f"{RUN}: DRIFTED — ver {nid_new} ({et}: {nota}); label preservado como historia")
             if not ok2: skip.append(m['node_id'] + ':stamp-alvo-FALHOU')  # nunca silencioso (3ª mordida)
             files[p] = t; sup += 1
+    # o radar não acusa YAML quebrado em todos os casos (medido 2026-10-15: label com `''` partido passou
+    # com radar 0); quando o PyYAML existe, o seal confere a forma ANTES de gravar e aborta se quebrou
+    try:
+        import yaml
+        for p, t in files.items():
+            try: yaml.safe_load(t)
+            except yaml.YAMLError as e:
+                print(f"census-seal: YAML INVÁLIDO gerado para {p} — selagem ABORTADA antes de gravar: {str(e)[:160]}", file=sys.stderr)
+                sys.exit(2)
+    except ImportError:
+        pass
     for p, t in files.items(): open(os.path.join(ROOT, p), 'w').write(t)
     for p in files:
         rc = subprocess.run(['bash', os.path.join(SCRIPTS, '.claude/validation/kg-radar.sh'),
