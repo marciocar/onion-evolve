@@ -2,13 +2,12 @@
 branch: feat/r56-residue-generator
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: 3294375aad6796b9b2cf719c0d9937153393bf7a7ce92402b21c195017979670
-reviewed_code_sha256: 5ecf898ddb3593614d50bb948e595949c743fdbf63a6b4e59fab66d431621529
-findings_total: 4
-findings_real: 4
+reviewed_diff_sha256: pendente
+findings_total: 5
+findings_real: 5
 tokens: 0
 duration_min: 0
-findings_fixed: 4
+findings_fixed: 5
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 reviewer: a sessão executora (SAC-142), sem revisor independente; ataques por 3 mutantes, pelo estudo prévio de um analista opus só leitura e pelo dogfood do próprio gerador neste resíduo
@@ -46,6 +45,12 @@ Esta é a parte A.
    diretório do resíduo não existia e o redirecionamento falhava sob `set -e`), e um `| grep -q` sob pipefail no
    (e) herdava o rc do validador. É a mesma classe achada no #1130: o caminho de falha de um caso só se testa com
    o mutante.
+
+5. **Ponteiro morto no mini, achado pelo CI.** O `/engineer:pr` viaja para o mini e passou a citar o
+   `review-artifact-check.sh`, que não viaja; o `door_mini` reprovou. O texto agora diz que o passo vale no core,
+   e o mini declara a ausência em `known_absent`, com o porquê. **O pré-voo não pegou:** é classe A, família fora
+   dele. A sombra gravou que o CI rodaria 134 famílias e o pré-voo rodou 3. É o 1º dado real para o
+   `Q_FAMILIAS_BARATAS_DO_MAPA_NO_PRE_VOO`.
 
 ## Mutantes
 
