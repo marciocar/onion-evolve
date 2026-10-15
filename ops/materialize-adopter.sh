@@ -68,7 +68,7 @@ if [ "${FROM}" = WORKTREE ]; then
   # tocado. Existe para o MUTANTE (PR 2 da SAC-149, 2026-10-15): o ops/mutate-and-restore.sh muda o arquivo no
   # disco, e um SUT que roda DENTRO da fixture (o lint, por exemplo) vinha do índice, sem o mutante — o caso
   # passava verde com a cura revertida, e parecia que o mutante não mordia.
-  _ti="$(mktemp)"; cp "$(git -C "${REPO_ROOT}" rev-parse --git-path index)" "${_ti}" 2>/dev/null || : > "${_ti}"
+  _ti="$(mktemp)"; cp "$(git -C "${REPO_ROOT}" rev-parse --path-format=absolute --git-path index)" "${_ti}" 2>/dev/null || : > "${_ti}"
   GIT_INDEX_FILE="${_ti}" git -C "${REPO_ROOT}" add -u >/dev/null 2>&1 || _die fonte "não consegui montar o índice temporário da árvore de trabalho"
   TREE="$(GIT_INDEX_FILE="${_ti}" git -C "${REPO_ROOT}" write-tree 2>/dev/null || true)"; rm -f "${_ti}"
   [ -n "${TREE}" ] || _die fonte "write-tree do índice temporário falhou"

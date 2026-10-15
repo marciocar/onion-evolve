@@ -223,6 +223,15 @@ if bad_app:
                      % (bad_app, sorted(ROLES)))
     sys.exit(2)
 
+# ...e no máximo UMA declaração por regra, no docstring: uma 2ª, dentro da função, era invisível a este gerador e o
+# lint a lia (passada adversarial, 2026-10-15) — hoje o lint também só lê a do docstring, e esta recusa a ambiguidade.
+_starts = [i for i, l in enumerate(lines) if rx.match(l)] + [len(lines)]
+dup_app = sorted(int(rx.match(lines[a]).group(1)) for a, b in zip(_starts, _starts[1:])
+                 if sum(1 for l in lines[a:b] if apprx.match(l)) > 1)
+if dup_app:
+    sys.stderr.write("ERRO rules-registry: '# aplica-se:' repetido em %s — declare UMA vez, no docstring\n" % dup_app)
+    sys.exit(2)
+
 # --- classificação (SSOT da categoria; a cobertura é guardada abaixo) --------
 CATEGORIES = [
     ("Frontmatter & conformidade de artefato",

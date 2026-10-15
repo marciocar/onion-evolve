@@ -35,7 +35,7 @@ python3 - "${GRAPH}" "${PIN}" "${MODE}" "$(date +%F)" <<'PY'
 import re, sys
 path, pin, mode, today = sys.argv[1:5]
 lines = open(path, encoding="utf-8").read().split("\n")
-start = next((i for i, l in enumerate(lines) if re.match(r"^  - id:[ \t]*ONION_INSTALLED[ \t]*$", l)), None)
+start = next((i for i, l in enumerate(lines) if re.match(r"""^  - id:[ \t]*["']?ONION_INSTALLED["']?[ \t]*$""", l)), None)
 if start is None:
     print("stamp-adoption-graph-pin: a semente não tem o nó ONION_INSTALLED — nada a carimbar"); sys.exit(0)
 end = start + 1
@@ -54,10 +54,19 @@ elif li is not None and LABEL_PIN.search(blk[li]):
 if mode == "check":
     if cur is None:
         print("stamp-adoption-graph-pin: ONION_INSTALLED sem x_pin e sem 'pin `<sha>`' no label — pin do grafo NÃO MEDIDO"); sys.exit(3)
-    if cur[:12] != pin[:12]:
+    _n = min(len(cur), len(pin))          # pin de 7 hex no label casa com o de 12 do carimbo (passada adversarial)
+    if _n < 7 or cur[:_n] != pin[:_n]:
         print(f"stamp-adoption-graph-pin: o grafo diz pin {cur}, o carimbo diz {pin}"); sys.exit(1)
     sys.exit(0)
-rc, label_ok = 0, li is not None and LABEL_PIN.search(blk[li])
+# IDEMPOTENTE DE VERDADE (passada adversarial, 2026-10-15): o x_pin já é o do carimbo → nada muda, nem o
+# verified_at. Re-carimbar o MESMO pin (o --promote-hub) deixava o grafo sujo e fora do commit dele.
+if xi is not None and cur and cur[:min(len(cur), len(pin))] == pin[:min(len(cur), len(pin))] and len(cur) >= len(pin):
+    print(f"stamp-adoption-graph-pin: ONION_INSTALLED já diz o pin {pin} — nada a carimbar"); sys.exit(0)
+# O LABEL só é reescrito quando ainda é o do SEMEADOR ("Framework instalado: pin `X`, modo …"). Label que o dono
+# editou (história de pins, notas) fica INTACTO: trocar só o hash deixava o resto da frase desatualizado e
+# cortava a cadeia que ele escreveu. Aí grava-se só o x_pin, que é o que a REGRA 108 lê, e diz-se isso.
+SEED_LABEL = re.compile(r'^    label: "Framework instalado: pin `[0-9a-f]{7,40}`, modo `[^`]*`, papel `[^`]*`, branch de integração `[^`]*`"[ \t]*$')
+rc, label_ok = 0, li is not None and SEED_LABEL.match(blk[li])
 if label_ok:
     blk[li] = LABEL_PIN.sub(f"pin `{pin}`", blk[li], count=1)
 else:
@@ -71,13 +80,14 @@ else:
 vi, gi = field("verified_at"), field("verified_against")
 if vi is not None:
     blk[vi] = f'    verified_at: "{today}"'
-if gi is not None:
+SEED_VA = ("stamp-claude-onion-version-lido-na-adocao", "stamp-claude-onion-version-lido-pelo-escritor-do-carimbo")
+if gi is not None and blk[gi].split(":", 1)[1].strip().strip('"\'') in SEED_VA:   # o do dono fica
     blk[gi] = "    verified_against: stamp-claude-onion-version-lido-pelo-escritor-do-carimbo"
 new = lines[:start] + blk + lines[end:]
 if new != lines:
     open(path + ".pin-tmp", "w", encoding="utf-8").write("\n".join(new))
     import os; os.replace(path + ".pin-tmp", path)
 print(f"stamp-adoption-graph-pin: ONION_INSTALLED carimbado com o pin {pin}"
-      + ("" if label_ok else " (só o x_pin: o label não traz 'pin `<sha>`', editado pelo dono — confira-o)"))
+      + ("" if label_ok else " (só o x_pin: o label foi editado pelo dono e ficou intacto — confira-o)"))
 sys.exit(rc)
 PY

@@ -130,7 +130,7 @@ collect_violations() { # <repo_dir>
       }
       FNR == 1 { flush(); rel = FILENAME; if (index(rel, prefix) == 1) rel = substr(rel, length(prefix) + 1)
                  fm = 0; isfm = 0; fmclosed = 0; fmcore = 0; indesc = 0; inpaths = 0
-                 code = (FILENAME ~ /\.(sh|py|js|mjs|ts)$/); srconly = 0 }
+                 code = (FILENAME ~ /\.(sh|py|js|mjs|ts)$/); srconly = 0; indoc = 0 }
       { l = $0; sub(/\r$/, "", l); if (FNR == 1) sub(/^\357\273\277/, "", l) }
       FNR == 1 && l == "---" && FILENAME ~ /\.md$/ { fm = 1; isfm = 1; next }
       fm == 1  { if (l == "---") { fm = 0; fmclosed = 1; next }
@@ -145,8 +145,9 @@ collect_violations() { # <repo_dir>
       # `violation "…"` IMPRIME — a mensagem chega ao adotante sem o teste que a protegia (a da REGRA 85
       # mandava rodar ops/publish-door.sh num adotante comum). Isenta só a regra declarada `# aplica-se: source`:
       # ela não roda fora do core, então a mensagem dela só é lida onde o ops/ existe.
-      code && l ~ /^# REGRA [0-9]+ / { srconly = 0 }
-      code && l ~ /^# aplica-se:[[:space:]]*source[[:space:]]*$/ { srconly = 1 }
+      code && l ~ /^# REGRA [0-9]+ / { srconly = 0; indoc = 1 }
+      code && indoc && l ~ /^[a-z_][a-z0-9_]*\(\)[[:space:]]*\{/ { indoc = 0 }
+      code && indoc && l ~ /^# aplica-se:[[:space:]]*source[[:space:]]*$/ { srconly = 1 }
       code && l ~ /violation[[:space:]]+"/ && srconly { next }
       { n = tokens(l)
         # atribuição a variável: P="$R/ops/a.sh" → vtok[P]
