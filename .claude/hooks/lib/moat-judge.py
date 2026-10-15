@@ -270,6 +270,8 @@ _MOAT_PUSH = re.compile(r"\b(push|send-pack)\b")
 
 def moat_relevant(text):
     t = text if isinstance(text, str) else " ".join(str(x) for x in text)
+    if _MOAT_MOTOR.search(t) and _MOAT_SIGNAL.search(t):
+        return True
     for ln in t.split("\n"):
         if _MOAT_SIGNAL.search(ln) and _MOAT_ACTION.search(ln):
             return True
@@ -325,10 +327,11 @@ _MOAT_WRAPPER_COPIES = ("a2a-queue-live",)
 # o NOME do motor escritor também é AÇÃO para a relevância (SAC-148, 2026-10-15): nas formas que o juiz não segue
 # (`python3 -c`, `xargs -I`, função que faz `shift`), a linha que cita o motor e um alvo do MOAT fechava só se
 # trouxesse um verbo da lista — e `a2a-invite.sh revoke --file <servido>` não traz nenhum. Medido: rc 0 nas três.
-# Só o nome SEGUIDO, na mesma linha, de um subcomando que escreve: `# a2a-invite.sh` num comentário de um
-# `python3 -c` que só LÊ o arquivo fechava (refutador, medido).
-_MOAT_ACTION = re.compile(_MOAT_ACTION.pattern + "|" + "|".join(
-    r"(?<![\w.-])" + re.escape(n) + r"\b[^\n]*\b(" + "|".join(sorted(subs)) + r")\b"
+# Só o nome SEGUIDO de um subcomando que escreve: `# a2a-invite.sh` num comentário de um `python3 -c` que só LÊ o
+# arquivo fechava (refutador, medido). E o par vale no TEXTO INTEIRO do trecho, não por linha: o `python3 -c`
+# multilinha com o motor numa linha e o `revoke` noutra passava (refutador, 2ª passada).
+_MOAT_MOTOR = re.compile("|".join(
+    r"(?<![\w.-])" + re.escape(n) + r"\b[\s\S]*?\b(" + "|".join(sorted(subs)) + r")\b"
     for n, (subs, _opts) in _MOAT_ARG_WRITERS.items()))
 
 
