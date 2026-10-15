@@ -7469,7 +7469,7 @@ PY
   }
   local _IL=lib/invocation-lines.sh
   _pvmut "(fn1) merge-gate: função com bash -c \"\$1\" e gh pr merge na chamada → VETO" 2 pretooluse-merge-gate.sh feat \
-    'run(){ bash -c "$1"; }; run "gh pr merge 5"' "${_IL}" $'    if name in FUNCS:\n        # emula' $'    if False:\n        # emula'
+    'run(){ bash -c "$1"; }; run "gh pr merge 5"' "${_IL}" '    if name in FUNCS and not bypass:' '    if False:'
   _pvmut "(fn2) merge-gate: função homônima definida DEPOIS da chamada não esconde o gh → VETO" 2 pretooluse-merge-gate.sh feat \
     'gh pr merge 5; gh(){ :; }' "${_IL}" $'        call_function(name, words, seg, depth, piped, stdin_from)\n' $'        call_function(name, words, seg, depth, piped, stdin_from)\n        return\n'
   _pvmut "(fn3) protect-main: função homônima num subshell não esconde o git → VETO" 2 pretooluse-protect-main.sh feat \
@@ -7482,6 +7482,11 @@ PY
     'run(){ bash -c "$1"; }; run "gh pr merge 5"; run(){ echo "$1"; }' "${_IL}" 'FUNCS.setdefault(name, []).append(body)' 'FUNCS[name] = [body]'
   _pvmut "(fn7) merge-gate: função que só IMPRIME o texto com gh pr merge → passa (fechar toda chamada que o cita reprova)" 0 pretooluse-merge-gate.sh feat \
     'note(){ echo "$1"; }; note "nunca rode gh pr merge 5 aqui"' "${_IL}" '        if body is None or shifts:' '        if True:'
+  local _many; _many="log(){ echo \"\$1\"; }; $(for _i in $(seq 300); do printf 'log "passo %s"; ' "${_i}"; done)echo 'gh pr merge vem depois'"
+  _pvmut "(fn8) merge-gate: 300 chamadas honestas e um echo citando gh pr merge → passa (o teto não fecha a string)" 0 pretooluse-merge-gate.sh feat \
+    "${_many}" "${_IL}" $'            emit_unanalyzable(seg, CWD[-1])\n        return\n    for body in FUNCS' $'            emit_unanalyzable(seg, CWD[-1])\n        raise Unanalyzable("teto")\n    for body in FUNCS'
+  _pvmut "(fn9) protect-main: wrapper git(){ command git \"\$@\"; } com push sem force → passa" 0 pretooluse-protect-main.sh feat \
+    'git(){ command git "$@"; }; git push origin HEAD:main' "${_IL}" 'raw_words[k] in ("command", "builtin")' 'raw_words[k] in ()'
   # invólucros — a classe medida pela auditoria de 2026-09-02 (todos passavam rc=0 nos DOIS vetos)
   _case "protect-main: command git push -f main → VETO"    2 "${pm}" feat 'command git push -f origin main'
   # escopo (2026-09-02): alvo em OUTRO repo não é assunto destes vetos; `-C .` e `-C <raiz>` continuam sendo
@@ -8176,7 +8181,7 @@ PY
     # (`docker exec <container servido> sh -c 'grep …'`, `sudo cat`, `journalctl`). Os casos (i24)-(i27) são esses.
     _mgcase "(i17) função com bash -c \"\$1\" escrevendo o arquivo de convites → VETO (a chamada é emulada)" "2:ops/a2a-invite-live.sh" "${P}" \
       "run(){ bash -c \"\$1\"; }; run \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
-      $'    if name in FUNCS:\n        # emula' $'    if False:\n        # emula'
+      '    if name in FUNCS and not bypass:' '    if False:'
     _mgcase "(i18) caminho em variável + função com \$* → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
       "D=${INV%/*}; run(){ bash -c \"\$*\"; }; run bash ${MOT} revoke m --file \"\$D/${INV##*/}\"" "${L}" \
       $'        if key in ("@", "*"):\n            return " ".join(pos[1:])' $'        if key in ("@", "*"):\n            return ""'
@@ -8188,7 +8193,7 @@ PY
       $'        elif t in ("$@", "${@}"):\n            out.extend(pos[1:])' $'        elif t in ("$@", "${@}"):\n            out.append(t)'
     _mgcase "(i21) motor + alvo em python3 -c → FECHA (o nome do motor é ação para a relevância)" "2:NÃO pode ser analisado" "${P}" \
       "python3 -c 'import subprocess; subprocess.run([\"bash\", \"${MOT}\", \"revoke\", \"m\", \"--file\", \"${INV}\"])'" "${J}" \
-      '_MOAT_ACTION = re.compile(_MOAT_ACTION.pattern + "|"' '_MOAT_ACTION = re.compile(_MOAT_ACTION.pattern or "|"'
+      '    if _MOAT_MOTOR.search(t) and _MOAT_SIGNAL.search(t):' '    if False:'
     _mgcase "(i22) xargs -I{} colado com bash -c → FECHA" "2:NÃO pode ser analisado" "${P}" \
       "echo 'bash ${MOT} revoke m --file ${INV}' | xargs -I{} bash -c '{}'" "${J}" \
       'replaces = any(a.startswith(("-I", "-i", "--replace")) for a in args)' 'replaces = "-I" in args'
@@ -8216,19 +8221,43 @@ PY
     # curas do refutador da SAC-148 (2026-10-15), cada contorno MEDIDO como caso
     _mgcase "(i30) stdin literal entrando na função (run(){ bash; }) → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
       "run(){ bash; }; echo 'bash ${MOT} revoke m --file ${INV}' | run" "${L}" \
-      '        prev_sep, prev_seg = "|", list(stdin_from)' '        pass'
+      '                    src = list(stdin_from)' '                    pass'
     _mgcase "(i31) printf -v c \"%s\" \"\$1\" dentro da função → VETO (o valor é o argumento, não o formato)" "2:ops/a2a-invite-live.sh" "${P}" \
       "r(){ printf -v c \"%s\" \"\$1\"; bash -c \"\$c\"; }; r \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
       'val = words[4] if words[3] == "%s" and len(words) == 5 else' 'val = words[3] if False else'
     _mgcase "(i32) alias da própria string que vira bash -c → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
       "alias r=\"bash -c\"; r \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
-      '    if words and words[0] in ALIASES and words[0] not in FUNCS:' '    if False:'
+      '    if words[0] in ALIASES and words[0] not in FUNCS:' '    if False:'
     _mgcase "(i33) python3 -c que só LÊ o arquivo, com o nome do motor num comentário → passa" 0 "${P}" \
       "python3 -c \"import json; print(len(json.load(open('${INV}'))))  # a2a-invite.sh\"" "${J}" \
-      'r"\b[^\n]*\b("' 'r"(|"'
-    _mgcase "(i34) fan-out de chamadas além do teto → FECHA (negação de serviço vira inanalisável)" "2:NÃO pode ser analisado" "${P}" \
-      "c(){ :; }; b(){ c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; }; a(){ b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; }; a; a; bash ${MOT} revoke m --file ${INV}" "${L}" \
+      'r"\b[\s\S]*?\b("' 'r"(|"'
+    _mgcase "(i34) chamada além do teto de emulação com o motor no argumento → FECHA" "2:NÃO pode ser analisado" "${P}" \
+      "c(){ :; }; b(){ c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; c; }; a(){ b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; b; }; run(){ bash -c \"\$1\"; }; a; run \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
       'CALL_BUDGET = [256]' 'CALL_BUDGET = [10 ** 9]'
+    # 2ª passada do refutador (2026-10-15)
+    _mgcase "(i35) python3 -c multilinha, motor numa linha e revoke noutra → FECHA" "2:NÃO pode ser analisado" "${P}" \
+      "python3 -c 'import subprocess
+m = \"${MOT}\"
+subprocess.run([\"bash\", m,
+  \"revoke\", \"m\", \"--file\", \"${INV}\"])'" "${J}" \
+      'r"\b[\s\S]*?\b("' 'r"\b[^\n]*\b("'
+    _mgcase "(i36) wrapper x(){ command x \"\$@\"; } de leitura → passa (command chama o programa, não a função)" 0 "${P}" \
+      "systemctl(){ command systemctl --no-pager \"\$@\"; }; systemctl status onion-vps-bridge" "${L}" \
+      'raw_words[k] in ("command", "builtin")' 'raw_words[k] in ()'
+    _mgcase "(i37) alias com ; no texto → VETO (o texto do alias é re-analisado)" "2:ops/a2a-invite-live.sh" "${P}" \
+      "alias r=\"true; bash -c\"; r \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
+      'analyze(text + " " + " ".join(shlex.quote(w) for w in words[1:]), depth + 1)' 'command(shlex.split(text) + list(words[1:]), depth + 1)'
+    _mgcase "(i38) here-string entrando na função → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "run(){ bash; }; run <<< \"bash ${MOT} revoke m --file ${INV}\"" "${L}" \
+      '    if "<<<" in words[:-1]:' '    if False:'
+    _mgcase "(i39) heredoc entrando na função → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "run(){ bash; }; run <<EOF
+bash ${MOT} revoke m --file ${INV}
+EOF" "${L}" \
+      'or bool(fn_on_line and fn_on_line.search(bare))' 'or False'
+    _mgcase "(i40) stdin da função lido pelo 2º comando do corpo → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "run(){ true; bash; }; echo 'bash ${MOT} revoke m --file ${INV}' | run" "${L}" \
+      'if stdin_from and (src is None or' 'if stdin_from and False and (src is None or'
     fi
   else
     record_skip "moat-gate: (i*) sem ops/a2a-invite-live.sh ou sem o motor de convites — casos do arquivo de convites pulados"

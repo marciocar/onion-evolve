@@ -470,6 +470,10 @@ def heredocs(text):
     """Corpos de heredoc: inerte → some; expansível → só as substituições; lido por SHELL → código."""
     lines, out, i, pend = text.split("\n"), [], 0, []
     swallowed = []
+    # função definida na string que RECEBE o heredoc (`run <<EOF`): o corpo pode virar código lá dentro (refutador)
+    fnames = set(re.findall(r"(?:^|[;&|({\s])([A-Za-z_][A-Za-z0-9_:.-]*)\s*\(\s*\)", text)) | \
+        set(re.findall(r"\bfunction\s+([A-Za-z_][A-Za-z0-9_:.-]*)", text))
+    fn_on_line = re.compile(r"(^|[;&|(]|\s)\s*(" + "|".join(re.escape(n) for n in sorted(fnames)) + r")(\s|$)") if fnames else None
     while i < len(lines):
         ln = lines[i]
         if pend:
@@ -491,7 +495,7 @@ def heredocs(text):
             # shell lendo o corpo (falso positivo da 3ª passada do Elenxo, M3)
             bare = re.sub(r"'[^']*'|\"(?:[^\"\\]|\\.)*\"", " ", ln)
             bare = re.sub(r"(^|\s)#.*$", " ", bare)       # nem em comentário (`<<'EOF'  # sobre bash`)
-            pend.append((term, inert, bool(SHELL_ON_LINE.search(bare))))
+            pend.append((term, inert, bool(SHELL_ON_LINE.search(bare)) or bool(fn_on_line and fn_on_line.search(bare))))
         i += 1
     if pend and relevant(swallowed):
         # heredoc sem terminador: o que sumiu como corpo tem a forma do que os vetos guardam — fechado
@@ -1185,11 +1189,22 @@ def substitute_positional(tokens, pos):
 def call_function(name, words, seg, depth, piped=False, stdin_from=None):
     """Chamada de função da própria string: CADA corpo definido com o nome (redefinição, `if`, subshell — a ordem
     e o escopo não se modelam, então erra para vetar) re-julgado com os argumentos da chamada e o stdin dela."""
-    CALL_BUDGET[0] -= 1
-    if CALL_BUDGET[0] < 0:
-        raise Unanalyzable("chamadas de função além do teto")
+    if "<<<" in words[:-1]:                             # `run <<< '<cmd>'`: o texto é o stdin da chamada
+        k = words.index("<<<")
+        piped, stdin_from = True, ["echo", words[k + 1]]
+        words = words[:k] + words[k + 2:]
     # o stdin da chamada (`echo '<cmd>' | run`) também é texto que ENTRA na função
     entered = " ".join(words) + ("\n" + " ".join(stdin_from) if piped and stdin_from else "")
+    CALL_BUDGET[0] -= 1
+    if CALL_BUDGET[0] < 0:
+        # além do teto a chamada não se emula: fecha só se o que ENTRA nela tem a forma guardada. A 1ª redação
+        # levantava Unanalyzable e o veto de merge fechava a string honesta inteira por um `echo` que citava
+        # `gh pr merge` (refutador, 2ª passada); o corpo literal já foi julgado na definição
+        if MOAT:
+            moat_unanalyzable(entered.split("\n"), "chamadas de função além do teto")
+        if relevant_tokens(seg) or relevant([entered]):
+            emit_unanalyzable(seg, CWD[-1])
+        return
     for body in FUNCS.get(name) or [None]:
         shifts = body is not None and (any(t == "shift" for t in body) or
                                        any(t == "set" and k + 1 < len(body) and body[k + 1] == "--" for k, t in enumerate(body)))
@@ -1235,8 +1250,6 @@ def run_tokens(tokens, depth, stdin_from=None):
     if depth > 4:
         raise Unanalyzable("aninhamento além do teto")
     seg, opened, prev_sep, prev_seg, compound = [], 0, ";", None, 0
-    if stdin_from:                                      # corpo de função chamada num pipe: o 1º comando lê o stdin dela
-        prev_sep, prev_seg = "|", list(stdin_from)
     for t in tokens + [";"]:
         if t and set(t) <= set(";&|()\n"):
             if seg:
@@ -1245,8 +1258,12 @@ def run_tokens(tokens, depth, stdin_from=None):
                 if first in ("if", "while", "until", "for", "case", "{"):
                     compound += 1
                 cond = prev_sep in ("&&", "||") or t.strip("()").strip("\n") == "||" or compound > 0
-                command(seg, depth, cond=cond, piped=prev_sep == "|",
-                        stdin_from=prev_seg if prev_sep == "|" else None)
+                # no corpo de função com stdin conhecido, TODO comando o lê (não só o 1º: `true; bash`), e `cat` nu
+                # num pipe repassa ele (`cat | bash`) — refutador, 2ª passada
+                src = prev_seg if prev_sep == "|" else None
+                if stdin_from and (src is None or [os.path.basename(x) for x in src] == ["cat"]):
+                    src = list(stdin_from)
+                command(seg, depth, cond=cond, piped=src is not None, stdin_from=src)
                 if seg[-1] in ("fi", "done", "esac", "}") or first in ("fi", "done", "esac", "}"):
                     compound = max(0, compound - 1)
             prev_seg = seg or prev_seg
@@ -1328,21 +1345,6 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
         else:
             ASSIGN[words[2]] = val
         return
-    if words and words[0] == "alias":
-        for w in words[1:]:
-            m = re.match(r"^([^=\s]+)=(.*)$", w, re.S)
-            if m:
-                ALIASES[m.group(1)] = m.group(2)
-        return
-    if words and words[0] in ALIASES and words[0] not in FUNCS:
-        # `alias r='bash -c'; r '<cmd>'`: o nome vira o texto (expand_aliases não se prova daqui: erra para vetar)
-        text = ALIASES.pop(words[0])                    # tirado durante a expansão: `alias r='r x'` não recursa
-        try:
-            command(shlex.split(text) + list(words[1:]), depth + 1, cond, piped, stdin_from)
-        except ValueError:
-            raise Unanalyzable("alias ilegível")
-        finally:
-            ALIASES[words[0]] = text
     env = {}
     try:
         words = strip_prefix(words, env)
@@ -1367,6 +1369,21 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
             words = shlex.split(words[0]) + words[1:]  # `$X` com espaço: word-splitting do bash
         except ValueError:
             emit_unanalyzable(seg); return
+    if words[0] == "alias":
+        for w in words[1:]:
+            m = re.match(r"^([^=\s]+)=(.*)$", w, re.S)
+            if m:
+                ALIASES[m.group(1)] = m.group(2)
+        return
+    if words[0] in ALIASES and words[0] not in FUNCS:
+        # `alias r='bash -c'; r '<cmd>'`: o nome vira o texto (expand_aliases não se prova daqui: erra para vetar).
+        # O texto é RE-ANALISADO, não partido em palavras: `alias r='true; bash -c'` tem dois comandos (refutador)
+        text = ALIASES.pop(words[0])                    # tirado durante a expansão: `alias r='r x'` não recursa
+        try:
+            analyze(text + " " + " ".join(shlex.quote(w) for w in words[1:]), depth + 1)
+        finally:
+            ALIASES[words[0]] = text
+        return
     name = words[0]
     if DYNAMIC.search(name) or re.search(r"\{[^}]*(,|\.\.)[^}]*\}", name):
         if MOAT:
@@ -1382,7 +1399,8 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
     base = os.path.basename(name)
     if MOAT:
         moat_command(words, raw_words, base, depth, env, piped, stdin_from)
-    if name in FUNCS:
+    bypass = any(raw_words[k] in ("command", "builtin") and raw_words[k + 1] == name for k in range(len(raw_words) - 1))
+    if name in FUNCS and not bypass:
         # emula a função E segue julgando o programa homônimo: a definição pode vir depois da chamada, num subshell
         # ou ser desfeita por `unset -f` — `gh pr merge 5; gh(){ :; }` saía rc 0 quando a função escondia o
         # programa (refutador, medido). Errar para vetar: `git(){ :; }; git push -f origin main` veta
