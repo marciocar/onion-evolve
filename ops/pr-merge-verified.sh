@@ -1031,6 +1031,10 @@ case "$state" in
     # exatamente a família de cenário que gerou o #814. Um rc≠0 após um merge PROVADO é o falso
     # negativo que este PR inteiro existe para matar; reintroduzi-lo pelo sync seria circular.
     # O rc deste script responde pelo MERGE, que é o trabalho dele; sincronizar `main` é cortesia.
+    # SEMPRE (SAC-143, 2026-10-15): a worktree que tem `main` em uso — o checkout principal, de onde o harness lê os
+    # hooks — sobe por fast-forward. Sem isto, hook mergeado não valia na sessão (36 commits atrás, medido). É a
+    # mesma cortesia do --sync: nunca muda o rc do merge.
+    [ -f "$(dirname "${BASH_SOURCE[0]}")/sync-main-worktree.sh" ] && say "$(bash "$(dirname "${BASH_SOURCE[0]}")/sync-main-worktree.sh")"
     if [ "${DO_SYNC:-0}" = 1 ]; then
       say "sync: merge provado — checkout main + pull"
       if git checkout main -q && git pull --ff-only origin main -q; then
