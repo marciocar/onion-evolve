@@ -204,7 +204,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,a2a_queue_live,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -7864,6 +7864,11 @@ run_moat_gate_selftests() {
     mkdir -p "${d}/proj/.claude/utils/federation-transport"
     cp "${REPO_ROOT}/.claude/utils/federation-transport/a2a-invite.sh" "${d}/proj/.claude/utils/federation-transport/a2a-invite.sh"
   fi
+  # o wrapper da fila A2A (2026-10-15), RASTREADO e com os caminhos mapeados como o TSV
+  local _queue_ok=0
+  if [ -f "${REPO_ROOT}/ops/a2a-queue-live.sh" ]; then
+    _queue_ok=1; _mg_map "${REPO_ROOT}/ops/a2a-queue-live.sh" > "${d}/proj/ops/a2a-queue-live.sh"
+  fi
   git init -q -b main "${d}/adotante"
   git -C "${d}/adotante" remote add origin https://github.com/onion-bancada/adotante.git
   mkdir -p "${d}/adotante/docs/evolution/inbound"
@@ -7887,6 +7892,11 @@ EOF
     cp "${d}/proj/ops/a2a-invite-live.sh" "${d}/scratch/live-copia.sh"
     cp "${d}/proj/.claude/utils/federation-transport/a2a-invite.sh" "${d}/scratch/renomeado.sh"
     printf '#!/usr/bin/env bash\n# lembrete: o a2a-invite.sh create só pelo wrapper\nls -la /var/www/onion-landing\n' > "${d}/scratch/so-leitura.sh"
+  fi
+  # a cópia NÃO rastreada do wrapper da fila e o script mínimo com função que embrulha sudo (2026-10-15)
+  if [ "${_queue_ok}" = 1 ]; then
+    cp "${d}/proj/ops/a2a-queue-live.sh" "${d}/scratch/queue-copia.sh"
+    printf '#!/bin/bash\nQ=/srv/vps-svc/onion-bridge/data/a2a-pending\nsv(){ sudo -n -u svc "$@"; }\nsv mv -n -- "$Q/x.json" "$Q/_archived/x.json"\n' > "${d}/scratch/sv-mv.sh"
   fi
   # o CASO DE CAMPO, literal: o script de scratchpad de 2026-10-13 (fora do projeto)
   cat > "${d}/scratch/update-kg-writer.sh" <<'FIELD'
@@ -8131,6 +8141,34 @@ PY
   else
     record_skip "moat-gate: (i*) sem ops/a2a-invite-live.sh ou sem o motor de convites — casos do arquivo de convites pulados"
   fi
+  # ── a fila A2A do bridge (2026-10-15): só o wrapper escreve; mv/rm direto na fila é vetado ─────────
+  if [ "${_queue_ok}" = 1 ]; then
+    local QD; QD="$(awk -F'\t' '$4=="ops/a2a-queue-live.sh" {print $3; exit}' "${P}/ops/moat-targets.tsv")"
+    if [ -z "${QD}" ]; then record_fail "moat-gate: (p0)" "ops/moat-targets.tsv sem a linha do ops/a2a-queue-live.sh (core-only)"
+    else
+    _mgcase "(p1) mv direto da fila para _archived, como a conta do serviço → VETO nomeando o wrapper da fila" "2:ops/a2a-queue-live.sh" "${P}" \
+      "sudo -u svc mv ${QD}/s.t.json ${QD}/_archived/" "${J}" '                   "setfacl", "mv"}' '                   "setfacl"}'
+    _mgcase "(p2) rm direto num registro da fila de um hub → VETO nomeando o wrapper da fila (mais específico)" "2:ops/a2a-queue-live.sh" "${P}" \
+      "sudo -n -u svc rm -f ${QD}/hub-x/s.t.json" "${J}" '            if best is None or len(pat) > len(best[1]):' '            if best is None:'
+    _mgcase "(p3) o wrapper VERSIONADO da fila (com o alvo citado na linha, que leva ao juiz) → passa" 0 "${P}" \
+      "bash ops/a2a-queue-live.sh archive s.t.json --apply && echo \"fila em ${QD}\"" "${J}" \
+      '    if _moat_versioned(p) and not copied:' '    if False:'
+    _mgcase "(p4) modo de teste do wrapper da fila na linha de comando → FECHA" "2:modo de teste do wrapper da fila" "${P}" \
+      "export ONION_A2A_QUEUE_TEST=1; ONION_A2A_QUEUE_BACKUP=/tmp/x.sh bash ops/a2a-queue-live.sh list" "${J}" \
+      '_moat_emit("inanalisavel", "ONION_A2A_QUEUE_TEST",' '(lambda *a: None)("inanalisavel", "ONION_A2A_QUEUE_TEST",'
+    _mgcase "(p6) CÓPIA do wrapper da fila fora do projeto → FECHA (função que embrulha sudo + alvo no corpo)" "2:função que embrulha sudo" "${P}" \
+      "bash ${d}/scratch/queue-copia.sh archive s.t.json --force-unaccepted motivo-qualquer --apply" "${J}" \
+      '    if not any(o.startswith("__ONION_MOAT__") for o in OUT[n_out:])' \
+      '    if False and not any(o.startswith("__ONION_MOAT__") for o in OUT[n_out:])'
+    _mgcase "(p7) script de 4 linhas com sv(){ sudo -u <conta> \"\$@\"; } e sv mv na fila → FECHA" "2:função que embrulha sudo" "${P}" \
+      "bash ${d}/scratch/sv-mv.sh" "${J}" \
+      '(?:function[ \t]+)?[A-Za-z_][A-Za-z0-9_]*[ \t]*\(\)' '(?:function[ \t]+)?ONION_NUNCA_[A-Za-z_][A-Za-z0-9_]*[ \t]*\(\)'
+    _mgcase "(p5) ls da fila (leitura) → passa" 0 "${P}" \
+      "sudo -n ls -la ${QD}/" "${J}" '                   "setfacl", "mv"}' '                   "setfacl", "mv", "ls"}'
+    fi
+  else
+    record_skip "moat-gate: (p*) sem ops/a2a-queue-live.sh — casos da fila A2A pulados"
+  fi
   # ── adotante e modo degradado ──────────────────────────────────────────────────────────────────
   _mgcase "(x1) adotante SEM ops/moat-targets.tsv: crontab - → passa (hook desarmado)" 0 "${d}/sem-tsv" \
     'crontab -' "${H}" '[ -f "$tsv" ] || exit 0' 'true' "${d}/sem-tsv"
@@ -8297,6 +8335,166 @@ PY
   _c_help() { local r rc=0; r="$(bash "$1" --help 2>&1)" || rc=$?
     IL_WHY="rc=${rc} fim='$(tail -1 <<< "${r}")'"; [ "${rc}" = 0 ] && case "${r}" in *"3 uso inválido"*) true ;; *) false ;; esac; }
   _ilcase "(w14) --help mostra o EXIT inteiro (até '3 uso inválido')" "'/^# USO/,/^# MODO DE TESTE/p'" "'/^# USO/,/^# EXIT/p'" _c_help
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo a2a-queue-live (2026-10-15) — o wrapper core-only da fila A2A do bridge de produção (data/a2a-pending e
+# os subdiretórios por receptor). Defeito datado: limpar a fila era ato manual do maestro com `!`, porque o veto
+# do MOAT barra, corretamente, `sudo -u <conta> mv` direto nela, e não havia caminho com trava, backup e prova.
+# Cada caso roda o wrapper REAL em MODO DE TESTE DECLARADO (ONION_A2A_QUEUE_TEST=1: tudo roda como quem roda,
+# numa fila de sandbox) com um `sudo` STUB no PATH que sai 97 — nenhum caso, nem mutante, alcança a conta do
+# serviço. E CADA caso tem MUTANTE executado numa cópia do wrapper, provado por _prove_mutation.
+# ---------------------------------------------------------------------------
+run_a2a_queue_live_selftests() {
+  local -; set +e
+  local wr="${REPO_ROOT}/ops/a2a-queue-live.sh"
+  if [ ! -f "${wr}" ]; then record_skip "a2a-queue-live: sem ops/a2a-queue-live.sh (core-only) — nada a testar"; return; fi
+  command -v python3 >/dev/null 2>&1 || { record_skip "a2a-queue-live: python3 ausente → pulado"; return; }
+  command -v flock >/dev/null 2>&1 || { record_skip "a2a-queue-live: flock ausente → pulado"; return; }
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/stub" "${d}/mvstub" "${d}/op"
+  printf '#!/bin/sh\necho "sudo-stub: a bancada nunca chama sudo" >&2\nexit 97\n' > "${d}/stub/sudo"
+  # o `mv` que copia e não remove: a escrita "sai 0" e a prova por contagem tem de reprovar
+  printf '#!/bin/sh\nwhile [ "$#" -gt 2 ]; do shift; done\nexec cp -- "$1" "$2"\n' > "${d}/mvstub/mv"
+  chmod +x "${d}/stub/sudo" "${d}/mvstub/mv"
+  cat > "${d}/bk.sh" <<EOF
+#!/usr/bin/env bash
+umask 077; tar -czf "${d}/bk-\$1.tgz" -C "${d}" q && echo "ok: ${d}/bk-\$1.tgz (1 bytes)"
+EOF
+  printf '#!/bin/sh\necho "ok: /nada"; exit 1\n' > "${d}/bk-falha.sh"
+  chmod +x "${d}/bk.sh" "${d}/bk-falha.sh"
+  local svc_home; svc_home="$(sed -n 's/^SVC_HOME=//p' "${wr}" | head -1)"
+  # a fila de sandbox: o core na raiz (um aceito, um não), um hub num subdiretório; o corpo leva um marcador
+  _qlreset() {
+    rm -rf "${d}/q" "${d}/inbox" "${d}/op/"*
+    mkdir -p "${d}/q/hub-bancada" "${d}/inbox/_processed"
+    _qlrec() { printf '{"taskId":"%s","receivedAt":"2026-10-15T12:00:00.000Z","from":"%s","receiver":%s,"signal":{"id":"s","from":"%s","body":"CORPO-SECRETO-BANCADA"},"verdict":{"verified":true},"envelope":{"jws":"x"}}\n' "$2" "$3" "$4" "$3" > "$1"; }
+    _qlrec "${d}/q/s1.t-aceito.json" t-aceito membro-a '"onion-evolve"'
+    _qlrec "${d}/q/s2.t-pendente.json" t-pendente membro-b null
+    _qlrec "${d}/q/hub-bancada/s3.t-hub.json" t-hub membro-c '"hub-bancada"'
+    printf -- '---\ntipo: sinal-upstream\nverificacao:\n  verified: true\n  taskId: t-aceito\n---\n\n# corpo\n' > "${d}/inbox/_processed/aceito.md"
+    # o taskId do hub ESTÁ no inbox do core: mesmo assim não conta (o hub aceita no repo dele)
+    printf -- '---\nverificacao:\n  taskId: t-hub\n---\n' > "${d}/inbox/hub.md"
+    # taskId só no CORPO (fora do frontmatter) não é aceite
+    printf -- '---\ntipo: x\n---\n\n  taskId: t-pendente\n' > "${d}/inbox/corpo.md"
+  }
+  # _qlr <wrapper> <args…> → "rc|saída" (stdout+stderr), env de teste completo; QLR_ENV/QLR_PATH extras
+  _qlr() {
+    local w="$1" rc=0 out; shift
+    out="$(cd "${d}" && env PATH="${QLR_PATH:-}${d}/stub:${PATH}" LC_ALL=C ONION_A2A_QUEUE_TEST=1 ONION_A2A_QUEUE_DIR="${d}/q" \
+      ONION_A2A_QUEUE_INBOX="${d}/inbox" ONION_A2A_QUEUE_BACKUP="${QLR_BK:-${d}/bk.sh}" ONION_A2A_QUEUE_LOCK="${d}/lock" \
+      ${QLR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  # _qlcase <nome> <wrapper-old> <wrapper-new> <função-de-caso> — intacto e mutante (cópia com OLD→NEW, 1ª ocorrência)
+  _qlcase() {
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
+    # a trava de PRODUÇÃO nunca é aberta pela bancada, nem por um mutante que caia no ramo de produção
+    sed "s#^PROD_LOCK=.*#PROD_LOCK=${d}/lock#" "${wr}" > "${d}/w.sh"
+    _qlreset; QL_WHY=""; "${fn}" "${d}/w.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "a2a-queue-live: ${name}"; else record_fail "a2a-queue-live: ${name}" "${QL_WHY:-caso não satisfeito}"; fi
+    cp "${d}/w.sh" "${d}/m.sh"
+    OLD="${old}" NEW="${new}" python3 - "${d}/m.sh" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    _qlreset; "${fn}" "${d}/m.sh" && rc_m=0
+    _prove_mutation "a2a-queue-live: ${name} (MUT)" "${d}/w.sh" "${d}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  _qlrc() { [ "${1%%|*}" = "$2" ]; }
+  _qlhas() { case "${1#*|}" in *"$2"*) true ;; *) false ;; esac; }
+  _c_list() { local r; r="$(_qlr "$1" list)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && _qlhas "${r}" "s1.t-aceito.json" && _qlhas "${r}" "aceito=sim (_processed/aceito.md)" \
+      && _qlhas "${r}" "remetente=membro-b" && ! _qlhas "${r}" "CORPO-SECRETO" \
+      && [ "$(_qlr "$1" list --json | grep -c CORPO-SECRETO)" = 0 ]; }
+  _c_hub() { local r; r="$(_qlr "$1" list)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && _qlhas "${r}" "fila hub-bancada" && _qlhas "${r}" "aceito=não medido" || return 1
+    r="$(_qlr "$1" list --receiver hub-bancada)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 0 && _qlhas "${r}" "s3.t-hub.json" && ! _qlhas "${r}" "s1.t-aceito.json"; }
+  _c_dry() { local r; r="$(_qlr "$1" archive s1.t-aceito.json)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 0 && _qlhas "${r}" "ENSAIO" && [ -f "${d}/q/s1.t-aceito.json" ] && [ ! -e "${d}/q/_archived" ] && ! ls "${d}"/bk-pre-* >/dev/null 2>&1; }
+  _c_apply() { local r sha; sha="$(sha256sum "${d}/q/s1.t-aceito.json" | cut -d' ' -f1)"
+    r="$(_qlr "$1" archive s1.t-aceito.json --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 0 && [ ! -e "${d}/q/s1.t-aceito.json" ] && [ -f "${d}/q/s2.t-pendente.json" ] \
+      && [ "$(sha256sum "${d}/q/_archived/s1.t-aceito.json" 2>/dev/null | cut -d' ' -f1)" = "${sha}" ] \
+      && grep -q $'\ts1.t-aceito.json\tt-aceito\taceito:_processed/aceito.md\t' "${d}/q/_archived/archive.log" \
+      && _qlhas "${r}" "fila 2 → 1, _archived 0 → 1"; }
+  _c_unacc() { local r; r="$(_qlr "$1" archive s2.t-pendente.json --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 1 && _qlhas "${r}" "não foi aceito" && [ -f "${d}/q/s2.t-pendente.json" ] && [ ! -e "${d}/q/_archived" ]; }
+  _c_force() { local r; r="$(_qlr "$1" archive s2.t-pendente.json --force-unaccepted "registro de teste da bancada" --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 0 && [ -f "${d}/q/_archived/s2.t-pendente.json" ] \
+      && grep -q $'\tforcado:registro de teste da bancada\t' "${d}/q/_archived/archive.log"; }
+  _c_short() { local r; r="$(_qlr "$1" archive s2.t-pendente.json --force-unaccepted "x" --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 3 && [ -f "${d}/q/s2.t-pendente.json" ]; }
+  _c_hubacc() { local r; r="$(_qlr "$1" archive s3.t-hub.json --receiver hub-bancada --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 1 && _qlhas "${r}" "o hub aceita no repo dele" && [ -f "${d}/q/hub-bancada/s3.t-hub.json" ]; }
+  _c_body() { local r; r="$(_qlr "$1" archive s2.t-pendente.json --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 1 && [ -f "${d}/q/s2.t-pendente.json" ]; }
+  _c_form() { local r; r="$(_qlr "$1" archive ../s1.t-aceito.json --apply)"; QL_WHY="${r:0:300}"; _qlrc "${r}" 3; }
+  _c_link() { local r; ln -s "${d}/q/s1.t-aceito.json" "${d}/q/link.json"
+    r="$(_qlr "$1" archive link.json --force-unaccepted "symlink da bancada" --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 1 && _qlhas "${r}" "symlink" && [ -L "${d}/q/link.json" ]; }
+  _c_bk() { local r; r="$(QLR_BK="${d}/bk-falha.sh" _qlr "$1" archive s1.t-aceito.json --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 2 && [ -f "${d}/q/s1.t-aceito.json" ]; }
+  _c_exists() { local r; mkdir -p "${d}/q/_archived"; printf '{}\n' > "${d}/q/_archived/s1.t-aceito.json"
+    r="$(_qlr "$1" archive s1.t-aceito.json --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 1 && _qlhas "${r}" "recuso sobrescrever o arquivado" && [ -f "${d}/q/s1.t-aceito.json" ]; }
+  _c_fake() { local r; r="$(QLR_PATH="${d}/mvstub:" _qlr "$1" archive s1.t-aceito.json --apply)"; QL_WHY="${r:0:400}"
+    _qlrc "${r}" 1 && _qlhas "${r}" "ROLLBACK MANUAL" && _qlhas "${r}" "mv -n -- ${d}/q/_archived/s1.t-aceito.json ${d}/q/s1.t-aceito.json"; }
+  _c_env() { local r rc=0; r="$(cd "${d}" && env PATH="${d}/stub:${PATH}" ONION_A2A_QUEUE_DIR="${d}/q" bash "$1" list 2>&1)" || rc=$?
+    QL_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ] && case "${r}" in *"produção não se redireciona"*) true ;; *) false ;; esac; }
+  _c_svc() { local r; r="$(QLR_ENV="ONION_A2A_QUEUE_DIR=${svc_home}/x/a2a-pending" _qlr "$1" list)"; QL_WHY="${r:0:200}"; _qlrc "${r}" 3; }
+  _c_opt() { local r; r="$(_qlr "$1" list --dir "${d}/outra")"; QL_WHY="${r:0:200}"; _qlrc "${r}" 3; }
+  _c_lock() { local r; rm -f "${d}/held"
+    ( flock -x 8; : > "${d}/held"; sleep 4 ) 8>"${d}/lock" &
+    local _n=0; while [ ! -f "${d}/held" ] && [ "${_n}" -lt 50 ]; do sleep 0.1; _n=$((_n + 1)); done
+    r="$(_qlr "$1" list)"; QL_WHY="${r:0:200}"; wait; _qlrc "${r}" 2; }
+  _c_copy() { local r rc=0; r="$(cd "${d}" && env PATH="${d}/stub:${PATH}" bash "$1" list 2>&1)" || rc=$?
+    QL_WHY="rc=${rc} ${r:0:200}"; [ "${rc}" = 3 ] && case "${r}" in *"não é arquivo rastreado"*) true ;; *) false ;; esac; }
+  _c_show() { local r; r="$(_qlr "$1" show s1.t-aceito.json --out "${d}/op/s1.json")"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 0 && [ "$(stat -c '%a %u' "${d}/op/s1.json" 2>/dev/null)" = "600 $(id -u)" ] \
+      && cmp -s "${d}/op/s1.json" "${d}/q/s1.t-aceito.json" && _qlhas "${r}" "a2a-accept.sh ${d}/op/s1.json" || return 1
+    r="$(_qlr "$1" show s1.t-aceito.json --out "${d}/op/s1.json")"; QL_WHY="2ª: ${r:0:200}"; _qlrc "${r}" 1; }
+  _c_showgit() { local r; git init -q "${d}/op/repo"
+    r="$(_qlr "$1" show s1.t-aceito.json --out "${d}/op/repo/s1.json")"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 1 && [ ! -e "${d}/op/repo/s1.json" ]; }
+  _c_help() { local r rc=0; r="$(bash "$1" --help 2>&1)" || rc=$?
+    QL_WHY="rc=${rc} fim='$(tail -1 <<< "${r}")'"; [ "${rc}" = 0 ] && case "${r}" in *"3 uso inválido"*) true ;; *) false ;; esac; }
+  _qlcase "(q1) list: nome, remetente e aceite, sem o corpo do sinal (texto e --json)" \
+    "    print(json.dumps(o))'" "    print(json.dumps(dict(o, raw=r)))'" _c_list
+  _qlcase "(q2) list: a fila do hub aparece com o aceite NÃO medido, e --receiver filtra" 'else acc="-"; fi' 'else acc=""; fi' _c_hub
+  _qlcase "(q3) archive sem --apply é ENSAIO: rc 0, nada movido, nenhum backup" 'if [ "${APPLY}" = 0 ]; then' 'if false; then' _c_dry
+  _qlcase "(q4) archive --apply de registro aceito: movido para _archived, sha256 igual, contagem e archive.log" \
+    'as_svc mv -n -- "${SRC}" "${DST}"' 'as_svc cp -- "${SRC}" "${DST}"' _c_apply
+  _qlcase "(q5) registro não aceito → rc 1, nada movido" 'elif [ "${FORCE_SET}" = 1 ]; then' 'elif true; then' _c_unacc
+  _qlcase "(q6) --force-unaccepted com motivo → arquiva e o motivo vai ao archive.log" 'STATUS="forcado:${FORCE}"' 'STATUS="forcado:"' _c_force
+  _qlcase "(q7) --force-unaccepted com motivo curto → rc 3" '^[^[:cntrl:]]{8,200}$' '^[^[:cntrl:]]{0,200}$' _c_short
+  _qlcase "(q8) registro de hub com o taskId no inbox do core NÃO conta como aceito" \
+    'if [ "${Q}" = "${QUEUE}" ] && { [ -z "${RRCV}" ] || [ "${RRCV}" = "${DEFAULT_RECEIVER}" ]; }; then ACC=' 'if true; then ACC=' _c_hubacc
+  _qlcase "(q9) taskId só no corpo do doc (fora do frontmatter) não é aceite" \
+    $'            if ln.strip() == "---":\n                break' $'            if ln.strip() == "---":\n                pass' _c_body
+  _qlcase "(q10) registro fora da forma (com diretório) → rc 3" '[[ "${REC}" =~ ${REC_RE} ]] ||' 'true ||' _c_form
+  _qlcase "(q11) registro symlink → rc 1, nada movido" 'as_svc test -L "${SRC}" && die 1' 'false && die 1' _c_link
+  _qlcase "(q12) backup falha → rc 2, nada movido" '[ $? -eq 0 ] || die 2 "backup falhou' 'true || die 2 "backup falhou' _c_bk
+  _qlcase "(q13) já arquivado com o mesmo nome → rc 1, recusa sobrescrever" 'as_svc test -e "${DST}" && die 1' 'false && die 1' _c_exists
+  _qlcase "(q14) mv que sai 0 sem mover → a contagem reprova, rc 1 com ROLLBACK impresso" \
+    "fail_after_write() { printf '[%s] ERRO: %s\n' \"\${NAME}\" \"\$1\" >&2; rollback; exit 1; }" \
+    "fail_after_write() { printf '[%s] ERRO: %s\n' \"\${NAME}\" \"\$1\" >&2; exit 1; }" _c_fake
+  _qlcase "(q15) ONION_A2A_QUEUE_* sem o modo de teste → rc 3 (produção não se redireciona)" \
+    "if compgen -e | grep -E '^ONION_A2A_QUEUE_' >/dev/null; then" 'if false; then' _c_env
+  _qlcase "(q16) modo de teste com fila sob a home da conta do serviço → rc 3" 'case "${_r}/" in "${SVC_HOME}/"*)' 'case "${_r}/" in "/nunca/"*)' _c_svc
+  _qlcase "(q17) opção fora da lista fechada (--dir) → rc 3" '    *) die 3 "opção não aceita: $1' '    *) shift 2; continue; die 3 "opção não aceita: $1' _c_opt
+  _qlcase "(q18) trava ocupada (update-bridge rodando) → rc 2" 'flock -n 9 || die 2' 'true || die 2' _c_lock
+  _qlcase "(q19) cópia do wrapper fora de um checkout, em produção → rc 3 antes de qualquer sudo" \
+    '      || die 3 "${_f} não é arquivo rastreado' '      || true "${_f} não é arquivo rastreado' _c_copy
+  _qlcase "(q20) show: cópia 0600 do operador igual ao registro, com a linha do aceite; não sobrescreve" \
+    '( umask 077; set -C; as_svc cat' '( umask 022; set -C; as_svc cat' _c_show
+  _qlcase "(q21) show --out numa árvore git sem .gitignore → rc 1, nada escrito" \
+    '     && ! git -C "${out_dir}" check-ignore -q' '     && false && ! git -C "${out_dir}" check-ignore -q' _c_showgit
+  _qlcase "(q22) --help mostra o EXIT inteiro (até '3 uso inválido')" "'/^# USO/,/^# MODO DE TESTE/p'" "'/^# USO/,/^# EXIT/p'" _c_help
   rm -rf "${d}"
 }
 
@@ -30005,6 +30203,7 @@ _family run_radar_composable_modes_selftests
 _family run_pretooluse_veto_selftests
 _family run_moat_gate_selftests
 _family run_a2a_invite_live_selftests
+_family run_a2a_queue_live_selftests
 _family run_version_drift_selftests
 _family run_premodelswitch_guard_selftests
 _family run_research_lens_selftests

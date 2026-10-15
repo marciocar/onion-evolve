@@ -6,8 +6,8 @@ meta:
   schema_version: "1"
   baseline: "2026-10-14"
   review_after: "2026-11-13"   # 30d: cadência de ferramenta
-  # ═══ TETO: 39 NÓS ═══
-  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão); +4 a F2 do lado do core (2026-10-15: a evidência, 2 achados e 1 decisão da sessão); +2 o wrapper de produção do convite (2026-10-15: o achado do MOAT e a evidência); +1 a decisão do maestro de esvaziar o pool legado (2026-10-15, /meta:decide); +1 o S6 vivo em produção (2026-10-15); +2 a F5 (2026-10-15: a evidência do manual escrito da saída real e o achado de que o /docs:build-project-manual não cobre docs/applying). +5 a F3 (2026-10-15, SAC-124: a evidência, 3 achados medidos (2 do refutador) e 1 decisão da sessão).
+  # ═══ TETO: 42 NÓS ═══
+  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão); +4 a F2 do lado do core (2026-10-15: a evidência, 2 achados e 1 decisão da sessão); +2 o wrapper de produção do convite (2026-10-15: o achado do MOAT e a evidência); +1 a decisão do maestro de esvaziar o pool legado (2026-10-15, /meta:decide); +1 o S6 vivo em produção (2026-10-15); +2 a F5 (2026-10-15: a evidência do manual escrito da saída real e o achado de que o /docs:build-project-manual não cobre docs/applying). +5 a F3 (2026-10-15, SAC-124: a evidência, 3 achados medidos (2 do refutador) e 1 decisão da sessão). +3 o wrapper da fila de produção (2026-10-15: a evidência, o achado de que a cópia de um wrapper com função que embrulha sudo passava o MOAT e 1 decisão da sessão sobre o que conta como aceite).
   x_linear_epic: "SAC-120"
 nodes:
   - id: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -619,6 +619,54 @@ nodes:
       locator: "onion-bridge#70 e a branch feat/a2a-hub-with-core"
       method: "derivado: decisão da sessão sob a autorização do maestro, a partir das medições da F3 (2026-10-15)"
       locality: "repo"
+  - id: C_FUNCAO_QUE_EMBRULHA_SUDO_PASSAVA_O_MOAT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 alimentando o pretooluse-moat-gate.sh com o JSON de PreToolUse (sem executar): uma cópia do ops/a2a-queue-live.sh fora do projeto, chamada com archive --apply, saía rc 0, e um script de 4 linhas com sv(){ sudo -n -u <conta> \"$@\"; } e sv mv na fila também; o mv direto na fila, como a conta do serviço, já saía rc 2. Depois da cura, rc 2 nos dois, e o veto preciso dos casos antigos (MOAT/deploy com o alvo) segue o mesmo"
+    label: "o veto do MOAT deixava passar script não versionado que escreve na fila por uma função que embrulha sudo: o juiz lê a função, não a chamada, e a cópia do wrapper da fila passava com rc 0"
+    narrative: "Cura: depois da análise precisa do corpo, se ela não emitiu nada, script não versionado com uma função cujo corpo chama sudo e com um alvo do MOAT no código (sem comentários) fecha como inanalisável. Vem depois da análise para não trocar o veto preciso por este genérico: a 1ª redação, antes da análise, derrubou três casos antigos da bancada (o script de campo do kg-writer, o cat | bash e o wrapper não rastreado), que passaram a sair pelo fecho genérico. Teto declarado: função de mais de 600 caracteres até o sudo e sudo chamado por variável seguem fora."
+    provenance:
+      source: ".claude/hooks/lib/moat-judge.py"
+      locator: "_moat_script, o fecho depois de scoped(); casos (p6) e (p7) de run_moat_gate_selftests"
+      method: "medição: payload real de PreToolUse e mutantes pela sessão"
+      locality: "repo"
+  - id: E_WRAPPER_DA_FILA_DE_PRODUCAO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 em sandbox (modo de teste declarado, sudo stub): LC_ALL=C bash .claude/validation/lint-selftest.sh --families moat_gate,a2a_invite_live,a2a_queue_live sai 227/0 (22 casos na família nova e 7 no moat_gate, cada um com mutante provado por _prove_mutation); 11 mutantes plantados por ops/mutate-and-restore.sh no wrapper e no juiz, cada um reprovando a família"
+    label: "a fila A2A de produção tem um caminho de escrita só: o wrapper core-only a2a-queue-live.sh lista, copia para o aceite e arquiva (mv para _archived, nunca apaga) como a conta do serviço, com trava, ensaio por padrão, backup antes e prova por contagem depois"
+    narrative: "A fila mora em ⟨a home da conta do serviço⟩/onion-bridge/data/a2a-pending (o default do bridge sob o WorkingDirectory da unidade, sem override medido no unit; o .env não foi lido, pela guarda), e a de cada hub num subdiretório desde a F3. O list nunca imprime o corpo do sinal nem o envelope. NÃO MEDIDO: o arquivamento na fila de produção, que é a prova viva da sessão principal depois do merge (os 2 registros de teste do maestro-notebook-test de 2026-10-15)."
+    provenance:
+      source: "ops/a2a-queue-live.sh"
+      locator: "run_a2a_queue_live_selftests (q1)-(q22) e os casos (p1)-(p7) de run_moat_gate_selftests"
+      method: "medição: bancada e mutantes pela sessão"
+      locality: "repo"
+  - id: D_ACEITE_DA_FILA_PELO_TASKID_NO_INBOX
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-15"
+    verified_against: "decidido pela sessão do wrapper da fila em 2026-10-15 sob a autorização do maestro para decidir sem ele (opção recomendada)"
+    label: "o archive só move registro aceito, e aceito é ter o taskId do registro no frontmatter de um doc do inbox do core (o que o a2a-accept.sh escreve); o resto exige --force-unaccepted com motivo, e registro de hub conta como não aceito"
+    narrative: "Decisão da sessão, aberta para o maestro ratificar ou trocar. O taskId é o randomUUID que o bridge gera por registro e o a2a-accept.sh grava em verificacao.taskId, então é único e não depende do nome do arquivo. Alternativas descartadas: o jti do envelope (o doc de inbox não o grava), o nome do sinal (o mesmo sinal pode chegar duas vezes com taskIds diferentes) e ler o inbox do hub (o wrapper não conhece o checkout dele). O motivo do --force-unaccepted vai ao archive.log de _archived, e nada se apaga. Gatilho para rever: o primeiro hub real com fila no bridge do core."
+    provenance:
+      source: "sessão do wrapper da fila"
+      locator: "ops/a2a-queue-live.sh, accepted_doc e o ramo do archive"
+      method: "derivado: decisão da sessão sob a autorização do maestro, a partir da medição do a2a-accept.sh e do bridge (src/a2a.ts, origin/main 5ff4116)"
+      locality: "repo"
 edges:
   - from: E_ONZE_PASSOS_MANUAIS_HOJE
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -754,4 +802,13 @@ edges:
     edge_type: SUPPORTS
   - from: D_RECEPTOR_NA_ROTA_VALIDADO_NO_BRIDGE_E_NO_GATE
     to: D_ENDPOINT_BRIDGE_MULTI_E_SERVIDOR_DO_HUB
+    edge_type: TRACES_TO
+  - from: C_FUNCAO_QUE_EMBRULHA_SUDO_PASSAVA_O_MOAT
+    to: E_WRAPPER_DA_FILA_DE_PRODUCAO
+    edge_type: SUPPORTS
+  - from: E_WRAPPER_DA_FILA_DE_PRODUCAO
+    to: C_PASSO_MANUAL_RESTANTE_E_DO_BRIDGE
+    edge_type: SUPPORTS
+  - from: D_ACEITE_DA_FILA_PELO_TASKID_NO_INBOX
+    to: E_WRAPPER_DA_FILA_DE_PRODUCAO
     edge_type: TRACES_TO

@@ -397,11 +397,21 @@ def _moat_script(path, depth, words):
             and _MOAT_SIGNAL.search(code)):
         _moat_emit("inanalisavel", p, "", "script não versionado que chama um motor escritor, com alvo do MOAT no corpo")
         return
+    n_out = len(OUT)
     try:
         scoped(heredocs(body), depth + 1)
     except Unanalyzable:
         if moat_relevant(body):
             _moat_emit("inanalisavel", p, "", "script fundo demais para analisar, com alvo do MOAT no corpo")
+    # script NÃO versionado com uma FUNÇÃO que embrulha sudo e um alvo do MOAT no corpo, que a análise acima não
+    # julgou: a escrita sai por `sv mv "$Q/x" …`, que o juiz não segue (ele lê a função, não a chamada). Medido em
+    # 2026-10-15: uma cópia do wrapper da fila A2A fora do projeto passava com rc 0, e um script de 4 linhas com
+    # `sv(){ sudo -u <conta> "$@"; }` e `sv mv` na fila também. Vem DEPOIS da análise para não trocar um veto
+    # preciso (MOAT/deploy com o alvo) por este genérico. O wrapper versionado segue fronteira; a cópia, não
+    if not any(o.startswith("__ONION_MOAT__") for o in OUT[n_out:]) \
+            and re.search(r"^[ \t]*(?:function[ \t]+)?[A-Za-z_][A-Za-z0-9_]*[ \t]*\(\)[ \t]*\{(?:(?!\n\}).){0,600}?\bsudo\b", code, re.S | re.M) \
+            and _MOAT_SIGNAL.search(code):
+        _moat_emit("inanalisavel", p, "", "script não versionado com função que embrulha sudo, com alvo do MOAT no corpo")
 
 
 def _moat_systemctl(args, detail):
@@ -508,6 +518,12 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
             or (isinstance(env, dict) and "ONION_A2A_LIVE_TEST" in env) \
             or "ONION_A2A_LIVE_TEST" in globals().get("ASSIGN", {}):   # `export X=1; …` e `X=1; …` caem no ASSIGN do lib
         _moat_emit("inanalisavel", "ONION_A2A_LIVE_TEST", "", "modo de teste do wrapper de convites fora da bancada — %s" % detail)
+    # o MESMO fecho para o wrapper da fila A2A (ops/a2a-queue-live.sh, 2026-10-15): o modo de teste dele roda o
+    # backup que o ambiente nomear e move arquivos como o operador — pela sessão, lavaria um script não versionado
+    if any(re.match(r"^(export\s+)?ONION_A2A_QUEUE_TEST=", w) for w in list(raw_words) + list(words)) \
+            or (isinstance(env, dict) and "ONION_A2A_QUEUE_TEST" in env) \
+            or "ONION_A2A_QUEUE_TEST" in globals().get("ASSIGN", {}):
+        _moat_emit("inanalisavel", "ONION_A2A_QUEUE_TEST", "", "modo de teste do wrapper da fila A2A fora da bancada — %s" % detail)
     if base == "cd" and len(words) > 1 and not DYNAMIC.search(words[1]) and words[1] != "-":
         prev = _MOAT_CDS[-1] if _MOAT_CDS else (CWD[-1] if CWD[-1] not in (None, UNKNOWN) else JCWD)
         _MOAT_CDS.append(os.path.normpath(os.path.join(prev, os.path.expanduser(words[1]))))
