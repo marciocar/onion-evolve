@@ -428,7 +428,7 @@ side_member() {
     b64u() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
     now="$(date +%s)"; jti="doctor-${now}-$$-$(openssl rand -hex 4)"
     bsha="$(printf '' | openssl dgst -sha256 | awk '{print $NF}')"
-    hd="$(printf '{"alg":"RS256","kid":"%s"}' "${KID}" | b64u)"
+    hd="$(jq -cn --arg k "${KID}" '{alg:"RS256",kid:$k}' | b64u)"   # jq, nunca printf: o kid não é JSON-seguro por construção
     pl="$(jq -cn --arg i "${MEMBER}" --arg a "${RECEIVER}" --arg j "${jti}" --arg b "${bsha}" --argjson t "${now}" \
           '{iss:$i,aud:$a,iat:$t,exp:($t+300),jti:$j,body_sha256:$b}' | b64u)"
     sig="$(printf '%s' "${hd}.${pl}" | openssl dgst -sha256 -sign "${priv}" 2>/dev/null | b64u)"
@@ -443,6 +443,7 @@ side_member() {
       case "${reason}" in
         trust-denied) nx="a topologia não deixa ${MEMBER} falar com ${RECEIVER}: confira trust e kind no registro" ;;
         kid-not-owned-by-from:*|unknown-kid:*) nx="o pino do kid está errado: ver (d)" ;;
+        bad-kid|jws-missing-kid) nx="o kid fora da forma do gate (1–160 de [A-Za-z0-9._-], sem '.' no início): gere outro com o a2a-keygen" ;;
         bad-signature) nx="a privada local não é a pinada: ver (c) e (d)" ;;
         tooling-absent:*) nx="instale ${reason#tooling-absent:}" ;;
         receiver-unknown) nx="${RECEIVER} não está no registro: confira o --receiver (ou o a2a.sends_to)" ;;

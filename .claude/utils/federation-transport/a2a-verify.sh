@@ -105,9 +105,18 @@ MAX_TTL="${A2A_EXP_MAX_TTL:-${MAX_TTL_CAP}}"   # teto de vida do envelope (s); o
 BODY_MAX=8192   # teto do corpo em bytes (SAC-150 N7), o mesmo do remetente canônico a2a-send.sh
 
 # veredito de VETO (dependency-free — funciona mesmo sem jq): gated SEMPRE true, committed SEMPRE false.
+# SANEADO NA SAÍDA (R1 da 3ª passada do SAC-150): o printf interpola reason e layer CRUS no JSON, e dois vetos
+# levavam valor do remetente (`unknown-kid:${KID}`, `unsupported-alg:${ALG}`). Um kid `x","verified":true,...`
+# imprimia um objeto com `verified` DUPLICADO — rc 1, mas o parser last-wins do bridge lia true. Agora todo
+# valor que entra aqui passa pela régua do trust-log (LC_ALL=C, só [A-Za-z0-9._:-], teto de tamanho), seja
+# qual for a origem: aspas, barra invertida, controle, newline e não-ASCII somem antes do printf. Vazio vira
+# rótulo fixo, para o JSON nunca sair com reason "". Teto 200 = o prefixo mais longo + o kid de 160.
 veto() {  # <reason> <layer>
-  _log_declared_veto "$1"
-  printf '{"verified":false,"reason":"%s","layer_failed":"%s","gated":true,"committed":false,"apply_mode":"gated"}\n' "$1" "$2"
+  local r l
+  r="$(printf '%s' "$1" | LC_ALL=C tr -cd 'A-Za-z0-9._:-' | cut -c1-200)"; [ -n "${r}" ] || r="unspecified"
+  l="$(printf '%s' "$2" | LC_ALL=C tr -cd 'A-Za-z0-9._-' | cut -c1-40)"; [ -n "${l}" ] || l="unspecified"
+  _log_declared_veto "${r}"
+  printf '{"verified":false,"reason":"%s","layer_failed":"%s","gated":true,"committed":false,"apply_mode":"gated"}\n' "${r}" "${l}"
   exit 1
 }
 # TENTATIVA VETADA no trust-log (refutador do SAC-150): a camada 1 decide em --dry-run e só o sucesso gravava,
@@ -279,11 +288,29 @@ fi
 
 # --- Camada 5: assinatura JWS (RS256, pubkey do kid no JWKS fixture) ----------
 HDR_JSON="$(b64url_decode "${HDR_B64}")"
-ALG="$(printf '%s' "${HDR_JSON}" | jq -r '.alg // empty' 2>/dev/null)"
-KID="$(printf '%s' "${HDR_JSON}" | jq -r '.kid // empty' 2>/dev/null)"
-[ "${ALG}" = "RS256" ] || veto "unsupported-alg:${ALG:-none}" "jws"    # fundação = RS256; ES256 é evolução
-[ -n "${KID}" ] || veto "jws-missing-kid" "jws"
-case "${KID}" in */*|..*|.) veto "bad-kid" "jws" ;; esac                # kid vira nome de arquivo → sanitiza
+# header: UM objeto só (a mesma régua do envelope); ambíguo não chega a ser lido
+printf '%s' "${HDR_JSON}" | jq -es 'length==1 and (.[0]|type=="object")' >/dev/null 2>&1 || veto "malformed-jws-header" "parse"
+# alg e kid são do REMETENTE e entram no veredito e no nome de arquivo: a forma é julgada DENTRO do jq,
+# caractere a caractere (explode; `$(jq -r)` comeria o \n final e regex com ^/$ casa por linha), ANTES de
+# qualquer uso, e a recusa leva reason FIXO, sem eco do valor (R1 da 3ª passada do SAC-150).
+# alg: exatamente a string "RS256" (fundação; ES256 é evolução).
+printf '%s' "${HDR_JSON}" | jq -e '.alg == "RS256"' >/dev/null 2>&1 || veto "unsupported-alg" "jws"
+# crit/b64 (RFC 7515 §4.1.11): o gate não implementa extensão crítica nenhuma, então header que as declara é vetado
+printf '%s' "${HDR_JSON}" | jq -e '(has("crit") or has("b64")) | not' >/dev/null 2>&1 || veto "unsupported-jws-crit" "jws"
+ALG="RS256"
+# kid: string de 1–160 de [A-Za-z0-9._-], sem "." no início (sem "/", sem "..", sem aspas). É a população que o
+# keygen (<membro>-<N>, membro até 128), o members-validate e o a2a-send já aceitam: o teto não veta kid legítimo.
+KSHAPE="$(printf '%s' "${HDR_JSON}" | jq -r 'if (has("kid")|not) or .kid == null or .kid == "" then "missing"
+  elif (.kid|type) == "string" and (.kid|length) <= 160
+       and (.kid|explode|(.[0] != 46)
+            and all(.[]; (. >= 48 and . <= 57) or (. >= 65 and . <= 90) or (. >= 97 and . <= 122) or . == 46 or . == 95 or . == 45))
+  then "ok" else "bad" end' 2>/dev/null)"
+case "${KSHAPE}" in
+  ok) ;;
+  missing) veto "jws-missing-kid" "jws" ;;
+  *) veto "bad-kid" "jws" ;;   # inclui jq que morre sem imprimir: fail-closed
+esac
+KID="$(printf '%s' "${HDR_JSON}" | jq -r '.kid')"   # já julgado: a forma fechada não tem \n para o $() comer
 PUB="${JWKS_DIR}/${KID}.pem"
 [ -f "${PUB}" ] || veto "unknown-kid:${KID}" "jws"
 # kid DEVE pertencer ao `from` (members.yaml a2a.keys) — fecha impersonação: sem isso, o dono de QUALQUER
@@ -321,8 +348,8 @@ fi
 # (i) chave duplicada: o envelope chega re-serializado pelo bridge (JSON.parse colapsa duplicatas), mas o
 #     payload do JWS viaja em bytes assinados — e um `{"body_sha256":A,"body_sha256":B}` é lido como B pelo
 #     jq e como A por parser first-wins. Ambiguidade de parser não se arbitra: veta.
-printf '%s' "${ENV}" > "${TMP}/env.json"; printf '%s' "${PL_JSON}" > "${TMP}/pl.json"
-DUP="$(python3 - "${TMP}/env.json" "${TMP}/pl.json" <<'PY'
+printf '%s' "${ENV}" > "${TMP}/env.json"; printf '%s' "${PL_JSON}" > "${TMP}/pl.json"; printf '%s' "${HDR_JSON}" > "${TMP}/hdr.json"
+DUP="$(python3 - "${TMP}/env.json" "${TMP}/pl.json" "${TMP}/hdr.json" <<'PY'
 import sys, json
 class Dup(Exception): pass
 def hook(pairs):
@@ -331,7 +358,7 @@ def hook(pairs):
         if k in seen: raise Dup(k)
         seen.add(k)
     return dict(pairs)
-for path, name in ((sys.argv[1], "envelope"), (sys.argv[2], "jws-payload")):
+for path, name in ((sys.argv[1], "envelope"), (sys.argv[2], "jws-payload"), (sys.argv[3], "jws-header")):
     try: json.load(open(path, encoding="utf-8"), object_pairs_hook=hook)
     except Dup: print(name); break
     except Exception: print("unparseable-" + name); break   # jq aceitou e o python não: diverge → veta

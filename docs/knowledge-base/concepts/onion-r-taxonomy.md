@@ -65,8 +65,8 @@ companion_of: onion-guardrails.md
 |---|---|---|---|
 | envelope inexistente / não-JSON / campos ausentes | `envelope-absent` · `malformed-envelope` · `envelope-missing-fields` | a2a-verify.sh | conf. |
 | JWS malformado / payload não-JSON | `malformed-jws` · `malformed-jws-payload` | a2a-verify.sh | conf. |
-| `alg` ≠ RS256 | `unsupported-alg:${ALG:-none}` | a2a-verify.sh | conf. |
-| `kid` ausente / com path-traversal / desconhecido | `jws-missing-kid` · `bad-kid` · `unknown-kid:${KID}` | a2a-verify.sh | conf. |
+| `alg` ≠ RS256 (ou header com `crit`/`b64`) | `unsupported-alg` · `unsupported-jws-crit` (reason fixo, sem eco do valor) | a2a-verify.sh | conf. |
+| `kid` ausente / fora da forma (1–160 de `[A-Za-z0-9._-]`, sem `.` inicial) / desconhecido | `jws-missing-kid` · `bad-kid` · `unknown-kid:${KID}` | a2a-verify.sh | conf. |
 | `kid` não pertence ao `from` em members.yaml | `kid-not-owned-by-from:${KID}` | a2a-verify.sh | conf. (gated) |
 | assinatura RS256 inválida | `bad-signature` | a2a-verify.sh | conf. |
 | `iss`/`aud`/`to` divergem do declarado | `claim-iss-mismatch` · `claim-aud-mismatch` · `signal-to-mismatch` | a2a-verify.sh | conf. |

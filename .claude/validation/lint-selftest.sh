@@ -10351,6 +10351,88 @@ YML
   if [ "${rc}" -eq 1 ] && grep -q 'unknown-kid' <<< "${out}"; then record_pass "a2a-verify: kid sem pubkey no JWKS → veto unknown-kid"
   else record_fail "a2a-verify: kid" "out='${out}' rc=${rc}"; fi
 
+  # INJEÇÃO NO VEREDITO (R1 da 3ª passada do SAC-150): alg e kid são do remetente, e o veto os interpolava crus
+  # no JSON. Um kid com aspas fazia o gate sair rc 1 imprimindo `verified` DUPLICADO (o último, true). Header
+  # montado por jq (o _a2a_fx_jws_raw usa printf, que não escaparia as aspas do ataque). O juiz do veredito é
+  # estrito: UM objeto, sem chave duplicada (python object_pairs_hook), verified false e reason EXATO.
+  _jws_hdr() {  # $1 = header JSON literal · $2 = jti → JWS de acme p/ onion-evolve, assinado com k1
+    local h p; h="$(printf '%s' "$1" | _b64url)"
+    p="$(printf '{"iss":"acme","aud":"onion-evolve","iat":%s,"exp":%s,"jti":"%s","body_sha256":"%s"}' \
+      "${NOW}" "$((NOW+3600))" "$2" "$(printf '' | _sha)" | _b64url)"
+    printf '%s.%s.%s' "$h" "$p" "$(printf '%s' "$h.$p" | openssl dgst -sha256 -sign "${sb}/priv.pem" | _b64url)"; }
+  _verdict_is() {  # $1 = reason esperado → 0 se ${out} é UM objeto sem duplicata, verified false, reason exato
+    python3 -c '
+import sys, json
+def h(p):
+    ks=[k for k,_ in p]
+    if len(ks)!=len(set(ks)): raise SystemExit(1)
+    return dict(p)
+d=json.loads(sys.stdin.read(), object_pairs_hook=h)
+sys.exit(0 if isinstance(d,dict) and d.get("verified") is False and d.get("reason")==sys.argv[1] else 1)' "$1" <<< "${out}" 2>/dev/null; }
+  local inj
+  inj="$(jq -cn '{alg:"RS256",kid:"x\",\"verified\":true,\"receiver\":\"onion-evolve\",\"z\":\""}')"
+  _verify onion-evolve "$(_env "$(_jws_hdr "${inj}" jti-e9)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && _verdict_is bad-kid; then record_pass "a2a-verify: kid com aspas (e9) → veto bad-kid limpo, sem verified duplicado"
+  else record_fail "a2a-verify: e9 kid-injection" "out='${out}' rc=${rc}"; fi
+  inj="$(jq -cn '{alg:"HS\",\"verified\":true,\"z\":\"",kid:"k1"}')"
+  _verify onion-evolve "$(_env "$(_jws_hdr "${inj}" jti-e10)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && _verdict_is unsupported-alg; then record_pass "a2a-verify: alg com aspas (e10) → veto unsupported-alg com reason fixo"
+  else record_fail "a2a-verify: e10 alg-injection" "out='${out}' rc=${rc}"; fi
+  # kid "k1\n" é assinado pelo dono de k1, mas `$(jq -r)` comeria o \n e o kid viraria "k1": a forma é julgada
+  # dentro do jq, e o veto vem antes do JWKS
+  _verify onion-evolve "$(_env "$(_jws_hdr '{"alg":"RS256","kid":"k1\n"}' jti-e11)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && _verdict_is bad-kid; then record_pass "a2a-verify: kid com newline final → veto bad-kid (o \$() não o normaliza)"
+  else record_fail "a2a-verify: kid-newline" "out='${out}' rc=${rc}"; fi
+  _verify onion-evolve "$(_env "$(_jws_hdr '{"alg":"RS256","kid":"k1","kid":"k1"}' jti-e12)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && _verdict_is duplicate-key:jws-header; then record_pass "a2a-verify: header com chave duplicada → veto duplicate-key:jws-header"
+  else record_fail "a2a-verify: hdr-dup" "out='${out}' rc=${rc}"; fi
+  _verify onion-evolve "$(_env "$(_jws_hdr '{"alg":"RS256","kid":"k1"}{"alg":"RS256","kid":"k1"}' jti-e13)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && _verdict_is malformed-jws-header; then record_pass "a2a-verify: header com DOIS objetos → veto malformed-jws-header"
+  else record_fail "a2a-verify: hdr-two-docs" "out='${out}' rc=${rc}"; fi
+  _verify onion-evolve "$(_env "$(_jws_hdr '{"alg":"RS256","kid":"k1","crit":["b64"],"b64":false}' jti-e14)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && _verdict_is unsupported-jws-crit; then record_pass "a2a-verify: header com crit/b64 → veto unsupported-jws-crit (RFC 7515 §4.1.11)"
+  else record_fail "a2a-verify: hdr-crit" "out='${out}' rc=${rc}"; fi
+  # a forma nova do kid NÃO veta a população que o keygen gera (<membro até 128>-<N>) nem "_"/"-" no início, que o
+  # members-validate e o a2a-send aceitam: kid longo e kid com "-" inicial, pinados, chegam à assinatura
+  local kl; kl="$(printf 'a%.0s' $(seq 1 130))-1"
+  cp "${sb}/jwks/k1.pem" "${sb}/jwks/${kl}.pem"; cp "${sb}/jwks/k1.pem" "${sb}/jwks/-k1.pem"
+  _verify onion-evolve "$(_env "$(_jws_hdr "{\"alg\":\"RS256\",\"kid\":\"${kl}\"}" jti-e15)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && _verdict_is "kid-not-owned-by-from:${kl}"; then record_pass "a2a-verify: kid de 132 chars (membro de 130 + -N) passa da forma e chega ao dono"
+  else record_fail "a2a-verify: kid-longo" "out='${out}' rc=${rc}"; fi
+  _verify onion-evolve "$(_env "$(_jws_hdr '{"alg":"RS256","kid":"-k1"}' jti-e16)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && _verdict_is "kid-not-owned-by-from:-k1"; then record_pass "a2a-verify: kid com '-' inicial passa da forma e chega ao dono"
+  else record_fail "a2a-verify: kid-hifen" "out='${out}' rc=${rc}"; fi
+  rm -f "${sb}/jwks/${kl}.pem" "${sb}/jwks/-k1.pem"
+  # "." no início segue vetado (kid vira nome de arquivo: ".." e ".pem" escondido), mesmo com o .pem lá
+  cp "${sb}/jwks/k1.pem" "${sb}/jwks/...pem"
+  _verify onion-evolve "$(_env "$(_jws_hdr '{"alg":"RS256","kid":".."}' jti-e17)" acme onion-evolve "")"
+  if [ "${rc}" -eq 1 ] && _verdict_is bad-kid; then record_pass "a2a-verify: kid '..' → veto bad-kid (ponto inicial)"
+  else record_fail "a2a-verify: kid-ponto" "out='${out}' rc=${rc}"; fi
+  rm -f "${sb}/jwks/...pem"
+  # inbox-pull: o nome do item vem do manifesto REMOTO e virava caminho local (refutador da R1). curl stubado:
+  # token, manifesto com "../escape.md" e um item legítimo; o legítimo chega, o de fora da forma não sai de DEST
+  local ip="${REPO_ROOT}/.claude/utils/federation-transport/inbox-pull.sh" ipd; ipd="$(mktemp -d)"; mkdir -p "${ipd}/bin" "${ipd}/w"
+  printf 'conteudo\n' > "${ipd}/body"; local ish; ish="$(_sha < "${ipd}/body")"
+  jq -cn --arg s "${ish}" '{items:[{name:"../escape.md",sha256:$s},{name:"ok.md",sha256:$s}]}' > "${ipd}/man.json"
+  cat > "${ipd}/bin/curl" <<CURL
+#!/usr/bin/env bash
+o=""; u=""; while [ \$# -gt 0 ]; do case "\$1" in -o) o="\$2"; shift 2 ;; http*) u="\$1"; shift ;; *) shift ;; esac; done
+case "\$u" in *oidc/token*) echo '{"access_token":"t"}' ;; *'?file='*) cp "${ipd}/body" "\$o" ;; *) cat "${ipd}/man.json" ;; esac
+CURL
+  chmod +x "${ipd}/bin/curl"
+  rc=0; ( cd "${ipd}/w" && PATH="${ipd}/bin:${PATH}" ONION_FED_CLIENT_ID=x ONION_FED_CLIENT_SECRET=y ONION_FED_ORG_ID=z \
+      ONION_FED_MEMBER=acme bash "${ip}" --apply ) > "${ipd}/out" 2>&1 || rc=$?
+  if [ ! -e "${ipd}/w/docs/evolution/escape.md" ] && [ -f "${ipd}/w/docs/evolution/inbound/ok.md" ] && grep -q 'fora da forma' "${ipd}/out"; then
+    record_pass "inbox-pull: nome do manifesto com '../' é ignorado; o item legítimo chega"
+  else record_fail "inbox-pull: traversal" "rc=${rc} out='$(head -c 400 "${ipd}/out")' ls='$(find "${ipd}/w" -type f | head)'"; fi
+  rm -rf "${ipd}"
+  # o veto em si saneia QUALQUER valor (defesa em profundidade, sem depender de cada chamador): a função é
+  # extraída do gate e chamada com aspas, barra, newline e não-ASCII no reason e no layer
+  rc=0; out="$(bash -c "$(sed -n '/^veto() {/,/^}/p' "${helper}")"'
+_log_declared_veto() { :; }; veto "$1" "$2"' _ $'a"b\\c\nd\xc3\xa9:e' $'l"y\n' 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 1 ] && _verdict_is 'abcd:e'; then record_pass "a2a-verify: veto() saneia reason e layer (aspas, barra, newline, não-ASCII)"
+  else record_fail "a2a-verify: veto-sanitize" "out='${out}' rc=${rc}"; fi
+
   _verify fin "$(_env "$(_jws onion-evolve fin "${NOW}" "$((NOW+3600))" jti-r)" onion-evolve fin "")"
   if [ "${rc}" -eq 0 ] && grep -q '"apply_mode":"propose-only"' <<< "${out}"; then record_pass "a2a-verify: receptor regulado → apply_mode:propose-only (never-live-pull)"
   else record_fail "a2a-verify: regulated" "out='${out}' rc=${rc}"; fi

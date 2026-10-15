@@ -10,7 +10,7 @@ assinatura de um sinal A2A: `alg: RS256`, `kid: <k>` → lê `${A2A_JWKS_DIR:-es
 - **Só chave PÚBLICA** (`.pem`). Chave privada **jamais** entra aqui (nem no repo). O `.gitignore` deste dir
   ignora `*.pem` justamente para uma chave privada nunca ser commitada por acidente — as públicas reais são
   adicionadas (force-add deliberado) quando o endpoint vivo existir e um membro publicar seu `kid`.
-- **`kid` vira nome de arquivo** → o `a2a-verify` sanitiza (`kid` com `/` ou `..` → veto `bad-kid`).
+- **`kid` vira nome de arquivo** → o `a2a-verify` julga a forma antes de usá-lo (1–160 de `[A-Za-z0-9._-]`, sem `.` no início; fora dela → veto `bad-kid`, sem eco do valor).
 - ~~**Vazio na fundação:** hoje não há endpoint vivo, logo não há `kid` real.~~ Caduco desde 2026-07-09: o
   endpoint está vivo e há públicas reais pinadas aqui. O `members-validate.sh` cobra, desde 2026-10-15, que
   todo `kid` de `a2a.keys` tenha `<kid>.pem` RSA de 2048 bits ou mais aqui, com dono único. Os selftests
