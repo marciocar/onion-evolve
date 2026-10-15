@@ -111,6 +111,7 @@ work_tool_sets:
   # validation/federation-*, skills/onion-publish/ e o motor de publicação do marketplace.
   adoption:
     - adopt
+    - federation-a2a         # /meta:federation-a2a (F1 do configurador A2A, SAC-122): convidar, pinar, diagnosticar, aceitar e revogar é ato do RECEPTOR (fonte ou hub)
     - federation-check
     - federation-member
     - federation-publish

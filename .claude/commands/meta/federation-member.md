@@ -4,7 +4,7 @@ description: Muta o registro de membros da federação (members.yaml) — OP-1 R
 category: meta
 tags: [federation, members, ledger, register, sdaal, spec-as-code]
 version: "1.0.0"
-updated: "2026-08-27"
+updated: "2026-10-15"
 allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/validation/*) Bash(git *)
 argument-hint: "register [--id <slug>] [--target <path-do-clone>]  (guiado se faltar argumento)"
 ---
@@ -54,6 +54,17 @@ Seguir o **template comentado** de `members.yaml` como forma canônica. Campos:
 - `adopted_at` e `personality_last_sync` = **data corrente** (fonte de tempo do sistema).
 - Bloco `trust:` = default do template (as 5 listas; `can_receive_from`/`can_advise_to`/
   `diary_readable_by` = `[onion-evolve]`, `can_correct_to`/`exposes_downstream` = `[]`).
+- **Bloco `a2a:`** (opcional; só se o membro vai falar com o core pelo canal ao vivo). Pergunte se ele
+  entra na rede A2A agora. Se sim, nasce **sem chave**, e a pública é pinada depois, pela trilha 2 do
+  [`/meta:federation-a2a`](federation-a2a.md):
+  ```yaml
+      a2a:
+        sends_to: onion-evolve   # o receptor: membro com role source ou hub, nunca porta
+        keys: []                 # kids <id>-<N> cujas públicas o core PINOU em jwks/<kid>.pem
+  ```
+  O `members-validate.sh` (Passo 7) cobra a forma: `kid` `<id>-<N>` com dono único, `jwks/<kid>.pem`
+  RSA de 2048 bits ou mais, `sends_to` obrigatório quando há chave e apontando receptor. Nunca escreva um
+  `kid` em `keys` sem a pública conferida pela impressão: a confiança nasce no merge do pino.
 
 ### Passo 3 — Guarda de duplicidade (idempotência)
 - Se o `id` **já existe** em `members.yaml` → **parar**: registrar é create. Para mudar um membro
@@ -93,6 +104,9 @@ bash .claude/validation/federation-console.sh > docs/onion/federation-console.ht
 ```
 - `docs/onion/agent-card.json` (REGRA 25) só muda se o membro trouxer bloco `a2a:` com kids que o core
   pina — regenerar via `a2a-agent-card.sh` **só nesse caso** e conferir por `git diff`.
+- Com bloco `a2a:`, termine pelo doctor do lado receptor (o membro nasce sem chave, então (d) sai
+  `falha` até a pública chegar, e isso é o esperado):
+  `bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <id>`
 
 ### Passo 8b — Confirmar projeção segura (REGRA 30)
 ```bash
@@ -147,4 +161,5 @@ ou, em falha:
 - Grafo do fio: `docs/onion/graph/m3-federation-admin-2026-07.kg.yaml` (nó `C_op_register`)
 - Validação: `.claude/validation/members-validate.sh` · pin: `.claude/validation/pin-integrity-check.sh`
 - Precedente comando↔script: `/meta:inventory` ↔ `.claude/validation/inventory.sh`
+- Rede A2A do membro (convite, pino da pública, doctor, aceite, revogação): [`/meta:federation-a2a`](federation-a2a.md)
 - **Não** é: `/meta:federation-register` (ledger de **contratos**)
