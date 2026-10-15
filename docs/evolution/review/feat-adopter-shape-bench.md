@@ -1,9 +1,8 @@
 ---
 branch: feat/adopter-shape-bench
-pr: pendente
+pr: 1156
 date: 2026-10-15
-reviewed_diff_sha256: eda07b5b71373f59b0b4f1d66b0ae0dc49ed81d3183385e7b0352809f7c47546
-reviewed_code_sha256: 47c21d0bddcd09ed573bb5d535315cd5806010549bfe54adda14d79e5ff901ac
+reviewed_diff_sha256: pendente
 findings_total: 11
 findings_real: 9
 tokens: 189594
@@ -83,3 +82,11 @@ São 9 mutantes, todos plantados pelo `ops/mutate-and-restore.sh` com LC_ALL=C, 
 - O caso Go não foi medido.
 - Teto do bundle de plugin.
 - O detector é léxico.
+
+## Re-revisão (depois da 1ª passada)
+
+O CI do PR reprovou `prettierignore: complete-no-header`. O template ganhou `vendor/kg-ssot/`, e a fixture do
+"alvo completo" ficou com os 5 caminhos antigos. A cura mexe só na FIXTURE da bancada, sem alterar o código
+de produção. Ela foi re-revisada por mim, não pelo refutador: a fixture passa a declarar os 6 caminhos do
+template, e a família `prettierignore` dá 7/0. Há um achado colateral: a seleção local (`--affected-staged`) não
+escolheu a família `prettierignore` para a mudança no `.tpl`, então só o CI a viu.
