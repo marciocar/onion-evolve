@@ -2,7 +2,8 @@
 branch: docs/announce-a2a-member-invites
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 24c524481c9516e193f717ef49d646b7178fc82082028ca7bd6f7301f0ea933d
+reviewed_code_sha256: 03ac2cc1c3253871e1008a4797da6dc98117dd662058ce24be2fc777558713cf
 findings_total: 2
 findings_real: 2
 tokens: 0
