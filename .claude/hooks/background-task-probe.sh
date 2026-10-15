@@ -48,7 +48,10 @@ export LC_ALL=C
 
 STALE_MIN=10          # minutos sem escrita no .output para contar como saída PARADA
 FIND_TIMEOUT=0.5      # teto do varrimento de /proc (s)
-READ_WCHAN='^(pipe_read|pipe_wait|pipe_wait_readable|n_tty_read|tty_read|wait_woken|unix_stream_read_generic|unix_stream_data_wait|sk_wait_data|wait_for_partner|fifo_open)$'
+# Os nomes do wchan MUDAM com a versão do kernel: aqui (6.8) a espera num pipe é `pipe_read`, e no runner do CI
+# (kernel mais novo) é `anon_pipe_read` — medido no 1º CI do #1129, onde o caso (b) com um FIFO real não marcou
+# SUSPEITO. Por isso a família do pipe casa com o prefixo `anon_` opcional.
+READ_WCHAN='^((anon_)?pipe_read|(anon_)?pipe_wait|pipe_wait_readable|n_tty_read|tty_read|wait_woken|unix_stream_read_generic|unix_stream_data_wait|sk_wait_data|wait_for_partner|fifo_open)$'
 
 input="$(cat 2>/dev/null)" || input=""
 if command -v jq >/dev/null 2>&1; then

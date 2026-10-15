@@ -2,11 +2,10 @@
 branch: feat/background-probe-replaces-prose-veto
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: 35c7b3ef096f1e932e67fff690520fa88ebf770b368059207c225a7dce1f5d79
-reviewed_code_sha256: b50d9f0c1140cf6996316b10ca391170b3f537b139e57c21640f5e467b9a4481
-findings_total: 4
-findings_real: 4
-findings_fixed: 4
+reviewed_diff_sha256: pendente
+findings_total: 5
+findings_real: 5
+findings_fixed: 5
 tokens: 0
 duration_min: 0
 verdict: REPROVADO_E_CURADO
@@ -99,3 +98,12 @@ porque o `rule-title-in-prose.sh` a usa. O caso (f) do `guard_forge` deixa de de
 aposentado. A família nova é `background_task_probe` (9 casos). O hook não viajava em nenhum manifesto de
 plugin, e a sonda também não viaja (core-only). Como um arquivo apagado não é citado por nenhuma família,
 o `--affected` deste diff cai no failsafe "tudo".
+
+## Rodada 1 do CI: o nome do wchan muda com o kernel
+
+O caso (b), com um FIFO real, reprovou no CI: lá a espera em pipe aparece como `anon_pipe_read` (kernel mais novo),
+e aqui (6.8) como `pipe_read`. A lista `READ_WCHAN` só tinha o nome local, então a sonda não marcava SUSPEITO no
+runner. Real, curado: a família do pipe aceita o prefixo `anon_`, com o porquê no comentário. Caso novo (j) exige que
+o padrão case os dois nomes e não case `do_wait`, sem depender do kernel que roda a bancada; mutante sem o `anon_`
+reprova o (j). É a mesma classe de lista (o vocabulário do kernel), contida aqui porque o conjunto de esperas de
+leitura é pequeno e o caso com processo real a cobre em cada runner.
