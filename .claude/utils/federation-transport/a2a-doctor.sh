@@ -331,7 +331,10 @@ side_member() {
   elif [ "${FOUND}" != 1 ]; then put d falha 1 "membro '${MEMBER}' não está no registro" "o receptor registra o membro (/meta:federation-member register)"
   elif [ -z "${KID}" ]; then put d nao-medido 1 "não sei qual kid é o desta chave" "resolva (a)"
   elif ! key_pinned "${KID}"; then
-    put d falha 1 "kid '${KID}' NÃO está pinado em a2a.keys de ${MEMBER} (${KEYS:-vazio}); o gate veta kid-not-owned-by-from" \
+    # o gate julga o .pem ANTES do dono: sem o .pem o veto é unknown-kid, com ele é kid-not-owned-by-from
+    # (medido contra o bridge local na F5, 2026-10-15: antes do pino o envio real voltou unknown-kid)
+    local veto=unknown-kid; [ -f "${JWKS}/${KID}.pem" ] && veto=kid-not-owned-by-from
+    put d falha 1 "kid '${KID}' NÃO está pinado em a2a.keys de ${MEMBER} (${KEYS:-vazio}); o gate veta ${veto}" \
       "mande a pública ao receptor e peça o pino (/meta:federation-a2a, trilha 2), conferindo a impressão de (c)"
   elif [ ! -f "${JWKS}/${KID}.pem" ]; then
     put d falha 1 "kid '${KID}' pinado no registro, mas jwks/${KID}.pem ausente; o gate veta unknown-kid" "o receptor grava a pública em jwks/${KID}.pem (impressão de c)"
@@ -439,7 +442,7 @@ side_receiver() {
   local kids=() k bits okk="" badk=""
   if [ -n "${KID}" ]; then kids=("${KID}"); elif [ -n "${KEYS}" ]; then IFS=',' read -ra kids <<< "${KEYS}"; fi
   if [ -z "${REG_OK}" ] || [ "${FOUND}" != 1 ]; then put d nao-medido 1 "sem registro legível com o membro não há pino a medir (depende de r)" "resolva (r)"
-  elif [ "${#kids[@]}" -eq 0 ]; then put d falha 1 "${MEMBER} não tem nenhum kid em a2a.keys; todo envio dele veta kid-not-owned-by-from" "pine a pública que o membro mandou (/meta:federation-a2a, trilha 2)"
+  elif [ "${#kids[@]}" -eq 0 ]; then put d falha 1 "${MEMBER} não tem nenhum kid em a2a.keys; todo envio dele veta unknown-kid (sem o .pem no JWKS) ou kid-not-owned-by-from (com o .pem)" "pine a pública que o membro mandou (/meta:federation-a2a, trilha 2)"
   elif ! command -v openssl >/dev/null 2>&1; then put d nao-medido 1 "openssl ausente: não sei ler a pública" "instale openssl"
   else
     for k in "${kids[@]}"; do

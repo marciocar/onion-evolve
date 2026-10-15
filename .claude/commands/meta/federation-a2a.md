@@ -27,10 +27,10 @@ e termina no **doctor**. A doutrina inteira (as 9 cláusulas e o que o comando N
 [`common:prompts:federation-a2a-doctrine`](../common/prompts/federation-a2a-doctrine.md). **Referencie, não copie.**
 
 **Manual para os três leitores** (operador do core, operador do hub e membro que entra), com o porquê de
-cada trilha e a saída real do doctor e dos motores em cada erro: o manual da rede A2A, publicado no
-repositório público do core em
-<https://github.com/marciocar/onion-evolve/blob/main/docs/applying/onion-a2a-manual.md>. Ele não viaja
-com este comando; o resumo que o operador precisa para conduzir está aqui mesmo, nas trilhas abaixo.
+cada trilha e a saída real do doctor e dos motores em cada erro: o **Manual da Rede A2A** (core-only),
+publicado nos guias de aplicação do repositório público do core,
+<https://github.com/marciocar/onion-evolve/tree/main/docs/applying>. Ele não viaja com este comando; o
+resumo que o operador precisa para conduzir está aqui mesmo, nas trilhas abaixo.
 
 **Por que existe:** pedido do maestro em 2026-10-14 (configurador completo, em wizard), forjado pelo
 `/meta:forge` em 2026-10-15 (F1 do programa, SAC-122). Plano, spike e decisões no grafo do programa,
@@ -116,6 +116,10 @@ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <
    ```bash
    bash .claude/utils/federation-transport/a2a-invite.sh create <id> --days 30 --file <A2A_INVITES_FILE> --token-out <arq> --dry-run
    ```
+   **No core, o arquivo de produção não se escreve por aqui:** ele mora num caminho servido, o veto do
+   MOAT barra o motor apontado para ele, e a escrita de produção é do maestro, pelo caminho de operação
+   do core (ensaio, backup antes, conferência por contagem depois). O que segue vale para o receptor
+   que opera o próprio bridge, ou para um arquivo de teste.
    O arquivo é da **conta do serviço do bridge** (0600, diretório sem escrita de grupo nem de outros),
    e o bridge recusa o arquivo inteiro se ele tiver outro dono. Por isso a escrita de verdade é do
    operador do receptor, **como essa conta**. Quando ela não escreve no diretório do token, gere o
@@ -190,6 +194,8 @@ força.
    bash .claude/utils/federation-transport/a2a-invite.sh revoke <id> --file <A2A_INVITES_FILE>
    bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <id> --invites <A2A_INVITES_FILE>   # (i) falha: convite-revogado
    ```
+   No core, a revogação de produção é do maestro, pelo mesmo caminho de operação do core da trilha 2
+   (o veto do MOAT barra o motor apontado para o arquivo servido).
    Membro no pool legado: o bearer dele sai pelo caminho de deploy do bridge do core (maestro).
 2. **A chave.** Tire o `kid` de `a2a.keys` e a pública do JWKS no mesmo PR (o validador reprova `kid`
    sem `.pem`, e `.pem` sem `kid` não autoriza nada), e peça ao membro que destrua a privada
@@ -236,7 +242,7 @@ que casa algo real).
 ## 🔗 Referências
 
 - Doutrina (peça 2): [`common:prompts:federation-a2a-doctrine`](../common/prompts/federation-a2a-doctrine.md)
-- Manual publicado (três leitores, saída real de cada erro): <https://github.com/marciocar/onion-evolve/blob/main/docs/applying/onion-a2a-manual.md>
+- Manual publicado (três leitores, saída real de cada erro): o **Manual da Rede A2A**, nos guias de aplicação do core (<https://github.com/marciocar/onion-evolve/tree/main/docs/applying>)
 - Motores: `.claude/utils/federation-transport/a2a-keygen.sh`, `a2a-send.sh`, `a2a-doctor.sh` (medidor
   da peça 3), `a2a-invite.sh` (o convite por membro), `a2a-verify.sh` (o gate) e `a2a-accept.sh` (o aceite)
 - Registro: `/meta:federation-member` e `.claude/validation/members-validate.sh`

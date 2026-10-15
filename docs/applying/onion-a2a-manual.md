@@ -59,7 +59,7 @@ e este manual conta cada uma delas com a saída real de cada erro.
 | **A chave** | par RSA (RS256) do membro, 3072 bits no keygen. O `kid` é `<membro>-<N>` | privada em `~/.config/onion/a2a/` da conta do membro (0700/0600); a pública vai ao receptor | o membro, pelo `a2a-keygen.sh` |
 | **O pino** | a pública aceita pelo receptor: o `kid` em `members.yaml[<membro>].a2a.keys` e o arquivo `jwks/<kid>.pem` | no repo do receptor, e só vale no **clone que o bridge serve** | o operador do receptor, por PR |
 | **O convite** | o bearer do canal, com **dono** (um membro), **receptor** e **validade** | o token fica com o membro (0600); no arquivo de convites do bridge fica só o SHA-256 dele | o operador do receptor, pelo `a2a-invite.sh` |
-| **O gate** | o `a2a-verify.sh`, seis camadas que vetam na dúvida: topologia de confiança, SSRF, forma do sinal, relógio, assinatura JWS com `kid` pinado, hash do corpo e replay | no core, chamado pelo bridge a cada envio | ninguém escreve: ele só julga |
+| **O gate** | o `a2a-verify.sh`, camadas que vetam na dúvida, da mais barata à mais cara: forma do envelope, topologia de confiança, replay, relógio e janela de tempo, SSRF, assinatura JWS com `kid` pinado, hash do corpo e, por fim, o modo do receptor regulado (`propose-only`) | no core, chamado pelo bridge a cada envio | ninguém escreve: ele só julga |
 
 ### 1.2 O caminho de um sinal
 
@@ -81,7 +81,9 @@ e este manual conta cada uma delas com a saída real de cada erro.
 Repare nas duas barreiras e nos dois códigos. O **guard do convite** responde **401** e fala da
 credencial (o bearer). O **gate** responde **403** e fala do sinal (a assinatura, o corpo, o relógio).
 O guard roda **antes** do gate de propósito: um bearer de outro membro é recusado sem gastar o `jti`
-do envelope, e o dono verdadeiro ainda consegue enviar o mesmo envelope depois (medido no spike S4).
+do envelope, e o dono verdadeiro ainda consegue enviar o mesmo envelope depois. Isso foi medido no
+protótipo do spike S4; no bridge da F2 este manual mediu a recusa (401 `convite-de-outro-membro`), não o
+reenvio pelo dono, que segue pela ordem do código (o guard antes do gate).
 
 ### 1.3 Três desentendimentos comuns
 
@@ -148,7 +150,7 @@ $ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member
 a2a-doctor · lado receiver · membro membro-exemplo · receptor onion-evolve
 
 ✅ (r) registro — registro válido e membro-exemplo presente
-❌ (d) pino no registro — membro-exemplo não tem nenhum kid em a2a.keys; todo envio dele veta kid-not-owned-by-from
+❌ (d) pino no registro — membro-exemplo não tem nenhum kid em a2a.keys; todo envio dele veta unknown-kid (sem o .pem no JWKS) ou kid-not-owned-by-from (com o .pem)
       → próximo passo: pine a pública que o membro mandou (/meta:federation-a2a, trilha 2)
 ⚪ (c) impressão SHA-256 [não crítica] — impressão do membro não informada: o pino não foi conferido contra o que ele gerou
       → próximo passo: passe --fingerprint sha256:<hex> com a impressão que o membro leu do keygen ou do doctor dele
@@ -277,8 +279,8 @@ a2a-invite · <sb>/svc/a2a-invites.json · estado do arquivo: ok
 [rc=0]
 ```
 
-Entregue ao membro, **fora de banda** e nunca pelo chat, o token e o descritor. O convite vale no
-próximo envio, sem restart.
+Entregue ao membro, **fora de banda** e nunca pelo chat, o token e o descritor, e depois destrua a sua
+cópia do token (`shred -u`). O convite vale no próximo envio, sem restart.
 
 **Quando a conta do serviço não escreve no seu diretório.** Gere o token como você e entregue-o ao
 motor por redirecionamento (`--token-stdin`): quem abre o arquivo é o seu shell, e o processo da conta
@@ -342,11 +344,13 @@ mostra exatamente o que falta:
 
 ```
 $ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member membro-exemplo --fingerprint sha256:<64 hex>
-❌ (d) pino no registro — membro-exemplo não tem nenhum kid em a2a.keys; todo envio dele veta kid-not-owned-by-from
+❌ (d) pino no registro — membro-exemplo não tem nenhum kid em a2a.keys; todo envio dele veta unknown-kid (sem o .pem no JWKS) ou kid-not-owned-by-from (com o .pem)
       → próximo passo: pine a pública que o membro mandou (/meta:federation-a2a, trilha 2)
 ⚪ (c) impressão SHA-256 — sem kid pinado (ou sem openssl) não há impressão a comparar
       → próximo passo: resolva (d)
 ```
+
+(Trecho: as demais checagens são as da trilha 1.)
 
 Pinar é duas coisas **no mesmo PR**: gravar a pública em
 `.claude/utils/federation-transport/jwks/<kid>.pem` (adição deliberada, `git add -f`, porque o
@@ -392,11 +396,10 @@ serve recebe o merge**, pelo caminho de deploy do bridge (no core, `ops/update-b
 maestro). O bridge lê o registro e o JWKS desse clone, não do repo de trabalho; o doctor mede o repo
 onde roda. Merge sem deploy é um pino que o bridge ainda não conhece.
 
-> **Um detalhe de vocabulário.** O doctor diz que, sem pino, o envio "veta kid-not-owned-by-from". O
-> gate de verdade responde `unknown-kid:<kid>` quando nem o `.pem` existe (medido no bridge local, com
-> o envio real do membro), e `kid-not-owned-by-from:<kid>` quando o `.pem` existe mas o `kid` não está
-> em `a2a.keys` daquele membro (medido na bancada, `run_federation_a2a_selftests`). Os dois motivos
-> apontam o mesmo buraco (falta o pino), e a cura é a mesma.
+> **Os dois vetos do pino.** O gate julga o `.pem` antes do dono. Sem o `.pem` no JWKS que o bridge lê,
+> o envio volta `unknown-kid:<kid>` (medido no bridge local, com o envio real do membro, seção 4.6); com o
+> `.pem` mas sem o `kid` em `a2a.keys` daquele membro, volta `kid-not-owned-by-from:<kid>` (medido na
+> bancada, `run_federation_a2a_selftests`). O doctor nomeia os dois, e a cura é a mesma: completar o pino.
 
 ### 2.4 A operação de produção: `ops/a2a-invite-live.sh`
 
@@ -429,7 +432,15 @@ bash ops/a2a-invite-live.sh revoke <membro>
 bash ops/a2a-invite-live.sh revoke <membro> --apply
 ```
 
-O wrapper chama `sudo -u` da conta do serviço onde precisa; rode-o como você, nunca como root.
+O wrapper chama `sudo -u` da conta do serviço onde precisa; rode-o como você, nunca como root. Depois
+de entregar o token ao membro, destrua a sua cópia (`shred -u ~/m.token`): o convite vive no hash, e o
+token só precisa existir na máquina do membro.
+
+**Em produção, ele já rodou.** O teste S6 do programa (2026-10-15, pela sessão principal) fez, contra o
+bridge de produção, o ciclo inteiro por este wrapper e pelos motores: `create --apply`, doctor do membro
+com 8 ok, envio assinado aceito (HTTP 200, `verified`, `gated`), aceite no inbox, `revoke --apply` e o
+reenvio recusado com 401 `convite-revogado`, em 56 s de relógio (nó `E_S6_PONTA_A_PONTA_EM_PRODUCAO` do
+grafo do programa).
 
 **Saída real.** Produção não foi escrita para este manual. As saídas abaixo são do wrapper em **modo de
 teste declarado** (`ONION_A2A_LIVE_TEST=1`, o mesmo que a bancada usa): o motor roda como quem roda, num
@@ -505,7 +516,9 @@ resumo: 6 ok · 0 falha · 1 não medida(s) → ✅ saudável (rc 0), SEM confer
 [rc=0]
 ```
 
-A checagem (i) diz o motivo que o guard do bridge daria. Os que este manual mediu:
+A checagem (i) diz o motivo que o guard do bridge daria. Os motivos abaixo foram medidos assim: `ok`,
+`convite-revogado` e `convites-indisponiveis` pela (i) do doctor; `convite-vencido` pela sonda do
+`a2a-invite.sh list`, que é o mesmo julgamento que a (i) chama:
 
 | (i) diz | O que é | Cura |
 |---|---|---|
@@ -613,14 +626,17 @@ Sem `--kid`, o doctor confere só os kids que restam. E lembre: até o clone ser
 ### 2.8 O pool legado
 
 Antes da F2, o convite era um bearer anônimo na variável `INVITE_TOKENS_A2A` do ambiente do bridge:
-sem dono, sem validade, e qualquer portador podia enviar como qualquer membro. Ele segue aceito para
+sem dono e sem validade. O bearer não amarrava o remetente: qualquer portador passava pelo bridge com
+qualquer `from`, e só a assinatura do gate (o `kid` pinado do próprio membro) segurava o envio. Ele segue aceito para
 quem ainda o usa, e o bridge registra no log a cada uso que ele está depreciado. Em 2026-10-15 o
 maestro decidiu **esvaziá-lo já**, sem esperar a migração dos remetentes atuais, que voltam por convite
 por membro. Tirar um bearer do pool é editar o ambiente do serviço, e isso é do maestro, pelo caminho
 de deploy do bridge; o wizard não toca o ambiente.
 
-Um bridge anterior à F2 ignora o arquivo de convites. O sintoma, para o membro, é
-`credencial-desconhecida` com um convite que o doctor do receptor diz estar ok.
+Um bridge anterior à F2 ignora o arquivo de convites. Pelo código anterior à F2 (não medido neste
+manual), o membro recebe um 401 **sem** `reason`, com a mensagem
+`não autorizado — /a2a requer token do pool a2a dedicado`, mesmo com um convite que o doctor do receptor
+diz estar ok. Esse é o sinal de que o clone servido não recebeu a F2.
 
 ---
 
@@ -721,11 +737,13 @@ mensagem assinada, pessoalmente). Se você é adotante com o carteiro upstream, 
 ### 4.4 Passo 3 — Gravar o convite
 
 Quando o token chegar, grave-o com `umask 077` em `~/.config/onion/a2a/bridge-token`. Nunca o cole no
-chat, num argumento de comando ou num arquivo legível por outros. Guarde o descritor ao lado. Para
+chat, num argumento de comando ou num arquivo legível por outros. Guarde o descritor ao lado, com o nome
+que ele chegou (no exemplo, `~/.config/onion/a2a/membro-exemplo.token.invite.json`). O doctor **não** o
+procura sozinho: passe-o sempre em `--invite`, senão a checagem (e) confere só o arquivo do token. Para
 conferir que o token é o deste descritor, sem imprimir nada:
 
 ```
-$ bash a2a-invite.sh inspect --invite ~/membro-exemplo.invite.json --member membro-exemplo --receiver onion-evolve --token-file ~/.config/onion/a2a/bridge-token
+$ bash a2a-invite.sh inspect --invite ~/.config/onion/a2a/membro-exemplo.token.invite.json --member membro-exemplo --receiver onion-evolve --token-file ~/.config/onion/a2a/bridge-token
 ativo: convite de 'membro-exemplo' válido até 2026-11-14T12:34:14Z
 [rc=0]
 ```
@@ -754,10 +772,11 @@ resumo: 5 ok · 1 falha · 2 não medida(s) → ❌ problema (rc 1)
 [rc=1]
 ```
 
-Com o token e o descritor, o melhor que a sua máquina consegue dizer é **rc 2**, e isso é esperado:
+Com o token e o descritor, o melhor que a sua máquina consegue dizer é **rc 2**, e isso é esperado
+(trecho: sem o cabeçalho e sem as linhas de próximo passo de d e h, que são as do bloco anterior):
 
 ```
-$ bash a2a-doctor.sh --member membro-exemplo --endpoint "$EP" --invite ~/membro-exemplo.invite.json
+$ bash a2a-doctor.sh --member membro-exemplo --endpoint "$EP" --invite ~/.config/onion/a2a/membro-exemplo.token.invite.json
 ✅ (a) chave privada — chave privada RSA 3072 bits presente e legível (kid membro-exemplo-1)
 ✅ (b) permissão — privada 600 · diretório 700
 ✅ (c) impressão SHA-256 — sha256:<64 hex>
@@ -776,7 +795,8 @@ ele não está na sua máquina. A resposta definitiva é o doctor do receptor (`
 no core: peça ao operador do core o lado dele. Não se responde de memória.
 
 Quando o doctor roda numa instalação que **tem** o registro e o gate (no sandbox, o mesmo doctor
-rodado a partir do core de fixture, com a HOME do membro), as oito checagens fecham:
+rodado a partir do core de fixture, com a HOME do membro), as oito checagens fecham (trecho: só as
+duas que mudaram e o resumo):
 
 ```
 ✅ (d) pino no registro — kid 'membro-exemplo-1' pinado e jwks/membro-exemplo-1.pem tem a mesma impressão
@@ -952,7 +972,8 @@ O sintoma, onde ele aparece, e a cura. Medido neste manual, salvo onde a linha d
 | Sintoma | Aparece em | Causa | Cura |
 |---|---|---|---|
 | `credencial-ausente` | log do bridge, 401 | envio sem bearer | grave o token em `bridge-token` |
-| `credencial-desconhecida` | send, 401 | o token não está no arquivo de convites, ou o bridge é anterior à F2 | `inspect` do descritor; peça convite novo |
+| `credencial-desconhecida` | send, 401 | o token não está no arquivo de convites | `inspect` do descritor; peça convite novo |
+| 401 sem `reason`, "requer token do pool a2a dedicado" | send (pelo código, não medido) | o bridge é anterior à F2 | deploy do bridge (maestro) |
 | `convite-de-outro-membro` | send, 401 | o `from` não é o dono do convite | envie com o seu id e o seu token |
 | `convite-vencido` | send 401; sonda (i) | `expires_at` no passado | convite novo |
 | `convite-revogado` | send 401; sonda (i) | o receptor revogou | convite novo, se for o caso |
@@ -972,12 +993,16 @@ O sintoma, onde ele aparece, e a cura. Medido neste manual, salvo onde a linha d
 
 ## Epílogo — O que ainda falta
 
+O ponta a ponta já passou em produção: o S6 (2026-10-15) levou um membro de teste do convite à
+revogação só com os motores e o wrapper, em 56 s. Ele deixou dois limites declarados: membro e core
+rodaram na mesma conta de sistema (a separação de contas está provada só na bancada), e dois passos
+seguem humanos, entregar o token fora de banda e limpar o registro da fila do bridge.
+
 Há peças que não aconteceram e estão desenhadas. A **F3** traz o hub como receptor dos filhos, pelo
-bridge do core. A **F4**, o hub com servidor próprio, está gated até o primeiro hub pedir. Os dois
-testes de ponta a ponta do spike (o S6, com duas contas de sistema e zero passo manual de shell, e o
-S7, com um adotante real trocando o remetente próprio pelo canônico) são o que vai dizer se a
-pergunta que abriu este programa fecha: *um wizard só leva o core, um membro e um hub da chave ao sinal
-aceito e à revogação, sem o maestro digitar shell além das respostas?*
+bridge do core. A **F4**, o hub com servidor próprio, está gated até o primeiro hub pedir. E o **S7**,
+com um adotante real trocando o remetente próprio pelo canônico, é o que falta para a pergunta que abriu
+este programa fechar: *um wizard só leva o core, um membro e um hub da chave ao sinal aceito e à
+revogação, sem o maestro digitar shell além das respostas?*
 
 Até lá, este manual é o mapa, e o doctor é a bússola. Quando um diz uma coisa e o outro diz outra,
 **o doctor vence**: ele mede, o manual só conta.
