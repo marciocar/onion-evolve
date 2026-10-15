@@ -111,8 +111,10 @@ PDF escaneado em que a ferramenta saía vazia.
 prometia, ou é status quo, condição futura ou parte do próprio veredito?* Se não entrega, o
 veredito é `nenhuma` com a medida, e isso é válido. O censo recusa o que a forma deixa ver: o nó
 do próprio veredito, o nó que **deriva** dele pelas arestas (circular), o nó `open`, sem
-`verified_at`, com `verified_at` futuro ou sem `verified_against` (não medido), e o nó cujo
-`verified_against`/`trace` é o próprio `x_dissect_criterion` (mede a reprovação, não a entrega).
+`verified_at` legível, com `verified_at` futuro ou sem `verified_against` (não medido), e o nó cujo
+`verified_against`/`trace` é igual ao `x_dissect_criterion` (mede a reprovação, não a entrega). A
+derivação se lê pelo tipo da aresta: `A SUPPORTS B` faz B derivar de A, `A TRACES_TO B` faz A
+derivar de B.
 O status quo rotulado de superação **não** é detectável sem palavra-chave frágil. Ele fica com a
 pergunta e com o Elenxo. Caso-modelo do consolo: um adotante de curadoria (PR #30) preencheu quatro
 superações que passaram na forma e que o Elenxo reprovou.

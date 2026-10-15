@@ -509,7 +509,7 @@ nodes:
     confidence: 0.9
     status: confirmed
     verified_at: "2026-10-15"
-    verified_against: "origin/main 1843a8a0: judge-verdict-check.sh sobre 5 vereditos de consolo deu rc 0 com 3 superações achadas e 0 recusados (a nova dá rc 1, 4 recusados, a nenhuma honesta mantida); dissect-census.sh --check-verdict deu veredito nas 7 fixtures de consolo e rc 0 nas reconstruções sobre os grafos reais tessl (circular) e cross-session (nó open), e a nova dá rc 1 nas duas"
+    verified_against: "origin/main 1843a8a0: judge-verdict-check.sh sobre 5 vereditos de consolo deu rc 0 com 3 superações achadas e 0 recusados (a nova dá rc 1, 4 recusados, a nenhuma honesta mantida); dissect-census.sh --check-verdict deu veredito nas 7 fixtures de consolo e rc 0 nas reconstruções sobre os grafos reais tessl (circular) e cross-session (nó open), e a nova dá rc 1 nas duas — as reconstruções foram medidas em scratch, NÃO versionadas; o versionado é a bancada"
     trace: ".claude/validation/lint-selftest.sh"
     label: "MEDIDO ANTES DA CURA: no main, as 4 formas do consolo passavam no juiz JSON e no veredito do dissect, inclusive reconstruídas sobre os grafos reais do adotante. A superação real (ancestral direto que SUPPORTS, medida) segue passando depois."
     provenance:
@@ -526,10 +526,10 @@ nodes:
     confidence: 0.85
     status: done
     verified_at: "2026-10-15"
-    verified_against: "bancada da branch feat/sac151-consolation-overcoming: og-k1, og-k2, og-c1, og-c2 e census-seal og-k passam, e cada recusa tem mutante (sed na bancada e ops/mutate-and-restore.sh no arquivo vivo) que os reprova"
-    trace: "https://linear.app/sacola/issue/SAC-151"
+    verified_against: "bancada da branch feat/sac151-consolation-overcoming: og-k1, og-k2, og-c1, og-c2 e census-seal og-k passam (3 famílias, 110/0), e cada recusa tem mutante sed na bancada que os reprova; 11 delas também foram mutadas no arquivo vivo com ops/mutate-and-restore.sh antes da passada do refutador"
+    trace: "https://linear.app/sacola/issue/SAC-152"
     label: "A SUPERAÇÃO TEM DE ENTREGAR, NÃO CONSOLAR. A máquina recusa o consolo que a forma deixa ver; o resto vira pergunta obrigatória ao juiz, respondida em superacao.classe, que aceita entrega ou nenhuma."
-    narrative: "Forma decidida sem o maestro (autorização de 2026-10-15, opção recomendada): (1) JUIZ JSON (bloco overcoming-gate, 3 cópias idênticas): classe obrigatória no schema; recusa classe ausente, classe incoerente com achada, o_que igual ao objeto (circular) e medida que contém o comando do critério (ancorada: mede a reprovação, não a entrega); só classe entrega vira nó no census-seal. (2) GRAFO do dissect: recusa a superação que é o próprio veredito ou deriva dele (alcançável seguindo from→to), a não medida (status fora de confirmed|done, sem verified_at, verified_at futuro, sem verified_against) e a ancorada no x_dissect_criterion. DIREÇÃO MEDIDA: from sustenta to, e a única superação real medida é ancestral direto que SUPPORTS; por isso o ancestral NÃO é recusado, e o pedido de recusar ancestral foi declinado com essa medida. TETO: o status quo rotulado de superação e a condição futura escrita em prosa num nó confirmed não são vistos sem palavra-chave frágil (o verified_against da superação real é token hifenizado, igual ao de um placeholder); ficam com a pergunta e o Elenxo."
+    narrative: "Forma decidida sem o maestro (autorização de 2026-10-15, opção recomendada): (1) JUIZ JSON (bloco overcoming-gate, 3 cópias idênticas): classe obrigatória no schema; recusa classe ausente, classe incoerente com achada, o_que igual ao objeto (circular) e medida que É o comando do critério, sem mais nada (ancorada: mede a reprovação, não a entrega; só igualdade, porque o critério aplicado à variante é a medida mais forte e a inclusão a recusaria); só classe entrega vira nó no census-seal. (2) GRAFO do dissect: recusa a superação que é o próprio veredito ou deriva dele por outro caminho que não a aresta declarada S→D, a não medida (status fora de confirmed|done, verified_at ausente, ilegível ou futuro, verified_against vazio ou só pontuação) e a ancorada (verified_against/trace igual ao x_dissect_criterion). DIREÇÃO POR TIPO, medida no contrato (a decisão aponta a origem com TRACES_TO): A SUPPORTS|CAUSES B ⇒ B deriva de A; A TRACES_TO|DEPENDS_ON B ⇒ A deriva de B. A única superação real medida é ancestral direto que SUPPORTS; por isso o ancestral NÃO é recusado, e o pedido de recusar ancestral foi declinado com essa medida. S TRACES_TO D (nasceu da reprovação) segue aceito porque é a forma que a doutrina pede e não se distingue por estrutura de 'é parte do veredito' (declarado). TETO: o status quo rotulado de superação e a condição futura escrita em prosa num nó confirmed não são vistos sem palavra-chave frágil (o verified_against da superação real é token hifenizado, igual ao de um placeholder); ficam com a pergunta e o Elenxo."
     provenance:
       source: ".claude/workflows/onion-research.js e .claude/validation/dissect-census.sh (branch feat/sac151-consolation-overcoming)"
       locator: "CONSOLO_QUESTION e overcomingWhy no bloco overcoming-gate; o awk ogc do ramo rejeitar|parquear"
@@ -546,7 +546,7 @@ nodes:
     verified_at: "2026-10-15"
     verified_against: "fixture quo do og-k1 segue veredito de propósito; um juiz que responde classe entrega com condição futura em prosa passa no og-c1"
     trace: ".claude/validation/lint-selftest.sh"
-    label: "O QUE A MÁQUINA AINDA NÃO VÊ: o status quo rotulado de superação e a condição futura escrita em prosa. Só a pergunta obrigatória e o Elenxo os pegam. GATILHO: o 1º consolo dessas formas que passar no gate e for achado depois."
+    label: "O QUE A MÁQUINA AINDA NÃO VÊ: status quo rotulado de superação, condição futura em prosa, o_que que só parafraseia o objeto e o nó de costura ligado por S TRACES_TO D. Só a pergunta e o Elenxo os pegam. GATILHO: o 1º desses consolos achado depois de passar no gate."
 
 edges:
   # as auto-incriminacoes reais sustentam a tese central (a forma prova a filosofia)

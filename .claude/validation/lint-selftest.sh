@@ -7274,11 +7274,13 @@ const V = [
   { alvo: 'c-status-quo-sem-classe', criterio: cr, superacao: { achada: true, o_que: 'o controle segue como esta hoje', medida: 'bancada: controle 2, metodo 3, empate 5' } },
   { alvo: 'a-futura-incoerente', criterio: cr, superacao: { classe: 'entrega', achada: false, o_que: '', medida: 'o carimbo resolve quando a probe existir' } },
   { alvo: 'a costura minima com o registro', criterio: cr, superacao: { classe: 'entrega', achada: true, o_que: 'A costura minima com o registro', medida: 'a costura e o que o veredito propoe' } },
-  { alvo: 'b-em-cura-ancorada', criterio: cr, superacao: { classe: 'entrega', achada: true, o_que: 'o canal federado do core', medida: 'medido com `gh issue view 101 --json state` = OPEN' } },
+  { alvo: 'b-em-cura-ancorada', criterio: cr, superacao: { classe: 'entrega', achada: true, o_que: 'o canal federado do core', medida: '`gh  issue view 101 --json   state`' } },
+  { alvo: 'variante-no-criterio', criterio: cr, superacao: { classe: 'entrega', achada: true, o_que: 'a variante com OCR local', medida: 'o mesmo criterio na variante: gh issue view 101 --json state = CLOSED' } },
   { alvo: 'nenhuma-honesta', criterio: cr, superacao: { classe: 'nenhuma', achada: false, o_que: '', medida: 'procurei canal aberto: grep -rn canal docs/ = 0' } },
   { alvo: 'entrega-real', criterio: cr, superacao: { classe: 'entrega', achada: true, o_que: 'o OCR local le o escaneado', medida: 'pdftoppm + tesseract acham 2,711,633' } }]
 const g = gateNegatives(V, () => true, C)
 console.log(JSON.stringify({ kept: g.kept.map(v => v.alvo), recused: g.recused.map(r => [r.verdict.alvo, r.why]), found: overcomingsFound(g.kept).map(v => v.alvo),
+  of: overcomingsFound([{ superacao: { achada: true, classe: 'nenhuma', o_que: 'x', medida: 'y' } }]).length,
   q: criteriaBlock(C).includes(CONSOLO_QUESTION) && /status quo, condição futura ou parte do próprio veredito/.test(CONSOLO_QUESTION),
   enumOk: OVERCOMING_PROPS.superacao.required.includes('classe') && JSON.stringify(OVERCOMING_PROPS.superacao.properties.classe.enum) === '["entrega","nenhuma"]' }))
 JS
@@ -7287,12 +7289,12 @@ JS
 }
 _og_consolo_probe_ok() {
   local o="$1"
-  grep -qF '"kept":["nenhuma-honesta","entrega-real"]' <<< "${o}" \
+  grep -qF '"kept":["variante-no-criterio","nenhuma-honesta","entrega-real"]' <<< "${o}" \
     && grep -qF '["c-status-quo-sem-classe","superacao sem classe (entrega|nenhuma)' <<< "${o}" \
     && grep -qF '["a-futura-incoerente","superacao com classe entrega contradiz achada:false"]' <<< "${o}" \
     && grep -qF '["a costura minima com o registro","superacao CIRCULAR' <<< "${o}" \
     && grep -qF '["b-em-cura-ancorada","superacao ancorada no criterio' <<< "${o}" \
-    && grep -qF '"found":["entrega-real"]' <<< "${o}" && grep -qF '"q":true,"enumOk":true' <<< "${o}"
+    && grep -qF '"found":["variante-no-criterio","entrega-real"]' <<< "${o}" && grep -qF '"of":0,"q":true,"enumOk":true' <<< "${o}"
 }
 _judge_consolo_json_cases() {
   local wf="$1" jvc="$2" o m k j jo jr
@@ -7303,12 +7305,13 @@ _judge_consolo_json_cases() {
   else record_fail "research-workflow: (og-c1)" "o gate não recusou o consolo como devia: ${o:0:400}"; fi
   # (og-c1m-*) MUTANTES: cada recusa desligada sozinha reprova o (og-c1)
   m="$(mktemp -d)"
-  for k in classe coerencia circular ancora pergunta; do
+  for k in classe coerencia circular ancora pergunta found; do
     case "${k}" in
       classe)    sed "s/if (s.classe !== 'entrega' \&\& s.classe !== 'nenhuma') return/if ('ONION_MUTANTE' === '') return/" "${wf}" > "${m}/${k}.js" ;;
       coerencia) sed "s/if ((s.classe === 'entrega') !== s.achada) return/if ('ONION_MUTANTE' === '') return/" "${wf}" > "${m}/${k}.js" ;;
-      circular)  sed "s/if (alvo \&\& _ogNorm(s.o_que) === alvo) return/if ('ONION_MUTANTE' === '') return/" "${wf}" > "${m}/${k}.js" ;;
-      ancora)    sed "s/if (cmd.length >= 12 \&\& _ogNorm(s.medida).includes(cmd)) return/if ('ONION_MUTANTE' === '') return/" "${wf}" > "${m}/${k}.js" ;;
+      circular)  sed "s/if (objTarget \&\& _ogNorm(s.o_que) === objTarget) return/if ('ONION_MUTANTE' === '') return/" "${wf}" > "${m}/${k}.js" ;;
+      ancora)    sed "s/if (cmd.length >= 8 \&\& _ogSquash(s.medida) === cmd) return/if ('ONION_MUTANTE' === '') return/" "${wf}" > "${m}/${k}.js" ;;
+      found)     sed "s/v.superacao.achada === true \&\& v.superacao.classe === 'entrega')/v.superacao.achada === true \&\& 'ONION_MUTANTE')/" "${wf}" > "${m}/${k}.js" ;;
       pergunta)  sed "s/  '- PERGUNTA OBRIGATÓRIA antes de preencher \`classe\`: ' + CONSOLO_QUESTION + '/  '- ONION_MUTANTE: ' + '/" "${wf}" > "${m}/${k}.js" ;;
     esac
     if cmp -s "${wf}" "${m}/${k}.js"; then record_fail "research-workflow: (og-c1m-${k})" "o mutante NÃO foi plantado (âncora do sed ausente)"; continue; fi
@@ -7397,9 +7400,20 @@ _og_consolo_states() {
   _og_ckg proprio "${med}" D_X '  - from: D_X\n    to: D_X\n    edge_type: TRACES_TO\n'
   _og_ckg deriva "${med}" S_SUP '  - from: D_X\n    to: S_SUP\n    edge_type: SUPPORTS\n'
   _og_ckg quo "${med}" S_SUP ''
+  # bordas do refutador (2026-10-15): D TRACES_TO S = D cita S como fonte (S é ancestral, LEGÍTIMO); D→X→S por
+  # SUPPORTS é derivação indireta; carimbo ilegível e placeholder de pontuação não são medida; ISO com hora de
+  # hoje é medida; citar o critério APLICADO À VARIANTE é a medida mais forte (não é âncora); status aninhado
+  # num sub-bloco não vale pelo do nó
+  _og_ckg citafonte "${med}" S_SUP '  - from: D_X\n    to: S_SUP\n    edge_type: TRACES_TO\n'
+  _og_ckg indireta "${med}" S_SUP '  - from: D_X\n    to: E_MEIO\n    edge_type: SUPPORTS\n  - from: E_MEIO\n    to: S_SUP\n    edge_type: SUPPORTS\n'
+  _og_ckg ilegivel '    status: confirmed\n    verified_at: "-"\n    verified_against: bancada-reproduzida\n' S_SUP ''
+  _og_ckg vgtraco '    status: confirmed\n    verified_at: "2026-10-15"\n    verified_against: "-"\n' S_SUP ''
+  _og_ckg isohora '    status: confirmed\n    verified_at: "2026-10-15T10:00:00Z"\n    verified_against: bancada-reproduzida\n' S_SUP ''
+  _og_ckg variante '    status: confirmed\n    verified_at: "2026-10-15"\n    verified_against: "o mesmo criterio na variante: gh issue view 101 --repo o/r --json state = CLOSED"\n' S_SUP ''
+  _og_ckg aninhado '    status: open\n    provenance:\n      status: confirmed\n    verified_at: "2026-10-15"\n    verified_against: bancada-reproduzida\n' S_SUP ''
   git -C "${d}" add -A >/dev/null 2>&1
   tsv="$(bash "${sut}" "${d}" --tsv 2>&1)"
-  for t in real futuro emcura ancorada proprio deriva quo; do printf '%s=%s;' "${t}" "$(printf '%s\n' "${tsv}" | awk -F'\t' -v t="${t}" '$1==t{print $9; exit}')"; done
+  for t in real futuro emcura ancorada proprio deriva quo citafonte indireta ilegivel vgtraco isohora variante aninhado; do printf '%s=%s;' "${t}" "$(printf '%s\n' "${tsv}" | awk -F'\t' -v t="${t}" '$1==t{print $9; exit}')"; done
   bash "${sut}" "${d}" --check-verdict deriva >/dev/null 2>&1; printf 'rc-deriva=%s\n' "$?"
   rm -rf "${d}"
 }
@@ -7411,7 +7425,12 @@ _og_consolo_ok() {
     && grep -qF 'ancorada=veredito-SEM-SUPERACAO(superacao-ancorada-no-criterio);' <<< "${o}" \
     && grep -qF 'proprio=veredito-SEM-SUPERACAO(superacao-circular-e-o-proprio-veredito);' <<< "${o}" \
     && grep -qF 'deriva=veredito-SEM-SUPERACAO(superacao-circular-deriva-do-veredito);' <<< "${o}" \
-    && grep -qF 'quo=veredito;' <<< "${o}" && grep -qF 'rc-deriva=1' <<< "${o}"
+    && grep -qF 'quo=veredito;' <<< "${o}" && grep -qF 'rc-deriva=1' <<< "${o}" \
+    && grep -qF 'citafonte=veredito;' <<< "${o}" && grep -qF 'indireta=veredito-SEM-SUPERACAO(superacao-circular-deriva-do-veredito);' <<< "${o}" \
+    && grep -qF 'ilegivel=veredito-SEM-SUPERACAO(superacao-verified_at-ilegivel);' <<< "${o}" \
+    && grep -qF 'vgtraco=veredito-SEM-SUPERACAO(superacao-sem-verified_against);' <<< "${o}" \
+    && grep -qF 'isohora=veredito;' <<< "${o}" && grep -qF 'variante=veredito;' <<< "${o}" \
+    && grep -qF 'aninhado=veredito-SEM-SUPERACAO(superacao-nao-medida-status-open);' <<< "${o}"
 }
 _judge_consolo_dissect_cases() {
   local sut="$1" o m k mo
@@ -7422,32 +7441,35 @@ _judge_consolo_dissect_cases() {
   else record_fail "dissect: (og-k1)" "estados inesperados: ${o}"; fi
   # (og-k1m-*) MUTANTES: cada recusa desligada sozinha faz o (og-k1) reprovar
   m="$(mktemp -d)"
-  for k in circ deriva status futuro sem-vg ancora; do
+  for k in circ deriva direcao status futuro sem-vg ancora sem-va ilegivel; do
     case "${k}" in
       circ)   sed 's/if (s == d) { print/if (s == d \&\& "ONION_MUTANTE" == "") { print/' "${sut}" > "${m}/${k}.sh" ;;
       deriva) sed 's/if (s in R) why = why/if ((s in R) \&\& "ONION_MUTANTE" == "") why = why/' "${sut}" > "${m}/${k}.sh" ;;
       status) sed 's/if (st != "confirmed" \&\& st != "done") why/if ("ONION_MUTANTE" == "") why/' "${sut}" > "${m}/${k}.sh" ;;
-      futuro) sed 's/else if (va > today) why/else if ("ONION_MUTANTE" == "") why/' "${sut}" > "${m}/${k}.sh" ;;
-      sem-vg) sed 's/if (vg == "") why = why/if ("ONION_MUTANTE" == "") why = why/' "${sut}" > "${m}/${k}.sh" ;;
-      ancora) sed 's/if (length(c) >= 12 \&\& (index/if ("ONION_MUTANTE" == "" \&\& (index/' "${sut}" > "${m}/${k}.sh" ;;
+      futuro) sed 's/else if (substr(va, 1, 10) > today) why/else if ("ONION_MUTANTE" == "") why/' "${sut}" > "${m}/${k}.sh" ;;
+      sem-vg) sed 's/if (vg == "" || length(al) < 3 || lv ~/if ("ONION_MUTANTE" == "" \&\& lv ~/' "${sut}" > "${m}/${k}.sh" ;;
+      direcao) sed 's/else if (et == "TRACES_TO" || et == "DEPENDS_ON") { n++; P\[n\] = to; C\[n\] = fr }/else if (et == "TRACES_TO" || et == "DEPENDS_ON") { n++; P[n] = fr; C[n] = to; ONION_MUTANTE = 1 }/' "${sut}" > "${m}/${k}.sh" ;;
+      sem-va) sed 's/if (va == "") why = why ",superacao-sem-verified_at"/if ("ONION_MUTANTE" == "") why = why ",superacao-sem-verified_at"/' "${sut}" > "${m}/${k}.sh" ;;
+      ilegivel) sed 's/else if (va !~ \/^\[0-9\]/else if ("ONION_MUTANTE" == "" \&\& va !~ \/^[0-9]/' "${sut}" > "${m}/${k}.sh" ;;
+      ancora) sed 's/if (length(c) >= 8 \&\& (squash(vg) == c/if ("ONION_MUTANTE" == "" \&\& (squash(vg) == c/' "${sut}" > "${m}/${k}.sh" ;;
     esac
     if cmp -s "${sut}" "${m}/${k}.sh"; then record_fail "dissect: (og-k1m-${k})" "o mutante NÃO foi plantado (âncora do sed ausente) — o caso não prova nada"; continue; fi
-    [ "${k}" = sem-vg ] && continue   # sem-vg não tem fixture própria no (og-k1): medido no (og-k2)
+    [ "${k}" = sem-va ] && continue   # sem-va não tem fixture própria no (og-k1): medido no (og-k2)
     mo="$(_og_consolo_states "${m}/${k}.sh")"
     if _og_consolo_ok "${mo}"; then record_fail "dissect: (og-k1m-${k})" "MUTANTE sem a recusa '${k}' PASSOU no (og-k1)"
     else record_pass "dissect: (og-k1m-${k}) mutante sem a recusa '${k}' reprova no (og-k1)"; fi
   done
   # (og-k2) superação SEM medida nenhuma (sem status, verified_at e verified_against) — a forma do main que o
-  #         fixture antigo do (og-d1) usava — é recusada pelos três motivos; mutante sem o de verified_against
+  #         fixture antigo do (og-d1) usava — é recusada pelos três motivos; mutante sem o de verified_at
   #         deixa de nomeá-lo.
   local d2 o2 o2m
   d2="$(mktemp -d)"; git -C "${d2}" init -q -b main 2>/dev/null; mkdir -p "${d2}/docs/evolution/dissect"
   printf 'meta:\n  id: nu\n  x_dissect_tool: nu\n  baseline: "2026-10-15"\n  review_after: "2099-01-01"\nnodes:\n  - id: S_SUP\n    node_type: claim\n    label: "a peca"\n  - id: D_X\n    node_type: decision\n    x_dissect_level: 3\n    x_dissect_verdict: rejeitar\n    x_dissect_criterion: "pdftotext a.pdf - | wc -c"\n    x_dissect_overcoming: S_SUP\n    label: "rejeitar"\n\nedges:\n  - from: S_SUP\n    to: D_X\n    edge_type: SUPPORTS\n' > "${d2}/docs/evolution/dissect/nu.kg.yaml"
   git -C "${d2}" add -A >/dev/null 2>&1
   o2="$(bash "${sut}" "${d2}" --tsv 2>&1 | awk -F'\t' '$1=="nu"{print $9}')"
-  o2m="$(bash "${m}/sem-vg.sh" "${d2}" --tsv 2>&1 | awk -F'\t' '$1=="nu"{print $9}')"
+  o2m="$(bash "${m}/sem-va.sh" "${d2}" --tsv 2>&1 | awk -F'\t' '$1=="nu"{print $9}')"
   if [ "${o2}" = 'veredito-SEM-SUPERACAO(superacao-nao-medida-status-ausente,superacao-sem-verified_at,superacao-sem-verified_against)' ] && [ "${o2m}" != "${o2}" ]; then
-    record_pass "dissect: (og-k2) superação sem medida nenhuma é recusada (status, verified_at e verified_against); o mutante sem a recusa do verified_against muda o estado"
+    record_pass "dissect: (og-k2) superação sem medida nenhuma é recusada (status, verified_at e verified_against); o mutante sem a recusa do verified_at muda o estado"
   else record_fail "dissect: (og-k2)" "estado=${o2} mutante=${o2m}"; fi
   rm -rf "${d2}" "${m}"
 }
