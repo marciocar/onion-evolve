@@ -2,7 +2,8 @@
 branch: docs/decisions-delegated-2026-10-15
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 098d5e2f7c3e129c80618dc652418e9160d24e80fc35b1ec104f0cc39aa64bfa
+reviewed_code_sha256: 69c2a8620b855bf1b98ca3f655965ee94f064f097643fd6da94f3842fe165214
 findings_total: 2
 findings_real: 2
 tokens: 0
