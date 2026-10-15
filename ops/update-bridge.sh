@@ -152,7 +152,15 @@ curl -fsS -m 10 "${HEALTH_PUBLIC}" | grep -q '"ok":true' || fail "/health via Ca
 [ "${NEW_BRIDGE_HEAD}" = "${BRIDGE_REMOTE}" ] || fail "bridge não ficou em origin/main"
 [ "${NEW_CLONE_HEAD}"  = "${CLONE_REMOTE}"  ] || fail "clone não ficou em origin/main"
 INV="$(systemctl show "${UNIT}" -p InvocationID --value)"
-BOOT="$(sudo journalctl "_SYSTEMD_INVOCATION_ID=${INV}" --no-pager 2>/dev/null || true)"
+# A linha de identidade sai DEPOIS do /health: o self-check do JWKS é assíncrono (medido em 2026-10-15:
+# "no ar" 16:35:08.65, "auth: enforce" 16:35:09.29). Uma leitura só, logo após o health, reprovava um
+# boot são. Espera ativa pela linha, com teto, como o /health acima.
+BOOT=""
+for _ in $(seq 1 10); do
+  BOOT="$(sudo journalctl "_SYSTEMD_INVOCATION_ID=${INV}" --no-pager 2>/dev/null || true)"
+  grep -q "auth: enforce" <<<"${BOOT}" && break
+  sleep 2
+done
 grep -q "auth: enforce" <<<"${BOOT}" || fail "boot DESTA invocação sem 'auth: enforce' — a superfície de auth mudou sem intenção"
 grep -q "JWKS OK"       <<<"${BOOT}" || log "AVISO: JWKS não confirmou neste boot (Logto fora?) — TUDO dará 401 até voltar"
 NEW_RESTARTS="$(systemctl show "${UNIT}" -p NRestarts --value)"
