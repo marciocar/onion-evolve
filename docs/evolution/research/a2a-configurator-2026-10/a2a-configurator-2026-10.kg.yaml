@@ -6,8 +6,8 @@ meta:
   schema_version: "1"
   baseline: "2026-10-14"
   review_after: "2026-11-13"   # 30d: cadência de ferramenta
-  # ═══ TETO: 31 NÓS ═══
-  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão); +4 a F2 do lado do core (2026-10-15: a evidência, 2 achados e 1 decisão da sessão); +2 o wrapper de produção do convite (2026-10-15: o achado do MOAT e a evidência); +1 a decisão do maestro de esvaziar o pool legado (2026-10-15, /meta:decide).
+  # ═══ TETO: 32 NÓS ═══
+  #   nasce com 7 (2026-10-14): a pergunta, 2 evidências medidas e as 4 decisões do maestro; +1 o manual (SAC-133); +7 o spike S1-S5 (3 evidências e 4 achados que restringem o desenho); +5 a F1a (2026-10-15: a evidência da bancada, 3 achados e 1 decisão da sessão); +4 a F1b (o selo da F1 com o dogfood, o passo manual restante, a confiança no clone servido e 1 decisão da sessão); +4 a F2 do lado do core (2026-10-15: a evidência, 2 achados e 1 decisão da sessão); +2 o wrapper de produção do convite (2026-10-15: o achado do MOAT e a evidência); +1 a decisão do maestro de esvaziar o pool legado (2026-10-15, /meta:decide); +1 o S6 vivo em produção (2026-10-15).
   x_linear_epic: "SAC-120"
 nodes:
   - id: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -492,6 +492,22 @@ nodes:
       locator: "pergunta com opções de 2026-10-15: «O pool antigo INVITE_TOKENS_A2A ainda deixa qualquer portador enviar como qualquer membro. Quando ele sai?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-15"
       locality: "pessoa"
+  - id: E_S6_PONTA_A_PONTA_EM_PRODUCAO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-15"
+    verified_against: "medido em 2026-10-15 contra o bridge de produção (9fb32df4, clone servido 24aedcff), com o membro de teste maestro-notebook-test: ops/a2a-invite-live.sh create --apply rc 0 · a2a-doctor.sh do membro 8 ok/0 falha/0 não medida · a2a-send.sh ao vivo HTTP 200 verified:true gated:true (jti nb-00f94d24f82914b66abd7ce9) · a2a-accept.sh rc 0 para o inbox (triado para _processed no mesmo PR) · revoke --apply rc 0 · reenvio HTTP 401 convite-revogado; do create ao revoke, 56 s de relógio"
+    label: "o S6 passou em produção: convite, doctor do membro, envio assinado verificado pelo gate, aceite no inbox e revogação, só com os motores e o wrapper, sem shell manual do maestro além da autorização"
+    narrative: "Teto declarado: as duas contas de sistema do S6 do plano não foram criadas (membro e core rodaram na mesma conta, com a privada do membro de teste no diretório de configuração A2A do operador); a separação de contas foi provada só na bancada. Passos que ainda são humanos: entregar o token fora de banda e limpar o registro da fila do bridge (escrita na conta do serviço, sem wrapper)."
+    provenance:
+      source: "ops/a2a-invite-live.sh + .claude/utils/federation-transport/{a2a-doctor,a2a-send,a2a-accept}.sh"
+      locator: "bridge de produção /a2a, 2026-10-15"
+      method: "medição: execução ao vivo pela sessão principal"
+      locality: "repo"
 edges:
   - from: E_ONZE_PASSOS_MANUAIS_HOJE
     to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
@@ -598,3 +614,9 @@ edges:
   - from: D_POOL_LEGADO_SAI_JA
     to: E_WRAPPER_DO_CONVITE_DE_PRODUCAO
     edge_type: TRACES_TO
+  - from: E_S6_PONTA_A_PONTA_EM_PRODUCAO
+    to: Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL
+    edge_type: SUPPORTS
+  - from: E_S6_PONTA_A_PONTA_EM_PRODUCAO
+    to: E_WRAPPER_DO_CONVITE_DE_PRODUCAO
+    edge_type: SUPPORTS
