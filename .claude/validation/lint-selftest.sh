@@ -34460,6 +34460,169 @@ for ln in m.group(1).splitlines():
 }
 _family run_merge_skip_ci_selftests || true
 
+# Modo selftest-family-merge — o driver de merge das famílias da bancada (SAC-146, 2026-10-15). Medido: os PRs
+# #1133, #1134 e #1135 acrescentaram cada um uma família depois da MESMA linha, e cada merge deixou o próximo em
+# conflito de fonte, resolvido à mão mantendo os dois blocos. O SUT é o driver REAL, ligado pelo .gitattributes
+# e pela config `git -c` que o pr-finalize passa, num rebase de verdade entre duas branches de um repo de mentira
+# com a forma da bancada (marcadores ONION-BENCH, motor, famílias). O caso (c) é a prova de que `merge=union`
+# não serve: ele junta também duas edições da mesma linha, e a segunda atribuição apaga a primeira.
+run_selftest_family_merge_selftests() {
+  # selftest-covers: .gitattributes
+  local drv="${REPO_ROOT}/ops/merge-drivers/selftest-families.py" pf="${REPO_ROOT}/ops/pr-finalize.sh"
+  [ -f "${drv}" ] || { record_skip "selftest-family-merge: ops/ ausente (adotante) → pulado"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "selftest-family-merge: python3 ausente (SUT não exercido)"; return; }
+  local d; d="$(mktemp -d)"
+  # base: motor, uma família hospedeira, uma invocação solta (a forma das linhas 'só _family') e o sumário
+  _sfm_base() {
+    printf '%s\n' '#!/usr/bin/env bash' 'SELFTEST_CORE_ONLY_FAMILIES="a,b"' '_family() { :; }' \
+      '# ═══ ONION-BENCH: FIM DO MOTOR — fixture ═══' '' 'run_host_selftests() {' '  record_pass "h"' '}' \
+      '_family run_host_selftests' '_family run_old_selftests' '' '# ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — fixture ═══' 'echo fim'
+  }
+  # bloco inteiro de família: <nome> [<helper de topo>]
+  _sfm_blk() {
+    printf '\n# Modo %s — fixture.\n' "$1"
+    [ -n "${2:-}" ] && printf '%s() {\n  :\n}\n' "$2"
+    printf 'run_%s_selftests() {\n  record_pass "%s"\n}\n_family run_%s_selftests\n' "$1" "$1" "$1"
+  }
+  # troca a 1ª ocorrência de $1 por $2 (exatamente uma ocorrência, senão o caso é mal formado)
+  _sfm_edit() {
+    python3 -I -c 'import sys
+p,a,b=sys.argv[1:4]; s=open(p,encoding="utf-8").read()
+assert s.count(a)==1, "âncora %d×" % s.count(a)
+open(p,"w",encoding="utf-8").write(s.replace(a,b,1))' "$1" "$2" "$3"
+  }
+  # _sfm_run <caso> <modo: driver|union|none> <âncora> <novo HEAD> <novo reaplicado> [<âncora do reaplicado>]
+  #   → rc do rebase; resultado em ${d}/<caso>/
+  _sfm_run() {
+    local c="${d}/$1" mode="$2" g=(-c user.email=t@t -c user.name=t -c commit.gpgsign=false -c core.hooksPath=/dev/null) cfg=() rc=0
+    mkdir -p "${c}/r/.claude/validation"
+    case "${mode}" in
+      union) printf '.claude/validation/lint-selftest.sh merge=union\n' > "${c}/r/.gitattributes" ;;
+      *) cp "${REPO_ROOT}/.gitattributes" "${c}/r/.gitattributes" ;;
+    esac
+    [ "${mode}" = driver ] && cfg=(-c "merge.onion-selftest-families.driver=python3 -I ${drv} %O %A %B %L %P")
+    _sfm_base > "${c}/r/.claude/validation/lint-selftest.sh"
+    ( cd "${c}/r" && git init -q -b main && git add -A && git "${g[@]}" commit -qm base \
+      && git checkout -q -b pr && _sfm_edit .claude/validation/lint-selftest.sh "${6:-$3}" "$5" && git "${g[@]}" commit -qam pr \
+      && git checkout -q main && _sfm_edit .claude/validation/lint-selftest.sh "$3" "$4" && git "${g[@]}" commit -qam main \
+      && git checkout -q pr ) >/dev/null 2>&1 || { echo "fixture" > "${c}/err"; return 9; }
+    ( cd "${c}/r" && git "${g[@]}" "${cfg[@]}" rebase main ) > "${c}/out" 2>&1 || rc=$?
+    git -C "${c}/r" diff --name-only --diff-filter=U > "${c}/unmerged" 2>/dev/null
+    cp "${c}/r/.claude/validation/lint-selftest.sh" "${c}/result"
+    return "${rc}"
+  }
+  local H='_family run_host_selftests
+' rc o
+
+  # (a) ⭐ o caso medido: duas famílias inteiras acrescentadas depois da MESMA invocação. Sem o driver na
+  #     config o conflito é o de sempre (o defeito reproduzido); com ele, rebase limpo, os dois blocos (o da
+  #     base do rebase primeiro), bash -n verde e a linha do que foi resolvido no stderr.
+  rc=0; _sfm_run a0 none "${H}" "${H}$(_sfm_blk alpha)
+" "${H}$(_sfm_blk beta)
+" || rc=$?
+  if [ "${rc}" -ne 0 ] && [ -s "${d}/a0/unmerged" ]; then
+    record_pass "selftest-family-merge: (a) sem o driver na config: o conflito medido se reproduz (merge de texto)"
+  else record_fail "selftest-family-merge: (a) reprodução" "rc=${rc} — duas famílias na mesma âncora deviam conflitar no merge de texto: $(tail -2 "${d}/a0/out" | tr '\n' '|')"; fi
+  rc=0; _sfm_run a driver "${H}" "${H}$(_sfm_blk alpha)
+" "${H}$(_sfm_blk beta)
+" || rc=$?
+  o="$(grep -n '^_family run_' "${d}/a/result" | cut -d: -f2 | tr '\n' ' ')"
+  if [ "${rc}" -eq 0 ] && [ ! -s "${d}/a/unmerged" ] && [ "${o}" = "_family run_host_selftests _family run_alpha_selftests _family run_beta_selftests _family run_old_selftests " ] \
+     && bash -n "${d}/a/result" && ! grep -q '^<<<<<<<\|^>>>>>>>' "${d}/a/result" \
+     && grep -q 'SELFTEST-FAMILIES: conflito de famílias acrescentadas lado a lado resolvido .*alpha + beta' "${d}/a/out"; then
+    record_pass "selftest-family-merge: (a) com o driver: rebase limpo, os dois blocos (HEAD antes do reaplicado), bash -n verde, resolução declarada"
+  else record_fail "selftest-family-merge: (a) resolução" "rc=${rc} ordem=[${o}] $(tail -3 "${d}/a/out" | tr '\n' '|')"; fi
+
+  # (b) os dois lados TROCAM a mesma invocação por outra (base não vazia): cada lado é uma invocação inteira, no
+  #     topo, depois de outra invocação — só a base vazia distingue isto de um acréscimo. É edição, não escolho.
+  # (as invocações da fixture nunca começam na coluna 0 desta família: o contador `^_family ` as leria)
+  local HB=$'_family run_old_selftests\n'
+  rc=0; _sfm_run b driver "${HB}" $'_family run_pee_selftests\n' $'_family run_queue_selftests\n' || rc=$?
+  if [ "${rc}" -ne 0 ] && [ -s "${d}/b/unmerged" ] && grep -q '^<<<<<<<' "${d}/b/result" && grep -q 'base não é vazia' "${d}/b/out"; then
+    record_pass "selftest-family-merge: (b) dois lados trocando a mesma invocação: fica conflito, com os marcadores do merge padrão"
+  else record_fail "selftest-family-merge: (b) base não vazia" "rc=${rc} — o driver resolveu (ou não disse por quê) o que é conflito real: $(tail -2 "${d}/b/out" | tr '\n' '|')"; fi
+
+  # (c) duas edições da MESMA linha do motor: com o driver fica conflito; com `merge=union` o rebase sai LIMPO
+  #     e o arquivo ganha DUAS atribuições — a segunda vence e a família da primeira some calada. É a prova de
+  #     que o union não serve para este arquivo.
+  local L='SELFTEST_CORE_ONLY_FAMILIES="a,b"'
+  rc=0; _sfm_run c driver "${L}" 'SELFTEST_CORE_ONLY_FAMILIES="a,b,pee"' 'SELFTEST_CORE_ONLY_FAMILIES="a,b,queue"' || rc=$?
+  if [ "${rc}" -ne 0 ] && [ -s "${d}/c/unmerged" ] && grep -q '^<<<<<<<' "${d}/c/result"; then
+    record_pass "selftest-family-merge: (c) a mesma linha editada pelos dois lados: com o driver, conflito"
+  else record_fail "selftest-family-merge: (c) mesma linha (driver)" "rc=${rc} $(tail -2 "${d}/c/out" | tr '\n' '|')"; fi
+  rc=0; _sfm_run cu union "${L}" 'SELFTEST_CORE_ONLY_FAMILIES="a,b,pee"' 'SELFTEST_CORE_ONLY_FAMILIES="a,b,queue"' || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(grep -c '^SELFTEST_CORE_ONLY_FAMILIES=' "${d}/cu/result")" -eq 2 ]; then
+    record_pass "selftest-family-merge: (c) com merge=union a mesma edição sai LIMPA e com duas atribuições — o union apagaria família calado"
+  else record_fail "selftest-family-merge: (c) prova do union" "rc=${rc} atribuições=$(grep -c '^SELFTEST_CORE_ONLY_FAMILIES=' "${d}/cu/result") — a premissa que descartou o union não se reproduz"; fi
+
+  # (d) duas famílias novas definindo a MESMA função de topo: a segunda definição apagaria a primeira.
+  rc=0; _sfm_run d driver "${H}" "${H}$(_sfm_blk pee _shared)
+" "${H}$(_sfm_blk queue _shared)
+" || rc=$?
+  if [ "${rc}" -ne 0 ] && [ -s "${d}/d/unmerged" ] && grep -q 'definido duas vezes.*_shared' "${d}/d/out"; then
+    record_pass "selftest-family-merge: (d) função de topo repetida entre os dois lados: fica conflito, nomeando o nome"
+  else record_fail "selftest-family-merge: (d) colisão de nome" "rc=${rc} $(tail -2 "${d}/d/out" | tr '\n' '|')"; fi
+
+  # (e) blocos inteiros acrescentados depois do marcador do SUMÁRIO: fora da região de famílias.
+  local MS='# ═══ ONION-BENCH: INÍCIO DO SUMÁRIO — fixture ═══
+'
+  rc=0; _sfm_run e driver "${MS}" "${MS}$(_sfm_blk pee)
+" "${MS}$(_sfm_blk queue)
+" || rc=$?
+  if [ "${rc}" -ne 0 ] && [ -s "${d}/e/unmerged" ] && grep -q 'fora da região de famílias' "${d}/e/out"; then
+    record_pass "selftest-family-merge: (e) blocos no sumário (motor): fica conflito"
+  else record_fail "selftest-family-merge: (e) região" "rc=${rc} $(tail -2 "${d}/e/out" | tr '\n' '|')"; fi
+
+  # (f) inserção DENTRO do corpo da hospedeira, terminando numa invocação _family: passa no bash -n e rodaria
+  #     a "família" dentro de outra. O ponto tem de ser o topo.
+  local IN=$'  record_pass "h"\n'
+  rc=0; _sfm_run f driver "${IN}" "${IN}"$'  _p() {\n    :\n  }\n_family run_pee_selftests\n' \
+    "${IN}"$'  _q() {\n    :\n  }\n_family run_queue_selftests\n' || rc=$?
+  if [ "${rc}" -ne 0 ] && [ -s "${d}/f/unmerged" ] && grep -q 'o ponto não é o topo' "${d}/f/out"; then
+    record_pass "selftest-family-merge: (f) inserção dentro do corpo de uma função: fica conflito"
+  else record_fail "selftest-family-merge: (f) topo" "rc=${rc} $(tail -2 "${d}/f/out" | tr '\n' '|')"; fi
+
+  # (h) mudanças em pontos DIFERENTES (o caso mais comum): o driver devolve o merge de texto limpo, com as duas.
+  #     Driver que devolvesse só o lado HEAD perderia o PR inteiro sem conflito nenhum.
+  rc=0; _sfm_run h driver "${L}" 'SELFTEST_CORE_ONLY_FAMILIES="a,b,zz"' "${H}$(_sfm_blk beta)
+" "${H}" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ ! -s "${d}/h/unmerged" ] && grep -q '^SELFTEST_CORE_ONLY_FAMILIES="a,b,zz"$' "${d}/h/result" \
+     && grep -q '^_family run_beta_selftests$' "${d}/h/result"; then
+    record_pass "selftest-family-merge: (h) mudanças em pontos diferentes: merge limpo com as duas (o driver não perde lado)"
+  else record_fail "selftest-family-merge: (h) merge limpo" "rc=${rc} $(tail -2 "${d}/h/out" | tr '\n' '|')"; fi
+
+  # (i) acréscimo de TOPO que não é família (duas atribuições depois da mesma invocação): base vazia, região e
+  #     ponto certos, nenhum nome de função — só "o lado termina numa invocação _family" o separa da perda
+  #     calada do caso (c).
+  rc=0; _sfm_run i driver "${H}" "${H}SELFTEST_X=1"$'\n' "${H}SELFTEST_X=2"$'\n' || rc=$?
+  if [ "${rc}" -ne 0 ] && [ -s "${d}/i/unmerged" ] && grep -q 'não termina numa invocação _family' "${d}/i/out"; then
+    record_pass "selftest-family-merge: (i) acréscimo de topo que não é bloco de família: fica conflito"
+  else record_fail "selftest-family-merge: (i) bloco incompleto" "rc=${rc} $(tail -2 "${d}/i/out" | tr '\n' '|')"; fi
+
+  # (j) DOIS conflitos no arquivo, um resolvível (famílias) e outro não (a mesma linha): tudo-ou-nada — rc ≠ 0
+  #     e os DOIS com marcadores; resolver só o bom esconderia o ruim no meio de um merge "quase limpo".
+  local HL="${L}"$'\n''_family() { :; }'$'\n''# ═══ ONION-BENCH: FIM DO MOTOR — fixture ═══'$'\n\n''run_host_selftests() {'$'\n''  record_pass "h"'$'\n''}'$'\n'"${H}"
+  local HLA="${HL/${L}/SELFTEST_CORE_ONLY_FAMILIES=\"a,b,pee\"}" HLB="${HL/${L}/SELFTEST_CORE_ONLY_FAMILIES=\"a,b,queue\"}"
+  rc=0; _sfm_run j driver "${HL}" "${HLA}$(_sfm_blk alpha)"$'\n' "${HLB}$(_sfm_blk beta)"$'\n' || rc=$?
+  if [ "${rc}" -ne 0 ] && [ -s "${d}/j/unmerged" ] && [ "$(grep -c '^<<<<<<<' "${d}/j/result")" -eq 2 ]; then
+    record_pass "selftest-family-merge: (j) um conflito bom e um ruim: nenhum resolvido, os dois marcados"
+  else record_fail "selftest-family-merge: (j) tudo-ou-nada" "rc=${rc} marcadores=$(grep -c '^<<<<<<<' "${d}/j/result") $(tail -2 "${d}/j/out" | tr '\n' '|')"; fi
+
+  # (g) a LIGAÇÃO: o .gitattributes do repo dá o driver à bancada, e o pr-finalize passa a config no rebase e
+  #     em cada --continue. Sem isso o driver existe e nunca roda.
+  local attr; attr="$(git -C "${REPO_ROOT}" check-attr merge -- .claude/validation/lint-selftest.sh 2>/dev/null)"
+  if [[ "${attr}" == *": merge: onion-selftest-families" ]] && [ -f "${pf}" ] \
+     && grep -qF "merge.onion-selftest-families.driver=python3 -I '\${ROOT}/ops/merge-drivers/selftest-families.py' %O %A %B %L %P" "${pf}" \
+     && grep -qF 'git "${_RB_CFG[@]}" rebase --autostash origin/main' "${pf}" \
+     && grep -qF 'git "${_RB_CFG[@]}" rebase --continue' "${pf}" \
+     && grep -qF "conflito de famílias acrescentadas lado a lado resolvido em" "${pf%/*}/pr-merge-verified.sh"; then
+    record_pass "selftest-family-merge: (g) ligação: .gitattributes → driver, o pr-finalize o passa no rebase e no --continue, e o merge verificado lê a resolução"
+  else record_fail "selftest-family-merge: (g) ligação" "attr=[${attr}] — o .gitattributes ou o pr-finalize não ligam o driver"; fi
+  unset -f _sfm_base _sfm_blk _sfm_edit _sfm_run
+  rm -rf "${d}"
+}
+_family run_selftest_family_merge_selftests
+
 # Modo selector-per-file — o MAPA POR ARQUIVO (decisão do maestro de 2026-10-13, «1+2 juntos, medido»). Medido
 # antes da cura com `ops/testing/selection-replay.sh` nos 50 últimos PRs mergeados: o PR seletivo caía em
 # 78–115 famílias porque prosa, grafo e resíduo de docs/ casavam por PREFIXO todo diretório que algum script

@@ -25,6 +25,11 @@
 # Estratégia de merge preservada (append-only)
 .claude/session-lifecycle.jsonl text eol=lf merge=union
 
+# Bancada: famílias novas acrescentadas lado a lado por PRs paralelos (SAC-146). NÃO é union — o
+# union juntaria também duas edições da mesma linha. O driver só resolve conflito de base vazia entre
+# blocos inteiros de família; o resto fica conflito. Sem o driver na config, vale o merge de texto.
+.claude/validation/lint-selftest.sh merge=onion-selftest-families
+
 # Binários: nunca normalizar
 *.png   binary
 *.jpg   binary

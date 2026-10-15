@@ -316,7 +316,8 @@ _rebase_trail() { # $1=head antigo $2=head novo (ou "—") $3=causa $4=N/MAX $5=
     "" \
     "${_RB_REASON_TEXT}" \
     "O rebase rodou na worktree local da branch por \`ops/pr-finalize.sh --rebase --push\`, que resolve só" \
-    "conflito de projeção gerada e regenera as projeções na árvore combinada.")"
+    "conflito de projeção gerada (e, pelo driver das famílias, o acréscimo lado a lado de famílias da bancada)" \
+    "e regenera as projeções na árvore combinada.")"
   if ! command -v gh >/dev/null 2>&1; then
     say "⚠️  auto-rebase SEM RASTRO no PR #${PR}: \`gh\` indisponível — head ${1:0:8} → ${2:0:8}, causa: ${3} (${4})"
     return 0
@@ -486,6 +487,13 @@ while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
   _old_head="${HEAD_SHA}"
   _wt_before="$(git -C "$_wt" rev-parse HEAD 2>/dev/null)"
   _rb_out="$(cd "$_wt" && bash ops/pr-finalize.sh --rebase --push 2>&1)"; _rb_rc=$?
+  # o driver das famílias (SAC-146) RESOLVEU a fonte: a branch local ficou rebaseada, e o pr-finalize parou no
+  # carimbo, porque o hash de código muda pelo contexto. Não é "conflito de FONTE", nem "nada mudou".
+  _fam="$(LC_ALL=C grep -o 'conflito de famílias acrescentadas lado a lado resolvido em [^ ]*' <<< "$_rb_out" | sed 's/^.* resolvido em //' | sort -u | paste -sd, -)"
+  if [ "$_rb_rc" -ne 0 ] && [ -n "${_fam}" ] && ! grep -q 'conflito REAL em ' <<< "$_rb_out"; then
+    _rebase_trail "${_old_head}" "—" "famílias da bancada acrescentadas lado a lado: ${_fam} (resolvido pelo driver)" "${_rebases}/${_REBASE_MAX}" "PARADO — rebaseado só na worktree, NÃO enviado; o resíduo pede re-revisão"
+    die "auto-rebase PARADO no carimbo do resíduo: o driver das famílias resolveu ${_fam}, a branch em ${_wt} está rebaseada e NÃO foi enviada, e o hash de código mudou pelo contexto — re-revise (reviewed_diff_sha256: pendente) e rode bash ops/pr-finalize.sh --push lá. pr-finalize disse: $(printf '%s\n' "$_rb_out" | tail -2 | tr '\n' ' ')"
+  fi
   if [ "$_rb_rc" -ne 0 ]; then
     _real="$(grep -o 'conflito REAL em [^ ]*' <<< "$_rb_out" | head -1)"
     _rebase_trail "${_old_head}" "—" "fonte: ${_real:-pr-finalize rc=${_rb_rc}}" "${_rebases}/${_REBASE_MAX}" "RECUSADO — nada mudou na branch; resolver à mão"
@@ -526,7 +534,8 @@ while [ "$_mg" = CONFLICTING ] || [ "${_behind}" -gt 0 ]; do
   # a causa vem do que o pr-finalize RESOLVEU (uma linha por projeção em conflito); sem nenhuma, o
   # rebase local foi limpo e quem disse CONFLICTING foi o forge — e isso também é dito, não inventado.
   _proj="$(LC_ALL=C grep -o 'conflito de projeção resolvido em [^ ]*' <<< "$_rb_out" | sed 's/^conflito de projeção resolvido em //' | paste -sd, - | sed 's/,/, /g')"
-  if [ -n "${_proj}" ]; then _causa="projeção gerada: ${_proj}"
+  if [ -n "${_fam}" ]; then _causa="famílias da bancada acrescentadas lado a lado: ${_fam} (resolvido pelo driver)${_proj:+; projeção gerada: ${_proj}}"
+  elif [ -n "${_proj}" ]; then _causa="projeção gerada: ${_proj}"
   elif [ "${_rb_state}" = CONFLICTING ]; then _causa="nenhum arquivo em conflito no rebase local (o forge marcou CONFLICTING)"
   else _causa="base atrás da ponta: ${_rb_state} — strict local"; fi
   if _skip_ci_decide "${_old_head}" "${HEAD_SHA}" "${_wt}" "${_wt_before}"; then
