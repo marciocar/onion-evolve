@@ -9,7 +9,7 @@ tags:
   - a2a
   - wizard
   - forge
-version: "1.0.0"
+version: "1.1.0"
 updated: "2026-10-15"
 related_commands:
   - /meta:federation-member
@@ -23,7 +23,7 @@ argument-hint: "[preparar|convidar|entrar|conferir|aceitar|revogar] [--member <i
 
 Leva o core e um membro da chave ao sinal aceito e à revogação, com o operador respondendo perguntas
 em vez de digitar shell. Cada trilha **explica o passo**, mostra o **dry-run** antes de qualquer escrita
-e termina no **doctor**. A doutrina inteira (as 8 cláusulas e o que o comando NÃO promete) vive em
+e termina no **doctor**. A doutrina inteira (as 9 cláusulas e o que o comando NÃO promete) vive em
 [`common:prompts:federation-a2a-doctrine`](../common/prompts/federation-a2a-doctrine.md). **Referencie, não copie.**
 
 **Por que existe:** pedido do maestro em 2026-10-14 (configurador completo, em wizard), forjado pelo
@@ -35,9 +35,14 @@ core-only: `docs/evolution/research/a2a-configurator-2026-10/` (no adotante não
 - **Roda na fonte e no hub** (conjunto `adoption` do `roles.yaml`, ao lado do `/meta:federation-member`):
   não viaja para standalone, plugins nem mini. Na F1 o receptor é o **core**; o hub como receptor dos
   próprios filhos é a F3.
-- **O membro não precisa ter este comando:** a trilha 2 prepara um **pacote de entrada** com os três
-  motores (keygen, remetente, doctor) e o roteiro da trilha 3, porque o membro adotado como standalone
-  não recebe `.claude/utils/federation-transport/`.
+- **O membro não precisa ter este comando:** a trilha 2 prepara um **pacote de entrada** com os quatro
+  motores (keygen, remetente, doctor e o `a2a-invite.sh`, que o doctor usa para julgar o descritor do
+  convite) e o roteiro da trilha 3, porque o membro adotado como standalone não recebe
+  `.claude/utils/federation-transport/`.
+- **O convite é por membro (F2):** o bearer tem dono, validade e revogação, e mora como hash no arquivo
+  de convites do seu bridge (`A2A_INVITES_FILE`), que o bridge relê a cada envio, sem restart. O pool
+  anônimo do ambiente do bridge (`INVITE_TOKENS_A2A`) é **caminho legado, depreciado**: segue aceito
+  para quem ainda o usa, mas convite novo nasce por membro.
 - Maestro-invocado. **Não faz deploy**, não edita o ambiente do bridge, não reinicia serviço, não
   escreve em repo alheio e não aceita sinal sem confirmação explícita, um por um (MOAT e cláusula 4).
   Esta superfície não cita caminhos core-privados de operação (REGRA 100 (Superfície que viaja não cita
@@ -94,14 +99,36 @@ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <
 ### Trilha 2 — Convidar um membro (core)
 1. **Registro.** Membro novo → `/meta:federation-member register` primeiro. O bloco `a2a` dele nasce com
    `sends_to: <core>` e `keys: []` até a pública chegar.
-2. **Pacote de entrada.** Copie para um diretório de entrega os três motores
-   (`.claude/utils/federation-transport/a2a-keygen.sh`, `a2a-send.sh`, `a2a-doctor.sh`) e um
-   `a2a.conf` com `member=`, `receiver=` e `endpoint=` (nenhum segredo). O pacote vai ao membro pelo
-   canal combinado; o core não o instala na máquina dele (I3).
-3. **Convite (F1).** O bearer do canal é gerado direto num arquivo 0600, nunca no chat:
-   `( umask 077; openssl rand -hex 32 > <arquivo> )`. Incluí-lo no pool do bridge é do caminho de
-   deploy do bridge do core (maestro). Entregue o arquivo fora de banda. O convite por membro, com
-   validade e sem restart, é a F2.
+2. **Pacote de entrada.** Copie para um diretório de entrega os quatro motores
+   (`.claude/utils/federation-transport/a2a-keygen.sh`, `a2a-send.sh`, `a2a-doctor.sh`,
+   `a2a-invite.sh`) e um `a2a.conf` com `member=`, `receiver=` e `endpoint=` (nenhum segredo). O pacote
+   vai ao membro pelo canal combinado; o core não o instala na máquina dele (I3).
+3. **Convite por membro.** O token nasce de `/dev/urandom` direto num arquivo 0600 e **nunca** passa
+   por chat, argv, stdout ou log; no arquivo de convites do seu bridge (`A2A_INVITES_FILE`) entra só o
+   SHA-256 dele, amarrado ao membro e ao receptor, com validade. O motor julga o arquivo pelas mesmas
+   regras do bridge e só o escreve por temporário no mesmo diretório + rename, em 0600. Dry-run antes:
+   ```bash
+   bash .claude/utils/federation-transport/a2a-invite.sh create <id> --days 30 --file <A2A_INVITES_FILE> --token-out <arq> --dry-run
+   ```
+   O arquivo é da **conta do serviço do bridge** (0600, diretório sem escrita de grupo nem de outros),
+   e o bridge recusa o arquivo inteiro se ele tiver outro dono. Por isso a escrita de verdade é do
+   operador do receptor, **como essa conta**. Quando ela não escreve no diretório do token, gere o
+   token como você e entregue-o por redirecionamento (quem abre o arquivo é o seu shell):
+   ```bash
+   ( umask 077; openssl rand -hex 32 > <arq> )
+   sudo -u <conta do serviço> bash <motor que a conta lê>/a2a-invite.sh create <id> --days 30 --receiver <id do core> \
+     --file <A2A_INVITES_FILE> --token-stdin --invite-out <descritor num diretório que a conta escreve> < <arq>
+   sudo -u <conta do serviço> bash <motor que a conta lê>/a2a-invite.sh check --file <A2A_INVITES_FILE>
+   ```
+   A conta do serviço precisa LER o motor e o registro: se ela não lê o seu repo de trabalho, use o
+   motor do clone que o bridge serve, ou uma cópia que ela leia, e passe `--receiver` (sem o registro
+   não há receptor padrão). O motor recusa rodar como root. Entregue fora de banda o token e o
+   **descritor**: com `--token-out` ele nasce em `<arq>.invite.json`, e com `--token-stdin` onde o
+   `--invite-out` mandar. O descritor não tem segredo: membro, receptor, validade e hash. O doctor do
+   membro confere que o hash do token dele bate com o do descritor. O convite vale no próximo envio,
+   sem restart. Membro que ainda usa o pool
+   legado: migre-o para um convite por membro e peça a retirada do bearer antigo pelo caminho de deploy
+   do bridge do core (maestro).
 4. **Pino**, quando a pública e a impressão chegarem (trilha 3, passo 2): confira a impressão por
    outro canal, grave a pública em `.claude/utils/federation-transport/jwks/<kid>.pem` (adição
    deliberada, `git add -f`), acrescente o `kid` em `a2a.keys`, rode o validador e o doctor do receptor
@@ -133,8 +160,11 @@ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <
    assinado e válido por 300 s: confira e descarte, não o cole em canal compartilhado.
 
 ### Trilha 4 — Conferir e diagnosticar (qualquer lado)
-O doctor do lado certo, com os insumos que a conversa tiver (`--endpoint`, `--invite`,
-`--fingerprint`). Leia cada ❌ e ⚪ com o próximo passo dele; nunca resuma rc 2 como saudável.
+O doctor do lado certo, com os insumos que a conversa tiver (`--endpoint`, `--invite` com o descritor
+do convite, `--fingerprint` e, no receptor, `--invites` com o arquivo de convites do seu bridge, rodando
+como a conta do serviço). A checagem (i) diz o motivo que o guard do bridge daria ao bearer do membro
+(`convite-revogado`, `convite-vencido`, `convite-de-outro-membro`, `convites-indisponiveis`…), sem
+ler token. Leia cada ❌ e ⚪ com o próximo passo dele; nunca resuma rc 2 como saudável.
 
 ### Trilha 5 — Aceitar a fila (core)
 A fila do bridge mora na conta do serviço; listá-la é do maestro, com o acesso dele. Para cada
@@ -146,9 +176,18 @@ O sinal entra no inbox e segue a triagem normal (`/meta:co-evolve`). Recusado (n
 força.
 
 ### Trilha 6 — Revogar (core)
-Tire o `kid` de `a2a.keys` e a pública do JWKS no mesmo PR (o validador reprova `kid` sem `.pem`, e
-`.pem` sem `kid` não autoriza nada); tire o bearer do pool pelo caminho de deploy do bridge; e peça ao
-membro que destrua a privada (`shred -u ~/.config/onion/a2a/<kid>.key.pem`). A revogação vale no
+1. **O convite**, que vale na hora: como a conta do serviço do bridge, dry-run e depois de verdade. O
+   motor marca `revoked: true` em todas as entradas do membro, e o bridge recusa o próximo envio com
+   `convite-revogado`, sem restart nem deploy:
+   ```bash
+   bash .claude/utils/federation-transport/a2a-invite.sh revoke <id> --file <A2A_INVITES_FILE> --dry-run
+   bash .claude/utils/federation-transport/a2a-invite.sh revoke <id> --file <A2A_INVITES_FILE>
+   bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <id> --invites <A2A_INVITES_FILE>   # (i) falha: convite-revogado
+   ```
+   Membro no pool legado: o bearer dele sai pelo caminho de deploy do bridge do core (maestro).
+2. **A chave.** Tire o `kid` de `a2a.keys` e a pública do JWKS no mesmo PR (o validador reprova `kid`
+   sem `.pem`, e `.pem` sem `kid` não autoriza nada), e peça ao membro que destrua a privada
+   (`shred -u ~/.config/onion/a2a/<kid>.key.pem`). A revogação vale no
 bridge **quando o clone que ele serve recebe o merge** (caminho de deploy do bridge, maestro): até lá o
 `kid` revogado segue aceito lá. Confira com o doctor do receptor nomeando o `kid` revogado, que tem de
 sair `falha` em (d) (sem `--kid` o doctor confere só os kids que restam):
@@ -158,7 +197,9 @@ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member <
 
 ## Destino (peça 5)
 
-O que muda de verdade é o **registro** (`members.yaml` e o JWKS), validado pelo `members-validate.sh` —
+O que muda de verdade é o **registro** (`members.yaml` e o JWKS) e o **arquivo de convites do
+bridge**. O arquivo de convites é conferido pelo `a2a-invite.sh check` e fica fora do git, porque mora
+na conta do serviço e os hashes não se versionam. O registro é validado pelo `members-validate.sh`,
 o mesmo que o lint cobra como HARD pela REGRA 66 (Registro da federação validado no gate). O que a
 trilha revelou de novo vai para o grafo do programa com o radar exit 0 (`kg-radar.sh --integrity
 --schema`). O **contrato de custo** (`run_id` · `tokens` · `agents` · `duration_min`) **não se aplica**:
@@ -182,13 +223,15 @@ que casa algo real).
   acesso de administrador (isso é do maestro).
 - Não escreve no repo do membro, não instala nada na máquina dele, não rotaciona chave sem pedido.
 - Não aceita sinal em lote nem sem confirmação.
-- Não é o convite por membro com validade (F2), nem o hub como receptor (F3), nem o servidor do hub (F4).
+- Não edita o arquivo de convites à mão nem fora do motor (a trava e a conferência de forma são dele),
+  e não cria convite em lote.
+- Não é o hub como receptor (F3), nem o servidor do hub (F4).
 
 ## 🔗 Referências
 
 - Doutrina (peça 2): [`common:prompts:federation-a2a-doctrine`](../common/prompts/federation-a2a-doctrine.md)
 - Motores: `.claude/utils/federation-transport/a2a-keygen.sh`, `a2a-send.sh`, `a2a-doctor.sh` (medidor
-  da peça 3), `a2a-verify.sh` (o gate) e `a2a-accept.sh` (o aceite)
+  da peça 3), `a2a-invite.sh` (o convite por membro), `a2a-verify.sh` (o gate) e `a2a-accept.sh` (o aceite)
 - Registro: `/meta:federation-member` e `.claude/validation/members-validate.sh`
 - Bancada (peça 7): `run_federation_a2a_selftests`
 - Lente (peça 6): `.claude/rules/federation-a2a-lens.md`

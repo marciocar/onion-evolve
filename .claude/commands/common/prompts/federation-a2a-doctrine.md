@@ -25,6 +25,10 @@ O wizard nunca resume um rc 2 como "tudo certo".
   da máquina**: o que viaja é a pública e a impressão SHA-256.
 - O **bearer do canal** vive num arquivo 0600 e chega ao `curl` por arquivo de cabeçalho; o remetente
   **recusa** token ou chave legível por grupo/outros (segredo que outra conta lê é segredo vazado).
+- O **token do convite** nasce de `/dev/urandom` direto no arquivo 0600 do `a2a-invite.sh create`
+  (sem sobrescrever, sem seguir symlink) e nunca passa por stdout, stderr, argv ou log. No arquivo de
+  convites do bridge mora só o hash. Quando a escrita é como a conta do serviço, o token chega por
+  redirecionamento (`--token-stdin`): quem abre o arquivo é o shell do operador.
 - O wizard **nunca pede** o token ou a chave no chat, nunca os coloca num argumento de comando e nunca
   os imprime. Quando o membro precisa gravar o token, a instrução é gravar por arquivo, com `umask 077`.
 - As `.pem` públicas são versionadas no JWKS do receptor por adição deliberada; a privada nunca entra
@@ -63,11 +67,37 @@ envio real: o teste ao vivo da trilha 3 é um sinal de verdade, e entra na fila 
 `sends_to` só aponta membro com `role: source` ou `hub` **e** que não seja porta (`kind: door`). Olhar só
 o `role` deixava a porta pública passar por receptor. O `members-validate.sh` cobra isso no gate do lint.
 
+### 9. O bearer tem DONO, e o arquivo de convites se julga como o bridge o julga (F2)
+O convite amarra o hash do token a **um** membro e a **um** receptor, com validade ISO 8601 com hora e
+fuso, e o guard do bridge exige que esse membro seja o `from` do envelope antes do gate (o gate prova o
+mesmo `from` pela assinatura). Três regras do bridge que um editor à mão quebra sem perceber, e que o
+`a2a-invite.sh` aplica:
+- **O arquivo é recusado INTEIRO** (`convites-indisponiveis`) quando tem outro dono, é symlink, é
+  gravável por grupo/outros, mora em diretório inseguro, ou não é JSON `version: 1`. Uma revogação
+  gravada com defeito nunca deixa o convite revogado de pé, e por isso o motor **não escreve** sobre
+  arquivo quebrado: ele manda conferir.
+- **`revoked` só vale como `false` literal**: `null`, ausente ou `0` é revogado. E um hash repetido com
+  uma entrada revogada derruba o token.
+- **A escrita é atômica** (temporário no mesmo diretório + rename, 0600) e **travada** no diretório,
+  e nunca como root, porque o arquivo nasceria de root e o bridge o recusaria. A trava só vale entre
+  motores. Contra um escritor de fora, o motor relê metadados (com o ctime) e conteúdo antes do rename
+  e recusa se algo mudou. Isso **estreita** a janela, mas não a fecha: medido, 1 escrita perdida em 300
+  corridas, contra 14 sem a releitura. Por isso o arquivo não se edita à mão.
+
+A paridade com o bridge foi **medida**, não suposta: os veredictos do motor batem com os do módulo real
+do bridge em 25 arquivos de teste e em 5002 datas aleatórias (2026-10-15). A primeira medição não
+bastou. O refutador achou mais quatro divergências, todas curadas: o `$` do Python casa antes de um
+`\n` final, a fração de `24:00` era truncada antes do teste, uma surrogate sozinha derrubava a escrita,
+e um JSON fundo demais era dado como quebrado (agora sai "não medido"). Revogar o convite vale no
+próximo envio, sem restart e sem deploy. É o contrário da revogação do `kid` (cláusula 3), que só vale
+quando o clone servido recebe o merge. Por isso a trilha 6 revoga o convite **primeiro**.
+
 ## O que este comando NÃO promete
 
-- **Não faz deploy** do bridge, não edita o ambiente do serviço e não reinicia nada. A F1 usa o pool de
-  convites que o bridge já tem; o convite por membro com validade, sem restart, é a F2 (no repo do
-  bridge, por sessão própria).
+- **Não faz deploy** do bridge, não edita o ambiente do serviço e não reinicia nada. O convite por
+  membro (F2) dispensa restart. O pool anônimo do ambiente do bridge (`INVITE_TOKENS_A2A`) é o caminho
+  legado, depreciado, e tirar um bearer dele continua sendo do caminho de deploy do bridge. Um bridge
+  anterior à F2 ignora o arquivo de convites, e o sintoma é o 401 `credencial-desconhecida`.
 - **Não roda na máquina do membro por conta própria:** a trilha 3 é executada pelo membro, no
   computador dele. O core prepara o pacote; o membro instala.
 - **Não aceita sinal sozinho** nem em lote (cláusula 4), e não rotaciona chave sem pedido.
