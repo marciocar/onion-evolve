@@ -2,8 +2,7 @@
 branch: feat/adapter-enforcement-declared
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: de95ffaf5670f7d583d20ce4b8774236e062f674fac784a1a87b9644226b6616
-reviewed_code_sha256: da91f413e6474571071d83dfa08b77ba5d891cfc43ca52710bc96cb3ceb6a411
+reviewed_diff_sha256: pendente
 findings_total: 2
 findings_real: 2
 tokens: 0
@@ -55,3 +54,9 @@ Os adapters de trust declaram `validator:` porque o `trust-topology-check.sh` é
 
 - A forma é conferida, a verdade não. Um `validator:` aponta para um validador que o lint chama, mas a guarda não prova que ele cobre o contrato daquele adapter.
 - Raiz SDAAL sem `adapters/` (por exemplo, a co-evolução, que é gerador) fica fora por derivação. O estudo a julgou fora do escopo SDAAL.
+
+## Rebase com conflito (re-revisão)
+
+O #1133 e o #1134 puseram as famílias deles na mesma âncora do `lint-selftest.sh`. Resolvi mantendo as três, uma
+depois da outra, e o conflito de projeção (`testing-inventory.md`) foi regenerado pelo gerador. As três famílias
+rodaram juntas: 15 casos verdes.
