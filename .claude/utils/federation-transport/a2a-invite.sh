@@ -524,7 +524,7 @@ def cmd_list(pos, opt, root, check=False):
     elif cur['state'] == 'unreadable':
         put('arquivo', 'nao-medido', 'esta conta não lê o arquivo (é 0600 da conta do serviço)', 'rode como a conta do serviço do bridge: sudo -u <conta>')
     elif cur['state'] == 'absent':
-        put('arquivo', 'falha', 'arquivo ausente: o bridge vê ZERO convites de membro (só o pool legado vale)', 'crie o primeiro convite: a2a-invite.sh create <member> …')
+        put('arquivo', 'falha', 'arquivo ausente: o bridge vê ZERO convites de membro (ninguém autentica)', 'crie o primeiro convite: a2a-invite.sh create <member> …')
     elif cur['state'] == 'error':
         put('arquivo', 'falha', f"o bridge recusa o arquivo INTEIRO ({cur['detail']}): nenhum convite de membro autentica (convites-indisponiveis)",
             'conserte o arquivo (dono = conta do serviço, 0600, diretório sem escrita de grupo/outros, JSON version 1)')

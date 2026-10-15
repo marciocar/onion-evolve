@@ -155,7 +155,7 @@ a2a-doctor · lado receiver · membro membro-exemplo · receptor onion-evolve
 ⚪ (c) impressão SHA-256 [não crítica] — impressão do membro não informada: o pino não foi conferido contra o que ele gerou
       → próximo passo: passe --fingerprint sha256:<hex> com a impressão que o membro leu do keygen ou do doctor dele
 ✅ (t) topologia de confiança — a topologia autoriza membro-exemplo → onion-evolve (relay)
-⚪ (i) convite por membro [não crítica] — arquivo de convites não informado: o convite por membro não foi conferido (ou o membro ainda usa o pool legado)
+⚪ (i) convite por membro [não crítica] — arquivo de convites não informado: o convite por membro não foi conferido
       → próximo passo: passe --invites <o arquivo de convites do seu bridge (A2A_INVITES_FILE)>, rodando como a conta do serviço do bridge
 ✅ (f) relógio — timedatectl NTPSynchronized=yes
 ✅ (g) endpoint — endpoint alcançável (HTTP 401: alcance, não autorização)
@@ -536,33 +536,62 @@ perguntou (não passou a flag), não algo saudável.
 inbox é **ato humano**, um registro de cada vez, depois de ler. A fila mora na conta do serviço;
 listá-la é do maestro, com o acesso dele.
 
-Um envio aceito pelo gate vira um registro assim (campos selecionados):
+Um envio aceito pelo gate vira um registro assim (campos selecionados; o `envelope` é o assinado,
+preservado inteiro):
 
 ```
 {
-  "from": "membro-exemplo",
-  "verdict": { "verified": true, "apply_mode": "gated" },
-  "signal": { "id": "2026-10-15-membro-exemplo-th-…", "kind": "question", "from": "membro-exemplo", "to": "onion-evolve" }
+  "taskId": "…", "receivedAt": "2026-10-15T19:20:22.000Z", "from": "membro-exemplo", "receiver": "onion-evolve",
+  "verdict": { "verified": true, "apply_mode": "gated", "receiver": "onion-evolve" },
+  "signal": { "id": "2026-10-15-membro-exemplo-th-…", "kind": "question", "from": "membro-exemplo", "to": "onion-evolve", "body": "…" },
+  "envelope": { "jws": "<h.p.s>", "signal": { … } }
 }
 ```
 
-Leia o sinal, confirme e aceite:
+**O aceite não confia no JSON** (2ª passada de refutação, 2026-10-15). O registro chega ao aceite fora de
+banda, e quem escreve na fila escreve `"verified": true` à vontade. Por isso o `a2a-accept.sh` passa o
+`envelope` preservado **de novo pelo gate**, com o mesmo receptor, julgando a janela de tempo no instante
+do recebimento (`receivedAt`); confere que o registro bate com o envelope (o `from`, o `signal` e o
+veredito); e só então escreve o doc. O que vai ao frontmatter sai do veredito reverificado, nunca do
+registro cru. O **corpo** do sinal entra no doc como **DADO**: dentro da moldura R15.2 (com nonce, e a
+marca forjada neutralizada), num bloco de código, com o `sha256` e `verified_semantic: false` no
+frontmatter. **Leia o doc materializado, nunca o JSON da fila.** Aceite um por vez:
 
 ```
 $ bash .claude/utils/federation-transport/a2a-accept.sh ../rec.json
-aceito → <sb>/core/docs/evolution/inbox/2026-10-15-membro-exemplo-th-….md
-  (próximo: /meta:co-evolve p/ triar; e limpar o registro da fila do bridge — ato humano via '!')
+aceito → <sb>/core/docs/evolution/inbox/2026-10-15-a2a-membro-exemplo-5964da055ae31cf8.md
+  (próximo: /meta:co-evolve p/ triar, lendo o DOC — nunca o JSON da fila; e limpar o registro da fila do bridge — ato humano)
 [rc=0]
 ```
 
-Aceitar de novo não sobrescreve nada (rc 0, "já aceito"). Um registro que o gate não verificou é
-recusado, e não se força:
+O nome do doc vem do `jti` **assinado** (os 16 primeiros hex do sha256 dele), não do `signal.id`, que
+não é assinado. Aceitar de novo não sobrescreve nada (rc 0, "já aceito"), mesmo depois de o doc ir para
+`_processed`. O mesmo `jti` com **outro** `taskId` é recusado: é replay, ou registro forjado reaproveitando
+o envelope. As recusas medidas no dogfood de 2026-10-15:
 
 ```
-$ bash .claude/utils/federation-transport/a2a-accept.sh ../rec-bad.json
-RECUSADO: registro não-verificado (verdict.verified != true) — não aceito.
-[rc=1]
+RECUSADO: registro sem o envelope assinado preservado — sem ele não há o que reverificar, e o veredito do JSON não basta.
+RECUSADO: o from do registro diverge do from assinado do envelope — registro adulterado.
+RECUSADO: o signal do registro diverge do envelope assinado — registro adulterado.
+RECUSADO: a reverificação do envelope VETOU: body-mismatch (camada body). O veredito do registro não vale sem ela.
+RECUSADO: a reverificação do envelope VETOU: kid-not-owned-by-from:acme-1 (camada jws). O veredito do registro não vale sem ela.
+RECUSADO: o jti deste envelope já foi aceito por OUTRO registro (…) — replay ou registro forjado reaproveitando o jti; nada sobrescrito.
 ```
+
+**O `receivedAt` não é assinado.** Quem escreve na fila escolhe esse valor, e com ele poderia reapresentar um
+envelope genuíno antigo dentro da janela dele. Por isso o aceite recusa envelope assinado (`iat`) há mais de
+**7 dias**, e guarda um **razão de aceites** (`.claude/sessions/.a2a-accept.<receptor>.ledger`, fora do inbox):
+o mesmo `jti` não entra duas vezes neste repo, nem depois de o doc ser apagado. A testemunha do recebimento
+fora do alcance do serviço é a decisão aberta do N2 (separar a escrita do `/chat` da confiança do A2A).
+
+**Registros de antes de 2026-10-14 não passam mais.** Um envelope sem `body_sha256`, sem `aud`, ou com chave
+desconhecida no `signal` é vetado na reverificação, como seria vetado hoje no recebimento. Não se força:
+o remetente reenvia pelo canônico.
+
+**A revogação alcança a fila.** A chave revogada (fora do `a2a.keys` e do JWKS) já derruba a
+reverificação. O convite revogado depois do recebimento só é visto com `--invites <arquivo de convites>`
+(o do bridge, 0600 da conta do serviço; uma cópia lida por quem opera): todo convite do membro para este
+receptor revogado = recusa. Sem `--invites`, o doc registra `convite_conferido: nao-medido`, nunca "ok".
 
 Depois do aceite, o sinal segue a triagem normal pelo `/meta:co-evolve`. Membro regulado continua
 `propose-only`: o gate marca o modo, e nada muda nisso por ser ao vivo.
@@ -623,15 +652,16 @@ $ bash .claude/utils/federation-transport/a2a-doctor.sh --side receiver --member
 Sem `--kid`, o doctor confere só os kids que restam. E lembre: até o clone servido receber o merge, o
 `kid` revogado **segue aceito no bridge**.
 
-### 2.8 O pool legado
+### 2.8 O pool legado (saiu do código)
 
 Antes da F2, o convite era um bearer anônimo na variável `INVITE_TOKENS_A2A` do ambiente do bridge:
 sem dono e sem validade. O bearer não amarrava o remetente: qualquer portador passava pelo bridge com
-qualquer `from`, e só a assinatura do gate (o `kid` pinado do próprio membro) segurava o envio. Ele segue aceito para
-quem ainda o usa, e o bridge registra no log a cada uso que ele está depreciado. Em 2026-10-15 o
-maestro decidiu **esvaziá-lo já**, sem esperar a migração dos remetentes atuais, que voltam por convite
-por membro. Tirar um bearer do pool é editar o ambiente do serviço, e isso é do maestro, pelo caminho
-de deploy do bridge; o wizard não toca o ambiente.
+qualquer `from`, e só a assinatura do gate (o `kid` pinado do próprio membro) segurava o envio. Em
+2026-10-15 o maestro decidiu **esvaziá-lo já**, e a 2ª passada de refutação apontou que o ramo seguia no
+código, sem conferir o `from`. Desde a SAC-150 o ramo **saiu do bridge**: só convite por membro
+autentica. Se a variável ainda vier preenchida, o bridge a **ignora** e avisa no boot
+(`INVITE_TOKENS_A2A traz N token(s) e é IGNORADA`); nenhum daqueles tokens passa. Apagar a variável é
+editar o ambiente do serviço, do maestro, pelo caminho de deploy do bridge; o wizard não toca o ambiente.
 
 Um bridge anterior à F2 ignora o arquivo de convites. Pelo código anterior à F2 (não medido neste
 manual), o membro recebe um 401 **sem** `reason`, com a mensagem
@@ -650,19 +680,20 @@ o core, siga a **Parte IV** como se fosse um membro: gere a chave, mande a públ
 convite e envie. A única diferença é que o hub costuma ter o Onion instalado, e então pode rodar o
 wizard em vez do pacote solto.
 
-### 3.2 O que chega na F3
+### 3.2 A F3: o hub recebe pelo bridge do core
 
-A F3 está em construção paralela no momento em que este manual foi escrito. O que ela entrega, pelo
-plano aprovado em 2026-10-14, e que **ainda não existe** em `main`:
+A F3 está em `main` desde 2026-10-15 (a correção desta seção veio da 2ª passada de refutação, que achou
+o texto antigo dizendo "ainda não existe"). O que ela entregou:
 
-- **chega na F3:** o registro do core passa a aceitar `parent: <hub>` nos filhos;
-- **chega na F3:** as trilhas 2 (convidar) e 5 (aceitar a fila) rodam no hub, para os filhos dele;
-- **chega na F3:** o bridge do core ganha **receptor múltiplo**, com a rota `/a2a/<hub>`: o hub
-  recebe os sinais dos filhos pelo bridge do core, sem servidor próprio;
-- **chega na F3:** o `/meta:co-deliver` e o `/meta:co-relay` passam a tratar `hub` e `consumer`.
+- o registro do core aceita `parent: <hub>` nos filhos, e o validador recusa consumer sem parent hub;
+- as trilhas 2 (convidar) e 5 (aceitar a fila) rodam para o hub, pedindo ao operador do core o que é do
+  registro e do arquivo de convites (`/meta:federation-a2a`, "Trilhas 2 e 5 no hub");
+- o bridge do core tem **receptor múltiplo**, com a rota `/a2a/<hub>`: o hub recebe os sinais dos filhos
+  pelo bridge do core, sem servidor próprio, numa fila à parte (o subdiretório com o id do hub).
 
-Este manual não descreve passo a passo nem saída da F3, porque ela não está pronta e saída inventada
-não serve a ninguém. Quando ela entrar, esta parte ganha as trilhas do hub com a saída real.
+No hub, o aceite precisa do registro de confiança do **core** para reverificar o envelope (as chaves dos
+filhos são pinadas lá): `a2a-accept.sh <registro> --receiver <id do hub> --trust-repo <clone do core>`.
+Sem o registro do core, a reverificação veta e nada entra.
 
 **O que já foi medido em protótipo.** O spike S5 (2026-10-14) mediu um protótipo do receptor múltiplo
 num bridge local. Não é o código da F3, mas mostra o contrato que ela persegue:
@@ -951,7 +982,9 @@ nunca pede token ou chave no chat.
    medir" é rc 2, nunca saudável.
 2. **A confiança nasce no merge que chega ao clone servido**, conferida fora de banda. Pública que
    chegou por um canal só e não foi conferida não é pinada.
-3. **O aceite é humano**, um por vez. O wizard lista e prepara; não aceita em lote.
+3. **O aceite é humano**, um por vez, e **reverifica** o envelope: o `verified` do JSON da fila não basta,
+   e a sessão lê o doc materializado (o corpo como DADO), nunca o JSON. O wizard lista e prepara; não
+   aceita em lote.
 4. **Cada repo tem um escritor.** O core nunca commita no repo do membro, e o membro nunca no do core.
 5. **Conferir não gasta o sinal.** O doctor só testa com envelope sintético de `jti` novo.
 6. **O bearer tem dono.** O guard do bridge exige que o dono do convite seja o `from` do envelope,
@@ -1018,7 +1051,7 @@ Até lá, este manual é o mapa, e o doctor é a bússola. Quando um diz uma coi
 | core | 2 | `bash .claude/utils/federation-transport/a2a-invite.sh create <id> --days N --file <arq> (--token-out <arq> \| --token-stdin) [--invite-out <arq>] [--dry-run]` |
 | core | 2, 4 | `bash .claude/utils/federation-transport/a2a-invite.sh check --file <arq>` · `list --file <arq> --member <id>` |
 | core (produção) | 2, 6 | `bash ops/a2a-invite-live.sh create\|revoke\|list\|check …` (ensaio por padrão; `--apply` escreve) |
-| core | 5 | `bash .claude/utils/federation-transport/a2a-accept.sh <registro.json>` |
+| core | 5 | `bash .claude/utils/federation-transport/a2a-accept.sh <registro.json> [--invites <arq>]` (reverifica o envelope; no hub: `--receiver <hub> --trust-repo <clone do core>`) |
 | core | 6 | `bash .claude/utils/federation-transport/a2a-invite.sh revoke <id> --file <arq> [--dry-run]` |
 | membro | 3 | `bash a2a-keygen.sh --member <id> [--n N]` |
 | membro | 3 | `bash a2a-invite.sh inspect --invite <descritor> --member <id> --token-file <arq>` |

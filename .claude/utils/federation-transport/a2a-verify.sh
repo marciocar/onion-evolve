@@ -22,19 +22,27 @@
 #                    nome do arquivo de jti. Um id inventado já morria no trust-check (rc 2, sem estado); o
 #                    ganho é o membro que EXISTE e não recebe (standalone, porta), que sem esta camada passava
 #                    a ter fila e estado de jti próprios. Receber ao vivo é só da fonte e dos hubs.
-#   1. trust       — COMPÕE trust-topology-check.sh (--from signal.from --to receiver --action relay): policy-as-data
+#   0c. from       — (SAC-150 N4) o signal.from tem a MESMA forma fechada do receptor ANTES da camada 1: ele
+#                    era repassado cru ao trust-check, que o gravava no trust-log. Senão veto from-malformed
+#   1. trust       — COMPÕE trust-topology-check.sh (--from signal.from --to receiver --action relay): policy-as-data.
+#                    A decisão roda em --dry-run (nada gravado); o trust-log só recebe a linha DEPOIS da assinatura,
+#                    com o from já provado (SAC-150 N4: antes o from declarado entrava no log como fato)
 #   2. replay      — jti já visto? (state file por-receptor) → veto replay  (jti só é GRAVADO no fim, após tudo passar)
 #   3. timestamp   — RELÓGIO CONFIÁVEL primeiro (janela de tempo só vale com fonte verificada: NTP sincronizado
 #                    via timedatectl|chronyc|ntpstat; sem prova → veto clock-untrusted; A2A_CLOCK_TRUST=attested
 #                    é o atestado explícito do operador p/ hosts sem essas ferramentas) · exp e iat OBRIGATÓRIOS
 #                    e inteiros (desde 2026-10-14) · exp<now → expired · iat>now+skew → future · exp<=iat →
 #                    exp-not-after-iat · vida exp−iat > teto OU exp > now+teto → exp-beyond-ceiling
-#                    (teto = A2A_EXP_MAX_TTL, default 3600 s)
+#                    (teto = A2A_EXP_MAX_TTL, default e TETO DURO 3600 s; skew = A2A_CLOCK_SKEW, default e teto 300 s:
+#                    desde a SAC-150 N8 o ambiente só APERTA — valor acima do teto veta bad-config). O atestado
+#                    A2A_CLOCK_TRUST=attested vale só onde NENHUMA ferramenta mede dessincronia: timedatectl dizendo
+#                    NTPSynchronized=no ou chronyc "Not synchronised" vence o atestado (env não afrouxa medição)
 #   4. ssrf        — a2a-ssrf-check.sh na URL do PushNotificationConfig (se houver)
 #   5. jws         — assinatura RS256 verificada com a pubkey do kid (JWKS fixture) + claims iss==from, aud==receiver
 #                    (aud OBRIGATÓRIO desde a F3: com vários receptores no mesmo bridge e o jti guardado por
 #                    receptor, um envelope sem aud aceito num receptor era reenviável no outro → jws-missing-aud)
-#   5b. body       — o CORPO entra na assinatura (desde 2026-10-14): claim body_sha256 OBRIGATÓRIO e igual a
+#   5b. body       — o CORPO entra na assinatura (desde 2026-10-14): teto de 8192 bytes (SAC-150 N7, o mesmo do
+#                    remetente canônico; antes só existia nele) → body-too-large; claim body_sha256 OBRIGATÓRIO e igual a
 #                    sha256(bytes UTF-8 do valor decodificado de signal.body; ausente = corpo vazio) → senão
 #                    body-mismatch; signal.body_path/thread, quando presentes, têm de ser claims iguais;
 #                    chave JSON duplicada no envelope ou no payload → duplicate-key; id/direction/kind/
@@ -45,8 +53,15 @@
 #   committed SEMPRE false (I3, entrega-sem-commit). O consumidor NUNCA auto-aplica. O veredito verificado
 #   ecoa o "receiver" julgado (F3): o bridge e o aceite conferem que é o receptor da rota e da fila.
 #
-# Uso : a2a-verify.sh --receiver <member-id> [--envelope <file>|-] [--repo <path>] [--dry-run]
+# Uso : a2a-verify.sh --receiver <member-id> [--envelope <file>|-] [--repo <path>] [--dry-run] [--reverify-at <epoch>]
 #   envelope (stdin se '-' ou omitido). --dry-run: repassa ao trust-check (não grava trust-log).
+#   --reverify-at <epoch> (SAC-150 N1): a REVERIFICAÇÃO do aceite. O a2a-accept.sh reverifica o envelope
+#     preservado no registro da fila em vez de confiar no `.verdict.verified` do JSON. Todas as camadas rodam
+#     iguais, com três diferenças declaradas: (a) a janela de tempo é julgada no instante do RECEBIMENTO
+#     (<epoch>, o receivedAt do registro), que não pode estar à frente de agora + skew (reverify-at-future), e
+#     por isso o relógio local não precisa de prova de NTP; (b) o estado de jti NÃO é lido nem gravado (o jti
+#     já foi consumido no recebimento; o aceite deduplica pelo jti no inbox); (c) nada vai ao trust-log. O
+#     veredito ecoa reverified_at, from e jti (todos já provados ou de forma fechada) para o aceite.
 # Envelope: { "jws":"<h.p.s>", "signal":{id,direction,from,to,kind,classification,body?,body_path?,thread?},
 #             "pushNotificationConfig":{"url":"..."} }
 #   claims do JWS: iss(=from)/aud(=to)/iat/exp/jti/body_sha256 (obrigatórios) + body_path/thread (se o signal os
@@ -61,13 +76,15 @@
 # =============================================================================
 set -uo pipefail
 
-RECEIVER=""; ENVFILE="-"; REPO=""; DRY=""
+RECEIVER=""; ENVFILE="-"; REPO=""; DRY=""; REVERIFY_AT=""
 while [ "$#" -gt 0 ]; do case "$1" in
   --receiver) RECEIVER="${2:-}"; shift 2 ;;
   --envelope) ENVFILE="${2:-}"; shift 2 ;;
   --repo)     REPO="${2:-}"; shift 2 ;;
   --dry-run)  DRY=1; shift ;;
-  *) echo "uso: a2a-verify.sh --receiver <id> [--envelope <file>|-] [--repo <path>] [--dry-run]" >&2; exit 2 ;;
+  --reverify-at) REVERIFY_AT="${2:-}"; case "${REVERIFY_AT}" in ''|*[!0-9]*) echo "uso: --reverify-at exige epoch inteiro" >&2; exit 2 ;; esac
+              [ "${#REVERIFY_AT}" -le 12 ] || { echo "uso: --reverify-at fora de faixa" >&2; exit 2; }; shift 2 ;;
+  *) echo "uso: a2a-verify.sh --receiver <id> [--envelope <file>|-] [--repo <path>] [--dry-run] [--reverify-at <epoch>]" >&2; exit 2 ;;
 esac; done
 [ -n "${RECEIVER}" ] || { echo "uso: a2a-verify.sh --receiver <id> [--envelope <file>|-]" >&2; exit 2; }
 
@@ -80,13 +97,32 @@ MEMBERS="${REPO}/docs/evolution/federation/members.yaml"
 TRUST_CHECK="${REAL_ROOT}/.claude/validation/trust-topology-check.sh"
 SSRF_CHECK="${HERE}/a2a-ssrf-check.sh"
 JWKS_DIR="${A2A_JWKS_DIR:-${HERE}/jwks}"
-SKEW="${A2A_CLOCK_SKEW:-300}"   # tolerância p/ iat futuro (s)
-MAX_TTL="${A2A_EXP_MAX_TTL:-3600}"   # teto de vida do envelope (s); os remetentes de julho usam exp=iat+3600
+# TETOS DUROS (SAC-150 N8): o ambiente só APERTA. Antes `A2A_EXP_MAX_TTL=99999999` aceitava envelope de vida
+# de anos e `A2A_CLOCK_SKEW` sem limite deixava iat futuro passar; acima do teto agora é bad-config (veto).
+SKEW_CAP=300; MAX_TTL_CAP=3600
+SKEW="${A2A_CLOCK_SKEW:-${SKEW_CAP}}"   # tolerância p/ iat futuro (s)
+MAX_TTL="${A2A_EXP_MAX_TTL:-${MAX_TTL_CAP}}"   # teto de vida do envelope (s); os remetentes de julho usam exp=iat+3600
+BODY_MAX=8192   # teto do corpo em bytes (SAC-150 N7), o mesmo do remetente canônico a2a-send.sh
 
 # veredito de VETO (dependency-free — funciona mesmo sem jq): gated SEMPRE true, committed SEMPRE false.
 veto() {  # <reason> <layer>
+  _log_declared_veto "$1"
   printf '{"verified":false,"reason":"%s","layer_failed":"%s","gated":true,"committed":false,"apply_mode":"gated"}\n' "$1" "$2"
   exit 1
+}
+# TENTATIVA VETADA no trust-log (refutador do SAC-150): a camada 1 decide em --dry-run e só o sucesso gravava,
+# então trust-denied, bad-signature, replay e os demais vetos não deixavam rastro. A linha do veto entra com o
+# from ROTULADO como declarado (não provado), e só quando ele já passou na forma fechada (FROM_SHAPED, camada
+# 0c): nada cru no log. Não grava em --dry-run nem na reverificação do aceite. Falha ao gravar avisa no stderr.
+FROM_SHAPED=""
+_log_declared_veto() {
+  [ -z "${DRY}" ] && [ -z "${REVERIFY_AT}" ] && [ -n "${FROM_SHAPED}" ] || return 0
+  local log="${REPO}/docs/evolution/trust-log.md" why
+  [ -f "${log}" ] || return 0   # o cabeçalho é do trust-topology-check.sh; sem o arquivo, não o invento
+  why="$(printf '%s' "$1" | tr -cd 'A-Za-z0-9._:-' | cut -c1-80)"
+  printf '| %s | %s (declarado, não provado) | %s | relay | BLOQUEADO | veto do gate a2a-verify: %s |\n' \
+    "$(date '+%F %H:%M')" "${FROM_SHAPED}" "${RECEIVER}" "${why}" >> "${log}" 2>/dev/null \
+    || echo "a2a-verify: AVISO: não gravei o veto no trust-log (${log})" >&2
 }
 
 # --- Camada 0b (forma): o receptor vira nome de arquivo (estado de jti) e é ecoado no veredito ---------
@@ -107,6 +143,10 @@ TO="$(printf '%s' "${ENV}" | jq -r '.signal.to // empty')"
 JWS="$(printf '%s' "${ENV}" | jq -r '.jws // empty')"
 HOOK="$(printf '%s' "${ENV}" | jq -r '.pushNotificationConfig.url // empty')"
 [ -n "${FROM}" ] && [ -n "${JWS}" ] || veto "envelope-missing-fields" "parse"
+# --- Camada 0c (forma do from, SAC-150 N4): antes do trust-check, que o usa como argv e o grava no log -----
+# A forma do id de membro (um from objeto/lista sai do `jq -r` como JSON, com chave e colchete, e cai aqui também).
+_rcv_ok "${FROM}" || veto "from-malformed" "parse"
+FROM_SHAPED="${FROM}"
 
 # decode base64url (pad + tradução) — usado p/ ler claims e verificar assinatura
 b64url_decode() {  # <b64url> → bytes em stdout
@@ -155,10 +195,11 @@ case "${RCV_STATE}" in
 esac
 
 # --- Camada 1: trust policy (compõe trust-topology-check.sh) ------------------
+# Só a DECISÃO, em --dry-run: o from aqui ainda é DECLARADO (a assinatura é a camada 5). O trust-log recebe a
+# linha no fim, depois da assinatura (SAC-150 N4); veto antes dela não vira fato no log de ninguém.
 [ -f "${TRUST_CHECK}" ] || veto "trust-check-absent" "trust"
 tc_args=(--from "${FROM}" --to "${RECEIVER}" --action relay --repo "${REPO}")
-[ -n "${DRY}" ] && tc_args+=(--dry-run)
-bash "${TRUST_CHECK}" "${tc_args[@]}" >/dev/null 2>&1 || veto "trust-denied" "trust"
+bash "${TRUST_CHECK}" "${tc_args[@]}" --dry-run >/dev/null 2>&1 || veto "trust-denied" "trust"
 
 # --- ler claims do JWS (precisa jq; já garantido) ----------------------------
 PL_JSON="$(b64url_decode "${PL_B64}")"
@@ -180,31 +221,45 @@ printf '%s' "${PL_JSON}" | jq -e '(.jti|type=="string") and (.iss|type=="string"
   || veto "jws-bad-claim-type" "parse"
 
 # --- Camada 2: anti-replay jti (CHECK agora; grava só no fim, após tudo passar) ---
+# Na reverificação (--reverify-at) o estado não é lido nem gravado: o jti já foi consumido no recebimento.
 STATE="${REPO}/.claude/sessions/.a2a-verify.${RECEIVER}.jti.state"
-if [ -f "${STATE}" ] && grep -qxF "${JTI}" "${STATE}" 2>/dev/null; then veto "replay" "replay"; fi
+if [ -z "${REVERIFY_AT}" ] && [ -f "${STATE}" ] && grep -qxF "${JTI}" "${STATE}" 2>/dev/null; then veto "replay" "replay"; fi
 
 # --- Camada 3: janela de timestamp -------------------------------------------
 # Pré-condição: o relógio local é confiável? Uma janela de tempo computada sobre relógio dessincronizado
 # aceita sinal expirado ou veta sinal válido — o carimbo só vale com fonte verificada (NTP). Fail-safe: VETO.
 clock_trusted() {
-  [ "${A2A_CLOCK_TRUST:-}" = "attested" ] && return 0   # atestado explícito do operador (host sem tooling NTP)
+  # MEDIÇÃO primeiro; o atestado do operador só vale onde nada MEDIU dessincronia (SAC-150 N8: antes o atestado
+  # vinha antes de tudo e calava um timedatectl dizendo NTPSynchronized=no — o env afrouxava a medição).
+  local measured_unsynced=""
   if command -v timedatectl >/dev/null 2>&1; then
-    [ "$(timedatectl show -p NTPSynchronized --value 2>/dev/null)" = "yes" ] && return 0
+    case "$(timedatectl show -p NTPSynchronized --value 2>/dev/null)" in yes) return 0 ;; no) measured_unsynced=1 ;; esac
   fi
-  if command -v chronyc >/dev/null 2>&1; then
-    chronyc tracking 2>/dev/null | grep -q '^Leap status.*Normal' && return 0
+  if command -v chronyc >/dev/null 2>&1; then   # mesma régua do doctor: Normal ou leap pendente = sincronizado
+    local tr; tr="$(chronyc tracking 2>/dev/null)"
+    grep -qE '^Leap status.*(Normal|Insert second|Delete second)' <<<"${tr}" && return 0
+    grep -q '^Leap status.*Not synchronised' <<<"${tr}" && measured_unsynced=1
   fi
   if command -v ntpstat >/dev/null 2>&1; then
-    ntpstat >/dev/null 2>&1 && return 0
+    local nr=0; ntpstat >/dev/null 2>&1 || nr=$?
+    [ "${nr}" -eq 0 ] && return 0
+    [ "${nr}" -eq 1 ] && measured_unsynced=1
   fi
+  [ -z "${measured_unsynced}" ] && [ "${A2A_CLOCK_TRUST:-}" = "attested" ] && return 0   # host sem medição: atestado
   return 1
 }
-clock_trusted || veto "clock-untrusted" "timestamp"
 NOW="$(date +%s)"
-# exp e iat OBRIGATÓRIOS (2026-10-14, achado F2 do spike a2a cross-user): sem exp o envelope não expira.
 _is_small_uint() { case "$1" in ''|*[!0-9]*) return 1 ;; esac; [ "${#1}" -le 12 ]; }
-_is_small_uint "${MAX_TTL}" && [ "${MAX_TTL}" -gt 0 ] || veto "bad-config:A2A_EXP_MAX_TTL" "timestamp"
-_is_small_uint "${SKEW}" || veto "bad-config:A2A_CLOCK_SKEW" "timestamp"
+_is_small_uint "${SKEW}" && [ "${SKEW}" -le "${SKEW_CAP}" ] || veto "bad-config:A2A_CLOCK_SKEW" "timestamp"
+if [ -n "${REVERIFY_AT}" ]; then
+  # reverificação: a janela é a do RECEBIMENTO; o instante declarado não pode estar no futuro
+  [ "${REVERIFY_AT}" -le "$(( NOW + SKEW ))" ] || veto "reverify-at-future" "timestamp"
+  NOW="${REVERIFY_AT}"
+else
+  clock_trusted || veto "clock-untrusted" "timestamp"
+fi
+# exp e iat OBRIGATÓRIOS (2026-10-14, achado F2 do spike a2a cross-user): sem exp o envelope não expira.
+_is_small_uint "${MAX_TTL}" && [ "${MAX_TTL}" -gt 0 ] && [ "${MAX_TTL}" -le "${MAX_TTL_CAP}" ] || veto "bad-config:A2A_EXP_MAX_TTL" "timestamp"
 [ -n "${EXP}" ] || veto "jws-missing-exp" "timestamp"
 _is_small_uint "${EXP}" || veto "jws-bad-exp" "timestamp"
 [ -n "${IAT}" ] || veto "jws-missing-iat" "timestamp"
@@ -305,6 +360,9 @@ CL_SHA="$(printf '%s' "${PL_JSON}" | jq -r 'if (.body_sha256|type)=="string" the
 # (iii) o corpo: string JSON ou ausente (ausente = corpo vazio, e o remetente assina sha256 do vazio)
 BTYPE="$(printf '%s' "${ENV}" | jq -r '.signal | if has("body") then (.body|type) else "absent" end' 2>/dev/null)"
 case "${BTYPE}" in string|absent) ;; *) veto "body-not-string" "body" ;; esac
+# teto do corpo (SAC-150 N7), em bytes UTF-8 do valor decodificado, contados por pipe (wc -c em LC_ALL=C)
+BODY_BYTES="$(printf '%s' "${ENV}" | jq -j '.signal.body // ""' | LC_ALL=C wc -c | tr -d ' ')"
+_is_small_uint "${BODY_BYTES}" && [ "${BODY_BYTES}" -le "${BODY_MAX}" ] || veto "body-too-large" "body"
 # canônico = bytes UTF-8 do valor decodificado; vai por pipe (jq -j) e não por $(...), que comeria o \n final
 BODY_SHA="$(printf '%s' "${ENV}" | jq -j '.signal.body // ""' | openssl dgst -sha256 | awk '{print $NF}')"
 [ "${BODY_SHA}" = "${CL_SHA}" ] || veto "body-mismatch" "body"
@@ -352,6 +410,15 @@ PY
 )"
 if [ "${MODE}" = "regulated" ]; then REG="true"; APPLY="propose-only"; else REG="false"; APPLY="gated"; fi
 
+# --- Reverificação (--reverify-at): sem estado de jti e sem trust-log; ecoa o que o aceite precisa ---------
+if [ -n "${REVERIFY_AT}" ]; then
+  jq -cn --argjson reg "${REG}" --arg apply "${APPLY}" --arg rcv "${RECEIVER}" --argjson at "${REVERIFY_AT}" \
+    --arg from "${FROM}" --arg jti "${JTI}" --argjson iat "${IAT}" \
+    '{verified:true,reason:"ok",layer_failed:null,gated:true,committed:false,regulated:$reg,apply_mode:$apply,receiver:$rcv,reverified_at:$at,from:$from,jti:$jti,iat:$iat}' \
+    || veto "verdict-emit-failed" "reverify"
+  exit 0
+fi
+
 # --- Sucesso: grava o jti (single-use) e emite o veredito --------------------
 # FAIL-CLOSED (2026-10-14, achado da sessão principal no preparo do spike a2a cross-user): a linha antiga
 # terminava em `|| true` — estado não-gravável fazia o anti-replay sumir EM SILÊNCIO e o veredito saía
@@ -368,5 +435,11 @@ fi
 # Duas linhas = outro processo gravou o mesmo jti → replay. (Na corrida exata os dois podem ver 2 e
 # vetar: fail-closed, o remetente reenvia com jti novo.)
 [ "$(grep -cxF "${JTI}" "${STATE}" 2>/dev/null)" = "1" ] || veto "replay" "replay"
+# trust-log DEPOIS da assinatura (SAC-150 N4): a linha leva o from já provado (iss==from, kid do from).
+# Sem --dry-run do chamador, grava; a decisão já foi tomada na camada 1, e falha ao gravar o log não é veto
+# (o log é auditoria, não a verificação).
+if [ -z "${DRY}" ] && ! bash "${TRUST_CHECK}" "${tc_args[@]}" >/dev/null 2>&1; then
+  echo "a2a-verify: AVISO: o trust-check não gravou a linha do sucesso no trust-log" >&2
+fi
 printf '{"verified":true,"reason":"ok","layer_failed":null,"gated":true,"committed":false,"regulated":%s,"apply_mode":"%s","receiver":"%s"}\n' "${REG}" "${APPLY}" "${RECEIVER}"
 exit 0
