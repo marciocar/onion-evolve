@@ -2,7 +2,8 @@
 branch: feat/adopter-shape-cures
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: e1d9505c475725986b024dfb8286deb55f096005580abc0f3b4cff5b11bfbe38
+reviewed_code_sha256: fb89f9bd1fdde4389a621785f16238a0c18a2b8606e8acbd83ffb60c63bf85bd
 findings_total: 13
 findings_real: 10
 tokens: 177543
