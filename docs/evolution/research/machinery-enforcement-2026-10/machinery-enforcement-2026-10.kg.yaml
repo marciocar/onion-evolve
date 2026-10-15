@@ -42,12 +42,14 @@ nodes:
   - id: Q_ADAPTER_DECLARA_PONTO_DE_COBRANCA
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.6
     label: "Parte D da SAC-142: cada raiz SDAAL (achada pela interface.md) declara, para cada adapter, onde ele é cobrado (exe, hook, validator ou none com motivo e gatilho), com lint HARD e lista derivada do filesystem."
-    narrative: "Hoje só o task-manager declara contrato legível por máquina; trust (4 adapters) e de-identification (3) não têm cobrança nenhuma, e o forge não cobra a criação de PR. Nasce com none: declarado e catraca. Falso positivo medido: 2 de 15 arquivos em adapters/ não são adapters (clickup-operacao.md, linear-leitura-completa.md), mais o none.md — precisa de marcador explícito de auxiliar."
-    trace: ".claude/utils/task-manager/interface.md"
+    narrative: "Hoje só o task-manager declara contrato legível por máquina; trust (4 adapters) e de-identification (3) não têm cobrança nenhuma, e o forge não cobra a criação de PR. Entregue como REGRA 107 (Adapter SDAAL declara onde o seu contrato é cobrado), com a declaração no irmão enforcement.tsv de cada raiz: dentro da interface.md estourava o teto da REGRA 5. Nasce com 7 none: declarados. Falso positivo medido: 2 de 15 arquivos em adapters/ não são adapters (clickup-operacao.md, linear-leitura-completa.md), mais o none.md — precisa de marcador explícito de auxiliar."
+    trace: ".claude/validation/adapter-enforcement-check.sh"
+    verified_at: "2026-10-15"
+    verified_against: "adapter-enforcement-check.sh sobre o core: 5 raízes, 18 adapters, 7 com none: declarado e gatilho, zero HARD; família adapter_enforcement com 3 mutantes"
 
   - id: Q_VETOS_REFUTADOS_COM_GATILHO
     node_type: question

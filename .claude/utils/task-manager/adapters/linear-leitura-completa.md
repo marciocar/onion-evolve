@@ -1,3 +1,4 @@
+<!-- adapter-auxiliar: linear -->
 # 🟣 Linear — Leitura completa e anexos (medição ao vivo de 2026-10-12, SAC-116)
 
 > **Irmão de [`linear.md`](linear.md) por *progressive disclosure* ([`sdaal.md` §14.5](../../../../docs/sdaal/sdaal.md)).**

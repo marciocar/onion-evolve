@@ -1,0 +1,7 @@
+# Onde o contrato de cada adapter de forge é COBRADO (REGRA 107 (Adapter SDAAL declara onde o seu contrato é cobrado); SAC-142).
+# Uma linha por adapter de adapters/*.md: <adapter><TAB><forma>:<valor>, forma em exe | hook | validator | none.
+#   exe:<caminho> um executável o roda · hook:<caminho> hook registrado barra o transporte cru ·
+#   validator:<caminho> validador chamado pelo lint · none:<motivo>; gatilho:<o que a pediria>
+# Arquivo auxiliar em adapters/ (não é adapter) declara <!-- adapter-auxiliar: <adapter> --> nas 5 primeiras linhas.
+github	hook:.claude/hooks/pretooluse-merge-gate.sh
+none	none:adaptador nulo (modo local), sem transporte remoto; gatilho: passar a chamar o host

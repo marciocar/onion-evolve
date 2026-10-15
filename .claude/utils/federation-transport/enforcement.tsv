@@ -1,0 +1,8 @@
+# Onde o contrato de cada adapter de federation-transport é COBRADO (REGRA 107 (Adapter SDAAL declara onde o seu contrato é cobrado); SAC-142).
+# Uma linha por adapter de adapters/*.md: <adapter><TAB><forma>:<valor>, forma em exe | hook | validator | none.
+#   exe:<caminho> um executável o roda · hook:<caminho> hook registrado barra o transporte cru ·
+#   validator:<caminho> validador chamado pelo lint · none:<motivo>; gatilho:<o que a pediria>
+# Arquivo auxiliar em adapters/ (não é adapter) declara <!-- adapter-auxiliar: <adapter> --> nas 5 primeiras linhas.
+a2a-live	exe:.claude/utils/federation-transport/a2a-verify.sh
+git-async	none:o transporte é commit e PR no git, e o contrato do envelope não tem conferência no recebimento; gatilho: um sinal git-async chegar malformado ou de remetente fora do registro
+local	none:entrega na mesma máquina pelo co-deliver e co-relay, sem conferência do contrato do transporte; gatilho: uma entrega local cair no checkout errado ou fora do inbox
