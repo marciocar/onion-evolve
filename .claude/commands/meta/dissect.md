@@ -102,6 +102,11 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
    subir o reprovado), e o grafo **declara** que foi assim. Sessão que já é subagente não
    orquestra: disseca direto.
 4. **VEREDITO** — um dos quatro, com razão escrita. `parquear` **exige gatilho nomeado**.
+   `rejeitar` e `parquear` são **negativos** e exigem, no nó do veredito, `x_dissect_criterion:` (o
+   comando que checa a reprovação) e `x_dissect_overcoming:` (o id do nó deste grafo com o que SUPERA,
+   com aresta para a decisão, ou `nenhuma` + `x_dissect_overcoming_measure:` com o que se procurou e
+   onde). Confira com `bash .claude/validation/dissect-census.sh . --check-verdict <ferramenta>` e só
+   siga com rc 0 (rc 1 = veredito negativo RECUSADO; SAC-151).
 4b. **PLANO DE ABSORÇÃO (só `absorver`/`costurar`, N4)** — a passagem para o
    [`/meta:forge`](forge.md). Um nó por peça a absorver, no MESMO grafo, com:
    `x_absorb_target:` (candidato como o `forge-census.sh` o nomeia, ou `novo:<nome>`) ·

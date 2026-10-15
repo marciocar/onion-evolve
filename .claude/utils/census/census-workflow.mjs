@@ -63,12 +63,70 @@ const WSchema = {
     else: { required: ['blocked_by'], properties: { blocked_by: { const: '' } } },
   },
 }
+// >>> overcoming-gate — O JUIZ QUE REPROVA BUSCA O QUE SUPERA (SAC-151). SSOT: este bloco; o
+// census-workflow.mjs carrega cópia BYTE A BYTE (a bancada confere) e o judge-verdict-check.sh o EXECUTA
+// para os juízes conduzidos pela sessão (/meta:cc-update, /meta:radar, /meta:dissect).
+// Maestro, 2026-10-15 (verbatim): "um juiz de sim ou não sem tentar superação em uma pesquisa pode restringir
+// possibilidades de crescimento e inovação; é preciso ter medição e critérios claros". Duas metades:
+// (a) veredito NEGATIVO carrega `superacao: {achada, o_que, medida}` — a peça, variante ou caminho que
+//     entregaria o valor que o objeto prometia; `achada:false` exige a razão MEDIDA (o que se procurou e onde);
+// (b) o critério de reprovação é PRÉ-REGISTRADO (args ou o default do juiz) e o veredito cita o `id` e o
+//     `comando` que o checa. Negativo sem as duas metades é RECUSADO aqui, no motor (fail-closed, contado):
+//     não vale como reprovação NEM como aprovação — o objeto fica não-julgado, nunca liberado.
+// Evidência que motivou: a dissecação do markitdown num adotante de curadoria (PR #26, merge a2f8a5aef524) fechou em
+// REJEITAR COM superação medida (o tesseract local lê o PDF escaneado em que a ferramenta sai vazia), e o
+// critério 1 do teste da régua deu INCONCLUSIVO porque o desenho não apontava o que superaria o teste.
+// TETO DECLARADO: o motor confere FORMA e PERTENÇA (o id está no registro, o comando não é vazio); se o
+// comando citado de fato reprova o objeto é trabalho de quem re-roda — o comando fica no grafo para isso.
+const OVERCOMING_PROPS = {
+  superacao: { type: 'object', required: ['achada', 'o_que', 'medida'], properties: {
+    achada: { type: 'boolean' }, o_que: { type: 'string' }, medida: { type: 'string' } } },
+  criterio: { type: 'object', required: ['id', 'comando'], properties: { id: { type: 'string' }, comando: { type: 'string' } } } }
+const _ogFilled = (s, min) => typeof s === 'string' && s.trim().length >= min
+// critérios do chamador (args) substituem o default SÓ quando bem formados: {id, when, check}
+function criteriaFrom(override, defaults) {
+  const list = Array.isArray(override) ? override.filter(c => c && _ogFilled(String(c.id || ''), 1) && _ogFilled(String(c.check || ''), 3))
+    .map(c => ({ id: String(c.id).trim(), when: String(c.when || '').trim(), check: String(c.check).trim() })) : []
+  return list.length ? list : defaults
+}
+const criteriaBlock = (criteria) => '\n\n## Critérios de reprovação PRÉ-REGISTRADOS (reprovar fora deles é preferência, não medida)\n' +
+  criteria.map(c => '- `' + c.id + '` — ' + c.when + ' · checa: `' + c.check + '`').join('\n') +
+  '\n\n## Todo veredito NEGATIVO leva as duas metades (o motor RECUSA e conta o que vier sem elas)\n' +
+  '- `criterio: {id, comando}` — o `id` de UM critério acima e o comando concreto (com os argumentos deste caso) que qualquer um re-roda para ver a reprovação.\n' +
+  '- `superacao: {achada, o_que, medida}` — antes de reprovar, PROCURE o que supera: a peça, variante, fonte ou caminho que entregaria o valor que o objeto prometia. `achada:true` → `o_que` nomeia e `medida` diz como se mediu; `achada:false` → `medida` diz o que se procurou e onde (comando ou fonte), nunca "não encontrei" seco.'
+function overcomingWhy(v, criteria) {
+  const s = v && v.superacao
+  if (!s || typeof s !== 'object' || typeof s.achada !== 'boolean') return 'veredito negativo sem superacao {achada, o_que, medida}'
+  if (s.achada && !_ogFilled(s.o_que, 8)) return 'superacao achada sem o_que (a peca, variante ou caminho que supera)'
+  if (!_ogFilled(s.medida, 8)) return s.achada ? 'superacao achada sem a medida que a sustenta' : 'superacao nao achada sem a razao MEDIDA (achada:false exige medida)'
+  const c = v.criterio
+  if (!c || typeof c !== 'object' || !_ogFilled(c.id, 1)) return 'veredito negativo sem criterio pre-registrado citado'
+  if (!criteria.some(k => k.id === String(c.id).trim())) return 'criterio ' + JSON.stringify(String(c.id)) + ' NAO esta pre-registrado (' + criteria.map(k => k.id).join(', ') + ')'
+  if (!_ogFilled(c.comando, 3)) return 'criterio citado sem o comando que o checa'
+  return ''
+}
+// separa o que VALE do que o motor recusa: { kept, recused: [{ verdict, why }] }
+function gateNegatives(list, isNegative, criteria) {
+  const kept = [], recused = []
+  for (const v of (list || [])) { if (!v) continue; const why = isNegative(v) ? overcomingWhy(v, criteria) : ''; if (why) recused.push({ verdict: v, why }); else kept.push(v) }
+  return { kept, recused }
+}
+const overcomingsFound = (list) => (list || []).filter(v => v && v.superacao && v.superacao.achada === true)
+// <<< overcoming-gate
+
+// critérios PRÉ-REGISTRADOS do juiz fixo (default; `args.rejectionCriteria` substitui) — SAC-151
+const JUDGE_CRITERIA = criteriaFrom(args.rejectionCriteria, [
+  { id: 'J1_METHOD_NAO_EXECUTADO', when: 'o method não foi executado de fato', check: 're-rodar o comando de method e comparar a saída com observed' },
+  { id: 'J2_ARQUIVO_ERRADO', when: 'mediu num arquivo/ambiente que não é o que o trace aponta', check: "grep -n 'trace:' <kg_file> no bloco do nó e comparar com o caminho medido em method" },
+  { id: 'J3_CONTAGEM_DESONESTA', when: 'claims_total não bate com as afirmações do label', check: 'contar as afirmações do label do nó em <kg_file> contra claims_total' },
+  { id: 'J4_SEM_PROCURA_DA_MORTE', when: 'CONFIRMED sem comando de procura da morte', check: 'method sem git log -S/grep/ls que procure o que superaria o nó' },
+  { id: 'J5_GATILHO_DECLARADO', when: 'GATED com gatilho declarado e não medido', check: 'method sem o comando que mede o gatilho' }])
 const JSchema = {
   type: 'object',
   required: ['aprovados','reprovados'],
   properties: {
     aprovados: { type: 'array', items: { type: 'string' } },
-    reprovados: { type: 'array', items: { type: 'object', required: ['node_id','motivo'], properties: { node_id: { type: 'string' }, motivo: { type: 'string' } } } },
+    reprovados: { type: 'array', items: { type: 'object', required: ['node_id','motivo','superacao','criterio'], properties: { node_id: { type: 'string' }, motivo: { type: 'string' }, ...OVERCOMING_PROPS } } },
   },
 }
 const medidos = await parallel(selecionados.map((a) => () => ag(
@@ -101,12 +159,23 @@ const verdicts = await parallel(lotes.map((lote,ix) => () => ag(
 `JUIZ FIXO do censo (mandato REFUTAR, default REPROVADO na dúvida; calibração 2026-08-29: FP 20%, subserviência 0/7). READ-ONLY no repo.
 Audite os desfechos PREGUIÇOSOS (CONFIRMED e GATED-não-disparado): method foi EXECUTADO (re-rode o barato)? mediu no arquivo que o trace aponta? contagem de claims honesta contra o label? CONFIRMED procurou a morte? gatilho MEDIDO ou só declarado?
 Devolva aprovados (node_ids) e reprovados (node_id+motivo específico).
+Reprovar NÃO basta: cada reprovado leva o critério e a superação — a medida certa que o worker devia ter feito, ou o que de fato superou o nó.${criteriaBlock(JUDGE_CRITERIA)}
 
 LOTE ${ix+1}:
 ${JSON.stringify(lote.map(r=>({node_id:r.node_id,kg_file:r.kg_file,method:r.method.slice(0,300),observed:r.observed.slice(0,300),verdict:r.verdict,claims:r.claims_measured+'/'+r.claims_total,realidade:r.realidade,gatilho:r.gatilho,gatilho_disparou:r.gatilho_disparou})))}`,
   { label: `juiz:lote${ix+1}`, phase: 'Juizo', model: 'opus', effort: 'high', budget: 70000, schema: JSchema }
 )))
+// SAC-151: reprovação sem critério pré-registrado/superação é RECUSADA pelo motor. FAIL-CLOSED: ela SEGUE em
+// `reprovados` (o census-seal.py pula todo reprovado — o nó fica NÃO-JULGADO, nunca carimbado como aprovado por
+// omissão, que é o que aconteceria se saísse da lista: o seal trata ausência como juiz N/A e carimba), com o
+// motivo prefixado e a contagem em `reprovacoes_recusadas`.
+let recusadas = 0
+for (const v of verdicts.filter(Boolean)) {
+  const g = gateNegatives(v.reprovados, () => true, JUDGE_CRITERIA)
+  for (const r of g.recused) { r.verdict.motivo = 'RECUSADA-SEM-SUPERACAO (' + r.why + '): ' + String(r.verdict.motivo || ''); r.verdict.recusada = true; recusadas++ }
+}
 return {
+  reprovacoes_recusadas: recusadas,
   selecionados: selecionados.length,
   nao_medidos_por_teto: unmeasuredByCap,
   descartados_medicao: descartados,

@@ -71,6 +71,13 @@ ele **não** diz que um item toca o Onion.
    oficial (URL no nó `E_DELTA_DA_RODADA`), medir cada ligação no vivo, julgar cada nó em
    SUSTENTA · EXAGERA · REPROVA e **listar o que a rodada deixou de ver**. Ele julga também a
    superação: `external_edges` SUPERSEDES (nomeando o nó superado) ou `x_supersedes_none` (com razão).
+   **Critério pré-registrado e superação (SAC-151):** antes de lançar o juiz, grave em
+   `data/judge-verdicts.json` os critérios (`criteria: [{id, when, check}]`, ex. `CU1_CITACAO_DIVERGE`
+   com `diff <(curl -s <changelog>) data/<versão>.txt`); o juiz devolve `verdicts: [{alvo, veredito,
+   criterio: {id, comando}, superacao: {achada, o_que, medida}}]`, e todo EXAGERA/REPROVA leva as duas
+   metades. Rode `bash .claude/validation/judge-verdict-check.sh data/judge-verdicts.json`: rc 1 =
+   reprovação RECUSADA (o nó fica como estava, não-julgado, e volta ao juiz); cada `SUPERACAO` impressa
+   vira nó `C_SUPERACAO_<AAAAMMDD>_…` com aresta `TRACES_TO` ao nó reprovado.
 5. **APLICAR.** Reprovado → corrigido ou rebaixado (impacto 1); exagerado → reescrito; omissão de
    impacto alto → nó novo. Grave a decisão de superação: `external_edges` SUPERSEDES no topo (contrato
    v4.3; o gate confere o alvo) ou `meta.x_supersedes_none` com o prefixo `x_` — a forma sem prefixo

@@ -106,6 +106,32 @@ e a tautologia.
 Critério que a proposta trivial passa mede **fidelidade**, não valor. Quando é esse o caso, o critério
 vira objeção sobrevivente, e a medição pede um juiz cego ao que se quer provar.
 
+### A etapa 3 não termina no NÃO — reprovar exige SUPERAÇÃO e critério pré-registrado
+
+O maestro, em 2026-10-15 (verbatim): "um juiz de sim ou não sem tentar superação em uma pesquisa pode restringir possibilidades de crescimento e inovação; é preciso ter medição e critérios claros".
+
+Um refutador que só diz "não" estreita o espaço: ele mata a opção e não olha o que a substituiria. A
+etapa 3 passa a ter duas obrigações, e as duas são **mecanismo**, não conselho:
+
+1. **Superação.** Todo veredito negativo (refutar, reprovar, rejeitar, parquear, inconclusivo) carrega
+   `superacao: {achada, o_que, medida}`: a peça, variante ou caminho que entregaria o valor que o objeto
+   prometia. `achada:false` exige a razão **medida**, ou seja, o que se procurou e onde. A superação achada
+   vira **nó** (`C_SUPERACAO_<AAAAMMDD>_…`, aresta `TRACES_TO` para o nó da reprovação), nunca comentário.
+2. **Critério pré-registrado.** O critério de reprovação existe **antes** do juiz rodar (no prompt ou nos
+   args), e o veredito cita o `id` dele e o **comando** que o checa. "Não" por julgamento sem medida é
+   preferência.
+
+Negativo sem as duas metades é **recusado pelo motor e contado** (fail-closed): não vale como reprovação
+nem como aprovação, e o objeto fica não-julgado. Onde vive: o bloco `overcoming-gate` de
+`.claude/workflows/onion-research.js` (Verify, Elenxo, ancoragem), a cópia idêntica no motor do censo,
+`.claude/validation/judge-verdict-check.sh` para os juízes que a sessão conduz, e o
+`dissect-census.sh --check-verdict` para `rejeitar`/`parquear`.
+
+O caso que mostrou as duas faces (dissecação do markitdown num adotante de curadoria, PR #26, merge
+`a2f8a5aef524`): o N3 fechou em **REJEITAR com superação medida**, já que o `tesseract` local lê o PDF
+escaneado em que a ferramenta sai vazia com rc 0. Já o critério 1 do teste da régua deu **INCONCLUSIVO**
+porque o desenho não apontava o que superaria o teste: um objeto com diferença checável por `grep`.
+
 ### A etapa 5 é a que mais falha — e isso é medido
 
 Em 2026-08-02, de **6 corridas que declararam Elenxo**, **2 narravam refutação em prosa com o grafo
@@ -147,6 +173,10 @@ consumidores** no repo — ninguém lê, logo ninguém foi enganado.
 
 **A conformidade aqui é lida por humano contra a tabela das 5 etapas.** Isso está declarado, não
 escondido — que é exatamente o que a doutrina exige de si mesma.
+
+O que **tem** gate desde 2026-10-15 é outra coisa, e a diferença importa: a **forma do veredito
+negativo** (superação + critério pré-registrado, seção da etapa 3 acima). Isso não diz se a corrida foi
+Elenxo. Diz só que um "não" sem medida não passa.
 
 ---
 

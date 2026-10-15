@@ -68,6 +68,14 @@ O censo mede as duas mortes: **registrada e sem `--selftest`** (dispara sem ser 
 `--selftest` e não registrada** (exercitada e nunca dispara). O 1º dogfood do censo acusou a guarda
 que estava sendo forjada **naquele instante** na segunda categoria.
 
+> **O refutador que reprova aponta o que supera** (SAC-151, maestro 2026-10-15: "um juiz de sim ou
+> não sem tentar superação em uma pesquisa pode restringir possibilidades de crescimento e
+> inovação; é preciso ter medição e critérios claros"). O subagente que REFUTA a guarda devolve, para
+> cada reprovação, o critério pré-registrado com o comando que a checa e a superação
+> `{achada, o_que, medida}`. Ou seja, o padrão, o substrato ou a guarda existente que cobriria a classe sem o defeito apontado. A sessão confere com
+> `bash .claude/validation/judge-verdict-check.sh <vereditos.json>` (rc 1 = reprovação recusada e
+> contada), e a superação achada vira nó.
+
 ## O que esta doutrina NÃO promete
 
 - **Não garante que a guarda pegue a classe** — só que ela pegue a **forma** que o caso descreve. A

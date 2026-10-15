@@ -182,6 +182,8 @@ nodes:
     confidence: 0.6
     x_dissect_level: 3
     x_dissect_verdict: parquear
+    x_dissect_criterion: "git ls-files '.claude/validation/*.sh' '.claude/hooks/*.sh' | wc -l (o corpo de guardas e shell; o Cedar nao analisa shell, logo absorver/costurar nao cabem)"
+    x_dissect_overcoming: E_N3_O_QUE_TRANSFERE
     verified_at: "2026-10-01"
     verified_against: 'NAO SELADA. O /meta:dissect nunca sela: status open, aguardando o maestro.'
     label: 'VEREDITO PROPOSTO — PARQUEAR, com gatilho nomeado (o maestro sela). Nao e `absorver`: a capacidade e propriedade da linguagem restrita e o corpus do Onion e shell agnostico por desenho. Nao e `costurar`: nao existe adapter possivel — o Cedar nao analisa shell. Nao e `rejeitar`: um PEDACO transfere ja (o padrao "IA autora, verificador determinístico admite", E_N3_O_QUE_TRANSFERE) e uma PERGUNTA fica viva, que e o que se parqueia. ═══ A PERGUNTA PARQUEADA ═══ "vale restringir a LINGUAGEM de um SUBCONJUNTO das guardas — as puramente declarativas, que so casam padrao em texto — para ganhar analise de sombreamento e condicao impossivel?" ═══ O GATILHO, nomeado e verificavel (parque sem gatilho e cemiterio) ═══ reabrir quando QUALQUER um ocorrer: (1) duas regras do corpo de guardas forem medidas como MUTUAMENTE SOMBREADAS em uso real (uma nunca dispara porque outra sempre dispara antes); (2) o corpus passar de 120 regras, onde o custo de nao saber da sobreposicao cresce mais rapido que o de uma DSL parcial; (3) sair ferramenta de analise estatica que aceite SHELL como entrada, o que derrubaria E_N3_NAO_TRANSFERE por completo. ═══ O QUE FAZER AGORA, e e barato ═══ nada de absorcao; so registrar E_N3_ORDEM_NINGUEM_DERIVA como resposta externa a pressao interna de ordenacao.'

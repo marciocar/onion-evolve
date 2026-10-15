@@ -411,6 +411,78 @@ nodes:
     trace: '.claude/commands/meta/setup-integration.md'
     label: 'O QUE A SUPERACAO AINDA NAO COBRE: bytecode que nenhum teste confere — instrucao em prosa de comando que a VM obedece sem verificador. Exemplo medido no mesmo dia: o setup-integration afirma que ler o .env com Read "nao expoe valores", e expoe; a doutrina dizia o contrario do que a ferramenta faz, e nada pegou ate um adotante usar. A medida desta lacuna e a fila de trabalho do Elenxo como movimento de superacao: cada instrucao critica de prosa ganha guarda (fix-must-become-mechanism) ou fica declarada como confianca-no-modelo. GATILHO: cada defeito de prosa medido em campo.'
 
+  - id: D_JUIZ_QUE_REPROVA_BUSCA_SUPERACAO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: done
+    verified_at: "2026-10-15"
+    verified_against: "reforço do maestro de 2026-10-15, repassado pela sessão da curadoria (verbatim no label); implementado como mecanismo em SAC-151 e medido pela bancada: 8 casos primários reprovam no main de antes e passam depois, cada um com mutante"
+    trace: "https://linear.app/sacola/issue/SAC-151"
+    label: 'JUIZ QUE REPROVA BUSCA O QUE SUPERA, por critério pré-registrado. Maestro (2026-10-15, verbatim): "um juiz de sim ou não sem tentar superação em uma pesquisa pode restringir possibilidades de crescimento e inovação; é preciso ter medição e critérios claros".'
+    narrative: "Leitura da casa: (1) veredito negativo carrega superacao {achada, o_que, medida}, e achada:false exige a razão medida; a superação achada vira nó C_SUPERACAO_<data>_… com TRACES_TO à reprovação; (2) o critério de reprovação existe antes do juiz e o veredito cita o id e o comando que o checa. Negativo sem as duas metades é recusado pelo motor e contado (fail-closed: o objeto fica não-julgado). Onde vive: bloco overcoming-gate do onion-research.js (Verify, Elenxo de decisão, ancoragem e Elenxo de primárias), cópia byte a byte no census-workflow.mjs, judge-verdict-check.sh para os juízes da sessão (/meta:cc-update, /meta:radar, refutadores de guarda e forja) e dissect-census.sh --check-verdict para rejeitar e parquear. Teto: o motor confere forma e pertença, não se o comando citado de fato reprova; o comando fica no grafo para quem re-roda."
+    provenance:
+      source: ".claude/workflows/onion-research.js e .claude/validation/judge-verdict-check.sh (branch feat/judge-overcoming-mechanism)"
+      locator: "bloco // >>> overcoming-gate; casos og1-og6 e og-d1 do lint-selftest.sh"
+      method: "testemunho: diretriz do maestro repassada pela sessão da curadoria; implementação medida pela bancada"
+      locality: "pessoa"
+
+  - id: E_MARKITDOWN_REJEITAR_COM_SUPERACAO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    verified_at: "2026-10-15"
+    verified_against: "onion-curation@a2f8a5aef524 (merge do PR #26): nós E_N3_LOCAL_TOOLS_COVER e D_MARKITDOWN_2610 do markitdown-2026-10.kg.yaml, lidos por git show"
+    trace: "https://github.com/marciocar/onion-curation/blob/a2f8a5aef524/docs/evolution/dissect/markitdown-2026-10/markitdown-2026-10.kg.yaml"
+    label: "CASO-MODELO: a dissecação do markitdown fechou em REJEITAR com superação medida. O tesseract local lê o PDF escaneado em que o markitdown sai vazio com rc 0, e o pdftotext -layout entrega o texto em trecho citável."
+    narrative: "Locator do adotante: pdftoppm + tesseract 5.3.4 no relatório escaneado acham 2,711,633, 8,826,561 e 12,501,996 (19 a 34 s, mesmo comando). A reprovação deixou de ser um não seco: apontou o que entrega o valor que a ferramenta prometia, e por isso o veredito é acionável."
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/a2f8a5aef524/docs/evolution/dissect/markitdown-2026-10/markitdown-2026-10.kg.yaml"
+      locator: "E_N3_LOCAL_TOOLS_COVER (locator do pdftotext e do tesseract) e D_MARKITDOWN_2610 (x_dissect_verdict: rejeitar)"
+      method: "leitura: git show a2f8a5aef524 no clone local do adotante (repo privado)"
+      locality: "web"
+
+  - id: E_CRITERIO1_INCONCLUSIVO_SEM_SUPERACAO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    verified_at: "2026-10-15"
+    verified_against: "onion-curation@a2f8a5aef524: data/criterion-1-replicas-judge.md (Veredito INCONCLUSIVO) e o nó E_CRITERION_1_ATTRIBUTION_OPEN"
+    trace: "https://github.com/marciocar/onion-curation/blob/a2f8a5aef524/docs/evolution/dissect/markitdown-2026-10/data/criterion-1-replicas-judge.md"
+    label: "CONTRA-EXEMPLO: no mesmo PR, o juiz binário do critério 1 do teste da régua deu INCONCLUSIVO porque o desenho não apontava o que superaria o teste, que seria um objeto com diferença checável por grep."
+    narrative: "Com 3 réplicas por régua, no eixo OCR a variação dentro da régua (1/3) igualou a variação entre réguas (4/9), e o ATRIBUÍDO dependia de uma saída contaminada. O juiz respondeu sim ou não a uma pergunta cujo critério não separava régua de ruído. É o caso que o reforço do maestro nomeia: sem superação procurada nem critério checável, o não (ou o talvez) fecha uma porta sem dizer qual abriria."
+    provenance:
+      source: "https://github.com/marciocar/onion-curation/blob/a2f8a5aef524/docs/evolution/dissect/markitdown-2026-10/data/criterion-1-replicas-judge.md"
+      locator: "tabela de concordância (OCR 1/3, 1/3, 4/9) e a linha Veredito: INCONCLUSIVO"
+      method: "leitura: git show a2f8a5aef524 no clone local do adotante (repo privado)"
+      locality: "web"
+
+  - id: E_JUIZES_SEM_SUPERACAO_MEDIDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-15"
+    verified_against: "grep -c supera .claude/workflows/onion-research.js = 0 em origin/main e84201c6; os casos og1, og2, og3, og4, og5, og6, og-d1 e census-seal og rodados contra os arquivos de origin/main deram FAIL (8 de 8) e passam na branch"
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "MEDIDO ANTES DA CURA: nenhum juiz da maquinaria pedia superação nem citava o comando do critério. No main de 2026-10-15 o veredito negativo sem superação passava nos 4 juízes do workflow de pesquisa, no juiz do censo e no veredito do dissect."
+    narrative: "Dívida legada contada pelo próprio gate novo: duas dissecações com parquear sem critério nem superação. A do Cedar foi curada nesta leva, porque a superação já estava medida no próprio grafo (E_N3_O_QUE_TRANSFERE). A do Superpowers segue listada como recusada no censo: é decisão done, selada pelo maestro, e não se toca."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh@feat/judge-overcoming-mechanism"
+      locator: "_judge_overcoming_research_cases, _judge_overcoming_dissect_cases, _judge_overcoming_seal_case"
+      method: "medição: os casos executados contra git show origin/main dos 4 arquivos"
+      locality: "repo"
+
 edges:
   # as auto-incriminacoes reais sustentam a tese central (a forma prova a filosofia)
   - from: E_ZIMMERMAN_FIX
@@ -495,4 +567,16 @@ edges:
     edge_type: SUPPORTS
   - from: Q_BYTECODE_SEM_TESTE
     to: D_PROMPTS_COMO_BYTECODE_LLM_COMO_VM_SUPERADA
+    edge_type: CONSTRAINS
+  - from: E_MARKITDOWN_REJEITAR_COM_SUPERACAO
+    to: D_JUIZ_QUE_REPROVA_BUSCA_SUPERACAO
+    edge_type: SUPPORTS
+  - from: E_CRITERIO1_INCONCLUSIVO_SEM_SUPERACAO
+    to: D_JUIZ_QUE_REPROVA_BUSCA_SUPERACAO
+    edge_type: SUPPORTS
+  - from: E_JUIZES_SEM_SUPERACAO_MEDIDO
+    to: D_JUIZ_QUE_REPROVA_BUSCA_SUPERACAO
+    edge_type: SUPPORTS
+  - from: D_JUIZ_QUE_REPROVA_BUSCA_SUPERACAO
+    to: D_ELENXO_IS_METHOD
     edge_type: CONSTRAINS

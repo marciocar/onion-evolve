@@ -46,16 +46,35 @@
 # Sai na coluna `escopo` (ausente = `-`, o repo inteiro): nível pago só se reusa na MESMA régua E no
 # MESMO escopo, e o censo mostra as duas colunas sem julgar a igualdade (comparação literal).
 #
+# ── VEREDITO NEGATIVO EXIGE SUPERAÇÃO E CRITÉRIO (SAC-151, maestro 2026-10-15) ───────────────
+# "um juiz de sim ou não sem tentar superação em uma pesquisa pode restringir possibilidades de
+# crescimento e inovação; é preciso ter medição e critérios claros". `rejeitar` e `parquear` são
+# vereditos NEGATIVOS e só contam como veredito quando o nó que os carrega declara:
+#   · `x_dissect_criterion: "<comando que checa a reprovação>"` — o critério pré-registrado, re-rodável;
+#   · `x_dissect_overcoming: <id>` de um nó DESTE grafo (`C_SUPERACAO_…` quando nasce da reprovação;
+#     uma evidência que já existe, quando a superação já estava medida) com aresta (from) para o nó
+#     da reprovação — a superação ACHADA vira nó —, OU `x_dissect_overcoming: nenhuma` com
+#     `x_dissect_overcoming_measure: "<o que se procurou e onde>"` (achada:false exige a razão medida).
+# Sem isso o estado sai `veredito-SEM-SUPERACAO(<motivos>)` (fail-closed: não conta como veredito)
+# e `--check-verdict <ferramenta>` sai 1. Caso que motivou: a dissecação do markitdown (num adotante de curadoria,
+# PR #26) fechou em REJEITAR com a superação medida — o tesseract local lê o PDF escaneado em que a
+# ferramenta sai vazia —, e é essa forma que passa a ser exigida.
+#
 # Uso:  bash .claude/validation/dissect-census.sh [<repo>] [--markdown|--tsv|--regua-padrao]
+#       bash .claude/validation/dissect-census.sh [<repo>] --check-verdict <ferramenta>
 # Exit: 0 = censo emitido (inclusive "zero dissecação", que é resposta) · 3 = NÃO PUDE MEDIR.
+#       --check-verdict: 0 = veredito positivo, ou negativo com critério + superação · 1 = negativo
+#       RECUSADO (motivos no stderr) ou sem veredito · 3 = ferramenta não declarada no corpus.
 #       Os PLANOS de absorção (N4) têm leitor próprio, do lado do forge: dissect-plans.sh — este
 #       script viaja no plugin onion-meta e não pode depender do forge-census, que não viaja.
 # Determinístico, sem LLM. Exercitado por lint-selftest.sh (run_dissect_selftests).
 # ===========================================================================
 set -uo pipefail
 
-REPO="${1:-}"; FMT="${2:---markdown}"
-case "${REPO}" in --*) FMT="${REPO}"; REPO="" ;; esac
+REPO="${1:-}"; FMT="${2:---markdown}"; CHECK_TOOL="${3:-}"
+case "${REPO}" in --*) CHECK_TOOL="${2:-}"; FMT="${REPO}"; REPO="" ;; esac
+[ "${FMT}" != "--check-verdict" ] || [ -n "${CHECK_TOOL}" ] \
+  || { echo "dissect-census: --check-verdict exige o nome da ferramenta (o valor de x_dissect_tool:)" >&2; exit 3; }
 REPO="${REPO:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 [ -d "${REPO}" ] || { echo "dissect-census: alvo inexistente: ${REPO}" >&2; exit 3; }
 
@@ -168,6 +187,32 @@ for rel in "${GRAPHS[@]}"; do
     [ "${open_q}" = "1" ] || incoh="${incoh},sem-question-aberta"
     if [ -n "${incoh}" ]; then state="estudo-INCOERENTE(${incoh#,})"; else state="estudo"; fi
   elif [ -n "${mode}" ]; then state="modo-DESCONHECIDO(${mode})"
+  elif [ "${verdict}" = "rejeitar" ] || [ "${verdict}" = "parquear" ]; then
+    # SAC-151: o nó da reprovação é o que carrega x_dissect_verdict; os marcadores moram NELE.
+    ogm="$(awk '
+      function flush() { if (isv) { printf "%s\t%s\t%s\t%s\n", id, crit, ov, meas; done = 1 } isv = 0; crit = ""; ov = ""; meas = ""; id = "" }
+      function val(s) { sub(/^[^:]*:[[:space:]]*/, "", s); gsub(/^["\047]|["\047][[:space:]]*$/, "", s); return s }
+      done { next }
+      /^[[:space:]]*- id:/ { flush(); if (done) next; id = $0; sub(/^[[:space:]]*- id:[[:space:]]*/, "", id); next }
+      /^edges:/ { flush(); next }
+      /^[[:space:]]*x_dissect_verdict:/ { isv = 1 }
+      /^[[:space:]]*x_dissect_criterion:/ { crit = val($0) }
+      /^[[:space:]]*x_dissect_overcoming:/ { ov = val($0) }
+      /^[[:space:]]*x_dissect_overcoming_measure:/ { meas = val($0) }
+      END { if (!done) flush() }' "${f}")"
+    IFS='	' read -r og_id og_crit og_ov og_meas <<< "${ogm}"
+    ogwhy=""
+    [ "${#og_crit}" -ge 3 ] || ogwhy="${ogwhy},sem-x_dissect_criterion"
+    if [ -z "${og_ov}" ]; then ogwhy="${ogwhy},sem-x_dissect_overcoming"
+    elif [ "${og_ov}" = "nenhuma" ]; then [ "${#og_meas}" -ge 8 ] || ogwhy="${ogwhy},nenhuma-sem-medida"
+    else
+      grep -qE "^[[:space:]]*- id:[[:space:]]*${og_ov}[[:space:]]*\$" "${f}" || ogwhy="${ogwhy},superacao-${og_ov}-inexistente"
+      awk -v s="${og_ov}" -v d="${og_id}" '
+        /^[[:space:]]*- from:/ { fr = $0; sub(/^[[:space:]]*- from:[[:space:]]*/, "", fr); to = "" ; next }
+        /^[[:space:]]*to:/ { to = $0; sub(/^[[:space:]]*to:[[:space:]]*/, "", to); if (fr == s && to == d) ok = 1 }
+        END { exit ok ? 0 : 1 }' "${f}" || ogwhy="${ogwhy},sem-aresta-${og_ov}-para-${og_id:-?}"
+    fi
+    if [ -n "${ogwhy}" ]; then state="veredito-SEM-SUPERACAO(${ogwhy#,})"; else state="veredito"; fi
   elif [ "${verdict}" != "-" ]; then state="veredito"
   else state="interrompida"; fi
 
@@ -178,6 +223,17 @@ for rel in "${GRAPHS[@]}"; do
 done
 
 sorted_rows="$(printf '%s' "${rows}" | sort -t'	' -k2,2nr -k1,1)"
+
+if [ "${FMT}" = "--check-verdict" ]; then
+  line="$(printf '%s\n' "${sorted_rows}" | awk -F'\t' -v t="${CHECK_TOOL}" '$1 == t { print; exit }')"
+  [ -n "${line}" ] || { echo "dissect-census: ferramenta '${CHECK_TOOL}' não declarada (x_dissect_tool:) em nenhum grafo rastreado" >&2; exit 3; }
+  IFS='	' read -r _t _lv cv_verdict _b _r _fr cv_graph _ag cv_state _sc <<< "${line}"
+  case "${cv_state}" in
+    veredito) echo "dissect-census: ${CHECK_TOOL} — veredito ${cv_verdict} conta (${cv_graph})"; exit 0 ;;
+    veredito-SEM-SUPERACAO*) echo "dissect-census: ${CHECK_TOOL} — veredito NEGATIVO ${cv_verdict} RECUSADO: ${cv_state} (${cv_graph}). Declare x_dissect_criterion e x_dissect_overcoming no nó da reprovação." >&2; exit 1 ;;
+    *) echo "dissect-census: ${CHECK_TOOL} — sem veredito que conte: estado ${cv_state} (${cv_graph})" >&2; exit 1 ;;
+  esac
+fi
 
 if [ "${FMT}" = "--tsv" ]; then
   # régua e estado entram no FIM: as colunas 1-7 seguem onde estavam para quem já as lê.
@@ -211,6 +267,7 @@ else
   _section 'estudos (pararam no N2 DE PROPÓSITO, sem veredito — a question "adotar?" segue aberta; decidir é dissecar de novo sem --study, entrando no N3)' '^estudo$'
   _section 'interrompidas (sem veredito e SEM marcador de estudo — retomar do nível alcançado ou fechar com veredito)' '^interrompida$'
   _section 'a corrigir (o grafo contradiz o próprio modo, ou declara modo que este censo não conhece)' '^(estudo-INCOERENTE|modo-DESCONHECIDO)'
+  _section 'vereditos NEGATIVOS recusados (rejeitar/parquear sem critério checável ou sem superação — não contam como veredito; ver x_dissect_criterion e x_dissect_overcoming)' '^veredito-SEM-SUPERACAO'
 fi
 printf '\n(ferramenta com nível fresco ENTRA no nível seguinte — re-derivar nível pago é o\n'
 printf 'desperdício que este censo corta. VENCIDO não se cita como se fosse de hoje: licença,\n'

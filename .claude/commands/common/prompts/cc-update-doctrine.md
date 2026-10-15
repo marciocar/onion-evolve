@@ -32,6 +32,10 @@ Este comando é a **resposta** padronizada a esse aviso.
 - **Juiz** (subagente não-fork, opus, effort high, mandato REFUTAR): confere cada citação **byte a
   byte** contra o CHANGELOG oficial, mede cada ligação no vivo e lista o que a rodada **deixou de
   ver**. O veredito é hipótese a verificar, não sentença — mas reprovação sustentada muda o grafo.
+  E reprovação só se sustenta com **critério pré-registrado + superação** (SAC-151, maestro
+  2026-10-15: "um juiz de sim ou não sem tentar superação em uma pesquisa pode restringir
+  possibilidades de crescimento e inovação; é preciso ter medição e critérios claros"): o
+  `judge-verdict-check.sh` recusa e conta o REPROVA/EXAGERA sem as duas metades.
 
 ### 3. Ligação com o Onion só com medição viva
 Afirmar que um item "toca" o Onion exige a evidência no **artefato atual** (caminho, linha, saída de
