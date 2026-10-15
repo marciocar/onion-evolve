@@ -3,7 +3,7 @@
 
 # Lente do grafo — `federation-research-2026-06-reconciled`
 
-**884 nós · 1090 arestas · 0 órfãos**
+**885 nós · 1091 arestas · 0 órfãos**
 
 > Projeção DERIVADA. O veredito (integridade, reconciliação, frescor) é do
 > `kg-radar.sh` — esta lente não julga, só mostra.
@@ -13,7 +13,7 @@
 | Tipo | n |
 |---|---|
 | claim | 413 |
-| decision | 174 |
+| decision | 175 |
 | evidence | 127 |
 | question | 108 |
 | entity | 34 |
@@ -25,11 +25,11 @@
 | open | 320 |
 | superseded | 61 |
 | refuted | 53 |
-| done | 38 |
+| done | 39 |
 
 | Plano | n |
 |---|---|
-| DEV | 709 |
+| DEV | 710 |
 | PROD | 175 |
 
 ## Radar — 25 focos de atenção (peso × centralidade)

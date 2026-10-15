@@ -2,8 +2,7 @@
 branch: docs/triage-tessl-parquear
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: 4a75eeaf6bec06387c6d419fdcc83278c5c69bafe2693d340aa8ef8c36df9bb5
-reviewed_code_sha256: 565baceea88aa3565472f486ea09bf739ed1f18fcb9f5237ac29fee544c87944
+reviewed_diff_sha256: pendente
 findings_total: 1
 findings_real: 1
 tokens: 0
