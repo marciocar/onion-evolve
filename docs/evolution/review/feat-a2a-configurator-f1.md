@@ -3,15 +3,15 @@ branch: feat/a2a-configurator-f1
 pr: pendente
 date: 2026-10-15
 reviewed_diff_sha256: pendente
-findings_total: 15
-findings_real: 15
+findings_total: 16
+findings_real: 16
 tokens: 167893
 duration_min: 7
-findings_fixed: 14
+findings_fixed: 15
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: subagente refutador (general-purpose) + mutantes da sessão
-nota: "15 = 14 do refutador + 1 achado pelo mutante K2 (suíte abortava); tokens e duração são do refutador; 1 parcial (date -d GNU-only) declarado em Limites"
+nota: "16 = 14 do refutador + 1 do mutante K2 (suíte abortava) + 1 do pré-voo (pipefail); tokens e duração são do refutador; 1 parcial (date -d GNU-only) declarado em Limites"
 ---
 
 # Passada adversarial: `feat/a2a-configurator-f1`
@@ -53,6 +53,7 @@ Do refutador (14, todos reais, nenhum bloqueante) e da sessão (1):
 | 13 | `A2A_JWKS_DIR` do ambiente vazava para a REGRA 66 | curado: o validador não lê mais a variável (só `--jwks` ou a raiz do registro) |
 | 14 | kid repetido no mesmo membro; teto de corpo por caractere; texto do piso | curados (V11; teto em bytes; cabeçalho corrigido) |
 | 15 | (sessão, mutante K2) atribuição que falha sob o `set -e` do runner abortava a suíte | curado: a família roda com `local -` e `set +e` |
+| 16 | (pré-voo, `shell_pipefail_robustness`) `printf … \| grep -q` e `tr … \| grep -q` no doctor, a corrida de EPIPE sob pipefail | curado: here-string e `case`; mutantes D21, D22, D3, D3b, D5 e D20 re-rodados e mortos |
 
 ## Mutantes
 
