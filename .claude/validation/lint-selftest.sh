@@ -6000,6 +6000,31 @@ run_durable_commit_selftests() {
     record_pass "durable-commit: (f) o commit de adoção leva a assinatura do PRÓPRIO adotante"
   else record_fail "durable-commit: (f) assinatura" "o commit saiu sem a attribution.commit do adotante"; fi
   rm -rf "${d}"
+  # (sac149) SAC-149 (2026-10-15): o que a adoção traz e o clone do time precisa receber.
+  #     (g1) .gitignore NÃO rastreado (o que o ensure-secret-gitignore cria num greenfield) entra no commit;
+  #     (g2) .gitignore JÁ rastreado e editado fica FORA (é do dono; teto declarado no helper);
+  #     (g3) vendor/kg-ssot com `vendor/` no .gitignore do alvo (PHP/Composer) entra por `git add -f`.
+  local _gi=""
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
+  _dc_setup; printf '.env\n' > "${d}/.gitignore"
+  bash "${helper}" "${d}" update NEW999 chore/onion-update-NEW999 >/dev/null 2>&1
+  [ -n "$(git -C "${d}" ls-files -- .gitignore)" ] || _gi="${_gi} g1:.gitignore-novo-fora-do-commit"
+  rm -rf "${d}"
+  _dc_setup; git -C "${d}" checkout -q - 2>/dev/null; printf 'build/\n' > "${d}/.gitignore"; git -C "${d}" add .gitignore; git -C "${d}" commit -qm gi; git -C "${d}" checkout -q feature/x 2>/dev/null; git -C "${d}" merge -q --no-edit - >/dev/null 2>&1
+  printf '.env\n' >> "${d}/.gitignore"
+  bash "${helper}" "${d}" update NEW999 chore/onion-update-NEW999 >/dev/null 2>&1
+  git -C "${d}" diff --quiet -- .gitignore 2>/dev/null && _gi="${_gi} g2:.gitignore-do-dono-commitado"
+  rm -rf "${d}"
+  _dc_setup; printf 'vendor/\n' > "${d}/.gitignore"; git -C "${d}" add .gitignore; git -C "${d}" commit -qm gi
+  mkdir -p "${d}/vendor/kg-ssot/tools"; printf 'Apache\n' > "${d}/vendor/kg-ssot/LICENSE"; printf 'x\n' > "${d}/vendor/kg-ssot/tools/kg_gate.py"
+  bash "${helper}" "${d}" update NEW999 chore/onion-update-NEW999 >/dev/null 2>&1
+  [ -n "$(git -C "${d}" ls-files -- vendor/kg-ssot/tools/kg_gate.py)" ] || _gi="${_gi} g3:vendor-ignorado-fora-do-commit"
+  rm -rf "${d}"
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+  if [ -z "${_gi}" ]; then
+    record_pass "durable-commit: (sac149) .gitignore novo entra, o do dono fica, e vendor/kg-ssot atravessa vendor/ ignorado"
+  else record_fail "durable-commit: (sac149)" "${_gi}"; fi
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
 }
 
@@ -29991,7 +30016,8 @@ run_door_mini_selftests() {
 # recebem: arquivo fora do commit durável não chega lá) e roda no clone o lint, o contrato e o radar.
 # "Não pude medir" por dependência que NÃO VIAJOU reprova. Mutantes de cada caso: grafo do tema
 # (docs/evolution/research/adopter-shape-bench-2026-10/), plantados pelo ops/mutate-and-restore.sh.
-_AS_UNJUDGED_RE='não pôde|nao pode julgar|não pode julgar|não dá para julgar|nao da para julgar|NAO-MEDIDO|NAO MEDIDO|NÃO MEDIDO|NÃO-MEDIDO|não foi medid|nao foi medid|não julgou|nao julgou|NAO-VERIFICADO|NÃO-VERIFICADO|não mediu|nao mediu|não pude|nao pude'
+_AS_UNJUDGED_RE='não pôde|nao pode julgar|não pode julgar|não dá para julgar|nao da para julgar|NAO-MEDIDO|NAO MEDIDO|NÃO MEDIDO|NÃO-MEDIDO|não foi medid|nao foi medid|não julgou|nao julgou|NAO-VERIFICADO|NÃO-VERIFICADO|não mediu|nao mediu|não pude|nao pude|não consegui|nao consegui'
+# (grep -i: "Não pôde" no início da frase também casa — sob LC_ALL=C o -i dobra só o ASCII, e é o que basta aqui)
 # _as_unjudged <saída do lint> <clone> <core> → "REGRA N<TAB>caminho", um por dependência que não viajou:
 # linha de "não pude julgar" que cita um caminho AUSENTE no clone e PRESENTE no core (exato ou pelo nome).
 # Caminho ausente nos DOIS não é dependência que ficou para trás (é outra classe, e não é desta guarda).
@@ -30004,14 +30030,14 @@ _as_unjudged() {
     [ -n "${_rule}" ] || _rule="$(sed -E 's/^VIOLATION: ([^:]+):.*/\1/' <<< "${_line}")"
     while IFS= read -r _tok; do
       [ -n "${_tok}" ] || continue
-      _tok="${_tok#"${_cl}"/}"; _tok="${_tok#./}"
+      _tok="${_tok#"${_cl}"/}"; _tok="${_tok#./}"; _tok="${_tok%%[.,;:]}"
       case "${_tok}" in /*) continue ;; esac
       [ -e "${_cl}/${_tok}" ] && continue
       if [ -e "${_core}/${_tok}" ] || grep -qE "(^|/)${_tok//./\\.}\$" <<< "${_files}"; then
         printf '%s\t%s\n' "${_rule}" "${_tok}"
       fi
     done < <(grep -oE '[A-Za-z0-9_./-]*[A-Za-z0-9_-]\.(sh|py|yaml|yml|json|md|txt|tsv)|vendor/[A-Za-z0-9_./-]+' <<< "${_line}" | LC_ALL=C sort -u || true)
-  done < <(grep -E "${_AS_UNJUDGED_RE}" "${_out}" || true)
+  done < <(grep -iE "${_AS_UNJUDGED_RE}" "${_out}" || true)
 }
 # _as_ops <saída do lint> <clone> → "REGRA N<TAB>ops/<arquivo>" para cada mensagem impressa que cita um
 # `ops/<arquivo>` que o clone não tem (a REGRA 100 (Superfície que viaja não cita ops/ como se o
@@ -30023,24 +30049,27 @@ _as_ops() {
     [ -n "${_rule}" ] || _rule="$(sed -E 's/^VIOLATION: ([^:]+):.*/\1/' <<< "${_line}")"
     while IFS= read -r _tok; do
       [ -n "${_tok}" ] && [ ! -e "${_cl}/${_tok}" ] && printf '%s\t%s\n' "${_rule}" "${_tok}"
-    done < <(grep -oE '(^|[^A-Za-z0-9_./-])ops/[A-Za-z0-9_.-]+\.[A-Za-z]+' <<< "${_line}" | sed -E 's/^[^o]//' | LC_ALL=C sort -u || true)
+    done < <(grep -oE '(^|[^A-Za-z0-9_./-])(\./)?ops/[A-Za-z0-9_.-]+\.[A-Za-z]+' <<< "${_line}" | sed -E 's/^[^o.]//; s|^\./||' | LC_ALL=C sort -u || true)
   done < <(grep -E '^VIOLATION' "${_out}" || true)
 }
 # O PASSIVO MEDIDO que o PR 2 da SAC-149 cura (aplicabilidade por papel no rules-registry; REGRA 100 nas
 # mensagens). CATRACA NOS DOIS SENTIDOS: regra NOVA fora da lista reprova, e entrada que PAROU de disparar
 # também reprova (a lista só encolhe, e encolhe junto com a cura — nunca fica tolerando o que já sumiu).
-_AS_PENDING_UNJUDGED="REGRA 85,REGRA 92"
-_AS_PENDING_OPS="REGRA 85"
-_as_ratchet() {  # $1=rótulo do caso $2=achados (regra<TAB>token por linha) $3=lista pendente (vírgulas)
-  local _lbl="$1" _found="$2" _pend="$3" _new="" _gone="" _r
-  while IFS=$'\t' read -r _r _; do
+_AS_PENDING_UNJUDGED="REGRA 85|members.yaml,REGRA 85|ops/publish-door.sh,REGRA 92|members.yaml"
+_AS_PENDING_OPS="REGRA 85|ops/publish-door.sh"
+# A catraca é por PAR regra|dependência (passada adversarial, 2026-10-15): por regra só, uma dependência NOVA sob
+# uma regra já tolerada passava calada.
+_as_ratchet() {  # $1=rótulo do caso $2=achados (regra<TAB>token por linha) $3=lista pendente (regra|token, vírgulas)
+  local _lbl="$1" _found="$2" _pend="$3" _new="" _gone="" _r _t _k
+  while IFS=$'\t' read -r _r _t; do
     [ -n "${_r}" ] || continue
-    case ",${_pend}," in *",${_r},"*) : ;; *) case " ${_new} " in *" ${_r} "*) : ;; *) _new="${_new} ${_r}" ;; esac ;; esac
+    _k="${_r}|${_t}"
+    case ",${_pend}," in *",${_k},"*) : ;; *) case ";${_new};" in *";${_k};"*) : ;; *) _new="${_new};${_k}" ;; esac ;; esac
   done <<< "${_found}"
   local -a _pl=(); IFS="," read -r -a _pl <<< "${_pend}"
-  for _r in "${_pl[@]}"; do
-    [ -n "${_r}" ] || continue
-    grep -qF "${_r}"$'\t' <<< "${_found}" || _gone="${_gone} ${_r}"
+  for _k in "${_pl[@]}"; do
+    [ -n "${_k}" ] || continue
+    grep -qxF "${_k%%|*}"$'\t'"${_k#*|}" <<< "${_found}" || _gone="${_gone};${_k}"
   done
   if [ -z "${_new}" ] && [ -z "${_gone}" ]; then
     record_pass "adopter-shape: ${_lbl} — só o passivo declarado (${_pend:-nenhum}) e todo ele ainda medido"
@@ -30067,14 +30096,39 @@ run_adopter_shape_selftests() {
   _p3="$(_as_unjudged "${d}/p3" "${_pc}" "${REPO_ROOT}")"
   mkdir -p "${_pc}/vendor/kg-ssot/tools"; : > "${_pc}/vendor/kg-ssot/tools/kg_gate.py"
   _p4="$(_as_unjudged "${d}/p1" "${_pc}" "${REPO_ROOT}")"
-  if grep -qF $'REGRA 990\tvendor/kg-ssot/tools/kg_gate.py' <<< "${_p1}" && [ -z "${_p2}" ] && [ -z "${_p3}" ] && [ -z "${_p4}" ]; then
+  rm -rf "${_pc}/vendor"
+  printf '%s\n' "VIOLATION: zz-sintetico.sh: REGRA 995 (T): Não pôde julgar — leitor em vendor/kg-ssot/tools/kg_gate.py." > "${d}/p6"
+  local _p6; _p6="$(_as_unjudged "${d}/p6" "${_pc}" "${REPO_ROOT}")"
+
+  if grep -qF $'REGRA 990\tvendor/kg-ssot/tools/kg_gate.py' <<< "${_p1}" && [ -z "${_p2}" ] && [ -z "${_p3}" ] && [ -z "${_p4}" ] \
+     && [ "${_p6}" = $'REGRA 995\tvendor/kg-ssot/tools/kg_gate.py' ]; then
     record_pass "adopter-shape: (p) o detector acusa a dependência que ficou no core e cala na isenção sem caminho, no caminho que não existe em lugar nenhum e no que viajou"
-  else record_fail "adopter-shape: (p)" "p1=[${_p1}] (esperado: REGRA 990 + kg_gate.py) p2=[${_p2}] p3=[${_p3}] p4=[${_p4}] (esperados vazios)"; fi
-  printf '%s\n' "VIOLATION: y.sh: REGRA 993 (T): rode bash ops/publish-door.sh --status" "VIOLATION: y.sh: REGRA 994 (T): veja docs/ops/guia.md e nada mais" > "${d}/p5"
+  else record_fail "adopter-shape: (p)" "p1=[${_p1}] (esperado: REGRA 990 + kg_gate.py) p2=[${_p2}] p3=[${_p3}] p4=[${_p4}] (esperados vazios) p6=[${_p6}] (esperado: REGRA 995 + kg_gate.py, sem o ponto final)"; fi
+  printf '%s\n' "VIOLATION: y.sh: REGRA 993 (T): rode bash ops/publish-door.sh --status" "VIOLATION: y.sh: REGRA 994 (T): veja docs/ops/guia.md e nada mais" "VIOLATION: y.sh: REGRA 996 (T): rode ./ops/registry-pins.sh" > "${d}/p5"
   _o="$(_as_ops "${d}/p5" "${_pc}")"
-  if [ "${_o}" = $'REGRA 993\tops/publish-door.sh' ]; then
+  if [ "${_o}" = $'REGRA 993\tops/publish-door.sh\nREGRA 996\tops/registry-pins.sh' ]; then
     record_pass "adopter-shape: (p2) mensagem que cita ops/<arquivo> ausente é acusada; 'docs/ops/…' não é ops/ da raiz"
   else record_fail "adopter-shape: (p2)" "esperado só 'REGRA 993<TAB>ops/publish-door.sh'; saiu [${_o}]"; fi
+
+  # (j) O CONTRATO QUE O ALVO JÁ TEM É DELE (passada adversarial, 2026-10-15: um adotante vendoriza o KG-SSOT
+  #     num pin próprio, e o merge do --update dava 13 conflitos). Pelo caminho do --update (print-manifest com
+  #     o alvo): sem vendor → o do core viaja; vendor PRÓPRIO → não viaja; o PRODUTO KG-SSOT → não viaja; vendor
+  #     que JÁ veio pelo Onion (está na onion/vendor do alvo) → segue viajando, como qualquer peça do framework.
+  local _vb="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh" _jt _jbad=""
+  _jman() { ONION_ROLE=adopted ONION_KIND=adoption bash "${_vb}" --print-manifest "${REPO_ROOT}" "$1" 2>/dev/null | grep -cxF ':(exclude)vendor/kg-ssot' || true; }
+  _jt="${d}/j-limpo"; mkdir -p "${_jt}"; git -C "${_jt}" init -q >/dev/null 2>&1
+  [ "$(_jman "${_jt}")" = 0 ] || _jbad="${_jbad} alvo-sem-vendor-nao-recebe"
+  _jt="${d}/j-proprio"; mkdir -p "${_jt}/vendor/kg-ssot"; printf '{"version":"4.7.2"}\n' > "${_jt}/vendor/kg-ssot/.kg-ssot-version"
+  git -C "${_jt}" init -q >/dev/null 2>&1; git -C "${_jt}" add -A >/dev/null 2>&1
+  git -C "${_jt}" -c user.email=t@t -c user.name=t commit -qm x >/dev/null 2>&1
+  [ "$(_jman "${_jt}")" = 1 ] || _jbad="${_jbad} vendor-proprio-sobrescrito"
+  git -C "${_jt}" branch onion/vendor >/dev/null 2>&1
+  [ "$(_jman "${_jt}")" = 0 ] || _jbad="${_jbad} vendor-do-onion-deixou-de-viajar"
+  _jt="${d}/j-produto"; mkdir -p "${_jt}/tools"; : > "${_jt}/tools/kg_validate.py"; git -C "${_jt}" init -q >/dev/null 2>&1
+  [ "$(_jman "${_jt}")" = 1 ] || _jbad="${_jbad} produto-recebe-copia-de-si"
+  if [ -z "${_jbad}" ]; then
+    record_pass "adopter-shape: (j) o contrato do core viaja só a quem não tem o seu: vendor próprio e o produto KG-SSOT ficam intocados"
+  else record_fail "adopter-shape: (j)" "${_jbad}"; fi
 
   # (a) o adotante nasce pelo corte do --update e o CLONE recebe o que ele cita
   local al="${d}/alvo" cl="${d}/clone"
@@ -30094,11 +30148,12 @@ run_adopter_shape_selftests() {
 
   # (b) o lint inteiro, NO CLONE: 0 HARD
   local lo="${d}/lint.out"
-  ( cd "${cl}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh ) > "${lo}" 2>&1; _r=$?
+  : > "${d}/hard.lst"
+  _r=0; ( cd "${cl}" && ONION_LINT_HARD_FILE="${d}/hard.lst" LC_ALL=C bash .claude/validation/lint-artifacts.sh ) > "${lo}" 2>&1 || _r=$?   # `|| _r=$?`: sob set -e um lint reprovando abortava a SUÍTE (medido no dogfood)
   local _h; _h="$(grep -oE 'Violações HARD : [0-9]+' "${lo}" | grep -oE '[0-9]+$' || true)"
   if [ "${_r}" -eq 0 ] && [ "${_h:-x}" = 0 ]; then
     record_pass "adopter-shape: (b) o lint do adotante materializado sai rc 0 com 0 HARD"
-  else record_fail "adopter-shape: (b)" "rc=${_r} HARD=${_h:-?} — $(grep -E '^VIOLATION' "${lo}" | grep -vE 'SOFT' | head -3 | cut -c1-200 | tr '\n' ' ')"; fi
+  else record_fail "adopter-shape: (b)" "rc=${_r} HARD=${_h:-?} — $(head -3 "${d}/hard.lst" | cut -c1-260 | tr '\n' ' ')"; fi
 
   # (c) "não pude julgar" por dependência que NÃO VIAJOU reprova (catraca do passivo do PR 2)
   _as_ratchet "(c) 'não pude julgar' por dependência que não viajou" "$(_as_unjudged "${lo}" "${cl}" "${REPO_ROOT}")" "${_AS_PENDING_UNJUDGED}"

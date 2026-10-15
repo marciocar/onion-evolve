@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 16 NÓS ═══
+# ═══ TETO: 20 NÓS ═══
 meta:
   id: adopter-shape-bench-2026-10
   schema_version: "1"
@@ -99,12 +99,12 @@ nodes:
     confidence: 0.9
     verified_at: "2026-10-15"
     verified_against: "ops/mutate-and-restore.sh com LC_ALL=C, cada mutante seguido de lint-selftest.sh --families adopter_shape"
-    label: "Seis mutantes plantados pelo ops/mutate-and-restore.sh mordem, cada um derrubando o caso nomeado: o vendor fora do manifesto e fora do commit durável (a, d), o .gitignore fora do commit (a), a catraca sem a 85 (c) e sem o ops/ (f), e o detector sem o filtro do que viajou (p, c)."
+    label: "Nove mutantes plantados pelo ops/mutate-and-restore.sh mordem, cada um derrubando o caso nomeado: vendor fora do manifesto e do commit (a, d), .gitignore fora (a), catraca sem a 85 e sem o ops/ (c, f), detector sem filtro e sem tirar pontuação (p), contrato próprio do alvo (j), vendor ignorado (durable-commit)."
     narrative: "O mutante do detector revelou o que a catraca protege: sem o filtro, as isenções das REGRAS 56 e 57 (que citam o próprio script da guarda, presente no clone) virariam achado. O dogfood pegou um defeito do harness no mesmo laço: a regra repetida por dois caminhos saía duas vezes na mensagem da catraca, curado por dedupe."
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_adopter_shape_selftests, casos p, p2, a até f"
-      method: "medição: seis mutantes plantados e restaurados com hash conferido"
+      method: "medição: nove mutantes plantados e restaurados com hash conferido"
       locality: "repo"
 
   - id: C_TETO_PASSOS_COPIADOS_DO_ADOPT
@@ -148,6 +148,54 @@ nodes:
     label: "Aberto para o PR 2 da SAC-149: aplicabilidade por papel declarada no rules-registry (as REGRAS 85 e 92 saem 'não se aplica'); a REGRA 100 estendida às mensagens impressas; pin com escritor único no --update; semente v2; role do registro; githook; falsos positivos do veto do .env."
     narrative: "A família carrega o passivo como catraca nos dois sentidos (_AS_PENDING_UNJUDGED e _AS_PENDING_OPS): o PR 2 só fecha se as listas zerarem junto com a cura."
 
+  - id: E_ELENXO_PR1_DOIS_BLOQUEADORES_CURADOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "refutador em worktree isolada sobre 53612815, com merge de três vias simulado contra um adotante que vendoriza o KG-SSOT 4.7.2 e o durable-commit.sh real num alvo com vendor/ ignorado"
+    label: "Elenxo (2026-10-15) REPROVOU o PR 1 com dois bloqueadores que a família não via: adotante com o PRÓPRIO vendor/kg-ssot teria 13 conflitos no --update, e alvo com vendor/ no .gitignore ficava sem o contrato no clone. Curados e cobertos pelos casos j e durable-commit sac149."
+    narrative: "Curas: (1) com ONION_TARGET apontando o alvo, o vendor-manifest.sh não transporta vendor/kg-ssot quando o alvo é o produto KG-SSOT ou já tem vendor que não veio pelo Onion (a onion/vendor dele não o tem); o vendor-branch.sh e o adopt.md o passam. (2) o durable-commit.sh força o vendor/kg-ssot quando ele está ignorado. Menores curados no mesmo laço: o selador do /meta:decide só diz 'contrato rc 0' quando o contrato julgou; o template de CI do adotante instala os requisitos do leitor; o .prettierignore cobre o vendor; o detector tira a pontuação final do caminho, casa sem caixa, aceita ./ops/ e 'não consegui', e a catraca é por par regra|dependência. O dogfood da cura pegou um defeito meu: o adopt.md passou de 800 linhas com as duas linhas novas (REGRA 5), visto pelo caso b."
+    provenance:
+      source: "relatório do refutador (subagente opus, worktree isolada)"
+      locator: "achados 1 a 11 da passada sobre 53612815"
+      method: "juízes: refutador adversarial com scripts executados, e as curas re-medidas pela bancada"
+      locality: "repo"
+
+  - id: C_TETO_VENDOR_PROPRIO_IGNORADO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    label: "TETO: um vendor/kg-ssot PRÓPRIO do alvo e ignorado de propósito também seria forçado no commit da adoção. Nenhum adotante medido assim: os dois com vendor próprio o rastreiam."
+
+  - id: C_TETO_GITIGNORE_DO_USUARIO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    label: "TETO: um .gitignore local que o usuário nunca commitou entra INTEIRO no commit da adoção, com as linhas dele; e no .gitignore já rastreado as linhas de segredo que a adoção acrescenta ficam só no disco até o dono commitá-las."
+
+  - id: C_TETO_CONTRATO_SEM_DEPENDENCIAS_PYTHON
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    label: "TETO: numa máquina sem PyYAML e jsonschema o kg-contract-check segue saindo rc 2, e a família só mede onde eles existem. O template de CI do adotante passou a instalá-los; a máquina local do adotante não é tocada."
+
+  - id: C_TETO_GO_VENDOR_NAO_MEDIDO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "NÃO MEDIDO: num projeto Go, um vendor/kg-ssot pode ativar o -mod=vendor e quebrar o build, e o go mod vendor pode apagá-lo. Sem go nesta máquina, a hipótese do refutador fica aberta."
+
 edges:
   - from: E_CONTRATO_VIAJA_SEM_LEITOR
     to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
@@ -176,3 +224,18 @@ edges:
   - from: E_R85_R92_SOFT_NAO_PODE_JULGAR
     to: Q_CURAS_DO_PR2
     edge_type: SUPPORTS
+  - from: E_ELENXO_PR1_DOIS_BLOQUEADORES_CURADOS
+    to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
+    edge_type: SUPPORTS
+  - from: C_TETO_VENDOR_PROPRIO_IGNORADO
+    to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
+    edge_type: CONSTRAINS
+  - from: C_TETO_GITIGNORE_DO_USUARIO
+    to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
+    edge_type: CONSTRAINS
+  - from: C_TETO_CONTRATO_SEM_DEPENDENCIAS_PYTHON
+    to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
+    edge_type: CONSTRAINS
+  - from: C_TETO_GO_VENDOR_NAO_MEDIDO
+    to: D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA
+    edge_type: CONSTRAINS

@@ -74,7 +74,7 @@ _from_target_stamp() {  # $1=TARGET → preenche ONION_ROLE/ONION_KIND vazios a 
 # Guarda `behavior-over-declaration` que testa declaração não é guarda.
 if [ "${1:-}" = "--print-manifest" ]; then
   [ -n "${2:-}" ] || { echo "uso: vendor-branch.sh --print-manifest <SOURCE_ROOT> [<TARGET>]" >&2; exit 2; }
-  [ -n "${3:-}" ] && _from_target_stamp "$3"   # o mesmo caminho do `update`, para a bancada medir
+  [ -n "${3:-}" ] && { _from_target_stamp "$3"; export ONION_TARGET="${ONION_TARGET:-$3}"; }   # o mesmo caminho do `update`, para a bancada medir
   _manifest "$2"
   exit 0
 fi
@@ -285,6 +285,7 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   local wt; wt="$(mktemp -d)/onion-vendor-wt"
   git -C "$T" worktree add -q "$wt" "$VENDOR" 2>/dev/null || { echo "ERRO: worktree do $VENDOR falhou." >&2; return 2; }
   _from_target_stamp "$T"
+  export ONION_TARGET="${ONION_TARGET:-$T}"   # o contrato do .kg.yaml que o alvo já tem não é sobrescrito (vendor-manifest.sh)
   local mf; mf="$(_manifest "$SRC")"
   [ -n "$mf" ] || { echo "ERRO: manifest vazio (core sem framework?)." >&2; git -C "$T" worktree remove --force "$wt" 2>/dev/null; return 2; }
   # O sha é resolvido UMA vez: transporte e lista de exigidos saem do MESMO commit (Elenxo: com dois

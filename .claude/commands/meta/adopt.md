@@ -97,7 +97,7 @@ ROLE="<ROLE do STATE.md (adoção, PASSO 0) | TARGET_ROLE (--update)>"   # adopt
 # (a) MANIFESTO (SSOT: `vendor-manifest.sh`) pela função que LÊ o rc do produtor e recusa o vazio —
 #     pathspec ausente é TODOS para o git (2222 arquivos copiados com rc=0, 2026-09-15). NUNCA
 #     `mapfile … < <(…) || ABORTADO`: o `||` lê o rc do mapfile (razão em load-manifest.sh).
-source "$SOURCE_ROOT/.claude/utils/adopt/load-manifest.sh"
+source "$SOURCE_ROOT/.claude/utils/adopt/load-manifest.sh"; export ONION_TARGET="$DEST"   # vendor/kg-ssot PRÓPRIO do alvo não é sobrescrito
 onion_load_manifest "$SOURCE_ROOT" "$ROLE" || exit 1
 
 # (b) Extrair para TMP (git archive = só a árvore TRACKED de HEAD → settings.local.json, sessions/,
@@ -727,7 +727,7 @@ export ONION_ROLE="$TARGET_ROLE"
 TARGET_KIND="$(awk '/^kind:/{print $2; exit}' "$TARGET/.claude/.onion-version")"
 if [ "$TARGET_KIND" = door ]; then export ONION_KIND=door; else export ONION_KIND=adoption; fi
 # Mesma função da cópia segura (o `mapfile … < <(…) || ABORTADO` daqui engolia o rc — ver load-manifest.sh).
-source "$SOURCE_ROOT/.claude/utils/adopt/load-manifest.sh"
+source "$SOURCE_ROOT/.claude/utils/adopt/load-manifest.sh"; export ONION_TARGET="$TARGET"
 onion_load_manifest "$SOURCE_ROOT" "$TARGET_ROLE" || exit 1
 git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.env.example)
 # Delta só com pin VERIFICADO (senão o range mente); a cópia segura abaixo não depende do delta.
