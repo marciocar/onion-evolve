@@ -62,6 +62,10 @@
 # (`bash x.sh`, `source x`, `curl … | bash`), função/alias definidos FORA da string, variável vinda de
 # FORA da string, subprocess de outra linguagem, git/gh chamado por outro programa, `url.*.pushInsteadOf`
 # e config global/de sistema. Lista completa no nó C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE.
+# FUNÇÃO DA STRING (SAC-148, 2026-10-15): a chamada é EMULADA (corpo re-julgado com `$1`/`$@`/`$*` trocados pelos
+# argumentos literais), e `bash -c '<texto>' a0 a1` dá os posicionais ao texto. Não emula: `shift`/`set --` (fecha
+# se o texto tem a forma guardada), `$(…)` dentro do corpo (julgado só na definição), `getopts` e laço sobre
+# os argumentos (`for a in "$@"`), e o ESCOPO de função (definida num subshell, a chamada de fora ainda a vê: erra para vetar).
 # RAMO DE PRODUÇÃO (2026-10-12): `main` sempre, mais `gitflow.branch.master` OU a branch padrão LOCAL dos
 # remotos (`refs/remotes/*/HEAD`), ou `master` sem fonte nenhuma. Não vê: `origin/HEAD` defasado do host
 # (`git remote set-head origin -a` o atualiza), produção com outro nome sem nenhuma das fontes, e o padrão
@@ -183,6 +187,14 @@ GH_SETDEFAULT = [False]          # `gh repo set-default` na string: o repositór
 DEFAULT_RE = re.compile(r"symbolic-ref|origin/HEAD|defaultBranchRef|default_branch|init\.defaultBranch")
 CWD = [None]                     # pilha do diretório julgado; None = a raiz do projeto
 MOAT = False                     # juiz do MOAT por alvo (moat-judge.py), ligado só pelo pretooluse-moat-gate.sh
+# FUNÇÃO DEFINIDA NA PRÓPRIA STRING (SAC-148, 2026-10-15): `run(){ bash -c "$1"; }; run "<comando>"` passava os
+# vetos com rc 0 — o corpo era julgado na DEFINIÇÃO, com `$1` dinâmico, e a CHAMADA era um comando desconhecido
+# com texto inerte como argumento. Agora o corpo é guardado e, a cada chamada, re-julgado com os parâmetros
+# posicionais substituídos pelos argumentos LITERAIS da chamada — a mesma emulação que `bash -c` já tinha para o
+# texto, estendida ao `$1`/`$@`/`$*`. Nome → tokens do corpo, ou None quando o corpo não se lê (`f() ( … )`).
+FUNCS = {}
+CALLS = []                       # pilha das chamadas de função em emulação: o texto que ENTROU pelos argumentos
+POSITIONAL = re.compile(r"\$\{([0-9]+|[@*#])\}|\$([0-9@*#])")
 
 KEYWORDS = {"if", "then", "else", "elif", "fi", "do", "done", "while", "until", "!", "{", "}",
             "case", "esac", "coproc"}
@@ -1086,7 +1098,103 @@ def relevant_tokens(words):
 
 
 # ── análise ────────────────────────────────────────────────────────────────────────────────────
-def analyze(text, depth=0):
+def is_punct(t):
+    return bool(t) and set(t) <= set(";&|()\n")
+
+
+def collect_functions(tokens):
+    """Guarda em FUNCS o corpo de `nome() { … }` e `function nome [()] { … }`; devolve os tokens sem o
+    `nome ()` da definição (o grupo `{ … }` segue julgado como antes, com `$1` dinâmico)."""
+    out, k = [], 0
+    while k < len(tokens):
+        t = tokens[k]
+        name, j = None, None
+        if not is_punct(t) and k + 1 < len(tokens) and tokens[k + 1].replace("\n", "") == "()" \
+                and re.match(r"^[A-Za-z_][A-Za-z0-9_:.-]*$", t) and (not out or is_punct(out[-1])):
+            name, j = t, k + 2
+        elif t == "function" and k + 1 < len(tokens) and not is_punct(tokens[k + 1]):
+            name, j = tokens[k + 1], k + 2
+            if j < len(tokens) and tokens[j].replace("\n", "") == "()":
+                j += 1
+        if name is None:
+            out.append(t); k += 1; continue
+        while j < len(tokens) and tokens[j] == "\n":
+            j += 1
+        if j < len(tokens) and tokens[j] == "{":
+            level, e = 0, j
+            while e < len(tokens):
+                if tokens[e] == "{":
+                    level += 1
+                elif tokens[e] == "}":
+                    level -= 1
+                    if level == 0:
+                        break
+                e += 1
+            if e < len(tokens):
+                FUNCS[name] = tokens[j + 1:e]
+                # o corpo segue julgado NA DEFINIÇÃO (o literal dele veta como antes), mas com os posicionais
+                # VAZIOS: `$1` dinâmico ali é ruído — a chamada é que os conhece, e é emulada. Sem isto, o ponto
+                # opaco (`bash -c "$1"`) julgaria a string inteira e fecharia toda leitura feita por função
+                out.extend(tokens[k:j + 1] if t == "function" else [";", "{"])
+                out.extend(substitute_positional(FUNCS[name], [name]))
+                out.append("}")
+                k = e + 1
+                continue
+            FUNCS[name] = None                          # `{` sem fechar: o corpo não se lê
+        else:
+            FUNCS[name] = None                          # `f() ( … )`, `f() if …`: corpo que não se lê
+        if t == "function":
+            out.append(t); k += 1                       # o ramo `function` de command() segue julgando o corpo
+        else:
+            out.append(";"); k += 2                     # some o `nome ()`; o resto fica
+    return out
+
+
+def substitute_positional(tokens, pos):
+    """`$0`…`$N`, `${N}`, `$@`, `$*`, `$#` pelos argumentos literais da chamada (pos[0] é o `$0`)."""
+    def sub(m):
+        key = m.group(1) or m.group(2)
+        if key in ("@", "*"):
+            return " ".join(pos[1:])
+        if key == "#":
+            return str(len(pos) - 1)
+        n = int(key)
+        return pos[n] if n < len(pos) else ""
+    out = []
+    for t in tokens:
+        if is_punct(t):
+            out.append(t)
+        elif t in ("$@", "${@}"):
+            out.extend(pos[1:])                         # `"$@"`: uma palavra por argumento
+        else:
+            out.append(POSITIONAL.sub(sub, t))
+    return out
+
+
+def call_function(name, words, seg, depth):
+    """Chamada de função da própria string: o corpo re-julgado com os argumentos da chamada."""
+    body = FUNCS.get(name)
+    shifts = body is not None and any(t == "shift" for t in body) or \
+        body is not None and any(t == "set" and k + 1 < len(body) and body[k + 1] == "--" for k, t in enumerate(body))
+    if body is None or shifts:
+        # corpo ilegível, ou que DESLOCA os posicionais (`shift`, `set --`): a substituição não se prova
+        why = "função da própria string com corpo que não se lê" if body is None else "função que desloca os argumentos (shift/set --)"
+        if MOAT:
+            moat_unanalyzable(list(seg) + list(body or []), why)
+        if relevant_tokens(seg) or relevant([" ".join(seg)]):
+            emit_unanalyzable(seg, CWD[-1])
+        if body is None:
+            return
+    if depth + 1 > 4:
+        raise Unanalyzable("função chamada além do teto de aninhamento")
+    CALLS.append(" ".join(words))
+    try:
+        run_tokens(substitute_positional(body, [name] + list(words[1:])), depth + 1)
+    finally:
+        CALLS.pop()
+
+
+def analyze(text, depth=0, pos=None):
     if depth > 4:
         raise Unanalyzable("aninhamento além do teto")
     text = prepass(text)
@@ -1099,6 +1207,15 @@ def analyze(text, depth=0):
         tokens = list(lex)
     except ValueError as e:
         raise Unanalyzable(str(e))
+    tokens = collect_functions(tokens)
+    if pos is not None:
+        tokens = substitute_positional(tokens, pos)     # `bash -c '<texto>' <$0> <$1> …`
+    run_tokens(tokens, depth)
+
+
+def run_tokens(tokens, depth):
+    if depth > 4:
+        raise Unanalyzable("aninhamento além do teto")
     seg, opened, prev_sep, prev_seg, compound = [], 0, ";", None, 0
     for t in tokens + [";"]:
         if t and set(t) <= set(";&|()\n"):
@@ -1125,12 +1242,12 @@ def analyze(text, depth=0):
             seg.append(t)
 
 
-def scoped(text, depth):
+def scoped(text, depth, pos=None):
     """Subshell, substituição e `sh -c` têm escopo PRÓPRIO de diretório."""
     base = len(CWD)
     CWD.append(CWD[-1])
     try:
-        analyze(text, depth)
+        analyze(text, depth, pos)
     finally:
         del CWD[base:]                  # restaura o TAMANHO, nunca `pop` às cegas
 
@@ -1216,7 +1333,7 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
     name = words[0]
     if DYNAMIC.search(name) or re.search(r"\{[^}]*(,|\.\.)[^}]*\}", name):
         if MOAT:
-            moat_unanalyzable(seg, "nome de comando só conhecido em runtime")
+            moat_unanalyzable(seg, "nome de comando só conhecido em runtime", whole=True)
         if name.endswith("/ops/pr-merge-verified.sh"):
             return                                      # o caminho verificado, chamado por $(…)/ops/…
         if relevant_loose(seg):
@@ -1228,6 +1345,9 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
     base = os.path.basename(name)
     if MOAT:
         moat_command(words, raw_words, base, depth, env, piped, stdin_from)
+    if name in FUNCS:
+        call_function(name, words, seg, depth)          # a função da string vence o programa homônimo, como no bash
+        return
     if base == "function" and len(words) >= 2:
         rest = [w for w in words[2:] if w not in ("{", "}")]
         if rest:
@@ -1282,7 +1402,8 @@ def command(seg, depth, cond=False, piped=False, stdin_from=None):
         args = words[1:]
         for k, w in enumerate(args):
             if re.match(r"^-[A-Za-z]*c[A-Za-z]*$", w) and k + 1 < len(args):
-                scoped(args[k + 1], depth + 1)
+                # `bash -c '<texto>' <$0> <$1> …`: os argumentos depois do texto são os posicionais dele
+                scoped(args[k + 1], depth + 1, args[k + 2:] if len(args) > k + 2 else None)
                 return
             if w == "<<<" and k + 1 < len(args):
                 scoped(args[k + 1], depth + 1)

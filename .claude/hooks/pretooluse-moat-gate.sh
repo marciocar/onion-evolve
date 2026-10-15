@@ -22,7 +22,8 @@
 #            escrita em /etc/cron*, /var/spool/cron ou num .timer.
 # O juiz mora em lib/moat-judge.py e roda DENTRO do tokenizador de lib/invocation-lines.sh (linhas de
 # invocação: heredoc inerte, echo e prosa que CITAM o alvo não vetam; `bash -c`, `sudo -u`, `$(…)`,
-# variável literal, `cd`, symlink e script fora do projeto são seguidos).
+# variável literal, `cd`, symlink, script fora do projeto e função definida na própria string — a chamada é
+# emulada com os argumentos dela, SAC-148 — são seguidos).
 #
 # ── O QUE NÃO VETA (fronteira declarada) ─────────────────────────────────────────────────────────────────
 #  · Wrapper versionado: `bash ops/update-kg-writer.sh` (core-only) passa — script RASTREADO pelo git deste
