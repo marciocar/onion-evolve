@@ -9768,7 +9768,7 @@ YML
 run_federation_a2a_selftests() {
   # `local -` + `set +e`: as opções de shell voltam ao retorno da família. Sem isto, sob o `set -euo pipefail`
   # do runner, uma atribuição `x="$(motor ...)"` que falha ABORTA a suíte em vez de reprovar o caso — medido
-  # pelo mutante K2 (privada 0644): a bancada saiu "BANCADA ABORTOU" e 30 casos não rodaram.
+  # pelo mutante K2 (privada 0644): a bancada saiu "BANCADA ABORTOU" e os casos seguintes não rodaram.
   local -; set +e
   local ft="${REPO_ROOT}/.claude/utils/federation-transport"
   # o corte por papel tira o diretório INTEIRO de standalone/plugins/mini: aí a família não tem SUT (⊘ visível);
@@ -9867,6 +9867,14 @@ YML
   rc=0; bash "${keygen}" --member '../x' --dir "${sb}/kbad" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 2 ] && [ ! -d "${sb}/kbad" ]; then record_pass "federation-a2a: keygen recusa member que viraria caminho (../)"
   else record_fail "federation-a2a: keygen member" "rc=${rc}"; fi
+  mkdir -p "${sb}/gitrepo"; git -C "${sb}/gitrepo" init -q 2>/dev/null || true
+  rc=0; err="$(bash "${keygen}" --member acme --dir "${sb}/gitrepo/keys" 2>&1 >/dev/null)" || rc=$?
+  if [ "${rc}" -eq 2 ] && _fa_has "${err}" 'dentro de um repositório git' && [ ! -e "${sb}/gitrepo/keys/acme-1.key.pem" ]; then
+    printf '*.key.pem\n' > "${sb}/gitrepo/.gitignore"
+    rc=0; bash "${keygen}" --member acme --dir "${sb}/gitrepo/keys" >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -eq 0 ]; then record_pass "federation-a2a: keygen recusa privada versionável num repo git, e aceita quando o .gitignore a cobre"
+    else record_fail "federation-a2a: keygen em repo git" "com .gitignore rc=${rc}"; fi
+  else record_fail "federation-a2a: keygen em repo git" "sem .gitignore rc=${rc} err='${err}'"; fi
   cp "${cfg}/acme-1.pem" "${jwks}/acme-1.pem"
 
   # ───────────────────────────────────────── REMETENTE ──────────────────────────────────────
@@ -9929,6 +9937,24 @@ STUB
   if [ "${rc}" -eq 2 ] && _fa_has "${err}" 'credencial embutida'; then record_pass "federation-a2a: URL com credencial embutida → recusa (rc 2)"
   else record_fail "federation-a2a: URL com credencial" "rc=${rc} err='${err}'"; fi
 
+  rm -f "${sb}/curl.argv"
+  rc=0; err="$(PATH="${sb}/stub:${PATH}" HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --from acme --to core-x --body x \
+    --endpoint "http://10.9.9.9/a2a" --token-file "${sb}/token" 2>&1 >/dev/null)" || rc=$?
+  if [ "${rc}" -eq 2 ] && _fa_has "${err}" 'só para loopback' && [ ! -f "${sb}/curl.argv" ]; then
+    record_pass "federation-a2a: endpoint http:// fora do loopback → recusa (o bearer viajaria em claro)"
+  else record_fail "federation-a2a: http fora do loopback" "rc=${rc} err='${err}'"; fi
+  printf 'abc\377\376 def' > "${sb}/body-bad"
+  rc=0; err="$(HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --dry-run --from acme --to core-x --body-file "${sb}/body-bad" 2>&1 >/dev/null)" || rc=$?
+  if [ "${rc}" -eq 2 ] && _fa_has "${err}" 'não é UTF-8 válido'; then record_pass "federation-a2a: corpo que não é UTF-8 válido → recusa (o hash não bateria com o corpo que viaja)"
+  else record_fail "federation-a2a: corpo UTF-8 inválido" "rc=${rc} err='${err}'"; fi
+  rc=0; HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --dry-run --to core-x --body x --from >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then record_pass "federation-a2a: flag sem valor → rc 2 (uso), nunca o rc 1 de recusa do receptor"
+  else record_fail "federation-a2a: flag sem valor" "rc=${rc}"; fi
+  rm -f "${sb}/env-out.json"
+  ( umask 000; HOME="${sb}/home" XDG_CONFIG_HOME= bash "${send}" --dry-run --from acme --to core-x --body x --out "${sb}/env-out.json" >/dev/null 2>&1 ) || true
+  if [ "$(stat -c %a "${sb}/env-out.json" 2>/dev/null)" = 600 ]; then record_pass "federation-a2a: --out grava o envelope (com o corpo) em 0600, mesmo com umask frouxa"
+  else record_fail "federation-a2a: --out 0600" "modo=$(stat -c %a "${sb}/env-out.json" 2>/dev/null || echo ausente)"; fi
+
   # ───────────────────────────────────────── DOCTOR ─────────────────────────────────────────
   ( umask 077; cp "${sb}/token" "${cfg}/bridge-token" )
   printf '{"member":"acme","expires_at":"%s","revoked":false}\n' "$(date -u -d '+1 day' +%FT%TZ)" > "${sb}/invite.json"
@@ -9952,14 +9978,29 @@ STUB
   mv "${cfg}/acme-1.key.pem" "${sb}/acme-1.key.pem.bak"; mv "${cfg}/acme-2.key.pem" "${sb}/acme-2.key.pem.bak"
   _fa_doc --invite "${sb}/invite.json"; _fa_state "sem chave" 1 a falha "chave privada ausente"
   mv "${sb}/acme-1.key.pem.bak" "${cfg}/acme-1.key.pem"; mv "${sb}/acme-2.key.pem.bak" "${cfg}/acme-2.key.pem"
-  _fa_doc --invite "${sb}/invite.json"
-  if [ "${rc}" -eq 0 ] && [ "$(_fa_chk a)" != "" ] && _fa_has "${out}" 'kid acme-1'; then
-    record_pass "federation-a2a: doctor com duas chaves no dir escolhe a única pinada (acme-1)"
+  # escolha do kid: pina SÓ a acme-2, que NÃO é a primeira da ordem (pinar a acme-1 deixava sobreviver o
+  # mutante "pega sempre a primeira" — caso decorativo apontado pelo refutador da F1a)
+  cp "${cfg}/acme-2.pem" "${jwks}/acme-2.pem"
+  _fa_reg '    a2a:
+      sends_to: core-x
+      keys: [acme-2]'
+  _fa_doc
+  if [ "${rc}" -eq 0 ] && _fa_has "${out}" 'kid acme-2'; then
+    record_pass "federation-a2a: doctor com duas chaves no dir escolhe a única pinada (acme-2, não a primeira)"
   else record_fail "federation-a2a: doctor escolha do kid" "rc=${rc} out='${out}'"; fi
+  _fa_reg '    a2a:
+      sends_to: core-x
+      keys: [acme-1, acme-2]'
+  _fa_doc; _fa_state "duas chaves pinadas no dir" 2 a nao-medido "não sei qual é a vigente"
+  rm -f "${jwks}/acme-2.pem"; _fa_reg "${_fa_pinned}"
   chmod 0644 "${cfg}/acme-1.key.pem"; _fa_doc --kid acme-1; _fa_state "privada 0644" 1 b falha "grupo/outros leem a chave"; chmod 0600 "${cfg}/acme-1.key.pem"
   _fa_doc --kid acme-2; _fa_state "kid fora do registro" 1 d falha "NÃO está pinado"
   printf '{"member":"acme","expires_at":"%s","revoked":false}\n' "$(date -u -d '-1 hour' +%FT%TZ)" > "${sb}/inv-old.json"
   _fa_doc --kid acme-1 --invite "${sb}/inv-old.json"; _fa_state "convite vencido" 1 e falha "convite VENCIDO"
+  printf '{"member":"acme","expires_at":"tomorrow","revoked":false}\n' > "${sb}/inv-rel.json"
+  _fa_doc --kid acme-1 --invite "${sb}/inv-rel.json"; _fa_state "convite com data relativa (nunca venceria)" 1 e falha "fora da forma"
+  printf '{"member":"acme","expires_at":99999999999999999999,"revoked":false}\n' > "${sb}/inv-big.json"
+  _fa_doc --kid acme-1 --invite "${sb}/inv-big.json"; _fa_state "convite com epoch gigante" 1 e falha "fora da forma"
   mv "${cfg}/bridge-token" "${sb}/bt.bak"; _fa_doc --kid acme-1; _fa_state "sem token do canal" 1 e falha "token do canal ausente"; mv "${sb}/bt.bak" "${cfg}/bridge-token"
   # relógio sem fonte: PATH só com as ferramentas que o doctor usa, e SEM timedatectl/chronyc/ntpstat
   local nocl="${sb}/bin-noclock" t p; mkdir -p "${nocl}"
@@ -9991,6 +10032,9 @@ STUB
   if [ "${rc}" -eq 0 ] && [ "$(jq '[.checks[]|select(.status!="ok")]|length' <<< "${out}" 2>/dev/null)" = 1 ] && [ "$(_fa_chk c | cut -d'|' -f1)" = ok ]; then
     record_pass "federation-a2a: doctor do receptor saudável com a impressão conferida → rc 0"
   else record_fail "federation-a2a: doctor receptor saudável" "rc=${rc} out='${out}'"; fi
+  rc=0; out="$(A2A_CLOCK_TRUST=attested bash "${doctor}" --side receiver --member acme --members "${reg}" --jwks "${jwks}" 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 0 ] && _fa_has "${out}" 'SEM conferir a impressão'; then record_pass "federation-a2a: receptor sem --fingerprint diz que NÃO conferiu a impressão (rc 0 não é aval de pino)"
+  else record_fail "federation-a2a: receptor sem fingerprint" "rc=${rc} out='${out}'"; fi
   _fa_rcv --fingerprint "sha256:$(printf '0%.0s' $(seq 1 64))"; _fa_state "receptor com impressão divergente" 1 c falha "que o membro mandou"
   _fa_rcv --receiver solo-x; _fa_state "receptor com topologia que não autoriza" 1 t falha "NÃO autoriza"
   mv "${jwks}/acme-1.pem" "${sb}/acme-1.pem.bak"; _fa_rcv; _fa_state "receptor com a pública pinada ausente" 1 d falha "jwks/acme-1.pem ausente"
@@ -10033,6 +10077,12 @@ STUB
   _fa_vbad "sends_to que é porta" '    a2a:
       sends_to: door-x
       keys: [acme-1]' "não é receptor"
+  _fa_vbad "sends_to que não é texto (lista)" '    a2a:
+      sends_to: [core-x]
+      keys: [acme-1]' "tem de ser o id"
+  _fa_vbad "kid repetido no mesmo membro" '    a2a:
+      sends_to: core-x
+      keys: [acme-1, acme-1]' "repetido em a2a.keys"
   _fa_vbad "sends_to fora do registro" '    a2a:
       sends_to: fantasma
       keys: [acme-1]' "não está no registro"

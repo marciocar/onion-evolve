@@ -268,7 +268,7 @@ nodes:
     impact: 3
     confidence: 0.9
     verified_at: "2026-10-15"
-    verified_against: "medido em 2026-10-15 pelo mutante K2 da família federation_a2a: com a privada 0644, a atribuição env=\"$(a2a-send.sh ...)\" saiu rc 2 sob o set -euo pipefail do lint-selftest.sh e a bancada abortou antes da soma (BANCADA ABORTOU), deixando de rodar 30 casos"
+    verified_against: "medido em 2026-10-15 pelo mutante K2 da família federation_a2a: com a privada 0644, a atribuição env=\"$(a2a-send.sh ...)\" saiu rc 2 sob o set -euo pipefail do lint-selftest.sh e a bancada abortou antes da soma (BANCADA ABORTOU), sem rodar os casos seguintes"
     label: "numa família da bancada, toda atribuição de $(...) que pode falhar aborta a suíte sob o set -e do runner; a família do A2A passou a rodar com local - e set +e, e o mutante que a abortava agora só reprova o seu caso"
     provenance:
       source: ".claude/validation/lint-selftest.sh"
@@ -283,8 +283,8 @@ nodes:
     impact: 4
     confidence: 0.85
     verified_at: "2026-10-15"
-    verified_against: "medido em 2026-10-15 na F1a (SAC-122): LC_ALL=C bash .claude/validation/lint-selftest.sh --families federation_a2a sai 42/42, e os 42 mutantes plantados por ops/mutate-and-restore.sh (um por caso) morreram cada um no caso nomeado, com restauração conferida por hash"
-    label: "o keygen, o remetente canônico, o doctor dos dois lados e o bloco a2a do registro estão graduados em .claude/utils/federation-transport/, com a família federation_a2a de 42 casos e um mutante morto por caso"
+    verified_against: "medido em 2026-10-15 na F1a (SAC-122): LC_ALL=C bash .claude/validation/lint-selftest.sh --families federation_a2a sai 53/53, e os 54 mutantes plantados por ops/mutate-and-restore.sh (pelo menos um por caso) morreram cada um no caso nomeado, sem abortar a suíte e com restauração conferida por hash; a passada adversarial achou 14 defeitos reais (nenhum bloqueante), curados na mesma branch"
+    label: "o keygen, o remetente canônico, o doctor dos dois lados e o bloco a2a do registro estão graduados em .claude/utils/federation-transport/, com a família federation_a2a de 53 casos e pelo menos um mutante morto por caso"
     provenance:
       source: ".claude/validation/lint-selftest.sh"
       locator: "run_federation_a2a_selftests; tabela de mutantes no resíduo da REGRA 56 da branch feat/a2a-configurator-f1"

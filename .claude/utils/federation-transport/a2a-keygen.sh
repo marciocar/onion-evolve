@@ -19,18 +19,21 @@
 # Uso: a2a-keygen.sh --member <id> [--n N] [--dir <dir>] [--bits B]
 #   --n     índice da chave (default 1; rotação = N+1, nunca sobrescrever)
 #   --bits  tamanho do módulo RSA (default 3072; mínimo 3072)
-# Exit: 0 = gerado · 2 = uso incorreto, chave já existe, diretório alheio ou ferramenta ausente
+# Recusa também gerar dentro de uma árvore git quando o .gitignore não cobre a privada: um `git add -A`
+# a levaria ao commit (achado do refutador da F1a, 2026-10-15).
+# Exit: 0 = gerado · 2 = uso incorreto, chave já existe, diretório alheio ou versionável, ou ferramenta ausente
 # Exercitado por lint-selftest.sh (run_federation_a2a_selftests).
 # =============================================================================
 set -euo pipefail
 
 MEMBER=""; N="1"; DIR="${XDG_CONFIG_HOME:-${HOME}/.config}/onion/a2a"; BITS="3072"
 die() { echo "a2a-keygen: $*" >&2; exit 2; }
+need() { [ "$#" -ge 2 ] && [ -n "$2" ] || die "$1 exige valor"; }
 while [ "$#" -gt 0 ]; do case "$1" in
-  --member) MEMBER="${2:-}"; shift 2 ;;
-  --n)      N="${2:-}"; shift 2 ;;
-  --dir)    DIR="${2:-}"; shift 2 ;;
-  --bits)   BITS="${2:-}"; shift 2 ;;
+  --member) need "$@"; MEMBER="$2"; shift 2 ;;
+  --n)      need "$@"; N="$2"; shift 2 ;;
+  --dir)    need "$@"; DIR="$2"; shift 2 ;;
+  --bits)   need "$@"; BITS="$2"; shift 2 ;;
   -h|--help) sed -n '2,24p' "$0"; exit 0 ;;
   *) die "argumento desconhecido: $1" ;;
 esac; done
@@ -49,10 +52,15 @@ PRIV="${DIR}/${KID}.key.pem"
 PUB="${DIR}/${KID}.pem"
 
 umask 077
-mkdir -p "${DIR}"
+mkdir -p "${DIR}" 2>/dev/null || die "não consegui criar o diretório ${DIR}"
 # diretório de OUTRA conta: quem o possui troca a chave depois de gerada (o 0700 não protege do dono)
 [ -O "${DIR}" ] || die "o diretório ${DIR} não pertence a esta conta; recuso gerar chave nele"
-chmod 700 "${DIR}"
+chmod 700 "${DIR}" || die "não consegui pôr ${DIR} em 0700"
+# dentro de uma árvore git, a privada só nasce se o .gitignore a cobrir (senão um `git add -A` a commita)
+if command -v git >/dev/null 2>&1 && git -C "${DIR}" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  git -C "${DIR}" check-ignore -q "${PRIV}" 2>/dev/null \
+    || die "${DIR} está dentro de um repositório git e o .gitignore não cobre ${KID}.key.pem; gere fora do repo (o default é ~/.config/onion/a2a)"
+fi
 [ -e "${PRIV}" ] && die "chave privada já existe, recuso sobrescrever: ${PRIV} (rotação = --n $(( N + 1 )))"
 [ -e "${PUB}" ]  && die "chave pública já existe, recuso sobrescrever: ${PUB} (rotação = --n $(( N + 1 )))"
 
