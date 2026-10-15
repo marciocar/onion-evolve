@@ -2,7 +2,8 @@
 branch: feat/judge-overcoming-mechanism
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 583babf6586dbb3378645a7f38e5f97bb003b639d9a497974ac329857b4f9eea
+reviewed_code_sha256: 3d6800247368982b33be522d82b48db3b03e0c0998dc68ba4ce9965e571fe344
 findings_total: 12
 findings_real: 11
 tokens: 175711
