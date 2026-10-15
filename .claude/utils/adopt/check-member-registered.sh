@@ -51,13 +51,19 @@ PY
 }
 
 _target="$(cd "${TARGET}" && pwd -P)"
+# WORKTREE IRMÃ (SAC-144, 2026-10-15): o /meta:adopt --update roda numa worktree irmã do alvo quando há sessão viva
+# lá, e o caminho dela nunca é o `local_path` do registro — saía "NÃO REGISTRADO" em todo update assim (medido no
+# update do onion-curation). O checkout PRINCIPAL do repo do alvo sai do git-common-dir, e casa também.
+_main=""
+_gcd="$(git -C "${_target}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" \
+  && [ "${_gcd##*/}" = .git ] && _main="$(cd "${_gcd%/.git}" 2>/dev/null && pwd -P)"
 _found=""
 while IFS= read -r _lp; do
   [ -n "${_lp}" ] || continue
   _lp="${_lp/#\~/${HOME}}"
   [ -d "${_lp}" ] || continue
   _can="$(cd "${_lp}" 2>/dev/null && pwd -P)" || continue
-  [ "${_can}" = "${_target}" ] && { _found=1; break; }
+  { [ "${_can}" = "${_target}" ] || { [ -n "${_main}" ] && [ "${_can}" = "${_main}" ]; }; } && { _found=1; break; }
 done < <(_local_paths "${MEMBERS}")
 
 if [ -n "${_found}" ]; then
