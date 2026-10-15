@@ -2,7 +2,8 @@
 branch: chore/pin-onion-curation-6687f0d5
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d9dfaa39d8713fe9f8c404f6e5d4615bfec0710ab210c14bea83d7415de2e074
+reviewed_code_sha256: 19a4c40fd26c4085a22561054e7c9ca56805822345e501262b9eb2b4555e5aec
 findings_total: 0
 findings_real: 0
 tokens: 0
