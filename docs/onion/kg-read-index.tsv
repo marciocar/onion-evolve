@@ -356,6 +356,7 @@
 .claude/utils/task-manager/interface.md	D_FORMATO_TSV_IRMAO_DO_ADAPTER	docs/evolution/research/guard-task-manager-capabilities-2026-10/task-manager-capabilities-2026-10.kg.yaml
 .claude/utils/task-manager/interface.md	D_LEITURA_DE_PONTOS_E_CAPACIDADE_PROPRIA	docs/evolution/research/task-progress-story-points-2026-10/task-progress-story-points-2026-10.kg.yaml
 .claude/utils/task-manager/interface.md	D_TASK_MANAGER_INTERFACE_WAVE2	docs/evolution/research/task-manager-vocabulario-2026-10/task-manager-vocabulario-2026-10.kg.yaml
+.claude/utils/task-manager/interface.md	Q_ADAPTER_DECLARA_PONTO_DE_COBRANCA	docs/evolution/research/machinery-enforcement-2026-10/machinery-enforcement-2026-10.kg.yaml
 .claude/utils/task-manager/progress.sh	C_TETO_STATUS_BINARIO_POR_SUBTASK	docs/evolution/research/task-progress-story-points-2026-10/task-progress-story-points-2026-10.kg.yaml
 .claude/utils/task-manager/progress.sh	D_MIXED_CAI_NA_CONTAGEM	docs/evolution/research/task-progress-story-points-2026-10/task-progress-story-points-2026-10.kg.yaml
 .claude/utils/task-manager/progress.sh	D_PROGRESS_E_DERIVACAO_COM_HELPER	docs/evolution/research/task-progress-story-points-2026-10/task-progress-story-points-2026-10.kg.yaml
@@ -591,6 +592,7 @@
 .claude/validation/resolve-production-branch.sh	SY5_branch_roles_second_resolver	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/validation/review-artifact-check.sh	E_O_VERDICT_GANHOU_VOCABULARIO_MAS_NAO_VERIFICACAO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/validation/review-artifact-check.sh	E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/validation/review-artifact-check.sh	Q_VETOS_REFUTADOS_COM_GATILHO	docs/evolution/research/machinery-enforcement-2026-10/machinery-enforcement-2026-10.kg.yaml
 .claude/validation/review-ledger.sh	E_A_REGUA_QUE_FALTAVA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/rules-registry.sh	D_TAG_OBRIGATORIO	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/validation/rules-registry.sh	E_OBJECAO_DRIFT_DO_ONION_E_DOCSTRING_VS_CORPO	docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml
