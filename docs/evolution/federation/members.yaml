@@ -741,7 +741,7 @@ members:
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-curation (privado)
     local_path: /home/marcio/onion-curation
-    onion_version: 85e93bba1609   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-15)
+    onion_version: 7a50fc145203   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-15)
     adopted_at: 2026-10-06
     mode: greenfield
     personality_summary: "Nasceu do pedido do maestro por um estudo profundo que disseca plataformas, aplicativos, sites, perfis, ideias, repositórios, ferramentas, arquiteturas, tecnologias, métodos, funcionalidades, concorrentes, modelos e negócios como CURADORIA para o Onion Evolve. Aqui se disseca e se PROPÕE (absorver | costurar | parquear | rejeitar, com evidência); a palavra final é do core, com a lente de Aristóteles, e a proposta sobe pelo inbox."
