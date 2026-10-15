@@ -547,6 +547,7 @@
 .claude/validation/lint-selftest.sh	E_BANCADA_MORREU_CALADA_POR_SET_E	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_BANCADA_NAO_CONTAVA_PARA_NINGUEM	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_CASA_MEDIDA_ORDEM_E_CORPUS_1001	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
+.claude/validation/lint-selftest.sh	E_CONSOLO_PASSA_NO_MAIN_MEDIDO	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_CORTE_POR_PAPEL_MEDIDO_0915	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_CURA_BANCADA_DOS_VETOS	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_CURE_REPRODUCED_AND_FIXED	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
@@ -573,6 +574,7 @@
 .claude/validation/lint-selftest.sh	E_minha_guarda_deu_fail_open	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_reproduction_3_tries	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_skeleton_vazio_reprova	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
+.claude/validation/lint-selftest.sh	Q_CONSOLO_INVISIVEL_A_FORMA	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	Q_FAMILIA_POR_ARQUIVO	docs/evolution/research/selftest-family-merge-2026-10/selftest-family-merge-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	Q_PRECOMMIT_SELECAO_POR_CASO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/lint-selftest.sh	Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml

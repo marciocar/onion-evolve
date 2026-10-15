@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**510 itens abertos** em 107 grafo(s) com aberto (de 136 no escopo) · 108 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**500 itens abertos** em 106 grafo(s) com aberto (de 135 no escopo) · 107 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -481,22 +481,6 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## adopter-shape-bench-2026-10 — 11 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 21.6 | `D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA` | adopter-shape-bench-2026-10 | O fechamento leva vendor/kg-ssot INTEIRO (316 arquivos, 1,9 MB) para todo papel menos o mini, e não um recorte de tools/ e spec/: |
-| 20.4 | `D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR` | adopter-shape-bench-2026-10 | Substrato: família de bancada (adopter_shape) com um materializador core-only (ops/materialize-adopter.sh). Molde: door_mini com  |
-| 6.4 | `Q_CURAS_DO_PR2` | adopter-shape-bench-2026-10 | Aberto para o PR 2 da SAC-149: aplicabilidade por papel declarada no rules-registry (as REGRAS 85 e 92 saem 'não se aplica'); a R |
-| 5.1 | `C_TETO_CONTRATO_SEM_DEPENDENCIAS_PYTHON` | adopter-shape-bench-2026-10 | TETO: numa máquina sem PyYAML e jsonschema o kg-contract-check segue saindo rc 2, e a família só mede onde eles existem. O temp |
-| 5.1 | `C_TETO_SO_O_PAPEL_ADOPTED` | adopter-shape-bench-2026-10 | TETO: a família mede o papel adopted, o mais comum. hub e standalone cortam diferente (o standalone perde adoção e federação) |
-| 4.8 | `C_TETO_DETECTOR_E_LEXICAL` | adopter-shape-bench-2026-10 | TETO: o detector de 'não pude julgar' é LEXICAL (uma lista de frases) e só vê dependência citada pelo CAMINHO ou pelo nome do |
-| 4.8 | `C_TETO_PASSOS_COPIADOS_DO_ADOPT` | adopter-shape-bench-2026-10 | TETO: o materializador copia os passos DETERMINÍSTICOS do adopt.md, numa lista dele. Passo novo no procedimento (que é markdown) |
-| 3.2 | `C_TETO_GITIGNORE_DO_USUARIO` | adopter-shape-bench-2026-10 | TETO: um .gitignore local que o usuário nunca commitou entra INTEIRO no commit da adoção, com as linhas dele; e no .gitignore j |
-| 3.0 | `C_TETO_GO_VENDOR_NAO_MEDIDO` | adopter-shape-bench-2026-10 | NÃO MEDIDO: num projeto Go, um vendor/kg-ssot pode ativar o -mod=vendor e quebrar o build, e o go mod vendor pode apagá-lo. Sem  |
-| 2.8 | `C_TETO_BUNDLE_DE_PLUGIN` | adopter-shape-bench-2026-10 | TETO: o bundle de plugin (onion.manifest.sh) também leva o kg-contract-check.sh e não leva vendor/kg-ssot. Lá o selador do /met |
-| 2.8 | `C_TETO_VENDOR_PROPRIO_IGNORADO` | adopter-shape-bench-2026-10 | TETO: um vendor/kg-ssot PRÓPRIO do alvo e ignorado de propósito também seria forçado no commit da adoção. Nenhum adotante me |
-
 ## guardas-revisao-2026-08 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -817,13 +801,14 @@
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
 
-## onion-doctrine-elenxo-bulbo-2026-07 — 4 item(ns)
+## onion-doctrine-elenxo-bulbo-2026-07 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.7 | `D_QUADRO_CITACOES` | onion-doctrine-elenxo-bulbo-2026-07 | quadro de citacoes do maestro NASCEU (gated): as formulacoes recorrentes dele, atribuidas+datadas (verbatim vs parafrase marcado)  |
 | 6.4 | `Q_BYTECODE_SEM_TESTE` | onion-doctrine-elenxo-bulbo-2026-07 | O QUE A SUPERACAO AINDA NAO COBRE: bytecode que nenhum teste confere — instrucao em prosa de comando que a VM obedece sem verifi |
 | 4.8 | `Q_RADAR_WIDGET_PARALLEL_FORMULA` | onion-doctrine-elenxo-bulbo-2026-07 | o RadarWidget de /maquinaria/ (site) DUPLICA a tabela de statusFactor do kg-radar.sh (conferida fator a fator na revisao adversari |
+| 4.2 | `Q_CONSOLO_INVISIVEL_A_FORMA` | onion-doctrine-elenxo-bulbo-2026-07 | O QUE A MÁQUINA AINDA NÃO VÊ: status quo rotulado de superação, condição futura em prosa, o_que que só parafraseia o objet |
 | 1.6 | `Q_BULBO_DIAGRAM` | onion-doctrine-elenxo-bulbo-2026-07 | um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZ |
 
 ## gtm-decisions-2026-07 — 4 item(ns)

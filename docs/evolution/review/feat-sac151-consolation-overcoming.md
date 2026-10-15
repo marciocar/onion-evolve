@@ -2,7 +2,8 @@
 branch: feat/sac151-consolation-overcoming
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a986b1895c1a2b41de154c8edafd3711996e0f2c2b2153c2a075a0be634e4a2e
+reviewed_code_sha256: 7f759deba574c8ea8daae6afc64a3d429b021d75b797c48ce9dd51bf02ac389f
 findings_total: 9
 findings_real: 9
 tokens: 163259
