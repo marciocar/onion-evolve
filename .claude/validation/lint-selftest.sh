@@ -10821,7 +10821,9 @@ run_review_artifact_selftests() {
   # (p) (MUT) sem a checagem de enum, o texto livre PASSA. Sem esta mutação, (n) poderia estar
   #     reprovando por qualquer outro motivo do helper — guarda que nunca rejeitou é vacuidade.
   local mutv; mutv="$(mktemp -d)"; cp "${helper}" "${mutv}/m.sh"
-  sed -i 's/^if \[ "${_VERD_OK}" -ne 1 \]; then/if false; then/' "${mutv}/m.sh"
+  # a âncora acompanha a forma do helper: desde 2026-10-15 (SAC-142) a checagem chama _verdict_ok, a função que
+  # o modo --schema também usa (fonte única do enum)
+  sed -i 's/^if ! _verdict_ok "${_VERD}"; then/if false; then/' "${mutv}/m.sh"
   if grep -q 'if false; then' "${mutv}/m.sh"; then
     _mk_pr_repo
     _art "${d}" "$(_sha_of "${d}")" 1 "FRASE-INTEIRA-NO-SLOT-DA-SERIE"
@@ -32421,6 +32423,63 @@ run_preflight_shadow_selftests() {
   rm -rf "${s}"
 }
 _family run_preflight_shadow_selftests
+
+# Modo residue-schema — o ESQUEMA do resíduo da REGRA 56 tem fonte única (o validador) e é cobrado ANTES do pré-voo
+# (SAC-142, decisão do maestro de 2026-10-15). Medido de 10-05 a 10-15: 12 resíduos nasceram fora do esquema,
+# escritos à mão por falta de gerador, e o pr-finalize só os achava no fim. Os casos exercitam o validador e o
+# pr-finalize REAIS; o pré-voo é de mentira e só registra se rodou.
+run_residue_schema_selftests() {
+  local v="${REPO_ROOT}/.claude/validation/review-artifact-check.sh" pf="${REPO_ROOT}/ops/pr-finalize.sh"
+  [ -f "${v}" ] || { record_fail "residue-schema" "validador ausente: ${v}"; return; }
+  local d out rc; d="$(mktemp -d)"
+  # (a) o esqueleto NÃO passa no esquema enquanto não for preenchido (campo vazio não vira resíduo válido)
+  bash "${v}" --skeleton feat/x > "${d}/sk.md" 2>/dev/null || true
+  rc=0; out="$(bash "${v}" --schema "${d}/sk.md" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'findings_total tem de ser número' <<< "${out}" && grep -q "verdict 'PREENCHA'" <<< "${out}"; then
+    record_pass "residue-schema: (a) o esqueleto cru reprova no esquema, nomeando os campos a preencher"
+  else record_fail "residue-schema: (a) esqueleto cru" "rc=${rc} out=[${out}]"; fi
+  # (b) preenchido (só os valores, sem mexer no resto), passa — e todo campo do enum vem do validador
+  sed 's/^findings_total: PREENCHA/findings_total: 2/;s/^findings_real: PREENCHA/findings_real: 1/;s/^findings_fixed: PREENCHA/findings_fixed: 1/;s/^tokens: PREENCHA/tokens: 0/;s/^duration_min: PREENCHA/duration_min: 0/;s/^verdict: PREENCHA/verdict: REPROVADO_E_CURADO/;s/^elenxo: PREENCHA/elenxo: sim/;s/^reviewer: PREENCHA/reviewer: x/' "${d}/sk.md" > "${d}/ok.md"
+  rc=0; out="$(bash "${v}" --schema "${d}/ok.md" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "residue-schema: (b) o esqueleto preenchido passa no esquema"
+  else record_fail "residue-schema: (b) preenchido" "rc=${rc} out=[${out}]"; fi
+  # (c) os três defeitos medidos no histórico, um por vez: verdict fora do enum, numérico ausente, código 'pendente'
+  sed 's/^verdict: .*/verdict: CONFORME/' "${d}/ok.md" > "${d}/c1.md"
+  sed '/^tokens:/d' "${d}/ok.md" > "${d}/c2.md"
+  sed '/^reviewed_diff_sha256:/a reviewed_code_sha256: pendente' "${d}/ok.md" > "${d}/c3.md"
+  local bad=""
+  bash "${v}" --schema "${d}/c1.md" >/dev/null 2>&1 && bad="${bad} verdict"
+  bash "${v}" --schema "${d}/c2.md" >/dev/null 2>&1 && bad="${bad} tokens"
+  bash "${v}" --schema "${d}/c3.md" >/dev/null 2>&1 && bad="${bad} code-pendente"
+  if [ -z "${bad}" ]; then record_pass "residue-schema: (c) verdict fora do enum, tokens ausente e reviewed_code_sha256 'pendente' reprovam"
+  else record_fail "residue-schema: (c) defeitos do histórico" "passaram:${bad}"; fi
+  # (d) FONTE ÚNICA: o enum que o julgamento do PR usa é o mesmo que o esquema usa (uma definição no arquivo)
+  if [ "$(grep -c '^VERDICT_ENUM=' "${v}")" = 1 ] && [ "$(grep -c '^NUMERIC_FIELDS=' "${v}")" = 1 ] \
+     && grep -q 'for f in ${NUMERIC_FIELDS}; do' "${v}" && grep -q '_verdict_ok "${_VERD}"' "${v}"; then
+    record_pass "residue-schema: (d) o julgamento do PR e o esquema leem as MESMAS constantes (uma definição)"
+  else record_fail "residue-schema: (d) fonte única" "VERDICT_ENUM/NUMERIC_FIELDS definidos mais de uma vez ou não usados pelo julgamento"; fi
+  # (e)/(f) o pr-finalize REAL: sem resíduo gera o esqueleto e para; fora do esquema para — os dois ANTES do pré-voo
+  if [ -f "${pf}" ]; then
+    local s="${d}/pf"; mkdir -p "${s}/ops/testing" "${s}/.claude/validation"
+    cp "${v}" "${s}/.claude/validation/review-artifact-check.sh"
+    printf '#!/bin/bash\n[ "$1" = --families-only ] && { echo fam_x; exit 0; }\necho PREFLIGHT >> "%s/pre.log"\n' "${s}" > "${s}/ops/testing/preflight-run.sh"
+    git -C "${s}" init -q -b main && git -C "${s}" add -A && git -C "${s}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1 \
+      && git -C "${s}" switch -q -c feat/x
+    ( cd "${s}" && GH_CONFIG_DIR="${s}/nogh" bash "${pf}" > "${s}/o1" 2>&1 ) || true
+    if [ -f "${s}/docs/evolution/review/feat-x.md" ] && grep -q 'esqueleto foi gerado' "${s}/o1" && [ ! -f "${s}/pre.log" ] \
+       && { out="$(bash "${v}" --schema "${s}/docs/evolution/review/feat-x.md" 2>&1)" || true; grep -q 'tem de ser número' <<< "${out}"; }; then
+      record_pass "residue-schema: (e) pr-finalize sem resíduo: gera o esqueleto pelo validador e para antes do pré-voo"
+    else record_fail "residue-schema: (e) esqueleto no pr-finalize" "$( { tail -3 "${s}/o1"; ls "${s}/pre.log" 2>/dev/null; } | tr '\n' '|' | cut -c1-240)"; fi
+    # mkdir: sem o passo 0 (o mutante) o diretório não existe, e o redirecionamento abortaria a suíte sob set -e
+    mkdir -p "${s}/docs/evolution/review"; sed 's/^verdict: .*/verdict: CONFORME/' "${d}/ok.md" > "${s}/docs/evolution/review/feat-x.md"
+    ( cd "${s}" && GH_CONFIG_DIR="${s}/nogh" bash "${pf}" > "${s}/o2" 2>&1 ) || true
+    if grep -q 'fora do esquema' "${s}/o2" && grep -q "verdict 'CONFORME'" "${s}/o2" && [ ! -f "${s}/pre.log" ]; then
+      record_pass "residue-schema: (f) pr-finalize com resíduo fora do esquema: para em ms, antes do pré-voo"
+    else record_fail "residue-schema: (f) esquema no pr-finalize" "$( { tail -3 "${s}/o2"; ls "${s}/pre.log" 2>/dev/null; } | tr '\n' '|' | cut -c1-240)"; fi
+  else record_skip "residue-schema: (e)(f) ops/ ausente (adotante) → pulado"; fi
+  rm -rf "${d}"
+}
+_family run_residue_schema_selftests
 
 run_shard_plan_selftests() {
   local sut="${REPO_ROOT}/ops/testing/selftest-shard-plan.sh"

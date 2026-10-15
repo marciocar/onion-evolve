@@ -1,0 +1,93 @@
+meta:
+  id: machinery-enforcement-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: "2026-10-15"
+  review_after: "2026-11-15"
+  note: "SAC-142: como a maquinaria cobra o próprio uso (executar, não interpretar). Estudo só de leitura antes de forjar; a cobrança fica na saída e no transporte, não na leitura."
+
+nodes:
+  - id: E_RESIDUO_SEM_GERADOR_NASCE_FORA_DO_ESQUEMA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    label: "De 2026-10-05 a 2026-10-15, 12 resíduos da REGRA 56 nasceram fora do esquema, todos achados só no fim do pr-finalize: não havia gerador, e o /engineer:pr mandava a sessão escrever o arquivo."
+    narrative: "Medido por um analista (subagente opus, só leitura) em 3.177 transcrições do core: 129 criações por Write e 50 por heredoc no Bash depois de 10-05; 28 e 8 delas fora do esquema ao nascer. Nenhum episódio chegou ao CI. O caso de 2026-10-15 custou 3 min 51 s, e desde o #1130 cada um custa o pré-voo inteiro."
+    verified_at: "2026-10-15"
+    verified_against: "saídas do validador nas transcrições do core, de 2026-10-05 a 2026-10-15"
+    provenance:
+      source: "transcrições das sessões do core e .claude/validation/review-artifact-check.sh@origin/main"
+      locator: "9 episódios de reviewed_code_sha256 'pendente' (10-07 a 10-12) e 3 de verdict ou campo ausente"
+      method: "medição: extração por script das escritas e das reprovações do validador"
+      locality: "repo"
+
+  - id: E_VETO_EM_WRITE_REFUTADO_PELA_MEDICAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    label: "Um veto na criação à mão por Write teria sido 100% falso positivo no resíduo (sem gerador), não veria o caso de 2026-10-15 (veio por heredoc no Bash) e barraria 41 grafos novos legítimos."
+    narrative: "Mesmo estudo. O veto no gh pr create evitaria cerca de 1 em 205 PRs: a assinatura já é mecanismo (attribution do settings), a base acertou 205 de 205 e o resíduo já é cobrado pela REGRA 56. O gatilho na leitura da prosa também não teria disparado: a sessão leu o /engineer:pr 12 min depois de escrever o resíduo, e 93% das leituras sem invocação foram por Bash."
+    verified_at: "2026-10-15"
+    verified_against: "310 PRs do core no forge (2026-09-11 a 2026-10-15) e 583 leituras de prosa de comando/skill nas transcrições"
+    provenance:
+      source: "gh pr list (marciocar/onion-evolve) e transcrições das sessões do core"
+      locator: "205 PRs depois do #923; 199 leituras sem invocação em até 3 h"
+      method: "medição: contagem por script sobre o forge e as transcrições"
+      locality: "web"
+
+  - id: Q_ADAPTER_DECLARA_PONTO_DE_COBRANCA
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "Parte D da SAC-142: cada raiz SDAAL (achada pela interface.md) declara, para cada adapter, onde ele é cobrado (exe, hook, validator ou none com motivo e gatilho), com lint HARD e lista derivada do filesystem."
+    narrative: "Hoje só o task-manager declara contrato legível por máquina; trust (4 adapters) e de-identification (3) não têm cobrança nenhuma, e o forge não cobra a criação de PR. Nasce com none: declarado e catraca. Falso positivo medido: 2 de 15 arquivos em adapters/ não são adapters (clickup-operacao.md, linear-leitura-completa.md), mais o none.md — precisa de marcador explícito de auxiliar."
+    trace: ".claude/utils/task-manager/interface.md"
+
+  - id: Q_VETOS_REFUTADOS_COM_GATILHO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    label: "O veto na criação de resíduo fora do gerador, o veto no gh pr create e o gatilho na leitura da prosa ficam sem forjar, cada um com gatilho nomeado."
+    narrative: "Gatilhos: (1) um resíduo criado à mão reprovar de novo depois do --skeleton existir; (2) um PR com base errada ou sem resíduo chegar ao CI; (3) um caso medido de prosa lida e refeita à mão com dano, que o validador do artefato não pegaria."
+    trace: ".claude/validation/review-artifact-check.sh"
+  - id: D_COBRAR_NA_SAIDA_E_NO_TRANSPORTE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "decisão do maestro em 2026-10-15, por pergunta com opções (/meta:decide): escolhida «A agora + D em seguida»"
+    label: "A maquinaria cobra o próprio uso na SAÍDA e no TRANSPORTE, não na leitura: o resíduo nasce do validador (--skeleton) e é conferido antes do pré-voo; cada adapter declara onde é cobrado"
+    narrative: "Selado por /meta:decide em 2026-10-15: escolhida «A agora + D em seguida»; descartadas: «Só A» · «A + D + veto só do resíduo»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-15: «SAC-142: o estudo derrubou o veto geral em Write. O que eu faço?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-15"
+      locality: "pessoa"
+
+edges:
+  - from: Q_ADAPTER_DECLARA_PONTO_DE_COBRANCA
+    to: D_COBRAR_NA_SAIDA_E_NO_TRANSPORTE
+    edge_type: CONSTRAINS
+  - from: E_RESIDUO_SEM_GERADOR_NASCE_FORA_DO_ESQUEMA
+    to: E_VETO_EM_WRITE_REFUTADO_PELA_MEDICAO
+    edge_type: SUPPORTS
+  - from: E_VETO_EM_WRITE_REFUTADO_PELA_MEDICAO
+    to: Q_VETOS_REFUTADOS_COM_GATILHO
+    edge_type: SUPPORTS
+  - from: E_VETO_EM_WRITE_REFUTADO_PELA_MEDICAO
+    to: Q_ADAPTER_DECLARA_PONTO_DE_COBRANCA
+    edge_type: SUPPORTS
+  - from: D_COBRAR_NA_SAIDA_E_NO_TRANSPORTE
+    to: E_RESIDUO_SEM_GERADOR_NASCE_FORA_DO_ESQUEMA
+    edge_type: TRACES_TO

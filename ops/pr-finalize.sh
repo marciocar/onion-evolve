@@ -294,6 +294,22 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
   git add -- "${RES}"
 }
 
+# 0a. O ESQUEMA DO RESÍDUO, antes de qualquer passo caro (SAC-142, decisão do maestro de 2026-10-15). Medido de
+#     10-05 a 10-15: 12 resíduos nasceram fora do esquema, todos achados só no FIM desta rodada; desde o pré-voo
+#     sempre (SAC-141) cada um passou a custar o pré-voo inteiro (3 min 51 s no caso de 2026-10-15). Sem resíduo:
+#     o esqueleto sai do PRÓPRIO validador (`--skeleton`, as mesmas constantes que julgam o PR) e a rodada para
+#     para ele ser preenchido. Com resíduo: `--schema` confere o frontmatter em milissegundos.
+if [ -f .claude/validation/review-artifact-check.sh ]; then
+  if [ ! -f "${RES}" ]; then
+    [ "${CHECK}" = 1 ] && die "resíduo ausente: ${RES} — gere com 'bash .claude/validation/review-artifact-check.sh --skeleton > ${RES}' e preencha (o --check não escreve)"
+    mkdir -p "$(dirname "${RES}")" && bash .claude/validation/review-artifact-check.sh --skeleton "${BR}" > "${RES}" \
+      || die "não consegui gerar o esqueleto do resíduo em ${RES}"
+    die "resíduo ausente: o esqueleto foi gerado em ${RES} pelo validador. Preencha a passada adversarial (REGRA 56) e rode de novo."
+  fi
+  _sch="$(bash .claude/validation/review-artifact-check.sh --schema "${RES}" 2>&1)" \
+    || { printf '%s\n' "${_sch}" >&2; die "o resíduo está fora do esquema — corrija e rode de novo (nada rodou ainda: nem pré-voo, nem lint)"; }
+fi
+
 # 0. PRÉ-VOO (2026-10-07; SEMPRE desde 2026-10-15, SAC-141, D_PRE_VOO_SEMPRE_E_SOMBRA): roda as famílias que o
 #    diff ALTEROU por dentro (+ a catraca estática `| grep -q`) num ambiente que IMITA o runner — o corpo vive em
 #    ops/testing/preflight-run.sh, que o pre-push também chama. Até 2026-10-15 ele só rodava sob

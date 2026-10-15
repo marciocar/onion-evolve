@@ -122,6 +122,18 @@ Siga estes passos para criar o PR:
    `findings_total`/`real`/`fixed`, `tokens`, `duration_min`, e o `elenxo: sim` que **passa a ser
    verdadeiro por construção** — antes deste passo ele era declarado antes de a passada existir.
 
+   **O resíduo nasce do gerador, nunca à mão** (SAC-142, 2026-10-15: 12 resíduos escritos à mão em 10 dias
+   nasceram fora do esquema). Execute, preencha os campos e confira:
+
+   ```bash
+   R="docs/evolution/review/$(git branch --show-current | tr / -).md"
+   bash .claude/validation/review-artifact-check.sh --skeleton > "$R"   # o esquema sai do validador
+   bash .claude/validation/review-artifact-check.sh --schema "$R"       # ✅ antes de fechar
+   ```
+
+   No core, o fechamento do PR cobra o mesmo no 1º passo: sem resíduo, gera o esqueleto e para; fora do
+   esquema, para antes do pré-voo.
+
 8. **Aguardar feedback do code review automatizado**: leia comentários via
    `forge.getReviewComments({ number: pr.number })` e confirme CI com `forge.getPRStatus(...)`.
    ⚠️ **Verde do revisor não é revisão:** ele pode sair verde por **soft-pass** (dependência externa

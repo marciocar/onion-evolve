@@ -29,9 +29,63 @@
 # PROPOSTO, não enquanto é feito. Logo: só cobra quando existe PR aberto para o branch.
 #
 # Uso  : bash .claude/validation/review-artifact-check.sh [<repo_root>] [--format tsv]
+#        bash .claude/validation/review-artifact-check.sh --skeleton [<branch>]   → o ESQUELETO do resíduo (stdout)
+#        bash .claude/validation/review-artifact-check.sh --schema <arquivo>     → só o frontmatter, em ms
 # Saída: relatório humano (default) ou TSV (severidade·tag·path·mensagem)
 # Exit : 0 = artefato presente e casando, ou fora de escopo · 1 = falta/caducou · 2 = uso inválido
+#
+# ═══ O ESQUEMA MORA AQUI, E SÓ AQUI (SAC-142, decisão do maestro de 2026-10-15) ═══
+# Medido de 10-05 a 10-15: 12 resíduos nasceram fora do esquema (verdict fora do vocabulário, campo numérico
+# ausente, `reviewed_code_sha256: pendente`), todos escritos à mão porque NÃO HAVIA gerador — o /engineer:pr
+# mandava a sessão escrever o arquivo, e os campos só existiam em prosa e aqui dentro. O pr-finalize os achava
+# no FIM, depois do pré-voo (3 min 51 s no caso de 2026-10-15). Agora o esqueleto (`--skeleton`) e a conferência
+# rápida (`--schema`) leem as MESMAS constantes que o julgamento do PR: o esquema muda num lugar só.
 set -euo pipefail
+
+VERDICT_ENUM="APROVADO CORRIGIDO REPROVADO REPROVADO_E_CURADO SEM_ACHADOS"
+NUMERIC_FIELDS="findings_total findings_real tokens duration_min"
+
+_field_of() {  # $1=arquivo $2=campo — só o frontmatter, sem aspas
+  awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' "$1" | sed -n "s/^$2:[[:space:]]*//p" | head -1 | tr -d '"'
+}
+_verdict_ok() {  # caixa e separador tolerados, palavra inteira
+  local v; v="$(printf '%s' "$1" | tr 'a-z' 'A-Z' | tr '-' '_')"
+  for _v in ${VERDICT_ENUM}; do [ "${v}" = "${_v}" ] && return 0; done; return 1
+}
+_schema_problems() {  # $1=arquivo → uma linha por problema; vazio = o frontmatter cabe no esquema
+  local f="$1" v
+  [ "$(head -1 "${f}")" = "---" ] || { echo "sem frontmatter (a 1ª linha tem de ser ---)"; return 0; }
+  v="$(_field_of "${f}" reviewed_diff_sha256)"
+  case "${v}" in pendente) ;; *) grep -qE '^[0-9a-f]{64}$' <<< "${v}" || echo "reviewed_diff_sha256 tem de ser 'pendente' (revisão nova) ou o hash de 64 hex, não '${v}'" ;; esac
+  v="$(_field_of "${f}" reviewed_code_sha256)"
+  [ -z "${v}" ] || grep -qE '^[0-9a-f]{64}$' <<< "${v}" || echo "reviewed_code_sha256 só existe carimbado (64 hex) — apague a linha, o pr-finalize a escreve ('${v}')"
+  for v in ${NUMERIC_FIELDS}; do
+    case "$(_field_of "${f}" "${v}")" in ''|*[!0-9]*) echo "${v} tem de ser número (0 = não medido, e diga isso em 'nota:')" ;; esac
+  done
+  v="$(_field_of "${f}" verdict)"
+  _verdict_ok "${v}" || echo "verdict '${v}' fora do vocabulário fechado (${VERDICT_ENUM})"
+  return 0
+}
+
+case "${1:-}" in
+  --skeleton)
+    _br="${2:-$(git rev-parse --abbrev-ref HEAD 2>/dev/null)}"
+    printf -- '---\nbranch: %s\npr: pendente\ndate: %s\nreviewed_diff_sha256: pendente\n' "${_br}" "$(date +%F)"
+    for _f in ${NUMERIC_FIELDS} findings_fixed; do printf '%s: PREENCHA\n' "${_f}"; done
+    # a orientação vai no CORPO: comentário na linha do campo vira parte do valor quando se preenche só o começo
+    printf 'verdict: PREENCHA\nelenxo: PREENCHA\nreviewer: PREENCHA\nnota: ""\n---\n\n'
+    printf '# Passada adversarial: `%s`\n\n' "${_br}"
+    printf '> Preencha o frontmatter: os campos numéricos são números (0 = não medido, dito em `nota:`); `verdict` é um\n'
+    printf '> de: %s; `elenxo` é sim ou nao. `reviewed_diff_sha256: pendente` fica: o pr-finalize carimba.\n' "${VERDICT_ENUM}"
+    printf '> Confira com `bash .claude/validation/review-artifact-check.sh --schema <este arquivo>`. Apague este bloco.\n\n'
+    printf '## O que muda\n\n## Achados\n\n## Mutantes\n\n## Limites declarados\n'
+    exit 0 ;;
+  --schema)
+    [ -f "${2:-}" ] || { printf 'review-artifact-check: --schema <arquivo> (não achei "%s")\n' "${2:-}" >&2; exit 2; }
+    _p="$(_schema_problems "$2")"
+    if [ -n "${_p}" ]; then printf '  ✗ ESQUEMA %s:\n' "$2"; printf '%s\n' "${_p}" | sed 's/^/    · /'; exit 1; fi
+    printf '  ✅ esquema do resíduo conforme: %s\n' "$2"; exit 0 ;;
+esac
 
 REPO_ROOT="$(cd "${1:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)" || {
   printf 'review-artifact-check: repo_root inválido\n' >&2; exit 2; }
@@ -204,7 +258,7 @@ fi
 # reavaliada se os dados existirem. Sem eles, no 10º PR eu repetiria o erro que este ciclo cura —
 # declarar "medido" sem ledger. São exigidos, não sugeridos.
 FALTAM=""
-for f in findings_total findings_real tokens duration_min; do
+for f in ${NUMERIC_FIELDS}; do
   v="$(_field "${f}")"
   case "${v}" in ''|*[!0-9]*) FALTAM="${FALTAM}${FALTAM:+, }${f}(nao-numerico)" ;; esac
 done
@@ -243,11 +297,8 @@ fi
 # corpus, com hífen, enquanto `APROVADO_APOS_CORRECAO` usava underscore. A grafia mista é do
 # histórico real desta casa — reprovar por `-` vs `_` seria inventar um defeito. A normalização
 # só casa a PALAVRA INTEIRA: `CORRIGIDO-E-RE-REVISADO` continua fora do vocabulário, como deve.
-VERDICT_ENUM="APROVADO CORRIGIDO REPROVADO REPROVADO_E_CURADO SEM_ACHADOS"
 _VERD="$(_field verdict | tr 'a-z' 'A-Z' | tr '-' '_')"
-_VERD_OK=0
-for _v in ${VERDICT_ENUM}; do [ "${_VERD}" = "${_v}" ] && _VERD_OK=1; done
-if [ "${_VERD_OK}" -ne 1 ]; then
+if ! _verdict_ok "${_VERD}"; then
   _out HARD VERDICT-FORA-DO-VOCABULARIO "${ART}" "verdict: '${_VERD}' nao esta no vocabulario fechado (${VERDICT_ENUM}). Selado em 2026-09-08 porque 262 residuos produziram 72 formas distintas e o campo deixou de sustentar serie. Se o que voce quer dizer nao cabe num dos cinco, o lugar e o campo livre 'nota:' — o veredito continua sendo um dos cinco. REPROVADO_E_CURADO existe para o caso 'a revisao reprovou e a cura entrou neste mesmo PR'."
   exit 1
 fi
