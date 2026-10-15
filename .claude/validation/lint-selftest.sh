@@ -32481,6 +32481,57 @@ run_residue_schema_selftests() {
 }
 _family run_residue_schema_selftests
 
+# Modo merge-hooks-prune — o merger poda o hook que o CORE APOSENTOU (SAC-145, 2026-10-15). Medido no 1º update
+# depois do #1129: o vendor apagou o script do Stop aposentado, a entrada ficou no settings.json do adotante e todo
+# Stop deu rc 127, com o relatório dizendo "0 removidos". O SUT é o merger REAL; fonte e alvo são diretórios
+# .claude/ de verdade, porque a poda decide pela EXISTÊNCIA do script nos dois lados.
+run_merge_hooks_prune_selftests() {
+  local m="${REPO_ROOT}/.claude/utils/adopt/merge-onion-hooks.sh"
+  [ -f "${m}" ] || { record_fail "merge-hooks-prune" "merger ausente: ${m}"; return; }
+  command -v jq >/dev/null 2>&1 || { record_skip "merge-hooks-prune: jq ausente (SUT não exercido)"; return; }
+  local d out err rc; d="$(mktemp -d)"
+  mkdir -p "${d}/src/.claude/hooks" "${d}/tgt/.claude/hooks"
+  printf '#!/bin/bash\n' > "${d}/src/.claude/hooks/vivo.sh"; cp "${d}/src/.claude/hooks/vivo.sh" "${d}/tgt/.claude/hooks/vivo.sh"
+  printf '#!/bin/bash\n' > "${d}/tgt/.claude/hooks/meu.sh"      # hook PRÓPRIO do alvo, com script
+  printf '#!/bin/bash\n' > "${d}/tgt/.claude/hooks/guardado.sh" # forma do Onion, mas o alvo manteve o script
+  printf '{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"bash \\"$CLAUDE_PROJECT_DIR/.claude/hooks/vivo.sh\\""}]}]}}\n' > "${d}/src/.claude/settings.json"
+  # alvo: o vivo, o APOSENTADO (forma do Onion, script ausente nos dois lados), o próprio, o morto de outra forma
+  # (script ausente, mas não é a forma do Onion), e o guardado (forma do Onion com script no alvo)
+  cat > "${d}/tgt/.claude/settings.json" <<'JSON'
+{"hooks":{
+ "Stop":[{"hooks":[{"type":"command","command":"bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/vivo.sh\""}]},
+         {"hooks":[{"type":"command","command":"bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/aposentado.sh\""}]},
+         {"hooks":[{"type":"command","command":"bash .claude/hooks/meu.sh"}]}],
+ "SessionEnd":[{"hooks":[{"type":"command","command":"python3 .claude/hooks/sumiu.py --x"},
+                         {"type":"command","command":"bash .claude/hooks/guardado.sh"}]}]}}
+JSON
+  err="${d}/err"; rc=0
+  out="$(bash "${m}" "${d}/src/.claude/settings.json" "${d}/tgt/.claude/settings.json" 2>"${err}")" || rc=$?
+  local cmds; cmds="$(jq -r '[.hooks[][]?.hooks[]?.command] | join("|")' <<< "${out}" 2>/dev/null)" || cmds=""
+  # (a) o aposentado SAI, e o stderr diz que podou
+  if [ "${rc}" -eq 0 ] && [[ "${cmds}" != *aposentado.sh* ]] && grep -q 'PODADO: hook aposentado' "${err}"; then
+    record_pass "merge-hooks-prune: (a) hook da forma do Onion com script ausente na fonte e no alvo é podado, e o stderr diz"
+  else record_fail "merge-hooks-prune: (a) poda" "rc=${rc} cmds=[${cmds}] err=[$(tr '\n' '|' < "${err}")]"; fi
+  # (b) o que é do alvo FICA: o próprio com script, e o da forma do Onion cujo script o alvo manteve
+  if [[ "${cmds}" == *"bash .claude/hooks/meu.sh"* ]] && [[ "${cmds}" == *"bash .claude/hooks/guardado.sh"* ]] && [[ "${cmds}" == *vivo.sh* ]]; then
+    record_pass "merge-hooks-prune: (b) hook próprio do alvo e hook com script presente ficam"
+  else record_fail "merge-hooks-prune: (b) never-clobber" "cmds=[${cmds}]"; fi
+  # (c) morto de OUTRA forma: não é do Onion → fica, com AVISO (quem decide é o alvo)
+  if [[ "${cmds}" == *"python3 .claude/hooks/sumiu.py --x"* ]] && grep -q 'AVISO: hook do alvo aponta para script ausente (sumiu.py)' "${err}"; then
+    record_pass "merge-hooks-prune: (c) entrada morta fora da forma do Onion fica, com aviso"
+  else record_fail "merge-hooks-prune: (c) aviso" "cmds=[${cmds}] err=[$(tr '\n' '|' < "${err}")]"; fi
+  # (d) o diff do relatório CONTA a poda, e a 2ª passada é no-op
+  printf '%s\n' "${out}" > "${d}/after.json"
+  local dl; dl="$(bash "${m}" --diff "${d}/tgt/.claude/settings.json" "${d}/after.json" 2>/dev/null | tail -1)" || dl=""
+  cp "${d}/after.json" "${d}/tgt/.claude/settings.json"
+  local again; again="$(bash "${m}" "${d}/src/.claude/settings.json" "${d}/tgt/.claude/settings.json" 2>/dev/null)" || again=""
+  if [[ "${dl}" == *"1 removido(s)"* ]] && [ "$(jq -S . <<< "${again}")" = "$(jq -S . "${d}/after.json")" ]; then
+    record_pass "merge-hooks-prune: (d) o --diff do relatório conta 1 removido, e re-merjar não muda nada"
+  else record_fail "merge-hooks-prune: (d) relatório/idempotência" "diff=[${dl}]"; fi
+  rm -rf "${d}"
+}
+_family run_merge_hooks_prune_selftests
+
 run_shard_plan_selftests() {
   local sut="${REPO_ROOT}/ops/testing/selftest-shard-plan.sh"
   if [ ! -f "${sut}" ]; then record_skip "shard-plan: o SUT nao existe (${sut})"; return; fi
