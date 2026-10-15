@@ -9,7 +9,7 @@ tags:
   - a2a
   - wizard
   - forge
-version: "1.1.0"
+version: "1.2.0"
 updated: "2026-10-15"
 related_commands:
   - /meta:federation-member
@@ -25,6 +25,12 @@ Leva o core e um membro da chave ao sinal aceito e à revogação, com o operado
 em vez de digitar shell. Cada trilha **explica o passo**, mostra o **dry-run** antes de qualquer escrita
 e termina no **doctor**. A doutrina inteira (as 9 cláusulas e o que o comando NÃO promete) vive em
 [`common:prompts:federation-a2a-doctrine`](../common/prompts/federation-a2a-doctrine.md). **Referencie, não copie.**
+
+**Manual para os três leitores** (operador do core, operador do hub e membro que entra), com o porquê de
+cada trilha e a saída real do doctor e dos motores em cada erro: o manual da rede A2A, publicado no
+repositório público do core em
+<https://github.com/marciocar/onion-evolve/blob/main/docs/applying/onion-a2a-manual.md>. Ele não viaja
+com este comando; o resumo que o operador precisa para conduzir está aqui mesmo, nas trilhas abaixo.
 
 **Por que existe:** pedido do maestro em 2026-10-14 (configurador completo, em wizard), forjado pelo
 `/meta:forge` em 2026-10-15 (F1 do programa, SAC-122). Plano, spike e decisões no grafo do programa,
@@ -230,6 +236,7 @@ que casa algo real).
 ## 🔗 Referências
 
 - Doutrina (peça 2): [`common:prompts:federation-a2a-doctrine`](../common/prompts/federation-a2a-doctrine.md)
+- Manual publicado (três leitores, saída real de cada erro): <https://github.com/marciocar/onion-evolve/blob/main/docs/applying/onion-a2a-manual.md>
 - Motores: `.claude/utils/federation-transport/a2a-keygen.sh`, `a2a-send.sh`, `a2a-doctor.sh` (medidor
   da peça 3), `a2a-invite.sh` (o convite por membro), `a2a-verify.sh` (o gate) e `a2a-accept.sh` (o aceite)
 - Registro: `/meta:federation-member` e `.claude/validation/members-validate.sh`
