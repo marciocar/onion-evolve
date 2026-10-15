@@ -259,6 +259,7 @@
 .claude/utils/adopt/vendor-branch.sh	Q_VENDOR_ENTRELACADO_COM_PRODUTO	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	A_ROLE_DECORATIVO_NO_TRANSPORTE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
+.claude/utils/adopt/vendor-manifest.sh	D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA	docs/evolution/research/adopter-shape-bench-2026-10/adopter-shape-bench-2026-10.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	D_LIMPAR_BASELINES_NO_PROXIMO_UPDATE	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	E_ADOPT_JA_E_ALLOWLIST_MEDIDO	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	E_A_COBERTURA_FALTAVA_ONDE_MAIS_IMPORTAVA	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
@@ -539,6 +540,7 @@
 .claude/validation/lint-selftest.sh	C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	C_offline_csp	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	D_PROVA_MUTACAO_COBRA_AS_TRES_CONDICOES	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
+.claude/validation/lint-selftest.sh	D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR	docs/evolution/research/adopter-shape-bench-2026-10/adopter-shape-bench-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	D_TRAP_QUE_GRITA_QUANDO_A_SUITE_MORRE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_36_selftests	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_A_RECORRENCIA_ESTAVA_NOMEADA_E_SEM_CURA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml

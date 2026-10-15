@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**499 itens abertos** em 106 grafo(s) com aberto (de 135 no escopo) · 107 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**507 itens abertos** em 107 grafo(s) com aberto (de 136 no escopo) · 108 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -130,14 +130,11 @@
 | 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
 | 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
 
-## a2a-configurator-2026-10 — 4 item(ns)
+## a2a-configurator-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 66.0 | `Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL` | a2a-configurator-2026-10 | um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do |
-| 9.0 | `D_N2_SEPARAR_A_ESCRITA_DO_CHAT_DA_CONFIANCA_DO_A2A` | a2a-configurator-2026-10 | como separar o agente do /chat dos insumos de confiança do A2A no clone servido (JWKS, members.yaml, estado de jti, fila)? Mudan |
-| 4.8 | `C_A8_SO_A_PARTE_DETERMINISTICA_RODOU` | a2a-configurator-2026-10 | do A8 e do A8g, rodou em sandbox o caminho de produção (fila → aceite → doc do inbox → sessão headless): 0 canário vazad |
-| 2.8 | `Q_ESTADO_DE_JTI_SO_CRESCE` | a2a-configurator-2026-10 | o estado de jti precisa de poda? Gatilho: o arquivo de estado de um receptor passar de 1 MiB ou 10 mil linhas (hoje 220 bytes) |
 
 ## infra-vps-2026-10 — 7 item(ns)
 
@@ -480,6 +477,22 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
+
+## adopter-shape-bench-2026-10 — 11 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 21.6 | `D_FECHAMENTO_LEVA_A_RELEASE_INTEIRA` | adopter-shape-bench-2026-10 | O fechamento leva vendor/kg-ssot INTEIRO (316 arquivos, 1,9 MB) para todo papel menos o mini, e não um recorte de tools/ e spec/: |
+| 20.4 | `D_SUBSTRATO_FAMILIA_COM_MATERIALIZADOR` | adopter-shape-bench-2026-10 | Substrato: família de bancada (adopter_shape) com um materializador core-only (ops/materialize-adopter.sh). Molde: door_mini com  |
+| 6.4 | `Q_CURAS_DO_PR2` | adopter-shape-bench-2026-10 | Aberto para o PR 2 da SAC-149: aplicabilidade por papel declarada no rules-registry (as REGRAS 85 e 92 saem 'não se aplica'); a R |
+| 5.1 | `C_TETO_CONTRATO_SEM_DEPENDENCIAS_PYTHON` | adopter-shape-bench-2026-10 | TETO: numa máquina sem PyYAML e jsonschema o kg-contract-check segue saindo rc 2, e a família só mede onde eles existem. O temp |
+| 5.1 | `C_TETO_SO_O_PAPEL_ADOPTED` | adopter-shape-bench-2026-10 | TETO: a família mede o papel adopted, o mais comum. hub e standalone cortam diferente (o standalone perde adoção e federação) |
+| 4.8 | `C_TETO_DETECTOR_E_LEXICAL` | adopter-shape-bench-2026-10 | TETO: o detector de 'não pude julgar' é LEXICAL (uma lista de frases) e só vê dependência citada pelo CAMINHO ou pelo nome do |
+| 4.8 | `C_TETO_PASSOS_COPIADOS_DO_ADOPT` | adopter-shape-bench-2026-10 | TETO: o materializador copia os passos DETERMINÍSTICOS do adopt.md, numa lista dele. Passo novo no procedimento (que é markdown) |
+| 3.2 | `C_TETO_GITIGNORE_DO_USUARIO` | adopter-shape-bench-2026-10 | TETO: um .gitignore local que o usuário nunca commitou entra INTEIRO no commit da adoção, com as linhas dele; e no .gitignore j |
+| 3.0 | `C_TETO_GO_VENDOR_NAO_MEDIDO` | adopter-shape-bench-2026-10 | NÃO MEDIDO: num projeto Go, um vendor/kg-ssot pode ativar o -mod=vendor e quebrar o build, e o go mod vendor pode apagá-lo. Sem  |
+| 2.8 | `C_TETO_BUNDLE_DE_PLUGIN` | adopter-shape-bench-2026-10 | TETO: o bundle de plugin (onion.manifest.sh) também leva o kg-contract-check.sh e não leva vendor/kg-ssot. Lá o selador do /met |
+| 2.8 | `C_TETO_VENDOR_PROPRIO_IGNORADO` | adopter-shape-bench-2026-10 | TETO: um vendor/kg-ssot PRÓPRIO do alvo e ignorado de propósito também seria forçado no commit da adoção. Nenhum adotante me |
 
 ## guardas-revisao-2026-08 — 4 item(ns)
 
