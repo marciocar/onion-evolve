@@ -34177,7 +34177,7 @@ run_background_task_probe_selftests() {
   _bgp_launch() { printf '{"type":"user","message":{"role":"user","content":[{"type":"tool_result","content":"Command running in background with ID: %s. Output is being written to: %s/%s.output. You will be notified when it completes."}]},"toolUseResult":{"stdout":"","backgroundTaskId":"%s"}}\n' "$1" "${tk}" "$1" "$1"; }
   _bgp_notify() { printf '{"type":"user","message":{"role":"user","content":"<task-notification>\\n<task-id>%s</task-id>\\n<tool-use-id>toolu_x</tool-use-id>\\n<output-file>%s/%s.output</output-file>\\n<status>completed</status>\\n<summary>Background command done</summary>\\n</task-notification>"}}\n' "$1" "${tk}" "$1"; }
   # sob `set -e` da bancada: rc capturado por `|| rc=$?`, nunca `cmd; rc=$?` (aborta a suite)
-  _bgp_run() { rc=0; out="$(printf '{"transcript_path":"%s","hook_event_name":"UserPromptSubmit","prompt":"x"}' "$1" | LC_ALL=C bash "${sut}" 2>&1)" || rc=$?
+  _bgp_run() { rc=0; out="$(printf '{"transcript_path":"%s","hook_event_name":"UserPromptSubmit","prompt":"x"}' "$1" | BG_PROBE_STATE_DIR="${d}/state" LC_ALL=C bash "${sut}" 2>&1)" || rc=$?
     ctx="$(jq -r '.hookSpecificOutput.additionalContext // empty' <<< "${out}" 2>/dev/null)" || ctx=""; }
   _bgp_line() { awk -v id="tarefa $1:" 'index($0, id) {print; f=1} END {exit !f}' <<< "${ctx}"; }
 
@@ -34187,33 +34187,57 @@ run_background_task_probe_selftests() {
   if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then record_pass "bg-probe: (e) sem tarefa, saida vazia e exit 0"
   else record_fail "bg-probe: (e) silencio" "rc=${rc} saida=[${out}]"; fi
 
-  # processos reais: (a) sleep vivo; (b) cat preso num FIFO com escritor aberto (pipe_read);
-  # (c) sleep vivo MAS notificado; (d) .output sem ninguem; (f) .output de tarefa parada por TaskStop
+  # processos reais: (a) sleep vivo; (b) cat preso num FIFO com escritor aberto;
+  # (c) sleep vivo MAS notificado; (d) .output sem ninguem; (f) .output de tarefa parada por TaskStop;
+  # (j) sleep com saida parada (wchan de TIMER, fora de qualquer lista de leitura); (k) laco ocupado com
+  #     saida parada (CPU andando)
+  local pj pk
   sleep 300 > "${tk}/bgpaaaa.output" 2>&1 & pa=$!
+  sleep 300 > "${tk}/bgpjjjj.output" 2>&1 & pj=$!
+  sh -c 'while :; do :; done' > "${tk}/bgpkkkk.output" 2>&1 & pk=$!
   mkfifo "${fifo}"; exec 8<>"${fifo}"
   cat "${fifo}" > "${tk}/bgpbbbb.output" 2>&1 & pb=$!
   sleep 300 > "${tk}/bgpcccc.output" 2>&1 & pc=$!
   : > "${tk}/bgpdddd.output"; : > "${tk}/bgpffff.output"; : > "${tk}/bgphhhh.output"
   for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
-    [ "$(cat "/proc/${pb}/wchan" 2>/dev/null)" = "pipe_read" ] && break; sleep 0.1
+    case "$(cat "/proc/${pb}/wchan" 2>/dev/null)" in *pipe*) break ;; esac; sleep 0.1
   done
-  touch -d '30 minutes ago' "${tk}/bgpbbbb.output" "${tk}/bgpdddd.output"
-  { for i in bgpaaaa bgpbbbb bgpcccc bgpdddd bgpffff; do _bgp_launch "${i}"; done
+  touch -d '30 minutes ago' "${tk}/bgpbbbb.output" "${tk}/bgpdddd.output" "${tk}/bgpjjjj.output" "${tk}/bgpkkkk.output"
+  { for i in bgpaaaa bgpbbbb bgpcccc bgpdddd bgpffff bgpjjjj bgpkkkk; do _bgp_launch "${i}"; done
     _bgp_notify bgpcccc
     printf '{"type":"user","message":{"role":"user","content":[{"type":"tool_result","content":"{\\"message\\":\\"Successfully stopped task: bgpffff (sleep 1)\\"}"}]}}\n'
     # (h) lancamento CITADO numa saida de ferramenta (um grep sobre outro transcript): a chave
     #     harness-only sai escapada e nao pode virar tarefa (fantasma medido no 2o dogfood)
     printf '{"type":"user","message":{"role":"user","content":[{"type":"tool_result","content":"Output is being written to: %s/bgphhhh.output. {\\"backgroundTaskId\\":\\"bgphhhh\\"}"}]}}\n' "${tk}"
   } > "${tp}"
+  # 1a medicao: sem amostra anterior nao ha SUSPEITO (o progresso ainda nao foi medido)
   _bgp_run "${tp}"
-  local la lb
+  local la lb lj lk
+  lb="$(_bgp_line bgpbbbb)" || lb=""
+  if [ "${rc}" -eq 0 ] && [[ "${lb}" == *"ainda não medido"* ]] && [[ "${ctx}" != *SUSPEITO* ]]; then
+    record_pass "bg-probe: (l) 1a medicao nao marca SUSPEITO (sem amostra anterior de CPU)"
+  else record_fail "bg-probe: (l) 1a medicao" "rc=${rc} ctx=[${ctx}]"; fi
+  # envelhece a amostra guardada em 120 s (o intervalo entre duas mensagens) e mede de novo
+  awk -F'\t' 'BEGIN{OFS="\t"} { split($2,a," "); print $1, a[1]" "a[2]" "(a[3]-120) }' \
+    "${d}/state/${sid}.tsv" > "${d}/state/x" 2>/dev/null && mv -f "${d}/state/x" "${d}/state/${sid}.tsv"
+  sleep 0.3
+  _bgp_run "${tp}"
   la="$(_bgp_line bgpaaaa)" || la=""; lb="$(_bgp_line bgpbbbb)" || lb=""
+  lj="$(_bgp_line bgpjjjj)" || lj=""; lk="$(_bgp_line bgpkkkk)" || lk=""
   if [ "${rc}" -eq 0 ] && [[ "${la}" == *"PID ${pa} "* ]] && [[ "${la}" != *SUSPEITO* ]]; then
     record_pass "bg-probe: (a) sleep vivo: linha com o PID de quem escreve o .output e sem SUSPEITO"
   else record_fail "bg-probe: (a) PID" "rc=${rc} esperado PID ${pa}; linha=[${la}] ctx=[${ctx}]"; fi
-  if [[ "${lb}" == *"PID ${pb} "* ]] && [[ "${lb}" == *pipe_read* ]] && [[ "${lb}" == *SUSPEITO* ]]; then
-    record_pass "bg-probe: (b) leitor de FIFO parado ha 30 min, CPU ~0 → SUSPEITO"
+  if [[ "${lb}" == *"PID ${pb} "* ]] && [[ "${lb}" == *SUSPEITO* ]]; then
+    record_pass "bg-probe: (b) leitor de FIFO com saida parada ha 30 min e CPU sem andar → SUSPEITO"
   else record_fail "bg-probe: (b) SUSPEITO" "linha=[${lb}]"; fi
+  # (j) nenhum NOME de kernel decide: um sleep (wchan de timer) parado tambem e SUSPEITO
+  if [[ "${lj}" == *"PID ${pj} "* ]] && [[ "${lj}" == *SUSPEITO* ]]; then
+    record_pass "bg-probe: (j) SUSPEITO nao depende do wchan (sleep parado, fora de qualquer lista de leitura)"
+  else record_fail "bg-probe: (j) sem lista de nomes" "linha=[${lj}]"; fi
+  # (k) CPU andando com saida parada nao e SUSPEITO (trabalhando sem imprimir)
+  if [[ "${lk}" == *"PID ${pk} "* ]] && [[ "${lk}" == *"CPU andou"* ]] && [[ "${lk}" != *SUSPEITO* ]]; then
+    record_pass "bg-probe: (k) laco ocupado com saida parada: CPU andou, sem SUSPEITO"
+  else record_fail "bg-probe: (k) CPU andando" "linha=[${lk}]"; fi
   if [ -n "${ctx}" ] && ! _bgp_line bgpcccc >/dev/null; then
     record_pass "bg-probe: (c) tarefa com notificacao de termino nao aparece (mesmo com processo vivo)"
   else record_fail "bg-probe: (c) notificada" "ctx=[${ctx}]"; fi
@@ -34243,17 +34267,10 @@ run_background_task_probe_selftests() {
     record_pass "bg-probe: (g) sem exit nao-zero nem leitura de .env no SUT"
   else record_fail "bg-probe: (g) contrato" "a sonda tem exit nao-zero ou le .env"; fi
 
-  kill "${pa}" "${pb}" "${pc}" 2>/dev/null || true; wait "${pa}" "${pb}" "${pc}" 2>/dev/null || true
+  kill "${pa}" "${pb}" "${pc}" "${pj}" "${pk}" 2>/dev/null || true; wait "${pa}" "${pb}" "${pc}" "${pj}" "${pk}" 2>/dev/null || true
   exec 8>&-
   unset -f _bgp_launch _bgp_notify _bgp_run _bgp_line
   rm -rf "${d}"
-  # (j) o wchan da espera em pipe muda com o kernel: `pipe_read` (6.8) e `anon_pipe_read` (o runner do CI, medido no
-  #     1º CI do #1129). Os dois têm de contar como espera em LEITURA, sem depender de qual kernel roda a bancada.
-  local _rw
-  _rw="$(sed -n "s/^READ_WCHAN='\(.*\)'$/\1/p" "${REPO_ROOT}/.claude/hooks/background-task-probe.sh")"
-  if [ -n "${_rw}" ] && [[ "pipe_read" =~ ${_rw} ]] && [[ "anon_pipe_read" =~ ${_rw} ]] && ! [[ "do_wait" =~ ${_rw} ]]; then
-    record_pass "bg-probe: (j) espera em pipe conta nos dois kernels (pipe_read e anon_pipe_read), do_wait não"
-  else record_fail "bg-probe: (j) wchan por kernel" "READ_WCHAN=[${_rw}] não casa pipe_read e anon_pipe_read, ou casa do_wait"; fi
 }
 _family run_background_task_probe_selftests
 

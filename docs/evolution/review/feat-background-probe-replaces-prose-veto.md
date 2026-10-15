@@ -2,8 +2,7 @@
 branch: feat/background-probe-replaces-prose-veto
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: 6fb7f34d21992176f24d94f0fc6f4e4b1bb315d32f4bc1f24f5b0d1810629dc4
-reviewed_code_sha256: 60c50c3a875c6941cd28bd5022fa91e78c5be84ec8b55cbb9d0dac07b8b63eee
+reviewed_diff_sha256: pendente
 findings_total: 5
 findings_real: 5
 findings_fixed: 5
@@ -108,3 +107,26 @@ runner. Real, curado: a família do pipe aceita o prefixo `anon_`, com o porquê
 o padrão case os dois nomes e não case `do_wait`, sem depender do kernel que roda a bancada; mutante sem o `anon_`
 reprova o (j). É a mesma classe de lista (o vocabulário do kernel), contida aqui porque o conjunto de esperas de
 leitura é pequeno e o caso com processo real a cobre em cada runner.
+
+## Rodada 2: a última lista sai (decisão do maestro, 2026-10-15)
+
+A cura da rodada 1 contia a classe, não a superava: o próximo kernel que renomear a espera quebra o SUSPEITO
+de novo. O maestro escolheu tirar a lista (`D_SONDA_JULGA_PROGRESSO_MEDIDO_NAO_NOME_DE_KERNEL`, selado pelo
+`kg-decide-seal.sh` no `guard-forge-2026-10`, com o teto do grafo subido +1 e o motivo na linha 2).
+
+- **Critério novo:** SUSPEITO = saída parada há ≥ 10 min **e** nenhum tique de CPU (soma dos escritores) desde
+  a medição anterior, feita há ≥ 60 s. A sonda guarda `id pid_folha cpu epoch` por tarefa em
+  `$XDG_RUNTIME_DIR/onion-bg-probe-<uid>/<sessão>.tsv` (diretório 0700, escrita atômica) e só reescreve
+  quando a CPU ou a folha mudam. Sem medição anterior: "progresso ainda não medido". O wchan fica só como dado.
+- **Casos:** (l) 1ª medição nunca é SUSPEITO; (b) FIFO real vira SUSPEITO na 2ª medição, em qualquer kernel;
+  (j) `sleep` parado (wchan de timer, fora de qualquer lista) vira SUSPEITO, provando que nenhum nome decide;
+  (k) laço ocupado com saída parada: "CPU andou", sem SUSPEITO. A bancada envelhece a amostra guardada em
+  120 s em vez de esperar.
+- **Mutantes (reprovam):** M1 sem comparar a CPU → (k); M2 de volta ao wchan de leitura → (j); M3 julgando
+  já na 1ª medição → (l).
+- **Dogfood na sessão real** (tarefa `sleep 600` de fundo): 1ª medição "ainda não medido"; com a saída
+  envelhecida e a amostra 2 min atrás, SUSPEITO. **Achado do dogfood, curado:** wrapper `bash` e `sleep`
+  nasceram no mesmo tique (`starttime` igual), e a folha ficava com o wrapper; agora o empate vai para o PID
+  maior (o filho). Sem caso de bancada: o empate de jiffy não é reproduzível de forma determinística, declarado.
+- **Teto novo, declarado:** espera legítima (`sleep`, rede lenta) e processo que redireciona a própria saída
+  também marcam SUSPEITO. Por isso o rótulo diz "sem progresso medido" e a sonda continua sem vetar.

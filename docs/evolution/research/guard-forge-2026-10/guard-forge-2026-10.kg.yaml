@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 12 NÓS ═══ (+1 em 2026-10-14: D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA, o selo do maestro que aposenta o veto sobre a prosa)
+# ═══ TETO: 13 NÓS ═══ (+1 em 2026-10-14: D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA, o selo do maestro que aposenta o veto sobre a prosa; +1 em 2026-10-15: D_SONDA_JULGA_PROGRESSO_MEDIDO_NAO_NOME_DE_KERNEL, o selo que tira da sonda a última lista de nomes)
 # ⚠️ SUBIDO DE 8 PARA 11 em 2026-10-02, e a razão importa porque ontem eu quase subi um teto pelo
 # motivo ERRADO: no `fios-abertos` o teto acusou uma violação de FRONTEIRA (fato no lugar do
 # compromisso) e subi-lo teria consertado o número mantendo a doença. AQUI é diferente e verificável:
@@ -189,6 +189,22 @@ nodes:
       locator: "pergunta com opções de 2026-10-14: «Guarda de estado de fundo: 17 de 20 vetos reais sobre afirmação certa, 0 no defeito de origem, SAC-138 com 6 de 6 falsos; o que fazer?»"
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-14"
       locality: "pessoa"
+  - id: D_SONDA_JULGA_PROGRESSO_MEDIDO_NAO_NOME_DE_KERNEL
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-15"
+    verified_against: "decisão do maestro em 2026-10-15, por pergunta com opções (/meta:decide): escolhida «Trocar a lista por progresso medido»"
+    label: "O SUSPEITO da sonda de fundo julga progresso MEDIDO (saída parada e CPU sem andar entre duas medições), nunca nome de wchan do kernel"
+    narrative: "Selado por /meta:decide em 2026-10-15: escolhida «Trocar a lista por progresso medido»; descartadas: «Mergear com a lista ampliada (anon_)» · «Tirar o rótulo SUSPEITO»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-15: «A sonda (SAC-140) acertou o essencial no CI, mas o rótulo SUSPEITO dependia de uma lista de nomes do kernel (wchan), que muda entre versões. Como fecho?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-15"
+      locality: "pessoa"
 
 edges:
   - from: E_BANCADA_VERDE_COM_ARTEFATO_INUTIL
@@ -227,3 +243,6 @@ edges:
   - from: D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA
     to: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
     edge_type: SUPERSEDES
+  - from: D_SONDA_JULGA_PROGRESSO_MEDIDO_NAO_NOME_DE_KERNEL
+    to: D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA
+    edge_type: TRACES_TO

@@ -24,8 +24,14 @@
 #      (o processo herda o stdout que o harness redirecionou). O PID mostrado é o MAIS NOVO entre os
 #      escritores (a folha: o wrapper `bash` fica em do_wait, quem trava é o filho).
 #   4. uma linha por tarefa: id, PID, etime, CPU (fração da vida da folha), minutos desde a última
-#      escrita no .output, estado/wchan. SUSPEITO = saída parada há ≥ STALE_MIN min E CPU ~0 (< 1% da
-#      vida) E a folha esperando em LEITURA (wchan da lista READ_WCHAN). Tarefa sem processo e sem
+#      escrita no .output, estado/wchan. SUSPEITO = saída parada há ≥ STALE_MIN min E NENHUM tique de CPU
+#      (soma de todos os escritores) desde a medição anterior, feita há ≥ MIN_GAP_S. A sonda guarda
+#      `id pid_folha cpu epoch` por tarefa num arquivo da sessão (STATE_DIR) e só o reescreve quando a CPU
+#      ou a folha mudam: o epoch guardado é "a última vez que vi progresso". Nenhum NOME de kernel decide
+#      (decisão do maestro de 2026-10-15): a 1ª versão exigia o wchan numa lista de leitura, e o 1º CI do
+#      #1129 mostrou que o nome muda com o kernel (`pipe_read` aqui, `anon_pipe_read` no runner) — a mesma
+#      classe do veto de prosa aposentado, lista fechada de vocabulário. O wchan fica só como informação.
+#      Sem medição anterior a linha diz "progresso ainda não medido", nunca SUSPEITO. Tarefa sem processo e sem
 #      notificação vira "sem processo nem notificação" — mas só se o varrimento de /proc MEDIU: find
 #      que estoura o teto ou não existe vira "NÃO MEDIDO", nunca "sem processo".
 #
@@ -33,9 +39,11 @@
 #   · SUBAGENTE — tarefa de fundo lançada por um subagente vive no transcript DELE; aqui só entra o que
 #     este transcript lançou. E o próprio agente de fundo (symlink) não é medido.
 #   · PROCESSO QUE REDIRECIONA A PRÓPRIA SAÍDA (`cmd > outro.log` dentro da tarefa) não segura o fd do
-#     .output: a folha medida vira o wrapper (do_wait, fora de READ_WCHAN) → nunca SUSPEITO, só a linha.
-#   · CPU é média da VIDA da folha, não amostra instantânea: quem trabalhou muito e depois travou mostra
-#     CPU alto e escapa do SUSPEITO. Erra para o lado de calar.
+#     .output: o escritor medido vira o wrapper, cuja CPU não anda enquanto o filho trabalha → pode marcar
+#     SUSPEITO uma tarefa que progride. Por isso SUSPEITO não é veredito, e a sonda nunca veta.
+#   · ESPERA LEGÍTIMA (`sleep`, rede lenta) também não gasta CPU: SUSPEITO diz "sem progresso medido",
+#     não "travado". Quem lê confere o processo.
+#   · O progresso só se mede ENTRE mensagens: duas mensagens a menos de MIN_GAP_S não comparam.
 #   · processo de outro usuário (fd ilegível) conta como "sem processo".
 # TEMPO: medido em 2026-10-14 nesta casa (transcript de 46 MB, ~840 processos): ver o resíduo da
 #   branch feat/background-probe-replaces-prose-veto. O `find` tem teto de FIND_TIMEOUT; a sonda inteira
@@ -47,11 +55,9 @@ set -uo pipefail
 export LC_ALL=C
 
 STALE_MIN=10          # minutos sem escrita no .output para contar como saída PARADA
+MIN_GAP_S=60          # janela mínima entre duas medições para "CPU não andou" valer
 FIND_TIMEOUT=0.5      # teto do varrimento de /proc (s)
-# Os nomes do wchan MUDAM com a versão do kernel: aqui (6.8) a espera num pipe é `pipe_read`, e no runner do CI
-# (kernel mais novo) é `anon_pipe_read` — medido no 1º CI do #1129, onde o caso (b) com um FIFO real não marcou
-# SUSPEITO. Por isso a família do pipe casa com o prefixo `anon_` opcional.
-READ_WCHAN='^((anon_)?pipe_read|(anon_)?pipe_wait|pipe_wait_readable|n_tty_read|tty_read|wait_woken|unix_stream_read_generic|unix_stream_data_wait|sk_wait_data|wait_for_partner|fifo_open)$'
+STATE_DIR="${BG_PROBE_STATE_DIR:-${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}/onion-bg-probe-$(id -u)}"
 
 input="$(cat 2>/dev/null)" || input=""
 if command -v jq >/dev/null 2>&1; then
@@ -95,6 +101,13 @@ done < <({
 } | awk -v d="$tdir" 'NR==FNR {done[$0]=1; next} { q=$0; sub(/\/[^\/]*$/, "", q); if (q==d && !($0 in done)) print }' - <(printf '%s\n' "$launched"))
 [ "${#pending[@]}" -gt 0 ] || exit 0
 
+# última medição com progresso, por tarefa: id → "pid cpu epoch"
+declare -A prev=() next=()
+sfile="${STATE_DIR}/${sid}.tsv"
+if [ -f "$sfile" ]; then
+  while IFS=$'\t' read -r k v; do [ -n "$k" ] && prev["$k"]="$v"; done < "$sfile" 2>/dev/null
+fi
+
 # quem escreve o quê: /proc/<pid>/fd/<n> → <dir>/<id>.output
 # rc do find: 1 é o normal aqui (processo que some no meio, fd de outro usuário); 124 (estourou o teto)
 # e 126/127 (sem `timeout`/`find`) NÃO são "ninguém escreve" — viram NÃO MEDIDO, nunca "sem processo".
@@ -135,12 +148,16 @@ for p in "${pending[@]}"; do
     lines+=("· tarefa ${id}: sem processo nem notificação — saída parada há ${idle} min (morreu sem aviso, ou o processo é de outro usuário)")
     continue
   fi
-  leaf="" leaf_st=-1 oldest_st="" n=0
+  leaf="" leaf_st=-1 oldest_st="" n=0 cpu_all=0
   for w in $ws; do
     { s="$(< "/proc/$w/stat")"; } 2>/dev/null || continue
     r="${s##*) }"; read -r -a f <<< "$r"
-    st="${f[19]:-0}"; n=$((n+1))
-    [ "$st" -gt "$leaf_st" ] && { leaf="$w"; leaf_st="$st"; lf=("${f[@]}"); }
+    st="${f[19]:-0}"; n=$((n+1)); cpu_all=$(( cpu_all + f[11] + f[12] ))
+    # empate no tique de início (wrapper e filho nascem no mesmo jiffy — medido no dogfood de 2026-10-15,
+    # bash e sleep com o mesmo starttime): desempata pelo PID maior, o filho
+    if [ "$st" -gt "$leaf_st" ] || { [ "$st" -eq "$leaf_st" ] && [ "$w" -gt "$leaf" ]; }; then
+      leaf="$w"; leaf_st="$st"; lf=("${f[@]}")
+    fi
     { [ -z "$oldest_st" ] || [ "$st" -lt "$oldest_st" ]; } && oldest_st="$st"
   done
   if [ -z "$leaf" ]; then
@@ -154,12 +171,32 @@ for p in "${pending[@]}"; do
   leaf_s=$(( up - leaf_st / hz )); [ "$leaf_s" -ge 1 ] || leaf_s=1
   pct_x10=$(( cpu_t * 1000 / (leaf_s * hz) ))
   line="· tarefa ${id}: PID ${leaf} (${comm:-?}; ${n} processo(s) escrevendo) · rodando há $(_dur "$run_s") · CPU $((pct_x10/10)).$((pct_x10%10))% · saída parada há ${idle} min · estado ${state}/${wchan}"
-  if [ "$idle" -ge "$STALE_MIN" ] && [ "$pct_x10" -lt 10 ] && [[ "$wchan" =~ $READ_WCHAN ]]; then
-    line="${line} · ⚠️ SUSPEITO: saída parada ≥ ${STALE_MIN} min, CPU ~0 e esperando LEITURA (stdin preso?)"
-    nsusp=$((nsusp+1))
+  # progresso = a folha mudou ou a CPU somada andou; só então o epoch guardado avança
+  read -r ppid pcpu pt <<< "${prev[$id]:-}"
+  if [ -z "${pt:-}" ] || [ "$ppid" != "$leaf" ] || [ "$pcpu" != "$cpu_all" ]; then
+    next["$id"]="$leaf ${cpu_all} ${now}"
+    if [ -z "${pt:-}" ]; then line="${line} · progresso ainda não medido (1ª medição)"
+    else line="${line} · CPU andou desde a medição anterior"; fi
+  else
+    next["$id"]="${prev[$id]}"
+    gap=$(( now - pt ))
+    if [ "$gap" -lt "$MIN_GAP_S" ]; then
+      line="${line} · CPU parada numa janela de ${gap}s (curta demais para julgar)"
+    elif [ "$idle" -ge "$STALE_MIN" ]; then
+      line="${line} · ⚠️ SUSPEITO: saída parada há ≥ ${STALE_MIN} min e nenhum tique de CPU há $(_dur "$gap") (travado, stdin preso ou esperando algo)"
+      nsusp=$((nsusp+1))
+    else
+      line="${line} · CPU parada há $(_dur "$gap"), mas a saída andou há ${idle} min"
+    fi
   fi
   lines+=("$line")
 done
+
+if [ "${#next[@]}" -gt 0 ] && mkdir -p -m 700 "$STATE_DIR" 2>/dev/null; then
+  tmp="$(mktemp "${sfile}.XXXXXX" 2>/dev/null)" && {
+    for k in "${!next[@]}"; do printf '%s\t%s\n' "$k" "${next[$k]}"; done > "$tmp" && mv -f "$tmp" "$sfile"
+  } 2>/dev/null || rm -f "${tmp:-}" 2>/dev/null
+fi
 
 ctx="🔎 Sonda de fundo (Onion) — ${#lines[@]} tarefa(s) de fundo desta sessão sem notificação de término, MEDIDAS agora (não afirme estado além disto):"
 for l in "${lines[@]}"; do ctx="${ctx}"$'\n'"${l}"; done
