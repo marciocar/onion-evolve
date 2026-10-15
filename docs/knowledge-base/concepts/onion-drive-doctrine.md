@@ -101,6 +101,19 @@ O driver opera num **degrau declarado**, nunca acima:
   de convites de produção é o wrapper `ops/a2a-invite-live.sh` (core-only): trava do update do bridge, ensaio por
   padrão (`--apply` escreve), backup cifrado antes, `check` e prova por contagem depois, rollback impresso.
 
+  **A fila A2A do bridge (2026-10-15).** A fila de sinais verificados (`data/a2a-pending` do bridge, a do core na
+  raiz e a de cada hub num subdiretório) também é caminho servido, com linha própria no `ops/moat-targets.tsv`: o
+  `mv` ou o `rm` direto nela, como a conta do serviço, é vetado nomeando o wrapper `ops/a2a-queue-live.sh`
+  (core-only). Ele lista (nome, remetente, recebido_em, verified e o aceite, nunca o corpo do sinal), copia um
+  registro para um arquivo 0600 do operador, que é o que o `a2a-accept.sh` lê, e arquiva: move para
+  `<fila>/_archived/`, nunca apaga, com a mesma trava, ensaio por padrão, backup cifrado antes, prova por contagem e
+  sha256 depois e rollback impresso. Só arquiva registro já aceito, isto é, cujo `taskId` está no frontmatter de um
+  doc do inbox do core; o resto exige `--force-unaccepted` com motivo, que vai ao `archive.log`. Registro de hub
+  conta como não aceito, porque o hub aceita no repo dele. Na mesma rodada o juiz ganhou um fecho: script não
+  versionado com uma função que embrulha `sudo` e um alvo do MOAT no corpo, que a análise precisa não julgou,
+  fecha. Medido: a cópia do wrapper da fila fora do projeto passava com rc 0, porque a escrita sai por
+  `as_svc mv "${SRC}" …`, e o juiz lê a função, não a chamada.
+
   No adotante o hook **se desarma**: sem `ops/moat-targets.tsv` (core-only) não há alvo, e o MOAT do adotante segue
   prosa. Escape = o maestro roda fora da sessão (`!` no prompt). Não há variável de bypass: escape que o modelo
   escreve na própria string seria gate textual com outro nome.

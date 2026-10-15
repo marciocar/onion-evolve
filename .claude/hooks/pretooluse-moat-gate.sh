@@ -69,6 +69,8 @@ signal=$(
     printf '%s\n' crontab systemd-run '.timer' /etc/cron /var/spool/cron
     # o modo de teste do wrapper de convites: só a bancada o liga; na linha de comando, o juiz fecha
     printf '%s\n' ONION_A2A_LIVE_TEST
+    # idem para o modo de teste do wrapper da fila A2A (ops/a2a-queue-live.sh)
+    printf '%s\n' ONION_A2A_QUEUE_TEST
   } | grep -v '^$' | sed 's/[][\.*^$+?(){}|/]/\\&/g' | sort -u | paste -sd'|' -)
 moat_action='(^|[^[:alnum:]_-])(systemctl|service|docker|rsync|cp|mv|install|tee|ln|rm|mkdir|touch|chmod|chown|dd|tar|unzip|crontab|systemd-run|at|batch|git|eval|xargs|sed|curl|wget)([^[:alnum:]_-]|$)|>'
 # rota dinâmica: SÓ os programas cujo alvo é um NOME (unidade, container, crontab) ou que tornam o texto opaco
