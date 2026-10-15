@@ -96,7 +96,7 @@ declaração do censo, não defeito do componente.
 > não sem tentar superação em uma pesquisa pode restringir possibilidades de crescimento e
 > inovação; é preciso ter medição e critérios claros"). O subagente que REFUTA a forja devolve, para
 > cada reprovação, o critério pré-registrado com o comando que a checa e a superação
-> `{achada, o_que, medida}`. Ou seja, a peça que já existe, o molde ou a variante que entregaria o que o comando prometia. A sessão confere com
+> `{classe, achada, o_que, medida}`. Ou seja, a peça que já existe, o molde ou a variante que entregaria o que o comando prometia. A sessão confere com
 > `bash .claude/validation/judge-verdict-check.sh <vereditos.json>` (rc 1 = reprovação recusada e
 > contada), e a superação achada vira nó.
 

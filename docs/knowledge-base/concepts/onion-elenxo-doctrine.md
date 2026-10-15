@@ -114,7 +114,7 @@ Um refutador que só diz "não" estreita o espaço: ele mata a opção e não ol
 etapa 3 passa a ter duas obrigações, e as duas são **mecanismo**, não conselho:
 
 1. **Superação.** Todo veredito negativo (refutar, reprovar, rejeitar, parquear, inconclusivo) carrega
-   `superacao: {achada, o_que, medida}`: a peça, variante ou caminho que entregaria o valor que o objeto
+   `superacao: {classe, achada, o_que, medida}`: a peça, variante ou caminho que entregaria o valor que o objeto
    prometia. `achada:false` exige a razão **medida**, ou seja, o que se procurou e onde. A superação achada
    vira **nó** (`C_SUPERACAO_<AAAAMMDD>_…`, aresta `TRACES_TO` para o nó da reprovação), nunca comentário.
 2. **Critério pré-registrado.** O critério de reprovação existe **antes** do juiz rodar (no prompt ou nos
@@ -131,6 +131,38 @@ O caso que mostrou as duas faces (dissecação do markitdown num adotante de cur
 `a2f8a5aef524`): o N3 fechou em **REJEITAR com superação medida**, já que o `tesseract` local lê o PDF
 escaneado em que a ferramenta sai vazia com rc 0. Já o critério 1 do teste da régua deu **INCONCLUSIVO**
 porque o desenho não apontava o que superaria o teste: um objeto com diferença checável por `grep`.
+
+#### O campo preenchido para passar: a superação de CONSOLO
+
+O gate confere a **forma**, não a **entrega**, e o primeiro uso de campo mostrou o preço. Ao pagar a
+dívida que o gate revelou, um adotante de curadoria (PR #30, 2026-10-15, lido como DADO) preencheu, na
+1ª versão, quatro superações que o gate aceitou. Só o Elenxo dela as reprovou:
+
+| forma do consolo | o que era | o que a máquina recusa hoje |
+|---|---|---|
+| (a) carimbo ou condição **futura** | "o carimbo resolve quando existir a probe" | nó da superação com `verified_at` no futuro ou `status` fora de `confirmed`/`done` |
+| (b) peça ainda **em cura** | um canal bloqueado por achados abertos, dado como `confirmed` | nó `open`, sem `verified_at`/`verified_against`, ou ancorado no próprio critério da reprovação |
+| (c) o **status quo** como superação | o braço de controle da bancada, que também não achou a causa | **nada** (sem palavra-chave frágil não se vê): é a pergunta obrigatória abaixo |
+| (d) costura **circular** | a costura faz parte do próprio veredito | o próprio nó do veredito, ou um nó que deriva dele pelas arestas; `o_que` igual ao objeto |
+
+É Goodhart no campo: a métrica virou alvo. A saída honesta é a que a doutrina já previa:
+`nenhuma`, com a medida do que se procurou. Por isso todo juiz responde, **antes** de preencher a
+superação, a pergunta obrigatória:
+
+> **A superação está MEDIDA e ENTREGA o valor que o objeto prometia, ou é status quo, condição
+> futura ou parte do próprio veredito?**
+
+A resposta vai no campo `superacao.classe`, que aceita `entrega` ou `nenhuma`. `entrega` exige
+`achada:true` e a medida da entrega. `nenhuma` exige a razão medida. O motor recusa e conta a classe
+ausente, a classe que contradiz `achada`, o `o_que` que é o próprio objeto e a `medida` que é o
+comando do critério da reprovação, porque isso mede a reprovação e não a entrega. No grafo do
+`/meta:dissect`, o `dissect-census.sh --check-verdict` recusa a superação circular, a não medida e a
+ancorada no critério.
+
+Uma leitura de direção, medida no corpus: a aresta vai de quem sustenta para quem é sustentado
+(`E SUPPORTS D`), e o nó da superação que já existia e sustenta a decisão (o OCR local do markitdown)
+é **ancestral direto** dela. Por isso o ancestral não é recusado. Recusar o ancestral derrubaria a
+única superação real medida. Recusa-se o que **deriva** do veredito.
 
 ### A etapa 5 é a que mais falha — e isso é medido
 

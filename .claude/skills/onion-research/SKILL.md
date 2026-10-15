@@ -46,7 +46,7 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
    escreveu, roda o radar e o contrato, e o laço de correção é contado no motor, até 3 tentativas;
    sem radar 0 pelo verificador o run devolve erro, e `writeAttempts` mostra o declarado contra o medido).
    **Todo juiz que reprova aponta o que supera** (SAC-151): refutação, objeção sobrevivente e rejeição na
-   ancoragem carregam `superacao {achada, o_que, medida}` e citam um critério pré-registrado com o comando
+   ancoragem carregam `superacao {classe, achada, o_que, medida}` e citam um critério pré-registrado com o comando
    que o checa. Os critérios default de cada juiz estão no workflow; passe `rejectionCriteria: { verify,
    elenxo, anchor }` (listas de `{id, when, check}`) para pré-registrar os da pergunta. Negativo sem as duas
    metades é recusado pelo motor e contado em `overcoming`. Superação achada vira nó `C_SUPERACAO_<data>_…`,

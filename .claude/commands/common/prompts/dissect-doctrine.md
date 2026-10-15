@@ -106,6 +106,17 @@ deste grafo com o que supera (aresta dele para a decisão), ou `nenhuma` mais
 rejeição do markitdown num adotante de curadoria, cuja superação medida foi o `tesseract` local lendo o
 PDF escaneado em que a ferramenta saía vazia.
 
+**A superação tem de ENTREGAR, não consolar** (SAC-151, 2ª leva). Antes de apontar
+`x_dissect_overcoming: <id>`, responda: *a superação está MEDIDA e ENTREGA o valor que o objeto
+prometia, ou é status quo, condição futura ou parte do próprio veredito?* Se não entrega, o
+veredito é `nenhuma` com a medida, e isso é válido. O censo recusa o que a forma deixa ver: o nó
+do próprio veredito, o nó que **deriva** dele pelas arestas (circular), o nó `open`, sem
+`verified_at`, com `verified_at` futuro ou sem `verified_against` (não medido), e o nó cujo
+`verified_against`/`trace` é o próprio `x_dissect_criterion` (mede a reprovação, não a entrega).
+O status quo rotulado de superação **não** é detectável sem palavra-chave frágil. Ele fica com a
+pergunta e com o Elenxo. Caso-modelo do consolo: um adotante de curadoria (PR #30) preencheu quatro
+superações que passaram na forma e que o Elenxo reprovou.
+
 ---
 
 ## 3. Evidência: executar quando der, ler quando não der, e DECLARAR qual foi
