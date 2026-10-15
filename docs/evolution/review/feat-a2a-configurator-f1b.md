@@ -2,7 +2,8 @@
 branch: feat/a2a-configurator-f1b
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 4d22f170564c98af37a0ddc286697415281869c6749a29b7ce5196b27b72e917
+reviewed_code_sha256: 3bd6e4a5107713424a2ecef93891c42b7d9bba83b86e5e705eddc861a18c2312
 findings_total: 6
 findings_real: 6
 tokens: 139980

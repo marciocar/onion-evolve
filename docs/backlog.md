@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**498 itens abertos** em 106 grafo(s) com aberto (de 135 no escopo) · 107 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**499 itens abertos** em 106 grafo(s) com aberto (de 135 no escopo) · 107 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -142,6 +142,15 @@
 | 0.9 | `C_OPCAO_C_VERTICAL_INFRA` | infra-vps-2026-10 | OPCAO C — vertical de engenharia infra que viaja para adotantes. Reprovada pela recomendacao do Elenxo: nenhum 2o adotante pediu |
 | 0.4 | `C_OPCAO_D_QUARTA_DIMENSAO` | infra-vps-2026-10 | OPCAO D — 4a dimensao peer. Reprovada pela recomendacao do Elenxo: as 3 dimensoes peer sao doutrina selada (nem design/ foi prom |
 
+## a2a-configurator-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 63.0 | `Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL` | a2a-configurator-2026-10 | um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do |
+| 7.2 | `D_PACOTE_DE_ENTRADA_LEVA_OS_MOTORES` | a2a-configurator-2026-10 | a trilha 2 entrega ao membro um pacote com os três motores e um a2a.conf sem segredo (lembrete legível que nenhum motor lê), em |
+| 4.8 | `D_PISO_2048_NO_REGISTRO_3072_NO_KEYGEN` | a2a-configurator-2026-10 | o validador do registro aceita pública RSA a partir de 2048 bits, e o keygen gera 3072: subir o piso do registro para 3072 reprov |
+| 4.8 | `Q_MANUAL_DO_A2A` | a2a-configurator-2026-10 | o configurador A2A ganha um manual para os três leitores (operador do core, operador do hub e membro que entra), escrito a partir |
+
 ## nanochat-onion-2026-10 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -193,14 +202,6 @@
 | 5.6 | `C_OPCAO_D_META_COMPANY_BRAIN_COMO_SERVICO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO D — META, Company Brain / grafo ancorado como serviço. A FAVOR: é o norte declarado da casa (NS1, conhecimento) e o mo |
 | 3.6 | `C_OPCAO_C_DURANTE_GATE_E_POLITICA` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO C — DURANTE, GATE/POLÍTICA: vender o veredito reprovador determinístico (exit 2 de hook, 91 regras, catracas por basel |
 | 1.8 | `C_OPCAO_F_NENHUMA_AGORA_COM_GATILHO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO F — NENHUMA AGORA, e só vale com GATILHO, DATA e ORÇAMENTO nomeados (sem os três é adiamento com outro nome). A FAVO |
-
-## a2a-configurator-2026-10 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 51.0 | `Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL` | a2a-configurator-2026-10 | um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do |
-| 4.8 | `D_PISO_2048_NO_REGISTRO_3072_NO_KEYGEN` | a2a-configurator-2026-10 | o validador do registro aceita pública RSA a partir de 2048 bits, e o keygen gera 3072: subir o piso do registro para 3072 reprov |
-| 4.8 | `Q_MANUAL_DO_A2A` | a2a-configurator-2026-10 | o configurador A2A ganha um manual para os três leitores (operador do core, operador do hub e membro que entra), escrito a partir |
 
 ## slm-frameworks-2026-10 — 14 item(ns)
 
