@@ -32575,6 +32575,61 @@ run_sync_main_worktree_selftests() {
   rm -rf "${d}"
 }
 _family run_sync_main_worktree_selftests
+# Modo adapter-enforcement — a REGRA 107 (Adapter SDAAL declara onde o seu contrato é cobrado), SAC-142 parte D
+# (2026-10-15). O SUT é o verificador REAL, invocado COMO O LINT O INVOCA (`<raiz> --format tsv`), sobre um repo de
+# mentira com raízes e adapters de verdade no filesystem: a lista é DERIVADA, então o caso é o diretório.
+run_adapter_enforcement_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/adapter-enforcement-check.sh"
+  [ -f "${sut}" ] || { record_fail "adapter-enforcement" "verificador ausente: ${sut}"; return; }
+  local d out; d="$(mktemp -d)"
+  _ae_mk() {  # repo base conforme: raiz r1 com 3 adapters, um auxiliar, um hook registrado e um validador no lint
+    rm -rf "${d}/r"; mkdir -p "${d}/r/.claude/utils/r1/adapters" "${d}/r/.claude/hooks" "${d}/r/.claude/validation"
+    : > "${d}/r/.claude/utils/r1/interface.md"
+    : > "${d}/r/.claude/utils/r1/adapters/a.md"; : > "${d}/r/.claude/utils/r1/adapters/b.md"; : > "${d}/r/.claude/utils/r1/adapters/c.md"
+    printf '<!-- adapter-auxiliar: a -->\n# irmão\n' > "${d}/r/.claude/utils/r1/adapters/a-extra.md"
+    printf '#!/bin/bash\n' > "${d}/r/.claude/hooks/h.sh"; printf '#!/bin/bash\n' > "${d}/r/.claude/validation/v.sh"
+    printf '{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"bash .claude/hooks/h.sh"}]}]}}\n' > "${d}/r/.claude/settings.json"
+    printf '#!/bin/bash\nbash "${SCRIPT_DIR}/v.sh"\n' > "${d}/r/.claude/validation/lint-artifacts.sh"
+    printf '# comentário\na\thook:.claude/hooks/h.sh\nb\tvalidator:.claude/validation/v.sh\nc\tnone:sem cobrança; gatilho: x\n' > "${d}/r/.claude/utils/r1/enforcement.tsv"
+  }
+  _ae_run() { out="$(bash "${sut}" "${d}/r" --format tsv 2>&1)" || true; }
+  # (a) conforme: nenhum HARD, e o passivo de none: sai SOFT (1 de 3)
+  _ae_mk; _ae_run
+  if ! grep -q '^HARD' <<< "${out}" && grep -q '^SOFT	PASSIVO	.*1 de 3 adapter' <<< "${out}"; then
+    record_pass "adapter-enforcement: (a) raiz conforme: zero HARD, passivo de none: SOFT, o auxiliar não conta como adapter"
+  else record_fail "adapter-enforcement: (a) conforme" "out=[${out}]"; fi
+  # (b) adapter NOVO sem linha → HARD (a lista é derivada do filesystem)
+  _ae_mk; : > "${d}/r/.claude/utils/r1/adapters/novo.md"; _ae_run
+  if grep -q '^HARD	ADAPTER-SEM-COBRANCA	.*adapters/novo.md' <<< "${out}"; then
+    record_pass "adapter-enforcement: (b) adapter novo em adapters/ sem declaração vira HARD"
+  else record_fail "adapter-enforcement: (b) adapter novo" "out=[${out}]"; fi
+  # (c) raiz sem enforcement.tsv → HARD
+  _ae_mk; rm -f "${d}/r/.claude/utils/r1/enforcement.tsv"; _ae_run
+  if grep -q '^HARD	SEM-DECLARACAO' <<< "${out}"; then record_pass "adapter-enforcement: (c) raiz sem enforcement.tsv vira HARD"
+  else record_fail "adapter-enforcement: (c) sem declaração" "out=[${out}]"; fi
+  # (d) hook não registrado, validador fora do lint, none sem gatilho, forma fora do enum, adapter inexistente
+  _ae_mk; printf '{"hooks":{}}\n' > "${d}/r/.claude/settings.json"; printf '#!/bin/bash\n' > "${d}/r/.claude/validation/lint-artifacts.sh"
+  printf 'a\thook:.claude/hooks/h.sh\nb\tvalidator:.claude/validation/v.sh\nc\tnone:sem motivo\nfantasma\texe:x\n' > "${d}/r/.claude/utils/r1/enforcement.tsv"; _ae_run
+  local miss=""
+  for c in HOOK-NAO-REGISTRADO VALIDADOR-FORA-DO-LINT NONE-SEM-GATILHO ADAPTER-INEXISTENTE; do grep -q "^HARD	${c}" <<< "${out}" || miss="${miss} ${c}"; done
+  printf 'a\tmagia:x\nb\texe:nao/existe.sh\nc\tnone:x; gatilho: y\n' > "${d}/r/.claude/utils/r1/enforcement.tsv"; _ae_run
+  grep -q '^HARD	FORMA-FORA-DO-ENUM' <<< "${out}" || miss="${miss} FORMA-FORA-DO-ENUM"
+  grep -q '^HARD	CAMINHO-AUSENTE' <<< "${out}" || miss="${miss} CAMINHO-AUSENTE"
+  if [ -z "${miss}" ]; then record_pass "adapter-enforcement: (d) hook não registrado, validador fora do lint, none sem gatilho, adapter inexistente, forma fora do enum e caminho ausente: cada um HARD"
+  else record_fail "adapter-enforcement: (d) códigos" "faltaram:${miss}"; fi
+  # (e) em repo DERIVADO, hook não registrado desce a SOFT (o settings.json é do adotante)
+  _ae_mk; printf '{"hooks":{}}\n' > "${d}/r/.claude/settings.json"; printf 'role: adopted\n' > "${d}/r/.claude/.onion-version"; _ae_run
+  if grep -q '^SOFT	HOOK-NAO-REGISTRADO' <<< "${out}" && ! grep -q '^HARD' <<< "${out}"; then
+    record_pass "adapter-enforcement: (e) no derivado, hook não registrado é SOFT"
+  else record_fail "adapter-enforcement: (e) derivado" "out=[${out}]"; fi
+  # (f) o core REAL: zero HARD (as 5 raízes declaram todos os adapters)
+  out="$(bash "${sut}" "${REPO_ROOT}" --format tsv 2>&1)" || true
+  if ! grep -q '^HARD' <<< "${out}"; then record_pass "adapter-enforcement: (f) o core declara a cobrança de todos os adapters (zero HARD)"
+  else record_fail "adapter-enforcement: (f) core" "$(grep '^HARD' <<< "${out}" | head -3 | tr '\n' '|')"; fi
+  unset -f _ae_mk _ae_run
+  rm -rf "${d}"
+}
+_family run_adapter_enforcement_selftests
 
 run_shard_plan_selftests() {
   local sut="${REPO_ROOT}/ops/testing/selftest-shard-plan.sh"

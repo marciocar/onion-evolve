@@ -5827,6 +5827,41 @@ check_door_leak_scan() {
 }
 check_door_leak_scan
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 107 — Adapter SDAAL declara onde o seu contrato é cobrado [HARD + SOFT]
+# previne: adapter em prosa cujo contrato só vale se a sessão lembrar — nenhum executável, hook ou validador o cobra.
+#   DANO MEDIDO (SAC-142, 2026-10-15, decisão do maestro D_COBRAR_NA_SAIDA_E_NO_TRANSPORTE): das 5 raízes SDAAL só o
+#   task-manager declarava contrato legível por máquina; o forge não cobrava a criação de PR, e trust e
+#   de-identification não tinham cobrança nenhuma no ponto de uso. Cada raiz declara, no irmão
+#   .claude/utils/<r>/enforcement.tsv, a forma de cobrança de cada adapter (exe | hook | validator | none com gatilho); raízes e
+#   adapters são DERIVADOS do filesystem (interface.md + adapters/*.md, auxiliar marcado), nunca uma lista digitada.
+#   O passivo de none: sai SOFT. Lógica e teto em adapter-enforcement-check.sh. Roda também no derivado (os utils
+#   viajam); lá, hook não registrado e validador fora do lint descem a SOFT.
+check_adapter_enforcement() {
+  local helper="${SCRIPT_DIR}/adapter-enforcement-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      */fixtures/*) return 0 ;;
+      */utils/*/enforcement.tsv|*/utils/*/adapters/*|*/adapter-enforcement-check.sh|*/settings.json) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0 _err
+  _err="$(mktemp 2>/dev/null || echo /dev/null)"
+  if _out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${_err}")"; then _hrc=0; else _hrc=$?; fi
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    violation "${_sev:-HARD}" "${REPO_ROOT}/${_path#./}" "REGRA 107 (Adapter SDAAL declara onde o seu contrato é cobrado): [${_code}] ${_msg}"
+  done <<< "${_out}"
+  if [ "${_hrc}" -ne 0 ]; then
+    violation "HARD" "${REPO_ROOT}/.claude/validation/adapter-enforcement-check.sh" "REGRA 107 (Adapter SDAAL declara onde o seu contrato é cobrado): a guarda NÃO RODOU (rc=${_hrc}: $(head -1 "${_err}" 2>/dev/null)) — isto não é aprovação"
+  fi
+  [ "${_err}" = /dev/null ] || rm -f "${_err}"
+  return 0
+}
+check_adapter_enforcement
+
 # ===========================================================================
 # REGRA 102 — Chave de frontmatter de agente pertence à allowlist (oficiais + as da casa) [HARD + SOFT]
 # previne: typo de chave de agente (`tool:` no lugar de `tools:`, `modle:`) que o Claude Code ignora em silêncio

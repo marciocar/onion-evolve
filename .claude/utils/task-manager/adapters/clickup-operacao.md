@@ -1,3 +1,4 @@
+<!-- adapter-auxiliar: clickup -->
 # 🔧 ClickUp — Operação (exemplos, bulk, hierarquia, checklists, troubleshooting)
 
 > **Irmão de [`clickup.md`](clickup.md) por *progressive disclosure* ([`sdaal.md` §14.5](../../../../docs/sdaal/sdaal.md)).**
