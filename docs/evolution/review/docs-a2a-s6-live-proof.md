@@ -2,7 +2,8 @@
 branch: docs/a2a-s6-live-proof
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c77a97a41cf9c0213d0cebb69c12157b77769db43cf9cd2099ad9d3a5f32c354
+reviewed_code_sha256: fa101700bc7d913f3c59100fbdcfe67f94508f73749a471c1805b6e56bad1b98
 findings_total: 1
 findings_real: 1
 tokens: 0
