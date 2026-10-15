@@ -1,9 +1,8 @@
 ---
 branch: fix/moat-gate-indirection
-pr: pendente
+pr: 1154
 date: 2026-10-15
-reviewed_diff_sha256: 09d1118e810237faf804eebc31d562e07488501a45fcf5354fcff4e09b0188fb
-reviewed_code_sha256: 6809e51e3bc48f34ef21759dd126cf46787cb071d8fdf27bf40dc30cdf663e66
+reviewed_diff_sha256: pendente
 findings_total: 14
 findings_real: 14
 tokens: 230996
@@ -72,3 +71,20 @@ A análise estática não fecha indireção arbitrária (Rice). Seguem fora:
 
 Nesses casos, a defesa que resta é a permissão do arquivo: 0600 da conta do serviço, escrita só com `sudo -u`.
 Ordem e escopo de função não se modelam, então o hook erra para vetar.
+
+## Re-revisão após o rebase sobre o #1152
+
+O `ops/merge-serial.sh` recusou o rebase automático por um conflito real em `.claude/hooks/lib/moat-judge.py`.
+O #1152 (wrapper `ops/a2a-queue-live.sh`) acrescentou ao juiz:
+- `_MOAT_WRAPPER_COPIES`: a cópia do wrapper reconhecida pelo nome;
+- o fechamento de `ONION_A2A_QUEUE_TEST` na linha de comando;
+- 7 casos na `moat_gate`.
+
+O conflito era de vizinhança: dois blocos novos no mesmo ponto do arquivo. Mantive os dois, sem mudar nenhum,
+e a bancada não teve conflito.
+
+Medido depois do rebase:
+- **Bancada:** `LC_ALL=C`, famílias `moat_gate`, `pretooluse_veto` e `a2a_queue_live`, 515 passaram e 0 falharam. Inclui os 33 casos desta branch e os do #1152, cada um provado contra o seu mutante.
+- **Hook vivo:** as 5 formas medidas da SAC-148 saem rc 2. Os 4 mutantes, replantados por `ops/mutate-and-restore.sh` no código rebaseado, as devolvem a rc 0. Restauração conferida por hash.
+- **Revisor adversarial:** não repassou o código rebaseado. O diff desta branch não mudou; só se juntou ao bloco vizinho. Por isso `reviewed_diff_sha256` volta a pendente, para o `pr-finalize` carimbar de novo.
+
