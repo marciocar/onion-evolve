@@ -30,9 +30,12 @@ O wizard nunca resume um rc 2 como "tudo certo".
 - As `.pem` públicas são versionadas no JWKS do receptor por adição deliberada; a privada nunca entra
   no repo (o `.gitignore` do JWKS ignora todo `.pem`).
 
-### 3. A confiança nasce no MERGE, conferida fora de banda
+### 3. A confiança nasce no MERGE que chega ao clone SERVIDO, conferida fora de banda
 Pinar é escrever `a2a.keys` e `jwks/<kid>.pem` no registro do receptor, e isso só vale depois do merge
-pelo caminho verificado. Antes do pino, a impressão que o membro leu do keygen é conferida **por outro
+pelo caminho verificado **e** da atualização do clone que o bridge serve, pelo caminho de deploy dele: o
+bridge lê o registro e o JWKS desse clone, e o doctor mede o repo onde roda. O mesmo vale ao contrário
+para a revogação: até o clone servido receber o merge, o `kid` revogado segue aceito no bridge (achado
+do refutador da F1b, 2026-10-15). Antes do pino, a impressão que o membro leu do keygen é conferida **por outro
 canal** (voz, mensagem assinada, presença) contra a do arquivo recebido — o doctor do lado receptor
 faz essa conta com `--fingerprint`. Pública que chegou por um canal só e não foi conferida não é pinada.
 
