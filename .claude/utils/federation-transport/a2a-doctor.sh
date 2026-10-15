@@ -130,11 +130,16 @@ put() { # id status critical causa proximo — tab e quebra de linha viram espa�
   printf '%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "${c}" "${n}" >> "${RES}"
 }
 have_yaml() { command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1; }
+# modo do ALVO (segue symlink): stat GNU (-c) ou BSD (-f); vazio quando nenhum responde (→ não medido)
+_mode() { stat -L -c '%a' "$1" 2>/dev/null || stat -L -f '%Lp' "$1" 2>/dev/null; }
 fp_of_pub() { openssl pkey -pubin -in "$1" -outform DER 2>/dev/null | openssl dgst -sha256 | awk '{print $NF}'; }
 # RSA se reconhece pelo módulo: o openssl 3 imprime "Private-Key: (N bit…)" para RSA E para EC (o spike
 # aprovou chave EC na 1ª versão por ler essa linha; o gate, só RS256, a recusaria). → "<bits>" ou "nao-rsa"
+# Na privada, os bits se medem sobre a PÚBLICA derivada (-pubout): o texto da privada traz os expoentes
+# secretos, e passá-lo por here-string o poria num arquivo temporário no bash 3.2 (achado do refutador).
 rsa_bits() {  # $1 = arquivo · $2 = "pub" ou "priv"
-  local t; if [ "$2" = pub ]; then t="$(openssl pkey -pubin -in "$1" -noout -text 2>/dev/null)"; else t="$(openssl pkey -in "$1" -noout -text 2>/dev/null)"; fi
+  local t; if [ "$2" = pub ]; then t="$(openssl pkey -pubin -in "$1" -noout -text 2>/dev/null)"
+  else t="$(openssl pkey -in "$1" -pubout 2>/dev/null | openssl pkey -pubin -noout -text 2>/dev/null)"; fi
   [ -n "${t}" ] || { echo ilegivel; return; }
   if grep -qiE '^(modulus|Modulus):' <<< "${t}"; then sed -n '1s/.*(\([0-9]*\) bit.*/\1/p' <<< "${t}"; else echo nao-rsa; fi
 }
@@ -213,7 +218,14 @@ side_member() {
   local priv="" n
   # resolução do kid: --kid; senão o único <member>-N.key.pem do dir; entre vários, o único pinado
   if [ -z "${KID}" ] && [ -d "${DIR}" ]; then
-    mapfile -t _cands < <(find "${DIR}" -maxdepth 1 -name "${MEMBER}-*.key.pem" -printf '%f\n' 2>/dev/null | sed 's/\.key\.pem$//' | /usr/bin/grep -E "^${MEMBER//./\\.}-[1-9][0-9]*$" | sort)
+    # glob do shell, não `find -printf` (GNU-only: no BSD a lista viria vazia e (a) acusaria a causa errada)
+    _cands=()
+    for _f in "${DIR}/${MEMBER}"-*.key.pem; do
+      [ -e "${_f}" ] || continue
+      _k="${_f##*/}"; _k="${_k%.key.pem}"
+      case "${_k#"${MEMBER}"-}" in ''|0*|*[!0-9]*) continue ;; esac
+      _cands+=("${_k}")
+    done
     if [ "${#_cands[@]}" -eq 1 ]; then KID="${_cands[0]}"
     elif [ "${#_cands[@]}" -gt 1 ] && [ -n "${KEYS}" ]; then
       n=0; for k in "${_cands[@]}"; do key_pinned "${k}" && { KID="${k}"; n=$((n+1)); }; done
@@ -247,9 +259,9 @@ side_member() {
     put b nao-medido 1 "sem chave não há permissão a medir (depende de a)" "resolva (a) primeiro"
   else
     local fm dm bad=""
-    fm="$(stat -c '%a' "${priv}" 2>/dev/null)"; dm="$(stat -c '%a' "${DIR}" 2>/dev/null)"
+    fm="$(_mode "${priv}")"; dm="$(_mode "${DIR}")"
     if [ -z "${fm}" ] || [ -z "${dm}" ]; then
-      put b nao-medido 1 "stat não devolveu o modo (stat não-GNU?)" "confira à mão: ls -ld <dir> <dir>/<kid>.key.pem"
+      put b nao-medido 1 "stat não devolveu o modo (nem GNU nem BSD)" "confira à mão: ls -ldL <dir> <dir>/<kid>.key.pem"
     else
       [ $(( 8#${fm} & 8#077 )) -eq 0 ] || bad="${KID}.key.pem está ${fm} (grupo/outros leem a chave)"
       [ $(( 8#${dm} & 8#077 )) -eq 0 ] || bad="${bad:+${bad}; }diretório está ${dm} (grupo/outros listam ou trocam a chave)"
@@ -294,7 +306,7 @@ side_member() {
   local ebad="" eok=""
   if [ ! -f "${TOKEN_FILE}" ]; then ebad="token do canal ausente em ${TOKEN_FILE}"
   else
-    local tm; tm="$(stat -c '%a' "${TOKEN_FILE}" 2>/dev/null)"
+    local tm; tm="$(_mode "${TOKEN_FILE}")"
     if [ -z "${tm}" ]; then ebad="não consegui ler o modo do token"
     elif [ $(( 8#${tm} & 8#077 )) -ne 0 ]; then ebad="o token está ${tm} (grupo/outros leem o bearer)"
     elif [ ! -s "${TOKEN_FILE}" ]; then ebad="o arquivo do token está vazio"
@@ -308,12 +320,18 @@ side_member() {
       local im ie ir iep now
       im="$(jq -r '.member // empty' "${INVITE}")"; ie="$(jq -r '.expires_at // empty' "${INVITE}")"
       ir="$(jq -r 'if .revoked == true then "true" elif (.revoked == false or .revoked == null) then "false" else "BAD" end' "${INVITE}")"
-      case "${ie}" in ''|*[!0-9]*) iep="$(date -d "${ie}" +%s 2>/dev/null)" ;; *) iep="${ie}" ;; esac
+      # forma ESTRITA (achado do refutador): epoch de até 11 dígitos, ou ISO-8601 com data, hora e fuso.
+      # O `date -d` do GNU aceita "tomorrow" (que nunca vence) e um epoch de 20 dígitos estourava o `[ -le ]`.
+      iep=""
+      if printf '%s' "${ie}" | grep -Eq '^[0-9]{1,11}$'; then iep="${ie}"
+      elif printf '%s' "${ie}" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$'; then
+        iep="$(date -d "${ie}" +%s 2>/dev/null)"; case "${iep}" in ''|*[!0-9]*) iep="" ;; esac
+      fi
       now="$(date +%s)"
       if [ "${im}" != "${MEMBER}" ]; then ebad="convite é de '${im:-ninguém}', não de '${MEMBER}'"
       elif [ "${ir}" = BAD ]; then ebad="campo revoked com tipo inválido (nem true nem false)"
       elif [ "${ir}" = true ]; then ebad="convite REVOGADO pelo receptor"
-      elif [ -z "${iep}" ]; then ebad="expires_at ausente ou ilegível (${ie:-vazio})"
+      elif [ -z "${iep}" ]; then ebad="expires_at ausente ou fora da forma (epoch ou ISO-8601 com fuso; veio '${ie:-vazio}')"
       elif [ "${iep}" -le "${now}" ]; then ebad="convite VENCIDO em $(date -u -d "@${iep}" +%FT%TZ)"
       else eok="${eok}; convite de '${MEMBER}' válido até $(date -u -d "@${iep}" +%FT%TZ)"; fi
     fi
@@ -374,7 +392,7 @@ side_receiver() {
   elif [ "${FOUND}" != 1 ]; then put r falha 1 "membro '${MEMBER}' não está no registro" "registre-o: /meta:federation-member register"
   elif [ ! -f "${VALIDATOR}" ]; then put r nao-medido 1 "members-validate.sh ausente: não sei validar o registro" "rode de uma instalação com o validador"
   else
-    local vout vrc=0; vout="$(A2A_JWKS_DIR="${JWKS}" bash "${VALIDATOR}" "${MEMBERS}" 2>&1)" || vrc=$?
+    local vout vrc=0; vout="$(bash "${VALIDATOR}" "${MEMBERS}" --jwks "${JWKS}" 2>&1)" || vrc=$?
     case "${vrc}" in
       0) put r ok 1 "registro válido e ${MEMBER} presente" "—" ;;
       1) put r falha 1 "registro inválido: $(grep -m3 '∟' <<< "${vout}" | sed 's/^ *∟ *//' | tr '\n' ';' | cut -c1-220)" "corrija o registro antes de pinar (o lint barra o mesmo erro pela REGRA 66)" ;;
@@ -458,6 +476,6 @@ else
   done < "${RES}"
   nf="$(awk -F'\t' '$2=="falha"' "${RES}" | wc -l)"; nn="$(awk -F'\t' '$2=="nao-medido"' "${RES}" | wc -l)"; no="$(awk -F'\t' '$2=="ok"' "${RES}" | wc -l)"
   printf '\nresumo: %s ok · %s falha · %s não medida(s) → ' "${no}" "${nf}" "${nn}"
-  case "${RC}" in 0) echo "✅ saudável (rc 0)" ;; 1) echo "❌ problema (rc 1)" ;; 2) echo "⚪ não pude medir o que é crítico (rc 2): não sei não é saudável" ;; esac
+  case "${RC}" in 0) if [ "${SIDE}" = receiver ] && [ -z "${EXPECT_FP}" ]; then echo "✅ saudável (rc 0), SEM conferir a impressão do membro: antes de PINAR, rode com --fingerprint"; else echo "✅ saudável (rc 0)"; fi ;; 1) echo "❌ problema (rc 1)" ;; 2) echo "⚪ não pude medir o que é crítico (rc 2): não sei não é saudável" ;; esac
 fi
 exit "${RC}"

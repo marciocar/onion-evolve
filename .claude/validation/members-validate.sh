@@ -27,9 +27,12 @@
 #             · a2a é mapa; keys, se presente, é lista de kids na forma <id>-<N> (o que o
 #               a2a-keygen.sh gera), e nenhum kid pertence a dois membros (jwks/<kid>.pem é
 #               um espaço de nomes só: kid repetido seria a mesma pública para dois donos);
-#             · cada kid tem jwks/<kid>.pem com pública RSA de pelo menos 2048 bits (o piso que
-#               o gate aceita; o keygen gera 3072). JWKS = --jwks, senão A2A_JWKS_DIR, senão o
-#               .claude/utils/federation-transport/jwks da raiz do repo do registro;
+#             · cada kid tem jwks/<kid>.pem com pública RSA de pelo menos 2048 bits (o piso deste
+#               validador e do doctor; o gate a2a-verify.sh NÃO confere bits, e o keygen gera 3072;
+#               os dois pinos vivos de 2048 explicam o piso). JWKS = --jwks, senão o
+#               .claude/utils/federation-transport/jwks da raiz do repo do registro. A variável
+#               A2A_JWKS_DIR do ambiente NÃO é lida aqui de propósito: exportada numa shell, ela
+#               dava HARD falso na REGRA 66 ou desviava a checagem (achado do refutador da F1a);
 #             · keys não vazio exige sends_to, e sends_to aponta um membro do registro que é
 #               receptor: role source ou hub, e NÃO porta (kind door). Medido no spike
 #               (C_RECEPTOR_PELO_PAPEL_INCLUI_A_PORTA): olhar só o role deixava entrar a porta.
@@ -71,14 +74,11 @@ done
 # JWKS: a raiz do repo do REGISTRO (não a deste script) quando o caminho tem a forma canônica, para
 # que validar o registro de outra árvore confira as públicas daquela árvore.
 if [[ -z "$JWKS" ]]; then
-  if [[ -n "${A2A_JWKS_DIR:-}" ]]; then JWKS="${A2A_JWKS_DIR}"
-  else
-    _mabs="$(cd "$(dirname "$MEMBERS")" 2>/dev/null && pwd)/$(basename "$MEMBERS")"
-    case "${_mabs}" in
-      */docs/evolution/federation/members.yaml) JWKS="${_mabs%/docs/evolution/federation/members.yaml}/.claude/utils/federation-transport/jwks" ;;
-      *) JWKS="${ROOT}/.claude/utils/federation-transport/jwks" ;;
-    esac
-  fi
+  _mabs="$(cd "$(dirname "$MEMBERS")" 2>/dev/null && pwd)/$(basename "$MEMBERS")"
+  case "${_mabs}" in
+    */docs/evolution/federation/members.yaml) JWKS="${_mabs%/docs/evolution/federation/members.yaml}/.claude/utils/federation-transport/jwks" ;;
+    *) JWKS="${ROOT}/.claude/utils/federation-transport/jwks" ;;
+  esac
 fi
 
 if [[ ! -f "$MEMBERS" ]]; then
@@ -291,7 +291,13 @@ if isinstance(doc, dict):
         if not isinstance(keys, list):
             err(f"{tag}: a2a.keys não é lista")
             keys = []
+        seen_k = set()
         for k in keys:
+            if isinstance(k, str) and k in seen_k:
+                err(f"{tag}: kid '{k}' repetido em a2a.keys")
+                continue
+            if isinstance(k, str):
+                seen_k.add(k)
             if not isinstance(k, str) or not re.fullmatch(r"[A-Za-z0-9._-]+", k) or k.startswith("."):
                 err(f"{tag}: a2a.keys tem kid fora de [A-Za-z0-9._-] ('{k}'); o kid vira nome de arquivo no JWKS")
                 continue
@@ -315,6 +321,9 @@ if isinstance(doc, dict):
             elif bits < 2048:
                 err(f"{tag}: jwks/{k}.pem tem {bits} bits (mínimo 2048)")
         st = a.get("sends_to")
+        if st is not None and not isinstance(st, str):
+            err(f"{tag}: a2a.sends_to tem de ser o id (texto) de um receptor, veio {type(st).__name__}")
+            st = None
         if keys and not st:
             err(f"{tag}: a2a.keys não vazio exige a2a.sends_to (o receptor dos sinais dele)")
         if st:
