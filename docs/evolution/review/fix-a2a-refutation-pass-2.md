@@ -2,7 +2,8 @@
 branch: fix/a2a-refutation-pass-2
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9529c298fe0e2dbd7d343cfa18ae16600bf3d2039e3ec73fb89cbeb3cf934561
+reviewed_code_sha256: bf789aa5f66338230a021da5d220113c86be03390a2bf0040b8154bcd7deece8
 findings_total: 8
 findings_real: 8
 tokens: 149861
