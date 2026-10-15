@@ -33,7 +33,20 @@
 #   marcador continua sendo interrompida) · estudo-INCOERENTE(<motivos>) · modo-DESCONHECIDO(<v>).
 # Modo que o censo não conhece NUNCA cai no caminho normal em silêncio (fail-closed, P0).
 #
-# Uso:  bash .claude/validation/dissect-census.sh [<repo>] [--markdown|--tsv]
+# ── RÉGUA PADRÃO = O PRÓPRIO REPO, e ESCOPO por componente (SAC-147, decisão de 2026-10-15) ──
+# Sem `--against`, a régua é o repo onde o dissect RODA, DERIVADA aqui (`--regua-padrao`), nunca
+# digitada: sem carimbo `.claude/.onion-version` (o core) ou com `role: source` / `kind: door` (as
+# portas são projeção do core) ⇒ `onion`, o comportamento de sempre; com qualquer outro papel
+# (adotado, hub) ⇒ o id do repo = o nome do remote `origin` (fallback: a pasta raiz). O campo
+# `framework:` do carimbo NÃO serve de id: medido em 2026-10-15, um adotado carrega
+# `framework: onion-evolve` (o nome da fonte), e a régua dele sairia o Onion. Grafo SEM o marcador
+# segue lido como `onion` (era o que a régua significava quando ele foi escrito).
+# `meta.x_dissect_scope: <pathspec[,pathspec]>` estreita a régua a um COMPONENTE do repo (uma
+# ferramenta, funcionalidade ou biblioteca — ex.: trocar o provedor de identidade de um produto).
+# Sai na coluna `escopo` (ausente = `-`, o repo inteiro): nível pago só se reusa na MESMA régua E no
+# MESMO escopo, e o censo mostra as duas colunas sem julgar a igualdade (comparação literal).
+#
+# Uso:  bash .claude/validation/dissect-census.sh [<repo>] [--markdown|--tsv|--regua-padrao]
 # Exit: 0 = censo emitido (inclusive "zero dissecação", que é resposta) · 3 = NÃO PUDE MEDIR.
 #       Os PLANOS de absorção (N4) têm leitor próprio, do lado do forge: dissect-plans.sh — este
 #       script viaja no plugin onion-meta e não pode depender do forge-census, que não viaja.
@@ -52,11 +65,44 @@ REPO="${REPO:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 git -C "${REPO}" rev-parse --git-dir >/dev/null 2>&1 \
   || { echo "dissect-census: sem índice git em ${REPO} — o censo seria de outro conjunto que o do CI. Recusa." >&2; exit 3; }
 
+# ── RÉGUA PADRÃO deste repo (SAC-147): derivada do carimbo, nunca digitada ──────────────────
+# Roda ANTES da exigência de corpus: derivar a régua não depende de haver grafo.
+# Imprime `<régua>\t<de onde veio>`. É a SSOT da derivação: o dissect-plans.sh a CHAMA em vez de
+# repetir a regra (duas cópias da mesma derivação divergem — a classe do vocabulário duplicado).
+# ⚠️ "SEM CARIMBO ⇒ O CORE" só vale quando este script MORA no repo medido. No plugin `onion-meta` ele
+#    mora na raiz do plugin e o projeto que o instalou não tem carimbo: sem esta conferência a régua de
+#    um produto qualquer saía `onion` (achado da passada adversarial, 2026-10-15). Fonte DESACOPLADA
+#    (`role: source` + `decoupled_from:`) é soberana, de linhagem própria: régua = o id dela, não o Onion.
+_self_regua() {
+  local stamp="${REPO}/.claude/.onion-version" role kind dec url id here mine
+  here="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P)"
+  mine="$(cd "${REPO}/.claude/validation" 2>/dev/null && pwd -P)"
+  if [ ! -f "${stamp}" ]; then
+    if [ -n "${here}" ] && [ "${here}" = "${mine}" ]; then printf 'onion\tsem carimbo .claude/.onion-version (o core)\n'; return; fi
+    role="nenhum (sem carimbo; o medidor mora fora do repo, ex. plugin)"
+  else
+    role="$(awk '/^role:/{print $2; exit}' "${stamp}" | tr -d "\"'\r")"
+    kind="$(awk '/^kind:/{print $2; exit}' "${stamp}" | tr -d "\"'\r")"
+    dec="$(awk '/^decoupled_from:/{print $2; exit}' "${stamp}" | tr -d "\"'\r")"
+    if [ "${kind}" = "door" ]; then printf 'onion\tcarimbo kind: door (porta = projeção do core)\n'; return; fi
+    if [ "${role}" = "source" ] && [ -z "${dec}" ]; then printf 'onion\tcarimbo role: source\n'; return; fi
+    [ -z "${dec}" ] || role="${role} desacoplada de ${dec}"
+  fi
+  url="$(git -C "${REPO}" remote get-url origin 2>/dev/null || true)"
+  id="$(printf '%s' "${url}" | sed -E 's#/+$##; s#.*[/:]##; s#\.git$##')"
+  if [ -n "${id}" ]; then printf '%s\tcarimbo role: %s · id = remote origin\n' "${id}" "${role:-adopted}"; return; fi
+  id="$(basename "$(git -C "${REPO}" rev-parse --show-toplevel 2>/dev/null || printf '%s' "${REPO}")")"
+  printf '%s\tcarimbo role: %s · id = pasta raiz (sem remote origin)\n' "${id}" "${role:-adopted}"
+}
+SELF_REGUA_LINE="$(_self_regua)"; SELF_REGUA="${SELF_REGUA_LINE%%	*}"
+if [ "${FMT}" = "--regua-padrao" ]; then printf '%s\n' "${SELF_REGUA_LINE}"; exit 0; fi
+
 mapfile -t GRAPHS < <(git -C "${REPO}" ls-files -- '*.kg.yaml' 2>/dev/null | sort -u)
 [ "${#GRAPHS[@]}" -gt 0 ] \
   || { echo "dissect-census: nenhum .kg.yaml RASTREADO em ${REPO} — sem corpus não há censo a emitir. Recusa." >&2; exit 3; }
 
 TODAY="$(date +%F)"
+
 
 # ── Leitura de UM grafo ────────────────────────────────────────────────────────────────────
 # Os marcadores são lidos com grep ancorado e o resultado DRENADO: nenhum fechador precoce
@@ -83,6 +129,9 @@ for rel in "${GRAPHS[@]}"; do
   # RÉGUA: contra quem N1/N3/N4 foram julgados. Ausente = o Onion (o comportamento de sempre).
   against="$(sed -n 's/^[[:space:]]*x_dissect_against:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#]*\).*/\1/p' "${f}" | head -1 | sed 's/[[:space:]]*$//')"
   [ -n "${against}" ] || against="onion"
+  # ESCOPO: o componente do repo contra o qual N1/N3/N4 se mediram. Ausente = `-` (o repo inteiro).
+  scope="$(sed -n 's/^[[:space:]]*x_dissect_scope:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#]*\).*/\1/p' "${f}" | head -1 | sed 's/[[:space:]]*$//')"
+  [ -n "${scope}" ] || scope="-"
   mode="$(sed -n 's/^[[:space:]]*x_dissect_mode:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#[:space:]]*\).*/\1/p' "${f}" | head -1)"
 
   verdict="$(sed -n 's/^[[:space:]]*\(x_\)\{0,1\}dissect_verdict:[[:space:]]*["'"'"']\{0,1\}\([a-z]*\).*/\2/p' "${f}" | head -1)"
@@ -122,7 +171,7 @@ for rel in "${GRAPHS[@]}"; do
   elif [ "${verdict}" != "-" ]; then state="veredito"
   else state="interrompida"; fi
 
-  rows="${rows}${tool}	${level}	${verdict}	${baseline}	${review}	${fresh}	${rel}	${against}	${state}
+  rows="${rows}${tool}	${level}	${verdict}	${baseline}	${review}	${fresh}	${rel}	${against}	${state}	${scope}
 "
   [ "${verdict}" = "parquear" ] && parked="${parked}${tool}	${rel}
 "
@@ -132,7 +181,7 @@ sorted_rows="$(printf '%s' "${rows}" | sort -t'	' -k2,2nr -k1,1)"
 
 if [ "${FMT}" = "--tsv" ]; then
   # régua e estado entram no FIM: as colunas 1-7 seguem onde estavam para quem já as lê.
-  printf 'ferramenta\tnivel\tveredito\tbaseline\treview_after\tfrescor\tgrafo\tregua\testado\n'
+  printf 'ferramenta\tnivel\tveredito\tbaseline\treview_after\tfrescor\tgrafo\tregua\testado\tescopo\n'
   [ "${found}" -gt 0 ] && printf '%s\n' "${sorted_rows}"
   exit 0
 fi
@@ -140,20 +189,23 @@ fi
 # ── Markdown: a projeção que entra na superfície como contexto injetado ────────────────────
 printf '# censo de dissecações · %s grafo(s) rastreado(s) · %s dissecação(ões) declarada(s)\n' \
   "${#GRAPHS[@]}" "${found}"
+printf '\nrégua padrão deste repo: **%s** (%s) — vale quando o dissect roda sem `--against`, e é\n' \
+  "${SELF_REGUA}" "${SELF_REGUA_LINE#*	}"
+printf 'gravada em `meta.x_dissect_against`; `--scope` a estreita a um componente (`meta.x_dissect_scope`).\n'
 if [ "${found}" -eq 0 ]; then
   printf '\nNenhum grafo do corpus se declara dissecação (marcador `x_dissect_tool:` no `meta:`).\n'
   printf 'Toda ferramenta entra pelo N0 — não há nível pago a reusar.\n'
 else
   # frescor fica na ÚLTIMA coluna de propósito: o evolve-census conta vencidas por `$NF`.
-  printf 'ferramenta | nível | veredito | régua | estado | baseline | review_after | frescor\n'
-  printf '%s\n' "${sorted_rows}" | awk -F'\t' 'NF>=9 && $1!=""{
-    printf "%s | N%s | %s | %s | %s | %s | %s | %s\n", $1, $2, $3, $8, $9, $4, $5, $6 }'
+  printf '\nferramenta | nível | veredito | régua | escopo | estado | baseline | review_after | frescor\n'
+  printf '%s\n' "${sorted_rows}" | awk -F'\t' 'NF>=10 && $1!=""{
+    printf "%s | N%s | %s | %s | %s | %s | %s | %s | %s\n", $1, $2, $3, $8, $10, $9, $4, $5, $6 }'
   if [ -n "${parked}" ]; then
     printf '\n## parqueadas (técnica a investigar — exigem gatilho nomeado)\n'
     printf '%s' "${parked}" | awk -F'\t' '$1!=""{ printf "- %s  (%s)\n", $1, $2 }'
   fi
   _section() {  # $1=título $2=regex do estado (awk)
-    local body; body="$(printf '%s\n' "${sorted_rows}" | awk -F'\t' -v re="$2" '$1!="" && $9 ~ re { printf "- %s · N%s · régua %s · %s  (%s)\n", $1, $2, $8, $9, $7 }')"
+    local body; body="$(printf '%s\n' "${sorted_rows}" | awk -F'\t' -v re="$2" '$1!="" && $9 ~ re { printf "- %s · N%s · régua %s · escopo %s · %s  (%s)\n", $1, $2, $8, $10, $9, $7 }')"
     [ -z "${body}" ] || printf '\n## %s\n%s\n' "$1" "${body}"
   }
   _section 'estudos (pararam no N2 DE PROPÓSITO, sem veredito — a question "adotar?" segue aberta; decidir é dissecar de novo sem --study, entrando no N3)' '^estudo$'
@@ -165,5 +217,6 @@ printf 'desperdício que este censo corta. VENCIDO não se cita como se fosse de
 printf 'mantenedor e preço mudam em semanas. TETO DECLARADO: o censo mede o que o corpus\n'
 printf 'DECLARA, não sabe de ferramenta que ninguém anotou, e não confere se a medição do nível\n'
 printf 'de fato ocorreu — o marcador é auto-atestado. RÉGUA: nível pago só se reusa na MESMA\n'
-printf 'régua — N0 e N2 descrevem a ferramenta, mas N1, N3 e N4 foram julgados contra a régua da\n'
-printf 'coluna, e contra outro alvo são outra pergunta.)\n'
+printf 'régua E no MESMO escopo — N0 e N2 descrevem a ferramenta, mas N1, N3 e N4 foram julgados\n'
+printf 'contra a régua e o escopo das colunas, e contra outro alvo ou outro componente são outra\n'
+printf 'pergunta. Escopo `-` = o repo inteiro.)\n'

@@ -40,12 +40,29 @@ aparência de análise.
 **A régua não é fixa no Onion.** "O que ela faz que o Onion não faz" é a pergunta do core. Num hub
 ou num adotado, a pergunta certa é contra o **alvo** — o repo que vai receber a peça. Por isso:
 
-- `--against <repo>` grava `meta.x_dissect_against: <repo>`. **Sem ele, a régua é o Onion** e o
-  comportamento do core não muda.
+- **A régua padrão é o próprio repo** (decisão do maestro de 2026-10-15, SAC-147): onde o dissect
+  roda, é sobre ele que N1, N3 e N4 se medem. No core isso **é** o Onion e nada muda; num produto
+  adotado, é o produto. A régua padrão é **derivada** pelo censo a partir do carimbo
+  `.claude/.onion-version` (sem carimbo, `role: source` ou porta ⇒ `onion`; outro papel ⇒ o id do
+  repo, pelo remote `origin`), nunca digitada pela sessão. "Sem carimbo" só é o core quando o medidor
+  mora no próprio repo: instalado por plugin, sem carimbo é um produto qualquer, e a régua é o id
+  dele; uma fonte desacoplada (`decoupled_from:`) também é soberana. A régua vai **sempre** para
+  `meta.x_dissect_against`. O campo `framework:` do carimbo não serve de id: um adotado pode
+  carregar o nome da fonte nele.
+- `--against <repo>` troca a régua por outro repo (o hub medindo para um adotado) e grava
+  `meta.x_dissect_against: <repo>`.
+- **A régua pode ser um componente, não o repo inteiro.** `--scope <pathspec[,pathspec]>` grava
+  `meta.x_dissect_scope` e estreita N1, N3 e N4 a uma ferramenta, funcionalidade ou biblioteca do
+  repo — o caso típico é **trocar o provedor de identidade de um produto**: o N1 pergunta o que a
+  ferramenta nova faz que o componente atual não faz, o N3 julga a substituição e o N4 escreve o
+  plano para o componente. O escopo é **caminho** (pathspec do git), porque caminho se mede: o leitor
+  de planos recusa plano cujo escopo não casa arquivo rastreado no repo da régua
+  (`escopo-sem-arquivo`). Nível pago só se reusa na **mesma régua E no mesmo escopo**.
 - Com outra régua, **N1** mede o delta contra o alvo, **N3** julga transferir para o alvo e **N4**
   escreve o plano (`x_absorb_*`) para o repo do alvo. **N0 e N2 independem da régua** (descrevem a
   ferramenta); **N1, N3 e N4 dependem**, então nível pago só se reusa na mesma régua.
-- O leitor de planos mede as peças **no repo do alvo**, pela raiz que lhe é **passada**. Construir
+- O leitor de planos mede as peças **no repo do alvo**, pela raiz que lhe é **passada** (para a
+  régua = o próprio repo, a raiz é `.` implícita). Construir
   o caminho a partir do nome do alvo é a classe que a cláusula 1 do censo da forja proíbe; sem a
   raiz o plano sai NAO-MEDIDO, nunca medido contra o repo errado.
 
