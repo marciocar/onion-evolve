@@ -33945,6 +33945,18 @@ run_member_registered_selftests() {
   rc=0; bash "${sut}" "${d}/fora" "${d}/members.yaml" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 3 ]; then record_pass "member-registered: (c) repo fora do registro sai rc=3 (o aviso não emudeceu)"
   else record_fail "member-registered: (c)" "repo fora do registro saiu rc=${rc} (esperado 3)"; fi
+  # (d) WORKTREE IRMÃ do membro registrado (o --update roda nela quando há sessão viva no alvo) é reconhecida, e a
+  #     worktree irmã de um repo FORA do registro segue rc=3 (SAC-144, 2026-10-15)
+  git -C "${d}/limpo" init -q -b main 2>/dev/null && git -C "${d}/limpo" -c user.email=t@t -c user.name=t commit -q --allow-empty -m b 2>/dev/null \
+    && git -C "${d}/limpo" worktree add -q -b upd "${d}/limpo-irma" 2>/dev/null
+  git -C "${d}/fora" init -q -b main 2>/dev/null && git -C "${d}/fora" -c user.email=t@t -c user.name=t commit -q --allow-empty -m b 2>/dev/null \
+    && git -C "${d}/fora" worktree add -q -b upd "${d}/fora-irma" 2>/dev/null
+  local rci=0 rcf=0
+  bash "${sut}" "${d}/limpo-irma" "${d}/members.yaml" >/dev/null 2>&1 || rci=$?
+  bash "${sut}" "${d}/fora-irma" "${d}/members.yaml" >/dev/null 2>&1 || rcf=$?
+  if [ "${rci}" -eq 0 ] && [ "${rcf}" -eq 3 ]; then
+    record_pass "member-registered: (d) worktree irmã do membro registrado é reconhecida; a de um repo fora segue rc=3"
+  else record_fail "member-registered: (d) worktree irmã" "irmã do registrado rc=${rci} (esperado 0), irmã de fora rc=${rcf} (esperado 3)"; fi
   rm -rf "${d}"
 }
 _family run_member_registered_selftests
