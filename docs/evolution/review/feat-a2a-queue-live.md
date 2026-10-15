@@ -2,7 +2,8 @@
 branch: feat/a2a-queue-live
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: fbcb37ac6714c1f4ad82169cd93b3e38f5925288c04acf7d701a7b7003a00265
+reviewed_code_sha256: 5cbc676adfc051822aba5ed32397dc07bd04d19a2efc0c24364308ef8ae22807
 findings_total: 12
 findings_real: 12
 tokens: 152017
