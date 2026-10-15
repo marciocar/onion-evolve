@@ -204,7 +204,7 @@ SELFTEST_LOCAL=0; SELFTEST_FULL="${ONION_SELFTEST_FULL:-0}"; SELFTEST_LOCAL_WHY=
 SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,moat_gate,a2a_invite_live,materialize_repo,rules_registry,ops_citation_travel,gitattributes_eol,eol_gitattributes"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -7848,8 +7848,22 @@ run_moat_gate_selftests() {
   git -C "${d}/proj" remote add origin https://github.com/onion-bancada/core.git
   # a raiz de casa da VPS vira FICTÍCIA na fixture (/srv/vps-home): a bancada viaja para as portas
   # públicas e não pode carregar caminho de máquina (o motor de publicação reprova, passo 5a).
-  sed 's#/home/[^/]*/#/srv/vps-home/#g' "${tsv_real}" > "${d}/proj/ops/moat-targets.tsv"
+  # a home de uma CONTA DE SERVIÇO que é alvo inteira (a linha `deploy path /home/<conta>`) vira /srv/vps-svc ANTES
+  # da troca genérica, com tudo o que está sob ela: sem isto, a linha mais específica de dentro dela (o arquivo de
+  # convites A2A, com wrapper próprio) cairia em /srv/vps-home e a regra do "mais específico vence" não se testaria.
+  # O nome da conta não aparece aqui: sai do próprio TSV.
+  local _svc_home; _svc_home="$(awk -F'\t' '!/^[[:space:]]*#/ && $2=="path" && $3 ~ /^\/home\/[^\/]+$/ {print $3; exit}' "${tsv_real}")"
+  _mg_map() { if [ -n "${_svc_home}" ]; then sed "s#${_svc_home}\([/\t\"]\|\$\)#/srv/vps-svc\1#g" "$1"; else cat "$1"; fi | sed 's#/home/[^/]*/#/srv/vps-home/#g'; }
+  _mg_map "${tsv_real}" > "${d}/proj/ops/moat-targets.tsv"
   cp "${REPO_ROOT}/ops/update-kg-writer.sh" "${d}/proj/ops/update-kg-writer.sh"
+  # o wrapper de convites (com os caminhos mapeados como o TSV) e o motor que escreve por --file, RASTREADOS
+  local _live_ok=0
+  if [ -f "${REPO_ROOT}/ops/a2a-invite-live.sh" ] && [ -f "${REPO_ROOT}/.claude/utils/federation-transport/a2a-invite.sh" ]; then
+    _live_ok=1
+    _mg_map "${REPO_ROOT}/ops/a2a-invite-live.sh" > "${d}/proj/ops/a2a-invite-live.sh"
+    mkdir -p "${d}/proj/.claude/utils/federation-transport"
+    cp "${REPO_ROOT}/.claude/utils/federation-transport/a2a-invite.sh" "${d}/proj/.claude/utils/federation-transport/a2a-invite.sh"
+  fi
   git init -q -b main "${d}/adotante"
   git -C "${d}/adotante" remote add origin https://github.com/onion-bancada/adotante.git
   mkdir -p "${d}/adotante/docs/evolution/inbound"
@@ -7868,6 +7882,11 @@ EOF
   cp "${REPO_ROOT}/ops/update-kg-writer.sh" "${d}/proj/ops/update-kg-writer-copia.sh"
   # repo de adotante SEM ops/moat-targets.tsv (o /meta:adopt copia .claude/, não ops/)
   git init -q -b main "${d}/sem-tsv"
+  # cópias NÃO rastreadas: o wrapper (fora do projeto) e o motor RENOMEADO (só o marcador o denuncia)
+  if [ "${_live_ok}" = 1 ]; then
+    cp "${d}/proj/ops/a2a-invite-live.sh" "${d}/scratch/live-copia.sh"
+    cp "${d}/proj/.claude/utils/federation-transport/a2a-invite.sh" "${d}/scratch/renomeado.sh"
+  fi
   # o CASO DE CAMPO, literal: o script de scratchpad de 2026-10-13 (fora do projeto)
   cat > "${d}/scratch/update-kg-writer.sh" <<'FIELD'
 #!/usr/bin/env bash
@@ -8055,6 +8074,43 @@ PY
     'echo "bash x.sh" | at now + 1 hour' "${J}" '    elif base in ("at", "batch"):' '    elif False:'
   _mgcase "(r8) at -l (lista) → passa" 0 "${P}" \
     'at -l' "${J}" 'all(x in ("-l", "-d", "-r", "-c", "-V") or x.isdigit() for x in args)' 'all(False for x in args)'
+  # ── o arquivo de convites A2A (2026-10-15): só o wrapper escreve; motor por --file é escrita ────────
+  if [ "${_live_ok}" = 1 ]; then
+    local INV; INV="$(awk -F'\t' '$4=="ops/a2a-invite-live.sh" {print $3; exit}' "${P}/ops/moat-targets.tsv")"
+    local MOT=.claude/utils/federation-transport/a2a-invite.sh
+    if [ -z "${INV}" ]; then record_fail "moat-gate: (i0)" "ops/moat-targets.tsv sem a linha do ops/a2a-invite-live.sh (core-only)"
+    else
+    _mgcase "(i1) mkdir na home da conta de serviço (o caso de campo) → VETO com o wrapper do bridge" "2:ops/update-bridge.sh" "${P}" \
+      "sudo -n -u svc mkdir -p /srv/vps-svc/a2a-probe" "${J}" '_MOAT_WRITE_ALL = {"tee", "rm", "rmdir", "mkdir",' '_MOAT_WRITE_ALL = {"tee", "rm", "rmdir",'
+    _mgcase "(i2) tee direto no arquivo de convites → VETO nomeando o wrapper de convites (mais específico)" "2:ops/a2a-invite-live.sh" "${P}" \
+      "sudo -u svc tee ${INV} < x.json" "${J}" '            if best is None or len(pat) > len(best[1]):' '            if best is None:'
+    _mgcase "(i3) motor do clone servido (ilegível) por bash, create --file no arquivo → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "sudo -n -u svc bash /srv/vps-svc/core/${MOT} create m --days 3 --token-stdin --file ${INV} < t" "${J}" \
+      '    _moat_arg_writer(p, _moat_script_args(p, words), " ".join(words))' '    pass'
+    _mgcase "(i4) motor do clone servido executado por caminho, --file= → VETO" "2:ops/a2a-invite-live.sh" "${P}" \
+      "sudo -u svc /srv/vps-svc/core/${MOT} revoke m --file=${INV}" "${J}" \
+      '            _moat_arg_writer(p, args, detail)   # antes do isfile' '            pass   # antes do isfile'
+    _mgcase "(i5) motor VERSIONADO deste projeto, revoke --file no arquivo → VETO (o alvo do argumento não é fronteira)" "2:ops/a2a-invite-live.sh" "${P}" \
+      "bash ${MOT} revoke m --file ${INV}" "${J}" '_MOAT_ARG_WRITERS = {"a2a-invite.sh": ({"create", "revoke"}' '_MOAT_ARG_WRITERS = {"a2a-invite.sh": ({"create"}'
+    _mgcase "(i6) motor RENOMEADO fora do projeto → VETO pelo marcador no corpo" "2:MOAT" "${P}" \
+      "bash ${d}/scratch/renomeado.sh create m --days 3 --token-stdin --file ${INV} < t" "${J}" \
+      '_MOAT_ARG_WRITER_MARK = "MOAT-ARG-WRITER:"' '_MOAT_ARG_WRITER_MARK = "MOAT-ARG-WRITER-NAO:"'
+    _mgcase "(i7) motor com --dry-run → passa (não escreve)" 0 "${P}" \
+      "bash ${MOT} create m --days 3 --token-stdin --dry-run --file ${INV} < t" "${J}" \
+      '    if not pos or pos[0] not in subs or "--dry-run" in args:' '    if not pos or pos[0] not in subs:'
+    _mgcase "(i8) motor check --file no arquivo → passa (leitura)" 0 "${P}" \
+      "sudo -u svc bash ${MOT} check --file ${INV}" "${J}" \
+      '    if not pos or pos[0] not in subs or "--dry-run" in args:' '    if not pos or "--dry-run" in args:'
+    _mgcase "(i9) o wrapper VERSIONADO (com o alvo citado na linha, que leva ao juiz) → passa" 0 "${P}" \
+      "bash ops/a2a-invite-live.sh create m --days 30 --token-file ~/m.token --invite-out ~/m.json --apply && echo \"convite em ${INV}\"" "${J}" \
+      '    if _moat_versioned(p):' '    if False:'
+    _mgcase "(i10) CÓPIA do wrapper fora do projeto → FECHA (o corpo chama o motor e cita o alvo)" "2:motor escritor" "${P}" \
+      "bash ${d}/scratch/live-copia.sh create m --days 30 --token-file ~/m.token --invite-out ~/m.json --apply" "${J}" \
+      '    if (_MOAT_ARG_WRITER_MARK in body or any(n in body for n in _MOAT_ARG_WRITERS)) and _MOAT_SIGNAL.search(body):' '    if False:'
+    fi
+  else
+    record_skip "moat-gate: (i*) sem ops/a2a-invite-live.sh ou sem o motor de convites — casos do arquivo de convites pulados"
+  fi
   # ── adotante e modo degradado ──────────────────────────────────────────────────────────────────
   _mgcase "(x1) adotante SEM ops/moat-targets.tsv: crontab - → passa (hook desarmado)" 0 "${d}/sem-tsv" \
     'crontab -' "${H}" '[ -f "$tsv" ] || exit 0' 'true' "${d}/sem-tsv"
@@ -8078,6 +8134,121 @@ PY
   if [ -z "${_bug}" ]; then record_pass "moat-gate: juiz sem bug interno nos casos de campo (modo estrito)"
   else record_fail "moat-gate: bug interno do juiz" "${_bug:0:300}"; fi
   rm -rf "${d}" "${np}"
+}
+
+# ---------------------------------------------------------------------------
+# Modo a2a-invite-live (2026-10-15) — o wrapper core-only que escreve o arquivo de convites A2A do bridge de
+# produção. Defeito datado: a preparação do arquivo à mão (`sudo -u <conta> mkdir -p <home da conta>/…`) foi
+# vetada pelo MOAT, corretamente, e não havia caminho de escrita com backup e check. Cada caso roda o wrapper
+# REAL em MODO DE TESTE DECLARADO (ONION_A2A_LIVE_TEST=1: o motor roda como quem roda, sem sudo, num arquivo
+# de sandbox) com um `sudo` STUB no PATH que sai 97 — nenhum caso, nem mutante, alcança a conta do serviço.
+# E CADA caso tem MUTANTE executado numa cópia do wrapper, provado por _prove_mutation.
+# ---------------------------------------------------------------------------
+run_a2a_invite_live_selftests() {
+  local -; set +e
+  local wr="${REPO_ROOT}/ops/a2a-invite-live.sh" mot="${REPO_ROOT}/.claude/utils/federation-transport/a2a-invite.sh"
+  if [ ! -f "${wr}" ]; then record_skip "a2a-invite-live: sem ops/a2a-invite-live.sh (core-only) — nada a testar"; return; fi
+  [ -f "${mot}" ] || { record_fail "a2a-invite-live" "motor ausente: ${mot}"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "a2a-invite-live: python3 ausente → pulado"; return; }
+  command -v flock >/dev/null 2>&1 || { record_skip "a2a-invite-live: flock ausente → pulado"; return; }
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/data" "${d}/op" "${d}/stub"; chmod 755 "${d}/data"
+  printf '#!/bin/sh\necho "sudo-stub: a bancada nunca chama sudo" >&2\nexit 97\n' > "${d}/stub/sudo"; chmod +x "${d}/stub/sudo"
+  cat > "${d}/members.yaml" <<'EOF'
+members:
+  - id: core-bancada
+    kind: source
+  - id: membro-bancada
+    kind: adopter
+EOF
+  cat > "${d}/bk.sh" <<EOF
+#!/usr/bin/env bash
+umask 077; tar -czf "${d}/bk-\$1.tgz" -C "${d}" data && echo "ok: ${d}/bk-\$1.tgz (1 bytes)"
+EOF
+  printf '#!/bin/sh\necho "ok: /nada"; exit 1\n' > "${d}/bk-falha.sh"
+  cat > "${d}/shim.sh" <<EOF
+case "\$1" in check) echo "shim: check reprova" >&2; exit 1 ;; esac
+exec bash "${mot}" "\$@"
+EOF
+  chmod +x "${d}/bk.sh" "${d}/bk-falha.sh"
+  ( umask 077; python3 -c 'import secrets; print(secrets.token_hex(32))' > "${d}/op/m.token" )
+  local TOK; TOK="$(cat "${d}/op/m.token")"
+  cp "${d}/op/m.token" "${d}/op/aberto.token"; chmod 644 "${d}/op/aberto.token"
+  ln -s "${d}/op/m.token" "${d}/op/link.token"
+  local svc_home; svc_home="$(sed -n 's/^SVC_HOME=//p' "${wr}" | head -1)"
+  # _ilr <wrapper> <args…> → "rc|saída" (stdout+stderr), env de teste completo; ILR_ENV extra antes
+  _ilr() {
+    local w="$1" rc=0 out; shift
+    out="$(cd "${d}" && env PATH="${d}/stub:${PATH}" LC_ALL=C ONION_A2A_LIVE_TEST=1 ONION_A2A_LIVE_FILE="${d}/data/a2a-invites.json" \
+      ONION_A2A_LIVE_MOTOR="${ILR_MOTOR:-${mot}}" ONION_A2A_LIVE_MEMBERS="${d}/members.yaml" ONION_A2A_LIVE_BACKUP="${ILR_BK:-${d}/bk.sh}" \
+      ONION_A2A_LIVE_LOCK="${d}/lock" ${ILR_ENV:-} bash "${w}" "$@" 2>&1)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  _ilreset() { rm -f "${d}/data/a2a-invites.json" "${d}/op/"*.json; }
+  # _ilcase <nome> <wrapper-old> <wrapper-new> <função-de-caso>  — a função recebe o caminho do wrapper e
+  # devolve 0 se o caso é satisfeito; roda no intacto e no mutante (cópia com OLD→NEW, 1ª ocorrência)
+  _ilcase() {
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
+    cp "${wr}" "${d}/w.sh"
+    _ilreset; "${fn}" "${d}/w.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "a2a-invite-live: ${name}"; else record_fail "a2a-invite-live: ${name}" "${IL_WHY:-caso não satisfeito}"; fi
+    cp "${wr}" "${d}/m.sh"
+    OLD="${old}" NEW="${new}" python3 - "${d}/m.sh" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    _ilreset; "${fn}" "${d}/m.sh" && rc_m=0
+    _prove_mutation "a2a-invite-live: ${name} (MUT)" "${d}/w.sh" "${d}/m.sh" "${rc_i}" "${rc_m}"
+  }
+  _c_dry() { local r; r="$(_ilr "$1" create membro-bancada --days 30 --token-file "${d}/op/m.token" --invite-out "${d}/op/m.json")"
+    IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 0 ] && [ ! -e "${d}/data/a2a-invites.json" ] && [ ! -e "${d}/op/m.json" ]; }
+  _c_apply() { local r; r="$(_ilr "$1" create membro-bancada --days 30 --token-file "${d}/op/m.token" --invite-out "${d}/op/m.json" --apply)"
+    IL_WHY="rc=${r%%|*} ${r#*|}"
+    [ "${r%%|*}" = 0 ] || return 1
+    [ "$(stat -c '%a %u' "${d}/op/m.json" 2>/dev/null)" = "600 $(id -u)" ] || { IL_WHY="descritor ausente ou com modo/dono errado"; return 1; }
+    [ "$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["invites"]))' "${d}/data/a2a-invites.json" 2>/dev/null)" = 1 ] || { IL_WHY="contagem != 1"; return 1; }
+    ! grep -qF "${TOK}" "${d}/op/m.json" "${d}/data/a2a-invites.json" || { IL_WHY="token em claro no descritor/arquivo"; return 1; }
+    case "${r#*|}" in *"${TOK}"*) IL_WHY="token na saída"; return 1 ;; esac
+    ! ls -d /tmp/onion-a2a-invite.* 2>/dev/null | while read -r t; do [ -O "${t}" ] && [ "${t}" -nt "${d}/members.yaml" ] && echo x; done | grep -q x || { IL_WHY="temporário da conta do serviço sobrou"; return 1; }
+  }
+  _c_mode() { local r; r="$(_ilr "$1" create membro-bancada --days 30 --token-file "${d}/op/aberto.token" --invite-out "${d}/op/m.json" --apply)"
+    IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 1 ] && case "${r#*|}" in *"modo 644"*) [ ! -e "${d}/data/a2a-invites.json" ] ;; *) false ;; esac; }
+  _c_link() { local r; r="$(_ilr "$1" create membro-bancada --days 30 --token-file "${d}/op/link.token" --invite-out "${d}/op/m.json" --apply)"
+    IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 1 ] && case "${r#*|}" in *"--token-file é symlink"*) true ;; *) false ;; esac; }
+  _c_env() { local r rc=0; r="$(cd "${d}" && env PATH="${d}/stub:${PATH}" ONION_A2A_LIVE_FILE="${d}/data/a2a-invites.json" bash "$1" check 2>&1)" || rc=$?
+    IL_WHY="rc=${rc} ${r}"; [ "${rc}" = 3 ]; }
+  _c_svc() { local r; r="$(ILR_ENV="ONION_A2A_LIVE_FILE=${svc_home}/x/a2a-invites.json" _ilr "$1" check)"
+    IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 3 ]; }
+  _c_opt() { local r; r="$(_ilr "$1" check --file "${d}/outro.json")"; IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 3 ]; }
+  _c_bk() { local r; r="$(ILR_BK="${d}/bk-falha.sh" _ilr "$1" create membro-bancada --days 30 --token-file "${d}/op/m.token" --invite-out "${d}/op/m.json" --apply)"
+    IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 2 ] && [ ! -e "${d}/data/a2a-invites.json" ]; }
+  _c_check() { local r; r="$(ILR_MOTOR="${d}/shim.sh" _ilr "$1" create membro-bancada --days 30 --token-file "${d}/op/m.token" --invite-out "${d}/op/m.json" --apply)"
+    IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 1 ] && case "${r#*|}" in *"ROLLBACK MANUAL"*) true ;; *) false ;; esac; }
+  _c_revoke() { local r
+    r="$(_ilr "${wr}" create membro-bancada --days 30 --token-file "${d}/op/m.token" --invite-out "${d}/op/m.json" --apply)"
+    [ "${r%%|*}" = 0 ] || { IL_WHY="setup: create rc=${r%%|*}"; return 1; }
+    r="$(_ilr "$1" revoke membro-bancada --apply)"; IL_WHY="rc=${r%%|*} ${r#*|}"
+    [ "${r%%|*}" = 0 ] && [ "$(python3 -c 'import json,sys; print(sum(1 for e in json.load(open(sys.argv[1]))["invites"] if e.get("revoked") is True))' "${d}/data/a2a-invites.json")" = 1 ]; }
+  _c_lock() { local r; rm -f "${d}/held"
+    ( flock -x 8; : > "${d}/held"; sleep 4 ) 8>"${d}/lock" &
+    local _n=0; while [ ! -f "${d}/held" ] && [ "${_n}" -lt 50 ]; do sleep 0.1; _n=$((_n + 1)); done
+    r="$(_ilr "$1" check)"; IL_WHY="rc=${r%%|*} ${r#*|}"; wait; [ "${r%%|*}" = 2 ]; }
+  _ilcase "(w1) sem --apply é ENSAIO: rc 0 e nada escrito" 'if [ "${APPLY}" = 0 ]; then' 'if false; then' _c_dry
+  _ilcase "(w2) --apply: 1 entrada, descritor 0600 do operador, token fora da saída e dos arquivos, temporário apagado" \
+    '( umask 077; set -C; as_svc cat -- "${tmpd}/invite.json" > "${INVITE_OUT}" )' '( true )' _c_apply
+  _ilcase "(w3) token 0644 → rc 1, nada escrito" '[ $(( 8#${t_mode} & 8#077 )) -eq 0 ] ||' 'true ||' _c_mode
+  _ilcase "(w4) token por symlink → rc 1" '[ -L "${TOKEN_FILE}" ] && die 1' 'false && die 1' _c_link
+  _ilcase "(w5) ONION_A2A_LIVE_* sem o modo de teste → rc 3 (produção não se redireciona)" "if env | grep -q '^ONION_A2A_LIVE_'; then" 'if false; then' _c_env
+  _ilcase "(w6) modo de teste com arquivo sob a home da conta do serviço → rc 3" 'case "${_r}/" in "${SVC_HOME}/"*)' 'case "${_r}/" in "/nunca/"*)' _c_svc
+  _ilcase "(w7) opção fora da lista fechada (--file) → rc 3" '    *) die 3 "opção não aceita: $1' '    *) shift; continue; die 3 "opção não aceita: $1' _c_opt
+  _ilcase "(w8) backup falha → rc 2, nada escrito" '[ $? -eq 0 ] || die 2 "backup falhou' 'true || die 2 "backup falhou' _c_bk
+  _ilcase "(w9) check reprova depois da escrita → rc 1 com ROLLBACK impresso" \
+    '  motor check --file "${FILE}" </dev/null || fail_after_write "check depois da escrita reprovou"' '  true || fail_after_write "check depois da escrita reprovou"' _c_check
+  _ilcase "(w10) revoke --apply → a entrada fica revoked: true" '  motor revoke "${MEMBER}" "${common[@]}" "${rcv[@]}" </dev/null' '  true' _c_revoke
+  _ilcase "(w11) trava ocupada (update-bridge rodando) → rc 2" 'flock -n 9 || die 2' 'true || die 2' _c_lock
+  rm -rf "${d}"
 }
 
 # ---------------------------------------------------------------------------
@@ -29324,6 +29495,7 @@ _family run_kg_status_factor_selftests
 _family run_radar_composable_modes_selftests
 _family run_pretooluse_veto_selftests
 _family run_moat_gate_selftests
+_family run_a2a_invite_live_selftests
 _family run_version_drift_selftests
 _family run_premodelswitch_guard_selftests
 _family run_research_lens_selftests

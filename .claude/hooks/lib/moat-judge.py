@@ -303,10 +303,57 @@ def _moat_versioned(path):
     return False
 
 
+# MOTOR QUE ESCREVE POR ARGUMENTO (2026-10-15): o motor de convites A2A escreve o arquivo que recebe em `--file`,
+# e o juiz só via escrita no VERBO (tee, cp, `>`). Medido: `sudo -u <conta> bash <motor> create … --file <arquivo
+# servido>` passava com rc 0 — do clone servido (ilegível para o operador, então nem o corpo era julgado) e da
+# worktree (versionado = fronteira). O wrapper de produção existiria e o caminho direto continuaria aberto.
+# Agora o VALOR de `--file` de um subcomando que escreve é julgado como destino de escrita, VERSIONADO OU NÃO: a
+# fronteira do script versionado vale para o que ele faz por dentro, não para o alvo que o comando lhe entrega.
+# Reconhecido pelo NOME do arquivo (o clone servido não se lê) OU pelo marcador no corpo (cópia renomeada).
+_MOAT_ARG_WRITERS = {"a2a-invite.sh": ({"create", "revoke"}, ("--file",))}
+_MOAT_ARG_WRITER_MARK = "MOAT-ARG-WRITER:"
+
+
+def _moat_arg_writer(p, args, detail):
+    spec = _MOAT_ARG_WRITERS.get(os.path.basename(p))
+    if spec is None and os.path.isfile(p):
+        try:
+            with open(p, encoding="utf-8", errors="replace") as fh:
+                head = fh.read(8192)
+        except OSError:
+            head = ""
+        m = re.search(re.escape(_MOAT_ARG_WRITER_MARK) + r"[ \t]*([a-z,-]+)[ \t]+(--[a-z-]+)", head)
+        if m:
+            spec = (set(m.group(1).split(",")), (m.group(2),))
+    if spec is None:
+        return
+    subs, opts = spec
+    pos = [a for a in args if not a.startswith("-")]
+    if not pos or pos[0] not in subs or "--dry-run" in args:
+        return
+    for o in opts:
+        v = _moat_opt_value(args, {o}, (o,))
+        if v is None:
+            continue
+        if DYNAMIC.search(v):
+            _moat_emit("inanalisavel", v, "", "%s %s %s só conhecido em runtime — %s" % (os.path.basename(p), pos[0], o, detail))
+        else:
+            _moat_write_path(_moat_abspath(v), detail, "%s %s %s" % (os.path.basename(p), pos[0], o), creates=False)
+
+
+def _moat_script_args(p, words):
+    """os argumentos que vêm DEPOIS do script na linha (`bash x.sh a b` → [a, b])."""
+    for k, w in enumerate(words):
+        if w and (os.path.basename(w) == os.path.basename(p)) and _moat_abspath(w) == p:
+            return words[k + 1:]
+    return []
+
+
 def _moat_script(path, depth, words):
     p = _moat_abspath(path)
     if not p:
         return                                          # caminho só conhecido em runtime: a fronteira do `bash x.sh`
+    _moat_arg_writer(p, _moat_script_args(p, words), " ".join(words))
     if not os.path.isfile(p) and p in _MOAT_COPIED and os.path.isfile(_MOAT_COPIED[p]):
         p = _MOAT_COPIED[p]                             # `cp a.sh b.sh && bash b.sh`: julga-se a.sh
     if not os.path.isfile(p):
@@ -327,6 +374,12 @@ def _moat_script(path, depth, words):
     except OSError:
         return                                          # ilegível: não se prova, não se acusa
     if "\x00" in body:
+        return
+    # script NÃO versionado que chama um motor escritor e cita um alvo do MOAT: a escrita sai por variável,
+    # função ou array (`motor create "${args[@]}"`), que o juiz não segue. Medido em 2026-10-15: uma cópia do
+    # wrapper de convites fora do projeto, que podia ter o backup e o check arrancados, passava com rc 0
+    if (_MOAT_ARG_WRITER_MARK in body or any(n in body for n in _MOAT_ARG_WRITERS)) and _MOAT_SIGNAL.search(body):
+        _moat_emit("inanalisavel", p, "", "script não versionado que chama um motor escritor, com alvo do MOAT no corpo")
         return
     try:
         scoped(heredocs(body), depth + 1)
@@ -569,6 +622,8 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
         _moat_script(args[0], depth, words)
     elif "/" in words[0] and base not in ("git", "gh"):
         p = _moat_abspath(words[0])
+        if p:
+            _moat_arg_writer(p, args, detail)   # antes do isfile: o motor no clone servido não se lê
         if p and os.path.isfile(p):
             try:
                 with open(p, "rb") as fh:
