@@ -2,7 +2,8 @@
 branch: chore/registry-pin-curation-85e93bba
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d89aeeedb94c2db88b01ff7650563e1f01124059ba83df2af28afc05324cfb8f
+reviewed_code_sha256: 288a13a4285bf9ce771493a5abf23b1844890d01f6eba4965f6b8df87a02d743
 findings_total: 0
 findings_real: 0
 tokens: 0
