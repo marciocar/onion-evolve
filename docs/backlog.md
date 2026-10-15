@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**497 itens abertos** em 106 grafo(s) com aberto (de 135 no escopo) · 107 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**496 itens abertos** em 106 grafo(s) com aberto (de 135 no escopo) · 107 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -130,12 +130,11 @@
 | 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
 | 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
 
-## a2a-configurator-2026-10 — 2 item(ns)
+## a2a-configurator-2026-10 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 66.0 | `Q_CONFIGURADOR_A2A_SEM_PASSO_MANUAL` | a2a-configurator-2026-10 | um wizard único consegue levar o core, um membro e um hub da chave ao sinal aceito e à revogação, sem passo manual de shell do |
-| 4.8 | `Q_MANUAL_DO_A2A` | a2a-configurator-2026-10 | o configurador A2A ganha um manual para os três leitores (operador do core, operador do hub e membro que entra), escrito a partir |
 
 ## infra-vps-2026-10 — 7 item(ns)
 

@@ -2,7 +2,8 @@
 branch: docs/a2a-manual-f5
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9e43086c4042402e0822dcf5344ed47bf1be9dc3b30f3d6ec2d35397dc8cc452
+reviewed_code_sha256: 0a139efb4fcb73cb57f8d6478580029fd11135ccb54f732d6397e2e826085b5e
 findings_total: 15
 findings_real: 15
 tokens: 206172
