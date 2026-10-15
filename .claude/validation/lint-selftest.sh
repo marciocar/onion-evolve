@@ -8232,7 +8232,9 @@ PY
     [ "$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["invites"]))' "${d}/data/a2a-invites.json" 2>/dev/null)" = 1 ] || { IL_WHY="contagem != 1"; return 1; }
     ! grep -qF "${TOK}" "${d}/op/m.json" "${d}/data/a2a-invites.json" || { IL_WHY="token em claro no descritor/arquivo"; return 1; }
     case "${r#*|}" in *"${TOK}"*) IL_WHY="token na saída"; return 1 ;; esac
-    ! ls -d /tmp/onion-a2a-invite.* 2>/dev/null | while read -r t; do [ -O "${t}" ] && [ "${t}" -nt "${d}/members.yaml" ] && echo x; done | grep -q x || { IL_WHY="temporário da conta do serviço sobrou"; return 1; }
+    local _t; for _t in /tmp/onion-a2a-invite.*; do
+      [ -d "${_t}" ] && [ -O "${_t}" ] && [ "${_t}" -nt "${d}/members.yaml" ] && { IL_WHY="temporário da conta do serviço sobrou: ${_t}"; return 1; }
+    done; return 0
   }
   _c_mode() { local r; r="$(_ilr "$1" create membro-bancada --days 30 --token-file "${d}/op/aberto.token" --invite-out "${d}/op/m.json" --apply)"
     IL_WHY="rc=${r%%|*} ${r#*|}"; [ "${r%%|*}" = 1 ] && case "${r#*|}" in *"modo 644"*) [ ! -e "${d}/data/a2a-invites.json" ] ;; *) false ;; esac; }
@@ -8272,7 +8274,7 @@ PY
     '( umask 077; set -C; as_svc cat -- "${tmpd}/invite.json" > "${INVITE_OUT}" )' '( true )' _c_apply
   _ilcase "(w3) token 0644 → rc 1, nada escrito" '[ $(( 8#${t_mode} & 8#077 )) -eq 0 ] ||' 'true ||' _c_mode
   _ilcase "(w4) token por symlink → rc 1" '[ -L "${TOKEN_FILE}" ] && die 1' 'false && die 1' _c_link
-  _ilcase "(w5) ONION_A2A_LIVE_* sem o modo de teste → rc 3 (produção não se redireciona)" "if env | grep -q '^ONION_A2A_LIVE_'; then" 'if false; then' _c_env
+  _ilcase "(w5) ONION_A2A_LIVE_* sem o modo de teste → rc 3 (produção não se redireciona)" "if compgen -e | grep -E '^ONION_A2A_LIVE_' >/dev/null; then" 'if false; then' _c_env
   _ilcase "(w6) modo de teste com arquivo sob a home da conta do serviço → rc 3" 'case "${_r}/" in "${SVC_HOME}/"*)' 'case "${_r}/" in "/nunca/"*)' _c_svc
   _ilcase "(w7) opção fora da lista fechada (--file) → rc 3" '    *) die 3 "opção não aceita: $1' '    *) shift; continue; die 3 "opção não aceita: $1' _c_opt
   _ilcase "(w8) backup falha → rc 2, nada escrito" '[ $? -eq 0 ] || die 2 "backup falhou' 'true || die 2 "backup falhou' _c_bk

@@ -76,7 +76,7 @@ if [ "${ONION_A2A_LIVE_TEST:-}" = 1 ]; then
   done
 else
   [ -n "${ONION_A2A_LIVE_TEST:-}" ] && die 3 "ONION_A2A_LIVE_TEST só aceita 1"
-  if env | grep -q '^ONION_A2A_LIVE_'; then
+  if compgen -e | grep -E '^ONION_A2A_LIVE_' >/dev/null; then
     die 3 "variável ONION_A2A_LIVE_* sem ONION_A2A_LIVE_TEST=1: produção não se redireciona por ambiente"
   fi
   FILE="${PROD_FILE}"; MOTOR="${PROD_MOTOR}"; MEMBERS=""; BACKUP=""; LOCK="${PROD_LOCK}"
