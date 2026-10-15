@@ -7896,7 +7896,7 @@ EOF
   # a cópia NÃO rastreada do wrapper da fila e o script mínimo com função que embrulha sudo (2026-10-15)
   if [ "${_queue_ok}" = 1 ]; then
     cp "${d}/proj/ops/a2a-queue-live.sh" "${d}/scratch/queue-copia.sh"
-    printf '#!/bin/bash\nQ=/srv/vps-svc/onion-bridge/data/a2a-pending\nsv(){ sudo -n -u svc "$@"; }\nsv mv -n -- "$Q/x.json" "$Q/_archived/x.json"\n' > "${d}/scratch/sv-mv.sh"
+    printf '#!/bin/bash\nQ=/srv/vps-svc/onion-bridge/data/a2a-pending\n_dk(){ docker "$@" || sudo -n docker "$@"; }\n_dk ps\nls -la "$Q"\n' > "${d}/scratch/sv-ro.sh"
   fi
   # o CASO DE CAMPO, literal: o script de scratchpad de 2026-10-13 (fora do projeto)
   cat > "${d}/scratch/update-kg-writer.sh" <<'FIELD'
@@ -8156,13 +8156,14 @@ PY
     _mgcase "(p4) modo de teste do wrapper da fila na linha de comando → FECHA" "2:modo de teste do wrapper da fila" "${P}" \
       "export ONION_A2A_QUEUE_TEST=1; ONION_A2A_QUEUE_BACKUP=/tmp/x.sh bash ops/a2a-queue-live.sh list" "${J}" \
       '_moat_emit("inanalisavel", "ONION_A2A_QUEUE_TEST",' '(lambda *a: None)("inanalisavel", "ONION_A2A_QUEUE_TEST",'
-    _mgcase "(p6) CÓPIA do wrapper da fila fora do projeto → FECHA (função que embrulha sudo + alvo no corpo)" "2:função que embrulha sudo" "${P}" \
+    _mgcase "(p6) CÓPIA do wrapper da fila fora do projeto → FECHA (o nome do wrapper + alvo no corpo)" "2:cópia não versionada de um wrapper" "${P}" \
       "bash ${d}/scratch/queue-copia.sh archive s.t.json --force-unaccepted motivo-qualquer --apply" "${J}" \
       '    if not any(o.startswith("__ONION_MOAT__") for o in OUT[n_out:])' \
       '    if False and not any(o.startswith("__ONION_MOAT__") for o in OUT[n_out:])'
-    _mgcase "(p7) script de 4 linhas com sv(){ sudo -u <conta> \"\$@\"; } e sv mv na fila → FECHA" "2:função que embrulha sudo" "${P}" \
-      "bash ${d}/scratch/sv-mv.sh" "${J}" \
-      '(?:function[ \t]+)?[A-Za-z_][A-Za-z0-9_]*[ \t]*\(\)' '(?:function[ \t]+)?ONION_NUNCA_[A-Za-z_][A-Za-z0-9_]*[ \t]*\(\)'
+    _mgcase "(p7) diagnóstico só de leitura com função que embrulha sudo, citando a fila → passa (o fecho é pelo nome do wrapper, não por vocabulário)" 0 "${P}" \
+      "bash ${d}/scratch/sv-ro.sh" "${J}" \
+      '            and any(n in code for n in _MOAT_WRAPPER_COPIES) and _MOAT_SIGNAL.search(code):' \
+      '            and re.search(r"\(\)\s*\{", code) and _MOAT_SIGNAL.search(code):'
     _mgcase "(p5) ls da fila (leitura) → passa" 0 "${P}" \
       "sudo -n ls -la ${QD}/" "${J}" '                   "setfacl", "mv"}' '                   "setfacl", "mv", "ls"}'
     fi
@@ -8357,7 +8358,12 @@ run_a2a_queue_live_selftests() {
   printf '#!/bin/sh\necho "sudo-stub: a bancada nunca chama sudo" >&2\nexit 97\n' > "${d}/stub/sudo"
   # o `mv` que copia e não remove: a escrita "sai 0" e a prova por contagem tem de reprovar
   printf '#!/bin/sh\nwhile [ "$#" -gt 2 ]; do shift; done\nexec cp -- "$1" "$2"\n' > "${d}/mvstub/mv"
-  chmod +x "${d}/stub/sudo" "${d}/mvstub/mv"
+  local realmv; realmv="$(command -v mv)"
+  mkdir -p "${d}/mvsha" "${d}/mvrace" "${d}/mvdel"
+  printf '#!/bin/sh\nwhile [ "$#" -gt 2 ]; do shift; done\n%s -- "$1" "$2" && printf x >> "$2"\n' "${realmv}" > "${d}/mvsha/mv"
+  printf '#!/bin/sh\nwhile [ "$#" -gt 2 ]; do shift; done\n%s -- "$1" "$2" && cp -- "$2" "$(dirname "$1")/novo.t-novo.json"\n' "${realmv}" > "${d}/mvrace/mv"
+  printf '#!/bin/sh\nwhile [ "$#" -gt 2 ]; do shift; done\n%s -- "$1" "$2" && rm -f -- "$(dirname "$1")/s2.t-pendente.json"\n' "${realmv}" > "${d}/mvdel/mv"
+  chmod +x "${d}/stub/sudo" "${d}/mvstub/mv" "${d}/mvsha/mv" "${d}/mvrace/mv" "${d}/mvdel/mv"
   cat > "${d}/bk.sh" <<EOF
 #!/usr/bin/env bash
 umask 077; tar -czf "${d}/bk-\$1.tgz" -C "${d}" q && echo "ok: ${d}/bk-\$1.tgz (1 bytes)"
@@ -8376,8 +8382,8 @@ EOF
     printf -- '---\ntipo: sinal-upstream\nverificacao:\n  verified: true\n  taskId: t-aceito\n---\n\n# corpo\n' > "${d}/inbox/_processed/aceito.md"
     # o taskId do hub ESTÁ no inbox do core: mesmo assim não conta (o hub aceita no repo dele)
     printf -- '---\nverificacao:\n  taskId: t-hub\n---\n' > "${d}/inbox/hub.md"
-    # taskId só no CORPO (fora do frontmatter) não é aceite
-    printf -- '---\ntipo: x\n---\n\n  taskId: t-pendente\n' > "${d}/inbox/corpo.md"
+    # taskId fora de verificacao: (sob outra chave do frontmatter, ou no corpo) não é aceite
+    printf -- '---\ntipo: x\ncita:\n  taskId: t-pendente\n---\n\n  taskId: t-pendente\n' > "${d}/inbox/corpo.md"
   }
   # _qlr <wrapper> <args…> → "rc|saída" (stdout+stderr), env de teste completo; QLR_ENV/QLR_PATH extras
   _qlr() {
@@ -8463,6 +8469,25 @@ PY
     _qlrc "${r}" 1 && [ ! -e "${d}/op/repo/s1.json" ]; }
   _c_help() { local r rc=0; r="$(bash "$1" --help 2>&1)" || rc=$?
     QL_WHY="rc=${rc} fim='$(tail -1 <<< "${r}")'"; [ "${rc}" = 0 ] && case "${r}" in *"3 uso inválido"*) true ;; *) false ;; esac; }
+  _c_sha() { local r; r="$(QLR_PATH="${d}/mvsha:" _qlr "$1" archive s1.t-aceito.json --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 1 && _qlhas "${r}" "não tem o sha256 do registro" && _qlhas "${r}" "ROLLBACK MANUAL"; }
+  _c_race() { local r; r="$(QLR_PATH="${d}/mvrace:" _qlr "$1" archive s1.t-aceito.json --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 0 && [ -f "${d}/q/novo.t-novo.json" ] && _qlhas "${r}" "1 chegado(s) durante" \
+      && grep -q $'\ts1.t-aceito.json\t' "${d}/q/_archived/archive.log"; }
+  _c_lost() { local r; r="$(QLR_PATH="${d}/mvdel:" _qlr "$1" archive s1.t-aceito.json --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 1 && _qlhas "${r}" "além de s1.t-aceito.json sumiram"; }
+  _c_arlink() { local r; mkdir -p "${d}/outro"; ln -s "${d}/outro" "${d}/q/_archived"
+    r="$(_qlr "$1" archive s1.t-aceito.json --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 1 && [ -f "${d}/q/s1.t-aceito.json" ] && [ ! -e "${d}/outro/s1.t-aceito.json" ]; }
+  _c_open() { local r; printf -- '---\nverificacao:\n  taskId: t-pendente\n' > "${d}/inbox/aberto.md"
+    r="$(_qlr "$1" archive s2.t-pendente.json --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 1 && [ -f "${d}/q/s2.t-pendente.json" ]; }
+  _c_inject() { local r; _qlrec "${d}/q/s4.t4.json" 't4\tFAKE\n2099-01-01\tz.json' membro-d null
+    r="$(_qlr "$1" archive s4.t4.json --force-unaccepted "registro de teste com taskId sujo" --apply)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 0 && [ "$(grep -c . "${d}/q/_archived/archive.log")" = 1 ] && ! grep -q FAKE "${d}/q/_archived/archive.log"; }
+  _c_ansi() { local r; _qlrec "${d}/q/s5.t5.json" t5 $'\\u001b[2JFAKE' null
+    r="$(_qlr "$1" list)"; QL_WHY="${r:0:300}"
+    _qlrc "${r}" 0 && _qlhas "${r}" "s5.t5.json" && ! _qlhas "${r}" $'\e'; }
   _qlcase "(q1) list: nome, remetente e aceite, sem o corpo do sinal (texto e --json)" \
     "    print(json.dumps(o))'" "    print(json.dumps(dict(o, raw=r)))'" _c_list
   _qlcase "(q2) list: a fila do hub aparece com o aceite NÃO medido, e --receiver filtra" 'else acc="-"; fi' 'else acc=""; fi' _c_hub
@@ -8474,13 +8499,13 @@ PY
   _qlcase "(q7) --force-unaccepted com motivo curto → rc 3" '^[^[:cntrl:]]{8,200}$' '^[^[:cntrl:]]{0,200}$' _c_short
   _qlcase "(q8) registro de hub com o taskId no inbox do core NÃO conta como aceito" \
     'if [ "${Q}" = "${QUEUE}" ] && { [ -z "${RRCV}" ] || [ "${RRCV}" = "${DEFAULT_RECEIVER}" ]; }; then ACC=' 'if true; then ACC=' _c_hubacc
-  _qlcase "(q9) taskId só no corpo do doc (fora do frontmatter) não é aceite" \
-    $'            if ln.strip() == "---":\n                break' $'            if ln.strip() == "---":\n                pass' _c_body
+  _qlcase "(q9) taskId fora de verificacao: (outra chave do frontmatter, ou o corpo) não é aceite" \
+    '            elif under and pat.match(ln):' '            elif pat.match(ln):' _c_body
   _qlcase "(q10) registro fora da forma (com diretório) → rc 3" '[[ "${REC}" =~ ${REC_RE} ]] ||' 'true ||' _c_form
   _qlcase "(q11) registro symlink → rc 1, nada movido" 'as_svc test -L "${SRC}" && die 1' 'false && die 1' _c_link
   _qlcase "(q12) backup falha → rc 2, nada movido" '[ $? -eq 0 ] || die 2 "backup falhou' 'true || die 2 "backup falhou' _c_bk
   _qlcase "(q13) já arquivado com o mesmo nome → rc 1, recusa sobrescrever" 'as_svc test -e "${DST}" && die 1' 'false && die 1' _c_exists
-  _qlcase "(q14) mv que sai 0 sem mover → a contagem reprova, rc 1 com ROLLBACK impresso" \
+  _qlcase "(q14) mv que sai 0 sem mover → rc 1 com ROLLBACK impresso" \
     "fail_after_write() { printf '[%s] ERRO: %s\n' \"\${NAME}\" \"\$1\" >&2; rollback; exit 1; }" \
     "fail_after_write() { printf '[%s] ERRO: %s\n' \"\${NAME}\" \"\$1\" >&2; exit 1; }" _c_fake
   _qlcase "(q15) ONION_A2A_QUEUE_* sem o modo de teste → rc 3 (produção não se redireciona)" \
@@ -8495,6 +8520,18 @@ PY
   _qlcase "(q21) show --out numa árvore git sem .gitignore → rc 1, nada escrito" \
     '     && ! git -C "${out_dir}" check-ignore -q' '     && false && ! git -C "${out_dir}" check-ignore -q' _c_showgit
   _qlcase "(q22) --help mostra o EXIT inteiro (até '3 uso inválido')" "'/^# USO/,/^# MODO DE TESTE/p'" "'/^# USO/,/^# EXIT/p'" _c_help
+  _qlcase "(q23) mv que altera o conteúdo → rc 1 pelo sha256, com ROLLBACK" \
+    '[ "${sha_after}" = "${sha_before}" ] || fail_after_write' 'true || fail_after_write' _c_sha
+  _qlcase "(q24) registro que CHEGA durante o arquivamento (o bridge segue enfileirando) não é falha" \
+    '[ "${missing}" = 0 ] || fail_after_write' '[ "${after_q}" = "$(( before_q - 1 ))" ] || fail_after_write' _c_race
+  _qlcase "(q25) outro registro que SOME durante o arquivamento → rc 1" '[ "${missing}" = 0 ] || fail_after_write' 'true || fail_after_write' _c_lost
+  _qlcase "(q26) _archived como symlink → rc 1, nada movido" 'as_svc test -L "${Q}/_archived" && die 1' 'false && die 1' _c_arlink
+  _qlcase "(q27) frontmatter sem fechamento não é aceite" '        if hit and closed:' '        if hit:' _c_open
+  _qlcase "(q28) taskId com tab e quebra de linha não injeta linha no archive.log" \
+    '[[ "${TID}" =~ ^[A-Za-z0-9-]{1,64}$ ]] || TID=""' 'true || TID=""' _c_inject
+  _qlcase "(q29) list em texto não imprime caractere de controle vindo do remetente" \
+    'o={k: ("".join(c for c in v if c.isprintable()) if isinstance(v, str) else v) for k, v in json.loads(sys.argv[1]).items()}' \
+    'o=json.loads(sys.argv[1])' _c_ansi
   rm -rf "${d}"
 }
 

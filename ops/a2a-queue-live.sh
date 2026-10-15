@@ -7,7 +7,10 @@
 # fila. Limpar a fila era ato manual do maestro com `!`, porque ela mora em /home/onion, um caminho SERVIDO
 # (ops/moat-targets.tsv), e o veto do MOAT barra, corretamente, `sudo -u <conta> mv` direto nela. Este wrapper é
 # o único caminho de escrita na fila: trava, ensaio por padrão, backup cifrado antes, prova por contagem depois e
-# rollback impresso. Molde: ops/a2a-invite-live.sh.
+# rollback impresso. Molde: ops/a2a-invite-live.sh. "Único" quer dizer o único que o veto deixa passar entre os
+# verbos que ele julga (mv, rm, cp, tee, …); interpretador (python3 -c, perl -e, node -e), rsync
+# --remove-source-files, tar --remove-files e função, array ou alias que embrulha sudo seguem fora do juiz
+# (classe pré-existente, declarada na doutrina do drive).
 #
 # USO
 #   ops/a2a-queue-live.sh list    [--receiver <id>] [--json]
@@ -170,11 +173,17 @@ for dp, _, fs in os.walk(root):
             continue
         if not ls or ls[0].strip() != "---":
             continue
+        hit, under, closed = False, False, False
         for ln in ls[1:]:
             if ln.strip() == "---":
+                closed = True
                 break
-            if pat.match(ln):
-                print(os.path.join(dp, f)); raise SystemExit' "${INBOX}" "$1" 2>/dev/null
+            if ln and not ln[0].isspace():
+                under = ln.rstrip() == "verificacao:"       # o a2a-accept.sh grava verificacao.taskId
+            elif under and pat.match(ln):
+                hit = True
+        if hit and closed:                                  # frontmatter sem fechamento não é frontmatter
+            print(os.path.join(dp, f)); raise SystemExit' "${INBOX}" "$1" 2>/dev/null
 }
 
 # ── list ───────────────────────────────────────────────────────────────────────────────────────────────
@@ -209,7 +218,7 @@ for n in sorted(os.listdir(d)):
         python3 -I -c 'import json,sys; o=json.loads(sys.argv[1]); o["queue"]=sys.argv[2]; o["accepted_doc"]=None if sys.argv[3] in ("", "-") else sys.argv[3]; o["accepted_measured"]=sys.argv[3] != "-"; print(json.dumps(o, ensure_ascii=False))' "${ln}" "${r}" "${acc}"
       else
         python3 -I -c 'import json,sys
-o=json.loads(sys.argv[1]); acc=sys.argv[2]
+o={k: ("".join(c for c in v if c.isprintable()) if isinstance(v, str) else v) for k, v in json.loads(sys.argv[1]).items()}; acc=sys.argv[2]
 if o.get("malformed"): print("  %s  [registro malformado]" % o["name"]); raise SystemExit
 a = "não medido (o hub aceita no repo dele)" if acc == "-" else (("sim (" + acc + ")") if acc else "não")
 print("  %s\n      remetente=%s  recebido_em=%s  verified=%s  aceito=%s" % (o["name"], o.get("from"), o.get("receivedAt"),
@@ -227,6 +236,8 @@ fi
 Q="$(qdir "${RECEIVER}")"
 SRC="${Q}/${REC}"
 as_svc test -d "${Q}" || die 1 "não há fila para o receptor '${RECEIVER:-${DEFAULT_RECEIVER}}'"
+as_svc test -L "${Q}" && die 1 "a fila do receptor é symlink: recusado (${Q})"
+as_svc test -L "${Q}/_archived" && die 1 "${Q}/_archived é symlink: recusado (o arquivado iria para outro lugar)"
 as_svc test -L "${SRC}" && die 1 "o registro é symlink: recusado (${SRC})"
 as_svc test -f "${SRC}" || die 1 "não há o registro ${REC} na fila ${Q}"
 META="$(scan "${Q}" | python3 -I -c 'import json,sys
@@ -257,6 +268,8 @@ fi
 
 # ── archive ────────────────────────────────────────────────────────────────────────────────────────────
 TID="$(mget taskId)"; RRCV="$(mget receiver)"
+[[ "${TID}" =~ ^[A-Za-z0-9-]{1,64}$ ]] || TID=""        # forma do randomUUID do bridge; fora dela, conta como ausente
+[[ "${RRCV}" =~ ${ID_RE} ]] || [ -z "${RRCV}" ] || RRCV="<fora-da-forma>"
 ACC=""
 if [ "${Q}" = "${QUEUE}" ] && { [ -z "${RRCV}" ] || [ "${RRCV}" = "${DEFAULT_RECEIVER}" ]; }; then ACC="$(accepted_doc "${TID}")"; fi
 if [ -n "${ACC}" ]; then
@@ -277,7 +290,9 @@ fi
 
 # ── contagem ANTES (a prova é por contagem, não pelo rc do mv) ─────────────────────────────────────────
 count() { as_svc test -d "$1" || { echo 0; return; }; scan "$1" | grep -c . || true; }
-before_q="$(count "${Q}")"; before_a="$(count "${DST_DIR}")"
+names() { as_svc test -d "$1" || return 0; scan "$1" | python3 -I -c 'import json,sys
+for ln in sys.stdin: print(json.loads(ln)["name"])'; }
+before_q="$(count "${Q}")"; before_a="$(count "${DST_DIR}")"; before_names="$(names "${Q}")"
 sha_before="$(as_svc sha256sum -- "${SRC}" | cut -d' ' -f1)"
 [[ "${before_q}" =~ ^[1-9][0-9]*$ ]] && [ -n "${sha_before}" ] || die 2 "não medi a fila antes do arquivamento"
 
@@ -304,17 +319,22 @@ fail_after_write() { printf '[%s] ERRO: %s\n' "${NAME}" "$1" >&2; rollback; exit
 as_svc mkdir -p -m 0750 -- "${DST_DIR}" || die 2 "não criei ${DST_DIR}"
 as_svc mv -n -- "${SRC}" "${DST}"
 rc=$?
-after_q="$(count "${Q}")"; after_a="$(count "${DST_DIR}")"
+after_q="$(count "${Q}")"; after_a="$(count "${DST_DIR}")"; after_names="$(names "${Q}")"
 if [ "${rc}" -ne 0 ]; then
-  [ "${after_q}" = "${before_q}" ] || fail_after_write "o mv saiu ${rc} e a contagem da fila mudou"
+  as_svc test -f "${SRC}" || fail_after_write "o mv saiu ${rc} e o registro não está mais na fila"
   say "o mv saiu ${rc}: nada foi movido (fila ${before_q} intacta)"; exit 1
 fi
 as_svc test -e "${SRC}" && fail_after_write "o registro continua na fila depois do mv"
-[ "${after_q}" = "$(( before_q - 1 ))" ] || fail_after_write "contagem da fila: esperava $(( before_q - 1 )), há ${after_q}"
+# a fila é medida como CONJUNTO, não como número: o bridge segue enfileirando durante o arquivamento (a trava só
+# exclui o update-bridge), e um registro que chega não é falha; um que SOME, além deste, é
+missing="$(comm -23 <(printf '%s\n' "${before_names}" | grep -vxF -- "${REC}" | LC_ALL=C sort) <(printf '%s\n' "${after_names}" | LC_ALL=C sort) | grep -c . || true)"
+[ "${missing}" = 0 ] || fail_after_write "contagem da fila: ${missing} registro(s) além de ${REC} sumiram da fila"
+arrived="$(comm -13 <(printf '%s\n' "${before_names}" | LC_ALL=C sort) <(printf '%s\n' "${after_names}" | LC_ALL=C sort) | grep -c . || true)"
+[ "${arrived}" = 0 ] && arrived=""
 [ "${after_a}" = "$(( before_a + 1 ))" ] || fail_after_write "contagem de _archived: esperava $(( before_a + 1 )), há ${after_a}"
 sha_after="$(as_svc sha256sum -- "${DST}" | cut -d' ' -f1)"
 [ "${sha_after}" = "${sha_before}" ] || fail_after_write "o arquivado não tem o sha256 do registro (${sha_after:0:12} ≠ ${sha_before:0:12})"
 printf '%s\t%s\t%s\t%s\t%s\n' "$(date -u +%FT%TZ)" "${REC}" "${TID:-}" "${STATUS}" "$(id -un)" \
   | as_svc tee -a -- "${DST_DIR}/archive.log" >/dev/null || say "AVISO: o registro FOI arquivado, mas a linha do archive.log falhou"
-say "OK — ${REC} arquivado (${STATUS%%:*}): fila ${before_q} → ${after_q}, _archived ${before_a} → ${after_a}, sha256 ${sha_after:0:12} conferido"
+say "OK — ${REC} arquivado (${STATUS%%:*}): fila ${before_q} → ${after_q}${arrived:+ (${arrived} chegado(s) durante)}, _archived ${before_a} → ${after_a}, sha256 ${sha_after:0:12} conferido"
 exit 0
