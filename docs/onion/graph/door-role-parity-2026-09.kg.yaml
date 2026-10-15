@@ -896,6 +896,46 @@ nodes:
       method: "medição: bancada com LC_ALL=C; cada mutante plantado por ops/mutate-and-restore.sh e o caso reprova"
       locality: "repo"
 
+  - id: E_FONTE_DO_UPDATE_SEM_ESCOLHA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: "2026-10-15"
+    verified_against: "git log --all -- .claude/.onion-version nos 22 adotantes locais do members.yaml, cada source_commit classificado contra git rev-list --first-parent origin/main do core: 126 pares adotante×pin, 112 na linha de main, 3 de branch mergeada depois, 3 que nunca chegaram a origin/main, 1 que não existe no core; nenhum de alvo kind: door"
+    source_kind: repo
+    source_tier: 10
+    label: "o --update usava sempre o HEAD do checkout da sessão, sem escolha nem medição: 6 de 126 pins de adotantes saíram de um HEAD fora da linha de main, 3 deles nunca chegaram a ela"
+    narrative: "Item 3 da SAC-144, sinal do update de um adotante em 2026-10-15: o executor teve de abrir à mão uma worktree do core no sha de origin/main, porque o adopt.md não deixava escolher a fonte. A regra vivia em 6 sítios de prosa do --update (o SOURCE_ROOT, o NOW de HEAD, o .env.example de HEAD, o diff ..HEAD, o vendor-branch update e o re-carimbo do onion-version.sh). O vendor-branch transportava o rev-parse HEAD da fonte e carimbava o pin recebido, sem conferir que eram o mesmo commit. A medição dos carimbos mostrou o efeito: 3 pins de branch ainda não mergeada (o adotante recebeu código não revisado) e 3 pins que nunca chegaram a origin/main, porque a branch foi reescrita; esses só existem enquanto a branch existir no disco de quem rodou. A medida de defasagem por data (pin atrás da ponta quando o carimbo foi commitado) é aproximada e não entra na contagem."
+    trace: ".claude/commands/meta/adopt.md · .claude/utils/adopt/vendor-branch.sh"
+    provenance:
+      source: "carimbos .claude/.onion-version da história dos adotantes locais e a linha first-parent de origin/main do core"
+      locator: "classificação por par adotante×pin: MAIN_FIRST_PARENT, MERGED_LATER_FEATURE, NEVER_ON_MAIN, NOT_IN_CORE"
+      method: "medição: leitura git somente, sem escrita nos adotantes"
+      locality: "repo"
+
+  - id: D_FONTE_DO_UPDATE_RESOLVIDA_POR_MECANISMO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: "2026-10-15"
+    verified_against: "run_adopt_update_source_selftests com LC_ALL=C: 10 casos verdes; 7 mutantes, cada um reprova o seu caso (auto não mergeado, worktree na ponta, porta, manifesto sujo, a prosa do adopt.md com eval numa linha só, pin diferente do HEAD no vendor-branch, --worktree do dedicated-branch); vendor_branch e adopt_robust seguem verdes com a guarda nova; dogfood no core real com um adotado e uma porta locais (auto, origin, commit nomeado e porta recusada)"
+    source_kind: repo
+    source_tier: 10
+    label: "a fonte do --update é resolvida por script (auto, origin, head ou commit), com recusa da fonte ambígua, do manifesto sujo e de porta fora da ponta de origin; o vendor-branch recusa pin diferente do HEAD"
+    narrative: "O resolve-update-source.sh entrega uma RAIZ cujo HEAD é o commit escolhido, não só um sha, porque os helpers do update leem a árvore de trabalho do SOURCE_ROOT e não só o HEAD. Quando a fonte não é o checkout, abre uma worktree destacada dentro do git-dir comum, que nunca aparece no checkout e é reusada na retomada. O auto só segue no caso inequívoco (HEAD na ponta de origin/<integração> e manifesto limpo); atrás da ponta, fora dela ou sem fetch, recusa e nomeia --source origin e --source head. Head ou commit fora de main é permitido num adotado, por escolha explícita e com aviso para o relatório. Numa porta só a ponta de origin passa, e o caminho normal de porta segue o /meta:publish. Porta pública como fonte ficou de fora: o pin carimbado tem de ser commit do core, e o commit de uma porta não é. O dedicated-branch.sh ganhou --worktree para forçar a worktree irmã sem farol. A prosa do adopt.md passou a citar o mecanismo em dois tempos (rc lido antes do eval)."
+    trace: ".claude/utils/adopt/resolve-update-source.sh · .claude/utils/adopt/vendor-branch.sh · .claude/utils/adopt/dedicated-branch.sh · .claude/commands/meta/adopt.md · .claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh, função run_adopt_update_source_selftests"
+      locator: "casos (s1) a (s10) e os mutantes de cada um"
+      method: "medição: bancada com LC_ALL=C; cada mutante plantado pelo mutate-and-restore e o caso reprova"
+      locality: "repo"
+
 edges:
   # o dano é a evidência de que a lacuna existia
   - from: E_DANO_85_ARQUIVOS
@@ -1127,5 +1167,12 @@ edges:
     to: D_CACHE_DO_PIN_LE_O_REMOTO_PELA_LEITURA_DO_STATUS
     edge_type: SUPPORTS
   - from: D_CACHE_DO_PIN_LE_O_REMOTO_PELA_LEITURA_DO_STATUS
+    to: E_PUBLICAR_SOB_DEMANDA_F3
+    edge_type: DEPENDS_ON
+  # a fonte sem escolha medida nos carimbos é a evidência da decisão de resolver a fonte por script
+  - from: E_FONTE_DO_UPDATE_SEM_ESCOLHA
+    to: D_FONTE_DO_UPDATE_RESOLVIDA_POR_MECANISMO
+    edge_type: SUPPORTS
+  - from: D_FONTE_DO_UPDATE_RESOLVIDA_POR_MECANISMO
     to: E_PUBLICAR_SOB_DEMANDA_F3
     edge_type: DEPENDS_ON

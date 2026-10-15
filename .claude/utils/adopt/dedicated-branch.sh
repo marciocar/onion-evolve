@@ -3,7 +3,9 @@
 # dedicated-branch.sh — prepara a BRANCH DEDICADA onde o /meta:adopt --update e o --promote-hub
 # escrevem, e imprime o DIRETÓRIO onde trabalhar.
 #
-# Uso : dedicated-branch.sh <TARGET> <BRANCH> <BASE>
+# Uso : dedicated-branch.sh <TARGET> <BRANCH> <BASE> [--worktree]
+#   --worktree = abre a worktree irmã mesmo sem farol vivo (SAC-144: o operador não tinha como
+#   forçá-la, e o checkout do alvo era trocado de branch sempre que nenhuma sessão estava lá)
 #   TARGET = repo do alvo · BRANCH = chore/onion-update-<pin> | chore/onion-promote-hub
 #   BASE   = de onde a branch nasce (a integração do alvo); ignorada se BRANCH já existe (retomada)
 # stdout: o diretório de trabalho — o próprio TARGET, ou uma WORKTREE dele quando há farol vivo.
@@ -24,8 +26,9 @@
 # =============================================================================
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-T="${1:-}"; BR="${2:-}"; BASE="${3:-}"
-[ -n "${T}" ] && [ -n "${BR}" ] && [ -n "${BASE}" ] || { echo "uso: dedicated-branch.sh <TARGET> <BRANCH> <BASE>" >&2; exit 2; }
+T="${1:-}"; BR="${2:-}"; BASE="${3:-}"; FORCE_WT=0
+case "${4:-}" in --worktree) FORCE_WT=1 ;; "") ;; *) echo "ERRO: 4º argumento desconhecido '${4}' (só --worktree)" >&2; exit 2 ;; esac
+[ -n "${T}" ] && [ -n "${BR}" ] && [ -n "${BASE}" ] || { echo "uso: dedicated-branch.sh <TARGET> <BRANCH> <BASE> [--worktree]" >&2; exit 2; }
 
 TOP="$(git -C "${T}" rev-parse --show-toplevel 2>/dev/null)" || { echo "ERRO: '${T}' não é repositório git." >&2; exit 2; }
 _has_br=0; git -C "${TOP}" rev-parse --verify --quiet "refs/heads/${BR}" >/dev/null && _has_br=1
@@ -48,7 +51,9 @@ fi
 # ── farol: há OUTRA sessão viva no alvo? ─────────────────────────────────────────────────────────
 BEACON="${HERE}/../../validation/session-beacon.sh"
 LIVE=1
-if [ -f "${BEACON}" ]; then
+if [ "${FORCE_WT}" = 1 ]; then
+  echo "  --worktree: worktree irmã por escolha do operador (sem consultar o farol)." >&2
+elif [ -f "${BEACON}" ]; then
   bash "${BEACON}" check "${TOP}" >/dev/null 2>&1 && LIVE=0
 else
   echo "  (sem session-beacon.sh: não há como provar que o alvo está livre — uso worktree)" >&2
@@ -66,7 +71,7 @@ if [ "${LIVE}" = 1 ]; then
   else
     git -C "${TOP}" worktree add -q -b "${BR}" "${WT}" "${BASE}" >&2 || { echo "ERRO: não consegui criar a worktree de '${BR}'." >&2; exit 2; }
   fi
-  echo "  farol vivo em ${TOP}: trabalho na worktree ${WT} (branch ${BR}); o checkout do alvo fica intocado." >&2
+  [ "${FORCE_WT}" = 1 ] || echo "  farol vivo em ${TOP}: trabalho na worktree ${WT} (branch ${BR}); o checkout do alvo fica intocado." >&2
   printf '%s\n' "${WT}"
   exit 0
 fi

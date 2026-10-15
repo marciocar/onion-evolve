@@ -248,6 +248,16 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
     echo "      Passe o commit real: git -C \"$SRC\" rev-parse --short=12 HEAD" >&2
     return 2
   fi
+  # O PIN É O COMMIT TRANSPORTADO (SAC-144, 2026-10-15): o transporte abaixo sai do HEAD da fonte, e
+  # o pin é o que se carimba. Pin ≠ HEAD = o adotante recebe um commit e registra outro — a escolha
+  # da fonte vive no resolve-update-source.sh, que entrega um SOURCE_ROOT cujo HEAD É o pin.
+  # Só compara o que resolve: lixo de pin é da guarda acima (o mutante dela tem de continuar mordendo).
+  _pin_full="$(git -C "$SRC" rev-parse --verify -q "${PIN}^{commit}" 2>/dev/null)"
+  if [ -n "${_pin_full}" ] && [ "${_pin_full}" != "$(git -C "$SRC" rev-parse HEAD)" ]; then
+    echo "ERRO: pin '${PIN}' não é o HEAD da fonte ($SRC) — o transporte sairia de outro commit." >&2
+    echo "      Resolva a fonte pelo resolve-update-source.sh (ele entrega a raiz cujo HEAD é o pin)." >&2
+    return 2
+  fi
 
   # Bootstrap de legado (sem vendor): ramifica do commit LIMPO (framework == core@pin-ADOTADO), não do HEAD
   # (que pode ter customização commitada → clobber no 1º merge — spec §8). Fresh-adoption já tem vendor.
