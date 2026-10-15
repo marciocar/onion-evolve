@@ -2,7 +2,8 @@
 branch: feat/a2a-invite-live-wrapper
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 2d09f527f683d40e0d60fc29834a610d12abf5313061f7d3e88552e041c261b1
+reviewed_code_sha256: 6d56c6ea805139f21615337e18aa0333fa67ccc874d2c5b3ae01b4cae28d2212
 findings_total: 12
 findings_real: 12
 tokens: 158618
