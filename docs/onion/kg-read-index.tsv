@@ -141,7 +141,7 @@
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_ORFAO_EXIGE_TRES_PROVAS	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/diary/2026-10-02-quatro-decisoes-seladas-e-tres-guardas-com-defeito-datado.md	E_O_EVOLVE_E_2_DE_7_NAO_ZERO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/hooks	E_AUTO_MODE_E_UMA_CAMADA_DE_PERMISSAO_QUE_O_ONION_NAO_USA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
-.claude/hooks/background-state-needs-evidence.sh	C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
+.claude/hooks/background-task-probe.sh	D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 .claude/hooks/bash-empty-result-guard.sh	E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/hooks/bash-empty-result-guard.sh	E_POSTTOOLUSE_E_SINAL_POS_FATO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_session_hook_pulls	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
@@ -162,6 +162,7 @@
 .claude/hooks/lib/invocation-lines.sh	E_ELENXO_3A_PASSADA_A_ISENCAO_E_A_FALHA_ABERTA	docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_PUSH_OPCAO_ABREVIADA	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_RECORTE_SEM_PYTHON_MEDIDO	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
+.claude/hooks/lib/transcript-tail.py	C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	C_PREMODELSWITCH_ABRE_SEM_PYTHON	docs/evolution/research/guard-vetos-fail-closed-2026-10/vetos-fail-closed-2026-10.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_A_GUARDA_VETOU_O_PROPRIO_MAESTRO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_ESCADA_DE_MODELOS_IMPLEMENTADA_0903	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml

@@ -1,14 +1,16 @@
 # transcript-tail.py — lê só a CAUDA do transcript JSONL, de trás para frente, com teto e fail-safe.
-# Carregado pelos hooks Stop (rule-title-in-prose.sh, background-state-needs-evidence.sh) por
-# importlib a partir do caminho; não roda sozinho.
+# Carregado pelo hook Stop rule-title-in-prose.sh por importlib a partir do caminho; não roda
+# sozinho. (O outro consumidor, background-state-needs-evidence.sh, foi APOSENTADO em 2026-10-14 —
+# D_VETO_DE_PROSA_APOSENTADO_PELA_SONDA; a sonda que o substituiu, background-task-probe.sh, lê o
+# transcript por grep, não por esta biblioteca.)
 #
 # ── POR QUE (SAC-137, rodada r11 do radar E3, medido em 2026-10-14) ──────────────────────────────────
 # Os dois hooks Stop liam e parseavam o transcript INTEIRO com json.loads linha a linha, a cada turno:
 # ~1,0 s e ~0,55 s num transcript de 44,7 MB, sem timeout. A 2.1.300 do Claude Code faz o transcript
 # crescer ~63 KB por resposta (registros api-request, api-request-shape, api-request-blob com system
 # prompt, tools e parâmetros de cada requisição) — o custo cresce com a vida da sessão, não com o turno.
-# Os dois hooks só precisam do FIM: o último turno (background-state) ou a última resposta com texto
-# (rule-title).
+# Os dois hooks só precisavam do FIM: o último turno (background-state, hoje aposentado) ou a última
+# resposta com texto (rule-title).
 #
 # ── O CONTRATO: o mesmo veredito por três caminhos ──────────────────────────────────────────────────
 # tail_until(path, pred) devolve as linhas parseadas desde a ÚLTIMA linha em que pred(row) é verdade
