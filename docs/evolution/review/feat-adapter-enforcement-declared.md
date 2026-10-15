@@ -2,7 +2,8 @@
 branch: feat/adapter-enforcement-declared
 pr: pendente
 date: 2026-10-15
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: de95ffaf5670f7d583d20ce4b8774236e062f674fac784a1a87b9644226b6616
+reviewed_code_sha256: da91f413e6474571071d83dfa08b77ba5d891cfc43ca52710bc96cb3ceb6a411
 findings_total: 2
 findings_real: 2
 tokens: 0
