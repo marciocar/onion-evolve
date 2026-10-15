@@ -22344,7 +22344,10 @@ run_role_cut_selftests() {
   local _core_lst="${d}/core.lst"
   git -C "${REPO_ROOT}" ls-tree -r --name-only HEAD -- .claude/agents .claude/commands .claude/skills \
       .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows \
-      docs/meta-specs docs/knowledge-base docs/sdaal 2>/dev/null | sort > "${_core_lst}"
+      docs/meta-specs docs/knowledge-base docs/sdaal vendor/kg-ssot 2>/dev/null | sort > "${_core_lst}"
+  # (vendor/kg-ssot entrou no oráculo em 2026-10-15, SAC-149: o leitor do contrato do .kg.yaml é dependência
+  #  do kg-contract-check.sh, que viaja; a superfície do core que o hub espelha passou a incluí-lo, à mão,
+  #  aqui e no manifesto — duas escritas de propósito, para o caso continuar oráculo e não eco do código.)
   # ⚠️ "TOTAL" GANHOU UMA EXCEÇÃO, E ELA É NOMEADA. A 1ª redação exigia ZERO excludes no `hub`, e
   # estava certa para o que sabia então. Depois a segurança decidiu que a CHAVE PRIVADA do
   # transporte de federação não viaja para papel nenhum — e um hub que recebe a chave privada do
@@ -29978,6 +29981,151 @@ run_door_mini_selftests() {
 }
 
 
+# ── ADOTANTE MATERIALIZADO: a maquinaria medida no formato de QUEM A RECEBE (SAC-149, 2026-10-15) ────
+# Raiz dos achados do `--update` de um adotante para 7a50fc14: o core testava a maquinaria no formato do
+# CORE. O `kg-contract-check.sh` viajava sem o leitor do contrato (vendor/kg-ssot) e lá saía SEMPRE rc 2;
+# as REGRAS 85 e 92 diziam "não pôde julgar" num adotante comum; a mensagem da 85 mandava rodar um `ops/`
+# que ele não tem. Nenhuma família montava um adotante: a do mini monta a PORTA didática, as do vendor
+# medem a LISTA. Esta monta um adotante greenfield pelo MESMO corte do `--update` (ops/materialize-adopter.sh,
+# core-only, que chama os helpers reais da adoção), CLONA (o clone é o que o time e o CI do adotante
+# recebem: arquivo fora do commit durável não chega lá) e roda no clone o lint, o contrato e o radar.
+# "Não pude medir" por dependência que NÃO VIAJOU reprova. Mutantes de cada caso: grafo do tema
+# (docs/evolution/research/adopter-shape-bench-2026-10/), plantados pelo ops/mutate-and-restore.sh.
+_AS_UNJUDGED_RE='não pôde|nao pode julgar|não pode julgar|não dá para julgar|nao da para julgar|NAO-MEDIDO|NAO MEDIDO|NÃO MEDIDO|NÃO-MEDIDO|não foi medid|nao foi medid|não julgou|nao julgou|NAO-VERIFICADO|NÃO-VERIFICADO|não mediu|nao mediu|não pude|nao pude'
+# _as_unjudged <saída do lint> <clone> <core> → "REGRA N<TAB>caminho", um por dependência que não viajou:
+# linha de "não pude julgar" que cita um caminho AUSENTE no clone e PRESENTE no core (exato ou pelo nome).
+# Caminho ausente nos DOIS não é dependência que ficou para trás (é outra classe, e não é desta guarda).
+_as_unjudged() {
+  local _out="$1" _cl="$2" _core="$3" _line _rule _tok _files
+  _files="$(git -C "${_core}" ls-files 2>/dev/null)"
+  while IFS= read -r _line; do
+    [ -n "${_line}" ] || continue
+    _rule="$(grep -oE 'REGRA [0-9]+' <<< "${_line}" | head -1 || true)"
+    [ -n "${_rule}" ] || _rule="$(sed -E 's/^VIOLATION: ([^:]+):.*/\1/' <<< "${_line}")"
+    while IFS= read -r _tok; do
+      [ -n "${_tok}" ] || continue
+      _tok="${_tok#"${_cl}"/}"; _tok="${_tok#./}"
+      case "${_tok}" in /*) continue ;; esac
+      [ -e "${_cl}/${_tok}" ] && continue
+      if [ -e "${_core}/${_tok}" ] || grep -qE "(^|/)${_tok//./\\.}\$" <<< "${_files}"; then
+        printf '%s\t%s\n' "${_rule}" "${_tok}"
+      fi
+    done < <(grep -oE '[A-Za-z0-9_./-]*[A-Za-z0-9_-]\.(sh|py|yaml|yml|json|md|txt|tsv)|vendor/[A-Za-z0-9_./-]+' <<< "${_line}" | LC_ALL=C sort -u || true)
+  done < <(grep -E "${_AS_UNJUDGED_RE}" "${_out}" || true)
+}
+# _as_ops <saída do lint> <clone> → "REGRA N<TAB>ops/<arquivo>" para cada mensagem impressa que cita um
+# `ops/<arquivo>` que o clone não tem (a REGRA 100 (Superfície que viaja não cita ops/ como se o
+# destinatário o tivesse) julga a PROSA dos arquivos; esta mede o que o lint IMPRIME no adotante).
+_as_ops() {
+  local _out="$1" _cl="$2" _line _rule _tok
+  while IFS= read -r _line; do
+    _rule="$(grep -oE 'REGRA [0-9]+' <<< "${_line}" | head -1 || true)"
+    [ -n "${_rule}" ] || _rule="$(sed -E 's/^VIOLATION: ([^:]+):.*/\1/' <<< "${_line}")"
+    while IFS= read -r _tok; do
+      [ -n "${_tok}" ] && [ ! -e "${_cl}/${_tok}" ] && printf '%s\t%s\n' "${_rule}" "${_tok}"
+    done < <(grep -oE '(^|[^A-Za-z0-9_./-])ops/[A-Za-z0-9_.-]+\.[A-Za-z]+' <<< "${_line}" | sed -E 's/^[^o]//' | LC_ALL=C sort -u || true)
+  done < <(grep -E '^VIOLATION' "${_out}" || true)
+}
+# O PASSIVO MEDIDO que o PR 2 da SAC-149 cura (aplicabilidade por papel no rules-registry; REGRA 100 nas
+# mensagens). CATRACA NOS DOIS SENTIDOS: regra NOVA fora da lista reprova, e entrada que PAROU de disparar
+# também reprova (a lista só encolhe, e encolhe junto com a cura — nunca fica tolerando o que já sumiu).
+_AS_PENDING_UNJUDGED="REGRA 85,REGRA 92"
+_AS_PENDING_OPS="REGRA 85"
+_as_ratchet() {  # $1=rótulo do caso $2=achados (regra<TAB>token por linha) $3=lista pendente (vírgulas)
+  local _lbl="$1" _found="$2" _pend="$3" _new="" _gone="" _r
+  while IFS=$'\t' read -r _r _; do
+    [ -n "${_r}" ] || continue
+    case ",${_pend}," in *",${_r},"*) : ;; *) case " ${_new} " in *" ${_r} "*) : ;; *) _new="${_new} ${_r}" ;; esac ;; esac
+  done <<< "${_found}"
+  local -a _pl=(); IFS="," read -r -a _pl <<< "${_pend}"
+  for _r in "${_pl[@]}"; do
+    [ -n "${_r}" ] || continue
+    grep -qF "${_r}"$'\t' <<< "${_found}" || _gone="${_gone} ${_r}"
+  done
+  if [ -z "${_new}" ] && [ -z "${_gone}" ]; then
+    record_pass "adopter-shape: ${_lbl} — só o passivo declarado (${_pend:-nenhum}) e todo ele ainda medido"
+  else
+    record_fail "adopter-shape: ${_lbl}" "nova(s) fora do passivo:${_new:- nenhuma} · declarada(s) que PARARAM de disparar (tire da lista):${_gone:- nenhuma} · achados: $(tr '\n' ';' <<< "${_found}" | cut -c1-400)"
+  fi
+}
+run_adopter_shape_selftests() {
+  local mat="${REPO_ROOT}/ops/materialize-adopter.sh"
+  if [ ! -f "${mat}" ]; then record_skip "adopter-shape: ops/materialize-adopter.sh ausente (adotante) → pulado"; return; fi
+  command -v python3 >/dev/null 2>&1 || { record_skip "adopter-shape: python3 ausente"; return; }
+  local d; d="$(mktemp -d)"
+  local _o _r
+
+  # (p) AS DUAS POLARIDADES do detector, em linhas sintéticas, antes do adotante real: sem elas um
+  #     detector que nunca acusa passaria todos os casos reais "limpo".
+  local _pc="${d}/pclone"; mkdir -p "${_pc}/.claude"
+  printf '%s\n' "VIOLATION: zz-sintetico.sh: REGRA 990 (T): a guarda não pôde julgar — vendor/kg-ssot/tools/kg_gate.py ausente" > "${d}/p1"
+  printf '%s\n' "VIOLATION: zz-sintetico.sh: REGRA 991 (T): [kg-selo/ISENCAO] REGRA 991 nao julgou nada: nenhuma SYNTHESIS declara ledger" > "${d}/p2"
+  printf '%s\n' "VIOLATION: zz-sintetico.sh: REGRA 992 (T): NAO-MEDIDO — docs/nao-existe-em-lugar-nenhum-zz.md ausente" > "${d}/p3"
+  local _p1 _p2 _p3 _p4
+  _p1="$(_as_unjudged "${d}/p1" "${_pc}" "${REPO_ROOT}")"
+  _p2="$(_as_unjudged "${d}/p2" "${_pc}" "${REPO_ROOT}")"
+  _p3="$(_as_unjudged "${d}/p3" "${_pc}" "${REPO_ROOT}")"
+  mkdir -p "${_pc}/vendor/kg-ssot/tools"; : > "${_pc}/vendor/kg-ssot/tools/kg_gate.py"
+  _p4="$(_as_unjudged "${d}/p1" "${_pc}" "${REPO_ROOT}")"
+  if grep -qF $'REGRA 990\tvendor/kg-ssot/tools/kg_gate.py' <<< "${_p1}" && [ -z "${_p2}" ] && [ -z "${_p3}" ] && [ -z "${_p4}" ]; then
+    record_pass "adopter-shape: (p) o detector acusa a dependência que ficou no core e cala na isenção sem caminho, no caminho que não existe em lugar nenhum e no que viajou"
+  else record_fail "adopter-shape: (p)" "p1=[${_p1}] (esperado: REGRA 990 + kg_gate.py) p2=[${_p2}] p3=[${_p3}] p4=[${_p4}] (esperados vazios)"; fi
+  printf '%s\n' "VIOLATION: y.sh: REGRA 993 (T): rode bash ops/publish-door.sh --status" "VIOLATION: y.sh: REGRA 994 (T): veja docs/ops/guia.md e nada mais" > "${d}/p5"
+  _o="$(_as_ops "${d}/p5" "${_pc}")"
+  if [ "${_o}" = $'REGRA 993\tops/publish-door.sh' ]; then
+    record_pass "adopter-shape: (p2) mensagem que cita ops/<arquivo> ausente é acusada; 'docs/ops/…' não é ops/ da raiz"
+  else record_fail "adopter-shape: (p2)" "esperado só 'REGRA 993<TAB>ops/publish-door.sh'; saiu [${_o}]"; fi
+
+  # (a) o adotante nasce pelo corte do --update e o CLONE recebe o que ele cita
+  local al="${d}/alvo" cl="${d}/clone"
+  if ! _o="$(bash "${mat}" "${al}" --role adopted 2>&1)"; then
+    record_fail "adopter-shape: (a) setup" "o materializador recusou: $(printf '%s' "${_o}" | tail -3 | tr '\n' ' ' | cut -c1-300)"
+    rm -rf "${d}"; return
+  fi
+  git clone -q "${al}" "${cl}" >/dev/null 2>&1 || { record_fail "adopter-shape: (a) setup" "git clone da fixture falhou"; rm -rf "${d}"; return; }
+  local _abad=""
+  grep -qx 'role: adopted' "${cl}/.claude/.onion-version" 2>/dev/null || _abad="${_abad} carimbo-sem-role-adopted"
+  [ -n "$(git -C "${cl}" ls-files -- vendor/kg-ssot/tools/kg_gate.py)" ] || _abad="${_abad} contrato-nao-rastreado-no-clone"
+  [ -n "$(git -C "${cl}" ls-files -- .gitignore)" ] || _abad="${_abad} gitignore-de-segredo-fora-do-commit"
+  grep -q 'FORA do commit durável' <<< "${_o}" && _abad="${_abad} sobrou-fora-do-commit:$(grep -o 'recebe): .*' <<< "${_o}" | cut -c1-120)"
+  if [ -z "${_abad}" ]; then
+    record_pass "adopter-shape: (a) o adotante nasce pelo corte do --update e o clone recebe o contrato do grafo e o .gitignore de segredo"
+  else record_fail "adopter-shape: (a)" "${_abad}"; fi
+
+  # (b) o lint inteiro, NO CLONE: 0 HARD
+  local lo="${d}/lint.out"
+  ( cd "${cl}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh ) > "${lo}" 2>&1; _r=$?
+  local _h; _h="$(grep -oE 'Violações HARD : [0-9]+' "${lo}" | grep -oE '[0-9]+$' || true)"
+  if [ "${_r}" -eq 0 ] && [ "${_h:-x}" = 0 ]; then
+    record_pass "adopter-shape: (b) o lint do adotante materializado sai rc 0 com 0 HARD"
+  else record_fail "adopter-shape: (b)" "rc=${_r} HARD=${_h:-?} — $(grep -E '^VIOLATION' "${lo}" | grep -vE 'SOFT' | head -3 | cut -c1-200 | tr '\n' ' ')"; fi
+
+  # (c) "não pude julgar" por dependência que NÃO VIAJOU reprova (catraca do passivo do PR 2)
+  _as_ratchet "(c) 'não pude julgar' por dependência que não viajou" "$(_as_unjudged "${lo}" "${cl}" "${REPO_ROOT}")" "${_AS_PENDING_UNJUDGED}"
+
+  # (d) o contrato do grafo JULGA no clone: rc 0 na semente, e nenhum grafo rastreado sai rc 2 (não medi)
+  local _g _cr _d2="" _seed_rc="?"
+  while IFS= read -r _g; do
+    [ -n "${_g}" ] || continue
+    _cr=0; ( cd "${cl}" && bash .claude/validation/kg-contract-check.sh "${_g}" ) > "${d}/contract.out" 2>&1 || _cr=$?
+    [ "${_g}" = docs/onion/graph/onion-adoption.kg.yaml ] && _seed_rc="${_cr}"
+    [ "${_cr}" -eq 2 ] && _d2="${_d2} ${_g}:$(head -c 160 "${d}/contract.out" | tr '\n' ' ')"
+  done < <(git -C "${cl}" ls-files '*.kg.yaml' | bash "${cl}/.claude/validation/kg-fixture-paths.sh" --filter)
+  if [ -z "${_d2}" ] && [ "${_seed_rc}" = 0 ]; then
+    record_pass "adopter-shape: (d) o kg-contract-check julga no clone do adotante (semente rc 0, nenhum grafo 'não medido')"
+  else record_fail "adopter-shape: (d)" "semente rc=${_seed_rc} · rc 2 em:${_d2:- nenhum}"; fi
+
+  # (e) o radar que a lente manda rodar: integridade + schema da semente, rc 0
+  _r=0; ( cd "${cl}" && bash .claude/validation/kg-radar.sh docs/onion/graph/onion-adoption.kg.yaml --integrity --schema ) > "${d}/radar.out" 2>&1 || _r=$?
+  if [ "${_r}" -eq 0 ]; then record_pass "adopter-shape: (e) kg-radar --integrity --schema da semente rc 0 no clone"
+  else record_fail "adopter-shape: (e)" "rc=${_r} $(tail -3 "${d}/radar.out" | tr '\n' ' ' | cut -c1-200)"; fi
+
+  # (f) mensagem que o lint IMPRIME no adotante não manda rodar ops/ (catraca do passivo do PR 2)
+  _as_ratchet "(f) mensagem do lint que cita ops/ ausente no adotante" "$(_as_ops "${lo}" "${cl}")" "${_AS_PENDING_OPS}"
+
+  rm -rf "${d}"
+}
+
 # ── RECORTE POR PAPEL: "não pude julgar" não é a mesma coisa em todo repo ─────────────────────
 # Nasceu da 1ª sessão REAL dentro da porta pública: o lint dela acusava 41 HARD, e a massa eram
 # guardas declarando honestamente NÃO TER JULGADO — sem `.kg.yaml`, sem `members.yaml`, sem PR.
@@ -30497,6 +30645,7 @@ _family run_door_cycle_selftests
 _family run_publish_selftests
 _family run_publish_release_selftests
 _family run_door_mini_selftests
+_family run_adopter_shape_selftests
 # ── REGRA 86: workflow que não parseia é workflow MORTO, e o repo não sabe ────────────────────
 # Nasceu de um `env:` duplicado que deixou o `onion-review-diagnose.yml` inexecutável por um dia
 # inteiro — e era exatamente o instrumento que a doutrina manda rodar antes de escrever causa

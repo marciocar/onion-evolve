@@ -54,12 +54,24 @@ git -C "${DEST}" rev-parse --verify "${BR}" >/dev/null 2>&1 \
 # acrescenta os ARTEFATOS GERADOS na adoção, que não viajam do core: CLAUDE.md, docs/onion, os três
 # contextos de domínio, .githooks. Propósitos diferentes — a SSOT diz o que COPIA, esta diz o que se
 # COMMITA no alvo. Unificá-las quebraria a durabilidade dos gerados.
-ONION_PATHS=(.claude docs/meta-specs docs/knowledge-base docs/sdaal docs/evolution \
+# ⚠️ `vendor/kg-ssot` entra pelo mesmo motivo do manifesto (SAC-149, 2026-10-15): o leitor do contrato do
+# .kg.yaml passou a viajar, e sem ele nesta lista a ADOÇÃO nova o deixava UNTRACKED — o disco do maestro
+# julgava o grafo e o clone do time saía rc 2. Medido pela família `adopter_shape` (ela roda num CLONE).
+ONION_PATHS=(.claude docs/meta-specs docs/knowledge-base docs/sdaal docs/evolution vendor/kg-ssot \
              docs/onion docs/business-context docs/technical-context docs/compliance-context \
              CLAUDE.md CLAUDE.onion.md .gitattributes .prettierignore .githooks .env.example.onion \
              LICENSE-ONION LICENSE-ONION-DOCS)
 add=(); for p in "${ONION_PATHS[@]}"; do [ -e "${DEST}/${p}" ] && add+=("${p}"); done
 [ "${#add[@]}" -gt 0 ] && git -C "${DEST}" add -- "${add[@]}" 2>/dev/null
+# `.gitignore` NASCIDO na adoção (SAC-149, 2026-10-15, medido pela família `adopter_shape` num greenfield
+# sem .gitignore): o `ensure-secret-gitignore.sh` o cria com os padrões de segredo, e sem este passo ele
+# ficava UNTRACKED — o disco do maestro protegia o `.env`, o clone do time não. Só entra quando NÃO existia
+# no HEAD: aí todo o conteúdo é da adoção. O `.gitignore` que JÁ é do alvo fica de fora (é dele, e pode
+# ter edição não commitada que este commit não tem o direito de levar) — teto declarado.
+if [ -f "${DEST}/.gitignore" ] && ! git -C "${DEST}" cat-file -e HEAD:.gitignore 2>/dev/null \
+   && [ -z "$(git -C "${DEST}" ls-files -- .gitignore 2>/dev/null)" ]; then
+  git -C "${DEST}" add -- .gitignore 2>/dev/null
+fi
 
 # ── PROJEÇÕES QUE CONTAM O ÍNDICE só existem DEPOIS do add (adoção greenfield, 2026-10-13) ─────────
 # `testing-inventory.md` (REGRA 80) e `testing-state.md` (REGRA 81) contam `git ls-files`. No greenfield
