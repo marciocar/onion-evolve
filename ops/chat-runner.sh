@@ -136,10 +136,15 @@ read_sources() {
     as_svc git -C "${BRIDGE}" ls-files --error-unmatch -- "${f}" >/dev/null 2>&1 || die 1 "${f} não é rastreado no bridge servido"
     as_svc git -C "${BRIDGE}" diff --quiet HEAD -- "${f}" 2>/dev/null || die 1 "${f} tem mudança não commitada no bridge servido: recusado"
   done
-  as_svc cat "${BRIDGE}/${SRC_DIR}/launcher.py" > "${TMPD}/launcher.py" || die 2 "não li o launcher.py do bridge servido"
-  as_svc cat "${BRIDGE}/${SRC_DIR}/onion-chat.socket.in" > "${TMPD}/socket.in" || die 2 "não li o onion-chat.socket.in"
-  as_svc cat "${BRIDGE}/${SRC_DIR}/onion-chat@.service.in" > "${TMPD}/service.in" || die 2 "não li o onion-chat@.service.in"
-  BRIDGE_HEAD="$(as_svc git -C "${BRIDGE}" rev-parse --short=12 HEAD 2>/dev/null)" || BRIDGE_HEAD="?"
+  # do OBJETO do commit, não da árvore: a checagem acima e a leitura não podem ver arquivos diferentes (refutador,
+  # passada 1, achado 3: TOCTOU entre o git e o cat). E o commit todo é de quem controla o clone — por isso o que vai
+  # para /etc/systemd passa ainda pela allowlist de diretivas (validate_units) e o degrau 1 é pré-condição
+  BRIDGE_SHA="$(as_svc git -C "${BRIDGE}" rev-parse HEAD 2>/dev/null)" || die 2 "não li o HEAD do bridge servido"
+  [[ "${BRIDGE_SHA}" =~ ^[0-9a-f]{40}$ ]] || die 2 "HEAD do bridge servido fora da forma"
+  as_svc git -C "${BRIDGE}" show "${BRIDGE_SHA}:${SRC_DIR}/launcher.py" > "${TMPD}/launcher.py" || die 2 "não li o launcher.py do bridge servido"
+  as_svc git -C "${BRIDGE}" show "${BRIDGE_SHA}:${SRC_DIR}/onion-chat.socket.in" > "${TMPD}/socket.in" || die 2 "não li o onion-chat.socket.in"
+  as_svc git -C "${BRIDGE}" show "${BRIDGE_SHA}:${SRC_DIR}/onion-chat@.service.in" > "${TMPD}/service.in" || die 2 "não li o onion-chat@.service.in"
+  BRIDGE_HEAD="${BRIDGE_SHA:0:12}"
 }
 
 render_one() {   # render_one <modelo> <saída> <de onde veio>
@@ -164,11 +169,76 @@ Environment=CHAT_HOMES_DIR=${HOME_ROOT}
 EOF
 }
 
+# validate_units — o que vai para /etc/systemd/system como root sai de um clone que a conta do serviço controla
+# (refutador, passada 1, achados 3 e 4: um template com DynamicUser=no, User=root ou um ExecStartPre passava pelo
+# ensaio e pelo verify). Allowlist FECHADA de diretivas, com os valores de segurança EXATOS; qualquer outra recusa.
+validate_units() {
+  local f="$1" kind="$2" out rc=0
+  out="$(python3 -I - "${f}" "${kind}" "${SOCKET}" "${SVC_USER}" "${GROUP}" "${STATE}" "${CLAUDE_SRC}" "${LIBEXEC}" <<'PY'
+import sys
+f, kind, sock, svc, grp, state, claude, libexec = sys.argv[1:]
+EXACT = {
+  "service": {"Type": "simple", "DynamicUser": "yes", "User": "onion-chat-%i", "SupplementaryGroups": grp,
+    "StandardInput": "socket", "StandardOutput": "socket", "StandardError": "journal", "PrivateTmp": "yes",
+    "ProtectHome": "yes", "ProtectProc": "invisible", "CapabilityBoundingSet": "", "TemporaryFileSystem": state,
+    "BindPaths": state + "/workspaces " + state + "/chat-homes", "KillMode": "control-group",
+    "RuntimeDirectory": "onion-chat/%i", "CollectMode": "inactive-or-failed",
+    "Environment": "ONION_CHAT_WS_ROOT=%s/workspaces ONION_CHAT_HOME_ROOT=%s/chat-homes ONION_CHAT_CLAUDE=/run/onion-chat-bin/claude" % (state, state),
+    "ExecStart": "/usr/bin/python3 -I /run/onion-chat-bin/launcher.py",
+    "ExecStopPost": "/usr/bin/python3 -I /run/onion-chat-bin/launcher.py --fixup"},
+  "socket": {"ListenStream": sock, "Accept": "yes", "SocketUser": svc, "SocketGroup": svc, "SocketMode": "0600"},
+}[kind]
+FREE = {"service": {"Description", "SyslogIdentifier", "RuntimeMaxSec", "TimeoutStopSec", "UMask", "PrivateDevices",
+                    "ProtectKernelTunables", "ProtectKernelModules", "ProtectKernelLogs", "ProtectControlGroups", "ProtectClock",
+                    "ProtectHostname", "RestrictNamespaces", "RestrictRealtime", "LockPersonality", "SystemCallArchitectures",
+                    "RestrictAddressFamilies", "MemoryMax", "TasksMax"},
+        "socket": {"Description", "MaxConnections", "WantedBy"}}[kind]
+BIND_RO = {claude + ":/run/onion-chat-bin/claude", libexec + "/launcher.py:/run/onion-chat-bin/launcher.py"}
+SECTIONS = {"service": {"[Unit]", "[Service]"}, "socket": {"[Unit]", "[Socket]", "[Install]"}}[kind]
+seen, binds, bad = {}, set(), []
+for n, line in enumerate(open(f, encoding="utf-8"), 1):
+    line = line.rstrip("\n")
+    if not line.strip() or line.lstrip().startswith(("#", ";")):
+        continue
+    if line.startswith("["):
+        if line not in SECTIONS:
+            bad.append("seção %s (linha %d)" % (line, n))
+        continue
+    if line.endswith("\\"):
+        bad.append("continuação de linha (linha %d)" % n); continue
+    k, eq, v = line.partition("=")
+    if not eq or k != k.strip():
+        bad.append("linha fora da forma (%d)" % n); continue
+    if k == "BindReadOnlyPaths" and kind == "service":
+        if v not in BIND_RO:
+            bad.append("BindReadOnlyPaths fora do esperado: %s" % v)
+        binds.add(v); continue
+    if k in seen:
+        bad.append("%s repetida" % k); continue
+    seen[k] = v
+    if k in EXACT:
+        if v != EXACT[k]:
+            bad.append("%s=%s (exigido: %s)" % (k, v, EXACT[k]))
+    elif k not in FREE:
+        bad.append("diretiva fora da allowlist: %s" % k)
+for k, v in EXACT.items():
+    if k not in seen:
+        bad.append("falta %s=%s" % (k, v))
+if kind == "service" and binds != BIND_RO:
+    bad.append("BindReadOnlyPaths incompletos")
+print("; ".join(bad)); sys.exit(1 if bad else 0)
+PY
+)" || rc=$?
+  [ "${rc}" = 0 ] || die 1 "o modelo ${kind} do bridge servido sai da allowlist de diretivas: ${out:0:600}"
+}
+
 render_all() {
   read_sources
   render_one "${TMPD}/socket.in" "${TMPD}/${SOCKET_UNIT}" "${SRC_DIR}/onion-chat.socket.in"
   render_one "${TMPD}/service.in" "${TMPD}/${TEMPLATE_UNIT}" "${SRC_DIR}/onion-chat@.service.in"
   render_dropin > "${TMPD}/${DROPIN_NAME}"
+  validate_units "${TMPD}/${SOCKET_UNIT}" socket
+  validate_units "${TMPD}/${TEMPLATE_UNIT}" service
 }
 
 render_all
@@ -184,12 +254,11 @@ fi
 # e as checagens que dependem dele viram AUSENTE.
 sandbox_props() {   # sandbox_props <template> <com-grupo 0|1> <launcher-a-ligar>
   local k v line
-  printf '%s\n' "-p" "DynamicUser=yes"
   while IFS= read -r line; do
     case "${line}" in ''|'#'*|'['*) continue ;; esac
     k="${line%%=*}"; v="${line#*=}"
     case "${k}" in
-      PrivateTmp|PrivateDevices|ProtectHome|ProtectProc|ProtectKernelTunables|ProtectKernelModules|ProtectKernelLogs|\
+      DynamicUser|PrivateTmp|PrivateDevices|ProtectHome|ProtectProc|ProtectKernelTunables|ProtectKernelModules|ProtectKernelLogs|\
 ProtectControlGroups|ProtectClock|ProtectHostname|RestrictNamespaces|RestrictRealtime|LockPersonality|CapabilityBoundingSet|\
 SystemCallArchitectures|RestrictAddressFamilies|UMask|TemporaryFileSystem|Environment|MemoryMax|TasksMax)
         printf '%s\n' "-p" "${k}=${v}" ;;
@@ -222,16 +291,23 @@ for p in "$home/onion-bridge/.env" "$home/.git-credentials" "$home/onion-bridge/
          "$home/onion-evolve/docs/evolution/federation/members.yaml" "$home/.ssh"; do
   if [ -r "$p" ] || [ -w "$p" ]; then bad "alcança $p"; else ok "não alcança $p"; fi
 done
-if [ -n "$(ls -A "$home" 2>/dev/null)" ]; then bad "a home do serviço é listável"; else ok "a home do serviço some (ProtectHome)"; fi
+# ProtectHome medido pela MONTAGEM, não pelo UID (refutador, achado 5: o -r acima passa só pela separação de UID)
+hm="$(stat -c %a "$(dirname "$home")" 2>/dev/null)"
+if [ "$hm" = 0 ] || ! stat "$home" >/dev/null 2>&1; then ok "a home do serviço some (ProtectHome: $(dirname "$home") modo ${hm:-inacessível})"
+else bad "a home do serviço está visível ($(dirname "$home") modo $hm): ProtectHome não pegou"; fi
 # o environ do processo do bridge (o segredo que o .env leva para a memória)
 if [ -n "$pid" ] && [ "$pid" != 0 ]; then
   if [ -r "/proc/$pid/environ" ]; then bad "lê o environ do bridge (MainPID $pid)"; else ok "não lê o environ do bridge (MainPID $pid)"; fi
 else echo "AUSENTE environ do bridge (sem MainPID)"; fi
 # o resto do diretório de estado some; voltam só os workspaces e as HOMEs do CLI
-for e in $(ls -A "$state" 2>/dev/null); do
-  case "$e" in workspaces|chat-homes) : ;; *) bad "o estado do bridge mostra $state/$e (TemporaryFileSystem não pegou)" ;; esac
-done
-ok "o estado do bridge só mostra workspaces e chat-homes"
+# o TemporaryFileSystem medido pelo TIPO da montagem: com a ACL só de travessia no estado, o `ls` falharia vazio e o
+# laço daria OK sem medir (refutador, achado 5)
+fs="$(findmnt -no FSTYPE -T "$state" 2>/dev/null | head -1)"
+if [ "$fs" != tmpfs ]; then bad "o estado do bridge NÃO é tmpfs na unit (montagem: ${fs:-?}): TemporaryFileSystem não pegou"
+else
+  extra=""; for e in $(ls -A "$state" 2>/dev/null); do case "$e" in workspaces|chat-homes) : ;; *) extra="$extra $e" ;; esac; done
+  if [ -n "$extra" ]; then bad "o estado do bridge mostra:$extra"; else ok "o estado do bridge é tmpfs e só mostra workspaces e chat-homes"; fi
+fi
 for d in "$ws" "$hr"; do
   if [ "$wg" = 0 ]; then echo "AUSENTE travessia de $d (o --apply cria o grupo e as ACLs)"; continue; fi
   if [ -x "$d" ]; then ok "atravessa $d"; else bad "não atravessa $d (grupo/ACL)"; fi
@@ -337,6 +413,9 @@ if [ "${SUB}" = verify ]; then verify_all; exit $?; fi
 
 # ── install: pré-voo ─────────────────────────────────────────────────────────────────────────────────
 systemctl cat "${UNIT}" >/dev/null 2>&1 || die 2 "a unit ${UNIT} não existe (ou não li)"
+# o degrau 1 é PRÉ-CONDIÇÃO: com ele o clone servido (de onde as fontes vêm) é só-leitura para o agente dentro da unit
+case " $(systemctl show -p DropInPaths --value "${UNIT}" 2>/dev/null) " in *"/30-integrity.conf "*) : ;;
+  *) die 1 "o degrau 1 (30-integrity.conf) não está carregado em ${UNIT}: instale-o antes (ops/bridge-hardening.sh)" ;; esac
 for p in "${STATE}" "${WS_ROOT}"; do
   priv test -d "${p}" || die 1 "premissa mudou: ${p} não existe"
   [ "$(priv realpath -m -- "${p}")" = "${p}" ] || die 1 "${p} tem SYMLINK no caminho: recusado (a ACL e o bind seguiriam o link)"
@@ -407,13 +486,15 @@ say "backup em ${BK} (ACLs do estado + o que havia instalado)"
 created_group=0; created_home=0; installed_dropin=0
 
 rollback() {
-  cat >&2 <<EOF
-[${NAME}] ─── ROLLBACK MANUAL (do maestro, fora da sessão: \`!\` no prompt) ───
+  echo "[${NAME}] ─── ROLLBACK MANUAL (do maestro, fora da sessão: \`!\` no prompt) ───" >&2
+  if [ "${installed_dropin}" = 1 ]; then
+    cat >&2 <<EOF
   sudo rm -f ${DROPIN_DIR}/${DROPIN_NAME}
   sudo systemctl daemon-reload && sudo systemctl reset-failed ${UNIT} && sudo systemctl restart ${UNIT}
   curl -fsS ${HEALTH_LOCAL}
-  sudo systemctl disable --now ${SOCKET_UNIT}
 EOF
+  fi
+  echo "  sudo systemctl disable --now ${SOCKET_UNIT}" >&2
   local f
   for f in "${SOCKET_UNIT}" "${TEMPLATE_UNIT}"; do
     if [ -f "${BK}/${f}" ]; then echo "  sudo install -m 0644 ${BK}/${f} ${UNIT_DIR}/${f}   # volta o anterior" >&2
@@ -422,7 +503,10 @@ EOF
   if [ -f "${BK}/launcher.py" ]; then echo "  sudo install -m 0644 ${BK}/launcher.py ${LIBEXEC}/launcher.py" >&2
   else echo "  sudo rm -rf ${LIBEXEC}" >&2; fi
   echo "  sudo systemctl daemon-reload" >&2
-  echo "  sudo setfacl --restore=${BK}/acl-state.txt   # as ACLs do estado como estavam" >&2
+  # NÃO `setfacl --restore` (refutador, achado 2, provado: segue um componente trocado e restaura dono e modo fora do
+  # estado); tira só as entradas que este wrapper pôs, como a dona, sem seguir symlink (-P). O backup fica como registro.
+  echo "  sudo setfacl -x g:${GROUP} -- ${STATE}" >&2
+  echo "  sudo -u ${SVC_USER} setfacl -R -P -x g:${GROUP},u:${SVC_USER},d:g:${GROUP},d:u:${SVC_USER} -- ${WS_ROOT} ${HOME_ROOT}   # registro em ${BK}/acl-state.txt" >&2
   [ "${created_home}" = 1 ] && echo "  sudo rm -rf ${HOME_ROOT}   # criado nesta execução (só HOMEs do CLI do runner)" >&2
   [ "${created_group}" = 1 ] && echo "  sudo groupdel ${GROUP}   # criado nesta execução" >&2
   return 0
@@ -440,13 +524,18 @@ fi
 # ACLs: o estado e as duas raízes são SÓ travessia para o grupo (não lista: o vizinho só pelo nome); o PADRÃO das
 # raízes dá ao grupo e à conta do serviço rwx no que nascer dentro (vence a umask 0027 do bridge e a 0007 do runner);
 # o que já existe ganha o mesmo, sem seguir symlink (-P)
+# Só o estado em si é do root (o nome dele mora em /var/lib, que a conta do serviço não escreve). As raízes e o que existe
+# dentro delas são da CONTA DO SERVIÇO: o setfacl roda como ELA (refutador, passada 1, achado 1, provado: como root, um
+# symlink trocado entre o pré-voo e o setfacl punha a ACL padrão num diretório à escolha de quem controla o estado).
+# Como a dona, um symlink só a leva aonde ela já escreve. O que os UIDs dinâmicos criaram já nasceu com a ACL padrão
+# (só a dona muda a ACL de um arquivo: o -user a restringe ao que é dela)
 priv setfacl -m "g:${GROUP}:--x" -- "${STATE}" || fail_after "setfacl em ${STATE} falhou"
 for d in "${WS_ROOT}" "${HOME_ROOT}"; do
-  priv setfacl -m "g:${GROUP}:--x,d:g:${GROUP}:rwx,d:u:${SVC_USER}:rwx,d:m::rwx" -- "${d}" || fail_after "setfacl em ${d} falhou"
-  while IFS= read -r -d '' w; do
-    priv setfacl -R -P -m "g:${GROUP}:rwX,u:${SVC_USER}:rwX" -- "${w}" || fail_after "setfacl -R em ${w} falhou"
-    priv find "${w}" -xdev -type d -exec setfacl -m "d:g:${GROUP}:rwx,d:u:${SVC_USER}:rwx,d:m::rwx" -- {} + || fail_after "ACL padrão em ${w} falhou"
-  done < <(priv find "${d}" -mindepth 1 -maxdepth 1 -type d -print0)
+  as_svc setfacl -m "g:${GROUP}:--x,d:g:${GROUP}:rwx,d:u:${SVC_USER}:rwx,d:m::rwx" -- "${d}" || fail_after "setfacl em ${d} falhou"
+  as_svc find "${d}" -mindepth 1 -xdev -user "${SVC_USER}" \( -type f -o -type d \) -exec setfacl -m "g:${GROUP}:rwX,u:${SVC_USER}:rwX" -- {} + \
+    || fail_after "ACL do grupo no que já existe em ${d} falhou"
+  as_svc find "${d}" -mindepth 1 -xdev -user "${SVC_USER}" -type d -exec setfacl -m "d:g:${GROUP}:rwx,d:u:${SVC_USER}:rwx,d:m::rwx" -- {} + \
+    || fail_after "ACL padrão no que já existe em ${d} falhou"
 done
 say "ACLs aplicadas: ${STATE} (travessia), ${WS_ROOT} e ${HOME_ROOT} (travessia + padrão), e cada workspace/HOME existente"
 for d in "${WS_ROOT}/${PROBE_SLUG}" "${HOME_ROOT}/${PROBE_SLUG}"; do
