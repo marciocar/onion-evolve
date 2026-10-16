@@ -1,0 +1,248 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code): o delta de 2.1.301 a 2.1.301 contra a baseline 2.1.300.
+# ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
+# no vivo), o juiz refuta, e a rodada decide a Aufhebung: external_edges SUPERSEDES ou x_supersedes_none.
+meta:
+  id: radar-E3-2026-10-16-r12
+  schema_version: "1"
+  baseline: "2026-10-16"
+  review_after: "2026-11-15"   # 30d: cadência de ferramenta
+  x_supersedes_none: "nenhum item de 2.1.301 contradiz nó da r11: a questão aberta Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO não é tocada pelo delta, e os 12 nós da r11 seguem valendo; os de hooks e OTel (E_HOOKS_DO_CORE_SAO_TODOS_COMMAND, E_OTEL_E_REFTABLE_SEM_CONSUMIDOR) foram medidos de novo em 2026-10-16 (22 hooks command, 0 consumidor de OTel)"
+  # ═══ TETO: 25 NÓS ═══
+  #   2 no esqueleto (2026-10-16); 13 depois da rodada e do juiz (2026-10-16).
+# ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
+#   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
+# external_edges:
+#   - to: "docs/evolution/research/radar-E3-2026-10-14-r11/radar-E3-2026-10-14-r11.kg.yaml#<NO_DERRUBADO>"
+#     edge_type: SUPERSEDES
+#   (b) não derrubou nada → no meta: x_supersedes_none: "<a razão medida>"
+external_edges:
+  - from: E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232
+    to: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml#E_CVE39861_FIXED_IN_2_1_64"
+    edge_type: SUPPORTS
+nodes:
+  - id: E_DELTA_DA_RODADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "CHANGELOG oficial: seções 2.1.301 (54 linhas, 51 itens); baseline 2.1.300, disco 2.1.301, processo 2.1.301"
+    trace: "docs/evolution/research/radar-E3-2026-10-16-r12/SYNTHESIS.md"
+    label: "o delta desde a baseline 2.1.300 são 1 versão(ões), de 2.1.301 a 2.1.301, extraídas do CHANGELOG oficial"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.301 a ## 2.1.301 (cópias em docs/evolution/research/radar-E3-2026-10-16-r12/data/)"
+      method: "medição: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
+  - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-16"
+    verified_against: "respondida pela rodada r12 em 2026-10-16: itens ligados a superfície medida no vivo e julgados pelo juiz opus/high; o achado central não é um item do delta e sim o alcance dele, porque o bridge e o runner do /chat rodam o CLI 2.1.232 do SDK; 2 ações abertas; os demais itens (vim, terminal, VSCode, self-hosted runner, mods, Windows) não tocam o core"
+    label: "quais itens de 2.1.301 a 2.1.301 tocam o Onion de verdade, medidos no vivo e julgados pelo juiz"
+  - id: E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16: o binário que o runner liga por bind (ops/chat-runner.sh l.192, CLAUDE_SRC no node_modules do bridge) responde 2.1.232 a --version; o package-lock do onion-bridge resolve @anthropic-ai/claude-agent-sdk 0.3.232 (package.json pede ^0.3.232); o processo do bridge (tsx src/server.ts, user onion) está vivo há 09:02; npm view do SDK devolve 0.3.301 com claudeCodeVersion 2.1.301; o cc-delta-census.sh tem 0 menções a SDK; corrigido pelo juiz: 57 seções publicadas no CHANGELOG entre 2.1.233 e 2.1.301 (12 números pulados) e 58 releases do SDK, não 69; o deploy de 2026-10-16 18:05 reinstalou o node_modules pelo lock e manteve o 0.3.232; 0 pathToClaudeCodeExecutable em src/, então o admin usa a resolução default do SDK, e a unit onion-chat@.service liga o mesmo arquivo por BindReadOnlyPaths"
+    narrative: "Juiz: EXAGERA no número (69 era a distância de patch); o achado central sustenta, e o juiz acrescentou que o deploy do mesmo dia reinstalou pelo lock e ficou em 0.3.232. O grafo de isolamento já media o CLI 2.1.232 (E_CVE39861_FIXED_IN_2_1_64); o novo desta rodada é ligar a versão ao alcance do delta do E3 e ao censo que não a vê."
+    label: "o /chat em produção (bridge pelo Agent SDK e runner do convidado sob DynamicUser) roda o CLI 2.1.232 do SDK 0.3.232, 57 versões atrás do host e preso pelo lock; nenhum item da 2.1.301 chega aos degraus de isolamento, e o censo mede só o CLI do host"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.301 (o delta inteiro: o alcance dele, não um item)"
+      method: "medição: --version do binário do SDK, package-lock do bridge e npm view"
+      locality: "web"
+  - id: E_NENHUM_ITEM_TOCA_SANDBOX_WEBFETCH_STREAMJSON
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16 sobre data/2.1.301.txt: 0 linhas com sandbox, WebFetch, stream-json, --settings, socket ou SDK; 5 com permission, 6 com hook, 1 com settings; as linhas de permission (7, 21, 32, 34, 53) são os campos OTel, a tool cortada na checagem, o prompt de ask de hook de plugin/skill, os scripts de Workflow depois de cd e a checagem de microfone do VSCode, e a de settings (38) é o MCP sob managed settings no self-hosted runner; a política do convidado vive no bridge (src/agent-policy.ts l.163-172: permissionMode default, ferramentas read-only ou de escrita, EXEC_TOOLS negadas, disableAllHooks, managedSettings com allowManagedHooksOnly), a sonda de verificação do runner usa --permission-prompt-tool stdio (ops/chat-runner.sh l.563-565), e o bridge decide por canUseTool (src/chat.ts l.363)"
+    label: "a 2.1.301 não mexe em sandbox, WebFetch, stream-json, --settings nem no socket; os itens de permissão tocam a checagem por canUseTool e pelo prompt stdio só quando o SDK do bridge subir, e nenhum muda a regra que o runner aplica"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.301, item 'Fixed a tool call cut off by a message sent mid-turn during its permission check being reported to the model as rejected by the user'"
+      method: "medição: grep das palavras de isolamento no delta e leitura das flags do runner"
+      locality: "web"
+  - id: Q_CENSO_MEDE_O_CLI_DO_SDK_DO_BRIDGE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-16"
+    verified_against: "aberta pela rodada r12 em 2026-10-16: fecha quando o cc-delta-census.sh imprimir a versão do CLI embutido no SDK do bridge ao lado do disco e do processo, com caso de bancada que reprove quando ela divergir do host sem aviso, e o mutante revertendo a cura"
+    narrative: "Issue SAC-155 no Linear, criada pelo tm.sh em 2026-10-16."
+    label: "o medidor do /meta:cc-update deve medir também o CLI que roda em produção (o embutido no Agent SDK do bridge), para o delta declarar a quem ele chega e a defasagem do bridge deixar de ser invisível"
+  - id: Q_SUBIR_O_SDK_DO_BRIDGE_COM_PISO_DE_VERSAO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_at: "2026-10-16"
+    verified_against: "aberta pela rodada r12 em 2026-10-16: fecha quando o maestro decidir subir o SDK do onion-bridge de 0.3.232 para a linha atual (0.3.301 medido no npm), com o chat-runner verify e o handshake por spawnClaudeCodeProcess re-provados no CLI novo, e um piso de versão que barre regressão abaixo de 2.1.64, o mínimo do CVE-2026-39861 já registrado no grafo de isolamento como pré-condição do degrau 3 (E_CVE39861_FIXED_IN_2_1_64), que o maestro parqueou em 2026-10-16; o piso pesa se o degrau 3 voltar, e a defasagem das correções pesa já"
+    narrative: "Issue SAC-156 no Linear, criada pelo tm.sh em 2026-10-16."
+    label: "o SDK do bridge deve subir com piso de versão declarado e o verify do runner re-provado no CLI novo; o piso de CVE do degrau 3 (parqueado) vale por acaso de versão e as correções de 57 versões publicadas não chegam ao /chat"
+  - id: E_GREP_E_GLOB_DEIXAM_DE_MENTIR_ZERO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16: a guarda anti-fail-open do core (bash-empty-result-guard.sh) é PostToolUse com matcher Bash (.claude/settings.json), então o zero falso das ferramentas Grep e Glob não tinha guarda; a pretooluse-env-guard.sh cobre Read|Grep|Bash só antes da chamada; o bridge nega Read/Grep/Glob fora do cwd no canUseTool (src/chat.ts l.374), roda o CLI 2.1.232 e não recebe a correção"
+    label: "a 2.1.301 faz Grep e Glob devolverem erro, e não 'nenhum resultado', quando o programa de busca falha; é a classe que o core guarda só no Bash, curada pela plataforma no host e ainda aberta no bridge"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.301, item 'Fixed Grep and Glob reporting no matches when the search program failed unexpectedly before returning any results'"
+      method: "medição: matchers dos hooks no settings.json e leitura do canUseTool do bridge"
+      locality: "web"
+  - id: E_WORKFLOW_PULAVA_O_PASSO_E_DIZIA_SUCESSO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16 e corrigido pelo juiz: o core tem 2 workflows; no meta-evolve-fanout o Scan aceita findings:[] como mediu e achou zero (l.159 só marca dead quando não é array), e a fase Verify (opus/high, l.172) só julga achados que existem; no onion-research a Ancoragem por agente separado (l.380-385) e a recusa sem claim ancorada (l.432) existem só no modo primaries (l.327); nos modos research e decision um Fetch que devolve claims vazio some calado, e se todos pularem a run devolve findings vazio com resumo, não erro (l.613-616), corrigido pelo refutador do diff; as runs antigas não são auditáveis por esta rodada"
+    narrative: "Juiz: EXAGERA na 1ª redação, que dizia que os dois workflows só re-verificam a escrita do grafo e apontava a leitura do onion-research; o buraco real é o Scan do meta-evolve-fanout. O refutador do diff estreitou a isenção: o onion-research só recusa leitura não ancorada no modo primaries, e o Fetch de research/decision é o 2º buraco da mesma classe."
+    label: "a 2.1.301 corrige agente de Workflow que pulava o passo e a run dizia sucesso; no core, o Scan do meta-evolve-fanout e o Fetch do onion-research (fora do modo primaries) aceitam saída vazia como medição, então um passo pulado passaria como achou zero"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.301, item 'Fixed workflow agents sometimes skipping their step, and the run still reporting success'"
+      method: "medição: leitura dos dois scripts de Workflow"
+      locality: "web"
+  - id: E_ARTIFACT_PASSA_PELO_EDIT_E_O_KG_READ_LEG
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16: kg-read-leg.sh é PreToolUse com matcher Read|Edit|Write|Bash e só sai 0 (5 saídas, todas exit 0); é contexto, nunca veto"
+    label: "a 2.1.301 destrava a atualização de Artifact onde um hook PreToolUse cobre Edit ou Write; o kg-read-leg do core cobre Edit|Write e nunca veta, mas a mera cobertura já fazia o host recusar a atualização nas sessões do core, e agora ele passa a ver essas edições"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.301, item 'Fixed artifact updates being refused where a PreToolUse hook covers Edit or Write'"
+      method: "medição: matcher e saídas do kg-read-leg.sh"
+      locality: "web"
+  - id: E_ALIAS_FABLE_SEM_USO_NO_CORE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16: a escada E6 usa o id completo claude-fable-5-1 (docs/onion/radar-baselines.yaml session_models); 0 model 'fable' ou 'best' em workflows, agentes, comandos, skills e ops; o settings do usuário não tem chave model; o fallbackModel do projeto lista opus-5-5, opus-5 e sonnet-5-5"
+    label: "a 2.1.301 faz o alias fable (e best) tentar uma vez o Fable anterior quando o mais novo não está disponível; o core não usa o alias, então a escada de modelos não muda"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.301, item 'Fixed the `fable` (and `best`) model alias erroring on the Anthropic API'"
+      method: "medição: grep do alias e leitura da escada"
+      locality: "web"
+  - id: E_PLUGIN_VALIDATE_CURTO_NO_MESMO_HOST
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16: ops/publish-door.sh l.880 roda claude plugin validate --strict por plugin, comando curto do CLI no mesmo host e na mesma conta das sessões do maestro; session-version-drift.sh e cc-delta-census.sh rodam claude --version; nenhum script roda claude auth status; nenhuma desconexão foi medida nesta rodada; o juiz mediu por strace que o claude plugin validate --strict abre o .credentials.json e conecta na faixa da Anthropic, então exercita a classe do item"
+    label: "a 2.1.301 corrige a renovação de login cortada por um comando curto do CLI que sai no meio dela; o core roda comandos curtos assim na publicação das portas, então a classe o alcança, sem incidente medido"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.301, item 'Fixed sign-in refresh timeouts and unexpected sign-outs after a short command'"
+      method: "medição: grep das chamadas ao CLI nos scripts"
+      locality: "web"
+  - id: E_SINAIS_DO_DELTA_SEM_CONSUMIDOR
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16: CLAUDE_CODE_RETRY_WATCHDOG com 0 ocorrências no core e no src do bridge; 0 scripts que consomem OpenTelemetry; .claude/mods e o diretório de mods do usuário não existem; awsAuthRefresh com 0 ocorrências e o settings do usuário sem env de Bedrock; 0 hooks WorktreeCreate no settings.json; git config extensions.refstorage ausente; o maior comando tem 11 marcadores de argumento, longe do teto de 64; acrescentado pelo juiz: os hooks PreModelSwitch/PostModelSwitch só se atrasariam com modelo application-inference-profile (0 no core), e a troca para janela menor apareceu 4 vezes em 6 semanas no log de model-switch"
+    label: "watchdog de retry, campos OTel de tool_decision, mods, awsAuthRefresh, WorktreeCreate, reftable, o teto de 64 nomes de argumento e o atraso dos hooks de troca de modelo da 2.1.301 não tocam o core"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.301, item 'Added `classifier_verdict` and `permission_mode` to OpenTelemetry `tool_decision` events'"
+      method: "medição: grep no core e no bridge"
+      locality: "web"
+  - id: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_301
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16: LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive com rc 0, 6 passaram, 0 pularam, 0 falharam, sob o CLI 2.1.301 do host"
+    label: "a guarda de deriva de binário que o censo manda rodar segue verde no CLI 2.1.301"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seção ## 2.1.301 (o binário inteiro)"
+      method: "medição: execução da família cited_directive"
+      locality: "web"
+edges:
+  - from: E_DELTA_DA_RODADA
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232
+    to: Q_CENSO_MEDE_O_CLI_DO_SDK_DO_BRIDGE
+    edge_type: SUPPORTS
+  - from: E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232
+    to: Q_SUBIR_O_SDK_DO_BRIDGE_COM_PISO_DE_VERSAO
+    edge_type: SUPPORTS
+  - from: E_GREP_E_GLOB_DEIXAM_DE_MENTIR_ZERO
+    to: Q_SUBIR_O_SDK_DO_BRIDGE_COM_PISO_DE_VERSAO
+    edge_type: SUPPORTS
+  - from: E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_NENHUM_ITEM_TOCA_SANDBOX_WEBFETCH_STREAMJSON
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GREP_E_GLOB_DEIXAM_DE_MENTIR_ZERO
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_WORKFLOW_PULAVA_O_PASSO_E_DIZIA_SUCESSO
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ARTIFACT_PASSA_PELO_EDIT_E_O_KG_READ_LEG
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_ALIAS_FABLE_SEM_USO_NO_CORE
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_PLUGIN_VALIDATE_CURTO_NO_MESMO_HOST
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_SINAIS_DO_DELTA_SEM_CONSUMIDOR
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_301
+    to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
+    edge_type: SUPPORTS

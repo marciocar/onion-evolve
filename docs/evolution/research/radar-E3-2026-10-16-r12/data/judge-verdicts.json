@@ -1,0 +1,314 @@
+{
+ "criteria": [
+  {
+   "id": "CU1_CITACAO_DIVERGE",
+   "when": "o data/2.1.301.txt ou o locator de um nó não bate byte a byte com a seção ## 2.1.301 do CHANGELOG oficial",
+   "check": "diff <(curl -s https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md | awk '/^## 2.1.301$/{f=1;print;next} /^## /{f=0} f') docs/evolution/research/radar-E3-2026-10-16-r12/data/2.1.301.txt"
+  },
+  {
+   "id": "CU2_MEDICAO_NAO_REPRODUZ",
+   "when": "o comando ou a leitura citados em verified_against, re-executados no vivo, devolvem outro número ou outro estado",
+   "check": "re-executar o grep, a leitura de linha ou o --version citado no nó e comparar com o verified_against"
+  },
+  {
+   "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+   "when": "o nó afirma que um item toca (ou não toca) o Onion e a superfície nomeada não existe, não é exercitada pelo item, ou existe outra superfície do core que o item alcança e o nó nega",
+   "check": "grep -rn <termo do item> .claude ops e leitura do arquivo e linha nomeados no nó"
+  },
+  {
+   "id": "CU4_IMPACTO_DESPROPORCIONAL",
+   "when": "o impacto declarado difere em 2 ou mais pontos do que a medição sustenta, ou a causa afirmada não é a medida",
+   "check": "comparar o impact do nó com a consequência medida no vivo (quem roda o caminho, com que frequência, o que quebra)"
+  },
+  {
+   "id": "CU5_OMISSAO_DE_IMPACTO",
+   "when": "um item do delta toca uma superfície do core ou do /chat em produção com impacto >= 2 medido e a rodada não tem nó para ele",
+   "check": "para cada item de data/2.1.301.txt, grep da superfície correspondente no core e no bridge"
+  }
+ ],
+ "verdicts": [
+  {
+   "alvo": "E_DELTA_DA_RODADA",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU1_CITACAO_DIVERGE",
+    "comando": "diff <(awk '/^## 2.1.301$/{f=1;print;next} /^## /{f=0} f' CHANGELOG.md) data/2.1.301.txt"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada",
+    "medida": "diff vazio; 54 linhas, 51 itens; os 7 locators aparecem 1 vez cada (grep -cF = 1)",
+    "classe_do_juiz": "nada"
+   },
+   "nota": "cópia byte a byte confirmada"
+  },
+  {
+   "alvo": "Q_O_QUE_O_DELTA_TOCA_NO_ONION",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "varredura dos 51 itens contra settings.json, hooks, workflows, ops/chat-runner.sh e o src do bridge"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nenhum item fora dos nós chega a impacto >= 2",
+    "medida": "3 itens marginais sem nó (l.19, l.22/42, l.26), todos com impacto <= 1",
+    "classe_do_juiz": "nada"
+   },
+   "nota": "correção do refutador do diff: as 3 omissões cobrem l.26 (Read binário), l.19/22/42 (troca de modelo) e l.34 (Workflow após cd)"
+  },
+  {
+   "alvo": "E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "command grep -E '^## 2\\.1\\.[0-9]+$' CHANGELOG.md | awk -F. '$3>232 && $3<=301' | wc -l; npm view @anthropic-ai/claude-agent-sdk versions --json"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "'69 versões' é a distância de patch; publicadas são 57 seções do CHANGELOG e 58 releases do SDK; e o deploy de 2026-10-16 18:05 reinstalou o node_modules pelo lock e manteve 0.3.232",
+    "medida": "57 seções em (2.1.232, 2.1.301]; 58 versões do SDK; 12 números pulados; --version do binário = 2.1.232; 0 pathToClaudeCodeExecutable em src",
+    "classe_do_juiz": "reescrita"
+   },
+   "nota": "achado central sustenta; só o número"
+  },
+  {
+   "alvo": "E_NENHUM_ITEM_TOCA_SANDBOX_WEBFETCH_STREAMJSON",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C command grep -ciE 'sandbox|webfetch|stream-json|--settings|socket|sdk' data/2.1.301.txt; sed -n 558,568p ops/chat-runner.sh"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "a 5ª linha com permission é o microfone do VSCode (l.53); o MCP sob managed settings é a linha de settings (l.38)",
+    "medida": "contagens 0/5/6/1 reproduzidas; permission nas linhas 7, 21, 32, 34, 53",
+    "classe_do_juiz": "reescrita"
+   },
+   "nota": "correção de redação"
+  },
+  {
+   "alvo": "Q_CENSO_MEDE_O_CLI_DO_SDK_DO_BRIDGE",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "command grep -ciE sdk .claude/validation/cc-delta-census.sh"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada",
+    "medida": "0 menções a SDK no censo; mede só disco (l.77) e processo",
+    "classe_do_juiz": "nada"
+   },
+   "nota": ""
+  },
+  {
+   "alvo": "Q_SUBIR_O_SDK_DO_BRIDGE_COM_PISO_DE_VERSAO",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "contagem de seções do CHANGELOG (57) e do npm (58); command grep -n CVE chat-agent-isolation-2026-10.kg.yaml"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "'as correções de 57 versões publicadas' e o piso nomeado >= 2.1.64 (CVE-2026-39861)",
+    "medida": "57 seções; piso 2.1.64 registrado no grafo de isolamento (l.1251-1256)",
+    "classe_do_juiz": "reescrita"
+   },
+   "nota": "só o número muda"
+  },
+  {
+   "alvo": "E_GREP_E_GLOB_DEIXAM_DE_MENTIR_ZERO",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "matchers do settings.json; sudo -n grep -n GUEST_TOOLS deploy/chat-runner/launcher.py; sudo -n grep -n READ_ONLY_TOOLS src/agent-policy.ts"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada",
+    "medida": "PostToolUse só Bash; Glob sem guarda; o convidado tem Grep e Glob (READ_ONLY_TOOLS l.38, GUEST_TOOLS l.51)",
+    "classe_do_juiz": "nada"
+   },
+   "nota": "superfície real no admin e no convidado | correção do refutador do diff: READ_ONLY_TOOLS está em src/agent-policy.ts l.38; GUEST_TOOLS não existe (o par é GUEST_WRITE_TOOLS, l.41)"
+  },
+  {
+   "alvo": "E_WORKFLOW_PULAVA_O_PASSO_E_DIZIA_SUCESSO",
+   "veredito": "EXAGERA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "sed -n 375,386p .claude/workflows/onion-research.js; sed -n 150,180p .claude/workflows/meta-evolve-fanout.js; command grep -n 'anchored.length === 0' .claude/workflows/onion-research.js"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "o buraco é o Scan do meta-evolve-fanout (findings:[] vale como zero medido, l.159); a leitura do onion-research é ancorada por agente separado (l.380-385) e a run é recusada sem claim ancorada (l.432); o meta-evolve tem Verify opus por achado (l.172)",
+    "medida": "1 Verify por achado no meta-evolve; 1 Ancoragem e 1 recusa no onion-research; 0 checagem de scan vazio",
+    "classe_do_juiz": "reescrita"
+   },
+   "nota": "superfície nomeada estava errada"
+  },
+  {
+   "alvo": "E_ARTIFACT_PASSA_PELO_EDIT_E_O_KG_READ_LEG",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "command grep -nE '\\bexit\\b' .claude/hooks/kg-read-leg.sh"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "ajuste fino: antes a mera cobertura de Edit|Write já fazia o host recusar a atualização de Artifact",
+    "medida": "matcher Read|Edit|Write|Bash; 5 saídas exit 0 (l.29, 55, 74, 96, 126)",
+    "classe_do_juiz": "reescrita"
+   },
+   "nota": ""
+  },
+  {
+   "alvo": "E_ALIAS_FABLE_SEM_USO_NO_CORE",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "grep do alias fable/best em .claude e ops; registros de model nos dados do bridge"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada",
+    "medida": "0 no core; 186 registros do bridge com ids explícitos, 0 fable/best",
+    "classe_do_juiz": "nada"
+   },
+   "nota": ""
+  },
+  {
+   "alvo": "E_PLUGIN_VALIDATE_CURTO_NO_MESMO_HOST",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "strace -f -e trace=connect,openat claude plugin validate --strict <sonda>"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "a ligação ganha prova: o comando abre .credentials.json e conecta na Anthropic",
+    "medida": "16 connect(), 3 para 160.79.104.10; abre .credentials.json",
+    "classe_do_juiz": "nada"
+   },
+   "nota": ""
+  },
+  {
+   "alvo": "E_SINAIS_DO_DELTA_SEM_CONSUMIDOR",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "grep de RETRY_WATCHDOG, OTel, mods, awsAuthRefresh, WorktreeCreate, refstorage e placeholders"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada",
+    "medida": "watchdog 0 em .claude/ops/bridge; 0 OTel; 0 mods; maior comando com 11 placeholders",
+    "classe_do_juiz": "nada"
+   },
+   "nota": "correção do refutador do diff: 'em .claude/ops/bridge' quer dizer em .claude, em ops e no src do bridge"
+  },
+  {
+   "alvo": "E_GUARDA_CITED_DIRECTIVE_VERDE_NA_2_1_301",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU2_MEDICAO_NAO_REPRODUZ",
+    "comando": "LC_ALL=C bash .claude/validation/lint-selftest.sh --families cited_directive"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nada",
+    "medida": "rc 0; 6 passaram, 0 pularam, 0 falharam",
+    "classe_do_juiz": "nada"
+   },
+   "nota": ""
+  },
+  {
+   "alvo": "OMISSAO_READ_BINARIO_NO_CHAT",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "sudo -n sed -n 141,212p src/chat.ts; web/src/adapters/attachments.ts"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "Read de .heic só chega ao convidado por multipart direto; a PWA manda imagem inline com 4 MIME",
+    "medida": "impacto <= 1",
+    "classe_do_juiz": "nó novo (não qualifica)"
+   },
+   "nota": "não qualifica para CU5"
+  },
+  {
+   "alvo": "OMISSAO_TROCA_DE_MODELO_E_HOOKS_DE_SWITCH",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "settings.json PreModelSwitch/PostModelSwitch; grep application-inference-profile; model-switch.jsonl"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "uma frase em E_SINAIS",
+    "medida": "0 application-inference-profile; 4 PreModelSwitch entre 09-02 e 10-04; impacto <= 1",
+    "classe_do_juiz": "nó novo (não qualifica)"
+   },
+   "nota": ""
+  },
+  {
+   "alvo": "OMISSAO_WORKFLOW_APOS_CD",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU5_OMISSAO_DE_IMPACTO",
+    "comando": "command grep -n EXEC ops/chat-runner.sh"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "Workflow é negado ao convidado",
+    "medida": "Workflow em EXEC_TOOLS; impacto 1",
+    "classe_do_juiz": "nada"
+   },
+   "nota": "correção do refutador do diff: EXEC_TOOLS mora em src/agent-policy.ts l.45, não no chat-runner.sh; e o item toca o HOST do core (sessões que dão cd para worktrees e rodam .claude/workflows/*.js), onde o efeito é atrito de permissão, impacto 1"
+  },
+  {
+   "alvo": "AUFHEBUNG",
+   "veredito": "SUSTENTA",
+   "criterio": {
+    "id": "CU3_LIGACAO_SEM_SUPERFICIE",
+    "comando": "command grep -ni 'bridge|sdk|2.1.232' r11.kg.yaml"
+   },
+   "superacao": {
+    "classe": "nenhuma",
+    "achada": false,
+    "o_que": "nenhum dos 11 nós da r11 é contradito",
+    "medida": "r11 com 0 menções a bridge/SDK/2.1.232",
+    "classe_do_juiz": "nada"
+   },
+   "nota": "x_supersedes_none correto | correção do refutador do diff: a r11 tem 12 nós, não 11"
+  }
+ ],
+ "judge": {
+  "model": "opus",
+  "effort": "high",
+  "mandato": "REFUTAR",
+  "date": "2026-10-16",
+  "tokens": 159071,
+  "tool_uses": 49,
+  "duration_ms": 517717
+ },
+ "x_mapeamento_de_classe": "o juiz devolveu classes livres (reescrita, nada, nó novo); a sessão respondeu a pergunta do consolo: nenhuma superação medida entrega um valor fora do próprio veredito (as reescritas são costura do veredito), então todas viram classe nenhuma com achada false; a classe original fica em classe_do_juiz",
+ "x_nota_refutador": "o juiz não recebeu o enum entrega|nenhuma; a resposta à pergunta do consolo foi da sessão julgada (autoavaliação declarada). Próximo ciclo: passar o schema ao juiz"
+}
