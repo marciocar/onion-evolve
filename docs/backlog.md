@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**558 itens abertos** em 108 grafo(s) com aberto (de 137 no escopo) · 109 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**559 itens abertos** em 108 grafo(s) com aberto (de 137 no escopo) · 109 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -870,13 +870,14 @@
 | 4.5 | `Q_VITRINE_E_GPT_DO_MINI_DEPOIS_DA_PORTA` | door-role-parity-2026-09 | a vitrine onionevolve.com/mini e o GPT-SETUP.md apontam a PONTA do repo onion-mini; depois da 1ª publicação a ponta é a porta  |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
 
-## onion-doctrine-elenxo-bulbo-2026-07 — 4 item(ns)
+## onion-doctrine-elenxo-bulbo-2026-07 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.7 | `D_QUADRO_CITACOES` | onion-doctrine-elenxo-bulbo-2026-07 | quadro de citacoes do maestro NASCEU (gated): as formulacoes recorrentes dele, atribuidas+datadas (verbatim vs parafrase marcado)  |
 | 6.4 | `Q_BYTECODE_SEM_TESTE` | onion-doctrine-elenxo-bulbo-2026-07 | O QUE A SUPERACAO AINDA NAO COBRE: bytecode que nenhum teste confere — instrucao em prosa de comando que a VM obedece sem verifi |
 | 4.8 | `Q_RADAR_WIDGET_PARALLEL_FORMULA` | onion-doctrine-elenxo-bulbo-2026-07 | o RadarWidget de /maquinaria/ (site) DUPLICA a tabela de statusFactor do kg-radar.sh (conferida fator a fator na revisao adversari |
+| 4.2 | `Q_CONSOLO_INVISIVEL_A_FORMA` | onion-doctrine-elenxo-bulbo-2026-07 | O QUE A MÁQUINA AINDA NÃO VÊ: status quo rotulado de superação, condição futura em prosa, o_que que só parafraseia o objet |
 | 1.6 | `Q_BULBO_DIAGRAM` | onion-doctrine-elenxo-bulbo-2026-07 | um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZ |
 
 ## gtm-decisions-2026-07 — 4 item(ns)
