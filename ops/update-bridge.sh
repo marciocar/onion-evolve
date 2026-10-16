@@ -165,5 +165,17 @@ grep -q "auth: enforce" <<<"${BOOT}" || fail "boot DESTA invocação sem 'auth: 
 grep -q "JWKS OK"       <<<"${BOOT}" || log "AVISO: JWKS não confirmou neste boot (Logto fora?) — TUDO dará 401 até voltar"
 NEW_RESTARTS="$(systemctl show "${UNIT}" -p NRestarts --value)"
 [ "${NEW_RESTARTS}" = "0" ] || log "AVISO: NRestarts=${NEW_RESTARTS} — investigar journal antes de confiar"
+# O drop-in de INTEGRIDADE (degrau 1 do isolamento do /chat, ops/bridge-hardening.sh) liga cada caminho no boot: um
+# caminho que o update removeu ou renomeou sai da proteção em silêncio (o '-' do drop-in evita o 226/NAMESPACE). O
+# verify mede no namespace DESTA invocação; reprovar não desfaz o update (o serviço está são), só avisa.
+if sudo test -f "/etc/systemd/system/${UNIT}.service.d/30-integrity.conf"; then
+  VOUT="$(bash "${SELF_DIR}/bridge-hardening.sh" verify 2>&1)"; VRC=$?
+  case "${VRC}" in
+    0) log "integridade (30-integrity.conf): verify OK no boot desta invocação" ;;
+    1) log "AVISO: o verify do drop-in de integridade REPROVOU neste boot ($(grep -c '^FALHA' <<<"${VOUT}") falha(s)):"
+       grep '^FALHA' <<<"${VOUT}" | head -5 | sed 's/^/    /' ;;
+    *) log "AVISO: o verify do drop-in de integridade NÃO MEDIU (rc ${VRC}): $(tail -1 <<<"${VOUT}")" ;;
+  esac
+fi
 log "OK — clone ${NEW_CLONE_HEAD:0:8} · bridge ${NEW_BRIDGE_HEAD:0:8} · health 200+ok:true local+público · auth enforce (invocação ${INV:0:8})"
 log "prova independente: compare um artefato novo do core no clone (ex.: ls ${CLONE}/.claude/rules/)"

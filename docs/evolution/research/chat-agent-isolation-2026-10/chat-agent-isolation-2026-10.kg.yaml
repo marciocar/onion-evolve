@@ -20,7 +20,11 @@ meta:
                                # Gatilhos antecipados: (1) [LIDOS na rodada de primárias de 2026-10-15]; (2) o degrau
                                # 0 ou 1 ser aplicado no vivo; (3) update do Claude Code/SDK no bridge.
   # kg-backlog-guard: on
-  # ═══ TETO: 127 NÓS ═══
+  # ═══ TETO: 131 NÓS ═══
+  #   DEGRAU 1 + SPIKES (2026-10-16, +4): o selo «1 já, 2 e 3 por spike» nasce como nó PRÓPRIO ligado à mãe
+  #   (que segue open até os degraus 2 e 3), mais as três medições que ele pede — o ensaio do drop-in de
+  #   integridade numa unit transitória (degrau 1), o lançador por socket sob DynamicUser (spike 2) e o que o
+  #   AppArmor desta VPS exige do sandbox nativo (spike 3), cada uma dizendo o degrau que confirma ou corrige.
   #   PROVAS (2026-10-16, +3): as três provas que o Elenxo pediu antes de selar os degraus 1–3, medidas em
   #   sandbox (E_PROVA1/2/3_*), cada uma dizendo qual degrau confirma, corrige ou derruba.
   #   SELO (2026-10-16, +1): a decisão do maestro «Degrau 0 já + 3 provas» nasce como nó PRÓPRIO
@@ -1979,6 +1983,77 @@ nodes:
       locator: "Options.sandbox, settings.sandbox, managedSettings.sandbox, failIfUnavailable"
       method: "medição: sondas executadas num diretório temporário, marcador em arquivo, chave literal inválida"
       locality: "host"
+  - id: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "decisão do maestro em 2026-10-16, por pergunta com opções (/meta:decide): escolhida «1 já, 2 e 3 por spike (Recomendado)»"
+    label: "DECISÃO DO MAESTRO (2026-10-16): aplicar já o degrau 1 (só integridade, por drop-in systemd instalado por wrapper core-only) e levar os degraus 2 (lançador por socket sob DynamicUser) e 3 (sandbox nativo estrito) a spike antes de selar."
+    narrative: "Selado por /meta:decide em 2026-10-16: escolhida «1 já, 2 e 3 por spike (Recomendado)»; descartadas: «Degraus 1 e 2 juntos» · «Parar no degrau 0»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-16: «Isolamento do /chat, degraus 1 a 3 (corrigidos pelas provas). O que selar e executar?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      locality: "pessoa"
+
+  # ═══ DEGRAU 1 + SPIKES DOS DEGRAUS 2 E 3 (2026-10-16, decisão D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016) ═══
+  # Nada persistente instalado: o degrau 1 foi ENSAIADO (unit transitória) e fica para a sessão principal aplicar pelo
+  # wrapper; os spikes usaram units transitórias ou de runtime (tmpfs, removidas ao fim). Sem chamada à API.
+
+  - id: E_DEGRAU1_INTEGRITY_DROPIN_ENSAIO_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-16"
+    verified_against: "namespace do MainPID do bridge (antes); units transitórias com as propriedades da unit de hoje + o 30-integrity.conf renderizado (systemd 255.4); ops/bridge-hardening.sh (core-only) install em ENSAIO no host, rc 0, 0 FALHA (4 placeholders AUSENTES por desenho)"
+    label: "DEGRAU 1 ENSAIADO: o drop-in torna só-leitura as duas ÁRVORES (bridge e clone servido) com as escritas do serviço aninhadas graváveis, os dotfiles e placeholders, e esconde .ssh e .git-credentials; 0 EROFS sob strace. CONFIRMA o degrau 1 e CORRIGE o escopo."
+    narrative: "Medido em 2026-10-16. ANTES (namespace vivo, como a conta do serviço): src/ do bridge, o jwks/ do clone servido e o .bashrc rw, e o .git-credentials legível. A 1ª forma protegia SUBDIRETÓRIOS (src/, node_modules/, jwks/…) e o refutador a derrubou com prova: com o pai gravável, `mv onion-bridge onion-bridge.old && mkdir -p onion-bridge/src` dava uma árvore nova gravável. CURA medida em sandbox: a raiz de cada árvore como ponto de montagem só-leitura (rename = EBUSY) com ReadWritePaths= ANINHADO nas escritas do serviço (gravou em data/; renomear data/ = EROFS). A árvore inteira também fecha o .git dos dois repositórios (core.fsmonitor e hooks rodam no git do update-bridge, que roda FORA da unit com a chave de deploy e o PAT à vista), o package-lock e o .npmrc de projeto (o npm ci) e os arquivos de confiança que o bridge lê do clone (agent-card, federation-orgs, a2a-verify, jwks, members.yaml). Placeholders criados no --apply para o que não existe e seria lido por algo como a conta do serviço: .claude/settings*.json `{}` (a classe do CVE-2026-25725), o .config da home vazio (o git leria o config XDG) e o .npmrc da home vazio. ESCRITAS DO SERVIÇO (código e mtime): data/, o estado em var-lib, a home (o CLI grava o .claude.json por temp+rename e o .claude/projects), o tmp privado e, no clone, só .claude/sessions e docs/evolution/trust-log.md. ENSAIO (unit transitória, as propriedades da unit de hoje + o drop-in): as 2 árvores e 3 dotfiles só-leitura E pontos de montagem próprios, .ssh e .git-credentials ilegíveis, as 8 escritas graváveis, o tsx transpila src/health.ts; sob strace, um turno do SDK (chave inválida, HOME descartável) fez 0 EROFS. ReadOnlyPaths= de caminho ausente sem '-' derruba o start com 226/NAMESPACE (medido), daí o '-' com o verify acusando a ausência; o bind de ARQUIVO some dentro da unit quando o arquivo é trocado por rename POR FORA (medido; o de diretório resiste), e o update-bridge para a unit antes do reset e chama o verify depois. Sem EnvironmentFile= (E_OBJECAO_01) e SEM guardar segredo: o .env e o environ seguem legíveis no mesmo UID. 2ª PASSADA DO REFUTADOR (curada): um symlink num componente do MEIO de uma exceção gravável a desviava para dentro da raiz de confiança (provado; só plantável antes do install) — o pré-voo passou a exigir que o caminho resolvido seja o literal e o verify confere um a um os arquivos de confiança concretos (src/server.ts, package-lock, a2a-verify.sh, jwks/, trust-topology-check.sh, members.yaml, .git/config); o .local/bin da home (entra no PATH do .profile) e o .bash_profile (vence o .profile no login; o placeholder só o encadeia) viraram placeholders. TETO DECLARADO (não coberto pelo degrau 1): data/ segue gravável inteiro, e lá mora o arquivo de convites A2A que o serviço só LÊ (quem grava é o wrapper de convites, fora da unit) — o agente no mesmo UID ainda cunharia convites; a cura é mover o que o serviço só lê para um subdiretório só-leitura aninhado (mudança no bridge) ou o degrau 2. Renomear o .claude da home (gravável) tira o bind dos settings*.json, de impacto baixo porque o SDK carrega só settingSources project. O ensaio não monta os placeholders (ausentes até o --apply). NÃO MEDIDO: o --apply no serviço real, um chat real e um POST /a2a com o drop-in ativo, e o que o CLI escreveria numa versão futura (o verify depois de cada update é a rede); o .cache e o resto do .local da home seguem graváveis (sem consumidor medido fora da unit)."
+    trace: "ops/bridge-hardening.sh (core-only) install e verify; sondas do scratchpad da sessão: run-d1.sh, run-d1b.sh, run-d1c.sh, run-d1-sdk.sh, run-d1-tsx.sh"
+    provenance:
+      source: "systemd 255.4 do host + ops/bridge-hardening.sh (core-only) desta branch + o SDK @anthropic-ai/claude-agent-sdk 0.3.232 do bridge"
+      locator: "systemd-run --pipe --wait --collect com ReadOnlyPaths=/ReadWritePaths=/InaccessiblePaths=; nsenter no MainPID; strace -f de query() e do tsx"
+      method: "medição: units transitórias, test -w/test -r (access), findmnt OPTIONS e TARGET, sem escrever em caminho servido; strace contando EROFS"
+      locality: "host"
+
+  - id: E_SPIKE2_SOCKET_LAUNCHER_DYNAMICUSER_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-16"
+    verified_against: "socket Accept=yes + template de RUNTIME (tmpfs, removido ao fim) com DynamicUser, User=onion-chat-%i, ProtectHome=yes, ProtectProc=invisible, RuntimeMaxSec=20; harness do SDK 0.3.232 como a conta do serviço, spawnClaudeCodeProcess sobre a conexão; ANTHROPIC_BASE_URL numa porta fechada (zero chamada à API)"
+    label: "SPIKE 2: o lançador por socket sobe o CLI 2.1.232 sob um UID dinâmico POR CONEXÃO e o SDK completa o init por spawnClaudeCodeProcess, sem a home do serviço. CONFIRMA o mecanismo do degrau 2 e CORRIGE três peças: User por instância, CollectMode e o teardown."
+    narrative: "Medido em 2026-10-16. (1) systemd-run NÃO faz Accept=yes ('Failed to set socket on service: Invalid argument': a unit transitória não é template); o spike usou socket + template de runtime no diretório volátil de units, removidos ao fim (0 unit e 0 arquivo restantes). (2) CICLO: o init chegou pelo socket (cli 2.1.232); o lançador (python3 -I, lê UMA linha de cabeçalho JSON byte a byte, allowlist de flags e de cwd, ambiente montado por ELE) registrou home do serviço invisível, segredo do bridge negado e o environ do PID 1 invisível. Os argumentos que o SDK entrega ao gancho foram medidos (--output-format, --verbose, --input-format, --max-turns, --tools, --setting-sources, --permission-mode). (3) CORREÇÃO: sem User=, as instâncias SIMULTÂNEAS dividiram o mesmo UID dinâmico (65396 nas duas); com User=onion-chat-%i, duas conexões simultâneas ganharam 62948 e 62991. (4) A allowlist recusou --dangerously-skip-permissions e um cwd fora da raiz (exit 64, conexão fechada em 119 ms). (5) CORREÇÃO: instância que FALHA ficava carregada; CollectMode=inactive-or-failed (seção [Unit]) a recolhe. (6) TEARDOWN: com o CLI ocioso, o EOF do stdin o encerra em 644 ms; com uma requisição em voo, o SDK fechou o stdin, esperou cerca de 2 s e destruiu o stream (o signal não foi abortado), e o CLI SEGUIU vivo até o RuntimeMaxSec matá-lo (status 143 aos 20 s). Logo o corte duro é o RuntimeMaxSec, e o lançador deve SUPERVISIONAR o CLI (não fazer exec) para matá-lo no fim da conexão — mesmo UID, sem o problema de E_OBJECAO_29. ABERTO: o workspace (o estado do bridge em var-lib é 0750 da conta do serviço, inalcançável pelo UID dinâmico; o spike usou o tmp privado), o exit code real (o canal só leva o stream) e o stderr (só no journal); o lançador e as units seguem a instalar pelo root, sem dogfood no bridge real."
+    trace: "sondas do scratchpad da sessão: s2/launcher.py, s2/onion-chat-spike.socket, s2/onion-chat-spike@.service, s2/harness.mjs, s2/up.sh e s2/down.sh"
+    provenance:
+      source: "systemd 255.4 do host + SDK @anthropic-ai/claude-agent-sdk 0.3.232 do onion-bridge (CLI 2.1.232)"
+      locator: "Accept=yes, DynamicUser=, User=onion-chat-%i, CollectMode=, RuntimeMaxSec=; Options.spawnClaudeCodeProcess"
+      method: "medição: units de runtime removidas ao fim, journal do lançador e do systemd, cronometria no harness"
+      locality: "host"
+
+  - id: E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-16"
+    verified_against: "sysctl, dpkg/apt-cache, aa-status, leitura do diretório de perfis do AppArmor, bwrap 0.9.0 como operador com o audit do kernel, e resolveSettings() do SDK 0.3.232 com managedSettings — nada instalado nem carregado"
+    label: "SPIKE 3: o sandbox nativo aqui exige socat (ausente) e um perfil AppArmor 'userns' para um bwrap; managedSettings DESCARTA bwrapPath e socatPath, e a cópia privada pediria managed-settings do root, válido para o host inteiro. CORRIGE o degrau 3: depende do degrau 2."
+    narrative: "Medido em 2026-10-16. (1) kernel.apparmor_restrict_unprivileged_userns = 1; apparmor 4.0.1; bubblewrap 0.9.0 sem setuid. O bwrap falha mesmo SEM --unshare-user (o não-setuid sempre cria userns), e o audit do kernel mostra o mecanismo: userns_create transita o processo para o perfil unprivileged_userns, que NEGA capability setpcap e a escrita no uid_map. (2) socat ausente (candidato 1.8.0.0-4ubuntu0.1): dependência do sandbox além do bwrap (E_PROVA3). (3) Nenhum perfil de bwrap carregado; 117 perfis carregados, 90 em modo unconfined; no diretório de perfis, 90 arquivos flags=(unconfined) e 92 com userns. SUPERFÍCIE JÁ ABERTA: o perfil runc é unconfined com userns e o binário dele EXISTE no host (vem com o Docker), então a restrição de userns já tem um contorno instalado — não exercitado. (4) resolveSettings() com managedSettings {sandbox: enabled, failIfUnavailable, allowUnsandboxedCommands:false, bwrapPath, socatPath} devolveu o sandbox efetivo SEM bwrapPath e SEM socatPath (filtro restrictive-only do tier do pai). Logo a cópia privada por bwrapPath exige o managed-settings.json do sistema (root; ele não existe hoje), que se aplica a TODO Claude Code do host — inclusive as sessões do maestro —, e com ele o managedSettings do bridge só entra com parentSettingsBehavior 'merge'. ALTERNATIVA (hipótese, NÃO medida): no degrau 2 cada instância tem namespace próprio; um bwrap privado ligado por BindReadOnlyPaths num caminho que só existe ali, achado pelo PATH que o lançador monta, e um perfil preso a esse caminho, sem managed-settings do sistema. PASSO DE INSTALAÇÃO PARA O MAESTRO (root, NÃO executado): instalar o socat; copiar o bwrap para um diretório de libexec privado do runner; um perfil com abi 4.0, include de tunables/global, flags=(unconfined) e a regra 'userns,' preso a esse caminho; apparmor_parser -r; provar com o bwrap rodando como o UID do runner; só então ligar o sandbox por Options.sandbox com failIfUnavailable:true e allowUnsandboxedCommands:false explícitos."
+    trace: "sonda do scratchpad da sessão: s3-resolve.mjs; sysctl kernel.apparmor_restrict_unprivileged_userns; aa-status; journalctl -k (audit do apparmor)"
+    provenance:
+      source: "kernel e AppArmor 4.0.1 do host + bubblewrap 0.9.0 + SDK @anthropic-ai/claude-agent-sdk 0.3.232 do onion-bridge"
+      locator: "perfil unprivileged_userns; audit userns_create/capable; resolveSettings() effective.sandbox"
+      method: "medição: leitura de estado e execuções sem privilégio; nenhum perfil carregado, nenhum pacote instalado"
+      locality: "host"
 
 edges:
   - from: E_SECDEP_PROXY_PATTERN_PLATFORM
@@ -2478,4 +2553,43 @@ edges:
     edge_type: CONSTRAINS
   - from: E_PROVA3_SANDBOX_FAIL_CLOSED_ONLY_WHEN_EXPLICIT_1016
     to: D_MAESTRO_DEGRAU0_E_TRES_PROVAS_1016
+    edge_type: TRACES_TO
+  - from: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
+    to: D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT
+    edge_type: TRACES_TO
+  - from: E_DEGRAU1_INTEGRITY_DROPIN_ENSAIO_1016
+    to: C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE
+    edge_type: SUPPORTS
+  - from: E_DEGRAU1_INTEGRITY_DROPIN_ENSAIO_1016
+    to: C_SUPERACAO_20261015_READONLY_FOR_INTEGRITY
+    edge_type: SUPPORTS
+  - from: E_DEGRAU1_INTEGRITY_DROPIN_ENSAIO_1016
+    to: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
+    edge_type: TRACES_TO
+  - from: E_SPIKE2_SOCKET_LAUNCHER_DYNAMICUSER_1016
+    to: C_SUPERACAO_20261015_SOCKET_ACTIVATED_PRIVILEGED_LAUNCHER
+    edge_type: SUPPORTS
+  - from: E_SPIKE2_SOCKET_LAUNCHER_DYNAMICUSER_1016
+    to: C_SUPERACAO_20261015_DYNAMICUSER_RUNNER_PER_SESSION
+    edge_type: CONSTRAINS
+  - from: E_SPIKE2_SOCKET_LAUNCHER_DYNAMICUSER_1016
+    to: C_SUPERACAO_20261015_TEARDOWN_BY_CHANNEL_EOF
+    edge_type: CONSTRAINS
+  - from: E_SPIKE2_SOCKET_LAUNCHER_DYNAMICUSER_1016
+    to: C_OPCAO_2_SEPARATE_UID_RUNNER
+    edge_type: SUPPORTS
+  - from: E_SPIKE2_SOCKET_LAUNCHER_DYNAMICUSER_1016
+    to: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
+    edge_type: TRACES_TO
+  - from: E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016
+    to: E_OBJECAO_30_BWRAP_PROFILE_IS_HOST_WIDE
+    edge_type: SUPPORTS
+  - from: E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016
+    to: C_SUPERACAO_20261015_PRIVATE_BWRAP_COPY_BWRAPPATH
+    edge_type: CONSTRAINS
+  - from: E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016
+    to: C_OPCAO_3_NATIVE_SANDBOX_STRICT
+    edge_type: CONSTRAINS
+  - from: E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016
+    to: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
     edge_type: TRACES_TO

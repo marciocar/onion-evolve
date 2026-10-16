@@ -23,6 +23,10 @@
 #   · a fila A2A do bridge (A2A_PENDING_DIR: o default ./data/a2a-pending sob o WorkingDirectory da unidade, medido em
 #     2026-10-15; a do core na raiz, a de cada hub num subdiretório, desde a F3) tem wrapper próprio: a2a-queue-live.sh
 #     lista, copia para o aceite e arquiva (mv para _archived/, nunca apaga) como a conta do serviço, com backup antes.
+#   · o drop-in de INTEGRIDADE do bridge (degrau 1 do isolamento do /chat, 2026-10-16) tem wrapper próprio:
+#     bridge-hardening.sh renderiza o 30-integrity.conf, ensaia numa unit transitória, guarda o anterior, instala,
+#     reinicia e prova no namespace vivo. Os placeholders `{}` dos .claude/settings*.json da conta do serviço nascem
+#     por ele (sem arquivo não há bind só-leitura, e o agente poderia criá-lo). O resto de /etc/systemd segue do maestro.
 #   · FORA DAQUI, de propósito: onion-vps-mcp-exec, onion-vps-mcp-kg e onion-vps-mcp-fw servem DIRETO do
 #     checkout principal do core (/home/marcio/onion-evolve). Escrever lá é trabalho normal da casa; listar o
 #     caminho vetaria todo commit. A unidade deles segue vetada pelo glob onion-vps-*.
@@ -35,9 +39,12 @@ deploy	path	/var/www/onion-landing	ops/deploy-site.sh
 deploy	path	/var/www	-
 deploy	path	/etc/caddy	ops/install-caddy-config.sh
 deploy	path	/etc/systemd	-
+deploy	path	/etc/systemd/system/onion-vps-bridge.service.d/30-integrity.conf	ops/bridge-hardening.sh
 deploy	path	/home/onion	ops/update-bridge.sh
 deploy	path	/home/onion/onion-bridge/data/a2a-invites.json	ops/a2a-invite-live.sh
 deploy	path	/home/onion/onion-bridge/data/a2a-pending	ops/a2a-queue-live.sh
+deploy	path	/home/onion/.claude/settings.json	ops/bridge-hardening.sh
+deploy	path	/home/onion/.claude/settings.local.json	ops/bridge-hardening.sh
 deploy	path	/home/marcio/mcp-kg/core-writer	ops/update-kg-writer.sh
 deploy	path	/var/lib/onion-chat-kg	-
 deploy	path	/home/marcio/mcp-kg	-

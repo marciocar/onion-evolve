@@ -323,7 +323,7 @@ def _moat_versioned(path):
 _MOAT_ARG_WRITERS = {"a2a-invite.sh": ({"create", "revoke"}, ("--file", "--invite-out", "--token-out"))}
 _MOAT_ARG_WRITER_MARK = "MOAT-ARG-WRITER:"
 # os wrappers que escrevem por função (a cópia deles fora do projeto fecha, ver _moat_script) (core-only)
-_MOAT_WRAPPER_COPIES = ("a2a-queue-live",)
+_MOAT_WRAPPER_COPIES = ("a2a-queue-live", "bridge-hardening")
 # o NOME do motor escritor também é AÇÃO para a relevância (SAC-148, 2026-10-15): nas formas que o juiz não segue
 # (`python3 -c`, `xargs -I`, função que faz `shift`), a linha que cita o motor e um alvo do MOAT fechava só se
 # trouxesse um verbo da lista — e `a2a-invite.sh revoke --file <servido>` não traz nenhum. Medido: rc 0 nas três.
@@ -545,6 +545,12 @@ def moat_command(words, raw_words, base, depth, env, piped, stdin_from):
             or (isinstance(env, dict) and "ONION_A2A_QUEUE_TEST" in env) \
             or "ONION_A2A_QUEUE_TEST" in globals().get("ASSIGN", {}):
         _moat_emit("inanalisavel", "ONION_A2A_QUEUE_TEST", "", "modo de teste do wrapper da fila A2A fora da bancada — %s" % detail)
+    # e para o wrapper do drop-in de integridade do bridge (ops/bridge-hardening.sh) (core-only), de 2026-10-16: o modo de
+    # teste dele instala o drop-in e chama systemctl/systemd-run/nsenter do PATH, sem sudo — pela sessão, lavaria falsos
+    if any(re.match(r"^(export\s+)?ONION_BRIDGE_HARDENING_TEST=", w) for w in list(raw_words) + list(words)) \
+            or (isinstance(env, dict) and "ONION_BRIDGE_HARDENING_TEST" in env) \
+            or "ONION_BRIDGE_HARDENING_TEST" in globals().get("ASSIGN", {}):
+        _moat_emit("inanalisavel", "ONION_BRIDGE_HARDENING_TEST", "", "modo de teste do wrapper do drop-in de integridade fora da bancada — %s" % detail)
     if base == "cd" and len(words) > 1 and not DYNAMIC.search(words[1]) and words[1] != "-":
         prev = _MOAT_CDS[-1] if _MOAT_CDS else (CWD[-1] if CWD[-1] not in (None, UNKNOWN) else JCWD)
         _MOAT_CDS.append(os.path.normpath(os.path.join(prev, os.path.expanduser(words[1]))))

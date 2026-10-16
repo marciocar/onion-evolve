@@ -19,7 +19,14 @@ As sessões de /chat, de admin e de convidados, rodam o agente de código (Agent
 de jti) e dos segredos do serviço (`.env` com o M2M do Logto, `.git-credentials` com o PAT). Como isolar,
 e o que serve ao ecossistema Onion?
 
-## Decisão do maestro (`D_MAESTRO_DEGRAU0_E_TRES_PROVAS_1016`, selada em 2026-10-16)
+## Decisão do maestro (`D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016`, selada em 2026-10-16)
+
+**«1 já, 2 e 3 por spike»** (descartadas: «Degraus 1 e 2 juntos» e «Parar no degrau 0»), à pergunta «Isolamento
+do /chat, degraus 1 a 3 (corrigidos pelas provas). O que selar e executar?». O degrau 1 vira um wrapper core-only
+que instala o drop-in de integridade; os degraus 2 e 3 viram spike, sem nada persistente. A decisão-mãe segue
+open até os degraus 2 e 3.
+
+## Decisão anterior (`D_MAESTRO_DEGRAU0_E_TRES_PROVAS_1016`, selada em 2026-10-16)
 
 **«Degrau 0 já + 3 provas»** (descartadas: «Só as 3 provas primeiro» e «Selar os degraus 0→3 como estão»).
 Rodada anterior (2026-10-15): «Primárias antes de tudo», que gerou a rodada 2.
@@ -32,9 +39,9 @@ os degraus 1–3 esperam as provas virarem evidência.
 | Degrau | O quê | Exige | Estado |
 |---|---|---|---|
 | **0** | Convidado sem Bash; deny Edit/Write no home do onion fora do workspace **e** no `.claude/` e `CLAUDE.md` do próprio workspace (`E_OBJECAO_32_WORKSPACE_CLAUDE_DIR_WRITABLE`) | nada de root | **decidido (aplicar já)** |
-| **1** | systemd reescrito, **só integridade**: sem `EnvironmentFile=` (o segredo iria para o environ legível pelo mesmo UID, `E_OBJECAO_01`), `ReadOnlyPaths=` no código do bridge, `.claude` do home, dotfiles, JWKS e `members.yaml`; `InaccessiblePaths=` no `.ssh` e no `.git-credentials` depois de medir o uso | root uma vez; medir as escritas de um chat real antes do restart | aguarda |
-| **2** | UID separado por sessão (template `onion-chat@` com `DynamicUser=`), plugado pela costura `spawnClaudeCodeProcess`; a troca de UID é do **chamador** (`E_SDK_SPAWNOPTIONS_HAS_NO_UID`), e o bridge não consegue trocá-la (`E_OBJECAO_27`): lançador ativado por socket, instalado pelo root | root; dogfood do wrapper | aguarda a prova 2 |
-| **3** | sandbox nativo como defesa em profundidade, só com perfil AppArmor numa **cópia privada** do bwrap (`E_OBJECAO_30`: o perfil no bwrap do sistema libera userns às 6 contas), `failIfUnavailable` explícito no nível de política e `allowUnsandboxedCommands:false` | root; política | aguarda a prova 3 |
+| **1** | systemd reescrito, **só integridade**: sem `EnvironmentFile=` (o segredo iria para o environ legível pelo mesmo UID, `E_OBJECAO_01`), `ReadOnlyPaths=` no código do bridge, `.claude` do home, dotfiles, JWKS e `members.yaml`; `InaccessiblePaths=` no `.ssh` e no `.git-credentials` depois de medir o uso | root uma vez; medir as escritas de um chat real antes do restart | **decidido; ensaiado** (`E_DEGRAU1_INTEGRITY_DROPIN_ENSAIO_1016`), a aplicar pelo wrapper |
+| **2** | UID separado por sessão (template `onion-chat@` com `DynamicUser=`), plugado pela costura `spawnClaudeCodeProcess`; a troca de UID é do **chamador** (`E_SDK_SPAWNOPTIONS_HAS_NO_UID`), e o bridge não consegue trocá-la (`E_OBJECAO_27`): lançador ativado por socket, instalado pelo root | root; dogfood do wrapper | **spike feito** (`E_SPIKE2_SOCKET_LAUNCHER_DYNAMICUSER_1016`); aguarda selo |
+| **3** | sandbox nativo como defesa em profundidade, só com perfil AppArmor numa **cópia privada** do bwrap (`E_OBJECAO_30`: o perfil no bwrap do sistema libera userns às 6 contas), `failIfUnavailable` explícito no nível de política e `allowUnsandboxedCommands:false` | root; política | **spike feito** (`E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016`); aguarda selo |
 | 4 | microVM/container por sessão | KVM (ausente nesta VPS) | fora desta VPS; opcional por adotante |
 | 5 | broker estreito (proxy da `ANTHROPIC_API_KEY`, git atrás de ferramenta) **sobre** o degrau 2 | o degrau 2 | aguarda |
 
@@ -45,6 +52,14 @@ os degraus 1–3 esperam as provas virarem evidência.
 | 1. settings hostil no workspace | `E_PROVA1_WORKSPACE_HOOK_RUNS_WITHOUT_BASH_1016` | Um `SessionStart` no `.claude/settings.json` do workspace **roda** com `settingSources:["project"]` e `tools:["Read"]`, sem Bash, como o UID do chamador. `managedSettings.allowManagedHooksOnly` e `settings.disableAllHooks` o cortam, cada um sozinho. O filtro do `managedSettings` mantém `deny`, `sandbox` e `allowManagedHooksOnly` (e também um `allow`, logo não é puramente restritivo), e descarta `hooks` e `disableSkillShellExecution`. | **corrige o degrau 0**: tirar o Bash não basta, os hooks têm de cair (aplicado no PR do bridge) |
 | 2. CLI sob `DynamicUser` | `E_PROVA2_DYNAMICUSER_CLI_SDK_HANDSHAKE_1016` | Unit transitória: UID dinâmico, home 0750 do onion, `.env`, `.git-credentials` e environ do bridge **negados**; o SDK completa o handshake por stdin/stdout via `spawnClaudeCodeProcess`. | **confirma o mecanismo do degrau 2**; o lançador por socket instalado pelo root segue sem prova (o teste usou sudo) |
 | 3. sandbox ligado sem sandbox disponível | `E_PROVA3_SANDBOX_FAIL_CLOSED_ONLY_WHEN_EXPLICIT_1016` | Falha **fechado** só com `Options.sandbox` (default `true`) ou com `failIfUnavailable:true` explícito; `settings` e `managedSettings` só com `enabled` **rodam sem gaiola**. | **corrige o degrau 3**: `failIfUnavailable` explícito sempre; `socat` é dependência além do bwrap |
+
+## Degrau 1 ensaiado e spikes dos degraus 2 e 3 (2026-10-16)
+
+| Medição | Nó | Resultado | Degrau |
+|---|---|---|---|
+| drop-in de integridade numa unit transitória | `E_DEGRAU1_INTEGRITY_DROPIN_ENSAIO_1016` | Antes: `src/`, `jwks/` e `.bashrc` graváveis e o `.git-credentials` legível no namespace vivo. Com o drop-in: as **duas árvores inteiras** (bridge e clone servido) só-leitura e pontos de montagem próprios, com as escritas do serviço aninhadas graváveis (`data/`, `.claude/sessions`, `trust-log.md`), dotfiles e placeholders só-leitura, `.ssh` e `.git-credentials` ilegíveis, e **0 EROFS** sob strace num turno do SDK. | **confirma o degrau 1 e corrige o escopo**: a 1ª forma (subdiretórios) caiu no refutador, porque renomear o pai dava uma árvore nova gravável; a árvore inteira também fecha os `.git` (o `core.fsmonitor` rodaria no git do update-bridge) e o lockfile; placeholders para `.claude/settings*.json`, `.config` e `.npmrc`; `-` em todo caminho (ausente sem `-` = 226/NAMESPACE) |
+| lançador por socket sob `DynamicUser` | `E_SPIKE2_SOCKET_LAUNCHER_DYNAMICUSER_1016` | O CLI sobe sob um UID dinâmico por conexão e o SDK completa o init por `spawnClaudeCodeProcess`, sem a home do serviço e sem chamar a API. | **confirma o mecanismo do degrau 2 e corrige três peças**: `User=onion-chat-%i` (sem ele as instâncias simultâneas dividem o UID), `CollectMode=inactive-or-failed`, e o teardown (o EOF encerra o CLI ocioso em 644 ms, mas com requisição em voo só o `RuntimeMaxSec` o matou: o lançador tem de supervisionar, não fazer exec). Aberto: o workspace (0750 da conta do serviço) |
+| o que o AppArmor desta VPS exige do sandbox | `E_SPIKE3_APPARMOR_SANDBOX_REQUIREMENTS_1016` | `socat` ausente; o bwrap cai no perfil `unprivileged_userns` (audit do kernel: `setpcap` e `uid_map` negados); o `managedSettings` **descarta** `bwrapPath` e `socatPath`; o perfil `runc` (unconfined, com userns) já existe com o binário instalado. | **corrige o degrau 3**: a cópia privada do bwrap pediria o `managed-settings.json` do root, válido para todo Claude Code do host; o caminho sem esse efeito é dentro da instância do degrau 2. O passo de instalação está no nó, para o maestro |
 
 ## O que sustenta (evidências ancoradas)
 
