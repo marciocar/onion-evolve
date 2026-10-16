@@ -8474,7 +8474,9 @@ EOF
     printf '#!/usr/bin/env bash\n# lembrete: o a2a-invite.sh create só pelo wrapper\nls -la /var/www/onion-landing\n' > "${d}/scratch/so-leitura.sh"
   fi
   [ "${_bh_ok}" = 1 ] && cp "${d}/proj/ops/bridge-hardening.sh" "${d}/scratch/bh-copia.sh"
-  [ "${_cr_ok}" = 1 ] && cp "${d}/proj/ops/chat-runner.sh" "${d}/scratch/cr-copia.sh"
+  # a cópia do wrapper do runner reduzida ao que só a regra da CÓPIA pega: escreve por FUNÇÃO (o juiz lê a função, não a
+  # chamada) e o nome do wrapper no código; a cópia inteira fecha antes por outro caminho (sudo com opção de runtime)
+  [ "${_cr_ok}" = 1 ] && printf '#!/usr/bin/env bash\nNAME=chat-runner\n_inst() { install -m 0644 "$1" "$2"; }\n_inst unit.service /etc/systemd/system/onion-chat@.service\n' > "${d}/scratch/cr-copia.sh"
   # a cópia NÃO rastreada do wrapper da fila e o script mínimo com função que embrulha sudo (2026-10-15)
   if [ "${_queue_ok}" = 1 ]; then
     cp "${d}/proj/ops/a2a-queue-live.sh" "${d}/scratch/queue-copia.sh"
@@ -9574,6 +9576,9 @@ def h(c):
     hd = json.loads(b)
     if "--dangerously-skip-permissions" in hd.get("args", []) and not os.path.exists(flag):
         c.close(); return
+    # como o lançador real: sem a deny de escrita no .git do workspace no --settings, recusa
+    if "/.git/**)" not in json.dumps(hd.get("args", [])):
+        c.close(); return
     buf = b""
     while b"\n" not in buf:
         x = c.recv(65536)
@@ -9823,6 +9828,8 @@ PY
     '-exec setfacl -m "g:${GROUP}:rwX,u:${SVC_USER}:rwX" -- {} +' '-exec true {} +' _cc_aclexisting
   _crcase "(r9) aperto de mão que reprova (a recusa não recusa) → rc 1, o bridge NÃO é ligado nem reiniciado" \
     'handshake | sed '"'"'s/^/    /'"'"'; [ "${PIPESTATUS[0]}" = 0 ] || fail_after "o aperto de mão' 'handshake | sed '"'"'s/^/    /'"'"'; true || fail_after "o aperto de mão' _cc_handshake
+  _crcase "(r31) o aperto de mão leva a política inteira (com a deny da config do workspace), senão o lançador recusa" \
+    'for t in (".claude/**", "CLAUDE.md", "CLAUDE.local.md", ".mcp.json", ".git", ".git/**")]' 'for t in (".claude/**", "CLAUDE.md", "CLAUDE.local.md", ".mcp.json")]' _cc_apply
   _crcase "(r10) /health doente antes do --apply → rc 2, nada escrito" \
     "grep -q '\"ok\":true' <<<\"\$(curl -fsS -m 5 \"\${HEALTH_LOCAL}\" 2>/dev/null)\"" 'true' _cc_health
   _crcase "(r11) restart do bridge que não troca a invocação → rc 1" '[ -n "${INV}" ] && [ "${INV}" != "${OLD_INV}" ] ||' '[ -n "${INV}" ] ||' _cc_sameinv
