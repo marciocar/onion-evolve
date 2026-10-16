@@ -2,8 +2,7 @@
 branch: docs/research-chat-agent-isolation
 pr: 1162
 date: 2026-10-16
-reviewed_diff_sha256: 09daaa63da3c881bc128235a1d918631a88b67b9abc4f1b7fe69f5e6769c417d
-reviewed_code_sha256: 7e78d47711af8242dba5d5c8934b689e03cee07946b8e61f1aac869f4fe1cdfd
+reviewed_diff_sha256: pendente
 findings_total: 10
 findings_real: 10
 tokens: 211129
@@ -55,4 +54,10 @@ managedSettings também deixa passar um allow, então não é puramente restriti
 filterEscalatingDefaultMode não foi medido; (5) a prova 1 confirma só a metade de CARGA da objeção 32;
 (6) o 'pat-negado' do hook não tem controle positivo; (7) a propagação do exitCode não foi comparada.
 Radar e contrato rc 0 depois das curas.
+
+## Re-revisão (3º commit: baseline da REGRA 99)
+
+O CI (selftest, família kg-machine-path) acusou ISENCAO-NOVA nos 2 nós que citam o `/proc/` da man page do
+systemd.exec(5) com `x_path_is_content: "citação"`. O caminho É o conteúdo da quote; o baseline foi emitido
+pelo gerador (`kg-machine-path-check.sh --emit-baseline`) e o diff dele é só essas 2 linhas `isento`.
 
