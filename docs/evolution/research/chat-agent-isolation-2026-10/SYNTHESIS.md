@@ -28,14 +28,15 @@ PowerShell e Monitor e os processos que eles iniciam. Ferramentas de arquivo, MC
 em três lugares e o lançador do degrau 2 recusa a sessão que não as negue. A rede que resta é a do **WebFetch**.
 Ele aceita IP literal (o preflight da Anthropic respondeu `can_fetch: true` para `127.0.0.1` e
 `169.254.169.254`), e o UID do runner alcança por TCP 27 de 27 portas do loopback. Hoje o que fecha o SSRF é o
-**protocolo**: o WebFetch só fala https, e nenhuma dessas portas completou TLS sem SNI. Nenhuma política o fecha.
+**protocolo e a verificação de certificado**: o WebFetch só fala https e verifica o certificado (por leitura do código, não exercitado), e no loopback só o
+Caddy fecha TLS, para nomes que resolvem no IP público. Nenhuma política o fecha.
 O spike `IPAddressDeny=` na unit (`C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX`) fecha o loopback, o
-link-local e as faixas privadas e mantém o DNS e o TLS com a API.
+link-local e as faixas privadas e mantém o DNS e o TLS com a API. Teto: os endereços públicos do próprio host seguem alcançáveis, e o wrapper teria de medi-los e negá-los na instalação.
 
 | Opção | O quê |
 |---|---|
 | **A (recomendada)** | Parquear o degrau 3 com gatilho e fechar a rede local na unit do runner (`IPAddressDeny=`, um PR em cada repo e um `--apply`) |
-| B | Parquear o degrau 3 com gatilho e não mexer na rede (o SSRF segue fechado só pelo protocolo) |
+| B | Parquear o degrau 3 com gatilho e não mexer na rede (o SSRF segue fechado só pelo protocolo e pelo certificado) |
 | C | Construir o degrau 3 mesmo assim (socat, bwrap privado e perfil `userns` para um caminho que o convidado não usa) |
 
 O degrau 3 reabre por **gatilho**: o convidado voltar a ter Bash, PowerShell ou Monitor; o admin passar a rodar
