@@ -756,11 +756,57 @@ def v_priority_set(args):
     return _issue_update(iss["id"], {"priority": _priority(args[1])})
 
 
+def _comment_opts(args):
+    """Parse do comment.add: só `--body-file <arq>`, `--body-file=<arq>` e `--` (fim das opções) são opções.
+    Token com forma de flag (`--palavra`) e desconhecido é erro de uso; texto que só COMEÇA com traços (`--- régua`,
+    `-- nota`) é corpo, não flag (achado do refutador, 2026-10-16)."""
+    o, pos, i, ended = {}, [], 0, False
+    while i < len(args):
+        a = args[i]
+        if not ended and a == "--":
+            ended = True
+        elif not ended and re.match(r"^--[a-z][a-z-]*(=.*)?$", a):
+            k, eq, v = a[2:].partition("=")
+            if k != "body-file":
+                raise TmError(f"opção desconhecida: --{k} (aceita: --body-file; texto que começa com traços vai depois de --)", 2)
+            if not eq:
+                if i + 1 >= len(args):
+                    raise TmError("--body-file exige valor", 2)
+                i += 1
+                v = args[i]
+            o["body-file"] = v
+        else:
+            pos.append(a)
+        i += 1
+    return o, pos
+
+
 def v_comment_add(args):
-    _need(args, 2, 'comment.add <ID> "<texto markdown>"')
-    iss = _issue(args[0])
+    # Flag desconhecida é erro de uso ANTES de qualquer rede (2026-10-16): até aqui o 2º posicional era o corpo,
+    # e `comment.add SAC-1 --body-file f` publicou o texto literal "--body-file" em 4 issues reais (SAC-146,
+    # 149, 150 e 153) — rc 0, sucesso declarado. O corpo longo vem por --body-file (o veto barra heredoc que
+    # cite merge/push, então o corpo por arquivo é o caminho normal desta casa); `-` lê a entrada padrão.
+    usage = 'comment.add <ID> "<texto markdown>" | comment.add <ID> --body-file <arquivo> | comment.add <ID> - (entrada padrão)'
+    o, pos = _comment_opts(args)
+    if o.get("body-file") is not None:
+        _need(pos, 1, usage)
+        if len(pos) != 1:
+            raise TmError(f"uso: tm.sh {usage} (texto posicional e --body-file juntos)", 2)
+        try:
+            with open(o["body-file"], encoding="utf-8") as fh:
+                body = fh.read()
+        except OSError as ex:
+            raise TmError(f"--body-file ilegível: {ex}", 2)
+    else:
+        _need(pos, 2, usage)
+        if len(pos) != 2:
+            raise TmError(f"uso: tm.sh {usage} (texto com espaços vai entre aspas)", 2)
+        body = sys.stdin.read() if pos[1] == "-" else pos[1]
+    if not body.strip():
+        raise TmError("corpo do comentário vazio", 2)
+    iss = _issue(pos[0])
     data = gql("mutation($in:CommentCreateInput!){ commentCreate(input:$in){ success comment { id body createdAt url user { id name } } } }",
-               {"in": {"issueId": iss["id"], "body": args[1]}})
+               {"in": {"issueId": iss["id"], "body": body}})
     r = data.get("commentCreate") or {}
     if not r.get("success"):
         raise TmError("commentCreate não confirmou sucesso")

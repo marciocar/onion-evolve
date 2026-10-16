@@ -11,7 +11,7 @@
 #   tm.sh item.read SAC-65              → leitura COMPLETA (comentários, atividade, hierarquia, anexos); --lean = enxuta
 #   tm.sh attachment.list SAC-65  ·  tm.sh attachment.read SAC-65 <n>  ·  tm.sh attachment.add SAC-65 <arquivo>
 #   tm.sh activity.list SAC-65  ·  tm.sh hierarchy.context SAC-65  ·  tm.sh inline.refs SAC-65
-#   tm.sh comment.add SAC-65 "texto em markdown"
+#   tm.sh comment.add SAC-65 "texto em markdown"   (ou --body-file <arquivo>)
 #   tm.sh status.transition SAC-65 <nomeDoEstado|stateId>
 #   tm.sh item.create --title T [--description D] [--project P] [--parent ID]
 #   tm.sh search.query "<texto>"   ·   tm.sh project.list   ·   tm.sh hierarchy.subtask_list SAC-65
