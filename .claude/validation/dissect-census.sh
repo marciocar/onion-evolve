@@ -198,9 +198,14 @@ for rel in "${GRAPHS[@]}"; do
     # o id da superação tem de ser do alfabeto do radar; a aresta é lida por ITEM do bloco `edges:` (from,
     # to e edge_type do MESMO item) e só TRACES_TO (a superação nasce da reprovação) ou SUPPORTS (evidência
     # que já existia e sustenta a decisão) contam — REFUTES/CONSTRAINS não são superação.
+    # ⚠️ SEPARADOR \037 (US), NUNCA TAB: tab é IFS-WHITESPACE para o `read`, e tabs seguidos COLAPSAM —
+    #    com `x_dissect_criterion:` vazio a medida caía em og_ov e o estado acusava `superacao-id-invalido`
+    #    (achado de campo da sessão de curadoria, 2026-10-16). O mesmo colapso pegava o id vazio (veredito
+    #    no `meta:`, antes de qualquer `- id:`) e o overcoming vazio com medida. Com separador que não é
+    #    whitespace, campo vazio fica vazio no lugar dele.
     ogm="$(awk '
       function val(s) { sub(/^[^:]*:[[:space:]]*/, "", s); sub(/[[:space:]]+#.*$/, "", s); gsub(/^["\047]|["\047][[:space:]]*$/, "", s); sub(/[[:space:]]+$/, "", s); return s }
-      function flush() { if (isv) { printf "%s\t%s\t%s\t%s\n", id, crit, ov, meas; done = 1 } isv = 0; crit = ""; ov = ""; meas = ""; id = "" }
+      function flush() { if (isv) { printf "%s\037%s\037%s\037%s\n", id, crit, ov, meas; done = 1 } isv = 0; crit = ""; ov = ""; meas = ""; id = "" }
       done { next }
       /^[[:space:]]*- id:/ { flush(); if (done) next; id = val($0); next }
       /^edges:/ { flush(); next }
@@ -209,7 +214,7 @@ for rel in "${GRAPHS[@]}"; do
       /^[[:space:]]*x_dissect_overcoming:/ { ov = val($0) }
       /^[[:space:]]*x_dissect_overcoming_measure:/ { meas = val($0) }
       END { if (!done) flush() }' "${f}")"
-    IFS='	' read -r og_id og_crit og_ov og_meas <<< "${ogm}"
+    IFS=$'\037' read -r og_id og_crit og_ov og_meas <<< "${ogm}"
     ogwhy=""
     # critério = um COMANDO com argumento (≥ 8 caracteres e um espaço), nunca "sim"
     { [ "${#og_crit}" -ge 8 ] && [[ "${og_crit}" == *" "* ]]; } || ogwhy="${ogwhy},sem-x_dissect_criterion"
@@ -304,6 +309,9 @@ sorted_rows="$(printf '%s' "${rows}" | sort -t'	' -k2,2nr -k1,1)"
 if [ "${FMT}" = "--check-verdict" ]; then
   line="$(printf '%s\n' "${sorted_rows}" | awk -F'\t' -v t="${CHECK_TOOL}" '$1 == t { print; exit }')"
   [ -n "${line}" ] || { echo "dissect-census: ferramenta '${CHECK_TOOL}' não declarada (x_dissect_tool:) em nenhum grafo rastreado" >&2; exit 3; }
+  # TAB aqui é seguro (medido, 2026-10-16): toda coluna de `rows` nasce não-vazia (padrão `-`/`onion`/`0`,
+  # ferramenta e grafo exigidos), então não há tabs seguidos a colapsar. Coluna nova que possa sair
+  # vazia tem de ganhar padrão — ou este read passa a errar de campo como o do veredito negativo errava.
   IFS='	' read -r _t _lv cv_verdict _b _r _fr cv_graph _ag cv_state _sc <<< "${line}"
   case "${cv_state}" in
     veredito) echo "dissect-census: ${CHECK_TOOL} — veredito ${cv_verdict} conta (${cv_graph})"; exit 0 ;;

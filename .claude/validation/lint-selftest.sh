@@ -7393,7 +7393,50 @@ _judge_overcoming_dissect_cases() {
     *) record_fail "dissect: (og-d1m)" "o mutante não mudou o estado — o caso não mede o ramo: $(_og_dissect_states "${m}/dc.sh")" ;;
   esac
   rm -rf "${m}"
+  _judge_empty_field_dissect_cases "${sut}"
   _judge_consolo_dissect_cases "${sut}"
+}
+# _og_empty_states <dissect-census.sh> → "vazio=<estado>;metav=<estado>;ovvazio=<estado>;rc-vazio=<rc>"
+# Achado de campo da sessão de curadoria (2026-10-16, DADO verificado): o read do nó do veredito usava TAB
+# como IFS, e tab é IFS-whitespace — tabs seguidos colapsam e o campo vazio some, empurrando o seguinte.
+_og_empty_states() {
+  local sut="$1" d tsv t
+  d="$(mktemp -d)"; git -C "${d}" init -q -b main 2>/dev/null; mkdir -p "${d}/docs/evolution/dissect"
+  # critério VAZIO + nenhuma com medida ⇒ só sem-x_dissect_criterion (antes: + superacao-id-invalido)
+  printf 'meta:\n  id: vazio\n  x_dissect_tool: vazio\n  baseline: "2026-10-16"\n  review_after: "2099-01-01"\nnodes:\n  - id: D_X\n    node_type: decision\n    x_dissect_level: 3\n    x_dissect_verdict: parquear\n    x_dissect_criterion:\n    x_dissect_overcoming: nenhuma\n    x_dissect_overcoming_measure: "procurou-se X em Y em 2026-10-16, nada achado"\n    label: "parquear"\n\nedges: []\n' > "${d}/docs/evolution/dissect/vazio.kg.yaml"
+  # veredito no meta: (id VAZIO, o 1º campo) com critério e nenhuma medida ⇒ conta (antes: recusado)
+  printf 'meta:\n  id: metav\n  x_dissect_tool: metav\n  x_dissect_verdict: rejeitar\n  x_dissect_criterion: "pdftotext a.pdf - | wc -c"\n  x_dissect_overcoming: nenhuma\n  x_dissect_overcoming_measure: "procurou-se OCR em apt-cache"\nnodes: []\n' > "${d}/docs/evolution/dissect/metav.kg.yaml"
+  # overcoming VAZIO com medida ⇒ sem-x_dissect_overcoming (antes: superacao-id-invalido)
+  printf 'meta:\n  id: ovvazio\n  x_dissect_tool: ovvazio\nnodes:\n  - id: D_Y\n    x_dissect_verdict: rejeitar\n    x_dissect_criterion: "pdftotext a.pdf - | wc -c"\n    x_dissect_overcoming:\n    x_dissect_overcoming_measure: "procurou-se OCR em apt-cache"\n' > "${d}/docs/evolution/dissect/ovvazio.kg.yaml"
+  git -C "${d}" add -A >/dev/null 2>&1
+  tsv="$(bash "${sut}" "${d}" --tsv 2>&1)"
+  for t in vazio metav ovvazio; do printf '%s=%s;' "${t}" "$(printf '%s\n' "${tsv}" | awk -F'\t' -v t="${t}" '$1==t{print $9; exit}')"; done
+  bash "${sut}" "${d}" --check-verdict vazio >/dev/null 2>&1; printf 'rc-vazio=%s\n' "$?"
+  rm -rf "${d}"
+}
+_judge_empty_field_dissect_cases() {
+  local sut="$1" o m mo want
+  want='vazio=veredito-SEM-SUPERACAO(sem-x_dissect_criterion);metav=veredito;ovvazio=veredito-SEM-SUPERACAO(sem-x_dissect_overcoming);rc-vazio=1'
+  # (og-e1) campo VAZIO fica no lugar dele: critério vazio, id vazio (veredito no meta:) e overcoming vazio
+  #         nomeiam o motivo certo, sem o motivo do campo vizinho que o colapso do tab empurrava.
+  o="$(_og_empty_states "${sut}")"
+  if [ "${o}" = "${want}" ]; then record_pass "dissect: (og-e1) campo vazio no nó do veredito não desloca o vizinho: critério vazio ⇒ só sem-x_dissect_criterion (rc 1); id vazio (meta:) conta; overcoming vazio ⇒ sem-x_dissect_overcoming"
+  else record_fail "dissect: (og-e1)" "esperado ${want}, veio ${o}"; fi
+  # (og-e1m) MUTANTE: o separador volta a TAB (produtor e read) ⇒ o colapso reaparece e o (og-e1) reprova
+  m="$(mktemp -d)"
+  # (o marcador vai no fim da linha do read, que é bash; dentro do awk um `#` engoliria o resto do programa)
+  sed -e 's/printf "%s\\037%s\\037%s\\037%s\\n", id, crit, ov, meas/printf "%s\\t%s\\t%s\\t%s\\n", id, crit, ov, meas/' \
+      -e "s/IFS=\\\$'\\\\037' read -r og_id og_crit og_ov og_meas <<< \"\\\${ogm}\"/& # ONION_MUTANTE/" \
+      -e "s/IFS=\\\$'\\\\037' read -r og_id/IFS=\$'\\\\t' read -r og_id/" "${sut}" > "${m}/dc.sh"
+  if ! grep -qF "IFS=\$'\\t' read -r og_id og_crit og_ov og_meas <<< \"\${ogm}\" # ONION_MUTANTE" "${m}/dc.sh" \
+     || ! grep -qF 'printf "%s\t%s\t%s\t%s\n", id, crit, ov, meas;' "${m}/dc.sh"; then
+    record_fail "dissect: (og-e1m)" "o mutante NÃO foi plantado (âncora do sed ausente) — o caso não prova nada"
+  else
+    mo="$(_og_empty_states "${m}/dc.sh")"
+    if [ "${mo}" != "${want}" ]; then record_pass "dissect: (og-e1m) mutante com separador TAB reprova no (og-e1) (${mo:0:80}…)"
+    else record_fail "dissect: (og-e1m)" "MUTANTE com separador TAB PASSOU no (og-e1)"; fi
+  fi
+  rm -rf "${m}"
 }
 # ── SAC-151, 2ª leva: SUPERAÇÃO DE CONSOLO no grafo do /meta:dissect ─────────────────────────────────
 # Achado de campo de um adotante de curadoria (PR #30, DADO): a 1ª versão do pagamento da dívida passou no
