@@ -10153,6 +10153,148 @@ PY
 }
 
 # ---------------------------------------------------------------------------
+# update-bridge (2026-10-16): as checagens PÓS-UPDATE do ops/update-bridge.sh são FAIL-CLOSED. Antes, o verify do
+# degrau 1 e o do runner, sob `set -e`, matavam o script NA ATRIBUIÇÃO com rc≠0 e sem uma linha (o AVISO era código
+# morto), e JWKS ausente ou boot que caiu saíam rc 0 com AVISO. O wrapper dirige sudo, systemctl e journalctl reais,
+# então a bancada roda uma CÓPIA com os caminhos de produção trocados por sed (o molde do PROD_LOCK do
+# bridge-hardening; nada de redirecionar produção por ambiente), sudo/systemctl/journalctl/curl/npm FALSOS no PATH,
+# repositórios git reais na sandbox e os três wrappers vizinhos (backup, bridge-hardening, chat-runner) como stubs.
+run_update_bridge_selftests() {
+  local -; set +e
+  local wr="${REPO_ROOT}/ops/update-bridge.sh"
+  if [ ! -f "${wr}" ]; then record_skip "update-bridge: sem ops/update-bridge.sh (core-only) — nada a testar"; return; fi
+  command -v flock >/dev/null 2>&1 || { record_skip "update-bridge: flock ausente → pulado"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "update-bridge: python3 ausente → pulado"; return; }
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/fake" "${d}/ops" "${d}/st"
+  # sudo FALSO: tira -n/-H/-u <conta> e executa como quem roda. Ele vem primeiro no PATH: o sudo real nunca é chamado.
+  printf '#!/bin/sh\nwhile [ $# -gt 0 ]; do case "$1" in -n|-H) shift ;; -u) shift 2 ;; *) break ;; esac; done\nexec "$@"\n' > "${d}/fake/sudo"
+  cat > "${d}/fake/systemctl" <<'EOF'
+#!/bin/sh
+F="$UB_ST"; echo "systemctl $*" >> "$F/calls"
+case "$1" in
+  show) case "$*" in
+          *InvocationID*) echo inv-ub ;;
+          *NRestarts*) [ -f "$F/nr-bad" ] && { echo ""; exit 0; }; cat "$F/nrestarts" 2>/dev/null || echo 0 ;;
+        esac ;;
+  start) if [ -f "$F/crash" ]; then n="$(cat "$F/nrestarts" 2>/dev/null || echo 0)"; echo $((n + 1)) > "$F/nrestarts"; fi ;;
+esac
+exit 0
+EOF
+  printf '#!/bin/sh\necho "[onion-bridge] no ar"\nif [ -f "$UB_ST/nojwks" ]; then echo "identidade: JWKS falhou | auth: enforce"; else echo "identidade: JWKS OK | auth: enforce"; fi\n' > "${d}/fake/journalctl"
+  printf '#!/bin/sh\necho "{\\"ok\\":true}"\n' > "${d}/fake/curl"
+  printf '#!/bin/sh\necho "npm $*" >> "$UB_ST/calls"\nexit 0\n' > "${d}/fake/npm"
+  # os vizinhos que o wrapper chama em ${SELF_DIR}: o rc do verify sai de um arquivo de estado
+  printf '#!/bin/sh\necho "backup: %s/bk/pre-update.tar.gpg"\n' "${d}" > "${d}/ops/bridge-backup.sh"
+  printf '#!/bin/sh\necho "bh $*" >> "$UB_ST/calls"\nrc="$(cat "$UB_ST/bh-rc" 2>/dev/null || echo 0)"\n[ "$rc" = 1 ] && echo "FALHA caminho-protegido-sumiu /x/src"\n[ "$rc" = 2 ] && echo "[bridge-hardening] ERRO: sudo pediu senha"\nexit "$rc"\n' > "${d}/ops/bridge-hardening.sh"
+  printf '#!/bin/sh\necho "cr $*" >> "$UB_ST/calls"\nrc="$(cat "$UB_ST/cr-rc" 2>/dev/null || echo 0)"\n[ "$rc" = 1 ] && echo "    FALHA CLI do SDK 2.1.50 abaixo do piso 2.1.64"\n[ "$rc" = 2 ] && echo "[chat-runner] ERRO: a unit não tem processo vivo"\nexit "$rc"\n' > "${d}/ops/chat-runner.sh"
+  chmod +x "${d}/fake/"* "${d}/ops/"*.sh
+  # origens bare com DOIS commits: a sandbox nasce no 1º, então o update não é NOOP
+  local r g="git -c user.name=ub -c user.email=ub@bench -c init.defaultBranch=main -c advice.detachedHead=false"
+  for r in clone bridge; do
+    ${g} init -q "${d}/seed-${r}" && printf 'node_modules/\n' > "${d}/seed-${r}/.gitignore" && echo 1 > "${d}/seed-${r}/v" \
+      && ${g} -C "${d}/seed-${r}" add -A && ${g} -C "${d}/seed-${r}" commit -qm um && echo 2 > "${d}/seed-${r}/v" \
+      && ${g} -C "${d}/seed-${r}" commit -qam dois && ${g} clone -q --bare "${d}/seed-${r}" "${d}/origin-${r}.git" \
+      || { record_fail "update-bridge: sandbox" "não montei a origem git ${r}"; rm -rf "${d}"; return; }
+  done
+  _ubreset() {
+    rm -rf "${d}/srv" "${d}/unit" "${d}/bk" "${d}/st" "${d}/lock"; mkdir -p "${d}/srv" "${d}/st" "${d}/bk" \
+      "${d}/unit/onion-vps-bridge.service.d"
+    ${g} clone -q "${d}/origin-clone.git" "${d}/srv/onion-evolve" && ${g} -C "${d}/srv/onion-evolve" reset -q --hard HEAD~1
+    ${g} clone -q "${d}/origin-bridge.git" "${d}/srv/onion-bridge" && ${g} -C "${d}/srv/onion-bridge" reset -q --hard HEAD~1
+    mkdir -p "${d}/srv/onion-bridge/node_modules"
+    printf '[Service]\n' > "${d}/unit/onion-vps-bridge.service.d/30-integrity.conf"; printf '[Socket]\n' > "${d}/unit/onion-chat.socket"
+  }
+  # _ubr <wrapper> → "rc|saída"
+  _ubr() {
+    local rc=0 out
+    out="$(cd "${d}" && env PATH="${d}/fake:${PATH}" LC_ALL=C UB_ST="${d}/st" GIT_CONFIG_GLOBAL=/dev/null bash "$1" 2>&1)" || rc=$?
+    printf '%s|%s' "${rc}" "${out}"
+  }
+  # _ubcase <nome> <ANTIGO> <NOVO> <função-de-caso>: intacto e mutante (cópia com ANTIGO→NOVO, 1ª ocorrência)
+  _ubcase() {
+    local name="$1" old="$2" new="$3" fn="$4" rc_i=1 rc_m=1
+    sed -e "s#^BRIDGE=.*#BRIDGE=${d}/srv/onion-bridge#" -e "s#^CLONE=.*#CLONE=${d}/srv/onion-evolve#" -e "s#^DEST=.*#DEST=${d}/bk#" \
+        -e "s#^UNIT_DIR=.*#UNIT_DIR=${d}/unit#" -e "s#^LOCK=.*#LOCK=${d}/lock#" "${wr}" > "${d}/ops/w.sh"
+    # a cópia nunca roda com caminho de produção: se o sed não pegou (constante renomeada), o caso REPROVA sem rodar
+    if grep -nE '^[^#]*(/home/onion|/etc/systemd|/tmp/onion-update-bridge\.lock|/home/marcio)' "${d}/ops/w.sh" >/dev/null; then
+      record_fail "update-bridge: ${name}" "a cópia da bancada ainda tem caminho de produção: $(grep -nE '^[^#]*(/home/onion|/etc/systemd|/tmp/onion-update-bridge\.lock|/home/marcio)' "${d}/ops/w.sh" | head -1 | cut -c1-120)"
+      return
+    fi
+    _ubreset; UB_WHY=""; "${fn}" "${d}/ops/w.sh" && rc_i=0
+    if [ "${rc_i}" = 0 ]; then record_pass "update-bridge: ${name}"; else record_fail "update-bridge: ${name}" "${UB_WHY:-caso não satisfeito}"; fi
+    cp "${d}/ops/w.sh" "${d}/ops/m.sh"
+    OLD="${old}" NEW="${new}" python3 - "${d}/ops/m.sh" <<'PY'
+import os, sys
+p = sys.argv[1]; s = open(p, encoding="utf-8").read(); o = os.environ["OLD"]
+if o in s:
+    open(p, "w", encoding="utf-8").write(s.replace(o, os.environ["NEW"], 1))
+PY
+    _ubreset; "${fn}" "${d}/ops/m.sh" && rc_m=0
+    _prove_mutation "update-bridge: ${name} (MUT)" "${d}/ops/w.sh" "${d}/ops/m.sh" "${rc_i}" "${rc_m}"
+  }
+  _ubrc() { [ "${1%%|*}" = "$2" ]; }
+  _ubhas() { case "${1#*|}" in *"$2"*) true ;; *) false ;; esac; }
+  # o serviço segue RODANDO: nenhum stop depois do start desta invocação
+  _ubrunning() { awk '/^systemctl start/{s=1} s && /^systemctl stop/{bad=1} END{exit bad}' "${d}/st/calls"; }
+  _ubold() { git -C "${d}/origin-clone.git" rev-parse main~1; }
+  _ub_ok() { local r; r="$(_ubr "$1")"; UB_WHY="${r:0:500}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "OK — clone" && ! _ubhas "${r}" "NÃO PROVADO" && _ubrunning \
+      && grep -qx "bh verify" "${d}/st/calls" && grep -qx "cr verify" "${d}/st/calls"; }
+  _ub_unproven() { # <rótulo esperado na lista> — rc 1, nomeado, rollback com o HEAD antigo, sem a linha OK, rodando
+    local r="$2"; UB_WHY="${r:0:700}"
+    _ubrc "${r}" 1 && _ubhas "${r}" "update NO AR e NÃO PROVADO" && _ubhas "${r}" "  - $1" && _ubhas "${r}" "ROLLBACK MANUAL" \
+      && ! _ubhas "${r}" "OK — clone" && _ubrunning; }
+  _ub_bh_fail() { echo 1 > "${d}/st/bh-rc"; local r; r="$(_ubr "$1")"
+    _ub_unproven "integridade (30-integrity.conf): o verify REPROVOU (1 falha(s)" "${r}" && _ubhas "${r}" "    FALHA caminho-protegido-sumiu"; }
+  _ub_bh_nomeasure() { echo 2 > "${d}/st/bh-rc"; local r; r="$(_ubr "$1")"
+    _ub_unproven "integridade (30-integrity.conf): o verify NÃO MEDIU (rc 2): [bridge-hardening] ERRO: sudo pediu senha" "${r}"; }
+  _ub_cr_fail() { echo 1 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"
+    _ub_unproven "runner do convidado (onion-chat.socket): o verify REPROVOU (1 falha(s)" "${r}" && _ubhas "${r}" "abaixo do piso 2.1.64"; }
+  _ub_cr_nomeasure() { echo 2 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"
+    _ub_unproven "runner do convidado (onion-chat.socket): o verify NÃO MEDIU (rc 2)" "${r}"; }
+  _ub_both() { echo 1 > "${d}/st/bh-rc"; echo 1 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"
+    _ub_unproven "integridade (30-integrity.conf): o verify REPROVOU" "${r}" && _ubhas "${r}" "  - runner do convidado (onion-chat.socket): o verify REPROVOU" \
+      && _ubhas "${r}" "2 checagem(ns)"; }
+  _ub_rollback() { echo 1 > "${d}/st/bh-rc"; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:700}"
+    _ubrc "${r}" 1 && _ubhas "${r}" "reset --hard $(_ubold)"; }
+  _ub_jwks() { : > "${d}/st/nojwks"; local r; r="$(_ubr "$1")"; _ub_unproven "JWKS não confirmou neste boot" "${r}"; }
+  _ub_crash() { : > "${d}/st/crash"; local r; r="$(_ubr "$1")"; _ub_unproven "o serviço reiniciou sozinho depois do start (NRestarts 0 → 1)" "${r}"; }
+  _ub_prior() { echo 5 > "${d}/st/nrestarts"; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:500}"; _ubrc "${r}" 0 && _ubhas "${r}" "OK — clone"; }
+  _ub_nrbad() { : > "${d}/st/nr-bad"; local r; r="$(_ubr "$1")"; _ub_unproven "NRestarts ilegível" "${r}"; }
+  _ub_skip() { rm -f "${d}/unit/onion-vps-bridge.service.d/30-integrity.conf" "${d}/unit/onion-chat.socket"
+    echo 1 > "${d}/st/bh-rc"; echo 1 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:500}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "30-integrity.conf não instalado" && _ubhas "${r}" "onion-chat.socket não instalado" && _ubhas "${r}" "OK — clone"; }
+  _ubcase "(u1) verifies OK, JWKS OK, sem reinício → rc 0 com a linha OK, os dois verifies rodaram" \
+    'if [ "${#NOT_PROVEN[@]}" -gt 0 ]; then' 'if [ "${#NOT_PROVEN[@]}" -ge 0 ]; then' _ub_ok
+  _ubcase "(u2) verify do degrau 1 REPROVA → rc 1 nomeado, FALHA no stderr (o set -e matava mudo: o mutante é a forma antiga)" \
+    '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)"; rc=$?' _ub_bh_fail
+  _ubcase "(u3) verify do degrau 1 NÃO MEDE (rc 2) → rc 1 nomeado como NÃO MEDIU, nunca 'está bom'" \
+    '    *) NOT_PROVEN+=("${label}: o verify NÃO MEDIU' '    *) _ub_x+=("${label}: o verify NÃO MEDIU' _ub_bh_nomeasure
+  _ubcase "(u4) verify do runner REPROVA (SDK abaixo do piso) → rc 1 nomeado" \
+    '  post_verify "runner do convidado (onion-chat.socket)" chat-runner.sh' '  : post_verify "runner do convidado (onion-chat.socket)" chat-runner.sh' _ub_cr_fail
+  _ubcase "(u5) verify do runner NÃO MEDE (rc 2) → rc 1, distinto de REPROVOU" \
+    '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=1' _ub_cr_nomeasure
+  _ubcase "(u6) os dois reprovam → os dois nomeados (acumula, não para no primeiro)" \
+    'for _m in "${NOT_PROVEN[@]}"; do' 'for _m in "${NOT_PROVEN[0]}"; do' _ub_both
+  _ubcase "(u7) não provado → o rollback impresso traz o HEAD de ANTES do clone" \
+    $'  print_rollback; exit 1\nfi' $'  exit 1\nfi' _ub_rollback
+  _ubcase "(u8) não provado → o serviço segue RODANDO (nenhum stop depois do start)" \
+    "  printf '[update-bridge] serviço deixado RODANDO" "  sudo systemctl stop \"\${UNIT}\"; printf '[update-bridge] serviço deixado RODANDO" _ub_bh_fail
+  _ubcase "(u9) boot sem 'JWKS OK' → rc 1 nomeado (era rc 0 com AVISO)" \
+    'grep -q "JWKS OK" <<<"${BOOT}" \' 'true || grep -q "JWKS OK" <<<"${BOOT}" \' _ub_jwks
+  _ubcase "(u10) o serviço caiu e voltou depois do start (NRestarts subiu) → rc 1 nomeado (era rc 0 com AVISO)" \
+    'elif [ "${NEW_RESTARTS}" -gt "${PRE_RESTARTS}" ]; then' 'elif false; then' _ub_crash
+  _ubcase "(u11) NRestarts com histórico anterior e sem reinício novo → rc 0 (compara o DELTA, não o absoluto)" \
+    'elif [ "${NEW_RESTARTS}" -gt "${PRE_RESTARTS}" ]; then' 'elif [ "${NEW_RESTARTS}" -gt 0 ]; then' _ub_prior
+  _ubcase "(u12) NRestarts ilegível → rc 1 (não medi não é provado)" \
+    'if ! [[ "${NEW_RESTARTS}" =~ ^[0-9]+$ && "${PRE_RESTARTS}" =~ ^[0-9]+$ ]]; then' 'if false; then' _ub_nrbad
+  _ubcase "(u13) drop-in e socket NÃO instalados → verifies não rodam, rc 0, cada um declarado" \
+    'if sudo test -f "${UNIT_DIR}/${UNIT}.service.d/30-integrity.conf"; then' 'if true; then' _ub_skip
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo pre-push + pr-finalize (2026-10-05) — o fechamento de PR na ordem certa e o gatilho que o cobra.
 # Defeito datado: num dia, #923 e #925 foram ao CI com o painel defasado (REGRA 81) e #924 foi enviado com
 # "Violações HARD : 2" porque o encadeamento lia a PRESENÇA da linha. O hook roda com lint STUB (ponto de
@@ -32553,6 +32695,7 @@ _family run_a2a_invite_live_selftests
 _family run_a2a_queue_live_selftests
 _family run_bridge_hardening_selftests
 _family run_chat_runner_selftests
+_family run_update_bridge_selftests
 _family run_version_drift_selftests
 _family run_premodelswitch_guard_selftests
 _family run_research_lens_selftests

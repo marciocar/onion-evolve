@@ -9,7 +9,7 @@ meta:
   review_after: "2026-11-15"   # 30d: cadência de ferramenta
   x_supersedes_none: "nenhum item de 2.1.301 contradiz nó da r11: a questão aberta Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO não é tocada pelo delta, e os 12 nós da r11 seguem valendo; os de hooks e OTel (E_HOOKS_DO_CORE_SAO_TODOS_COMMAND, E_OTEL_E_REFTABLE_SEM_CONSUMIDOR) foram medidos de novo em 2026-10-16 (22 hooks command, 0 consumidor de OTel)"
   # ═══ TETO: 25 NÓS ═══
-  #   2 no esqueleto (2026-10-16); 13 depois da rodada e do juiz (2026-10-16); 14 com a prova em produção da SAC-156 (2026-10-16); 15 com a cura do censo da SAC-155 (2026-10-16), teto mantido.
+  #   2 no esqueleto (2026-10-16); 13 depois da rodada e do juiz (2026-10-16); 14 com a prova em produção da SAC-156 (2026-10-16); 15 com a cura do censo da SAC-155 (2026-10-16); 16 com o deploy do bridge fail-closed depois do update (2026-10-16), teto mantido.
 # ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
 #   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
 # external_edges:
@@ -241,7 +241,30 @@ nodes:
       locator: "saída do censo na VPS (tabela de versões e avisos) e a família run_cc_delta_census_selftests, casos (j) a (n)"
       method: "medição: censo rodado ao vivo na VPS, bancada com LC_ALL=C e mutantes por ops/mutate-and-restore.sh"
       locality: "host"
+  - id: E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16 numa sandbox (cópia do wrapper com os caminhos trocados por sed, sudo, systemctl, journalctl, curl e npm falsos, git real), nunca contra o serviço: a versão de origin/main, com o verify do degrau 1 reprovando, saiu rc 1 SEM nenhuma linha depois de 'clone do core' (o set -e matava na atribuição VOUT=$(…); VRC=$? e o case do AVISO era código morto), rc 2 mudo com o verify sem medir, rc 1 mudo com o verify do runner reprovando, e rc 0 com a linha OK quando o boot não tinha 'JWKS OK' ou quando o serviço reiniciou sozinho depois do start; a versão curada sai rc 1 nos cinco casos, com 'update NO AR e NÃO PROVADO', cada checagem nomeada, as linhas FALHA no stderr, o rollback com os HEADs de antes, e nenhum stop depois do start; o refutador mediu numa unit transitória com Restart=always no systemd 255 que o start manual ZERA o NRestarts (3 → 0 → 1), o que derrubou a 1ª redação por delta e fixou a checagem absoluta depois do start; a 2ª passada mostrou que a cura sugerida (rodar de novo) caía no NOOP com rc 0 sem verificar, e o NOOP passou a rodar as mesmas checagens sobre o boot vivo; trava ocupada passou de rc 0 a rc 2; a bancada update_bridge tem 21 casos e 21 mutantes, 42 de 42 verdes, e cinco mutantes plantados pelo mutate-and-restore no arquivo real derrubaram 7, 2, 1, 1 e 2 casos intactos; não medido: o próximo deploy real, e os verifies do degrau 1 e do runner que devolvem rc 1 quando o sudo falha (o update-bridge os nomeia como REPROVOU, não como NÃO MEDIU)"
+    narrative: "Cura a lacuna declarada em Q_SUBIR_O_SDK_DO_BRIDGE_COM_PISO_DE_VERSAO e em E_SDK_0_3_301_EM_PRODUCAO_1016 ('o piso só avisa no deploy'). A medição corrigiu a premissa: o wrapper não avisava e saía rc 0, ele morria mudo com rc diferente de zero, e só JWKS e reinício saíam rc 0 com AVISO. Escolha (a): falhar nomeado com o rollback impresso e o serviço RODANDO. Rollback automático foi descartado medindo: o npm ci do rollback depende de rede e, se falhar, deixa o serviço parado, pior que o estado no ar com /health 200 e auth enforce; os verifies rodam do checkout do operador, então o bridge antigo pode reprovar o mesmo piso; e a cura de cópias do runner defasadas é o install do runner, não desfazer o bridge. Cada item nomeado leva o comando que o cura para a frente. O verify só julga se for byte a byte o do clone servido, e NRestarts é lido absoluto depois do start. O NOOP re-verifica o boot vivo, então re-rodar depois de uma cura é verificar."
+    label: "o deploy do bridge reprova, nomeado e com o rollback impresso, todo update cujo verify do degrau 1 ou do runner reprove ou não meça, cujo boot não confirme o JWKS, ou cujo serviço caia depois do start; antes, os verifies morriam mudos"
+    trace: "ops/update-bridge.sh"
+    provenance:
+      source: "ops/update-bridge.sh (fase 6) e a família update_bridge do .claude/validation/lint-selftest.sh"
+      locator: "função post_verify e o bloco NOT_PROVEN da fase 6; casos (u1) a (u21) da família"
+      method: "medição: a versão de origin/main e a curada na mesma sandbox, mais a bancada com mutante por caso"
+      locality: "host"
 edges:
+  - from: E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016
+    to: Q_SUBIR_O_SDK_DO_BRIDGE_COM_PISO_DE_VERSAO
+    edge_type: SUPPORTS
+  - from: E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016
+    to: E_SDK_0_3_301_EM_PRODUCAO_1016
+    edge_type: SUPPORTS
   - from: E_CENSO_MEDE_O_CLI_DO_SDK_1016
     to: Q_CENSO_MEDE_O_CLI_DO_SDK_DO_BRIDGE
     edge_type: SUPPORTS
