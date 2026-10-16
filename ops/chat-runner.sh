@@ -190,6 +190,11 @@ BRIDGE="${SVC_HOME}/onion-bridge"
 SRC_DIR="deploy/chat-runner"
 SOURCES=( "${SRC_DIR}/launcher.py" "${SRC_DIR}/onion-chat.socket.in" "${SRC_DIR}/onion-chat@.service.in" src/chat-runner.ts )
 CLAUDE_SRC="${BRIDGE}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"
+# o PISO do CLI que o template liga por bind (SAC-156): o CVE-2026-39861 afeta o Claude Code < 2.1.64 (grafo
+# chat-agent-isolation-2026-10, nó E_CVE39861_FIXED_IN_2_1_64), e o binário é o do Agent SDK do bridge SERVIDO. Até
+# 2026-10-16 o piso valia por acaso de versão (0.3.232 embutia o 2.1.232): um deploy que regredisse o SDK passaria em
+# todo o resto do verify. A versão é a que o próprio binário responde, como a conta do serviço, sem a home dela
+CLI_FLOOR=2.1.64
 WS_ROOT="${STATE}/workspaces"
 HOME_ROOT="${STATE}/chat-homes"
 DROPIN_DIR="${UNIT_DIR}/${UNIT}.service.d"
@@ -549,6 +554,24 @@ run_sandbox_probe() {   # run_sandbox_probe <template> <com-grupo> <launcher> [<
   [ "${rc}" = 0 ] && grep -qx 'n_fail=0' <<<"${out}"
 }
 
+# o piso do CLI (CLI_FLOOR): imprime UMA linha OK/FALHA; rc 0 = o binário responde uma versão no piso ou acima.
+# Comparação numérica por campo (2.1.100 > 2.1.64), nunca lexical; saída sem versão é FALHA, nunca passa calada
+cli_floor() {
+  local out v fl
+  out="$(as_svc /usr/bin/env -i PATH=/usr/bin:/bin HOME=/nonexistent DISABLE_AUTOUPDATER=1 "${CLAUDE_SRC}" --version 2>/dev/null)"
+  out="${out:0:200}"
+  [[ "${CLI_FLOOR}" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]] || { echo "FALHA CLI_FLOOR fora da forma: ${CLI_FLOOR}"; return 1; }
+  fl=$(( 10#${BASH_REMATCH[1]} * 1000000000000 + 10#${BASH_REMATCH[2]} * 1000000 + 10#${BASH_REMATCH[3]} ))
+  if [[ "${out}" =~ ^([0-9]{1,6})\.([0-9]{1,6})\.([0-9]{1,6}) ]]; then
+    v=$(( 10#${BASH_REMATCH[1]} * 1000000000000 + 10#${BASH_REMATCH[2]} * 1000000 + 10#${BASH_REMATCH[3]} ))
+    if [ "${v}" -ge "${fl}" ]; then
+      echo "OK o CLI do SDK responde ${BASH_REMATCH[0]}, no piso ${CLI_FLOOR} ou acima (${CLAUDE_SRC})"; return 0
+    fi
+    echo "FALHA o CLI do SDK responde ${BASH_REMATCH[0]}, ABAIXO do piso ${CLI_FLOOR} (CVE-2026-39861): suba o Agent SDK do bridge"; return 1
+  fi
+  echo "FALHA o CLI do SDK não respondeu uma versão a --version (${CLAUDE_SRC}): ${out:0:60}"; return 1
+}
+
 # o aperto de mão REAL pelo socket, como a conta do serviço: o initialize do SDK (o CLI responde sem chamar a API) e a
 # recusa (flag fora da allowlist: zero byte de volta). Nenhuma chave vai no cabeçalho.
 handshake() {
@@ -697,6 +720,7 @@ verify_all() {
   if priv test -L "${SOCKET}" || ! priv test -S "${SOCKET}"; then vbad "o socket ${SOCKET} não existe (ou é symlink)"
   elif [ "$(systemctl is-active "${SOCKET_UNIT}" 2>/dev/null)" = active ]; then vok "${SOCKET_UNIT} ativo em ${SOCKET}"
   else vbad "${SOCKET_UNIT} não está ativo"; fi
+  local floor; if floor="$(cli_floor)"; then vok "${floor#OK }"; else vbad "${floor#FALHA }"; fi
   echo "-- sandbox do template INSTALADO (unit transitória sob UID dinâmico):"
   if priv test -f "${UNIT_DIR}/${TEMPLATE_UNIT}"; then
     priv cat "${UNIT_DIR}/${TEMPLATE_UNIT}" > "${TMPD}/installed.service"
@@ -735,6 +759,7 @@ done
 priv test -e "${HOME_ROOT}" && { [ "$(priv realpath -m -- "${HOME_ROOT}")" = "${HOME_ROOT}" ] && priv test -d "${HOME_ROOT}" \
   || die 1 "${HOME_ROOT} existe e não é diretório real: recusado"; }
 priv test -x "${CLAUDE_SRC}" || die 1 "o CLI do SDK não está em ${CLAUDE_SRC} (o template o liga por bind)"
+CLI_FLOOR_LINE="$(cli_floor)" || die 1 "${CLI_FLOOR_LINE#FALHA }"
 if [ "${FENCE}" = 1 ] && [ "${TEST}" = 0 ]; then
   priv test -f "${FENCE_RESOLV_SRC}" || die 1 "${FENCE_RESOLV_SRC} ausente: sem ele a cerca corta o DNS (o stub do resolvedor fica fora)"
 fi
