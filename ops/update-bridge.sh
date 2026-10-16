@@ -144,9 +144,6 @@ if sudo test -f "${BRIDGE}/web/package.json"; then
   sudo -u onion -H npm --prefix "${BRIDGE}/web" ci --no-audit --no-fund || fail "npm ci da PWA falhou"
   sudo -u onion -H npm --prefix "${BRIDGE}/web" run build || fail "build da PWA falhou"
 fi
-# Reinícios automáticos ANTES do start: a fase 6 compara o delta, não o absoluto (a semântica de zerar o
-# contador no start manual não foi medida nesta máquina, e o delta não depende dela).
-PRE_RESTARTS="$(systemctl show "${UNIT}" -p NRestarts --value 2>/dev/null || true)"
 sudo systemctl start "${UNIT}" || fail "systemctl start recusou"
 DEPS_TOUCHED=0
 
@@ -182,55 +179,80 @@ grep -q "auth: enforce" <<<"${BOOT}" || fail "boot DESTA invocação sem 'auth: 
 # com cada falha nomeada e o rollback impresso.
 # POR QUE NÃO ROLLBACK AUTOMÁTICO (decidido medindo, 2026-10-16), apesar de o script ter os dois HEADs e o
 # backup: (1) o rollback refaz o npm ci, que depende de rede — se ele falhar, o serviço fica PARADO, pior que
-# o estado em que a fase 6 o encontra (no ar, /health 200, auth enforce); (2) os verifies rodam do checkout do
-# OPERADOR (${SELF_DIR}), não do clone servido: o piso do SDK e as cópias do runner são julgados pela versão
-# NOVA do core, e o bridge antigo pode reprovar o mesmo verify; (3) a cura de "cópias do runner defasadas" é
+# o estado em que a fase 6 o encontra (no ar, /health 200, auth enforce); (2) o verify é o do core NOVO (o
+# post_verify exige que o do checkout do operador seja byte a byte o do clone servido): o piso do SDK e as cópias
+# do runner são julgados pela versão nova, e o bridge antigo pode reprovar o mesmo verify; (3) a cura de "cópias do runner defasadas" é
 # o install do runner, não desfazer o bridge; (4) o rollback não pode ser provado sem o serviço real, e
 # deploy é do maestro. Então: para, nomeia, imprime o rollback, e o maestro decide.
 NOT_PROVEN=()
 grep -q "JWKS OK" <<<"${BOOT}" \
   || NOT_PROVEN+=("JWKS não confirmou neste boot (Logto fora?): com auth enforce, TODO /chat dá 401 até voltar")
+# NRestarts ABSOLUTO, depois do start: o start manual ZERA o contador (medido pelo refutador em 2026-10-16 numa unit
+# transitória com Restart=always no systemd 255: 3 reinícios → start manual → 0 → uma queda → 1). Qualquer valor acima de
+# zero é queda DESTE boot. (A 1ª redação comparava com o valor de antes do start e deixava passar até N quedas novas.)
 NEW_RESTARTS="$(systemctl show "${UNIT}" -p NRestarts --value 2>/dev/null || true)"
-if ! [[ "${NEW_RESTARTS}" =~ ^[0-9]+$ && "${PRE_RESTARTS}" =~ ^[0-9]+$ ]]; then
-  NOT_PROVEN+=("NRestarts ilegível (antes '${PRE_RESTARTS}', depois '${NEW_RESTARTS}'): não pude medir se o boot novo caiu")
-elif [ "${NEW_RESTARTS}" -gt "${PRE_RESTARTS}" ]; then
-  NOT_PROVEN+=("o serviço reiniciou sozinho depois do start (NRestarts ${PRE_RESTARTS} → ${NEW_RESTARTS}): investigar o journal antes de confiar")
+if ! [[ "${NEW_RESTARTS}" =~ ^[0-9]+$ ]]; then
+  NOT_PROVEN+=("NRestarts ilegível ('${NEW_RESTARTS}'): não pude medir se o boot novo caiu")
+elif [ "${NEW_RESTARTS}" -gt 0 ]; then
+  NOT_PROVEN+=("o serviço reiniciou sozinho depois do start (NRestarts=${NEW_RESTARTS}): investigar o journal antes de confiar")
 fi
-# post_verify <rótulo> <wrapper em ${SELF_DIR}>: o rc é capturado SEM o set -e matar (o `|| rc=$?`), e as linhas
-# de FALHA vão ao stderr. 0 = provado · 1 = reprovou · outro = não mediu (trava, sudo, unit) — os dois últimos
-# entram em NOT_PROVEN, porque "não medi" nunca é "está bom".
+# post_verify <rótulo> <wrapper em ${SELF_DIR}> <cura>: o rc é capturado SEM o set -e matar (o `|| rc=$?`), e as
+# linhas de FALHA vão ao stderr. 0 = provado · 1 = reprovou · outro = não mediu (trava, sudo, unit, o teto de 10 min
+# do timeout = 124) — os dois últimos entram em NOT_PROVEN, porque "não medi" nunca é "está bom". Cada entrada leva o
+# comando que a cura para a frente.
+# O JUIZ É O SERVIDO: o verify roda do checkout do operador, que pode não ser o origin/main (um worktree de feature
+# julgaria o piso e as cópias com outro código). Ele só vale se for byte a byte o mesmo arquivo do clone servido,
+# que acabou de ser posto em origin/main.
 post_verify() {
-  local label="$1" wrapper="$2" out rc=0 n
-  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?
+  local label="$1" wrapper="$2" cure="$3" out rc=0 n
+  if ! sudo cmp -s "${SELF_DIR}/${wrapper}" "${CLONE}/ops/${wrapper}"; then
+    NOT_PROVEN+=("${label}: o ${wrapper} deste checkout (${SELF_DIR}) NÃO é o do clone servido em ${NEW_CLONE_HEAD:0:8}: o verify não foi rodado. Rode o update-bridge de um checkout em origin/main")
+    return 0
+  fi
+  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?
   case "${rc}" in
     0) log "${label}: verify OK no boot desta invocação" ;;
     1) n="$(grep -cE '^ *FALHA' <<<"${out}" || true)"
-       NOT_PROVEN+=("${label}: o verify REPROVOU (${n} falha(s); ${wrapper} verify)")
+       if [ "${n}" = 0 ]; then
+         NOT_PROVEN+=("${label}: o verify REPROVOU sem linha FALHA (última linha: $(tail -1 <<<"${out}")). Cura: ${cure}")
+       else
+         NOT_PROVEN+=("${label}: o verify REPROVOU (${n} falha(s); ${wrapper} verify). Cura: ${cure}")
+       fi
        { grep -E '^ *FALHA' <<<"${out}" || true; } | head -5 | sed 's/^ */    /' >&2 ;;
     *) NOT_PROVEN+=("${label}: o verify NÃO MEDIU (rc ${rc}): $(tail -1 <<<"${out}")") ;;
   esac
 }
+# installed_or_unreadable <arquivo>: 0 = instalado; 1 = ausente (o diretório É legível e o arquivo não está lá);
+# 2 = não pude ler o diretório (sudo falhou) — este vai a NOT_PROVEN, nunca a "não se aplica".
+installed_or_unreadable() {
+  sudo test -f "$1" && return 0
+  sudo test -d "${UNIT_DIR}" && return 1
+  return 2
+}
 # O drop-in de INTEGRIDADE (degrau 1 do isolamento do /chat, ops/bridge-hardening.sh) liga cada caminho no boot: um
 # caminho que o update removeu ou renomeou sai da proteção em silêncio (o '-' do drop-in evita o 226/NAMESPACE). O
 # verify mede no namespace DESTA invocação.
-if sudo test -f "${UNIT_DIR}/${UNIT}.service.d/30-integrity.conf"; then
-  post_verify "integridade (30-integrity.conf)" bridge-hardening.sh
-else
-  log "integridade: 30-integrity.conf não instalado — verify do degrau 1 não se aplica"
-fi
+# AUSENTE segue "não se aplica" de propósito: o update não remove units, e tirar um degrau é ato do maestro.
+_st=0; installed_or_unreadable "${UNIT_DIR}/${UNIT}.service.d/30-integrity.conf" || _st=$?
+case "${_st}" in
+  0) post_verify "integridade (30-integrity.conf)" bridge-hardening.sh "o caminho protegido que sumiu volta ao lugar, e então 'bash ops/bridge-hardening.sh install --apply' (do maestro)" ;;
+  1) log "integridade: 30-integrity.conf não instalado — verify do degrau 1 não se aplica" ;;
+  *) NOT_PROVEN+=("integridade: não pude ler ${UNIT_DIR} (sudo?) para saber se o 30-integrity.conf está instalado") ;;
+esac
 # O RUNNER do convidado (degrau 2, ops/chat-runner.sh) é instalado A PARTIR do bridge servido: o lançador e as units
 # instaladas são cópias de root, e um update que muda deploy/chat-runner/ as deixa defasadas (o verify acusa "DIFERE");
 # o verify também prova o contrato do SDK servido contra o lançador instalado (o piso). Reinstalar é
 # `! bash ops/chat-runner.sh install --apply`, do maestro.
-if sudo test -f "${UNIT_DIR}/onion-chat.socket"; then
-  post_verify "runner do convidado (onion-chat.socket)" chat-runner.sh
-else
-  log "runner: onion-chat.socket não instalado — verify do degrau 2 não se aplica"
-fi
+_st=0; installed_or_unreadable "${UNIT_DIR}/onion-chat.socket" || _st=$?
+case "${_st}" in
+  0) post_verify "runner do convidado (onion-chat.socket)" chat-runner.sh "'! bash ops/chat-runner.sh install --apply' (do maestro) reinstala as cópias do bridge servido; SDK abaixo do piso se cura no bridge, não aqui" ;;
+  1) log "runner: onion-chat.socket não instalado — verify do degrau 2 não se aplica" ;;
+  *) NOT_PROVEN+=("runner: não pude ler ${UNIT_DIR} (sudo?) para saber se o onion-chat.socket está instalado") ;;
+esac
 if [ "${#NOT_PROVEN[@]}" -gt 0 ]; then
   printf '[update-bridge] ERRO: update NO AR e NÃO PROVADO — %s checagem(ns) pós-update falharam:\n' "${#NOT_PROVEN[@]}" >&2
   for _m in "${NOT_PROVEN[@]}"; do printf '  - %s\n' "${_m}" >&2; done
-  printf '[update-bridge] serviço deixado RODANDO de propósito (/health 200 e auth enforce neste boot): parar seria pior. Corrija para a frente ou rode o rollback abaixo.\n' >&2
+  printf '[update-bridge] serviço deixado RODANDO de propósito (/health 200 e auth enforce no momento da medida, não prova de estabilidade): parar seria pior. Corrija para a frente pela cura de cada item, ou rode o rollback abaixo.\n' >&2
   print_rollback; exit 1
 fi
 log "OK — clone ${NEW_CLONE_HEAD:0:8} · bridge ${NEW_BRIDGE_HEAD:0:8} · health 200+ok:true local+público · auth enforce (invocação ${INV:0:8})"

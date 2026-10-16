@@ -10177,27 +10177,36 @@ case "$1" in
           *InvocationID*) echo inv-ub ;;
           *NRestarts*) [ -f "$F/nr-bad" ] && { echo ""; exit 0; }; cat "$F/nrestarts" 2>/dev/null || echo 0 ;;
         esac ;;
-  start) if [ -f "$F/crash" ]; then n="$(cat "$F/nrestarts" 2>/dev/null || echo 0)"; echo $((n + 1)) > "$F/nrestarts"; fi ;;
+  start) if [ -f "$F/crash" ]; then echo 1; else echo 0; fi > "$F/nrestarts" ;;   # o start manual ZERA (systemd 255, medido)
 esac
 exit 0
 EOF
   printf '#!/bin/sh\necho "[onion-bridge] no ar"\nif [ -f "$UB_ST/nojwks" ]; then echo "identidade: JWKS falhou | auth: enforce"; else echo "identidade: JWKS OK | auth: enforce"; fi\n' > "${d}/fake/journalctl"
   printf '#!/bin/sh\necho "{\\"ok\\":true}"\n' > "${d}/fake/curl"
   printf '#!/bin/sh\necho "npm $*" >> "$UB_ST/calls"\nexit 0\n' > "${d}/fake/npm"
-  # os vizinhos que o wrapper chama em ${SELF_DIR}: o rc do verify sai de um arquivo de estado
-  printf '#!/bin/sh\necho "backup: %s/bk/pre-update.tar.gpg"\n' "${d}" > "${d}/ops/bridge-backup.sh"
-  printf '#!/bin/sh\necho "bh $*" >> "$UB_ST/calls"\nrc="$(cat "$UB_ST/bh-rc" 2>/dev/null || echo 0)"\n[ "$rc" = 1 ] && echo "FALHA caminho-protegido-sumiu /x/src"\n[ "$rc" = 2 ] && echo "[bridge-hardening] ERRO: sudo pediu senha"\nexit "$rc"\n' > "${d}/ops/bridge-hardening.sh"
-  printf '#!/bin/sh\necho "cr $*" >> "$UB_ST/calls"\nrc="$(cat "$UB_ST/cr-rc" 2>/dev/null || echo 0)"\n[ "$rc" = 1 ] && echo "    FALHA CLI do SDK 2.1.50 abaixo do piso 2.1.64"\n[ "$rc" = 2 ] && echo "[chat-runner] ERRO: a unit não tem processo vivo"\nexit "$rc"\n' > "${d}/ops/chat-runner.sh"
-  chmod +x "${d}/fake/"* "${d}/ops/"*.sh
-  # origens bare com DOIS commits: a sandbox nasce no 1º, então o update não é NOOP
+  # timeout falso: com $UB_ST/hang o verify "trava" e o teto devolve 124, como o do coreutils
+  printf '#!/bin/sh\n[ -f "$UB_ST/hang" ] && exit 124\nshift\nexec "$@"\n' > "${d}/fake/timeout"
+  # os vizinhos que o wrapper chama em ${SELF_DIR}: o rc do verify sai de um arquivo de estado ("1n" = rc 1 sem FALHA).
+  # _ubstubs reescreve os três a cada caso (um caso muda o chat-runner.sh do checkout para o juiz divergir do servido).
+  _ubstubs() {
+    printf '#!/bin/sh\necho "backup: %s/bk/pre-update.tar.gpg"\n' "${d}" > "$1/bridge-backup.sh"
+    printf '#!/bin/sh\necho "bh $*" >> "$UB_ST/calls"\nrc="$(cat "$UB_ST/bh-rc" 2>/dev/null || echo 0)"\n[ "$rc" = 1 ] && echo "FALHA caminho-protegido-sumiu /x/src"\n[ "$rc" = 1n ] && { echo "[bridge-hardening] o drop-in NAO foi carregado"; exit 1; }\n[ "$rc" = 2 ] && echo "[bridge-hardening] ERRO: sudo pediu senha"\nexit "$rc"\n' > "$1/bridge-hardening.sh"
+    printf '#!/bin/sh\necho "cr $*" >> "$UB_ST/calls"\nrc="$(cat "$UB_ST/cr-rc" 2>/dev/null || echo 0)"\n[ "$rc" = 1 ] && echo "    FALHA CLI do SDK 2.1.50 abaixo do piso 2.1.64"\n[ "$rc" = 2 ] && echo "[chat-runner] ERRO: a unit não tem processo vivo"\nexit "$rc"\n' > "$1/chat-runner.sh"
+    chmod +x "$1/"*.sh
+  }
+  _ubstubs "${d}/ops"; chmod +x "${d}/fake/"*
+  # origens bare com DOIS commits: a sandbox nasce no 1º, então o update não é NOOP. O clone servido carrega os MESMOS
+  # verifies em ops/ (o update-bridge só aceita o juiz do checkout se ele for o do clone servido).
   local r g="git -c user.name=ub -c user.email=ub@bench -c init.defaultBranch=main -c advice.detachedHead=false"
   for r in clone bridge; do
     ${g} init -q "${d}/seed-${r}" && printf 'node_modules/\n' > "${d}/seed-${r}/.gitignore" && echo 1 > "${d}/seed-${r}/v" \
+      && { [ "${r}" != clone ] || { mkdir -p "${d}/seed-${r}/ops" && cp "${d}/ops/bridge-hardening.sh" "${d}/ops/chat-runner.sh" "${d}/seed-${r}/ops/"; }; } \
       && ${g} -C "${d}/seed-${r}" add -A && ${g} -C "${d}/seed-${r}" commit -qm um && echo 2 > "${d}/seed-${r}/v" \
       && ${g} -C "${d}/seed-${r}" commit -qam dois && ${g} clone -q --bare "${d}/seed-${r}" "${d}/origin-${r}.git" \
       || { record_fail "update-bridge: sandbox" "não montei a origem git ${r}"; rm -rf "${d}"; return; }
   done
   _ubreset() {
+    _ubstubs "${d}/ops"
     rm -rf "${d}/srv" "${d}/unit" "${d}/bk" "${d}/st" "${d}/lock"; mkdir -p "${d}/srv" "${d}/st" "${d}/bk" \
       "${d}/unit/onion-vps-bridge.service.d"
     ${g} clone -q "${d}/origin-clone.git" "${d}/srv/onion-evolve" && ${g} -C "${d}/srv/onion-evolve" reset -q --hard HEAD~1
@@ -10246,11 +10255,13 @@ PY
     _ubrc "${r}" 1 && _ubhas "${r}" "update NO AR e NÃO PROVADO" && _ubhas "${r}" "  - $1" && _ubhas "${r}" "ROLLBACK MANUAL" \
       && ! _ubhas "${r}" "OK — clone" && _ubrunning; }
   _ub_bh_fail() { echo 1 > "${d}/st/bh-rc"; local r; r="$(_ubr "$1")"
-    _ub_unproven "integridade (30-integrity.conf): o verify REPROVOU (1 falha(s)" "${r}" && _ubhas "${r}" "    FALHA caminho-protegido-sumiu"; }
+    _ub_unproven "integridade (30-integrity.conf): o verify REPROVOU (1 falha(s); bridge-hardening.sh verify). Cura: o caminho protegido" "${r}" \
+      && _ubhas "${r}" "    FALHA caminho-protegido-sumiu"; }
   _ub_bh_nomeasure() { echo 2 > "${d}/st/bh-rc"; local r; r="$(_ubr "$1")"
     _ub_unproven "integridade (30-integrity.conf): o verify NÃO MEDIU (rc 2): [bridge-hardening] ERRO: sudo pediu senha" "${r}"; }
   _ub_cr_fail() { echo 1 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"
-    _ub_unproven "runner do convidado (onion-chat.socket): o verify REPROVOU (1 falha(s)" "${r}" && _ubhas "${r}" "abaixo do piso 2.1.64"; }
+    _ub_unproven "runner do convidado (onion-chat.socket): o verify REPROVOU (1 falha(s); chat-runner.sh verify). Cura: '! bash ops/chat-runner.sh install --apply'" "${r}" \
+      && _ubhas "${r}" "abaixo do piso 2.1.64"; }
   _ub_cr_nomeasure() { echo 2 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"
     _ub_unproven "runner do convidado (onion-chat.socket): o verify NÃO MEDIU (rc 2)" "${r}"; }
   _ub_both() { echo 1 > "${d}/st/bh-rc"; echo 1 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"
@@ -10259,22 +10270,32 @@ PY
   _ub_rollback() { echo 1 > "${d}/st/bh-rc"; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:700}"
     _ubrc "${r}" 1 && _ubhas "${r}" "reset --hard $(_ubold)"; }
   _ub_jwks() { : > "${d}/st/nojwks"; local r; r="$(_ubr "$1")"; _ub_unproven "JWKS não confirmou neste boot" "${r}"; }
-  _ub_crash() { : > "${d}/st/crash"; local r; r="$(_ubr "$1")"; _ub_unproven "o serviço reiniciou sozinho depois do start (NRestarts 0 → 1)" "${r}"; }
-  _ub_prior() { echo 5 > "${d}/st/nrestarts"; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:500}"; _ubrc "${r}" 0 && _ubhas "${r}" "OK — clone"; }
+  _ub_crash() { echo 5 > "${d}/st/nrestarts"; : > "${d}/st/crash"; local r; r="$(_ubr "$1")"
+    _ub_unproven "o serviço reiniciou sozinho depois do start (NRestarts=1)" "${r}"; }
+  _ub_judge() { echo "# outro" >> "${d}/ops/chat-runner.sh"; local r; r="$(_ubr "$1")"
+    _ub_unproven "runner do convidado (onion-chat.socket): o chat-runner.sh deste checkout" "${r}" && ! grep -qx "cr verify" "${d}/st/calls" \
+      && grep -qx "bh verify" "${d}/st/calls"; }
+  _ub_nofalha() { echo 1n > "${d}/st/bh-rc"; local r; r="$(_ubr "$1")"
+    _ub_unproven "integridade (30-integrity.conf): o verify REPROVOU sem linha FALHA (última linha: [bridge-hardening] o drop-in NAO foi carregado)" "${r}"; }
+  _ub_hang() { : > "${d}/st/hang"; local r; r="$(_ubr "$1")"; _ub_unproven "integridade (30-integrity.conf): o verify NÃO MEDIU (rc 124)" "${r}"; }
+  _ub_sockskip() { rm -f "${d}/unit/onion-chat.socket"; echo 1 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:500}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "onion-chat.socket não instalado" && ! grep -qx "cr verify" "${d}/st/calls"; }
+  _ub_unitdir() { rm -rf "${d}/unit"; local r; r="$(_ubr "$1")"
+    _ub_unproven "integridade: não pude ler" "${r}" && _ubhas "${r}" "  - runner: não pude ler"; }
   _ub_nrbad() { : > "${d}/st/nr-bad"; local r; r="$(_ubr "$1")"; _ub_unproven "NRestarts ilegível" "${r}"; }
   _ub_skip() { rm -f "${d}/unit/onion-vps-bridge.service.d/30-integrity.conf" "${d}/unit/onion-chat.socket"
     echo 1 > "${d}/st/bh-rc"; echo 1 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:500}"
     _ubrc "${r}" 0 && _ubhas "${r}" "30-integrity.conf não instalado" && _ubhas "${r}" "onion-chat.socket não instalado" && _ubhas "${r}" "OK — clone"; }
   _ubcase "(u1) verifies OK, JWKS OK, sem reinício → rc 0 com a linha OK, os dois verifies rodaram" \
     'if [ "${#NOT_PROVEN[@]}" -gt 0 ]; then' 'if [ "${#NOT_PROVEN[@]}" -ge 0 ]; then' _ub_ok
-  _ubcase "(u2) verify do degrau 1 REPROVA → rc 1 nomeado, FALHA no stderr (o set -e matava mudo: o mutante é a forma antiga)" \
-    '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)"; rc=$?' _ub_bh_fail
+  _ubcase "(u2) verify do degrau 1 REPROVA → rc 1 nomeado com a cura, FALHA no stderr (o set -e matava mudo: o mutante é a forma antiga)" \
+    '  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' '  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)"; rc=$?' _ub_bh_fail
   _ubcase "(u3) verify do degrau 1 NÃO MEDE (rc 2) → rc 1 nomeado como NÃO MEDIU, nunca 'está bom'" \
     '    *) NOT_PROVEN+=("${label}: o verify NÃO MEDIU' '    *) _ub_x+=("${label}: o verify NÃO MEDIU' _ub_bh_nomeasure
-  _ubcase "(u4) verify do runner REPROVA (SDK abaixo do piso) → rc 1 nomeado" \
-    '  post_verify "runner do convidado (onion-chat.socket)" chat-runner.sh' '  : post_verify "runner do convidado (onion-chat.socket)" chat-runner.sh' _ub_cr_fail
+  _ubcase "(u4) verify do runner REPROVA (SDK abaixo do piso) → rc 1 nomeado com a cura" \
+    '  0) post_verify "runner do convidado (onion-chat.socket)" chat-runner.sh' '  0) : post_verify "runner do convidado (onion-chat.socket)" chat-runner.sh' _ub_cr_fail
   _ubcase "(u5) verify do runner NÃO MEDE (rc 2) → rc 1, distinto de REPROVOU" \
-    '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=1' _ub_cr_nomeasure
+    '  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' '  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=1' _ub_cr_nomeasure
   _ubcase "(u6) os dois reprovam → os dois nomeados (acumula, não para no primeiro)" \
     'for _m in "${NOT_PROVEN[@]}"; do' 'for _m in "${NOT_PROVEN[0]}"; do' _ub_both
   _ubcase "(u7) não provado → o rollback impresso traz o HEAD de ANTES do clone" \
@@ -10283,14 +10304,22 @@ PY
     "  printf '[update-bridge] serviço deixado RODANDO" "  sudo systemctl stop \"\${UNIT}\"; printf '[update-bridge] serviço deixado RODANDO" _ub_bh_fail
   _ubcase "(u9) boot sem 'JWKS OK' → rc 1 nomeado (era rc 0 com AVISO)" \
     'grep -q "JWKS OK" <<<"${BOOT}" \' 'true || grep -q "JWKS OK" <<<"${BOOT}" \' _ub_jwks
-  _ubcase "(u10) o serviço caiu e voltou depois do start (NRestarts subiu) → rc 1 nomeado (era rc 0 com AVISO)" \
-    'elif [ "${NEW_RESTARTS}" -gt "${PRE_RESTARTS}" ]; then' 'elif false; then' _ub_crash
-  _ubcase "(u11) NRestarts com histórico anterior e sem reinício novo → rc 0 (compara o DELTA, não o absoluto)" \
-    'elif [ "${NEW_RESTARTS}" -gt "${PRE_RESTARTS}" ]; then' 'elif [ "${NEW_RESTARTS}" -gt 0 ]; then' _ub_prior
+  _ubcase "(u10) caiu depois do start com 5 reinícios de antes (o start zera) → rc 1 pelo NRestarts ABSOLUTO (o delta deixava passar)" \
+    'elif [ "${NEW_RESTARTS}" -gt 0 ]; then' 'elif [ "${NEW_RESTARTS}" -gt 5 ]; then' _ub_crash
+  _ubcase "(u11) o verify do checkout NÃO é o do clone servido → rc 1, esse verify não roda (o juiz é o servido)" \
+    '  if ! sudo cmp -s "${SELF_DIR}/${wrapper}" "${CLONE}/ops/${wrapper}"; then' '  if false; then' _ub_judge
   _ubcase "(u12) NRestarts ilegível → rc 1 (não medi não é provado)" \
-    'if ! [[ "${NEW_RESTARTS}" =~ ^[0-9]+$ && "${PRE_RESTARTS}" =~ ^[0-9]+$ ]]; then' 'if false; then' _ub_nrbad
+    'if ! [[ "${NEW_RESTARTS}" =~ ^[0-9]+$ ]]; then' 'if false; then' _ub_nrbad
   _ubcase "(u13) drop-in e socket NÃO instalados → verifies não rodam, rc 0, cada um declarado" \
-    'if sudo test -f "${UNIT_DIR}/${UNIT}.service.d/30-integrity.conf"; then' 'if true; then' _ub_skip
+    '_st=0; installed_or_unreadable "${UNIT_DIR}/${UNIT}.service.d/30-integrity.conf" || _st=$?' '_st=0' _ub_skip
+  _ubcase "(u14) só o socket ausente → o verify do runner não roda, rc 0" \
+    '_st=0; installed_or_unreadable "${UNIT_DIR}/onion-chat.socket" || _st=$?' '_st=0' _ub_sockskip
+  _ubcase "(u15) verify rc 1 SEM linha FALHA → o motivo (a última linha) vai nomeado, nunca '0 falha(s)'" \
+    '       if [ "${n}" = 0 ]; then' '       if false; then' _ub_nofalha
+  _ubcase "(u16) verify que trava → o teto devolve 124 e vira NÃO MEDIU, rc 1" \
+    '  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' _ub_hang
+  _ubcase "(u17) diretório das units ilegível (sudo falhou) → rc 1, nunca 'não se aplica'" \
+    $'  return 2\n}' $'  return 1\n}' _ub_unitdir
   rm -rf "${d}"
 }
 
