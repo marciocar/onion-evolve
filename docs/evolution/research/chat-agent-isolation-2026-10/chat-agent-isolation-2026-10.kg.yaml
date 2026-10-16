@@ -20,7 +20,10 @@ meta:
                                # Gatilhos antecipados: (1) [LIDOS na rodada de primárias de 2026-10-15]; (2) o degrau
                                # 0 ou 1 ser aplicado no vivo; (3) update do Claude Code/SDK no bridge.
   # kg-backlog-guard: on
-  # ═══ TETO: 134 NÓS ═══
+  # ═══ TETO: 136 NÓS ═══
+  #   DEGRAU 2 CONSTRUÍDO (2026-10-16, +2): o spike do WORKSPACE que o E_SPIKE2 deixou aberto (opções medidas com units de
+  #   runtime, a escolhida e por quê) e a construção com o dogfood real (units de runtime + o SDK do bridge, sem chamar a
+  #   API) e os modos de falha, cada um dizendo o que confirma, o que corrige e o teto que fica.
   #   SELOS DOS DEGRAUS 2 E 3 (2026-10-16, +2): as respostas do maestro «Construir já, instalar com você» (degrau 2)
   #   e «Depois do degrau 2» (degrau 3) nascem como nós PRÓPRIOS ligados ao selo «1 já, 2 e 3 por spike», pelo
   #   selador (kg-decide-seal.sh), antes de qualquer construção.
@@ -2109,6 +2112,40 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
+  - id: E_DEGRAU2_WORKSPACE_SPIKE_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "socket Accept=yes + template de RUNTIME (diretório volátil de units, removido ao fim) com DynamicUser, User por instância e SupplementaryGroups de um grupo TEMPORÁRIO; fixture de estado espelhando o do bridge (0750 da conta do papel do serviço); 0 unit, 0 arquivo e 0 grupo restantes"
+    label: "SPIKE DO WORKSPACE (degrau 2): o UID dinâmico alcança o workspace e a HOME do CLI por GRUPO com ACL padrão, com o estado do bridge escondido por TemporaryFileSystem; o nome da instância e o fd passado não servem. ESCOLHE grupo + ACL padrão + devolver-ao-grupo pelo dono."
+    narrative: "Medido em 2026-10-16. (1) StateDirectory/BindPaths por INSTÂNCIA não servem: com Accept=yes num socket unix o nome da instância é <n>-<PID>-<UID> do par (medido: 0-2975316-1000), sem nada que o bridge escolha, e o UID muda a cada conexão, então nenhum diretório por instância persiste entre turnos (o resume relê o transcrito do turno anterior). (2) fd do diretório passado pela conexão (SCM_RIGHTS) com o estado escondido: a leitura relativa funciona, mas getcwd falha (EACCES) e o CLI trabalha com caminho absoluto. (3) GRUPO + ACL PADRÃO: com TemporaryFileSystem no diretório de estado e BindPaths dos workspaces e das HOMEs, um grupo estático em SupplementaryGroups e ACL padrão (grupo e conta do serviço rwx) nas raízes, o UID dinâmico lê o que o serviço criou com umask fechada (a ACL padrão vence a umask), grava 0660, não lista a pasta-mãe (só travessia), e o serviço lê o que ele criou. Duas lições: o pai 0750 bloqueia a travessia mesmo com tmpfs abaixo dele (o tmpfs tem de ser o próprio diretório de estado), e arquivo criado com modo explícito 0600/0700 (o CLI faz isso na HOME) fecha a máscara da ACL: o próximo UID e o serviço não leem. Cura medida: o DONO (o UID da sessão) devolve ao grupo no fim; o find coletivo falha porque a pasta-mãe só tem travessia, então o lançador conhece o caminho. (4) Cópia de entrada/saída pela conexão: descartada sem medir o custo, pela corrida entre turnos simultâneos do mesmo workspace e pelo git do bridge. TETO DECLARADO: o grupo é compartilhado — um convidado alcança o workspace e a HOME de OUTRO pelo nome (hash não listável), e o que o impede é o degrau 0 (sem execução, guarda de leitura fora do cwd), não o UID; a chave da API chega ao CLI, como hoje (degrau 5); o UID dinâmico é reciclado pelo systemd, e o 'só o que é meu' do devolver-ao-grupo vale para quem herdar o número (hipótese, sem isolamento por UID a perder: o grupo já é comum)."
+    trace: "sondas do scratchpad da sessão: s2w/probe.py, s2w/gen.py, s2w/up.sh, s2w/down.sh, s2w/harness.py"
+    provenance:
+      source: "systemd 255.4 do host + acl 2.3 (setfacl/getfacl)"
+      locator: "Accept=yes (nome da instância), SupplementaryGroups=, TemporaryFileSystem=, BindPaths=, ACL padrão (d:g:, d:u:, máscara)"
+      method: "medição: units de runtime e grupo temporário removidos ao fim; o papel do serviço feito pelo operador sobre um fixture"
+      locality: "host"
+
+  - id: E_DEGRAU2_CONSTRUIDO_DOGFOOD_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-16"
+    verified_against: "ops/chat-runner.sh (core-only) em modo de teste contra um fixture com o systemd REAL para as units do runner (só no diretório volátil) e o bridge falso; o SDK 0.3.232 do bridge com a política real do convidado e o runnerSpawn deste PR; API falsa local (400 na hora; um buraco negro para requisição em voo); bancada do bridge (44+ mutantes) e família chat_runner do core"
+    label: "DEGRAU 2 CONSTRUÍDO E PROVADO EM RUNTIME: o convidado roda o CLI sob um UID dinâmico por conexão, com resume entre UIDs, sessões simultâneas em UIDs distintos, recusa sem derrubar o bridge e o CLI morto no fim da conexão. Falta só o --apply do maestro e a flag ligada."
+    narrative: "Medido em 2026-10-16. CONSTRUÍDO: no bridge, o lançador SUPERVISOR (allowlist de flags e valores que EXIGE a política do convidado, inclusive a deny de escrita na config do próprio workspace; cwd de workspace sem symlink; HOME derivada do slug; ambiente montado por ele; os dois sentidos não bloqueantes com contrapressão; mata o CLI no fim da conexão; devolve ao grupo antes de fechar, fora do .git), os modelos do socket (Accept=yes) e do template (DynamicUser, User=onion-chat-%i, CollectMode=inactive-or-failed, ProtectHome, ProtectProc, TemporaryFileSystem do estado), o spawnClaudeCodeProcess sobre o socket só para o CONVIDADO atrás de CHAT_RUNNER_SOCKET (desligado por padrão, sem fallback), a HOME do CLI por workspace com cópia única dos transcritos de antes, e o .git fora da ACL. No core, o wrapper (ensaio por padrão; --apply root do maestro) com allowlist FECHADA de diretivas e valores exatos, bytes de controle recusados, as propriedades EFETIVAS conferidas no systemctl show, o degrau 1 como pré-condição, as ACLs aplicadas como a dona, o aperto de mão real pelo socket com a identidade lida do journal, e o drop-in que liga a flag. DOGFOOD (sem chamar a API): o ensaio mediu na unit transitória ProtectHome com o pai da home modo 0, o estado como tmpfs, 7 caminhos de segredo e de código inalcançáveis e o environ do bridge ilegível; o --apply e o verify passaram 35 checagens; um turno inteiro do SDK correu pelo socket (init, assistant, result) num workspace anterior ao --apply e num novo; o resume com OUTRO UID achou o transcrito (mesmo session_id); duas sessões simultâneas ganharam UIDs distintos; a política de admin (bypass) e um cwd fora da raiz deram exit 64 sem derrubar nada; com a requisição em voo, o abort do SDK derrubou o CLI em ~5 s (fim da entrada + destroy), não no RuntimeMaxSec; o SIGKILL do lançador deixou o devolver-ao-grupo para o ExecStopPost (1 ajuste); nenhuma instância falha ficou carregada. ACHADOS DO DOGFOOD, curados: a recusa do lançador chegava como ECONNRESET e o readline do SDK, sem handler, DERRUBAVA o processo do bridge (os streams do SpawnedProcess agora são do bridge); o destroy que vem depois do fim da entrada só era visto no fim do grace (POLLHUP a cada volta); o CLI re-tenta 401 (a API falsa passou a 400). REFUTADOR em duas passadas: 19 achados — ACL como root seguindo symlink, rollback por --restore que seguia diretório trocado, units vindas de um clone gravável, ensaio vazio de prova, deadlock do supervisor, NUL que separa linha só para o systemd, valores fracos aceitos, o .git aberto ao grupo, o resume das conversas antigas, a corrida do devolver-ao-grupo e a identidade da instância — curados com caso de bancada e mutante; declarados como teto: gpasswd/usermod no grupo e python -c no MOAT, o resíduo de ACL no rollback e a reciclagem de UID. NÃO MEDIDO: o --apply no host real, um turno real com a API e um convidado logado, o ensaio do wrapper contra o bridge SERVIDO (ele recusa até o deploy do bridge com o runner: medido), e a primeira cópia de transcritos com conversas reais."
+    trace: "ops/chat-runner.sh (core-only); sondas do scratchpad da sessão: df/up.sh, df/down.sh, df/fakeapi.py e os harnesses do SDK na worktree do bridge"
+    provenance:
+      source: "systemd 255.4 do host + SDK @anthropic-ai/claude-agent-sdk 0.3.232 do onion-bridge (CLI 2.1.232) + os dois PRs deste degrau"
+      locator: "ops/chat-runner.sh install/verify; deploy/chat-runner/ e src/chat-runner.ts do bridge"
+      method: "medição: units de runtime, grupo temporário e fixture removidos ao fim; API falsa no loopback; journal do lançador"
+      locality: "host"
+
 edges:
   - from: E_SECDEP_PROXY_PATTERN_PLATFORM
     to: Q_CHAT_AGENT_ISOLATION_2026
@@ -2662,3 +2699,24 @@ edges:
   - from: D_MAESTRO_DEGRAU3_DEPOIS_DO_DEGRAU2_1016
     to: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
     edge_type: TRACES_TO
+  - from: E_DEGRAU2_WORKSPACE_SPIKE_1016
+    to: D_MAESTRO_DEGRAU2_CONSTRUIR_JA_1016
+    edge_type: TRACES_TO
+  - from: E_DEGRAU2_WORKSPACE_SPIKE_1016
+    to: C_SUPERACAO_20261015_DYNAMICUSER_RUNNER_PER_SESSION
+    edge_type: CONSTRAINS
+  - from: E_DEGRAU2_WORKSPACE_SPIKE_1016
+    to: E_OBJECAO_24_SHARED_RUNNER_MIXES_TENANTS
+    edge_type: SUPPORTS
+  - from: E_DEGRAU2_CONSTRUIDO_DOGFOOD_1016
+    to: D_MAESTRO_DEGRAU2_CONSTRUIR_JA_1016
+    edge_type: TRACES_TO
+  - from: E_DEGRAU2_CONSTRUIDO_DOGFOOD_1016
+    to: C_OPCAO_2_SEPARATE_UID_RUNNER
+    edge_type: SUPPORTS
+  - from: E_DEGRAU2_CONSTRUIDO_DOGFOOD_1016
+    to: C_SUPERACAO_20261015_SOCKET_ACTIVATED_PRIVILEGED_LAUNCHER
+    edge_type: SUPPORTS
+  - from: E_DEGRAU2_CONSTRUIDO_DOGFOOD_1016
+    to: C_SUPERACAO_20261015_TEARDOWN_BY_CHANNEL_EOF
+    edge_type: CONSTRAINS
