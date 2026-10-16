@@ -185,18 +185,25 @@ EXACT = {
     "RuntimeDirectory": "onion-chat/%i", "CollectMode": "inactive-or-failed",
     "Environment": "ONION_CHAT_WS_ROOT=%s/workspaces ONION_CHAT_HOME_ROOT=%s/chat-homes ONION_CHAT_CLAUDE=/run/onion-chat-bin/claude" % (state, state),
     "ExecStart": "/usr/bin/python3 -I /run/onion-chat-bin/launcher.py",
-    "ExecStopPost": "/usr/bin/python3 -I /run/onion-chat-bin/launcher.py --fixup"},
-  "socket": {"ListenStream": sock, "Accept": "yes", "SocketUser": svc, "SocketGroup": svc, "SocketMode": "0600"},
+    "ExecStopPost": "/usr/bin/python3 -I /run/onion-chat-bin/launcher.py --fixup",
+    "RuntimeMaxSec": "1800", "TimeoutStopSec": "10", "UMask": "0007", "PrivateDevices": "yes",
+    "ProtectKernelTunables": "yes", "ProtectKernelModules": "yes", "ProtectKernelLogs": "yes", "ProtectControlGroups": "yes",
+    "ProtectClock": "yes", "ProtectHostname": "yes", "RestrictNamespaces": "yes", "RestrictRealtime": "yes",
+    "LockPersonality": "yes", "SystemCallArchitectures": "native", "RestrictAddressFamilies": "AF_UNIX AF_INET AF_INET6",
+    "MemoryMax": "2G", "TasksMax": "256"},
+  "socket": {"ListenStream": sock, "Accept": "yes", "SocketUser": svc, "SocketGroup": svc, "SocketMode": "0600",
+             "MaxConnections": "32", "WantedBy": "sockets.target"},
 }[kind]
-FREE = {"service": {"Description", "SyslogIdentifier", "RuntimeMaxSec", "TimeoutStopSec", "UMask", "PrivateDevices",
-                    "ProtectKernelTunables", "ProtectKernelModules", "ProtectKernelLogs", "ProtectControlGroups", "ProtectClock",
-                    "ProtectHostname", "RestrictNamespaces", "RestrictRealtime", "LockPersonality", "SystemCallArchitectures",
-                    "RestrictAddressFamilies", "MemoryMax", "TasksMax"},
-        "socket": {"Description", "MaxConnections", "WantedBy"}}[kind]
+FREE = {"service": {"Description", "SyslogIdentifier"}, "socket": {"Description"}}[kind]
 BIND_RO = {claude + ":/run/onion-chat-bin/claude", libexec + "/launcher.py:/run/onion-chat-bin/launcher.py"}
 SECTIONS = {"service": {"[Unit]", "[Service]"}, "socket": {"[Unit]", "[Socket]", "[Install]"}}[kind]
 seen, binds, bad = {}, set(), []
-for n, line in enumerate(open(f, encoding="utf-8"), 1):
+raw = open(f, "rb").read()
+ctl = sorted({b for b in raw if (b < 0x20 and b not in (0x0a, 0x09)) or b == 0x7f})
+if ctl:
+    print("byte de controle no modelo (o systemd quebra linha em NUL; o parser daqui não): %s" % ",".join("0x%02x" % b for b in ctl))
+    sys.exit(1)
+for n, line in enumerate(raw.decode("utf-8").split("\n"), 1):
     line = line.rstrip("\n")
     if not line.strip() or line.lstrip().startswith(("#", ";")):
         continue
@@ -376,6 +383,54 @@ sys.exit(0 if okh and okr else 1)
 PY
 }
 
+# o que o systemd CARREGOU (refutador, passada 2, achados 1 e 7): o parser do wrapper pode divergir do systemd, e drop-ins
+# de onion-chat@.service ou do socket mudariam a instância sem passar pela allowlist. Uma instância de sonda NÃO é iniciada:
+# `systemctl show` de um nome de instância só carrega o template.
+effective_props() {
+  local out nf=0 dp
+  out="$(systemctl show onion-chat@verify.service -p DynamicUser -p User -p ExecStartPre -p ExecStartPost -p ExecStart -p ProtectHome -p TemporaryFileSystem -p PrivateTmp 2>/dev/null)"
+  grep -qx 'DynamicUser=yes' <<<"${out}" || { echo "    FALHA efetivo: DynamicUser não é yes"; nf=$((nf+1)); }
+  grep -qx 'User=onion-chat-verify' <<<"${out}" || { echo "    FALHA efetivo: User não é onion-chat-<instância> ($(grep '^User=' <<<"${out}"))"; nf=$((nf+1)); }
+  grep -qx 'ExecStartPre=' <<<"${out}" && grep -qx 'ExecStartPost=' <<<"${out}" || { echo "    FALHA efetivo: há ExecStartPre/ExecStartPost"; nf=$((nf+1)); }
+  grep -q '^ExecStart=.*argv\[\]=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py ;' <<<"${out}" || { echo "    FALHA efetivo: ExecStart não é o lançador"; nf=$((nf+1)); }
+  grep -qx 'ProtectHome=yes' <<<"${out}" || { echo "    FALHA efetivo: ProtectHome não é yes"; nf=$((nf+1)); }
+  for u in onion-chat@verify.service "${SOCKET_UNIT}"; do
+    dp="$(systemctl show -p DropInPaths --value "${u}" 2>/dev/null)"
+    # na bancada/dogfood o drop-in de ensaio (50-dogfood*) é declarado; em produção nenhum drop-in é aceito
+    [ "${TEST}" = 1 ] && dp="$(tr ' ' '\n' <<<"${dp}" | grep -v '/50-dogfood[^/]*$' | paste -sd' ' -)"
+    [ -z "${dp// /}" ] || { echo "    FALHA efetivo: drop-in(s) em ${u}: ${dp}"; nf=$((nf+1)); }
+  done
+  [ "${nf}" = 0 ] && echo "    OK efetivo: DynamicUser=yes, User=onion-chat-%i, só o ExecStart do lançador, ProtectHome=yes, sem drop-in"
+  [ "${nf}" = 0 ]
+}
+
+# a identidade da instância REAL (refutador, passada 2, achado 6): o aperto de mão só prova que o CLI respondeu. O lançador
+# registra o UID de cada sessão e de cada recusa; desde <ts>, os dois têm de existir e não ser o UID do serviço nem 0
+runner_identity() {
+  local j su uid ok_s=0 ok_r=0
+  su="$(id -u "${SVC_USER}" 2>/dev/null)"
+  j="$(priv journalctl -t onion-chat --since "@$1" --no-pager -o cat 2>/dev/null)"
+  for uid in $(grep -oE 'chat-runner: sessão uid=[0-9]+' <<<"${j}" | grep -oE '[0-9]+$'); do
+    [ "${uid}" != 0 ] && [ "${uid}" != "${su}" ] && ok_s=1
+  done
+  for uid in $(grep -oE 'chat-runner: RECUSA uid=[0-9]+' <<<"${j}" | grep -oE '[0-9]+$'); do
+    [ "${uid}" != 0 ] && [ "${uid}" != "${su}" ] && ok_r=1
+  done
+  [ "${ok_s}" = 1 ] && echo "    OK a sessão do aperto de mão rodou sob UID próprio (journal)" || echo "    FALHA o journal não mostra a sessão sob UID próprio"
+  [ "${ok_r}" = 1 ] && echo "    OK a recusa veio do lançador sob UID próprio (journal), não de outro fechamento" || echo "    FALHA o journal não mostra a RECUSA do lançador"
+  [ "${ok_s}" = 1 ] && [ "${ok_r}" = 1 ]
+}
+
+# nenhum .git de workspace aberto ao grupo (refutador, passada 2, achado 3: o bridge roda git nele como a conta do serviço)
+gitdirs_private() {
+  local g bad=0
+  while IFS= read -r -d '' g; do
+    if as_svc getfacl -p --omit-header -- "${g}" 2>/dev/null | grep -q "group:${GROUP}:"; then echo "    FALHA .git aberto ao grupo: ${g}"; bad=1; fi
+  done < <(as_svc find "${WS_ROOT}" -mindepth 2 -maxdepth 2 -name .git -type d -print0 2>/dev/null)
+  [ "${bad}" = 0 ] && echo "    OK nenhum .git de workspace aberto ao grupo ${GROUP}"
+  [ "${bad}" = 0 ]
+}
+
 acl_has() {   # acl_has <caminho> <entrada exata do getfacl>
   priv getfacl -p --omit-header -- "$1" 2>/dev/null | grep -qx -- "$2"
 }
@@ -406,9 +461,13 @@ verify_all() {
     priv cat "${UNIT_DIR}/${TEMPLATE_UNIT}" > "${TMPD}/installed.service"
     run_sandbox_probe "${TMPD}/installed.service" 1 "${LIBEXEC}/launcher.py" || vbad "o sandbox do template instalado reprovou (linhas FALHA acima)"
   else vbad "sem template instalado para medir o sandbox"; fi
+  effective_props || vbad "as propriedades EFETIVAS das units do runner divergem do exigido (linhas acima)"
   echo "-- pelo socket, como a conta do serviço:"
+  local since; since="$(date +%s)"
   handshake | sed 's/^/    /'; rc="${PIPESTATUS[0]}"
   [ "${rc}" = 0 ] || vbad "o aperto de mão ou a recusa pelo socket reprovou"
+  runner_identity "${since}" || vbad "o journal não prova a identidade da instância real (linhas acima)"
+  gitdirs_private || vbad "um .git de workspace está aberto ao grupo do runner (linhas acima)"
   pid="$(systemctl show -p MainPID --value "${UNIT}" 2>/dev/null)"
   dp="$(systemctl show -p DropInPaths --value "${UNIT}" 2>/dev/null)"
   case " ${dp} " in *"/${DROPIN_NAME} "*) vok "o ${DROPIN_NAME} está carregado na unit ${UNIT}" ;; *) vbad "o ${DROPIN_NAME} NÃO está carregado na unit ${UNIT}" ;; esac
@@ -517,6 +576,8 @@ EOF
   # estado); tira só as entradas que este wrapper pôs, como a dona, sem seguir symlink (-P). O backup fica como registro.
   echo "  sudo setfacl -x g:${GROUP} -- ${STATE}" >&2
   echo "  sudo -u ${SVC_USER} setfacl -R -P -x g:${GROUP},u:${SVC_USER},d:g:${GROUP},d:u:${SVC_USER} -- ${WS_ROOT} ${HOME_ROOT}   # registro em ${BK}/acl-state.txt" >&2
+  echo "  # RESÍDUO declarado: arquivos criados pelos UIDs do runner seguem com a ACL do grupo (a dona não muda ACL alheia)" >&2
+  echo "  # e a máscara padrão das raízes fica; sem o grupo, as entradas viram GID órfão — inofensivo, mas não some" >&2
   [ "${created_home}" = 1 ] && echo "  sudo rm -rf ${HOME_ROOT}   # criado nesta execução (só HOMEs do CLI do runner)" >&2
   [ "${created_group}" = 1 ] && echo "  sudo groupdel ${GROUP}   # criado nesta execução" >&2
   return 0
@@ -542,11 +603,15 @@ fi
 priv setfacl -m "g:${GROUP}:--x" -- "${STATE}" || fail_after "setfacl em ${STATE} falhou"
 for d in "${WS_ROOT}" "${HOME_ROOT}"; do
   as_svc setfacl -m "g:${GROUP}:--x,d:g:${GROUP}:rwx,d:u:${SVC_USER}:rwx,d:m::rwx" -- "${d}" || fail_after "setfacl em ${d} falhou"
-  as_svc find "${d}" -mindepth 1 -xdev -user "${SVC_USER}" \( -type f -o -type d \) -exec setfacl -m "g:${GROUP}:rwX,u:${SVC_USER}:rwX" -- {} + \
+  # o .git de cada workspace fica FORA (refutador, passada 2, achado 3): o bridge roda git nele como a conta do serviço
+  as_svc find "${d}" -mindepth 1 -xdev -name .git -prune -o -user "${SVC_USER}" \( -type f -o -type d \) -exec setfacl -m "g:${GROUP}:rwX,u:${SVC_USER}:rwX" -- {} + \
     || fail_after "ACL do grupo no que já existe em ${d} falhou"
-  as_svc find "${d}" -mindepth 1 -xdev -user "${SVC_USER}" -type d -exec setfacl -m "d:g:${GROUP}:rwx,d:u:${SVC_USER}:rwx,d:m::rwx" -- {} + \
+  as_svc find "${d}" -mindepth 1 -xdev -name .git -prune -o -user "${SVC_USER}" -type d -exec setfacl -m "d:g:${GROUP}:rwx,d:u:${SVC_USER}:rwx,d:m::rwx" -- {} + \
     || fail_after "ACL padrão no que já existe em ${d} falhou"
 done
+while IFS= read -r -d '' g; do
+  as_svc setfacl -R -P -b -- "${g}" || fail_after "não tirei as ACLs de ${g}"
+done < <(as_svc find "${WS_ROOT}" -mindepth 2 -maxdepth 2 -name .git -type d -print0)
 say "ACLs aplicadas: ${STATE} (travessia), ${WS_ROOT} e ${HOME_ROOT} (travessia + padrão), e cada workspace/HOME existente"
 for d in "${WS_ROOT}/${PROBE_SLUG}" "${HOME_ROOT}/${PROBE_SLUG}"; do
   as_svc mkdir -p -- "${d}" || fail_after "não criei o workspace de sonda ${d}"
@@ -561,7 +626,10 @@ priv systemctl enable "${SOCKET_UNIT}" >/dev/null 2>&1 || fail_after "enable ${S
 priv systemctl restart "${SOCKET_UNIT}" || fail_after "restart ${SOCKET_UNIT} falhou"
 say "lançador e units instalados; ${SOCKET_UNIT} ativo"
 # o runner tem de responder ANTES de o bridge passar a usá-lo
+HS_SINCE="$(date +%s)"
 handshake | sed 's/^/    /'; [ "${PIPESTATUS[0]}" = 0 ] || fail_after "o aperto de mão pelo socket reprovou: o bridge NÃO foi ligado ao runner"
+effective_props || fail_after "as propriedades efetivas das units do runner divergem: o bridge NÃO foi ligado ao runner"
+runner_identity "${HS_SINCE}" || fail_after "o journal não prova a identidade da instância: o bridge NÃO foi ligado ao runner"
 
 priv install -d -m 0755 "${DROPIN_DIR}" || fail_after "não criei ${DROPIN_DIR}"
 priv install "${own[@]}" -m 0644 "${TMPD}/${DROPIN_NAME}" "${DROPIN_DIR}/${DROPIN_NAME}" || fail_after "não instalei o ${DROPIN_NAME}"
