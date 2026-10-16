@@ -2,8 +2,7 @@
 branch: feat/adopter-shape-cures
 pr: 1159
 date: 2026-10-15
-reviewed_diff_sha256: ecfa4fd2c0367db0ec98f3da009fd948667ec61b33bfeb2bb4674937a9e015dd
-reviewed_code_sha256: 4324a2224a7ca40e6f32e88a22ad1ba00f1dcc94d16e7e917d64f32abc1e5206
+reviewed_diff_sha256: pendente
 findings_total: 13
 findings_real: 10
 tokens: 177543
@@ -117,3 +116,12 @@ O resíduo do #1156 fica como está na main, e este PR leva apenas o próprio. O
 (`docs/backlog.md`, `docs/onion/testing-inventory.md`) foram resolvidos pelo lado da main e regenerados pelo
 `pr-finalize`. O código do PR 2 não mudou no rebase. A re-revisão foi feita por mim, não pelo refutador:
 re-rodei as famílias afetadas com `LC_ALL=C`.
+
+## Re-revisão (CI do #1159, plugin-bundle)
+
+A faixa 4 do CI reprovou dois casos de `plugin-bundle`. No (a), o comentário que este PR acrescentou ao
+`pretooluse-env-guard.sh` citava a regex com o caminho da pasta de hooks do core, que no plugin não resolve
+(HARD 74). No (b2), a baseline de caminho nu cresceu de 81 para 82. A cura foi pela FORMA: o comentário
+descreve o padrão sem o caminho, e a baseline não cresce. Só o comentário mudou, sem código executável. A
+re-revisão foi minha: as famílias `plugin_bundle`, `env_exposure` e `plugin_bare_path` deram 26/0 com
+`LC_ALL=C`, e o pré-voo deu 74/0.
