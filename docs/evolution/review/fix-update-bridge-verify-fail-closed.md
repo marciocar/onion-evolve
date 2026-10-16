@@ -2,8 +2,7 @@
 branch: fix/update-bridge-verify-fail-closed
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: 9a00fc12f4730166a77b7f038a113e65c2b5910352dfefdcf4dac867842dc189
-reviewed_code_sha256: 2b2f488c2ab7fc66b5cbcf5e266bfbcda250e1cc331d9d74285c5e8acbda1edf
+reviewed_diff_sha256: pendente
 findings_total: 14
 findings_real: 13
 tokens: 259577
@@ -66,3 +65,12 @@ Nó: `E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016` no grafo da rodada r12.
 - Os wrappers vizinhos devolvem rc 1 quando o sudo falha, e isso aparece aqui como REPROVOU, não como NÃO MEDIU.
 - Moat-targets: não se aplica, porque nenhum caminho servido novo foi criado.
 - O NOOP agora roda os verifies, que só leem, mas com sudo: ele fica mais lento do que o NOOP de antes.
+
+## Re-revisão (rebase sobre origin/main 9ae5e233)
+
+O rebase trouxe a SAC-155, o censo do SDK, que também mexe no grafo r12 e na bancada. O hash de código mudou só pelo contexto: as linhas
+adicionadas e removidas de `ops/update-bridge.sh` e `.claude/validation/lint-selftest.sh` são IDÊNTICAS antes e depois. Medido com
+`diff` das linhas `+`/`-` de `git diff 5179e467 af7d7c5a` contra as de `git diff origin/main HEAD`, saída vazia. O conflito real ficou no grafo
+r12: os dois nós (o E_CENSO_MEDE_O_CLI_DO_SDK_1016 da main e o deste PR) foram mantidos, e a linha do teto foi para 16 nós. Radar e
+contrato saíram com rc 0 depois da resolução, e o pré-voo do pr-finalize também ficou verde. Não houve nova passada de agente: a re-revisão é essa conferência
+mecânica, declarada aqui.
