@@ -79,7 +79,10 @@ medição que o justificaria.
   de um arquivo de configuração (`CC_DELTA_SDK_TARGETS`; no core, o arquivo de alvos da oficina), mede
   o `--version` do binário do SDK como a conta dona, cruza com o `claudeCodeVersion` do package.json
   e avisa quando ele está N versões atrás do host. Alvo inalcançável é **NÃO MEDIDO** com rc, nunca
-  versão vazia; sem arquivo, a linha diz "nenhum alvo declarado".
+  versão vazia; sem arquivo, a linha diz "nenhum alvo declarado". O arquivo de alvos **é código**: lê-lo
+  executa o binário nomeado com o poder da conta declarada. Por isso o medidor recusa a perna do SDK
+  rodando como root, nunca usa conta root, e exige que o binário real fique na árvore `node_modules`
+  do pacote, seja da conta declarada e não seja gravável por outros.
 - **Não substitui o juiz por regex.** O sinal de ids de modelo fora da allowlist é fato, não ligação.
 - **Não roda offline.** Sem o CHANGELOG oficial o medidor sai rc 2 e declara a lacuna; nunca
   reconstrói o delta de memória.

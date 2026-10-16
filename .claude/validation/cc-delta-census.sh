@@ -108,11 +108,19 @@ TMPD="$(mktemp -d)"; trap 'rm -rf "${TMPD}"' EXIT
 # ── o CLI embutido no Agent SDK de quem serve (SAC-155) ─────────────────────────────────────
 # Uma linha por alvo em ${TMPD}/sdk.tsv: rótulo · n · rc do package.json · rc do binário · motivo do pacote ·
 # motivo do binário; as saídas brutas em sdk-<n>.pkg / sdk-<n>.bin. O Python lê e julga; aqui só se mede.
-# A FORMA do alvo é fechada (refutador, passada 1, 2026-10-16): a conta nunca é root, o pacote é o package.json
-# do @anthropic-ai/claude-agent-sdk e o binário é o `claude` de um pacote-irmão na MESMA árvore node_modules.
-# Sem isso, uma linha no arquivo de alvos (ou uma variável herdada) fazia o medidor que "só lê" executar
-# qualquer binário como root: medido com um alvo que lia /etc/shadow. O teto que resta: o binário roda com o
-# poder da conta dona do SDK, que é a mesma que já o executa em produção.
+# ── FRONTEIRA DE CONFIANÇA (refutador, passadas 1 e 2, 2026-10-16) ──
+# O ARQUIVO DE ALVOS (e a variável) É CÓDIGO: lê-lo é EXECUTAR o binário que ele nomeia, com o poder da conta
+# declarada — e, se essa conta tem sudo sem senha, com o poder dela inteiro. Por isso:
+#   · o censo rodando como ROOT recusa a perna do SDK inteira (passada 2: conta `-` sob root executava como uid 0);
+#   · a conta declarada nunca é root nem uid 0;
+#   · a FORMA do caminho é a do SDK (pacote em node_modules/@anthropic-ai/claude-agent-sdk/, binário `claude` num
+#     irmão @anthropic-ai/claude-agent-sdk-<plataforma>/) E O LOCAL REAL também: os caminhos são resolvidos
+#     (readlink -f) COMO A CONTA, o binário real tem de ficar na mesma árvore node_modules real do pacote, ser
+#     DA conta declarada e não ser gravável por outros (nem o diretório dele); executa-se o caminho resolvido.
+#     Passada 2: só o nome era fechado, e um `claude` em qualquer node_modules (no /tmp, no checkout) rodava.
+# TETO declarado: a conta `-` é quem roda o censo — o binário tem o poder de quem o roda, como qualquer script do
+# repo; entre a checagem e a execução há janela (TOCTOU) que só a conta dona ou root conseguem usar; e o grupo
+# pode escrever (a instalação do bridge é 775/664 com o grupo da própria conta, medido em 2026-10-16).
 SDK_CONF="${CC_DELTA_SDK_TARGETS-}"
 if [ -z "${CC_DELTA_SDK_TARGETS+x}" ]; then
   SDK_CONF="${REPO}/ops/cc-sdk-targets.tsv"
@@ -127,7 +135,11 @@ _sdk_bad() {  # <rótulo> <motivo>: alvo que não chega a ser medido (vira NÃO 
   printf '%s\t-\t-\t-\t%s\t\n' "$1" "$2" >> "${TMPD}/sdk.tsv"
 }
 _clip() { head -c 160 "$1" 2>/dev/null | tr '\t\n\r' '   '; }
-if [ -n "${SDK_CONF}" ]; then
+# CC_DELTA_UID=0 só FORÇA a recusa (bancada que não roda como root); nunca afrouxa
+_uid="$(id -u)"; [ "${CC_DELTA_UID:-}" = 0 ] && _uid=0
+if [ -n "${SDK_CONF}" ] && [ "${_uid}" = 0 ]; then
+  _sdk_bad "(alvos)" "o censo roda como root: recuso executar binário de SDK com uid 0 (rode como o operador)"
+elif [ -n "${SDK_CONF}" ]; then
   if [ ! -f "${SDK_CONF}" ] || [ ! -r "${SDK_CONF}" ]; then
     _sdk_bad "(alvos)" "o arquivo de alvos declarado não existe ou não é legível: ${SDK_CONF}"
   else
@@ -160,6 +172,30 @@ if [ -n "${SDK_CONF}" ]; then
           _sdk_bad "${lb}" "linha ${ln}: o binário tem de ser o claude de @anthropic-ai/claude-agent-sdk-<plataforma> na mesma árvore node_modules do package.json, ou -"; continue
         fi
       fi
+      # o LOCAL REAL, resolvido como a conta (a home dela pode ser fechada para quem roda o censo)
+      own="${usr}"; [ "${own}" = "-" ] && own="$(id -un)"
+      rn="$(_as "${usr}" /usr/bin/env -i PATH=/usr/bin:/bin readlink -e -- "${nm}" 2> "${TMPD}/rl.err")"; rrc=$?
+      if [ "${rrc}" != 0 ] || [ -z "${rn}" ]; then
+        _sdk_bad "${lb}" "linha ${ln}: inalcançável como a conta ${own}: o node_modules não resolve (readlink rc=${rrc}: $(_clip "${TMPD}/rl.err"))"; continue
+      fi
+      rp="$(_as "${usr}" /usr/bin/env -i PATH=/usr/bin:/bin readlink -f -- "${pkg}" 2>/dev/null)"
+      if [ "${rp}" != "${rn}/@anthropic-ai/claude-agent-sdk/package.json" ]; then
+        _sdk_bad "${lb}" "linha ${ln}: o package.json real (${rp:-irresolúvel}) não fica em node_modules/@anthropic-ai/claude-agent-sdk/ de ${rn:-?}"; continue
+      fi
+      if [ "${bin}" != "-" ]; then
+        rb="$(_as "${usr}" /usr/bin/env -i PATH=/usr/bin:/bin readlink -f -- "${bin}" 2>/dev/null)"
+        mid="${rb#"${rn}/@anthropic-ai/claude-agent-sdk-"}"
+        if [ -z "${rb}" ] || [ "${mid}" = "${rb}" ] || ! [[ "${mid}" =~ ^[a-z0-9-]+/claude$ ]]; then
+          _sdk_bad "${lb}" "linha ${ln}: o binário real (${rb:-irresolúvel}) não fica em @anthropic-ai/claude-agent-sdk-<plataforma>/ da mesma árvore node_modules real"; continue
+        fi
+        st="$(_as "${usr}" /usr/bin/env -i PATH=/usr/bin:/bin stat -c '%U %a' -- "${rb}" "${rb%/claude}" 2>/dev/null | tr '\n' ' ')"
+        read -r o1 m1 o2 m2 _ <<< "${st}"
+        if [ "${o1:-}" != "${own}" ] || [ "${o2:-}" != "${own}" ] || ! [[ "${m1:-}" =~ ^[0-7]*[0145]$ ]] || ! [[ "${m2:-}" =~ ^[0-7]*[0145]$ ]]; then
+          _sdk_bad "${lb}" "linha ${ln}: o binário real e o diretório dele têm de ser da conta ${own} e não graváveis por outros (medido: ${st:-sem stat})"; continue
+        fi
+        bin="${rb}"
+      fi
+      pkg="${rp}"
       # teto de tempo e de tamanho também na leitura (um FIFO travava o censo; /dev/zero encheria o /tmp)
       _as "${usr}" /usr/bin/env -i PATH=/usr/bin:/bin timeout 30 head -c 1048576 -- "${pkg}" > "${TMPD}/sdk-${n}.pkg" 2> "${TMPD}/sdk-${n}.pkgerr"; prc=$?
       brc=-

@@ -15,7 +15,9 @@
 # com DOIS binários-irmãos (-linux-x64 e -linux-x64-musl, ambos 0.3.301): o SDK prefere o glibc, o host é glibc e o
 # bridge não fixa pathToClaudeCodeExecutable, por isso o alvo é o -linux-x64 (o mesmo que o runner liga). Se o
 # bridge passar a fixar outro executável, esta linha muda junto.
-# A FORMA é fechada pelo censo: conta nunca root, pacote em node_modules/@anthropic-ai/claude-agent-sdk/ e binário
-# num irmão @anthropic-ai/claude-agent-sdk-<plataforma>/claude da mesma árvore.
+# ESTE ARQUIVO É CÓDIGO: o censo EXECUTA o binário de cada linha como a conta dela. Ele recusa rodar sob root,
+# recusa conta root/uid 0 e confere o LOCAL REAL (resolvido como a conta): pacote em
+# node_modules/@anthropic-ai/claude-agent-sdk/, binário num irmão @anthropic-ai/claude-agent-sdk-<plataforma>/claude
+# da mesma árvore real, do dono declarado e não gravável por outros. A conta onion não tem sudo (sudo -l -U, 2026-10-16).
 # Medido: package.json version 0.3.301, claudeCodeVersion 2.1.301; binário responde "2.1.301 (Claude Code)".
 bridge	onion	/home/onion/onion-bridge/node_modules/@anthropic-ai/claude-agent-sdk/package.json	/home/onion/onion-bridge/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude

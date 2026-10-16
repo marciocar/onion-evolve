@@ -38818,7 +38818,7 @@ run_cc_delta_census_selftests() {
      && ! LC_ALL=C grep -q '^external_edges:' "${g}"; then
     record_pass "cc-delta-census: (i) o esqueleto ensina external_edges SUPERSEDES sobre a rodada anterior, comentado, sem a chave velha"
   else record_fail "cc-delta-census: (i)" "forma da Aufhebung no esqueleto: $(LC_ALL=C grep -n 'external_edges\|supersedes' "${g}" 2>/dev/null | head -5 | tr '\n' ' ')"; fi
-  # (j)–(u) o CLI EMBUTIDO no Agent SDK de quem serve (SAC-155, rodada r12 de 2026-10-16): o host media 2.1.301 e o
+  # (j)–(v) o CLI EMBUTIDO no Agent SDK de quem serve (SAC-155, rodada r12 de 2026-10-16): o host media 2.1.301 e o
   #     bridge rodava o 2.1.232 do SDK 0.3.232, invisível ao censo. Fixture: um SDK falso no sandbox, na forma do
   #     pacote (node_modules/@anthropic-ai/claude-agent-sdk + o irmão -linux-x64/claude), alvo com conta `-`;
   #     produção não é tocada. TETO: o ramo `sudo -n -u <conta>` e o `timeout 30` não são exercidos (exigiriam
@@ -38836,14 +38836,15 @@ run_cc_delta_census_selftests() {
   # (j) alvo medido pelo BINÁRIO, 2 versões publicadas atrás do host (1.0.2 e 1.0.3): linha na tabela + aviso com N
   if out="$(_ccd_sdk "${tg}" --markdown)"; then rc=0; else rc=$?; fi
   if [ "${rc}" -eq 0 ] && LC_ALL=C grep -qF '| SDK `bridge` (CLI embutido, binário --version) | 1.0.1 (SDK 0.3.1) |' <<< "${out}" \
-     && LC_ALL=C grep -qF 'o CLI do SDK bridge (1.0.1, SDK 0.3.1) está 2 versão(ões) publicada(s) atrás do host (1.0.3)' <<< "${out}"; then
+     && LC_ALL=C grep -qF 'o CLI do SDK bridge (1.0.1, SDK 0.3.1) está 2 versão(ões) publicada(s) atrás do host (1.0.3)' <<< "${out}" \
+     && ! LC_ALL=C grep -q 'NÃO MEDIDO' <<< "${out}"; then
     record_pass "cc-delta-census: (j) o CLI do SDK entra na tabela de versões e o veredito avisa N versões atrás do host"
   else record_fail "cc-delta-census: (j)" "rc=${rc} $(_emit "${out}" | LC_ALL=C grep -E 'SDK|atrás' | head -3 | tr '\n' ' ')"; fi
   # (k) alvo INALCANÇÁVEL (na forma, mas ausente) → NÃO MEDIDO com rc na linha e no aviso; o rc do censo segue 0
   printf 'sumido\t-\t%s\t%s\n' "${sb}/x/node_modules/@anthropic-ai/claude-agent-sdk/package.json" "${sb}/x/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude" > "${sb}/t-sumido.tsv"
   if out="$(_ccd_sdk "${sb}/t-sumido.tsv")"; then rc=0; else rc=$?; fi
-  if [ "${rc}" -eq 0 ] && LC_ALL=C grep -q "^sdk${tab}sumido${tab}nao_medido${tab}package.json rc=1.*; binário rc=12[67]" <<< "${out}" \
-     && LC_ALL=C grep -q "^aviso${tab}SDK sumido: NÃO MEDIDO (package.json rc=1" <<< "${out}"; then
+  if [ "${rc}" -eq 0 ] && LC_ALL=C grep -q "^sdk${tab}sumido${tab}nao_medido${tab}linha 1: inalcançável como a conta .*readlink rc=1" <<< "${out}" \
+     && LC_ALL=C grep -q "^aviso${tab}SDK sumido: NÃO MEDIDO (linha 1: inalcançável" <<< "${out}"; then
     record_pass "cc-delta-census: (k) alvo inalcançável → NÃO MEDIDO com rc (linha e aviso), censo rc 0"
   else record_fail "cc-delta-census: (k)" "rc=${rc} $(_emit "${out}" | LC_ALL=C grep -E '^(sdk|aviso)' | head -3 | tr '\t\n' '  ')"; fi
   # (l) sem arquivo de alvos no repo → "sem_alvo" declarado; com ops/cc-sdk-targets.tsv no repo (o default) → medido
@@ -38933,6 +38934,52 @@ run_cc_delta_census_selftests() {
   elif python3 -c 'import sys, yaml; yaml.safe_load(open(sys.argv[1]))' "${yml}" >/dev/null 2>&1; then
     record_pass "cc-delta-census: (s) o esqueleto leva a versão do SDK e o rótulo malformado não quebra o YAML"
   else record_fail "cc-delta-census: (s)" "o esqueleto com alvo malformado não é YAML válido"; fi
+  # (t) o censo rodando como ROOT recusa a perna do SDK inteira e não executa nada (refutador, passada 2: conta `-`
+  #     sob root rodava o binário como uid 0). CC_DELTA_UID=0 só força a recusa; nunca afrouxa.
+  local spyd="${nm}/claude-agent-sdk-spy"; mkdir -p "${spyd}"; rm -f "${sb}/spy-ran"
+  printf '#!/bin/sh\ntouch %s\necho 1.0.1\n' "${sb}/spy-ran" > "${spyd}/claude"; chmod 755 "${spyd}/claude"
+  printf 'espia\t-\t%s\t%s\n' "${pk}" "${spyd}/claude" > "${sb}/t-espia.tsv"
+  if out="$(CC_DELTA_UID=0 _ccd_sdk "${sb}/t-espia.tsv")"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ ! -e "${sb}/spy-ran" ] \
+     && LC_ALL=C grep -q "^sdk${tab}(alvos)${tab}nao_medido${tab}o censo roda como root" <<< "${out}"; then
+    record_pass "cc-delta-census: (t) sob root a perna do SDK é recusada inteira, sem executar nada"
+  else record_fail "cc-delta-census: (t)" "rc=${rc} spy=$([ -e "${sb}/spy-ran" ] && echo RODOU || echo não) $(_emit "${out}" | LC_ALL=C grep '^sdk' | tr '\t\n' '  ')"; fi
+  # (u) o LOCAL REAL, não só o nome (passada 2): binário de OUTRA árvore node_modules, irmão que é symlink para
+  #     fora, e binário gravável por outros — os três recusados sem executar
+  local fora="${sb}/fora"; mkdir -p "${fora}"; cp "${spyd}/claude" "${fora}/claude"
+  ln -sfn "${fora}" "${nm}/claude-agent-sdk-link"
+  local nm3="${sb}/sdk3/node_modules/@anthropic-ai"; mkdir -p "${nm3}/claude-agent-sdk" "${nm3}/claude-agent-sdk-linux-x64"
+  cp "${pk}" "${nm3}/claude-agent-sdk/package.json"; cp "${spyd}/claude" "${nm3}/claude-agent-sdk-linux-x64/claude"
+  chmod 757 "${nm3}/claude-agent-sdk-linux-x64/claude"
+  local nm4="${sb}/sdk4/node_modules/@anthropic-ai"; mkdir -p "${nm4}/claude-agent-sdk"; cp "${pk}" "${fora}/package.json"
+  ln -sfn "${fora}/package.json" "${nm4}/claude-agent-sdk/package.json"
+  printf 'alheio\t-\t%s\t%s\nelo\t-\t%s\t%s\naberto\t-\t%s\t%s\npkelo\t-\t%s\t-\n' "${pk}" "${nm2}/claude-agent-sdk-linux-x64/claude" \
+    "${pk}" "${nm}/claude-agent-sdk-link/claude" "${nm3}/claude-agent-sdk/package.json" "${nm3}/claude-agent-sdk-linux-x64/claude" \
+    "${nm4}/claude-agent-sdk/package.json" > "${sb}/t-local.tsv"
+  rm -f "${sb}/spy-ran"
+  if out="$(_ccd_sdk "${sb}/t-local.tsv")"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && [ ! -e "${sb}/spy-ran" ] \
+     && LC_ALL=C grep -q "^sdk${tab}alheio${tab}nao_medido${tab}.*o binário tem de ser" <<< "${out}" \
+     && LC_ALL=C grep -q "^sdk${tab}elo${tab}nao_medido${tab}.*o binário real (${fora}/claude) não fica" <<< "${out}" \
+     && LC_ALL=C grep -q "^sdk${tab}aberto${tab}nao_medido${tab}.*não graváveis por outros" <<< "${out}" \
+     && LC_ALL=C grep -q "^sdk${tab}pkelo${tab}nao_medido${tab}.*o package.json real (${fora}/package.json) não fica" <<< "${out}"; then
+    record_pass "cc-delta-census: (u) binário de outra árvore, symlink para fora (binário ou pacote) e gravável por outros são recusados"
+  else record_fail "cc-delta-census: (u)" "rc=${rc} spy=$([ -e "${sb}/spy-ran" ] && echo RODOU || echo não) $(_emit "${out}" | LC_ALL=C grep '^sdk' | tr '\t\n' '  ')"; fi
+  # (v) higiene das meias-falhas: alvo SEM binário (fonte anotada), pacote sem claudeCodeVersion (avisado) e pacote
+  #     acima do teto de 1 MiB (truncado → ilegível, avisado; sem o teto a leitura não tinha limite)
+  printf 'sembin\t-\t%s\t-\n' "${pk}" > "${sb}/t-sembin.tsv"
+  if out="$(_ccd_sdk "${sb}/t-sembin.tsv")"; then rc=0; else rc=$?; fi
+  g="${out}"; printf '{"version":"0.3.1"}\n' > "${pk}"
+  if out="$(_ccd_sdk "${tg}")"; then :; else rc=$?; fi
+  g="${g}${out}"
+  python3 -c 'import json,sys; json.dump({"version":"0.3.1","claudeCodeVersion":"1.0.1","pad":"x"*1200000}, open(sys.argv[1],"w"))' "${pk}"
+  if out="$(_ccd_sdk "${tg}")"; then :; else rc=$?; fi
+  printf '{"name":"@anthropic-ai/claude-agent-sdk","version":"0.3.1","claudeCodeVersion":"1.0.1"}\n' > "${pk}"
+  if [ "${rc}" -eq 0 ] && LC_ALL=C grep -qx "sdk${tab}sembin${tab}1.0.1${tab}0.3.1${tab}package.json claudeCodeVersion (sem binário declarado)" <<< "${g}" \
+     && LC_ALL=C grep -qF 'SDK bridge: o package.json não declara claudeCodeVersion legível' <<< "${g}" \
+     && LC_ALL=C grep -qF 'SDK bridge: package.json ilegível (JSONDecodeError)' <<< "${out}"; then
+    record_pass "cc-delta-census: (v) sem binário anotado; pacote sem claudeCodeVersion e acima do teto avisados"
+  else record_fail "cc-delta-census: (v)" "rc=${rc} $(_emit "${g}${out}" | LC_ALL=C grep -E '^(sdk|aviso.*SDK (sembin|bridge):)' | tr '\t\n' '  ')"; fi
   # (e) o ESQUELETO escrito em (a) passa no radar (--integrity --schema) e no contrato v3
   g="${sb}/w/radar-E3-2026-10-08-r9/radar-E3-2026-10-08-r9.kg.yaml"
   if [ ! -f "${g}" ]; then record_fail "cc-delta-census: (e)" "esqueleto não escrito em ${g}"
