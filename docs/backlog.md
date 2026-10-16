@@ -48,14 +48,16 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 93.0 | `Q_CHAT_AGENT_ISOLATION_2026` | chat-agent-isolation-2026-10 | Como isolar o agente de código do /chat do onion-bridge (Agent SDK, Bash, mesmo UID onion dono da raiz de confiança do A2A e dos |
-| 60.0 | `C_OPCAO_2_SEPARATE_UID_RUNNER` | chat-agent-isolation-2026-10 | OPÇÃO (2) UID separado para o runner do /chat — estado final, via spawnClaudeCodeProcess e unit por sessão (DynamicUser). |
+| 63.0 | `C_OPCAO_2_SEPARATE_UID_RUNNER` | chat-agent-isolation-2026-10 | OPÇÃO (2) UID separado para o runner do /chat — estado final, via spawnClaudeCodeProcess e unit por sessão (DynamicUser). |
 | 51.8 | `C_OPCAO_3_NATIVE_SANDBOX_STRICT` | chat-agent-isolation-2026-10 | OPÇÃO (3) sandbox nativo bwrap/seccomp/proxy — só com perfil AppArmor + failIfUnavailable + allowUnsandboxedCommands=false. |
 | 40.0 | `D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT` | chat-agent-isolation-2026-10 | DECISÃO ABERTA: isolar o agente do /chat por (0) convidado sem Bash, (1) systemd reescrito, (2) UID separado, (3) sandbox estrito |
 | 33.0 | `C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE` | chat-agent-isolation-2026-10 | OPÇÃO (1) systemd já — REESCRITA: sem EnvironmentFile, com ReadOnlyPaths voltado à integridade (código do bridge, .claude d |
 | 30.2 | `C_OPCAO_5_NARROW_CREDENTIAL_BROKER` | chat-agent-isolation-2026-10 | OPÇÃO (5) credential broker — estreito: proxy da ANTHROPIC_API_KEY e ferramenta de git, sobre a opção 2. |
 | 17.5 | `C_OPCAO_0_GUEST_NO_BASH_DENY_EDIT_OUTSIDE_WORKSPACE` | chat-agent-isolation-2026-10 | OPÇÃO (0) imediato sem root: convidado sem Bash + deny Edit/Write no home do onion fora do workspace. |
 | 7.5 | `C_OPCAO_4_CONTAINER_MICROVM_PER_SESSION` | chat-agent-isolation-2026-10 | OPÇÃO (4) container/microVM por sessão — inviável nesta VPS (sem KVM); opcional por adotante. |
-| 5.4 | `C_SUPERACAO_20261015_DYNAMICUSER_RUNNER_PER_SESSION` | chat-agent-isolation-2026-10 | Runner por sessão com HOME efêmero (unit template onion-chat@<sessão>) e DynamicUser=yes: UID único por sessão sem criar cont |
+| 7.2 | `C_SUPERACAO_20261015_DYNAMICUSER_RUNNER_PER_SESSION` | chat-agent-isolation-2026-10 | Runner por sessão com HOME efêmero (unit template onion-chat@<sessão>) e DynamicUser=yes: UID único por sessão sem criar cont |
+| 6.0 | `C_SUPERACAO_20261015_SOCKET_ACTIVATED_PRIVILEGED_LAUNCHER` | chat-agent-isolation-2026-10 | Lançador privilegiado instalado uma vez pelo root: unit template onion-chat@.service ativado por socket (DynamicUser=yes ou User= |
+| 6.0 | `C_SUPERACAO_20261015_TEARDOWN_BY_CHANNEL_EOF` | chat-agent-isolation-2026-10 | Teardown pelo canal, não por sinal: o SDK fecha o stdin e espera cerca de 2 s; o fechamento do socket encerra o CLI do outro lado |
 | 5.4 | `C_SUPERACAO_20261015_PROCESS_AND_UID_VIA_SPAWN` | chat-agent-isolation-2026-10 | Processo separado E UID separado, via spawnClaudeCodeProcess, presente no SDK instalado (sdk.d.ts:2132 da 0.3.232): o spawn do CLI |
 | 5.4 | `C_SUPERACAO_20261015_READONLY_FOR_INTEGRITY` | chat-agent-isolation-2026-10 | Variante da opção 1 voltada à integridade: ReadOnlyPaths em src/, node_modules/, web/ do bridge, .claude/settings.json, .bashrc |
 | 5.4 | `C_SUPERACAO_20261015_SANDBOX_THREE_PIECES` | chat-agent-isolation-2026-10 | A opção 3 só vale com as três peças: perfil AppArmor do bwrap instalado por root, sandbox.failIfUnavailable=true e allowUnsan |
@@ -63,8 +65,6 @@
 | 4.5 | `C_SUPERACAO_20261015_EXPLICIT_FAILIFUNAVAILABLE_VIA_OPTIONS` | chat-agent-isolation-2026-10 | Passar o sandbox por Options (sandbox ou managedSettings) com failIfUnavailable=true explícito, sem depender do default de nenhum |
 | 4.5 | `C_SUPERACAO_20261015_POLICY_TIER_AND_WORKSPACE_CLAUDE_DENY` | chat-agent-isolation-2026-10 | Duas peças: (1) fixar sandbox e permissões no nível de política via Options.managedSettings (restrictive-only, sem arquivo de  |
 | 4.5 | `C_SUPERACAO_20261015_PRIVATE_BWRAP_COPY_BWRAPPATH` | chat-agent-isolation-2026-10 | Cópia PRIVADA do bwrap num caminho executável só pelo grupo do agente (root:onion-chat 0750), com o perfil 'userns,' preso a ES |
-| 4.5 | `C_SUPERACAO_20261015_SOCKET_ACTIVATED_PRIVILEGED_LAUNCHER` | chat-agent-isolation-2026-10 | Lançador privilegiado instalado uma vez pelo root: unit template onion-chat@.service ativado por socket (DynamicUser=yes ou User= |
-| 4.5 | `C_SUPERACAO_20261015_TEARDOWN_BY_CHANNEL_EOF` | chat-agent-isolation-2026-10 | Teardown pelo canal, não por sinal: o SDK fecha o stdin e espera cerca de 2 s; o fechamento do socket encerra o CLI do outro lado |
 | 3.6 | `C_SUPERACAO_20261015_BYPASS_RETRY_DETERMINISTIC_OFF` | chat-agent-isolation-2026-10 | Em bypassPermissions o retry com dangerouslyDisableSandbox roda sem prompt; o desligamento determinístico é sandbox.allowUnsandb |
 | 3.6 | `C_SUPERACAO_20261015_BYPASS_RETRY_INTERACTIVE_SCOPE_ASK_RULE` | chat-agent-isolation-2026-10 | Na sessão interativa, em bypassPermissions o retry com dangerouslyDisableSandbox roda sem prompt; uma ask rule Bash(dangerouslyDi |
 | 3.6 | `C_SUPERACAO_20261015_CONTAINMENT_WITHOUT_APPROVAL` | chat-agent-isolation-2026-10 | Contenção que não depende de aprovação: convidado sem Bash, ou Bash só no UID separado. |
