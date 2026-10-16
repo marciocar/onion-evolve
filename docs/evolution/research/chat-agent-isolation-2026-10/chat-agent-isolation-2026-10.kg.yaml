@@ -20,7 +20,9 @@ meta:
                                # Gatilhos antecipados: (1) [LIDOS na rodada de primárias de 2026-10-15]; (2) o degrau
                                # 0 ou 1 ser aplicado no vivo; (3) update do Claude Code/SDK no bridge.
   # kg-backlog-guard: on
-  # ═══ TETO: 124 NÓS ═══
+  # ═══ TETO: 127 NÓS ═══
+  #   PROVAS (2026-10-16, +3): as três provas que o Elenxo pediu antes de selar os degraus 1–3, medidas em
+  #   sandbox (E_PROVA1/2/3_*), cada uma dizendo qual degrau confirma, corrige ou derruba.
   #   SELO (2026-10-16, +1): a decisão do maestro «Degrau 0 já + 3 provas» nasce como nó PRÓPRIO
   #   (D_MAESTRO_DEGRAU0_E_TRES_PROVAS_1016) ligado à decisão-mãe, que segue open até os degraus 1–3.
   #   RODADA 1 (varredura em modo decisão, run wf_505962e3-7c9) — 75 nós: 1 question + 22 evidências web
@@ -1923,6 +1925,61 @@ nodes:
       method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
       locality: "pessoa"
 
+  # ═══ AS 3 PROVAS DO ELENXO (2026-10-16, decisão D_MAESTRO_DEGRAU0_E_TRES_PROVAS_1016) — medidas em sandbox ═══
+  # Cada uma: comando, saída, rc e o degrau que confirma/corrige/derruba. Nada persistente na VPS; sem chave real
+  # (literal inválido: tudo o que se mede acontece antes da chamada à API). SDK 0.3.232, CLI embutido 2.1.232.
+
+  - id: E_PROVA1_WORKSPACE_HOOK_RUNS_WITHOUT_BASH_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "query() do SDK 0.3.232 (CLI 2.1.232) num workspace temporário com .claude/settings.json hostil, chave literal inválida; resolveSettings() no mesmo diretório; rc 0 nas três rodadas"
+    label: "PROVA 1: um SessionStart hostil no .claude/settings.json do workspace RODA com settingSources:[\"project\"] e tools:[\"Read\"] (sem Bash), como o UID do chamador. CONFIRMA a metade de carga da objeção 32 e CORRIGE o degrau 0: tirar o Bash não basta, os hooks têm de cair."
+    narrative: "Medido em 2026-10-16. (a) resolveSettings({cwd, settingSources:[\"project\"]}) devolve o tier project inteiro: hooks.SessionStart, permissions.allow [Bash(*), Edit(**), Write(**)], sandbox.enabled=false, disableSkillShellExecution=false, enableAllProjectMcpServers=true; filterEscalatingDefaultMode remove o defaultMode bypass (o resto não foi comparado). Com settingSources:[] o cascade fica vazio. (b) Com managedSettings, o filtro MANTÉM permissions.deny, sandbox e allowManagedHooksOnly — e também um permissions.allow [Read(**)], mesclado no effective, então o filtro não é puramente restritivo — e DESCARTA hooks e disableSkillShellExecution. (c) Execução real: query() com o hook 'id -un > marcador' → hook_started/hook_response e o marcador escrito com o usuário do chamador. Com managedSettings {allowManagedHooksOnly:true} → o marcador não foi escrito; com settings (flag) {disableAllHooks:true} → também não. (d) Shell inline (!`…`) num slash command do projeto: com tools sem Bash o CLI recusa ('Permission to use Bash has been denied'); com settings {disableSkillShellExecution:true} o comando vira placeholder. (e) Dogfood da política do degrau 0 do bridge (agent-policy.ts) contra o mesmo workspace hostil: convidado leitor tools=[Glob,Grep,Read,WebFetch,WebSearch], convidado escritor tools=[Edit,Glob,Grep,NotebookEdit,Read,WebFetch,WebSearch,Write], hook NÃO rodou nos dois; admin (modo default no teste) com o conjunto completo e o hook RODOU, como esperado (admin inalterado). NÃO medido: se a deny Edit/Write em <workspace>/.claude/** barra a ESCRITA pelo modelo (exige chamada real à API)."
+    trace: "sonda no scratchpad da sessão: probe1.mjs, probe1b.mjs, probe1d.mjs e dogfood-policy.mts (SDK do bridge, HOME descartável)"
+    provenance:
+      source: "SDK @anthropic-ai/claude-agent-sdk 0.3.232 instalado no onion-bridge (CLI embutido 2.1.232)"
+      locator: "resolveSettings(), query() com settingSources:[\"project\"], managedSettings, settings.disableAllHooks"
+      method: "medição: sondas executadas num diretório temporário, marcador em arquivo, chave literal inválida"
+      locality: "host"
+
+  - id: E_PROVA2_DYNAMICUSER_CLI_SDK_HANDSHAKE_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "sudo systemd-run --pipe --wait -p DynamicUser=yes TRANSITÓRIO (systemd 255.4), nada instalado; query() do SDK com spawnClaudeCodeProcess devolvendo o ChildProcess do systemd-run; rc 0; nenhuma unit run-u* restante depois"
+    label: "PROVA 2: o CLI 2.1.232 roda sob DynamicUser (UID 6xxxx), não lê o home 0750 do onion, o .env, o .git-credentials nem o environ do bridge, e completa o handshake do SDK por stdin/stdout via spawnClaudeCodeProcess. CONFIRMA o mecanismo do degrau 2."
+    narrative: "Medido em 2026-10-16. (a) systemd-run -p DynamicUser=yes -p BindReadOnlyPaths=⟨binário do claude no node_modules do bridge⟩:⟨caminho de runtime⟩ -p PrivateTmp=yes: id = uid dinâmico (64129, depois 62773 e 65140); ls do home do onion, cat do .env do bridge e do .git-credentials = Permission denied; environ e cwd do processo do bridge (MainPID) no procfs = negados; claude --version = 2.1.232, rc 0. (b) query() com spawnClaudeCodeProcess que lança 'sudo -n systemd-run --pipe --wait --collect -p DynamicUser=yes … -p RuntimeMaxSec=120' com ambiente MONTADO PELO LANÇADOR (HOME, PATH e a chave do teste, nada do env do pai): o init chegou (cli=2.1.232, cwd temporário, tools [Read]) e o SessionStart do lado dinâmico respondeu 'uid=62773 user=run-u23358' e 'pat-negado' (sem controle positivo no hook: com o home 0750 qualquer UID diferente do onion falha a travessia; o 'Permission denied' literal do .git-credentials veio do item (a)); o erro final foi a chave inválida, no lugar esperado. LIÇÕES: o systemd-run resolve o executável no HOST antes do bind existir (exige entrar pelo sh do sistema e fazer exec); o home 0750 obriga o binário a sair dele (o bind resolveu sem cópia); o exitCode do lançador (o sudo) foi 1, sem comparar com o código do CLI. LIMITES: o teste usou sudo (root) como lançador — o bridge não tem sudo (E_OBJECAO_27), então o degrau 2 segue exigindo o lançador por socket instalado pelo root, NÃO provado aqui; teardown por EOF do stdin e RuntimeMaxSec= não exercitados até o fim."
+    trace: "sonda no scratchpad da sessão: probe2.mjs; systemctl list-units --all --type=service | grep -c run-u = 0 depois"
+    provenance:
+      source: "systemd 255.4 do host + SDK @anthropic-ai/claude-agent-sdk 0.3.232 do onion-bridge"
+      locator: "systemd-run --pipe -p DynamicUser=yes; Options.spawnClaudeCodeProcess"
+      method: "medição: unit transitória com autorização do maestro, chave literal inválida"
+      locality: "host"
+
+  - id: E_PROVA3_SANDBOX_FAIL_CLOSED_ONLY_WHEN_EXPLICIT_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: "2026-10-16"
+    verified_against: "query() do SDK 0.3.232 em bypassPermissions com 7 rotas de sandbox num host onde ele não sobe (socat ausente; bwrap 'setting up uid map: Permission denied' com apparmor_restrict_unprivileged_userns=1); comando de marca por shell inline, antes da API"
+    label: "PROVA 3: sem sandbox disponível, só falha FECHADO o Options.sandbox (default true) ou failIfUnavailable:true explícito; settings e managedSettings só com enabled RODAM o comando sem gaiola. CONFIRMA a objeção 31 e CORRIGE o degrau 3: failIfUnavailable explícito, sempre."
+    narrative: "Medido em 2026-10-16, admin-like (bypassPermissions + allowDangerouslySkipPermissions, tools [Bash, Read]). Comando rodou? A Options.sandbox{enabled} → NÃO ('Sandbox required but unavailable … socat not installed', erro no startup). B Options.sandbox{enabled, failIfUnavailable:false} → SIM ('⚠ Sandbox disabled … Commands will run' sem gaiola). C settings{sandbox.enabled} → SIM. D settings{enabled, failIfUnavailable:true} → NÃO. E managedSettings{enabled, failIfUnavailable:true, allowUnsandboxedCommands:false} → NÃO. F managedSettings{enabled} só → SIM. Z controle sem sandbox → SIM. Com um socat FALSO no PATH (dependência presente e quebrada), todas as rotas iniciam e o 1º comando é bloqueado ('Failed to create bridge sockets'), mas B, C e F fazem o CLI DECLARAR 'Sandboxing is disabled for the rest of this session'; um 2º comando na mesma sessão não foi exercitado (maxTurns 1, um comando por sessão). ACRESCENTA ao degrau 3: socat é dependência além do bwrap. NÃO MEDIDO: o caminho específico do AppArmor (com socat real o bwrap chegaria ao userns negado); instalar socat muda o sistema e ficou fora."
+    trace: "sonda no scratchpad da sessão: probe3.mjs (com e sem o socat falso no PATH)"
+    provenance:
+      source: "SDK @anthropic-ai/claude-agent-sdk 0.3.232 do onion-bridge (CLI 2.1.232); bwrap 0.9.0 do host"
+      locator: "Options.sandbox, settings.sandbox, managedSettings.sandbox, failIfUnavailable"
+      method: "medição: sondas executadas num diretório temporário, marcador em arquivo, chave literal inválida"
+      locality: "host"
+
 edges:
   - from: E_SECDEP_PROXY_PATTERN_PLATFORM
     to: Q_CHAT_AGENT_ISOLATION_2026
@@ -2391,4 +2448,34 @@ edges:
     edge_type: CONSTRAINS
   - from: D_MAESTRO_DEGRAU0_E_TRES_PROVAS_1016
     to: D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT
+    edge_type: TRACES_TO
+  - from: E_PROVA1_WORKSPACE_HOOK_RUNS_WITHOUT_BASH_1016
+    to: E_OBJECAO_32_WORKSPACE_CLAUDE_DIR_WRITABLE
+    edge_type: SUPPORTS
+  - from: E_PROVA1_WORKSPACE_HOOK_RUNS_WITHOUT_BASH_1016
+    to: C_OPCAO_0_GUEST_NO_BASH_DENY_EDIT_OUTSIDE_WORKSPACE
+    edge_type: CONSTRAINS
+  - from: E_PROVA1_WORKSPACE_HOOK_RUNS_WITHOUT_BASH_1016
+    to: C_SUPERACAO_20261015_POLICY_TIER_AND_WORKSPACE_CLAUDE_DENY
+    edge_type: SUPPORTS
+  - from: E_PROVA1_WORKSPACE_HOOK_RUNS_WITHOUT_BASH_1016
+    to: D_MAESTRO_DEGRAU0_E_TRES_PROVAS_1016
+    edge_type: TRACES_TO
+  - from: E_PROVA2_DYNAMICUSER_CLI_SDK_HANDSHAKE_1016
+    to: C_OPCAO_2_SEPARATE_UID_RUNNER
+    edge_type: SUPPORTS
+  - from: E_PROVA2_DYNAMICUSER_CLI_SDK_HANDSHAKE_1016
+    to: D_MAESTRO_DEGRAU0_E_TRES_PROVAS_1016
+    edge_type: TRACES_TO
+  - from: E_PROVA3_SANDBOX_FAIL_CLOSED_ONLY_WHEN_EXPLICIT_1016
+    to: E_OBJECAO_31_FAILIFUNAVAILABLE_DEFAULT_BY_ROUTE
+    edge_type: SUPPORTS
+  - from: E_PROVA3_SANDBOX_FAIL_CLOSED_ONLY_WHEN_EXPLICIT_1016
+    to: C_SUPERACAO_20261015_EXPLICIT_FAILIFUNAVAILABLE_VIA_OPTIONS
+    edge_type: SUPPORTS
+  - from: E_PROVA3_SANDBOX_FAIL_CLOSED_ONLY_WHEN_EXPLICIT_1016
+    to: C_OPCAO_3_NATIVE_SANDBOX_STRICT
+    edge_type: CONSTRAINS
+  - from: E_PROVA3_SANDBOX_FAIL_CLOSED_ONLY_WHEN_EXPLICIT_1016
+    to: D_MAESTRO_DEGRAU0_E_TRES_PROVAS_1016
     edge_type: TRACES_TO

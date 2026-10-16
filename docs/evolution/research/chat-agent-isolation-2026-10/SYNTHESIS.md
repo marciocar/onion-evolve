@@ -38,6 +38,14 @@ os degraus 1–3 esperam as provas virarem evidência.
 | 4 | microVM/container por sessão | KVM (ausente nesta VPS) | fora desta VPS; opcional por adotante |
 | 5 | broker estreito (proxy da `ANTHROPIC_API_KEY`, git atrás de ferramenta) **sobre** o degrau 2 | o degrau 2 | aguarda |
 
+## As 3 provas (2026-10-16, medidas em sandbox, sem chave real)
+
+| Prova | Nó | Resultado | Degrau |
+|---|---|---|---|
+| 1. settings hostil no workspace | `E_PROVA1_WORKSPACE_HOOK_RUNS_WITHOUT_BASH_1016` | Um `SessionStart` no `.claude/settings.json` do workspace **roda** com `settingSources:["project"]` e `tools:["Read"]`, sem Bash, como o UID do chamador. `managedSettings.allowManagedHooksOnly` e `settings.disableAllHooks` o cortam, cada um sozinho. O filtro do `managedSettings` mantém `deny`, `sandbox` e `allowManagedHooksOnly` (e também um `allow`, logo não é puramente restritivo), e descarta `hooks` e `disableSkillShellExecution`. | **corrige o degrau 0**: tirar o Bash não basta, os hooks têm de cair (aplicado no PR do bridge) |
+| 2. CLI sob `DynamicUser` | `E_PROVA2_DYNAMICUSER_CLI_SDK_HANDSHAKE_1016` | Unit transitória: UID dinâmico, home 0750 do onion, `.env`, `.git-credentials` e environ do bridge **negados**; o SDK completa o handshake por stdin/stdout via `spawnClaudeCodeProcess`. | **confirma o mecanismo do degrau 2**; o lançador por socket instalado pelo root segue sem prova (o teste usou sudo) |
+| 3. sandbox ligado sem sandbox disponível | `E_PROVA3_SANDBOX_FAIL_CLOSED_ONLY_WHEN_EXPLICIT_1016` | Falha **fechado** só com `Options.sandbox` (default `true`) ou com `failIfUnavailable:true` explícito; `settings` e `managedSettings` só com `enabled` **rodam sem gaiola**. | **corrige o degrau 3**: `failIfUnavailable` explícito sempre; `socat` é dependência além do bwrap |
+
 ## O que sustenta (evidências ancoradas)
 
 - **Primárias da Anthropic:** `.env` e `.git-credentials` são arquivos de risco (`E_SECDEP_RISK_FILES_*`);
@@ -65,9 +73,10 @@ workspace é gravável e carregado por `settingSources:["project"]` (`_32`).
 
 ## NÃO-VERIFICADOS
 
-1. **As três provas da decisão** (pendentes até a evidência entrar no grafo): `resolveSettings()` com
-   `.claude/settings.json` hostil no workspace; wrapper `SpawnedProcess` sob `DynamicUser`; `query()` com
-   sandbox ligado sem perfil bwrap (fail-closed ou fail-open?).
+1. **O que as três provas deixaram aberto:** se a deny de Edit/Write em `<workspace>/.claude/**` barra a
+   escrita **pelo modelo** (exige chamada real à API); o lançador por socket do degrau 2 (a prova usou sudo);
+   o teardown por EOF; o caminho específico do AppArmor no degrau 3 (com `socat` ausente o CLI para antes; um
+   `socat` falso no PATH também não chega ao userns, e instalar o real muda o sistema).
 2. Se `Options.managedSettings` conta como "admin-controlled" para `sandbox.bwrapPath`.
 3. O comportamento do retry sem sandbox e das `excludedCommands` em `bypassPermissions` no SDK **headless**
    (a primária escopa o trecho à sessão interativa).

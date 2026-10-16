@@ -1,18 +1,17 @@
 ---
 branch: docs/research-chat-agent-isolation
-pr: pendente
+pr: 1162
 date: 2026-10-16
-reviewed_diff_sha256: 81d4203ede133bcb9a84c29f3d0f04466e13afbdafd8f7e1b27d9d919ba56720
-reviewed_code_sha256: 388b485b779aff3141376b584dc924b2928ac994590db152411cf36decae7a6a
-findings_total: 3
-findings_real: 3
-tokens: 96064
-duration_min: 1
-findings_fixed: 3
+reviewed_diff_sha256: pendente
+findings_total: 10
+findings_real: 10
+tokens: 211129
+duration_min: 4
+findings_fixed: 10
 verdict: CORRIGIDO
 elenxo: sim
 reviewer: subagente general-purpose opus, mandato REFUTAR
-nota: "PR de registro: grafo da pesquisa (2 runs) + selo da decisão do maestro de 2026-10-16 + SYNTHESIS; 3 achados do refutador, todos curados."
+nota: "PR de registro: grafo da pesquisa (2 runs) + selo da decisão do maestro de 2026-10-16 + SYNTHESIS; 2 passadas do refutador (3 + 7 achados), todas curadas; o 2º commit traz as 3 provas como evidência."
 ---
 
 # Passada adversarial: `docs/research-chat-agent-isolation`
@@ -42,3 +41,17 @@ Não se aplica: o PR não muda código nem guarda; o gate é o radar `--integrit
 
 As 3 provas pedidas pelo Elenxo NÃO estão neste PR: entram como evidência num 2º PR, depois das medições.
 Decisão tomada sem o maestro: o selo como nó novo (não fechar a decisão-mãe), com o teto subindo 1.
+
+## Re-revisão (2º commit: as 3 provas)
+
+O PR recebeu as 3 provas pedidas pelo Elenxo como nós de evidência (`E_PROVA1/2/3_*`, teto 124→127, 11
+arestas) e a seção correspondente na SYNTHESIS. O diff mudou depois da 1ª passada, então o carimbo volta a
+`pendente` e o `reviewed_code_sha256` sai; o `pr-finalize` recarimba. Passada adversarial própria sobre o
+diff novo (opus, mandato REFUTAR, reexecutou probe1b e probe3): 7 achados de PRECISÃO, nenhum derruba prova,
+todos curados no texto: (1) o 'fail-open dali em diante' da prova 3 não foi medido, agora é 'o CLI declara';
+(2) a aresta E_PROVA2 → lançador por socket sustentava o que a prova não prova, removida; (3) o filtro do
+managedSettings também deixa passar um allow, então não é puramente restritivo; (4) o 'só' do
+filterEscalatingDefaultMode não foi medido; (5) a prova 1 confirma só a metade de CARGA da objeção 32;
+(6) o 'pat-negado' do hook não tem controle positivo; (7) a propagação do exitCode não foi comparada.
+Radar e contrato rc 0 depois das curas.
+
