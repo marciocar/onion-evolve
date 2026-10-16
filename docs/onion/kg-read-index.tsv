@@ -1472,6 +1472,7 @@ docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.propos
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	Q_vps_declared	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/evolution/outbox/diary/2026-07-09-security-gate-degrades-to-veto.md	C_a2a_gate_narrow	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+docs/evolution/research/a2a-configurator-2026-10/a2a-configurator-2026-10.kg.yaml	E_CORPUS_PRIOR_BRIDGE_AND_A2A_1015	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
 docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	C_CONSENTIMENTO_POR_MENSAGEM_MATA_CONVERSA	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	C_VOLTA_ENTRE_USUARIOS_EXIGE_TASKS_GET	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
 docs/evolution/research/a2a-cross-user-spike-2026-10/SPIKE-PROTOCOL.md	D_EMENDA_PROTOCOLO_POS_CURADORIA_2026_10_14	docs/evolution/research/a2a-cross-user-spike-2026-10/a2a-cross-user-spike-2026-10.kg.yaml
@@ -1517,6 +1518,13 @@ docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md	E_QUOTA_GAP_FECHADO_
 docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md	E_TETOS_DA_PESQUISA	docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml
 docs/evolution/research/canal-vivo-sessoes-2026-10/SYNTHESIS.md	E_LACUNAS_CANAL_VIVO_PRIMARIAS_1007	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
 docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml	C_LIVE_CLASS_DESIGN_CONSTRAINTS	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
+docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	C_OPCAO_0_GUEST_NO_BASH_DENY_EDIT_OUTSIDE_WORKSPACE	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
+docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
+docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	C_OPCAO_2_SEPARATE_UID_RUNNER	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
+docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	C_OPCAO_3_NATIVE_SANDBOX_STRICT	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
+docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	C_OPCAO_4_CONTAINER_MICROVM_PER_SESSION	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
+docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	C_OPCAO_5_NARROW_CREDENTIAL_BROKER	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
+docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml	Q_CHAT_AGENT_ISOLATION_2026	docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml
 docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/SYNTHESIS.md	AR_SYNTHESIS_COMPANY_BRAIN_1001	docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml
 docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml	C_OPCAO_BD_PACOTE_NO_FORMATO_GURU	docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml
 docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml	C_OPCAO_B_COMPANY_BRAIN_ANCORADO_COMO_SERVICO	docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml
