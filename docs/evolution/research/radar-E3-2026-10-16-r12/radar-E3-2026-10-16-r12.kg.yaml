@@ -17,6 +17,9 @@ meta:
 #     edge_type: SUPERSEDES
 #   (b) não derrubou nada → no meta: x_supersedes_none: "<a razão medida>"
 external_edges:
+  - from: E_SDK_0_3_301_EM_PRODUCAO_1016
+    to: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml#E_CVE39861_FIXED_IN_2_1_64"
+    edge_type: SUPPORTS
   - from: E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232
     to: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml#E_CVE39861_FIXED_IN_2_1_64"
     edge_type: SUPPORTS
@@ -98,7 +101,7 @@ nodes:
     confidence: 0.5
     verified_at: "2026-10-16"
     verified_against: "aberta pela rodada r12 em 2026-10-16: fecha quando o maestro decidir subir o SDK do onion-bridge de 0.3.232 para a linha atual (0.3.301 medido no npm), com o chat-runner verify e o handshake por spawnClaudeCodeProcess re-provados no CLI novo, e um piso de versão que barre regressão abaixo de 2.1.64, o mínimo do CVE-2026-39861 já registrado no grafo de isolamento como pré-condição do degrau 3 (E_CVE39861_FIXED_IN_2_1_64), que o maestro parqueou em 2026-10-16; o piso pesa se o degrau 3 voltar, e a defasagem das correções pesa já"
-    narrative: "Issue SAC-156 no Linear, criada pelo tm.sh em 2026-10-16. Fechada em 2026-10-16 pela prova em produção (E_SDK_0_3_301_EM_PRODUCAO_1016): a decisão do maestro é o merge do onion-bridge#77 (0d1bc843), feito por ele, e o piso entrou no core pelo #1171 (99a821cb); o deploy e o verify independente deram rc 0. Fica declarado o que não foi medido: nenhum turno com a API real rodou no CLI novo."
+    narrative: "Issue SAC-156 no Linear, criada pelo tm.sh em 2026-10-16. Fechada em 2026-10-16 pela prova em produção (E_SDK_0_3_301_EM_PRODUCAO_1016): a decisão do maestro é o merge do onion-bridge#77 (0d1bc843), feito por ele, e o piso entrou no core pelo #1171 (99a821cb); o deploy e o verify independente deram rc 0. Fica declarado o que não foi medido: nenhum turno com a API real rodou no CLI novo. Lacuna medida e declarada: o piso barra no install do runner e só avisa no deploy do bridge, então um downgrade por deploy entraria no ar com AVISO; o critério 'barre regressão' vale no install, não no deploy."
     label: "o SDK do bridge deve subir com piso de versão declarado e o verify do runner re-provado no CLI novo; o piso de CVE do degrau 3 (parqueado) vale por acaso de versão e as correções de 57 versões publicadas não chegam ao /chat"
   - id: E_GREP_E_GLOB_DEIXAM_DE_MENTIR_ZERO
     node_type: evidence
@@ -214,9 +217,9 @@ nodes:
     impact: 3
     confidence: 0.85
     verified_at: "2026-10-16"
-    verified_against: "medido pela sessão principal em 2026-10-16 por volta de 20:45 UTC: onion-bridge#77 mergeado pelo maestro (0d1bc843) e core #1171 mergeado (99a821cb); o wrapper de deploy do bridge saiu rc 0 com backup cifrado antes, e o resultado foi clone 99a821cb, bridge 0d1bc843, health 200 local e público, auth enforce, verify do degrau 1 e do runner OK depois do update; o chat-runner verify independente saiu rc 0 com n_fail=0, com as linhas 'OK o CLI do SDK responde 2.1.301, no piso 2.1.64 ou acima' e 'OK o argv do SDK servido, com a política do convidado, passa pelo lançador instalado (25 asserções)', e a cerca de rede (TLS com a API) segue; o package.json do SDK no clone servido, lido como a conta do serviço, declara 0.3.301; não medido: um turno com a API real"
+    verified_against: "medido pela sessão principal em 2026-10-16 por volta de 20:45 UTC: onion-bridge#77 mergeado pelo maestro (0d1bc843) e core #1171 mergeado (99a821cb); o wrapper de deploy do bridge saiu rc 0 com backup cifrado antes, e o resultado foi clone 99a821cb, bridge 0d1bc843, health 200 local e público, auth enforce, verify do degrau 1 e do runner OK depois do update; o chat-runner verify independente saiu rc 0 com n_fail=0, com as linhas 'OK o CLI do SDK responde 2.1.301, no piso 2.1.64 ou acima' e 'OK o argv do SDK servido, com a política do convidado, passa pelo lançador instalado (25 asserções)', e a cerca de rede (TLS com a API) segue; como o n_fail conta toda falha do verify, o zero inclui o aperto de mão pelo socket (initialize respondido pelo CLI novo, cliente do próprio verify, não o spawnClaudeCodeProcess do bridge) e a recusa da flag fora da allowlist, sem a linha literal citada aqui; o package.json do SDK no clone servido, lido como a conta do serviço, declara 0.3.301; re-medido nesta passada: o cc-delta-census.sh segue com 0 menções a SDK, então o censo continua cego ao CLI do bridge; lacuna medida: o piso barra no install do runner (die) e só AVISA no deploy do bridge, cujo wrapper diz que reprovar não desfaz o update; não medido: um turno com a API real"
     narrative: "Fecha a SAC-156. A versão saiu de 0.3.232 (CLI 2.1.232, E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232) para 0.3.301 (CLI 2.1.301), e o piso 2.1.64 do CVE-2026-39861 passou a ser cobrado pelo verify, não mais garantido por acaso de versão. A prova cobre o deploy, a versão do CLI servido e o argv pelo lançador; o turno ponta a ponta com a API fica como lacuna declarada."
-    label: "o /chat em produção roda o SDK 0.3.301 com o CLI 2.1.301, acima do piso 2.1.64 que o verify do runner agora cobra, depois do deploy de onion-bridge 0d1bc843 e core 99a821cb com rc 0"
+    label: "o /chat em produção serve o SDK 0.3.301 com o CLI 2.1.301, acima do piso 2.1.64 que o verify do runner agora cobra, depois do deploy de onion-bridge 0d1bc843 e core 99a821cb com rc 0"
     provenance:
       source: "onion-bridge@0d1bc843 (PR #77) e onion-evolve@99a821cb (PR #1171); saída do chat-runner verify e do wrapper de deploy do bridge"
       locator: "linhas OK do verify: 'o CLI do SDK responde 2.1.301, no piso 2.1.64 ou acima' e 'o argv do SDK servido ... passa pelo lançador instalado (25 asserções)'; campo version do package.json do SDK no clone servido"
@@ -225,6 +228,9 @@ nodes:
 edges:
   - from: E_SDK_0_3_301_EM_PRODUCAO_1016
     to: Q_SUBIR_O_SDK_DO_BRIDGE_COM_PISO_DE_VERSAO
+    edge_type: SUPPORTS
+  - from: E_SDK_0_3_301_EM_PRODUCAO_1016
+    to: Q_CENSO_MEDE_O_CLI_DO_SDK_DO_BRIDGE
     edge_type: SUPPORTS
   - from: E_SDK_0_3_301_EM_PRODUCAO_1016
     to: E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232
