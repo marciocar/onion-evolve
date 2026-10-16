@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**569 itens abertos** em 110 grafo(s) com aberto (de 139 no escopo) · 111 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**568 itens abertos** em 110 grafo(s) com aberto (de 139 no escopo) · 111 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -1016,12 +1016,11 @@
 | 3.6 | `I_ADOPT_CAMADA_COLABORADOR` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): a skill onion-onboarding JA tem o ram |
 | 2.4 | `I_KB_GAMIFICACAO_RAMPA_GATED` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): o core tem docs/knowledge-base/educat |
 
-## radar-E3-2026-10-16-r12 — 2 item(ns)
+## radar-E3-2026-10-16-r12 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 4.5 | `Q_SUBIR_O_SDK_DO_BRIDGE_COM_PISO_DE_VERSAO` | radar-E3-2026-10-16-r12 | o SDK do bridge deve subir com piso de versão declarado e o verify do runner re-provado no CLI novo; o piso de CVE do degrau 3 (p |
-| 3.0 | `Q_CENSO_MEDE_O_CLI_DO_SDK_DO_BRIDGE` | radar-E3-2026-10-16-r12 | o medidor do /meta:cc-update deve medir também o CLI que roda em produção (o embutido no Agent SDK do bridge), para o delta dec |
+| 4.5 | `Q_CENSO_MEDE_O_CLI_DO_SDK_DO_BRIDGE` | radar-E3-2026-10-16-r12 | o medidor do /meta:cc-update deve medir também o CLI que roda em produção (o embutido no Agent SDK do bridge), para o delta dec |
 
 ## rea-method-2026-10 — 2 item(ns)
 

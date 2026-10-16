@@ -2,7 +2,8 @@
 branch: docs/kg-sdk-bridge-prod-evidence
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ffc0d82ddfe7ad09c868655f5172632eabde138eb565ae595e09ad38fa7c97fa
+reviewed_code_sha256: 62156d04e78d7ccbf0db8a05cfb5deff77617c1ec1ccf90e8a3fc94e201a97fc
 findings_total: 4
 findings_real: 3
 tokens: 90553
