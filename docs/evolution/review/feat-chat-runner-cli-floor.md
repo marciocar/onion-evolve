@@ -2,7 +2,8 @@
 branch: feat/chat-runner-cli-floor
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c1096869693ce8311f800a5660a19a4195608ecf9245826f440d7e2f293c4c86
+reviewed_code_sha256: 680a74ea1d3958b1cba116af328089d492e4bb8beee4665f0cd82e8f2f23cb57
 findings_total: 13
 findings_real: 12
 tokens: 378467
