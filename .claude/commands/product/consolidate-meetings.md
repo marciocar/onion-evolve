@@ -4,7 +4,7 @@ description: |
   Consolida múltiplas reuniões usando o Consolidador de Reuniões.
   Aceita pasta ou arquivos individuais para análise profunda, identificando divergências, convergências e insights estratégicos.
   Use para transformar múltiplas reuniões em conhecimento estratégico consolidado.
-allowed-tools: Read Write Bash(find *) Bash(ls *)
+allowed-tools: Read Write Bash(find *) Bash(ls *) Bash(bash .claude/validation/meeting-graph-check.sh *)
 
 parameters:
   - name: source
@@ -50,8 +50,9 @@ Transformar múltiplas reuniões em conhecimento estratégico consolidado, ident
 
 **Onde moram as reuniões:** `docs/meetings/`, o mesmo diretório em que o `/product:extract-meeting` grava o
 resumo (`<nome>-extract.md`) e o grafo da reunião (`<nome>.kg.yaml`). Quando houver o grafo, leia-o junto do
-resumo: as decisões, ações e riscos dele trazem `trace` ao trecho da transcrição, e é esse trace que a
-consolidação deve citar. A consolidação ainda sai em Markdown; o grafo de consolidação entre reuniões (as
+resumo, depois de passar nele o gate (`bash .claude/validation/meeting-graph-check.sh <grafo>`, rc 0): as
+decisões, ações e riscos dele trazem `trace` ao trecho da transcrição, e é esse trace que a consolidação deve
+citar. Grafo reprovado no gate (sem tentativa de aviso, por exemplo) não entra na consolidação. A consolidação ainda sai em Markdown; o grafo de consolidação entre reuniões (as
 reuniões ligadas por arestas) é trabalho aberto.
 
 ## ⚡ Fluxo de Execução

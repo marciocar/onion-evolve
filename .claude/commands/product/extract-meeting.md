@@ -4,7 +4,7 @@ description: |
   Extração estruturada de conhecimento de transcrições de reuniões usando Framework EXTRACT.
   Use para transformar arquivos de contexto bruto em artefatos de alto valor para humanos, sistemas e IA.
   Grava o resumo (.md) e o grafo da reunião (.kg.yaml, com trace ao trecho e o registro de aviso aos
-  participantes) em docs/meetings/, e o grafo só fica se passar no gate meeting-graph-check.sh.
+  participantes) em docs/meetings/; o gate meeting-graph-check.sh diz se o grafo vale.
 allowed-tools: Read Write Bash(find *) Bash(test -e *) Bash(mkdir -p *) Bash(basename *) Bash(wc -l *) Bash(bash .claude/validation/meeting-graph-check.sh *)
 
 parameters:
@@ -277,8 +277,13 @@ jurídico, não fato da transcrição, e o gate reprova qualquer chave `legal_co
   `SEM-TENTATIVA-DE-AVISO`. É o comportamento esperado; o caminho é registrar o aviso na próxima reunião (ou anexar à transcrição o aviso
   que foi dado por outro canal, como o convite, e citar essa linha).
 - Participante que não respondeu é `sem_resposta`, nunca `ciente` por suposição.
-- Se alguém **recusou**, a captura para ali: `x_capture_stopped_at: "#L<linha da recusa>"`, e nenhuma
-  decisão, ação ou risco pode citar trecho depois dessa linha.
+- Se alguém **recusou**, a captura para ali: `x_capture_stopped_at: "#L<linha da recusa>"` (a linha do
+  `trace` do participante que recusou, ou antes dela), e nenhuma decisão, ação ou risco pode citar trecho
+  que **termine** depois dessa linha.
+- O `x_notice_text` é **verbatim** do trecho que o `trace` do aviso cita, e o aviso vem antes do primeiro
+  fato (decisão, ação ou risco). Aviso dado depois do que foi decidido não avisou ninguém.
+- Todo nó do grafo leva `x_meeting_role`, e `x_meeting_source` é relativo à raiz do repo, sem `..` que saia
+  dela. Nenhuma chave fala de consentimento (o gate reprova qualquer chave com `consent` no nome).
 
 ### Passo 7: Gate do grafo
 
@@ -287,7 +292,9 @@ bash .claude/validation/meeting-graph-check.sh docs/meetings/<nome>.kg.yaml
 ```
 
 - **rc 0**: conforme (aviso registrado, trace ao trecho, radar verde).
-- **rc 1**: reprovado. A saída lista um motivo por linha, `MOTIVO<TAB>nó<TAB>detalhe`; mostre todos. Corrija o que é erro de extração (trace
+- **rc 1**: reprovado. A saída lista um motivo por linha, `MOTIVO<TAB>nó<TAB>detalhe`; mostre todos. O
+  grafo reprovado **fica gravado** em `docs/meetings/` (é o registro do que a transcrição tem e do que falta),
+  mas não é apresentado como válido, e quem o consome roda o gate antes. Corrija o que é erro de extração (trace
   errado, nó órfão, dono que não é participante) e rode de novo. `SEM-TENTATIVA-DE-AVISO` e
   `RECUSA-SEM-PARADA` **não se corrigem no grafo**: dizem que a reunião não tem registro de aviso ou que a
   captura seguiu depois de uma recusa. Mostre o motivo ao usuário e não apresente o grafo como válido.
