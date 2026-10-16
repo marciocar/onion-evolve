@@ -9771,7 +9771,7 @@ PY
   _cc_acldefault() { local r; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:300} | $(grep -c . "${d}/st/acl" 2>/dev/null)"
     _crrc "${r}" 0 && grep -qF -- "-m g:onion-chat:--x,d:g:onion-chat:rwx,d:u:$(id -un):rwx,d:m::rwx -- ${d}/state/workspaces" "${d}/st/acl"; }
   _cc_aclexisting() { local r; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:300}"
-    _crrc "${r}" 0 && grep -F -- "-m g:onion-chat:rwX,u:$(id -un):rwX -- " "${d}/st/acl" | grep -qF "${d}/state/workspaces/aaaaaaaaaaaaaaaa"; }
+    _crrc "${r}" 0 && grep -qF "${d}/state/workspaces/aaaaaaaaaaaaaaaa" <<< "$(grep -F -- "-m g:onion-chat:rwX,u:$(id -un):rwX -- " "${d}/st/acl")"; }
   _cc_handshake() { local r; : > "${d}/st/accept-all"; r="$(_crr "$1" install --apply)"; CR_WHY="${r:0:600}"
     _crrc "${r}" 1 && _crhas "${r}" "FALHA recusa" && _crhas "${r}" "o bridge NÃO foi ligado" \
       && [ ! -f "${d}/units/onion-vps-bridge.service.d/40-chat-runner.conf" ] && [ "$(grep -c 'systemctl restart onion-vps-bridge' "${d}/st/calls")" = 0 ]; }
