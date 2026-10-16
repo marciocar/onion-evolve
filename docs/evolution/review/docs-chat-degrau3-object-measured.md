@@ -2,8 +2,7 @@
 branch: docs/chat-degrau3-object-measured
 pr: 1167
 date: 2026-10-16
-reviewed_diff_sha256: 2d9600d0f580e98278d7b900e72675f1b1ab7a9d46dd2b34a7c7405c2553be01
-reviewed_code_sha256: 087e6dee7ab816bc98751ba77f0c19e54f699483040da0af3d695f448e57ff27
+reviewed_diff_sha256: pendente
 findings_total: 12
 findings_real: 10
 tokens: 317000
@@ -69,3 +68,7 @@ o `kg-contract-check.sh` rc 0 e o `kg-machine-path-check.sh` com 0 acusação.
 - O `IPAddressDeny=` foi medido só em unit transitória, não na unit real do runner. A allowlist fechada do wrapper
   recusaria a diretiva até ser estendida.
 - A contagem de portas é do instante da sonda (~11:45 UTC); as efêmeras mudam.
+
+## Re-revisão (selo do maestro, 2026-10-16)
+
+O maestro respondeu a `D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016` com «Parquear + fechar a rede (Recomendado)», selado pelo `kg-decide-seal.sh` (radar `--integrity --schema` exit 0 e contrato rc 0). O diff novo é só o selo no nó (escolhida, descartadas, data, pergunta); não há código. A tese revisada nas duas passadas não muda: a opção A passa a ser o próximo PR de execução (unit do runner com `IPAddressDeny=` atrás de flag no bridge e a allowlist do `chat-runner.sh` com bancada e mutante).
