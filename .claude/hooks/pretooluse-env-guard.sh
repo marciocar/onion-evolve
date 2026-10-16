@@ -184,7 +184,8 @@ INTERP = {'python', 'python3', 'node', 'ruby', 'perl', 'php', 'deno', 'bun'}
 DUMPERS = {'env', 'printenv'}
 VALUE_FLAGS = {'--exclude', '--exclude-dir', '--env-file', '-e', '--regexp', '-f'}   # o valor seguinte não é arquivo lido
 HELPER = 'env-check.sh'
-# SAC-149 (2026-10-15, medido no --update de um adotante): `grep -oE '\.claude/hooks/[A-Za-z0-9_.-]*' arq; test -f .env`
+# SAC-149 (2026-10-15, medido no --update de um adotante): um grep cujo PADRÃO era a regex dos nomes de hook (pasta
+# de hooks seguida de `[A-Za-z0-9_.-]*`), numa linha que também rodava `test -f .env`,
 # era vetado. O `.env` literal da linha liga o modo estrito, e o veto julgava o PADRÃO do grep como um glob que
 # alcança `.env` (`[A-Za-z0-9_.-]*` casa `.env` no fnmatch). O padrão não é arquivo: o grep o lê como regex.
 # Sem -e/-f (nem cluster curto que os contenha, que erra para o veto), o 1º posicional sai da lista de lidos.
