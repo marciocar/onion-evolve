@@ -2,7 +2,8 @@
 branch: feat/chat-runner-egress-fence
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f5ae82708847515bb17054be6c8a05e01702598db051fb4ebdfc471157e7f2a1
+reviewed_code_sha256: 58fcdd4e73e4bda5ece574f1f22d5533ee02ffd8559aab87eb5b8411b5713926
 findings_total: 15
 findings_real: 13
 tokens: 383000
