@@ -325,6 +325,8 @@ A formatação de descrições e comentários **muda conforme o provider ativo**
 
 Toda mudança no core do Onion se valida **rodando o artefato de verdade** — não só plano/lint/spec. Aprenda com o que o uso revela e **resolva no mesmo loop** (fix → re-dogfood), testando modo-de-falha (não só happy-path) e tratando veredito de revisor/subagente como hipótese a verificar com evidência. O gate mecânico (`.claude/validation/`: lint + selftest + inventory) é o dogfood determinístico; para o resto, **invoque o artefato e observe**. Doutrina canônica (com evidência e o encaixe no loop de auto-evolução): [`docs/knowledge-base/concepts/onion-dogfooding-doctrine.md`](docs/knowledge-base/concepts/onion-dogfooding-doctrine.md).
 
+**Base atual, sempre (ordem eterna do maestro, 2026-10-16):** construa sobre a `origin/main` recém-buscada e as versões atuais; defasagem no caminho é subida ou nomeada; faltou pacote, peça autorização ao maestro e instale pela fonte oficial, nunca contorne. Quem cobra é o hook `session-currency-check.sh` (mede por `.claude/validation/currency-census.sh`). Doutrina: [`keep-current-doctrine.md`](docs/knowledge-base/concepts/keep-current-doctrine.md).
+
 ---
 
 ## 🚀 Deployment

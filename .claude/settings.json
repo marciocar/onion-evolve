@@ -92,6 +92,16 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-currency-check.sh\"",
+            "timeout": 15,
+            "statusMessage": "Conferindo se a base está nas versões atuais (Onion)"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-degraded-notice.sh\""
           }
         ]
