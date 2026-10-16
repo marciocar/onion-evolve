@@ -9998,6 +9998,9 @@ PY
     _crrc "${r}" 1 && _crhas "${r}" "ABAIXO do piso 2.1.64" && ! _crinstalled; }
   _cc_floor_noversion() { local r; _crr "$1" install --apply >/dev/null; _crcli "cli-falso"; r="$(_crr "$1" verify)"; CR_WHY="${r:0:500}"
     _crrc "${r}" 1 && _crhas "${r}" "não respondeu uma versão a --version"; }
+  _cc_floor_rc() { local r; _crr "$1" install --apply >/dev/null
+    printf '#!/bin/sh\necho "2.1.301 (Claude Code)"\nexit 3\n' > "${d}/home/h/onion-bridge/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"
+    r="$(_crr "$1" verify)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "saiu com rc 3"; }
   _cc_f_flagonly() { local r; r="$(_crr "$1" verify --egress-fence)"; CR_WHY="${r:0:200}"; _crrc "${r}" 3; }
   _cc_help() { local r rc=0; r="$(bash "$1" --help 2>&1)" || rc=$?
     CR_WHY="rc=${rc} fim='$(tail -1 <<< "${r}")'"; [ "${rc}" = 0 ] && case "${r}" in *"3 uso inválido"*) true ;; *) false ;; esac; }
@@ -10120,6 +10123,8 @@ PY
     'CLI_FLOOR_LINE="$(cli_floor)" || die 1' 'CLI_FLOOR_LINE="$(cli_floor)" || true' _cc_floor_install
   _crcase "(r62) CLI que não responde versão a --version → FALHA, nunca passa calado" \
     '(${CLAUDE_SRC}): ${out:0:60}"; return 1' '(${CLAUDE_SRC}): ${out:0:60}"; return 0' _cc_floor_noversion
+  _crcase "(r63) --version do CLI que sai com erro (ou sudo que falha) → FALHA com o rc, mesmo com uma versão impressa" \
+    '  if [ "${rc}" != 0 ]; then' '  if false; then' _cc_floor_rc
   [ -f "${d}/st/runner.pid" ] && kill "$(cat "${d}/st/runner.pid")" 2>/dev/null
   kill "${pid_on}" "${pid_off}" 2>/dev/null; wait "${pid_on}" "${pid_off}" 2>/dev/null
   chmod 0755 "${d}/home" 2>/dev/null; [ -d "${d}/home/h" ] && chmod -R u+rwX "${d}/home/h" 2>/dev/null; [ -d "${d}/state" ] && chmod -R u+rwX "${d}/state" 2>/dev/null
