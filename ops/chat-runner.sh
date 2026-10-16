@@ -577,6 +577,27 @@ cli_floor() {
   echo "FALHA o CLI do SDK não respondeu uma versão a --version (${CLAUDE_SRC}): ${out:0:60}"; return 1
 }
 
+# o CONTRATO entre o Agent SDK SERVIDO e o lançador INSTALADO (refutador da SAC-156, passada 2): o aperto de mão abaixo
+# usa um argv escrito aqui, na forma separada, e não o que o SDK do bridge entrega; um bump do SDK que mudasse uma flag
+# faria o lançador recusar todo turno de convidado sem nenhuma linha FALHA. A prova é do bridge servido
+# (scripts/sdk-runner-contract-selftest.py: o argv do SDK instalado com a política real passa pelo check_args, o piso do
+# CLI, o ambiente e o initialize), rodada como a conta do serviço contra o lançador que o root instalou. Imprime UMA
+# linha OK/FALHA; o rodapé do selftest vai junto quando reprova
+CONTRACT_SELFTEST=scripts/sdk-runner-contract-selftest.py
+sdk_contract() {
+  local out rc
+  if ! as_svc test -f "${BRIDGE}/${CONTRACT_SELFTEST}"; then
+    echo "FALHA o bridge servido não tem ${CONTRACT_SELFTEST} (anterior à SAC-156): faça o deploy do bridge (ops/update-bridge.sh)"; return 1
+  fi
+  out="$(as_svc /usr/bin/timeout 180 /usr/bin/env -i PATH=/usr/bin:/bin HOME="${SVC_HOME}" LC_ALL=C \
+    LAUNCHER_PATH="${LIBEXEC}/launcher.py" /usr/bin/python3 -I "${BRIDGE}/${CONTRACT_SELFTEST}" 2>&1)"; rc=$?
+  if [ "${rc}" = 0 ]; then
+    echo "OK o argv do SDK servido, com a política do convidado, passa pelo lançador instalado ($(grep -c '^  ✓' <<<"${out}") asserções)"; return 0
+  fi
+  echo "FALHA o contrato SDK↔lançador instalado reprovou (rc ${rc}$([ "${rc}" = 124 ] && echo ', teto de 180 s')): $(grep -m3 '^  ✗' <<<"${out}" | tr '\n' ' ' | cut -c1-400)"
+  return 1
+}
+
 # o aperto de mão REAL pelo socket, como a conta do serviço: o initialize do SDK (o CLI responde sem chamar a API) e a
 # recusa (flag fora da allowlist: zero byte de volta). Nenhuma chave vai no cabeçalho.
 handshake() {
@@ -726,6 +747,7 @@ verify_all() {
   elif [ "$(systemctl is-active "${SOCKET_UNIT}" 2>/dev/null)" = active ]; then vok "${SOCKET_UNIT} ativo em ${SOCKET}"
   else vbad "${SOCKET_UNIT} não está ativo"; fi
   local floor; if floor="$(cli_floor)"; then vok "${floor#OK }"; else vbad "${floor#FALHA }"; fi
+  local contract; if contract="$(sdk_contract)"; then vok "${contract#OK }"; else vbad "${contract#FALHA }"; fi
   echo "-- sandbox do template INSTALADO (unit transitória sob UID dinâmico):"
   if priv test -f "${UNIT_DIR}/${TEMPLATE_UNIT}"; then
     priv cat "${UNIT_DIR}/${TEMPLATE_UNIT}" > "${TMPD}/installed.service"

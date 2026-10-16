@@ -9784,6 +9784,13 @@ EOF
     mkdir -p "${C}" "${B}/src" "${B}/data" "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64" "${d}/home/h/.ssh"
     # o CLI FALSO responde uma versão no piso (SAC-156: o wrapper mede o --version contra o CLI_FLOOR)
     printf '#!/bin/sh\necho "2.1.301 (Claude Code)"\n' > "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"; chmod +x "${B}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"
+    # SAC-156: o selftest do contrato SDK↔lançador do bridge servido, FALSO: passa só com o lançador INSTALADO no
+    # LAUNCHER_PATH e o ambiente limpo; reprova quando a bancada planta ${d}/st/contract-fail
+    mkdir -p "${B}/scripts"; printf '%s\n' 'import os, sys' \
+      "lp = os.environ.get('LAUNCHER_PATH', ''); bad = os.path.exists('${d}/st/contract-fail')" \
+      "if lp != '${d}/libexec/launcher.py' or not os.path.isfile(lp) or 'CR_FAKE' in os.environ or bad:" \
+      "    print('  ✗ contrato falso: LAUNCHER_PATH=%r fail=%s' % (lp, bad)); sys.exit(1)" \
+      "print('  ✓ contrato falso: o lançador instalado'); print('  ✓ e o ambiente limpo')" > "${B}/scripts/sdk-runner-contract-selftest.py"
     printf 'node_modules/\n' > "${B}/.gitignore"; echo x > "${B}/src/server.ts"; echo x > "${B}/src/chat-runner.ts"; echo pat > "${d}/home/h/.git-credentials"
     cat > "${C}/launcher.py" <<'PYEOF'
 import os, sys
@@ -10001,6 +10008,13 @@ PY
   _cc_floor_rc() { local r; _crr "$1" install --apply >/dev/null
     printf '#!/bin/sh\necho "2.1.301 (Claude Code)"\nexit 3\n' > "${d}/home/h/onion-bridge/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude"
     r="$(_crr "$1" verify)"; CR_WHY="${r:0:500}"; _crrc "${r}" 1 && _crhas "${r}" "saiu com rc 3"; }
+  _cc_contract_fail() { local r; _crr "$1" install --apply >/dev/null; : > "${d}/st/contract-fail"; r="$(_crr "$1" verify)"; CR_WHY="${r:0:600}"
+    _crrc "${r}" 1 && _crhas "${r}" "FALHA o contrato SDK↔lançador instalado reprovou (rc 1)" && _crhas "${r}" "contrato falso"; }
+  _cc_contract_ok() { local r; _crr "$1" install --apply >/dev/null; r="$(_crr "$1" verify)"; CR_WHY="${r:0:600}"
+    _crrc "${r}" 0 && _crhas "${r}" "OK o argv do SDK servido, com a política do convidado, passa pelo lançador instalado (2 asserções)"; }
+  _cc_contract_absent() { local r; _crr "$1" install --apply >/dev/null
+    git -C "${d}/home/h/onion-bridge" rm -q scripts/sdk-runner-contract-selftest.py && git -C "${d}/home/h/onion-bridge" -c user.email=t@t -c user.name=t commit -qm rm
+    r="$(_crr "$1" verify)"; CR_WHY="${r:0:600}"; _crrc "${r}" 1 && _crhas "${r}" "anterior à SAC-156"; }
   _cc_f_flagonly() { local r; r="$(_crr "$1" verify --egress-fence)"; CR_WHY="${r:0:200}"; _crrc "${r}" 3; }
   _cc_help() { local r rc=0; r="$(bash "$1" --help 2>&1)" || rc=$?
     CR_WHY="rc=${rc} fim='$(tail -1 <<< "${r}")'"; [ "${rc}" = 0 ] && case "${r}" in *"3 uso inválido"*) true ;; *) false ;; esac; }
@@ -10125,6 +10139,13 @@ PY
     '(${CLAUDE_SRC}): ${out:0:60}"; return 1' '(${CLAUDE_SRC}): ${out:0:60}"; return 0' _cc_floor_noversion
   _crcase "(r63) --version do CLI que sai com erro (ou sudo que falha) → FALHA com o rc, mesmo com uma versão impressa" \
     '  if [ "${rc}" != 0 ]; then' '  if false; then' _cc_floor_rc
+  _crcase "(r64) verify: o contrato SDK↔lançador do bridge servido reprova → rc 1 com o rodapé do selftest" \
+    '  if [ "${rc}" = 0 ]; then' '  if true; then' _cc_contract_fail
+  _crcase "(r65) o contrato roda contra o lançador INSTALADO (LAUNCHER_PATH), com o ambiente limpo, e passa" \
+    '    LAUNCHER_PATH="${LIBEXEC}/launcher.py" /usr/bin/python3' '    /usr/bin/python3' _cc_contract_ok
+  _crcase "(r66) bridge servido sem o selftest do contrato → FALHA pedindo o deploy, nunca passa calado" \
+    '    echo "FALHA o bridge servido não tem ${CONTRACT_SELFTEST} (anterior à SAC-156): faça o deploy do bridge (ops/update-bridge.sh)"; return 1' \
+    '    echo "OK sem contrato"; return 0' _cc_contract_absent
   [ -f "${d}/st/runner.pid" ] && kill "$(cat "${d}/st/runner.pid")" 2>/dev/null
   kill "${pid_on}" "${pid_off}" 2>/dev/null; wait "${pid_on}" "${pid_off}" 2>/dev/null
   chmod 0755 "${d}/home" 2>/dev/null; [ -d "${d}/home/h" ] && chmod -R u+rwX "${d}/home/h" 2>/dev/null; [ -d "${d}/state" ] && chmod -R u+rwX "${d}/state" 2>/dev/null
