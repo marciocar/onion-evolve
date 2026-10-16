@@ -1,9 +1,8 @@
 ---
 branch: feat/adopter-shape-cures
-pr: pendente
+pr: 1159
 date: 2026-10-15
-reviewed_diff_sha256: e1d9505c475725986b024dfb8286deb55f096005580abc0f3b4cff5b11bfbe38
-reviewed_code_sha256: fb89f9bd1fdde4389a621785f16238a0c18a2b8606e8acbd83ffb60c63bf85bd
+reviewed_diff_sha256: pendente
 findings_total: 13
 findings_real: 10
 tokens: 177543
@@ -108,3 +107,12 @@ O dogfood dos mutantes pegou três defeitos da própria família, curados no la�
 - Só o papel adopted é medido.
 - O lint só lê `# aplica-se:` no docstring. Não há caso de bancada para a linha posta dentro da função: o
   registry a recusa, mas a recusa do lado do lint não está coberta.
+
+## Re-revisão (rebase sobre a main depois do merge do #1156)
+
+O #1156 entrou na main, e o merge-serial recusou o auto-rebase deste PR: havia conflito no resíduo do #1156,
+que este PR empilhado também carregava. Rebaseei só os commits deste PR sobre `origin/main` (rebase --onto).
+O resíduo do #1156 fica como está na main, e este PR leva apenas o próprio. Os conflitos de projeção
+(`docs/backlog.md`, `docs/onion/testing-inventory.md`) foram resolvidos pelo lado da main e regenerados pelo
+`pr-finalize`. O código do PR 2 não mudou no rebase. A re-revisão foi feita por mim, não pelo refutador:
+re-rodei as famílias afetadas com `LC_ALL=C`.
