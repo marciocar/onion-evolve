@@ -20,7 +20,10 @@ meta:
                                # Gatilhos antecipados: (1) [LIDOS na rodada de primárias de 2026-10-15]; (2) o degrau
                                # 0 ou 1 ser aplicado no vivo; (3) update do Claude Code/SDK no bridge.
   # kg-backlog-guard: on
-  # ═══ TETO: 132 NÓS ═══
+  # ═══ TETO: 134 NÓS ═══
+  #   SELOS DOS DEGRAUS 2 E 3 (2026-10-16, +2): as respostas do maestro «Construir já, instalar com você» (degrau 2)
+  #   e «Depois do degrau 2» (degrau 3) nascem como nós PRÓPRIOS ligados ao selo «1 já, 2 e 3 por spike», pelo
+  #   selador (kg-decide-seal.sh), antes de qualquer construção.
   #   DEGRAU 1 EM PRODUÇÃO (2026-10-16, +1): o --apply do 30-integrity.conf medido no processo vivo
   #   (E_DEGRAU1_EM_PRODUCAO_1016). Ele DISPARA o gatilho (2) da revisita acima (degrau 1 aplicado no vivo).
   #   DEGRAU 1 + SPIKES (2026-10-16, +4): o selo «1 já, 2 e 3 por spike» nasce como nó PRÓPRIO ligado à mãe
@@ -2073,6 +2076,38 @@ nodes:
       locator: "⟨drop-in 30-integrity.conf do onion-vps-bridge⟩; nsenter -t <MainPID> -m findmnt"
       method: "medição: wrapper em produção + leitura independente sem escrita em caminho servido"
       locality: "host"
+  - id: D_MAESTRO_DEGRAU2_CONSTRUIR_JA_1016
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "decisão do maestro em 2026-10-16, por pergunta com opções (/meta:decide): escolhida «Construir já, instalar com você (Recomendado)»"
+    label: "DECISÃO DO MAESTRO (2026-10-16): construir já o degrau 2 do isolamento do /chat (UID distinto por sessão: lançador por socket sob DynamicUser, com as 3 correções do spike) e instalá-lo com o maestro, que roda o --apply root."
+    narrative: "Selado por /meta:decide em 2026-10-16: escolhida «Construir já, instalar com você (Recomendado)»; descartadas: «Só a cura parcial do data/» · «Parquear com gatilho»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-16: «Degrau 2 (UID distinto por sessão do /chat): é o único que fecha o segredo (.env, environ, PAT) e o data/ gravável. O spike provou o mecanismo (socket + DynamicUser) com 3 correções. Como seguir?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      locality: "pessoa"
+  - id: D_MAESTRO_DEGRAU3_DEPOIS_DO_DEGRAU2_1016
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-16"
+    verified_against: "decisão do maestro em 2026-10-16, por pergunta com opções (/meta:decide): escolhida «Depois do degrau 2 (Recomendado)»"
+    label: "DECISÃO DO MAESTRO (2026-10-16): o degrau 3 (sandbox nativo do Claude Code no /chat) espera o degrau 2: socat, a cópia privada do bwrap e o perfil AppArmor entram depois, pelo caminho dentro da instância do degrau 2, sem o managed-settings do host."
+    narrative: "Selado por /meta:decide em 2026-10-16: escolhida «Depois do degrau 2 (Recomendado)»; descartadas: «Instalar socat e perfil já» · «Parquear»."
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-16: «Degrau 3 (sandbox nativo do Claude Code no /chat): exige socat, uma cópia privada do bwrap e um perfil AppArmor (root); o managedSettings descarta bwrapPath, e o caminho alternativo depende do degrau 2. Como seguir?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      locality: "pessoa"
 
 edges:
   - from: E_SECDEP_PROXY_PATTERN_PLATFORM
@@ -2619,5 +2654,11 @@ edges:
     to: C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE
     edge_type: SUPPORTS
   - from: E_DEGRAU1_EM_PRODUCAO_1016
+    to: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
+    edge_type: TRACES_TO
+  - from: D_MAESTRO_DEGRAU2_CONSTRUIR_JA_1016
+    to: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
+    edge_type: TRACES_TO
+  - from: D_MAESTRO_DEGRAU3_DEPOIS_DO_DEGRAU2_1016
     to: D_MAESTRO_DEGRAU1_JA_DEGRAUS_2_3_POR_SPIKE_1016
     edge_type: TRACES_TO
