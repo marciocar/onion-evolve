@@ -7408,15 +7408,18 @@ _og_empty_states() {
   printf 'meta:\n  id: metav\n  x_dissect_tool: metav\n  x_dissect_verdict: rejeitar\n  x_dissect_criterion: "pdftotext a.pdf - | wc -c"\n  x_dissect_overcoming: nenhuma\n  x_dissect_overcoming_measure: "procurou-se OCR em apt-cache"\nnodes: []\n' > "${d}/docs/evolution/dissect/metav.kg.yaml"
   # overcoming VAZIO com medida ⇒ sem-x_dissect_overcoming (antes: superacao-id-invalido)
   printf 'meta:\n  id: ovvazio\n  x_dissect_tool: ovvazio\nnodes:\n  - id: D_Y\n    x_dissect_verdict: rejeitar\n    x_dissect_criterion: "pdftotext a.pdf - | wc -c"\n    x_dissect_overcoming:\n    x_dissect_overcoming_measure: "procurou-se OCR em apt-cache"\n' > "${d}/docs/evolution/dissect/ovvazio.kg.yaml"
+  # veredito no meta: com superação POR ID e aresta sem `to:` ⇒ recusado (sem id não há nó a apontar;
+  # achado do refutador: com d="" a aresta sem `to:` casava e o negativo contava)
+  printf 'meta:\n  id: metasup\n  x_dissect_tool: metasup\n  x_dissect_verdict: rejeitar\n  x_dissect_criterion: "pdftotext a.pdf - | wc -c"\n  x_dissect_overcoming: S_X\nnodes:\n  - id: S_X\n    node_type: evidence\n    status: confirmed\n    verified_at: "2026-10-15"\n    verified_against: bancada-reproduzida\n    label: "s"\n\nedges:\n  - from: S_X\n    edge_type: TRACES_TO\n' > "${d}/docs/evolution/dissect/metasup.kg.yaml"
   git -C "${d}" add -A >/dev/null 2>&1
   tsv="$(bash "${sut}" "${d}" --tsv 2>&1)"
-  for t in vazio metav ovvazio; do printf '%s=%s;' "${t}" "$(printf '%s\n' "${tsv}" | awk -F'\t' -v t="${t}" '$1==t{print $9; exit}')"; done
+  for t in vazio metav ovvazio metasup; do printf '%s=%s;' "${t}" "$(printf '%s\n' "${tsv}" | awk -F'\t' -v t="${t}" '$1==t{print $9; exit}')"; done
   bash "${sut}" "${d}" --check-verdict vazio >/dev/null 2>&1; printf 'rc-vazio=%s\n' "$?"
   rm -rf "${d}"
 }
 _judge_empty_field_dissect_cases() {
   local sut="$1" o m mo want
-  want='vazio=veredito-SEM-SUPERACAO(sem-x_dissect_criterion);metav=veredito;ovvazio=veredito-SEM-SUPERACAO(sem-x_dissect_overcoming);rc-vazio=1'
+  want='vazio=veredito-SEM-SUPERACAO(sem-x_dissect_criterion);metav=veredito;ovvazio=veredito-SEM-SUPERACAO(sem-x_dissect_overcoming);metasup=veredito-SEM-SUPERACAO(superacao-sem-id-do-veredito);rc-vazio=1'
   # (og-e1) campo VAZIO fica no lugar dele: critério vazio, id vazio (veredito no meta:) e overcoming vazio
   #         nomeiam o motivo certo, sem o motivo do campo vizinho que o colapso do tab empurrava.
   o="$(_og_empty_states "${sut}")"
@@ -7435,6 +7438,14 @@ _judge_empty_field_dissect_cases() {
     mo="$(_og_empty_states "${m}/dc.sh")"
     if [ "${mo}" != "${want}" ]; then record_pass "dissect: (og-e1m) mutante com separador TAB reprova no (og-e1) (${mo:0:80}…)"
     else record_fail "dissect: (og-e1m)" "MUTANTE com separador TAB PASSOU no (og-e1)"; fi
+  fi
+  # (og-e1m2) MUTANTE: sem a recusa do veredito sem id, o metasup com aresta sem `to:` volta a contar
+  sed 's/elif \[ -z "${og_id}" \]; then ogwhy=/elif false; then ogwhy= # ONION_MUTANTE /' "${sut}" > "${m}/dc2.sh"
+  if cmp -s "${sut}" "${m}/dc2.sh"; then record_fail "dissect: (og-e1m2)" "o mutante NÃO foi plantado (âncora do sed ausente) — o caso não prova nada"
+  else
+    mo="$(_og_empty_states "${m}/dc2.sh")"
+    if [ "${mo}" != "${want}" ] && grep -qF 'metasup=veredito;' <<< "${mo}"; then record_pass "dissect: (og-e1m2) mutante sem a recusa do veredito sem id deixa o metasup contar (o (og-e1) o pega)"
+    else record_fail "dissect: (og-e1m2)" "o mutante não mudou o metasup para veredito: ${mo}"; fi
   fi
   rm -rf "${m}"
 }

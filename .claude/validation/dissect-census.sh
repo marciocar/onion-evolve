@@ -223,6 +223,10 @@ for rel in "${GRAPHS[@]}"; do
       # a razão MEDIDA tem palavras (duas com letra), não pontuação de enchimento
       [ "$(printf '%s' "${og_meas}" | LC_ALL=C tr -s '[:space:]' '\n' | LC_ALL=C grep -c '[A-Za-z]')" -ge 2 ] || ogwhy="${ogwhy},nenhuma-sem-medida"
     elif ! [[ "${og_ov}" =~ ^[A-Za-z0-9_]+$ ]]; then ogwhy="${ogwhy},superacao-id-invalido"
+    # veredito SEM id (declarado no `meta:`, antes de qualquer `- id:`): não há nó para a aresta da
+    # superação apontar, e com d="" uma aresta SEM `to:` casava `to == d` e a busca de circularidade
+    # semeava do vazio (achado do refutador, 2026-10-16). `nenhuma` medida segue valendo no meta:.
+    elif [ -z "${og_id}" ]; then ogwhy="${ogwhy},superacao-sem-id-do-veredito"
     else
       grep -qE "^[[:space:]]*- id:[[:space:]]*[\"']?${og_ov}[\"']?[[:space:]]*(#.*)?\$" "${f}" || ogwhy="${ogwhy},superacao-${og_ov}-inexistente"
       awk -v s="${og_ov}" -v d="${og_id}" '
