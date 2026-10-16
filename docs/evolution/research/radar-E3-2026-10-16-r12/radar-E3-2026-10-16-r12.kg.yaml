@@ -9,7 +9,7 @@ meta:
   review_after: "2026-11-15"   # 30d: cadência de ferramenta
   x_supersedes_none: "nenhum item de 2.1.301 contradiz nó da r11: a questão aberta Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO não é tocada pelo delta, e os 12 nós da r11 seguem valendo; os de hooks e OTel (E_HOOKS_DO_CORE_SAO_TODOS_COMMAND, E_OTEL_E_REFTABLE_SEM_CONSUMIDOR) foram medidos de novo em 2026-10-16 (22 hooks command, 0 consumidor de OTel)"
   # ═══ TETO: 25 NÓS ═══
-  #   2 no esqueleto (2026-10-16); 13 depois da rodada e do juiz (2026-10-16); 14 com a prova em produção da SAC-156 (2026-10-16); 15 com a cura do censo da SAC-155 (2026-10-16); 16 com o deploy do bridge fail-closed depois do update (2026-10-16), teto mantido.
+  #   2 no esqueleto (2026-10-16); 13 depois da rodada e do juiz (2026-10-16); 14 com a prova em produção da SAC-156 (2026-10-16); 15 com a cura do censo da SAC-155 (2026-10-16); 16 com o deploy do bridge fail-closed depois do update (2026-10-16); 17 com os verifies que separam NÃO MEDIU de REPROVOU (2026-10-16), teto mantido.
 # ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
 #   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
 # external_edges:
@@ -258,7 +258,27 @@ nodes:
       locator: "função post_verify e o bloco NOT_PROVEN da fase 6; casos (u1) a (u21) da família"
       method: "medição: a versão de origin/main e a curada na mesma sandbox, mais a bancada com mutante por caso"
       locality: "host"
+  - id: E_VERIFY_DO_BRIDGE_SEPARA_NAO_MEDIU_DE_REPROVOU_1016
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-16"
+    verified_against: "medido em 2026-10-16 na branch fix/bridge-wrappers-unmeasured-rc, sem tocar o serviço: os dois wrappers REAIS, em produção, com um sudo falso que sai 1 com 'sudo: a password is required' e um systemctl falso; em origin/main o verify do degrau 1 saiu rc 1 (última linha: a mensagem do sudo) e o do runner saiu rc 1 afirmando 'fonte com SYMLINK no caminho' sobre um arquivo que ninguém leu, e o update-bridge rotularia os dois 'o verify REPROVOU'; curados, os dois saem rc 2 com 'NÃO MEDI' (o rc que o EXIT dos dois já reservava para sudo, sem colidir com o 3 de uso inválido), e o update-bridge os nomeia 'NÃO MEDIU (rc 2)'; o bridge-hardening exige a linha n_fail do sh de checagem (sem ela o sh não rodou: sudo, nsenter ou alvo ilegível) e o DropInPaths legível; o chat-runner sonda sudo -n como root e como a conta do serviço antes de qualquer leitura; o JWKS medido uma vez NÃO é corrida no update (o veredito do jwksSelfCheck sai na MESMA linha do 'auth: enforce' que a fase 5 espera, e cada /chat re-busca sozinho no bridge), mas no NOOP o boot vivo pode ter dias e a linha OK passou a dar a data do boot e declarar que a alcançabilidade de agora não é re-medida; bancada: bridge_hardening (h29, h30), chat_runner (r24b, r24c, na cópia rastreada num git da sandbox, em produção, com sudo falso que nunca executa nada) e update_bridge (u22, u23), cada um com mutante; quatro mutantes plantados por ops/mutate-and-restore.sh nos arquivos reais derrubaram 1, 2, 3 e 1 casos intactos; teto declarado: a sonda do runner prova o sudo no início, e um sudo que passe a falhar no meio ainda cai no veredito da checagem; não medido: o verify verde contra o serviço real"
+    narrative: "Cura a lacuna que E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016 declarou como não medida: o deploy já saía rc 1 nos dois casos, mas o rótulo dizia REPROVOU onde a verdade era NÃO MEDIU. A medição achou pior que o rótulo: o runner AFIRMAVA um symlink que não leu."
+    label: "os verifies do degrau 1 e do runner saem rc 2 (não pude medir) quando o sudo, o nsenter ou o alvo falham, e o deploy do bridge os nomeia NÃO MEDIU, nunca REPROVOU"
+    trace: "ops/chat-runner.sh"
+    provenance:
+      source: "ops/bridge-hardening.sh (verify_live), ops/chat-runner.sh (sonda do sudo), ops/update-bridge.sh (fase 6) e as famílias bridge_hardening, chat_runner e update_bridge do .claude/validation/lint-selftest.sh"
+      locator: "casos (h29), (h30), (r24b), (r24c), (u22) e (u23)"
+      method: "medição: os wrappers reais de origin/main e curados com sudo falso, mais a bancada com mutante por caso"
+      locality: "host"
 edges:
+  - from: E_VERIFY_DO_BRIDGE_SEPARA_NAO_MEDIU_DE_REPROVOU_1016
+    to: E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016
+    edge_type: SUPPORTS
   - from: E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016
     to: Q_SUBIR_O_SDK_DO_BRIDGE_COM_PISO_DE_VERSAO
     edge_type: SUPPORTS
