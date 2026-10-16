@@ -282,8 +282,11 @@ jurídico, não fato da transcrição, e o gate reprova qualquer chave `legal_co
   que **termine** depois dessa linha.
 - O `x_notice_text` é **verbatim** do trecho que o `trace` do aviso cita, e o aviso vem antes do primeiro
   fato (decisão, ação ou risco). Aviso dado depois do que foi decidido não avisou ninguém.
+- O `x_notice_text` é a fala do aviso **inteira** (ao menos metade do trecho citado), nunca uma palavra dela.
 - Todo nó do grafo leva `x_meeting_role`, e `x_meeting_source` é relativo à raiz do repo, sem `..` que saia
-  dela. Nenhuma chave fala de consentimento (o gate reprova qualquer chave com `consent` no nome).
+  dela. As chaves `x_` são **só** as do esquema acima (vocabulário fechado), e nenhuma chave fala de
+  consentimento. Um nó por item `- id:`, sem estilo fluxo (`- {id: …}`), sem chave repetida e sem lista
+  dentro do nó.
 
 ### Passo 7: Gate do grafo
 

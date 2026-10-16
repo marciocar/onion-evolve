@@ -39825,7 +39825,7 @@ _family run_mcp_onion_kg_writer_selftests
 # GRAFO DE REUNIÃO — SAC-157 (passo zero do core, 2026-10-16). O /product:extract-meeting passou a gravar o
 # `.kg.yaml` da reunião, e o gate dele é o meeting-graph-check.sh: trace ao trecho da transcrição e o modelo
 # aviso ≠ consentimento (tentativa de aviso, resposta por participante, parada na recusa, nunca consentimento
-# legal). Casos: (a) o --selftest próprio (39 polaridades, o contrato julgado no core) · (b) a CLI sobre a fixture boa, como o comando a
+# legal). Casos: (a) o --selftest próprio (55 polaridades, o contrato julgado no core) · (b) a CLI sobre a fixture boa, como o comando a
 # chama → rc 0 · (c) a CLI sobre a reunião SEM tentativa de aviso (o grafo que o próprio comando gerou no dogfood)
 # → rc 1 com esse motivo e só ele · (d) sem o radar
 # ao lado → rc 2, nunca verde · (m) UM MUTANTE POR CURA, na CÓPIA — mutante que não se aplica é FALHA.
@@ -39849,6 +39849,10 @@ run_meeting_graph_selftests() {
   if [ "${rc}" -eq 1 ] && grep -q $'^SEM-TENTATIVA-DE-AVISO\t' <<< "${o}" && [ "$(grep -c $'\t' <<< "${o}")" -eq 1 ]; then
     record_pass "meeting-graph: (c) reunião sem tentativa de aviso → rc 1, só SEM-TENTATIVA-DE-AVISO"
   else record_fail "meeting-graph: (c) sem aviso" "rc=${rc}; $(head -3 <<< "${o}" | tr '\n' '|')"; fi
+  # (e) a seleção por caso não é verde por vacuidade: nome inexistente → rc 1
+  if o="$(LC_ALL=C bash "${chk}" --selftest "caso que não existe" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -qF '✗ caso inexistente' <<< "${o}"; then record_pass "meeting-graph: (e) --selftest de caso inexistente → rc 1"
+  else record_fail "meeting-graph: (e) seleção vazia" "rc=${rc}"; fi
   # (d) sem o radar ao lado → rc 2 (não julgou a integridade, não passa)
   local sb; sb="$(TMPDIR=/tmp mktemp -d)"
   mkdir -p "${sb}/.claude/validation/lib" "${sb}/.claude/validation/fixtures/meeting-graph" "${sb}/.claude/utils"
@@ -39872,7 +39876,8 @@ run_meeting_graph_selftests() {
          "${s}" "${old}" "${new}"; then
       record_fail "meeting-graph: (m) mutante não aplicou" "${want}"; continue
     fi
-    if mo="$(LC_ALL=C bash "${s}" --selftest 2>&1)"; then mrc=0; else mrc=$?; fi
+    # só o caso que o mutante nomeia (a cura dele); as 55 polaridades inteiras por mutante custavam ~50x o (a)
+    if mo="$(LC_ALL=C bash "${s}" --selftest "${want}" 2>&1)"; then mrc=0; else mrc=$?; fi
     if [ "${mrc}" -eq 1 ] && grep -qF "✗ ${want}" <<< "${mo}"; then record_pass "meeting-graph: (m) mutante morde → ✗ ${want}"
     else record_fail "meeting-graph: (m) mutante NÃO morde" "${want} (rc=${mrc})"; fi
   done <<EOF_MUT
@@ -39883,23 +39888,39 @@ if not notices:$(printf '\x1f')if 0:$(printf '\x1f')sem tentativa de aviso repro
 RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso"}$(printf '\x1f')RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso", "consentiu"}$(printf '\x1f')resposta 'consentiu' reprova
         if notices and roles.get(ref) != "notice_attempt": fail($(printf '\x1f')        if 0: fail($(printf '\x1f')ref de aviso inexistente reprova
 if notices and roles.get(ref) != "notice_attempt": fail($(printf '\x1f')if roles.get(ref) != "notice_attempt": fail($(printf '\x1f')sem aviso, com refs '-', reprova por um motivo só
-    if re.search(r"consent", re.sub(r"[_\\-]", "", k.lower())): consent_keys.append(k)$(printf '\x1f')    pass$(printf '\x1f')consentimento legal declarado reprova
-re.sub(r"[_\\-]", "", k.lower())$(printf '\x1f')k$(printf '\x1f')consentimento em outra grafia reprova
+    if re.search(r"consent", k.lower()): consent_keys.append(k)$(printf '\x1f')    pass$(printf '\x1f')consentimento legal declarado reprova
+re.search(r"consent", k.lower())$(printf '\x1f')re.search(r"consent", k)$(printf '\x1f')consentimento em outra grafia reprova
     if not s or s.startswith("#"): continue$(printf '\x1f')    if not s: continue$(printf '\x1f')comentário que cita consentimento não reprova
 if refusal_lines and stop_line is None:$(printf '\x1f')if 0:$(printf '\x1f')recusa sem parada reprova
 if refusal_lines and stop_line is not None and stop_line > min(refusal_lines):$(printf '\x1f')if 0:$(printf '\x1f')parada depois da recusa reprova
-        if r in FACTS and by[i].get("_to", 0) > stop_line:$(printf '\x1f')        if 0:$(printf '\x1f')recusa com parada antes da decisão reprova
+stop_line > min(refusal_lines)$(printf '\x1f')stop_line > max(refusal_lines)$(printf '\x1f')duas recusas: a parada vale pela 1ª
+        if r != "meeting" and by[i].get("_to", 0) > stop_line:$(printf '\x1f')        if 0:$(printf '\x1f')recusa com parada antes da decisão reprova
 by[i].get("_to", 0) > stop_line$(printf '\x1f')by[i].get("_from", 0) > stop_line$(printf '\x1f')faixa que atravessa a parada reprova
+by[i].get("_to", 0) > stop_line$(printf '\x1f')by[i].get("_to", 0) >= stop_line$(printf '\x1f')fato que termina na linha da parada passa
+if r != "meeting" and by[i]$(printf '\x1f')if r in FACTS and by[i]$(printf '\x1f')participante depois da parada reprova
 (nlines is None or int(m.group(1)) <= nlines)$(printf '\x1f')(True)$(printf '\x1f')parada além do fim do arquivo reprova
+if m and int(m.group(1)) >= 1 and$(printf '\x1f')if m and$(printf '\x1f')parada na linha 0 reprova
     if r is None: fail("PAPEL-AUSENTE", n["id"], "nó sem x_meeting_role num grafo de reunião"); continue$(printf '\x1f')    if r is None: continue$(printf '\x1f')nó sem papel reprova
-elif cur is not None and ind(line) == nodecol + 2 and k and k not in cur:$(printf '\x1f')elif cur is not None and ind(line) == 4 and k and k not in cur:$(printf '\x1f')nó com outra indentação é lido
+elif cur is not None and ind(line) == nodecol + 2 and k and not s.startswith("- "):$(printf '\x1f')elif cur is not None and ind(line) == 4 and k and not s.startswith("- "):$(printf '\x1f')nó com outra indentação é lido
+elif cur is not None and ind(line) == nodecol + 2 and k and not s.startswith("- "):$(printf '\x1f')elif cur is not None and ind(line) == nodecol + 2 and k:$(printf '\x1f')lista dentro do nó não sombreia a chave real
+            else: fail("NO-FORA-DA-FORMA"$(printf '\x1f')            else: (lambda *a: None)("NO-FORA-DA-FORMA"$(printf '\x1f')nó em estilo fluxo reprova
+        if not s or ind(line) > block: continue$(printf '\x1f')        pass$(printf '\x1f')texto de bloco literal não é chave
+            if k in cur: dup.append((cur["id"], k))$(printf '\x1f')            if 0: dup.append((cur["id"], k))$(printf '\x1f')chave repetida no nó reprova
+        if k.startswith("x_") and k not in NODE_X: fail($(printf '\x1f')        if 0: fail($(printf '\x1f')chave x fora do vocabulário reprova
+    return nfc(re.sub(r"\\s+#.*\$", "", v))$(printf '\x1f')    return nfc(v)$(printf '\x1f')comentário no fim do valor é ignorado
+    if not m or os.path.normpath(m.group(1)) != src:$(printf '\x1f')    if not m:$(printf '\x1f')trace para outro arquivo reprova
+src = os.path.normpath(meta.get("x_meeting_source", ""))$(printf '\x1f')src = (meta.get("x_meeting_source", ""))$(printf '\x1f')fonte com ./ passa
     if not t: fail("TRACE-AUSENTE", n["id"], "nó de reunião sem trace ao trecho"); continue$(printf '\x1f')    if not t: continue$(printf '\x1f')nó sem trace reprova
-    if not m or m.group(1) != src:$(printf '\x1f')    if not m:$(printf '\x1f')trace para outro arquivo reprova
+    if a < 1 or b < a or (nlines is not None and b > nlines):$(printf '\x1f')    if (nlines is not None and b > nlines):$(printf '\x1f')trace na linha 0 reprova
+    if a < 1 or b < a or (nlines is not None and b > nlines):$(printf '\x1f')    if a < 1 or (nlines is not None and b > nlines):$(printf '\x1f')faixa invertida reprova
     if a < 1 or b < a or (nlines is not None and b > nlines):$(printf '\x1f')    if 0:$(printf '\x1f')trace além do fim do arquivo reprova
-    if os.path.isabs(src) or not (p == rr or p.startswith(rr + os.sep)):$(printf '\x1f')    if 0:$(printf '\x1f')fonte absoluta reprova
+    if not (p == rr or p.startswith(rr + os.sep)):$(printf '\x1f')    if 0:$(printf '\x1f')fonte absoluta reprova
 if "participant" not in roles.values(): fail($(printf '\x1f')if 0: fail($(printf '\x1f')reunião sem participante reprova
-    if lines is not None and "_from" in n and txt not in$(printf '\x1f')    if 0 and lines is not None and "_from" in n and txt not in$(printf '\x1f')aviso que não está no trecho reprova
+    if txt not in cited:$(printf '\x1f')    if txt not in norm(" ".join(lines)):$(printf '\x1f')aviso citando outra linha reprova
+    if txt not in cited:$(printf '\x1f')    if 0:$(printf '\x1f')aviso que não está no trecho reprova
+    elif len(txt) < 20 or len(txt) * 2 < len(cited):$(printf '\x1f')    elif 0:$(printf '\x1f')aviso de uma palavra reprova
 if facts_from and notice_from and min(notice_from) > min(facts_from):$(printf '\x1f')if 0:$(printf '\x1f')aviso depois dos fatos reprova
+min(notice_from) > min(facts_from)$(printf '\x1f')max(notice_from) > min(facts_from)$(printf '\x1f')dois avisos: vale o 1º
         if not (o == "NAO_ESPECIFICADO" or roles.get(o) == "participant"):$(printf '\x1f')        if 0:$(printf '\x1f')ação sem dono reprova
     if r not in ROLES: fail($(printf '\x1f')    if 0: fail($(printf '\x1f')papel desconhecido reprova
     else: fail("TRANSCRICAO-AUSENTE"$(printf '\x1f')    else: (lambda *a: None)("TRANSCRICAO-AUSENTE"$(printf '\x1f')transcrição ausente reprova
@@ -39909,6 +39930,7 @@ if facts_from and notice_from and min(notice_from) > min(facts_from):$(printf '\
 if "meeting" not in roles.values(): fail($(printf '\x1f')if 0: fail($(printf '\x1f')sem nó de reunião reprova
   if [ "\${rrc}" -ne 0 ]; then$(printf '\x1f')  if false; then$(printf '\x1f')radar reprova o órfão
       1) printf 'CONTRATO$(printf '\x1f')      9) printf 'CONTRATO$(printf '\x1f')contrato reprova o method fora da forma
+  g="\$(realpath -- "\$1")"$(printf '\x1f')  g="\$1"$(printf '\x1f')contrato julga também o caminho relativo
 EOF_MUT
   rm -rf "${sb}"
 }

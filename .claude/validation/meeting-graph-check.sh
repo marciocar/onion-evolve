@@ -11,7 +11,7 @@
 # transcrição). Este script cobra as duas e roda o radar por cima.
 #
 # Uso:  bash .claude/validation/meeting-graph-check.sh <grafo.kg.yaml> [--root <dir>]
-#       bash .claude/validation/meeting-graph-check.sh --selftest
+#       bash .claude/validation/meeting-graph-check.sh --selftest ["<nome de um caso>"]
 #   --root  diretório a que `meta.x_meeting_source` e os `trace:` são relativos (padrão: a raiz git do
 #           grafo; sem git, o diretório corrente).
 #
@@ -53,47 +53,72 @@ FIX="${HERE}/fixtures/meeting-graph"
 command -v python3 >/dev/null 2>&1 || { echo "meeting-graph-check: python3 ausente — não pude julgar" >&2; exit 2; }
 
 _check() {   # <grafo> <raiz>
-  local g="$1" root="$2" out rc rout rrc
+  local g root="$2" out rc rout rrc
+  # caminho ABSOLUTO já: o contrato roda com `cd` na raiz, e um relativo saía "não julgado" com rc 0
+  # (2ª passada do refutador, achado 3 — a mesma classe que o kg-decide-seal.sh já curou)
+  g="$(realpath -- "$1")"
   out="$(python3 -I -B - "${g}" "${root}" <<'PY'
-import os, re, sys
+import os, re, sys, unicodedata
 g, root = sys.argv[1], sys.argv[2]
 ROLES = {"meeting", "participant", "notice_attempt", "decision", "action", "risk"}
 FACTS = ("decision", "action", "risk")
 RESP = {"ciente", "recusou", "sem_resposta", "autora_do_aviso"}
 CHAN = {"chat", "voz", "convite", "outro"}
+# VOCABULÁRIO FECHADO das extensões `x_` (2ª passada do refutador, achado 6): negar por substring deixava
+# `x_autorizacao_lgpd: concedida` passar. Chave x_ fora destas listas reprova; o resto do nó é a gramática
+# do .kg.yaml, que o radar e o contrato julgam.
+META_X = {"x_meeting_date", "x_meeting_source", "x_capture_stopped_at", "x_cost_tokens"}
+NODE_X = {"x_meeting_role", "x_notice_channel", "x_notice_text", "x_notice_ref", "x_notice_response",
+          "x_owner", "x_due", "x_path_is_content"}
 bad = []
 def fail(code, nid, why): bad.append(f"{code}\t{nid}\t{why}")
+nfc = lambda x: unicodedata.normalize("NFC", x)
 def val(line):
     v = line.split(":", 1)[1].strip()
-    v = re.sub(r"\s+#.*$", "", v) if not v.startswith(('"', "'")) else v
-    if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'": v = v[1:-1]
-    return v
+    if v[:1] == '"' and v[-1:] == '"' and len(v) >= 2: return nfc(v[1:-1].replace('\\"', '"'))
+    if v[:1] == "'" and v[-1:] == "'" and len(v) >= 2: return nfc(v[1:-1].replace("''", "'"))
+    return nfc(re.sub(r"\s+#.*$", "", v))
 def ind(line): return len(line) - len(line.lstrip(" "))
-# LEITOR: a forma estrita do radar, mas sem confiar em coluna fixa. Comentário (`#` em qualquer coluna) NUNCA
-# abre seção — o 1º leitor tratava `# ── decisões ──` na coluna 0 como seção nova e cegava o gate para os nós
-# seguintes (achado 1 do refutador). Seção = chave de topo `^[A-Za-z_]...:`. As chaves de um nó são as da
-# indentação do `- id:` + 2, qualquer que seja ela (achado 2: `- id:` com 4 espaços escapava).
-meta, nodes, cur, sec, nodecol = {}, [], None, None, None
-consent_keys = []
+# LEITOR: a forma estrita do radar, sem confiar em coluna fixa e sem deixar nada escapar calado.
+#  · comentário (`#`, qualquer coluna) nunca abre seção; seção = chave de topo `^[A-Za-z_]...:` (1ª passada);
+#  · conteúdo de bloco literal (`|`, `>`) é texto, não chave (um `- id:` dentro de label não cria nó);
+#  · o 1º `- id:` fixa a coluna dos nós; as chaves do nó são SÓ as da coluna + 2, e item de lista dentro do nó
+#    (`- x_notice_response: …` sob uma chave aninhada) NÃO é chave do nó (2ª passada, achado 1: sombreava a real);
+#  · na coluna dos nós, todo item que não for `- id:` (estilo fluxo `- {id: …}`, `-   id:`) reprova (achado 2);
+#  · chave repetida no nó reprova aqui, sem depender do radar.
+meta, nodes, cur, sec, nodecol, block = {}, [], None, None, None, None
+consent_keys, dup = [], []
 for raw in open(g, encoding="utf-8"):
-    line = raw.rstrip("\n").rstrip("\r")
+    line = raw.rstrip("\n")
     s = line.strip()
+    if block is not None:
+        if not s or ind(line) > block: continue
+        block = None
     if not s or s.startswith("#"): continue
     m = re.match(r"^([A-Za-z_][A-Za-z0-9_]*):", line)
     if m: sec = m.group(1); cur = None; nodecol = None; continue
     key = s[2:] if s.startswith("- ") else s
     k = key.split(":", 1)[0].strip() if ":" in key else ""
-    # qualquer chave que fale de consentimento, em qualquer grafia (legal_consent, legalConsent, x_lgpd_consent,
-    # consentimento_legal…): o modelo registra AVISO e RESPOSTA, e consentimento é juízo jurídico (achado 7)
-    if re.search(r"consent", re.sub(r"[_\-]", "", k.lower())): consent_keys.append(k)
-    if sec == "meta" and ind(line) == 2 and k: meta[k] = val(key)
+    if ":" in key and re.fullmatch(r"[|>][+-]?", key.split(":", 1)[1].strip()): block = ind(line)
+    if re.search(r"consent", k.lower()): consent_keys.append(k)
+    if sec == "meta" and ind(line) == 2 and k and not s.startswith("- "): meta[k] = val(key)
     elif sec == "nodes":
-        if re.match(r"^- id:", s):
-            cur = {"id": val(s[2:])}; nodes.append(cur); nodecol = ind(line)
-        elif cur is not None and ind(line) == nodecol + 2 and k and k not in cur: cur[k] = val(key)
+        if nodecol is None and s.startswith("-"): nodecol = ind(line)
+        if ind(line) == nodecol and s.startswith("-"):
+            if re.match(r"^- id:", s): cur = {"id": val(s[2:])}; nodes.append(cur)
+            else: fail("NO-FORA-DA-FORMA", "-", f"item da lista de nós fora da forma `- id:`: {s[:60]}"); cur = None
+        elif cur is not None and ind(line) == nodecol + 2 and k and not s.startswith("- "):
+            if k in cur: dup.append((cur["id"], k))
+            else: cur[k] = val(key)
 for k in consent_keys:
     fail("CONSENTIMENTO-LEGAL-DECLARADO", "-", f"chave {k}: o grafo registra aviso e resposta, nunca consentimento")
-src = meta.get("x_meeting_source", "")
+for nid, k in dup: fail("CHAVE-DUPLICADA", nid, f"{k} aparece mais de uma vez no nó")
+for k in meta:
+    if k.startswith("x_") and k not in META_X: fail("CHAVE-X-DESCONHECIDA", "meta", f"{k} fora do vocabulário do grafo de reunião")
+for n in nodes:
+    for k in n:
+        if k.startswith("x_") and k not in NODE_X: fail("CHAVE-X-DESCONHECIDA", n["id"], f"{k} fora do vocabulário do grafo de reunião")
+src = os.path.normpath(meta.get("x_meeting_source", "")) if meta.get("x_meeting_source") else ""
 for k in ("x_meeting_date", "x_meeting_source", "x_capture_stopped_at"):
     if not meta.get(k): fail("META-INCOMPLETA", "meta", f"falta {k}")
 if meta.get("x_meeting_date") and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", meta["x_meeting_date"]):
@@ -101,11 +126,11 @@ if meta.get("x_meeting_date") and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", meta["x
 lines = None
 if src:
     rr = os.path.realpath(root); p = os.path.realpath(os.path.join(root, src))
-    # a fonte MORA na raiz: absoluto ou `..` que sai dela não é trecho reverificável (achado 5)
-    if os.path.isabs(src) or not (p == rr or p.startswith(rr + os.sep)):
+    # a fonte MORA na raiz: absoluto ou `..` que sai dela não é trecho reverificável (1ª passada)
+    if not (p == rr or p.startswith(rr + os.sep)):
         fail("FONTE-FORA-DA-RAIZ", "meta", f"x_meeting_source {src} é absoluto ou sai da raiz")
     elif os.path.isfile(p):
-        with open(p, encoding="utf-8", errors="replace") as fh: lines = [x.rstrip("\r\n") for x in fh]
+        with open(p, encoding="utf-8", errors="replace") as fh: lines = [nfc(x.rstrip("\r\n")) for x in fh]
     else: fail("TRANSCRICAO-AUSENTE", "meta", f"x_meeting_source não existe sob a raiz: {src}")
 nlines = len(lines) if lines is not None else None
 stop = meta.get("x_capture_stopped_at", "")
@@ -117,7 +142,7 @@ if stop and stop != "-":
 roles = {}
 for n in nodes:
     r = n.get("x_meeting_role")
-    # num grafo de reunião TODO nó tem papel: sem ele, o nó fugia de todas as regras (achado 2)
+    # num grafo de reunião TODO nó tem papel: sem ele, o nó fugia de todas as regras (1ª passada)
     if r is None: fail("PAPEL-AUSENTE", n["id"], "nó sem x_meeting_role num grafo de reunião"); continue
     roles[n["id"]] = r
     if r not in ROLES: fail("PAPEL-DESCONHECIDO", n["id"], f"x_meeting_role {r}"); continue
@@ -129,7 +154,7 @@ for n in nodes:
     t = n.get("trace", "")
     if not t: fail("TRACE-AUSENTE", n["id"], "nó de reunião sem trace ao trecho"); continue
     m = re.fullmatch(r"(.+)#L(\d+)(?:-L(\d+))?", t)
-    if not m or m.group(1) != src:
+    if not m or os.path.normpath(m.group(1)) != src:
         fail("TRACE-FORA-DA-FONTE", n["id"], f"trace {t!r} não é {src}#L<a>[-L<b>]"); continue
     a = int(m.group(2)); b = int(m.group(3) or a)
     if a < 1 or b < a or (nlines is not None and b > nlines):
@@ -147,9 +172,14 @@ for i in notices:
     txt = norm(n.get("x_notice_text", ""))
     if n.get("x_notice_channel") not in CHAN or not txt:
         fail("AVISO-INCOMPLETO", i, "x_notice_channel (chat|voz|convite|outro) e x_notice_text são obrigatórios"); continue
-    # o texto é VERBATIM do trecho citado (achado 8): aviso que não está na linha citada não foi dado ali
-    if lines is not None and "_from" in n and txt not in norm(" ".join(lines[n["_from"] - 1:n["_to"]])):
+    if lines is None or "_from" not in n: continue
+    cited = norm(" ".join(lines[n["_from"] - 1:n["_to"]]))
+    # VERBATIM do trecho citado (1ª passada) E não um fragmento dele (2ª passada, achado 4: uma palavra
+    # satisfazia a cobrança): o texto do aviso cobre ao menos metade do trecho e tem ao menos 20 caracteres.
+    if txt not in cited:
         fail("AVISO-FORA-DO-TRECHO", i, "x_notice_text não aparece no trecho que o trace cita")
+    elif len(txt) < 20 or len(txt) * 2 < len(cited):
+        fail("AVISO-FRAGMENTO", i, f"x_notice_text cobre {len(txt)} de {len(cited)} caracteres do trecho: copie a fala do aviso inteira")
 facts_from = [by[i]["_from"] for i, r in roles.items() if r in FACTS and "_from" in by[i]]
 notice_from = [by[i]["_from"] for i in notices if "_from" in by[i]]
 if facts_from and notice_from and min(notice_from) > min(facts_from):
@@ -161,7 +191,8 @@ for i, r in roles.items():
         resp = n.get("x_notice_response")
         if not resp: fail("PARTICIPANTE-SEM-RESPOSTA", i, "falta x_notice_response")
         elif resp not in RESP: fail("RESPOSTA-FORA-DO-ENUM", i, f"x_notice_response {resp} (enum: {'|'.join(sorted(RESP))})")
-        if resp == "recusou": refusal_lines.append(n.get("_from", 0))
+        # a recusa acontece no FIM do trecho do participante (quem entra em L11 e recusa em L13 cita L11-L13)
+        if resp == "recusou": refusal_lines.append(n.get("_to", 0))
         ref = n.get("x_notice_ref", "")
         # sem NENHUMA tentativa de aviso o motivo é um só (SEM-TENTATIVA-DE-AVISO); a ref vazia é consequência
         if notices and roles.get(ref) != "notice_attempt": fail("AVISO-REF-INEXISTENTE", i, f"x_notice_ref {ref or '(vazio)'} não é um notice_attempt")
@@ -169,14 +200,15 @@ for i, r in roles.items():
         o = n.get("x_owner", "")
         if not (o == "NAO_ESPECIFICADO" or roles.get(o) == "participant"):
             fail("ACAO-SEM-DONO", i, f"x_owner {o or '(vazio)'} não é participant nem NAO_ESPECIFICADO")
-# A PARADA é amarrada à RECUSA (achado 3): existe, não passa da 1ª linha de recusa, e nenhum fato TERMINA depois dela
+# A PARADA é amarrada à RECUSA: existe, não passa da 1ª recusa, e nada além do nó da reunião cita trecho
+# que TERMINE depois dela (2ª passada, achado 7: participante e aviso também são captura)
 if refusal_lines and stop_line is None:
     fail("RECUSA-SEM-PARADA", "meta", "alguém recusou o aviso e x_capture_stopped_at é \"-\": a captura tem de parar na recusa")
 if refusal_lines and stop_line is not None and stop_line > min(refusal_lines):
     fail("PARADA-DEPOIS-DA-RECUSA", "meta", f"a captura parou em #L{stop_line}, depois da 1ª recusa em #L{min(refusal_lines)}")
 if stop_line is not None:
     for i, r in roles.items():
-        if r in FACTS and by[i].get("_to", 0) > stop_line:
+        if r != "meeting" and by[i].get("_to", 0) > stop_line:
             fail("CAPTURA-APOS-RECUSA", i, f"trecho vai até a linha {by[i]['_to']}, depois da parada em #L{stop_line}")
 print("\n".join(bad))
 sys.exit(1 if bad else 0)
@@ -189,7 +221,7 @@ PY
   # ("não pude julgar": vendor ausente, como num plugin) é DECLARADO, não reprova nem vira verde calado.
   if [ -f "${HERE}/kg-contract-check.sh" ]; then
     local cout crc
-    cout="$(cd "${root}" && LC_ALL=C bash "${HERE}/kg-contract-check.sh" "$(realpath -- "${g}")" 2>&1)"; crc=$?
+    cout="$(cd "${root}" && LC_ALL=C bash "${HERE}/kg-contract-check.sh" "${g}" 2>&1)"; crc=$?
     case "${crc}" in
       0) ;;
       1) printf 'CONTRATO	-	kg-contract-check.sh reprovou: %s
@@ -208,6 +240,9 @@ PY
 }
 
 if [ "${1:-}" = "--selftest" ]; then
+  # `--selftest "<nome do caso>"` roda SÓ esse caso: é o que o mutante da bancada usa (um mutante por cura,
+  # e o caso que ele nomeia). Nome que não casa caso nenhum sai 1 — seleção vazia nunca é verde.
+  ONLY="${2:-}"
   # Polaridades sobre CÓPIAS do grafo bom da bancada (fixture fictícia, nenhum dado real). Cada caso
   # reprova pelo MOTIVO nomeado — reprovar por outro motivo não conta.
   [ -f "${FIX}/meeting-ok.kg.yaml" ] && [ -f "${FIX}/transcript-ok.txt" ] \
@@ -218,9 +253,11 @@ if [ "${1:-}" = "--selftest" ]; then
   G="${T}/g.kg.yaml"; P=0; F=0
   _case() {   # <nome> <motivo-esperado|OK|SO:motivo> <python que muta o texto em s> [raiz]   (SO: = o ÚNICO motivo)
     local name="$1" want="$2" mut="$3" croot="${4:-${T}}" o r only=0
+    [ -z "${ONLY}" ] || [ "${name}" = "${ONLY}" ] || return 0
     case "${want}" in SO:*) only=1; want="${want#SO:}" ;; esac
     python3 -I -B -c "import sys; s=open(sys.argv[1]).read(); ${mut}; open(sys.argv[2],'w').write(s)" "${FIX}/meeting-ok.kg.yaml" "${G}"
-    o="$(_check "${G}" "${croot}" 2>/dev/null)"; r=$?
+    if [ "${5:-}" = "rel" ]; then o="$(cd "${T}" && _check "$(basename "${G}")" "${croot}" 2>/dev/null)"; r=$?
+    else o="$(_check "${G}" "${croot}" 2>/dev/null)"; r=$?; fi
     if [ "${only}" -eq 1 ] && [ "$(grep -c . <<< "${o}")" -ne 1 ]; then r=99; fi
     if { [ "${want}" = "OK" ] && [ "${r}" -eq 0 ]; } || { [ "${want}" != "OK" ] && [ "${r}" -eq 1 ] && grep -q "^${want}	" <<< "${o}"; }; then
       echo "✅ ${name}"; P=$((P+1))
@@ -242,7 +279,7 @@ if [ "${1:-}" = "--selftest" ]; then
   _case "recusa no fim, com parada nela, passa" OK "s=s.replace('x_notice_response: ciente','x_notice_response: recusou',1).replace('transcript-ok.txt#L4\"','transcript-ok.txt#L10\"',1).replace('x_capture_stopped_at: \"-\"','x_capture_stopped_at: \"#L10\"',1)"
   _case "comentário na coluna 0 não cega o leitor" RECUSA-SEM-PARADA "s=s.replace('  - id: P_BRUNO_EXEMPLO','# ── participantes ──\n  - id: P_BRUNO_EXEMPLO',1).replace('x_notice_response: ciente','x_notice_response: recusou',1)"
   _case "nó sem papel reprova" PAPEL-AUSENTE "s=s.replace('    x_meeting_role: decision\n','',1)"
-  _case "nó com outra indentação é lido" TRACE-FORA-DA-FONTE "s=s.replace('  - id: R_LIB_PDF_SEM_MANUTENCAO\n    node_type: claim\n    x_meeting_role: risk\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.6\n','    - id: R_LIB_PDF_SEM_MANUTENCAO\n      node_type: claim\n      x_meeting_role: risk\n      plane: DEV\n      status: open\n      impact: 3\n      confidence: 0.6\n',1).replace('    trace: \".claude/validation/fixtures/meeting-graph/transcript-ok.txt#L9\"','      trace: \"outra.txt#L9\"',1)"
+  _case "nó com outra indentação é lido" TRACE-FORA-DA-FONTE "import re; a=s.index('nodes:\\n')+7; b=s.index('\\nedges:'); s=s[:a]+re.sub(r'(?m)^(?=.)','  ',s[a:b])+s[b:]; s=s.replace('transcript-ok.txt#L9\\\"','outra.txt#L9\\\"',1)"
   _case "fonte absoluta reprova" FONTE-FORA-DA-RAIZ "s=s.replace('x_meeting_source: \".claude','x_meeting_source: \"/.claude',1)"
   _case "fonte que sai da raiz reprova" FONTE-FORA-DA-RAIZ "s=s.replace('x_meeting_source: \".claude','x_meeting_source: \"../x/.claude',1)"
   _case "reunião sem participante reprova" SEM-PARTICIPANTE "s=s.replace('x_meeting_role: participant','x_meeting_role: meeting').replace('x_owner: P_CARLA_MODELO','x_owner: NAO_ESPECIFICADO',1)"
@@ -253,6 +290,22 @@ if [ "${1:-}" = "--selftest" ]; then
   _case "meta sem data reprova" META-INCOMPLETA "import re; s=re.sub(r'\n  x_meeting_date:[^\n]*','',s,1)"
   _case "sem nó de reunião reprova" SEM-REUNIAO "s=s.replace('x_meeting_role: meeting','x_meeting_role: risk',1)"
   _case "comentário que cita consentimento não reprova" OK "s=s.replace('nodes:\n','nodes:\n  # x_legal_consent: não se usa, o modelo é aviso e resposta\n',1)"
+  _case "lista dentro do nó não sombreia a chave real" RECUSA-SEM-PARADA "s=s.replace('    x_notice_response: ciente\n','    tags:\n    - x_notice_response: ciente\n    x_notice_response: recusou\n',1)"
+  _case "nó em estilo fluxo reprova" NO-FORA-DA-FORMA "s=s.replace('\nedges:','  - {id: D_SECRET, x_meeting_role: decision}\n\nedges:',1)"
+  _case "texto de bloco literal não é chave" OK "s=s.replace('    label: \"Risco: a biblioteca','    narrative: |-\n      consent: isto é texto do bloco, não chave\n    label: \"Risco: a biblioteca',1)"
+  _case "chave repetida no nó reprova" CHAVE-DUPLICADA "s=s.replace('    x_notice_response: ciente\n','    x_notice_response: ciente\n    x_notice_response: ciente\n',1)"
+  _case "chave x fora do vocabulário reprova" CHAVE-X-DESCONHECIDA "s=s.replace('    x_notice_response: ciente\n','    x_notice_response: ciente\n    x_autorizacao_lgpd: concedida\n',1)"
+  _case "aviso de uma palavra reprova" AVISO-FRAGMENTO "import re; s=re.sub(r'x_notice_text: \"[^\"]*\"','x_notice_text: \"Aviso\"',s,1)"
+  _case "aviso citando outra linha reprova" AVISO-FORA-DO-TRECHO "s=s.replace('transcript-ok.txt#L3\"','transcript-ok.txt#L6\"',1)"
+  _case "duas recusas: a parada vale pela 1ª" PARADA-DEPOIS-DA-RECUSA "s=s.replace('x_notice_response: ciente','x_notice_response: recusou').replace('x_capture_stopped_at: \"-\"','x_capture_stopped_at: \"#L5\"',1)"
+  _case "dois avisos: vale o 1º" OK "s=s.replace('  - id: P_ANA_TESTE','  - id: NOTICE_2\n    node_type: evidence\n    x_meeting_role: notice_attempt\n    x_notice_channel: voz\n    x_notice_text: \"Risco: a biblioteca de PDF que usamos está sem manutenção há um ano.\"\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.5\n    label: \"Segunda tentativa de aviso, fictícia.\"\n    trace: \".claude/validation/fixtures/meeting-graph/transcript-ok.txt#L9\"\n\n  - id: P_ANA_TESTE',1).replace('\nedges:\n','\nedges:\n\n  - from: NOTICE_2\n    to: MEETING\n    edge_type: SUPPORTS\n',1)"
+  _case "fato que termina na linha da parada passa" OK "s=s.replace('x_notice_response: ciente','x_notice_response: recusou',1).replace('transcript-ok.txt#L4\"','transcript-ok.txt#L9\"',1).replace('x_capture_stopped_at: \"-\"','x_capture_stopped_at: \"#L9\"',1)"
+  _case "participante depois da parada reprova" CAPTURA-APOS-RECUSA "s=s.replace('x_notice_response: ciente','x_notice_response: recusou',1).replace('transcript-ok.txt#L4\"','transcript-ok.txt#L9\"',1).replace('x_capture_stopped_at: \"-\"','x_capture_stopped_at: \"#L9\"',1).replace('transcript-ok.txt#L5\"','transcript-ok.txt#L10\"',1)"
+  _case "trace na linha 0 reprova" TRACE-FORA-DO-ARQUIVO "s=s.replace('transcript-ok.txt#L9\"','transcript-ok.txt#L0\"',1)"
+  _case "faixa invertida reprova" TRACE-FORA-DO-ARQUIVO "s=s.replace('transcript-ok.txt#L6-L7','transcript-ok.txt#L7-L6',1)"
+  _case "parada na linha 0 reprova" META-INCOMPLETA "s=s.replace('x_capture_stopped_at: \"-\"','x_capture_stopped_at: \"#L0\"',1)"
+  _case "comentário no fim do valor é ignorado" OK "s=s.replace('    x_notice_response: ciente\n','    x_notice_response: ciente  # respondeu\n',1)"
+  _case "fonte com ./ passa" OK "s=s.replace('x_meeting_source: \".claude','x_meeting_source: \"./.claude',1)"
   _case "CRLF passa" OK "s=s.replace('\n','\r\n')"
   _case "nó sem trace reprova" TRACE-AUSENTE "import re; s=re.sub(r'\n    trace: \"[^\"]*#L9\"','',s,1)"
   _case "trace para outro arquivo reprova" TRACE-FORA-DA-FONTE "s=s.replace('transcript-ok.txt#L9','outra.txt#L9',1)"
@@ -269,7 +322,9 @@ if [ "${1:-}" = "--selftest" ]; then
   if [ -n "${CROOT}" ] && [ -f "${CROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && [ -f "${HERE}/kg-contract-check.sh" ] \
      && [ -f "${CROOT}/.claude/validation/fixtures/meeting-graph/transcript-ok.txt" ]; then
     _case "contrato reprova o method fora da forma" CONTRATO "s=s.replace('method: \"leitura: trecho da transcrição da reunião\"','method: \"lido na transcrição\"',1)" "${CROOT}"
+    _case "contrato julga também o caminho relativo" CONTRATO "s=s.replace('method: \"leitura: trecho da transcrição da reunião\"','method: \"lido na transcrição\"',1)" "${CROOT}" rel
   else echo "⊘ contrato reprova o method fora da forma (vendor/kg-ssot ausente: não julgado aqui)"; fi
+  if [ -n "${ONLY}" ] && [ "$((P + F))" -eq 0 ]; then echo "✗ caso inexistente: ${ONLY}"; F=1; fi
   echo "meeting-graph selftest: ${P} passaram, ${F} falharam"
   [ "${F}" -eq 0 ]; exit $?
 fi
