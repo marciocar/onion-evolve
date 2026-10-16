@@ -2,7 +2,8 @@
 branch: feat/chat-isolation-degrau1
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a03e6f187b05437647e77d151e898036b5e1d9fca3502a0fe1fbf71149fde21b
+reviewed_code_sha256: 0ff24729ebcb407b5b2f294725c320b4e4e38ed2be9236beacdaa513b5166a87
 findings_total: 12
 findings_real: 12
 tokens: 318101
