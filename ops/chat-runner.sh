@@ -391,7 +391,8 @@ effective_props() {
   out="$(systemctl show onion-chat@verify.service -p DynamicUser -p User -p ExecStartPre -p ExecStartPost -p ExecStart -p ProtectHome -p TemporaryFileSystem -p PrivateTmp 2>/dev/null)"
   grep -qx 'DynamicUser=yes' <<<"${out}" || { echo "    FALHA efetivo: DynamicUser não é yes"; nf=$((nf+1)); }
   grep -qx 'User=onion-chat-verify' <<<"${out}" || { echo "    FALHA efetivo: User não é onion-chat-<instância> ($(grep '^User=' <<<"${out}"))"; nf=$((nf+1)); }
-  grep -qx 'ExecStartPre=' <<<"${out}" && grep -qx 'ExecStartPost=' <<<"${out}" || { echo "    FALHA efetivo: há ExecStartPre/ExecStartPost"; nf=$((nf+1)); }
+  # vazio, o systemctl show nem imprime a linha (medido no dogfood): falha é a linha COM valor
+  ! grep -qE '^ExecStart(Pre|Post)=.+' <<<"${out}" || { echo "    FALHA efetivo: há ExecStartPre/ExecStartPost"; nf=$((nf+1)); }
   grep -q '^ExecStart=.*argv\[\]=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py ;' <<<"${out}" || { echo "    FALHA efetivo: ExecStart não é o lançador"; nf=$((nf+1)); }
   grep -qx 'ProtectHome=yes' <<<"${out}" || { echo "    FALHA efetivo: ProtectHome não é yes"; nf=$((nf+1)); }
   for u in onion-chat@verify.service "${SOCKET_UNIT}"; do
