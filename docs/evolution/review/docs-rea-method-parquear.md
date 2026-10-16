@@ -2,7 +2,8 @@
 branch: docs/rea-method-parquear
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 3ad6a1f4f666d37901cbab3fa1690ccaff37ab3ffd21cf80afea0f3d13487038
+reviewed_code_sha256: bfe4f236eb6f20b87ced7a05df24f2c3972f8aad5401d744fc1d4256f06b1d6e
 findings_total: 3
 findings_real: 2
 tokens: 125952

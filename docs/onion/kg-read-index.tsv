@@ -99,6 +99,7 @@
 .claude/commands/meta/kb-freshness.md	Q_D4_E_D5_NAO_RODARAM_NESTA_RODADA	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
 .claude/commands/meta/kb-freshness.md	SY6_ev_kbfreshness_gate3	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/kg-freshness.md	D_KG_FRESHNESS_DISTINGUE_BLOQUEIO_DE_HARNESS	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
+.claude/commands/meta/kg-freshness.md	E_CORE_JA_SUPERA_REA_1016	docs/evolution/dissect/rea-method-2026-10/rea-method-2026-10.kg.yaml
 .claude/commands/meta/kg-freshness.md	E_F4_BLOCK_READS_FORA_WORKDIR	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/commands/meta/kg-freshness.md	E_O_SCHEMA_DO_KG_FRESHNESS_NAO_RODA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/commands/meta/kg-freshness.md	Q_READONLY_CLAUSE_E_DEFEITO_DE_ESPEC	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
@@ -387,6 +388,7 @@
 .claude/validation/dissect-census.sh	D_PLANO_DE_ABSORCAO_E_NO	docs/evolution/research/dissect-forge-2026-10/dissect-forge-2026-10.kg.yaml
 .claude/validation/dissect-census.sh	E_DISSECT_CAMPO_VAZIO_DESLOCAVA	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 .claude/validation/dissect-census.sh	E_REGUA_PADRAO_DERIVADA_NAO_PELO_FRAMEWORK	docs/evolution/research/dissect-forge-2026-10/dissect-forge-2026-10.kg.yaml
+.claude/validation/dissect-plans.sh	Q_REABRIR_PARIDADE_POS_FORGE	docs/evolution/dissect/rea-method-2026-10/rea-method-2026-10.kg.yaml
 .claude/validation/door-role-parity-check.sh	D_PAPEL_DUAS_DIMENSOES	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/door-staleness-baseline.txt	E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/door-staleness-baseline.txt	Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA	docs/onion/graph/federation-health-2026-07.kg.yaml
@@ -1387,6 +1389,7 @@ docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	D_CONDUCTOR_1
 docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	E_DOGFOOD_CONDUCTOR_ATE_N4	docs/evolution/research/dissect-forge-2026-10/dissect-forge-2026-10.kg.yaml
 docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	E_N3_FAIL_OPEN_NAO_TRANSFERE	docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml
 docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml	Q_CONDUCTOR_ABSORVER_OU_NAO_1011	docs/evolution/dissect/conductor-2026-10/conductor-2026-10.kg.yaml
+docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml	Q_REABRIR_AUTORIDADE_NO_PROBE	docs/evolution/dissect/rea-method-2026-10/rea-method-2026-10.kg.yaml
 docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml	Q_REABRIR_TRES_SKILLS	docs/evolution/dissect/superpowers-2026-10/superpowers-2026-10.kg.yaml
 docs/evolution/federation-roadmap-2026.md	C_naive_admin_platform	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 docs/evolution/federation-roadmap-2026.md	ENT_substrate	docs/onion/graph/vps-shared-tools-2026-07.kg.yaml
@@ -1471,6 +1474,7 @@ docs/evolution/inbox/_processed/2026-10-13-proposal-superpowers-parquear.md	E_TR
 docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md	Q_REOPEN_IF_ADOPTER_ASKS_CROSS_ORG_CHANNEL	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md	Q_REOPEN_IF_ANTHROPIC_SHIPS_CROSS_USER_CHANNEL	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-14-proposal-cross-session-channel.md	Q_XSESSION_LIVE_NOT_VERIFIED	docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-16-proposal-rea-method-parquear.md	D_REA_METHOD_2610	docs/evolution/dissect/rea-method-2026-10/rea-method-2026-10.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
