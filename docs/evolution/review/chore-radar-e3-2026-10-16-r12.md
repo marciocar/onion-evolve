@@ -2,7 +2,8 @@
 branch: chore/radar-e3-2026-10-16-r12
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c1ae7c855fe50669b78178ff97a21498cbdf41a07dba5645fd251dfd06650964
+reviewed_code_sha256: f463e03d5d49af8c3b0e160275941a37c8fa87844e64bbbee785b1be2589beca
 findings_total: 11
 findings_real: 9
 tokens: 142641
