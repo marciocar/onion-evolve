@@ -431,14 +431,14 @@ runner_identity() {
 gitdirs_private() {
   local g bad=0
   while IFS= read -r -d '' g; do
-    if as_svc getfacl -p --omit-header -- "${g}" 2>/dev/null | grep -q "group:${GROUP}:"; then echo "    FALHA .git aberto ao grupo: ${g}"; bad=1; fi
+    if grep -q "group:${GROUP}:" <<<"$(as_svc getfacl -p --omit-header -- "${g}" 2>/dev/null)"; then echo "    FALHA .git aberto ao grupo: ${g}"; bad=1; fi
   done < <(as_svc find "${WS_ROOT}" -mindepth 2 -maxdepth 2 -name .git -type d -print0 2>/dev/null)
   [ "${bad}" = 0 ] && echo "    OK nenhum .git de workspace aberto ao grupo ${GROUP}"
   [ "${bad}" = 0 ]
 }
 
 acl_has() {   # acl_has <caminho> <entrada exata do getfacl>
-  priv getfacl -p --omit-header -- "$1" 2>/dev/null | grep -qx -- "$2"
+  grep -qx -- "$2" <<<"$(priv getfacl -p --omit-header -- "$1" 2>/dev/null)"
 }
 
 # ── verify ──────────────────────────────────────────────────────────────────────────────────────────
