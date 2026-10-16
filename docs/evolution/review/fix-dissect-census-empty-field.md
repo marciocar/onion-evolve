@@ -1,6 +1,6 @@
 ---
 branch: fix/dissect-census-empty-field
-pr: pendente
+pr: 1166
 date: 2026-10-16
 reviewed_diff_sha256: pendente
 findings_total: 2
@@ -55,3 +55,11 @@ Restauração conferida: zero `ONION_MUTANTE` no SUT depois de cada um. Na banca
 
 - Valor de YAML contendo o byte `\037` deslocaria campos; não ocorre em grafo real, não tratado.
 - Sem medir o corpus vivo de adotantes: a medição foi em fixtures e no corpus do core (CI).
+
+## Re-revisão (rebase sobre origin/main 66d27350)
+
+O PR #1166 ficou em conflito com a main (entraram #1165 e #1167, que tocam `lint-selftest.sh`, moat e o
+grafo chat-agent-isolation). Rebase feito: os dois commits do fix aplicaram sem conflito (o bloco
+`(og-e1)` mora ao lado do `(og-d1m)`, longe das âncoras novas); o único conflito foi o commit de
+projeções geradas, descartado e regenerado pelo pr-finalize. `reviewed_diff_sha256` volta a pendente e
+o pr-finalize recarimba. A família `dissect` foi re-rodada depois do rebase: 61/0.
