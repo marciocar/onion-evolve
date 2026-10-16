@@ -2,7 +2,8 @@
 branch: docs/chat-degrau3-object-measured
 pr: 1167
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 82d75491a21a117c572f4a3762f9e114c412a30affbb8cdd13e4f13352e9e724
+reviewed_code_sha256: 2856d2ef0fa51548beea5ab9f40b2b095fe17bd301e7fc552a2f83068fcc40f8
 findings_total: 12
 findings_real: 10
 tokens: 317000
