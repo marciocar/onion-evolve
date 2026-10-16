@@ -2201,15 +2201,24 @@ nodes:
   - id: D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016
     node_type: decision
     layer: audit
-    plane: DEV
-    status: open
     impact: 4
     confidence: 0.6
-    verified_at: "2026-10-16"
-    verified_against: "NÃO SELADA: aguarda o maestro. A recomendação é desta sessão, de um agente, e passou pelo refutador."
     label: "DECISÃO ABERTA: o degrau 3 não tem objeto no convidado com os degraus 0 e 2 de pé. Opções: (A, recomendada) parquear o degrau 3 com gatilho e fechar a rede local na unit do runner; (B) parquear o degrau 3 com gatilho e não mexer na rede; (C) construir o degrau 3 mesmo assim."
-    narrative: "Nasce de E_DEGRAU3_OBJETO_MEDIDO_1016 e responde a D_MAESTRO_DEGRAU3_DEPOIS_DO_DEGRAU2_1016, que mandou o degrau 3 esperar o degrau 2 (em produção desde 11:31 UTC, E_DEGRAU2_EM_PRODUCAO_1016). (A) RECOMENDADA, «Parquear o degrau 3 com gatilho e fechar a rede local na unit do runner»: o degrau 3 fica parado com o gatilho de C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX, sem socat, sem perfil AppArmor e sem cópia do bwrap no host. O SSRF do WebFetch para o loopback, hoje fechado só pelo protocolo e pela verificação de certificado, vira política: IPAddressDeny na unit do runner, com os endereços globais do host medidos na instalação (PR no bridge com o modelo da unit + extensão da allowlist do wrapper + caso de bancada com mutante + verify que prova o timeout no loopback e o TLS na API). Custo: um PR em cada repo e um --apply. (B) «Parquear o degrau 3 com gatilho e não mexer na rede»: zero mudança; o SSRF segue fechado pelo protocolo e pelo certificado, sem vigia. (C) «Construir o degrau 3 mesmo assim»: instala socat, a cópia privada do bwrap e o perfil AppArmor 'userns' para um caminho que nenhuma ferramenta do convidado usa, ou seja, superfície de kernel nova (E_USERNS_KERNEL_SURFACE_RISK) sem ganho medido. Descartada nas três: o managed-settings do host, que valeria para toda sessão Claude Code da VPS."
     trace: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-16"
+    verified_against: "decisão do maestro em 2026-10-16, por pergunta com opções (/meta:decide): escolhida «Parquear + fechar a rede (Recomendado)»"
+    narrative: |-
+      Nasce de E_DEGRAU3_OBJETO_MEDIDO_1016 e responde a D_MAESTRO_DEGRAU3_DEPOIS_DO_DEGRAU2_1016, que mandou o degrau 3 esperar o degrau 2 (em produção desde 11:31 UTC, E_DEGRAU2_EM_PRODUCAO_1016). (A) RECOMENDADA, «Parquear o degrau 3 com gatilho e fechar a rede local na unit do runner»: o degrau 3 fica parado com o gatilho de C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX, sem socat, sem perfil AppArmor e sem cópia do bwrap no host. O SSRF do WebFetch para o loopback, hoje fechado só pelo protocolo e pela verificação de certificado, vira política: IPAddressDeny na unit do runner, com os endereços globais do host medidos na instalação (PR no bridge com o modelo da unit + extensão da allowlist do wrapper + caso de bancada com mutante + verify que prova o timeout no loopback e o TLS na API). Custo: um PR em cada repo e um --apply. (B) «Parquear o degrau 3 com gatilho e não mexer na rede»: zero mudança; o SSRF segue fechado pelo protocolo e pelo certificado, sem vigia. (C) «Construir o degrau 3 mesmo assim»: instala socat, a cópia privada do bwrap e o perfil AppArmor 'userns' para um caminho que nenhuma ferramenta do convidado usa, ou seja, superfície de kernel nova (E_USERNS_KERNEL_SURFACE_RISK) sem ganho medido. Descartada nas três: o managed-settings do host, que valeria para toda sessão Claude Code da VPS.
+
+      verified_against anterior: «NÃO SELADA: aguarda o maestro. A recomendação é desta sessão, de um agente, e passou pelo refutador.»
+      Selado por /meta:decide em 2026-10-16: escolhida «Parquear + fechar a rede (Recomendado)»; descartadas: «Só parquear» · «Construir mesmo assim».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-16: «Degrau 3: sem objeto no convidado (sandbox só cobre Bash/PowerShell/Monitor); o que fazemos com o risco da rede do WebFetch?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      locality: "pessoa"
 
 edges:
   - from: E_SECDEP_PROXY_PATTERN_PLATFORM
