@@ -2,7 +2,8 @@
 branch: fix/dissect-census-empty-field
 pr: 1166
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 78a85fb959f137a70144a396405abd0838a077de83817a1def62204f2de2a659
+reviewed_code_sha256: 70a2c827bfed535087dffd42ce0b45d96ab50def76148db6fc7f558df14f9b6e
 findings_total: 2
 findings_real: 1
 tokens: 107946
