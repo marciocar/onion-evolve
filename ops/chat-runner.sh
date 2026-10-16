@@ -410,7 +410,12 @@ effective_props() {
 runner_identity() {
   local j su uid ok_s=0 ok_r=0
   su="$(id -u "${SVC_USER}" 2>/dev/null)"
-  j="$(priv journalctl -t onion-chat --since "@$1" --no-pager -o cat 2>/dev/null)"
+  # o journal chega com atraso: até ~5 s pelas duas linhas
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    j="$(priv journalctl -t onion-chat --since "@$1" --no-pager -o cat 2>/dev/null)"
+    grep -q 'chat-runner: sessão uid=' <<<"${j}" && grep -q 'chat-runner: RECUSA uid=' <<<"${j}" && break
+    sleep 0.5
+  done
   for uid in $(grep -oE 'chat-runner: sessão uid=[0-9]+' <<<"${j}" | grep -oE '[0-9]+$'); do
     [ "${uid}" != 0 ] && [ "${uid}" != "${su}" ] && ok_s=1
   done
