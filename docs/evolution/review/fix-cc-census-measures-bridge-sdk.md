@@ -2,7 +2,8 @@
 branch: fix/cc-census-measures-bridge-sdk
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c0da6388494b51b3476a15eea2e8e87c8f0f1f83782c76c9a16efee47332f5b5
+reviewed_code_sha256: 29500858a875ede1a4186562563542c7f11f7b99ab98262072e914738ff3a99b
 findings_total: 14
 findings_real: 14
 tokens: 284140
