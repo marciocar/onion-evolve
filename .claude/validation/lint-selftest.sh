@@ -10185,7 +10185,7 @@ EOF
   printf '#!/bin/sh\necho "{\\"ok\\":true}"\n' > "${d}/fake/curl"
   printf '#!/bin/sh\necho "npm $*" >> "$UB_ST/calls"\nexit 0\n' > "${d}/fake/npm"
   # timeout falso: com $UB_ST/hang o verify "trava" e o teto devolve 124, como o do coreutils
-  printf '#!/bin/sh\n[ -f "$UB_ST/hang" ] && exit 124\nshift\nexec "$@"\n' > "${d}/fake/timeout"
+  printf '#!/bin/sh\n[ -f "$UB_ST/hang" ] && exit 124\nwhile [ $# -gt 0 ]; do case "$1" in -k) shift 2 ;; -*) shift ;; *) break ;; esac; done\nshift\nexec "$@"\n' > "${d}/fake/timeout"
   # os vizinhos que o wrapper chama em ${SELF_DIR}: o rc do verify sai de um arquivo de estado ("1n" = rc 1 sem FALHA).
   # _ubstubs reescreve os três a cada caso (um caso muda o chat-runner.sh do checkout para o juiz divergir do servido).
   _ubstubs() {
@@ -10280,6 +10280,17 @@ PY
   _ub_hang() { : > "${d}/st/hang"; local r; r="$(_ubr "$1")"; _ub_unproven "integridade (30-integrity.conf): o verify NÃO MEDIU (rc 124)" "${r}"; }
   _ub_sockskip() { rm -f "${d}/unit/onion-chat.socket"; echo 1 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:500}"
     _ubrc "${r}" 0 && _ubhas "${r}" "onion-chat.socket não instalado" && ! grep -qx "cr verify" "${d}/st/calls"; }
+  _ubnoop() { ${g} -C "${d}/srv/onion-evolve" reset -q --hard origin/main; ${g} -C "${d}/srv/onion-bridge" reset -q --hard origin/main; }
+  _ub_noop_fail() { _ubnoop; echo 1 > "${d}/st/bh-rc"; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:700}"
+    _ubrc "${r}" 1 && _ubhas "${r}" "NOOP (nada foi atualizado) e o boot VIVO NÃO está provado" \
+      && _ubhas "${r}" "  - integridade (30-integrity.conf): o verify REPROVOU" && ! _ubhas "${r}" "ROLLBACK MANUAL" \
+      && ! grep -qE '^systemctl (stop|start)' "${d}/st/calls"; }
+  _ub_noop_ok() { _ubnoop; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:500}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "NOOP OK" && grep -qx "bh verify" "${d}/st/calls" && grep -qx "cr verify" "${d}/st/calls"; }
+  _ub_lock() { local r; exec 8>"${d}/lock"; flock -n 8; r="$(_ubr "$1")"; exec 8>&-; UB_WHY="${r:0:300}"
+    _ubrc "${r}" 2 && _ubhas "${r}" "NADA foi atualizado"; }
+  _ub_nocmp() { rm -f "${d}/ops/chat-runner.sh"; local r; r="$(_ubr "$1")"
+    _ub_unproven "runner do convidado (onion-chat.socket): não pude comparar o chat-runner.sh deste checkout" "${r}"; }
   _ub_unitdir() { rm -rf "${d}/unit"; local r; r="$(_ubr "$1")"
     _ub_unproven "integridade: não pude ler" "${r}" && _ubhas "${r}" "  - runner: não pude ler"; }
   _ub_nrbad() { : > "${d}/st/nr-bad"; local r; r="$(_ubr "$1")"; _ub_unproven "NRestarts ilegível" "${r}"; }
@@ -10289,13 +10300,13 @@ PY
   _ubcase "(u1) verifies OK, JWKS OK, sem reinício → rc 0 com a linha OK, os dois verifies rodaram" \
     'if [ "${#NOT_PROVEN[@]}" -gt 0 ]; then' 'if [ "${#NOT_PROVEN[@]}" -ge 0 ]; then' _ub_ok
   _ubcase "(u2) verify do degrau 1 REPROVA → rc 1 nomeado com a cura, FALHA no stderr (o set -e matava mudo: o mutante é a forma antiga)" \
-    '  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' '  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)"; rc=$?' _ub_bh_fail
+    '  out="$(timeout -k 30 600 bash "${SELF_DIR}/${wrapper}" verify </dev/null 2>&1)" || rc=$?' '  out="$(timeout -k 30 600 bash "${SELF_DIR}/${wrapper}" verify </dev/null 2>&1)"; rc=$?' _ub_bh_fail
   _ubcase "(u3) verify do degrau 1 NÃO MEDE (rc 2) → rc 1 nomeado como NÃO MEDIU, nunca 'está bom'" \
     '    *) NOT_PROVEN+=("${label}: o verify NÃO MEDIU' '    *) _ub_x+=("${label}: o verify NÃO MEDIU' _ub_bh_nomeasure
   _ubcase "(u4) verify do runner REPROVA (SDK abaixo do piso) → rc 1 nomeado com a cura" \
     '  0) post_verify "runner do convidado (onion-chat.socket)" chat-runner.sh' '  0) : post_verify "runner do convidado (onion-chat.socket)" chat-runner.sh' _ub_cr_fail
   _ubcase "(u5) verify do runner NÃO MEDE (rc 2) → rc 1, distinto de REPROVOU" \
-    '  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' '  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=1' _ub_cr_nomeasure
+    '  out="$(timeout -k 30 600 bash "${SELF_DIR}/${wrapper}" verify </dev/null 2>&1)" || rc=$?' '  out="$(timeout -k 30 600 bash "${SELF_DIR}/${wrapper}" verify </dev/null 2>&1)" || rc=1' _ub_cr_nomeasure
   _ubcase "(u6) os dois reprovam → os dois nomeados (acumula, não para no primeiro)" \
     'for _m in "${NOT_PROVEN[@]}"; do' 'for _m in "${NOT_PROVEN[0]}"; do' _ub_both
   _ubcase "(u7) não provado → o rollback impresso traz o HEAD de ANTES do clone" \
@@ -10304,10 +10315,10 @@ PY
     "  printf '[update-bridge] serviço deixado RODANDO" "  sudo systemctl stop \"\${UNIT}\"; printf '[update-bridge] serviço deixado RODANDO" _ub_bh_fail
   _ubcase "(u9) boot sem 'JWKS OK' → rc 1 nomeado (era rc 0 com AVISO)" \
     'grep -q "JWKS OK" <<<"${BOOT}" \' 'true || grep -q "JWKS OK" <<<"${BOOT}" \' _ub_jwks
-  _ubcase "(u10) caiu depois do start com 5 reinícios de antes (o start zera) → rc 1 pelo NRestarts ABSOLUTO (o delta deixava passar)" \
+  _ubcase "(u10) caiu depois do start (o falso zera no start, como o systemd 255 medido) → rc 1 a partir de UMA queda (limiar absoluto zero)" \
     'elif [ "${NEW_RESTARTS}" -gt 0 ]; then' 'elif [ "${NEW_RESTARTS}" -gt 5 ]; then' _ub_crash
   _ubcase "(u11) o verify do checkout NÃO é o do clone servido → rc 1, esse verify não roda (o juiz é o servido)" \
-    '  if ! sudo cmp -s "${SELF_DIR}/${wrapper}" "${CLONE}/ops/${wrapper}"; then' '  if false; then' _ub_judge
+    '  sudo cmp -s "${SELF_DIR}/${wrapper}" "${CLONE}/ops/${wrapper}" || crc=$?' '  true || crc=$?' _ub_judge
   _ubcase "(u12) NRestarts ilegível → rc 1 (não medi não é provado)" \
     'if ! [[ "${NEW_RESTARTS}" =~ ^[0-9]+$ ]]; then' 'if false; then' _ub_nrbad
   _ubcase "(u13) drop-in e socket NÃO instalados → verifies não rodam, rc 0, cada um declarado" \
@@ -10316,10 +10327,18 @@ PY
     '_st=0; installed_or_unreadable "${UNIT_DIR}/onion-chat.socket" || _st=$?' '_st=0' _ub_sockskip
   _ubcase "(u15) verify rc 1 SEM linha FALHA → o motivo (a última linha) vai nomeado, nunca '0 falha(s)'" \
     '       if [ "${n}" = 0 ]; then' '       if false; then' _ub_nofalha
-  _ubcase "(u16) verify que trava → o teto devolve 124 e vira NÃO MEDIU, rc 1" \
-    '  out="$(timeout 600 bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' _ub_hang
+  _ubcase "(u16) o verify passa pelo timeout, e o 124 do teto vira NÃO MEDIU, rc 1 (o timeout é falso: o KILL real não é exercido)" \
+    '  out="$(timeout -k 30 600 bash "${SELF_DIR}/${wrapper}" verify </dev/null 2>&1)" || rc=$?' '  out="$(bash "${SELF_DIR}/${wrapper}" verify 2>&1)" || rc=$?' _ub_hang
   _ubcase "(u17) diretório das units ilegível (sudo falhou) → rc 1, nunca 'não se aplica'" \
     $'  return 2\n}' $'  return 1\n}' _ub_unitdir
+  _ubcase "(u18) NOOP com o verify reprovando → rc 1 (re-rodar depois de uma cura VERIFICA), sem stop/start nem rollback" \
+    '  post_update_checks noop' '  : post_update_checks noop' _ub_noop_fail
+  _ubcase "(u19) NOOP com tudo provado → rc 0 com os dois verifies rodados no boot vivo" \
+    '  post_update_checks noop' '  : post_update_checks noop' _ub_noop_ok
+  _ubcase "(u20) trava ocupada → rc 2 (nada foi feito), nunca rc 0" \
+    'NADA foi atualizado." >&2; exit 2; }' 'NADA foi atualizado." >&2; exit 0; }' _ub_lock
+  _ubcase "(u21) verify do checkout ausente (cmp rc 2) → rc 1 nomeado 'não pude comparar', o verify não roda" \
+    '    *) NOT_PROVEN+=("${label}: não pude comparar' '    *) _ub_z+=("${label}: não pude comparar' _ub_nocmp
   rm -rf "${d}"
 }
 
