@@ -2,7 +2,7 @@
 branch: feat/adopter-shape-cures
 pr: 1159
 date: 2026-10-15
-reviewed_diff_sha256: c93c1949c484a1048d5fe545a5f6d817dcbf18f178ddfee7ca81e0bae11e689b
+reviewed_diff_sha256: ec7f490633668c1673edd9fa1c2d6c7fa4959fc40ac6540fe81a486185badbc7
 reviewed_code_sha256: 50182b34bd5cf9590c6bf48d90352854a7001a8966b4423554b2e996392ff392
 findings_total: 13
 findings_real: 10
