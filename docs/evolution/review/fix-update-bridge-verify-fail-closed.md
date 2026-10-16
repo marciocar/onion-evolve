@@ -2,7 +2,8 @@
 branch: fix/update-bridge-verify-fail-closed
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 9a384725768f70e9704c1186ef083ce0bf1640a59135cd1366de6dfc3f174951
+reviewed_code_sha256: d6ea49a4d52be49fcb0754eba377cb9ceef0f0608a7f738489b664b9a1855399
 findings_total: 14
 findings_real: 13
 tokens: 259577
