@@ -2,7 +2,8 @@
 branch: fix/tm-comment-body-file
 pr: pendente
 date: 2026-10-16
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 882db4c7d1ace28e5a3915ad27142944538bca0b4a31952f46fc9256d053ae88
+reviewed_code_sha256: 0b4e88e7f4317f455cb757e7e9860f7f9d03680d1be228c9f7b0fc49e3a9de6c
 findings_total: 5
 findings_real: 3
 tokens: 95535
