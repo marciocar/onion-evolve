@@ -177,5 +177,17 @@ if sudo test -f "/etc/systemd/system/${UNIT}.service.d/30-integrity.conf"; then
     *) log "AVISO: o verify do drop-in de integridade NÃO MEDIU (rc ${VRC}): $(tail -1 <<<"${VOUT}")" ;;
   esac
 fi
+# O RUNNER do convidado (degrau 2, ops/chat-runner.sh) é instalado A PARTIR do bridge servido: o lançador e as units
+# instaladas são cópias de root, e um update que muda deploy/chat-runner/ as deixa defasadas (o verify acusa "DIFERE").
+# Reprovar não desfaz o update, só avisa: a reinstalação é `! bash ops/chat-runner.sh install --apply`, do maestro.
+if sudo test -f /etc/systemd/system/onion-chat.socket; then
+  VOUT="$(bash "${SELF_DIR}/chat-runner.sh" verify 2>&1)"; VRC=$?
+  case "${VRC}" in
+    0) log "runner do convidado (onion-chat.socket): verify OK depois do update" ;;
+    1) log "AVISO: o verify do runner do convidado REPROVOU depois do update ($(grep -cE '^ *FALHA' <<<"${VOUT}") falha(s)):"
+       grep -E '^ *FALHA' <<<"${VOUT}" | head -5 | sed 's/^ */    /' ;;
+    *) log "AVISO: o verify do runner do convidado NÃO MEDIU (rc ${VRC}): $(tail -1 <<<"${VOUT}")" ;;
+  esac
+fi
 log "OK — clone ${NEW_CLONE_HEAD:0:8} · bridge ${NEW_BRIDGE_HEAD:0:8} · health 200+ok:true local+público · auth enforce (invocação ${INV:0:8})"
 log "prova independente: compare um artefato novo do core no clone (ex.: ls ${CLONE}/.claude/rules/)"

@@ -74,6 +74,8 @@ signal=$(
     printf '%s\n' ONION_A2A_QUEUE_TEST
     # e do wrapper do drop-in de integridade do bridge (ops/bridge-hardening.sh) (core-only)
     printf '%s\n' ONION_BRIDGE_HARDENING_TEST
+    # e do wrapper do runner do convidado (ops/chat-runner.sh) (core-only)
+    printf '%s\n' ONION_CHAT_RUNNER_TEST
   } | grep -v '^$' | sed 's/[][\.*^$+?(){}|/]/\\&/g' | sort -u | paste -sd'|' -)
 moat_action='(^|[^[:alnum:]_-])(systemctl|service|docker|rsync|cp|mv|install|tee|ln|rm|mkdir|touch|chmod|chown|dd|tar|unzip|crontab|systemd-run|at|batch|git|eval|xargs|sed|curl|wget)([^[:alnum:]_-]|$)|>'
 # rota dinâmica: SÓ os programas cujo alvo é um NOME (unidade, container, crontab) ou que tornam o texto opaco
