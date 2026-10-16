@@ -339,13 +339,20 @@ handshake() {
 import json, socket, sys, time
 sock, cwd = sys.argv[1], sys.argv[2]
 EXEC = "Bash,Monitor,PowerShell,REPL,Workflow,Task,Agent"
-settings = json.dumps({"permissions": {"deny": EXEC.split(",")}, "disableSkillShellExecution": True, "disableAllHooks": True})
+# a política mínima que o lançador exige: as ferramentas que executam E a escrita na config do próprio workspace
+cfg = ["%s(/%s/%s)" % (v, cwd, t) for v in ("Edit", "Write", "NotebookEdit")
+       for t in (".claude/**", "CLAUDE.md", "CLAUDE.local.md", ".mcp.json", ".git", ".git/**")]
+settings = json.dumps({"permissions": {"deny": EXEC.split(",") + cfg}, "disableSkillShellExecution": True, "disableAllHooks": True})
 args = ["--output-format", "stream-json", "--verbose", "--input-format", "stream-json", "--permission-prompt-tool", "stdio",
         "--disallowedTools", EXEC, "--tools", "Read", "--setting-sources=project", "--permission-mode", "default",
         "--managed-settings", '{"allowManagedHooksOnly":true}', "--settings", settings]
 def conn(header, extra=b"", wait=30):
     s = socket.socket(socket.AF_UNIX); s.settimeout(wait); s.connect(sock)
-    s.sendall((json.dumps(header) + "\n").encode() + extra); buf = b""; t0 = time.monotonic()
+    buf = b""; t0 = time.monotonic()
+    try:
+        s.sendall((json.dumps(header) + "\n").encode() + extra)
+    except OSError:
+        s.close(); return buf, time.monotonic() - t0
     try:
         while time.monotonic() - t0 < wait:
             c = s.recv(65536)
@@ -353,6 +360,9 @@ def conn(header, extra=b"", wait=30):
             buf += c
             if b'"control_response"' in buf and buf.endswith(b"\n"): break
     except socket.timeout:
+        pass
+    except OSError:
+        # a RECUSA do lançador chega como reset (ele fecha com bytes não lidos — medido no dogfood): é fim, não erro
         pass
     s.close(); return buf, time.monotonic() - t0
 init = json.dumps({"type": "control_request", "request_id": "chat-runner-verify", "request": {"subtype": "initialize"}}).encode() + b"\n"
