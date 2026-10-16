@@ -52,6 +52,8 @@ deploy	path	/etc/systemd/system/onion-vps-bridge.service.d/40-chat-runner.conf	o
 deploy	path	/etc/systemd/system/onion-chat.socket	ops/chat-runner.sh
 deploy	path	/etc/systemd/system/onion-chat@.service	ops/chat-runner.sh
 deploy	path	/usr/local/libexec/onion-chat	ops/chat-runner.sh
+deploy	path	/var/backups/onion-chat-runner	ops/chat-runner.sh
+deploy	path	/run/onion-chat.sock	ops/chat-runner.sh
 deploy	path	/var/lib/onion-bridge	-
 deploy	path	/var/lib/onion-bridge/chat-homes	ops/chat-runner.sh
 deploy	path	/home/onion	ops/update-bridge.sh
