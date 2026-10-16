@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**564 itens abertos** em 108 grafo(s) com aberto (de 137 no escopo) · 109 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**566 itens abertos** em 108 grafo(s) com aberto (de 137 no escopo) · 109 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -43,17 +43,19 @@
 | 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
 | 1.8 | `C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA` | plugin-mcp-posture-2026-09 | OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (stric |
 
-## chat-agent-isolation-2026-10 — 48 item(ns)
+## chat-agent-isolation-2026-10 — 50 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 93.0 | `Q_CHAT_AGENT_ISOLATION_2026` | chat-agent-isolation-2026-10 | Como isolar o agente de código do /chat do onion-bridge (Agent SDK, Bash, mesmo UID onion dono da raiz de confiança do A2A e dos |
-| 63.0 | `C_OPCAO_2_SEPARATE_UID_RUNNER` | chat-agent-isolation-2026-10 | OPÇÃO (2) UID separado para o runner do /chat — estado final, via spawnClaudeCodeProcess e unit por sessão (DynamicUser). |
-| 51.8 | `C_OPCAO_3_NATIVE_SANDBOX_STRICT` | chat-agent-isolation-2026-10 | OPÇÃO (3) sandbox nativo bwrap/seccomp/proxy — só com perfil AppArmor + failIfUnavailable + allowUnsandboxedCommands=false. |
+| 66.0 | `C_OPCAO_2_SEPARATE_UID_RUNNER` | chat-agent-isolation-2026-10 | OPÇÃO (2) UID separado para o runner do /chat — estado final, via spawnClaudeCodeProcess e unit por sessão (DynamicUser). |
+| 54.0 | `C_OPCAO_3_NATIVE_SANDBOX_STRICT` | chat-agent-isolation-2026-10 | OPÇÃO (3) sandbox nativo bwrap/seccomp/proxy — só com perfil AppArmor + failIfUnavailable + allowUnsandboxedCommands=false. |
 | 40.0 | `D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT` | chat-agent-isolation-2026-10 | DECISÃO ABERTA: isolar o agente do /chat por (0) convidado sem Bash, (1) systemd reescrito, (2) UID separado, (3) sandbox estrito |
 | 33.0 | `C_OPCAO_1_SYSTEMD_INTEGRITY_REWRITE` | chat-agent-isolation-2026-10 | OPÇÃO (1) systemd já — REESCRITA: sem EnvironmentFile, com ReadOnlyPaths voltado à integridade (código do bridge, .claude d |
 | 30.2 | `C_OPCAO_5_NARROW_CREDENTIAL_BROKER` | chat-agent-isolation-2026-10 | OPÇÃO (5) credential broker — estreito: proxy da ANTHROPIC_API_KEY e ferramenta de git, sobre a opção 2. |
 | 17.5 | `C_OPCAO_0_GUEST_NO_BASH_DENY_EDIT_OUTSIDE_WORKSPACE` | chat-agent-isolation-2026-10 | OPÇÃO (0) imediato sem root: convidado sem Bash + deny Edit/Write no home do onion fora do workspace. |
+| 9.6 | `D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016` | chat-agent-isolation-2026-10 | DECISÃO ABERTA: o degrau 3 não tem objeto no convidado com os degraus 0 e 2 de pé. Opções: (A, recomendada) parquear o degrau |
+| 8.4 | `C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX` | chat-agent-isolation-2026-10 | A rede de saída do convidado se fecha na UNIT do runner (IPAddressDeny do loopback, link-local e faixas privadas, com o resolvedo |
 | 7.5 | `C_OPCAO_4_CONTAINER_MICROVM_PER_SESSION` | chat-agent-isolation-2026-10 | OPÇÃO (4) container/microVM por sessão — inviável nesta VPS (sem KVM); opcional por adotante. |
 | 7.2 | `C_SUPERACAO_20261015_DYNAMICUSER_RUNNER_PER_SESSION` | chat-agent-isolation-2026-10 | Runner por sessão com HOME efêmero (unit template onion-chat@<sessão>) e DynamicUser=yes: UID único por sessão sem criar cont |
 | 6.0 | `C_SUPERACAO_20261015_SOCKET_ACTIVATED_PRIVILEGED_LAUNCHER` | chat-agent-isolation-2026-10 | Lançador privilegiado instalado uma vez pelo root: unit template onion-chat@.service ativado por socket (DynamicUser=yes ou User= |
