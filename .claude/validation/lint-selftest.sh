@@ -9359,6 +9359,7 @@ case "$1" in
   show)
     shift; props=""; val=0
     while [ $# -gt 0 ]; do case "$1" in -p) props="$props $2"; shift 2 ;; --value) val=1; shift ;; *) shift ;; esac; done
+    case "$props" in *DropInPaths*) [ -f "$F/show-fail" ] && exit 1 ;; esac
     for p in $props; do
       case "$p" in
         MainPID) v="$(cat "$F/mainpid" 2>/dev/null || echo 0)" ;;
@@ -9397,7 +9398,9 @@ sk=""; [ -f "$F/noeffect-ro" ] && sk=ro
 tac "$F/sr-save" | while read -r m p; do chmod "$m" "$p"; done; rm -f "$F/mounts-ens"
 exit $rc
 EOF
-  printf '#!/bin/sh\nwhile [ "$#" -gt 0 ] && [ "$1" != -- ]; do shift; done\nshift\nexec "$@"\n' > "${d}/fake/nsenter"
+  # priv-fail: o `sudo -n nsenter …` de produção falhando ANTES de entrar no namespace (o stub faz o papel do sudo, que
+  # no modo de teste não é chamado): a mensagem e o rc 1 do sudo real, e nenhuma linha do sh de checagem
+  printf '#!/bin/sh\n[ -f "$BH_FAKE/priv-fail" ] && { echo "sudo: a password is required" >&2; exit 1; }\nwhile [ "$#" -gt 0 ] && [ "$1" != -- ]; do shift; done\nshift\nexec "$@"\n' > "${d}/fake/nsenter"
   # findmnt falso: OPTIONS pela escrita; TARGET = o próprio caminho se ele está na lista de pontos de montagem
   printf '#!/bin/sh\nfor p; do :; done\ncase "$*" in *TARGET*) if grep -qxF "$p" "$BH_FAKE/mounts" "$BH_FAKE/mounts-ens" 2>/dev/null; then echo "$p"; else echo /; fi; exit 0 ;; esac\nif [ -w "$p" ]; then echo rw,relatime; else echo ro,relatime; fi\n' > "${d}/fake/findmnt"
   printf '#!/bin/sh\nif [ -f "$BH_FAKE/noauth" ]; then echo "boot sem a linha"; else echo "[onion-bridge] identidade: JWKS OK | auth: enforce"; fi\n' > "${d}/fake/journalctl"
@@ -9585,6 +9588,15 @@ PY
     '  if verify_live >/dev/null 2>&1; then' '  if true; then' _c_noopverify
   _bhcase "(h23) restart que não aplica o drop-in → o verify do processo vivo reprova → rc 1 com ROLLBACK impresso" \
     'verify_live || fail_after' 'true || fail_after' _c_noeffect
+  # NÃO MEDIU ≠ REPROVOU (E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016): o sudo que falha não é um veredito
+  _c_privfail() { local r; _bhr "$1" install --apply >/dev/null; : > "${d}/st/priv-fail"; r="$(_bhr "$1" verify)"; BH_WHY="${r:0:400}"
+    _bhrc "${r}" 2 && _bhhas "${r}" "NÃO MEDI: o check no namespace do MainPID" && _bhhas "${r}" "sudo: a password is required"; }
+  _c_showfail() { local r; _bhr "$1" install --apply >/dev/null; : > "${d}/st/show-fail"; r="$(_bhr "$1" verify)"; BH_WHY="${r:0:400}"
+    _bhrc "${r}" 2 && _bhhas "${r}" "NÃO MEDI: o systemctl show" && ! _bhhas "${r}" "NÃO está carregado"; }
+  _bhcase "(h29) verify em que o sudo -n do nsenter falha (sem a linha n_fail) → rc 2 NÃO MEDI, nunca o rc 1 de reprovado" \
+    "  grep -qE '^n_fail=[0-9]+\$' <<<\"\${out}\" \\" "  true \\" _c_privfail
+  _bhcase "(h30) verify em que o systemctl show do DropInPaths falha → rc 2 NÃO MEDI, nunca 'NÃO está carregado'" \
+    '2>/dev/null)" || { say "NÃO MEDI: o systemctl show de ${UNIT} falhou (DropInPaths)"; return 2; }' '2>/dev/null)"' _c_showfail
   [ -d "${d}/h" ] && chmod -R u+rwX "${d}/h" 2>/dev/null
   rm -rf "${d}"
 }
@@ -10081,6 +10093,26 @@ PY
   _crcase "(r23) cópia do wrapper fora de um checkout, em produção → rc 3 antes de qualquer sudo" \
     '    || die 3 "${_f} não é arquivo rastreado' '    || true "${_f} não é arquivo rastreado' _cc_copy
   _crcase "(r24) trava ocupada (update-bridge ou wrapper do bridge rodando) → rc 2" 'flock -n 9 || die 2' 'true || die 2' _cc_lock
+  # NÃO MEDIU ≠ REPROVOU (E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016): a sonda do sudo só existe em PRODUÇÃO (no modo
+  # de teste nada passa por sudo), então o caso roda a cópia em produção, RASTREADA num repositório git da sandbox, com
+  # um sudo FALSO que nunca executa nada: ou falha tudo, ou só aceita o `-n true` da sonda de root. Sem a sonda (o
+  # mutante), o 1º priv de verdade falha e o read_sources morre com rc 1 dizendo "fonte com SYMLINK" — o rótulo falso.
+  _cc_sudo_run() { local rc=0 p="${d}/prodrepo"; rm -rf "${p}" "${d}/sudofake"; mkdir -p "${p}/ops" "${d}/sudofake"
+    cp "$1" "${p}/ops/chat-runner.sh" && git -C "${p}" init -q -b main && git -C "${p}" add -A \
+      && git -C "${p}" -c user.email=t@t -c user.name=t commit -qm w || { CR_WHY="não montei o repo de produção da sandbox"; return 1; }
+    if [ "$2" = svc ]; then printf '#!/bin/sh\n[ "$*" = "-n true" ] && exit 0\necho "sudo: a password is required" >&2\nexit 1\n' > "${d}/sudofake/sudo"
+    else printf '#!/bin/sh\necho "sudo: a password is required" >&2\nexit 1\n' > "${d}/sudofake/sudo"; fi
+    chmod +x "${d}/sudofake/sudo"
+    CR_OUT="$(cd "${d}" && env PATH="${d}/sudofake:${d}/fake:${PATH}" LC_ALL=C bash "${p}/ops/chat-runner.sh" verify 2>&1)" || rc=$?
+    CR_RC="${rc}"; CR_WHY="rc=${rc} ${CR_OUT:0:300}"; }
+  _cc_sudo_root() { _cc_sudo_run "$1" root || return 1
+    [ "${CR_RC}" = 2 ] && case "${CR_OUT}" in *"NÃO MEDI: o sudo -n falhou"*) true ;; *) false ;; esac; }
+  _cc_sudo_svc() { _cc_sudo_run "$1" svc || return 1
+    [ "${CR_RC}" = 2 ] && case "${CR_OUT}" in *"NÃO MEDI: o sudo -n -u onion falhou"*) true ;; *) false ;; esac; }
+  _crcase "(r24b) produção com o sudo -n falhando → verify rc 2 NÃO MEDI antes de qualquer leitura, nunca rc 1 'SYMLINK'" \
+    $'if [ "${TEST}" = 0 ]; then\n  sudo -n true' $'if false; then\n  sudo -n true' _cc_sudo_root
+  _crcase "(r24c) produção com só o sudo -n -u da conta do serviço falhando → verify rc 2 NÃO MEDI" \
+    '  sudo -n -u "${SVC_USER}" true >/dev/null 2>&1 || die 2' '  true || die 2' _cc_sudo_svc
   _crcase "(r25) opção fora da lista fechada → rc 3" '    *) die 3 "opção não aceita: $1' '    *) shift 2; continue; die 3 "opção não aceita: $1' _cc_opt
   _crcase "(r26) modo de teste com o estado de produção do bridge → rc 3" \
     'case "${_r}/" in "${PROD_SVC_HOME}/"*|"${PROD_STATE}/"*|' 'case "${_r}/" in "/nunca/"*|' _cc_testprod
@@ -10181,7 +10213,8 @@ case "$1" in
 esac
 exit 0
 EOF
-  printf '#!/bin/sh\necho "[onion-bridge] no ar"\nif [ -f "$UB_ST/nojwks" ]; then echo "identidade: JWKS falhou | auth: enforce"; else echo "identidade: JWKS OK | auth: enforce"; fi\n' > "${d}/fake/journalctl"
+  # com -o short-iso (o NOOP) cada linha nasce com a data, como no journalctl real
+  printf '#!/bin/sh\np=""; case "$*" in *short-iso*) p="2026-10-01T00:00:00+00:00 vps onion-bridge[1]: " ;; esac\necho "${p}[onion-bridge] no ar"\nif [ -f "$UB_ST/nojwks" ]; then echo "${p}identidade: JWKS falhou | auth: enforce"; else echo "${p}identidade: JWKS OK | auth: enforce"; fi\n' > "${d}/fake/journalctl"
   printf '#!/bin/sh\necho "{\\"ok\\":true}"\n' > "${d}/fake/curl"
   printf '#!/bin/sh\necho "npm $*" >> "$UB_ST/calls"\nexit 0\n' > "${d}/fake/npm"
   # timeout falso: com $UB_ST/hang o verify "trava" e o teto devolve 124, como o do coreutils
@@ -10314,7 +10347,7 @@ PY
   _ubcase "(u8) não provado → o serviço segue RODANDO (nenhum stop depois do start)" \
     "  printf '[update-bridge] serviço deixado RODANDO" "  sudo systemctl stop \"\${UNIT}\"; printf '[update-bridge] serviço deixado RODANDO" _ub_bh_fail
   _ubcase "(u9) boot sem 'JWKS OK' → rc 1 nomeado (era rc 0 com AVISO)" \
-    'grep -q "JWKS OK" <<<"${BOOT}" \' 'true || grep -q "JWKS OK" <<<"${BOOT}" \' _ub_jwks
+    'if grep -q "JWKS OK" <<<"${BOOT}"; then' 'if true || grep -q "JWKS OK" <<<"${BOOT}"; then' _ub_jwks
   _ubcase "(u10) caiu depois do start (o falso zera no start, como o systemd 255 medido) → rc 1 a partir de UMA queda (limiar absoluto zero)" \
     'elif [ "${NEW_RESTARTS}" -gt 0 ]; then' 'elif [ "${NEW_RESTARTS}" -gt 5 ]; then' _ub_crash
   _ubcase "(u11) o verify do checkout NÃO é o do clone servido → rc 1, esse verify não roda (o juiz é o servido)" \
@@ -10339,6 +10372,19 @@ PY
     'NADA foi atualizado." >&2; exit 2; }' 'NADA foi atualizado." >&2; exit 0; }' _ub_lock
   _ubcase "(u21) verify do checkout ausente (cmp rc 2) → rc 1 nomeado 'não pude comparar', o verify não roda" \
     '    *) NOT_PROVEN+=("${label}: não pude comparar' '    *) _ub_z+=("${label}: não pude comparar' _ub_nocmp
+  # NÃO MEDIU ≠ REPROVOU (E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016): o rc 2 dos dois wrappers (o sudo -n que
+  # falhou, agora declarado por eles) vira NÃO MEDIU nos dois itens e nenhum REPROVOU aparece
+  _ub_both_nomeasure() { echo 2 > "${d}/st/bh-rc"; echo 2 > "${d}/st/cr-rc"; local r; r="$(_ubr "$1")"
+    _ub_unproven "integridade (30-integrity.conf): o verify NÃO MEDIU (rc 2)" "${r}" \
+      && _ubhas "${r}" "  - runner do convidado (onion-chat.socket): o verify NÃO MEDIU (rc 2)" && ! _ubhas "${r}" "REPROVOU"; }
+  # o JWKS do NOOP é o instantâneo do boot vivo (pode ter dias): a linha leva a data do boot e diz que agora não é medido
+  _ub_noop_jwks_age() { _ubnoop; local r; r="$(_ubr "$1")"; UB_WHY="${r:0:600}"
+    _ubrc "${r}" 0 && _ubhas "${r}" "JWKS: OK no boot vivo, em 2026-10-01T00:00:00+00:00 (instantâneo do boot" \
+      && _ubhas "${r}" "AGORA não é re-medida" && _ubhas "${r}" "NOOP OK"; }
+  _ubcase "(u22) os dois verifies saem rc 2 (sudo -n falhou) → os dois NÃO MEDIU, nenhum REPROVOU" \
+    '    1) n="$(grep -cE' '    1|2) n="$(grep -cE' _ub_both_nomeasure
+  _ubcase "(u23) NOOP: o JWKS OK vem datado do boot vivo e declarado instantâneo, nunca 'medido agora'" \
+    '--no-pager -o short-iso 2>/dev/null' '--no-pager 2>/dev/null' _ub_noop_jwks_age
   rm -rf "${d}"
 }
 

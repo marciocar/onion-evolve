@@ -200,6 +200,18 @@ HOME_ROOT="${STATE}/chat-homes"
 DROPIN_DIR="${UNIT_DIR}/${UNIT}.service.d"
 FENCE_DIR="${UNIT_DIR}/${TEMPLATE_UNIT}.d"
 FENCE_SRC="${SRC_DIR}/onion-chat-egress-fence.conf.in"
+# ── o privilégio, ANTES de qualquer medida: NÃO MEDIU ≠ REPROVOU ──────────────────────────────────────
+# (2026-10-16, E_DEPLOY_DO_BRIDGE_REPROVA_O_QUE_NAO_PROVOU_1016) Com o sudo -n falhando (sem NOPASSWD, sessão sem
+# TTY), cada `priv`/`as_svc` abaixo devolvia 1 e virava um veredito FALSO: o teste da cerca dava "não instalada"
+# calado, e o read_sources morria com rc 1 dizendo "fonte com SYMLINK no caminho" — o update-bridge então rotulava
+# "o verify REPROVOU" sem nada ter sido medido. A sonda prova as DUAS identidades que o wrapper usa (root e a conta do
+# serviço) e sai rc 2 (não pude medir), o rc que o EXIT acima já reserva para o sudo. TETO: ela prova o sudo no
+# início; um sudo que passe a falhar NO MEIO (sudoers trocado durante a execução) ainda cai no veredito da checagem.
+if [ "${TEST}" = 0 ]; then
+  sudo -n true >/dev/null 2>&1 || die 2 "NÃO MEDI: o sudo -n falhou (sem NOPASSWD ou sem sessão): nada foi lido nem medido"
+  sudo -n -u "${SVC_USER}" true >/dev/null 2>&1 || die 2 "NÃO MEDI: o sudo -n -u ${SVC_USER} falhou: nada foi lido nem medido"
+fi
+
 # a cerca vale quando pedida OU já instalada (instalada é o estado: o install sem a flag não a tira em silêncio)
 FENCE=0; HOST_ADDRS=""
 if [ "${EGRESS}" = 1 ] || priv test -e "${FENCE_DIR}/${FENCE_NAME}"; then FENCE=1; fi
