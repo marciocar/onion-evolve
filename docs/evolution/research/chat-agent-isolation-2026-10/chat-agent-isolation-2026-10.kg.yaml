@@ -20,7 +20,10 @@ meta:
                                # Gatilhos antecipados: (1) [LIDOS na rodada de primárias de 2026-10-15]; (2) o degrau
                                # 0 ou 1 ser aplicado no vivo; (3) update do Claude Code/SDK no bridge.
   # kg-backlog-guard: on
-  # ═══ TETO: 141 NÓS ═══
+  # ═══ TETO: 142 NÓS ═══
+  #   CERCA DE REDE EM PRODUÇÃO (2026-10-16, +1): a prova no host real do --apply com --egress-fence
+  #   (E_EGRESS_FENCE_EM_PRODUCAO_1016). O motivo do teto: é a prova que a entrada da OPÇÃO A CONSTRUÍDA prometeu
+  #   para o PR seguinte ao --apply; plano PROD, não detalhe de nó existente.
   #   OPÇÃO A CONSTRUÍDA (2026-10-16, +1): a cerca de rede do runner, escolhida pelo maestro no selo do degrau 3, vira
   #   modelo no bridge e flag no wrapper, com o dogfood e o modo de falha. O motivo do teto: construção nova pedida pela
   #   decisão, não detalhe de nó existente. A prova em produção nasce no PR seguinte ao --apply.
@@ -2240,6 +2243,23 @@ nodes:
       method: "medição: units transitórias sem nada persistente, o verify do wrapper contra a produção e a bancada com mutantes"
       locality: "host"
 
+  - id: E_EGRESS_FENCE_EM_PRODUCAO_1016
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "ops/chat-runner.sh (core-only) install --apply --egress-fence rc 0 pela sessão principal às ~17:20 UTC, depois do merge de onion-bridge#75 (86c9c000) e do core #1168 (cff29401) e do update do bridge rc 0 (health 200, verify dos degraus 1 e 2 OK); verify depois: 73 OK, n_fail=0"
+    label: "CERCA DE REDE EM PRODUÇÃO: a instância do runner do /chat roda com IPAddressDeny de 13 faixas e nenhum IPAddressAllow; o TCP ao loopback, ao stub do resolvedor e aos endereços do host fica barrado, e o DNS e o TLS com a API seguem. Não medido: um turno real de convidado."
+    narrative: "Medido em 2026-10-16 ~17:20 UTC pela sessão principal. Ordem: onion-bridge#75 mergeado pelo maestro (86c9c000) e o core #1168 (cff29401); o update do bridge saiu rc 0, com health 200 e o verify dos degraus 1 e 2 OK. O ensaio install --egress-fence saiu rc 0 com n_fail=0, e só o 60-egress-fence.conf NOVO. O install --apply --egress-fence saiu rc 0, com backup datado do wrapper (20261016-171950). O verify depois deu 73 OK e n_fail=0. Na instância: IPAddressDeny com 13 faixas, sem IPAddressAllow. TCP barrado com a cerca e aberto sem ela para o loopback na porta do bridge, o stub do resolvedor na 22 e os dois endereços globais do host na 22 (IPv4 e IPv6, conferidos com o ip addr da interface pública). O DNS de api.anthropic.com pelos resolvedores públicos segue, o TLS 1.3 com certificado verificado também, e o aperto de mão pelo socket deu OK. Depois: health 200, onion-vps-bridge e onion-chat.socket active, 0 erro no journal em 3 min. NÃO MEDIDO: um turno real de convidado com a API dentro da cerca e o WebFetch de um modelo contra o loopback. TETO (o de E_CERCA_DE_REDE_CONSTRUIDA_1016): a cerca é de IP, o AF_UNIX segue aberto; e um processo de dentro da slice do runner ainda forjaria a linha do journal."
+    trace: "ops/chat-runner.sh (core-only) verify; PR #1168; onion-bridge#75"
+    provenance:
+      source: "onion-chat@ e onion-chat.socket no host, sob a cerca 60-egress-fence.conf; onion-vps-bridge em 86c9c000"
+      locator: "ops/chat-runner.sh install --apply --egress-fence e verify; systemctl show das propriedades IPAddressDeny e IPAddressAllow da instância; GET /health no loopback; journal de 3 min"
+      method: "medição: wrapper em produção pela sessão principal, com perna de controle sem a cerca para cada alvo"
+      locality: "host"
+
 edges:
   - from: E_SECDEP_PROXY_PATTERN_PLATFORM
     to: Q_CHAT_AGENT_ISOLATION_2026
@@ -2856,3 +2876,12 @@ edges:
   - from: E_CERCA_DE_REDE_CONSTRUIDA_1016
     to: C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX
     edge_type: CONSTRAINS
+  - from: E_EGRESS_FENCE_EM_PRODUCAO_1016
+    to: C_SUPERACAO_20261016_EGRESS_PELA_UNIT_NAO_PELO_SANDBOX
+    edge_type: SUPPORTS
+  - from: E_EGRESS_FENCE_EM_PRODUCAO_1016
+    to: D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016
+    edge_type: TRACES_TO
+  - from: E_EGRESS_FENCE_EM_PRODUCAO_1016
+    to: E_DEGRAU2_EM_PRODUCAO_1016
+    edge_type: TRACES_TO
