@@ -9,7 +9,7 @@ meta:
   review_after: "2026-11-15"   # 30d: cadência de ferramenta
   x_supersedes_none: "nenhum item de 2.1.301 contradiz nó da r11: a questão aberta Q_MERGE_SERIAL_SOBREVIVE_A_SAIDA_DA_SESSAO não é tocada pelo delta, e os 12 nós da r11 seguem valendo; os de hooks e OTel (E_HOOKS_DO_CORE_SAO_TODOS_COMMAND, E_OTEL_E_REFTABLE_SEM_CONSUMIDOR) foram medidos de novo em 2026-10-16 (22 hooks command, 0 consumidor de OTel)"
   # ═══ TETO: 25 NÓS ═══
-  #   2 no esqueleto (2026-10-16); 13 depois da rodada e do juiz (2026-10-16).
+  #   2 no esqueleto (2026-10-16); 13 depois da rodada e do juiz (2026-10-16); 14 com a prova em produção da SAC-156 (2026-10-16), teto mantido.
 # ═══ AUFHEBUNG: a rodada decide UMA forma antes de selar (a REGRA 89 acusa até lá) ═══
 #   (a) derrubou nó da rodada anterior → descomente e NOMEIE o nó (contrato v4.3; o gate confere o alvo):
 # external_edges:
@@ -51,12 +51,12 @@ nodes:
     node_type: evidence
     layer: audit
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 3
     confidence: 0.9
     verified_at: "2026-10-16"
     verified_against: "medido em 2026-10-16: o binário que o runner liga por bind (ops/chat-runner.sh l.192, CLAUDE_SRC no node_modules do bridge) responde 2.1.232 a --version; o package-lock do onion-bridge resolve @anthropic-ai/claude-agent-sdk 0.3.232 (package.json pede ^0.3.232); o processo do bridge (tsx src/server.ts, user onion) está vivo há 09:02; npm view do SDK devolve 0.3.301 com claudeCodeVersion 2.1.301; o cc-delta-census.sh tem 0 menções a SDK; corrigido pelo juiz: 57 seções publicadas no CHANGELOG entre 2.1.233 e 2.1.301 (12 números pulados) e 58 releases do SDK, não 69; o deploy de 2026-10-16 18:05 reinstalou o node_modules pelo lock e manteve o 0.3.232; 0 pathToClaudeCodeExecutable em src/, então o admin usa a resolução default do SDK, e a unit onion-chat@.service liga o mesmo arquivo por BindReadOnlyPaths"
-    narrative: "Juiz: EXAGERA no número (69 era a distância de patch); o achado central sustenta, e o juiz acrescentou que o deploy do mesmo dia reinstalou pelo lock e ficou em 0.3.232. O grafo de isolamento já media o CLI 2.1.232 (E_CVE39861_FIXED_IN_2_1_64); o novo desta rodada é ligar a versão ao alcance do delta do E3 e ao censo que não a vê."
+    narrative: "Juiz: EXAGERA no número (69 era a distância de patch); o achado central sustenta, e o juiz acrescentou que o deploy do mesmo dia reinstalou pelo lock e ficou em 0.3.232. O grafo de isolamento já media o CLI 2.1.232 (E_CVE39861_FIXED_IN_2_1_64); o novo desta rodada é ligar a versão ao alcance do delta do E3 e ao censo que não a vê. Superada em 2026-10-16 por E_SDK_0_3_301_EM_PRODUCAO_1016: o deploy de onion-bridge 0d1bc843 subiu o SDK para 0.3.301; a medição desta rodada valeu até ali, e o ponto do censo (Q_CENSO_MEDE_O_CLI_DO_SDK_DO_BRIDGE) segue aberto."
     label: "o /chat em produção (bridge pelo Agent SDK e runner do convidado sob DynamicUser) roda o CLI 2.1.232 do SDK 0.3.232, 57 versões atrás do host e preso pelo lock; nenhum item da 2.1.301 chega aos degraus de isolamento, e o censo mede só o CLI do host"
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
@@ -93,12 +93,12 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.5
     verified_at: "2026-10-16"
     verified_against: "aberta pela rodada r12 em 2026-10-16: fecha quando o maestro decidir subir o SDK do onion-bridge de 0.3.232 para a linha atual (0.3.301 medido no npm), com o chat-runner verify e o handshake por spawnClaudeCodeProcess re-provados no CLI novo, e um piso de versão que barre regressão abaixo de 2.1.64, o mínimo do CVE-2026-39861 já registrado no grafo de isolamento como pré-condição do degrau 3 (E_CVE39861_FIXED_IN_2_1_64), que o maestro parqueou em 2026-10-16; o piso pesa se o degrau 3 voltar, e a defasagem das correções pesa já"
-    narrative: "Issue SAC-156 no Linear, criada pelo tm.sh em 2026-10-16."
+    narrative: "Issue SAC-156 no Linear, criada pelo tm.sh em 2026-10-16. Fechada em 2026-10-16 pela prova em produção (E_SDK_0_3_301_EM_PRODUCAO_1016): a decisão do maestro é o merge do onion-bridge#77 (0d1bc843), feito por ele, e o piso entrou no core pelo #1171 (99a821cb); o deploy e o verify independente deram rc 0. Fica declarado o que não foi medido: nenhum turno com a API real rodou no CLI novo."
     label: "o SDK do bridge deve subir com piso de versão declarado e o verify do runner re-provado no CLI novo; o piso de CVE do degrau 3 (parqueado) vale por acaso de versão e as correções de 57 versões publicadas não chegam ao /chat"
   - id: E_GREP_E_GLOB_DEIXAM_DE_MENTIR_ZERO
     node_type: evidence
@@ -206,7 +206,29 @@ nodes:
       locator: "seção ## 2.1.301 (o binário inteiro)"
       method: "medição: execução da família cited_directive"
       locality: "web"
+  - id: E_SDK_0_3_301_EM_PRODUCAO_1016
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-16"
+    verified_against: "medido pela sessão principal em 2026-10-16 por volta de 20:45 UTC: onion-bridge#77 mergeado pelo maestro (0d1bc843) e core #1171 mergeado (99a821cb); o wrapper de deploy do bridge saiu rc 0 com backup cifrado antes, e o resultado foi clone 99a821cb, bridge 0d1bc843, health 200 local e público, auth enforce, verify do degrau 1 e do runner OK depois do update; o chat-runner verify independente saiu rc 0 com n_fail=0, com as linhas 'OK o CLI do SDK responde 2.1.301, no piso 2.1.64 ou acima' e 'OK o argv do SDK servido, com a política do convidado, passa pelo lançador instalado (25 asserções)', e a cerca de rede (TLS com a API) segue; o package.json do SDK no clone servido, lido como a conta do serviço, declara 0.3.301; não medido: um turno com a API real"
+    narrative: "Fecha a SAC-156. A versão saiu de 0.3.232 (CLI 2.1.232, E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232) para 0.3.301 (CLI 2.1.301), e o piso 2.1.64 do CVE-2026-39861 passou a ser cobrado pelo verify, não mais garantido por acaso de versão. A prova cobre o deploy, a versão do CLI servido e o argv pelo lançador; o turno ponta a ponta com a API fica como lacuna declarada."
+    label: "o /chat em produção roda o SDK 0.3.301 com o CLI 2.1.301, acima do piso 2.1.64 que o verify do runner agora cobra, depois do deploy de onion-bridge 0d1bc843 e core 99a821cb com rc 0"
+    provenance:
+      source: "onion-bridge@0d1bc843 (PR #77) e onion-evolve@99a821cb (PR #1171); saída do chat-runner verify e do wrapper de deploy do bridge"
+      locator: "linhas OK do verify: 'o CLI do SDK responde 2.1.301, no piso 2.1.64 ou acima' e 'o argv do SDK servido ... passa pelo lançador instalado (25 asserções)'; campo version do package.json do SDK no clone servido"
+      method: "medição: deploy pelo wrapper, verify independente e leitura do package.json como a conta do serviço"
+      locality: "host"
 edges:
+  - from: E_SDK_0_3_301_EM_PRODUCAO_1016
+    to: Q_SUBIR_O_SDK_DO_BRIDGE_COM_PISO_DE_VERSAO
+    edge_type: SUPPORTS
+  - from: E_SDK_0_3_301_EM_PRODUCAO_1016
+    to: E_BRIDGE_E_RUNNER_RODAM_O_CLI_2_1_232
+    edge_type: SUPERSEDES
   - from: E_DELTA_DA_RODADA
     to: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     edge_type: SUPPORTS
