@@ -1,0 +1,106 @@
+meta:
+  id: vexa-2026-10
+  schema_version: "1"
+  x_dissect_tool: vexa
+  x_dissect_against: onion
+  baseline: "2026-10-16"
+  review_after: "2026-11-15"   # 30d: ferramenta (cadência da doutrina), o MESMO prazo da dissecação de origem
+  # kg-backlog-guard: on
+  # ═══ TETO: 4 NÓS. Triagem fechada: cresce quando o portão do Meet for medido ou o gatilho do Teams disparar. ═══
+  #
+  # TRIAGEM DO CORE de uma dissecação feita FORA dele (SAC-160, fase 3a da SAC-157): o adotante de curadoria
+  # dissecou a Vexa (bot e extensão de navegador para Meet e Teams, Apache-2.0) contra a régua do Onion e
+  # propôs COSTURAR a medir, Meet primeiro. O grafo canônico (13 nós, N0 a N3, com o Elenxo que reprovou o
+  # 1º rascunho, que propunha parquear) mora no repo de curadoria, no MESMO caminho relativo deste arquivo.
+  # Este grafo NÃO re-mede a Vexa: sela a decisão do maestro, guarda o portão e o gatilho do Teams, e existe
+  # para o dissect-census.sh DO CORE responder "já dissecamos a Vexa?" sem o clone da curadoria.
+  # Mesma forma da triagem do método do REA (rea-method-2026-10). baseline e review_after repetem os da origem.
+  # Proposta triada: docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md
+
+nodes:
+
+  - id: D_VEXA_2610
+    node_type: decision
+    impact: 5
+    confidence: 0.6
+    x_dissect_level: 3
+    x_dissect_verdict: costurar
+    label: "COSTURAR a Vexa a medir, Meet primeiro: extensão de navegador + host desktop local (ou o Lite com STT local), ligada ao grafo da reunião por um adaptador do contrato transcript.v1, com o aviso registrado por fora. Teams parqueado com critério."
+    trace: "docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-16"
+    verified_against: "decisão do maestro em 2026-10-16, por pergunta com opções (/meta:decide): escolhida «Costurar, Meet primeiro (Recomendado)»"
+    narrative: |-
+      O veredito proposto pela curadoria (o Elenxo de lá reprovou o 1º rascunho, que parqueava: o "Teams quebrado" era erro do usuário e o caminho sem bot da própria Vexa tinha ficado de fora). O registro de aviso não vem da Vexa (o bot não posta no chat): vem do grafo da reunião, no modelo aviso ≠ consentimento (P_CONSENT_EVIDENCE_REWRITE em meeting-capture-2026-10). O adaptador do transcript.v1 escreve no mesmo esquema que o /product:extract-meeting grava a partir de texto, e no mesmo diretório: docs/meetings/.
+
+      Acréscimo do maestro na mesma resposta, literal: "vamos padronizar o diretorio para acabar com o desencontro docs/meetings/ × docs/meet/". Executado no mesmo PR que sela esta decisão: o canônico é docs/meetings/ (E_DIR_MEETINGS_CANONICO em meeting-capture-2026-10).
+
+      Selado por /meta:decide em 2026-10-16: escolhida «Costurar, Meet primeiro (Recomendado)»; descartadas: «Parquear» · «Rejeitar».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-16: «Vexa (bot/extensão de navegador para Meet e Teams, Apache-2.0): qual veredito?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      locality: "pessoa"
+
+  - id: E_CURADORIA_VEXA_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    x_dissect_level: 3
+    verified_at: "2026-10-16"
+    verified_against: "grafo da dissecação da Vexa no repo de curadoria (onion-curation@aa70452), lido inteiro pela triagem: D_VEXA_2610, E_N3_FIT, E_N2_EXTENSION_NO_BOT, E_N2_TEAMS_FRAGILE, E_N2_NOT_RUN e E_ELENXO_REVERSAL"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "A dissecação da curadoria sustenta o costurar: o transcript.v1 traz falante, texto e tempo por segmento, e o caminho extensão + desktop roda local em CPU, sem bot nem lobby. Não transfere: o registro de consentimento e o Teams, frágil."
+    trace: "docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md"
+    narrative: "Tudo do lado de lá é LEITURA de código no pin: nada foi executado e nenhum bot entrou em reunião (E_N2_NOT_RUN, open). Por isso o veredito é costurar A MEDIR, com portão (Q_VEXA_PORTAO_MEET)."
+    provenance:
+      source: "github.com/marciocar/onion-curation@aa70452:docs/evolution/dissect/vexa-2026-10/vexa-2026-10.kg.yaml"
+      locator: "nós D_VEXA_2610, E_N3_FIT, E_N2_EXTENSION_NO_BOT, E_N2_TEAMS_FRAGILE, E_N2_NOT_RUN, E_ELENXO_REVERSAL"
+      method: "leitura: grafo canônico da curadoria, conferido pela sessão de lá (C1) e relido pela triagem do core"
+      locality: "repo"
+
+  - id: Q_VEXA_PORTAO_MEET
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    x_dissect_level: 3
+    label: "Portão do Meet: num teste consentido, sem dado real, a extensão + desktop da Vexa produz 1 segmento ou mais com speaker não vazio, e o adaptador grava um grafo de reunião que passa no meeting-graph-check.sh?"
+    x_gatilho: "fecha quando o teste consentido rodar no Meet: rc 0 do meeting-graph-check.sh sobre o grafo gerado pelo adaptador e ≥1 segmento com speaker não vazio no transcript.v1. Depende da máquina de captura (Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016)."
+    trace: ".claude/validation/meeting-graph-check.sh"
+
+  - id: Q_VEXA_TEAMS_PARQUEADO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    x_dissect_level: 3
+    label: "O Teams fica parqueado dentro do veredito enquanto o join autenticado da Vexa for admitido sem áudio (issue #1795 aberta)."
+    x_gatilho: "reabrir quando `gh api repos/Vexa-ai/vexa/issues/1795 --jq .state | grep -qx open` sair rc 1 (a issue fechou). rc 0 = o bloqueio vale. A #1848 (bot marcado como ameaça até o aceite manual) entra na mesma reabertura."
+    trace: "docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md"
+
+edges:
+
+  - from: E_CURADORIA_VEXA_1016
+    to: D_VEXA_2610
+    edge_type: SUPPORTS
+  - from: Q_VEXA_PORTAO_MEET
+    to: D_VEXA_2610
+    edge_type: CONSTRAINS
+  - from: Q_VEXA_TEAMS_PARQUEADO
+    to: D_VEXA_2610
+    edge_type: CONSTRAINS
+
+external_edges:
+  - from: D_VEXA_2610
+    to: "docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml#P_CONSENT_EVIDENCE_REWRITE"
+    edge_type: DEPENDS_ON
+  - from: Q_VEXA_PORTAO_MEET
+    to: "docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml#Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016"
+    edge_type: DEPENDS_ON

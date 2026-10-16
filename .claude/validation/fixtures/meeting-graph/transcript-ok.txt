@@ -1,0 +1,10 @@
+Transcrição FICTÍCIA para a bancada do grafo de reunião. Nenhuma pessoa, empresa ou dado real.
+Reunião de planejamento do módulo de relatórios, 2026-10-16, 10h00.
+[10:00:05] Ana Teste (chat): Aviso: esta reunião está sendo gravada e transcrita para virar ata e grafo. Quem não concordar, diga agora.
+[10:00:20] Bruno Exemplo: Ciente, pode gravar.
+[10:00:31] Carla Modelo: Ciente.
+[10:01:10] Ana Teste: Primeiro ponto, o relatório mensal. Proposta: gerar em PDF e em planilha.
+[10:02:02] Bruno Exemplo: Concordo. Fechamos PDF e planilha, sem o HTML por enquanto.
+[10:02:40] Carla Modelo: Eu monto o gerador de planilha até sexta, dia 23.
+[10:03:15] Bruno Exemplo: Risco: a biblioteca de PDF que usamos está sem manutenção há um ano.
+[10:03:50] Ana Teste: Anotado. Encerramos por hoje.

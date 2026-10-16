@@ -114,7 +114,7 @@ OUTPUT_DIR=".claude/sessions/consolidated-transform/"; mkdir -p "$OUTPUT_DIR"
 
 ```bash
 # Após consolidar reuniões (interativo)
-/product/transform-consolidated "docs/meet/consolidation-2025-12-02-sprint-planning.md" --mode=interactive
+/product/transform-consolidated "docs/meetings/consolidation-2025-12-02-sprint-planning.md" --mode=interactive
 
 # Após consolidar documentos (auto, ambos os outputs)
 /product/transform-consolidated "docs/consolidated/business-context/" --mode=auto --output_format=both
@@ -123,7 +123,7 @@ OUTPUT_DIR=".claude/sessions/consolidated-transform/"; mkdir -p "$OUTPUT_DIR"
 /product/transform-consolidated "docs/consolidated/" --mode=auto --output_format=tasks-only
 
 # Apenas contexto, sem tasks
-/product/transform-consolidated "docs/meet/consolidation-*.md" --mode=context-only
+/product/transform-consolidated "docs/meetings/consolidation-*.md" --mode=context-only
 ```
 
 ## ⚙️ Parâmetros

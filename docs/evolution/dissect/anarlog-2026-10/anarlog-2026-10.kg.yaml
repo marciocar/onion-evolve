@@ -1,0 +1,103 @@
+meta:
+  id: anarlog-2026-10
+  schema_version: "1"
+  x_dissect_tool: anarlog
+  x_dissect_against: onion
+  baseline: "2026-10-16"
+  review_after: "2026-11-15"   # 30d: ferramenta (cadência da doutrina), o MESMO prazo da dissecação de origem
+  # kg-backlog-guard: on
+  # ═══ TETO: 4 NÓS. Triagem fechada: cresce quando o portão do export for medido na máquina de captura. ═══
+  #
+  # TRIAGEM DO CORE de uma dissecação feita FORA dele (SAC-161, fase 3b da SAC-157): o adotante de curadoria
+  # dissecou o anarlog (ex-Hyprnote, captura local sem bot, MIT fora de enterprise/) contra a régua do Onion e
+  # propôs COSTURAR pela CLI de export. O grafo canônico (13 nós, N0 a N3, com o Elenxo que corrigiu a costura
+  # e a condição) mora no repo de curadoria, no MESMO caminho relativo deste arquivo. Este grafo NÃO re-mede o
+  # anarlog: sela a decisão do maestro (o veredito E a escolha do aviso, que a curadoria deixou ao core),
+  # guarda o portão e existe para o dissect-census.sh DO CORE responder sem o clone da curadoria.
+  # Proposta triada: docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md
+
+nodes:
+
+  - id: D_ANARLOG_2610
+    node_type: decision
+    impact: 5
+    confidence: 0.6
+    x_dissect_level: 3
+    x_dissect_verdict: costurar
+    label: "COSTURAR o anarlog como captura local: o app grava e transcreve na máquina de captura, e um adaptador do Onion chama 'anarlog meetings export <id> --format json' e escreve o grafo da reunião, sem o Nango. O aviso aos participantes é PRÓPRIO, em pt-BR."
+    trace: "docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md"
+    status: done
+    plane: DEV
+    verified_at: "2026-10-16"
+    verified_against: "decisão do maestro em 2026-10-16, por pergunta com opções (/meta:decide): escolhida «Costurar com aviso próprio pt-BR (Recomendado)»"
+    narrative: |-
+      Da escolha do aviso que a curadoria deixou ao core (i: aviso em inglês, como está; ii: desligar o envio automático e postar aviso próprio em pt-BR; iii: fork de duas constantes), o maestro escolheu a (ii). O custo declarado da (ii) é perder o registro da tentativa DENTRO do anarlog; ele é coberto por fora: a tentativa de aviso e as respostas vão ao grafo da reunião, no modelo aviso ≠ consentimento (P_CONSENT_EVIDENCE_REWRITE em meeting-capture-2026-10), e o meeting-graph-check.sh reprova a reunião sem tentativa de aviso registrada. Condição que segue aberta: haver STT local alcançável na máquina de captura (Q_ANARLOG_PORTAO_EXPORT, que depende de Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016). A importação do Meet e do Teams do anarlog roda no servidor dele, via Nango, e fica fora da costura.
+
+      Selado por /meta:decide em 2026-10-16: escolhida «Costurar com aviso próprio pt-BR (Recomendado)»; descartadas: «Costurar com aviso em inglês» · «Costurar com fork de 2 constantes» · «Parquear o anarlog».
+    provenance:
+      source: "maestro, na sessão do /meta:decide"
+      locator: "pergunta com opções de 2026-10-16: «anarlog: costurar pela CLI meetings export --format json, com qual aviso aos participantes?»"
+      method: "testemunho: decisão do maestro por pergunta com opções, 2026-10-16"
+      locality: "pessoa"
+
+  - id: E_CURADORIA_ANARLOG_1016
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    x_dissect_level: 3
+    verified_at: "2026-10-16"
+    verified_against: "grafo da dissecação do anarlog no repo de curadoria (onion-curation@aa70452), lido inteiro pela triagem: D_ANARLOG_2610, E_N2_EXPORT_CLI, E_N2_LOCAL_STT_PATHS, E_N2_CONSENT_EVIDENCE_MODEL, E_N2_CAPTURE_MACHINE e E_ELENXO_CORRECTIONS"
+    source_tier: 8
+    source_kind: primary-repo
+    label: "A dissecação da curadoria sustenta o costurar: o export por CLI devolve as palavras com tempo, canal e falante só lendo o banco; o motor STT embutido só existe em macOS Apple Silicon, e no Linux o provedor custom aponta um servidor local, não medido."
+    trace: "docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md"
+    narrative: "Tudo do lado de lá é LEITURA de código no pin: nada foi compilado nem executado (E_N2_NOT_RUN, open). O aviso do anarlog é constante em inglês, vem desligado por padrão e é postado por acessibilidade da UI; no Windows a função recusa (E_N2_CONSENT_EVIDENCE_MODEL). Isso pesa na pergunta da máquina de captura, que o maestro respondeu ser Windows."
+    provenance:
+      source: "github.com/marciocar/onion-curation@aa70452:docs/evolution/dissect/anarlog-2026-10/anarlog-2026-10.kg.yaml"
+      locator: "nós D_ANARLOG_2610, E_N2_EXPORT_CLI, E_N2_LOCAL_STT_PATHS, E_N2_CONSENT_EVIDENCE_MODEL, E_N2_CAPTURE_MACHINE, E_ELENXO_CORRECTIONS"
+      method: "leitura: grafo canônico da curadoria, conferido pela sessão de lá (C1) e relido pela triagem do core"
+      locality: "repo"
+
+  - id: Q_ANARLOG_PORTAO_EXPORT
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    x_dissect_level: 3
+    label: "Portão do anarlog: numa reunião de teste consentida, o export JSON traz palavras com start_ms, end_ms, channel e speaker, e a transcrição roda sem sair da máquina de captura?"
+    x_gatilho: "fecha quando o teste consentido rodar na máquina de captura: o export traz os quatro campos por palavra e o adaptador grava um grafo que passa no meeting-graph-check.sh. Se a máquina for Windows sem caminho de STT local, o portão reprova e o veredito reabre (Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016)."
+    trace: ".claude/validation/meeting-graph-check.sh"
+
+  - id: E_AVISO_WINDOWS_RECUSA
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    x_dissect_level: 2
+    label: "RISCO ao costurar: a função de postar o aviso do anarlog recusa no Windows, e o maestro disse que a máquina dele é Windows. O aviso próprio em pt-BR escolhido não depende dela, mas o caminho do anarlog no Windows não foi medido."
+    trace: "docs/evolution/inbox/_processed/2026-10-16-proposal-meeting-capture-to-graph.md"
+    narrative: "Fonte: E_N2_CONSENT_EVIDENCE_MODEL no grafo da curadoria (o aviso é postado por acessibilidade da UI: AT-SPI no Linux, meeting_ax no Mac; no Windows a função recusa). Fica open: ninguém rodou o anarlog no Windows."
+
+edges:
+
+  - from: E_CURADORIA_ANARLOG_1016
+    to: D_ANARLOG_2610
+    edge_type: SUPPORTS
+  - from: Q_ANARLOG_PORTAO_EXPORT
+    to: D_ANARLOG_2610
+    edge_type: CONSTRAINS
+  - from: E_AVISO_WINDOWS_RECUSA
+    to: D_ANARLOG_2610
+    edge_type: CONSTRAINS
+
+external_edges:
+  - from: D_ANARLOG_2610
+    to: "docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml#P_CONSENT_EVIDENCE_REWRITE"
+    edge_type: DEPENDS_ON
+  - from: Q_ANARLOG_PORTAO_EXPORT
+    to: "docs/evolution/research/meeting-capture-2026-10/meeting-capture-2026-10.kg.yaml#Q_CAPTURA_WINDOWS_CLIENTE_VPS_SERVIDOR_1016"
+    edge_type: DEPENDS_ON

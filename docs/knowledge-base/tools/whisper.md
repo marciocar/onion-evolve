@@ -159,10 +159,10 @@ whisper reuniao-28-nov.m4a --language pt --model large --output_format txt
 /product/extract-meeting source=reuniao-28-nov.txt
 
 # 3. Consolidar múltiplas reuniões
-/product/consolidate-meetings source=docs/meet/sprint-planning/
+/product/consolidate-meetings source=docs/meetings/sprint-planning/
 
 # 4. Converter em tasks
-/product/convert-to-tasks source=docs/meet/consolidation-*.md
+/product/convert-to-tasks source=docs/meetings/consolidation-*.md
 ```
 
 ### 4. Legendagem de Vídeos
@@ -224,10 +224,10 @@ whisper reuniao.m4a --language pt --model large --output_format txt
 /product/extract-meeting source=reuniao.txt level=executive
 
 # 3. Consolidar múltiplas reuniões
-/product/consolidate-meetings source=docs/meet/
+/product/consolidate-meetings source=docs/meetings/
 
 # 4. Converter em tasks acionáveis
-/product/convert-to-tasks source=docs/meet/consolidation-*.md
+/product/convert-to-tasks source=docs/meetings/consolidation-*.md
 ```
 
 ---
@@ -351,23 +351,23 @@ whisper sprint-planning-2025-12-02.m4a \
   --model large \
   --device cuda \
   --output_format txt \
-  --output_dir docs/meet/transcripts/
+  --output_dir docs/meetings/transcripts/
 
-# Resultado: docs/meet/transcripts/sprint-planning-2025-12-02.txt
+# Resultado: docs/meetings/transcripts/sprint-planning-2025-12-02.txt
 ```
 
 ### Exemplo 2: Processamento em Lote com Qualidade Alta
 
 ```bash
 # Processar todas as reuniões de uma pasta
-for file in docs/meet/raw/*.m4a; do
+for file in docs/meetings/raw/*.m4a; do
   filename=$(basename "$file" .m4a)
   whisper "$file" \
     --language pt \
     --model large \
     --device cuda \
     --output_format txt \
-    --output_dir docs/meet/transcripts/
+    --output_dir docs/meetings/transcripts/
 done
 ```
 
@@ -381,10 +381,10 @@ whisper reuniao-28-nov.m4a --language pt --model large --output_format txt
 /product/extract-meeting source=reuniao-28-nov.txt level=executive
 
 # 3. Consolidar múltiplas reuniões relacionadas
-/product/consolidate-meetings source=docs/meet/sprint-planning/
+/product/consolidate-meetings source=docs/meetings/sprint-planning/
 
 # 4. Converter conhecimento consolidado em tasks
-/product/convert-to-tasks source=docs/meet/consolidation-*.md
+/product/convert-to-tasks source=docs/meetings/consolidation-*.md
 ```
 
 ---

@@ -36,8 +36,8 @@ related_commands:
 knowledge_bases:
   - docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md
 
-version: "3.0.0"
-updated: "2025-12-01"
+version: "3.1.0"
+updated: "2026-10-16"
 ---
 
 Você é um especialista em transformar transcrições brutas de reuniões em conhecimento estruturado de alto valor. Domina o **Framework EXTRACT** e produz outputs consumíveis por humanos, sistemas e IA.
@@ -302,9 +302,22 @@ meeting:
 # Processar múltiplos arquivos de contexto
 @extract-meeting-specialist "Processar pasta de contexto: [DIRETÓRIO]"
 
-# Gerar grafo de conhecimento
-@extract-meeting-specialist "Gerar grafo JSON: [ARQUIVO]"
+# Gerar o grafo da reunião (.kg.yaml)
+@extract-meeting-specialist "Gerar o grafo da reunião: [ARQUIVO]"
 ```
+
+## 🕸️ O grafo da reunião (`docs/meetings/<nome>.kg.yaml`)
+
+Além do resumo, a extração grava o grafo da reunião no esquema do `/product:extract-meeting` (Passo 6):
+um nó `MEETING`, um `notice_attempt` por tentativa de aviso, um `participant` por pessoa, e os nós de
+decisão, ação e risco, **cada um com `trace` ao trecho** (`<transcrição>#L<a>[-L<b>]`). O gate é o
+`.claude/validation/meeting-graph-check.sh`; grafo que não passa nele não é entregue como válido.
+
+**Aviso ≠ consentimento.** Registre cada tentativa de aviso (canal e texto verbatim) e a resposta de cada
+participante (`ciente`, `recusou`, `sem_resposta`, `autora_do_aviso`). Nunca declare consentimento legal,
+que é juízo jurídico e não fato da transcrição. Sem aviso na transcrição, não invente um: o gate reprova, e
+é esse o resultado certo. Se alguém recusou, a captura para na linha da recusa (`x_capture_stopped_at`), e
+nada depois dela entra no grafo.
 
 ## 🎯 Exemplos de Aplicação
 
