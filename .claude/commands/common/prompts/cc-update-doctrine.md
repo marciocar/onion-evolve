@@ -24,7 +24,7 @@ Este comando é a **resposta** padronizada a esse aviso.
 
 ### 2. O script MEDE, o juiz JULGA — e ninguém troca de papel
 - **Medidor** (`.claude/validation/cc-delta-census.sh`, determinístico, sem LLM): versões (baseline,
-  disco, processo), as seções do delta copiadas byte a byte do CHANGELOG oficial, o inventário das
+  disco, processo **e o CLI embutido em cada Agent SDK declarado como alvo**), as seções do delta copiadas byte a byte do CHANGELOG oficial, o inventário das
   superfícies do Onion e o **esqueleto** do grafo. Ele **não** liga item a superfície: casar por
   palavra-chave fabrica exatamente as três ligações que a r8 teve de reprovar.
 - **Rodada** (a sessão): lê o delta, propõe as ligações **medindo o vivo** (`grep` no core, leitura
@@ -73,6 +73,13 @@ medição que o justificaria.
   CHANGELOG; capacidade só citada lá entra com essa ressalva e com medição ao vivo como condição.
 - **Não mede capacidade que o processo não tem.** Se o processo está numa versão anterior à do disco,
   o que só existe na nova está invisível nesta sessão: reinicie antes de medir comportamento.
+- **Não dá o delta por recebido em produção quando quem serve roda outro CLI.** Quem serve por Agent
+  SDK carrega o próprio binário, e o `claude --version` do host não o vê (r12, 2026-10-16: host em
+  2.1.301, bridge no 2.1.232 do SDK 0.3.232, 57 versões publicadas invisíveis). O medidor lê os alvos
+  de um arquivo de configuração (`CC_DELTA_SDK_TARGETS`; no core, o arquivo de alvos da oficina), mede
+  o `--version` do binário do SDK como a conta dona, cruza com o `claudeCodeVersion` do package.json
+  e avisa quando ele está N versões atrás do host. Alvo inalcançável é **NÃO MEDIDO** com rc, nunca
+  versão vazia; sem arquivo, a linha diz "nenhum alvo declarado".
 - **Não substitui o juiz por regex.** O sinal de ids de modelo fora da allowlist é fato, não ligação.
 - **Não roda offline.** Sem o CHANGELOG oficial o medidor sai rc 2 e declara a lacuna; nunca
   reconstrói o delta de memória.

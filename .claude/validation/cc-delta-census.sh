@@ -37,6 +37,23 @@
 #   CC_DELTA_DISK=<x.y.z>          sobrescreve a versão do disco
 #   CC_DELTA_PROC=<x.y.z>          sobrescreve a versão do processo (vazio-definido = sem sinal)
 #   CC_DELTA_TODAY=<AAAA-MM-DD>    data da rodada (default: date +%F)
+#   CC_DELTA_SDK_TARGETS=<arquivo> alvos do CLI EMBUTIDO em Agent SDK (default: ops/cc-sdk-targets.tsv (core-only)
+#                                  do repo, se existir; vazio-definido = nenhum alvo)
+#
+# ── O CLI QUE SERVE NÃO É O DO HOST (SAC-155, nasceu de defeito medido) ─────────────────────
+# Na rodada r12 (2026-10-16) o censo mediu o host em 2.1.301 enquanto o bridge e o runner do /chat rodavam o
+# CLI 2.1.232 embutido no Agent SDK 0.3.232: 57 versões publicadas que o delta declarava e que NÃO chegavam
+# a produção, e nenhuma linha dizia isso. Quem serve por SDK carrega o próprio binário; `claude --version`
+# do host não o vê. Por isso cada ALVO declarado vira uma linha da tabela de versões, e o veredito avisa
+# quando o CLI do SDK está N versões publicadas atrás do host.
+#   FONTE: o `--version` do BINÁRIO que o SDK traz (o que roda; comportamento), com o `claudeCodeVersion` do
+#   package.json do SDK como declaração cruzada — divergência entre os dois é aviso. O package.json é lido
+#   como ARQUIVO (`require` do pacote falha pelo campo `exports`). Rodado como a conta dona (`sudo -n -u`),
+#   em `/`, com ambiente limpo e teto de 30 s.
+#   DECLARADO POR CONFIGURAÇÃO, nunca por caminho no código: o arquivo de alvos (TAB: rótulo · conta ou `-` ·
+#   package.json · binário ou `-`). Quem não serve por SDK não tem o arquivo e lê "nenhum alvo declarado".
+#   Alvo inalcançável é "NÃO MEDIDO (rc, motivo)" na linha e no aviso, nunca versão vazia em silêncio; e
+#   ele NÃO derruba o rc do censo: a medição do host segue válida.
 # Exit: 0 = medido (delta ou "NADA A MEDIR", a linha VEREDITO diz qual) · 2 = entrada quebrada
 #       (sem baseline, CHANGELOG inalcançável, versão ilegível ou fora do CHANGELOG) — nunca 0 em
 #       silêncio. Determinístico, sem LLM. Exercitado por lint-selftest.sh
@@ -60,7 +77,7 @@ command -v python3 >/dev/null 2>&1 || { echo "cc-delta-census: python3 ausente �
 # Override ativo é DECLARADO antes de qualquer veredito. Achado do 1º dogfood de carga (2026-10-08): com
 # CC_DELTA_URL herdado de um teste, a sessão leu "CHANGELOG oficial inalcançável" e a causa era a variável.
 # O erro culpava a fonte; quem lê tem de saber que a medição não é a de produção.
-OVR="$(env | LC_ALL=C grep -oE '^CC_DELTA_[A-Z]+=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
+OVR="$(env | LC_ALL=C grep -oE '^CC_DELTA_[A-Z_]+=.*' | LC_ALL=C sort | tr '\n' ' ' | sed 's/ $//')"
 [ -n "${OVR}" ] && echo "cc-delta-census: ⚠️ override ativo — esta NÃO é a medição de produção: ${OVR}" >&2
 
 # ── versões ────────────────────────────────────────────────────────────────────────────────
@@ -86,9 +103,52 @@ if [ -z "${CC_DELTA_PROC+x}" ]; then
 fi
 [ -n "${DISK}${PROC}" ] || { echo "cc-delta-census: nem o disco nem o processo deram versão do Claude Code — não sei o que foi instalado" >&2; exit 2; }
 
+TMPD="$(mktemp -d)"; trap 'rm -rf "${TMPD}"' EXIT
+
+# ── o CLI embutido no Agent SDK de quem serve (SAC-155) ─────────────────────────────────────
+# Uma linha por alvo em ${TMPD}/sdk.tsv: rótulo · n · rc do package.json · rc do binário · motivo; as saídas
+# brutas em sdk-<n>.pkg / sdk-<n>.bin. O Python lê e julga; aqui só se mede.
+SDK_CONF="${CC_DELTA_SDK_TARGETS-}"
+if [ -z "${CC_DELTA_SDK_TARGETS+x}" ]; then
+  SDK_CONF="${REPO}/ops/cc-sdk-targets.tsv"
+  [ -f "${SDK_CONF}" ] || SDK_CONF=""
+fi
+: > "${TMPD}/sdk.tsv"
+_as() {  # <conta|-> <cmd…>: roda como a conta dona do SDK, em /, sem pedir senha
+  local u="$1"; shift
+  if [ "${u}" = "-" ] || [ "${u}" = "$(id -un)" ]; then (cd / && "$@" < /dev/null); else (cd / && sudo -n -u "${u}" "$@" < /dev/null); fi
+}
+if [ -n "${SDK_CONF}" ]; then
+  if [ ! -r "${SDK_CONF}" ]; then
+    printf '(alvos)\t-\t-\t-\to arquivo de alvos declarado não existe ou não é legível: %s\n' "${SDK_CONF}" >> "${TMPD}/sdk.tsv"
+  else
+    n=0; ln=0
+    while IFS= read -r line || [ -n "${line}" ]; do
+      ln=$((ln + 1))
+      case "${line}" in ''|'#'*) continue ;; esac
+      n=$((n + 1))
+      IFS=$'\t' read -r lb usr pkg bin extra <<< "${line}"
+      if ! [[ "${lb:-}" =~ ^[A-Za-z0-9_.-]+$ ]] || ! [[ "${usr:-}" =~ ^(-|[a-z_][a-z0-9_-]*)$ ]] \
+         || ! [[ "${pkg:-}" =~ ^/ ]] || ! [[ "${bin:--}" =~ ^(-|/.*)$ ]] || [ -n "${extra:-}" ]; then
+        printf '%s\t-\t-\t-\tlinha %s do arquivo de alvos fora da forma (rótulo · conta|- · /package.json · /binário|-)\n' \
+          "${lb:-(linha ${ln})}" "${ln}" >> "${TMPD}/sdk.tsv"; continue
+      fi
+      _as "${usr}" /usr/bin/env -i PATH=/usr/bin:/bin cat -- "${pkg}" > "${TMPD}/sdk-${n}.pkg" 2> "${TMPD}/sdk-${n}.pkgerr"; prc=$?
+      brc=-
+      if [ "${bin:--}" != "-" ]; then
+        _as "${usr}" /usr/bin/env -i PATH=/usr/bin:/bin HOME=/nonexistent DISABLE_AUTOUPDATER=1 \
+          timeout 30 "${bin}" --version > "${TMPD}/sdk-${n}.bin" 2> "${TMPD}/sdk-${n}.binerr"; brc=$?
+      fi
+      why="$(head -c 160 "${TMPD}/sdk-${n}.pkgerr" 2>/dev/null | tr '\t\n' '  ')"
+      [ "${brc}" != "-" ] && [ "${brc}" != 0 ] && why="${why:+${why}; }binário: $( (head -c 160 "${TMPD}/sdk-${n}.binerr" 2>/dev/null; [ "${brc}" = 124 ] && printf 'teto de 30 s') | tr '\t\n' '  ')"
+      printf '%s\t%s\t%s\t%s\t%s\n' "${lb}" "${n}" "${prc}" "${brc}" "${why}" >> "${TMPD}/sdk.tsv"
+    done < "${SDK_CONF}"
+    [ "${n}" -gt 0 ] || printf '(alvos)\t-\t-\t-\to arquivo de alvos %s não declara nenhum alvo\n' "${SDK_CONF}" >> "${TMPD}/sdk.tsv"
+  fi
+fi
+
 # ── CHANGELOG oficial ──────────────────────────────────────────────────────────────────────
 CL="${CC_DELTA_CHANGELOG:-}"
-TMPD="$(mktemp -d)"; trap 'rm -rf "${TMPD}"' EXIT
 if [ -z "${CL}" ]; then
   URL="${CC_DELTA_URL:-https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md}"
   CL="${TMPD}/CHANGELOG.md"
@@ -99,9 +159,9 @@ fi
 [ -s "${CL}" ] || { echo "cc-delta-census: CHANGELOG vazio ou ausente: ${CL}" >&2; exit 2; }
 
 TODAY="${CC_DELTA_TODAY:-$(date +%F)}"
-PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${CL}" "${BASE}" "${DISK}" "${PROC}" "${FMT}" "${WRITE}" "${TODAY}" "${OVR}" <<'PY'
+PYTHONDONTWRITEBYTECODE=1 python3 -I -B - "${REPO}" "${CL}" "${BASE}" "${DISK}" "${PROC}" "${FMT}" "${WRITE}" "${TODAY}" "${OVR}" "${TMPD}" "${SDK_CONF}" <<'PY'
 import sys, os, re, json, glob, datetime
-repo, cl, base, disk, proc, fmt, write, today, ovr = sys.argv[1:10]
+repo, cl, base, disk, proc, fmt, write, today, ovr, tmpd, sdk_conf = sys.argv[1:12]
 def vt(v): return tuple(int(x) for x in v.split('.'))
 text = open(cl, encoding='utf-8').read()
 parts = re.split(r'(?m)^## ', text)
@@ -127,6 +187,47 @@ if disk and proc and disk != proc:
     avisos.append(f'processo em {proc} e disco em {disk}: o que só existe na versão nova está invisível nesta sessão (reinicie antes de medir capacidade)')
 if vt(target) < vt(base):
     avisos.append(f'a instalada ({target}) é ANTERIOR à baseline ({base}) — downgrade? nada a medir para frente')
+
+# ── o CLI embutido no Agent SDK (SAC-155): a quem o delta chega em produção ─────────────────
+def _x(path):
+    try: return open(path, encoding='utf-8', errors='replace').read()
+    except Exception: return ''
+sdks = []   # dicts: label, cli, sdk, fonte, falta (motivo de NÃO MEDIDO, vazio se medido)
+for r in [l.split('\t', 4) for l in _x(os.path.join(tmpd, 'sdk.tsv')).splitlines() if l]:
+    lb, n, prc, brc, why = (r + [''] * 5)[:5]
+    d = {'label': lb, 'cli': '', 'sdk': '', 'fonte': '', 'falta': ''}
+    if n == '-':
+        d['falta'] = why; sdks.append(d); continue
+    pkg_cc = ''
+    if prc == '0':
+        try:
+            pj = json.loads(_x(os.path.join(tmpd, f'sdk-{n}.pkg')))
+            d['sdk'] = str(pj.get('version', '') or '')
+            m = re.search(r'\d+\.\d+\.\d+', str(pj.get('claudeCodeVersion', '') or ''))
+            pkg_cc = m.group(0) if m else ''
+        except Exception as e:
+            why = (why + '; ' if why else '') + f'package.json ilegível ({type(e).__name__})'
+    m = re.search(r'\d+\.\d+\.\d+', _x(os.path.join(tmpd, f'sdk-{n}.bin'))) if brc == '0' else None
+    bin_v = m.group(0) if m else ''
+    if bin_v:
+        d['cli'], d['fonte'] = bin_v, 'binário --version'
+        if pkg_cc and pkg_cc != bin_v:
+            avisos.append(f'SDK {lb}: o binário responde {bin_v} e o package.json declara claudeCodeVersion {pkg_cc} — vale o binário (é o que roda); o pacote está remendado ou fora do lock')
+    elif pkg_cc:
+        d['cli'], d['fonte'] = pkg_cc, 'package.json claudeCodeVersion' + (' (binário NÃO respondeu)' if brc not in ('-', '0') else '')
+    if not d['cli']:
+        d['falta'] = f'package.json rc={prc}, binário rc={brc}' + (f': {why.strip()}' if why.strip() else '')
+    sdks.append(d)
+for d in sdks:
+    if d['falta']:
+        avisos.append(f'SDK {d["label"]}: NÃO MEDIDO ({d["falta"]}) — a quem o delta chega em produção ficou sem medida')
+        continue
+    c = d['cli']
+    if vt(c) < vt(target):
+        atras = sum(1 for v in sections if vt(c) < vt(v) <= vt(target))
+        avisos.append(f'o CLI do SDK {d["label"]} ({c}{", SDK " + d["sdk"] if d["sdk"] else ""}) está {atras} versão(ões) publicada(s) atrás do host ({target}): o que entrou depois de {c} NÃO chega a quem serve por ele — suba o SDK antes de dar o delta por recebido em produção')
+    elif vt(c) > vt(target):
+        avisos.append(f'o CLI do SDK {d["label"]} ({c}) está À FRENTE do host ({target}): o delta medido aqui não cobre o que produção já roda')
 
 # ── inventário das superfícies do Onion (o que EXISTE; não o que é tocado) ─────────────────
 def fm(path):
@@ -214,6 +315,7 @@ if write:
         review = (datetime.date.fromisoformat(today) + datetime.timedelta(days=30)).isoformat()
         conta = ', '.join(f'{v} ({lines[v]} linhas, {items[v]} itens)' for v in delta)
         rel = os.path.relpath(os.path.join(write, 'data'), repo) if os.path.isabs(write) else os.path.join(write, 'data')
+        sdk_va = ''.join(f', SDK {d["label"]} ' + (d['cli'] if not d['falta'] else 'NÃO MEDIDO') for d in sdks)
         kg = f'''# kg-backlog-guard: on
 # Radar E3 (ecossistema Claude Code): o delta de {delta[0]} a {delta[-1]} contra a baseline {base}.
 # ESQUELETO gerado por .claude/validation/cc-delta-census.sh — a rodada liga item a superfície (com medição
@@ -240,7 +342,7 @@ nodes:
     impact: 3
     confidence: 0.9
     verified_at: "{today}"
-    verified_against: "CHANGELOG oficial: seções {conta}; baseline {base}, disco {disk or '—'}, processo {proc or '—'}"
+    verified_against: "CHANGELOG oficial: seções {conta}; baseline {base}, disco {disk or '—'}, processo {proc or '—'}{sdk_va}"
     label: "o delta desde a baseline {base} são {len(delta)} versão(ões), de {delta[0]} a {delta[-1]}, extraídas do CHANGELOG oficial"
     provenance:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
@@ -267,6 +369,9 @@ edges:
 if fmt == '--tsv':
     print(f'veredito\t{veredito}'); print(f'baseline\t{base}'); print(f'disco\t{disk}'); print(f'processo\t{proc}')
     print(f'rodada_anterior\t{prev_kg}'); print(f'proxima_rodada\t{next_dir}')
+    if not sdks: print('sdk\t-\tsem_alvo')
+    for d in sdks:
+        print(f'sdk\t{d["label"]}\tnao_medido\t{d["falta"]}' if d['falta'] else f'sdk\t{d["label"]}\t{d["cli"]}\t{d["sdk"] or "-"}\t{d["fonte"]}')
     for v in delta: print(f'versao\t{v}\t{lines[v]}\t{items[v]}')
     print(f'hooks\t{len(hooks)}\tsem_onFailure\t{len(sem_onfail)}')
     for f in inv['guardas_binario']: print(f'guarda_binario\t{f}')
@@ -276,7 +381,13 @@ if fmt == '--tsv':
 print(f'# delta do Claude Code · {today}\n')
 print(f'**VEREDITO: {veredito}**\n')
 print('| fonte | versão |\n|---|---|')
-print(f'| baseline E3 (`cc_version`) | {base} |\n| disco (`claude --version`) | {disk or "— (sem sinal)"} |\n| processo | {proc or "— (sem sinal)"} |\n')
+print(f'| baseline E3 (`cc_version`) | {base} |\n| disco (`claude --version`) | {disk or "— (sem sinal)"} |\n| processo | {proc or "— (sem sinal)"} |')
+if not sdks:
+    print('| CLI embutido em Agent SDK | — (nenhum alvo declarado' + (f': {sdk_conf} vazio' if sdk_conf else '') + ') |')
+for d in sdks:
+    if d['falta']: print(f'| SDK `{d["label"]}` (CLI embutido) | — NÃO MEDIDO ({d["falta"]}) |')
+    else: print(f'| SDK `{d["label"]}` (CLI embutido, {d["fonte"]}) | {d["cli"]}' + (f' (SDK {d["sdk"]})' if d['sdk'] else '') + ' |')
+print()
 for a in avisos: print(f'⚠️ {a}\n')
 if not delta:
     print('Nada a medir: a instalada não passa da baseline. Não há rodada a escrever.')

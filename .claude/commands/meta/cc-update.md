@@ -36,6 +36,9 @@ CI. Forjado pelo `/meta:forge` no mesmo dia; decisão e evidência em
 
 - **Core-only.** Maestro-invocado; o gatilho é o aviso de drift de versão (REGRA 65 (Radar de mundo
   com baseline DATADA por eixo) e o hook de drift da sessão).
+- **O medidor viaja com a meta-fábrica, a configuração de produção não.** Os alvos do CLI embutido em
+  Agent SDK vêm de `CC_DELTA_SDK_TARGETS` ou, no core, de `ops/cc-sdk-targets.tsv` (core-only); quem
+  não tem nenhum dos dois lê "nenhum alvo declarado" na tabela de versões, nunca um erro.
 - **Vai até o PR mergeado** (decisão do maestro, 2026-10-08), pelo caminho verificado.
 - **Não implementa ações.** Cada ação proposta vira nó + issue (passo 8).
 
@@ -58,7 +61,9 @@ ele **não** diz que um item toca o Onion.
 
 1. **VEREDITO.** `NADA A MEDIR` → diga a versão medida e **pare**. Linha de erro do medidor (rc 2) →
    declare a lacuna e pare; nunca reconstrua o delta de memória. Aviso de processo ≠ disco → peça o
-   restart antes de medir capacidade nova.
+   restart antes de medir capacidade nova. Aviso de **CLI do SDK atrás do host** → o delta não chega a
+   quem serve por aquele SDK: a rodada o registra (e, em `NADA A MEDIR`, você o informa antes de parar);
+   **SDK NÃO MEDIDO** → declare a lacuna de produção, nunca a preencha de memória.
 2. **ESQUELETO.** Rode o medidor de novo com `--write` apontando para o diretório da próxima rodada
    que ele mesmo imprimiu (derivado do `kg:` do eixo E3). Saem `data/<versão>.txt` (cópia byte a byte
    do CHANGELOG) e o `.kg.yaml` com 2 nós. Confirme: `.claude/validation/kg-radar.sh <grafo> --integrity --schema` e

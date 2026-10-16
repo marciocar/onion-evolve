@@ -1,0 +1,16 @@
+# ops/cc-sdk-targets.tsv — os ALVOS do CLI EMBUTIDO em Agent SDK desta máquina (Hostinger KVM 8), lidos por
+# .claude/validation/cc-delta-census.sh (o medidor do /meta:cc-update). Core-only: ops/ não viaja, e sem este
+# arquivo o censo imprime "nenhum alvo declarado" (adotante que serve por SDK declara o seu por CC_DELTA_SDK_TARGETS).
+#
+# Colunas (TAB): rótulo · conta · package.json · binário
+#   rótulo        nome curto na tabela de versões do censo
+#   conta         dona do SDK (lido por sudo -n -u <conta>, em /, com ambiente limpo), ou - para a conta atual
+#   package.json  o do @anthropic-ai/claude-agent-sdk SERVIDO, lido como arquivo (require falha pelo exports)
+#   binário       o CLI nativo que o SDK traz (o --version dele É a medição; o claudeCodeVersion do pacote é a
+#                 declaração cruzada), ou - se não houver
+#
+# DE ONDE SAEM (medido em 2026-10-16, SAC-155, nunca de memória): o bridge servido mora em /home/onion/onion-bridge
+# (conta onion, home 0750), e o runner do /chat de convidado liga por bind ESTE MESMO binário (o CLAUDE_SRC do
+# ops/chat-runner.sh) — uma linha cobre os dois. Só há uma instalação do SDK sob /home/onion (find, maxdepth 5).
+# Medido: package.json version 0.3.301, claudeCodeVersion 2.1.301; binário responde "2.1.301 (Claude Code)".
+bridge	onion	/home/onion/onion-bridge/node_modules/@anthropic-ai/claude-agent-sdk/package.json	/home/onion/onion-bridge/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/claude
