@@ -57,7 +57,7 @@ nodes:
     confidence: 0.6
     label: "Como isolar o agente de código do /chat do onion-bridge (Agent SDK, Bash, mesmo UID onion dono da raiz de confiança do A2A e dos segredos do serviço) e o que é melhor para o ecossistema Onion?"
     narrative: "Pergunta do maestro de 2026-10-15. Contexto declarado: sessões de /chat de admin e de convidados com Bash rodam no MESMO UID onion que é dono de jwks/, do members.yaml do clone servido, da fila a2a-pending, do estado de jti, do .env com o segredo M2M do Logto e do .git-credentials com o PAT do maestro; o .env é carregado dentro do processo Node; a unit já tem ProtectSystem=strict, ProtectHome=read-only, ReadWritePaths no home do onion, NoNewPrivileges e PrivateTmp; o onion não tem sudo. Opções a julgar: (1) systemd já, (2) UID separado, (3) sandbox nativo, (4) container/microVM por sessão, (5) credential broker; o Elenxo acrescentou (0) imediato sem root. Segue open: a decisão é do maestro (D_ISOLATE_CHAT_AGENT_FROM_TRUST_ROOT)."
-    trace: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml"
+    trace: "docs/evolution/research/chat-agent-isolation-2026-10/chat-agent-isolation-2026-10.kg.yaml · projeção: docs/evolution/research/chat-agent-isolation-2026-10/SYNTHESIS.md"
 
   - id: E_SECDEP_PROXY_PATTERN_PLATFORM
     node_type: evidence
