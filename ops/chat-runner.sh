@@ -13,16 +13,26 @@
 # impresso, prova depois).
 #
 # USO
-#   ops/chat-runner.sh install [--apply]   ensaio (padrão) ou instalação do runner
+#   ops/chat-runner.sh install [--apply] [--egress-fence]   ensaio (padrão) ou instalação do runner
 #   ops/chat-runner.sh verify              prova, no instalado e no processo vivo, que o runner vale
 #   ops/chat-runner.sh show                imprime o que seria instalado (nada é medido)
 #
 #   install sem --apply é ENSAIO: lê as fontes do bridge servido (rastreadas e limpas), renderiza as units e o
 #   drop-in, mostra a diferença para o instalado e roda as checagens numa unit TRANSITÓRIA (systemd-run --collect)
 #   com o sandbox do template renderizado, sob um UID dinâmico. Nada persistente é escrito.
+#   --egress-fence (DESLIGADA por padrão; decisão do maestro D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016, opção A) instala
+#   também a CERCA DE REDE do runner: o drop-in onion-chat@.service.d/60-egress-fence.conf, renderizado do modelo do
+#   bridge servido com os endereços GLOBAIS do próprio host medidos agora (IPAddressDeny do loopback, link-local,
+#   faixas privadas e do host, SEM nenhum IPAddressAllow; o DNS vai direto aos resolvedores públicos pelo resolv.conf de
+#   upstream ligado no /etc/resolv.conf da instância). Instalada, ela é o ESTADO: o install sem a flag a mantém e o
+#   verify a prova; tirá-la é a linha de reversão que o install imprime.
 #   verify é só leitura (sem trava): confere o instalado contra o renderizado, o grupo e as ACLs, o sandbox do
 #   template INSTALADO numa unit transitória, o aperto de mão real pelo socket (initialize do CLI, sem chamar a API)
-#   e a recusa do lançador, e o drop-in carregado no processo vivo do bridge.
+#   e a recusa do lançador, e o drop-in carregado no processo vivo do bridge. Com a cerca instalada, prova também a
+#   rede: numa unit transitória com o template e a cerca INSTALADOS, na slice do runner, o TCP ao loopback, ao stub do
+#   resolvedor e aos endereços do host é barrado ONDE uma perna de controle (o mesmo sandbox sem a cerca) o vê aberto ou
+#   recusado, e o DNS e o TLS com a API seguem; o efetivo da instância carrega as mesmas faixas e nenhum IPAddressAllow,
+#   nem nas slices-mãe (allow vence deny); e o aperto de mão pelo socket (o CLI sob a cerca) segue respondendo.
 #
 # O QUE O install --apply FAZ: trava (a do update-bridge, que reinicia a mesma unit) → pré-voo → ensaio → backup
 # (ACLs do estado, units e drop-in anteriores) → grupo do runner → HOMEs do CLI e workspace de sonda → ACLs →
@@ -53,6 +63,70 @@ HEALTH_LOCAL="http://127.0.0.1:8787/health"
 DROPIN_NAME=40-chat-runner.conf
 SOCKET_UNIT=onion-chat.socket
 TEMPLATE_UNIT=onion-chat@.service
+FENCE_NAME=60-egress-fence.conf      # a cerca de rede (opção A do degrau 3), drop-in do template do runner
+# as faixas que a cerca EXIGE (as mesmas do modelo do bridge; a allowlist confere uma a uma) e o único furo
+FENCE_REQUIRED="0.0.0.0/8 127.0.0.0/8 ::/128 ::1/128 169.254.0.0/16 fe80::/10 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 100.64.0.0/10 fc00::/7"
+# SEM IPAddressAllow: o filtro do cgroup julga só o ENDEREÇO, nunca a porta, e um furo no stub do resolvedor (127.0.0.53)
+# abria todo serviço escutando em 0.0.0.0 (refutador da cerca, achado 1, medido: o proxy reverso e o sshd por ele). O DNS
+# sai pelos resolvedores públicos: o resolv.conf de upstream do systemd-resolved no lugar do /etc/resolv.conf
+FENCE_RESOLV_SRC=/run/systemd/resolve/resolv.conf
+FENCE_RESOLV_BIND="${FENCE_RESOLV_SRC}:/etc/resolv.conf"
+NET_PROBE_API=api.anthropic.com      # o que a cerca NÃO pode cortar: o DNS e o TLS com a API
+# as slices de onde um IPAddressAllow venceria o deny da instância (allow vence deny no systemd, também herdado)
+RUNNER_SLICE='system-onion\x2dchat.slice'
+FENCE_SLICES=( "${RUNNER_SLICE}" system.slice -.slice )
+# a sonda de REDE da cerca, que roda DENTRO das units transitórias (python3 -I -c). Modos:
+#   probe <h:p>...      uma linha "NET <h:p> <estado>" por alvo: aberto | recusado | barrado (timeout ou EPERM) | erro:<tipo>
+#   api <host>          "OK|FALHA cerca: ..." para o DNS e o TLS (certificado verificado) com a API
+#   --classify-selftest a tabela do classificador conferida com exceções sintéticas (a bancada o exercita de verdade)
+NETPY="$(cat <<'NETPY'
+import socket, ssl, sys
+
+def classify(exc):
+    if exc is None:
+        return "aberto"
+    if isinstance(exc, ConnectionRefusedError):
+        return "recusado"
+    if isinstance(exc, (socket.timeout, TimeoutError, PermissionError)):
+        return "barrado"
+    return "erro:%s" % type(exc).__name__
+
+def tcp(target):
+    h, _, p = target.rpartition(":")
+    try:
+        socket.create_connection((h.strip("[]"), int(p)), timeout=3).close()
+        return classify(None)
+    except Exception as e:
+        return classify(e)
+
+mode = sys.argv[1] if len(sys.argv) > 1 else ""
+if mode == "probe":
+    for t in sys.argv[2:]:
+        print("NET %s %s" % (t, tcp(t)))
+elif mode == "api":
+    api = sys.argv[2]
+    try:
+        ip = socket.getaddrinfo(api, 443, proto=socket.IPPROTO_TCP)[0][4][0]
+    except Exception as e:
+        print("FALHA cerca: o DNS de %s falhou (%s)" % (api, type(e).__name__)); sys.exit(0)
+    print("OK cerca: o DNS de %s segue (resolvedores públicos)" % api)
+    try:
+        s = socket.create_connection((ip, 443), timeout=8)
+        t = ssl.create_default_context().wrap_socket(s, server_hostname=api); v = t.version(); t.close()
+        print("OK cerca: o TLS com %s segue (%s, certificado verificado)" % (api, v))
+    except Exception as e:
+        print("FALHA cerca: o TLS com %s falhou (%s)" % (api, type(e).__name__))
+elif mode == "--classify-selftest":
+    cases = [(None, "aberto"), (ConnectionRefusedError(), "recusado"), (socket.timeout(), "barrado"),
+             (TimeoutError(), "barrado"), (PermissionError(), "barrado"), (OSError(110, "x"), "barrado"),
+             (OSError(101, "x"), "erro:OSError"), (ValueError(), "erro:ValueError")]
+    bad = [(repr(e), w, classify(e)) for e, w in cases if classify(e) != w]
+    print("classify-selftest: %d de %d" % (len(cases) - len(bad), len(cases)) + ("" if not bad else " FALHA %s" % bad))
+    sys.exit(1 if bad else 0)
+else:
+    sys.exit(64)
+NETPY
+)"
 PROBE_SLUG=0000000000000000          # o workspace de SONDA do verify (16 hex: a forma que o lançador aceita)
 MARKER="# onion-chat-runner: v1"
 SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -102,11 +176,12 @@ as_svc() { if [ "${TEST}" = 1 ]; then (cd / && "$@"); else (cd / && sudo -n -u "
 
 # ── argumentos: lista FECHADA ─────────────────────────────────────────────────────────────────────────
 SUB="$1"; shift
-APPLY=0
+APPLY=0; EGRESS=0
 case "${SUB}" in install|verify|show) : ;; *) usage ;; esac
 while [ $# -gt 0 ]; do
   case "$1" in
     --apply) [ "${SUB}" = install ] || die 3 "--apply só no install"; APPLY=1; shift ;;
+    --egress-fence) [ "${SUB}" = install ] || die 3 "--egress-fence só no install (o verify e o show leem o estado instalado)"; EGRESS=1; shift ;;
     *) die 3 "opção não aceita: $1 (as units, os caminhos e o socket são fixos)" ;;
   esac
 done
@@ -118,6 +193,11 @@ CLAUDE_SRC="${BRIDGE}/node_modules/@anthropic-ai/claude-agent-sdk-linux-x64/clau
 WS_ROOT="${STATE}/workspaces"
 HOME_ROOT="${STATE}/chat-homes"
 DROPIN_DIR="${UNIT_DIR}/${UNIT}.service.d"
+FENCE_DIR="${UNIT_DIR}/${TEMPLATE_UNIT}.d"
+FENCE_SRC="${SRC_DIR}/onion-chat-egress-fence.conf.in"
+# a cerca vale quando pedida OU já instalada (instalada é o estado: o install sem a flag não a tira em silêncio)
+FENCE=0; HOST_ADDRS=""
+if [ "${EGRESS}" = 1 ] || priv test -e "${FENCE_DIR}/${FENCE_NAME}"; then FENCE=1; fi
 
 # ── trava (só no install: verify e show só leem) ─────────────────────────────────────────────────────
 if [ "${SUB}" = install ]; then
@@ -144,13 +224,38 @@ read_sources() {
   as_svc git -C "${BRIDGE}" show "${BRIDGE_SHA}:${SRC_DIR}/launcher.py" > "${TMPD}/launcher.py" || die 2 "não li o launcher.py do bridge servido"
   as_svc git -C "${BRIDGE}" show "${BRIDGE_SHA}:${SRC_DIR}/onion-chat.socket.in" > "${TMPD}/socket.in" || die 2 "não li o onion-chat.socket.in"
   as_svc git -C "${BRIDGE}" show "${BRIDGE_SHA}:${SRC_DIR}/onion-chat@.service.in" > "${TMPD}/service.in" || die 2 "não li o onion-chat@.service.in"
+  if [ "${FENCE}" = 1 ]; then
+    [ "$(priv realpath -m -- "${BRIDGE}/${FENCE_SRC}")" = "${BRIDGE}/${FENCE_SRC}" ] || die 1 "fonte com SYMLINK no caminho: ${BRIDGE}/${FENCE_SRC}"
+    as_svc git -C "${BRIDGE}" cat-file -e "${BRIDGE_SHA}:${FENCE_SRC}" 2>/dev/null \
+      || die 1 "o bridge servido não tem ${FENCE_SRC} (a cerca de rede): faça o deploy do bridge com a cerca (ops/update-bridge.sh) antes"
+    as_svc git -C "${BRIDGE}" show "${BRIDGE_SHA}:${FENCE_SRC}" > "${TMPD}/fence.in" || die 2 "não li o ${FENCE_SRC}"
+  fi
   BRIDGE_HEAD="${BRIDGE_SHA:0:12}"
+}
+
+# host_addrs — os endereços GLOBAIS do próprio host, medidos agora (/32 e /128), fora das faixas que a cerca já nega.
+# O tráfego local para o IP público não passa pelo firewall de fora: sem isto, um serviço futuro em 0.0.0.0 protegido
+# só por ele ficaria ao alcance do runner (refutador do degrau 3, achado 4, medido)
+host_addrs() {
+  ip -j addr show scope global 2>/dev/null | python3 -I -c '
+import ipaddress, json, sys
+req = [ipaddress.ip_network(x) for x in sys.argv[1].split()]
+out = set()
+for itf in json.load(sys.stdin):
+    for a in itf.get("addr_info", []):
+        if a.get("scope") != "global" or a.get("family") not in ("inet", "inet6"):
+            continue
+        ip = ipaddress.ip_address(a["local"])
+        if any(ip in n for n in req if n.version == ip.version):
+            continue
+        out.add(str(ipaddress.ip_network(ip)))
+print(" ".join(sorted(out)))' "${FENCE_REQUIRED}"
 }
 
 render_one() {   # render_one <modelo> <saída> <de onde veio>
   { printf '%s\n# GERADO por ops/chat-runner.sh (core-only) a partir de %s do bridge servido. Não edite à mão.\n' "${MARKER}" "$3"
     sed -e "s#@SOCKET@#${SOCKET}#g" -e "s#@SVC_USER@#${SVC_USER}#g" -e "s#@GROUP@#${GROUP}#g" -e "s#@STATE@#${STATE}#g" \
-        -e "s#@CLAUDE_SRC@#${CLAUDE_SRC}#g" -e "s#@LIBEXEC@#${LIBEXEC}#g" "$1"; } > "$2"
+        -e "s#@CLAUDE_SRC@#${CLAUDE_SRC}#g" -e "s#@LIBEXEC@#${LIBEXEC}#g" -e "s#@HOST_ADDRS@#${HOST_ADDRS:-@HOST_ADDRS@}#g" "$1"; } > "$2"
   if grep -nE '@[A-Z_]+@' "$2" >/dev/null; then die 1 "marcador sem valor em $3: $(grep -oE '@[A-Z_]+@' "$2" | sort -u | paste -sd' ' -)"; fi
 }
 
@@ -174,9 +279,54 @@ EOF
 # ensaio e pelo verify). Allowlist FECHADA de diretivas, com os valores de segurança EXATOS; qualquer outra recusa.
 validate_units() {
   local f="$1" kind="$2" out rc=0
-  out="$(python3 -I - "${f}" "${kind}" "${SOCKET}" "${SVC_USER}" "${GROUP}" "${STATE}" "${CLAUDE_SRC}" "${LIBEXEC}" <<'PY'
+  out="$(python3 -I - "${f}" "${kind}" "${SOCKET}" "${SVC_USER}" "${GROUP}" "${STATE}" "${CLAUDE_SRC}" "${LIBEXEC}" \
+           "${FENCE_REQUIRED}" "${FENCE_RESOLV_BIND}" "${HOST_ADDRS:-}" <<'PY'
 import sys
-f, kind, sock, svc, grp, state, claude, libexec = sys.argv[1:]
+f, kind, sock, svc, grp, state, claude, libexec, freq, fresolv, fhost = sys.argv[1:]
+if kind == "fence":
+    # a cerca de rede: só [Service], só IPAddressDeny e o bind do resolv.conf público, e o conjunto EXATO (as faixas
+    # exigidas mais os endereços do host medidos agora). Faixa a mais, a menos ou mais larga recusa; IPAddressAllow recusa
+    # sempre; valor VAZIO recusa (no systemd, `IPAddressDeny=` vazio ZERA a lista acumulada: refutador, achado 2, medido)
+    import ipaddress
+    def norm(xs, where):
+        out = set()
+        for x in xs:
+            try:
+                out.add(str(ipaddress.ip_network(x, strict=True)))
+            except ValueError:
+                print("%s fora da forma: %s" % (where, x)); sys.exit(1)
+        return out
+    bad, deny, binds = [], [], []
+    raw = open(f, "rb").read()
+    if any((b < 0x20 and b not in (0x0a, 0x09)) or b == 0x7f for b in raw):
+        print("byte de controle no modelo da cerca"); sys.exit(1)
+    for n, line in enumerate(raw.decode("utf-8").split("\n"), 1):
+        if not line.strip() or line.lstrip().startswith(("#", ";")):
+            continue
+        if line.startswith("["):
+            if line != "[Service]":
+                bad.append("seção %s (linha %d)" % (line, n))
+            continue
+        if line.endswith("\\"):
+            bad.append("continuação de linha (linha %d)" % n); continue
+        k, eq, v = line.partition("=")
+        if not eq or k != k.strip():
+            bad.append("linha fora da forma (%d)" % n); continue
+        if not v.strip():
+            bad.append("%s com valor VAZIO (linha %d: no systemd zera a lista acumulada)" % (k, n)); continue
+        if k == "IPAddressDeny":
+            deny += v.split()
+        elif k == "BindReadOnlyPaths":
+            binds.append(v)
+        else:
+            bad.append("diretiva fora da allowlist da cerca: %s" % k)
+    want = norm(freq.split(), "faixa exigida") | norm(fhost.split(), "endereço do host")
+    got = norm(deny, "IPAddressDeny")
+    if got != want:
+        bad.append("IPAddressDeny diferente do exigido (faltam: %s; a mais: %s)" % (" ".join(sorted(want - got)) or "-", " ".join(sorted(got - want)) or "-"))
+    if binds != [fresolv]:
+        bad.append("BindReadOnlyPaths=%s (exigido só: %s)" % (" | ".join(binds) or "-", fresolv))
+    print("; ".join(bad)); sys.exit(1 if bad else 0)
 EXACT = {
   "service": {"Type": "simple", "DynamicUser": "yes", "User": "onion-chat-%i", "SupplementaryGroups": grp,
     "StandardInput": "socket", "StandardOutput": "socket", "StandardError": "journal", "PrivateTmp": "yes",
@@ -246,11 +396,19 @@ render_all() {
   render_dropin > "${TMPD}/${DROPIN_NAME}"
   validate_units "${TMPD}/${SOCKET_UNIT}" socket
   validate_units "${TMPD}/${TEMPLATE_UNIT}" service
+  if [ "${FENCE}" = 1 ]; then
+    HOST_ADDRS="$(host_addrs)"
+    [ -n "${HOST_ADDRS}" ] || die 2 "não medi os endereços globais do host (ip -j addr): a cerca sem eles deixaria o próprio host ao alcance"
+    render_one "${TMPD}/fence.in" "${TMPD}/${FENCE_NAME}" "${FENCE_SRC}"
+    validate_units "${TMPD}/${FENCE_NAME}" fence
+  fi
 }
 
 render_all
 if [ "${SUB}" = show ]; then
   for f in "${SOCKET_UNIT}" "${TEMPLATE_UNIT}" "${DROPIN_NAME}"; do printf -- '──── %s\n' "${f}"; cat "${TMPD}/${f}"; done
+  if [ "${FENCE}" = 1 ]; then printf -- '──── %s (%s)\n' "${FENCE_NAME}" "${FENCE_DIR}"; cat "${TMPD}/${FENCE_NAME}"
+  else printf -- '──── %s: DESLIGADA (install --egress-fence a liga)\n' "${FENCE_NAME}"; fi
   printf -- '──── launcher.py: %s bytes, sha256 %s (bridge servido em %s)\n' "$(wc -c < "${TMPD}/launcher.py")" "$(sha256sum < "${TMPD}/launcher.py" | cut -c1-16)" "${BRIDGE_HEAD}"
   exit 0
 fi
@@ -278,6 +436,9 @@ SystemCallArchitectures|RestrictAddressFamilies|UMask|TemporaryFileSystem|Enviro
         case "${v}" in *"/launcher.py:/run/onion-chat-bin/launcher.py") printf '%s\n' "-p" "BindReadOnlyPaths=$3:/run/onion-chat-bin/launcher.py" ;;
           *) printf '%s\n' "-p" "${k}=${v}" ;; esac ;;
       SupplementaryGroups) [ "$2" = 1 ] && printf '%s\n' "-p" "${k}=${v}" ;;
+      # a cerca: uma propriedade por endereço (o systemd-run recusa a lista com palavra-chave; medido)
+      # vazio passa FIEL (`-p IPAddressDeny=` zera, como na unit): pular o vazio fazia o ensaio medir outra cerca
+      IPAddressDeny|IPAddressAllow) local a; if [ -z "${v// /}" ]; then printf '%s\n' "-p" "${k}="; else for a in ${v}; do printf '%s\n' "-p" "${k}=${a}"; done; fi ;;
     esac
   done < "$1"
 }
@@ -285,11 +446,13 @@ SystemCallArchitectures|RestrictAddressFamilies|UMask|TemporaryFileSystem|Enviro
 # check_script → o sh que roda DENTRO da unit transitória, sob o UID dinâmico. Só lê e usa access(2). Cada linha:
 # OK|FALHA|AUSENTE <o quê>. $1 = com-grupo (0|1).
 check_script() {
-  local wg="$1" pid
+  local wg="$1" fence="${2:-0}" ctl="${3:-}" pid
   pid="$(systemctl show -p MainPID --value "${UNIT}" 2>/dev/null)"
   echo 'n_fail=0; ok() { echo "OK $*"; }; bad() { echo "FALHA $*"; n_fail=$((n_fail+1)); }'
-  printf 'svc_uid=%q; home=%q; state=%q; ws=%q; hr=%q; pid=%q; probe=%q; wg=%q\n' \
-    "$(id -u "${SVC_USER}" 2>/dev/null || echo x)" "${SVC_HOME}" "${STATE}" "${WS_ROOT}" "${HOME_ROOT}" "${pid}" "${PROBE_SLUG}" "${wg}"
+  printf 'svc_uid=%q; home=%q; state=%q; ws=%q; hr=%q; pid=%q; probe=%q; wg=%q; fence=%q; api=%q; targets=%q; ctl=%q\n' \
+    "$(id -u "${SVC_USER}" 2>/dev/null || echo x)" "${SVC_HOME}" "${STATE}" "${WS_ROOT}" "${HOME_ROOT}" "${pid}" "${PROBE_SLUG}" "${wg}" \
+    "${fence}" "${NET_PROBE_API}" "$(net_targets)" "${ctl}"
+  [ "${fence}" = 1 ] && net_probe_writer
   cat <<'EOS'
 u="$(id -u)"
 if [ "$u" != "$svc_uid" ] && [ "$u" != 0 ]; then ok "UID próprio ($u), não o da conta do serviço"; else bad "UID da unit é o do serviço ou root ($u)"; fi
@@ -327,14 +490,61 @@ if [ "$wg" = 1 ]; then
 fi
 if [ -x /run/onion-chat-bin/claude ]; then ok "o CLI está ligado fora da home (/run/onion-chat-bin/claude)"; else bad "o CLI não está em /run/onion-chat-bin/claude"; fi
 if /usr/bin/python3 -I /run/onion-chat-bin/launcher.py --check-config 2>/dev/null; then ok "o lançador aceita a configuração da unit"; else bad "o lançador recusa a configuração da unit (--check-config)"; fi
+# a CERCA DE REDE (opção A do degrau 3). Barrado só prova a cerca onde a perna de CONTROLE (o mesmo sandbox sem ela)
+# viu o alvo aberto ou recusado: timeout sozinho seria qualquer descarte (refutador da cerca, achado 4, medido)
+if [ "$fence" = 1 ]; then
+  netout="$(timeout 90 python3 -I "${TMPDIR:-/tmp}"/onion-netprobe.py probe $targets 2>&1)"
+  for t in $targets; do
+    fs="$(printf '%s\n' "$netout" | awk -v t="$t" '$1 == "NET" && $2 == t { print $3 }')"
+    cs="$(printf '%s\n' "$ctl" | tr ';' '\n' | awk -v t="$t" '$1 == t { print $2 }')"
+    case "$fs:$cs" in
+      barrado:aberto|barrado:recusado) ok "cerca: TCP para $t barrado (sem a cerca: $cs)" ;;
+      barrado:barrado) bad "cerca: $t NÃO PROVA (descartado também sem a cerca)" ;;
+      barrado:) bad "cerca: $t sem perna de controle" ;;
+      *) bad "cerca: TCP para $t ${fs:-sem resposta} (sem a cerca: ${cs:-?})" ;;
+    esac
+  done
+  apiout="$(timeout 60 python3 -I "${TMPDIR:-/tmp}"/onion-netprobe.py api "$api" 2>&1)"
+  printf '%s\n' "$apiout"
+  n_fail=$((n_fail + $(printf '%s\n' "$apiout" | grep -c '^FALHA')))
+  # `case`, não `printf | grep -q` (a classe pipefail; o sh da unit não tem here-string)
+  case "$apiout" in *"OK cerca: o TLS"*) : ;; *) bad "cerca: o TLS com a API não foi provado" ;; esac
+else
+  echo "AUSENTE cerca de rede (desligada: install --egress-fence a liga)"
+fi
 echo "n_fail=$n_fail"; [ "$n_fail" = 0 ]
 EOS
 }
 
-run_sandbox_probe() {   # run_sandbox_probe <template> <com-grupo> <launcher> → imprime as linhas, rc 0 = n_fail 0
-  local out rc props=()
+# os alvos da sonda: o loopback (a porta do bridge), o stub do resolvedor numa porta que não é DNS (o 0.0.0.0 do sshd) e
+# cada endereço GLOBAL do host (v4 e v6), também na 22
+net_targets() {
+  local lport a t="127.0.0.1:"
+  lport="${HEALTH_LOCAL#http://127.0.0.1:}"; lport="${lport%%/*}"; t+="${lport} 127.0.0.53:22"
+  for a in ${HOST_ADDRS}; do a="${a%/*}"; case "${a}" in *:*) t+=" [${a}]:22" ;; *) t+=" ${a}:22" ;; esac; done
+  printf '%s' "${t}"
+}
+net_probe_writer() {   # o script da sonda, escrito DENTRO da unit (o TMPDIR é o dela)
+  printf '%s\n' 'cat > "${TMPDIR:-/tmp}/onion-netprobe.py" <<'"'"'ONION_NETPY_EOF'"'"''
+  printf '%s\nONION_NETPY_EOF\n' "${NETPY}"
+}
+# a perna de CONTROLE: o mesmo sandbox do template, na mesma slice, SEM a cerca; devolve "alvo estado;alvo estado;…"
+net_control() {   # net_control <template> <com-grupo> <launcher>
+  local props=() out
   mapfile -t props < <(sandbox_props "$1" "$2" "$3")
-  out="$(check_script "$2" | priv systemd-run --quiet --pipe --wait --collect "${props[@]}" /bin/sh -s 2>&1)"; rc=$?
+  out="$({ net_probe_writer; printf 'timeout 90 python3 -I "${TMPDIR:-/tmp}"/onion-netprobe.py probe %s\n' "$(net_targets)"; } \
+         | priv systemd-run --quiet --pipe --wait --collect --slice="${RUNNER_SLICE}" "${props[@]}" /bin/sh -s 2>&1)"
+  awk '$1 == "NET" { printf "%s %s;", $2, $3 }' <<<"${out}"
+}
+
+run_sandbox_probe() {   # run_sandbox_probe <template> <com-grupo> <launcher> [<cerca>] → imprime as linhas, rc 0 = n_fail 0
+  local out rc props=() fence=0 unitf="$1" ctl=""
+  if [ -n "${4:-}" ]; then
+    cat "$1" "$4" > "${TMPD}/probe-with-fence.service"; unitf="${TMPD}/probe-with-fence.service"; fence=1
+    ctl="$(net_control "$1" "$2" "$3")"
+  fi
+  mapfile -t props < <(sandbox_props "${unitf}" "$2" "$3")
+  out="$(check_script "$2" "${fence}" "${ctl}" | priv systemd-run --quiet --pipe --wait --collect --slice="${RUNNER_SLICE}" "${props[@]}" /bin/sh -s 2>&1)"; rc=$?
   printf '%s\n' "${out}" | sed 's/^/    /'
   [ "${rc}" = 0 ] && grep -qx 'n_fail=0' <<<"${out}"
 }
@@ -388,20 +598,41 @@ PY
 # `systemctl show` de um nome de instância só carrega o template.
 effective_props() {
   local out nf=0 dp
-  out="$(systemctl show onion-chat@verify.service -p DynamicUser -p User -p ExecStartPre -p ExecStartPost -p ExecStart -p ProtectHome -p TemporaryFileSystem -p PrivateTmp 2>/dev/null)"
+  out="$(systemctl show onion-chat@verify.service -p DynamicUser -p User -p ExecStartPre -p ExecStartPost -p ExecStart -p ProtectHome -p TemporaryFileSystem -p PrivateTmp -p IPAddressDeny -p IPAddressAllow -p BindReadOnlyPaths 2>/dev/null)"
   grep -qx 'DynamicUser=yes' <<<"${out}" || { echo "    FALHA efetivo: DynamicUser não é yes"; nf=$((nf+1)); }
   grep -qx 'User=onion-chat-verify' <<<"${out}" || { echo "    FALHA efetivo: User não é onion-chat-<instância> ($(grep '^User=' <<<"${out}"))"; nf=$((nf+1)); }
   # vazio, o systemctl show nem imprime a linha (medido no dogfood): falha é a linha COM valor
   ! grep -qE '^ExecStart(Pre|Post)=.+' <<<"${out}" || { echo "    FALHA efetivo: há ExecStartPre/ExecStartPost"; nf=$((nf+1)); }
   grep -q '^ExecStart=.*argv\[\]=/usr/bin/python3 -I /run/onion-chat-bin/launcher.py ;' <<<"${out}" || { echo "    FALHA efetivo: ExecStart não é o lançador"; nf=$((nf+1)); }
   grep -qx 'ProtectHome=yes' <<<"${out}" || { echo "    FALHA efetivo: ProtectHome não é yes"; nf=$((nf+1)); }
+  # a cerca EFETIVA: com ela, as faixas que o systemd carregou são exatamente as renderizadas (comparadas como conjunto,
+  # normalizadas); sem ela, nenhuma (uma faixa vinda de outro lugar mudaria a instância sem passar pela allowlist)
+  local fd fa
+  fd="$(grep '^IPAddressDeny=' <<<"${out}" | cut -d= -f2-)"; fa="$(grep '^IPAddressAllow=' <<<"${out}" | cut -d= -f2-)"
+  # IPAddressAllow nunca: nem na instância nem nas slices-mãe (um allow herdado vence o deny da unit: refutador da cerca,
+  # achado 3, medido com uma slice de runtime)
+  [ -z "${fa// /}" ] || { echo "    FALHA efetivo: IPAddressAllow=${fa} na instância (vence o deny)"; nf=$((nf+1)); }
+  local sl sa
+  for sl in "${FENCE_SLICES[@]}"; do
+    sa="$(systemctl show -p IPAddressAllow --value "${sl}" 2>/dev/null)"
+    [ -z "${sa// /}" ] || { echo "    FALHA efetivo: IPAddressAllow=${sa} na slice ${sl} (herdado, vence o deny da instância)"; nf=$((nf+1)); }
+  done
+  if [ "${FENCE}" = 1 ]; then
+    if python3 -I -c 'import ipaddress,sys; n=lambda x:{str(ipaddress.ip_network(a,strict=False)) for a in x.split()}; sys.exit(0 if n(sys.argv[1])==n(sys.argv[2]) else 1)' \
+         "${fd}" "${FENCE_REQUIRED} ${HOST_ADDRS}" 2>/dev/null; then
+      echo "    OK efetivo: a cerca de rede carregada na instância (IPAddressDeny com as $(wc -w <<<"${FENCE_REQUIRED} ${HOST_ADDRS}") faixas, sem IPAddressAllow)"
+    else echo "    FALHA efetivo: a cerca carregada difere da renderizada (IPAddressDeny=${fd:-vazio})"; nf=$((nf+1)); fi
+    grep -q "^BindReadOnlyPaths=.*${FENCE_RESOLV_SRC}:/etc/resolv.conf" <<<"${out}" \
+      || { echo "    FALHA efetivo: o resolv.conf público não está ligado na instância (o DNS cairia)"; nf=$((nf+1)); }
+  elif [ -n "${fd// /}" ]; then echo "    FALHA efetivo: IPAddressDeny na instância sem a cerca deste wrapper"; nf=$((nf+1)); fi
   for u in onion-chat@verify.service "${SOCKET_UNIT}"; do
     dp="$(systemctl show -p DropInPaths --value "${u}" 2>/dev/null)"
-    # na bancada/dogfood o drop-in de ensaio (50-dogfood*) é declarado; em produção nenhum drop-in é aceito
+    # na bancada/dogfood o drop-in de ensaio (50-dogfood*) é declarado; em produção só a cerca deste wrapper, se instalada
     [ "${TEST}" = 1 ] && dp="$(tr ' ' '\n' <<<"${dp}" | grep -v '/50-dogfood[^/]*$' | paste -sd' ' -)"
+    [ "${FENCE}" = 1 ] && [ "${u}" = onion-chat@verify.service ] && dp="$(tr ' ' '\n' <<<"${dp}" | grep -vxF -- "${FENCE_DIR}/${FENCE_NAME}" | paste -sd' ' -)"
     [ -z "${dp// /}" ] || { echo "    FALHA efetivo: drop-in(s) em ${u}: ${dp}"; nf=$((nf+1)); }
   done
-  [ "${nf}" = 0 ] && echo "    OK efetivo: DynamicUser=yes, User=onion-chat-%i, só o ExecStart do lançador, ProtectHome=yes, sem drop-in"
+  [ "${nf}" = 0 ] && echo "    OK efetivo: DynamicUser=yes, User=onion-chat-%i, só o ExecStart do lançador, ProtectHome=yes, nenhum drop-in alheio"
   [ "${nf}" = 0 ]
 }
 
@@ -412,7 +643,9 @@ runner_identity() {
   su="$(id -u "${SVC_USER}" 2>/dev/null)"
   # o journal chega com atraso: até ~5 s pelas duas linhas
   for _ in 1 2 3 4 5 6 7 8 9 10; do
-    j="$(priv journalctl -t onion-chat --since "@$1" --no-pager -o cat 2>/dev/null)"
+    # o identificador (-t) é forjável por qualquer conta local; a slice (_SYSTEMD_SLICE) é campo CONFIÁVEL, escrito pelo
+    # journald (refutador da cerca, achado 6): só conta linha que veio de uma instância do runner
+    j="$(priv journalctl -t onion-chat "_SYSTEMD_SLICE=${RUNNER_SLICE}" --since "@$1" --no-pager -o cat 2>/dev/null)"
     grep -q 'chat-runner: sessão uid=' <<<"${j}" && grep -q 'chat-runner: RECUSA uid=' <<<"${j}" && break
     sleep 0.5
   done
@@ -446,8 +679,10 @@ verify_all() {
   local nf=0 f dst rc pid dp
   vbad() { echo "FALHA $*"; nf=$((nf + 1)); }
   vok()  { echo "OK $*"; }
-  for f in "${SOCKET_UNIT}:${UNIT_DIR}/${SOCKET_UNIT}" "${TEMPLATE_UNIT}:${UNIT_DIR}/${TEMPLATE_UNIT}" \
-           "launcher.py:${LIBEXEC}/launcher.py" "${DROPIN_NAME}:${DROPIN_DIR}/${DROPIN_NAME}"; do
+  local files=( "${SOCKET_UNIT}:${UNIT_DIR}/${SOCKET_UNIT}" "${TEMPLATE_UNIT}:${UNIT_DIR}/${TEMPLATE_UNIT}" \
+                "launcher.py:${LIBEXEC}/launcher.py" "${DROPIN_NAME}:${DROPIN_DIR}/${DROPIN_NAME}" )
+  [ "${FENCE}" = 1 ] && files+=( "${FENCE_NAME}:${FENCE_DIR}/${FENCE_NAME}" )
+  for f in "${files[@]}"; do
     dst="${f#*:}"
     if ! priv test -f "${dst}"; then vbad "não instalado: ${dst}"; continue; fi
     if priv cmp -s "${TMPD}/${f%%:*}" "${dst}"; then vok "instalado = renderizado do bridge servido: ${dst}"
@@ -465,7 +700,9 @@ verify_all() {
   echo "-- sandbox do template INSTALADO (unit transitória sob UID dinâmico):"
   if priv test -f "${UNIT_DIR}/${TEMPLATE_UNIT}"; then
     priv cat "${UNIT_DIR}/${TEMPLATE_UNIT}" > "${TMPD}/installed.service"
-    run_sandbox_probe "${TMPD}/installed.service" 1 "${LIBEXEC}/launcher.py" || vbad "o sandbox do template instalado reprovou (linhas FALHA acima)"
+    local fence_inst=""
+    if [ "${FENCE}" = 1 ] && priv test -f "${FENCE_DIR}/${FENCE_NAME}"; then priv cat "${FENCE_DIR}/${FENCE_NAME}" > "${TMPD}/installed-fence.conf"; fence_inst="${TMPD}/installed-fence.conf"; fi
+    run_sandbox_probe "${TMPD}/installed.service" 1 "${LIBEXEC}/launcher.py" "${fence_inst}" || vbad "o sandbox do template instalado reprovou (linhas FALHA acima)"
   else vbad "sem template instalado para medir o sandbox"; fi
   effective_props || vbad "as propriedades EFETIVAS das units do runner divergem do exigido (linhas acima)"
   echo "-- pelo socket, como a conta do serviço:"
@@ -498,12 +735,15 @@ done
 priv test -e "${HOME_ROOT}" && { [ "$(priv realpath -m -- "${HOME_ROOT}")" = "${HOME_ROOT}" ] && priv test -d "${HOME_ROOT}" \
   || die 1 "${HOME_ROOT} existe e não é diretório real: recusado"; }
 priv test -x "${CLAUDE_SRC}" || die 1 "o CLI do SDK não está em ${CLAUDE_SRC} (o template o liga por bind)"
+if [ "${FENCE}" = 1 ] && [ "${TEST}" = 0 ]; then
+  priv test -f "${FENCE_RESOLV_SRC}" || die 1 "${FENCE_RESOLV_SRC} ausente: sem ele a cerca corta o DNS (o stub do resolvedor fica fora)"
+fi
 command -v setfacl >/dev/null 2>&1 && command -v getfacl >/dev/null 2>&1 || die 2 "setfacl/getfacl ausentes (pacote acl)"
 [ -x /usr/bin/python3 ] || die 2 "/usr/bin/python3 ausente (o lançador é python)"
 if priv test -e "${SOCKET}" && ! systemctl cat "${SOCKET_UNIT}" >/dev/null 2>&1; then
   die 1 "${SOCKET} já existe e não é do ${SOCKET_UNIT}: recusado"
 fi
-for f in "${UNIT_DIR}/${SOCKET_UNIT}" "${UNIT_DIR}/${TEMPLATE_UNIT}" "${DROPIN_DIR}/${DROPIN_NAME}"; do
+for f in "${UNIT_DIR}/${SOCKET_UNIT}" "${UNIT_DIR}/${TEMPLATE_UNIT}" "${DROPIN_DIR}/${DROPIN_NAME}" "${FENCE_DIR}/${FENCE_NAME}"; do
   if priv test -e "${f}"; then
     [ "$(priv realpath -m -- "${f}")" = "${f}" ] || die 1 "${f} é symlink: recusado"
     priv grep -qxF "${MARKER}" "${f}" || say "AVISO: ${f} já existe e NÃO foi gerado por este wrapper (sem o marcador): vai para o backup antes da troca"
@@ -512,8 +752,12 @@ done
 
 # ── diferença para o instalado ───────────────────────────────────────────────────────────────────────
 changed=0
-for f in "${SOCKET_UNIT}:${UNIT_DIR}/${SOCKET_UNIT}" "${TEMPLATE_UNIT}:${UNIT_DIR}/${TEMPLATE_UNIT}" \
-         "launcher.py:${LIBEXEC}/launcher.py" "${DROPIN_NAME}:${DROPIN_DIR}/${DROPIN_NAME}"; do
+targets=( "${SOCKET_UNIT}:${UNIT_DIR}/${SOCKET_UNIT}" "${TEMPLATE_UNIT}:${UNIT_DIR}/${TEMPLATE_UNIT}" \
+          "launcher.py:${LIBEXEC}/launcher.py" "${DROPIN_NAME}:${DROPIN_DIR}/${DROPIN_NAME}" )
+[ "${FENCE}" = 1 ] && targets+=( "${FENCE_NAME}:${FENCE_DIR}/${FENCE_NAME}" )
+[ "${FENCE}" = 1 ] && [ "${EGRESS}" = 0 ] && say "a cerca de rede já está instalada: segue no lugar e é provada (para tirá-la, a linha de reversão no fim)"
+[ "${FENCE}" = 0 ] && say "cerca de rede DESLIGADA (padrão): o runner segue sem IPAddressDeny; install --egress-fence a liga"
+for f in "${targets[@]}"; do
   dst="${f#*:}"
   if priv test -f "${dst}"; then
     if priv cmp -s "${TMPD}/${f%%:*}" "${dst}"; then say "igual ao instalado: ${dst}"
@@ -537,12 +781,13 @@ fi
 
 # ── ensaio: unit TRANSITÓRIA com o sandbox do template renderizado ───────────────────────────────────
 say "ensaio numa unit transitória (systemd-run --collect, nada persistente) com o sandbox do template renderizado:"
-if ! run_sandbox_probe "${TMPD}/${TEMPLATE_UNIT}" "${group_ok}" "${TMPD}/launcher.py"; then
+fence_r=""; [ "${FENCE}" = 1 ] && fence_r="${TMPD}/${FENCE_NAME}"
+if ! run_sandbox_probe "${TMPD}/${TEMPLATE_UNIT}" "${group_ok}" "${TMPD}/launcher.py" "${fence_r}"; then
   say "o ENSAIO reprovou: nada foi escrito. Leia as linhas FALHA acima."; exit 1
 fi
 if [ "${APPLY}" = 0 ]; then
   say "ENSAIO OK: nada foi escrito. Para instalar, repita com --apply (cria o grupo ${GROUP}, ACLs em ${STATE}, as units e o drop-in, e reinicia ${UNIT})."
-  say "o --apply exige root (sudo) e é do maestro:  ! bash ops/chat-runner.sh install --apply"
+  say "o --apply exige root (sudo) e é do maestro:  ! bash ops/chat-runner.sh install --apply$([ "${EGRESS}" = 1 ] && echo ' --egress-fence')"
   exit 0
 fi
 
@@ -554,11 +799,11 @@ BK="${BACKUP_DIR}/${TS}"
 priv install -d -m 0700 "${BACKUP_DIR}" "${BK}" || die 2 "não criei o diretório de backup ${BK}"
 # as ACLs de hoje do estado inteiro: o rollback é setfacl --restore deste arquivo
 priv sh -c 'getfacl -R -P -p "$1" > "$2"' _ "${STATE}" "${BK}/acl-state.txt" || die 2 "backup das ACLs falhou: sem rede de segurança não se troca"
-for f in "${UNIT_DIR}/${SOCKET_UNIT}" "${UNIT_DIR}/${TEMPLATE_UNIT}" "${LIBEXEC}/launcher.py" "${DROPIN_DIR}/${DROPIN_NAME}"; do
+for f in "${UNIT_DIR}/${SOCKET_UNIT}" "${UNIT_DIR}/${TEMPLATE_UNIT}" "${LIBEXEC}/launcher.py" "${DROPIN_DIR}/${DROPIN_NAME}" "${FENCE_DIR}/${FENCE_NAME}"; do
   if priv test -f "${f}"; then priv install -m 0600 "${f}" "${BK}/$(basename "${f}")" || die 2 "backup de ${f} falhou"; fi
 done
 say "backup em ${BK} (ACLs do estado + o que havia instalado)"
-created_group=0; created_home=0; installed_dropin=0
+created_group=0; created_home=0; installed_dropin=0; installed_fence=0
 
 rollback() {
   echo "[${NAME}] ─── ROLLBACK MANUAL (do maestro, fora da sessão: \`!\` no prompt) ───" >&2
@@ -568,6 +813,10 @@ rollback() {
   sudo systemctl daemon-reload && sudo systemctl reset-failed ${UNIT} && sudo systemctl restart ${UNIT}
   curl -fsS ${HEALTH_LOCAL}
 EOF
+  fi
+  if [ "${installed_fence}" = 1 ] || [ "${FENCE}" = 1 ]; then
+    if [ -f "${BK}/${FENCE_NAME}" ]; then echo "  sudo install -m 0644 ${BK}/${FENCE_NAME} ${FENCE_DIR}/${FENCE_NAME}   # volta a cerca anterior" >&2
+    else echo "  sudo rm -f ${FENCE_DIR}/${FENCE_NAME} && sudo rmdir --ignore-fail-on-non-empty ${FENCE_DIR}   # tira a cerca de rede" >&2; fi
   fi
   echo "  sudo systemctl disable --now ${SOCKET_UNIT}" >&2
   local f
@@ -627,6 +876,12 @@ priv install "${own[@]}" -d -m 0755 "${LIBEXEC}" || fail_after "não criei ${LIB
 priv install "${own[@]}" -m 0644 "${TMPD}/launcher.py" "${LIBEXEC}/launcher.py" || fail_after "não instalei o lançador"
 priv install "${own[@]}" -m 0644 "${TMPD}/${SOCKET_UNIT}" "${UNIT_DIR}/${SOCKET_UNIT}" || fail_after "não instalei ${SOCKET_UNIT}"
 priv install "${own[@]}" -m 0644 "${TMPD}/${TEMPLATE_UNIT}" "${UNIT_DIR}/${TEMPLATE_UNIT}" || fail_after "não instalei ${TEMPLATE_UNIT}"
+# a cerca ANTES do aperto de mão: a instância que responde abaixo já nasce dentro dela
+if [ "${FENCE}" = 1 ]; then
+  priv install "${own[@]}" -d -m 0755 "${FENCE_DIR}" || fail_after "não criei ${FENCE_DIR}"
+  priv install "${own[@]}" -m 0644 "${TMPD}/${FENCE_NAME}" "${FENCE_DIR}/${FENCE_NAME}" || fail_after "não instalei a cerca ${FENCE_NAME}"
+  installed_fence=1; say "cerca de rede instalada: ${FENCE_DIR}/${FENCE_NAME}"
+fi
 priv systemctl daemon-reload || fail_after "daemon-reload falhou"
 priv systemctl enable "${SOCKET_UNIT}" >/dev/null 2>&1 || fail_after "enable ${SOCKET_UNIT} falhou"
 priv systemctl restart "${SOCKET_UNIT}" || fail_after "restart ${SOCKET_UNIT} falhou"
@@ -661,6 +916,6 @@ grep -q "auth: enforce" <<<"${BOOT}" || fail_after "boot desta invocação sem '
 grep -q "chat-runner: LIGADO" <<<"${BOOT}" || fail_after "boot desta invocação sem 'chat-runner: LIGADO' (o bridge servido não tem o runner?)"
 grep -q "chat-runner LIGADO sem ANTHROPIC_API_KEY" <<<"${BOOT}" && fail_after "o bridge ligou o runner SEM chave da API: o /chat de convidado falharia"
 verify_all || fail_after "o verify reprovou depois do restart"
-say "OK — runner instalado e ligado (bridge ${BRIDGE_HEAD}, invocação ${INV:0:8}); o /chat de CONVIDADO roda sob UID próprio"
+say "OK — runner instalado e ligado (bridge ${BRIDGE_HEAD}, invocação ${INV:0:8}); o /chat de CONVIDADO roda sob UID próprio$([ "${FENCE}" = 1 ] && echo ', dentro da cerca de rede')"
 rollback 2>&1 | sed 's/^/  (se precisar) /'
 exit 0

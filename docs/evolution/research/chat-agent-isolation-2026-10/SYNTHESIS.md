@@ -19,7 +19,19 @@ As sessões de /chat, de admin e de convidados, rodam o agente de código (Agent
 de jti) e dos segredos do serviço (`.env` com o M2M do Logto, `.git-credentials` com o PAT). Como isolar,
 e o que serve ao ecossistema Onion?
 
-## Decisão ABERTA: o degrau 3 sem objeto no convidado (`D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016`)
+## Degrau 3: selado «Parquear + fechar a rede» e a cerca construída
+
+O maestro escolheu a **opção A** em 2026-10-16 (`D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016`). A cerca de rede do runner
+está construída (`E_CERCA_DE_REDE_CONSTRUIDA_1016`): o modelo vive no bridge e a instalação é `install --egress-fence`
+no wrapper, **desligada por padrão**. A cerca nega o loopback, o link-local, as faixas privadas e os endereços do
+próprio host medidos na instalação, **sem nenhum IPAddressAllow**: o furo no stub do resolvedor, do spike, abria toda
+porta em 0.0.0.0, e o refutador o derrubou. O DNS vai direto aos resolvedores públicos. O verify prova a cerca no efetivo
+da instância e nas slices-mãe, numa unit transitória com a cerca instalada (TCP barrado onde a perna de controle o vê
+aberto, DNS e TLS com a API seguem) e no aperto de mão pelo socket. O CLI real sob a cerca chegou à API (401 com chave
+inválida). Teto: a cerca é de IP, e o AF_UNIX segue aberto.
+Faltam o deploy do bridge, o merge e o `--apply`.
+
+### A medição que levou ao selo
 
 Antes de construir o degrau 3, esta rodada mediu o que ele ainda protegeria com os degraus 0 e 2 de pé
 (`E_DEGRAU3_OBJETO_MEDIDO_1016`). **Nada no convidado.** Pela doc atual, o sandbox nativo cobre só Bash,
@@ -71,7 +83,7 @@ os degraus 1–3 esperam as provas virarem evidência.
 | **0** | Convidado sem Bash; deny Edit/Write no home do onion fora do workspace **e** no `.claude/` e `CLAUDE.md` do próprio workspace (`E_OBJECAO_32_WORKSPACE_CLAUDE_DIR_WRITABLE`) | nada de root | **decidido (aplicar já)** |
 | **1** | systemd reescrito, **só integridade**: sem `EnvironmentFile=` (o segredo iria para o environ legível pelo mesmo UID, `E_OBJECAO_01`), `ReadOnlyPaths=` no código do bridge, `.claude` do home, dotfiles, JWKS e `members.yaml`; `InaccessiblePaths=` no `.ssh` e no `.git-credentials` depois de medir o uso | root uma vez; medir as escritas de um chat real antes do restart | **decidido; ensaiado** (`E_DEGRAU1_INTEGRITY_DROPIN_ENSAIO_1016`), a aplicar pelo wrapper |
 | **2** | UID separado por sessão (template `onion-chat@` com `DynamicUser=`), plugado pela costura `spawnClaudeCodeProcess`; a troca de UID é do **chamador** (`E_SDK_SPAWNOPTIONS_HAS_NO_UID`), e o bridge não consegue trocá-la (`E_OBJECAO_27`): lançador ativado por socket, instalado pelo root | root; dogfood do wrapper | **em produção** (`E_DEGRAU2_EM_PRODUCAO_1016`); falta medir um turno real de convidado com a API |
-| **3** | sandbox nativo como defesa em profundidade, só com perfil AppArmor numa **cópia privada** do bwrap (`E_OBJECAO_30`: o perfil no bwrap do sistema libera userns às 6 contas), `failIfUnavailable` explícito no nível de política e `allowUnsandboxedCommands:false` | root; política | **sem objeto no convidado** (`E_DEGRAU3_OBJETO_MEDIDO_1016`); decisão aberta (`D_DEGRAU3_SEM_OBJETO_NO_CONVIDADO_1016`) |
+| **3** | sandbox nativo como defesa em profundidade, só com perfil AppArmor numa **cópia privada** do bwrap (`E_OBJECAO_30`: o perfil no bwrap do sistema libera userns às 6 contas), `failIfUnavailable` explícito no nível de política e `allowUnsandboxedCommands:false` | root; política | **sem objeto no convidado** (`E_DEGRAU3_OBJETO_MEDIDO_1016`); parqueado com gatilho, e a cerca de rede no lugar dele (`E_CERCA_DE_REDE_CONSTRUIDA_1016`) |
 | 4 | microVM/container por sessão | KVM (ausente nesta VPS) | fora desta VPS; opcional por adotante |
 | 5 | broker estreito (proxy da `ANTHROPIC_API_KEY`, git atrás de ferramenta) **sobre** o degrau 2 | o degrau 2 | aguarda |
 
